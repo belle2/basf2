@@ -1,19 +1,18 @@
 
 # define directories
-export EXTDIR := $(MAKEDIR)/externals
+export EXTDIR :=  $(shell pwd)
 export EXTINCDIR := $(EXTDIR)/include
-export EXTLIBDIR := $(EXTDIR)/lib/$(ARCH)
-export EXTBINDIR := $(EXTDIR)/bin/$(ARCH)
+export EXTLIBDIR := $(EXTDIR)/lib/$(BELLE2_SUBDIR)
+export EXTBINDIR := $(EXTDIR)/bin/$(BELLE2_SUBDIR)
 
 
 # all target
-all: boost astyle clhep geant4 root scons
+all: boost clhep geant4 root
 
 # clean up target
 clean:
 	@cd root; make clean
 	@cd boost; ./bjam --clean
-	@cd astyle/build/gcc; make clean
 
 # directory creation
 $(EXTINCDIR):
@@ -29,30 +28,12 @@ $(EXTBINDIR):
 	@mkdir -p $(EXTBINDIR)
 
 
-# dependence for root build
-root: root/config/Makefile.config
-
-# root build command
-root/config/Makefile.config:
-	@cd root; ./configure --incdir=$(EXTINCDIR)/root --libdir=$(EXTLIBDIR) --bindir=$(EXTBINDIR) \
-	--prefix=$(EXTDIR) --etcdir=$(EXTDIR)/share/etc --enable-gsl-shared \
-	--with-g4-incdir=$(EXTINCDIR)/geant4 --with-g4-libdir=$(EXTLIBDIR) \
-	--with-clhep-incdir=$(EXTINCDIR); make; make install
-
 # dependence for boost build
 boost: boost/project-config.jam
 
 # boost build command
 boost/project-config.jam:
 	@cd boost; ./bootstrap.sh --includedir=$(EXTINCDIR) --libdir=$(EXTLIBDIR); ./bjam install
-
-# dependence for astyle build
-astyle: astyle/build/gcc/bin/astyle
-
-# astyle build command
-astyle/build/gcc/bin/astyle: $(EXTBINDIR)
-	@cd astyle/build/gcc; make
-	@cp astyle/build/gcc/bin/astyle $(EXTBINDIR)
 
 # dependence for CLHEP build
 clhep: CLHEP/config.log
@@ -94,12 +75,12 @@ geant4/env.sh: CLHEP/config.log geant4/Configure
 	@cp -a $(EXTDIR)/geant4/lib/*/* $(EXTLIBDIR)
 
 
-# dependency for scons build
-scons: scons/build
+# dependence for root build
+root: root/config/Makefile.config
 
-# scons build command
-scons/build:
-	@cd scons; python bootstrap.py build/scons; \
-	cd build/scons; python setup.py install --no-version-script \
-	--install-scripts=$(EXTBINDIR) --install-data=$(EXTDIR)/share --install-lib=$(EXTLIBDIR)
-
+# root build command
+root/config/Makefile.config:
+	@cd root; ./configure --incdir=$(EXTINCDIR)/root --libdir=$(EXTLIBDIR) --bindir=$(EXTBINDIR) \
+	--prefix=$(EXTDIR) --etcdir=$(EXTDIR)/share/etc --enable-gsl-shared \
+	--with-g4-incdir=$(EXTINCDIR)/geant4 --with-g4-libdir=$(EXTLIBDIR) \
+	--with-clhep-incdir=$(EXTINCDIR); make; make install

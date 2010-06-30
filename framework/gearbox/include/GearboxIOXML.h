@@ -13,8 +13,8 @@
 
 #include <libxml/xpath.h>
 
-#include <gearbox/GbxExceptions.h>
-#include <gearbox/GearboxIOAbs.h>
+#include <framework/gearbox/GbxExceptions.h>
+#include <framework/gearbox/GearboxIOAbs.h>
 
 #include <string>
 #include <map>

@@ -14,9 +14,9 @@
 #include <boost/python.hpp>
 #include <boost/python/exception_translator.hpp>
 
-#include <gearbox/GearboxIOAbs.h>
-#include <gearbox/GearDir.h>
-#include <gearbox/GbxExceptions.h>
+#include <framework/gearbox/GearboxIOAbs.h>
+#include <framework/gearbox/GearDir.h>
+#include <framework/gearbox/GbxExceptions.h>
 
 #include <string>
 

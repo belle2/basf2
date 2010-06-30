@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <datastore/EventMetaData.h>
+#include <framework/datastore/EventMetaData.h>
 
 using namespace std;
 using namespace Belle2;

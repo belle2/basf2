@@ -8,12 +8,12 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "../evtmetagen/EvtMetaGen.h"
+#include "framework/modules/evtmetagen/EvtMetaGen.h"
 
-#include <fwcore/ModuleManager.h>
-#include <datastore/StoreObjPtr.h>
-#include <datastore/StoreDefs.h>
-#include <datastore/EventMetaData.h>
+#include <framework/fwcore/ModuleManager.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/datastore/StoreDefs.h>
+#include <framework/datastore/EventMetaData.h>
 
 using namespace std;
 using namespace Belle2;

@@ -8,13 +8,13 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <../geobuilder/GeoSaver.h>
+#include <framework/modules/geobuilder/GeoSaver.h>
 
-#include <fwcore/ModuleManager.h>
+#include <framework/fwcore/ModuleManager.h>
 
-#include <gearbox/Gearbox.h>
-#include <gearbox/GearboxIOXML.h>
-#include <geodetector/GeoDetector.h>
+#include <framework/gearbox/Gearbox.h>
+#include <framework/gearbox/GearboxIOXML.h>
+#include <framework/geodetector/GeoDetector.h>
 
 using namespace std;
 using namespace Belle2;

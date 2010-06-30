@@ -19,8 +19,8 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/python/list.hpp>
 
-#include <fwcore/Module.h>
-#include <fwcore/ModuleList.h>
+#include <framework/fwcore/Module.h>
+#include <framework/fwcore/ModuleList.h>
 
 namespace Belle2 {
 

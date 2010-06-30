@@ -11,7 +11,7 @@
 #ifndef EVTMETAINFO_H_
 #define EVTMETAINFO_H_
 
-#include <fwcore/Module.h>
+#include <framework/fwcore/Module.h>
 #include <vector>
 
 

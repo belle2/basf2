@@ -12,7 +12,7 @@
 
 #include <TRef.h>
 #include <TObject.h>
-#include <logging/Logger.h>
+#include <framework/logging/Logger.h>
 
 namespace Belle2 {
 

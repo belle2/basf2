@@ -8,15 +8,15 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <fwcore/Framework.h>
-#include <fwcore/ModuleManager.h>
-#include <logging/Logger.h>
-#include <logging/LogConnectionIOStream.h>
-#include <logging/LogConnectionTxtFile.h>
+#include <framework/fwcore/Framework.h>
+#include <framework/fwcore/ModuleManager.h>
+#include <framework/logging/Logger.h>
+#include <framework/logging/LogConnectionIOStream.h>
+#include <framework/logging/LogConnectionTxtFile.h>
 
-#include <datastore/StoreObjPtr.h>
-#include <datastore/StoreDefs.h>
-#include <datastore/EventMetaData.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/datastore/StoreDefs.h>
+#include <framework/datastore/EventMetaData.h>
 
 
 using namespace std;

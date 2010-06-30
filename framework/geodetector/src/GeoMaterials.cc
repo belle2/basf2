@@ -8,9 +8,9 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <geodetector/GeoMaterials.h>
-#include <gearbox/GearDir.h>
-#include <datastore/Units.h>
+#include <framework/geodetector/GeoMaterials.h>
+#include <framework/gearbox/GearDir.h>
+#include <framework/datastore/Units.h>
 
 #include <cmath>
 #include <boost/format.hpp>

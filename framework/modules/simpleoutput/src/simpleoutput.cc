@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <../simpleoutput/simpleoutput.h>
+#include <framework/modules/simpleoutput/simpleoutput.h>
 
 using namespace std;
 using namespace Belle2;

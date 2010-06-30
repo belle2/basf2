@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <kbasf2/kbasf2pymodule.h>
+#include <framework/kbasf2/kbasf2pymodule.h>
 
 using namespace Belle2;
 using namespace boost::python;

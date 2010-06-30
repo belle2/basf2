@@ -11,8 +11,8 @@
 #ifndef GEARDIR_H_
 #define GEARDIR_H_
 
-#include <gearbox/GearboxIOAbs.h>
-#include <gearbox/GbxExceptions.h>
+#include <framework/gearbox/GearboxIOAbs.h>
+#include <framework/gearbox/GbxExceptions.h>
 
 #include <string>
 

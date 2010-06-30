@@ -11,10 +11,10 @@
 #ifndef GEODETECTOR_H_
 #define GEODETECTOR_H_
 
-#include <gearbox/GearboxIOAbs.h>
-#include <geodetector/SensitiveDetDBItem.h>
-#include <geodetector/CreatorBase.h>
-#include <geodetector/GDetExceptions.h>
+#include <framework/gearbox/GearboxIOAbs.h>
+#include <framework/geodetector/SensitiveDetDBItem.h>
+#include <framework/geodetector/CreatorBase.h>
+#include <framework/geodetector/GDetExceptions.h>
 
 #include <TGeoVolume.h>
 

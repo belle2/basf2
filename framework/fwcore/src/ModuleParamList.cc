@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <fwcore/ModuleParamList.h>
+#include <framework/fwcore/ModuleParamList.h>
 
 using namespace std;
 using namespace Belle2;

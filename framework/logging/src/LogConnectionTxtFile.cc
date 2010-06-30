@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <logging/LogConnectionTxtFile.h>
+#include <framework/logging/LogConnectionTxtFile.h>
 
 using namespace Belle2;
 using namespace std;

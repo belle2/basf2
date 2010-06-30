@@ -11,8 +11,8 @@
 #ifndef LOGCONNECTIONIOSTREAM_H_
 #define LOGCONNECTIONIOSTREAM_H_
 
-#include <logging/LogCommon.h>
-#include <logging/LogConnectionAbs.h>
+#include <framework/logging/LogCommon.h>
+#include <framework/logging/LogConnectionAbs.h>
 
 #include <string>
 #include <iostream>

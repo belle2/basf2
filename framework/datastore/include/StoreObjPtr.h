@@ -11,9 +11,9 @@
 #ifndef STOREOBJPTR_H
 #define STOREOBJPTR_H
 
-#include <datastore/DataStore.h>
-#include <datastore/StoreDefs.h>
-#include <logging/Logger.h>
+#include <framework/datastore/DataStore.h>
+#include <framework/datastore/StoreDefs.h>
+#include <framework/logging/Logger.h>
 
 namespace Belle2 {
   //! Type save access pointer.

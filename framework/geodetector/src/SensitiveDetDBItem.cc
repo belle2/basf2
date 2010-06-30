@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <geodetector/SensitiveDetDBItem.h>
-#include <logging/Logger.h>
+#include <framework/geodetector/SensitiveDetDBItem.h>
+#include <framework/logging/Logger.h>
 
 using namespace std;
 using namespace Belle2;

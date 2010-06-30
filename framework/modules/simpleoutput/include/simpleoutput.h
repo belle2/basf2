@@ -11,18 +11,18 @@
 #ifndef MODULESIMPLEOUTPUT_H
 #define MODULESIMPLEOUTPUT_H
 
-#include <fwcore/Module.h>
-#include <fwcore/ModuleManager.h>
+#include <framework/fwcore/Module.h>
+#include <framework/fwcore/ModuleManager.h>
 #include <boost/shared_ptr.hpp>
 #include <string>
 #include <vector>
 #include <iostream>
 #include <algorithm>
 
-#include <datastore/StoreObjPtr.h>
-#include <datastore/DataStore.h>
-#include <datastore/StoreDefs.h>
-#include <datastore/StoreMapIter.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/datastore/DataStore.h>
+#include <framework/datastore/StoreDefs.h>
+#include <framework/datastore/StoreMapIter.h>
 
 #include <TFile.h>
 #include <TTree.h>

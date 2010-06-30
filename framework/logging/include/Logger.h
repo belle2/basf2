@@ -11,9 +11,9 @@
 #ifndef LOGGER_H
 #define LOGGER_H
 
-#include <logging/LogCommon.h>
-#include <logging/LogSystem.h>
-#include <logging/LogMethod.h>
+#include <framework/logging/LogCommon.h>
+#include <framework/logging/LogSystem.h>
+#include <framework/logging/LogMethod.h>
 
 #include <string>
 #include <iostream>

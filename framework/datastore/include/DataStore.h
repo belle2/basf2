@@ -11,9 +11,9 @@
 #ifndef DATASTORE_H
 #define DATASTORE_H
 
-#include <logging/Logger.h>
-#include <datastore/StoreDefs.h>
-#include <datastore/StoreMapIter.h>
+#include <framework/logging/Logger.h>
+#include <framework/datastore/StoreDefs.h>
+#include <framework/datastore/StoreMapIter.h>
 
 #include <TObject.h>
 #include <TClonesArray.h>

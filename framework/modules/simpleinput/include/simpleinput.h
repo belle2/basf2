@@ -11,14 +11,14 @@
 #ifndef MODULESIMPLEINPUT_H
 #define MODULESIMPLEINPUT_H
 
-#include <fwcore/Module.h>
-#include <fwcore/ModuleManager.h>
+#include <framework/fwcore/Module.h>
+#include <framework/fwcore/ModuleManager.h>
 #include <boost/shared_ptr.hpp>
 #include <string>
 #include <vector>
 
-#include <datastore/DataStore.h>
-#include <datastore/StoreDefs.h>
+#include <framework/datastore/DataStore.h>
+#include <framework/datastore/StoreDefs.h>
 
 #include <TFile.h>
 #include <TTree.h>

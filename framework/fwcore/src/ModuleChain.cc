@@ -8,12 +8,12 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <fwcore/ModuleChain.h>
-#include <fwcore/ModuleManager.h>
-#include <logging/LogSystem.h>
+#include <framework/fwcore/ModuleChain.h>
+#include <framework/fwcore/ModuleManager.h>
+#include <framework/logging/LogSystem.h>
 
-#include <datastore/DataStore.h>
-#include <datastore/StoreDefs.h>
+#include <framework/datastore/DataStore.h>
+#include <framework/datastore/StoreDefs.h>
 
 using namespace std;
 using namespace Belle2;

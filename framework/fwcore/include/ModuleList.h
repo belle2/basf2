@@ -11,8 +11,8 @@
 #ifndef MODULELIST_H_
 #define MODULELIST_H_
 
-#include <fwcore/Module.h>
-#include <fwcore/FwExceptions.h>
+#include <framework/fwcore/Module.h>
+#include <framework/fwcore/FwExceptions.h>
 
 #include <list>
 

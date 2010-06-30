@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <logging/LogSystem.h>
+#include <framework/logging/LogSystem.h>
 
 #include <stdio.h>
 #include <stdlib.h>

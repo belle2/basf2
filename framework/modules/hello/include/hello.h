@@ -4,7 +4,7 @@
 #ifndef MODULEHELLO_H
 #define MODULEHELLO_H
 
-#include <fwcore/Module.h>
+#include <framework/fwcore/Module.h>
 #include <boost/shared_ptr.hpp>
 #include <boost/format.hpp>
 
@@ -12,13 +12,13 @@
 #include <vector>
 #include <TRandom3.h>
 
-#include <datastore/StoreDefs.h>
-#include <datastore/StoreObjPtr.h>
-#include <datastore/StoreArray.h>
-#include <datastore/DataStore.h>
-#include <datastore/SimpleVec.h>
-#include <datastore/Relation.h>
-#include <datastore/EventMetaData.h>
+#include <framework/datastore/StoreDefs.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/datastore/StoreArray.h>
+#include <framework/datastore/DataStore.h>
+#include <framework/datastore/SimpleVec.h>
+#include <framework/datastore/Relation.h>
+#include <framework/datastore/EventMetaData.h>
 
 
 

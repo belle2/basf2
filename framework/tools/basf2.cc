@@ -32,10 +32,10 @@
 
 #include <boost/python.hpp> //Has to be the first include (restriction due to python)
 
-#include <kbasf2/kbasf2pymodule.h>
-#include <fwcore/Framework.h>
-#include <fwcore/FwExceptions.h>
-#include <logging/Logger.h>
+#include <framework/kbasf2/kbasf2pymodule.h>
+#include <framework/fwcore/Framework.h>
+#include <framework/fwcore/FwExceptions.h>
+#include <framework/logging/Logger.h>
 
 #include <boost/program_options.hpp>
 #include <boost/filesystem.hpp>
@@ -91,21 +91,16 @@ int main(int argc, char* argv[])
     return 1;
   }
 
-  //Get architecture string
-  struct utsname uts;
-
-  if (uname(&uts) < 0) {
-    ERROR("Could not retrieve the system architecture.")
+  char* belle2SubDir = getenv("BELLE2_SUBDIR");
+  if (belle2LocalDir == NULL) {
+    ERROR("The environment variable BELLE2_SUBDIR is not set. Please execute the 'setuprel' script first.")
     return 1;
   }
 
-  string archString = string(uts.sysname) + "_" + string(uts.machine);
-
   //Get the lib path
   boost::filesystem::path libPath(belle2LocalDir);
-  libPath /= "prototype";
   libPath /= "lib";
-  libPath /=  archString;
+  libPath /=  belle2SubDir;
 
   bool runInteractiveMode = true;
 

@@ -16,9 +16,9 @@
 #include <boost/python/list.hpp>
 #include <boost/python/dict.hpp>
 
-#include <fwcore/CondParser.h>
-#include <fwcore/ModuleParamList.h>
-#include <logging/Logger.h>
+#include <framework/fwcore/CondParser.h>
+#include <framework/fwcore/ModuleParamList.h>
+#include <framework/logging/Logger.h>
 
 #include <vector>
 #include <list>

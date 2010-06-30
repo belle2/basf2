@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <fwcore/Path.h>
-#include <logging/Logger.h>
+#include <framework/fwcore/Path.h>
+#include <framework/logging/Logger.h>
 
 #include <boost/python/register_ptr_to_python.hpp>
 

@@ -11,7 +11,7 @@
 #ifndef GEOSAVER_H_
 #define GEOSAVER_H_
 
-#include <fwcore/Module.h>
+#include <framework/fwcore/Module.h>
 
 #include <string>
 

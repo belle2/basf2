@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <gearbox/GearboxIOXML.h>
-#include <datastore/Units.h>
+#include <framework/gearbox/GearboxIOXML.h>
+#include <framework/datastore/Units.h>
 
 #include <cmath>
 #include <string>

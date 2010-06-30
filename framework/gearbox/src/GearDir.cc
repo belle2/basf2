@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <gearbox/Gearbox.h>
-#include <gearbox/GearDir.h>
+#include <framework/gearbox/Gearbox.h>
+#include <framework/gearbox/GearDir.h>
 
 using namespace std;
 using namespace Belle2;

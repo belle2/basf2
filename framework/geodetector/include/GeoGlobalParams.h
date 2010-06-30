@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <geodetector/CreatorBase.h>
+#include <framework/geodetector/CreatorBase.h>
 
 #ifndef GEOGLOBALPARAMS_H_
 #define GEOGLOBALPARAMS_H_

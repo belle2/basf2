@@ -11,8 +11,8 @@
 #ifndef LOGCONNECTIONTXTFILE_H_
 #define LOGCONNECTIONTXTFILE_H_
 
-#include <logging/LogCommon.h>
-#include <logging/LogConnectionAbs.h>
+#include <framework/logging/LogCommon.h>
+#include <framework/logging/LogConnectionAbs.h>
 
 #include <string>
 #include <iostream>

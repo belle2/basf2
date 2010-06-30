@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <datastore/DataStore.h>
-#include <logging/Logger.h>
+#include <framework/datastore/DataStore.h>
+#include <framework/logging/Logger.h>
 
 DataStore* DataStore::m_instance = 0;
 

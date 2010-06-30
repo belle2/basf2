@@ -15,7 +15,7 @@
 #include <map>
 #include <list>
 
-#include <geodetector/GDetExceptions.h>
+#include <framework/geodetector/GDetExceptions.h>
 
 namespace Belle2 {
 

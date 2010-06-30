@@ -11,7 +11,7 @@
 #ifndef LOGCONNECTIONABS_H_
 #define LOGCONNECTIONABS_H_
 
-#include <logging/LogCommon.h>
+#include <framework/logging/LogCommon.h>
 
 #include <string>
 

@@ -12,8 +12,8 @@
 #define STOREARRAY_H
 
 #include "TClonesArray.h"
-#include "datastore/DataStore.h"
-#include "datastore/StoreDefs.h"
+#include "framework/datastore/DataStore.h"
+#include "framework/datastore/StoreDefs.h"
 
 namespace Belle2 {
 

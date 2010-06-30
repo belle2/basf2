@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <geodetector/CreatorManager.h>
-#include <geodetector/CreatorBase.h>
+#include <framework/geodetector/CreatorManager.h>
+#include <framework/geodetector/CreatorBase.h>
 
 using namespace std;
 using namespace Belle2;

@@ -11,7 +11,7 @@
 #ifndef GEARBOXIOABS_H_
 #define GEARBOXIOABS_H_
 
-#include <gearbox/GbxExceptions.h>
+#include <framework/gearbox/GbxExceptions.h>
 
 #include <string>
 

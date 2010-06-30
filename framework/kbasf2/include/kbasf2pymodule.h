@@ -13,12 +13,12 @@
 
 #include <boost/python.hpp>
 
-#include <fwcore/Module.h>
-#include <fwcore/Path.h>
-#include <fwcore/Framework.h>
-#include <fwcore/ModuleParamList.h>
+#include <framework/fwcore/Module.h>
+#include <framework/fwcore/Path.h>
+#include <framework/fwcore/Framework.h>
+#include <framework/fwcore/ModuleParamList.h>
 
-#include <gearbox/Gearbox.h>
+#include <framework/gearbox/Gearbox.h>
 
 namespace Belle2 {
 

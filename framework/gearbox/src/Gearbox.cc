@@ -8,9 +8,9 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <gearbox/Gearbox.h>
-#include <gearbox/GearboxIOXML.h>
-#include <logging/Logger.h>
+#include <framework/gearbox/Gearbox.h>
+#include <framework/gearbox/GearboxIOXML.h>
+#include <framework/logging/Logger.h>
 
 #include <boost/filesystem.hpp>
 

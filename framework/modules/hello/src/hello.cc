@@ -1,11 +1,11 @@
 // This is a template module for the basf2 framework
 // it contains a class that should be derived from some basf2 module base class
 
-#include <../hello/hello.h>
-#include <fwcore/ModuleManager.h>
+#include <framework/modules/hello/hello.h>
+#include <framework/fwcore/ModuleManager.h>
 
-#include <gearbox/Gearbox.h>
-#include <gearbox/GearDir.h>
+#include <framework/gearbox/Gearbox.h>
+#include <framework/gearbox/GearDir.h>
 
 #include <iostream>
 

@@ -6,15 +6,15 @@
 #pragma link C++ nestedclasses;
 
 
-#pragma link C++ class Relation;
-#pragma link C++ class RelationArray;
+#pragma link C++ class Belle2::Relation;
+#pragma link C++ class Belle2::RelationArray;
 
-#pragma link C++ class SimpleVec<int>;
-#pragma link C++ class SimpleVec<double>;
-#pragma link C++ class SimpleVec<float>;
-#pragma link C++ class SimpleVec<char>;
+#pragma link C++ class Belle2::SimpleVec<int>;
+#pragma link C++ class Belle2::SimpleVec<double>;
+#pragma link C++ class Belle2::SimpleVec<float>;
+#pragma link C++ class Belle2::SimpleVec<char>;
 
-#pragma link C++ class EventMetaData;
+#pragma link C++ class Belle2::EventMetaData;
 
 
 

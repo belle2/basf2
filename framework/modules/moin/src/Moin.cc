@@ -1,11 +1,11 @@
 // This is a template module for the basf2 framework
 // it contains a class that should be derived from some basf2 module base class
 
-#include <../moin/Moin.h>
-#include <fwcore/ModuleManager.h>
+#include <framework/modules/moin/Moin.h>
+#include <framework/fwcore/ModuleManager.h>
 
-#include <gearbox/Gearbox.h>
-#include <gearbox/GearDir.h>
+#include <framework/gearbox/Gearbox.h>
+#include <framework/gearbox/GearDir.h>
 
 #include <iostream>
 
@@ -52,11 +52,11 @@ void ModuleMoin::event()
   vector<int> vec = Vec->getVector();
   INFO("vec[0] is " << vec[0]);
 
-  StoreArray<HitCDC> CDCArray("HitCDCArray");
-  outputstream << CDCArray.GetEntries() << endl;
-  for (int ii = 0; ii < CDCArray.GetEntries(); ii++) {
-    outputstream << "CDC: " << CDCArray[ii]->getLayerId() << " " << CDCArray[ii]->getWireId() << " " <<  CDCArray[ii]->getTime()  << endl;
-  }
+//  StoreArray<HitCDC> CDCArray("HitCDCArray");
+//  outputstream << CDCArray.GetEntries() << endl;
+//  for (int ii = 0; ii < CDCArray.GetEntries(); ii++) {
+//    outputstream << "CDC: " << CDCArray[ii]->getLayerId() << " " << CDCArray[ii]->getWireId() << " " <<  CDCArray[ii]->getTime()  << endl;
+//  }
 
 
   outputstream << "\n#Next event!#" << endl;

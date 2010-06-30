@@ -4,7 +4,7 @@
 #ifndef MODULEMOIN_H
 #define MODULEMOIN_H
 
-#include <fwcore/Module.h>
+#include <framework/fwcore/Module.h>
 #include <boost/shared_ptr.hpp>
 #include <boost/format.hpp>
 
@@ -15,13 +15,13 @@
 #include <iostream>
 #include <fstream>
 
-#include <datastore/StoreDefs.h>
-#include <datastore/StoreObjPtr.h>
-#include <datastore/StoreArray.h>
-#include <datastore/DataStore.h>
-#include <datastore/SimpleVec.h>
-#include <datastore/Relation.h>
-#include <hitcdc/HitCDC.h>
+#include <framework/datastore/StoreDefs.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/datastore/StoreArray.h>
+#include <framework/datastore/DataStore.h>
+#include <framework/datastore/SimpleVec.h>
+#include <framework/datastore/Relation.h>
+//#include <cdc/hitcdc/HitCDC.h>
 
 #include <TDatabasePDG.h>
 #include <TParticlePDG.h>

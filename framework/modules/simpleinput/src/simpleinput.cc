@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <../simpleinput/simpleinput.h>
+#include <framework/modules/simpleinput/simpleinput.h>
 
 using namespace std;
 using namespace Belle2;

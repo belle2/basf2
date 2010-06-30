@@ -12,8 +12,8 @@
 #ifndef STOREMAPITER_H
 #define STOREMAPITER_H
 
-#include <logging/Logger.h>
-#include <datastore/StoreIter.h>
+#include <framework/logging/Logger.h>
+#include <framework/datastore/StoreIter.h>
 
 #include <TObject.h>
 

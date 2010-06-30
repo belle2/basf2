@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <datastore/Relation.h>
+#include <framework/datastore/Relation.h>
 
 using namespace std;
 using namespace Belle2;

@@ -8,9 +8,9 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <fwcore/ModuleList.h>
-#include <fwcore/ModuleManager.h>
-#include <logging/Logger.h>
+#include <framework/fwcore/ModuleList.h>
+#include <framework/fwcore/ModuleManager.h>
+#include <framework/logging/Logger.h>
 
 using namespace std;
 using namespace Belle2;

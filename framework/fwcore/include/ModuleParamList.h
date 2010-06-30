@@ -14,10 +14,10 @@
 #include <boost/python.hpp>
 #include <boost/python/list.hpp>
 
-#include <fwcore/FwExceptions.h>
-#include <fwcore/ModuleParam.h>
-#include <fwcore/PyObjConvUtils.h>
-#include <logging/Logger.h>
+#include <framework/fwcore/FwExceptions.h>
+#include <framework/fwcore/ModuleParam.h>
+#include <framework/fwcore/PyObjConvUtils.h>
+#include <framework/logging/Logger.h>
 
 #include <map>
 #include <vector>

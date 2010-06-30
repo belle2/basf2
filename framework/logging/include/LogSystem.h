@@ -11,9 +11,9 @@
 #ifndef LOGSYSTEM_H_
 #define LOGSYSTEM_H_
 
-#include <logging/LogCommon.h>
-#include <logging/LogConnectionAbs.h>
-#include <logging/LogConnectionIOStream.h>
+#include <framework/logging/LogCommon.h>
+#include <framework/logging/LogConnectionAbs.h>
+#include <framework/logging/LogConnectionIOStream.h>
 
 #include <string>
 

@@ -11,8 +11,8 @@
 #ifndef LOGMETHOD_H_
 #define LOGMETHOD_H_
 
-#include <logging/LogCommon.h>
-#include <logging/LogSystem.h>
+#include <framework/logging/LogCommon.h>
+#include <framework/logging/LogSystem.h>
 
 #include <string>
 

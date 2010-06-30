@@ -10,8 +10,8 @@
 
 #include <boost/python/register_ptr_to_python.hpp>
 
-#include <fwcore/Module.h>
-#include <fwcore/ModuleManager.h>
+#include <framework/fwcore/Module.h>
+#include <framework/fwcore/ModuleManager.h>
 
 using namespace std;
 using namespace Belle2;

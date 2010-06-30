@@ -11,8 +11,8 @@
 #ifndef MODULEMANAGER_H_
 #define MODULEMANAGER_H_
 
-#include <fwcore/Module.h>
-#include <fwcore/FwExceptions.h>
+#include <framework/fwcore/Module.h>
+#include <framework/fwcore/FwExceptions.h>
 
 #include <string>
 #include <map>

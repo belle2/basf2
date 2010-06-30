@@ -11,8 +11,8 @@
 #ifndef CREATORBASE_H_
 #define CREATORBASE_H_
 
-#include <geodetector/GDetExceptions.h>
-#include <gearbox/GearDir.h>
+#include <framework/geodetector/GDetExceptions.h>
+#include <framework/gearbox/GearDir.h>
 
 #include <TGeoMatrix.h>
 #include <TGeoVolume.h>

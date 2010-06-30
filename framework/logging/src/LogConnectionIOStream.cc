@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <logging/LogConnectionIOStream.h>
+#include <framework/logging/LogConnectionIOStream.h>
 
 using namespace Belle2;
 using namespace std;

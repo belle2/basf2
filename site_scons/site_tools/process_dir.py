@@ -98,17 +98,17 @@ def process_dir(parent_env, dir_name):
 
 
     # setup environment for building executables, include SConscript if it exists
-    tools_env = env.Clone()
-    tools_env['TOOLS_FILES'] = Glob(os.path.join(dir_name, 'tools', '*.cc'))
+    save_env = env.Clone()
+    env['TOOLS_FILES'] = Glob(os.path.join(dir_name, 'tools', '*.cc'))
     if os.path.isfile(os.path.join(dir_name, 'tools', 'SConscript')):
         result = SConscript(os.path.join(dir_name, 'tools', 'SConscript'), exports = 'env')
         if isinstance(result, Environment):
-            tools_env = result
+            env = result
 
     # build a binary for each source file in the tools directory
-    for bin_file in tools_env['TOOLS_FILES']:
+    for bin_file in env['TOOLS_FILES']:
         bin_filename = os.path.splitext(os.path.basename(str(bin_file)))[0]
-        bin_env = tools_env.Clone()
+        bin_env = env.Clone()
         if bin_env['TOOLS_LIBS'].has_key(bin_filename):
             bin_env['LIBS'] = Flatten([env.subst(str(lib)).split() for lib in Flatten(bin_env['TOOLS_LIBS'][bin_filename])])
         if bin_env['TOOLS_LIBPATH'].has_key(bin_filename):
@@ -120,6 +120,8 @@ def process_dir(parent_env, dir_name):
         env.Alias(os.path.join(dir_name, bin_filename), tool)
         define_aliases(env, tool, dir_name, '.bin')
 
+    # restore original environment
+    env = save_env
 
 def generate(env):
     env.AddMethod(process_dir, 'ProcessDirectory')

@@ -120,14 +120,7 @@ def configure_externals(conf):
         root_env.ParseConfig('root-config --glibs')
         conf.env['ROOT_GLIBS'] = root_env['LIBS']
     else:
-        ext_target = False
-        if len(BUILD_TARGETS) > 0:
-            ext_target = True
-            for target in BUILD_TARGETS:
-                if not target.startswith('externals'):
-                    ext_target = False
-                    break
-        if not ext_target:
+        if BUILD_TARGETS != ['externals']:
             print 'root configuration tool missing'
             print '-> create it with the command "scons externals"'
             return False

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ParamSet type="Params">
+	<Name>Global parameters for Belle II Detector</Name>
+	<Description>Belle II worldbox used for the GEANT4 simulation</Description>
+	<Version>0</Version>
+        <Creator>GeoGlobalParams</Creator>
+	<Content>
+		<WorldBox>
+			<Material>Vacuum</Material>
+			<X unit="m">8</X>
+			<Y unit="m">8</Y>
+			<Z unit="m">8</Z>
+		</WorldBox>
+	</Content>
+</ParamSet>

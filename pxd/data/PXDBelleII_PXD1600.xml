@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  // PIXELS (ACTIVE + PASSIVE PART) ~ top view
+   //
+   //    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   //    |   |Sw| <~> |Sw|     |Sw| pBS |Sw|     |Sw|     |Sw|   |
+   //    |   |  |  d  |  |   pxlBalcSwitchWidth  |  |     |  |   |
+   //    |   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~   | ^
+   //    | p | ~~~~~~rim~~~~~~~~~~ | S | ~~~~~~rim~~~~~~~~~~ | p | lw  ^ ~y
+   //  ^ | x |r|~~~~~~~~~~~~~~~~~|r| i |r|~~~~~~~~~~~~~~~~~|r| x | ai  |
+   // sW | l |i|~~~~DEPFET~1~~~~~|i| g |i|~~~~DEPFET~2~~~~~|i| l | dd  |
+   //  ^ | B |m|~~~~~~~~~~~~~~~~~|m| a |m|~~~~~~~~~~~~~~~~~|m| B | et  ~~~~>
+   //    | W | ~~~~~~rim~~~~~~~~~~ | p | ~~~~~~rim~~~~~~~~~~ | W | rh     z
+   //    |   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~   | ^
+   //    |            balcony (pxlBalcWidth =  pxlBW)            |
+   //    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   //                           <~~~~~~~~~> support situated here
+   //          <~~~~~~~~~~~~~~~~~> sensorLength (sW = sensorWidth)
+   //        <~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~>
+   //                              ladderLength
+   //
+
+   // PIXEL LADDER (ACTIVE + PASSIVE PART) ~ front view
+   //
+   //    _Switcher_                          ^ x
+   //  _|__________|_________________________|_______________________ _____
+   // |              |                 D E P | F E T                 |     |
+   // |              |_______________________|_______________________|  B  |
+   // |              |                       |                       |  a  |
+   // |   Balcony    |                 S u p | p o r t               |  l  |
+   // | switcher side|_______________________|_______________________|  c  |
+   // |              |                       |                       |  o  |
+   // |              |                       |                       |  n  |
+   // |              |                       |                       |  y  |
+   // |______________|                       |                       |_____|
+   //                                        |
+   //                                        |
+   //                              symmetry axis of Depfet
+   //
+
+   // STRIP LADDER (ACTIVE PART) ~ top view
+   //    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ^
+   //    | ~~~~rim~~~~ |   | ~~~~rim~~~~ |   | ~~~~rim~~~~ |   | ~~~~rim~~~~ | lw  ^ ~y
+   //  ^ |r|~~~~~~~~~|r| g |r|~~~~~~~~~|r| g |r|~~~~~~~~~|r| g |r|~~~~~~~~~|r| ai  |
+   // sW |i|~~DSSD~1~|i| a |i|~~DSSD~2~|i| a |i|~~DSSD~3~|i| a |i|~~DSSD~4~|i| dd  |
+   //  ^ |m|~~~~~~~~~|m| p |m|~~~~~~~~~|m| p |m|~~~~~~~~~|m| p |m|~~~~~~~~~|m| et  ~~~~>
+   //    | ~~~~rim~~~~ |   | |~~~rim~~~| |   |~~~~~rim~~~~ |   | ~~~~rim~~~~ | rh     z
+   //    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ^
+   //       <~~~~~~~~> sensorLength (sW = sensorWidth)
+   //    <~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~>
+   //                  ladderLength
+   //
+   // DSSD consists of active silicon part and passive silicon part (no strips in this area, called rim)
+
+   // LAYERS
+   //      ~~~~        ~ ~~~~~~~~~~~~~~~~~~~~~~
+   //  theta ~        ~   ~ ~~~~~~~~~~~~~~~~~~
+   //       ~        ~   ~    ~~~~~~~~~~~~~~~
+   //          slanted part     barrel part
+   //         (forward reg.)
+
+-->
+<ParamSet type="PXD">
+	<Name>PXD BelleII 1600pix</Name>
+	<Description>The famous RedBull can</Description>
+	<Version>0</Version>
+	<Creator>PXDBelleII</Creator>
+	<Content>
+		<Rotation desc="Rotation of the hole PXD detector (should be the same as beampipe)" unit="mrad">22.0</Rotation>
+		<OffsetZ desc="The offset of the whole PXD in z with respect to the IP (should be the same as beampipe)" unit="mm">0.0</OffsetZ>		
+		<MaterialSensor>Silicon</MaterialSensor>
+
+		<Layers>
+			<Layer id="1">
+				<Phi0 desc="The starting angle of the layer in the r-phi plane" unit="deg">90.0</Phi0>
+				<Theta desc="The tilt angle of the layer with respect to the z axis" unit="deg">0.0</Theta>
+				<Radius desc="Radius of the layer" unit="mm">13</Radius>
+				<OffsetY desc="The offset of the center of the layer in y direction (Wind Mill structure)" unit="mm">-2.25</OffsetY>
+				<OffsetZ desc="The offset of the center of the layer in z direction" unit="mm">10.0</OffsetZ>
+				<NumberOfLadders desc="Number of ladders in this layer">8</NumberOfLadders>
+				<Ladder desc="The silicon modules the detector is made of">
+					<Length desc="The over all length of the ladder" unit="mm">90.0</Length>
+					<Width desc="The over all width of the ladder" unit="mm">12.5</Width>
+					<Thickness desc="silicon thickness of the thinned down ladder" unit="um">50</Thickness>
+					<NumberOfSensors>2</NumberOfSensors>
+					<Sensor>
+						<Length desc="The over all length of the sensor" unit="mm">45</Length>
+						<Width desc="The over all width of the sensor" unit="mm">12.5</Width>
+						<Thickness desc="Thickness of the sensors" unit="um">50</Thickness>
+						<Gap desc="The gap between sensors that is insensitiv" unit="mm">0</Gap>
+						<PadSizeRPhi desc="pixel size or strip size" unit="um">50</PadSizeRPhi>
+						<PadSizeZ desc="pixel size or strip size" unit="um">56.25</PadSizeZ>
+					</Sensor>
+					<PXLSwitcherDistance desc="Distance between the switcher chips on the PXD Ladder" unit="mm">1.5</PXLSwitcherDistance>
+					<PXLLadderSupport desc="The support needed to join PXD half ladders">False</PXLLadderSupport>
+				</Ladder>
+			</Layer>
+			<Layer id="2">
+				<Phi0 desc="The starting angle of the layer in the r-phi plane" unit="deg">90.0</Phi0>
+				<Theta desc="The tilt angle of the layer with respect to the z axis" unit="deg">0.0</Theta>
+				<Radius desc="Radius of the layer" unit="mm">22</Radius>
+				<OffsetY desc="The offset of the center of the layer in y direction (Wind Mill structure)" unit="mm">-2.53</OffsetY>
+				<OffsetZ desc="The offset of the center of the layer in z direction" unit="mm">23.86</OffsetZ>
+				<NumberOfLadders desc="Number of ladders in this layer">12</NumberOfLadders>
+				<Ladder desc="The silicon modules the detector is made of">
+					<Length desc="The over all length of the ladder" unit="mm">124.15</Length>
+					<Width desc="The over all width of the ladder" unit="mm">12.5</Width>
+					<Thickness desc="silicon thickness of the thinned down ladder" unit="um">50</Thickness>
+					<NumberOfSensors>2</NumberOfSensors>
+					<Sensor>
+						<Length desc="The over all length of the sensor" unit="mm">61.8</Length>
+						<Width desc="The over all width of the sensor" unit="mm">12.5</Width>
+						<Thickness desc="Thickness of the sensors" unit="um">50</Thickness>
+						<Gap desc="The gap between sensors that is insensitiv" unit="um">550</Gap>
+						<PadSizeRPhi desc="pixel size or strip size" unit="um">50</PadSizeRPhi>
+						<PadSizeZ desc="pixel size or strip size" unit="um">77.25</PadSizeZ>
+					</Sensor>
+					<PXLSwitcherDistance desc="Distance between the switcher chips on the PXD Ladder" unit="mm">5</PXLSwitcherDistance>
+					<PXLLadderSupport desc="The support needed to join PXD half ladders">True</PXLLadderSupport>
+				</Ladder>
+			</Layer>
+		</Layers>
+	</Content>
+</ParamSet>
+

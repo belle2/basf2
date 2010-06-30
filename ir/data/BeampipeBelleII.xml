@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ParamSet type="Beampipe">
+	<Name>Belle II Beampipe</Name>
+	<Description>Belle II beampipe consists from shells of gold and beryllium</Description>
+	<Version>0</Version>
+	<Creator>BeampipeBelleII</Creator>
+	<Content>
+		<Rotation desc="Rotation of beam pipe with respect to the Detector" unit="mrad">22.0</Rotation>
+		<Length desc="The full length of the beampipe" unit="mm">190</Length>
+		<OffsetZ desc="The offset of the beampipe in z with respect to the IP" unit="mm">15</OffsetZ>
+
+		<Shells>		
+			<Shell name="InnerShell">
+				<InnerRadius unit="mm">10.0</InnerRadius>
+				<OuterRadius unit="mm">10.6</OuterRadius>
+				<Material>Beryllium</Material>
+			</Shell>
+
+			<Shell name="CoolingGap">
+				<InnerRadius unit="mm">10.6</InnerRadius>
+				<OuterRadius unit="mm">11.1</OuterRadius>
+				<Material>Paraffin</Material>
+			</Shell>
+
+			<Shell name="OuterShell">
+				<InnerRadius unit="mm">11.1</InnerRadius>
+				<OuterRadius unit="mm">11.45</OuterRadius>
+				<Material>Beryllium</Material>
+			</Shell>
+
+			<Shell name="GoldLayer">
+				<InnerRadius unit="mm">11.45</InnerRadius>
+				<OuterRadius unit="mm">11.46</OuterRadius>
+				<Material>Gold</Material>
+			</Shell>
+		</Shells>
+	</Content>
+</ParamSet>
+

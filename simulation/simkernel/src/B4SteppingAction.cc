@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <simkernel/B4SteppingAction.h>
-#include <logging/Logger.h>
+#include <simulation/simkernel/B4SteppingAction.h>
+#include <framework/logging/Logger.h>
 
 #include "G4UnitsTable.hh"
 #include "G4Track.hh"

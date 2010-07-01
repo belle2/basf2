@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <simkernel/B4SensitiveDetectorBase.h>
+#include <simulation/simkernel/B4SensitiveDetectorBase.h>
 
 #include "G4SDManager.hh"
 

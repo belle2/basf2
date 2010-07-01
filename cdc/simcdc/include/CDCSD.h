@@ -11,7 +11,7 @@
 #ifndef CDCSD_H
 #define CDCSD_H
 
-#include <simcdc/CDCHit.h>
+#include <cdc/simcdc/CDCHit.h>
 #include "G4VSensitiveDetector.hh"
 
 namespace Belle2 {

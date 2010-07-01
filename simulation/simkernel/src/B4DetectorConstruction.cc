@@ -8,11 +8,11 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <geodetector/GeoDetector.h>
+#include <framework/geodetector/GeoDetector.h>
 
-#include <simkernel/B4DetectorConstruction.h>
-#include <simkernel/B4MagneticField.h>
-#include <logging/Logger.h>
+#include <simulation/simkernel/B4DetectorConstruction.h>
+#include <simulation/simkernel/B4MagneticField.h>
+#include <framework/logging/Logger.h>
 
 using namespace Belle2;
 

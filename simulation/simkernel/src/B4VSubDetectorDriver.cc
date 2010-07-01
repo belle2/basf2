@@ -8,12 +8,12 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <geodetector/GeoDetector.h>
-#include <geodetector/GDetExceptions.h>
-#include <logging/Logger.h>
+#include <framework/geodetector/GeoDetector.h>
+#include <framework/geodetector/GDetExceptions.h>
+#include <framework/logging/Logger.h>
 
-#include <simkernel/B4VSubDetectorDriver.h>
-#include <simkernel/B4DetectorConstruction.h>
+#include <simulation/simkernel/B4VSubDetectorDriver.h>
+#include <simulation/simkernel/B4DetectorConstruction.h>
 
 #include "globals.hh"
 #include "G4SDManager.hh"

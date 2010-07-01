@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <hitcdc/HitCDC.h>
+#include <cdc/hitcdc/HitCDC.h>
 
 using namespace std;
 using namespace Belle2;

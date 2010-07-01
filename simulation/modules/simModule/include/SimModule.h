@@ -11,7 +11,7 @@
 #ifndef SIMMODULE_H
 #define SIMMODULE_H
 
-#include <fwcore/Module.h>
+#include <framework/fwcore/Module.h>
 #include <boost/shared_ptr.hpp>
 #include <string>
 

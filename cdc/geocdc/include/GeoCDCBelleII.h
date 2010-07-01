@@ -12,7 +12,7 @@
 #define GEOCDCBELLEII_H
 
 #include <TGeoVolume.h>
-#include <geodetector/CreatorBase.h>
+#include <framework/geodetector/CreatorBase.h>
 
 namespace Belle2 {
 

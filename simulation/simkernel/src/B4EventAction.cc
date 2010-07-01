@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <simkernel/B4EventAction.h>
-#include <simkernel/B4VHit.h>
+#include <simulation/simkernel/B4EventAction.h>
+#include <simulation/simkernel/B4VHit.h>
 
 #include "G4UImanager.hh"
 #include "G4SDManager.hh"

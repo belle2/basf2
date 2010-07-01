@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <simpxd/PXDB4VHit.h>
+#include <pxd/simpxd/PXDB4VHit.h>
 //#include <hitcdc/SimHitCDC.h>
 
 //DataStore classes

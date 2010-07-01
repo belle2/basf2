@@ -8,10 +8,10 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <geoir/GeoBeampipeBelleII.h>
+#include <ir/geoir/GeoBeampipeBelleII.h>
 
-#include <gearbox/GearDir.h>
-#include <datastore/Units.h>
+#include <framework/gearbox/GearDir.h>
+#include <framework/datastore/Units.h>
 
 #include <cmath>
 #include <boost/format.hpp>

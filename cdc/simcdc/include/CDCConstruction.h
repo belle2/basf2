@@ -11,7 +11,7 @@
 #ifndef CDCCONSTRUCTION_H
 #define CDCCONSTRUCTION_H
 
-#include <simkernel/B4VSubDetectorDriver.h>
+#include <simulation/simkernel/B4VSubDetectorDriver.h>
 
 #include <string>
 

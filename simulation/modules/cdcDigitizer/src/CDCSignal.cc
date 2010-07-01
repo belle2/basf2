@@ -8,10 +8,10 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "../cdcDigitizer/CDCSignal.h"
-#include "../cdcDigitizer/CDCColours.h"
+#include "simulation/modules/cdcDigitizer/CDCSignal.h"
+#include "simulation/modules/cdcDigitizer/CDCColours.h"
 
-#include <logging/Logger.h>
+#include <framework/logging/Logger.h>
 
 #include <cstdlib>
 #include <iomanip>

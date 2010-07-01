@@ -8,13 +8,13 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <simcdc/CDCHit.h>
-#include <hitcdc/SimHitCDC.h>
+#include <cdc/simcdc/CDCHit.h>
+#include <cdc/hitcdc/SimHitCDC.h>
 
 //DataStore classes
-#include <datastore/StoreObjPtr.h>
-#include <datastore/StoreDefs.h>
-#include <datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/datastore/StoreDefs.h>
+#include <framework/datastore/StoreArray.h>
 
 //Geant4 classes
 #include "G4VVisManager.hh"

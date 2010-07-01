@@ -11,7 +11,7 @@
 #ifndef B4PRIMARYGENERATORMESSENGER_H
 #define B4PRIMARYGENERATORMESSENGER_H
 
-#include <simkernel/B4PrimaryGeneratorAction.h>
+#include <simulation/simkernel/B4PrimaryGeneratorAction.h>
 
 #include "G4UImessenger.hh"
 #include "globals.hh"

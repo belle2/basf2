@@ -11,13 +11,13 @@
 #ifndef CDCDIGI_H
 #define CDCDIGI_H
 
-#include <../cdcDigitizer/CDCSignal.h>
+#include <simulation/modules/cdcDigitizer/CDCSignal.h>
 
-#include <fwcore/Module.h>
+#include <framework/fwcore/Module.h>
 #include <string>
 //#include <boost/shared_ptr.hpp>
 
-#include <hitcdc/SimHitCDC.h>
+#include <cdc/hitcdc/SimHitCDC.h>
 
 #include <vector>
 #include <queue>

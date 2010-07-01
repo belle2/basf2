@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <simpxd/PXDSensitiveDetector.h>
-#include <logging/Logger.h>
+#include <pxd/simpxd/PXDSensitiveDetector.h>
+#include <framework/logging/Logger.h>
 
 #include "G4Step.hh"
 #include "G4SteppingManager.hh"

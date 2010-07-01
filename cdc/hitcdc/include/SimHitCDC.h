@@ -11,7 +11,7 @@
 #ifndef SIMHITCDC_H
 #define SIMHITCDC_H
 
-#include <datastore/DataStore.h>
+#include <framework/datastore/DataStore.h>
 
 #include <TObject.h>
 #include <TVector3.h>

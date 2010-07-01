@@ -8,11 +8,11 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <geocdc/GeoCDCBelleII.h>
+#include <cdc/geocdc/GeoCDCBelleII.h>
 
-#include <gearbox/GearDir.h>
-#include <datastore/Units.h>
-#include <logging/Logger.h>
+#include <framework/gearbox/GearDir.h>
+#include <framework/datastore/Units.h>
+#include <framework/logging/Logger.h>
 
 #include <cmath>
 #include <boost/format.hpp>

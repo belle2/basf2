@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <simkernel/B4MagneticFieldMessenger.h>
-#include <simkernel/B4MagneticField.h>
+#include <simulation/simkernel/B4MagneticFieldMessenger.h>
+#include <simulation/simkernel/B4MagneticField.h>
 
 #include "G4UIdirectory.hh"
 #include "G4UIcmdWithAString.hh"

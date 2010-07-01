@@ -11,7 +11,7 @@
 #ifndef B4DETECTORCONSTRUCTION_H
 #define B4DETECTORCONSTRUCTION_H
 
-#include <simkernel/B4VSubDetectorDriver.h>
+#include <simulation/simkernel/B4VSubDetectorDriver.h>
 
 #include "TG4RootDetectorConstruction.h"
 

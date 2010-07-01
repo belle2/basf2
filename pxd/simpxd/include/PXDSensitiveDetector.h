@@ -11,7 +11,7 @@
 #ifndef PXDSENSITIVEDETECTOR_H_
 #define PXDSENSITIVEDETECTOR_H_
 
-#include <simpxd/PXDB4VHit.h>
+#include <pxd/simpxd/PXDB4VHit.h>
 #include "G4VSensitiveDetector.hh"
 
 namespace Belle2 {

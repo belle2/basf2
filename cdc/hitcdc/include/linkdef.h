@@ -5,7 +5,7 @@
 #pragma link off all functions;
 #pragma link C++ nestedclasses;
 
-#pragma link C++ class SimHitCDC;
-#pragma link C++ class HitCDC;
+#pragma link C++ class Belle2::SimHitCDC;
+#pragma link C++ class Belle2::HitCDC;
 
 #endif

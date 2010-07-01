@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <simpxd/PXDConstruction.h>
-#include <simpxd/PXDSensitiveDetector.h>
+#include <pxd/simpxd/PXDConstruction.h>
+#include <pxd/simpxd/PXDSensitiveDetector.h>
 
 #include <string>
 

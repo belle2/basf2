@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <simkernel/B4RunManager.h>
+#include <simulation/simkernel/B4RunManager.h>
 
 using namespace Belle2;
 

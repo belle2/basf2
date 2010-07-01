@@ -8,11 +8,11 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <gearbox/Gearbox.h>
-#include <gearbox/GearDir.h>
-#include <logging/Logger.h>
+#include <framework/gearbox/Gearbox.h>
+#include <framework/gearbox/GearDir.h>
+#include <framework/logging/Logger.h>
 
-#include <geocdc/CDCGeometryPar.h>
+#include <cdc/geocdc/CDCGeometryPar.h>
 
 #include <cmath>
 #include <boost/format.hpp>

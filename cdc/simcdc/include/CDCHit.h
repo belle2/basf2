@@ -11,7 +11,7 @@
 #ifndef CDCHIT_H
 #define CDCHIT_H
 
-#include <simkernel/B4VHit.h>
+#include <simulation/simkernel/B4VHit.h>
 
 //Geant4 classes
 #include "G4THitsCollection.hh"

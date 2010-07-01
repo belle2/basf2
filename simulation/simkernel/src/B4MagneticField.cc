@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <simkernel/B4MagneticField.h>
+#include <simulation/simkernel/B4MagneticField.h>
 
 #include "G4TransportationManager.hh"
 #include "G4ios.hh"

@@ -8,16 +8,16 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <../simModule/SimModule.h>
+#include <simulation/modules/simModule/SimModule.h>
 
-#include <simkernel/B4RunManager.h>
-#include <simkernel/B4DetectorConstruction.h>
-#include <simkernel/B4PrimaryGeneratorAction.h>
-#include <simkernel/B4EventAction.h>
-#include <simkernel/B4SteppingAction.h>
+#include <simulation/simkernel/B4RunManager.h>
+#include <simulation/simkernel/B4DetectorConstruction.h>
+#include <simulation/simkernel/B4PrimaryGeneratorAction.h>
+#include <simulation/simkernel/B4EventAction.h>
+#include <simulation/simkernel/B4SteppingAction.h>
 
-#include <fwcore/ModuleManager.h>
-#include <logging/Logger.h>
+#include <framework/fwcore/ModuleManager.h>
+#include <framework/logging/Logger.h>
 #include <boost/format.hpp>
 
 #include "TGeoManager.h"

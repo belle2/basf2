@@ -11,7 +11,7 @@
 #ifndef PXDCONSTRUCTION_H_
 #define PXDCONSTRUCTION_H_
 
-#include <simkernel/B4VSubDetectorDriver.h>
+#include <simulation/simkernel/B4VSubDetectorDriver.h>
 
 namespace Belle2 {
 

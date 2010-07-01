@@ -11,7 +11,7 @@
 #ifndef PXDG4HIT_H_
 #define PXDG4HIT_H_
 
-#include <simkernel/B4VHit.h>
+#include <simulation/simkernel/B4VHit.h>
 
 #include <list>
 

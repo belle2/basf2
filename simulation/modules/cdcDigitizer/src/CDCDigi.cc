@@ -8,19 +8,19 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <../cdcDigitizer/CDCDigi.h>
-#include <../cdcDigitizer/CDCColours.h>
+#include <simulation/modules/cdcDigitizer/CDCDigi.h>
+#include <simulation/modules/cdcDigitizer/CDCColours.h>
 
-#include <fwcore/ModuleManager.h>
+#include <framework/fwcore/ModuleManager.h>
 //#include <boost/format.hpp>
 
-#include <datastore/StoreObjPtr.h>
-#include <datastore/StoreDefs.h>
-#include <datastore/StoreArray.h>
-#include <datastore/Units.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/datastore/StoreDefs.h>
+#include <framework/datastore/StoreArray.h>
+#include <framework/datastore/Units.h>
 
-#include <logging/Logger.h>
-#include <hitcdc/HitCDC.h>
+#include <framework/logging/Logger.h>
+#include <cdc/hitcdc/HitCDC.h>
 
 #include <cstdlib>
 #include <iomanip>

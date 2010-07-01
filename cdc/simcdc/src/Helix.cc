@@ -82,7 +82,7 @@
 #include <float.h>
 #include <exception>
 
-#include <simcdc/Helix.h>
+#include <cdc/simcdc/Helix.h>
 #include "CLHEP/Matrix/Matrix.h"
 
 using namespace CLHEP;

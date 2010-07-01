@@ -11,7 +11,7 @@
 #ifndef B4MAGNETICFIELD_H
 #define B4MAGNETICFIELD_H
 
-#include <simkernel/B4MagneticFieldMessenger.h>
+#include <simulation/simkernel/B4MagneticFieldMessenger.h>
 
 #include "globals.hh"
 #include "G4MagneticField.hh"

@@ -8,11 +8,11 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <simcdc/CDCSD.h>
+#include <cdc/simcdc/CDCSD.h>
 
-#include <simcdc/Helix.h>
-#include <geocdc/CDCGeometryPar.h>
-#include <logging/Logger.h>
+#include <cdc/simcdc/Helix.h>
+#include <cdc/geocdc/CDCGeometryPar.h>
+#include <framework/logging/Logger.h>
 
 /*
 #ifdef G4VIS_USE

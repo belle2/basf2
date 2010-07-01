@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <simkernel/B4PrimaryGeneratorMessenger.h>
+#include <simulation/simkernel/B4PrimaryGeneratorMessenger.h>
 
 #include "G4ios.hh"
 

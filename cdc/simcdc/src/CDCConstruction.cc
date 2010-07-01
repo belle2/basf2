@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <simcdc/CDCConstruction.h>
-#include <simcdc/CDCSD.h>
+#include <cdc/simcdc/CDCConstruction.h>
+#include <cdc/simcdc/CDCSD.h>
 
 using namespace Belle2;
 

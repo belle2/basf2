@@ -75,7 +75,7 @@ def process_dir(parent_env, dir_name):
             process_dir(env, os.path.join(dir_name, entry))
 
     # check whether we have to create a new library
-    if (dir_name == env['PACKAGE']) or (env.Dictionary().has_key('SUBLIB') and (env['SUBLIB'] == True) or dir_name.endswith('modules')):
+    if (dir_name == env['PACKAGE']) or (env.Dictionary().has_key('SUBLIB') and (env['SUBLIB'] == True) or (env.Dictionary().has_key('PYTHON_MODULE') and (env['PYTHON_MODULE'] == True)) or dir_name.endswith('modules')):
     
         # generate dictionaries
         dict_files = []
@@ -90,6 +90,10 @@ def process_dir(parent_env, dir_name):
             lib = env.SharedLibrary(os.path.join(env['LIBDIR'], lib_name), [env['SRC_FILES'], dict_files])
             env.Alias(lib_name, lib)
             define_aliases(env, lib, dir_name, '.lib')
+            if env.Dictionary().has_key('PYTHON_MODULE') and (env['PYTHON_MODULE'] == True):
+                pymod = env.InstallAs(os.path.join(env['LIBDIR'],os.path.basename(dir_name) + 'module' + env['SHLIBSUFFIX']), lib)            
+                define_aliases(env, pymod, dir_name, '.lib')
+                
 
     # add linkdef, and source files to parent environment if we are in a normal sub-directory
     else:

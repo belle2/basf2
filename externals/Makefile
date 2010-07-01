@@ -33,6 +33,7 @@ boost: boost/project-config.jam
 
 # boost build command
 boost/project-config.jam:
+	@echo "building boost"
 	@cd boost; ./bootstrap.sh --includedir=$(EXTINCDIR) --libdir=$(EXTLIBDIR); ./bjam install
 
 # dependence for CLHEP build
@@ -40,12 +41,14 @@ clhep: CLHEP/config.log
 
 # dependence for CLHEP download
 CLHEP/configure:
+	@echo "downloading CLHEP"
 	@wget -O - http://proj-clhep.web.cern.ch/proj-clhep/DISTRIBUTION/tarFiles/clhep-2.0.4.5.tgz | tar xz
 	@mv 2.0.4.5/CLHEP .
 	@rmdir 2.0.4.5
 
 # CLHEP build command
 CLHEP/config.log: CLHEP/configure
+	@echo "building CLHEP"
 	@cd CLHEP; ./configure --prefix=$(EXTDIR) \
 	--includedir=$(EXTINCDIR) --libdir=$(EXTLIBDIR) --bindir=$(EXTBINDIR); make; make install
 
@@ -54,6 +57,7 @@ geant4: geant4/env.sh
 
 # dependence for GEANT4 download
 geant4/Configure:
+	@echo "downloading geant4"
 	@wget -O - http://geant4.cern.ch/support/source/geant4.9.3.tar.gz | tar xz
 	@mv geant4.9.3 geant4
 	@mkdir -p share/geant4/data
@@ -66,6 +70,7 @@ geant4/Configure:
 
 # GEANT4 build command
 geant4/env.sh: CLHEP/config.log geant4/Configure
+	@echo "building geant4"
 	@cd geant4; rm -f Configure.new; cat Configure | sed "s/g4granular='n'/g4granular='y'/g" | sed "s/g4granular=n/g4granular=y/g" > Configure.new; chmod a+x Configure.new
 	@cd geant4; ./Configure.new -build -d -e -s -D d_portable=y -D g4includes_flag=y \
 	-D g4data=$(EXTDIR)/share/geant4/data -D g4clhep_base_dir=$(EXTDIR) \
@@ -80,6 +85,7 @@ root: root/config/Makefile.config
 
 # root build command
 root/config/Makefile.config:
+	@echo "building root"
 	@cd root; ./configure --incdir=$(EXTINCDIR)/root --libdir=$(EXTLIBDIR) --bindir=$(EXTBINDIR) \
 	--prefix=$(EXTDIR) --etcdir=$(EXTDIR)/share/etc --enable-gsl-shared \
 	--with-g4-incdir=$(EXTINCDIR)/geant4 --with-g4-libdir=$(EXTLIBDIR) \

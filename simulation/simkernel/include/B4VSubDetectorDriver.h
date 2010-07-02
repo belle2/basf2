@@ -71,7 +71,7 @@ namespace Belle2 {
         \param sensitiveDetector The sensitive detector class which handles the geant4 information.
         \param dc The G4Root construction object, which manages all automatic translated TGeo to geant4 objects.
     */
-    void setSensitiveDetAndVolumes(G4VSensitiveDetector* sensitiveDetector, TG4RootDetectorConstruction* dc);
+    void setSensitiveDetectorAuto(G4VSensitiveDetector* sensitiveDetector, TG4RootDetectorConstruction* dc);
 
 
   private:

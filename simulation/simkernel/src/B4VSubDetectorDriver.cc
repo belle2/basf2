@@ -43,7 +43,7 @@ bool B4VSubDetectorDriver::isApplicable(const std::string& driverName) const
 }
 
 
-void B4VSubDetectorDriver::setSensitiveDetAndVolumes(G4VSensitiveDetector* sensitiveDetector, TG4RootDetectorConstruction* dc)
+void B4VSubDetectorDriver::setSensitiveDetectorAuto(G4VSensitiveDetector* sensitiveDetector, TG4RootDetectorConstruction* dc)
 {
   //-----------------------------------------------------------
   // Add sensitive detector to sensitive detector manager

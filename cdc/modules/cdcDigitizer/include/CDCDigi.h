@@ -11,7 +11,7 @@
 #ifndef CDCDIGI_H
 #define CDCDIGI_H
 
-#include <simulation/modules/cdcDigitizer/CDCSignal.h>
+#include <cdc/modules/cdcDigitizer/CDCSignal.h>
 
 #include <framework/fwcore/Module.h>
 #include <string>

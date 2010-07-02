@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <simulation/modules/cdcDigitizer/CDCDigi.h>
-#include <simulation/modules/cdcDigitizer/CDCColours.h>
+#include <cdc/modules/cdcDigitizer/CDCDigi.h>
+#include <cdc/modules/cdcDigitizer/CDCColours.h>
 
 #include <framework/fwcore/ModuleManager.h>
 //#include <boost/format.hpp>

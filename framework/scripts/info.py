@@ -48,6 +48,7 @@ print ("Version "+basf2version).center(48)
 print ""
 print "-------------------------------------------------"
 print "BELLE2_LOCAL_DIR:    ",envarLocalDir
+print "BELLE2_SUBDIR:       ",envarSubDir
 print "Machine architecture:",archstring
 print "Kernel version:      ",os.uname()[2]
 print "Operating system:    ",os.uname()[3]

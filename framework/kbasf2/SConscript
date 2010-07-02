@@ -4,5 +4,5 @@ Import('env')
 env['PYTHON_MODULE'] = True
 env['LIBS'] = ['$ROOT_LIBS', 'Geom', 'EG', 'G4root', 'CLHEP', '$GEANT4_LIBS', '$PYTHON_LIBS',
                'boost_date_time', 'boost_filesystem', 'boost_program_options',
-               'boost_python', 'boost_regex', 'boost_system', '$XML_LIBS', 'framework']
+               'boost_python', 'boost_regex', 'boost_system', '$XML_LIBS', 'framework', 'simulation']
 Return('env')

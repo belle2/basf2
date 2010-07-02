@@ -22,14 +22,19 @@ if envarLocalDir is None:
   print """The environment variable BELLE2_LOCAL_DIR is not set. Please execute the 'setuprel' script first."""
   Exit(1)
 
+envarSubDir = os.environ.get("BELLE2_SUBDIR", None)
+if envarSubDir is None:
+  print """The environment variable BELLE2_SUBDIR is not set. Please execute the 'setuprel' script first."""
+  Exit(1)
+
 #Get the architecture of the computer
 unamelist = os.uname()
 archstring = unamelist[0]+"_"+unamelist[4]
 
 #Set basf2 directories
-basf2dir     = os.path.join(envarLocalDir,'prototype') #basf2 directory
-basf2libdir  = os.path.join(basf2dir,'lib',archstring) #basf2 lib directory
-basf2datadir = os.path.join(basf2dir,'data')           #basf2 data directory
+basf2dir     = envarLocalDir                            #basf2 directory
+basf2libdir  = os.path.join(basf2dir,'lib',envarSubDir) #basf2 lib directory
+basf2datadir = os.path.join(basf2dir,'data')            #basf2 data directory
 
 
 #-----------------------------------------------

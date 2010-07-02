@@ -21,5 +21,5 @@ INSTANTIATE(CDCConstruction)
 void CDCConstruction::initialize(TG4RootDetectorConstruction* dc)
 {
   //Add CDC sensitive detector to sensitive detector manager (using auto-naming mechanism)
-  setSensitiveDetAndVolumes(new CDCSD("CDCSD", (2*24)*eV, 10*MeV), dc);
+  setSensitiveDetectorAuto(new CDCSD("CDCSD", (2*24)*eV, 10*MeV), dc);
 }

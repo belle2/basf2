@@ -66,13 +66,17 @@ SimModule::~SimModule()
 
 void SimModule::initialize()
 {
-  //--------------------------------------------------------------------------
-  // Get TGeo from gearbox and use g4root to convert them to Geant4 geometry.
-  //--------------------------------------------------------------------------
+  //----------------------------------------------------------------------------
+  // Get TGeo from gGeoManager and use g4root to convert them to Geant4 geometry.
+  //----------------------------------------------------------------------------
   TG4RootNavMgr* g4rootNav_mgr = TG4RootNavMgr::GetInstance(gGeoManager);
 
-  m_run_mgr = B4RunManager::Instance();
+  if (g4rootNav_mgr == NULL) {
+    ERROR("Could not retrieve an instance of the TG4RootNavMgr !")
+    return;
+  }
 
+  m_run_mgr = B4RunManager::Instance();
   g4rootNav_mgr->Initialize(B4DetectorConstruction::Instance());
   g4rootNav_mgr->ConnectToG4();
 

@@ -7,12 +7,12 @@
     <!--xi:include href="FieldBelleII.xml"/-->
   </Global>
   <MaterialSets>
-    <xi:include href="materials/BasicMaterials.xml"/>
+    <xi:include href="BasicMaterials.xml"/>
   </MaterialSets>
   <Subdetectors>
-    <xi:include href="ir/BeampipeBelleII.xml"/>
-    <xi:include href="pxd/PXDBelleII_PXD1600.xml"/>
-    <xi:include href="svd/SVDBelleII.xml"/>
-    <xi:include href="cdc/CDCBelleII.xml"/>
+    <xi:include href="../ir/BeampipeBelleII.xml"/>
+    <xi:include href="../pxd/PXDBelleII_PXD1600.xml"/>
+    <xi:include href="../svd/SVDBelleII.xml"/>
+    <xi:include href="../cdc/CDCBelleII.xml"/>
   </Subdetectors>
 </Detector>

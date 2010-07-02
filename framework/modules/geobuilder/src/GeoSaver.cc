@@ -12,12 +12,14 @@
 
 #include <framework/fwcore/ModuleManager.h>
 
-#include <framework/gearbox/Gearbox.h>
-#include <framework/gearbox/GearboxIOXML.h>
 #include <framework/geodetector/GeoDetector.h>
+
+#include <boost/filesystem.hpp>
 
 using namespace std;
 using namespace Belle2;
+
+using namespace boost::filesystem;
 
 //-----------------------------------------------------------------
 //                 Register the Module
@@ -35,6 +37,13 @@ GeoSaver::GeoSaver() : Module("GeoSaver")
 
   //Parameter definition
   addParam("Filename",  m_filenameROOT, string("Belle2.root"), "The filename of the ROOT output file.");
+
+  path fullPath(initial_path<path>());
+  fullPath = system_complete(path(m_filenameROOT));
+  fullPath.remove_filename();
+  if (!exists(fullPath.string())) {
+    ERROR("Parameter <Filename>: The path " << fullPath.string() << " does not exist !")
+  }
 }
 
 
@@ -58,7 +67,7 @@ void GeoSaver::beginRun()
 
 void GeoSaver::event()
 {
-
+  GeoDetector::Instance().saveToRootFile(m_filenameROOT);
 }
 
 

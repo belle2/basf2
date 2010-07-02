@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef GEOBUILDER_H_
-#define GEOBUILDER_H_
+#ifndef PARAMLOADERXML_H_
+#define PARAMLOADERXML_H_
 
 #include <framework/fwcore/Module.h>
 
@@ -18,22 +18,28 @@
 
 namespace Belle2 {
 
-  //! The GeoBuilder module.
+  //! The ParamLoaderXML module.
   /*!
-     This module creates the detector Belle II detector geometry.
+     This module loads the parameters from a XML document.
+
+     Creates a GearboxIO object which reads the parameters
+     for the Belle II detector geometry from XML files.
+     Starting from the basic XML file, which includes all other
+     XML files (e.g. for each subdetector one file), this method
+     allows accessing all parameters from locally stored XML documents.
   */
-  class GeoBuilder : public Module {
+  class ParamLoaderXML : public Module {
 
   public:
 
     //! Macro which adds a method to return a new instance of the module.
-    NEW_MODULE(GeoBuilder)
+    NEW_MODULE(ParamLoaderXML)
 
     //! Constructor
-    GeoBuilder();
+    ParamLoaderXML();
 
     //! Destructor
-    virtual ~GeoBuilder();
+    virtual ~ParamLoaderXML();
 
     //! Initialize the Module
     /*! Function is called only once at the beginning of your job at the beginning of the corresponding module.
@@ -79,7 +85,9 @@ namespace Belle2 {
 
   private:
 
+    std::string m_filenameXML;   /*!< The filename of the XML file. */
+
   };
 }
 
-#endif /* GEOBUILDER_H_ */
+#endif /* PARAMLOADERXML_H_ */

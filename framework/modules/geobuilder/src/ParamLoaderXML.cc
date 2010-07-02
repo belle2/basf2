@@ -8,9 +8,12 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <framework/modules/geobuilder/GeoBuilder.h>
+#include <framework/modules/geobuilder/ParamLoaderXML.h>
+
 #include <framework/fwcore/ModuleManager.h>
-#include <framework/geodetector/GeoDetector.h>
+
+#include <framework/gearbox/Gearbox.h>
+#include <framework/gearbox/GearboxIOXML.h>
 
 using namespace std;
 using namespace Belle2;
@@ -18,52 +21,62 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(GeoBuilder)
+REG_MODULE(ParamLoaderXML)
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-GeoBuilder::GeoBuilder() : Module("GeoBuilder")
+ParamLoaderXML::ParamLoaderXML() : Module("ParamLoaderXML")
 {
   //Set module properties
-  setDescription("Loads the Belle II detector parameters and creates the detector geometry.");
+  setDescription("Loads the Belle II detector parameters from a XML document.");
 
   //Parameter definition
+  addParam("InputFileXML",  m_filenameXML, string("Belle2.xml"), "The filename of the XML input file which should be loaded.");
 }
 
 
-GeoBuilder::~GeoBuilder()
+ParamLoaderXML::~ParamLoaderXML()
 {
 
 }
 
 
-void GeoBuilder::initialize()
+void ParamLoaderXML::initialize()
 {
-  GeoDetector::Instance().createDetector();
+  GearboxIOXML* gearboxIOXML = new GearboxIOXML();
+  bool result = gearboxIOXML->open(m_filenameXML);
+
+  if (result) {
+    Gearbox& gearbox = Gearbox::Instance();
+    gearbox.connect(gearboxIOXML);
+
+  } else {
+    ERROR("Could not open XML file: " << m_filenameXML)
+  }
 }
 
 
-void GeoBuilder::beginRun()
-{
-
-}
-
-
-void GeoBuilder::event()
-{
-
-}
-
-
-void GeoBuilder::endRun()
+void ParamLoaderXML::beginRun()
 {
 
 }
 
 
-void GeoBuilder::terminate()
+void ParamLoaderXML::event()
+{
+
+}
+
+
+void ParamLoaderXML::endRun()
+{
+
+}
+
+
+void ParamLoaderXML::terminate()
 {
 
 }

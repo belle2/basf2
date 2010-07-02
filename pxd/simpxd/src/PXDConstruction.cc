@@ -31,5 +31,5 @@ PXDConstruction::PXDConstruction() : B4VSubDetectorDriver(string("PXDBelleII"))
 void PXDConstruction::initialize(TG4RootDetectorConstruction* dc)
 {
   //Add PXD sensitive detector to sensitive detector manager (using auto-naming mechanism)
-  setSensitiveDetAndVolumes(new PXDSensitiveDetector("PXDSensitiveDetector"), dc);
+  setSensitiveDetectorAuto(new PXDSensitiveDetector("PXDSensitiveDetector"), dc);
 }

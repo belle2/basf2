@@ -28,8 +28,8 @@ namespace Belle2 {
     //! The wire id of this digit.
     int m_wireId;
 
-    //! Time of this digit.
-    double m_time;
+    //! Drigt length of this digit.
+    double m_driftLength;
 
     //! Charge of this digit.
     double m_charge;
@@ -41,7 +41,7 @@ namespace Belle2 {
     void setWireId(int wireId) { m_wireId = wireId; }
 
     //! The method to set time
-    void setTime(double time) { m_time = time; }
+    void setDriftLength(double driftLength) { m_driftLength = driftLength; }
 
     //! The method to set charge
     void setCharge(double charge) { m_charge = charge; }
@@ -53,7 +53,7 @@ namespace Belle2 {
     int getWireId() { return m_wireId; }
 
     //! The method to get time
-    double getTime() { return m_time; }
+    double getDriftLength() { return m_driftLength; }
 
     //! The method to get charge
     double getCharge() { return m_charge; }
@@ -66,11 +66,11 @@ namespace Belle2 {
     //! Useful Constructor
     HitCDC(int layerId,
            int wireId,
-           double time,
+           double driftLength,
            double charge) {
       m_layerId = layerId;
       m_wireId = wireId;
-      m_time = time;
+      m_driftLength = driftLength;
       m_charge = charge;
     }
 

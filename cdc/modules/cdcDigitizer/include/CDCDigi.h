@@ -96,8 +96,15 @@ namespace Belle2 {
     //! Method used to smear drift length
     /*!
         \param driftLength The value of drift length.
+        \param fraction Fraction of the first Gaussian used to smear drift length.
+        \param mean1 Mean value of the first Gassian used to smear drift length.
+        \param resolution1 Resolution of the first Gassian used to smear drift length.
+        \param mean2 Mean value of the second Gassian used to smear drift length.
+        \param resolution2 Resolution of the second Gassian used to smear drift length.
+
+        \return Drift length after smearing.
     */
-    double smearDriftLength(double driftLength);
+    double smearDriftLength(double driftLength, double fraction, double mean1, double resolution1, double mean2, double resolution2);
 
     //! Method to add noise to pure mc signal
     /*! Method generating random noise using Gaussian distribution and add this effect
@@ -109,6 +116,8 @@ namespace Belle2 {
     //! The method to get drift time based on drift length
     /*! In this method, X-T function will be used to calculate drift time.
         \param driftLength The value of drift length.
+
+        \return Drift time.
     */
     double getDriftTime(double driftLength);
 
@@ -141,7 +150,11 @@ namespace Belle2 {
     std::string m_relColNamePlsToMC; /*!< Relation collection name - cdc signal (Digit)  <-> MCParticle */
     std::string m_relColNameMCToSim; /*!< Relation collection name - MCParticle        <-> SimTrkHit */
 
-    double m_spatialResolution;       /*!< Spatial resolution of the sense wire */
+    double m_fraction;          /*!< Fraction of the first Gaussian used to smear drift length */
+    double m_mean1;             /*!< Mean value of the first Gassian used to smear drift length */
+    double m_resolution1;       /*!< Resolution of the first Gassian used to smear drift length */
+    double m_mean2;             /*!< Mean value of the second Gassian used to smear drift length */
+    double m_resolution2;       /*!< Resolution of the second Gassian used to smear drift length */
 
     int   m_electronicEffects;       /*!< Add noise? */
     double m_elNoise;                 /*!< Noise added to the signal */

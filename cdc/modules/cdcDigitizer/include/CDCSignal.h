@@ -29,15 +29,15 @@ namespace Belle2 {
         \param layerId Layer id.
         \param wireId  Wire id.
         \param charge The charge of this signal.
-        \param time The time of this signal.
+        \param driftLength Drift length of this signal.
     */
-    CDCSignal(int layerId, int wireId, double charge, double time) : m_layerId(layerId), m_wireId(wireId), m_charge(charge), m_time(time) {;}
+    CDCSignal(int layerId, int wireId, double charge, double driftLength) : m_layerId(layerId), m_wireId(wireId), m_charge(charge), m_driftLength(driftLength) {;}
 
-    //CDCSignal(int layerId, int wireId, double charge, double time, EVENT::MCParticle * mcPart) : m_layerId(layerId), m_wireId(wireId), m_charge(charge),
-    //       m_time(time) { m_MCPartVec.push_back(mcPart); m_MCWeightVec.push_back(charge);}
+    //CDCSignal(int layerId, int wireId, double charge, double driftLength, EVENT::MCParticle * mcPart) : m_layerId(layerId), m_wireId(wireId), m_charge(charge),
+    //       m_driftLength(driftLength) { m_MCPartVec.push_back(mcPart); m_MCWeightVec.push_back(charge);}
 
-    //CDCSignal(int layerId, int wireId, double charge, double time, MCPartVec mcPartVec, MCWeightVec mcWeightVec) :
-    //       m_layerId(layerId), m_wireId(wireId), m_charge(charge), m_time(time) { m_MCPartVec = mcPartVec; m_MCWeightVec = mcWeightVec;}
+    //CDCSignal(int layerId, int wireId, double charge, double driftLength, MCPartVec mcPartVec, MCWeightVec mcWeightVec) :
+    //       m_layerId(layerId), m_wireId(wireId), m_charge(charge), m_driftLength(driftLength) { m_MCPartVec = mcPartVec; m_MCWeightVec = mcWeightVec;}
 
     //! Destructor
     ~CDCSignal() {};
@@ -66,11 +66,11 @@ namespace Belle2 {
     */
     inline void updateCharge(double charge) { m_charge += charge; }
 
-    //! Set time when signal was created
+    //! Set drift length when signal was created
     /*!
-        \param time Time when signal was created.
+        \param driftLength Drift length when signal was created.
     */
-    inline void setTime(double time) { m_time = time; }
+    inline void setDriftLength(double driftLength) { m_driftLength = driftLength; }
 
     //! Update MC truth information
     //void updateMCParticles(EVENT::MCParticle * mcPart, float weight);
@@ -97,11 +97,11 @@ namespace Belle2 {
     */
     inline double getCharge() const {return m_charge;}
 
-    //! Get time when signal was created
+    //! Get drift length when signal was created
     /*!
-        \return Time of current signal.
+        \return Drift length of current signal.
     */
-    inline double getTime() const {return m_time;}
+    inline double getDriftLength() const {return m_driftLength;}
 
     //! Get MC truth information - particle pointers
     //inline MCPartVec getMCPartVec() const {return m_MCPartVec;}
@@ -117,7 +117,7 @@ namespace Belle2 {
     int m_layerId;   /*!< Layer id */
     int m_wireId;    /*!< Wire id */
     double m_charge; /*!< Charge of CDC signal */
-    double m_time;   /*!< Time when signal has been created */
+    double m_driftLength;   /*!< Drift length when signal has been created */
 
   };
 

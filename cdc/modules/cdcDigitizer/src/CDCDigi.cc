@@ -42,7 +42,11 @@ CDCDigi::CDCDigi() : Module("CDCDigitizer")
   addParam("RandomSeed", m_randomSeed, 12345, "Random seed");
   addParam("InputColName", m_inColName, string("SimHitCDCArray"), "Input collection name");
   addParam("OutputColName", m_outColName, string("HitCDCArray"), "Output collection name");
-  addParam("SpatialResolution", m_spatialResolution, 0.013, "Spatial resolution of sense wire, set in cm");
+  addParam("Fraction", m_fraction, 1.0, "The fraction of the first Gaussian used to smear drift length, set in cm");
+  addParam("Mean1", m_mean1, 0.0, "The mean value of the first Gaussian used to smear drift length, set in cm");
+  addParam("Resolution1", m_resolution1, 0.013, "Resolution of the first Gaussian used to smear drift length, set in cm");
+  addParam("Mean2", m_mean1, 0.0, "The mean value of the second Gaussian used to smear drift length, set in cm");
+  addParam("Resolution2", m_resolution2, 0.013, "Resolution of the second Gaussian used to smear drift length, set in cm");
   addParam("ElectronicEffects", m_electronicEffects, 0, "Apply electronic effects?");
   addParam("ElectronicsNoise", m_elNoise, 1000.0, "Noise added by the electronics, set in ENC");
   addParam("RelCollectionNameMCToSimHit", m_relColNameMCToSim, string("MCToSimHitCDCRel"), "Name of relation collection - MCParticle to SimCDCHit (if nonzero, created)");
@@ -60,7 +64,10 @@ void CDCDigi::initialize()
   m_nEvent  = 0 ;
 
   // Set variables in appropriate physical units
-  m_spatialResolution  *= cm;
+  m_mean1  *= cm;
+  m_mean2  *= cm;
+  m_resolution1  *= cm;
+  m_resolution2  *= cm;
 
   // Initialize random generator (engine, mean, sigma)
   m_random = new TRandom((UInt_t)m_randomSeed);
@@ -131,8 +138,8 @@ void CDCDigi::event()
           ifNewDigi = false;
 
           // If true, update drift length
-          if (hitDriftLength < iterCDCMap->second->getTime()) {
-            iterCDCMap->second->setTime(hitDriftLength);
+          if (hitDriftLength < iterCDCMap->second->getDriftLength()) {
+            iterCDCMap->second->setDriftLength(hitDriftLength);
           }
 
           // Update signal magnitude (add current charge to the total)
@@ -155,16 +162,16 @@ void CDCDigi::event()
   //-----------------------------------------------------
   int iDigits = 0;
   for (iterCDCMap = cdcSignalMap.begin(); iterCDCMap != cdcSignalMap.end(); iterCDCMap++) {
-    // Smear drift length using single Gaussion, based on spatial resolution.
-    double hitNewDriftLength =  smearDriftLength(iterCDCMap->second->getTime());
-    iterCDCMap->second->setTime(hitNewDriftLength);
+    // Smear drift length using double  Gaussion, based on spatial resolution.
+    double hitNewDriftLength =  smearDriftLength(iterCDCMap->second->getDriftLength(), m_fraction, m_mean1, m_resolution1, m_mean2, m_resolution2);
+    iterCDCMap->second->setDriftLength(hitNewDriftLength);
 
     // Save digits into data store
     StoreArray<HitCDC> cdcArray(m_outColName);
     new(cdcArray->AddrAt(iDigits)) HitCDC();
     cdcArray[iDigits]->setLayerId(iterCDCMap->second->getLayerId());
     cdcArray[iDigits]->setWireId(iterCDCMap->second->getWireId());
-    cdcArray[iDigits]->setTime(iterCDCMap->second->getTime());
+    cdcArray[iDigits]->setDriftLength(iterCDCMap->second->getDriftLength());
     cdcArray[iDigits]->setCharge(iterCDCMap->second->getCharge());
 
     // Count number of digits
@@ -174,11 +181,21 @@ void CDCDigi::event()
   m_nEvent++;
 }
 
-double CDCDigi::smearDriftLength(double driftLength)
+double CDCDigi::smearDriftLength(double driftLength, double fraction, double mean1, double resolution1, double mean2, double resolution2)
 {
+  // Smear drift length using double Gaussian function
+  double mean, resolution;
+  if (m_random->Uniform() <= fraction) {
+    mean = mean1;
+    resolution = resolution1;
+  } else {
+    mean = mean2;
+    resolution = resolution2;
+  }
+
   // Smear drift length
-  double newDL = m_random->Gaus(driftLength / cm, m_spatialResolution / cm);
-  while (newDL <= 0.) newDL = m_random->Gaus(driftLength / cm, m_spatialResolution / cm);
+  double newDL = m_random->Gaus(driftLength / cm + mean / cm, resolution / cm);
+  while (newDL <= 0.) newDL = m_random->Gaus(driftLength / cm + mean / cm, resolution / cm);
   return newDL*cm;
 }
 
@@ -318,7 +335,10 @@ void CDCDigi::printModuleParams() const
   //     << "  Electronics noise - ENC [fC]:          " << std::setw(6) << m_elNoise      << "\n");
 
   INFO("                                         " << "\n"
-       << "  Spatial resolution [um]:               " << std::setw(6) << m_spatialResolution / um  << "\n"
+       << "  Mean1 [um]:                     " << std::setw(6) << m_mean1 / um  << "\n"
+       << "  Resolution1 [um]:               " << std::setw(6) << m_resolution1 / um  << "\n"
+       << "  Mean2 [um]:                     " << std::setw(6) << m_mean2 / um  << "\n"
+       << "  Resolution2 [um]:               " << std::setw(6) << m_resolution2 / um  << "\n"
        << std::resetiosflags(std::ios::showpos)
        << std::setprecision(0)
        << "\n");
@@ -349,7 +369,7 @@ void CDCDigi::printCDCSignalInfo(std::string info, const CDCSignalMap & cdcSigna
          << std::setiosflags(std::ios::fixed | std::ios::internal)
          << std::setprecision(2)
          << " Total charge [keV]: "  << iterCDCMap->second->getCharge() / keV
-         << " Drift length [mm]: " << iterCDCMap->second->getTime() / mm
+         << " Drift length [mm]: " << iterCDCMap->second->getDriftLength() / mm
          << std::setprecision(0));
   } // end loop
 }

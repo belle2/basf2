@@ -80,7 +80,7 @@ def process_dir(parent_env, dir_name):
         # generate dictionaries
         dict_files = []
         for linkdef_file in env['LINKDEF_FILES']:
-            dict_filename = str(linkdef_file)[:-9] + 'Dict.cc'        
+            dict_filename = str(linkdef_file).replace(os.sep, '_')[:-9] + 'Dict.cc'
             dict_file = env.RootDict(os.path.join(env['BUILDDIR'], dict_filename), linkdef_file)
             # add current directory to include path for dictionary compilation
             dict_files.append(env.SharedObject(dict_file, CPPPATH = ['.'] + env['CPPPATH']))

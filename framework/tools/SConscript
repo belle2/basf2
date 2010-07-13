@@ -1,9 +1,7 @@
 Import('env')
 
-env['TOOLS_LIBS']['basf2'] = ['ir', 'cdc', 'pxd', 'svd', 'framework', 'framework_kbasf2', 'simulation',
-                              'boost_date_time', 'boost_filesystem', 'boost_program_options',
-                              'boost_python', 'boost_regex', 'boost_system', '$XML_LIBS',
-                              'CLHEP', '$GEANT4_LIBS', '$PYTHON_LIBS', '$ROOT_LIBS', 'Geom', 'EG', 'G4root' 
-                              ]
+env['TOOLS_LIBS']['basf2'] = ['framework_kbasf2', 'framework',
+                              'boost_filesystem', 'boost_program_options', 'boost_python',
+                              '$PYTHON_LIBS']
 
 Return('env')

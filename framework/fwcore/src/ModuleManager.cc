@@ -144,8 +144,10 @@ void ModuleManager::loadLibrary(const std::string& libName, const std::string& l
     //Check if modules were registered, otherwise close the library
     if (m_typeModuleMap.size() > numRegModBefore) {
       m_nameLibraryMap.insert(make_pair(libName, libPointer));
-    } else {
-      dlclose(libPointer);
+// The dlclose is commented out because closing a library causes problems if the library contains objects
+// that register themselves in some collections in other libraries.
+//    } else {
+//      dlclose(libPointer);
     }
   }
 }

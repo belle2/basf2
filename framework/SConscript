@@ -1,0 +1,7 @@
+Import('env')
+
+env['LIBS'] = ['$ROOT_LIBS', 'Geom',
+               'boost_python', 'boost_filesystem',
+               '$PYTHON_LIBS', '$XML_LIBS']
+
+Return('env')

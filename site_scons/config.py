@@ -91,6 +91,10 @@ def check_system(conf):
 # configure the external packages
 def configure_externals(conf):
     
+    # configure externals only after they have been built
+    if BUILD_TARGETS == ['externals']:
+        return True
+
     # boost
     conf.env.Append(CPPPATH = os.path.join(conf.env['EXTINCDIR'], 'boost'))
 
@@ -120,10 +124,9 @@ def configure_externals(conf):
         root_env.ParseConfig('root-config --glibs')
         conf.env['ROOT_GLIBS'] = root_env['LIBS']
     else:
-        if BUILD_TARGETS != ['externals']:
-            print 'root configuration tool missing'
-            print '-> create it with the command "scons externals"'
-            return False
+        print 'root configuration tool missing'
+        print '-> create it with the command "scons externals"'
+        return False
 
     return True
 

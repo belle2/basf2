@@ -19,7 +19,7 @@ namespace Belle2 {
 
   class GearDir;
 
-  //!  The GeoPXDBelleII class.
+//!  The GeoPXDBelleII class.
   /*!
      The creator for the PXD geometry of the Belle II detector.
   */

@@ -3,12 +3,13 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Andreas Moll, Zbynek Drasal                              *
+ * Contributors: Andreas Moll, Zbynek Drasal, Christian Oswald            *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
 #include <pxd/geopxd/GeoPXDBelleII.h>
+#include <pxd/geopxd/B2GeomPXDLayer.h>
 
 #include <framework/gearbox/GearDir.h>
 #include <framework/datastore/Units.h>
@@ -21,6 +22,8 @@
 #include <TGeoMatrix.h>
 #include <TGeoManager.h>
 #include <TGeoVolume.h>
+
+
 
 
 using namespace std;
@@ -68,12 +71,6 @@ void GeoPXDBelleII::create(GearDir& content)
 
 
   //----------------------------------------
-  //            Get Material
-  //----------------------------------------
-  TGeoMedium* sensorMed = gGeoManager->GetMedium(sensorMatName.c_str());
-
-
-  //----------------------------------------
   //           Build subdetector
   //----------------------------------------
 
@@ -82,65 +79,12 @@ void GeoPXDBelleII::create(GearDir& content)
 
   for (int iLayer = 1; iLayer <= nLayer; ++iLayer) {
 
-    GearDir layerContent(content);
-    layerContent.append((format("Layers/Layer[%1%]/") % (iLayer)).str());
-
-    //Collect layer data
-    double layerPhi0    = layerContent.getParamAngle("Phi0");
-    double layerTheta   = layerContent.getParamAngle("Theta");
-    double layerRadius  = layerContent.getParamLength("Radius");
-    double layerOffsetY = layerContent.getParamLength("OffsetY");
-    double layerOffsetZ = layerContent.getParamLength("OffsetZ");
-    int    nLadder      = int(layerContent.getParamNumValue("NumberOfLadders"));
-
-    //Collect ladder data
-    layerContent.append("Ladder/");
-    double ladderLength     = layerContent.getParamLength("Length");
-    //double ladderWidth      = layerContent.getParamLength("Width");
-    //double ladderThick      = layerContent.getParamLength("Thickness");
-    //double switcherDistance = layerContent.getParamLength("PXLSwitcherDistance");
-    int    nSensor          = int(layerContent.getParamNumValue("NumberOfSensors"));
-
-    //Collect sensor data
-    layerContent.append("Sensor/");
-    double sensorLength      = layerContent.getParamLength("Length");
-    double sensorWidth       = layerContent.getParamLength("Width");
-    double sensorGap         = layerContent.getParamLength("Gap");
-    double sensorThick       = layerContent.getParamLength("Thickness");
-    //double sensorPadSizeRPhi = layerContent.getParamLength("PadSizeRPhi");
-    //double sensorPadSizeZ    = layerContent.getParamLength("PadSizeZ");
-
-    double sensorRimWidthZ   = ((ladderLength - (nSensor - 1) * sensorGap) / nSensor - sensorLength) / 2.0; //rim around active sensor + active sensor length
-    if (sensorRimWidthZ < (0.00001)) sensorRimWidthZ = 0; // Check if sensor rim not below precision (0.01 um)
-
     //Build geometry
-    double ladderPhiRot = (2.0 * M_PI) / nLadder;
-    TGeoVolumeAssembly* volGrpLayer;
-    TGeoVolumeAssembly* volGrpLadder;
+    B2GeomPXDLayer* b2gPXDLayer = new B2GeomPXDLayer(iLayer);
+    b2gPXDLayer->init(content);
+    b2gPXDLayer->make();
 
-    volGrpLayer = new TGeoVolumeAssembly((format("PXDLayer_%1%") % iLayer).str().c_str());
-    volGrpPXD->AddNode(volGrpLayer, 1);
+    volGrpPXD->AddNode(b2gPXDLayer->getVol(), 1);
 
-    for (int iLadder = 0; iLadder < nLadder; ++iLadder) {
-      double currentPhi = layerPhi0 + ladderPhiRot * iLadder;
-
-      volGrpLadder = new TGeoVolumeAssembly((format("PXDLadder_%1%_%2%") % iLayer % iLadder).str().c_str());
-      TGeoRotation* ladderRot = new TGeoRotation((format("PXDLadderRot_%1%_%2%") % iLayer % iLadder).str().c_str());
-      ladderRot->RotateX(layerTheta / deg);
-      ladderRot->RotateZ((currentPhi / deg) - 90.0);
-      TVector3 ladderPos(layerRadius, layerOffsetY, layerOffsetZ); // Ladder starting position
-      ladderPos.RotateZ(currentPhi); // Ladder final position
-      volGrpLayer->AddNode(volGrpLadder, 1, new TGeoCombiTrans(ladderPos[0], ladderPos[1], ladderPos[2], ladderRot));
-
-      for (int iSensor = 0; iSensor < nSensor; ++iSensor) {
-
-        //1) Build active sensors (The SD prefix (Sensitive Detector), flags the volume to be a sensitive detector)
-        TGeoVolume* volSensorBox = gGeoManager->MakeBox((format("SD_PXDSensor_%1%_%2%_%3%") % iLayer % iLadder % iSensor).str().c_str(),
-                                                        sensorMed, sensorWidth * 0.5, sensorThick * 0.5, sensorLength * 0.5);
-
-        volGrpLadder->AddNode(volSensorBox, 1, new TGeoTranslation(0.0, 0.0, -0.5*ladderLength + 0.5*(sensorLength + 2*sensorRimWidthZ) +
-                                                                   iSensor*(sensorLength + 2*sensorRimWidthZ + sensorGap)));
-      }
-    }
   }
 }

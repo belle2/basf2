@@ -16,41 +16,71 @@ REG_MODULE(ModuleMoin)
 
 ModuleMoin::ModuleMoin() : Module("Moin")
 {
-  setDescription("Moin World");
+  setDescription("Test Module for Martin's work on framework issues.");
 
-  setPropertyFlags(1);
+  addParam("fill_datastore", m_fillDataStore, 1, "Fill stuff into the DataStore");
+
+  DEBUG(100, "Constructor of Moin done");
 }
 
 
 ModuleMoin::~ModuleMoin()
 {
+  DEBUG(100, "Destructor of Moin done");
 }
 
 void ModuleMoin::initialize()
 {
-  outputstream.open("output.txt", fstream::out);
+  m_evtNum = 0;
+//  outputstream.open("output.txt", fstream::out);
 }
 
 
 void ModuleMoin::beginRun()
 {
-  cout << "beginRun called" << endl;
+  DEBUG(100, "BeginRun of Moin called.");
 }
 
 
 void ModuleMoin::event()
 {
-  StoreObjPtr<SimpleVec<int> > Pointer2;
+  // Vectors of int
+  StoreObjPtr<SimpleVec<int> > testVector1("testVector1");
+  StoreObjPtr<SimpleVec<int> > testVector2("testVector2");
+
+  // Relation
+  StoreObjPtr<Relation> relation("relation");
+
 
   m_evtNum++;
 
-  StoreObjPtr<Relation> RelPtr("RelPtr");
-  TObject* object = RelPtr->getFrom();
-  if (object) { INFO("Moin Relation");} else {INFO("No return Object");}
+  if (m_fillDataStore) {
+    // fill some values
+    vector<int> vector1;
+    vector<int> vector2;
+    for (int ii = 0; ii < 10; ++ii) {
+      vector1.push_back(random.Poisson(10));
+      vector2.push_back(random.Poisson(m_evtNum * ii));
 
-  SimpleVec<int>* Vec = (SimpleVec<int>*)(object);
-  vector<int> vec = Vec->getVector();
-  INFO("vec[0] is " << vec[0]);
+//      INFO ("vector1[" << ii << "] : " << vector1[ii]);
+    }
+    testVector1->setVector(vector1);
+    testVector2->setVector(vector2);
+
+    relation->setFrom(&(*testVector1));
+    relation->setTo(&(*testVector2));
+  } else {
+
+    StoreObjPtr<Relation> relation("relation");
+    TObject* object = relation->getFrom();
+    SimpleVec<int>* vectorFromRelation = static_cast<SimpleVec<int>* >(object);
+
+    vector<int> vector1 = vectorFromRelation->getVector();
+
+    INFO(vector1[0])
+
+  }
+
 
 //  StoreArray<HitCDC> CDCArray("HitCDCArray");
 //  outputstream << CDCArray.GetEntries() << endl;
@@ -59,20 +89,20 @@ void ModuleMoin::event()
 //  }
 
 
-  outputstream << "\n#Next event!#" << endl;
+//  outputstream << "\n#Next event!#" << endl;
 
-  TParticlePDG* particle = TDatabasePDG::Instance()->GetParticle(13);
-  WARNING(particle->Mass());
+  /*  TParticlePDG* particle = TDatabasePDG::Instance()->GetParticle(13);
+    WARNING(particle->Mass());*/
 }
 
 
 void ModuleMoin::endRun()
 {
-  cout << "endRun called" << endl;
+  DEBUG(100, "EndRun of Moin called.");
 }
 
 
 void ModuleMoin::terminate()
 {
-  cout << "Term called" << endl;
+  DEBUG(100, "Terminate of Moin called.");
 }

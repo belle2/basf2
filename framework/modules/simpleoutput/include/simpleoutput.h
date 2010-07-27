@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef MODULESIMPLEOUTPUT_H
-#define MODULESIMPLEOUTPUT_H
+#ifndef SIMPLEOUTPUT_H
+#define SIMPLEOUTPUT_H
 
 #include <framework/fwcore/Module.h>
 #include <framework/fwcore/ModuleManager.h>
@@ -39,18 +39,18 @@ namespace Belle2 {
       \sa EDurability
       \author <a href="mailto:martin.heck@kit.edu?subject=Output Module">Martin Heck</a>
   */
-  class ModuleSimpleOutput : public Module {
+  class SimpleOutput : public Module {
 
   public:
 
-    //! Macro which adds a method to return a new instance of the module.
-    NEW_MODULE(ModuleSimpleOutput)
+    // Macro which adds a method to return a new instance of the module.
+    NEW_MODULE(SimpleOutput)
 
     //! Constructor
-    ModuleSimpleOutput();
+    SimpleOutput();
 
     //! Destructor
-    virtual ~ModuleSimpleOutput();
+    virtual ~SimpleOutput();
 
     //! Initialize the Module
     /*! Opens a file, creates TTree(s), fetches Iterators over the maps of the DataStore,
@@ -179,4 +179,4 @@ namespace Belle2 {
 
 } // end namespace Belle2
 
-#endif // MODULEHELLO_H
+#endif // SIMPLEOUTPUT_H

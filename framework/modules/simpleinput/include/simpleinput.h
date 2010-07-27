@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef MODULESIMPLEINPUT_H
-#define MODULESIMPLEINPUT_H
+#ifndef SIMPLEINPUT_H
+#define SIMPLEINPUT_H
 
 #include <framework/fwcore/Module.h>
 #include <framework/fwcore/ModuleManager.h>
@@ -34,18 +34,18 @@ namespace Belle2 {
       \sa EDurability
       \author <a href="mailto:martin.heck@kit.edu?subject=Input Module">Martin Heck</a>
   */
-  class ModuleSimpleInput : public Module {
+  class SimpleInput : public Module {
 
   public:
 
-    //! Macro which adds a method to return a new instance of the module.
-    NEW_MODULE(ModuleSimpleInput)
+    // Macro which adds a method to return a new instance of the module.
+    NEW_MODULE(SimpleInput)
 
     //! Constructor
-    ModuleSimpleInput();
+    SimpleInput();
 
     //! Destructor
-    virtual ~ModuleSimpleInput();
+    virtual ~SimpleInput();
 
     //! Initialize the Module
     /*!
@@ -141,4 +141,4 @@ namespace Belle2 {
 
 } // end namespace Belle2
 
-#endif // MODULEHELLO_H
+#endif // SIMPLEINPUT_H

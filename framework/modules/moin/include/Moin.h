@@ -26,6 +26,8 @@
 #include <TDatabasePDG.h>
 #include <TParticlePDG.h>
 
+#include <TRandom3.h>
+
 
 namespace Belle2 {
 
@@ -36,7 +38,7 @@ namespace Belle2 {
 
   public:
 
-    //! Macro which adds a method to return a new instance of the module.
+    // Macro which adds a method to return a new instance of the module.
     NEW_MODULE(ModuleMoin)
 
     //! Constructor
@@ -88,6 +90,8 @@ namespace Belle2 {
 
 
   private:
+
+    int m_fillDataStore;
 
     int m_evtNum;
 

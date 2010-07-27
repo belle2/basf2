@@ -13,9 +13,9 @@
 using namespace std;
 using namespace Belle2;
 
-REG_MODULE(ModuleSimpleInput)
+REG_MODULE(SimpleInput)
 
-ModuleSimpleInput::ModuleSimpleInput() : Module("SimpleInput")
+SimpleInput::SimpleInput() : Module("SimpleInput")
 {
   //Set module properties
   setDescription("simple input");
@@ -53,16 +53,13 @@ ModuleSimpleInput::ModuleSimpleInput() : Module("SimpleInput")
   addParam(m_steerBranchNames[0], m_branchNames[0], branchNames, "Names of branches to be read into event map. Empty means all branches.");
   addParam(m_steerBranchNames[1], m_branchNames[1], branchNames, "Names of branches to be read into run map. Empty means all branches.");
   addParam(m_steerBranchNames[2], m_branchNames[2], branchNames, "Names of branches to be read into persistent map. Empty means all branches.");
-
-
-  INFO("Constructor done.")
 }
 
 
-ModuleSimpleInput::~ModuleSimpleInput()
+SimpleInput::~SimpleInput()
 {}
 
-void ModuleSimpleInput::initialize()
+void SimpleInput::initialize()
 {
   //Open TFile
   m_file = new TFile(m_inputFileName.c_str(), "READ");
@@ -128,13 +125,13 @@ void ModuleSimpleInput::initialize()
 }
 
 
-void ModuleSimpleInput::beginRun()
+void SimpleInput::beginRun()
 {
   cout << "beginRun called" << endl;
 }
 
 
-void ModuleSimpleInput::event()
+void SimpleInput::event()
 {
   m_file->cd();
 
@@ -143,24 +140,24 @@ void ModuleSimpleInput::event()
 }
 
 
-void ModuleSimpleInput::endRun()
+void SimpleInput::endRun()
 {
   cout << "endRun called" << endl;
 }
 
 
-void ModuleSimpleInput::terminate()
+void SimpleInput::terminate()
 {
   cout << "Term called" << endl;
 }
 
 
-void ModuleSimpleInput::setupTFile()
+void SimpleInput::setupTFile()
 {
 }
 
 
-void ModuleSimpleInput::readTree(const EDurability& durability)
+void SimpleInput::readTree(const EDurability& durability)
 {
   // Fill m_objects
   WARNING("Durability" << durability)
@@ -178,7 +175,7 @@ void ModuleSimpleInput::readTree(const EDurability& durability)
 
 }
 
-TBranch* ModuleSimpleInput::validBranch(int& ibranch, TObjArray* branches)
+TBranch* SimpleInput::validBranch(int& ibranch, TObjArray* branches)
 {
   TBranch* branch = static_cast<TBranch*>(branches->At(ibranch));
   if (!branch) {

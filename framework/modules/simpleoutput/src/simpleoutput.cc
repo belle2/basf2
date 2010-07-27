@@ -13,9 +13,9 @@
 using namespace std;
 using namespace Belle2;
 
-REG_MODULE(ModuleSimpleOutput)
+REG_MODULE(SimpleOutput)
 
-ModuleSimpleOutput::ModuleSimpleOutput() : Module("SimpleOutput")
+SimpleOutput::SimpleOutput() : Module("SimpleOutput")
 {
   //Set module properties
   setDescription("simple output");
@@ -52,13 +52,10 @@ ModuleSimpleOutput::ModuleSimpleOutput() : Module("SimpleOutput")
   addParam(m_steerBranchNames[2], m_branchNames[2], branchNames, "Names of branches to be written from persistent map. Empty means all branches.");
 
   addParam("switchBranchNameMeaning", m_switchBranchNameMeaning, false, "If true, given branch names are excluded instead of taken.");
-
-
-  INFO("Constructor done.");
 }
 
 
-ModuleSimpleOutput::~ModuleSimpleOutput()
+SimpleOutput::~SimpleOutput()
 {
   if (m_file) {
     delete m_file;
@@ -75,7 +72,7 @@ ModuleSimpleOutput::~ModuleSimpleOutput()
   }
 }
 
-void ModuleSimpleOutput::initialize()
+void SimpleOutput::initialize()
 {
   // check for same treeNames
   for (int ii = 0; ii < c_NDurabilityTypes; ++ii) {
@@ -110,13 +107,13 @@ void ModuleSimpleOutput::initialize()
 }
 
 
-void ModuleSimpleOutput::beginRun()
+void SimpleOutput::beginRun()
 {
   INFO("beginRun called.");
 }
 
 
-void ModuleSimpleOutput::event()
+void SimpleOutput::event()
 {
   //Restore Object Count:
   if (!m_done[c_Event]) {
@@ -135,7 +132,7 @@ void ModuleSimpleOutput::event()
 }
 
 
-void ModuleSimpleOutput::endRun()
+void SimpleOutput::endRun()
 {
   //fill Run data
   if (m_treeNames[1] != "NONE") {
@@ -149,7 +146,7 @@ void ModuleSimpleOutput::endRun()
 }
 
 
-void ModuleSimpleOutput::terminate()
+void SimpleOutput::terminate()
 {
   //fill Persistent data
   if (m_treeNames[2] != "NONE") {
@@ -168,7 +165,7 @@ void ModuleSimpleOutput::terminate()
   INFO("terminate called");
 }
 
-size_t ModuleSimpleOutput::getSize(const int& mapID)
+size_t SimpleOutput::getSize(const int& mapID)
 {
   int sizeCounter = 0;
   m_iter[mapID]->first();
@@ -187,7 +184,7 @@ size_t ModuleSimpleOutput::getSize(const int& mapID)
   return sizeCounter;
 }
 
-void ModuleSimpleOutput::setupTFile()
+void SimpleOutput::setupTFile()
 {
   m_file = new TFile(m_outputFileName.c_str(), "RECREATE", "basf2 Event File");
   m_file->SetCompressionLevel(m_compressionLevel);
@@ -200,7 +197,7 @@ void ModuleSimpleOutput::setupTFile()
   }
 }
 
-void ModuleSimpleOutput::fillTree(const EDurability& durability)
+void SimpleOutput::fillTree(const EDurability& durability)
 {
   size_t sizeCounter = 0;
 
@@ -274,7 +271,7 @@ void ModuleSimpleOutput::fillTree(const EDurability& durability)
 }
 
 
-void ModuleSimpleOutput::switchBranchNameMeaning(const EDurability& durability)
+void SimpleOutput::switchBranchNameMeaning(const EDurability& durability)
 {
   vector<string> branchNameDummy;
   for (int ii = 2 * durability; ii < 2*durability + 2; ii++) {

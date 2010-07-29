@@ -8,10 +8,15 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <pxd/geopxd/B2GeomPXDLadder.h>
+#define B2GEOM_BASF2
 
+#ifdef B2GEOM_BASF2
+#include <pxd/geopxd/B2GeomPXDLadder.h>
 using namespace Belle2;
 using namespace boost;
+#else
+#include "B2GeomPXDLadder.h"
+#endif
 using namespace std;
 
 B2GeomPXDLadder::B2GeomPXDLadder()
@@ -23,13 +28,16 @@ B2GeomPXDLadder::B2GeomPXDLadder(Int_t iLay, Int_t iLad)
 {
   iLayer = iLay;
   iLadder = iLad;
-  path = (format("PXD_Layer_%1%_Ladder_%2%") % iLayer % iLadder).str();
+  char text[200];
+  sprintf(text, "PXD_Layer_%i_Ladder_%i", iLayer, iLadder);
+  path = string(text);
 }
 
 B2GeomPXDLadder::~B2GeomPXDLadder()
 {
 }
 
+#ifdef B2GEOM_BASF2
 Bool_t B2GeomPXDLadder::init(GearDir& content)
 {
   ladderContent = GearDir(content);
@@ -42,6 +50,12 @@ Bool_t B2GeomPXDLadder::init(GearDir& content)
   medGlue = new TGeoMedium("medGlue", 1, matVacuum);
   return true;
 }
+#else
+Bool_t B2GeomPXDLadder::init()
+{
+
+}
+#endif
 
 Bool_t B2GeomPXDLadder::make()
 {
@@ -56,7 +70,11 @@ void B2GeomPXDLadder::putSensors()
 
   for (int iSensor = 0; iSensor < nSensors; ++iSensor) {
     b2gPXDSensors[iSensor] = new B2GeomPXDSensor(iLayer, iLadder, iSensor);
+#ifdef B2GEOM_BASF2
     b2gPXDSensors[iSensor]->init(ladderContent);
+#else
+    b2gPXDSensors[iSensor]->init();
+#endif
     b2gPXDSensors[iSensor]->make();
     volPXDLadder->AddNode(b2gPXDSensors[iSensor]->getVol(), 1, new TGeoTranslation(0.0,
                           0.0,

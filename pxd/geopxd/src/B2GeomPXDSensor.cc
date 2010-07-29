@@ -8,10 +8,16 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <pxd/geopxd/B2GeomPXDSensor.h>
+#define B2GEOM_BASF2
 
+#ifdef B2GEOM_BASF2
+#include <pxd/geopxd/B2GeomPXDSensor.h>
 using namespace boost;
 using namespace Belle2;
+#else
+#include "B2GeomPXDSensor.h"
+#endif
+
 using namespace std;
 
 B2GeomPXDSensor::B2GeomPXDSensor()
@@ -28,7 +34,9 @@ B2GeomPXDSensor::B2GeomPXDSensor(Int_t iLay, Int_t iLad, Int_t iSen)
   iLayer = iLay;
   iLadder = iLad;
   iSensor = iSen;
-  path = (format("PXD_Layer_%1%_Ladder_%2%_Sensor_%3%") % iLayer % iLadder % iSensor).str();
+  char text[200];
+  sprintf(text, "PXD_Layer_%i_Ladder_%i_Sensor_%i", iLayer, iLadder, iSensor);
+  path = string(text);
 
 }
 
@@ -37,6 +45,7 @@ B2GeomPXDSensor::~B2GeomPXDSensor()
 
 }
 
+#ifdef B2GEOM_BASF2
 Bool_t B2GeomPXDSensor::init(GearDir& content)
 {
   GearDir sensorContent(content);
@@ -71,8 +80,7 @@ Bool_t B2GeomPXDSensor::init(GearDir& content)
   return true;
 
 }
-
-
+#else
 Bool_t B2GeomPXDSensor::init()
 {
   // check if this sensor has been already created??
@@ -94,6 +102,7 @@ Bool_t B2GeomPXDSensor::init()
   return true;
 
 }
+#endif
 
 Bool_t B2GeomPXDSensor::make()
 {

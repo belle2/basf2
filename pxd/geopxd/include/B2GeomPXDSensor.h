@@ -8,11 +8,13 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-
+#ifdef B2GEOM_BASF2
 #include <framework/gearbox/GearDir.h>
 #include <framework/datastore/Units.h>
-#include <string>
 #include <boost/format.hpp>
+#endif
+
+#include <string>
 #include "TGeoMaterial.h"
 #include "TGeoMedium.h"
 #include "TGeoManager.h"
@@ -26,8 +28,10 @@
 
 using namespace std;
 
+#ifdef B2GEOM_BASF2
 namespace Belle2 {
   class GearDir;
+#endif
 
   class B2GeomPXDSensor {
   private:
@@ -72,8 +76,11 @@ namespace Belle2 {
     B2GeomPXDSensor(Int_t iLayer , Int_t iLadder, Int_t iSensor);
     ~B2GeomPXDSensor();
 
+#ifdef B2GEOM_BASF2
     Bool_t init(GearDir& content);
+#else
     Bool_t init();
+#endif
     Bool_t make();
     TGeoVolumeAssembly* getVol() {
       return volPXDSensor;
@@ -83,6 +90,7 @@ namespace Belle2 {
     }
 
   };
+#ifdef B2GEOM_BASF2
 }
-
+#endif
 #endif

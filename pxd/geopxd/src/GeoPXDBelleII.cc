@@ -8,6 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+#define B2GEOM_BASF2
+
 #include <pxd/geopxd/GeoPXDBelleII.h>
 #include <pxd/geopxd/B2GeomPXDLayer.h>
 

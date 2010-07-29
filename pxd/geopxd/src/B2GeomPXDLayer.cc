@@ -8,10 +8,16 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <pxd/geopxd/B2GeomPXDLayer.h>
+#define B2GEOM_BASF2
 
+#ifdef B2GEOM_BASF2
+#include <pxd/geopxd/B2GeomPXDLayer.h>
 using namespace Belle2;
 using namespace boost;
+#else
+#include "B2GeomPXDLayer.h"
+#endif
+
 using namespace std;
 
 B2GeomPXDLayer::B2GeomPXDLayer()
@@ -23,7 +29,9 @@ B2GeomPXDLayer::B2GeomPXDLayer(Int_t iLay)
 {
   volPXDLayer = 0;
   iLayer = iLay;
-  path = (format("PXD_Layer_%1%") % iLayer).str();
+  char text[200];
+  sprintf(text, "PXD_Layer_%i", iLayer);
+  path = string(text);
 
 }
 
@@ -32,6 +40,7 @@ B2GeomPXDLayer::~B2GeomPXDLayer()
 
 }
 
+#ifdef B2GEOM_BASF2
 Bool_t B2GeomPXDLayer::init(GearDir& content)
 {
   layerContent = GearDir(content);
@@ -56,6 +65,12 @@ Bool_t B2GeomPXDLayer::init(GearDir& content)
   // fHalfShellOffsetZ[1] = 0;
   return true;
 }
+#else
+Bool_t B2GeomPXDLayer::init()
+{
+
+}
+#endif
 
 Bool_t B2GeomPXDLayer::make()
 {
@@ -91,9 +106,12 @@ void B2GeomPXDLayer::putLadder(Int_t iLadder)
 
   // create Ladder
   b2gPXDLadders[iLadder] = new B2GeomPXDLadder(iLayer, iLadder);
+#ifdef B2GEOM_BASF2
   b2gPXDLadders[iLadder]->init(layerContent);
+#else
+  b2gPXDLadders[iLadder]->init();
+#endif
   b2gPXDLadders[iLadder]->make();
-
   volPXDLayer->AddNode(b2gPXDLadders[iLadder]->getVol(), 1, hmaLadderPosition);
 
 }

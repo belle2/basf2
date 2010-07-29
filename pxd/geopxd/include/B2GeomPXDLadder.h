@@ -8,33 +8,42 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+#ifdef B2GEOM_BASF2
 #include <pxd/geopxd/B2GeomPXDSensor.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/datastore/Units.h>
 #include <boost/format.hpp>
+#else
+#include "B2GeomPXDSensor.h"
+#endif
+
 #include "TGeoMaterial.h"
 #include "TGeoMedium.h"
 #include "TGeoManager.h"
 #include "TGeoMatrix.h"
 #include "TGeoVolume.h"
-#include <vector>
 #include <string>
+#include <vector>
 
 
 #ifndef B2GEOMPXDLADDER_H_
 #define B2GEOMPXDLADDER_H_
 
 using namespace std;
+
+#ifdef B2GEOM_BASF2
 namespace Belle2 {
 
   class GearDir;
-
+#endif
   class B2GeomPXDLadder {
   private:
 
     //! path of this Ladder
     string path;
+#ifdef B2GEOM_BASF2
     GearDir ladderContent;
+#endif
 
     //! TGeoVolumeAssembly which contains all parts of this sensor
     TGeoVolumeAssembly* volPXDLadder;
@@ -67,13 +76,18 @@ namespace Belle2 {
     B2GeomPXDLadder();
     B2GeomPXDLadder(Int_t iLayer , Int_t iLadder);
     ~B2GeomPXDLadder();
+#ifdef B2GEOM_BASF2
     Bool_t init(GearDir& content);
+#else
+    Bool_t init();
+#endif
     Bool_t make();
     TGeoVolumeAssembly* getVol() {
       return volPXDLadder;
     }
   };
-
+#ifdef B2GEOM_BASF2
 }
+#endif
 
 #endif

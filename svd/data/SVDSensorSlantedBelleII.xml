@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<SlantedSensor>
+<!-- All numbers from TDR -->
+<MaterialSensor>Silicon</MaterialSensor>
+<ThicknessActive desc="Thickness of the active sensors" unit="um">300</ThicknessActive>
+<WidthActive desc="Width of the active sensor" unit="mm">57.59</WidthActive>
+<Width2Active desc="Width2 of the active sensor" unit="mm">38.42</Width2Active>
+<LengthActive desc="Length of the active sensor" unit="mm">122.76</LengthActive>
+<Thickness desc="The over all thickness of the sensor" unit="mm">1</Thickness>
+<Length desc="The over all length of the sensor" unit="mm">125.58</Length>
+<Width desc="The overall width of the sensor" unit="mm">60.63</Width>
+<Width2 desc="The overall width2 of the sensor" unit="mm">41.02</Width2>
+</SlantedSensor>

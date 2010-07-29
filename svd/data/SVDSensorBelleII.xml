@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Sensor>
+<!-- All numbers from TDR -->
+<MaterialSensor>Silicon</MaterialSensor>
+<ThicknessActive desc="Thickness of the active sensors" unit="um">300</ThicknessActive>
+<WidthActive desc="Width of the active sensor" unit="mm">57.72</WidthActive>
+<LengthActive desc="Length of the active sensor" unit="mm">122.9</LengthActive>
+<Thickness desc="The over all thickness of the sensor" unit="mm">1</Thickness>
+<Length desc="The over all width of the sensor" unit="mm">124.880</Length>
+<Width desc="The overall length of the sensor" unit="mm">59.600</Width>
+</Sensor>

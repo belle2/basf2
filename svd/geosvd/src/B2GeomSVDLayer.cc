@@ -8,10 +8,16 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <svd/geosvd/B2GeomSVDLayer.h>
+#define B2GEOM_BASF2
 
+#ifdef B2GEOM_BASF2
+#include <svd/geosvd/B2GeomSVDLayer.h>
 using namespace Belle2;
 using namespace boost;
+#else
+#include "B2GeomSVDLayer.h"
+#endif
+
 using namespace std;
 
 B2GeomSVDLayer::B2GeomSVDLayer()
@@ -23,7 +29,9 @@ B2GeomSVDLayer::B2GeomSVDLayer(Int_t iLay)
 {
   volSVDLayer = 0;
   iLayer = iLay;
-  path = (format("SVD_Layer_%1%") % iLayer).str();
+  char text[200];
+  sprintf(text, "SVD_Layer_%i", iLayer);
+  path = string(text);
 
 }
 
@@ -32,6 +40,7 @@ B2GeomSVDLayer::~B2GeomSVDLayer()
 
 }
 
+#ifdef B2GEOM_BASF2
 Bool_t B2GeomSVDLayer::init(GearDir& content)
 {
   layerContent = GearDir(content);
@@ -55,9 +64,16 @@ Bool_t B2GeomSVDLayer::init(GearDir& content)
   // fHalfShellOffsetZ[1] = 0;
   return true;
 }
+#else
+Bool_t B2GeomSVDLayer::init()
+{
+
+}
+#endif
 
 Bool_t B2GeomSVDLayer::make()
 {
+  printf("make B2GeomSVDLayer %i\n", iLayer);
 
   volSVDLayer = new TGeoVolumeAssembly(path.c_str());
   for (int iLadder = 0; iLadder < nLadders; ++iLadder) {
@@ -91,7 +107,11 @@ void B2GeomSVDLayer::putLadder(Int_t iLadder)
 
   // create Ladder
   b2gSVDLadders[iLadder] = new B2GeomSVDLadder(iLayer, iLadder);
+#ifdef B2GEOM_BASF2
   b2gSVDLadders[iLadder]->init(layerContent);
+#else
+  b2gSVDLadders[iLadder]->init();
+#endif
   b2gSVDLadders[iLadder]->make();
 
   volSVDLayer->AddNode(b2gSVDLadders[iLadder]->getVol(), 1, hmaLadderPosition);

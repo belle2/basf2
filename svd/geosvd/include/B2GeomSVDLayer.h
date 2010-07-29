@@ -8,18 +8,23 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+#ifdef B2GEOM_BASF2
 #include <svd/geosvd/B2GeomSVDLadder.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/datastore/Units.h>
+#include <boost/format.hpp>
+#else
+#include "B2GeomSVDLadder.h"
+#endif
+
 #include "TGeoMaterial.h"
 #include "TGeoMedium.h"
 #include "TGeoManager.h"
 #include "TGeoMatrix.h"
 #include "TGeoVolume.h"
 #include "TVector3.h"
-#include <boost/format.hpp>
-#include <vector>
 #include <string>
+#include <vector>
 
 
 #ifndef B2GEOMSVDLAYER_H_
@@ -27,14 +32,17 @@
 
 using namespace std;
 
+#ifdef B2GEOM_BASF2
 namespace Belle2 {
 
   class GearDir;
+#endif
   class B2GeomSVDLayer {
 
   private:
-
+#ifdef B2GEOM_BASF2
     GearDir layerContent;
+#endif
     //! path of this Layer
     string path;
 
@@ -67,12 +75,18 @@ namespace Belle2 {
     B2GeomSVDLayer();
     B2GeomSVDLayer(Int_t iLay);
     ~B2GeomSVDLayer();
+#ifdef B2GEOM_BASF2
     Bool_t init(GearDir& content);
+#else
+    Bool_t init();
+#endif
     Bool_t make();
     TGeoVolume* getVol() {
       return volSVDLayer;
 
     }
   };
+#ifdef B2GEOM_BASF2
 }
+#endif
 #endif

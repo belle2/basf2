@@ -8,15 +8,21 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+#ifdef B2GEOM_BASF2
 #include <svd/geosvd/B2GeomSVDSensor.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/datastore/Units.h>
 #include <boost/format.hpp>
+#else
+#include "B2GeomSVDSensor.h"
+#endif
+
 #include "TGeoMaterial.h"
 #include "TGeoMedium.h"
 #include "TGeoManager.h"
 #include "TGeoMatrix.h"
 #include "TGeoVolume.h"
+#include "TMath.h"
 #include <vector>
 #include <string>
 
@@ -26,16 +32,19 @@
 
 using namespace std;
 
+#ifdef B2GEOM_BASF2
 namespace Belle2 {
-
   class GearDir;
+#endif
 
   class B2GeomSVDLadder {
   private:
 
     //! path of this Ladder
     string path;
+#ifdef B2GEOM_BASF2
     GearDir ladderContent;
+#endif
 
     //! TGeoVolumeAssembly which contains all parts of this sensor
     TGeoVolumeAssembly* volSVDLadder;
@@ -53,11 +62,10 @@ namespace Belle2 {
     //! number of slanted sensors
     Int_t nSlantedSensors;
 
-    Double_t fSensorLength;
-    Double_t fSensorWidth;
-    Double_t fSensorWidth2;
-    Double_t fSensorThick;
+    //! Gap between two sensor boxes
     Double_t fGapLength;
+    //! Angle of slanted sensor
+    Double_t fTheta;
 
     //! Mediums contained in the sensor
     TGeoMedium* medAir;
@@ -72,13 +80,17 @@ namespace Belle2 {
     B2GeomSVDLadder();
     B2GeomSVDLadder(Int_t iLayer , Int_t iLadder);
     ~B2GeomSVDLadder();
+#ifdef B2GEOM_BASF2
     Bool_t init(GearDir& content);
+#else
+    Bool_t init();
+#endif
     Bool_t make();
     TGeoVolumeAssembly* getVol() {
       return volSVDLadder;
     }
   };
-
+#ifdef B2GEOM_BASF2
 }
-
+#endif
 #endif

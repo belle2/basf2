@@ -7,6 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+#define B2GEOM_BASF2
 
 #include <svd/geosvd/GeoSVDBelleII.h>
 #include <svd/geosvd/B2GeomSVDLayer.h>

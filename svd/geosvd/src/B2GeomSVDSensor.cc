@@ -8,10 +8,16 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <svd/geosvd/B2GeomSVDSensor.h>
+#define B2GEOM_BASF2
 
+#ifdef B2GEOM_BASF2
+#include <svd/geosvd/B2GeomSVDSensor.h>
 using namespace boost;
 using namespace Belle2;
+#else
+#include "B2GeomSVDSensor.h"
+#endif
+
 using namespace std;
 
 B2GeomSVDSensor::B2GeomSVDSensor()
@@ -29,7 +35,9 @@ B2GeomSVDSensor::B2GeomSVDSensor(Int_t iLay, Int_t iLad, Int_t iSen, Bool_t isW)
   iLadder = iLad;
   iSensor = iSen;
   isWedge = isW;
-  path = (format("SVD_Layer_%1%_Ladder_%2%_Sensor_%3%") % iLayer % iLadder % iSensor).str();
+  char text[200];
+  sprintf(text, "SVD_Layer_%i_Ladder_%i_Sensor_%i", iLayer, iLadder, iSensor);
+  path = string(text);
 
 }
 
@@ -38,6 +46,7 @@ B2GeomSVDSensor::~B2GeomSVDSensor()
 
 }
 
+#ifdef B2GEOM_BASF2
 Bool_t B2GeomSVDSensor::init(GearDir& content)
 {
   GearDir sensorContent(content);
@@ -46,20 +55,20 @@ Bool_t B2GeomSVDSensor::init(GearDir& content)
 
   //Collect sensor data
   //sensorContent.append("Sensor/");
-  fActiveSensorLength      = sensorContent.getParamLength("Length");
-  fActiveSensorWidth       = sensorContent.getParamLength("Width");
-  if (isWedge) fActiveSensorWidth2      = sensorContent.getParamLength("Width2");
-  // sensorGap         = sensorContent.getParamLength("Gap");
-  fActiveSensorThick       = sensorContent.getParamLength("Thickness");
+  fActiveSensorLength      = sensorContent.getParamLength("LengthActive");
+  fActiveSensorWidth       = sensorContent.getParamLength("WidthActive");
+  if (isWedge) fActiveSensorWidth2 = sensorContent.getParamLength("Width2Active");
+  fActiveSensorThick       = sensorContent.getParamLength("ThicknessActive");
 
-  // check if this sensor has been already created??
-  fSensorLength = 1.1 * sensorContent.getParamLength("Length");
-  fSensorWidth = 1.1 * sensorContent.getParamLength("Width");
-  fSensorThick = 1.1 * sensorContent.getParamLength("Thickness");
+  fSensorLength = sensorContent.getParamLength("Length");
+  fSensorWidth = sensorContent.getParamLength("Width");
+  if (isWedge) fSensorWidth2 = sensorContent.getParamLength("Width2");
+  fSensorThick = sensorContent.getParamLength("Thickness");
 
   // Get materials
   string sensorMatName  = sensorContent.getParamString("MaterialSensor");
   medActiveSensor = gGeoManager->GetMedium(sensorMatName.c_str());
+  medSilicon = gGeoManager->GetMedium(sensorMatName.c_str());
 
   TGeoMaterial* matVacuum = new TGeoMaterial("Vacuum", 0, 0, 0);
   medAir = new TGeoMedium("medAir", 1, matVacuum);
@@ -67,49 +76,94 @@ Bool_t B2GeomSVDSensor::init(GearDir& content)
   return true;
 
 }
+#else
+Bool_t B2GeomSVDSensor::init()
+{
+  fActiveSensorLength      = 11.52;
+  fActiveSensorWidth       = 5.76;
+  if (isWedge) fActiveSensorWidth2 = 3.84;
+  fActiveSensorThick       = 0.03;
 
+  fSensorLength = 12.4880;
+  fSensorWidth = 5.9600;
+  fSensorThick = 0.1;
+
+  if (iLayer == 3) {
+    fActiveSensorWidth = 3.84;
+  }
+
+  TGeoMaterial* matVacuum = new TGeoMaterial("Vacuum", 0, 0, 0);
+  medAir = new TGeoMedium("medAir", 1, matVacuum);
+  medActiveSensor = new TGeoMedium("medAir", 1, matVacuum);
+
+  return true;
+}
+#endif
 
 Bool_t B2GeomSVDSensor::make()
 {
+  printf("make B2GeomSVDSensor %i \n", iSensor);
   volSVDSensor = new TGeoVolumeAssembly(path.c_str());
-  if (!isWedge) putSensor();
-  if (isWedge) putSensorWedge();
+  putSensor();
   putSwitchers();
   return true;
 }
 
 void B2GeomSVDSensor::putSensor()
 {
-  char name[200];
+  char nameActive[200];
+  char nameSilicon[200];
   // define the active volume of the SVD sensor
   // the prefix SD flags the volume as active
-  sprintf(name, "SD_%s_ActiveSensor", path.c_str());
-  TGeoVolume* volActiveSensor = gGeoManager->MakeBox(name, medActiveSensor,
-                                                     fActiveSensorThick * 0.5,
-                                                     fActiveSensorWidth * 0.5,
-                                                     fActiveSensorLength * 0.5);
+  sprintf(nameActive, "SD_%s_ActiveSensor", path.c_str());
+  sprintf(nameSilicon, "%s_Silicon", path.c_str());
+  if (!isWedge) {
+    volSilicon = gGeoManager->MakeBox(nameSilicon, medSilicon,
+                                      fSensorWidth * 0.5,
+                                      fActiveSensorThick * 0.5,
+                                      fSensorLength * 0.5);
+
+    volActiveSensor = gGeoManager->MakeBox(nameActive, medActiveSensor,
+                                           fActiveSensorWidth * 0.5,
+                                           fActiveSensorThick * 0.5,
+                                           fActiveSensorLength * 0.5);
+
+    volSilicon->AddNode(volActiveSensor, 1, new TGeoTranslation(0.0, 0.0, 0.0));
+
+  }
+  if (isWedge) {
+    volSilicon = gGeoManager->MakeTrd1(nameSilicon, medSilicon,
+                                       fSensorWidth * 0.5,
+                                       fSensorWidth2 * 0.5,
+                                       fActiveSensorThick * 0.5,
+                                       fSensorLength * 0.5);
+
+    volActiveSensor = gGeoManager->MakeTrd1(nameActive, medActiveSensor,
+                                            fActiveSensorWidth * 0.5,
+                                            fActiveSensorWidth2 * 0.5,
+                                            fActiveSensorThick * 0.5,
+                                            fActiveSensorLength * 0.5);
+
+    volSilicon->AddNode(volActiveSensor, 1, new TGeoTranslation(0.0, 0.0, 0.0));
+
+  }
+
   volActiveSensor->SetLineColor(kRed);
-  volSVDSensor->AddNode(volActiveSensor, 1, new TGeoTranslation(0.0, 0.0, 0.0));
+  volSilicon->SetLineColor(kBlue);
+  TGeoTranslation traX(0.5 * fActiveSensorThick, 0.0, 0.0);
+  TGeoRotation rot1("name", 90.0, 0.0, 0.0);
+  TGeoHMatrix hmaHelp;
+  hmaHelp = gGeoIdentity;
+  hmaHelp = rot1 * hmaHelp;
+  hmaHelp = traX * hmaHelp;
+  TGeoHMatrix* hmaActiveSensorPosition = new TGeoHMatrix(hmaHelp);
+  volSVDSensor->AddNode(volSilicon, 1, hmaActiveSensorPosition);
 }
 
-void B2GeomSVDSensor::putSensorWedge()
-{
-  char name[200];
-  // define the active volume of the SVD sensor
-  // the prefix SD flags the volume as active
-  sprintf(name, "SD_%s_ActiveSensor", path.c_str());
-  TGeoVolume* volActiveSensor = gGeoManager->MakeTrd1(name, medActiveSensor,
-                                                      fActiveSensorWidth * 0.5,
-                                                      fActiveSensorWidth2 * 0.5,
-                                                      fActiveSensorThick * 0.5,
-                                                      fActiveSensorLength * 0.5);
-  volActiveSensor->SetLineColor(kRed);
-  volSVDSensor->AddNode(volActiveSensor, 1, new TGeoRotation("name", 90.0, 0.0, 0.0));
-}
 
 void B2GeomSVDSensor::putSwitchers()
 {
-  TGeoVolume *box = gGeoManager->MakeBox("test", medAir, 0.25, 0.25, 0.25);
+  // TGeoVolume *box = gGeoManager->MakeBox("test", medAir, 0.25, 0.25, 0.25);
   // volSVDSensor->AddNode(box, 1, new TGeoTranslation(-.125-0.5*fSensorThick,0,0));
 }
 

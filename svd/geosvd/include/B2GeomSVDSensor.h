@@ -73,7 +73,6 @@ namespace Belle2 {
     Double_t fActiveSensorWidth2;
     Double_t fActiveSensorThick;
 
-
     //! Methods to place components
     void putSensor();
     void putSwitchers();
@@ -95,6 +94,9 @@ namespace Belle2 {
     }
     Double_t getLength() {
       return fSensorLength;
+    }
+    Double_t getWidth() {
+      return fSensorWidth;
     }
 
   };

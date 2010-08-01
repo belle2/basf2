@@ -46,12 +46,20 @@ Bool_t B2GeomSVDLadder::init(GearDir& content)
   nSensors = int(ladderContent.getParamNumValue("NumberOfSensors"));
   nSlantedSensors = int(ladderContent.getParamNumValue("NumberOfSlantedSensors"));
   b2gSVDSensors.resize(nSensors + nSlantedSensors);
-  fTheta = double(ladderContent.getParamNumValue("Theta"));
-  fGapLength = double(ladderContent.getParamNumValue("Gap"));
-  fGapLength = 0;
+  fRibUPosition.resize(2);
+  fRibUPosition[0] = double(ladderContent.getParamLength("RibUPosition0"));
+  fRibUPosition[1] = double(ladderContent.getParamLength("RibUPosition1"));
+  fRibCarbonThick = double(ladderContent.getParamLength("RibCarbonThick"));
+  fRibCarbonWidth = double(ladderContent.getParamLength("RibCarbonWidth"));
+  fRibFoamWidth = double(ladderContent.getParamLength("RibFoamWidth"));
+  fRibGapThick = double(ladderContent.getParamLength("RibGapThick"));
+  fTheta = double(ladderContent.getParamLength("Theta"));
+  fGapLength = double(ladderContent.getParamLength("Gap"));
   TGeoMaterial* matVacuum = new TGeoMaterial("Vacuum", 0, 0, 0);
   medAir = new TGeoMedium("medAir", 1, matVacuum);
-  medGlue = new TGeoMedium("medGlue", 1, matVacuum);
+  medFoam = new TGeoMedium("medFoam", 1, matVacuum);
+  medCarbon = new TGeoMedium("medCarbon", 1, matVacuum);
+
   return true;
 }
 #else
@@ -66,7 +74,8 @@ Bool_t B2GeomSVDLadder::make()
   printf("make B2GeomSVDLadder %i\n", iLadder);
   volSVDLadder = new TGeoVolumeAssembly(path.c_str());
   putSensors();
-  putGlue();
+  putRibBarrel(0);
+  putRibBarrel(1);
   return true;
 }
 
@@ -102,7 +111,7 @@ void B2GeomSVDLadder::putSensors()
     // incline the sensor to z axis
     TGeoRotation rotTheta("name", -90.0, fTheta, 90.0);
     // go to outer end of the laddder
-    TGeoTranslation tra2(0.0, 0.0, -1.0 * b2gSVDSensors[0]->getLength() + nSensors *(b2gSVDSensors[0]->getLength()) + (nSensors - 1) * fGapLength);
+    TGeoTranslation tra2(0.0, 0.0, -1.0 * b2gSVDSensors[0]->getLength() + getLengthBarrel());
 
     TGeoHMatrix hmaHelp;
     hmaHelp = gGeoIdentity;
@@ -114,8 +123,57 @@ void B2GeomSVDLadder::putSensors()
   }
 }
 
-void B2GeomSVDLadder::putGlue()
+void B2GeomSVDLadder::putRibBarrel(Int_t iRibNo)
 {
 
+  fRibBarrelCarbonLength = getLengthBarrel();
+
+  char nameRibBarrel[200];
+  sprintf(nameRibBarrel, "SVD_Rib_Barrel");
+
+  volRibBarrel = (TGeoVolume*) gROOT->FindObjectAny(nameRibBarrel);
+  if (!volRibBarrel) {
+    volRibBarrel = gGeoManager->MakeBox(nameRibBarrel, medAir,
+                                        0.5 * fRibCarbonThick,
+                                        2 * 0.5 * fRibCarbonWidth + 0.5 * fRibFoamWidth,
+                                        0.5 * fRibBarrelCarbonLength);
+
+    char nameCarbonBarrel[200];
+    sprintf(nameCarbonBarrel, "SVD_Rib_Barrel_Carbon");
+    volCarbonBarrel = gGeoManager->MakeBox(nameCarbonBarrel, medCarbon,
+                                           0.5 * fRibCarbonThick,
+                                           0.5 * fRibCarbonWidth,
+                                           0.5 * fRibBarrelCarbonLength);
+
+    volCarbonBarrel->SetLineColor(kMagenta);
+    char nameFoamBarrel[200];
+    sprintf(nameFoamBarrel, "SVD_Rib_Barrel_Foam");
+    volFoamBarrel = gGeoManager->MakeBox(nameFoamBarrel, medFoam,
+                                         0.5 * fRibCarbonThick,
+                                         0.5 * fRibFoamWidth,
+                                         0.5 * fRibBarrelCarbonLength);
+    volFoamBarrel->SetLineColor(kCyan);
+
+    volRibBarrel->AddNode(volCarbonBarrel, 1, new TGeoTranslation(0.0, - 0.5 *(fRibCarbonWidth + fRibFoamWidth), 0.0));
+    volRibBarrel->AddNode(volFoamBarrel, 1, new TGeoTranslation(0.0, 0.0, 0.0));
+    volRibBarrel->AddNode(volCarbonBarrel, 2, new TGeoTranslation(0.0, + 0.5 *(fRibCarbonWidth + fRibFoamWidth), 0.0));
+
+  }
+
+
+  volSVDLadder->AddNode(volRibBarrel, 1000 * iLayer + 10 *iLadder + iRibNo + 1,
+                        new TGeoTranslation(- fRibGapThick - 0.5 * fRibCarbonThick,
+                                            fRibUPosition[iRibNo],
+                                            0.0));
+}
+
+Double_t B2GeomSVDLadder::getLengthBarrel()
+{
+  Double_t fLengthBarrel = 0.0;
+  for (Int_t iSensor = 0; iSensor < nSensors; iSensor++) {
+    fLengthBarrel = fLengthBarrel + b2gSVDSensors[iSensor]->getLength();
+  }
+  fLengthBarrel = fLengthBarrel + (nSensors - 1) * fGapLength;
+  return fLengthBarrel;
 }
 

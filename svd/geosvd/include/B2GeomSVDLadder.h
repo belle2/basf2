@@ -17,6 +17,7 @@
 #include "B2GeomSVDSensor.h"
 #endif
 
+#include "TROOT.h"
 #include "TGeoMaterial.h"
 #include "TGeoMedium.h"
 #include "TGeoManager.h"
@@ -49,6 +50,13 @@ namespace Belle2 {
     //! TGeoVolumeAssembly which contains all parts of this sensor
     TGeoVolumeAssembly* volSVDLadder;
 
+    TGeoVolume* volRibBarrel;
+    TGeoVolume* volCarbonBarrel;
+    TGeoVolume* volFoamBarrel;
+    TGeoVolume* volRibSlanted;
+    TGeoVolume* volCarbonSlanted;
+    TGeoVolume* volFoamSlanted;
+
     //! Volumes contained in the sensor
     vector<B2GeomSVDSensor*> b2gSVDSensors;
 
@@ -69,12 +77,24 @@ namespace Belle2 {
 
     //! Mediums contained in the sensor
     TGeoMedium* medAir;
-    TGeoMedium* medGlue;
+    TGeoMedium* medFoam;
+    TGeoMedium* medCarbon;
 
+    //! Dimensions of the carbon+foam rib
+    Double_t fRibCarbonThick;
+    Double_t fRibCarbonWidth;
+    Double_t fRibBarrelCarbonLength;
+    Double_t fRibSlantedCarbonLength;
+    Double_t fRibFoamWidth;
+
+    //! gap between sensor and rib
+    Double_t fRibGapThick;
+    //! position of the "inner" edge of the rib
+    vector<Double_t> fRibUPosition;
 
     //! Methods to place components
     void putSensors();
-    void putGlue();
+    void putRibBarrel(Int_t iRibNo);
 
   public:
     B2GeomSVDLadder();
@@ -89,6 +109,9 @@ namespace Belle2 {
     TGeoVolumeAssembly* getVol() {
       return volSVDLadder;
     }
+    //! Gives the Length of the barrel style part of the SVD ladder (sum over sensor lengths plus gaps)
+    Double_t getLengthBarrel();
+
   };
 #ifdef B2GEOM_BASF2
 }

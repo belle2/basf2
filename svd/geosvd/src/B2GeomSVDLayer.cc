@@ -74,7 +74,6 @@ Bool_t B2GeomSVDLayer::init()
 Bool_t B2GeomSVDLayer::make()
 {
   printf("make B2GeomSVDLayer %i\n", iLayer);
-
   volSVDLayer = new TGeoVolumeAssembly(path.c_str());
   for (int iLadder = 0; iLadder < nLadders; ++iLadder) {
     putLadder(iLadder);
@@ -84,7 +83,6 @@ Bool_t B2GeomSVDLayer::make()
 
 void B2GeomSVDLayer::putLadder(Int_t iLadder)
 {
-
   // position the ladder at radius
   TGeoTranslation traX = TGeoTranslation("name", fRadius, 0., 0.);
   // create the wind mill structure
@@ -104,9 +102,9 @@ void B2GeomSVDLayer::putLadder(Int_t iLadder)
 
   // this transformation is finally used for positioning of the ladder
   TGeoHMatrix* hmaLadderPosition = new TGeoHMatrix(hmaHelp);
-
   // create Ladder
   b2gSVDLadders[iLadder] = new B2GeomSVDLadder(iLayer, iLadder);
+
 #ifdef B2GEOM_BASF2
   b2gSVDLadders[iLadder]->init(layerContent);
 #else

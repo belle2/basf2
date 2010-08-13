@@ -15,11 +15,17 @@ using namespace Belle2;
 
 ClassImp(RelationArray)
 
-RelationArray::RelationArray(TObject* from, vector<TObject*> to, float weight)
-    : m_weight(weight)
+
+RelationArray::RelationArray(TObject* from, TClonesArray* to, std::list<int>& indexList, float weight)
 {
   m_from = from;
-  for (vector<TObject*>::iterator iter = to.begin(), end = to.end(); iter != end; ++iter) {
-    m_to.Add(*iter);
+  m_weight.push_back(weight);
+  for (list<int>::iterator iter = indexList.begin(), end = indexList.end(); iter != end; ++iter) {
+    m_to.Add(to->At(*iter));
   }
+}
+
+RelationArray::RelationArray(TObject* from, TClonesArray* to, std::list<std::pair<int, float> > indexWeightList)
+{
+
 }

@@ -65,6 +65,7 @@ void ModuleMoin::event()
 //      INFO ("vector1[" << ii << "] : " << vector1[ii]);
     }
     testVector1->setVector(vector1);
+    INFO("vector1[0]" << vector1[0]);
     testVector2->setVector(vector2);
 
     relation->setFrom(&(*testVector1));
@@ -73,11 +74,11 @@ void ModuleMoin::event()
 
     StoreObjPtr<Relation> relation("relation");
     TObject* object = relation->getFrom();
-    SimpleVec<int>* vectorFromRelation = static_cast<SimpleVec<int>* >(object);
+    SimpleVec<int>* vectorFromRelation = dynamic_cast<SimpleVec<int>* >(object);
 
     vector<int> vector1 = vectorFromRelation->getVector();
 
-    INFO(vector1[0])
+    INFO("This number should be Poisson distributed around 10 and is:" << vector1[0])
 
   }
 

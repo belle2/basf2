@@ -11,8 +11,14 @@
 #ifndef STOREOBJPTR_H
 #define STOREOBJPTR_H
 
+#include <utility>
+
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreDefs.h>
+#include <framework/datastore/Relation.h>
+#include <framework/datastore/RelationArray.h>
+#include <framework/datastore/StoreAccessorAbs.h>
+
 #include <framework/logging/Logger.h>
 
 namespace Belle2 {
@@ -21,7 +27,7 @@ namespace Belle2 {
       \author <a href="mailto:martin.heck@kit.edu?subject=StoreObjPtr">Martin Heck</a>
   */
   template <class T>
-  class StoreObjPtr {
+  class StoreObjPtr : StoreAccessorAbs <TObject> {
   public:
 
     //! Constructor with assignment.
@@ -67,9 +73,30 @@ namespace Belle2 {
     //! imitate pointer functionality
     operator bool() const {return m_storeObjPtr;};
 
+    /*!
+    */
+    TObject* getPtr() {return m_storeObjPtr;}
+
+    /*! Convinient Relation creating.
+        Using this way to create Relations is safer than direct creation,
+        because in this case you use definitively an object, that is already stored
+        in the DataStore.
+    */
+    Relation* relateTo(const StoreAccessorAbs<TObject>& to, const float& weight = 1);
+
+    /*! Convenient RelationArray creating.
+        This way of creation can be used, if all weights are the same.
+    */
+    RelationArray* relateTo(const StoreAccessorAbs<TClonesArray>& to, const std::list<int>& indexList, const float& weight = 1);
+
+    /*! RelationArray creation in case of multiple weights.
+
+    */
+    RelationArray* relateTo(const StoreAccessorAbs<TClonesArray>& to, const std::list<std::pair<int, float> > indexWeightList);
+
   private:
 
-    //! Store of actual pointer
+    //! Store of actual pointer.
     T* m_storeObjPtr;
   };
 
@@ -106,4 +133,26 @@ bool StoreObjPtr<T>::storeObject(T* AObject, const std::string& name, const EDur
   }
   return false;
 }
+
+
+template <class T>
+Relation* StoreObjPtr<T>::relateTo(const StoreAccessorAbs<TObject>& to, const float& weight)
+{
+  return new Relation(m_storeObjPtr, to.getPtr(), weight);
+}
+
+
+template <class T>
+RelationArray* StoreObjPtr<T>::relateTo(const StoreAccessorAbs<TClonesArray>& to, const std::list<int>& indexList, const float& weight)
+{
+  return RelationArray(m_storeObjPtr, to.getPtr(), indexList, weight);
+}
+
+
+template <class T>
+RelationArray* StoreObjPtr<T>::relateTo(const StoreAccessorAbs<TClonesArray>& to, const std::list<std::pair<int, float> > indexWeightList)
+{
+  return RelationArray(m_storeObjPtr, to.getPtr, indexWeightList);
+}
+
 #endif

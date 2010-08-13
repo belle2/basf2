@@ -152,15 +152,18 @@ void ModuleHello::event()
 
   //setProcessRecordType(BEGIN_RUN);
 
-  StoreObjPtr<Relation> RelPtr("RelPtr");
-  TObject* object = &(*(Pointer1));
-  if (object) {INFO("There should be an object in the Relation");} else {INFO("There is no object in the Relation");}
-  RelPtr->setFrom(object);
-  object = &(*(Pointer2));
-  RelPtr->setTo(&(*(Pointer2)));
+  StoreObjPtr<Relation> RelPtr;
 
-  TObject* testObject = RelPtr->getFrom();
-  if (testObject) { INFO("Hello Relation");} else {INFO("No return Object");}
+  /*  TObject* object = &(*(Pointer1));
+    if (object) {INFO("There should be an object in the Relation");} else {INFO("There is no object in the Relation");}
+    RelPtr->setFrom(object);
+    object = &(*(Pointer2));
+    RelPtr->setTo(&(*(Pointer2)));
+    RelPtr.storeObject(Pointer1.relateTo(Pointer2),"RelPtr");
+
+    TObject testObject = RelPtr->getFrom();
+    if (testObject) { INFO("Hello Relation");} else {INFO("No return Object");}
+    */
 }
 
 

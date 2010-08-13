@@ -11,7 +11,8 @@
 #ifndef STOREARRAY_H
 #define STOREARRAY_H
 
-#include "TClonesArray.h"
+#include <framework/datastore/StoreAccessorAbs.h>
+#include <TClonesArray.h>
 #include "framework/datastore/DataStore.h"
 #include "framework/datastore/StoreDefs.h"
 
@@ -26,7 +27,7 @@ namespace Belle2 {
       \author <a href="mailto:martin.heck@kit.edu?subject=StoreArray">Martin Heck</a>
   */
   template <class T>
-  class StoreArray {
+  class StoreArray : public StoreAccessorAbs<TClonesArray> {
   public:
 
     //!Constructor.
@@ -48,13 +49,17 @@ namespace Belle2 {
     bool assignArray(const std::string& name, const EDurability& durability = c_Event, bool generate = false);
 
     //! Imitate array functionality.
-    TClonesArray& operator *() const {return *m_storeArray;};
+    TClonesArray& operator *() const {return *m_storeArray;}
 
     //! Imitate array functioanlity.
-    TClonesArray* operator ->() const {return m_storeArray;};
+    TClonesArray* operator ->() const {return m_storeArray;}
+
+    /*!
+    */
+    TClonesArray* getPtr() {return m_storeArray;}
 
     //! Imitate array functionality.
-    operator bool() const {return m_storeArray;};
+    operator bool() const {return m_storeArray;}
 
     //! Imitate array functionality.
     /*! By default the TClonesArray would return TObjects, so a cast is necessary.

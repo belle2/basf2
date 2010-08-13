@@ -10,9 +10,13 @@
 #ifndef RELATIONARRAY_H
 #define RELATIONARRAY_H
 
+#include <utility>
+#include <list>
+
 #include <TRef.h>
 #include <TRefArray.h>
 #include <TObject.h>
+#include <TClonesArray.h>
 
 namespace Belle2 {
 
@@ -22,12 +26,41 @@ namespace Belle2 {
   class RelationArray : public TObject {
   public:
 
+    /*! Paramter free Constructor for I/O purposes.
+    */
     RelationArray()
         : m_weight(1.0) {}
 
-    RelationArray(TObject* from, std::vector<TObject*> to, float weight = 1.0);
+    /*! Constructor with single weight for all relations together.
+        \param from      Pointer to the TObject on the "from" side of the RelationArray.
+        \param to        Pointer to the TClonesArray, which contains the objects to be pointed to.
+        \param indexList list with integers, that define at which positions the objects for the "to"
+                         side can be found in the given TClonesArray.
+        \param weight    Single weight for all the relations. The default value of 1, ensures, that
+                         you don't have to bother with weights, if you don't like to.
+    */
+    RelationArray(TObject* from, TClonesArray* to, std::list<int>& indexList, float weight = 1.0);
 
+    /*! Constructor with weight for all relations separated.
+        \param from      Pointer to the TObject on the "from" side of the RelationArray.
+        \param to        Pointer to the TClonesArray, which contains the objects to be pointed to.
+        \param indexWeight List list of pairs with integers, that define at which positions the objects for the "to"
+                           side can be found in the given TClonesArray, and floats for the weights of the relations.
+    */
+    RelationArray(TObject* from, TClonesArray* to, std::list<std::pair<int, float> > indexWeightList);
+
+    /*! Destructor.
+    */
     ~RelationArray() {}
+
+    /*! Setter for "from" part of the RelationArray.
+        \param from This has to be a pointer to a TObject.
+    */
+    void setFrom(TObject* from) {m_from = from;}
+
+    /*! Setter for "to" part of the RelationArray with single weight for all relations.
+        \param
+    */
 
   private:
     //! First end of Relation.
@@ -38,7 +71,7 @@ namespace Belle2 {
 
     /*! Weight of the RelationArray
     */
-    float m_weight;
+    std::vector<float> m_weight;
 
     ClassDef(RelationArray, 1);
   }; //class

@@ -32,24 +32,28 @@ namespace Belle2 {
   class ParamTypeInfo {
   public:
 
-    //! supported parameter types
-    enum EParamType {
-      c_SingleInt,    /*!< A single integer parameter value */
-      c_SingleDouble, /*!< A single double parameter value */
-      c_SingleString, /*!< A single string parameter value */
-      c_SingleBool,   /*!< A single boolean parameter value */
-      c_ListInt,      /*!< A list of integer parameter values */
-      c_ListDouble,   /*!< A list of double parameter values */
-      c_ListString,   /*!< A list of string parameter values */
-      c_ListBool,     /*!< A list of boolean parameter values */
-      c_NotSupported  /*!< Not supported parameter type */
+    //! supported basic parameter types
+    enum EParamBasicType {
+      c_SingleParam,    /*!< A single parameter value */
+      c_ListParam,      /*!< A list of parameter values */
+      c_NotSupportedPBT /*!< Not supported basic type */
     };
 
-    EParamType  m_paramType;
-    std::string m_readableName;
+    //! supported parameter value types
+    enum EParamValueType {
+      c_IntegerParam,   /*!< An integer parameter value */
+      c_DoubleParam,    /*!< A double parameter value */
+      c_StringParam,    /*!< A string parameter value */
+      c_BoolParam,      /*!< A boolean parameter value */
+      c_NotSupportedPVT /*!< Not supported parameter type */
+    };
 
-    ParamTypeInfo(EParamType paramType, std::string readableName) :
-        m_paramType(paramType), m_readableName(readableName) {};
+    EParamBasicType  m_paramBasicType; /*!< The basic parameter type (single/list). */
+    EParamValueType  m_paramValueType; /*!< The parameter value type. */
+    std::string      m_readableName;   /*!< The readable name of the parameter type. */
+
+    ParamTypeInfo(EParamBasicType paramBasicType, EParamValueType paramValueType, std::string readableName) :
+        m_paramBasicType(paramBasicType), m_paramValueType(paramValueType), m_readableName(readableName) {};
   };
 
 
@@ -90,12 +94,37 @@ namespace Belle2 {
     template<typename T>
     void setParameter(const std::string& name, T& value);
 
+    //! Returns a reference to a parameter. The returned parameter has already the correct type.
+    /*!
+       Throws an exception of type FwExcModuleParameterNotFound if a parameter with the given name does not exist.
+       Throws an exception of type FwExcModuleParameterType if the parameter type of does not match to the template parameter.
+
+        \param name The unique name of the parameter.
+        \return A reference to a module parameter having the correct type.
+    */
+    template<typename T>
+    ModuleParam<T>& getParameter(const std::string& name) const throw(FwExcModuleParameterNotFound, FwExcModuleParameterType);
+
     //! Returns the parameter type information of the given parameter.
     /*!
         \param name The unique name of the parameter.
         \return The parameter type information.
     */
     ParamTypeInfo::ParamTypeInfo getParamTypeInfo(const std::string& name) const;
+
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    //                   Python API
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    //! Returns a python list of all parameters.
+    /*!
+        Each item in the list consists of the name of the parameter, a string describing its type,
+        a python list of all values, a python list of all default values, the information of
+        the parameter was set in the steering file and the description of the parameter.
+        \return A python list containing the parameters of this parameter list.
+    */
+    boost::python::list getParamInfoListPython() const;
 
     //! Implements a method for setting boost::python objects.
     /*! The method supports the following types: int, double, string, bool
@@ -105,17 +134,7 @@ namespace Belle2 {
         \param name The unique name of the parameter.
         \param pyObj The object which should be converted and stored as the parameter value.
     */
-    void setParamObject(const std::string& name, const boost::python::object& pyObj);
-
-    //! Implements a template based method for setting boost::python objects.
-    /*! The method converts a boost::python object to a C++ type and stores the result as the
-        parameter value.
-
-        \param name The unique name of the parameter.
-        \param pyObj The object which should be converted and stored as the parameter value.
-    */
-    template<typename T>
-    void setParamObjectTemplate(const std::string& name, const boost::python::object& pyObj);
+    void setParamObjectPython(const std::string& name, const boost::python::object& pyObj);
 
     //! Implements a method for setting boost::python lists.
     /*! The method supports lists of the following types: int, double, string, bool
@@ -125,41 +144,19 @@ namespace Belle2 {
         \param name The unique name of the parameter.
         \param pyList The list which should be converted to a std::vector and stored as the parameter value.
     */
-    void setParamList(const std::string& name, const boost::python::list& pyList);
+    void setParamListPython(const std::string& name, const boost::python::list& pyList);
 
-    //! Implements a template based method for setting boost::python lists.
-    /*! The method converts a boost::python list to a std::vector and stores the result as the
-        parameter value.
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-        \param name The unique name of the parameter.
-        \param pyList The list which should be converted to a std::vector and stored as the parameter value.
-    */
-    template<typename T>
-    void setParamListTemplate(const std::string& name, const boost::python::list& pyList);
 
-    //! Returns a python list containing the default values of the given parameter.
-    /*!
-        Calls according to the parameter type a specialized version of the template method getParamDefaultValuesTemplate().
-        \param name The unique name of the parameter.
-        \param Reference to the output list containing the parameter default values. For single value parameter, the list only consists of one element.
-    */
-    void getParamDefaultValues(const std::string& name, boost::python::list& outputList) const;
+  protected:
 
-    //! Returns a python list containing the default values of the given single value parameter (template method).
-    /*!
-        \param name The unique name of the parameter.
-        \param outputList The python list containing the single parameter default value.
-    */
-    template<typename T>
-    void getParamDefaultValuesSingleTemplate(const std::string& name, boost::python::list& outputList) const;
 
-    //! Returns a python list containing the default values of the given list value parameter (template method).
-    /*!
-        \param name The unique name of the parameter.
-        \param outputList The python list containing the list parameter default values.
-    */
-    template<typename T>
-    void getParamDefaultValuesListTemplate(const std::string& name, boost::python::list& outputList) const;
+  private:
+
+    std::map<std::string, ModuleParamPtr> m_paramMap;  /*!< Stores the module parameters together with a string name as key. */
+    std::map<std::string, ParamTypeInfo>  m_paramTypeInfoMap; /*!< Map which stores the typeid name as key and information about the parameter as value. */
+
 
     //! Returns the type identifier of the parameter as string.
     /*!
@@ -171,65 +168,65 @@ namespace Belle2 {
     std::string getParamTypeString(const std::string& name) const;
 
 
-    //--------------------------------------------------
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     //                   Python API
-    //--------------------------------------------------
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    //! Returns a python list of all parameters.
-    /*!
-        Each item in the list consists of the name of the parameter, a string describing its type,
-        a python list of all default values and the description of the parameter.
-        \return A python list containing the parameters of this parameter list.
-    */
-    boost::python::list getParamInfoListPython() const;
-
-    //! Exposes methods of the Module class to Python.
-    static void exposePythonAPI();
-
-
-  protected:
-
-
-  private:
-
-    std::map<std::string, ModuleParamPtr> m_paramMap;  /*!< Stores the module parameters together with a string name as key. */
-    std::map<std::string, ParamTypeInfo>  m_paramTypeInfoMap; /*!< Map which stores the typeid name as key and information about the parameter as value. */
-
-    //! Returns a reference to a module parameter. The returned parameter has already the correct type.
-    /*!
-       Throws an exception of type FwExcModuleParameterNotFound if a parameter with the given name does not exist.
-       Throws an exception of type FwExcModuleParameterType if the parameter type of does not match to the template parameter.
+    //! Implements a template based method for setting boost::python objects.
+    /*! The method converts a boost::python object to a C++ type and stores the result as the
+        parameter value.
 
         \param name The unique name of the parameter.
-        \return A reference to a module parameter having the correct type.
+        \param pyObj The object which should be converted and stored as the parameter value.
     */
     template<typename T>
-    ModuleParam<T>& getModuleParameter(const std::string& name) const throw(FwExcModuleParameterNotFound, FwExcModuleParameterType);
+    void setParamObjectTemplatePython(const std::string& name, const boost::python::object& pyObj);
+
+    //! Implements a template based method for setting boost::python lists.
+    /*! The method converts a boost::python list to a std::vector and stores the result as the
+        parameter value.
+
+        \param name The unique name of the parameter.
+        \param pyList The list which should be converted to a std::vector and stored as the parameter value.
+    */
+    template<typename T>
+    void setParamListTemplatePython(const std::string& name, const boost::python::list& pyList);
+
+    //! Returns a python list containing the default values of the given parameter.
+    /*!
+        Calls according to the parameter type a specialized version of the template method getParamDefaultValuesTemplate().
+        \param name The unique name of the parameter.
+        \param Reference to the output list containing the parameter default values. For single value parameter, the list only consists of one element.
+        \param defaultValues If true returns a list of default values otherwise a list of the parameter values.
+    */
+    void getParamValuesPython(const std::string& name, boost::python::list& outputList, bool defaultValues = false) const;
+
+    //! Returns a python list containing the parameter/default values of a single value parameter (template method).
+    /*!
+        \param name The unique name of the parameter.
+        \param outputList The python list containing the parameter/default values.
+        \param defaultValues If true returns a list of default values otherwise a list of the parameter values.
+    */
+    template<typename T>
+    void getParamObjectValuesTemplatePython(const std::string& name, boost::python::list& outputList, bool defaultValues = false) const;
+
+    //! Returns a python list containing the parameter/default values of a list parameter (template method).
+    /*!
+        \param name The unique name of the parameter.
+        \param outputList The python list containing the parameter/default values.
+        \param defaultValues If true returns a list of default values otherwise a list of the parameter values.
+    */
+    template<typename T>
+    void getParamListValuesTemplatePython(const std::string& name, boost::python::list& outputList, bool defaultValues = false) const;
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
   };
 
 
-  //------------------------------------------------------
+  //======================================================
   //       Implementation of template based methods
-  //------------------------------------------------------
-
-  template<typename T>
-  ModuleParam<T>& ModuleParamList::getModuleParameter(const std::string& name) const throw(FwExcModuleParameterNotFound, FwExcModuleParameterType)
-  {
-    //Check if a parameter with the given name exists
-    std::map<std::string, ModuleParamPtr>::const_iterator mapIter;
-    mapIter = m_paramMap.find(name);
-
-    if (mapIter != m_paramMap.end()) {
-      ModuleParamPtr moduleParam = mapIter->second;
-
-      //Check the type of the stored parameter (currently done using the type identifier string)
-      if (moduleParam->getTypeInfo() == typeid(T).name()) {
-        ModuleParam<T>* explModParam = static_cast< ModuleParam<T>* >(moduleParam.get());
-        return *explModParam;
-      } else throw FwExcModuleParameterType(moduleParam->getTypeInfo(), typeid(T).name());
-    } else throw FwExcModuleParameterNotFound(name);
-  }
-
+  //======================================================
 
   template<typename T>
   void ModuleParamList::addParameter(const std::string& name, T& paramVariable, const T& defaultValue, const std::string& description)
@@ -254,7 +251,7 @@ namespace Belle2 {
   void ModuleParamList::setParameter(const std::string& name, T& value)
   {
     try {
-      ModuleParam<T>& explModParam = getModuleParameter<T>(name);
+      ModuleParam<T>& explModParam = getParameter<T>(name);
       explModParam.setValue(value);
 
     } catch (FwExcModuleParameterNotFound& exc) {
@@ -270,7 +267,26 @@ namespace Belle2 {
 
 
   template<typename T>
-  void ModuleParamList::setParamObjectTemplate(const std::string& name, const boost::python::object& pyObj)
+  ModuleParam<T>& ModuleParamList::getParameter(const std::string& name) const throw(FwExcModuleParameterNotFound, FwExcModuleParameterType)
+  {
+    //Check if a parameter with the given name exists
+    std::map<std::string, ModuleParamPtr>::const_iterator mapIter;
+    mapIter = m_paramMap.find(name);
+
+    if (mapIter != m_paramMap.end()) {
+      ModuleParamPtr moduleParam = mapIter->second;
+
+      //Check the type of the stored parameter (currently done using the type identifier string)
+      if (moduleParam->getTypeInfo() == typeid(T).name()) {
+        ModuleParam<T>* explModParam = static_cast< ModuleParam<T>* >(moduleParam.get());
+        return *explModParam;
+      } else throw FwExcModuleParameterType(moduleParam->getTypeInfo(), typeid(T).name());
+    } else throw FwExcModuleParameterNotFound(name);
+  }
+
+
+  template<typename T>
+  void ModuleParamList::setParamObjectTemplatePython(const std::string& name, const boost::python::object& pyObj)
   {
     boost::python::extract<T> valueProxy(pyObj);
     if (valueProxy.check()) {
@@ -283,7 +299,7 @@ namespace Belle2 {
 
 
   template<typename T>
-  void ModuleParamList::setParamListTemplate(const std::string& name, const boost::python::list& pyList)
+  void ModuleParamList::setParamListTemplatePython(const std::string& name, const boost::python::list& pyList)
   {
     std::vector<T> tmpList;
     int nList = boost::python::len(pyList);
@@ -301,12 +317,22 @@ namespace Belle2 {
 
 
   template<typename T>
-  void ModuleParamList::getParamDefaultValuesSingleTemplate(const std::string& name, boost::python::list& outputList) const
+  void ModuleParamList::getParamObjectValuesTemplatePython(const std::string& name, boost::python::list& outputList, bool defaultValues) const
   {
     try {
-      ModuleParam<T>& explModParam = getModuleParameter<T>(name);
-      PyObjConvUtils::addSingleValueToList<T>(explModParam.getDefaultValue(), outputList);
+      ModuleParam<T>& explModParam = getParameter<T>(name);
+      ParamTypeInfo::ParamTypeInfo paramInfo = getParamTypeInfo(name);
 
+      if (paramInfo.m_paramBasicType != ParamTypeInfo::c_SingleParam) {
+        ERROR("The parameter type of parameter '" + name + "' is not a single parameter value !")
+        return;
+      }
+
+      if (defaultValues) {
+        PyObjConvUtils::addSingleValueToList<T>(explModParam.getDefaultValue(), outputList);
+      } else {
+        PyObjConvUtils::addSingleValueToList<T>(explModParam.getValue(), outputList);
+      }
     } catch (FwExcModuleParameterNotFound& exc) {
       ERROR("Could not find the parameter with the name '" + exc.getParamInfo1() + "' ! The value of the parameter could NOT be set.");
 
@@ -320,11 +346,22 @@ namespace Belle2 {
 
 
   template<typename T>
-  void ModuleParamList::getParamDefaultValuesListTemplate(const std::string& name, boost::python::list& outputList) const
+  void ModuleParamList::getParamListValuesTemplatePython(const std::string& name, boost::python::list& outputList, bool defaultValues) const
   {
     try {
-      ModuleParam<T>& explModParam = getModuleParameter<T>(name);
-      PyObjConvUtils::addSTLVectorToList<T>(explModParam.getDefaultValue(), outputList);
+      ModuleParam<T>& explModParam = getParameter<T>(name);
+      ParamTypeInfo::ParamTypeInfo paramInfo = getParamTypeInfo(name);
+
+      if (paramInfo.m_paramBasicType != ParamTypeInfo::c_ListParam) {
+        ERROR("The parameter type of parameter '" + name + "' is not a list parameter value !")
+        return;
+      }
+
+      if (defaultValues) {
+        PyObjConvUtils::addSTLVectorToList<T>(explModParam.getDefaultValue(), outputList);
+      } else {
+        PyObjConvUtils::addSTLVectorToList<T>(explModParam.getValue(), outputList);
+      }
 
     } catch (FwExcModuleParameterNotFound& exc) {
       ERROR("Could not find the parameter with the name '" + exc.getParamInfo1() + "' ! The value of the parameter could NOT be set.");
@@ -336,7 +373,6 @@ namespace Belle2 {
       ERROR(errorString);
     }
   }
-
 
 } //end of Belle2 namespace
 

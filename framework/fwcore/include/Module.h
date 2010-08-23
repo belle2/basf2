@@ -212,9 +212,9 @@ namespace Belle2 {
     */
     bool isRegisteredToFramework() const {return m_registeredToFramework; };
 
-    //--------------------------------------------------
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     //                   Python API
-    //--------------------------------------------------
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     //! Returns a python list of all parameters.
     /*!
@@ -226,6 +226,8 @@ namespace Belle2 {
 
     //! Exposes methods of the Module class to Python.
     static void exposePythonAPI();
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
   protected:
@@ -251,6 +253,17 @@ namespace Belle2 {
     */
     template<typename T>
     void addParam(const std::string& name, T& paramVariable, const T& defaultValue, const std::string& description = "");
+
+    //! Returns a reference to a parameter. The returned parameter has already the correct type.
+    /*!
+       Throws an exception of type FwExcModuleParameterNotFound if a parameter with the given name does not exist.
+       Throws an exception of type FwExcModuleParameterType if the parameter type of does not match to the template parameter.
+
+        \param name The unique name of the parameter.
+        \return A reference to a module parameter having the correct type.
+    */
+    template<typename T>
+    ModuleParam<T>& getParam(const std::string& name) const throw(FwExcModuleParameterNotFound, FwExcModuleParameterType);
 
     //! Sets the return value for this module as integer.
     /*! The value can be used in the steering file to divide the analysis chain
@@ -305,6 +318,10 @@ namespace Belle2 {
     Belle2::CondParser::EConditionOperators m_conditionOperator;  /*!< The operator of the condition (set by parsing the condition expression). */
     int m_conditionValue;                    /*!< The value of the condition (set by parsing the condition expression). */
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    //                    Python API
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     //! Implements a method for setting boost::python objects.
     /*! The method supports the following types: int, double, string, bool
         The conversion of the python object to the C++ type and the final storage of the
@@ -333,6 +350,8 @@ namespace Belle2 {
     */
     void setParamDict(const boost::python::dict& dictionary);
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     friend class ModuleManager;
   };
 
@@ -347,6 +366,12 @@ namespace Belle2 {
     m_moduleParamList.addParameter(name, paramVariable, defaultValue, description);
   }
 
+
+  template<typename T>
+  ModuleParam<T>& Module::getParam(const std::string& name) const throw(FwExcModuleParameterNotFound, FwExcModuleParameterType)
+  {
+    return m_moduleParamList.getParameter<T>(name);
+  }
 
   //------------------------------------------------------
   //             Define convenient typdefs

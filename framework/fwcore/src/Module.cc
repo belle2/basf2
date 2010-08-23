@@ -117,13 +117,13 @@ void Module::setProcessRecordType(EProcessRecordType processRecordType)
 
 void Module::setParamObject(const std::string& name, const boost::python::object& pyObj)
 {
-  m_moduleParamList.setParamObject(name, pyObj);
+  m_moduleParamList.setParamObjectPython(name, pyObj);
 }
 
 
 void Module::setParamList(const std::string& name, const boost::python::list& pyList)
 {
-  m_moduleParamList.setParamList(name, pyList);
+  m_moduleParamList.setParamListPython(name, pyList);
 }
 
 

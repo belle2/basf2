@@ -22,7 +22,7 @@ BOOST_PYTHON_MODULE(kbasf2)
   Module::exposePythonAPI();
   Path::exposePythonAPI();
   Framework::exposePythonAPI();
-  ModuleParamList::exposePythonAPI();
+  ModuleParamInfoPython::exposePythonAPI();
   Gearbox::exposePythonAPI();
 }
 

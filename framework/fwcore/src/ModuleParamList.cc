@@ -18,14 +18,14 @@ using namespace boost::python;
 ModuleParamList::ModuleParamList()
 {
   //Fill the map with the type identifiers and type information about the parameters.
-  m_paramTypeInfoMap.insert(make_pair(typeid(int).name(), ParamTypeInfo(ParamTypeInfo::c_SingleInt, "Integer")));
-  m_paramTypeInfoMap.insert(make_pair(typeid(double).name(), ParamTypeInfo(ParamTypeInfo::c_SingleDouble, "Double")));
-  m_paramTypeInfoMap.insert(make_pair(typeid(string).name(), ParamTypeInfo(ParamTypeInfo::c_SingleString, "String")));
-  m_paramTypeInfoMap.insert(make_pair(typeid(bool).name(), ParamTypeInfo(ParamTypeInfo::c_SingleBool, "Boolean")));
-  m_paramTypeInfoMap.insert(make_pair(typeid(vector<int>).name(), ParamTypeInfo(ParamTypeInfo::c_ListInt, "List(Integer)")));
-  m_paramTypeInfoMap.insert(make_pair(typeid(vector<double>).name(), ParamTypeInfo(ParamTypeInfo::c_ListDouble, "List(Double)")));
-  m_paramTypeInfoMap.insert(make_pair(typeid(vector<string>).name(), ParamTypeInfo(ParamTypeInfo::c_ListString, "List(String)")));
-  m_paramTypeInfoMap.insert(make_pair(typeid(vector<bool>).name(), ParamTypeInfo(ParamTypeInfo::c_ListBool, "List(Boolean)")));
+  m_paramTypeInfoMap.insert(make_pair(typeid(int).name(), ParamTypeInfo(ParamTypeInfo::c_SingleParam, ParamTypeInfo::c_IntegerParam, "Integer")));
+  m_paramTypeInfoMap.insert(make_pair(typeid(double).name(), ParamTypeInfo(ParamTypeInfo::c_SingleParam, ParamTypeInfo::c_DoubleParam, "Double")));
+  m_paramTypeInfoMap.insert(make_pair(typeid(string).name(), ParamTypeInfo(ParamTypeInfo::c_SingleParam, ParamTypeInfo::c_StringParam, "String")));
+  m_paramTypeInfoMap.insert(make_pair(typeid(bool).name(), ParamTypeInfo(ParamTypeInfo::c_SingleParam, ParamTypeInfo::c_BoolParam, "Boolean")));
+  m_paramTypeInfoMap.insert(make_pair(typeid(vector<int>).name(), ParamTypeInfo(ParamTypeInfo::c_ListParam, ParamTypeInfo::c_IntegerParam, "List(Integer)")));
+  m_paramTypeInfoMap.insert(make_pair(typeid(vector<double>).name(), ParamTypeInfo(ParamTypeInfo::c_ListParam, ParamTypeInfo::c_DoubleParam, "List(Double)")));
+  m_paramTypeInfoMap.insert(make_pair(typeid(vector<string>).name(), ParamTypeInfo(ParamTypeInfo::c_ListParam, ParamTypeInfo::c_StringParam, "List(String)")));
+  m_paramTypeInfoMap.insert(make_pair(typeid(vector<bool>).name(), ParamTypeInfo(ParamTypeInfo::c_ListParam, ParamTypeInfo::c_BoolParam, "List(Boolean)")));
 }
 
 
@@ -39,7 +39,7 @@ ModuleParamList::~ModuleParamList()
 ParamTypeInfo::ParamTypeInfo ModuleParamList::getParamTypeInfo(const std::string& name) const
 {
   string typeName = getParamTypeString(name);
-  ParamTypeInfo::ParamTypeInfo notSupportedType(ParamTypeInfo::c_NotSupported, "Not supported");
+  ParamTypeInfo::ParamTypeInfo notSupportedType(ParamTypeInfo::c_NotSupportedPBT, ParamTypeInfo::c_NotSupportedPVT, "Not supported");
 
   if (!typeName.empty()) {
     map<string, ParamTypeInfo>::const_iterator mapIter = m_paramTypeInfoMap.find(typeName);
@@ -50,22 +50,52 @@ ParamTypeInfo::ParamTypeInfo ModuleParamList::getParamTypeInfo(const std::string
 }
 
 
-void ModuleParamList::setParamObject(const std::string& name, const boost::python::object& pyObj)
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//                   Python API
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+boost::python::list ModuleParamList::getParamInfoListPython() const
+{
+  boost::python::list returnList;
+  map<string, ModuleParamPtr>::const_iterator mapIter;
+
+  for (mapIter = m_paramMap.begin(); mapIter != m_paramMap.end(); mapIter++) {
+    ModuleParamInfoPython newParamInfo;
+    ModuleParamPtr currParam = mapIter->second;
+
+    newParamInfo.m_name = mapIter->first;
+    newParamInfo.m_description = currParam->getDescription();
+    newParamInfo.m_typeName = getParamTypeInfo(mapIter->first).m_readableName;
+    newParamInfo.m_setInSteering = currParam->isSetInSteering();
+    getParamValuesPython(mapIter->first, newParamInfo.m_defaultValues, true);
+    getParamValuesPython(mapIter->first, newParamInfo.m_values, false);
+
+    returnList.append(boost::python::object(newParamInfo));
+  }
+  return returnList;
+}
+
+
+void ModuleParamList::setParamObjectPython(const std::string& name, const boost::python::object& pyObj)
 {
   ParamTypeInfo::ParamTypeInfo paramInfo = getParamTypeInfo(name);
 
-  switch (paramInfo.m_paramType) {
-    case ParamTypeInfo::c_SingleInt:
-      setParamObjectTemplate<int>(name, pyObj);
+  if (paramInfo.m_paramBasicType != ParamTypeInfo::c_SingleParam) {
+    ERROR("The parameter type of parameter '" + name + "' is not a single parameter value !")
+    return;
+  }
+
+  switch (paramInfo.m_paramValueType) {
+    case ParamTypeInfo::c_IntegerParam:
+      setParamObjectTemplatePython<int>(name, pyObj);
       break;
-    case ParamTypeInfo::c_SingleDouble:
-      setParamObjectTemplate<double>(name, pyObj);
+    case ParamTypeInfo::c_DoubleParam:
+      setParamObjectTemplatePython<double>(name, pyObj);
       break;
-    case ParamTypeInfo::c_SingleString:
-      setParamObjectTemplate<string>(name, pyObj);
+    case ParamTypeInfo::c_StringParam:
+      setParamObjectTemplatePython<string>(name, pyObj);
       break;
-    case ParamTypeInfo::c_SingleBool:
-      setParamObjectTemplate<bool>(name, pyObj);
+    case ParamTypeInfo::c_BoolParam:
+      setParamObjectTemplatePython<bool>(name, pyObj);
       break;
     default:
       ERROR("The parameter type of parameter '" + name + "' is not a supported single value type !")
@@ -73,63 +103,39 @@ void ModuleParamList::setParamObject(const std::string& name, const boost::pytho
 }
 
 
-void ModuleParamList::setParamList(const std::string& name, const boost::python::list& pyList)
+void ModuleParamList::setParamListPython(const std::string& name, const boost::python::list& pyList)
 {
   ParamTypeInfo::ParamTypeInfo paramInfo = getParamTypeInfo(name);
 
-  switch (paramInfo.m_paramType) {
-    case ParamTypeInfo::c_ListInt:
-      setParamListTemplate<int>(name, pyList);
+  if (paramInfo.m_paramBasicType != ParamTypeInfo::c_ListParam) {
+    ERROR("The parameter type of parameter '" + name + "' is not a list parameter value !")
+    return;
+  }
+
+  switch (paramInfo.m_paramValueType) {
+    case ParamTypeInfo::c_IntegerParam:
+      setParamListTemplatePython<int>(name, pyList);
       break;
-    case ParamTypeInfo::c_ListDouble:
-      setParamListTemplate<double>(name, pyList);
+    case ParamTypeInfo::c_DoubleParam:
+      setParamListTemplatePython<double>(name, pyList);
       break;
-    case ParamTypeInfo::c_ListString:
-      setParamListTemplate<string>(name, pyList);
+    case ParamTypeInfo::c_StringParam:
+      setParamListTemplatePython<string>(name, pyList);
       break;
-    case ParamTypeInfo::c_ListBool:
-      setParamListTemplate<bool>(name, pyList);
+    case ParamTypeInfo::c_BoolParam:
+      setParamListTemplatePython<bool>(name, pyList);
       break;
     default:
       ERROR("The parameter type of parameter '" + name + "' is not a supported list value type !")
   }
 }
 
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-void ModuleParamList::getParamDefaultValues(const std::string& name, boost::python::list& outputList) const
-{
-  ParamTypeInfo::ParamTypeInfo paramInfo = getParamTypeInfo(name);
 
-  switch (paramInfo.m_paramType) {
-    case ParamTypeInfo::c_SingleInt:
-      getParamDefaultValuesSingleTemplate<int>(name, outputList);
-      break;
-    case ParamTypeInfo::c_SingleDouble:
-      getParamDefaultValuesSingleTemplate<double>(name, outputList);
-      break;
-    case ParamTypeInfo::c_SingleString:
-      getParamDefaultValuesSingleTemplate<string>(name, outputList);
-      break;
-    case ParamTypeInfo::c_SingleBool:
-      getParamDefaultValuesSingleTemplate<bool>(name, outputList);
-      break;
-    case ParamTypeInfo::c_ListInt:
-      getParamDefaultValuesListTemplate< vector<int> >(name, outputList);
-      break;
-    case ParamTypeInfo::c_ListDouble:
-      getParamDefaultValuesListTemplate< vector<double> >(name, outputList);
-      break;
-    case ParamTypeInfo::c_ListString:
-      getParamDefaultValuesListTemplate< vector<string> >(name, outputList);
-      break;
-    case ParamTypeInfo::c_ListBool:
-      getParamDefaultValuesListTemplate< vector<bool> >(name, outputList);
-      break;
-    default:
-      ERROR("The parameter type of parameter '" + name + "' is not a supported single value type !")
-  }
-}
-
+//==================================================================================
+//                                Private methods
+//==================================================================================
 
 std::string ModuleParamList::getParamTypeString(const std::string& name) const
 {
@@ -146,37 +152,54 @@ std::string ModuleParamList::getParamTypeString(const std::string& name) const
 }
 
 
-//=====================================================================
-//                          Python API
-//=====================================================================
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//                   Python API
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-boost::python::list ModuleParamList::getParamInfoListPython() const
+void ModuleParamList::getParamValuesPython(const std::string& name, boost::python::list& outputList, bool defaultValues) const
 {
-  boost::python::list returnList;
-  map<string, ModuleParamPtr>::const_iterator mapIter;
+  ParamTypeInfo::ParamTypeInfo paramInfo = getParamTypeInfo(name);
 
-  for (mapIter = m_paramMap.begin(); mapIter != m_paramMap.end(); mapIter++) {
-    ModuleParamInfoPython newParamInfo;
-    ModuleParamPtr currParam = mapIter->second;
-
-    newParamInfo.m_name = mapIter->first;
-    newParamInfo.m_description = currParam->getDescription();
-    newParamInfo.m_typeName = getParamTypeInfo(mapIter->first).m_readableName;
-    getParamDefaultValues(mapIter->first, newParamInfo.m_defaultValues);
-
-    returnList.append(boost::python::object(newParamInfo));
+  switch (paramInfo.m_paramBasicType) {
+    case ParamTypeInfo::c_SingleParam:
+      switch (paramInfo.m_paramValueType) {
+        case ParamTypeInfo::c_IntegerParam:
+          getParamObjectValuesTemplatePython<int>(name, outputList, defaultValues);
+          break;
+        case ParamTypeInfo::c_DoubleParam:
+          getParamObjectValuesTemplatePython<double>(name, outputList, defaultValues);
+          break;
+        case ParamTypeInfo::c_StringParam:
+          getParamObjectValuesTemplatePython<string>(name, outputList, defaultValues);
+          break;
+        case ParamTypeInfo::c_BoolParam:
+          getParamObjectValuesTemplatePython<bool>(name, outputList, defaultValues);
+          break;
+        default:
+          ERROR("The parameter type of parameter '" + name + "' is not a supported parameter value type !")
+      }
+      break;
+    case ParamTypeInfo::c_ListParam:
+      switch (paramInfo.m_paramValueType) {
+        case ParamTypeInfo::c_IntegerParam:
+          getParamListValuesTemplatePython< vector<int> >(name, outputList, defaultValues);
+          break;
+        case ParamTypeInfo::c_DoubleParam:
+          getParamListValuesTemplatePython< vector<double> >(name, outputList, defaultValues);
+          break;
+        case ParamTypeInfo::c_StringParam:
+          getParamListValuesTemplatePython< vector<string> >(name, outputList, defaultValues);
+          break;
+        case ParamTypeInfo::c_BoolParam:
+          getParamListValuesTemplatePython< vector<bool> >(name, outputList, defaultValues);
+          break;
+        default:
+          ERROR("The parameter type of parameter '" + name + "' is not a supported parameter value type !")
+      }
+      break;
+    default:
+      ERROR("The parameter type of parameter '" + name + "' is not a supported basic parameter type !")
   }
-  return returnList;
 }
 
-
-void ModuleParamList::exposePythonAPI()
-{
-  //Python class definition
-  class_<ModuleParamInfoPython>("ModuleParamInfo")
-  .def_readonly("name", &ModuleParamInfoPython::m_name)
-  .def_readonly("type", &ModuleParamInfoPython::m_typeName)
-  .def_readonly("default", &ModuleParamInfoPython::m_defaultValues)
-  .def_readonly("description", &ModuleParamInfoPython::m_description)
-  ;
-}
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

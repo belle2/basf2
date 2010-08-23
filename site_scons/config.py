@@ -2,8 +2,10 @@ from SCons.Script import *
 import os, platform
 from distutils import sysconfig
 
-# check for the existance of an environment variable
+
 def CheckEnvVar(conf, var, text = None):
+    """check for the existance of an environment variable"""
+
     if text:
         conf.Message('Checking for %s...' % text)
     else:
@@ -12,15 +14,30 @@ def CheckEnvVar(conf, var, text = None):
     conf.Result(result)
     return result
 
-# check for the existance of a tool
+
 def CheckConfigTool(conf, tool):
+    """check for the existance of a tool"""
+
     conf.Message('Checking for %s...' % tool)
     result, version = conf.TryAction('%s --version' % tool)
     conf.Result(result)
     return result
 
-# check for the existance a file
+
+def CheckPackage(conf, package, text = None):
+    """check for the existance of a package via the pkg-config tool"""
+
+    if not text:
+        text = package
+    conf.Message('Checking for %s...' % text)
+    result, output = conf.TryAction('pkg-config --exists %s' % package)
+    conf.Result(result)
+    return result
+
+
 def CheckFile(conf, dir, text = None):
+    """check for the existance a file"""
+
     if text:
         conf.Message('Checking for %s...' % text)
     else:
@@ -33,9 +50,9 @@ def CheckFile(conf, dir, text = None):
     return result
 
 
-# check the Belle II environment
 def configure_belle2(conf):
-    
+    """check the Belle II environment"""
+
     # Belle II environment setup
     if not conf.CheckEnvVar('BELLE2_TOOLS', 'Belle II environment setup'):
         print 'Belle II software environment is not set up.'
@@ -51,9 +68,9 @@ def configure_belle2(conf):
     return True
 
 
-# configure the system packages
 def configure_system(conf):
-    
+    """configure the system packages"""
+
     # python
     python_version = platform.python_version_tuple()
     conf.env['PYTHON_LIBS'] = ['python%s.%s' % (python_version[0], python_version[1])]
@@ -63,7 +80,18 @@ def configure_system(conf):
         print 'XML configuration tool missing'
         print '-> install the libxml2 development package'
         return False
-        
+
+    # graphics packages: OpenGL, OpenSceneGraph, Qt
+    conf.env['HAS_GRAPHICS'] = False
+    conf.env['GRAPHICS_LIBS'] = []
+    graphics_packages = 'gl openscenegraph QtCore QtOpenGL QtDesignerComponents QtGui'
+    if conf.CheckPackage(graphics_packages, 'graphics packages'):
+        conf.env['HAS_GRAPHICS'] = True
+        conf.env.ParseConfig('pkg-config %s --cflags --libs-only-L' % graphics_packages)
+        graphics_env = Environment(ENV = os.environ)
+        graphics_env.ParseConfig('pkg-config %s --libs' % graphics_packages)
+        conf.env['GRAPHICS_LIBS'] = graphics_env['LIBS']
+
     conf.env.ParseConfig('xml2-config --cflags')
     xml_env = Environment(ENV = os.environ)
     xml_env.ParseConfig('xml2-config --libs')
@@ -72,10 +100,9 @@ def configure_system(conf):
     return True
 
 
-# check the system packages
-# (this doesn't work for some reason)
 def check_system(conf):
-    
+    """check the system packages"""
+
     if not conf.CheckLib('xml'):
         print 'XML library missing'
         print '-> install the libxml2 package'
@@ -88,9 +115,9 @@ def check_system(conf):
     return True
 
 
-# configure the external packages
 def configure_externals(conf):
-    
+    """configure the external packages"""
+
     # configure externals only after they have been built
     if BUILD_TARGETS == ['externals']:
         return True
@@ -131,9 +158,9 @@ def configure_externals(conf):
     return True
 
 
-# check the external packages
 def check_externals(conf):
-    
+    """check the external packages"""
+
     # boost
     if not conf.CheckFile('externals/include/boost/version.hpp', 'boost'):
         if not conf.CheckFile('externals/boost/bootstrap.sh', 'boost source code'):
@@ -183,11 +210,12 @@ def check_externals(conf):
 
 
 
-# configure the environment
 def configure(env):
+    """configure the environment"""
 
     conf = Configure(env, custom_tests = {'CheckEnvVar' : CheckEnvVar,
                                           'CheckConfigTool' : CheckConfigTool,
+                                          'CheckPackage' : CheckPackage,
                                           'CheckFile' : CheckFile})
 
     if (not configure_belle2(conf)) or (not configure_system(conf)) or (not configure_externals(conf)):

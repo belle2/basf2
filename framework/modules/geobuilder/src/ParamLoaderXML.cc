@@ -34,6 +34,7 @@ ParamLoaderXML::ParamLoaderXML() : Module("ParamLoaderXML")
 
   //Parameter definition
   addParam("InputFileXML",  m_filenameXML, string("Belle2.xml"), "The filename of the XML input file which should be loaded.");
+  addParam("ParamCheck",  m_paramCheck, true, "Turns on/off parameter validation. Turn it off for speedup.");
 }
 
 
@@ -51,6 +52,8 @@ void ParamLoaderXML::initialize()
   if (result) {
     Gearbox& gearbox = Gearbox::Instance();
     gearbox.connect(gearboxIOXML);
+
+    gearbox.enableParamCheck(m_paramCheck);
 
   } else {
     ERROR("Could not open XML file: " << m_filenameXML)

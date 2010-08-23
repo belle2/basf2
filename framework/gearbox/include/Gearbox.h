@@ -75,6 +75,43 @@ namespace Belle2 {
     */
     std::string getSubdetectorPath(const std::string& subdetector) const;
 
+    //! Enables the validation of all paths and parameters.
+    /*!
+      If set to true, a validity check of all paths and parameters is performed
+      each time they are accessed. By default the check is turned on.
+      Turn it off, in order to speed up the parameter access.
+
+      Different types of exceptions can be thrown:
+      GbxExcIONotConnected: if the GearboxIO is not connected to a storage medium.
+
+      \param pathCheck If set to true, a check of a path/parameter is performed each time it is accessed.
+    */
+    void enableParamCheck(bool paramCheck)
+    throw(GbxExcIONotConnected);
+
+    //! Checks if the given path is a valid path.
+    /*!
+      Different types of exceptions can be thrown:
+      GbxExcIONotConnected: if the GearboxIO is not connected to a storage medium.
+
+      \param path The path which should be validated.
+      \return True if the path is valid.
+    */
+    bool isPathValid(const std::string& path) const
+    throw(GbxExcIONotConnected);
+
+    //! Checks if a parameter given by the path is available.
+    /*!
+      Different types of exceptions can be thrown:
+      GbxExcIONotConnected: if the GearboxIO is not connected to a storage medium.
+      GbxExcPathNotValid: if the path statement is not valid.
+
+      \param path The path to the node which should be checked for existence.
+      \return True if the path to the node and the node (parameter) itself exists.
+    */
+    bool isParamAvailable(const std::string& path) const
+    throw(GbxExcIONotConnected, GbxExcPathNotValid);
+
     //! Returns the number of nodes given by the last node in the path.
     /*!
       Different types of exceptions can be thrown:
@@ -99,6 +136,7 @@ namespace Belle2 {
       Different types of exceptions can be thrown:
       GbxExcIONotConnected: if the GearboxIO is not connected to a storage medium.
       GbxExcPathNotValid: if the path statement is not valid.
+      GbxExcParamNotExists: if the parameter does not exist and the parameter check is enabled.
       GbxExcPathEmptyResult: if the returned result of the path query is empty.
       GbxExcPathResultNotValid: if the returned type of the path query is not supported.
       GbxExcStringNumConvFailed: if the conversion of a string to a numerical value failed.
@@ -108,7 +146,7 @@ namespace Belle2 {
               the value is assumed to be in [cm].
     */
     double getParamLength(const std::string& path) const
-    throw(GbxExcIONotConnected, GbxExcPathNotValid, GbxExcPathEmptyResult,
+    throw(GbxExcIONotConnected, GbxExcPathNotValid, GbxExcParamNotExists, GbxExcPathEmptyResult,
           GbxExcPathResultNotValid, GbxExcStringNumConvFailed);
 
     //! Returns a parameter, given by the path, which describes an angle.
@@ -121,6 +159,7 @@ namespace Belle2 {
       Different types of exceptions can be thrown:
       GbxExcIONotConnected: if the GearboxIO is not connected to a storage medium.
       GbxExcPathNotValid: if the path statement is not valid.
+      GbxExcParamNotExists: if the parameter does not exist and the parameter check is enabled.
       GbxExcPathEmptyResult: if the returned result of the path query is empty.
       GbxExcPathResultNotValid: if the returned type of the path query is not supported.
       GbxExcStringNumConvFailed: if the conversion of a string to a numerical value failed.
@@ -130,7 +169,7 @@ namespace Belle2 {
               the value is assumed to be in [rad].
     */
     double getParamAngle(const std::string& path) const
-    throw(GbxExcIONotConnected, GbxExcPathNotValid, GbxExcPathEmptyResult,
+    throw(GbxExcIONotConnected, GbxExcPathNotValid, GbxExcParamNotExists, GbxExcPathEmptyResult,
           GbxExcPathResultNotValid, GbxExcStringNumConvFailed);
 
     //! Returns a parameter, given by the path, which describes a general numerical value.
@@ -141,6 +180,7 @@ namespace Belle2 {
       Different types of exceptions can be thrown:
       GbxExcIONotConnected: if the GearboxIO is not connected to a storage medium.
       GbxExcPathNotValid: if the path statement is not valid.
+      GbxExcParamNotExists: if the parameter does not exist and the parameter check is enabled.
       GbxExcPathEmptyResult: if the returned result of the path query is empty.
       GbxExcPathResultNotValid: if the returned type of the path query is not supported.
       GbxExcStringNumConvFailed: if the conversion of a string to a numerical value failed.
@@ -149,7 +189,7 @@ namespace Belle2 {
       \return The numerical value.
     */
     double getParamNumValue(const std::string& path) const
-    throw(GbxExcIONotConnected, GbxExcPathNotValid, GbxExcPathEmptyResult,
+    throw(GbxExcIONotConnected, GbxExcPathNotValid, GbxExcParamNotExists, GbxExcPathEmptyResult,
           GbxExcPathResultNotValid, GbxExcStringNumConvFailed);
 
     //! Returns a parameter as a string.
@@ -160,6 +200,7 @@ namespace Belle2 {
       Different types of exceptions can be thrown:
       GbxExcIONotConnected: if the GearboxIO is not connected to a storage medium.
       GbxExcPathNotValid: if the path statement is not valid.
+      GbxExcParamNotExists: if the parameter does not exist and the parameter check is enabled.
       GbxExcPathEmptyResult: if the returned result of the path query is empty.
       GbxExcPathResultNotValid: if the returned type of the path query is not supported.
 
@@ -167,7 +208,7 @@ namespace Belle2 {
       \return The string value.
     */
     std::string getParamString(const std::string& path) const
-    throw(GbxExcIONotConnected, GbxExcPathNotValid, GbxExcPathEmptyResult,
+    throw(GbxExcIONotConnected, GbxExcPathNotValid, GbxExcParamNotExists, GbxExcPathEmptyResult,
           GbxExcPathResultNotValid);
 
 

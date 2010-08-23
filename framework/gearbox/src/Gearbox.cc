@@ -64,6 +64,30 @@ std::string Gearbox::getSubdetectorPath(const string& subdetector) const
 }
 
 
+void Gearbox::enableParamCheck(bool paramCheck)
+throw(GbxExcIONotConnected)
+{
+  if ((m_gearboxIO == NULL) || (!m_gearboxIO->isOpen())) throw GbxExcIONotConnected();
+  return m_gearboxIO->enableParamCheck(paramCheck);
+}
+
+
+bool Gearbox::isPathValid(const std::string& path) const
+throw(GbxExcIONotConnected)
+{
+  if ((m_gearboxIO == NULL) || (!m_gearboxIO->isOpen())) throw GbxExcIONotConnected();
+  return m_gearboxIO->isPathValid(path);
+}
+
+
+bool Gearbox::isParamAvailable(const std::string& path) const
+throw(GbxExcIONotConnected, GbxExcPathNotValid)
+{
+  if ((m_gearboxIO == NULL) || (!m_gearboxIO->isOpen())) throw GbxExcIONotConnected();
+  return m_gearboxIO->isParamAvailable(path);
+}
+
+
 int Gearbox::getNumberNodes(const std::string& path) const
 throw(GbxExcIONotConnected, GbxExcPathNotValid, GbxExcPathEmptyResult, GbxExcPathResultNotValid)
 {
@@ -73,7 +97,7 @@ throw(GbxExcIONotConnected, GbxExcPathNotValid, GbxExcPathEmptyResult, GbxExcPat
 
 
 double Gearbox::getParamLength(const std::string& path) const
-throw(GbxExcIONotConnected, GbxExcPathNotValid, GbxExcPathEmptyResult,
+throw(GbxExcIONotConnected, GbxExcPathNotValid, GbxExcParamNotExists, GbxExcPathEmptyResult,
       GbxExcPathResultNotValid, GbxExcStringNumConvFailed)
 {
   if ((m_gearboxIO == NULL) || (!m_gearboxIO->isOpen())) throw GbxExcIONotConnected();
@@ -82,7 +106,7 @@ throw(GbxExcIONotConnected, GbxExcPathNotValid, GbxExcPathEmptyResult,
 
 
 double Gearbox::getParamAngle(const std::string& path) const
-throw(GbxExcIONotConnected, GbxExcPathNotValid, GbxExcPathEmptyResult,
+throw(GbxExcIONotConnected, GbxExcPathNotValid, GbxExcParamNotExists, GbxExcPathEmptyResult,
       GbxExcPathResultNotValid, GbxExcStringNumConvFailed)
 {
   if ((m_gearboxIO == NULL) || (!m_gearboxIO->isOpen())) throw GbxExcIONotConnected();
@@ -91,7 +115,7 @@ throw(GbxExcIONotConnected, GbxExcPathNotValid, GbxExcPathEmptyResult,
 
 
 double Gearbox::getParamNumValue(const std::string& path) const
-throw(GbxExcIONotConnected, GbxExcPathNotValid, GbxExcPathEmptyResult,
+throw(GbxExcIONotConnected, GbxExcPathNotValid, GbxExcParamNotExists, GbxExcPathEmptyResult,
       GbxExcPathResultNotValid, GbxExcStringNumConvFailed)
 {
   if ((m_gearboxIO == NULL) || (!m_gearboxIO->isOpen())) throw GbxExcIONotConnected();
@@ -100,7 +124,7 @@ throw(GbxExcIONotConnected, GbxExcPathNotValid, GbxExcPathEmptyResult,
 
 
 std::string Gearbox::getParamString(const std::string& path) const
-throw(GbxExcIONotConnected, GbxExcPathNotValid, GbxExcPathEmptyResult,
+throw(GbxExcIONotConnected, GbxExcPathNotValid, GbxExcParamNotExists, GbxExcPathEmptyResult,
       GbxExcPathResultNotValid)
 {
   if ((m_gearboxIO == NULL) || (!m_gearboxIO->isOpen())) throw GbxExcIONotConnected();

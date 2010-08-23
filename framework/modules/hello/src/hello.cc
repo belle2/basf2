@@ -96,6 +96,9 @@ void ModuleHello::initialize()
   GearDir gbxParams = gearbox.getContent("PXD");
   INFO(gbxParams.getParamString("Rotation"))
 
+  bool avail = gbxParams.isParamAvailable("OffsetZ");
+  INFO("Param available: " << avail);
+
   m_evtNum = 0;
   TNamed* named = new TNamed("NAME of named", "TITLE of named");
 

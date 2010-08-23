@@ -45,6 +45,26 @@ bool GearDir::isOpen() const
 }
 
 
+void GearDir::enableParamCheck(bool paramCheck)
+{
+  Gearbox::Instance().getGearboxIO().enableParamCheck(paramCheck);
+}
+
+
+bool GearDir::isPathValid(const std::string& path) const
+throw(GbxExcIONotConnected)
+{
+  return Gearbox::Instance().getGearboxIO().isPathValid(m_dirPath + path);
+}
+
+
+bool GearDir::isParamAvailable(const std::string& path) const
+throw(GbxExcIONotConnected, GbxExcPathNotValid)
+{
+  return Gearbox::Instance().getGearboxIO().isParamAvailable(m_dirPath + path);
+}
+
+
 int GearDir::getNumberNodes(const string& path) const
 throw(GbxExcIONotConnected, GbxExcPathNotValid, GbxExcPathEmptyResult, GbxExcPathResultNotValid)
 {
@@ -53,7 +73,7 @@ throw(GbxExcIONotConnected, GbxExcPathNotValid, GbxExcPathEmptyResult, GbxExcPat
 
 
 double GearDir::getParamLength(const string& path) const
-throw(GbxExcIONotConnected, GbxExcPathNotValid, GbxExcPathEmptyResult,
+throw(GbxExcIONotConnected, GbxExcPathNotValid, GbxExcParamNotExists, GbxExcPathEmptyResult,
       GbxExcPathResultNotValid, GbxExcStringNumConvFailed)
 {
   return Gearbox::Instance().getGearboxIO().getParamLength(m_dirPath + path);
@@ -61,7 +81,7 @@ throw(GbxExcIONotConnected, GbxExcPathNotValid, GbxExcPathEmptyResult,
 
 
 double GearDir::getParamAngle(const string& path) const
-throw(GbxExcIONotConnected, GbxExcPathNotValid, GbxExcPathEmptyResult,
+throw(GbxExcIONotConnected, GbxExcPathNotValid, GbxExcParamNotExists, GbxExcPathEmptyResult,
       GbxExcPathResultNotValid, GbxExcStringNumConvFailed)
 {
   return Gearbox::Instance().getGearboxIO().getParamAngle(m_dirPath + path);
@@ -69,7 +89,7 @@ throw(GbxExcIONotConnected, GbxExcPathNotValid, GbxExcPathEmptyResult,
 
 
 double GearDir::getParamNumValue(const string& path) const
-throw(GbxExcIONotConnected, GbxExcPathNotValid, GbxExcPathEmptyResult,
+throw(GbxExcIONotConnected, GbxExcPathNotValid, GbxExcParamNotExists, GbxExcPathEmptyResult,
       GbxExcPathResultNotValid, GbxExcStringNumConvFailed)
 {
   return Gearbox::Instance().getGearboxIO().getParamNumValue(m_dirPath + path);
@@ -77,7 +97,7 @@ throw(GbxExcIONotConnected, GbxExcPathNotValid, GbxExcPathEmptyResult,
 
 
 string GearDir::getParamString(const string& path) const
-throw(GbxExcIONotConnected, GbxExcPathNotValid, GbxExcPathEmptyResult,
+throw(GbxExcIONotConnected, GbxExcPathNotValid, GbxExcParamNotExists, GbxExcPathEmptyResult,
       GbxExcPathResultNotValid)
 {
   return Gearbox::Instance().getGearboxIO().getParamString(m_dirPath + path);

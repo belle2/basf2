@@ -134,6 +134,21 @@ namespace Belle2 {
   };
 
   //-------------------------------------------------------------------
+  //!  The GbxExcParamNotExists class.
+  /*!
+    This exception is thrown if the parameter does not exist.
+  */
+  class GbxExcParamNotExists : public GbxExcXPathBase {
+
+  public:
+    //! The GbxExcParamNotExists constructor.
+    /*!
+      \param xpathStatement The XPath statement which resulted in this exception.
+    */
+    GbxExcParamNotExists(std::string xpathStatement) : GbxExcXPathBase(xpathStatement) {};
+  };
+
+  //-------------------------------------------------------------------
   //!  The GbxExcPathEmptyResult class.
   /*!
     This exception is thrown if the result of the XPath query is empty.

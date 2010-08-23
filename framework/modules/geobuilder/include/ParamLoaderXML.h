@@ -86,6 +86,7 @@ namespace Belle2 {
   private:
 
     std::string m_filenameXML;   /*!< The filename of the XML file. */
+    bool m_paramCheck; /*!< If set to true, performs a check of the path/parameter each time it is accessed. */
 
   };
 }

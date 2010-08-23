@@ -29,6 +29,8 @@ using namespace Belle2;
 GearboxIOXML::GearboxIOXML()
 {
   m_xmlDocument = NULL;
+  m_enableParamCheck = true;
+
   setLengthUnitMap();
   setAngleUnitMap();
 }
@@ -69,11 +71,52 @@ bool GearboxIOXML::isOpen() const
 }
 
 
+bool GearboxIOXML::isPathValid(const std::string& path) const
+throw(GbxExcIONotConnected)
+{
+  if (!isOpen()) throw GbxExcIONotConnected();
+  if (path.empty()) return false;
+
+  xmlXPathObjectPtr result;
+  result = getNodeSet(m_xmlDocument, (xmlChar*)path.c_str());
+
+  if (result == NULL) return false;
+
+  if (xmlXPathNodeSetIsEmpty(result->nodesetval)) {
+    xmlXPathFreeObject(result);
+    return false;
+  }
+
+  xmlXPathFreeObject(result);
+  return true;
+}
+
+
+bool GearboxIOXML::isParamAvailable(const std::string& path) const
+throw(GbxExcIONotConnected, GbxExcPathNotValid)
+{
+  if (!isOpen()) throw GbxExcIONotConnected();
+  if (path.empty()) throw GbxExcPathNotValid("");
+
+  //1. Check if the path to the parameter exists, by
+  //   evaluating the whole path except the last node
+  string pathOnly = path.substr(0, path.find_last_of("/"));
+  if (!isPathValid(pathOnly)) throw GbxExcPathNotValid(path);
+
+  //2. Check if the parameter exists
+  return isPathValid(path);
+}
+
+
 int GearboxIOXML::getNumberNodes(const string& path) const
 throw(GbxExcIONotConnected, GbxExcPathNotValid, GbxExcPathEmptyResult, GbxExcPathResultNotValid)
 {
   if (!isOpen()) throw GbxExcIONotConnected();
   if (path.empty()) throw GbxExcPathNotValid("");
+
+  if (m_enableParamCheck) {
+    if (!isPathValid(path)) throw GbxExcPathNotValid(path);
+  }
 
   xmlXPathObjectPtr result;
 
@@ -83,7 +126,10 @@ throw(GbxExcIONotConnected, GbxExcPathNotValid, GbxExcPathEmptyResult, GbxExcPat
   result = getNodeSet(m_xmlDocument, (xmlChar*)queryString.str().c_str());
 
   if (result == NULL) throw GbxExcPathEmptyResult(queryString.str());
-  if (result->type != XPATH_NUMBER) throw GbxExcPathResultNotValid(queryString.str());
+  if (result->type != XPATH_NUMBER) {
+    xmlXPathFreeObject(result);
+    throw GbxExcPathResultNotValid(queryString.str());
+  }
 
   int numberNodes = (int)result->floatval;
   xmlXPathFreeObject(result);
@@ -93,10 +139,15 @@ throw(GbxExcIONotConnected, GbxExcPathNotValid, GbxExcPathEmptyResult, GbxExcPat
 
 
 double GearboxIOXML::getParamLength(const std::string& path) const
-throw(GbxExcIONotConnected, GbxExcPathNotValid, GbxExcPathEmptyResult, GbxExcPathResultNotValid, GbxExcStringNumConvFailed)
+throw(GbxExcIONotConnected, GbxExcPathNotValid, GbxExcPathEmptyResult, GbxExcParamNotExists,
+      GbxExcPathResultNotValid, GbxExcStringNumConvFailed)
 {
   double resultLength;
   int currentUnitType;
+
+  if (m_enableParamCheck) {
+    if (!isParamAvailable(path)) throw GbxExcParamNotExists(path);
+  }
 
   getDoubleWithUnit(resultLength, currentUnitType, path, c_CM, m_lengthUnitMap);
 
@@ -123,10 +174,15 @@ throw(GbxExcIONotConnected, GbxExcPathNotValid, GbxExcPathEmptyResult, GbxExcPat
 
 
 double GearboxIOXML::getParamAngle(const std::string& path) const
-throw(GbxExcIONotConnected, GbxExcPathNotValid, GbxExcPathEmptyResult, GbxExcPathResultNotValid, GbxExcStringNumConvFailed)
+throw(GbxExcIONotConnected, GbxExcPathNotValid, GbxExcPathEmptyResult, GbxExcParamNotExists,
+      GbxExcPathResultNotValid, GbxExcStringNumConvFailed)
 {
   double resultAngle;
   int currentUnitType;
+
+  if (m_enableParamCheck) {
+    if (!isParamAvailable(path)) throw GbxExcParamNotExists(path);
+  }
 
   getDoubleWithUnit(resultAngle, currentUnitType, path, c_Rad, m_angleUnitMap);
 
@@ -146,10 +202,15 @@ throw(GbxExcIONotConnected, GbxExcPathNotValid, GbxExcPathEmptyResult, GbxExcPat
 
 
 double GearboxIOXML::getParamNumValue(const std::string& path) const
-throw(GbxExcIONotConnected, GbxExcPathNotValid, GbxExcPathEmptyResult, GbxExcPathResultNotValid, GbxExcStringNumConvFailed)
+throw(GbxExcIONotConnected, GbxExcPathNotValid, GbxExcPathEmptyResult, GbxExcParamNotExists,
+      GbxExcPathResultNotValid, GbxExcStringNumConvFailed)
 {
   if (!isOpen()) throw GbxExcIONotConnected();
   if (path.empty()) throw GbxExcPathNotValid("");
+
+  if (m_enableParamCheck) {
+    if (!isParamAvailable(path)) throw GbxExcParamNotExists(path);
+  }
 
   xmlXPathObjectPtr result;
   result = getNodeSet(m_xmlDocument, (xmlChar*)path.c_str());
@@ -180,16 +241,26 @@ throw(GbxExcIONotConnected, GbxExcPathNotValid, GbxExcPathEmptyResult, GbxExcPat
 
 
 std::string GearboxIOXML::getParamString(const std::string& path) const
-throw(GbxExcIONotConnected, GbxExcPathNotValid, GbxExcPathEmptyResult, GbxExcPathResultNotValid)
+throw(GbxExcIONotConnected, GbxExcPathNotValid, GbxExcParamNotExists, GbxExcPathEmptyResult,
+      GbxExcPathResultNotValid)
 {
   if (!isOpen()) throw GbxExcIONotConnected();
   if (path.empty()) throw GbxExcPathNotValid("");
+
+  if (m_enableParamCheck) {
+    if (!isParamAvailable(path)) throw GbxExcParamNotExists(path);
+  }
 
   xmlXPathObjectPtr result;
   result = getNodeSet(m_xmlDocument, (xmlChar*)path.c_str());
 
   if (result == NULL) throw GbxExcPathEmptyResult(path);
-  if (result->type != XPATH_NODESET) throw GbxExcPathResultNotValid(path);
+
+  if (result->type != XPATH_NODESET) {
+    xmlXPathFreeObject(result);
+    throw GbxExcPathResultNotValid(path);
+  }
+
   if (xmlXPathNodeSetIsEmpty(result->nodesetval)) {
     xmlXPathFreeObject(result);
     throw GbxExcPathEmptyResult(path);
@@ -235,7 +306,12 @@ throw(GbxExcIONotConnected, GbxExcPathNotValid, GbxExcPathEmptyResult,
   result = getNodeSet(m_xmlDocument, (xmlChar*)xpath.c_str());
 
   if (result == NULL) throw GbxExcPathEmptyResult(xpath);
-  if (result->type != XPATH_NODESET) throw GbxExcPathResultNotValid(xpath);
+
+  if (result->type != XPATH_NODESET) {
+    xmlXPathFreeObject(result);
+    throw GbxExcPathResultNotValid(xpath);
+  }
+
   if (xmlXPathNodeSetIsEmpty(result->nodesetval)) {
     xmlXPathFreeObject(result);
     throw GbxExcPathEmptyResult(xpath);

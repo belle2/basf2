@@ -99,7 +99,7 @@ namespace Belle2 {
     //! Processes the full module chain, starting with the first module in the given path.
     /*!
         \param startPath The processing starts with the first module of this path.
-        \param maxEvent The maximum number of events that will be processed. The number must be greater or equal to 0.
+        \param maxEvent The maximum number of events that will be processed. If the number is smaller than 1, all events will be processed.
     */
     void process(PathPtr startPath, long maxEvent);
 
@@ -108,7 +108,7 @@ namespace Belle2 {
         Processes the full module chain for the given run number and for events from 0 to maxEvent.
 
         \param startPath The processing starts with the first module of this path.
-        \param maxEvent The maximum number of events that will be processed. The number must be greater or equal to 0.
+        \param maxEvent The maximum number of events that will be processed. If the number is smaller than 1, all events will be processed.
         \param runNumber The number of the run which should be processed.
     */
     void process(PathPtr startPath, long maxEvent, unsigned long runNumber);

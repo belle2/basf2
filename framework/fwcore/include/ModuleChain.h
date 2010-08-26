@@ -96,9 +96,9 @@ namespace Belle2 {
     /*!
         \param startPath The processing starts with the first module of this path.
         \param modulePathList A list of all modules which could be executed during the data processing (used for calling the beginRun() and endRun() method).
-        \param maxEvent If this number is greater or equal than 0, only this number of events will be processed.
+        \param maxEvent The maximum number of events that will be processed. If the number is smaller or equal 0, all events are processed.
     */
-    void processChain(PathPtr startPath, const ModulePtrList& modulePathList, long maxEvent = -1);
+    void processChain(PathPtr startPath, const ModulePtrList& modulePathList, long maxEvent = 0);
 
     //! Terminates the modules.
     /*!

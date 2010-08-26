@@ -164,7 +164,7 @@ void ModuleChain::processChain(PathPtr startPath, const ModulePtrList& modulePat
     //Delete event related data in DataStore
     DataStore::Instance().clearMaps(c_Event);
 
-    if ((maxEvent >= 0) && (currEvent >= maxEvent)) endProcess = true;
+    if ((maxEvent > 0) && (currEvent >= maxEvent)) endProcess = true;
     currEvent++;
   }
 }

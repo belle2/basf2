@@ -116,11 +116,6 @@ void Framework::process(PathPtr startPath, long maxEvent)
   //Get list of modules which could be executed during the data processing.
   ModulePtrList moduleList = m_moduleChain->getModulePathList(startPath);
 
-  if (maxEvent < 0) {
-    ERROR("The maximum event number has to be 0 or greater. Current value is: " << maxEvent)
-    return;
-  }
-
   m_moduleChain->processInitialize(moduleList);
 
   //Check if there is exactly one module in the chain, which can specify the begin of a new run.
@@ -146,11 +141,6 @@ void Framework::process(PathPtr startPath, long maxEvent, unsigned long runNumbe
 {
   //Get list of modules which could be executed during the data processing.
   ModulePtrList moduleList = m_moduleChain->getModulePathList(startPath);
-
-  if (maxEvent < 0) {
-    ERROR("The maximum event number has to be 0 or greater. Current value is: " << maxEvent)
-    return;
-  }
 
   m_moduleChain->processInitialize(moduleList);
 

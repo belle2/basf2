@@ -2,47 +2,42 @@
 <Sensors>
   <Sensor desc="The small SVD sensor" type="0">
     <Thickness desc="The over all thickness of the sensor" unit="mm">1</Thickness>
-    <Length desc="The over all width of the sensor" unit="mm">124.9</Length>
-    <Width desc="The overall length of the sensor" unit="mm">38.4</Width>
+    <Length desc="The over all length of the sensor" unit="mm">122</Length>
+    <Width desc="The overall width of the sensor" unit="mm">38.4</Width>
     <MaterialSensor>Silicon</MaterialSensor>
-      <ThicknessSilicon desc="The over all thickness of the sensor" unit="mm">300</ThicknessSilicon>
-         <LengthSilicon desc="The over all width of the sensor" unit="mm">124.880</LengthSilicon>
-    <WidthSilicon desc="The overall length of the sensor" unit="mm">38.4</WidthSilicon>
-    <LengthActive desc="The over all length of the active sensor" unit="mm">115.2</LengthActive>
+    <ThicknessSilicon desc="The over all thickness of the sensor" unit="mm">300</ThicknessSilicon>
+    <LengthSilicon desc="The over all width of the sensor" unit="mm">122</LengthSilicon>
+    <WidthSilicon desc="The overall width of the silicon" unit="mm">38.4</WidthSilicon>
+    <LengthActive desc="The over all length of the active sensor" unit="mm">122</LengthActive>
     <ThicknessActive desc="Thickness of the active sensors" unit="um">300</ThicknessActive>
     <WidthActive desc="The over all width of active the sensor" unit="mm">38.4</WidthActive>
   </Sensor>
   <Sensor desc="The standard SVD sensor" type="1">
     <!-- All numbers from TDR -->
-    
-
-<MaterialSensor>Silicon</MaterialSensor>
+    <MaterialSensor>Silicon</MaterialSensor>
     <Thickness desc="The over all thickness of the sensor" unit="mm">1</Thickness>
-    <Length desc="The over all width of the sensor" unit="mm">124.90</Length>
+    <Length desc="The over all width of the sensor" unit="mm">124.9</Length>
     <Width desc="The overall length of the sensor" unit="mm">59.600</Width>
-    
-<ThicknessSilicon desc="The over all thickness of the sensor" unit="um">300</ThicknessSilicon>
+    <ThicknessSilicon desc="The over all thickness of the sensor" unit="um">300</ThicknessSilicon>
     <LengthSilicon desc="The over all width of the sensor" unit="mm">124.880</LengthSilicon>
     <WidthSilicon desc="The overall length of the sensor" unit="mm">59.600</WidthSilicon>
-    
     <ThicknessActive desc="Thickness of the active sensors" unit="um">300</ThicknessActive>
     <WidthActive desc="Width of the active sensor" unit="mm">57.72</WidthActive>
-    <LengthActive desc="Length of the active sensor" unit="mm">122.9</LengthActive>
-
-  <RibCarbonWidth desc="The width of the rib carbon" unit="mm">0.065</RibCarbonWidth>
-<RibCarbonThick desc="The thickness of the carbon ribs" unit="mm">6.5</RibCarbonThick>
-<RibFoamWidth desc="The width of the rib foam" unit="mm">2.87</RibFoamWidth>
-<RibUPosition0 desc="Position of the rib in U direction" unit="mm">12.205</RibUPosition0>
-<RibUPosition1 desc="Position of the rib in U direction" unit="mm">-12.205</RibUPosition1>
-<RibGapThick desc="Gap between sensor and support rip in W direction" unit="mm">1</RibGapThick>
+    <LengthActive desc="Length of the active sensor" unit="mm">124.88</LengthActive>
+    <RibCarbonWidth desc="The width of the rib carbon" unit="mm">0.065</RibCarbonWidth>
+    <RibCarbonThick desc="The thickness of the carbon ribs" unit="mm">6.5</RibCarbonThick>
+    <RibFoamWidth desc="The width of the rib foam" unit="mm">2.87</RibFoamWidth>
+    <RibUPosition0 desc="Position of the rib in U direction" unit="mm">12.205</RibUPosition0>
+    <RibUPosition1 desc="Position of the rib in U direction" unit="mm">-12.205</RibUPosition1>
+    <RibGapThick desc="Gap between sensor and support rip in W direction" unit="mm">1</RibGapThick>
   </Sensor>
   <Sensor desc="The wedge SVD sensor" type="2">
     <!-- All numbers from TDR -->
-        <Thickness desc="The over all thickness of the sensor" unit="mm">1</Thickness>
+    <Thickness desc="The over all thickness of the sensor" unit="mm">1</Thickness>
     <Length desc="The over all length of the sensor" unit="mm">125.58</Length>
     <Width desc="The overall width of the sensor" unit="mm">60.63</Width>
     <Width2 desc="The overall width2 of the sensor" unit="mm">41.02</Width2>
-      <ThicknessSilicon desc="The over all thickness of the sensor" unit="mm">1</ThicknessSilicon>
+    <ThicknessSilicon desc="The over all thickness of the sensor" unit="mm">1</ThicknessSilicon>
     <LengthSilicon desc="The over all length of the sensor" unit="mm">125.58</LengthSilicon>
     <WidthSilicon desc="The overall width of the sensor" unit="mm">60.63</WidthSilicon>
     <Width2Silicon desc="The overall width2 of the sensor" unit="mm">41.02</Width2Silicon>

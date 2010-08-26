@@ -60,6 +60,7 @@ Bool_t B2GeomSVDLadder::init(GearDir& content)
     sensorsContent.append("Position/");
     fThetas[iSensor] = double(sensorsContent.getParamLength("Theta"));
     fSensorVPositions[iSensor] = double(sensorsContent.getParamLength("V"));
+    fSensorWPositions[iSensor] =  double(sensorsContent.getParamLength("W"));
   }
 
   TGeoMaterial* matVacuum = new TGeoMaterial("Vacuum", 0, 0, 0);
@@ -119,7 +120,7 @@ void B2GeomSVDLadder::putSensors()
     // incline the sensor to z axis
     TGeoRotation rotTheta("name", -90.0, fThetas[iSensor], 90.0);
     //move the sensor to its position
-    TGeoTranslation tra(0.0, 0.0, fSensorVPositions[iSensor]);
+    TGeoTranslation tra(fSensorWPositions[iSensor], 0.0, fSensorVPositions[iSensor]);
 
     TGeoHMatrix hmaHelp;
     hmaHelp = gGeoIdentity;

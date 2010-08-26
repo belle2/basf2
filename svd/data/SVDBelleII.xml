@@ -27,7 +27,8 @@
                 <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Sensor[@type=0]/*)"/>
               </SensorParameters>
               <Position>
-                <V desc="sensor position (middle of the volume) in V (local coordinate system of ladder)" unit="mm">-27.8</V>
+                <V desc="sensor position (middle of the volume) in V (local coordinate system of ladder)" unit="mm">-34.2</V>
+                <W desc="sensor position (middle of the active volume) in W (local coordinate system of ladder)" unit="mm">0</W>
                 <Theta desc="rotation about Euler angle Theta in LOCAL coordinate system" unit="deg">0</Theta>
               </Position>
             </Sensor>
@@ -37,7 +38,8 @@
                 <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Sensor[@type=0]/*)"/>
               </SensorParameters>
               <Position>
-                <V desc="sensor position (middle of the volume) in V (local coordinate system of ladder)" unit="mm">95.2</V>
+                <V desc="sensor position (middle of the volume) in V (local coordinate system of ladder)" unit="mm">88</V>
+                <W desc="sensor position (middle of the active volume) in W (local coordinate system of ladder)" unit="mm">0</W>
                 <Theta desc="rotation about Euler angle Theta in LOCAL coordinate system" unit="deg">0</Theta>
               </Position>
             </Sensor>
@@ -60,7 +62,8 @@
                 <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Sensor[@type=1]/*)"/>
               </SensorParameters>
               <Position>
-                <V desc="sensor position (middle of the volume) in V (local coordinate system of ladder)" unit="mm">-98.8</V>
+                <V desc="sensor position (middle of the volume) in V (local coordinate system of ladder)" unit="mm">-98.81</V>
+                <W desc="sensor position (middle of the active volume) in W (local coordinate system of ladder)" unit="mm">0</W>
                 <Theta desc="rotation about Euler angle Theta in LOCAL coordinate system" unit="deg">0</Theta>
               </Position>
             </Sensor>
@@ -70,7 +73,8 @@
                 <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Sensor[@type=1]/*)"/>
               </SensorParameters>
               <Position>
-                <V desc="sensor position (middle of the volume) in V (local coordinate system of ladder)" unit="mm">24.2</V>
+                <V desc="sensor position (middle of the volume) in V (local coordinate system of ladder)" unit="mm">26.19</V>
+                <W desc="sensor position (middle of the active volume) in W (local coordinate system of ladder)" unit="mm">0</W>
                 <Theta desc="rotation about Euler angle Theta in LOCAL coordinate system" unit="deg">0</Theta>
               </Position>
             </Sensor>
@@ -80,8 +84,8 @@
                 <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Sensor[@type=2]/*)"/>
               </SensorParameters>
               <Position>
-                <V desc="sensor position (middle of the volume) in V (local coordinate system of ladder)" unit="mm">150.18</V>
-                <W desc="sensor position (middle of the active volume) in W (local coordinate system of ladder)" unit="mm">-12.87</W>
+                <V desc="sensor position (middle of the volume) in V (local coordinate system of ladder)" unit="mm">150.01</V>
+                <W desc="sensor position (middle of the active volume) in W (local coordinate system of ladder)" unit="mm">-13.41</W>
                 <Theta desc="rotation about Euler angle Theta in LOCAL coordinate system" unit="deg">11.9</Theta>
               </Position>
             </Sensor>
@@ -91,11 +95,11 @@
       <Layer id="SVD_Layer_5">
         <Phi0 desc="The starting angle of the layer in the r-phi plane" unit="deg">14.4</Phi0>
         <Radius desc="Radius of the layer" unit="mm">115.0</Radius>
-           <OffsetY desc="The offset of the center of the ladder in y direction (Wind Mill structure)" unit="mm">-8.0</OffsetY>
+        <OffsetY desc="The offset of the center of the ladder in y direction (Wind Mill structure)" unit="mm">-8.0</OffsetY>
         <NumberOfLadders desc="Number of ladders in this layer">14</NumberOfLadders>
         <Ladders>
           <!-- Common parameters for all ladders -->
-           <NumberOfSensors>4</NumberOfSensors>
+          <NumberOfSensors>4</NumberOfSensors>
           <xi:include href="SVDLadderBelleII.xml" xpointer="xpointer(/*/*)"/>
           <Sensors>
             <Sensor id="SVD_Layer_5_Ladder_Sensor_0">
@@ -104,7 +108,8 @@
                 <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Sensor[@type=1]/*)"/>
               </SensorParameters>
               <Position>
-                <V desc="sensor position (middle of the volume) in V (local coordinate system of ladder)" unit="mm">-89.7</V>
+                <V desc="sensor position (middle of the volume) in V (local coordinate system of ladder)" unit="mm">-146.08</V>
+                <W desc="sensor position (middle of the active volume) in W (local coordinate system of ladder)" unit="mm">0</W>
                 <Theta desc="rotation about Euler angle Theta in LOCAL coordinate system" unit="deg">0</Theta>
               </Position>
             </Sensor>
@@ -114,7 +119,8 @@
                 <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Sensor[@type=1]/*)"/>
               </SensorParameters>
               <Position>
-                <V desc="sensor position (middle of the volume) in V (local coordinate system of ladder)" unit="mm">33.3</V>
+                <V desc="sensor position (middle of the volume) in V (local coordinate system of ladder)" unit="mm">-21.08</V>
+                <W desc="sensor position (middle of the active volume) in W (local coordinate system of ladder)" unit="mm">0</W>
                 <Theta desc="rotation about Euler angle Theta in LOCAL coordinate system" unit="deg">0</Theta>
               </Position>
             </Sensor>
@@ -124,7 +130,8 @@
                 <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Sensor[@type=1]/*)"/>
               </SensorParameters>
               <Position>
-                <V desc="sensor position (middle of the volume) in V (local coordinate system of ladder)" unit="mm">156.3</V>
+                <V desc="sensor position (middle of the volume) in V (local coordinate system of ladder)" unit="mm">103.92</V>
+                <W desc="sensor position (middle of the active volume) in W (local coordinate system of ladder)" unit="mm">0</W>
                 <Theta desc="rotation about Euler angle Theta in LOCAL coordinate system" unit="deg">0</Theta>
               </Position>
             </Sensor>
@@ -134,8 +141,8 @@
                 <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Sensor[@type=2]/*)"/>
               </SensorParameters>
               <Position>
-                <V desc="sensor position (middle of the volume) in V (local coordinate system of ladder)" unit="mm">220.77</V>
-                <W desc="sensor position (middle of active volume) in W (local coordinate system of lader)" unit="mm">-18.46</W>
+                <V desc="sensor position (middle of the volume) in V (local coordinate system of ladder)" unit="mm">226.36</V>
+                <W desc="sensor position (middle of active volume) in W (local coordinate system of lader)" unit="mm">-19.02</W>
                 <Theta desc="rotation about Euler angle Theta in LOCAL coordinate system" unit="deg">17.2</Theta>
               </Position>
             </Sensor>
@@ -159,7 +166,8 @@
                 <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Sensor[@type=1]/*)"/>
               </SensorParameters>
               <Position>
-                <V desc="sensor position (middle of the volume) in V (local coordinate system of ladder)" unit="mm">-80.6</V>
+                <V desc="sensor position (middle of the volume) in V (local coordinate system of ladder)" unit="mm">-197.56</V>
+                <W desc="sensor position (middle of the active volume) in W (local coordinate system of ladder)" unit="mm">0</W>
                 <Theta desc="rotation about Euler angle Theta in LOCAL coordinate system" unit="deg">0</Theta>
               </Position>
             </Sensor>
@@ -169,7 +177,8 @@
                 <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Sensor[@type=1]/*)"/>
               </SensorParameters>
               <Position>
-                <V desc="sensor position (middle of the volume) in V (local coordinate system of ladder)" unit="mm">42.4</V>
+                <V desc="sensor position (middle of the volume) in V (local coordinate system of ladder)" unit="mm">-72.56</V>
+                <W desc="sensor position (middle of the active volume) in W (local coordinate system of ladder)" unit="mm">0</W>
                 <Theta desc="rotation about Euler angle Theta in LOCAL coordinate system" unit="deg">0</Theta>
               </Position>
             </Sensor>
@@ -179,7 +188,8 @@
                 <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Sensor[@type=1]/*)"/>
               </SensorParameters>
               <Position>
-                <V desc="sensor position (middle of the volume) in V (local coordinate system of ladder)" unit="mm">165.4</V>
+                <V desc="sensor position (middle of the volume) in V (local coordinate system of ladder)" unit="mm">52.44</V>
+                <W desc="sensor position (middle of the active volume) in W (local coordinate system of ladder)" unit="mm">0</W>
                 <Theta desc="rotation about Euler angle Theta in LOCAL coordinate system" unit="deg">0</Theta>
               </Position>
             </Sensor>
@@ -189,7 +199,8 @@
                 <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Sensor[@type=1]/*)"/>
               </SensorParameters>
               <Position>
-                <V desc="sensor position (middle of the volume) in V (local coordinate system of ladder)" unit="mm">288.4</V>
+                <V desc="sensor position (middle of the volume) in V (local coordinate system of ladder)" unit="mm">177.44</V>
+                <W desc="sensor position (middle of the active volume) in W (local coordinate system of ladder)" unit="mm">0</W>
                 <Theta desc="rotation about Euler angle Theta in LOCAL coordinate system" unit="deg">0</Theta>
               </Position>
             </Sensor>
@@ -199,8 +210,8 @@
                 <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Sensor[@type=2]/*)"/>
               </SensorParameters>
               <Position>
-                <V desc="sensor position (middle of the volume) in V (local coordinate system of ladder)" unit="mm">291.42</V>
-                <W desc="sensor position (middle of active volume) in W (local coordinate system of ladder)" unit="mm">-22.48</W>
+                <V desc="sensor position (middle of the volume) in V (local coordinate system of ladder)" unit="mm">298.35</V>
+                <W desc="sensor position (middle of active volume) in W (local coordinate system of ladder)" unit="mm">-22.99</W>
                 <Theta desc="rotation about Euler angle Theta in LOCAL coordinate system" unit="deg">21.1</Theta>
               </Position>
             </Sensor>

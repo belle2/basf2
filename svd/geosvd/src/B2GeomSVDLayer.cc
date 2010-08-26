@@ -32,6 +32,7 @@ B2GeomSVDLayer::B2GeomSVDLayer(Int_t iLay)
   char text[200];
   sprintf(text, "SVD_Layer_%i", iLayer);
   path = string(text);
+  printf("Layer %i created! \n", iLayer);
 
 }
 
@@ -44,24 +45,38 @@ B2GeomSVDLayer::~B2GeomSVDLayer()
 Bool_t B2GeomSVDLayer::init(GearDir& content)
 {
   layerContent = GearDir(content);
-  layerContent.append((format("Layers/Layer[%1%]/") % (iLayer)).str());
+  layerContent.append((format("Layers/Layer[@id=\'SVD_Layer_%1%\']/") % (iLayer)).str());
   fPhi0 = layerContent.getParamAngle("Phi0");
   nLadders = int(layerContent.getParamNumValue("NumberOfLadders"));
   b2gSVDLadders.resize(nLadders);
-  // iHalfShell.resize(nLadders);
   fPhi.resize(nLadders);
   fLadderOffsetY = layerContent.getParamLength("OffsetY");
-  fLadderOffsetZ = layerContent.getParamLength("OffsetZ");;
   fRadius = layerContent.getParamLength("Radius");
   for (int iLadder = 0; iLadder < nLadders; iLadder++) {
     fPhi[iLadder] = iLadder * (360. / nLadders) + fPhi0;
-    // iHalfShell[iLadder] = 0;
   }
 
-  // offsets
-  // fHalfShellOffsetZ.resize(2);
-  // fHalfShellOffsetZ[0] = 0;
-  // fHalfShellOffsetZ[1] = 0;
+  b2gLadderOffsets.resize(nLadders);
+  if (initOffsets()) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+Bool_t B2GeomSVDLayer::initOffsets()
+{
+  // create GearDir object for parameter access
+  GearDir offsetsDir;
+
+  for (Int_t iLadder = 0; iLadder < nLadders; iLadder++) {
+    // go in XML file to section where the parameters for the corresponding sensor are stored
+    printf("(%i / %i)\n", nLadders, iLadder);
+    offsetsDir.setDirPath((format("//LadderOffset[@id=\'SVD_Offsets_Layer_%1%_Ladder_%2%\']/") % iLayer % iLadder).str());
+    // init parameters
+    b2gLadderOffsets[iLadder] = new B2GeomOffset();
+    b2gLadderOffsets[iLadder]->init(offsetsDir);
+  }
   return true;
 }
 #else
@@ -88,7 +103,7 @@ void B2GeomSVDLayer::putLadder(Int_t iLadder)
   // create the wind mill structure
   TGeoTranslation traY = TGeoTranslation("name", 0., fLadderOffsetY, 0.);
   // shift the ladder in z diretion
-  TGeoTranslation traZ = TGeoTranslation("name", 0., 0., fLadderOffsetZ);
+  TGeoTranslation traZ = TGeoTranslation("name", 0., 0., 0);
   // rotate around z
   TGeoRotation rotPhi = TGeoRotation("name", fPhi[iLadder], 0, 0);
 

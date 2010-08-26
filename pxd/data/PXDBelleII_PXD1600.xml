@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <!--
   // PIXELS (ACTIVE + PASSIVE PART) ~ top view
    //
@@ -68,7 +68,7 @@
 	<Content>
 		<Rotation desc="Rotation of the hole PXD detector (should be the same as beampipe)" unit="mrad">22.0</Rotation>
 		<OffsetZ desc="The offset of the whole PXD in z with respect to the IP (should be the same as beampipe)" unit="mm">0.0</OffsetZ>		
-		<MaterialSensor>Silicon</MaterialSensor>
+							<MaterialSensor>Silicon</MaterialSensor>
 
 		<Layers>
 			<Layer id="1">
@@ -83,11 +83,14 @@
 					<Width desc="The over all width of the ladder" unit="mm">12.5</Width>
 					<Thickness desc="silicon thickness of the thinned down ladder" unit="um">50</Thickness>
 					<NumberOfSensors>2</NumberOfSensors>
+											<Gap desc="The gap between sensors that is insensitiv" unit="mm">0</Gap>
+
 					<Sensor>
+							<MaterialSensor>Silicon</MaterialSensor>
+
 						<Length desc="The over all length of the sensor" unit="mm">45</Length>
 						<Width desc="The over all width of the sensor" unit="mm">12.5</Width>
 						<Thickness desc="Thickness of the sensors" unit="um">50</Thickness>
-						<Gap desc="The gap between sensors that is insensitiv" unit="mm">0</Gap>
 						<PadSizeRPhi desc="pixel size or strip size" unit="um">50</PadSizeRPhi>
 						<PadSizeZ desc="pixel size or strip size" unit="um">56.25</PadSizeZ>
 					</Sensor>
@@ -107,11 +110,13 @@
 					<Width desc="The over all width of the ladder" unit="mm">12.5</Width>
 					<Thickness desc="silicon thickness of the thinned down ladder" unit="um">50</Thickness>
 					<NumberOfSensors>2</NumberOfSensors>
+            <Gap desc="The gap between sensors that is insensitiv" unit="um">550</Gap>
 					<Sensor>
+							<MaterialSensor>Silicon</MaterialSensor>
+
 						<Length desc="The over all length of the sensor" unit="mm">61.8</Length>
 						<Width desc="The over all width of the sensor" unit="mm">12.5</Width>
 						<Thickness desc="Thickness of the sensors" unit="um">50</Thickness>
-						<Gap desc="The gap between sensors that is insensitiv" unit="um">550</Gap>
 						<PadSizeRPhi desc="pixel size or strip size" unit="um">50</PadSizeRPhi>
 						<PadSizeZ desc="pixel size or strip size" unit="um">77.25</PadSizeZ>
 					</Sensor>

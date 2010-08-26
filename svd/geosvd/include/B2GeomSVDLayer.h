@@ -10,11 +10,13 @@
 
 #ifdef B2GEOM_BASF2
 #include <svd/geosvd/B2GeomSVDLadder.h>
+#include <svd/geosvd/B2GeomOffset.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/datastore/Units.h>
 #include <boost/format.hpp>
 #else
 #include "B2GeomSVDLadder.h"
+#include "B2GeomOffset.h"
 #endif
 
 #include "TGeoMaterial.h"
@@ -46,7 +48,7 @@ namespace Belle2 {
     //! path of this Layer
     string path;
 
-    //! number of the Layer - 1
+    //! number of the Layer
     Int_t iLayer;
     //! number of ladders per layer
     Int_t nLadders;
@@ -58,14 +60,14 @@ namespace Belle2 {
     Double_t fRadius;
     //! Rotation about z axis after moving to fRadius
     vector<Double_t> fPhi;
-    //! Offset in z direction
-    Double_t fLadderOffsetZ;
     //! Offset in y direction (wind mill structure)
     Double_t fLadderOffsetY;
-    //! which layer is in which half shell?
-    vector<Int_t> iHalfShell;
 
+    //! Objects representing the ladders
     vector<B2GeomSVDLadder*> b2gSVDLadders;
+    //! Object representing the offsets of the ladders
+    vector<B2GeomOffset*> b2gLadderOffsets;
+
     TGeoVolumeAssembly* volSVDLayer;
 
     void putLadder(Int_t iLadder);
@@ -77,6 +79,7 @@ namespace Belle2 {
     ~B2GeomSVDLayer();
 #ifdef B2GEOM_BASF2
     Bool_t init(GearDir& content);
+    Bool_t initOffsets();
 #else
     Bool_t init();
 #endif

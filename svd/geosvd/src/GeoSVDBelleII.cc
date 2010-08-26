@@ -53,24 +53,24 @@ GeoSVDBelleII::~GeoSVDBelleII()
 
 void GeoSVDBelleII::create(GearDir& content)
 {
-  //Get global parameters
+  //----------------------------------------
+  //         Get global parameters
+  //----------------------------------------
   double globalRotAngle = content.getParamAngle("Rotation") / deg;
   double globalOffsetZ  = content.getParamLength("OffsetZ");
-  //string sensorMatName  = content.getParamString("MaterialSensor");
 
-  TGeoVolume* topVolume = gGeoManager->GetTopVolume();
-  TGeoVolumeAssembly* volGrpSVD = new TGeoVolumeAssembly("SVD");
+  //----------------------------------------
+  //        Add subdetector group
+  //----------------------------------------
 
   TGeoRotation* geoRot = new TGeoRotation("SVDRot", 90.0, globalRotAngle, 0.0);
-  topVolume->AddNode(volGrpSVD, 1, new TGeoCombiTrans(0.0, 0.0, globalOffsetZ, geoRot)); //rotation followed by a translation
+  TGeoVolumeAssembly* volGrpSVD = addSubdetectorGroup("SVD", new TGeoCombiTrans(0.0, 0.0, globalOffsetZ, geoRot));
 
-  //Get Material
-  // TGeoMedium* sensorMed = gGeoManager->GetMedium(sensorMatName.c_str());
+  //----------------------------------------
+  //           Build subdetector
+  //----------------------------------------
 
-  //Get number of layers
-  int nLayer = content.getNumberNodes("Layers/Layer");
-
-  for (int iLayer = 1; iLayer <= nLayer; ++iLayer) {
+  for (int iLayer = 3; iLayer <= 6; iLayer++) {
     B2GeomSVDLayer* b2gSVDLayer = new B2GeomSVDLayer(iLayer);
     b2gSVDLayer->init(content);
     b2gSVDLayer->make();

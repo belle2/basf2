@@ -22,10 +22,10 @@ using namespace std;
 
 B2GeomSVDSensor::B2GeomSVDSensor()
 {
-  B2GeomSVDSensor(-1, -1, -1);
+  B2GeomSVDSensor(-1, -1, -1, -1);
 }
 
-B2GeomSVDSensor::B2GeomSVDSensor(Int_t iLay, Int_t iLad, Int_t iSen, Bool_t isW)
+B2GeomSVDSensor::B2GeomSVDSensor(Int_t iLay, Int_t iLad, Int_t iSen, Int_t iST)
 {
   volSVDSensor = 0;
   // check for valid parameters (e.g. Layer 1 or 2 etc.....)
@@ -34,7 +34,7 @@ B2GeomSVDSensor::B2GeomSVDSensor(Int_t iLay, Int_t iLad, Int_t iSen, Bool_t isW)
   iLayer = iLay;
   iLadder = iLad;
   iSensor = iSen;
-  isWedge = isW;
+  iSensorType = iST;
   char text[200];
   sprintf(text, "SVD_Layer_%i_Ladder_%i_Sensor_%i", iLayer, iLadder, iSensor);
   path = string(text);
@@ -50,29 +50,46 @@ B2GeomSVDSensor::~B2GeomSVDSensor()
 Bool_t B2GeomSVDSensor::init(GearDir& content)
 {
   GearDir sensorContent(content);
-  if (!isWedge) sensorContent.append("Sensor/");
-  if (isWedge) sensorContent.append("SlantedSensor/");
+
+  sensorContent.append((format("Sensors/Sensor[@id=\'SVD_Layer_%1%_Ladder_Sensor_%2%\']/SensorParameters/") % iLayer % iSensor).str());
 
   //Collect sensor data
-  //sensorContent.append("Sensor/");
   fActiveSensorLength      = sensorContent.getParamLength("LengthActive");
   fActiveSensorWidth       = sensorContent.getParamLength("WidthActive");
-  if (isWedge) fActiveSensorWidth2 = sensorContent.getParamLength("Width2Active");
+  if (iSensorType == 2) {
+    fActiveSensorWidth2 = sensorContent.getParamLength("Width2Active");
+  }
   fActiveSensorThick       = sensorContent.getParamLength("ThicknessActive");
 
   fSensorLength = sensorContent.getParamLength("Length");
   fSensorWidth = sensorContent.getParamLength("Width");
-  if (isWedge) fSensorWidth2 = sensorContent.getParamLength("Width2");
+  if (iSensorType == 2) fSensorWidth2 = sensorContent.getParamLength("Width2");
   fSensorThick = sensorContent.getParamLength("Thickness");
 
+
+  fSiliconLength = sensorContent.getParamLength("LengthSilicon");
+  fSiliconWidth = sensorContent.getParamLength("WidthSilicon");
+  if (iSensorType == 2) fSiliconWidth2 = sensorContent.getParamLength("Width2Silicon");
+  fSiliconThick = sensorContent.getParamLength("ThicknessSilicon");
+
+  // get parameters for the ribs
+  if (iSensorType == 1) {
+    fRibUPosition.resize(2);
+    fRibUPosition[0] = double(sensorContent.getParamLength("RibUPosition0"));
+    fRibUPosition[1] = double(sensorContent.getParamLength("RibUPosition1"));
+    fRibCarbonThick = double(sensorContent.getParamLength("RibCarbonThick"));
+    fRibCarbonWidth = double(sensorContent.getParamLength("RibCarbonWidth"));
+    fRibFoamWidth = double(sensorContent.getParamLength("RibFoamWidth"));
+    fRibGapThick = double(sensorContent.getParamLength("RibGapThick"));
+  }
   // Get materials
   string sensorMatName  = sensorContent.getParamString("MaterialSensor");
-  medActiveSensor = gGeoManager->GetMedium(sensorMatName.c_str());
-  medSilicon = gGeoManager->GetMedium(sensorMatName.c_str());
+  medSVD_Silicon = gGeoManager->GetMedium(sensorMatName.c_str());
 
   TGeoMaterial* matVacuum = new TGeoMaterial("Vacuum", 0, 0, 0);
+  medFoam = new TGeoMedium("medFoam", 1, matVacuum);
+  medCarbon = new TGeoMedium("medCarbon", 1, matVacuum);
   medAir = new TGeoMedium("medAir", 1, matVacuum);
-
   return true;
 
 }
@@ -94,7 +111,7 @@ Bool_t B2GeomSVDSensor::init()
 
   TGeoMaterial* matVacuum = new TGeoMaterial("Vacuum", 0, 0, 0);
   medAir = new TGeoMedium("medAir", 1, matVacuum);
-  medActiveSensor = new TGeoMedium("medAir", 1, matVacuum);
+  medSVD_Silicon = new TGeoMedium("medAir", 1, matVacuum);
 
   return true;
 }
@@ -102,14 +119,13 @@ Bool_t B2GeomSVDSensor::init()
 
 Bool_t B2GeomSVDSensor::make()
 {
-  printf("make B2GeomSVDSensor %i \n", iSensor);
   volSVDSensor = new TGeoVolumeAssembly(path.c_str());
-  putSensor();
-  putSwitchers();
+  putSilicon();
+  if (iSensorType == 1) putRibsBarrel();
   return true;
 }
 
-void B2GeomSVDSensor::putSensor()
+void B2GeomSVDSensor::putSilicon()
 {
   char nameActive[200];
   char nameSilicon[200];
@@ -117,13 +133,13 @@ void B2GeomSVDSensor::putSensor()
   // the prefix SD flags the volume as active
   sprintf(nameActive, "SD_%s_ActiveSensor", path.c_str());
   sprintf(nameSilicon, "%s_Silicon", path.c_str());
-  if (!isWedge) {
-    volSilicon = gGeoManager->MakeBox(nameSilicon, medSilicon,
-                                      fSensorWidth * 0.5,
-                                      fActiveSensorThick * 0.5,
-                                      fSensorLength * 0.5);
+  if (iSensorType < 2) {
+    volSilicon = gGeoManager->MakeBox(nameSilicon, medSVD_Silicon,
+                                      fSiliconWidth * 0.5,
+                                      fSiliconThick * 0.5,
+                                      fSiliconLength * 0.5);
 
-    volActiveSensor = gGeoManager->MakeBox(nameActive, medActiveSensor,
+    volActiveSensor = gGeoManager->MakeBox(nameActive, medSVD_Silicon,
                                            fActiveSensorWidth * 0.5,
                                            fActiveSensorThick * 0.5,
                                            fActiveSensorLength * 0.5);
@@ -131,14 +147,14 @@ void B2GeomSVDSensor::putSensor()
     volSilicon->AddNode(volActiveSensor, 1, new TGeoTranslation(0.0, 0.0, 0.0));
 
   }
-  if (isWedge) {
-    volSilicon = gGeoManager->MakeTrd1(nameSilicon, medSilicon,
-                                       fSensorWidth * 0.5,
-                                       fSensorWidth2 * 0.5,
-                                       fActiveSensorThick * 0.5,
-                                       fSensorLength * 0.5);
+  if (iSensorType == 2) {
+    volSilicon = gGeoManager->MakeTrd1(nameSilicon, medSVD_Silicon,
+                                       fSiliconWidth * 0.5,
+                                       fSiliconWidth2 * 0.5,
+                                       fSiliconThick * 0.5,
+                                       fSiliconLength * 0.5);
 
-    volActiveSensor = gGeoManager->MakeTrd1(nameActive, medActiveSensor,
+    volActiveSensor = gGeoManager->MakeTrd1(nameActive, medSVD_Silicon,
                                             fActiveSensorWidth * 0.5,
                                             fActiveSensorWidth2 * 0.5,
                                             fActiveSensorThick * 0.5,
@@ -150,14 +166,73 @@ void B2GeomSVDSensor::putSensor()
 
   volActiveSensor->SetLineColor(kRed);
   volSilicon->SetLineColor(kBlue);
-  TGeoTranslation traX(0.5 * fActiveSensorThick, 0.0, 0.0);
   TGeoRotation rot1("name", 90.0, 0.0, 0.0);
   TGeoHMatrix hmaHelp;
   hmaHelp = gGeoIdentity;
   hmaHelp = rot1 * hmaHelp;
-  hmaHelp = traX * hmaHelp;
   TGeoHMatrix* hmaActiveSensorPosition = new TGeoHMatrix(hmaHelp);
   volSVDSensor->AddNode(volSilicon, 1, hmaActiveSensorPosition);
+}
+
+void B2GeomSVDSensor::putRibsBarrel()
+{
+  char nameRibBarrel[200];
+  sprintf(nameRibBarrel, "SVD_Rib_Barrel");
+
+  volRibBarrel = (TGeoVolume*) gROOT->FindObjectAny(nameRibBarrel);
+  if (!volRibBarrel) {
+    volRibBarrel = gGeoManager->MakeTrd1(nameRibBarrel, medAir,
+                                         0.5 * fSensorLength,
+                                         0.5 * fSensorLength,
+                                         2 * 0.5 * fRibCarbonWidth + 0.5 * fRibFoamWidth,
+                                         0.5 * fRibCarbonThick);
+
+    char nameCarbonBarrel[200];
+    sprintf(nameCarbonBarrel, "SVD_Rib_Barrel_Carbon");
+    volCarbonBarrel = gGeoManager->MakeTrd1(nameCarbonBarrel, medCarbon,
+                                            0.5 * fSensorLength,
+                                            0.5 * fSensorLength, // later we make this shorter -> offsets!
+                                            0.5 * fRibCarbonWidth,
+                                            0.5 * fRibCarbonThick
+                                           );
+
+    volCarbonBarrel->SetLineColor(kMagenta);
+    char nameFoamBarrel[200];
+    sprintf(nameFoamBarrel, "SVD_Rib_Barrel_Foam");
+    volFoamBarrel = gGeoManager->MakeTrd1(nameFoamBarrel, medFoam,
+                                          0.5 * fSensorLength,
+                                          0.5 * fSensorLength, // later we make this shorter -> offsets!
+                                          0.5 * fRibFoamWidth,
+                                          0.5 * fRibCarbonThick);
+    volFoamBarrel->SetLineColor(kCyan);
+
+    volRibBarrel->AddNode(volCarbonBarrel, 1, new TGeoTranslation(0.0, - 0.5 *(fRibCarbonWidth + fRibFoamWidth), 0.0));
+    volRibBarrel->AddNode(volFoamBarrel, 1, new TGeoTranslation(0.0, 0.0, 0.0));
+    volRibBarrel->AddNode(volCarbonBarrel, 2, new TGeoTranslation(0.0, + 0.5 *(fRibCarbonWidth + fRibFoamWidth), 0.0));
+
+  }
+
+  TGeoRotation rot1("name", 90.0, 90.0, 90.0);
+  TGeoTranslation traRib0(- fRibGapThick - 0.5 * fRibCarbonThick - 0.5* fSiliconThick,
+                          fRibUPosition[0],
+                          0.0);
+  TGeoTranslation traRib1(- fRibGapThick - 0.5 * fRibCarbonThick - 0.5* fSiliconThick,
+                          fRibUPosition[1],
+                          0.0);
+
+  TGeoHMatrix hmaHelp;
+  hmaHelp = gGeoIdentity;
+  hmaHelp = rot1 * hmaHelp;
+  hmaHelp = traRib0 * hmaHelp;
+  TGeoHMatrix* hmaRib0Position = new TGeoHMatrix(hmaHelp);
+  volSVDSensor->AddNode(volRibBarrel, 1, hmaRib0Position);
+
+  hmaHelp = gGeoIdentity;
+  hmaHelp = rot1 * hmaHelp;
+  hmaHelp = traRib1 * hmaHelp;
+  TGeoHMatrix* hmaRib1Position = new TGeoHMatrix(hmaHelp);
+  volSVDSensor->AddNode(volRibBarrel, 2, hmaRib1Position);
+
 }
 
 

@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Sensors>
+  <Sensor desc="The small PXD sensor" type="1">
+    <Length desc="The over all length of the sensor" unit="mm">90</Length>
+    <Width desc="The over all width of the sensor" unit="mm">12.5</Width>
+    <Thickness desc="Thickness of the sensors" unit="um">75</Thickness>
+    <MaterialActiveSensor>Silicon</MaterialActiveSensor>
+    <LengthActive desc="The over all length of the active sensor" unit="mm">90</LengthActive>
+    <ThicknessActive desc="Thickness of the active sensors" unit="um">75</ThicknessActive>
+    <WidthActive desc="The over all width of active the sensor" unit="mm">12.5</WidthActive>
+  </Sensor>
+  <Sensor desc="The large PXD sensor" type="2">
+  							<MaterialSensor>Silicon</MaterialSensor>
+						<Length desc="The over all length of the sensor" unit="mm">123.45</Length>
+						<Width desc="The over all width of the sensor" unit="mm">12.5</Width>
+						<Thickness desc="Thickness of the sensors" unit="um">75</Thickness>
+						<LengthActive desc="The over all length of the sensor" unit="mm">123.45</LengthActive>
+						<WidthActive desc="The over all width of the sensor" unit="mm">12.5</WidthActive>
+						<ThicknessActive desc="Thickness of the sensors" unit="um">75</ThicknessActive>
+					</Sensor>
+</Sensors>

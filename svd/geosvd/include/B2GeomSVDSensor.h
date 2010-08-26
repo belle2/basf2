@@ -20,6 +20,7 @@
 #include "TGeoManager.h"
 #include "TGeoMatrix.h"
 #include "TGeoVolume.h"
+#include "TROOT.h"
 
 
 
@@ -36,6 +37,7 @@ namespace Belle2 {
 
   class B2GeomSVDSensor {
   private:
+
     //! path of this Sensor
     string path;
 
@@ -47,11 +49,30 @@ namespace Belle2 {
     TGeoVolume* volSilicon;
     TGeoVolume* volSwitcher;
     TGeoVolume* volAir;
+    TGeoVolume* volRibBarrel;
+    TGeoVolume* volCarbonBarrel;
+    TGeoVolume* volFoamBarrel;
+    //TGeoVolume* volRibSlanted;
+    //TGeoVolume* volCarbonSlanted;
+    //TGeoVolume* volFoamSlanted;
 
     //! Mediums contained in the sensor
     TGeoMedium* medAir;
-    TGeoMedium* medSilicon;
-    TGeoMedium* medActiveSensor;
+    TGeoMedium* medSVD_Silicon;
+    TGeoMedium* medFoam;
+    TGeoMedium* medCarbon;
+
+    //! Dimensions of the carbon+foam rib
+    Double_t fRibCarbonThick;
+    Double_t fRibCarbonWidth;
+    Double_t fRibBarrelCarbonLength;
+    Double_t fRibSlantedCarbonLength;
+    Double_t fRibFoamWidth;
+
+    //! gap between sensor and rib
+    Double_t fRibGapThick;
+    //! position of the "inner" edge of the rib
+    vector<Double_t> fRibUPosition;
 
     // Parameters
     //! Layer number of this sensor
@@ -60,13 +81,21 @@ namespace Belle2 {
     Int_t iLadder;
     //! Number of this sensor
     Int_t iSensor;
-    //! Wedge layout?
-    Bool_t isWedge;
-    //! Dimensions of a box which contains the full sensor (including switchers, capton, etc)
+    //! Sensor type (0 = small, 1 = normal, 2 = wedge)
+    Int_t iSensorType;
+
+    //! Dimensions of a box which contains the whole sensor
     Double_t fSensorLength;
     Double_t fSensorWidth;
     Double_t fSensorWidth2;
     Double_t fSensorThick;
+
+    //! Dimensions of a box which contains the silicon (active + passive)
+    Double_t fSiliconLength;
+    Double_t fSiliconWidth;
+    Double_t fSiliconWidth2;
+    Double_t fSiliconThick;
+
     //! Dimensions of the active part of the sensor
     Double_t fActiveSensorLength;
     Double_t fActiveSensorWidth;
@@ -74,20 +103,19 @@ namespace Belle2 {
     Double_t fActiveSensorThick;
 
     //! Methods to place components
-    void putSensor();
+    void putSilicon();
     void putSwitchers();
-
+    void putRibsBarrel();
   public:
-    B2GeomSVDSensor();
-    B2GeomSVDSensor(Int_t iLayer , Int_t iLadder, Int_t iSensor, Bool_t isWedge = false);
-    ~B2GeomSVDSensor();
 
+    B2GeomSVDSensor();
+    B2GeomSVDSensor(Int_t iLay, Int_t iLad, Int_t iSen, Int_t iST);
+    ~B2GeomSVDSensor();
 #ifdef B2GEOM_BASF2
     Bool_t init(GearDir& content);
 #else
     Bool_t init();
 #endif
-
     Bool_t make();
     TGeoVolumeAssembly* getVol() {
       return volSVDSensor;
@@ -103,5 +131,4 @@ namespace Belle2 {
 #ifdef B2GEOM_BASF2
 }
 #endif
-
 #endif

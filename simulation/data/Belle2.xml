@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <Detector xmlns:xi="http://www.w3.org/2001/XInclude">
   <Name>Belle2Detector</Name>
   <Description>The Belle II detector</Description>

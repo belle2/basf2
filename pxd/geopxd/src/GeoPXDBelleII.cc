@@ -62,8 +62,6 @@ void GeoPXDBelleII::create(GearDir& content)
   //----------------------------------------
   double globalRotAngle = content.getParamAngle("Rotation") / deg;
   double globalOffsetZ  = content.getParamLength("OffsetZ");
-  string sensorMatName  = content.getParamString("MaterialSensor");
-
 
   //----------------------------------------
   //        Add subdetector group

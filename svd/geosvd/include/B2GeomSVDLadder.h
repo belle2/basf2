@@ -10,11 +10,13 @@
 
 #ifdef B2GEOM_BASF2
 #include <svd/geosvd/B2GeomSVDSensor.h>
+#include <svd/geosvd/B2GeomOffset.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/datastore/Units.h>
 #include <boost/format.hpp>
 #else
 #include "B2GeomSVDSensor.h"
+#include "B2GeomOffset.h"
 #endif
 
 #include "TROOT.h"
@@ -47,17 +49,12 @@ namespace Belle2 {
     GearDir ladderContent;
 #endif
 
-    //! TGeoVolumeAssembly which contains all parts of this sensor
+    //! TGeoVolumeAssembly which contains all parts of this ladder
     TGeoVolumeAssembly* volSVDLadder;
 
-    TGeoVolume* volRibBarrel;
-    TGeoVolume* volCarbonBarrel;
-    TGeoVolume* volFoamBarrel;
-    TGeoVolume* volRibSlanted;
-    TGeoVolume* volCarbonSlanted;
-    TGeoVolume* volFoamSlanted;
 
-    //! Volumes contained in the sensor
+
+    //! The sensor objects
     vector<B2GeomSVDSensor*> b2gSVDSensors;
 
     // Parameters
@@ -67,41 +64,37 @@ namespace Belle2 {
     Int_t iLadder;
     //! number of barrel sensors
     Int_t nSensors;
-    //! number of slanted sensors
-    Int_t nSlantedSensors;
 
-    //! Gap between two sensor boxes
-    Double_t fGapLength;
-    //! Angle of slanted sensor
-    Double_t fTheta;
+    //! The offsets of the sensors from their ideal position
+    vector<B2GeomOffset*> b2gSensorOffsets;
 
-    //! Mediums contained in the sensor
+    //! V Position of the sensors
+    vector<Double_t> fSensorVPositions;
+
+    //! W Position of the sensors
+    vector<Double_t> fSensorWPositions;
+
+
+    //! types of the sensors
+    // 0 = small, 1 = normal, 2 = wedge
+    vector<Int_t> sensorTypes;
+
+    //! Angle of the sensors
+    vector<Double_t> fThetas;
+
+    //! Mediums contained in the ladder
     TGeoMedium* medAir;
-    TGeoMedium* medFoam;
-    TGeoMedium* medCarbon;
-
-    //! Dimensions of the carbon+foam rib
-    Double_t fRibCarbonThick;
-    Double_t fRibCarbonWidth;
-    Double_t fRibBarrelCarbonLength;
-    Double_t fRibSlantedCarbonLength;
-    Double_t fRibFoamWidth;
-
-    //! gap between sensor and rib
-    Double_t fRibGapThick;
-    //! position of the "inner" edge of the rib
-    vector<Double_t> fRibUPosition;
 
     //! Methods to place components
     void putSensors();
-    void putRibBarrel(Int_t iRibNo);
 
   public:
     B2GeomSVDLadder();
-    B2GeomSVDLadder(Int_t iLayer , Int_t iLadder);
+    B2GeomSVDLadder(Int_t iLayer, Int_t iLadder);
     ~B2GeomSVDLadder();
 #ifdef B2GEOM_BASF2
     Bool_t init(GearDir& content);
+    Bool_t initOffsets();
 #else
     Bool_t init();
 #endif

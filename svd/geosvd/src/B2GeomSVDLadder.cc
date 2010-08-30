@@ -46,6 +46,19 @@ Bool_t B2GeomSVDLadder::init(GearDir& content)
 
   // get parameters for the sensors
   nSensors = int(ladderContent.getParamNumValue("NumberOfSensors"));
+
+  if (iLayer > 3) {
+    fThicknessRibs = double(ladderContent.getParamLength("ThicknessRibs"));
+    fRibUPosition0 = double(ladderContent.getParamLength("RibUPosition0"));
+    fRibUPosition1 = double(ladderContent.getParamLength("RibUPosition1"));
+    fWidthRibs = double(ladderContent.getParamLength("WidthRibs"));
+    fWidthCarbon = double(ladderContent.getParamLength("WidthCarbon"));
+    fLengthRibsBarrel = double(ladderContent.getParamLength("LengthRibsBarrel"));
+    fLength1RibsSlanted = double(ladderContent.getParamLength("Length1RibsSlanted"));
+    fLength2RibsSlanted = double(ladderContent.getParamLength("Length2RibsSlanted"));
+    fRibsDistanceFromSensor = double(ladderContent.getParamLength("RibsDistanceFromSensor"));
+  }
+
   b2gSVDSensors.resize(nSensors);
   sensorTypes.resize(nSensors);
   fThetas.resize(nSensors);
@@ -65,6 +78,8 @@ Bool_t B2GeomSVDLadder::init(GearDir& content)
 
   TGeoMaterial* matVacuum = new TGeoMaterial("Vacuum", 0, 0, 0);
   medAir = new TGeoMedium("medAir", 1, matVacuum);
+  medFoam = new TGeoMedium("medFoam", 1, matVacuum);
+  medCarbon = new TGeoMedium("medCarbon", 1, matVacuum);
 
 
   b2gSensorOffsets.resize(nSensors);
@@ -92,15 +107,52 @@ Bool_t B2GeomSVDLadder::initOffsets()
 #else
 Bool_t B2GeomSVDLadder::init()
 {
+// get parameters for the sensors
+  if (iLayer == 3) {
+    nSensors = 2;
 
+    b2gSVDSensors.resize(nSensors);
+    sensorTypes.resize(nSensors);
+    fThetas.resize(nSensors);
+    fSensorVPositions.resize(nSensors);
+    fSensorWPositions.resize(nSensors);
+
+    fThetas[0] = 0.0;
+    fThetas[1] = 0.0;
+    fSensorVPositions[0] = -3.42;
+    fSensorWPositions[0] = 0.0;
+    fSensorVPositions[1] = 8.8;
+    fSensorWPositions[1] = 0.0;
+  }
+
+}
+
+TGeoMaterial* matVacuum = new TGeoMaterial("Vacuum", 0, 0, 0);
+medAir = new TGeoMedium("medAir", 1, matVacuum);
+medFoam = new TGeoMedium("medFoam", 1, matVacuum);
+medCarbon = new TGeoMedium("medCarbon", 1, matVacuum);
+
+
+b2gSensorOffsets.resize(nSensors);
+if (initOffsets())
+{
+  return true;
+} else
+{
+  return false;
+}
 }
 #endif
 
 Bool_t B2GeomSVDLadder::make()
 {
-  printf("make B2GeomSVDLadder %i\n", iLadder);
+  //printf("make B2GeomSVDLadder %i\n", iLadder);
   volSVDLadder = new TGeoVolumeAssembly(path.c_str());
   putSensors();
+  if (iLayer > 3) {
+    putRibsBarrel();
+    // putRibsSlanted();
+  }
   return true;
 }
 
@@ -132,9 +184,104 @@ void B2GeomSVDLadder::putSensors()
 }
 
 
-Double_t B2GeomSVDLadder::getLengthBarrel()
+void B2GeomSVDLadder::putRibsBarrel()
 {
-  Double_t fLengthBarrel = 10.0;
-  return fLengthBarrel;
+  char nameRibsBarrel[200];
+  sprintf(nameRibsBarrel, "SVD_Ribs_Barrel");
+
+  volRibsBarrel = (TGeoVolume*) gROOT->FindObjectAny(nameRibsBarrel);
+  if (!volRibsBarrel) {
+
+    volRibsBarrel = gGeoManager->MakeBox(nameRibsBarrel, medAir,
+                                         0.5 * fThicknessRibs,
+                                         0.5 * (fRibUPosition0 - fRibUPosition1) + 0.5 * fWidthRibs,
+                                         0.5 * fLengthRibsBarrel);
+
+    char nameRibBarrel[200];
+    sprintf(nameRibBarrel, "SVD_Rib_Barrel");
+    volRibBarrel = gGeoManager->MakeBox(nameRibBarrel, medFoam,
+                                        0.5 * fThicknessRibs,
+                                        0.5 * fWidthRibs,
+                                        0.5 * fLengthRibsBarrel
+                                       );
+
+    char nameCarbonBarrel[200];
+    sprintf(nameCarbonBarrel, "SVD_Rib_Barrel_Foam");
+    volCarbonBarrel = gGeoManager->MakeBox(nameCarbonBarrel, medCarbon,
+                                           0.5 * fThicknessRibs,
+                                           0.5 * fWidthCarbon, // later we make this shorter -> offsets!
+                                           0.5 * fLengthRibsBarrel);
+
+    volRibBarrel->AddNode(volCarbonBarrel, 1, new TGeoTranslation(0.0, - 0.5 * fWidthRibs + 0.5 * fWidthCarbon, 0.0));
+    volRibBarrel->AddNode(volCarbonBarrel, 2, new TGeoTranslation(0.0, + 0.5 * fWidthRibs - 0.5 * fWidthCarbon, 0.0));
+    volRibsBarrel->AddNode(volRibBarrel, 1, new TGeoTranslation(0.0, fRibUPosition0, 0.0));
+    volRibsBarrel->AddNode(volRibBarrel, 2, new TGeoTranslation(0.0, fRibUPosition1, 0.0));
+
+  }
+  volSVDLadder->AddNode(volRibsBarrel, 1, new TGeoTranslation(-fRibsDistanceFromSensor,
+                                                              0.,
+                                                              fSensorVPositions[nSensors-2] + 0.5*b2gSVDSensors[0]->getLength() - 0.5 * fLengthRibsBarrel
+                                                             ));
 }
+
+void B2GeomSVDLadder::putRibsSlanted()
+{
+  char nameRibsSlanted[200];
+  sprintf(nameRibsSlanted, "SVD_Ribs_Slanted");
+
+  volRibsSlanted = (TGeoVolume*) gROOT->FindObjectAny(nameRibsSlanted);
+  if (!volRibsSlanted) {
+
+    volRibsSlanted = gGeoManager->MakeTrd1(nameRibsSlanted, medAir,
+                                           0.5 * fLength1RibsSlanted,
+                                           0.5 * fLength2RibsSlanted,
+                                           0.5 * (fRibUPosition0 - fRibUPosition1) + 0.5 * fWidthRibs,
+                                           0.5 * fThicknessRibs
+                                          );
+
+    char nameRibSlanted[200];
+    sprintf(nameRibSlanted, "SVD_Rib_Slanted");
+    volRibSlanted = gGeoManager->MakeTrd1(nameRibSlanted, medFoam,
+                                          0.5 * fLength1RibsSlanted,
+                                          0.5 * fLength2RibsSlanted,
+                                          0.5 * fWidthRibs,
+                                          0.5 * fThicknessRibs
+                                         );
+
+    char nameCarbonSlanted[200];
+    sprintf(nameCarbonSlanted, "SVD_Rib_Barrel_Carbon");
+    volCarbonSlanted = gGeoManager->MakeTrd1(nameCarbonSlanted, medCarbon,
+                                             0.5 * fLength1RibsSlanted,
+                                             0.5 * fLength2RibsSlanted,
+                                             0.5 * fWidthCarbon, // later we make this shorter -> offsets!
+                                             0.5 * fThicknessRibs);
+
+    volRibSlanted->AddNode(volCarbonSlanted, 1, new TGeoTranslation(0.0, - 0.5 * fWidthRibs + 0.5 * fWidthCarbon, 0.0));
+    volRibSlanted->AddNode(volCarbonSlanted, 2, new TGeoTranslation(0.0, + 0.5 * fWidthRibs - 0.5 * fWidthCarbon, 0.0));
+    volRibsSlanted->AddNode(volRibSlanted, 1, new TGeoTranslation(0.0, fRibUPosition0, 0.0));
+    volRibsSlanted->AddNode(volRibSlanted, 2, new TGeoTranslation(0.0, fRibUPosition1, 0.0));
+
+  }
+
+  // rotate the Trd1 to the right coordinates
+  TGeoRotation rot1("rot1", -90.0, 90.0, 90.0);
+  // take into account distance between sensor and rib
+  TGeoTranslation tra2(-fRibsDistanceFromSensor, 0.0, 0.0);
+  // rotate about theta angle
+  TGeoRotation rot3("rot3", -90.0, fThetas[nSensors-1], 90.0);
+  // position at slanted sensor position
+  TGeoTranslation tra4(fSensorWPositions[nSensors-1], 0.0, fSensorVPositions[nSensors-1]);
+
+  TGeoHMatrix hmaHelp;
+  hmaHelp = gGeoIdentity;
+  hmaHelp = rot1 * hmaHelp;
+  hmaHelp = tra2 * hmaHelp;
+  hmaHelp = rot3 * hmaHelp;
+  hmaHelp = tra4 * hmaHelp;
+
+  TGeoHMatrix* hmaRibsSlantedPosition = new TGeoHMatrix(hmaHelp);
+
+  volSVDLadder->AddNode(volRibsSlanted, 1, hmaRibsSlantedPosition);
+}
+
 

@@ -49,9 +49,39 @@ namespace Belle2 {
     GearDir ladderContent;
 #endif
 
+    // volumes in SVD ladder
     //! TGeoVolumeAssembly which contains all parts of this ladder
     TGeoVolumeAssembly* volSVDLadder;
+    TGeoVolume* volRibsBarrel;
+    TGeoVolume* volRibBarrel;
+    TGeoVolume* volCarbonBarrel;
+    TGeoVolume* volRibsSlanted;
+    TGeoVolume* volRibSlanted;
+    TGeoVolume* volCarbonSlanted;
 
+
+    // Mediums used in SVD ladder
+    TGeoMedium* medFoam;
+    TGeoMedium* medCarbon;
+
+    // Dimensions of the carbon+foam rib
+    //! thickness of the ribs
+    Double_t fThicknessRibs;
+    //! position of the middle of each rib
+    Double_t fRibUPosition0;
+    Double_t fRibUPosition1;
+    //! width of the ribs
+    Double_t fWidthRibs;
+    //! width of the carbon
+    Double_t fWidthCarbon;
+    //! length of the ribs in barrel region
+    Double_t fLengthRibsBarrel;
+    //! distance between middle of sensor and middle of carbon rib
+    Double_t fRibsDistanceFromSensor;
+    //! Length1 of the ribs in slanted region (theta angle => implementation of rib as Trd1)
+    Double_t fLength1RibsSlanted;
+    //! Length2 of the ribs in slanted region (theta angle => implementation of rib as Trd1)
+    Double_t fLength2RibsSlanted;
 
 
     //! The sensor objects
@@ -74,7 +104,6 @@ namespace Belle2 {
     //! W Position of the sensors
     vector<Double_t> fSensorWPositions;
 
-
     //! types of the sensors
     // 0 = small, 1 = normal, 2 = wedge
     vector<Int_t> sensorTypes;
@@ -87,6 +116,9 @@ namespace Belle2 {
 
     //! Methods to place components
     void putSensors();
+    void putRibsBarrel();
+    void putRibsSlanted();
+
 
   public:
     B2GeomSVDLadder();
@@ -102,9 +134,6 @@ namespace Belle2 {
     TGeoVolumeAssembly* getVol() {
       return volSVDLadder;
     }
-    //! Gives the Length of the barrel style part of the SVD ladder (sum over sensor lengths plus gaps)
-    Double_t getLengthBarrel();
-
   };
 #ifdef B2GEOM_BASF2
 }

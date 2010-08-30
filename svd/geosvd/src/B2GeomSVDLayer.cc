@@ -32,7 +32,7 @@ B2GeomSVDLayer::B2GeomSVDLayer(Int_t iLay)
   char text[200];
   sprintf(text, "SVD_Layer_%i", iLayer);
   path = string(text);
-  printf("Layer %i created! \n", iLayer);
+  printf("SVD Layer %i created! \n", iLayer);
 
 }
 
@@ -71,7 +71,7 @@ Bool_t B2GeomSVDLayer::initOffsets()
 
   for (Int_t iLadder = 0; iLadder < nLadders; iLadder++) {
     // go in XML file to section where the parameters for the corresponding sensor are stored
-    printf("(%i / %i)\n", nLadders, iLadder);
+    // printf("(%i / %i)\n", nLadders, iLadder);
     offsetsDir.setDirPath((format("//LadderOffset[@id=\'SVD_Offsets_Layer_%1%_Ladder_%2%\']/") % iLayer % iLadder).str());
     // init parameters
     b2gLadderOffsets[iLadder] = new B2GeomOffset();

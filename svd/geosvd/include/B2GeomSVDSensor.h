@@ -49,30 +49,10 @@ namespace Belle2 {
     TGeoVolume* volSilicon;
     TGeoVolume* volSwitcher;
     TGeoVolume* volAir;
-    TGeoVolume* volRibBarrel;
-    TGeoVolume* volCarbonBarrel;
-    TGeoVolume* volFoamBarrel;
-    //TGeoVolume* volRibSlanted;
-    //TGeoVolume* volCarbonSlanted;
-    //TGeoVolume* volFoamSlanted;
 
     //! Mediums contained in the sensor
     TGeoMedium* medAir;
     TGeoMedium* medSVD_Silicon;
-    TGeoMedium* medFoam;
-    TGeoMedium* medCarbon;
-
-    //! Dimensions of the carbon+foam rib
-    Double_t fRibCarbonThick;
-    Double_t fRibCarbonWidth;
-    Double_t fRibBarrelCarbonLength;
-    Double_t fRibSlantedCarbonLength;
-    Double_t fRibFoamWidth;
-
-    //! gap between sensor and rib
-    Double_t fRibGapThick;
-    //! position of the "inner" edge of the rib
-    vector<Double_t> fRibUPosition;
 
     // Parameters
     //! Layer number of this sensor

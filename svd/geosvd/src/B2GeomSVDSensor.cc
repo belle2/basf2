@@ -72,23 +72,11 @@ Bool_t B2GeomSVDSensor::init(GearDir& content)
   if (iSensorType == 2) fSiliconWidth2 = sensorContent.getParamLength("Width2Silicon");
   fSiliconThick = sensorContent.getParamLength("ThicknessSilicon");
 
-  // get parameters for the ribs
-  if (iSensorType == 1) {
-    fRibUPosition.resize(2);
-    fRibUPosition[0] = double(sensorContent.getParamLength("RibUPosition0"));
-    fRibUPosition[1] = double(sensorContent.getParamLength("RibUPosition1"));
-    fRibCarbonThick = double(sensorContent.getParamLength("RibCarbonThick"));
-    fRibCarbonWidth = double(sensorContent.getParamLength("RibCarbonWidth"));
-    fRibFoamWidth = double(sensorContent.getParamLength("RibFoamWidth"));
-    fRibGapThick = double(sensorContent.getParamLength("RibGapThick"));
-  }
   // Get materials
   string sensorMatName  = sensorContent.getParamString("MaterialSensor");
   medSVD_Silicon = gGeoManager->GetMedium(sensorMatName.c_str());
 
   TGeoMaterial* matVacuum = new TGeoMaterial("Vacuum", 0, 0, 0);
-  medFoam = new TGeoMedium("medFoam", 1, matVacuum);
-  medCarbon = new TGeoMedium("medCarbon", 1, matVacuum);
   medAir = new TGeoMedium("medAir", 1, matVacuum);
   return true;
 
@@ -121,7 +109,6 @@ Bool_t B2GeomSVDSensor::make()
 {
   volSVDSensor = new TGeoVolumeAssembly(path.c_str());
   putSilicon();
-  if (iSensorType == 1) putRibsBarrel();
   return true;
 }
 
@@ -164,75 +151,12 @@ void B2GeomSVDSensor::putSilicon()
 
   }
 
-  volActiveSensor->SetLineColor(kRed);
-  volSilicon->SetLineColor(kBlue);
   TGeoRotation rot1("name", 90.0, 0.0, 0.0);
   TGeoHMatrix hmaHelp;
   hmaHelp = gGeoIdentity;
   hmaHelp = rot1 * hmaHelp;
   TGeoHMatrix* hmaActiveSensorPosition = new TGeoHMatrix(hmaHelp);
   volSVDSensor->AddNode(volSilicon, 1, hmaActiveSensorPosition);
-}
-
-void B2GeomSVDSensor::putRibsBarrel()
-{
-  char nameRibBarrel[200];
-  sprintf(nameRibBarrel, "SVD_Rib_Barrel");
-
-  volRibBarrel = (TGeoVolume*) gROOT->FindObjectAny(nameRibBarrel);
-  if (!volRibBarrel) {
-    volRibBarrel = gGeoManager->MakeTrd1(nameRibBarrel, medAir,
-                                         0.5 * fSensorLength,
-                                         0.5 * fSensorLength,
-                                         2 * 0.5 * fRibCarbonWidth + 0.5 * fRibFoamWidth,
-                                         0.5 * fRibCarbonThick);
-
-    char nameCarbonBarrel[200];
-    sprintf(nameCarbonBarrel, "SVD_Rib_Barrel_Carbon");
-    volCarbonBarrel = gGeoManager->MakeTrd1(nameCarbonBarrel, medCarbon,
-                                            0.5 * fSensorLength,
-                                            0.5 * fSensorLength, // later we make this shorter -> offsets!
-                                            0.5 * fRibCarbonWidth,
-                                            0.5 * fRibCarbonThick
-                                           );
-
-    volCarbonBarrel->SetLineColor(kMagenta);
-    char nameFoamBarrel[200];
-    sprintf(nameFoamBarrel, "SVD_Rib_Barrel_Foam");
-    volFoamBarrel = gGeoManager->MakeTrd1(nameFoamBarrel, medFoam,
-                                          0.5 * fSensorLength,
-                                          0.5 * fSensorLength, // later we make this shorter -> offsets!
-                                          0.5 * fRibFoamWidth,
-                                          0.5 * fRibCarbonThick);
-    volFoamBarrel->SetLineColor(kCyan);
-
-    volRibBarrel->AddNode(volCarbonBarrel, 1, new TGeoTranslation(0.0, - 0.5 *(fRibCarbonWidth + fRibFoamWidth), 0.0));
-    volRibBarrel->AddNode(volFoamBarrel, 1, new TGeoTranslation(0.0, 0.0, 0.0));
-    volRibBarrel->AddNode(volCarbonBarrel, 2, new TGeoTranslation(0.0, + 0.5 *(fRibCarbonWidth + fRibFoamWidth), 0.0));
-
-  }
-
-  TGeoRotation rot1("name", 90.0, 90.0, 90.0);
-  TGeoTranslation traRib0(- fRibGapThick - 0.5 * fRibCarbonThick - 0.5* fSiliconThick,
-                          fRibUPosition[0],
-                          0.0);
-  TGeoTranslation traRib1(- fRibGapThick - 0.5 * fRibCarbonThick - 0.5* fSiliconThick,
-                          fRibUPosition[1],
-                          0.0);
-
-  TGeoHMatrix hmaHelp;
-  hmaHelp = gGeoIdentity;
-  hmaHelp = rot1 * hmaHelp;
-  hmaHelp = traRib0 * hmaHelp;
-  TGeoHMatrix* hmaRib0Position = new TGeoHMatrix(hmaHelp);
-  volSVDSensor->AddNode(volRibBarrel, 1, hmaRib0Position);
-
-  hmaHelp = gGeoIdentity;
-  hmaHelp = rot1 * hmaHelp;
-  hmaHelp = traRib1 * hmaHelp;
-  TGeoHMatrix* hmaRib1Position = new TGeoHMatrix(hmaHelp);
-  volSVDSensor->AddNode(volRibBarrel, 2, hmaRib1Position);
-
 }
 
 

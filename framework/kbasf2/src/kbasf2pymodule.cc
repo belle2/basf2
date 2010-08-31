@@ -28,7 +28,7 @@ BOOST_PYTHON_MODULE(kbasf2)
 
 
 //! Creates the basf2 python module.
-void Kbasf2PyModule::embeddPythonModule() throw(FwExcPythonModuleNotEmbedded)
+void Kbasf2PyModule::embedPythonModule() throw(FwExcPythonModuleNotEmbedded)
 {
   if (PyImport_AppendInittab(const_cast<char*>("kbasf2"), initkbasf2) == -1) {
     throw FwExcPythonModuleNotEmbedded();

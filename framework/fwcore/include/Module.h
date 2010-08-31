@@ -379,13 +379,17 @@ namespace Belle2 {
 
   typedef boost::shared_ptr<Module> ModulePtr;
 
+  //! Class that defines the < comparison operator ModulePtrs. Used to declare a set of ModulePtrs.
   struct ModulePtrOperators {
+    //! Comparison operator for two ModulePtr.
     bool operator()(const ModulePtr& a, const ModulePtr& b) {
       return a.get() < b.get();
     }
   };
 
+  //! Class that defines the equality operator for ModulePtrs.
   struct ModulePtrOperatorsEq: public std::binary_function<ModulePtr, ModulePtr, bool> {
+    //! Equality operator for two ModulePtr.
     bool operator()(const ModulePtr& a, const ModulePtr& b) const {
       return a.get() == b.get();
     }

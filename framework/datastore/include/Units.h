@@ -33,46 +33,46 @@ namespace Belle2 {
   const double e   = 1.;  //!< Standard of [electric charge]
 
   // length units
-  const double km  = cm * 1e5;
-  const double m   = cm * 1e2;
-  const double mm  = m  * 1e-3;
-  const double um  = m  * 1e-6;
-  const double nm  = m  * 1e-7;
-  const double fm  = m  * 1e-12;
+  const double km  = cm * 1e5;   //!< [kilometers]
+  const double m   = cm * 1e2;   //!< [centimeters]
+  const double mm  = m  * 1e-3;  //!< [millimeters]
+  const double um  = m  * 1e-6;  //!< [micrometers]
+  const double nm  = m  * 1e-7;  //!< [nanometers]
+  const double fm  = m  * 1e-12; //!< [femtometers]
 
   // area units
-  const double m2  = m * m;
-  const double cm2 = cm * cm;
-  const double mm2 = mm * mm;
+  const double m2  = m * m;      //!< [square meters]
+  const double cm2 = cm * cm;    //!< [square centimeters]
+  const double mm2 = mm * mm;    //!< [square millimeters]
 
-  const double b   = m2 * 1e-28;
-  const double mb  = b  * 1e-3;
-  const double ub  = b  * 1e-6;
-  const double nb  = b  * 1e-9;
-  const double pb  = b  * 1e-12;
-  const double fb  = b  * 1e-15;
-  const double ab  = b  * 1e-18;
+  const double b   = m2 * 1e-28; //!< [barn]
+  const double mb  = b  * 1e-3;  //!< [millibarn]
+  const double ub  = b  * 1e-6;  //!< [microbarn]
+  const double nb  = b  * 1e-9;  //!< [nanobarn]
+  const double pb  = b  * 1e-12; //!< [picobarn]
+  const double fb  = b  * 1e-15; //!< [femtobarn]
+  const double ab  = b  * 1e-18; //!< [atobarn]
 
   // volume units
-  const double m3  = m * m * m;
-  const double cm3 = cm * cm * cm;
-  const double mm3 = mm * mm * mm;
+  const double m3  = m * m * m;    //!< [cubic meters]
+  const double cm3 = cm * cm * cm; //!< [cubic centimeters]
+  const double mm3 = mm * mm * mm; //!< [cubic millimeters]
 
   // time units
-  const double s   = ns * 1e9;
-  const double ms  = s  * 1e-3;
-  const double us  = s  * 1e-6;
-  const double ps  = s  * 1e-12;
-  const double fs  = s  * 1e-15;
+  const double s   = ns * 1e9;   //!< [second]
+  const double ms  = s  * 1e-3;  //!< [millisecond]
+  const double us  = s  * 1e-6;  //!< [microsecond]
+  const double ps  = s  * 1e-12; //!< [picosecond]
+  const double fs  = s  * 1e-15; //!< [femtosecond]
 
   // angle units
-  const double mrad = rad * 1e-3;
-  const double deg  = TMath::DegToRad();
+  const double mrad = rad * 1e-3;        //!< [millirad]
+  const double deg  = TMath::DegToRad(); //!< degree to radians
 
   // energy units
-  const double eV  = GeV * 1e-9;
-  const double keV = eV  * 1e3;
-  const double MeV = eV  * 1e6;
+  const double eV  = GeV * 1e-9; //!< [electronvolt]
+  const double keV = eV  * 1e3;  //!< [kiloelectronvolt]
+  const double MeV = eV  * 1e6;  //!< [megaelectronvolt]
 
 } // end namespace Belle2
 

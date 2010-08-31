@@ -188,7 +188,7 @@ int main(int argc, char* argv[])
       Py_Initialize();
 
       //Embedd Python modules
-      Kbasf2PyModule::embeddPythonModule();
+      Kbasf2PyModule::embedPythonModule();
 
       //Execute Python file
       executePythonFile(pythonFile);

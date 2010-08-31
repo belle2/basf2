@@ -22,11 +22,16 @@
 
 namespace Belle2 {
 
+  //!  The Kbasf2PyModule class.
+  /*!
+     This class defines the Python basf2 module.
+  */
   class Kbasf2PyModule {
 
   public:
 
-    static void embeddPythonModule() throw(FwExcPythonModuleNotEmbedded);
+    //! Embeds the Python module.
+    static void embedPythonModule() throw(FwExcPythonModuleNotEmbedded);
 
   };
 

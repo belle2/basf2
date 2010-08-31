@@ -31,6 +31,7 @@ namespace Belle2 {
                      c_Fatal    /*!< Fatal: for situations were the program execution can not be continued. */
                    };
 
+    //! The number of log levels. Make sure this number corresponds to the number of entries in ELogLevel.
     static const int ELogLevelCount = 5;
 
     //! Converts a log level type to a string.

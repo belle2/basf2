@@ -52,6 +52,12 @@ namespace Belle2 {
     EParamValueType  m_paramValueType; /*!< The parameter value type. */
     std::string      m_readableName;   /*!< The readable name of the parameter type. */
 
+    //! The ParamTypeInfo constructor
+    /*!
+        \param paramBasicType The basic parameter type (single/list).
+        \param paramValueType The parameter value type.
+        \param readableName The readable name of the parameter type.
+    */
     ParamTypeInfo(EParamBasicType paramBasicType, EParamValueType paramValueType, std::string readableName) :
         m_paramBasicType(paramBasicType), m_paramValueType(paramValueType), m_readableName(readableName) {};
   };

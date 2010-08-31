@@ -51,7 +51,7 @@ namespace Belle2 {
     const std::string& getMessage() const {return m_message; };
 
   private:
-    std::string m_message;
+    std::string m_message; /*!< The message of the exception. */
   };
 
   //-------------------------------------------------------------------
@@ -76,7 +76,7 @@ namespace Belle2 {
     const std::string& getModuleType() const {return m_moduleType; };
 
   private:
-    std::string m_moduleType;
+    std::string m_moduleType; /*!< The module type which is involved in the exception. */
   };
 
 
@@ -109,8 +109,8 @@ namespace Belle2 {
     const std::string& getParamInfo2() const {return m_paramInfo2; };
 
   private:
-    std::string m_paramInfo1;
-    std::string m_paramInfo2;
+    std::string m_paramInfo1; /*!< First parameter information. */
+    std::string m_paramInfo2; /*!< Second parameter information. */
   };
 
   //===================================================================

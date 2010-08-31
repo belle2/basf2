@@ -11,18 +11,18 @@
 #ifndef GEOCDCBELLEII_H
 #define GEOCDCBELLEII_H
 
-#include <TGeoVolume.h>
 #include <framework/geodetector/CreatorBase.h>
+
+#include <TGeoVolume.h>
 
 namespace Belle2 {
 
   class GearDir;
 
-//!  The GeoCDCBelleII class.
+  //!  The GeoCDCBelleII class.
   /*!
      The creator for the CDC geometry of the Belle II detector.
   */
-
   class GeoCDCBelleII : public CreatorBase {
 
   public:
@@ -38,6 +38,7 @@ namespace Belle2 {
       \param content A reference to the content part of the parameter description, which should to be used to create the ROOT objects.
     */
     virtual void create(GearDir& content);
+
 
   protected:
 

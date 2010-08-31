@@ -11,7 +11,6 @@
 #ifndef CREATORBASE_H_
 #define CREATORBASE_H_
 
-#include <geometry/geodetector/SensitiveDetDBItem.h>
 #include <geometry/geodetector/GDetExceptions.h>
 #include <geometry/gearbox/GearDir.h>
 

@@ -10,7 +10,7 @@
 
 #include <ir/geoir/GeoBeampipeBelleII.h>
 
-#include <framework/gearbox/GearDir.h>
+#include <geometry/gearbox/GearDir.h>
 #include <framework/datastore/Units.h>
 
 #include <cmath>

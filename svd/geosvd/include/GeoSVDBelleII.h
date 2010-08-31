@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <framework/geodetector/CreatorBase.h>
+#include <geometry/geodetector/CreatorBase.h>
 
 #ifndef GEOSVDBELLEII_H_
 #define GEOSVDBELLEII_H_

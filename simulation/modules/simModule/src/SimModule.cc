@@ -77,7 +77,7 @@ void SimModule::initialize()
   }
 
   m_run_mgr = B4RunManager::Instance();
-  g4rootNav_mgr->Initialize(B4DetectorConstruction::Instance());
+  g4rootNav_mgr->Initialize(new B4DetectorConstruction());
   g4rootNav_mgr->ConnectToG4();
 
   //--------------------------------------------------

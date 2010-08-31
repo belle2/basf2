@@ -320,12 +320,9 @@ void GeoIRBelleIISymm::create(GearDir& content)
   double zMin   = content.getParamLength("RangeStart");
   double zMax     = content.getParamLength("RangeEnd");
 
-  TGeoVolume* topVolume = gGeoManager->GetTopVolume();
-  TGeoVolumeAssembly* volGrpBP = new TGeoVolumeAssembly("OuterIR");
-
-  TGeoRotation* geoRot = new TGeoRotation("BeamPipeRot", 90.0, rotAngle, 0.0);
   // volGrpBP is aligned and centred on BelleII IP
-  topVolume->AddNode(volGrpBP, 1, new TGeoCombiTrans(0.0, 0.0, 0.0, geoRot));   // note: modified to apply translations inside nodes
+  TGeoRotation* geoRot = new TGeoRotation("BeamPipeRot", 90.0, rotAngle, 0.0);
+  TGeoVolumeAssembly* volGrpBP = addSubdetectorGroup("IR", new TGeoCombiTrans(0.0, 0.0, 0.0, geoRot));
 
   // -------------------------------------------------
   // ---  Build BeamPipe from shells ---

@@ -5,7 +5,7 @@
 	<Version>0</Version>
 	<Creator>IRBelleII</Creator>
 	<Content>
-		<Rotation desc="Rotation of IP beampipe with respect to the Detector" unit="mrad">22.0</Rotation>
+		<Rotation desc="Rotation of IP beampipe with respect to the Detector" unit="mrad">0.0</Rotation>
 		<Length desc="The full length of the IP beampipe" unit="mm">200</Length>
 		<OffsetZ desc="The offset of the IP beampipe in z with respect to the IP" unit="mm">10</OffsetZ>
 		
@@ -18,29 +18,29 @@
 		<RangeEnd desc="Ending z-axis range (0=no limit, does not apply to IP beampipe)" 
                             unit="m">0</RangeEnd>
 		
-		<Shells>		
-			<Shell name="InnerShell">
+		<Shells>	
+			<Shell name="GoldLayer">
 				<InnerRadius unit="mm">10.0</InnerRadius>
-				<OuterRadius unit="mm">10.6</OuterRadius>
+				<OuterRadius unit="mm">10.01</OuterRadius>
+				<Material>Gold</Material>
+			</Shell>
+
+			<Shell name="InnerShell">
+				<InnerRadius unit="mm">10.01</InnerRadius>
+				<OuterRadius unit="mm">10.61</OuterRadius>
 				<Material>Beryllium</Material>
 			</Shell>
 			
 			<Shell name="CoolingGap">
-				<InnerRadius unit="mm">10.6</InnerRadius>
-				<OuterRadius unit="mm">11</OuterRadius>
+				<InnerRadius unit="mm">10.61</InnerRadius>
+				<OuterRadius unit="mm">11.01</OuterRadius>
 				<Material>Paraffin</Material>
 			</Shell>
 			
 			<Shell name="OuterShell">
-				<InnerRadius unit="mm">11</InnerRadius>
-				<OuterRadius unit="mm">11.45</OuterRadius>
+				<InnerRadius unit="mm">11.01</InnerRadius>
+				<OuterRadius unit="mm">11.46</OuterRadius>
 				<Material>Beryllium</Material>
-			</Shell>
-			
-			<Shell name="GoldLayer">
-				<InnerRadius unit="mm">11.45</InnerRadius>
-				<OuterRadius unit="mm">14.2</OuterRadius>
-				<Material>Gold</Material>
 			</Shell>
 		</Shells>
 		

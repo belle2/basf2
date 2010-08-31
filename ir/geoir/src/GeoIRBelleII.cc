@@ -344,12 +344,9 @@ void GeoIRBelleII::create(GearDir& content)
   if (zMin > zMax)
     swap(zMin, zMax);
 
-  TGeoVolume* topVolume = gGeoManager->GetTopVolume();
-  TGeoVolumeAssembly* volGrpBP = new TGeoVolumeAssembly("IR");
-
   // volGrpBP is aligned and centred on BelleII IP
   TGeoRotation* geoRot = new TGeoRotation("BeamPipeRot", 90.0, rotAngle, 0.0);
-  topVolume->AddNode(volGrpBP, 1, new TGeoCombiTrans(0.0, 0.0, 0.0, geoRot));   // note: modified to apply translations inside nodes
+  TGeoVolumeAssembly* volGrpBP = addSubdetectorGroup("IR", new TGeoCombiTrans(0.0, 0.0, 0.0, geoRot));
 
   // -------------------------------------------------
   // ---  Build IR chamber streams ---

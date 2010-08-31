@@ -12,8 +12,9 @@
 
 #include <pxd/geopxd/GeoPXDBelleII.h>
 #include <pxd/geopxd/B2GeomPXDLayer.h>
+#include <pxd/simpxd/PXDSensitiveDetector.h>
 
-#include <framework/gearbox/GearDir.h>
+#include <geometry/gearbox/GearDir.h>
 #include <framework/datastore/Units.h>
 
 #include <cmath>
@@ -45,7 +46,7 @@ GeoPXDBelleII regGeoPXDBelleII;
 GeoPXDBelleII::GeoPXDBelleII() : CreatorBase("PXDBelleII")
 {
   setDescription("Creates the TGeo objects for the PXD geometry of the Belle II detector.");
-  activateAutoSensitiveVolumes("SD_"); //The PXD subdetector uses the "SD_" prefix to flag its sensitive volumes
+  addSensitiveDetector("SD_", new PXDSensitiveDetector("PXDSensitiveDetector")); //The PXD subdetector uses the "SD_" prefix to flag its sensitive volumes
 }
 
 

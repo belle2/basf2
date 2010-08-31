@@ -9,7 +9,7 @@
  **************************************************************************/
 
 #ifdef B2GEOM_BASF2
-#include <framework/gearbox/GearDir.h>
+#include <geometry/gearbox/GearDir.h>
 #include <framework/datastore/Units.h>
 #include <boost/format.hpp>
 #endif

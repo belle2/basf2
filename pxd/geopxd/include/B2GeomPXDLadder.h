@@ -10,7 +10,7 @@
 
 #ifdef B2GEOM_BASF2
 #include <pxd/geopxd/B2GeomPXDSensor.h>
-#include <framework/gearbox/GearDir.h>
+#include <geometry/gearbox/GearDir.h>
 #include <framework/datastore/Units.h>
 #include <boost/format.hpp>
 #else

@@ -26,6 +26,7 @@ CreatorBase::CreatorBase(const string& name) throw(GDetExcCreatorNameEmpty)
   if (name.empty()) throw GDetExcCreatorNameEmpty();
   m_name = name;
   m_hasGroupName = false;
+  m_geoGroupName = "";
   m_senDetNumber = 0;
 
   CreatorManager::Instance().registerCreator(this);
@@ -40,6 +41,13 @@ CreatorBase::~CreatorBase()
 
 void CreatorBase::assignSensitiveVolumes(TG4RootDetectorConstruction* detConstruct)
 {
+  if (!m_hasGroupName) return;
+
+  if (m_sensitiveDetMap.size() == 0) {
+    INFO_S("The Creator " << m_name << " has no sensitive detectors defined. Sensitive volume search is skipped.")
+    return;
+  }
+
   m_senDetNumber = 0;
 
   //Create the path to the subdetector
@@ -84,6 +92,7 @@ TGeoVolumeAssembly* CreatorBase::addSubdetectorGroup(const std::string& groupNam
   TGeoVolumeAssembly* subDetGrp = new TGeoVolumeAssembly(groupName.c_str());
   topVolume->AddNode(subDetGrp, 1, groupTrafo);
   m_geoGroupName = groupName;
+  m_hasGroupName = true;
   return subDetGrp;
 }
 

@@ -1,6 +1,10 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <Ladders>
-<Gap desc="The gap between sensors" unit="mm">0</Gap>
-<Width desc="The over all width of the ladder" unit="mm">59.6</Width>
-<Width2 desc="lower Width for slanted part of the ladder" unit="mm">40.4</Width2>
+<WidthRibs desc="The width of the ribs = 2*width of carbon + width of foam" unit="mm">3.13</WidthRibs>
+<WidthCarbon desc="The width of the carbon" unit="mm">0.065</WidthCarbon>
+<ThicknessRibs desc="The thickness of the ribs" unit="mm">6.5</ThicknessRibs>
+ <RibUPosition0 desc="Position of the rib in U direction" unit="mm">12.205</RibUPosition0>
+ <RibUPosition1 desc="Position of the rib in U direction" unit="mm">-12.205</RibUPosition1>
+ <RibsDistanceFromSensor desc="distance between inner surface of the sensor and middle of the rib" unit="mm">3.75</RibsDistanceFromSensor>
+ <Length1RibsSlanted desc="Length1 of the Ribs in the Slanted Region" unit="mm">125.58</Length1RibsSlanted>
 </Ladders>

@@ -13,8 +13,9 @@
     <Layers>
       <Layer id="SVD_Layer_3">
         <Phi0 desc="The starting angle of the layer in the r-phi plane" unit="deg">12.2</Phi0>
-        <Radius desc="Radius of the layer" unit="mm">38.0</Radius>
+        <Radius desc="Radius of the layer" unit="mm">38</Radius>
         <OffsetY desc="The offset of the center of the ladder in y direction (Wind Mill structure)" unit="mm">-5.0</OffsetY>
+        <PhiLadder desc="Rotation of the ladder about its local V axis (parallel to global z axis)" unit="deg">-8</PhiLadder>
         <NumberOfLadders desc="Number of ladders in this layer">8</NumberOfLadders>
         <Ladders>
           <!-- Common parameters for all ladders -->
@@ -50,11 +51,14 @@
         <Phi0 desc="The starting angle of the layer in the r-phi plane" unit="deg">5.0</Phi0>
         <Radius desc="Radius of the layer" unit="mm">80.0</Radius>
         <OffsetY desc="The offset of the center of the ladder in y direction (Wind Mill structure)" unit="mm">-8.0</OffsetY>
+        <PhiLadder desc="Rotation of the ladder about its local V axis (parallel to global z axis)" unit="deg">-6</PhiLadder>
         <NumberOfLadders desc="Number of ladders in this layer">10</NumberOfLadders>
         <Ladders>
-          <!-- Common parameters for all ladders -->
+         <!-- Common parameters for all ladders -->
           <xi:include href="SVDLadderBelleII.xml" xpointer="xpointer(/*/*)"/>
           <NumberOfSensors>3</NumberOfSensors>
+          <LengthRibsBarrel desc="Length of the Ribs in the Barrel Region" unit="mm">249.88</LengthRibsBarrel>
+          <Length2RibsSlanted desc="Length2 of the Ribs in the Slanted Region" unit="mm">122.84</Length2RibsSlanted>
           <Sensors>
             <Sensor id="SVD_Layer_4_Ladder_Sensor_0">
               <SensorType desc="0 = small sensor (layer3), 1 = normal sensor (layer 4,5,6)">1</SensorType>
@@ -96,11 +100,14 @@
         <Phi0 desc="The starting angle of the layer in the r-phi plane" unit="deg">14.4</Phi0>
         <Radius desc="Radius of the layer" unit="mm">115.0</Radius>
         <OffsetY desc="The offset of the center of the ladder in y direction (Wind Mill structure)" unit="mm">-8.0</OffsetY>
+        <PhiLadder desc="Rotation of the ladder about its local V axis (parallel to global z axis)" unit="deg">-7</PhiLadder>
         <NumberOfLadders desc="Number of ladders in this layer">14</NumberOfLadders>
         <Ladders>
           <!-- Common parameters for all ladders -->
           <NumberOfSensors>4</NumberOfSensors>
           <xi:include href="SVDLadderBelleII.xml" xpointer="xpointer(/*/*)"/>
+           <LengthRibsBarrel desc="Length of the Ribs in the Barrel Region" unit="mm">374.88</LengthRibsBarrel>
+           <Length2RibsSlanted desc="Length2 of the Ribs in the Slanted Region" unit="mm">121.56</Length2RibsSlanted>
           <Sensors>
             <Sensor id="SVD_Layer_5_Ladder_Sensor_0">
               <SensorType desc="0 = small sensor (layer3), 1 = normal sensor (layer 4,5,6)">1</SensorType>
@@ -154,11 +161,14 @@
         <Radius desc="Radius of the layer" unit="mm">140</Radius>
         <Radius2 desc="Radius of slanted part of the ladder" unit="mm">114.0</Radius2>
         <OffsetY desc="The offset of the center of the ladder in y direction (Wind Mill structure)" unit="mm">-8.0</OffsetY>
+        <PhiLadder desc="Rotation of the ladder about its local V axis (parallel to global z axis)" unit="deg">-7</PhiLadder>
         <NumberOfLadders desc="Number of ladders in this layer">17</NumberOfLadders>
         <Ladders>
           <!-- Common parameters for all ladders -->
           <xi:include href="SVDLadderBelleII.xml" xpointer="xpointer(/*/*)"/>
           <NumberOfSensors>5</NumberOfSensors>
+           <LengthRibsBarrel desc="Length of the Ribs in the Barrel Region" unit="mm">499.88</LengthRibsBarrel>
+           <Length2RibsSlanted desc="Length2 of the Ribs in the Slanted Region" unit="mm">120.56</Length2RibsSlanted>
           <Sensors>
             <Sensor id="SVD_Layer_6_Ladder_Sensor_0">
               <SensorType desc="0 = small sensor (layer3), 1 = normal sensor (layer 4,5,6)">1</SensorType>
@@ -210,8 +220,8 @@
                 <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Sensor[@type=2]/*)"/>
               </SensorParameters>
               <Position>
-                <V desc="sensor position (middle of the volume) in V (local coordinate system of ladder)" unit="mm">298.35</V>
-                <W desc="sensor position (middle of active volume) in W (local coordinate system of ladder)" unit="mm">-22.99</W>
+                <V desc="sensor position (middle of the volume) in V (local coordinate system of ladder)" unit="mm">298.352</V>
+                <W desc="sensor position (middle of active volume) in W (local coordinate system of ladder)" unit="mm">-22.991</W>
                 <Theta desc="rotation about Euler angle Theta in LOCAL coordinate system" unit="deg">21.1</Theta>
               </Position>
             </Sensor>

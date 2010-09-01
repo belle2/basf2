@@ -134,6 +134,9 @@ namespace Belle2 {
     TGeoVolumeAssembly* getVol() {
       return volSVDLadder;
     }
+    TGeoHMatrix getOrigin();
+
+
   };
 #ifdef B2GEOM_BASF2
 }

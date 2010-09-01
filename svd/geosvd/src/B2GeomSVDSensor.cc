@@ -72,12 +72,28 @@ Bool_t B2GeomSVDSensor::init(GearDir& content)
   if (iSensorType == 2) fSiliconWidth2 = sensorContent.getParamLength("Width2Silicon");
   fSiliconThick = sensorContent.getParamLength("ThicknessSilicon");
 
+  fThickFoam = sensorContent.getParamLength("ThicknessFoam");
+
+  fThickKapton = sensorContent.getParamLength("ThicknessKapton");
+
+  if (iSensorType == 1) fWidthSMDs = sensorContent.getParamLength("WidthSMDs");
+  if (iSensorType == 1) fThickSMDs = sensorContent.getParamLength("ThicknessSMDs");
+  if (iSensorType == 1) fUPositionSMDs = sensorContent.getParamLength("UPositionSMDs");
+
+  if (iSensorType == 1) fOuterRadiusCoolPipe = sensorContent.getParamLength("OuterRadiusCoolPipe");
+  if (iSensorType == 1) fInnerRadiusCoolPipe = sensorContent.getParamLength("InnerRadiusCoolPipe");
+  if (iSensorType == 1) fUPositionCoolPipe = sensorContent.getParamLength("UPositionCoolPipe");
+
   // Get materials
   string sensorMatName  = sensorContent.getParamString("MaterialSensor");
   medSVD_Silicon = gGeoManager->GetMedium(sensorMatName.c_str());
 
   TGeoMaterial* matVacuum = new TGeoMaterial("Vacuum", 0, 0, 0);
   medAir = new TGeoMedium("medAir", 1, matVacuum);
+  medSVD_Foam = new TGeoMedium("medSVD_Foam", 1, matVacuum);
+  medSVD_Kapton = new TGeoMedium("medSVD_Kapton", 1, matVacuum);
+  medSVD_CoolPipeSteel = new TGeoMedium("medSVD_CoolPIpeSteel", 1, matVacuum);
+  medSVD_SMDs = new TGeoMedium("medSVD_SMDs", 1, matVacuum);
   return true;
 
 }
@@ -109,6 +125,10 @@ Bool_t B2GeomSVDSensor::make()
 {
   volSVDSensor = new TGeoVolumeAssembly(path.c_str());
   putSilicon();
+  putFoam();
+  putKapton();
+  putSMDs();
+  putCoolingPipe();
   return true;
 }
 
@@ -131,8 +151,6 @@ void B2GeomSVDSensor::putSilicon()
                                            fActiveSensorThick * 0.5,
                                            fActiveSensorLength * 0.5);
 
-    volSilicon->AddNode(volActiveSensor, 1, new TGeoTranslation(0.0, 0.0, 0.0));
-
   }
   if (iSensorType == 2) {
     volSilicon = gGeoManager->MakeTrd1(nameSilicon, medSVD_Silicon,
@@ -147,22 +165,129 @@ void B2GeomSVDSensor::putSilicon()
                                             fActiveSensorThick * 0.5,
                                             fActiveSensorLength * 0.5);
 
-    volSilicon->AddNode(volActiveSensor, 1, new TGeoTranslation(0.0, 0.0, 0.0));
-
   }
+  volSilicon->SetLineColor(kBlue + 3);
+  volActiveSensor->SetLineColor(kBlue - 10);
+  volSilicon->AddNode(volActiveSensor, 1, new TGeoTranslation(0.0, 0.0, 0.0));
 
   TGeoRotation rot1("name", 90.0, 0.0, 0.0);
+  TGeoTranslation tra1(0.5*fSiliconThick, 0.0, 0.0);
   TGeoHMatrix hmaHelp;
   hmaHelp = gGeoIdentity;
   hmaHelp = rot1 * hmaHelp;
+  hmaHelp = tra1 * hmaHelp;
   TGeoHMatrix* hmaActiveSensorPosition = new TGeoHMatrix(hmaHelp);
   volSVDSensor->AddNode(volSilicon, 1, hmaActiveSensorPosition);
 }
 
 
-void B2GeomSVDSensor::putSwitchers()
+void B2GeomSVDSensor::putFoam()
 {
-  // TGeoVolume *box = gGeoManager->MakeBox("test", medAir, 0.25, 0.25, 0.25);
-  // volSVDSensor->AddNode(box, 1, new TGeoTranslation(-.125-0.5*fSensorThick,0,0));
+  // is there foam in layer 3??
+  if (iLayer == 3) return;
+  // foam for slanted sensors not implented yet
+  if (iSensorType == 2) return;
+  char nameFoam[200];
+  sprintf(nameFoam, "SVD_Foam");
+
+  volFoam = (TGeoVolume*) gROOT->FindObjectAny(nameFoam);
+  if (!volFoam) {
+    volFoam = gGeoManager->MakeBox(nameFoam, medSVD_Foam,
+                                   fSiliconWidth * 0.5,
+                                   fThickFoam * 0.5,
+                                   fSiliconLength * 0.5);
+    volFoam->SetLineColor(kYellow - 9);
+  }
+  // rotate the foam to the right coordinate system
+  TGeoRotation rot1("name", 90.0, 0.0, 0.0);
+  // position the foam above the silicon
+  TGeoTranslation tra1(fSiliconThick + 0.5 * fThickFoam, 0.0, 0.0);
+  TGeoHMatrix hmaHelp;
+  hmaHelp = gGeoIdentity;
+  hmaHelp = rot1 * hmaHelp;
+  hmaHelp = tra1 * hmaHelp;
+  volSVDSensor->AddNode(volFoam, 1, new TGeoHMatrix(hmaHelp));
 }
+
+void B2GeomSVDSensor::putKapton()
+{
+// no kapton in layer 3 (??)
+  if (iLayer == 3) return;
+// kapton for slanted sensors not implented yet
+  if (iSensorType == 2) return;
+  char nameKapton[200];
+  sprintf(nameKapton, "SVD_Kapton");
+
+  volKapton = (TGeoVolume*) gROOT->FindObjectAny(nameKapton);
+  if (!volKapton) {
+    volKapton = gGeoManager->MakeBox(nameKapton, medSVD_Kapton,
+                                     fSiliconWidth * 0.5,
+                                     fThickKapton * 0.5,
+                                     fSiliconLength * 0.5);
+    volKapton->SetLineColor(kOrange + 2);
+  }
+  // rotate the kapton to the right coordinate system
+  TGeoRotation rot1("name", 90.0, 0.0, 0.0);
+  // position the kapton above the foam
+  TGeoTranslation tra1(fSiliconThick + fThickFoam + 0.5* fThickKapton, 0.0, 0.0);
+  TGeoHMatrix hmaHelp;
+  hmaHelp = gGeoIdentity;
+  hmaHelp = rot1 * hmaHelp;
+  hmaHelp = tra1 * hmaHelp;
+  volSVDSensor->AddNode(volKapton, 1, new TGeoHMatrix(hmaHelp));
+}
+
+void B2GeomSVDSensor::putSMDs()
+{
+  // electronics for layer 3 outside?
+  if (iSensorType == 0) return;
+// electronics for slanted sensors??
+  if (iSensorType == 2) return;
+
+  char nameSMDs[200];
+  sprintf(nameSMDs, "SVD_SMDs");
+
+  volSMDs = (TGeoVolume*) gROOT->FindObjectAny(nameSMDs);
+  if (!volSMDs) {
+    volSMDs = gGeoManager->MakeBox(nameSMDs, medSVD_SMDs, 0.5 * fThickSMDs, 0.5 * fWidthSMDs, 0.5 * fSensorLength);
+    volSMDs->SetLineColor(kBlue + 4);
+  }
+  TGeoTranslation tra(fSiliconThick + fThickFoam + fThickKapton + 0.5*fThickSMDs, fUPositionSMDs, 0.0);
+  TGeoHMatrix hmaHelp;
+  hmaHelp = gGeoIdentity;
+  hmaHelp = tra * hmaHelp;
+  volSVDSensor->AddNode(volSMDs, 1, new TGeoHMatrix(hmaHelp));
+}
+
+void B2GeomSVDSensor::putCoolingPipe()
+{
+// no cooling pipe for layer 3?
+  if (iSensorType == 0) return;
+// no cooling pipe for slanted sensors??
+  if (iSensorType == 2) return;
+  char nameCoolPipe[200];
+  sprintf(nameCoolPipe, "SVD_Cool_Pipe");
+
+  volCoolPipe = (TGeoVolume*) gROOT->FindObjectAny(nameCoolPipe);
+  if (!volCoolPipe) {
+    volCoolPipe = gGeoManager->MakeTube(nameCoolPipe, medSVD_CoolPipeSteel, fInnerRadiusCoolPipe, fOuterRadiusCoolPipe, 0.5 * fSensorLength);
+    volCoolPipe->SetLineColor(kCyan - 5);
+  }
+  TGeoTranslation tra(fSiliconThick + fThickFoam + fThickKapton + fThickSMDs + fOuterRadiusCoolPipe, fUPositionCoolPipe, 0.0);
+  TGeoHMatrix hmaHelp;
+  hmaHelp = gGeoIdentity;
+  hmaHelp = tra * hmaHelp;
+  volSVDSensor->AddNode(volCoolPipe, 1, new TGeoHMatrix(hmaHelp));
+}
+
+TGeoHMatrix B2GeomSVDSensor::getSurfaceCenterPosition()
+{
+  TGeoHMatrix hmaHelp;
+  TGeoTranslation tra(0.0, 0.0, 0.0);
+  hmaHelp = gGeoIdentity;
+  hmaHelp = tra * hmaHelp;
+  return hmaHelp;
+}
+
+
 

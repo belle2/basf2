@@ -63,6 +63,9 @@ namespace Belle2 {
     //! Offset in y direction (wind mill structure)
     Double_t fLadderOffsetY;
 
+    //! rotation of the ladder about its local v axis (parallel to global z axis)
+    Double_t fPhiLadder;
+
     //! Objects representing the ladders
     vector<B2GeomSVDLadder*> b2gSVDLadders;
     //! Object representing the offsets of the ladders

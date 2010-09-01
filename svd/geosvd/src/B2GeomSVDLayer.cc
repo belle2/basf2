@@ -51,6 +51,7 @@ Bool_t B2GeomSVDLayer::init(GearDir& content)
   b2gSVDLadders.resize(nLadders);
   fPhi.resize(nLadders);
   fLadderOffsetY = layerContent.getParamLength("OffsetY");
+  fPhiLadder = layerContent.getParamLength("PhiLadder");
   fRadius = layerContent.getParamLength("Radius");
   for (int iLadder = 0; iLadder < nLadders; iLadder++) {
     fPhi[iLadder] = iLadder * (360. / nLadders) + fPhi0;
@@ -88,7 +89,6 @@ Bool_t B2GeomSVDLayer::init()
 
 Bool_t B2GeomSVDLayer::make()
 {
-  printf("make B2GeomSVDLayer %i\n", iLayer);
   volSVDLayer = new TGeoVolumeAssembly(path.c_str());
   for (int iLadder = 0; iLadder < nLadders; ++iLadder) {
     putLadder(iLadder);
@@ -98,25 +98,6 @@ Bool_t B2GeomSVDLayer::make()
 
 void B2GeomSVDLayer::putLadder(Int_t iLadder)
 {
-  // position the ladder at radius
-  TGeoTranslation traX = TGeoTranslation("name", fRadius, 0., 0.);
-  // create the wind mill structure
-  TGeoTranslation traY = TGeoTranslation("name", 0., fLadderOffsetY, 0.);
-  // shift the ladder in z diretion
-  TGeoTranslation traZ = TGeoTranslation("name", 0., 0., 0);
-  // rotate around z
-  TGeoRotation rotPhi = TGeoRotation("name", fPhi[iLadder], 0, 0);
-
-  // compose the transformation to position the ladder
-  TGeoHMatrix hmaHelp;
-  hmaHelp = gGeoIdentity;
-  hmaHelp = traX * hmaHelp;
-  hmaHelp = traY * hmaHelp;
-  hmaHelp = traZ * hmaHelp;
-  hmaHelp = rotPhi * hmaHelp;
-
-  // this transformation is finally used for positioning of the ladder
-  TGeoHMatrix* hmaLadderPosition = new TGeoHMatrix(hmaHelp);
   // create Ladder
   b2gSVDLadders[iLadder] = new B2GeomSVDLadder(iLayer, iLadder);
 
@@ -127,7 +108,37 @@ void B2GeomSVDLayer::putLadder(Int_t iLadder)
 #endif
   b2gSVDLadders[iLadder]->make();
 
-  volSVDLayer->AddNode(b2gSVDLadders[iLadder]->getVol(), 1, hmaLadderPosition);
+// compose the transformation to position the ladder
+  TGeoHMatrix hmaHelp;
+  hmaHelp = gGeoIdentity;
+
+  // go to ladder origin (= sensor surfaces, centered in U direction)
+  hmaHelp = b2gSVDLadders[iLadder]->getOrigin() * hmaHelp;
+
+// rotate the ladder about its v axis => wind mill structure
+  TGeoRotation rotPhiLadder("name", fPhiLadder, 0.0, 0.0);
+  hmaHelp = rotPhiLadder * hmaHelp;
+
+  // position the ladder at radius
+  TGeoTranslation traX = TGeoTranslation("name", fRadius, 0., 0.);
+  hmaHelp = traX * hmaHelp;
+
+  // create the wind mill structure
+  // TGeoTranslation traY = TGeoTranslation("name", 0., fLadderOffsetY, 0.);
+  //hmaHelp = traY * hmaHelp;
+
+  // shift the ladder in z diretion
+  TGeoTranslation traZ = TGeoTranslation("name", 0., 0., 0);
+  hmaHelp = traZ * hmaHelp;
+
+  // rotate around z
+  TGeoRotation rotPhi = TGeoRotation("name", fPhi[iLadder], 0, 0);
+  hmaHelp = rotPhi * hmaHelp;
+
+
+// position the ladder in the SVD layer
+
+  volSVDLayer->AddNode(b2gSVDLadders[iLadder]->getVol(), 1, new TGeoHMatrix(hmaHelp));
 
 }
 

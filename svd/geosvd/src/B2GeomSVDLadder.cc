@@ -146,7 +146,6 @@ if (initOffsets())
 
 Bool_t B2GeomSVDLadder::make()
 {
-  //printf("make B2GeomSVDLadder %i\n", iLadder);
   volSVDLadder = new TGeoVolumeAssembly(path.c_str());
   putSensors();
   if (iLayer > 3) {
@@ -171,23 +170,22 @@ void B2GeomSVDLadder::putSensors()
 
     // incline the sensor to z axis
     TGeoRotation rotTheta("name", -90.0, fThetas[iSensor], 90.0);
-    //move the sensor to its position
+    // calculate sensor position
     TGeoTranslation tra(fSensorWPositions[iSensor], 0.0, fSensorVPositions[iSensor]);
-
     TGeoHMatrix hmaHelp;
     hmaHelp = gGeoIdentity;
     hmaHelp = rotTheta * hmaHelp;
     hmaHelp = tra * hmaHelp;
     TGeoHMatrix* hmaSensorPosition = new TGeoHMatrix(hmaHelp);
+    // place sensor in the ladder
     volSVDLadder->AddNode(b2gSVDSensors[iSensor]->getVol(), 1, hmaSensorPosition);
   }
 }
 
-
 void B2GeomSVDLadder::putRibsBarrel()
 {
   char nameRibsBarrel[200];
-  sprintf(nameRibsBarrel, "SVD_Ribs_Barrel");
+  sprintf(nameRibsBarrel, "SVD_Layer_%i_Ladder_Ribs_Barrel", iLayer);
 
   volRibsBarrel = (TGeoVolume*) gROOT->FindObjectAny(nameRibsBarrel);
   if (!volRibsBarrel) {
@@ -196,22 +194,24 @@ void B2GeomSVDLadder::putRibsBarrel()
                                          0.5 * fThicknessRibs,
                                          0.5 * (fRibUPosition0 - fRibUPosition1) + 0.5 * fWidthRibs,
                                          0.5 * fLengthRibsBarrel);
+    volRibsBarrel->SetInvisible();
 
     char nameRibBarrel[200];
-    sprintf(nameRibBarrel, "SVD_Rib_Barrel");
+    sprintf(nameRibBarrel, "SVD_Layer_%i_Ladder_Ribs_Barrel_Rib", iLayer);
     volRibBarrel = gGeoManager->MakeBox(nameRibBarrel, medFoam,
                                         0.5 * fThicknessRibs,
                                         0.5 * fWidthRibs,
                                         0.5 * fLengthRibsBarrel
                                        );
+    volRibBarrel->SetLineColor(kYellow - 9);
 
     char nameCarbonBarrel[200];
-    sprintf(nameCarbonBarrel, "SVD_Rib_Barrel_Foam");
+    sprintf(nameCarbonBarrel, "SVD_Layer_%i_Ladder_Ribs_Barrel_Rib_Carbon", iLayer);
     volCarbonBarrel = gGeoManager->MakeBox(nameCarbonBarrel, medCarbon,
                                            0.5 * fThicknessRibs,
                                            0.5 * fWidthCarbon, // later we make this shorter -> offsets!
                                            0.5 * fLengthRibsBarrel);
-
+    volCarbonBarrel->SetLineColor(kBlack);
     volRibBarrel->AddNode(volCarbonBarrel, 1, new TGeoTranslation(0.0, - 0.5 * fWidthRibs + 0.5 * fWidthCarbon, 0.0));
     volRibBarrel->AddNode(volCarbonBarrel, 2, new TGeoTranslation(0.0, + 0.5 * fWidthRibs - 0.5 * fWidthCarbon, 0.0));
     volRibsBarrel->AddNode(volRibBarrel, 1, new TGeoTranslation(0.0, fRibUPosition0, 0.0));
@@ -238,6 +238,8 @@ void B2GeomSVDLadder::putRibsSlanted()
                                            0.5 * (fRibUPosition0 - fRibUPosition1) + 0.5 * fWidthRibs,
                                            0.5 * fThicknessRibs
                                           );
+
+
 
     char nameRibSlanted[200];
     sprintf(nameRibSlanted, "SVD_Rib_Slanted");
@@ -282,6 +284,13 @@ void B2GeomSVDLadder::putRibsSlanted()
   TGeoHMatrix* hmaRibsSlantedPosition = new TGeoHMatrix(hmaHelp);
 
   volSVDLadder->AddNode(volRibsSlanted, 1, hmaRibsSlantedPosition);
+}
+
+TGeoHMatrix B2GeomSVDLadder::getOrigin()
+{
+  TGeoTranslation tra(0.0, 0.0, 0.0);
+  TGeoHMatrix hmaHelp(tra);
+  return hmaHelp;
 }
 
 

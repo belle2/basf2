@@ -47,12 +47,19 @@ namespace Belle2 {
     //! Volumes contained in the sensor
     TGeoVolume* volActiveSensor;
     TGeoVolume* volSilicon;
-    TGeoVolume* volSwitcher;
+    TGeoVolume* volFoam;
     TGeoVolume* volAir;
+    TGeoVolume* volKapton;
+    TGeoVolume* volCoolPipe;
+    TGeoVolume* volSMDs;
 
     //! Mediums contained in the sensor
     TGeoMedium* medAir;
     TGeoMedium* medSVD_Silicon;
+    TGeoMedium* medSVD_Foam;
+    TGeoMedium* medSVD_Kapton;
+    TGeoMedium* medSVD_CoolPipeSteel;
+    TGeoMedium* medSVD_SMDs;
 
     // Parameters
     //! Layer number of this sensor
@@ -82,10 +89,33 @@ namespace Belle2 {
     Double_t fActiveSensorWidth2;
     Double_t fActiveSensorThick;
 
+    //! Thickness of the foam
+    Double_t fThickFoam;
+
+    //! Thickness of the kapton
+    Double_t fThickKapton;
+
+    //! Outer radius of the cooling pipe
+    Double_t fOuterRadiusCoolPipe;
+    //! Inner radius of the cooling pipe
+    Double_t fInnerRadiusCoolPipe;
+    //! Position of the cooling pipe in U direction
+    Double_t fUPositionCoolPipe;
+
+    //! Width of the SMDs
+    Double_t fWidthSMDs;
+    //! Thickness of the SMDs
+    Double_t fThickSMDs;
+    //! Position of the SMDs in U direction
+    Double_t fUPositionSMDs;
+
     //! Methods to place components
     void putSilicon();
-    void putSwitchers();
-    void putRibsBarrel();
+    void putFoam();
+    void putKapton();
+    void putCoolingPipe();
+    void putSMDs();
+
   public:
 
     B2GeomSVDSensor();
@@ -106,6 +136,9 @@ namespace Belle2 {
     Double_t getWidth() {
       return fSensorWidth;
     }
+    //! returns the Coordinate of the center of the inner surface of the silicon
+    TGeoHMatrix getSurfaceCenterPosition();
+
 
   };
 #ifdef B2GEOM_BASF2

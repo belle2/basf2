@@ -1,16 +1,22 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <Sensors>
   <Sensor desc="The small SVD sensor" type="0">
+
     <Thickness desc="The over all thickness of the sensor" unit="mm">1</Thickness>
     <Length desc="The over all length of the sensor" unit="mm">122</Length>
     <Width desc="The overall width of the sensor" unit="mm">38.4</Width>
     <MaterialSensor>Silicon</MaterialSensor>
-    <ThicknessSilicon desc="The over all thickness of the sensor" unit="mm">300</ThicknessSilicon>
+    <ThicknessSilicon desc="The over all thickness of the sensor" unit="um">300</ThicknessSilicon>
     <LengthSilicon desc="The over all width of the sensor" unit="mm">122</LengthSilicon>
     <WidthSilicon desc="The overall width of the silicon" unit="mm">38.4</WidthSilicon>
     <LengthActive desc="The over all length of the active sensor" unit="mm">122</LengthActive>
     <ThicknessActive desc="Thickness of the active sensors" unit="um">300</ThicknessActive>
     <WidthActive desc="The over all width of active the sensor" unit="mm">38.4</WidthActive>
+    <!-- Foam in Layer 3???? -->
+      <ThicknessFoam desc="Thickness of the foam layer between capton and silicon" unit="mm">0</ThicknessFoam>
+<!-- No kapton in Layer 3 ?? -->    
+      <ThicknessKapton desc="Thickness of the kapton layer" unit="mm">0</ThicknessKapton>
+
   </Sensor>
   <Sensor desc="The standard SVD sensor" type="1">
     <!-- All numbers from TDR -->
@@ -19,17 +25,23 @@
     <Length desc="The over all width of the sensor" unit="mm">124.9</Length>
     <Width desc="The overall length of the sensor" unit="mm">59.600</Width>
     <ThicknessSilicon desc="The over all thickness of the sensor" unit="um">300</ThicknessSilicon>
-    <LengthSilicon desc="The over all width of the sensor" unit="mm">124.880</LengthSilicon>
-    <WidthSilicon desc="The overall length of the sensor" unit="mm">59.600</WidthSilicon>
+    <LengthSilicon desc="The over all length of the sensor" unit="mm">124.880</LengthSilicon>
+    <WidthSilicon desc="The overall width of the sensor" unit="mm">59.600</WidthSilicon>
     <ThicknessActive desc="Thickness of the active sensors" unit="um">300</ThicknessActive>
     <WidthActive desc="Width of the active sensor" unit="mm">57.72</WidthActive>
     <LengthActive desc="Length of the active sensor" unit="mm">124.88</LengthActive>
-    <RibCarbonWidth desc="The width of the rib carbon" unit="mm">0.065</RibCarbonWidth>
-    <RibCarbonThick desc="The thickness of the carbon ribs" unit="mm">6.5</RibCarbonThick>
-    <RibFoamWidth desc="The width of the rib foam" unit="mm">2.87</RibFoamWidth>
-    <RibUPosition0 desc="Position of the rib in U direction" unit="mm">12.205</RibUPosition0>
-    <RibUPosition1 desc="Position of the rib in U direction" unit="mm">-12.205</RibUPosition1>
-    <RibGapThick desc="Gap between sensor and support rip in W direction" unit="mm">1</RibGapThick>
+        <ThicknessFoam desc="Thickness of the foam layer between capton and silicon" unit="mm">1</ThicknessFoam>
+              <ThicknessKapton desc="Thickness of the kapton layer" unit="mm">0.1</ThicknessKapton>
+<!--- The parameters of the cooling pipe have to be verified -->              
+              <OuterRadiusCoolPipe desc="The outer radius of the cooling pipe" unit="mm">0.7</OuterRadiusCoolPipe>
+              <InnerRadiusCoolPipe desc="The inner radius of the cooling pipe" unit="mm">0.65</InnerRadiusCoolPipe>
+              <UPositionCoolPipe desc="The position of the cooling pipe in u direction" unit="mm">17.2</UPositionCoolPipe>
+              <!--- The parameters of the SMDs have to be verified -->              
+              <WidthSMDs desc="The width of the SMDs" unit="mm">8.055</WidthSMDs>
+              <ThicknessSMDs desc="The thickness of the SMDs" unit="mm">0.4</ThicknessSMDs>
+              <UPositionSMDs desc="The position of the SMDs in u direction" unit="mm">15.1725</UPositionSMDs>
+
+
   </Sensor>
   <Sensor desc="The wedge SVD sensor" type="2">
     <!-- All numbers from TDR -->
@@ -46,5 +58,8 @@
     <WidthActive desc="Width of the active sensor" unit="mm">57.59</WidthActive>
     <Width2Active desc="Width2 of the active sensor" unit="mm">38.42</Width2Active>
     <LengthActive desc="Length of the active sensor" unit="mm">122.76</LengthActive>
+        <ThicknessFoam desc="Thickness of the foam layer between capton and silicon" unit="mm">1</ThicknessFoam>
+      <ThicknessKapton desc="Thickness of the kapton layer" unit="mm">0</ThicknessKapton>
+
   </Sensor>
 </Sensors>

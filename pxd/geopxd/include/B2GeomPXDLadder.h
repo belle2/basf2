@@ -61,16 +61,15 @@ namespace Belle2 {
     Double_t fSensorLength;
     Double_t fSensorWidth;
     Double_t fSensorThick;
-    Double_t fGapLength;
+
+    //! positions of edge of sensors in minus v (= minus z) direction
+    vector<Double_t> fVPosition;
 
     //! Mediums contained in the sensor
     TGeoMedium* medAir;
-    TGeoMedium* medGlue;
-
 
     //! Methods to place components
     void putSensors();
-    void putGlue();
 
   public:
     B2GeomPXDLadder();

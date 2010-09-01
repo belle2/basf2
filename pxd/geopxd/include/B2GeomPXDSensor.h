@@ -20,6 +20,8 @@
 #include "TGeoManager.h"
 #include "TGeoMatrix.h"
 #include "TGeoVolume.h"
+#include "TGeoTrd2.h"
+#include "TGeoCompositeShape.h"
 
 
 
@@ -42,6 +44,7 @@ namespace Belle2 {
     TGeoVolumeAssembly* volPXDSensor;
 
     //! Volumes contained in the sensor
+    TGeoVolume* volSilicon;
     TGeoVolume* volDEPFET;
     TGeoVolume* volActiveSensor;
     TGeoVolume* volSwitcher;
@@ -51,6 +54,7 @@ namespace Belle2 {
     TGeoMedium* medAir;
     TGeoMedium* medDEPFET;
     TGeoMedium* medActiveSensor;
+    TGeoMedium* medPXD_Silicon;
 
     // Parameters
     //! Layer number of this sensor
@@ -59,16 +63,39 @@ namespace Belle2 {
     Int_t iLadder;
     //! Number of this sensor
     Int_t iSensor;
-    Double_t fSensorLength;
+
+    // box which contains whole sensor
     Double_t fSensorWidth;
     Double_t fSensorThick;
-    Double_t fActiveSensorLength;
-    Double_t fActiveSensorWidth;
-    Double_t fActiveSensorThick;
+
+    // box of active DEPFET area
+    Double_t fLengthActive;
+    Double_t fWidthActive;
+    Double_t fThickActive;
+
+
+    // distances of active area from borders of silicon
+    Double_t fVDistanceActiveFromInnerEdge;
+    Double_t fUDistanceActiveFromInnerEdge;
+
+    // distances of thinned volume from borders of silicon
+    Double_t fVDistanceThinnedFromOuterEdge;
+    Double_t fVDistanceThinnedFromInnerEdge;
+    Double_t fUDistanceThinnedFromOuterEdge;
+    Double_t fUDistanceThinnedFromInnerEdge;
+
+    // angle at the borders of thinned volume
+    Double_t fAlphaThinned;
+
+    // box of depfet silicon
+    Double_t fLengthSilicon;
+    Double_t fWidthSilicon;
+    Double_t fThickSilicon;
 
 
     //! Methods to place components
     void putDEPFET();
+    void putSilicon();
     void putSwitchers();
 
   public:
@@ -85,11 +112,11 @@ namespace Belle2 {
     TGeoVolumeAssembly* getVol() {
       return volPXDSensor;
     }
-    Double_t getLength() {
-      return fSensorLength;
-    }
-
+    Double_t getLengthSilicon();
+    //! returns TGeoHMatrix which moves the sensor to the center of the surface
+    TGeoHMatrix getSurfaceCenterPosition();
   };
+
 #ifdef B2GEOM_BASF2
 }
 #endif

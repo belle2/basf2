@@ -54,8 +54,8 @@ namespace Belle2 {
     Int_t nLadders;
     //! Rotation of whole PXD about z axis
     Double_t fPhi0;
-    //! Rotation about z axis before moving to fRadius
-    vector<Double_t> fTheta;
+    //! rotation of the whole ladder (ladders of layer 1 are upside down)
+    Double_t fPhiLadder;
     //! Distance from origin
     Double_t fRadius;
     //! Rotation about z axis after moving to fRadius

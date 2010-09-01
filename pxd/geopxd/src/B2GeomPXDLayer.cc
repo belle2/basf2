@@ -44,25 +44,19 @@ B2GeomPXDLayer::~B2GeomPXDLayer()
 Bool_t B2GeomPXDLayer::init(GearDir& content)
 {
   layerContent = GearDir(content);
-  layerContent.append((format("Layers/Layer[%1%]/") % (iLayer)).str());
+  layerContent.append((format("Layers/Layer[@id=\'PXD_Layer_%1%\']/") % (iLayer)).str());
 
   fPhi0 = layerContent.getParamAngle("Phi0");
   nLadders = int(layerContent.getParamNumValue("NumberOfLadders"));
   b2gPXDLadders.resize(nLadders);
-  // iHalfShell.resize(nLadders);
   fPhi.resize(nLadders);
   fLadderOffsetY = layerContent.getParamLength("OffsetY");
   fLadderOffsetZ = layerContent.getParamLength("OffsetZ");;
   fRadius = layerContent.getParamLength("Radius");
+  fPhiLadder = double(layerContent.getParamLength("PhiLadder"));
   for (int iLadder = 0; iLadder < nLadders; iLadder++) {
     fPhi[iLadder] = iLadder * (360. / nLadders) + fPhi0;
-    // iHalfShell[iLadder] = 0;
   }
-
-  // offsets
-  // fHalfShellOffsetZ.resize(2);
-  // fHalfShellOffsetZ[0] = 0;
-  // fHalfShellOffsetZ[1] = 0;
   return true;
 }
 #else
@@ -83,7 +77,8 @@ Bool_t B2GeomPXDLayer::make()
 
 void B2GeomPXDLayer::putLadder(Int_t iLadder)
 {
-
+  // rotation of whole ladder
+  TGeoRotation rotTheta("name", fPhiLadder, 0.0, 0.0);
   // position the ladder at radius
   TGeoTranslation traX = TGeoTranslation("name", fRadius, 0., 0.);
   // create the wind mill structure
@@ -93,9 +88,12 @@ void B2GeomPXDLayer::putLadder(Int_t iLadder)
   // rotate around z
   TGeoRotation rotPhi = TGeoRotation("name", fPhi[iLadder], 0, 0);
 
+
+
   // compose the transformation to position the ladder
   TGeoHMatrix hmaHelp;
   hmaHelp = gGeoIdentity;
+  hmaHelp = rotTheta * hmaHelp;
   hmaHelp = traX * hmaHelp;
   hmaHelp = traY * hmaHelp;
   hmaHelp = traZ * hmaHelp;

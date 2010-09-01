@@ -42,12 +42,17 @@ Bool_t B2GeomPXDLadder::init(GearDir& content)
 {
   ladderContent = GearDir(content);
   ladderContent.append("Ladder/");
-  fGapLength = int(ladderContent.getParamNumValue("Gap"));
   nSensors = int(ladderContent.getParamNumValue("NumberOfSensors"));
   b2gPXDSensors.resize(nSensors);
+  fVPosition.resize(nSensors);
+  for (Int_t iSensor = 0; iSensor < nSensors; iSensor++) {
+    GearDir sensorPositionContent(ladderContent);
+    sensorPositionContent.append((format("Sensors/Sensor[@id=\'PXD_Layer_%1%_Ladder_Sensor_%2%\']/Position/") % iLayer % iSensor).str());
+    fVPosition[iSensor] = sensorPositionContent.getParamLength("V");
+  }
+
   TGeoMaterial* matVacuum = new TGeoMaterial("Vacuum", 0, 0, 0);
   medAir = new TGeoMedium("medAir", 1, matVacuum);
-  medGlue = new TGeoMedium("medGlue", 1, matVacuum);
   return true;
 }
 #else
@@ -61,7 +66,6 @@ Bool_t B2GeomPXDLadder::make()
 {
   volPXDLadder = new TGeoVolumeAssembly(path.c_str());
   putSensors();
-  putGlue();
   return true;
 }
 
@@ -76,14 +80,13 @@ void B2GeomPXDLadder::putSensors()
     b2gPXDSensors[iSensor]->init();
 #endif
     b2gPXDSensors[iSensor]->make();
-    volPXDLadder->AddNode(b2gPXDSensors[iSensor]->getVol(), 1, new TGeoTranslation(0.0,
-                          0.0,
-                          -0.5 * b2gPXDSensors[iSensor]->getLength() - 0.5 * fGapLength + iSensor *(b2gPXDSensors[iSensor]->getLength() + fGapLength)));
+    TGeoTranslation tra(0.0, 0.0, fVPosition[iSensor] + 0.5 * b2gPXDSensors[iSensor]->getLengthSilicon());
+    TGeoHMatrix hmaHelp;
+    hmaHelp = gGeoIdentity;
+    hmaHelp = b2gPXDSensors[iSensor]->getSurfaceCenterPosition() * hmaHelp;
+    hmaHelp = tra * hmaHelp;
+    volPXDLadder->AddNode(b2gPXDSensors[iSensor]->getVol(), 1, new TGeoHMatrix(hmaHelp));
   }
 }
 
-void B2GeomPXDLadder::putGlue()
-{
-
-}
 

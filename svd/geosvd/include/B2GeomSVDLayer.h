@@ -11,7 +11,7 @@
 #ifdef B2GEOM_BASF2
 #include <svd/geosvd/B2GeomSVDLadder.h>
 #include <svd/geosvd/B2GeomOffset.h>
-#include <geometry/gearbox/GearDir.h>
+#include <framework/gearbox/GearDir.h>
 #include <framework/datastore/Units.h>
 #include <boost/format.hpp>
 #else

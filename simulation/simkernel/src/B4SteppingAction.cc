@@ -137,6 +137,4 @@ void B4SteppingAction::UserSteppingAction(const G4Step* aStep)
   } else {
     num_zero_steps_in_a_row = 0;
   }
-
-  return;
 }

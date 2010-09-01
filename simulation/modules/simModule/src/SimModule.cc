@@ -49,6 +49,9 @@ SimModule::SimModule() : Module("SimModule"), m_run_mgr(NULL)
   setDescription("SimModule");
   m_event_number = 0;
 
+  //---------------------------------------
+  //         Module parameters
+  //---------------------------------------
   addParam("RunId", m_runId, -9, "Set run id");
   addParam("RandomSeed", m_randomSeed, 12345, "Set random seed");
   addParam("RunVerbosity", m_runVerbose, 2, "Control run verbose level in Geant4");
@@ -57,7 +60,7 @@ SimModule::SimModule() : Module("SimModule"), m_run_mgr(NULL)
   addParam("InteractiveG4", m_interactiveG4, false, "If true, interactive mode will start");
   addParam("Visualize", m_vis, false, "If true, open visualization function and visualization driver is needed, like OpenGL");
   addParam("MacroName", m_macroName, string("None"), "Macro name");
-
+  addParam("MaxNumStep", m_maxNumberSteps, 100000, "The maximum number of steps before a track is stopped and killed");
 }
 
 SimModule::~SimModule()
@@ -88,16 +91,17 @@ void SimModule::initialize()
   m_run_mgr->SetUserInitialization(new QGSP_BERT);
 
   // Generator
-  G4VUserPrimaryGeneratorAction* gen_action = new B4PrimaryGeneratorAction;
+  G4VUserPrimaryGeneratorAction* gen_action = new B4PrimaryGeneratorAction();
   m_run_mgr->SetUserAction(gen_action);
 
   // Event action
-  G4UserEventAction* event_action = new B4EventAction;
+  G4UserEventAction* event_action = new B4EventAction();
   m_run_mgr->SetUserAction(event_action);
 
   // Step action
-  G4UserSteppingAction* step_action = new B4SteppingAction;
-  m_run_mgr->SetUserAction(step_action);
+  B4SteppingAction* stepAction = new B4SteppingAction();
+  stepAction->setMaxNumberSteps(m_maxNumberSteps);
+  m_run_mgr->SetUserAction(stepAction);
 
   //-----------------------
   // Initialize G4 kernel

@@ -32,19 +32,23 @@ namespace Belle2 {
     //! Destructor
     ~B4SteppingAction();
 
+    //! Sets the maximum number of steps before a track is stopped and killed.
+    /*!
+        \param maxSteps The maximum number of steps.
+    */
+    void setMaxNumberSteps(unsigned int maxSteps) {m_maxNumberSteps = maxSteps; };
+
     //! The method will be called at each step during simulation.
     /*! Add some protections to remove unreasonable tracks.
         \param aStep The pointer of current step.
     */
     void UserSteppingAction(const G4Step* aStep);
 
-    //! If the step number of current track is greater than MaxStep, this track will be stopped and killed.
-    enum { MaxStep = 100000 };
-
 
   private:
 
-    double m_worldBoxSize[3]; /*!< The size of the simulation world box. */
+    double m_worldBoxSize[3];      /*!< The size of the simulation world box. */
+    unsigned int m_maxNumberSteps; /*!< The maximum number of steps before the tracking is stopped and killed. */
 
   };
 

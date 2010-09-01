@@ -34,6 +34,9 @@ B4SteppingAction :: B4SteppingAction()
   m_worldBoxSize[2] = globalContent.getParamLength("WorldBox/Z");
 
   INFO("Geant4 tracking volume set to [cm]: " << m_worldBoxSize[0] << "," << m_worldBoxSize[1] << "," << m_worldBoxSize[2])
+
+  //Default value for the maximum number of steps
+  m_maxNumberSteps = 100000;
 }
 
 
@@ -81,7 +84,7 @@ void B4SteppingAction::UserSteppingAction(const G4Step* aStep)
   //---------------------------------------
   // Check for very high number of steps.
   //---------------------------------------
-  if (track->GetCurrentStepNumber() > MaxStep) {
+  if (track->GetCurrentStepNumber() > m_maxNumberSteps) {
     const G4VPhysicalVolume* pv = track->GetVolume();
     const G4VProcess* lastproc = track->GetStep()->GetPostStepPoint()->GetProcessDefinedStep();
     INFO("Event ID: " << G4RunManager::GetRunManager()->GetCurrentEvent()->GetEventID()

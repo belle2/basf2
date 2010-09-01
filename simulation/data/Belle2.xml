@@ -10,9 +10,10 @@
     <xi:include href="BasicMaterials.xml"/>
   </MaterialSets>
   <Subdetectors>
-    <xi:include href="../ir/BeampipeBelleII.xml"/>
+    <!--xi:include href="../ir/IRBelleIISymm.xml"/-->
+    <xi:include href="../ir/IRBelleII.xml"/>
     <xi:include href="../pxd/PXDBelleII_PXD1600.xml"/>
-    <xi:include href="../svd/SVDBelleII.xml"/>
+    <!--xi:include href="../svd/SVDBelleII.xml"/-->
     <xi:include href="../cdc/CDCBelleII.xml"/>
   </Subdetectors>
 </Detector>

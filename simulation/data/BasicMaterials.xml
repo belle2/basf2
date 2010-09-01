@@ -183,5 +183,13 @@
 			<InterLength>0</InterLength>
 		</Material>
 
+		<Material name="Tantalum">
+			<AtomNumber>73.0</AtomNumber>
+			<MassNumber>180.94788</MassNumber>
+			<Density unit="g/cm3">16.69</Density>
+			<RadLength>1.0</RadLength>
+			<InterLength>0</InterLength>
+		</Material>
+
 	</Content>
 </ParamSet>

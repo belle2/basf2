@@ -16,7 +16,7 @@
 
 namespace Belle2 {
 
-//! The Class for Belle2 Event Action
+  //! The Class for Belle2 Event Action
   /*! This class inherits from G4UserEventAction in GEANT4.
       In this class, you can do what you want to do at the beginning and end of each event.
       For example, at the end of each event, you can save hits, do digitization and so on.

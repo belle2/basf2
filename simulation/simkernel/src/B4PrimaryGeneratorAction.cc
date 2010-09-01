@@ -47,12 +47,14 @@ B4PrimaryGeneratorAction::B4PrimaryGeneratorAction()
   m_messenger = new B4PrimaryGeneratorMessenger(this);
 }
 
+
 B4PrimaryGeneratorAction::~B4PrimaryGeneratorAction()
 {
   if (m_particleGun) delete m_particleGun;
   if (m_messenger)   delete m_messenger;
   if (m_HEPEvt)      delete m_HEPEvt;
 }
+
 
 void B4PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 {

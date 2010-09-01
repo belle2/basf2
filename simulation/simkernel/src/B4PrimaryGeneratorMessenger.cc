@@ -135,6 +135,7 @@ B4PrimaryGeneratorMessenger::B4PrimaryGeneratorMessenger(B4PrimaryGeneratorActio
   m_testerCmd->SetParameter(parameter);
 }
 
+
 B4PrimaryGeneratorMessenger::~B4PrimaryGeneratorMessenger()
 {
   if (m_generatorDirectory) delete m_generatorDirectory;
@@ -142,6 +143,7 @@ B4PrimaryGeneratorMessenger::~B4PrimaryGeneratorMessenger()
   if (m_HEPEvtCmd)          delete m_HEPEvtCmd;
   if (m_testerCmd)          delete m_testerCmd;
 }
+
 
 void B4PrimaryGeneratorMessenger::SetNewValue(G4UIcommand * command, G4String newValue)
 {
@@ -180,6 +182,7 @@ void B4PrimaryGeneratorMessenger::SetNewValue(G4UIcommand * command, G4String ne
     m_myAction->setPosZ(z);
   }
 }
+
 
 G4String B4PrimaryGeneratorMessenger::GetCurrentValue(G4UIcommand *)
 {

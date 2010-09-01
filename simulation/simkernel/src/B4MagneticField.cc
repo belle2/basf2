@@ -49,6 +49,7 @@ B4MagneticField::B4MagneticField(): m_chordFinder(0), m_equation(0), m_stepper(0
   initialiseAll();
 }
 
+
 B4MagneticField :: ~B4MagneticField()
 {
   if (m_fieldMessenger) delete m_fieldMessenger;
@@ -56,6 +57,7 @@ B4MagneticField :: ~B4MagneticField()
   if (m_equation)       delete m_equation;
   if (m_stepper)        delete m_stepper;
 }
+
 
 void B4MagneticField :: GetFieldValue(const G4double Point[3], G4double *Bfield) const
 {
@@ -72,6 +74,7 @@ void B4MagneticField :: GetFieldValue(const G4double Point[3], G4double *Bfield)
   }
 }
 
+
 void B4MagneticField::initialiseAll()
 {
   m_fieldMessenger = new B4MagneticFieldMessenger(this);
@@ -83,6 +86,7 @@ void B4MagneticField::initialiseAll()
 
   createStepperAndChordFinder();
 }
+
 
 void B4MagneticField::createStepperAndChordFinder()
 {
@@ -103,6 +107,7 @@ void B4MagneticField::createStepperAndChordFinder()
 
   return;
 }
+
 
 //--------------------------------------------
 // Set stepper according to the stepper type

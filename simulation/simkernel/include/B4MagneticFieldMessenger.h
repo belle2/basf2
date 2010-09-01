@@ -20,12 +20,11 @@ namespace Belle2 {
 
   class B4MagneticField;
 
-//! Class for MagneticField Messenger
+  //! Class for MagneticField Messenger
   /*! This class is used to set new values for variables defined in class B4MagneticField.
       These new values will read from macro file, so if you want to change some values,
       don't need to re-compile the program, just edit the macro.
   */
-
   class B4MagneticFieldMessenger: public G4UImessenger {
 
   public:
@@ -45,9 +44,9 @@ namespace Belle2 {
 
   private:
 
-    B4MagneticField* m_fieldSetup;
-    G4UIdirectory* m_fieldDir;
-    G4UIcommand* m_fieldCmd;
+    B4MagneticField* m_fieldSetup; /*!< The pointer that points class B4MagneticField. */
+    G4UIdirectory*   m_fieldDir;   /*!< The pointer that points class G4UIdirectory. */
+    G4UIcommand*     m_fieldCmd;   /*!< The pointer that points class G4UIcommand. */
 
   };
 

@@ -22,7 +22,7 @@ namespace Belle2 {
 
   class B4PrimaryGeneratorMessenger;
 
-//! The Class for Implementing a Simple Particle Generator
+  //! The Class for Implementing a Simple Particle Generator
   /*! This class inherits from G4VUserPrimaryGeneratorAction in GEANT4.
       It implements a simple particle generator.
       Using this generator, you can generate one or more particles in a event.

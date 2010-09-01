@@ -81,11 +81,13 @@ B4MagneticFieldMessenger::B4MagneticFieldMessenger(B4MagneticField* fieldSetup) 
   m_fieldCmd->SetParameter(parameter);
 }
 
+
 B4MagneticFieldMessenger::~B4MagneticFieldMessenger()
 {
   if (m_fieldDir)   delete m_fieldDir;
   if (m_fieldCmd)   delete m_fieldCmd;
 }
+
 
 void B4MagneticFieldMessenger::SetNewValue(G4UIcommand* command, G4String newvalue)
 {
@@ -106,5 +108,4 @@ void B4MagneticFieldMessenger::SetNewValue(G4UIcommand* command, G4String newval
     m_fieldSetup->setMaxEpsilonStep(maxEpsilonStep);
     m_fieldSetup->createStepperAndChordFinder();
   }
-
 }

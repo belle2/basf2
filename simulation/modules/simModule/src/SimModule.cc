@@ -41,7 +41,7 @@ using namespace Belle2;
 
 REG_MODULE(SimModule)
 
-SimModule::SimModule() : Module("SimModule"), m_initialize(false), m_run_mgr(NULL)
+SimModule::SimModule() : Module("SimModule"), m_run_mgr(NULL)
 #ifdef G4VIS_USE
     , m_visMgr(NULL)
 #endif

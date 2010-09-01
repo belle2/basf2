@@ -23,7 +23,7 @@ namespace Belle2 {
 
   class B4RunManager;
 
-//! Module SimModule
+  //! Module SimModule
   /*! This class is a module of Belle2 simulation.
       It inherits from basf2 module and will finish some necessary initializations in geant4,
       such as detector geometry, physics processes, particle gun generator and some user actions.
@@ -33,7 +33,6 @@ namespace Belle2 {
       In this module, users can use interactive mode and visualization function during detector simulation.
       And some parameters are also provided for changing some properties.
   */
-
   class SimModule : public Module {
 
   public:
@@ -84,19 +83,18 @@ namespace Belle2 {
 
   private:
 
-    int m_runId;
-    int m_event_number;
+    int m_event_number;      /*!< The current event number. */
 
-    int m_randomSeed;
-    int m_runVerbose;
-    int m_eventVerbose;
-    int m_trackVerbose;
-    bool m_interactiveG4;
-    bool m_vis;
-    bool m_initialize;
-    std::string m_macroName;
+    int m_runId;             /*!< The run id parameter. */
+    int m_randomSeed;        /*!< The random seed parameter. */
+    int m_runVerbose;        /*!< The geant4 run verbose level parameter. */
+    int m_eventVerbose;      /*!< The geant4 event verbose level parameter. */
+    int m_trackVerbose;      /*!< The geant4 track verbose level parameter. */
+    bool m_interactiveG4;    /*!< The geant4 interactive switch parameter. */
+    bool m_vis;              /*!< The geant4 visualization switch parameter. */
+    std::string m_macroName; /*!< The path to the geant4 macro file. */
 
-    B4RunManager* m_run_mgr;
+    B4RunManager* m_run_mgr; /*!< Pointer to the geant4 run manager. */
 
 #ifdef G4VIS_USE
     G4VisManager* m_visMgr;

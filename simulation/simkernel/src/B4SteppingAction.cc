@@ -25,10 +25,14 @@
 using namespace Belle2;
 
 B4SteppingAction :: B4SteppingAction()
-{}
+{
+}
+
 
 B4SteppingAction :: ~B4SteppingAction()
-{}
+{
+}
+
 
 void B4SteppingAction::UserSteppingAction(const G4Step* aStep)
 {

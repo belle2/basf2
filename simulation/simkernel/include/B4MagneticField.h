@@ -23,7 +23,7 @@
 
 namespace Belle2 {
 
-//! The Class for Belle2 Magnetic Field
+  //! The Class for Belle2 Magnetic Field
   /*! This class inherits from G4MagneticField in GEANT4.
       It is used to provide magnetic field during the simulation.
 

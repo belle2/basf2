@@ -17,7 +17,7 @@
 
 namespace Belle2 {
 
-//! The Class for Hits
+  //! The Class for Hits
   /*! This is a base class and all sub-detector hit classes should inherit from it.
       Some pure virtual functions should be implemented in sub-detector hit classes based on your requirements.
       However, the function Save(G4int) are strongly recommended to implement in sub-detector hit classes.

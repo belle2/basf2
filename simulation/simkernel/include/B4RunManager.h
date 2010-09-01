@@ -16,7 +16,7 @@
 
 namespace Belle2 {
 
-//! The Class for Belle2 Run Manager
+  //! The Class for Belle2 Run Manager
   /*! This class is used in simulation module to do some initializations and processes one event simulation.
       In future, more functions will be extended.
   */

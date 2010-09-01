@@ -22,6 +22,11 @@
 
 namespace Belle2 {
 
+  //! Class for B4PrimaryGenerator Messenger
+  /*! This class is used to set new values for variables defined in class B4PrimaryGeneratorAction.
+      These new values will read from macro file, so if you want to change some values,
+      don't need to re-compile the program, just edit the macro.
+  */
   class B4PrimaryGeneratorMessenger: public G4UImessenger {
 
   public:

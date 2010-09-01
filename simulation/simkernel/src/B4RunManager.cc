@@ -20,6 +20,7 @@ B4RunManager* B4RunManager::Instance()
   return m_instance;
 }
 
+
 B4RunManager::B4RunManager()
 {
 }
@@ -29,6 +30,7 @@ B4RunManager::~B4RunManager()
 {
 }
 
+
 void B4RunManager::beginRun()
 {
   // Call run initialization in G4RunManager.
@@ -37,6 +39,7 @@ void B4RunManager::beginRun()
     RunInitialization();
   }
 }
+
 
 void B4RunManager::event(int iEvent)
 {
@@ -49,9 +52,11 @@ void B4RunManager::event(int iEvent)
   StackPreviousEvent(currentEvent);
 }
 
+
 void B4RunManager::endOfEvent()
 {
 }
+
 
 void B4RunManager::endRun()
 {

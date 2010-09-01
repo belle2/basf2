@@ -16,7 +16,7 @@
 
 namespace Belle2 {
 
-//! The Class for Stepping Action
+  //! The Class for Stepping Action
   /*! In principle, you can do what you want to associated to each step.
       But, please make sure that your codes are necessary, otherwise they maybe slow down the program.
       Now, I just add some protections to remove some unreasonable tracks and make sure that the program

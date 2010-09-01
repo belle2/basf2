@@ -21,9 +21,11 @@ B4EventAction::B4EventAction(void): G4UserEventAction()
 {
 }
 
+
 B4EventAction::~B4EventAction(void)
 {
 }
+
 
 void B4EventAction::BeginOfEventAction(const G4Event* event)
 {
@@ -31,6 +33,7 @@ void B4EventAction::BeginOfEventAction(const G4Event* event)
   G4int eventId = event->GetEventID();
   if (eventId % 100 == 0)  G4cout << "---> Begin of event: " << eventId << G4endl;
 }
+
 
 void B4EventAction::EndOfEventAction(const G4Event* event)
 {

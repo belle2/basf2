@@ -102,6 +102,8 @@ namespace Belle2 {
     //! Position of the cooling pipe in U direction
     Double_t fUPositionCoolPipe;
 
+    //! Has this sensor SMDs?
+    Bool_t isSMDs;
     //! Width of the SMDs
     Double_t fWidthSMDs;
     //! Thickness of the SMDs

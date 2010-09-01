@@ -76,6 +76,8 @@ Bool_t B2GeomSVDSensor::init(GearDir& content)
 
   fThickKapton = sensorContent.getParamLength("ThicknessKapton");
 
+  isSMDs = sensorContent.getParamNumValue("isSMD");
+
   if (iSensorType == 1) fWidthSMDs = sensorContent.getParamLength("WidthSMDs");
   if (iSensorType == 1) fThickSMDs = sensorContent.getParamLength("ThicknessSMDs");
   if (iSensorType == 1) fUPositionSMDs = sensorContent.getParamLength("UPositionSMDs");
@@ -127,7 +129,7 @@ Bool_t B2GeomSVDSensor::make()
   putSilicon();
   putFoam();
   putKapton();
-  putSMDs();
+  if (isSMDs) putSMDs();
   putCoolingPipe();
   return true;
 }

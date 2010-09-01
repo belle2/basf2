@@ -11,7 +11,7 @@
 #include <cdc/geocdc/GeoCDCBelleII.h>
 #include <cdc/simcdc/CDCSD.h>
 
-#include <framework/gearbox/GearDir.h>
+#include <geometry/gearbox/GearDir.h>
 #include <framework/datastore/Units.h>
 #include <framework/logging/Logger.h>
 

@@ -11,7 +11,7 @@
 #ifndef GEOCDCBELLEII_H
 #define GEOCDCBELLEII_H
 
-#include <framework/geodetector/CreatorBase.h>
+#include <geometry/geodetector/CreatorBase.h>
 
 #include <TGeoVolume.h>
 

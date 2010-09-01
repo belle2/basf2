@@ -895,8 +895,8 @@ Helix::checkValid(void)
 {
 
   if (!ms_check_range) return;
-  const double adr   = abs(m_a[0]);
-  const double acpa   = abs(m_a[2]);
+  const double adr   = fabs(m_a[0]);
+  const double acpa   = fabs(m_a[2]);
   if (!(adr >= ms_amin[0] && adr <= ms_amax[0])) {
     m_helixValid = false;
   } else if (!(acpa >= ms_amin[2] && acpa <= ms_amax[2])) {

@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Guofu Cao                                                *
+ * Contributors: Guofu Cao, Andreas Moll                                  *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -48,7 +48,7 @@ namespace Belle2 {
     /*! Add some protections to remove unreasonable tracks.
         \param aStep The pointer of current step.
     */
-    void UserSteppingAction(const G4Step* aStep);
+    virtual void UserSteppingAction(const G4Step* aStep);
 
 
   private:

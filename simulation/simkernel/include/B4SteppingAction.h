@@ -18,11 +18,10 @@ namespace Belle2 {
 
   //! The Class for Stepping Action
   /*! In principle, you can do what you want to associated to each step.
-      But, please make sure that your codes are necessary, otherwise they maybe slow down the program.
-      Now, I just add some protections to remove some unreasonable tracks and make sure that the program
-      can run smoothly with no crash.
+      But, please make sure that your codes are necessary, otherwise they may slow down the program.
+      At the moment only some protections are implemented in order to remove unreasonable tracks and
+      to make sure that the program can run smoothly without any crash.
   */
-
   class B4SteppingAction : public G4UserSteppingAction {
 
   public:
@@ -41,6 +40,11 @@ namespace Belle2 {
 
     //! If the step number of current track is greater than MaxStep, this track will be stopped and killed.
     enum { MaxStep = 100000 };
+
+
+  private:
+
+    double m_worldBoxSize[3]; /*!< The size of the simulation world box. */
 
   };
 

@@ -38,6 +38,12 @@ namespace Belle2 {
     */
     void setMaxNumberSteps(unsigned int maxSteps) {m_maxNumberSteps = maxSteps; };
 
+    //! Sets the maximum number of zero steps on a row before a track is stopped and killed.
+    /*!
+        \param maxSteps The maximum number of zero steps in a row.
+    */
+    void setMaxZeroSteps(unsigned int maxSteps) {m_maxZeroSteps = maxSteps; };
+
     //! The method will be called at each step during simulation.
     /*! Add some protections to remove unreasonable tracks.
         \param aStep The pointer of current step.
@@ -49,6 +55,7 @@ namespace Belle2 {
 
     double m_worldBoxSize[3];      /*!< The size of the simulation world box. */
     unsigned int m_maxNumberSteps; /*!< The maximum number of steps before the tracking is stopped and killed. */
+    unsigned int m_maxZeroSteps;   /*!< The maximum number of zero steps in a row before the tracking is stopped and killed. */
 
   };
 

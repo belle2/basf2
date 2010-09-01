@@ -61,6 +61,7 @@ SimModule::SimModule() : Module("SimModule"), m_run_mgr(NULL)
   addParam("Visualize", m_vis, false, "If true, open visualization function and visualization driver is needed, like OpenGL");
   addParam("MacroName", m_macroName, string("None"), "Macro name");
   addParam("MaxNumStep", m_maxNumberSteps, 100000, "The maximum number of steps before a track is stopped and killed");
+  addParam("MaxZeroStep", m_maxZeroSteps, 4, "The maximum number of zero steps in a row before a track is stopped and killed");
 }
 
 SimModule::~SimModule()
@@ -101,6 +102,7 @@ void SimModule::initialize()
   // Step action
   B4SteppingAction* stepAction = new B4SteppingAction();
   stepAction->setMaxNumberSteps(m_maxNumberSteps);
+  stepAction->setMaxZeroSteps(m_maxZeroSteps);
   m_run_mgr->SetUserAction(stepAction);
 
   //-----------------------

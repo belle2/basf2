@@ -94,6 +94,7 @@ namespace Belle2 {
     bool m_vis;              /*!< The geant4 visualization switch parameter. */
     std::string m_macroName; /*!< The path to the geant4 macro file. */
     int m_maxNumberSteps;    /*!< The maximum number of steps before a track is stopped and killed. */
+    int m_maxZeroSteps;      /*!< The maximum number of zero steps in a row before a track is stopped and killed. */
 
     B4RunManager* m_run_mgr; /*!< Pointer to the geant4 run manager. */
 

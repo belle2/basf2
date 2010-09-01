@@ -37,6 +37,9 @@ B4SteppingAction :: B4SteppingAction()
 
   //Default value for the maximum number of steps
   m_maxNumberSteps = 100000;
+
+  //Default value for the maximum number of zero steps in a row
+  m_maxZeroSteps = 4;
 }
 
 
@@ -106,7 +109,7 @@ void B4SteppingAction::UserSteppingAction(const G4Step* aStep)
   static G4int num_zero_steps_in_a_row = 0;
   if (aStep->GetStepLength() <= 1e-10 && track->GetCurrentStepNumber() > 1) {
     num_zero_steps_in_a_row++;
-    if (num_zero_steps_in_a_row > 4) {
+    if (num_zero_steps_in_a_row > m_maxZeroSteps) {
       const G4VPhysicalVolume* pv = track->GetVolume();
       const G4VProcess* lastproc = track->GetStep()->GetPostStepPoint()->GetProcessDefinedStep();
       G4EmCalculator c;

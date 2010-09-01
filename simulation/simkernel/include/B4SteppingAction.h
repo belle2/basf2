@@ -51,11 +51,13 @@ namespace Belle2 {
     virtual void UserSteppingAction(const G4Step* aStep);
 
 
-  private:
+  protected:
 
     double m_worldBoxSize[3]; /*!< The size of the simulation world box. */
     int m_maxNumberSteps;     /*!< The maximum number of steps before the tracking is stopped and killed. */
     int m_maxZeroSteps;       /*!< The maximum number of zero steps in a row before the tracking is stopped and killed. */
+
+  private:
 
   };
 

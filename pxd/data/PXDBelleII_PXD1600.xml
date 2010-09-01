@@ -66,7 +66,7 @@
 	<Version>0</Version>
 	<Creator>PXDBelleII</Creator>
 	<Content>
-		<Rotation desc="Rotation of the hole PXD detector (should be the same as beampipe)" unit="mrad">22.0</Rotation>
+		<Rotation desc="Rotation of the hole PXD detector (should be the same as beampipe)" unit="mrad">0.0</Rotation>
 		<OffsetZ desc="The offset of the whole PXD in z with respect to the IP (should be the same as beampipe)" unit="mm">0.0</OffsetZ>		
 							<MaterialSensor>Silicon</MaterialSensor>
 

@@ -14,7 +14,7 @@
 #include <pxd/geopxd/B2GeomPXDLayer.h>
 #include <pxd/simpxd/PXDSensitiveDetector.h>
 
-#include <geometry/gearbox/GearDir.h>
+#include <framework/gearbox/GearDir.h>
 #include <framework/datastore/Units.h>
 
 #include <cmath>

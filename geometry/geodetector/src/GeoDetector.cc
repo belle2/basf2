@@ -8,12 +8,12 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <geometry/gearbox/Gearbox.h>
-#include <geometry/gearbox/GearDir.h>
+#include <framework/gearbox/Gearbox.h>
+#include <framework/gearbox/GearDir.h>
+#include <framework/gearbox/GbxExceptions.h>
 #include <geometry/geodetector/GeoDetector.h>
 #include <geometry/geodetector/CreatorManager.h>
 #include <geometry/geodetector/GDetExceptions.h>
-#include <geometry/gearbox/GbxExceptions.h>
 #include <framework/logging/Logger.h>
 
 #include <TGeoManager.h>

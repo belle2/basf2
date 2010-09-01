@@ -11,7 +11,7 @@
 #ifndef GEODETECTOR_H_
 #define GEODETECTOR_H_
 
-#include <geometry/gearbox/GearboxIOAbs.h>
+#include <framework/gearbox/GearboxIOAbs.h>
 #include <geometry/geodetector/CreatorBase.h>
 #include <geometry/geodetector/GDetExceptions.h>
 

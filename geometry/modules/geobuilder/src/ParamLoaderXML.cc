@@ -12,8 +12,8 @@
 
 #include <framework/fwcore/ModuleManager.h>
 
-#include <geometry/gearbox/Gearbox.h>
-#include <geometry/gearbox/GearboxIOXML.h>
+#include <framework/gearbox/Gearbox.h>
+#include <framework/gearbox/GearboxIOXML.h>
 
 using namespace std;
 using namespace Belle2;

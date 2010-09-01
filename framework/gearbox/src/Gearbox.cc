@@ -50,11 +50,29 @@ GearboxIOAbs& Gearbox::getGearboxIO() const throw(GbxExcIONotConnected)
 }
 
 
-GearDir Gearbox::getContent(const std::string& subdetector) throw(GbxExcIONotConnected)
+GearDir Gearbox::getContent(const std::string& paramSetType, EGearboxContentType contentType) throw(GbxExcIONotConnected)
 {
   if ((m_gearboxIO == NULL) || (!m_gearboxIO->isOpen())) throw GbxExcIONotConnected();
-  GearDir result(getSubdetectorPath(subdetector));
-  return result;
+
+  switch (contentType) {
+    case c_GbxGlobal:       return GearDir(getGlobalParamPath(paramSetType));
+    case c_GbxMaterial:     return GearDir(getMaterialParamPath(paramSetType));
+    case c_GbxSubdetectors: return GearDir(getSubdetectorPath(paramSetType));
+    default:                return GearDir();
+  }
+  return GearDir();
+}
+
+
+std::string Gearbox::getGlobalParamPath(const std::string& globalParam) const
+{
+  return "/Detector/Global/ParamSet[@type=\"" + globalParam + "\"]/Content/";
+}
+
+
+std::string Gearbox::getMaterialParamPath(const std::string& materialParam) const
+{
+  return "/Detector/MaterialSets/ParamSet[@type=\"" + materialParam + "\"]/Content/";
 }
 
 

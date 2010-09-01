@@ -34,6 +34,13 @@ namespace Belle2 {
 
   public:
 
+    //! The content return types
+    enum EGearboxContentType {
+      c_GbxGlobal,       /*!< The content section of the global parameters. */
+      c_GbxMaterial,     /*!< The content section of the material sets. */
+      c_GbxSubdetectors /*!< The content section of the subdetector parameters. */
+    };
+
     //! Static method to get a reference to the Gearbox instance.
     /*!
       \return A reference to an instance of this class.
@@ -60,13 +67,27 @@ namespace Belle2 {
     */
     GearboxIOAbs& getGearboxIO() const throw(GbxExcIONotConnected);
 
-    //! Returns a GearDir pointing to the content section of the specified subdetector.
+    //! Returns a GearDir pointing to the content section of the specified parameter set.
     /*!
-      \param subdetector The name of the subdetector.
-      \return A GearDir object pointing to the content part of the specified subdetector.
+      \param paramSetType The name of the parameter set type.
+      \return A GearDir object pointing to the content part of the specified parameter set.
     */
-    GearDir getContent(const std::string& subdetector)
+    GearDir getContent(const std::string& paramSetType, EGearboxContentType contentType = c_GbxSubdetectors)
     throw(GbxExcIONotConnected);
+
+    //! Returns the path to the content section of the given global parameter set.
+    /*!
+      \param globalParam The name of the global parameter set.
+      \return The full path to the content section of the global parameter set.
+    */
+    std::string getGlobalParamPath(const std::string& globalParam) const;
+
+    //! Returns the path to the content section of the given material set.
+    /*!
+      \param globalParam The name of the material set.
+      \return The full path to the content section of the material set.
+    */
+    std::string getMaterialParamPath(const std::string& materialParam) const;
 
     //! Returns the path to the content section of the given subdetector.
     /*!

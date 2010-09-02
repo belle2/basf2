@@ -48,6 +48,8 @@ def print_params( module ):
     for paramItem in paramList:
         defaultStr = ", ".join(['%s' % defaultItem for defaultItem in paramItem.default])
         valueStr   = ", ".join(['%s' % valueItem for valueItem in paramItem.values])
-        print '%-20s %-20s %-20s %-30s %-10s %s' % (paramItem.name, paramItem.type, defaultStr, valueStr, paramItem.setInSteering, paramItem.description)
+        forceString = ""
+        if paramItem.forceInSteering: forceString = "*"
+        print '%-1s %-20s %-20s %-20s %-30s %-10s %s' % (forceString, paramItem.name, paramItem.type, defaultStr, valueStr, paramItem.setInSteering, paramItem.description)
     print ""
 

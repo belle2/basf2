@@ -79,6 +79,11 @@ bool Module::hasProperties(unsigned int propertyFlags)
 }
 
 
+bool Module::hasUnsetForcedParams() const
+{
+  return m_moduleParamList.hasUnsetForcedParams();
+}
+
 //============================================================================
 //                          Protected methods
 //============================================================================

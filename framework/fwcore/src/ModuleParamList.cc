@@ -50,6 +50,18 @@ ParamTypeInfo::ParamTypeInfo ModuleParamList::getParamTypeInfo(const std::string
 }
 
 
+bool ModuleParamList::hasUnsetForcedParams() const
+{
+  map<string, ModuleParamPtr>::const_iterator mapIter;
+
+  for (mapIter = m_paramMap.begin(); mapIter != m_paramMap.end(); mapIter++) {
+    if ((mapIter->second->isForcedInSteering()) && (!mapIter->second->isSetInSteering())) return true;
+  }
+
+  return false;
+}
+
+
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //                   Python API
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -66,6 +78,7 @@ boost::python::list ModuleParamList::getParamInfoListPython() const
     newParamInfo.m_description = currParam->getDescription();
     newParamInfo.m_typeName = getParamTypeInfo(mapIter->first).m_readableName;
     newParamInfo.m_setInSteering = currParam->isSetInSteering();
+    newParamInfo.m_forceInSteering = currParam->isForcedInSteering();
     getParamValuesPython(mapIter->first, newParamInfo.m_defaultValues, true);
     getParamValuesPython(mapIter->first, newParamInfo.m_values, false);
 

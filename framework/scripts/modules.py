@@ -12,5 +12,9 @@ for item in avModList:
   paramList = item.available_params()
   for paramItem in paramList:
     defaultStr = ", ".join(['%s' % defaultItem for defaultItem in paramItem.default])
-    print '%-20s %-14s %-30s %s' % (paramItem.name, paramItem.type, defaultStr, paramItem.description)
+
+    forceString = ""
+    if paramItem.forceInSteering: forceString = "*"
+
+    print '%-1s %-20s %-14s %-30s %s' % (forceString, paramItem.name, paramItem.type, defaultStr, paramItem.description)
 

@@ -81,6 +81,11 @@ void ModuleChain::processInitialize(const ModulePtrList& modulePathList)
   for (listIter = modulePathList.begin(); listIter != modulePathList.end(); listIter++) {
     Module* module = listIter->get();
 
+    if (module->hasUnsetForcedParams()) {
+      ERROR("The module " << module->getType() << " has unset parameters which have to be set by the user !")
+      continue;
+    }
+
     //Set the module dependent log level
     logSystem.setLogLevel(module->getLogLevel());
     logSystem.setDebugLevel(module->getDebugLevel());

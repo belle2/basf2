@@ -32,8 +32,13 @@ namespace Belle2 {
   public:
 
     //! Constructor
-    ModuleParamBase(const std::string& typeInfo, const std::string& description)
-        : m_typeInfo(typeInfo), m_description(description), m_setInSteering(false) {};
+    /*!
+        \param typeInfo The type string of the parameter.
+        \param description The description of the parameter.
+        \param force If true the parameter has to be set in the steering file by the user.
+    */
+    ModuleParamBase(const std::string& typeInfo, const std::string& description, bool force)
+        : m_typeInfo(typeInfo), m_description(description), m_forceInSteering(force), m_setInSteering(false) {};
 
     //! Destructor
     virtual ~ModuleParamBase() {};
@@ -62,11 +67,19 @@ namespace Belle2 {
     const bool isSetInSteering() const {return m_setInSteering; }
 
 
+    //! Returns true if the parameter has to be set by the user in the steering file.
+    /*!
+        \return True if the parameter has to be set in the steering file.
+    */
+    const bool isForcedInSteering() const {return m_forceInSteering; }
+
+
   protected:
 
-    std::string m_typeInfo;      /*!< The type of the parameter stored as string. */
-    std::string m_description;   /*!< The (optional) description of the parameter. */
-    bool        m_setInSteering; /*!< True, if the parameter value was changed in the steering file. */
+    std::string m_typeInfo;        /*!< The type of the parameter stored as string. */
+    std::string m_description;     /*!< The (optional) description of the parameter. */
+    bool        m_forceInSteering; /*!< If true the parameter has to be set by the user in the steering file. */
+    bool        m_setInSteering;   /*!< True, if the parameter value was changed in the steering file. */
 
 
   private:
@@ -91,9 +104,10 @@ namespace Belle2 {
 
         \param paramVariable Reference to the variable which stores the parameter value.
         \param description The optional description of the parameter.
+        \param force If true the parameter has to be set by the user in the steering file.
     */
-    ModuleParam(T& paramVariable, const std::string& description = "")
-        : ModuleParamBase(typeid(T).name(), description), m_paramVariable(paramVariable) {};
+    ModuleParam(T& paramVariable, const std::string& description = "", bool force = false)
+        : ModuleParamBase(typeid(T).name(), description, force), m_paramVariable(paramVariable) {};
 
     //! Destructor
     virtual ~ModuleParam() {};
@@ -163,6 +177,7 @@ namespace Belle2 {
     boost::python::list m_defaultValues; /*!< The default values of the parameter as a python list. */
     boost::python::list m_values;        /*!< The values of the parameter as a python list. */
     std::string m_description;           /*!< The description of the parameter. */
+    bool m_forceInSteering;              /*!< If true the parameter has to be set by the user in the steering file. */
     bool m_setInSteering;                /*!< True if the parameter was set in the steering file. */
 
 
@@ -175,6 +190,7 @@ namespace Belle2 {
       .def_readonly("default", &ModuleParamInfoPython::m_defaultValues)
       .def_readonly("values", &ModuleParamInfoPython::m_values)
       .def_readonly("description", &ModuleParamInfoPython::m_description)
+      .def_readonly("forceInSteering", &ModuleParamInfoPython::m_forceInSteering)
       .def_readonly("setInSteering", &ModuleParamInfoPython::m_setInSteering)
       ;
     }

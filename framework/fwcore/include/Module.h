@@ -212,6 +212,13 @@ namespace Belle2 {
     */
     bool isRegisteredToFramework() const {return m_registeredToFramework; };
 
+    //! Returns true if the module has still unset parameters which the user has to set in the steering file.
+    /*!
+        \return True if the module has still unset parameters which the user has to set in the steering file.
+    */
+    bool hasUnsetForcedParams() const;
+
+
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     //                   Python API
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -250,9 +257,10 @@ namespace Belle2 {
         \param paramVariable The local member variable of the module to which the value from the steering file is written.
         \param defaultValue The default value of the parameter which is used if there was no value given in the steering file.
         \param description Optional: a short description of the parameter.
+        \param force Optional: If set to true the parameter has to be set in the steering file by the user.
     */
     template<typename T>
-    void addParam(const std::string& name, T& paramVariable, const T& defaultValue, const std::string& description = "");
+    void addParam(const std::string& name, T& paramVariable, const T& defaultValue, const std::string& description = "", bool force = false);
 
     //! Returns a reference to a parameter. The returned parameter has already the correct type.
     /*!
@@ -361,9 +369,9 @@ namespace Belle2 {
   //------------------------------------------------------
 
   template<typename T>
-  void Module::addParam(const std::string& name, T& paramVariable, const T& defaultValue, const std::string& description)
+  void Module::addParam(const std::string& name, T& paramVariable, const T& defaultValue, const std::string& description, bool force)
   {
-    m_moduleParamList.addParameter(name, paramVariable, defaultValue, description);
+    m_moduleParamList.addParameter(name, paramVariable, defaultValue, description, force);
   }
 
 

@@ -86,9 +86,10 @@ namespace Belle2 {
         \param paramVariable Reference to the variable which stores the parameter value.
         \param defaultValue The default value of the parameter.
         \param description An optional description of the parameter.
+        \param force If set to true the parameter has to be defined in the steering file by the user.
     */
     template<typename T>
-    void addParameter(const std::string& name, T& paramVariable, const T& defaultValue, const std::string& description = "");
+    void addParameter(const std::string& name, T& paramVariable, const T& defaultValue, const std::string& description = "", bool force = false);
 
     //! Sets the value of a parameter given by its name.
     /*!
@@ -118,6 +119,11 @@ namespace Belle2 {
     */
     ParamTypeInfo::ParamTypeInfo getParamTypeInfo(const std::string& name) const;
 
+    //! Returns true if unset parameters exist which the user has to set in the steering file.
+    /*!
+        \return True if unset parameters exist which the user has to set in the steering file.
+    */
+    bool hasUnsetForcedParams() const;
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     //                   Python API
@@ -235,9 +241,9 @@ namespace Belle2 {
   //======================================================
 
   template<typename T>
-  void ModuleParamList::addParameter(const std::string& name, T& paramVariable, const T& defaultValue, const std::string& description)
+  void ModuleParamList::addParameter(const std::string& name, T& paramVariable, const T& defaultValue, const std::string& description, bool force)
   {
-    ModuleParamPtr newParam(new ModuleParam<T>(paramVariable, description));
+    ModuleParamPtr newParam(new ModuleParam<T>(paramVariable, description, force));
 
     //Check if a parameter with the given name already exists
     std::map<std::string, ModuleParamPtr>::iterator mapIter;

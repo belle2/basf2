@@ -59,7 +59,7 @@ SimModule::SimModule() : Module("SimModule"), m_run_mgr(NULL)
   addParam("TrackingVerbosity", m_trackVerbose, 0, "Control tracking verbose level in Geant4");
   addParam("InteractiveG4", m_interactiveG4, false, "If true, interactive mode will start");
   addParam("Visualize", m_vis, false, "If true, open visualization function and visualization driver is needed, like OpenGL");
-  addParam("MacroName", m_macroName, string("None"), "Macro name");
+  addParam("MacroName", m_macroName, string("None"), "Macro name", true);
   addParam("MaxNumStep", m_maxNumberSteps, 100000, "The maximum number of steps before a track is stopped and killed");
   addParam("MaxZeroStep", m_maxZeroSteps, 100, "The maximum number of zero steps in a row before a track is stopped and killed");
 }

@@ -92,7 +92,7 @@ namespace Belle2 {
       \param path The path to the nodes which are counted.
       \return The number of nodes.
     */
-    virtual int getNumberNodes(const std::string& path) const
+    virtual int getNumberNodes(const std::string& path = "") const
     throw(GbxExcIONotConnected, GbxExcPathNotValid, GbxExcPathEmptyResult, GbxExcPathResultNotValid) = 0;
 
     //! Returns a parameter, given by the path, which describes a length.
@@ -114,7 +114,7 @@ namespace Belle2 {
       \return The value of the length parameter in [cm]. If no unit or an unknown unit is given,
               the value is assumed to be in [cm].
     */
-    virtual double getParamLength(const std::string& path) const
+    virtual double getParamLength(const std::string& path = "") const
     throw(GbxExcIONotConnected, GbxExcPathNotValid, GbxExcParamNotExists, GbxExcPathEmptyResult,
           GbxExcPathResultNotValid, GbxExcStringNumConvFailed) = 0;
 
@@ -137,7 +137,7 @@ namespace Belle2 {
       \return The value of the length parameter in [rad]. If no unit or an unknown unit is given,
               the value is assumed to be in [rad].
     */
-    virtual double getParamAngle(const std::string& path) const
+    virtual double getParamAngle(const std::string& path = "") const
     throw(GbxExcIONotConnected, GbxExcPathNotValid, GbxExcParamNotExists, GbxExcPathEmptyResult,
           GbxExcPathResultNotValid, GbxExcStringNumConvFailed) = 0;
 
@@ -157,7 +157,7 @@ namespace Belle2 {
       \param path The path to the node which should be returned.
       \return The numerical value.
     */
-    virtual double getParamNumValue(const std::string& path) const
+    virtual double getParamNumValue(const std::string& path = "") const
     throw(GbxExcIONotConnected, GbxExcPathNotValid, GbxExcParamNotExists, GbxExcPathEmptyResult,
           GbxExcPathResultNotValid, GbxExcStringNumConvFailed) = 0;
 
@@ -176,7 +176,7 @@ namespace Belle2 {
       \param path The path to the node which should be returned.
       \return The string value.
     */
-    virtual std::string getParamString(const std::string& path) const
+    virtual std::string getParamString(const std::string& path = "") const
     throw(GbxExcIONotConnected, GbxExcPathNotValid, GbxExcParamNotExists, GbxExcPathEmptyResult,
           GbxExcPathResultNotValid) = 0;
 

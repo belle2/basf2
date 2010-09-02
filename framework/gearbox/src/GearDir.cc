@@ -11,7 +11,10 @@
 #include <framework/gearbox/Gearbox.h>
 #include <framework/gearbox/GearDir.h>
 
+#include <boost/format.hpp>
+
 using namespace std;
+using namespace boost;
 using namespace Belle2;
 
 
@@ -21,9 +24,15 @@ GearDir::GearDir(const std::string& path) : GearboxIOAbs(), m_dirPath(path)
 }
 
 
-GearDir::GearDir(GearDir& gearDir, const std::string& path = "") : GearboxIOAbs()
+GearDir::GearDir(GearDir& gearDir, const std::string& path) : GearboxIOAbs()
 {
   m_dirPath = gearDir.getDirPath() + path;
+}
+
+
+GearDir::GearDir(GearDir& gearDir, const int index) : GearboxIOAbs()
+{
+  m_dirPath = (format(gearDir.getDirPath() + "[%1%]/") % (index)).str();
 }
 
 

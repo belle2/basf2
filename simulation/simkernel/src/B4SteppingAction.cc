@@ -39,7 +39,7 @@ B4SteppingAction :: B4SteppingAction()
   m_maxNumberSteps = 100000;
 
   //Default value for the maximum number of zero steps in a row
-  m_maxZeroSteps = 4;
+  m_maxZeroSteps = 100;
 }
 
 
@@ -75,9 +75,9 @@ void B4SteppingAction::UserSteppingAction(const G4Step* aStep)
   //-----------------------------------------------------
   // If the track out of tsukuba_hall (+0.01m), kill it.
   //-----------------------------------------------------
-  if (fabs(stepPos.x()) > (m_worldBoxSize[0] + 0.01) * m ||
-      fabs(stepPos.y()) > (m_worldBoxSize[1] + 0.01) * m ||
-      fabs(stepPos.z()) > (m_worldBoxSize[2] + 0.01) * m) {
+  if (fabs(stepPos.x()) > (m_worldBoxSize[0] + 1.0) * m ||
+      fabs(stepPos.y()) > (m_worldBoxSize[1] + 1.0) * m ||
+      fabs(stepPos.z()) > (m_worldBoxSize[2] + 1.0) * m) {
     INFO("Event ID: " << G4RunManager::GetRunManager()->GetCurrentEvent()->GetEventID()
          << " Out of World " << G4BestUnit(stepPos, "Length"));
     track->SetTrackStatus(fStopAndKill);

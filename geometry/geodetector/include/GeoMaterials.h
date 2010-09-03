@@ -57,6 +57,22 @@ namespace Belle2 {
 
   private:
 
+    //! Reads the values of a Material and returns a pointer to the created Material object.
+    /*!
+      \param materialContent A GearDir pointing to the material description.
+      \param weight Returns a weight for a material mixture if it is defined. If not -1 is returned.
+      \return A pointer to the created TGeoMaterial object.
+    */
+    TGeoMaterial* readMaterial(GearDir& materialContent, double& weight);
+
+    //! Reads the values of an Element and returns a pointer to the created Element object.
+    /*!
+      \param materialContent A GearDir pointing to the element description.
+      \param weight Returns a weight for a material mixture.
+      \return A pointer to the created TGeoElement object.
+    */
+    TGeoElement* readElement(GearDir& elementContent, double& weight);
+
   };
 
 

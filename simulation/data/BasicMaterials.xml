@@ -14,15 +14,15 @@
 		<Mixture name="Vacuum">
 			<Density>1.2e-12</Density>
 			<Elements>
-				<Element weight="0.78">
+				<Element name="N" weight="0.78">
 					<AtomNumber>7.0</AtomNumber>
 					<MassNumber>14.01</MassNumber>
 				</Element>
-				<Element weight="0.21">
+				<Element name="O" weight="0.21">
 					<AtomNumber>8.0</AtomNumber>
 					<MassNumber>16.00</MassNumber>
 				</Element>
-				<Element weight="0.01">
+				<Element name="Ar" weight="0.01">
 					<AtomNumber>18.0</AtomNumber>
 					<MassNumber>39.95</MassNumber>
 				</Element>
@@ -32,15 +32,15 @@
 		<Mixture name="Air">
 			<Density>1.2e-3</Density>
 			<Elements>
-				<Element weight="0.78">
+				<Element name="N" weight="0.78">
 					<AtomNumber>7.0</AtomNumber>
 					<MassNumber>14.01</MassNumber>
 				</Element>
-				<Element weight="0.21">
+				<Element name="O" weight="0.21">
 					<AtomNumber>8.0</AtomNumber>
 					<MassNumber>16.00</MassNumber>
 				</Element>
-				<Element weight="0.01">
+				<Element name="Ar" weight="0.01">
 					<AtomNumber>18.0</AtomNumber>
 					<MassNumber>39.95</MassNumber>
 				</Element>
@@ -50,15 +50,15 @@
                 <Mixture name="CDCGas">
                         <Density>7.67e-4</Density>
                         <Elements>
-                                <Element weight="0.5">
+                                <Element name="He" weight="0.5">
                                         <AtomNumber>2.0</AtomNumber>
                                         <MassNumber>4.002602</MassNumber>
                                 </Element>
-                                <Element weight="0.399">
+                                <Element name="C" weight="0.399">
                                         <AtomNumber>6.0</AtomNumber>
                                         <MassNumber>12.011</MassNumber>
                                 </Element>
-                                <Element weight="0.101">
+                                <Element name="H" weight="0.101">
                                         <AtomNumber>1.0</AtomNumber>
                                         <MassNumber>1.00794</MassNumber>
                                 </Element>
@@ -68,7 +68,7 @@
                 <Mixture name="Helium">
                         <Density>1.786e-4</Density>
                         <Elements>
-                                <Element weight="1.0">
+                                <Element name="He" weight="1.0">
                                         <AtomNumber>2.0</AtomNumber>
                                         <MassNumber>4.002602</MassNumber>
                                 </Element>
@@ -78,11 +78,11 @@
                 <Mixture name="Ethane">
                         <Density>1.356e-3</Density>
                         <Elements>
-                                <Element weight="0.7989">
+                                <Element name="C" weight="0.7989">
                                         <AtomNumber>6.0</AtomNumber>
                                         <MassNumber>12.011</MassNumber>
                                 </Element>
-                                <Element weight="0.2011">
+                                <Element name="H" weight="0.2011">
                                         <AtomNumber>1.0</AtomNumber>
                                         <MassNumber>1.00794</MassNumber>
                                 </Element>
@@ -92,15 +92,15 @@
                 <Mixture name="CFRP">
                         <Density>1.555</Density>
                         <Elements>
-                                <Element weight="0.912">
+                                <Element name="C" weight="0.912">
                                         <AtomNumber>6.0</AtomNumber>
                                         <MassNumber>12.011</MassNumber>
                                 </Element>
-                                <Element weight="0.002">
+                                <Element name="H" weight="0.002">
                                         <AtomNumber>1.0</AtomNumber>
                                         <MassNumber>1.00794</MassNumber>
                                 </Element>
-                                <Element weight="0.086">
+                                <Element name="O" weight="0.086">
                                         <AtomNumber>8.0</AtomNumber>
                                         <MassNumber>15.999</MassNumber>
                                 </Element>
@@ -110,11 +110,11 @@
 		<Mixture name="Paraffin">
 			<Density>0.93</Density>
 			<Elements>
-				<Element weight="0.15">
+				<Element name="H" weight="0.15">
 					<AtomNumber>1.0</AtomNumber>
 					<MassNumber>1.00794</MassNumber>
 				</Element>
-				<Element weight="0.85">
+				<Element name="C" weight="0.85">
 					<AtomNumber>6.0</AtomNumber>
 					<MassNumber>12.0107</MassNumber>
 				</Element>
@@ -124,19 +124,19 @@
                 <Mixture name="NEMA_G10_Plate">
                         <Density>1.70</Density>
                         <Elements>      
-                                <Element weight="0.2802">
+                                <Element name="Si" weight="0.2802">
                                         <AtomNumber>14.0</AtomNumber>
                                         <MassNumber>28.0855</MassNumber>
                                 </Element>
-                                <Element weight="0.3874">
+                                <Element name="O" weight="0.3874">
                                         <AtomNumber>8.0</AtomNumber>
                                         <MassNumber>15.9994</MassNumber>
                                 </Element>
-                                <Element weight="0.304">
+                                <Element name="C" weight="0.304">
                                         <AtomNumber>6.0</AtomNumber>
                                         <MassNumber>12.011</MassNumber>
                                 </Element>
-                                <Element weight="0.0284">
+                                <Element name="H" weight="0.0284">
                                         <AtomNumber>1.0</AtomNumber>
                                         <MassNumber>1.00794</MassNumber>
                                 </Element>
@@ -190,6 +190,5 @@
 			<RadLength>1.0</RadLength>
 			<InterLength>0</InterLength>
 		</Material>
-
 	</Content>
 </ParamSet>

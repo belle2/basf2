@@ -155,6 +155,9 @@ def configure_externals(conf):
         print '-> create it with the command "scons externals"'
         return False
 
+    # genfit
+    conf.env.Append(CPPPATH = os.path.join(conf.env['EXTINCDIR'], 'genfit'))
+
     return True
 
 
@@ -203,6 +206,17 @@ def check_externals(conf):
             return False
         if not root_target:
             print 'root is not built'
+            print '-> build it with the command "scons externals"'
+            return False
+
+    # genfit
+    if not conf.CheckFile('externals/include/genfit/GFTrack.h', 'genfit'):
+        if not conf.CheckFile('externals/Makefile', 'externals package'):
+            print 'genfit is missing'
+            print '-> add and build the externals package'
+            return False
+        if BUILD_TARGETS[0] not in ['externals', 'externals.genfit']:
+            print 'genfit is not built'
             print '-> build it with the command "scons externals"'
             return False
 

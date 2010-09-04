@@ -5,9 +5,11 @@ export EXTINCDIR := $(EXTDIR)/include
 export EXTLIBDIR := $(EXTDIR)/lib/$(BELLE2_SUBDIR)
 export EXTBINDIR := $(EXTDIR)/bin/$(BELLE2_SUBDIR)
 
+export GENFIT := $(EXTDIR)/genfit
+
 
 # all target
-all: boost clhep geant4 root
+all: boost clhep geant4 root genfit
 
 # clean up target
 clean:
@@ -90,3 +92,18 @@ root/config/Makefile.config:
 	--prefix=$(EXTDIR) --etcdir=$(EXTDIR)/share/etc --enable-gsl-shared \
 	--with-g4-incdir=$(EXTINCDIR)/geant4 --with-g4-libdir=$(EXTLIBDIR) \
 	--with-clhep-incdir=$(EXTINCDIR); make; make install
+
+
+# dependence for genfit build
+genfit: genfit/lib/libgenfit.so
+
+# genfit build command
+genfit/lib/libgenfit.so:
+	@echo "building genfit"
+	@cd genfit; cmake .; make
+	@cp -a $(EXTDIR)/genfit/lib/* $(EXTLIBDIR)
+	@mkdir -p $(EXTINCDIR)/genfit
+	@cp -a $(EXTDIR)/genfit/core/*.h $(EXTINCDIR)/genfit/
+	@cp -a $(EXTDIR)/genfit/core/*/*.h $(EXTINCDIR)/genfit/
+	@cp -a $(EXTDIR)/genfit/RKTrackRep/*.h $(EXTINCDIR)/genfit/
+

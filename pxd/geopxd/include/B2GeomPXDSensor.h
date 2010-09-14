@@ -41,7 +41,7 @@ namespace Belle2 {
     string path;
 
     //! TGeoVolumeAssembly which contains all parts of this sensor
-    TGeoVolumeAssembly* volPXDSensor;
+    TGeoVolume* volPXDSensor;
 
     //! Volumes contained in the sensor
     TGeoVolume* volSilicon;
@@ -53,7 +53,6 @@ namespace Belle2 {
     //! Mediums contained in the sensor
     TGeoMedium* medAir;
     TGeoMedium* medDEPFET;
-    TGeoMedium* medActiveSensor;
     TGeoMedium* medPXD_Silicon;
 
     // Parameters
@@ -64,9 +63,13 @@ namespace Belle2 {
     //! Number of this sensor
     Int_t iSensor;
 
+    //! Sensor type (1 = Laye1, 2 = Layer2, 9x = active sensor only)
+    Int_t iSensorType;
+
     // box which contains whole sensor
     Double_t fSensorWidth;
     Double_t fSensorThick;
+    Double_t fSensorLength;
 
     // box of active DEPFET area
     Double_t fLengthActive;
@@ -93,9 +96,10 @@ namespace Belle2 {
     Double_t fThickSilicon;
 
 
-    //! Methods to place components
+    // Methods to place components
     void putDEPFET();
     void putSilicon();
+    void putActiveSiliconOnly();
     void putSwitchers();
 
   public:
@@ -109,12 +113,26 @@ namespace Belle2 {
     Bool_t init();
 #endif
     Bool_t make();
-    TGeoVolumeAssembly* getVol() {
+
+    TGeoVolume* getVol() {
+      /*
+      volPXDSensor =  new TGeoVolumeAssembly("bla");
+      char nameLayer[200];
+      TGeoMaterial* matVacuum = new TGeoMaterial("Vacuum", 0, 0, 0);
+      TGeoMedium* medLayer = new TGeoMedium("medLayer", 1, matVacuum);
+      sprintf(nameLayer, "Layer_%i", iLayer);
+      TGeoVolume* layer = gGeoManager->MakeBox(nameLayer, medLayer, 0.2, 0.2, 0.2);
+      return layer;
+      //volPXDSensor->AddNode(layer, 1, new TGeoTranslation(0,0,0));
+      */
       return volPXDSensor;
     }
     Double_t getLengthSilicon();
     //! returns TGeoHMatrix which moves the sensor to the center of the surface
     TGeoHMatrix getSurfaceCenterPosition();
+    //! returns TGeoHMatrix which points from the sensor(0,0,0) to the active_sensor(0,0,0)
+    TGeoHMatrix getActiveSensorCenter();
+
   };
 
 #ifdef B2GEOM_BASF2

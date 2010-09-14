@@ -1,9 +1,11 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <Sensors>
   <Sensor desc="The small PXD sensor" type="1">
+  <SensorType desc="1 = Layer1, 2 = Layer2, 9x = active sensor only">1</SensorType>
               <MaterialSensor>Silicon</MaterialSensor>
               <Width unit="mm">15</Width>
               <Thickness unit="um">420</Thickness>
+              <Length unit="mm">67.975</Length>
 						<LengthActive desc="The over all length of the sensor" unit="mm">44.725</LengthActive>
 						<WidthActive desc="The over all width of the sensor" unit="mm">12.5</WidthActive>
 						<ThicknessActive desc="Thickness of the sensors" unit="um">75</ThicknessActive>
@@ -21,9 +23,11 @@
 
   </Sensor>
   <Sensor desc="The large PXD sensor" type="2">
+  <SensorType desc="1 = Layer1, 2 = Layer2, 9x = active sensor only">2</SensorType>
               <MaterialSensor>Silicon</MaterialSensor>
               <Width unit="mm">15</Width>
               <Thickness unit="um">420</Thickness>
+              <Length unit="mm">84.975</Length>
 						<LengthActive desc="The over all length of the active sensor" unit="mm">61.725</LengthActive>
 						<WidthActive desc="The over all width of the active sensor" unit="mm">12.5</WidthActive>
 						<ThicknessActive desc="Thickness of the active sensor" unit="um">75</ThicknessActive>
@@ -38,5 +42,33 @@
 						<UDistanceThinnedFromOuterEdge unit="mm">2</UDistanceThinnedFromOuterEdge>
 						<UDistanceThinnedFromInnerEdge unit="mm">1</UDistanceThinnedFromInnerEdge>
            <AlphaThinned unit="deg">54.7</AlphaThinned>						
+					</Sensor>
+					
+					  <Sensor desc="The small PXD sensor" type="91">
+					  <SensorType desc="1 = Layer1, 2 = Layer2, 9x = active sensor only">91</SensorType>
+              <MaterialSensor>Silicon</MaterialSensor>
+              <Width unit="mm">15</Width>
+              <Thickness unit="um">420</Thickness>
+              <Length unit="mm">67.975</Length>
+						<LengthActive desc="The over all length of the sensor" unit="mm">44.725</LengthActive>
+						<WidthActive desc="The over all width of the sensor" unit="mm">12.5</WidthActive>
+						<ThicknessActive desc="Thickness of the sensors" unit="um">75</ThicknessActive>
+						<LengthSilicon desc="The over all length of the sensor" unit="mm">67.975</LengthSilicon>
+						<WidthSilicon desc="The over all width of the sensor" unit="mm">15</WidthSilicon>
+						<ThicknessSilicon desc="Thickness of the sensors" unit="um">420</ThicknessSilicon>
+  </Sensor>
+
+  <Sensor desc="The large PXD sensor" type="92">
+  <SensorType desc="1 = Layer1, 2 = Layer2, 9x = active sensor only">92</SensorType>
+              <MaterialSensor>Silicon</MaterialSensor>
+              <Width unit="mm">15</Width>
+              <Thickness unit="um">420</Thickness>
+              <Length unit="mm">84.975</Length>
+						<LengthActive desc="The over all length of the active sensor" unit="mm">61.725</LengthActive>
+						<WidthActive desc="The over all width of the active sensor" unit="mm">12.5</WidthActive>
+						<ThicknessActive desc="Thickness of the active sensor" unit="um">75</ThicknessActive>
+						<LengthSilicon desc="The over all length of the sensor" unit="mm">84.975</LengthSilicon>
+						<WidthSilicon desc="The over all width of the sensor" unit="mm">15</WidthSilicon>
+						<ThicknessSilicon desc="Thickness of the sensor" unit="um">420</ThicknessSilicon>
 					</Sensor>
   </Sensors>

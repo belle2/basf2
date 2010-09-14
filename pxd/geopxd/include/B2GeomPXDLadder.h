@@ -49,7 +49,7 @@ namespace Belle2 {
     TGeoVolumeAssembly* volPXDLadder;
 
     //! Volumes contained in the sensor
-    vector<B2GeomPXDSensor*> b2gPXDSensors;
+    B2GeomPXDSensor** b2gPXDSensors;
 
     // Parameters
     //! layer number

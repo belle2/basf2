@@ -78,14 +78,16 @@ void GeoPXDBelleII::create(GearDir& content)
   //Get number of layers
   int nLayer = content.getNumberNodes("Layers/Layer");
 
+
   for (int iLayer = 1; iLayer <= nLayer; ++iLayer) {
 
     //Build geometry
+
     B2GeomPXDLayer* b2gPXDLayer = new B2GeomPXDLayer(iLayer);
     b2gPXDLayer->init(content);
     b2gPXDLayer->make();
 
-    volGrpPXD->AddNode(b2gPXDLayer->getVol(), 1);
+    volGrpPXD->AddNode(b2gPXDLayer->getVol(), 1, new TGeoTranslation(0, 0, 0));
 
   }
 }

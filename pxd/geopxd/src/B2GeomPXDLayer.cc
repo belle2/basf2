@@ -69,6 +69,7 @@ Bool_t B2GeomPXDLayer::init()
 Bool_t B2GeomPXDLayer::make()
 {
   volPXDLayer = new TGeoVolumeAssembly(path.c_str());
+
   for (int iLadder = 0; iLadder < nLadders; ++iLadder) {
     putLadder(iLadder);
   }

@@ -43,7 +43,7 @@ Bool_t B2GeomPXDLadder::init(GearDir& content)
   ladderContent = GearDir(content);
   ladderContent.append("Ladder/");
   nSensors = int(ladderContent.getParamNumValue("NumberOfSensors"));
-  b2gPXDSensors.resize(nSensors);
+  b2gPXDSensors = new B2GeomPXDSensor*[nSensors];
   fVPosition.resize(nSensors);
   for (Int_t iSensor = 0; iSensor < nSensors; iSensor++) {
     GearDir sensorPositionContent(ladderContent);
@@ -85,6 +85,7 @@ void B2GeomPXDLadder::putSensors()
     hmaHelp = gGeoIdentity;
     hmaHelp = b2gPXDSensors[iSensor]->getSurfaceCenterPosition() * hmaHelp;
     hmaHelp = tra * hmaHelp;
+
     volPXDLadder->AddNode(b2gPXDSensors[iSensor]->getVol(), 1, new TGeoHMatrix(hmaHelp));
   }
 }

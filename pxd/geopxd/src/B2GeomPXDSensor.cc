@@ -53,10 +53,22 @@ Bool_t B2GeomPXDSensor::init(GearDir& content)
 
   fSensorWidth = sensorContent.getParamLength("Width");
   fSensorThick = sensorContent.getParamLength("Thickness");
+  fSensorLength = sensorContent.getParamLength("Length");
 
   fLengthActive      = sensorContent.getParamLength("LengthActive");
   fWidthActive       = sensorContent.getParamLength("WidthActive");
   fThickActive       = sensorContent.getParamLength("ThicknessActive");
+
+  iSensorType = sensorContent.getParamNumValue("SensorType");
+
+  // Get materials
+  string sensorMatName  = sensorContent.getParamString("MaterialSensor");
+  medPXD_Silicon = gGeoManager->GetMedium(sensorMatName.c_str());
+  TGeoMaterial* matVacuum = new TGeoMaterial("Vacuum", 0, 0, 0);
+  medAir = new TGeoMedium("medAir", 1, matVacuum);
+
+  // don't read any further parameters if active sensor only
+  if (iSensorType >= 90) return true;
 
   fVDistanceActiveFromInnerEdge = sensorContent.getParamLength("VDistanceActiveFromInnerEdge");
   fUDistanceActiveFromInnerEdge = sensorContent.getParamLength("UDistanceActiveFromInnerEdge");
@@ -71,16 +83,6 @@ Bool_t B2GeomPXDSensor::init(GearDir& content)
   fLengthSilicon = sensorContent.getParamLength("LengthSilicon");
   fWidthSilicon = sensorContent.getParamLength("WidthSilicon");
   fThickSilicon = sensorContent.getParamLength("ThicknessSilicon");
-
-  // Get materials
-  string sensorMatName  = sensorContent.getParamString("MaterialSensor");
-  medDEPFET = gGeoManager->GetMedium(sensorMatName.c_str());
-  medActiveSensor = gGeoManager->GetMedium(sensorMatName.c_str());
-  medPXD_Silicon = gGeoManager->GetMedium(sensorMatName.c_str());
-
-  TGeoMaterial* matVacuum = new TGeoMaterial("Vacuum", 0, 0, 0);
-  medAir = new TGeoMedium("medAir", 1, matVacuum);
-
 
   return true;
 
@@ -110,10 +112,23 @@ Bool_t B2GeomPXDSensor::init()
 
 Bool_t B2GeomPXDSensor::make()
 {
-  volPXDSensor = new TGeoVolumeAssembly(path.c_str());
-  putSilicon();
-  // putDEPFET();
-  // putSwitchers();
+  // volPXDSensor = new TGeoVolumeAssembly(path.c_str());
+  volPXDSensor = gGeoManager->MakeBox(path.c_str(), medAir,
+                                      0.5 * fSensorThick,
+                                      0.5 * fSensorWidth,
+                                      0.5 * fSensorLength);
+  return true;
+  if (iSensorType < 90) {
+    // create full PXD
+    putSilicon();
+    // putSwitchers();
+  } else {
+    // create active silicon only
+    putActiveSiliconOnly();
+  }
+
+
+
   return true;
 }
 
@@ -171,11 +186,11 @@ void B2GeomPXDSensor::putSilicon()
 
   }
   // different Layer number different position of thinned volume in U
-  if (iLayer == 1) {
+  if (iSensorType == 1) {
     TGeoTranslation tra(0.0, 0.5 * fWidthSilicon - fUDistanceThinnedFromOuterEdge - 0.5 * fWidth1Thinned, 0.0);
     hmaHelp = tra * hmaHelp;
   }
-  if (iLayer == 2) {
+  if (iSensorType == 2) {
     TGeoTranslation tra(0.0, -0.5 * fWidthSilicon + fUDistanceThinnedFromOuterEdge + 0.5 * fWidth1Thinned, 0.0);
     hmaHelp = tra * hmaHelp;
   }
@@ -208,7 +223,51 @@ void B2GeomPXDSensor::putSilicon()
   volActiveSensor->SetLineColor(kBlue - 10);
 
 
+  // add active volume to the silicon
+  volSilicon->AddNode(volActiveSensor, 1, new TGeoHMatrix(getActiveSensorCenter()));
+
+  // add silicon volume to sensor volume
+  volPXDSensor->AddNode(volSilicon, 1, new TGeoTranslation(0.0, 0.0, 0.0));
+}
+
+void B2GeomPXDSensor::putActiveSiliconOnly()
+{
+// Create the active volume to the silicon
+  char nameActive[200];
+  sprintf(nameActive, "SD_%s_ActiveSensor", path.c_str());
+  volActiveSensor = gGeoManager->MakeBox(nameActive, medPXD_Silicon,
+                                         0.5 * fThickActive,
+                                         0.5 * fWidthActive,
+                                         0.5 * fLengthActive);
+  volActiveSensor->SetLineColor(kBlue - 10);
+  volPXDSensor->AddNode(volActiveSensor, 1, new TGeoHMatrix(getActiveSensorCenter()));
+}
+
+
+void B2GeomPXDSensor::putSwitchers()
+{
+  // TGeoVolume *box = gGeoManager->MakeBox("test", medAir, 0.25, 0.25, 0.25);
+  // volPXDSensor->AddNode(box, 1, new TGeoTranslation(-.125-0.5*fSensorThick,0,0));
+}
+
+Double_t B2GeomPXDSensor::getLengthSilicon()
+{
+  return fLengthSilicon;
+}
+
+TGeoHMatrix B2GeomPXDSensor::getSurfaceCenterPosition()
+{
+  TGeoHMatrix hmaHelp;
+  TGeoTranslation tra(0.5*fThickSilicon, 0.0, 0.0);
+  hmaHelp = gGeoIdentity;
+  hmaHelp = tra * hmaHelp;
+  return hmaHelp;
+}
+
+TGeoHMatrix B2GeomPXDSensor::getActiveSensorCenter()
+{
   // define position of active volume inside the silicon
+  TGeoHMatrix hmaHelp;
   hmaHelp = gGeoIdentity;
   TGeoTranslation traActive(0.5 * fThickSilicon - 0.5 * fThickActive, 0.0 , 0.0);
   hmaHelp = traActive * hmaHelp;
@@ -233,34 +292,7 @@ void B2GeomPXDSensor::putSilicon()
     TGeoTranslation tra(0.0, 0.5 * fWidthSilicon - fUDistanceActiveFromInnerEdge - 0.5 * fWidthActive, 0.0);
     hmaHelp = tra * hmaHelp;
   }
-
-
-  // add active volume to the silicon
-  volSilicon->AddNode(volActiveSensor, 1, new TGeoHMatrix(hmaHelp));
-
-  // add silicon volume to sensor volume
-  volPXDSensor->AddNode(volSilicon, 1, new TGeoTranslation(0.0, 0.0, 0.0));
-}
-
-
-
-void B2GeomPXDSensor::putSwitchers()
-{
-  // TGeoVolume *box = gGeoManager->MakeBox("test", medAir, 0.25, 0.25, 0.25);
-  // volPXDSensor->AddNode(box, 1, new TGeoTranslation(-.125-0.5*fSensorThick,0,0));
-}
-
-Double_t B2GeomPXDSensor::getLengthSilicon()
-{
-  return fLengthSilicon;
-}
-
-TGeoHMatrix B2GeomPXDSensor::getSurfaceCenterPosition()
-{
-  TGeoHMatrix hmaHelp;
-  TGeoTranslation tra(0.5*fThickSilicon, 0.0, 0.0);
-  hmaHelp = gGeoIdentity;
-  hmaHelp = tra * hmaHelp;
   return hmaHelp;
+
 }
 

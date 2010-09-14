@@ -95,6 +95,9 @@ namespace Belle2 {
     //! number of barrel sensors
     Int_t nSensors;
 
+    //! put ribs?
+    bool isRibs;
+
     //! The offsets of the sensors from their ideal position
     vector<B2GeomOffset*> b2gSensorOffsets;
 
@@ -103,10 +106,6 @@ namespace Belle2 {
 
     //! W Position of the sensors
     vector<Double_t> fSensorWPositions;
-
-    //! types of the sensors
-    // 0 = small, 1 = normal, 2 = wedge
-    vector<Int_t> sensorTypes;
 
     //! Angle of the sensors
     vector<Double_t> fThetas;

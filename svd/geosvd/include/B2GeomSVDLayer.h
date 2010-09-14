@@ -60,8 +60,6 @@ namespace Belle2 {
     Double_t fRadius;
     //! Rotation about z axis after moving to fRadius
     vector<Double_t> fPhi;
-    //! Offset in y direction (wind mill structure)
-    Double_t fLadderOffsetY;
 
     //! rotation of the ladder about its local v axis (parallel to global z axis)
     Double_t fPhiLadder;

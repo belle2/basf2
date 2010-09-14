@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <ParamSet type="SVD">
-  <Name>SVD</Name>
+  <Name>SVD BelleII active sensors</Name>
   <Description>The key component of the tracking system</Description>
   <Version>0</Version>
   <Creator>SVDBelleII</Creator>
@@ -17,14 +17,14 @@
         <PhiLadder desc="Rotation of the ladder about its local V axis (parallel to global z axis)" unit="deg">8</PhiLadder>
         <NumberOfLadders desc="Number of ladders in this layer">8</NumberOfLadders>
         <Ladders>
-          <isRibs>1</isRibs>
+        <isRibs>0</isRibs>
           <!-- Common parameters for all ladders -->
           <xi:include href="SVDLadderBelleII.xml" xpointer="xpointer(/*/*)"/>
           <NumberOfSensors>2</NumberOfSensors>
           <Sensors>
             <Sensor id="SVD_Layer_3_Ladder_Sensor_0">
               <SensorParameters>
-                <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Sensor[@type=0]/*)"/>
+                <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Sensor[@type=90]/*)"/>
                 <isSMD desc="Does this sensor has SMD components?">0</isSMD>
               </SensorParameters>
               <Position>
@@ -35,7 +35,7 @@
             </Sensor>
             <Sensor id="SVD_Layer_3_Ladder_Sensor_1">
               <SensorParameters>
-                <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Sensor[@type=0]/*)"/>
+                <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Sensor[@type=90]/*)"/>
                 <isSMD desc="Does this sensor has SMD components?">0</isSMD>
               </SensorParameters>
               <Position>
@@ -53,7 +53,7 @@
         <PhiLadder desc="Rotation of the ladder about its local V axis (parallel to global z axis)" unit="deg">6</PhiLadder>
         <NumberOfLadders desc="Number of ladders in this layer">10</NumberOfLadders>
         <Ladders>
-          <isRibs>1</isRibs>
+              <isRibs>0</isRibs>
           <!-- Common parameters for all ladders -->
           <xi:include href="SVDLadderBelleII.xml" xpointer="xpointer(/*/*)"/>
           <NumberOfSensors>3</NumberOfSensors>
@@ -62,7 +62,7 @@
           <Sensors>
             <Sensor id="SVD_Layer_4_Ladder_Sensor_0">
               <SensorParameters>
-                <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Sensor[@type=1]/*)"/>
+                <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Sensor[@type=91]/*)"/>
                 <isSMD desc="Does this sensor has SMD components?">0</isSMD>
               </SensorParameters>
               <Position>
@@ -73,7 +73,7 @@
             </Sensor>
             <Sensor id="SVD_Layer_4_Ladder_Sensor_1">
               <SensorParameters>
-                <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Sensor[@type=1]/*)"/>
+                <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Sensor[@type=91]/*)"/>
                 <isSMD desc="Does this sensor has SMD components?">1</isSMD>
               </SensorParameters>
               <Position>
@@ -84,7 +84,7 @@
             </Sensor>
             <Sensor id="SVD_Layer_4_Ladder_Sensor_2">
               <SensorParameters>
-                <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Sensor[@type=2]/*)"/>
+                <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Sensor[@type=92]/*)"/>
                 <isSMD desc="Does this sensor has SMD components?">0</isSMD>
               </SensorParameters>
               <Position>
@@ -102,7 +102,7 @@
         <PhiLadder desc="Rotation of the ladder about its local V axis (parallel to global z axis)" unit="deg">7</PhiLadder>
         <NumberOfLadders desc="Number of ladders in this layer">14</NumberOfLadders>
         <Ladders>
-          <isRibs>1</isRibs>
+                <isRibs>0</isRibs>
           <!-- Common parameters for all ladders -->
           <NumberOfSensors>4</NumberOfSensors>
           <xi:include href="SVDLadderBelleII.xml" xpointer="xpointer(/*/*)"/>
@@ -111,7 +111,7 @@
           <Sensors>
             <Sensor id="SVD_Layer_5_Ladder_Sensor_0">
               <SensorParameters>
-                <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Sensor[@type=1]/*)"/>
+                <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Sensor[@type=91]/*)"/>
                 <isSMD desc="Does this sensor has SMD components?">0</isSMD>
               </SensorParameters>
               <Position>
@@ -122,7 +122,7 @@
             </Sensor>
             <Sensor id="SVD_Layer_5_Ladder_Sensor_1">
               <SensorParameters>
-                <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Sensor[@type=1]/*)"/>
+                <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Sensor[@type=91]/*)"/>
                 <isSMD desc="Does this sensor has SMD components?">1</isSMD>
               </SensorParameters>
               <Position>
@@ -133,7 +133,7 @@
             </Sensor>
             <Sensor id="SVD_Layer_5_Ladder_Sensor_2">
               <SensorParameters>
-                <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Sensor[@type=1]/*)"/>
+                <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Sensor[@type=91]/*)"/>
                 <isSMD desc="Does this sensor has SMD components?">1</isSMD>
               </SensorParameters>
               <Position>
@@ -145,7 +145,7 @@
             <Sensor id="SVD_Layer_5_Ladder_Sensor_3">
               <SensorParameters>
                 <isSMD desc="Does this sensor has SMD components?">0</isSMD>
-                <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Sensor[@type=2]/*)"/>
+                <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Sensor[@type=92]/*)"/>
               </SensorParameters>
               <Position>
                 <V desc="sensor position (middle of the volume) in V (local coordinate system of ladder)" unit="mm">226.36</V>
@@ -161,9 +161,9 @@
         <Radius desc="Radius of the layer" unit="mm">140</Radius>
         <Radius2 desc="Radius of slanted part of the ladder" unit="mm">114.0</Radius2>
         <PhiLadder desc="Rotation of the ladder about its local V axis (parallel to global z axis)" unit="deg">7</PhiLadder>
-          <NumberOfLadders desc="Number of ladders in this layer">17</NumberOfLadders>
+                <NumberOfLadders desc="Number of ladders in this layer">17</NumberOfLadders>
         <Ladders>
-          <isRibs>1</isRibs>
+          <isRibs>0</isRibs>
           <!-- Common parameters for all ladders -->
           <xi:include href="SVDLadderBelleII.xml" xpointer="xpointer(/*/*)"/>
           <NumberOfSensors>5</NumberOfSensors>
@@ -172,7 +172,7 @@
           <Sensors>
             <Sensor id="SVD_Layer_6_Ladder_Sensor_0">
               <SensorParameters>
-                <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Sensor[@type=1]/*)"/>
+                <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Sensor[@type=91]/*)"/>
                 <isSMD desc="Does this sensor has SMD components?">0</isSMD>
               </SensorParameters>
               <Position>
@@ -183,7 +183,7 @@
             </Sensor>
             <Sensor id="SVD_Layer_6_Ladder_Sensor_1">
               <SensorParameters>
-                <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Sensor[@type=1]/*)"/>
+                <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Sensor[@type=91]/*)"/>
                 <isSMD desc="Does this sensor has SMD components?">1</isSMD>
               </SensorParameters>
               <Position>
@@ -194,7 +194,7 @@
             </Sensor>
             <Sensor id="SVD_Layer_6_Ladder_Sensor_2">
               <SensorParameters>
-                <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Sensor[@type=1]/*)"/>
+                <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Sensor[@type=91]/*)"/>
                 <isSMD desc="Does this sensor has SMD components?">1</isSMD>
               </SensorParameters>
               <Position>
@@ -205,7 +205,7 @@
             </Sensor>
             <Sensor id="SVD_Layer_6_Ladder_Sensor_3">
               <SensorParameters>
-                <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Sensor[@type=1]/*)"/>
+                <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Sensor[@type=91]/*)"/>
                 <isSMD desc="Does this sensor has SMD components?">1</isSMD>
               </SensorParameters>
               <Position>
@@ -216,7 +216,7 @@
             </Sensor>
             <Sensor id="SVD_Layer_6_Ladder_Sensor_4">
               <SensorParameters>
-                <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Sensor[@type=2]/*)"/>
+                <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Sensor[@type=92]/*)"/>
                 <isSMD desc="Does this sensor has SMD components?">0</isSMD>
               </SensorParameters>
               <Position>

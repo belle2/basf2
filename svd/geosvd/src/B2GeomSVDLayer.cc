@@ -50,7 +50,6 @@ Bool_t B2GeomSVDLayer::init(GearDir& content)
   nLadders = int(layerContent.getParamNumValue("NumberOfLadders"));
   b2gSVDLadders.resize(nLadders);
   fPhi.resize(nLadders);
-  fLadderOffsetY = layerContent.getParamLength("OffsetY");
   fPhiLadder = layerContent.getParamLength("PhiLadder");
   fRadius = layerContent.getParamLength("Radius");
   for (int iLadder = 0; iLadder < nLadders; iLadder++) {

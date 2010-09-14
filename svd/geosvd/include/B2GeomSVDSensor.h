@@ -42,7 +42,7 @@ namespace Belle2 {
     string path;
 
     //! TGeoVolumeAssembly which contains all parts of this sensor
-    TGeoVolumeAssembly* volSVDSensor;
+    TGeoVolume* volSVDSensor;
 
     //! Volumes contained in the sensor
     TGeoVolume* volActiveSensor;
@@ -68,7 +68,7 @@ namespace Belle2 {
     Int_t iLadder;
     //! Number of this sensor
     Int_t iSensor;
-    //! Sensor type (0 = small, 1 = normal, 2 = wedge)
+    //! Sensor type (0 = small, 1 = normal, 2 = wedge, 9x = active sensor only)
     Int_t iSensorType;
 
     //! Dimensions of a box which contains the whole sensor
@@ -111,8 +111,10 @@ namespace Belle2 {
     //! Position of the SMDs in U direction
     Double_t fUPositionSMDs;
 
-    //! Methods to place components
+    // Methods to place components
+    void putContainer();
     void putSilicon();
+    void putActiveSiliconOnly();
     void putFoam();
     void putKapton();
     void putCoolingPipe();
@@ -121,7 +123,7 @@ namespace Belle2 {
   public:
 
     B2GeomSVDSensor();
-    B2GeomSVDSensor(Int_t iLay, Int_t iLad, Int_t iSen, Int_t iST);
+    B2GeomSVDSensor(Int_t iLay, Int_t iLad, Int_t iSen);
     ~B2GeomSVDSensor();
 #ifdef B2GEOM_BASF2
     Bool_t init(GearDir& content);
@@ -129,7 +131,7 @@ namespace Belle2 {
     Bool_t init();
 #endif
     Bool_t make();
-    TGeoVolumeAssembly* getVol() {
+    TGeoVolume* getVol() {
       return volSVDSensor;
     }
     Double_t getLength() {
@@ -137,6 +139,9 @@ namespace Belle2 {
     }
     Double_t getWidth() {
       return fSensorWidth;
+    }
+    Double_t getThick() {
+      return fSensorThick;
     }
     //! returns the Coordinate of the center of the inner surface of the silicon
     TGeoHMatrix getSurfaceCenterPosition();

@@ -46,8 +46,9 @@ Bool_t B2GeomSVDLadder::init(GearDir& content)
 
   // get parameters for the sensors
   nSensors = int(ladderContent.getParamNumValue("NumberOfSensors"));
+  isRibs = bool(ladderContent.getParamNumValue("isRibs"));
 
-  if (iLayer > 3) {
+  if (iLayer > 3 && isRibs) {
     fThicknessRibs = double(ladderContent.getParamLength("ThicknessRibs"));
     fRibUPosition0 = double(ladderContent.getParamLength("RibUPosition0"));
     fRibUPosition1 = double(ladderContent.getParamLength("RibUPosition1"));
@@ -60,7 +61,6 @@ Bool_t B2GeomSVDLadder::init(GearDir& content)
   }
 
   b2gSVDSensors.resize(nSensors);
-  sensorTypes.resize(nSensors);
   fThetas.resize(nSensors);
   fSensorVPositions.resize(nSensors);
   fSensorWPositions.resize(nSensors);
@@ -69,7 +69,6 @@ Bool_t B2GeomSVDLadder::init(GearDir& content)
     GearDir sensorsContent(ladderContent);
     sensorsContent.append("Sensors/");
     sensorsContent.append((format("Sensor[@id=\'SVD_Layer_%1%_Ladder_Sensor_%2%\']/") % iLayer % iSensor).str());
-    sensorTypes[iSensor] = int(sensorsContent.getParamNumValue("SensorType"));
     sensorsContent.append("Position/");
     fThetas[iSensor] = double(sensorsContent.getParamLength("Theta"));
     fSensorVPositions[iSensor] = double(sensorsContent.getParamLength("V"));
@@ -112,7 +111,6 @@ Bool_t B2GeomSVDLadder::init()
     nSensors = 2;
 
     b2gSVDSensors.resize(nSensors);
-    sensorTypes.resize(nSensors);
     fThetas.resize(nSensors);
     fSensorVPositions.resize(nSensors);
     fSensorWPositions.resize(nSensors);
@@ -148,7 +146,7 @@ Bool_t B2GeomSVDLadder::make()
 {
   volSVDLadder = new TGeoVolumeAssembly(path.c_str());
   putSensors();
-  if (iLayer > 3) {
+  if (iLayer > 3 && isRibs) {
     putRibsBarrel();
     // putRibsSlanted();
   }
@@ -160,12 +158,14 @@ void B2GeomSVDLadder::putSensors()
 
   for (int iSensor = 0; iSensor < nSensors; ++iSensor) {
 
-    b2gSVDSensors[iSensor] = new B2GeomSVDSensor(iLayer, iLadder, iSensor, sensorTypes[iSensor]);
+    b2gSVDSensors[iSensor] = new B2GeomSVDSensor(iLayer, iLadder, iSensor);
+
 #ifdef B2GEOM_BASF2
     b2gSVDSensors[iSensor]->init(ladderContent);
 #else
     b2gSVDSensors[iSensor]->init();
 #endif
+
     b2gSVDSensors[iSensor]->make();
 
     // incline the sensor to z axis
@@ -174,6 +174,8 @@ void B2GeomSVDLadder::putSensors()
     TGeoTranslation tra(fSensorWPositions[iSensor], 0.0, fSensorVPositions[iSensor]);
     TGeoHMatrix hmaHelp;
     hmaHelp = gGeoIdentity;
+    // first go to the center of the sensor surface
+    hmaHelp = b2gSVDSensors[iSensor]->getSurfaceCenterPosition().Inverse() * hmaHelp;
     hmaHelp = rotTheta * hmaHelp;
     hmaHelp = tra * hmaHelp;
     TGeoHMatrix* hmaSensorPosition = new TGeoHMatrix(hmaHelp);

@@ -5,6 +5,6 @@
 <ThicknessRibs desc="The thickness of the ribs" unit="mm">6.5</ThicknessRibs>
  <RibUPosition0 desc="Position of the rib in U direction" unit="mm">12.205</RibUPosition0>
  <RibUPosition1 desc="Position of the rib in U direction" unit="mm">-12.205</RibUPosition1>
- <RibsDistanceFromSensor desc="distance between inner surface of the sensor and middle of the rib" unit="mm">3.75</RibsDistanceFromSensor>
+ <RibsDistanceFromSensor desc="distance between inner surface of the sensor and middle of the rib" unit="mm">4.25</RibsDistanceFromSensor>
  <Length1RibsSlanted desc="Length1 of the Ribs in the Slanted Region" unit="mm">125.58</Length1RibsSlanted>
 </Ladders>

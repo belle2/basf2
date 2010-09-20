@@ -11,8 +11,8 @@
 #ifndef PATHLIST_H_
 #define PATHLIST_H_
 
-#include <framework/fwcore/Module.h>
-#include <framework/fwcore/Path.h>
+#include <framework/core/Module.h>
+#include <framework/core/Path.h>
 
 #include <list>
 #include <set>

@@ -33,8 +33,8 @@
 #include <boost/python.hpp> //Has to be the first include (restriction due to python)
 
 #include <framework/kbasf2/kbasf2pymodule.h>
-#include <framework/fwcore/Framework.h>
-#include <framework/fwcore/FwExceptions.h>
+#include <framework/core/Framework.h>
+#include <framework/core/FwExceptions.h>
 #include <framework/logging/Logger.h>
 
 #include <boost/program_options.hpp>

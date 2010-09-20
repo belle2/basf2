@@ -10,7 +10,7 @@
 
 #include "framework/modules/evtmetagen/EvtMetaInfo.h"
 
-#include <framework/fwcore/ModuleManager.h>
+#include <framework/core/ModuleManager.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreDefs.h>
 #include <framework/datastore/EventMetaData.h>

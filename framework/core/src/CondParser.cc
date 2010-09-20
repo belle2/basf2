@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <framework/fwcore/CondParser.h>
+#include <framework/core/CondParser.h>
 
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>

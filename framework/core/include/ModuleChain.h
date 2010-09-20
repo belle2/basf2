@@ -11,11 +11,11 @@
 #ifndef MODULECHAIN_H_
 #define MODULECHAIN_H_
 
-#include <framework/fwcore/Module.h>
-#include <framework/fwcore/ModuleList.h>
-#include <framework/fwcore/Path.h>
-#include <framework/fwcore/PathList.h>
-#include <framework/fwcore/FwExceptions.h>
+#include <framework/core/Module.h>
+#include <framework/core/ModuleList.h>
+#include <framework/core/Path.h>
+#include <framework/core/PathList.h>
+#include <framework/core/FwExceptions.h>
 
 #include <string>
 #include <list>

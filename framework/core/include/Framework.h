@@ -16,10 +16,10 @@
 #include <boost/python/dict.hpp>
 #include <boost/python/exception_translator.hpp>
 
-#include <framework/fwcore/Path.h>
-#include <framework/fwcore/Module.h>
-#include <framework/fwcore/ModuleChain.h>
-#include <framework/fwcore/FwExceptions.h>
+#include <framework/core/Path.h>
+#include <framework/core/Module.h>
+#include <framework/core/ModuleChain.h>
+#include <framework/core/FwExceptions.h>
 
 #include <string>
 #include <list>

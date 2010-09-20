@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <framework/fwcore/ModuleChain.h>
-#include <framework/fwcore/ModuleManager.h>
+#include <framework/core/ModuleChain.h>
+#include <framework/core/ModuleManager.h>
 #include <framework/logging/LogSystem.h>
 
 #include <framework/datastore/DataStore.h>

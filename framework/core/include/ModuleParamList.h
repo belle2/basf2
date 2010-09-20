@@ -14,9 +14,9 @@
 #include <boost/python.hpp>
 #include <boost/python/list.hpp>
 
-#include <framework/fwcore/FwExceptions.h>
-#include <framework/fwcore/ModuleParam.h>
-#include <framework/fwcore/PyObjConvUtils.h>
+#include <framework/core/FwExceptions.h>
+#include <framework/core/ModuleParam.h>
+#include <framework/core/PyObjConvUtils.h>
 #include <framework/logging/Logger.h>
 
 #include <map>

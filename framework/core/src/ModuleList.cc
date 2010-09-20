@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <framework/fwcore/ModuleList.h>
-#include <framework/fwcore/ModuleManager.h>
+#include <framework/core/ModuleList.h>
+#include <framework/core/ModuleManager.h>
 #include <framework/logging/Logger.h>
 
 using namespace std;

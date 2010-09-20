@@ -11,7 +11,7 @@
 #ifndef EVTMETAGEN_H_
 #define EVTMETAGEN_H_
 
-#include <framework/fwcore/Module.h>
+#include <framework/core/Module.h>
 #include <vector>
 
 

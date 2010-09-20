@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <framework/fwcore/Framework.h>
-#include <framework/fwcore/ModuleManager.h>
+#include <framework/core/Framework.h>
+#include <framework/core/ModuleManager.h>
 #include <framework/logging/Logger.h>
 #include <framework/logging/LogConnectionIOStream.h>
 #include <framework/logging/LogConnectionTxtFile.h>

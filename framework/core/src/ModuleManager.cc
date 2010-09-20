@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <framework/fwcore/ModuleManager.h>
+#include <framework/core/ModuleManager.h>
 
 #include <dlfcn.h>
 #include <iostream>

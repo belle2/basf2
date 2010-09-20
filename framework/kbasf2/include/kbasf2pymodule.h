@@ -13,10 +13,10 @@
 
 #include <boost/python.hpp>
 
-#include <framework/fwcore/Module.h>
-#include <framework/fwcore/Path.h>
-#include <framework/fwcore/Framework.h>
-#include <framework/fwcore/ModuleParam.h>
+#include <framework/core/Module.h>
+#include <framework/core/Path.h>
+#include <framework/core/Framework.h>
+#include <framework/core/ModuleParam.h>
 
 #include <framework/gearbox/Gearbox.h>
 

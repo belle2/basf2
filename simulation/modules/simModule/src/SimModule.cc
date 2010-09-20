@@ -16,7 +16,7 @@
 #include <simulation/simkernel/B4EventAction.h>
 #include <simulation/simkernel/B4SteppingAction.h>
 
-#include <framework/fwcore/ModuleManager.h>
+#include <framework/core/ModuleManager.h>
 #include <framework/logging/Logger.h>
 #include <boost/format.hpp>
 

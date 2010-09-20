@@ -13,7 +13,7 @@
 
 #include <cdc/modules/cdcDigitizer/CDCSignal.h>
 
-#include <framework/fwcore/Module.h>
+#include <framework/core/Module.h>
 #include <string>
 //#include <boost/shared_ptr.hpp>
 

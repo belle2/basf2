@@ -11,7 +11,7 @@
 #include <cdc/modules/cdcDigitizer/CDCDigi.h>
 #include <cdc/modules/cdcDigitizer/CDCColours.h>
 
-#include <framework/fwcore/ModuleManager.h>
+#include <framework/core/ModuleManager.h>
 //#include <boost/format.hpp>
 
 #include <framework/datastore/StoreObjPtr.h>

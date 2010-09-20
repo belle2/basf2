@@ -11,8 +11,8 @@
 #ifndef SIMPLEOUTPUT_H
 #define SIMPLEOUTPUT_H
 
-#include <framework/fwcore/Module.h>
-#include <framework/fwcore/ModuleManager.h>
+#include <framework/core/Module.h>
+#include <framework/core/ModuleManager.h>
 #include <boost/shared_ptr.hpp>
 #include <string>
 #include <vector>

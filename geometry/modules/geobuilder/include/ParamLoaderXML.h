@@ -11,7 +11,7 @@
 #ifndef PARAMLOADERXML_H_
 #define PARAMLOADERXML_H_
 
-#include <framework/fwcore/Module.h>
+#include <framework/core/Module.h>
 
 #include <string>
 

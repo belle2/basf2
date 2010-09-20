@@ -11,7 +11,7 @@
 #ifndef GEOBUILDER_H_
 #define GEOBUILDER_H_
 
-#include <framework/fwcore/Module.h>
+#include <framework/core/Module.h>
 
 #include <string>
 

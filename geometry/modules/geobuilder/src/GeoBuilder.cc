@@ -9,7 +9,7 @@
  **************************************************************************/
 
 #include <geometry/modules/geobuilder/GeoBuilder.h>
-#include <framework/fwcore/ModuleManager.h>
+#include <framework/core/ModuleManager.h>
 #include <geometry/geodetector/GeoDetector.h>
 
 using namespace std;

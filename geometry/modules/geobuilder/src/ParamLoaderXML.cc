@@ -10,7 +10,7 @@
 
 #include <geometry/modules/geobuilder/ParamLoaderXML.h>
 
-#include <framework/fwcore/ModuleManager.h>
+#include <framework/core/ModuleManager.h>
 
 #include <framework/gearbox/Gearbox.h>
 #include <framework/gearbox/GearboxIOXML.h>

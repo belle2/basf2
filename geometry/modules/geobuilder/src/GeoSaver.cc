@@ -10,7 +10,7 @@
 
 #include <geometry/modules/geobuilder/GeoSaver.h>
 
-#include <framework/fwcore/ModuleManager.h>
+#include <framework/core/ModuleManager.h>
 
 #include <geometry/geodetector/GeoDetector.h>
 

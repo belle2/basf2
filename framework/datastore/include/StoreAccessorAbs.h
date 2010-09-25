@@ -21,12 +21,25 @@ namespace Belle2 {
   template <class T>
   class StoreAccessorAbs {
   public:
+
+    /*! Destructor.
+    */
+    virtual ~StoreAccessorAbs() = 0;
+
+
     /*!
     */
     virtual T* getPtr() = 0;
 
   };
 }
+
+//------------------------Implementation of template class -----------------------------------------
+using namespace std;
+using namespace Belle2;
+
+template <class T>
+StoreAccessorAbs<T>::~StoreAccessorAbs() {}
 
 
 #endif // STOREACCESSORABS_H

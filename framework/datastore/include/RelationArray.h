@@ -28,8 +28,7 @@ namespace Belle2 {
 
     /*! Paramter free Constructor for I/O purposes.
     */
-    RelationArray()
-        : m_weight(1.0) {}
+    RelationArray() {}
 
     /*! Constructor with single weight for all relations together.
         \param from      Pointer to the TObject on the "from" side of the RelationArray.

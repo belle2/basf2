@@ -1,0 +1,437 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ParamSet type="EKLM">
+  <Name>Belle II EKLM</Name>
+  <Description>Belle II EKLM geometry</Description>
+  <Version>0</Version>
+  <Creator>EKLMBelleII</Creator>
+  <Content>
+    <Rotation desc="Rotation of the EKLM with respect to the Detector"  unit="mrad">0.0</Rotation>
+    <OffsetZ  desc="The offset of the EKLM in z with respect to the IP" unit="mm">2770.0</OffsetZ>
+    <FwEndCap>
+      <InnerR desc="Inner radius"   unit="mm">1306.0</InnerR>
+      <OuterR desc="Outer radius"   unit="mm">3308.0</OuterR>
+      <Length desc="Length"         unit="mm">1321.0</Length>
+      <PositionX  desc="X position" unit="mm">0</PositionX>
+      <PositionY  desc="Y position" unit="mm">0</PositionY>
+  <!--    <PositionZ  desc="Z position" unit="mm">0</PositionZ> -->
+      <Layer>	
+	<Name>Layer</Name>
+	<InnerR desc="Inner radius"   unit="mm">1326.0</InnerR>
+	<OuterR desc="Outer radius"   unit="mm">3288.0</OuterR>
+	<Length desc="Length"         unit="mm">44.0</Length>
+	<PositionX  desc="X position" unit="mm">62.0</PositionX>
+	<PositionY  desc="Y position" unit="mm">52.0</PositionY>
+ <!--  	<PositionZ  desc="Z position" unit="mm">0</PositionZ> -->
+	<ShiftZ     desc="Z Shift"    unit="mm">47.0</ShiftZ>
+	<Sector>
+	  <Name>Sector</Name>
+	  <InnerR desc="Inner radius"   unit="mm">1326</InnerR>
+	  <OuterR desc="Outer radius"   unit="mm">3288</OuterR>
+	  <Length desc="Length"         unit="mm">44.0</Length>
+	  <PositionX  desc="X position" unit="mm">0</PositionX>
+	  <PositionY  desc="Y position" unit="mm">0</PositionY>
+	  <PositionZ  desc="Z position" unit="mm">0</PositionZ>
+	  <Xplane>
+	    <Name>Xplane</Name>
+	    <InnerR desc="Inner radius"   unit="mm">1326</InnerR>
+	    <OuterR desc="Outer radius"   unit="mm">3288</OuterR>
+	    <Length desc="Length"         unit="mm">10.0</Length>
+	    <PositionX  desc="X position" unit="mm">0</PositionX>
+	    <PositionY  desc="Y position" unit="mm">0</PositionY>
+	    <PositionZ  desc="Z position" unit="mm">-11.0</PositionZ>
+	  </Xplane>
+	  <Yplane>
+	    <Name>Yplane</Name>
+	    <InnerR desc="Inner radius"   unit="mm">1326</InnerR>
+	    <OuterR desc="Outer radius"   unit="mm">3288</OuterR>
+	    <Length desc="Length"         unit="mm">10.0</Length>
+	    <PositionX  desc="X position" unit="mm">0</PositionX>
+	    <PositionY  desc="Y position" unit="mm">0</PositionY>
+	    <PositionZ  desc="Z position" unit="mm">11.0</PositionZ>
+	  </Yplane>
+
+	  <Strips>
+	    <Name>Strip</Name>
+	    <Width      desc="Width"       unit="mm">40.0</Width>
+	    <Thickness  desc="Thickness"   unit="mm">7.0</Thickness>
+	    <Strip id="0">
+	      <Length     desc="Length"      unit="mm">1530.0</Length>
+	      <PositionX  desc="X position"  unit="mm">2198.0</PositionX>
+	      <PositionY  desc="Y position"  unit="mm">123.0</PositionY>
+	    </Strip>
+	    <Strip id="1">
+	      <Length     desc="Length"      unit="mm">1570.0</Length>
+	      <PositionX  desc="X position"  unit="mm">2178.0</PositionX>
+	      <PositionY  desc="Y position"  unit="mm">163.0</PositionY>
+	    </Strip>
+	    <Strip id="2">
+	      <Length     desc="Length"      unit="mm">1650.0</Length>
+	      <PositionX  desc="X position"  unit="mm">2178.0</PositionX>
+	      <PositionY  desc="Y position"  unit="mm">203.0</PositionY>
+	    </Strip>
+	    <Strip id="3">
+	      <Length     desc="Length"      unit="mm">1650.0</Length>
+	      <PositionX  desc="X position"  unit="mm">2178.0</PositionX>
+	      <PositionY  desc="Y position"  unit="mm">243.0</PositionY>
+	    </Strip>
+	    <Strip id="4">
+	      <Length     desc="Length"      unit="mm">1690.0</Length>
+	      <PositionX  desc="X position"  unit="mm">2198.0</PositionX>
+	      <PositionY  desc="Y position"  unit="mm">283.0</PositionY>
+	    </Strip>
+	    <Strip id="5">
+	      <Length     desc="Length"      unit="mm">1730.0</Length>
+	      <PositionX  desc="X position"  unit="mm">2178.0</PositionX>
+	      <PositionY  desc="Y position"  unit="mm">323.0</PositionY>
+	    </Strip>
+	    <Strip id="6">
+	      <Length     desc="Length"      unit="mm">1770.0</Length>
+	      <PositionX  desc="X position"  unit="mm">2198.0</PositionX>
+	      <PositionY  desc="Y position"  unit="mm">363.0</PositionY>
+	    </Strip>
+	    <Strip id="7">
+	      <Length     desc="Length"      unit="mm">1770.0</Length>
+	      <PositionX  desc="X position"  unit="mm">2198.0</PositionX>
+	      <PositionY  desc="Y position"  unit="mm">403.0</PositionY>
+	    </Strip>
+	    <Strip id="8">
+	      <Length     desc="Length"      unit="mm">1855.0</Length>
+	      <PositionX  desc="X position"  unit="mm">2195.5</PositionX>
+	      <PositionY  desc="Y position"  unit="mm">443.0</PositionY>
+	    </Strip>
+	    <Strip id="9">
+	      <Length     desc="Length"      unit="mm">1855.0</Length>
+	      <PositionX  desc="X position"  unit="mm">2195.5</PositionX>
+	      <PositionY  desc="Y position"  unit="mm">483.0</PositionY>
+	    </Strip>
+	    <Strip id="10">
+	      <Length     desc="Length"      unit="mm">1855.0</Length>
+	      <PositionX  desc="X position"  unit="mm">2195.5</PositionX>
+	      <PositionY  desc="Y position"  unit="mm">523.0</PositionY>
+	    </Strip>
+	    <Strip id="11">
+	      <Length     desc="Length"      unit="mm">1895.0</Length>
+	      <PositionX  desc="X position"  unit="mm">2175.5</PositionX>
+	      <PositionY desc="Y position" unit="mm">563.0</PositionY>
+	    </Strip>
+	    <Strip id="12">
+	      <Length desc="Length" unit="mm">1895.0</Length>
+	      <PositionX desc="X position" unit="mm">2175.5</PositionX>
+	      <PositionY desc="Y position" unit="mm">603.0</PositionY>
+	    </Strip>
+	    <Strip id="13">
+	      <Length desc="Length" unit="mm">1935.0</Length>
+	      <PositionX desc="X position" unit="mm">2155.5</PositionX>
+	      <PositionY desc="Y position" unit="mm">643.0</PositionY>
+	    </Strip>
+	    <Strip id="14">
+	      <Length desc="Length" unit="mm">1935.0</Length>
+	      <PositionX desc="X position" unit="mm">2155.5</PositionX>
+	      <PositionY desc="Y position" unit="mm">683.0</PositionY>
+	    </Strip>
+	    <Strip id="15">
+	      <Length desc="Length" unit="mm">1975.0</Length>
+	      <PositionX desc="X position" unit="mm">2135.5</PositionX>
+	      <PositionY desc="Y position" unit="mm">728.0</PositionY>
+	    </Strip>
+	    <Strip id="16">
+	      <Length desc="Length" unit="mm">2015.0</Length>
+	      <PositionX desc="X position" unit="mm">2115.5</PositionX>
+	      <PositionY desc="Y position" unit="mm">768.0</PositionY>
+	    </Strip>
+	    <Strip id="17">
+	      <Length desc="Length" unit="mm">2015.0</Length>
+	      <PositionX desc="X position" unit="mm">2115.5</PositionX>
+	      <PositionY desc="Y position" unit="mm">808.0</PositionY>
+	    </Strip>
+	    <Strip id="18">
+	      <Length desc="Length" unit="mm">2055.0</Length>
+	      <PositionX desc="X position" unit="mm">2095.5</PositionX>
+	      <PositionY desc="Y position" unit="mm">848.0</PositionY>
+	    </Strip>
+	    <Strip id="19">
+	      <Length desc="Length" unit="mm">2095.0</Length>
+	      <PositionX desc="X position" unit="mm">2075.5</PositionX>
+	      <PositionY desc="Y position" unit="mm">888.0</PositionY>
+	    </Strip>
+	    <Strip id="20">
+	      <Length desc="Length" unit="mm">2095.0</Length>
+	      <PositionX desc="X position" unit="mm">2035.5</PositionX>
+	      <PositionY desc="Y position" unit="mm">928.0</PositionY>
+	    </Strip>
+	    <Strip id="21">
+	      <Length desc="Length" unit="mm">2135.0</Length>
+	      <PositionX desc="X position" unit="mm">2015.5</PositionX>
+	      <PositionY desc="Y position" unit="mm">968.0</PositionY>
+	    </Strip>
+	    <Strip id="22">
+	      <Length desc="Length" unit="mm">2175.0</Length>
+	      <PositionX desc="X position" unit="mm">1995.5</PositionX>
+	      <PositionY desc="Y position" unit="mm">1008.0</PositionY>
+	    </Strip>
+	    <Strip id="23">
+	      <Length desc="Length" unit="mm">2175.0</Length>
+	      <PositionX desc="X position" unit="mm">1955.5</PositionX>
+	      <PositionY desc="Y position" unit="mm">1048.0</PositionY>
+	    </Strip>
+	    <Strip id="24">
+	      <Length desc="Length" unit="mm">2215.0</Length>
+	      <PositionX desc="X position" unit="mm">1935.5</PositionX>
+	      <PositionY desc="Y position" unit="mm">1088.0</PositionY>
+	    </Strip>
+	    <Strip id="25">
+	      <Length desc="Length" unit="mm">2295.0</Length>
+	      <PositionX desc="X position" unit="mm">1895.5</PositionX>
+	      <PositionY desc="Y position" unit="mm">1128.0</PositionY>
+	    </Strip>
+	    <Strip id="26">
+	      <Length desc="Length" unit="mm">2295.0</Length>
+	      <PositionX desc="X position" unit="mm">1855.5</PositionX>
+	      <PositionY desc="Y position" unit="mm">1168.0</PositionY>
+	    </Strip>
+	    <Strip id="27">
+	      <Length desc="Length" unit="mm">2380.0</Length>
+	      <PositionX desc="X position" unit="mm">1813.0</PositionX>
+	      <PositionY desc="Y position" unit="mm">1208.0</PositionY>
+	    </Strip>
+	    <Strip id="28">
+	      <Length desc="Length" unit="mm">2420.0</Length>
+	      <PositionX desc="X position" unit="mm">1753.0</PositionX>
+	      <PositionY desc="Y position" unit="mm">1248.0</PositionY>
+	    </Strip>
+	    <Strip id="29">
+	      <Length desc="Length" unit="mm">2540.0</Length>
+	      <PositionX desc="X position" unit="mm">1693.0</PositionX>
+	      <PositionY desc="Y position" unit="mm">1288.0</PositionY>
+	    </Strip>
+	    <Strip id="30">
+	      <Length desc="Length" unit="mm">2660.0</Length>
+	      <PositionX desc="X position" unit="mm">1633.0</PositionX>
+	      <PositionY desc="Y position" unit="mm">1333.0</PositionY>
+	    </Strip>
+	    <Strip id="31">
+	      <Length desc="Length" unit="mm">2740.0</Length>
+	      <PositionX desc="X position" unit="mm">1553.0</PositionX>
+	      <PositionY desc="Y position" unit="mm">1373.0</PositionY>
+	    </Strip>
+	    <Strip id="32">
+	      <Length desc="Length" unit="mm">2780.0</Length>
+	      <PositionX desc="X position" unit="mm">1533.0</PositionX>
+	      <PositionY desc="Y position" unit="mm">1413.0</PositionY>
+	    </Strip>
+	    <Strip id="33">
+	      <Length desc="Length" unit="mm">2780.0</Length>
+	      <PositionX desc="X position" unit="mm">1493.0</PositionX>
+	      <PositionY desc="Y position" unit="mm">1453.0</PositionY>
+	    </Strip>
+	    <Strip id="34">
+	      <Length desc="Length" unit="mm">2740.0</Length>
+	      <PositionX desc="X position" unit="mm">1473.0</PositionX>
+	      <PositionY desc="Y position" unit="mm">1493.0</PositionY>
+	    </Strip>
+	    <Strip id="35">
+	      <Length desc="Length" unit="mm">2740.0</Length>
+	      <PositionX desc="X position" unit="mm">1473.0</PositionX>
+	      <PositionY desc="Y position" unit="mm">1533.0</PositionY>
+	    </Strip>
+	    <Strip id="36">
+	      <Length desc="Length" unit="mm">2700.0</Length>
+	      <PositionX desc="X position" unit="mm">1453.0</PositionX>
+	      <PositionY desc="Y position" unit="mm">1573.0</PositionY>
+	    </Strip>
+	    <Strip id="37">
+	      <Length desc="Length" unit="mm">2700.0</Length>
+	      <PositionX desc="X position" unit="mm">1453.0</PositionX>
+	      <PositionY desc="Y position" unit="mm">1613.0</PositionY>
+	    </Strip>
+	    <Strip id="38">
+	      <Length desc="Length" unit="mm">2660.0</Length>
+	      <PositionX desc="X position" unit="mm">1433.0</PositionX>
+	      <PositionY desc="Y position" unit="mm">1653.0</PositionY>
+	    </Strip>
+	    <Strip id="39">
+	      <Length desc="Length" unit="mm">2660.0</Length>
+	      <PositionX desc="X position" unit="mm">1433.0</PositionX>
+	      <PositionY desc="Y position" unit="mm">1693.0</PositionY>
+	    </Strip>
+	    <Strip id="40">
+	      <Length desc="Length" unit="mm">2620.0</Length>
+	      <PositionX desc="X position" unit="mm">1413.0</PositionX>
+	      <PositionY desc="Y position" unit="mm">1733.0</PositionY>
+	    </Strip>
+	    <Strip id="41">
+	      <Length desc="Length" unit="mm">2580.0</Length>
+	      <PositionX desc="X position" unit="mm">1393.0</PositionX>
+	      <PositionY desc="Y position" unit="mm">1773.0</PositionY>
+	    </Strip>
+	    <Strip id="42">
+	      <Length desc="Length" unit="mm">2580.0</Length>
+	      <PositionX desc="X position" unit="mm">1393.0</PositionX>
+	      <PositionY desc="Y position" unit="mm">1813.0</PositionY>
+	    </Strip>
+	    <Strip id="43">
+	      <Length desc="Length" unit="mm">2540.0</Length>
+	      <PositionX desc="X position" unit="mm">1373.0</PositionX>
+	      <PositionY desc="Y position" unit="mm">1853.0</PositionY>
+	    </Strip>
+	    <Strip id="44">
+	      <Length desc="Length" unit="mm">2500.0</Length>
+	      <PositionX desc="X position" unit="mm">1353.0</PositionX>
+	      <PositionY desc="Y position" unit="mm">1893.0</PositionY>
+	    </Strip>
+	    <Strip id="45">
+	      <Length desc="Length" unit="mm">2500.0</Length>
+	      <PositionX desc="X position" unit="mm">1353.0</PositionX>
+	      <PositionY desc="Y position" unit="mm">1938.0</PositionY>
+	    </Strip>
+	    <Strip id="46">
+	      <Length desc="Length" unit="mm">2460.0</Length>
+	      <PositionX desc="X position" unit="mm">1333.0</PositionX>
+	      <PositionY desc="Y position" unit="mm">1978.0</PositionY>
+	    </Strip>
+	    <Strip id="47">
+	      <Length desc="Length" unit="mm">2415.0</Length>
+	      <PositionX desc="X position" unit="mm">1310.5</PositionX>
+	      <PositionY desc="Y position" unit="mm">2018.0</PositionY>
+	    </Strip>
+	    <Strip id="48">
+	      <Length desc="Length" unit="mm">2375.0</Length>
+	      <PositionX desc="X position" unit="mm">1290.5</PositionX>
+	      <PositionY desc="Y position" unit="mm">2058.0</PositionY>
+	    </Strip>
+	    <Strip id="49">
+	      <Length desc="Length" unit="mm">2335.0</Length>
+	      <PositionX desc="X position" unit="mm">1270.5</PositionX>
+	      <PositionY desc="Y position" unit="mm">2098.0</PositionY>
+	    </Strip>
+	    <Strip id="50">
+	      <Length desc="Length" unit="mm">2295.0</Length>
+	      <PositionX desc="X position" unit="mm">1250.5</PositionX>
+	      <PositionY desc="Y position" unit="mm">2138.0</PositionY>
+	    </Strip>
+	    <Strip id="51">
+	      <Length desc="Length" unit="mm">2255.0</Length>
+	      <PositionX desc="X position" unit="mm">1230.5</PositionX>
+	      <PositionY desc="Y position" unit="mm">2178.0</PositionY>
+	    </Strip>
+	    <Strip id="52">
+	      <Length desc="Length" unit="mm">2255.0</Length>
+	      <PositionX desc="X position" unit="mm">1230.5</PositionX>
+	      <PositionY desc="Y position" unit="mm">2218.0</PositionY>
+	    </Strip>
+	    <Strip id="53">
+	      <Length desc="Length" unit="mm">2215.0</Length>
+	      <PositionX desc="X position" unit="mm">1210.5</PositionX>
+	      <PositionY desc="Y position" unit="mm">2258.0</PositionY>
+	    </Strip>
+	    <Strip id="54">
+	      <Length desc="Length" unit="mm">2175.0</Length>
+	      <PositionX desc="X position" unit="mm">1190.5</PositionX>
+	      <PositionY desc="Y position" unit="mm">2298.0</PositionY>
+	    </Strip>
+	    <Strip id="55">
+	      <Length desc="Length" unit="mm">2135.0</Length>
+	      <PositionX desc="X position" unit="mm">1170.5</PositionX>
+	      <PositionY desc="Y position" unit="mm">2338.0</PositionY>
+	    </Strip>
+	    <Strip id="56">
+	      <Length desc="Length" unit="mm">2055.0</Length>
+	      <PositionX desc="X position" unit="mm">1130.5</PositionX>
+	      <PositionY desc="Y position" unit="mm">2378.0</PositionY>
+	    </Strip>
+	    <Strip id="57">
+	      <Length desc="Length" unit="mm">2015.0</Length>
+	      <PositionX desc="X position" unit="mm">1110.5</PositionX>
+	      <PositionY desc="Y position" unit="mm">2418.0</PositionY>
+	    </Strip>
+	    <Strip id="58">
+	      <Length desc="Length" unit="mm">1975.0</Length>
+	      <PositionX desc="X position" unit="mm">1090.5</PositionX>
+	      <PositionY desc="Y position" unit="mm">2458.0</PositionY>
+	    </Strip>
+	    <Strip id="59">
+	      <Length desc="Length" unit="mm">1935.0</Length>
+	      <PositionX desc="X position" unit="mm">1070.5</PositionX>
+	      <PositionY desc="Y position" unit="mm">2498.0</PositionY>
+	    </Strip>
+	    <Strip id="60">
+	      <Length desc="Length" unit="mm">1895.0</Length>
+	      <PositionX desc="X position" unit="mm">1050.5</PositionX>
+	      <PositionY desc="Y position" unit="mm">2543.0</PositionY>
+	    </Strip>
+	    <Strip id="61">
+	      <Length desc="Length" unit="mm">1855.0</Length>
+	      <PositionX desc="X position" unit="mm">1030.5</PositionX>
+	      <PositionY desc="Y position" unit="mm">2583.0</PositionY>
+	    </Strip>
+	    <Strip id="62">
+	      <Length desc="Length" unit="mm">1770.0</Length>
+	      <PositionX desc="X position" unit="mm">988.0</PositionX>
+	      <PositionY desc="Y position" unit="mm">2623.0</PositionY>
+	    </Strip>
+	    <Strip id="63">
+	      <Length desc="Length" unit="mm">1730.0</Length>
+	      <PositionX desc="X position" unit="mm">968.0</PositionX>
+	      <PositionY desc="Y position" unit="mm">2663.0</PositionY>
+	    </Strip>
+	    <Strip id="64">
+	      <Length desc="Length" unit="mm">1650.0</Length>
+	      <PositionX desc="X position" unit="mm">928.0</PositionX>
+	      <PositionY desc="Y position" unit="mm">2703.0</PositionY>
+	    </Strip>
+	    <Strip id="65">
+	      <Length desc="Length" unit="mm">1610.0</Length>
+	      <PositionX desc="X position" unit="mm">908.0</PositionX>
+	      <PositionY desc="Y position" unit="mm">2743.0</PositionY>
+	    </Strip>
+	    <Strip id="66">
+	      <Length desc="Length" unit="mm">1530.0</Length>
+	      <PositionX desc="X position" unit="mm">868.0</PositionX>
+	      <PositionY desc="Y position" unit="mm">2783.0</PositionY>
+	    </Strip>
+	    <Strip id="67">
+	      <Length desc="Length" unit="mm">1450.0</Length>
+	      <PositionX desc="X position" unit="mm">828.0</PositionX>
+	      <PositionY desc="Y position" unit="mm">2823.0</PositionY>
+	    </Strip>
+	    <Strip id="68">
+	      <Length desc="Length" unit="mm">1370.0</Length>
+	      <PositionX desc="X position" unit="mm">788.0</PositionX>
+	      <PositionY desc="Y position" unit="mm">2863.0</PositionY>
+	    </Strip>
+	    <Strip id="69">
+	      <Length desc="Length" unit="mm">1330.0</Length>
+	      <PositionX desc="X position" unit="mm">768.0</PositionX>
+	      <PositionY desc="Y position" unit="mm">2903.0</PositionY>
+	    </Strip>
+	    <Strip id="70">
+	      <Length desc="Length" unit="mm">1250.0</Length>
+	      <PositionX desc="X position" unit="mm">728.0</PositionX>
+	      <PositionY desc="Y position" unit="mm">2943.0</PositionY>
+	    </Strip>
+	    <Strip id="71">
+	      <Length desc="Length" unit="mm">1045.0</Length>
+	      <PositionX desc="X position" unit="mm">705.5</PositionX>
+	      <PositionY desc="Y position" unit="mm">2983.0</PositionY>
+	    </Strip>
+	    <Strip id="72">
+	      <Length desc="Length" unit="mm">885.0</Length>
+	      <PositionX desc="X position" unit="mm">705.5</PositionX>
+	      <PositionY desc="Y position" unit="mm">3023.0</PositionY>
+	    </Strip>
+	    <Strip id="73">
+	      <Length desc="Length" unit="mm">685.0</Length>
+	      <PositionX desc="X position" unit="mm">685.5</PositionX>
+	      <PositionY desc="Y position" unit="mm">3063.0</PositionY>
+	    </Strip>
+	    <Strip id="74">
+	      <Length desc="Length" unit="mm">485.0</Length>
+	      <PositionX desc="X position" unit="mm">665.5</PositionX>
+	      <PositionY desc="Y position" unit="mm">3103.0</PositionY>
+	    </Strip>
+	  </Strips>
+ 	</Sector>
+      </Layer>   
+    </FwEndCap>  
+  </Content>
+</ParamSet>

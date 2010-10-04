@@ -62,6 +62,8 @@ void GeoMaterials::create(GearDir& content)
 void GeoMaterials::createMaterialSingle(GearDir& content)
 {
   //Get number of materials in the material set
+  if (!content.isPathValid("Material")) return;
+
   GearDir matContent(content, "Material");
   int nMat = matContent.getNumberNodes();
   double weight = -1.0;
@@ -80,6 +82,8 @@ void GeoMaterials::createMaterialSingle(GearDir& content)
 void GeoMaterials::createMaterialMixture(GearDir& content)
 {
   //Get number of mixtures in the material set
+  if (!content.isPathValid("Mixture")) return;
+
   GearDir mixContent(content, "Mixture");
   int nMix = mixContent.getNumberNodes();
   double weight = -1.0;

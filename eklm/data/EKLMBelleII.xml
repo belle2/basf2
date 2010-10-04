@@ -7,7 +7,7 @@
   <Content>
     <Rotation desc="Rotation of the EKLM with respect to the Detector"  unit="mrad">0.0</Rotation>
     <OffsetZ  desc="The offset of the EKLM in z with respect to the IP" unit="mm">2770.0</OffsetZ>
-    <FwEndCap>
+    <EndCap>
       <InnerR desc="Inner radius"   unit="mm">1306.0</InnerR>
       <OuterR desc="Outer radius"   unit="mm">3308.0</OuterR>
       <Length desc="Length"         unit="mm">1321.0</Length>
@@ -15,7 +15,6 @@
       <PositionY  desc="Y position" unit="mm">0</PositionY>
   <!--    <PositionZ  desc="Z position" unit="mm">0</PositionZ> -->
       <Layer>	
-	<Name>Layer</Name>
 	<InnerR desc="Inner radius"   unit="mm">1326.0</InnerR>
 	<OuterR desc="Outer radius"   unit="mm">3288.0</OuterR>
 	<Length desc="Length"         unit="mm">44.0</Length>
@@ -24,34 +23,21 @@
  <!--  	<PositionZ  desc="Z position" unit="mm">0</PositionZ> -->
 	<ShiftZ     desc="Z Shift"    unit="mm">47.0</ShiftZ>
 	<Sector>
-	  <Name>Sector</Name>
 	  <InnerR desc="Inner radius"   unit="mm">1326</InnerR>
 	  <OuterR desc="Outer radius"   unit="mm">3288</OuterR>
 	  <Length desc="Length"         unit="mm">44.0</Length>
 	  <PositionX  desc="X position" unit="mm">0</PositionX>
 	  <PositionY  desc="Y position" unit="mm">0</PositionY>
 	  <PositionZ  desc="Z position" unit="mm">0</PositionZ>
-	  <Xplane>
-	    <Name>Xplane</Name>
+	  <Plane>
 	    <InnerR desc="Inner radius"   unit="mm">1326</InnerR>
 	    <OuterR desc="Outer radius"   unit="mm">3288</OuterR>
 	    <Length desc="Length"         unit="mm">10.0</Length>
 	    <PositionX  desc="X position" unit="mm">0</PositionX>
 	    <PositionY  desc="Y position" unit="mm">0</PositionY>
 	    <PositionZ  desc="Z position" unit="mm">-11.0</PositionZ>
-	  </Xplane>
-	  <Yplane>
-	    <Name>Yplane</Name>
-	    <InnerR desc="Inner radius"   unit="mm">1326</InnerR>
-	    <OuterR desc="Outer radius"   unit="mm">3288</OuterR>
-	    <Length desc="Length"         unit="mm">10.0</Length>
-	    <PositionX  desc="X position" unit="mm">0</PositionX>
-	    <PositionY  desc="Y position" unit="mm">0</PositionY>
-	    <PositionZ  desc="Z position" unit="mm">11.0</PositionZ>
-	  </Yplane>
-
+	  </Plane>
 	  <Strips>
-	    <Name>Strip</Name>
 	    <Width      desc="Width"       unit="mm">40.0</Width>
 	    <Thickness  desc="Thickness"   unit="mm">7.0</Thickness>
 	    <Strip id="0">
@@ -432,6 +418,6 @@
 	  </Strips>
  	</Sector>
       </Layer>   
-    </FwEndCap>  
+    </EndCap>  
   </Content>
 </ParamSet>

@@ -8,6 +8,8 @@
   </Global>
   <MaterialSets>
     <xi:include href="BasicMaterials.xml"/>
+    <xi:include href="../arich/ARICHMaterials.xml"/>
+    <xi:include href="../top/TOPMaterials.xml"/>
   </MaterialSets>
   <Subdetectors>
     <!--xi:include href="../ir/IRBelleIISymm.xml"/-->
@@ -15,5 +17,7 @@
     <xi:include href="../pxd/PXDBelleII_PXD1600.xml"/>
     <xi:include href="../svd/SVDBelleII.xml"/>
     <xi:include href="../cdc/CDCBelleII.xml"/>
+    <xi:include href="../arich/ARICHBelleII.xml"/>
+    <xi:include href="../top/TOPBelleII.xml"/>
   </Subdetectors>
 </Detector>

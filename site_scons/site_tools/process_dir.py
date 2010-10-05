@@ -10,7 +10,7 @@ def define_aliases(env, target, dir_name, extension = None):
             env.Alias(parent_dir + extension, target)
         parent_dir = os.path.split(parent_dir)[0]
 
-def process_dir(parent_env, dir_name):
+def process_dir(parent_env, dir_name, is_module_dir):
     
     # determine library name
     lib_name = dir_name.replace(os.sep, '_')
@@ -61,8 +61,8 @@ def process_dir(parent_env, dir_name):
     define_aliases(env, includes, dir_name, '.include')
 
     # install script files in the library directory
-    data = env.Install(env['LIBDIR'], env['SCRIPT_FILES'])
-    define_aliases(env, data, dir_name, '.scripts')
+    scripts = env.Install(env['LIBDIR'], env['SCRIPT_FILES'])
+    define_aliases(env, scripts, dir_name, '.scripts')
 
     # install data files in the data directory
     data = env.Install(os.path.join(env['DATADIR'], dir_name), env['DATA_FILES'])
@@ -72,10 +72,10 @@ def process_dir(parent_env, dir_name):
     entries = os.listdir(dir_name)
     for entry in entries:
         if entry.find('.') == -1 and not os.path.isfile(os.path.join(dir_name, entry)) and not entry in ['include', 'src', 'tools', 'data']:
-            process_dir(env, os.path.join(dir_name, entry))
+            process_dir(env, os.path.join(dir_name, entry), os.path.basename(dir_name) == 'modules')
 
     # check whether we have to create a new library
-    if (dir_name == env['PACKAGE']) or (env.Dictionary().has_key('SUBLIB') and (env['SUBLIB'] == True) or (env.Dictionary().has_key('PYTHON_MODULE') and (env['PYTHON_MODULE'] == True)) or dir_name.endswith('modules')):
+    if (dir_name == env['PACKAGE']) or (env.Dictionary().has_key('SUBLIB') and (env['SUBLIB'] == True) or (env.Dictionary().has_key('PYTHON_MODULE') and (env['PYTHON_MODULE'] == True)) or is_module_dir):
     
         # generate dictionaries
         dict_files = []
@@ -87,13 +87,21 @@ def process_dir(parent_env, dir_name):
 
         # build a shared library with all source and dictionary files
         if len(env['SRC_FILES']) > 0:
-            lib = env.SharedLibrary(os.path.join(env['LIBDIR'], lib_name), [env['SRC_FILES'], dict_files])
-            env.Alias(lib_name, lib)
-            define_aliases(env, lib, dir_name, '.lib')
-            if env.Dictionary().has_key('PYTHON_MODULE') and (env['PYTHON_MODULE'] == True):
-                pymod = env.InstallAs(os.path.join(env['LIBDIR'],os.path.basename(dir_name) + 'module' + env['SHLIBSUFFIX']), lib)            
-                define_aliases(env, pymod, dir_name, '.lib')
-                
+            if is_module_dir:
+                module_name = os.path.basename(dir_name)
+                module_lib = env.SharedLibrary(os.path.join(env['MODDIR'], env.subst('$SHLIBPREFIX') + module_name + env.subst('$SHLIBSUFFIX')), [env['SRC_FILES'], dict_files])
+                module_map = env.ModuleMap(os.path.join(env['MODDIR'], env.subst('$SHLIBPREFIX') + module_name + '.map'), env['SRC_FILES'])
+                env.Alias(module_name, [module_lib, module_map])
+                define_aliases(env, [module_lib, module_map], dir_name, '.modules')
+
+            else:
+                lib = env.SharedLibrary(os.path.join(env['LIBDIR'], lib_name), [env['SRC_FILES'], dict_files])
+                env.Alias(lib_name, lib)
+                define_aliases(env, lib, dir_name, '.lib')
+                if env.Dictionary().has_key('PYTHON_MODULE') and (env['PYTHON_MODULE'] == True):
+                    pymod = env.InstallAs(os.path.join(env['LIBDIR'], os.path.basename(dir_name) + 'module' + env.subst('$SHLIBSUFFIX')), lib)            
+                    define_aliases(env, pymod, dir_name, '.lib')
+
 
     # add linkdef, and source files to parent environment if we are in a normal sub-directory
     else:

@@ -33,7 +33,7 @@ archstring = unamelist[0]+"_"+unamelist[4]
 
 #Set basf2 directories
 basf2dir     = envarLocalDir                            #basf2 directory
-basf2libdir  = os.path.join(basf2dir,'lib',envarSubDir) #basf2 lib directory
+basf2libdir  = os.path.join(basf2dir,'modules',envarSubDir) #basf2 lib directory
 basf2datadir = os.path.join(basf2dir,'data')            #basf2 data directory
 
 

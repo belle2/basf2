@@ -15,10 +15,10 @@
 	    <TubeInnerRadius desc="Outer radius of aerogel tube" unit="mm">440</TubeInnerRadius>
 	    <TubeOuterRadius desc="Outer radius of aerogel tube" unit="mm">1140</TubeOuterRadius>
 	    <TileGap desc="Gap between the edges of aerogel tiles" unit="mm">1</TileGap>
-	    <TubeMaterial desc="Material that fills the gaps between aerogel tiles">Aluminium</TubeMaterial>
+	    <TubeMaterial desc="Material that fills the gaps between aerogel tiles">Aluminum</TubeMaterial>
 	    
 	    <SupportPlate>
-	      <Material desc="Material of aerogel support plate">Aluminium</Material>
+	      <Material desc="Material of aerogel support plate">Aluminum</Material>
 	      <Thickness desc="Thickness of aerogel support plate" unit="mm">2</Thickness>
 	    </SupportPlate>
 	    <Layers>    
@@ -92,7 +92,7 @@
 		
 	      </Rings>
 	      <SupportPlate>
-		<Material desc="Material of detectors support plate">Aluminium</Material>
+		<Material desc="Material of detectors support plate">Aluminum</Material>
 		<Thickness desc="The tickness of detectors support plate" unit="mm">4</Thickness>
 		<HoleXSize desc="X size of the rectangular hole in support plate behind each HAPD (for cables)" unit="mm">60</HoleXSize>
 		<HoleYSize desc="Y size of the rectangular hole in support plate behind each HAPD (for cables)" unit="mm">60</HoleYSize>

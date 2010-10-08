@@ -9,7 +9,7 @@
  **************************************************************************/
 
 #include <cdc/geocdc/GeoCDCBelleII.h>
-#include <cdc/simcdc/CDCSD.h>
+#include <cdc/simcdc/CDCSensitiveDetector.h>
 
 #include <framework/gearbox/GearDir.h>
 #include <framework/datastore/Units.h>
@@ -42,7 +42,7 @@ GeoCDCBelleII regGeoCDCBelleII;
 GeoCDCBelleII::GeoCDCBelleII() : CreatorBase("CDCBelleII")
 {
   setDescription("Creates the TGeo objects for the CDC geometry of the Belle II detector.");
-  addSensitiveDetector("SD_", new CDCSD("CDCSD", (2*24)*eV, 10*MeV)); //The CDC subdetector uses the "SD_" prefix to flag its sensitive volumes
+  addSensitiveDetector("SD_", new CDCSensitiveDetector("CDCSensitiveDetector", (2*24)*eV, 10*MeV)); //The CDC subdetector uses the "SD_" prefix to flag its sensitive volumes
 }
 
 

@@ -23,12 +23,12 @@ using namespace std;
 using namespace boost;
 using namespace Belle2;
 
-CDCGeometryPar* CDCGeometryPar::p_B4CDCGeometryParDB = 0;
+CDCGeometryPar* CDCGeometryPar::m_B4CDCGeometryParDB = 0;
 
-CDCGeometryPar* CDCGeometryPar::Instance(void)
+CDCGeometryPar* CDCGeometryPar::Instance()
 {
-  if (!p_B4CDCGeometryParDB) p_B4CDCGeometryParDB = new CDCGeometryPar();
-  return p_B4CDCGeometryParDB;
+  if (!m_B4CDCGeometryParDB) m_B4CDCGeometryParDB = new CDCGeometryPar();
+  return m_B4CDCGeometryParDB;
 }
 
 CDCGeometryPar::CDCGeometryPar()
@@ -41,40 +41,31 @@ CDCGeometryPar::~CDCGeometryPar()
 {
 }
 
-void
-CDCGeometryPar::clear(void)
+void CDCGeometryPar::clear()
 {
-  _version = "unknown";
-  _nSLayer = 0;
-  _nFLayer = 0;
-  _senseWireDiameter = 0.0;
-  _fieldWireDiameter = 0.0;
+  m_version = "unknown";
+  m_nSLayer = 0;
+  m_nFLayer = 0;
+  m_senseWireDiameter = 0.0;
+  m_fieldWireDiameter = 0.0;
   for (unsigned i = 0; i < 4; i++) {
-    _rWall[i] = 0;
+    m_rWall[i] = 0;
     for (unsigned j = 0; j < 2; j++)
-      _zWall[i][j] = 0;
+      m_zWall[i][j] = 0;
   }
   for (unsigned i = 0; i < MAX_N_SLAYERS; i++) {
-    _rSLayer[i] = 0;
-    _zSForwardLayer[i] = 0;
-    _zSBackwardLayer[i] = 0;
-    _cellSize[i] = 0;
-    _nWires[i] = 0;
-    _offSet[i] = 0;
-    _nShifts[i] = 0;
-    for (unsigned j = 0; j < MAX_N_SCELLS; j++) {
-      _wireForwardPosition[i][j].SetX(0);
-      _wireForwardPosition[i][j].SetY(0);
-      _wireForwardPosition[i][j].SetZ(0);
-      _wireBackwardPosition[i][j].SetX(0);
-      _wireBackwardPosition[i][j].SetY(0);
-      _wireBackwardPosition[i][j].SetZ(0);
-    }
+    m_rSLayer[i] = 0;
+    m_zSForwardLayer[i] = 0;
+    m_zSBackwardLayer[i] = 0;
+    m_cellSize[i] = 0;
+    m_nWires[i] = 0;
+    m_offSet[i] = 0;
+    m_nShifts[i] = 0;
   }
   for (unsigned i = 0; i < MAX_N_FLAYERS; i++) {
-    _rFLayer[i] = 0;
-    _zFForwardLayer[i] = 0;
-    _zFBackwardLayer[i] = 0;
+    m_rFLayer[i] = 0;
+    m_zFForwardLayer[i] = 0;
+    m_zFBackwardLayer[i] = 0;
   }
 }
 
@@ -89,77 +80,77 @@ void CDCGeometryPar::read()
   //------------------------------
 
   // Get inner wall parameters
-  _rWall[0]    = gbxParams.getParamLength("InnerWalls/InnerWall[3]/InnerR");
-  _zWall[0][0] = gbxParams.getParamLength("InnerWalls/InnerWall[1]/BackwardZ");
-  _zWall[0][1] = gbxParams.getParamLength("InnerWalls/InnerWall[1]/ForwardZ");
+  m_rWall[0]    = gbxParams.getParamLength("InnerWalls/InnerWall[3]/InnerR");
+  m_zWall[0][0] = gbxParams.getParamLength("InnerWalls/InnerWall[1]/BackwardZ");
+  m_zWall[0][1] = gbxParams.getParamLength("InnerWalls/InnerWall[1]/ForwardZ");
 
-  _rWall[1] = gbxParams.getParamLength("InnerWalls/InnerWall[1]/OuterR");
-  _zWall[1][0] = gbxParams.getParamLength("InnerWalls/InnerWall[1]/BackwardZ");
-  _zWall[1][1] = gbxParams.getParamLength("InnerWalls/InnerWall[1]/ForwardZ");
+  m_rWall[1] = gbxParams.getParamLength("InnerWalls/InnerWall[1]/OuterR");
+  m_zWall[1][0] = gbxParams.getParamLength("InnerWalls/InnerWall[1]/BackwardZ");
+  m_zWall[1][1] = gbxParams.getParamLength("InnerWalls/InnerWall[1]/ForwardZ");
 
   // Get outer wall parameters
-  _rWall[2] = gbxParams.getParamLength("OuterWalls/OuterWall[1]/InnerR");
-  _zWall[2][0] = gbxParams.getParamLength("OuterWalls/OuterWall[1]/BackwardZ");
-  _zWall[2][1] = gbxParams.getParamLength("OuterWalls/OuterWall[1]/ForwardZ");
+  m_rWall[2] = gbxParams.getParamLength("OuterWalls/OuterWall[1]/InnerR");
+  m_zWall[2][0] = gbxParams.getParamLength("OuterWalls/OuterWall[1]/BackwardZ");
+  m_zWall[2][1] = gbxParams.getParamLength("OuterWalls/OuterWall[1]/ForwardZ");
 
-  _rWall[3] = gbxParams.getParamLength("OuterWalls/OuterWall[2]/OuterR");
-  _zWall[3][0] = gbxParams.getParamLength("OuterWalls/OuterWall[1]/BackwardZ");
-  _zWall[3][1] = gbxParams.getParamLength("OuterWalls/OuterWall[1]/ForwardZ");
+  m_rWall[3] = gbxParams.getParamLength("OuterWalls/OuterWall[2]/OuterR");
+  m_zWall[3][0] = gbxParams.getParamLength("OuterWalls/OuterWall[1]/BackwardZ");
+  m_zWall[3][1] = gbxParams.getParamLength("OuterWalls/OuterWall[1]/ForwardZ");
 
   // Get sense layers parameters
   int nSLayer = gbxParams.getNumberNodes("SLayers/SLayer");
-  _nSLayer = nSLayer;
+  m_nSLayer = nSLayer;
 
   // Loop over all sense layers
   for (int iSLayer = 0; iSLayer < nSLayer; iSLayer++) {
     int layerId = atoi((gbxParams.getParamString((format("SLayers/SLayer[%1%]/@id") % (iSLayer + 1)).str())).c_str());
-    _rSLayer[layerId] = gbxParams.getParamLength((format("SLayers/SLayer[%1%]/Radius") % (iSLayer + 1)).str());
-    _zSBackwardLayer[layerId] = gbxParams.getParamLength((format("SLayers/SLayer[%1%]/BackwardZ") % (iSLayer + 1)).str());
-    _zSForwardLayer[layerId] = gbxParams.getParamLength((format("SLayers/SLayer[%1%]/ForwardZ") % (iSLayer + 1)).str());
-    _nWires[layerId] = atoi((gbxParams.getParamString((format("SLayers/SLayer[%1%]/NHoles") % (iSLayer + 1)).str())).c_str()) / 2;
-    _nShifts[layerId] = atoi((gbxParams.getParamString((format("SLayers/SLayer[%1%]/NShift") % (iSLayer + 1)).str())).c_str());
-    _offSet[layerId] = atof((gbxParams.getParamString((format("SLayers/SLayer[%1%]/Offset") % (iSLayer + 1)).str())).c_str());
-    _cellSize[layerId] = 2 * M_PI * _rSLayer[layerId] / (double) _nWires[layerId];
+    m_rSLayer[layerId] = gbxParams.getParamLength((format("SLayers/SLayer[%1%]/Radius") % (iSLayer + 1)).str());
+    m_zSBackwardLayer[layerId] = gbxParams.getParamLength((format("SLayers/SLayer[%1%]/BackwardZ") % (iSLayer + 1)).str());
+    m_zSForwardLayer[layerId] = gbxParams.getParamLength((format("SLayers/SLayer[%1%]/ForwardZ") % (iSLayer + 1)).str());
+    m_nWires[layerId] = atoi((gbxParams.getParamString((format("SLayers/SLayer[%1%]/NHoles") % (iSLayer + 1)).str())).c_str()) / 2;
+    m_nShifts[layerId] = atoi((gbxParams.getParamString((format("SLayers/SLayer[%1%]/NShift") % (iSLayer + 1)).str())).c_str());
+    m_offSet[layerId] = atof((gbxParams.getParamString((format("SLayers/SLayer[%1%]/Offset") % (iSLayer + 1)).str())).c_str());
+    m_cellSize[layerId] = 2 * M_PI * m_rSLayer[layerId] / (double) m_nWires[layerId];
   }
 
   // Get field layers parameters
   int nFLayer = gbxParams.getNumberNodes("FLayers/FLayer");
-  _nFLayer = nFLayer;
+  m_nFLayer = nFLayer;
 
   // Loop over all field layers
   for (int iFLayer = 0; iFLayer < nFLayer; iFLayer++) {
     int layerId = atoi((gbxParams.getParamString((format("FLayers/FLayer[%1%]/@id") % (iFLayer + 1)).str())).c_str());
-    _rFLayer[layerId] = gbxParams.getParamLength((format("FLayers/FLayer[%1%]/Radius") % (iFLayer + 1)).str());
-    _zFBackwardLayer[layerId] = gbxParams.getParamLength((format("FLayers/FLayer[%1%]/BackwardZ") % (iFLayer + 1)).str());
-    _zFForwardLayer[layerId] = gbxParams.getParamLength((format("FLayers/FLayer[%1%]/ForwardZ") % (iFLayer + 1)).str());
+    m_rFLayer[layerId] = gbxParams.getParamLength((format("FLayers/FLayer[%1%]/Radius") % (iFLayer + 1)).str());
+    m_zFBackwardLayer[layerId] = gbxParams.getParamLength((format("FLayers/FLayer[%1%]/BackwardZ") % (iFLayer + 1)).str());
+    m_zFForwardLayer[layerId] = gbxParams.getParamLength((format("FLayers/FLayer[%1%]/ForwardZ") % (iFLayer + 1)).str());
   }
 
   // Get sense wire diameter
-  _senseWireDiameter = gbxParams.getParamLength("SenseWire/Diameter");
+  m_senseWireDiameter = gbxParams.getParamLength("SenseWire/Diameter");
 
   // Get field wire diameter
-  _fieldWireDiameter = gbxParams.getParamLength("FieldWire/Diameter");
+  m_fieldWireDiameter = gbxParams.getParamLength("FieldWire/Diameter");
 
   //Print();
 
 }
 
-void CDCGeometryPar::Print(void) const
+void CDCGeometryPar::Print() const
 {
 }
 
-TVector3 CDCGeometryPar::wireForwardPosition(int layerID, int cellID)
+const TVector3 CDCGeometryPar::wireForwardPosition(int layerID, int cellID) const
 {
-  const unsigned nWires = _nWires[layerID];
-  double offset = _offSet[layerID];
+  const unsigned nWires = m_nWires[layerID];
+  double offset = m_offSet[layerID];
   //...Offset modification to be aligned to axial at z=0...
   const double phiSize = 2 * M_PI / double(nWires);
   {
     const double phiF = phiSize * offset
-                        + phiSize * 0.5 * double(_nShifts[layerID]);
+                        + phiSize * 0.5 * double(m_nShifts[layerID]);
     const double phiB = phiSize * offset;
-    const TVector3 f(_rSLayer[layerID] * cos(phiF), _rSLayer[layerID] * sin(phiF), _zSForwardLayer[layerID]);
-    const TVector3 b(_rSLayer[layerID] * cos(phiB), _rSLayer[layerID] * sin(phiB), _zSBackwardLayer[layerID]);
+    const TVector3 f(m_rSLayer[layerID] * cos(phiF), m_rSLayer[layerID] * sin(phiF), m_zSForwardLayer[layerID]);
+    const TVector3 b(m_rSLayer[layerID] * cos(phiB), m_rSLayer[layerID] * sin(phiB), m_zSBackwardLayer[layerID]);
 
     const TVector3 v = f - b;
     const TVector3 u = v.Unit();
@@ -170,30 +161,27 @@ TVector3 CDCGeometryPar::wireForwardPosition(int layerID, int cellID)
   }
 
   const double phiF = phiSize * (double(cellID) + offset)
-                      + phiSize * 0.5 * double(_nShifts[layerID]);
+                      + phiSize * 0.5 * double(m_nShifts[layerID]);
   const double phiB = phiSize * (double(cellID) + offset);
-  const TVector3 f(_rSLayer[layerID] * cos(phiF), _rSLayer[layerID] * sin(phiF), _zSForwardLayer[layerID]);
-  const TVector3 b(_rSLayer[layerID] * cos(phiB), _rSLayer[layerID] * sin(phiB), _zSBackwardLayer[layerID]);
-  _wireForwardPosition[layerID][cellID].SetX(f.X());
-  _wireForwardPosition[layerID][cellID].SetY(f.Y());
-  _wireForwardPosition[layerID][cellID].SetZ(f.Z());
+  const TVector3 f(m_rSLayer[layerID] * cos(phiF), m_rSLayer[layerID] * sin(phiF), m_zSForwardLayer[layerID]);
+  const TVector3 b(m_rSLayer[layerID] * cos(phiB), m_rSLayer[layerID] * sin(phiB), m_zSBackwardLayer[layerID]);
 
-  return _wireForwardPosition[layerID][cellID];
+  return f;
 }
 
-TVector3 CDCGeometryPar::wireBackwardPosition(int layerID, int cellID)
+const TVector3 CDCGeometryPar::wireBackwardPosition(int layerID, int cellID) const
 {
-  const unsigned nWires = _nWires[layerID];
+  const unsigned nWires = m_nWires[layerID];
 
-  double offset = _offSet[layerID];
+  double offset = m_offSet[layerID];
   //...Offset modification to be aligned to axial at z=0...
   const double phiSize = 2 * M_PI / double(nWires);
   {
     const double phiF = phiSize * offset
-                        + phiSize * 0.5 * double(_nShifts[layerID]);
+                        + phiSize * 0.5 * double(m_nShifts[layerID]);
     const double phiB = phiSize * offset;
-    const TVector3 f(_rSLayer[layerID] * cos(phiF), _rSLayer[layerID] * sin(phiF), _zSForwardLayer[layerID]);
-    const TVector3 b(_rSLayer[layerID] * cos(phiB), _rSLayer[layerID] * sin(phiB), _zSBackwardLayer[layerID]);
+    const TVector3 f(m_rSLayer[layerID] * cos(phiF), m_rSLayer[layerID] * sin(phiF), m_zSForwardLayer[layerID]);
+    const TVector3 b(m_rSLayer[layerID] * cos(phiB), m_rSLayer[layerID] * sin(phiB), m_zSBackwardLayer[layerID]);
 
     const TVector3 v = f - b;
     const TVector3 u = v.Unit();
@@ -204,58 +192,51 @@ TVector3 CDCGeometryPar::wireBackwardPosition(int layerID, int cellID)
   }
 
   const double phiF = phiSize * (double(cellID) + offset)
-                      + phiSize * 0.5 * double(_nShifts[layerID]);
+                      + phiSize * 0.5 * double(m_nShifts[layerID]);
   const double phiB = phiSize * (double(cellID) + offset);
-  const TVector3 f(_rSLayer[layerID] * cos(phiF), _rSLayer[layerID] * sin(phiF), _zSForwardLayer[layerID]);
-  const TVector3 b(_rSLayer[layerID] * cos(phiB), _rSLayer[layerID] * sin(phiB), _zSBackwardLayer[layerID]);
-  _wireBackwardPosition[layerID][cellID].SetX(b.X());
-  _wireBackwardPosition[layerID][cellID].SetY(b.Y());
-  _wireBackwardPosition[layerID][cellID].SetZ(b.Z());
+  const TVector3 f(m_rSLayer[layerID] * cos(phiF), m_rSLayer[layerID] * sin(phiF), m_zSForwardLayer[layerID]);
+  const TVector3 b(m_rSLayer[layerID] * cos(phiB), m_rSLayer[layerID] * sin(phiB), m_zSBackwardLayer[layerID]);
 
-  return _wireBackwardPosition[layerID][cellID];
+  return b;
 }
 
-const double *
-CDCGeometryPar::innerRadiusWireLayer(void) const
+const double* CDCGeometryPar::innerRadiusWireLayer() const
 {
   static double IRWL[MAX_N_SLAYERS] = {0};
 
   IRWL[0] = outerRadiusInnerWall();
   for (unsigned i = 1; i < nWireLayers(); i++)
-    //IRWL[i] = (_rSLayer[i - 1] + _rSLayer[i]) / 2.;
-    IRWL[i] = _rFLayer[i - 1];
+    //IRWL[i] = (m_rSLayer[i - 1] + m_rSLayer[i]) / 2.;
+    IRWL[i] = m_rFLayer[i - 1];
 
   return IRWL;
 }
 
-const double *
-CDCGeometryPar::outerRadiusWireLayer(void) const
+const double* CDCGeometryPar::outerRadiusWireLayer() const
 {
   static double ORWL[MAX_N_SLAYERS] = {0};
 
   ORWL[nWireLayers() - 1] = innerRadiusOuterWall();
   for (unsigned i = 0; i < nWireLayers() - 1; i++)
-    //ORWL[i] = (_rSLayer[i] + _rSLayer[i + 1]) / 2.;
-    ORWL[i] = _rFLayer[i];
+    //ORWL[i] = (m_rSLayer[i] + m_rSLayer[i + 1]) / 2.;
+    ORWL[i] = m_rFLayer[i];
 
   return ORWL;
 }
 
-unsigned
-CDCGeometryPar::cellId(unsigned layerId,
-                       const TVector3 & position) const
+unsigned CDCGeometryPar::cellId(unsigned layerId, const TVector3& position) const
 {
-  const unsigned nWires = _nWires[layerId];
+  const unsigned nWires = m_nWires[layerId];
 
-  double offset = _offSet[layerId];
+  double offset = m_offSet[layerId];
   //...Offset modification to be aligned to axial at z=0...
   const double phiSize = 2 * M_PI / double(nWires);
   {
     const double phiF = phiSize * offset
-                        + phiSize * 0.5 * double(_nShifts[layerId]);
+                        + phiSize * 0.5 * double(m_nShifts[layerId]);
     const double phiB = phiSize * offset;
-    const TVector3 f(_rSLayer[layerId] * cos(phiF), _rSLayer[layerId] * sin(phiF), _zSForwardLayer[layerId]);
-    const TVector3 b(_rSLayer[layerId] * cos(phiB), _rSLayer[layerId] * sin(phiB), _zSBackwardLayer[layerId]);
+    const TVector3 f(m_rSLayer[layerId] * cos(phiF), m_rSLayer[layerId] * sin(phiF), m_zSForwardLayer[layerId]);
+    const TVector3 b(m_rSLayer[layerId] * cos(phiB), m_rSLayer[layerId] * sin(phiB), m_zSBackwardLayer[layerId]);
 
     const TVector3 v = f - b;
     const TVector3 u = v.Unit();
@@ -268,10 +249,10 @@ CDCGeometryPar::cellId(unsigned layerId,
   unsigned j = 0;
   for (unsigned i = 0; i < 1; i++) {
     const double phiF = phiSize * (double(i) + offset)
-                        + phiSize * 0.5 * double(_nShifts[layerId]);
+                        + phiSize * 0.5 * double(m_nShifts[layerId]);
     const double phiB = phiSize * (double(i) + offset);
-    const TVector3 f(_rSLayer[layerId] * cos(phiF), _rSLayer[layerId] * sin(phiF), _zSForwardLayer[layerId]);
-    const TVector3 b(_rSLayer[layerId] * cos(phiB), _rSLayer[layerId] * sin(phiB), _zSBackwardLayer[layerId]);
+    const TVector3 f(m_rSLayer[layerId] * cos(phiF), m_rSLayer[layerId] * sin(phiF), m_zSForwardLayer[layerId]);
+    const TVector3 b(m_rSLayer[layerId] * cos(phiB), m_rSLayer[layerId] * sin(phiB), m_zSBackwardLayer[layerId]);
     const TVector3 v = f - b;
     const TVector3 u = v.Unit();
     const double beta = (position.z() - b.z()) / u.z();
@@ -309,7 +290,7 @@ void CDCGeometryPar::generateXML(const string & of)
 
   ofs << "    <SLayers>" << endl;
 
-  for (int i = 0; i < _nSLayer; i++) {
+  for (int i = 0; i < m_nSLayer; i++) {
     ofs << "      <SLayer id=\"" << i << "\">" << endl;
     ofs << "        <Radius desc=\"Radius of wires in this layer\" unit=\"mm\">" << senseWireR(i) << "</Radius>" << endl;
     ofs << "        <BackwardZ desc=\"z position of this wire layer at backward endplate\" unit=\"mm\">" << senseWireBZ(i) << "</BackwardZ>" << endl;
@@ -318,14 +299,14 @@ void CDCGeometryPar::generateXML(const string & of)
 //    ofs << "        <ForwardPhi desc=\"azimuth angle of the first wire in this layer at forward endplate\" unit=\"rad\">" << wireForwardPosition(i).phi() << "</ForwardPhi>" << endl;
     ofs << "        <NHoles desc=\"the number of holes in this layer, 2*(cell number)\">" << nWiresInLayer(i)*2 << "</NHoles>" << endl;
     ofs << "        <NShift desc=\"the shifted hole number of each wire in this layer\">" << nShifts(i) << "</NShift>" << endl;
-    ofs << "        <Offset desc=\"wire offset in phi direction at endplate\">" << _offSet[i] << "</Offset>" << endl;
+    ofs << "        <Offset desc=\"wire offset in phi direction at endplate\">" << m_offSet[i] << "</Offset>" << endl;
     ofs << "      </SLayer>" << endl;
   }
 
   ofs << "    </SLayers>" << endl;
   ofs << "    <FLayers>" << endl;
 
-  for (int i = 0; i < _nFLayer; i++) {
+  for (int i = 0; i < m_nFLayer; i++) {
     ofs << "      <FLayer id=\"" << i << "\">" << endl;
     ofs << "        <Radius desc=\"Radius of field wires in this layer\" unit=\"mm\">" << fieldWireR(i) << "</Radius>" << endl;
     ofs << "        <BackwardZ desc=\"z position of this field wire layer at backward endplate\" unit=\"mm\">" << fieldWireBZ(i) << "</BackwardZ>" << endl;
@@ -338,15 +319,15 @@ void CDCGeometryPar::generateXML(const string & of)
   ofs << "    <InnerWall name=\"InnerWall\">" << endl;
   ofs << "      <InnerR desc=\"Inner radius\" unit=\"mm\">" << innerRadiusInnerWall() << "</InnerR>" << endl;
   ofs << "      <OuterR desc=\"Outer radius\" unit=\"mm\">" << outerRadiusInnerWall() << "</OuterR>" << endl;
-  ofs << "      <BackwardZ desc=\"z position at backward endplate\" unit=\"mm\">" << _zWall[0][0] << "</BackwardZ>" << endl;
-  ofs << "      <ForwardZ desc=\"z position at forward endplate\" unit=\"mm\">" << _zWall[0][1] << "</ForwardZ>" << endl;
+  ofs << "      <BackwardZ desc=\"z position at backward endplate\" unit=\"mm\">" << m_zWall[0][0] << "</BackwardZ>" << endl;
+  ofs << "      <ForwardZ desc=\"z position at forward endplate\" unit=\"mm\">" << m_zWall[0][1] << "</ForwardZ>" << endl;
   ofs << "    </InnerWall>" << endl;
 
   ofs << "    <OuterWall name=\"OuterWall\">" << endl;
   ofs << "      <InnerR desc=\"Inner radius\" unit=\"mm\">" << innerRadiusOuterWall() << "</InnerR>" << endl;
   ofs << "      <OuterR desc=\"Outer radius\" unit=\"mm\">" << outerRadiusOuterWall() << "</OuterR>" << endl;
-  ofs << "      <BackwardZ desc=\"z position at backward endplate\" unit=\"mm\">" << _zWall[2][0] << "</BackwardZ>" << endl;
-  ofs << "      <ForwardZ desc=\"z position at forward endplate\" unit=\"mm\">" << _zWall[2][1] << "</ForwardZ>" << endl;
+  ofs << "      <BackwardZ desc=\"z position at backward endplate\" unit=\"mm\">" << m_zWall[2][0] << "</BackwardZ>" << endl;
+  ofs << "      <ForwardZ desc=\"z position at forward endplate\" unit=\"mm\">" << m_zWall[2][1] << "</ForwardZ>" << endl;
   ofs << "    </OuterWall>" << endl;
 
   ofs << "  </Content>"                                         << endl

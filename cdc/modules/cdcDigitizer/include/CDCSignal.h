@@ -117,7 +117,7 @@ namespace Belle2 {
     int m_layerId;   /*!< Layer id */
     int m_wireId;    /*!< Wire id */
     double m_charge; /*!< Charge of CDC signal */
-    double m_driftLength;   /*!< Drift length when signal has been created */
+    double m_driftLength;    /*!< Left drift length when signal has been created */
 
   };
 

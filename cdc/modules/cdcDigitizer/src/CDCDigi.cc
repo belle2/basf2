@@ -171,7 +171,8 @@ void CDCDigi::event()
     new(cdcArray->AddrAt(iDigits)) HitCDC();
     cdcArray[iDigits]->setLayerId(iterCDCMap->second->getLayerId());
     cdcArray[iDigits]->setWireId(iterCDCMap->second->getWireId());
-    cdcArray[iDigits]->setDriftLength(iterCDCMap->second->getDriftLength());
+    cdcArray[iDigits]->setLeftDriftLength(iterCDCMap->second->getDriftLength());
+    cdcArray[iDigits]->setRightDriftLength(iterCDCMap->second->getDriftLength());
     cdcArray[iDigits]->setCharge(iterCDCMap->second->getCharge());
 
     // Count number of digits

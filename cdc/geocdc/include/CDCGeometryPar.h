@@ -41,13 +41,13 @@ namespace Belle2 {
     /*!
         \return A reference to an instance of this class.
     */
-    static CDCGeometryPar* Instance(void);
+    static CDCGeometryPar* Instance();
 
     //! Clears
-    void clear(void);
+    void clear();
 
     //! Print some debug information
-    void Print(void) const;
+    void Print() const;
 
     //! Gets geometry parameters from gearbox.
     void read();
@@ -70,67 +70,67 @@ namespace Belle2 {
     /*!
         \return The inner radius of the outer wall.
     */
-    double innerRadiusOuterWall(void) const;
+    double innerRadiusOuterWall() const;
 
     //! Returns the outer radius of the outer wall.
     /*!
         \return The outer radius of the outer wall.
     */
-    double outerRadiusOuterWall(void) const;
+    double outerRadiusOuterWall() const;
 
     //! Returns the length of the outer wall in Z.
     /*!
         \return The length of the outer wall.
     */
-    double zOuterWall(void) const;
+    double zOuterWall() const;
 
     //! Returns the offset of the outer wall in z direction.
     /*!
         \return The z offset of the outer wall.
     */
-    double zOffsetOuterWall(void) const;
+    double zOffsetOuterWall() const;
 
     //! Returns the inner radius of the inner wall.
     /*!
         \return The inner radius of the inner wall.
     */
-    double innerRadiusInnerWall(void) const;
+    double innerRadiusInnerWall() const;
 
     //! Returns the outer radius of the inner wall.
     /*!
         \return The outer radius of the inner wall.
     */
-    double outerRadiusInnerWall(void) const;
+    double outerRadiusInnerWall() const;
 
     //! Returns the length of the inner wall in Z.
     /*!
         \return The length of the inner wall.
     */
-    double zInnerWall(void) const;
+    double zInnerWall() const;
 
     //! Returns the offset of the outer wall in z direction.
     /*!
         \return The z offset of the outer wall.
     */
-    double zOffsetInnerWall(void) const;
+    double zOffsetInnerWall() const;
 
     //! Returns diameter of the sense wire.
     /*!
         \return Diameter of the sense wire.
     */
-    double senseWireDiameter(void) const;
+    double senseWireDiameter() const;
 
     //! Returns diameter of the field wire.
     /*!
         \return Diameter of the field wire.
     */
-    double fieldWireDiameter(void) const;
+    double fieldWireDiameter() const;
 
     //! Returns a number of wire layers.
     /*!
         \return The number of wire layers.
     */
-    unsigned nWireLayers(void) const;
+    unsigned nWireLayers() const;
 
     //! Returns wire numbers in a layer
     /*!
@@ -143,25 +143,25 @@ namespace Belle2 {
     /*!
         \return An array of inner radius of wire layers.
     */
-    const double * innerRadiusWireLayer(void) const;
+    const double * innerRadiusWireLayer() const;
 
     //! Returns an array of outer radius of wire layers.
     /*!
         \return A array of outer radius of wire layers.
     */
-    const double * outerRadiusWireLayer(void) const;
+    const double * outerRadiusWireLayer() const;
 
     //! Returns an array of forward z of wire layers.
     /*!
         \return An array of forward z.
     */
-    const double * zForwardWireLayer(void) const;
+    const double * zForwardWireLayer() const;
 
     //! Returns an array of backward z of wire layers.
     /*!
         \return An array of backward z.
     */
-    const double * zBackwardWireLayer(void) const;
+    const double * zBackwardWireLayer() const;
 
     //! Returns the offset of z of the wire layer i.
     /*!
@@ -176,7 +176,7 @@ namespace Belle2 {
         \param cellId The wire id.
         \return The forward position of wire cellId in layer layerId.
     */
-    TVector3 wireForwardPosition(int layerId, int cellId);
+    const TVector3 wireForwardPosition(int layerId, int cellId) const;
 
     //! Returns an array of backward position of sense wires in each layer.
     /*!
@@ -184,7 +184,7 @@ namespace Belle2 {
         \param cellId The wire id.
         \return The backward position of wire cellId in layer layerId.
     */
-    TVector3 wireBackwardPosition(int layerId, int cellId);
+    const TVector3 wireBackwardPosition(int layerId, int cellId) const;
 
     //! Returns radius of sense wire in each layer.
     /*!
@@ -258,185 +258,157 @@ namespace Belle2 {
 
   private:
 
-    std::string _version; /*!< The version of geometry parameters. */
-    int _nSLayer;         /*!< The number of sense wire layer. */
-    int _nFLayer;         /*!< The number of field wire layer. */
-    double _rWall[4];     /*!< The array to store radius of inner wall and outer wall. */
-    double _zWall[4][2];  /*!< The array to store z position of inner wall and outer wall. */
+    std::string m_version; /*!< The version of geometry parameters. */
+    int m_nSLayer;         /*!< The number of sense wire layer. */
+    int m_nFLayer;         /*!< The number of field wire layer. */
+    double m_rWall[4];     /*!< The array to store radius of inner wall and outer wall. */
+    double m_zWall[4][2];  /*!< The array to store z position of inner wall and outer wall. */
 
-    double _rSLayer[MAX_N_SLAYERS];          /*!< The array to store radius of sense wire layers. */
-    double _zSForwardLayer[MAX_N_SLAYERS];   /*!< The array to store forward z position of sense wire layers. */
-    double _zSBackwardLayer[MAX_N_SLAYERS];  /*!< The array to store backward z position of sense wire layers. */
-    double _rFLayer[MAX_N_FLAYERS];          /*!< The array to store radius of field wire layers. */
-    double _zFForwardLayer[MAX_N_FLAYERS];   /*!< The array to store forward z position of field wire layers. */
-    double _zFBackwardLayer[MAX_N_FLAYERS];  /*!< The array to store backward z position of field wire layers. */
-    double _offSet[MAX_N_SLAYERS];           /*!< The array to store z offset of sense wire layers. */
-    double _cellSize[MAX_N_SLAYERS];         /*!< The array to store cell size in each sense wire layer. */
-    int _nShifts[MAX_N_SLAYERS];             /*!< The array to store shifted cell number in each sense wire layer. */
-    unsigned _nWires[MAX_N_SLAYERS];         /*!< The array to store the wire number in each sense wire layre. */
+    double m_rSLayer[MAX_N_SLAYERS];          /*!< The array to store radius of sense wire layers. */
+    double m_zSForwardLayer[MAX_N_SLAYERS];   /*!< The array to store forward z position of sense wire layers. */
+    double m_zSBackwardLayer[MAX_N_SLAYERS];  /*!< The array to store backward z position of sense wire layers. */
+    double m_rFLayer[MAX_N_FLAYERS];          /*!< The array to store radius of field wire layers. */
+    double m_zFForwardLayer[MAX_N_FLAYERS];   /*!< The array to store forward z position of field wire layers. */
+    double m_zFBackwardLayer[MAX_N_FLAYERS];  /*!< The array to store backward z position of field wire layers. */
+    double m_offSet[MAX_N_SLAYERS];           /*!< The array to store z offset of sense wire layers. */
+    double m_cellSize[MAX_N_SLAYERS];         /*!< The array to store cell size in each sense wire layer. */
+    int m_nShifts[MAX_N_SLAYERS];             /*!< The array to store shifted cell number in each sense wire layer. */
+    unsigned m_nWires[MAX_N_SLAYERS];         /*!< The array to store the wire number in each sense wire layre. */
 
-    TVector3 _wireForwardPosition[MAX_N_SLAYERS][MAX_N_SCELLS];  /*!< The forward position of each sense wire in each layer. */
-    TVector3 _wireBackwardPosition[MAX_N_SLAYERS][MAX_N_SCELLS]; /*!< The backward position of each sense wire in each layer. */
+    //TVector3 m_wireForwardPosition[MAX_N_SLAYERS][MAX_N_SCELLS];  /*!< The forward position of each sense wire in each layer. */
+    //TVector3 m_wireBackwardPosition[MAX_N_SLAYERS][MAX_N_SCELLS]; /*!< The backward position of each sense wire in each layer. */
 
-    double _senseWireDiameter;                   /*!< The diameter of sense wires. */
-    double _fieldWireDiameter;                   /*!< The diameter of field wires. */
+    double m_senseWireDiameter;                   /*!< The diameter of sense wires. */
+    double m_fieldWireDiameter;                   /*!< The diameter of field wires. */
 
-    static CDCGeometryPar* p_B4CDCGeometryParDB; /*!< Pointer that saves the instance of this class. */
+    static CDCGeometryPar* m_B4CDCGeometryParDB; /*!< Pointer that saves the instance of this class. */
   };
 
 //-----------------------------------------------------------------------------
 
   inline int CDCGeometryPar::nShifts(int layerID) const
   {
-    return _nShifts[layerID];
+    return m_nShifts[layerID];
   }
 
   inline unsigned CDCGeometryPar::nWiresInLayer(int layerID) const
   {
-    return _nWires[layerID];
+    return m_nWires[layerID];
   }
 
   inline void CDCGeometryPar::setSenseWireR(int layerId, double r)
   {
-    _rSLayer[layerId] = r;
+    m_rSLayer[layerId] = r;
   }
 
   inline void CDCGeometryPar::setSenseWireFZ(int layerId, double fz)
   {
-    _zSForwardLayer[layerId] = fz;
+    m_zSForwardLayer[layerId] = fz;
   }
 
   inline void CDCGeometryPar::setSenseWireBZ(int layerId, double bz)
   {
-    _zSBackwardLayer[layerId] = bz;
+    m_zSBackwardLayer[layerId] = bz;
   }
 
   inline double CDCGeometryPar::senseWireR(int layerID) const
   {
-    return _rSLayer[layerID];
+    return m_rSLayer[layerID];
   }
 
   inline double CDCGeometryPar::senseWireFZ(int layerID) const
   {
-    return _zSForwardLayer[layerID];
+    return m_zSForwardLayer[layerID];
   }
 
   inline double CDCGeometryPar::senseWireBZ(int layerID) const
   {
-    return _zSBackwardLayer[layerID];
+    return m_zSBackwardLayer[layerID];
   }
 
   inline double CDCGeometryPar::fieldWireR(int layerID) const
   {
-    return _rFLayer[layerID];
+    return m_rFLayer[layerID];
   }
 
   inline double CDCGeometryPar::fieldWireFZ(int layerID) const
   {
-    return _zFForwardLayer[layerID];
+    return m_zFForwardLayer[layerID];
   }
 
   inline double CDCGeometryPar::fieldWireBZ(int layerID) const
   {
-    return _zFBackwardLayer[layerID];
+    return m_zFBackwardLayer[layerID];
   }
 
-  inline
-  double
-  CDCGeometryPar::innerRadiusOuterWall(void) const
+  inline double CDCGeometryPar::innerRadiusOuterWall() const
   {
-    return _rWall[2];
+    return m_rWall[2];
   }
 
-  inline
-  double
-  CDCGeometryPar::outerRadiusOuterWall(void) const
+  inline double CDCGeometryPar::outerRadiusOuterWall() const
   {
-    return _rWall[3];
+    return m_rWall[3];
   }
 
-  inline
-  double
-  CDCGeometryPar::zOuterWall(void) const
+  inline double CDCGeometryPar::zOuterWall() const
   {
-    return (_zWall[2][1] - _zWall[2][0]);
+    return (m_zWall[2][1] - m_zWall[2][0]);
   }
 
-  inline
-  double
-  CDCGeometryPar::innerRadiusInnerWall(void) const
+  inline double CDCGeometryPar::innerRadiusInnerWall() const
   {
-    return _rWall[0];
+    return m_rWall[0];
   }
 
-  inline
-  double
-  CDCGeometryPar::outerRadiusInnerWall(void) const
+  inline double CDCGeometryPar::outerRadiusInnerWall() const
   {
-    return _rWall[1];
+    return m_rWall[1];
   }
 
-  inline
-  double
-  CDCGeometryPar::zInnerWall(void) const
+  inline double CDCGeometryPar::zInnerWall() const
   {
-    return (_zWall[0][1] - _zWall[0][0]);
+    return (m_zWall[0][1] - m_zWall[0][0]);
   }
 
-  inline
-  double
-  CDCGeometryPar::zOffsetOuterWall(void) const
+  inline double CDCGeometryPar::zOffsetOuterWall() const
   {
-    return (_zWall[2][0] + zOuterWall() / 2);
+    return (m_zWall[2][0] + zOuterWall() / 2);
   }
 
-  inline
-  double
-  CDCGeometryPar::zOffsetInnerWall(void) const
+  inline double CDCGeometryPar::zOffsetInnerWall() const
   {
-    return (_zWall[0][0] + zInnerWall() / 2);
+    return (m_zWall[0][0] + zInnerWall() / 2);
   }
 
-  inline
-  double
-  CDCGeometryPar::senseWireDiameter(void) const
+  inline double CDCGeometryPar::senseWireDiameter() const
   {
-    return _senseWireDiameter;
+    return m_senseWireDiameter;
   }
 
-  inline
-  double
-  CDCGeometryPar::fieldWireDiameter(void) const
+  inline double CDCGeometryPar::fieldWireDiameter() const
   {
-    return _fieldWireDiameter;
+    return m_fieldWireDiameter;
   }
 
-  inline
-  unsigned
-  CDCGeometryPar::nWireLayers(void) const
+  inline unsigned CDCGeometryPar::nWireLayers() const
   {
     return MAX_N_SLAYERS;
   }
 
-  inline
-  const double *
-  CDCGeometryPar::zForwardWireLayer(void) const
+  inline const double* CDCGeometryPar::zForwardWireLayer() const
   {
-    return _zSForwardLayer;
+    return m_zSForwardLayer;
   }
 
-  inline
-  const double *
-  CDCGeometryPar::zBackwardWireLayer(void) const
+  inline const double* CDCGeometryPar::zBackwardWireLayer() const
   {
-    return _zSBackwardLayer;
+    return m_zSBackwardLayer;
   }
 
-  inline
-  double
-  CDCGeometryPar::zOffsetWireLayer(unsigned i) const
+  inline double CDCGeometryPar::zOffsetWireLayer(unsigned i) const
   {
-    return (_zSBackwardLayer[i] + (_zSForwardLayer[i] - _zSBackwardLayer[i]) / 2);
+    return (m_zSBackwardLayer[i] + (m_zSForwardLayer[i] - m_zSBackwardLayer[i]) / 2);
   }
 
 } // end of namespace Belle2

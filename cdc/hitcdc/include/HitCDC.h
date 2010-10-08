@@ -28,8 +28,11 @@ namespace Belle2 {
     //! The wire id of this digit.
     int m_wireId;
 
-    //! Drigt length of this digit.
-    double m_driftLength;
+    //! Left drift length of this digit.
+    double m_leftDriftLength;
+
+    //! Right drift length of this digit.
+    double m_rightDriftLength;
 
     //! Charge of this digit.
     double m_charge;
@@ -40,23 +43,29 @@ namespace Belle2 {
     //! The method to set wire id
     void setWireId(int wireId) { m_wireId = wireId; }
 
-    //! The method to set time
-    void setDriftLength(double driftLength) { m_driftLength = driftLength; }
+    //! The method to set left drift length
+    void setLeftDriftLength(double leftDriftLength) { m_leftDriftLength = leftDriftLength; }
+
+    //! The method to set right drift length
+    void setRightDriftLength(double rightDriftLength) { m_rightDriftLength = rightDriftLength; }
 
     //! The method to set charge
     void setCharge(double charge) { m_charge = charge; }
 
     //! The method to get layer id
-    int getLayerId() { return m_layerId; }
+    int getLayerId() const { return m_layerId; }
 
     //! The method to get wire id
-    int getWireId() { return m_wireId; }
+    int getWireId() const { return m_wireId; }
 
-    //! The method to get time
-    double getDriftLength() { return m_driftLength; }
+    //! The method to get left drift length
+    double getLeftDriftLength() const { return m_leftDriftLength; }
+
+    //! The method to get right drift length
+    double getRightDriftLength() const { return m_rightDriftLength; }
 
     //! The method to get charge
-    double getCharge() { return m_charge; }
+    double getCharge() const { return m_charge; }
 
     //! Empty constructor
     /*! Recommended for ROOT IO
@@ -66,11 +75,13 @@ namespace Belle2 {
     //! Useful Constructor
     HitCDC(int layerId,
            int wireId,
-           double driftLength,
+           double leftDriftLength,
+           double rightDriftLength,
            double charge) {
       m_layerId = layerId;
       m_wireId = wireId;
-      m_driftLength = driftLength;
+      m_leftDriftLength = leftDriftLength;
+      m_rightDriftLength = rightDriftLength;
       m_charge = charge;
     }
 

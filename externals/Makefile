@@ -9,7 +9,7 @@ export GENFIT := $(EXTDIR)/genfit
 
 
 # all target
-all: boost clhep geant4 root genfit
+all: boost clhep geant4 root
 
 # clean up target
 clean:

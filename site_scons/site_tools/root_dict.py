@@ -3,7 +3,7 @@ from SCons.Builder import Builder
 from SCons.Scanner.C import CScanner
 
 # regular expression to find class names in linkdef files
-linkdef_class_re = re.compile(r'^#pragma\s+link\s+C\+\+\s+class\s+Belle2::(\S+);\s*$', re.M)
+linkdef_class_re = re.compile(r'^#pragma\s+link\s+C\+\+\s+class\s+Belle2::([\w<>,\*]+)[+-]?\!?;\s*$', re.M)
 
 # define emitter for linkdef files:
 # add all header files for classes which are listed in the linkdef file

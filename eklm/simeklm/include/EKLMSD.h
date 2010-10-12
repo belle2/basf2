@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Glina Pakhlova, Timofey Uglov                            *
+ * Contributors:  Timofey Uglov                            *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -11,14 +11,14 @@
 #ifndef EKLMSD_H
 #define EKLMSD_H
 
-#include <eklm/simeklm/EKLMHit.h>
+#include <eklm/eklmhit/EKLMSimHit.h>
 #include "G4VSensitiveDetector.hh"
 
 namespace Belle2 {
 
   //! The Class for EKLM Sensitive Detector
   /*! In this class, every variable defined in EKLMHit will be calculated.
-      And save EKLMHit into hits collection.
+    EKLMHits are saved into hits collection.
   */
 
 //class EKLMSD: public B4SensitiveDetectorBase
@@ -48,7 +48,7 @@ namespace Belle2 {
   private:
     G4double m_ThresholdEnergyDeposit;
     G4double m_ThresholdKineticEnergy;
-    EKLMHitsCollection *m_HitCollection;
+    EKLMSimHitsCollection *m_HitCollection;
     G4int m_HCID;
 
   };

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ParamSet type="EKLM">
-  <Name>Belle II EKLM</Name>
+  <Name>EKLM BelleII </Name>
   <Description>Belle II EKLM geometry</Description>
   <Version>0</Version>
   <Creator>EKLMBelleII</Creator>

@@ -28,7 +28,7 @@ def linkdef_emitter(target, source, env):
     return target, sources
 
 # define builder for root dictionaries
-rootcint = Builder(action = "rootcint -f $TARGET -c $_CPPDEFFLAGS $_CPPINCFLAGS $SOURCES",
+rootcint = Builder(action = "rootcint -f $TARGET -c -p $_CPPDEFFLAGS $_CPPINCFLAGS $SOURCES",
                    emitter = linkdef_emitter,
                    source_scanner = CScanner())
 

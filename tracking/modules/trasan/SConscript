@@ -1,0 +1,7 @@
+Import('env')
+
+env['LIBS'] = ['trigger']
+#env.ParseConfig('pkg-config --cflags --libs gtkmm-2.4')
+#print env.Dump()
+
+Return('env')

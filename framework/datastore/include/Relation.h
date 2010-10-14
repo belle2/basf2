@@ -89,6 +89,9 @@ namespace Belle2 {
     /*! Weight of the Relation. */
     float m_weight;
 
+    /*! ROOT Macro to make EventMetaData a ROOT class.*/
+    /*!
+    */
     ClassDef(Relation, 1);
   }; //class
 } // namespace Belle2

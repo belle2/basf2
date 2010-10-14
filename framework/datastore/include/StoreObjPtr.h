@@ -64,16 +64,17 @@ namespace Belle2 {
     */
     bool storeObject(T* AObject, const std::string& name, const EDurability& durability = c_Event);
 
-    /*! imitate pointer functionality */
+    /*! Imitate pointer functionality */
     T& operator *() const {return *m_storeObjPtr;};
 
-    /*! imitate pointer functionality */
+    /*! Imitate pointer functionality */
     T* operator ->() const {return m_storeObjPtr;};
 
-    /*! imitate pointer functionality */
+    /*! Imitate pointer functionality */
     operator bool() const {return m_storeObjPtr;};
 
-    /*!
+    /*! Returns the object as TObject.
+        This function overwrites the inherited virtual function.
     */
     TObject* getPtr() {return m_storeObjPtr;}
 

@@ -82,14 +82,23 @@ namespace Belle2 {
   private:
 
     /*! Event number. */
+    /*!
+    */
     unsigned long m_event;
 
     /*! Run number. */
+    /*!
+    */
     unsigned long m_run;
 
     /*! Experiment number. */
+    /*!
+    */
     unsigned long m_experiment;
 
+    /*! ROOT Macro to make EventMetaData a ROOT class.*/
+    /*!
+    */
     ClassDef(EventMetaData, 1);
 
   }; //class

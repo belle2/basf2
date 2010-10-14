@@ -23,11 +23,14 @@ namespace Belle2 {
   public:
 
     /*! Destructor.
+        Virtual because this is a base class.
     */
     virtual ~StoreAccessorAbs() = 0;
 
 
-    /*!
+    /*! Returns the object, that holds the information.
+        For StoreObjPtr this will be a TObject. <br>
+        For StoreArrays, this will give you back a TClonesArray.
     */
     virtual T* getPtr() = 0;
 

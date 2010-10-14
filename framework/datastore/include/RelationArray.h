@@ -72,6 +72,9 @@ namespace Belle2 {
     */
     std::vector<float> m_weight;
 
+    /*! ROOT Macro to make EventMetaData a ROOT class.*/
+    /*!
+    */
     ClassDef(RelationArray, 1);
   }; //class
 } // namespace Belle2

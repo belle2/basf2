@@ -15,16 +15,9 @@
 
 #include <iostream>
 #include <pangomm/init.h>
+#include "trigger/cdc/CDCTriggerWire.h"
+#include "trigger/cdc/CDCTriggerWireHit.h"
 #include "trigger/cdc/CDCTriggerDisplayDrawingArea.h"
-
-// #include "tracking/modules/trasan/CDCTriggerDisplayDrawingArea.h"
-// #include "tracking/modules/trasan/Trasan.h"
-// #include "trigger/cdc/CDCTriggerWireHit.h"
-// #include "tracking/modules/trasan/TLink.h"
-// #include "tracking/modules/trasan/TTrackBase.h"
-// #include "tracking/modules/trasan/TSegment.h"
-// #include "tracking/modules/trasan/TTrack.h"
-// #include "tracking/modules/trasan/TCircle.h"
 
 using namespace std;
 
@@ -37,6 +30,7 @@ CDCTriggerDisplayDrawingArea::CDCTriggerDisplayDrawingArea(int size,
       _axial(true),
       _stereo(false),
       _wireName(false),
+      _oldCDC(false),
       _x(0),
       _y(0),
       _innerR(innerR),
@@ -146,33 +140,37 @@ CDCTriggerDisplayDrawingArea::drawCDC(void) {
 		      360 * 64);
 
     //...Belle CDC...
-    const double innerR = 118;
-    const double outerR = 880;
-    _gc->set_foreground(_grey);
-    _gc->set_line_attributes(1,
-			     Gdk::LINE_ON_OFF_DASH,
-			     Gdk::CAP_NOT_LAST,
-			     Gdk::JOIN_MITER);
-    _window->draw_arc(_gc,
-		      0,
-		      x(- innerR),
-		      y(innerR),
- 		      int(2 * innerR * _scale),
- 		      int(2 * innerR * _scale),
-		      0,
-		      360 * 64);
-    _window->draw_arc(_gc,
-		      0,
-		      x(- outerR),
-		      y(outerR),
- 		      int(2 * outerR * _scale),
- 		      int(2 * outerR * _scale),
-		      0,
-		      360 * 64);
+    if (_oldCDC) {
+	const double innerR = 118;
+	const double outerR = 880;
+	_gc->set_foreground(_grey);
+	_gc->set_line_attributes(1,
+				 Gdk::LINE_ON_OFF_DASH,
+				 Gdk::CAP_NOT_LAST,
+				 Gdk::JOIN_MITER);
+	_window->draw_arc(_gc,
+			  0,
+			  x(- innerR),
+			  y(innerR),
+			  int(2 * innerR * _scale),
+			  int(2 * innerR * _scale),
+			  0,
+			  360 * 64);
+	_window->draw_arc(_gc,
+			  0,
+			  x(- outerR),
+			  y(outerR),
+			  int(2 * outerR * _scale),
+			  int(2 * outerR * _scale),
+			  0,
+			  360 * 64);
+    }
 }
 
 void
 CDCTriggerDisplayDrawingArea::draw(void) {
+    drawHits();
+
 //     unsigned n = _objects.length();
 //     for (unsigned i = 0; i < n; i++) {
 // 	const TTrackBase & track = * _objects[i];
@@ -192,50 +190,57 @@ CDCTriggerDisplayDrawingArea::draw(void) {
 //     }
 }
 
-// void
-// CDCTriggerDisplayDrawingArea::drawBase(const TTrackBase & base, Gdk::Color & c) {
-//     Glib::RefPtr<Gdk::Colormap> colormap = get_default_colormap();
-//     colormap->alloc_color(c);
-//     _gc->set_foreground(c);
-//     _gc->set_line_attributes(1,
-// 			     Gdk::LINE_SOLID,
-// 			     Gdk::CAP_NOT_LAST,
-// 			     Gdk::JOIN_MITER);
+void
+CDCTriggerDisplayDrawingArea::drawHits(void) {
+    Glib::RefPtr<Gdk::Colormap> colormap = get_default_colormap();
+    const unsigned n = _hits.size();
+    for (unsigned i = 0; i < n; i++) {
+ 	if (! _stereo)
+ 	    if (_hits[i]->wire().stereo())
+ 		continue;
+ 	if (! _axial)
+ 	    if (_hits[i]->wire().axial())
+ 		continue;
 
-//     const AList<TLink> & links = base.links();
-//     unsigned n = links.length();
-//     for (unsigned i = 0; i < n; i++) {
-// 	if (links[i]->wire() == NULL) continue;
-//  	if (! _stereo)
-//  	    if (links[i]->wire()->stereo())
-//  		continue;
-//  	if (! _axial)
-//  	    if (links[i]->wire()->axial())
-//  		continue;
+	//...Points...
+	const CTWire & w = _hits[i]->wire();
+	const HepGeom::Point3D<double> & p = w.forwardPosition();
+	double radius = _hits[i]->drift();
+	//	std::cout << "p=" << p << " drift=" << radius << std::endl;
 
-// 	//...Points...
-// 	const HepGeom::Point3D<double> & p = links[i]->wire()->forwardPosition();
-// 	//	const HepGeom::Point3D<double> & pz0 = links[i]->wire()->xyPosition();
-// 	double radius = links[i]->hit()->drift();
-// 	//	std::cout << "p=" << p << " drift=" << radius << std::endl;
+	colormap->alloc_color(_hitsColor[i]);
+	_gc->set_foreground(_hitsColor[i]);
+	_gc->set_line_attributes(1,
+				 Gdk::LINE_SOLID,
+				 Gdk::CAP_NOT_LAST,
+				 Gdk::JOIN_MITER);
 
-// 	_window->draw_arc(_gc,
-// 			  0,
-// 			  x((p.x() - radius) * 10),
-// 			  y((p.y() + radius) * 10),
-// 			  int(2 * radius * 10 * _scale),
-// 			  int(2 * radius * 10 * _scale),
-// 			  0,
-// 			  360 * 64);
-//  	if (_wireName) {
-// 	    Glib::ustring wn = links[i]->wire()->name().c_str();
-// 	    _pl->set_text(wn);
-// 	    _window->draw_layout(_gc, x(p.x() * 10.), y(p.y() * 10.), _pl);
+	_window->draw_arc(_gc,
+			  0,
+			  x((p.x() - radius) * 10),
+			  y((p.y() + radius) * 10),
+			  int(2 * radius * 10 * _scale),
+			  int(2 * radius * 10 * _scale),
+			  0,
+			  360 * 64);
+ 	if (_wireName) {
+	    Glib::ustring wn = _hits[i]->wire().name().c_str();
+	    _pl->set_text(wn);
+	    _window->draw_layout(_gc, x(p.x() * 10.), y(p.y() * 10.), _pl);
+	}
+
+// 	//...Cell shape...
+// 	Glib::ArrayHandle<Point> points;
+// 	const nDivisions = 3;
+// 	for (unsigned j = 0; j < nDivisions; j++) {
+	    
 // 	}
-//     }
 
-//     colormap->free_color(c);
-// }
+
+
+	colormap->free_color(_hitsColor[i]);
+    }
+}
 
 // void
 // CDCTriggerDisplayDrawingArea::drawSegment(const TSegment & base, Gdk::Color & c) {
@@ -402,19 +407,16 @@ CDCTriggerDisplayDrawingArea::resetPosition(void) {
     on_expose_event((GdkEventExpose *) NULL);
 }
 
-// void
-// CDCTriggerDisplayDrawingArea::append(const CAList<Belle2::CDCTriggerWireHit> & list,
-// 				    Gdk::Color c) {
-//     AList<TLink> links;
-//     for (unsigned i = 0; i < (unsigned) list.length(); i++)
-// 	links.append(new TLink(NULL, list[i]));
-//     _selfTLinks.append(links);
-//     TTrackBase * base = new TTrackBase(links);
-//     _selfObjects.append(base);
-//     _objects.append(base);
-//     _colors.append(new Gdk::Color(c));
-//     on_expose_event((GdkEventExpose *) NULL);
-// }
+void
+CDCTriggerDisplayDrawingArea::append(const std::vector<const CTWHit *> & l,
+				     Gdk::Color c) {
+    const unsigned n = l.size();
+    for (unsigned i = 0; i < n; i++) {
+	_hits.push_back(l[i]);
+	_hitsColor.push_back(c);
+    }
+    on_expose_event((GdkEventExpose *) NULL);
+}
 
 // void
 // CDCTriggerDisplayDrawingArea::append(const AList<TLink> & list, Gdk::Color c) {
@@ -508,6 +510,16 @@ CDCTriggerDisplayDrawingArea::resetPosition(void) {
 //     }
 //     on_expose_event((GdkEventExpose *) NULL);
 // }
+
+void
+CDCTriggerDisplayDrawingArea::clear(void) {
+    _hits.clear();
+    _hitsColor.clear();
+//     _objects.removeAll();
+//     HepAListDeleteAll(_colors);
+//     HepAListDeleteAll(_selfObjects);
+//     HepAListDeleteAll(_selfTLinks);
+}
 
 } // namespace Belle2
 

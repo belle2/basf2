@@ -86,7 +86,8 @@ class CDCTriggerWireHit {
 	      const std::string & prefix = std::string("")) const;
 
     /// returns a pointer to a CDCTriggerWire.
-    const CDCTriggerWire * const wire(void) const;
+//  const CDCTriggerWire * const wire(void) const;
+    const CDCTriggerWire & wire(void) const;
 
     /// returns state.
     unsigned state(void) const;
@@ -144,7 +145,8 @@ class CDCTriggerWireHit {
     mutable unsigned _state;
     float _drift[2];         // 0:left, 1:right
     float _driftError[2];
-    const CDCTriggerWire * const _wire;
+//  const CDCTriggerWire * const _wire;
+    const CDCTriggerWire & _wire;
     const HepGeom::Point3D<double>  & _xyPosition;
     mutable const void * _track;
     const CDCTriggerWireHitMC * _mc;
@@ -200,7 +202,8 @@ class CDCTriggerWireHit {
 #ifdef CDCTriggerWireHit_INLINE_DEFINE_HERE
 
 inline
-const CDCTriggerWire * const
+// const CDCTriggerWire * const
+const CDCTriggerWire &
 CDCTriggerWireHit::wire(void) const {
     return _wire;
 }

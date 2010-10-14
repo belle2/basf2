@@ -21,17 +21,16 @@
 namespace Belle2 {
 
 CDCTriggerWireHit::CDCTriggerWireHit(const CDCTriggerWire & w,
-			 float driftLeft,
-			 float driftLeftError,
-			 float driftRight,
-			 float driftRightError,
-			 float fudgeFactor)
-:
-  _state(0),
-  _wire(& w),
-  _xyPosition(w.xyPosition()),
-  _track(0),
-  _mc(0) {
+				     float driftLeft,
+				     float driftLeftError,
+				     float driftRight,
+				     float driftRightError,
+				     float fudgeFactor)
+    :  _state(0),
+       _wire(w),
+       _xyPosition(w.xyPosition()),
+       _track(0),
+       _mc(0) {
 //  w.hit(this); // set by CDCTrigger
     _drift[0] = driftLeft;
     _drift[1] = driftRight;
@@ -61,9 +60,10 @@ CDCTriggerWireHit::~CDCTriggerWireHit() {
 }
 
 void
-CDCTriggerWireHit::dump(const std::string & msg, const std::string & pre) const {
+CDCTriggerWireHit::dump(const std::string & msg,
+			const std::string & pre) const {
     std::cout << pre;
-    std::cout << _wire->name();
+    std::cout << _wire.name();
     if (msg.find("state") != std::string::npos ||
 	msg.find("detail") != std::string::npos) {
 	std::cout << ",state";
@@ -93,9 +93,9 @@ CDCTriggerWireHit::dump(const std::string & msg, const std::string & pre) const 
 
 Point3D
 CDCTriggerWireHit::position(unsigned lr) const {
-const HepGeom::Vector3D<double> HepXHat(1.0, 0.0, 0.0);
-const HepGeom::Vector3D<double> HepYHat(0.0, 1.0, 0.0);
-const HepGeom::Vector3D<double> HepZHat(0.0, 0.0, 1.0);
+    static const HepGeom::Vector3D<double> HepXHat(1.0, 0.0, 0.0);
+    static const HepGeom::Vector3D<double> HepYHat(0.0, 1.0, 0.0);
+    static const HepGeom::Vector3D<double> HepZHat(0.0, 0.0, 1.0);
 
     //...Left...
     if (lr == WireHitLeft) {
@@ -113,9 +113,9 @@ const HepGeom::Vector3D<double> HepZHat(0.0, 0.0, 1.0);
 int
 CDCTriggerWireHit::sortByWireId(const CDCTriggerWireHit ** a,
 				const CDCTriggerWireHit ** b) {
-    if ((* a)->wire()->id() > (* b)->wire()->id())
+    if ((* a)->wire().id() > (* b)->wire().id())
 	return 1;
-    else if ((* a)->wire()->id() == (* b)->wire()->id())
+    else if ((* a)->wire().id() == (* b)->wire().id())
 	return 0;
     else
 	return -1;

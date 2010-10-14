@@ -135,6 +135,12 @@ CDCTrigger::initialize(void) {
 	    lastShifts = nShifts;
 	}
 
+	//...Calculate radius...
+	const float swr = cdc2.senseWireR(i);
+	const float fwr = cdc2.fieldWireR(i);
+	const float innerRadius = swr - (fwr - swr);
+	const float outerRadius = swr + (fwr - swr);
+
 	//...New layer...
 	CDCTriggerLayer * layer = new CDCTriggerLayer(i,
 						      superLayerId,
@@ -146,7 +152,9 @@ CDCTrigger::initialize(void) {
 						      M_PI * cdc2.senseWireR(i)
 						      * cdc2.senseWireR(i)
 						      / double(nWiresInLayer),
-						      nWiresInLayer);
+						      nWiresInLayer,
+						      innerRadius,
+						      outerRadius);
 	_layers.push_back(layer);
 	superLayer->push_back(layer);
 	if (axial)
@@ -228,15 +236,17 @@ CDCTrigger::initialize(void) {
 	const CDCTriggerWire & wi = * slayer[0]->front();
 
 	const unsigned layerId = wi.layerId();
-	const float swr = cdc2.senseWireR(layerId);
-	const float fwr = cdc2.fieldWireR(layerId);
+//	const float swr = cdc2.senseWireR(layerId);
+//	const float fwr = cdc2.fieldWireR(layerId);
 	_width[i] = M_PI * 2 / float(slayer.back()->nWires());
-	_r[i] = swr - (fwr - swr);
+//	_r[i] = swr - (fwr - swr);
+	_r[i] = slayer[0]->innerRadius();
 	_r2[i] = _r[i] * _r[i];
 	if (i == (nSuperLayers() - 1)) {
-	    const float swr2 = cdc2.senseWireR(layerId);
-	    const float fwr2 = cdc2.fieldWireR(layerId - 1);
-	    _r[i] = swr2 - (swr2 - fwr2);
+// 	    const float swr2 = cdc2.senseWireR(layerId);
+// 	    const float fwr2 = cdc2.fieldWireR(layerId - 1);
+// 	    _r[i] = swr2 - (swr2 - fwr2);
+	    _r[i + 1] = slayer.back()->outerRadius();
  	    _r2[i + 1] = _r[i + 1] * _r[i + 1];
 // #ifdef CDCTRIGGER_DEBUG
 // 	std::cout << "    super layer " << i << " outer radius=" << _r[i]
@@ -424,7 +434,7 @@ CDCTrigger::fastClear(void) {
     if (_badHits.size()) {
 	unsigned i = 0;
 	while (CDCTriggerWireHit * h = _badHits[i++])
-	    ((CDCTriggerWire *) h->wire())->clear();
+	    ((CDCTriggerWire &) h->wire()).clear();
     }
 
     _hitWires.clear();
@@ -573,12 +583,12 @@ CDCTrigger::classification(void) {
 
     for (unsigned i = 0; i < n; i++) {
 	CDCTriggerWireHit * h = _hits[i];
-	const CDCTriggerWire * w = h->wire();
+	const CDCTriggerWire & w = h->wire();
 	unsigned state = h->state();
 
 	//...Cache pointers to a neighbor...
 	const CDCTriggerWire * neighbor[7];
-	for (unsigned j = 0; j < 7; j++) neighbor[j] = w->neighbor(j);
+	for (unsigned j = 0; j < 7; j++) neighbor[j] = w.neighbor(j);
 
 	//...Decide hit pattern...
 	unsigned pattern = 0;
@@ -604,14 +614,14 @@ CDCTrigger::classification(void) {
 	}
 
 	//...Check continuation...
-//	unsigned superLayer = w->superLayerId();
+//	unsigned superLayer = w.superLayerId();
 	bool previous = false;
 	bool next = false;
 	if (neighbor[0] == 0) previous = true;
 	else {
 	    if ((neighbor[0]->hit()) || neighbor[1]->hit())
 		previous = true;
-// 	    if (m_smallcell && w->layerId() == 3)
+// 	    if (m_smallcell && w.layerId() == 3)
 // 		if (neighbor[6]->hit())
 // 		    previous = true;
 	}

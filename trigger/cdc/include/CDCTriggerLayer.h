@@ -38,7 +38,9 @@ class CDCTriggerLayer : public std::vector<CDCTriggerWire *> {
 		    float offset,
 		    int nShifts,
 		    float cellSize,
-		    unsigned nWires);
+		    unsigned nWires,
+		    float innerRadius,
+		    float outerRadius);
 
     /// Constructor for track segments.
     CDCTriggerLayer(unsigned id,
@@ -84,14 +86,18 @@ class CDCTriggerLayer : public std::vector<CDCTriggerWire *> {
     /// returns cell size.
     float cellSize(void) const;
 
+    /// sets and returns inner radius.
+    float innerRadius(void) const;
+
+    /// sets and returns outer radius.
+    float outerRadius(void) const;
+
     /// dumps debug information.
     void dump(const std::string & message = std::string(""),
 	      const std::string & prefix = std::string("")) const;
 
     /// returns "A" or "U" or "V" depending on stereo type.
     const std::string stereoType(void) const;
-
-  public:// Modifiers
 
   private:
     const unsigned _id;
@@ -103,6 +109,8 @@ class CDCTriggerLayer : public std::vector<CDCTriggerWire *> {
     const int _nShifts;
     const float _cellSize;
     const unsigned _nWires;
+    float _innerRadius;
+    float _outerRadius;
 };
 
 //-----------------------------------------------------------------------------

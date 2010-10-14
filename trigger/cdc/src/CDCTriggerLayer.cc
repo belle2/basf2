@@ -28,7 +28,9 @@ CDCTriggerLayer::CDCTriggerLayer(unsigned id,
 				 float offset,
 				 int nShifts,
 				 float cellSize,
-				 unsigned nWires)
+				 unsigned nWires,
+				 float innerRadius,
+				 float outerRadius)
 :  _id(id),
    _superLayerId(superLayerId),
    _localLayerId(localLayerId),
@@ -37,7 +39,9 @@ CDCTriggerLayer::CDCTriggerLayer(unsigned id,
    _offset(offset),
    _nShifts(nShifts),
    _cellSize(cellSize),
-   _nWires(nWires) {
+   _nWires(nWires),
+   _innerRadius(innerRadius),
+   _outerRadius(outerRadius) {
 }
 
 CDCTriggerLayer::CDCTriggerLayer(unsigned id,

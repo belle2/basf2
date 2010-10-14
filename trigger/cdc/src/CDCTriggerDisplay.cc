@@ -13,14 +13,7 @@
 
 #ifdef CDCTRIGGER_DISPLAY
 
-//#include <iostream>
 #include "trigger/cdc/CDCTriggerDisplay.h"
-// #include "tracking/modules/trasan/Trasan.h"
-// #include "trigger/cdc/CDCTriggerWireHit.h"
-// #include "tracking/modules/trasan/TLink.h"
-// #include "tracking/modules/trasan/TTrackBase.h"
-// #include "tracking/modules/trasan/TSegment.h"
-// #include "tracking/modules/trasan/TTrack.h"
 
 namespace Belle2 {
 
@@ -36,12 +29,13 @@ CDCTriggerDisplay::CDCTriggerDisplay(const std::string & name,
     : _axial(true),
       _stereo(false),
       _wireName(false),
+      _oldCDC(false),
       _box0(false, 2),
       _menuButtons(true, 2),
       _buttonNext("Next Step"),
       _buttonEndOfEvent("End of Event"),
       _buttonNextEvent("Next Eevnt"),
-      _label("Stage : Tracking not started yet \nInformation : ",
+      _label("Stage : Triggering not started \nInformation : An event just occured",
 	     Gtk::ALIGN_LEFT,
 	     Gtk::ALIGN_TOP),
       _adjustment(double(size) / outerR / 2,
@@ -53,9 +47,20 @@ CDCTriggerDisplay::CDCTriggerDisplay(const std::string & name,
       _buttonAxial("Axial"),
       _buttonStereo("Stereo"),
       _buttonWireName("Wire Name"),
+      _buttonBelleCDC("Belle CDC"),
       _w(size, innerR, outerR) {
 
     set_title(name);
+
+    _buttonAxial.set_active();
+    _axial = _buttonAxial.get_active();
+    _buttonStereo.set_active(false);
+    _buttonBelleCDC.set_active(false);
+    _stereo = _buttonStereo.get_active();
+    _buttonWireName.set_active(false);
+    _wireName = _buttonWireName.get_active();
+
+    _w.set_size_request(size, size);
 
     _buttonNext
 	.signal_clicked()
@@ -77,7 +82,8 @@ CDCTriggerDisplay::CDCTriggerDisplay(const std::string & name,
     _scaler.set_size_request(200, 30);
     _scaler
 	.signal_value_changed()
-	.connect(sigc::mem_fun(* this, & CDCTriggerDisplay::on_scale_value_changed));
+	.connect(sigc::mem_fun(* this,
+			       & CDCTriggerDisplay::on_scale_value_changed));
     _buttonPositionReset
 	.signal_clicked()
 	.connect(sigc::mem_fun(* this, & CDCTriggerDisplay::on_positionReset));
@@ -90,18 +96,24 @@ CDCTriggerDisplay::CDCTriggerDisplay(const std::string & name,
     _buttonWireName
 	.signal_clicked()
 	.connect(sigc::mem_fun(* this, & CDCTriggerDisplay::on_wireName));
+    _buttonBelleCDC
+	.signal_clicked()
+	.connect(sigc::mem_fun(* this, & CDCTriggerDisplay::on_BelleCDC));
     _scale.pack_start(_scaler, Gtk::PACK_SHRINK, 5);
     _scale.pack_start(_buttonPositionReset, Gtk::PACK_EXPAND_WIDGET, 2);
     _scale.pack_start(_buttonAxial, Gtk::PACK_SHRINK, 2);
     _scale.pack_start(_buttonStereo, Gtk::PACK_SHRINK, 2);
     _scale.pack_start(_buttonWireName, Gtk::PACK_SHRINK, 2);
+    _scale.pack_start(_buttonBelleCDC, Gtk::PACK_SHRINK, 2);
 
-    _buttonAxial.set_active();
-    _axial = _buttonAxial.get_active();
-    _buttonStereo.set_active(false);
-    _stereo = _buttonStereo.get_active();
-    _buttonWireName.set_active(false);
-    _wireName = _buttonWireName.get_active();
+    _box0.pack_start(_menuButtons, Gtk::PACK_SHRINK, 5);
+    _box0.pack_start(_label, Gtk::PACK_EXPAND_WIDGET, 5);
+    _box0.pack_start(_w, Gtk::PACK_EXPAND_WIDGET, 5);
+    _box0.pack_start(_scale, Gtk::PACK_SHRINK, 5);
+
+    set_border_width(5);
+    add(_box0);
+    show_all();
 }
 
 CDCTriggerDisplay::~CDCTriggerDisplay() {
@@ -109,10 +121,18 @@ CDCTriggerDisplay::~CDCTriggerDisplay() {
 
 void
 CDCTriggerDisplay::on_scale_value_changed(void) {
+    const double val = scale();
+    _w.scale(val);
+// std::cout << "scale value=" << val << std::endl;
+    _w.on_expose_event((GdkEventExpose *) NULL);
 }
 
 void
 CDCTriggerDisplay::on_positionReset(void) {
+    _w.resetPosition();
+    const double val = _w.scale();
+    scale(val);
+    _w.on_expose_event((GdkEventExpose *) NULL);
 }
 
 void
@@ -131,6 +151,38 @@ void
 CDCTriggerDisplay::on_nextEvent(void) {
     _skipEvent = true;
     Gtk::Main::quit();
+}
+
+inline
+void
+CDCTriggerDisplay::on_axial(void) {
+    _axial = _buttonAxial.get_active();
+    _w.axial(_axial);
+    _w.on_expose_event((GdkEventExpose *) NULL);
+}
+
+inline
+void
+CDCTriggerDisplay::on_stereo(void) {
+    _stereo = _buttonStereo.get_active();
+    _w.stereo(_stereo);
+    _w.on_expose_event((GdkEventExpose *) NULL);
+}
+
+inline
+void
+CDCTriggerDisplay::on_wireName(void) {
+    _wireName = _buttonWireName.get_active();
+    _w.wireName(_wireName);
+    _w.on_expose_event((GdkEventExpose *) NULL);
+}
+
+inline
+void
+CDCTriggerDisplay::on_BelleCDC(void) {
+    _oldCDC = _buttonBelleCDC.get_active();
+    _w.oldCDC(_oldCDC);
+    _w.on_expose_event((GdkEventExpose *) NULL);
 }
 
 // void
@@ -155,17 +207,11 @@ CDCTriggerDisplay::run(void) {
 }
 
 void
-CDCTriggerDisplay::pack(Gtk::DrawingArea & w) {
-//    _w = & w;
-
-    _box0.pack_start(_menuButtons, Gtk::PACK_SHRINK, 5);
-    _box0.pack_start(_label, Gtk::PACK_EXPAND_WIDGET, 5);
-    _box0.pack_start(_w, Gtk::PACK_EXPAND_WIDGET, 5);
-    _box0.pack_start(_scale, Gtk::PACK_SHRINK, 5);
-
-    set_border_width(5);
-    add(_box0);
-    show_all();
+CDCTriggerDisplay::clear(void) {
+    _w.clear();
+    const std::string id = "unknown : ";
+    _stage = "";
+    _info = id;
 }
 
 } // namespace Belle2

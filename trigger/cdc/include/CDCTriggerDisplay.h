@@ -40,14 +40,38 @@ class CDCTriggerDisplay : public Gtk::Window {
 
   public: // dispaly control
 
+    /// runs GTK.
+    void run(void);
+
     /// clears window.
     virtual void clear(void);
+
+    /// tells window here is the beginning of an event.
+    void beginEvent(void);
+
+    /// tells window here is the end of an event.
+    void endOfEvent(void);
 
     /// returns skip flag.
     bool skip(void) const;
 
     /// sets and returns skip flag.
     bool skip(bool);
+
+    /// returns scaler value.
+    double scale(void) const;
+
+    /// sets and returns scaler value.
+    double scale(double);
+
+    /// returns present condition for axial wire display.
+    bool axial(void) const;
+
+    /// returns present condition for stereo wire display.
+    bool stereo(void) const;
+
+    /// returns present condition for wire name display.
+    bool wireName(void) const;
 
   public: // Status
 
@@ -57,13 +81,12 @@ class CDCTriggerDisplay : public Gtk::Window {
     /// sets information of present stage.
     void information(const std::string & information);
 
-    /// tells window here is the beginning of an event.
-    void beginEvent(void);
+  public: // Access to drawing area.
 
-    /// tells window here is the end of an event.
-    void endOfEvent(void);
+    /// returns drawing area.
+    CDCTriggerDisplayDrawingArea & area(void);
 
-  public: // Actions
+  private: // Actions
     virtual void on_next(void);
     virtual void on_endOfEvent(void);
     virtual void on_nextEvent(void);
@@ -72,36 +95,22 @@ class CDCTriggerDisplay : public Gtk::Window {
     virtual void on_axial(void);
     virtual void on_stereo(void);
     virtual void on_wireName(void);
-//  virtual bool on_expose_event(GdkEventExpose *);
+    virtual void on_BelleCDC(void);
 
-  public: // Static functions
-//    static void initializeGTK(void);
-    void run(void);
-
-  public: // Others
-    /// Set and pack drawing area.
-    void pack(Gtk::DrawingArea &);
-
-    /// To get/set sclaer value.
-    double scale(void) const;
-    double scale(double);
-
-    bool axial(void) const;
-    bool stereo(void) const;
-    bool wireName(void) const;
-
-  private: // Tracking stuff
+  private: // Objects to display and control
     std::string _stage;
     std::string _info;
     bool _skip;
     static bool _endOfEvent;
     static bool _endOfEventFlag;
     static bool _skipEvent;
+    std::vector<CDCTriggerWireHit *> _hits;
 
   private: // GTK stuff
     bool _axial;
     bool _stereo;
     bool _wireName;
+    bool _oldCDC;
     Gtk::VBox _box0;
     Gtk::HBox _menuButtons;
     Gtk::Button _buttonNext;
@@ -115,9 +124,7 @@ class CDCTriggerDisplay : public Gtk::Window {
     Gtk::CheckButton _buttonAxial;
     Gtk::CheckButton _buttonStereo;
     Gtk::CheckButton _buttonWireName;
-//  Gtk::DrawingArea * _w;
-
-  private: // GTK stuff
+    Gtk::CheckButton _buttonBelleCDC;
     CDCTriggerDisplayDrawingArea _w;
 };
 
@@ -130,25 +137,6 @@ class CDCTriggerDisplay : public Gtk::Window {
 #define TWINDOWGTK_INLINE_DEFINE_HERE
 #endif
 #ifdef TWINDOWGTK_INLINE_DEFINE_HERE
-
-inline
-void
-CDCTriggerDisplay::clear(void) {
-//     const struct belle_event & ev = 
-// 	* (struct belle_event *) BsGetEnt(BELLE_EVENT, 1, BBS_No_Index);
-//     const unsigned e = ev.m_ExpNo;
-//     const unsigned r = ev.m_RunNo;
-//     const unsigned f = (ev.m_EvtNo >> 28);
-//     const unsigned v = ev.m_EvtNo & 0x0fffffff;
-//     const std::string id =
-// 	"e" + itostring(e) +
-// 	" r" + itostring(r) +
-// 	" f" + itostring(f) +
-// 	" ev" + itostring(v) + " : ";
-    const std::string id = "unknown : ";
-    _stage = "";
-    _info = id;
-}
 
 inline
 void
@@ -176,24 +164,6 @@ inline
 bool
 CDCTriggerDisplay::skip(bool a) {
     return _skip = a;
-}
-
-inline
-void
-CDCTriggerDisplay::on_axial(void) {
-    _axial = _buttonAxial.get_active();
-}
-
-inline
-void
-CDCTriggerDisplay::on_stereo(void) {
-    _stereo = _buttonStereo.get_active();
-}
-
-inline
-void
-CDCTriggerDisplay::on_wireName(void) {
-    _wireName = _buttonWireName.get_active();
 }
 
 inline
@@ -238,6 +208,12 @@ inline
 void
 CDCTriggerDisplay::endOfEvent(void) {
     _endOfEvent = true;
+}
+
+inline
+CDCTriggerDisplayDrawingArea &
+CDCTriggerDisplay::area(void) {
+    return _w;
 }
 
 #endif

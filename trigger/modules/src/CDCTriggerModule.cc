@@ -20,15 +20,6 @@
 #include "trigger/cdc/CDCTriggerDisplay.h"
 #endif
 
-// #include <vector>
-// #include <TRandom3.h>
-// #include <framework/datastore/StoreDefs.h>
-// #include <framework/datastore/StoreObjPtr.h>
-// #include <framework/datastore/StoreArray.h>
-// #include <framework/datastore/DataStore.h>
-// #include <framework/datastore/SimpleVec.h>
-// #include <framework/datastore/Relation.h>
-
 namespace Belle2_CDCTrigger {
     Belle2::ModuleManager::Registrator<Belle2::CDCTriggerModule> REG;
 #ifdef CDCTRIGGER_DISPLAY
@@ -102,7 +93,6 @@ CDCTriggerModule::initialize() {
     _cdc->debugLevel(_debugLevel);
 
 #ifdef CDCTRIGGER_DISPLAY
-    cout << "CDCTriggerModule ... initializing GTK" << endl;
     int argc = 0;
     char ** argv = 0;
     Gtk::Main main_instance(argc, argv);
@@ -110,7 +100,7 @@ CDCTriggerModule::initialize() {
 	D = new CTDisplay();
     D->clear();
     D->show();
-    cout << "CDCTriggerModule ... display opened " << endl;
+    cout << "CDCTriggerModule ... GTK initialized" << endl;
 #endif
 #ifdef CDCTRIGGER_DEBUG
 //  _cdc->dump("geometry superLayers layers wires detail");
@@ -129,6 +119,14 @@ void
 CDCTriggerModule::event() {
 #ifdef CDCTRIGGER_DEBUG
     cout << "CDCTriggerModule ... event called " << endl;
+#endif
+#ifdef CDCTRIGGER_DISPLAY
+    _cdc->update(false);
+//  _cdc->dump("hits");
+    D->clear();
+    D->beginEvent();
+    D->area().append(_cdc->hits());
+    D->run();
 #endif
 }
 

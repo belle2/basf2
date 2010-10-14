@@ -19,6 +19,10 @@
 #include <vector>
 #include <gtkmm.h>
 
+#ifdef CDCTRIGGER_SHORT_NAMES
+#define CTDDArea CDCTriggerDisplayDrawingArea
+#endif
+
 namespace Belle2 {
 
 class CDCTriggerWireHit;
@@ -42,8 +46,14 @@ class CDCTriggerDisplayDrawingArea : public Gtk::DrawingArea {
     bool stereo(bool);
     bool wireName(void) const;
     bool wireName(bool);
+    bool oldCDC(void) const;
+    bool oldCDC(bool);
 
     void clear(void);
+
+    /// appends wire hits to display.
+    void append(const std::vector<const CDCTriggerWireHit *> &,
+ 		Gdk::Color color = Gdk::Color("grey"));
 //     void append(const std::vector<const Belle2::CDCTriggerWireHit *> &,
 // 		Gdk::Color color = Gdk::Color("grey"));
 //     void append(const AList<TLink> &,
@@ -62,6 +72,7 @@ class CDCTriggerDisplayDrawingArea : public Gtk::DrawingArea {
     virtual void on_realize();
     void drawCDC(void);
     void draw(void);
+    void drawHits(void);
 //     void drawBase(const TTrackBase &, Gdk::Color & c);
 //     void drawSegment(const TSegment &, Gdk::Color & c);
 //     void drawTrack(const TTrack &, Gdk::Color & c);
@@ -79,11 +90,15 @@ class CDCTriggerDisplayDrawingArea : public Gtk::DrawingArea {
     bool _axial;
     bool _stereo;
     bool _wireName;
+    bool _oldCDC;
     double _x, _y;
     double _innerR;
     double _outerR;
 
-    Gtk::Main * GtkMain;
+    std::vector<const CDCTriggerWireHit *> _hits;
+    std::vector<Gdk::Color> _hitsColor;
+
+//    Gtk::Main * GtkMain;
 //     CAList<TTrackBase> _objects;
 //     AList<Gdk::Color> _colors;
 //     AList<TTrackBase> _selfObjects;
@@ -157,6 +172,18 @@ CDCTriggerDisplayDrawingArea::wireName(bool a) {
 }
 
 inline
+bool
+CDCTriggerDisplayDrawingArea::oldCDC(void) const {
+    return _oldCDC;
+}
+
+inline
+bool
+CDCTriggerDisplayDrawingArea::oldCDC(bool a) {
+    return _oldCDC = a;
+}
+
+inline
 int
 CDCTriggerDisplayDrawingArea::x(double a) const {
 /*     std::cout << "_x,_scale,_winw/2,a=" << _x << "," << _scale << "," */
@@ -181,15 +208,6 @@ int
 CDCTriggerDisplayDrawingArea::yR(double a) const {
     return int((- a - _winh / 2) / _scale + _y);
 }
-
-// inline
-// void
-// CDCTriggerDisplayDrawingArea::clear(void) {
-//     _objects.removeAll();
-//     HepAListDeleteAll(_colors);
-//     HepAListDeleteAll(_selfObjects);
-//     HepAListDeleteAll(_selfTLinks);
-// }
 
 #endif
 #undef inline

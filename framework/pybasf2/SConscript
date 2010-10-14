@@ -4,6 +4,6 @@ env['PYTHON_MODULE'] = True
 env['LIBS'] = ['framework',
                'boost_python',
                '$PYTHON_LIBS',
-               'ir', 'pxd', 'svd', 'cdc', 'top', 'arich']
+               'ir', 'pxd', 'svd', 'cdc', 'top', 'arich', 'eklm']
 
 Return('env')

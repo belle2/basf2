@@ -2,7 +2,7 @@ import os, re
 from SCons.Builder import Builder
 
 # regular expression to find module names in source files
-module_name_re = re.compile(r'REG_MODULE\((\S+)\)', re.M)
+module_name_re = re.compile(r'REG_MODULE\(([\S ]+)\)', re.M)
 
 # extract the module names from all source files
 def build_map(target, source, env):

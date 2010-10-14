@@ -473,9 +473,9 @@ CDCTrigger::update(bool mcAnalysis) {
 
 	//...CDCTriggerWireHit...
 	CDCTriggerWireHit * hit = new CDCTriggerWireHit(w,
-							h.getDriftLength(),
+							h.getLeftDriftLength(),
 							0.15,
-							h.getDriftLength(),
+   						       h.getRightDriftLength(),
 							0.15,
 							1);
 	hit->state(WireHitFindingValid | WireHitFittingValid );

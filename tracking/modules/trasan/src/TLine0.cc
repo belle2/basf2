@@ -257,17 +257,17 @@ TLine0::fit2() {
 	TLink & l = * _links[i];
         for (unsigned j = i+1; j < n  ; j++) {
    	   TLink & s = * _links[j];
-           if(l.hit()->wire()->layerId() == s.hit()->wire()->layerId()){
+           if(l.hit()->wire().layerId() == s.hit()->wire().layerId()){
 	     //... Check 3 consective hits
              if(i > 0 && (mask[i-1] == 1 && mask[j] == 1) ){
                TLink & t = * _links[i-1];
-               if(l.hit()->wire()->layerId() == t.hit()->wire()->layerId()){
+               if(l.hit()->wire().layerId() == t.hit()->wire().layerId()){
 	         mask[i] = 1;
 	       }
 	     }
-             int ilast = nsl[l.hit()->wire()->superLayerId()]-1;
-             int ilocal = l.hit()->wire()->localId();
-             int jlocal = s.hit()->wire()->localId();
+             int ilast = nsl[l.hit()->wire().superLayerId()]-1;
+             int ilocal = l.hit()->wire().localId();
+             int jlocal = s.hit()->wire().localId();
              if(ilocal > 0 && ilocal < ilast){
                if(abs(jlocal-ilocal) > 1 ) {
                   mask[i] = 1;
@@ -315,7 +315,7 @@ TLine0::fit2() {
 	sumXY += x * y;
 	sumY2 += y * y;
         if(nused < 2){
-          lyid[nused] = l.hit()->wire()->layerId();
+          lyid[nused] = l.hit()->wire().layerId();
 	}
         nused += 1;
     }
@@ -346,7 +346,7 @@ TLine0::fit2s() {
 	TLink & l = * _links[i];
         for (unsigned j = i+1; j < n  ; j++) {
    	   TLink & s = * _links[j];
-           if(l.hit()->wire()->layerId() == s.hit()->wire()->layerId()){
+           if(l.hit()->wire().layerId() == s.hit()->wire().layerId()){
               mask[i] = 1;
               mask[j] = 1;
            }
@@ -408,7 +408,7 @@ TLine0::fit2sp() {
 	TLink & l = * _links[i];
         for (unsigned j = i+1; j < n  ; j++) {
    	   TLink & s = * _links[j];
-           if(l.hit()->wire()->layerId() == s.hit()->wire()->layerId()){
+           if(l.hit()->wire().layerId() == s.hit()->wire().layerId()){
               mask[i] = 1;
               mask[j] = 1;
            }
@@ -487,17 +487,17 @@ TLine0::fit2p() {
 	TLink & l = * _links[i];
         for (unsigned j = i+1; j < n  ; j++) {
    	   TLink & s = * _links[j];
-           if(l.hit()->wire()->layerId() == s.hit()->wire()->layerId()){
+           if(l.hit()->wire().layerId() == s.hit()->wire().layerId()){
 	     //... Check 3 consective hits
              if(i > 0 && (mask[i-1] == 1 && mask[j] == 1) ){
                TLink & t = * _links[i-1];
-               if(l.hit()->wire()->layerId() == t.hit()->wire()->layerId()){
+               if(l.hit()->wire().layerId() == t.hit()->wire().layerId()){
 	         mask[i] = 1;
 	       }
 	     }
-             int ilast = nsl[l.hit()->wire()->superLayerId()]-1;
-             int ilocal = l.hit()->wire()->localId();
-             int jlocal = s.hit()->wire()->localId();
+             int ilast = nsl[l.hit()->wire().superLayerId()]-1;
+             int ilocal = l.hit()->wire().localId();
+             int jlocal = s.hit()->wire().localId();
              if(ilocal > 0 && ilocal < ilast){
                if(abs(jlocal-ilocal) > 1 ) {
                   mask[i] = 1;
@@ -560,7 +560,7 @@ TLine0::fit2p() {
 	sumXY += x * y;
 	sumY2 += y * y;
         if(nused < 2){
-          lyid[nused] = l.hit()->wire()->layerId();
+          lyid[nused] = l.hit()->wire().layerId();
 	}
         nused += 1;
     }
@@ -588,7 +588,7 @@ TLine0::removeChits() {
     int nneg = 0, npos = 0;
     for (unsigned i = 0; i < n -1 ; i++) {
 	TLink & l = * _links[i];
-        nlyr[l.hit()->wire()->layerId()] += 1;
+        nlyr[l.hit()->wire().layerId()] += 1;
         if(l.position().y() < 0.){
            nneg += 1;
 	}else {
@@ -603,7 +603,7 @@ TLine0::removeChits() {
 	TLink & l = * _links[i];
 
 	//...if # of hits in a wire layer, don't use...
-	if (nlyr[l.hit()->wire()->layerId()] > 3) {
+	if (nlyr[l.hit()->wire().layerId()] > 3) {
             bad.append(l);
             continue;
 	}
@@ -647,7 +647,7 @@ TLine0::appendByszdistance(AList<TLink> & list, unsigned isl, float maxSigma) {
     unsigned n = list.length();
     for (unsigned i = 0; i < n; i++) {
 	TLink & l = * list[i];
-        if(l.hit()->wire()->superLayerId() == isl){
+        if(l.hit()->wire().superLayerId() == isl){
   	  double dist = distance(l);
 	  if (dist < maxSigma) {
             _links.append(l);
@@ -663,8 +663,8 @@ TLine0::appendByszdistance(AList<TLink> & list, unsigned isl, float maxSigma) {
          TLink & l = * _links[i];
          if(i < na - 1) {
            TLink & lnext = * _links[i+1];
-           if(l.hit()->wire()->layerId() == lnext.hit()->wire()->layerId() ){
-             if(l.hit()->wire()->localId() == lnext.hit()->wire()->localId()){
+           if(l.hit()->wire().layerId() == lnext.hit()->wire().layerId() ){
+             if(l.hit()->wire().localId() == lnext.hit()->wire().localId()){
                bad.append(l);
 	     }
 	   }

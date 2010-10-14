@@ -328,7 +328,8 @@ void T3DLineFitter::drift(const T3DLine& t,const TLink& l,
   }
   
   //...T0 and propagation corrections...
-  int wire = h.wire()->id();
+//int wire = h.wire()->id();
+  int wire = h.wire().id();
   int side = leftRight;
   if (side==0) side = -1;
   float p[3] = {-t.sinPhi0(),t.cosPhi0(),t.tanl()};

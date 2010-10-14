@@ -693,14 +693,14 @@ TLink::distance(void) const {
 inline
 const Belle2::CDCTriggerWire * const
 TLink::wire(void) const {
-    if (_hit) return _hit->wire();
+    if (_hit) return & _hit->wire();
     return NULL;
 }
 
 inline
 const HepGeom::Point3D<double> &
 TLink::xyPosition(void) const {
-    return _hit->wire()->xyPosition();
+    return _hit->wire().xyPosition();
 }
 
 inline

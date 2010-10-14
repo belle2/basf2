@@ -985,22 +985,22 @@ TBuilder0::buildStereo(TTrack & track, const AList<TLink> & list) const {
 			int relation23 = -1;
 
 			//... Check the hit in fist and it in the second layer
-			relation12 = checkHits(l.hit()->wire()->localId(),
-					       l2.hit()->wire()->localId(),
+			relation12 = checkHits(l.hit()->wire().localId(),
+					       l2.hit()->wire().localId(),
 					       isl);
 			//... 
 			if (l.zStatus() == 20 && relation12 < 0)
-			    relation12 = checkHits(m.hit()->wire()->localId(),
-						   l2.hit()->wire()->localId(),
+			    relation12 = checkHits(m.hit()->wire().localId(),
+						   l2.hit()->wire().localId(),
 						   isl);
 
 			//...Check the hit in second  and it in the third layer
-			relation23 = checkHits(l2.hit()->wire()->localId(),
-					       l3.hit()->wire()->localId(),
+			relation23 = checkHits(l2.hit()->wire().localId(),
+					       l3.hit()->wire().localId(),
 					       isl);
 			if (l.zStatus() == 20 && relation23 < 0)
-			    relation23 = checkHits(m2.hit()->wire()->localId(),
-						   l3.hit()->wire()->localId(),
+			    relation23 = checkHits(m2.hit()->wire().localId(),
+						   l3.hit()->wire().localId(),
 						   isl);
 	     
 			//...Bad relation...
@@ -1198,38 +1198,38 @@ TBuilder0::buildStereo(TTrack & track, const AList<TLink> & list) const {
 			    int relation34 = -1;
 
 //...For debug...
-//			    if (l.hit()->wire()->consective(* l2.hit()->wire())
+//			    if (l.hit()->wire().consective(* l2.hit()->wire())
 //...For debug end...
 
 			    
 			    //... Check the hit in fist and it in the second
-			    relation12 = checkHits(l.hit()->wire()->localId(),
-						   l2.hit()->wire()->localId(),
+			    relation12 = checkHits(l.hit()->wire().localId(),
+						   l2.hit()->wire().localId(),
 						   isl);
 			    if (l.zStatus() == 20 && relation12 < 0)
 				relation12 =
-				    checkHits(m.hit()->wire()->localId(),
-					      l2.hit()->wire()->localId(),
+				    checkHits(m.hit()->wire().localId(),
+					      l2.hit()->wire().localId(),
 					      isl);
 			    
 			    //... Check the hit in second  and it in the third
-			    relation23 = checkHits(l2.hit()->wire()->localId(),
-						   l3.hit()->wire()->localId(),
+			    relation23 = checkHits(l2.hit()->wire().localId(),
+						   l3.hit()->wire().localId(),
 						   isl);
 			    if (l.zStatus() == 20 && relation23 < 0)
 				relation23 =
-				    checkHits(m2.hit()->wire()->localId(),
-					      l3.hit()->wire()->localId(),
+				    checkHits(m2.hit()->wire().localId(),
+					      l3.hit()->wire().localId(),
 					      isl);
 			    
 			    //... Check the hit in second  and it in the forth
-			    relation34 = checkHits(l3.hit()->wire()->localId(),
-						   l4.hit()->wire()->localId(),
+			    relation34 = checkHits(l3.hit()->wire().localId(),
+						   l4.hit()->wire().localId(),
 						   isl);
 			    if (l3.zStatus() == 20 && relation34 < 0)
 				relation34 =
-				    checkHits(m3.hit()->wire()->localId(),
-					      l4.hit()->wire()->localId(),
+				    checkHits(m3.hit()->wire().localId(),
+					      l4.hit()->wire().localId(),
 					      isl);
 			    
 			    //...remove Bad segments
@@ -1713,18 +1713,18 @@ int
 TBuilder0::check2CnHits(TLink &l, TLink & s, int ichg) const {
 
     //...Check same layer ?...
-    if(l.hit()->wire()->layerId() != s.hit()->wire()->layerId()) return -1;
+    if(l.hit()->wire().layerId() != s.hit()->wire().layerId()) return -1;
 
     //...Initialization...
     int nsl[11] = {64,80,96,128,144,160,192,208,240,256,288};
     float hcell[50] = {0.,0.,0.,0.,0.,0.,0.687499,0.747198,0.806896,0.,0.,0.,0.,0.,0.,0.782967,0.820598,0.858229,0.,0.,0.,0.,0.,0.878423,0.908646,0.939845,0.970068,0.,0.,0.,0.,0.,0.892908,0.916188,0.940219,0.963499,0.,0.,0.,0.,0.,0.901912,0.920841,0.940382,0.959312,0.,0.,0.,0.,0.};
 
-     int ilast  = nsl[l.hit()->wire()->superLayerId()] - 1;
-     int ilocal = l.hit()->wire()->localId();
-     int jlocal = s.hit()->wire()->localId();
+     int ilast  = nsl[l.hit()->wire().superLayerId()] - 1;
+     int ilocal = l.hit()->wire().localId();
+     int jlocal = s.hit()->wire().localId();
 
-     double ddist1 = l.hit()->drift() / hcell[l.hit()->wire()->layerId()];
-     double ddist2 = s.hit()->drift() / hcell[s.hit()->wire()->layerId()];
+     double ddist1 = l.hit()->drift() / hcell[l.hit()->wire().layerId()];
+     double ddist2 = s.hit()->drift() / hcell[s.hit()->wire().layerId()];
      double ddist = 0.5 * (ddist1 + ddist2);
 
      //...Case by case...
@@ -1826,8 +1826,8 @@ TBuilder0::consectiveHits(TLink & l, TLink & s, int ichg) const {
 			      0.,0.,0.,0.,0.,
 			      0.901912,0.920841,0.940382,0.959312,
 			      0.,0.,0.,0.,0.};
-    const Belle2::CDCTriggerWire & wire = * l.hit()->wire();
-    const Belle2::CDCTriggerWire & next = * s.hit()->wire();
+    const Belle2::CDCTriggerWire & wire = l.hit()->wire();
+    const Belle2::CDCTriggerWire & next = s.hit()->wire();
 
     //...Check same layer ?...
     if (wire.layerId() != next.layerId()) return -1;

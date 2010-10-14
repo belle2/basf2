@@ -369,7 +369,7 @@ TCosmicFitter::fit(TTrackBase & b, float t0Offset) const {
 
 	    //...Check wire...
 	    if (! nTrial)
-		if (h.wire()->stereo()) allAxial = false;
+		if (h.wire().stereo()) allAxial = false;
 
 	    //...Cal. closest points...
             int doSagCorrection = 0;
@@ -391,7 +391,7 @@ TCosmicFitter::fit(TTrackBase & b, float t0Offset) const {
 	    double eDistance = h.dDrift(leftRight);
 	    //... 
             if(nTrial  && !allAxial){
-               int wire = h.wire()->id();
+               int wire = h.wire().id();
                int side = leftRight;
                if(side==0) side = -1;
                float x[3]={ onWire.x(), onWire.y(), onWire.z()};
@@ -418,7 +418,7 @@ TCosmicFitter::fit(TTrackBase & b, float t0Offset) const {
 
 	    //...Chi2 related...
 	    // dDda = (v.x() * dxda + v.y() * dyda + v.z() * dzda) / vmag;
-	    HepGeom::Vector3D<double> vw = h.wire()->direction();
+	    HepGeom::Vector3D<double> vw = h.wire().direction();
             dDda = (vmag > 0.)
 		? ((v.x() * (1. - vw.x() * vw.x()) -
 		    v.y() * vw.x() * vw.y() - v.z() * vw.x() * vw.z())
@@ -471,7 +471,7 @@ TCosmicFitter::fit(TTrackBase & b, float t0Offset) const {
 
             //...Check wire...
             if (! nTrial)
-              if (h.wire()->stereo()) allAxial = false;
+              if (h.wire().stereo()) allAxial = false;
             
             //...Cal. closest points...
             int doSagCorrection = 0;
@@ -492,7 +492,7 @@ TCosmicFitter::fit(TTrackBase & b, float t0Offset) const {
             double distance = h.drift(leftRight);
 	    double eDistance = h.dDrift(leftRight);
             if(nTrial  && !allAxial){
-               int wire = h.wire()->id();
+               int wire = h.wire().id();
                int side = leftRight;
                if(side==0) side = -1;
                float x[3]={ onWire.x(), onWire.y(), onWire.z()};
@@ -519,7 +519,7 @@ TCosmicFitter::fit(TTrackBase & b, float t0Offset) const {
             
             //...Chi2 related...
             //dDda = (v.x() * dxda + v.y() * dyda + v.z() * dzda) / vmag;
-            HepGeom::Vector3D<double> vw = h.wire()->direction();
+            HepGeom::Vector3D<double> vw = h.wire().direction();
             dDda = (vmag > 0.)
 		? ((v.x() * (1. - vw.x() * vw.x()) -
 		    v.y() * vw.x() * vw.y() - v.z() * vw.x() * vw.z())
@@ -682,13 +682,13 @@ TCosmicFitter::fitWithCathode( TTrackBase &b, float t0Offset,
 
        // Check layer status ( cathode added ) 
         LayerStat = 0;
-        if ( h.wire()->stereo() ) LayerStat = 1;
-        unsigned nlayer = h.wire()->layerId();
+        if ( h.wire().stereo() ) LayerStat = 1;
+        unsigned nlayer = h.wire().layerId();
         if (nlayer == 0 || nlayer == 1 || nlayer == 2 ) LayerStat = 2;
 
         //...Check wire...
         if (! nTrial)
-          if (h.wire()->stereo() || LayerStat == 2 ) allAxial = false;
+          if (h.wire().stereo() || LayerStat == 2 ) allAxial = false;
 
         //...Cal. closest points...
         int doSagCorrection = 0;
@@ -710,7 +710,7 @@ TCosmicFitter::fitWithCathode( TTrackBase &b, float t0Offset,
         double eDistance = h.dDrift(leftRight);
             //... 
             if(nTrial  && !allAxial){
-               int wire = h.wire()->id();
+               int wire = h.wire().id();
                int side = leftRight;
                if(side==0) side = -1;
                float x[3]={ onWire.x(), onWire.y(), onWire.z()};
@@ -740,7 +740,7 @@ TCosmicFitter::fitWithCathode( TTrackBase &b, float t0Offset,
 
         if( LayerStat == 0 || LayerStat == 1 ){
             // dDda = (v.x() * dxda + v.y() * dyda + v.z() * dzda) / vmag;
-            HepGeom::Vector3D<double> vw = h.wire()->direction();
+            HepGeom::Vector3D<double> vw = h.wire().direction();
             dDda = (vmag > 0.)
                 ? ((v.x() * (1. - vw.x() * vw.x()) -
                     v.y() * vw.x() * vw.y() - v.z() * vw.x() * vw.z())
@@ -858,8 +858,8 @@ TCosmicFitter::fitWithCathode( TTrackBase &b, float t0Offset,
 
      // Check layer status ( cathode added )          
         LayerStat = 0;
-        if ( h.wire()->stereo() ) LayerStat = 1;
-        unsigned nlayer = h.wire()->layerId();
+        if ( h.wire().stereo() ) LayerStat = 1;
+        unsigned nlayer = h.wire().layerId();
         if (nlayer == 0 || nlayer == 1 || nlayer == 2 ) LayerStat = 2;
 
      //...Cal. closest points...
@@ -881,7 +881,7 @@ TCosmicFitter::fitWithCathode( TTrackBase &b, float t0Offset,
         double distance = h.drift(leftRight);
         double eDistance = h.dDrift(leftRight);
        if(nTrial  && !allAxial){
-               int wire = h.wire()->id();
+               int wire = h.wire().id();
                int side = leftRight;
                if(side==0) side = -1;
                float x[3]={ onWire.x(), onWire.y(), onWire.z()};
@@ -912,7 +912,7 @@ TCosmicFitter::fitWithCathode( TTrackBase &b, float t0Offset,
 
         if( LayerStat == 0 || LayerStat == 1 ){
             // dDda = (v.x() * dxda + v.y() * dyda + v.z() * dzda) / vmag;
-            HepGeom::Vector3D<double> vw = h.wire()->direction();
+            HepGeom::Vector3D<double> vw = h.wire().direction();
             dDda = (vmag > 0.)
                 ? ((v.x() * (1. - vw.x() * vw.x()) -
                     v.y() * vw.x() * vw.y() - v.z() * vw.x() * vw.z())

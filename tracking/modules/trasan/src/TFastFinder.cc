@@ -248,7 +248,7 @@ TFastFinder::selectSimpleSegments(const AList<Belle2::CDCTriggerWireHit> & in,
 		(state & WireHitNeighborPatternMask) >> WireHitNeighborHit;
 	    for (unsigned i = 0; i < 7; i++) {
 		if ((ptn >> i) % 2) {
-		    const Belle2::CDCTriggerWireHit & b = * a.wire()->neighbor(i)->hit();
+		    const Belle2::CDCTriggerWireHit & b = * a.wire().neighbor(i)->hit();
 		    toBeChecked.append((Belle2::CDCTriggerWireHit &) b);
 		}
 	    }

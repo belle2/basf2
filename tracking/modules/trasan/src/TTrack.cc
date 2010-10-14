@@ -1325,7 +1325,7 @@ TTrack::findCatHit(unsigned trackid) {
 
 //  	    //...Chi2 related...
 //  	    // dDda = (v.x() * dxda + v.y() * dyda + v.z() * dzda) / vmag;
-//  	    HepGeom::Vector3D<double> vw = h.wire()->direction();
+//  	    HepGeom::Vector3D<double> vw = h.wire().direction();
 //              dDda = (vmag > 0.)
 //  		? ((v.x() * (1. - vw.x() * vw.x()) -
 //  		    v.y() * vw.x() * vw.y() - v.z() * vw.x() * vw.z())
@@ -1374,7 +1374,7 @@ TTrack::findCatHit(unsigned trackid) {
             
 //              //...Check wire...
 //              if (! nTrial)
-//                if (h.wire()->stereo()) allAxial = false;
+//                if (h.wire().stereo()) allAxial = false;
             
 //              //...Cal. closest points...
 //              approach(* l);
@@ -1404,7 +1404,7 @@ TTrack::findCatHit(unsigned trackid) {
             
 //              //...Chi2 related...
 //              //dDda = (v.x() * dxda + v.y() * dyda + v.z() * dzda) / vmag;
-//              HepGeom::Vector3D<double> vw = h.wire()->direction();
+//              HepGeom::Vector3D<double> vw = h.wire().direction();
 //              dDda = (vmag > 0.)
 //  		? ((v.x() * (1. - vw.x() * vw.x()) -
 //  		    v.y() * vw.x() * vw.y() - v.z() * vw.x() * vw.z())
@@ -1917,13 +1917,13 @@ int TTrack::fitWithCathode(float window, int SysCorr ) {
 
 // 	// Check layer status ( cathode added ) 
 // 	LayerStat = 0;
-// 	if ( h.wire()->stereo() ) LayerStat = 1;
-// 	unsigned nlayer = h.wire()->layerId();
+// 	if ( h.wire().stereo() ) LayerStat = 1;
+// 	unsigned nlayer = h.wire().layerId();
 // 	if (nlayer == 0 || nlayer == 1 || nlayer == 2 ) LayerStat = 2;
 
 // 	//...Check wire...
 // 	if (! nTrial)
-// 	  if (h.wire()->stereo() || LayerStat == 2 ) allAxial = false;
+// 	  if (h.wire().stereo() || LayerStat == 2 ) allAxial = false;
 
 // 	//...Cal. closest points...
 // 	approach(* l);
@@ -1956,7 +1956,7 @@ int TTrack::fitWithCathode(float window, int SysCorr ) {
 
 // 	if( LayerStat == 0 || LayerStat == 1 ){
 // 	    // dDda = (v.x() * dxda + v.y() * dyda + v.z() * dzda) / vmag;
-//             HepGeom::Vector3D<double> vw = h.wire()->direction();
+//             HepGeom::Vector3D<double> vw = h.wire().direction();
 //             dDda = (vmag > 0.)
 // 		? ((v.x() * (1. - vw.x() * vw.x()) -
 // 		    v.y() * vw.x() * vw.y() - v.z() * vw.x() * vw.z())
@@ -2072,8 +2072,8 @@ int TTrack::fitWithCathode(float window, int SysCorr ) {
 
 //      // Check layer status ( cathode added ) 	      
 //         LayerStat = 0;
-//         if ( h.wire()->stereo() ) LayerStat = 1;
-//         unsigned nlayer = h.wire()->layerId();
+//         if ( h.wire().stereo() ) LayerStat = 1;
+//         unsigned nlayer = h.wire().layerId();
 //         if (nlayer == 0 || nlayer == 1 || nlayer == 2 ) LayerStat = 2;
 
 //         //...Cal. closest points...
@@ -2107,7 +2107,7 @@ int TTrack::fitWithCathode(float window, int SysCorr ) {
 
 //         if( LayerStat == 0 || LayerStat == 1 ){
 // 	    // dDda = (v.x() * dxda + v.y() * dyda + v.z() * dzda) / vmag;
-//             HepGeom::Vector3D<double> vw = h.wire()->direction();
+//             HepGeom::Vector3D<double> vw = h.wire().direction();
 //             dDda = (vmag > 0.)
 // 		? ((v.x() * (1. - vw.x() * vw.x()) -
 // 		    v.y() * vw.x() * vw.y() - v.z() * vw.x() * vw.z())
@@ -2261,16 +2261,16 @@ TTrack::stereoHitForCurl(TLink & link, AList<Point3D> & arcZList) const
 
     */
   
-    // std::cout << "\n\nWire ID = " << link.hit()->wire()->id() << std::endl;
+    // std::cout << "\n\nWire ID = " << link.hit()->wire().id() << std::endl;
     const Belle2::CDCTriggerWireHit &h = *link.hit();
-    Vector3D X     = 0.5*(h.wire()->forwardPosition() +
-				  h.wire()->backwardPosition());
+    Vector3D X     = 0.5*(h.wire().forwardPosition() +
+				  h.wire().backwardPosition());
     
     HepGeom::Point3D<double> center = _helix->center();
     HepGeom::Point3D<double> tmp(-999., -999., 0.);
     Vector3D x     = Vector3D(X.x(), X.y(), 0.);
     Vector3D w     = x - center;
-    Vector3D V     = h.wire()->direction();
+    Vector3D V     = h.wire().direction();
     Vector3D v     = Vector3D(V.x(), V.y(), 0.);
     double   vmag2 = v.mag2();
     double   vmag  = sqrt(vmag2);
@@ -2402,20 +2402,20 @@ TTrack::stereoHitForCurl(TLink & link, AList<Point3D> & arcZList) const
 
     //...Check z position...
     if(ok_xy[0][0]){
-	if (z[0][0] < h.wire()->backwardPosition().z() || 
-	    z[0][0] > h.wire()->forwardPosition().z()) ok_xy[0][0] = false;
+	if (z[0][0] < h.wire().backwardPosition().z() || 
+	    z[0][0] > h.wire().forwardPosition().z()) ok_xy[0][0] = false;
     }
     if(ok_xy[1][0]){
-	if (z[1][0] < h.wire()->backwardPosition().z() || 
-	    z[1][0] > h.wire()->forwardPosition().z()) ok_xy[1][0] = false;
+	if (z[1][0] < h.wire().backwardPosition().z() || 
+	    z[1][0] > h.wire().forwardPosition().z()) ok_xy[1][0] = false;
     }
     if(ok_xy[0][1]){
-	if (z[0][1] < h.wire()->backwardPosition().z() || 
-	    z[0][1] > h.wire()->forwardPosition().z()) ok_xy[0][1] = false;
+	if (z[0][1] < h.wire().backwardPosition().z() || 
+	    z[0][1] > h.wire().forwardPosition().z()) ok_xy[0][1] = false;
     }
     if(ok_xy[1][1]){
-	if (z[1][1] < h.wire()->backwardPosition().z() || 
-	    z[1][1] > h.wire()->forwardPosition().z()) ok_xy[1][1] = false;
+	if (z[1][1] < h.wire().backwardPosition().z() || 
+	    z[1][1] > h.wire().forwardPosition().z()) ok_xy[1][1] = false;
     }
     if ((!ok_xy[0][0]) && (!ok_xy[1][0]) &&
 	  (!ok_xy[0][1]) && (!ok_xy[1][1])){
@@ -2724,11 +2724,11 @@ TTrack::stereoHitForCurl(AList<TLink> & list) const
   double r  = fabs(_helix->curv());
   for(unsigned i = 0, size = list.length(); i < size; ++i){
     Belle2::CDCTriggerWireHit &h = *const_cast<Belle2::CDCTriggerWireHit*>(list[i]->hit());
-    Vector3D X = 0.5*(h.wire()->forwardPosition() +
-		      h.wire()->backwardPosition());
+    Vector3D X = 0.5*(h.wire().forwardPosition() +
+		      h.wire().backwardPosition());
     Vector3D x     = Vector3D(X.x(), X.y(), 0.);
     Vector3D w     = x - center;
-    Vector3D V     = h.wire()->direction();
+    Vector3D V     = h.wire().direction();
     Vector3D v     = Vector3D(V.x(), V.y(), 0.);
     double   vmag2 = v.mag2();
     double   vmag  = sqrt(vmag2);
@@ -2854,20 +2854,20 @@ TTrack::stereoHitForCurl(AList<TLink> & list) const
     
     //...Check z position...
     if(ok_xy[0][0]){
-      if (z[0][0] < h.wire()->backwardPosition().z() || 
-	  z[0][0] > h.wire()->forwardPosition().z()) ok_xy[0][0] = false;
+      if (z[0][0] < h.wire().backwardPosition().z() || 
+	  z[0][0] > h.wire().forwardPosition().z()) ok_xy[0][0] = false;
     }
     if(ok_xy[1][0]){
-      if (z[1][0] < h.wire()->backwardPosition().z() || 
-	  z[1][0] > h.wire()->forwardPosition().z()) ok_xy[1][0] = false;
+      if (z[1][0] < h.wire().backwardPosition().z() || 
+	  z[1][0] > h.wire().forwardPosition().z()) ok_xy[1][0] = false;
     }
     if(ok_xy[0][1]){
-      if (z[0][1] < h.wire()->backwardPosition().z() || 
-	  z[0][1] > h.wire()->forwardPosition().z()) ok_xy[0][1] = false;
+      if (z[0][1] < h.wire().backwardPosition().z() || 
+	  z[0][1] > h.wire().forwardPosition().z()) ok_xy[0][1] = false;
     }
     if(ok_xy[1][1]){
-      if (z[1][1] < h.wire()->backwardPosition().z() || 
-	  z[1][1] > h.wire()->forwardPosition().z()) ok_xy[1][1] = false;
+      if (z[1][1] < h.wire().backwardPosition().z() || 
+	  z[1][1] > h.wire().forwardPosition().z()) ok_xy[1][1] = false;
     }
     if ((!ok_xy[0][0]) && (!ok_xy[1][0]) &&
 	(!ok_xy[0][1]) && (!ok_xy[1][1])){
@@ -2995,7 +2995,7 @@ TTrack::stereoHitForCurl(AList<TLink> & list) const
       }
       fclose(data);
     }
-    Vector3D tX = h.wire()->forwardPosition()-h.wire()->backwardPosition();
+    Vector3D tX = h.wire().forwardPosition()-h.wire().backwardPosition();
     Vector3D tDist(tX.x(), tX.y(), 0.);
     double tD = tDist.mag();
     double vvvM = 1./ v.mag();
@@ -3004,8 +3004,8 @@ TTrack::stereoHitForCurl(AList<TLink> & list) const
     dStep = tD/step;
     if((data = fopen("dat5","w")) != NULL){
       for(int ii=0;ii<step+1;++ii){
-	double X = h.wire()->backwardPosition().x()+dStep*static_cast<double>(ii)*tDire.x();
-	double Y = h.wire()->backwardPosition().y()+dStep*static_cast<double>(ii)*tDire.y();
+	double X = h.wire().backwardPosition().x()+dStep*static_cast<double>(ii)*tDire.x();
+	double Y = h.wire().backwardPosition().y()+dStep*static_cast<double>(ii)*tDire.y();
 std::fprintf(data,"%lf, %lf\n",X,Y);
 	if(gmaxX < X)gmaxX = X;
 	if(gminX > X)gminX = X;
@@ -3015,8 +3015,8 @@ std::fprintf(data,"%lf, %lf\n",X,Y);
       fclose(data);
     }
     if((data = fopen("dat6","w")) != NULL){
-      double X = h.wire()->backwardPosition().x();
-      double Y = h.wire()->backwardPosition().y();
+      double X = h.wire().backwardPosition().x();
+      double Y = h.wire().backwardPosition().y();
      std::fprintf(data,"%lf, %lf\n",X,Y);
       if(gmaxX < X)gmaxX = X;
       if(gminX > X)gminX = X;
@@ -3025,8 +3025,8 @@ std::fprintf(data,"%lf, %lf\n",X,Y);
       fclose(data);    
     }
     if((data = fopen("dat7","w")) != NULL){
-      double X = h.wire()->forwardPosition().x();
-      double Y = h.wire()->forwardPosition().y();
+      double X = h.wire().forwardPosition().x();
+      double Y = h.wire().forwardPosition().y();
      std::fprintf(data,"%lf, %lf\n",X,Y);
       if(gmaxX < X)gmaxX = X;
       if(gminX > X)gminX = X;
@@ -3540,7 +3540,7 @@ TTrack::fit2D(unsigned ipFlag, double ipDistance, double ipError) {
     strcat(name,counter);
     if((data = fopen(name,"w")) != NULL){
       for(int ii=0;ii<step;++ii){
-	double X = l->wire()->xyPosition().x() + drift*cos(dStep*static_cast<double>(ii));
+	double X = l->wire().xyPosition().x() + drift*cos(dStep*static_cast<double>(ii));
 	double Y = l->wire()->xyPosition().y() + drift*sin(dStep*static_cast<double>(ii));
 std::fprintf(data,"%lf, %lf\n",X,Y);
 	if(gmaxX < X)gmaxX = X;
@@ -3945,7 +3945,7 @@ TTrack::relationClusterWithWire(){
 //    while( CDCTriggerCatHit *c = _catHits[k1] ){
 
 //    // Matching of layer 
-//     if( c->layerID() != l->hit()->wire()->layerId() ) {
+//     if( c->layerID() != l->hit()->wire().layerId() ) {
 //        k1++; continue;
 //        }
 
@@ -3969,7 +3969,7 @@ TTrack::relationClusterWithWire(){
 
 //    // Selection of cluster
 //     flag = -1;
-//     float cand_sector = CathodeSectorId( cwire[k2]->wire()->id());
+//     float cand_sector = CathodeSectorId( cwire[k2]->wire().id());
 
 //     // --- debug ---
 //     //	    std::cout<< "cand_sector = " << cand_sector << std::endl;
@@ -4070,8 +4070,8 @@ void TTrack::relationClusterWithLayer( int SysCorr ){
 int
 TTrack::szPosition(TLink & link) const {
     const Belle2::CDCTriggerWireHit & h = * link.hit();
-    Vector3D X = 0.5 * (h.wire()->forwardPosition()
-			+ h.wire()->backwardPosition());
+    Vector3D X = 0.5 * (h.wire().forwardPosition()
+			+ h.wire().backwardPosition());
     //    double theta = atan2(X.y(), X.x());
     //    Vector3D lr(h.distance(WireHitLeft) * sin(theta),
     //		- h.distance(WireHitLeft) * cos(theta),
@@ -4097,7 +4097,7 @@ TTrack::szPosition(TLink & link) const {
     HepGeom::Point3D<double> tmp(-9999., -9999., 0.);
     Vector3D x = Vector3D(X.x(), X.y(), 0.);
     Vector3D w = x - center;
-    Vector3D V = h.wire()->direction();
+    Vector3D V = h.wire().direction();
     Vector3D v = Vector3D(V.x(), V.y(), 0.);
     double vmag2 = v.mag2();
 //  double vmag = sqrt(vmag2);
@@ -4139,16 +4139,16 @@ TTrack::szPosition(TLink & link) const {
 
     //...Check z position...
     if (link.leftRight() == 2) {
-	if (z[0] < h.wire()->backwardPosition().z() - 20. 
-	    || z[0] > h.wire()->forwardPosition().z() + 20.) ok[0] = false;
-	if (z[1] < h.wire()->backwardPosition().z()-20.
-	    || z[1] > h.wire()->forwardPosition().z()+20.) ok[1] = false;
+	if (z[0] < h.wire().backwardPosition().z() - 20. 
+	    || z[0] > h.wire().forwardPosition().z() + 20.) ok[0] = false;
+	if (z[1] < h.wire().backwardPosition().z()-20.
+	    || z[1] > h.wire().forwardPosition().z()+20.) ok[1] = false;
     }
     else {
-	if (z[0] < h.wire()->backwardPosition().z() 
-	    || z[0] > h.wire()->forwardPosition().z()) ok[0] = false;
-	if (z[1] < h.wire()->backwardPosition().z()
-	    || z[1] > h.wire()->forwardPosition().z()) ok[1] = false;
+	if (z[0] < h.wire().backwardPosition().z() 
+	    || z[0] > h.wire().forwardPosition().z()) ok[0] = false;
+	if (z[1] < h.wire().backwardPosition().z()
+	    || z[1] > h.wire().forwardPosition().z()) ok[1] = false;
     }
     if ((! ok[0]) && (! ok[1])) {
 	link.position(tmp);
@@ -4257,7 +4257,7 @@ TTrack::assign(unsigned hitMask) {
 
 #ifdef TRASAN_DEBUG
 	if (h->track()) {
-	    std::cout<< "TTrack::assign !!! hit(" << h->wire()->name();
+	    std::cout<< "TTrack::assign !!! hit(" << h->wire().name();
 	    std::cout<< ") already assigned" << std::endl;
 	}
 #endif

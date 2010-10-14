@@ -420,7 +420,7 @@ int TRungeFitter::fit(TTrackBase& tb, float t0Offset) const{
 	eDistance = h.dDrift(leftRight);
       }else{
 	//...T0 and propagation corrections...
-	int wire = h.wire()->id();
+	int wire = h.wire().id();
 	int side = leftRight;
 	if (side==0) side = -1;
 	float tp[3] = {p.x(),p.y(),p.z()};

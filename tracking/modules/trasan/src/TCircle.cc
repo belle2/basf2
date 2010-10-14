@@ -257,12 +257,12 @@ TCircle::weight(const TLink & l) const {
   int maxLink = 0;
   int localID[7];
   int layerID[7];
-  int LayerID = l.hit()->wire()->layerId();
+  int LayerID = l.hit()->wire().layerId();
   for(int i=0;i<7;i++){
     if(l.neighbor(i)){
       maxLink = i;
-      localID[i] = l.neighbor(i)->hit()->wire()->localId();
-      layerID[i] = l.neighbor(i)->hit()->wire()->layerId();
+      localID[i] = l.neighbor(i)->hit()->wire().localId();
+      layerID[i] = l.neighbor(i)->hit()->wire().layerId();
     }else{
       break;
     }
@@ -282,9 +282,9 @@ TCircle::fitForCurl(int ipConst) {
 
     //IP check
     unsigned flagIP = 1;
-    unsigned layerID = _links[0]->hit()->wire()->layerId();
+    unsigned layerID = _links[0]->hit()->wire().layerId();
     for(unsigned i = 0; i < n; i++){
-      if(layerID != _links[i]->hit()->wire()->layerId()){
+      if(layerID != _links[i]->hit()->wire().layerId()){
         flagIP = 0;
         break;
       }

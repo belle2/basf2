@@ -657,10 +657,10 @@ THelixFitter::main(TTrackBase & b, float t0Offset,
 
 	    //...Chi2 related...
 	    // dDda = (v.x() * dxda + v.y() * dyda + v.z() * dzda) / vmag;
-	    // HepGeom::Vector3D<double> vw = h.wire()->direction();
-	    double vw[3] = { h.wire()->direction().x(),
-                             h.wire()->direction().y(),
-                             h.wire()->direction().z() };
+	    // HepGeom::Vector3D<double> vw = h.wire().direction();
+	    double vw[3] = { h.wire().direction().x(),
+                             h.wire().direction().y(),
+                             h.wire().direction().z() };
             double vwxy = vw[0]*vw[1];
             double vwyz = vw[1]*vw[2];
             double vwzx = vw[2]*vw[0];
@@ -706,7 +706,7 @@ THelixFitter::main(TTrackBase & b, float t0Offset,
 #ifdef TRASAN_DEBUG
 //  	    if ((! fitBy2D) && (nTrial == 0)) {
 //  		unsigned as = 0;
-//  		if (l->hit()->wire()->stereo()) as = 1;
+//  		if (l->hit()->wire().stereo()) as = 1;
 //  		unsigned mt = 0;
 //  		if (& hep != l->hit()->mc()->hep()) mt = 1;
 
@@ -1045,7 +1045,7 @@ THelixFitter::main(TTrackBase & b, float t0Offset,
 
 	    //...Chi2 related...
 	    // dDda = (v.x() * dxda + v.y() * dyda + v.z() * dzda) / vmag;
-	    HepGeom::Vector3D<double> vw = h.wire()->direction();
+	    HepGeom::Vector3D<double> vw = h.wire().direction();
 	    static CLHEP::HepVector nv(5,0);
             dDda = (vmag > 0.)
 		? ((v.x() * (1. - vw.x() * vw.x()) -
@@ -1618,7 +1618,7 @@ THelixFitter::drift(const TTrack & t,
     }
 
     //...T0 and propagation corrections...
-    int wire = h.wire()->id();
+    int wire = h.wire().id();
     int side = leftRight;
     if (side == 0) side = -1;
     HepGeom::Vector3D<double> tp = t.helix().momentum(dPhi);
@@ -1744,9 +1744,9 @@ THelixFitter::main(TTrackBase & b, float & tev, float & tev_err,
 
 	    //...Chi2 related...
 	    // dDda = (v.x() * dxda + v.y() * dyda + v.z() * dzda) / vmag;
-	    double vw[3] = { h.wire()->direction().x(),
-                             h.wire()->direction().y(),
-                             h.wire()->direction().z() };
+	    double vw[3] = { h.wire().direction().x(),
+                             h.wire().direction().y(),
+                             h.wire().direction().z() };
             double vwxy = vw[0]*vw[1];
             double vwyz = vw[1]*vw[2];
             double vwzx = vw[2]*vw[0];
@@ -2006,7 +2006,7 @@ THelixFitter::main(TTrackBase & b, float & tev, float & tev_err,
 
 	    //...Chi2 related...
 	    // dDda = (v.x() * dxda + v.y() * dyda + v.z() * dzda) / vmag;
-	    HepGeom::Vector3D<double> vw = h.wire()->direction();
+	    HepGeom::Vector3D<double> vw = h.wire().direction();
             dDda_5dim = (vmag > 0.)
 		? ((v.x() * (1. - vw.x() * vw.x()) -
 		    v.y() * vw.x() * vw.y() - v.z() * vw.x() * vw.z())
@@ -2216,7 +2216,7 @@ THelixFitter::drift(const TTrack & t,
     }
     
     //...T0 and propagation corrections...
-    int wire = h.wire()->id();
+    int wire = h.wire().id();
     int side = leftRight;
     if (side==0) side = -1;
     HepGeom::Vector3D<double> tp = t.helix().momentum(dPhi);

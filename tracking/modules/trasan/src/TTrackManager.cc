@@ -930,7 +930,7 @@ TTrackManager::salvage(const CAList<Belle2::CDCTriggerWireHit> & hits) const {
 	//...Already used?...
 	if (h.state() & WireHitUsed) continue;
 #ifdef TRASAN_DEBUG_DETAIL
-	std::cout << "    checking " << h.wire()->name() << std::endl;
+	std::cout << "    checking " << h.wire().name() << std::endl;
 #endif
 
 	//...Select the closest track to a hit...
@@ -1404,7 +1404,7 @@ TTrackManager::divide(const TTrack & t, AList<TLink> * l) const {
     }
 
 #ifdef TRASAN_DEBUG_DETAIL
-    std::cout << "    outer link = " << start.hit()->wire()->name() << std::endl;
+    std::cout << "    outer link = " << start.hit()->wire().name() << std::endl;
     std::cout << "        nLinks of 0 = " << l[0].length() << std::endl;
     std::cout << "        nLinks of 1 = " << l[1].length() << std::endl;
 #endif
@@ -1441,7 +1441,7 @@ TTrackManager::removeHitsAcrossOverIp(AList<TLink> & l) const {
     unsigned n = l.length();
     float phiSum = 0.;
     for (unsigned i = 0; i < n; i++) {
-	const Belle2::CDCTriggerWire & w = * l[i]->hit()->wire();
+	const Belle2::CDCTriggerWire & w = l[i]->hit()->wire();
 	unsigned j = w.localId();
 	unsigned nWire = w.layer().nWires();
 
@@ -1452,7 +1452,7 @@ TTrackManager::removeHitsAcrossOverIp(AList<TLink> & l) const {
 
     AList<TLink> cross;
     for (unsigned i = 0; i < n; i++) {
-	const Belle2::CDCTriggerWire & w = * l[i]->hit()->wire();
+	const Belle2::CDCTriggerWire & w = l[i]->hit()->wire();
 	unsigned j = w.localId();
 	unsigned nWire = w.layer().nWires();
 
@@ -2771,7 +2771,7 @@ TTrackManager::salvageAssociateHits(const CAList<Belle2::CDCTriggerWireHit> & hi
 	//...Already used ?...
 	if (h.state() & WireHitUsed) continue;
 #ifdef TRASAN_DEBUG_DETAIL
-	std::cout << Tab() << "checking " << h.wire()->name() << std::endl;;
+	std::cout << Tab() << "checking " << h.wire().name() << std::endl;;
 #endif
 
 	//...Track loop...
@@ -2788,7 +2788,7 @@ TTrackManager::salvageAssociateHits(const CAList<Belle2::CDCTriggerWireHit> & hi
 	    //...Pre-selection...
 	    TPoint2D c = t.center();
 	    TPoint2D co = - c;
-	    TPoint2D x = h.wire()->xyPosition();
+	    TPoint2D x = h.wire().xyPosition();
 
 #ifdef TRASAN_DEBUG_DETAIL
 	    std::cout << Tab(+2) << "c= " << co.cross(x - c) * t.charge()
@@ -2847,7 +2847,7 @@ TTrackManager::salvageAssociateHits(const CAList<Belle2::CDCTriggerWireHit> & hi
 	    best->hit()->state(best->hit()->state() | WireHitInvalidForFit);
 	    _associateHits.append(best);
 #ifdef TRASAN_DEBUG_DETAIL
-	    std::cout << Tab(+1) << best->hit()->wire()->name()
+	    std::cout << Tab(+1) << best->hit()->wire().name()
 		      << "->" << bestTrack->name() << std::endl;
 #endif
 	}

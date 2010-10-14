@@ -147,7 +147,7 @@ void
 TSegmentCurl::append(TLink &e)
 {
   m_flagOfUpdate = true;
-  m_li[e.hit()->wire()->localLayerId()].m_layer.append(e);
+  m_li[e.hit()->wire().localLayerId()].m_layer.append(e);
   m_list.append(e);
 }
 
@@ -157,7 +157,7 @@ void
 TSegmentCurl::append(TLink *e)
 {
   m_flagOfUpdate = true;
-  m_li[e->hit()->wire()->localLayerId()].m_layer.append(e);
+  m_li[e->hit()->wire().localLayerId()].m_layer.append(e);
   m_list.append(e);
 }
 
@@ -168,7 +168,7 @@ TSegmentCurl::append(AList<TLink> &e)
 {
   m_flagOfUpdate = true;
   for(unsigned i = 0; i < (unsigned) e.length(); ++i)
-    m_li[e[i]->hit()->wire()->localLayerId()].m_layer.append(e[i]);
+    m_li[e[i]->hit()->wire().localLayerId()].m_layer.append(e[i]);
   m_list.append(e);
 }
 
@@ -178,7 +178,7 @@ void
 TSegmentCurl::remove(TLink &e)
 {
   m_flagOfUpdate = true;
-  m_li[e.hit()->wire()->localLayerId()].m_layer.remove(e);
+  m_li[e.hit()->wire().localLayerId()].m_layer.remove(e);
   m_list.remove(e);
 }
 
@@ -188,7 +188,7 @@ void
 TSegmentCurl::remove(TLink *e)
 {
   m_flagOfUpdate = true;
-  m_li[e->hit()->wire()->localLayerId()].m_layer.remove(e);
+  m_li[e->hit()->wire().localLayerId()].m_layer.remove(e);
   m_list.remove(e);
 }
 
@@ -201,8 +201,8 @@ TSegmentCurl::remove(AList<TLink> &e)
   //  dump();
   for(unsigned i = 0; i < (unsigned) e.length(); ++i) {
     //    e[i]->dump();
-    if(e[i]->hit()->wire()->superLayerId()==superLayerId()) {
-      m_li[e[i]->hit()->wire()->localLayerId()].m_layer.remove(e[i]);
+    if(e[i]->hit()->wire().superLayerId()==superLayerId()) {
+      m_li[e[i]->hit()->wire().localLayerId()].m_layer.remove(e[i]);
     }
   }
   m_list.remove(e);
@@ -329,9 +329,9 @@ TSegmentCurl::operator=(const TSegmentCurl &s)
 int
 sortByWireSerialNumber( const TLink **a, const TLink **b )
 {
-  if( (*a)->hit()->wire()->id() < (*b)->hit()->wire()->id() ){
+  if( (*a)->hit()->wire().id() < (*b)->hit()->wire().id() ){
     return 1;
-  }else if( (*a)->hit()->wire()->id() == (*b)->hit()->wire()->id() ){
+  }else if( (*a)->hit()->wire().id() == (*b)->hit()->wire().id() ){
     return 0;
   }else{
     return -1;
@@ -343,9 +343,9 @@ sortByWireSerialNumber( const void *av, const void *bv )
 {
   const TLink **a((const TLink **)av);
   const TLink **b((const TLink **)bv);
-  if( (*a)->hit()->wire()->id() < (*b)->hit()->wire()->id() ){
+  if( (*a)->hit()->wire().id() < (*b)->hit()->wire().id() ){
     return 1;
-  }else if( (*a)->hit()->wire()->id() == (*b)->hit()->wire()->id() ){
+  }else if( (*a)->hit()->wire().id() == (*b)->hit()->wire().id() ){
     return 0;
   }else{
     return -1;
@@ -377,11 +377,11 @@ TSegmentCurl::calcuSeq(unsigned i)
 //   unsigned maxSeq = 0;
   
 //   //...calculation
-//   if(m_li[i].m_layer[0]->hit()->wire()->localId() == static_cast<unsigned>(wires(m_superLayerId)-1) && 
-//      m_li[i].m_layer[size-1]->hit()->wire()->localId() == 0){
+//   if(m_li[i].m_layer[0]->hit()->wire().localId() == static_cast<unsigned>(wires(m_superLayerId)-1) && 
+//      m_li[i].m_layer[size-1]->hit()->wire().localId() == 0){
 //     for(unsigned j=0;j<size-1;++j){
-//       if(m_li[i].m_layer[j]->hit()->wire()->localIdForMinus()-1 == 
-// 	 (int) m_li[i].m_layer[j+1]->hit()->wire()->localId()){
+//       if(m_li[i].m_layer[j]->hit()->wire().localIdForMinus()-1 == 
+// 	 (int) m_li[i].m_layer[j+1]->hit()->wire().localId()){
 // 	++seq;
 //       }else{
 // 	break;
@@ -390,8 +390,8 @@ TSegmentCurl::calcuSeq(unsigned i)
 //     }
 //     ++seq;
 //     for(unsigned j=size-1;j>0;--j){
-//       if(m_li[i].m_layer[j]->hit()->wire()->localIdForPlus()+1 == 
-// 	 (int) m_li[i].m_layer[j-1]->hit()->wire()->localId()){
+//       if(m_li[i].m_layer[j]->hit()->wire().localIdForPlus()+1 == 
+// 	 (int) m_li[i].m_layer[j-1]->hit()->wire().localId()){
 // 	++seq;
 //       }else{
 // 	break;
@@ -402,8 +402,8 @@ TSegmentCurl::calcuSeq(unsigned i)
 //   }
 //   seq = 1;
 //   for(unsigned j=0;j<size-1;++j){
-//     if(m_li[i].m_layer[j]->hit()->wire()->localIdForMinus()-1 == 
-//        (int) m_li[i].m_layer[j+1]->hit()->wire()->localId()){
+//     if(m_li[i].m_layer[j]->hit()->wire().localIdForMinus()-1 == 
+//        (int) m_li[i].m_layer[j+1]->hit()->wire().localId()){
 //       ++seq;
 //     }else{
 //       if(seq > maxSeq)maxSeq = seq;
@@ -482,7 +482,7 @@ TSegmentCurl::dump(void) {
 	std::cout << tab << i << " | " << m_li[i].m_seqOfLayer << "   | "
 		  << m_li[i].m_sizeOfLayer << "   | " << m_li[i].m_layer.length() << "   | ";
 	for(unsigned j = 0, size = m_li[i].m_layer.length(); j < size; ++j)
-	    std::cout << m_li[i].m_layer[j]->hit()->wire()->localId()
+	    std::cout << m_li[i].m_layer[j]->hit()->wire().localId()
 		      << ", ";
 	std::cout << tab << std::endl;
     }

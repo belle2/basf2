@@ -1074,7 +1074,7 @@ TCurlFinder::makeWireHitsListsSegments(const CAList<Belle2::CDCTriggerWireHit> &
   for(unsigned i=0;i<size;++i){
     if(axialList[i]->state() & WireHitFindingValid){
       m_allAxialHitsOriginal.append(new TLink(0,axialList[i]));      
-      if(axialList[i]->wire()->superLayerId() <= 2)
+      if(axialList[i]->wire().superLayerId() <= 2)
 	m_hitsOnInnerSuperLayer.append(axialList[i]);
 
     }
@@ -1096,7 +1096,7 @@ TCurlFinder::makeWireHitsListsSegments(const CAList<Belle2::CDCTriggerWireHit> &
   for(unsigned i=0;i<size;++i){
     if(stereoList[i]->state() & WireHitFindingValid){
       m_allStereoHitsOriginal.append(new TLink(0,stereoList[i]));
-      if(stereoList[i]->wire()->superLayerId() <= 2)
+      if(stereoList[i]->wire().superLayerId() <= 2)
 	m_hitsOnInnerSuperLayer.append(stereoList[i]);
     }
   }
@@ -1115,12 +1115,12 @@ TCurlFinder::makeWireHitsListsSegments(const CAList<Belle2::CDCTriggerWireHit> &
   //...shares unsed hit wires to each layer.
   size = m_unusedAxialHitsOriginal.length();
   for(unsigned i=0;i<size;++i){
-    m_unusedAxialHitsOnEachLayer[m_unusedAxialHitsOriginal[i]->hit()->wire()->
+    m_unusedAxialHitsOnEachLayer[m_unusedAxialHitsOriginal[i]->hit()->wire().
 				axialStereoLayerId()].append(m_unusedAxialHitsOriginal[i]);
   }
   size = m_unusedStereoHitsOriginal.length();
   for(unsigned i=0;i<size;++i){
-    m_unusedStereoHitsOnEachLayer[m_unusedStereoHitsOriginal[i]->hit()->wire()->
+    m_unusedStereoHitsOnEachLayer[m_unusedStereoHitsOriginal[i]->hit()->wire().
 				 axialStereoLayerId()].append(m_unusedStereoHitsOriginal[i]);
   }
   
@@ -1159,7 +1159,7 @@ TCurlFinder::makeWireHitsListsSegments(const CAList<Belle2::CDCTriggerWireHit> &
 
 void
 TCurlFinder::linkNeighboringWires(AList<TLink> *list, const unsigned num, bool stereo) {
-  const Belle2::CDCTrigger &cdc = *Belle2::CDCTrigger::getCDCTrigger();
+//  const Belle2::CDCTrigger &cdc = *Belle2::CDCTrigger::getCDCTrigger();
 
 //cnv
 // #ifdef TRASAN_DEBUG_DETAIL
@@ -1316,20 +1316,20 @@ TCurlFinder::linkNeighboringWiresSmallCell(AList<TLink> *list,
 	for (unsigned j = 0; j < (unsigned) list[i].length(); ++j) {
 	    if (i) {
 		for (unsigned k = 0; k < (unsigned) list[i - 1].length(); k++)
-		    if (CDC->neighbor(* list[i][j]->hit()->wire(),
-				      * list[i - 1][k]->hit()->wire()))
+		    if (CDC->neighbor(list[i][j]->hit()->wire(),
+				      list[i - 1][k]->hit()->wire()))
 			setNeighboringWires(list[i][j], list[i - 1][k]);
 	    }
 	    if ((i + 1) < num) {
 		for (unsigned k = 0; k < (unsigned) list[i + 1].length(); k++)
-		    if (CDC->neighbor(* list[i][j]->hit()->wire(),
-				      * list[i + 1][k]->hit()->wire()))
+		    if (CDC->neighbor(list[i][j]->hit()->wire(),
+				      list[i + 1][k]->hit()->wire()))
 			setNeighboringWires(list[i][j], list[i + 1][k]);
 	    }
 	    for (unsigned k = 0; k < (unsigned) list[i].length(); k++) {
 		if (j == k) continue;
-		if (CDC->neighbor(* list[i][j]->hit()->wire(),
-				  * list[i][k]->hit()->wire()))
+		if (CDC->neighbor(list[i][j]->hit()->wire(),
+				  list[i][k]->hit()->wire()))
 		    setNeighboringWires(list[i][j], list[i][k]);
 	    }
 	}
@@ -1418,9 +1418,9 @@ TCurlFinder::createSegments(AList<TLink> &list) {
 
   AList<TLink> seedStock;
   do{
-    TSegmentCurl *segment = new TSegmentCurl(list[0]->hit()->wire()->superLayerId(),
+    TSegmentCurl *segment = new TSegmentCurl(list[0]->hit()->wire().superLayerId(),
 					     maxLocalLayerId(list[0]->hit()->wire()
-							     ->superLayerId()));
+							     .superLayerId()));
 
     segment->append(list[0]);    
     TLink *seed = list[0];
@@ -1599,12 +1599,12 @@ TCurlFinder::checkExceptionalSegmentsType01(void) {
 					     m_segmentList[i]->maxLocalLayerId());
       for(unsigned j = 0, size = m_segmentList[i]->size(); j < size; ++j){
 	if(m_segmentList[i]->layerIdOfMaxSeq()+1 <= 
-	   (m_segmentList[i]->list())[j]->hit()->wire()->localLayerId() &&
-	   (m_segmentList[i]->list())[j]->hit()->wire()->localLayerId() <= 
+	   (m_segmentList[i]->list())[j]->hit()->wire().localLayerId() &&
+	   (m_segmentList[i]->list())[j]->hit()->wire().localLayerId() <= 
 	   m_segmentList[i]->maxLocalLayerId()){
 	  outer->append((m_segmentList[i]->list())[j]);
 	}else if(m_segmentList[i]->layerIdOfMaxSeq()-1 >= 
-		 (m_segmentList[i]->list())[j]->hit()->wire()->localLayerId()){
+		 (m_segmentList[i]->list())[j]->hit()->wire().localLayerId()){
 	  ++innerHits;
 	}
       }
@@ -2195,8 +2195,8 @@ TCurlFinder::dividing2DTrack(TCircle *circle) {
 
   AList<TLink> positive, negative;
   for(unsigned i = 0, size = circle->nLinks(); i < size; ++i){
-    if(circle->center().x()*circle->links()[i]->hit()->wire()->xyPosition().y() -
-       circle->center().y()*circle->links()[i]->hit()->wire()->xyPosition().x() > 0.){
+    if(circle->center().x()*circle->links()[i]->hit()->wire().xyPosition().y() -
+       circle->center().y()*circle->links()[i]->hit()->wire().xyPosition().x() > 0.){
       positive.append(circle->links()[i]);
     }else{
       negative.append(circle->links()[i]);
@@ -2306,11 +2306,11 @@ TCurlFinder::trace2DTrack(TCircle *circle) {
 
   double q = circle->radius() > 0. ? 1. : -1;
   for(unsigned i=0,size=m_hitsOnInnerSuperLayer.length();i<size;++i){
-    double mag = distance(m_hitsOnInnerSuperLayer[i]->wire()->xyPosition().x()-cx,
-			  m_hitsOnInnerSuperLayer[i]->wire()->xyPosition().y()-cy);
+    double mag = distance(m_hitsOnInnerSuperLayer[i]->wire().xyPosition().x()-cx,
+			  m_hitsOnInnerSuperLayer[i]->wire().xyPosition().y()-cy);
     if(fabs(mag-r) < m_param.TRACE2D_FIRST_SUPERLAYER &&
-       q*(cx*m_hitsOnInnerSuperLayer[i]->wire()->xyPosition().y()-
-	  cy*m_hitsOnInnerSuperLayer[i]->wire()->xyPosition().x()) > 0.){
+       q*(cx*m_hitsOnInnerSuperLayer[i]->wire().xyPosition().y()-
+	  cy*m_hitsOnInnerSuperLayer[i]->wire().xyPosition().x()) > 0.){
       return 1;
     }
   }
@@ -2567,13 +2567,13 @@ TCurlFinder::merge3DTrack(TTrack *track, AList<TTrack> &confTracks) {
 	i<size;++i){
       if(!oldTrack){
 	if((R > 0. && 
-	    cX*(m_hitsOnInnerSuperLayer[i]->wire()->xyPosition().y()-cY)-
-	    cY*(m_hitsOnInnerSuperLayer[i]->wire()->xyPosition().x()-cX) > 0.) ||
+	    cX*(m_hitsOnInnerSuperLayer[i]->wire().xyPosition().y()-cY)-
+	    cY*(m_hitsOnInnerSuperLayer[i]->wire().xyPosition().x()-cX) > 0.) ||
 	   (R < 0. && 
-	    cX*(m_hitsOnInnerSuperLayer[i]->wire()->xyPosition().y()-cY)-
-	    cY*(m_hitsOnInnerSuperLayer[i]->wire()->xyPosition().x()-cX) < 0.)){
-	  double dist = distance(m_hitsOnInnerSuperLayer[i]->wire()->xyPosition().x()-cX,
-				 m_hitsOnInnerSuperLayer[i]->wire()->xyPosition().y()-cY);
+	    cX*(m_hitsOnInnerSuperLayer[i]->wire().xyPosition().y()-cY)-
+	    cY*(m_hitsOnInnerSuperLayer[i]->wire().xyPosition().x()-cX) < 0.)){
+	  double dist = distance(m_hitsOnInnerSuperLayer[i]->wire().xyPosition().x()-cX,
+				 m_hitsOnInnerSuperLayer[i]->wire().xyPosition().y()-cY);
 	  if(dist < fabs(R)){
 	    if(fabs(fabs(R)-dist-m_hitsOnInnerSuperLayer[i]->drift()) < 0.5){
 	      ++oldCounter;
@@ -2589,13 +2589,13 @@ TCurlFinder::merge3DTrack(TTrack *track, AList<TTrack> &confTracks) {
       }
       if(!newTrack){
 	if((r > 0. && 
-	    cx*(m_hitsOnInnerSuperLayer[i]->wire()->xyPosition().y()-cy)-
-	    cy*(m_hitsOnInnerSuperLayer[i]->wire()->xyPosition().x()-cx) > 0.) ||
+	    cx*(m_hitsOnInnerSuperLayer[i]->wire().xyPosition().y()-cy)-
+	    cy*(m_hitsOnInnerSuperLayer[i]->wire().xyPosition().x()-cx) > 0.) ||
 	   (r < 0. && 
-	    cx*(m_hitsOnInnerSuperLayer[i]->wire()->xyPosition().y()-cy)-
-	    cy*(m_hitsOnInnerSuperLayer[i]->wire()->xyPosition().x()-cx) < 0.)){
-	  double dist = distance(m_hitsOnInnerSuperLayer[i]->wire()->xyPosition().x()-cx,
-				 m_hitsOnInnerSuperLayer[i]->wire()->xyPosition().y()-cy);
+	    cx*(m_hitsOnInnerSuperLayer[i]->wire().xyPosition().y()-cy)-
+	    cy*(m_hitsOnInnerSuperLayer[i]->wire().xyPosition().x()-cx) < 0.)){
+	  double dist = distance(m_hitsOnInnerSuperLayer[i]->wire().xyPosition().x()-cx,
+				 m_hitsOnInnerSuperLayer[i]->wire().xyPosition().y()-cy);
 	  if(dist < fabs(r)){
 	    if(fabs(fabs(r)-dist-m_hitsOnInnerSuperLayer[i]->drift()) < 0.5){
 	      ++newCounter;
@@ -2824,7 +2824,7 @@ TCurlFinder::make2DTrack(const AList<TLink> &seed,
   int searchPath(searchDirection);
   bool searchZero(false);
   bool changeDirection(false);
-  unsigned superLayerId = seed[0]->hit()->wire()->superLayerId();
+  unsigned superLayerId = seed[0]->hit()->wire().superLayerId();
 
   AList<TLink> cand, tmpList;
   AList<TLink> preAxialCand, preStereoCand;
@@ -2990,7 +2990,7 @@ TCurlFinder::searchAxialCand(AList<TLink> &cand,
   int innerSuperLayerId = nextSuperAxialLayerId(superLayerID, depth);
   if(innerSuperLayerId < 0)return;
   for(unsigned i = 0, size = preCand.length(); i < size; ++i){
-    if(preCand[i]->hit()->wire()->superLayerId() == 
+    if(preCand[i]->hit()->wire().superLayerId() == 
        (static_cast<unsigned>(innerSuperLayerId))){
 #if 0
       if(searchHits(preCand[i], circle, searchError))cand.append(preCand[i]);
@@ -3035,7 +3035,7 @@ TCurlFinder::searchStereoCand(AList<TLink> &cand,
   int innerSuperLayerId = nextSuperStereoLayerId(superLayerID, depth);
   if(innerSuperLayerId < 0 || innerSuperLayerId > (int) m_param.SUPERLAYER_FOR_STEREO_SEARCH)return;
   for(unsigned i = 0, size = preCand.length(); i < size; ++i){
-    if(preCand[i]->hit()->wire()->superLayerId() == 
+    if(preCand[i]->hit()->wire().superLayerId() == 
        (static_cast<unsigned>(innerSuperLayerId))){
       if(searchHits(preCand[i], circle, searchError))cand.append(preCand[i]);
     }
@@ -3049,8 +3049,8 @@ TCurlFinder::searchHits(const TLink *link, const TCircle *circle,
   // ..."searchError" is length for checking.
   // ...returns 0 = error
   //            1 = no error
-  double dist = distance(link->hit()->wire()->xyPosition().x() - circle->center().x(),
-			 link->hit()->wire()->xyPosition().y() - circle->center().y());
+  double dist = distance(link->hit()->wire().xyPosition().x() - circle->center().x(),
+			 link->hit()->wire().xyPosition().y() - circle->center().y());
   double radius = fabs(circle->radius());
   // std::cout << link->wire()->localId() << " " << link->wire()->layerId() << " r=" 
   //   << radius << " e=" << searchError << " d=" << dist << std::endl;
@@ -3580,8 +3580,8 @@ std::fprintf(data,"%lf, %lf\n",x,y);
     AList<TLink> list = m_unusedAxialHitsOriginal;
     list.append(m_unusedStereoHitsOriginal);
     for(int i=0;i<list.length();i++){
-      double x = list[i]->hit()->wire()->xyPosition().x();
-      double y = list[i]->hit()->wire()->xyPosition().y();
+      double x = list[i]->hit()->wire().xyPosition().x();
+      double y = list[i]->hit()->wire().xyPosition().y();
      std::fprintf(data,"%lf, %lf\n",x,y);
     }
     fclose(data);
@@ -3603,10 +3603,10 @@ TCurlFinder::plotSegment(const AList<TLink>& list, const int flag) {
   if((data = fopen("tmp.dat","w")) != NULL){
     if(flag)std::cout << "Wire ID = ";
     for(int i=0;i<list.length();i++){
-      double x = list[i]->hit()->wire()->xyPosition().x();
-      double y = list[i]->hit()->wire()->xyPosition().y();
+      double x = list[i]->hit()->wire().xyPosition().x();
+      double y = list[i]->hit()->wire().xyPosition().y();
      std::fprintf(data,"%lf, %lf\n",x,y);
-      if(flag)std::cout << list[i]->hit()->wire()->id() << ", ";
+      if(flag)std::cout << list[i]->hit()->wire().id() << ", ";
     }
     if(flag)std::cout << std::endl;
     fclose(data);
@@ -3646,16 +3646,16 @@ TCurlFinder::plotCircle(const TCircle& circle, const int flag) {
   if((data = fopen("tmp.dat1","w")) != NULL){
     if(flag)std::cout << "Axial  Wire ID ==> " << std::endl;
     for(int i=0;i<circle.nLinks();++i){
-      if(circle.links()[i]->hit()->wire()->axial()){
-	double x = circle.links()[i]->hit()->wire()->xyPosition().x();
-	double y = circle.links()[i]->hit()->wire()->xyPosition().y();
+      if(circle.links()[i]->hit()->wire().axial()){
+	double x = circle.links()[i]->hit()->wire().xyPosition().x();
+	double y = circle.links()[i]->hit()->wire().xyPosition().y();
 std::fprintf(data,"%lf, %lf\n",x,y);
 	if(flag){
 	  /*if(debugMcFlag){
-	    std::cout << " A:" << circle.links()[i]->hit()->wire()->id() << ", ";
+	    std::cout << " A:" << circle.links()[i]->hit()->wire().id() << ", ";
 	    std::cout << ", HepTrackID = " << circle.links()[i]->hit()->mc()->hep()->id();
 	    std::cout << ", HepLundID = "  << circle.links()[i]->hit()->mc()->hep()->pType() << std::endl;
-	    }else std::cout << " A:" << circle.links()[i]->hit()->wire()->id() << std::endl;*/
+	    }else std::cout << " A:" << circle.links()[i]->hit()->wire().id() << std::endl;*/
 	}
       }
     }
@@ -3665,16 +3665,16 @@ std::fprintf(data,"%lf, %lf\n",x,y);
   if((data = fopen("tmp.dat2","w")) != NULL){
     if(flag)std::cout << "Stereo Wire ID ==> " << std::endl;
     for(int i=0;i<circle.nLinks();++i){
-      if(circle.links()[i]->hit()->wire()->stereo()){
-	double x = circle.links()[i]->hit()->wire()->xyPosition().x();
-	double y = circle.links()[i]->hit()->wire()->xyPosition().y();
+      if(circle.links()[i]->hit()->wire().stereo()){
+	double x = circle.links()[i]->hit()->wire().xyPosition().x();
+	double y = circle.links()[i]->hit()->wire().xyPosition().y();
 std::fprintf(data,"%lf, %lf\n",x,y);
 	if(flag){
 	  /*if(debugMcFlag){
-	    std::cout << " S:" << circle.links()[i]->hit()->wire()->id() << ", ";
+	    std::cout << " S:" << circle.links()[i]->hit()->wire().id() << ", ";
 	    std::cout << ", HepTrackID = " << circle.links()[i]->hit()->mc()->hep()->id();
 	    std::cout << ", HepLundID = "  << circle.links()[i]->hit()->mc()->hep()->pType() << std::endl;
-	    }else std::cout << " S:" << circle.links()[i]->hit()->wire()->id() << std::endl;*/
+	    }else std::cout << " S:" << circle.links()[i]->hit()->wire().id() << std::endl;*/
 	}
       }
     }
@@ -3728,16 +3728,16 @@ TCurlFinder::plotTrack(const TTrack& track, const int flag) {
   if((data = fopen("tmp.dat1","w")) != NULL){
     if(flag)std::cout << "Axial  Wire ID ==> " << std::endl;
     for(int i=0;i<track.nLinks();++i){
-      if(track.links()[i]->hit()->wire()->axial()){
-	double x = track.links()[i]->hit()->wire()->xyPosition().x();
-	double y = track.links()[i]->hit()->wire()->xyPosition().y();
+      if(track.links()[i]->hit()->wire().axial()){
+	double x = track.links()[i]->hit()->wire().xyPosition().x();
+	double y = track.links()[i]->hit()->wire().xyPosition().y();
 std::fprintf(data,"%lf, %lf\n",x,y);
 	if(flag){
 	  if(debugMcFlag){
-	    std::cout << " A:" << track.links()[i]->hit()->wire()->id() << ", ";
+	    std::cout << " A:" << track.links()[i]->hit()->wire().id() << ", ";
 	    std::cout << ", HepTrackID = " << track.links()[i]->hit()->mc()->hep()->id();
 	    std::cout << ", HepLundID = "  << track.links()[i]->hit()->mc()->hep()->pType() << std::endl;
-	  }else std::cout << " A:" << track.links()[i]->hit()->wire()->id() << std::endl;
+	  }else std::cout << " A:" << track.links()[i]->hit()->wire().id() << std::endl;
 	}
       }
     }
@@ -3747,16 +3747,16 @@ std::fprintf(data,"%lf, %lf\n",x,y);
   if((data = fopen("tmp.dat2","w")) != NULL){
     if(flag)std::cout << "Stereo Wire ID ==> " << std::endl;
     for(int i=0;i<track.nLinks();++i){
-      if(track.links()[i]->hit()->wire()->stereo()){
-	double x = track.links()[i]->hit()->wire()->xyPosition().x();
-	double y = track.links()[i]->hit()->wire()->xyPosition().y();
+      if(track.links()[i]->hit()->wire().stereo()){
+	double x = track.links()[i]->hit()->wire().xyPosition().x();
+	double y = track.links()[i]->hit()->wire().xyPosition().y();
 std::fprintf(data,"%lf, %lf\n",x,y);
 	if(flag){
 	  if(debugMcFlag){
-	    std::cout << " S:" << track.links()[i]->hit()->wire()->id() << ", ";
+	    std::cout << " S:" << track.links()[i]->hit()->wire().id() << ", ";
 	    std::cout << ", HepTrackID = " << track.links()[i]->hit()->mc()->hep()->id();
 	    std::cout << ", HepLundID = "  << track.links()[i]->hit()->mc()->hep()->pType() << std::endl;
-	  }else std::cout << " S:" << track.links()[i]->hit()->wire()->id() << std::endl;
+	  }else std::cout << " S:" << track.links()[i]->hit()->wire().id() << std::endl;
 	}
       }
     }
@@ -3815,8 +3815,8 @@ TCurlFinder::writeSegment(const AList<TLink>& list, const int type) {
   ++m_debugFileNumber;
   if((data = fopen(nameFile,"w")) != NULL){
     for(int i=0;i<list.length();i++){
-      double x = list[i]->hit()->wire()->xyPosition().x();
-      double y = list[i]->hit()->wire()->xyPosition().y();
+      double x = list[i]->hit()->wire().xyPosition().x();
+      double y = list[i]->hit()->wire().xyPosition().y();
      std::fprintf(data,"%lf, %lf\n",x,y);
     }
     fclose(data);
@@ -3830,10 +3830,10 @@ void
 TCurlFinder::dumpType1(TTrack *track) {
   for(int j=0;j<(int) track->nLinks();++j){
     std::cout << "Used Wire Info...";
-    if(track->links()[j]->hit()->wire()->axial()){
-      std::cout << "A:" << track->links()[j]->hit()->wire()->id() << ", ";
+    if(track->links()[j]->hit()->wire().axial()){
+      std::cout << "A:" << track->links()[j]->hit()->wire().id() << ", ";
     }else{
-      std::cout << "S:" << track->links()[j]->hit()->wire()->id() << ", ";
+      std::cout << "S:" << track->links()[j]->hit()->wire().id() << ", ";
     }
     if(debugMcFlag){
       std::cout << ", HepTrackID = " << track->links()[j]->hit()->mc()->hep()->id();
@@ -3849,10 +3849,10 @@ TCurlFinder::dumpType1(TTrack *track) {
     double dist = distance(*track, *(list[j]));
     std::cout << "Close Wire Info in ALL( <0.5cm )...";
     if(dist < 0.5){
-      if(list[j]->hit()->wire()->axial())
-	std::cout << "CA:" << list[j]->hit()->wire()->id() << ", ";
+      if(list[j]->hit()->wire().axial())
+	std::cout << "CA:" << list[j]->hit()->wire().id() << ", ";
       else
-	std::cout << "CS:" << list[j]->hit()->wire()->id() << ", ";
+	std::cout << "CS:" << list[j]->hit()->wire().id() << ", ";
       if(debugMcFlag){
 	std::cout << ", HepTrackID = " << list[j]->hit()->mc()->hep()->id();
 	std::cout << ", HepLundID = "  << list[j]->hit()->mc()->hep()->pType();
@@ -3893,7 +3893,7 @@ TCurlFinder::dumpType2(TTrack *track) {
   // std::cout << "MAX HepID = " << *u << ", Ratio = " << ratio[maxIndex] << std::endl;
   std::cout << "Ratio " << ratio[maxIndex] << std::endl;
   for(int i=0;i<(int)size;++i){
-    if(track->links()[i]->hit()->wire()->axial())std::cout << "A ";
+    if(track->links()[i]->hit()->wire().axial())std::cout << "A ";
     else std::cout << "S ";
 
     double dist = distance(*track, *(track->links()[i]));

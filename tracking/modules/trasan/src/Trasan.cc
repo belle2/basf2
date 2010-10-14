@@ -1431,7 +1431,7 @@ trasan_start:
     allHits.sort(Belle2::CDCTriggerWireHit::sortByWireId);
     for (unsigned i = 0; i < allHits.length(); i++) {
 	const Belle2::CDCTriggerWireHit * hit = allHits[i];
-	if (hit->wire()->axial())
+	if (hit->wire().axial())
 	    axialHits.append(hit);
 	else
 	    stereoHits.append(hit);

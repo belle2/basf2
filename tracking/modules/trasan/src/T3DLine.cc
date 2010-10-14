@@ -255,8 +255,8 @@ int T3DLine::approach(TLink& l,bool doSagCorrection) const{
   }
   // Sag correction
   //   loop for sag correction
-  double onWire_y = onWire.y();
-  double onWire_z = onWire.z();
+//   double onWire_y = onWire.y();
+//   double onWire_z = onWire.z();
 
   unsigned nTrial = 1;
   std::cout << "T3DLine::approach !!! sag correction is not implemented"

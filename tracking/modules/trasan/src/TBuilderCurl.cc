@@ -479,7 +479,7 @@ TBuilderCurl::buildStereo(TTrack & track,
       int ok = 1;
       for (unsigned j = 0; j < nList; ++j) {
 	TLink * l = list[j];
-	if(l->hit()->wire()->id() == (track.links())[i]->hit()->wire()->id()){
+	if(l->hit()->wire().id() == (track.links())[i]->hit()->wire().id()){
 	  ok = 0; break;
 	}
       }
@@ -505,7 +505,7 @@ TBuilderCurl::buildStereo(TTrack & track,
 #ifdef TRASAN_DEBUG_DETAIL
   unsigned debug_stereo_counter1 = 0;
   for(unsigned i=0;i<track.links().length();++i){
-    unsigned superID = (track.links())[i]->hit()->wire()->superLayerId();
+    unsigned superID = (track.links())[i]->hit()->wire().superLayerId();
     if(superID == 1 || superID == 3 ||
        superID == 5 || superID == 7 ||
        superID == 9 )++debug_stereo_counter1;
@@ -567,7 +567,7 @@ TBuilderCurl::buildStereo(TTrack & track,
 //   //...separates
 //   AList<TLink> layer[18];
 //   for(unsigned i = 0, size = list.length(); i < size; ++i){
-//     layer[list[i]->wire()->layer()->axialStereoLayerId()].append(*list[i]);
+//     layer[list[i]->wire().layer()->axialStereoLayerId()].append(*list[i]);
 //   }
 
 // #if DEBUG_CURL_DUMP
@@ -1234,8 +1234,8 @@ TBuilderCurl::check(const TTrack &track) const {
 //   int low  = 0;
 //   int high = 0;
 //   for(int i=0;i>size;++i){
-//     if(list[i]->hit()->wire()->localId() < (unsigned) LId)low = 1;
-//     else if(list[i]->hit()->wire()->localId() > (unsigned) HId)high = 1;
+//     if(list[i]->hit()->wire().localId() < (unsigned) LId)low = 1;
+//     else if(list[i]->hit()->wire().localId() > (unsigned) HId)high = 1;
 //     if(low == 1 && high == 1)return 1;
 //   }
 //   return 0;
@@ -1254,7 +1254,7 @@ TBuilderCurl::check(const TTrack &track) const {
 //   list.append(layer3);
 //   int size = list.length();
 //   if(size <= 1)return 0;
-//   int layerId = list[0]->hit()->wire()->layerId();
+//   int layerId = list[0]->hit()->wire().layerId();
 //   int maxLocalId = 79;
 //   if(ms_superb) {
 //     const CDCTriggerLayer &l=*cdc.layer(layerId);
@@ -1270,8 +1270,8 @@ TBuilderCurl::check(const TTrack &track) const {
 //   int low  = 0;
 //   int high = 0;
 //   for(int i=0;i>size;++i){
-//     if(list[i]->hit()->wire()->localId() < (unsigned) LId)low = 1;
-//     else if(list[i]->hit()->wire()->localId() > (unsigned) HId)high = 1;
+//     if(list[i]->hit()->wire().localId() < (unsigned) LId)low = 1;
+//     else if(list[i]->hit()->wire().localId() > (unsigned) HId)high = 1;
 //     if(low == 1 && high == 1)return 1;
 //   }
 //   return 0;
@@ -1282,7 +1282,7 @@ int
 TBuilderCurl::offsetBorder(TLink *l){
   const Belle2::CDCTrigger &cdc = *Belle2::CDCTrigger::getCDCTrigger();
 
-  int layerId = l->hit()->wire()->layerId();
+  int layerId = l->hit()->wire().layerId();
   if(ms_superb) {
     const Belle2::CDCTriggerLayer &l=*cdc.layer(layerId);
     return l.nWires();
@@ -1303,11 +1303,11 @@ TBuilderCurl::makeList(AList<TLink> &layer, AList<TLink> &list, double q, int bo
   if(checkB == 0){
     for(int i=0;i<n;++i){
       if(q < 0.){
-	if((int) layer[i]->hit()->wire()->localId() >= border)
+	if((int) layer[i]->hit()->wire().localId() >= border)
 	    list.append(layer[i]);
       }
       else {
-	  if((int)layer[i]->hit()->wire()->localId() <= border)
+	  if((int)layer[i]->hit()->wire().localId() <= border)
 	      list.append(layer[i]);
       }
     }
@@ -1316,7 +1316,7 @@ TBuilderCurl::makeList(AList<TLink> &layer, AList<TLink> &list, double q, int bo
     int offset = offsetBorder(layer0);
     if(border*2 < offset)border += offset;
     for(int i=0;i<n;++i){
-      int lId = layer[i]->hit()->wire()->localId();
+      int lId = layer[i]->hit()->wire().localId();
       if(lId*2 < offset)lId += offset;
       if(q < 0.){
 	if(lId >= border)list.append(layer[i]);
@@ -1333,7 +1333,7 @@ TBuilderCurl::sortByLocalId(AList<TLink> &list) const{
 
   int size = list.length();
   if(size <= 1)return 0;
-  int layerId = list[0]->hit()->wire()->layerId();
+  int layerId = list[0]->hit()->wire().layerId();
   int maxLocalId;
   if(ms_superb) {
     const Belle2::CDCTriggerLayer &l=*cdc.layer(layerId);
@@ -1347,10 +1347,10 @@ TBuilderCurl::sortByLocalId(AList<TLink> &list) const{
   }
   int flag = 0;
   for(int i=0;i<size;++i){
-    if(list[i]->hit()->wire()->localId() == 0 ||
-       list[i]->hit()->wire()->localId() == 1 ||
-       list[i]->hit()->wire()->localId() == (unsigned) maxLocalId-1 ||
-       list[i]->hit()->wire()->localId() == (unsigned) maxLocalId){
+    if(list[i]->hit()->wire().localId() == 0 ||
+       list[i]->hit()->wire().localId() == 1 ||
+       list[i]->hit()->wire().localId() == (unsigned) maxLocalId-1 ||
+       list[i]->hit()->wire().localId() == (unsigned) maxLocalId){
       flag = 1;
       break;
     }
@@ -1360,7 +1360,7 @@ TBuilderCurl::sortByLocalId(AList<TLink> &list) const{
   AList<TLink> fList; //former
   AList<TLink> lList; //later
   for(int i=0;i<size;++i){
-      if((int) list[i]->hit()->wire()->localId() < maxDif)
+      if((int) list[i]->hit()->wire().localId() < maxDif)
       lList.append(list[i]);
     else
       fList.append(list[i]);
@@ -1497,7 +1497,7 @@ TBuilderCurl::plotArcZ(AList<TLink> &tmpLine,
      std::fprintf(data,"%lf, %lf\n",
 	      tmpLine[ii]->position().x(),
 	      tmpLine[ii]->position().y());
-      if(flag)std::cout << " Wire ID = " << tmpLine[ii]->hit()->wire()->id() 
+      if(flag)std::cout << " Wire ID = " << tmpLine[ii]->hit()->wire().id() 
 		   << " Arc = " << tmpLine[ii]->position().x()
 		   << " Z = " << tmpLine[ii]->position().y();
       //if(flag && !debugMcFlag)std::cout << std::endl;
@@ -2208,11 +2208,11 @@ TBuilderCurl::stereoHit(double &xc, double &yc, double &r, double &q,
   HepGeom::Point3D<double> tmp(-999., -999., 0.);
   for(unsigned i = 0, size = list.length(); i < size; ++i){
     Belle2::CDCTriggerWireHit &h = *const_cast<Belle2::CDCTriggerWireHit*>(list[i]->hit());
-    Vector3D X = 0.5*(h.wire()->forwardPosition() +
-                      h.wire()->backwardPosition());
+    Vector3D X = 0.5*(h.wire().forwardPosition() +
+                      h.wire().backwardPosition());
     Vector3D x     = Vector3D(X.x(), X.y(), 0.);
     Vector3D w     = x - center;
-    Vector3D V     = h.wire()->direction();
+    Vector3D V     = h.wire().direction();
     Vector3D v     = Vector3D(V.x(), V.y(), 0.);
     double   vmag2 = v.mag2();
     double   vmag  = sqrt(vmag2);
@@ -2326,20 +2326,20 @@ TBuilderCurl::stereoHit(double &xc, double &yc, double &r, double &q,
     
     //...Check z position...
     if(ok_xy[0][0]){
-      if (z[0][0] < h.wire()->backwardPosition().z() || 
-          z[0][0] > h.wire()->forwardPosition().z()) ok_xy[0][0] = false;
+      if (z[0][0] < h.wire().backwardPosition().z() || 
+          z[0][0] > h.wire().forwardPosition().z()) ok_xy[0][0] = false;
     }
     if(ok_xy[1][0]){
-      if (z[1][0] < h.wire()->backwardPosition().z() || 
-          z[1][0] > h.wire()->forwardPosition().z()) ok_xy[1][0] = false;
+      if (z[1][0] < h.wire().backwardPosition().z() || 
+          z[1][0] > h.wire().forwardPosition().z()) ok_xy[1][0] = false;
     }
     if(ok_xy[0][1]){
-      if (z[0][1] < h.wire()->backwardPosition().z() || 
-          z[0][1] > h.wire()->forwardPosition().z()) ok_xy[0][1] = false;
+      if (z[0][1] < h.wire().backwardPosition().z() || 
+          z[0][1] > h.wire().forwardPosition().z()) ok_xy[0][1] = false;
     }
     if(ok_xy[1][1]){
-      if (z[1][1] < h.wire()->backwardPosition().z() || 
-          z[1][1] > h.wire()->forwardPosition().z()) ok_xy[1][1] = false;
+      if (z[1][1] < h.wire().backwardPosition().z() || 
+          z[1][1] > h.wire().forwardPosition().z()) ok_xy[1][1] = false;
     }
     if ((!ok_xy[0][0]) && (!ok_xy[1][0]) &&
         (!ok_xy[0][1]) && (!ok_xy[1][1])){

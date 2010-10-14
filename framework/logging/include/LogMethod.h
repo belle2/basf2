@@ -18,7 +18,7 @@
 
 namespace Belle2 {
 
-  //! The LogMethod class
+  /*! The LogMethod class */
   /*!
      This class allows the logging of the entering and leaving point of
      a method. Therefore an object of this class is created on the stack,
@@ -31,7 +31,7 @@ namespace Belle2 {
 
   public:
 
-    //! The LogMethod constructor
+    /*! The LogMethod constructor */
     /*!
      \param package The package name where the message was sent from.
      \param function The function name where the message was sent from.
@@ -40,7 +40,7 @@ namespace Belle2 {
     */
     LogMethod(const std::string& package, const std::string& function, const std::string& file, unsigned int line);
 
-    //! The LogMethod destructor
+    /*! The LogMethod destructor */
     ~LogMethod();
 
 

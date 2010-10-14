@@ -1,0 +1,9 @@
+Import('env')
+
+env['PYTHON_MODULE'] = True
+env['LIBS'] = ['framework',
+               'boost_python',
+               '$PYTHON_LIBS',
+               'ir', 'pxd', 'svd', 'cdc', 'top', 'arich']
+
+Return('env')

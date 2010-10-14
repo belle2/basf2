@@ -1,8 +1,11 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 import os
 from basf2 import *
 
-#The Belle II logo graphics
-logo = """                                                 
+# The Belle II logo graphics
+logo = \
+    """                                                 
                      eeeeeeee                    
                eeeeeeeeeeeeeeeeeeee              
          eeeeeeee        eeeeeeeeeeeeeeee        
@@ -36,25 +39,25 @@ logo = """
 
 logolist = logo.splitlines()
 
-CSI="\x1B["
-reset=CSI+"m"
+CSI = "\x1B["
+reset = CSI + 'm'
 for ii in range(len(logolist)):
-  print CSI+"93;44m" + logolist[ii][:-1] + CSI + "0m"
+    print CSI + '93;44m' + (logolist[ii])[:-1] + CSI + '0m'
 
-print ""
+print ''
 print basf2label.center(48)
 print basf2copyright.center(48)
-print ("Version "+basf2version).center(48)
-print ""
-print "-------------------------------------------------"
-print "BELLE2_LOCAL_DIR:    ",envarLocalDir
-print "BELLE2_SUBDIR:       ",envarSubDir
-print "Machine architecture:",archstring
-print "Kernel version:      ",os.uname()[2]
-print "Operating system:    ",os.uname()[3]
-print ""
-print "basf2      directory:",basf2dir
-print "basf2 lib  directory:",basf2libdir
-print "basf2 data directory:",basf2datadir
-print "-------------------------------------------------"
+print ('Version ' + basf2version).center(48)
+print ''
+print '-------------------------------------------------'
+print 'BELLE2_LOCAL_DIR:    ', envarLocalDir
+print 'BELLE2_SUBDIR:       ', envarSubDir
+print 'Machine architecture:', archstring
+print 'Kernel version:      ', os.uname()[2]
+print 'Operating system:    ', os.uname()[3]
+print ''
+print 'basf2         directory:', basf2dir
+print 'basf2 modules directory:', basf2moddir
+print 'basf2 data    directory:', basf2datadir
+print '-------------------------------------------------'
 

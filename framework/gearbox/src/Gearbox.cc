@@ -43,16 +43,16 @@ void Gearbox::connect(GearboxIOAbs* gearboxIO)
 }
 
 
-GearboxIOAbs& Gearbox::getGearboxIO() const throw(GbxExcIONotConnected)
+GearboxIOAbs& Gearbox::getGearboxIO() const throw(GearboxIONotConnectedError)
 {
-  if ((m_gearboxIO == NULL) || (!m_gearboxIO->isOpen())) throw GbxExcIONotConnected();
+  if ((m_gearboxIO == NULL) || (!m_gearboxIO->isOpen())) throw GearboxIONotConnectedError();
   return *m_gearboxIO;
 }
 
 
-GearDir Gearbox::getContent(const std::string& paramSetType, EGearboxContentType contentType) throw(GbxExcIONotConnected)
+GearDir Gearbox::getContent(const std::string& paramSetType, EGearboxContentType contentType) throw(GearboxIONotConnectedError)
 {
-  if ((m_gearboxIO == NULL) || (!m_gearboxIO->isOpen())) throw GbxExcIONotConnected();
+  if ((m_gearboxIO == NULL) || (!m_gearboxIO->isOpen())) throw GearboxIONotConnectedError();
 
   switch (contentType) {
     case c_GbxGlobal:       return GearDir(getGlobalParamPath(paramSetType));
@@ -83,116 +83,70 @@ std::string Gearbox::getSubdetectorPath(const string& subdetector) const
 
 
 void Gearbox::enableParamCheck(bool paramCheck)
-throw(GbxExcIONotConnected)
+throw(GearboxIONotConnectedError)
 {
-  if ((m_gearboxIO == NULL) || (!m_gearboxIO->isOpen())) throw GbxExcIONotConnected();
+  if ((m_gearboxIO == NULL) || (!m_gearboxIO->isOpen())) throw GearboxIONotConnectedError();
   return m_gearboxIO->enableParamCheck(paramCheck);
 }
 
 
 bool Gearbox::isPathValid(const std::string& path) const
-throw(GbxExcIONotConnected)
+throw(GearboxIONotConnectedError)
 {
-  if ((m_gearboxIO == NULL) || (!m_gearboxIO->isOpen())) throw GbxExcIONotConnected();
+  if ((m_gearboxIO == NULL) || (!m_gearboxIO->isOpen())) throw GearboxIONotConnectedError();
   return m_gearboxIO->isPathValid(path);
 }
 
 
 bool Gearbox::isParamAvailable(const std::string& path) const
-throw(GbxExcIONotConnected, GbxExcPathNotValid)
+throw(GearboxIONotConnectedError, GearboxPathNotValidError)
 {
-  if ((m_gearboxIO == NULL) || (!m_gearboxIO->isOpen())) throw GbxExcIONotConnected();
+  if ((m_gearboxIO == NULL) || (!m_gearboxIO->isOpen())) throw GearboxIONotConnectedError();
   return m_gearboxIO->isParamAvailable(path);
 }
 
 
 int Gearbox::getNumberNodes(const std::string& path) const
-throw(GbxExcIONotConnected, GbxExcPathNotValid, GbxExcPathEmptyResult, GbxExcPathResultNotValid)
+throw(GearboxIONotConnectedError, GearboxPathNotValidError, GearboxPathEmptyResultError, GearboxPathResultNotValidError)
 {
-  if ((m_gearboxIO == NULL) || (!m_gearboxIO->isOpen())) throw GbxExcIONotConnected();
+  if ((m_gearboxIO == NULL) || (!m_gearboxIO->isOpen())) throw GearboxIONotConnectedError();
   return m_gearboxIO->getNumberNodes(path);
 }
 
 
 double Gearbox::getParamLength(const std::string& path) const
-throw(GbxExcIONotConnected, GbxExcPathNotValid, GbxExcParamNotExists, GbxExcPathEmptyResult,
-      GbxExcPathResultNotValid, GbxExcStringNumConvFailed)
+throw(GearboxIONotConnectedError, GearboxPathNotValidError, GearboxParamNotExistsError, GearboxPathEmptyResultError,
+      GearboxPathResultNotValidError, GearboxStringNumConversionError)
 {
-  if ((m_gearboxIO == NULL) || (!m_gearboxIO->isOpen())) throw GbxExcIONotConnected();
+  if ((m_gearboxIO == NULL) || (!m_gearboxIO->isOpen())) throw GearboxIONotConnectedError();
   return m_gearboxIO->getParamLength(path);
 }
 
 
 double Gearbox::getParamAngle(const std::string& path) const
-throw(GbxExcIONotConnected, GbxExcPathNotValid, GbxExcParamNotExists, GbxExcPathEmptyResult,
-      GbxExcPathResultNotValid, GbxExcStringNumConvFailed)
+throw(GearboxIONotConnectedError, GearboxPathNotValidError, GearboxParamNotExistsError, GearboxPathEmptyResultError,
+      GearboxPathResultNotValidError, GearboxStringNumConversionError)
 {
-  if ((m_gearboxIO == NULL) || (!m_gearboxIO->isOpen())) throw GbxExcIONotConnected();
+  if ((m_gearboxIO == NULL) || (!m_gearboxIO->isOpen())) throw GearboxIONotConnectedError();
   return m_gearboxIO->getParamAngle(path);
 }
 
 
 double Gearbox::getParamNumValue(const std::string& path) const
-throw(GbxExcIONotConnected, GbxExcPathNotValid, GbxExcParamNotExists, GbxExcPathEmptyResult,
-      GbxExcPathResultNotValid, GbxExcStringNumConvFailed)
+throw(GearboxIONotConnectedError, GearboxPathNotValidError, GearboxParamNotExistsError, GearboxPathEmptyResultError,
+      GearboxPathResultNotValidError, GearboxStringNumConversionError)
 {
-  if ((m_gearboxIO == NULL) || (!m_gearboxIO->isOpen())) throw GbxExcIONotConnected();
+  if ((m_gearboxIO == NULL) || (!m_gearboxIO->isOpen())) throw GearboxIONotConnectedError();
   return m_gearboxIO->getParamNumValue(path);
 }
 
 
 std::string Gearbox::getParamString(const std::string& path) const
-throw(GbxExcIONotConnected, GbxExcPathNotValid, GbxExcParamNotExists, GbxExcPathEmptyResult,
-      GbxExcPathResultNotValid)
+throw(GearboxIONotConnectedError, GearboxPathNotValidError, GearboxParamNotExistsError, GearboxPathEmptyResultError,
+      GearboxPathResultNotValidError)
 {
-  if ((m_gearboxIO == NULL) || (!m_gearboxIO->isOpen())) throw GbxExcIONotConnected();
+  if ((m_gearboxIO == NULL) || (!m_gearboxIO->isOpen())) throw GearboxIONotConnectedError();
   return m_gearboxIO->getParamString(path);
-}
-
-
-//=====================================================================
-//                          Python API
-//=====================================================================
-
-void translateGbxExcPathNotValid(GbxExcPathNotValid const& exc)
-{
-  // Use the Python 'C' API to set up an exception object
-  string excMessage = "The path \"" + exc.getXPathStatement() + "\" is not valid !";
-  PyErr_SetString(PyExc_RuntimeError, excMessage.c_str());
-}
-
-
-void translateGbxExcPathEmptyResult(GbxExcPathEmptyResult const& exc)
-{
-  // Use the Python 'C' API to set up an exception object
-  string excMessage = "The result of the path \"" + exc.getXPathStatement() + "\" is empty !";
-  PyErr_SetString(PyExc_RuntimeError, excMessage.c_str());
-}
-
-
-void translateGbxExcPathResultNotValid(GbxExcPathResultNotValid const& exc)
-{
-  // Use the Python 'C' API to set up an exception object
-  string excMessage = "The result of the path \"" + exc.getXPathStatement() + "\" is not valid !";
-  PyErr_SetString(PyExc_RuntimeError, excMessage.c_str());
-}
-
-
-void translateGbxExcIONotAvailable(GbxExcIONotAvailable const&)
-{
-  // Use the Python 'C' API to set up an exception object
-  string excMessage = "The GearboxIO object is not available. Please make sure you have the Gearbox module in your path !";
-  PyErr_SetString(PyExc_RuntimeError, excMessage.c_str());
-}
-
-
-void Gearbox::exposePythonAPI()
-{
-  //Register exception translators
-  register_exception_translator<GbxExcPathNotValid>(&translateGbxExcPathNotValid);
-  register_exception_translator<GbxExcPathEmptyResult>(&translateGbxExcPathEmptyResult);
-  register_exception_translator<GbxExcPathResultNotValid>(&translateGbxExcPathResultNotValid);
-  register_exception_translator<GbxExcIONotAvailable>(&translateGbxExcIONotAvailable);
 }
 
 

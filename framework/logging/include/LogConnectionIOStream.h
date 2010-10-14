@@ -19,7 +19,7 @@
 
 namespace Belle2 {
 
-  //! Implements a log connection to a IO Stream.
+  /*! Implements a log connection to a IO Stream. */
   /*!
      Inherits from the abstract base class LogConnectionAbs.
   */
@@ -27,16 +27,16 @@ namespace Belle2 {
 
   public:
 
-    //! The constructor
+    /*! The constructor */
     /*!
       \param outputStream The output stream.
     */
     LogConnectionIOStream(std::ostream& outputStream);
 
-    //! The LogConnectionIOStream destructor
+    /*! The LogConnectionIOStream destructor */
     virtual ~LogConnectionIOStream();
 
-    //! Sends a log message.
+    /*! Sends a log message. */
     /*!
      \param logLevel The log level of the message (e.g. debug, info, warning, error, fatal).
      \param message The message string which should be send.
@@ -50,7 +50,7 @@ namespace Belle2 {
     virtual bool sendMessage(LogCommon::ELogLevel logLevel, const std::string& message, const std::string& package,
                              const std::string& function, const std::string& file, unsigned int line, bool sendLocationInfo);
 
-    //! Returns true if the connection to the io stream could be established.
+    /*! Returns true if the connection to the io stream could be established. */
     /*!
      \return True if the connection to the io stream could be established.
     */

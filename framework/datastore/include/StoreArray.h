@@ -18,7 +18,7 @@
 
 namespace Belle2 {
 
-  //! Accessor to stored TClonesArrays.
+  /*! Accessor to stored TClonesArrays. */
   /*! This is an accessor class for the TClonesArrays saved in the DataStore.
       To add new objects, please use the TClonesArray function
       <a href="http://root.cern.ch/root/htmldoc/TClonesArray.html#TClonesArray:New">New</a>.
@@ -30,7 +30,7 @@ namespace Belle2 {
   class StoreArray : public StoreAccessorAbs<TClonesArray> {
   public:
 
-    //!Constructor.
+    /*!Constructor. */
     /*! \param name Name with which the TClonesArray is saved.
         \param durability Specifies lifetime of array in question.
         \param generate Shall array be created, if none with name exists so far.
@@ -41,38 +41,40 @@ namespace Belle2 {
       }
     }
 
-    //!Switch the array, the StoreArray points to.
+    /*!Switch the array, the StoreArray points to. */
     /*! \param name Name with which the TClonesArray is saved.
         \param durability Specifies lifetime of array in question.
         \param generate Shall array be created, if none with name exists so far.
     */
     bool assignArray(const std::string& name, const EDurability& durability = c_Event, bool generate = false);
 
-    //! Imitate array functionality.
+    /*! Imitate array functionality. */
     TClonesArray& operator *() const {return *m_storeArray;}
 
-    //! Imitate array functioanlity.
+    /*! Imitate array functioanlity. */
     TClonesArray* operator ->() const {return m_storeArray;}
 
     /*!
     */
     TClonesArray* getPtr() {return m_storeArray;}
 
-    //! Imitate array functionality.
+    /*! Imitate array functionality. */
     operator bool() const {return m_storeArray;}
 
-    //! Imitate array functionality.
+    /*! Imitate array functionality. */
     /*! By default the TClonesArray would return TObjects, so a cast is necessary.
         The static cast is save here, because at a previous stage, it is already checked,
         that the TClonesArray contains type T.
     */
     T* operator [](int i) const {return static_cast<T*>(m_storeArray->At(i));}
 
-    //! Get the number of occupied slots in the array.
+    /*! Get the number of occupied slots in the array. */
     int GetEntries() const {return m_storeArray->GetEntriesFast();}
 
+
   private:
-    //! Pointer that actually holds the TClonesArray.
+
+    /*! Pointer that actually holds the TClonesArray. */
     TClonesArray* m_storeArray;
   };
 

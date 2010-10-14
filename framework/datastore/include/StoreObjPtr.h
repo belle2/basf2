@@ -22,7 +22,7 @@
 #include <framework/logging/Logger.h>
 
 namespace Belle2 {
-  //! Type save access pointer.
+  /*! Type save access pointer.*/
   /*! Use this, if you want to access or create a single object in the store.
       \author <a href="mailto:martin.heck@kit.edu?subject=StoreObjPtr">Martin Heck</a>
   */
@@ -30,7 +30,7 @@ namespace Belle2 {
   class StoreObjPtr : StoreAccessorAbs <TObject> {
   public:
 
-    //! Constructor with assignment.
+    /*! Constructor with assignment. */
     /*! \param name Name of the object to be hold by this pointer
         \param durability Decides durability map used for getting or creating the accessed object.
         \param generate If true, object is created, if it doesn't exist with name AND type of template, points to NULL if one of
@@ -42,13 +42,13 @@ namespace Belle2 {
       };
     }
 
-    //! Constructor, no assignment
+    /*! Constructor, no assignment */
     /*! This contructor doesn't request a name. You can later assign an object to it, if you like.
     */
     StoreObjPtr()
         : m_storeObjPtr(0) {}
 
-    //! Assigning an object to the pointer.
+    /*! Assigning an object to the pointer. */
     /*! \param name Name of the object to be assigned.
         \param durability Decides durability map used for getting or creating the accessed object.
         \param generate If true, object is created, if it doesn't exist with name AND type of template, points to NULL if one of
@@ -56,7 +56,7 @@ namespace Belle2 {
     */
     bool assignObject(const std::string& name, const EDurability& durability = c_Event, bool generate = false);
 
-    //! Store existing object.
+    /*! Store existing object. */
     /*! Instead of creating a new obect, you can store an object, that already exists.
         \param name Name of the object to be stored.
         \param durability Decides durability map used to store the object.
@@ -64,13 +64,13 @@ namespace Belle2 {
     */
     bool storeObject(T* AObject, const std::string& name, const EDurability& durability = c_Event);
 
-    //! imitate pointer functionality
+    /*! imitate pointer functionality */
     T& operator *() const {return *m_storeObjPtr;};
 
-    //! imitate pointer functionality
+    /*! imitate pointer functionality */
     T* operator ->() const {return m_storeObjPtr;};
 
-    //! imitate pointer functionality
+    /*! imitate pointer functionality */
     operator bool() const {return m_storeObjPtr;};
 
     /*!
@@ -96,7 +96,7 @@ namespace Belle2 {
 
   private:
 
-    //! Store of actual pointer.
+    /*! Store of actual pointer. */
     T* m_storeObjPtr;
   };
 

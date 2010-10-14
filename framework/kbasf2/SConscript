@@ -1,8 +1,0 @@
-Import('env')
-
-env['PYTHON_MODULE'] = True
-env['LIBS'] = ['framework', 'geometry',
-               'boost_python',
-               '$PYTHON_LIBS']
-
-Return('env')

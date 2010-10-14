@@ -16,7 +16,7 @@
 
 namespace Belle2 {
 
-  //! The condition parser class.
+  /*! The condition parser class. */
   /*! Implements a condition parser.
 
       It supports conditions of the form [comparison operator][integer]
@@ -31,7 +31,7 @@ namespace Belle2 {
 
   public:
 
-    //! The supported condition operators
+    /*! The supported condition operators */
     enum EConditionOperators {
       c_GT,    /*!< Greater than:          ">"  */
       c_ST,    /*!< Smaller than:          "<"  */
@@ -41,13 +41,13 @@ namespace Belle2 {
       c_NE     /*!< Not equal:             "!=" */
     };
 
-    //! Constructor
+    /*! Constructor */
     CondParser();
 
-    //! Destructor
+    /*! Destructor */
     virtual ~CondParser();
 
-    //! Parses a given condition expression and returns the operator and the integer value.
+    /*! Parses a given condition expression and returns the operator and the integer value. */
     /*!
         The condition has to be of the form: [comparison operator][integer]
         e.g. ">5", "=7", "!= 0"
@@ -60,7 +60,7 @@ namespace Belle2 {
     */
     bool parseCondition(std::string expression, EConditionOperators& condOperator, int& condValue) const;
 
-    //! Evaluates a condition, given by two input values and a condition (comparison) operator.
+    /*! Evaluates a condition, given by two input values and a condition (comparison) operator. */
     /*!
         The evaluation is as follows: value1 [operator] value2
 

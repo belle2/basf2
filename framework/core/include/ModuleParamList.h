@@ -14,7 +14,7 @@
 #include <boost/python.hpp>
 #include <boost/python/list.hpp>
 
-#include <framework/core/FwExceptions.h>
+#include <framework/core/FrameworkExceptions.h>
 #include <framework/core/ModuleParam.h>
 #include <framework/core/PyObjConvUtils.h>
 #include <framework/logging/Logger.h>
@@ -26,20 +26,24 @@
 
 namespace Belle2 {
 
-  //! The parameter type info class
+  //Define exceptions
+  BELLE2_DEFINE_EXCEPTION(ModuleParameterNotFoundError, "Could not find the parameter with the name '%1%' ! The value of the parameter could NOT be set.");
+  BELLE2_DEFINE_EXCEPTION(ModuleParameterTypeError, "The type of the module parameter '%1%' (%2%) is different from the type of the value it should be set to (%3%) !");
+
+  /*! The parameter type info class */
   /*! Stores information about each supported parameter type.
   */
   class ParamTypeInfo {
   public:
 
-    //! supported basic parameter types
+    /*! supported basic parameter types */
     enum EParamBasicType {
       c_SingleParam,    /*!< A single parameter value */
       c_ListParam,      /*!< A list of parameter values */
       c_NotSupportedPBT /*!< Not supported basic type */
     };
 
-    //! supported parameter value types
+    /*! supported parameter value types */
     enum EParamValueType {
       c_IntegerParam,   /*!< An integer parameter value */
       c_DoubleParam,    /*!< A double parameter value */
@@ -52,7 +56,7 @@ namespace Belle2 {
     EParamValueType  m_paramValueType; /*!< The parameter value type. */
     std::string      m_readableName;   /*!< The readable name of the parameter type. */
 
-    //! The ParamTypeInfo constructor
+    /*! The ParamTypeInfo constructor */
     /*!
         \param paramBasicType The basic parameter type (single/list).
         \param paramValueType The parameter value type.
@@ -63,20 +67,20 @@ namespace Belle2 {
   };
 
 
-  //! The Module parameter list class
+  /*! The Module parameter list class */
   /*! Stores and manages all parameters of a module.
   */
   class ModuleParamList {
 
   public:
 
-    //! Constructor
+    /*! Constructor */
     ModuleParamList();
 
-    //! Destructor
+    /*! Destructor */
     ~ModuleParamList();
 
-    //! Adds a new parameter to the module list.
+    /*! Adds a new parameter to the module list. */
     /*!
         A parameter consists of a reference pointing to a member variable in the module
         which stores and allows fast access to the parameter value. In addition the type
@@ -91,7 +95,7 @@ namespace Belle2 {
     template<typename T>
     void addParameter(const std::string& name, T& paramVariable, const T& defaultValue, const std::string& description = "", bool force = false);
 
-    //! Sets the value of a parameter given by its name.
+    /*! Sets the value of a parameter given by its name. */
     /*!
         A template based method which is invoked by the module.
 
@@ -101,7 +105,7 @@ namespace Belle2 {
     template<typename T>
     void setParameter(const std::string& name, T& value);
 
-    //! Returns a reference to a parameter. The returned parameter has already the correct type.
+    /*! Returns a reference to a parameter. The returned parameter has already the correct type. */
     /*!
        Throws an exception of type FwExcModuleParameterNotFound if a parameter with the given name does not exist.
        Throws an exception of type FwExcModuleParameterType if the parameter type of does not match to the template parameter.
@@ -110,16 +114,16 @@ namespace Belle2 {
         \return A reference to a module parameter having the correct type.
     */
     template<typename T>
-    ModuleParam<T>& getParameter(const std::string& name) const throw(FwExcModuleParameterNotFound, FwExcModuleParameterType);
+    ModuleParam<T>& getParameter(const std::string& name) const throw(ModuleParameterNotFoundError, ModuleParameterTypeError);
 
-    //! Returns the parameter type information of the given parameter.
+    /*! Returns the parameter type information of the given parameter. */
     /*!
         \param name The unique name of the parameter.
         \return The parameter type information.
     */
     ParamTypeInfo::ParamTypeInfo getParamTypeInfo(const std::string& name) const;
 
-    //! Returns true if unset parameters exist which the user has to set in the steering file.
+    /*! Returns true if unset parameters exist which the user has to set in the steering file. */
     /*!
         \return True if unset parameters exist which the user has to set in the steering file.
     */
@@ -129,7 +133,7 @@ namespace Belle2 {
     //                   Python API
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    //! Returns a python list of all parameters.
+    /*! Returns a python list of all parameters. */
     /*!
         Each item in the list consists of the name of the parameter, a string describing its type,
         a python list of all values, a python list of all default values, the information of
@@ -138,7 +142,7 @@ namespace Belle2 {
     */
     boost::python::list getParamInfoListPython() const;
 
-    //! Implements a method for setting boost::python objects.
+    /*! Implements a method for setting boost::python objects. */
     /*! The method supports the following types: int, double, string, bool
         The conversion of the python object to the C++ type and the final storage of the
         parameter value is done by specializing the template method setParamObjectTemplate().
@@ -148,7 +152,7 @@ namespace Belle2 {
     */
     void setParamObjectPython(const std::string& name, const boost::python::object& pyObj);
 
-    //! Implements a method for setting boost::python lists.
+    /*! Implements a method for setting boost::python lists. */
     /*! The method supports lists of the following types: int, double, string, bool
         The conversion of the python list to the std::vector and the final storage of the
         parameter value is done by specializing the template method setParamListTemplate().
@@ -170,7 +174,7 @@ namespace Belle2 {
     std::map<std::string, ParamTypeInfo>  m_paramTypeInfoMap; /*!< Map which stores the typeid name as key and information about the parameter as value. */
 
 
-    //! Returns the type identifier of the parameter as string.
+    /*! Returns the type identifier of the parameter as string. */
     /*!
         The type identifier is used to discriminate between problematic parameter types (e.g. double and int)
 
@@ -184,7 +188,7 @@ namespace Belle2 {
     //                   Python API
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    //! Implements a template based method for setting boost::python objects.
+    /*! Implements a template based method for setting boost::python objects. */
     /*! The method converts a boost::python object to a C++ type and stores the result as the
         parameter value.
 
@@ -194,7 +198,7 @@ namespace Belle2 {
     template<typename T>
     void setParamObjectTemplatePython(const std::string& name, const boost::python::object& pyObj);
 
-    //! Implements a template based method for setting boost::python lists.
+    /*! Implements a template based method for setting boost::python lists. */
     /*! The method converts a boost::python list to a std::vector and stores the result as the
         parameter value.
 
@@ -204,7 +208,7 @@ namespace Belle2 {
     template<typename T>
     void setParamListTemplatePython(const std::string& name, const boost::python::list& pyList);
 
-    //! Returns a python list containing the default values of the given parameter.
+    /*! Returns a python list containing the default values of the given parameter. */
     /*!
         Calls according to the parameter type a specialized version of the template method getParamDefaultValuesTemplate().
         \param name The unique name of the parameter.
@@ -213,7 +217,7 @@ namespace Belle2 {
     */
     void getParamValuesPython(const std::string& name, boost::python::list& outputList, bool defaultValues = false) const;
 
-    //! Returns a python list containing the parameter/default values of a single value parameter (template method).
+    /*! Returns a python list containing the parameter/default values of a single value parameter (template method). */
     /*!
         \param name The unique name of the parameter.
         \param outputList The python list containing the parameter/default values.
@@ -222,7 +226,7 @@ namespace Belle2 {
     template<typename T>
     void getParamObjectValuesTemplatePython(const std::string& name, boost::python::list& outputList, bool defaultValues = false) const;
 
-    //! Returns a python list containing the parameter/default values of a list parameter (template method).
+    /*! Returns a python list containing the parameter/default values of a list parameter (template method). */
     /*!
         \param name The unique name of the parameter.
         \param outputList The python list containing the parameter/default values.
@@ -254,7 +258,7 @@ namespace Belle2 {
       ModuleParam<T>* explModParam = static_cast< ModuleParam<T>* >(newParam.get());
       explModParam->setDefaultValue(defaultValue);
     } else {
-      ERROR("A parameter with the name '" + name + "' already exists ! The name of a module parameter must be unique within a module.");
+      ERROR("A parameter with the name '" + name + "' already exists ! The name of a module parameter must be unique within a module.")
     }
   }
 
@@ -265,21 +269,16 @@ namespace Belle2 {
     try {
       ModuleParam<T>& explModParam = getParameter<T>(name);
       explModParam.setValue(value);
-
-    } catch (FwExcModuleParameterNotFound& exc) {
-      ERROR("Could not find the parameter with the name '" + exc.getParamInfo1() + "' ! The value of the parameter could NOT be set.");
-
-    } catch (FwExcModuleParameterType& exc) {
-      std::string errorString = std::string("The type of the module parameter '") + name + std::string("' (") + exc.getParamInfo1();
-      errorString += std::string(") is different from the type of the value it should be set to (") + exc.getParamInfo2() + std::string(").");
-      errorString += std::string("The value of the parameter could NOT be set.");
-      ERROR(errorString);
+    } catch (ModuleParameterNotFoundError& exc) {
+      ERROR(exc.what())
+    } catch (ModuleParameterTypeError& exc) {
+      ERROR(exc.what())
     }
   }
 
 
   template<typename T>
-  ModuleParam<T>& ModuleParamList::getParameter(const std::string& name) const throw(FwExcModuleParameterNotFound, FwExcModuleParameterType)
+  ModuleParam<T>& ModuleParamList::getParameter(const std::string& name) const throw(ModuleParameterNotFoundError, ModuleParameterTypeError)
   {
     //Check if a parameter with the given name exists
     std::map<std::string, ModuleParamPtr>::const_iterator mapIter;
@@ -292,8 +291,8 @@ namespace Belle2 {
       if (moduleParam->getTypeInfo() == typeid(T).name()) {
         ModuleParam<T>* explModParam = static_cast< ModuleParam<T>* >(moduleParam.get());
         return *explModParam;
-      } else throw FwExcModuleParameterType(moduleParam->getTypeInfo(), typeid(T).name());
-    } else throw FwExcModuleParameterNotFound(name);
+      } else throw ModuleParameterTypeError(name, moduleParam->getTypeInfo(), typeid(T).name());
+    } else throw ModuleParameterNotFoundError(name);
   }
 
 
@@ -305,7 +304,7 @@ namespace Belle2 {
       T tmpValue = static_cast<T>(valueProxy);
       setParameter(name, tmpValue);
     } else {
-      ERROR("Could not set a module parameter: The python object defined by '" + name + "' could not be converted !");
+      ERROR("Could not set a module parameter: The python object defined by '" + name + "' could not be converted !")
     }
   }
 
@@ -321,7 +320,7 @@ namespace Belle2 {
       if (checkValue.check()) {
         tmpList.push_back(checkValue);
       } else {
-        ERROR("Could not set a module parameter: A python object defined in the list '" + name + "' could not be converted !");
+        ERROR("Could not set a module parameter: A python object defined in the list '" + name + "' could not be converted !")
       }
     }
     setParameter(name, tmpList);
@@ -345,14 +344,10 @@ namespace Belle2 {
       } else {
         PyObjConvUtils::addSingleValueToList<T>(explModParam.getValue(), outputList);
       }
-    } catch (FwExcModuleParameterNotFound& exc) {
-      ERROR("Could not find the parameter with the name '" + exc.getParamInfo1() + "' ! The value of the parameter could NOT be set.");
-
-    } catch (FwExcModuleParameterType& exc) {
-      std::string errorString = std::string("The type of the module parameter '") + name + std::string("' (") + exc.getParamInfo1();
-      errorString += std::string(") is different from the type of the value it should be set to (") + exc.getParamInfo2() + std::string(").");
-      errorString += std::string("The value of the parameter could NOT be set.");
-      ERROR(errorString);
+    } catch (ModuleParameterNotFoundError& exc) {
+      ERROR(exc.what())
+    } catch (ModuleParameterTypeError& exc) {
+      ERROR(exc.what())
     }
   }
 
@@ -374,15 +369,10 @@ namespace Belle2 {
       } else {
         PyObjConvUtils::addSTLVectorToList<T>(explModParam.getValue(), outputList);
       }
-
-    } catch (FwExcModuleParameterNotFound& exc) {
-      ERROR("Could not find the parameter with the name '" + exc.getParamInfo1() + "' ! The value of the parameter could NOT be set.");
-
-    } catch (FwExcModuleParameterType& exc) {
-      std::string errorString = std::string("The type of the module parameter '") + name + std::string("' (") + exc.getParamInfo1();
-      errorString += std::string(") is different from the type of the value it should be set to (") + exc.getParamInfo2() + std::string(").");
-      errorString += std::string("The value of the parameter could NOT be set.");
-      ERROR(errorString);
+    } catch (ModuleParameterNotFoundError& exc) {
+      ERROR(exc.what())
+    } catch (ModuleParameterTypeError& exc) {
+      ERROR(exc.what())
     }
   }
 

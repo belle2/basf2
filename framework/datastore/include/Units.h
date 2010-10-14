@@ -15,7 +15,7 @@
 
 namespace Belle2 {
 
-  //! Definition of units
+  /*! Definition of units */
   /*! \file
       It defines the standard units that should be used everywhere.
       If the value of a variable is not given in standard units the variable name

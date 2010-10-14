@@ -11,8 +11,10 @@
 #ifndef MODULEMANAGER_H_
 #define MODULEMANAGER_H_
 
-#include <framework/core/Module.h>
-#include <framework/core/FwExceptions.h>
+#include <boost/shared_ptr.hpp>
+#include <boost/filesystem.hpp>
+
+#include <framework/core/FrameworkExceptions.h>
 
 #include <string>
 #include <map>
@@ -22,131 +24,138 @@
 
 namespace Belle2 {
 
-  //! The ModuleManager Class
-  /*! This class manages the dynamically loaded modules.
-      It provides methods to load modules from a shared file (module library) and
-      to create instances of the found modules.
+  class Module;
+  class ModuleProxyBase;
+
+  //Define exceptions
+  BELLE2_DEFINE_EXCEPTION(ModuleNotCreatedError, "Could not create module: %1%");
+
+  /*! The ModuleManager Class */
+  /*! This class is responsible for creating and managing new module instances.
+      The module manager can only find those modules, whose shared library files are located in one of the
+      directories known to the module manager. Directories can be added to the directory list with
+      the method addModuleSearchPath(). By adding a new directory, the directory is searched for *.map
+      files which specify the kind of modules that can be found in the shared library files. The map files
+      are parsed and the found modules are added to an internal list.
+
+      If a shared library is loaded by the module manager, all modules inside the library automatically
+      register themselves to the module manager. This is done by a so-called proxy class. Each module has a proxy
+      class attached to it, which does the registration with the module manager and is later used to create
+      the actual instance of the module. By using a proxy class, the module itself is only instantiated
+      if the user requests it.
+
+      The creation of a new module instance works as following:
+      1) The user requests a new module by calling the method registerModule() with the module name given as a parameter.</br>
+      2) The ModuleManager checks if a proxy class was already registered for the given module name. If yes, the proxy creates
+         a new module instance. Otherwise the modules known to the manager are searched for the given module name. If the
+         module is known to the module manager the associated shared library is dynamically loaded.</br>
 
       This class is designed as a singleton.
   */
-
   class ModuleManager {
 
   public:
 
-    //-----------------------------------------------------------
-    //! Class for registering modules
-    template<class AModule> class Registrator {
-    public:
-
-      //! Constructor
-      Registrator() {
-        m_module = new AModule;
-        ModuleManager::Instance().registerModule(m_module);
-      }
-
-      //! Destructor
-      ~Registrator() {
-        delete m_module;
-      }
-
-    private:
-      Module* m_module; /*!< Stores the registered module. */
-    };
-    //-----------------------------------------------------------
-
-    //! Static method to get a reference to the ModuleManager instance.
+    /*! Static method to get a reference to the ModuleManager instance. */
     /*!
       \return A reference to an instance of this class.
     */
     static ModuleManager& Instance();
 
-    //! Searches for module libraries in the given path and dynamically loads them.
-    /*!
-     \param path The path to the folder or directly to the shared file, which contains module libraries or modules.
-    */
-    void loadModuleLibs(const std::string& path);
-
-    //!  Registers a module.
+    /*! Registers a module proxy. */
     /*
-     Each module registers itself to the Module Manager using this method.
-     \param module Pointer to the module which should be registered.
-     */
-    void registerModule(Module* module);
-
-    //! Returns a reference to a module given by its type (string).
-    /*!
-     The returned module is taken from the list of self registered
-     modules and therefore not meant to be used in paths.
-
-     If a module with the given type is not found, an exception of
-     type FwExcModuleTypeNotFound is thrown.
-
-     \param type The type string of the module which should be returned.
-     \return A reference to the module given by its type.
+     Each module has a proxy assigned to it, which registers itself to the ModuleManager.
+     The proxy is then responsible to create an instance of a module.
+     \param moduleProxy Pointer to the module proxy which should be registered.
     */
-    const Module& getModuleByType(const std::string& type) const throw(FwExcModuleTypeNotFound);
+    void registerModuleProxy(ModuleProxyBase* moduleProxy);
 
-    //!  Returns a list of all available modules.
+    /*! Adds a new filepath to the list of filepaths which are searched for a requested module. */
     /*
-     \return A list of all available modules.
-     */
-    std::list<ModulePtr> getAvailableModules() const;
-
-    //! Creates a new module of a given type.
-    /*!
-     The ModuleManager does not take ownership of the returned Module.
-
-     If the module could not be created, an exception of type FwExcModuleNotCreated is thrown.
-
-     \param type The type string of the module which should be created.
-     \return A pointer to the newly created module.
+     If a module is requested by the method registerModule(), all module search paths
+     are scanned for the first occurrence of a shared library carrying the module
+     name in its filename.
+     \param path The module search path which should be added to the list of paths.
     */
-    ModulePtr createModule(const std::string& type) const throw(FwExcModuleNotCreated);
+    void addModuleSearchPath(const std::string& path);
 
-    //! Adds a new file extension to the list of supported file extension for module libraries.
-    /*!
-     The module manager searches for module library files having specific file extensions. This
-     method allows to add additional supported file extensions.
-
-     \param fileExt The new file extension.
+    /*! Returns a reference to the list of the modules search filepaths. */
+    /*
+     \return A reference to the list of the modules search filepaths.
     */
-    void addLibFileExtension(const std::string& fileExt);
+    const std::list<std::string>& getModuleSearchPaths() const;
+
+    /*! Returns a map of all modules that were found in the module search paths. */
+    /*
+     The key of the map represents the module name and the value the shared library file in which the module is defined.
+     \return A map of all modules that were found in the module search paths.
+    */
+    const std::map<std::string, std::string>& getAvailableModules() const;
+
+    /*! Creates an instance of a module and registers it to the ModuleManager. */
+    /*
+     Each module carries an unique name, which is used to find the corresponding shared
+     library file. The found shared library is dynamically loaded and the module proxy registered.
+     Using the proxy an instance of the module is created and returned.
+
+     The search order is as following:</br>
+     1) First the method checks if a proxy associated with the module name was already registered</br>
+     2) If not, the method checks if a shared library path was given and tries to load the module from that shared library</br>
+     3) If not, the method searches for the module name in the map of known modules due to the given search paths</br>
+
+     \param moduleName The unique name of the Module which should be created.
+     \param sharedLibPath Optional: The shared library from which the module should be registered (not a map file !).
+     \return A shared pointer to the created module instance.
+    */
+    boost::shared_ptr<Module> registerModule(const std::string& moduleName, const std::string sharedLibPath = "") throw(ModuleNotCreatedError);
+
+    /*! Returns a reference to the list of created modules. */
+    /*
+     \return A reference to the list of created modules.
+    */
+    const std::list< boost::shared_ptr<Module> >& getCreatedModules() const;
+
+    /*! Returns a list of those modules which carry property flags matching the specified ones. */
+    /*!
+     Loops over all module instances specified in a list
+     and adds those to the returned list whose property flags match the given property flags.
+
+     \param modulePathList The list containing all module instances added to a path.
+     \param propertyFlags The flags for the module properties.
+     \return A list containing those modules which carry property flags matching the specified ones.
+    */
+    std::list< boost::shared_ptr<Module> > getModulesByProperties(const std::list< boost::shared_ptr<Module> >& modulePathList, unsigned int propertyFlags) const;
 
 
   private:
 
-    std::map<const std::string, void*>   m_nameLibraryMap; /*!< Maps the name of a library to its pointer. */
-    std::map<const std::string, Module*> m_typeModuleMap;  /*!< Maps the type of a module to its pointer. */
-    std::set<std::string> m_libFileExtensions;             /*!< List of all supported file extensions for module library files. */
+    std::list<std::string> m_moduleSearchPathList;                /*!< List of all checked and validated filepaths that are searched for map files. */
+    std::map<std::string, std::string> m_moduleNameLibMap;        /*!< Maps the module name to the filename of the shared library which containes the module. */
+    std::map<std::string, ModuleProxyBase*> m_registeredProxyMap; /*!< Maps the module name to a pointer of its proxy. */
+    std::list< boost::shared_ptr<Module> > m_createdModulesList;  /*!< List of all created modules. */
 
-    //! Loads the library shared file given by the library path.
+    /*! Adds the module names defined in the map file to the list of known module names. */
     /*!
-     \param libName The name of the library which will be loaded.
-     \param libPath The path to the library shared file.
+     \param mapFilename The filename (path+name) of the map file which should be parsed for module names.
     */
-    void loadLibrary(const std::string& libName, const std::string& libPath);
+    void fillModuleNameLibMap(boost::filesystem::directory_entry& mapPath);
 
-    //! Closes all open libraries.
-    void closeOpenLibraries();
-
-    //! Returns true if the given file extension is supported by the framework.
+    /*! Loads the shared library file given by the library path. */
     /*!
-     \param fileExt The file extension which should be tested.
-     \return True if the given file extension is supported.
+     \param libPath The path to the shared library file.
     */
-    bool isExtensionSupported(const std::string& fileExt) const;
+    void loadLibrary(const std::string& libraryPath);
 
-    //! The constructor is hidden to avoid that someone creates an instance of this class.
+    /*! The constructor is hidden to avoid that someone creates an instance of this class. */
     ModuleManager();
 
-    //! Disable/Hide the copy constructor
+    /*! Disable/Hide the copy constructor */
     ModuleManager(const ModuleManager&);
 
-    //! Disable/Hide the copy assignment operator
+    /*! Disable/Hide the copy assignment operator */
     ModuleManager& operator=(const ModuleManager&);
 
-    //! The ModuleManager destructor
+    /*! The ModuleManager destructor */
     /*!
       Deletes the ModuleManager.
     */
@@ -154,7 +163,7 @@ namespace Belle2 {
 
     static ModuleManager* m_instance; /*!< Pointer that saves the instance of this class. */
 
-    //! Destroyer class to delete the instance of the ModuleManager class when the program terminates.
+    /*! Destroyer class to delete the instance of the ModuleManager class when the program terminates. */
     class SingletonDestroyer {
     public: ~SingletonDestroyer() {
         if (ModuleManager::m_instance != NULL) delete ModuleManager::m_instance;

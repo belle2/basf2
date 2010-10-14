@@ -22,18 +22,18 @@ namespace Belle2 {
   class Relation : public TObject {
   public:
 
-    //! Constructor for I/O.
+    /*! Constructor for I/O. */
     Relation()
         : m_weight(1.0) {}
 
-    //! Constuctor to create the actual relation.
+    /*! Constuctor to create the actual relation. */
     Relation(TObject* from, TObject* to, const float& weight = 1.0)
         : m_weight(weight) {
       m_from = from;
       m_to   = to;
     }
 
-    //! Destructor.
+    /*! Destructor. */
     ~Relation() {}
 
     /*! Setter for from.
@@ -80,13 +80,13 @@ namespace Belle2 {
 
 
   private:
-    //! First end of Relation.
+    /*! First end of Relation. */
     TRef m_from;
 
-    //! Second end of Relation.
+    /*! Second end of Relation. */
     TRef m_to;
 
-    //! Weight of the Relation.
+    /*! Weight of the Relation. */
     float m_weight;
 
     ClassDef(Relation, 1);

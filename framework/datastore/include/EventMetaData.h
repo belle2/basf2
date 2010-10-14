@@ -14,23 +14,23 @@
 
 namespace Belle2 {
 
-  //! Store event number, run number, and experiment number.
+  /*! Store event number, run number, and experiment number. */
   /*! Master modules have to create an object of this type!
       \author <a href="mailto:martin.heck@kit.edu?subject=EventMetaData">Martin Heck</a>
   */
   class EventMetaData : public TObject {
   public:
 
-    //! Constructor.
+    /*! Constructor. */
     /*! Initilises meta data of event with Nulls.
     */
     EventMetaData(const unsigned long& event = 0, const unsigned long& run = 0, const unsigned long& experiment = 0)
         : m_event(event), m_run(run), m_experiment(experiment) {}
 
-    //! Destructor.
+    /*! Destructor. */
     ~EventMetaData() {}
 
-    //! Event Setter.
+    /*! Event Setter. */
     /*! Should be set to currently processed event.
        \param event The current event number.
     */
@@ -38,7 +38,7 @@ namespace Belle2 {
       m_event = event;
     }
 
-    //! Run Setter.
+    /*! Run Setter. */
     /*! Should be set to currently processed run.
        \param run The number of the current run.
     */
@@ -46,7 +46,7 @@ namespace Belle2 {
       m_run = run;
     }
 
-    //! Experiment Setter.
+    /*! Experiment Setter. */
     /*! Should be set to currently processed experiment.
        \param experiment The number of the current experiment.
     */
@@ -54,7 +54,7 @@ namespace Belle2 {
       m_experiment = experiment;
     }
 
-    //! Event Getter.
+    /*! Event Getter. */
     /*! Is intended to return the current event number, set by a master module.
        \return The number of the current event.
     */
@@ -62,7 +62,7 @@ namespace Belle2 {
       return m_event;
     }
 
-    //! Run Getter.
+    /*! Run Getter. */
     /*! Is intended to return the current run number, set by a master module.
        \return The number of the current run.
     */
@@ -70,7 +70,7 @@ namespace Belle2 {
       return m_run;
     }
 
-    //! Experiment Getter.
+    /*! Experiment Getter. */
     /*! Is intended to return the current experiment number, set by a master module.
        \return The number of the current experiment.
     */
@@ -81,11 +81,17 @@ namespace Belle2 {
 
   private:
 
+    /*! Event number. */
     unsigned long m_event;
+
+    /*! Run number. */
     unsigned long m_run;
+
+    /*! Experiment number. */
     unsigned long m_experiment;
 
     ClassDef(EventMetaData, 1);
+
   }; //class
 } // namespace Belle2
 #endif // EVENTMETADATA

@@ -19,7 +19,7 @@
 
 namespace Belle2 {
 
-  //! Iterator for DataStore maps.
+  /*! Iterator for DataStore maps. */
   /*! This iterator has to be specified with the exact map, that is used.
       Usually you shouldn't use this class, but the parent class, and only the DataStore has
       to create this class internally.
@@ -69,23 +69,21 @@ namespace Belle2 {
       return m_map[str];
     }
 
-    //! Prefix increment operator
+    /*! Prefix increment operator */
     StoreMapIter <T>& operator++() {
       next();
       return *this;
     }
 
-    //! Postfix increment operator
+    /*! Postfix increment operator */
     StoreMapIter<T> operator++(int) {
       StoreMapIter<T> buffer(*this);
       next();
       return buffer;
     }
 
+    //private:
 
-
-
-//  private:
     T*     m_map;
     typename T::iterator  m_iter;
 

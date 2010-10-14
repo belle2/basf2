@@ -21,13 +21,13 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(EvtMetaGen)
+REG_MODULE(EvtMetaGen, "EvtMetaGen")
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-EvtMetaGen::EvtMetaGen() : Module("EvtMetaGen")
+EvtMetaGen::EvtMetaGen() : Module()
 {
   //Set module properties
   setDescription("Sets the event meta data information (exp, run, evt).");

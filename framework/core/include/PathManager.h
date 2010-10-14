@@ -8,44 +8,47 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PATHLIST_H_
-#define PATHLIST_H_
+#ifndef PATHMANAGER_H_
+#define PATHMANAGER_H_
 
 #include <framework/core/Module.h>
 #include <framework/core/Path.h>
+#include <framework/core/FrameworkExceptions.h>
 
 #include <list>
-#include <set>
+
 
 namespace Belle2 {
 
+  //Define exceptions
+  BELLE2_DEFINE_EXCEPTION(PathNotCreatedError, "Could not create path !");
 
-  //! The PathList Class
-  /*!
-    This class manages the created path instances. It provides methods to created
-    new path instances.
+  /*! The PathManager Class */
+  /*! This class is responsible for creating and managing new paths.
+      A path is a container for modules. The user can create an arbitrary
+      number of paths and connect them using conditions. This class allows
+      the creation of paths and provides convenient utility methods.
   */
-  class PathList : public std::list<PathPtr> {
+  class PathManager {
 
   public:
 
-    //! Constructor
-    PathList();
+    /*! Constructor */
+    PathManager();
 
-    //! Destructor
-    virtual ~PathList();
+    /*! Destructor */
+    ~PathManager();
 
-    //! Creates a new path and adds it to the list of available paths.
+    /*! Creates a new path and adds it to the list of available paths. */
     /*!
         This method creates a new path and adds it to the list.
-
         If the path could not be created, an exception of type FwExcPathNotCreated is thrown.
 
         \return A reference to the newly created path.
     */
-    PathPtr createPath() throw(FwExcPathNotCreated);
+    PathPtr createPath() throw(PathNotCreatedError);
 
-    //! Builds a list of all modules which could be executed during the data processing.
+    /*! Builds a list of all modules which could be executed during the data processing. */
     /*!
         The method starts with the given path, iterates over the modules in the path and
         follows recursively module conditions to make sure the final list contains all
@@ -60,10 +63,11 @@ namespace Belle2 {
 
   protected:
 
-
   private:
 
-    //! Fills the module list with the modules of the given path.
+    std::list<PathPtr> m_createdPathList; /*!< List of all created paths. */
+
+    /*! Fills the module list with the modules of the given path. */
     /*!
         Calls itself recursively for modules having a condition
 
@@ -74,6 +78,6 @@ namespace Belle2 {
 
   };
 
-} // end namespace Belle2
+}
 
-#endif /* PATHLIST_H_ */
+#endif /* PATHMANAGER_H_ */

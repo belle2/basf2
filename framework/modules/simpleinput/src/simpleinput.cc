@@ -10,12 +10,22 @@
 
 #include <framework/modules/simpleinput/simpleinput.h>
 
+#include <framework/core/ModuleManager.h>
+#include <boost/shared_ptr.hpp>
+
 using namespace std;
 using namespace Belle2;
 
-REG_MODULE(SimpleInput)
+//-----------------------------------------------------------------
+//                 Register the Module
+//-----------------------------------------------------------------
+REG_MODULE(SimpleInput, "SimpleInput")
 
-SimpleInput::SimpleInput() : Module("SimpleInput")
+//-----------------------------------------------------------------
+//                 Implementation
+//-----------------------------------------------------------------
+
+SimpleInput::SimpleInput() : Module()
 {
   //Set module properties
   setDescription("simple input");

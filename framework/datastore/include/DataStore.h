@@ -24,7 +24,7 @@
 
 namespace Belle2 {
 
-  //! In the store you can park objects, that have to be accessed by various modules.
+  /*! In the store you can park objects, that have to be accessed by various modules. */
   /*! The store saves objects together with names in maps.
       Normal users should try to access the store via StoreAccess classes like the
       StoreObjPtr or the StoreArray. <br>
@@ -39,13 +39,13 @@ namespace Belle2 {
   class DataStore {
   public:
 
-    //! Instance of singleton Store.
+    /*! Instance of singleton Store. */
     /*! Store for information needed in more than one module.
     */
     static DataStore& Instance();
 
 
-    //! Create new object with check of existence.
+    /*! Create new object with check of existence. */
     /*! Checks if object with given name already exists in corresponding map. If one of the given name, but different type exists,
         the function will end the programm.
         \return If object of given name, type and durability exists, it is returned, otherwise the new object.
@@ -56,7 +56,7 @@ namespace Belle2 {
     T* createObject(const std::string& name, const EDurability& durability = c_Event);
 
 
-    //! Get existing object.
+    /*! Get existing object. */
     /*! Name, durability and type of object have to match. <br>
         For matching the type of the object, however, derived classes are cast to their base classes.
         \return Existing object, if all matches or NULL pointer. NULL is as well returned, when the object exists,
@@ -69,7 +69,7 @@ namespace Belle2 {
     T* getObject(const std::string& name, const EDurability& durability = c_Event);
 
 
-    //! Create new object without check of existence.
+    /*! Create new object without check of existence. */
     /*! The function just creates a new objects, even if one already exists with the same name.
         It is faster than the other createObject function, but has the risk of a memory leak.
         \return New object.
@@ -80,7 +80,7 @@ namespace Belle2 {
     T* createObjectRaw(const std::string& name, const EDurability& durability = c_Event);
 
 
-    //! Create TClonesArray with check of existence.
+    /*! Create TClonesArray with check of existence. */
     /*! First it is checked, if array of corresponding name, durability, and object type to be stored already exists,
         and if so is returned. If not, a new object is returned.<br>
         Note, that even arrays of durability "Event" are not destroyed, but just cleared.
@@ -95,7 +95,7 @@ namespace Belle2 {
     TClonesArray* createArray(const std::string& name, const EDurability& durability = c_Event);
 
 
-    //! Get existing TClonesArray with check of existence.
+    /*! Get existing TClonesArray with check of existence. */
     /*! Aborts the programm, if object of name and durability, but different type already exists.
         \return Existing TClonesArray, if one of corresponding name, durability and object type to be stored exists,
         otherwise NULL.
@@ -106,7 +106,7 @@ namespace Belle2 {
     TClonesArray* getArray(const std::string& name, const EDurability& durability = c_Event);
 
 
-    //! Store existing Object
+    /*! Store existing Object */
     /*! Stored object has to follow the usual rules, like inheritance from TObject, ClassDef Macro...
         \return Was storing successful?
         \param object Object to be stored.
@@ -116,7 +116,7 @@ namespace Belle2 {
     bool storeObject(TObject* object, const std::string& name, const EDurability& durability = c_Event);
 
 
-    //! Store existing TClonesArray
+    /*! Store existing TClonesArray */
     /*! This function will overwrite the content of an potentially existing TClonesArray.
         \return Was storing successful?
         \param array TClonesArray to be stored.
@@ -126,7 +126,7 @@ namespace Belle2 {
     bool storeArray(TClonesArray* array, const std::string& name, const EDurability& durability = c_Event);
 
 
-    //! Clearing Maps of a specified durability.
+    /*! Clearing Maps of a specified durability. */
     /*! Called by the framework. Users should usually not use this function without a good reason.
         Object Maps are just delted. ArrayMaps don't delete the TClonesArrays, but just their content.
         The TClonesArray keeps the memory occupied and one can faster store objects into it.
@@ -135,13 +135,13 @@ namespace Belle2 {
     void clearMaps(const EDurability& durability = c_Event);
 
 
-    //! Get an iterator for one of the object map
+    /*! Get an iterator for one of the object map */
     /*! \param  durability EDurability type to specify map.
         \return iterator for the specified map.
     */
     StoreMapIter<StoreObjMap>* getObjectIterator(const EDurability& durability);
 
-    //! Get an iterator for one of the object map
+    /*! Get an iterator for one of the object map */
     /*! \param  durability EDurability type to specify map.
         \return iterator for the specified map.
     */
@@ -149,13 +149,14 @@ namespace Belle2 {
 
 
   protected:
-    //! Constructor is private, as it is a singleton.
+
+    /*! Constructor is private, as it is a singleton. */
     explicit DataStore();
 
 
   private:
 
-    //! Destructor
+    /*! Destructor */
     ~DataStore() {};
 
     //! Map for TObjects.
@@ -167,7 +168,7 @@ namespace Belle2 {
     StoreObjMap m_objectMap[c_NDurabilityTypes];
 
 
-    //! Map for TClonesArrays.
+    /*! Map for TClonesArrays. */
     /*! Separe map because of the special properties of the TClonesArray.
         Otherwise same as map for the TObjects.
     */
@@ -177,6 +178,7 @@ namespace Belle2 {
 
   };
 }
+
 //---------------------------------------Implementation -------------------------------------------------
 
 using namespace Belle2;

@@ -30,7 +30,7 @@ namespace Belle2 {
   typedef StoreObjMap::iterator StoreObjIter; /*!< Iterator for TObjectMap*/
   typedef StoreArrayMap::iterator StoreArrayIter; /*!< Iterator for TClonesArraysMap*/
 
-  //! Durability types.
+  /*! Durability types. */
   /*! These types are used to identify the map used in the DataStore.
       \author <a href="mailto:martin.heck@kit.edu?subject=EDurability">Martin Heck</a>
   */
@@ -40,7 +40,7 @@ namespace Belle2 {
     c_Persistent /*!< Object is persistent.*/
   };
 
-  //! Number of Durability Types
+  /*! Number of Durability Types */
   /*! Probably useless, but in principle additional maps are easily created this way.
   */
   enum ENDurabilityTypes {

@@ -20,7 +20,7 @@
 
 namespace Belle2 {
 
-  //! Implements a log connection to a text file.
+  /*! Implements a log connection to a text file. */
   /*!
      Inherits from the abstract base class LogConnectionAbs.
   */
@@ -28,7 +28,7 @@ namespace Belle2 {
 
   public:
 
-    //! The constructor
+    /*! The constructor */
     /*!
       \param filename The path and name of the text file.
       \param append If this value is set to true, an existing file will not be overridden,
@@ -36,10 +36,10 @@ namespace Belle2 {
     */
     LogConnectionTxtFile(const std::string& filename, bool append = false);
 
-    //! The LogConnectionTxtFile destructor
+    /*! The LogConnectionTxtFile destructor */
     virtual ~LogConnectionTxtFile();
 
-    //! Sends a log message.
+    /*! Sends a log message. */
     /*!
      \param logLevel The log level of the message (e.g. debug, info, warning, error, fatal).
      \param message The message string which should be send.
@@ -53,7 +53,7 @@ namespace Belle2 {
     virtual bool sendMessage(LogCommon::ELogLevel logLevel, const std::string& message, const std::string& package,
                              const std::string& function, const std::string& file, unsigned int line, bool sendLocationInfo);
 
-    //! Returns true if the connection to the text file could be established.
+    /*! Returns true if the connection to the text file could be established. */
     /*!
      \return True if the connection to the text file could be established.
     */

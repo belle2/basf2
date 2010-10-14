@@ -1,20 +1,12 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 from basf2 import *
 
-avModList = fw.available_modules()
-print "The following modules were found (%s):" %(len(avModList))
+# Get the list of available modules
+avModList = fw.list_available_modules()
 
-for item in avModList:
-  print ""
-  print "==================="
-  print '%-20s %s' % (item.type(), item.description())
-  print "-------------------"
-
-  paramList = item.available_params()
-  for paramItem in paramList:
-    defaultStr = ", ".join(['%s' % defaultItem for defaultItem in paramItem.default])
-
-    forceString = ""
-    if paramItem.forceInSteering: forceString = "*"
-
-    print '%-1s %-20s %-14s %-30s %s' % (forceString, paramItem.name, paramItem.type, defaultStr, paramItem.description)
+# Loop over the list of available modules, register them and print their information
+for (moduleName, sharedLib) in avModList.iteritems():
+    current_module = register_module(moduleName)
+    print_params(current_module, False, sharedLib)
 

@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include <boost/python/register_ptr_to_python.hpp>
+#include <boost/shared_ptr.hpp>
 
 #include <framework/core/Module.h>
 #include <framework/core/ModuleManager.h>
@@ -18,8 +19,9 @@ using namespace Belle2;
 using namespace boost::python;
 
 
-Module::Module(const std::string& type) : m_type(type)
+Module::Module()
 {
+  m_name = "";
   m_debugFlag = 0;
   m_description = "Not set by the author";
 
@@ -28,7 +30,6 @@ Module::Module(const std::string& type) : m_type(type)
   m_hasCondition = false;
   m_processRecordType = prt_Event;
   m_propertyFlags = 0;
-  m_registeredToFramework = false;
 
   //Parameter definitions
   addParam("LogLevel", m_logLevel, static_cast<int>(LogCommon::c_Info), "The log level of the module [Debug=0, Info=1, Warning=2, Error=3, Fatal=4].");
@@ -175,8 +176,8 @@ void Module::exposePythonAPI()
   void (Module::*setConditionBool)(boost::shared_ptr<Path>) = &Module::setCondition;
 
   //Python class definition
-  class_<Module>("Module", init<std::string>())
-  .def("type", &Module::getType, return_value_policy<copy_const_reference>())
+  class_<Module>("Module")
+  .def("name", &Module::getName, return_value_policy<copy_const_reference>())
   .def("description", &Module::getDescription, return_value_policy<copy_const_reference>())
   .def("condition", setConditionString)
   .def("condition", setConditionBool)
@@ -187,4 +188,14 @@ void Module::exposePythonAPI()
   ;
 
   register_ptr_to_python<ModulePtr>();
+}
+
+
+//=====================================================================
+//                          ModuleProxyBase
+//=====================================================================
+
+ModuleProxyBase::ModuleProxyBase(const std::string& moduleName) : m_moduleName(moduleName)
+{
+  ModuleManager::Instance().registerModuleProxy(this);
 }

@@ -10,13 +10,13 @@
 
 namespace Belle2 {
 
-  //! Python object converter utilities class.
+  /*! Python object converter utilities class. */
   /*! Provides various static template methods to convert a STL variable to a python object
   */
   class PyObjConvUtils {
 
   public:
-    //! Adds a single variable value to a python list.
+    /*! Adds a single variable value to a python list. */
     /*!
         \param value The single value which should be added to the python list.
         \param outputList The python list to which the converted value is added.
@@ -24,7 +24,7 @@ namespace Belle2 {
     template<typename T>
     static void addSingleValueToList(const T& value, boost::python::list& outputList);
 
-    //! Adds the content of a STL vector to a python list.
+    /*! Adds the content of a STL vector to a python list. */
     /*!
         \param value The STL vector whose items should be added to a python list.
         \param outputList The python list to which the content of the STL vector is added.

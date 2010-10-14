@@ -24,14 +24,14 @@
 namespace Belle2 {
 
 
-  //! Base class for module parameter.
+  /*! Base class for module parameter. */
   /*! The base class stores all common information for parameters.
   */
   class ModuleParamBase {
 
   public:
 
-    //! Constructor
+    /*! Constructor */
     /*!
         \param typeInfo The type string of the parameter.
         \param description The description of the parameter.
@@ -40,7 +40,7 @@ namespace Belle2 {
     ModuleParamBase(const std::string& typeInfo, const std::string& description, bool force)
         : m_typeInfo(typeInfo), m_description(description), m_forceInSteering(force), m_setInSteering(false) {};
 
-    //! Destructor
+    /*! Destructor */
     virtual ~ModuleParamBase() {};
 
     //! Returns the type identifier of the parameter as string.
@@ -51,13 +51,13 @@ namespace Belle2 {
     */
     const std::string& getTypeInfo() const {return m_typeInfo; }
 
-    //! Returns the description of the parameter.
+    /*! Returns the description of the parameter. */
     /*!
         \return The description of the parameter.
     */
     const std::string& getDescription() const {return m_description; }
 
-    //! Returns true if the parameter was set in the steering file.
+    /*! Returns true if the parameter was set in the steering file. */
     /*!
         If the value was not set in the steering file but is still the
         default value, this method returns false.
@@ -67,7 +67,7 @@ namespace Belle2 {
     const bool isSetInSteering() const {return m_setInSteering; }
 
 
-    //! Returns true if the parameter has to be set by the user in the steering file.
+    /*! Returns true if the parameter has to be set by the user in the steering file. */
     /*!
         \return True if the parameter has to be set in the steering file.
     */
@@ -87,7 +87,7 @@ namespace Belle2 {
   };
 
 
-  //! A single parameter of the module.
+  /*! A single parameter of the module. */
   /*! Implements a single parameter of the module as a template class.
       Inherits from the module parameter base class.
   */
@@ -96,7 +96,7 @@ namespace Belle2 {
 
   public:
 
-    //! Constructor
+    /*! Constructor */
     /*!
         A parameter consists of a reference pointing to a member variable in the module
         which stores and allows fast access to the parameter value. In addition the type
@@ -109,10 +109,10 @@ namespace Belle2 {
     ModuleParam(T& paramVariable, const std::string& description = "", bool force = false)
         : ModuleParamBase(typeid(T).name(), description, force), m_paramVariable(paramVariable) {};
 
-    //! Destructor
+    /*! Destructor */
     virtual ~ModuleParam() {};
 
-    //! Sets the value of a parameter.
+    /*! Sets the value of a parameter. */
     /*!
         \param value The parameter value which should be assigned to the parameter.
     */
@@ -121,7 +121,7 @@ namespace Belle2 {
       m_setInSteering = true;
     }
 
-    //! Sets the default value of a parameter.
+    /*! Sets the default value of a parameter. */
     /*!
         \param defaultValue The parameter default value of the parameter.
     */
@@ -131,19 +131,19 @@ namespace Belle2 {
       m_setInSteering = false;
     }
 
-    //! Returns the value of the parameter.
+    /*! Returns the value of the parameter. */
     /*!
         \return The value of the parameter.
     */
     T& getValue() {return m_paramVariable; }
 
-    //! Returns the default value of the parameter.
+    /*! Returns the default value of the parameter. */
     /*!
         \return The default value of the parameter.
     */
     T& getDefaultValue() {return m_defaultValue; }
 
-    //! Resets the parameter value by assigning the default value to the parameter value.
+    /*! Resets the parameter value by assigning the default value to the parameter value. */
     void resetValue() {
       m_paramVariable = m_defaultValue;
       m_setInSteering = false;
@@ -155,7 +155,7 @@ namespace Belle2 {
 
   private:
 
-    T m_defaultValue; /*!< The default value of the parameter. */
+    T m_defaultValue;   /*!< The default value of the parameter. */
     T& m_paramVariable; /*!< Reference to the member variable in the module which stores the parameter value. */
 
   };
@@ -165,7 +165,7 @@ namespace Belle2 {
   //                  Python API
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-  //! Class to store basic information about a parameter.
+  /*! Class to store basic information about a parameter. */
   /*! This class is used in the Python API to provide the user with information about a parameter.
   */
   class ModuleParamInfoPython {

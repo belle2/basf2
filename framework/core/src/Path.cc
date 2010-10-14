@@ -32,15 +32,7 @@ Path::~Path()
 
 void Path::addModule(ModulePtr module)
 {
-  //Only add modules to the path if they are
-  //were registered by the user to the framework
-  if (module->isRegisteredToFramework()) {
-    m_modules.push_back(module);
-  } else {
-    string errorString = "Only user registered modules can be added to a path.";
-    errorString += "Please use the method 'register_module()' to create such a module.";
-    ERROR(errorString);
-  }
+  m_modules.push_back(module);
 }
 
 

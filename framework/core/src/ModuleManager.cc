@@ -12,11 +12,18 @@
 
 #include <dlfcn.h>
 #include <iostream>
-#include <boost/filesystem.hpp>
+#include <fstream>
+#include <boost/regex.hpp>
 #include <framework/logging/Logger.h>
+#include <framework/core/Module.h>
+#include <framework/core/ModuleUtils.h>
 
 using namespace Belle2;
 using namespace std;
+
+#define MAP_FILE_EXTENSION ".map"
+#define LIB_FILE_EXTENSION ".so"
+
 
 ModuleManager* ModuleManager::m_instance = NULL;
 
@@ -29,95 +36,116 @@ ModuleManager& ModuleManager::Instance()
 }
 
 
-void ModuleManager::loadModuleLibs(const string& path)
+void ModuleManager::registerModuleProxy(ModuleProxyBase* moduleProxy)
 {
-  if (path.empty()) return;
+  //Only register a module proxy if it was not yet registered.
+  if (m_registeredProxyMap.find(moduleProxy->getModuleName()) == m_registeredProxyMap.end()) {
+    m_registeredProxyMap.insert(make_pair(moduleProxy->getModuleName(), moduleProxy));
+  }
+}
 
-  boost::filesystem::path fullPath(boost::filesystem::initial_path<boost::filesystem::path>());
 
-  try {
+void ModuleManager::addModuleSearchPath(const string& path)
+{
+  if (ModuleUtils::isDirectory(path)) {
+    m_moduleSearchPathList.push_back(path);
+
+    //Search the path for map files and add the contained module names to the known module names
+    boost::filesystem::path fullPath(boost::filesystem::initial_path<boost::filesystem::path>());
     fullPath = boost::filesystem::system_complete(boost::filesystem::path(path));
-    if (!boost::filesystem::exists(fullPath)) {
-      WARNING("Could not load module library ! Invalid path: " + path);
-      return;
-    }
+    boost::filesystem::directory_iterator endIter;
 
-    //If the path is a directory, search for libraries in the directory
-    //if not try to load the given file as a library.
-    if (boost::filesystem::is_directory(fullPath)) {
-      boost::filesystem::directory_iterator endIter;
-      for (boost::filesystem::directory_iterator dirItr(fullPath); dirItr != endIter; ++dirItr) {
-
-        //Only files in the given folder are taken, subfolders are not used.
-        if (boost::filesystem::is_regular(dirItr->status())) {
-          //Take only files having the correct module extension
-          if (isExtensionSupported(boost::filesystem::extension(dirItr->path()))) {
-            loadLibrary(dirItr->path().filename(), dirItr->path().string());
-          }
+    for (boost::filesystem::directory_iterator dirItr(fullPath); dirItr != endIter; ++dirItr) {
+      //Only files in the given folder are taken, subfolders are not used.
+      if (boost::filesystem::is_regular_file(dirItr->status())) {
+        if (boost::filesystem::extension(dirItr->path()) == MAP_FILE_EXTENSION) {
+          fillModuleNameLibMap(*dirItr);
         }
       }
+    }
+
+  } else {
+    WARNING("Could not add module search filepath ! Directory does not exist: " + path);
+  }
+}
+
+
+const list<string>& ModuleManager::getModuleSearchPaths() const
+{
+  return m_moduleSearchPathList;
+}
+
+
+const map<string, string>& ModuleManager::getAvailableModules() const
+{
+  return m_moduleNameLibMap;
+}
+
+
+ModulePtr ModuleManager::registerModule(const string& moduleName, const std::string sharedLibPath) throw(ModuleNotCreatedError)
+{
+  map<string, ModuleProxyBase*>::iterator moduleIter =  m_registeredProxyMap.find(moduleName);
+
+  //If the proxy of the module was not already registered, load the corresponding shared library first
+  if (moduleIter == m_registeredProxyMap.end()) {
+
+    //If a shared library path is given, load the library and search for the registered module.
+    if (!sharedLibPath.empty()) {
+      if (ModuleUtils::isFile(sharedLibPath)) {
+        loadLibrary(sharedLibPath);
+        moduleIter =  m_registeredProxyMap.find(moduleName);
+      } else WARNING("Could not load shared library " + sharedLibPath + ". File does not exist !");
+
+      //Check if the loaded shared library file contained the module
+      if (moduleIter == m_registeredProxyMap.end()) {
+        ERROR("The shared library " + sharedLibPath + " does not contain the module " + moduleName + " !");
+      }
     } else {
-      if (isExtensionSupported(boost::filesystem::extension(fullPath))) {
-        loadLibrary(fullPath.filename(), fullPath.string());
+      //If no library path is given, check if the module name is known to the manager and load
+      //the appropriate shared library.
+      map<string, string>::const_iterator libIter = m_moduleNameLibMap.find(moduleName);
+
+      if (libIter != m_moduleNameLibMap.end()) {
+        loadLibrary(libIter->second);
+        moduleIter =  m_registeredProxyMap.find(moduleName);
+
+        //Check if the loaded shared library file contained the module
+        if (moduleIter == m_registeredProxyMap.end()) {
+          ERROR("The shared library " + libIter->second + " does not contain the module " + moduleName + " !");
+        }
+      } else {
+        ERROR("The module " + moduleName + " is not known to the framework !")
       }
     }
-  } catch (...) {
-    ERROR("Could not load module library ! Invalid path: " + path);
-  }
-}
-
-
-void ModuleManager::registerModule(Module* module)
-{
-  //Only do module self-registration if the module does not yet exist.
-  if (m_typeModuleMap.find(module->getType()) == m_typeModuleMap.end()) {
-    m_typeModuleMap.insert(make_pair(module->getType(), module));
-  } else {
-    ERROR("Could not self-register Module '" + module->getType() + "' ! A module of this type already exists.");
-  }
-}
-
-
-const Module& ModuleManager::getModuleByType(const string& type) const throw(FwExcModuleTypeNotFound)
-{
-  map<const string, Module*>::const_iterator findIter = m_typeModuleMap.find(type);
-
-  if (findIter == m_typeModuleMap.end()) {
-    throw FwExcModuleTypeNotFound(type);
-  } else return *(findIter->second);
-}
-
-
-list<ModulePtr> ModuleManager::getAvailableModules() const
-{
-  list<ModulePtr> returnList;
-
-  map<const string, Module*>::const_iterator mapIter;
-  for (mapIter = m_typeModuleMap.begin(); mapIter != m_typeModuleMap.end(); mapIter++) {
-    ModulePtr returnModule = mapIter->second->newModule();
-    returnList.push_back(returnModule);
   }
 
-  return returnList;
+  //Create an instance of the module found or loaded in the previous steps and return it.
+  //If the iterator points to the end of the map, throw an exception
+  if (moduleIter != m_registeredProxyMap.end()) {
+    ModulePtr currModulePtr = moduleIter->second->createModule();
+    m_createdModulesList.push_back(currModulePtr);
+    return currModulePtr;
+  } else throw ModuleNotCreatedError(moduleName);
 }
 
 
-ModulePtr ModuleManager::createModule(const std::string& type) const throw(FwExcModuleNotCreated)
+const ModulePtrList& ModuleManager::getCreatedModules() const
 {
-  try {
-    Module& newModule = const_cast<Module&>(getModuleByType(type));
-    return newModule.newModule();
-  } catch (FwExcModuleTypeNotFound& exc) {
+  return m_createdModulesList;
+}
 
-    ERROR("Could not create a module of type '" + exc.getModuleType() + "' ! Module type was not found.");
-    throw FwExcModuleNotCreated(type);
+
+ModulePtrList ModuleManager::getModulesByProperties(const ModulePtrList& modulePathList, unsigned int propertyFlags) const
+{
+  ModulePtrList tmpModuleList;
+  ModulePtrList::const_iterator listIter;
+
+  for (listIter = modulePathList.begin(); listIter != modulePathList.end(); listIter++) {
+    Module* module = listIter->get();
+    if (module->hasProperties(propertyFlags)) tmpModuleList.push_back(*listIter);
   }
-}
 
-
-void ModuleManager::addLibFileExtension(const std::string& fileExt)
-{
-  m_libFileExtensions.insert(fileExt);
+  return tmpModuleList;
 }
 
 
@@ -125,47 +153,51 @@ void ModuleManager::addLibFileExtension(const std::string& fileExt)
 //                              Private methods
 //============================================================================
 
-void ModuleManager::loadLibrary(const std::string& libName, const std::string& libPath)
+void ModuleManager::fillModuleNameLibMap(boost::filesystem::directory_entry& mapPath)
 {
-  //Check if library with same name was not already added
-  if (m_nameLibraryMap.find(libName) != m_nameLibraryMap.end()) {
-    ERROR("Could not load module library '" + libName + "' ! A module library with the same name was already loaded.");
+  //Check if the associated shared library file exists
+  string sharedLibPath = boost::filesystem::change_extension(mapPath, LIB_FILE_EXTENSION).string();
+  if (!ModuleUtils::fileNameExists(sharedLibPath)) {
+    ERROR("The shared library file: " << sharedLibPath << " doesn't exist, but is required by " << mapPath.string())
     return;
   }
 
-  unsigned int numRegModBefore = m_nameLibraryMap.size();
+  //Open the map file and parse the content line by line
+  ifstream mapFile(mapPath.string().c_str());
+  string currentLine;
 
-  //Open the library. By opening the library, the Modules register themselves.
-  void* libPointer = dlopen(libPath.c_str() , RTLD_LAZY | RTLD_GLOBAL);
+  //Read each line of the map file and use boost regular expression to find the quoted module name string
+  string::const_iterator start, end;
+  boost::regex expression("\"(.+)\"");
+  boost::match_results<std::string::const_iterator> matchResult;
+  boost::match_flag_type flags = boost::match_default;
+
+  while (getline(mapFile, currentLine)) {
+    start = currentLine.begin();
+    end = currentLine.end();
+    boost::regex_search(start, end, matchResult, expression, flags);
+
+    //We expect exactly two result entries: [0] the string that matched the regular expression
+    //                                      [1] the string that matched sub-expressions (here: the string inside the quotes)
+    if (matchResult.size() == 2) {
+      //Add result to map
+      m_moduleNameLibMap.insert(make_pair(string(matchResult[1].first, matchResult[1].second), sharedLibPath));
+    } else ERROR("Regular expression did not work. Is the module map file well formated ?")
+    }
+
+  //Close the map file
+  mapFile.close();
+}
+
+
+void ModuleManager::loadLibrary(const std::string& libraryPath)
+{
+  //Open the library. By opening the library, the module proxies register themselves.
+  void* libPointer = dlopen(libraryPath.c_str() , RTLD_LAZY | RTLD_GLOBAL);
 
   if (libPointer == NULL) {
     ERROR("Could not open shared library file (error in dlopen) : " + string(dlerror()));
-  } else {
-    //Check if modules were registered, otherwise close the library
-    if (m_typeModuleMap.size() > numRegModBefore) {
-      m_nameLibraryMap.insert(make_pair(libName, libPointer));
-// The dlclose is commented out because closing a library causes problems if the library contains objects
-// that register themselves in some collections in other libraries.
-//    } else {
-//      dlclose(libPointer);
-    }
   }
-}
-
-
-void ModuleManager::closeOpenLibraries()
-{
-  map<const string, void*>::iterator mapIter;
-
-  for (mapIter = m_nameLibraryMap.begin(); mapIter != m_nameLibraryMap.end(); mapIter++) {
-    dlclose(mapIter->second);
-  }
-}
-
-
-bool ModuleManager::isExtensionSupported(const std::string& fileExt) const
-{
-  return m_libFileExtensions.find(fileExt) != m_libFileExtensions.end();
 }
 
 
@@ -177,5 +209,4 @@ ModuleManager::ModuleManager()
 
 ModuleManager::~ModuleManager()
 {
-  closeOpenLibraries();
 }

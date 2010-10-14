@@ -17,7 +17,7 @@
 
 namespace Belle2 {
 
-  //! Iterator for DataStore maps.
+  /*! Iterator for DataStore maps. */
   /*! \author <a href="mailto:martin.heck@kit.edu?subject=">Martin Heck</a>
   */
   class StoreIter {

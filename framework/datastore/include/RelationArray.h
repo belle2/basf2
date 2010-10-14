@@ -62,10 +62,10 @@ namespace Belle2 {
     */
 
   private:
-    //! First end of Relation.
+    /*! First end of Relation. */
     TRef m_from;
 
-    //! Second end of Relation.
+    /*! Second end of Relation. */
     TRefArray m_to;
 
     /*! Weight of the RelationArray

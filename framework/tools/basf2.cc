@@ -3,15 +3,13 @@
  *                                                                        *
  *                  The Belle Analysis Framework 2                        *
  *                                                                        *
- *                          basf2-kernel                                  *
- *                            (kbasf2)                                    *
  *                                                                        *
  * There are two ways to work with the framework. Either                  *
  * by executing "basf2" and providing a python steering                   *
  * file as an argument or by using the framework within                   *
  * python itself.                                                         *
  *                                                                        *
- * This file implements the main executable "kbasf2".                     *
+ * This file implements the main executable "basf2".                      *
  *                                                                        *
  *                                                                        *
  * Copyright(C) 2010 - Belle II Collaboration                             *
@@ -32,9 +30,8 @@
 
 #include <boost/python.hpp> //Has to be the first include (restriction due to python)
 
-#include <framework/kbasf2/kbasf2pymodule.h>
+#include <framework/pybasf2/PyBasf2.h>
 #include <framework/core/Framework.h>
-#include <framework/core/FwExceptions.h>
 #include <framework/logging/Logger.h>
 
 #include <boost/program_options.hpp>
@@ -188,15 +185,15 @@ int main(int argc, char* argv[])
       Py_Initialize();
 
       //Embedd Python modules
-      Kbasf2PyModule::embedPythonModule();
+      PyBasf2::embedPythonModule();
 
       //Execute Python file
       executePythonFile(pythonFile);
 
       //Finish Python interpreter
       Py_Finalize();
-    } catch (FwExcPythonModuleNotEmbedded) {
-      ERROR("The framework python module could not be embedded !");
+    } catch (PythonModuleNotEmbeddedError& exc) {
+      ERROR(exc.what());
     } catch (error_already_set) {
       PyErr_Print();
     }

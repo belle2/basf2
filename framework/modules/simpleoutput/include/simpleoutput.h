@@ -12,8 +12,8 @@
 #define SIMPLEOUTPUT_H
 
 #include <framework/core/Module.h>
-#include <framework/core/ModuleManager.h>
-#include <boost/shared_ptr.hpp>
+
+
 #include <string>
 #include <vector>
 #include <iostream>
@@ -31,7 +31,7 @@
 
 namespace Belle2 {
 
-  //! Module Simple Output
+  /*! Module Simple Output */
   /*! This module writes the objects from the DataStore into a root file.
       Please make sure, that you create the same objects in each call of event,
       otherwise the module might not write out everything or has dangling pointers.
@@ -43,16 +43,13 @@ namespace Belle2 {
 
   public:
 
-    // Macro which adds a method to return a new instance of the module.
-    NEW_MODULE(SimpleOutput)
-
-    //! Constructor
+    /*! Constructor */
     SimpleOutput();
 
-    //! Destructor
+    /*! Destructor */
     virtual ~SimpleOutput();
 
-    //! Initialize the Module
+    /*! Initialize the Module */
     /*! Opens a file, creates TTree(s), fetches Iterators over the maps of the DataStore,
         sets m_done to false.
     */
@@ -62,17 +59,17 @@ namespace Belle2 {
     */
     virtual void beginRun();
 
-    //! Running over all events
+    /*! Running over all events */
     /*! Loops over all objects in event maps and writes to event-TTree.
     */
     virtual void event();
 
-    //! Is called after processing the last event of a run
+    /*! Is called after processing the last event of a run */
     /*! Loops over all objects in run maps and writes to run-TTree.
     */
     virtual void endRun();
 
-    //! Is called at the end of your Module
+    /*! Is called at the end of your Module */
     /*! Loops over all objects in persistent maps and writes to persistent-TTree.
         Writes TTree(s) out.
     */
@@ -83,24 +80,24 @@ namespace Belle2 {
 
 
   private:
-    //! Find out, how many objects and arrays, actually are in the datastore.
+    /*! Find out, how many objects and arrays, actually are in the datastore. */
     /*! Used to fill m_size and m_sizeObj.
         \return Number of elements in the respective map.
         \par mapID mapID is 2 times durability plus one for the array maps.
     */
     size_t getSize(const int& mapID);
 
-    //! Configuring the TFile.
+    /*! Configuring the TFile. */
     void setupTFile();
 
-    //! Fill TTree.
+    /*! Fill TTree. */
     /*! Read the objects from the DataStore and store them in m_objects.
         m_objects is connected with the tree, so the ROOT TTree::Fill() function can be called.
         \par durability Specifies map and tree to be used.
     */
     void fillTree(const EDurability& durability);
 
-    //! Switch branch name meaning function.
+    /*! Switch branch name meaning function. */
     /*! This function reads the elements from the respective durability map, eliminates the members
         that are in the inital branchNames vector and returns the remaining ones.
         \param durability Specifies branchNames to be taken.
@@ -110,29 +107,29 @@ namespace Belle2 {
 
     //first the steerable variables:
 
-    //! Name for output file.
+    /*! Name for output file. */
     /*! This string is steerable.
         Best practice: Let it end on .root
     */
     std::string m_outputFileName;
 
-    //! Name array for output tree names.
+    /*! Name array for output tree names. */
     /*! Each element of the array is steerable as separate string.
     */
     std::string m_treeNames[c_NDurabilityTypes];
 
-    //! Array for names of branches, that shall be written out.
+    /*! Array for names of branches, that shall be written out. */
     /*! Empty vectors result in all branches of the specific durability being written.
         These vectors can be configured in the steering file.
     */
     std::vector<std::string> m_branchNames[c_NDurabilityTypes];
 
-    //! Switch branchNames from exclusion to inclusion list.
+    /*! Switch branchNames from exclusion to inclusion list. */
     /*!
     */
     bool m_switchBranchNameMeaning;
 
-    //! TFile compression level.
+    /*! TFile compression level. */
     /*! Set the TFile compression level.
         Should be between 1 for low compression and 9 for much compression.
         <a href="http://root.cern.ch/root/html/src/TFile.cxx.html#b.RlJE">See the ROOT page for more information</a>.
@@ -142,38 +139,38 @@ namespace Belle2 {
 
     //then those for purely internal use:
 
-    //! TFile for output.
+    /*! TFile for output. */
     TFile* m_file;
 
-    //! TTree for output.
+    /*! TTree for output. */
     TTree* m_tree[c_NDurabilityTypes];
 
-    //! Has branch creation already happened?
+    /*! Has branch creation already happened? */
     /*! People will create objects in the event loop.
         Therefore the branch creation can not happen before the event function.
         However, in the event function, the branches should be created just once.
     */
     bool m_done[c_NDurabilityTypes];
 
-    //! Total number of branches.
+    /*! Total number of branches. */
     size_t m_size[c_NDurabilityTypes];
 
-    //! Number of branches for non-array objects.
+    /*! Number of branches for non-array objects. */
     size_t m_sizeObj[c_NDurabilityTypes];
 
-    //! Pointer to pointer, that can be utilised by the TTree.
+    /*! Pointer to pointer, that can be utilised by the TTree. */
     TObject** m_objects[c_NDurabilityTypes];
 
-    //! Iterators over the maps.
+    /*! Iterators over the maps. */
     StoreIter* m_iter[2*c_NDurabilityTypes];
 
-    //! ROOT Object ID Restore Counter
+    /*! ROOT Object ID Restore Counter */
     int m_nObjID;
 
-    //! String vector with steering parameter Names for m_treeNames.
+    /*! String vector with steering parameter Names for m_treeNames. */
     std::vector<std::string>  m_steerTreeNames;
 
-    //! String vector with steering parameter Names for m_branchNames.
+    /*! String vector with steering parameter Names for m_branchNames. */
     std::vector<std::string>  m_steerBranchNames;
   };
 

@@ -8,36 +8,38 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <framework/core/PathList.h>
+#include <framework/core/PathManager.h>
 
-using namespace std;
+
 using namespace Belle2;
+using namespace std;
 
-PathList::PathList()
+
+PathManager::PathManager()
 {
 
 }
 
 
-PathList::~PathList()
+PathManager::~PathManager()
 {
 
 }
 
 
-PathPtr PathList::createPath() throw(FwExcPathNotCreated)
+PathPtr PathManager::createPath() throw(PathNotCreatedError)
 {
   try {
     PathPtr newPath(new Path());
-    push_back(newPath);
+    m_createdPathList.push_back(newPath);
     return newPath;
   } catch (...) {
-    throw FwExcPathNotCreated();
+    throw PathNotCreatedError();
   }
 }
 
 
-ModulePtrList PathList::buildModulePathList(PathPtr startPath) const
+ModulePtrList PathManager::buildModulePathList(PathPtr startPath) const
 {
   ModulePtrList tmpModuleList;
 
@@ -52,7 +54,7 @@ ModulePtrList PathList::buildModulePathList(PathPtr startPath) const
 //                              Private methods
 //============================================================================
 
-void PathList::fillModulePathList(PathPtr path, ModulePtrList& modList) const
+void PathManager::fillModulePathList(PathPtr path, ModulePtrList& modList) const
 {
   ModulePtrList::const_iterator moduleIter;
   const ModulePtrList& currModList = path->getModules();

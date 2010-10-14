@@ -12,13 +12,11 @@
 #define SIMPLEINPUT_H
 
 #include <framework/core/Module.h>
-#include <framework/core/ModuleManager.h>
-#include <boost/shared_ptr.hpp>
-#include <string>
-#include <vector>
-
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreDefs.h>
+
+#include <string>
+#include <vector>
 
 #include <TFile.h>
 #include <TTree.h>
@@ -26,7 +24,7 @@
 
 namespace Belle2 {
 
-  //! Module Simple Input
+  /*! Module Simple Input */
   /*! This module reads objects from a root file and writes them into the DataStore.
       For more information consult the TWiki basf2 Software Portal.
       You can specify different TTrees for different durabilities, and give lists, which objects
@@ -38,36 +36,33 @@ namespace Belle2 {
 
   public:
 
-    // Macro which adds a method to return a new instance of the module.
-    NEW_MODULE(SimpleInput)
-
-    //! Constructor
+    /*! Constructor */
     SimpleInput();
 
-    //! Destructor
+    /*! Destructor */
     virtual ~SimpleInput();
 
-    //! Initialize the Module
+    /*! Initialize the Module */
     /*!
     */
     virtual void initialize();
 
-    //! Called when entering a new run
+    /*! Called when entering a new run */
     /*! Nothing so far.
     */
     virtual void beginRun();
 
-    //! Running over all events
+    /*! Running over all events */
     /*!
     */
     virtual void event();
 
-    //! Is called after processing the last event of a run
+    /*! Is called after processing the last event of a run */
     /*! Nothing so far.
     */
     virtual void endRun();
 
-    //! Is called at the end of your Module
+    /*! Is called at the end of your Module */
     /*!
     */
     virtual void terminate();
@@ -77,35 +72,35 @@ namespace Belle2 {
 
 
   private:
-    //! gives back Null, if the branch isn't good for read out.
+    /*! gives back Null, if the branch isn't good for read out. */
     TBranch* validBranch(int& ibranch, TObjArray* branches);
 
-    //! Some TFile setup.
+    /*! Some TFile setup. */
     void setupTFile();
 
-    //! Function that actually performs the reading from the tree into m_objects.
+    /*! Function that actually performs the reading from the tree into m_objects. */
     void readTree(const EDurability& durability);
 
 
     //first the steerable variables:
 
-    //! File to read from.
+    /*! File to read from. */
     /*! This string is steerable.
     */
     std::string m_inputFileName;
 
-    //! Name array for input tree names.
+    /*! Name array for input tree names. */
     /*! Each element of the array is steerable as separate string.
     */
     std::string m_treeNames[c_NDurabilityTypes];
 
-    //! Array for names of branches, that shall be written out.
+    /*! Array for names of branches, that shall be written out. */
     /*! Empty vector results in all branches being read.
         These vectors can be configured in the steering file.
     */
     std::vector<std::string> m_branchNames[c_NDurabilityTypes];
 
-    //! Event Number.
+    /*! Event Number. */
     /*! Steerable number of events to be skipped before start.
     */
     int m_eventNumber;
@@ -113,28 +108,28 @@ namespace Belle2 {
 
     //then those for purely internal use:
 
-    //! Name of
+    /*! Name of */
     std::vector<std::string> m_objectNames[c_NDurabilityTypes];
 
-    //! TFile for input.
+    /*! TFile for input. */
     TFile* m_file;
 
-    //!  TTree for input.
+    /*!  TTree for input. */
     TTree* m_tree[c_NDurabilityTypes];
 
-    //! Total number of branches.
+    /*! Total number of branches. */
     int m_size[c_NDurabilityTypes];
 
-    //! Number of branches from non-array objects.
+    /*! Number of branches from non-array objects. */
     int m_sizeObj[c_NDurabilityTypes];
 
-    //! Pointer to pointer, that can be utilised by the TTree.
+    /*! Pointer to pointer, that can be utilised by the TTree. */
     TObject** m_objects[c_NDurabilityTypes];
 
-    //! String vector with steering parameter Names for m_treeNames.
+    /*! String vector with steering parameter Names for m_treeNames. */
     std::vector<std::string>  m_steerTreeNames;
 
-    //! String vector with steering parameter Names for m_branchNames.
+    /*! String vector with steering parameter Names for m_branchNames. */
     std::vector<std::string>  m_steerBranchNames;
 
   };

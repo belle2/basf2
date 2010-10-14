@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef KBASF2MODULE_H_
-#define KBASF2MODULE_H_
+#include <framework/pybasf2/PyBasf2.h>
 
 #include <boost/python.hpp>
 
@@ -18,24 +17,27 @@
 #include <framework/core/Framework.h>
 #include <framework/core/ModuleParam.h>
 
-#include <framework/gearbox/Gearbox.h>
+using namespace Belle2;
+using namespace boost::python;
 
-namespace Belle2 {
 
-  //!  The Kbasf2PyModule class.
-  /*!
-     This class defines the Python basf2 module.
-  */
-  class Kbasf2PyModule {
+//-----------------------------------
+//   Define the pybasf2 python module
+//-----------------------------------
+BOOST_PYTHON_MODULE(pybasf2)
+{
+  Module::exposePythonAPI();
+  Path::exposePythonAPI();
+  Framework::exposePythonAPI();
+  ModuleParamInfoPython::exposePythonAPI();
+}
 
-  public:
 
-    //! Embeds the Python module.
-    static void embedPythonModule() throw(FwExcPythonModuleNotEmbedded);
-
-  };
-
-} //end of namespace Belle2
-
-#endif /* KBASF2MODULE_H_ */
+//! Creates the basf2 Python module.
+void PyBasf2::embedPythonModule() throw(PythonModuleNotEmbeddedError)
+{
+  if (PyImport_AppendInittab(const_cast<char*>("pybasf2"), initpybasf2) == -1) {
+    throw PythonModuleNotEmbeddedError();
+  }
+}
 

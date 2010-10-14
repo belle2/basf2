@@ -10,12 +10,21 @@
 
 #include <framework/modules/simpleoutput/simpleoutput.h>
 
+#include <framework/core/ModuleManager.h>
+
 using namespace std;
 using namespace Belle2;
 
-REG_MODULE(SimpleOutput)
+//-----------------------------------------------------------------
+//                 Register the Module
+//-----------------------------------------------------------------
+REG_MODULE(SimpleOutput, "SimpleOutput")
 
-SimpleOutput::SimpleOutput() : Module("SimpleOutput")
+//-----------------------------------------------------------------
+//                 Implementation
+//-----------------------------------------------------------------
+
+SimpleOutput::SimpleOutput() : Module()
 {
   //Set module properties
   setDescription("simple output");

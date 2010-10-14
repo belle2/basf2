@@ -17,7 +17,7 @@
 
 namespace Belle2 {
 
-  //! Abstract base class for the different types of log connections.
+  /*! Abstract base class for the different types of log connections. */
   /*!
   */
   class LogConnectionAbs {
@@ -28,7 +28,7 @@ namespace Belle2 {
 
     virtual ~LogConnectionAbs() {};
 
-    //! Sends a log message.
+    /*! Sends a log message. */
     /*!
      \param logLevel The log level of the message (e.g. debug, info, warning, error, fatal).
      \param message The message string which should be send.
@@ -42,7 +42,7 @@ namespace Belle2 {
     virtual bool sendMessage(LogCommon::ELogLevel logLevel, const std::string& message, const std::string& package,
                              const std::string& function, const std::string& file, unsigned int line, bool sendLocationInfo) = 0;
 
-    //! Returns true if the connection could be established.
+    /*! Returns true if the connection could be established. */
     /*!
      \return True if the connection could be established.
     */

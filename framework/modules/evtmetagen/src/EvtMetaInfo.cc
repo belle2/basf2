@@ -21,13 +21,13 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(EvtMetaInfo)
+REG_MODULE(EvtMetaInfo, "EvtMetaInfo")
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-EvtMetaInfo::EvtMetaInfo() : Module("EvtMetaInfo")
+EvtMetaInfo::EvtMetaInfo() : Module()
 {
   //Set module properties
   setDescription("Prints the current event meta data information (exp, run, evt).");

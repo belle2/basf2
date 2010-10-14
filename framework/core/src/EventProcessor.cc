@@ -8,72 +8,83 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <framework/core/ModuleChain.h>
-#include <framework/core/ModuleManager.h>
-#include <framework/logging/LogSystem.h>
+#include <framework/core/EventProcessor.h>
 
+#include <framework/core/ModuleManager.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreDefs.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/datastore/EventMetaData.h>
+#include <framework/logging/Logger.h>
 
 using namespace std;
 using namespace Belle2;
 
 
-ModuleChain::ModuleChain()
+EventProcessor::EventProcessor(PathManager& pathManager) : m_pathManager(pathManager)
 {
-  m_moduleList = new ModuleList();
-  m_pathList = new PathList();
+
 }
 
 
-ModuleChain::~ModuleChain()
+EventProcessor::~EventProcessor()
 {
-  delete m_pathList;
-  delete m_moduleList;
+
 }
 
 
-ModulePtr ModuleChain::registerModule(const string& type) throw(FwExcModuleNotRegistered)
+void EventProcessor::process(PathPtr startPath, long maxEvent, long runNumber)
 {
-  try {
-    return m_moduleList->createModule(type);
-  } catch (FwExcModuleNotCreated& exc) {
-    throw FwExcModuleNotRegistered(type);
-  }
-}
+  ModuleManager& moduleManager = ModuleManager::Instance();
 
+  //Get list of modules which could be executed during the data processing.
+  ModulePtrList moduleList = m_pathManager.buildModulePathList(startPath);
 
-PathPtr ModuleChain::addPath() throw(FwExcPathNotAdded)
-{
-  try {
-    return m_pathList->createPath();
-  } catch (FwExcPathNotCreated& exc) {
-    throw FwExcPathNotAdded();
-  }
-}
-
-
-ModulePtrList ModuleChain::getModulePathList(PathPtr startPath) const
-{
-  return m_pathList->buildModulePathList(startPath);
-}
-
-
-ModulePtrList ModuleChain::getModulesByProperties(const ModulePtrList& modulePathList, unsigned int propertyFlags) const
-{
-  ModulePtrList tmpModuleList;
-  ModulePtrList::const_iterator listIter;
-
-  for (listIter = modulePathList.begin(); listIter != modulePathList.end(); listIter++) {
-    Module* module = listIter->get();
-    if (module->hasProperties(propertyFlags)) tmpModuleList.push_back(*listIter);
+  //Check if there is at least one module in the chain, which can specify the end of the data flow (if maxEvent is <= 0).
+  if (maxEvent <= 0) {
+    ModulePtrList selEoDModuleList = moduleManager.getModulesByProperties(moduleList, Module::c_TriggersEndOfData);
+    if (selEoDModuleList.size() == 0) {
+      ERROR("There must be at least one module in the chain which can specify the end of the data flow.")
+      return;
+    }
   }
 
-  return tmpModuleList;
+  //Check if there is exactly one module in the chain, which can specify the begin of a new run (if runNumber < 0).
+  if (runNumber < 0) {
+    ModulePtrList selBnRModuleList = moduleManager.getModulesByProperties(moduleList, Module::c_TriggersNewRun);
+    if (selBnRModuleList.size() != 1) {
+      ERROR("There are currently " << selBnRModuleList.size() << " modules in the chain which specify the beginning of a new run. There is exactly one module of this type allowed.")
+      return;
+    }
+  } else {
+    //Store the run number in the MetaData object
+    StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", c_Persistent);
+    eventMetaDataPtr->setRun(runNumber);
+  }
+
+  //Initialize modules
+  processInitialize(moduleList);
+
+  //Check if errors appeared. If yes, don't start the event processing.
+  int numLogError = LogSystem::Instance().getMessageCounter(LogCommon::c_Error);
+  if (numLogError == 0) {
+    if (runNumber > -1) processBeginRun(moduleList); //If the run number was set, start a new run manually
+    processCore(startPath, moduleList, maxEvent); //Do the event processing
+
+  } else {
+    ERROR(numLogError << " ERROR(S) occurred ! The processing of events will not be started.");
+  }
+
+  //Terminate modules
+  processTerminate(moduleList);
 }
 
 
-void ModuleChain::processInitialize(const ModulePtrList& modulePathList)
+//============================================================================
+//                              Private methods
+//============================================================================
+
+void EventProcessor::processInitialize(const ModulePtrList& modulePathList)
 {
   LogSystem& logSystem = LogSystem::Instance();
   ModulePtrList::const_iterator listIter;
@@ -82,7 +93,7 @@ void ModuleChain::processInitialize(const ModulePtrList& modulePathList)
     Module* module = listIter->get();
 
     if (module->hasUnsetForcedParams()) {
-      ERROR("The module " << module->getType() << " has unset parameters which have to be set by the user !")
+      ERROR("The module " << module->getName() << " has unset parameters which have to be set by the user !")
       continue;
     }
 
@@ -96,7 +107,7 @@ void ModuleChain::processInitialize(const ModulePtrList& modulePathList)
 }
 
 
-void ModuleChain::processChain(PathPtr startPath, const ModulePtrList& modulePathList, long maxEvent)
+void EventProcessor::processCore(PathPtr startPath, const ModulePtrList& modulePathList, long maxEvent)
 {
   long currEvent = 0;
   bool normalEvent = true;
@@ -135,7 +146,7 @@ void ModuleChain::processChain(PathPtr startPath, const ModulePtrList& modulePat
             currPath = startPath;
             moduleIter = currPath->getModules().begin();
             normalEvent = false;
-          } else WARNING("Module " << module->getType() << "requested to start a new run, but doesn't have the necessary property set. Request was ignored.");
+          } else WARNING("Module " << module->getName() << "requested to start a new run, but doesn't have the necessary property set. Request was ignored.");
           break;
 
         case Module::prt_EndRun    :
@@ -146,14 +157,14 @@ void ModuleChain::processChain(PathPtr startPath, const ModulePtrList& modulePat
             currPath = startPath;
             moduleIter = currPath->getModules().begin();
             normalEvent = false;
-          } else WARNING("Module " << module->getType() << "requested to end a run, but doesn't have the necessary property set. Request was ignored.");
+          } else WARNING("Module " << module->getName() << "requested to end a run, but doesn't have the necessary property set. Request was ignored.");
           break;
 
         case Module::prt_EndOfData :
           //If the current module is allowed to end the process and the end of data flow is reached, stop the event process.
           if (module->hasProperties(Module::c_TriggersEndOfData)) {
             endProcess = true;
-          } else WARNING("Module " << module->getType() << "requested to stop the event processing (end of data), but doesn't have the necessary property set. Request was ignored.");
+          } else WARNING("Module " << module->getName() << "requested to stop the event processing (end of data), but doesn't have the necessary property set. Request was ignored.");
           break;
       }
 
@@ -169,13 +180,13 @@ void ModuleChain::processChain(PathPtr startPath, const ModulePtrList& modulePat
     //Delete event related data in DataStore
     DataStore::Instance().clearMaps(c_Event);
 
-    if ((maxEvent > 0) && (currEvent >= maxEvent)) endProcess = true;
     currEvent++;
+    if ((maxEvent > 0) && (currEvent >= maxEvent)) endProcess = true;
   }
 }
 
 
-void ModuleChain::processTerminate(const ModulePtrList& modulePathList)
+void EventProcessor::processTerminate(const ModulePtrList& modulePathList)
 {
   LogSystem& logSystem = LogSystem::Instance();
   ModulePtrList::const_reverse_iterator listIter;
@@ -196,7 +207,7 @@ void ModuleChain::processTerminate(const ModulePtrList& modulePathList)
 }
 
 
-void ModuleChain::processBeginRun(const ModulePtrList& modulePathList)
+void EventProcessor::processBeginRun(const ModulePtrList& modulePathList)
 {
   LogSystem& logSystem = LogSystem::Instance();
   ModulePtrList::const_iterator listIter;
@@ -214,7 +225,7 @@ void ModuleChain::processBeginRun(const ModulePtrList& modulePathList)
 }
 
 
-void ModuleChain::processEndRun(const ModulePtrList& modulePathList)
+void EventProcessor::processEndRun(const ModulePtrList& modulePathList)
 {
   LogSystem& logSystem = LogSystem::Instance();
   ModulePtrList::const_iterator listIter;
@@ -233,8 +244,3 @@ void ModuleChain::processEndRun(const ModulePtrList& modulePathList)
   //Delete run related data in DataStore
   DataStore::Instance().clearMaps(c_Run);
 }
-
-
-//============================================================================
-//                              Private methods
-//============================================================================

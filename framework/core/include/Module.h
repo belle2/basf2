@@ -19,6 +19,7 @@
 #include <framework/core/CondParser.h>
 #include <framework/core/ModuleParamList.h>
 #include <framework/logging/Logger.h>
+#include <framework/core/ModuleManager.h>
 
 #include <vector>
 #include <list>
@@ -30,14 +31,17 @@ namespace Belle2 {
 
   class Path;
 
-  //! Base Class for Modules
-  /*! You have to inherit from this class to run over events.
+  /*! Base Class for Modules */
+  /*! A module is the smallest building block of the framework.
+      A typical event processing chain consists of a linear arrangement
+      of modules. By inheriting from this base class, various types of
+      modules can be created. Each module is identified by its unique name.
   */
   class Module {
 
   public:
 
-    //! The process record types
+    /*! The process record types */
     enum EProcessRecordType {
       prt_Event,       /*!< The default value: Marks event data */
       prt_BeginRun,    /*!< Marks the beginning of a new run (only used for the first method in the chain) */
@@ -50,7 +54,7 @@ namespace Belle2 {
                           setting this EProcessRecordType has finished.*/
     };
 
-    //! Each module can be tagged with property flags, which indicate certain features of the module.
+    /*! Each module can be tagged with property flags, which indicate certain features of the module. */
     enum EModulePropFlags {
       c_TriggersNewRun          = 1,   /*!< This module is able to trigger new runs. */
       c_TriggersEndOfData       = 2,   /*!< This module is able to send the message that there is no more data available. */
@@ -62,26 +66,19 @@ namespace Belle2 {
       c_RequiresGUISupport      = 128  /*!< This module requires the framework to have GUI support built-in. */
     };
 
-    //! Constructor
+    /*! Constructor */
     /*!
       Create and allocate memory for variables here. Add the module parameters in this method.
-      \param type The type of the Module (is saved as a string)
     */
-    Module(const std::string& type);
+    Module();
 
-    //! Destructor
+    /*! Destructor */
     /*!
        Use the destructor to release the memory you allocated in the constructor.
     */
     virtual ~Module();
 
-    //! Returns a new instance of the module.
-    /*!
-        This method has to be implemented by subclasses.
-    */
-    virtual boost::shared_ptr<Module> newModule() {boost::shared_ptr<Module> nm(new Module("Module")); return nm; };
-
-    //! Initialize the Module
+    /*! Initialize the Module */
     /*! This method is called only once before the actual event processing starts.
         Use this method to initialize variables, open files etc.
 
@@ -89,28 +86,28 @@ namespace Belle2 {
     */
     virtual void initialize() {};
 
-    //! Called when entering a new run
+    /*! Called when entering a new run */
     /*! Called at the beginning of each run, the method gives you the chance to change run dependent constants like alignment parameters, etc.
 
         This method has to be implemented by subclasses.
     */
     virtual void beginRun() {};
 
-    //! This method is the core of the module.
+    /*! This method is the core of the module. */
     /*! This method is called for each event. All processing of the event has to take place in this method.
 
         This method has to be implemented by subclasses.
     */
     virtual void event() {};
 
-    //! This method is called if the current run ends.
+    /*! This method is called if the current run ends. */
     /*! Use this method to store information, which should be aggregated over one run.
 
         This method has to be implemented by subclasses.
     */
     virtual void endRun() {};
 
-    //! This method is called at the end of the event processing.
+    /*! This method is called at the end of the event processing. */
     /*! This method is called only once after the event processing finished.
         Use this method for cleaning up, closing files, etc.
 
@@ -118,31 +115,31 @@ namespace Belle2 {
     */
     virtual void terminate() {};
 
-    //! Returns the type of the module
+    /*! Returns the name of the module */
     /*!
-        \return The type of the module as string
+        \return The name of the module as string
     */
-    const std::string& getType() const {return m_type;}
+    const std::string& getName() const {return m_name;}
 
-    //! Returns the description of the module
+    /*! Returns the description of the module */
     /*!
         \return The description of the module as string
     */
     const std::string& getDescription() const {return m_description;}
 
-    //! Returns the log level used for this module.
+    /*! Returns the log level used for this module. */
     /*!
         \return Returns the log level of the module.
     */
     LogCommon::ELogLevel getLogLevel() {return static_cast<LogCommon::ELogLevel>(m_logLevel); };
 
-    //! Returns the debug messaging level used for this module.
+    /*! Returns the debug messaging level used for this module. */
     /*!
         \return Returns the debug messaging level of the module.
     */
     int getDebugLevel() {return m_debugLevel; };
 
-    //! Sets the condition of the module.
+    /*! Sets the condition of the module. */
     /*!
         Please be careful: Avoid creating cyclic paths, e.g. by linking a condition
         to a path which is processed before the path where this module is
@@ -153,7 +150,7 @@ namespace Belle2 {
     */
     void setCondition(const std::string& expression, boost::shared_ptr<Path> path);
 
-    //! A simplified version to set the condition of the module.
+    /*! A simplified version to set the condition of the module. */
     /*!
         Please be careful: Avoid creating cyclic paths, e.g. by linking a condition
         to a path which is processed before the path where this module is
@@ -165,13 +162,13 @@ namespace Belle2 {
     */
     void setCondition(boost::shared_ptr<Path> path);
 
-    //! Returns true if a condition and a return value was set for the module.
+    /*! Returns true if a condition and a return value was set for the module. */
     /*!
         \return True if a condition and a return value was set for the module.
     */
     bool hasCondition() const { return m_hasCondition; };
 
-    //! If a condition was set, it is evaluated and the result is returned.
+    /*! If a condition was set, it is evaluated and the result is returned. */
     /*!
         If no condition or result value was defined, the method returns false.
         Otherwise, the condition is evaluated and the result of the evaluation returned.
@@ -181,38 +178,26 @@ namespace Belle2 {
     */
     bool evalCondition();
 
-    //! Returns the path of the condition.
+    /*! Returns the path of the condition. */
     /*!
         \return The path of the condition.
     */
     boost::shared_ptr<Path> getConditionPath() const {return m_conditionPath; };
 
-    //! Returns true if all specified property flags are available in this module.
+    /*! Returns true if all specified property flags are available in this module. */
     /*!
         \param propertyFlags The flags which should be compared with the module flags.
         \return True if all specified property flags are available in this module.
     */
     bool hasProperties(unsigned int propertyFlags);
 
-    //! Returns the current process record type.
+    /*! Returns the current process record type. */
     /*!
         \return The current process record type.
     */
     EProcessRecordType getProcessRecordType() const {return m_processRecordType; };
 
-    //! Sets the flag if the module was registered by the user to the framework.
-    /*!
-        \param regFramework Set to true if the module was registered by the user to the framework.
-    */
-    void setRegisteredToFramework(bool regFramework) {m_registeredToFramework = regFramework; };
-
-    //! Returns true if the module was registered by the user to the framework.
-    /*!
-        \return True if the module was registered by the user to the framework.
-    */
-    bool isRegisteredToFramework() const {return m_registeredToFramework; };
-
-    //! Returns true if the module has still unset parameters which the user has to set in the steering file.
+    /*! Returns true if the module has still unset parameters which the user has to set in the steering file. */
     /*!
         \return True if the module has still unset parameters which the user has to set in the steering file.
     */
@@ -223,7 +208,7 @@ namespace Belle2 {
     //                   Python API
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    //! Returns a python list of all parameters.
+    /*! Returns a python list of all parameters. */
     /*!
         Each item in the list consists of the name of the parameter, a string describing its type,
         a python list of all default values and the description of the parameter.
@@ -231,7 +216,7 @@ namespace Belle2 {
     */
     boost::python::list getParamInfoListPython() const;
 
-    //! Exposes methods of the Module class to Python.
+    /*! Exposes methods of the Module class to Python. */
     static void exposePythonAPI();
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -239,19 +224,19 @@ namespace Belle2 {
 
   protected:
 
-    //! Sets the flags for the module properties.
+    /*! Sets the flags for the module properties. */
     /*!
         \param propertyFlags The flags for the module properties.
     */
     void setPropertyFlags(unsigned int propertyFlags);
 
-    //! Sets the description of the module.
+    /*! Sets the description of the module. */
     /*!
         \param description A short description of the module.
     */
     void setDescription(const std::string description);
 
-    //! Adds a new parameter to the module. This method has to be called in the constructor of the module.
+    /*! Adds a new parameter to the module. This method has to be called in the constructor of the module. */
     /*!
         \param name The unique name of the parameter.
         \param paramVariable The local member variable of the module to which the value from the steering file is written.
@@ -262,18 +247,18 @@ namespace Belle2 {
     template<typename T>
     void addParam(const std::string& name, T& paramVariable, const T& defaultValue, const std::string& description = "", bool force = false);
 
-    //! Returns a reference to a parameter. The returned parameter has already the correct type.
+    /*! Returns a reference to a parameter. The returned parameter has already the correct type. */
     /*!
-       Throws an exception of type FwExcModuleParameterNotFound if a parameter with the given name does not exist.
-       Throws an exception of type FwExcModuleParameterType if the parameter type of does not match to the template parameter.
+       Throws an exception of type ModuleParameterNotFoundError if a parameter with the given name does not exist.
+       Throws an exception of type ModuleParameterTypeError if the parameter type of does not match to the template parameter.
 
         \param name The unique name of the parameter.
         \return A reference to a module parameter having the correct type.
     */
     template<typename T>
-    ModuleParam<T>& getParam(const std::string& name) const throw(FwExcModuleParameterNotFound, FwExcModuleParameterType);
+    ModuleParam<T>& getParam(const std::string& name) const throw(ModuleParameterNotFoundError, ModuleParameterTypeError);
 
-    //! Sets the return value for this module as integer.
+    /*! Sets the return value for this module as integer. */
     /*! The value can be used in the steering file to divide the analysis chain
         into several paths.
 
@@ -281,7 +266,7 @@ namespace Belle2 {
     */
     void setReturnValue(int value);
 
-    //! Sets the return value for this module as bool.
+    /*! Sets the return value for this module as bool. */
     /*! The bool value is saved as an integer with the convention 1 meaning true and 0 meaning false.
         The value can be used in the steering file to divide the analysis chain
         into several paths.
@@ -290,7 +275,7 @@ namespace Belle2 {
     */
     void setReturnValue(bool value);
 
-    //! Sets the process record type.
+    /*! Sets the process record type. */
     /*! Usually this method is used by data generating or data reading modules.
         Please note: Only for the first module in the chain the BEGIN_RUN and
         END_RUN process record types are checked.
@@ -302,15 +287,11 @@ namespace Belle2 {
 
   private:
 
-    //! This variable controls the messaging level
-    /*! \sa setDebugFlag
-    */
-    int m_debugFlag;
+    int m_debugFlag; /*!< This variable controls the messaging level. */
 
-    std::string m_type;           /*!< The type of the module, saved as a string. */
+    std::string m_name;           /*!< The name of the module, saved as a string. */
     std::string m_description;    /*!< The description of the module. */
     unsigned int m_propertyFlags; /*!< The properties of the module (Master, multi processing etc.) saved as bitwise flags. */
-    bool m_registeredToFramework; /*!< True if the module was registered by the user to the framework. */
 
     int m_logLevel;            /*!< The log messaging level of the module. Defined as int for the parameter handling. */
     int m_debugLevel;          /*!< The debug messaging level of the module. */
@@ -330,7 +311,7 @@ namespace Belle2 {
     //                    Python API
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    //! Implements a method for setting boost::python objects.
+    /*! Implements a method for setting boost::python objects. */
     /*! The method supports the following types: int, double, string, bool
         The conversion of the python object to the C++ type and the final storage of the
         parameter value is done by specializing the template method setParamObjectTemplate().
@@ -340,7 +321,7 @@ namespace Belle2 {
     */
     void setParamObject(const std::string& name, const boost::python::object& pyObj);
 
-    //! Implements a method for setting boost::python lists.
+    /*! Implements a method for setting boost::python lists. */
     /*! The method supports lists of the following types: int, double, string, bool
         The conversion of the python list to the std::vector and the final storage of the
         parameter value is done by specializing the template method setParamListTemplate().
@@ -350,7 +331,7 @@ namespace Belle2 {
     */
     void setParamList(const std::string& name, const boost::python::list& pyList);
 
-    //! Implements a method for reading the parameter values from a boost::python dictionary.
+    /*! Implements a method for reading the parameter values from a boost::python dictionary. */
     /*! The key of the dictionary has to be the name of the parameter and the value has to
         be of one of the supported parameter types (both, single parameters and lists are allowed).
 
@@ -360,14 +341,13 @@ namespace Belle2 {
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    friend class ModuleManager;
+    template<class U> friend class ModuleProxy;
   };
 
 
   //------------------------------------------------------
   //       Implementation of template based methods
   //------------------------------------------------------
-
   template<typename T>
   void Module::addParam(const std::string& name, T& paramVariable, const T& defaultValue, const std::string& description, bool force)
   {
@@ -376,10 +356,11 @@ namespace Belle2 {
 
 
   template<typename T>
-  ModuleParam<T>& Module::getParam(const std::string& name) const throw(FwExcModuleParameterNotFound, FwExcModuleParameterType)
+  ModuleParam<T>& Module::getParam(const std::string& name) const throw(ModuleParameterNotFoundError, ModuleParameterTypeError)
   {
     return m_moduleParamList.getParameter<T>(name);
   }
+
 
   //------------------------------------------------------
   //             Define convenient typdefs
@@ -387,7 +368,7 @@ namespace Belle2 {
 
   typedef boost::shared_ptr<Module> ModulePtr;
 
-  //! Class that defines the < comparison operator ModulePtrs. Used to declare a set of ModulePtrs.
+  /*! Class that defines the < comparison operator ModulePtrs. Used to declare a set of ModulePtrs. */
   struct ModulePtrOperators {
     //! Comparison operator for two ModulePtr.
     bool operator()(const ModulePtr& a, const ModulePtr& b) {
@@ -395,7 +376,7 @@ namespace Belle2 {
     }
   };
 
-  //! Class that defines the equality operator for ModulePtrs.
+  /*! Class that defines the equality operator for ModulePtrs. */
   struct ModulePtrOperatorsEq: public std::binary_function<ModulePtr, ModulePtr, bool> {
     //! Equality operator for two ModulePtr.
     bool operator()(const ModulePtr& a, const ModulePtr& b) const {
@@ -408,10 +389,72 @@ namespace Belle2 {
 
 
   //------------------------------------------------------
+  //  Proxy class for creating an instance of the module
+  //------------------------------------------------------
+  /*! The base module proxy class is used to create new instances of a module. */
+  /*!
+    By loading a shared library, which contains modules, the proxy class of each
+    module is automatically registered to the global ModuleManager. If an instance of
+    a module is required, its proxy class is responsible to create an instance of the
+    module.
+  */
+  class ModuleProxyBase {
+
+  public:
+    /*! The constructor of the ModuleProxyBase class. */
+    /*! The constructor registers the proxy to the ModuleManager.
+        \param moduleName The type name of the module.
+    */
+    ModuleProxyBase(const std::string& moduleName);
+
+    /*! Abstract method which creates a new module and returns a shared pointer to it. */
+    /*! Instances of modules can only be created by this method.
+       \return A shared pointer to the created module instance.
+    */
+    virtual ModulePtr createModule() const = 0;
+
+    /*! Returns the module name of the module associated to this proxy. */
+    /*!
+       \return The module name of the module associated to this proxy.
+    */
+    const std::string& getModuleName() const {return m_moduleName; }
+
+
+  protected:
+
+    std::string m_moduleName; /*!< The type name of the module. */
+  };
+
+
+  /*! The templated proxy class. */
+  /*!
+    Be defining a global variable of this class, any module can be registered to the ModuleManager.
+    This definition has to be added to each module definition. A macro is available
+  */
+  template <class T>
+  class ModuleProxy : ModuleProxyBase {
+
+  public:
+
+    ModuleProxy(const std::string& moduleName) : ModuleProxyBase(moduleName) {};
+
+    /*! Creates a new module and returns a shared pointer to it. */
+    /*! Instances of modules can only be created by this method.
+       \return A shared pointer to the created module instance.
+    */
+    ModulePtr createModule() const {
+      ModulePtr nm(new T());
+      nm->m_name = m_moduleName;
+      return nm;
+    }
+  };
+
+
+  //------------------------------------------------------
   //             Define convenient macros
   //------------------------------------------------------
-#define NEW_MODULE(className) virtual ModulePtr newModule() { ModulePtr nm(new className()); return nm; };
-#define REG_MODULE(className) ModuleManager::Registrator<className> reg##className;
+#define REG_MODULE(className, moduleName) ModuleProxy<className> regProxy##className(moduleName);
+
   //-------------------------------
 
 } // end namespace Belle2

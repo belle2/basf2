@@ -8,7 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <geometry/geodetector/CreatorManager.h>
 #include <geometry/geodetector/CreatorBase.h>
 #include <framework/logging/Logger.h>
 
@@ -21,9 +20,9 @@ using namespace std;
 using namespace Belle2;
 
 
-CreatorBase::CreatorBase(const string& name) throw(GDetExcCreatorNameEmpty)
+CreatorBase::CreatorBase(const string& name) throw(GeometryCreatorNameEmptyError)
 {
-  if (name.empty()) throw GDetExcCreatorNameEmpty();
+  if (name.empty()) throw GeometryCreatorNameEmptyError();
   m_name = name;
   m_hasGroupName = false;
   m_geoGroupName = "";

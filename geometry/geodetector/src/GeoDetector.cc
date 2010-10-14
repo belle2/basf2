@@ -10,10 +10,8 @@
 
 #include <framework/gearbox/Gearbox.h>
 #include <framework/gearbox/GearDir.h>
-#include <framework/gearbox/GbxExceptions.h>
 #include <geometry/geodetector/GeoDetector.h>
 #include <geometry/geodetector/CreatorManager.h>
-#include <geometry/geodetector/GDetExceptions.h>
 #include <framework/logging/Logger.h>
 
 #include <TGeoManager.h>
@@ -90,15 +88,15 @@ void GeoDetector::createDetector()
     }
     gGeoManager->CloseGeometry();
 
-  } catch (GbxExcIONotConnected&) {
+  } catch (GearboxIONotConnectedError&) {
     ERROR("Could not fetch parameters. No GearboxIO object was created !")
-  } catch (GDetExcCreatorNotExists& exc) {
-    ERROR("Could not call creator. A creator with the name '" + exc.getName() + "' does not exist !")
-  } catch (GbxExcPathEmptyResult& exc) {
-    ERROR("The result of the statement (" + exc.getXPathStatement() + ") is empty !")
-  } catch (GbxExcXPathBase& exc) {
-    ERROR("The path statement is not valid (" + exc.getXPathStatement() + ") !")
-  } catch (GbxException) {
+  } catch (GeometryCreatorNotExistsError& exc) {
+    ERROR(exc.what())
+  } catch (GearboxPathNotValidError& exc) {
+    ERROR(exc.what())
+  } catch (GearboxPathEmptyResultError& exc) {
+    ERROR(exc.what())
+  } catch (...) {
     ERROR("An error occurred during the creation of the detector geometry !")
   }
 }
@@ -109,10 +107,10 @@ void GeoDetector::saveToRootFile(const std::string& filename)
   try {
     string detectorName = Gearbox::Instance().getParamString("/Detector/Name");
     gGeoManager->Export(filename.c_str(), detectorName.c_str());
-  } catch (GbxExcIONotConnected&) {
+  } catch (GearboxIONotConnectedError&) {
     ERROR("Could not fetch parameters. No GearboxIO object was created !")
-  } catch (GbxExcXPathBase& exc) {
-    ERROR("Could not fetch parameters. The path statement is not valid (" + exc.getXPathStatement() + ") !")
+  } catch (GearboxPathNotValidError& exc) {
+    ERROR(exc.what())
   }
 }
 

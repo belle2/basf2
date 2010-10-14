@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include <geometry/modules/geobuilder/GeoBuilder.h>
+
 #include <framework/core/ModuleManager.h>
 #include <geometry/geodetector/GeoDetector.h>
 
@@ -18,13 +19,13 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(GeoBuilder)
+REG_MODULE(GeoBuilder, "GeoBuilder")
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-GeoBuilder::GeoBuilder() : Module("GeoBuilder")
+GeoBuilder::GeoBuilder() : Module()
 {
   //Set module properties
   setDescription("Loads the Belle II detector parameters and creates the detector geometry.");

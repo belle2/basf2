@@ -11,7 +11,7 @@
 #include <geometry/modules/geobuilder/ParamLoaderXML.h>
 
 #include <framework/core/ModuleManager.h>
-
+#include <framework/core/ModuleUtils.h>
 #include <framework/gearbox/Gearbox.h>
 #include <framework/gearbox/GearboxIOXML.h>
 
@@ -21,13 +21,13 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(ParamLoaderXML)
+REG_MODULE(ParamLoaderXML, "ParamLoaderXML")
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-ParamLoaderXML::ParamLoaderXML() : Module("ParamLoaderXML")
+ParamLoaderXML::ParamLoaderXML() : Module()
 {
   //Set module properties
   setDescription("Loads the Belle II detector parameters from a XML document.");
@@ -46,6 +46,11 @@ ParamLoaderXML::~ParamLoaderXML()
 
 void ParamLoaderXML::initialize()
 {
+  //Check parameters
+  if (!ModuleUtils::fileNameExists(m_filenameXML)) {
+    ERROR("Parameter <InputFileXML>: The specified filename " << m_filenameXML << " does not exist !")
+  }
+
   GearboxIOXML* gearboxIOXML = new GearboxIOXML();
   bool result = gearboxIOXML->open(m_filenameXML);
 

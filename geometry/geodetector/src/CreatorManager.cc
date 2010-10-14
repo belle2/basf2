@@ -26,16 +26,16 @@ CreatorManager& CreatorManager::Instance()
 }
 
 
-void CreatorManager::registerCreator(CreatorBase* creator, bool force) throw(GDetExcCreatorNameEmpty, GDetExcCreatorExists)
+void CreatorManager::registerCreator(CreatorBase* creator, bool force) throw(GeometryCreatorNameEmptyError, GeometryCreatorAlreadyExistsError)
 {
   //Check if the name of the creator is empty
-  if (creator->getName().empty()) throw GDetExcCreatorNameEmpty();
+  if (creator->getName().empty()) throw GeometryCreatorNameEmptyError();
 
   //Check if a creator with the given name already exists
   map<string, CreatorBase*>::iterator mapIter = m_creatorMap.find(creator->getName());
 
   if (mapIter != m_creatorMap.end()) {
-    if (!force) throw GDetExcCreatorExists(creator->getName());
+    if (!force) throw GeometryCreatorAlreadyExistsError(creator->getName());
     else {
       delete mapIter->second;
       m_creatorMap.erase(mapIter);
@@ -46,14 +46,14 @@ void CreatorManager::registerCreator(CreatorBase* creator, bool force) throw(GDe
 }
 
 
-CreatorBase& CreatorManager::getCreator(const std::string& name) const throw(GDetExcCreatorNameEmpty, GDetExcCreatorNotExists)
+CreatorBase& CreatorManager::getCreator(const std::string& name) const throw(GeometryCreatorNameEmptyError, GeometryCreatorNotExistsError)
 {
   //Check if the name of the creator is empty
-  if (name.empty()) throw GDetExcCreatorNameEmpty();
+  if (name.empty()) throw GeometryCreatorNameEmptyError();
 
   map<string, CreatorBase*>::const_iterator mapIter = m_creatorMap.find(name);
 
-  if (mapIter == m_creatorMap.end()) throw GDetExcCreatorNotExists(name);
+  if (mapIter == m_creatorMap.end()) throw GeometryCreatorNotExistsError(name);
   return *mapIter->second;
 }
 

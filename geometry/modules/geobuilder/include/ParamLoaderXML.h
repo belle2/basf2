@@ -18,7 +18,7 @@
 
 namespace Belle2 {
 
-  //! The ParamLoaderXML module.
+  /*! The ParamLoaderXML module. */
   /*!
      This module loads the parameters from a XML document.
 
@@ -32,16 +32,13 @@ namespace Belle2 {
 
   public:
 
-    //! Macro which adds a method to return a new instance of the module.
-    NEW_MODULE(ParamLoaderXML)
-
-    //! Constructor
+    /*! Constructor */
     ParamLoaderXML();
 
-    //! Destructor
+    /*! Destructor */
     virtual ~ParamLoaderXML();
 
-    //! Initialize the Module
+    /*! Initialize the Module */
     /*! Function is called only once at the beginning of your job at the beginning of the corresponding module.
         Things that can be done here, should be done here, as it is relatively cheap in terms of CPU time.
 
@@ -49,14 +46,14 @@ namespace Belle2 {
     */
     virtual void initialize();
 
-    //! Called when entering a new run
+    /*! Called when entering a new run */
     /*! At the beginning of each run, the function gives you the chance to change run dependent constants like alignment parameters, etc.
 
         This method has to be implemented by subclasses.
     */
     virtual void beginRun();
 
-    //! Running over all events
+    /*! Running over all events */
     /*! Function is called for each evRunning over all events
         This means, this function is called very often, and good performance of the code is of strong interest.
 
@@ -64,14 +61,14 @@ namespace Belle2 {
     */
     virtual void event();
 
-    //! Is called after processing the last event of a run
+    /*! Is called after processing the last event of a run */
     /*! Good e.g. for storing stuff, that you want to aggregate over one run.
 
         This method has to be implemented by subclasses.
     */
     virtual void endRun();
 
-    //! Is called at the end of your Module
+    /*! Is called at the end of your Module */
     /*! Function is called only once at the end of your job at the end of the corresponding module.
         This function is for cleaning up, closing files, etc.
 

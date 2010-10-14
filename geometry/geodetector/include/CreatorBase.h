@@ -11,8 +11,9 @@
 #ifndef CREATORBASE_H_
 #define CREATORBASE_H_
 
-#include <geometry/geodetector/GDetExceptions.h>
+#include <framework/core/FrameworkExceptions.h>
 #include <framework/gearbox/GearDir.h>
+#include <geometry/geodetector/CreatorManager.h>
 
 #include <TGeoMatrix.h>
 #include <TGeoVolume.h>
@@ -25,7 +26,7 @@
 
 namespace Belle2 {
 
-  //!  The CreatorBase class.
+  /*!  The CreatorBase class. */
   /*!
     Defines the base class for all creators (e.g. geometry, material).
 
@@ -39,17 +40,17 @@ namespace Belle2 {
 
   public:
 
-    //! Constructor of the CreatorBase class.
+    /*! Constructor of the CreatorBase class. */
     /*!
-      Throws an exception of type GDetExcCreatorNameEmpty if the name of the creator is empty.
+      Throws an exception of type GeometryCreatorNameEmptyError if the name of the creator is empty.
       \param name The unique name of the Creator.
     */
-    CreatorBase(const std::string& name) throw(GDetExcCreatorNameEmpty);
+    CreatorBase(const std::string& name) throw(GeometryCreatorNameEmptyError);
 
-    //! The destructor of the CreatorBase class.
+    /*! The destructor of the CreatorBase class. */
     virtual ~CreatorBase();
 
-    //! Creates the ROOT Objects.
+    /*! Creates the ROOT Objects. */
     /*!
       All creators have to implement this method with the ROOT object
       creation source code.
@@ -57,7 +58,7 @@ namespace Belle2 {
     */
     virtual void create(GearDir& content) = 0;
 
-    //! This method is called after the geometry was converted from ROOT to Geant4
+    /*! This method is called after the geometry was converted from ROOT to Geant4 */
     /*! Implement this method to add functionality to the Geant4 native objects like connecting
         Geant4 objects to the geometry (such as: sensitive detectors, user limits, magnetic field, ...).
 
@@ -65,7 +66,7 @@ namespace Belle2 {
     */
     virtual void initializeGeant4(TG4RootDetectorConstruction* detConstruct) {};
 
-    //! Searches for sensitive volumes given by their prefix and assigns the appropriate sensitive detector class.
+    /*! Searches for sensitive volumes given by their prefix and assigns the appropriate sensitive detector class. */
     /*!
       The method searches for all volumes starting with the prefixes given
       in the sensitive detector map. The found volumes are then connected to
@@ -73,19 +74,19 @@ namespace Belle2 {
     */
     void assignSensitiveVolumes(TG4RootDetectorConstruction* detConstruct);
 
-    //! Returns the unique name of the creator.
+    /*! Returns the unique name of the creator. */
     /*!
       \return The unique name of the creator.
     */
     const std::string& getName() const {return m_name; };
 
-    //! Returns the (optional) description of the creator.
+    /*! Returns the (optional) description of the creator. */
     /*!
       \return The (optional) description of the creator.
     */
     const std::string& getDescription() const {return m_description; };
 
-    //! Returns the group name of the subdetector in the TGeo hierarchy.
+    /*! Returns the group name of the subdetector in the TGeo hierarchy. */
     /*!
       \return The group name of the subdetector in the TGeo hierarchy.
     */
@@ -94,13 +95,13 @@ namespace Belle2 {
 
   protected:
 
-    //! Sets the optional description of the creator.
+    /*! Sets the optional description of the creator. */
     /*!
       \param description The optional description of the creator.
     */
     void setDescription(const std::string& description);
 
-    //! Adds a new subdetector group to the TGeo hierarchy.
+    /*! Adds a new subdetector group to the TGeo hierarchy. */
     /*!
       \param groupName The name of the subdetector group. Usually the subdetector name.
       \param groupTrafo A global transformation which should be applied to the whole subdetector.
@@ -108,7 +109,7 @@ namespace Belle2 {
     */
     TGeoVolumeAssembly* addSubdetectorGroup(const std::string& groupName, TGeoMatrix* groupTrafo = 0);
 
-    //! Add a new sensitive detector handling class to the geometry.
+    /*! Add a new sensitive detector handling class to the geometry. */
     /*!
       The sensitive detector handling class deals with the output of the Geant4 simulation.
       In order to automatically assign the sensitive detector classes to the volumes,
@@ -132,7 +133,7 @@ namespace Belle2 {
 
     std::map<std::string, G4VSensitiveDetector*> m_sensitiveDetMap; /*!< Maps a prefix to its sensitive detector handling class. */
 
-    //! Goes through the volumes recursively and connects the found sensitive volumes to the sensitive detector classes.
+    /*! Goes through the volumes recursively and connects the found sensitive volumes to the sensitive detector classes. */
     /*!
       \param volume The mother volume who is checked for being a sensitive volume and whose daughters are checked recursively.
       \param detConstruct The pointer of TG4RootDetectorConstruction in g4root which provides methods to access GEANT4 created objects corresponding to the TGeo ones.

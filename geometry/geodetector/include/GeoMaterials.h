@@ -18,7 +18,7 @@ namespace Belle2 {
 
   class GearDir;
 
-  //!  The GeoMaterials class.
+  /*!  The GeoMaterials class. */
   /*!
      The creator for the materials of the Belle II detector.
   */
@@ -26,13 +26,13 @@ namespace Belle2 {
 
   public:
 
-    //! Constructor of the GeoMaterials class.
+    /*! Constructor of the GeoMaterials class. */
     GeoMaterials();
 
-    //! The destructor of the GeoMaterials class.
+    /*! The destructor of the GeoMaterials class. */
     virtual ~GeoMaterials();
 
-    //! Creates the ROOT materials.
+    /*! Creates the ROOT materials. */
     /*!
       \param content A reference to the content part of the parameter description, which should to be used to create the ROOT objects.
     */
@@ -43,13 +43,13 @@ namespace Belle2 {
 
     int m_matIndex; /*!< Each material gets an index assigned. Needed by ROOT. */
 
-    //! Create all single element materials.
+    /*! Create all single element materials. */
     /*!
       \param content A reference to the content part of the parameter description.
     */
     void createMaterialSingle(GearDir& content);
 
-    //! Create all material mixtures.
+    /*! Create all material mixtures. */
     /*!
       \param content A reference to the content part of the parameter description.
     */
@@ -57,7 +57,7 @@ namespace Belle2 {
 
   private:
 
-    //! Reads the values of a Material and returns a pointer to the created Material object.
+    /*! Reads the values of a Material and returns a pointer to the created Material object. */
     /*!
       \param materialContent A GearDir pointing to the material description.
       \param weight Returns a weight for a material mixture if it is defined. If not -1 is returned.
@@ -65,7 +65,7 @@ namespace Belle2 {
     */
     TGeoMaterial* readMaterial(GearDir& materialContent, double& weight);
 
-    //! Reads the values of an Element and returns a pointer to the created Element object.
+    /*! Reads the values of an Element and returns a pointer to the created Element object. */
     /*!
       \param materialContent A GearDir pointing to the element description.
       \param weight Returns a weight for a material mixture.

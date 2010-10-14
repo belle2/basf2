@@ -11,7 +11,7 @@
 #include <geometry/modules/geobuilder/GeoSaver.h>
 
 #include <framework/core/ModuleManager.h>
-
+#include <framework/core/ModuleUtils.h>
 #include <geometry/geodetector/GeoDetector.h>
 
 #include <boost/filesystem.hpp>
@@ -24,13 +24,13 @@ using namespace boost::filesystem;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(GeoSaver)
+REG_MODULE(GeoSaver, "GeoSaver")
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-GeoSaver::GeoSaver() : Module("GeoSaver")
+GeoSaver::GeoSaver() : Module()
 {
   //Set module properties
   setDescription("Saves the Belle II detector geometry to a root file.");
@@ -38,11 +38,9 @@ GeoSaver::GeoSaver() : Module("GeoSaver")
   //Parameter definition
   addParam("Filename",  m_filenameROOT, string("Belle2.root"), "The filename of the ROOT output file.");
 
-  path fullPath(initial_path<path>());
-  fullPath = system_complete(path(m_filenameROOT));
-  fullPath.remove_filename();
-  if (!exists(fullPath.string())) {
-    ERROR("Parameter <Filename>: The path " << fullPath.string() << " does not exist !")
+  //Check parameters
+  if (!ModuleUtils::filePathExists(m_filenameROOT)) {
+    ERROR("Parameter <Filename>: The path of the filename " << m_filenameROOT << " does not exist !")
   }
 }
 

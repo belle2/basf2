@@ -55,10 +55,10 @@ void B4DetectorConstruction::Initialize(TG4RootDetectorConstruction *dc)
       //Do work on the native geant4 volumes
       currCreator.initializeGeant4(dc);
 
-    } catch (GDetExcCreatorNameEmpty) {
-      ERROR("The name of the Creator is empty !");
-    } catch (GDetExcCreatorNotExists& e) {
-      ERROR("A Creator with the name " << e.getName() << " does not exist !");
+    } catch (GeometryCreatorNameEmptyError& exc) {
+      ERROR(exc.what());
+    } catch (GeometryCreatorNotExistsError& exc) {
+      ERROR(exc.what());
     }
   }
 }

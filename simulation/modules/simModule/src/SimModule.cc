@@ -39,9 +39,16 @@ using namespace std;
 using namespace boost;
 using namespace Belle2;
 
-REG_MODULE(SimModule)
+//-----------------------------------------------------------------
+//                 Register the Module
+//-----------------------------------------------------------------
+REG_MODULE(SimModule, "SimModule")
 
-SimModule::SimModule() : Module("SimModule"), m_run_mgr(NULL)
+//-----------------------------------------------------------------
+//                 Implementation
+//-----------------------------------------------------------------
+
+SimModule::SimModule() : Module(), m_run_mgr(NULL)
 #ifdef G4VIS_USE
     , m_visMgr(NULL)
 #endif

@@ -37,9 +37,6 @@ namespace Belle2 {
 
   public:
 
-    //! Macro which adds a method to return a new instance of the module.
-    NEW_MODULE(SimModule)
-
     //! Constructor
     SimModule();
 

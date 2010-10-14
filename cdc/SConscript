@@ -1,6 +1,6 @@
 Import('env')
 
-env['LIBS'] = ['simulation', 'framework',
+env['LIBS'] = ['simulation', 'framework', 'geometry',
                '$ROOT_LIBS', 'Geom', 'EG', 'G4root',
                '$GEANT4_LIBS', 'CLHEP']
 

@@ -31,9 +31,16 @@ using namespace std;
 using namespace boost;
 using namespace Belle2;
 
-REG_MODULE(CDCDigi)
+//-----------------------------------------------------------------
+//                 Register the Module
+//-----------------------------------------------------------------
+REG_MODULE(CDCDigi, "CDCDigitizer")
 
-CDCDigi::CDCDigi() : Module("CDCDigitizer")
+//-----------------------------------------------------------------
+//                 Implementation
+//-----------------------------------------------------------------
+
+CDCDigi::CDCDigi() : Module()
 {
   // Set description
   setDescription("CDCDigitizer");

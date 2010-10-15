@@ -8,10 +8,13 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <eklm/simeklm/EKLMSD.h>
+
+#include <eklm/simeklm/EKLMSensetiveDetector.h>
 #include <eklm/simeklm/EKLMDigitizer.h>
 #include <framework/logging/Logger.h>
 
+
+#include <eklm/eklmutils/EKLMutils.h>
 
 #include "G4Step.hh"
 #include "G4SteppingManager.hh"
@@ -25,7 +28,7 @@
 namespace Belle2 {
 
 
-  EKLMSD::EKLMSD(G4String name, G4double thresholdEnergyDeposit, G4double thresholdKineticEnergy):
+  EKLMSensetiveDetector::EKLMSensetiveDetector(G4String name, G4double thresholdEnergyDeposit, G4double thresholdKineticEnergy):
       G4VSensitiveDetector(name), m_ThresholdEnergyDeposit(thresholdEnergyDeposit),
       m_ThresholdKineticEnergy(thresholdKineticEnergy), m_HitCollection(0),
       m_HCID(-1)
@@ -35,7 +38,7 @@ namespace Belle2 {
     collectionName.insert(CollName1);
   }
 
-  void EKLMSD::Initialize(G4HCofThisEvent * HCTE)
+  void EKLMSensetiveDetector::Initialize(G4HCofThisEvent * HCTE)
   {
     // Create a new hit collection
     m_HitCollection = new EKLMSimHitsCollection(SensitiveDetectorName, collectionName[0]);
@@ -53,13 +56,13 @@ namespace Belle2 {
 //-----------------------------------------------------
 // Method invoked for every step in sensitive detector
 //-----------------------------------------------------
-  G4bool EKLMSD::ProcessHits(G4Step *aStep, G4TouchableHistory *)
+  G4bool EKLMSensetiveDetector::ProcessHits(G4Step *aStep, G4TouchableHistory *)
   {
     // Get deposited energy
     const G4double eDep = aStep->GetTotalEnergyDeposit();
 
     // ignore tracks with small energy deposition
-    double eDepositionThreshold = 0.0;  // should be accessible via xml
+    double eDepositionThreshold = 0.001 / MeV;  // should be accessible via xml
     if (eDep <= eDepositionThreshold) return false;
 
 
@@ -76,18 +79,24 @@ namespace Belle2 {
 
     // drop hit if global time is nan or if it is  mothe than hitTimeThreshold (to avoid nuclei fission signals)
     if (isnan(hitTime)) {
-      ERROR("EKLMSD: global time is nan");
+      ERROR("EKLMSensetiveDetector: global time is nan");
       return false;
 
-      double hitTimeThreshold = 500;
+      double hitTimeThreshold = 500; // should be parameter or accessev via xml
       if (hitTime > hitTimeThreshold) {
-        INFO("EKLMSD:  ALL HITS WITH TIME > 500 ns ARE DROPPED!!!!!!!");
+        INFO("EKLMSensetiveDetector:  ALL HITS WITH TIME > hitTimeThreshold ARE DROPPED!!!!!!!");
         return false;
       }
 
     }
 
+
+    // Get particle information
     const G4int PDGcode = track.GetDefinition()->GetPDGEncoding();
+
+
+
+
     const G4ThreeVector & position = 0.5 * (aStep->GetPostStepPoint()->GetPosition() +
                                             aStep->GetPreStepPoint()->GetPosition());
 
@@ -98,14 +107,13 @@ namespace Belle2 {
     // insert hit to the hit collection
     m_HitCollection->insert(hit);
 
-    hit->Save("/tmp/q_");
     return true;
   }
 
 
-  void EKLMSD::EndOfEvent(G4HCofThisEvent *)
+  void EKLMSensetiveDetector::EndOfEvent(G4HCofThisEvent *)
   {
-    DEBUG(1, " START DIGITALIZATION");
+    DEBUG(1, " START DIGITIZATION");
 
     EKLMDigitizer *digi = new EKLMDigitizer(m_HitCollection);
 
@@ -113,13 +121,7 @@ namespace Belle2 {
     digi->mergeSimHitsToStripHits();
     digi->saveStripHits();
 
-    // Do not forget to delete digi !!!!!!!!!!!!
+    //    delete(digi);
   }
-
-
-
-
-
-
 
 } //namespace Belle II

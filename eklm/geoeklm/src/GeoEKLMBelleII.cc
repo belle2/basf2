@@ -8,7 +8,7 @@
 *  This software is provided "as is" without any warranty.               *
 * ***********************************************************************/
 #include <eklm/geoeklm/GeoEKLMBelleII.h>
-#include <eklm/simeklm/EKLMSD.h>
+#include <eklm/simeklm/EKLMSensetiveDetector.h>
 
 #include <framework/gearbox/GearDir.h>
 #include <framework/datastore/Units.h>
@@ -46,7 +46,7 @@ GeoEKLMBelleII::GeoEKLMBelleII() : CreatorBase("EKLMBelleII")
 {
   setDescription("Creates the TGeo objects for the EKLM geometry of the Belle II detector.");
 
-  addSensitiveDetector("Strip_", new EKLMSD("EKLMSD", (2*24)*eV, 10*MeV)); //The EKLM subdetector uses the "Strip_" prefix to flag its sensitive volumes since all Strips are sensitive and vice versa.
+  addSensitiveDetector("Strip_", new EKLMSensetiveDetector("EKLMSensetiveDetector", (2*24)*eV, 10*MeV)); //The EKLM subdetector uses the "Strip_" prefix to flag its sensitive volumes since all Strips are sensitive and vice versa.
 }
 GeoEKLMBelleII::~GeoEKLMBelleII()
 {
@@ -144,7 +144,7 @@ void GeoEKLMBelleII::create(GearDir& content)
   //----------------------------------------
 
   TGeoRotation* geoRot = new TGeoRotation("EKLMRot", 0.0, 0, 0.0);
-  TGeoVolumeAssembly* volGrpEKLM = addSubdetectorGroup("EKLM", new TGeoCombiTrans(0.0, 0.0, 0.0, geoRot));
+  volGrpEKLM = addSubdetectorGroup("EKLM", new TGeoCombiTrans(0.0, 0.0, 0.0, geoRot));
 
   //  Build EndCaps
   for (int iEndcap  = 0; iEndcap < nEndcap; ++iEndcap) {

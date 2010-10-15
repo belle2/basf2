@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLMSD_H
-#define EKLMSD_H
+#ifndef EKLMSENSETIVEDETECTOR_H
+#define EKLMSENSETIVEDETECTOR_H
 
 #include <eklm/eklmhit/EKLMSimHit.h>
 #include "G4VSensitiveDetector.hh"
@@ -21,16 +21,16 @@ namespace Belle2 {
     EKLMHits are saved into hits collection.
   */
 
-//class EKLMSD: public B4SensitiveDetectorBase
-  class EKLMSD: public G4VSensitiveDetector {
+//class EKLMSensetiveDetector: public B4SensitiveDetectorBase
+  class EKLMSensetiveDetector: public G4VSensitiveDetector {
 
   public:
 
     //! Constructor
-    EKLMSD(G4String name, G4double thresholdEnergyDeposit, G4double thresholdKineticEnergy);
+    EKLMSensetiveDetector(G4String name, G4double thresholdEnergyDeposit, G4double thresholdKineticEnergy);
 
     //! Destructor
-    ~EKLMSD() {};
+    ~EKLMSensetiveDetector() {};
 
     //! Register EKLM hits collection into G4HCofThisEvent
     void Initialize(G4HCofThisEvent *eventHC);

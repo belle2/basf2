@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors:  Timofey Uglov                            *
+ * Contributors:  Timofey Uglov                                           *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -16,7 +16,6 @@
 #include <map>
 #include <vector>
 
-#include "G4TransportationManager.hh"
 
 namespace Belle2 {
 

@@ -8,11 +8,10 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLMHITBASE_H
-#define EKLMHITBASE_H
+#ifndef EKLMUTILS_H
+#define EKLMUTILS_H
 
-#include <TObject.h>
-#include <simulation/simkernel/B4VHit.h>
+// Tools collections common for EKLM
 
 #include <framework/datastore/StoreDefs.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -21,30 +20,23 @@
 
 
 namespace Belle2 {
-
-  // inherit HitBase class from TObject to make all hits storable and from B4VHit for HitCollections
-  class EKLMHitBase: public TObject  {
-
-  public:
-
-    //! Constructor
-    EKLMHitBase() {};
-
-    //! Destructor
-    virtual ~EKLMHitBase() {};
-
-    virtual void Print();
-    virtual void Draw();
+  template < class T >
+  void storeEKLMObject(std::string , T*);
 
 
+  //------------------------  Implemantation of the templates -------------------------
 
-  private:
-    ClassDef(EKLMHitBase, 1);   // needed to be storable
+  template < class T >
+  void storeEKLMObject(std::string arrayName, T* obj)
+  {
+    StoreArray<T> array(arrayName);
+    // since the array is indexed from 0 GetEntries() points exactly to the next to the last entry
+    new(array->AddrAt(array.GetEntries())) T(*obj);
+  }
+
+}
 
 
-  };
 
 
-} // end of namespace Belle2
-
-#endif //EKLMHITBASE_H
+#endif //EKLMUTILS_H

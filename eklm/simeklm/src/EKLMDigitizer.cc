@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include <eklm/simeklm/EKLMDigitizer.h>
+#include <eklm/eklmutils/EKLMutils.h>
 #include <framework/logging/Logger.h>
 #include<iostream>
 #include<fstream>
@@ -21,6 +22,12 @@
 #include <framework/datastore/StoreArray.h>
 
 
+#include "G4TransportationManager.hh"
+
+#include<geometry/geodetector/CreatorManager.h>
+#include<geometry/geodetector/CreatorBase.h>
+
+#include<eklm/geoeklm/GeoEKLMBelleII.h>
 
 #include "boost/lexical_cast.hpp"
 
@@ -40,8 +47,7 @@ namespace Belle2 {
       //get strip name
       G4String StripName = theNavigator->LocateGlobalPointAndSetup((*iHit)->getPos())->GetName();
 
-
-      // search for etries of the same strip
+      // search for entries of the same strip
       std::map<G4String, std::vector<EKLMSimHit*> >::iterator it = m_HitStripMap.find(StripName);
 
       if (it == m_HitStripMap.end()) { //  new entry
@@ -75,6 +81,27 @@ namespace Belle2 {
       hitPos = hitPos / hitE;
 
       EKLMStripHit *stripHit = new EKLMStripHit();
+      /*
+      CreatorManager & CreatorMgr=CreatorManager::Instance();
+      // potentially dangerous! will crash if EKLM creator name will be changed!
+      TGeoVolume* topEKLM=dynamic_cast<GeoEKLMBelleII*>(&CreatorMgr.getCreator("EKLMBelleII"))->getTopmostVolume();
+      topEKLM->PrintNodes();
+      exit(0);
+      //      TGeoVolume *strip= topEKLM->FindNode(it->first)->GetVolume();
+      //      std::cout<<strip->GetName()<<std::endl;
+      */
+
+      //std::cout<<gGeoManager->GetCurrentNode()->GetVolume()->GetName()<<std::endl;
+      //      std::cout<<gGeoManager->FindNode(hitPos.x()/mm,hitPos.y()/mm,hitPos.z()/mm)<<std::endl;;
+      std::cout << gGeoManager->GetPath() << " " << gGeoManager->GetCurrentNode()->GetVolume()->GetName() << std::endl;
+
+      double globalPos[] = {hitPos.x() / mm, hitPos.y() / mm, hitPos.z() / mm};
+      double localPos[3];
+      gGeoManager->MasterToLocal(globalPos, localPos);
+      std::cout << hitPos << " --->  (" << localPos[0] << "," << localPos[1] << "," << localPos[2] << ")" << std::endl;
+
+
+
       stripHit->setName(it->first);
       stripHit->setNumberPhotoElectrons(energyToPhotoElectrons(hitE, hitPos));
       stripHit->setTime(lightPropagationTime(hitTfirst, hitPos));
@@ -85,23 +112,21 @@ namespace Belle2 {
 
   void EKLMDigitizer::saveStripHits()
   {
-    int iHit = 0;
-
-    StoreArray<EKLMStripHit> eklmStripHitArray("StipHitsEKLMArray");
-
-    for (std::vector<EKLMStripHit*>::const_iterator iter = m_HitVector.begin(); iter != m_HitVector.end(); ++iter)
-      new(eklmStripHitArray->AddrAt(iHit++)) EKLMStripHit(**iter);
-    for (std::vector<EKLMStripHit*>::const_iterator iter = m_HitVector.begin(); iter != m_HitVector.end(); ++iter)
-      std::cout << (*iter)->getName() << " " << (*iter)->getTime() << " " << (*iter)->getNumberPhotoElectrons() << " " <<
-                (*iter)->getLeadingParticlePDGCode() << std::endl;
+    for (std::vector<EKLMStripHit*>::const_iterator iter = m_HitVector.begin();
+         iter != m_HitVector.end(); ++iter)
+      storeEKLMObject("StipHitsEKLMArray", *iter);
   }
 
   G4double EKLMDigitizer::energyToPhotoElectrons(G4double energy , G4ThreeVector pos)
   {
+
+    // not implemented
     return energy;
   }
   G4double EKLMDigitizer::lightPropagationTime(G4double time, G4ThreeVector pos)
   {
+
+    //not implemented
     return time;
   }
 

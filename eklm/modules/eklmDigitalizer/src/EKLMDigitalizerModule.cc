@@ -8,12 +8,16 @@
 using namespace std;
 using namespace Belle2;
 
-REG_MODULE(EKLMDigitalizerModule)
+//-----------------------------------------------------------------
+//                 Register the Module
+//-----------------------------------------------------------------
+REG_MODULE(EKLMDigitalizerModule, "EKLMDigitalizerModule")
 
+//-----------------------------------------------------------------
+//                 Implementation
+//-----------------------------------------------------------------
 
-
-
-EKLMDigitalizerModule::EKLMDigitalizerModule() : Module(string("EKLMDigitalizerModule"))
+EKLMDigitalizerModule::EKLMDigitalizerModule() : Module()
 {
   setDescription("Hit reader simple module for tests");
   addParam("InputColName", m_inColName, string("EKLMSD_Collection"), "Input collection name");

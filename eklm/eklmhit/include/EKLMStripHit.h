@@ -32,13 +32,13 @@ namespace Belle2 {
 
     void Print();
 
-    inline void setNumberPhotoElectrons(const G4double &npe)
+    inline void setNumberPhotoElectrons(const double &npe)
     {m_NumberPhotoElectrons = npe;};
 
     inline void setName(const std::string &name)
     {m_Name = name;};
 
-    inline void setTime(const G4double  &time)
+    inline void setTime(const double  &time)
     {m_Time = time;};
 
     inline void setLeadingParticlePDGCode(const int  &pdg)
@@ -50,15 +50,15 @@ namespace Belle2 {
     {return m_Name;};
 
 
-    inline G4double getTime()const
+    inline double getTime()const
     {return m_Time;};
 
 
-    inline G4double getNumberPhotoElectrons()const
+    inline double getNumberPhotoElectrons()const
     {return m_NumberPhotoElectrons;};
 
 
-    inline G4int getLeadingParticlePDGCode()const
+    inline int getLeadingParticlePDGCode()const
     {return m_LeadingParticlePDGCode;};
 
 
@@ -66,9 +66,9 @@ namespace Belle2 {
 
   private:
 
-    G4double m_NumberPhotoElectrons;
-    G4int m_LeadingParticlePDGCode;
-    G4double m_Time;
+    double m_NumberPhotoElectrons;
+    int m_LeadingParticlePDGCode;
+    double m_Time;
     std::string m_Name;
 
     ClassDef(EKLMStripHit, 1);

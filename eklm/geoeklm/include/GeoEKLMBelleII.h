@@ -13,12 +13,13 @@
 #include <TGeoShape.h>
 #include <TGeoMedium.h>
 #include <TGeoMatrix.h>
+#include <TGeoVolume.h>
 
 #include <string>
 #include <vector>
 
-#ifndef GEOEKLMBelleII_H_
-#define GEOEKLMBelleII_H_
+#ifndef GEOEKLMBELLEII_H_
+#define GEOEKLMBELLEII_H_
 
 namespace Belle2 {
 
@@ -41,9 +42,14 @@ namespace Belle2 {
 
     virtual void create(GearDir& content);
 
+
+    inline TGeoVolume * getTopmostVolume()
+    {return volGrpEKLM;}
   protected:
 
   private:
+
+    TGeoVolumeAssembly* volGrpEKLM ;  // top volume in the EKLM hierarhy
 
   };
 

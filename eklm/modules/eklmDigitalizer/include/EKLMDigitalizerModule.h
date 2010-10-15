@@ -18,9 +18,6 @@ namespace Belle2 {
 
   public:
 
-    NEW_MODULE(EKLMDigitalizerModule)
-
-
     //! Constructor
     /*!
       Create and allocate memory for variables here. Add the module parameters in this method.

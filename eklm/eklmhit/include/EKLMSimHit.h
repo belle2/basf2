@@ -11,7 +11,10 @@
 #ifndef EKLMSIMHIT_H
 #define EKLMSIMHIT_H
 
+
+#include <TObject.h>
 #include <simulation/simkernel/B4VHit.h>
+
 
 //Geant4 classes
 #include "G4THitsCollection.hh"
@@ -22,12 +25,13 @@
 
 namespace Belle2 {
 
-  class EKLMSimHit  : public B4VHit {
+  class EKLMSimHit  :  public B4VHit  {
 
   public:
 
-    //! Constructor with initial values
+    inline EKLMSimHit() {};
 
+    //! Constructor with initial values
     inline EKLMSimHit(G4ThreeVector pos, G4double time, G4int PDGcode,  G4double eDep) {
       m_pos = pos;
       m_time = time;
@@ -51,8 +55,6 @@ namespace Belle2 {
     {return m_PDGcode;}
 
 
-
-    void Print();
     void Save(char * filename);
 
   private:
@@ -60,6 +62,9 @@ namespace Belle2 {
     G4double m_time;
     G4double m_eDep;
     G4int m_PDGcode;
+
+    ClassDef(EKLMSimHit, 1);
+
   };
 
   typedef G4THitsCollection<EKLMSimHit> EKLMSimHitsCollection;

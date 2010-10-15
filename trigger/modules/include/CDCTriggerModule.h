@@ -25,12 +25,12 @@ class CDCTriggerModule : public Module {
 
   public:
 
-    /// returns a pointe to CDCTriggerModule.
-    virtual ModulePtr newModule();
+//     /// returns a pointe to CDCTriggerModule.
+//     virtual ModulePtr newModule();
 
     /// Constructor
     CDCTriggerModule();
-    CDCTriggerModule(const std::string & type);
+//    CDCTriggerModule(const std::string & type);
 
     /// Destructor
     virtual ~CDCTriggerModule();

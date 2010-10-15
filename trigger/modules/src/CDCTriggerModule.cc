@@ -21,7 +21,7 @@
 #endif
 
 namespace Belle2_CDCTrigger {
-    Belle2::ModuleManager::Registrator<Belle2::CDCTriggerModule> REG;
+//  Belle2::ModuleManager::Registrator<Belle2::CDCTriggerModule> REG;
 #ifdef CDCTRIGGER_DISPLAY
     Belle2::CDCTriggerDisplay * D = 0;
 #endif
@@ -32,35 +32,37 @@ using namespace Belle2_CDCTrigger;
 
 namespace Belle2 {
 
+REG_MODULE(CDCTriggerModule, "CDCTrigger");
+
 string
 CDCTriggerModule::version() const {
-    return "0.00";
+    return "0.01";
 }
 
-ModulePtr
-CDCTriggerModule::newModule() {
-    ModulePtr nm(new CDCTriggerModule("CDCTrigger"));
-    return nm;
-};
+// ModulePtr
+// CDCTriggerModule::newModule() {
+//     ModulePtr nm(new CDCTriggerModule("CDCTrigger"));
+//     return nm;
+// };
 
-CDCTriggerModule::CDCTriggerModule(const string & type)
-    : Module::Module(type),
-      _debugLevel(0),
-      _cdc(0),
-      _testParamInt(0) {
+// CDCTriggerModule::CDCTriggerModule(const string & type)
+//     : Module::Module(type),
+//       _debugLevel(0),
+//       _cdc(0),
+//       _testParamInt(0) {
 
-    string desc = "CDCTriggerModule(" + version() + ")";
-    setDescription(desc);
+//     string desc = "CDCTriggerModule(" + version() + ")";
+//     setDescription(desc);
 
-    addParam("testParamInt", _testParamInt, 20);
+//     addParam("testParamInt", _testParamInt, 20);
 
-#ifdef CDCTRIGGER_DEBUG
-    cout << "CDCTriggerModule ... created with " << type << endl;
-#endif
-}
+// #ifdef CDCTRIGGER_DEBUG
+//     cout << "CDCTriggerModule ... created with " << type << endl;
+// #endif
+// }
 
 CDCTriggerModule::CDCTriggerModule()
-    : Module::Module("CDCTrigger"),
+    : Module::Module(),
       _debugLevel(0),
       _cdc(0),
       _testParamInt(0) {

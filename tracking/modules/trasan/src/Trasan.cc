@@ -681,12 +681,11 @@
 #include <cfloat>
 #include <time.h>
 
-#include "framework/core/ModuleManager.h"
+//#include "framework/core/ModuleManager.h"
+#include "framework/core/Module.h"
 
 #define HEP_SHORT_NAMES
 #include "tracking/modules/trasan/Strings.h"
-
-
 #include "tracking/modules/trasan/THelix.h"
 #include "tracking/modules/trasan/Trasan.h"
 #include "trigger/cdc/CDCTrigger.h"
@@ -903,11 +902,6 @@ struct reccdc_timing {
 
 namespace Belle {
 
-//...Belle2...
-//REG_MODULE(Trasan)
-    Belle2::ModuleManager::Registrator<Trasan> reg;
-
-
 //...Globals...
 Trasan *
 Trasan::_trasan = 0;
@@ -939,8 +933,10 @@ Trasan::getTrasan(void) {
 Trasan::~Trasan() {
 }
 
-Trasan::Trasan(void)
-: Belle2::Module::Module("Trasan"),
+//Trasan::Trasan(void)
+Trasan::Trasan()
+//: Belle2::Module::Module("Trasan"),
+: Belle2::Module::Module(),
   b_cdcVersion(0),       // 0:automatic, 1:normal cell, 2:small cell
   b_fudgeFactor(1.0),
 
@@ -1109,7 +1105,7 @@ Trasan::Trasan(void)
     TrasanTHelixFitterChisqMax = b_helixFitterChisqMax;
     TrasanTHelixFitterNtrialMax = b_helixFitterNtrialMax;
 
-    addParam("testParamInt", b_doSalvage, 20);
+//    addParam("testParamInt", b_doSalvage, 20);
 
 //    int a = 10 / 0;
 

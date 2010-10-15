@@ -13,8 +13,10 @@
 
 #include <framework/datastore/StoreAccessorAbs.h>
 #include <TClonesArray.h>
-#include "framework/datastore/DataStore.h"
-#include "framework/datastore/StoreDefs.h"
+#include <framework/datastore/DataStore.h>
+#include <framework/datastore/StoreDefs.h>
+#include <framework/datastore/Relation.h>
+#include <framework/datastore/RelationArray.h>
 
 namespace Belle2 {
 
@@ -71,6 +73,25 @@ namespace Belle2 {
     /*! Get the number of occupied slots in the array. */
     int GetEntries() const {return m_storeArray->GetEntriesFast();}
 
+    /*! Convinient Relation creating.
+        Using this way to create Relations is safer than direct creation,
+        because in this case you use definitively an object, that is already stored
+        in the DataStore.
+        \par to   Object towards which the relation shall be.
+        \par from index of the object, from which the relation shall point. 0 means, the Relation has the whole TClonesArray stored in the StoreArray as from.
+        \par weight Assign a weight to the Relation.
+    */
+    Relation* relateTo(StoreAccessorAbs<TObject>& to, const int& from = 0, float& weight = 1);
+
+    /*! Convenient RelationArray creating.
+        This way of creation can be used, if all weights are the same.
+    */
+    RelationArray* relateTo(StoreAccessorAbs<TClonesArray>& to, std::list<int>& indexList, const int& from = 0, float& weight = 1);
+
+    /*! RelationArray creation in case of multiple weights.
+    */
+    RelationArray* relateTo(StoreAccessorAbs<TClonesArray>& to, std::list<std::pair<int, float> > indexWeightList, const int& from = 0);
+
 
   private:
 
@@ -102,6 +123,36 @@ bool StoreArray<T>::assignArray(const std::string& name, const EDurability& dura
   }
   return (false);
 
+}
+
+template <class T>
+Relation* StoreArray<T>::relateTo(StoreAccessorAbs<TObject>& to, const int& from, float& weight)
+{
+  if (from == 0) {
+    return new Relation(m_storeArray, to.getPtr(), weight);
+  } else {
+    return new Relation(m_storeArray->At(from), to.getPtr());
+  }
+}
+
+template <class T>
+RelationArray* StoreArray<T>::relateTo(StoreAccessorAbs<TClonesArray>& to, std::list<int>& indexList, const int& from, float& weight)
+{
+  if (from == 0) {
+    return new RelationArray(dynamic_cast<TObject*>(m_storeArray), to.getPtr(), indexList, weight);
+  } else {
+    return new RelationArray(m_storeArray->At(from), to.getPtr(), indexList, weight);
+  }
+}
+
+template <class T>
+RelationArray* StoreArray<T>::relateTo(StoreAccessorAbs<TClonesArray>& to, std::list<std::pair<int, float> > indexWeightList, const int& from)
+{
+  if (from == 0) {
+    return new RelationArray(m_storeArray, to.getPtr(), indexWeightList);
+  } else {
+    return new RelationArray(m_storeArray->At(from), to.getPtr(), indexWeightList);
+  }
 }
 
 #endif

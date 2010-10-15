@@ -34,24 +34,24 @@ namespace Belle2 {
     /*! The destructor is virtual, because this is meant as base class.*/
     virtual ~StoreIter() {}
 
-    /*!Set Iterator to first element.*/
+    /*! Set Iterator to first element.*/
     /*!*/
     virtual void first() = 0;
 
-    /*!Set Iterator to next element.*/
+    /*! Set Iterator to next element.*/
     /*!*/
     virtual void next() = 0;
 
-    /*!Checks, if you have moved to the last element.*/
+    /*! Checks, if you have moved to the last element.*/
     /*!*/
     virtual bool isDone() const = 0;
 
-    /*!Returns the object, the Iterator currently points to.*/
+    /*! Returns the object, the Iterator currently points to.*/
     /*!*/
     virtual TObject* value() = 0;
 
-    /*!*/
-    /*!*/
+    /*! Getter for key associated with the object.*/
+    /*! */
     virtual std::string key() = 0;
 
   };

@@ -79,7 +79,7 @@ namespace Belle2 {
     }
 
 
-    /* Find key in map.
+    /*!Find key in map.
        \par name of the object to be pointed to.
        \return Iterator to object with key name.
     */
@@ -116,12 +116,12 @@ namespace Belle2 {
 
   private:
 
-    /* Pointer to map for which the iterator is.
+    /*! Pointer to map for which the iterator is.
 
     */
     T* m_map;
 
-    /* Iterator for the map.
+    /*! Iterator for the map.
 
     */
     typename T::iterator  m_iter;

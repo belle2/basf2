@@ -9,7 +9,7 @@ export GENFIT := $(EXTDIR)/genfit
 
 
 # all target
-all: boost clhep geant4 root
+all: boost clhep geant4 root genfit
 
 # clean up target
 clean:
@@ -95,15 +95,11 @@ root/config/Makefile.config:
 
 
 # dependence for genfit build
-genfit: genfit/lib/libgenfit.so
+genfit: include/genfit/RKTrackRep/RKTrackRep.h
 
 # genfit build command
-genfit/lib/libgenfit.so:
+include/genfit/RKTrackRep/RKTrackRep.h:
 	@echo "building genfit"
-	@cd genfit; cmake .; make
-	@cp -a $(EXTDIR)/genfit/lib/* $(EXTLIBDIR)
-	@mkdir -p $(EXTINCDIR)/genfit
-	@cp -a $(EXTDIR)/genfit/core/*.h $(EXTINCDIR)/genfit/
-	@cp -a $(EXTDIR)/genfit/core/*/*.h $(EXTINCDIR)/genfit/
-	@cp -a $(EXTDIR)/genfit/RKTrackRep/*.h $(EXTINCDIR)/genfit/
+	@-cd genfit/RKTrackRep; patch -N < ../RKTrackRep.patch; fi
+	@cd genfit; scons
 

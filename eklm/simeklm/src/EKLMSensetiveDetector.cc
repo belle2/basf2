@@ -15,6 +15,7 @@
 
 
 #include <eklm/eklmutils/EKLMutils.h>
+#include <framework/datastore/Units.h>
 
 #include "G4Step.hh"
 #include "G4SteppingManager.hh"
@@ -98,7 +99,8 @@ namespace Belle2 {
 
 
     const G4ThreeVector & position = 0.5 * (aStep->GetPostStepPoint()->GetPosition() +
-                                            aStep->GetPreStepPoint()->GetPosition());
+                                            aStep->GetPreStepPoint()->GetPosition())
+                                     * 0.1; // to convert to cm
 
 
     //creates hit

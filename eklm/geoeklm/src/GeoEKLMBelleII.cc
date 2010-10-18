@@ -66,7 +66,13 @@ void GeoEKLMBelleII::create(GearDir& content)
   TGeoMaterial* matVacuum = new TGeoMaterial("Vacuum", 0, 0, 0);
   TGeoMedium*   medAir    = new TGeoMedium("medAir", 1, matVacuum);
 
+
+
   TGeoMedium* medPlastic = gGeoManager->GetMedium("Polystyrene");
+
+  TGeoMaterial *matFe = new TGeoMaterial("Fe", 55.845, 26, 7.87);
+  TGeoMedium *medFe = new TGeoMedium("Iron", 1, matFe);
+
 
   //----------------------------------------
   //         Get parameters from XML
@@ -153,7 +159,7 @@ void GeoEKLMBelleII::create(GearDir& content)
 
 
     TGeoVolume* volEndcap =
-      gGeoManager->MakeTube(Endcap_Name.c_str(), medAir,
+      gGeoManager->MakeTube(Endcap_Name.c_str(), medFe,
                             Endcap_InnerR,
                             Endcap_OuterR,
                             Endcap_length / 2);
@@ -188,10 +194,11 @@ void GeoEKLMBelleII::create(GearDir& content)
                                                        Layer_InnerR,
                                                        Layer_OuterR,
                                                        Layer_length / 2.0);
-      if (iLayer == 0)
-        volLayer->SetLineColor(kGreen);
-      else
-        volLayer->SetLineColor(kBlack);
+      //      volLayer->SetInvisible();
+      // if (iLayer == 0)
+      //   volLayer->SetLineColor(kGreen);
+      // else
+      //   volLayer->SetLineColor(kBlack);
       double  Layer_positionZ  = -Endcap_length / 2.0 + (iLayer + 1) * Layer_shiftZ + (iLayer + 0.5) *  Layer_length ;
       volEndcap->AddNode(volLayer, iLayer ,
                          new TGeoTranslation(Layer_positionX,
@@ -211,8 +218,8 @@ void GeoEKLMBelleII::create(GearDir& content)
                                 Sector_OuterR,
                                 Sector_length / 2.0,
                                 0.0, 90.);
-        volSector->SetLineColor(kRed);
-
+        //        volSector->SetLineColor(kRed);
+        //  volSector->SetInvisible();
 
         // Reflect sectors
         TGeoRotation* SectorRot = new TGeoRotation("SectorRot", 0.0, 0, 0.0);
@@ -248,8 +255,8 @@ void GeoEKLMBelleII::create(GearDir& content)
                                   Plane_length / 2.0,
                                   0.0, 90.);
 
-          volPlane->SetLineColor(kBlue + 3);
-
+          //          volPlane->SetLineColor(kBlue + 3);
+          //    volPlane->SetInvisible();
 
 
           TGeoRotation* PlaneRot = new TGeoRotation("PlaneRot", 0.0, 0, 0.0);
@@ -282,12 +289,19 @@ void GeoEKLMBelleII::create(GearDir& content)
                                    Strip_length[iStrip] / 2.0 ,
                                    Strip_width / 2.0 ,
                                    Strip_thickness / 2.0);
+            /*
+              inner end corresponds to negative local X
+              outer (with SiPM) -- to positive X)
+            */
 
-            if (iStrip % 2)
-              volStrip->SetLineColor(kRed);
-            else
-              volStrip->SetLineColor(kRed + 2);
 
+            volStrip->SetInvisible();
+            /*
+                  if (iStrip % 2)
+                    volStrip->SetLineColor(kRed);
+                  else
+                    volStrip->SetLineColor(kRed + 2);
+            */
             volPlane->AddNode(volStrip, iStrip ,
                               new TGeoTranslation(Strip_positionX[iStrip],
                                                   Strip_positionY[iStrip],

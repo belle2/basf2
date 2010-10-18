@@ -17,11 +17,27 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 
+#include <TGeoVolume.h>
+
 
 
 namespace Belle2 {
+
+
+
   template < class T >
   void storeEKLMObject(std::string , T*);
+
+  class EKLMNameManipulator {
+    EKLMNameManipulator();
+    ~EKLMNameManipulator();
+
+  public:
+    // get sector name from strip
+    static std::string getSectorName(std::string *);
+    static std::string getSectorName(TGeoVolume *);
+
+  };
 
 
   //------------------------  Implemantation of the templates -------------------------

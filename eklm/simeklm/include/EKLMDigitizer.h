@@ -11,10 +11,12 @@
 #ifndef EKLMDIGITIZER_H
 #define EKLMDIGITIZER_H
 
+#include <eklm/eklmutils/EKLMutils.h>
 #include <eklm/eklmhit/EKLMSimHit.h>
 #include <eklm/eklmhit/EKLMStripHit.h>
 #include <map>
 #include <vector>
+#include  "CLHEP/Vector/ThreeVector.h"
 
 
 namespace Belle2 {
@@ -51,14 +53,15 @@ namespace Belle2 {
 
   private:
 
-    std::map<G4String, std::vector<EKLMSimHit*> > m_HitStripMap;
+    std::map<std::string, std::vector<EKLMSimHit*> > m_HitStripMap;
 
     std::vector<EKLMStripHit*> m_HitVector;
 
     EKLMSimHitsCollection* m_HitCollection;
 
-    G4double energyToPhotoElectrons(G4double  , G4ThreeVector);
-    G4double lightPropagationTime(G4double  , G4ThreeVector);
+    int energyToPhotoElectrons(double  , double , bool isMirrored = false);
+    double lightPropagationTime(double);
+    void lightPropagationDistance(double &firstHitDist, double &secondHitDist, CLHEP::Hep3Vector pos);
 
 
   };

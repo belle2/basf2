@@ -89,9 +89,6 @@ namespace Belle2 {
       gGeoManager->GetCurrentVolume()->SetVisibility(true);  // potentially dangerous!   use only after EKLMDigitizer::lightPropagationDistance
 
 
-      std::cout << it->first << std::endl;
-
-
       // Create hit
       EKLMStripHit *stripHit = new EKLMStripHit();
       stripHit->setName(it->first);
@@ -99,7 +96,6 @@ namespace Belle2 {
       stripHit->setTime(lightPropagationTime(firstHitDist));
       stripHit->setLeadingParticlePDGCode(leadingParticlePDG);
       m_HitVector.push_back(stripHit);
-
 
       // Create mirrored hit
       /*

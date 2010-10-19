@@ -8,29 +8,32 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <eklm/eklmhit/EKLMStripHit.h>
-#include <framework/logging/Logger.h>
+#ifndef EKLMRECON_H
+#define EKLMRECON_H
 
-
-using namespace Belle2;
-using namespace std;
-
-ClassImp(EKLMStripHit);
-
-EKLMStripHit::EKLMStripHit(const char * name)
-{
-  m_Name = name;
-}
-
-EKLMStripHit::EKLMStripHit(std::string & name)
-{
-  m_Name = name;
-}
-
-void EKLMStripHit::Print()
-{
-  std::cout << "Strip Hit: " << m_Name << std::endl;
-}
+#include<vector>
+#include<eklm/eklmhit/EKLMStripHit.h>
+#include<eklm/eklmhit/EKLMSectorHit.h>
 
 
 
+namespace Belle2 {
+
+  // class for creation 1d and 2d hits
+  class EKLMRecon   {
+
+  public:
+    EKLMRecon() {};
+    ~EKLMRecon() {};
+
+    void readStripHits();
+    void createSectorHits();
+  private:
+    std::vector <EKLMStripHit*> m_StripHitVector;
+    std::vector <EKLMSectorHit*> m_SectorHitVector;
+    //    std::vector <EKLMHit2d> m_Hit2dVector;
+  };
+
+} // end of namespace Belle2
+
+#endif //EKLMRECON_H

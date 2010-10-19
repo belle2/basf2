@@ -8,29 +8,46 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <eklm/eklmhit/EKLMStripHit.h>
+#include <eklm/eklmhit/EKLMSectorHit.h>
+#include <eklm/eklmutils/EKLMutils.h>
 #include <framework/logging/Logger.h>
 
 
 using namespace Belle2;
 using namespace std;
 
-ClassImp(EKLMStripHit);
+ClassImp(EKLMSectorHit);
 
-EKLMStripHit::EKLMStripHit(const char * name)
+EKLMSectorHit::EKLMSectorHit(const char * name)
 {
   m_Name = name;
 }
 
-EKLMStripHit::EKLMStripHit(std::string & name)
+EKLMSectorHit::EKLMSectorHit(std::string & name)
 {
   m_Name = name;
 }
 
-void EKLMStripHit::Print()
+
+void EKLMSectorHit::Print()
 {
-  std::cout << "Strip Hit: " << m_Name << std::endl;
+  std::cout << "------------  Sector Hit  -------------- " << std::endl;
+  std::cout << m_Name << std::endl;
+  for (std::vector<EKLMStripHit*>::iterator it = m_stripHitVector.begin(); it != m_stripHitVector.end(); ++it)
+    (*it)->Print();
 }
+
+
+bool EKLMSectorHit::addStripHit(EKLMStripHit *stripHit)
+{
+  // important! getName is case sensetive!!
+  if (EKLMNameManipulator::getSectorName(stripHit->getName()) == m_Name) {
+    m_stripHitVector.push_back(stripHit);
+    return true;
+  }
+  return false;
+}
+
 
 
 

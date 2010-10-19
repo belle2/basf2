@@ -8,72 +8,53 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLMSTRIPHIT_H
-#define EKLMSTRIPHIT_H
+#ifndef EKLMSECTORHIT_H
+#define EKLMSECTORHIT_H
 
 #include <framework/datastore/DataStore.h>
 #include <TObject.h>
 
-#include  <eklm/eklmhit/EKLMHitBase.h>
+#include  <eklm/eklmhit/EKLMStripHit.h>
 #include  "globals.hh"
 
 #include <string>
 namespace Belle2 {
 
-  class EKLMStripHit : public EKLMHitBase  {
+  class EKLMSectorHit : public EKLMHitBase  {
 
   public:
 
     //! Constructor
-    EKLMStripHit() {};
+    EKLMSectorHit() {};
 
     //! Constructor with name
-    EKLMStripHit(const char *);
+    EKLMSectorHit(const char *);
 
     //! Constructor with name
-    EKLMStripHit(std::string &);
+    EKLMSectorHit(std::string &);
+
 
     //! Destructor
-    ~EKLMStripHit() {};
+    ~EKLMSectorHit() {};
 
     void Print();
 
-    inline void setNumberPhotoElectrons(const double &npe)
-    {m_NumberPhotoElectrons = npe;};
+    //    void clear();
 
-    inline void setTime(const double  &time)
-    {m_Time = time;};
+    bool addStripHit(EKLMStripHit *);
 
-    inline void setLeadingParticlePDGCode(const int  &pdg)
-    {m_LeadingParticlePDGCode = pdg;};
-
-
-
-    inline std::string getName()const
-    {return m_Name;};
-
-
-    inline double getTime()const
-    {return m_Time;};
-
-
-    inline double getNumberPhotoElectrons()const
-    {return m_NumberPhotoElectrons;};
-
-
-    inline int getLeadingParticlePDGCode()const
-    {return m_LeadingParticlePDGCode;};
-
+    inline std::vector <EKLMStripHit*> getStripHitVector() const
+    {return m_stripHitVector;}
 
 
 
   private:
 
-    double m_NumberPhotoElectrons;
-    int m_LeadingParticlePDGCode;
-    double m_Time;
 
-    ClassDef(EKLMStripHit, 1);
+    std::vector<EKLMStripHit*> m_stripHitVector;
+    //    std::vector<EKLM2dHit*> m_hit2dVector;
+
+    ClassDef(EKLMSectorHit, 1);
 
 
   };
@@ -82,4 +63,4 @@ namespace Belle2 {
 
 } // end of namespace Belle2
 
-#endif //EKLMSTRIPHIT_H
+#endif //EKLMSECTORHIT_H

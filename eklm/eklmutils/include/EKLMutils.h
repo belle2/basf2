@@ -33,8 +33,17 @@ namespace Belle2 {
     ~EKLMNameManipulator();
 
   public:
+    // get plane name from strip
+    static std::string getPlane(const char *);
+    static std::string getPlane(std::string *);
+    static std::string getPlane(std::string);
+    static std::string getPlane(TGeoVolume *);
+
+
     // get sector name from strip
+    static std::string getSectorName(const char *);
     static std::string getSectorName(std::string *);
+    static std::string getSectorName(std::string);
     static std::string getSectorName(TGeoVolume *);
 
   };

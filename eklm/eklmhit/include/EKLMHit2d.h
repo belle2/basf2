@@ -8,72 +8,52 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLMSTRIPHIT_H
-#define EKLMSTRIPHIT_H
+#ifndef EKLMHIT2D_H
+#define EKLMHIT2D_H
 
 #include <framework/datastore/DataStore.h>
 #include <TObject.h>
 
-#include  <eklm/eklmhit/EKLMHitBase.h>
+#include  <eklm/eklmhit/EKLMStripHit.h>
 #include  "globals.hh"
 
 #include <string>
 namespace Belle2 {
 
-  class EKLMStripHit : public EKLMHitBase  {
+  class EKLMHit2d : public EKLMHitBase  {
 
   public:
 
     //! Constructor
-    EKLMStripHit() {};
+    EKLMHit2d();
 
     //! Constructor with name
-    EKLMStripHit(const char *);
+    EKLMHit2d(const char *);
 
     //! Constructor with name
-    EKLMStripHit(std::string &);
+    EKLMHit2d(std::string &);
 
     //! Destructor
-    ~EKLMStripHit() {};
+    ~EKLMHit2d() {};
 
     void Print();
 
-    inline void setNumberPhotoElectrons(const double &npe)
-    {m_NumberPhotoElectrons = npe;};
+    bool addStripHit(EKLMStripHit *);
 
-    inline void setTime(const double  &time)
-    {m_Time = time;};
+    inline EKLMStripHit* getXStripHit() const
+    {return m_XStrip;}
 
-    inline void setLeadingParticlePDGCode(const int  &pdg)
-    {m_LeadingParticlePDGCode = pdg;};
-
-
-
-    inline std::string getName()const
-    {return m_Name;};
-
-
-    inline double getTime()const
-    {return m_Time;};
-
-
-    inline double getNumberPhotoElectrons()const
-    {return m_NumberPhotoElectrons;};
-
-
-    inline int getLeadingParticlePDGCode()const
-    {return m_LeadingParticlePDGCode;};
-
+    inline EKLMStripHit* getYStripHit() const
+    {return m_YStrip;}
 
 
 
   private:
 
-    double m_NumberPhotoElectrons;
-    int m_LeadingParticlePDGCode;
-    double m_Time;
+    EKLMStripHit * m_XStrip;
+    EKLMStripHit * m_YStrip;
 
-    ClassDef(EKLMStripHit, 1);
+    ClassDef(EKLMHit2d, 1);
 
 
   };
@@ -82,4 +62,4 @@ namespace Belle2 {
 
 } // end of namespace Belle2
 
-#endif //EKLMSTRIPHIT_H
+#endif //EKLMHIT2D_H

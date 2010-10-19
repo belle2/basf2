@@ -18,6 +18,7 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 
+#include  <string>
 
 
 namespace Belle2 {
@@ -30,19 +31,34 @@ namespace Belle2 {
     //! Constructor
     EKLMHitBase() {};
 
+    EKLMHitBase(const char *);
+    EKLMHitBase(std::string &);
+
     //! Destructor
     virtual ~EKLMHitBase() {};
 
     virtual void Print();
     virtual void Draw();
 
+    inline void setName(std::string name)
+    {m_Name = name;}
+
+    inline std::string getName() const
+    {return m_Name;}
+
+    /*     inline void setHitPosition(CLHEP::Hep3Vector pos) */
+    /*     {m_hitPosition=pos;} */
 
 
   private:
     ClassDef(EKLMHitBase, 1);   // needed to be storable
 
+    std::string m_Name;
 
+    //    CLHEP::Hep3Vector m_hitPosition;
   };
+
+
 
 
 } // end of namespace Belle2

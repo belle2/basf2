@@ -15,10 +15,27 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 
+//Geant4 classes
+#include "G4VVisManager.hh"
+#include "G4Colour.hh"
+#include "G4VisAttributes.hh"
+#include "G4Polyline.hh"
+#include "G4Circle.hh"
+
 
 using namespace Belle2;
 
 ClassImp(EKLMHitBase);
+
+EKLMHitBase::EKLMHitBase(const char * name)
+{
+  m_Name = name;
+}
+EKLMHitBase::EKLMHitBase(std::string &name)
+{
+  m_Name = name;
+}
+
 
 void EKLMHitBase::Print()
 {
@@ -27,5 +44,18 @@ void EKLMHitBase::Print()
 
 void EKLMHitBase::Draw()
 {
-  INFO("Not implemented yet");
+  // buggy
+
+  G4VVisManager* pVVisManager = G4VVisManager::GetConcreteInstance();
+  if (pVVisManager) {
+    G4Colour colour(1., 1., 1.);
+    G4VisAttributes attribs(colour);
+    G4Circle circle;
+    //    circle.SetPosition(G4Point3D(m_hitPosition.x(), m_hitPosition.y(), m_hitPosition.z()));
+    circle.SetScreenDiameter(2.0);
+    circle.SetFillStyle(G4Circle::filled);
+    circle.SetVisAttributes(attribs);
+    pVVisManager->Draw(circle);
+  }
 }
+

@@ -100,6 +100,6 @@ genfit: include/genfit/RKTrackRep/RKTrackRep.h
 # genfit build command
 include/genfit/RKTrackRep/RKTrackRep.h:
 	@echo "building genfit"
-	@-cd genfit/RKTrackRep; patch -N < ../RKTrackRep.patch; fi
+	@-cd genfit/RKTrackRep; patch -N < ../RKTrackRep.patch
 	@cd genfit; scons
 

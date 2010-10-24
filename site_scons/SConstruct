@@ -12,7 +12,7 @@ subdir = os.environ['BELLE2_SUBDIR']
 
 # create construction environment
 global_env = Environment(ENV = os.environ,
-                         tools = ['default', 'root_dict', 'process_dir', 'module_map'],
+                         tools = ['default', 'root_dict', 'process_dir', 'reg_map'],
                          BUILDERS = {},
                          BUILDDIR = os.path.join('#build', subdir),
                          INCDIR = '#include',

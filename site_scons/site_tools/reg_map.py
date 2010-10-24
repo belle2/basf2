@@ -2,7 +2,7 @@ import os, re
 from SCons.Builder import Builder
 
 # regular expression to find module names in source files
-module_name_re = re.compile(r'REG_MODULE\(([\S ]+)\)', re.M)
+reg_re = re.compile(r'(REG_[A-Z0-9_]+\([\S ]+\))', re.M)
 
 # extract the module names from all source files
 def build_map(target, source, env):
@@ -13,7 +13,7 @@ def build_map(target, source, env):
     # loop over source files and extract registered modules
     for source_file in source:
         contents = source_file.get_text_contents()
-        for entry in module_name_re.findall(contents):
+        for entry in reg_re.findall(contents):
             map_file.write(entry + '\n')
 
     map_file.close()
@@ -22,9 +22,10 @@ def build_map(target, source, env):
 
 # define builder for module map files
 map_builder = Builder(action = build_map)
+map_builder.action.cmdstr = '${MAPCOMSTR}'
 
 def generate(env):
-    env['BUILDERS']['ModuleMap'] = map_builder
+    env['BUILDERS']['RegMap'] = map_builder
 
 def exists(env):
     return True

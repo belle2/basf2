@@ -31,6 +31,7 @@ def linkdef_emitter(target, source, env):
 rootcint = Builder(action = "rootcint -f $TARGET -c -p $_CPPDEFFLAGS $_CPPINCFLAGS $SOURCES",
                    emitter = linkdef_emitter,
                    source_scanner = CScanner())
+rootcint.action.cmdstr = '${ROOTCINTCOMSTR}'
 
 def generate(env):
     env['BUILDERS']['RootDict'] = rootcint

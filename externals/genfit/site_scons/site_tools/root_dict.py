@@ -9,18 +9,12 @@ linkdef_class_re = re.compile(r'^#pragma\s+link\s+C\+\+\s+class\s+([\w<>,\*]+)[+
 # add all header files for classes which are listed in the linkdef file
 def linkdef_emitter(target, source, env):
 
-    # determine the right include directory
-    include_dir = os.path.dirname(str(source[0]))
-    if include_dir.endswith('include'):
-        include_dir = os.path.dirname(include_dir)
-    include_dir = os.path.join(env['INCDIR'], include_dir)
-
     # loop over class names and construct the corresponding header file names
     sources = []
     contents = source[0].get_text_contents()
     for entry in linkdef_class_re.findall(contents):
         include_base = entry.split('<')[0] + '.h'
-        include_file = os.path.join(include_dir, include_base)
+        include_file = os.path.join(env['INCDIR'], include_base)
         if not include_file in sources:
             sources.append(include_file)
 

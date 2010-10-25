@@ -42,7 +42,10 @@ def process_dir(parent_env, dir_name):
 
 
     # install header files in the include directory
-    includes = env.Install(os.path.join(env['INCDIR'], dir_name), env['HEADER_FILES'])
+    inc_dir_name = ''
+    if dir_name.find(os.sep) > 0:
+        inc_dir_name = dir_name[dir_name.find(os.sep)+1:]
+    includes = env.Install(os.path.join(env['INCDIR'], inc_dir_name), env['HEADER_FILES'])
 
     # loop over subdirs
     entries = os.listdir(dir_name)

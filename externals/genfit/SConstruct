@@ -12,10 +12,9 @@ global_env = Environment(ENV = os.environ,
                          BUILDDIR = os.path.join('#build', subdir),
                          EXTDIR = os.path.join(os.environ['BELLE2_LOCAL_DIR'], 'externals'),
                          INCDIR = os.path.join('$EXTDIR', 'include', 'genfit'),
-                         LIBDIR = os.path.join('$EXTDIR', 'lib', subdir),
-                         BINDIR = os.path.join('$EXTDIR', 'bin', subdir),
+                         LIBDIR = '#lib',
                          CCFLAGS = ['-Wall'],
-                         CPPPATH = ['.', 'include', '$INCDIR', os.path.join('$EXTDIR', 'include', 'root')])
+                         CPPPATH = ['$INCDIR', os.path.join('$EXTDIR', 'include', 'root')])
 
 
 # check for debug flag

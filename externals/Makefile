@@ -95,11 +95,11 @@ root/config/Makefile.config:
 
 
 # dependence for genfit build
-genfit: include/genfit/RKTrackRep/RKTrackRep.h
+genfit: include/genfit/RKTrackRep.h
 
 # genfit build command
-include/genfit/RKTrackRep/RKTrackRep.h:
+include/genfit/RKTrackRep.h:
 	@echo "building genfit"
-	@-cd genfit/RKTrackRep; patch -N < ../RKTrackRep.patch
 	@cd genfit; scons
+	@cp genfit/lib/* $(EXTLIBDIR)/
 

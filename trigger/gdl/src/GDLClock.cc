@@ -1,0 +1,96 @@
+//-----------------------------------------------------------------------------
+// $Id$
+//-----------------------------------------------------------------------------
+// Filename : GDLClock.h
+// Section  : CDC Trigger
+// Owner    : Yoshihito Iwasaki
+// Email    : yoshihito.iwasaki@kek.jp
+//-----------------------------------------------------------------------------
+// Description : A class to represent a clock.
+//-----------------------------------------------------------------------------
+// $Log$
+//-----------------------------------------------------------------------------
+
+#include <limits>
+#include <iostream>
+#include "trigger/gdl/GDLClock.h"
+#include "trigger/gdl/GDLTime.h"
+
+using namespace std;
+
+namespace Belle2_GDL {
+
+    //...This should be moved to GDL module...
+    const Belle2::GDLClock GDLSystemClock(5.9, 125.000, "GDL system clock");
+}
+
+namespace Belle2 {
+
+GDLClock::GDLClock(double offset,
+		   double frequency,
+		   const std::string & name) :
+    _offset(offset),
+    _frequency(frequency),
+    _cycle(1000 / frequency),
+//     _min(int(GDLTime::min() / frequency)),
+//     _max(int(GDLTime::max() / frequency)),
+//     _min(numeric_limits<int>::min() + 100),
+//     _max(numeric_limits<int>::max() - 100),
+    _min(numeric_limits<int>::min() / 16),
+    _max(numeric_limits<int>::max() / 16),
+    _name(name) {
+
+    if (this != & Belle2_GDL::GDLSystemClock) {
+	if (Belle2_GDL::GDLSystemClock.minTiming() > minTiming())
+	    _min = int(Belle2_GDL::GDLSystemClock.minTiming() / _cycle);
+	if (Belle2_GDL::GDLSystemClock.maxTiming() < maxTiming())
+	    _max = int(Belle2_GDL::GDLSystemClock.maxTiming() / _cycle);
+    }
+}
+
+GDLClock::~GDLClock() {
+}
+
+void
+GDLClock::dump(const std::string & message,
+	       const std::string & pre) const {
+    cout << pre << _name << ":" << endl
+	 << pre << "    offset   :" << _offset << endl
+	 << pre << "    freq(MHz):" << _frequency << endl
+	 << pre << "    cycle(ns):" << _cycle << endl
+	 << pre << "    min pos  :" << _min << endl
+	 << pre << "    max pos  :" << _max << endl
+	 << pre << "    min(ns)  :" << minTiming() << endl
+	 << pre << "    max(ns)  :" << maxTiming() << endl;
+
+    cout << "min,max=" << numeric_limits<int>::min() << ","
+	 << numeric_limits<int>::max() << endl;
+
+
+}
+
+int
+GDLClock::time(double t) const {
+    if ((t < minTiming()) || (t > maxTiming()))
+	cout << "GDLClock::unit(" << _name
+	     << ") !!! out of time window : min=" << minTiming()
+	     << ",max=" << maxTiming() << ",given value=" << t << endl;
+
+//     cout << "t,offset,unit=" << t << "," << _offset << "," << int((t - _offset) / _cycle) << endl;
+
+    return int((t - _offset) / _cycle);
+}
+
+GDLTime
+GDLClock::minGDLTime(bool edge) const {
+    GDLTime a(minTiming(), edge, * this, _name + "_min");
+    return a;
+}
+
+GDLTime
+GDLClock::maxGDLTime(bool edge) const {
+    GDLTime a(maxTiming(), edge, * this, _name + "_max");
+    return a;
+}
+
+} // namespace Belle2

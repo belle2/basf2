@@ -15,8 +15,12 @@
 
 #include "trigger/cdc/CDCTrigger.h"
 #include "trigger/cdc/CDCTriggerWire.h"
+#include "trigger/cdc/CDCTriggerWireHit.h"
 #include "trigger/cdc/CDCTriggerWireHitMC.h"
+
 #define P3D HepGeom::Point3D<double>
+
+using namespace std;
 
 namespace Belle2 {
 
@@ -30,7 +34,8 @@ CDCTriggerWire::CDCTriggerWire(unsigned id,
       _layer(l),
       _forwardPosition(fp),
       _backwardPosition(bp),
-      _direction(fp - bp) {
+      _direction(fp - bp),
+      _triggerOutput(0) {
     _state = 0;
     _hit = 0;
     _xyPosition = 0.5 * (_forwardPosition + _backwardPosition);
@@ -42,16 +47,16 @@ CDCTriggerWire::~CDCTriggerWire() {
 }
 
 void
-CDCTriggerWire::dump(const std::string & msg, const std::string & pre) const {
-    std::cout << pre;
-    std::cout << "w " << _id;
-    std::cout << ",local " << _localId;
-    std::cout << ",layer " << layerId();
-    std::cout << ",super layer " << superLayerId();
-    std::cout << ",local layer " << localLayerId();
-    std::cout << std::endl;
-    if (msg.find("neighbor") != std::string::npos ||
-	msg.find("detail") != std::string::npos) {
+CDCTriggerWire::dump(const string & msg, const string & pre) const {
+    cout << pre;
+    cout << "w " << _id;
+    cout << ",local " << _localId;
+    cout << ",layer " << layerId();
+    cout << ",super layer " << superLayerId();
+    cout << ",local layer " << localLayerId();
+    cout << endl;
+    if (msg.find("neighbor") != string::npos ||
+	msg.find("detail") != string::npos) {
 	for (unsigned i = 0; i < 7; i++)
 	    if (neighbor(i))
 		neighbor(i)->dump("", pre + CDCTrigger::itostring(i) + "   ");
@@ -62,9 +67,9 @@ const CDCTriggerWire * const
 CDCTriggerWire::neighbor(unsigned i) const {
     static bool first = false;
     if (first)
-	std::cout << "CDCTriggerWire::neighbor !!! "
+	cout << "CDCTriggerWire::neighbor !!! "
 		  << "this function is not tested yet"
-		  << std::endl;
+		  << endl;
 
     const CDCTrigger & cdc = * CDCTrigger::getCDCTrigger();
     const unsigned layerId = _layer->id();
@@ -309,8 +314,8 @@ CDCTriggerWire::neighbor(unsigned i) const {
 // 		       HepGeom::Point3D<double> & xy,
 // 		       HepGeom::Point3D<double> & back,
 // 		       Vector3D & dir) const {
-//     std::cout << "CDCTriggerWire::wirePosition !!! this function is not test yet"
-// 	      << std::endl;
+//     cout << "CDCTriggerWire::wirePosition !!! this function is not test yet"
+// 	      << endl;
 
 //     back = _backwardPosition;
 
@@ -334,10 +339,10 @@ CDCTriggerWire::neighbor(unsigned i) const {
 //       double dzf = (_forwardPosition.z() - z) / dz;
 
 //       xy = dzb * _forwardPosition + dzf * _backwardPosition;
-//       std::cout << "f=" << _forwardPosition << std::endl;
-//       std::cout << "b=" << _backwardPosition << std::endl;
-//       std::cout << "p" << xy << std::endl;
-//       std::cout << "z=" << z << " dz=" << dz << " dzb=" << dzb << " dzf=" << dzf << std::endl;
+//       cout << "f=" << _forwardPosition << endl;
+//       cout << "b=" << _backwardPosition << endl;
+//       cout << "p" << xy << endl;
+//       cout << "z=" << z << " dz=" << dz << " dzb=" << dzb << " dzf=" << dzf << endl;
 //       dir = _direction;
 //       return;
 //     }
@@ -361,8 +366,8 @@ CDCTriggerWire::localIdDifference(const CDCTriggerWire & a) const {
 
 #ifdef CDCTRG_DEBUG_DETAIL
     if (superLayerId() != a.superLayerId()) {
-	std::cout << "CDCTriggerWire::localIdDifference !!!";
-	std::cout << "super layer assumption violation" << std::endl;
+	cout << "CDCTriggerWire::localIdDifference !!!";
+	cout << "super layer assumption violation" << endl;
     }
 #endif
 
@@ -388,14 +393,56 @@ CDCTriggerWire::clear(void) {
     for (unsigned i = 0; i < _mcHits.size(); i++)
 	delete _mcHits[i];
     _mcHits.clear();
+
+    if (_triggerOutput) {
+	delete _triggerOutput;
+	_triggerOutput = 0;
+    }
 }
 
-std::string
+string
 CDCTriggerWire::name(void) const {
     if (axial())
-	return CDCTrigger::itostring(layerId()) + std::string("-") + CDCTrigger::itostring(_localId);
-    return CDCTrigger::itostring(layerId()) + std::string("=") + CDCTrigger::itostring(_localId);
+	return string("w") +
+	    CDCTrigger::itostring(layerId()) +
+	    string("-") +
+	    CDCTrigger::itostring(_localId);
+    return string("w") + 
+	CDCTrigger::itostring(layerId()) +
+	string("=") +
+	CDCTrigger::itostring(_localId);
 }
+
+const GDLSignal *
+CDCTriggerWire::triggerOutput(void) const {
+    if (! _hit)
+	return 0;
+
+    if (_triggerOutput) {
+	return _triggerOutput;
+    }
+    else {
+
+	//...Clock...
+	const GDLClock & clock = CDCTrigger::getCDCTrigger()->systemClock();
+
+	//...Drift legnth(micron) to drift time(ns)...
+	//   coefficient used here must be re-calculated.
+	float driftTime = _hit->drift() * 10 * 1000 / 40;
+	
+//	cout << name() << " drift=" << _hit->drift() << endl;
+
+	GDLTime rise = GDLTime(driftTime, true, clock, name() + string("trg"));
+	GDLTime fall = rise;
+	fall.shift(1).reverse();
+	_triggerOutput = new GDLSignal(rise & fall);
+	_triggerOutput->name(name() + string("to"));
+//	_triggerOutput->dump();
+	
+	return _triggerOutput;
+    }
+}
+
 
 } // namespace Belle2
 

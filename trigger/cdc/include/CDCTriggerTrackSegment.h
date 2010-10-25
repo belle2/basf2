@@ -24,6 +24,7 @@
 
 namespace Belle2 {
 
+class GDLSignal;
 class CDCTriggerLayer;
 
 /// A class to represent a wire in CDC.
@@ -31,15 +32,16 @@ class CDCTriggerTrackSegment : public CDCTriggerWire {
 
   public:
     /// Constructor.
-    CDCTriggerTrackSegment(const CDCTriggerWire & w,
-			   unsigned n,
-			   const int * shape,
-			   const CDCTriggerLayer * layer);
+    CDCTriggerTrackSegment(unsigned id,
+			   const CDCTriggerWire & w,
+			   const CDCTriggerLayer * layer,
+			   const std::vector<const CDCTriggerWire *> & cells);
 
     /// Destructor
     virtual ~CDCTriggerTrackSegment();
 
   public:// Selectors
+
     /// returns id.
     unsigned id(void) const;
 
@@ -53,7 +55,10 @@ class CDCTriggerTrackSegment : public CDCTriggerWire {
     unsigned superLayerId(void) const;
 
     /// returns a pointer to a TS layer.
-    const CDCTriggerLayer * const layer(void) const;
+    const CDCTriggerLayer * layer(void) const;
+
+    /// returns a vector containing pointers to a wire.
+    const std::vector<const CDCTriggerWire *> & wires(void) const;
 
     /// returns state.
     unsigned state(void) const;
@@ -61,22 +66,34 @@ class CDCTriggerTrackSegment : public CDCTriggerWire {
     /// returns name.
     std::string name(void) const;
 
+    /// returns a wire.
+    const CDCTriggerWire * operator[](unsigned id) const;
+
+    /// returns trigger output. Null will returned if no signal.
+    const GDLSignal * triggerOutput(void) const;
+
     /// dumps debug information.
     void dump(const std::string & message = std::string(""),
 	      const std::string & prefix = std::string("")) const;
 
   public:// Modifiers
+
     /// sets state.
     unsigned state(unsigned newState);
 
     /// clears information.
     void clear(void);
 
+    /// simulates TF hit using wire information.
+    void simulate(void);
+
   private:
     unsigned _state;
     unsigned _id;
     unsigned _localId;
     const CDCTriggerLayer * _layer;
+    std::vector<const CDCTriggerWire *> _wires;
+    GDLSignal * _signal;
 };
 
 //-----------------------------------------------------------------------------
@@ -115,7 +132,7 @@ CDCTriggerTrackSegment::superLayerId(void) const {
 }
 
 inline
-const CDCTriggerLayer * const
+const CDCTriggerLayer *
 CDCTriggerTrackSegment::layer(void) const {
     return _layer;
 }
@@ -132,6 +149,24 @@ CDCTriggerTrackSegment::state(unsigned a) {
     return _state = a;
 }
 
+inline
+const std::vector<const CDCTriggerWire *> &
+CDCTriggerTrackSegment::wires(void) const {
+    return _wires;
+}
+
+inline
+const CDCTriggerWire *
+CDCTriggerTrackSegment::operator[](unsigned id) const {
+    return _wires[id];
+}
+
+inline
+const GDLSignal *
+CDCTriggerTrackSegment::triggerOutput(void) const {
+    return _signal;
+}
+
 #endif
 
 #undef inline
@@ -139,4 +174,3 @@ CDCTriggerTrackSegment::state(unsigned a) {
 } // namespace Belle2
 
 #endif /* CDCTriggerTrackSegment_FLAG_ */
-

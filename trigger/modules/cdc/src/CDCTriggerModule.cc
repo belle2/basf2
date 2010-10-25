@@ -11,8 +11,13 @@
 // 0.00 : 2010/10/08 : First version
 //-----------------------------------------------------------------------------
 
+#define CDCTRIGGER_SHORT_NAMES
+
 #include <iostream>
 #include "framework/core/ModuleManager.h"
+#include "trigger/gdl/GDLSignal.h"
+#include "trigger/gdl/GDLClock.h"
+#include "trigger/cdc/CDCTriggerTrackSegment.h"
 #include "trigger/modules/CDCTriggerModule.h"
 
 #ifdef CDCTRIGGER_DISPLAY
@@ -21,7 +26,6 @@
 #endif
 
 namespace Belle2_CDCTrigger {
-//  Belle2::ModuleManager::Registrator<Belle2::CDCTriggerModule> REG;
 #ifdef CDCTRIGGER_DISPLAY
     Belle2::CDCTriggerDisplay * D = 0;
 #endif
@@ -39,32 +43,10 @@ CDCTriggerModule::version() const {
     return "0.01";
 }
 
-// ModulePtr
-// CDCTriggerModule::newModule() {
-//     ModulePtr nm(new CDCTriggerModule("CDCTrigger"));
-//     return nm;
-// };
-
-// CDCTriggerModule::CDCTriggerModule(const string & type)
-//     : Module::Module(type),
-//       _debugLevel(0),
-//       _cdc(0),
-//       _testParamInt(0) {
-
-//     string desc = "CDCTriggerModule(" + version() + ")";
-//     setDescription(desc);
-
-//     addParam("testParamInt", _testParamInt, 20);
-
-// #ifdef CDCTRIGGER_DEBUG
-//     cout << "CDCTriggerModule ... created with " << type << endl;
-// #endif
-// }
-
 CDCTriggerModule::CDCTriggerModule()
     : Module::Module(),
       _debugLevel(0),
-      _cdc(0),
+//    _cdc(0),
       _testParamInt(0) {
 
     string desc = "CDCTriggerModule(" + version() + ")";
@@ -90,9 +72,8 @@ CDCTriggerModule::~CDCTriggerModule() {
 
 void
 CDCTriggerModule::initialize() {
-    const string versionCDC = "cdc2_test";
-    _cdc = CDCTrigger::getCDCTrigger(versionCDC);
-    _cdc->debugLevel(_debugLevel);
+
+    //...Do nothing here...
 
 #ifdef CDCTRIGGER_DISPLAY
     int argc = 0;
@@ -105,8 +86,9 @@ CDCTriggerModule::initialize() {
     cout << "CDCTriggerModule ... GTK initialized" << endl;
 #endif
 #ifdef CDCTRIGGER_DEBUG
-//  _cdc->dump("geometry superLayers layers wires detail");
-    _cdc->dump("geometry superLayers layers detail");
+    const CDCTrigger & cdc = * CDCTrigger::getCDCTrigger();
+//  cdc.dump("geometry superLayers layers wires detail");
+    cdc.dump("geometry superLayers layers detail");
 #endif
 }
 
@@ -119,15 +101,32 @@ CDCTriggerModule::beginRun() {
 
 void
 CDCTriggerModule::event() {
+
+    //...CDC trigger...
+    CDCTrigger & cdc = * CDCTrigger::getCDCTrigger();
+
+    //...CDC clock...
+    const GDLClock & cdcClock = cdc.systemClock();
+
+    //...CDC trigger simulation...
+    cdc.update();
+    cdc.simulate();
+
 #ifdef CDCTRIGGER_DEBUG
     cout << "CDCTriggerModule ... event called " << endl;
+    cout << "    TS hits" << endl;
+    for (unsigned i = 0; i < cdc.nTrackSegments(); i++) {
+	const CTTSegment & s = * cdc.trackSegment(i);
+	if (s.triggerOutput())
+	    s.dump("detail", "        ");
+    }
 #endif
 #ifdef CDCTRIGGER_DISPLAY
-    _cdc->update(false);
-//  _cdc->dump("hits");
+//  cdc.dump("hits");
     D->clear();
     D->beginEvent();
-    D->area().append(_cdc->hits());
+    D->area().append(cdc.hits());
+    D->area().append(cdc.tsHits(), Gdk::Color("#6600FF009900"));
     D->run();
 #endif
 }

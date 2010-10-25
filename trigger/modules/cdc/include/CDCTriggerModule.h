@@ -58,7 +58,7 @@ class CDCTriggerModule : public Module {
   private:
     int _debugLevel;
 //  const CDCTrigger * _cdc;
-    CDCTrigger * _cdc;
+//  CDCTrigger * _cdc;
     int _testParamInt;
 };
 

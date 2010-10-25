@@ -18,6 +18,7 @@
 #include <vector>
 #include "CLHEP/Geometry/Vector3D.h"
 #include "CLHEP/Geometry/Point3D.h"
+#include "trigger/gdl/GDLSignal.h"
 #include "trigger/cdc/CDCTriggerLayer.h"
 
 #ifdef CDCTRIGGER_SHORT_NAMES
@@ -79,7 +80,7 @@ class CDCTriggerWire {
     const CDCTriggerLayer & layer(void) const;
 
     /// returns a pointer to a CDCTriggerWireHit.
-    const CDCTriggerWireHit * const hit(void) const;
+    const CDCTriggerWireHit * hit(void) const;
 
     /// returns state.
     unsigned state(void) const;
@@ -144,12 +145,17 @@ class CDCTriggerWire {
     void dump(const std::string & message = std::string(""),
 	      const std::string & prefix = std::string("")) const;
 
+  public:// Trigger
+
+    /// returns trigger output. Null will returned if no signal.
+    virtual const GDLSignal * triggerOutput(void) const;
+
   public:// Modifiers
     /// sets a pointer to CDCTriggerWireHit.
-    const CDCTriggerWireHit * const hit(const CDCTriggerWireHit * const);
+    const CDCTriggerWireHit * hit(const CDCTriggerWireHit * const);
 
     /// appends a pointer to CDCTriggerWireHitMC.
-    const CDCTriggerWireHitMC * const hit(CDCTriggerWireHitMC * const);
+    const CDCTriggerWireHitMC * hit(CDCTriggerWireHitMC * const);
 
     /// sets state.
     unsigned state(unsigned newState);
@@ -169,6 +175,8 @@ class CDCTriggerWire {
     HepGeom::Point3D<double>  _forwardPosition;
     HepGeom::Point3D<double>  _backwardPosition;
     Vector3D _direction;
+
+    mutable GDLSignal * _triggerOutput;
 };
 
 //-----------------------------------------------------------------------------
@@ -231,19 +239,19 @@ CDCTriggerWire::state(unsigned a) {
 }
 
 inline
-const CDCTriggerWireHit * const
+const CDCTriggerWireHit *
 CDCTriggerWire::hit(const CDCTriggerWireHit * const h) {
     return _hit = h;
 }
 
 inline
-const CDCTriggerWireHit * const
+const CDCTriggerWireHit *
 CDCTriggerWire::hit(void) const {
     return _hit;
 }
 
 inline
-const CDCTriggerWireHitMC * const
+const CDCTriggerWireHitMC *
 CDCTriggerWire::hit(CDCTriggerWireHitMC * const a) {
     _mcHits.push_back(a);
     return a;

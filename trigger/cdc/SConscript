@@ -1,0 +1,7 @@
+Import('env')
+
+#env.Append(CPPDEFINES = {'CDCTRIGGER_DEBUG':None,
+	                 'CDCTRIGGER_DISPLAY':None})
+#env.ParseConfig('pkg-config --cflags --libs gtkmm-2.4')
+
+Return('env')

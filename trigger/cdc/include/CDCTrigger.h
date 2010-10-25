@@ -17,11 +17,16 @@
 #include <cmath>
 #include <string>
 #include <vector>
+#include "trigger/gdl/GDLClock.h"
 
 #define CDCTrigger_UNDEFINED 999999
 
 namespace HepGeom {
     template <class T> class Point3D;
+}
+
+namespace Belle2 {
+    class GDLTime;
 }
 
 namespace Belle2 {
@@ -53,8 +58,12 @@ class CDCTrigger {
     CDCTrigger(const std::string & cdcVersion);
     virtual ~CDCTrigger();
 
-    /// Initialize CDC geometry.
+    /// initializes CDC geometry.
     void initialize(void);
+
+  public:
+    /// simulates CDC trigger.
+    void simulate(void);
 
   public:// Selectors
     /// returns name.
@@ -120,6 +129,12 @@ class CDCTrigger {
     /// returns (inner radius)^2 of super layer.
     float superLayerR2(unsigned superLayerId) const;
 
+    /// returns \# of track segments.
+    unsigned nTrackSegments(void) const;
+
+    /// returns a track segment.
+    const CDCTriggerTrackSegment * trackSegment(unsigned id) const;
+
   public:// Event by event hit information.
 
     /// clears all CDCTrigger hit information.
@@ -180,6 +195,17 @@ class CDCTrigger {
 // 			      unsigned correctionFlag = 0,
 // 			      float T0Offset = 0.);
 
+  public:// Trigger information
+
+    /// returns the system clock.
+    const GDLClock & systemClock(void) const;
+
+    /// returns the system offset in MC.
+    double systemOffsetMC(void) const;
+
+    /// returns a vector of hit TSs.
+    const std::vector<const CDCTriggerTrackSegment *> tsHits(void) const;
+
   private:
     /// classify hits.
     void classification(void);
@@ -205,12 +231,16 @@ class CDCTrigger {
     std::vector<CDCTriggerWireHit *> _badHits;
     std::vector<CDCTriggerWireHitMC *> _hitsMC;
     std::vector<CDCTriggerTrackSegment *> _tss;
+    std::vector<CDCTriggerTrackSegment *> _tsHits;
     std::vector<CDCTriggerLayer *> _tsLayers;
 
     float _fudgeFactor;
     float * _width;
     float * _r;
     float * _r2;
+
+    const GDLClock _clock;
+    const double _offset;
 
   public: // Utility functions
     static std::string itostring(int i);
@@ -342,6 +372,38 @@ inline
 float
 CDCTrigger::superLayerR2(unsigned i) const {
     return _r2[i];
+}
+
+inline
+const CDCTriggerTrackSegment *
+CDCTrigger::trackSegment(unsigned id) const {
+    return _tss[id];
+}
+
+inline
+unsigned
+CDCTrigger::nTrackSegments(void) const {
+    return _tss.size();
+}
+
+inline
+const GDLClock &
+CDCTrigger::systemClock(void) const {
+    return _clock;
+}
+
+inline
+double
+CDCTrigger::systemOffsetMC(void) const {
+    return _offset;
+}
+
+inline
+const std::vector<const CDCTriggerTrackSegment *>
+CDCTrigger::tsHits(void) const {
+    std::vector<const CDCTriggerTrackSegment *> t;
+    t.assign(_tsHits.begin(), _tsHits.end());
+    return t;
 }
 
 #endif

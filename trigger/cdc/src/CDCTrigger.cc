@@ -11,11 +11,15 @@
 // $Log$
 //-----------------------------------------------------------------------------
 
+#define CDCTRIGGER_SHORT_NAMES
+
 #include <iomanip>
 #include <math.h>
 #include "framework/datastore/StoreArray.h"
 #include "cdc/hitcdc/HitCDC.h"
 #include "cdc/geocdc/CDCGeometryPar.h"
+#include "trigger/gdl/GDLTime.h"
+#include "trigger/gdl/GDLSignal.h"
 #include "trigger/cdc/CDCTrigger.h"
 #include "trigger/cdc/CDCTriggerWire.h"
 #include "trigger/cdc/CDCTriggerLayer.h"
@@ -25,6 +29,8 @@
 #include "trigger/cdc/CDCTriggerTrackSegment.h"
 
 #define P3D HepGeom::Point3D<double>
+
+using namespace std;
 
 namespace Belle2 {
 
@@ -60,17 +66,22 @@ CDCTrigger::getCDCTrigger(void) {
     return getCDCTrigger("Belle2");
 }
 
-CDCTrigger::CDCTrigger(const std::string & version) 
-    : _debugLevel(0),
-      _cdcVersion(version),
-      _fudgeFactor(1.),
-      _width(0),
-      _r(0),
-      _r2(0) {
+CDCTrigger::CDCTrigger(const std::string & version) :
+    _debugLevel(0),
+    _cdcVersion(version),
+    _fudgeFactor(1.),
+    _width(0),
+    _r(0),
+    _r2(0),
+    _clock(GDLClock(2.7, 125.000, "CDCTrigge system clock")),
+    _offset(5.3) {
+
     if (! _cdc) {
 	std::cout << "CDCTrigger ... CDCTrigger initializing for "
 		  << _cdcVersion << std::endl;
 	initialize();
+	Belle2_GDL::GDLSystemClock.dump();
+	_clock.dump();
 	std::cout << "CDCTrigger ... CDCTrigger created for "
 		  << _cdcVersion << std::endl;
     }
@@ -96,6 +107,7 @@ CDCTrigger::initialize(void) {
     int ias = -1;
     int iss = -1;
     unsigned nWires = 0;
+    float fwrLast = 0;
     for (unsigned i = 0; i < nLayers; i++) {
 	const unsigned nWiresInLayer = cdc2.nWiresInLayer(i);
 
@@ -137,9 +149,16 @@ CDCTrigger::initialize(void) {
 
 	//...Calculate radius...
 	const float swr = cdc2.senseWireR(i);
-	const float fwr = cdc2.fieldWireR(i);
+	float fwr = cdc2.fieldWireR(i);
+	if (i == nLayers - 2)
+	    fwrLast = fwr;
+	else if (i == nLayers - 1)
+	    fwr = swr + (swr - fwrLast);
 	const float innerRadius = swr - (fwr - swr);
 	const float outerRadius = swr + (fwr - swr);
+
+
+	cout << "... " << i << ", in=" << innerRadius << ", out=" << outerRadius << ", swr=" << swr << ", fwr" << fwr << endl;
 
 	//...New layer...
 	CDCTriggerLayer * layer = new CDCTriggerLayer(i,
@@ -194,6 +213,7 @@ CDCTrigger::initialize(void) {
 			   2, 0,
 			   2, 1};
     unsigned id = 0;
+    unsigned idTS = 0;
     for (unsigned i = 0; i < nSuperLayers(); i++) {
 	const unsigned nLayers = _superLayers[i]->size();
 	if (nLayers < 5) {
@@ -204,19 +224,37 @@ CDCTrigger::initialize(void) {
 	}
 
 	//...TS layer... w is a central wire
-	const CDCTriggerWire & w = * (* _superLayers[i])[2]->front();
-	CDCTriggerLayer * layer = new CDCTriggerLayer(id++, w);
+	const CDCTriggerWire & ww = * (* _superLayers[i])[2]->front();
+	CDCTriggerLayer * layer = new CDCTriggerLayer(id++, ww);
 	_tsLayers.push_back(layer);
 
 	//...Loop over all wires in a central wire layer...
-	const unsigned nWiresInLayer = w.layer().nWires();
+	const unsigned nWiresInLayer = ww.layer().nWires();
 	for (unsigned j = 0; j < nWiresInLayer; j++) {
+	    const CDCTriggerWire & w = * (* (* _superLayers[i])[2])[j];
+
+	    const unsigned localId = w.localId();
+	    const unsigned layerId = w.layerId();
+	    std::vector<const CDCTriggerWire *> cells;
+
+	    for (unsigned i = 0; i < nWiresInTS; i++) {
+		const unsigned laid = layerId + shape[i * 2];
+		const unsigned loid = localId + shape[i * 2 + 1];
+	
+		const CDCTriggerWire * c = wire(laid, loid);
+		if (! c)
+		    cout << "CDCTrigger !!! no such a wire for TS : "
+			 << "layer id=" << laid << ", local id=" << loid
+			 << endl;
+
+		cells.push_back(c);
+	    }
 	
 	    //...Center of a track segment...
-	    CDCTriggerTrackSegment * ts = new CDCTriggerTrackSegment(w,
- 							            nWiresInTS,
-								     shape,
-								     layer);
+	    CDCTriggerTrackSegment * ts = new CDCTriggerTrackSegment(idTS++,
+								     w,
+								     layer,
+								     cells);
 
 	    //...Store it...
 	    _tss.push_back(ts);
@@ -233,9 +271,7 @@ CDCTrigger::initialize(void) {
     _r2 = new float[nSuperLayers() + 1];
     for (unsigned i = 0; i < nSuperLayers(); i++) {
 	const std::vector<CDCTriggerLayer *> & slayer = * _superLayers[i];
-	const CDCTriggerWire & wi = * slayer[0]->front();
 
-	const unsigned layerId = wi.layerId();
 //	const float swr = cdc2.senseWireR(layerId);
 //	const float fwr = cdc2.fieldWireR(layerId);
 	_width[i] = M_PI * 2 / float(slayer.back()->nWires());
@@ -255,10 +291,12 @@ CDCTrigger::initialize(void) {
 	}
 
 #ifdef CDCTRIGGER_DEBUG
+	const CDCTriggerWire & wi = * slayer[0]->front();
+	const unsigned layerId = wi.layerId();
 	std::cout << layerId << "," << cdc2.senseWireR(layerId) << ","
-	       << cdc2.fieldWireR(layerId) << std::endl;
+		  << cdc2.fieldWireR(layerId) << std::endl;
 	std::cout << "    super layer " << i << " radius=" << _r[i] << "(r^2="
-	       << _r2[i] << ")" << std::endl;
+		  << _r2[i] << ")" << std::endl;
 #endif
     }
 }
@@ -409,6 +447,9 @@ CDCTrigger::clear(void) {
     unsigned i = 0;
     while (CDCTriggerWire * w = _wires[i++])
 	w->clear();
+    for (unsigned i = 0; i < _tsHits.size(); i++)
+	_tsHits[i]->clear();
+    _tsHits.clear();
 
     _hitWires.clear();
     _axialHits.clear();
@@ -458,7 +499,8 @@ CDCTrigger::update(bool mcAnalysis) {
 //    if (TUpdater::updated()) return;
 
     //...Clear old information...
-    fastClear();
+//  fastClear();
+    clear();
 
     //...Loop over HitCDC...
     StoreArray<HitCDC> cdcHits("HitCDCArray");
@@ -491,7 +533,9 @@ CDCTrigger::update(bool mcAnalysis) {
 	hit->state(WireHitFindingValid | WireHitFittingValid );
 
 	//...Store a hit...
-	_wires[wireId]->hit(hit);
+	(* _layers[layerId])[wireId]->hit(hit);
+//	_layers[layerId]->wire(wireId)->hit(hit);
+//	_wires[wireId]->hit(hit);
 	_hits.push_back(hit);
 	if (w.axial()) _axialHits.push_back(hit);
 	else           _stereoHits.push_back(hit);
@@ -1031,6 +1075,17 @@ CDCTrigger::bitDisplay(unsigned val, unsigned f, unsigned l) {
     for (i = 0; i < f - l; i++) {
         if ((i % 8) == 0) std::cout << " ";
 	std::cout << (val >> (f - i)) % 2;
+    }
+}
+
+void
+CDCTrigger::simulate(void) {
+    const unsigned n = _tss.size();
+    for (unsigned i = 0; i < n; i++) {
+	CTTSegment & s = * _tss[i];
+	s.simulate();
+	if (s.triggerOutput())
+	    _tsHits.push_back(& s);
     }
 }
 

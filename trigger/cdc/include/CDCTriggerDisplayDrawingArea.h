@@ -25,7 +25,9 @@
 
 namespace Belle2 {
 
+class CDCTriggerWire;
 class CDCTriggerWireHit;
+class CDCTriggerTrackSegment;
 
 /// Actual class to display trigger objects
 class CDCTriggerDisplayDrawingArea : public Gtk::DrawingArea {
@@ -54,6 +56,10 @@ class CDCTriggerDisplayDrawingArea : public Gtk::DrawingArea {
     /// appends wire hits to display.
     void append(const std::vector<const CDCTriggerWireHit *> &,
  		Gdk::Color color = Gdk::Color("grey"));
+    void append(const CDCTriggerTrackSegment &,
+  		Gdk::Color color = Gdk::Color("grey"));
+    void append(const std::vector<const CDCTriggerTrackSegment *> &,
+  		Gdk::Color color = Gdk::Color("grey"));
 //     void append(const std::vector<const Belle2::CDCTriggerWireHit *> &,
 // 		Gdk::Color color = Gdk::Color("grey"));
 //     void append(const AList<TLink> &,
@@ -73,6 +79,16 @@ class CDCTriggerDisplayDrawingArea : public Gtk::DrawingArea {
     void drawCDC(void);
     void draw(void);
     void drawHits(void);
+
+    void drawWire(const CDCTriggerWire & w,
+		  int lineWidth,
+		  Gdk::Color & c,
+		  Gdk::LineStyle s);
+    void drawTrackSegment(const CDCTriggerTrackSegment & w,
+			  int lineWidth,
+			  Gdk::Color & c,
+			  Gdk::LineStyle s);
+
 //     void drawBase(const TTrackBase &, Gdk::Color & c);
 //     void drawSegment(const TSegment &, Gdk::Color & c);
 //     void drawTrack(const TTrack &, Gdk::Color & c);
@@ -97,6 +113,9 @@ class CDCTriggerDisplayDrawingArea : public Gtk::DrawingArea {
 
     std::vector<const CDCTriggerWireHit *> _hits;
     std::vector<Gdk::Color> _hitsColor;
+
+    std::vector<const CDCTriggerTrackSegment *> _segments;
+    std::vector<Gdk::Color> _segmentsColor;
 
 //    Gtk::Main * GtkMain;
 //     CAList<TTrackBase> _objects;

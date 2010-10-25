@@ -13,10 +13,13 @@
 
 #ifdef CDCTRIGGER_DISPLAY
 
+#define CDCTRIGGER_SHORT_NAMES
+
 #include <iostream>
 #include <pangomm/init.h>
 #include "trigger/cdc/CDCTriggerWire.h"
 #include "trigger/cdc/CDCTriggerWireHit.h"
+#include "trigger/cdc/CDCTriggerTrackSegment.h"
 #include "trigger/cdc/CDCTriggerDisplayDrawingArea.h"
 
 using namespace std;
@@ -170,6 +173,11 @@ CDCTriggerDisplayDrawingArea::drawCDC(void) {
 void
 CDCTriggerDisplayDrawingArea::draw(void) {
     drawHits();
+    for (unsigned i = 0; i < _segments.size(); i++)
+	drawTrackSegment(* _segments[i],
+			 1,
+			 _segmentsColor[i],
+			 Gdk::LINE_SOLID);
 
 //     unsigned n = _objects.length();
 //     for (unsigned i = 0; i < n; i++) {
@@ -206,7 +214,6 @@ CDCTriggerDisplayDrawingArea::drawHits(void) {
 	const CTWire & w = _hits[i]->wire();
 	const HepGeom::Point3D<double> & p = w.forwardPosition();
 	double radius = _hits[i]->drift();
-	//	std::cout << "p=" << p << " drift=" << radius << std::endl;
 
 	colormap->alloc_color(_hitsColor[i]);
 	_gc->set_foreground(_hitsColor[i]);
@@ -214,7 +221,6 @@ CDCTriggerDisplayDrawingArea::drawHits(void) {
 				 Gdk::LINE_SOLID,
 				 Gdk::CAP_NOT_LAST,
 				 Gdk::JOIN_MITER);
-
 	_window->draw_arc(_gc,
 			  0,
 			  x((p.x() - radius) * 10),
@@ -228,89 +234,74 @@ CDCTriggerDisplayDrawingArea::drawHits(void) {
 	    _pl->set_text(wn);
 	    _window->draw_layout(_gc, x(p.x() * 10.), y(p.y() * 10.), _pl);
 	}
-
-// 	//...Cell shape...
-// 	Glib::ArrayHandle<Point> points;
-// 	const nDivisions = 3;
-// 	for (unsigned j = 0; j < nDivisions; j++) {
-	    
-// 	}
-
-
-
 	colormap->free_color(_hitsColor[i]);
     }
 }
 
-// void
-// CDCTriggerDisplayDrawingArea::drawSegment(const TSegment & base, Gdk::Color & c) {
-//     Glib::RefPtr<Gdk::Colormap> colormap = get_default_colormap();
-//     colormap->alloc_color(c);
-//     _gc->set_foreground(c);
-//     _gc->set_line_attributes(1,
-// 			     Gdk::LINE_SOLID,
-// 			     Gdk::CAP_NOT_LAST,
-// 			     Gdk::JOIN_MITER);
+void
+CDCTriggerDisplayDrawingArea::drawWire(const CTWire & w,
+				       int lineWidth,
+				       Gdk::Color & c,
+				       Gdk::LineStyle s) {
 
-//     const AList<TLink> & links = base.links();
-//     unsigned n = links.length();
-//     double lx = 0;
-//     double ly = 0;
-//     for (unsigned i = 0; i < n; i++) {
-// 	if (links[i]->wire() == NULL) continue;
-//  	if (! _stereo)
-//  	    if (links[i]->wire()->stereo())
-//  		continue;
-//  	if (! _axial)
-//  	    if (links[i]->wire()->axial())
-//  		continue;
+    if (! _stereo)
+	if (w.stereo())
+	    return;
+    if (! _axial)
+	if (w.axial())
+	    return;
 
-// 	//...Points...
-// 	const HepGeom::Point3D<double> & p = links[i]->wire()->forwardPosition();
-// 	double radius = links[i]->hit()->drift();
-// 	_window->draw_arc(_gc,
-// 			  0,
-// 			  x((p.x() - radius) * 10),
-// 			  y((p.y() + radius) * 10),
-// 			  int(2 * radius * 10 * _scale),
-// 			  int(2 * radius * 10 * _scale),
-// 			  0,
-// 			  360 * 64);
-//  	if (_wireName) {
-// 	    Glib::ustring wn = links[i]->wire()->name().c_str();
-// 	    _pl->set_text(wn);
-// 	    _window->draw_layout(_gc, x(p.x() * 10.), y(p.y() * 10.), _pl);
-// 	}
+    Glib::RefPtr<Gdk::Colormap> colormap = get_default_colormap();
+    colormap->alloc_color(c);
+    _gc->set_foreground(c);
+    _gc->set_line_attributes(lineWidth,
+			     s,
+			     Gdk::CAP_NOT_LAST,
+			     Gdk::JOIN_MITER);
 
-// 	//...Lines...
-// 	if (i) {
-// 	    _window->draw_line(_gc,
-// 			       x(lx * 10),
-// 			       y(ly * 10),
-// 			       x(p.x() * 10),
-// 			       y(p.y() * 10));
-// 	}
-// 	lx = p.x();
-// 	ly = p.y();
-//     }
+    //...Cell shape...
+    Gdk::Point p0;
+    std::vector<Gdk::Point> points;
+    const unsigned nDivisions = 5;
+    const float ri = w.layer().innerRadius();
+    const float ro = w.layer().outerRadius();
+    const float cPhi = w.forwardPosition().phi();
+    const float dPhi = M_PI / w.layer().nWires();
+    for (unsigned j = 0; j < nDivisions + 1; j++) {  // inner
+	const float phi = cPhi - dPhi
+	    + (2 * dPhi / float(nDivisions)) * float(j);
+	const float xx = ri * cos(phi) * 10;
+	const float yy = ri * sin(phi) * 10;
+	if (j == 0) {
+	    p0.set_x(x(xx));
+	    p0.set_y(y(yy));
+	}
+	points.push_back(Gdk::Point(x(xx), y(yy)));
+    }
+    for (unsigned j = 0; j < nDivisions + 1; j++) {  // outer
+	const float phi = cPhi + dPhi
+	    - (2 * dPhi / float(nDivisions)) * float(j);
+	const float xx = ro * cos(phi) * 10;
+	const float yy = ro * sin(phi) * 10;
+	points.push_back(Gdk::Point(x(xx), y(yy)));
+    }
+    points.push_back(p0);
 
-//     //...Draw segment lines...
-//     const AList<TSegment> & inners = base.innerLinks();
-//     for (unsigned i = 0; i < (unsigned) inners.length(); i++) {
-// 	_gc->set_foreground(_grey);
-// 	const HepGeom::Point3D<double> & p
-// 	    = (inners[i]->outers())[0]->wire()->forwardPosition();
-// 	const HepGeom::Point3D<double> & q
-// 	    = (base.inners())[0]->wire()->forwardPosition();
-// 	_window->draw_line(_gc,
-// 			   x(p.x() * 10),
-// 			   y(p.y() * 10),
-// 			   x(q.x() * 10),
-// 			   y(q.y() * 10));
-//     }
+    _gc->set_foreground(c);
+    _window->draw_lines(_gc, points);
+}
 
-//     colormap->free_color(c);
-// }
+void
+CDCTriggerDisplayDrawingArea::drawTrackSegment(const CTTSegment & w,
+					       int lineWidth,
+					       Gdk::Color & c,
+					       Gdk::LineStyle s) {
+    const std::vector<const CTWire *> wires = w.wires();
+    const unsigned n = wires.size();
+    for (unsigned i = 0; i < n; i++) {
+	drawWire(* wires[i], lineWidth, c, s);
+    }
+}
 
 // void
 // CDCTriggerDisplayDrawingArea::drawTrack(const TTrack & t, Gdk::Color & c) {
@@ -418,6 +409,25 @@ CDCTriggerDisplayDrawingArea::append(const std::vector<const CTWHit *> & l,
     on_expose_event((GdkEventExpose *) NULL);
 }
 
+void
+CDCTriggerDisplayDrawingArea::append(const CTTSegment & s,
+				     Gdk::Color c) {
+    _segments.push_back(& s);
+    _segmentsColor.push_back(c);
+    on_expose_event((GdkEventExpose *) NULL);
+}
+
+void
+CDCTriggerDisplayDrawingArea::append(const std::vector<const CTTSegment *> & l,
+				     Gdk::Color c) {
+    const unsigned n = l.size();
+    for (unsigned i = 0; i < n; i++) {
+	_segments.push_back(l[i]);
+	_segmentsColor.push_back(c);
+    }
+    on_expose_event((GdkEventExpose *) NULL);
+}
+
 // void
 // CDCTriggerDisplayDrawingArea::append(const AList<TLink> & list, Gdk::Color c) {
 //     TTrackBase * t = new TTrackBase(list);
@@ -515,10 +525,8 @@ void
 CDCTriggerDisplayDrawingArea::clear(void) {
     _hits.clear();
     _hitsColor.clear();
-//     _objects.removeAll();
-//     HepAListDeleteAll(_colors);
-//     HepAListDeleteAll(_selfObjects);
-//     HepAListDeleteAll(_selfTLinks);
+    _segments.clear();
+    _segmentsColor.clear();
 }
 
 } // namespace Belle2

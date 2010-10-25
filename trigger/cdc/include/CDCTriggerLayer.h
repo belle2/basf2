@@ -23,6 +23,7 @@
 
 namespace Belle2 {
 
+class CDCTrigger;
 class CDCTriggerWire;
 
 /// A class to represent a wire layer.
@@ -111,6 +112,8 @@ class CDCTriggerLayer : public std::vector<CDCTriggerWire *> {
     const unsigned _nWires;
     float _innerRadius;
     float _outerRadius;
+
+    friend class CDCTrigger;
 };
 
 //-----------------------------------------------------------------------------
@@ -201,6 +204,18 @@ CDCTriggerLayer::stereoType(void) const {
 	return "U";
     else
 	return "V";
+}
+
+inline
+float
+CDCTriggerLayer::innerRadius(void) const {
+    return _innerRadius;
+}
+
+inline
+float
+CDCTriggerLayer::outerRadius(void) const {
+    return _outerRadius;
 }
 
 #endif

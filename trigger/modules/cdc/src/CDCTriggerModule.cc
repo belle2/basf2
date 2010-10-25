@@ -18,7 +18,7 @@
 #include "trigger/gdl/GDLSignal.h"
 #include "trigger/gdl/GDLClock.h"
 #include "trigger/cdc/CDCTriggerTrackSegment.h"
-#include "trigger/modules/CDCTriggerModule.h"
+#include "trigger/modules/cdc/CDCTriggerModule.h"
 
 #ifdef CDCTRIGGER_DISPLAY
 #undef ERROR
@@ -106,7 +106,7 @@ CDCTriggerModule::event() {
     CDCTrigger & cdc = * CDCTrigger::getCDCTrigger();
 
     //...CDC clock...
-    const GDLClock & cdcClock = cdc.systemClock();
+//  const GDLClock & cdcClock = cdc.systemClock();
 
     //...CDC trigger simulation...
     cdc.update();

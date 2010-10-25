@@ -7,8 +7,8 @@ diff -rupN RKTrackRep/RKTrackRep.cxx TMPRKTrackRep/RKTrackRep.cxx
  #include"TDatabasePDG.h"
 -#include"GFException.h"
 -#include"GFFieldManager.h"
-+#include"core/GFException.h"
-+#include"core/GFFieldManager.h"
++#include"genfit/GFException.h"
++#include"genfit/GFFieldManager.h"
  
  #define MINSTEP 0.001   // minimum step [cm] for Runge Kutta and iteration to POCA
  
@@ -21,11 +21,11 @@ diff -rupN RKTrackRep/RKTrackRep.h TMPRKTrackRep/RKTrackRep.h
  
 -#include "GFAbsTrackRep.h"
 -#include "GFDetPlane.h"
-+#include "core/GFAbsTrackRep.h"
-+#include "core/GFDetPlane.h"
++#include "genfit/GFAbsTrackRep.h"
++#include "genfit/GFDetPlane.h"
  
 -#include "geometry/GFMaterialEffects.h"
-+#include "core/geometry/GFMaterialEffects.h"
++#include "genfit/geometry/GFMaterialEffects.h"
  
  /** @brief Track Representation module based on a Runge-Kutta algorithm including a full material model
   *

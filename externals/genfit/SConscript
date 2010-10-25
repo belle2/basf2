@@ -1,6 +1,6 @@
 Import('env')
 
-env['LIBS'] = ['core',
+env['LIBS'] = ['genfit',
                '$ROOT_LIBS']
 
 Return('env')

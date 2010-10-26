@@ -46,8 +46,6 @@ namespace Belle2 {
 
   protected:
 
-  private:
-
     PathManager& m_pathManager; /*!< Reference to the path manager, which takes care of creating and handling paths. */
 
     /*! Initializes the modules. */
@@ -95,6 +93,8 @@ namespace Belle2 {
          \param modulePathList The list containing all module instances added to a path.
     */
     void processEndRun(const ModulePtrList& modulePathList);
+
+  private:
 
   };
 

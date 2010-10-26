@@ -15,6 +15,7 @@
 #include <framework/core/Module.h>
 #include <framework/core/Path.h>
 #include <framework/core/Framework.h>
+#include <framework/pcore/pFramework.h>
 #include <framework/core/ModuleParam.h>
 
 using namespace Belle2;
@@ -29,6 +30,7 @@ BOOST_PYTHON_MODULE(pybasf2)
   Module::exposePythonAPI();
   Path::exposePythonAPI();
   Framework::exposePythonAPI();
+  pFramework::exposePythonAPI();
   ModuleParamInfoPython::exposePythonAPI();
 }
 

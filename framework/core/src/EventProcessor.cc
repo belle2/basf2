@@ -81,7 +81,7 @@ void EventProcessor::process(PathPtr startPath, long maxEvent, long runNumber)
 
 
 //============================================================================
-//                              Private methods
+//                            Protected methods
 //============================================================================
 
 void EventProcessor::processInitialize(const ModulePtrList& modulePathList)

@@ -18,6 +18,7 @@
 #include <framework/datastore/StoreArray.h>
 
 #include <TGeoVolume.h>
+#include "boost/lexical_cast.hpp"
 
 
 
@@ -33,22 +34,24 @@ namespace Belle2 {
     ~EKLMNameManipulator();
 
   public:
-    // get plane name from strip
-    static std::string getPlane(const char *);
-    static std::string getPlane(std::string *);
-    static std::string getPlane(std::string);
-    static std::string getPlane(TGeoVolume *);
 
 
-    // get sector name from strip
-    static std::string getSectorName(const char *);
-    static std::string getSectorName(std::string *);
-    static std::string getSectorName(std::string);
-    static std::string getSectorName(TGeoVolume *);
+    static int getVolumeNumber(const char*, const char*);
+    static int getVolumeNumber(std::string, std::string);
+
+
+    static std::string getVolumeName(const char *, const char *);
+    static std::string getVolumeName(std::string, std::string);
+
+    static const char * getNodePath(const char *);
+    static const char * getNodePath(std::string);
+
+
+
+    template < class T >
+    static bool isX(T stripName);
 
   };
-
-
   //------------------------  Implemantation of the templates -------------------------
 
   template < class T >
@@ -58,6 +61,13 @@ namespace Belle2 {
     // since the array is indexed from 0 GetEntries() points exactly to the next to the last entry
     new(array->AddrAt(array.GetEntries())) T(*obj);
   }
+
+  template < class T >
+  bool EKLMNameManipulator::isX(T stripName)
+  {
+    return !(boost::lexical_cast<bool>(getVolumeNumber(stripName, "Plane")));
+  };
+
 
 }
 

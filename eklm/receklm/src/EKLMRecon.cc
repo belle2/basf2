@@ -47,15 +47,25 @@ namespace Belle2 {
       }
       if (sectorNotFound) {
         EKLMSectorHit  *newSectorHit =
-          new EKLMSectorHit(EKLMNameManipulator::getSectorName((*stripIter)->getName()).c_str());
+          new EKLMSectorHit(EKLMNameManipulator::getVolumeName((*stripIter)->getName(), "Sector").c_str());
         newSectorHit->addStripHit(*stripIter);
         m_SectorHitVector.push_back(newSectorHit);
       }
     }
 
     for (std::vector<EKLMSectorHit*>::iterator sectorIter = m_SectorHitVector.begin();
-         sectorIter != m_SectorHitVector.end(); sectorIter++)
+         sectorIter != m_SectorHitVector.end(); sectorIter++) {
       storeEKLMObject("SectorHitsEKLMArray", *sectorIter);
+      //  (*sectorIter)->Print();
+    }
   }
 
+  void EKLMRecon::create2dHits()
+  {
+    for (std::vector<EKLMSectorHit*>::iterator sectorIter = m_SectorHitVector.begin();
+         sectorIter != m_SectorHitVector.end(); sectorIter++) { // loop over sectors
+      (*sectorIter)->create2dHits();
+      //      (*sectorIter)->Print();
+    }
+  }
 }//namespace

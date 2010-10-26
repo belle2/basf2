@@ -8,88 +8,77 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-
-
-
+#include <eklm/geoeklm/GeoEKLMBelleII.h>
 
 #include <eklm/eklmutils/EKLMutils.h>
-
 #include <iostream>
 #include <string>
-
+#include "boost/lexical_cast.hpp"
 
 namespace Belle2 {
 
 
-  // get plane
+  std::string EKLMNameManipulator::getVolumeName(const char * stripName, const char * elementName)
+  {
+    return getVolumeName(std::string(stripName), std::string(elementName));
+  }
 
-  std::string EKLMNameManipulator::getPlane(std::string *stripName)
+  std::string EKLMNameManipulator::getVolumeName(std::string stripName, std::string elementName)
   {
     std::string str;
     try {
-      str = stripName->substr(stripName->find("Plane") + 6, 1); // get from "r" to the end
+      str = stripName.substr(stripName.find(elementName)); // get from elementName to the end
     } catch (exception& e) {
-      ERROR("exception caught:" << e.what() << " Strip name does not point plane!");
+      ERROR("exception caught:" << e.what() << " Strip name does not point " + elementName + "!");
     }
-    return str;
-  }
-
-  std::string EKLMNameManipulator::getPlane(const char * stripName)
-  {
-    return getPlane(std::string(stripName));
-  }
-
-  std::string EKLMNameManipulator::getPlane(TGeoVolume * strip)
-  {
-    return getPlane(strip->GetName());
-  }
-
-  std::string EKLMNameManipulator::getPlane(std::string stripName)
-  {
-    std::string str;
-    try {
-      str = stripName.substr(stripName.find("Plane") + 6, 1); // get from "Sector" to the end
-    } catch (exception& e) {
-      ERROR("exception caught:" << e.what() << " Strip name does not point sector!");
-    }
+    //    std::cout << "EKLMNameManipulator::getName(" << stripName << "," << elementName << ")=" << str << std::endl;
     return str;
   }
 
 
+  int EKLMNameManipulator::getVolumeNumber(const char * stripName, const char * elementName)
+  {
+    return getVolumeNumber(std::string(stripName), std::string(elementName));
+  }
 
-  // get sector name
 
-
-  std::string EKLMNameManipulator::getSectorName(std::string *stripName)
+  int EKLMNameManipulator::getVolumeNumber(std::string stripName, std::string elementName)
   {
     std::string str;
     try {
-      str = stripName->substr(stripName->find("Sector")); // get from "Sector" to the end
+      size_t pos1 = stripName.find(elementName + "_") + 1 + elementName.size();
+      size_t pos2 = stripName.find("_", pos1 + 1);
+      str = stripName.substr(pos1, pos2 - pos1); // get string btw elementName_  and next _
     } catch (exception& e) {
-      ERROR("exception caught:" << e.what() << " Strip name does not point sector!");
+      ERROR("exception caught:" << e.what() << elementName + " name does not point a number!");
     }
-    return str;
-  }
-
-  std::string EKLMNameManipulator::getSectorName(const char * stripName)
-  {
-    return getSectorName(std::string(stripName));
-  }
-  std::string EKLMNameManipulator::getSectorName(std::string stripName)
-  {
-    std::string str;
-    try {
-      str = stripName.substr(stripName.find("Sector")); // get from "Sector" to the end
-    } catch (exception& e) {
-      ERROR("exception caught:" << e.what() << " Strip name does not point sector!");
-    }
-    return str;
-  }
-  std::string EKLMNameManipulator::getSectorName(TGeoVolume * strip)
-  {
-    return getSectorName(strip->GetName());
+    return boost::lexical_cast<int>(str);
   }
 
 
+
+  const char *  EKLMNameManipulator::getNodePath(const char * stripName)
+  {
+    return getNodePath(std::string(stripName));
+  }
+
+  const char * EKLMNameManipulator::getNodePath(std::string stripName)
+  {
+    std::string path = \
+                       std::string("/Top_1/EKLM_1") +          \
+                       std::string("/") + getVolumeName(stripName, "Endcap") +   \
+                       std::string("_") + boost::lexical_cast<std::string>(getVolumeNumber(stripName, "Endcap")) + \
+                       std::string("/") + getVolumeName(stripName, "Layer") +    \
+                       std::string("_") + boost::lexical_cast<std::string>(getVolumeNumber(stripName, "Layer")) + \
+                       std::string("/") + getVolumeName(stripName, "Sector") +   \
+                       std::string("_") + boost::lexical_cast<std::string>(getVolumeNumber(stripName, "Sector")) + \
+                       std::string("/") + getVolumeName(stripName, "Plane") +    \
+                       std::string("_") + boost::lexical_cast<std::string>(getVolumeNumber(stripName, "Plane")) + \
+                       std::string("/") + getVolumeName(stripName, "Strip") +    \
+                       std::string("_") + boost::lexical_cast<std::string>(getVolumeNumber(stripName, "Strip"));
+    // tempopary. Used for the procedure checks
+    if (!gGeoManager->CheckPath(path.c_str()))
+      ERROR("Something goes wrong! Strip path is not found!");
+    return path.c_str();
+  }
 }
-

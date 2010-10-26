@@ -16,6 +16,8 @@
 
 #include  <eklm/eklmhit/EKLMHitBase.h>
 #include  "globals.hh"
+#include  "CLHEP/Vector/ThreeVector.h"
+
 
 #include <string>
 namespace Belle2 {
@@ -65,13 +67,16 @@ namespace Belle2 {
     {return m_LeadingParticlePDGCode;};
 
 
+    bool doesIntersect(EKLMStripHit *, CLHEP::Hep3Vector &);
 
+    double getLightPropagationLength(CLHEP::Hep3Vector &);
 
   private:
 
     double m_NumberPhotoElectrons;
     int m_LeadingParticlePDGCode;
     double m_Time;
+    double m_LightPropagationLength;
 
     ClassDef(EKLMStripHit, 1);
 

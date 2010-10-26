@@ -38,7 +38,6 @@ namespace Belle2 {
     virtual ~EKLMHitBase() {};
 
     virtual void Print();
-    virtual void Draw();
 
     inline void setName(std::string name)
     {m_Name = name;}

@@ -15,6 +15,7 @@
 #include <TObject.h>
 
 #include  <eklm/eklmhit/EKLMStripHit.h>
+#include  <eklm/eklmhit/EKLMHit2d.h>
 #include  "globals.hh"
 
 #include <string>
@@ -48,11 +49,13 @@ namespace Belle2 {
 
 
 
+    void create2dHits();
+
   private:
 
 
     std::vector<EKLMStripHit*> m_stripHitVector;
-    //    std::vector<EKLM2dHit*> m_hit2dVector;
+    std::vector<EKLMHit2d*> m_hit2dVector;
 
     ClassDef(EKLMSectorHit, 1);
 

@@ -42,20 +42,5 @@ void EKLMHitBase::Print()
   INFO("Not implemented yet");
 }
 
-void EKLMHitBase::Draw()
-{
-  // buggy
 
-  G4VVisManager* pVVisManager = G4VVisManager::GetConcreteInstance();
-  if (pVVisManager) {
-    G4Colour colour(1., 1., 1.);
-    G4VisAttributes attribs(colour);
-    G4Circle circle;
-    //    circle.SetPosition(G4Point3D(m_hitPosition.x(), m_hitPosition.y(), m_hitPosition.z()));
-    circle.SetScreenDiameter(2.0);
-    circle.SetFillStyle(G4Circle::filled);
-    circle.SetVisAttributes(attribs);
-    pVVisManager->Draw(circle);
-  }
-}
 

@@ -16,6 +16,7 @@
 
 #include  <eklm/eklmhit/EKLMStripHit.h>
 #include  "globals.hh"
+#include  "CLHEP/Vector/ThreeVector.h"
 
 #include <string>
 namespace Belle2 {
@@ -31,7 +32,10 @@ namespace Belle2 {
     EKLMHit2d(const char *);
 
     //! Constructor with name
-    EKLMHit2d(std::string &);
+    EKLMHit2d(const std::string &);
+
+    //! Constructor with two strips
+    EKLMHit2d(EKLMStripHit*, EKLMStripHit*);
 
     //! Destructor
     ~EKLMHit2d() {};
@@ -46,6 +50,14 @@ namespace Belle2 {
     inline EKLMStripHit* getYStripHit() const
     {return m_YStrip;}
 
+    inline void  setCrossPoint(CLHEP::Hep3Vector & point)
+    {m_crossPoint = point;}
+
+    void setChiSq();
+
+
+    inline double getChiSq() const
+    {return m_ChiSq;}
 
 
   private:
@@ -53,8 +65,11 @@ namespace Belle2 {
     EKLMStripHit * m_XStrip;
     EKLMStripHit * m_YStrip;
 
+    CLHEP::Hep3Vector m_crossPoint;
+
     ClassDef(EKLMHit2d, 1);
 
+    double m_ChiSq;
 
   };
 

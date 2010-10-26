@@ -28,6 +28,7 @@ namespace Belle2 {
 
     void readStripHits();
     void createSectorHits();
+    void create2dHits();
   private:
     std::vector <EKLMStripHit*> m_StripHitVector;
     std::vector <EKLMSectorHit*> m_SectorHitVector;

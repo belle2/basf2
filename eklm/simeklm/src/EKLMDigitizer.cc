@@ -22,6 +22,8 @@
 #include <framework/gearbox/GearDir.h>
 
 
+
+
 #include<geometry/geodetector/CreatorManager.h>
 #include<geometry/geodetector/CreatorBase.h>
 
@@ -93,7 +95,7 @@ namespace Belle2 {
       EKLMStripHit *stripHit = new EKLMStripHit();
       stripHit->setName(it->first);
       stripHit->setNumberPhotoElectrons(energyToPhotoElectrons(hitE, firstHitDist));
-      stripHit->setTime(lightPropagationTime(firstHitDist));
+      stripHit->setTime(hitTfirst + lightPropagationTime(firstHitDist));  // convert to ns!
       stripHit->setLeadingParticlePDGCode(leadingParticlePDG);
       m_HitVector.push_back(stripHit);
 
@@ -118,15 +120,14 @@ namespace Belle2 {
 
   int EKLMDigitizer::energyToPhotoElectrons(double energy , double dist, bool isMirrored)
   {
-
     // nearly arbitrary function. to be updated
-    return energy*20;
+    return static_cast<int>(energy*20);
   }
   double EKLMDigitizer::lightPropagationTime(double L)
   {
     // nearly arbitrary function. to be updated
     double speed = 17;// (cm/ns)   // should be accessible via xml!
-    return L*speed;
+    return L / speed;
   }
 
   void EKLMDigitizer::lightPropagationDistance(double &firstHitDist, double &secondHitDist, Hep3Vector pos)

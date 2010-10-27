@@ -5,70 +5,58 @@
   <Version>0</Version>
   <Creator>PXDBelleII</Creator>
   <Content xmlns:xi="http://www.w3.org/2001/XInclude">
-    <Rotation desc="Rotation of the hole PXD detector (should be the same as beampipe)" unit="mrad">22.0</Rotation>
-    <OffsetZ desc="The offset of the whole PXD in z with respect to the IP (should be the same as beampipe)" unit="mm">0.0</OffsetZ>
+  <!--
+    <Rotation desc="Rotation of the hole PXD detector (should be the same as beampipe)" unit="mrad">0</Rotation>
+    /-->
+    <Rotation desc="Rotation of the hole PXD detector (should be the same as beampipe)" unit="mrad">22</Rotation>
+    <OffsetZ unit="mm">0</OffsetZ>
     <Layers>
       <Layer id="PXD_Layer_1">
+        <Material>Vacuum</Material>
         <Phi0 desc="The starting angle of the layer in the r-phi plane" unit="deg">90.0</Phi0>
-        <Theta desc="The tilt angle of the layer with respect to the z axis" unit="deg">0.0</Theta>
-        <Radius desc="Radius of the layer" unit="mm">14.21</Radius>
-        <OffsetY desc="The offset of the center of the layer in y direction (Wind Mill structure)" unit="mm">-3.3</OffsetY>
-        <OffsetZ desc="The offset of the center of the layer in z direction" unit="mm">10.0</OffsetZ>
         <NumberOfLadders desc="Number of ladders in this layer">8</NumberOfLadders>
-                <PhiLadder desc="The rotation of the whole Ladder">180</PhiLadder>
         <Ladder desc="The silicon modules the detector is made of">
-         <NumberOfSensors>2</NumberOfSensors> 
-         <Sensors>
-              <Sensor id="PXD_Layer_1_Ladder_Sensor_0">
-              <SensorParameters>
+          <Material>Vacuum</Material>
+          <WPosition desc="The distance between interaction point and ladder (radius)" unit="mm">14</WPosition>
+          <UPosition desc="The offset of the center of the layer in Y direction (Wind Mill structure)" unit="mm">3.3</UPosition>
+          <Sensors>
+            <Sensor id="PXD_Layer_1_Ladder_Sensor_0">
               <xi:include href="PXDSensorBelleII.xml" xpointer="xpointer(//Sensor[@type=1]/*)"/>
-              </SensorParameters>
-              <Position>
-              <V desc="sensor position of sensor edge in minus V direction (local coordinate system of ladder)" unit="mm">-54</V>
-              </Position>
+              <!-- VPosition = -54mm + 0.5 * Silicon/Length /-->
+              <VPosition desc="sensor position of sensor edge in minus V direction (local coordinate system of ladder)" unit="mm">-20.0125</VPosition>
             </Sensor>
             <Sensor id="PXD_Layer_1_Ladder_Sensor_1">
-              <SensorParameters>
-                <xi:include href="PXDSensorBelleII.xml" xpointer="xpointer(//Sensor[@type=1]/*)"/>
-              </SensorParameters>
-              <Position>
-              <V desc="sensor position of sensor edge in minus V direction (local coordinate system of ladder)" unit="mm">14.025</V>
-              </Position>
+              <xi:include href="PXDSensorBelleII.xml" xpointer="xpointer(//Sensor[@type=1]/*)"/>
+              <!-- VPosition = 82mm - 0.5 * Silicon/Length /-->
+              <VPosition desc="sensor position of sensor edge in minus V direction (local coordinate system of ladder)" unit="mm">48.0125</VPosition>
+              <ReflectZ>1</ReflectZ>
             </Sensor>
           </Sensors>
         </Ladder>
       </Layer>
       <Layer id="PXD_Layer_2">
+        <Material>Vacuum</Material>
         <Phi0 desc="The starting angle of the layer in the r-phi plane" unit="deg">90.0</Phi0>
-        <Theta desc="The tilt angle of the layer with respect to the z axis" unit="deg">0.0</Theta>
-        <Radius desc="Radius of the layer" unit="mm">22.21</Radius>
-        <OffsetY desc="The offset of the center of the layer in y direction (Wind Mill structure)" unit="mm">-3.3</OffsetY>
-        <OffsetZ desc="The offset of the center of the layer in z direction" unit="mm">23.86</OffsetZ>
         <NumberOfLadders desc="Number of ladders in this layer">12</NumberOfLadders>
-        <PhiLadder desc="The rotation of the whole Ladder">0</PhiLadder>
         <Ladder desc="The silicon modules the detector is made of">
-          <NumberOfSensors>2</NumberOfSensors>
+          <Material>Vacuum</Material>
+          <WPosition desc="The distance between interaction point and ladder (radius)" unit="mm">22</WPosition>
+          <UPosition desc="The offset of the center of the layer in Y direction (Wind Mill structure)" unit="mm">3.3</UPosition>
           <Sensors>
-         <Sensor id="PXD_Layer_2_Ladder_Sensor_0">
-            <Position>
-              <V desc="sensor position of sensor edge in minus V direction (local coordinate system of ladder)" unit="mm">-66</V>
-            </Position>
-            <SensorParameters>
-                <xi:include href="PXDSensorBelleII.xml" xpointer="xpointer(//Sensor[@type=2]/*)"/>
-                          </SensorParameters>
-          </Sensor>
-          <Sensor id="PXD_Layer_2_Ladder_Sensor_1">
-            <Position>
-              <V desc="sensor position of sensor edge in minus V direction (local coordinate system of ladder)" unit="mm">19.025</V>
-            </Position>
-            <SensorParameters>
-                <xi:include href="PXDSensorBelleII.xml" xpointer="xpointer(//Sensor[@type=2]/*)"/>
-                     </SensorParameters>
-          </Sensor>
+            <Sensor id="PXD_Layer_2_Ladder_Sensor_0">
+              <!-- VPosition = -66mm + 0.5 * SiliconLength /-->
+              <VPosition desc="sensor position of sensor edge in minus V direction (local coordinate system of ladder)" unit="mm">-23.5125</VPosition>
+              <xi:include href="PXDSensorBelleII.xml" xpointer="xpointer(//Sensor[@type=2]/*)"/>
+            </Sensor>
+            <Sensor id="PXD_Layer_2_Ladder_Sensor_1">
+              <xi:include href="PXDSensorBelleII.xml" xpointer="xpointer(//Sensor[@type=2]/*)"/>
+              <!-- VPosition = 104mm - 0.5 * Silicon/Length /-->
+              <VPosition desc="sensor position of sensor edge in minus V direction (local coordinate system of ladder)" unit="mm">61.5125</VPosition>
+              <ReflectZ>1</ReflectZ>
+            </Sensor>
           </Sensors>
         </Ladder>
       </Layer>
     </Layers>
   </Content>
 </ParamSet>
-

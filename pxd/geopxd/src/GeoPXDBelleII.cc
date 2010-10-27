@@ -8,8 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#define B2GEOM_BASF2
-
 #include <pxd/geopxd/GeoPXDBelleII.h>
 #include <pxd/geopxd/B2GeomPXDLayer.h>
 #include <pxd/simpxd/PXDSensitiveDetector.h>
@@ -77,7 +75,6 @@ void GeoPXDBelleII::create(GearDir& content)
 
   //Get number of layers
   int nLayer = content.getNumberNodes("Layers/Layer");
-
 
   for (int iLayer = 1; iLayer <= nLayer; ++iLayer) {
 

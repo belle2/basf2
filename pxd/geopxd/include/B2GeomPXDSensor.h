@@ -8,14 +8,14 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifdef B2GEOM_BASF2
 #include <framework/gearbox/GearDir.h>
 #include <framework/datastore/Units.h>
 #include <boost/format.hpp>
-#endif
+#include <pxd/geopxd/B2GeomVolume.h>
 
 #include <string>
 #include "TGeoMaterial.h"
+#include "TROOT.h"
 #include "TGeoMedium.h"
 #include "TGeoManager.h"
 #include "TGeoMatrix.h"
@@ -30,30 +30,52 @@
 
 using namespace std;
 
-#ifdef B2GEOM_BASF2
 namespace Belle2 {
   class GearDir;
-#endif
 
-  class B2GeomPXDSensor {
+  class B2GeomPXDSensorActive : public B2GeomVolume {
+  private:
+    string path;
+    Int_t iLayer;
+    Int_t iLadder;
+    Int_t iSensor;
+  public:
+    B2GeomPXDSensorActive(Int_t iLay, Int_t iLad, Int_t iSen);
+    Bool_t init(GearDir& content);
+    Bool_t make();
+  };
+
+  class B2GeomPXDSensorThinned : public B2GeomVolume {
+  private:
+    string path;
+    Int_t iLayer;
+  public:
+    B2GeomPXDSensorThinned(Int_t iLay);
+    Bool_t init(GearDir& content);
+    Bool_t make();
+  };
+
+  class B2GeomPXDSensorSilicon: public B2GeomVolume {
+  private:
+    string path;
+    Int_t iLayer;
+    Int_t iLadder;
+    Int_t iSensor;
+    B2GeomPXDSensorActive* volActive;
+    B2GeomPXDSensorThinned* volThinned;
+  public:
+    B2GeomPXDSensorSilicon(Int_t iLay, Int_t iLad, Int_t iSen);
+    Bool_t init(GearDir& content);
+    Bool_t make();
+  };
+
+  class B2GeomPXDSensor : public B2GeomVolume {
   private:
     //! path of this Sensor
     string path;
 
-    //! TGeoVolumeAssembly which contains all parts of this sensor
-    TGeoVolume* volPXDSensor;
-
     //! Volumes contained in the sensor
-    TGeoVolume* volSilicon;
-    TGeoVolume* volDEPFET;
-    TGeoVolume* volActiveSensor;
-    TGeoVolume* volSwitcher;
-    TGeoVolume* volAir;
-
-    //! Mediums contained in the sensor
-    TGeoMedium* medAir;
-    TGeoMedium* medDEPFET;
-    TGeoMedium* medPXD_Silicon;
+    B2GeomPXDSensorSilicon* volSilicon;
 
     // Parameters
     //! Layer number of this sensor
@@ -63,79 +85,14 @@ namespace Belle2 {
     //! Number of this sensor
     Int_t iSensor;
 
-    //! Sensor type (1 = Laye1, 2 = Layer2, 9x = active sensor only)
-    Int_t iSensorType;
-
-    // box which contains whole sensor
-    Double_t fSensorWidth;
-    Double_t fSensorThick;
-    Double_t fSensorLength;
-
-    // box of active DEPFET area
-    Double_t fLengthActive;
-    Double_t fWidthActive;
-    Double_t fThickActive;
-
-
-    // distances of active area from borders of silicon
-    Double_t fVDistanceActiveFromInnerEdge;
-    Double_t fUDistanceActiveFromInnerEdge;
-
-    // distances of thinned volume from borders of silicon
-    Double_t fVDistanceThinnedFromOuterEdge;
-    Double_t fVDistanceThinnedFromInnerEdge;
-    Double_t fUDistanceThinnedFromOuterEdge;
-    Double_t fUDistanceThinnedFromInnerEdge;
-
-    // angle at the borders of thinned volume
-    Double_t fAlphaThinned;
-
-    // box of depfet silicon
-    Double_t fLengthSilicon;
-    Double_t fWidthSilicon;
-    Double_t fThickSilicon;
-
-
-    // Methods to place components
-    void putDEPFET();
-    void putSilicon();
-    void putActiveSiliconOnly();
-    void putSwitchers();
-
   public:
     B2GeomPXDSensor();
     B2GeomPXDSensor(Int_t iLayer , Int_t iLadder, Int_t iSensor);
     ~B2GeomPXDSensor();
 
-#ifdef B2GEOM_BASF2
     Bool_t init(GearDir& content);
-#else
-    Bool_t init();
-#endif
     Bool_t make();
-
-    TGeoVolume* getVol() {
-      /*
-      volPXDSensor =  new TGeoVolumeAssembly("bla");
-      char nameLayer[200];
-      TGeoMaterial* matVacuum = new TGeoMaterial("Vacuum", 0, 0, 0);
-      TGeoMedium* medLayer = new TGeoMedium("medLayer", 1, matVacuum);
-      sprintf(nameLayer, "Layer_%i", iLayer);
-      TGeoVolume* layer = gGeoManager->MakeBox(nameLayer, medLayer, 0.2, 0.2, 0.2);
-      return layer;
-      //volPXDSensor->AddNode(layer, 1, new TGeoTranslation(0,0,0));
-      */
-      return volPXDSensor;
-    }
-    Double_t getLengthSilicon();
-    //! returns TGeoHMatrix which moves the sensor to the center of the surface
-    TGeoHMatrix getSurfaceCenterPosition();
-    //! returns TGeoHMatrix which points from the sensor(0,0,0) to the active_sensor(0,0,0)
-    TGeoHMatrix getActiveSensorCenter();
-
   };
 
-#ifdef B2GEOM_BASF2
 }
-#endif
 #endif

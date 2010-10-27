@@ -8,14 +8,12 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifdef B2GEOM_BASF2
 #include <pxd/geopxd/B2GeomPXDLadder.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/datastore/Units.h>
+#include <pxd/geopxd/B2GeomVolume.h>
 #include <boost/format.hpp>
-#else
-#include "B2GeomPXDLadder.h"
-#endif
+
 
 #include "TGeoMaterial.h"
 #include "TGeoMedium.h"
@@ -33,18 +31,13 @@
 
 using namespace std;
 
-#ifdef B2GEOM_BASF2
 namespace Belle2 {
 
   class GearDir;
-#endif
-  class B2GeomPXDLayer {
+
+  class B2GeomPXDLayer : public B2GeomVolume {
 
   private:
-
-#ifdef B2GEOM_BASF2
-    GearDir layerContent;
-#endif
     //! path of this Layer
     string path;
 
@@ -54,41 +47,17 @@ namespace Belle2 {
     Int_t nLadders;
     //! Rotation of whole PXD about z axis
     Double_t fPhi0;
-    //! rotation of the whole ladder (ladders of layer 1 are upside down)
-    Double_t fPhiLadder;
-    //! Distance from origin
-    Double_t fRadius;
     //! Rotation about z axis after moving to fRadius
     vector<Double_t> fPhi;
-    //! Offset in z direction
-    Double_t fLadderOffsetZ;
-    //! Offset in y direction (wind mill structure)
-    Double_t fLadderOffsetY;
-    //! which layer is in which half shell?
-    vector<Int_t> iHalfShell;
-
-    vector<B2GeomPXDLadder*> b2gPXDLadders;
-    TGeoVolumeAssembly* volPXDLayer;
-
-    void putLadder(Int_t iLadder);
-
+    B2GeomPXDLadder** b2gPXDLadders;
 
   public:
     B2GeomPXDLayer();
     B2GeomPXDLayer(Int_t iLay);
     ~B2GeomPXDLayer();
-#ifdef B2GEOM_BASF2
     Bool_t init(GearDir& content);
-#else
-    Bool_t init();
-#endif
     Bool_t make();
-    TGeoVolume* getVol() {
-      return volPXDLayer;
 
-    }
   };
-#ifdef B2GEOM_BASF2
 }
-#endif
 #endif

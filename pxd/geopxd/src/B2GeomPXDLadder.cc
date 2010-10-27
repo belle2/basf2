@@ -8,15 +8,11 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#define B2GEOM_BASF2
-
-#ifdef B2GEOM_BASF2
 #include <pxd/geopxd/B2GeomPXDLadder.h>
+
 using namespace Belle2;
 using namespace boost;
-#else
-#include "B2GeomPXDLadder.h"
-#endif
+
 using namespace std;
 
 B2GeomPXDLadder::B2GeomPXDLadder()
@@ -37,57 +33,41 @@ B2GeomPXDLadder::~B2GeomPXDLadder()
 {
 }
 
-#ifdef B2GEOM_BASF2
 Bool_t B2GeomPXDLadder::init(GearDir& content)
 {
-  ladderContent = GearDir(content);
+  //printf("B2GeomPXDLadder::init start (Lay:%i, Lad:%i)\n", iLayer, iLadder);
+  GearDir ladderContent(content);
   ladderContent.append("Ladder/");
-  nSensors = int(ladderContent.getParamNumValue("NumberOfSensors"));
-  b2gPXDSensors = new B2GeomPXDSensor*[nSensors];
-  fVPosition.resize(nSensors);
-  for (Int_t iSensor = 0; iSensor < nSensors; iSensor++) {
-    GearDir sensorPositionContent(ladderContent);
-    sensorPositionContent.append((format("Sensors/Sensor[@id=\'PXD_Layer_%1%_Ladder_Sensor_%2%\']/Position/") % iLayer % iSensor).str());
-    fVPosition[iSensor] = sensorPositionContent.getParamLength("V");
-  }
 
-  TGeoMaterial* matVacuum = new TGeoMaterial("Vacuum", 0, 0, 0);
-  medAir = new TGeoMedium("medAir", 1, matVacuum);
+  initBasicParameters(ladderContent);
+
+  // get number of sensors
+  GearDir sensorsContent(ladderContent);
+  sensorsContent.append("/Sensors/Sensor");
+  nSensors = int(sensorsContent.getNumberNodes());
+
+  b2gPXDSensors = new B2GeomPXDSensor*[nSensors];
+  for (Int_t iSensor = 0; iSensor < nSensors; iSensor++) {
+    b2gPXDSensors[iSensor] = new B2GeomPXDSensor(iLayer, iLadder, iSensor);
+    b2gPXDSensors[iSensor]->init(ladderContent);
+  }
+  //printf("B2GeomPXDLadder::init stop\n");
   return true;
 }
-#else
-Bool_t B2GeomPXDLadder::init()
-{
 
-}
-#endif
 
 Bool_t B2GeomPXDLadder::make()
 {
-  volPXDLadder = new TGeoVolumeAssembly(path.c_str());
-  putSensors();
+  //printf("B2GeomPXDLadder::make start (Lay:%i, Lad:%i)\n", iLayer, iLadder);
+  tVolume = new TGeoVolumeAssembly(path.c_str());
+  for (int iSensor = 0; iSensor < nSensors; ++iSensor) {
+    b2gPXDSensors[iSensor]->make();
+    tVolume->AddNode(b2gPXDSensors[iSensor]->getVol(), 1, b2gPXDSensors[iSensor]->getPosition());
+  }
+  //printf("B2GeomPXDLadder::make stop\n");
   return true;
 }
 
-void B2GeomPXDLadder::putSensors()
-{
 
-  for (int iSensor = 0; iSensor < nSensors; ++iSensor) {
-    b2gPXDSensors[iSensor] = new B2GeomPXDSensor(iLayer, iLadder, iSensor);
-#ifdef B2GEOM_BASF2
-    b2gPXDSensors[iSensor]->init(ladderContent);
-#else
-    b2gPXDSensors[iSensor]->init();
-#endif
-    b2gPXDSensors[iSensor]->make();
-    TGeoTranslation tra(0.0, 0.0, fVPosition[iSensor] + 0.5 * b2gPXDSensors[iSensor]->getLengthSilicon());
-    TGeoHMatrix hmaHelp;
-    hmaHelp = gGeoIdentity;
-    hmaHelp = b2gPXDSensors[iSensor]->getSurfaceCenterPosition() * hmaHelp;
-    hmaHelp = tra * hmaHelp;
-
-    volPXDLadder->AddNode(b2gPXDSensors[iSensor]->getVol(), 1, new TGeoHMatrix(hmaHelp));
-  }
-}
 
 

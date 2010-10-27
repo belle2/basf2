@@ -1,9 +1,13 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 from SCons.Script import *
-import os, platform
+import os
+import platform
 from distutils import sysconfig
 
 
-def CheckEnvVar(conf, var, text = None):
+def CheckEnvVar(conf, var, text=None):
     """check for the existance of an environment variable"""
 
     if text:
@@ -19,30 +23,30 @@ def CheckConfigTool(conf, tool):
     """check for the existance of a tool"""
 
     conf.Message('Checking for %s...' % tool)
-    result, version = conf.TryAction('%s --version' % tool)
+    (result, version) = conf.TryAction('%s --version' % tool)
     conf.Result(result)
     return result
 
 
-def CheckPackage(conf, package, text = None):
+def CheckPackage(conf, package, text=None):
     """check for the existance of a package via the pkg-config tool"""
 
     if not text:
         text = package
     conf.Message('Checking for %s...' % text)
-    result, output = conf.TryAction('pkg-config --exists %s' % package)
+    (result, output) = conf.TryAction('pkg-config --exists %s' % package)
     conf.Result(result)
     return result
 
 
-def CheckFile(conf, dir, text = None):
+def CheckFile(conf, dir, text=None):
     """check for the existance a file"""
 
     if text:
         conf.Message('Checking for %s...' % text)
     else:
         conf.Message('Checking for directory %s...' % dir)
-    if (conf.env.FindFile(dir, '.') == None):
+    if conf.env.FindFile(dir, '.') == None:
         result = 0
     else:
         result = 1
@@ -73,7 +77,8 @@ def configure_system(conf):
 
     # python
     python_version = platform.python_version_tuple()
-    conf.env['PYTHON_LIBS'] = ['python%s.%s' % (python_version[0], python_version[1])]
+    conf.env['PYTHON_LIBS'] = ['python%s.%s' % (python_version[0],
+                               python_version[1])]
 
     # xml
     if not conf.CheckConfigTool('xml2-config'):
@@ -84,16 +89,18 @@ def configure_system(conf):
     # graphics packages: OpenGL, OpenSceneGraph, Qt
     conf.env['HAS_GRAPHICS'] = False
     conf.env['GRAPHICS_LIBS'] = []
-    graphics_packages = 'gl openscenegraph QtCore QtOpenGL QtDesignerComponents QtGui'
+    graphics_packages = \
+        'gl openscenegraph QtCore QtOpenGL QtDesignerComponents QtGui'
     if conf.CheckPackage(graphics_packages, 'graphics packages'):
         conf.env['HAS_GRAPHICS'] = True
-        conf.env.ParseConfig('pkg-config %s --cflags --libs-only-L' % graphics_packages)
-        graphics_env = Environment(ENV = os.environ)
+        conf.env.ParseConfig('pkg-config %s --cflags --libs-only-L'
+                             % graphics_packages)
+        graphics_env = Environment(ENV=os.environ)
         graphics_env.ParseConfig('pkg-config %s --libs' % graphics_packages)
         conf.env['GRAPHICS_LIBS'] = graphics_env['LIBS']
 
     conf.env.ParseConfig('xml2-config --cflags')
-    xml_env = Environment(ENV = os.environ)
+    xml_env = Environment(ENV=os.environ)
     xml_env.ParseConfig('xml2-config --libs')
     conf.env['XML_LIBS'] = xml_env['LIBS']
 
@@ -123,29 +130,47 @@ def configure_externals(conf):
         return True
 
     # boost
-    conf.env.Append(CPPPATH = os.path.join(conf.env['EXTINCDIR'], 'boost'))
+    conf.env.Append(CPPPATH=os.path.join(conf.env['EXTINCDIR'], 'boost'))
 
     # CLHEP
-    conf.env.Append(CPPPATH = os.path.join(conf.env['EXTINCDIR'], 'CLHEP'))
+    conf.env.Append(CPPPATH=os.path.join(conf.env['EXTINCDIR'], 'CLHEP'))
 
     # geant4
-    conf.env.Append(CPPPATH = os.path.join(conf.env['EXTINCDIR'], 'geant4'))
-    conf.env['GEANT4_LIBS'] = ['G4digits_hits', 'G4error_propagation', 'G4event',
-                               'G4FR', 'G4geometry', 'G4global',
-                               'G4graphics_reps', 'G4intercoms', 'G4interfaces',
-                               'G4materials', 'G4modeling', 'G4parmodels',
-                               'G4particles', 'G4physicslists',
-                               'G4processes', 'G4RayTracer', 'G4readout',
-                               'G4run', 'G4track', 'G4tracking', 'G4Tree',
-                               'G4visHepRep', 'G4vis_management', 'G4visXXX',
-                               'G4VRML']
+    conf.env.Append(CPPPATH=os.path.join(conf.env['EXTINCDIR'], 'geant4'))
+    conf.env['GEANT4_LIBS'] = [
+        'G4digits_hits',
+        'G4error_propagation',
+        'G4event',
+        'G4FR',
+        'G4geometry',
+        'G4global',
+        'G4graphics_reps',
+        'G4intercoms',
+        'G4interfaces',
+        'G4materials',
+        'G4modeling',
+        'G4parmodels',
+        'G4particles',
+        'G4physicslists',
+        'G4processes',
+        'G4RayTracer',
+        'G4readout',
+        'G4run',
+        'G4track',
+        'G4tracking',
+        'G4Tree',
+        'G4visHepRep',
+        'G4vis_management',
+        'G4visXXX',
+        'G4VRML',
+        ]
 
     # root
-    conf.env.Append(CPPPATH = os.path.join(conf.env['EXTINCDIR'], 'root'))
+    conf.env.Append(CPPPATH=os.path.join(conf.env['EXTINCDIR'], 'root'))
 
     conf.env['ROOT_LIBS'] = conf.env['ROOT_GLIBS'] = []
     if conf.CheckConfigTool('root-config'):
-        root_env = Environment(ENV = os.environ)
+        root_env = Environment(ENV=os.environ)
         root_env.ParseConfig('root-config --libs')
         conf.env['ROOT_LIBS'] = root_env['LIBS']
         root_env.ParseConfig('root-config --glibs')
@@ -156,7 +181,7 @@ def configure_externals(conf):
         return False
 
     # genfit
-    conf.env.Append(CPPPATH = os.path.join(conf.env['EXTINCDIR'], 'genfit'))
+    conf.env.Append(CPPPATH=os.path.join(conf.env['EXTINCDIR'], 'genfit'))
 
     return True
 
@@ -166,7 +191,8 @@ def check_externals(conf):
 
     # boost
     if not conf.CheckFile('externals/include/boost/version.hpp', 'boost'):
-        if not conf.CheckFile('externals/boost/bootstrap.sh', 'boost source code'):
+        if not conf.CheckFile('externals/boost/bootstrap.sh',
+                              'boost source code'):
             print 'boost is missing'
             print '-> add and build the externals package'
             return False
@@ -198,7 +224,8 @@ def check_externals(conf):
             return False
 
     # root
-    root_target = (len(BUILD_TARGETS) == 1) and (BUILD_TARGETS[0] in ['externals', 'externals.root'])
+    root_target = len(BUILD_TARGETS) == 1 and BUILD_TARGETS[0] in ['externals'
+            , 'externals.root']
     if not conf.CheckFile('externals/include/root/RVersion.h', 'root'):
         if not conf.CheckFile('externals/root/configure', 'root source code'):
             print 'root is missing'
@@ -223,18 +250,22 @@ def check_externals(conf):
     return True
 
 
-
 def configure(env):
     """configure the environment"""
 
-    conf = Configure(env, custom_tests = {'CheckEnvVar' : CheckEnvVar,
-                                          'CheckConfigTool' : CheckConfigTool,
-                                          'CheckPackage' : CheckPackage,
-                                          'CheckFile' : CheckFile})
+    conf = Configure(env, custom_tests={
+        'CheckEnvVar': CheckEnvVar,
+        'CheckConfigTool': CheckConfigTool,
+        'CheckPackage': CheckPackage,
+        'CheckFile': CheckFile,
+        })
 
-    if (not configure_belle2(conf)) or (not configure_system(conf)) or (not configure_externals(conf)):
+    if not configure_belle2(conf) or not configure_system(conf) \
+        or not configure_externals(conf):
         return False
 
     env = conf.Finish()
 
     return True
+
+

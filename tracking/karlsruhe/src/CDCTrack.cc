@@ -1,0 +1,114 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                   *
+ * Copyright(C) 2010 - Belle II Collaboration                       *
+ *                                    *
+ * Author: The Belle II Collaboration                     *
+ * Contributors: Oksana Brovchenko                          *
+ *                                    *
+ * This software is provided "as is" without any warranty.          *
+**************************************************************************/
+
+
+#include "../include/CDCTrack.h"
+
+
+using namespace std;
+using namespace Belle2;
+
+ClassImp(CDCTrack)
+
+CDCTrack::CDCTrack()
+{
+}
+
+CDCTrack::CDCTrack(int Id)
+{
+  m_Id = Id;
+
+  //some start values
+  m_nSegments = 0;
+  m_nHits = 0;
+  m_direction.SetX(0);
+  m_direction.SetY(0);
+  m_direction.SetZ(0);
+
+}
+
+CDCTrack::~CDCTrack()
+{
+}
+
+void CDCTrack::addSegment(CDCSegment aSegment)
+{
+  m_Segments.push_back(aSegment);
+  for (int i = 0; i < aSegment.getNHits(); i++) {
+    m_TrackHits.push_back(aSegment.getTrackHits().at(i));
+  }
+  update();
+}
+
+void CDCTrack::addTrackHit(CDCTrackHit aTrackHit)
+{
+  m_TrackHits.push_back(aTrackHit);
+  update();
+}
+
+
+void CDCTrack::update()
+{
+  m_nSegments = m_Segments.size();
+  m_nHits = m_TrackHits.size();
+
+//Calculate the direction from the directions of axial segments
+  for (int i = 0; i < m_nSegments; i++) {
+    if (m_Segments.at(i).getSuperlayerId() % 2 != 0) {
+      m_direction = m_direction + m_Segments.at(i).getDirection();
+    }
+  }
+  //double norm = m_direction.Mag();
+  //m_direction.SetX( m_direction.x()/norm);
+  //m_direction.SetY( m_direction.y()/norm);
+  //m_direction.SetZ( m_direction.z()/norm);
+
+//Assign correct innermost and outermost hits
+  int min = 10;
+  int max = 0;
+  int max_index = 0;
+  int min_index = 0;
+
+  for (unsigned i = 0; i < m_TrackHits.size(); i++) {
+    if (m_TrackHits.at(i).getSuperlayerId() > max && m_TrackHits.at(i).getSuperlayerId() % 2 != 0) {
+      max = m_TrackHits.at(i).getSuperlayerId() ;
+      max_index = i;
+    }
+    if (m_TrackHits.at(i).getSuperlayerId() < min && m_TrackHits.at(i).getSuperlayerId() % 2 != 0) {
+      min = m_TrackHits.at(i).getSuperlayerId() ;
+      min_index = i;
+    }
+  }
+  m_innerMostHit = m_TrackHits.at(min_index);
+  m_outerMostHit = m_TrackHits.at(max_index);
+
+//Assign correct innermost and outermost segments
+  int minSL = 10;
+  int maxSL = 0;
+  int max_indexSeg = 0;
+  int min_indexSeg = 0;
+
+  for (int i = 0; i < m_nSegments; i++) {
+    if (m_Segments.at(i).getSuperlayerId() > maxSL && m_Segments.at(i).getSuperlayerId() % 2 != 0) {
+      maxSL = m_Segments.at(i).getSuperlayerId() ;
+      max_indexSeg = i;
+    }
+    if (m_Segments.at(i).getSuperlayerId() < minSL && m_Segments.at(i).getSuperlayerId() % 2 != 0) {
+      minSL = m_Segments.at(i).getSuperlayerId() ;
+      min_indexSeg = i;
+    }
+  }
+  m_innerMostSegment = m_Segments.at(min_indexSeg);
+  m_outerMostSegment = m_Segments.at(max_indexSeg);
+
+
+
+}
+

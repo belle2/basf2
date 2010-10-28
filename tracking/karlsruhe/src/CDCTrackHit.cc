@@ -31,7 +31,8 @@ CDCTrackHit::CDCTrackHit(HitCDC&hitcdc)
 {
   m_layerId = hitcdc.getLayerId();
   m_wireId = hitcdc.getWireId();
-  m_driftLength = hitcdc.getDriftLength();
+  m_leftDriftLength = hitcdc.getLeftDriftLength();
+  m_rightDriftLength = hitcdc.getRightDriftLength();
   m_charge = hitcdc.getCharge();
 }
 

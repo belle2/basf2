@@ -100,7 +100,7 @@ genfit: include/genfit/RKTrackRep.h
 # genfit build command
 include/genfit/RKTrackRep.h:
 	@echo "building genfit"
-	@cd include; mkdir genfit; cd genfit; ln -s . genfit; cd ..; cd ..
 	@cd genfit; scons
-	@cp genfit/lib/* $(EXTLIBDIR)/
+	@cp genfit/lib/* $(EXTLIBDIR)/ # copy the libraries
+	@cp -r genfit/include/* $(EXTINCDIR)/ # copy the installed files
 

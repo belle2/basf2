@@ -218,7 +218,8 @@ void CDCTrackingModule::event()
       Hitsfile << std::setprecision(5) << aTrackHit->getWirePosX() / mm << " \t"
       <<  aTrackHit->getWirePosY() / mm << " \t"
       <<  aTrackHit->getWirePosZ() / mm << " \t"
-      << aTrackHit->getDriftLength() / mm << endl;
+      << aTrackHit->getLeftDriftLength() / mm << " \t"
+      << aTrackHit->getRightDriftLength() / mm << endl;
 
       ConfHitsfile << std::setprecision(5) << aTrackHit->getConformalX() / mm << " \t"
       <<  aTrackHit->getConformalY() / mm << endl;

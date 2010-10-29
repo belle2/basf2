@@ -58,32 +58,8 @@ void CDCTrackHit::setSuperlayerId()
     m_superlayerId = 1;
   }
 
-  else if (m_layerId >= 8 && m_layerId < 14) {
-    m_superlayerId = 2;
-  }
-
-  else if (m_layerId >= 14 && m_layerId < 20) {
-    m_superlayerId = 3;
-  }
-
-  else if (m_layerId >= 20 && m_layerId < 26) {
-    m_superlayerId = 4;
-  }
-
-  else if (m_layerId >= 26 && m_layerId < 32) {
-    m_superlayerId = 5;
-  }
-
-  else if (m_layerId >= 32 && m_layerId < 38) {
-    m_superlayerId = 6;
-  }
-
-  else if (m_layerId >= 38 && m_layerId < 44) {
-    m_superlayerId = 7;
-  }
-
-  else if (m_layerId >= 44 && m_layerId < 50) {
-    m_superlayerId = 8;
+  else if (m_layerId >= 8 && m_layerId < 50) {
+    m_superlayerId = (m_layerId - 2) / 6 + 1 ;
   }
 
   else if (m_layerId >= 50 && m_layerId < 58) {

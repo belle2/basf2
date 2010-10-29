@@ -12,7 +12,6 @@
 #define CDCTRACK_H
 
 #include "TObject.h"
-#include <tracking/karlsruhe/HitCDC.h>
 #include <tracking/karlsruhe/CDCTrackHit.h>
 #include <tracking/karlsruhe/CDCSegment.h>
 

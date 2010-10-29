@@ -1,0 +1,243 @@
+Only in .: config.mk
+diff -rup ../9.1/configure ./configure
+--- ../9.1/configure	2008-02-22 19:54:23.000000000 +0100
++++ ./configure	2010-10-26 15:26:23.000000000 +0200
+@@ -54,7 +54,7 @@ check_arguments () {
+ check_arguments $* 
+ 
+ # CLHEP_PATH
+-: ${CLHEP_PATH:=${PATH_TO_EXTERNAL}/clhep/${CLHEP_VERSION}/${LCGPLATFORM}}  #set PATH if it is not defined
++: ${CLHEP_PATH:=${BELLE2_LOCAL_DIR}/externals/CLHEP  #set PATH if it is not defined
+ [ -d ${CLHEP_PATH} ] || { echo "Directory ${CLHEP_PATH} does not exist. Exiting!" ; exit 1; }
+ 
+ echo  "CLHEP_PATH is ${CLHEP_PATH}"
+@@ -62,9 +62,9 @@ echo  "Compilation mode is ${COMPMODE}"
+ 
+ #Package-specific:>
+ 
+-INCLUDE_CLHEP_PATH=${CLHEP_PATH}/include
++INCLUDE_CLHEP_PATH=${BELLE2_LOCAL_DIR}/externals/include
+ INCLUDE_CLHEP=" -I${INCLUDE_CLHEP_PATH} "
+-LIBS_CLHEP_PATH=${CLHEP_PATH}/lib
++LIBS_CLHEP_PATH=${BELLE2_LOCAL_DIR}/externals/lib/${BELLE2_SUBDIR}
+ LIBS_CLHEP=" -lCLHEP -L${LIBS_CLHEP_PATH} "
+ LIBS_CLHEP_STATIC=" ${LIBS_CLHEP_PATH}/libCLHEP.a "
+ echo "Assuming libCLHEP* reside in ${LIBS_CLHEP_PATH}"
+Only in .: configure~
+diff -rup ../9.1/EvtGen/EvtGen.hh ./EvtGen/EvtGen.hh
+--- ../9.1/EvtGen/EvtGen.hh	2005-06-15 16:37:33.000000000 +0200
++++ ./EvtGen/EvtGen.hh	2010-10-26 15:19:46.000000000 +0200
+@@ -31,6 +31,8 @@
+ #include "EvtGenBase/EvtPDL.hh"
+ #include "CLHEP/Vector/LorentzVector.h"
+ 
++using namespace CLHEP;
++
+ class EvtParticle;
+ class EvtRandomEngine;
+ class EvtVector4R;
+diff -rup ../9.1/EvtGenModels/EvtBtoXsgammaFermiUtil.hh ./EvtGenModels/EvtBtoXsgammaFermiUtil.hh
+--- ../9.1/EvtGenModels/EvtBtoXsgammaFermiUtil.hh	2003-10-02 19:26:50.000000000 +0200
++++ ./EvtGenModels/EvtBtoXsgammaFermiUtil.hh	2010-10-26 15:08:21.000000000 +0200
+@@ -25,6 +25,8 @@
+ 
+ #include "CLHEP/Matrix/Vector.h"
+ 
++using namespace CLHEP;
++
+ class EvtBtoXsgammaFermiUtil {
+ 
+ //--------------------
+diff -rup ../9.1/EvtGenModels/EvtBtoXsgammaKagan.hh ./EvtGenModels/EvtBtoXsgammaKagan.hh
+--- ../9.1/EvtGenModels/EvtBtoXsgammaKagan.hh	2003-10-02 19:26:50.000000000 +0200
++++ ./EvtGenModels/EvtBtoXsgammaKagan.hh	2010-10-26 15:06:16.000000000 +0200
+@@ -26,6 +26,8 @@
+ #include "CLHEP/Matrix/Vector.h"
+ #include "EvtGenModels/EvtBtoXsgammaAbsModel.hh"
+ 
++using namespace CLHEP;
++
+ class EvtBtoXsgammaKagan : public EvtBtoXsgammaAbsModel {
+ 
+ public:
+diff -rup ../9.1/EvtGenModels/EvtHepRandomEngine.hh ./EvtGenModels/EvtHepRandomEngine.hh
+--- ../9.1/EvtGenModels/EvtHepRandomEngine.hh	2005-11-20 23:02:37.000000000 +0100
++++ ./EvtGenModels/EvtHepRandomEngine.hh	2010-10-26 15:15:12.000000000 +0200
+@@ -24,10 +24,12 @@
+ #ifndef EVTHEPRANDOMENGINE_HH
+ #define EVTHEPRANDOMENGINE_HH
+ 
+-#include "CLHEP/config/CLHEP.h"
++//#include "CLHEP/config/CLHEP.h"
+ #include "CLHEP/Random/RandomEngine.h"
+ #include "EvtGenBase/EvtRandomEngine.hh"
+ 
++using namespace CLHEP;
++
+ class EvtHepRandomEngine:public  HepRandomEngine, public EvtRandomEngine  {
+ 
+ public:
+@@ -38,14 +40,14 @@ public:
+ 
+   virtual double random();
+ 
+-  virtual HepDouble flat();
++  virtual double flat();
+ 
+   void showStatus() const;
+   void restoreStatus(const char filename[]) ;
+   void saveStatus(const char filename[]) const;
+   void setSeeds(const long* a, int b);
+   void setSeed(long a, int b);
+-  void flatArray(const HepInt s, HepDouble* vect);
++  void flatArray(const int s, double* vect);
+   
+   virtual std::string name() const ;
+ };
+diff -rup ../9.1/EvtGenModels/EvtItgFourCoeffFcn.hh ./EvtGenModels/EvtItgFourCoeffFcn.hh
+--- ../9.1/EvtGenModels/EvtItgFourCoeffFcn.hh	2003-10-02 19:26:51.000000000 +0200
++++ ./EvtGenModels/EvtItgFourCoeffFcn.hh	2010-10-26 15:04:08.000000000 +0200
+@@ -25,6 +25,8 @@
+ #include "CLHEP/Matrix/Vector.h"
+ #include "EvtGenModels/EvtItgAbsFunction.hh"
+ 
++using namespace CLHEP;
++
+ class EvtItgFourCoeffFcn: public EvtItgAbsFunction {
+ 
+ public:
+diff -rup ../9.1/EvtGenModels/EvtItgPtrFunction.hh ./EvtGenModels/EvtItgPtrFunction.hh
+--- ../9.1/EvtGenModels/EvtItgPtrFunction.hh	2003-10-02 19:26:51.000000000 +0200
++++ ./EvtGenModels/EvtItgPtrFunction.hh	2010-10-26 15:19:14.000000000 +0200
+@@ -27,6 +27,8 @@
+ #include "CLHEP/Matrix/Vector.h"
+ #include "EvtGenModels/EvtItgAbsFunction.hh"
+ 
++using namespace CLHEP;
++
+ class EvtItgPtrFunction: public EvtItgAbsFunction {
+ 
+ public:
+diff -rup ../9.1/EvtGenModels/EvtItgThreeCoeffFcn.hh ./EvtGenModels/EvtItgThreeCoeffFcn.hh
+--- ../9.1/EvtGenModels/EvtItgThreeCoeffFcn.hh	2003-10-02 19:26:52.000000000 +0200
++++ ./EvtGenModels/EvtItgThreeCoeffFcn.hh	2010-10-26 15:05:33.000000000 +0200
+@@ -32,6 +32,8 @@ extern "C" {
+ 
+ #include "EvtGenModels/EvtItgAbsFunction.hh"
+ 
++using namespace CLHEP;
++
+ class EvtItgThreeCoeffFcn: public EvtItgAbsFunction {
+ 
+ public:
+diff -rup ../9.1/EvtGenModels/EvtItgTwoCoeffFcn.hh ./EvtGenModels/EvtItgTwoCoeffFcn.hh
+--- ../9.1/EvtGenModels/EvtItgTwoCoeffFcn.hh	2003-10-02 19:26:52.000000000 +0200
++++ ./EvtGenModels/EvtItgTwoCoeffFcn.hh	2010-10-26 15:09:29.000000000 +0200
+@@ -32,6 +32,8 @@ extern "C" {
+ 
+ #include "EvtGenModels/EvtItgAbsFunction.hh"
+ 
++using namespace CLHEP;
++
+ class EvtItgTwoCoeffFcn: public EvtItgAbsFunction {
+ 
+ public:
+diff -rup ../9.1/EvtGenModels/EvtVub.hh ./EvtGenModels/EvtVub.hh
+--- ../9.1/EvtGenModels/EvtVub.hh	2005-06-15 16:37:33.000000000 +0200
++++ ./EvtGenModels/EvtVub.hh	2010-10-26 15:08:55.000000000 +0200
+@@ -26,6 +26,8 @@
+ #include "EvtGenBase/EvtDecayIncoherent.hh"
+ #include "CLHEP/Random/RandGeneral.h"
+ 
++using namespace CLHEP;
++
+ class EvtParticle;
+ class EvtVubdGamma;
+ 
+Only in .: lib
+diff -rup ../9.1/src/EvtHepRandomEngine.cpp ./src/EvtHepRandomEngine.cpp
+--- ../9.1/src/EvtHepRandomEngine.cpp	2005-11-20 23:02:37.000000000 +0100
++++ ./src/EvtHepRandomEngine.cpp	2010-10-26 15:15:50.000000000 +0200
+@@ -35,7 +35,7 @@ double EvtHepRandomEngine::random()
+   return EvtRandom::Flat();
+ }
+ 
+-HepDouble EvtHepRandomEngine::flat()
++double EvtHepRandomEngine::flat()
+ {
+   return random();
+ }
+@@ -45,7 +45,7 @@ void EvtHepRandomEngine::restoreStatus(c
+ void EvtHepRandomEngine::saveStatus(const char /*filename*/[]) const {}
+ void EvtHepRandomEngine::setSeeds(const long* /*a*/, int /*b*/) {}
+ void EvtHepRandomEngine::setSeed(long /*a*/, int /*b*/) {}
+-void EvtHepRandomEngine::flatArray(const HepInt s, HepDouble* vect) 
++void EvtHepRandomEngine::flatArray(const int s, double* vect) 
+ {
+   for (int i=0;i<s;i++)
+     vect[i] = flat();
+diff -rup ../9.1/src/EvtIncoherentMixing.cpp ./src/EvtIncoherentMixing.cpp
+--- ../9.1/src/EvtIncoherentMixing.cpp	2007-10-11 15:17:32.000000000 +0200
++++ ./src/EvtIncoherentMixing.cpp	2010-10-26 15:18:37.000000000 +0200
+@@ -8,6 +8,7 @@
+ #include "EvtGenBase/EvtPDL.hh"
+ #include "EvtGenBase/EvtId.hh"
+ #include "EvtGenBase/EvtRandom.hh"
++#include <stdlib.h>
+ 
+ //-----------------------------------------------------------------------------
+ // Implementation file for class : EvtIncoherentMixing
+@@ -52,7 +53,7 @@ void EvtIncoherentMixing::incoherentB0Mi
+   if ( ( B0 != id ) && ( B0B != id ) ) {
+     report(ERROR,"EvtGen") << "Bad configuration in incoherentB0Mix" 
+                            << std::endl ;
+-    ::abort() ;
++    abort() ;
+   }
+   
+   double x = getdeltamd() * EvtPDL::getctau( B0 ) / EvtConst::c ;
+@@ -93,7 +94,7 @@ void EvtIncoherentMixing::incoherentBsMi
+   if ( ( BS != id ) && ( BSB != id ) ) {
+     report(ERROR,"EvtGen") << "Bad configuration in incoherentBsMix" 
+                            << std::endl ;
+-    ::abort() ;
++    abort() ;
+   }
+   
+   double x = getdeltams() * EvtPDL::getctau( BS ) / EvtConst::c ;
+diff -rup ../9.1/src/EvtPartPropDb.cpp ./src/EvtPartPropDb.cpp
+--- ../9.1/src/EvtPartPropDb.cpp	2007-10-14 20:50:08.000000000 +0200
++++ ./src/EvtPartPropDb.cpp	2010-10-26 15:07:40.000000000 +0200
+@@ -11,6 +11,7 @@
+ #include <stdio.h>
+ #include <fstream>
+ #include <stdlib.h>
++#include <string.h>
+ #include "EvtGenBase/EvtPartPropDb.hh"
+ 
+ std::vector<std::string> EvtPartPropDb::_names;
+diff -rup ../9.1/src/EvtVub.cpp ./src/EvtVub.cpp
+--- ../9.1/src/EvtVub.cpp	2006-02-07 18:26:13.000000000 +0100
++++ ./src/EvtVub.cpp	2010-10-26 15:21:46.000000000 +0200
+@@ -133,7 +133,7 @@ void EvtVub::init(){
+   const int aSize = 10000;
+ 
+   EvtPFermi pFermi(_a,mB,_mb);
+-  HepDouble pf[aSize];
++  double pf[aSize];
+ 
+   for(i=0;i<aSize;i++){
+     double kplus = xlow + (double)(i+0.5)/((double)aSize)*(xhigh-xlow);
+diff -rup ../9.1/src/EvtVubdGamma.cpp ./src/EvtVubdGamma.cpp
+--- ../9.1/src/EvtVubdGamma.cpp	2007-01-24 12:21:19.000000000 +0100
++++ ./src/EvtVubdGamma.cpp	2010-10-26 15:16:28.000000000 +0200
+@@ -34,7 +34,7 @@
+ //-----------------------
+ // This Class's Header --
+ //-----------------------
+-#include "CLHEP/config/CLHEP.h"
++//#include "CLHEP/config/CLHEP.h"
+ #include "EvtGenModels/EvtVubdGamma.hh"
+ #include "EvtGenBase/EvtDiLog.hh"
+ 
+Only in .: tmp

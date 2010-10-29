@@ -104,3 +104,20 @@ include/genfit/RKTrackRep.h:
 	@cp genfit/lib/* $(EXTLIBDIR)/ # copy the libraries
 	@cp -r genfit/include/* $(EXTINCDIR)/ # copy the installed files
 
+
+# dependence for EvtGen build
+evtgen: evtgen/config.mk
+
+# dependence for EvtGen download
+evtgen/configure:
+	@echo "downloading EvtGen"
+	@wget -O - http://service-spi.web.cern.ch/service-spi/external/MCGenerators/distribution/evtgenlhc-9.1-src.tgz | tar xz
+	@mv evtgenlhc/9.1 evtgen
+	@cd evtgen; patch -Np0 < ../evtgen.patch
+	@rmdir evtgenlhc
+
+# EvtGen build command
+evtgen/config.mk: evtgen/configure
+	@echo "building EvtGen"
+	@cd evtgen; ./configure --lcgplatform=x86_64-slc5-gcc43-opt; make
+	@cd evtgen; cp lib/* $(EXTLIBDIR)/; mkdir $(EXTINCDIR)/evtgen; cp -r EvtGen* $(EXTINCDIR)/evtgen

@@ -10,5 +10,6 @@
 #pragma link C++ class Belle2::EKLMHitBase+;
 #pragma link C++ class Belle2::EKLMSectorHit+;
 #pragma link C++ class Belle2::EKLMHit2d+;
+#pragma link C++ class CLHEP::Hep3Vector+;
 
 #endif

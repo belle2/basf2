@@ -25,10 +25,12 @@
 
 namespace Belle2 {
 
+  //! Class to handle simulation hits
   class EKLMSimHit  :  public B4VHit  {
 
   public:
 
+    //! constructor needed to make the class storable
     inline EKLMSimHit() {};
 
     //! Constructor with initial values
@@ -42,25 +44,36 @@ namespace Belle2 {
     //! Destructor
     ~EKLMSimHit() {};
 
+    //! returns position of the hit
     inline G4ThreeVector getPos() const
     {return m_pos;}
 
+    //! returns hit time
     inline G4double getTime() const
     {return m_time;}
 
+    //! returns energy deposition
     inline G4double getEDep() const
     {return m_eDep;}
 
+    //! returns PDG code of the particle
     inline G4int getPDGCode() const
     {return m_PDGcode;}
 
-
+    //! dumps hit into ASCII file
     void Save(char * filename);
 
   private:
+    //! hit position (in global reference frame)
     G4ThreeVector m_pos;
+
+    //!hit time
     G4double m_time;
+
+    //! energy depostion
     G4double m_eDep;
+
+    //! PDG code of the track particle
     G4int m_PDGcode;
 
     ClassDef(EKLMSimHit, 1);

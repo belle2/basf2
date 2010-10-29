@@ -19,20 +19,38 @@
 
 namespace Belle2 {
 
-  // class for creation 1d and 2d hits
+  //! class for creation 1d, 2d hits and clusters identification
   class EKLMRecon   {
 
   public:
+    //! constructor
     EKLMRecon() {};
+
+    //! destructor
     ~EKLMRecon() {};
 
+    //! read StripHits from the datastore
     void readStripHits();
+
+    //! creates Sector hits and fill it with StripHits
     void createSectorHits();
+
+    //! Creates 2d hits in each SectorHit
     void create2dHits();
+
+    //! Stores 2d hits in the datastore
+    void store2dHits();
+
   private:
+    //! vector of StripHits
     std::vector <EKLMStripHit*> m_StripHitVector;
+
+    //! vector of SectorHits
     std::vector <EKLMSectorHit*> m_SectorHitVector;
-    //    std::vector <EKLMHit2d> m_Hit2dVector;
+
+    //! vector of  2d hits
+    std::vector <EKLMHit2d*> m_2dHitVector;
+
   };
 
 } // end of namespace Belle2

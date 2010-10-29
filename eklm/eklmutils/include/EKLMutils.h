@@ -11,7 +11,7 @@
 #ifndef EKLMUTILS_H
 #define EKLMUTILS_H
 
-// Tools collections common for EKLM
+//! Tools collections common for EKLM
 
 #include <framework/datastore/StoreDefs.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -24,32 +24,46 @@
 
 namespace Belle2 {
 
-
-
+  //! template function to simple store any storable object in the datastore. (too slow?)
   template < class T >
   void storeEKLMObject(std::string , T*);
 
+  //! Class for manipulting with hits/strips/ectors etc names. containes only static functions
   class EKLMNameManipulator {
-    EKLMNameManipulator();
-    ~EKLMNameManipulator();
 
   public:
-
-
+    //! returns number of the volume, first agument is volume name, sectond is volume type(Strip, Layer, Plane etc).
     static int getVolumeNumber(const char*, const char*);
+
+    //! returns number of the volume, first agument is volume name, sectond is volume type(Strip, Layer, Plane etc). .
     static int getVolumeNumber(std::string, std::string);
 
 
+    //! returns name of the volume, first agument is volume name, sectond is volume type(Strip, Layer, Plane etc).
     static std::string getVolumeName(const char *, const char *);
+
+    //! returns name of the volume, first agument is volume name, sectond is volume type(Strip, Layer, Plane etc).
     static std::string getVolumeName(std::string, std::string);
 
+
+    //! returns path from the top to the volume with given name
     static const char * getNodePath(const char *);
+
+    //! returns path from the top to the volume with given name
     static const char * getNodePath(std::string);
 
 
-
+    //! returns true if the strip is along X otherwise returns false
     template < class T >
     static bool isX(T stripName);
+
+
+  private:
+    //! Constructor is hidden since we do not intend to create the objects of this calss
+    EKLMNameManipulator();
+    //! Destructor
+    ~EKLMNameManipulator();
+
 
   };
   //------------------------  Implemantation of the templates -------------------------

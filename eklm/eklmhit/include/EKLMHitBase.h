@@ -23,7 +23,7 @@
 
 namespace Belle2 {
 
-  // inherit HitBase class from TObject to make all hits storable and from B4VHit for HitCollections
+  //! Base Hit reconstruction class. inherit HitBase class from TObject to make all hits storable
   class EKLMHitBase: public TObject  {
 
   public:
@@ -31,30 +31,32 @@ namespace Belle2 {
     //! Constructor
     EKLMHitBase() {};
 
+    //! Constructor with name
     EKLMHitBase(const char *);
+
+    //! Constructor with name
     EKLMHitBase(std::string &);
 
     //! Destructor
     virtual ~EKLMHitBase() {};
 
+    //! Print hit information
     virtual void Print();
 
+    //! sets name for the hit. Usually constructed from the strip name
     inline void setName(std::string name)
     {m_Name = name;}
 
+    //! returns hit name
     inline std::string getName() const
     {return m_Name;}
-
-    /*     inline void setHitPosition(CLHEP::Hep3Vector pos) */
-    /*     {m_hitPosition=pos;} */
 
 
   private:
     ClassDef(EKLMHitBase, 1);   // needed to be storable
 
+    //! name of the hit
     std::string m_Name;
-
-    //    CLHEP::Hep3Vector m_hitPosition;
   };
 
 

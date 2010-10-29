@@ -25,31 +25,31 @@ namespace Belle2 {
 
   class GearDir;
 
-  //   The GeoEKLMBelleII class.
-  //   The creator for the outer EKLM geometry of the Belle II detector.
+  //!   The GeoEKLMBelleII class.
+  //!   The creator for the outer EKLM geometry of the Belle II detector.
 
   class GeoEKLMBelleII : public CreatorBase {
 
   public:
 
-    // Constructor of the GeoEKLMBelleII class.
+    //! Constructor of the GeoEKLMBelleII class.
     GeoEKLMBelleII();
 
-    // The destructor of the GeoEKLMBelleII class.
+    //! The destructor of the GeoEKLMBelleII class.
     virtual ~GeoEKLMBelleII();
 
-    // Creates the ROOT Objects for the EKLM geometry.
-
+    //! Creates the ROOT Objects for the EKLM geometry.
     virtual void create(GearDir& content);
 
-
+    //! returns top volume for EKLM
     inline TGeoVolume * getTopmostVolume()
     {return volGrpEKLM;}
   protected:
 
   private:
 
-    TGeoVolumeAssembly* volGrpEKLM ;  // top volume in the EKLM hierarhy
+    //! top volume in the EKLM hierarhy
+    TGeoVolumeAssembly* volGrpEKLM ;
 
   };
 

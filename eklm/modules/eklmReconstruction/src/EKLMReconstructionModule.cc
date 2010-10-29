@@ -46,7 +46,7 @@ void EKLMReconstructionModule::event()
   recon->readStripHits();
   recon->createSectorHits();
   recon->create2dHits();
-
+  recon->store2dHits();
 
   delete recon;
 }

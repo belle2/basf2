@@ -17,11 +17,10 @@
 namespace Belle2 {
 
   //! The Class for EKLM Sensitive Detector
-  /*! In this class, every variable defined in EKLMHit will be calculated.
-    EKLMHits are saved into hits collection.
+  /*! In this class, every variables defined in EKLMSimHit will be calculated.
+    EKLMSimHits are saved into hits collection.
   */
 
-//class EKLMSensetiveDetector: public B4SensitiveDetectorBase
   class EKLMSensetiveDetector: public G4VSensitiveDetector {
 
   public:
@@ -41,14 +40,20 @@ namespace Belle2 {
     //! Do what you want to do at the end of each event
     void EndOfEvent(G4HCofThisEvent *eventHC);
 
-    //void CreateCollection();
-
+    //! Add random background To be implemented later
     //void AddbgOne(bool doit);
 
   private:
+    //! all hits with energies less than m_ThresholdEnergyDeposit will be dropped
     G4double m_ThresholdEnergyDeposit;
+
+    //! all hits with kinetic energies less than m_ThresholdEnergyDeposit will be dropped
     G4double m_ThresholdKineticEnergy;
+
+    //! sim hits collection
     EKLMSimHitsCollection *m_HitCollection;
+
+    //! hit colleation ID
     G4int m_HCID;
 
   };

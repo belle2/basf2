@@ -64,8 +64,16 @@ void EKLMSectorHit::create2dHits()
       hit2d->setCrossPoint(crossPoint);
       hit2d->setChiSq();
       m_hit2dVector.push_back(hit2d);
-      hit2d->Print();
+      //      hit2d->Print();
     }
 
   }
+}
+
+
+void EKLMSectorHit::store2dHits()
+{
+  for (std::vector<EKLMHit2d*>::iterator it = m_hit2dVector.begin();
+       it != m_hit2dVector.end(); ++it)
+    storeEKLMObject("Hits2dEKLMArray", *it);
 }

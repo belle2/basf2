@@ -22,7 +22,7 @@
 namespace Belle2 {
 
 
-
+  //! Digitize EKLMSimHits  to get EKLM StripHits
   class EKLMDigitizer {
 
   public:
@@ -36,11 +36,13 @@ namespace Belle2 {
     //! Destructor
     ~EKLMDigitizer();
 
-    // Get hits from the collection
+    //! Get hits from the collection
     void getSimHits();
 
+    //! merges hits from the same strip. Creates EKLMStripHits
     void mergeSimHitsToStripHits();
 
+    //! Saves EKLMStripHits to the DataStore
     void saveStripHits();
 
 
@@ -53,14 +55,22 @@ namespace Belle2 {
 
   private:
 
+    //! std::map for hits sorting according strip name
     std::map<std::string, std::vector<EKLMSimHit*> > m_HitStripMap;
 
+    //! vector of EKLMStripHits
     std::vector<EKLMStripHit*> m_HitVector;
 
+    //! sim hits collection
     EKLMSimHitsCollection* m_HitCollection;
 
+    //! converts energy depostion to the number of photo electrons. Not fully implemented yet
     int energyToPhotoElectrons(double  , double , bool isMirrored = false);
+
+    //! returns delay depending on the distance to the hit
     double lightPropagationTime(double);
+
+    //! calculates 'distances' to the direct and mirrored hits
     void lightPropagationDistance(double &firstHitDist, double &secondHitDist, CLHEP::Hep3Vector pos);
 
 
@@ -69,7 +79,7 @@ namespace Belle2 {
   extern G4Allocator<EKLMDigitizer>   EKLMDigitizerAllocator;
 
 
-  // Operator new
+  //! Operator new
   inline void* EKLMDigitizer::operator new(size_t)
   {
     void *aEKLMDigitizer;
@@ -77,7 +87,7 @@ namespace Belle2 {
     return aEKLMDigitizer;
   }
 
-  // Operator delete
+  //! Operator delete
   inline void EKLMDigitizer::operator delete(void *aEKLMDigitizer)
   {
     EKLMDigitizerAllocator.FreeSingle((EKLMDigitizer*) aEKLMDigitizer);

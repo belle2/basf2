@@ -48,7 +48,8 @@ namespace Belle2 {
     gGeoManager->cd(EKLMNameManipulator::getNodePath(m_Name));
     gGeoManager->MasterToLocal(global, local);
     gGeoManager->GetCurrentVolume()->GetShape()->GetAxisRange(1, min, max);
-    return max - local[0];
+    m_LightPropagationLength = max - local[0];
+    return m_LightPropagationLength;
   }
 
   bool EKLMStripHit::doesIntersect(EKLMStripHit * hit, CLHEP::Hep3Vector & crossPoint)
@@ -85,12 +86,12 @@ namespace Belle2 {
         return true;
       }
     }
-    std::cout << "doesIntersect(EKLMStripHit * hit, CLHEP::Hep3Vector & crossPoint)" << std::endl;
-    std::cout << "(" << global1[0] << " " << global1[1] << " " << global1[2] << ") " << max1 << "  ";
-    if (EKLMNameManipulator::isX(hit->getName())) std::cout << " X ;"; else std::cout << " Y ;";
-    std::cout << "(" << global2[0] << " " << global2[1] << " " << global2[2] << ") " << max2;
-    if (EKLMNameManipulator::isX(m_Name)) std::cout << " X ;"; else std::cout << " Y ;";
-    std::cout << std::endl;
+    //    std::cout << "doesIntersect(EKLMStripHit * hit, CLHEP::Hep3Vector & crossPoint)" << std::endl;
+    //    std::cout << "(" << global1[0] << " " << global1[1] << " " << global1[2] << ") " << max1 << "  ";
+    //    if (EKLMNameManipulator::isX(hit->getName())) std::cout << " X ;"; else std::cout << " Y ;";
+    //    std::cout << "(" << global2[0] << " " << global2[1] << " " << global2[2] << ") " << max2;
+    //    if (EKLMNameManipulator::isX(m_Name)) std::cout << " X ;"; else std::cout << " Y ;";
+    //    std::cout << std::endl;
     return false;
 
   }

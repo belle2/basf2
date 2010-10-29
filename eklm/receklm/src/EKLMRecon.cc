@@ -63,9 +63,19 @@ namespace Belle2 {
   void EKLMRecon::create2dHits()
   {
     for (std::vector<EKLMSectorHit*>::iterator sectorIter = m_SectorHitVector.begin();
-         sectorIter != m_SectorHitVector.end(); sectorIter++) { // loop over sectors
+         sectorIter != m_SectorHitVector.end(); sectorIter++)  // loop over sectors
       (*sectorIter)->create2dHits();
-      //      (*sectorIter)->Print();
-    }
   }
+
+
+  void EKLMRecon::store2dHits()
+  {
+    for (std::vector<EKLMSectorHit*>::iterator sectorIter = m_SectorHitVector.begin();
+         sectorIter != m_SectorHitVector.end(); sectorIter++)  // loop over sectors
+      (*sectorIter)->store2dHits();
+  }
+
+
+
+
 }//namespace

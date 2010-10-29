@@ -30,136 +30,154 @@ namespace Belle2 {
   BELLE2_DEFINE_EXCEPTION(ModuleParameterNotFoundError, "Could not find the parameter with the name '%1%' ! The value of the parameter could NOT be set.");
   BELLE2_DEFINE_EXCEPTION(ModuleParameterTypeError, "The type of the module parameter '%1%' (%2%) is different from the type of the value it should be set to (%3%) !");
 
-  /*! The parameter type info class */
-  /*! Stores information about each supported parameter type.
-  */
+  /**
+   * The parameter type info class.
+   * Stores information about each supported parameter type.
+   */
   class ParamTypeInfo {
   public:
 
-    /*! supported basic parameter types */
+    /** Supported basic parameter types. */
     enum EParamBasicType {
-      c_SingleParam,    /*!< A single parameter value */
-      c_ListParam,      /*!< A list of parameter values */
-      c_NotSupportedPBT /*!< Not supported basic type */
+      c_SingleParam,    /**< A single parameter value */
+      c_ListParam,      /**< A list of parameter values */
+      c_NotSupportedPBT /**< Not supported basic type */
     };
 
-    /*! supported parameter value types */
+    /** Supported parameter value types. */
     enum EParamValueType {
-      c_IntegerParam,   /*!< An integer parameter value */
-      c_DoubleParam,    /*!< A double parameter value */
-      c_StringParam,    /*!< A string parameter value */
-      c_BoolParam,      /*!< A boolean parameter value */
-      c_NotSupportedPVT /*!< Not supported parameter type */
+      c_IntegerParam,   /**< An integer parameter value */
+      c_DoubleParam,    /**< A double parameter value */
+      c_StringParam,    /**< A string parameter value */
+      c_BoolParam,      /**< A boolean parameter value */
+      c_NotSupportedPVT /**< Not supported parameter type */
     };
 
-    EParamBasicType  m_paramBasicType; /*!< The basic parameter type (single/list). */
-    EParamValueType  m_paramValueType; /*!< The parameter value type. */
-    std::string      m_readableName;   /*!< The readable name of the parameter type. */
+    EParamBasicType  m_paramBasicType; /**< The basic parameter type (single/list). */
+    EParamValueType  m_paramValueType; /**< The parameter value type. */
+    std::string      m_readableName;   /**< The readable name of the parameter type. */
 
-    /*! The ParamTypeInfo constructor */
-    /*!
-        \param paramBasicType The basic parameter type (single/list).
-        \param paramValueType The parameter value type.
-        \param readableName The readable name of the parameter type.
-    */
+    /**
+     * The ParamTypeInfo constructor.
+     *
+     * @param paramBasicType The basic parameter type (single/list).
+     * @param paramValueType The parameter value type.
+     * @param readableName The readable name of the parameter type.
+     */
     ParamTypeInfo(EParamBasicType paramBasicType, EParamValueType paramValueType, std::string readableName) :
         m_paramBasicType(paramBasicType), m_paramValueType(paramValueType), m_readableName(readableName) {};
   };
 
 
-  /*! The Module parameter list class */
-  /*! Stores and manages all parameters of a module.
-  */
+  /**
+   * The Module parameter list class.
+   * Stores and manages all parameters of a module.
+   */
   class ModuleParamList {
 
   public:
 
-    /*! Constructor */
+    /**
+     * Constructor.
+     */
     ModuleParamList();
 
-    /*! Destructor */
+    /**
+     * Destructor.
+     */
     ~ModuleParamList();
 
-    /*! Adds a new parameter to the module list. */
-    /*!
-        A parameter consists of a reference pointing to a member variable in the module
-        which stores and allows fast access to the parameter value. In addition the type
-        of the parameter is saved and optionally a description can be given.
-
-        \param name The unique name of the parameter.
-        \param paramVariable Reference to the variable which stores the parameter value.
-        \param defaultValue The default value of the parameter.
-        \param description An optional description of the parameter.
-        \param force If set to true the parameter has to be defined in the steering file by the user.
-    */
+    /**
+     * Adds a new parameter to the module list.
+     *
+     * A parameter consists of a reference pointing to a member variable in the module
+     * which stores and allows fast access to the parameter value. In addition the type
+     * of the parameter is saved and optionally a description can be given.
+     *
+     * @param name The unique name of the parameter.
+     * @param paramVariable Reference to the variable which stores the parameter value.
+     * @param defaultValue The default value of the parameter.
+     * @param description An optional description of the parameter.
+     * @param force If set to true the parameter has to be defined in the steering file by the user.
+     */
     template<typename T>
     void addParameter(const std::string& name, T& paramVariable, const T& defaultValue, const std::string& description = "", bool force = false);
 
-    /*! Sets the value of a parameter given by its name. */
-    /*!
-        A template based method which is invoked by the module.
-
-        \param name The unique name of the parameter.
-        \param value The parameter value which should be assigned to the parameter given by its name.
-    */
+    /**
+     * Sets the value of a parameter given by its name.
+     *
+     * A template based method which is invoked by the module.
+     *
+     * @param name The unique name of the parameter.
+     * @param value The parameter value which should be assigned to the parameter given by its name.
+     */
     template<typename T>
     void setParameter(const std::string& name, T& value);
 
-    /*! Returns a reference to a parameter. The returned parameter has already the correct type. */
-    /*!
-       Throws an exception of type FwExcModuleParameterNotFound if a parameter with the given name does not exist.
-       Throws an exception of type FwExcModuleParameterType if the parameter type of does not match to the template parameter.
-
-        \param name The unique name of the parameter.
-        \return A reference to a module parameter having the correct type.
-    */
+    /**
+     * Returns a reference to a parameter. The returned parameter has already the correct type.
+     *
+     * Throws an exception of type ModuleParameterNotFoundError if a parameter with the given name does not exist.
+     * Throws an exception of type ModuleParameterTypeError if the parameter type of does not match to the template parameter.
+     *
+     * @param name The unique name of the parameter.
+     * @return A reference to a module parameter having the correct type.
+     */
     template<typename T>
     ModuleParam<T>& getParameter(const std::string& name) const throw(ModuleParameterNotFoundError, ModuleParameterTypeError);
 
-    /*! Returns the parameter type information of the given parameter. */
-    /*!
-        \param name The unique name of the parameter.
-        \return The parameter type information.
-    */
+    /**
+     * Returns the parameter type information of the given parameter.
+     *
+     * @param name The unique name of the parameter.
+     * @return The parameter type information.
+     */
     ParamTypeInfo::ParamTypeInfo getParamTypeInfo(const std::string& name) const;
 
-    /*! Returns true if unset parameters exist which the user has to set in the steering file. */
-    /*!
-        \return True if unset parameters exist which the user has to set in the steering file.
-    */
+    /**
+     * Returns true if unset parameters exist which the user has to set in the steering file.
+     *
+     * @return True if unset parameters exist which the user has to set in the steering file.
+     */
     bool hasUnsetForcedParams() const;
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     //                   Python API
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    /*! Returns a python list of all parameters. */
-    /*!
-        Each item in the list consists of the name of the parameter, a string describing its type,
-        a python list of all values, a python list of all default values, the information of
-        the parameter was set in the steering file and the description of the parameter.
-        \return A python list containing the parameters of this parameter list.
-    */
+    /**
+     * Returns a python list of all parameters.
+     *
+     * Each item in the list consists of the name of the parameter, a string describing its type,
+     * a python list of all values, a python list of all default values, the information of
+     * the parameter was set in the steering file and the description of the parameter.
+     *
+     * @return A python list containing the parameters of this parameter list.
+     */
     boost::python::list getParamInfoListPython() const;
 
-    /*! Implements a method for setting boost::python objects. */
-    /*! The method supports the following types: int, double, string, bool
-        The conversion of the python object to the C++ type and the final storage of the
-        parameter value is done by specializing the template method setParamObjectTemplate().
-
-        \param name The unique name of the parameter.
-        \param pyObj The object which should be converted and stored as the parameter value.
-    */
+    /**
+     * Implements a method for setting boost::python objects.
+     *
+     * The method supports the following types: int, double, string, bool
+     * The conversion of the python object to the C++ type and the final storage of the
+     * parameter value is done by specializing the template method setParamObjectTemplate().
+     *
+     * @param name The unique name of the parameter.
+     * @param pyObj The object which should be converted and stored as the parameter value.
+     */
     void setParamObjectPython(const std::string& name, const boost::python::object& pyObj);
 
-    /*! Implements a method for setting boost::python lists. */
-    /*! The method supports lists of the following types: int, double, string, bool
-        The conversion of the python list to the std::vector and the final storage of the
-        parameter value is done by specializing the template method setParamListTemplate().
-
-        \param name The unique name of the parameter.
-        \param pyList The list which should be converted to a std::vector and stored as the parameter value.
-    */
+    /**
+     * Implements a method for setting boost::python lists.
+     *
+     * The method supports lists of the following types: int, double, string, bool
+     * The conversion of the python list to the std::vector and the final storage of the
+     * parameter value is done by specializing the template method setParamListTemplate().
+     *
+     * @param name The unique name of the parameter.
+     * @param pyList The list which should be converted to a std::vector and stored as the parameter value.
+     */
     void setParamListPython(const std::string& name, const boost::python::list& pyList);
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -170,17 +188,18 @@ namespace Belle2 {
 
   private:
 
-    std::map<std::string, ModuleParamPtr> m_paramMap;  /*!< Stores the module parameters together with a string name as key. */
-    std::map<std::string, ParamTypeInfo>  m_paramTypeInfoMap; /*!< Map which stores the typeid name as key and information about the parameter as value. */
+    std::map<std::string, ModuleParamPtr> m_paramMap;  /**< Stores the module parameters together with a string name as key. */
+    std::map<std::string, ParamTypeInfo>  m_paramTypeInfoMap; /**< Map which stores the typeid name as key and information about the parameter as value. */
 
 
-    /*! Returns the type identifier of the parameter as string. */
-    /*!
-        The type identifier is used to discriminate between problematic parameter types (e.g. double and int)
-
-        \param name The unique name of the parameter.
-        \return The type identifier as string. Returns an empty string if a parameter with the given name could not be found.
-    */
+    /**
+     * Returns the type identifier of the parameter as string.
+     *
+     * The type identifier is used to discriminate between problematic parameter types (e.g. double and int)
+     *
+     * @param name The unique name of the parameter.
+     * @return The type identifier as string. Returns an empty string if a parameter with the given name could not be found.
+     */
     std::string getParamTypeString(const std::string& name) const;
 
 
@@ -188,50 +207,58 @@ namespace Belle2 {
     //                   Python API
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    /*! Implements a template based method for setting boost::python objects. */
-    /*! The method converts a boost::python object to a C++ type and stores the result as the
-        parameter value.
-
-        \param name The unique name of the parameter.
-        \param pyObj The object which should be converted and stored as the parameter value.
-    */
+    /**
+     * Implements a template based method for setting boost::python objects.
+     *
+     * The method converts a boost::python object to a C++ type and stores the result as the
+     * parameter value.
+     *
+     * @param name The unique name of the parameter.
+     * @param pyObj The object which should be converted and stored as the parameter value.
+     */
     template<typename T>
     void setParamObjectTemplatePython(const std::string& name, const boost::python::object& pyObj);
 
-    /*! Implements a template based method for setting boost::python lists. */
-    /*! The method converts a boost::python list to a std::vector and stores the result as the
-        parameter value.
-
-        \param name The unique name of the parameter.
-        \param pyList The list which should be converted to a std::vector and stored as the parameter value.
-    */
+    /**
+     * Implements a template based method for setting boost::python lists.
+     *
+     * The method converts a boost::python list to a std::vector and stores the result as the
+     * parameter value.
+     *
+     * @param name The unique name of the parameter.
+     * @param pyList The list which should be converted to a std::vector and stored as the parameter value.
+     */
     template<typename T>
     void setParamListTemplatePython(const std::string& name, const boost::python::list& pyList);
 
-    /*! Returns a python list containing the default values of the given parameter. */
-    /*!
-        Calls according to the parameter type a specialized version of the template method getParamDefaultValuesTemplate().
-        \param name The unique name of the parameter.
-        \param Reference to the output list containing the parameter default values. For single value parameter, the list only consists of one element.
-        \param defaultValues If true returns a list of default values otherwise a list of the parameter values.
-    */
+    /**
+     * Returns a python list containing the default values of the given parameter.
+     *
+     * Calls according to the parameter type a specialized version of the template method getParamDefaultValuesTemplate().
+     *
+     * @param name The unique name of the parameter.
+     * @param Reference to the output list containing the parameter default values. For single value parameter, the list only consists of one element.
+     * @param defaultValues If true returns a list of default values otherwise a list of the parameter values.
+     */
     void getParamValuesPython(const std::string& name, boost::python::list& outputList, bool defaultValues = false) const;
 
-    /*! Returns a python list containing the parameter/default values of a single value parameter (template method). */
-    /*!
-        \param name The unique name of the parameter.
-        \param outputList The python list containing the parameter/default values.
-        \param defaultValues If true returns a list of default values otherwise a list of the parameter values.
-    */
+    /**
+     * Returns a python list containing the parameter/default values of a single value parameter (template method).
+     *
+     * @param name The unique name of the parameter.
+     * @param outputList The python list containing the parameter/default values.
+     * @param defaultValues If true returns a list of default values otherwise a list of the parameter values.
+     */
     template<typename T>
     void getParamObjectValuesTemplatePython(const std::string& name, boost::python::list& outputList, bool defaultValues = false) const;
 
-    /*! Returns a python list containing the parameter/default values of a list parameter (template method). */
-    /*!
-        \param name The unique name of the parameter.
-        \param outputList The python list containing the parameter/default values.
-        \param defaultValues If true returns a list of default values otherwise a list of the parameter values.
-    */
+    /**
+     * Returns a python list containing the parameter/default values of a list parameter (template method).
+     *
+     * @param name The unique name of the parameter.
+     * @param outputList The python list containing the parameter/default values.
+     * @param defaultValues If true returns a list of default values otherwise a list of the parameter values.
+     */
     template<typename T>
     void getParamListValuesTemplatePython(const std::string& name, boost::python::list& outputList, bool defaultValues = false) const;
 

@@ -24,31 +24,38 @@
 
 namespace Belle2 {
 
-  //! The path class
-  /*! Implements a path consisting of modules. The modules are arranged in a linear order.
-  */
+  /** The path class.
+   * Implements a path consisting of modules. The modules are arranged in a linear order.
+   */
   class Path {
 
   public:
 
-    /*! Constructor */
+    /**
+     * Constructor.
+     */
     Path();
 
-    /*! Destructor */
+    /**
+     * Destructor.
+     */
     ~Path();
 
-    /*! Adds a new module to the path. */
-    /*!
-        A new module is added to the path by inserting it to the end
-        of the list of modules.
-        \param module Reference to the module that should be added to the path.
-    */
+    /**
+     * Adds a new module to the path.
+     *
+     * A new module is added to the path by inserting it to the end
+     * of the list of modules.
+     *
+     * @param module Reference to the module that should be added to the path.
+     */
     void addModule(ModulePtr module);
 
-    /*! Returns a list of the modules in this path. */
-    /*!
-        \return A list of all modules of this path.
-    */
+    /**
+     * Returns a list of the modules in this path.
+     *
+     * @return A list of all modules of this path.
+     */
     const std::list<ModulePtr>& getModules() const {return m_modules; };
 
 
@@ -56,13 +63,14 @@ namespace Belle2 {
     //                   Python API
     //--------------------------------------------------
 
-    /*! Returns a list of the modules in this path (as python list). */
-    /*!
-        \return A list of all modules of this path (as python list).
-    */
+    /**
+     * Returns a list of the modules in this path (as python list).
+     *
+     * @return A list of all modules of this path (as python list).
+     */
     boost::python::list getModulesPython() const;
 
-    /*! Exposes methods of the Path class to Python. */
+    /** Exposes methods of the Path class to Python. */
     static void exposePythonAPI();
 
 
@@ -71,7 +79,7 @@ namespace Belle2 {
 
   private:
 
-    std::list<ModulePtr> m_modules; /*!< The list of modules (the module objects are owned by ModuleList). */
+    std::list<ModulePtr> m_modules; /**< The list of modules (the module objects are owned by ModuleList). */
 
   };
 

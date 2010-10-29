@@ -114,12 +114,13 @@ namespace Belle2 {
       return buffer;
     }
 
-  private:
-
+    //FIXME: Make it private again. Used for MCParticle.
     /*! Pointer to map for which the iterator is.
 
     */
     T* m_map;
+
+  private:
 
     /*! Iterator for the map.
 

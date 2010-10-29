@@ -17,81 +17,91 @@
 
 namespace Belle2 {
 
-  /*! The EventProcessor Class */
-  /*!
-    This class provides the core event processing loop.
-  */
+  /**
+   * The EventProcessor Class.
+   *
+   * This class provides the core event processing loop.
+   */
   class EventProcessor {
 
   public:
 
-    /*! Constructor */
+    /**
+     * Constructor.
+     */
     EventProcessor(PathManager& pathManager);
 
-    /*! Destructor */
+    /**
+     * Destructor.
+     */
     virtual ~EventProcessor();
 
-    /*! Processes the full module chain, starting with the first module in the given path. */
-    /*!
-        Processes all events for the given run number and for events from 0 to maxEvent.
-        If maxEvent is smaller or equal 0 the maximum number check is disabled and all events are processed.
-        If runNumber is smaller than 0, the run number has to be set externally by a module and not the given number is used.
-
-        \param startPath The processing starts with the first module of this path.
-        \param maxEvent Optional: The maximum number of events that will be processed. If the number is smaller or equal 0, all events will be processed.
-        \param runNumber Optional: The number of the run which should be processed. If the number is smaller than 0, the run number has to be set externally by a module.
-    */
+    /**
+     * Processes the full module chain, starting with the first module in the given path.
+     *
+     * Processes all events for the given run number and for events from 0 to maxEvent.
+     * If maxEvent is smaller or equal 0 the maximum number check is disabled and all events are processed.
+     * If runNumber is smaller than 0, the run number has to be set externally by a module and not the given number is used.
+     *
+     * @param startPath The processing starts with the first module of this path.
+     * @param maxEvent Optional: The maximum number of events that will be processed. If the number is smaller or equal 0, all events will be processed.
+     * @param runNumber Optional: The number of the run which should be processed. If the number is smaller than 0, the run number has to be set externally by a module.
+     */
     void process(PathPtr startPath, long maxEvent = 0, long runNumber = -1);
 
 
   protected:
 
-    PathManager& m_pathManager; /*!< Reference to the path manager, which takes care of creating and handling paths. */
+    PathManager& m_pathManager; /**< Reference to the path manager, which takes care of creating and handling paths. */
 
-    /*! Initializes the modules. */
-    /*!
-         Loops over all module instances specified in a list and calls their initialize() method.
-
-         \param modulePathList A list of all modules which could be executed during the data processing.
-    */
+    /**
+     * Initializes the modules.
+     *
+     * Loops over all module instances specified in a list and calls their initialize() method.
+     *
+     * @param modulePathList A list of all modules which could be executed during the data processing.
+     */
     void processInitialize(const ModulePtrList& modulePathList);
 
-    /*! Processes the full module chain consisting of an arbitrary number of connected paths, starting with the first module in the specified path. */
-    /*!
-        \param startPath The processing starts with the first module of this path.
-        \param modulePathList A list of all modules which could be executed during the data processing (used for calling the beginRun() and endRun() method).
-        \param maxEvent The maximum number of events that will be processed. If the number is smaller or equal 0, all events are processed.
-    */
+    /**
+     * Processes the full module chain consisting of an arbitrary number of connected paths, starting with the first module in the specified path.
+     *
+     * @param startPath The processing starts with the first module of this path.
+     * @param modulePathList A list of all modules which could be executed during the data processing (used for calling the beginRun() and endRun() method).
+     * @param maxEvent The maximum number of events that will be processed. If the number is smaller or equal 0, all events are processed.
+     */
     void processCore(PathPtr startPath, const ModulePtrList& modulePathList, long maxEvent = 0);
 
-    /*! Terminates the modules. */
-    /*!
-         Loops over all module instances in reverse order specified in a list and calls their terminate() method.
-
-         \param modulePathList A list of all modules which could be executed during the data processing.
-    */
+    /**
+     * Terminates the modules.
+     *
+     * Loops over all module instances in reverse order specified in a list and calls their terminate() method.
+     * @param modulePathList A list of all modules which could be executed during the data processing.
+     */
     void processTerminate(const ModulePtrList& modulePathList);
 
-    /*! Calls the begin run methods of all modules. */
-    /*!
-         Loops over all module instances specified in a list
-         and calls their beginRun() method. Please note: the
-         beginRun() method of the module which triggered
-         the beginRun() loop will also be called.
-
-         \param modulePathList The list containing all module instances added to a path.
-    */
+    /**
+     * Calls the begin run methods of all modules.
+     *
+     * Loops over all module instances specified in a list
+     * and calls their beginRun() method. Please note: the
+     * beginRun() method of the module which triggered
+     * the beginRun() loop will also be called.
+     *
+     * @param modulePathList The list containing all module instances added to a path.
+     */
     void processBeginRun(const ModulePtrList& modulePathList);
 
-    /*! Calls the end run methods of all modules. */
-    /*!
-         Loops over all module instances specified in a list
-         and calls their endRun() method. Please note: the
-         endRun() method of the module which triggered
-         the endRun() loop will also be called.
-
-         \param modulePathList The list containing all module instances added to a path.
-    */
+    /**
+     * Calls the end run methods of all modules.
+     *
+     * Loops over all module instances specified in a list
+     * and calls their endRun() method. Please note: the
+     * endRun() method of the module which triggered
+     * the endRun() loop will also be called.
+     *
+     * @param modulePathList The list containing all module instances added to a path.
+     */
     void processEndRun(const ModulePtrList& modulePathList);
 
   private:

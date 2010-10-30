@@ -13,217 +13,187 @@
     <Layers>
       <Layer id="SVD_Layer_3">
         <Phi0 desc="The starting angle of the layer in the r-phi plane" unit="deg">-8</Phi0>
-        <Radius desc="Radius of the layer" unit="mm">40</Radius>
-        <PhiLadder desc="Rotation of the ladder about its local V axis (parallel to global z axis)" unit="deg">8</PhiLadder>
         <NumberOfLadders desc="Number of ladders in this layer">8</NumberOfLadders>
         <Ladders>
-          <isRibs>1</isRibs>
-          <!-- Common parameters for all ladders -->
-          <xi:include href="SVDLadderBelleII.xml" xpointer="xpointer(/*/*)"/>
-          <NumberOfSensors>2</NumberOfSensors>
+          <WPosition desc="Radius of the layer" unit="mm">40</WPosition>
+          <PhiLocal desc="Rotation of the ladder about its local V axis (parallel to global z axis)" unit="deg">8</PhiLocal>
+          <Material>Vacuum</Material>
           <Sensors>
             <Sensor id="SVD_Layer_3_Ladder_Sensor_0">
-              <SensorParameters>
-                <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Sensor[@type=0]/*)"/>
-                <isSMD desc="Does this sensor has SMD components?">0</isSMD>
-              </SensorParameters>
-              <Position>
-                <V desc="sensor position (middle of the volume) in V (local coordinate system of ladder)" unit="mm">-34.2</V>
-                <W desc="sensor position (middle of the active volume) in W (local coordinate system of ladder)" unit="mm">0</W>
-                <Theta desc="rotation about Euler angle Theta in LOCAL coordinate system" unit="deg">0</Theta>
-              </Position>
+              <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Sensor[@type=0]/*)"/>
+              <VPosition desc="sensor position (middle of the volume) in V (local coordinate system of ladder)" unit="mm">-34.2</VPosition>
             </Sensor>
             <Sensor id="SVD_Layer_3_Ladder_Sensor_1">
-              <SensorParameters>
-                <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Sensor[@type=0]/*)"/>
-                <isSMD desc="Does this sensor has SMD components?">0</isSMD>
-              </SensorParameters>
-              <Position>
-                <V desc="sensor position (middle of the volume) in V (local coordinate system of ladder)" unit="mm">88</V>
-                <W desc="sensor position (middle of the active volume) in W (local coordinate system of ladder)" unit="mm">0</W>
-                <Theta desc="rotation about Euler angle Theta in LOCAL coordinate system" unit="deg">0</Theta>
-              </Position>
+              <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Sensor[@type=0]/*)"/>
+              <VPosition desc="sensor position (middle of the volume) in V (local coordinate system of ladder)" unit="mm">88</VPosition>
             </Sensor>
           </Sensors>
         </Ladders>
       </Layer>
       <Layer id="SVD_Layer_4">
         <Phi0 desc="The starting angle of the layer in the r-phi plane" unit="deg">-6</Phi0>
-        <Radius desc="Radius of the layer" unit="mm">80.0</Radius>
-        <PhiLadder desc="Rotation of the ladder about its local V axis (parallel to global z axis)" unit="deg">6</PhiLadder>
         <NumberOfLadders desc="Number of ladders in this layer">10</NumberOfLadders>
         <Ladders>
-          <isRibs>1</isRibs>
-          <!-- Common parameters for all ladders -->
-          <xi:include href="SVDLadderBelleII.xml" xpointer="xpointer(/*/*)"/>
-          <NumberOfSensors>3</NumberOfSensors>
-          <LengthRibsBarrel desc="Length of the Ribs in the Barrel Region" unit="mm">249.88</LengthRibsBarrel>
-          <Length2RibsSlanted desc="Length2 of the Ribs in the Slanted Region" unit="mm">122.84</Length2RibsSlanted>
+          <WPosition desc="Radius of the layer" unit="mm">80.0</WPosition>
+          <PhiLocal desc="Rotation of the ladder about its local V axis (parallel to global z axis)" unit="deg">6</PhiLocal>
+          <Material>Vacuum</Material>
+          <Barrel>
+            <Ribs>
+              <xi:include href="SVDLadderBelleII.xml" xpointer="xpointer(/*/Ribs/*)"/>
+              <Length desc="Length of the Ribs in the Barrel Region" unit="mm">249.88</Length>
+              <VPosition desc="The position of the ribs in V direction" unit="mm">-41.43</VPosition>
+            </Ribs>
+          </Barrel>
+          <CoolingPipe>
+            <xi:include href="SVDLadderBelleII.xml" xpointer="xpointer(/*/CoolingPipe/*)"/>
+            <!-- The following parameters are ONLY ESTIMASTIONS and NOT CORRECT!!!! /!-->
+            <Length desc="The length of the cooling pipe" unit="mm">249.88</Length>
+            <VPosition desc="The position of the cooling pipe in V direction" unit="mm">-41.43</VPosition>
+          </CoolingPipe>
           <Sensors>
             <Sensor id="SVD_Layer_4_Ladder_Sensor_0">
-              <SensorParameters>
-                <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Sensor[@type=1]/*)"/>
-                <isSMD desc="Does this sensor has SMD components?">0</isSMD>
-              </SensorParameters>
-              <Position>
-                <V desc="sensor position (middle of the volume) in V (local coordinate system of ladder)" unit="mm">-98.81</V>
-                <W desc="sensor position (middle of the active volume) in W (local coordinate system of ladder)" unit="mm">0</W>
-                <Theta desc="rotation about Euler angle Theta in LOCAL coordinate system" unit="deg">0</Theta>
-              </Position>
+              <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Sensor[@type=1]/*)"/>
+              <VPosition desc="sensor position (middle of the volume) in V (local coordinate system of ladder)" unit="mm">-98.81</VPosition>
+              <Kapton>
+                <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Kapton/*)"/>
+                <DensityFactor desc="How many layers of kapton for this sensor?">1</DensityFactor>
+              </Kapton>
             </Sensor>
             <Sensor id="SVD_Layer_4_Ladder_Sensor_1">
-              <SensorParameters>
-                <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Sensor[@type=1]/*)"/>
-                <isSMD desc="Does this sensor has SMD components?">1</isSMD>
-              </SensorParameters>
-              <Position>
-                <V desc="sensor position (middle of the volume) in V (local coordinate system of ladder)" unit="mm">26.19</V>
-                <W desc="sensor position (middle of the active volume) in W (local coordinate system of ladder)" unit="mm">0</W>
-                <Theta desc="rotation about Euler angle Theta in LOCAL coordinate system" unit="deg">0</Theta>
-              </Position>
+              <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Sensor[@type=1]/*)"/>
+              <VPosition desc="sensor position (middle of the volume) in V (local coordinate system of ladder)" unit="mm">26.19</VPosition>
+              <Kapton>
+                <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Kapton/*)"/>
+                <DensityFactor desc="How many layers of kapton for this sensor?">1</DensityFactor>
+              </Kapton>
             </Sensor>
             <Sensor id="SVD_Layer_4_Ladder_Sensor_2">
-              <SensorParameters>
-                <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Sensor[@type=2]/*)"/>
-                <isSMD desc="Does this sensor has SMD components?">0</isSMD>
-              </SensorParameters>
-              <Position>
-                <V desc="sensor position (middle of the volume) in V (local coordinate system of ladder)" unit="mm">150.01</V>
-                <W desc="sensor position (middle of the active volume) in W (local coordinate system of ladder)" unit="mm">-13.41</W>
-                <Theta desc="rotation about Euler angle Theta in LOCAL coordinate system" unit="deg">11.9</Theta>
-              </Position>
+              <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Sensor[@type=2]/*)"/>
+              <VPosition desc="sensor position (middle of the volume) in V (local coordinate system of ladder)" unit="mm">150.01</VPosition>
+              <WPosition desc="sensor position (middle of the active volume) in W (local coordinate system of ladder)" unit="mm">-13.41</WPosition>
+              <PhiLocal unit="deg">-90</PhiLocal>
+              <ThetaLocal desc="rotation about Euler angle Theta in LOCAL coordinate system" unit="deg">11.9</ThetaLocal>
+              <PsiLocal unit="deg">90</PsiLocal>
             </Sensor>
           </Sensors>
         </Ladders>
       </Layer>
       <Layer id="SVD_Layer_5">
         <Phi0 desc="The starting angle of the layer in the r-phi plane" unit="deg">-7</Phi0>
-        <Radius desc="Radius of the layer" unit="mm">115.0</Radius>
-        <PhiLadder desc="Rotation of the ladder about its local V axis (parallel to global z axis)" unit="deg">7</PhiLadder>
         <NumberOfLadders desc="Number of ladders in this layer">14</NumberOfLadders>
         <Ladders>
-          <isRibs>1</isRibs>
-          <!-- Common parameters for all ladders -->
-          <NumberOfSensors>4</NumberOfSensors>
-          <xi:include href="SVDLadderBelleII.xml" xpointer="xpointer(/*/*)"/>
-          <LengthRibsBarrel desc="Length of the Ribs in the Barrel Region" unit="mm">374.88</LengthRibsBarrel>
-          <Length2RibsSlanted desc="Length2 of the Ribs in the Slanted Region" unit="mm">121.56</Length2RibsSlanted>
+          <WPosition desc="Radius of the layer" unit="mm">115.0</WPosition>
+          <PhiLocal desc="Rotation of the ladder about its local V axis (parallel to global z axis)" unit="deg">7</PhiLocal>
+          <Material>Vacuum</Material>
+          <Barrel>
+            <Ribs>
+              <xi:include href="SVDLadderBelleII.xml" xpointer="xpointer(/*/Ribs/*)"/>
+              <Length desc="Length of the Ribs in the Barrel Region" unit="mm">374.88</Length>
+              <VPosition desc="The position of the ribs in V direction" unit="mm">-21.08</VPosition>
+            </Ribs>
+          </Barrel>
+          <CoolingPipe>
+            <xi:include href="SVDLadderBelleII.xml" xpointer="xpointer(/*/CoolingPipe/*)"/>
+            <!-- The following parameters are ONLY ESTIMASTIONS and NOT CORRECT!!!! /!-->
+            <Length desc="The length of the cooling pipe" unit="mm">374.88</Length>
+            <VPosition desc="The position of the cooling pipe in V direction" unit="mm">-21.08</VPosition>
+          </CoolingPipe>
           <Sensors>
             <Sensor id="SVD_Layer_5_Ladder_Sensor_0">
-              <SensorParameters>
-                <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Sensor[@type=1]/*)"/>
-                <isSMD desc="Does this sensor has SMD components?">0</isSMD>
-              </SensorParameters>
-              <Position>
-                <V desc="sensor position (middle of the volume) in V (local coordinate system of ladder)" unit="mm">-146.08</V>
-                <W desc="sensor position (middle of the active volume) in W (local coordinate system of ladder)" unit="mm">0</W>
-                <Theta desc="rotation about Euler angle Theta in LOCAL coordinate system" unit="deg">0</Theta>
-              </Position>
+              <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Sensor[@type=1]/*)"/>
+              <VPosition desc="sensor position (middle of the volume) in V (local coordinate system of ladder)" unit="mm">-146.08</VPosition>
+              <Kapton>
+                <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Kapton/*)"/>
+                <DensityFactor desc="How many layers of kapton for this sensor?">1</DensityFactor>
+              </Kapton>
             </Sensor>
             <Sensor id="SVD_Layer_5_Ladder_Sensor_1">
-              <SensorParameters>
-                <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Sensor[@type=1]/*)"/>
-                <isSMD desc="Does this sensor has SMD components?">1</isSMD>
-              </SensorParameters>
-              <Position>
-                <V desc="sensor position (middle of the volume) in V (local coordinate system of ladder)" unit="mm">-21.08</V>
-                <W desc="sensor position (middle of the active volume) in W (local coordinate system of ladder)" unit="mm">0</W>
-                <Theta desc="rotation about Euler angle Theta in LOCAL coordinate system" unit="deg">0</Theta>
-              </Position>
+              <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Sensor[@type=1]/*)"/>
+              <VPosition desc="sensor position (middle of the volume) in V (local coordinate system of ladder)" unit="mm">-21.08</VPosition>
+              <Kapton>
+                <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Kapton/*)"/>
+                <DensityFactor desc="How many layers of kapton for this sensor?">1</DensityFactor>
+              </Kapton>
             </Sensor>
             <Sensor id="SVD_Layer_5_Ladder_Sensor_2">
-              <SensorParameters>
-                <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Sensor[@type=1]/*)"/>
-                <isSMD desc="Does this sensor has SMD components?">1</isSMD>
-              </SensorParameters>
-              <Position>
-                <V desc="sensor position (middle of the volume) in V (local coordinate system of ladder)" unit="mm">103.92</V>
-                <W desc="sensor position (middle of the active volume) in W (local coordinate system of ladder)" unit="mm">0</W>
-                <Theta desc="rotation about Euler angle Theta in LOCAL coordinate system" unit="deg">0</Theta>
-              </Position>
+              <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Sensor[@type=1]/*)"/>
+              <VPosition desc="sensor position (middle of the volume) in V (local coordinate system of ladder)" unit="mm">103.92</VPosition>
+              <Kapton>
+                <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Kapton/*)"/>
+                <DensityFactor desc="How many layers of kapton for this sensor?">1</DensityFactor>
+              </Kapton>
             </Sensor>
             <Sensor id="SVD_Layer_5_Ladder_Sensor_3">
-              <SensorParameters>
-                <isSMD desc="Does this sensor has SMD components?">0</isSMD>
-                <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Sensor[@type=2]/*)"/>
-              </SensorParameters>
-              <Position>
-                <V desc="sensor position (middle of the volume) in V (local coordinate system of ladder)" unit="mm">226.36</V>
-                <W desc="sensor position (middle of active volume) in W (local coordinate system of lader)" unit="mm">-19.02</W>
-                <Theta desc="rotation about Euler angle Theta in LOCAL coordinate system" unit="deg">17.2</Theta>
-              </Position>
+              <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Sensor[@type=2]/*)"/>
+              <VPosition desc="sensor position (middle of the volume) in V (local coordinate system of ladder)" unit="mm">226.36</VPosition>
+              <WPosition desc="sensor position (middle of active volume) in W (local coordinate system of lader)" unit="mm">-19.02</WPosition>
+              <PhiLocal unit="deg">-90</PhiLocal>
+              <ThetaLocal desc="rotation about Euler angle Theta in LOCAL coordinate system" unit="deg">17.2</ThetaLocal>
+              <PsiLocal unit="deg">90</PsiLocal>
             </Sensor>
           </Sensors>
         </Ladders>
       </Layer>
       <Layer id="SVD_Layer_6">
         <Phi0 desc="The starting angle of the layer in the r-phi plane" unit="deg">-7</Phi0>
-        <Radius desc="Radius of the layer" unit="mm">140</Radius>
-        <Radius2 desc="Radius of slanted part of the ladder" unit="mm">114.0</Radius2>
-        <PhiLadder desc="Rotation of the ladder about its local V axis (parallel to global z axis)" unit="deg">7</PhiLadder>
-          <NumberOfLadders desc="Number of ladders in this layer">17</NumberOfLadders>
+        <NumberOfLadders desc="Number of ladders in this layer">17</NumberOfLadders>
         <Ladders>
-          <isRibs>1</isRibs>
-          <!-- Common parameters for all ladders -->
-          <xi:include href="SVDLadderBelleII.xml" xpointer="xpointer(/*/*)"/>
-          <NumberOfSensors>5</NumberOfSensors>
-          <LengthRibsBarrel desc="Length of the Ribs in the Barrel Region" unit="mm">499.88</LengthRibsBarrel>
-          <Length2RibsSlanted desc="Length2 of the Ribs in the Slanted Region" unit="mm">120.56</Length2RibsSlanted>
+          <WPosition desc="Radius of the layer" unit="mm">140</WPosition>
+          <PhiLocal desc="Rotation of the ladder about its local V axis (parallel to global z axis)" unit="deg">7</PhiLocal>
+          <Material>Vacuum</Material>
+          <Barrel>
+            <Ribs>
+              <xi:include href="SVDLadderBelleII.xml" xpointer="xpointer(/*/Ribs/*)"/>
+              <Length desc="Length of the Ribs in the Barrel Region" unit="mm">499.88</Length>
+              <VPosition desc="The position of the ribs in V direction" unit="mm">-10.06</VPosition>
+            </Ribs>
+          </Barrel>
+          <CoolingPipe>
+            <xi:include href="SVDLadderBelleII.xml" xpointer="xpointer(/*/CoolingPipe/*)"/>
+            <!-- The following parameters are ONLY ESTIMASTIONS and NOT CORRECT!!!! /!-->
+            <Length desc="The length of the cooling pipe" unit="mm">499.88</Length>
+            <VPosition desc="The position of the cooling pipe in V direction" unit="mm">-10.06</VPosition>
+          </CoolingPipe>
           <Sensors>
             <Sensor id="SVD_Layer_6_Ladder_Sensor_0">
-              <SensorParameters>
-                <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Sensor[@type=1]/*)"/>
-                <isSMD desc="Does this sensor has SMD components?">0</isSMD>
-              </SensorParameters>
-              <Position>
-                <V desc="sensor position (middle of the volume) in V (local coordinate system of ladder)" unit="mm">-197.56</V>
-                <W desc="sensor position (middle of the active volume) in W (local coordinate system of ladder)" unit="mm">0</W>
-                <Theta desc="rotation about Euler angle Theta in LOCAL coordinate system" unit="deg">0</Theta>
-              </Position>
+              <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Sensor[@type=1]/*)"/>
+              <VPosition desc="sensor position (middle of the volume) in V (local coordinate system of ladder)" unit="mm">-197.56</VPosition>
+              <Kapton>
+                <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Kapton/*)"/>
+                <DensityFactor desc="How many layers of kapton for this sensor?">1</DensityFactor>
+              </Kapton>
             </Sensor>
             <Sensor id="SVD_Layer_6_Ladder_Sensor_1">
-              <SensorParameters>
-                <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Sensor[@type=1]/*)"/>
-                <isSMD desc="Does this sensor has SMD components?">1</isSMD>
-              </SensorParameters>
-              <Position>
-                <V desc="sensor position (middle of the volume) in V (local coordinate system of ladder)" unit="mm">-72.56</V>
-                <W desc="sensor position (middle of the active volume) in W (local coordinate system of ladder)" unit="mm">0</W>
-                <Theta desc="rotation about Euler angle Theta in LOCAL coordinate system" unit="deg">0</Theta>
-              </Position>
+              <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Sensor[@type=1]/*)"/>
+              <VPosition desc="sensor position (middle of the volume) in V (local coordinate system of ladder)" unit="mm">-72.56</VPosition>
+              <Kapton>
+                <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Kapton/*)"/>
+                <DensityFactor desc="How many layers of kapton for this sensor?">1</DensityFactor>
+              </Kapton>
             </Sensor>
             <Sensor id="SVD_Layer_6_Ladder_Sensor_2">
-              <SensorParameters>
-                <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Sensor[@type=1]/*)"/>
-                <isSMD desc="Does this sensor has SMD components?">1</isSMD>
-              </SensorParameters>
-              <Position>
-                <V desc="sensor position (middle of the volume) in V (local coordinate system of ladder)" unit="mm">52.44</V>
-                <W desc="sensor position (middle of the active volume) in W (local coordinate system of ladder)" unit="mm">0</W>
-                <Theta desc="rotation about Euler angle Theta in LOCAL coordinate system" unit="deg">0</Theta>
-              </Position>
+              <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Sensor[@type=1]/*)"/>
+              <VPosition desc="sensor position (middle of the volume) in V (local coordinate system of ladder)" unit="mm">52.44</VPosition>
+              <Kapton>
+                <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Kapton/*)"/>
+                <DensityFactor desc="How many layers of kapton for this sensor?">1</DensityFactor>
+              </Kapton>
             </Sensor>
             <Sensor id="SVD_Layer_6_Ladder_Sensor_3">
-              <SensorParameters>
-                <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Sensor[@type=1]/*)"/>
-                <isSMD desc="Does this sensor has SMD components?">1</isSMD>
-              </SensorParameters>
-              <Position>
-                <V desc="sensor position (middle of the volume) in V (local coordinate system of ladder)" unit="mm">177.44</V>
-                <W desc="sensor position (middle of the active volume) in W (local coordinate system of ladder)" unit="mm">0</W>
-                <Theta desc="rotation about Euler angle Theta in LOCAL coordinate system" unit="deg">0</Theta>
-              </Position>
+              <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Sensor[@type=1]/*)"/>
+              <VPosition desc="sensor position (middle of the volume) in V (local coordinate system of ladder)" unit="mm">177.44</VPosition>
+              <Kapton>
+                <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Kapton/*)"/>
+                <DensityFactor desc="How many layers of kapton for this sensor?">1</DensityFactor>
+              </Kapton>
             </Sensor>
             <Sensor id="SVD_Layer_6_Ladder_Sensor_4">
-              <SensorParameters>
-                <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Sensor[@type=2]/*)"/>
-                <isSMD desc="Does this sensor has SMD components?">0</isSMD>
-              </SensorParameters>
-              <Position>
-                <V desc="sensor position (middle of the volume) in V (local coordinate system of ladder)" unit="mm">298.352</V>
-                <W desc="sensor position (middle of active volume) in W (local coordinate system of ladder)" unit="mm">-22.991</W>
-                <Theta desc="rotation about Euler angle Theta in LOCAL coordinate system" unit="deg">21.1</Theta>
-              </Position>
+              <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Sensor[@type=2]/*)"/>
+              <VPosition desc="sensor position (middle of the volume) in V (local coordinate system of ladder)" unit="mm">298.352</VPosition>
+              <WPosition desc="sensor position (middle of active volume) in W (local coordinate system of ladder)" unit="mm">-22.991</WPosition>
+              <PhiLocal unit="deg">-90</PhiLocal>
+              <ThetaLocal desc="rotation about Euler angle Theta in LOCAL coordinate system" unit="deg">21.1</ThetaLocal>
+              <PsiLocal unit="deg">90</PsiLocal>
             </Sensor>
           </Sensors>
         </Ladders>

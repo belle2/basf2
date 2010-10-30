@@ -1,0 +1,103 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!-- Notes:
+  RadLength, InterLength: If the values are negative, their absolute value
+                          is taken, otherwise radiation length is recomputed using G3 formula.
+-->
+<ParamSet type="MAT">
+  <Name>SVDMaterials</Name>
+  <Description>SVD material definitions</Description>
+  <Version>0</Version>
+  <Creator>GeoMaterials</Creator>
+  <Content>
+    <Mixture name="SVD_Sensors_KaptonMix">
+      <Density unit="g/cm3">1.5</Density>
+      <Elements>
+        <Element name="C" weight="1.0">
+          <AtomNumber>6</AtomNumber>
+          <MassNumber>12</MassNumber>
+        </Element>
+      </Elements>
+    </Mixture>
+    <Mixture name="SVD_Sensors_Foam">
+      <Density unit="g/cm3">1.5</Density>
+      <Elements>
+        <Element name="C" weight="1.0">
+          <AtomNumber>6</AtomNumber>
+          <MassNumber>12</MassNumber>
+        </Element>
+      </Elements>
+    </Mixture>
+    <Mixture name="SVD_Sensors_Large_SMDs">
+      <Density unit="g/cm3">2.3</Density>
+      <Elements>
+        <Element name="Si" weight="1.0">
+          <AtomNumber>14.0</AtomNumber>
+          <MassNumber>28.0855</MassNumber>
+        </Element>
+      </Elements>
+    </Mixture>
+    <Mixture name="SVD_Sensors_Large_Silicon">
+      <Density unit="g/cm3">2.3</Density>
+      <Elements>
+        <Element name="Si" weight="1.0">
+          <AtomNumber>14.0</AtomNumber>
+          <MassNumber>28.0855</MassNumber>
+        </Element>
+      </Elements>
+    </Mixture>
+    <Mixture name="SVD_Sensors_Small_Silicon">
+      <Density unit="g/cm3">2.3</Density>
+      <Elements>
+        <Element name="Si" weight="1.0">
+          <AtomNumber>14.0</AtomNumber>
+          <MassNumber>28.0855</MassNumber>
+        </Element>
+      </Elements>
+    </Mixture>
+    <Mixture name="SVD_Sensors_Wedge_Silicon">
+      <Density unit="g/cm3">2.3</Density>
+      <Elements>
+        <Element name="Si" weight="1.0">
+          <AtomNumber>14.0</AtomNumber>
+          <MassNumber>28.0855</MassNumber>
+        </Element>
+      </Elements>
+    </Mixture>
+    <Mixture name="SVD_Air">
+      <Density unit="g/cm3">0.001</Density>
+      <Elements>
+        <Element name="N" weight="1">
+          <AtomNumber>7</AtomNumber>
+          <MassNumber>14</MassNumber>
+        </Element>
+      </Elements>
+    </Mixture>
+    <Mixture name="SVD_Ribs_Foam">
+      <Density unit="g/cm3">1.5</Density>
+      <Elements>
+        <Element name="C" weight="1.0">
+          <AtomNumber>6</AtomNumber>
+          <MassNumber>12</MassNumber>
+        </Element>
+      </Elements>
+    </Mixture>
+    <Mixture name="SVD_Ribs_Carbon">
+      <Density unit="g/cm3">1.5</Density>
+      <Elements>
+        <Element name="C" weight="1.0">
+          <AtomNumber>6</AtomNumber>
+          <MassNumber>12</MassNumber>
+        </Element>
+      </Elements>
+    </Mixture>
+    <Mixture name="SVD_CoolingPipe_Steel">
+      <Density unit="g/cm3">7.85</Density>
+      <Elements>
+        <Element name="Fe" weight="1.0">
+          <AtomNumber>26</AtomNumber>
+          <MassNumber>55</MassNumber>
+        </Element>
+      </Elements>
+    </Mixture>
+  </Content>
+</ParamSet>

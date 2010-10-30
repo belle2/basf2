@@ -8,12 +8,9 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifdef B2GEOM_BASF2
 #include <framework/gearbox/GearDir.h>
 #include <framework/datastore/Units.h>
 #include <boost/format.hpp>
-#endif
-
 #include "TGeoMatrix.h"
 
 #ifndef B2GEOMOFFSET_H
@@ -21,11 +18,9 @@
 
 using namespace std;
 
-#ifdef B2GEOM_BASF2
 namespace Belle2 {
 
   class GearDir;
-#endif
 
   class B2GeomOffset {
   private:
@@ -44,19 +39,12 @@ namespace Belle2 {
     B2GeomOffset();
     ~B2GeomOffset();
 
-#ifdef B2GEOM_BASF2
     //! initialises the parameters from GearDir
     Bool_t init(GearDir offSetDir);
-#else
-    Bool_t init();
-#endif
 
     //! returns the TGeoHMatrix corresponding to the offset of the component
     TGeoHMatrix* getHMatrix();
   };
 
-#ifdef B2GEOM_BASF2
 }
-#endif
-
 #endif

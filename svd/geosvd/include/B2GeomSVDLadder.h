@@ -8,17 +8,11 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifdef B2GEOM_BASF2
 #include <svd/geosvd/B2GeomSVDSensor.h>
-#include <svd/geosvd/B2GeomOffset.h>
+#include <pxd/geopxd/B2GeomVolume.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/datastore/Units.h>
 #include <boost/format.hpp>
-#else
-#include "B2GeomSVDSensor.h"
-#include "B2GeomOffset.h"
-#endif
-
 #include "TROOT.h"
 #include "TGeoMaterial.h"
 #include "TGeoMedium.h"
@@ -29,63 +23,73 @@
 #include <vector>
 #include <string>
 
-
 #ifndef B2GEOMSVDLADDER_H_
 #define B2GEOMSVDLADDER_H_
 
 using namespace std;
-
-#ifdef B2GEOM_BASF2
 namespace Belle2 {
   class GearDir;
-#endif
 
-  class B2GeomSVDLadder {
+// ------------------------------------------------------------------------------------------------
+// Classes describing the ribs of SVD
+// ------------------------------------------------------------------------------------------------
+
+  class B2GeomSVDLadderRibFoam : public B2GeomVolume {
+  protected:
+    Int_t iLayer;
+  public:
+    B2GeomSVDLadderRibFoam(Int_t iLay);
+    Bool_t init(GearDir& content);
+    Bool_t make();
+  };
+
+  class B2GeomSVDLadderRib : public B2GeomVolume {
+  protected:
+    Int_t iLayer;
+  public:
+    B2GeomSVDLadderRib(Int_t iLay);
+    Bool_t init(GearDir& content);
+    Bool_t make();
+  };
+
+  class B2GeomSVDLadderRibs : public B2GeomVolume {
+  protected:
+    B2GeomSVDLadderRib* volRib;
+    Int_t iLayer;
+    Float_t fRib1UPosition;
+    Float_t fRib2UPosition;
+  public:
+    B2GeomSVDLadderRibs(Int_t iLay);
+    Bool_t init(GearDir& content);
+    Bool_t make();
+  };
+
+// ------------------------------------------------------------------------------------------------
+// Classes describing the cooling pipe of SVD
+// ------------------------------------------------------------------------------------------------
+
+  class B2GeomSVDLadderCoolingpipe : public B2GeomVolume {
+  protected:
+    Int_t iLayer;
+  public:
+    B2GeomSVDLadderCoolingpipe(Int_t iLay);
+    Bool_t init(GearDir& content);
+    Bool_t make();
+  };
+
+// ------------------------------------------------------------------------------------------------
+// Classes describing the SVD ladder itself
+// ------------------------------------------------------------------------------------------------
+
+  class B2GeomSVDLadder : public B2GeomVolume {
   private:
 
     //! path of this Ladder
     string path;
-#ifdef B2GEOM_BASF2
     GearDir ladderContent;
-#endif
-
-    // volumes in SVD ladder
-    //! TGeoVolumeAssembly which contains all parts of this ladder
-    TGeoVolumeAssembly* volSVDLadder;
-    TGeoVolume* volRibsBarrel;
-    TGeoVolume* volRibBarrel;
-    TGeoVolume* volCarbonBarrel;
-    TGeoVolume* volRibsSlanted;
-    TGeoVolume* volRibSlanted;
-    TGeoVolume* volCarbonSlanted;
-
-
-    // Mediums used in SVD ladder
-    TGeoMedium* medFoam;
-    TGeoMedium* medCarbon;
-
-    // Dimensions of the carbon+foam rib
-    //! thickness of the ribs
-    Double_t fThicknessRibs;
-    //! position of the middle of each rib
-    Double_t fRibUPosition0;
-    Double_t fRibUPosition1;
-    //! width of the ribs
-    Double_t fWidthRibs;
-    //! width of the carbon
-    Double_t fWidthCarbon;
-    //! length of the ribs in barrel region
-    Double_t fLengthRibsBarrel;
-    //! distance between middle of sensor and middle of carbon rib
-    Double_t fRibsDistanceFromSensor;
-    //! Length1 of the ribs in slanted region (theta angle => implementation of rib as Trd1)
-    Double_t fLength1RibsSlanted;
-    //! Length2 of the ribs in slanted region (theta angle => implementation of rib as Trd1)
-    Double_t fLength2RibsSlanted;
-
 
     //! The sensor objects
-    vector<B2GeomSVDSensor*> b2gSVDSensors;
+    B2GeomSVDSensor** b2gSVDSensors;
 
     // Parameters
     //! layer number
@@ -95,49 +99,17 @@ namespace Belle2 {
     //! number of barrel sensors
     Int_t nSensors;
 
-    //! put ribs?
-    bool isRibs;
-
-    //! The offsets of the sensors from their ideal position
-    vector<B2GeomOffset*> b2gSensorOffsets;
-
-    //! V Position of the sensors
-    vector<Double_t> fSensorVPositions;
-
-    //! W Position of the sensors
-    vector<Double_t> fSensorWPositions;
-
-    //! Angle of the sensors
-    vector<Double_t> fThetas;
-
-    //! Mediums contained in the ladder
-    TGeoMedium* medAir;
-
-    //! Methods to place components
-    void putSensors();
-    void putRibsBarrel();
-    void putRibsSlanted();
-
+    B2GeomSVDLadderRibs* volBarrelRibs;
+    B2GeomSVDLadderRibs* volSlantedRibs;
+    B2GeomSVDLadderCoolingpipe* volCoolingpipe;
 
   public:
     B2GeomSVDLadder();
     B2GeomSVDLadder(Int_t iLayer, Int_t iLadder);
     ~B2GeomSVDLadder();
-#ifdef B2GEOM_BASF2
     Bool_t init(GearDir& content);
-    Bool_t initOffsets();
-#else
-    Bool_t init();
-#endif
     Bool_t make();
-    TGeoVolumeAssembly* getVol() {
-      return volSVDLadder;
-    }
-    TGeoHMatrix getOrigin();
-
-
   };
-#ifdef B2GEOM_BASF2
 }
 #endif
-#endif
+

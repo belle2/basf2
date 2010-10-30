@@ -8,15 +8,10 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#define B2GEOM_BASF2
 
-#ifdef B2GEOM_BASF2
 #include <svd/geosvd/B2GeomOffset.h>
 using namespace boost;
 using namespace Belle2;
-#else
-#include "B2GeomOffset.h"
-#endif
 
 B2GeomOffset::B2GeomOffset()
 {
@@ -34,7 +29,6 @@ B2GeomOffset::~B2GeomOffset()
 
 }
 
-#ifdef B2GEOM_BASF2
 Bool_t B2GeomOffset::init(GearDir offsetDir)
 {
   fOffsetPhi = offsetDir.getParamAngle("OffsetPhi");
@@ -44,17 +38,6 @@ Bool_t B2GeomOffset::init(GearDir offsetDir)
   fOffsetU = offsetDir.getParamLength("OffsetU");
   fOffsetV = offsetDir.getParamLength("OffsetV");
 }
-#else
-Boolt_t B2GeomOffset::init()
-{
-  fOffsetW = 0.0;
-  fOffsetU = 0.0;
-  fOffsetV = 0.0;
-  fOffsetPhi = 0.;
-  fOffsetTheta = 0.0;
-  fOffsetPsi = 0.0;
-}
-#endif
 
 TGeoHMatrix* B2GeomOffset::getHMatrix()
 {

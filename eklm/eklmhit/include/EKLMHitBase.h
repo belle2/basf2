@@ -53,7 +53,8 @@ namespace Belle2 {
 
 
   private:
-    ClassDef(EKLMHitBase, 1);   // needed to be storable
+    //! needed to make objects storable
+    ClassDef(EKLMHitBase, 1);
 
     //! name of the hit
     std::string m_Name;

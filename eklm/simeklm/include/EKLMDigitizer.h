@@ -76,6 +76,7 @@ namespace Belle2 {
 
   };
 
+  //! Extern allocator
   extern G4Allocator<EKLMDigitizer>   EKLMDigitizerAllocator;
 
 

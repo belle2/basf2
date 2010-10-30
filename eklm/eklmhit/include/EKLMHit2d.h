@@ -86,7 +86,7 @@ namespace Belle2 {
     //! ChiSq of the hit
     double m_ChiSq;
 
-
+    //! Needed to make EKLMHit2d storable
     ClassDef(EKLMHit2d, 1);
   };
 

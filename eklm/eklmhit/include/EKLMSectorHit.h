@@ -69,6 +69,7 @@ namespace Belle2 {
     //!  vector of pointers to 2d hits included to the EKLMSectorHit
     std::vector<EKLMHit2d*> m_hit2dVector;
 
+    //! Needed to make objects storable
     ClassDef(EKLMSectorHit, 1);
 
 

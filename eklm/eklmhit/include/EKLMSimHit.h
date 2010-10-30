@@ -76,10 +76,12 @@ namespace Belle2 {
     //! PDG code of the track particle
     G4int m_PDGcode;
 
+    //! Needed to make root object storable
     ClassDef(EKLMSimHit, 1);
 
   };
 
+  //! define collections of Sim Hits
   typedef G4THitsCollection<EKLMSimHit> EKLMSimHitsCollection;
 
 } // end of namespace Belle2

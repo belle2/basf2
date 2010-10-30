@@ -90,6 +90,7 @@ namespace Belle2 {
     //! distance btw. the hit and SiPM
     double m_LightPropagationLength;
 
+    //! Makes objects storable
     ClassDef(EKLMStripHit, 1);
 
 

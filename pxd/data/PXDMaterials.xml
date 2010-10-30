@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!-- Notes:
+  RadLength, InterLength: If the values are negative, their absolute value
+                          is taken, otherwise radiation length is recomputed using G3 formula.
+-->
+<ParamSet type="MAT">
+  <Name>PXDMaterials</Name>
+  <Description>PXD material definitions</Description>
+  <Version>0</Version>
+  <Creator>GeoMaterials</Creator>
+  <Content>
+    <Mixture name="PXD_Silicon">
+      <Density unit="g/cm3">2.3</Density>
+      <Elements>
+        <Element name="Si" weight="1.0">
+          <AtomNumber>14.0</AtomNumber>
+          <MassNumber>28.0855</MassNumber>
+        </Element>
+      </Elements>
+    </Mixture>    
+  </Content>
+</ParamSet>

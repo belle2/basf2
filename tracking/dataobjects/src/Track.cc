@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <tracking/storage/Track.h>
+#include <tracking/dataobjects/Track.h>
 
 using namespace std;
 using namespace Belle2;

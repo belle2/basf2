@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <Detector xmlns:xi="http://www.w3.org/2001/XInclude">
   <Name>Belle2Detector</Name>
   <Description>The Belle II detector</Description>
@@ -12,14 +12,16 @@
     <xi:include href="../top/TOPMaterials.xml"/>
     <xi:include href="../pxd/PXDMaterials.xml"/>
     <xi:include href="../svd/SVDMaterials.xml"/>
+    <xi:include href="../eklm/EKLMMaterials.xml"/>
   </MaterialSets>
   <Subdetectors>
     <xi:include href="../ir/IRBelleIISymm.xml"/>
     <!--xi:include href="../ir/IRBelleII.xml"/-->
     <xi:include href="../pxd/PXDBelleII_PXD1600.xml"/>
-    <xi:include href="../svd/SVDBelleII.xml"/>
+    <!--xi:include href="../svd/SVDBelleII.xml"/-->
     <xi:include href="../cdc/CDCBelleII.xml"/>
     <xi:include href="../arich/ARICHBelleII.xml"/>
     <xi:include href="../top/TOPBelleII.xml"/>
+    <xi:include href="../eklm/EKLMBelleII.xml"/>
   </Subdetectors>
 </Detector>

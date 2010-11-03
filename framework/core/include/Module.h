@@ -292,7 +292,7 @@ namespace Belle2 {
      * @return A reference to a module parameter having the correct type.
      */
     template<typename T>
-    ModuleParam<T>& getParam(const std::string& name) const throw(ModuleParameterNotFoundError, ModuleParameterTypeError);
+    ModuleParam<T>& getParam(const std::string& name) const throw(ModuleParamList::ModuleParameterNotFoundError, ModuleParamList::ModuleParameterTypeError);
 
     /**
      * Sets the return value for this module as integer.
@@ -398,7 +398,7 @@ namespace Belle2 {
 
 
   template<typename T>
-  ModuleParam<T>& Module::getParam(const std::string& name) const throw(ModuleParameterNotFoundError, ModuleParameterTypeError)
+  ModuleParam<T>& Module::getParam(const std::string& name) const throw(ModuleParamList::ModuleParameterNotFoundError, ModuleParamList::ModuleParameterTypeError)
   {
     return m_moduleParamList.getParameter<T>(name);
   }

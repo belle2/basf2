@@ -72,7 +72,7 @@ bool GearboxIOXML::isOpen() const
 
 
 bool GearboxIOXML::isPathValid(const std::string& path) const
-throw(GearboxIONotConnectedError)
+throw(GearboxIOAbs::GearboxIONotConnectedError)
 {
   if (!isOpen()) throw GearboxIONotConnectedError();
   if (path.empty()) return false;
@@ -93,15 +93,15 @@ throw(GearboxIONotConnectedError)
 
 
 bool GearboxIOXML::isParamAvailable(const std::string& path) const
-throw(GearboxIONotConnectedError, GearboxPathNotValidError)
+throw(GearboxIOAbs::GearboxIONotConnectedError, GearboxIOAbs::GearboxPathNotValidError)
 {
   if (!isOpen()) throw GearboxIONotConnectedError();
-  if (path.empty()) throw GearboxPathNotValidError("");
+  if (path.empty()) throw(GearboxPathNotValidError() << "");
 
   //1. Check if the path to the parameter exists, by
   //   evaluating the whole path except the last node
   string pathOnly = path.substr(0, path.find_last_of("/"));
-  if (!isPathValid(pathOnly)) throw GearboxPathNotValidError(path);
+  if (!isPathValid(pathOnly)) throw(GearboxPathNotValidError() << path);
 
   //2. Check if the parameter exists
   return isPathValid(path);
@@ -109,13 +109,14 @@ throw(GearboxIONotConnectedError, GearboxPathNotValidError)
 
 
 int GearboxIOXML::getNumberNodes(const string& path) const
-throw(GearboxIONotConnectedError, GearboxPathNotValidError, GearboxPathEmptyResultError, GearboxPathResultNotValidError)
+throw(GearboxIOAbs::GearboxIONotConnectedError, GearboxIOAbs::GearboxPathNotValidError,
+      GearboxIOAbs::GearboxPathEmptyResultError, GearboxIOAbs::GearboxPathResultNotValidError)
 {
   if (!isOpen()) throw GearboxIONotConnectedError();
-  if (path.empty()) throw GearboxPathNotValidError("");
+  if (path.empty()) throw(GearboxPathNotValidError() << "");
 
   if (m_enableParamCheck) {
-    if (!isPathValid(path)) throw GearboxPathNotValidError(path);
+    if (!isPathValid(path)) throw(GearboxPathNotValidError() << path);
   }
 
   xmlXPathObjectPtr result;
@@ -125,10 +126,10 @@ throw(GearboxIONotConnectedError, GearboxPathNotValidError, GearboxPathEmptyResu
 
   result = getNodeSet(m_xmlDocument, (xmlChar*)queryString.str().c_str());
 
-  if (result == NULL) throw GearboxPathEmptyResultError(queryString.str());
+  if (result == NULL) throw(GearboxPathEmptyResultError() << queryString.str());
   if (result->type != XPATH_NUMBER) {
     xmlXPathFreeObject(result);
-    throw GearboxPathResultNotValidError(queryString.str());
+    throw(GearboxPathResultNotValidError() << queryString.str());
   }
 
   int numberNodes = (int)result->floatval;
@@ -139,14 +140,15 @@ throw(GearboxIONotConnectedError, GearboxPathNotValidError, GearboxPathEmptyResu
 
 
 double GearboxIOXML::getParamLength(const std::string& path) const
-throw(GearboxIONotConnectedError, GearboxPathNotValidError, GearboxPathEmptyResultError, GearboxParamNotExistsError,
-      GearboxPathResultNotValidError, GearboxStringNumConversionError)
+throw(GearboxIOAbs::GearboxIONotConnectedError, GearboxIOAbs::GearboxPathNotValidError,
+      GearboxIOAbs::GearboxPathEmptyResultError, GearboxIOAbs::GearboxParamNotExistsError,
+      GearboxIOAbs::GearboxPathResultNotValidError, GearboxIOAbs::GearboxStringNumConversionError)
 {
   double resultLength;
   int currentUnitType;
 
   if (m_enableParamCheck) {
-    if (!isParamAvailable(path)) throw GearboxParamNotExistsError(path);
+    if (!isParamAvailable(path)) throw(GearboxParamNotExistsError() << path);
   }
 
   getDoubleWithUnit(resultLength, currentUnitType, path, c_CM, m_lengthUnitMap);
@@ -174,14 +176,15 @@ throw(GearboxIONotConnectedError, GearboxPathNotValidError, GearboxPathEmptyResu
 
 
 double GearboxIOXML::getParamAngle(const std::string& path) const
-throw(GearboxIONotConnectedError, GearboxPathNotValidError, GearboxPathEmptyResultError, GearboxParamNotExistsError,
-      GearboxPathResultNotValidError, GearboxStringNumConversionError)
+throw(GearboxIOAbs::GearboxIONotConnectedError, GearboxIOAbs::GearboxPathNotValidError,
+      GearboxIOAbs::GearboxPathEmptyResultError, GearboxIOAbs::GearboxParamNotExistsError,
+      GearboxIOAbs::GearboxPathResultNotValidError, GearboxIOAbs::GearboxStringNumConversionError)
 {
   double resultAngle;
   int currentUnitType;
 
   if (m_enableParamCheck) {
-    if (!isParamAvailable(path)) throw GearboxParamNotExistsError(path);
+    if (!isParamAvailable(path)) throw(GearboxParamNotExistsError() << path);
   }
 
   getDoubleWithUnit(resultAngle, currentUnitType, path, c_Rad, m_angleUnitMap);
@@ -202,24 +205,25 @@ throw(GearboxIONotConnectedError, GearboxPathNotValidError, GearboxPathEmptyResu
 
 
 double GearboxIOXML::getParamNumValue(const std::string& path) const
-throw(GearboxIONotConnectedError, GearboxPathNotValidError, GearboxPathEmptyResultError, GearboxParamNotExistsError,
-      GearboxPathResultNotValidError, GearboxStringNumConversionError)
+throw(GearboxIOAbs::GearboxIONotConnectedError, GearboxIOAbs::GearboxPathNotValidError,
+      GearboxIOAbs::GearboxPathEmptyResultError, GearboxIOAbs::GearboxParamNotExistsError,
+      GearboxIOAbs::GearboxPathResultNotValidError, GearboxIOAbs::GearboxStringNumConversionError)
 {
   if (!isOpen()) throw GearboxIONotConnectedError();
-  if (path.empty()) throw GearboxPathNotValidError("");
+  if (path.empty()) throw(GearboxPathNotValidError() << "");
 
   if (m_enableParamCheck) {
-    if (!isParamAvailable(path)) throw GearboxParamNotExistsError(path);
+    if (!isParamAvailable(path)) throw(GearboxParamNotExistsError() << path);
   }
 
   xmlXPathObjectPtr result;
   result = getNodeSet(m_xmlDocument, (xmlChar*)path.c_str());
 
-  if (result == NULL) throw GearboxPathEmptyResultError(path);
-  if (result->type != XPATH_NODESET) throw GearboxPathResultNotValidError(path);
+  if (result == NULL) throw(GearboxPathEmptyResultError() << path);
+  if (result->type != XPATH_NODESET) throw(GearboxPathResultNotValidError() << path);
   if (xmlXPathNodeSetIsEmpty(result->nodesetval)) {
     xmlXPathFreeObject(result);
-    throw GearboxPathEmptyResultError(path);
+    throw(GearboxPathEmptyResultError() << path);
   }
 
   xmlNodeSetPtr nodeSet;
@@ -232,7 +236,7 @@ throw(GearboxIONotConnectedError, GearboxPathNotValidError, GearboxPathEmptyResu
     resultValue = boost::lexical_cast<double>((char*)resultChar);
   } catch (boost::bad_lexical_cast &) {
     xmlXPathFreeObject(result);
-    throw GearboxStringNumConversionError(string((char*)resultChar));
+    throw(GearboxStringNumConversionError() << string((char*)resultChar));
   }
 
   xmlXPathFreeObject(result);
@@ -241,29 +245,30 @@ throw(GearboxIONotConnectedError, GearboxPathNotValidError, GearboxPathEmptyResu
 
 
 std::string GearboxIOXML::getParamString(const std::string& path) const
-throw(GearboxIONotConnectedError, GearboxPathNotValidError, GearboxParamNotExistsError, GearboxPathEmptyResultError,
-      GearboxPathResultNotValidError)
+throw(GearboxIOAbs::GearboxIONotConnectedError, GearboxIOAbs::GearboxPathNotValidError,
+      GearboxIOAbs::GearboxParamNotExistsError, GearboxIOAbs::GearboxPathEmptyResultError,
+      GearboxIOAbs::GearboxPathResultNotValidError)
 {
   if (!isOpen()) throw GearboxIONotConnectedError();
-  if (path.empty()) throw GearboxPathNotValidError("");
+  if (path.empty()) throw(GearboxPathNotValidError() << "");
 
   if (m_enableParamCheck) {
-    if (!isParamAvailable(path)) throw GearboxParamNotExistsError(path);
+    if (!isParamAvailable(path)) throw(GearboxParamNotExistsError() << path);
   }
 
   xmlXPathObjectPtr result;
   result = getNodeSet(m_xmlDocument, (xmlChar*)path.c_str());
 
-  if (result == NULL) throw GearboxPathEmptyResultError(path);
+  if (result == NULL) throw(GearboxPathEmptyResultError() << path);
 
   if (result->type != XPATH_NODESET) {
     xmlXPathFreeObject(result);
-    throw GearboxPathResultNotValidError(path);
+    throw(GearboxPathResultNotValidError() << path);
   }
 
   if (xmlXPathNodeSetIsEmpty(result->nodesetval)) {
     xmlXPathFreeObject(result);
-    throw GearboxPathEmptyResultError(path);
+    throw(GearboxPathEmptyResultError() << path);
   }
 
   xmlNodeSetPtr nodeSet;
@@ -296,25 +301,25 @@ xmlXPathObjectPtr GearboxIOXML::getNodeSet(xmlDocPtr document, xmlChar *xpath) c
 
 void GearboxIOXML::getDoubleWithUnit(double& value, int& unit, const string& xpath,
                                      int defaultUnit, const std::map<std::string, int>& unitMap) const
-throw(GearboxIONotConnectedError, GearboxPathNotValidError, GearboxPathEmptyResultError,
-      GearboxPathResultNotValidError, GearboxStringNumConversionError)
+throw(GearboxIOAbs::GearboxIONotConnectedError, GearboxIOAbs::GearboxPathNotValidError, GearboxIOAbs::GearboxPathEmptyResultError,
+      GearboxIOAbs::GearboxPathResultNotValidError, GearboxIOAbs::GearboxStringNumConversionError)
 {
   if (!isOpen()) throw GearboxIONotConnectedError();
-  if (xpath.empty()) throw GearboxPathNotValidError("");
+  if (xpath.empty()) throw(GearboxPathNotValidError() << "");
 
   xmlXPathObjectPtr result;
   result = getNodeSet(m_xmlDocument, (xmlChar*)xpath.c_str());
 
-  if (result == NULL) throw GearboxPathEmptyResultError(xpath);
+  if (result == NULL) throw(GearboxPathEmptyResultError() << xpath);
 
   if (result->type != XPATH_NODESET) {
     xmlXPathFreeObject(result);
-    throw GearboxPathResultNotValidError(xpath);
+    throw(GearboxPathResultNotValidError() << xpath);
   }
 
   if (xmlXPathNodeSetIsEmpty(result->nodesetval)) {
     xmlXPathFreeObject(result);
-    throw GearboxPathEmptyResultError(xpath);
+    throw(GearboxPathEmptyResultError() << xpath);
   }
 
   xmlNodeSetPtr nodeSet;
@@ -346,7 +351,7 @@ throw(GearboxIONotConnectedError, GearboxPathNotValidError, GearboxPathEmptyResu
     value = boost::lexical_cast<double>((char*)valueChar);
   } catch (boost::bad_lexical_cast &) {
     xmlXPathFreeObject(result);
-    throw GearboxStringNumConversionError(string((char*)valueChar));
+    throw(GearboxStringNumConversionError() << string((char*)valueChar));
   }
 
   xmlXPathFreeObject(result);

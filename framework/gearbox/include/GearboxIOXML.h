@@ -74,7 +74,7 @@ namespace Belle2 {
       \return True if the path is valid.
     */
     bool isPathValid(const std::string& path) const
-    throw(GearboxIONotConnectedError);
+    throw(GearboxIOAbs::GearboxIONotConnectedError);
 
     /*! Checks if a parameter given by the path is available. */
     /*!
@@ -86,7 +86,7 @@ namespace Belle2 {
       \return True if the path to the node and the node (parameter) itself exists.
     */
     bool isParamAvailable(const std::string& path) const
-    throw(GearboxIONotConnectedError, GearboxPathNotValidError);
+    throw(GearboxIOAbs::GearboxIONotConnectedError, GearboxIOAbs::GearboxPathNotValidError);
 
     /*! Returns the number of nodes given by the last node in the path. */
     /*!
@@ -100,7 +100,8 @@ namespace Belle2 {
       \return The number of nodes.
     */
     int getNumberNodes(const std::string& path) const
-    throw(GearboxIONotConnectedError, GearboxPathNotValidError, GearboxPathEmptyResultError, GearboxPathResultNotValidError);
+    throw(GearboxIOAbs::GearboxIONotConnectedError, GearboxIOAbs::GearboxPathNotValidError,
+          GearboxIOAbs::GearboxPathEmptyResultError, GearboxIOAbs::GearboxPathResultNotValidError);
 
     /*! Returns a parameter, given by the path, which describes a length. */
     /*!
@@ -122,8 +123,9 @@ namespace Belle2 {
               the value is assumed to be in [cm].
     */
     double getParamLength(const std::string& path) const
-    throw(GearboxIONotConnectedError, GearboxPathNotValidError, GearboxParamNotExistsError, GearboxPathEmptyResultError,
-          GearboxPathResultNotValidError, GearboxStringNumConversionError);
+    throw(GearboxIOAbs::GearboxIONotConnectedError, GearboxIOAbs::GearboxPathNotValidError,
+          GearboxIOAbs::GearboxParamNotExistsError, GearboxIOAbs::GearboxPathEmptyResultError,
+          GearboxIOAbs::GearboxPathResultNotValidError, GearboxIOAbs::GearboxStringNumConversionError);
 
     /*! Returns a parameter, given by the path, which describes an angle. */
     /*!
@@ -145,8 +147,9 @@ namespace Belle2 {
               the value is assumed to be in [rad].
     */
     double getParamAngle(const std::string& path) const
-    throw(GearboxIONotConnectedError, GearboxPathNotValidError, GearboxParamNotExistsError, GearboxPathEmptyResultError,
-          GearboxPathResultNotValidError, GearboxStringNumConversionError);
+    throw(GearboxIOAbs::GearboxIONotConnectedError, GearboxIOAbs::GearboxPathNotValidError,
+          GearboxIOAbs::GearboxParamNotExistsError, GearboxIOAbs::GearboxPathEmptyResultError,
+          GearboxIOAbs::GearboxPathResultNotValidError, GearboxIOAbs::GearboxStringNumConversionError);
 
     /*! Returns a parameter, given by the path, which describes a general numerical value. */
     /*!
@@ -165,8 +168,9 @@ namespace Belle2 {
       \return The numerical value.
     */
     double getParamNumValue(const std::string& path) const
-    throw(GearboxIONotConnectedError, GearboxPathNotValidError, GearboxParamNotExistsError, GearboxPathEmptyResultError,
-          GearboxPathResultNotValidError, GearboxStringNumConversionError);
+    throw(GearboxIOAbs::GearboxIONotConnectedError, GearboxIOAbs::GearboxPathNotValidError,
+          GearboxIOAbs::GearboxParamNotExistsError, GearboxIOAbs::GearboxPathEmptyResultError,
+          GearboxIOAbs::GearboxPathResultNotValidError, GearboxIOAbs::GearboxStringNumConversionError);
 
     /*! Returns a parameter as a string. */
     /*!
@@ -184,8 +188,9 @@ namespace Belle2 {
       \return The string value.
     */
     std::string getParamString(const std::string& path) const
-    throw(GearboxIONotConnectedError, GearboxPathNotValidError, GearboxParamNotExistsError, GearboxPathEmptyResultError,
-          GearboxPathResultNotValidError);
+    throw(GearboxIOAbs::GearboxIONotConnectedError, GearboxIOAbs::GearboxPathNotValidError,
+          GearboxIOAbs::GearboxParamNotExistsError, GearboxIOAbs::GearboxPathEmptyResultError,
+          GearboxIOAbs::GearboxPathResultNotValidError);
 
 
   protected:
@@ -238,8 +243,8 @@ namespace Belle2 {
     */
     void getDoubleWithUnit(double& value, int& unit, const std::string& xpath,
                            int defaultUnit, const std::map<std::string, int>& unitMap) const
-    throw(GearboxIONotConnectedError, GearboxPathNotValidError, GearboxPathEmptyResultError,
-          GearboxPathResultNotValidError, GearboxStringNumConversionError);
+    throw(GearboxIOAbs::GearboxIONotConnectedError, GearboxIOAbs::GearboxPathNotValidError, GearboxIOAbs::GearboxPathEmptyResultError,
+          GearboxIOAbs::GearboxPathResultNotValidError, GearboxIOAbs::GearboxStringNumConversionError);
 
     /*! Fills the map which links the string representing of a length unit to the type if the unit. */
     void setLengthUnitMap();

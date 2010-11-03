@@ -45,19 +45,19 @@ void Framework::addModuleSearchPath(const string& path)
 }
 
 
-ModulePtr Framework::registerModule(const string moduleName) throw(ModuleNotCreatedError)
+ModulePtr Framework::registerModule(const string moduleName) throw(ModuleManager::ModuleNotCreatedError)
 {
   return ModuleManager::Instance().registerModule(moduleName);
 }
 
 
-ModulePtr Framework::registerModule(const string moduleName, const string sharedLibPath) throw(ModuleNotCreatedError)
+ModulePtr Framework::registerModule(const string moduleName, const string sharedLibPath) throw(ModuleManager::ModuleNotCreatedError)
 {
   return ModuleManager::Instance().registerModule(moduleName, sharedLibPath);
 }
 
 
-PathPtr Framework::createPath() throw(PathNotCreatedError)
+PathPtr Framework::createPath() throw(PathManager::PathNotCreatedError)
 {
   return m_pathManager->createPath();
 }

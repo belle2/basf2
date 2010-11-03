@@ -61,53 +61,58 @@ void GearDir::enableParamCheck(bool paramCheck)
 
 
 bool GearDir::isPathValid(const std::string& path) const
-throw(GearboxIONotConnectedError)
+throw(GearboxIOAbs::GearboxIONotConnectedError)
 {
   return Gearbox::Instance().getGearboxIO().isPathValid(m_dirPath + path);
 }
 
 
 bool GearDir::isParamAvailable(const std::string& path) const
-throw(GearboxIONotConnectedError, GearboxPathNotValidError)
+throw(GearboxIOAbs::GearboxIONotConnectedError, GearboxIOAbs::GearboxPathNotValidError)
 {
   return Gearbox::Instance().getGearboxIO().isParamAvailable(m_dirPath + path);
 }
 
 
 int GearDir::getNumberNodes(const string& path) const
-throw(GearboxIONotConnectedError, GearboxPathNotValidError, GearboxPathEmptyResultError, GearboxPathResultNotValidError)
+throw(GearboxIOAbs::GearboxIONotConnectedError, GearboxIOAbs::GearboxPathNotValidError,
+      GearboxIOAbs::GearboxPathEmptyResultError, GearboxIOAbs::GearboxPathResultNotValidError)
 {
   return Gearbox::Instance().getGearboxIO().getNumberNodes(m_dirPath + path);
 }
 
 
 double GearDir::getParamLength(const string& path) const
-throw(GearboxIONotConnectedError, GearboxPathNotValidError, GearboxParamNotExistsError, GearboxPathEmptyResultError,
-      GearboxPathResultNotValidError, GearboxStringNumConversionError)
+throw(GearboxIOAbs::GearboxIONotConnectedError, GearboxIOAbs::GearboxPathNotValidError,
+      GearboxIOAbs::GearboxParamNotExistsError, GearboxIOAbs::GearboxPathEmptyResultError,
+      GearboxIOAbs::GearboxPathResultNotValidError, GearboxIOAbs::GearboxStringNumConversionError)
 {
   return Gearbox::Instance().getGearboxIO().getParamLength(m_dirPath + path);
 }
 
 
 double GearDir::getParamAngle(const string& path) const
-throw(GearboxIONotConnectedError, GearboxPathNotValidError, GearboxParamNotExistsError, GearboxPathEmptyResultError,
-      GearboxPathResultNotValidError, GearboxStringNumConversionError)
+throw(GearboxIOAbs::GearboxIONotConnectedError, GearboxIOAbs::GearboxPathNotValidError,
+      GearboxIOAbs::GearboxParamNotExistsError, GearboxIOAbs::GearboxPathEmptyResultError,
+      GearboxIOAbs::GearboxPathResultNotValidError, GearboxIOAbs::GearboxStringNumConversionError)
 {
   return Gearbox::Instance().getGearboxIO().getParamAngle(m_dirPath + path);
 }
 
 
 double GearDir::getParamNumValue(const string& path) const
-throw(GearboxIONotConnectedError, GearboxPathNotValidError, GearboxParamNotExistsError, GearboxPathEmptyResultError,
-      GearboxPathResultNotValidError, GearboxStringNumConversionError)
+throw(GearboxIOAbs::GearboxIONotConnectedError, GearboxIOAbs::GearboxPathNotValidError,
+      GearboxIOAbs::GearboxParamNotExistsError, GearboxIOAbs::GearboxPathEmptyResultError,
+      GearboxIOAbs::GearboxPathResultNotValidError, GearboxIOAbs::GearboxStringNumConversionError)
 {
   return Gearbox::Instance().getGearboxIO().getParamNumValue(m_dirPath + path);
 }
 
 
 string GearDir::getParamString(const string& path) const
-throw(GearboxIONotConnectedError, GearboxPathNotValidError, GearboxParamNotExistsError, GearboxPathEmptyResultError,
-      GearboxPathResultNotValidError)
+throw(GearboxIOAbs::GearboxIONotConnectedError, GearboxIOAbs::GearboxPathNotValidError,
+      GearboxIOAbs::GearboxParamNotExistsError, GearboxIOAbs::GearboxPathEmptyResultError,
+      GearboxIOAbs::GearboxPathResultNotValidError)
 {
   return Gearbox::Instance().getGearboxIO().getParamString(m_dirPath + path);
 }

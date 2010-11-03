@@ -67,7 +67,7 @@ namespace Belle2 {
      * @param moduleName The unique name of the module which should be created.
      * @return A shared pointer of the newly created and registered module.
      */
-    ModulePtr registerModule(const std::string moduleName) throw(ModuleNotCreatedError);
+    ModulePtr registerModule(const std::string moduleName) throw(ModuleManager::ModuleNotCreatedError);
 
     /**
      * Registers a new module to the framework and returns a shared pointer.
@@ -82,7 +82,7 @@ namespace Belle2 {
      * @param sharedLibPath Optional: The shared library from which the module should be registered (not a map file !).
      * @return A shared pointer of the newly created and registered module.
      */
-    ModulePtr registerModule(const std::string moduleName, const std::string sharedLibPath) throw(ModuleNotCreatedError);
+    ModulePtr registerModule(const std::string moduleName, const std::string sharedLibPath) throw(ModuleManager::ModuleNotCreatedError);
 
     /**
      * Creates a new path, adds it to the framework and returns a shared pointer.
@@ -92,7 +92,7 @@ namespace Belle2 {
      *
      * @return A shared pointer of the added and registered path.
      */
-    PathPtr createPath() throw(PathNotCreatedError);
+    PathPtr createPath() throw(PathManager::PathNotCreatedError);
 
     /**
      * Processes all events by starting with the first module in the specified path.

@@ -43,16 +43,16 @@ void Gearbox::connect(GearboxIOAbs* gearboxIO)
 }
 
 
-GearboxIOAbs& Gearbox::getGearboxIO() const throw(GearboxIONotConnectedError)
+GearboxIOAbs& Gearbox::getGearboxIO() const throw(GearboxIOAbs::GearboxIONotConnectedError)
 {
-  if ((m_gearboxIO == NULL) || (!m_gearboxIO->isOpen())) throw GearboxIONotConnectedError();
+  if ((m_gearboxIO == NULL) || (!m_gearboxIO->isOpen())) throw GearboxIOAbs::GearboxIONotConnectedError();
   return *m_gearboxIO;
 }
 
 
-GearDir Gearbox::getContent(const std::string& paramSetType, EGearboxContentType contentType) throw(GearboxIONotConnectedError)
+GearDir Gearbox::getContent(const std::string& paramSetType, EGearboxContentType contentType) throw(GearboxIOAbs::GearboxIONotConnectedError)
 {
-  if ((m_gearboxIO == NULL) || (!m_gearboxIO->isOpen())) throw GearboxIONotConnectedError();
+  if ((m_gearboxIO == NULL) || (!m_gearboxIO->isOpen())) throw GearboxIOAbs::GearboxIONotConnectedError();
 
   switch (contentType) {
     case c_GbxGlobal:       return GearDir(getGlobalParamPath(paramSetType));
@@ -83,69 +83,74 @@ std::string Gearbox::getSubdetectorPath(const string& subdetector) const
 
 
 void Gearbox::enableParamCheck(bool paramCheck)
-throw(GearboxIONotConnectedError)
+throw(GearboxIOAbs::GearboxIONotConnectedError)
 {
-  if ((m_gearboxIO == NULL) || (!m_gearboxIO->isOpen())) throw GearboxIONotConnectedError();
+  if ((m_gearboxIO == NULL) || (!m_gearboxIO->isOpen())) throw GearboxIOAbs::GearboxIONotConnectedError();
   return m_gearboxIO->enableParamCheck(paramCheck);
 }
 
 
 bool Gearbox::isPathValid(const std::string& path) const
-throw(GearboxIONotConnectedError)
+throw(GearboxIOAbs::GearboxIONotConnectedError)
 {
-  if ((m_gearboxIO == NULL) || (!m_gearboxIO->isOpen())) throw GearboxIONotConnectedError();
+  if ((m_gearboxIO == NULL) || (!m_gearboxIO->isOpen())) throw GearboxIOAbs::GearboxIONotConnectedError();
   return m_gearboxIO->isPathValid(path);
 }
 
 
 bool Gearbox::isParamAvailable(const std::string& path) const
-throw(GearboxIONotConnectedError, GearboxPathNotValidError)
+throw(GearboxIOAbs::GearboxIONotConnectedError, GearboxIOAbs::GearboxPathNotValidError)
 {
-  if ((m_gearboxIO == NULL) || (!m_gearboxIO->isOpen())) throw GearboxIONotConnectedError();
+  if ((m_gearboxIO == NULL) || (!m_gearboxIO->isOpen())) throw GearboxIOAbs::GearboxIONotConnectedError();
   return m_gearboxIO->isParamAvailable(path);
 }
 
 
 int Gearbox::getNumberNodes(const std::string& path) const
-throw(GearboxIONotConnectedError, GearboxPathNotValidError, GearboxPathEmptyResultError, GearboxPathResultNotValidError)
+throw(GearboxIOAbs::GearboxIONotConnectedError, GearboxIOAbs::GearboxPathNotValidError,
+      GearboxIOAbs::GearboxPathEmptyResultError, GearboxIOAbs::GearboxPathResultNotValidError)
 {
-  if ((m_gearboxIO == NULL) || (!m_gearboxIO->isOpen())) throw GearboxIONotConnectedError();
+  if ((m_gearboxIO == NULL) || (!m_gearboxIO->isOpen())) throw GearboxIOAbs::GearboxIONotConnectedError();
   return m_gearboxIO->getNumberNodes(path);
 }
 
 
 double Gearbox::getParamLength(const std::string& path) const
-throw(GearboxIONotConnectedError, GearboxPathNotValidError, GearboxParamNotExistsError, GearboxPathEmptyResultError,
-      GearboxPathResultNotValidError, GearboxStringNumConversionError)
+throw(GearboxIOAbs::GearboxIONotConnectedError, GearboxIOAbs::GearboxPathNotValidError,
+      GearboxIOAbs::GearboxParamNotExistsError, GearboxIOAbs::GearboxPathEmptyResultError,
+      GearboxIOAbs::GearboxPathResultNotValidError, GearboxIOAbs::GearboxStringNumConversionError)
 {
-  if ((m_gearboxIO == NULL) || (!m_gearboxIO->isOpen())) throw GearboxIONotConnectedError();
+  if ((m_gearboxIO == NULL) || (!m_gearboxIO->isOpen())) throw GearboxIOAbs::GearboxIONotConnectedError();
   return m_gearboxIO->getParamLength(path);
 }
 
 
 double Gearbox::getParamAngle(const std::string& path) const
-throw(GearboxIONotConnectedError, GearboxPathNotValidError, GearboxParamNotExistsError, GearboxPathEmptyResultError,
-      GearboxPathResultNotValidError, GearboxStringNumConversionError)
+throw(GearboxIOAbs::GearboxIONotConnectedError, GearboxIOAbs::GearboxPathNotValidError,
+      GearboxIOAbs::GearboxParamNotExistsError, GearboxIOAbs::GearboxPathEmptyResultError,
+      GearboxIOAbs::GearboxPathResultNotValidError, GearboxIOAbs::GearboxStringNumConversionError)
 {
-  if ((m_gearboxIO == NULL) || (!m_gearboxIO->isOpen())) throw GearboxIONotConnectedError();
+  if ((m_gearboxIO == NULL) || (!m_gearboxIO->isOpen())) throw GearboxIOAbs::GearboxIONotConnectedError();
   return m_gearboxIO->getParamAngle(path);
 }
 
 
 double Gearbox::getParamNumValue(const std::string& path) const
-throw(GearboxIONotConnectedError, GearboxPathNotValidError, GearboxParamNotExistsError, GearboxPathEmptyResultError,
-      GearboxPathResultNotValidError, GearboxStringNumConversionError)
+throw(GearboxIOAbs::GearboxIONotConnectedError, GearboxIOAbs::GearboxPathNotValidError,
+      GearboxIOAbs::GearboxParamNotExistsError, GearboxIOAbs::GearboxPathEmptyResultError,
+      GearboxIOAbs::GearboxPathResultNotValidError, GearboxIOAbs::GearboxStringNumConversionError)
 {
-  if ((m_gearboxIO == NULL) || (!m_gearboxIO->isOpen())) throw GearboxIONotConnectedError();
+  if ((m_gearboxIO == NULL) || (!m_gearboxIO->isOpen())) throw GearboxIOAbs::GearboxIONotConnectedError();
   return m_gearboxIO->getParamNumValue(path);
 }
 
 
 std::string Gearbox::getParamString(const std::string& path) const
-throw(GearboxIONotConnectedError, GearboxPathNotValidError, GearboxParamNotExistsError, GearboxPathEmptyResultError,
-      GearboxPathResultNotValidError)
+throw(GearboxIOAbs::GearboxIONotConnectedError, GearboxIOAbs::GearboxPathNotValidError,
+      GearboxIOAbs::GearboxParamNotExistsError, GearboxIOAbs::GearboxPathEmptyResultError,
+      GearboxIOAbs::GearboxPathResultNotValidError)
 {
-  if ((m_gearboxIO == NULL) || (!m_gearboxIO->isOpen())) throw GearboxIONotConnectedError();
+  if ((m_gearboxIO == NULL) || (!m_gearboxIO->isOpen())) throw GearboxIOAbs::GearboxIONotConnectedError();
   return m_gearboxIO->getParamString(path);
 }
 

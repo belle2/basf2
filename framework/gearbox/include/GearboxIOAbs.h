@@ -17,14 +17,6 @@
 
 namespace Belle2 {
 
-  //Define exceptions
-  BELLE2_DEFINE_EXCEPTION(GearboxIONotConnectedError, "The GearboxIO object is not available. Please make sure you have the Gearbox module in your path !");
-  BELLE2_DEFINE_EXCEPTION(GearboxPathNotValidError, "The path \"%1%\" is not valid !");
-  BELLE2_DEFINE_EXCEPTION(GearboxPathEmptyResultError, "The result of the path \"%1%\" is empty !");
-  BELLE2_DEFINE_EXCEPTION(GearboxPathResultNotValidError, "The result of the path \"%1%\" is not valid !");
-  BELLE2_DEFINE_EXCEPTION(GearboxParamNotExistsError, "The requested gearbox parameter %1% does not exist !");
-  BELLE2_DEFINE_EXCEPTION(GearboxStringNumConversionError, "The conversion of the string \"%1%\" to a number failed !");
-
   /*!  The GearboxIOAbs class. */
   /*!
     Defines an abstract interface class for reading parameters from an arbitrary source.
@@ -37,6 +29,14 @@ namespace Belle2 {
   class GearboxIOAbs {
 
   public:
+
+    //Define exceptions
+    BELLE2_DEFINE_EXCEPTION(GearboxIONotConnectedError, "The GearboxIO object is not available. Please make sure you have the Gearbox module in your path !");
+    BELLE2_DEFINE_EXCEPTION(GearboxPathNotValidError, "The path \"%1%\" is not valid !");
+    BELLE2_DEFINE_EXCEPTION(GearboxPathEmptyResultError, "The result of the path \"%1%\" is empty !");
+    BELLE2_DEFINE_EXCEPTION(GearboxPathResultNotValidError, "The result of the path \"%1%\" is not valid !");
+    BELLE2_DEFINE_EXCEPTION(GearboxParamNotExistsError, "The requested gearbox parameter %1% does not exist !");
+    BELLE2_DEFINE_EXCEPTION(GearboxStringNumConversionError, "The conversion of the string \"%1%\" to a number failed !");
 
     /*! The GearboxIOAbs constructor. */
     GearboxIOAbs() {};

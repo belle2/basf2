@@ -26,10 +26,6 @@
 
 namespace Belle2 {
 
-  //Define exceptions
-  BELLE2_DEFINE_EXCEPTION(ModuleParameterNotFoundError, "Could not find the parameter with the name '%1%' ! The value of the parameter could NOT be set.");
-  BELLE2_DEFINE_EXCEPTION(ModuleParameterTypeError, "The type of the module parameter '%1%' (%2%) is different from the type of the value it should be set to (%3%) !");
-
   /**
    * The parameter type info class.
    * Stores information about each supported parameter type.
@@ -76,6 +72,10 @@ namespace Belle2 {
   class ModuleParamList {
 
   public:
+
+    //Define exceptions
+    BELLE2_DEFINE_EXCEPTION(ModuleParameterNotFoundError, "Could not find the parameter with the name '%1%' ! The value of the parameter could NOT be set.");
+    BELLE2_DEFINE_EXCEPTION(ModuleParameterTypeError, "The type of the module parameter '%1%' (%2%) is different from the type of the value it should be set to (%3%) !");
 
     /**
      * Constructor.
@@ -318,8 +318,8 @@ namespace Belle2 {
       if (moduleParam->getTypeInfo() == typeid(T).name()) {
         ModuleParam<T>* explModParam = static_cast< ModuleParam<T>* >(moduleParam.get());
         return *explModParam;
-      } else throw ModuleParameterTypeError(name, moduleParam->getTypeInfo(), typeid(T).name());
-    } else throw ModuleParameterNotFoundError(name);
+      } else throw(ModuleParameterTypeError() << name << moduleParam->getTypeInfo() << typeid(T).name());
+    } else throw(ModuleParameterNotFoundError() << name);
   }
 
 

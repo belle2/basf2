@@ -20,9 +20,6 @@
 
 namespace Belle2 {
 
-  //Define exceptions
-  BELLE2_DEFINE_EXCEPTION(PathNotCreatedError, "Could not create path !");
-
   /**
    * The PathManager Class.
    *
@@ -34,6 +31,9 @@ namespace Belle2 {
   class PathManager {
 
   public:
+
+    //Define exceptions
+    BELLE2_DEFINE_EXCEPTION(PathNotCreatedError, "Could not create path !");
 
     /**
      * Constructor.

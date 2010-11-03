@@ -27,9 +27,6 @@ namespace Belle2 {
   class Module;
   class ModuleProxyBase;
 
-  //Define exceptions
-  BELLE2_DEFINE_EXCEPTION(ModuleNotCreatedError, "Could not create module: %1%");
-
   /**
    * The ModuleManager Class.
    *
@@ -57,6 +54,9 @@ namespace Belle2 {
   class ModuleManager {
 
   public:
+
+    //Define exceptions
+    BELLE2_DEFINE_EXCEPTION(ModuleNotCreatedError, "Could not create module: %1%");
 
     /**
      * Static method to get a reference to the ModuleManager instance.

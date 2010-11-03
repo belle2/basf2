@@ -55,9 +55,9 @@ void B4DetectorConstruction::Initialize(TG4RootDetectorConstruction *dc)
       //Do work on the native geant4 volumes
       currCreator.initializeGeant4(dc);
 
-    } catch (GeometryCreatorNameEmptyError& exc) {
+    } catch (CreatorManager::GeometryCreatorNameEmptyError& exc) {
       ERROR(exc.what());
-    } catch (GeometryCreatorNotExistsError& exc) {
+    } catch (CreatorManager::GeometryCreatorNotExistsError& exc) {
       ERROR(exc.what());
     }
   }

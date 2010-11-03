@@ -31,11 +31,13 @@ using namespace Belle2;
 namespace Belle2 {
   BELLE2_DEFINE_EXCEPTION(LastChildIndexOutOfRangError, "Last child index out of range !");
   BELLE2_DEFINE_EXCEPTION(NoParticleListSetError, "No Particle list set, cannot determine related particles !");
+  BELLE2_DEFINE_EXCEPTION(ParticlePDGNotKnownError, "The pdg value (%1%) of the MCParticle is not known !");
 }
 
 void MCParticle::setPDG(int pdg)
 {
   m_pdg = pdg;
+  if (TDatabasePDG::Instance()->GetParticle(pdg) == NULL) throw(ParticlePDGNotKnownError() << pdg);
   m_mass = TDatabasePDG::Instance()->GetParticle(pdg)->Mass();
 }
 

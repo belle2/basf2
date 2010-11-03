@@ -28,6 +28,7 @@ namespace Belle2 {
    */
   class MCParticle: public TObject {
   public:
+
     enum StatusBit {
       PrimaryParticle = 1,    /**< bit 0: Particle is primary particle. */
       StableInGenerator = 2,  /**< bit 1: Particle is stable in the generator. */

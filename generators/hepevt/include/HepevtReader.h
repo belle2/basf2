@@ -19,13 +19,6 @@
 
 namespace Belle2 {
 
-  //Define exceptions
-  BELLE2_DEFINE_EXCEPTION(HepEvtCouldNotOpenFileError, "Could not open file %1% !");
-  BELLE2_DEFINE_EXCEPTION(HepEvtInvalidDaughterIndicesError, "Line %1%: Invalid daughter indices d1=%2%, d2=%3%, N=%4% (0<=d1<=d2<=N required)");
-  BELLE2_DEFINE_EXCEPTION(HepEvtHeaderNotValidError, "Line %1%: Event header not understood: %2%");
-  BELLE2_DEFINE_EXCEPTION(HepEvtConvertFieldError, "Line %1%: Could not convert field %2%: %3%");
-  BELLE2_DEFINE_EXCEPTION(HepEvtParticleFormatError, "Line %1%: Particle format not understood, got %2% fields !");
-
   /**
    * Class to read Hepevt files and store the content in a MCParticle graph.
    *
@@ -38,6 +31,13 @@ namespace Belle2 {
   class HepevtReader {
 
   public:
+
+    //Define exceptions
+    BELLE2_DEFINE_EXCEPTION(HepEvtCouldNotOpenFileError, "Could not open file %1% !");
+    BELLE2_DEFINE_EXCEPTION(HepEvtInvalidDaughterIndicesError, "Line %1%: Invalid daughter indices d1=%2%, d2=%3%, N=%4% (0<=d1<=d2<=N required)");
+    BELLE2_DEFINE_EXCEPTION(HepEvtHeaderNotValidError, "Line %1%: Event header not understood: %2%");
+    BELLE2_DEFINE_EXCEPTION(HepEvtConvertFieldError, "Line %1%: Could not convert field %2%: %3%");
+    BELLE2_DEFINE_EXCEPTION(HepEvtParticleFormatError, "Line %1%: Particle format not understood, got %2% fields !");
 
     /**
      * Constructor.

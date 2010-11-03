@@ -10,7 +10,7 @@
 
 #include <framework/datastore/Units.h>
 #include <framework/logging/Logger.h>
-#include <generators/objects/HepevtReader.h>
+#include <generators/hepevt/HepevtReader.h>
 
 #include <string>
 #include <stdexcept>
@@ -28,7 +28,7 @@ void HepevtReader::open(const string& filename) throw(HepEvtCouldNotOpenFileErro
 {
   m_lineNr = 0;
   m_input.open(filename.c_str());
-  if (!m_input) throw HepEvtCouldNotOpenFileError(filename);
+  if (!m_input) throw(HepEvtCouldNotOpenFileError() << filename);
 }
 
 
@@ -51,7 +51,7 @@ bool HepevtReader::getEvent(MCParticleGraph &graph) throw(HepEvtInvalidDaughterI
     int d1 = p.getFirstDaughter();
     int d2 = p.getLastDaughter();
     if (d1 < 0 || d1 > nparticles || d2 < d1 || d2 > nparticles) {
-      throw HepEvtInvalidDaughterIndicesError(TO_STR(m_lineNr), TO_STR(d1), TO_STR(d2), TO_STR(nparticles));
+      throw(HepEvtInvalidDaughterIndicesError() << m_lineNr << d1 << d2 << nparticles);
     }
     if (d1 == 0) p.addStatus(MCParticle::StableInGenerator);
     //Add decays
@@ -103,7 +103,7 @@ int HepevtReader::readEventHeader() throw(HepEvtHeaderNotValidError)
   try {
     nparticles = boost::lexical_cast<int>(line);
   } catch (boost::bad_lexical_cast &) {
-    throw HepEvtHeaderNotValidError(TO_STR(m_lineNr), line);
+    throw(HepEvtHeaderNotValidError() << m_lineNr << line);
   }
   return nparticles;
 }
@@ -124,9 +124,10 @@ void HepevtReader::readParticle(MCParticleGraph::GraphParticle &particle) throw(
     try {
       fields.push_back(boost::lexical_cast<double>(tok));
     } catch (boost::bad_lexical_cast &e) {
-      throw HepEvtConvertFieldError(TO_STR(m_lineNr), TO_STR(index), tok);
+      throw(HepEvtConvertFieldError() << m_lineNr << index << tok);
     }
   }
+
   switch (fields.size()) {
     case 8:
       particle.setStatus(MCParticle::PrimaryParticle);
@@ -159,6 +160,6 @@ void HepevtReader::readParticle(MCParticleGraph::GraphParticle &particle) throw(
       }
       break;
     default:
-      throw HepEvtParticleFormatError(TO_STR(m_lineNr), TO_STR(fields.size()));
+      throw(HepEvtParticleFormatError() << m_lineNr << fields.size());
   }
 }

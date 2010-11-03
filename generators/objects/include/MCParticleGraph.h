@@ -41,7 +41,7 @@ namespace Belle2 {
 
     BELLE2_DEFINE_EXCEPTION(CyclicReferenceError, "Cyclic decay, cannot continue");
     BELLE2_DEFINE_EXCEPTION(NotSameGraphError, "Particles not from same graph");
-    BELLE2_DEFINE_EXCEPTION(NonContinousDaughtersError, "Can not represent decay graph, non continous indices for daughters");
+    BELLE2_DEFINE_EXCEPTION(NonContinousDaughtersError, "Can not represent decay graph, non continuous indices for daughters");
     BELLE2_DEFINE_EXCEPTION(OutOfRangeError, "Index out of range");
 
     /** Type representing a decay in the graph. */
@@ -187,7 +187,7 @@ namespace Belle2 {
     size_t size() { return m_particles.size(); }
 
     /**
-     * Generate the MCParticle list and store them in the StoreArray with the given name.
+     * Generates the MCParticle list and stores it in the StoreArray with the given name.
      *
      * The graph will be checked for validity. If a cyclic reference is detected, a runtime_error is thrown.
      * Similar, if the decay chain cannot be represented with continuous daughter indices, a runtime_error
@@ -198,7 +198,7 @@ namespace Belle2 {
      * @param options Additional options which steer the creation of the StoreArray.
      * @see class MCParticle
      */
-    void generate(const std::string& name = DEFAULT_MCPARTICLES, GraphOptions options = set_nothing);
+    void generate(const std::string& name = DEFAULT_MCPARTICLES, int options = set_nothing);
 
     /**
      * Reset particles and decay information to make the class reusable.

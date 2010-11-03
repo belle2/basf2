@@ -182,7 +182,7 @@ TGeoElement* GeoMaterials::readElement(GearDir& elementContent, double& weight)
   //Collect information
   weight            = elementContent.getParamNumValue("attribute::weight");
   string elemName   = elementContent.getParamString("attribute::name");
-  double atomNumber = elementContent.getParamNumValue("AtomNumber");
+  int    atomNumber = static_cast<int>(elementContent.getParamNumValue("AtomNumber"));
   double massNumber = elementContent.getParamNumValue("MassNumber");
 
   //Build root element

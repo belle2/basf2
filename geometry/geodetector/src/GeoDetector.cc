@@ -88,13 +88,13 @@ void GeoDetector::createDetector()
     }
     gGeoManager->CloseGeometry();
 
-  } catch (GearboxIONotConnectedError&) {
+  } catch (GearboxIOAbs::GearboxIONotConnectedError&) {
     ERROR("Could not fetch parameters. No GearboxIO object was created !")
-  } catch (GeometryCreatorNotExistsError& exc) {
+  } catch (CreatorManager::GeometryCreatorNotExistsError& exc) {
     ERROR(exc.what())
-  } catch (GearboxPathNotValidError& exc) {
+  } catch (GearboxIOAbs::GearboxPathNotValidError& exc) {
     ERROR(exc.what())
-  } catch (GearboxPathEmptyResultError& exc) {
+  } catch (GearboxIOAbs::GearboxPathEmptyResultError& exc) {
     ERROR(exc.what())
   } catch (...) {
     ERROR("An error occurred during the creation of the detector geometry !")
@@ -107,9 +107,9 @@ void GeoDetector::saveToRootFile(const std::string& filename)
   try {
     string detectorName = Gearbox::Instance().getParamString("/Detector/Name");
     gGeoManager->Export(filename.c_str(), detectorName.c_str());
-  } catch (GearboxIONotConnectedError&) {
+  } catch (GearboxIOAbs::GearboxIONotConnectedError&) {
     ERROR("Could not fetch parameters. No GearboxIO object was created !")
-  } catch (GearboxPathNotValidError& exc) {
+  } catch (GearboxIOAbs::GearboxPathNotValidError& exc) {
     ERROR(exc.what())
   }
 }

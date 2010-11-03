@@ -35,7 +35,7 @@ void CreatorManager::registerCreator(CreatorBase* creator, bool force) throw(Geo
   map<string, CreatorBase*>::iterator mapIter = m_creatorMap.find(creator->getName());
 
   if (mapIter != m_creatorMap.end()) {
-    if (!force) throw GeometryCreatorAlreadyExistsError(creator->getName());
+    if (!force) throw(GeometryCreatorAlreadyExistsError() << creator->getName());
     else {
       delete mapIter->second;
       m_creatorMap.erase(mapIter);
@@ -53,7 +53,7 @@ CreatorBase& CreatorManager::getCreator(const std::string& name) const throw(Geo
 
   map<string, CreatorBase*>::const_iterator mapIter = m_creatorMap.find(name);
 
-  if (mapIter == m_creatorMap.end()) throw GeometryCreatorNotExistsError(name);
+  if (mapIter == m_creatorMap.end()) throw(GeometryCreatorNotExistsError() << name);
   return *mapIter->second;
 }
 

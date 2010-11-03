@@ -20,9 +20,9 @@ using namespace std;
 using namespace Belle2;
 
 
-CreatorBase::CreatorBase(const string& name) throw(GeometryCreatorNameEmptyError)
+CreatorBase::CreatorBase(const string& name) throw(CreatorManager::GeometryCreatorNameEmptyError)
 {
-  if (name.empty()) throw GeometryCreatorNameEmptyError();
+  if (name.empty()) throw CreatorManager::GeometryCreatorNameEmptyError();
   m_name = name;
   m_hasGroupName = false;
   m_geoGroupName = "";

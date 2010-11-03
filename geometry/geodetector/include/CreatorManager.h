@@ -21,11 +21,6 @@ namespace Belle2 {
 
   class CreatorBase;
 
-  //Define exceptions
-  BELLE2_DEFINE_EXCEPTION(GeometryCreatorNameEmptyError, "Can't create a Creator with an empty name !");
-  BELLE2_DEFINE_EXCEPTION(GeometryCreatorAlreadyExistsError, "A Creator with the name '%1%' already exists !");
-  BELLE2_DEFINE_EXCEPTION(GeometryCreatorNotExistsError, "A Creator with the name '%1%' does not exist !");
-
   /*!  The CreatorManager class. */
   /*!
       This class manages the self registered creators.
@@ -34,6 +29,11 @@ namespace Belle2 {
   class CreatorManager {
 
   public:
+
+    //Define exceptions
+    BELLE2_DEFINE_EXCEPTION(GeometryCreatorNameEmptyError, "Can't create a Creator with an empty name !");
+    BELLE2_DEFINE_EXCEPTION(GeometryCreatorAlreadyExistsError, "A Creator with the name '%1%' already exists !");
+    BELLE2_DEFINE_EXCEPTION(GeometryCreatorNotExistsError, "A Creator with the name '%1%' does not exist !");
 
     /*! Static method to get a reference to the CreatorManager instance. */
     /*!

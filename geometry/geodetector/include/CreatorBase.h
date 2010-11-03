@@ -45,7 +45,7 @@ namespace Belle2 {
       Throws an exception of type GeometryCreatorNameEmptyError if the name of the creator is empty.
       \param name The unique name of the Creator.
     */
-    CreatorBase(const std::string& name) throw(GeometryCreatorNameEmptyError);
+    CreatorBase(const std::string& name) throw(CreatorManager::GeometryCreatorNameEmptyError);
 
     /*! The destructor of the CreatorBase class. */
     virtual ~CreatorBase();

@@ -321,7 +321,7 @@ void GeoIRBelleIISymm::create(GearDir& content)
   double zMax     = content.getParamLength("RangeEnd");
 
   // volGrpBP is aligned and centred on BelleII IP
-  TGeoRotation* geoRot = new TGeoRotation("BeamPipeRot", 90.0, rotAngle, 0.0);
+  TGeoRotation* geoRot = new TGeoRotation("BeamPipeRot", 90.0, rotAngle, -90.0);
   TGeoVolumeAssembly* volGrpBP = addSubdetectorGroup("IR", new TGeoCombiTrans(0.0, 0.0, 0.0, geoRot));
 
   // -------------------------------------------------

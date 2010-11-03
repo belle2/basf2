@@ -3,15 +3,15 @@
 *  Copyright(C) 2010 - Belle II Collaboration                            *
 *                                                                        *
 *  Author: The Belle II Collaboration                                    *
-*  Contributors: Andreas Moll, Zbynek Drasal                             *
-*  Modified to include surrounding IR geometry by Clement Ng
+*  Contributors: Andreas Moll, Zbynek Drasal, Clement Ng                 *
 *                                                                        *
 *  This software is provided "as is" without any warranty.               *
 * *************************************************************************/
 
 //** todo:
 //  - allow default parameter values for sections (thickness, material, crotch) and pipe (angle, radiusend)
-//  - assign volume hierarchy?
+//  - july gunya-gunya pipe construction
+//  - finalise and delete debug
 
 #include <ir/geoir/GeoIRBelleII.h>
 
@@ -345,7 +345,7 @@ void GeoIRBelleII::create(GearDir& content)
     swap(zMin, zMax);
 
   // volGrpBP is aligned and centred on BelleII IP
-  TGeoRotation* geoRot = new TGeoRotation("BeamPipeRot", 90.0, rotAngle, 0.0);
+  TGeoRotation* geoRot = new TGeoRotation("BeamPipeRot", 90.0, rotAngle, -90.0);
   TGeoVolumeAssembly* volGrpBP = addSubdetectorGroup("IR", new TGeoCombiTrans(0.0, 0.0, 0.0, geoRot));
 
   // -------------------------------------------------

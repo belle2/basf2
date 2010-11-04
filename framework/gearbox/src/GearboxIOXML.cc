@@ -28,6 +28,9 @@ using namespace Belle2;
 
 GearboxIOXML::GearboxIOXML()
 {
+  xmlInitParser();
+  LIBXML_TEST_VERSION
+
   m_xmlDocument = NULL;
   m_enableParamCheck = true;
 

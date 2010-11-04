@@ -18,8 +18,7 @@
 #include "TKey.h"
 #include "Riostream.h"
 
-#include <framework/core/Module.h>
-#include <framework/pcore/HistoModule.h>
+#include <framework/core/HistoModule.h>
 
 namespace Belle2 {
   /*! Class to manage histograms defined in registered modules */

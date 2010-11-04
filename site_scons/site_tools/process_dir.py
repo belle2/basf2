@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 import os
@@ -20,14 +20,37 @@ def define_aliases(
         parent_dir = os.path.split(parent_dir)[0]
 
 
-def process_dir(parent_env, dir_name, is_module_dir):
+def get_files(path_name, release_dir):
+    if release_dir:
+        save_dir = os.getcwd()
+        os.chdir(release_dir)
+        result = Glob(path_name)
+        os.chdir(save_dir)
+        return result
+    else:
+        return Glob(path_name)
+
+
+def real_path(path_name, release_dir):
+    if release_dir:
+        return os.path.join(release_dir, path_name)
+    else:
+        return path_name
+
+
+def process_dir(
+    parent_env,
+    dir_name,
+    is_module_dir,
+    release_dir,
+    ):
 
     # determine library name
     lib_name = dir_name.replace(os.sep, '_')
 
     # get list of header and linkdef files
-    header_files = Glob(os.path.join(dir_name, '*.h')) \
-        + Glob(os.path.join(dir_name, 'include', '*.h'))
+    header_files = get_files(os.path.join(dir_name, '*.h'), release_dir) \
+        + get_files(os.path.join(dir_name, 'include', '*.h'), release_dir)
     linkdef_files = []
     for header_file in header_files:
         if str(header_file).lower().endswith('linkdef.h'):
@@ -35,16 +58,17 @@ def process_dir(parent_env, dir_name, is_module_dir):
             header_files.remove(header_file)
 
     # get list of source files
-    src_nodes = Glob(os.path.join(dir_name, '*.cc')) \
-        + Glob(os.path.join(dir_name, 'src', '*.cc'))
+    src_nodes = get_files(os.path.join(dir_name, '*.cc'), release_dir) \
+        + get_files(os.path.join(dir_name, 'src', '*.cc'), release_dir)
     src_files = [os.path.join(parent_env['BUILDDIR'], str(node)) for node in
                  src_nodes]
 
     # get list of script files
-    script_files = Glob(os.path.join(dir_name, 'scripts', '*'))
+    script_files = get_files(os.path.join(dir_name, 'scripts', '*'),
+                             release_dir)
 
     # get list of data files
-    data_files = Glob(os.path.join(dir_name, 'data', '*'))
+    data_files = get_files(os.path.join(dir_name, 'data', '*'), release_dir)
 
     # create environment for directory
     env = parent_env.Clone()
@@ -55,9 +79,10 @@ def process_dir(parent_env, dir_name, is_module_dir):
     env['DATA_FILES'] = data_files
 
     # include SConscript file if it exists
-    if os.path.isfile(os.path.join(dir_name, 'SConscript')):
-        result = SConscript(os.path.join(dir_name, 'SConscript'), exports='env'
-                            )
+    sconscript_name = real_path(os.path.join(dir_name, 'SConscript'),
+                                release_dir)
+    if os.path.isfile(sconscript_name):
+        result = SConscript(sconscript_name, exports='env')
 
         # use the new environment if it was updated by the SConscript file
         if isinstance(result, Environment):
@@ -75,20 +100,24 @@ def process_dir(parent_env, dir_name, is_module_dir):
 
     # install script files in the library directory
     scripts = env.Install(env['LIBDIR'], env['SCRIPT_FILES'])
+    Local(scripts)
     define_aliases(env, scripts, dir_name, '.scripts')
 
     # install data files in the data directory
     data = env.Install(os.path.join(env['DATADIR'], dir_name), env['DATA_FILES'
                        ])
+    Local(data)
     define_aliases(env, data, dir_name, '.data')
 
     # loop over subdirs
-    entries = os.listdir(dir_name)
+    entries = os.listdir(real_path(dir_name, release_dir))
     for entry in entries:
-        if entry.find('.') == -1 and not os.path.isfile(os.path.join(dir_name,
-                entry)) and not entry in ['include', 'src', 'tools', 'data']:
+        if entry.find('.') == -1 \
+            and not os.path.isfile(real_path(os.path.join(dir_name, entry),
+                                   release_dir)) and not entry in ['include',
+                'src', 'tools', 'data']:
             process_dir(env, os.path.join(dir_name, entry), entry == 'modules'
-                        or is_module_dir)
+                        or is_module_dir, release_dir)
 
     # check whether we have to create a new library
     if env.Dictionary().has_key('MODULE') and env['MODULE'] == True:
@@ -123,6 +152,7 @@ def process_dir(parent_env, dir_name, is_module_dir):
             reg_map = env.RegMap(os.path.join(lib_dir_name,
                                  env.subst('$SHLIBPREFIX') + lib_name + '.map'
                                  ), env['SRC_FILES'])
+            Local([lib, reg_map])
             env.Alias(lib_name, [lib, reg_map])
             if is_module_dir:
                 define_aliases(env, [lib, reg_map], dir_name, '.modules')
@@ -133,6 +163,7 @@ def process_dir(parent_env, dir_name, is_module_dir):
                 pymod = env.InstallAs(os.path.join(env['LIBDIR'],
                                       os.path.basename(dir_name) + 'module'
                                       + env.subst('$SHLIBSUFFIX')), lib)
+                Local(pymod)
                 define_aliases(env, pymod, dir_name, '.lib')
     else:
 
@@ -142,10 +173,12 @@ def process_dir(parent_env, dir_name, is_module_dir):
 
     # setup environment for building executables, include SConscript if it exists
     save_env = env.Clone()
-    env['TOOLS_FILES'] = Glob(os.path.join(dir_name, 'tools', '*.cc'))
-    if os.path.isfile(os.path.join(dir_name, 'tools', 'SConscript')):
-        result = SConscript(os.path.join(dir_name, 'tools', 'SConscript'),
-                            exports='env')
+    env['TOOLS_FILES'] = get_files(os.path.join(dir_name, 'tools', '*.cc'),
+                                   release_dir)
+    sconscript_name = real_path(os.path.join(dir_name, 'tools', 'SConscript'),
+                                release_dir)
+    if os.path.isfile(sconscript_name):
+        result = SConscript(sconscript_name, exports='env')
         if isinstance(result, Environment):
             env = result
 

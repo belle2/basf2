@@ -67,4 +67,16 @@ for entry in os.listdir(os.getcwd()):
     global_env['PACKAGE'] = entry
     local_packages.append(entry)
 
-    global_env.ProcessDirectory(entry, False)
+    global_env.ProcessDirectory(entry, False, None)
+
+# loop over directory entries in central release
+if repository:
+    for entry in os.listdir(repository):
+        if entry.find('.') > -1 or os.path.isfile(os.path.join(repository, entry)) or entry in exclude_dirs + local_packages:
+            continue
+
+        # we are in a package directory
+        global_env['PACKAGE'] = entry
+
+        global_env.ProcessDirectory(entry, False, repository)
+

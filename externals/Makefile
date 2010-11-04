@@ -88,6 +88,7 @@ root: root/config/Makefile.config
 # root build command
 root/config/Makefile.config:
 	@echo "building root"
+	@-cd root; patch -Np0 < ../root.patch
 	@cd root; ./configure --incdir=$(EXTINCDIR)/root --libdir=$(EXTLIBDIR) --bindir=$(EXTBINDIR) \
 	--prefix=$(EXTDIR) --etcdir=$(EXTDIR)/share/etc --enable-gsl-shared \
 	--with-g4-incdir=$(EXTINCDIR)/geant4 --with-g4-libdir=$(EXTLIBDIR) \

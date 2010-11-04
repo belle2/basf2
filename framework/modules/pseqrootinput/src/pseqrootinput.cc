@@ -55,7 +55,7 @@ void pSeqRootInput::initialize()
   }
 
   // Attach to ring buffer if nprocess > 0
-  m_nproc = pFramework::nprocess();
+  m_nproc = Framework::nprocess();
 
   //  printf ( "pRootInput : nproc = %d\n", m_nproc );
   WARNING("pRootInput : nproc = " << m_nproc)

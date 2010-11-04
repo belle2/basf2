@@ -10,7 +10,7 @@
 
 #include <framework/modules/histomanager/HistoManager.h>
 
-#include <framework/pcore/pFramework.h>
+#include <framework/core/Framework.h>
 #include <framework/pcore/ProcHandler.h>
 
 using namespace Belle2;
@@ -40,7 +40,7 @@ HistoManager::~HistoManager()
 {
   if (m_initmain) {
     cout << "HistoManager:: destructor called from pid=" << ProcHandler::EvtProcID() << endl;
-    if (pFramework::nprocess() > 0 && ProcHandler::EvtProcID() == -1) {
+    if (Framework::nprocess() > 0 && ProcHandler::EvtProcID() == -1) {
       cout << "HistoManager:: adding histogram files" << endl;
       RbTupleManager::Instance().hadd();
     }
@@ -49,7 +49,7 @@ HistoManager::~HistoManager()
 
 void HistoManager::initialize()
 {
-  RbTupleManager::Instance().init(pFramework::nprocess(), m_histfile.c_str());
+  RbTupleManager::Instance().init(Framework::nprocess(), m_histfile.c_str());
 
   m_initmain = true;
   cout << "HistoManager::initialization done" << endl;

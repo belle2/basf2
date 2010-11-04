@@ -113,7 +113,9 @@ int RbTupleManager::hadd(void)
   for (int i = 0; i < m_nproc; i++) {
     char filename[1024];
     sprintf(filename, "%s.%d", m_filename, i);
-    filelist->Add(TFile::Open(filename));
+    //    filelist->Add(TFile::Open(filename));
+    TFile* tf = new TFile(filename, "READ");
+    filelist->Add(tf) ;
   }
 
   // Open a root file to merge histograms

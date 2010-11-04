@@ -68,7 +68,7 @@ void pRootOutput::initialize()
   }
 
   // Attach to ring buffer if nprocess > 0
-  m_nproc = pFramework::nprocess();
+  m_nproc = Framework::nprocess();
 
   //  printf ( "pRootInput : nproc = %d\n", m_nproc );
   WARNING("pRootInput : nproc = " << m_nproc)
@@ -95,7 +95,7 @@ void pRootOutput::beginRun()
 void pRootOutput::event()
 {
   //fill Event data
-  if (pFramework::nprocess() == 0) {
+  if (Framework::nprocess() == 0) {
     fillTree(c_Event);
   } else {
     fillRingBuf(c_Event);
@@ -224,7 +224,7 @@ void pRootOutput::endRun()
 void pRootOutput::terminate()
 {
   // Single process mode
-  if (pFramework::nprocess() == 0)  {
+  if (Framework::nprocess() == 0)  {
     //write the trees
     m_file->cd();
     for (int ii = 0; ii < c_NDurabilityTypes; ++ii) {

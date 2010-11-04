@@ -4,6 +4,7 @@
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Andreas Moll                                             *
+ *               R.Itoh, addition of parallel processing function         *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -20,6 +21,8 @@
 #include <framework/core/Path.h>
 #include <framework/core/PathManager.h>
 #include <framework/core/EventProcessor.h>
+
+#include <framework/pcore/pEventProcessor.h>
 
 #include <string>
 #include <map>
@@ -121,9 +124,24 @@ namespace Belle2 {
      */
     void process(PathPtr startPath, long maxEvent, long runNumber);
 
+    /* Additions to implement parallel processing by R.Itoh */
+
     /**
-     * Sets the logging output to the shell (std::cout).
-     */
+     * Function to set number of processes for parallel processing
+     *
+     * @param nproc Number of processes for parallel processing
+    */
+    void set_nprocess(int nproc);
+
+    /**
+     * Function to get number of processes for parallel processing
+    */
+    static int nprocess(void);
+
+    /* End of parallel processing additions */
+
+
+    /*! Sets the logging output to the shell (std::cout). */
     void setLoggingToShell();
 
     /**
@@ -178,8 +196,12 @@ namespace Belle2 {
 
     PathManager* m_pathManager;       /**< The path manager, which takes care of creating and handling paths. */
     EventProcessor* m_eventProcessor; /**< The event processor, which loops over the events and calls the modules. */
+    pEventProcessor* m_peventProcessor; /*!< The event processor, which loops over the events and calls the modules. */
+
 
   private:
+
+    static int m_nproc;
 
   };
 

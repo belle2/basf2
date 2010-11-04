@@ -16,7 +16,6 @@
 #include <framework/pcore/EvtMessage.h>
 #include <framework/pcore/MsgHandler.h>
 #include <framework/pcore/RingBuffer.h>
-#include <framework/pcore/pFramework.h>
 #include <framework/pcore/SeqFile.h>
 
 #include <boost/shared_ptr.hpp>
@@ -26,11 +25,25 @@
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreDefs.h>
 
-#define RINGBUF_SIZE 4000000*4     // 4Mwords for ring buffer
-#define MAXEVTSIZE   4000000*4     // 4Mwords for maximum event size
-
+/*! RINBGBUF_SIZE and MAXEVTSIZE defines maximum size of IPC shared memory for RingBuffer */
+/*!
+  Defaulted to 4MBytes which is the default maximum of standard Linux setting.
+  The size should be increased for better performance. To increase the size, system parameter
+  has to be changed by adding
+      kernel.shmmax = MAX_SHAREDMEM_SIZE
+  in /etc/sysctl.conf and issue
+   % sysctl -p
+  in root account. The default Linux setting(4MB) comes from ancient limitation on the IPC memory
+  size of old UNIX which is now completely obsolete. You can set any values to it.
+  100MBytes could be a recommended value for it.
+*/
+#define RINGBUF_SIZE 1000000*4     // 1Mwords=4MB for ring buffer
+#define MAXEVTSIZE   1000000*4     // 1Mwords=4MB for maximum event size
 
 namespace Belle2 {
+
+  /*! Class definition for the output module of Sequential ROOT I/O */
+
   class pSeqRootOutput : public pOutputServer {
 
     // Public functions

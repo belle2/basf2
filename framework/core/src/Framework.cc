@@ -4,6 +4,7 @@
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Andreas Moll                                             *
+ *               R.Itoh, addition of parallel processing function         *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -24,16 +25,22 @@ using namespace Belle2;
 
 using namespace boost::python;
 
+// Static variable
+int Framework::m_nproc = 0;
+
 
 Framework::Framework()
 {
   m_pathManager = new PathManager();
   m_eventProcessor = new EventProcessor(*m_pathManager);
+  m_peventProcessor = new pEventProcessor(*m_pathManager);
+  m_nproc = 0;
 }
 
 
 Framework::~Framework()
 {
+  delete m_peventProcessor;
   delete m_eventProcessor;
   delete m_pathManager;
 }
@@ -65,7 +72,15 @@ PathPtr Framework::createPath() throw(PathManager::PathNotCreatedError)
 
 void Framework::process(PathPtr startPath)
 {
+  /* Original coding
   m_eventProcessor->process(startPath);
+  */
+  // Extended for parallel processing
+  if (m_nproc == 0)
+    m_eventProcessor->process(startPath);
+  else
+    m_peventProcessor->process(startPath);
+
 }
 
 
@@ -79,6 +94,19 @@ void Framework::process(PathPtr startPath, long maxEvent, long runNumber)
 {
   m_eventProcessor->process(startPath, maxEvent, runNumber);
 }
+
+// Addition for parallel processing
+void Framework::set_nprocess(int nproc)
+{
+  m_nproc = nproc;
+  m_peventProcessor->nprocess(nproc);
+}
+
+int Framework::nprocess(void)
+{
+  return m_nproc;
+}
+// End of addition
 
 
 void Framework::setLoggingToShell()
@@ -155,6 +183,7 @@ void Framework::exposePythonAPI()
   void(Framework::*process1)(PathPtr) = &Framework::process;
   void(Framework::*process2)(PathPtr, long) = &Framework::process;
   void(Framework::*process3)(PathPtr, long, long) = &Framework::process;
+  void(Framework::*set_nprocess)(int) = &Framework::set_nprocess;
 
   //Expose framework class
   class_<Framework>("Framework")
@@ -168,6 +197,7 @@ void Framework::exposePythonAPI()
   .def("process", process1)
   .def("process", process2)
   .def("process", process3)
+  .def("set_nprocess", set_nprocess)
   .def("log_to_shell", &Framework::setLoggingToShell)
   .def("log_to_txtfile", &Framework::setLoggingToTxtFile)
   .def("log_statistics", &Framework::getLogStatisticPython)

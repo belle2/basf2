@@ -38,14 +38,23 @@ namespace Belle2 {
         Processes all events for the given run number and for events from 0 to maxEvent.
         \param spath The processing starts with the first module of this path.
     */
-    void process_parallel(PathPtr spath);
+    void process(PathPtr spath);
 
-    static int m_nproc;
+    /*! Set number of processes for parallel processing */
+    /*!
+        Number of processes. 0 means normal single event processing
+    \param nproc Number of processes
+    */
+    void nprocess(int nproc);
+
+    /*! Get number of processes from outside */
+    int nprocess(void);
 
   protected:
 
   private:
 
+    int m_nproc;
     ModulePtrList m_input_list;
     ModulePtrList m_output_list;
     ProcHandler* procHandler;

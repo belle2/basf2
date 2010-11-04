@@ -10,9 +10,6 @@
 using namespace std;
 using namespace Belle2;
 
-// Static variable
-int pEventProcessor::m_nproc = 0;
-
 pEventProcessor::pEventProcessor(PathManager& pathManager) : EventProcessor(pathManager)
 {
   procHandler = new ProcHandler();
@@ -25,11 +22,12 @@ pEventProcessor::~pEventProcessor()
 }
 
 
-void pEventProcessor::process_parallel(PathPtr spath)
+void pEventProcessor::process(PathPtr spath)
 {
   if (spath->getModules().size() == 0) return;
 
   // 0. If nprocess is 0, pass control to kbasf2::process()
+
   if (m_nproc == 0) {   // Single process -> fall back to kbasf2
     //    process ( spath, maxev );
     process(spath);
@@ -87,3 +85,14 @@ void pEventProcessor::process_parallel(PathPtr spath)
     procHandler->wait_processes();
   }
 }
+
+void pEventProcessor::nprocess(int nproc)
+{
+  m_nproc = nproc;
+}
+
+int pEventProcessor::nprocess(void)
+{
+  return m_nproc;
+}
+

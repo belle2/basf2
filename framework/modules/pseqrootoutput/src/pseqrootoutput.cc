@@ -55,7 +55,7 @@ void pSeqRootOutput::initialize()
   }
 
   // Attach to ring buffer if nprocess > 0
-  m_nproc = pFramework::nprocess();
+  m_nproc = Framework::nprocess();
 
   //  printf ( "pRootInput : nproc = %d\n", m_nproc );
   WARNING("pRootInput : nproc = " << m_nproc)
@@ -126,7 +126,7 @@ void pSeqRootOutput::endRun()
 void pSeqRootOutput::terminate()
 {
   // Single process mode
-  if (pFramework::nprocess() == 0)  {
+  if (Framework::nprocess() == 0)  {
     delete m_file;
   } else { // Parallel processing
     // Send termination packet to output server

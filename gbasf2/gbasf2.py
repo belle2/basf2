@@ -1,0 +1,156 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+#
+# gBasf2 - http://b2comp.kek.jp/~twiki/bin/view/Computing/GBasf2
+# gBasf2 is the commandline client for submitting grid-based basf2 jobs.
+# It uses the DIRAC Distributed Computing Framework to control the jobs.
+#
+# Tom Fifield (fifieldt@unimelb.edu.au) - 2010-11
+#
+
+# we require Amga tools from Polish devs for metadata
+from AmgaSearch import AmgaSearch
+# handy file/path features
+import os
+# we're part of DIRAC, yay
+import DIRAC
+from DIRAC.Core.Base import Script
+# used for commandline and steeringfile option parsing
+from gbasf2util import CLIParams
+# used to make tar for input sandbox
+import tarfile
+
+# make_jdl takes the options defined by the user and and lfn and makes a basic
+# JDL file. This is then written into a temporary file in the same directory.
+
+
+def make_jdl(
+    steering_file,
+    project,
+    CPUTime,
+    priority,
+    lfn,
+    swver,
+    tar,
+    ):
+
+    f = open(project + '-' + os.path.basename(lfn) + '.jdl', 'w')
+    f.write('[\n')
+    f.write('    Executable = "basf2 ' + steering_file + '";\n')
+    f.write('    JobGroup = ' + project + ';\n')
+    f.write('    JobName = ' + os.path.basename(lfn) + ';\n')
+    f.write('    PilotType = "private";\n')
+    f.write('    SystemConfig = ' + swver + ';\n')
+    f.write('    InputSandbox = \n')
+    f.write('    {\n')
+    f.write('      "' + steering_file + '",\n')
+    if tar is not None:
+        f.write('      "' + tar + '",\n')
+    f.write('      "LFN:' + lfn + '"\n')
+    f.write('''    };
+\
+      OutputSandbox =
+\
+        {
+\
+            "*.his",
+\
+            "*.root",
+\
+            "*.log",
+\
+            "std.err",
+\
+            "std.out"
+\
+        };
+\
+      StdError = "std.err";
+\
+      StdOutput = "std.out";
+\
+      OutputData = "std.out";
+\
+      MaxCPUTime = '''
+            + str(CPUTime) + ';\n\
+      Priority = ' + str(priority) + ' ;\n]'
+            )
+    f.close()
+
+
+# basic function to make a tar of input files, written to pwd
+
+
+def make_tar(project, files):
+    if files is not None:
+        tar = tarfile.open(project + '-inputsandbox.tar.bz2', 'w:bz2')
+        for file in files:
+            tar.add(file)
+        return project + '-inputsandbox.tar.bz2'
+    else:
+        return None
+
+
+# gBasf2 takes a number of options - either from the commandline or in a steering file (see
+# gbasf2utils.py) and uses them to (currently)
+# 1. conduct a metadata query to match appropriate data to work with - a set of LFNs
+# 2. construct a project based on the name provided and appropriate JDLs - presently just 1 per job
+# 3. submits the created jdls to the DIRAC Workload Management System
+#
+
+
+def main():
+  # ./gbasf2.py w -s steering-simpleexample.py -g test -m test -m 'id >1 and id <5'
+    exitCode = 0
+    errorList = []
+
+  # setup options
+    cliParams = CLIParams()
+    cliParams.registerCLISwitches()
+    Script.parseCommandLine(ignoreErrors=True)
+    cliParams.registerSteeringOptions()
+
+  # setup dirac - import here because it pwns everything
+    from DIRAC.Interfaces.API import Dirac
+    dirac = Dirac.Dirac()
+
+  # perform the metadata query
+    asearch = AmgaSearch()
+    asearch.setDataType(cliParams.getDataType())
+    asearch.setExperiments([int(s) for s in
+                           cliParams.getExperiments().split(',')])
+    asearch.setQuery(cliParams.getQuery())
+    lfns = asearch.executeAmgaQuery()
+
+  # create the input sandbox
+    tar = make_tar(cliParams.getProject(), cliParams.getInputFiles())
+
+  # for each of the lfns, make a job and submit it
+    for lfn in lfns:
+        make_jdl(
+            cliParams.getSteeringFile(),
+            cliParams.getProject(),
+            cliParams.getCPUTime(),
+            cliParams.getJobPriority(),
+            lfn,
+            cliParams.getSwVer(),
+            tar,
+            )
+        result = dirac.submit(cliParams.getProject() + '-'
+                              + os.path.basename(lfn) + '.jdl')
+        if result['OK']:
+            print 'JobID = %s' % result['Value']
+        else:
+            errorList.append('[' + lfn + '] ' + result['Message'])
+            exitCode = 2
+
+  # print any errors encountered during submission
+    for error in errorList:
+        print 'ERROR %s' % error
+
+    DIRAC.exit(exitCode)
+
+
+if __name__ == '__main__':
+    main()

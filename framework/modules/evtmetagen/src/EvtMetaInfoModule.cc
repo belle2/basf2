@@ -8,9 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "framework/modules/evtmetagen/EvtMetaInfo.h"
+#include "framework/modules/evtmetagen/EvtMetaInfoModule.h"
 
-#include <framework/core/ModuleManager.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreDefs.h>
 #include <framework/datastore/EventMetaData.h>
@@ -21,13 +20,13 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(EvtMetaInfo, "EvtMetaInfo")
+REG_MODULE(EvtMetaInfoModule, "EvtMetaInfo")
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-EvtMetaInfo::EvtMetaInfo() : Module()
+EvtMetaInfoModule::EvtMetaInfoModule() : Module()
 {
   //Set module properties
   setDescription("Prints the current event meta data information (exp, run, evt).");
@@ -36,47 +35,35 @@ EvtMetaInfo::EvtMetaInfo() : Module()
 }
 
 
-EvtMetaInfo::~EvtMetaInfo()
+EvtMetaInfoModule::~EvtMetaInfoModule()
 {
 
 }
 
 
-void EvtMetaInfo::initialize()
+void EvtMetaInfoModule::beginRun()
 {
-
-}
-
-
-void EvtMetaInfo::beginRun()
-{
-  StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", c_Persistent);
+  StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", c_Event);
   INFO_S("========================================================================");
   INFO_S(">>> Start new run: " << eventMetaDataPtr->getRun());
   INFO_S("------------------------------------------------------------------------");
 }
 
 
-void EvtMetaInfo::event()
+void EvtMetaInfoModule::event()
 {
   //Print event meta data information
-  StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", c_Persistent);
+  StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", c_Event);
   INFO("EXP NUMBER: " << eventMetaDataPtr->getExperiment());
   INFO("RUN NUMBER: " << eventMetaDataPtr->getRun());
   INFO("EVT NUMBER: " << eventMetaDataPtr->getEvent());
 }
 
 
-void EvtMetaInfo::endRun()
+void EvtMetaInfoModule::endRun()
 {
-  StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", c_Persistent);
+  StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", c_Event);
   INFO_S("------------------------------------------------------------------------");
   INFO_S("<<< End run: " << eventMetaDataPtr->getRun());
   INFO_S("========================================================================");
-}
-
-
-void EvtMetaInfo::terminate()
-{
-
 }

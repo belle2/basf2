@@ -8,8 +8,6 @@
 
 #include <framework/modules/prootinput/prootinput.h>
 
-#include <framework/core/ModuleManager.h>
-
 using namespace std;
 using namespace Belle2;
 

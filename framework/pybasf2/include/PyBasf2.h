@@ -18,16 +18,17 @@ namespace Belle2 {
   //Define exceptions
   BELLE2_DEFINE_EXCEPTION(PythonModuleNotEmbeddedError, "Could not embed the basf2 Python module !");
 
-  //!  The Pybasf2 class.
-  /*!
-     This class defines the Python basf2 module. Import this module
-     in a plane python script to have the basf2 framework available.
-  */
+  /**
+   * The Pybasf2 class.
+   *
+   * This class defines the Python basf2 module. Import this module
+   * in a plane python script to have the basf2 framework available.
+   */
   class PyBasf2 {
 
   public:
 
-    //! Embeds the Python module.
+    /** Embeds the Python module. */
     static void embedPythonModule() throw(PythonModuleNotEmbeddedError);
 
   };

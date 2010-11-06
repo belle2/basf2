@@ -10,7 +10,6 @@
 #define PROOT_OUTPUT_H
 
 #include <framework/core/Module.h>
-#include <framework/core/ModuleManager.h>
 #include <framework/core/Framework.h>
 #include <framework/pcore/pEventServer.h>
 #include <framework/pcore/EvtMessage.h>

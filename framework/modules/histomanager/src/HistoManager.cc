@@ -6,8 +6,6 @@
 // Date : 27 - Jul - 2010
 //-
 
-#include <framework/core/ModuleManager.h>
-
 #include <framework/modules/histomanager/HistoManager.h>
 
 #include <framework/core/Framework.h>

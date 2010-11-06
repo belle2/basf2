@@ -15,29 +15,31 @@
 
 namespace Belle2 {
 
-  /*!  The LogCommon class. */
-  /*!
-    This class provides commonly used methods for the logging library.
-  */
+  /**
+   * The LogCommon class.
+   *
+   * This class provides commonly used methods for the logging library.
+   */
   class LogCommon {
   public:
 
-    /*! Definition of the supported log levels. In ascending order ! */
-    enum ELogLevel { c_Debug,   /*!< Debug: for code development.  */
-                     c_Info,    /*!< Info: for informational messages, e.g. about opened files, processed events, etc. */
-                     c_Warning, /*!< Warning: for potential problems that the user should pay attention to. */
-                     c_Error,   /*!< Error: for things that went wrong and have to be fixed. */
-                     c_Fatal    /*!< Fatal: for situations were the program execution can not be continued. */
+    /** Definition of the supported log levels. In ascending order ! */
+    enum ELogLevel { c_Debug,   /**< Debug: for code development.  */
+                     c_Info,    /**< Info: for informational messages, e.g. about opened files, processed events, etc. */
+                     c_Warning, /**< Warning: for potential problems that the user should pay attention to. */
+                     c_Error,   /**< Error: for things that went wrong and have to be fixed. */
+                     c_Fatal    /**< Fatal: for situations were the program execution can not be continued. */
                    };
 
-    /*! The number of log levels. Make sure this number corresponds to the number of entries in ELogLevel. */
+    /** The number of log levels. Make sure this number corresponds to the number of entries in ELogLevel. */
     static const int ELogLevelCount = 5;
 
-    /*! Converts a log level type to a string. */
-    /*!
-      \param logLevelType The type of the log level.
-      \return The string representation of the log level type.
-    */
+    /**
+     * Converts a log level type to a string.
+     *
+     * @param logLevelType The type of the log level.
+     * @return The string representation of the log level type.
+     */
     static std::string logLevelToString(ELogLevel logLevelType) {
       std::string result;
 

@@ -8,15 +8,16 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+#include <framework/core/Module.h>
 #include <framework/core/ModuleManager.h>
+
+#include <framework/logging/Logger.h>
+#include <framework/core/ModuleUtils.h>
 
 #include <dlfcn.h>
 #include <iostream>
 #include <fstream>
 #include <boost/regex.hpp>
-#include <framework/logging/Logger.h>
-#include <framework/core/Module.h>
-#include <framework/core/ModuleUtils.h>
 
 using namespace Belle2;
 using namespace std;

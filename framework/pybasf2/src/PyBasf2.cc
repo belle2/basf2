@@ -8,9 +8,9 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <framework/pybasf2/PyBasf2.h>
-
 #include <boost/python.hpp>
+
+#include <framework/pybasf2/PyBasf2.h>
 
 #include <framework/core/Module.h>
 #include <framework/core/Path.h>

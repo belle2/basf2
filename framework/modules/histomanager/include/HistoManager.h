@@ -8,10 +8,10 @@
 // Date : 27 - Jul - 2010
 //-
 
-#include <string>
-
 #include <framework/core/Module.h>
 #include <framework/pcore/RbTuple.h>
+
+#include <string>
 
 namespace Belle2 {
 

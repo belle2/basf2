@@ -10,7 +10,6 @@
 
 #include <framework/modules/simpleinput/simpleinput.h>
 
-#include <framework/core/ModuleManager.h>
 #include <boost/shared_ptr.hpp>
 
 using namespace std;

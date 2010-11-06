@@ -8,9 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "framework/modules/evtmetagen/EvtMetaGen.h"
+#include "framework/modules/evtmetagen/EvtMetaGenModule.h"
 
-#include <framework/core/ModuleManager.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreDefs.h>
 #include <framework/datastore/EventMetaData.h>
@@ -21,13 +20,13 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(EvtMetaGen, "EvtMetaGen")
+REG_MODULE(EvtMetaGenModule, "EvtMetaGen")
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-EvtMetaGen::EvtMetaGen() : Module()
+EvtMetaGenModule::EvtMetaGenModule() : Module()
 {
   //Set module properties
   setDescription("Sets the event meta data information (exp, run, evt).");
@@ -42,13 +41,13 @@ EvtMetaGen::EvtMetaGen() : Module()
 }
 
 
-EvtMetaGen::~EvtMetaGen()
+EvtMetaGenModule::~EvtMetaGenModule()
 {
 
 }
 
 
-void EvtMetaGen::initialize()
+void EvtMetaGenModule::initialize()
 {
   //Make sure all lists have the same size
   unsigned int defListSize = m_expList.size();
@@ -74,13 +73,7 @@ void EvtMetaGen::initialize()
 }
 
 
-void EvtMetaGen::beginRun()
-{
-
-}
-
-
-void EvtMetaGen::event()
+void EvtMetaGenModule::event()
 {
   bool storeMetaData = true;
 
@@ -112,22 +105,10 @@ void EvtMetaGen::event()
 
   //Store the event meta data information.
   if (storeMetaData) {
-    StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", c_Persistent);
+    StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", c_Event);
     eventMetaDataPtr->setExperiment(m_expList[m_colIndex]);
     eventMetaDataPtr->setRun(m_runList[m_colIndex]);
     eventMetaDataPtr->setEvent(m_evtNumber);
   }
-
-}
-
-
-void EvtMetaGen::endRun()
-{
-
-}
-
-
-void EvtMetaGen::terminate()
-{
 
 }

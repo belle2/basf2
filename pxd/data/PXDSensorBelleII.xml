@@ -2,7 +2,7 @@
 <Sensors>
   <Sensor desc="The small PXD sensor" type="1">
     <SensorType desc="1 = Layer1, 2 = Layer2">1</SensorType>
-    <Material>Vacuum</Material>
+    <Material>Air</Material>
     <Width unit="mm">15</Width>
     <Thickness unit="um">420</Thickness>
     <Length unit="mm">67.975</Length>
@@ -23,7 +23,7 @@
         <VPosition unit="mm">11.375</VPosition>
       </Active>
       <Thinned>
-        <Material>Vacuum</Material>
+        <Material>Air</Material>
         <Length unit="um">345</Length>
         <Thickness unit="mm">44.775</Thickness>
         <Thickness2 unit="mm">44.286</Thickness2>
@@ -60,7 +60,7 @@
         <VPosition unit="mm">11.375</VPosition>
       </Active>
       <Thinned>
-      <Material>Vacuum</Material>
+      <Material>Air</Material>
       <Thickness unit="mm">61.775</Thickness>
       <Thickness2 unit="mm">61.286</Thickness2>
       <Width unit="mm">12</Width>

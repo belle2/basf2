@@ -89,17 +89,25 @@ Bool_t B2GeomVolume::initBasicParameters(GearDir& con)
 
 Bool_t B2GeomVolume::correctDensity()
 {
-// check if the volume is defined
+  //check if density has already been corrected
+  if (isDensityCorrected) return true;
+
+  // check if the volume is defined
   if (tVolume == NULL) return false;
-// don't correct density if volume is a TGeoVolumeAssembly
+
+  // don't correct density if volume is a TGeoVolumeAssembly
   if (strcmp(tVolume->ClassName(), "TGeoVolumeAssembly") == 0) return true;
-// get volume without the daughter volumes!
-  Double_t fVolume = tVolume->GetShape()->Capacity() - tVolume->Capacity();
-// correct density
-  if (fMass < 0) fMass = fVolume * tVolume->GetMaterial()->GetDensity();
-  tVolume->GetMaterial()->SetDensity(fMass*fDensityFactor / fVolume);
+
+  // get volume without the daughter volumes!
+  Double_t fVolume = tVolume->GetShape()->Capacity();
+  if (tVolume->GetNdaughters()) fVolume = fVolume - tVolume->Capacity();
+
+  // correct density
+  if (fMass > 0) tVolume->GetMaterial()->SetDensity(fMass / fVolume);
+  if (fDensityFactor > 0) tVolume->GetMaterial()->SetDensity(fDensityFactor * tVolume->GetMaterial()->GetDensity());
+
   // make sure that the density is only changed once for the volume
-  isDensityCorrected = false;
+  isDensityCorrected = true;
   return true;
 }
 

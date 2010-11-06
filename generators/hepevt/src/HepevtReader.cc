@@ -131,17 +131,17 @@ void HepevtReader::readParticle(MCParticleGraph::GraphParticle &particle) throw(
   switch (fields.size()) {
     case 8:
       particle.setStatus(MCParticle::PrimaryParticle);
-      particle.setPDG(fields[1]);
-      particle.setFirstDaughter(fields[2]);
-      particle.setLastDaughter(fields[3]);
+      particle.setPDG(static_cast<int>(fields[1]));
+      particle.setFirstDaughter(static_cast<int>(fields[2]));
+      particle.setLastDaughter(static_cast<int>(fields[3]));
       particle.setMomentum(TVector3(&fields[4]));
       particle.setMass(fields[7]);
       break;
     case 15:
       particle.setStatus(MCParticle::PrimaryParticle);
-      particle.setPDG(fields[1]);
-      particle.setFirstDaughter(fields[4]);
-      particle.setLastDaughter(fields[5]);
+      particle.setPDG(static_cast<int>(fields[1]));
+      particle.setFirstDaughter(static_cast<int>(fields[4]));
+      particle.setLastDaughter(static_cast<int>(fields[5]));
       particle.setMomentum(TVector3(&fields[6]));
       //particle.setEnergy(fields[9]);
       particle.setMass(fields[10]);

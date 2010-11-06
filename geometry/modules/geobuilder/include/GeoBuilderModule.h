@@ -8,50 +8,52 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <geometry/geodetector/CreatorBase.h>
+#ifndef GEOBUILDER_H_
+#define GEOBUILDER_H_
 
-#ifndef GEOGLOBALPARAMS_H_
-#define GEOGLOBALPARAMS_H_
+#include <framework/core/Module.h>
+
+#include <string>
 
 
 namespace Belle2 {
 
-  class GearDir;
-
   /**
-   * The GeoGlobalParams class.
+   * The GeoBuilder module.
    *
-   * The creator for the global parameters of the Belle II detector.
+   * This module creates the detector Belle II detector geometry
+   * in memory.
    */
-  class GeoGlobalParams : public CreatorBase {
+  class GeoBuilderModule : public Module {
 
   public:
 
     /**
-     * Constructor of the GeoGlobalParams class.
-     */
-    GeoGlobalParams();
-
-    /**
-     * The destructor of the GeoGlobalParams class.
-     */
-    virtual ~GeoGlobalParams();
-
-    /**
-     * Creates the global ROOT objects and prepares everything for other creators.
+     * Constructor.
      *
-     * @param content A reference to the content part of the parameter description, which should to be used to create the ROOT objects.
+     * Sets the description of the module.
      */
-    virtual void create(GearDir& content);
+    GeoBuilderModule();
+
+    /** Destructor. */
+    virtual ~GeoBuilderModule();
+
+    /*! Creates the geometry during initialization of the module.
+     *
+     * It calls the method createDetector() of the GeoDetector class which
+     * loops over the Creators. The Creators create then the ROOT geometry.
+     * In order to access the geometry, the global Variable gGeoManager can
+     * be used.
+     */
+    virtual void initialize();
 
 
   protected:
 
+
   private:
 
   };
-
-
 }
 
-#endif /* GEOGLOBALPARAMS_H_ */
+#endif /* GEOBUILDER_H_ */

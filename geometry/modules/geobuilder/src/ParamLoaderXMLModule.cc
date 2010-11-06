@@ -8,9 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <geometry/modules/geobuilder/ParamLoaderXML.h>
+#include <geometry/modules/geobuilder/ParamLoaderXMLModule.h>
 
-#include <framework/core/ModuleManager.h>
 #include <framework/core/ModuleUtils.h>
 #include <framework/gearbox/Gearbox.h>
 #include <framework/gearbox/GearboxIOXML.h>
@@ -21,13 +20,13 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(ParamLoaderXML, "ParamLoaderXML")
+REG_MODULE(ParamLoaderXMLModule, "ParamLoaderXML")
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-ParamLoaderXML::ParamLoaderXML() : Module()
+ParamLoaderXMLModule::ParamLoaderXMLModule() : Module()
 {
   //Set module properties
   setDescription("Loads the Belle II detector parameters from a XML document.");
@@ -38,13 +37,13 @@ ParamLoaderXML::ParamLoaderXML() : Module()
 }
 
 
-ParamLoaderXML::~ParamLoaderXML()
+ParamLoaderXMLModule::~ParamLoaderXMLModule()
 {
 
 }
 
 
-void ParamLoaderXML::initialize()
+void ParamLoaderXMLModule::initialize()
 {
   //Check parameters
   if (!ModuleUtils::fileNameExists(m_filenameXML)) {
@@ -63,28 +62,4 @@ void ParamLoaderXML::initialize()
   } else {
     ERROR("Could not open XML file: " << m_filenameXML)
   }
-}
-
-
-void ParamLoaderXML::beginRun()
-{
-
-}
-
-
-void ParamLoaderXML::event()
-{
-
-}
-
-
-void ParamLoaderXML::endRun()
-{
-
-}
-
-
-void ParamLoaderXML::terminate()
-{
-
 }

@@ -8,9 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <geometry/modules/geobuilder/GeoBuilder.h>
+#include <geometry/modules/geobuilder/GeoBuilderModule.h>
 
-#include <framework/core/ModuleManager.h>
 #include <geometry/geodetector/GeoDetector.h>
 
 using namespace std;
@@ -19,13 +18,13 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(GeoBuilder, "GeoBuilder")
+REG_MODULE(GeoBuilderModule, "GeoBuilder")
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-GeoBuilder::GeoBuilder() : Module()
+GeoBuilderModule::GeoBuilderModule() : Module()
 {
   //Set module properties
   setDescription("Loads the Belle II detector parameters and creates the detector geometry.");
@@ -34,37 +33,13 @@ GeoBuilder::GeoBuilder() : Module()
 }
 
 
-GeoBuilder::~GeoBuilder()
+GeoBuilderModule::~GeoBuilderModule()
 {
 
 }
 
 
-void GeoBuilder::initialize()
+void GeoBuilderModule::initialize()
 {
   GeoDetector::Instance().createDetector();
-}
-
-
-void GeoBuilder::beginRun()
-{
-
-}
-
-
-void GeoBuilder::event()
-{
-
-}
-
-
-void GeoBuilder::endRun()
-{
-
-}
-
-
-void GeoBuilder::terminate()
-{
-
 }

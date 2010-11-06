@@ -8,9 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <geometry/modules/geobuilder/GeoSaver.h>
+#include <geometry/modules/geobuilder/GeoSaverModule.h>
 
-#include <framework/core/ModuleManager.h>
 #include <framework/core/ModuleUtils.h>
 #include <geometry/geodetector/GeoDetector.h>
 
@@ -24,20 +23,30 @@ using namespace boost::filesystem;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(GeoSaver, "GeoSaver")
+REG_MODULE(GeoSaverModule, "GeoSaver")
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-GeoSaver::GeoSaver() : Module()
+GeoSaverModule::GeoSaverModule() : Module()
 {
   //Set module properties
   setDescription("Saves the Belle II detector geometry to a root file.");
 
   //Parameter definition
   addParam("Filename",  m_filenameROOT, string("Belle2.root"), "The filename of the ROOT output file.");
+}
 
+
+GeoSaverModule::~GeoSaverModule()
+{
+
+}
+
+
+void GeoSaverModule::initialize()
+{
   //Check parameters
   if (!ModuleUtils::filePathExists(m_filenameROOT)) {
     ERROR("Parameter <Filename>: The path of the filename " << m_filenameROOT << " does not exist !")
@@ -45,37 +54,7 @@ GeoSaver::GeoSaver() : Module()
 }
 
 
-GeoSaver::~GeoSaver()
-{
-
-}
-
-
-void GeoSaver::initialize()
-{
-
-}
-
-
-void GeoSaver::beginRun()
-{
-
-}
-
-
-void GeoSaver::event()
+void GeoSaverModule::event()
 {
   GeoDetector::Instance().saveToRootFile(m_filenameROOT);
-}
-
-
-void GeoSaver::endRun()
-{
-
-}
-
-
-void GeoSaver::terminate()
-{
-
 }

@@ -17,7 +17,7 @@
         <Ladders>
           <WPosition desc="Radius of the layer" unit="mm">40</WPosition>
           <PhiLocal desc="Rotation of the ladder about its local V axis (parallel to global z axis)" unit="deg">8</PhiLocal>
-          <Material>Vacuum</Material>
+          <Material>Air</Material>
           <Sensors>
             <Sensor id="SVD_Layer_3_Ladder_Sensor_0">
               <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Sensor[@type=0]/*)"/>
@@ -36,7 +36,7 @@
         <Ladders>
           <WPosition desc="Radius of the layer" unit="mm">80.0</WPosition>
           <PhiLocal desc="Rotation of the ladder about its local V axis (parallel to global z axis)" unit="deg">6</PhiLocal>
-          <Material>Vacuum</Material>
+          <Material>Air</Material>
           <Barrel>
             <Ribs>
               <xi:include href="SVDLadderBelleII.xml" xpointer="xpointer(/*/Ribs/*)"/>
@@ -84,7 +84,7 @@
         <Ladders>
           <WPosition desc="Radius of the layer" unit="mm">115.0</WPosition>
           <PhiLocal desc="Rotation of the ladder about its local V axis (parallel to global z axis)" unit="deg">7</PhiLocal>
-          <Material>Vacuum</Material>
+          <Material>Air</Material>
           <Barrel>
             <Ribs>
               <xi:include href="SVDLadderBelleII.xml" xpointer="xpointer(/*/Ribs/*)"/>
@@ -140,7 +140,7 @@
         <Ladders>
           <WPosition desc="Radius of the layer" unit="mm">140</WPosition>
           <PhiLocal desc="Rotation of the ladder about its local V axis (parallel to global z axis)" unit="deg">7</PhiLocal>
-          <Material>Vacuum</Material>
+          <Material>Air</Material>
           <Barrel>
             <Ribs>
               <xi:include href="SVDLadderBelleII.xml" xpointer="xpointer(/*/Ribs/*)"/>

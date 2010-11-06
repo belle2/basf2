@@ -188,6 +188,7 @@ B2GeomSVDLadderRib::B2GeomSVDLadderRib(Int_t iLay)
 {
   B2GeomVolume();
   iLayer = iLay;
+  volFoam = NULL;
 }
 Bool_t B2GeomSVDLadderRib::init(GearDir& content)
 {
@@ -195,6 +196,13 @@ Bool_t B2GeomSVDLadderRib::init(GearDir& content)
   GearDir ribContent(content);
   ribContent.append("Rib/");
   initBasicParameters(ribContent);
+  if (ribContent.isParamAvailable("Foam")) {
+    volFoam = new B2GeomSVDLadderRibFoam(iLayer);
+    if (!volFoam->init(ribContent)) {
+      printf("ERROR! Parameter reading for SVD RibFoam failed!\n");
+      return false;
+    }
+  }
   printf("SVDLadderRib::init stop\n");
   return true;
 }
@@ -211,6 +219,10 @@ Bool_t B2GeomSVDLadderRib::make()
                                   0.5 * fLength
                                  );
   tVolume->SetLineColor(kBlack);
+  if (volFoam != NULL) {
+    volFoam->make();
+    tVolume->AddNode(volFoam->getVol(), 1, volFoam->getPosition());
+  }
   return true;
 }
 

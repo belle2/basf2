@@ -9,95 +9,170 @@
   <Version>0</Version>
   <Creator>GeoMaterials</Creator>
   <Content>
-    <Mixture name="SVD_Sensors_KaptonMix">
-      <Density unit="g/cm3">1.5</Density>
+
+		    <Mixture name="SVD_Rohacell">
+      <Density unit="g/cm3">0.032</Density>
       <Elements>
-        <Element name="C" weight="1.0">
+        <Element name="C" weight="0.2">
           <AtomNumber>6</AtomNumber>
-          <MassNumber>12</MassNumber>
+          <MassNumber>12.0107</MassNumber>
         </Element>
-      </Elements>
-    </Mixture>
-    <Mixture name="SVD_Sensors_Foam">
-      <Density unit="g/cm3">1.5</Density>
-      <Elements>
-        <Element name="C" weight="1.0">
-          <AtomNumber>6</AtomNumber>
-          <MassNumber>12</MassNumber>
+        <Element name="H" weight="0.275">
+          <AtomNumber>1</AtomNumber>
+          <MassNumber>1.00794</MassNumber>
         </Element>
-      </Elements>
-    </Mixture>
-    <Mixture name="SVD_Sensors_Large_SMDs">
-      <Density unit="g/cm3">2.3</Density>
-      <Elements>
-        <Element name="Si" weight="1.0">
-          <AtomNumber>14.0</AtomNumber>
-          <MassNumber>28.0855</MassNumber>
-        </Element>
-      </Elements>
-    </Mixture>
-    <Mixture name="SVD_Sensors_Large_Silicon">
-      <Density unit="g/cm3">2.3</Density>
-      <Elements>
-        <Element name="Si" weight="1.0">
-          <AtomNumber>14.0</AtomNumber>
-          <MassNumber>28.0855</MassNumber>
-        </Element>
-      </Elements>
-    </Mixture>
-    <Mixture name="SVD_Sensors_Small_Silicon">
-      <Density unit="g/cm3">2.3</Density>
-      <Elements>
-        <Element name="Si" weight="1.0">
-          <AtomNumber>14.0</AtomNumber>
-          <MassNumber>28.0855</MassNumber>
-        </Element>
-      </Elements>
-    </Mixture>
-    <Mixture name="SVD_Sensors_Wedge_Silicon">
-      <Density unit="g/cm3">2.3</Density>
-      <Elements>
-        <Element name="Si" weight="1.0">
-          <AtomNumber>14.0</AtomNumber>
-          <MassNumber>28.0855</MassNumber>
-        </Element>
-      </Elements>
-    </Mixture>
-    <Mixture name="SVD_Air">
-      <Density unit="g/cm3">0.001</Density>
-      <Elements>
-        <Element name="N" weight="1">
+        <Element name="N" weight="0.025">
           <AtomNumber>7</AtomNumber>
-          <MassNumber>14</MassNumber>
+          <MassNumber>14.00674</MassNumber>
+        </Element>
+        <Element name="O" weight="0.5">
+          <AtomNumber>8</AtomNumber>
+          <MassNumber>15.9994</MassNumber>
         </Element>
       </Elements>
     </Mixture>
-    <Mixture name="SVD_Ribs_Foam">
-      <Density unit="g/cm3">1.5</Density>
+
+    <Mixture name="SVD_Carbon">
+      <Density unit="g/cm3">2</Density>
       <Elements>
-        <Element name="C" weight="1.0">
+        <Element name="C" weight="1">
           <AtomNumber>6</AtomNumber>
-          <MassNumber>12</MassNumber>
+          <MassNumber>12.0107</MassNumber>
         </Element>
       </Elements>
     </Mixture>
-    <Mixture name="SVD_Ribs_Carbon">
-      <Density unit="g/cm3">1.5</Density>
+
+    <Mixture name="SVD_Aluminum">
+      <Density unit="g/cm3">2.699</Density>
       <Elements>
-        <Element name="C" weight="1.0">
+        <Element name="Al" weight="1">
+          <AtomNumber>13</AtomNumber>
+          <MassNumber>26.981538</MassNumber>
+        </Element>
+      </Elements>
+    </Mixture>
+
+    <Mixture name="SVD_CoolingLiquid">
+      <Density unit="g/cm3">1</Density>
+      <Elements>
+        <Element name="H" weight="0.666666666666667">
+          <AtomNumber>1</AtomNumber>
+          <MassNumber>1.00794</MassNumber>
+        </Element>
+        <Element name="O" weight="0.333333333333333">
+          <AtomNumber>8</AtomNumber>
+          <MassNumber>15.9994</MassNumber>
+        </Element>
+      </Elements>
+    </Mixture>
+
+    <Mixture name="SVD_Silicon">
+      <Density unit="g/cm3">2.33</Density>
+      <Elements>
+        <Element name="Si" weight="1">
+          <AtomNumber>14</AtomNumber>
+          <MassNumber>28.0855</MassNumber>
+        </Element>
+      </Elements>
+    </Mixture>
+
+    <Mixture name="SVD_KaptonFront">
+      <Density unit="g/cm3">1.2</Density>
+      <Elements>
+        <Element name="H" weight="0.256410256410256">
+          <AtomNumber>1</AtomNumber>
+          <MassNumber>1.00794</MassNumber>
+        </Element>
+        <Element name="C" weight="0.564102564102564">
           <AtomNumber>6</AtomNumber>
-          <MassNumber>12</MassNumber>
+          <MassNumber>12.0107</MassNumber>
+        </Element>
+        <Element name="N" weight="0.0512820512820513">
+          <AtomNumber>7</AtomNumber>
+          <MassNumber>14.00674</MassNumber>
+        </Element>
+        <Element name="O" weight="0.128205128205128">
+          <AtomNumber>8</AtomNumber>
+          <MassNumber>15.9994</MassNumber>
         </Element>
       </Elements>
     </Mixture>
-    <Mixture name="SVD_CoolingPipe_Steel">
-      <Density unit="g/cm3">7.85</Density>
+
+    <Mixture name="SVD_RohacellPad">
+      <Density unit="g/cm3">0.032</Density>
       <Elements>
-        <Element name="Fe" weight="1.0">
-          <AtomNumber>26</AtomNumber>
-          <MassNumber>55</MassNumber>
+        <Element name="C" weight="0.2">
+          <AtomNumber>6</AtomNumber>
+          <MassNumber>12.0107</MassNumber>
+        </Element>
+        <Element name="H" weight="0.275">
+          <AtomNumber>1</AtomNumber>
+          <MassNumber>1.00794</MassNumber>
+        </Element>
+        <Element name="N" weight="0.025">
+          <AtomNumber>7</AtomNumber>
+          <MassNumber>14.00674</MassNumber>
+        </Element>
+        <Element name="O" weight="0.5">
+          <AtomNumber>8</AtomNumber>
+          <MassNumber>15.9994</MassNumber>
         </Element>
       </Elements>
     </Mixture>
+
+    <Mixture name="SVD_Kapton">
+      <Density unit="g/cm3">1.2</Density>
+      <Elements>
+        <Element name="H" weight="0.256410256410256">
+          <AtomNumber>1</AtomNumber>
+          <MassNumber>1.00794</MassNumber>
+        </Element>
+        <Element name="C" weight="0.564102564102564">
+          <AtomNumber>6</AtomNumber>
+          <MassNumber>12.0107</MassNumber>
+        </Element>
+        <Element name="N" weight="0.0512820512820513">
+          <AtomNumber>7</AtomNumber>
+          <MassNumber>14.00674</MassNumber>
+        </Element>
+        <Element name="O" weight="0.128205128205128">
+          <AtomNumber>8</AtomNumber>
+          <MassNumber>15.9994</MassNumber>
+        </Element>
+      </Elements>
+    </Mixture>
+
+    <Mixture name="SVD_SiliconChips">
+      <Density unit="g/cm3">2.33</Density>
+      <Elements>
+        <Element name="Si" weight="1">
+          <AtomNumber>14</AtomNumber>
+          <MassNumber>28.0855</MassNumber>
+        </Element>
+      </Elements>
+    </Mixture>
+
+    <Mixture name="SVD_KaptonFlex">
+      <Density unit="g/cm3">1.2</Density>
+      <Elements>
+        <Element name="H" weight="0.256410256410256">
+          <AtomNumber>1</AtomNumber>
+          <MassNumber>1.00794</MassNumber>
+        </Element>
+        <Element name="C" weight="0.564102564102564">
+          <AtomNumber>6</AtomNumber>
+          <MassNumber>12.0107</MassNumber>
+        </Element>
+        <Element name="N" weight="0.0512820512820513">
+          <AtomNumber>7</AtomNumber>
+          <MassNumber>14.00674</MassNumber>
+        </Element>
+        <Element name="O" weight="0.128205128205128">
+          <AtomNumber>8</AtomNumber>
+          <MassNumber>15.9994</MassNumber>
+        </Element>
+      </Elements>
+    </Mixture>
+
   </Content>
 </ParamSet>

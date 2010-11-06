@@ -46,6 +46,7 @@ namespace Belle2 {
   class B2GeomSVDLadderRib : public B2GeomVolume {
   protected:
     Int_t iLayer;
+    B2GeomSVDLadderRibFoam* volFoam;
   public:
     B2GeomSVDLadderRib(Int_t iLay);
     Bool_t init(GearDir& content);

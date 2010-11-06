@@ -32,8 +32,11 @@ namespace Belle2 {
   public:
 
     //Define exceptions
+    /** Exception is thrown if the user tries to create a Creator having an empty name. */
     BELLE2_DEFINE_EXCEPTION(GeometryCreatorNameEmptyError, "Can't create a Creator with an empty name !");
+    /** Exception is thrown if the system tries to register a Creator carrying the same name as an already existing Creator. */
     BELLE2_DEFINE_EXCEPTION(GeometryCreatorAlreadyExistsError, "A Creator with the name '%1%' already exists !");
+    /** Exception is thrown if the system tries to access a Creator by name but could not find it.. */
     BELLE2_DEFINE_EXCEPTION(GeometryCreatorNotExistsError, "A Creator with the name '%1%' does not exist !");
 
     /**

@@ -65,13 +65,13 @@ void executePythonFile(const string& pythonFile)
 
         exec_file(boost::python::str(fullPath.string()), main_namespace, main_namespace);
       } catch (error_already_set const &) {
-        ERROR("An error occurred during the execution of the python file: " + pythonFile);
+        BELLE2_ERROR("An error occurred during the execution of the python file: " + pythonFile);
       }
     } else {
-      ERROR("The given filename and/or path is not valid: " + pythonFile);
+      BELLE2_ERROR("The given filename and/or path is not valid: " + pythonFile);
     }
   } catch (...) {
-    ERROR("An error occurred during the execution of the python file: " + pythonFile);
+    BELLE2_ERROR("An error occurred during the execution of the python file: " + pythonFile);
   }
 }
 
@@ -84,13 +84,13 @@ int main(int argc, char* argv[])
   //Check for the Belle2 environment variable
   char* belle2LocalDir = getenv("BELLE2_LOCAL_DIR");
   if (belle2LocalDir == NULL) {
-    ERROR("The environment variable BELLE2_LOCAL_DIR is not set. Please execute the 'setuprel' script first.")
+    BELLE2_ERROR("The environment variable BELLE2_LOCAL_DIR is not set. Please execute the 'setuprel' script first.")
     return 1;
   }
 
   char* belle2SubDir = getenv("BELLE2_SUBDIR");
   if (belle2LocalDir == NULL) {
-    ERROR("The environment variable BELLE2_SUBDIR is not set. Please execute the 'setuprel' script first.")
+    BELLE2_ERROR("The environment variable BELLE2_SUBDIR is not set. Please execute the 'setuprel' script first.")
     return 1;
   }
 
@@ -193,7 +193,7 @@ int main(int argc, char* argv[])
       //Finish Python interpreter
       Py_Finalize();
     } catch (PythonModuleNotEmbeddedError& exc) {
-      ERROR(exc.what());
+      BELLE2_ERROR(exc.what());
     } catch (error_already_set) {
       PyErr_Print();
     }

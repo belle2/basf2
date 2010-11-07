@@ -36,62 +36,40 @@ namespace Belle2 {
 #endif
 
 // debug messages
-#ifdef LOG_NO_DEBUG
-#define DEBUG(level, streamText)
-#define DEBUG_S(level, streamText)
+#ifdef LOG_NO_BELLE2_DEBUG
+#define BELLE2_DEBUG(level, streamText)
 #else
-#define DEBUG(level, streamText) { if (LogSystem::Instance().isLevelEnabled(LogCommon::c_Debug,level)) { \
+#define BELLE2_DEBUG(level, streamText) { if (LogSystem::Instance().isLevelEnabled(LogCommon::c_Debug,level)) { \
       std::ostringstream stringBuffer; stringBuffer << streamText; \
       LogSystem::Instance().sendMessage(LogCommon::c_Debug,streamText,PACKAGENAME(),FUNCTIONNAME(),__FILE__,__LINE__); } }
-
-#define DEBUG_S(level, streamText) { if (LogSystem::Instance().isLevelEnabled(LogCommon::c_Debug,level)) { \
-      std::ostringstream stringBuffer; stringBuffer << streamText; \
-      LogSystem::Instance().sendMessage(LogCommon::c_Debug,streamText,PACKAGENAME(),FUNCTIONNAME(),__FILE__,__LINE__,false); } }
 #endif
 
 // info messages
-#ifdef LOG_NO_INFO
-#define INFO(streamText)
-#define INFO_S(streamText)
+#ifdef LOG_NO_BELLE2_INFO
+#define BELLE2_INFO(streamText)
 #else
-#define INFO(streamText) { if (LogSystem::Instance().isLevelEnabled(LogCommon::c_Info)) { \
+#define BELLE2_INFO(streamText) { if (LogSystem::Instance().isLevelEnabled(LogCommon::c_Info)) { \
       std::ostringstream stringBuffer; stringBuffer << streamText; \
       LogSystem::Instance().sendMessage(LogCommon::c_Info,stringBuffer.rdbuf()->str(),PACKAGENAME(),FUNCTIONNAME(),__FILE__,__LINE__); } }
-
-#define INFO_S(streamText) { if (LogSystem::Instance().isLevelEnabled(LogCommon::c_Info)) { \
-      std::ostringstream stringBuffer; stringBuffer << streamText; \
-      LogSystem::Instance().sendMessage(LogCommon::c_Info,stringBuffer.rdbuf()->str(),PACKAGENAME(),FUNCTIONNAME(),__FILE__,__LINE__,false); } }
 #endif
 
 // warning messages
-#ifdef LOG_NO_WARNING
-#define WARNING(streamText)
-#define WARNING_S(streamText)
+#ifdef LOG_NO_BELLE2_WARNING
+#define BELLE2_WARNING(streamText)
 #else
-#define WARNING(streamText) { if (LogSystem::Instance().isLevelEnabled(LogCommon::c_Warning)) { \
+#define BELLE2_WARNING(streamText) { if (LogSystem::Instance().isLevelEnabled(LogCommon::c_Warning)) { \
       std::ostringstream stringBuffer; stringBuffer << streamText; \
       LogSystem::Instance().sendMessage(LogCommon::c_Warning,stringBuffer.rdbuf()->str(),PACKAGENAME(),FUNCTIONNAME(),__FILE__,__LINE__); } }
-
-#define WARNING_S(streamText) { if (LogSystem::Instance().isLevelEnabled(LogCommon::c_Warning)) { \
-      std::ostringstream stringBuffer; stringBuffer << streamText; \
-      LogSystem::Instance().sendMessage(LogCommon::c_Warning,stringBuffer.rdbuf()->str(),PACKAGENAME(),FUNCTIONNAME(),__FILE__,__LINE__,false); } }
 #endif
 
 // error messages
-#define ERROR(streamText) { if (LogSystem::Instance().isLevelEnabled(LogCommon::c_Error)) { \
+#define BELLE2_ERROR(streamText) { if (LogSystem::Instance().isLevelEnabled(LogCommon::c_Error)) { \
       std::ostringstream stringBuffer; stringBuffer << streamText; \
       LogSystem::Instance().sendMessage(LogCommon::c_Error,stringBuffer.rdbuf()->str(),PACKAGENAME(),FUNCTIONNAME(),__FILE__,__LINE__); } }
 
-#define ERROR_S(streamText) { if (LogSystem::Instance().isLevelEnabled(LogCommon::c_Error)) { \
-      std::ostringstream stringBuffer; stringBuffer << streamText; \
-      LogSystem::Instance().sendMessage(LogCommon::c_Error,stringBuffer.rdbuf()->str(),PACKAGENAME(),FUNCTIONNAME(),__FILE__,__LINE__,false); } }
-
 // fatal messages
-#define FATAL(streamText) { std::ostringstream stringBuffer; stringBuffer << streamText; \
+#define BELLE2_FATAL(streamText) { std::ostringstream stringBuffer; stringBuffer << streamText; \
     LogSystem::Instance().sendMessageForceAbort(LogCommon::c_Fatal,stringBuffer.rdbuf()->str(),PACKAGENAME(),FUNCTIONNAME(),__FILE__,__LINE__);}
-
-#define FATAL_S(streamText) { std::ostringstream stringBuffer; stringBuffer << streamText; \
-    LogSystem::Instance().sendMessageForceAbort(LogCommon::c_Fatal,stringBuffer.rdbuf()->str(),PACKAGENAME(),FUNCTIONNAME(),__FILE__,__LINE__,false);}
 
 // scoped logging for entering/leaving methods
 #ifdef LOG_NO_METHOD

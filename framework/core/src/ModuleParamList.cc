@@ -93,7 +93,7 @@ void ModuleParamList::setParamObjectPython(const std::string& name, const boost:
   ParamTypeInfo::ParamTypeInfo paramInfo = getParamTypeInfo(name);
 
   if (paramInfo.m_paramBasicType != ParamTypeInfo::c_SingleParam) {
-    ERROR("The parameter type of parameter '" + name + "' is not a single parameter value !")
+    BELLE2_ERROR("The parameter type of parameter '" + name + "' is not a single parameter value !")
     return;
   }
 
@@ -111,7 +111,7 @@ void ModuleParamList::setParamObjectPython(const std::string& name, const boost:
       setParamObjectTemplatePython<bool>(name, pyObj);
       break;
     default:
-      ERROR("The parameter type of parameter '" + name + "' is not a supported single value type !")
+      BELLE2_ERROR("The parameter type of parameter '" + name + "' is not a supported single value type !")
   }
 }
 
@@ -121,7 +121,7 @@ void ModuleParamList::setParamListPython(const std::string& name, const boost::p
   ParamTypeInfo::ParamTypeInfo paramInfo = getParamTypeInfo(name);
 
   if (paramInfo.m_paramBasicType != ParamTypeInfo::c_ListParam) {
-    ERROR("The parameter type of parameter '" + name + "' is not a list parameter value !")
+    BELLE2_ERROR("The parameter type of parameter '" + name + "' is not a list parameter value !")
     return;
   }
 
@@ -139,7 +139,7 @@ void ModuleParamList::setParamListPython(const std::string& name, const boost::p
       setParamListTemplatePython<bool>(name, pyList);
       break;
     default:
-      ERROR("The parameter type of parameter '" + name + "' is not a supported list value type !")
+      BELLE2_ERROR("The parameter type of parameter '" + name + "' is not a supported list value type !")
   }
 }
 
@@ -159,7 +159,7 @@ std::string ModuleParamList::getParamTypeString(const std::string& name) const
   if (mapIter != m_paramMap.end()) {
     return mapIter->second.get()->getTypeInfo();
   } else {
-    ERROR("Could not find the type of the parameter '" + name + "' !");
+    BELLE2_ERROR("Could not find the type of the parameter '" + name + "' !");
   }
   return string();
 }
@@ -189,7 +189,7 @@ void ModuleParamList::getParamValuesPython(const std::string& name, boost::pytho
           getParamObjectValuesTemplatePython<bool>(name, outputList, defaultValues);
           break;
         default:
-          ERROR("The parameter type of parameter '" + name + "' is not a supported parameter value type !")
+          BELLE2_ERROR("The parameter type of parameter '" + name + "' is not a supported parameter value type !")
       }
       break;
     case ParamTypeInfo::c_ListParam:
@@ -207,11 +207,11 @@ void ModuleParamList::getParamValuesPython(const std::string& name, boost::pytho
           getParamListValuesTemplatePython< vector<bool> >(name, outputList, defaultValues);
           break;
         default:
-          ERROR("The parameter type of parameter '" + name + "' is not a supported parameter value type !")
+          BELLE2_ERROR("The parameter type of parameter '" + name + "' is not a supported parameter value type !")
       }
       break;
     default:
-      ERROR("The parameter type of parameter '" + name + "' is not a supported basic parameter type !")
+      BELLE2_ERROR("The parameter type of parameter '" + name + "' is not a supported basic parameter type !")
   }
 }
 

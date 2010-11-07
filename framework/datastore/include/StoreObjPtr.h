@@ -38,7 +38,7 @@ namespace Belle2 {
     */
     StoreObjPtr(const std::string& name, const EDurability& durability = c_Event, bool generate = true) {
       if (assignObject(name, durability,  generate)) {
-        DEBUG(100, name);
+        BELLE2_DEBUG(100, name);
       };
     }
 
@@ -108,7 +108,7 @@ namespace Belle2 {
 template <class T>
 bool StoreObjPtr<T>::assignObject(const std::string& name, const EDurability& durability, bool generate)
 {
-  if (name == "") { FATAL("No Name was specified");}
+  if (name == "") { BELLE2_FATAL("No Name was specified");}
 
   m_storeObjPtr =  DataStore::Instance().getObject<T>(name, durability);
 
@@ -126,7 +126,7 @@ bool StoreObjPtr<T>::assignObject(const std::string& name, const EDurability& du
 template <class T>
 bool StoreObjPtr<T>::storeObject(T* AObject, const std::string& name, const EDurability& durability)
 {
-  if (name == "") { FATAL("No Name was specified");}
+  if (name == "") { BELLE2_FATAL("No Name was specified");}
 
   m_storeObjPtr =  AObject;
   if (DataStore::Instance().storeObject(AObject, name, durability)) {

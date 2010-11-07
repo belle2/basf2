@@ -36,7 +36,7 @@ pSeqRootOutput::pSeqRootOutput() : pOutputServer()
   addParam("outputFileName"  , m_outputFileName, string("pSeqRootOutput.root"), "SeqRoot file name.");
   addParam("compressionLevel", m_compressionLevel, 1, "Compression Level: 0 for no, 1 for low, 9 for high compression.");
 
-  INFO("pSeqRootOutput: Constructor done.");
+  BELLE2_INFO("pSeqRootOutput: Constructor done.");
 }
 
 
@@ -58,7 +58,7 @@ void pSeqRootOutput::initialize()
   m_nproc = Framework::nprocess();
 
   //  printf ( "pRootInput : nproc = %d\n", m_nproc );
-  WARNING("pRootInput : nproc = " << m_nproc)
+  BELLE2_WARNING("pRootInput : nproc = " << m_nproc)
   if (m_nproc > 0) {
     char temp[] = "PROUTXXXXXX";
     char* rbufname = mktemp(temp);
@@ -70,7 +70,7 @@ void pSeqRootOutput::initialize()
   // Message handler to encode serialized object
   m_msghandler = new MsgHandler(m_compressionLevel);
 
-  INFO("pSeqRootOutput initialized.");
+  BELLE2_INFO("pSeqRootOutput initialized.");
 }
 
 
@@ -92,7 +92,7 @@ void pSeqRootOutput::beginRun()
     }
   }
 
-  INFO("beginRun called.");
+  BELLE2_INFO("beginRun called.");
 }
 
 void pSeqRootOutput::event()
@@ -112,14 +112,14 @@ void pSeqRootOutput::event()
       usleep(200);
     }
   }
-  //  INFO ( "Event sent : " << m_nsent++ )
+  //  BELLE2_INFO ( "Event sent : " << m_nsent++ )
 }
 
 void pSeqRootOutput::endRun()
 {
   //fill Run data
 
-  INFO("endRun done.");
+  BELLE2_INFO("endRun done.");
 }
 
 
@@ -137,7 +137,7 @@ void pSeqRootOutput::terminate()
       usleep(200);
     }
   }
-  INFO("terminate called")
+  BELLE2_INFO("terminate called")
 }
 
 // Fill Datastore
@@ -188,7 +188,7 @@ EvtMessage* pSeqRootOutput::buildMessage(RECORD_TYPE rectype)
 // Output Server function
 void pSeqRootOutput::output_server(void)
 {
-  INFO("----> Output Server Invoked");
+  BELLE2_INFO("----> Output Server Invoked");
 
   // Open output ROOT file
   m_file = new SeqFile(m_outputFileName.c_str(), "w");
@@ -205,7 +205,7 @@ void pSeqRootOutput::output_server(void)
       usleep(100);
     }
     if (size < 0) {
-      WARNING("pSeqRootOutput : output server : error in remq")
+      BELLE2_WARNING("pSeqRootOutput : output server : error in remq")
       exit(-99);
     }
     m_nrecv++;
@@ -218,7 +218,7 @@ void pSeqRootOutput::output_server(void)
     if (evtmsg->type() == MSG_TERMINATE) {
       delete m_file;
       delete[] evtbuf;
-      INFO("Output Server terminated")
+      BELLE2_INFO("Output Server terminated")
       exit(0);
     }
 
@@ -231,7 +231,7 @@ void pSeqRootOutput::output_server(void)
         count_bgr = m_nproc - 1;
         nwrote++;
       } else {
-        INFO("skipping extra Begin_Run");
+        BELLE2_INFO("skipping extra Begin_Run");
         count_bgr--;
       }
     } else if (evtmsg->type() == MSG_EVENT) {

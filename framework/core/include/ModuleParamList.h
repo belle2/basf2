@@ -287,7 +287,7 @@ namespace Belle2 {
       ModuleParam<T>* explModParam = static_cast< ModuleParam<T>* >(newParam.get());
       explModParam->setDefaultValue(defaultValue);
     } else {
-      ERROR("A parameter with the name '" + name + "' already exists ! The name of a module parameter must be unique within a module.")
+      BELLE2_ERROR("A parameter with the name '" + name + "' already exists ! The name of a module parameter must be unique within a module.")
     }
   }
 
@@ -299,9 +299,9 @@ namespace Belle2 {
       ModuleParam<T>& explModParam = getParameter<T>(name);
       explModParam.setValue(value);
     } catch (ModuleParameterNotFoundError& exc) {
-      ERROR(exc.what())
+      BELLE2_ERROR(exc.what())
     } catch (ModuleParameterTypeError& exc) {
-      ERROR(exc.what())
+      BELLE2_ERROR(exc.what())
     }
   }
 
@@ -333,7 +333,7 @@ namespace Belle2 {
       T tmpValue = static_cast<T>(valueProxy);
       setParameter(name, tmpValue);
     } else {
-      ERROR("Could not set a module parameter: The python object defined by '" + name + "' could not be converted !")
+      BELLE2_ERROR("Could not set a module parameter: The python object defined by '" + name + "' could not be converted !")
     }
   }
 
@@ -349,7 +349,7 @@ namespace Belle2 {
       if (checkValue.check()) {
         tmpList.push_back(checkValue);
       } else {
-        ERROR("Could not set a module parameter: A python object defined in the list '" + name + "' could not be converted !")
+        BELLE2_ERROR("Could not set a module parameter: A python object defined in the list '" + name + "' could not be converted !")
       }
     }
     setParameter(name, tmpList);
@@ -364,7 +364,7 @@ namespace Belle2 {
       ParamTypeInfo::ParamTypeInfo paramInfo = getParamTypeInfo(name);
 
       if (paramInfo.m_paramBasicType != ParamTypeInfo::c_SingleParam) {
-        ERROR("The parameter type of parameter '" + name + "' is not a single parameter value !")
+        BELLE2_ERROR("The parameter type of parameter '" + name + "' is not a single parameter value !")
         return;
       }
 
@@ -374,9 +374,9 @@ namespace Belle2 {
         PyObjConvUtils::addSingleValueToList<T>(explModParam.getValue(), outputList);
       }
     } catch (ModuleParameterNotFoundError& exc) {
-      ERROR(exc.what())
+      BELLE2_ERROR(exc.what())
     } catch (ModuleParameterTypeError& exc) {
-      ERROR(exc.what())
+      BELLE2_ERROR(exc.what())
     }
   }
 
@@ -389,7 +389,7 @@ namespace Belle2 {
       ParamTypeInfo::ParamTypeInfo paramInfo = getParamTypeInfo(name);
 
       if (paramInfo.m_paramBasicType != ParamTypeInfo::c_ListParam) {
-        ERROR("The parameter type of parameter '" + name + "' is not a list parameter value !")
+        BELLE2_ERROR("The parameter type of parameter '" + name + "' is not a list parameter value !")
         return;
       }
 
@@ -399,9 +399,9 @@ namespace Belle2 {
         PyObjConvUtils::addSTLVectorToList<T>(explModParam.getValue(), outputList);
       }
     } catch (ModuleParameterNotFoundError& exc) {
-      ERROR(exc.what())
+      BELLE2_ERROR(exc.what())
     } catch (ModuleParameterTypeError& exc) {
-      ERROR(exc.what())
+      BELLE2_ERROR(exc.what())
     }
   }
 

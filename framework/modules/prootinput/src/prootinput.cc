@@ -48,7 +48,7 @@ pRootInput::pRootInput() : pEventServer()
   addParam("RunBranch", m_branchNames[1], tmpbranch, "Names of branches to be read into run map. Empty means all branches.");
   addParam("PersistentBranch", m_branchNames[2], tmpbranch, "Names of branches to be read into persistent map. Empty means all branches.");
 
-  INFO("pRootInput:Constructor done.")
+  BELLE2_INFO("pRootInput:Constructor done.")
 }
 
 
@@ -67,8 +67,8 @@ void pRootInput::initialize()
   //Open TFile
   m_file = new TFile(m_inputFileName.c_str(), "READ");
   m_file->cd();
-  if (!m_file) {FATAL("Input file " + m_inputFileName + " doesn't exist");}
-  INFO("Opened file " + m_inputFileName);
+  if (!m_file) {BELLE2_FATAL("Input file " + m_inputFileName + " doesn't exist");}
+  BELLE2_INFO("Opened file " + m_inputFileName);
 
   // Setup TTrees
   for (int ii = 0; ii < c_NDurabilityTypes; ++ii) { // Loop over durabilities
@@ -76,10 +76,10 @@ void pRootInput::initialize()
     if (m_treeNames[ii] != "NONE") {
       m_tree[ii] = dynamic_cast<TTree*>(m_file->Get(m_treeNames[ii].c_str()));
       if (!m_tree[ii]) {
-        FATAL("TTree " + m_treeNames[ii] + " doesn't exist");
+        BELLE2_FATAL("TTree " + m_treeNames[ii] + " doesn't exist");
         continue;
       }
-      INFO("Opened tree " + m_treeNames[ii]);
+      BELLE2_INFO("Opened tree " + m_treeNames[ii]);
 
       //Count number of objects and arrays in the TTree
       TObjArray* branches = m_tree[ii]->GetListOfBranches();
@@ -114,7 +114,7 @@ void pRootInput::initialize()
   m_nproc = Framework::nprocess();
 
   //  printf ( "pRootInput : nproc = %d\n", m_nproc );
-  WARNING("pRootInput : nproc = " << m_nproc)
+  BELLE2_WARNING("pRootInput : nproc = " << m_nproc)
   if (m_nproc > 0) {
     m_rbuf = new RingBuffer("PRIN", RINGBUF_SIZE);
     m_msghandler = new MsgHandler(m_complevel);
@@ -168,7 +168,7 @@ void pRootInput::setupTFile()
 int pRootInput::readTree(const EDurability& durability)
 {
   // Fill m_objects
-  //  WARNING("Durability" << durability)
+  //  BELLE2_WARNING("Durability" << durability)
   m_tree[durability]->GetEntry(m_eventNumber);
 
   // Restore objects in DataStore
@@ -264,7 +264,7 @@ TBranch* pRootInput::validBranch(int& ibranch, TObjArray* branches)
 void pRootInput::event_server(void)
 {
   //  printf ( "----> Event Server Invoked\n" );
-  INFO("----> Event Server Invoked");
+  BELLE2_INFO("----> Event Server Invoked");
   while (1) {
     if (m_eventNumber > m_nevt) {
       // Send termination record

@@ -73,15 +73,15 @@ void SimpleInput::initialize()
   //Open TFile
   m_file = new TFile(m_inputFileName.c_str(), "READ");
   m_file->cd();
-  if (!m_file) {FATAL("Input file " + m_inputFileName + " doesn't exist");}
-  INFO("Opened file " + m_inputFileName);
+  if (!m_file) {BELLE2_FATAL("Input file " + m_inputFileName + " doesn't exist");}
+  BELLE2_INFO("Opened file " + m_inputFileName);
 
   for (int ii = 0; ii < c_NDurabilityTypes; ++ii) {
     //Get TTree
     if (m_treeNames[ii] != "NONE") {
       m_tree[ii] = dynamic_cast<TTree*>(m_file->Get(m_treeNames[ii].c_str()));
-      if (!m_tree[ii]) {FATAL("TTree " + m_treeNames[ii] + " doesn't exist");}
-      INFO("Opened tree " + m_treeNames[ii]);
+      if (!m_tree[ii]) {BELLE2_FATAL("TTree " + m_treeNames[ii] + " doesn't exist");}
+      BELLE2_INFO("Opened tree " + m_treeNames[ii]);
 
       //Connect the branches to the TObject pointers
       TObjArray* branches = m_tree[ii]->GetListOfBranches();
@@ -169,7 +169,7 @@ void SimpleInput::setupTFile()
 void SimpleInput::readTree(const EDurability& durability)
 {
   // Fill m_objects
-  WARNING("Durability" << durability)
+  BELLE2_WARNING("Durability" << durability)
   m_tree[durability]->GetEntry(m_eventNumber);
 
 

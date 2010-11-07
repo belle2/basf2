@@ -24,11 +24,11 @@ namespace Belle2 {
    * Class for logging debug, info and error messages.
    *
    * For log messages the following preprocessor macros should be used:
-   *    DEBUG   for code development
-   *    INFO    for informational messages, e.g. about opened files, processed events, etc.
-   *    WARNING for potential problems that the user should pay attention to
-   *    ERROR   for things that went wrong and have to be fixed
-   *    FATAL   for situations were the program execution can not be continued
+   *    BELLE2_DEBUG   for code development
+   *    BELLE2_INFO    for informational messages, e.g. about opened files, processed events, etc.
+   *    BELLE2_WARNING for potential problems that the user should pay attention to
+   *    BELLE2_ERROR   for things that went wrong and have to be fixed
+   *    BELLE2_FATAL   for situations were the program execution can not be continued
    *
    *    By default the Logger sends messages to std::cout.
    *
@@ -86,7 +86,7 @@ namespace Belle2 {
     /**
      * Sets the messaging intensity for debug messages.
      *
-     * The debug level is only considered if the messaging level is at least set to DEBUG.
+     * The debug level is only considered if the messaging level is at least set to c_Debug.
      * The meaning of a certain level depends on the usage by the developer.
      */
     void setDebugLevel(int level) {m_debugLevel = level;}

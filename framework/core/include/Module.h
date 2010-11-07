@@ -408,6 +408,7 @@ namespace Belle2 {
   //             Define convenient typdefs
   //------------------------------------------------------
 
+  /** Defines a pointer to a module object as a boost shared pointer. */
   typedef boost::shared_ptr<Module> ModulePtr;
 
   /**
@@ -430,7 +431,9 @@ namespace Belle2 {
     }
   };
 
+  /** Defines a std::set of shared module pointers.*/
   typedef std::set<ModulePtr, ModulePtrOperators> ModulePtrSet;
+  /** Defines a std::list of shared module pointers.*/
   typedef std::list<ModulePtr> ModulePtrList;
 
 
@@ -453,6 +456,11 @@ namespace Belle2 {
      * @param moduleName The type name of the module.
      */
     ModuleProxyBase(const std::string& moduleName);
+
+    /**
+     * The destructor of the ModuleProxyBase class.
+     */
+    virtual ~ModuleProxyBase() {};
 
     /**
      * Abstract method which creates a new module and returns a shared pointer to it.
@@ -484,7 +492,17 @@ namespace Belle2 {
 
   public:
 
+    /**
+     * The constructor of the ModuleProxy class.
+     * Calls the constructor of the base class.
+     * @param moduleName The type name of the module.
+     */
     ModuleProxy(const std::string& moduleName) : ModuleProxyBase(moduleName) {};
+
+    /**
+     * The destructor of the ModuleProxy class.
+     */
+    virtual ~ModuleProxy() {};
 
     /**
      * Creates a new module and returns a shared pointer to it.

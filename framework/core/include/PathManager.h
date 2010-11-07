@@ -33,6 +33,7 @@ namespace Belle2 {
   public:
 
     //Define exceptions
+    /** Exception is thrown if the path could not be created. */
     BELLE2_DEFINE_EXCEPTION(PathNotCreatedError, "Could not create path !");
 
     /**

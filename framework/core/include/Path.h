@@ -83,6 +83,11 @@ namespace Belle2 {
 
   };
 
+  //------------------------------------------------------
+  //             Define convenient typdefs
+  //------------------------------------------------------
+
+  /** Defines a pointer to a path object as a boost shared pointer. */
   typedef boost::shared_ptr<Path> PathPtr;
 
 } // end namespace Belle2

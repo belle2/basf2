@@ -75,7 +75,7 @@ namespace Belle2 {
   const double MeV = eV  * 1e6;  /**< [megaelectronvolt] */
 
   //Various constants
-  const double speed_of_light = 29.9792458; /** cm/ns */
+  const double speed_of_light = 29.9792458; /**< [cm/ns] */
 
 } // end namespace Belle2
 

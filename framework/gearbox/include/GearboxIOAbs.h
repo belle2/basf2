@@ -32,11 +32,17 @@ namespace Belle2 {
   public:
 
     //Define exceptions
+    /** Exception is thrown if the GearboxIO is not connected to a storage medium. */
     BELLE2_DEFINE_EXCEPTION(GearboxIONotConnectedError, "The GearboxIO object is not available. Please make sure you have the Gearbox module in your path !");
+    /** Exception is thrown if the path statement is not valid. */
     BELLE2_DEFINE_EXCEPTION(GearboxPathNotValidError, "The path \"%1%\" is not valid !");
+    /** Exception is thrown if the returned result of the path query is empty. */
     BELLE2_DEFINE_EXCEPTION(GearboxPathEmptyResultError, "The result of the path \"%1%\" is empty !");
+    /** Exception is thrown if the returned type of the path query is not supported. */
     BELLE2_DEFINE_EXCEPTION(GearboxPathResultNotValidError, "The result of the path \"%1%\" is not valid !");
+    /** Exception is thrown if the parameter does not exist and the parameter check is enabled. */
     BELLE2_DEFINE_EXCEPTION(GearboxParamNotExistsError, "The requested gearbox parameter %1% does not exist !");
+    /** Exception is thrown if the conversion of a string to a numerical value failed. */
     BELLE2_DEFINE_EXCEPTION(GearboxStringNumConversionError, "The conversion of the string \"%1%\" to a number failed !");
 
     /** The GearboxIOAbs constructor. */

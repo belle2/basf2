@@ -56,6 +56,7 @@ namespace Belle2 {
   public:
 
     //Define exceptions
+    /** Exception is thrown if the requested module could not be created by the ModuleManager. */
     BELLE2_DEFINE_EXCEPTION(ModuleNotCreatedError, "Could not create module: %1%");
 
     /**

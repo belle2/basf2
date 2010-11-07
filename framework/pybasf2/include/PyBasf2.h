@@ -16,6 +16,7 @@
 namespace Belle2 {
 
   //Define exceptions
+  /** Exception is thrown if the basf2 Python module could not be embedded into Python. */
   BELLE2_DEFINE_EXCEPTION(PythonModuleNotEmbeddedError, "Could not embed the basf2 Python module !");
 
   /**

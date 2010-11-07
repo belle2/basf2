@@ -222,6 +222,7 @@ namespace Belle2 {
   //             Define convenient typdefs
   //------------------------------------------------------
 
+  /** Defines a pointer to a module parameter as a boost shared pointer. */
   typedef boost::shared_ptr<ModuleParamBase> ModuleParamPtr;
 
 

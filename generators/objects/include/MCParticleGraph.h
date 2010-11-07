@@ -39,9 +39,15 @@ namespace Belle2 {
 
   public:
 
+    //Exception definition
+
+    /** The exception is thrown if a cyclic reference in the graph was detected. */
     BELLE2_DEFINE_EXCEPTION(CyclicReferenceError, "Cyclic decay, cannot continue");
+    /** The exception is thrown if two particles do not belong to the same graph. */
     BELLE2_DEFINE_EXCEPTION(NotSameGraphError, "Particles not from same graph");
+    /** The exception is thrown if a non-physical decay was detected in the graph. */
     BELLE2_DEFINE_EXCEPTION(NonContinousDaughtersError, "Can not represent decay graph, non continuous indices for daughters");
+    /** The exception is thrown if the specified index is out of range. */
     BELLE2_DEFINE_EXCEPTION(OutOfRangeError, "Index out of range");
 
     /** Type representing a decay in the graph. */

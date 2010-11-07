@@ -29,6 +29,7 @@ namespace Belle2 {
   class MCParticle: public TObject {
   public:
 
+    /** The status information for the MCParticle. */
     enum StatusBit {
       PrimaryParticle = 1,    /**< bit 0: Particle is primary particle. */
       StableInGenerator = 2,  /**< bit 1: Particle is stable in the generator. */
@@ -341,6 +342,7 @@ namespace Belle2 {
     int m_first_daughter;       /**< 1-based index of first daughter particle in collection, 0 if no daughters */
     int m_last_daughter;        /**< 1-based index of last daughter particle in collection, 0 if no daughters */
 
+    /** Class definition required for the creation of the ROOT dictionary. */
     ClassDef(MCParticle, 1);
   };
 

@@ -33,10 +33,15 @@ namespace Belle2 {
   public:
 
     //Define exceptions
+    /** Excpetion is thrown if the HepEvt file could not be opened. */
     BELLE2_DEFINE_EXCEPTION(HepEvtCouldNotOpenFileError, "Could not open file %1% !");
+    /** Excpetion is thrown if the given indices of the daughters are not valid. */
     BELLE2_DEFINE_EXCEPTION(HepEvtInvalidDaughterIndicesError, "Line %1%: Invalid daughter indices d1=%2%, d2=%3%, N=%4% (0<=d1<=d2<=N required)");
+    /** Excpetion is thrown if the header specifying the number of particles per event could not be parsed. */
     BELLE2_DEFINE_EXCEPTION(HepEvtHeaderNotValidError, "Line %1%: Event header not understood: %2%");
+    /** Excpetion is thrown if a field in the HepEvt file could not be converted to a number. */
     BELLE2_DEFINE_EXCEPTION(HepEvtConvertFieldError, "Line %1%: Could not convert field %2%: %3%");
+    /** Excpetion is thrown if the format of a line of the HepEvt file could not be parsed. */
     BELLE2_DEFINE_EXCEPTION(HepEvtParticleFormatError, "Line %1%: Particle format not understood, got %2% fields !");
 
     /**

@@ -39,7 +39,7 @@ namespace Belle2 {
     */
     StoreArray(const std::string& name, const EDurability& durability = c_Event, bool generate = true) {
       if (assignArray(name, durability, generate)) {
-        BELLE2_DEBUG(100, "A TClonesArray with name " + name + " has been generated");
+        B2DEBUG(100, "A TClonesArray with name " + name + " has been generated");
       }
     }
 
@@ -109,7 +109,7 @@ using namespace std;
 template <class T>
 bool StoreArray<T>::assignArray(const std::string& name, const EDurability& durability, bool generate)
 {
-  if (name == "") {BELLE2_FATAL("No name was specified!");}
+  if (name == "") {B2FATAL("No name was specified!");}
 
   m_storeArray =  DataStore::Instance().getArray<T>(name, durability);
 

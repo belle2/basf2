@@ -38,7 +38,7 @@ void Gearbox::connect(GearboxIOAbs* gearboxIO)
   if (close()) {
     m_gearboxIO = gearboxIO;
   } else {
-    BELLE2_ERROR("Could not close the connection of the GearboxIO object !")
+    B2ERROR("Could not close the connection of the GearboxIO object !")
   }
 }
 

@@ -28,7 +28,7 @@ bool ModuleUtils::fileNameExists(const std::string& filename)
     fullPath = boost::filesystem::system_complete(boost::filesystem::path(filename));
     return boost::filesystem::exists(fullPath);
   } catch (...) {
-    BELLE2_ERROR("Could not check for the existence of the path: " + filename + " !");
+    B2ERROR("Could not check for the existence of the path: " + filename + " !");
   }
   return false;
 }
@@ -42,7 +42,7 @@ bool ModuleUtils::filePathExists(const std::string& filepath)
     fullPath.remove_filename();
     return boost::filesystem::exists(fullPath);
   } catch (...) {
-    BELLE2_ERROR("Could not check for the existence of the path: " + filepath + " !");
+    B2ERROR("Could not check for the existence of the path: " + filepath + " !");
   }
   return false;
 }
@@ -55,7 +55,7 @@ bool ModuleUtils::isFile(const std::string& filename)
     fullPath = boost::filesystem::system_complete(boost::filesystem::path(filename));
     return (boost::filesystem::exists(fullPath)) && (boost::filesystem::is_regular_file(fullPath));
   } catch (...) {
-    BELLE2_ERROR("Could not check if the filename " + filename + " is a file !");
+    B2ERROR("Could not check if the filename " + filename + " is a file !");
   }
   return false;
 }
@@ -68,7 +68,7 @@ bool ModuleUtils::isDirectory(const std::string& filename)
     fullPath = boost::filesystem::system_complete(boost::filesystem::path(filename));
     return (boost::filesystem::exists(fullPath)) && (boost::filesystem::is_directory(fullPath));
   } catch (...) {
-    BELLE2_ERROR("Could not check if the filename " + filename + " is a directory !");
+    B2ERROR("Could not check if the filename " + filename + " is a directory !");
   }
   return false;
 }

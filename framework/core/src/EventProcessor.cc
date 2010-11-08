@@ -44,7 +44,7 @@ void EventProcessor::process(PathPtr startPath, long maxEvent, long runNumber)
   if (maxEvent <= 0) {
     ModulePtrList selEoDModuleList = moduleManager.getModulesByProperties(moduleList, Module::c_TriggersEndOfData);
     if (selEoDModuleList.size() == 0) {
-      BELLE2_ERROR("There must be at least one module in the chain which can specify the end of the data flow.")
+      B2ERROR("There must be at least one module in the chain which can specify the end of the data flow.")
       return;
     }
   }
@@ -53,7 +53,7 @@ void EventProcessor::process(PathPtr startPath, long maxEvent, long runNumber)
   if (runNumber < 0) {
     ModulePtrList selBnRModuleList = moduleManager.getModulesByProperties(moduleList, Module::c_TriggersNewRun);
     if (selBnRModuleList.size() != 1) {
-      BELLE2_ERROR("There are currently " << selBnRModuleList.size() << " modules in the chain which specify the beginning of a new run. There is exactly one module of this type allowed.")
+      B2ERROR("There are currently " << selBnRModuleList.size() << " modules in the chain which specify the beginning of a new run. There is exactly one module of this type allowed.")
       return;
     }
   } else {
@@ -72,7 +72,7 @@ void EventProcessor::process(PathPtr startPath, long maxEvent, long runNumber)
     processCore(startPath, moduleList, maxEvent); //Do the event processing
 
   } else {
-    BELLE2_ERROR(numLogError << " BELLE2_ERROR(S) occurred ! The processing of events will not be started.");
+    B2ERROR(numLogError << " B2ERROR(S) occurred ! The processing of events will not be started.");
   }
 
   //Terminate modules
@@ -93,7 +93,7 @@ void EventProcessor::processInitialize(const ModulePtrList& modulePathList)
     Module* module = listIter->get();
 
     if (module->hasUnsetForcedParams()) {
-      BELLE2_ERROR("The module " << module->getName() << " has unset parameters which have to be set by the user !")
+      B2ERROR("The module " << module->getName() << " has unset parameters which have to be set by the user !")
       continue;
     }
 
@@ -146,7 +146,7 @@ void EventProcessor::processCore(PathPtr startPath, const ModulePtrList& moduleP
             currPath = startPath;
             moduleIter = currPath->getModules().begin();
             normalEvent = false;
-          } else BELLE2_WARNING("Module " << module->getName() << "requested to start a new run, but doesn't have the necessary property set. Request was ignored.");
+          } else B2WARNING("Module " << module->getName() << "requested to start a new run, but doesn't have the necessary property set. Request was ignored.");
           break;
 
         case Module::prt_EndRun    :
@@ -157,14 +157,14 @@ void EventProcessor::processCore(PathPtr startPath, const ModulePtrList& moduleP
             currPath = startPath;
             moduleIter = currPath->getModules().begin();
             normalEvent = false;
-          } else BELLE2_WARNING("Module " << module->getName() << "requested to end a run, but doesn't have the necessary property set. Request was ignored.");
+          } else B2WARNING("Module " << module->getName() << "requested to end a run, but doesn't have the necessary property set. Request was ignored.");
           break;
 
         case Module::prt_EndOfData :
           //If the current module is allowed to end the process and the end of data flow is reached, stop the event process.
           if (module->hasProperties(Module::c_TriggersEndOfData)) {
             endProcess = true;
-          } else BELLE2_WARNING("Module " << module->getName() << "requested to stop the event processing (end of data), but doesn't have the necessary property set. Request was ignored.");
+          } else B2WARNING("Module " << module->getName() << "requested to stop the event processing (end of data), but doesn't have the necessary property set. Request was ignored.");
           break;
       }
 

@@ -50,7 +50,7 @@ void Module::setCondition(const std::string& expression, boost::shared_ptr<Path>
     m_hasCondition = true;
     m_conditionPath = path;
   } else {
-    BELLE2_ERROR("Invalid condition: could not parse condition: '" + expression + "' ! The condition is NOT active !");
+    B2ERROR("Invalid condition: could not parse condition: '" + expression + "' ! The condition is NOT active !");
   }
 }
 
@@ -62,7 +62,7 @@ void Module::setCondition(boost::shared_ptr<Path> path)
     m_hasCondition = true;
     m_conditionPath = path;
   } else {
-    BELLE2_ERROR("Invalid condition: could not parse condition: '<1' ! The condition is NOT active !");
+    B2ERROR("Invalid condition: could not parse condition: '<1' ! The condition is NOT active !");
   }
 }
 
@@ -153,7 +153,7 @@ void Module::setParamDict(const boost::python::dict& dictionary)
         setParamObject(keyProxy, currValue);
       }
     } else {
-      BELLE2_ERROR("Setting the module parameters from a python dictionary: invalid key in dictionary !");
+      B2ERROR("Setting the module parameters from a python dictionary: invalid key in dictionary !");
     }
   }
 }

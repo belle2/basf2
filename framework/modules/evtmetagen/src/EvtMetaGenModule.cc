@@ -53,7 +53,7 @@ void EvtMetaGenModule::initialize()
   unsigned int defListSize = m_expList.size();
   if ((m_runList.size() != defListSize) || (m_evtStartList.size() != defListSize) ||
       (m_evtEndList.size() != defListSize)) {
-    BELLE2_ERROR("Parameters are inconsistent. The lists must have the same number of entries.")
+    B2ERROR("Parameters are inconsistent. The lists must have the same number of entries.")
   } else {
 
     if (m_expList.size() != 0) {
@@ -61,14 +61,14 @@ void EvtMetaGenModule::initialize()
       //Make sure the event start number is smaller than the event end number
       for (unsigned int iEvt = 0; iEvt < defListSize; ++iEvt) {
         if (m_evtStartList[iEvt] > m_evtEndList[iEvt]) {
-          BELLE2_ERROR("Exp " << m_expList[iEvt] << ", Run " << m_runList[iEvt] <<  ": The start event number (" << m_evtStartList[iEvt]  << ") is greater than the end event number (" << m_evtEndList[iEvt] << ")")
+          B2ERROR("Exp " << m_expList[iEvt] << ", Run " << m_runList[iEvt] <<  ": The start event number (" << m_evtStartList[iEvt]  << ") is greater than the end event number (" << m_evtEndList[iEvt] << ")")
           break;
         }
       }
 
       m_colIndex = -1;
       setProcessRecordType(prt_EndRun);
-    } else BELLE2_ERROR("There are no events to be processed !")
+    } else B2ERROR("There are no events to be processed !")
     }
 }
 
@@ -99,7 +99,7 @@ void EvtMetaGenModule::event()
       } else m_evtNumber++;
       break;
     case prt_EndOfData :
-      BELLE2_ERROR("EndOfData record type in event() method !")
+      B2ERROR("EndOfData record type in event() method !")
       break;
   }
 

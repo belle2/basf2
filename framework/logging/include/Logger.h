@@ -36,39 +36,39 @@ namespace Belle2 {
 #endif
 
 // debug messages
-#ifdef LOG_NO_BELLE2_DEBUG
-#define BELLE2_DEBUG(level, streamText)
+#ifdef LOG_NO_B2DEBUG
+#define B2DEBUG(level, streamText)
 #else
-#define BELLE2_DEBUG(level, streamText) { if (LogSystem::Instance().isLevelEnabled(LogCommon::c_Debug,level)) { \
+#define B2DEBUG(level, streamText) { if (LogSystem::Instance().isLevelEnabled(LogCommon::c_Debug,level)) { \
       std::ostringstream stringBuffer; stringBuffer << streamText; \
       LogSystem::Instance().sendMessage(LogCommon::c_Debug,streamText,PACKAGENAME(),FUNCTIONNAME(),__FILE__,__LINE__); } }
 #endif
 
 // info messages
-#ifdef LOG_NO_BELLE2_INFO
-#define BELLE2_INFO(streamText)
+#ifdef LOG_NO_B2INFO
+#define B2INFO(streamText)
 #else
-#define BELLE2_INFO(streamText) { if (LogSystem::Instance().isLevelEnabled(LogCommon::c_Info)) { \
+#define B2INFO(streamText) { if (LogSystem::Instance().isLevelEnabled(LogCommon::c_Info)) { \
       std::ostringstream stringBuffer; stringBuffer << streamText; \
       LogSystem::Instance().sendMessage(LogCommon::c_Info,stringBuffer.rdbuf()->str(),PACKAGENAME(),FUNCTIONNAME(),__FILE__,__LINE__); } }
 #endif
 
 // warning messages
-#ifdef LOG_NO_BELLE2_WARNING
-#define BELLE2_WARNING(streamText)
+#ifdef LOG_NO_B2WARNING
+#define B2WARNING(streamText)
 #else
-#define BELLE2_WARNING(streamText) { if (LogSystem::Instance().isLevelEnabled(LogCommon::c_Warning)) { \
+#define B2WARNING(streamText) { if (LogSystem::Instance().isLevelEnabled(LogCommon::c_Warning)) { \
       std::ostringstream stringBuffer; stringBuffer << streamText; \
       LogSystem::Instance().sendMessage(LogCommon::c_Warning,stringBuffer.rdbuf()->str(),PACKAGENAME(),FUNCTIONNAME(),__FILE__,__LINE__); } }
 #endif
 
 // error messages
-#define BELLE2_ERROR(streamText) { if (LogSystem::Instance().isLevelEnabled(LogCommon::c_Error)) { \
+#define B2ERROR(streamText) { if (LogSystem::Instance().isLevelEnabled(LogCommon::c_Error)) { \
       std::ostringstream stringBuffer; stringBuffer << streamText; \
       LogSystem::Instance().sendMessage(LogCommon::c_Error,stringBuffer.rdbuf()->str(),PACKAGENAME(),FUNCTIONNAME(),__FILE__,__LINE__); } }
 
 // fatal messages
-#define BELLE2_FATAL(streamText) { std::ostringstream stringBuffer; stringBuffer << streamText; \
+#define B2FATAL(streamText) { std::ostringstream stringBuffer; stringBuffer << streamText; \
     LogSystem::Instance().sendMessageForceAbort(LogCommon::c_Fatal,stringBuffer.rdbuf()->str(),PACKAGENAME(),FUNCTIONNAME(),__FILE__,__LINE__);}
 
 // scoped logging for entering/leaving methods

@@ -44,9 +44,9 @@ EvtMetaInfoModule::~EvtMetaInfoModule()
 void EvtMetaInfoModule::beginRun()
 {
   StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", c_Event);
-  BELLE2_INFO("========================================================================");
-  BELLE2_INFO(">>> Start new run: " << eventMetaDataPtr->getRun());
-  BELLE2_INFO("------------------------------------------------------------------------");
+  B2INFO("========================================================================");
+  B2INFO(">>> Start new run: " << eventMetaDataPtr->getRun());
+  B2INFO("------------------------------------------------------------------------");
 }
 
 
@@ -54,16 +54,16 @@ void EvtMetaInfoModule::event()
 {
   //Print event meta data information
   StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", c_Event);
-  BELLE2_INFO("EXP NUMBER: " << eventMetaDataPtr->getExperiment());
-  BELLE2_INFO("RUN NUMBER: " << eventMetaDataPtr->getRun());
-  BELLE2_INFO("EVT NUMBER: " << eventMetaDataPtr->getEvent());
+  B2INFO("EXP NUMBER: " << eventMetaDataPtr->getExperiment());
+  B2INFO("RUN NUMBER: " << eventMetaDataPtr->getRun());
+  B2INFO("EVT NUMBER: " << eventMetaDataPtr->getEvent());
 }
 
 
 void EvtMetaInfoModule::endRun()
 {
   StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", c_Event);
-  BELLE2_INFO("------------------------------------------------------------------------");
-  BELLE2_INFO("<<< End run: " << eventMetaDataPtr->getRun());
-  BELLE2_INFO("========================================================================");
+  B2INFO("------------------------------------------------------------------------");
+  B2INFO("<<< End run: " << eventMetaDataPtr->getRun());
+  B2INFO("========================================================================");
 }

@@ -192,13 +192,13 @@ T* DataStore::createObject(const std::string& name, const EDurability& durabilit
 
   //if name already exists, iter does not point to the end of the map
   if (iter != m_objectMap[durability].end()) {
-    BELLE2_INFO("Called object, that already exists.");
+    B2INFO("Called object, that already exists.");
     //casting includes type check
     T* corrObject = dynamic_cast<T*>(iter->second);
 
     //if type doesn't match, user probably messed up mightily
     if (!corrObject) {
-      BELLE2_FATAL("Existing object is of different type than requested one. Name was: " + name);
+      B2FATAL("Existing object is of different type than requested one. Name was: " + name);
     }
 
     //return of the existing object
@@ -256,7 +256,7 @@ TClonesArray* DataStore::getArray(const std::string& name, const EDurability& du
 
     //only return, if type matches
     if (T::Class() != iter->second->GetClass()) {
-      BELLE2_FATAL("Array contains elements of different type than expected; " + name);
+      B2FATAL("Array contains elements of different type than expected; " + name);
     }
     return (iter->second);
   }
@@ -273,7 +273,7 @@ TClonesArray* DataStore::createArray(const std::string& name, const EDurability&
   TClonesArray* array = getArray<T>(name, durability);
 
   if (array) {
-    BELLE2_WARNING("Array " + name + " already exists");
+    B2WARNING("Array " + name + " already exists");
     return array;
   }
 

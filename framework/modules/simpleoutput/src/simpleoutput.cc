@@ -86,7 +86,7 @@ void SimpleOutput::initialize()
   for (int ii = 0; ii < c_NDurabilityTypes; ++ii) {
     for (int jj = 0; jj < c_NDurabilityTypes; ++jj) {
       if ((ii != jj) && (m_treeNames[ii] != "NONE") && (m_treeNames[ii] == m_treeNames[jj])) {
-        BELLE2_ERROR(m_steerTreeNames[ii] << " and " << m_steerTreeNames[jj] << " are the same: " << m_treeNames[ii]);
+        B2ERROR(m_steerTreeNames[ii] << " and " << m_steerTreeNames[jj] << " are the same: " << m_treeNames[ii]);
       }
     }
   }
@@ -107,17 +107,17 @@ void SimpleOutput::initialize()
     m_branchNames[jj].resize(unique(m_branchNames[jj].begin(), m_branchNames[jj].end()) - m_branchNames[jj].begin());
 
     if (size != m_branchNames[jj].size()) {
-      BELLE2_WARNING(m_steerBranchNames[jj] << " has duplicate entries.");
+      B2WARNING(m_steerBranchNames[jj] << " has duplicate entries.");
     }
   }
 
-  BELLE2_INFO("SimpleOutput initialised.");
+  B2INFO("SimpleOutput initialised.");
 }
 
 
 void SimpleOutput::beginRun()
 {
-  BELLE2_INFO("beginRun called.");
+  B2INFO("beginRun called.");
 }
 
 
@@ -150,7 +150,7 @@ void SimpleOutput::endRun()
   //make sure setup is done only once
   m_done[c_Run] = true;
 
-  BELLE2_INFO("endRun done.");
+  B2INFO("endRun done.");
 }
 
 
@@ -165,12 +165,12 @@ void SimpleOutput::terminate()
   m_file->cd();
   for (int ii = 0; ii < c_NDurabilityTypes; ++ii) {
     if (m_treeNames[ii] != "NONE") {
-      BELLE2_INFO("Write TTree " << m_treeNames[ii]);
+      B2INFO("Write TTree " << m_treeNames[ii]);
       m_tree[ii]->Write();
     }
   }
 
-  BELLE2_INFO("terminate called");
+  B2INFO("terminate called");
 }
 
 size_t SimpleOutput::getSize(const int& mapID)
@@ -220,9 +220,9 @@ void SimpleOutput::fillTree(const EDurability& durability)
       sort(m_branchNames[durability].begin(), m_branchNames[durability].end());
 
       // print out branch names
-      BELLE2_INFO("Sorted list of branch names for EDurability map " << durability << ":");
+      B2INFO("Sorted list of branch names for EDurability map " << durability << ":");
       for (vector<string>::iterator stringIter = m_branchNames[durability].begin(); stringIter != m_branchNames[durability].end(); ++stringIter) {
-        BELLE2_INFO(*stringIter)
+        B2INFO(*stringIter)
       }
     }
 
@@ -254,7 +254,7 @@ void SimpleOutput::fillTree(const EDurability& durability)
       }
     }
     if ((m_branchNames[durability].size()) && sizeCounter != m_branchNames[durability].size() && !m_switchBranchNameMeaning) {
-      BELLE2_WARNING("Number of saved branches is not the same as size of steered branchName list for durability " << durability);
+      B2WARNING("Number of saved branches is not the same as size of steered branchName list for durability " << durability);
     }
   } else {
     // no need to reconnect the arrays, as the TClonesArrays aren't deleted
@@ -272,7 +272,7 @@ void SimpleOutput::fillTree(const EDurability& durability)
         }
       }
       m_iter[2*durability]->next();
-      if (sizeCounter > m_sizeObj[durability]) {BELLE2_FATAL("More elements than in first event.");}
+      if (sizeCounter > m_sizeObj[durability]) {B2FATAL("More elements than in first event.");}
     }
   }
   m_tree[durability]->Fill();
@@ -300,16 +300,16 @@ void SimpleOutput::switchBranchNameMeaning(const EDurability& durability)
     }
   }
   if (m_branchNames[durability].size()) {
-    BELLE2_WARNING(m_branchNames[durability].size() << " Element(s) of the branchNames vector with EDurability " << durability << " is(are) not in the DataStore");
-    BELLE2_INFO("These members are: ")
+    B2WARNING(m_branchNames[durability].size() << " Element(s) of the branchNames vector with EDurability " << durability << " is(are) not in the DataStore");
+    B2INFO("These members are: ")
     for (vector<string>::iterator iter = m_branchNames[durability].begin(); iter != m_branchNames[durability].end(); iter++) {
-      BELLE2_INFO(*iter);
+      B2INFO(*iter);
     }
   }
   m_branchNames[durability] = branchNameDummy;
   if (branchNameDummy.size()) {
   } else {
     m_branchNames[durability].push_back("NONE");
-    BELLE2_WARNING("Tree with EDurability " << durability << ": " << m_treeNames[durability] << " will be empty");
+    B2WARNING("Tree with EDurability " << durability << ": " << m_treeNames[durability] << " will be empty");
   }
 }

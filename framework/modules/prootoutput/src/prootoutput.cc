@@ -50,7 +50,7 @@ pRootOutput::pRootOutput() : pOutputServer()
   addParam(m_steerBranchNames[2], m_branchNames[2], branchNames, "Names of branches to be written from persistent map. Empty means all branches.");
 
 
-  BELLE2_INFO("pRootOutput: Constructor done.");
+  B2INFO("pRootOutput: Constructor done.");
 }
 
 
@@ -72,7 +72,7 @@ void pRootOutput::initialize()
   m_nproc = Framework::nprocess();
 
   //  printf ( "pRootInput : nproc = %d\n", m_nproc );
-  BELLE2_WARNING("pRootInput : nproc = " << m_nproc)
+  B2WARNING("pRootInput : nproc = " << m_nproc)
   if (m_nproc > 0) {
     char temp[] = "PROUTXXXXXX";
     char* rbufname = mktemp(temp);
@@ -84,13 +84,13 @@ void pRootOutput::initialize()
   // Message handler to encode serialized object
   m_msghandler = new MsgHandler(m_compressionLevel);
 
-  BELLE2_INFO("pRootOutput initialized.");
+  B2INFO("pRootOutput initialized.");
 }
 
 
 void pRootOutput::beginRun()
 {
-  BELLE2_INFO("beginRun called.");
+  B2INFO("beginRun called.");
 }
 
 void pRootOutput::event()
@@ -102,14 +102,14 @@ void pRootOutput::event()
     fillRingBuf(c_Event);
   }
 
-  //  BELLE2_INFO ( "Event sent : " << m_nsent++ )
+  //  B2INFO ( "Event sent : " << m_nsent++ )
 }
 
 void pRootOutput::fillTree(const EDurability& durability)
 {
   if (!m_done[durability]) {
     setupTTree(durability);
-    BELLE2_INFO("SetupTTree done!!!!");
+    B2INFO("SetupTTree done!!!!");
   }
 
   // Loop over objects
@@ -211,14 +211,14 @@ void pRootOutput::fillRingBuf(const EDurability& durability)
   }
   delete msg;
 
-  //  BELLE2_INFO ( "Event sent : " << m_nsent++ )
+  //  B2INFO ( "Event sent : " << m_nsent++ )
 }
 
 void pRootOutput::endRun()
 {
   //fill Run data
 
-  BELLE2_INFO("endRun done.");
+  B2INFO("endRun done.");
 }
 
 
@@ -230,7 +230,7 @@ void pRootOutput::terminate()
     m_file->cd();
     for (int ii = 0; ii < c_NDurabilityTypes; ++ii) {
       if (m_treeNames[ii] != "NONE") {
-        BELLE2_INFO("Write TTree " << m_treeNames[ii]);
+        B2INFO("Write TTree " << m_treeNames[ii]);
         m_tree[ii]->Write();
       }
     }
@@ -244,7 +244,7 @@ void pRootOutput::terminate()
       usleep(200);
     }
   }
-  BELLE2_INFO("terminate called")
+  B2INFO("terminate called")
 }
 
 size_t pRootOutput::getSizeOfObj(const EDurability& durability)
@@ -301,7 +301,7 @@ void pRootOutput::setupTFile()
 // Setup ttree
 void pRootOutput::setupTTree(const EDurability& durability)
 {
-  BELLE2_INFO("pRootOutput: TTree is being set up output server.");
+  B2INFO("pRootOutput: TTree is being set up output server.");
 
   // Count number of objects in DataStore
   int nobjs = getSizeOfObj(durability);
@@ -370,7 +370,7 @@ void pRootOutput::setupTTree(const EDurability& durability)
 // Output Server function
 void pRootOutput::output_server(void)
 {
-  BELLE2_INFO("----> Output Server Invoked");
+  B2INFO("----> Output Server Invoked");
 
   // Open output ROOT file
   setupTFile();
@@ -387,7 +387,7 @@ void pRootOutput::output_server(void)
       usleep(100);
     }
     if (size < 0) {
-      BELLE2_WARNING("pRootOutput : output server : error in remq")
+      B2WARNING("pRootOutput : output server : error in remq")
       exit(-99);
     }
     //    printf ( "Output Server: got a record = %d\n", size );
@@ -400,12 +400,12 @@ void pRootOutput::output_server(void)
       m_file->cd();
       for (int ii = 0; ii < c_NDurabilityTypes; ++ii) {
         if (m_treeNames[ii] != "NONE") {
-          BELLE2_INFO("Write TTree " << m_treeNames[ii]);
+          B2INFO("Write TTree " << m_treeNames[ii]);
           m_tree[ii]->Write();
         }
       }
       delete[] evtbuf;
-      BELLE2_INFO("Output Server terminated")
+      B2INFO("Output Server terminated")
       exit(0);
     }
 
@@ -428,7 +428,7 @@ void pRootOutput::output_server(void)
         DataStore::Instance().storeArray((TClonesArray*)objlist[i],
                                          namelist[i]);
       setupTTree(durability);
-      BELLE2_INFO("Output server : TTrees initialized");
+      B2INFO("Output server : TTrees initialized");
     }
 
     // Copy objects in Branch buffers
@@ -447,7 +447,7 @@ void pRootOutput::output_server(void)
     // Clear DataStore
     DataStore::Instance().clearMaps(durability);
 
-    //    BELLE2_INFO ( "Event received = " << m_nrecv++ )
+    //    B2INFO ( "Event received = " << m_nrecv++ )
   }
 }
 

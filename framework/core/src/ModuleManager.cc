@@ -66,7 +66,7 @@ void ModuleManager::addModuleSearchPath(const string& path)
     }
 
   } else {
-    BELLE2_WARNING("Could not add module search filepath ! Directory does not exist: " + path);
+    B2WARNING("Could not add module search filepath ! Directory does not exist: " + path);
   }
 }
 
@@ -95,11 +95,11 @@ ModulePtr ModuleManager::registerModule(const string& moduleName, const std::str
       if (ModuleUtils::isFile(sharedLibPath)) {
         loadLibrary(sharedLibPath);
         moduleIter =  m_registeredProxyMap.find(moduleName);
-      } else BELLE2_WARNING("Could not load shared library " + sharedLibPath + ". File does not exist !");
+      } else B2WARNING("Could not load shared library " + sharedLibPath + ". File does not exist !");
 
       //Check if the loaded shared library file contained the module
       if (moduleIter == m_registeredProxyMap.end()) {
-        BELLE2_ERROR("The shared library " + sharedLibPath + " does not contain the module " + moduleName + " !");
+        B2ERROR("The shared library " + sharedLibPath + " does not contain the module " + moduleName + " !");
       }
     } else {
       //If no library path is given, check if the module name is known to the manager and load
@@ -112,10 +112,10 @@ ModulePtr ModuleManager::registerModule(const string& moduleName, const std::str
 
         //Check if the loaded shared library file contained the module
         if (moduleIter == m_registeredProxyMap.end()) {
-          BELLE2_ERROR("The shared library " + libIter->second + " does not contain the module " + moduleName + " !");
+          B2ERROR("The shared library " + libIter->second + " does not contain the module " + moduleName + " !");
         }
       } else {
-        BELLE2_ERROR("The module " + moduleName + " is not known to the framework !")
+        B2ERROR("The module " + moduleName + " is not known to the framework !")
       }
     }
   }
@@ -159,7 +159,7 @@ void ModuleManager::fillModuleNameLibMap(boost::filesystem::directory_entry& map
   //Check if the associated shared library file exists
   string sharedLibPath = boost::filesystem::change_extension(mapPath, LIB_FILE_EXTENSION).string();
   if (!ModuleUtils::fileNameExists(sharedLibPath)) {
-    BELLE2_ERROR("The shared library file: " << sharedLibPath << " doesn't exist, but is required by " << mapPath.string())
+    B2ERROR("The shared library file: " << sharedLibPath << " doesn't exist, but is required by " << mapPath.string())
     return;
   }
 
@@ -183,7 +183,7 @@ void ModuleManager::fillModuleNameLibMap(boost::filesystem::directory_entry& map
     if (matchResult.size() == 2) {
       //Add result to map
       m_moduleNameLibMap.insert(make_pair(string(matchResult[1].first, matchResult[1].second), sharedLibPath));
-    } else BELLE2_ERROR("Regular expression did not work. Is the module map file well formated ?")
+    } else B2ERROR("Regular expression did not work. Is the module map file well formated ?")
     }
 
   //Close the map file
@@ -197,7 +197,7 @@ void ModuleManager::loadLibrary(const std::string& libraryPath)
   void* libPointer = dlopen(libraryPath.c_str() , RTLD_LAZY | RTLD_GLOBAL);
 
   if (libPointer == NULL) {
-    BELLE2_ERROR("Could not open shared library file (error in dlopen) : " + string(dlerror()));
+    B2ERROR("Could not open shared library file (error in dlopen) : " + string(dlerror()));
   }
 }
 

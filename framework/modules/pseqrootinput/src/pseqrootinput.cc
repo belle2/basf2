@@ -36,7 +36,7 @@ pSeqRootInput::pSeqRootInput() : pEventServer()
   addParam("inputFileName"  , m_inputFileName, string("pSeqRootInput.root"), "SeqRoot file name.");
   addParam("compressionLevel", m_compressionLevel, 1, "Compression Level: 0 for no, 1 for low, 9 for high compression.");
 
-  BELLE2_INFO("pSeqRootInput: Constructor done.");
+  B2INFO("pSeqRootInput: Constructor done.");
 }
 
 
@@ -58,7 +58,7 @@ void pSeqRootInput::initialize()
   m_nproc = Framework::nprocess();
 
   //  printf ( "pRootInput : nproc = %d\n", m_nproc );
-  BELLE2_WARNING("pRootInput : nproc = " << m_nproc)
+  B2WARNING("pRootInput : nproc = " << m_nproc)
   if (m_nproc > 0) {
     char temp[] = "PROUTXXXXXX";
     char* rbufname = mktemp(temp);
@@ -72,13 +72,13 @@ void pSeqRootInput::initialize()
   // Message handler to encode serialized object
   m_msghandler = new MsgHandler(m_compressionLevel);
 
-  BELLE2_INFO("pSeqRootInput initialized.");
+  B2INFO("pSeqRootInput initialized.");
 }
 
 
 void pSeqRootInput::beginRun()
 {
-  BELLE2_INFO("beginRun called.");
+  B2INFO("beginRun called.");
 }
 
 
@@ -123,7 +123,7 @@ void pSeqRootInput::event()
     // Notify event server of arrival of begin/end run and synchronize
     m_rbctl->set_flag(ProcHandler::EvtProcID(), 1);
     m_rbctl->sync_wait();
-    BELLE2_INFO("event process : begin/end run synchronization done");
+    B2INFO("event process : begin/end run synchronization done");
   }
 
 
@@ -150,26 +150,26 @@ void pSeqRootInput::event()
       (TClonesArray*)objlist.at(i + nobjs),
       namelist.at(i + nobjs), durability);
   }
-  //  BELLE2_INFO ( "Event received : " << m_nrecv++ )
+  //  B2INFO ( "Event received : " << m_nrecv++ )
 }
 
 void pSeqRootInput::endRun()
 {
   //fill Run data
 
-  BELLE2_INFO("endRun done.");
+  B2INFO("endRun done.");
 }
 
 
 void pSeqRootInput::terminate()
 {
-  BELLE2_INFO("terminate called")
+  B2INFO("terminate called")
 }
 
 // Input Server function
 void pSeqRootInput::event_server(void)
 {
-  BELLE2_INFO("----> Input Server Invoked");
+  B2INFO("----> Input Server Invoked");
 
   // Open output ROOT file
   m_file = new SeqFile(m_inputFileName.c_str(), "r");
@@ -196,7 +196,7 @@ void pSeqRootInput::event_server(void)
     } else {
       // Put the message in ring buffer
       EvtMessage* msg = new EvtMessage(evtbuf);
-      //      BELLE2_INFO ( "Message type = " << msg->type() );
+      //      B2INFO ( "Message type = " << msg->type() );
       // Begin_run or End_run record
       if (msg->type() == MSG_BEGIN_RUN || msg->type() == MSG_END_RUN) {
         // Wait until ring buffer is cleared
@@ -209,7 +209,7 @@ void pSeqRootInput::event_server(void)
         for (int i = 0; i < m_nproc; i++)
           m_rbctl->set_flag(i, 0);
         // Queue begin/end run records up to m_nproc
-        BELLE2_INFO("event_server : sending begin/end run records");
+        B2INFO("event_server : sending begin/end run records");
         for (int i = 0; i < m_nproc; i++) {
           for (;;) {
             int stat = m_rbuf->insq((int*)msg->buffer(), (msg->size() - 1) / 4 + 1);

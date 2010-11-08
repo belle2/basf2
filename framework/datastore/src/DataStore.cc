@@ -33,7 +33,7 @@ bool DataStore::storeObject(TObject* object, const std::string& name, const EDur
   map<string, TObject*>::iterator iter = m_objectMap[durability].find(name);
 
   if (iter != m_objectMap[durability].end()) {
-    BELLE2_ERROR("Object of chosen name already exists@durability." + name);
+    B2ERROR("Object of chosen name already exists@durability." + name);
     return false;
   }
 

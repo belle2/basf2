@@ -149,6 +149,8 @@ def main():
     for error in errorList:
         print 'ERROR %s' % error
 
+    print 'Now visit https://kek2-uidev.cc.kek.jp:15043/DIRAC/jobs/JobMonitor/display and select Project ' \
+        + cliParams.getProject()
     DIRAC.exit(exitCode)
 
 

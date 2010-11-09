@@ -1,8 +1,8 @@
 Import('env')
 
-env['LIBS'] = ['tracking', 'simulation', 'framework',
-               '$ROOT_LIBS', 'Geom', 'EG', 'boost_python', 'G4root',
-               '$GEANT4_LIBS', 'CLHEP', 'boost_filesystem', '$PYTHON_LIBS', '$XML_LIBS']
+env['LIBS'] = ['framework',
+               '$ROOT_LIBS', 'Geom', 'EG', 
+               '$XML_LIBS']
 
 Return('env')
 

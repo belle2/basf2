@@ -28,6 +28,8 @@ query="id > 10 and id < 15"
 type="data"
 #estimated Maximum CPU Time (in seconds)
 cputime="864200"
+# Files to be sent with the job
+inputfiles = 'file1.txt,file2.txt'
 
 You can then invoke gBasf2 using the steering file and it will do the rest:
 
@@ -42,7 +44,7 @@ Usage:
  ./gbasf2.py (<options>|<cfgFile>)*
  Options:
  -h  --help  :  Shows this help
- -s:  --steering_file=  :  basf2 steering file
+ -s:  --steering=  :  basf2 steering file
  -p:  --project=  :  Name for project
  -c:  --CPUTime=  :  estimated CPUTime (in seconds)
  -w:  --priority=  :  Job priority: 0 is default
@@ -50,6 +52,7 @@ Usage:
  -t:  --type=  :  Type of Data ('data' or 'MC')
  -e:  --experiments=  :  Experiments (comma separated list)
  -l:  --swver=  :  Software Version
+ -f:  --inputfiles= : Files required for the job (comma separated list, max 10MB)
 
 For example:
 

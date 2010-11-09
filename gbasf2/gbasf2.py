@@ -23,6 +23,7 @@ import tarfile
 
 # make_jdl takes the options defined by the user and and lfn and makes a basic
 # JDL file. This is then written into a temporary file in the same directory.
+# Returns the path of the JDL
 
 
 def make_jdl(
@@ -77,6 +78,7 @@ def make_jdl(
       Priority = ' + str(priority) + ' ;\n]'
             )
     f.close()
+    return project + '-' + os.path.basename(lfn) + '.jdl'
 
 
 # basic function to make a tar of input files, written to pwd
@@ -128,7 +130,7 @@ def main():
 
   # for each of the lfns, make a job and submit it
     for lfn in lfns:
-        make_jdl(
+        jdl = make_jdl(
             cliParams.getSteeringFile(),
             cliParams.getProject(),
             cliParams.getCPUTime(),
@@ -137,10 +139,11 @@ def main():
             cliParams.getSwVer(),
             tar,
             )
-        result = dirac.submit(cliParams.getProject() + '-'
-                              + os.path.basename(lfn) + '.jdl')
+        result = dirac.submit(jdl)
         if result['OK']:
             print 'JobID = %s' % result['Value']
+            # remove the JDL - we keep it on error
+            os.remove(jdl)
         else:
             errorList.append('[' + lfn + '] ' + result['Message'])
             exitCode = 2
@@ -148,6 +151,12 @@ def main():
   # print any errors encountered during submission
     for error in errorList:
         print 'ERROR %s' % error
+
+  # clean temporary files
+    if exitCode != 2 and tar is not None:
+        os.remove(tar)
+    else:
+        print 'Something went wrong - leaving JDL and sandbox in place'
 
     print 'Now visit https://kek2-uidev.cc.kek.jp:15043/DIRAC/jobs/JobMonitor/display and select Project ' \
         + cliParams.getProject()

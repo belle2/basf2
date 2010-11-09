@@ -62,7 +62,7 @@ void CDCSignal::updateMCParticles(MCPartVec mcPartVec, MCWeightVec mcWeightVec)
   // Check if sizes the same
   if (mcPartVec.size() != mcWeightVec.size()) {
 
-     ERROR(   "CDCSignal::updateMCParticles - MC particle vector size: " << mcPartVec.size()
+     B2ERROR(   "CDCSignal::updateMCParticles - MC particle vector size: " << mcPartVec.size()
            << " is different from MC weight vector size: "            << mcWeightVec.size()
            << ", exit.");
      exit(0);

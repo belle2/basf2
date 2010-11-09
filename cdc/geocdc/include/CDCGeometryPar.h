@@ -58,6 +58,12 @@ namespace Belle2 {
     */
     void generateXML(const std::string & of);
 
+    //! Returns the version of cdc geometry parameters
+    /*!
+       \return The version of the cdc geometry parameters.
+    */
+    std::string version() const;
+
     //! The method to get cell id based on given layer id and the position.
     /*!
         \param layerId The given layer id.
@@ -285,6 +291,10 @@ namespace Belle2 {
   };
 
 //-----------------------------------------------------------------------------
+  inline std::string CDCGeometryPar::version() const
+  {
+    return m_version;
+  }
 
   inline int CDCGeometryPar::nShifts(int layerID) const
   {

@@ -71,9 +71,12 @@ void CDCGeometryPar::clear()
 
 void CDCGeometryPar::read()
 {
+  // Get the version of cdc geometry parameters
+  GearDir gbxParams = GearDir("/Detector/Subdetectors/ParamSet[@type=\"CDC\"]/");
+  m_version = gbxParams.getParamString("Version");
 
   // Get Gearbox parameters
-  GearDir gbxParams = Gearbox::Instance().getContent("CDC");
+  gbxParams = Gearbox::Instance().getContent("CDC");
 
   //------------------------------
   // Get CDC geometry parameters
@@ -273,8 +276,8 @@ void CDCGeometryPar::generateXML(const string & of)
   //...Open xml file...
   std::ofstream ofs(of.c_str(), std::ios::out);
   if (! ofs) {
-    ERROR("CDCGeometryPar::read !!! can not open file : "
-          << of);
+    B2ERROR("CDCGeometryPar::read !!! can not open file : "
+            << of);
   }
   ofs << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"                                                                                                << endl
   << "<Subdetector type=\"CDC\">"                                                                                                                << endl

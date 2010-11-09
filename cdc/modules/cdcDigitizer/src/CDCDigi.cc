@@ -89,9 +89,9 @@ void CDCDigi::initialize()
 void CDCDigi::beginRun()
 {
   // Print run number
-  INFO(" Processing run: "
-       << ENDCOLOR
-       << m_nRun);
+  B2INFO(" Processing run: "
+         << ENDCOLOR
+         << m_nRun);
 
   m_nRun++;
 }
@@ -103,7 +103,7 @@ void CDCDigi::event()
   //------------------------------------------
   StoreArray<SimHitCDC> cdcArray(m_inColName);
   if (!cdcArray) {
-    ERROR("Can not find " << m_inColName << ", exit.");
+    B2ERROR("Can not find " << m_inColName << ", exit.");
     exit(-1);
   }
 
@@ -218,7 +218,7 @@ void CDCDigi::terminate()
 
   if (m_random)  delete m_random;
   // Print message
-  //INFO(   " "
+  //B2INFO(   " "
   //     << "Time per event: "
   //     << std::setiosflags(std::ios::fixed | std::ios::internal )
   //     << std::setprecision(3)
@@ -285,20 +285,20 @@ void CDCDigi::printSimCDCHitInfo(const SimHitCDC & aHit) const
   // Printing a hit info.
   //----------------------
   double depE = aHit.getEnergyDep() / keV;
-  INFO("    Hit:"
-       << std::fixed
-       << std::setprecision(1)
-       << " DepE [keV]: "     << depE
-       << std::setprecision(3)
-       << std::setiosflags(std::ios::showpos)
-       << " Pos X [mm]: " << (aHit.getPosIn()[0] + aHit.getPosOut()[0]) / 2. / mm
-       << " Pos Y [mm]: " << (aHit.getPosIn()[1] + aHit.getPosOut()[1]) / 2. / mm
-       << " Pos Z [mm]: " << (aHit.getPosIn()[2] + aHit.getPosOut()[2]) / 2. / mm
-       << " DriftLength [mm]: "      << aHit.getDriftLength() / mm
-       << " Time of flight [ns]: "      << aHit.getFlightTime() / ns
-       << " Position flag: "      << aHit.getPosFlag()
-       << std::resetiosflags(std::ios::showpos)
-       << std::setprecision(0));
+  B2INFO("    Hit:"
+         << std::fixed
+         << std::setprecision(1)
+         << " DepE [keV]: "     << depE
+         << std::setprecision(3)
+         << std::setiosflags(std::ios::showpos)
+         << " Pos X [mm]: " << (aHit.getPosIn()[0] + aHit.getPosOut()[0]) / 2. / mm
+         << " Pos Y [mm]: " << (aHit.getPosIn()[1] + aHit.getPosOut()[1]) / 2. / mm
+         << " Pos Z [mm]: " << (aHit.getPosIn()[2] + aHit.getPosOut()[2]) / 2. / mm
+         << " DriftLength [mm]: "      << aHit.getDriftLength() / mm
+         << " Time of flight [ns]: "      << aHit.getFlightTime() / ns
+         << " Position flag: "      << aHit.getPosFlag()
+         << std::resetiosflags(std::ios::showpos)
+         << std::setprecision(0));
 }
 
 void CDCDigi::printSimCDCHitsInfo(std::string info, const SimHitCDCVec & hitVec) const
@@ -308,7 +308,7 @@ void CDCDigi::printSimCDCHitsInfo(std::string info, const SimHitCDCVec & hitVec)
   //---------------------
   SimHitCDCVec::const_iterator iterHits;
 
-  INFO("   " << info << ":" << "\n");
+  B2INFO("   " << info << ":" << "\n");
   for (iterHits = hitVec.begin(); iterHits != hitVec.end(); iterHits++) {
     printSimCDCHitInfo(**iterHits);
   }
@@ -319,37 +319,37 @@ void CDCDigi::printModuleParams() const
   //-----------------------------
   // Printing module parameters.
   //-----------------------------
-  INFO(" "
-       << DUNDERL
-       << DBLUE
-       << "CDCDigi parameters:"
-       << ENDCOLOR
-       << " "
-       << "\n");
+  B2INFO(" "
+         << DUNDERL
+         << DBLUE
+         << "CDCDigi parameters:"
+         << ENDCOLOR
+         << " "
+         << "\n");
 
-  INFO("  Input collection name:                 " << std::setw(6) << m_inColName << "\n");
+  B2INFO("  Input collection name:                 " << std::setw(6) << m_inColName << "\n");
 
-  INFO("                                         " << "\n");
+  B2INFO("                                         " << "\n");
 
-  INFO("  Output collection name:                " << std::setw(6) << m_outColName << "\n");
+  B2INFO("  Output collection name:                " << std::setw(6) << m_outColName << "\n");
 
-  INFO("                                         " << "\n");
+  B2INFO("                                         " << "\n");
 
-  //INFO(   "  Apply electronic effect?               " << std::setw(6) << m_electronicEffects << "\n" );
+  //B2INFO(   "  Apply electronic effect?               " << std::setw(6) << m_electronicEffects << "\n" );
   //
-  //INFO(   "                                         " << "\n"
+  //B2INFO(   "                                         " << "\n"
   //     << std::setiosflags(std::ios::fixed | std::ios::internal )
   //     << std::setprecision(2)
   //     << "  Electronics noise - ENC [fC]:          " << std::setw(6) << m_elNoise      << "\n");
 
-  INFO("                                         " << "\n"
-       << "  Mean1 [um]:                     " << std::setw(6) << m_mean1 / um  << "\n"
-       << "  Resolution1 [um]:               " << std::setw(6) << m_resolution1 / um  << "\n"
-       << "  Mean2 [um]:                     " << std::setw(6) << m_mean2 / um  << "\n"
-       << "  Resolution2 [um]:               " << std::setw(6) << m_resolution2 / um  << "\n"
-       << std::resetiosflags(std::ios::showpos)
-       << std::setprecision(0)
-       << "\n");
+  B2INFO("                                         " << "\n"
+         << "  Mean1 [um]:                     " << std::setw(6) << m_mean1 / um  << "\n"
+         << "  Resolution1 [um]:               " << std::setw(6) << m_resolution1 / um  << "\n"
+         << "  Mean2 [um]:                     " << std::setw(6) << m_mean2 / um  << "\n"
+         << "  Resolution2 [um]:               " << std::setw(6) << m_resolution2 / um  << "\n"
+         << std::resetiosflags(std::ios::showpos)
+         << std::setprecision(0)
+         << "\n");
 }
 
 void CDCDigi::printCDCSignalInfo(std::string info, const CDCSignalMap & cdcSignalMap) const
@@ -361,23 +361,23 @@ void CDCDigi::printCDCSignalInfo(std::string info, const CDCSignalMap & cdcSigna
   //  map of cdc digits with total integrated charge
   CDCSignalMap::const_iterator iterCDCMap;
 
-  INFO("  Digi results - " << info
-       << ":");
+  B2INFO("  Digi results - " << info
+         << ":");
 
   // Loop over all digits
   for (iterCDCMap = cdcSignalMap.begin(); iterCDCMap != cdcSignalMap.end(); iterCDCMap++) {
     int layerId = iterCDCMap->second->getLayerId();
     int wireId =  iterCDCMap->second->getWireId();
 
-    INFO("   Layer: " << layerId
-         << "   Wire: "  << wireId);
+    B2INFO("   Layer: " << layerId
+           << "   Wire: "  << wireId);
 
     // cdc signal (digits)
-    INFO("                 " << "\n"
-         << std::setiosflags(std::ios::fixed | std::ios::internal)
-         << std::setprecision(2)
-         << " Total charge [keV]: "  << iterCDCMap->second->getCharge() / keV
-         << " Drift length [mm]: " << iterCDCMap->second->getDriftLength() / mm
-         << std::setprecision(0));
+    B2INFO("                 " << "\n"
+           << std::setiosflags(std::ios::fixed | std::ios::internal)
+           << std::setprecision(2)
+           << " Total charge [keV]: "  << iterCDCMap->second->getCharge() / keV
+           << " Drift length [mm]: " << iterCDCMap->second->getDriftLength() / mm
+           << std::setprecision(0));
   } // end loop
 }

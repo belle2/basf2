@@ -91,7 +91,7 @@ G4bool CDCSensitiveDetector::ProcessHits(G4Step *aStep, G4TouchableHistory *)
 
   const G4double tof = t.GetGlobalTime();
   if (isnan(tof)) {
-    ERROR("CDCSensitiveDetector: global time is nan");
+    B2ERROR("CDCSensitiveDetector: global time is nan");
     return false;
   }
 
@@ -112,6 +112,7 @@ G4bool CDCSensitiveDetector::ProcessHits(G4Step *aStep, G4TouchableHistory *)
   // Calculate cell ID
   CDCGeometryPar * cdcgp = CDCGeometryPar::Instance();
   CDCGeometryPar & cdcg(*cdcgp);
+
   TVector3 tposIn(posIn.x() / cm, posIn.y() / cm, posIn.z() / cm);
   TVector3 tposOut(posOut.x() / cm, posOut.y() / cm, posOut.z() / cm);
   const unsigned idIn = cdcg.cellId(layerId, tposIn);
@@ -330,7 +331,7 @@ void CDCSensitiveDetector::AddbgOne(bool doit) {
     for( int i=0;i<olhitmgr.count();i++ ){
       Belle::Datcdc_olhit&  h = olhitmgr[i];
     }
-    dout(Debugout::INFO,"CDCSensitiveDetector")
+    dout(Debugout::B2INFO,"CDCSensitiveDetector")
       << "AddbgOne " << olhitmgr.size()
       << std::endl;
   }
@@ -499,29 +500,29 @@ L100:
     RotVec(xint[3], xint[4], xint[5], phi, theta, mode + 1);
     if (mode == 0) xint[2] += zw;
   } else {
-    //INFO("No intersection " << iflag <<" "<< xx1[1] <<" "<< xx2[1] <<" "<< yc << " "<< irTry <<" "<< ic1 <<" "<< ic2);
-    //INFO("Retry with line approximation");
+    //B2INFO("No intersection " << iflag <<" "<< xx1[1] <<" "<< xx2[1] <<" "<< yc << " "<< irTry <<" "<< ic1 <<" "<< ic2);
+    //B2INFO("Retry with line approximation");
     GIPLAN(yc, xx1, xx2, s1, s2, 2, xint, sint, pzint, iflag);
     if (iflag == 1) {
       xint[1] -= yshift;
       RotVec(xint[0], xint[1], xint[2], phi, theta, mode + 1);
       RotVec(xint[3], xint[4], xint[5], phi, theta, mode + 1);
       if (mode == 0) xint[2] += zw;
-      //  INFO(" ");
-      //  INFO("mode= " << mode);
-      //  INFO("phi= " << phi);
-      //  INFO("theta= " << theta);
-      //  INFO("yc= " << yc);
-      //  INFO("xx2= " << xx2);
-      //  INFO("s1= " << s1);
-      //  INFO("s2= " << s2);
-      //  INFO("ic= " << ic);
-      //  INFO("xint= " << xint);
-      //  INFO("sint= " << sint);
-      //  INFO("venter= " << venter);
-      //  INFO("vexit= " << vexit);
+      //  B2INFO(" ");
+      //  B2INFO("mode= " << mode);
+      //  B2INFO("phi= " << phi);
+      //  B2INFO("theta= " << theta);
+      //  B2INFO("yc= " << yc);
+      //  B2INFO("xx2= " << xx2);
+      //  B2INFO("s1= " << s1);
+      //  B2INFO("s2= " << s2);
+      //  B2INFO("ic= " << ic);
+      //  B2INFO("xint= " << xint);
+      //  B2INFO("sint= " << sint);
+      //  B2INFO("venter= " << venter);
+      //  B2INFO("vexit= " << vexit);
     } else {
-      //INFO("Fail again");
+      //B2INFO("Fail again");
     }
   }
 
@@ -880,7 +881,7 @@ CDCSensitiveDetector::Rotat(G4double& x, G4double& y, G4double& z,
     y = brot[1][0] * x0 + brot[1][1] * y0 + brot[1][2] * z0;
     z = brot[2][0] * x0 + brot[2][1] * y0 + brot[2][2] * z0;
   } else {
-    //ERROR("CDCSensitiveDetector " <<"invalid mode " << mode << "specifed");
+    //B2ERROR("CDCSensitiveDetector " <<"invalid mode " << mode << "specifed");
   }
   return;
 
@@ -907,7 +908,7 @@ CDCSensitiveDetector::Rotat(G4double x[3], const int mode)
     x[1] = brot[1][0] * x0 + brot[1][1] * y0 + brot[1][2] * z0;
     x[2] = brot[2][0] * x0 + brot[2][1] * y0 + brot[2][2] * z0;
   } else {
-    //ERROR("CDCSensitiveDetector " <<"invalid mode " << mode << "specifed");
+    //B2ERROR("CDCSensitiveDetector " <<"invalid mode " << mode << "specifed");
   }
   return;
 
@@ -1134,7 +1135,7 @@ line1:
   fst     = f;
 
   if (ntry > ntryMax) {
-    //DEBUG(" Exceed max. trials HelWir ");
+    //B2DEBUG(" Exceed max. trials HelWir ");
     goto line100;
   }
   //write(6,*) ntry, fist, deltafi
@@ -1194,7 +1195,7 @@ CDCSensitiveDetector::Mvopr(const G4int ndim, const G4double b[3], const G4doubl
   //-----------------------------------------------------------------------
 
   if (ndim != 3) {
-    //ERROR("invalid ndim " << ndim << " specified");
+    //B2ERROR("invalid ndim " << ndim << " specified");
     return;
   }
 
@@ -1217,7 +1218,7 @@ CDCSensitiveDetector::Mvopr(const G4int ndim, const G4double b[3], const G4doubl
       c[0] += b[i] * tmp[i];
     }
   } else {
-    //ERROR("Error, you specified invalid mode= " << mode);
+    //B2ERROR("Error, you specified invalid mode= " << mode);
   }
 
   return;

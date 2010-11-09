@@ -228,7 +228,7 @@ void GeoCDCBelleII::create(GearDir& content)
   int nEndplate = content.getNumberNodes("Endplates/Endplate");
 
   if (nSLayer != nEndplate) {
-    ERROR("The number of sensitive layers is not same with the number of endplates, exit.");
+    B2ERROR("The number of sensitive layers is not same with the number of endplates, exit.");
     exit(0);
   }
 

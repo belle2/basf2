@@ -1,6 +1,6 @@
 Import('env')
 
-env['LIBS'] = ['framework',
+env['LIBS'] = ['framework', 'cdc',
                '$ROOT_LIBS', 'Geom', 'EG', 
                '$XML_LIBS']
 

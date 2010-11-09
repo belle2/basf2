@@ -108,7 +108,7 @@ class CLIParams:
   # This is also used to generate the --help option
 
     def registerCLISwitches(self):
-        Script.registerSwitch('s:', 'steering_file=', 'basf2 steering file',
+        Script.registerSwitch('s:', 'steering=', 'basf2 steering file',
                               self.setSteeringFile)
         Script.registerSwitch('p:', 'project=', 'Name for project',
                               self.setProject)

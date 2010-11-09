@@ -66,7 +66,7 @@ void EventProcessor::process(PathPtr startPath, long maxEvent, long runNumber)
   processInitialize(moduleList);
 
   //Check if errors appeared. If yes, don't start the event processing.
-  int numLogError = LogSystem::Instance().getMessageCounter(LogCommon::c_Error);
+  int numLogError = LogSystem::Instance().getMessageCounter(LogConfig::c_Error);
   if (numLogError == 0) {
     if (runNumber > -1) processBeginRun(moduleList); //If the run number was set, start a new run manually
     processCore(startPath, moduleList, maxEvent); //Do the event processing
@@ -98,11 +98,13 @@ void EventProcessor::processInitialize(const ModulePtrList& modulePathList)
     }
 
     //Set the module dependent log level
-    logSystem.setLogLevel(module->getLogLevel());
-    logSystem.setDebugLevel(module->getDebugLevel());
+    logSystem.setModuleLogConfig(module->config());
 
     //Do initialization
     module->initialize();
+
+    //Set the global log level
+    logSystem.setModuleLogConfig(0);
   }
 }
 
@@ -127,11 +129,13 @@ void EventProcessor::processCore(PathPtr startPath, const ModulePtrList& moduleP
       normalEvent = true;
 
       //Set the module dependent log level
-      logSystem.setLogLevel(module->getLogLevel());
-      logSystem.setDebugLevel(module->getDebugLevel());
+      logSystem.setModuleLogConfig(module->config());
 
       //Call the event method of the module
       module->event();
+
+      //Set the global log level
+      logSystem.setModuleLogConfig(0);
 
       //Check the returned process record type
       switch (module->getProcessRecordType()) {
@@ -195,11 +199,13 @@ void EventProcessor::processTerminate(const ModulePtrList& modulePathList)
     Module* module = listIter->get();
 
     //Set the module dependent log level
-    logSystem.setLogLevel(module->getLogLevel());
-    logSystem.setDebugLevel(module->getDebugLevel());
+    logSystem.setModuleLogConfig(module->config());
 
     //Do termination
     module->terminate();
+
+    //Set the global log level
+    logSystem.setModuleLogConfig(0);
   }
 
   //Delete persistent data in DataStore
@@ -216,11 +222,13 @@ void EventProcessor::processBeginRun(const ModulePtrList& modulePathList)
     Module* module = listIter->get();
 
     //Set the module dependent log level
-    logSystem.setLogLevel(module->getLogLevel());
-    logSystem.setDebugLevel(module->getDebugLevel());
+    logSystem.setModuleLogConfig(module->config());
 
     //Do beginRun() call
     module->beginRun();
+
+    //Set the global log level
+    logSystem.setModuleLogConfig(0);
   }
 }
 
@@ -234,11 +242,13 @@ void EventProcessor::processEndRun(const ModulePtrList& modulePathList)
     Module* module = listIter->get();
 
     //Set the module dependent log level
-    logSystem.setLogLevel(module->getLogLevel());
-    logSystem.setDebugLevel(module->getDebugLevel());
+    logSystem.setModuleLogConfig(module->config());
 
     //Do endRun() call
     module->endRun();
+
+    //Set the global log level
+    logSystem.setModuleLogConfig(0);
   }
 
   //Delete run related data in DataStore

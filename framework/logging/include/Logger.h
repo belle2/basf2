@@ -11,7 +11,8 @@
 #ifndef LOGGER_H
 #define LOGGER_H
 
-#include <framework/logging/LogCommon.h>
+#include <framework/logging/LogConfig.h>
+#include <framework/logging/LogMessage.h>
 #include <framework/logging/LogSystem.h>
 #include <framework/logging/LogMethod.h>
 
@@ -29,7 +30,9 @@ namespace Belle2 {
 #endif
 
 // function name
-#if defined(__GNUC__) || defined(__ICC) || defined(__ECC) || defined(__APPLE__)
+#if defined(__GNUC__)
+#define FUNCTIONNAME() __PRETTY_FUNCTION__
+#elif defined(__ICC) || defined(__ECC) || defined(__APPLE__)
 #define FUNCTIONNAME() __FUNCTION__
 #else
 #define FUNCTIONNAME() "???"
@@ -39,37 +42,37 @@ namespace Belle2 {
 #ifdef LOG_NO_B2DEBUG
 #define B2DEBUG(level, streamText)
 #else
-#define B2DEBUG(level, streamText) { if (LogSystem::Instance().isLevelEnabled(LogCommon::c_Debug,level)) { \
+#define B2DEBUG(level, streamText) { if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug,level,PACKAGENAME())) { \
       std::ostringstream stringBuffer; stringBuffer << streamText; \
-      LogSystem::Instance().sendMessage(LogCommon::c_Debug,streamText,PACKAGENAME(),FUNCTIONNAME(),__FILE__,__LINE__); } }
+      LogSystem::Instance().sendMessage(LogMessage(LogConfig::c_Debug,stringBuffer.rdbuf()->str(),PACKAGENAME(),FUNCTIONNAME(),__FILE__,__LINE__)); } }
 #endif
 
 // info messages
 #ifdef LOG_NO_B2INFO
 #define B2INFO(streamText)
 #else
-#define B2INFO(streamText) { if (LogSystem::Instance().isLevelEnabled(LogCommon::c_Info)) { \
+#define B2INFO(streamText) { if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Info,0,PACKAGENAME())) { \
       std::ostringstream stringBuffer; stringBuffer << streamText; \
-      LogSystem::Instance().sendMessage(LogCommon::c_Info,stringBuffer.rdbuf()->str(),PACKAGENAME(),FUNCTIONNAME(),__FILE__,__LINE__); } }
+      LogSystem::Instance().sendMessage(LogMessage(LogConfig::c_Info,stringBuffer.rdbuf()->str(),PACKAGENAME(),FUNCTIONNAME(),__FILE__,__LINE__)); } }
 #endif
 
 // warning messages
 #ifdef LOG_NO_B2WARNING
 #define B2WARNING(streamText)
 #else
-#define B2WARNING(streamText) { if (LogSystem::Instance().isLevelEnabled(LogCommon::c_Warning)) { \
+#define B2WARNING(streamText) { if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Warning,0,PACKAGENAME())) { \
       std::ostringstream stringBuffer; stringBuffer << streamText; \
-      LogSystem::Instance().sendMessage(LogCommon::c_Warning,stringBuffer.rdbuf()->str(),PACKAGENAME(),FUNCTIONNAME(),__FILE__,__LINE__); } }
+      LogSystem::Instance().sendMessage(LogMessage(LogConfig::c_Warning,stringBuffer.rdbuf()->str(),PACKAGENAME(),FUNCTIONNAME(),__FILE__,__LINE__)); } }
 #endif
 
 // error messages
-#define B2ERROR(streamText) { if (LogSystem::Instance().isLevelEnabled(LogCommon::c_Error)) { \
+#define B2ERROR(streamText) { if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Error,0,PACKAGENAME())) { \
       std::ostringstream stringBuffer; stringBuffer << streamText; \
-      LogSystem::Instance().sendMessage(LogCommon::c_Error,stringBuffer.rdbuf()->str(),PACKAGENAME(),FUNCTIONNAME(),__FILE__,__LINE__); } }
+      LogSystem::Instance().sendMessage(LogMessage(LogConfig::c_Error,stringBuffer.rdbuf()->str(),PACKAGENAME(),FUNCTIONNAME(),__FILE__,__LINE__)); } }
 
 // fatal messages
 #define B2FATAL(streamText) { std::ostringstream stringBuffer; stringBuffer << streamText; \
-    LogSystem::Instance().sendMessageForceAbort(LogCommon::c_Fatal,stringBuffer.rdbuf()->str(),PACKAGENAME(),FUNCTIONNAME(),__FILE__,__LINE__);}
+    LogSystem::Instance().sendMessage(LogMessage(LogConfig::c_Fatal,stringBuffer.rdbuf()->str(),PACKAGENAME(),FUNCTIONNAME(),__FILE__,__LINE__));}
 
 // scoped logging for entering/leaving methods
 #ifdef LOG_NO_METHOD

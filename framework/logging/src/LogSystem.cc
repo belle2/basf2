@@ -3,12 +3,13 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Andreas Moll                                             *
+ * Contributors: Andreas Moll, Thomas Kuhr                                             *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
 #include <framework/logging/LogSystem.h>
+#include <framework/logging/LogConnectionIOStream.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -27,53 +28,81 @@ LogSystem& LogSystem::Instance()
 }
 
 
-void LogSystem::setLogConnection(LogConnectionAbs* logConnection)
+void LogSystem::addLogConnection(LogConnectionBase* logConnection)
 {
-  if (m_logConnection != NULL) delete m_logConnection;
-  m_logConnection = logConnection;
+  m_logConnections.push_back(logConnection);
 }
 
 
-bool LogSystem::isLevelEnabled(LogCommon::ELogLevel level, int debugLevel)
+void LogSystem::resetLogConnections()
 {
-  return ((level != LogCommon::c_Debug) && (m_logLevel <= level)) ||
-         ((level == LogCommon::c_Debug) && (m_logLevel == LogCommon::c_Debug) && (m_debugLevel >= debugLevel));
+  for (unsigned int i = 0; i < m_logConnections.size(); i++) {
+    delete m_logConnections[i];
+  }
+  m_logConnections.clear();
 }
 
 
-bool LogSystem::sendMessage(LogCommon::ELogLevel logLevel, const string& message, const string& package,
-                            const string& function, const string& file, unsigned int line, bool sendLocationInfo)
+bool LogSystem::isLevelEnabled(LogConfig::ELogLevel level, int debugLevel, std::string package)
 {
-  if (m_logConnection == NULL) return false;
+  LogConfig::ELogLevel logLevelLimit = m_logConfig.getLogLevel();
+  int debugLevelLimit = m_logConfig.getDebugLevel();
 
-  bool messageSent = m_logConnection->sendMessage(logLevel, message, package, function, file, line, sendLocationInfo);
+  map<string, LogConfig>::iterator packageLogConfig = m_packageLogConfigs.find(package);
+  if (packageLogConfig != m_packageLogConfigs.end()) {
+    LogConfig& logConfig = packageLogConfig->second;
+    logLevelLimit = logConfig.getLogLevel();
+    debugLevelLimit = logConfig.getDebugLevel();
+  } else if (m_moduleLogConfig && (m_moduleLogConfig->getLogLevel() != LogConfig::c_Default)) {
+    logLevelLimit = m_moduleLogConfig->getLogLevel();
+    debugLevelLimit = m_moduleLogConfig->getDebugLevel();
+  }
+
+  return ((level != LogConfig::c_Debug) && (logLevelLimit <= level)) ||
+         ((level == LogConfig::c_Debug) && (logLevelLimit == LogConfig::c_Debug) && (debugLevelLimit >= debugLevel));
+}
+
+
+bool LogSystem::sendMessage(LogMessage message)
+{
+  LogConfig::ELogLevel logLevel = message.getLogLevel();
+  map<string, LogConfig>::iterator packageLogConfig = m_packageLogConfigs.find(message.getPackage());
+  if (packageLogConfig != m_packageLogConfigs.end()) {
+    message.setLogInfo(packageLogConfig->second.getLogInfo(logLevel));
+  } else if (m_moduleLogConfig && m_moduleLogConfig->getLogInfo(logLevel)) {
+    message.setLogInfo(m_moduleLogConfig->getLogInfo(logLevel));
+  } else {
+    message.setLogInfo(m_logConfig.getLogInfo(logLevel));
+  }
+
+  bool messageSent = false;
+  for (unsigned int i = 0; i < m_logConnections.size(); i++) {
+    if (m_logConnections[i]->sendMessage(message)) {
+      messageSent = true;
+    }
+  }
 
   if (messageSent) {
     incMessageCounter(logLevel);
   }
-  return messageSent;
-}
 
-
-void LogSystem::sendMessageForceAbort(LogCommon::ELogLevel logLevel, const std::string& message, const std::string& package,
-                                      const std::string& function, const std::string& file, unsigned int line, bool sendLocationInfo)
-{
-  if (m_logConnection != NULL) {
-    m_logConnection->sendMessage(logLevel, message, package, function, file, line, sendLocationInfo);
+  if (logLevel >= m_logConfig.getAbortLevel()) {
+    abort();
   }
-  abort();
+
+  return messageSent;
 }
 
 
 void LogSystem::resetMessageCounter()
 {
-  for (int i = 0; i < LogCommon::ELogLevelCount; ++i) {
+  for (int i = 0; i < LogConfig::c_Default; ++i) {
     m_messageCounter[i] = 0;
   }
 }
 
 
-int LogSystem::getMessageCounter(LogCommon::ELogLevel logLevel)
+int LogSystem::getMessageCounter(LogConfig::ELogLevel logLevel)
 {
   return m_messageCounter[logLevel];
 }
@@ -83,27 +112,33 @@ int LogSystem::getMessageCounter(LogCommon::ELogLevel logLevel)
 //                              Private methods
 //============================================================================
 
-LogSystem::LogSystem()
+LogSystem::LogSystem() :
+    m_logConfig(LogConfig::c_Info, 100),
+    m_moduleLogConfig(0)
 {
-  m_logConnection = NULL;
-  m_debugLevel = 100;
-  m_logLevel = LogCommon::c_Info;
+  unsigned int logInfo = LogConfig::c_Level + LogConfig::c_Message;
+  unsigned int debugLogInfo = LogConfig::c_Level + LogConfig::c_Message + LogConfig::c_Module + LogConfig::c_File + LogConfig::c_Line;
+  unsigned int fatalLogInfo = LogConfig::c_Level + LogConfig::c_Message + LogConfig::c_Module + LogConfig::c_Function;
+  m_logConfig.setLogInfo(LogConfig::c_Debug, debugLogInfo);
+  m_logConfig.setLogInfo(LogConfig::c_Info, logInfo);
+  m_logConfig.setLogInfo(LogConfig::c_Warning, logInfo);
+  m_logConfig.setLogInfo(LogConfig::c_Error, logInfo);
+  m_logConfig.setLogInfo(LogConfig::c_Fatal, fatalLogInfo);
 
-  m_messageCounter = new int[LogCommon::ELogLevelCount];
+//  m_messageCounter = new int[LogConfig::c_Default];
   resetMessageCounter();
 
-  setLogConnection(new LogConnectionIOStream(std::cout));
+  addLogConnection(new LogConnectionIOStream(std::cout));
 }
 
 
 LogSystem::~LogSystem()
 {
-  delete [] m_messageCounter;
-  if (m_logConnection != NULL) delete m_logConnection;
+  resetLogConnections();
 }
 
 
-void LogSystem::incMessageCounter(LogCommon::ELogLevel logLevel)
+void LogSystem::incMessageCounter(LogConfig::ELogLevel logLevel)
 {
   m_messageCounter[logLevel]++;
 }

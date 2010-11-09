@@ -8,10 +8,11 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef LOGCONNECTIONABS_H_
-#define LOGCONNECTIONABS_H_
+#ifndef LOGCONNECTIONBASE_H_
+#define LOGCONNECTIONBASE_H_
 
-#include <framework/logging/LogCommon.h>
+#include <framework/logging/LogConfig.h>
+#include <framework/logging/LogMessage.h>
 
 #include <string>
 
@@ -20,30 +21,23 @@ namespace Belle2 {
   /**
    * Abstract base class for the different types of log connections.
    */
-  class LogConnectionAbs {
+  class LogConnectionBase {
 
   public:
 
-    /** The LogConnectionAbs default constructor. */
-    LogConnectionAbs() {};
+    /** The LogConnectionBase default constructor. */
+    LogConnectionBase() {};
 
-    /** The LogConnectionAbs destructor. */
-    virtual ~LogConnectionAbs() {};
+    /** The LogConnectionBase destructor. */
+    virtual ~LogConnectionBase() {};
 
     /**
      * Sends a log message.
      *
-     * @param logLevel The log level of the message (e.g. debug, info, warning, error, fatal).
-     * @param message The message string which should be send.
-     * @param package The package name where the message was sent from.
-     * @param function The function name where the message was sent from.
-     * @param file The file name where the message was sent from.
-     * @param line The line number in the source code where the message was sent from.
-     * @param sendLocationInfo If true, the location info (package, function, file, line) is sent
+     * @param message The log message object.
      * @return Returns true if the message could be send.
      */
-    virtual bool sendMessage(LogCommon::ELogLevel logLevel, const std::string& message, const std::string& package,
-                             const std::string& function, const std::string& file, unsigned int line, bool sendLocationInfo) = 0;
+    virtual bool sendMessage(LogMessage message) = 0;
 
     /**
      * Returns true if the connection could be established.
@@ -60,4 +54,4 @@ namespace Belle2 {
 
 } // end namespace Belle2
 
-#endif /* LOGCONNECTIONABS_H_ */
+#endif /* LOGCONNECTIONBASE_H_ */

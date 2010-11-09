@@ -18,7 +18,7 @@
 
 #include <framework/core/CondParser.h>
 #include <framework/core/ModuleParamList.h>
-#include <framework/logging/Logger.h>
+#include <framework/logging/LogConfig.h>
 #include <framework/core/ModuleManager.h>
 
 #include <vector>
@@ -147,18 +147,40 @@ namespace Belle2 {
     const std::string& getDescription() const {return m_description;}
 
     /**
-     * Returns the log level used for this module.
+     * Returns the log system configuration.
      *
-     * @return Returns the log level of the module.
+     * @return The log system configuration.
      */
-    LogCommon::ELogLevel getLogLevel() {return static_cast<LogCommon::ELogLevel>(m_logLevel); };
+    LogConfig* config() {return &m_logConfig;}
 
     /**
-     * Returns the debug messaging level used for this module.
+     * Configure the log level.
      *
-     * @return Returns the debug messaging level of the module.
+     * @param logLevel The log level.
      */
-    int getDebugLevel() {return m_debugLevel; };
+    void setLogLevel(int logLevel);
+
+    /**
+     * Configure the debug messaging level.
+     *
+     * @param debugLevel The debug level.
+     */
+    void setDebugLevel(int debugLevel);
+
+    /**
+     * Configure the abort log level.
+     *
+     * @param abortLevel The abort log level.
+     */
+    void setAbortLevel(int abortLevel);
+
+    /**
+     * Configure the printed log information for the given level.
+     *
+     * @param logLevel The log level.
+     * @param logInfo The log information that should be printed.
+     */
+    void setLogInfo(int logLevel, unsigned int logInfo);
 
     /**
      * Sets the condition of the module.
@@ -326,14 +348,11 @@ namespace Belle2 {
 
   private:
 
-    int m_debugFlag; /**< This variable controls the messaging level. */
-
     std::string m_name;           /**< The name of the module, saved as a string. */
     std::string m_description;    /**< The description of the module. */
     unsigned int m_propertyFlags; /**< The properties of the module (Master, multi processing etc.) saved as bitwise flags. */
 
-    int m_logLevel;            /**< The log messaging level of the module. Defined as int for the parameter handling. */
-    int m_debugLevel;          /**< The debug messaging level of the module. */
+    LogConfig m_logConfig;     /**< the log system configuration of the module. */
 
     ModuleParamList m_moduleParamList; /**< List storing and managing all parameter of the module. */
 

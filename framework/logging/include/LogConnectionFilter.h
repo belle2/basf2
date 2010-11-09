@@ -3,42 +3,37 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Andreas Moll                                             *
+ * Contributors: Thomas Kuhr                                              *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef LOGCONNECTIONIOSTREAM_H_
-#define LOGCONNECTIONIOSTREAM_H_
+#ifndef LOGCONNECTIONFILTER_H_
+#define LOGCONNECTIONFILTER_H_
 
-#include <framework/logging/LogConfig.h>
 #include <framework/logging/LogConnectionBase.h>
 
-#include <string>
-#include <iostream>
 
 namespace Belle2 {
 
   /**
-   * Implements a log connection to a IO Stream.
-   *
-   * Inherits from the abstract base class LogConnectionBase.
+   * Implements a log connection that filters repeated messages.
    */
-  class LogConnectionIOStream : public LogConnectionBase {
+  class LogConnectionFilter : public LogConnectionBase {
 
   public:
 
     /**
      * The constructor.
      *
-     * @param outputStream The output stream.
+     * @param logConnection The log connection that actually prints the messages.
      */
-    LogConnectionIOStream(std::ostream& outputStream);
+    LogConnectionFilter(LogConnectionBase* logConnection);
 
     /**
-     * The LogConnectionIOStream destructor.
+     * The LogConnectionFilter destructor.
      */
-    virtual ~LogConnectionIOStream();
+    virtual ~LogConnectionFilter();
 
     /**
      * Sends a log message.
@@ -49,9 +44,9 @@ namespace Belle2 {
     virtual bool sendMessage(LogMessage message);
 
     /**
-     * Returns true if the connection to the io stream could be established.
+     * Returns true if the log connection could be established.
      *
-     * @return True if the connection to the io stream could be established.
+     * @return True if the log connection could be established.
      */
     virtual bool isConnected();
 
@@ -59,10 +54,17 @@ namespace Belle2 {
 
   private:
 
-    std::ostream* m_stream;  /**< The output stream used for sending the log message.*/
+    /**
+     * If there are repeated messages print the number of repetitions.
+     */
+    void printRepetitions();
+
+    LogConnectionBase* m_logConnection; /**< The actual log connection.*/
+    LogMessage m_previousMessage;       /**< The previous log message. */
+    int m_repeatCounter;                /**< Counter for repeated messages. */
 
   };
 
 } // end namespace Belle2
 
-#endif /* LOGCONNECTIONIOSTREAM_H_ */
+#endif /* LOGCONNECTIONFILTER_H_ */

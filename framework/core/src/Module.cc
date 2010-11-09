@@ -19,27 +19,49 @@ using namespace Belle2;
 using namespace boost::python;
 
 
-Module::Module()
+Module::Module() :
+    m_name(""),
+    m_description("Not set by the author"),
+    m_propertyFlags(0),
+    m_logConfig(),
+    m_hasReturnValue(false),
+    m_returnValue(0),
+    m_processRecordType(prt_Event),
+    m_hasCondition(false)
 {
-  m_name = "";
-  m_debugFlag = 0;
-  m_description = "Not set by the author";
-
-  m_hasReturnValue = false;
-  m_returnValue = 0;
-  m_hasCondition = false;
-  m_processRecordType = prt_Event;
-  m_propertyFlags = 0;
-
   //Parameter definitions
-  addParam("LogLevel", m_logLevel, static_cast<int>(LogCommon::c_Info), "The log level of the module [Debug=0, Info=1, Warning=2, Error=3, Fatal=4].");
-  addParam("DebugLevel", m_debugLevel, 100, "The debug level of the module.");
+  addParam("LogLevel", *((int*)(&m_logConfig.logLevel())), static_cast<int>(LogConfig::c_Default), "The log level of the module [Debug=0, Info=1, Warning=2, Error=3, Fatal=4].");
+  addParam("DebugLevel", m_logConfig.debugLevel(), 100, "The debug level of the module.");
 }
 
 
 Module::~Module()
 {
 
+}
+
+
+void Module::setLogLevel(int logLevel)
+{
+  m_logConfig.setLogLevel(static_cast<LogConfig::ELogLevel>(logLevel));
+}
+
+
+void Module::setDebugLevel(int debugLevel)
+{
+  m_logConfig.setDebugLevel(debugLevel);
+}
+
+
+void Module::setAbortLevel(int abortLevel)
+{
+  m_logConfig.setAbortLevel(static_cast<LogConfig::ELogLevel>(abortLevel));
+}
+
+
+void Module::setLogInfo(int logLevel, unsigned int logInfo)
+{
+  m_logConfig.setLogInfo(static_cast<LogConfig::ELogLevel>(logLevel), logInfo);
 }
 
 
@@ -185,6 +207,10 @@ void Module::exposePythonAPI()
   .def("param", &Module::setParamList)
   .def("param", &Module::setParamDict)
   .def("available_params", &Module::getParamInfoListPython)
+  .def("log_level", &Module::setLogLevel)
+  .def("debug_level", &Module::setDebugLevel)
+  .def("abort_level", &Module::setAbortLevel)
+  .def("log_info", &Module::setLogInfo)
   ;
 
   register_ptr_to_python<ModulePtr>();

@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Andreas Moll                                             *
+ * Contributors: Andreas Moll, Thomas Kuhr                                *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -11,11 +11,13 @@
 #ifndef LOGSYSTEM_H_
 #define LOGSYSTEM_H_
 
-#include <framework/logging/LogCommon.h>
-#include <framework/logging/LogConnectionAbs.h>
-#include <framework/logging/LogConnectionIOStream.h>
+#include <framework/logging/LogConfig.h>
+#include <framework/logging/LogMessage.h>
+#include <framework/logging/LogConnectionBase.h>
 
 #include <string>
+#include <vector>
+#include <map>
 
 
 namespace Belle2 {
@@ -50,29 +52,41 @@ namespace Belle2 {
     static LogSystem& Instance();
 
     /**
-     * Sets the log connection object which is used to the send the logging messages.
+     * Adds a log connection object which is used to the send the logging messages.
      *
      * Please note: The LogSystem class takes ownership of the log connection object.
      *
      * @param logConnection Pointer to the logging connection object. The LogSystem takes ownership of this object.
      */
-    void setLogConnection(LogConnectionAbs* logConnection);
+    void addLogConnection(LogConnectionBase* logConnection);
 
     /**
-     * Sets the log level (messaging intensity).
-     *
-     * @param level The level of the message intensity (e.g. debug, info, warning, error, fatal).
-     * @sa enum ELogLevel
+     * Removes all log connections.
      */
-    void setLogLevel(LogCommon::ELogLevel level) {m_logLevel = level;}
+    void resetLogConnections();
 
     /**
-     * Returns the log level (messaging intensity).
+     * Returns the log system configuration.
      *
-     * @return The current log level of the log system.
-     * @sa enum ELogLevel
+     * @return The log system configuration.
      */
-    LogCommon::ELogLevel getLogLevel() {return m_logLevel;}
+    LogConfig* config() {return &m_logConfig;}
+
+    /**
+     * Sets the log configuration to the given module log configuration.
+     * This method should _only_ be called by the EventProcessor.
+     *
+     * @param moduleLogConfig Pointer to the logging configuration object of the module.
+     */
+    void setModuleLogConfig(LogConfig* moduleLogConfig) {m_moduleLogConfig = moduleLogConfig; };
+
+    /**
+     * Sets the log configuration to the given module log configuration.
+     * This method should _only_ be called by the EventProcessor.
+     *
+     * @param moduleLogConfig Pointer to the logging configuration object of the module.
+     */
+    void addPackageLogConfig(std::string package, LogConfig logConfig) {m_packageLogConfigs[package] = logConfig; };
 
     /**
      * Returns true if the log level of the log system is greater or equal the given level.
@@ -81,54 +95,16 @@ namespace Belle2 {
      * @param debugLevel The level for debug messages. Only used for the debug level.
      * @return True if the log level of the log system is greater or equal the given level.
      */
-    bool isLevelEnabled(LogCommon::ELogLevel level, int debugLevel = 0);
-
-    /**
-     * Sets the messaging intensity for debug messages.
-     *
-     * The debug level is only considered if the messaging level is at least set to c_Debug.
-     * The meaning of a certain level depends on the usage by the developer.
-     */
-    void setDebugLevel(int level) {m_debugLevel = level;}
-
-    /**
-     * Returns the current debug messaging level.
-     *
-     * @return The debug level as it was set by the developer.
-     */
-    int getDebugLevel() {return m_debugLevel;}
+    bool isLevelEnabled(LogConfig::ELogLevel level, int debugLevel = 0, std::string package = "");
 
     /**
      * Sends a log message using the log connection object.
+     * This method should _only_ be called by the logger macros.
      *
-     * @param logLevel The log level of the message (e.g. debug, info, warning, error, fatal).
-     * @param message The message string which should be send.
-     * @param package The package name where the message was sent from.
-     * @param function The function name where the message was sent from.
-     * @param file The file name where the message was sent from.
-     * @param line The line number in the source code where the message was sent from.
-     * @param sendLocationInfo If true, the location info (package, function, file, line) is sent
+     * @param message The log message object.
      * @return Returns true if the message could be send.
      */
-    bool sendMessage(LogCommon::ELogLevel logLevel, const std::string& message, const std::string& package,
-                     const std::string& function, const std::string& file, unsigned int line, bool sendLocationInfo = true);
-
-    /**
-     * Sends a log message using the log connection object and immediately after having send the message abort the program.
-     *
-     * This method is used by the fatal message, which forces the termination of the program execution.
-     * The currently set debug level is NOT checked.
-     *
-     * @param logLevel The log level of the message (e.g. debug, info, warning, error, fatal).
-     * @param message The message string which should be send.
-     * @param package The package name where the message was sent from.
-     * @param function The function name where the message was sent from.
-     * @param file The file name where the message was sent from.
-     * @param line The line number in the source code where the message was sent from.
-     * @param sendLocationInfo If true, the location info (package, function, file, line) is sent
-     */
-    void sendMessageForceAbort(LogCommon::ELogLevel logLevel, const std::string& message, const std::string& package,
-                               const std::string& function, const std::string& file, unsigned int line, bool sendLocationInfo = true);
+    bool sendMessage(LogMessage message);
 
     /** Resets the message counter by setting all message counts to 0. */
     void resetMessageCounter();
@@ -139,16 +115,17 @@ namespace Belle2 {
      * @param logLevel The logging level which should be returned.
      * @return The number of message calls for the given log level.
      */
-    int getMessageCounter(LogCommon::ELogLevel logLevel);
+    int getMessageCounter(LogConfig::ELogLevel logLevel);
 
 
   private:
 
-    LogConnectionAbs* m_logConnection; /**< Stores the pointer to the log connection object. */
-    LogCommon::ELogLevel m_logLevel;   /**< the current log level of the log system. */
-    int m_debugLevel;                  /**< the current debug messaging level of the log system. */
+    std::vector<LogConnectionBase*> m_logConnections; /**< Stores the pointers to the log connection objects. */
+    LogConfig m_logConfig;             /**< the global log system configuration. */
+    LogConfig* m_moduleLogConfig;      /**< the current module log system configuration. */
+    std::map<std::string, LogConfig> m_packageLogConfigs; /**< Stores the log config objects for packages. */
 
-    int* m_messageCounter;             /**< Counts the number of messages sent per message level. */
+    int m_messageCounter[LogConfig::c_Default]; /**< Counts the number of messages sent per message level. */
 
     /** The constructor is hidden to avoid that someone creates an instance of this class. */
     LogSystem();
@@ -167,7 +144,7 @@ namespace Belle2 {
      *
      * @param logLevel The logging level which should be increased by one.
      */
-    void incMessageCounter(LogCommon::ELogLevel logLevel);
+    void incMessageCounter(LogConfig::ELogLevel logLevel);
 
     static LogSystem* m_instance; /**< Pointer that saves the instance of this class. */
 

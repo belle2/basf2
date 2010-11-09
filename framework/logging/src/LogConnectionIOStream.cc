@@ -31,17 +31,10 @@ bool LogConnectionIOStream::isConnected()
 }
 
 
-bool LogConnectionIOStream::sendMessage(LogCommon::ELogLevel logLevel, const std::string& message, const std::string& package,
-                                        const std::string& function, const std::string& file, unsigned int line, bool sendLocationInfo)
+bool LogConnectionIOStream::sendMessage(LogMessage message)
 {
   if (isConnected()) {
-    (*m_stream) << "[" << LogCommon::logLevelToString(logLevel) << "] ";
-
-    if (sendLocationInfo) {
-      (*m_stream) << file << ":" << package << ", " << function << "():" << line << ": ";
-    }
-
-    (*m_stream) << message << endl;
+    (*m_stream) << message;
     return true;
   } else return false;
 }

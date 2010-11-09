@@ -14,6 +14,7 @@
 #include <framework/logging/Logger.h>
 #include <framework/logging/LogConnectionIOStream.h>
 #include <framework/logging/LogConnectionTxtFile.h>
+#include <framework/logging/LogConnectionFilter.h>
 
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreDefs.h>
@@ -109,15 +110,51 @@ int Framework::nprocess(void)
 // End of addition
 
 
-void Framework::setLoggingToShell()
+void Framework::setLogLevel(int logLevel)
 {
-  LogSystem::Instance().setLogConnection(new LogConnectionIOStream(std::cout));
+  LogSystem::Instance().config()->setLogLevel(static_cast<LogConfig::ELogLevel>(logLevel));
 }
 
 
-void Framework::setLoggingToTxtFile(const std::string& filename, bool append)
+void Framework::setDebugLevel(int debugLevel)
 {
-  LogSystem::Instance().setLogConnection(new LogConnectionTxtFile(filename, append));
+  LogSystem::Instance().config()->setDebugLevel(debugLevel);
+}
+
+
+void Framework::setAbortLevel(int abortLevel)
+{
+  LogSystem::Instance().config()->setAbortLevel(static_cast<LogConfig::ELogLevel>(abortLevel));
+}
+
+
+void Framework::setLogInfo(int logLevel, unsigned int logInfo)
+{
+  LogSystem::Instance().config()->setLogInfo(static_cast<LogConfig::ELogLevel>(logLevel), logInfo);
+}
+
+
+void Framework::setPackageLogLevel(std::string package, int logLevel, int debugLevel)
+{
+  LogSystem::Instance().addPackageLogConfig(package, LogConfig(static_cast<LogConfig::ELogLevel>(logLevel), debugLevel));
+}
+
+
+void Framework::addLoggingToShell()
+{
+  LogSystem::Instance().addLogConnection(new LogConnectionFilter(new LogConnectionIOStream(std::cout)));
+}
+
+
+void Framework::addLoggingToTxtFile(const std::string& filename, bool append)
+{
+  LogSystem::Instance().addLogConnection(new LogConnectionFilter(new LogConnectionTxtFile(filename, append)));
+}
+
+
+void Framework::resetLogging()
+{
+  LogSystem::Instance().resetLogConnections();
 }
 
 
@@ -166,9 +203,9 @@ boost::python::dict Framework::getLogStatisticPython() const
   boost::python::dict returnDict;
   LogSystem& logSys = LogSystem::Instance();
 
-  for (int iLevel = 0; iLevel < LogCommon::ELogLevelCount; ++iLevel) {
-    LogCommon::ELogLevel logLevel = static_cast<LogCommon::ELogLevel>(iLevel);
-    returnDict[boost::python::object(LogCommon::logLevelToString(logLevel))] = boost::python::object(logSys.getMessageCounter(logLevel));
+  for (int iLevel = 0; iLevel < LogConfig::c_Default; ++iLevel) {
+    LogConfig::ELogLevel logLevel = static_cast<LogConfig::ELogLevel>(iLevel);
+    returnDict[boost::python::object(LogConfig::logLevelToString(logLevel))] = boost::python::object(logSys.getMessageCounter(logLevel));
   }
 
   return returnDict;
@@ -198,8 +235,14 @@ void Framework::exposePythonAPI()
   .def("process", process2)
   .def("process", process3)
   .def("set_nprocess", set_nprocess)
-  .def("log_to_shell", &Framework::setLoggingToShell)
-  .def("log_to_txtfile", &Framework::setLoggingToTxtFile)
+  .def("log_level", &Framework::setLogLevel)
+  .def("debug_level", &Framework::setDebugLevel)
+  .def("abort_level", &Framework::setAbortLevel)
+  .def("log_info", &Framework::setLogInfo)
+  .def("log_package", &Framework::setPackageLogLevel)
+  .def("log_to_shell", &Framework::addLoggingToShell)
+  .def("log_to_txtfile", &Framework::addLoggingToTxtFile)
+  .def("reset_log", &Framework::resetLogging)
   .def("log_statistics", &Framework::getLogStatisticPython)
   ;
 }

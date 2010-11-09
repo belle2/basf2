@@ -141,17 +141,58 @@ namespace Belle2 {
     /* End of parallel processing additions */
 
 
-    /*! Sets the logging output to the shell (std::cout). */
-    void setLoggingToShell();
+    /**
+     * Configure the log level.
+     *
+     * @param logLevel The log level.
+     */
+    void setLogLevel(int logLevel);
 
     /**
-     * Sets the logging output to a text file.
+     * Configure the debug messaging level.
+     *
+     * @param debugLevel The debug level.
+     */
+    void setDebugLevel(int debugLevel);
+
+    /**
+     * Configure the abort log level.
+     *
+     * @param abortLevel The abort log level.
+     */
+    void setAbortLevel(int abortLevel);
+
+    /**
+     * Configure the printed log information for the given level.
+     *
+     * @param logLevel The log level.
+     * @param logInfo The log information that should be printed.
+     */
+    void setLogInfo(int logLevel, unsigned int logInfo);
+
+    /**
+     * Sets the log level and debug level for a package.
+     *
+     * @param package The package name.
+     * @param logLevel The log level.
+     * @param debugLevel The debug level.
+     */
+    void setPackageLogLevel(std::string package, int logLevel, int debugLevel);
+
+    /*! Adds the logging output to the shell (std::cout). */
+    void addLoggingToShell();
+
+    /**
+     * Adds the logging output to a text file.
      *
      * @param filename The path and name of the text file.
      * @param append If this value is set to true, an existing file will not be overridden,
      *               but instead the log messages will be added to the end of the file.
      */
-    void setLoggingToTxtFile(const std::string& filename, bool append);
+    void addLoggingToTxtFile(const std::string& filename, bool append);
+
+    /*! Removes all logging output. */
+    void resetLogging();
 
 
     //--------------------------------------------------

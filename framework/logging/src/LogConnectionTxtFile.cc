@@ -33,17 +33,10 @@ bool LogConnectionTxtFile::isConnected()
 }
 
 
-bool LogConnectionTxtFile::sendMessage(LogCommon::ELogLevel logLevel, const std::string& message, const std::string& package,
-                                       const std::string& function, const std::string& file, unsigned int line, bool sendLocationInfo)
+bool LogConnectionTxtFile::sendMessage(LogMessage message)
 {
   if (isConnected()) {
-    (*m_fileStream) << "[" << LogCommon::logLevelToString(logLevel) << "] ";
-
-    if (sendLocationInfo) {
-      (*m_fileStream) << file << ":" << package << ", " << function << "():" << line << ": ";
-    }
-
-    (*m_fileStream) << message << endl;
+    (*m_fileStream) << message;
     return true;
   } else return false;
 }

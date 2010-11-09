@@ -11,9 +11,6 @@
 #ifndef LOGMETHOD_H_
 #define LOGMETHOD_H_
 
-#include <framework/logging/LogCommon.h>
-#include <framework/logging/LogSystem.h>
-
 #include <string>
 
 namespace Belle2 {

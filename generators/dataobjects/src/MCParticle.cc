@@ -82,17 +82,16 @@ void MCParticle::fixParticleList() const
   if (m_plist != 0) return;
 
   TClonesArray* plist(0);
+
   //Search default location
-  //
   StoreArray<MCParticle> MCParticles(DEFAULT_MCPARTICLES);
   if (MCParticles->IndexOf(this) >= 0) {
     plist = MCParticles.getPtr();
   } else {
     //Search all StoreArrays which happen to store MCParticles
-    //FIXME: access to m_map which should be protected, but StoreIter seemed broken
-    StoreArrayMap  &map = *(DataStore::Instance().getArrayIterator(c_Event)->m_map);
-    for (StoreArrayMap::iterator it = map.begin(); it != map.end(); it++) {
-      TClonesArray &value = *(static_cast<TClonesArray*>(it->second));
+    StoreMapIter<StoreArrayMap>* iter = DataStore::Instance().getArrayIterator(c_Event);
+    for (iter->first(); iter->isDone(); iter++) {
+      TClonesArray &value = *(static_cast<TClonesArray*>(iter->value()));
       if (value.GetClass() == Class() && value.IndexOf(this) >= 0) {
         plist = &value;
         break;

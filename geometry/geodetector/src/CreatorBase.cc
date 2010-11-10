@@ -43,7 +43,7 @@ void CreatorBase::assignSensitiveVolumes(TG4RootDetectorConstruction* detConstru
   if (!m_hasGroupName) return;
 
   if (m_sensitiveDetMap.size() == 0) {
-    INFO_S("The Creator " << m_name << " has no sensitive detectors defined. Sensitive volume search is skipped.")
+    B2INFO("The Creator " << m_name << " has no sensitive detectors defined. Sensitive volume search is skipped.")
     return;
   }
 
@@ -52,11 +52,11 @@ void CreatorBase::assignSensitiveVolumes(TG4RootDetectorConstruction* detConstru
   //Create the path to the subdetector
   gGeoManager->CdTop();
   string subDetPath(gGeoManager->GetPath() + string("/") + m_geoGroupName + string("_1"));
-  INFO_S("Constructing " << m_geoGroupName << " sensitive volumes from TGeo path '" << subDetPath << "'...")
+  B2INFO("Constructing " << m_geoGroupName << " sensitive volumes from TGeo path '" << subDetPath << "'...")
 
   //Check if there is the specified subdetector available
   if (!gGeoManager->CheckPath(subDetPath.c_str())) {
-    ERROR("Could not find TGeo path to " << m_geoGroupName << " subdetector. Does the path " << subDetPath << " exist ?")
+    B2ERROR("Could not find TGeo path to " << m_geoGroupName << " subdetector. Does the path " << subDetPath << " exist ?")
     return;
   }
 
@@ -65,7 +65,7 @@ void CreatorBase::assignSensitiveVolumes(TG4RootDetectorConstruction* detConstru
   //Go recursively through the subdetector volumes and search for volumes having the prefix given by the creator.
   assignSensitiveVolumesRec(gGeoManager->GetCurrentVolume(), detConstruct);
 
-  INFO_S("...constructed " << m_senDetNumber << " sensitive " << m_geoGroupName << " volumes.")
+  B2INFO("...constructed " << m_senDetNumber << " sensitive " << m_geoGroupName << " volumes.")
 }
 
 
@@ -78,12 +78,12 @@ void CreatorBase::setDescription(const std::string& description)
 TGeoVolumeAssembly* CreatorBase::addSubdetectorGroup(const std::string& groupName, TGeoMatrix* groupTrafo)
 {
   if (m_hasGroupName) {
-    ERROR("The Creator " << m_name << " has already a subdetector group name !")
+    B2ERROR("The Creator " << m_name << " has already a subdetector group name !")
     return 0;
   }
 
   if (groupName.empty()) {
-    ERROR("Empty group name specified in creator " << m_name << " !")
+    B2ERROR("Empty group name specified in creator " << m_name << " !")
     return 0;
   }
 
@@ -100,7 +100,7 @@ void CreatorBase::addSensitiveDetector(const std::string prefix, G4VSensitiveDet
 {
   //Sensitive detector class check
   if (sensitiveDetector == NULL) {
-    ERROR("The sensitive detector class is NULL !")
+    B2ERROR("The sensitive detector class is NULL !")
     return;
   }
 
@@ -108,7 +108,7 @@ void CreatorBase::addSensitiveDetector(const std::string prefix, G4VSensitiveDet
   map<string, G4VSensitiveDetector*>::iterator foundIter = m_sensitiveDetMap.find(prefix);
 
   if (foundIter != m_sensitiveDetMap.end()) {
-    ERROR("The sensitive detector prefix " << prefix << " already exists in the Creator " << m_name << " !")
+    B2ERROR("The sensitive detector prefix " << prefix << " already exists in the Creator " << m_name << " !")
     return;
   }
 

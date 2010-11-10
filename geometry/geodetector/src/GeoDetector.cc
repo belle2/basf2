@@ -44,9 +44,9 @@ void GeoDetector::createDetector()
     string detectorName = detectorDir.getParamString("Name");
     string detectorDesc = detectorDir.getParamString("Description");
 
-    INFO_S("----------------------------------------------")
-    INFO_S("Creating geometry for detector: " << detectorName)
-    INFO_S("----------------------------------------------")
+    B2INFO("----------------------------------------------")
+    B2INFO("Creating geometry for detector: " << detectorName)
+    B2INFO("----------------------------------------------")
 
     m_calledCreators.clear();
 
@@ -54,8 +54,6 @@ void GeoDetector::createDetector()
     //deleting the old TGeoManager when the new one is created.
     new TGeoManager(detectorName.c_str(), detectorDesc.c_str());
     gGeoManager->Clear();
-
-    CreatorManager& creatorManager = CreatorManager::Instance();
 
     //Create ROOT objects by calling the associated creators
     //Loop over all supported sections
@@ -75,29 +73,29 @@ void GeoDetector::createDetector()
         string subDetName  = sectionDirLocal.getParamString("Name");
 
         if (!creatorName.empty()) {
-          INFO_S("Calling creator for: " << subDetName << " (" << creatorName << ")")
+          B2INFO("Calling creator for: " << subDetName << " (" << creatorName << ")")
 
-          CreatorBase& currCreator = creatorManager.getCreator(creatorName);
+          CreatorBase& currCreator = CreatorManager::Instance().getCreator(creatorName);
           GearDir content(sectionDir, queryString.str() + "Content/");
 
           //Create the TGeo objects
           currCreator.create(content);
           m_calledCreators.push_back(creatorName);
-        } else ERROR("Could not call creator. There was no creator defined (" + queryString.str() + "Creator" + ") !")
+        } else B2ERROR("Could not call creator. There was no creator defined (" + queryString.str() + "Creator" + ") !")
         }
     }
     gGeoManager->CloseGeometry();
 
   } catch (GearboxIOAbs::GearboxIONotConnectedError&) {
-    ERROR("Could not fetch parameters. No GearboxIO object was created !")
+    B2ERROR("Could not fetch parameters. No GearboxIO object was created !")
   } catch (CreatorManager::GeometryCreatorNotExistsError& exc) {
-    ERROR(exc.what())
+    B2ERROR(exc.what())
   } catch (GearboxIOAbs::GearboxPathNotValidError& exc) {
-    ERROR(exc.what())
+    B2ERROR(exc.what())
   } catch (GearboxIOAbs::GearboxPathEmptyResultError& exc) {
-    ERROR(exc.what())
+    B2ERROR(exc.what())
   } catch (...) {
-    ERROR("An error occurred during the creation of the detector geometry !")
+    B2ERROR("An error occurred during the creation of the detector geometry !")
   }
 }
 
@@ -108,9 +106,9 @@ void GeoDetector::saveToRootFile(const std::string& filename)
     string detectorName = Gearbox::Instance().getParamString("/Detector/Name");
     gGeoManager->Export(filename.c_str(), detectorName.c_str());
   } catch (GearboxIOAbs::GearboxIONotConnectedError&) {
-    ERROR("Could not fetch parameters. No GearboxIO object was created !")
+    B2ERROR("Could not fetch parameters. No GearboxIO object was created !")
   } catch (GearboxIOAbs::GearboxPathNotValidError& exc) {
-    ERROR(exc.what())
+    B2ERROR(exc.what())
   }
 }
 

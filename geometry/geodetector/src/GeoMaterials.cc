@@ -124,7 +124,7 @@ void GeoMaterials::createMaterialMixture(GearDir& content)
       TGeoMaterial* currMaterial = readMaterial(matContentIdx, weight);
 
       if (weight < 0.0) {
-        ERROR("The material " << currMaterial->GetName() << " has no weight defined. It was not added to the mixture " << geoMix->GetName())
+        B2ERROR("The material " << currMaterial->GetName() << " has no weight defined. It was not added to the mixture " << geoMix->GetName())
         continue;
       }
 
@@ -170,7 +170,7 @@ TGeoMaterial* GeoMaterials::readMaterial(GearDir& materialContent, double& weigh
 
   } else {
     geoMat = gGeoManager->GetMaterial(matName.c_str());
-    if (geoMat == NULL) ERROR("Material " << matName << " could not be found in gGeoManager !")
+    if (geoMat == NULL) B2ERROR("Material " << matName << " could not be found in gGeoManager !")
     }
 
   return geoMat;

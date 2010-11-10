@@ -47,7 +47,7 @@ void ParamLoaderXMLModule::initialize()
 {
   //Check parameters
   if (!ModuleUtils::fileNameExists(m_filenameXML)) {
-    ERROR("Parameter <InputFileXML>: The specified filename " << m_filenameXML << " does not exist !")
+    B2ERROR("Parameter <InputFileXML>: The specified filename " << m_filenameXML << " does not exist !")
   }
 
   GearboxIOXML* gearboxIOXML = new GearboxIOXML();
@@ -60,6 +60,6 @@ void ParamLoaderXMLModule::initialize()
     gearbox.enableParamCheck(m_paramCheck);
 
   } else {
-    ERROR("Could not open XML file: " << m_filenameXML)
+    B2ERROR("Could not open XML file: " << m_filenameXML)
   }
 }

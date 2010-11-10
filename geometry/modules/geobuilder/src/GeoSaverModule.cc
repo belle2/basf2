@@ -49,7 +49,7 @@ void GeoSaverModule::initialize()
 {
   //Check parameters
   if (!ModuleUtils::filePathExists(m_filenameROOT)) {
-    ERROR("Parameter <Filename>: The path of the filename " << m_filenameROOT << " does not exist !")
+    B2ERROR("Parameter <Filename>: The path of the filename " << m_filenameROOT << " does not exist !")
   }
 }
 

@@ -74,7 +74,7 @@ G4bool PXDSensitiveDetector::ProcessHits(G4Step* aStep, G4TouchableHistory*)
   //Get time (check for proper global time)
   const G4double globalTime = track.GetGlobalTime();
   if (isnan(globalTime)) {
-    ERROR("PXD Sensitive Detector: global time is nan !");
+    B2ERROR("PXD Sensitive Detector: global time is nan !");
     return false;
   }
 
@@ -102,7 +102,7 @@ G4bool PXDSensitiveDetector::ProcessHits(G4Step* aStep, G4TouchableHistory*)
 
   double radIn = sqrt(preStepPos[0] * preStepPos[0] + preStepPos[1] * preStepPos[1]);
 
-  INFO(vol.GetName() << " " << radIn)
+  B2INFO(vol.GetName() << " " << radIn)
 
   //-------------------------------------------------------
   //                Add hit to collection

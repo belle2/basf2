@@ -48,11 +48,11 @@ Bool_t B2GeomPXDSensor::init(GearDir& content)
   if (sensorContent.isParamAvailable("Silicon")) {
     volSilicon = new B2GeomPXDSensorSilicon(iLayer, iLadder, iSensor);
     if (!volSilicon->init(sensorContent)) {
-      printf("ERROR! Parameter reading for SVD silicon failed!\n");
+      printf("B2ERROR! Parameter reading for SVD silicon failed!\n");
       return false;
     }
   } else {
-    printf("ERROR! Definition of Silicon missing in XML file!\n");
+    printf("B2ERROR! Definition of Silicon missing in XML file!\n");
     return false;
   }
   printf("B2GeomPXDSensor::init stop\n");
@@ -68,7 +68,7 @@ Bool_t B2GeomPXDSensor::make()
                                  0.5 * fLength);
   // add silicon volume to sensor volume
   if (!volSilicon->make()) {
-    printf("ERROR! Cannot create silicon of PXD sensor!\n");
+    printf("B2ERROR! Cannot create silicon of PXD sensor!\n");
     return false;
   }
   tVolume->AddNode(volSilicon->getVol(), 1, volSilicon->getPosition());
@@ -101,21 +101,21 @@ Bool_t B2GeomPXDSensorSilicon::init(GearDir& content)
   if (siliconContent.isParamAvailable("Thinned")) {
     volThinned = new B2GeomPXDSensorThinned(iLayer);
     if (!volThinned->init(siliconContent)) {
-      printf("ERROR! Parameter reading for PXD silicon thinned failed!\n");
+      printf("B2ERROR! Parameter reading for PXD silicon thinned failed!\n");
       return false;
     }
   } else {
-    printf("ERROR! Definition of PXD Silicon Thinned missing in XML file!\n");
+    printf("B2ERROR! Definition of PXD Silicon Thinned missing in XML file!\n");
     return false;
   }
   if (siliconContent.isParamAvailable("Active")) {
     volActive = new B2GeomPXDSensorActive(iLayer, iLadder, iSensor);
     if (!volActive->init(siliconContent)) {
-      printf("ERROR! Parameter reading for SVD silicon active failed!\n");
+      printf("B2ERROR! Parameter reading for SVD silicon active failed!\n");
       return false;
     }
   } else {
-    printf("ERROR! Definition of PXD Silicon Active missing in XML file!\n");
+    printf("B2ERROR! Definition of PXD Silicon Active missing in XML file!\n");
     return false;
   }
   return true;
@@ -173,7 +173,7 @@ Bool_t B2GeomPXDSensorSilicon::make()
 
   // add thinned out volume with air
   if (!volThinned->make()) {
-    printf("ERROR! Cannot create thinned volume of PXD sensor!");
+    printf("B2ERROR! Cannot create thinned volume of PXD sensor!");
     return false;
   }
   tVolume->AddNode(volThinned->getVol(), 1, volThinned->getPosition());
@@ -181,7 +181,7 @@ Bool_t B2GeomPXDSensorSilicon::make()
 
   // add active volume to the silicon
   if (!volActive->make()) {
-    printf("ERROR! Cannot create active volume of PXD sensor!");
+    printf("B2ERROR! Cannot create active volume of PXD sensor!");
     return false;
   }
   tVolume->AddNode(volActive->getVol(), 1, volActive->getPosition());

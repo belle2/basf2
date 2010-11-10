@@ -57,7 +57,7 @@ Bool_t B2GeomVolume::initBasicParameters(GearDir& con)
         tMedium = gGeoManager->GetMedium(materialName.c_str());
         printf("...material ok!\n");
       } else {
-        printf("ERROR! No material provided in XML file\n");
+        printf("B2ERROR! No material provided in XML file\n");
         printf("Current XPath is: %s\n", content.getDirPath().c_str());
         return false;
       }

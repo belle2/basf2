@@ -201,34 +201,27 @@ double* GeoIRBelleII::createPipe(const char* name_,
           break;
         if (streamDirZ == 1  && ((end_   && pipePrevEnd.z() >= end_) || (start_ &&  pipePrevEnd.z() + pipeLength <= start_)))
           break;
-        cout << "Entered pipe: " << pipeName << endl;
-        cout << "pipeAngle:" << pipeAngle << "; pipeRadEnd: " << pipeRadEnd << endl;
 
         // collect information about next pipe
         GearDir pipeNextContent(streamContent);
         double pipeNextAngle = 0;
         if (iPipe < nPipe) {
-          cout << "more pipes!" << endl;
           pipeNextContent.append((format("Section[%1%]/Pipe[%2%]/") % (iSection) % (iPipe + 1)).str());
           if (pipeNextContent.isParamAvailable("Angle")) pipeNextAngle = pipeNextContent.getParamAngle("Angle") / deg;
         } else if (iSection < nSection) {
-          cout << "more sections!" << endl;
           pipeNextContent.append((format("Section[%1%]/Pipe[1]/") % (iSection + 1)).str());
           if (pipeNextContent.isParamAvailable("Angle")) pipeNextAngle = pipeNextContent.getParamAngle("Angle") / deg;
         }
-        cout << "pipeNextAngle" << pipeNextAngle << endl;
         // calculate position
         double pipeRotY   = pipePrevRotY + pipeAngle;
         double sint       = sin(pipeRotY * deg);
         double cost       = cos(pipeRotY * deg);
         TVector3 pipeRelEnd  = 0.5 * TVector3(pipeLength * sint, 0., streamDirZ * pipeLength * cost);   // pipe end relative to its centre
         TVector3 pipePos  = pipePrevEnd + pipeRelEnd;
-        cout << " mou boketeru w" << endl;
         // --- Add pipe
         double pipeRadInn = pipePrevRadEnd;
         double pipeRadOut = pipePrevRadEnd + sectionThickness;
         double pipeRadChange  = pipeRadEnd - pipePrevRadEnd;
-        cout << "pipeLength " << pipeLength << "; pipeRadInn " << pipeRadInn << "; pipeRadChange " << pipeRadChange << "; pipeAngle " << pipeAngle << "; pipeNextAngle " << pipeNextAngle << endl;
         TGeoRotation* pipeRot = new TGeoRotation(pipeName.c_str(), 90., pipeRotY, -90.);
         pipeRot->MultiplyBy(streamRot, kFALSE);
         TGeoCombiTrans* pipeTrans = new TGeoCombiTrans(pipeName.c_str(), pipePos.x(), 0.0, pipePos.z(), pipeRot);
@@ -391,18 +384,18 @@ void GeoIRBelleII::create(GearDir& content)
   double *overlap = new double[2];
   overlap[0] = 0;
   overlap[1] = 0;
-//  try {
-  overlap = createPipe("", IRPipe, IRMed, IRTrans, content, zMin, zMax, 0);
-  cout << "IR Chamber defined: returned - " << overlap[0] << ": " << overlap[1] << endl;
+  try {
+    overlap = createPipe("", IRPipe, IRMed, IRTrans, content, zMin, zMax, 0);
+    cout << "IR Chamber defined: returned - " << overlap[0] << ": " << overlap[1] << endl;
 
-  for (int i = 0; i < (int)IRPipe.size(); i++) {
-    TGeoVolume* IRPipeVol = new TGeoVolume(IRPipe[i]->GetName(), IRPipe[i], IRMed[i]);
-    IRPipeVol->SetLineColor(kTeal + 3);
-    volGrpBP->AddNode(IRPipeVol, 1, IRTrans[i]);
+    for (int i = 0; i < (int)IRPipe.size(); i++) {
+      TGeoVolume* IRPipeVol = new TGeoVolume(IRPipe[i]->GetName(), IRPipe[i], IRMed[i]);
+      IRPipeVol->SetLineColor(kTeal + 3);
+      volGrpBP->AddNode(IRPipeVol, 1, IRTrans[i]);
+    }
+  } catch (...) {             // ** change to GearboxIOAbs::GearboxPathNotValidError
+    cout << "No IR chamber streams defined." << endl;
   }
-//  } catch (...) {             // ** change to GearboxIOAbs::GearboxPathNotValidError
-//    cout << "No IR chamber streams defined." << endl;
-//  }
 
 
   // -------------------------------------------------

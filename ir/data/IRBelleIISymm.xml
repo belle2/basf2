@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ParamSet type="IR">
 	<Name>Belle II IR</Name>
-	<Description>Belle II IR geometry</Description>
+	<Description>Belle II IR geometry - Symmetric</Description>
 	<Version>0</Version>
 	<Creator>IRBelleIISymm</Creator>
 	<Content>
@@ -22,7 +22,7 @@
 				<OuterRadius unit="mm">10.01</OuterRadius>
 				<Material>Gold</Material>
 			</Shell>
-
+                        
 			<Shell name="InnerShell">
 				<InnerRadius unit="mm">10.01</InnerRadius>
 				<OuterRadius unit="mm">10.61</OuterRadius>
@@ -31,13 +31,13 @@
 			
 			<Shell name="CoolingGap">
 				<InnerRadius unit="mm">10.61</InnerRadius>
-				<OuterRadius unit="mm">11.01</OuterRadius>
+				<OuterRadius unit="mm">11.61</OuterRadius>
 				<Material>Paraffin</Material>
 			</Shell>
 			
 			<Shell name="OuterShell">
-				<InnerRadius unit="mm">11.01</InnerRadius>
-				<OuterRadius unit="mm">11.46</OuterRadius>
+				<InnerRadius unit="mm">11.61</InnerRadius>
+				<OuterRadius unit="mm">12.01</OuterRadius>
 				<Material>Beryllium</Material>
 			</Shell>
 		</Shells>

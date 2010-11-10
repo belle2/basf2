@@ -56,9 +56,9 @@ void B4DetectorConstruction::Initialize(TG4RootDetectorConstruction *dc)
       currCreator.initializeGeant4(dc);
 
     } catch (CreatorManager::GeometryCreatorNameEmptyError& exc) {
-      ERROR(exc.what());
+      B2ERROR(exc.what());
     } catch (CreatorManager::GeometryCreatorNotExistsError& exc) {
-      ERROR(exc.what());
+      B2ERROR(exc.what());
     }
   }
 }

@@ -83,7 +83,7 @@ void SimModule::initialize()
   TG4RootNavMgr* g4rootNav_mgr = TG4RootNavMgr::GetInstance(gGeoManager);
 
   if (g4rootNav_mgr == NULL) {
-    ERROR("Could not retrieve an instance of the TG4RootNavMgr !")
+    B2ERROR("Could not retrieve an instance of the TG4RootNavMgr !")
     return;
   }
 
@@ -120,7 +120,7 @@ void SimModule::initialize()
 #ifdef G4VIS_USE
   // For visualization, but need visualization drivers, like OpenGL.
   if (m_vis) {
-    INFO("Initializing G4SvcVisManager");
+    B2INFO("Initializing G4SvcVisManager");
     m_visMgr = new G4VisExecutive;
     m_visMgr->Initialize();
   }
@@ -132,7 +132,7 @@ void SimModule::initialize()
   G4UImanager* ui_manager = G4UImanager::GetUIpointer();
 
   if (!ui_manager) {
-    ERROR("Can not get G4 user interface pointer.");
+    B2ERROR("Can not get G4 user interface pointer.");
     exit(1);
   }
 
@@ -142,13 +142,13 @@ void SimModule::initialize()
 
   // Set macro file name
   if (m_macroName != "None") {
-    INFO("Running G4 macro " << m_macroName);
+    B2INFO("Running G4 macro " << m_macroName);
     ui_manager->ApplyCommand("/control/execute " + m_macroName);
   }
 
   // Enable interactive mode
   if (m_interactiveG4) {
-    INFO("Starting G4 terminal");
+    B2INFO("Starting G4 terminal");
 
     G4UIsession * ses = new G4UIterminal(new G4UItcsh);
     ses->SessionStart();

@@ -33,7 +33,7 @@ B4SteppingAction :: B4SteppingAction()
   m_worldBoxSize[1] = globalContent.getParamLength("WorldBox/Y");
   m_worldBoxSize[2] = globalContent.getParamLength("WorldBox/Z");
 
-  INFO("Geant4 tracking volume set to [cm]: " << m_worldBoxSize[0] << "," << m_worldBoxSize[1] << "," << m_worldBoxSize[2])
+  B2INFO("Geant4 tracking volume set to [cm]: " << m_worldBoxSize[0] << "," << m_worldBoxSize[1] << "," << m_worldBoxSize[2])
 
   //Default value for the maximum number of steps
   m_maxNumberSteps = 100000;
@@ -57,15 +57,15 @@ void B4SteppingAction::UserSteppingAction(const G4Step* aStep)
   //------------------------------
   if (track->GetVolume() == NULL) {
     const G4VProcess* lastproc = track->GetStep()->GetPostStepPoint()->GetProcessDefinedStep();
-    INFO("Event ID: " << G4RunManager::GetRunManager()->GetCurrentEvent()->GetEventID()
-         << " B4SteppingAction: Track in NULL volume, terminating!\n"
-         << " step_no=" + track->GetCurrentStepNumber()
-         << " type=" << track->GetDefinition()->GetParticleName()
-         << "\n volume=NULL"
-         << " last_process="
-         << (lastproc != 0 ? lastproc->GetProcessName() : G4String("NULL"))
-         << "\n position=" << G4BestUnit(track->GetPosition(), "Length")
-         << " momentum=" << G4BestUnit(track->GetMomentum(), "Energy"));
+    B2INFO("Event ID: " << G4RunManager::GetRunManager()->GetCurrentEvent()->GetEventID()
+           << " B4SteppingAction: Track in NULL volume, terminating!\n"
+           << " step_no=" + track->GetCurrentStepNumber()
+           << " type=" << track->GetDefinition()->GetParticleName()
+           << "\n volume=NULL"
+           << " last_process="
+           << (lastproc != 0 ? lastproc->GetProcessName() : G4String("NULL"))
+           << "\n position=" << G4BestUnit(track->GetPosition(), "Length")
+           << " momentum=" << G4BestUnit(track->GetMomentum(), "Energy"));
     track->SetTrackStatus(fStopAndKill);
     return;
   }
@@ -78,8 +78,8 @@ void B4SteppingAction::UserSteppingAction(const G4Step* aStep)
   if (fabs(stepPos.x()) > (m_worldBoxSize[0] + 1.0) * m ||
       fabs(stepPos.y()) > (m_worldBoxSize[1] + 1.0) * m ||
       fabs(stepPos.z()) > (m_worldBoxSize[2] + 1.0) * m) {
-    INFO("Event ID: " << G4RunManager::GetRunManager()->GetCurrentEvent()->GetEventID()
-         << " Out of World " << G4BestUnit(stepPos, "Length"));
+    B2INFO("Event ID: " << G4RunManager::GetRunManager()->GetCurrentEvent()->GetEventID()
+           << " Out of World " << G4BestUnit(stepPos, "Length"));
     track->SetTrackStatus(fStopAndKill);
     return;
   }
@@ -90,15 +90,15 @@ void B4SteppingAction::UserSteppingAction(const G4Step* aStep)
   if (track->GetCurrentStepNumber() > m_maxNumberSteps) {
     const G4VPhysicalVolume* pv = track->GetVolume();
     const G4VProcess* lastproc = track->GetStep()->GetPostStepPoint()->GetProcessDefinedStep();
-    INFO("Event ID: " << G4RunManager::GetRunManager()->GetCurrentEvent()->GetEventID()
-         << " B4SteppingAction: Too many steps for this track, terminating!\n"
-         << " step_no=" << track->GetCurrentStepNumber()
-         << " type=" << track->GetDefinition()->GetParticleName()
-         << "\n volume=" << (pv != 0 ? pv->GetName() : G4String("NULL"))
-         << " last_process="
-         << (lastproc != 0 ? lastproc->GetProcessName() : G4String("NULL"))
-         << "\n position=" << G4BestUnit(track->GetPosition(), "Length")
-         << " momentum=" << G4BestUnit(track->GetMomentum(), "Energy"));
+    B2INFO("Event ID: " << G4RunManager::GetRunManager()->GetCurrentEvent()->GetEventID()
+           << " B4SteppingAction: Too many steps for this track, terminating!\n"
+           << " step_no=" << track->GetCurrentStepNumber()
+           << " type=" << track->GetDefinition()->GetParticleName()
+           << "\n volume=" << (pv != 0 ? pv->GetName() : G4String("NULL"))
+           << " last_process="
+           << (lastproc != 0 ? lastproc->GetProcessName() : G4String("NULL"))
+           << "\n position=" << G4BestUnit(track->GetPosition(), "Length")
+           << " momentum=" << G4BestUnit(track->GetMomentum(), "Energy"));
     track->SetTrackStatus(fStopAndKill);
     return;
   }
@@ -116,20 +116,20 @@ void B4SteppingAction::UserSteppingAction(const G4Step* aStep)
       G4double range = c.GetRange(track->GetKineticEnergy(),
                                   track->GetDefinition(),
                                   pv->GetLogicalVolume()->GetMaterial());
-      WARNING("Event ID: " << G4RunManager::GetRunManager()->GetCurrentEvent()->GetEventID()
-              << " B4SteppingAction: Too many zero steps for this track, terminating!"
-              << G4BestUnit(aStep->GetStepLength(), "Length")
-              << " step_no=" << track->GetCurrentStepNumber()
-              << " type=" << track->GetDefinition()->GetParticleName()
-              << "\n volume=" << (pv != 0 ? pv->GetName() : G4String("NULL"))
-              << " last_process="
-              << (lastproc != 0 ? lastproc->GetProcessName() : G4String("NULL"))
-              << "\n position=" << G4BestUnit(track->GetPosition(), "Length")
-              << " momentum=" << G4BestUnit(track->GetMomentum(), "Energy")
-              << " kinetic energy=" << G4BestUnit(track->GetKineticEnergy(), "Energy")
-              << " material=" << pv->GetLogicalVolume()->GetMaterial()->GetName()
-              << " range=" << G4BestUnit(range, "Length")
-              << " num_zero=" << num_zero_steps_in_a_row);
+      B2WARNING("Event ID: " << G4RunManager::GetRunManager()->GetCurrentEvent()->GetEventID()
+                << " B4SteppingAction: Too many zero steps for this track, terminating!"
+                << G4BestUnit(aStep->GetStepLength(), "Length")
+                << " step_no=" << track->GetCurrentStepNumber()
+                << " type=" << track->GetDefinition()->GetParticleName()
+                << "\n volume=" << (pv != 0 ? pv->GetName() : G4String("NULL"))
+                << " last_process="
+                << (lastproc != 0 ? lastproc->GetProcessName() : G4String("NULL"))
+                << "\n position=" << G4BestUnit(track->GetPosition(), "Length")
+                << " momentum=" << G4BestUnit(track->GetMomentum(), "Energy")
+                << " kinetic energy=" << G4BestUnit(track->GetKineticEnergy(), "Energy")
+                << " material=" << pv->GetLogicalVolume()->GetMaterial()->GetName()
+                << " range=" << G4BestUnit(range, "Length")
+                << " num_zero=" << num_zero_steps_in_a_row);
       track->SetTrackStatus(fStopAndKill);
       num_zero_steps_in_a_row = 0;
       return;

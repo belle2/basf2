@@ -26,6 +26,7 @@ basf2authors = [
 # -----------------------------------------------
 
 # Check for environment variables set by the belle 2 release script
+envarReleaseDir = os.environ.get('BELLE2_RELEASE_DIR', None)
 envarLocalDir = os.environ.get('BELLE2_LOCAL_DIR', None)
 if envarLocalDir is None:
     print """The environment variable BELLE2_LOCAL_DIR is not set. Please execute the 'setuprel' script first."""
@@ -54,6 +55,19 @@ fw = Framework()
 
 # Add the module search path pointing to the modules shipped with the framework
 fw.add_module_search_path(basf2moddir)
+
+# -----------------------------------------------
+#         Load evtgen particle tables
+# -----------------------------------------------
+evtgen_loaded = fw.read_evtgen_table(os.path.join(envarLocalDir,
+                                     'externals/evtgen/DecFiles/scripts/evt.pdl'
+                                     ))
+if evtgen_loaded is not True:
+    evtgen_loaded = fw.read_evtgen_table(os.path.join(envarReleaseDir,
+            'externals/evtgen/DecFiles/scripts/evt.pdl'))
+
+if evtgen_loaded is not True:
+    print """ERROR: Could not load the evtgen table file !"""
 
 # -----------------------------------------------
 #             Print output

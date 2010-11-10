@@ -20,6 +20,8 @@
 #include <framework/datastore/StoreDefs.h>
 #include <framework/datastore/EventMetaData.h>
 
+#include "TDatabasePDG.h"
+
 
 using namespace std;
 using namespace Belle2;
@@ -102,6 +104,17 @@ void Framework::set_nprocess(int nproc)
 int Framework::nprocess(void)
 {
   return m_nproc;
+}
+
+
+bool Framework::readEvtGenTableFromFile(const std::string& filename)
+{
+  if (ModuleUtils::isFile(filename)) {
+    TDatabasePDG::Instance()->ReadEvtGenTable(filename.c_str());
+  } else {
+    return false;
+  }
+  return true;
 }
 
 
@@ -230,14 +243,15 @@ void Framework::exposePythonAPI()
   .def("process", process2)
   .def("process", process3)
   .def("set_nprocess", set_nprocess)
-  .def("log_level", &Framework::setLogLevel)
-  .def("debug_level", &Framework::setDebugLevel)
-  .def("abort_level", &Framework::setAbortLevel)
-  .def("log_info", &Framework::setLogInfo)
-  .def("log_package", &Framework::setPackageLogLevel)
+  .def("read_evtgen_table", &Framework::readEvtGenTableFromFile)
+  .def("set_log_level", &Framework::setLogLevel)
+  .def("set_debug_level", &Framework::setDebugLevel)
+  .def("set_abort_level", &Framework::setAbortLevel)
+  .def("set_log_info", &Framework::setLogInfo)
+  .def("set_log_package", &Framework::setPackageLogLevel)
   .def("log_to_shell", &Framework::addLoggingToShell)
   .def("log_to_txtfile", &Framework::addLoggingToTxtFile)
   .def("reset_log", &Framework::resetLogging)
-  .def("log_statistics", &Framework::getLogStatisticPython)
+  .def("get_log_statistics", &Framework::getLogStatisticPython)
   ;
 }

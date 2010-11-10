@@ -17,6 +17,7 @@
 #include <boost/python/dict.hpp>
 
 #include <framework/core/Module.h>
+#include <framework/core/ModuleUtils.h>
 #include <framework/core/ModuleManager.h>
 #include <framework/core/Path.h>
 #include <framework/core/PathManager.h>
@@ -124,22 +125,24 @@ namespace Belle2 {
      */
     void process(PathPtr startPath, long maxEvent, long runNumber);
 
-    /* Additions to implement parallel processing by R.Itoh */
-
     /**
-     * Function to set number of processes for parallel processing
+     * Function to set number of processes for parallel processing.
      *
      * @param nproc Number of processes for parallel processing
     */
     void set_nprocess(int nproc);
 
     /**
-     * Function to get number of processes for parallel processing
+     * Function to get number of processes for parallel processing.
     */
     static int nprocess(void);
 
-    /* End of parallel processing additions */
-
+    /**
+     * Reads the particle information from the evtgen table file specified by its filename.
+     * @param filename The path and the file which should be read and its content stored into TDatabasePDG.
+     * @return True if the filename exists and the content could be read.
+    */
+    bool readEvtGenTableFromFile(const std::string& filename);
 
     /**
      * Configure the log level.
@@ -235,9 +238,9 @@ namespace Belle2 {
 
   protected:
 
-    PathManager* m_pathManager;       /**< The path manager, which takes care of creating and handling paths. */
-    EventProcessor* m_eventProcessor; /**< The event processor, which loops over the events and calls the modules. */
-    pEventProcessor* m_peventProcessor; /*!< The event processor, which loops over the events and calls the modules. */
+    PathManager* m_pathManager;         /**< The path manager, which takes care of creating and handling paths. */
+    EventProcessor* m_eventProcessor;   /**< The event processor, which loops over the events and calls the modules. */
+    pEventProcessor* m_peventProcessor; /**< The event processor, which loops over the events and calls the modules. */
 
 
   private:

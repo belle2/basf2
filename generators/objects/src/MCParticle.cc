@@ -101,7 +101,7 @@ void MCParticle::fixParticleList() const
   }
   //Could not find any collection, raise exception
   if (!plist) {
-    ERROR("Could not determine StoreArray the MCParticle belongs to !");
+    B2ERROR("Could not determine StoreArray the MCParticle belongs to !");
     throw NoParticleListSetError();
   }
   //Set plist pointer and index for whole array

@@ -153,9 +153,9 @@ void HepevtReader::readParticle(MCParticleGraph::GraphParticle &particle) throw(
         const double &E  = particle.getEnergy();
         double dE = fabs(fields[9] - E) / E;
         if (dE > 1e-3) {
-          WARNING_S(boost::format("line %d: Energy of particle does not match with expected energy: %.6e != %.6e")
+          B2WARNING(boost::format("line %d: Energy of particle does not match with expected energy: %.6e != %.6e")
                     % m_lineNr % fields[9] % E);
-          WARNING_S(boost::format("delta E = %.2f%% -> ignoring given value") % (dE*100));
+          B2WARNING(boost::format("delta E = %.2f%% -> ignoring given value") % (dE*100));
         }
       }
       break;

@@ -48,7 +48,7 @@ void PrintMCParticles::event()
   StoreArray<MCParticle> MCParticles(m_particleList);
   m_seen.clear();
   m_seen.resize(MCParticles.GetEntries() + 1, false);
-  INFO_S("Content from MCParticle Collection '" + m_particleList + "':");
+  B2INFO("Content from MCParticle Collection '" + m_particleList + "':");
 
   //Loop over the primary particles (no mother particle exists)
   for (int i = 0; i < MCParticles.GetEntries(); i++) {
@@ -73,13 +73,13 @@ void PrintMCParticles::printTree(const MCParticle &mc, int level)
   string name = pdef ? (string(" (") + pdef->GetTitle() + ")") : "";
 
   if (m_seen[mc.getIndex()]) {
-    INFO_S(boost::format("%4d %s%10d%s*") % mc.getIndex() % indent % mc.getPDG() % name);
+    B2INFO(boost::format("%4d %s%10d%s*") % mc.getIndex() % indent % mc.getPDG() % name);
     return;
   }
   const TVector3& p = mc.getMomentum();
   const TVector3& v = mc.getVertex();
 
-  INFO_S(boost::format("%4d %s%10d%s%40tp:(%10.3e, %10.3e, %10.3e) v:(%10.3e, %10.3e, %10.3e), t:%10.3e,%10.3e, s:%d")
+  B2INFO(boost::format("%4d %s%10d%s%40tp:(%10.3e, %10.3e, %10.3e) v:(%10.3e, %10.3e, %10.3e), t:%10.3e,%10.3e, s:%d")
          % mc.getIndex() % indent % mc.getPDG() % name
          % p.X() % p.Y() % p.Z()
          % v.X() % v.Y() % v.Z()

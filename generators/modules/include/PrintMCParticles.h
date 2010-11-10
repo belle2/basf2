@@ -21,7 +21,7 @@ namespace Belle2 {
 
   /** The PrintMCParticles module.
    * Prints the content of the MCParticle collection
-   * as tree using the INFO message to the logging system.
+   * as tree using the B2INFO message to the logging system.
    */
   class PrintMCParticles : public Module {
 

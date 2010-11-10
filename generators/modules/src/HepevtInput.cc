@@ -47,7 +47,7 @@ void HepevtInput::initialize()
     m_hepevt.open(m_inputFileName);
     m_hepevt.skipEvents(m_skipEventNumber);
   } catch (runtime_error &e) {
-    FATAL_S(e.what());
+    B2FATAL(e.what());
   }
 }
 
@@ -62,7 +62,7 @@ void HepevtInput::event()
     }
     mpg.generate(DEFAULT_MCPARTICLES, MCParticleGraph::set_decay_info | MCParticleGraph::check_cyclic);
   } catch (runtime_error &e) {
-    ERROR_S(e.what());
+    B2ERROR(e.what());
     setProcessRecordType(prt_EndOfData);
   }
 }

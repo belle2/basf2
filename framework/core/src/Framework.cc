@@ -73,10 +73,6 @@ PathPtr Framework::createPath() throw(PathManager::PathNotCreatedError)
 
 void Framework::process(PathPtr startPath)
 {
-  /* Original coding
-  m_eventProcessor->process(startPath);
-  */
-  // Extended for parallel processing
   if (m_nproc == 0)
     m_eventProcessor->process(startPath);
   else
@@ -96,7 +92,7 @@ void Framework::process(PathPtr startPath, long maxEvent, long runNumber)
   m_eventProcessor->process(startPath, maxEvent, runNumber);
 }
 
-// Addition for parallel processing
+
 void Framework::set_nprocess(int nproc)
 {
   m_nproc = nproc;
@@ -107,30 +103,29 @@ int Framework::nprocess(void)
 {
   return m_nproc;
 }
-// End of addition
 
 
 void Framework::setLogLevel(int logLevel)
 {
-  LogSystem::Instance().config()->setLogLevel(static_cast<LogConfig::ELogLevel>(logLevel));
+  LogSystem::Instance().getLogConfig()->setLogLevel(static_cast<LogConfig::ELogLevel>(logLevel));
 }
 
 
 void Framework::setDebugLevel(int debugLevel)
 {
-  LogSystem::Instance().config()->setDebugLevel(debugLevel);
+  LogSystem::Instance().getLogConfig()->setDebugLevel(debugLevel);
 }
 
 
 void Framework::setAbortLevel(int abortLevel)
 {
-  LogSystem::Instance().config()->setAbortLevel(static_cast<LogConfig::ELogLevel>(abortLevel));
+  LogSystem::Instance().getLogConfig()->setAbortLevel(static_cast<LogConfig::ELogLevel>(abortLevel));
 }
 
 
 void Framework::setLogInfo(int logLevel, unsigned int logInfo)
 {
-  LogSystem::Instance().config()->setLogInfo(static_cast<LogConfig::ELogLevel>(logLevel), logInfo);
+  LogSystem::Instance().getLogConfig()->setLogInfo(static_cast<LogConfig::ELogLevel>(logLevel), logInfo);
 }
 
 

@@ -151,7 +151,7 @@ namespace Belle2 {
      *
      * @return The log system configuration.
      */
-    LogConfig* config() {return &m_logConfig;}
+    LogConfig* getLogConfiguration() {return &m_logConfig;}
 
     /**
      * Configure the log level.
@@ -352,7 +352,7 @@ namespace Belle2 {
     std::string m_description;    /**< The description of the module. */
     unsigned int m_propertyFlags; /**< The properties of the module (Master, multi processing etc.) saved as bitwise flags. */
 
-    LogConfig m_logConfig;     /**< the log system configuration of the module. */
+    LogConfig m_logConfig;        /**< The log system configuration of the module. */
 
     ModuleParamList m_moduleParamList; /**< List storing and managing all parameter of the module. */
 

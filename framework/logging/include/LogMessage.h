@@ -77,6 +77,7 @@ namespace Belle2 {
      */
     std::ostream& print(std::ostream& out) const;
 
+
   private:
 
     LogConfig::ELogLevel m_logLevel;  /**< The log level of the message. */

@@ -125,7 +125,6 @@ LogSystem::LogSystem() :
   m_logConfig.setLogInfo(LogConfig::c_Error, logInfo);
   m_logConfig.setLogInfo(LogConfig::c_Fatal, fatalLogInfo);
 
-//  m_messageCounter = new int[LogConfig::c_Default];
   resetMessageCounter();
 
   addLogConnection(new LogConnectionIOStream(std::cout));

@@ -75,10 +75,10 @@ namespace Belle2 {
     LogSystem::Instance().sendMessage(LogMessage(LogConfig::c_Fatal,stringBuffer.rdbuf()->str(),PACKAGENAME(),FUNCTIONNAME(),__FILE__,__LINE__));}
 
 // scoped logging for entering/leaving methods
-#ifdef LOG_NO_METHOD
-#define LOG_METHOD()
+#ifdef LOG_NO_B2METHOD
+#define B2METHOD()
 #else
-#define LOG_METHOD() LogMethod logMethod(PACKAGENAME(),FUNCTIONNAME(),__FILE__,__LINE__);
+#define B2METHOD() LogMethod logMethod(PACKAGENAME(),FUNCTIONNAME(),__FILE__,__LINE__);
 #endif
 
 }  // end namespace Belle2

@@ -70,21 +70,23 @@ namespace Belle2 {
      *
      * @return The log system configuration.
      */
-    LogConfig* config() {return &m_logConfig;}
+    LogConfig* getLogConfig() {return &m_logConfig;}
 
     /**
      * Sets the log configuration to the given module log configuration.
      * This method should _only_ be called by the EventProcessor.
      *
      * @param moduleLogConfig Pointer to the logging configuration object of the module.
+     *                        Set to NULL to use the global log configuration.
      */
     void setModuleLogConfig(LogConfig* moduleLogConfig) {m_moduleLogConfig = moduleLogConfig; };
 
     /**
-     * Sets the log configuration to the given module log configuration.
-     * This method should _only_ be called by the EventProcessor.
+     * Add the per package log configuration.
+     * Adds a new log configuration for the given package name.
      *
-     * @param moduleLogConfig Pointer to the logging configuration object of the module.
+     * @param package The name of the package whose log configuration should be added.
+     * @param logConfig The log configuration which should be assigned to the given package.
      */
     void addPackageLogConfig(std::string package, LogConfig logConfig) {m_packageLogConfigs[package] = logConfig; };
 
@@ -120,10 +122,10 @@ namespace Belle2 {
 
   private:
 
-    std::vector<LogConnectionBase*> m_logConnections; /**< Stores the pointers to the log connection objects. */
-    LogConfig m_logConfig;             /**< the global log system configuration. */
-    LogConfig* m_moduleLogConfig;      /**< the current module log system configuration. */
-    std::map<std::string, LogConfig> m_packageLogConfigs; /**< Stores the log config objects for packages. */
+    std::vector<LogConnectionBase*> m_logConnections;     /**< Stores the pointers to the log connection objects. */
+    LogConfig m_logConfig;                                /**< The global log system configuration. */
+    LogConfig* m_moduleLogConfig;                         /**< The current module log system configuration. */
+    std::map<std::string, LogConfig> m_packageLogConfigs; /**< Stores the log configuration objects for packages. */
 
     int m_messageCounter[LogConfig::c_Default]; /**< Counts the number of messages sent per message level. */
 

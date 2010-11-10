@@ -27,7 +27,7 @@ namespace Belle2 {
                      c_Warning, /**< Warning: for potential problems that the user should pay attention to. */
                      c_Error,   /**< Error: for things that went wrong and have to be fixed. */
                      c_Fatal,   /**< Fatal: for situations were the program execution can not be continued. */
-                     c_Default, /**< Default: use globally configured log level.  */
+                     c_Default  /**< Default: use globally configured log level.  */
                    };
 
     /** Definition of the supported log message information. */
@@ -71,13 +71,6 @@ namespace Belle2 {
     ELogLevel getLogLevel() {return m_logLevel; };
 
     /**
-     * Returns a reference to the log level.
-     *
-     * @return Returns a reference to the log level.
-     */
-    ELogLevel& logLevel() {return m_logLevel; };
-
-    /**
      * Configure the debug messaging level.
      *
      * @param debugLevel The debug level.
@@ -90,13 +83,6 @@ namespace Belle2 {
      * @return Returns the configured debug messaging level.
      */
     int getDebugLevel() {return m_debugLevel; };
-
-    /**
-     * Returns a reference to the debug level.
-     *
-     * @return Returns a reference to the debug level.
-     */
-    int& debugLevel() {return m_debugLevel; };
 
     /**
      * Configure the abort level.
@@ -127,11 +113,12 @@ namespace Belle2 {
      */
     unsigned int getLogInfo(ELogLevel logLevel) {return m_logInfo[logLevel]; };
 
+
   private:
 
-    ELogLevel m_logLevel;      /**< The log messaging level. Defined as int for the parameter handling. */
-    int m_debugLevel;          /**< The debug messaging level. */
-    ELogLevel m_abortLevel;    /**< The log level at which the execution should be stopped. */
+    ELogLevel m_logLevel;               /**< The log messaging level. Defined as int for the parameter handling. */
+    int m_debugLevel;                   /**< The debug messaging level. */
+    ELogLevel m_abortLevel;             /**< The log level at which the execution should be stopped. */
     unsigned int m_logInfo[c_Default];  /**< The kind of printed information per log level. */
 
   };

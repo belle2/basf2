@@ -98,13 +98,13 @@ void EventProcessor::processInitialize(const ModulePtrList& modulePathList)
     }
 
     //Set the module dependent log level
-    logSystem.setModuleLogConfig(module->config());
+    logSystem.setModuleLogConfig(module->getLogConfiguration());
 
     //Do initialization
     module->initialize();
 
     //Set the global log level
-    logSystem.setModuleLogConfig(0);
+    logSystem.setModuleLogConfig(NULL);
   }
 }
 
@@ -129,13 +129,13 @@ void EventProcessor::processCore(PathPtr startPath, const ModulePtrList& moduleP
       normalEvent = true;
 
       //Set the module dependent log level
-      logSystem.setModuleLogConfig(module->config());
+      logSystem.setModuleLogConfig(module->getLogConfiguration());
 
       //Call the event method of the module
       module->event();
 
       //Set the global log level
-      logSystem.setModuleLogConfig(0);
+      logSystem.setModuleLogConfig(NULL);
 
       //Check the returned process record type
       switch (module->getProcessRecordType()) {
@@ -199,13 +199,13 @@ void EventProcessor::processTerminate(const ModulePtrList& modulePathList)
     Module* module = listIter->get();
 
     //Set the module dependent log level
-    logSystem.setModuleLogConfig(module->config());
+    logSystem.setModuleLogConfig(module->getLogConfiguration());
 
     //Do termination
     module->terminate();
 
     //Set the global log level
-    logSystem.setModuleLogConfig(0);
+    logSystem.setModuleLogConfig(NULL);
   }
 
   //Delete persistent data in DataStore
@@ -222,13 +222,13 @@ void EventProcessor::processBeginRun(const ModulePtrList& modulePathList)
     Module* module = listIter->get();
 
     //Set the module dependent log level
-    logSystem.setModuleLogConfig(module->config());
+    logSystem.setModuleLogConfig(module->getLogConfiguration());
 
     //Do beginRun() call
     module->beginRun();
 
     //Set the global log level
-    logSystem.setModuleLogConfig(0);
+    logSystem.setModuleLogConfig(NULL);
   }
 }
 
@@ -242,13 +242,13 @@ void EventProcessor::processEndRun(const ModulePtrList& modulePathList)
     Module* module = listIter->get();
 
     //Set the module dependent log level
-    logSystem.setModuleLogConfig(module->config());
+    logSystem.setModuleLogConfig(module->getLogConfiguration());
 
     //Do endRun() call
     module->endRun();
 
     //Set the global log level
-    logSystem.setModuleLogConfig(0);
+    logSystem.setModuleLogConfig(NULL);
   }
 
   //Delete run related data in DataStore

@@ -29,9 +29,6 @@ Module::Module() :
     m_processRecordType(prt_Event),
     m_hasCondition(false)
 {
-  //Parameter definitions
-  addParam("LogLevel", *((int*)(&m_logConfig.logLevel())), static_cast<int>(LogConfig::c_Default), "The log level of the module [Debug=0, Info=1, Warning=2, Error=3, Fatal=4].");
-  addParam("DebugLevel", m_logConfig.debugLevel(), 100, "The debug level of the module.");
 }
 
 

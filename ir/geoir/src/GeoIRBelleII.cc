@@ -1,22 +1,21 @@
 /**************************************************************************
-*  BASF2 (Belle Analysis Framework 2)                                    *
-*  Copyright(C) 2010 - Belle II Collaboration                            *
-*                                                                        *
-*  Author: The Belle II Collaboration                                    *
-*  Contributors: Andreas Moll, Zbynek Drasal, Clement Ng                 *
-*                                                                        *
-*  This software is provided "as is" without any warranty.               *
-* *************************************************************************/
+ *  BASF2 (Belle Analysis Framework 2)                                    *
+ *  Copyright(C) 2010 - Belle II Collaboration                            *
+ *                                                                        *
+ *  Author: The Belle II Collaboration                                    *
+ *  Contributors: Clement Ng, Andreas Moll                                *
+ *                                                                        *
+ *  This software is provided "as is" without any warranty.               *
+ **************************************************************************/
 
 //** todo:
-// - Fix exception catching
 // - Would be a lot better implementing a separate classes for streams, shields, ip chamber etc
 //    to replace the pass vector to function method, which creates inaccessible new pointers etc
 
 #include <ir/geoir/GeoIRBelleII.h>
 
 #include <framework/gearbox/GearDir.h>
-//#include <framework/gearbox/GearboxIOAbs.h>
+#include <framework/gearbox/GearboxIOAbs.h>
 #include <framework/datastore/Units.h>
 #include <framework/logging/Logger.h>
 
@@ -383,10 +382,9 @@ void GeoIRBelleII::create(GearDir& content)
       IRPipeVol->SetLineColor(kTeal + 3);
       volGrpBP->AddNode(IRPipeVol, 1, IRTrans[i]);
     }
-  } catch (...) {             // ** change to GearboxIOAbs::GearboxPathNotValidError
-    B2ERROR("No IR chamber streams defined.")
+  } catch (runtime_error& exc) {
+    B2ERROR("No IR chamber streams defined ! " << exc.what())
   }
-
 
   // -------------------------------------------------
   // ---  Build shields ---
@@ -439,10 +437,9 @@ void GeoIRBelleII::create(GearDir& content)
       shieldVol->SetLineColor(kCyan + 4);
       volGrpBP->AddNode(shieldVol, 1);
     }
-  } catch (...) {             // ** change to GearboxIOAbs::GearboxPathNotValidError
-    B2ERROR("No shields defined.")
+  } catch (runtime_error& exc) {
+    B2ERROR("No shields defined ! " << exc.what())
   }
-
 
   // -------------------------------------------------
   // ---  Build IP Chamber ---
@@ -474,7 +471,7 @@ void GeoIRBelleII::create(GearDir& content)
       shellTube->SetLineColor(kOrange + 3);
       volGrpBP->AddNode(shellTube, 1, new TGeoTranslation(0.0, 0.0, offsetZ));    //translation moved to here
     }
-  } catch (...) {             // ** change to GearboxIOAbs::GearboxPathNotValidError
-    B2ERROR("No IP chamber defined.")
+  } catch (runtime_error& exc) {
+    B2ERROR("No IP chamber defined ! " << exc.what())
   }
 }

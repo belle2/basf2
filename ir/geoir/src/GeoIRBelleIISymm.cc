@@ -6,7 +6,7 @@
  *  Contributors: Clement Ng, Andreas Moll                                *
  *                                                                        *
  *  This software is provided "as is" without any warranty.               *
-* *************************************************************************/
+ **************************************************************************/
 
 //** todo:
 //  - allow default parameter values

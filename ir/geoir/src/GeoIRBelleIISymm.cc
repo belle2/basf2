@@ -1,12 +1,11 @@
 /**************************************************************************
-*  BASF2 (Belle Analysis Framework 2)                                    *
-*  Copyright(C) 2010 - Belle II Collaboration                            *
-*                                                                        *
-*  Author: The Belle II Collaboration                                    *
-*  Contributors: Andreas Moll, Zbynek Drasal                             *
-*  Modified to include surrounding IR geometry by Clement Ng
-*                                                                        *
-*  This software is provided "as is" without any warranty.               *
+ *  BASF2 (Belle Analysis Framework 2)                                    *
+ *  Copyright(C) 2010 - Belle II Collaboration                            *
+ *                                                                        *
+ *  Author: The Belle II Collaboration                                    *
+ *  Contributors: Clement Ng, Andreas Moll                                *
+ *                                                                        *
+ *  This software is provided "as is" without any warranty.               *
 * *************************************************************************/
 
 //** todo:
@@ -19,6 +18,7 @@
 
 #include <framework/gearbox/GearDir.h>
 #include <framework/datastore/Units.h>
+#include <framework/logging/Logger.h>
 
 #include <cmath>
 #include <boost/format.hpp>
@@ -30,7 +30,9 @@
 #include <TGeoVolume.h>
 #include <TGeoBBox.h>
 #include <TGeoPcon.h>
-#include "TGeoCompositeShape.h"
+#include <TGeoTube.h>
+#include <TGeoCone.h>
+#include <TGeoCompositeShape.h>
 
 #include <iostream>
 
@@ -59,22 +61,13 @@ GeoIRBelleIISymm::~GeoIRBelleIISymm()
 
 }
 
-#include "TGeoTube.h"
-#include "TGeoCone.h"
-// -----------------------------------------------------------
-// --- TGeoShape function for BelleII Pipe segment ---
-// --
-// - Will create a pipe shape, optionally cut along x-axis with either:
-// - - different angle ends
-// - - different radius ends
-// - but NOT both
 
 TGeoShape* GeoIRBelleIISymm::GeoBelleIICutPipe(const char* name_,
                                                const double length_,           // length of pipe
                                                const double radinn1_,          // inner radius at start
                                                const double radout1_,          // outer radius at start
                                                const double radchange_,        // change in radius
-                                               const double theta1_,     // angle to previous pipe
+                                               const double theta1_,           // angle to previous pipe
                                                const double theta2_,           // angle to next pipe
                                                const double cutheight_,        // x-axis cut distance from centre
                                                const int cutdirection_,        // x-axis cut direction (to do: 0 ignores cut)
@@ -93,7 +86,7 @@ TGeoShape* GeoIRBelleIISymm::GeoBelleIICutPipe(const char* name_,
   if (radinn2 != radinn1_) {
     // --- Form conical pipe
     if (theta1_ != theta2_) {
-      cout << "Warning: different end-angled cone pipes not supported: ignoring end-angles." << endl;
+      B2WARNING("Warning: different end-angled cone pipes not supported: ignoring end-angles.")
     }
     tube = new TGeoConeSeg(tubeName.c_str(), length_,
                            radinn1_, radout1_,
@@ -113,7 +106,10 @@ TGeoShape* GeoIRBelleIISymm::GeoBelleIICutPipe(const char* name_,
   pipeRot->RegisterYourself();
 
   string clipName       = string("clip") + string(name_);
-  TGeoBBox* clip        = new TGeoBBox(clipName.c_str(), radout1_, radout1_, length_ + radout1_);  // using halfSpace function may be faster? does not visualise properly
+
+  //Hint: Looks like a memory leak, but Root takes care of the created instance
+  new TGeoBBox(clipName.c_str(), radout1_, radout1_, length_ + radout1_);  // using halfSpace function may be faster? does not visualise properly
+
   string clipTransName       = "clipTrans" + string(name_);
   TGeoTranslation* clipTrans = new TGeoTranslation(clipTransName.c_str(), (cutdirection_*radout1_) + cutheight_, 0, 0);
   clipTrans->RegisterYourself();
@@ -131,11 +127,7 @@ TGeoShape* GeoIRBelleIISymm::GeoBelleIICutPipe(const char* name_,
   return pipe;
 }
 
-// -----------------------------------------------------------
-// ---  Pipe stream creator ---
-// --
-// Fills containers with specified range of pipe segments from GearDir content
-// ** Better to use shared_ptr?
+
 void GeoIRBelleIISymm::createPipe(const string& name_,
                                   vector<TGeoShape*>& shape_,
                                   vector<TGeoMedium*>& medium_,
@@ -143,7 +135,7 @@ void GeoIRBelleIISymm::createPipe(const string& name_,
                                   GearDir& content_,
                                   const double start_,
                                   const double end_,
-                                  const bool solid_)  // if true create solid pipes
+                                  const bool solid_)
 {
   // --- Collect global parameters
   double length     = content_.getParamLength("Length");
@@ -198,7 +190,7 @@ void GeoIRBelleIISymm::createPipe(const string& name_,
         // --- Collect pipe information
         string pipeName         = (format("%1%%2%%3%%4%") % name_ % streamName % sectionName % iPipe).str();
         double pipeLength   = pipeContent.getParamLength("Length");   // full length
-        double pipeAngle      = pipeContent.getParamAngle("Angle") / deg; // **to do: use previous if undefined
+        double pipeAngle    = pipeContent.getParamAngle("Angle") / deg; // **to do: use previous if undefined
         double pipeRadEnd   = pipeContent.getParamLength("RadiusEnd");  // **to do: use previous if undefined
 
         if (streamDirZ == -1 && ((start_ && pipePrevEnd.z() <= start_) || (end_   &&  pipePrevEnd.z() - pipeLength >= end_)))

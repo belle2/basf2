@@ -10,7 +10,7 @@
 
 //** todo:
 // - Fix exception catching
-// - Would be a lot better implenting a separate classes for streams, shields, ip chamber etc
+// - Would be a lot better implementing a separate classes for streams, shields, ip chamber etc
 //    to replace the pass vector to function method, which creates inaccessible new pointers etc
 
 #include <ir/geoir/GeoIRBelleII.h>
@@ -18,6 +18,7 @@
 #include <framework/gearbox/GearDir.h>
 //#include <framework/gearbox/GearboxIOAbs.h>
 #include <framework/datastore/Units.h>
+#include <framework/logging/Logger.h>
 
 #include <cmath>
 #include <boost/format.hpp>
@@ -29,7 +30,9 @@
 #include <TGeoVolume.h>
 #include <TGeoBBox.h>
 #include <TGeoPcon.h>
-#include "TGeoCompositeShape.h"
+#include <TGeoTube.h>
+#include <TGeoCone.h>
+#include <TGeoCompositeShape.h>
 
 #include <iostream>
 
@@ -58,14 +61,6 @@ GeoIRBelleII::~GeoIRBelleII()
 
 }
 
-#include "TGeoTube.h"
-#include "TGeoCone.h"
-// -----------------------------------------------------------
-// --- TGeoShape function for BelleII Pipe segment ---
-// --
-// - Will create a pipe shape with either (but NOT both):
-// - - different angle ends
-// - - different radius ends
 
 TGeoShape* GeoIRBelleII::GeoBelleIIPipe(const char* name_,
                                         const double length_,           // length of pipe
@@ -88,8 +83,8 @@ TGeoShape* GeoIRBelleII::GeoBelleIIPipe(const char* name_,
   if (radinn2 != radinn1_) {
     // --- Form conical pipe
     if (theta1_ != theta2_) {
-      cout << "Warning: different end-angled cone pipes not supported: ignoring end-angles." << endl
-           << "  Rad: " << radinn1_ << " -> " << radinn2 << "; Angle: " << theta1_ << "->" << theta2_ << endl;
+      B2WARNING("Warning: different end-angled cone pipes not supported: ignoring end-angles." <<
+                "  Rad: " << radinn1_ << " -> " << radinn2 << "; Angle: " << theta1_ << "->" << theta2_ << endl)
     }
     tube = new TGeoConeSeg(tubeName.c_str(), length_,
                            radinn1_, radout1_,
@@ -106,12 +101,7 @@ TGeoShape* GeoIRBelleII::GeoBelleIIPipe(const char* name_,
   return tube;
 }
 
-// -----------------------------------------------------------
-// ---  Outer pipes creator ---
-// --
-// Fills containers with specified range of pipes from GearDir content
-// Manages crotch pipe shape creation
-// Returns array of end overlap lengths with IP chamber due to the crotch joints
+
 double* GeoIRBelleII::createPipe(const char* name_,
                                  vector<TGeoShape*>& shape_,
                                  vector<TGeoMedium*>& medium_,
@@ -119,7 +109,7 @@ double* GeoIRBelleII::createPipe(const char* name_,
                                  GearDir& content_,
                                  double start_,
                                  double end_,
-                                 const bool solid_)     // if true create solid pipes
+                                 const bool solid_)
 {
   // --- Collect global parameters
   double length                 = 0;
@@ -312,7 +302,7 @@ double* GeoIRBelleII::createPipe(const char* name_,
       crotchRot->SetAngles(0, 180, 0);
       crotchName = string(name_) + "HERUpstreamCrotch";
     }
-    cout << "Combining " << nCrotchPipe << " pipes for crotch at " << crotchName << endl;
+    B2INFO("Combining " << nCrotchPipe << " pipes for crotch at " << crotchName)
 
     // --- Create extention to IP Beampipe to meet with crotch pipe
     double extRadOut    = IPBeampipeRad + sectionThickness;
@@ -329,7 +319,7 @@ double* GeoIRBelleII::createPipe(const char* name_,
     TGeoCombiTrans* extTrans = new TGeoCombiTrans(extName.c_str(), 0.0, 0.0, extPosZ, crotchRot);
     extTrans->RegisterYourself();
 
-    cout << "IP Chamber extension created: " << extName << endl;
+    B2INFO("IP Chamber extension created: " << extName)
 
     // Add outer crotch shapes
     string arg = string(extOutShape->GetName()) + ":" + string(extTrans->GetName());
@@ -343,7 +333,7 @@ double* GeoIRBelleII::createPipe(const char* name_,
         arg += "-" + string(crotchInn[side][i]->GetName()) + ":" + string(crotchTrans[side][i]->GetName());
     }
 
-    cout << "Creating crotch pipe: " << crotchName << " with arguments:" << endl << arg << endl;
+    B2INFO("Creating crotch pipe: " << crotchName << " with arguments:" << endl << arg)
 
     TGeoCompositeShape* crotchShape = new TGeoCompositeShape(crotchName.c_str(), arg.c_str());
 
@@ -352,7 +342,7 @@ double* GeoIRBelleII::createPipe(const char* name_,
     trans_.push_back(new TGeoCombiTrans());
     IPChamberOverlap[side] = extLength;
 
-    cout << "Crotch pipe defined. " << endl;
+    B2INFO("Crotch pipe defined. ")
   }
   return IPChamberOverlap;
 }
@@ -386,7 +376,7 @@ void GeoIRBelleII::create(GearDir& content)
   overlap[1] = 0;
   try {
     overlap = createPipe("", IRPipe, IRMed, IRTrans, content, zMin, zMax, 0);
-    cout << "IR Chamber defined: returned - " << overlap[0] << ": " << overlap[1] << endl;
+    B2INFO("IR Chamber defined: returned - " << overlap[0] << ": " << overlap[1])
 
     for (int i = 0; i < (int)IRPipe.size(); i++) {
       TGeoVolume* IRPipeVol = new TGeoVolume(IRPipe[i]->GetName(), IRPipe[i], IRMed[i]);
@@ -394,7 +384,7 @@ void GeoIRBelleII::create(GearDir& content)
       volGrpBP->AddNode(IRPipeVol, 1, IRTrans[i]);
     }
   } catch (...) {             // ** change to GearboxIOAbs::GearboxPathNotValidError
-    cout << "No IR chamber streams defined." << endl;
+    B2ERROR("No IR chamber streams defined.")
   }
 
 
@@ -437,7 +427,7 @@ void GeoIRBelleII::create(GearDir& content)
       vector<TGeoMedium*>shieldPipeMed;
       vector<TGeoCombiTrans*>shieldPipeTrans;
 
-      double* dummy = createPipe("ShieldPipe", shieldPipe, shieldPipeMed, shieldPipeTrans, content, shieldStart, shieldEnd, 1);
+      createPipe("ShieldPipe", shieldPipe, shieldPipeMed, shieldPipeTrans, content, shieldStart, shieldEnd, 1);
 
       string arg = shieldBulkName + ":" + shieldTrans->GetName();
       for (int i = 0; i < (int)shieldPipe.size(); i++) {
@@ -450,7 +440,7 @@ void GeoIRBelleII::create(GearDir& content)
       volGrpBP->AddNode(shieldVol, 1);
     }
   } catch (...) {             // ** change to GearboxIOAbs::GearboxPathNotValidError
-    cout << "No shields defined." << endl;
+    B2ERROR("No shields defined.")
   }
 
 
@@ -485,6 +475,6 @@ void GeoIRBelleII::create(GearDir& content)
       volGrpBP->AddNode(shellTube, 1, new TGeoTranslation(0.0, 0.0, offsetZ));    //translation moved to here
     }
   } catch (...) {             // ** change to GearboxIOAbs::GearboxPathNotValidError
-    cout << "No IP chamber defined." << endl;
+    B2ERROR("No IP chamber defined.")
   }
 }

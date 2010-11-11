@@ -8,9 +8,10 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <simulation/simkernel/B4SteppingAction.h>
 #include <framework/gearbox/Gearbox.h>
 #include <framework/logging/Logger.h>
+
+#include <simulation/simkernel/B4SteppingAction.h>
 
 #include "G4UnitsTable.hh"
 #include "G4Track.hh"

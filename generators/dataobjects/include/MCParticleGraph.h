@@ -18,7 +18,7 @@
 
 #include <framework/core/FrameworkExceptions.h>
 #include <framework/core/MemoryPool.h>
-#include <generators/objects/MCParticle.h>
+#include <generators/dataobjects/MCParticle.h>
 
 
 namespace Belle2 {

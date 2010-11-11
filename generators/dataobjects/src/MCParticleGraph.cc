@@ -19,7 +19,7 @@
 #include <boost/foreach.hpp>
 #include <boost/format.hpp>
 
-#include <generators/objects/MCParticleGraph.h>
+#include <generators/dataobjects/MCParticleGraph.h>
 
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreDefs.h>

@@ -20,7 +20,7 @@
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreDefs.h>
 #include <framework/datastore/StoreArray.h>
-#include <generators/objects/MCParticle.h>
+#include <generators/dataobjects/MCParticle.h>
 
 #include <boost/foreach.hpp>
 

@@ -15,7 +15,7 @@
 
 #include <string>
 #include <vector>
-#include <generators/objects/MCParticle.h>
+#include <generators/dataobjects/MCParticle.h>
 
 namespace Belle2 {
 

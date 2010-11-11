@@ -14,7 +14,7 @@
 #include <framework/core/Module.h>
 
 #include <string>
-#include <generators/objects/MCParticle.h>
+#include <generators/dataobjects/MCParticle.h>
 #include <generators/hepevt/HepevtReader.h>
 
 namespace Belle2 {

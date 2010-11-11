@@ -15,7 +15,7 @@
 #include <fstream>
 
 #include <framework/core/FrameworkExceptions.h>
-#include <generators/objects/MCParticleGraph.h>
+#include <generators/dataobjects/MCParticleGraph.h>
 
 namespace Belle2 {
 

@@ -240,6 +240,30 @@ namespace Belle2 {
     void append(const std::string& path);
 
     /**
+     * Appends a new path based on an index value to the current directory path.
+     *
+     * Useful to go into a deeper level of a hierarchy having the same identifier name.
+     * For example:
+     * <Ladders>
+     *  <Ladder> 1 </Ladder>
+     *  <Ladder> 2 </Ladder>
+     *  <Ladder> 3 </Ladder>
+     * </Ladders>
+     *
+     * Instead of having to write:
+     *  laddersContent.append((format("Ladder[%1%]/") % (iLadder)).str());
+     * this method allows to have it much shorter:
+     *  laddersContent.append("Ladder", iLadder);
+     *
+     * Please note: It is highly recommended to avoid having a trailing slash in the path parameter.
+     *              The path of the GearDir after this method has a trailing slash.
+     *
+     * @param path The path which is appended together with an index to the end of the current directory path.
+     * @param index The index value of the path.
+    */
+    void append(const std::string& path, int index);
+
+    /**
      * Appends the path of the given GearDir to the current directory path. Useful to go into a deeper level of the hierarchy.
      *
      * @param gearDir The path of the this GearDir is appended to the end of the current directory path.

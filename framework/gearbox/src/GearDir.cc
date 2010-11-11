@@ -130,6 +130,15 @@ void GearDir::append(const string& path)
 }
 
 
+void GearDir::append(const std::string& path, int index)
+{
+  //If there is a trailing '/' use the string except the last character
+  if (path[path.length()-1] == '/') {
+    m_dirPath += (path.substr(0, path.length() - 1) + (format("[%1%]/") % (index)).str());
+  } else m_dirPath += (path + (format("[%1%]/") % (index)).str());
+}
+
+
 void GearDir::append(GearDir& gearDir)
 {
   m_dirPath += gearDir.getDirPath();

@@ -144,7 +144,7 @@ double* GeoIRBelleII::createPipe(const char* name_,
 
     // --- Collect stream information
     GearDir streamContent(content_);
-    streamContent.append((format("Streams/Stream[%1%]/") % (iStream)).str());
+    streamContent.append("Streams/Stream", iStream);
     string streamName           = streamContent.getParamString("attribute::name");
     int streamDirZ              = int (streamContent.getParamNumValue("Direction"));
     TGeoRotation* streamRot     = new TGeoRotation();
@@ -160,7 +160,7 @@ double* GeoIRBelleII::createPipe(const char* name_,
 
     for (int iSection = 1; iSection <= nSection; ++iSection) {
       GearDir sectionContent(streamContent);
-      sectionContent.append((format("Section[%1%]/") % (iSection)).str());
+      sectionContent.append("Section", iSection);
 
       // --- Collect section information
       string sectionName        = sectionContent.getParamString("attribute::name");
@@ -176,7 +176,7 @@ double* GeoIRBelleII::createPipe(const char* name_,
 
       for (int iPipe = 1; iPipe <= nPipe; ++iPipe) {
         GearDir pipeContent(sectionContent);
-        pipeContent.append((format("Pipe[%1%]/") % (iPipe)).str());
+        pipeContent.append("Pipe", iPipe);
 
         // --- Collect pipe information
         string pipeName   = (format("%1%%2%%3%%4%") % name_ % streamName % sectionName % iPipe).str();
@@ -393,7 +393,7 @@ void GeoIRBelleII::create(GearDir& content)
     int nShield = content.getNumberNodes("Shields/Shield");
     for (int iShield = 1; iShield <= nShield; ++iShield) {
       GearDir shieldContent(content);
-      shieldContent.append((format("Shields/Shield[%1%]/") % (iShield)).str());
+      shieldContent.append("Shields/Shield", iShield);
 
       // --- Collect shield information
       string shieldName   = shieldContent.getParamString("attribute::name");
@@ -411,7 +411,7 @@ void GeoIRBelleII::create(GearDir& content)
       TGeoPcon* shieldBulk = new TGeoPcon(shieldBulkName.c_str(), 0, 360, nSeg);
       for (int iSeg = 1; iSeg <= nSeg; ++iSeg) {
         GearDir segContent(shieldContent);
-        segContent.append((format("Seg[%1%]/") % (iSeg)).str());
+        segContent.append("Seg" , iSeg);
         shieldBulk->DefineSection(iSeg - 1, segContent.getParamLength("z"), 0, segContent.getParamLength("rad"));
         if (iSeg == nSeg)
           shieldEnd = shieldStart + segContent.getParamLength("z");
@@ -455,7 +455,7 @@ void GeoIRBelleII::create(GearDir& content)
     int nShell = content.getNumberNodes("Shells/Shell");
     for (int iShell = 1; iShell <= nShell; ++iShell) {
       GearDir shellContent(content);
-      shellContent.append((format("Shells/Shell[%1%]/") % (iShell)).str());
+      shellContent.append("Shells/Shell", iShell);
 
       //Collect information
       string shellName    = shellContent.getParamString("attribute::name");

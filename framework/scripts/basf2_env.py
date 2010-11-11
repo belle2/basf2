@@ -8,7 +8,7 @@ from pybasf2 import *
 #             Set basf2 information
 # -----------------------------------------------
 basf2label = 'BASF2 (Belle Analysis Framework 2)'
-basf2version = '0.0.1'
+basf2version = os.environ.get('BELLE2_RELEASE', 'unknown')
 basf2copyright = 'Copyright(C) 2010 - Belle II Collaboration'
 basf2authors = [
     'Andreas Moll',

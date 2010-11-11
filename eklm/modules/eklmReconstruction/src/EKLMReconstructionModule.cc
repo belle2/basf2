@@ -30,19 +30,19 @@ EKLMReconstructionModule::~EKLMReconstructionModule()
 
 void EKLMReconstructionModule::initialize()
 {
-  INFO("EKLMReconstructionModule initialized");
+  B2INFO("EKLMReconstructionModule initialized");
 }
 
 void EKLMReconstructionModule::beginRun()
 {
-  DEBUG(1, "EKLMReconstructionModule : beginRun");
+  B2DEBUG(1, "EKLMReconstructionModule : beginRun");
 }
 
 void EKLMReconstructionModule::event()
 {
 
   EKLMRecon * recon = new EKLMRecon();
-  std::cout << "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB" << std::endl;
+  B2INFO("EKLMReconstructionModule::event() called")
   recon->readStripHits();
   recon->createSectorHits();
   recon->create2dHits();

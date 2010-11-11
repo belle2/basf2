@@ -39,7 +39,7 @@ EKLMHitBase::EKLMHitBase(std::string &name)
 
 void EKLMHitBase::Print()
 {
-  INFO("Not implemented yet");
+  B2INFO("Not implemented yet");
 }
 
 

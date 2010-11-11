@@ -29,7 +29,7 @@ namespace Belle2 {
     try {
       str = stripName.substr(stripName.find(elementName)); // get from elementName to the end
     } catch (exception& e) {
-      ERROR("exception caught:" << e.what() << " Strip name does not point " + elementName + "!");
+      B2ERROR("exception caught:" << e.what() << " Strip name does not point " + elementName + "!");
     }
     //    std::cout << "EKLMNameManipulator::getName(" << stripName << "," << elementName << ")=" << str << std::endl;
     return str;
@@ -50,7 +50,7 @@ namespace Belle2 {
       size_t pos2 = stripName.find("_", pos1 + 1);
       str = stripName.substr(pos1, pos2 - pos1); // get string btw elementName_  and next _
     } catch (exception& e) {
-      ERROR("exception caught:" << e.what() << elementName + " name does not point a number!");
+      B2ERROR("exception caught:" << e.what() << elementName + " name does not point a number!");
     }
     return boost::lexical_cast<int>(str);
   }
@@ -78,7 +78,7 @@ namespace Belle2 {
                        std::string("_") + boost::lexical_cast<std::string>(getVolumeNumber(stripName, "Strip"));
     // tempopary. Used for the procedure checks
     if (!gGeoManager->CheckPath(path.c_str()))
-      ERROR("Something goes wrong! Strip path is not found!");
+      B2ERROR("Something goes wrong! Strip path is not found!");
     return path.c_str();
   }
 }

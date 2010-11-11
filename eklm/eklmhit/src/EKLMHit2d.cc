@@ -66,7 +66,7 @@ bool EKLMHit2d::addStripHit(EKLMStripHit *stripHit)
   // important! getName() is case sensetive!!
 
   if (m_XStrip != NULL && m_YStrip != NULL) {
-    FATAL("Attempt to add more than 2 strips in 2d hit!");
+    B2FATAL("Attempt to add more than 2 strips in 2d hit!");
     exit(0);
   }
   if (m_XStrip == NULL && EKLMNameManipulator::isX(stripHit->getName())) {

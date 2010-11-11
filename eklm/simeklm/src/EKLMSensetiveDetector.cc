@@ -80,12 +80,12 @@ namespace Belle2 {
 
     // drop hit if global time is nan or if it is  mothe than hitTimeThreshold (to avoid nuclei fission signals)
     if (isnan(hitTime)) {
-      ERROR("EKLMSensetiveDetector: global time is nan");
+      B2ERROR("EKLMSensetiveDetector: global time is nan");
       return false;
 
       double hitTimeThreshold = 500; // should be parameter or accessev via xml
       if (hitTime > hitTimeThreshold) {
-        INFO("EKLMSensetiveDetector:  ALL HITS WITH TIME > hitTimeThreshold ARE DROPPED!!!!!!!");
+        B2INFO("EKLMSensetiveDetector:  ALL HITS WITH TIME > hitTimeThreshold ARE DROPPED!!!!!!!");
         return false;
       }
 
@@ -115,7 +115,7 @@ namespace Belle2 {
 
   void EKLMSensetiveDetector::EndOfEvent(G4HCofThisEvent *)
   {
-    DEBUG(1, " START DIGITIZATION");
+    B2DEBUG(1, " START DIGITIZATION");
 
     EKLMDigitizer *digi = new EKLMDigitizer(m_HitCollection);
 

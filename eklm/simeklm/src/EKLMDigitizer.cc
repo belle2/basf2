@@ -64,7 +64,7 @@ namespace Belle2 {
   //!  This function is intended to form StripHits from SimHits.
   void EKLMDigitizer::mergeSimHitsToStripHits()
   {
-    DEBUG(1, "STRAT MERGING HITS");
+    B2DEBUG(1, "STRAT MERGING HITS");
     for (std::map<std::string, std::vector<EKLMSimHit*> >::iterator it = m_HitStripMap.begin();
          it != m_HitStripMap.end(); it++) {
       std::vector<EKLMSimHit*> vectorHits = it->second;

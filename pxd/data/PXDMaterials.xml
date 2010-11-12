@@ -9,14 +9,58 @@
   <Version>0</Version>
   <Creator>GeoMaterials</Creator>
   <Content>
-    <Mixture name="PXD_Silicon">
-      <Density unit="g/cm3">2.3</Density>
+    <Mixture name="PXD_Glue">
+      <Density unit="g/cm3">1.13</Density>
       <Elements>
-        <Element name="Si" weight="1.0">
-          <AtomNumber>14.0</AtomNumber>
+        <Element name="C" weight="0.43902439">
+          <AtomNumber>6</AtomNumber>
+          <MassNumber>12.0107</MassNumber>
+        </Element>
+        <Element name="O" weight="0.073170732">
+          <AtomNumber>8</AtomNumber>
+          <MassNumber>15.9994</MassNumber>
+        </Element>
+        <Element name="H" weight="0.487804878">
+          <AtomNumber>1</AtomNumber>
+          <MassNumber>1.00794</MassNumber>
+        </Element>
+      </Elements>
+    </Mixture>
+
+    <Mixture name="PXD_Silicon">
+      <Density unit="g/cm3">2.33</Density>
+      <Elements>
+        <Element name="Si" weight="1">
+          <AtomNumber>14</AtomNumber>
           <MassNumber>28.0855</MassNumber>
         </Element>
       </Elements>
-    </Mixture>    
+    </Mixture>
+
+    <Mixture name="PXD_Implants">
+      <Density unit="g/cm3">8.96</Density>
+      <Elements>
+        <Element name="Cu" weight="1">
+          <AtomNumber>29</AtomNumber>
+          <MassNumber>63.546</MassNumber>
+        </Element>
+      </Elements>
+    </Mixture>
+
+    <Mixture name="PXD_SiliconSwitcher">
+      <Density unit="g/cm3">2.15870967741935</Density>
+      <Elements>
+        <Element name="Si" weight="0.744416873449131">
+          <AtomNumber>6</AtomNumber>
+          <MassNumber>12.0107</MassNumber>
+        </Element>
+        <Material name="PXD_Glue" weight="0.248138957816377"/>
+        <Element name="Au" weight="0.00744416873449132">
+          <AtomNumber>79</AtomNumber>
+          <MassNumber>196.96655</MassNumber>
+        </Element>
+      </Elements>
+    </Mixture>
+
   </Content>
 </ParamSet>

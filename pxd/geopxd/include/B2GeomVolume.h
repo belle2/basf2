@@ -2,6 +2,8 @@
 #include "TGeoVolume.h"
 #include "TGeoMaterial.h"
 #include "TGeoMatrix.h"
+#include "TMath.h"
+#include "TROOT.h"
 #include <framework/gearbox/GearDir.h>
 #include <framework/datastore/Units.h>
 #include <string>
@@ -10,14 +12,36 @@
 #define B2GEOMVOLUME_H_
 namespace Belle2 {
   class GearDir;
+
+  class B2GeomOffset {
+  public:
+    // offsets according to local coordinates of component (in cm, radians)
+    Double_t fOffsetW;
+    Double_t fOffsetU;
+    Double_t fOffsetV;
+    Double_t fOffsetPhi;
+    Double_t fOffsetTheta;
+    Double_t fOffsetPsi;
+    B2GeomOffset();
+    ~B2GeomOffset();
+  };
+
   class B2GeomVolume {
   protected:
+    char name[200];
+    char shape[200];
     TGeoVolume* tVolume;
+    // the sub components of this volume
+    // this = ladder => components = Sensors
+    // this = layer => components = Ladders
+    B2GeomVolume** components;
+    B2GeomOffset* offset;
+    // number of sub components (= numbers of sensors, ladders)
+    Int_t nComponents;
     TGeoMedium* tMedium;
     Double_t fMass;
     Double_t fDensityFactor;
-    Bool_t correctDensity();
-    Bool_t initBasicParameters(GearDir& content);
+
     // basic parameters
     Double_t fLength;
     Double_t fWidth;
@@ -37,14 +61,36 @@ namespace Belle2 {
     Bool_t isReflectZ;
     //! true = correctDensity() has been already called
     bool isDensityCorrected;
+    //! true = getOffset() has been called once
+    bool isCalculatedOffset;
+    //! true = resetBasicParameters() has been called
+    bool isReset;
+
+    Bool_t correctDensity();
+    void resetBasicParameters();
+    Bool_t initBasicParameters(GearDir& content);
+    Bool_t initOffsets(GearDir& con);
   public:
-    B2GeomVolume();
-    TGeoVolume* getVol() {
-      correctDensity();
-      return tVolume;
-    }
+
+    TGeoVolume* getVol();
     bool goToParentNode(GearDir& con, bool isShowDebug = false);
-    virtual TGeoHMatrix* getPosition();
+    //! returns the position of the volume with relation to the mother volume
+    TGeoHMatrix* getPosition();
+    //! sets the position of the volume with relation to the mother volume
+    void setPosition(TGeoHMatrix* newPosition);
+    //! gives the idel position of the volume with relation to its mother volume
+    TGeoHMatrix* getIdealPosition();
+    //! init this volume with parameters from GearDir
+    virtual Bool_t init(GearDir& content, std::string subDir);
+    //! init this volume with parameters from GearDir
+    virtual Bool_t init(GearDir& content) {return false;}
+    //! create TGeoVolume from the parameters
+    virtual Bool_t make();
+    // returns the offset from the ideal position
+    B2GeomOffset* getOffset();
+    Double_t getPhiLocal() {return fPhiLocal;}
+    Double_t getThetaLocal() {return fThetaLocal;}
+    Double_t getPsiLocal() {return fPsiLocal;}
   };
 }
 #endif

@@ -35,7 +35,6 @@ namespace Belle2 {
 
   class B2GeomPXDSensorActive : public B2GeomVolume {
   private:
-    string path;
     Int_t iLayer;
     Int_t iLadder;
     Int_t iSensor;
@@ -47,7 +46,6 @@ namespace Belle2 {
 
   class B2GeomPXDSensorThinned : public B2GeomVolume {
   private:
-    string path;
     Int_t iLayer;
   public:
     B2GeomPXDSensorThinned(Int_t iLay);
@@ -57,25 +55,39 @@ namespace Belle2 {
 
   class B2GeomPXDSensorSilicon: public B2GeomVolume {
   private:
-    string path;
     Int_t iLayer;
     Int_t iLadder;
     Int_t iSensor;
     B2GeomPXDSensorActive* volActive;
     B2GeomPXDSensorThinned* volThinned;
   public:
-    B2GeomPXDSensorSilicon(Int_t iLay, Int_t iLad, Int_t iSen);
-    Bool_t init(GearDir& content);
+    B2GeomPXDSensorSilicon(Int_t iLay, Int_t Ladder, Int_t Sensor);
     Bool_t make();
+    Bool_t init(GearDir& content);
   };
+
+  class B2GeomPXDSensorSwitchers1: public B2GeomVolume {
+  private:
+    Int_t iLayer;
+  public:
+    B2GeomPXDSensorSwitchers1(Int_t iLay);
+  };
+
+  class B2GeomPXDSensorSwitchers2: public B2GeomVolume {
+  private:
+    Int_t iLayer;
+  public:
+    B2GeomPXDSensorSwitchers2(Int_t iLay);
+  };
+
+
 
   class B2GeomPXDSensor : public B2GeomVolume {
   private:
-    //! path of this Sensor
-    string path;
-
     //! Volumes contained in the sensor
     B2GeomPXDSensorSilicon* volSilicon;
+    B2GeomPXDSensorSwitchers1* volSwitchers1;
+    B2GeomPXDSensorSwitchers2* volSwitchers2;
 
     // Parameters
     //! Layer number of this sensor

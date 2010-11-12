@@ -3,16 +3,35 @@
   <Sensor desc="The small PXD sensor" type="1">
     <SensorType desc="1 = Layer1, 2 = Layer2">1</SensorType>
     <Material>Air</Material>
-    <Width unit="mm">15</Width>
-    <Thickness unit="um">420</Thickness>
-    <Length unit="mm">67.975</Length>
-    <WPosition unit="um">210</WPosition>
     <ReflectX>1</ReflectX>
+    <Switchers1>
+      <Shape>Box</Shape>
+      <Material>PXD_SiliconSwitcher</Material>
+      <!-- These parameters are only estimation from drawing, please fill exact values! /-->
+      <Thickness unit="mm">0.3</Thickness>
+      <Width unit="mm">12</Width>
+      <Length unit="mm">10</Length>
+      <WPosition unit="mm">0.15</WPosition>
+      <UPosition unit="mm">-1</UPosition>
+      <VPosition unit="mm">-15.9875</VPosition>
+    </Switchers1>
+    <Switchers2>
+      <Shape>Box</Shape>
+      <Material>PXD_SiliconSwitcher</Material>
+      <!-- These parameters are only estimation from drawing, please fill exact values! /-->
+      <Thickness unit="mm">0.3</Thickness>
+      <Width unit="mm">2</Width>
+      <Length unit="mm">44.725</Length>
+      <WPosition unit="mm">0.15</WPosition>
+      <UPosition unit="mm">6.5</UPosition>
+      <VPosition unit="mm">11.625</VPosition>
+    </Switchers2>
     <Silicon>
       <Material>Silicon</Material>
       <Thickness desc="Thickness of the sensors" unit="um">420</Thickness>
       <Width desc="The over all width of the sensor" unit="mm">15</Width>
       <Length desc="The over all length of the sensor" unit="mm">67.975</Length>
+      <WPosition unit="mm">-0.21</WPosition>
       <Active>
         <Material>Silicon</Material>
         <Thickness desc="Thickness of the sensors" unit="um">75</Thickness>
@@ -33,23 +52,42 @@
         <UPosition unit="mm">-0.75</UPosition>
         <VPosition unit="mm">11.4</VPosition>
         <PhiLocal unit="deg">90</PhiLocal>
-        <ThetaLocal unit="deg">-90</ThetaLocal>
+        <ThetaLocal unit="deg">90</ThetaLocal>
         <PsiLocal unit="deg">90</PsiLocal>
       </Thinned>
     </Silicon>
   </Sensor>
   <Sensor desc="The large PXD sensor" type="2">
     <SensorType desc="1 = Layer1, 2 = Layer2">2</SensorType>
-    <Material>Silicon</Material>
-    <Thickness unit="um">420</Thickness>
-    <Width unit="mm">15</Width>
-    <Length unit="mm">84.975</Length>
-    <WPosition unit="um">-210</WPosition>
+    <Material>Air</Material>
+    <Switchers1>
+      <Shape>Box</Shape>
+      <Material>PXD_SiliconSwitcher</Material>
+      <!-- These parameters are only estimation from drawing, please fill exact values! /-->
+      <Thickness unit="mm">0.3</Thickness>
+      <Width unit="mm">12</Width>
+      <Length unit="mm">10</Length>
+      <WPosition unit="mm">0.15</WPosition>
+      <UPosition unit="mm">-1</UPosition>
+      <VPosition unit="mm">-24.4875</VPosition>
+    </Switchers1>
+    <Switchers2>
+      <Shape>Box</Shape>
+      <Material>PXD_SiliconSwitcher</Material>
+      <!-- These parameters are only estimation from drawing, please fill exact values! /-->
+      <Thickness unit="mm">0.3</Thickness>
+      <Width unit="mm">2</Width>
+      <Length unit="mm">61.725</Length>
+      <WPosition unit="mm">0.15</WPosition>
+      <UPosition unit="mm">6.5</UPosition>
+      <VPosition unit="mm">11.625</VPosition>
+    </Switchers2>
     <Silicon>
       <Material>Silicon</Material>
       <Length desc="The over all length of the sensor" unit="mm">84.975</Length>
       <Width desc="The over all width of the sensor" unit="mm">15</Width>
       <Thickness desc="Thickness of the sensor" unit="um">420</Thickness>
+      <WPosition unit="mm">-0.21</WPosition>
       <Active>
         <Material>Silicon</Material>
         <Thickness desc="Thickness of the active sensor" unit="um">75</Thickness>
@@ -60,17 +98,17 @@
         <VPosition unit="mm">11.375</VPosition>
       </Active>
       <Thinned>
-      <Material>Air</Material>
-      <Thickness unit="mm">61.775</Thickness>
-      <Thickness2 unit="mm">61.286</Thickness2>
-      <Width unit="mm">12</Width>
-      <Width2 unit="mm">11.511</Width2>
+        <Material>Air</Material>
+        <Thickness unit="mm">61.775</Thickness>
+        <Thickness2 unit="mm">61.286</Thickness2>
+        <Width unit="mm">12</Width>
+        <Width2 unit="mm">11.511</Width2>
         <Length unit="um">345</Length>
         <WPosition unit="mm">-0.0375</WPosition>
         <UPosition unit="mm">-0.75</UPosition>
         <VPosition unit="mm">11.4</VPosition>
         <PhiLocal unit="deg">90</PhiLocal>
-        <ThetaLocal unit="deg">-90</ThetaLocal>
+        <ThetaLocal unit="deg">90</ThetaLocal>
         <PsiLocal unit="deg">90</PsiLocal>
       </Thinned>
     </Silicon>

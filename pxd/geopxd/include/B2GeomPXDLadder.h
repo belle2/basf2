@@ -33,20 +33,11 @@ namespace Belle2 {
   class GearDir;
   class B2GeomPXDLadder : public B2GeomVolume {
   private:
-
-    //! path of this Ladder
-    string path;
-
-    //! Sensors of the ladder
-    B2GeomPXDSensor** b2gPXDSensors;
-
     // Parameters
     //! layer number
     Int_t iLayer;
     //! ladder number
     Int_t iLadder;
-    //! number of sensors
-    Int_t nSensors;
 
   public:
     B2GeomPXDLadder();

@@ -24,9 +24,8 @@ B2GeomPXDLadder::B2GeomPXDLadder(Int_t iLay, Int_t iLad)
 {
   iLayer = iLay;
   iLadder = iLad;
-  char text[200];
-  sprintf(text, "PXD_Layer_%i_Ladder_%i", iLayer, iLadder);
-  path = string(text);
+  sprintf(name, "PXD_Layer_%i_Ladder_%i", iLayer, iLadder);
+  resetBasicParameters();
 }
 
 B2GeomPXDLadder::~B2GeomPXDLadder()
@@ -44,12 +43,12 @@ Bool_t B2GeomPXDLadder::init(GearDir& content)
   // get number of sensors
   GearDir sensorsContent(ladderContent);
   sensorsContent.append("/Sensors/Sensor");
-  nSensors = int(sensorsContent.getNumberNodes());
+  nComponents = int(sensorsContent.getNumberNodes());
 
-  b2gPXDSensors = new B2GeomPXDSensor*[nSensors];
-  for (Int_t iSensor = 0; iSensor < nSensors; iSensor++) {
-    b2gPXDSensors[iSensor] = new B2GeomPXDSensor(iLayer, iLadder, iSensor);
-    b2gPXDSensors[iSensor]->init(ladderContent);
+  components = new B2GeomVolume*[nComponents];
+  for (Int_t iSensor = 0; iSensor < nComponents; iSensor++) {
+    components[iSensor] = new B2GeomPXDSensor(iLayer, iLadder, iSensor);
+    components[iSensor]->init(ladderContent);
   }
   //printf("B2GeomPXDLadder::init stop\n");
   return true;
@@ -59,10 +58,10 @@ Bool_t B2GeomPXDLadder::init(GearDir& content)
 Bool_t B2GeomPXDLadder::make()
 {
   //printf("B2GeomPXDLadder::make start (Lay:%i, Lad:%i)\n", iLayer, iLadder);
-  tVolume = new TGeoVolumeAssembly(path.c_str());
-  for (int iSensor = 0; iSensor < nSensors; ++iSensor) {
-    b2gPXDSensors[iSensor]->make();
-    tVolume->AddNode(b2gPXDSensors[iSensor]->getVol(), 1, b2gPXDSensors[iSensor]->getPosition());
+  tVolume = new TGeoVolumeAssembly(name);
+  for (int iSensor = 0; iSensor < nComponents; ++iSensor) {
+    components[iSensor]->make();
+    tVolume->AddNode(components[iSensor]->getVol(), 1, components[iSensor]->getPosition());
   }
   //printf("B2GeomPXDLadder::make stop\n");
   return true;

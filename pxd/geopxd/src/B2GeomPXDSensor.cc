@@ -25,11 +25,11 @@ B2GeomPXDSensor::B2GeomPXDSensor(Int_t iLay, Int_t iLad, Int_t iSen)
   iLayer = iLay;
   iLadder = iLad;
   iSensor = iSen;
-  B2GeomVolume();
-  char text[200];
-  sprintf(text, "PXD_Layer_%i_Ladder_%i_Sensor_%i", iLayer, iLadder, iSensor);
-  path = string(text);
+  resetBasicParameters();
+  sprintf(name, "PXD_Layer_%i_Ladder_%i_Sensor_%i", iLayer, iLadder, iSensor);
   volSilicon = NULL;
+  volSwitchers1 = NULL;
+  volSwitchers2 = NULL;
 }
 
 B2GeomPXDSensor::~B2GeomPXDSensor()
@@ -39,7 +39,7 @@ B2GeomPXDSensor::~B2GeomPXDSensor()
 
 Bool_t B2GeomPXDSensor::init(GearDir& content)
 {
-  printf("B2GeomPXDSensor::init start\n");
+  // printf("B2GeomPXDSensor::init start\n");
   GearDir sensorContent(content);
   sensorContent.append((format("Sensors/Sensor[@id=\'PXD_Layer_%1%_Ladder_Sensor_%2%\']/") % iLayer % iSensor).str());
   initBasicParameters(sensorContent);
@@ -55,24 +55,49 @@ Bool_t B2GeomPXDSensor::init(GearDir& content)
     printf("B2ERROR! Definition of Silicon missing in XML file!\n");
     return false;
   }
-  printf("B2GeomPXDSensor::init stop\n");
+
+  if (sensorContent.isParamAvailable("Switchers1")) {
+    volSwitchers1 = new B2GeomPXDSensorSwitchers1(iLayer);
+    if (!volSwitchers1->init(sensorContent, "Switchers1/")) return false;
+  }
+
+  if (sensorContent.isParamAvailable("Switchers2")) {
+    volSwitchers2 = new B2GeomPXDSensorSwitchers2(iLayer);
+    if (!volSwitchers2->init(sensorContent, "Switchers2/")) return false;
+  }
+
+  // init offsets from XML file
+  sensorContent.setDirPath((format("//Offsets/Sensor[@id=\'PXD_Offset_Layer_%1%_Ladder_%2%_Sensor_%3%\']/") % iLayer % iLadder % iSensor).str());
+  initOffsets(sensorContent);
+  // printf("B2GeomPXDSensor::init stop\n");
   return true;
 }
 
 Bool_t B2GeomPXDSensor::make()
 {
-  printf("B2GeomPXDSensor::make start\n");
-  tVolume = gGeoManager->MakeBox(path.c_str(), tMedium,
-                                 0.5 * fThickness,
-                                 0.5 * fWidth,
-                                 0.5 * fLength);
+  //printf("B2GeomPXDSensor::make start\n");
+  tVolume = new TGeoVolumeAssembly(name);
+
   // add silicon volume to sensor volume
   if (!volSilicon->make()) {
     printf("B2ERROR! Cannot create silicon of PXD sensor!\n");
     return false;
   }
   tVolume->AddNode(volSilicon->getVol(), 1, volSilicon->getPosition());
-  printf("B2GeomPXDSensor::make stop\n");
+
+  if (volSwitchers1 != NULL) {
+    volSwitchers1->make();
+    tVolume->AddNode(volSwitchers1->getVol(), 1, volSwitchers1->getPosition());
+    volSwitchers1->getVol()->SetLineColor(kGray + 3);
+  }
+
+  if (volSwitchers2 != NULL) {
+    volSwitchers2->make();
+    tVolume->AddNode(volSwitchers2->getVol(), 1, volSwitchers2->getPosition());
+    volSwitchers2->getVol()->SetLineColor(kGray + 3);
+  }
+
+  //printf("B2GeomPXDSensor::make stop\n");
   return true;
 }
 
@@ -85,10 +110,8 @@ B2GeomPXDSensorSilicon::B2GeomPXDSensorSilicon(Int_t iLay, Int_t iLad, Int_t iSe
   iLayer = iLay;
   iLadder = iLad;
   iSensor = iSen;
-  B2GeomVolume();
-  char nameSilicon[200];
-  sprintf(nameSilicon, "PXD_Layer_%i_Ladder_%i_Sensor_%i_Silicon", iLayer, iLadder, iSensor);
-  path = string(nameSilicon);
+  resetBasicParameters();
+  sprintf(name, "PXD_Layer_%i_Ladder_%i_Sensor_%i_Silicon", iLayer, iLadder, iSensor);
   volActive = NULL;
   volThinned = NULL;
 }
@@ -124,7 +147,7 @@ Bool_t B2GeomPXDSensorSilicon::init(GearDir& content)
 Bool_t B2GeomPXDSensorSilicon::make()
 {
 
-  printf("B2GeomPXDSensorSilicon::make start\n");
+  //printf("B2GeomPXDSensorSilicon::make start\n");
 
   /*
   char compShapeName[200];
@@ -164,7 +187,7 @@ Bool_t B2GeomPXDSensorSilicon::make()
    tVolume = new TGeoVolume(path.c_str(), shaSiliconMinusThinned);
   */
 
-  tVolume = gGeoManager->MakeBox(path.c_str(), tMedium,
+  tVolume = gGeoManager->MakeBox(name, tMedium,
                                  0.5 * fThickness,
                                  0.5 * fWidth,
                                  0.5 * fLength
@@ -177,7 +200,6 @@ Bool_t B2GeomPXDSensorSilicon::make()
     return false;
   }
   tVolume->AddNode(volThinned->getVol(), 1, volThinned->getPosition());
-  volThinned->getPosition()->Print();
 
   // add active volume to the silicon
   if (!volActive->make()) {
@@ -185,7 +207,7 @@ Bool_t B2GeomPXDSensorSilicon::make()
     return false;
   }
   tVolume->AddNode(volActive->getVol(), 1, volActive->getPosition());
-  printf("B2GeomPXDSensorSilicon::make stop\n");
+  //printf("B2GeomPXDSensorSilicon::make stop\n");
   return true;
 }
 
@@ -198,10 +220,8 @@ B2GeomPXDSensorActive::B2GeomPXDSensorActive(Int_t iLay, Int_t iLad, Int_t iSen)
   iLayer = iLay;
   iLadder = iLad;
   iSensor = iSen;
-  char text[200];
-  sprintf(text, "SD_PXD_Layer_%i_Ladder_%i_Sensor_%i_Silicon_Active", iLayer, iLadder, iSensor);
-  path = string(text);
-  B2GeomVolume();
+  sprintf(name, "SD_PXD_Layer_%i_Ladder_%i_Sensor_%i_Silicon_Active", iLayer, iLadder, iSensor);
+  resetBasicParameters();
 }
 
 Bool_t B2GeomPXDSensorActive::init(GearDir& content)
@@ -223,10 +243,8 @@ Bool_t B2GeomPXDSensorActive::init(GearDir& content)
 
 Bool_t B2GeomPXDSensorActive::make()
 {
-  char nameActive[200];
   // define the active volume of the SVD sensor
-  sprintf(nameActive, "%s", path.c_str());
-  tVolume = gGeoManager->MakeBox(nameActive, tMedium,
+  tVolume = gGeoManager->MakeBox(name, tMedium,
                                  fThickness * 0.5,
                                  fWidth * 0.5,
                                  fLength * 0.5);
@@ -240,10 +258,8 @@ Bool_t B2GeomPXDSensorActive::make()
 B2GeomPXDSensorThinned::B2GeomPXDSensorThinned(Int_t iLay)
 {
   iLayer = iLay;
-  char shaThinnedName[200];
-  sprintf(shaThinnedName, "PXD_Layer_%i_Silicon_Thinned", iLayer);
-  path = string(shaThinnedName);
-  B2GeomVolume();
+  sprintf(name, "PXD_Layer_%i_Silicon_Thinned", iLayer);
+  resetBasicParameters();
 }
 
 Bool_t B2GeomPXDSensorThinned::init(GearDir& content)
@@ -257,14 +273,40 @@ Bool_t B2GeomPXDSensorThinned::init(GearDir& content)
 
 Bool_t B2GeomPXDSensorThinned::make()
 {
-  tVolume = (TGeoVolume*) gROOT->FindObjectAny(path.c_str());
+  tVolume = (TGeoVolume*) gROOT->FindObjectAny(name);
   if (!tVolume) {
-    tVolume = gGeoManager->MakeTrd2(path.c_str(), tMedium,
+    tVolume = gGeoManager->MakeTrd2(name, tMedium,
                                     0.5 * fThickness,
                                     0.5 * fThickness2,
                                     0.5 * fWidth,
                                     0.5 * fWidth2,
                                     0.5 * fLength);
+    tVolume->SetLineColor(kWhite);
   }
   return true;
 }
+
+// ------------------------------------------------------------------------------------------------
+// Electronics1 of the PXD module
+// ------------------------------------------------------------------------------------------------
+
+B2GeomPXDSensorSwitchers1::B2GeomPXDSensorSwitchers1(Int_t iLay)
+{
+  iLayer = iLay;
+  sprintf(name, "PXD_Layer_%i_Switchers1", iLayer);
+  resetBasicParameters();
+}
+
+// ------------------------------------------------------------------------------------------------
+// Electronics2 of the PXD module
+// ------------------------------------------------------------------------------------------------
+
+B2GeomPXDSensorSwitchers2::B2GeomPXDSensorSwitchers2(Int_t iLay)
+{
+  iLayer = iLay;
+  sprintf(name, "PXD_Layer_%i_Switchers2", iLayer);
+  resetBasicParameters();
+}
+
+
+

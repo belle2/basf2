@@ -38,18 +38,12 @@ namespace Belle2 {
   class B2GeomPXDLayer : public B2GeomVolume {
 
   private:
-    //! path of this Layer
-    string path;
-
     //! number of the Layer - 1
     Int_t iLayer;
-    //! number of ladders per layer
-    Int_t nLadders;
     //! Rotation of whole PXD about z axis
     Double_t fPhi0;
     //! Rotation about z axis after moving to fRadius
     vector<Double_t> fPhi;
-    B2GeomPXDLadder** b2gPXDLadders;
 
   public:
     B2GeomPXDLayer();
@@ -57,7 +51,6 @@ namespace Belle2 {
     ~B2GeomPXDLayer();
     Bool_t init(GearDir& content);
     Bool_t make();
-
   };
 }
 #endif

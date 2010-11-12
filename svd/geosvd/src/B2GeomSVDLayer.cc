@@ -21,12 +21,10 @@ B2GeomSVDLayer::B2GeomSVDLayer()
 
 B2GeomSVDLayer::B2GeomSVDLayer(Int_t iLay)
 {
-  B2GeomVolume();
+  resetBasicParameters();
   iLayer = iLay;
-  char text[200];
-  sprintf(text, "SVD_Layer_%i", iLayer);
-  path = string(text);
-  printf("SVD Layer %i created! \n", iLayer);
+  printf("Create SVD Layer %i! \n", iLayer);
+  sprintf(name, "SVD_Layer_%i", iLayer);
 }
 
 B2GeomSVDLayer::~B2GeomSVDLayer()
@@ -39,33 +37,36 @@ Bool_t B2GeomSVDLayer::init(GearDir& content)
   GearDir layerContent(content);
   layerContent.append((format("Layers/Layer[@id=\'SVD_Layer_%1%\']/") % (iLayer)).str());
   fPhi0 = layerContent.getParamAngle("Phi0");
-  nLadders = int(layerContent.getParamNumValue("NumberOfLadders"));
-  b2gSVDLadders = new B2GeomSVDLadder*[nLadders];
-  fPhi.resize(nLadders);
-  for (int iLadder = 0; iLadder < nLadders; iLadder++) {
-    b2gSVDLadders[iLadder] = new B2GeomSVDLadder(iLayer, iLadder);
-    b2gSVDLadders[iLadder]->init(layerContent);
-    fPhi[iLadder] = iLadder * (360. / nLadders) + fPhi0;
+  nComponents = int(layerContent.getParamNumValue("NumberOfLadders"));
+  components = new B2GeomVolume*[nComponents];
+  for (int iLadder = 0; iLadder < nComponents; iLadder++) {
+    components[iLadder] = new B2GeomSVDLadder(iLayer, iLadder);
+    components[iLadder]->init(layerContent);
+
+    // add rotation about phi to the ladder parameters
+    TGeoHMatrix* componentPositionOld = components[iLadder]->getPosition();
+    TGeoRotation rotPhi("rotPhi", iLadder *(360. / nComponents) + fPhi0, 0.0, 0.0);
+    TGeoHMatrix componentPositionNew;
+    componentPositionNew.CopyFrom(componentPositionOld);
+    componentPositionNew = rotPhi * componentPositionNew;
+    TGeoHMatrix* componentPositionNewPointer = new TGeoHMatrix(componentPositionNew);
+    components[iLadder]->setPosition(componentPositionNewPointer);
+    delete componentPositionOld;
+    //delete componentPositionNewPointer;
   }
   return true;
 }
 
 Bool_t B2GeomSVDLayer::make()
 {
-  tVolume = new TGeoVolumeAssembly(path.c_str());
-  for (int iLadder = 0; iLadder < nLadders; ++iLadder) {
+  tVolume = new TGeoVolumeAssembly(name);
+  for (int iLadder = 0; iLadder < nComponents; ++iLadder) {
     // create Ladder
 
-    if (!b2gSVDLadders[iLadder]->make()) return false;
-
-    // rotate around z
-    TGeoRotation rotPhi = TGeoRotation("name", fPhi[iLadder], 0, 0);
-    TGeoHMatrix pos;
-    pos.CopyFrom(b2gSVDLadders[iLadder]->getPosition());
-    pos = rotPhi * pos;
+    if (!components[iLadder]->make()) return false;
 
     // position the ladder in the SVD layer
-    tVolume->AddNode(b2gSVDLadders[iLadder]->getVol(), 1, new TGeoHMatrix(pos));
+    tVolume->AddNode(components[iLadder]->getVol(), 1, components[iLadder]->getPosition());
   }
   return true;
 }

@@ -2,55 +2,47 @@
 <Sensors>
   <Sensor desc="The small SVD sensor" type="0">
     <Material>Air</Material>
-    <SensorType desc="0 = small sensor (layer3), 1 = normal sensor (layer 4,5,6)">0</SensorType>
-       <Silicon>
-      <Material>SVD_Silicon</Material>
-      <Thickness desc="The over all thickness of the sensor" unit="um">300</Thickness>
       <Length desc="The over all length of the sensor" unit="mm">122</Length>
       <Width desc="The overall width of the silicon" unit="mm">38.4</Width>
-      <PhiLocal desc="Rotation of the katpon volume before positioning it" unit="deg">90</PhiLocal>
-      <WPosition desc="The position of the silicon inside the sensor box" unit="um">150</WPosition>
-          <Active>
+    <Silicon>
       <Material>SVD_Silicon</Material>
-      <Length desc="The over all length of the active sensor" unit="mm">122</Length>
-      <Thickness desc="Thickness of the active sensors" unit="um">300</Thickness>
-      <Width desc="The over all width of active the sensor" unit="mm">38.4</Width>
-    </Active>
+      <Thickness desc="The over all thickness of the sensor" unit="um">300</Thickness>
+      <WPosition desc="The position of the silicon inside the sensor box" unit="um">150</WPosition>
+      <Active>
+        <Material>SVD_Silicon</Material>
+        <Length desc="The over all length of the active sensor" unit="mm">122</Length>
+        <Thickness desc="Thickness of the active sensors" unit="um">300</Thickness>
+        <Width desc="The over all width of active the sensor" unit="mm">38.4</Width>
+      </Active>
     </Silicon>
   </Sensor>
   <Sensor desc="The standard SVD sensor" type="1">
     <Material>Air</Material>
-    <SensorType desc="0 = small sensor (layer3), 1 = normal sensor (layer 4,5,6)">1</SensorType>
-    <!-- All numbers from TDR -->
-     <Silicon>
+    <Length desc="The over all length of the sensor" unit="mm">124.880</Length>
+    <Width desc="The overall width of the sensor" unit="mm">59.600</Width>
+    <Silicon>
       <Material>SVD_Silicon</Material>
       <Thickness desc="The over all thickness of the sensor" unit="um">300</Thickness>
-      <Length desc="The over all length of the sensor" unit="mm">124.880</Length>
-      <Width desc="The overall width of the sensor" unit="mm">59.600</Width>
       <!--- 0.5* silicon thickness -->
       <WPosition desc="The position of the silicon inside the sensor box" unit="um">150</WPosition>
-      <PhiLocal desc="Rotation of the katpon volume before positioning it" unit="deg">90</PhiLocal>
       <Active>
         <Material>SVD_Silicon</Material>
         <Thickness desc="Thickness of the active sensors" unit="um">300</Thickness>
         <Width desc="Width of the active sensor" unit="mm">57.72</Width>
-        <Length desc="Length of the active sensor" unit="mm">124.88</Length>
       </Active>
     </Silicon>
     <Foam>
       <Material>SVD_RohacellPad</Material>
+      <Mass unit="g">0.22634496</Mass>
       <Thickness desc="Thickness of the foam layer between capton and silicon" unit="mm">1</Thickness>
-            <Length desc="The over all length of the sensor" unit="mm">124.880</Length>
-      <Width desc="The overall width of the sensor" unit="mm">59.600</Width>
       <!--- silicon thickness + 0.5 * foam thickness  -->
       <WPosition desc="The W position of the kapton measured from the surface of the sensor" unit="mm">0.8</WPosition>
-      <PhiLocal desc="Rotation of the katpon volume before positioning it" unit="deg">90</PhiLocal>
     </Foam>
     <SMDs>
       <Material>SVD_SiliconChips</Material>
+      <Mass unit="g">0.685037475</Mass>
       <Width desc="The width of the SMDs" unit="mm">8.055</Width>
       <Thickness desc="The thickness of the SMDs" unit="mm">0.4</Thickness>
-      <Length desc="The over all length of the sensor" unit="mm">124.880</Length>
       <UPosition desc="The position of the SMDs in u direction" unit="mm">15.1725</UPosition>
       <!--- silicon thickness + foam thickness + kapton thickness + 0.5 * smds thickness-->
       <WPosition desc="The W position of the SMDs measured from the center of the sensor" unit="mm">1.6</WPosition>
@@ -58,32 +50,46 @@
   </Sensor>
   <Sensor desc="The wedge SVD sensor" type="2">
     <Material>Air</Material>
-    <SensorType desc="0 = small sensor (layer3), 1 = normal sensor (layer 4,5,6)">2</SensorType>
     <!-- All numbers from TDR -->
+    <Length desc="The over all length of the sensor" unit="mm">125.58</Length>
+    <Width desc="The overall width of the sensor" unit="mm">60.63</Width>
+    <Width2 desc="The overall width2 of the sensor" unit="mm">41.02</Width2>
     <Silicon>
-    <PhiLocal desc="Rotation of the katpon volume before positioning it" unit="deg">90</PhiLocal>
-    <WPosition desc="The position of the silicon inside the sensor box" unit="um">150</WPosition>
+      <WPosition desc="The position of the silicon inside the sensor box" unit="um">150</WPosition>
       <Material>SVD_Silicon</Material>
       <Thickness desc="The over all thickness of the sensor" unit="um">300</Thickness>
-      <Length desc="The over all length of the sensor" unit="mm">125.58</Length>
-      <Width desc="The overall width of the sensor" unit="mm">60.63</Width>
-      <Width2 desc="The overall width2 of the sensor" unit="mm">41.02</Width2>
-          <Active>
-      <Material>SVD_Silicon</Material>
-      <Thickness desc="Thickness of the active sensors" unit="um">300</Thickness>
-      <Width desc="Width of the active sensor" unit="mm">57.59</Width>
-      <Width2 desc="Width2 of the active sensor" unit="mm">38.42</Width2>
-      <Length desc="Length of the active sensor" unit="mm">122.76</Length>
-    </Active>
+      <Active>
+        <Material>SVD_Silicon</Material>
+        <Thickness desc="Thickness of the active sensors" unit="um">300</Thickness>
+        <Width desc="Width of the active sensor" unit="mm">57.59</Width>
+        <Width2 desc="Width2 of the active sensor" unit="mm">38.42</Width2>
+        <Length desc="Length of the active sensor" unit="mm">122.76</Length>
+      </Active>
     </Silicon>
+    <Foam>
+      <Material>SVD_RohacellPad</Material>
+      <Mass unit="g">0.186624</Mass>
+      <Thickness desc="Thickness of the foam layer between capton and silicon" unit="mm">1</Thickness>
+      <!--- silicon thickness + 0.5 * foam thickness  -->
+      <WPosition desc="The W position of the kapton measured from the surface of the sensor" unit="mm">0.8</WPosition>
+    </Foam>
   </Sensor>
-      <Kapton>
-      <Material>SVD_Kapton</Material>
-      <Thickness desc="Thickness of the kapton layer" unit="mm">0.1</Thickness>
-      <Length desc="The over all length of the sensor" unit="mm">124.880</Length>
-      <Width desc="The overall width of the sensor" unit="mm">59.600</Width>
-      <!--- silicon thickness + foam thickness + 0.5* kapton thickness -->
-      <WPosition desc="The W position of the kapton measured from the center of the sensor" unit="mm">1.35</WPosition>
-      <PhiLocal desc="Rotation of the katpon volume before positioning it" unit="deg">90</PhiLocal>
-    </Kapton>
+  <Kapton>
+    <Material>SVD_Kapton</Material>
+    <Thickness desc="Thickness of the kapton layer" unit="mm">0.1</Thickness>
+    <!--- silicon thickness + foam thickness + 0.5* kapton thickness -->
+    <WPosition desc="The W position of the kapton measured from the center of the sensor" unit="mm">1.35</WPosition>
+  </Kapton>
+  <KaptonFlex>
+    <Material>SVD_KaptonFlex</Material>
+    <Thickness desc="Thickness of the kapton flex layer" unit="mm">0.1</Thickness>
+    <!--- -0.5*  thickness -->
+    <WPosition desc="The W position of the kapton measured from the center of the sensor" unit="mm">-0.05</WPosition>
+  </KaptonFlex>
+  <KaptonFront>
+    <Material>SVD_KaptonFront</Material>
+    <Thickness desc="Thickness of the kapton front layer" unit="mm">0.1</Thickness>
+    <!--- -0.5*  Thickness -../KaptonFront/Thickness-->
+    <WPosition desc="The W position of the kapton measured from the center of the sensor" unit="mm">-0.15</WPosition>
+   </KaptonFront>
 </Sensors>

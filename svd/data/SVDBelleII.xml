@@ -5,8 +5,7 @@
   <Version>0</Version>
   <Creator>SVDBelleII</Creator>
   <Content xmlns:xi="http://www.w3.org/2001/XInclude">
-    <!-- Offsets of the SVD -->
-    <xi:include href="SVDOffsetsBelleII.xml"/>
+  <Offsets> <xi:include href="SVDOffsets.xml" xpointer="xpointer(//Offsets/*)"/></Offsets>
     <!-- these variables are already stored in the offset file, they should be removed from here, but the framework asks for it -->
     <Rotation>0</Rotation>
     <OffsetZ>0</OffsetZ>
@@ -22,10 +21,18 @@
             <Sensor id="SVD_Layer_3_Ladder_Sensor_0">
               <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Sensor[@type=0]/*)"/>
               <VPosition desc="sensor position (middle of the volume) in V (local coordinate system of ladder)" unit="mm">-34.2</VPosition>
+              <KaptonFront>
+                <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//KaptonFront/*)"/>
+                <Mass unit="g">0.369843269592233</Mass>
+              </KaptonFront>
             </Sensor>
             <Sensor id="SVD_Layer_3_Ladder_Sensor_1">
               <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Sensor[@type=0]/*)"/>
               <VPosition desc="sensor position (middle of the volume) in V (local coordinate system of ladder)" unit="mm">88</VPosition>
+              <KaptonFront>
+                <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//KaptonFront/*)"/>
+                <Mass unit="g">0.369843269592233</Mass>
+              </KaptonFront>
             </Sensor>
           </Sensors>
         </Ladders>
@@ -46,6 +53,7 @@
           </Barrel>
           <CoolingPipe>
             <xi:include href="SVDLadderBelleII.xml" xpointer="xpointer(/*/CoolingPipe/*)"/>
+            <Mass unit="g">1.70056838960177</Mass>
             <!-- The following parameters are ONLY ESTIMASTIONS and NOT CORRECT!!!! /!-->
             <Length desc="The length of the cooling pipe" unit="mm">249.88</Length>
             <VPosition desc="The position of the cooling pipe in V direction" unit="mm">-41.43</VPosition>
@@ -56,16 +64,24 @@
               <VPosition desc="sensor position (middle of the volume) in V (local coordinate system of ladder)" unit="mm">-98.81</VPosition>
               <Kapton>
                 <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Kapton/*)"/>
-                <DensityFactor desc="How many layers of kapton for this sensor?">1</DensityFactor>
+                <Mass unit="g">2.10072635462545</Mass>
               </Kapton>
+              <KaptonFront>
+                <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//KaptonFront/*)"/>
+                <Mass unit="g">0.554764904388349</Mass>
+              </KaptonFront>
             </Sensor>
             <Sensor id="SVD_Layer_4_Ladder_Sensor_1">
+              <Mass unit="g">2.10072635462545</Mass>
               <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Sensor[@type=1]/*)"/>
               <VPosition desc="sensor position (middle of the volume) in V (local coordinate system of ladder)" unit="mm">26.19</VPosition>
               <Kapton>
                 <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Kapton/*)"/>
-                <DensityFactor desc="How many layers of kapton for this sensor?">1</DensityFactor>
               </Kapton>
+              <KaptonFlex>
+                <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//KaptonFlex/*)"/>
+                <Mass unit="g">1.00883971686634</Mass>
+              </KaptonFlex>
             </Sensor>
             <Sensor id="SVD_Layer_4_Ladder_Sensor_2">
               <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Sensor[@type=2]/*)"/>
@@ -74,6 +90,10 @@
               <PhiLocal unit="deg">-90</PhiLocal>
               <ThetaLocal desc="rotation about Euler angle Theta in LOCAL coordinate system" unit="deg">11.9</ThetaLocal>
               <PsiLocal unit="deg">90</PsiLocal>
+              <KaptonFront>
+                <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//KaptonFront/*)"/>
+                <Mass unit="g">0.457409988349515</Mass>
+              </KaptonFront>
             </Sensor>
           </Sensors>
         </Ladders>
@@ -93,6 +113,7 @@
             </Ribs>
           </Barrel>
           <CoolingPipe>
+            <Mass unit="g">2.41599739411755</Mass>
             <xi:include href="SVDLadderBelleII.xml" xpointer="xpointer(/*/CoolingPipe/*)"/>
             <!-- The following parameters are ONLY ESTIMASTIONS and NOT CORRECT!!!! /!-->
             <Length desc="The length of the cooling pipe" unit="mm">374.88</Length>
@@ -104,24 +125,36 @@
               <VPosition desc="sensor position (middle of the volume) in V (local coordinate system of ladder)" unit="mm">-146.08</VPosition>
               <Kapton>
                 <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Kapton/*)"/>
-                <DensityFactor desc="How many layers of kapton for this sensor?">1</DensityFactor>
+                <Mass unit="g">4.20145270925089</Mass>
               </Kapton>
+              <KaptonFront>
+                <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//KaptonFront/*)"/>
+                <Mass unit="g">0.554764904388349</Mass>
+              </KaptonFront>
             </Sensor>
             <Sensor id="SVD_Layer_5_Ladder_Sensor_1">
               <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Sensor[@type=1]/*)"/>
               <VPosition desc="sensor position (middle of the volume) in V (local coordinate system of ladder)" unit="mm">-21.08</VPosition>
               <Kapton>
                 <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Kapton/*)"/>
-                <DensityFactor desc="How many layers of kapton for this sensor?">1</DensityFactor>
+                <Mass unit="g">4.20145270925089</Mass>
               </Kapton>
+              <KaptonFlex>
+                <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//KaptonFlex/*)"/>
+                <Mass unit="g">1.00883971686634</Mass>
+              </KaptonFlex>
             </Sensor>
             <Sensor id="SVD_Layer_5_Ladder_Sensor_2">
               <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Sensor[@type=1]/*)"/>
               <VPosition desc="sensor position (middle of the volume) in V (local coordinate system of ladder)" unit="mm">103.92</VPosition>
               <Kapton>
                 <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Kapton/*)"/>
-                <DensityFactor desc="How many layers of kapton for this sensor?">1</DensityFactor>
+                <Mass unit="g">2.10072635462545</Mass>
               </Kapton>
+              <KaptonFlex>
+                <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//KaptonFlex/*)"/>
+                <Mass unit="g">1.00883971686634</Mass>
+              </KaptonFlex>
             </Sensor>
             <Sensor id="SVD_Layer_5_Ladder_Sensor_3">
               <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Sensor[@type=2]/*)"/>
@@ -130,6 +163,10 @@
               <PhiLocal unit="deg">-90</PhiLocal>
               <ThetaLocal desc="rotation about Euler angle Theta in LOCAL coordinate system" unit="deg">17.2</ThetaLocal>
               <PsiLocal unit="deg">90</PsiLocal>
+              <KaptonFront>
+                <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//KaptonFront/*)"/>
+                <Mass unit="g">0.457409988349515</Mass>
+              </KaptonFront>
             </Sensor>
           </Sensors>
         </Ladders>
@@ -150,6 +187,7 @@
           </Barrel>
           <CoolingPipe>
             <xi:include href="SVDLadderBelleII.xml" xpointer="xpointer(/*/CoolingPipe/*)"/>
+            <Mass unit="g">3.13142639863333</Mass>
             <!-- The following parameters are ONLY ESTIMASTIONS and NOT CORRECT!!!! /!-->
             <Length desc="The length of the cooling pipe" unit="mm">499.88</Length>
             <VPosition desc="The position of the cooling pipe in V direction" unit="mm">-10.06</VPosition>
@@ -160,32 +198,48 @@
               <VPosition desc="sensor position (middle of the volume) in V (local coordinate system of ladder)" unit="mm">-197.56</VPosition>
               <Kapton>
                 <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Kapton/*)"/>
-                <DensityFactor desc="How many layers of kapton for this sensor?">1</DensityFactor>
+                <Mass unit="g">4.20145270925089</Mass>
               </Kapton>
+              <KaptonFront>
+              <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//KaptonFront/*)"/>
+                <Mass unit="g">0.554764904388349</Mass>
+              </KaptonFront>
             </Sensor>
             <Sensor id="SVD_Layer_6_Ladder_Sensor_1">
               <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Sensor[@type=1]/*)"/>
               <VPosition desc="sensor position (middle of the volume) in V (local coordinate system of ladder)" unit="mm">-72.56</VPosition>
               <Kapton>
                 <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Kapton/*)"/>
-                <DensityFactor desc="How many layers of kapton for this sensor?">1</DensityFactor>
+                <Mass unit="g">4.20145270925089</Mass>
               </Kapton>
+              <KaptonFlex>
+                <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//KaptonFlex/*)"/>
+                <Mass unit="g">1.00883971686634</Mass>
+              </KaptonFlex>
             </Sensor>
             <Sensor id="SVD_Layer_6_Ladder_Sensor_2">
               <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Sensor[@type=1]/*)"/>
               <VPosition desc="sensor position (middle of the volume) in V (local coordinate system of ladder)" unit="mm">52.44</VPosition>
               <Kapton>
                 <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Kapton/*)"/>
-                <DensityFactor desc="How many layers of kapton for this sensor?">1</DensityFactor>
+                <Mass unit="g">2.10072635462545</Mass>
               </Kapton>
+              <KaptonFlex>
+                <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//KaptonFlex/*)"/>
+                <Mass unit="g">1.00883971686634</Mass>
+              </KaptonFlex>
             </Sensor>
             <Sensor id="SVD_Layer_6_Ladder_Sensor_3">
               <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Sensor[@type=1]/*)"/>
               <VPosition desc="sensor position (middle of the volume) in V (local coordinate system of ladder)" unit="mm">177.44</VPosition>
               <Kapton>
                 <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Kapton/*)"/>
-                <DensityFactor desc="How many layers of kapton for this sensor?">1</DensityFactor>
+                <Mass unit="g">2.10072635462545</Mass>
               </Kapton>
+              <KaptonFlex>
+                <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//KaptonFlex/*)"/>
+                <Mass unit="g">1.00883971686634</Mass>
+              </KaptonFlex>
             </Sensor>
             <Sensor id="SVD_Layer_6_Ladder_Sensor_4">
               <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Sensor[@type=2]/*)"/>
@@ -194,6 +248,14 @@
               <PhiLocal unit="deg">-90</PhiLocal>
               <ThetaLocal desc="rotation about Euler angle Theta in LOCAL coordinate system" unit="deg">21.1</ThetaLocal>
               <PsiLocal unit="deg">90</PsiLocal>
+              <Kapton>
+                <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//KaptonFront/*)"/>
+                <Mass unit="g">1.73207282903768</Mass>
+              </Kapton>
+              <KaptonFront>
+                <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//KaptonFront/*)"/>
+                <Mass unit="g">0.457409988349515</Mass>
+              </KaptonFront>
             </Sensor>
           </Sensors>
         </Ladders>

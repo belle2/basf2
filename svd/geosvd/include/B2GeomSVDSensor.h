@@ -31,7 +31,6 @@ namespace Belle2 {
 
   class B2GeomSVDSensorActive : public B2GeomVolume {
   private:
-    string path;
     //! Dimensions of the active part of the sensor
     Int_t iLayer;
     Int_t iLadder;
@@ -45,7 +44,6 @@ namespace Belle2 {
 
   class B2GeomSVDSensorSilicon : public B2GeomVolume {
   private:
-    string path;
     Int_t iLayer;
     Int_t iLadder;
     Int_t iSensor;
@@ -72,6 +70,21 @@ namespace Belle2 {
     Bool_t make();
   };
 
+  class B2GeomSVDSensorKaptonFront : public B2GeomVolume {
+  private:
+  public:
+    B2GeomSVDSensorKaptonFront();
+    Bool_t init(GearDir& content);
+    Bool_t make();
+  };
+
+  class B2GeomSVDSensorKaptonFlex : public B2GeomVolume {
+  private:
+  public:
+    B2GeomSVDSensorKaptonFlex();
+    Bool_t init(GearDir& content);
+    Bool_t make();
+  };
 
   class B2GeomSVDSensorSmds : public B2GeomVolume {
   private:
@@ -84,12 +97,6 @@ namespace Belle2 {
 
   class B2GeomSVDSensor : public B2GeomVolume {
   private:
-
-    //! path of this Sensor
-    string path;
-
-    //! Medium of the sensor container
-    TGeoMedium* medAir;
 
     // Parameters
     //! Layer number of this sensor
@@ -106,6 +113,8 @@ namespace Belle2 {
     B2GeomSVDSensorFoam* volFoam;
     B2GeomSVDSensorSmds* volSMDs;
     B2GeomSVDSensorKapton* volKapton;
+    B2GeomSVDSensorKaptonFlex* volKaptonFlex;
+    B2GeomSVDSensorKaptonFront* volKaptonFront;
 
   public:
     B2GeomSVDSensor();

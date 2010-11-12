@@ -69,9 +69,19 @@ namespace Belle2 {
 // Classes describing the cooling pipe of SVD
 // ------------------------------------------------------------------------------------------------
 
+  class B2GeomSVDLadderCoolingliquid : public B2GeomVolume {
+  protected:
+    Int_t iLayer;
+  public:
+    B2GeomSVDLadderCoolingliquid(Int_t iLay);
+    Bool_t init(GearDir& content);
+    Bool_t make();
+  };
+
   class B2GeomSVDLadderCoolingpipe : public B2GeomVolume {
   protected:
     Int_t iLayer;
+    B2GeomSVDLadderCoolingliquid* volLiquid;
   public:
     B2GeomSVDLadderCoolingpipe(Int_t iLay);
     Bool_t init(GearDir& content);
@@ -89,16 +99,11 @@ namespace Belle2 {
     string path;
     GearDir ladderContent;
 
-    //! The sensor objects
-    B2GeomSVDSensor** b2gSVDSensors;
-
     // Parameters
     //! layer number
     Int_t iLayer;
     //! ladder number
     Int_t iLadder;
-    //! number of barrel sensors
-    Int_t nSensors;
 
     B2GeomSVDLadderRibs* volBarrelRibs;
     B2GeomSVDLadderRibs* volSlantedRibs;

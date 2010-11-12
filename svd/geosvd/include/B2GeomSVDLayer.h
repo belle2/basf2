@@ -34,25 +34,10 @@ namespace Belle2 {
   class B2GeomSVDLayer : public B2GeomVolume {
 
   private:
-    //! path of this Layer
-    string path;
-
     //! number of the Layer
     Int_t iLayer;
-    //! number of ladders per layer
-    Int_t nLadders;
     //! Rotation of whole SVD about z axis
     Double_t fPhi0;
-    //! Rotation about z axis before moving to fRadius
-    vector<Double_t> fTheta;
-    //! Rotation about z axis after moving to fRadius
-    vector<Double_t> fPhi;
-
-    //! rotation of the ladder about its local v axis (parallel to global z axis)
-    Double_t fPhiLadder;
-
-    //! Objects representing the ladders
-    B2GeomSVDLadder** b2gSVDLadders;
 
   public:
     B2GeomSVDLayer();

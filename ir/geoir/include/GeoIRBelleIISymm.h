@@ -77,18 +77,17 @@ namespace Belle2 {
                                  const double rotation_);
 
     /**
-     * Pipe stream creator.
+     * Outer pipes creator.
      *
      * Fills containers with specified range of pipe segments from GearDir content.
-     * Better to use shared_ptr?
      *
-     * @param name_ **To be filled by Clement**
-     * @param shape_ **To be filled by Clement**
-     * @param medium_ **To be filled by Clement**
-     * @param trans_ **To be filled by Clement**
-     * @param content_ **To be filled by Clement**
-     * @param start_ **To be filled by Clement**
-     * @param end_ **To be filled by Clement**
+     * @param name_ Name of the IR geometry
+     * @param shape_ Container of pipe shapes
+     * @param medium_ Container of pipe material
+     * @param trans_  Container of pipe transformations
+     * @param content_ GearBox content
+     * @param start_  Starting pipe range
+     * @param end_ Ending pipe range
      * @param solid_ If true create solid pipes.
      */
     void createPipe(const std::string& name_,

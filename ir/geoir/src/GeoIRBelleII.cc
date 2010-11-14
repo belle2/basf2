@@ -66,7 +66,7 @@ TGeoShape* GeoIRBelleII::GeoBelleIIPipe(const char* name_,
                                         const double radinn1_,          // inner radius at start
                                         const double radout1_,          // outer radius at start
                                         const double radchange_,        // change in radius
-                                        const double theta1_,     // angle to previous pipe
+                                        const double theta1_,           // angle to previous pipe
                                         const double theta2_)           // angle to next pipe
 {
   double cost1 = cos(0.5 * theta1_ * deg);
@@ -102,13 +102,13 @@ TGeoShape* GeoIRBelleII::GeoBelleIIPipe(const char* name_,
 
 
 double* GeoIRBelleII::createPipe(const char* name_,
-                                 vector<TGeoShape*>& shape_,
-                                 vector<TGeoMedium*>& medium_,
-                                 vector<TGeoCombiTrans*>& trans_,
-                                 GearDir& content_,
-                                 double start_,
-                                 double end_,
-                                 const bool solid_)
+                                 vector<TGeoShape*>& shape_,            // container of pipe shapes
+                                 vector<TGeoMedium*>& medium_,          // container of pipe material
+                                 vector<TGeoCombiTrans*>& trans_,       // container of pipe transformations
+                                 GearDir& content_,                     // GearBox content
+                                 double start_,                         // starting pipe range
+                                 double end_,                           // end pipe range
+                                 const bool solid_)                     // specify solid geometry
 {
   // --- Collect global parameters
   double length                 = 0;
@@ -363,9 +363,10 @@ void GeoIRBelleII::create(GearDir& content)
   TGeoVolumeAssembly* volGrpBP = addSubdetectorGroup("IR", new TGeoCombiTrans(0.0, 0.0, 0.0, geoRot));
 
 
-  // -------------------------------------------------
-  // ---  Build IR chamber streams ---
-  // --
+  //-----------------------------------------------------------------
+  //                 Build IR chamber streams
+  //-----------------------------------------------------------------
+
   vector<TGeoShape*>IRPipe;
   vector<TGeoMedium*>IRMed;
   vector<TGeoCombiTrans*>IRTrans;
@@ -386,9 +387,10 @@ void GeoIRBelleII::create(GearDir& content)
     B2ERROR("No IR chamber streams defined ! " << exc.what())
   }
 
-  // -------------------------------------------------
-  // ---  Build shields ---
-  // --
+  //-----------------------------------------------------------------
+  //                 Build shields
+  //-----------------------------------------------------------------
+
   try {
     int nShield = content.getNumberNodes("Shields/Shield");
     for (int iShield = 1; iShield <= nShield; ++iShield) {
@@ -441,9 +443,9 @@ void GeoIRBelleII::create(GearDir& content)
     B2ERROR("No shields defined ! " << exc.what())
   }
 
-  // -------------------------------------------------
-  // ---  Build IP Chamber ---
-  // --
+  //-----------------------------------------------------------------
+  //                 Build IP Chamber
+  //-----------------------------------------------------------------
 
   try {
     double length     = content.getParamLength("Length");   // full length

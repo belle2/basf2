@@ -18,8 +18,6 @@
 using namespace std;
 using namespace Belle2;
 
-using namespace boost::filesystem;
-
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------

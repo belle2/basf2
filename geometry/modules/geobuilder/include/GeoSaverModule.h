@@ -39,7 +39,7 @@ namespace Belle2 {
 
     /**
      * Checks the validity of the module parameters.
-     * Checks if the filepath of the given filenname exists.
+     * Checks if the filepath of the given filename exists.
      */
     virtual void initialize();
 

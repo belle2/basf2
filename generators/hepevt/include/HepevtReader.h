@@ -11,11 +11,11 @@
 #ifndef HEPEVTREADER_H
 #define HEPEVTREADER_H
 
-#include <string>
-#include <fstream>
-
 #include <framework/core/FrameworkExceptions.h>
 #include <generators/dataobjects/MCParticleGraph.h>
+
+#include <string>
+#include <fstream>
 
 namespace Belle2 {
 

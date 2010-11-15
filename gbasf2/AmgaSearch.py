@@ -127,6 +127,6 @@ if __name__ == '__main__':
     asearch = AmgaSearch()
     asearch.setDataType('data')  # or setDataType('MC')
     asearch.setExperimets([1, 2])
-    asearch.setQuery('id > 1 and id < 5')
+    asearch.setQuery('(id > 1 and id < 5) or events = 666')
     lfns = asearch.executeAmgaQuery()
     # return lfns

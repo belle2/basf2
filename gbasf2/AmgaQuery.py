@@ -6,7 +6,7 @@
 '''
 Created on Jan 16, 2010
 
-@author: milosz
+@author: milosz, fifieldt
 '''
 
 from AmgaClient import AmgaClient
@@ -22,6 +22,7 @@ class AmgaQuery(object):
     query = ''
     amgaclient = None
     config = None
+    vo = 'belle2'
 
 ###############################################################################
 
@@ -43,7 +44,11 @@ class AmgaQuery(object):
         query,
         ):
         '''
-        Executes search query.
+        Executes search query. Called by AmgaSearch module.
+        Arguments:
+            - dataType - type of data ('data' or 'MC')
+            - experiments - list of numbers of experiments to search in or None to search all
+            - query - SQL-like query with definition of data parameters
         '''
 
         exp = []
@@ -51,9 +56,11 @@ class AmgaQuery(object):
 
         if experiments is not None:
             for e in experiments:
-                exp.append('/belle2/' + dataType + '/E' + str(e) + '/FC:lfn')  # XXX those paths need to be read from config file
+                exp.append('/' + self.vo + '/' + dataType + '/E' + str(e)
+                           + '/FC:lfn')  # XXX those paths need to be read from config file
         else:
-            exp = self.amgaclient.getSubdirectories('/belle2/' + dataType)  # XXX as above
+            exp = self.amgaclient.getSubdirectories('/' + self.vo + '/'
+                    + dataType)  # XXX as above
             for i in xrange(len(exp)):
                 exp[i] += '/FC'
 
@@ -63,4 +70,16 @@ class AmgaQuery(object):
 
 
 ###############################################################################
+
+
+def registerQuery(self, dataType, metadata):
+    '''
+  Registers data into AMGA
+  input metadata is of form metadata[experiment][entry_id] = ([attributes],[values])
+  '''
+
+    for experiment in metadata.keys():
+        self.amgaclient.bulkInsert(self, '/' + self.vo + '/' + dataType + '/'
+                                   + experiment, metadata[experiment])
+
 

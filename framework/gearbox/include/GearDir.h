@@ -252,11 +252,11 @@ namespace Belle2 {
      *
      * Instead of having to write:
      *  laddersContent.append((format("Ladder[%1%]/") % (iLadder)).str());
-     * this method allows to have it much shorter:
+     * this method allows having it much shorter:
      *  laddersContent.append("Ladder", iLadder);
      *
      * Please note: It is highly recommended to avoid having a trailing slash in the path parameter.
-     *              The path of the GearDir after this method has a trailing slash.
+     *              The path of the GearDir after applying this method has a trailing slash.
      *
      * @param path The path which is appended together with an index to the end of the current directory path.
      * @param index The index value of the path.

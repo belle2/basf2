@@ -45,9 +45,9 @@ namespace Belle2 {
 
     /** The process record types. */
     enum EProcessRecordType {
-      prt_Event,       /**< The default value: Marks event data */
-      prt_BeginRun,    /**< Marks the beginning of a new run (only used for the first method in the chain) */
-      prt_EndRun,      /**< Marks the end of a new run (only used for the first method in the chain) */
+      prt_Event,       /**< The default value: Marks event data. */
+      prt_BeginRun,    /**< Marks the beginning of a new run (only used for the first method in the chain). */
+      prt_EndRun,      /**< Marks the end of a new run (only used for the first method in the chain). */
       prt_EndOfData    /**< Marks the end of the data. This will stop the
                             processing of the events. This is especially useful
                             for input modules which run out of events before the

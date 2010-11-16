@@ -35,9 +35,9 @@ namespace Belle2 {
   public:
 
     //Define exceptions
-    /** Excpetion is thrown if the Touschek file could not be opened. */
+    /** Exception is thrown if the Touschek file could not be opened. */
     BELLE2_DEFINE_EXCEPTION(TouschekCouldNotOpenFileError, "Could not open file %1% !");
-    /** Excpetion is thrown if a field in the Touschek file could not be converted to a number. */
+    /** Exception is thrown if a field in the Touschek file could not be converted to a number. */
     BELLE2_DEFINE_EXCEPTION(TouschekConvertFieldError, "Line %1%: Could not convert field %2%: %3%");
 
     /**
@@ -60,8 +60,8 @@ namespace Belle2 {
 
     /**
      * Reads the specified number of particles from the file and stores the result in the given MCParticle graph.
-     * The number of the last particle which was read is saved. So next time this method is called the reading
-     * continues at the last particle which was read.
+     * The number of the last particle which was read is saved. So the next time this method is called the reading
+     * continues at the position where the last particle which was read.
      *
      * @param number The number of particles that should be read from the file. Set it to -1 to read all particles.
      * @param graph Reference to the graph which should be filled with the information from the Touschek file.

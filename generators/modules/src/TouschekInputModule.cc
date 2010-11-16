@@ -61,11 +61,11 @@ TouschekInputModule::~TouschekInputModule()
 void TouschekInputModule::initialize()
 {
   //Check parameters
-  if ((m_readHER) && (!ModuleUtils::filePathExists(m_filenameHER))) {
+  if ((m_readHER) && (!ModuleUtils::fileNameExists(m_filenameHER))) {
     B2ERROR("Parameter <FilenameHER>: The path of the filename " << m_filenameHER << " does not exist !")
   } else m_readerHER->open(m_filenameHER);
 
-  if ((m_readLER) && (!ModuleUtils::filePathExists(m_filenameLER))) {
+  if ((m_readLER) && (!ModuleUtils::fileNameExists(m_filenameLER))) {
     B2ERROR("Parameter <FilenameLER>: The path of the filename " << m_filenameLER << " does not exist !")
   } else m_readerLER->open(m_filenameLER);
 

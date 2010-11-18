@@ -37,8 +37,6 @@ namespace Belle2 {
     Int_t iSensor;
   public:
     B2GeomSVDSensorActive(Int_t iLay, Int_t iLad, Int_t iSen);
-    Bool_t init(GearDir& content);
-    Bool_t make();
   };
 
 
@@ -53,47 +51,6 @@ namespace Belle2 {
     Bool_t init(GearDir& content);
     Bool_t make();
   };
-
-  class B2GeomSVDSensorFoam : public B2GeomVolume {
-  private:
-  public:
-    B2GeomSVDSensorFoam();
-    Bool_t init(GearDir& content);
-    Bool_t make();
-  };
-
-  class B2GeomSVDSensorKapton : public B2GeomVolume {
-  private:
-  public:
-    B2GeomSVDSensorKapton();
-    Bool_t init(GearDir& content);
-    Bool_t make();
-  };
-
-  class B2GeomSVDSensorKaptonFront : public B2GeomVolume {
-  private:
-  public:
-    B2GeomSVDSensorKaptonFront();
-    Bool_t init(GearDir& content);
-    Bool_t make();
-  };
-
-  class B2GeomSVDSensorKaptonFlex : public B2GeomVolume {
-  private:
-  public:
-    B2GeomSVDSensorKaptonFlex();
-    Bool_t init(GearDir& content);
-    Bool_t make();
-  };
-
-  class B2GeomSVDSensorSmds : public B2GeomVolume {
-  private:
-  public:
-    B2GeomSVDSensorSmds();
-    Bool_t init(GearDir& content);
-    Bool_t make();
-  };
-
 
   class B2GeomSVDSensor : public B2GeomVolume {
   private:
@@ -110,11 +67,11 @@ namespace Belle2 {
 
     //! parameters for sensor components
     B2GeomSVDSensorSilicon* volSilicon;
-    B2GeomSVDSensorFoam* volFoam;
-    B2GeomSVDSensorSmds* volSMDs;
-    B2GeomSVDSensorKapton* volKapton;
-    B2GeomSVDSensorKaptonFlex* volKaptonFlex;
-    B2GeomSVDSensorKaptonFront* volKaptonFront;
+    B2GeomVolume* volFoam;
+    B2GeomVolume* volSMDs;
+    B2GeomVolume* volKapton;
+    B2GeomVolume* volKaptonFlex;
+    B2GeomVolume* volKaptonFront;
 
   public:
     B2GeomSVDSensor();

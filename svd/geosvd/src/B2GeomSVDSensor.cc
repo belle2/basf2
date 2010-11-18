@@ -62,28 +62,28 @@ Bool_t B2GeomSVDSensor::init(GearDir& content)
   }
 
   if (sensorContent.isParamAvailable("Foam")) {
-    volFoam = new B2GeomSVDSensorFoam();
-    volFoam->init(sensorContent);
+    volFoam = new B2GeomVolume();
+    volFoam->init(sensorContent, "Foam/");
   }
 
   if (sensorContent.isParamAvailable("Kapton")) {
-    volKapton = new B2GeomSVDSensorKapton();
-    volKapton->init(sensorContent);
+    volKapton = new B2GeomVolume();
+    volKapton->init(sensorContent, "Kapton/");
   }
 
   if (sensorContent.isParamAvailable("KaptonFlex")) {
-    volKaptonFlex = new B2GeomSVDSensorKaptonFlex();
-    volKaptonFlex->init(sensorContent);
+    volKaptonFlex = new B2GeomVolume();
+    volKaptonFlex->init(sensorContent, "KaptonFlex/");
   }
 
   if (sensorContent.isParamAvailable("KaptonFront")) {
-    volKaptonFront = new B2GeomSVDSensorKaptonFront();
-    volKaptonFront->init(sensorContent);
+    volKaptonFront = new B2GeomVolume();
+    volKaptonFront->init(sensorContent, "KaptonFront/");
   }
 
   if (sensorContent.isParamAvailable("SMDs")) {
-    volSMDs = new B2GeomSVDSensorSmds;
-    volSMDs->init(sensorContent);
+    volSMDs = new B2GeomVolume();
+    volSMDs->init(sensorContent, "SMDs/");
   }
 
   sensorContent.setDirPath((format("//Offsets/Sensor[@id=\'SVD_Offset_Layer_%1%_Ladder_%2%_Sensor_%3%\']/") % iLayer % iLadder % iSensor).str());
@@ -96,7 +96,8 @@ Bool_t B2GeomSVDSensor::init(GearDir& content)
 Bool_t B2GeomSVDSensor::make()
 {
   // create container for SVD sensor components
-  tVolume = new TGeoVolumeAssembly(name);
+//printf("B2GeomSVDSensor::make start\n");
+  makeGeneric();
 
   // add silicon to container
   volSilicon->make();
@@ -115,14 +116,19 @@ Bool_t B2GeomSVDSensor::make()
     volKaptonFront->make();
     tVolume->AddNode(volKaptonFront->getVol(), 1, volKaptonFront->getPosition());
   }
+
   if (volKaptonFlex != NULL) {
-    volKaptonFlex->make();
+    if (!volKaptonFlex->make()) {
+      printf("ERROR!\n");
+      return false;
+    }
     tVolume->AddNode(volKaptonFlex->getVol(), 1, volKaptonFlex->getPosition());
   }
   if (volSMDs != NULL) {
     volSMDs->make();
     tVolume->AddNode(volSMDs->getVol(), 1, volSMDs->getPosition());
   }
+  //printf("B2GeomSVDSensor::make stop\n");
   return true;
 }
 
@@ -136,7 +142,7 @@ B2GeomSVDSensorSilicon::B2GeomSVDSensorSilicon(Int_t iLay, Int_t iLad, Int_t iSe
   iLadder = iLad;
   iSensor = iSen;
   resetBasicParameters();
-  volActive = new B2GeomSVDSensorActive(iLayer, iLadder, iSensor);
+  volActive = NULL;
   sprintf(name, "SVD_Layer_%i_Ladder_%i_Sensor_%i_Silicon", iLayer, iLadder, iSensor);
 }
 
@@ -149,7 +155,8 @@ Bool_t B2GeomSVDSensorSilicon::init(GearDir& content)
   // initialize the contained active volume
   // Read parameters for active sensor
   if (siliconContent.isParamAvailable("Active")) {
-    if (!volActive->init(siliconContent)) {
+    volActive = new B2GeomSVDSensorActive(iLayer, iLadder, iSensor);
+    if (!volActive->init(siliconContent, "Active/")) {
       printf("ERROR! Parameter reading for SVD active silicon failed!\n");
       return false;
     };
@@ -163,18 +170,12 @@ Bool_t B2GeomSVDSensorSilicon::init(GearDir& content)
 
 Bool_t B2GeomSVDSensorSilicon::make()
 {
+  makeGeneric();
+
   if (!volActive->make()) {
     printf("ERROR! Cannot create TGeoVolume for SVD active silicon!\n");
     return false;
   };
-
-  tVolume = gGeoManager->MakeTrd2(name, tMedium,
-                                  fThickness * 0.5,
-                                  fThickness2 * 0.5,
-                                  fWidth * 0.5,
-                                  fWidth2 * 0.5,
-                                  fLength * 0.5);
-  tVolume->SetLineColor(kBlue + 3);
   tVolume->AddNode(volActive->getVol(), 1, volActive->getPosition());
   return true;
 }
@@ -193,190 +194,13 @@ B2GeomSVDSensorActive::B2GeomSVDSensorActive(Int_t iLay, Int_t iLad, Int_t iSen)
   sprintf(name, "SD_SVD_Layer_%i_Ladder_%i_Sensor_%i_Silicon_Active", iLayer, iLadder, iSensor);
 }
 
-Bool_t B2GeomSVDSensorActive::init(GearDir& content)
-{
-  GearDir activeContent(content);
-  activeContent.append("Active/");
-  initBasicParameters(activeContent);
-  return true;
-}
-
-Bool_t B2GeomSVDSensorActive::make()
-{
-  tVolume = gGeoManager->MakeTrd2(name, tMedium,
-                                  fThickness * 0.5,
-                                  fThickness2 * 0.5,
-                                  fWidth * 0.5,
-                                  fWidth2 * 0.5,
-                                  fLength * 0.5);
-  tVolume->SetLineColor(kBlue - 10);
-  return true;
-
-}
-
-// ------------------------------------------------------------------------------------------------
-// Rohacell Foam Layer of SVD senor
-// ------------------------------------------------------------------------------------------------
-
-B2GeomSVDSensorFoam::B2GeomSVDSensorFoam()
-{
-  resetBasicParameters();
-}
 
 
-Bool_t B2GeomSVDSensorFoam::init(GearDir& content)
-{
-  GearDir foamContent(content);
-  foamContent.append("Foam/");
-  initBasicParameters(foamContent);
-  sprintf(name, "SVD_Foam");
-  return true;
-}
-
-Bool_t B2GeomSVDSensorFoam::make()
-{
-  tVolume = (TGeoVolume*) gROOT->FindObjectAny(name);
-  if (!tVolume) {
-    tVolume = gGeoManager->MakeTrd2(name, tMedium,
-                                    fThickness * 0.5,
-                                    fThickness2 * 0.5,
-                                    fWidth * 0.5,
-                                    fWidth2 * 0.5,
-                                    fLength * 0.5);
-    tVolume->SetLineColor(kYellow - 9);
-  }
-  return true;
-}
-
-// ------------------------------------------------------------------------------------------------
-// upper Kapton layer of SVD senor
-// ------------------------------------------------------------------------------------------------
-
-B2GeomSVDSensorKapton::B2GeomSVDSensorKapton()
-{
-  resetBasicParameters();
-}
-
-Bool_t B2GeomSVDSensorKapton::init(GearDir& content)
-{
-  GearDir kaptonContent(content);
-  kaptonContent.append("Kapton/");
-  initBasicParameters(kaptonContent);
-  sprintf(name, "SVD_Kapton");
-  return true;
-}
-
-Bool_t B2GeomSVDSensorKapton::make()
-{
-  tVolume = (TGeoVolume*) gROOT->FindObjectAny(name);
-  if (!tVolume) {
-    tVolume = gGeoManager->MakeTrd2(name, tMedium,
-                                    fThickness * 0.5,
-                                    fThickness2 * 0.5,
-                                    fWidth * 0.5,
-                                    fWidth2 * 0.5,
-                                    fLength * 0.5);
-    tVolume->SetLineColor(kOrange + 2);
-  }
-  return true;
-}
-
-// ------------------------------------------------------------------------------------------------
-// lower KaptonFlex layer of SVD senor
-// ------------------------------------------------------------------------------------------------
-
-B2GeomSVDSensorKaptonFlex::B2GeomSVDSensorKaptonFlex()
-{
-  resetBasicParameters();
-}
-
-Bool_t B2GeomSVDSensorKaptonFlex::init(GearDir& content)
-{
-  GearDir kaptonContent(content);
-  kaptonContent.append("KaptonFlex/");
-  initBasicParameters(kaptonContent);
-  sprintf(name, "SVD_Kapton_Flex");
-  return true;
-}
-
-Bool_t B2GeomSVDSensorKaptonFlex::make()
-{
-  tVolume = (TGeoVolume*) gROOT->FindObjectAny(name);
-  if (!tVolume) {
-    tVolume = gGeoManager->MakeTrd2(name, tMedium,
-                                    fThickness * 0.5,
-                                    fThickness2 * 0.5,
-                                    fWidth * 0.5,
-                                    fWidth2 * 0.5,
-                                    fLength * 0.5);
-    tVolume->SetLineColor(kOrange + 2);
-  }
-  return true;
-}
-
-// ------------------------------------------------------------------------------------------------
-// lower KaptonFrontRead layer of SVD senor
-// ------------------------------------------------------------------------------------------------
-
-B2GeomSVDSensorKaptonFront::B2GeomSVDSensorKaptonFront()
-{
-  resetBasicParameters();
-}
-
-Bool_t B2GeomSVDSensorKaptonFront::init(GearDir& content)
-{
-  GearDir kaptonContent(content);
-  kaptonContent.append("KaptonFront/");
-  initBasicParameters(kaptonContent);
-  sprintf(name, "SVD_KaptonFront");
-  return true;
-}
-
-Bool_t B2GeomSVDSensorKaptonFront::make()
-{
-  tVolume = (TGeoVolume*) gROOT->FindObjectAny(name);
-  if (!tVolume) {
-    tVolume = gGeoManager->MakeTrd2(name, tMedium,
-                                    fThickness * 0.5,
-                                    fThickness2 * 0.5,
-                                    fWidth * 0.5,
-                                    fWidth2 * 0.5,
-                                    fLength * 0.5);
-    tVolume->SetLineColor(kOrange + 2);
-  }
-  return true;
-}
-
-// ------------------------------------------------------------------------------------------------
-// SMDs of SVD senor
-// ------------------------------------------------------------------------------------------------
 
 
-B2GeomSVDSensorSmds::B2GeomSVDSensorSmds()
-{
-  resetBasicParameters();
-}
-Bool_t B2GeomSVDSensorSmds::init(GearDir& content)
-{
-  GearDir smdsContent(content);
-  smdsContent.append("SMDs/");
-  initBasicParameters(smdsContent);
-  sprintf(name, "SVD_SMDs");
-  return true;
-}
 
-Bool_t B2GeomSVDSensorSmds::make()
-{
-  tVolume = (TGeoVolume*) gROOT->FindObjectAny(name);
-  if (!tVolume) {
-    tVolume = gGeoManager->MakeBox(name, tMedium,
-                                   0.5 * fThickness,
-                                   0.5 * fWidth,
-                                   0.5 * fLength);
-    tVolume->SetLineColor(kBlue + 4);
-  }
-  return true;
-}
+
+
 
 
 

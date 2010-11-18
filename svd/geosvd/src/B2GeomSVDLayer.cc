@@ -36,6 +36,7 @@ Bool_t B2GeomSVDLayer::init(GearDir& content)
 {
   GearDir layerContent(content);
   layerContent.append((format("Layers/Layer[@id=\'SVD_Layer_%1%\']/") % (iLayer)).str());
+  initBasicParameters(layerContent);
   fPhi0 = layerContent.getParamAngle("Phi0");
   nComponents = int(layerContent.getParamNumValue("NumberOfLadders"));
   components = new B2GeomVolume*[nComponents];
@@ -59,14 +60,22 @@ Bool_t B2GeomSVDLayer::init(GearDir& content)
 
 Bool_t B2GeomSVDLayer::make()
 {
-  tVolume = new TGeoVolumeAssembly(name);
+  //printf("B2GeomSVDLayer::make start\n");
+  if (!makeGeneric()) {
+    printf("Creating SVD Layer failed!\n");
+    return false;
+  }
+
+
   for (int iLadder = 0; iLadder < nComponents; ++iLadder) {
     // create Ladder
 
     if (!components[iLadder]->make()) return false;
 
     // position the ladder in the SVD layer
+    if (tVolume == NULL) printf("ERROR!!!!!\n");
     tVolume->AddNode(components[iLadder]->getVol(), 1, components[iLadder]->getPosition());
   }
+  //printf("B2GeomSVDLayer::make stop\n");
   return true;
 }

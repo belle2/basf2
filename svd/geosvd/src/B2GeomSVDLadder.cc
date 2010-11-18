@@ -90,9 +90,8 @@ Bool_t B2GeomSVDLadder::init(GearDir& content)
 
 Bool_t B2GeomSVDLadder::make()
 {
-  //printf("SVDLadder::make (Lay: %i, Lad: %i) \n", iLayer, iLadder);
-  // create container for SVD ladder
-  tVolume = new TGeoVolumeAssembly(name);
+  // printf("B2GeomSVDLadder::make start\n");
+  makeGeneric();
 
   // put SVD sensors
   for (int iSensor = 0; iSensor < nComponents; ++iSensor) {
@@ -114,7 +113,7 @@ Bool_t B2GeomSVDLadder::make()
     volCoolingpipe->make();
     tVolume->AddNode(volCoolingpipe->getVol(), 1, volCoolingpipe->getPosition());
   }
-  //printf("ladder made\n");
+  //printf("B2GeomSVDLadder::make stop\n");
   return true;
 
 }

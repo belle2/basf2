@@ -400,6 +400,14 @@
 <OffsetTheta desc="rotation about Euler angle Theta in LOCAL coordinate system" unit="deg">0</OffsetTheta>
 <OffsetPsi desc="rotation about Euler angle Psi in LOCAL coordinate system" unit="deg">0</OffsetPsi>
 </Sensor>
+<Sensor id="SVD_Offset_Layer_5_Ladder_0_Sensor_4">
+<OffsetW desc="offset in W (x) direction in LOCAL coordinate system" unit="mm">0</OffsetW>
+<OffsetU desc="offsetin U (y) direction in LOCAL coordinate system" unit="mm">0</OffsetU>
+<OffsetV desc="offset in V (z) direction in LOCAL coordinate system" unit="mm">0</OffsetV>
+<OffsetPhi desc="rotation about Euler angle Phi in LOCAL coordinate system" unit="deg">0</OffsetPhi>
+<OffsetTheta desc="rotation about Euler angle Theta in LOCAL coordinate system" unit="deg">0</OffsetTheta>
+<OffsetPsi desc="rotation about Euler angle Psi in LOCAL coordinate system" unit="deg">0</OffsetPsi>
+</Sensor>
 <Sensor id="SVD_Offset_Layer_5_Ladder_1_Sensor_0">
 <OffsetW desc="offset in W (x) direction in LOCAL coordinate system" unit="mm">0</OffsetW>
 <OffsetU desc="offsetin U (y) direction in LOCAL coordinate system" unit="mm">0</OffsetU>
@@ -425,6 +433,14 @@
 <OffsetPsi desc="rotation about Euler angle Psi in LOCAL coordinate system" unit="deg">0</OffsetPsi>
 </Sensor>
 <Sensor id="SVD_Offset_Layer_5_Ladder_1_Sensor_3">
+<OffsetW desc="offset in W (x) direction in LOCAL coordinate system" unit="mm">0</OffsetW>
+<OffsetU desc="offsetin U (y) direction in LOCAL coordinate system" unit="mm">0</OffsetU>
+<OffsetV desc="offset in V (z) direction in LOCAL coordinate system" unit="mm">0</OffsetV>
+<OffsetPhi desc="rotation about Euler angle Phi in LOCAL coordinate system" unit="deg">0</OffsetPhi>
+<OffsetTheta desc="rotation about Euler angle Theta in LOCAL coordinate system" unit="deg">0</OffsetTheta>
+<OffsetPsi desc="rotation about Euler angle Psi in LOCAL coordinate system" unit="deg">0</OffsetPsi>
+</Sensor>
+<Sensor id="SVD_Offset_Layer_5_Ladder_1_Sensor_4">
 <OffsetW desc="offset in W (x) direction in LOCAL coordinate system" unit="mm">0</OffsetW>
 <OffsetU desc="offsetin U (y) direction in LOCAL coordinate system" unit="mm">0</OffsetU>
 <OffsetV desc="offset in V (z) direction in LOCAL coordinate system" unit="mm">0</OffsetV>
@@ -464,6 +480,14 @@
 <OffsetTheta desc="rotation about Euler angle Theta in LOCAL coordinate system" unit="deg">0</OffsetTheta>
 <OffsetPsi desc="rotation about Euler angle Psi in LOCAL coordinate system" unit="deg">0</OffsetPsi>
 </Sensor>
+<Sensor id="SVD_Offset_Layer_5_Ladder_2_Sensor_4">
+<OffsetW desc="offset in W (x) direction in LOCAL coordinate system" unit="mm">0</OffsetW>
+<OffsetU desc="offsetin U (y) direction in LOCAL coordinate system" unit="mm">0</OffsetU>
+<OffsetV desc="offset in V (z) direction in LOCAL coordinate system" unit="mm">0</OffsetV>
+<OffsetPhi desc="rotation about Euler angle Phi in LOCAL coordinate system" unit="deg">0</OffsetPhi>
+<OffsetTheta desc="rotation about Euler angle Theta in LOCAL coordinate system" unit="deg">0</OffsetTheta>
+<OffsetPsi desc="rotation about Euler angle Psi in LOCAL coordinate system" unit="deg">0</OffsetPsi>
+</Sensor>
 <Sensor id="SVD_Offset_Layer_5_Ladder_3_Sensor_0">
 <OffsetW desc="offset in W (x) direction in LOCAL coordinate system" unit="mm">0</OffsetW>
 <OffsetU desc="offsetin U (y) direction in LOCAL coordinate system" unit="mm">0</OffsetU>
@@ -489,6 +513,14 @@
 <OffsetPsi desc="rotation about Euler angle Psi in LOCAL coordinate system" unit="deg">0</OffsetPsi>
 </Sensor>
 <Sensor id="SVD_Offset_Layer_5_Ladder_3_Sensor_3">
+<OffsetW desc="offset in W (x) direction in LOCAL coordinate system" unit="mm">0</OffsetW>
+<OffsetU desc="offsetin U (y) direction in LOCAL coordinate system" unit="mm">0</OffsetU>
+<OffsetV desc="offset in V (z) direction in LOCAL coordinate system" unit="mm">0</OffsetV>
+<OffsetPhi desc="rotation about Euler angle Phi in LOCAL coordinate system" unit="deg">0</OffsetPhi>
+<OffsetTheta desc="rotation about Euler angle Theta in LOCAL coordinate system" unit="deg">0</OffsetTheta>
+<OffsetPsi desc="rotation about Euler angle Psi in LOCAL coordinate system" unit="deg">0</OffsetPsi>
+</Sensor>
+<Sensor id="SVD_Offset_Layer_5_Ladder_3_Sensor_4">
 <OffsetW desc="offset in W (x) direction in LOCAL coordinate system" unit="mm">0</OffsetW>
 <OffsetU desc="offsetin U (y) direction in LOCAL coordinate system" unit="mm">0</OffsetU>
 <OffsetV desc="offset in V (z) direction in LOCAL coordinate system" unit="mm">0</OffsetV>
@@ -528,6 +560,14 @@
 <OffsetTheta desc="rotation about Euler angle Theta in LOCAL coordinate system" unit="deg">0</OffsetTheta>
 <OffsetPsi desc="rotation about Euler angle Psi in LOCAL coordinate system" unit="deg">0</OffsetPsi>
 </Sensor>
+<Sensor id="SVD_Offset_Layer_5_Ladder_4_Sensor_4">
+<OffsetW desc="offset in W (x) direction in LOCAL coordinate system" unit="mm">0</OffsetW>
+<OffsetU desc="offsetin U (y) direction in LOCAL coordinate system" unit="mm">0</OffsetU>
+<OffsetV desc="offset in V (z) direction in LOCAL coordinate system" unit="mm">0</OffsetV>
+<OffsetPhi desc="rotation about Euler angle Phi in LOCAL coordinate system" unit="deg">0</OffsetPhi>
+<OffsetTheta desc="rotation about Euler angle Theta in LOCAL coordinate system" unit="deg">0</OffsetTheta>
+<OffsetPsi desc="rotation about Euler angle Psi in LOCAL coordinate system" unit="deg">0</OffsetPsi>
+</Sensor>
 <Sensor id="SVD_Offset_Layer_5_Ladder_5_Sensor_0">
 <OffsetW desc="offset in W (x) direction in LOCAL coordinate system" unit="mm">0</OffsetW>
 <OffsetU desc="offsetin U (y) direction in LOCAL coordinate system" unit="mm">0</OffsetU>
@@ -553,6 +593,14 @@
 <OffsetPsi desc="rotation about Euler angle Psi in LOCAL coordinate system" unit="deg">0</OffsetPsi>
 </Sensor>
 <Sensor id="SVD_Offset_Layer_5_Ladder_5_Sensor_3">
+<OffsetW desc="offset in W (x) direction in LOCAL coordinate system" unit="mm">0</OffsetW>
+<OffsetU desc="offsetin U (y) direction in LOCAL coordinate system" unit="mm">0</OffsetU>
+<OffsetV desc="offset in V (z) direction in LOCAL coordinate system" unit="mm">0</OffsetV>
+<OffsetPhi desc="rotation about Euler angle Phi in LOCAL coordinate system" unit="deg">0</OffsetPhi>
+<OffsetTheta desc="rotation about Euler angle Theta in LOCAL coordinate system" unit="deg">0</OffsetTheta>
+<OffsetPsi desc="rotation about Euler angle Psi in LOCAL coordinate system" unit="deg">0</OffsetPsi>
+</Sensor>
+<Sensor id="SVD_Offset_Layer_5_Ladder_5_Sensor_4">
 <OffsetW desc="offset in W (x) direction in LOCAL coordinate system" unit="mm">0</OffsetW>
 <OffsetU desc="offsetin U (y) direction in LOCAL coordinate system" unit="mm">0</OffsetU>
 <OffsetV desc="offset in V (z) direction in LOCAL coordinate system" unit="mm">0</OffsetV>
@@ -592,6 +640,14 @@
 <OffsetTheta desc="rotation about Euler angle Theta in LOCAL coordinate system" unit="deg">0</OffsetTheta>
 <OffsetPsi desc="rotation about Euler angle Psi in LOCAL coordinate system" unit="deg">0</OffsetPsi>
 </Sensor>
+<Sensor id="SVD_Offset_Layer_5_Ladder_6_Sensor_4">
+<OffsetW desc="offset in W (x) direction in LOCAL coordinate system" unit="mm">0</OffsetW>
+<OffsetU desc="offsetin U (y) direction in LOCAL coordinate system" unit="mm">0</OffsetU>
+<OffsetV desc="offset in V (z) direction in LOCAL coordinate system" unit="mm">0</OffsetV>
+<OffsetPhi desc="rotation about Euler angle Phi in LOCAL coordinate system" unit="deg">0</OffsetPhi>
+<OffsetTheta desc="rotation about Euler angle Theta in LOCAL coordinate system" unit="deg">0</OffsetTheta>
+<OffsetPsi desc="rotation about Euler angle Psi in LOCAL coordinate system" unit="deg">0</OffsetPsi>
+</Sensor>
 <Sensor id="SVD_Offset_Layer_5_Ladder_7_Sensor_0">
 <OffsetW desc="offset in W (x) direction in LOCAL coordinate system" unit="mm">0</OffsetW>
 <OffsetU desc="offsetin U (y) direction in LOCAL coordinate system" unit="mm">0</OffsetU>
@@ -617,6 +673,14 @@
 <OffsetPsi desc="rotation about Euler angle Psi in LOCAL coordinate system" unit="deg">0</OffsetPsi>
 </Sensor>
 <Sensor id="SVD_Offset_Layer_5_Ladder_7_Sensor_3">
+<OffsetW desc="offset in W (x) direction in LOCAL coordinate system" unit="mm">0</OffsetW>
+<OffsetU desc="offsetin U (y) direction in LOCAL coordinate system" unit="mm">0</OffsetU>
+<OffsetV desc="offset in V (z) direction in LOCAL coordinate system" unit="mm">0</OffsetV>
+<OffsetPhi desc="rotation about Euler angle Phi in LOCAL coordinate system" unit="deg">0</OffsetPhi>
+<OffsetTheta desc="rotation about Euler angle Theta in LOCAL coordinate system" unit="deg">0</OffsetTheta>
+<OffsetPsi desc="rotation about Euler angle Psi in LOCAL coordinate system" unit="deg">0</OffsetPsi>
+</Sensor>
+<Sensor id="SVD_Offset_Layer_5_Ladder_7_Sensor_4">
 <OffsetW desc="offset in W (x) direction in LOCAL coordinate system" unit="mm">0</OffsetW>
 <OffsetU desc="offsetin U (y) direction in LOCAL coordinate system" unit="mm">0</OffsetU>
 <OffsetV desc="offset in V (z) direction in LOCAL coordinate system" unit="mm">0</OffsetV>
@@ -656,6 +720,14 @@
 <OffsetTheta desc="rotation about Euler angle Theta in LOCAL coordinate system" unit="deg">0</OffsetTheta>
 <OffsetPsi desc="rotation about Euler angle Psi in LOCAL coordinate system" unit="deg">0</OffsetPsi>
 </Sensor>
+<Sensor id="SVD_Offset_Layer_5_Ladder_8_Sensor_4">
+<OffsetW desc="offset in W (x) direction in LOCAL coordinate system" unit="mm">0</OffsetW>
+<OffsetU desc="offsetin U (y) direction in LOCAL coordinate system" unit="mm">0</OffsetU>
+<OffsetV desc="offset in V (z) direction in LOCAL coordinate system" unit="mm">0</OffsetV>
+<OffsetPhi desc="rotation about Euler angle Phi in LOCAL coordinate system" unit="deg">0</OffsetPhi>
+<OffsetTheta desc="rotation about Euler angle Theta in LOCAL coordinate system" unit="deg">0</OffsetTheta>
+<OffsetPsi desc="rotation about Euler angle Psi in LOCAL coordinate system" unit="deg">0</OffsetPsi>
+</Sensor>
 <Sensor id="SVD_Offset_Layer_5_Ladder_9_Sensor_0">
 <OffsetW desc="offset in W (x) direction in LOCAL coordinate system" unit="mm">0</OffsetW>
 <OffsetU desc="offsetin U (y) direction in LOCAL coordinate system" unit="mm">0</OffsetU>
@@ -681,6 +753,14 @@
 <OffsetPsi desc="rotation about Euler angle Psi in LOCAL coordinate system" unit="deg">0</OffsetPsi>
 </Sensor>
 <Sensor id="SVD_Offset_Layer_5_Ladder_9_Sensor_3">
+<OffsetW desc="offset in W (x) direction in LOCAL coordinate system" unit="mm">0</OffsetW>
+<OffsetU desc="offsetin U (y) direction in LOCAL coordinate system" unit="mm">0</OffsetU>
+<OffsetV desc="offset in V (z) direction in LOCAL coordinate system" unit="mm">0</OffsetV>
+<OffsetPhi desc="rotation about Euler angle Phi in LOCAL coordinate system" unit="deg">0</OffsetPhi>
+<OffsetTheta desc="rotation about Euler angle Theta in LOCAL coordinate system" unit="deg">0</OffsetTheta>
+<OffsetPsi desc="rotation about Euler angle Psi in LOCAL coordinate system" unit="deg">0</OffsetPsi>
+</Sensor>
+<Sensor id="SVD_Offset_Layer_5_Ladder_9_Sensor_4">
 <OffsetW desc="offset in W (x) direction in LOCAL coordinate system" unit="mm">0</OffsetW>
 <OffsetU desc="offsetin U (y) direction in LOCAL coordinate system" unit="mm">0</OffsetU>
 <OffsetV desc="offset in V (z) direction in LOCAL coordinate system" unit="mm">0</OffsetV>
@@ -720,6 +800,14 @@
 <OffsetTheta desc="rotation about Euler angle Theta in LOCAL coordinate system" unit="deg">0</OffsetTheta>
 <OffsetPsi desc="rotation about Euler angle Psi in LOCAL coordinate system" unit="deg">0</OffsetPsi>
 </Sensor>
+<Sensor id="SVD_Offset_Layer_5_Ladder_10_Sensor_4">
+<OffsetW desc="offset in W (x) direction in LOCAL coordinate system" unit="mm">0</OffsetW>
+<OffsetU desc="offsetin U (y) direction in LOCAL coordinate system" unit="mm">0</OffsetU>
+<OffsetV desc="offset in V (z) direction in LOCAL coordinate system" unit="mm">0</OffsetV>
+<OffsetPhi desc="rotation about Euler angle Phi in LOCAL coordinate system" unit="deg">0</OffsetPhi>
+<OffsetTheta desc="rotation about Euler angle Theta in LOCAL coordinate system" unit="deg">0</OffsetTheta>
+<OffsetPsi desc="rotation about Euler angle Psi in LOCAL coordinate system" unit="deg">0</OffsetPsi>
+</Sensor>
 <Sensor id="SVD_Offset_Layer_5_Ladder_11_Sensor_0">
 <OffsetW desc="offset in W (x) direction in LOCAL coordinate system" unit="mm">0</OffsetW>
 <OffsetU desc="offsetin U (y) direction in LOCAL coordinate system" unit="mm">0</OffsetU>
@@ -745,6 +833,14 @@
 <OffsetPsi desc="rotation about Euler angle Psi in LOCAL coordinate system" unit="deg">0</OffsetPsi>
 </Sensor>
 <Sensor id="SVD_Offset_Layer_5_Ladder_11_Sensor_3">
+<OffsetW desc="offset in W (x) direction in LOCAL coordinate system" unit="mm">0</OffsetW>
+<OffsetU desc="offsetin U (y) direction in LOCAL coordinate system" unit="mm">0</OffsetU>
+<OffsetV desc="offset in V (z) direction in LOCAL coordinate system" unit="mm">0</OffsetV>
+<OffsetPhi desc="rotation about Euler angle Phi in LOCAL coordinate system" unit="deg">0</OffsetPhi>
+<OffsetTheta desc="rotation about Euler angle Theta in LOCAL coordinate system" unit="deg">0</OffsetTheta>
+<OffsetPsi desc="rotation about Euler angle Psi in LOCAL coordinate system" unit="deg">0</OffsetPsi>
+</Sensor>
+<Sensor id="SVD_Offset_Layer_5_Ladder_11_Sensor_4">
 <OffsetW desc="offset in W (x) direction in LOCAL coordinate system" unit="mm">0</OffsetW>
 <OffsetU desc="offsetin U (y) direction in LOCAL coordinate system" unit="mm">0</OffsetU>
 <OffsetV desc="offset in V (z) direction in LOCAL coordinate system" unit="mm">0</OffsetV>
@@ -784,6 +880,14 @@
 <OffsetTheta desc="rotation about Euler angle Theta in LOCAL coordinate system" unit="deg">0</OffsetTheta>
 <OffsetPsi desc="rotation about Euler angle Psi in LOCAL coordinate system" unit="deg">0</OffsetPsi>
 </Sensor>
+<Sensor id="SVD_Offset_Layer_5_Ladder_12_Sensor_4">
+<OffsetW desc="offset in W (x) direction in LOCAL coordinate system" unit="mm">0</OffsetW>
+<OffsetU desc="offsetin U (y) direction in LOCAL coordinate system" unit="mm">0</OffsetU>
+<OffsetV desc="offset in V (z) direction in LOCAL coordinate system" unit="mm">0</OffsetV>
+<OffsetPhi desc="rotation about Euler angle Phi in LOCAL coordinate system" unit="deg">0</OffsetPhi>
+<OffsetTheta desc="rotation about Euler angle Theta in LOCAL coordinate system" unit="deg">0</OffsetTheta>
+<OffsetPsi desc="rotation about Euler angle Psi in LOCAL coordinate system" unit="deg">0</OffsetPsi>
+</Sensor>
 <Sensor id="SVD_Offset_Layer_5_Ladder_13_Sensor_0">
 <OffsetW desc="offset in W (x) direction in LOCAL coordinate system" unit="mm">0</OffsetW>
 <OffsetU desc="offsetin U (y) direction in LOCAL coordinate system" unit="mm">0</OffsetU>
@@ -809,6 +913,14 @@
 <OffsetPsi desc="rotation about Euler angle Psi in LOCAL coordinate system" unit="deg">0</OffsetPsi>
 </Sensor>
 <Sensor id="SVD_Offset_Layer_5_Ladder_13_Sensor_3">
+<OffsetW desc="offset in W (x) direction in LOCAL coordinate system" unit="mm">0</OffsetW>
+<OffsetU desc="offsetin U (y) direction in LOCAL coordinate system" unit="mm">0</OffsetU>
+<OffsetV desc="offset in V (z) direction in LOCAL coordinate system" unit="mm">0</OffsetV>
+<OffsetPhi desc="rotation about Euler angle Phi in LOCAL coordinate system" unit="deg">0</OffsetPhi>
+<OffsetTheta desc="rotation about Euler angle Theta in LOCAL coordinate system" unit="deg">0</OffsetTheta>
+<OffsetPsi desc="rotation about Euler angle Psi in LOCAL coordinate system" unit="deg">0</OffsetPsi>
+</Sensor>
+<Sensor id="SVD_Offset_Layer_5_Ladder_13_Sensor_4">
 <OffsetW desc="offset in W (x) direction in LOCAL coordinate system" unit="mm">0</OffsetW>
 <OffsetU desc="offsetin U (y) direction in LOCAL coordinate system" unit="mm">0</OffsetU>
 <OffsetV desc="offset in V (z) direction in LOCAL coordinate system" unit="mm">0</OffsetV>
@@ -856,6 +968,14 @@
 <OffsetTheta desc="rotation about Euler angle Theta in LOCAL coordinate system" unit="deg">0</OffsetTheta>
 <OffsetPsi desc="rotation about Euler angle Psi in LOCAL coordinate system" unit="deg">0</OffsetPsi>
 </Sensor>
+<Sensor id="SVD_Offset_Layer_6_Ladder_0_Sensor_5">
+<OffsetW desc="offset in W (x) direction in LOCAL coordinate system" unit="mm">0</OffsetW>
+<OffsetU desc="offsetin U (y) direction in LOCAL coordinate system" unit="mm">0</OffsetU>
+<OffsetV desc="offset in V (z) direction in LOCAL coordinate system" unit="mm">0</OffsetV>
+<OffsetPhi desc="rotation about Euler angle Phi in LOCAL coordinate system" unit="deg">0</OffsetPhi>
+<OffsetTheta desc="rotation about Euler angle Theta in LOCAL coordinate system" unit="deg">0</OffsetTheta>
+<OffsetPsi desc="rotation about Euler angle Psi in LOCAL coordinate system" unit="deg">0</OffsetPsi>
+</Sensor>
 <Sensor id="SVD_Offset_Layer_6_Ladder_1_Sensor_0">
 <OffsetW desc="offset in W (x) direction in LOCAL coordinate system" unit="mm">0</OffsetW>
 <OffsetU desc="offsetin U (y) direction in LOCAL coordinate system" unit="mm">0</OffsetU>
@@ -889,6 +1009,14 @@
 <OffsetPsi desc="rotation about Euler angle Psi in LOCAL coordinate system" unit="deg">0</OffsetPsi>
 </Sensor>
 <Sensor id="SVD_Offset_Layer_6_Ladder_1_Sensor_4">
+<OffsetW desc="offset in W (x) direction in LOCAL coordinate system" unit="mm">0</OffsetW>
+<OffsetU desc="offsetin U (y) direction in LOCAL coordinate system" unit="mm">0</OffsetU>
+<OffsetV desc="offset in V (z) direction in LOCAL coordinate system" unit="mm">0</OffsetV>
+<OffsetPhi desc="rotation about Euler angle Phi in LOCAL coordinate system" unit="deg">0</OffsetPhi>
+<OffsetTheta desc="rotation about Euler angle Theta in LOCAL coordinate system" unit="deg">0</OffsetTheta>
+<OffsetPsi desc="rotation about Euler angle Psi in LOCAL coordinate system" unit="deg">0</OffsetPsi>
+</Sensor>
+<Sensor id="SVD_Offset_Layer_6_Ladder_1_Sensor_5">
 <OffsetW desc="offset in W (x) direction in LOCAL coordinate system" unit="mm">0</OffsetW>
 <OffsetU desc="offsetin U (y) direction in LOCAL coordinate system" unit="mm">0</OffsetU>
 <OffsetV desc="offset in V (z) direction in LOCAL coordinate system" unit="mm">0</OffsetV>
@@ -936,6 +1064,14 @@
 <OffsetTheta desc="rotation about Euler angle Theta in LOCAL coordinate system" unit="deg">0</OffsetTheta>
 <OffsetPsi desc="rotation about Euler angle Psi in LOCAL coordinate system" unit="deg">0</OffsetPsi>
 </Sensor>
+<Sensor id="SVD_Offset_Layer_6_Ladder_2_Sensor_5">
+<OffsetW desc="offset in W (x) direction in LOCAL coordinate system" unit="mm">0</OffsetW>
+<OffsetU desc="offsetin U (y) direction in LOCAL coordinate system" unit="mm">0</OffsetU>
+<OffsetV desc="offset in V (z) direction in LOCAL coordinate system" unit="mm">0</OffsetV>
+<OffsetPhi desc="rotation about Euler angle Phi in LOCAL coordinate system" unit="deg">0</OffsetPhi>
+<OffsetTheta desc="rotation about Euler angle Theta in LOCAL coordinate system" unit="deg">0</OffsetTheta>
+<OffsetPsi desc="rotation about Euler angle Psi in LOCAL coordinate system" unit="deg">0</OffsetPsi>
+</Sensor>
 <Sensor id="SVD_Offset_Layer_6_Ladder_3_Sensor_0">
 <OffsetW desc="offset in W (x) direction in LOCAL coordinate system" unit="mm">0</OffsetW>
 <OffsetU desc="offsetin U (y) direction in LOCAL coordinate system" unit="mm">0</OffsetU>
@@ -969,6 +1105,14 @@
 <OffsetPsi desc="rotation about Euler angle Psi in LOCAL coordinate system" unit="deg">0</OffsetPsi>
 </Sensor>
 <Sensor id="SVD_Offset_Layer_6_Ladder_3_Sensor_4">
+<OffsetW desc="offset in W (x) direction in LOCAL coordinate system" unit="mm">0</OffsetW>
+<OffsetU desc="offsetin U (y) direction in LOCAL coordinate system" unit="mm">0</OffsetU>
+<OffsetV desc="offset in V (z) direction in LOCAL coordinate system" unit="mm">0</OffsetV>
+<OffsetPhi desc="rotation about Euler angle Phi in LOCAL coordinate system" unit="deg">0</OffsetPhi>
+<OffsetTheta desc="rotation about Euler angle Theta in LOCAL coordinate system" unit="deg">0</OffsetTheta>
+<OffsetPsi desc="rotation about Euler angle Psi in LOCAL coordinate system" unit="deg">0</OffsetPsi>
+</Sensor>
+<Sensor id="SVD_Offset_Layer_6_Ladder_3_Sensor_5">
 <OffsetW desc="offset in W (x) direction in LOCAL coordinate system" unit="mm">0</OffsetW>
 <OffsetU desc="offsetin U (y) direction in LOCAL coordinate system" unit="mm">0</OffsetU>
 <OffsetV desc="offset in V (z) direction in LOCAL coordinate system" unit="mm">0</OffsetV>
@@ -1016,6 +1160,14 @@
 <OffsetTheta desc="rotation about Euler angle Theta in LOCAL coordinate system" unit="deg">0</OffsetTheta>
 <OffsetPsi desc="rotation about Euler angle Psi in LOCAL coordinate system" unit="deg">0</OffsetPsi>
 </Sensor>
+<Sensor id="SVD_Offset_Layer_6_Ladder_4_Sensor_5">
+<OffsetW desc="offset in W (x) direction in LOCAL coordinate system" unit="mm">0</OffsetW>
+<OffsetU desc="offsetin U (y) direction in LOCAL coordinate system" unit="mm">0</OffsetU>
+<OffsetV desc="offset in V (z) direction in LOCAL coordinate system" unit="mm">0</OffsetV>
+<OffsetPhi desc="rotation about Euler angle Phi in LOCAL coordinate system" unit="deg">0</OffsetPhi>
+<OffsetTheta desc="rotation about Euler angle Theta in LOCAL coordinate system" unit="deg">0</OffsetTheta>
+<OffsetPsi desc="rotation about Euler angle Psi in LOCAL coordinate system" unit="deg">0</OffsetPsi>
+</Sensor>
 <Sensor id="SVD_Offset_Layer_6_Ladder_5_Sensor_0">
 <OffsetW desc="offset in W (x) direction in LOCAL coordinate system" unit="mm">0</OffsetW>
 <OffsetU desc="offsetin U (y) direction in LOCAL coordinate system" unit="mm">0</OffsetU>
@@ -1049,6 +1201,14 @@
 <OffsetPsi desc="rotation about Euler angle Psi in LOCAL coordinate system" unit="deg">0</OffsetPsi>
 </Sensor>
 <Sensor id="SVD_Offset_Layer_6_Ladder_5_Sensor_4">
+<OffsetW desc="offset in W (x) direction in LOCAL coordinate system" unit="mm">0</OffsetW>
+<OffsetU desc="offsetin U (y) direction in LOCAL coordinate system" unit="mm">0</OffsetU>
+<OffsetV desc="offset in V (z) direction in LOCAL coordinate system" unit="mm">0</OffsetV>
+<OffsetPhi desc="rotation about Euler angle Phi in LOCAL coordinate system" unit="deg">0</OffsetPhi>
+<OffsetTheta desc="rotation about Euler angle Theta in LOCAL coordinate system" unit="deg">0</OffsetTheta>
+<OffsetPsi desc="rotation about Euler angle Psi in LOCAL coordinate system" unit="deg">0</OffsetPsi>
+</Sensor>
+<Sensor id="SVD_Offset_Layer_6_Ladder_5_Sensor_5">
 <OffsetW desc="offset in W (x) direction in LOCAL coordinate system" unit="mm">0</OffsetW>
 <OffsetU desc="offsetin U (y) direction in LOCAL coordinate system" unit="mm">0</OffsetU>
 <OffsetV desc="offset in V (z) direction in LOCAL coordinate system" unit="mm">0</OffsetV>
@@ -1096,6 +1256,14 @@
 <OffsetTheta desc="rotation about Euler angle Theta in LOCAL coordinate system" unit="deg">0</OffsetTheta>
 <OffsetPsi desc="rotation about Euler angle Psi in LOCAL coordinate system" unit="deg">0</OffsetPsi>
 </Sensor>
+<Sensor id="SVD_Offset_Layer_6_Ladder_6_Sensor_5">
+<OffsetW desc="offset in W (x) direction in LOCAL coordinate system" unit="mm">0</OffsetW>
+<OffsetU desc="offsetin U (y) direction in LOCAL coordinate system" unit="mm">0</OffsetU>
+<OffsetV desc="offset in V (z) direction in LOCAL coordinate system" unit="mm">0</OffsetV>
+<OffsetPhi desc="rotation about Euler angle Phi in LOCAL coordinate system" unit="deg">0</OffsetPhi>
+<OffsetTheta desc="rotation about Euler angle Theta in LOCAL coordinate system" unit="deg">0</OffsetTheta>
+<OffsetPsi desc="rotation about Euler angle Psi in LOCAL coordinate system" unit="deg">0</OffsetPsi>
+</Sensor>
 <Sensor id="SVD_Offset_Layer_6_Ladder_7_Sensor_0">
 <OffsetW desc="offset in W (x) direction in LOCAL coordinate system" unit="mm">0</OffsetW>
 <OffsetU desc="offsetin U (y) direction in LOCAL coordinate system" unit="mm">0</OffsetU>
@@ -1129,6 +1297,14 @@
 <OffsetPsi desc="rotation about Euler angle Psi in LOCAL coordinate system" unit="deg">0</OffsetPsi>
 </Sensor>
 <Sensor id="SVD_Offset_Layer_6_Ladder_7_Sensor_4">
+<OffsetW desc="offset in W (x) direction in LOCAL coordinate system" unit="mm">0</OffsetW>
+<OffsetU desc="offsetin U (y) direction in LOCAL coordinate system" unit="mm">0</OffsetU>
+<OffsetV desc="offset in V (z) direction in LOCAL coordinate system" unit="mm">0</OffsetV>
+<OffsetPhi desc="rotation about Euler angle Phi in LOCAL coordinate system" unit="deg">0</OffsetPhi>
+<OffsetTheta desc="rotation about Euler angle Theta in LOCAL coordinate system" unit="deg">0</OffsetTheta>
+<OffsetPsi desc="rotation about Euler angle Psi in LOCAL coordinate system" unit="deg">0</OffsetPsi>
+</Sensor>
+<Sensor id="SVD_Offset_Layer_6_Ladder_7_Sensor_5">
 <OffsetW desc="offset in W (x) direction in LOCAL coordinate system" unit="mm">0</OffsetW>
 <OffsetU desc="offsetin U (y) direction in LOCAL coordinate system" unit="mm">0</OffsetU>
 <OffsetV desc="offset in V (z) direction in LOCAL coordinate system" unit="mm">0</OffsetV>
@@ -1176,6 +1352,14 @@
 <OffsetTheta desc="rotation about Euler angle Theta in LOCAL coordinate system" unit="deg">0</OffsetTheta>
 <OffsetPsi desc="rotation about Euler angle Psi in LOCAL coordinate system" unit="deg">0</OffsetPsi>
 </Sensor>
+<Sensor id="SVD_Offset_Layer_6_Ladder_8_Sensor_5">
+<OffsetW desc="offset in W (x) direction in LOCAL coordinate system" unit="mm">0</OffsetW>
+<OffsetU desc="offsetin U (y) direction in LOCAL coordinate system" unit="mm">0</OffsetU>
+<OffsetV desc="offset in V (z) direction in LOCAL coordinate system" unit="mm">0</OffsetV>
+<OffsetPhi desc="rotation about Euler angle Phi in LOCAL coordinate system" unit="deg">0</OffsetPhi>
+<OffsetTheta desc="rotation about Euler angle Theta in LOCAL coordinate system" unit="deg">0</OffsetTheta>
+<OffsetPsi desc="rotation about Euler angle Psi in LOCAL coordinate system" unit="deg">0</OffsetPsi>
+</Sensor>
 <Sensor id="SVD_Offset_Layer_6_Ladder_9_Sensor_0">
 <OffsetW desc="offset in W (x) direction in LOCAL coordinate system" unit="mm">0</OffsetW>
 <OffsetU desc="offsetin U (y) direction in LOCAL coordinate system" unit="mm">0</OffsetU>
@@ -1209,6 +1393,14 @@
 <OffsetPsi desc="rotation about Euler angle Psi in LOCAL coordinate system" unit="deg">0</OffsetPsi>
 </Sensor>
 <Sensor id="SVD_Offset_Layer_6_Ladder_9_Sensor_4">
+<OffsetW desc="offset in W (x) direction in LOCAL coordinate system" unit="mm">0</OffsetW>
+<OffsetU desc="offsetin U (y) direction in LOCAL coordinate system" unit="mm">0</OffsetU>
+<OffsetV desc="offset in V (z) direction in LOCAL coordinate system" unit="mm">0</OffsetV>
+<OffsetPhi desc="rotation about Euler angle Phi in LOCAL coordinate system" unit="deg">0</OffsetPhi>
+<OffsetTheta desc="rotation about Euler angle Theta in LOCAL coordinate system" unit="deg">0</OffsetTheta>
+<OffsetPsi desc="rotation about Euler angle Psi in LOCAL coordinate system" unit="deg">0</OffsetPsi>
+</Sensor>
+<Sensor id="SVD_Offset_Layer_6_Ladder_9_Sensor_5">
 <OffsetW desc="offset in W (x) direction in LOCAL coordinate system" unit="mm">0</OffsetW>
 <OffsetU desc="offsetin U (y) direction in LOCAL coordinate system" unit="mm">0</OffsetU>
 <OffsetV desc="offset in V (z) direction in LOCAL coordinate system" unit="mm">0</OffsetV>
@@ -1256,6 +1448,14 @@
 <OffsetTheta desc="rotation about Euler angle Theta in LOCAL coordinate system" unit="deg">0</OffsetTheta>
 <OffsetPsi desc="rotation about Euler angle Psi in LOCAL coordinate system" unit="deg">0</OffsetPsi>
 </Sensor>
+<Sensor id="SVD_Offset_Layer_6_Ladder_10_Sensor_5">
+<OffsetW desc="offset in W (x) direction in LOCAL coordinate system" unit="mm">0</OffsetW>
+<OffsetU desc="offsetin U (y) direction in LOCAL coordinate system" unit="mm">0</OffsetU>
+<OffsetV desc="offset in V (z) direction in LOCAL coordinate system" unit="mm">0</OffsetV>
+<OffsetPhi desc="rotation about Euler angle Phi in LOCAL coordinate system" unit="deg">0</OffsetPhi>
+<OffsetTheta desc="rotation about Euler angle Theta in LOCAL coordinate system" unit="deg">0</OffsetTheta>
+<OffsetPsi desc="rotation about Euler angle Psi in LOCAL coordinate system" unit="deg">0</OffsetPsi>
+</Sensor>
 <Sensor id="SVD_Offset_Layer_6_Ladder_11_Sensor_0">
 <OffsetW desc="offset in W (x) direction in LOCAL coordinate system" unit="mm">0</OffsetW>
 <OffsetU desc="offsetin U (y) direction in LOCAL coordinate system" unit="mm">0</OffsetU>
@@ -1289,6 +1489,14 @@
 <OffsetPsi desc="rotation about Euler angle Psi in LOCAL coordinate system" unit="deg">0</OffsetPsi>
 </Sensor>
 <Sensor id="SVD_Offset_Layer_6_Ladder_11_Sensor_4">
+<OffsetW desc="offset in W (x) direction in LOCAL coordinate system" unit="mm">0</OffsetW>
+<OffsetU desc="offsetin U (y) direction in LOCAL coordinate system" unit="mm">0</OffsetU>
+<OffsetV desc="offset in V (z) direction in LOCAL coordinate system" unit="mm">0</OffsetV>
+<OffsetPhi desc="rotation about Euler angle Phi in LOCAL coordinate system" unit="deg">0</OffsetPhi>
+<OffsetTheta desc="rotation about Euler angle Theta in LOCAL coordinate system" unit="deg">0</OffsetTheta>
+<OffsetPsi desc="rotation about Euler angle Psi in LOCAL coordinate system" unit="deg">0</OffsetPsi>
+</Sensor>
+<Sensor id="SVD_Offset_Layer_6_Ladder_11_Sensor_5">
 <OffsetW desc="offset in W (x) direction in LOCAL coordinate system" unit="mm">0</OffsetW>
 <OffsetU desc="offsetin U (y) direction in LOCAL coordinate system" unit="mm">0</OffsetU>
 <OffsetV desc="offset in V (z) direction in LOCAL coordinate system" unit="mm">0</OffsetV>
@@ -1336,6 +1544,14 @@
 <OffsetTheta desc="rotation about Euler angle Theta in LOCAL coordinate system" unit="deg">0</OffsetTheta>
 <OffsetPsi desc="rotation about Euler angle Psi in LOCAL coordinate system" unit="deg">0</OffsetPsi>
 </Sensor>
+<Sensor id="SVD_Offset_Layer_6_Ladder_12_Sensor_5">
+<OffsetW desc="offset in W (x) direction in LOCAL coordinate system" unit="mm">0</OffsetW>
+<OffsetU desc="offsetin U (y) direction in LOCAL coordinate system" unit="mm">0</OffsetU>
+<OffsetV desc="offset in V (z) direction in LOCAL coordinate system" unit="mm">0</OffsetV>
+<OffsetPhi desc="rotation about Euler angle Phi in LOCAL coordinate system" unit="deg">0</OffsetPhi>
+<OffsetTheta desc="rotation about Euler angle Theta in LOCAL coordinate system" unit="deg">0</OffsetTheta>
+<OffsetPsi desc="rotation about Euler angle Psi in LOCAL coordinate system" unit="deg">0</OffsetPsi>
+</Sensor>
 <Sensor id="SVD_Offset_Layer_6_Ladder_13_Sensor_0">
 <OffsetW desc="offset in W (x) direction in LOCAL coordinate system" unit="mm">0</OffsetW>
 <OffsetU desc="offsetin U (y) direction in LOCAL coordinate system" unit="mm">0</OffsetU>
@@ -1369,6 +1585,14 @@
 <OffsetPsi desc="rotation about Euler angle Psi in LOCAL coordinate system" unit="deg">0</OffsetPsi>
 </Sensor>
 <Sensor id="SVD_Offset_Layer_6_Ladder_13_Sensor_4">
+<OffsetW desc="offset in W (x) direction in LOCAL coordinate system" unit="mm">0</OffsetW>
+<OffsetU desc="offsetin U (y) direction in LOCAL coordinate system" unit="mm">0</OffsetU>
+<OffsetV desc="offset in V (z) direction in LOCAL coordinate system" unit="mm">0</OffsetV>
+<OffsetPhi desc="rotation about Euler angle Phi in LOCAL coordinate system" unit="deg">0</OffsetPhi>
+<OffsetTheta desc="rotation about Euler angle Theta in LOCAL coordinate system" unit="deg">0</OffsetTheta>
+<OffsetPsi desc="rotation about Euler angle Psi in LOCAL coordinate system" unit="deg">0</OffsetPsi>
+</Sensor>
+<Sensor id="SVD_Offset_Layer_6_Ladder_13_Sensor_5">
 <OffsetW desc="offset in W (x) direction in LOCAL coordinate system" unit="mm">0</OffsetW>
 <OffsetU desc="offsetin U (y) direction in LOCAL coordinate system" unit="mm">0</OffsetU>
 <OffsetV desc="offset in V (z) direction in LOCAL coordinate system" unit="mm">0</OffsetV>
@@ -1416,6 +1640,14 @@
 <OffsetTheta desc="rotation about Euler angle Theta in LOCAL coordinate system" unit="deg">0</OffsetTheta>
 <OffsetPsi desc="rotation about Euler angle Psi in LOCAL coordinate system" unit="deg">0</OffsetPsi>
 </Sensor>
+<Sensor id="SVD_Offset_Layer_6_Ladder_14_Sensor_5">
+<OffsetW desc="offset in W (x) direction in LOCAL coordinate system" unit="mm">0</OffsetW>
+<OffsetU desc="offsetin U (y) direction in LOCAL coordinate system" unit="mm">0</OffsetU>
+<OffsetV desc="offset in V (z) direction in LOCAL coordinate system" unit="mm">0</OffsetV>
+<OffsetPhi desc="rotation about Euler angle Phi in LOCAL coordinate system" unit="deg">0</OffsetPhi>
+<OffsetTheta desc="rotation about Euler angle Theta in LOCAL coordinate system" unit="deg">0</OffsetTheta>
+<OffsetPsi desc="rotation about Euler angle Psi in LOCAL coordinate system" unit="deg">0</OffsetPsi>
+</Sensor>
 <Sensor id="SVD_Offset_Layer_6_Ladder_15_Sensor_0">
 <OffsetW desc="offset in W (x) direction in LOCAL coordinate system" unit="mm">0</OffsetW>
 <OffsetU desc="offsetin U (y) direction in LOCAL coordinate system" unit="mm">0</OffsetU>
@@ -1456,6 +1688,14 @@
 <OffsetTheta desc="rotation about Euler angle Theta in LOCAL coordinate system" unit="deg">0</OffsetTheta>
 <OffsetPsi desc="rotation about Euler angle Psi in LOCAL coordinate system" unit="deg">0</OffsetPsi>
 </Sensor>
+<Sensor id="SVD_Offset_Layer_6_Ladder_15_Sensor_5">
+<OffsetW desc="offset in W (x) direction in LOCAL coordinate system" unit="mm">0</OffsetW>
+<OffsetU desc="offsetin U (y) direction in LOCAL coordinate system" unit="mm">0</OffsetU>
+<OffsetV desc="offset in V (z) direction in LOCAL coordinate system" unit="mm">0</OffsetV>
+<OffsetPhi desc="rotation about Euler angle Phi in LOCAL coordinate system" unit="deg">0</OffsetPhi>
+<OffsetTheta desc="rotation about Euler angle Theta in LOCAL coordinate system" unit="deg">0</OffsetTheta>
+<OffsetPsi desc="rotation about Euler angle Psi in LOCAL coordinate system" unit="deg">0</OffsetPsi>
+</Sensor>
 <Sensor id="SVD_Offset_Layer_6_Ladder_16_Sensor_0">
 <OffsetW desc="offset in W (x) direction in LOCAL coordinate system" unit="mm">0</OffsetW>
 <OffsetU desc="offsetin U (y) direction in LOCAL coordinate system" unit="mm">0</OffsetU>
@@ -1489,6 +1729,14 @@
 <OffsetPsi desc="rotation about Euler angle Psi in LOCAL coordinate system" unit="deg">0</OffsetPsi>
 </Sensor>
 <Sensor id="SVD_Offset_Layer_6_Ladder_16_Sensor_4">
+<OffsetW desc="offset in W (x) direction in LOCAL coordinate system" unit="mm">0</OffsetW>
+<OffsetU desc="offsetin U (y) direction in LOCAL coordinate system" unit="mm">0</OffsetU>
+<OffsetV desc="offset in V (z) direction in LOCAL coordinate system" unit="mm">0</OffsetV>
+<OffsetPhi desc="rotation about Euler angle Phi in LOCAL coordinate system" unit="deg">0</OffsetPhi>
+<OffsetTheta desc="rotation about Euler angle Theta in LOCAL coordinate system" unit="deg">0</OffsetTheta>
+<OffsetPsi desc="rotation about Euler angle Psi in LOCAL coordinate system" unit="deg">0</OffsetPsi>
+</Sensor>
+<Sensor id="SVD_Offset_Layer_6_Ladder_16_Sensor_5">
 <OffsetW desc="offset in W (x) direction in LOCAL coordinate system" unit="mm">0</OffsetW>
 <OffsetU desc="offsetin U (y) direction in LOCAL coordinate system" unit="mm">0</OffsetU>
 <OffsetV desc="offset in V (z) direction in LOCAL coordinate system" unit="mm">0</OffsetV>

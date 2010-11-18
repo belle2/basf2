@@ -11,9 +11,18 @@
     <OffsetZ>0</OffsetZ>
     <Layers>
       <Layer id="SVD_Layer_3">
+      <Shape>Assembly</Shape>
+      <Material>Air</Material>
+                   <!--
+<Shape>Tube</Shape>
+<InnerRadius unit="mm">35</InnerRadius>
+<OuterRadius unit="mm">49</OuterRadius>
+<Length unit="mm">310</Length>
+/-->
         <Phi0 desc="The starting angle of the layer in the r-phi plane" unit="deg">-8</Phi0>
         <NumberOfLadders desc="Number of ladders in this layer">8</NumberOfLadders>
         <Ladders>
+        <Shape>Assembly</Shape>
           <WPosition desc="Radius of the layer" unit="mm">40</WPosition>
           <PhiLocal desc="Rotation of the ladder about its local V axis (parallel to global z axis)" unit="deg">8</PhiLocal>
           <Material>Air</Material>
@@ -38,12 +47,15 @@
         </Ladders>
       </Layer>
       <Layer id="SVD_Layer_4">
+      <Material>Air</Material>
+      <Shape>Assembly</Shape>
         <Phi0 desc="The starting angle of the layer in the r-phi plane" unit="deg">-6</Phi0>
         <NumberOfLadders desc="Number of ladders in this layer">10</NumberOfLadders>
         <Ladders>
           <WPosition desc="Radius of the layer" unit="mm">80.0</WPosition>
           <PhiLocal desc="Rotation of the ladder about its local V axis (parallel to global z axis)" unit="deg">6</PhiLocal>
           <Material>Air</Material>
+          <Shape>Assembly</Shape>
           <Barrel>
             <Ribs>
               <xi:include href="SVDLadderBelleII.xml" xpointer="xpointer(/*/Ribs/*)"/>
@@ -77,6 +89,7 @@
               <VPosition desc="sensor position (middle of the volume) in V (local coordinate system of ladder)" unit="mm">26.19</VPosition>
               <Kapton>
                 <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Kapton/*)"/>
+                <Mass unit="g">2.10072635462545</Mass>
               </Kapton>
               <KaptonFlex>
                 <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//KaptonFlex/*)"/>
@@ -99,9 +112,12 @@
         </Ladders>
       </Layer>
       <Layer id="SVD_Layer_5">
+      <Material>Air</Material>
+      <Shape>Assembly</Shape>
         <Phi0 desc="The starting angle of the layer in the r-phi plane" unit="deg">-7</Phi0>
         <NumberOfLadders desc="Number of ladders in this layer">14</NumberOfLadders>
         <Ladders>
+        <Shape>Assembly</Shape>
           <WPosition desc="Radius of the layer" unit="mm">115.0</WPosition>
           <PhiLocal desc="Rotation of the ladder about its local V axis (parallel to global z axis)" unit="deg">7</PhiLocal>
           <Material>Air</Material>
@@ -149,7 +165,7 @@
               <VPosition desc="sensor position (middle of the volume) in V (local coordinate system of ladder)" unit="mm">103.92</VPosition>
               <Kapton>
                 <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Kapton/*)"/>
-                <Mass unit="g">2.10072635462545</Mass>
+              <Mass unit="g">2.10072635462545</Mass>
               </Kapton>
               <KaptonFlex>
                 <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//KaptonFlex/*)"/>
@@ -172,9 +188,12 @@
         </Ladders>
       </Layer>
       <Layer id="SVD_Layer_6">
+      <Material>Air</Material>
         <Phi0 desc="The starting angle of the layer in the r-phi plane" unit="deg">-7</Phi0>
         <NumberOfLadders desc="Number of ladders in this layer">17</NumberOfLadders>
+        <Shape>Assembly</Shape>
         <Ladders>
+        <Shape>Assembly</Shape>
           <WPosition desc="Radius of the layer" unit="mm">140</WPosition>
           <PhiLocal desc="Rotation of the ladder about its local V axis (parallel to global z axis)" unit="deg">7</PhiLocal>
           <Material>Air</Material>
@@ -249,7 +268,7 @@
               <ThetaLocal desc="rotation about Euler angle Theta in LOCAL coordinate system" unit="deg">21.1</ThetaLocal>
               <PsiLocal unit="deg">90</PsiLocal>
               <Kapton>
-                <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//KaptonFront/*)"/>
+                <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Kapton/*)"/>
                 <Mass unit="g">1.73207282903768</Mass>
               </Kapton>
               <KaptonFront>

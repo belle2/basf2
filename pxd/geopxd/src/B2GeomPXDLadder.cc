@@ -58,7 +58,10 @@ Bool_t B2GeomPXDLadder::init(GearDir& content)
 Bool_t B2GeomPXDLadder::make()
 {
   //printf("B2GeomPXDLadder::make start (Lay:%i, Lad:%i)\n", iLayer, iLadder);
-  tVolume = new TGeoVolumeAssembly(name);
+  if (!makeGeneric()) {
+    printf("Creating PXD Ladder failed!\n");
+    return false;
+  }
   for (int iSensor = 0; iSensor < nComponents; ++iSensor) {
     components[iSensor]->make();
     tVolume->AddNode(components[iSensor]->getVol(), 1, components[iSensor]->getPosition());

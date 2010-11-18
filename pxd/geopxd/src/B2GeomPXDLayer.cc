@@ -23,7 +23,6 @@ B2GeomPXDLayer::B2GeomPXDLayer()
 B2GeomPXDLayer::B2GeomPXDLayer(Int_t iLay)
 {
   iLayer = iLay;
-  sprintf(name, "PXD_Layer_%i", iLayer);
   resetBasicParameters();
 }
 
@@ -56,8 +55,10 @@ Bool_t B2GeomPXDLayer::init(GearDir& content)
 
 Bool_t B2GeomPXDLayer::make()
 {
-  //printf("B2GeomPXDLayer::make start (Lay:%i)\n", iLayer);
-  tVolume = new TGeoVolumeAssembly(name);
+  if (!makeGeneric()) {
+    printf("Creating PXD Layer failed!\n");
+    return false;
+  }
 
   for (int iLadder = 0; iLadder < nComponents; ++iLadder) {
     // create Ladder

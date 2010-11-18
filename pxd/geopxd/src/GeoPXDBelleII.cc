@@ -62,12 +62,18 @@ void GeoPXDBelleII::create(GearDir& content)
   double globalRotAngle = content.getParamAngle("Rotation") / deg;
   double globalOffsetZ  = content.getParamLength("OffsetZ");
 
+
+
   //----------------------------------------
   //        Add subdetector group
   //----------------------------------------
   TGeoRotation* geoRot = new TGeoRotation("PXDRot", 90.0, globalRotAngle, 0.0);
   TGeoVolumeAssembly* volGrpPXD = addSubdetectorGroup("PXD", new TGeoCombiTrans(0.0, 0.0, globalOffsetZ, geoRot));
-
+  /*
+  bool isWithContainer = true;
+  TGeoVolume* volPXD = gGeoManager->MakeTube("PXD_Container", gGeoManager->GetMedium("Air"), 1.1, 2.6, 11);
+  if (isWithContainer) volGrpPXD->AddNode(volPXD, 1, new TGeoTranslation(0.0,0.0,0.0));
+  */
 
   //----------------------------------------
   //           Build subdetector
@@ -84,7 +90,13 @@ void GeoPXDBelleII::create(GearDir& content)
     b2gPXDLayer->init(content);
     b2gPXDLayer->make();
 
+    /*
+    if (isWithContainer) {
+        volPXD->AddNode(b2gPXDLayer->getVol(), 1, new TGeoTranslation(0, 0, 0));
+    } else {
+       volGrpPXD->AddNode(b2gPXDLayer->getVol(), 1, new TGeoTranslation(0, 0, 0));
+    }
+    */
     volGrpPXD->AddNode(b2gPXDLayer->getVol(), 1, new TGeoTranslation(0, 0, 0));
-
   }
 }

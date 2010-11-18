@@ -11,12 +11,22 @@
     <Layers>
       <Layer id="PXD_Layer_1">
         <Material>Vacuum</Material>
+        <Name>PXD_Layer_1</Name>
+        <Shape>Assembly</Shape>
+        <!--
+        <Shape>Tube</Shape>
+        <InnerRadius unit="mm">11</InnerRadius>
+        <OuterRadius unit="mm">19</OuterRadius>
+        <Length unit ="mm">220</Length>
+        /-->
+        
         <Phi0 desc="The starting angle of the layer in the r-phi plane" unit="deg">90.0</Phi0>
         <NumberOfLadders desc="Number of ladders in this layer">8</NumberOfLadders>
         <Ladder desc="The silicon modules the detector is made of">
           <Material>Vacuum</Material>
+          <Shape>Assembly</Shape>
           <WPosition desc="The distance between interaction point and ladder (radius)" unit="mm">14</WPosition>
-          <UPosition desc="The offset of the center of the layer in Y direction (Wind Mill structure)" unit="mm">3.3</UPosition>
+          <UPosition desc="The offset of the center of the layer in Y direction (Wind Mill structure)" unit="mm">-3.3</UPosition>
           <Sensors>
             <Sensor id="PXD_Layer_1_Ladder_Sensor_0">
               <xi:include href="PXDSensorBelleII.xml" xpointer="xpointer(//Sensor[@type=1]/*)"/>
@@ -34,12 +44,21 @@
       </Layer>
       <Layer id="PXD_Layer_2">
         <Material>Vacuum</Material>
+        <Name>PXD_Layer_2</Name>
+        <Shape>Assembly</Shape>
+        <!--
+        <Shape>Tube</Shape>
+        <InnerRadius unit="mm">19</InnerRadius>
+        <OuterRadius unit="mm">26</OuterRadius>
+        <Length unit ="mm">220</Length>
+        /-->
         <Phi0 desc="The starting angle of the layer in the r-phi plane" unit="deg">90.0</Phi0>
         <NumberOfLadders desc="Number of ladders in this layer">12</NumberOfLadders>
         <Ladder desc="The silicon modules the detector is made of">
           <Material>Vacuum</Material>
+          <Shape>Assembly</Shape>
           <WPosition desc="The distance between interaction point and ladder (radius)" unit="mm">22</WPosition>
-          <UPosition desc="The offset of the center of the layer in Y direction (Wind Mill structure)" unit="mm">3.3</UPosition>
+          <UPosition desc="The offset of the center of the layer in Y direction (Wind Mill structure)" unit="mm">-3.3</UPosition>
           <Sensors>
             <Sensor id="PXD_Layer_2_Ladder_Sensor_0">
               <!-- VPosition = -66mm + 0.5 * SiliconLength /-->

@@ -1,3 +1,13 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2010 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Christian Oswald            *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
 #include <pxd/geopxd/B2GeomVolume.h>
 using namespace Belle2;
 using namespace std;
@@ -41,20 +51,24 @@ void B2GeomVolume::resetBasicParameters()
   fPhiLocal = 0;
   fThetaLocal = 0;
   fPsiLocal = 0;
+  iColor = -1;
   isReflectX = false;
   isReflectY = false;
   isReflectZ = false;
   isDensityCorrected = false;
   isReset = true;
+  isInitBasicParameters = false;
 }
 
 TGeoVolume* B2GeomVolume::getVol()
 {
+  //printf("B2GeomVolume::getVol start!\n");
   if (!isReset) {
     printf("B2GeomVolume: Please run resetBasicParameters() method before any other method!\n");
     return NULL;
   }
   correctDensity();
+  //printf("B2GeomVolume::getVol stop!\n");
   return tVolume;
 }
 
@@ -80,6 +94,7 @@ Bool_t B2GeomVolume::initBasicParameters(GearDir& con)
     printf("B2GeomVolume: Please run resetBasicParameters() method before any other method!\n");
     return false;
   }
+  isInitBasicParameters = true;
   GearDir content(con);
   // How to position the volume in its mother volume?
   if (content.isParamAvailable("ReflectX")) isReflectX = true;
@@ -133,13 +148,26 @@ Bool_t B2GeomVolume::initBasicParameters(GearDir& con)
     if ((fLength < 0) && content.isParamAvailable("Length")) fLength = content.getParamLength("Length");
     if ((fInnerRadius < 0) && content.isParamAvailable("InnerRadius")) fInnerRadius = content.getParamLength("InnerRadius");
     if ((fOuterRadius < 0) && content.isParamAvailable("OuterRadius")) fOuterRadius = content.getParamLength("OuterRadius");
+    if ((iColor < 0) && content.isParamAvailable("Color")) iColor = content.getParamNumValue("Color");
     if (!goToParentNode(content)) break;
+  }
+
+  if (fMass > 0) {
+    sprintf(name, "%s_Mass_%i_mg", name, (int)(fMass*1000));
+  }
+
+  if (fDensityFactor > 0) {
+    sprintf(name, "%s_DensityFactor_%i_E-3", name, (int)(fDensityFactor*1000));
   }
   return true;
 }
 
 Bool_t B2GeomVolume::correctDensity()
 {
+  if (!isInitBasicParameters) {
+    printf("B2GeomVolume: Please run initBasicParameters() before using correctDensity()!\n");
+    return NULL;
+  }
   //check if density has already been corrected
   if (isDensityCorrected) return true;
 
@@ -183,9 +211,9 @@ Bool_t B2GeomVolume::correctDensity()
   return true;
 }
 
-
 TGeoHMatrix* B2GeomVolume::getPosition()
 {
+  //printf("B2GeomVolume::getPosition start!\n");
   if (!isReset) {
     printf("B2GeomVolume: Please run resetBasicParameters() method before any other method!\n");
     return NULL;
@@ -210,6 +238,7 @@ TGeoHMatrix* B2GeomVolume::getPosition()
   TGeoTranslation tra(fWPosition, fUPosition, fVPosition);
   hmaHelp = tra * hmaHelp;
   TGeoHMatrix* hmaPosition = new TGeoHMatrix(hmaHelp);
+  //printf("B2GeomVolume::getPosition stop!\n");
   return hmaPosition;
 }
 
@@ -358,26 +387,44 @@ Bool_t B2GeomVolume::init(GearDir& content, string subDir)
 }
 
 
-Bool_t B2GeomVolume::make()
+Bool_t B2GeomVolume::makeGeneric()
 {
   tVolume = (TGeoVolume*) gROOT->FindObjectAny(name);
+  //printf("shape: %s\n", shape);
   if (tVolume) return true;
-  if (strncmp(shape, "Trd2", 3) == 0) {
+  if (strncmp(shape, "Trd2", 4) == 0) {
     tVolume = gGeoManager->MakeTrd2(name, tMedium,
                                     0.5 * fThickness,
                                     0.5 * fThickness2,
                                     0.5 * fWidth,
                                     0.5 * fWidth2,
                                     0.5 * fLength);
+    if (iColor > 0) tVolume->SetLineColor(iColor);
     return true;
   } else if (strncmp(shape, "Box", 3) == 0) {
     tVolume = gGeoManager->MakeBox(name, tMedium,
                                    0.5 * fThickness,
                                    0.5 * fWidth,
                                    0.5 * fLength);
+    if (iColor > 0) tVolume->SetLineColor(iColor);
+    return true;
+  } else if (strncmp(shape, "Tube", 4) == 0) {
+    tVolume = gGeoManager->MakeTube(name, tMedium,
+                                    0.5 * fInnerRadius,
+                                    0.5 * fOuterRadius,
+                                    0.5 * fLength);
+    if (iColor > 0) tVolume->SetLineColor(iColor);
+    return true;
+  } else if (strncmp(shape, "Assembly", 8) == 0) {
+    tVolume = new TGeoVolumeAssembly(name);
     return true;
   } else {
     return false;
   }
+}
+
+Bool_t B2GeomVolume::make()
+{
+  return makeGeneric();
 }
 

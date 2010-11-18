@@ -1,3 +1,13 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2010 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Christian Oswald                                         *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
 #include "TGeoManager.h"
 #include "TGeoVolume.h"
 #include "TGeoMaterial.h"
@@ -56,6 +66,8 @@ namespace Belle2 {
     Double_t fPhiLocal;
     Double_t fThetaLocal;
     Double_t fPsiLocal;
+    //! The color as integer from the ROOT color wheel
+    Int_t iColor;
     Bool_t isReflectX;
     Bool_t isReflectY;
     Bool_t isReflectZ;
@@ -65,13 +77,16 @@ namespace Belle2 {
     bool isCalculatedOffset;
     //! true = resetBasicParameters() has been called
     bool isReset;
+    //! true = initBasicParameters() has been called
+    bool isInitBasicParameters;
 
     Bool_t correctDensity();
     void resetBasicParameters();
     Bool_t initBasicParameters(GearDir& content);
     Bool_t initOffsets(GearDir& con);
+    Bool_t makeGeneric();
   public:
-
+    B2GeomVolume() {resetBasicParameters();}
     TGeoVolume* getVol();
     bool goToParentNode(GearDir& con, bool isShowDebug = false);
     //! returns the position of the volume with relation to the mother volume

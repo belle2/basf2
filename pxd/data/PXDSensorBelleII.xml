@@ -3,10 +3,13 @@
   <Sensor desc="The small PXD sensor" type="1">
     <SensorType desc="1 = Layer1, 2 = Layer2">1</SensorType>
     <Material>Air</Material>
+    <Shape>Assembly</Shape>
     <ReflectX>1</ReflectX>
+    <ReflectY>1</ReflectY>
     <Switchers1>
       <Shape>Box</Shape>
       <Material>PXD_SiliconSwitcher</Material>
+      <Name>PXD_Layer_1_Switchers1</Name>
       <!-- These parameters are only estimation from drawing, please fill exact values! /-->
       <Thickness unit="mm">0.3</Thickness>
       <Width unit="mm">12</Width>
@@ -18,6 +21,7 @@
     <Switchers2>
       <Shape>Box</Shape>
       <Material>PXD_SiliconSwitcher</Material>
+      <Name>PXD_Layer_1_Switchers2</Name>
       <!-- These parameters are only estimation from drawing, please fill exact values! /-->
       <Thickness unit="mm">0.3</Thickness>
       <Width unit="mm">2</Width>
@@ -28,12 +32,16 @@
     </Switchers2>
     <Silicon>
       <Material>Silicon</Material>
+      <Color>597</Color>
+      <Shape>Box</Shape>
       <Thickness desc="Thickness of the sensors" unit="um">420</Thickness>
       <Width desc="The over all width of the sensor" unit="mm">15</Width>
       <Length desc="The over all length of the sensor" unit="mm">67.975</Length>
       <WPosition unit="mm">-0.21</WPosition>
       <Active>
         <Material>Silicon</Material>
+        <Color>590</Color>
+        <Shape>Box</Shape>
         <Thickness desc="Thickness of the sensors" unit="um">75</Thickness>
         <Width desc="The over all width of the sensor" unit="mm">12.5</Width>
         <Length desc="The over all length of the sensor" unit="mm">44.725</Length>
@@ -43,6 +51,9 @@
       </Active>
       <Thinned>
         <Material>Air</Material>
+        <Name>PXD_Layer_1_Silicon_Thinned</Name>
+        <Shape>Trd2</Shape>
+        <Color>0</Color>
         <Length unit="um">345</Length>
         <Thickness unit="mm">44.775</Thickness>
         <Thickness2 unit="mm">44.286</Thickness2>
@@ -60,9 +71,12 @@
   <Sensor desc="The large PXD sensor" type="2">
     <SensorType desc="1 = Layer1, 2 = Layer2">2</SensorType>
     <Material>Air</Material>
+    <Shape>Assembly</Shape>
+    <ReflectY>1</ReflectY>
     <Switchers1>
       <Shape>Box</Shape>
       <Material>PXD_SiliconSwitcher</Material>
+      <Name>PXD_Layer_2_Switchers1</Name>
       <!-- These parameters are only estimation from drawing, please fill exact values! /-->
       <Thickness unit="mm">0.3</Thickness>
       <Width unit="mm">12</Width>
@@ -74,6 +88,7 @@
     <Switchers2>
       <Shape>Box</Shape>
       <Material>PXD_SiliconSwitcher</Material>
+      <Name>PXD_Layer_2_Switchers2</Name>
       <!-- These parameters are only estimation from drawing, please fill exact values! /-->
       <Thickness unit="mm">0.3</Thickness>
       <Width unit="mm">2</Width>
@@ -84,12 +99,16 @@
     </Switchers2>
     <Silicon>
       <Material>Silicon</Material>
+      <Color>597</Color>
+      <Shape>Box</Shape>
       <Length desc="The over all length of the sensor" unit="mm">84.975</Length>
       <Width desc="The over all width of the sensor" unit="mm">15</Width>
       <Thickness desc="Thickness of the sensor" unit="um">420</Thickness>
       <WPosition unit="mm">-0.21</WPosition>
       <Active>
         <Material>Silicon</Material>
+        <Color>590</Color>
+        <Shape>Box</Shape>
         <Thickness desc="Thickness of the active sensor" unit="um">75</Thickness>
         <Width desc="The over all width of the active sensor" unit="mm">12.5</Width>
         <Length desc="The over all length of the active sensor" unit="mm">61.725</Length>
@@ -99,6 +118,9 @@
       </Active>
       <Thinned>
         <Material>Air</Material>
+        <Name>PXD_Layer_2_Silicon_Thinned</Name>
+        <Shape>Trd2</Shape>
+        <Color>0</Color>
         <Thickness unit="mm">61.775</Thickness>
         <Thickness2 unit="mm">61.286</Thickness2>
         <Width unit="mm">12</Width>

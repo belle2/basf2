@@ -44,7 +44,6 @@ Bool_t B2GeomPXDSensor::init(GearDir& content)
   sensorContent.append((format("Sensors/Sensor[@id=\'PXD_Layer_%1%_Ladder_Sensor_%2%\']/") % iLayer % iSensor).str());
   initBasicParameters(sensorContent);
 
-
   if (sensorContent.isParamAvailable("Silicon")) {
     volSilicon = new B2GeomPXDSensorSilicon(iLayer, iLadder, iSensor);
     if (!volSilicon->init(sensorContent)) {
@@ -57,12 +56,12 @@ Bool_t B2GeomPXDSensor::init(GearDir& content)
   }
 
   if (sensorContent.isParamAvailable("Switchers1")) {
-    volSwitchers1 = new B2GeomPXDSensorSwitchers1(iLayer);
+    volSwitchers1 = new B2GeomVolume();
     if (!volSwitchers1->init(sensorContent, "Switchers1/")) return false;
   }
 
   if (sensorContent.isParamAvailable("Switchers2")) {
-    volSwitchers2 = new B2GeomPXDSensorSwitchers2(iLayer);
+    volSwitchers2 = new B2GeomVolume();
     if (!volSwitchers2->init(sensorContent, "Switchers2/")) return false;
   }
 
@@ -76,7 +75,10 @@ Bool_t B2GeomPXDSensor::init(GearDir& content)
 Bool_t B2GeomPXDSensor::make()
 {
   //printf("B2GeomPXDSensor::make start\n");
-  tVolume = new TGeoVolumeAssembly(name);
+  if (!makeGeneric()) {
+    printf("Creating PXD Sensor failed!\n");
+    return false;
+  }
 
   // add silicon volume to sensor volume
   if (!volSilicon->make()) {
@@ -122,8 +124,8 @@ Bool_t B2GeomPXDSensorSilicon::init(GearDir& content)
   siliconContent.append("Silicon/");
   initBasicParameters(siliconContent);
   if (siliconContent.isParamAvailable("Thinned")) {
-    volThinned = new B2GeomPXDSensorThinned(iLayer);
-    if (!volThinned->init(siliconContent)) {
+    volThinned = new B2GeomVolume();
+    if (!volThinned->init(siliconContent, "Thinned/")) {
       printf("B2ERROR! Parameter reading for PXD silicon thinned failed!\n");
       return false;
     }
@@ -148,51 +150,7 @@ Bool_t B2GeomPXDSensorSilicon::make()
 {
 
   //printf("B2GeomPXDSensorSilicon::make start\n");
-
-  /*
-  char compShapeName[200];
-  sprintf(compShapeName, "PXD_Layer_%i_ShapeSiliconMinusThinned", iLayer);
-  TGeoCompositeShape* shaSiliconMinusThinned = (TGeoCompositeShape*) gROOT->FindObjectAny(compShapeName);
-
-  if (!shaSiliconMinusThinned) {
-
-  char shaSiliconName[200];
-  sprintf(shaSiliconName, "%s_ShapeSilicon", path.c_str());
-  TGeoBBox *shaSilicon = new TGeoBBox(shaSiliconName,
-                                      0.5 * fThickness,
-                                      0.5 * fWidth,
-                                      0.5 * fLength);
-  char shaThinnedName[200];
-  sprintf(shaThinnedName, "%s_ShapeThinned", path.c_str());
-  if (!volThinned->make()) return false;
-  TGeoShape* shaThinned = volThinned->getVol()->GetShape();
-  shaThinned->SetName(shaThinnedName);
-
-  char thinnedPosName[200];
-  sprintf(thinnedPosName, "hmaThinnedPosition_Layer_%i_Sensor_%i", iLayer, iSensor);
-  TGeoHMatrix* hmaThinnedVolumePosition = (TGeoHMatrix*) gROOT->FindObjectAny(thinnedPosName);
-  if (!hmaThinnedVolumePosition) {
-  hmaThinnedVolumePosition = volThinned->getPosition();
-  hmaThinnedVolumePosition->SetName(thinnedPosName);
-  hmaThinnedVolumePosition->RegisterYourself();
-  }
-
-  // we subtract now the thinned volume from the silicon
-  char compShapeCommand[200];
-  sprintf(compShapeCommand, "%s - %s:%s", shaSiliconName, shaThinnedName, thinnedPosName);
-  shaSiliconMinusThinned = new TGeoCompositeShape(compShapeName, compShapeCommand);
-  shaSiliconMinusThinned->InspectShape();
-  }
-
-   tVolume = new TGeoVolume(path.c_str(), shaSiliconMinusThinned);
-  */
-
-  tVolume = gGeoManager->MakeBox(name, tMedium,
-                                 0.5 * fThickness,
-                                 0.5 * fWidth,
-                                 0.5 * fLength
-                                );
-  tVolume->SetLineColor(kBlue + 3);
+  makeGeneric();
 
   // add thinned out volume with air
   if (!volThinned->make()) {
@@ -241,72 +199,10 @@ Bool_t B2GeomPXDSensorActive::init(GearDir& content)
   return true;
 }
 
-Bool_t B2GeomPXDSensorActive::make()
-{
-  // define the active volume of the SVD sensor
-  tVolume = gGeoManager->MakeBox(name, tMedium,
-                                 fThickness * 0.5,
-                                 fWidth * 0.5,
-                                 fLength * 0.5);
-  tVolume->SetLineColor(kBlue - 10);
-  return true;
-}
-
-// ------------------------------------------------------------------------------------------------
-// Thinned part of the sensor
-// ------------------------------------------------------------------------------------------------
-B2GeomPXDSensorThinned::B2GeomPXDSensorThinned(Int_t iLay)
-{
-  iLayer = iLay;
-  sprintf(name, "PXD_Layer_%i_Silicon_Thinned", iLayer);
-  resetBasicParameters();
-}
-
-Bool_t B2GeomPXDSensorThinned::init(GearDir& content)
-{
-  GearDir thinnedContent(content);
-  thinnedContent.append("Thinned/");
-  initBasicParameters(thinnedContent);
-  return true;
-}
 
 
-Bool_t B2GeomPXDSensorThinned::make()
-{
-  tVolume = (TGeoVolume*) gROOT->FindObjectAny(name);
-  if (!tVolume) {
-    tVolume = gGeoManager->MakeTrd2(name, tMedium,
-                                    0.5 * fThickness,
-                                    0.5 * fThickness2,
-                                    0.5 * fWidth,
-                                    0.5 * fWidth2,
-                                    0.5 * fLength);
-    tVolume->SetLineColor(kWhite);
-  }
-  return true;
-}
 
-// ------------------------------------------------------------------------------------------------
-// Electronics1 of the PXD module
-// ------------------------------------------------------------------------------------------------
 
-B2GeomPXDSensorSwitchers1::B2GeomPXDSensorSwitchers1(Int_t iLay)
-{
-  iLayer = iLay;
-  sprintf(name, "PXD_Layer_%i_Switchers1", iLayer);
-  resetBasicParameters();
-}
-
-// ------------------------------------------------------------------------------------------------
-// Electronics2 of the PXD module
-// ------------------------------------------------------------------------------------------------
-
-B2GeomPXDSensorSwitchers2::B2GeomPXDSensorSwitchers2(Int_t iLay)
-{
-  iLayer = iLay;
-  sprintf(name, "PXD_Layer_%i_Switchers2", iLayer);
-  resetBasicParameters();
-}
 
 
 

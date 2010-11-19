@@ -91,26 +91,26 @@ namespace Belle2 {
 
   private:
 
-    int m_superlayerId;
-    bool m_isAxial;
-    bool m_isUsed;
+    int m_superlayerId; /**< ID of the superlayer of the Hit (superlayer = group of 6/8 layers with the same orientation)*/
+    bool m_isAxial; /**< Boolean to mark a Hit as belonging to an axial superlayer (axial superlayers are 1,3,5,7,9)*/
+    bool m_isUsed; /**<Boolean to mark a Hit as already used for reconstruction of a track candidate*/
 
-    double m_posWireX;
-    double m_posWireY;
-    double m_posWireZ;
+    double m_posWireX; /**< Central X coordinate of the wire*/
+    double m_posWireY; /**< Central Y coordinate of the wire*/
+    double m_posWireZ; /**< Central Z coordinate of the wire*/
 
-    double m_posWireX_f;
-    double m_posWireY_f;
-    double m_posWireZ_f;
+    double m_posWireX_f; /**<X coordinate of the forward end of the wire*/
+    double m_posWireY_f; /**<Y coordinate of the forward end of the wire*/
+    double m_posWireZ_f; /**<Z coordinate of the forward end of the wire*/
 
-    double m_posWireX_b;
-    double m_posWireY_b;
-    double m_posWireZ_b;
+    double m_posWireX_b; /**<X coordinate of the backward end of the wire*/
+    double m_posWireY_b; /**<Y coordinate of the backward end of the wire*/
+    double m_posWireZ_b; /**<Z coordinate of the backward end of the wire*/
 
-    TVector3 m_wireVector;
+    TVector3 m_wireVector; /**< A vector along the wire*/
 
-    double m_conformalX;
-    double m_conformalY;
+    double m_conformalX; /**<X coordinate of the hit in the conformal plane*/
+    double m_conformalY; /**<Y coordinate of the hit in the conformal plane*/
 
     //! ROOT ClassDef macro to make this class a ROOT class.
     ClassDef(CDCTrackHit, 1);

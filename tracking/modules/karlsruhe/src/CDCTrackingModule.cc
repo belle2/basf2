@@ -9,7 +9,7 @@
 **************************************************************************/
 
 #include <tracking/modules/karlsruhe/CDCTrackingModule.h>
-#include <framework/core/ModuleManager.h>
+//#include <framework/core/ModuleManager.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreDefs.h>
@@ -42,7 +42,7 @@ REG_MODULE(CDCTrackingModule, "CDCTrackingModule")
 
 CDCTrackingModule::CDCTrackingModule() : Module()
 {
-  setDescription("The CDCTrackingModule performs the first rough pattern recognition step in the CDC. Digitized CDC Hits are combined to Tracks");
+  setDescription("The CDCTrackingModule performs the first rough pattern recognition step in the CDC. Digitized CDC Hits are combined to track candidates");
 
   addParam("InputSimHitsColName", m_inSimHitsColName, string("SimHitCDCArray"), "Input simulated hits collection name");
   addParam("InputHitsColName", m_inHitsColName, string("HitCDCArray"), "Input digitized hits collection name");
@@ -72,7 +72,7 @@ void CDCTrackingModule::initialize()
 
 void CDCTrackingModule::beginRun()
 {
-  INFO("CDCTrackingModule beginRun");
+  B2INFO("CDCTrackingModule beginRun");
 }
 
 void CDCTrackingModule::event()
@@ -80,7 +80,7 @@ void CDCTrackingModule::event()
 
   //StoreArray with simulated CDCHits, should already be created by previous modules
   StoreArray<SimHitCDC> cdcSimHitArray(m_inSimHitsColName);
-  INFO("Number of simulated Hits:  " << cdcSimHitArray.GetEntries());
+  B2INFO("Number of simulated Hits:  " << cdcSimHitArray.GetEntries());
 
 
   //StoreArray with digitized CDCHits, should already be created by CDCDigitized module
@@ -98,7 +98,7 @@ void CDCTrackingModule::event()
   }
 
   int NHits = cdcTrackHitArray.GetEntries();
-  INFO("Number of digitized Hits: " << NHits);
+  B2INFO("Number of digitized Hits: " << NHits);
 
   //Calculates the coordinates in the conformal plane for each TrackHit in the StoreArray
   SegmentFinder::ConformalTransformation(m_outTrackHitsColName);
@@ -108,7 +108,7 @@ void CDCTrackingModule::event()
   StoreArray<CDCSegment> cdcSegmentsArray(m_outSegmentsColName);
 
   //Combine CDCTrackHits to CDCSegment, fill cdcSegmentsArray with new created Segments
-  INFO("Searching for Segments... ");
+  B2INFO("Searching for Segments... ");
   SegmentFinder::FindSegments(m_outTrackHitsColName, m_outSegmentsColName);
   //Count good and bad segments
   int goodSeg = 0;
@@ -119,14 +119,14 @@ void CDCTrackingModule::event()
     else badSeg++;
   }
 
-  INFO("Number of found Segments: " << cdcSegmentsArray.GetEntries() << " (good: " << goodSeg << ", bad: " << badSeg << " )");
+  B2INFO("Number of found Segments: " << cdcSegmentsArray.GetEntries() << " (good: " << goodSeg << ", bad: " << badSeg << " )");
 
 
-  INFO("Superlayer Segment Id  Nr of Hits ");
+  B2INFO("Superlayer Segment Id  Nr of Hits ");
 
   for (int j = 0; j < cdcSegmentsArray.GetEntries(); j++) {
 
-    INFO("     " << cdcSegmentsArray[j]->getSuperlayerId() << "           " << cdcSegmentsArray[j]->getId() << "         " << cdcSegmentsArray[j]->getNHits());
+    B2INFO("     " << cdcSegmentsArray[j]->getSuperlayerId() << "           " << cdcSegmentsArray[j]->getId() << "         " << cdcSegmentsArray[j]->getNHits());
   }
 
 //Divide Segments into Axial and Stereo, create two new StoreArrays
@@ -158,32 +158,32 @@ void CDCTrackingModule::event()
 //create StoreArray for Tracks
   StoreArray<CDCTrack> cdcTracksArray(m_outTracksColName);
 //combinde Axial Segments to Tracks, fill cdcTracksArray with new Tracks
-  INFO("Connect axial Segments...");
+  B2INFO("Connect axial Segments...");
   AxialTrackFinder::ConnectSegments("AxialSegmentsCDCArray", m_outTracksColName); //assigns Segments to Tracks, returns a Tracks array
 
-  INFO("Number of Tracks: " << cdcTracksArray.GetEntries());
-  INFO("Track Id  Nr of Segments  Nr of Hits: ");
+  B2INFO("Number of track candidates: " << cdcTracksArray.GetEntries());
+  B2INFO("Track Id  Nr of Segments  Nr of Hits: ");
 
 
   for (int j = 0; j < cdcTracksArray.GetEntries(); j++) { //loop over all Tracks
 
-    INFO("  " << cdcTracksArray[j]->getId()  << "             " << cdcTracksArray[j]->getNSegments() << "           " << cdcTracksArray[j]->getNHits());
+    B2INFO("  " << cdcTracksArray[j]->getId()  << "             " << cdcTracksArray[j]->getNSegments() << "           " << cdcTracksArray[j]->getNHits());
 
   }//end loop over all Tracks
 
 //Append Stereo Segment to existing Tracks
-  INFO("Append stereo Segments...");
+  B2INFO("Append stereo Segments...");
   StereoFinder::AppendStereoSegments("StereoSegmentsCDCArray", m_outTracksColName);
-  INFO("Salvage axial Hits...");
+  B2INFO("Salvage axial Hits...");
   HitSalvager::SalvageHits("AxialSegmentsCDCArray", m_outTracksColName, 0.0005);
-  INFO("Salvage stereo Hits...");
+  B2INFO("Salvage stereo Hits...");
   HitSalvager::SalvageHits("StereoSegmentsCDCArray", m_outTracksColName, 0.0005);
 
-  INFO("Track Id  Nr of Segments  Nr of Hits: ");
+  B2INFO("Track Id  Nr of Segments  Nr of Hits: ");
 
   for (int j = 0; j < cdcTracksArray.GetEntries(); j++) { //loop over all Tracks
 
-    INFO("  " << cdcTracksArray[j]->getId() << "             " << cdcTracksArray[j]->getNSegments() << "           " << cdcTracksArray[j]->getNHits());
+    B2INFO("  " << cdcTracksArray[j]->getId() << "             " << cdcTracksArray[j]->getNSegments() << "           " << cdcTracksArray[j]->getNHits());
   }//end loop over all Tracks
 
 
@@ -193,7 +193,7 @@ void CDCTrackingModule::event()
     usedHits = usedHits + cdcTracksArray[j]->getNHits();
   }
   double fraction = double(usedHits) / double(NHits);
-  INFO(std::setprecision(3) << fraction*100 << " %" << "  of all hits were used to reconstruct " << cdcTracksArray.GetEntries() << " tracks");
+  B2INFO(std::setprecision(3) << fraction*100 << " %" << "  of all hits were used to reconstruct " << cdcTracksArray.GetEntries() << " track candidates");
 
 
 
@@ -243,6 +243,7 @@ void CDCTrackingModule::event()
 
     }//end loop over all Tracks
   }//endif m_textFileOutput
+
 }
 
 void CDCTrackingModule::endRun()

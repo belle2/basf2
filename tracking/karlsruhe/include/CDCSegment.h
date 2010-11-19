@@ -89,20 +89,20 @@ namespace Belle2 {
 
   private:
 
-    int m_superlayerId;
-    int m_Id; /*! Id to count segments within one superlayer*/
-    bool m_isAxial;
+    int m_superlayerId; /**< ID of the superlayer of the Segment (superlayer = group of 6/8 layers with the same orientation)*/
+    int m_Id; /**< Id to count segments within one superlayer*/
+    bool m_isAxial; /**< Boolean to mark a Segment as belonging to an axial superlayer (axial superlayers are 1,3,5,7,9)*/
 
 
-    std::vector<CDCTrackHit> m_TrackHits; /*!vector to store TrackHits */
-    int m_nHits;  /*!number of Hits in the Segment */
+    std::vector<CDCTrackHit> m_TrackHits; /**< vector to store TrackHits belonging to this segment*/
+    int m_nHits;  /**<Number of Hits in the Segment */
 
-    TVector3 m_direction; /*!direction of the Segment in conformal plane */
-    CDCTrackHit m_innerMostHit;
-    CDCTrackHit m_outerMostHit;
+    TVector3 m_direction; /**<Direction of the Segment in conformal plane */
+    CDCTrackHit m_innerMostHit; /**<Innermost (closest to the origin) Hit of the Segment*/
+    CDCTrackHit m_outerMostHit; /**<Outermost (farthest to the origin) Hit of the Segment*/
 
-    bool m_isGood; /*! classifies Segment as 'good' or 'bad', only 'good' Segments are used in the first step of track reconstruction*/
-    bool m_isUsed; /*! true if the Segment was already used to reconstruct a track (each Segment can be used only once)*/
+    bool m_isGood; /**< classifies Segment as 'good' or 'bad', only 'good' Segments are used in the first step of track reconstruction*/
+    bool m_isUsed; /**<Boolean to mark a Segment as already used for reconstruction of a track candidate*/
 
     //! ROOT ClassDef macro to make this class a ROOT class.
     ClassDef(CDCSegment, 1);

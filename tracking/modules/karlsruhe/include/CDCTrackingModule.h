@@ -71,19 +71,20 @@ namespace Belle2 {
 
   private:
 
-    std::string m_inSimHitsColName; /*!< Input simulated hits collection name (should already be used by the CDCDigitizer module) */
-    std::string m_inHitsColName; /*!< Input digitized hits collection name (output of CDCDigitizer module) */
-    std::string m_outTrackHitsColName; /*!< Output hits collection name (digitized hits collection changed to be used in tracking) */
-    std::string m_outSegmentsColName; /*!< Output segments collection name (tracklets within one superlayer) */
-    std::string m_outTracksColName; /*!< Output tracks collection name*/
+    std::string m_inSimHitsColName; /**< Input simulated hits collection name (should already be used by the CDCDigitizer module) */
+    std::string m_inHitsColName; /**< Input digitized hits collection name (output of CDCDigitizer module) */
+    std::string m_outTrackHitsColName; /**< Output hits collection name (digitized hits collection changed to be used in tracking) */
+    std::string m_outSegmentsColName; /**< Output segments collection name (tracklets within one superlayer) */
+    std::string m_outTracksColName; /**< Output tracks collection name*/
 
     bool m_textFileOutput;
 
-    std::ofstream SimHitsfile;
-    std::ofstream Hitsfile;
-    std::ofstream ConfHitsfile;
-    std::ofstream Tracksfile;
-    std::ofstream ConfTracksfile;
+    std::ofstream SimHitsfile; /**< Simple text file to write out the coordinates of the simulated hits*/
+    std::ofstream Hitsfile;  /**< Simple text file to write out the coordinates of the digitized hits*/
+    std::ofstream ConfHitsfile; /**< Simple text file to write out the coordinates of the digitized hits in the conformal plane*/
+    std::ofstream Tracksfile; /**< Simple text file to write out the coordinates of the digitized hits ordered by their belonging to a track candidate*/
+    std::ofstream ConfTracksfile; /**< Simple text file to write out the coordinates of the digitized hits in the conformal plane ordered by their belonging to a track candidate*/
+
 
   };
 } // end namespace Belle2

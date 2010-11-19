@@ -76,19 +76,19 @@ namespace Belle2 {
 
   private:
 
-    int m_Id;
-    int m_nSegments;
-    int m_nHits;
+    int m_Id; /**< Id of the track candidate*/
+    int m_nSegments; /**<Number of Segments in the Track*/
+    int m_nHits;  /**<Number of Hits in the Track */
 
-    std::vector<CDCSegment> m_Segments;
-    std::vector<CDCTrackHit> m_TrackHits;
+    std::vector<CDCSegment> m_Segments;  /**< vector to store Segments belonging to this Track*/
+    std::vector<CDCTrackHit> m_TrackHits;  /**< vector to store TrackHits belonging to this Track*/
 
-    TVector3 m_direction;
+    TVector3 m_direction; /**<Direction of the Track in the conformal plane */
 
-    CDCTrackHit m_innerMostHit;
-    CDCTrackHit m_outerMostHit;
-    CDCSegment m_innerMostSegment;
-    CDCSegment m_outerMostSegment;
+    CDCTrackHit m_innerMostHit; /**<Innermost (closest to the origin) Hit of the Track*/
+    CDCTrackHit m_outerMostHit; /**<Outermost (farthest to the origin) Hit of the Track*/
+    CDCSegment m_innerMostSegment; /**<Innermost (closest to the origin) Segment of the Track*/
+    CDCSegment m_outerMostSegment; /**<Outermost (farthest to the origin) Segment of the Track*/
 
 
     //! ROOT ClassDef macro to make this class a ROOT class.

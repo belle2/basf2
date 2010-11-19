@@ -75,7 +75,6 @@ int AxialTrackFinder::FindNextSegment(CDCTrack track, string SegmentsCDCArray, i
   StoreArray<CDCSegment> cdcSegmentsArray(SegmentsCDCArray.c_str());
 
 //start values for the search, just some big enough values
-  double minAngle = 4;
   double minDistance = 3;
 
   int nSegment = cdcSegmentsArray->GetEntries();

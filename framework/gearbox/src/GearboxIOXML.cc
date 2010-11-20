@@ -26,7 +26,7 @@ using namespace std;
 using namespace Belle2;
 
 
-GearboxIOXML::GearboxIOXML()
+GearboxIOXML::GearboxIOXML() : GearboxIOAbs()
 {
   xmlInitParser();
   LIBXML_TEST_VERSION

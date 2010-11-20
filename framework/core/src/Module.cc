@@ -204,10 +204,10 @@ void Module::exposePythonAPI()
   .def("param", &Module::setParamList)
   .def("param", &Module::setParamDict)
   .def("available_params", &Module::getParamInfoListPython)
-  .def("log_level", &Module::setLogLevel)
-  .def("debug_level", &Module::setDebugLevel)
-  .def("abort_level", &Module::setAbortLevel)
-  .def("log_info", &Module::setLogInfo)
+  .def("set_log_level", &Module::setLogLevel)
+  .def("set_debug_level", &Module::setDebugLevel)
+  .def("set_abort_level", &Module::setAbortLevel)
+  .def("set_log_info", &Module::setLogInfo)
   ;
 
   register_ptr_to_python<ModulePtr>();

@@ -62,11 +62,11 @@ void TouschekInputModule::initialize()
 {
   //Check parameters
   if ((m_readHER) && (!ModuleUtils::fileNameExists(m_filenameHER))) {
-    B2ERROR("Parameter <FilenameHER>: The path of the filename " << m_filenameHER << " does not exist !")
+    B2ERROR("Parameter <FilenameHER>: Could not open the file. The filename " << m_filenameHER << " does not exist !")
   } else m_readerHER->open(m_filenameHER);
 
   if ((m_readLER) && (!ModuleUtils::fileNameExists(m_filenameLER))) {
-    B2ERROR("Parameter <FilenameLER>: The path of the filename " << m_filenameLER << " does not exist !")
+    B2ERROR("Parameter <FilenameLER>: Could not open the file. The filename " << m_filenameLER << " does not exist !")
   } else m_readerLER->open(m_filenameLER);
 
   //Get the transformation from local Touschek plane space to global geant4 space

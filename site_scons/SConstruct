@@ -3,6 +3,11 @@ from distutils import sysconfig
 import config
 
 
+# build options
+AddOption('--color', dest = 'color', nargs = 1, default = 'off', action = 'store', help = 'Enable color output. Possible values are: off, light, dark')
+AddOption('--verbose', dest = 'verbose', action = 'store_true', default = False, help='Enable verbose output')
+
+
 # get the sub directory name for architecture and build option dependent files
 if not os.environ.has_key('BELLE2_SUBDIR'):
     print 'Belle II software environment is not set up.'
@@ -12,7 +17,7 @@ subdir = os.environ['BELLE2_SUBDIR']
 
 # create construction environment
 global_env = Environment(ENV = os.environ,
-                         tools = ['default', 'root_dict', 'process_dir', 'reg_map'],
+                         tools = ['default', 'root_dict', 'process_dir', 'reg_map', 'output'],
                          BUILDERS = {},
                          BUILDDIR = os.path.join('#build', subdir),
                          INCDIR = '#include',
@@ -29,7 +34,9 @@ global_env = Environment(ENV = os.environ,
                          CPPPATH = ['include', '$EXTINCDIR', sysconfig.get_python_inc()],
                          LIBPATH = ['$LIBDIR', '$EXTLIBDIR'],
                          TOOLS_LIBS = {},
-                         TOOLS_LIBPATH = {})
+                         TOOLS_LIBPATH = {},
+                         TEST_LIBS = [],
+                         TEST_FILES = [])
 
 # check for debug flag
 option = os.environ['BELLE2_OPTION']
@@ -80,3 +87,9 @@ if repository:
 
         global_env.ProcessDirectory(entry, False, repository)
 
+
+# build global test executable
+test = global_env.Program(os.path.join(global_env['BINDIR'], 'test_all'),
+                          global_env['TEST_FILES'], LIBS = global_env['TEST_LIBS'])
+global_env.Alias('test_all', test)
+global_env.Alias('tests', test)

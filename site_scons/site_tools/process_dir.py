@@ -16,8 +16,10 @@ def define_aliases(
     while len(parent_dir) > 0:
         env.Alias(parent_dir, target)
         if extension:
-            env.Alias(parent_dir + extension, target)
+            env.Alias(parent_dir + '.' + extension, target)
         parent_dir = os.path.split(parent_dir)[0]
+    if extension:
+        env.Alias(extension, target)
 
 
 def get_files(path_name, release_dir):
@@ -63,6 +65,11 @@ def process_dir(
     src_files = [os.path.join(parent_env['BUILDDIR'], str(node)) for node in
                  src_nodes]
 
+    # get list of test files
+    test_files = [os.path.join(parent_env['BUILDDIR'], str(node)) for node in
+                  get_files(os.path.join(dir_name, 'tests', '*.cc'),
+                  release_dir)]
+
     # get list of script files
     script_files = get_files(os.path.join(dir_name, 'scripts', '*'),
                              release_dir)
@@ -75,6 +82,8 @@ def process_dir(
     env['HEADER_FILES'] = header_files
     env['LINKDEF_FILES'] = linkdef_files
     env['SRC_FILES'] = src_files
+    env['TEST_FILES'] = test_files
+    env['TEST_LIBS'] = []
     env['SCRIPT_FILES'] = script_files
     env['DATA_FILES'] = data_files
 
@@ -96,26 +105,35 @@ def process_dir(
     # install header files in the include directory
     includes = env.Install(os.path.join(env['INCDIR'], dir_name),
                            env['HEADER_FILES'])
-    define_aliases(env, includes, dir_name, '.include')
+    define_aliases(env, includes, dir_name, 'include')
 
     # install script files in the library directory
     scripts = env.Install(env['LIBDIR'], env['SCRIPT_FILES'])
     Local(scripts)
-    define_aliases(env, scripts, dir_name, '.scripts')
+    define_aliases(env, scripts, dir_name, 'scripts')
 
     # install data files in the data directory
     data = env.Install(os.path.join(env['DATADIR'], dir_name), env['DATA_FILES'
                        ])
     Local(data)
-    define_aliases(env, data, dir_name, '.data')
+    define_aliases(env, data, dir_name, 'data')
+
+    # remember tests defined in this directory
+    local_test_files = env['TEST_FILES']
 
     # loop over subdirs
     entries = os.listdir(real_path(dir_name, release_dir))
     for entry in entries:
         if entry.find('.') == -1 \
             and not os.path.isfile(real_path(os.path.join(dir_name, entry),
-                                   release_dir)) and not entry in ['include',
-                'src', 'tools', 'data']:
+                                   release_dir)) and not entry in [
+            'include',
+            'src',
+            'tools',
+            'tests',
+            'scripts',
+            'data',
+            ]:
             process_dir(env, os.path.join(dir_name, entry), entry == 'modules'
                         or is_module_dir, release_dir)
 
@@ -155,21 +173,21 @@ def process_dir(
             Local([lib, reg_map])
             env.Alias(lib_name, [lib, reg_map])
             if is_module_dir:
-                define_aliases(env, [lib, reg_map], dir_name, '.modules')
+                define_aliases(env, [lib, reg_map], dir_name, 'modules')
             else:
-                define_aliases(env, [lib, reg_map], dir_name, '.lib')
+                define_aliases(env, [lib, reg_map], dir_name, 'lib')
             if env.Dictionary().has_key('PYTHON_MODULE') \
                 and env['PYTHON_MODULE'] == True:
                 pymod = env.InstallAs(os.path.join(env['LIBDIR'],
                                       os.path.basename(dir_name) + 'module'
                                       + env.subst('$SHLIBSUFFIX')), lib)
                 Local(pymod)
-                define_aliases(env, pymod, dir_name, '.lib')
+                define_aliases(env, pymod, dir_name, 'lib')
     else:
 
         # add linkdef, and source files to parent environment if we are in a normal sub-directory
-        parent_env['LINKDEF_FILES'] += linkdef_files
-        parent_env['SRC_FILES'] += src_files
+        parent_env['LINKDEF_FILES'] += env['LINKDEF_FILES']
+        parent_env['SRC_FILES'] += env['SRC_FILES']
 
     # setup environment for building executables, include SConscript if it exists
     save_env = env.Clone()
@@ -198,10 +216,34 @@ def process_dir(
         env.Alias(os.path.join(dir_name, 'tools', bin_filename), tool)
         env.Alias(os.path.join(dir_name, 'tools'), tool)
         env.Alias(os.path.join(dir_name, bin_filename), tool)
-        define_aliases(env, tool, dir_name, '.bin')
+        define_aliases(env, tool, dir_name, 'bin')
 
     # restore original environment
     env = save_env
+
+    # check whether we have to create a new test executable
+    if len(local_test_files) > 0:
+        test_filename = 'test_' + lib_name
+        test_env = env.Clone()
+        sconscript_name = real_path(os.path.join(dir_name, 'tests',
+                                    'SConscript'), release_dir)
+        if os.path.isfile(sconscript_name):
+            result = SConscript(sconscript_name, exports='env')
+            if isinstance(result, Environment):
+                test_env = result
+        test_env.Append(LIBS=['gtest'])
+        env.AppendUnique(TEST_LIBS=test_env['LIBS'])
+        env['TEST_FILES'] = test_env.SharedObject(local_test_files)
+        test = test_env.Program(os.path.join(test_env['BINDIR'],
+                                test_filename), env['TEST_FILES'])
+        env.Alias(os.path.join(dir_name, 'tests', test_filename), test)
+        env.Alias(os.path.join(dir_name, 'tests'), test)
+        env.Alias(os.path.join(dir_name, test_filename), test)
+        define_aliases(env, test, dir_name, 'tests')
+
+    # add test files and libs to parent environment
+    parent_env.AppendUnique(TEST_LIBS=env['TEST_LIBS'])
+    parent_env['TEST_FILES'] += env['TEST_FILES']
 
 
 def generate(env):

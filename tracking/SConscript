@@ -1,6 +1,6 @@
 Import('env')
 
-env['LIBS'] = ['tracking', 'framework',
+env['LIBS'] = ['framework',
                'cdc', 'pxd', 'svd',
                '$ROOT_LIBS', 'EG']
 Return('env')

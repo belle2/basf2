@@ -89,7 +89,8 @@ if repository:
 
 
 # build global test executable
-test = global_env.Program(os.path.join(global_env['BINDIR'], 'test_all'),
-                          global_env['TEST_FILES'], LIBS = global_env['TEST_LIBS'])
-global_env.Alias('test_all', test)
-global_env.Alias('tests', test)
+if len(global_env['TEST_FILES']) > 0:
+    test = global_env.Program(os.path.join(global_env['BINDIR'], 'test_all'),
+                              global_env['TEST_FILES'], LIBS = global_env['TEST_LIBS'])
+    global_env.Alias('test_all', test)
+    global_env.Alias('tests', test)

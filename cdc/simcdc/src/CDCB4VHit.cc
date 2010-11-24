@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <cdc/simcdc/CDCHit.h>
+#include <cdc/simcdc/CDCB4VHit.h>
 #include <cdc/hitcdc/SimHitCDC.h>
 
 //DataStore classes
@@ -30,12 +30,12 @@
 
 namespace Belle2 {
 
-  G4Allocator<CDCHit> CDCHitAllocator;
+  G4Allocator<CDCB4VHit> CDCB4VHitAllocator;
 
 //------------------
 // Copy constructor
 //------------------
-  CDCHit::CDCHit(const CDCHit &right): B4VHit()
+  CDCB4VHit::CDCB4VHit(const CDCB4VHit &right): B4VHit()
   {
     _trackID = right._trackID;
     _PDG = right._PDG;
@@ -55,7 +55,7 @@ namespace Belle2 {
 //-------------
 // operator =
 //-------------
-  const CDCHit& CDCHit::operator=(const CDCHit &right)
+  const CDCB4VHit& CDCB4VHit::operator=(const CDCB4VHit &right)
   {
     _trackID = right._trackID;
     _PDG = right._PDG;
@@ -76,7 +76,7 @@ namespace Belle2 {
 //--------------
 // operator ==
 //--------------
-  int CDCHit::operator==(const CDCHit &right) const
+  int CDCB4VHit::operator==(const CDCB4VHit &right) const
   {
     return ((_trackID == right._trackID) &&
             (_PDG == right._PDG) &&
@@ -96,7 +96,7 @@ namespace Belle2 {
 //------------
 // Draw hits
 //------------
-  void CDCHit::Draw()
+  void CDCB4VHit::Draw()
   {
     G4VVisManager* pVVisManager = G4VVisManager::GetConcreteInstance();
     if (pVVisManager) {
@@ -114,14 +114,14 @@ namespace Belle2 {
 //--------
 // Print
 //--------
-  void CDCHit::Print()
+  void CDCB4VHit::Print()
   {
   }
 
 //---------------------------
 // Save hits into ASCII file
 //---------------------------
-  void CDCHit::Save(FILE *oFile)
+  void CDCB4VHit::Save(FILE *oFile)
   {
     if (oFile) {
       fprintf(oFile, "nL:%d nW:%d trkID:%d PDG:%d DriftLen[mm]:%7.2f gTime[ns]:%7.2f edep[keV]%15e stepLen[mm]:%7.2f vecP[GeV]:%7.2f %7.2f %7.2f vecPosw[mm]:%7.2f %7.2f %7.2f vecPosIn[mm]:%7.2f %7.2f %7.2f vecPosOut[mm]:%7.2f %7.2f %7.2f posFlag:%d\n",
@@ -153,7 +153,7 @@ namespace Belle2 {
 //---------------------------
 // Save hits into DataStore
 //---------------------------
-  void CDCHit::Save(int ihit)
+  void CDCB4VHit::Save(int ihit)
   {
     StoreArray<SimHitCDC> cdcArray("SimHitCDCArray");
     new(cdcArray->AddrAt(ihit)) SimHitCDC();
@@ -179,7 +179,7 @@ namespace Belle2 {
 //-----------------------------
 // Load hits from a text file
 //-----------------------------
-  G4bool CDCHit::Load(FILE *iFile)
+  G4bool CDCB4VHit::Load(FILE *iFile)
   {
     G4double Px, Py, Pz, PosWx, PosWy, PosWz, PosInx, PosIny, PosInz, PosOutx, PosOuty, PosOutz;
     G4bool ReadStatus;

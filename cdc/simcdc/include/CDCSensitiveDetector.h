@@ -11,14 +11,14 @@
 #ifndef CDCSensitiveDetector_H
 #define CDCSensitiveDetector_H
 
-#include <cdc/simcdc/CDCHit.h>
+#include <cdc/simcdc/CDCB4VHit.h>
 #include "G4VSensitiveDetector.hh"
 
 namespace Belle2 {
 
   //! The Class for CDC Sensitive Detector
-  /*! In this class, every variable defined in CDCHit will be calculated.
-      And save CDCHit into hits collection.
+  /*! In this class, every variable defined in CDCB4VHit will be calculated.
+      And save CDCB4VHit into hits collection.
   */
 
 //class CDCSensitiveDetector: public B4SensitiveDetectorBase
@@ -35,7 +35,7 @@ namespace Belle2 {
     //! Register CDC hits collection into G4HCofThisEvent
     void Initialize(G4HCofThisEvent *eventHC);
 
-    //! Process each step and calculate variables defined in CDCHit
+    //! Process each step and calculate variables defined in CDCB4VHit
     G4bool ProcessHits(G4Step *aStep, G4TouchableHistory *history);
 
     //! Do what you want to do at the end of each event
@@ -44,7 +44,7 @@ namespace Belle2 {
     //! Read hits information from text file
     void LoadEvent(FILE *eventFile);
 
-    //! Save CDCHit into hits collection
+    //! Save CDCB4VHit into hits collection
     void makeRawHit(const G4int layerId,
                     const G4int wireId,
                     const G4int trackID,
@@ -269,7 +269,7 @@ namespace Belle2 {
 
     G4double fThresholdEnergyDeposit;
     G4double fThresholdKineticEnergy;
-    CDCHitsCollection *fHitCollection;
+    CDCB4VHitsCollection *fHitCollection;
     G4int fHCID;
   };
 

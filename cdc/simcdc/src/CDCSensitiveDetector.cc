@@ -57,7 +57,7 @@ CDCSensitiveDetector::CDCSensitiveDetector(G4String name, G4double thresholdEner
 void CDCSensitiveDetector::Initialize(G4HCofThisEvent * HCTE)
 {
   // Create a new hit collection
-  fHitCollection = new CDCHitsCollection(SensitiveDetectorName, collectionName[0]);
+  fHitCollection = new CDCB4VHitsCollection(SensitiveDetectorName, collectionName[0]);
 
   // Assign a unique ID to the hits collection
   if (fHCID < 0) {
@@ -295,11 +295,11 @@ void CDCSensitiveDetector::EndOfEvent(G4HCofThisEvent *)
 
 void CDCSensitiveDetector::LoadEvent(FILE * theSubDetectorEventHitsFileInput)
 {
-  CDCHit * newHit = new CDCHit();
+  CDCB4VHit * newHit = new CDCB4VHit();
 
   while (newHit->Load(theSubDetectorEventHitsFileInput)) {
     fHitCollection->insert(newHit);
-    newHit = new CDCHit();
+    newHit = new CDCB4VHit();
   }
 
   delete newHit;
@@ -320,7 +320,7 @@ CDCSensitiveDetector::makeRawHit(const G4int layerId,
                                  const G4ThreeVector & posOut,
                                  const G4int lr)
 {
-  CDCHit * hit = new CDCHit(layerId, wireId, trackID, pid, distance, tof, edep, stepLength, mom, posW, posIn, posOut, lr);
+  CDCB4VHit * hit = new CDCB4VHit(layerId, wireId, trackID, pid, distance, tof, edep, stepLength, mom, posW, posIn, posOut, lr);
   fHitCollection->insert(hit);
 }
 

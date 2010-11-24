@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef CDCHIT_H
-#define CDCHIT_H
+#ifndef CDCB4VHIT_H
+#define CDCB4VHIT_H
 
 #include <simulation/simkernel/B4VHit.h>
 
@@ -25,12 +25,12 @@ namespace Belle2 {
   /*! Implementation of CDC hit for BelleII experiment.
   */
 
-  class CDCHit : public B4VHit {
+  class CDCB4VHit : public B4VHit {
 
   public:
 
     //! Constructor
-    CDCHit() :
+    CDCB4VHit() :
         _layer(0), _wire(0), _trackID(0), _PDG(0), _driftLength(0.), _globalTime(0.),
         _edep(0.), _stepLength(0.), _posFlag(0) {
       _momentum.setX(0.); _momentum.setY(0.); _momentum.setZ(0.);
@@ -40,9 +40,9 @@ namespace Belle2 {
     }
 
     //! Constructor with initial values
-    CDCHit(G4int layer, G4int wire, G4int trackID, G4int PDG, G4double driftLength, G4double globalTime,
-           G4double edep, G4double stepLength, G4ThreeVector momentum,
-           G4ThreeVector posw, G4ThreeVector posIn, G4ThreeVector posOut, G4int posFlag)
+    CDCB4VHit(G4int layer, G4int wire, G4int trackID, G4int PDG, G4double driftLength, G4double globalTime,
+              G4double edep, G4double stepLength, G4ThreeVector momentum,
+              G4ThreeVector posw, G4ThreeVector posIn, G4ThreeVector posOut, G4int posFlag)
         :
         _layer(layer), _wire(wire), _trackID(trackID), _PDG(PDG), _driftLength(driftLength), _globalTime(globalTime),
         _edep(edep), _stepLength(stepLength), _posFlag(posFlag) {
@@ -53,22 +53,22 @@ namespace Belle2 {
     }
 
     //! Destructor
-    ~CDCHit() {}
+    ~CDCB4VHit() {}
 
     //! Copy Constructor
-    CDCHit(const CDCHit &right);
+    CDCB4VHit(const CDCB4VHit &right);
 
     //! Operator =
-    const CDCHit& operator=(const CDCHit &right);
+    const CDCB4VHit& operator=(const CDCB4VHit &right);
 
     //! Operator ==
-    int operator==(const CDCHit &right) const;
+    int operator==(const CDCB4VHit &right) const;
 
     //! Operator new
     inline void *operator new(size_t);
 
     //! Operator delete
-    inline void operator delete(void *aCDCHit);
+    inline void operator delete(void *aCDCB4VHit);
 
     //! Draw hits
     void Draw();
@@ -159,24 +159,24 @@ namespace Belle2 {
     inline G4double GetPosOutz() { return _posOut.getZ(); }
   };
 
-  typedef G4THitsCollection<CDCHit> CDCHitsCollection;
+  typedef G4THitsCollection<CDCB4VHit> CDCB4VHitsCollection;
 
-  extern G4Allocator<CDCHit> CDCHitAllocator;
+  extern G4Allocator<CDCB4VHit> CDCB4VHitAllocator;
 
 // Operator new
-  inline void* CDCHit::operator new(size_t)
+  inline void* CDCB4VHit::operator new(size_t)
   {
-    void *aCDCHit;
-    aCDCHit = (void *) CDCHitAllocator.MallocSingle();
-    return aCDCHit;
+    void *aCDCB4VHit;
+    aCDCB4VHit = (void *) CDCB4VHitAllocator.MallocSingle();
+    return aCDCB4VHit;
   }
 
 // Operator delete
-  inline void CDCHit::operator delete(void *aCDCHit)
+  inline void CDCB4VHit::operator delete(void *aCDCB4VHit)
   {
-    CDCHitAllocator.FreeSingle((CDCHit*) aCDCHit);
+    CDCB4VHitAllocator.FreeSingle((CDCB4VHit*) aCDCB4VHit);
   }
 
 } // end of namespace Belle2
 
-#endif //CDCHIT_H
+#endif //CDCB4VHIT_H

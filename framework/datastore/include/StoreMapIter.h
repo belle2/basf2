@@ -19,43 +19,38 @@
 
 namespace Belle2 {
 
-  /*! Iterator for DataStore maps. */
-  /*! This iterator has to be specified with the exact map, that is used.
-      Usually you shouldn't use this class, but the parent class, and only the DataStore has
-      to create this class internally.
-      \author <a href="mailto:martin.heck@kit.edu?subject=StoreMapIter">Martin Heck</a>
-  */
+  /** Iterator for DataStore maps.
+   *
+   *  This iterator has to be specified with the exact map, that is used.
+   *  Usually you shouldn't use this class, but the parent class, and only the DataStore has
+   *  to create this class internally.
+   *
+   *  @author <a href="mailto:martin.heck@kit.edu?subject=StoreMapIter">Martin Heck</a>
+   */
   template <class T>
   class StoreMapIter : public StoreIter {
   public:
 
-    /*! Constructor.
-        \par Map to which this is an iterator.
-    */
+    /** Constructor.
+     *
+     *  @par Map to which this is an iterator.
+     */
     StoreMapIter(T* AMap)
         : m_map(AMap), m_iter(0) {}
 
-    /* Destructor.
-
-    */
+    /** Destructor. */
     ~StoreMapIter() {}
 
 
-    /*! Point Iterator to first element.
-
-    */
+    /** Point Iterator to first element. */
     void first() { m_iter = m_map->begin(); }
 
 
-    /*! Point Iterator to next element.
-
-    */
+    /** Point Iterator to next element. */
     void next() { m_iter++; }
 
 
-    /*! Check if iterator is through.
-
-    */
+    /** Check if iterator is through. */
     bool isDone() const {
       if (m_iter == m_map->end()) {
         return true;
@@ -64,50 +59,50 @@ namespace Belle2 {
     }
 
 
-    /*! Getter for the object to which iterator points.
-        \return Object pointed to.
-    */
+    /** Getter for the object to which iterator points.
+     *
+     * @return Object pointed to.
+     */
     TObject* value() {
       return (m_iter->second);
     }
 
-    /*! Getter for the name under which the object is saved in the map.
-        \return Name of object, the iterator points to.
-    */
+    /** Getter for the name under which the object is saved in the map.
+     *
+     *  @return Name of object, the iterator points to.
+     */
     std::string key() {
       return m_iter->first;
     }
 
 
-    /*!Find key in map.
-       \par name of the object to be pointed to.
-       \return Iterator to object with key name.
-    */
+    /** Find key in map.
+     *
+     *  @return Iterator to object with key name.
+     *  @par name of the object to be pointed to.
+     */
     typename T::iterator find(const std::string& name) {
       m_iter = m_map.find(name);
       return m_iter;
     }
 
 
-    /*! Another form of find.
-        This is a short form of find?!
-        To be checked later again.
-    */
+    /** Another form of find.
+     *
+     *  This is a short form of find?!
+     *  To be checked later again.
+     */
     typename T::iterator operator[](std::string str) {
       return m_map[str];
     }
 
-    /*! Prefix increment operator
-
-     */
+    /** Prefix increment operator. */
     StoreMapIter <T>& operator++() {
       next();
       return *this;
     }
 
-    /*! Postfix increment operator
-
-     */
+    /** Postfix increment operator. */
     StoreMapIter<T> operator++(int) {
       StoreMapIter<T> buffer(*this);
       next();
@@ -117,14 +112,10 @@ namespace Belle2 {
 
   private:
 
-    /*! Pointer to map for which the iterator is.
-
-    */
+    /** Pointer to map for which the iterator is. */
     T* m_map;
 
-    /*! Iterator for the map.
-
-    */
+    /** Iterator for the map. */
     typename T::iterator  m_iter;
 
   };

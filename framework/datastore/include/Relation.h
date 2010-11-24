@@ -16,82 +16,94 @@
 
 namespace Belle2 {
 
-  /*! Use the constructor to create a connection between two objects, that are stored in the DataStore.
-      \author <a href=mailto:"martin.heck@kit.edu?subject=Relation">Martin Heck</a>
-  */
+  /** Use the constructor to create a connection between two objects, that are stored in the DataStore.
+   *
+   *  @author <a href=mailto:"martin.heck@kit.edu?subject=Relation">Martin Heck</a>
+   */
   class Relation : public TObject {
   public:
 
-    /*! Constructor for I/O. */
+    /** Constructor for I/O. */
     Relation()
         : m_weight(1.0) {}
 
-    /*! Constuctor to create the actual relation. */
+    /** Constuctor to create the actual relation.
+     *
+     * The constructor has 'from' and 'to' sides, but the Relation is in principle completely symmetric.
+     *
+     * @param from   first side of the Relation.
+     * @param to     second side of the Relation.
+     * @param weight weight of the Relation. Sometimes you might want to use this number to encode other information.
+     */
     Relation(TObject* from, TObject* to, const float& weight = 1.0)
         : m_weight(weight) {
       m_from = from;
       m_to   = to;
     }
 
-    /*! Destructor. */
+    /** Destructor. */
     ~Relation() {}
 
-    /*! Setter for from.
-        \param from Object for "from" end of relation.
-    */
+    /** Setter for from.
+     *
+     * @param from Object for "from" end of relation.
+     */
     void setFrom(TObject* from) {
       m_from = from;
     }
 
-    /*! Setter for to.
-        \param to Object for "to" end of the relation.
-    */
+    /** Setter for to.
+     *
+     * @param to Object for "to" end of the relation.
+     */
     void setTo(TObject* to) {
       m_to = to;
     }
 
-    /*! Getter for from.
-        \return Object of "from" end of the relation.
-    */
+    /** Getter for from.
+     *
+     * @return Object of "from" end of the relation.
+     */
     TObject* getFrom() {
       return m_from.GetObject();
     }
 
-    /*! Getter for to.
-        \return Object of "to" end of the relation.
-    */
+    /** Getter for to.
+     *
+     *  @return Object of "to" end of the relation.
+     */
     TObject* getTo() {
       return m_to.GetObject();
     }
 
-    /*! Setter for weight.
-        \param weight value for the weight of the relation.
-    */
+    /** Setter for weight.
+     *
+     * @param weight value for the weight of the relation.
+     */
     void setWeight(const float& weight) {
       m_weight = weight;
     }
 
-    /*! Getter for weight.
-        \return Weight of relation.
-    */
+    /** Getter for weight.
+     *
+     * @return Weight of relation.
+     */
     float getWeight() {
       return m_weight;
     }
 
 
   private:
-    /*! First end of Relation. */
+    /** First end of Relation. */
     TRef m_from;
 
-    /*! Second end of Relation. */
+    /** Second end of Relation. */
     TRef m_to;
 
-    /*! Weight of the Relation. */
+    /** Weight of the Relation. */
     float m_weight;
 
-    /*! ROOT Macro to make EventMetaData a ROOT class.*/
-    /*!
-    */
+    /** ROOT Macro to make EventMetaData a ROOT class.*/
     ClassDef(Relation, 1);
   }; //class
 } // namespace Belle2

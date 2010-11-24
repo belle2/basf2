@@ -14,52 +14,64 @@
 
 namespace Belle2 {
 
-  /*! Use this class to store primitive types like ints in the DataStore
-      \author <a href="mailto:martin.heck@kit.edu?subject=SimpleVec">Martin Heck</a>
-  */
+  /** Possibility to store primitive types like ints into the DataStore; not recommended for use in official modules.
+   *
+   *  Use this class to store primitive types like integers the DataStore in a simple way.
+   *  However, objects in official modules should be properly created in their own objects, so this object is meant
+   *  for private modules/analysis and so on. <br>
+   *  This object is still quite preliminary. Please improve by making it more convenient.
+   *
+   *  @author <a href="mailto:martin.heck@kit.edu?subject=SimpleVec">Martin Heck</a>
+   */
   template <class T>
   class SimpleVec : public TObject {
   public:
 
-    /*! Constructor with STL vector for saving.*/
-    /*! \par Vector, that will be saved internally.
-    */
+    /** Constructor with STL vector for saving.
+     *
+     *  @par AVector, that will be saved internally.
+     */
     SimpleVec(std::vector<T> AVector) {
       m_vector = AVector;
     }
 
-    /*  Empty constructor.*/
-    /*! This constructor is needed for I/O purposes.
-    */
+    /**  Empty constructor.
+     *
+     *  This constructor is needed for I/O purposes.
+     */
     SimpleVec()
         : m_vector(0) {}
 
-    /*! Destructor.*/
-    /*! As no pointers are used, there is nothing special done here.
-    */
+    /** Destructor.
+     *
+     *  As no pointers are used, there is nothing special done here.
+     */
     ~SimpleVec() {}
 
-    /*! Assign a vector to the interally saved vector.*/
-    /*! \par Vector to be saved. Keep in mind the initial template instantiation.
-    */
+    /** Assign a vector to the interally saved vector.
+     *
+     *  @par AVector Vector to be saved. Keep in mind the initial template instantiation.
+     */
     void setVector(std::vector<T> AVector) {
       m_vector = AVector;
     }
 
-    /*! Getter for the vector.*/
-    /* \return Vector, that was internally saved. */
+    /** Getter for the vector.
+     *
+     *  @return Vector, that was internally saved.
+     */
     std::vector<T> getVector() {
       return m_vector;
     }
 
   private:
-    /*! Saved vector.*/
-    /*! This variable actually holds the saved vector.*/
+    /** Saved vector.
+     *
+     *  This variable actually holds the saved vector.
+     */
     std::vector<T> m_vector;
 
-    /*! Needed for ROOT purposes.*/
-    /*! This Macro makes a ROOT object from SimpleVec.
-    */
+    /** Needed for ROOT purposes. This Macro makes a ROOT object from SimpleVec. */
     ClassDef(SimpleVec, 1);
   }; //class
 } // namespace Belle2

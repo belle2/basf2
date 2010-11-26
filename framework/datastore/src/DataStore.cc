@@ -9,7 +9,6 @@
  **************************************************************************/
 
 #include <framework/datastore/DataStore.h>
-#include <framework/logging/Logger.h>
 
 DataStore* DataStore::m_instance = 0;
 

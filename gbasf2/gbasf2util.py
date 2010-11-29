@@ -23,7 +23,8 @@ class CLIParams:
     swver = 'Belle-v1r0'
     datatype = None
     experiments = None
-    inputfiles = None
+    inputsandboxfiles = None
+    maxevents = None
 
     def setSteeringFile(self, arg):
         self.steering_file = arg
@@ -71,11 +72,18 @@ class CLIParams:
 
     def setInputFiles(self, arg):
     # FIXME: check all files exist
-        self.inputfiles = arg.rstrip().split(',')
-        for file in self.inputfiles:
+        self.inputsandboxfiles = arg.rstrip().split(',')
+        for file in self.inputsandboxfiles:
             if os.path.exists(file) is False:
                 return DIRAC.S_ERROR(file + ' does not exist.')
         return DIRAC.S_OK()
+
+    def setMaxEvents(self, arg):
+      # FIXME : check for integer
+        if arg > 0:
+            self.maxevents = arg.strip()
+        else:
+            return DIRAC.S_ERROR
 
     def getSteeringFile(self):
         return self.steering_file
@@ -102,7 +110,7 @@ class CLIParams:
         return self.swver
 
     def getInputFiles(self):
-        return self.inputfiles
+        return self.inputsandboxfiles
 
   # registers alll of the possible commandline options with the DIRAC Script handler
   # This is also used to generate the --help option
@@ -115,7 +123,8 @@ class CLIParams:
         Script.registerSwitch('c:', 'CPUTime=',
                               'estimated CPUTime (in seconds)',
                               self.setCPUTime)
-        Script.registerSwitch('w:', 'priority=', 'Job priority: 0 is default',
+        Script.registerSwitch('w:', 'priority=',
+                              '(optional) Job priority: 0 is default',
                               self.setJobPriority)
         Script.registerSwitch('m:', 'query=', 'Metadata Query', self.setQuery)
         Script.registerSwitch('t:', 'type=', "Type of Data ('data' or 'MC')",
@@ -125,9 +134,12 @@ class CLIParams:
                               self.setExperiments)
         Script.registerSwitch('l:', 'swver=', 'Software Version',
                               self.setSwVer)
-        Script.registerSwitch('f:', 'inputfiles=',
-                              'Files required for the job (comma separated list, max 10MB)'
+        Script.registerSwitch('f:', 'inputsandboxfiles=',
+                              '(optional) Files required for the job (comma separated list, max 10MB)'
                               , self.setInputFiles)
+        Script.registerSwitch('x:', 'maxevents=',
+                              '(optional) Maximum number of events to use',
+                              self.setMaxEvents)
         Script.addDefaultOptionValue('LogLevel', 'debug')
 
   # loop through the steering file to determine any options set there
@@ -146,7 +158,8 @@ class CLIParams:
                 'type': 'setDataType',
                 'experiments': 'setExperiments',
                 'swver': 'setSwVer',
-                'inputfiles': 'setInputFiles',
+                'inputsandboxfiles': 'setInputFiles',
+                'maxevents': 'setMaxEvents',
                 }
       # read the options
             f = open(self.steering_file)

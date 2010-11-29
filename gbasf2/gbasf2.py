@@ -16,6 +16,10 @@ import os
 # we're part of DIRAC, yay
 import DIRAC
 from DIRAC.Core.Base import Script
+from DIRAC.Core.Security.Misc import *
+from DIRAC.Core.Security import Properties
+from DIRAC.FrameworkSystem.Client.ProxyGeneration import generateProxy
+from DIRAC.FrameworkSystem.Client.ProxyManagerClient import ProxyManagerClient
 # used for commandline and steeringfile option parsing
 from gbasf2util import CLIParams
 # used to make tar for input sandbox
@@ -110,12 +114,69 @@ def main():
   # setup options
     cliParams = CLIParams()
     cliParams.registerCLISwitches()
+    Script.disableCS()
     Script.parseCommandLine(ignoreErrors=True)
     cliParams.registerSteeringOptions()
 
   # setup dirac - import here because it pwns everything
     from DIRAC.Interfaces.API import Dirac
     dirac = Dirac.Dirac()
+
+  # check for proxy prescence and if not present, make it
+  # FIXME - upload proxy if necessary
+  # FIXME - upload proxy for lifetime of certificate
+  # FIXME - warn on certificate validity
+    proxyinfo = getProxyInfo()
+    if not proxyinfo['OK'] or 'username' not in proxyinfo['Value'].keys():
+        print 'No proxy found - trying to generate one'
+        proxyparams = DIRAC.FrameworkSystem.Client.ProxyGeneration.CLIParams()
+        proxyparams.diracGroup = 'belle'
+        proxyparams.proxyLifeTime = 604800
+        proxyparams.checkClock = True
+        proxyparams.debug = True
+        retVal = generateProxy(proxyparams)
+        if not retVal['OK']:
+            print retVal['Message']
+            DIRAC.exit(1)
+        else:
+            proxyinfo = getProxyInfo()
+            if not proxyinfo['OK']:
+                print 'Error: %s' % proxyinfo['Message']
+                DIRAC.exit(1)
+    else:
+      # We need to enable the configuration service ourselves if we're not generating a proxy
+        Script.enableCS()
+
+    proxyProps = proxyinfo['Value']
+    userName = proxyProps['username']
+    if Properties.PROXY_MANAGEMENT not in proxyProps['groupProperties'] \
+        and userName != CS.getUsernameForDN(proxyProps['issuer'])['Value']:
+        print "You're trying to manage a proxy that is not yours, without permission!"
+        DIRAC.exit(1)
+
+    DNresult = CS.getDNForUsername(userName)
+    if not DNresult['OK']:
+        print 'Oops %s' % DNresult['Message']
+        DIRAC.exit(1)
+
+    dnList = DNresult['Value']
+    if not dnList:
+        print 'User %s has no DN defined!' % userName
+        DIRAC.exit(1)
+
+    # Next, check there's a proxy that's been uploaded
+    pmc = ProxyManagerClient()
+    PMCresult = pmc.userHasProxy(dnList[0], 'belle')
+    if not PMCresult['OK']:
+        print 'Could not retrieve the proxy list: %s' % PMCresult['Value']
+        DIRAC.exit(1)
+    else:
+        lifetime = pmc.getUploadedProxyLifeTime(dnList[0], 'belle')
+        if not lifetime['OK'] or lifetime['Value'] < 604799:
+            uploadResult = pmc.uploadProxy()
+            if not uploadResult['OK']:
+                print "Couldn't find a valid uploaded proxy, and couldn't upload one %s " \
+                    % uploadResult['Value']
 
   # perform the metadata query
     asearch = AmgaSearch()

@@ -8,7 +8,7 @@ from basf2 import *
 ############################
 # Name for project
 project = 'e055-test'
-# Job priority
+# (optional) Job priority
 priority = '1'
 # Experiments (comma separated list)
 experiments = '13,57'
@@ -18,8 +18,10 @@ query = 'id > 10 and id < 15'
 type = 'data'
 # estimated Maximum CPU Time (in seconds)
 cputime = '864200'
-# Files to be send with the job
-inputfiles = 'file1.txt,file2.txt'
+# (optional) Files to be send with the job
+inputsandboxfiles = 'file1.txt,file2.txt'
+# (optional) max events - the maximum number of events to use
+maxevents = 100000
 
 # Create module
 test = fw.register_module('Hello')

@@ -10,6 +10,7 @@
 
 #include <framework/gearbox/Gearbox.h>
 #include <framework/gearbox/GearDir.h>
+#include <framework/gearbox/GearReader.h>
 
 #include <boost/format.hpp>
 
@@ -133,6 +134,16 @@ throw(GearboxIOAbs::GearboxIONotConnectedError, GearboxIOAbs::GearboxPathNotVali
       GearboxIOAbs::GearboxPathResultNotValidError)
 {
   return Gearbox::Instance().getGearboxIO().getParamString(m_dirPath + path);
+}
+
+
+TGeoMaterial* GearDir::readMaterial(const string& path)
+throw(GearboxIOAbs::GearboxIONotConnectedError, GearboxIOAbs::GearboxPathNotValidError,
+      GearboxIOAbs::GearboxParamNotExistsError, GearboxIOAbs::GearboxPathEmptyResultError,
+      GearboxIOAbs::GearboxPathResultNotValidError)
+{
+  GearDir materialDir(*this, path);
+  return GearReader::readMaterial(materialDir);
 }
 
 

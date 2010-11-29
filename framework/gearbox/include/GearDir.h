@@ -14,6 +14,7 @@
 #include <framework/gearbox/GearboxIOAbs.h>
 
 #include <string>
+#include <TGeoMaterial.h>
 
 namespace Belle2 {
 
@@ -267,6 +268,59 @@ namespace Belle2 {
           GearboxIOAbs::GearboxParamNotExistsError, GearboxIOAbs::GearboxPathEmptyResultError,
           GearboxIOAbs::GearboxPathResultNotValidError);
 
+    /**
+     * Reads a material definition section and returns a pointer to the created TGeoMaterial object.
+     * The material section can be either a <Material> or a <Mixture>.
+     *
+     * The following definitions for a <Material> are supported:
+     * <Material name="">
+     *   <Density unit="g/cm3"></Density>
+     *   <RadLength></RadLength>
+     *   <InterLength></InterLength>
+     *   <AtomNumber> </AtomNumber>
+     *   <MassNumber> </MassNumber>
+     * </Material>
+     *
+     * <Material name="">
+     *   <Density unit="g/cm3"></Density>
+     *   <AtomNumber> </AtomNumber>
+     *   <MassNumber> </MassNumber>
+     * </Material>
+     *
+     * A Mixture consist of elements and a weight factor for each of them.
+     * These elements can be an arbitrary combination of Elements, Materials
+     * or other Mixtures. The basic structure is:
+     * <Mixture name="">
+     *   <Density unit="g/cm3"></Density>
+     *   <Elements>
+     *     add here the elements of the mixture.
+     *   </Elements>
+     * </Mixture>
+     *
+     * The elements of a mixture can be
+     * 1) Elements
+     *    <Element name="" weight="">
+     *      <AtomNumber></AtomNumber>
+     *      <MassNumber></MassNumber>
+     *    </Element>
+     *
+     * 2) Materials
+     *    Both material definitions given above are supported.
+     *
+     * 3) Mixtures
+     *    As described here.
+     *
+     * 4) Existing Materials or Mixtures
+     *    <Material name="" weight=""/>
+     *    or
+     *    <Mixture name="" weight=""/>
+     *
+     * @param path The path to the node which defines the TGeoMaterial or TGeoMixture.
+     */
+    TGeoMaterial* readMaterial(const std::string& path = "")
+    throw(GearboxIOAbs::GearboxIONotConnectedError, GearboxIOAbs::GearboxPathNotValidError,
+          GearboxIOAbs::GearboxParamNotExistsError, GearboxIOAbs::GearboxPathEmptyResultError,
+          GearboxIOAbs::GearboxPathResultNotValidError);
 
     /**
      * Sets the path which is added automatically as prefix to a given path.

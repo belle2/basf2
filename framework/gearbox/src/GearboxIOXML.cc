@@ -148,7 +148,6 @@ throw(GearboxIOAbs::GearboxIONotConnectedError, GearboxIOAbs::GearboxPathNotVali
   if (m_enableParamCheck) {
     if (!isParamAvailable(path)) throw(GearboxParamNotExistsError() << path);
   }
-
   return getDoubleWithUnit(path, UnitConverter::c_UnitLength);
 }
 
@@ -161,8 +160,31 @@ throw(GearboxIOAbs::GearboxIONotConnectedError, GearboxIOAbs::GearboxPathNotVali
   if (m_enableParamCheck) {
     if (!isParamAvailable(path)) throw(GearboxParamNotExistsError() << path);
   }
-
   return getDoubleWithUnit(path, UnitConverter::c_UnitAngle);
+}
+
+
+double GearboxIOXML::getParamEnergy(const std::string& path) const
+throw(GearboxIOAbs::GearboxIONotConnectedError, GearboxIOAbs::GearboxPathNotValidError,
+      GearboxIOAbs::GearboxParamNotExistsError, GearboxIOAbs::GearboxPathEmptyResultError,
+      GearboxIOAbs::GearboxPathResultNotValidError, GearboxIOAbs::GearboxStringNumConversionError)
+{
+  if (m_enableParamCheck) {
+    if (!isParamAvailable(path)) throw(GearboxParamNotExistsError() << path);
+  }
+  return getDoubleWithUnit(path, UnitConverter::c_UnitEnergy);
+}
+
+
+double GearboxIOXML::getParamDensity(const std::string& path) const
+throw(GearboxIOAbs::GearboxIONotConnectedError, GearboxIOAbs::GearboxPathNotValidError,
+      GearboxIOAbs::GearboxParamNotExistsError, GearboxIOAbs::GearboxPathEmptyResultError,
+      GearboxIOAbs::GearboxPathResultNotValidError, GearboxIOAbs::GearboxStringNumConversionError)
+{
+  if (m_enableParamCheck) {
+    if (!isParamAvailable(path)) throw(GearboxParamNotExistsError() << path);
+  }
+  return getDoubleWithUnit(path, UnitConverter::c_UnitDensity);
 }
 
 

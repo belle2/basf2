@@ -106,55 +106,6 @@ throw(GearboxIOAbs::GearboxIONotConnectedError, GearboxIOAbs::GearboxPathNotVali
 }
 
 
-int Gearbox::getNumberNodes(const std::string& path) const
-throw(GearboxIOAbs::GearboxIONotConnectedError, GearboxIOAbs::GearboxPathNotValidError,
-      GearboxIOAbs::GearboxPathEmptyResultError, GearboxIOAbs::GearboxPathResultNotValidError)
-{
-  if ((m_gearboxIO == NULL) || (!m_gearboxIO->isOpen())) throw GearboxIOAbs::GearboxIONotConnectedError();
-  return m_gearboxIO->getNumberNodes(path);
-}
-
-
-double Gearbox::getParamLength(const std::string& path) const
-throw(GearboxIOAbs::GearboxIONotConnectedError, GearboxIOAbs::GearboxPathNotValidError,
-      GearboxIOAbs::GearboxParamNotExistsError, GearboxIOAbs::GearboxPathEmptyResultError,
-      GearboxIOAbs::GearboxPathResultNotValidError, GearboxIOAbs::GearboxStringNumConversionError)
-{
-  if ((m_gearboxIO == NULL) || (!m_gearboxIO->isOpen())) throw GearboxIOAbs::GearboxIONotConnectedError();
-  return m_gearboxIO->getParamLength(path);
-}
-
-
-double Gearbox::getParamAngle(const std::string& path) const
-throw(GearboxIOAbs::GearboxIONotConnectedError, GearboxIOAbs::GearboxPathNotValidError,
-      GearboxIOAbs::GearboxParamNotExistsError, GearboxIOAbs::GearboxPathEmptyResultError,
-      GearboxIOAbs::GearboxPathResultNotValidError, GearboxIOAbs::GearboxStringNumConversionError)
-{
-  if ((m_gearboxIO == NULL) || (!m_gearboxIO->isOpen())) throw GearboxIOAbs::GearboxIONotConnectedError();
-  return m_gearboxIO->getParamAngle(path);
-}
-
-
-double Gearbox::getParamNumValue(const std::string& path) const
-throw(GearboxIOAbs::GearboxIONotConnectedError, GearboxIOAbs::GearboxPathNotValidError,
-      GearboxIOAbs::GearboxParamNotExistsError, GearboxIOAbs::GearboxPathEmptyResultError,
-      GearboxIOAbs::GearboxPathResultNotValidError, GearboxIOAbs::GearboxStringNumConversionError)
-{
-  if ((m_gearboxIO == NULL) || (!m_gearboxIO->isOpen())) throw GearboxIOAbs::GearboxIONotConnectedError();
-  return m_gearboxIO->getParamNumValue(path);
-}
-
-
-std::string Gearbox::getParamString(const std::string& path) const
-throw(GearboxIOAbs::GearboxIONotConnectedError, GearboxIOAbs::GearboxPathNotValidError,
-      GearboxIOAbs::GearboxParamNotExistsError, GearboxIOAbs::GearboxPathEmptyResultError,
-      GearboxIOAbs::GearboxPathResultNotValidError)
-{
-  if ((m_gearboxIO == NULL) || (!m_gearboxIO->isOpen())) throw GearboxIOAbs::GearboxIONotConnectedError();
-  return m_gearboxIO->getParamString(path);
-}
-
-
 //============================================================================
 //                              Private methods
 //============================================================================

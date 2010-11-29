@@ -175,6 +175,56 @@ namespace Belle2 {
           GearboxIOAbs::GearboxPathResultNotValidError, GearboxIOAbs::GearboxStringNumConversionError);
 
     /**
+     * Returns a parameter, given by the path, which describes an energy/mass/momentum.
+     *
+     * The path specifies the node, whose value should be returned. Instead of a single
+     * node, a Path statement can also be used.
+     * The attribute 'unit' of the node is used to convert the given angle parameter to [GeV].
+     * The following units are currently supported: [eV], [keV], [MeV], [GeV], [TeV]
+     *
+     * Different types of exceptions can be thrown:
+     * GearboxIONotConnectedError: if the GearboxIO is not connected to a storage medium.
+     * GearboxPathNotValidError: if the path statement is not valid.
+     * GearboxParamNotExistsError: if the parameter does not exist and the parameter check is enabled.
+     * GearboxPathEmptyResultError: if the returned result of the path query is empty.
+     * GearboxPathResultNotValidError: if the returned type of the path query is not supported.
+     * GearboxStringNumConversionError: if the conversion of a string to a numerical value failed.
+     *
+     * @param path The path to the node which should be returned.
+     * @return The value of the length parameter in [GeV]. If no unit or an unknown unit is given,
+     *         the value is assumed to be in [GeV].
+     */
+    double getParamEnergy(const std::string& path = "") const
+    throw(GearboxIOAbs::GearboxIONotConnectedError, GearboxIOAbs::GearboxPathNotValidError,
+          GearboxIOAbs::GearboxParamNotExistsError, GearboxIOAbs::GearboxPathEmptyResultError,
+          GearboxIOAbs::GearboxPathResultNotValidError, GearboxIOAbs::GearboxStringNumConversionError);
+
+    /**
+     * Returns a parameter, given by the path, which describes a density.
+     *
+     * The path specifies the node, whose value should be returned. Instead of a single
+     * node, a Path statement can also be used.
+     * The attribute 'unit' of the node is used to convert the given angle parameter to [g/cm^3].
+     * The following units are currently supported: [mg/cm^3], [kg/cm^3], [mg/mm^3], [g/mm^3], [kg/mm^3]
+     *
+     * Different types of exceptions can be thrown:
+     * GearboxIONotConnectedError: if the GearboxIO is not connected to a storage medium.
+     * GearboxPathNotValidError: if the path statement is not valid.
+     * GearboxParamNotExistsError: if the parameter does not exist and the parameter check is enabled.
+     * GearboxPathEmptyResultError: if the returned result of the path query is empty.
+     * GearboxPathResultNotValidError: if the returned type of the path query is not supported.
+     * GearboxStringNumConversionError: if the conversion of a string to a numerical value failed.
+     *
+     * @param path The path to the node which should be returned.
+     * @return The value of the length parameter in [g/cm^3]. If no unit or an unknown unit is given,
+     *         the value is assumed to be in [g/cm^3].
+     */
+    double getParamDensity(const std::string& path = "") const
+    throw(GearboxIOAbs::GearboxIONotConnectedError, GearboxIOAbs::GearboxPathNotValidError,
+          GearboxIOAbs::GearboxParamNotExistsError, GearboxIOAbs::GearboxPathEmptyResultError,
+          GearboxIOAbs::GearboxPathResultNotValidError, GearboxIOAbs::GearboxStringNumConversionError);
+
+    /**
      * Returns a parameter, given by the path, which describes a general numerical value.
      *
      * The path specifies the node, which value should be returned. Instead of a single

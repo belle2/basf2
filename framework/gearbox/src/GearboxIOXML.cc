@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include <framework/gearbox/GearboxIOXML.h>
+
 #include <framework/datastore/Units.h>
 
 #include <cmath>
@@ -33,9 +34,6 @@ GearboxIOXML::GearboxIOXML() : GearboxIOAbs()
 
   m_xmlDocument = NULL;
   m_enableParamCheck = true;
-
-  setLengthUnitMap();
-  setAngleUnitMap();
 }
 
 
@@ -147,34 +145,11 @@ throw(GearboxIOAbs::GearboxIONotConnectedError, GearboxIOAbs::GearboxPathNotVali
       GearboxIOAbs::GearboxPathEmptyResultError, GearboxIOAbs::GearboxParamNotExistsError,
       GearboxIOAbs::GearboxPathResultNotValidError, GearboxIOAbs::GearboxStringNumConversionError)
 {
-  double resultLength;
-  int currentUnitType;
-
   if (m_enableParamCheck) {
     if (!isParamAvailable(path)) throw(GearboxParamNotExistsError() << path);
   }
 
-  getDoubleWithUnit(resultLength, currentUnitType, path, c_CM, m_lengthUnitMap);
-
-  //--- Convert length value ---
-  switch (currentUnitType) {
-    case c_UM:
-      resultLength *= um;
-      break;
-    case c_MM:
-      resultLength *= mm;
-      break;
-    case c_CM:
-      resultLength *= cm;
-      break;
-    case c_M:
-      resultLength *= m;
-      break;
-    case c_KM:
-      resultLength *= km;
-      break;
-  }
-  return resultLength;
+  return getDoubleWithUnit(path, UnitConverter::c_UnitLength);
 }
 
 
@@ -183,27 +158,11 @@ throw(GearboxIOAbs::GearboxIONotConnectedError, GearboxIOAbs::GearboxPathNotVali
       GearboxIOAbs::GearboxPathEmptyResultError, GearboxIOAbs::GearboxParamNotExistsError,
       GearboxIOAbs::GearboxPathResultNotValidError, GearboxIOAbs::GearboxStringNumConversionError)
 {
-  double resultAngle;
-  int currentUnitType;
-
   if (m_enableParamCheck) {
     if (!isParamAvailable(path)) throw(GearboxParamNotExistsError() << path);
   }
 
-  getDoubleWithUnit(resultAngle, currentUnitType, path, c_Rad, m_angleUnitMap);
-
-  //--- Convert angle value ---
-  switch (currentUnitType) {
-    case c_Deg:
-      resultAngle *= deg;
-      break;
-    case c_Rad:
-      break;
-    case c_MRad:
-      resultAngle *= mrad;
-      break;
-  }
-  return resultAngle;
+  return getDoubleWithUnit(path, UnitConverter::c_UnitAngle);
 }
 
 
@@ -302,8 +261,7 @@ xmlXPathObjectPtr GearboxIOXML::getNodeSet(xmlDocPtr document, xmlChar *xpath) c
 }
 
 
-void GearboxIOXML::getDoubleWithUnit(double& value, int& unit, const string& xpath,
-                                     int defaultUnit, const std::map<std::string, int>& unitMap) const
+double GearboxIOXML::getDoubleWithUnit(const string& xpath, UnitConverter::EUnitTypes unitType) const
 throw(GearboxIOAbs::GearboxIONotConnectedError, GearboxIOAbs::GearboxPathNotValidError, GearboxIOAbs::GearboxPathEmptyResultError,
       GearboxIOAbs::GearboxPathResultNotValidError, GearboxIOAbs::GearboxStringNumConversionError)
 {
@@ -328,6 +286,17 @@ throw(GearboxIOAbs::GearboxIONotConnectedError, GearboxIOAbs::GearboxPathNotVali
   xmlNodeSetPtr nodeSet;
   nodeSet = result->nodesetval;
 
+  //--- Get the value ---
+  xmlChar *valueChar = xmlNodeListGetString(m_xmlDocument, nodeSet->nodeTab[0]->xmlChildrenNode, 1);
+  double value = 0.0;
+
+  try {
+    value = boost::lexical_cast<double>((char*)valueChar);
+  } catch (boost::bad_lexical_cast &) {
+    xmlXPathFreeObject(result);
+    throw(GearboxStringNumConversionError() << string((char*)valueChar));
+  }
+
   //--- Get the unit ---
   xmlAttrPtr attribute = nodeSet->nodeTab[0]->properties;
   bool unitFound = false;
@@ -339,43 +308,9 @@ throw(GearboxIOAbs::GearboxIONotConnectedError, GearboxIOAbs::GearboxPathNotVali
 
   if (unitFound) {
     string unitString = (char*)attribute->children->content;
-
-    map<string, int>::const_iterator mapIter;
-    mapIter = unitMap.find(unitString);
-    if (mapIter != unitMap.end()) unit = mapIter->second;
-    else unit = defaultUnit;
-  } else unit = defaultUnit;
-
-  //--- Get the value ---
-  xmlChar *valueChar = xmlNodeListGetString(m_xmlDocument, nodeSet->nodeTab[0]->xmlChildrenNode, 1);
-  value = 0.0;
-
-  try {
-    value = boost::lexical_cast<double>((char*)valueChar);
-  } catch (boost::bad_lexical_cast &) {
-    xmlXPathFreeObject(result);
-    throw(GearboxStringNumConversionError() << string((char*)valueChar));
+    value = UnitConverter::Instance().convertValue(value, unitType, unitString);
   }
 
   xmlXPathFreeObject(result);
-}
-
-
-void GearboxIOXML::setLengthUnitMap()
-{
-  m_lengthUnitMap.clear();
-  m_lengthUnitMap.insert(make_pair("um", c_UM)); //Micrometer
-  m_lengthUnitMap.insert(make_pair("mm", c_MM)); //Millimeter
-  m_lengthUnitMap.insert(make_pair("cm", c_CM)); //Centimeter
-  m_lengthUnitMap.insert(make_pair("m", c_M));   //Meter
-  m_lengthUnitMap.insert(make_pair("km", c_KM)); //Kilometer
-}
-
-
-void GearboxIOXML::setAngleUnitMap()
-{
-  m_angleUnitMap.clear();
-  m_angleUnitMap.insert(make_pair("deg", c_Deg));  //Degree
-  m_angleUnitMap.insert(make_pair("rad", c_Rad));  //Radian
-  m_angleUnitMap.insert(make_pair("mrad", c_MRad)); //milliradian
+  return value;
 }

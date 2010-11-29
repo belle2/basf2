@@ -14,6 +14,7 @@
 #include <libxml/xpath.h>
 
 #include <framework/gearbox/GearboxIOAbs.h>
+#include <framework/gearbox/UnitConverter.h>
 
 #include <string>
 #include <map>
@@ -206,23 +207,7 @@ namespace Belle2 {
 
   protected:
 
-    /** Definition of the supported length units. */
-    enum ELengthUnitTypes { c_UM,  /**< length unit [micrometer]. */
-                            c_MM,  /**< length unit [mm]. */
-                            c_CM,  /**< length unit [cm]. */
-                            c_M,   /**< length unit [m]. */
-                            c_KM   /**< length unit [km]. */
-                          };
-
-    /** Definition of the supported length units. */
-    enum EAngleUnitTypes { c_Deg,  /**< angle unit [deg]. */
-                           c_Rad,  /**< angle unit [rad]. */
-                           c_MRad  /**< angle unit [mrad]. */
-                         };
-
     xmlDocPtr m_xmlDocument;                    /**< The XML document. */
-    std::map<std::string, int> m_lengthUnitMap; /**< Maps a string representing a length unit to the unit type. */
-    std::map<std::string, int> m_angleUnitMap;  /**< Maps a string representing an angle unit to the unit type. */
 
     bool m_enableParamCheck; /**< If set to true, performs a check of the path/parameter each time it is accessed. */
 
@@ -238,7 +223,11 @@ namespace Belle2 {
     xmlXPathObjectPtr getNodeSet(xmlDocPtr document, xmlChar *xpath) const;
 
     /**
-     * Returns a parameter as double value and its unit.
+     * Returns a parameter as double value converted into the framework default unit.
+     *
+     * The method checks if the "unit" argument is given. If it is, the unit
+     * is used to convert the floating point value to the framework default
+     * unit. If not the value specified by the xpath is returned.
      *
      * Different types of exceptions can be thrown:
      * GearboxIONotConnectedError: if the GearboxIO is not connected to a storage medium.
@@ -247,22 +236,12 @@ namespace Belle2 {
      * GearboxPathResultNotValidError: if the returned type of the path query is not supported.
      * GearboxStringNumConversionError: if the conversion of a string to a numerical value failed.
      *
-     * @param value The found value is returned in this variable.
-     * @param unit The found unit is returned in this variable.
      * @param xpath The XPath statement defining the requested node.
-     * @param defaultUnit The default unit which is used if no unit is found.
-     * @param unitMap The map which links unit string representations to unit types.
+     * @param unitType The type of the unit (length, angle, energy, distance)
      */
-    void getDoubleWithUnit(double& value, int& unit, const std::string& xpath,
-                           int defaultUnit, const std::map<std::string, int>& unitMap) const
+    double getDoubleWithUnit(const std::string& xpath, UnitConverter::EUnitTypes unitType) const
     throw(GearboxIOAbs::GearboxIONotConnectedError, GearboxIOAbs::GearboxPathNotValidError, GearboxIOAbs::GearboxPathEmptyResultError,
           GearboxIOAbs::GearboxPathResultNotValidError, GearboxIOAbs::GearboxStringNumConversionError);
-
-    /** Fills the map which links the string representing of a length unit to the type if the unit. */
-    void setLengthUnitMap();
-
-    /** Fills the map which links the string representing of an angle unit to the type if the unit. */
-    void setAngleUnitMap();
 
   };
 

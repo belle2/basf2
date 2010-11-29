@@ -24,13 +24,14 @@ namespace Belle2 {
    */
 
   // standard units
-  const double cm  = 1.;  /**< Standard of [length] */
-  const double ns  = 1.;  /**< Standard of [time] */
-  const double rad = 1.;  /**< Standard of [angle] */
-  const double GeV = 1.;  /**< Standard of [energy, momentum, mass] */
-  const double K   = 1.;  /**< Standard of [temperature] */
-  const double T   = 1.;  /**< Standard of [magnetic field] */
-  const double e   = 1.;  /**< Standard of [electric charge] */
+  const double cm   = 1.; /**< Standard of [length] */
+  const double ns   = 1.; /**< Standard of [time] */
+  const double rad  = 1.; /**< Standard of [angle] */
+  const double GeV  = 1.; /**< Standard of [energy, momentum, mass] */
+  const double K    = 1.; /**< Standard of [temperature] */
+  const double T    = 1.; /**< Standard of [magnetic field] */
+  const double e    = 1.; /**< Standard of [electric charge] */
+  const double gcm3 = 1.; /**< Standard of [density] */
 
   // length units
   const double km  = cm * 1e5;   /**< [kilometers] */
@@ -73,6 +74,14 @@ namespace Belle2 {
   const double eV  = GeV * 1e-9; /**< [electronvolt] */
   const double keV = eV  * 1e3;  /**< [kiloelectronvolt] */
   const double MeV = eV  * 1e6;  /**< [megaelectronvolt] */
+  const double TeV = eV  * 1e9;  /**< [megaelectronvolt] */
+
+  // density units
+  const double mgcm3  = gcm3 * 1e-3; /**< [mg/cm^3] */
+  const double kgcm3  = gcm3 * 1e3;  /**< [kg/cm^3] */
+  const double gmm3   = gcm3 / mm3;  /**< [g/mm^3] */
+  const double mgmm3  = mgcm3 / mm3; /**< [mg/mm^3] */
+  const double kgmm3  = kgcm3 / mm3; /**< [kg/mm^3] */
 
   //Various constants
   const double speed_of_light = 29.9792458; /**< [cm/ns] */

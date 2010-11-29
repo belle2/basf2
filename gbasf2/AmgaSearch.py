@@ -28,8 +28,6 @@ class AmgaSearch(object):
     experiments = None
     attributes = None
     queryString = None
-    user_functions = ['setDataType', 'setExperiments', 'setAttributes',
-                      'executeAmgaQuery']
 
 ###############################################################################
 
@@ -126,7 +124,7 @@ class AmgaSearch(object):
 if __name__ == '__main__':
     asearch = AmgaSearch()
     asearch.setDataType('data')  # or setDataType('MC')
-    asearch.setExperimets([1, 2])
+    asearch.setExperimets(['01', '02', '05'])
     asearch.setQuery('(id > 1 and id < 5) or events = 666')
     lfns = asearch.executeAmgaQuery()
-    # return lfns
+    print lfns

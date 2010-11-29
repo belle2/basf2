@@ -57,7 +57,7 @@ class AmgaQuery(object):
         if experiments is not None:
             for e in experiments:
                 exp.append('/' + self.vo + '/' + dataType + '/E' + str(e)
-                           + '/FC:lfn')  # XXX those paths need to be read from config file
+                           + '/FC')  # XXX those paths need to be read from config file
         else:
             exp = self.amgaclient.getSubdirectories('/' + self.vo + '/'
                     + dataType)  # XXX as above
@@ -65,7 +65,7 @@ class AmgaQuery(object):
                 exp[i] += '/FC'
 
         for e in exp:
-            lfns.extend(self.amgaclient.getGUIDs(e, query))
+            lfns.extend(self.amgaclient.directQuery(e, query))
         return lfns
 
 

@@ -6,7 +6,6 @@
 # 2010-01
 
 import mdclient
-import mdinterface
 import sys
 
 sys.path.append('../')
@@ -62,9 +61,9 @@ class AmgaClient(object):
         guids = []
         self.client.selectAttr([experiment], query)
         while not self.client.eot():
-            # guids.append('guid:' + self.client.fetchRow())
+            guids.append('guid:' + self.client.fetchRow())
             # -  we're interesteed in LFNS now
-            guids.append(self.client.fetchRow())
+            # guids.append(self.client.fetchRow())
         return guids
 
 ###############################################################################
@@ -75,10 +74,18 @@ class AmgaClient(object):
         Returns list of LFNs.
         '''
 
-        self.client.find('*', query)
+        tmp = []
         results = []
+
+        self.client.find(experiment, query)
         while not self.client.eot():
+            tmp.append(experiment + '/' + self.client.fetchRow())
+
+        for t in tmp:
+            self.client.getattr(t, ['lfn'])
+            self.client.fetchRow()
             results.append(self.client.fetchRow())
+
         return results
 
 ###############################################################################

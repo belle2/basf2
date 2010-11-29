@@ -13,10 +13,11 @@
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreDefs.h>
+#include <framework/datastore/Units.h>
 
 #include <framework/logging/Logger.h>
 #include <cdc/hitcdc/SimHitCDC.h>
-#include <cdc/simcdc/CDCHit.h>
+#include <cdc/simcdc/CDCB4VHit.h>
 
 #include <tracking/karlsruhe/CDCTrackHit.h>
 #include <tracking/karlsruhe/CDCSegment.h>

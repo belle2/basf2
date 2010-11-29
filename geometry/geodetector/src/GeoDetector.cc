@@ -103,7 +103,7 @@ void GeoDetector::createDetector()
 void GeoDetector::saveToRootFile(const std::string& filename)
 {
   try {
-    string detectorName = Gearbox::Instance().getParamString("/Detector/Name");
+    string detectorName = Gearbox::Instance().getGearboxIO().getParamString("/Detector/Name");
     gGeoManager->Export(filename.c_str(), detectorName.c_str());
   } catch (GearboxIOAbs::GearboxIONotConnectedError&) {
     B2ERROR("Could not fetch parameters. No GearboxIO object was created !")

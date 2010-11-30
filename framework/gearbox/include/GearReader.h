@@ -105,7 +105,7 @@ namespace Belle2 {
      * @param weight Returns a weight which is meant for usage inside a material mixture. If it isn't defined -1 is returned.
      * @return Pointer to the created TGeoElement. Ownership is given to the method receiving the pointer. Returns NULL if the TGeoMaterial could not be created.
      */
-    TGeoElement* readElementSection(GearDir& elementContent, double& weight);
+    static TGeoElement* readElementSection(GearDir& elementContent, double& weight);
 
     /**
      * Reads a material section.
@@ -114,7 +114,7 @@ namespace Belle2 {
      * @param weight Returns a weight which is meant for usage inside a material mixture. If it isn't defined -1 is returned.
      * @return Pointer to the created TGeoMaterial. Ownership is given to the method receiving the pointer. Returns NULL if the TGeoMaterial could not be created.
      */
-    TGeoMaterial* readMaterialSection(GearDir& materialContent, double& weight);
+    static TGeoMaterial* readMaterialSection(GearDir& materialContent, double& weight);
 
     /**
      * Reads a mixture section.
@@ -123,7 +123,7 @@ namespace Belle2 {
      * @param weight Returns a weight which is meant for usage inside a material mixture. If it isn't defined -1 is returned.
      * @return Pointer to the created TGeoMixture. Ownership is given to the method receiving the pointer. Returns NULL if the TGeoMaterial could not be created.
      */
-    TGeoMixture* readMixtureSection(GearDir& mixtureContent, double& weight);
+    static TGeoMixture* readMixtureSection(GearDir& mixtureContent, double& weight);
 
 
 

@@ -33,7 +33,12 @@ GearDir::GearDir(GearDir& gearDir, const string& path) : GearboxIOAbs()
 
 GearDir::GearDir(GearDir& gearDir, int index) : GearboxIOAbs()
 {
-  append(gearDir.getDirPath(), index);
+  string path = gearDir.getDirPath();
+
+  //If there is a trailing '/' use the string except the last character
+  if (path[path.length()-1] == '/') {
+    m_dirPath = (path.substr(0, path.length() - 1) + (format("[%1%]/") % (index)).str());
+  } else m_dirPath = (path + (format("[%1%]/") % (index)).str());
 }
 
 

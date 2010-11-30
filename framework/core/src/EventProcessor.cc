@@ -72,7 +72,7 @@ void EventProcessor::process(PathPtr startPath, long maxEvent, long runNumber)
     processCore(startPath, moduleList, maxEvent); //Do the event processing
 
   } else {
-    B2ERROR(numLogError << " B2ERROR(S) occurred ! The processing of events will not be started.");
+    B2ERROR(numLogError << " ERROR(S) occurred ! The processing of events will not be started.");
   }
 
   //Terminate modules

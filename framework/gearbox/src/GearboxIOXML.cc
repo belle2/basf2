@@ -81,7 +81,13 @@ throw(GearboxIOAbs::GearboxIONotConnectedError)
   if (!isOpen()) throw GearboxIONotConnectedError();
   if (path.empty()) return false;
 
-  xmlXPathObjectPtr result = getNodeSet(m_xmlDocument, (xmlChar*)path.c_str());
+  //If there is a trailing '/' remove it
+  string pathOnly = path;
+  if (path[path.length()-1] == '/') {
+    pathOnly =  path.substr(0, path.length() - 1);
+  }
+
+  xmlXPathObjectPtr result = getNodeSet(m_xmlDocument, (xmlChar*)pathOnly.c_str());
 
   if (result == NULL) return false;
 
@@ -150,7 +156,11 @@ throw(GearboxIOAbs::GearboxIONotConnectedError, GearboxIOAbs::GearboxPathNotVali
   }
 
   boost::format queryString("count(%1%)");
-  queryString % path;
+
+  //If there is a trailing '/' remove it
+  if (path[path.length()-1] == '/') {
+    queryString % (path.substr(0, path.length() - 1));
+  } else queryString % path;
 
   xmlXPathObjectPtr result = getNodeSet(m_xmlDocument, (xmlChar*)queryString.str().c_str());
 

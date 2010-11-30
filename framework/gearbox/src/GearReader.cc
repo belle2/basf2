@@ -25,15 +25,18 @@ TGeoMaterial* GearReader::readMaterial(GearDir& gearDir)
   double weight = 0;
 
   string nodeName = gearDir.getNodeName();
+  gearDir.convertNodeToPath();
 
   //Check if the GearDir points to a <Material> or <Mixture> node
-  if (gearDir.getNodeName() == "Mixture") {
+  if (nodeName == "Mixture") {
     geomMat = readMixtureSection(gearDir, weight);
-  } else if (gearDir.getNodeName() == "Material") {
+  } else if (nodeName == "Material") {
     geomMat = readMaterialSection(gearDir, weight);
   } else {
     B2ERROR("The specified Material is neither a <Material> nor a <Mixture> section (" << gearDir.getDirPath() << ") !");
   }
+
+  gearDir.convertPathToNode();
   return geomMat;
 }
 
@@ -44,12 +47,6 @@ TGeoMaterial* GearReader::readMaterial(GearDir& gearDir)
 
 TGeoElement* GearReader::readElementSection(GearDir& elementContent, double& weight)
 {
-  //Check if the GearDir points to an <Element> node
-  if (elementContent.getNodeName() != "Element") {
-    B2ERROR("Can't read the <Element> section specified by '" << elementContent.getDirPath() << "'. The path is not pointing to an <Element> node !");
-    return NULL;
-  }
-
   weight = readWeightAttribute(elementContent);
   string matName = readNameAttribute(elementContent);
 
@@ -68,12 +65,6 @@ TGeoElement* GearReader::readElementSection(GearDir& elementContent, double& wei
 
 TGeoMaterial* GearReader::readMaterialSection(GearDir& materialContent, double& weight)
 {
-  //Check if the GearDir points to a <Material> node
-  if (materialContent.getNodeName() != "Material") {
-    B2ERROR("Can't read the <Material> section specified by '" << materialContent.getDirPath() << "'. The path is not pointing to a <Material> node !");
-    return NULL;
-  }
-
   weight = readWeightAttribute(materialContent);
   string matName = readNameAttribute(materialContent);
 
@@ -112,12 +103,6 @@ TGeoMaterial* GearReader::readMaterialSection(GearDir& materialContent, double& 
 
 TGeoMixture* GearReader::readMixtureSection(GearDir& mixtureContent, double& weight)
 {
-  //Check if the GearDir points to a <Mixture> node
-  if (mixtureContent.getNodeName() != "Mixture") {
-    B2ERROR("Can't read the <Mixture> section specified by '" << mixtureContent.getDirPath() << "'. The path is not pointing to a <Mixture> node !");
-    return NULL;
-  }
-
   weight = readWeightAttribute(mixtureContent);
   string matName = readNameAttribute(mixtureContent);
 

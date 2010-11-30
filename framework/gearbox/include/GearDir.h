@@ -357,6 +357,28 @@ namespace Belle2 {
     std::string getDirPath() const {return m_dirPath; };
 
     /**
+     * By removing a trailing '/', a pure path is converted to a path pointing to a node.
+     *
+     * For example:
+     *              The path
+     *                /Detector/MaterialSets/ParamSet[1]/Content/Material[1]/
+     *              is converted to
+     *                /Detector/MaterialSets/ParamSet[1]/Content/Material[1]
+     */
+    void convertPathToNode();
+
+    /**
+     * By adding a trailing '/', a path pointing to a node is converted to a pure path.
+     *
+     * For example:
+     *              The path
+     *                /Detector/MaterialSets/ParamSet[1]/Content/Material[1]
+     *              is converted to
+     *                /Detector/MaterialSets/ParamSet[1]/Content/Material[1]/
+     */
+    void convertNodeToPath();
+
+    /**
      * Appends a new path to the current directory path. Useful to go into a deeper level of the hierarchy.
      *
      * @param path The path which is appended to the end of the current directory path.

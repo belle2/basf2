@@ -75,25 +75,9 @@ namespace Belle2 {
      *    or
      *    <Mixture name="" weight=""/>
      *
-     * @param gearDir Reference to a GearDir pointing to the TGeoMaterial or TGeoMixture definition. Returns NULL if the TGeoMaterial could not be created.
+     * @param gearDir Reference to a GearDir pointing to the node representing a TGeoMaterial or TGeoMixture section. Returns NULL if the TGeoMaterial could not be created.
      */
     static TGeoMaterial* readMaterial(GearDir& gearDir);
-
-    /**
-     * Reads the weight attribute of the node the gearDir is pointing to.
-     *
-     * @param gearDir The GearDir pointing to the node from which the weight attribute should be read.
-     * @return The weight value which is meant for usage inside a material mixture. If it isn't defined -1 is returned.
-     */
-    static double readWeightAttribute(GearDir& gearDir);
-
-    /**
-     * Reads the name attribute of the node the gearDir is pointing to.
-     *
-     * @param gearDir The GearDir pointing to the node from which the name attribute should be read.
-     * @return The name value of the specified node. If the name attribute doesn't exist, an empty string is returned.
-     */
-    static std::string readNameAttribute(GearDir& gearDir);
 
 
   protected:
@@ -125,6 +109,21 @@ namespace Belle2 {
      */
     static TGeoMixture* readMixtureSection(GearDir& mixtureContent, double& weight);
 
+    /**
+     * Reads the weight attribute of the node the gearDir is pointing to.
+     *
+     * @param gearDir The GearDir path from which the weight attribute should be read.
+     * @return The weight value which is meant for usage inside a material mixture. If it isn't defined -1 is returned.
+     */
+    static double readWeightAttribute(GearDir& gearDir);
+
+    /**
+     * Reads the name attribute of the node the gearDir is pointing to.
+     *
+     * @param gearDir The GearDir path from which the name attribute should be read.
+     * @return The name value of the specified node. If the name attribute doesn't exist, an empty string is returned.
+     */
+    static std::string readNameAttribute(GearDir& gearDir);
 
 
   private:

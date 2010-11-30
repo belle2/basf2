@@ -167,6 +167,23 @@ void GearDir::setDirPath(const string& path)
 }
 
 
+void GearDir::convertPathToNode()
+{
+  //If there is a trailing '/' use the path except the last character.
+  if (m_dirPath[m_dirPath.length()-1] == '/') {
+    m_dirPath = m_dirPath.substr(0, m_dirPath.length() - 1);
+  }
+}
+
+
+void GearDir::convertNodeToPath()
+{
+  //If there isn't a trailing '/' add one.
+  if (m_dirPath[m_dirPath.length()-1] != '/') {
+    m_dirPath += "/";
+  }
+}
+
 void GearDir::append(const string& path)
 {
   m_dirPath += path;

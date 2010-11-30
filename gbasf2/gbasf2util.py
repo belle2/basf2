@@ -112,6 +112,9 @@ class CLIParams:
     def getInputFiles(self):
         return self.inputsandboxfiles
 
+    def getMaxEvents(self):
+        return self.maxevents
+
   # registers alll of the possible commandline options with the DIRAC Script handler
   # This is also used to generate the --help option
 
@@ -167,7 +170,7 @@ class CLIParams:
                 for option in options.keys():
                     if option in line[0:len(option)]:
                         setFunction = getattr(self, options[option])
-                        print line
+                        # DEBUG print line
                         setFunction(line.split('=', 1)[1].strip().replace('"',
                                     '').replace("'", ''))
 

@@ -115,7 +115,6 @@ class AmgaClient(object):
             results[t] = {}
             for attribute in attributes:
                 results[t][attribute] = self.client.fetchRow()
-                print attribute + ' = ' + results[t][attribute]
 
         return results
 

@@ -86,6 +86,7 @@ def make_jdl(
 
 
 # basic function to make a tar of input files, written to pwd
+# FIXME - upload to SandboxSE, return an URL and reuse URL to speed up submission
 
 
 def make_tar(project, files):
@@ -189,6 +190,8 @@ def main():
   # create the input sandbox
     tar = make_tar(cliParams.getProject(), cliParams.getInputFiles())
 
+  # keep track of the number of events submitted
+    totalevents = 0
   # for each of the lfns, make a job and submit it
     for result in results:
         jdl = make_jdl(  # Events/sec into CPUSecs
@@ -201,13 +204,18 @@ def main():
             cliParams.getSwVer(),
             tar,
             )
-        result = dirac.submit(jdl)
-        if result['OK']:
-            print 'JobID = %s' % result['Value']
+        subresult = dirac.submit(jdl)
+        if subresult['OK']:
+            print 'JobID = %s' % subresult['Value']
             # remove the JDL - we keep it on error
             os.remove(jdl)
+            totalevents = totalevents + int(results[result]['events'])
+            # Yes, that's right - this is done after submission, so MaxEvents isn't really max!
+            if totalevents > cliParams.getMaxEvents():
+                print 'Maximum number of events exceeded - skipping the other files'
+                break
         else:
-            errorList.append('[' + lfn + '] ' + result['Message'])
+            errorList.append('[' + lfn + '] ' + subresult['Message'])
             exitCode = 2
 
   # print any errors encountered during submission
@@ -220,6 +228,7 @@ def main():
     else:
         print 'Something went wrong - leaving JDL and sandbox in place'
 
+    print str(totalevents) + 'events to process!'
     print 'Now visit https://kek2-uidev.cc.kek.jp:15043/DIRAC/jobs/JobMonitor/display and select Project ' \
         + cliParams.getProject()
     DIRAC.exit(exitCode)

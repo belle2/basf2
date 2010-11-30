@@ -97,6 +97,24 @@ namespace Belle2 {
     throw(GearboxIOAbs::GearboxIONotConnectedError, GearboxIOAbs::GearboxPathNotValidError);
 
     /**
+     * Returns the name of the node the path is pointing to.
+     *
+     * Different types of exceptions can be thrown:
+     * GearboxIONotConnectedError: if the GearboxIO is not connected to a storage medium.
+     * GearboxPathNotValidError: if the path statement is not valid.
+     * GearboxParamNotExistsError: if the parameter does not exist and the parameter check is enabled.
+     * GearboxPathEmptyResultError: if the returned result of the path query is empty.
+     * GearboxPathResultNotValidError: if the returned type of the path query is not supported.
+     *
+     * @param path The path to the node whose name should be returned.
+     * @return The name of the node the path is pointing to.
+     */
+    std::string getNodeName(const std::string& path) const
+    throw(GearboxIOAbs::GearboxIONotConnectedError, GearboxIOAbs::GearboxPathNotValidError,
+          GearboxIOAbs::GearboxParamNotExistsError, GearboxIOAbs::GearboxPathEmptyResultError,
+          GearboxIOAbs::GearboxPathResultNotValidError);
+
+    /**
      * Returns the number of nodes given by the last node in the path.
      *
      * Different types of exceptions can be thrown:

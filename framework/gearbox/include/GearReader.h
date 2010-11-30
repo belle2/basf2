@@ -12,6 +12,7 @@
 #define GEARREADER_H_
 
 #include <TGeoMaterial.h>
+#include <string>
 
 namespace Belle2 {
 
@@ -74,12 +75,57 @@ namespace Belle2 {
      *    or
      *    <Mixture name="" weight=""/>
      *
-     * @param gearDir Reference to a GearDir pointing to the TGeoMaterial or TGeoMixture definition.
+     * @param gearDir Reference to a GearDir pointing to the TGeoMaterial or TGeoMixture definition. Returns NULL if the TGeoMaterial could not be created.
      */
     static TGeoMaterial* readMaterial(GearDir& gearDir);
 
+    /**
+     * Reads the weight attribute of the node the gearDir is pointing to.
+     *
+     * @param gearDir The GearDir pointing to the node from which the weight attribute should be read.
+     * @return The weight value which is meant for usage inside a material mixture. If it isn't defined -1 is returned.
+     */
+    static double readWeightAttribute(GearDir& gearDir);
+
+    /**
+     * Reads the name attribute of the node the gearDir is pointing to.
+     *
+     * @param gearDir The GearDir pointing to the node from which the name attribute should be read.
+     * @return The name value of the specified node. If the name attribute doesn't exist, an empty string is returned.
+     */
+    static std::string readNameAttribute(GearDir& gearDir);
+
 
   protected:
+
+    /**
+     * Reads an element section.
+     *
+     * @param gearDir The GearDir pointing to the element section.
+     * @param weight Returns a weight which is meant for usage inside a material mixture. If it isn't defined -1 is returned.
+     * @return Pointer to the created TGeoElement. Ownership is given to the method receiving the pointer. Returns NULL if the TGeoMaterial could not be created.
+     */
+    TGeoElement* readElementSection(GearDir& gearDir, double& weight);
+
+    /**
+     * Reads a material section.
+     *
+     * @param gearDir The GearDir pointing to the material section.
+     * @param weight Returns a weight which is meant for usage inside a material mixture. If it isn't defined -1 is returned.
+     * @return Pointer to the created TGeoMaterial. Ownership is given to the method receiving the pointer. Returns NULL if the TGeoMaterial could not be created.
+     */
+    TGeoMaterial* readMaterialSection(GearDir& gearDir, double& weight);
+
+    /**
+     * Reads a mixture section.
+     *
+     * @param gearDir The GearDir pointing to the mixture section.
+     * @param weight Returns a weight which is meant for usage inside a material mixture. If it isn't defined -1 is returned.
+     * @return Pointer to the created TGeoMixture. Ownership is given to the method receiving the pointer. Returns NULL if the TGeoMaterial could not be created.
+     */
+    TGeoMixture* readMixtureSection(GearDir& gearDir, double& weight);
+
+
 
   private:
 

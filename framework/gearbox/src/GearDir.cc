@@ -19,21 +19,21 @@ using namespace boost;
 using namespace Belle2;
 
 
-GearDir::GearDir(const std::string& path) : GearboxIOAbs(), m_dirPath(path)
+GearDir::GearDir(const string& path) : GearboxIOAbs(), m_dirPath(path)
 {
 
 }
 
 
-GearDir::GearDir(GearDir& gearDir, const std::string& path) : GearboxIOAbs()
+GearDir::GearDir(GearDir& gearDir, const string& path) : GearboxIOAbs()
 {
   m_dirPath = gearDir.getDirPath() + path;
 }
 
 
-GearDir::GearDir(GearDir& gearDir, const int index) : GearboxIOAbs()
+GearDir::GearDir(GearDir& gearDir, int index) : GearboxIOAbs()
 {
-  m_dirPath = (format(gearDir.getDirPath() + "[%1%]/") % (index)).str();
+  append(gearDir.getDirPath(), index);
 }
 
 
@@ -61,17 +61,26 @@ void GearDir::enableParamCheck(bool paramCheck)
 }
 
 
-bool GearDir::isPathValid(const std::string& path) const
+bool GearDir::isPathValid(const string& path) const
 throw(GearboxIOAbs::GearboxIONotConnectedError)
 {
   return Gearbox::Instance().getGearboxIO().isPathValid(m_dirPath + path);
 }
 
 
-bool GearDir::isParamAvailable(const std::string& path) const
+bool GearDir::isParamAvailable(const string& path) const
 throw(GearboxIOAbs::GearboxIONotConnectedError, GearboxIOAbs::GearboxPathNotValidError)
 {
   return Gearbox::Instance().getGearboxIO().isParamAvailable(m_dirPath + path);
+}
+
+
+string GearDir::getNodeName(const string& path) const
+throw(GearboxIOAbs::GearboxIONotConnectedError, GearboxIOAbs::GearboxPathNotValidError,
+      GearboxIOAbs::GearboxParamNotExistsError, GearboxIOAbs::GearboxPathEmptyResultError,
+      GearboxIOAbs::GearboxPathResultNotValidError)
+{
+  return Gearbox::Instance().getGearboxIO().getNodeName(m_dirPath + path);
 }
 
 
@@ -159,7 +168,7 @@ void GearDir::append(const string& path)
 }
 
 
-void GearDir::append(const std::string& path, int index)
+void GearDir::append(const string& path, int index)
 {
   //If there is a trailing '/' use the string except the last character
   if (path[path.length()-1] == '/') {

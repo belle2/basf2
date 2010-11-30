@@ -50,6 +50,9 @@ bool GearboxIOXML::open(const string& filename)
   m_xmlDocument = xmlParseFile(filename.c_str());
   xmlXIncludeProcess(m_xmlDocument);
 
+  //Speeds up XPath computation on static documents.
+  xmlXPathOrderDocElems(m_xmlDocument);
+
   if (m_xmlDocument == NULL) return false;
   else return true;
 }
@@ -72,14 +75,13 @@ bool GearboxIOXML::isOpen() const
 }
 
 
-bool GearboxIOXML::isPathValid(const std::string& path) const
+bool GearboxIOXML::isPathValid(const string& path) const
 throw(GearboxIOAbs::GearboxIONotConnectedError)
 {
   if (!isOpen()) throw GearboxIONotConnectedError();
   if (path.empty()) return false;
 
-  xmlXPathObjectPtr result;
-  result = getNodeSet(m_xmlDocument, (xmlChar*)path.c_str());
+  xmlXPathObjectPtr result = getNodeSet(m_xmlDocument, (xmlChar*)path.c_str());
 
   if (result == NULL) return false;
 
@@ -93,7 +95,7 @@ throw(GearboxIOAbs::GearboxIONotConnectedError)
 }
 
 
-bool GearboxIOXML::isParamAvailable(const std::string& path) const
+bool GearboxIOXML::isParamAvailable(const string& path) const
 throw(GearboxIOAbs::GearboxIONotConnectedError, GearboxIOAbs::GearboxPathNotValidError)
 {
   if (!isOpen()) throw GearboxIONotConnectedError();
@@ -109,6 +111,33 @@ throw(GearboxIOAbs::GearboxIONotConnectedError, GearboxIOAbs::GearboxPathNotVali
 }
 
 
+string GearboxIOXML::getNodeName(const string& path) const
+throw(GearboxIOAbs::GearboxIONotConnectedError, GearboxIOAbs::GearboxPathNotValidError,
+      GearboxIOAbs::GearboxParamNotExistsError, GearboxIOAbs::GearboxPathEmptyResultError,
+      GearboxIOAbs::GearboxPathResultNotValidError)
+{
+  if (!isOpen()) throw GearboxIONotConnectedError();
+  if (path.empty()) throw(GearboxPathNotValidError() << "");
+
+  if (m_enableParamCheck) {
+    if (!isPathValid(path)) throw(GearboxPathNotValidError() << path);
+  }
+
+  xmlXPathObjectPtr result = getNodeSet(m_xmlDocument, (xmlChar*)path.c_str());
+
+  if (result == NULL) throw(GearboxPathEmptyResultError() << path);
+  if (result->type != XPATH_NODESET) throw(GearboxPathResultNotValidError() << path);
+  if (xmlXPathNodeSetIsEmpty(result->nodesetval)) {
+    xmlXPathFreeObject(result);
+    throw(GearboxPathEmptyResultError() << path);
+  }
+
+  xmlNodeSetPtr nodeSet = result->nodesetval;
+
+  return (char*)(nodeSet->nodeTab[0]->name);
+}
+
+
 int GearboxIOXML::getNumberNodes(const string& path) const
 throw(GearboxIOAbs::GearboxIONotConnectedError, GearboxIOAbs::GearboxPathNotValidError,
       GearboxIOAbs::GearboxPathEmptyResultError, GearboxIOAbs::GearboxPathResultNotValidError)
@@ -120,12 +149,10 @@ throw(GearboxIOAbs::GearboxIONotConnectedError, GearboxIOAbs::GearboxPathNotVali
     if (!isPathValid(path)) throw(GearboxPathNotValidError() << path);
   }
 
-  xmlXPathObjectPtr result;
-
   boost::format queryString("count(%1%)");
   queryString % path;
 
-  result = getNodeSet(m_xmlDocument, (xmlChar*)queryString.str().c_str());
+  xmlXPathObjectPtr result = getNodeSet(m_xmlDocument, (xmlChar*)queryString.str().c_str());
 
   if (result == NULL) throw(GearboxPathEmptyResultError() << queryString.str());
   if (result->type != XPATH_NUMBER) {
@@ -140,7 +167,7 @@ throw(GearboxIOAbs::GearboxIONotConnectedError, GearboxIOAbs::GearboxPathNotVali
 }
 
 
-double GearboxIOXML::getParamLength(const std::string& path) const
+double GearboxIOXML::getParamLength(const string& path) const
 throw(GearboxIOAbs::GearboxIONotConnectedError, GearboxIOAbs::GearboxPathNotValidError,
       GearboxIOAbs::GearboxPathEmptyResultError, GearboxIOAbs::GearboxParamNotExistsError,
       GearboxIOAbs::GearboxPathResultNotValidError, GearboxIOAbs::GearboxStringNumConversionError)
@@ -152,7 +179,7 @@ throw(GearboxIOAbs::GearboxIONotConnectedError, GearboxIOAbs::GearboxPathNotVali
 }
 
 
-double GearboxIOXML::getParamAngle(const std::string& path) const
+double GearboxIOXML::getParamAngle(const string& path) const
 throw(GearboxIOAbs::GearboxIONotConnectedError, GearboxIOAbs::GearboxPathNotValidError,
       GearboxIOAbs::GearboxPathEmptyResultError, GearboxIOAbs::GearboxParamNotExistsError,
       GearboxIOAbs::GearboxPathResultNotValidError, GearboxIOAbs::GearboxStringNumConversionError)
@@ -164,7 +191,7 @@ throw(GearboxIOAbs::GearboxIONotConnectedError, GearboxIOAbs::GearboxPathNotVali
 }
 
 
-double GearboxIOXML::getParamEnergy(const std::string& path) const
+double GearboxIOXML::getParamEnergy(const string& path) const
 throw(GearboxIOAbs::GearboxIONotConnectedError, GearboxIOAbs::GearboxPathNotValidError,
       GearboxIOAbs::GearboxParamNotExistsError, GearboxIOAbs::GearboxPathEmptyResultError,
       GearboxIOAbs::GearboxPathResultNotValidError, GearboxIOAbs::GearboxStringNumConversionError)
@@ -176,7 +203,7 @@ throw(GearboxIOAbs::GearboxIONotConnectedError, GearboxIOAbs::GearboxPathNotVali
 }
 
 
-double GearboxIOXML::getParamDensity(const std::string& path) const
+double GearboxIOXML::getParamDensity(const string& path) const
 throw(GearboxIOAbs::GearboxIONotConnectedError, GearboxIOAbs::GearboxPathNotValidError,
       GearboxIOAbs::GearboxParamNotExistsError, GearboxIOAbs::GearboxPathEmptyResultError,
       GearboxIOAbs::GearboxPathResultNotValidError, GearboxIOAbs::GearboxStringNumConversionError)
@@ -188,7 +215,7 @@ throw(GearboxIOAbs::GearboxIONotConnectedError, GearboxIOAbs::GearboxPathNotVali
 }
 
 
-double GearboxIOXML::getParamNumValue(const std::string& path) const
+double GearboxIOXML::getParamNumValue(const string& path) const
 throw(GearboxIOAbs::GearboxIONotConnectedError, GearboxIOAbs::GearboxPathNotValidError,
       GearboxIOAbs::GearboxPathEmptyResultError, GearboxIOAbs::GearboxParamNotExistsError,
       GearboxIOAbs::GearboxPathResultNotValidError, GearboxIOAbs::GearboxStringNumConversionError)
@@ -200,8 +227,7 @@ throw(GearboxIOAbs::GearboxIONotConnectedError, GearboxIOAbs::GearboxPathNotVali
     if (!isParamAvailable(path)) throw(GearboxParamNotExistsError() << path);
   }
 
-  xmlXPathObjectPtr result;
-  result = getNodeSet(m_xmlDocument, (xmlChar*)path.c_str());
+  xmlXPathObjectPtr result = getNodeSet(m_xmlDocument, (xmlChar*)path.c_str());
 
   if (result == NULL) throw(GearboxPathEmptyResultError() << path);
   if (result->type != XPATH_NODESET) throw(GearboxPathResultNotValidError() << path);
@@ -210,8 +236,7 @@ throw(GearboxIOAbs::GearboxIONotConnectedError, GearboxIOAbs::GearboxPathNotVali
     throw(GearboxPathEmptyResultError() << path);
   }
 
-  xmlNodeSetPtr nodeSet;
-  nodeSet = result->nodesetval;
+  xmlNodeSetPtr nodeSet = result->nodesetval;
 
   xmlChar *resultChar = xmlNodeListGetString(m_xmlDocument, nodeSet->nodeTab[0]->xmlChildrenNode, 1);
   double resultValue = 0.0;
@@ -228,7 +253,7 @@ throw(GearboxIOAbs::GearboxIONotConnectedError, GearboxIOAbs::GearboxPathNotVali
 }
 
 
-std::string GearboxIOXML::getParamString(const std::string& path) const
+string GearboxIOXML::getParamString(const string& path) const
 throw(GearboxIOAbs::GearboxIONotConnectedError, GearboxIOAbs::GearboxPathNotValidError,
       GearboxIOAbs::GearboxParamNotExistsError, GearboxIOAbs::GearboxPathEmptyResultError,
       GearboxIOAbs::GearboxPathResultNotValidError)
@@ -240,8 +265,7 @@ throw(GearboxIOAbs::GearboxIONotConnectedError, GearboxIOAbs::GearboxPathNotVali
     if (!isParamAvailable(path)) throw(GearboxParamNotExistsError() << path);
   }
 
-  xmlXPathObjectPtr result;
-  result = getNodeSet(m_xmlDocument, (xmlChar*)path.c_str());
+  xmlXPathObjectPtr result = getNodeSet(m_xmlDocument, (xmlChar*)path.c_str());
 
   if (result == NULL) throw(GearboxPathEmptyResultError() << path);
 
@@ -255,9 +279,7 @@ throw(GearboxIOAbs::GearboxIONotConnectedError, GearboxIOAbs::GearboxPathNotVali
     throw(GearboxPathEmptyResultError() << path);
   }
 
-  xmlNodeSetPtr nodeSet;
-  nodeSet = result->nodesetval;
-
+  xmlNodeSetPtr nodeSet = result->nodesetval;
   xmlChar *resultChar = xmlNodeListGetString(m_xmlDocument, nodeSet->nodeTab[0]->xmlChildrenNode, 1);
 
   xmlXPathFreeObject(result);
@@ -271,12 +293,10 @@ throw(GearboxIOAbs::GearboxIONotConnectedError, GearboxIOAbs::GearboxPathNotVali
 
 xmlXPathObjectPtr GearboxIOXML::getNodeSet(xmlDocPtr document, xmlChar *xpath) const
 {
-  xmlXPathContextPtr context;
-  xmlXPathObjectPtr result;
-  context = xmlXPathNewContext(document);
+  xmlXPathContextPtr context = xmlXPathNewContext(document);
   if (context == NULL) return NULL;
 
-  result = xmlXPathEvalExpression(xpath, context);
+  xmlXPathObjectPtr result = xmlXPathEvalExpression(xpath, context);
   xmlXPathFreeContext(context);
   if (result == NULL) return NULL;
   return result;
@@ -290,8 +310,7 @@ throw(GearboxIOAbs::GearboxIONotConnectedError, GearboxIOAbs::GearboxPathNotVali
   if (!isOpen()) throw GearboxIONotConnectedError();
   if (xpath.empty()) throw(GearboxPathNotValidError() << "");
 
-  xmlXPathObjectPtr result;
-  result = getNodeSet(m_xmlDocument, (xmlChar*)xpath.c_str());
+  xmlXPathObjectPtr result = getNodeSet(m_xmlDocument, (xmlChar*)xpath.c_str());
 
   if (result == NULL) throw(GearboxPathEmptyResultError() << xpath);
 
@@ -305,8 +324,7 @@ throw(GearboxIOAbs::GearboxIONotConnectedError, GearboxIOAbs::GearboxPathNotVali
     throw(GearboxPathEmptyResultError() << xpath);
   }
 
-  xmlNodeSetPtr nodeSet;
-  nodeSet = result->nodesetval;
+  xmlNodeSetPtr nodeSet = result->nodesetval;
 
   //--- Get the value ---
   xmlChar *valueChar = xmlNodeListGetString(m_xmlDocument, nodeSet->nodeTab[0]->xmlChildrenNode, 1);

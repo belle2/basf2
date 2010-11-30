@@ -49,10 +49,12 @@ namespace Belle2 {
     /**
      * The GearDir constructor copying another GearDir and appending an index value for iterating.
      *
+     * Please note: It is highly recommended to avoid having a trailing slash in the path parameter.
+     *
      * @param gearDir The gearDir which should be copied.
      * @param index The index value which should be added to the path of the copied GearDir.
      */
-    GearDir(GearDir& gearDir, const int index);
+    GearDir(GearDir& gearDir, int index);
 
     /**
      * The GearGroup destructor.
@@ -108,6 +110,24 @@ namespace Belle2 {
      */
     bool isParamAvailable(const std::string& path) const
     throw(GearboxIOAbs::GearboxIONotConnectedError, GearboxIOAbs::GearboxPathNotValidError);
+
+    /**
+     * Returns the name of the node the GearDir is pointing to.
+     *
+     * Different types of exceptions can be thrown:
+     * GearboxIONotConnectedError: if the GearboxIO is not connected to a storage medium.
+     * GearboxPathNotValidError: if the path statement is not valid.
+     * GearboxParamNotExistsError: if the parameter does not exist and the parameter check is enabled.
+     * GearboxPathEmptyResultError: if the returned result of the path query is empty.
+     * GearboxPathResultNotValidError: if the returned type of the path query is not supported.
+     *
+     * @param path The path to the node whose name should be returned.
+     * @return The name of the node the GearDir is pointing to.
+     */
+    std::string getNodeName(const std::string& path = "") const
+    throw(GearboxIOAbs::GearboxIONotConnectedError, GearboxIOAbs::GearboxPathNotValidError,
+          GearboxIOAbs::GearboxParamNotExistsError, GearboxIOAbs::GearboxPathEmptyResultError,
+          GearboxIOAbs::GearboxPathResultNotValidError);
 
     /**
      * Returns the number of nodes given by the last node in the path.
@@ -323,16 +343,16 @@ namespace Belle2 {
           GearboxIOAbs::GearboxPathResultNotValidError);
 
     /**
-     * Sets the path which is added automatically as prefix to a given path.
+     * Sets the path to which this GearDir is pointing to.
      *
-     * @param path The prefix path which is added in front of a given path.
+     * @param path The path to which this GearDir is pointing to.
      */
     void setDirPath(const std::string& path);
 
     /**
-     * Returns the path which is added automatically as prefix to a given path.
+     * Returns the path to which this GearDir is pointing to.
      *
-     * @return The prefix path which is added in front of a given path.
+     * @return The path to which this GearDir is pointing to.
      */
     std::string getDirPath() const {return m_dirPath; };
 
@@ -377,7 +397,7 @@ namespace Belle2 {
 
   protected:
 
-    std::string m_dirPath;     /**< The prefix path which is added in front of a given path. */
+    std::string m_dirPath;     /**< The path to which this GearDir is pointing to. */
 
 
   private:

@@ -16,12 +16,12 @@ experiments = '13,57'
 query = 'id > 10 and id < 15'
 # Type of Data ('data' or 'MC')
 type = 'data'
-# estimated Maximum CPU Time (in seconds)
-cputime = '864200'
+# estimated Average Events per Minute (official MC = 40)
+evtpermin = '40'
 # (optional) Files to be send with the job
 inputsandboxfiles = 'file1.txt,file2.txt'
 # (optional) max events - the maximum number of events to use
-maxevents = 100000
+maxevents = '100000'
 
 # Create module
 test = fw.register_module('Hello')

@@ -103,13 +103,12 @@ def make_tar(project, files):
 # 1. conduct a metadata query to match appropriate data to work with - a set of LFNs
 # 2. construct a project based on the name provided and appropriate JDLs - presently just 1 per job
 # 3. submits the created jdls to the DIRAC Workload Management System
-#
 
 
 def main():
-  # ./gbasf2.py w -s steering-simpleexample.py -g test -m test -m 'id >1 and id <5'
     exitCode = 0
     errorList = []
+    lfns = []
 
   # setup options
     cliParams = CLIParams()
@@ -123,7 +122,6 @@ def main():
     dirac = Dirac.Dirac()
 
   # check for proxy prescence and if not present, make it
-  # FIXME - upload proxy if necessary
   # FIXME - upload proxy for lifetime of certificate
   # FIXME - warn on certificate validity
     proxyinfo = getProxyInfo()
@@ -184,19 +182,22 @@ def main():
     asearch.setExperiments([int(s) for s in
                            cliParams.getExperiments().split(',')])
     asearch.setQuery(cliParams.getQuery())
-    lfns = asearch.executeAmgaQuery()
+    asearch.setAttributes(['lfn', 'events'])
+    results = asearch.executeAmgaQueryWithAttributes()
+    print results
 
   # create the input sandbox
     tar = make_tar(cliParams.getProject(), cliParams.getInputFiles())
 
   # for each of the lfns, make a job and submit it
-    for lfn in lfns:
-        jdl = make_jdl(
+    for result in results:
+        jdl = make_jdl(  # Events/sec into CPUSecs
             cliParams.getSteeringFile(),
             cliParams.getProject(),
-            cliParams.getCPUTime(),
+            int(float(results[result]['events']) / (cliParams.getEvtPerMin()
+                / 60.0)),
             cliParams.getJobPriority(),
-            lfn,
+            results[result]['lfn'],
             cliParams.getSwVer(),
             tar,
             )

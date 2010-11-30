@@ -32,7 +32,6 @@ class AmgaQuery(object):
         '''
 
         # connect with amga here
-        # self.config = Config(yamlfile)
         self.amgaclient = AmgaClient()
 
 ###############################################################################
@@ -66,7 +65,45 @@ class AmgaQuery(object):
 
         for e in exp:
             lfns.extend(self.amgaclient.directQuery(e, query))
+        print lfns
         return lfns
+
+###############################################################################
+
+    def searchQueryWithAttributes(
+        self,
+        dataType,
+        experiments,
+        query,
+        attributes,
+        ):
+        '''
+        Executes search query. Called by AmgaSearch module.
+        Arguments:
+            - dataType - type of data ('data' or 'MC')
+            - experiments - list of numbers of experiments to search in or None to search all
+            - query - SQL-like query with definition of data parameters
+            - attributes - Attributes to be returned with the query
+        '''
+
+        exp = []
+        results = {}
+
+        if experiments is not None:
+            for e in experiments:
+                exp.append('/' + self.vo + '/' + dataType + '/E' + str(e)
+                           + '/FC')
+        else:
+            exp = self.amgaclient.getSubdirectories('/' + self.vo + '/'
+                    + dataType)
+            for i in xrange(len(exp)):
+                exp[i] += '/FC'
+
+        for e in exp:
+            results.update(self.amgaclient.directQueryWithAttributes(e, query,
+                           attributes))
+        print results
+        return results
 
 
 ###############################################################################

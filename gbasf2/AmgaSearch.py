@@ -1,16 +1,15 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# TODO
-# getters
-
-# imports
-# from sets import Set
+#
+# AmgaSearch is a container for information used in creating
+# a search-style metadata query to AMGA
+#
 
 '''
 Created on Jan 17, 2010
 
-@author: milosz
+@author: milosz, fifieldt
 '''
 
 from AmgaQuery import AmgaQuery
@@ -68,7 +67,7 @@ class AmgaSearch(object):
 
 ###############################################################################
 
-    def setAttributes(
+    def setAttributesWithOperators(
         self,
         attributes,
         operators,
@@ -98,6 +97,32 @@ class AmgaSearch(object):
 
 ###############################################################################
 
+    def setAttributes(self, attributes):
+        '''
+       Sets a list of attributes to be returned with the Search
+      '''
+
+        self.attributes = attributes
+
+###############################################################################
+
+    def getDataType(self):
+        return self.dataType
+
+    def getLfns(self):
+        return self.lfns
+
+    def getExperiments(self):
+        return self.experiments
+
+    def getAttributes(self):
+        return self.attributes
+
+    def getQueryString(self):
+        return self.queryString
+
+###############################################################################
+
     def executeAmgaQuery(self):
         '''
         Execute AMGA query and return list of LFNs
@@ -114,6 +139,22 @@ class AmgaSearch(object):
 
 ###############################################################################
 
+    def executeAmgaQueryWithAttributes(self):
+        '''
+        Execute AMGA query and return list of LFNs
+        No arguments
+        '''
+
+        if len(self.queryString) == 0:
+            raise Exception('No query. Aborting.')
+
+        aq = AmgaQuery()
+        results = aq.searchQueryWithAttributes(self.dataType,
+                self.experiments, self.queryString, self.attributes)
+        return results
+
+###############################################################################
+
     def setQuery(self, query):
         self.queryString = query
 
@@ -124,7 +165,7 @@ class AmgaSearch(object):
 if __name__ == '__main__':
     asearch = AmgaSearch()
     asearch.setDataType('data')  # or setDataType('MC')
-    asearch.setExperimets(['01', '02', '05'])
+    asearch.setExperiments(['01', '02', '05'])
     asearch.setQuery('(id > 1 and id < 5) or events = 666')
     lfns = asearch.executeAmgaQuery()
     print lfns

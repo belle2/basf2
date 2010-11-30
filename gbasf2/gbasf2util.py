@@ -15,7 +15,7 @@ import os
 
 class CLIParams:
 
-    CPUTime = 862400
+    EvtPerMin = 45
     steering_file = None
     project = 'Ungrouped'
     priority = 0
@@ -35,12 +35,12 @@ class CLIParams:
         self.project = arg
         return DIRAC.S_OK()
 
-    def setCPUTime(self, arg):
+    def setEvtPerMin(self, arg):
         if arg > 0:
-            self.CPUTime = arg
+            self.EvtPerMin = int(arg)
             return DIRAC.S_OK()
         else:
-            return DIRAC.S_ERROR('CPUTime is <=0')
+            return DIRAC.S_ERROR('EvtPerMin is <=0')
 
     def setJobPriority(self, arg):
     # FIXME: check query is within range
@@ -91,8 +91,8 @@ class CLIParams:
     def getProject(self):
         return self.project
 
-    def getCPUTime(self):
-        return self.CPUTime
+    def getEvtPerMin(self):
+        return self.EvtPerMin
 
     def getJobPriority(self):
         return self.priority
@@ -120,9 +120,9 @@ class CLIParams:
                               self.setSteeringFile)
         Script.registerSwitch('p:', 'project=', 'Name for project',
                               self.setProject)
-        Script.registerSwitch('c:', 'CPUTime=',
-                              'estimated CPUTime (in seconds)',
-                              self.setCPUTime)
+        Script.registerSwitch('c:', 'evtpermin=',
+                              'estimated EvtPerMin (in seconds)',
+                              self.setEvtPerMin)
         Script.registerSwitch('w:', 'priority=',
                               '(optional) Job priority: 0 is default',
                               self.setJobPriority)
@@ -152,7 +152,7 @@ class CLIParams:
       # hackhackhack option-function mapping :)
             options = {
                 'project': 'setProject',
-                'CPUTime': 'setCPUTime',
+                'evtpermin': 'setEvtPerMin',
                 'priority': 'setJobPriority',
                 'query': 'setQuery',
                 'type': 'setDataType',
@@ -167,7 +167,6 @@ class CLIParams:
                 for option in options.keys():
                     if option in line[0:len(option)]:
                         setFunction = getattr(self, options[option])
-                        print setFunction
                         print line
                         setFunction(line.split('=', 1)[1].strip().replace('"',
                                     '').replace("'", ''))

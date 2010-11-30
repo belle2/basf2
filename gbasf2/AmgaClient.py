@@ -4,13 +4,13 @@
 # Implementation of AmgaClient class used for communication with AMGA metadata catalog
 # Author: Milosz Zdybal (milosz.zdybal@ifj.edu.pl)
 # 2010-01
+# Editor: Tom Fifield (fifieldt@unimelb.edu.au)
+# 2010-11
 
 import mdclient
 import sys
 
 sys.path.append('../')
-
-# from cnfg import Config
 
 
 class AmgaClient(object):
@@ -29,7 +29,6 @@ class AmgaClient(object):
         Constructor - needs path of yaml file with configuration
         '''
 
-        # self.config = Config.Config(confile)
         # self.client = mdclient.MDClient('amga2.collab.unimelb.edu.au', 8822, '', '')
         # self.client = mdclient.MDClient('uib2dev.ifj.edu.pl', 8822, '', '')
         try:
@@ -82,9 +81,41 @@ class AmgaClient(object):
             tmp.append(experiment + '/' + self.client.fetchRow())
 
         for t in tmp:
-            self.client.getattr(t, ['lfn'])
+            self.client.getattr(t, ['lfn', 'events'])
             self.client.fetchRow()
             results.append(self.client.fetchRow())
+
+        return results
+
+###############################################################################
+
+    def directQueryWithAttributes(
+        self,
+        experiment,
+        query,
+        attributes,
+        ):
+        '''
+        Query with ability to define parameters in SQL way.
+        Returns dict of attribute values, indexed by path and attribute names
+        '''
+
+        tmp = []
+        results = {}
+
+        self.client.find(experiment, query)
+        while not self.client.eot():
+            tmp.append(experiment + '/' + self.client.fetchRow())
+
+        for t in tmp:
+            self.client.getattr(t, attributes)
+          # ignore the first row
+            self.client.fetchRow()
+          # attributes are returned as a dict (index is path) of dicts
+            results[t] = {}
+            for attribute in attributes:
+                results[t][attribute] = self.client.fetchRow()
+                print attribute + ' = ' + results[t][attribute]
 
         return results
 

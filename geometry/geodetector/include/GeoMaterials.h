@@ -48,8 +48,14 @@ namespace Belle2 {
 
     int m_matIndex; /**< Each material gets an index assigned. Needed by ROOT. */
 
+
   private:
 
+    /** Creates all media in the GearDir 'content' having the node name given by nodeName.
+     *
+     * @param content A reference to the content part which contains the description of the media.
+     * @param content The name of the nodes for which TGeoMedium objects should be created.
+     */
     void createMedia(GearDir& content, const std::string nodeName);
 
   };

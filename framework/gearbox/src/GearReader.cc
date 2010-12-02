@@ -164,9 +164,13 @@ TGeoMixture* GearReader::readMixtureSection(GearDir& mixtureContent, double& wei
     }
 
     //4) Loop over all materials
+    TGeoMaterial* firstMaterial = NULL;
     for (int iMat = 1; iMat <= nMat; ++iMat) {
       GearDir matContentIdx(materials, iMat);
       TGeoMaterial* currMaterial = readMaterialSection(matContentIdx, localWeight);
+
+      //Save the first TGeoMaterial so it can be used later for the relative density
+      if (iMat == 1) firstMaterial = currMaterial;
 
       if (localWeight < 0.0) {
         B2ERROR("The material " << currMaterial->GetName() << " has no weight defined. It was not added to the mixture " << geoMix->GetName() << " !")
@@ -193,10 +197,27 @@ TGeoMixture* GearReader::readMixtureSection(GearDir& mixtureContent, double& wei
       geoMix->SetCerenkovProperties(readMaterialProperties(propContent));
     }
 
-    //7) Finalize
-    double density = mixtureContent.getParamDensity("Density");
-    geoMix->SetDensity(density);
+    //7) Set the density of the mixture.
+    //   Either by setting a standard <Density> or
+    //   by specifying a relative density <DensityFactor>.
+    //   If both are set, the <Density> tag is used. The relative
+    //   density settings uses the density of the first
+    //   <Material> element and multiplies it with the given
+    //   density factor.
+    if (mixtureContent.isParamAvailable("Density")) {
+      double density = mixtureContent.getParamDensity("Density");
+      geoMix->SetDensity(density);
 
+    } else if (mixtureContent.isParamAvailable("DensityFactor")) {
+      double densityFactor = mixtureContent.getParamNumValue("DensityFactor");
+      if (firstMaterial != NULL) {
+        geoMix->SetDensity(densityFactor * firstMaterial->GetDensity());
+      } else {
+        B2ERROR("A density factor was specified, but no material from which the density could be taken was found !")
+      }
+    } else {
+      B2ERROR("The mixture '" << mixtureContent.getDirPath() << "' has no density set !")
+    }
   } else {
     geoMix = dynamic_cast<TGeoMixture*>(gGeoManager->GetMaterial(matName.c_str()));
     if (geoMix == NULL) B2ERROR("Mixture " << matName << " could not be found in gGeoManager !")

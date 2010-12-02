@@ -100,6 +100,7 @@ void B4DetectorConstruction::Initialize(TG4RootDetectorConstruction *dc)
           currProperty->fillArrays(energies, values);
           g4PropTable->AddProperty(currProperty->getName().c_str(), energies, values, currProperty->getNumberValues());
         }
+        delete propIter;
 
         G4Material* g4Material = dc->GetG4Material(currMaterial);
         g4Material->SetMaterialPropertiesTable(g4PropTable);
@@ -108,4 +109,5 @@ void B4DetectorConstruction::Initialize(TG4RootDetectorConstruction *dc)
       }
     }
   }
+  delete matIter;
 }

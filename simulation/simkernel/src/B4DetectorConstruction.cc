@@ -11,10 +11,19 @@
 #include <geometry/geodetector/GeoDetector.h>
 #include <geometry/geodetector/CreatorManager.h>
 
+#include <framework/gearbox/MaterialProperty.h>
+#include <framework/gearbox/MaterialPropertyList.h>
+
 #include <simulation/simkernel/B4DetectorConstruction.h>
 #include <simulation/simkernel/B4MagneticField.h>
 
 #include <framework/logging/Logger.h>
+
+#include <G4Material.hh>
+#include <G4MaterialPropertiesTable.hh>
+
+#include <TCollection.h>
+#include <TList.h>
 
 
 using namespace std;
@@ -59,6 +68,44 @@ void B4DetectorConstruction::Initialize(TG4RootDetectorConstruction *dc)
       B2ERROR(exc.what());
     } catch (CreatorManager::GeometryCreatorNotExistsError& exc) {
       B2ERROR(exc.what());
+    }
+  }
+
+  //--------------------------------------------------------------------
+  // Get the list of created ROOT materials and read the Cerenkov
+  // properties. If they exist, create a G4MaterialPropertiesTable,
+  // fill it with the data from the Cerenkov properties and append
+  // it to the corresponding G4Material.
+  //--------------------------------------------------------------------
+  TIterator* matIter = gGeoManager->GetListOfMaterials()->MakeIterator();
+  TGeoMaterial* currMaterial;
+  while ((currMaterial = dynamic_cast<TGeoMaterial*>(matIter->Next()))) {
+
+    //Check if the material has Cerenkov properties attached
+    if (currMaterial->GetCerenkovProperties() != NULL) {
+      MaterialPropertyList* currList = dynamic_cast<MaterialPropertyList*>(currMaterial->GetCerenkovProperties());
+
+      //Check if the property list has at least one property
+      if (currList->GetSize() > 0) {
+        G4MaterialPropertiesTable* g4PropTable = new G4MaterialPropertiesTable();
+
+        //Loop over the list of properties
+        MaterialProperty* currProperty;
+        TIterator* propIter = currList->MakeIterator();
+        while ((currProperty = dynamic_cast<MaterialProperty*>(propIter->Next()))) {
+          double energies[currProperty->getNumberValues()];
+          double values[currProperty->getNumberValues()];
+
+          //Fill the arrays of energies and values and use them to create a new property entry in the Geant4 table
+          currProperty->fillArrays(energies, values);
+          g4PropTable->AddProperty(currProperty->getName().c_str(), energies, values, currProperty->getNumberValues());
+        }
+
+        G4Material* g4Material = dc->GetG4Material(currMaterial);
+        g4Material->SetMaterialPropertiesTable(g4PropTable);
+      } else {
+        B2ERROR("The material property list of the material '" << currMaterial->GetName() << "' is empty !")
+      }
     }
   }
 }

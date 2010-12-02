@@ -265,6 +265,8 @@ MaterialPropertyList* GearReader::readMaterialProperties(GearDir& propertyConten
         }
       }
     }
+  } else {
+    B2ERROR("The material property list '" << propertyContent.getDirPath() << "' doesn't have any properties defined. The creation of the material properties was skipped !")
   }
   return propListResult;
 }

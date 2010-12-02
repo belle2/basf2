@@ -10,6 +10,7 @@
 
 #include <framework/gearbox/GearReader.h>
 
+#include <framework/gearbox/MaterialProperty.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
 
@@ -90,6 +91,12 @@ TGeoMaterial* GearReader::readMaterialSection(GearDir& materialContent, double& 
       double radlength   = materialContent.getParamNumValue("RadLength");   //radiation length
       double interlength = materialContent.getParamNumValue("InterLength"); //interaction length
       geoMat->SetRadLen(radlength, interlength);
+    }
+
+    //Read material properties (if available)
+    if (materialContent.isPathValid("Properties")) {
+      GearDir propContent(materialContent, "Properties/");
+      geoMat->SetCerenkovProperties(readMaterialProperties(propContent));
     }
 
   } else {
@@ -178,7 +185,13 @@ TGeoMixture* GearReader::readMixtureSection(GearDir& mixtureContent, double& wei
       geoMix->AddElement(currMixture, localWeight);
     }
 
-    //3) Finalize
+    //6) Read material properties (if available)
+    if (mixtureContent.isPathValid("Properties")) {
+      GearDir propContent(mixtureContent, "Properties/");
+      geoMix->SetCerenkovProperties(readMaterialProperties(propContent));
+    }
+
+    //7) Finalize
     double density = mixtureContent.getParamDensity("Density");
     geoMix->SetDensity(density);
 
@@ -188,6 +201,72 @@ TGeoMixture* GearReader::readMixtureSection(GearDir& mixtureContent, double& wei
     }
 
   return geoMix;
+}
+
+
+MaterialPropertyList* GearReader::readMaterialProperties(GearDir& propertyContent)
+{
+  MaterialPropertyList* propListResult = NULL;
+
+  //Get the number of properties
+  int nProp = 0;
+  GearDir properties(propertyContent);
+  if (properties.isPathValid("Property")) {
+    properties.append("Property");
+    nProp = properties.getNumberNodes();
+  }
+
+  //If there is at least one property defined, create the property list
+  if (nProp > 0) {
+    propListResult = new MaterialPropertyList();
+
+    //Loop over all properties
+    for (int iProp = 1; iProp <= nProp; ++iProp) {
+      GearDir propContentIdx(properties, iProp);
+
+      //Read the property attributes
+      string propName = readNameAttribute(propContentIdx);
+      string unitName = readUnitAttribute(propContentIdx);
+
+      //Check if a name was specified
+      if (propName.empty()) {
+        B2ERROR("The property '" << propContentIdx.getDirPath() << "' has no name. The property was skipped !")
+        continue;
+      }
+
+      //Get the number of the values
+      int nValue = 0;
+      GearDir values(propContentIdx);
+      if (values.isPathValid("value")) {
+        values.append("value");
+        nValue = values.getNumberNodes();
+      }
+
+      //If the property has at least one value, create it
+      if (nValue > 0) {
+        MaterialProperty& currProperty = propListResult->addProperty(propName);
+
+        //Loop over all values
+        for (int iValue = 1; iValue <= nValue; ++iValue) {
+          GearDir valueContentIdx(values, iValue);
+
+          //Read energy attribute, If it is not available, skip the value
+          if (valueContentIdx.isParamAvailable("attribute::energy")) {
+            double currEnergy = valueContentIdx.getParamNumValue("attribute::energy");
+            valueContentIdx.convertPathToNode();
+            double currValue = valueContentIdx.getParamNumValue();
+
+            //Add a new value to the property
+            currProperty.addValue(currEnergy, currValue);
+          } else {
+            B2ERROR("The value '" << valueContentIdx.getDirPath() << "' has no energy defined. The value was skipped !")
+            continue;
+          }
+        }
+      }
+    }
+  }
+  return propListResult;
 }
 
 
@@ -205,5 +284,14 @@ string GearReader::readNameAttribute(GearDir& gearDir)
   //Check if a name attribute is defined. If it is, read its value.
   if (gearDir.isParamAvailable("attribute::name")) {
     return gearDir.getParamString("attribute::name");
+  } else return string("");
+}
+
+
+string GearReader::readUnitAttribute(GearDir& gearDir)
+{
+  //Check if a unit attribute is defined. If it is, read its value.
+  if (gearDir.isParamAvailable("attribute::unit")) {
+    return gearDir.getParamString("attribute::unit");
   } else return string("");
 }

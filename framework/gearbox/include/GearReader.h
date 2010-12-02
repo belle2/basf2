@@ -11,6 +11,8 @@
 #ifndef GEARREADER_H_
 #define GEARREADER_H_
 
+#include <framework/gearbox/MaterialPropertyList.h>
+
 #include <TGeoMaterial.h>
 #include <string>
 
@@ -75,6 +77,19 @@ namespace Belle2 {
      *    or
      *    <Mixture name="" weight=""/>
      *
+     * Both, materials and mixtures, can have an optional material properties section.
+     * The values are used to fill the G4MaterialPropertiesTable for the material in Geant4.
+     * <Properties>
+     *   <Property name="" unit="eV">
+     *     <value energy=""> </value>
+     *     <value energy=""> </value>
+     *   </Property>
+     *   <Property name="" unit="eV">
+     *     <value energy=""> </value>
+     *     <value energy=""> </value>
+     *   </Property>
+     * </Properties>
+     *
      * @param gearDir Reference to a GearDir pointing to the node representing a TGeoMaterial or TGeoMixture section. Returns NULL if the TGeoMaterial could not be created.
      */
     static TGeoMaterial* readMaterial(GearDir& gearDir);
@@ -94,7 +109,7 @@ namespace Belle2 {
     /**
      * Reads a material section.
      *
-     * @param gearDir The GearDir pointing to the material section.
+     * @param materialContent The GearDir pointing to the material section.
      * @param weight Returns a weight which is meant for usage inside a material mixture. If it isn't defined -1 is returned.
      * @return Pointer to the created TGeoMaterial. Ownership is given to the method receiving the pointer. Returns NULL if the TGeoMaterial could not be created.
      */
@@ -103,11 +118,19 @@ namespace Belle2 {
     /**
      * Reads a mixture section.
      *
-     * @param gearDir The GearDir pointing to the mixture section.
+     * @param mixtureContent The GearDir pointing to the mixture section.
      * @param weight Returns a weight which is meant for usage inside a material mixture. If it isn't defined -1 is returned.
      * @return Pointer to the created TGeoMixture. Ownership is given to the method receiving the pointer. Returns NULL if the TGeoMaterial could not be created.
      */
     static TGeoMixture* readMixtureSection(GearDir& mixtureContent, double& weight);
+
+    /**
+     * Reads a material property section.
+     *
+     * @param propertyContent The GearDir pointing to the material property section.
+     * @return Pointer to the created MaterialPropertyList object. Ownership is given to the method receiving the pointer. Returns NULL if the MaterialProperties could not be created.
+     */
+    static MaterialPropertyList* readMaterialProperties(GearDir& propertyContent);
 
     /**
      * Reads the weight attribute of the node the gearDir is pointing to.
@@ -125,6 +148,13 @@ namespace Belle2 {
      */
     static std::string readNameAttribute(GearDir& gearDir);
 
+    /**
+     * Reads the unit attribute of the node the gearDir is pointing to.
+     *
+     * @param gearDir The GearDir path from which the unit attribute should be read.
+     * @return The unit value as a string of the specified node. If the unit attribute doesn't exist, an empty string is returned.
+     */
+    static std::string readUnitAttribute(GearDir& gearDir);
 
   private:
 

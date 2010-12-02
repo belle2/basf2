@@ -14,24 +14,27 @@ using namespace std;
 using namespace Belle2;
 
 
-MaterialProperty::MaterialProperty() : m_name("")
+bool MaterialProperty::addValue(double energy, double value)
 {
-  m_valueTree.Branch("energy", &m_energy, "E/D");
-  m_valueTree.Branch("value", &m_value, "V/D");
+  //Check if the energy was already used
+  map<double, double>::iterator mapIter = m_valueMap.find(energy);
+
+  //If not, add it to the map
+  if (mapIter == m_valueMap.end()) {
+    m_valueMap.insert(make_pair(energy, value));
+    return true;
+  } else return false;
 }
 
 
-MaterialProperty::MaterialProperty(const std::string& name) : m_name(name)
+void MaterialProperty::fillArrays(double* energies, double* values)
 {
-  m_valueTree.Branch("energy", &m_energy, "E/D");
-  m_valueTree.Branch("value", &m_value, "V/D");
-}
-
-void MaterialProperty::addValue(double energy, double value)
-{
-  m_energy = energy;
-  m_value = value;
-  m_valueTree.Fill();
+  int index = 0;
+  for (map<double, double>::iterator mapIter = m_valueMap.begin();  mapIter != m_valueMap.end(); mapIter++) {
+    energies[index] = mapIter->first;
+    values[index] = mapIter->second;
+    index++;
+  }
 }
 
 

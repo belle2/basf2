@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <pxd/simpxd/PXDSensitiveDetector.h>
+#include <svd/simsvd/SVDSensitiveDetector.h>
 #include <framework/logging/Logger.h>
 
 #include "G4Step.hh"
@@ -22,7 +22,7 @@ using namespace Belle2;
 
 const G4double c_Epsilon = 1.0e-8;
 
-PXDSensitiveDetector::PXDSensitiveDetector(G4String name) : G4VSensitiveDetector(name)
+SVDSensitiveDetector::SVDSensitiveDetector(G4String name) : G4VSensitiveDetector(name)
 {
   G4String colName = name + "Collection";
   collectionName.insert(colName);
@@ -31,16 +31,16 @@ PXDSensitiveDetector::PXDSensitiveDetector(G4String name) : G4VSensitiveDetector
 }
 
 
-PXDSensitiveDetector::~PXDSensitiveDetector()
+SVDSensitiveDetector::~SVDSensitiveDetector()
 {
 
 }
 
 
-void PXDSensitiveDetector::Initialize(G4HCofThisEvent* HCTE)
+void SVDSensitiveDetector::Initialize(G4HCofThisEvent* HCTE)
 {
   //Create new B4VHit collection
-  m_hitCollection = new PXDB4VHitsCollection(SensitiveDetectorName, collectionName[0]);
+  m_hitCollection = new SVDB4VHitsCollection(SensitiveDetectorName, collectionName[0]);
 
   // Assign a unique ID to the hits collection
   if (m_hitColID < 0) {
@@ -52,7 +52,7 @@ void PXDSensitiveDetector::Initialize(G4HCofThisEvent* HCTE)
 }
 
 
-G4bool PXDSensitiveDetector::ProcessHits(G4Step* aStep, G4TouchableHistory*)
+G4bool SVDSensitiveDetector::ProcessHits(G4Step* aStep, G4TouchableHistory*)
 {
   //-------------------------------------------------------
   //               Some basic checks
@@ -74,7 +74,7 @@ G4bool PXDSensitiveDetector::ProcessHits(G4Step* aStep, G4TouchableHistory*)
   //Get time (check for proper global time)
   const G4double globalTime = track.GetGlobalTime();
   if (isnan(globalTime)) {
-    B2ERROR("PXD Sensitive Detector: global time is nan !");
+    B2ERROR("SVD Sensitive Detector: global time is nan !");
     return false;
   }
 
@@ -110,7 +110,7 @@ G4bool PXDSensitiveDetector::ProcessHits(G4Step* aStep, G4TouchableHistory*)
   //                Add hit to collection
   //-------------------------------------------------------
 
-  PXDB4VHit* newHit = new PXDB4VHit(preStepPosLocal, posStepPosLocal,
+  SVDB4VHit* newHit = new SVDB4VHit(preStepPosLocal, posStepPosLocal,
                                     theta, momIn, partPDG, trackID,
                                     depEnergy, stepLength, globalTime,
                                     vol.GetName());
@@ -119,7 +119,7 @@ G4bool PXDSensitiveDetector::ProcessHits(G4Step* aStep, G4TouchableHistory*)
 }
 
 
-void PXDSensitiveDetector::EndOfEvent(G4HCofThisEvent*)
+void SVDSensitiveDetector::EndOfEvent(G4HCofThisEvent*)
 {
 
 }

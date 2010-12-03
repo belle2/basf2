@@ -3,13 +3,13 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Andreas Moll                                             *
+ * Contributors: Andreas Moll, Peter Kvasnicka                            *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PXDG4HIT_H_
-#define PXDG4HIT_H_
+#ifndef SVDG4HIT_H_
+#define SVDG4HIT_H_
 
 #include <simulation/simkernel/B4VHit.h>
 
@@ -28,20 +28,20 @@ namespace Belle2 {
    *
    * Not implemented yet.
    */
-  struct PXDStep {
+  struct SVDStep {
 
   };
 
 
   /**
-   * PXD hit class for GEANT4 simulation.
+   * SVD hit class for GEANT4 simulation.
    *
    * This class stores the data produced by GEANT4. For storage in DataStore,
-   * it is converted in a TObject-ized class PXDSimHit by its own Save method.
+   * it is converted in a TObject-ized class SVDSimHit by its own Save method.
    * This is an oversimplified implementation usable only for the very thin
-   * PXD detectors - a single GEANT4 step is assumed per track.
+   * SVD detectors - a single GEANT4 step is assumed per track.
    */
-  class PXDB4VHit : public B4VHit {
+  class SVDB4VHit : public B4VHit {
 
   public:
 
@@ -59,7 +59,7 @@ namespace Belle2 {
      * @param globalTime Global time.
      * @param volumeName Name of the sensitive volume that the track crossed.
      */
-    PXDB4VHit(G4ThreeVector posIn, G4ThreeVector posOut, G4double theta,
+    SVDB4VHit(G4ThreeVector posIn, G4ThreeVector posOut, G4double theta,
               G4ThreeVector momIn, G4int PDGcode, G4int trackID,
               G4double energyDep, G4double stepLength, G4double globalTime,
               G4String volumeName);
@@ -67,18 +67,18 @@ namespace Belle2 {
     /**
      * Destructor.
      */
-    ~PXDB4VHit();
+    ~SVDB4VHit();
 
     /**
-     * Update the PXD hit information.
+     * Update the SVD hit information.
      */
     void updateHit();
 
     /**
-     * Convert the hit into PXDSimHit for storing to the DataStore.
+     * Convert the hit into SVDSimHit for storing to the DataStore.
      *
      * Called from G4 runManager event action after each event.
-     * @param ihhit Position in the DataStore PXDSimHitArray collection
+     * @param ihhit Position in the DataStore SVDSimHitArray collection
      * where the hit has to be saved.
      */
     void Save(G4int iHit);
@@ -91,7 +91,7 @@ namespace Belle2 {
     /**
      * Overloaded delete operator.
      */
-    inline void operator delete(void *aPXDB4VHit);
+    inline void operator delete(void *aSVDB4VHit);
 
     /**
      * Setters
@@ -138,7 +138,7 @@ namespace Belle2 {
 
     G4String m_volumeName; /**< Name of the sensitive volume. */
 
-    std::list<PXDStep> m_stepList; /**< List of steps that contributed to the hit. */
+    std::list<SVDStep> m_stepList; /**< List of steps that contributed to the hit. */
 
   };
 
@@ -147,26 +147,26 @@ namespace Belle2 {
   //    Typdefs
   //-------------------
 
-  /** Geant4 collection for PXDB4VHits. */
-  typedef G4THitsCollection<PXDB4VHit> PXDB4VHitsCollection;
+  /** Geant4 collection for SVDB4VHits. */
+  typedef G4THitsCollection<SVDB4VHit> SVDB4VHitsCollection;
 
-  /** Geant4 Allocator for the PXDB4VHit class. */
-  extern G4Allocator<PXDB4VHit> PXDB4VHitAllocator;
+  /** Geant4 Allocator for the SVDB4VHit class. */
+  extern G4Allocator<SVDB4VHit> SVDB4VHitAllocator;
 
   //Operator new
-  inline void* PXDB4VHit::operator new(size_t)
+  inline void* SVDB4VHit::operator new(size_t)
   {
-    void *aPXDB4VHit;
-    aPXDB4VHit = (void *) PXDB4VHitAllocator.MallocSingle();
-    return aPXDB4VHit;
+    void *aSVDB4VHit;
+    aSVDB4VHit = (void *) SVDB4VHitAllocator.MallocSingle();
+    return aSVDB4VHit;
   }
 
   //Operator delete
-  inline void PXDB4VHit::operator delete(void *aPXDB4VHit)
+  inline void SVDB4VHit::operator delete(void *aSVDB4VHit)
   {
-    PXDB4VHitAllocator.FreeSingle((PXDB4VHit*) aPXDB4VHit);
+    SVDB4VHitAllocator.FreeSingle((SVDB4VHit*) aSVDB4VHit);
   }
 
 } // end of namespace Belle2
 
-#endif /* PXDG4HIT_H_ */
+#endif /* SVDG4HIT_H_ */

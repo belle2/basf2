@@ -8,38 +8,38 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PXDSENSITIVEDETECTOR_H_
-#define PXDSENSITIVEDETECTOR_H_
+#ifndef SVDSENSITIVEDETECTOR_H_
+#define SVDSENSITIVEDETECTOR_H_
 
-#include <pxd/simpxd/PXDB4VHit.h>
+#include <svd/simsvd/SVDB4VHit.h>
 #include "G4VSensitiveDetector.hh"
 
 namespace Belle2 {
 
   /**
-   * The PXD Sensitive Detector class.
+   * The SVD Sensitive Detector class.
    *
-   * In this class, every variable defined in PXDB4VHit will be
-   * calculated, and the PXDB4VHit will be added into  collection.
+   * In this class, every variable defined in SVDB4VHit will be
+   * calculated, and the SVDB4VHit will be added into  collection.
    * This is a simplistic implementation usable only for the very
-   * thin PXD detectors - a single GEANT4 step is assumed for each
+   * thin SVD detectors - a single GEANT4 step is assumed for each
    * pass through the active detector.
    */
 
-  class PXDSensitiveDetector: public G4VSensitiveDetector {
+  class SVDSensitiveDetector: public G4VSensitiveDetector {
 
   public:
 
     /** Constructor. */
-    PXDSensitiveDetector(G4String name);
+    SVDSensitiveDetector(G4String name);
 
     //! Destructor
-    ~PXDSensitiveDetector();
+    ~SVDSensitiveDetector();
 
-    //! Register PXDB4VHit collection into G4HCofThisEvent
+    //! Register SVDB4VHit collection into G4HCofThisEvent
     void Initialize(G4HCofThisEvent* HCTE);
 
-    //! Process each step and calculate variables defined in PXDB4VHit
+    //! Process each step and calculate variables defined in SVDB4VHit
     G4bool ProcessHits(G4Step* aStep, G4TouchableHistory*);
 
     //! Do what you want to do at the end of each event
@@ -51,13 +51,13 @@ namespace Belle2 {
 
   private:
 
-    PXDB4VHitsCollection* m_hitCollection; /*!< The collection of hits in this sensitive detector. */
+    SVDB4VHitsCollection* m_hitCollection; /*!< The collection of hits in this sensitive detector. */
     G4int m_hitColID;
 
-    PXDB4VHit* m_currentHit;
+    SVDB4VHit* m_currentHit;
 
   };
 
 } // end of namespace Belle2
 
-#endif /* PXDSENSITIVEDETECTOR_H_ */
+#endif /* SVDSENSITIVEDETECTOR_H_ */

@@ -3,13 +3,13 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Andreas Moll                                             *
+ * Contributors: Andreas Moll, Peter Kvasnicka                            *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <pxd/simpxd/PXDB4VHit.h>
-#include <pxd/hitpxd/PXDSimHit.h>
+#include <svd/simsvd/SVDB4VHit.h>
+#include <svd/hitsvd/SVDSimHit.h>
 
 //DataStore classes
 #include <framework/datastore/StoreObjPtr.h>
@@ -18,9 +18,9 @@
 
 namespace Belle2 {
 
-  G4Allocator<PXDB4VHit> PXDB4VHitAllocator;
+  G4Allocator<SVDB4VHit> SVDB4VHitAllocator;
 
-  PXDB4VHit::PXDB4VHit(G4ThreeVector posIn, G4ThreeVector posOut, G4double theta,
+  SVDB4VHit::SVDB4VHit(G4ThreeVector posIn, G4ThreeVector posOut, G4double theta,
                        G4ThreeVector momIn, G4int PDGcode, G4int trackID,
                        G4double energyDep, G4double stepLength, G4double globalTime,
                        G4String volumeName) :
@@ -32,16 +32,16 @@ namespace Belle2 {
   }
 
 
-  PXDB4VHit::~PXDB4VHit()
+  SVDB4VHit::~SVDB4VHit()
   {
 
   }
 
 
-  void PXDB4VHit::Save(G4int iHit)
+  void SVDB4VHit::Save(G4int iHit)
   {
-    StoreArray<PXDSimHit> pxdArray("PXDSimHitArray");
-    new(pxdArray->AddrAt(iHit)) PXDSimHit(*this);
+    StoreArray<SVDSimHit> SVDArray("SVDSimHitArray");
+    new(SVDArray->AddrAt(iHit)) SVDSimHit(*this);
   }
 
 } // end of namespace Belle2

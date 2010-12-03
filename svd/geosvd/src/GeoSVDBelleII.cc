@@ -11,6 +11,7 @@
 
 #include <svd/geosvd/GeoSVDBelleII.h>
 #include <svd/geosvd/B2GeomSVDLayer.h>
+#include <svd/simsvd/SVDSensitiveDetector.h>
 
 #include <framework/gearbox/GearDir.h>
 #include <framework/datastore/Units.h>
@@ -42,6 +43,8 @@ GeoSVDBelleII regGeoSVDBelleII;
 GeoSVDBelleII::GeoSVDBelleII() : CreatorBase("SVDBelleII")
 {
   setDescription("Creates the TGeo objects for the SVD geometry of the Belle II detector.");
+  addSensitiveDetector("SD_", new SVDSensitiveDetector("SVDSensitiveDetector"));
+  //The SVD subdetector uses the "SD_" prefix to flag its sensitive volumes
 }
 
 

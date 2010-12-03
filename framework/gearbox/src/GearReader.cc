@@ -278,8 +278,8 @@ MaterialPropertyList* GearReader::readMaterialProperties(GearDir& propertyConten
             double currEnergy = valueContentIdx.getParamNumValue("attribute::energy");
 
             //Use the property unit information to convert the energy value to the correct unit for Geant4
-            //The conversion method returns the basf2 standard unit [GeV]. Geant4 takes eV for material properties.
-            currEnergy = UnitConverter::Instance().convertValue(currEnergy, UnitConverter::c_UnitEnergy, unitName) / eV;
+            //The conversion method returns the basf2 standard unit [GeV]. Geant4 takes MeV for material properties.
+            currEnergy = UnitConverter::Instance().convertValue(currEnergy, UnitConverter::c_UnitEnergy, unitName) / MeV;
 
             valueContentIdx.convertPathToNode();
             double currValue = valueContentIdx.getParamNumValue();

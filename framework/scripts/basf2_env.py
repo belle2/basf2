@@ -13,11 +13,12 @@ basf2copyright = 'Copyright(C) 2010 - Belle II Collaboration'
 basf2authors = [
     'Andreas Moll',
     'Martin Heck',
-    'Nobu Katayama',
-    'Ryosuke Itoh',
     'Thomas Kuhr',
-    'Kolja Prothmann',
+    'Ryosuke Itoh',
     'Martin Ritter',
+    'Susanne Koblitz',
+    'Nobu Katayama',
+    'Kolja Prothmann',
     'Zbynek Drasal',
     ]
 

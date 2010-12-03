@@ -46,6 +46,8 @@ def print_params(module, print_values=True, shared_lib_path=None):
     This function prints parameter information
 
     module: Print the parameter information of this module
+    print_values: Set it to True to print the current values of the parameters
+    shared_lib_path: The path of the shared library from which the module was loaded
     """
 
     print ''
@@ -93,5 +95,53 @@ def print_params(module, print_values=True, shared_lib_path=None):
             print '%-1s %-20s %-20s %-20s %s' % (forceString, paramItem.name,
                     paramItem.type, defaultStr, paramItem.description)
     print ''
+
+
+def set_log_level(level):
+    """
+    Sets the global log level which specifies up to which level the logging messages will be shown
+
+    level: The level as a number: 0=Debug, 1=Info, 2=Warning, 3=Error, 4=Fatal
+    """
+
+    fw.set_log_level(level)
+
+
+def set_debug_level(level):
+    """
+    Sets the global debug level which specifies up to which level the debug messages should be shown
+
+    level: The debug level. The default value is 100
+    """
+
+    fw.set_debug_level(level)
+
+
+def log_to_shell():
+    """
+    Adds the standard output stream to the list of logging destinations. The shell logging destination is
+    added to the list by the framework by default.
+    """
+
+    fw.log_to_shell()
+
+
+def log_to_txtfile(filename, append=False):
+    """
+    Adds a text file to the list of logging destinations.
+
+    filename: The path and filename of the text file
+    append: Should the logging system append the messages to the end of the file (True) or create a new file for each event processing session (False). Default is False.
+    """
+
+    fw.log_to_txtfile(filename, append)
+
+
+def reset_log():
+    """
+    Resets the logging by removing all logging destinations
+    """
+
+    fw.reset_log()
 
 

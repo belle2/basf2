@@ -285,7 +285,9 @@ MaterialPropertyList* GearReader::readMaterialProperties(GearDir& propertyConten
             double currValue = valueContentIdx.getParamNumValue();
 
             //Add a new value to the property
-            currProperty.addValue(currEnergy, currValue);
+            if (!currProperty.addValue(currEnergy, currValue)) {
+              B2ERROR("The energy " << currEnergy << " for the value " << currValue << " was already set. The value was skipped !")
+            }
           } else {
             B2ERROR("The value '" << valueContentIdx.getDirPath() << "' has no energy defined. The value was skipped !")
             continue;

@@ -19,7 +19,13 @@ namespace Belle2 {
 
   class PXDB4VHit;
 
-  //! TObject-ized simulated PXD hit for DataStore
+  /**
+    * ClassPXDSimHit - Geant4 simulated hit for the PXD
+    *
+    * This class holds particle hit data from geant4 simulation. As the simulated
+    * hit classes are used to generate detector response, they contain _local_
+    * information.
+    */
   class PXDSimHit : public TObject {
 
   public:
@@ -78,7 +84,6 @@ namespace Belle2 {
     //! Constructor from a G4 simhit
     PXDSimHit(const PXDB4VHit & g4hit);
 
-    /** Setters. */
 
     /** The method to set LayerID.*/
     void setLayerID(int layerID) { m_layerID = layerID; }
@@ -116,7 +121,6 @@ namespace Belle2 {
     /** The method to set GlobalTime.*/
     void setGlobalTime(double globalTime) { m_globalTime = globalTime; }
 
-    /** Getters.*/
 
     /** The method to get layer id.*/
     int getLayerID() const { return m_layerID; }

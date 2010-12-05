@@ -23,20 +23,16 @@ namespace Belle2 {
    * The current implementation is not in fact lean, as some necessary
    * normalizations are unclear: normalizations of coordinates and their
    * (co-)variance, and of energy and its error.
-   *
    * A first attempt is made to create a lean sensor identifier storing
    * layer/ladder/sensor info. To keep this hit class free of additonal members,
    * the coding/decoding is done via a separate class CIDManager.
-   * Just
-   *    #include <pxd/hitpxd/CIDManager.h>,
-   * and, to decode, do
+   * Just #include <pxd/hitpxd/CIDManager.h>, and, to decode, do
    *    CIDManager cid(hit.getSensorCID());
    *    int layerID = cid.getLayerID(); etc.,
    * or, to encode, do
    *    CIDManager cid();
    *    cid.setLayerID(myLayerID); etc.,
    *    short int myCID = cid.getCID();
-   *
    * For normalization of spatial data, a precision of 1 um should be
    * satisfactory (expected resolutions are ~4 um and more). A 4-byte
    * integer would be more than enough (but a 2-byte int will not). For energy,
@@ -50,14 +46,10 @@ namespace Belle2 {
 
   public:
 
-    /*
-     ** Default constructor for ROOT IO.
-     */
+    /** Default constructor for ROOT IO. */
     PXDHit() {;}
 
-    /*
-     ** Useful Constructor.
-     */
+    /** Useful Constructor. */
     PXDHit(int sensorCID,
            float u,
            float uError,
@@ -74,8 +66,6 @@ namespace Belle2 {
         m_energyDepError(energyDepError) {
       /* no action */
     }
-
-    /** Setters.*/
 
     /** Set compressed layer/ladder/sensor id.*/
     void setSensorCID(int CID) { m_sensorCID = CID; }
@@ -101,8 +91,6 @@ namespace Belle2 {
     /** Set deposited energy error.*/
     void setEnergyDepError(float energyDepError)
     { m_energyDepError = energyDepError; }
-
-    /** Getters.*/
 
     /** Get the compact ID.*/
     int getSensorCID() const { return m_sensorCID; }

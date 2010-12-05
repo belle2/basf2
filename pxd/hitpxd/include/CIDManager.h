@@ -17,28 +17,28 @@
 
 namespace Belle2 {
 
-  /*
-   ** A simple utility class to manage layer/ladder/sensor IDs.
+  /**
+   * A simple utility class to manage layer/ladder/sensor IDs.
    *
    * The class compresses integer (ladderID, layerID, sensorID) to
    * a short compressed ID (CID). It provides the corresponding
    * getters and setters to make the use of CIDs in lean SD hits
    * convenient.
+   * Bit layout data of the class are static and are initialized to reasonable
+   * defaults for current PXD/SVD design, but in principle can be changed with
+   * the constraint of total number of bits being at most 15.
    */
   class CIDManager {
 
   public:
 
-    /*
-     ** Constructor.
+    /**
+     * Constructor.
      *
-     * @param aCID - an existing CID to decode. If omitted, IDs are expected
+     * @param aCID An existing CID to decode. If omitted or zero, IDs are expected
      * to be set by the user.
-     * or an existing cid to decode.
      */
     CIDManager(short int aCID = 0);
-
-    /**Setters.*/
 
     /** Set CID.*/
     void setCID(short int aCID) { m_CID = aCID; }
@@ -60,8 +60,6 @@ namespace Belle2 {
 
     /** Set number of sensor bits.*/
     static void setBitsSensor(int nbits);
-
-    /** Getters.*/
 
     /** Get encoded ID.*/
     short int getCID() const { return m_CID; }
@@ -87,13 +85,6 @@ namespace Belle2 {
 
     short int m_CID;                /**< The compressed ID.*/
 
-    /*
-     ** Static layout data.
-     *
-     * These are initialized to reasonable defaults for current PXD/SVD
-     * design, but in principle can be changed for the class with the constraint
-     * of total number of bits being at most 15.
-     */
     static int m_nbitsLayer;       /**< Number of bits occupied by Layer ID.*/
     static int m_nbitsLadder;      /**< Number of bits occupied by Ladder ID.*/
     static int m_nbitsSensor;      /**< Number of bits occupied by Sensor ID.*/

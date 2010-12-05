@@ -1,6 +1,6 @@
 Import('env')
 
-env['LIBS'] = ['svd', 'simulation', 'framework',
+env['LIBS'] = ['svd', 'pxd', 'framework',
                '$ROOT_LIBS']
 
 Return('env')

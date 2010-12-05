@@ -78,7 +78,7 @@ namespace Belle2 {
      * Convert the hit into SVDSimHit for storing to the DataStore.
      *
      * Called from G4 runManager event action after each event.
-     * @param ihhit Position in the DataStore SVDSimHitArray collection
+     * @param iHit Position in the DataStore SVDSimHitArray collection
      * where the hit has to be saved.
      */
     void Save(G4int iHit);
@@ -93,9 +93,6 @@ namespace Belle2 {
      */
     inline void operator delete(void *aSVDB4VHit);
 
-    /**
-     * Setters
-     */
     void setPosIn(double x, double y, double z) { m_posIn = G4ThreeVector(x, y, z); }
     void setPosOut(double x, double y, double z) { m_posOut.set(x, y, z); }
     void setTheta(double aTheta) { m_theta = aTheta; }
@@ -107,9 +104,6 @@ namespace Belle2 {
     void setGlobalTime(double globalTime) { m_globalTime = globalTime; }
     void setVolumeName(const char* volumeName) { m_volumeName = volumeName; }
 
-    /**
-     * Getters.
-     */
     const G4ThreeVector& getPosIn() const { return m_posIn; }
     const G4ThreeVector& getPosOut() const { return m_posOut; }
     double getTheta() const { return m_theta; }
@@ -144,7 +138,7 @@ namespace Belle2 {
 
 
   //-------------------
-  //    Typdefs
+  //    Typedefs
   //-------------------
 
   /** Geant4 collection for SVDB4VHits. */
@@ -153,7 +147,7 @@ namespace Belle2 {
   /** Geant4 Allocator for the SVDB4VHit class. */
   extern G4Allocator<SVDB4VHit> SVDB4VHitAllocator;
 
-  //Operator new
+  /** Overloaded new operator.*/
   inline void* SVDB4VHit::operator new(size_t)
   {
     void *aSVDB4VHit;
@@ -161,7 +155,7 @@ namespace Belle2 {
     return aSVDB4VHit;
   }
 
-  //Operator delete
+  /** Overloaded delete operator.*/
   inline void SVDB4VHit::operator delete(void *aSVDB4VHit)
   {
     SVDB4VHitAllocator.FreeSingle((SVDB4VHit*) aSVDB4VHit);

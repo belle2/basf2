@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <simulation/modules/simModule/FullSimModule.h>
+#include <simulation/modules/fullsim/FullSimModule.h>
 #include <simulation/kernel/RunManager.h>
 #include <simulation/kernel/DetectorConstruction.h>
 #include <simulation/kernel/PhysicsList.h>

@@ -10,8 +10,9 @@
 
 #include <simulation/kernel/RunManager.h>
 
-using namespace Belle2;
 using namespace std;
+using namespace Belle2;
+using namespace Belle2::Simulation;
 
 RunManager* RunManager::m_instance = NULL;
 

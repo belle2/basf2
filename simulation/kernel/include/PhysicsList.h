@@ -20,47 +20,52 @@
 
 namespace Belle2 {
 
-  /**
-   * The basf2 physics list.
-   * Takes an existing physics list as template and adds the
-   * G4UnknownParticle to it.
-   */
-  template<class T> class PhysicsList: public T {
-  public:
+  namespace Simulation {
 
     /**
-     * The PhysicsList constructor.
-     * @param ver The verbosity level of the physics list.
+     * The basf2 physics list.
+     * Takes an existing physics list as template and adds the
+     * G4UnknownParticle to it.
      */
-    PhysicsList(G4int ver = 1) : T(ver) {}
+    template<class T> class PhysicsList: public T {
+    public:
 
-    /**
-     * Instantiates each particle type.
-     */
-    virtual void ConstructParticle() {
-      T::ConstructParticle();
-      G4UnknownParticle::UnknownParticleDefinition();
-    }
+      /**
+       * The PhysicsList constructor.
+       * @param ver The verbosity level of the physics list.
+       */
+      PhysicsList(G4int ver = 1) : T(ver) {}
 
-    /**
-     * Instantiates each physics process and registers it to the process manager of each particle type.
-     */
-    virtual void ConstructProcess() {
-      T::ConstructProcess();
-      G4ParticleDefinition* unknown = G4UnknownParticle::UnknownParticleDefinition();
-      G4ProcessManager* pmanager = unknown->GetProcessManager();
-      pmanager->AddProcess(&m_UnknownDecay);
-      pmanager->SetProcessOrdering(&m_UnknownDecay, idxPostStep);
-    }
+      /**
+       * Instantiates each particle type.
+       */
+      virtual void ConstructParticle() {
+        T::ConstructParticle();
+        G4UnknownParticle::UnknownParticleDefinition();
+      }
+
+      /**
+       * Instantiates each physics process and registers it to the process manager of each particle type.
+       */
+      virtual void ConstructProcess() {
+        T::ConstructProcess();
+        G4ParticleDefinition* unknown = G4UnknownParticle::UnknownParticleDefinition();
+        G4ProcessManager* pmanager = unknown->GetProcessManager();
+        pmanager->AddProcess(&m_UnknownDecay);
+        pmanager->SetProcessOrdering(&m_UnknownDecay, idxPostStep);
+      }
 
 
-  private:
+    private:
 
-    G4UnknownDecay m_UnknownDecay; /**< Object of an unknown decay. */
+      G4UnknownDecay m_UnknownDecay; /**< Object of an unknown decay. */
 
-    /**Enum to check for a valid class hierarchy at compile time. */
-    enum {ok = CompileTimeConstraints::IsA<T, G4VModularPhysicsList>::ok };
-  };
+      /**Enum to check for a valid class hierarchy at compile time. */
+      enum {ok = CompileTimeConstraints::IsA<T, G4VModularPhysicsList>::ok };
+    };
+
+  } //end namespace Simulation
+
 } //end Belle2 namespace
 
 #endif /* PHYSICSLIST_H_ */

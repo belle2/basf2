@@ -20,6 +20,7 @@
 
 using namespace std;
 using namespace Belle2;
+using namespace Belle2::Simulation;
 
 //-----------------------------------------------------------------
 //                 Register the Module
@@ -77,6 +78,10 @@ void FullSimModule::initialize()
 
   //Create the Physics list
   runManager.SetUserInitialization(new PhysicsList<QGSP_BERT>);
+
+  //Generator action
+  //G4VUserPrimaryGeneratorAction* generatorAction = new B4PrimaryGeneratorAction();
+  //runManager.SetUserAction(generatorAction);
 
 }
 

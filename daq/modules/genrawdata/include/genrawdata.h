@@ -9,7 +9,7 @@
 #ifndef GEN_RAWDATA_H
 #define GEN_RAWDATA_H
 
-#include <framework/fwcore/Module.h>
+#include <framework/core/Module.h>
 #include <framework/datastore/DataStore.h>
 #include <daq/rawdata/RawCDC.h>
 #include <daq/rawdata/RawHeader.h>
@@ -19,9 +19,6 @@ namespace Belle2 {
   class GenRawData : public Module {
 
   public:
-
-    //! Macro which adds a method to return a new instance of the module.
-    NEW_MODULE(GenRawData)
 
     //! Constructor
     GenRawData();

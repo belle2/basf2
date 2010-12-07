@@ -8,7 +8,7 @@
 
 #include "daq/modules/genrawdata/genrawdata.h"
 
-#include <framework/fwcore/ModuleManager.h>
+#include <framework/core/ModuleManager.h>
 
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreDefs.h>
@@ -20,11 +20,11 @@ using namespace std;
 using namespace Belle2;
 
 // Framework interface
-REG_MODULE(GenRawData)
+REG_MODULE(GenRawData, "GenRawData")
 
 // Constructor and destructor
 
-GenRawData::GenRawData() : Module("GenRawData")
+GenRawData::GenRawData() : Module()
 {
   //Set module properties
   setDescription("GenRawData module");

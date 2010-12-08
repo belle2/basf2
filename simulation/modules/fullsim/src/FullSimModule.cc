@@ -12,6 +12,9 @@
 #include <simulation/kernel/RunManager.h>
 #include <simulation/kernel/DetectorConstruction.h>
 #include <simulation/kernel/PhysicsList.h>
+#include <simulation/kernel/PrimaryGeneratorAction.h>
+
+#include <generators/dataobjects/MCParticle.h>
 
 #include <QGSP_BERT.hh>
 
@@ -33,10 +36,11 @@ REG_MODULE(FullSimModule, "FullSim")
 
 FullSimModule::FullSimModule() : Module()
 {
-  //Set module properties
+  //Set module properties and the description
   setDescription("Performs the full Geant4 detector simulation. Requires a valid geometry in memory.");
 
   //Parameter definition
+  addParam("MCParticleCollection", m_mcParticleCollectionName, string(DEFAULT_MCPARTICLES), "The name of the input MCParticle collection.");
 }
 
 
@@ -79,9 +83,9 @@ void FullSimModule::initialize()
   //Create the Physics list
   runManager.SetUserInitialization(new PhysicsList<QGSP_BERT>);
 
-  //Generator action
-  //G4VUserPrimaryGeneratorAction* generatorAction = new B4PrimaryGeneratorAction();
-  //runManager.SetUserAction(generatorAction);
+  //Create the generator action which takes the MCParticle list and converts it to Geant4 primary vertices.
+  G4VUserPrimaryGeneratorAction* generatorAction = new PrimaryGeneratorAction(m_mcParticleCollectionName);
+  runManager.SetUserAction(generatorAction);
 
 }
 

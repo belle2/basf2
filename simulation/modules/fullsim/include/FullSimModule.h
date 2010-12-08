@@ -13,6 +13,8 @@
 
 #include <framework/core/Module.h>
 
+#include <string>
+
 namespace Belle2 {
 
   /** The full Geant4 simulation module.
@@ -73,6 +75,7 @@ namespace Belle2 {
 
   protected:
 
+    std::string m_mcParticleCollectionName; /**< The parameter variable for the name of the MCParticle collection. */
 
   private:
 

@@ -28,6 +28,7 @@ namespace Belle2 {
      * G4UnknownParticle to it.
      */
     template<class T> class PhysicsList: public T {
+
     public:
 
       /**

@@ -6,7 +6,7 @@
   <Creator>PXDBelleII</Creator>
   <Content xmlns:xi="http://www.w3.org/2001/XInclude">
   <Offsets> <xi:include href="PXDOffsets.xml" xpointer="xpointer(//Offsets/*)"/></Offsets>
-    <Rotation desc="Rotation of the hole PXD detector (should be the same as beampipe)" unit="mrad">22</Rotation>
+    <Rotation desc="Rotation of the hole PXD detector (should be the same as beampipe)" unit="mrad">0</Rotation>
     <OffsetZ unit="mm">0</OffsetZ>
     <Layers>
       <Layer id="PXD_Layer_1">

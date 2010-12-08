@@ -199,7 +199,7 @@ protected:
 };
 
 
-void MCParticleGraph::generate(const string& name, int options)
+void MCParticleGraph::generateList(const string& name, int options)
 {
   //Make Graph and connect all primary vertices (particles without mother)
   //to an artificial 0ths vertex to be able to find them easily

@@ -60,7 +60,7 @@ void HepevtInput::event()
       setProcessRecordType(prt_EndOfData);
       return;
     }
-    mpg.generate(DEFAULT_MCPARTICLES, MCParticleGraph::set_decay_info | MCParticleGraph::check_cyclic);
+    mpg.generateList(DEFAULT_MCPARTICLES, MCParticleGraph::set_decay_info | MCParticleGraph::check_cyclic);
   } catch (runtime_error &e) {
     B2ERROR(e.what());
     setProcessRecordType(prt_EndOfData);

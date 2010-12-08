@@ -102,8 +102,8 @@ void TouschekInputModule::event()
     if ((readHERParticles <= 0) && (readLERParticles <= 0)) {
       setProcessRecordType(prt_EndOfData);
     } else {
-      //Generate MCParticle table
-      mpg.generate(DEFAULT_MCPARTICLES, MCParticleGraph::set_decay_info | MCParticleGraph::check_cyclic);
+      //Generate MCParticle list
+      mpg.generateList(DEFAULT_MCPARTICLES, MCParticleGraph::set_decay_info | MCParticleGraph::check_cyclic);
 
       B2INFO("Read " << readHERParticles << " e- particles (HER).")
       B2INFO("Read " << readLERParticles << " e+ particles (LER).")

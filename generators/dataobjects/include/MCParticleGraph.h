@@ -30,7 +30,7 @@ namespace Belle2 {
    * particles can be added using addDecay(), MCParticleGraph::Particle::decaysInto() and
    * MCParticleGraph::Particle::comesFrom().
    *
-   * Once all all particles and decays are added and their parameters set, call generate() to fill
+   * Once all all particles and decays are added and their parameters set, call generateList() to fill
    * the specified StoreArray with the resulting MCParticle list. The decay chain will be checked for
    * cyclic references and a runtime_error will be thrown in that case. The particle will be sorted
    * breadth first: First all primary particles, then all particles first generation and so on.
@@ -204,7 +204,7 @@ namespace Belle2 {
      * @param options Additional options which steer the creation of the StoreArray.
      * @see class MCParticle
      */
-    void generate(const std::string& name = DEFAULT_MCPARTICLES, int options = set_nothing);
+    void generateList(const std::string& name = DEFAULT_MCPARTICLES, int options = set_nothing);
 
     /**
      * Reset particles and decay information to make the class reusable.

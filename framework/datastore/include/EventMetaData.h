@@ -57,6 +57,14 @@ namespace Belle2 {
       m_experiment = experiment;
     }
 
+    /** Generated Weight Setter.
+     *
+     *  @param generated weight The weight produced by the event generator
+     */
+    void setGeneratedWeight(const double& weight) {
+      m_generated_weight = weight;
+    }
+
     /** Event Getter.
      *
      *  @return The number of the current event.
@@ -81,6 +89,14 @@ namespace Belle2 {
       return m_experiment;
     }
 
+    /** Generated Weight Getter.
+     *
+     *  @return The weight produced by the event generator
+     */
+    double getGeneratedWeight() const {
+      return m_generated_weight;
+    }
+
 
   private:
 
@@ -98,6 +114,8 @@ namespace Belle2 {
 
     /** ROOT Macro to make EventMetaData a ROOT class.
      */
+    double m_generated_weight;
+
     ClassDef(EventMetaData, 1);
 
   }; //class

@@ -10,6 +10,7 @@
 
 #include <framework/gearbox/GearDir.h>
 #include <framework/datastore/Units.h>
+#include <framework/logging/Logger.h>
 #include <boost/format.hpp>
 #include <pxd/geopxd/B2GeomVolume.h>
 #include <string>
@@ -29,55 +30,33 @@ namespace Belle2 {
 
   class GearDir;
 
-  class B2GeomSVDSensorActive : public B2GeomVolume {
+  class B2GeomSVDSensorSilicon : public B2GeomVXDVolume {
   private:
-    //! Dimensions of the active part of the sensor
-    Int_t iLayer;
-    Int_t iLadder;
-    Int_t iSensor;
+    B2GeomVXDVolume* volActive; /** < Object representing the geometry of the active sensor of SVD. */
   public:
-    B2GeomSVDSensorActive(Int_t iLay, Int_t iLad, Int_t iSen);
-  };
-
-
-  class B2GeomSVDSensorSilicon : public B2GeomVolume {
-  private:
-    Int_t iLayer;
-    Int_t iLadder;
-    Int_t iSensor;
-    B2GeomSVDSensorActive* volActive;
-  public:
-    B2GeomSVDSensorSilicon(Int_t iLay, Int_t iLad, Int_t iSen);
+    /** Constructor for geometry object representing the silicon of the SVD sensor. */
+    B2GeomSVDSensorSilicon();
+    /** Initialize Parameters from GearBox */
     Bool_t init(GearDir& content);
+    /** Build TGeoVolume according to the parameters. */
     Bool_t make();
   };
 
-  class B2GeomSVDSensor : public B2GeomVolume {
+  class B2GeomSVDSensor : public B2GeomVXDStructVolume<B2GeomSVDSensor> {
   private:
-
-    // Parameters
-    //! Layer number of this sensor
-    Int_t iLayer;
-    //! Ladder number of this sensor
-    Int_t iLadder;
-    //! Number of this sensor
-    Int_t iSensor;
-    //! Sensor type (0 = small, 1 = normal, 2 = wedge, 9x = active sensor only)
-    Int_t iSensorType;
-
-    //! parameters for sensor components
-    B2GeomSVDSensorSilicon* volSilicon;
-    B2GeomVolume* volFoam;
-    B2GeomVolume* volSMDs;
-    B2GeomVolume* volKapton;
-    B2GeomVolume* volKaptonFlex;
-    B2GeomVolume* volKaptonFront;
+    B2GeomSVDSensorSilicon* volSilicon; /** < Object representing the geometry of the silicon of the SVD sensor. */
+    B2GeomVXDVolume* volFoam; /** < Object representing the geometry of the insulating Rohacell Foam pad of the SVD sensor. */
+    B2GeomVXDVolume* volSMDs; /** < Object representing the geometry of the chips on the SVD sensor */
+    B2GeomVXDVolume* volKapton; /** < Object to represent the geometry of one type of kapton cable. */
+    B2GeomVXDVolume* volKaptonFlex; /** < Object to represent the geometry of one type of kapton cable. */
+    B2GeomVXDVolume* volKaptonFront; /** < Object to represent the geometry of one type of kapton cable. */
 
   public:
+    /** Constructor for geometry object representing the SVD active sensor. */
     B2GeomSVDSensor();
-    B2GeomSVDSensor(Int_t iLay, Int_t iLad, Int_t iSen);
-    ~B2GeomSVDSensor();
+    /** Initialize Parameters from GearBox */
     Bool_t init(GearDir& content);
+    /** Build TGeoVolume according to the parameters. */
     Bool_t make();
   };
 }

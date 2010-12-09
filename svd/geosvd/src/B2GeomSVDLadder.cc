@@ -17,105 +17,76 @@ using namespace std;
 
 B2GeomSVDLadder::B2GeomSVDLadder()
 {
-  B2GeomSVDLadder(-1, -1);
-}
-
-B2GeomSVDLadder::B2GeomSVDLadder(Int_t iLay, Int_t iLad)
-{
-  iLayer = iLay;
-  iLadder = iLad;
-  sprintf(name, "SVD_Layer_%i_Ladder_%i" , iLayer, iLadder);
-  resetBasicParameters();
   volBarrelRibs = NULL;
   volSlantedRibs = NULL;
   volCoolingpipe = NULL;
 }
 
-B2GeomSVDLadder::~B2GeomSVDLadder()
+Bool_t B2GeomSVDLadder::init(GearDir& ladderContent)
 {
-}
-
-Bool_t B2GeomSVDLadder::init(GearDir& content)
-{
-  //printf("SVDLadder::init start (Lay: %i, Lad: %i)\n", iLayer, iLadder);
-  ladderContent = GearDir(content);
-  ladderContent.append("Ladders/");
-
-  initBasicParameters(ladderContent);
+  //B2METHOD();
+  // get parameters from XML file
+  if (!initBasicParameters(ladderContent)) {
+    B2FATAL("Could not initialize SVD ladder!");
+    return false;
+  }
 
   // Read parameters for ribs
   if (ladderContent.isParamAvailable("Barrel")) {
     GearDir barrelContent(ladderContent);
     barrelContent.append("Barrel/");
-    volBarrelRibs = new B2GeomSVDLadderRibs(iLayer);
-    if (!volBarrelRibs->init(barrelContent)) {
-      printf("ERROR! Parameter reading for SVD barrel ribs failed!\n");
-      return false;
-    }
+    initComponent<B2GeomSVDLadderRibs>(&volBarrelRibs, barrelContent, "Ribs");
   }
+
   if (ladderContent.isParamAvailable("Slanted")) {
     GearDir slantedContent(ladderContent);
     slantedContent.append("Slanted/");
-    volSlantedRibs = new B2GeomSVDLadderRibs(iLayer);
-    if (!volSlantedRibs->init(slantedContent)) {
-      printf("ERROR! Parameter reading for SVD slanted ribs failed!\n");
-      return false;
-    }
+    initComponent<B2GeomSVDLadderRibs>(&volSlantedRibs, slantedContent, "Ribs");
   }
 
-  if (ladderContent.isParamAvailable("CoolingPipe")) {
-    volCoolingpipe = new B2GeomSVDLadderCoolingpipe(iLayer);
-    if (!volCoolingpipe->init(ladderContent)) {
-      printf("ERROR! Parameter reading for SVD cooling pipe failed!\n");
-      return false;
-    }
-  }
+  initComponent<B2GeomSVDLadderCoolingpipe>(&volCoolingpipe, ladderContent, "CoolingPipe");
 
-  // get parameters for the sensors
-  GearDir sensorsContent(ladderContent);
-  sensorsContent.append("/Sensors/Sensor");
-  nComponents = int(sensorsContent.getNumberNodes());
+// go to correct node of GearDir
+  GearDir sensorContent(ladderContent);
+  sensorContent.append("/Sensors/Sensor");
+  nComponents = int(sensorContent.getNumberNodes());
+  components = new B2GeomSVDSensor*[nComponents];
+  for (int iComponent = 0; iComponent < nComponents; iComponent++) components[iComponent] = NULL;
 
-  components = new B2GeomVolume*[nComponents];
-  for (int iSensor = 0; iSensor < nComponents; iSensor++) {
-    components[iSensor] = new B2GeomSVDSensor(iLayer, iLadder, iSensor);
-    if (!components[iSensor]->init(ladderContent)) {
-      printf("ERROR! Parameter reading for SVD sensor failed\n");
+  // initialise sensors
+  for (iSensor = 0; iSensor < nComponents; iSensor++) {
+    string relativePath((format("Sensors/Sensor[@id=\'SVD_Layer_%1%_Ladder_Sensor_%2%\']") % iLayer % iSensor).str());
+    if (!initComponent<B2GeomSVDSensor>(&components[iSensor], ladderContent, relativePath)) {
+      B2FATAL("Parameter reading for SVD sensor failed");
       return false;
     }
   }
   return true;
-  //printf("SVDLadder::init stop\n");
 }
 
 Bool_t B2GeomSVDLadder::make()
 {
-  // printf("B2GeomSVDLadder::make start\n");
-  makeGeneric();
+  //B2METHOD();
+  // build SVD ladder from the parameters read in before
+  if (!makeGeneric()) return false;
 
   // put SVD sensors
-  for (int iSensor = 0; iSensor < nComponents; ++iSensor) {
-    components[iSensor]->make();
-    // place sensor in the ladder
-    tVolume->AddNode(components[iSensor]->getVol(), 1, components[iSensor]->getPosition());
+  for (iSensor = 0; iSensor < nComponents; ++iSensor) {
+    if (!makeAndAddComponent(components[iSensor])) {
+      B2FATAL("Cannot build SVD geometry without sensor!!!");
+      return false;
+    }
   }
 
   // put barrel ribs
-  if (volBarrelRibs != NULL) {
-    volBarrelRibs->make();
-    tVolume->AddNode(volBarrelRibs->getVol(), 1, volBarrelRibs->getPosition());
-  }
+  makeAndAddComponent(volBarrelRibs);
 
   // put slanted ribs
+  makeAndAddComponent(volSlantedRibs);
 
   // put cooling pipe
-  if (volCoolingpipe != NULL) {
-    volCoolingpipe->make();
-    tVolume->AddNode(volCoolingpipe->getVol(), 1, volCoolingpipe->getPosition());
-  }
-  //printf("B2GeomSVDLadder::make stop\n");
+  makeAndAddComponent(volCoolingpipe);
   return true;
-
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -123,52 +94,29 @@ Bool_t B2GeomSVDLadder::make()
 // ------------------------------------------------------------------------------------------------
 
 
-B2GeomSVDLadderRibs::B2GeomSVDLadderRibs(Int_t iLay)
+B2GeomSVDLadderRibs::B2GeomSVDLadderRibs()
 {
-  iLayer = iLay;
-  resetBasicParameters();
   volRib = NULL;
 }
 
-Bool_t B2GeomSVDLadderRibs::init(GearDir& content)
+Bool_t B2GeomSVDLadderRibs::init(GearDir& ribsContent)
 {
-  //printf("SVDLadderRibs::init start\n");
-  GearDir ribsContent(content);
-  ribsContent.append("Ribs/");
-  initBasicParameters(ribsContent);
+  // read basic parameters from XML
+  if (!initBasicParameters(ribsContent)) return false;
+
+  // get additionally the position of the ribs
   fRib1UPosition = ribsContent.getParamLength("Rib1UPosition");
   fRib2UPosition = ribsContent.getParamLength("Rib2UPosition");
-  if (ribsContent.isParamAvailable("Rib")) {
-    volRib = new B2GeomSVDLadderRib(iLayer);
-    if (!volRib->init(ribsContent)) {
-      printf("ERROR! Parameter reading for SVD Rib failed!\n");
-      return false;
-    }
-  }
-  //printf("SVDLadderRibs::init stop\n");
+
+  // initialize the volume for a rib (only one is needed, because it is cloned in the geometry)
+  if (!initComponent<B2GeomSVDLadderRib>(&volRib, ribsContent, "Rib")) return false;
   return true;
 }
 
 Bool_t B2GeomSVDLadderRibs::make()
 {
-  if (!volRib->make()) {
-    printf("ERROR! Cannot create TGeoVolume for SVD rib ladder!\n");
-    return false;
-  }
-
-  char nameRibs[200];
-  sprintf(nameRibs, "SVD_Layer_%i_Ladder_Ribs_Barrel", iLayer);
-
-  tVolume = (TGeoVolume*) gROOT->FindObjectAny(nameRibs);
-  if (!tVolume) {
-    tVolume = gGeoManager->MakeTrd2(nameRibs, tMedium,
-                                    0.5 * fThickness,
-                                    0.5 * fThickness2,
-                                    0.5 * fWidth,
-                                    0.5 * fWidth2,
-                                    0.5 * fLength);
-
-  }
+  if (!makeGeneric()) return false;
+  if (!volRib->make()) return false;
 
   tVolume->AddNode(volRib->getVol(), 1, new TGeoTranslation(0.0, fRib1UPosition, 0.0));
   tVolume->AddNode(volRib->getVol(), 2, new TGeoTranslation(0.0, fRib2UPosition, 0.0));
@@ -180,77 +128,23 @@ Bool_t B2GeomSVDLadderRibs::make()
 // Rib of SVD ladder
 // ------------------------------------------------------------------------------------------------
 
-B2GeomSVDLadderRib::B2GeomSVDLadderRib(Int_t iLay)
+B2GeomSVDLadderRib::B2GeomSVDLadderRib()
 {
-  resetBasicParameters();
-  iLayer = iLay;
   volFoam = NULL;
 }
-Bool_t B2GeomSVDLadderRib::init(GearDir& content)
+
+Bool_t B2GeomSVDLadderRib::init(GearDir& ribContent)
 {
-  //printf("SVDLadderRib::init start\n");
-  GearDir ribContent(content);
-  ribContent.append("Rib/");
-  initBasicParameters(ribContent);
-  sprintf(name, "SVD_Layer_%i_Ladder_Ribs_Barrel_Rib", iLayer);
-  if (ribContent.isParamAvailable("Foam")) {
-    volFoam = new B2GeomSVDLadderRibFoam(iLayer);
-    if (!volFoam->init(ribContent)) {
-      printf("ERROR! Parameter reading for SVD RibFoam failed!\n");
-      return false;
-    }
-  }
-  //printf("SVDLadderRib::init stop\n");
+  // read parameters from XML file
+  if (!initBasicParameters(ribContent)) return false;
+  if (!initComponent<B2GeomVXDVolume>(&volFoam, ribContent, "Foam")) return false;
   return true;
 }
 
 Bool_t B2GeomSVDLadderRib::make()
 {
-
-  tVolume = gGeoManager->MakeTrd2(name, tMedium,
-                                  0.5 * fThickness,
-                                  0.5 * fThickness2,
-                                  0.5 * fWidth,
-                                  0.5 * fWidth2,
-                                  0.5 * fLength
-                                 );
-  tVolume->SetLineColor(kBlack);
-  if (volFoam != NULL) {
-    volFoam->make();
-    tVolume->AddNode(volFoam->getVol(), 1, volFoam->getPosition());
-  }
-  return true;
-}
-
-// ------------------------------------------------------------------------------------------------
-// Foam of Rib of SVD ladder
-// ------------------------------------------------------------------------------------------------
-
-B2GeomSVDLadderRibFoam::B2GeomSVDLadderRibFoam(Int_t iLay)
-{
-  iLayer = iLay;
-  resetBasicParameters();
-}
-
-Bool_t B2GeomSVDLadderRibFoam::init(GearDir& content)
-{
-  GearDir ribfoamContent(content);
-  ribfoamContent.append("Foam/");
-  initBasicParameters(ribfoamContent);
-  sprintf(name, "SVD_Layer_%i_Ladder_Ribs_Barrel_Rib_Foam", iLayer);
-  return true;
-}
-
-
-Bool_t B2GeomSVDLadderRibFoam::make()
-{
-  tVolume = gGeoManager->MakeTrd2(name, tMedium,
-                                  0.5 * fThickness,
-                                  0.5 * fThickness2,
-                                  0.5 * fWidth,
-                                  0.5 * fWidth2,
-                                  0.5 * fLength);
-  tVolume->SetLineColor(kYellow - 9);
+  if (!makeGeneric()) return false;
+  if (!makeAndAddComponent(volFoam)) return false;
   return true;
 }
 
@@ -258,79 +152,22 @@ Bool_t B2GeomSVDLadderRibFoam::make()
 // Cooling pipe of SVD ladder
 // ------------------------------------------------------------------------------------------------
 
-
-B2GeomSVDLadderCoolingliquid::B2GeomSVDLadderCoolingliquid(Int_t iLay)
+B2GeomSVDLadderCoolingpipe::B2GeomSVDLadderCoolingpipe()
 {
-  iLayer = iLay;
-  resetBasicParameters();
-}
-Bool_t B2GeomSVDLadderCoolingliquid::init(GearDir& content)
-{
-  GearDir coolingliquidContent(content);
-  coolingliquidContent.append("CoolingLiquid/");
-  initBasicParameters(coolingliquidContent);
-  sprintf(name, "SVD_Layer_%i_Cool_Liquid", iLayer);
-
-  return true;
-}
-
-Bool_t B2GeomSVDLadderCoolingliquid::make()
-{
-  tVolume = (TGeoVolume*) gROOT->FindObjectAny(name);
-  if (!tVolume) {
-    tVolume = gGeoManager->MakeTube(name, tMedium,
-                                    fInnerRadius,
-                                    fOuterRadius,
-                                    0.5 * fLength
-                                   );
-    tVolume->SetLineColor(kCyan - 5);
-  }
-  return true;
-}
-
-
-B2GeomSVDLadderCoolingpipe::B2GeomSVDLadderCoolingpipe(Int_t iLay)
-{
-  iLayer = iLay;
-  resetBasicParameters();
   volLiquid = NULL;
 }
-Bool_t B2GeomSVDLadderCoolingpipe::init(GearDir& content)
+
+Bool_t B2GeomSVDLadderCoolingpipe::init(GearDir& coolingpipeContent)
 {
-  GearDir coolingpipeContent(content);
-  coolingpipeContent.append("CoolingPipe/");
-  initBasicParameters(coolingpipeContent);
-  sprintf(name, "SVD_Layer_%i_Cool_Pipe", iLayer);
-  if (coolingpipeContent.isParamAvailable("CoolingLiquid")) {
-    volLiquid = new B2GeomSVDLadderCoolingliquid(iLayer);
-    if (!volLiquid->init(coolingpipeContent)) {
-      printf("ERROR! Parameter reading for SVD Cooling Liquid failed!\n");
-      return false;
-    }
-  }
+  // read basic parameters from XML
+  if (!initBasicParameters(coolingpipeContent)) return false;
+  initComponent<B2GeomVXDVolume>(&volLiquid, coolingpipeContent, "CoolingLiquid");
   return true;
 }
 
 Bool_t B2GeomSVDLadderCoolingpipe::make()
 {
-  tVolume = (TGeoVolume*) gROOT->FindObjectAny(name);
-  if (!tVolume) {
-    tVolume = gGeoManager->MakeTube(name, tMedium,
-                                    fInnerRadius,
-                                    fOuterRadius,
-                                    0.5 * fLength
-                                   );
-    tVolume->SetLineColor(kCyan - 5);
-  }
-  if (volLiquid != NULL) {
-    volLiquid->make();
-    tVolume->AddNode(volLiquid->getVol(), 1, volLiquid->getPosition());
-  }
+  if (!makeGeneric()) return false;
+  if (!makeAndAddComponent(volLiquid)) return false;
   return true;
-
 }
-
-
-
-
-

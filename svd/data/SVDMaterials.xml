@@ -30,6 +30,7 @@
         </Element>
       </Elements>
     </Mixture>
+
     <Mixture name="SVD_Glue">
       <Density unit="g/cm3">1.13</Density>
       <Elements>
@@ -47,6 +48,7 @@
         </Element>
       </Elements>
     </Mixture>
+
     <Mixture name="SVD_Conductives">
       <Density unit="g/cm3">8.96</Density>
       <Elements>
@@ -64,6 +66,7 @@
         </Element>
       </Elements>
     </Mixture>
+
     <Mixture name="SVD_Conductives2">
       <Density unit="g/cm3">8.96</Density>
       <Elements>
@@ -81,6 +84,8 @@
         </Element>
       </Elements>
     </Mixture>
+
+
     <Mixture name="SVD_Rohacell">
       <Density unit="g/cm3">0.032</Density>
       <Elements>
@@ -102,8 +107,9 @@
         </Element>
       </Elements>
     </Mixture>
+
     <Mixture name="SVD_Carbon">
-      <Density unit="g/cm3">2</Density>
+      <Density unit="g/cm3">2.0</Density>
       <Elements>
         <Element name="C" weight="1">
           <AtomNumber>6</AtomNumber>
@@ -111,6 +117,7 @@
         </Element>
       </Elements>
     </Mixture>
+
     <Mixture name="SVD_Aluminium">
       <Density unit="g/cm3">2.699</Density>
       <Elements>
@@ -120,8 +127,9 @@
         </Element>
       </Elements>
     </Mixture>
+
     <Mixture name="SVD_CoolingLiquid">
-      <Density unit="g/cm3">1</Density>
+      <Density unit="g/cm3">1.0</Density>
       <Elements>
         <Element name="H" weight="0.666666666666667">
           <AtomNumber>1</AtomNumber>
@@ -133,6 +141,7 @@
         </Element>
       </Elements>
     </Mixture>
+
     <Mixture name="SVD_Silicon">
       <Density unit="g/cm3">2.33</Density>
       <Elements>
@@ -142,6 +151,7 @@
         </Element>
       </Elements>
     </Mixture>
+
     <Mixture name="SVD_KaptonFront">
       <Density unit="g/cm3">1.4260</Density>
       <Elements>
@@ -149,12 +159,14 @@
         <Material name="SVD_Conductives2" weight="0.029126214"/>
       </Elements>
     </Mixture>
+
     <Mixture name="SVD_RohacellPad">
       <Density>1.</Density>
       <Elements>
         <Material name="SVD_Rohacell" weight="1"/>
       </Elements>
     </Mixture>
+
     <Mixture name="SVD_Kapton">
       <Density unit="g/cm3">1.6620</Density>
       <Elements>
@@ -163,6 +175,7 @@
         <Material name="SVD_Conductives" weight="0.059921062"/>
       </Elements>
     </Mixture>
+
     <Mixture name="SVD_SiliconChips">
       <Density unit="g/cm3">2.33</Density>
       <Elements>
@@ -172,6 +185,7 @@
         </Element>
       </Elements>
     </Mixture>
+
     <Mixture name="SVD_KaptonFlex">
       <Density unit="g/cm3">3.4203</Density>
       <Elements>

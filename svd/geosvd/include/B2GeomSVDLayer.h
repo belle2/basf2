@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Christian Oswald, Andreas Moll, Zbynek Drasal            *
+ * Contributors: Christian Oswald, Andreas Moll                           *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -11,6 +11,7 @@
 #include <svd/geosvd/B2GeomSVDLadder.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/datastore/Units.h>
+#include <framework/logging/Logger.h>
 #include <boost/format.hpp>
 
 #include "TGeoMaterial.h"
@@ -31,22 +32,17 @@ using namespace std;
 namespace Belle2 {
 
   class GearDir;
-  class B2GeomSVDLayer : public B2GeomVolume {
+  class B2GeomSVDLayer : public B2GeomVXDStructVolume<B2GeomSVDLadder> {
 
   private:
-    //! number of the Layer
-    Int_t iLayer;
-    //! Rotation of whole SVD about z axis
-    Double_t fPhi0;
-
+    Double_t fPhi0; /** < starting angle for placing the ladders. */
   public:
+    /** Constructor. */
     B2GeomSVDLayer();
-    B2GeomSVDLayer(Int_t iLay);
-    ~B2GeomSVDLayer();
-
+    /** Initialize parameters from GearBox. */
     Bool_t init(GearDir& content);
+    /** Build the geometry. */
     Bool_t make();
-
   };
 }
 #endif

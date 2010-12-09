@@ -46,8 +46,8 @@ namespace Belle2 {
      * Default constructor for ROOT.
      */
     MCParticle():
-        m_plist(0), m_index(0), m_status(0), m_pdg(0),
-        m_mass(0), m_momentum_x(0),
+        m_plist(0), m_mother(0), m_index(0), m_status(0),
+        m_pdg(0), m_mass(0), m_momentum_x(0),
         m_momentum_y(0), m_momentum_z(0),
         m_validVertex(false), m_productionTime(0),
         m_productionVertex_x(0), m_productionVertex_y(0),
@@ -65,8 +65,8 @@ namespace Belle2 {
      * @see class MCParticleGraph
      */
     MCParticle(TClonesArray* plist, const MCParticle& p):
-        m_plist(plist), m_index(p.m_index), m_status(p.m_status), m_pdg(p.m_pdg),
-        m_mass(p.m_mass), m_momentum_x(p.m_momentum_x),
+        m_plist(plist), m_mother(0), m_index(p.m_index), m_status(p.m_status),
+        m_pdg(p.m_pdg), m_mass(p.m_mass), m_momentum_x(p.m_momentum_x),
         m_momentum_y(p.m_momentum_y), m_momentum_z(p.m_momentum_z),
         m_validVertex(p.m_validVertex), m_productionTime(p.m_productionTime),
         m_productionVertex_x(p.m_productionVertex_x), m_productionVertex_y(p.m_productionVertex_y),
@@ -193,11 +193,10 @@ namespace Belle2 {
     const std::vector<Belle2::MCParticle*> getDaughters() const; //Need namespace qualifier because ROOT CINT as troubles otherwise
 
     /**
-     * Get vector of all mother particles, empty vector if none.
-     * @return A list of all mother particles. The list is empty if
-     *         the MonteCarlo particle doesn't have any mother particles.
+     * Returns a pointer to the mother particle. NULL if the particle doesn't have a mother.
+     * @return A pointer to the mother particle. NULL if no mother was defined for the particle.
      */
-    const std::vector<Belle2::MCParticle*> getMothers() const; //Need namespace qualifier because ROOT CINT as troubles otherwise
+    MCParticle* getMother() const; //Need namespace qualifier because ROOT CINT as troubles otherwise
 
     /**
      * Set PDG code of the particle.
@@ -316,6 +315,8 @@ namespace Belle2 {
      * correctly on first access after deserialisation
      */
     TClonesArray* m_plist; //! transient pointer to particle list
+
+    MCParticle* m_mother; //! transient pointer to the mother particle
 
     /** 1-based index of the particle, will be set automatically after deserialisation if needed. */
     int m_index; //! transient 1-based index of particle

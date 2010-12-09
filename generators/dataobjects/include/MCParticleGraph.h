@@ -47,6 +47,8 @@ namespace Belle2 {
     BELLE2_DEFINE_EXCEPTION(NotSameGraphError, "Particles not from same graph");
     /** The exception is thrown if a non-physical decay was detected in the graph. */
     BELLE2_DEFINE_EXCEPTION(NonContinousDaughtersError, "Can not represent decay graph, non continuous indices for daughters");
+    /** The exception is thrown if a daughter already has a mother assigned to it. */
+    BELLE2_DEFINE_EXCEPTION(DaughterHasMotherError, "A daughter particle was already assigned to a mother. A particle can't have two mothers !");
     /** The exception is thrown if the specified index is out of range. */
     BELLE2_DEFINE_EXCEPTION(OutOfRangeError, "Index out of range");
 
@@ -175,10 +177,12 @@ namespace Belle2 {
 
     /**
      * Add decay information between two particles.
+     * If the daughter has already a mother attached, an exception of type DaughterHasMotherError is thrown.
+     *
      * @param mother The mother particle which decays.
      * @param daughter The daughter particle in which the mother particle decays.
      */
-    void addDecay(GraphParticle& mother, GraphParticle& daughter) throw(NotSameGraphError);
+    void addDecay(GraphParticle& mother, GraphParticle& daughter) throw(NotSameGraphError, DaughterHasMotherError);
 
     /**
      * Return reference to added particle with range check.
@@ -243,9 +247,10 @@ namespace Belle2 {
 
 
   inline void MCParticleGraph::addDecay(MCParticleGraph::GraphParticle &mother, MCParticleGraph::GraphParticle &daughter)
-  throw(NotSameGraphError)
+  throw(MCParticleGraph::NotSameGraphError, MCParticleGraph::DaughterHasMotherError)
   {
     if (this != mother.m_graph || this != daughter.m_graph) throw NotSameGraphError();
+    if (daughter.getMother() != NULL) throw DaughterHasMotherError();
     m_decays.insert(DecayLine(mother.m_vertexId, daughter.m_vertexId));
     daughter.m_primary = false;
   }

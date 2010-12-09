@@ -61,19 +61,10 @@ const vector<MCParticle*> MCParticle::getDaughters() const
 }
 
 
-const vector<MCParticle*> MCParticle::getMothers() const
+MCParticle* MCParticle::getMother() const
 {
-  //TODO: Maybe add transient vector of mothers and childrens to MCParticle and fill them only once?
-  vector<MCParticle*> result;
   fixParticleList();
-  //We only look up to m_index since MCParticles are sorted breadth first
-  for (int i = 0; i < m_index - 1; ++i) {
-    MCParticle &mc = *(static_cast<MCParticle*>(m_plist->At(i)));
-    if (mc.m_first_daughter <= m_index && m_index <= mc.m_last_daughter) {
-      result.push_back(&mc);
-    }
-  }
-  return result;
+  return m_mother;
 }
 
 
@@ -103,11 +94,17 @@ void MCParticle::fixParticleList() const
     B2ERROR("Could not determine StoreArray the MCParticle belongs to !");
     throw NoParticleListSetError();
   }
+
   //Set plist pointer and index for whole array
   for (int i = 0; i < plist->GetEntries(); i++) {
     MCParticle &mc = *(static_cast<MCParticle*>(plist->At(i)));
     mc.m_plist = plist;
     mc.m_index = i + 1;
+
+    //Loop over all daughters and set the mother particle
+    BOOST_FOREACH(MCParticle* currParticle, mc.getDaughters()) {
+      currParticle->m_mother = &mc;
+    }
   }
 }
 

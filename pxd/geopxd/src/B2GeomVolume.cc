@@ -337,7 +337,7 @@ string B2GeomVXDVolume::searchAndReplaceInName(string inputString)
 {
   char text[10];
   // position in the string
-  unsigned int pos = string::npos;
+  int pos = string::npos;
 
   pos = inputString.find("%Layer");
   if (pos != string::npos) {

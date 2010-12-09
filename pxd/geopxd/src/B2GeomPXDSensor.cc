@@ -31,7 +31,7 @@ Bool_t B2GeomPXDSensor::init(GearDir& sensorContent)
 
   // Read parameters for Silicon part
   if (!initComponent<B2GeomPXDSensorSilicon>(&volSilicon, sensorContent, "Silicon")) {
-    B2FATAL("Parameter reading for SVD silicon failed!\n");
+    B2FATAL("Parameter reading for PXD silicon failed!\n");
     return false;
   }
 

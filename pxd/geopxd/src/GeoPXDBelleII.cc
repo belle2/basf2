@@ -81,14 +81,11 @@ void GeoPXDBelleII::create(GearDir& content)
       B2FATAL("Could not build PXD Layer " << iLayer);
       return;
     }
-
     // build PXD layer in geometry
     if (!b2gPXDLayer->make()) {
       B2FATAL("Could not build PXD Layer " << iLayer);
     }
-
     // add PXD layer to geometry
     volGrpPXD->AddNode(b2gPXDLayer->getVol(), 1, new TGeoTranslation(0, 0, 0));
-
   }
 }

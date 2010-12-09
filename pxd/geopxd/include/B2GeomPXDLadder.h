@@ -8,9 +8,13 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+#ifndef B2GEOMPXDLADDER_H_
+#define B2GEOMPXDLADDER_H_
+
 #include <pxd/geopxd/B2GeomPXDSensor.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/datastore/Units.h>
+#include <framework/logging/Logger.h>
 #include <boost/format.hpp>
 #include <pxd/geopxd/B2GeomVolume.h>
 
@@ -22,28 +26,18 @@
 #include <string>
 #include <vector>
 
-
-#ifndef B2GEOMPXDLADDER_H_
-#define B2GEOMPXDLADDER_H_
-
 using namespace std;
 
 namespace Belle2 {
 
   class GearDir;
-  class B2GeomPXDLadder : public B2GeomVolume {
-  private:
-    // Parameters
-    //! layer number
-    Int_t iLayer;
-    //! ladder number
-    Int_t iLadder;
-
+  class B2GeomPXDLadder : public B2GeomVXDStructVolume<B2GeomPXDSensor> {
   public:
-    B2GeomPXDLadder();
-    B2GeomPXDLadder(Int_t iLayer , Int_t iLadder);
-    ~B2GeomPXDLadder();
+    /** Constructor for a PXD ladder geometry object. */
+    B2GeomPXDLadder() { }
+    /** init PXD ladder geometry object with parameters from GearDir. */
     Bool_t init(GearDir& content);
+    /** create TGeoVolume from the parameters. */
     Bool_t make();
   };
 

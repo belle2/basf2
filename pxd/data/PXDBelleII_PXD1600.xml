@@ -23,6 +23,7 @@
         <Phi0 desc="The starting angle of the layer in the r-phi plane" unit="deg">90.0</Phi0>
         <NumberOfLadders desc="Number of ladders in this layer">8</NumberOfLadders>
         <Ladder desc="The silicon modules the detector is made of">
+        <Name>PXD_Layer_%Layer_Ladder_%Ladder</Name>
           <Material>Vacuum</Material>
           <Shape>Assembly</Shape>
           <WPosition desc="The distance between interaction point and ladder (radius)" unit="mm">14</WPosition>
@@ -55,6 +56,7 @@
         <Phi0 desc="The starting angle of the layer in the r-phi plane" unit="deg">90.0</Phi0>
         <NumberOfLadders desc="Number of ladders in this layer">12</NumberOfLadders>
         <Ladder desc="The silicon modules the detector is made of">
+        <Name>PXD_Layer_%Layer_Ladder_%Ladder</Name>
           <Material>Vacuum</Material>
           <Shape>Assembly</Shape>
           <WPosition desc="The distance between interaction point and ladder (radius)" unit="mm">22</WPosition>

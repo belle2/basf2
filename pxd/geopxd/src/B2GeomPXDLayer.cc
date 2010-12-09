@@ -15,40 +15,36 @@ using namespace boost;
 
 using namespace std;
 
-B2GeomPXDLayer::B2GeomPXDLayer()
-{
-  B2GeomPXDLayer(-1);
-}
-
-B2GeomPXDLayer::B2GeomPXDLayer(Int_t iLay)
-{
-  iLayer = iLay;
-  resetBasicParameters();
-}
-
-B2GeomPXDLayer::~B2GeomPXDLayer()
-{
-
-}
-
-
 Bool_t B2GeomPXDLayer::init(GearDir& content)
 {
-  //printf("B2GeomPXDLayer::init start\n");
+  ////B2METHOD();
+  // go to correct GearDir
   GearDir layerContent(content);
   layerContent.append((format("Layers/Layer[@id=\'PXD_Layer_%1%\']/") % (iLayer)).str());
-  initBasicParameters(layerContent);
 
+  // read basic parameters from XML file
+  if (!initBasicParameters(layerContent)) {
+    B2FATAL("Could not initialize PXD layer!");
+    return false;
+  }
+
+  // read starting angle of the windmill structure
   fPhi0 = layerContent.getParamAngle("Phi0");
+  // read number of ladders for this layer
   nComponents = int(layerContent.getParamNumValue("NumberOfLadders"));
   fPhi.resize(nComponents);
-  components = new B2GeomVolume*[nComponents];
-  for (Int_t iLadder = 0; iLadder < nComponents; iLadder++) {
-    components[iLadder] = new B2GeomPXDLadder(iLayer, iLadder);
-    components[iLadder]->init(layerContent);
+  components = new B2GeomPXDLadder*[nComponents];
+  for (int iComponent = 0; iComponent < nComponents; iComponent++) components[iComponent] = NULL;
+
+  // initialize ladders
+  for (iLadder = 0; iLadder < nComponents; iLadder++) {
+    if (!initComponent<B2GeomPXDLadder>(&components[iLadder], layerContent, "Ladder")) {
+      B2FATAL("Could not create PXD ladder.");
+      return false;
+    }
+    // calculate position in phi of this ladder
     fPhi[iLadder] = iLadder * (360. / nComponents) + fPhi0;
   }
-  //printf("B2GeomPXDLayer::init stop\n");
   return true;
 }
 
@@ -56,15 +52,18 @@ Bool_t B2GeomPXDLayer::init(GearDir& content)
 Bool_t B2GeomPXDLayer::make()
 {
   if (!makeGeneric()) {
-    printf("Creating PXD Layer failed!\n");
+    B2FATAL("Creating PXD Layer failed!\n");
     return false;
   }
 
-  for (int iLadder = 0; iLadder < nComponents; ++iLadder) {
+  for (iLadder = 0; iLadder < nComponents; ++iLadder) {
     // create Ladder
-    components[iLadder]->make();
+    if (!components[iLadder]->make()) {
+      B2FATAL("Could not build PXD ladder");
+      return false;
+    }
 
-    // calculate ladder position
+    // calculate ladder position (= add Phi rotation about z axis)
     TGeoHMatrix pos;
     pos.CopyFrom(components[iLadder]->getPosition());
     TGeoRotation rotPhi = TGeoRotation("name", fPhi[iLadder], 0, 0);
@@ -75,7 +74,6 @@ Bool_t B2GeomPXDLayer::make()
     // position ladder
     tVolume->AddNode(components[iLadder]->getVol(), 1, hmaLadderPosition);
   }
-  //printf("B2GeomPXDLayer::make stop\n");
   return true;
 }
 

@@ -48,14 +48,41 @@
     </Mixture>
 
     <Mixture name="PXD_SiliconSwitcher">
-      <Density unit="g/cm3">2.15870967741935</Density>
+      <Density unit="g/cm3">2.43133200795229</Density>
       <Elements>
-        <Element name="Si" weight="0.744416873449131">
+        <Element name="Si" weight="0.99403578528827">
           <AtomNumber>6</AtomNumber>
           <MassNumber>12.0107</MassNumber>
         </Element>
-        <Material name="PXD_Glue" weight="0.248138957816377"/>
-        <Element name="Au" weight="0.00744416873449132">
+        <Element name="Au" weight="0.00596421471172962">
+          <AtomNumber>79</AtomNumber>
+          <MassNumber>196.96655</MassNumber>
+        </Element>
+      </Elements>
+    </Mixture>
+
+    <Mixture name="PXD_SiliconDCD">
+      <Density unit="g/cm3">2.43133200795229</Density>
+      <Elements>
+        <Element name="Si" weight="0.99403578528827">
+          <AtomNumber>6</AtomNumber>
+          <MassNumber>12.0107</MassNumber>
+        </Element>
+        <Element name="Au" weight="0.00596421471172962">
+          <AtomNumber>79</AtomNumber>
+          <MassNumber>196.96655</MassNumber>
+        </Element>
+      </Elements>
+    </Mixture>
+
+    <Mixture name="PXD_SiliconDHP">
+      <Density unit="g/cm3">2.43133200795229</Density>
+      <Elements>
+        <Element name="Si" weight="0.99403578528827">
+          <AtomNumber>6</AtomNumber>
+          <MassNumber>12.0107</MassNumber>
+        </Element>
+        <Element name="Au" weight="0.00596421471172962">
           <AtomNumber>79</AtomNumber>
           <MassNumber>196.96655</MassNumber>
         </Element>

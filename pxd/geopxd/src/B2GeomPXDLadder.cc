@@ -15,58 +15,46 @@ using namespace boost;
 
 using namespace std;
 
-B2GeomPXDLadder::B2GeomPXDLadder()
-{
-  B2GeomPXDLadder(-1, -1);
-}
-
-B2GeomPXDLadder::B2GeomPXDLadder(Int_t iLay, Int_t iLad)
-{
-  iLayer = iLay;
-  iLadder = iLad;
-  sprintf(name, "PXD_Layer_%i_Ladder_%i", iLayer, iLadder);
-  resetBasicParameters();
-}
-
-B2GeomPXDLadder::~B2GeomPXDLadder()
-{
-}
-
 Bool_t B2GeomPXDLadder::init(GearDir& content)
 {
-  //printf("B2GeomPXDLadder::init start (Lay:%i, Lad:%i)\n", iLayer, iLadder);
-  GearDir ladderContent(content);
-  ladderContent.append("Ladder/");
-
-  initBasicParameters(ladderContent);
+  ////B2METHOD();
+  // read basic parameters from XML file
+  if (!initBasicParameters(content)) {
+    B2FATAL("Could not read parameters for PXD ladder from XML file");
+    return false;
+  }
 
   // get number of sensors
-  GearDir sensorsContent(ladderContent);
+  GearDir sensorsContent(content);
   sensorsContent.append("/Sensors/Sensor");
   nComponents = int(sensorsContent.getNumberNodes());
+  components = new B2GeomPXDSensor*[nComponents];
+  for (int iComponent = 0; iComponent < nComponents; iComponent++) components[iComponent] = NULL;
 
-  components = new B2GeomVolume*[nComponents];
-  for (Int_t iSensor = 0; iSensor < nComponents; iSensor++) {
-    components[iSensor] = new B2GeomPXDSensor(iLayer, iLadder, iSensor);
-    components[iSensor]->init(ladderContent);
+  // initialize sensors
+  for (iSensor = 0; iSensor < nComponents; iSensor++) {
+    string relativePath = (format("Sensors/Sensor[@id=\'PXD_Layer_%1%_Ladder_Sensor_%2%\']") % iLayer % iSensor).str();
+    if (!initComponent<B2GeomPXDSensor>(&components[iSensor], content, relativePath)) {
+      B2FATAL("Could not initialize PXD sensor!");
+      return false;
+    }
   }
-  //printf("B2GeomPXDLadder::init stop\n");
   return true;
 }
 
 
 Bool_t B2GeomPXDLadder::make()
 {
-  //printf("B2GeomPXDLadder::make start (Lay:%i, Lad:%i)\n", iLayer, iLadder);
   if (!makeGeneric()) {
-    printf("Creating PXD Ladder failed!\n");
+    B2FATAL("Creating PXD Ladder failed!\n");
     return false;
   }
-  for (int iSensor = 0; iSensor < nComponents; ++iSensor) {
-    components[iSensor]->make();
-    tVolume->AddNode(components[iSensor]->getVol(), 1, components[iSensor]->getPosition());
+  for (iSensor = 0; iSensor < nComponents; ++iSensor) {
+    if (!makeAndAddComponent(components[iSensor])) {
+      B2FATAL("Could not build PXD sensor!")
+      return false;
+    }
   }
-  //printf("B2GeomPXDLadder::make stop\n");
   return true;
 }
 

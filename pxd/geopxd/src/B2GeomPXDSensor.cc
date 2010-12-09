@@ -16,90 +16,58 @@ using namespace std;
 
 B2GeomPXDSensor::B2GeomPXDSensor()
 {
-  B2GeomPXDSensor(-1, -1, -1);
-}
-
-B2GeomPXDSensor::B2GeomPXDSensor(Int_t iLay, Int_t iLad, Int_t iSen)
-{
-  // define ID of this sensor
-  iLayer = iLay;
-  iLadder = iLad;
-  iSensor = iSen;
-  resetBasicParameters();
-  sprintf(name, "PXD_Layer_%i_Ladder_%i_Sensor_%i", iLayer, iLadder, iSensor);
   volSilicon = NULL;
   volSwitchers1 = NULL;
   volSwitchers2 = NULL;
 }
 
-B2GeomPXDSensor::~B2GeomPXDSensor()
+Bool_t B2GeomPXDSensor::init(GearDir& sensorContent)
 {
-
-}
-
-Bool_t B2GeomPXDSensor::init(GearDir& content)
-{
-  // printf("B2GeomPXDSensor::init start\n");
-  GearDir sensorContent(content);
-  sensorContent.append((format("Sensors/Sensor[@id=\'PXD_Layer_%1%_Ladder_Sensor_%2%\']/") % iLayer % iSensor).str());
-  initBasicParameters(sensorContent);
-
-  if (sensorContent.isParamAvailable("Silicon")) {
-    volSilicon = new B2GeomPXDSensorSilicon(iLayer, iLadder, iSensor);
-    if (!volSilicon->init(sensorContent)) {
-      printf("B2ERROR! Parameter reading for SVD silicon failed!\n");
-      return false;
-    }
-  } else {
-    printf("B2ERROR! Definition of Silicon missing in XML file!\n");
+  ////B2METHOD();
+  if (!initBasicParameters(sensorContent)) {
+    B2FATAL("Could not initialize basic parameters of PXD sensor");
     return false;
   }
 
-  if (sensorContent.isParamAvailable("Switchers1")) {
-    volSwitchers1 = new B2GeomVolume();
-    if (!volSwitchers1->init(sensorContent, "Switchers1/")) return false;
+  // Read parameters for Silicon part
+  if (!initComponent<B2GeomPXDSensorSilicon>(&volSilicon, sensorContent, "Silicon")) {
+    B2FATAL("Parameter reading for SVD silicon failed!\n");
+    return false;
   }
 
-  if (sensorContent.isParamAvailable("Switchers2")) {
-    volSwitchers2 = new B2GeomVolume();
-    if (!volSwitchers2->init(sensorContent, "Switchers2/")) return false;
-  }
+  // Read parameters for Switchers
+  if (!initComponent<B2GeomVXDVolume>(&volSwitchers1, sensorContent, "Switchers1")) B2WARNING("No switchters created!");
+  if (!initComponent<B2GeomVXDVolume>(&volSwitchers2, sensorContent, "Switchers2"))  B2WARNING("No switchters created!");
 
-  // init offsets from XML file
+  // Read offsets from XML file
   sensorContent.setDirPath((format("//Offsets/Sensor[@id=\'PXD_Offset_Layer_%1%_Ladder_%2%_Sensor_%3%\']/") % iLayer % iLadder % iSensor).str());
-  initOffsets(sensorContent);
-  // printf("B2GeomPXDSensor::init stop\n");
+  if (!initOffsets(sensorContent)) {
+    B2WARNING("PXD sensor offsets not initialized!");
+  }
   return true;
 }
 
+
 Bool_t B2GeomPXDSensor::make()
 {
-  //printf("B2GeomPXDSensor::make start\n");
+  ////B2METHOD();
+
+  // Build the container for the sensor components
   if (!makeGeneric()) {
-    printf("Creating PXD Sensor failed!\n");
+    B2FATAL("Creating PXD Sensor failed!");
     return false;
   }
 
-  // add silicon volume to sensor volume
-  if (!volSilicon->make()) {
-    printf("B2ERROR! Cannot create silicon of PXD sensor!\n");
+  // Build the silicon of the PXD sensor
+  if (!makeAndAddComponent(volSilicon)) {
+    B2FATAL("Cannot create silicon of PXD sensor!\n");
     return false;
   }
-  tVolume->AddNode(volSilicon->getVol(), 1, volSilicon->getPosition());
 
-  if (volSwitchers1 != NULL) {
-    volSwitchers1->make();
-    tVolume->AddNode(volSwitchers1->getVol(), 1, volSwitchers1->getPosition());
-    volSwitchers1->getVol()->SetLineColor(kGray + 3);
-  }
+  makeAndAddComponent(volSwitchers1);
 
-  if (volSwitchers2 != NULL) {
-    volSwitchers2->make();
-    tVolume->AddNode(volSwitchers2->getVol(), 1, volSwitchers2->getPosition());
-    volSwitchers2->getVol()->SetLineColor(kGray + 3);
-  }
+  makeAndAddComponent(volSwitchers2);
 
-  //printf("B2GeomPXDSensor::make stop\n");
   return true;
 }
 
@@ -107,40 +75,22 @@ Bool_t B2GeomPXDSensor::make()
 // Silicon part of the sensor
 // ------------------------------------------------------------------------------------------------
 
-B2GeomPXDSensorSilicon::B2GeomPXDSensorSilicon(Int_t iLay, Int_t iLad, Int_t iSen)
+B2GeomPXDSensorSilicon::B2GeomPXDSensorSilicon()
 {
-  iLayer = iLay;
-  iLadder = iLad;
-  iSensor = iSen;
-  resetBasicParameters();
-  sprintf(name, "PXD_Layer_%i_Ladder_%i_Sensor_%i_Silicon", iLayer, iLadder, iSensor);
   volActive = NULL;
   volThinned = NULL;
 }
 
 Bool_t B2GeomPXDSensorSilicon::init(GearDir& content)
 {
-  GearDir siliconContent(content);
-  siliconContent.append("Silicon/");
-  initBasicParameters(siliconContent);
-  if (siliconContent.isParamAvailable("Thinned")) {
-    volThinned = new B2GeomVolume();
-    if (!volThinned->init(siliconContent, "Thinned/")) {
-      printf("B2ERROR! Parameter reading for PXD silicon thinned failed!\n");
-      return false;
-    }
-  } else {
-    printf("B2ERROR! Definition of PXD Silicon Thinned missing in XML file!\n");
-    return false;
-  }
-  if (siliconContent.isParamAvailable("Active")) {
-    volActive = new B2GeomPXDSensorActive(iLayer, iLadder, iSensor);
-    if (!volActive->init(siliconContent)) {
-      printf("B2ERROR! Parameter reading for SVD silicon active failed!\n");
-      return false;
-    }
-  } else {
-    printf("B2ERROR! Definition of PXD Silicon Active missing in XML file!\n");
+  // initialize parameters from XML
+  if (!initBasicParameters(content)) return false;
+
+
+  initComponent<B2GeomVXDVolume>(&volThinned, content, "Thinned");
+
+  if (!initComponent<B2GeomPXDSensorActive>(&volActive, content, "Active")) {
+    B2FATAL("Parameter reading for SVD silicon active failed!\n");
     return false;
   }
   return true;
@@ -148,24 +98,20 @@ Bool_t B2GeomPXDSensorSilicon::init(GearDir& content)
 
 Bool_t B2GeomPXDSensorSilicon::make()
 {
-
-  //printf("B2GeomPXDSensorSilicon::make start\n");
-  makeGeneric();
+  ////B2METHOD();
+  if (!makeGeneric()) {
+    B2FATAL("Cannot build silicon of PXD sensor");
+    return false;
+  }
 
   // add thinned out volume with air
-  if (!volThinned->make()) {
-    printf("B2ERROR! Cannot create thinned volume of PXD sensor!");
-    return false;
-  }
-  tVolume->AddNode(volThinned->getVol(), 1, volThinned->getPosition());
+  makeAndAddComponent(volThinned);
 
   // add active volume to the silicon
-  if (!volActive->make()) {
-    printf("B2ERROR! Cannot create active volume of PXD sensor!");
+  if (!makeAndAddComponent(volActive)) {
+    B2FATAL("Cannot build active volume of PXD sensor!");
     return false;
   }
-  tVolume->AddNode(volActive->getVol(), 1, volActive->getPosition());
-  //printf("B2GeomPXDSensorSilicon::make stop\n");
   return true;
 }
 
@@ -173,25 +119,17 @@ Bool_t B2GeomPXDSensorSilicon::make()
 // Active Silicon part of the sensor
 // ------------------------------------------------------------------------------------------------
 
-B2GeomPXDSensorActive::B2GeomPXDSensorActive(Int_t iLay, Int_t iLad, Int_t iSen)
-{
-  iLayer = iLay;
-  iLadder = iLad;
-  iSensor = iSen;
-  sprintf(name, "SD_PXD_Layer_%i_Ladder_%i_Sensor_%i_Silicon_Active", iLayer, iLadder, iSensor);
-  resetBasicParameters();
-}
-
 Bool_t B2GeomPXDSensorActive::init(GearDir& content)
 {
-  GearDir activeContent(content);
-  activeContent.append("Active/");
-  initBasicParameters(activeContent);
+  if (!initBasicParameters(content)) {
+    B2FATAL("Could not read parameters for PXD sensitive volume!!!!")
+    return false;
+  }
 
   // check if the sensor or the ladder is mirrored!
   // then the active sensor has also to be mirrored in order to keep the right coordinates
   while (true) {
-    if (!goToParentNode(activeContent)) break;
+    if (!goToParentNode(content)) break;
     if (content.isParamAvailable("ReflectX")) isReflectX = !isReflectX;
     if (content.isParamAvailable("ReflectY")) isReflectY = !isReflectY;
     if (content.isParamAvailable("ReflectZ")) isReflectZ = !isReflectZ;

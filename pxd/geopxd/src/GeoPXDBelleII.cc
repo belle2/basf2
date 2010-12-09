@@ -10,6 +10,7 @@
 
 #include <pxd/geopxd/GeoPXDBelleII.h>
 #include <pxd/geopxd/B2GeomPXDLayer.h>
+#include <framework/logging/Logger.h>
 #include <pxd/simpxd/PXDSensitiveDetector.h>
 
 #include <framework/gearbox/GearDir.h>
@@ -44,7 +45,8 @@ GeoPXDBelleII regGeoPXDBelleII;
 GeoPXDBelleII::GeoPXDBelleII() : CreatorBase("PXDBelleII")
 {
   setDescription("Creates the TGeo objects for the PXD geometry of the Belle II detector.");
-  addSensitiveDetector("SD_", new PXDSensitiveDetector("PXDSensitiveDetector")); //The PXD subdetector uses the "SD_" prefix to flag its sensitive volumes
+  //The PXD subdetector uses the "SD_" prefix to flag its sensitive volumes
+  addSensitiveDetector("SD_", new PXDSensitiveDetector("PXDSensitiveDetector"));
 }
 
 
@@ -56,47 +58,37 @@ GeoPXDBelleII::~GeoPXDBelleII()
 
 void GeoPXDBelleII::create(GearDir& content)
 {
-  //----------------------------------------
-  //         Get global parameters
-  //----------------------------------------
+  // Get global parameters
   double globalRotAngle = content.getParamAngle("Rotation") / deg;
   double globalOffsetZ  = content.getParamLength("OffsetZ");
 
-
-
-  //----------------------------------------
-  //        Add subdetector group
-  //----------------------------------------
+  // Add subdetector group
   TGeoRotation* geoRot = new TGeoRotation("PXDRot", 90.0, globalRotAngle, 0.0);
   TGeoVolumeAssembly* volGrpPXD = addSubdetectorGroup("PXD", new TGeoCombiTrans(0.0, 0.0, globalOffsetZ, geoRot));
-  /*
-  bool isWithContainer = true;
-  TGeoVolume* volPXD = gGeoManager->MakeTube("PXD_Container", gGeoManager->GetMedium("Air"), 1.1, 2.6, 11);
-  if (isWithContainer) volGrpPXD->AddNode(volPXD, 1, new TGeoTranslation(0.0,0.0,0.0));
-  */
 
-  //----------------------------------------
-  //           Build subdetector
-  //----------------------------------------
-
+  // Build subdetector
   //Get number of layers
   int nLayer = content.getNumberNodes("Layers/Layer");
+  if (nLayer == 0) {
+    B2FATAL("Could not find any PXD layers in XML file.");
+    return;
+  }
 
   for (int iLayer = 1; iLayer <= nLayer; ++iLayer) {
-
-    //Build geometry
-
-    B2GeomPXDLayer* b2gPXDLayer = new B2GeomPXDLayer(iLayer);
-    b2gPXDLayer->init(content);
-    b2gPXDLayer->make();
-
-    /*
-    if (isWithContainer) {
-        volPXD->AddNode(b2gPXDLayer->getVol(), 1, new TGeoTranslation(0, 0, 0));
-    } else {
-       volGrpPXD->AddNode(b2gPXDLayer->getVol(), 1, new TGeoTranslation(0, 0, 0));
+    // initialize new PXD Layer object
+    B2GeomPXDLayer* b2gPXDLayer = new B2GeomPXDLayer(); b2gPXDLayer->setId(iLayer);
+    if (!b2gPXDLayer->init(content)) {
+      B2FATAL("Could not build PXD Layer " << iLayer);
+      return;
     }
-    */
+
+    // build PXD layer in geometry
+    if (!b2gPXDLayer->make()) {
+      B2FATAL("Could not build PXD Layer " << iLayer);
+    }
+
+    // add PXD layer to geometry
     volGrpPXD->AddNode(b2gPXDLayer->getVol(), 1, new TGeoTranslation(0, 0, 0));
+
   }
 }

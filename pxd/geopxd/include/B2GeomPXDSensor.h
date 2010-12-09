@@ -8,8 +8,12 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+#ifndef B2GEOMPXDSENSOR_H_
+#define B2GEOMPXDSENSOR_H_
+
 #include <framework/gearbox/GearDir.h>
 #include <framework/datastore/Units.h>
+#include <framework/logging/Logger.h>
 #include <boost/format.hpp>
 #include <pxd/geopxd/B2GeomVolume.h>
 
@@ -24,59 +28,50 @@
 #include "TGeoCompositeShape.h"
 
 
-
-#ifndef B2GEOMPXDSENSOR_H_
-#define B2GEOMPXDSENSOR_H_
-
 using namespace std;
 
 namespace Belle2 {
   class GearDir;
 
-  class B2GeomPXDSensorActive : public B2GeomVolume {
-  private:
-    Int_t iLayer;
-    Int_t iLadder;
-    Int_t iSensor;
+  /** Class for building the active silicon of the PXD sensor. */
+  class B2GeomPXDSensorActive : public B2GeomVXDVolume {
   public:
-    B2GeomPXDSensorActive(Int_t iLay, Int_t iLad, Int_t iSen);
+    /** Constructor for the active sensor */
+    B2GeomPXDSensorActive() { }
+    /** Reads parameters for PXD active silicon from GearBox. */
     Bool_t init(GearDir& content);
   };
 
-  class B2GeomPXDSensorSilicon: public B2GeomVolume {
+  /** Class to build the silicon of the PXD Sensor. */
+  class B2GeomPXDSensorSilicon: public B2GeomVXDVolume {
   private:
-    Int_t iLayer;
-    Int_t iLadder;
-    Int_t iSensor;
-    B2GeomPXDSensorActive* volActive;
-    B2GeomVolume* volThinned;
+    B2GeomPXDSensorActive* volActive; /** < Object for building the active volume */
+    B2GeomVXDVolume* volThinned; /** < Object for building the thinning. */
   public:
-    B2GeomPXDSensorSilicon(Int_t iLay, Int_t Ladder, Int_t Sensor);
+    /** Constructor for the Silicon of the PXD. */
+    B2GeomPXDSensorSilicon();
+    /** Reads Parameters for PXD Silicon from GearBox. */
+    Bool_t init(GearDir& content);
+    /** Builds the geometry of the PXD sensor silicon. */
     Bool_t make();
-    Bool_t init(GearDir& content);
+
   };
 
-  class B2GeomPXDSensor : public B2GeomVolume {
+  /** Class to build the PXD Sensor (silicon, active silicon, thinning, switchers). */
+  class B2GeomPXDSensor : public B2GeomVXDStructVolume<B2GeomPXDSensor> {
   private:
-    //! Volumes contained in the sensor
-    B2GeomPXDSensorSilicon* volSilicon;
-    B2GeomVolume* volSwitchers1;
-    B2GeomVolume* volSwitchers2;
-
-    // Parameters
-    //! Layer number of this sensor
-    Int_t iLayer;
-    //! Ladder number of this sensor
-    Int_t iLadder;
-    //! Number of this sensor
-    Int_t iSensor;
+    B2GeomPXDSensorSilicon* volSilicon; /** < Object for building the silicon including thinning and active volume. */
+    B2GeomVXDVolume* volSwitchers1; /** < Object for building the switchers. */
+    B2GeomVXDVolume* volSwitchers2; /** < Object for building the switchers. */
 
   public:
+    /** Constructor for PXD Sensor. */
     B2GeomPXDSensor();
-    B2GeomPXDSensor(Int_t iLayer , Int_t iLadder, Int_t iSensor);
-    ~B2GeomPXDSensor();
-
+    /** Destructor for PXD Sensor. */
+    ~B2GeomPXDSensor() { }
+    /** Reads parameters from GearBox and creates objects for sub components. */
     Bool_t init(GearDir& content);
+    /** Builds the PXD sensor geometry. */
     Bool_t make();
   };
 

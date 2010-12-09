@@ -27,14 +27,10 @@ B2GeomOffset::~B2GeomOffset()
 
 }
 
-void B2GeomVolume::resetBasicParameters()
+B2GeomVolume::B2GeomVolume()
 {
   tVolume = NULL;
   tMedium = NULL;
-  components = NULL;
-  offset = new B2GeomOffset();
-  isCalculatedOffset = false;
-  nComponents = 0;
   fMass = -1.;
   fDensityFactor = -1.;
   fLength = -1;
@@ -56,46 +52,28 @@ void B2GeomVolume::resetBasicParameters()
   isReflectY = false;
   isReflectZ = false;
   isDensityCorrected = false;
-  isReset = true;
   isInitBasicParameters = false;
+  sprintf(name, "NULL");
 }
 
 TGeoVolume* B2GeomVolume::getVol()
 {
-  //printf("B2GeomVolume::getVol start!\n");
-  if (!isReset) {
-    printf("B2GeomVolume: Please run resetBasicParameters() method before any other method!\n");
+  ////B2METHOD();
+  // check if parameters have been initialized from GearBox
+  if (!isInitBasicParameters) {
+    B2ERROR("Please run initBasicParameters() method before getVol()!\n");
     return NULL;
   }
   correctDensity();
-  //printf("B2GeomVolume::getVol stop!\n");
   return tVolume;
-}
-
-Bool_t B2GeomVolume::initOffsets(GearDir& content)
-{
-  if (!isReset) {
-    printf("B2GeomVolume: Please run resetBasicParameters() method before any other method!\n");
-    return false;
-  }
-  // read offsets of ideal position, if available
-  if (content.isParamAvailable("OffsetW")) offset->fOffsetW = content.getParamLength("OffsetW");
-  if (content.isParamAvailable("OffsetU")) offset->fOffsetU = content.getParamLength("OffsetU");
-  if (content.isParamAvailable("OffsetV")) offset->fOffsetV = content.getParamLength("OffsetV");
-  if (content.isParamAvailable("OffsetPhi")) offset->fOffsetPhi = TMath::RadToDeg() *  content.getParamAngle("OffsetPhi");
-  if (content.isParamAvailable("OffsetTheta")) offset->fOffsetTheta = TMath::RadToDeg() * content.getParamAngle("OffsetTheta");
-  if (content.isParamAvailable("OffsetPsi")) offset->fOffsetPsi = TMath::RadToDeg() * content.getParamAngle("OffsetPsi");
-  return true;
 }
 
 Bool_t B2GeomVolume::initBasicParameters(GearDir& con)
 {
-  if (!isReset) {
-    printf("B2GeomVolume: Please run resetBasicParameters() method before any other method!\n");
-    return false;
-  }
-  isInitBasicParameters = true;
+  //B2METHOD();
+  // 'Copy' GearDir con for further manipulation
   GearDir content(con);
+
   // How to position the volume in its mother volume?
   if (content.isParamAvailable("ReflectX")) isReflectX = true;
   if (content.isParamAvailable("ReflectY")) isReflectY = true;
@@ -124,50 +102,70 @@ Bool_t B2GeomVolume::initBasicParameters(GearDir& con)
         string materialName  = content.getParamString("Material");
         tMedium = gGeoManager->GetMedium(materialName.c_str());
       } else {
-        printf("B2ERROR! No material provided in XML file\n");
-        printf("Current XPath is: %s\n", content.getDirPath().c_str());
+        B2ERROR("B2ERROR! No material provided in XML file");
+        B2DEBUG(10, "Current XPath is:" << content.getDirPath());
         return false;
       }
     }
+
+    // get thickness if not defined before
     if ((fThickness < 0) && content.isParamAvailable("Thickness")) fThickness = content.getParamLength("Thickness");
+    // check if thickness2 has been defined before
     if (fThickness2 < 0) {
+      // check if thickness2 is available in XML file
       if (content.isParamAvailable("Thickness2")) {
+        // take thickness2 from XML file
         fThickness2 = content.getParamLength("Thickness2");
       } else {
+        // if thickness is already defined, take same value for thickness2
         if (fThickness > 0) fThickness2 = fThickness;
       }
     }
+
+    // get width if not defined before
     if ((fWidth < 0) && content.isParamAvailable("Width")) fWidth = content.getParamLength("Width");
+    // check if width2 has been defined before
     if (fWidth2 < 0) {
+      // check if with2 is available in XML file
       if (content.isParamAvailable("Width2")) {
+        // take width2 form XML file
         fWidth2 = content.getParamLength("Width2");
       } else {
+        // if width is already defined, take same value for width2
         if (fWidth > 0) fWidth2 = fWidth;
       }
     }
+    // get length if not defined before
     if ((fLength < 0) && content.isParamAvailable("Length")) fLength = content.getParamLength("Length");
+    // get inner radius if not defined before
     if ((fInnerRadius < 0) && content.isParamAvailable("InnerRadius")) fInnerRadius = content.getParamLength("InnerRadius");
+    // get outer radius if not defined before
     if ((fOuterRadius < 0) && content.isParamAvailable("OuterRadius")) fOuterRadius = content.getParamLength("OuterRadius");
+    // get color if not defined before
     if ((iColor < 0) && content.isParamAvailable("Color")) iColor = content.getParamNumValue("Color");
+    // go one node up in GearDir or exit this loop
     if (!goToParentNode(content)) break;
   }
 
+  // change the name of this volume if any density correction is applied
   if (fMass > 0) {
     sprintf(name, "%s_Mass_%i_mg", name, (int)(fMass*1000));
   }
-
   if (fDensityFactor > 0) {
-    sprintf(name, "%s_DensityFactor_%i_E-3", name, (int)(fDensityFactor*1000));
+    sprintf(name, "%s_DensityFactor_%ie-3", name, (int)(fDensityFactor*1000));
   }
+  isInitBasicParameters = true;
   return true;
 }
 
 Bool_t B2GeomVolume::correctDensity()
 {
+  // check if parameters are initialized
   if (!isInitBasicParameters) {
-    printf("B2GeomVolume: Please run initBasicParameters() before using correctDensity()!\n");
+    B2ERROR("Please run initBasicParameters() before using correctDensity()!\n");
     return NULL;
   }
+
   //check if density has already been corrected
   if (isDensityCorrected) return true;
 
@@ -203,6 +201,7 @@ Bool_t B2GeomVolume::correctDensity()
     TGeoMedium* newMedium = gGeoManager->GetMedium(newMaterialName);
     if (!newMedium) newMedium = new TGeoMedium(newMaterialName, 1, newMaterial);
 
+    // set the medium of this volume to the new medium (with corrected density)
     tMedium = newMedium;
     tVolume->SetMedium(tMedium);
   }
@@ -213,9 +212,9 @@ Bool_t B2GeomVolume::correctDensity()
 
 TGeoHMatrix* B2GeomVolume::getPosition()
 {
-  //printf("B2GeomVolume::getPosition start!\n");
-  if (!isReset) {
-    printf("B2GeomVolume: Please run resetBasicParameters() method before any other method!\n");
+  // //B2METHOD();
+  if (!isInitBasicParameters) {
+    B2ERROR("Please run initBasicParameters() method before getPosition()!\n");
     return NULL;
   }
 
@@ -224,21 +223,14 @@ TGeoHMatrix* B2GeomVolume::getPosition()
   // first rotate volume to right position
   TGeoRotation rot("rot", fPhiLocal, fThetaLocal, fPsiLocal);
   hmaHelp = rot * hmaHelp;
-  // second rotate about the offset
-  TGeoRotation rotOffset("rotoffset", getOffset()->fOffsetPhi, getOffset()->fOffsetTheta, getOffset()->fOffsetPsi);
-  hmaHelp = rotOffset * hmaHelp;
-  // third, mirror volume if necessary
+  // second, mirror volume if necessary
   if (isReflectX) hmaHelp.ReflectX(true);
   if (isReflectY) hmaHelp.ReflectY(true);
   if (isReflectZ) hmaHelp.ReflectZ(true);
-  // forth do (local) offset in WUV
-  TGeoTranslation traOffset(getOffset()->fOffsetW, getOffset()->fOffsetU, getOffset()->fOffsetV);
-  hmaHelp = traOffset * hmaHelp;
-  // fith go to position of this volume in its mother volume
+  // third go to position of this volume in its mother volume
   TGeoTranslation tra(fWPosition, fUPosition, fVPosition);
   hmaHelp = tra * hmaHelp;
   TGeoHMatrix* hmaPosition = new TGeoHMatrix(hmaHelp);
-  //printf("B2GeomVolume::getPosition stop!\n");
   return hmaPosition;
 }
 
@@ -258,139 +250,27 @@ void B2GeomVolume::setPosition(TGeoHMatrix* newPosition)
   }
 }
 
-TGeoHMatrix* B2GeomVolume::getIdealPosition()
-{
-  // rotate the volume to the right coordinate system
-  TGeoRotation rot1("name", fPhiLocal, fThetaLocal, fPsiLocal);
-  // position the volume
-  TGeoTranslation tra1(fWPosition, fUPosition, fVPosition);
-  TGeoHMatrix hmaHelp;
-  hmaHelp = gGeoIdentity;
-  hmaHelp = rot1 * hmaHelp;
-  if (isReflectX) hmaHelp.ReflectX(true);
-  if (isReflectY) hmaHelp.ReflectY(true);
-  if (isReflectZ) hmaHelp.ReflectZ(true);
-  hmaHelp = tra1 * hmaHelp;
-  TGeoHMatrix* hmaPosition = new TGeoHMatrix(hmaHelp);
-  return hmaPosition;
-}
-
-
-B2GeomOffset* B2GeomVolume::getOffset()
-{
-  if (!isReset) {
-    printf("B2GeomVolume: Please run resetBasicParameters() method before any other method!\n");
-    return NULL;
-  }
-  // calculate the offset from the offset of the (sub components)
-  // offset of this volume = average of offsets of sub components
-  // first the average of the LOCAL offsets of the components is calculated in the coordinates of THIS volume
-  // then the average offset is subtracted from each component in its LOCAL coordinates
-  if (!isCalculatedOffset) {
-    for (int iComponent = 0; iComponent < nComponents; iComponent++) {
-      // rotate the axis of THIS coordinate system to the LOCAL coordinatesystem of the component
-      TGeoRotation rotComponent("rotComponent", components[iComponent]->getPhiLocal(), components[iComponent]->getThetaLocal(), components[iComponent]->getPsiLocal());
-      // rotation about the component offset angles in the LOCAL coordinate system of the component
-      TGeoRotation rotComponentOffsetLocal("rotComponentOffsetLocal", components[iComponent]->getOffset()->fOffsetPhi, components[iComponent]->getOffset()->fOffsetTheta, components[iComponent]->getOffset()->fOffsetPsi);
-      // calculate the offset angles in the coordinate system of THIS volume
-      TGeoRotation rotComponentOffsetThis("rotComponentOffsetThis");
-
-      rotComponentOffsetThis = rotComponent;
-      rotComponentOffsetThis = rotComponentOffsetLocal * rotComponentOffsetThis;
-
-      rotComponentOffsetThis = rotComponent.Inverse() * rotComponentOffsetThis;
-      Double_t fComponentOffsetPhi, fComponentOffsetTheta, fComponentOffsetPsi;
-      rotComponentOffsetThis.GetAngles(fComponentOffsetPhi, fComponentOffsetTheta, fComponentOffsetPsi);
-
-      // add rotation offset of this component
-      offset->fOffsetPhi = offset->fOffsetPhi + fComponentOffsetPhi / nComponents;
-      offset->fOffsetTheta = offset->fOffsetTheta + fComponentOffsetTheta  / nComponents;
-      offset->fOffsetPsi = offset->fOffsetPsi +  fComponentOffsetPsi / nComponents;
-
-      // get translation offset of this component in its local coordinate system
-      Double_t fComponentTransOffsetsLocal[3];
-      fComponentTransOffsetsLocal[0] = components[iComponent]->getOffset()->fOffsetW;
-      fComponentTransOffsetsLocal[1] = components[iComponent]->getOffset()->fOffsetU;
-      fComponentTransOffsetsLocal[2] = components[iComponent]->getOffset()->fOffsetV;
-
-      // transform the translation offset from LOCAL coordinate system to THIS coordinatesystem
-      Double_t fComponentTransOffsetsThis[3];
-      rotComponent.LocalToMasterVect(fComponentTransOffsetsLocal, fComponentTransOffsetsThis);
-
-      offset->fOffsetW = offset->fOffsetW + fComponentTransOffsetsThis[0] / nComponents;
-      offset->fOffsetU = offset->fOffsetU + fComponentTransOffsetsThis[1] / nComponents;
-      offset->fOffsetV = offset->fOffsetV + fComponentTransOffsetsThis[2] / nComponents;
-    }
-    for (int iComponent = 0; iComponent < nComponents; iComponent++) {
-      // rotate the axis of THIS coordinate system to the LOCAL coordinatesystem of the component
-      TGeoRotation rotComponent("rotComponent", components[iComponent]->getPhiLocal(), components[iComponent]->getThetaLocal(), components[iComponent]->getPsiLocal());
-      // rotation about the component offset angles in the LOCAL coordinate system of the component
-      TGeoRotation rotComponentOffsetThis("rotComponentOffsetThis", offset->fOffsetPhi, offset->fOffsetTheta, offset->fOffsetPsi);
-      // calculate the offset angles in the coordinate system of the LOCAL coordinate system of the component
-      TGeoRotation rotComponentOffsetLocal("rotComponentOffsetLocal");
-
-      rotComponentOffsetLocal = rotComponent.Inverse();
-      rotComponentOffsetLocal =  rotComponentOffsetThis * rotComponentOffsetLocal;
-
-      rotComponentOffsetLocal = rotComponent * rotComponentOffsetLocal;
-      Double_t fComponentOffsetPhi, fComponentOffsetTheta, fComponentOffsetPsi;
-      rotComponentOffsetLocal.GetAngles(fComponentOffsetPhi, fComponentOffsetTheta, fComponentOffsetPsi);
-
-      // subtract the offset taken by THIS volume from the offset of the component
-      components[iComponent]->getOffset()->fOffsetPhi = components[iComponent]->getOffset()->fOffsetPhi - fComponentOffsetPhi;
-      components[iComponent]->getOffset()->fOffsetTheta = components[iComponent]->getOffset()->fOffsetTheta - fComponentOffsetTheta;
-      components[iComponent]->getOffset()->fOffsetPsi = components[iComponent]->getOffset()->fOffsetPsi - fComponentOffsetPsi;
-
-      // transform the translation offset from LOCAL coordinate system to THIS coordinatesystem
-      Double_t fTransOffsetsThis[3];
-      fTransOffsetsThis[0] = offset->fOffsetW;
-      fTransOffsetsThis[1] = offset->fOffsetU;
-      fTransOffsetsThis[2] = offset->fOffsetV;
-
-      // subtract the offset taken by THIS volume from the offset of the components
-      Double_t fTransOffsetsLocal[3];
-      rotComponent.MasterToLocalVect(fTransOffsetsThis, fTransOffsetsLocal);
-      components[iComponent]->getOffset()->fOffsetW = components[iComponent]->getOffset()->fOffsetW - fTransOffsetsLocal[0];
-      components[iComponent]->getOffset()->fOffsetU = components[iComponent]->getOffset()->fOffsetU - fTransOffsetsLocal[1];
-      components[iComponent]->getOffset()->fOffsetV = components[iComponent]->getOffset()->fOffsetV - fTransOffsetsLocal[2];
-    }
-    isCalculatedOffset = true;
-  }
-  return offset;
-}
-
-bool B2GeomVolume::goToParentNode(GearDir& content, bool isShowDebug)
+bool B2GeomVolume::goToParentNode(GearDir& content)
 {
   string dirPath = content.getDirPath();
-  if (isShowDebug) printf("---\n");
-  if (isShowDebug) printf("%s\n", dirPath.c_str());
+  B2DEBUG(110, "---\n" << dirPath << "\n");
   dirPath.erase(dirPath.end() - 1);
   int iParentNodePos = dirPath.find_last_of("/");
   if (iParentNodePos > 0) {
     content.setDirPath(dirPath.substr(0, iParentNodePos + 1));
     dirPath = content.getDirPath();
-    if (isShowDebug) printf("%s\n", dirPath.c_str());
-    if (isShowDebug) printf("---\n");
+    B2DEBUG(110, dirPath << "\n---\n")
     return true;
   } else {
-    if (isShowDebug) printf("***\n");
     return false;
   }
 }
 
-Bool_t B2GeomVolume::init(GearDir& content, string subDir)
-{
-  GearDir myContent(content);
-  myContent.append(subDir);
-  initBasicParameters(myContent);
-  return true;
-}
-
-
 Bool_t B2GeomVolume::makeGeneric()
 {
+  //B2METHOD();
   tVolume = (TGeoVolume*) gROOT->FindObjectAny(name);
-  //printf("shape: %s\n", shape);
+  B2DEBUG(110, "shape:" << string(shape) << "\n");
   if (tVolume) return true;
   if (strncmp(shape, "Trd2", 4) == 0) {
     tVolume = gGeoManager->MakeTrd2(name, tMedium,
@@ -419,12 +299,70 @@ Bool_t B2GeomVolume::makeGeneric()
     tVolume = new TGeoVolumeAssembly(name);
     return true;
   } else {
+    B2WARNING("Could not build " << string(name) << "!");
     return false;
   }
 }
 
+
 Bool_t B2GeomVolume::make()
 {
+  //B2METHOD();
   return makeGeneric();
 }
 
+Bool_t B2GeomVolume::makeAndAddComponent(B2GeomVolume* component)
+{
+  //B2METHOD();
+  if (component != NULL) {
+    if (component->make()) {
+      tVolume->AddNode(component->getVol(), 1, component->getPosition());
+    } else {
+      B2WARNING("Could not build subcomponent of " << string(name));
+      return false;
+    }
+  }
+  return true;
+}
+
+//==========================================================================================
+B2GeomVXDVolume::B2GeomVXDVolume()
+{
+  iLayer = -1;
+  iLadder = -1;
+  iSensor = -1;
+}
+
+string B2GeomVXDVolume::searchAndReplaceInName(string inputString)
+{
+  char text[10];
+  // position in the string
+  unsigned int pos = string::npos;
+
+  pos = inputString.find("%Layer");
+  if (pos != string::npos) {
+    sprintf(text, "%i", iLayer);
+    inputString.replace(pos, 6, string(text));
+  }
+
+  pos = inputString.find("%Ladder");
+  if (pos != string::npos) {
+    sprintf(text, "%i", iLadder);
+    inputString.replace(pos, 7, string(text));
+  }
+
+  pos = inputString.find("%Sensor");
+  if (pos != string::npos) {
+    sprintf(text, "%i", iSensor);
+    inputString.replace(pos, 7, string(text));
+  }
+  return inputString;
+}
+
+void B2GeomVXDVolume::setId(Int_t iLay, Int_t iLad, Int_t iSen)
+{
+  iLayer = iLay;
+  iLadder = iLad;
+  iSensor = iSen;
+  sprintf(name, "%s", (searchAndReplaceInName(string(name))).c_str());
+}

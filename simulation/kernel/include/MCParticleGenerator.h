@@ -23,6 +23,7 @@ namespace Belle2 {
 
     /**
      * The MCParticleGenerator class generates the Geant4 primary particles using the MCParticle list from the DataStore.
+     * The generator assumes that each particle in the list has exactly one mother.
      */
     class MCParticleGenerator: public G4VPrimaryGenerator {
 

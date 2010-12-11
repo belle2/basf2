@@ -178,9 +178,17 @@ Bool_t B2GeomVolume::correctDensity()
   // correct density
   if ((fMass > 0) || (fDensityFactor > 0)) {
 
-    // get volume without the daughter volumes!
-    Double_t fVolume = tVolume->GetShape()->Capacity();
-    if (tVolume->GetNdaughters()) fVolume = fVolume - tVolume->Capacity();
+    // get volume of THIS node
+    Double_t fVolume = tVolume->Capacity();
+
+    // subtract the volume  of all daughter nodes
+    TObjArray* tDaughterNodeArray = tVolume->GetNodes();
+    if (tDaughterNodeArray != NULL) {
+      for (int iDaughter = 0; iDaughter < tDaughterNodeArray->GetEntriesFast(); iDaughter++) {
+        TGeoNode* tDaughterNode = (TGeoNode*) tDaughterNodeArray->At(iDaughter);
+        fVolume = fVolume - tDaughterNode->GetVolume()->Capacity();
+      }
+    }
 
     // calculate correct density
     Double_t fDensity = tVolume->GetMaterial()->GetDensity();

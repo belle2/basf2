@@ -98,7 +98,7 @@ Bool_t B2GeomPXDSensorSilicon::init(GearDir& content)
 
 Bool_t B2GeomPXDSensorSilicon::make()
 {
-  ////B2METHOD();
+  B2METHOD();
   if (!makeGeneric()) {
     B2FATAL("Cannot build silicon of PXD sensor");
     return false;

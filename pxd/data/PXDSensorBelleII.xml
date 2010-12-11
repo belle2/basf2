@@ -37,7 +37,7 @@
     </Switchers2>
     <Silicon>
     <Name>PXD_Layer_%Layer_Ladder_%Ladder_Sensor_%Sensor_Silicon</Name>
-      <Material>Silicon</Material>
+      <Material>PXD_Silicon</Material>
       <Color>597</Color>
       <Shape>Box</Shape>
       <Mass unit="g">0.300470975</Mass>
@@ -46,7 +46,7 @@
       <Length desc="The over all length of the sensor" unit="mm">67.975</Length>
       <WPosition unit="mm">-0.21</WPosition>
       <Active>
-        <Material>Silicon</Material>
+        <Material>PXD_Silicon</Material>
         <Name>SD_PXD_Layer_%Layer_Ladder_%Ladder_Sensor_%Sensor_Silicon_Active</Name>
         <Color>590</Color>
         <Shape>Box</Shape>
@@ -113,7 +113,7 @@
     </Switchers2>
     <Silicon>
     <Name>PXD_Layer_%Layer_Ladder_%Ladder_Sensor_%Sensor_Silicon</Name>
-      <Material>Silicon</Material>
+      <Material>PXD_Silicon</Material>
       <Color>597</Color>
       <Shape>Box</Shape>
       <Mass unit="g">0.328197975</Mass>
@@ -123,7 +123,7 @@
       <WPosition unit="mm">-0.21</WPosition>
       <Active>
          <Name>SD_PXD_Layer_%Layer_Ladder_%Ladder_Sensor_%Sensor_Silicon_Active</Name>
-        <Material>Silicon</Material>
+        <Material>PXD_Silicon</Material>
         <Color>590</Color>
         <Shape>Box</Shape>
          <Mass unit="g">0.134830546875</Mass>

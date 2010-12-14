@@ -8,8 +8,10 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef UNITCONVERTER_H_
-#define UNITCONVERTER_H_
+#ifndef UNIT_H_
+#define UNIT_H_
+
+#include <TMath.h>
 
 #include <string>
 #include <map>
@@ -18,15 +20,81 @@
 namespace Belle2 {
 
   /**
-   * The UnitConverter class.
+   * The Unit class.
    *
-   * This class provides methods to convert floating point numbers from a
-   * specified unit to the standard unit of the framework.
-   * It is designed as a singleton.
+   * This class provides a set of units for the framework. Use these to
+   * specify the unit of your value. In addition the class offers methods
+   * to convert floating point numbers from a specified unit to the standard
+   * unit of the framework.
+   *
+   * This class can either be used a singleton or by using its static methods.
    */
-  class UnitConverter {
+  class Unit {
 
   public:
+
+    // standard units
+    static double cm;   /**< Standard of [length] */
+    static double ns;   /**< Standard of [time] */
+    static double rad;  /**< Standard of [angle] */
+    static double GeV;  /**< Standard of [energy, momentum, mass] */
+    static double K;    /**< Standard of [temperature] */
+    static double T;    /**< Standard of [magnetic field] */
+    static double e;    /**< Standard of [electric charge] */
+    static double gcm3; /**< Standard of [density] */
+
+    // length units
+    static double km; /**< [kilometers] */
+    static double m;  /**< [meters] */
+    static double mm; /**< [millimeters] */
+    static double um; /**< [micrometers] */
+    static double nm; /**< [nanometers] */
+    static double fm; /**< [femtometers] */
+
+    // area units
+    static double m2;  /**< [square meters] */
+    static double cm2; /**< [square centimeters] */
+    static double mm2; /**< [square millimeters] */
+
+    static double b;  /**< [barn] */
+    static double mb; /**< [millibarn] */
+    static double ub; /**< [microbarn] */
+    static double nb; /**< [nanobarn] */
+    static double pb; /**< [picobarn] */
+    static double fb; /**< [femtobarn] */
+    static double ab; /**< [atobarn] */
+
+    // volume units
+    static double m3;  /**< [cubic meters] */
+    static double cm3; /**< [cubic centimeters] */
+    static double mm3; /**< [cubic millimeters] */
+
+    // time units
+    static double s;   /**< [second] */
+    static double ms;  /**< [millisecond] */
+    static double us;  /**< [microsecond] */
+    static double ps;  /**< [picosecond] */
+    static double fs;  /**< [femtosecond] */
+
+    // angle units
+    static double mrad; /**< [millirad] */
+    static double deg;  /**< degree to radians */
+
+    // energy units
+    static double eV;  /**< [electronvolt] */
+    static double keV; /**< [kiloelectronvolt] */
+    static double MeV; /**< [megaelectronvolt] */
+    static double TeV; /**< [megaelectronvolt] */
+
+    // density units
+    static double mgcm3; /**< [mg/cm^3] */
+    static double kgcm3; /**< [kg/cm^3] */
+    static double gmm3;  /**< [g/mm^3] */
+    static double mgmm3; /**< [mg/mm^3] */
+    static double kgmm3; /**< [kg/mm^3] */
+
+    //Various constants
+    static double speed_of_light; /**< [cm/ns] */
 
     /** Definition of the supported units. */
     enum EUnitTypes { c_UnitLength, /**< length unit, default [cm]. */
@@ -71,7 +139,7 @@ namespace Belle2 {
      *
      * @return A reference to an instance of this class.
      */
-    static UnitConverter& Instance();
+    static Unit& Instance();
 
 
     /**
@@ -82,7 +150,43 @@ namespace Belle2 {
      * @param unitString The string of the unit of the specified value.
      * @return The value converted to the specified unit.
      */
-    double convertValue(double value, EUnitTypes unitType, const std::string& unitString) const;
+    static double convertValue(double value, EUnitTypes unitType, const std::string& unitString);
+
+    /**
+     * Converts a length value to the standard framework length unit [cm].
+     *
+     * @param value The value which should be converted.
+     * @param unitString The string of the unit of the specified value.
+     * @return The value converted to the specified unit.
+     */
+    static double convertLength(double value, const std::string& unitString);
+
+    /**
+     * Converts an angle value to the standard framework angle unit [rad].
+     *
+     * @param value The value which should be converted.
+     * @param unitString The string of the unit of the specified value.
+     * @return The value converted to the specified unit.
+     */
+    static double convertAngle(double value, const std::string& unitString);
+
+    /**
+     * Converts an energy value to the standard framework energy unit [GeV].
+     *
+     * @param value The value which should be converted.
+     * @param unitString The string of the unit of the specified value.
+     * @return The value converted to the specified unit.
+     */
+    static double convertEnergy(double value, const std::string& unitString);
+
+    /**
+     * Converts a density value to the standard framework energy unit [g/cm3].
+     *
+     * @param value The value which should be converted.
+     * @param unitString The string of the unit of the specified value.
+     * @return The value converted to the specified unit.
+     */
+    static double convertDensity(double value, const std::string& unitString);
 
 
   protected:
@@ -99,42 +203,6 @@ namespace Belle2 {
     /** Fills the map which links the string representing of a density unit to the type if the unit. */
     void setDensityUnitMap();
 
-    /**
-     * Converts a length value to the standard framework length unit [cm].
-     *
-     * @param value The value which should be converted.
-     * @param unitString The string of the unit of the specified value.
-     * @return The value converted to the specified unit.
-     */
-    double convertLength(double value, const std::string& unitString) const;
-
-    /**
-     * Converts an angle value to the standard framework angle unit [rad].
-     *
-     * @param value The value which should be converted.
-     * @param unitString The string of the unit of the specified value.
-     * @return The value converted to the specified unit.
-     */
-    double convertAngle(double value, const std::string& unitString) const;
-
-    /**
-     * Converts an energy value to the standard framework energy unit [GeV].
-     *
-     * @param value The value which should be converted.
-     * @param unitString The string of the unit of the specified value.
-     * @return The value converted to the specified unit.
-     */
-    double convertEnergy(double value, const std::string& unitString) const;
-
-    /**
-     * Converts a density value to the standard framework energy unit [g/cm3].
-     *
-     * @param value The value which should be converted.
-     * @param unitString The string of the unit of the specified value.
-     * @return The value converted to the specified unit.
-     */
-    double convertDensity(double value, const std::string& unitString) const;
-
     std::map<std::string, int> m_lengthUnitMap;  /**< Maps a string representing a length unit to the unit type. */
     std::map<std::string, int> m_angleUnitMap;   /**< Maps a string representing an angle unit to the unit type. */
     std::map<std::string, int> m_energyUnitMap;  /**< Maps a string representing an energy unit to the unit type. */
@@ -146,29 +214,30 @@ namespace Belle2 {
     /**
      * The constructor is hidden to avoid that someone creates an instance of this class.
      */
-    UnitConverter();
+    Unit();
 
     /** Disable/Hide the copy constructor. */
-    UnitConverter(const UnitConverter&);
+    Unit(const Unit&);
 
     /** Disable/Hide the copy assignment operator. */
-    UnitConverter& operator=(const UnitConverter&);
+    Unit& operator=(const Unit&);
 
-    /** The UnitConverter destructor. */
-    ~UnitConverter();
+    /** The Unit destructor. */
+    ~Unit();
 
-    static UnitConverter* m_instance; /**< Pointer that saves the instance of this class. */
+    static Unit* m_instance; /**< Pointer that saves the instance of this class. */
 
     /** Destroyer class to delete the instance of the Gearbox class when the program terminates. */
     class SingletonDestroyer {
     public: ~SingletonDestroyer() {
-        if (UnitConverter::m_instance != NULL) delete UnitConverter::m_instance;
+        if (Unit::m_instance != NULL) delete Unit::m_instance;
       }
     };
     friend class SingletonDestroyer;
+
 
   };
 
 }
 
-#endif /* UNITCONVERTER_H_ */
+#endif /* UNIT_H_ */

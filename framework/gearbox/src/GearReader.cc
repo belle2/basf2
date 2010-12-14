@@ -11,10 +11,9 @@
 #include <framework/gearbox/GearReader.h>
 
 #include <framework/gearbox/MaterialProperty.h>
-#include <framework/gearbox/UnitConverter.h>
+#include <framework/gearbox/Unit.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
-#include <framework/datastore/Units.h>
 
 #include <TGeoManager.h>
 
@@ -279,7 +278,7 @@ MaterialPropertyList* GearReader::readMaterialProperties(GearDir& propertyConten
 
             //Use the property unit information to convert the energy value to the correct unit for Geant4
             //The conversion method returns the basf2 standard unit [GeV]. Geant4 takes MeV for material properties.
-            currEnergy = UnitConverter::Instance().convertValue(currEnergy, UnitConverter::c_UnitEnergy, unitName) / MeV;
+            currEnergy = Unit::convertValue(currEnergy, Unit::c_UnitEnergy, unitName) / Unit::MeV;
 
             valueContentIdx.convertPathToNode();
             double currValue = valueContentIdx.getParamNumValue();

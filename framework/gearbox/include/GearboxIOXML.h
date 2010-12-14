@@ -14,7 +14,7 @@
 #include <libxml/xpath.h>
 
 #include <framework/gearbox/GearboxIOAbs.h>
-#include <framework/gearbox/UnitConverter.h>
+#include <framework/gearbox/Unit.h>
 
 #include <string>
 #include <map>
@@ -307,7 +307,7 @@ namespace Belle2 {
      * @param xpath The XPath statement defining the requested node.
      * @param unitType The type of the unit (length, angle, energy, distance)
      */
-    double getDoubleWithUnit(const std::string& xpath, UnitConverter::EUnitTypes unitType) const
+    double getDoubleWithUnit(const std::string& xpath, Unit::EUnitTypes unitType) const
     throw(GearboxIOAbs::GearboxIONotConnectedError, GearboxIOAbs::GearboxPathNotValidError, GearboxIOAbs::GearboxPathEmptyResultError,
           GearboxIOAbs::GearboxPathResultNotValidError, GearboxIOAbs::GearboxStringNumConversionError);
 

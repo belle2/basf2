@@ -10,8 +10,6 @@
 
 #include <framework/gearbox/GearboxIOXML.h>
 
-#include <framework/datastore/Units.h>
-
 #include <cmath>
 #include <string>
 
@@ -175,7 +173,7 @@ throw(GearboxIOAbs::GearboxIONotConnectedError, GearboxIOAbs::GearboxPathNotVali
   if (m_enableParamCheck) {
     if (!isParamAvailable(path)) throw(GearboxParamNotExistsError() << path);
   }
-  return getDoubleWithUnit(path, UnitConverter::c_UnitLength);
+  return getDoubleWithUnit(path, Unit::c_UnitLength);
 }
 
 
@@ -187,7 +185,7 @@ throw(GearboxIOAbs::GearboxIONotConnectedError, GearboxIOAbs::GearboxPathNotVali
   if (m_enableParamCheck) {
     if (!isParamAvailable(path)) throw(GearboxParamNotExistsError() << path);
   }
-  return getDoubleWithUnit(path, UnitConverter::c_UnitAngle);
+  return getDoubleWithUnit(path, Unit::c_UnitAngle);
 }
 
 
@@ -199,7 +197,7 @@ throw(GearboxIOAbs::GearboxIONotConnectedError, GearboxIOAbs::GearboxPathNotVali
   if (m_enableParamCheck) {
     if (!isParamAvailable(path)) throw(GearboxParamNotExistsError() << path);
   }
-  return getDoubleWithUnit(path, UnitConverter::c_UnitEnergy);
+  return getDoubleWithUnit(path, Unit::c_UnitEnergy);
 }
 
 
@@ -211,7 +209,7 @@ throw(GearboxIOAbs::GearboxIONotConnectedError, GearboxIOAbs::GearboxPathNotVali
   if (m_enableParamCheck) {
     if (!isParamAvailable(path)) throw(GearboxParamNotExistsError() << path);
   }
-  return getDoubleWithUnit(path, UnitConverter::c_UnitDensity);
+  return getDoubleWithUnit(path, Unit::c_UnitDensity);
 }
 
 
@@ -303,7 +301,7 @@ xmlXPathObjectPtr GearboxIOXML::getNodeSet(xmlDocPtr document, xmlChar *xpath) c
 }
 
 
-double GearboxIOXML::getDoubleWithUnit(const string& xpath, UnitConverter::EUnitTypes unitType) const
+double GearboxIOXML::getDoubleWithUnit(const string& xpath, Unit::EUnitTypes unitType) const
 throw(GearboxIOAbs::GearboxIONotConnectedError, GearboxIOAbs::GearboxPathNotValidError, GearboxIOAbs::GearboxPathEmptyResultError,
       GearboxIOAbs::GearboxPathResultNotValidError, GearboxIOAbs::GearboxStringNumConversionError)
 {
@@ -348,7 +346,7 @@ throw(GearboxIOAbs::GearboxIONotConnectedError, GearboxIOAbs::GearboxPathNotVali
 
   if (unitFound) {
     string unitString = (char*)attribute->children->content;
-    value = UnitConverter::Instance().convertValue(value, unitType, unitString);
+    value = Unit::convertValue(value, unitType, unitString);
   }
 
   xmlXPathFreeObject(result);

@@ -36,7 +36,7 @@
 
 #include "tracking/modules/trasan/T3DLine.h"
 #include "tracking/modules/trasan/T3DLineFitter.h"
-#include "trigger/cdc/CDCTriggerWire.h"
+#include "trg/cdc/Wire.h"
 #include "tracking/modules/trasan/TTrack.h"
 
 namespace Belle {
@@ -236,7 +236,7 @@ const CLHEP::HepSymMatrix& T3DLine::Ea(const CLHEP::HepSymMatrix& tEa){
 
 int T3DLine::approach(TLink& l,bool doSagCorrection) const{
 
-  const Belle2::CDCTriggerWire& w=*l.wire();
+  const Belle2::TRGCDCWire& w=*l.wire();
   HepGeom::Point3D<double> xw = w.xyPosition();
   HepGeom::Point3D<double> wireBackwardPosition = w.backwardPosition();
   HepGeom::Vector3D<double> v = w.direction();

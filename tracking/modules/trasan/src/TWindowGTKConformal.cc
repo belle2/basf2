@@ -17,7 +17,7 @@
 #ifdef TRASAN_WINDOW_GTK
 
 #include <iostream>
-#include "trigger/cdc/CDCTriggerWireHit.h"
+#include "trg/cdc/WireHit.h"
 
 #include "tracking/modules/trasan/TWindowGTKConformal.h"
 #include "tracking/modules/trasan/Trasan.h"
@@ -58,7 +58,7 @@ TWindowGTKConformal::on_positionReset(void) {
 }
 
 void
-TWindowGTKConformal::append(const CAList<Belle2::CDCTriggerWireHit> & list, Gdk::Color c) {
+TWindowGTKConformal::append(const CAList<Belle2::TRGCDCWireHit> & list, Gdk::Color c) {
     _w.append(list, c);
 }
 

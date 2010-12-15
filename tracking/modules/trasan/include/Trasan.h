@@ -164,7 +164,7 @@
 // Trasan 1.17 release : cathode codes updated by T.Matsumoto, FPE error fixed by J.Tanaka
 //
 // Revision 1.26  1998/12/04 15:11:08  yiwasaki
-// CDCTrigger creation timing changed, zero-division protection for TTrackMC
+// TRGCDC creation timing changed, zero-division protection for TTrackMC
 //
 // Revision 1.25  1998/11/27 08:15:53  yiwasaki
 // Trasan 1.1 RC 3 release : salvaging improved
@@ -221,10 +221,10 @@
 // minor changes
 //
 // Revision 1.5  1998/04/14 01:05:54  yiwasaki
-// CDCTriggerWireHitMC added
+// TRGCDCWireHitMC added
 //
 // Revision 1.4  1998/04/10 09:38:21  yiwasaki
-// TTrack added, CDCTrigger becomes Singleton
+// TTrack added, TRGCDC becomes Singleton
 //
 // Revision 1.3  1998/04/10 00:51:16  yiwasaki
 // TCircle, TConformalFinder, TConformalLink, TFinderBase, THistogram, TLink, TTrackBase classes added
@@ -256,14 +256,14 @@
 #endif
 
 namespace Belle2 {
-    class CDCTrigger;
-    class CDCTriggerWireHit;
+    class TRGCDC;
+    class TRGCDCWireHit;
 }
 
 namespace Belle {
 
-class CDCTriggerCat;
-class CDCTriggerClustFinder;
+class TRGCDCCat;
+class TRGCDCClustFinder;
 class TFinderBase;
 class TConformalFinder0;
 class TCurlFinder;
@@ -326,7 +326,7 @@ class Trasan : public Belle2::Module, TUpdater {
     const TFinderBase * curlFinder(void) const;
 
     /// returns a pointer to the cluster finder.
-    const CDCTriggerClustFinder * clustFinder(void) const;
+    const TRGCDCClustFinder * clustFinder(void) const;
 
     /// returns a pointer to TTrackManager.
     const TTrackManager & trackManager(void) const;
@@ -335,10 +335,10 @@ class Trasan : public Belle2::Module, TUpdater {
     const TFinderBase * pmCurlFinder(void) const;
 
   public: // to access information
-    /// clears all CDCTrigger information.
+    /// clears all TRGCDC information.
     void clear(bool termination=false);
 
-    /// clears CDCTrigger information.
+    /// clears TRGCDC information.
     void fastClear(void);
 
     /// returns a list of reconstructed tracks.
@@ -352,23 +352,23 @@ class Trasan : public Belle2::Module, TUpdater {
     void mcInformation(void);
 
     /// returns unused hits.
-    void selectUnusedHits(const CAList<Belle2::CDCTriggerWireHit> & hits,
-			  CAList<Belle2::CDCTriggerWireHit> & unusedHits) const;
+    void selectUnusedHits(const CAList<Belle2::TRGCDCWireHit> & hits,
+			  CAList<Belle2::TRGCDCWireHit> & unusedHits) const;
 
     /// Cathode
     void cathode(float);
 
     /// standard main loop.
-    void main0(const CAList<Belle2::CDCTriggerWireHit> & axialHits,
-	       const CAList<Belle2::CDCTriggerWireHit> & stereoHits,
-	       const CAList<Belle2::CDCTriggerWireHit> & allHits,
+    void main0(const CAList<Belle2::TRGCDCWireHit> & axialHits,
+	       const CAList<Belle2::TRGCDCWireHit> & stereoHits,
+	       const CAList<Belle2::TRGCDCWireHit> & allHits,
 	       AList<TTrack> & tracks,
 	       AList<TTrack> & tracks2D);
 
     /// Hough + Conf + Curl (Conf doesn't use used hits)
-    void main1(const CAList<Belle2::CDCTriggerWireHit> & axialHits,
-	       const CAList<Belle2::CDCTriggerWireHit> & stereoHits,
-	       const CAList<Belle2::CDCTriggerWireHit> & allHits,
+    void main1(const CAList<Belle2::TRGCDCWireHit> & axialHits,
+	       const CAList<Belle2::TRGCDCWireHit> & stereoHits,
+	       const CAList<Belle2::TRGCDCWireHit> & allHits,
 	       AList<TTrack> & tracks,
 	       AList<TTrack> & tracks2D);
 
@@ -533,12 +533,12 @@ class Trasan : public Belle2::Module, TUpdater {
 
   private:
     static Trasan * _trasan;
-    Belle2::CDCTrigger * _cdc;
-    CDCTriggerCat * _cdccat;
+    Belle2::TRGCDC * _cdc;
+    TRGCDCCat * _cdccat;
     TFinderBase * _perfectFinder;
     TFinderBase * _confFinder;
     TCurlFinder * _curlFinder;
-//cnv    CDCTriggerClustFinder * _clustFinder;
+//cnv    TRGCDCClustFinder * _clustFinder;
     TTrackManager _trackManager;
 
 //cnv    TPMCurlFinder * _pmCurlFinder;
@@ -598,7 +598,7 @@ Trasan::tracks(void) const {
 }
 
 /* inline */
-/* const CDCTriggerClustFinder * */
+/* const TRGCDCClustFinder * */
 /* Trasan::clustFinder(void) const { */
 /*     return _clustFinder; */
 /* } */

@@ -26,7 +26,7 @@ namespace Belle {
 
 class TPoint2D;
 class THoughPlane;
-// class CDCTriggerWireHit;
+// class TRGCDCWireHit;
 // class TLink;
 // class TTrackBase;
 // class TSegment;

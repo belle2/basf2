@@ -77,7 +77,7 @@ class TTrack;
 class Range;
 template <class T> class CAList;
 
-/// A class to relate CDCTriggerWireHit and TTrack objects.
+/// A class to relate TRGCDCWireHit and TTrack objects.
 class TSegment0 : public TTrackBase {
 
   public:

@@ -80,8 +80,8 @@ class TPerfectFinder : public TFinderBase {
     void init(void);
 
     /// finds tracks.
-    int doit(const CAList<Belle2::CDCTriggerWireHit> & axialHits,
-	     const CAList<Belle2::CDCTriggerWireHit> & stereoHits,
+    int doit(const CAList<Belle2::TRGCDCWireHit> & axialHits,
+	     const CAList<Belle2::TRGCDCWireHit> & stereoHits,
 	     AList<TTrack> & tracks,
 	     AList<TTrack> & tracks2D);
 

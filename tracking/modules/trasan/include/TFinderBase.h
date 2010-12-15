@@ -50,7 +50,7 @@
 // Trasan 1 alpha 1 release
 //
 // Revision 1.2  1998/04/10 09:38:19  yiwasaki
-// TTrack added, CDCTrigger becomes Singleton
+// TTrack added, TRGCDC becomes Singleton
 //
 // Revision 1.1  1998/04/10 00:51:14  yiwasaki
 // TCircle, TConformalFinder, TConformalLink, TFinderBase, THistogram, TLink, TTrackBase classes added
@@ -72,7 +72,7 @@
 #include "tracking/modules/trasan/ConstAList.h"
 
 namespace Belle2 {
-    class CDCTriggerWireHit;
+    class TRGCDCWireHit;
 }
 
 namespace Belle {
@@ -127,8 +127,8 @@ class TFinderBase {
     virtual bool doSalvage(bool);
 
     /// finds tracks. 'hits' are used to reconstruct. 'tracks' can be used for both inputs and outputs. Return value = (0, +, -) means (success, warning, fatal error).
-    virtual int doit(const CAList<Belle2::CDCTriggerWireHit> & axialHits,
-		     const CAList<Belle2::CDCTriggerWireHit> & stereoHits,
+    virtual int doit(const CAList<Belle2::TRGCDCWireHit> & axialHits,
+		     const CAList<Belle2::TRGCDCWireHit> & stereoHits,
 		     AList<TTrack> & tracks3D,
 		     AList<TTrack> & tracks2D) = 0;
     

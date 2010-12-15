@@ -96,7 +96,7 @@ namespace Belle {
 #endif
 
 typedef HepGeom::Vector3D<double>  Vector3D;
-class CDCTriggerWireHit;
+class TRGCDCWireHit;
 class TTrackBase;
 class TTrack;
 class TLine;
@@ -129,7 +129,7 @@ class TWindow {
     void clear(void);
 
     /// appends/remove objects.
-    void append(const AList<CDCTriggerWireHit> &, leda_color = leda_black);
+    void append(const AList<TRGCDCWireHit> &, leda_color = leda_black);
     void append(const TTrackBase &,
 		leda_color = leda_black,
 		bool toBeSelfObject = false);

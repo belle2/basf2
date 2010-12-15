@@ -98,7 +98,7 @@
 // Trasan 1 beta 1 release
 //
 // Revision 1.10  1998/06/03 17:16:54  yiwasaki
-// const added to CDCTrigger::hits,axialHits,stereoHits,hitsMC, symbols WireHitNeghborHit* added in CDCTriggerWireHit, TCluster::innerWidth,outerWidth,innerMostLayer,outerMostLayer,type,split,split2,widht,outer,updateType added, TLink::conf added, TTrack::appendStereo3,refineStereo2,aa,bb,Zchisqr added
+// const added to TRGCDC::hits,axialHits,stereoHits,hitsMC, symbols WireHitNeghborHit* added in TRGCDCWireHit, TCluster::innerWidth,outerWidth,innerMostLayer,outerMostLayer,type,split,split2,widht,outer,updateType added, TLink::conf added, TTrack::appendStereo3,refineStereo2,aa,bb,Zchisqr added
 //
 // Revision 1.9  1998/05/26 05:09:16  yiwasaki
 // cvs repair
@@ -119,10 +119,10 @@
 // minor changes
 //
 // Revision 1.3  1998/04/14 01:05:53  yiwasaki
-// CDCTriggerWireHitMC added
+// TRGCDCWireHitMC added
 //
 // Revision 1.2  1998/04/10 09:38:19  yiwasaki
-// TTrack added, CDCTrigger becomes Singleton
+// TTrack added, TRGCDC becomes Singleton
 //
 // Revision 1.1  1998/04/10 00:51:14  yiwasaki
 // TCircle, TConformalFinder, TConformalLink, TFinderBase, THistogram, TLink, TTrackBase classes added
@@ -142,7 +142,7 @@
 #include "tracking/modules/trasan/TBuilder0.h"
 
 namespace Belle2 {
-    class CDCTriggerWireHit;
+    class TRGCDCWireHit;
 }
 
 namespace Belle {
@@ -197,19 +197,19 @@ class TConformalFinder0 : public TFinderBase {
     void init(void);
 
     /// finds tracks.
-    int doit(const CAList<Belle2::CDCTriggerWireHit> & axialHits,
-	     const CAList<Belle2::CDCTriggerWireHit> & stereoHits,
+    int doit(const CAList<Belle2::TRGCDCWireHit> & axialHits,
+	     const CAList<Belle2::TRGCDCWireHit> & stereoHits,
 	     AList<TTrack> & tracks,
 	     AList<TTrack> & tracks3D);
 
     /// transforms hits into a conformal plane. 'center' is a center of the transformation. Z position of 'center' must be zero. Transformed positions are newly created, and are stored in 'links'. 
     static void conformalTransformation(const HepGeom::Point3D<double>  & center,
-					const CAList<Belle2::CDCTriggerWireHit> & hits,
+					const CAList<Belle2::TRGCDCWireHit> & hits,
 					AList<TLink> & links);
 
     /// transforms hits into a conformal plane. 'center' is a center of the transformation. Z position of 'center' must be zero. Transformed positions are newly created, and are stored in 'links'. 
     static void conformalTransformationRphi(const HepGeom::Point3D<double>  & center,
-					    const CAList<Belle2::CDCTriggerWireHit> & hits,
+					    const CAList<Belle2::TRGCDCWireHit> & hits,
 					    AList<TLink> & links);
     
     /// finds segments.

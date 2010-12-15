@@ -150,8 +150,8 @@ struct reccdc_wirhit {
   float m_adc;
 };
 #endif
-#ifndef PANTHER_DACDCTrigger_MCWIRHIT_
-#define PANTHER_DACDCTrigger_MCWIRHIT_
+#ifndef PANTHER_DATRGCDC_MCWIRHIT_
+#define PANTHER_DATRGCDC_MCWIRHIT_
 struct datcdc_mcwirhit {
   int m_panther_dummy_;
   int m_ID;
@@ -302,7 +302,7 @@ void T3DLineFitter::drift(const T3DLine& t,const TLink& l,
 			  float t0Offset,
 			  double& distance,double& err) const{
 
-  const Belle2::CDCTriggerWireHit& h = *l.hit();
+  const Belle2::TRGCDCWireHit& h = *l.hit();
   const Point3D& onTrack = l.positionOnTrack();
   const Point3D& onWire = l.positionOnWire();
   unsigned leftRight = WireHitRight;
@@ -411,7 +411,7 @@ int T3DLineFitter::fit(TTrackBase& tb, float t0Offset) const{
     //...Loop with hits...
     unsigned i=0;
     while(TLink* l = cores[i++]){
-      const Belle2::CDCTriggerWireHit& h = *l->hit();
+      const Belle2::TRGCDCWireHit& h = *l->hit();
 
       //...Cal. closest points...
       t.approach(*l,_sag);
@@ -530,7 +530,7 @@ int T3DLineFitter::dxda(const TLink& l,const T3DLine& t,
   //   onTrack = x0 + t * k
   //   onWire  = w0 + s * wireDirection
   //...Setup...
-  const Belle2::CDCTriggerWire& w = *l.wire();
+  const Belle2::TRGCDCWire& w = *l.wire();
   const HepGeom::Vector3D<double> k = t.k();
   const double cosPhi0 = t.cosPhi0();
   const double sinPhi0 = t.sinPhi0();

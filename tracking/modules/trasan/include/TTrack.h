@@ -230,7 +230,7 @@
 // Trasan 1 alpha 8 release, Stereo append bug fixed, TCurlFinder added
 //
 // Revision 1.8  1998/06/03 17:16:56  yiwasaki
-// const added to CDCTrigger::hits,axialHits,stereoHits,hitsMC, symbols WireHitNeghborHit* added in CDCTriggerWireHit, TCluster::innerWidth,outerWidth,innerMostLayer,outerMostLayer,type,split,split2,widht,outer,updateType added, TLink::conf added, TTrack::appendStereo3,refineStereo2,aa,bb,Zchisqr added
+// const added to TRGCDC::hits,axialHits,stereoHits,hitsMC, symbols WireHitNeghborHit* added in TRGCDCWireHit, TCluster::innerWidth,outerWidth,innerMostLayer,outerMostLayer,type,split,split2,widht,outer,updateType added, TLink::conf added, TTrack::appendStereo3,refineStereo2,aa,bb,Zchisqr added
 //
 // Revision 1.7  1998/05/26 05:09:18  yiwasaki
 // cvs repair
@@ -239,7 +239,7 @@
 // Trasan 1 alpha 5 release, pivot is moved to the first hit
 //
 // Revision 1.5  1998/05/11 10:16:58  yiwasaki
-// TTrack::assign -> TTrack::assert, WireHitUsedMask is set in CDCTriggerWireHit
+// TTrack::assign -> TTrack::assert, WireHitUsedMask is set in TRGCDCWireHit
 //
 // Revision 1.4  1998/05/08 09:47:07  yiwasaki
 // Trasan 1 alpha 2 relase, stereo recon. added, off-vtx recon. added
@@ -251,7 +251,7 @@
 // minor changes
 //
 // Revision 1.1  1998/04/10 09:38:21  yiwasaki
-// TTrack added, CDCTrigger becomes Singleton
+// TTrack added, TRGCDC becomes Singleton
 //
 // Revision 1.1  1998/04/10 00:51:13  yiwasaki
 // TTrack, TConformalFinder, TConformalLink, TFinderBase, THistogram, TLink, TTrackBase classes added
@@ -325,7 +325,7 @@
 #include "tracking/modules/trasan/TBuilder0.h"
 #include "tracking/modules/trasan/TBuilderCosmic.h"
 #include "tracking/modules/trasan/TBuilderCurl.h"
-//cnv #include "trigger/cdc/CDCTriggerCatHit.h"
+//cnv #include "trg/cdc/CatHit.h"
 #include "tracking/modules/trasan/TPoint2D.h"
 #include "tracking/modules/trasan/TSvdHit.h"
 
@@ -504,7 +504,7 @@ class TTrack : public TTrackBase {
 
   public:// temporary added
     /// returns a cathode hit list.
-//cnv    const AList<CDCTriggerCatHit> & catHits(void) const;
+//cnv    const AList<TRGCDCCatHit> & catHits(void) const;
 
     /// calculates an intersection of this track and a cylinder.
     int HelCyl(double rhole,
@@ -656,7 +656,7 @@ class TTrack : public TTrackBase {
     static TPoint2D _points1[100];
 
   private:// temporary added
-//cnv    AList<CDCTriggerCatHit> _catHits;
+//cnv    AList<TRGCDCCatHit> _catHits;
 
     friend class TTrackManager;
     friend class Trasan;
@@ -732,7 +732,7 @@ TTrack::charge(double a) {
 }
 
 //cnv inline
-// const AList<CDCTriggerCatHit> &
+// const AList<TRGCDCCatHit> &
 // TTrack::catHits(void) const {
 //     return _catHits;
 // }

@@ -131,8 +131,8 @@ struct reccdc_wirhit {
   float m_adc;
 };
 #endif
-#ifndef PANTHER_DACDCTrigger_MCWIRHIT_
-#define PANTHER_DACDCTrigger_MCWIRHIT_
+#ifndef PANTHER_DATRGCDC_MCWIRHIT_
+#define PANTHER_DATRGCDC_MCWIRHIT_
 struct datcdc_mcwirhit {
   int m_panther_dummy_;
   int m_ID;
@@ -401,7 +401,7 @@ int TRungeFitter::fit(TTrackBase& tb, float t0Offset) const{
     //...Loop with hits...
     i=0;
     while(TLink* l = cores[i++]){
-      const Belle2::CDCTriggerWireHit& h = *l->hit();
+      const Belle2::TRGCDCWireHit& h = *l->hit();
 
       //...Cal. closest points...
       if(t.approach(*l,tof,p,_sag)<0){

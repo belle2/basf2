@@ -385,16 +385,16 @@
 // Trasan 1.53a release : cathode updates by T.Matsumoto, minor change of Conformal finder
 //
 // Revision 1.104  1999/07/06 10:41:11  yiwasaki
-// Trasan 1.52a release : CDCTrigger bug fix, associated hits output
+// Trasan 1.52a release : TRGCDC bug fix, associated hits output
 //
 // Revision 1.103  1999/07/01 08:15:24  yiwasaki
-// Trasan 1.51a release : builder bug fix, CDCTrigger bug fix again, T0 determination has more parameters
+// Trasan 1.51a release : builder bug fix, TRGCDC bug fix again, T0 determination has more parameters
 //
 // Revision 1.102  1999/06/30 06:59:31  yiwasaki
-// Trasan 1.50a release : CDCTrigger::updateMC bug fix
+// Trasan 1.50a release : TRGCDC::updateMC bug fix
 //
 // Revision 1.101  1999/06/29 05:14:40  yiwasaki
-// Trasan 1.49a release : minor change : Support for invalid hits in CDCTrigger
+// Trasan 1.49a release : minor change : Support for invalid hits in TRGCDC
 //
 // Revision 1.100  1999/06/29 00:03:02  yiwasaki
 // Trasan 1.48a release : TFastFinder added
@@ -412,7 +412,7 @@
 // Trasan 1.44 release : new THelixFitter
 //
 // Revision 1.95  1999/06/15 06:33:42  yiwasaki
-// Trasan 1.43 release : minor changes in CDCTriggerClust and TBuilder
+// Trasan 1.43 release : minor changes in TRGCDCClust and TBuilder
 //
 // Revision 1.94  1999/06/14 12:40:22  yiwasaki
 // Trasan 1.42 release : bug in findCloseHits fixed, sakura 1.06
@@ -493,7 +493,7 @@
 // Trasan 1.20 release : Fitter in TBuilder is modified
 //
 // Revision 1.68  1999/03/03 09:14:52  yiwasaki
-// CDCTriggerWireHit::WireHitValid -> WireHitFindingValid, WireHitFittingValid flag is checked in THelixFitter::fit
+// TRGCDCWireHit::WireHitValid -> WireHitFindingValid, WireHitFittingValid flag is checked in THelixFitter::fit
 //
 // Revision 1.67  1999/02/21 13:08:55  yiwasaki
 // Trasan 1.18 : Cosmic builder loose cut
@@ -523,7 +523,7 @@
 // cathode updates from S.Suzuki
 //
 // Revision 1.58  1998/12/04 15:11:04  yiwasaki
-// CDCTrigger creation timing changed, zero-division protection for TTrackMC
+// TRGCDC creation timing changed, zero-division protection for TTrackMC
 //
 // Revision 1.57  1998/11/27 08:15:39  yiwasaki
 // Trasan 1.1 RC 3 release : salvaging improved
@@ -538,7 +538,7 @@
 // Trasan 1.1 beta 9 release : more protections for negative sqrt and zero division
 //
 // Revision 1.53  1998/11/10 09:09:14  yiwasaki
-// Trasan 1.1 beta 8 release : negative sqrt fixed, curl finder updated by j.tanaka, CDCTrigger classes modified by y.iwasaki
+// Trasan 1.1 beta 8 release : negative sqrt fixed, curl finder updated by j.tanaka, TRGCDC classes modified by y.iwasaki
 //
 // Revision 1.52  1998/10/13 04:04:48  yiwasaki
 // Trasan 1.1 beta 7 release : memory leak fixed by J.Tanaka, TCurlFinderParameters.h added by J.Tanaka
@@ -637,7 +637,7 @@
 // Trasan 1 alpha 8 release, Stereo append bug fixed, TCurlFinder added
 //
 // Revision 1.17  1998/06/03 17:17:40  yiwasaki
-// const added to CDCTrigger::hits,axialHits,stereoHits,hitsMC, symbols WireHitNeghborHit* added in CDCTriggerWireHit, TCluster::innerWidth,outerWidth,innerMostLayer,outerMostLayer,type,split,split2,widht,outer,updateType added, TLink::conf added, TTrack::appendStereo3,refineStereo2,aa,bb,Zchisqr added
+// const added to TRGCDC::hits,axialHits,stereoHits,hitsMC, symbols WireHitNeghborHit* added in TRGCDCWireHit, TCluster::innerWidth,outerWidth,innerMostLayer,outerMostLayer,type,split,split2,widht,outer,updateType added, TLink::conf added, TTrack::appendStereo3,refineStereo2,aa,bb,Zchisqr added
 //
 // Revision 1.16  1998/05/26 05:10:19  yiwasaki
 // cvs repair
@@ -670,7 +670,7 @@
 // minor changes
 //
 // Revision 1.6  1998/04/10 09:36:28  yiwasaki
-// TTrack added, CDCTrigger becomes Singleton
+// TTrack added, TRGCDC becomes Singleton
 //
 // Revision 1.5  1998/04/10 00:50:17  yiwasaki
 // TCircle, TConformalFinder, TConformalLink, TFinderBase, THistogram, TLink, TTrackBase classes added
@@ -688,12 +688,12 @@
 #include "tracking/modules/trasan/Strings.h"
 #include "tracking/modules/trasan/THelix.h"
 #include "tracking/modules/trasan/Trasan.h"
-#include "trigger/cdc/CDCTrigger.h"
-//cnv #include "trigger/cdc/CDCTriggerCat.h"
-//cnv #include "trigger/cdc/CDCTriggerClustFinder.h"
-#include "trigger/cdc/CDCTriggerWire.h"
-#include "trigger/cdc/CDCTriggerWireHit.h"
-#include "trigger/cdc/CDCTriggerTrackMC.h"
+#include "trg/cdc/TRGCDC.h"
+//cnv #include "trg/cdc/Cat.h"
+//cnv #include "trg/cdc/ClustFinder.h"
+#include "trg/cdc/Wire.h"
+#include "trg/cdc/WireHit.h"
+#include "trg/cdc/TrackMC.h"
 #include "tracking/modules/trasan/TPerfectFinder.h"
 #include "tracking/modules/trasan/TConformalFinder0.h"
 #include "tracking/modules/trasan/TConformalFinder.h"
@@ -802,8 +802,8 @@ struct reccdc_wirhit {
   float m_adc;
 };
 #endif
-#ifndef PANTHER_DACDCTrigger_MCWIRHIT_
-#define PANTHER_DACDCTrigger_MCWIRHIT_
+#ifndef PANTHER_DATRGCDC_MCWIRHIT_
+#define PANTHER_DATRGCDC_MCWIRHIT_
 struct datcdc_mcwirhit {
   int m_panther_dummy_;
   int m_ID;
@@ -1119,9 +1119,9 @@ Trasan::initialize() {
     std::cout << "Trasan ... initializing" << std::endl;
 #endif
 
-    //...Create CDCTrigger...
+    //...Create TRGCDC...
     _cdcVersion = "cdc2_test";
-    _cdc = Belle2::CDCTrigger::getCDCTrigger(_cdcVersion);
+    _cdc = Belle2::TRGCDC::getTRGCDC(_cdcVersion);
     _cdc->debugLevel(b_debugLevel);
 #if defined(TRASAN_DEBUG)
 //  _cdc->dump("geometry superLayers layers wires detail");
@@ -1269,7 +1269,7 @@ Trasan::initialize() {
 
     //...Create cathode cluster finder...
 //cnv     if (_cdccat) {
-// // 	if (! _clustFinder) _clustFinder = new CDCTriggerClustFinder(_cdccat);
+// // 	if (! _clustFinder) _clustFinder = new TRGCDCClustFinder(_cdccat);
 // // 	_clustFinder->debugLevel(b_debugLevel);
 //     }
 
@@ -1406,7 +1406,7 @@ trasan_start:
 	      << ",#TTracksMax=" << TTrack::nTTracksMax() << std::endl;
 #endif
 
-    //...Update CDCTrigger...
+    //...Update TRGCDC...
     _cdc->update(b_doMCAnalysis);
 ///    _cdc->dump("detail hits");
 //cnv    if (b_doClustFinder && _cdccat) _cdccat->update();
@@ -1414,19 +1414,19 @@ trasan_start:
     //...Get lists of hits...
     unsigned mask = 0;
     if (! b_useAllHits) mask = WireHitFindingValid;
-//  const AList<CDCTriggerWireHit> & axialHits = _cdc->axialHits(mask);
-//  const AList<CDCTriggerWireHit> & stereoHits = _cdc->stereoHits(mask);
-//  const AList<CDCTriggerWireHit> & allHits = _cdc->hits(mask);
-    CAList<Belle2::CDCTriggerWireHit> axialHits;
-    CAList<Belle2::CDCTriggerWireHit> stereoHits;
-    CAList<Belle2::CDCTriggerWireHit> allHits;
-    const std::vector<const Belle2::CDCTriggerWireHit *> hits = _cdc->hits();
+//  const AList<TRGCDCWireHit> & axialHits = _cdc->axialHits(mask);
+//  const AList<TRGCDCWireHit> & stereoHits = _cdc->stereoHits(mask);
+//  const AList<TRGCDCWireHit> & allHits = _cdc->hits(mask);
+    CAList<Belle2::TRGCDCWireHit> axialHits;
+    CAList<Belle2::TRGCDCWireHit> stereoHits;
+    CAList<Belle2::TRGCDCWireHit> allHits;
+    const std::vector<const Belle2::TRGCDCWireHit *> hits = _cdc->hits();
     for (unsigned i = 0; i < hits.size(); i++) {
 	allHits.append(hits[i]);
     }
-    allHits.sort(Belle2::CDCTriggerWireHit::sortByWireId);
+    allHits.sort(Belle2::TRGCDCWireHit::sortByWireId);
     for (unsigned i = 0; i < allHits.length(); i++) {
-	const Belle2::CDCTriggerWireHit * hit = allHits[i];
+	const Belle2::TRGCDCWireHit * hit = allHits[i];
 	if (hit->wire().axial())
 	    axialHits.append(hit);
 	else
@@ -1568,7 +1568,7 @@ Trasan::mcInformation(void) {
 //  const AList<TTrack> & allTracks = _trackManager.allTracks();
     const AList<TTrack> & allTracks = _trackManager.tracksFinal();
 
-    unsigned nHep = Belle2::CDCTriggerTrackMC::list().size();
+    unsigned nHep = Belle2::TRGCDCTrackMC::list().size();
     unsigned nTrk = allTracks.length();
     unsigned * N;
     if (NULL == (N = (unsigned *) malloc(nHep * sizeof(unsigned)))) {
@@ -1613,10 +1613,10 @@ Trasan::mcInformation(void) {
 
     //...Debug...
     if (b_debugLevel) {
-	std::cout << "Belle2::CDCTriggerTrackMC list ..." << std::endl;
+	std::cout << "Belle2::TRGCDCTrackMC list ..." << std::endl;
 	std::cout << "   id:ptype:mother:p:v" << std::endl;
 	for (unsigned i = 0; i < nHep; i++)
-	    (Belle2::CDCTriggerTrackMC::list())[i]->dump("", "    ");
+	    (Belle2::TRGCDCTrackMC::list())[i]->dump("", "    ");
 	std::cout << "TTrackMC list ..." << std::endl;
 	for (unsigned i = 0; i < nTrk; i++)
 	    allTracks[i]->_mc->dump("", "    ");
@@ -1649,10 +1649,10 @@ Trasan::cathode(float window) {
 // //         while (TTrack * t = tracks[i0++]){
 
 // //           unsigned i1 = 0;
-// //           while(CDCTriggerCatHit *cathit = t->catHits()[i1++]){
+// //           while(TRGCDCCatHit *cathit = t->catHits()[i1++]){
 
 // //             unsigned i2 = 0;
-// //             while(CDCTriggerClust *clust = cathit->candclust()[i2++]){
+// //             while(TRGCDCClust *clust = cathit->candclust()[i2++]){
 // // 		if( clust->stat() == 1 ){
 // //               clust->zcalc( atan(t->helix().tanl()));
 // //               clust->esterz( atan(t->helix().tanl()));
@@ -2079,7 +2079,7 @@ Trasan::banner(void) const {
     std::cout << " 1.1 RC 1  : 12-Nov-1998 : Y.Iwasaki : salvaging installed\n";
     std::cout << " 1.1 RC 2  : 19-Nov-1998 : Y.Iwasaki : salvaging improved\n";
     std::cout << " 1.1 RC 3  : 27-Nov-1998 : Y.Iwasaki : salvaging improved\n";
-    std::cout << " 1.1 RC 4  : 04-Dec-1998 : Y.Iwasaki : CDCTrigger\n";
+    std::cout << " 1.1 RC 4  : 04-Dec-1998 : Y.Iwasaki : TRGCDC\n";
     std::cout << " 1.1 : 26-Dec-1998 : J.Suzuki, S.Suzuki : stereo&cathode mod\n";
     std::cout << " 1.11: 11-Jan-1999 : Y.Iwasaki : fitter classes added\n";
     std::cout << " 1.12: 19-Jan-1999 : Y.Iwasaki : movePivot problem avoided\n";
@@ -2121,12 +2121,12 @@ Trasan::banner(void) const {
     std::cout << " 1.45 : 17-Jun-1999 : Y.Iwasaki : t0 determined by 2D fit\n";
     std::cout << " 1.46 : 25-Jun-1999 : Y.Iwasaki : test version\n";
     std::cout << " 1.46a: 25-Jun-1999 : Y.Iwasaki : test version upto 2D\n";
-    std::cout << " 1.47a: 25-Jun-1999 : Y.Iwasaki : CDCTrigger reads valid hits only\n";
+    std::cout << " 1.47a: 25-Jun-1999 : Y.Iwasaki : TRGCDC reads valid hits only\n";
     std::cout << " 1.48a: 25-Jun-1999 : Y.Iwasaki : tighter hit selection\n";
-    std::cout << " 1.49a: 29-Jun-1999 : Y.Iwasaki : CDCTrigger for invalid hits\n";
-    std::cout << " 1.50a: 30-Jun-1999 : Y.Iwasaki : CDCTrigger bug fix\n";
-    std::cout << " 1.51a: 30-Jun-1999 : Y.Iwasaki : CDCTrigger & Curl bug fix,T0 mod\n";
-    std::cout << " 1.52a: 06-Jul-1999 : Y.Iwasaki : CDCTrigger bug,output assc. hits\n";
+    std::cout << " 1.49a: 29-Jun-1999 : Y.Iwasaki : TRGCDC for invalid hits\n";
+    std::cout << " 1.50a: 30-Jun-1999 : Y.Iwasaki : TRGCDC bug fix\n";
+    std::cout << " 1.51a: 30-Jun-1999 : Y.Iwasaki : TRGCDC & Curl bug fix,T0 mod\n";
+    std::cout << " 1.52a: 06-Jul-1999 : Y.Iwasaki : TRGCDC bug,output assc. hits\n";
     std::cout << " 1.53a: 07-Jul-1999 : T.Matsumoto : cathode updates \n";
     std::cout << " 1.54a: 12-Jul-1999 : N.Katayama : approch, hit #\n";
     std::cout << " 1.55b: 15-Jul-1999 : JT, YI : curl, fitter, mc, fast\n";
@@ -2307,8 +2307,8 @@ Trasan::beginRun() {
 // 	//	b_doCurlFinder = 0;
 //     }
 
-//     //...Create CDCTrigger...
-//     _cdc = CDCTrigger::getCDCTrigger(_cdcVersion);
+//     //...Create TRGCDC...
+//     _cdc = TRGCDC::getTRGCDC(_cdcVersion);
 //     _cdc->debugLevel(b_debugLevel);
 // //  _cdc->simulateSmallCell(b_simulateSmallCell);
 //     TLink::initializeBuffers();
@@ -2335,7 +2335,7 @@ Trasan::beginRun() {
 //     _cdccat = NULL;
 //     //    if (_cdcVersion.toFloat() > 0) {
 // //     if (atof(_cdcVersion.c_str()) > 0) {
-// // 	if (! _cdccat) _cdccat = new CDCTriggerCat();
+// // 	if (! _cdccat) _cdccat = new TRGCDCCat();
 // // 	_cdccat->debugLevel(b_debugLevel);
 // //     }
 // //     else {
@@ -2352,18 +2352,18 @@ Trasan::endRun() {
 }
 
 void
-Trasan::selectUnusedHits(const CAList<Belle2::CDCTriggerWireHit> & hits,
-			 CAList<Belle2::CDCTriggerWireHit> & unusedHits) const {
+Trasan::selectUnusedHits(const CAList<Belle2::TRGCDCWireHit> & hits,
+			 CAList<Belle2::TRGCDCWireHit> & unusedHits) const {
 
     //...Pick up used hits (3D tracks only)...
-    CAList<Belle2::CDCTriggerWireHit> used;
+    CAList<Belle2::TRGCDCWireHit> used;
     const AList<TTrack> & tracks = _trackManager.tracks();
     for (unsigned i = 0; i < tracks.length(); i++) {
 	const TTrack & t = * tracks[i];
 	const AList<TLink> & links = t.links();
 	const unsigned n = links.length();
 	for (unsigned j = 0; j < n; j++)
-	    used.append((Belle2::CDCTriggerWireHit *) links[j]->hit());
+	    used.append((Belle2::TRGCDCWireHit *) links[j]->hit());
     }
 
     unusedHits = hits;
@@ -2371,9 +2371,9 @@ Trasan::selectUnusedHits(const CAList<Belle2::CDCTriggerWireHit> & hits,
 }
 
 void
-Trasan::main0(const CAList<Belle2::CDCTriggerWireHit> & axialHits,
-	      const CAList<Belle2::CDCTriggerWireHit> & stereoHits,
-	      const CAList<Belle2::CDCTriggerWireHit> & allHits,
+Trasan::main0(const CAList<Belle2::TRGCDCWireHit> & axialHits,
+	      const CAList<Belle2::TRGCDCWireHit> & stereoHits,
+	      const CAList<Belle2::TRGCDCWireHit> & allHits,
 	      AList<TTrack> & tracks,
 	      AList<TTrack> & tracks2D) {
 
@@ -2391,8 +2391,8 @@ start:
 		((TConformalFinder *) _confFinder)->doT0Reset(false);
 	}		    
 
-// 	    AList<CDCTriggerWireHit> unusedAxial;
-// 	    AList<CDCTriggerWireHit> unusedStereo;
+// 	    AList<TRGCDCWireHit> unusedAxial;
+// 	    AList<TRGCDCWireHit> unusedStereo;
 // 	    selectUnusedHits(axialHits, unusedAxial);
 // 	    selectUnusedHits(stereoHits, unusedStereo);
 //	    _confFinder->doit(unusedAxial, unusedStereo, tracks, tracks2D);
@@ -2434,8 +2434,8 @@ start:
 				       _trackManager.tracks());
 	}
 
-// 	    AList<CDCTriggerWireHit> unusedAxial;
-// 	    AList<CDCTriggerWireHit> unusedStereo;
+// 	    AList<TRGCDCWireHit> unusedAxial;
+// 	    AList<TRGCDCWireHit> unusedStereo;
 // 	    selectUnusedHits(axialHits, unusedAxial);
 // 	    selectUnusedHits(stereoHits, unusedStereo);
 
@@ -2492,9 +2492,9 @@ start:
 }
 
 void
-Trasan::main1(const CAList<Belle2::CDCTriggerWireHit> & axialHits,
-	      const CAList<Belle2::CDCTriggerWireHit> & stereoHits,
-	      const CAList<Belle2::CDCTriggerWireHit> & allHits,
+Trasan::main1(const CAList<Belle2::TRGCDCWireHit> & axialHits,
+	      const CAList<Belle2::TRGCDCWireHit> & stereoHits,
+	      const CAList<Belle2::TRGCDCWireHit> & allHits,
 	      AList<TTrack> & tracks,
 	      AList<TTrack> & tracks2D) {
 
@@ -2511,8 +2511,8 @@ Trasan::main1(const CAList<Belle2::CDCTriggerWireHit> & axialHits,
 //cnv  if (b_doConformalFinder) {
     if (0) {
 
-	CAList<Belle2::CDCTriggerWireHit> unusedAxial;
-	CAList<Belle2::CDCTriggerWireHit> unusedStereo;
+	CAList<Belle2::TRGCDCWireHit> unusedAxial;
+	CAList<Belle2::TRGCDCWireHit> unusedStereo;
 	selectUnusedHits(axialHits, unusedAxial);
 	selectUnusedHits(stereoHits, unusedStereo);
 

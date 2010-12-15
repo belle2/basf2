@@ -19,7 +19,7 @@
 #include <iostream>
 #include "tracking/modules/trasan/TWindowGTK.h"
 #include "tracking/modules/trasan/Trasan.h"
-#include "trigger/cdc/CDCTriggerWireHit.h"
+#include "trg/cdc/WireHit.h"
 #include "tracking/modules/trasan/TLink.h"
 #include "tracking/modules/trasan/TTrackBase.h"
 #include "tracking/modules/trasan/TSegment.h"

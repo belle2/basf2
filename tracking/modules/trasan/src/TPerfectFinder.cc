@@ -39,8 +39,8 @@
 
 
 
-#include "trigger/cdc/CDCTriggerWireHitMC.h"
-#include "trigger/cdc/CDCTriggerTrackMC.h"
+#include "trg/cdc/WireHitMC.h"
+#include "trg/cdc/TrackMC.h"
 #include "tracking/modules/trasan/TPerfectFinder.h"
 #include "tracking/modules/trasan/TTrack.h"
 #include "tracking/modules/trasan/THelix.h"
@@ -76,14 +76,14 @@ TPerfectFinder::dump(const std::string & msg, const std::string & pre) const {
 }
 
 int
-TPerfectFinder::doit(const CAList<Belle2::CDCTriggerWireHit> & axialHits,
-		     const CAList<Belle2::CDCTriggerWireHit> & stereoHits,
+TPerfectFinder::doit(const CAList<Belle2::TRGCDCWireHit> & axialHits,
+		     const CAList<Belle2::TRGCDCWireHit> & stereoHits,
 		     AList<TTrack> & tracks,
 		     AList<TTrack> &) {
 //cnv
 //     //...Preparations...
 //     static const HepGeom::Point3D<double> dummy(0, 0, 0);
-//     CAList<CDCTriggerWireHit> hits;
+//     CAList<TRGCDCWireHit> hits;
 //     hits.append(axialHits);
 //     hits.append(stereoHits);
 
@@ -91,7 +91,7 @@ TPerfectFinder::doit(const CAList<Belle2::CDCTriggerWireHit> & axialHits,
 //     CAList<TTrackHEP> heps;
 //     const unsigned nHits = hits.length();
 //     for (unsigned i = 0; i < nHits; i++) {
-// 	const CDCTriggerWireHitMC * const mc = hits[i]->mc();
+// 	const TRGCDCWireHitMC * const mc = hits[i]->mc();
 // 	if (! mc) continue;
 // 	const TTrackHEP * const hep = mc->hep();
 
@@ -101,7 +101,7 @@ TPerfectFinder::doit(const CAList<Belle2::CDCTriggerWireHit> & axialHits,
 //     heps.purge();
 
 //     //...Create tracks...
-//     const AList<CDCTriggerWireHitMC> & mcHits = CDCTrigger::getCDCTrigger()->hitsMC();
+//     const AList<TRGCDCWireHitMC> & mcHits = TRGCDC::getTRGCDC()->hitsMC();
 // //  const unsigned nHitsMC = mcHits.length();
 //     const unsigned nHeps = heps.length();
 //     for (unsigned i = 0; i < nHeps; i++) {
@@ -115,7 +115,7 @@ TPerfectFinder::doit(const CAList<Belle2::CDCTriggerWireHit> & axialHits,
 // 	TLink * linkIn;
 // 	unsigned lastLayer = 0;
 // 	for (unsigned j = 0; j < (unsigned) mcHits.length(); j++) {
-// 	    const CDCTriggerWireHitMC * const mc = mcHits[j];
+// 	    const TRGCDCWireHitMC * const mc = mcHits[j];
 // 	    if (! mc) continue;
 // 	    if (! mc->hit()) continue;
 // 	    if (& hep != mc->hep()) continue;

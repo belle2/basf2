@@ -25,7 +25,7 @@
 
 namespace Belle {
 
-class CDCTriggerWireHit;
+class TRGCDCWireHit;
 class TLink;
 class TTrackBase;
 class TSegment;

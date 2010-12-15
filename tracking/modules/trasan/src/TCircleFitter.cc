@@ -82,7 +82,7 @@ TCircleFitter::fit(TTrackBase & t) const {
     unsigned n = t.links().length();
     for (unsigned i = 0; i < n; i++) {
 	TLink * l = t.links()[i];
-	const Belle2::CDCTriggerWireHit * h = l->hit();
+	const Belle2::TRGCDCWireHit * h = l->hit();
 
 	//...Check next hit...
 	Point3D point;
@@ -115,7 +115,7 @@ TCircleFitter::fit(TTrackBase & t) const {
 	TLink * l = t.links()[i];
 	if (l == 0) continue;
 
-	const Belle2::CDCTriggerWireHit * h = l->hit();
+	const Belle2::TRGCDCWireHit * h = l->hit();
 	if (h == 0) continue;
 
 	float q = (_center.cross(h->xyPosition())).z();

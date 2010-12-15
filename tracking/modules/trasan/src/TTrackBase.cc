@@ -116,7 +116,7 @@
 // Trasan 1.1 RC 1 release : salvaging installed, basf_if/refit.cc added
 //
 // Revision 1.18  1998/11/10 09:09:10  yiwasaki
-// Trasan 1.1 beta 8 release : negative sqrt fixed, curl finder updated by j.tanaka, CDCTrigger classes modified by y.iwasaki
+// Trasan 1.1 beta 8 release : negative sqrt fixed, curl finder updated by j.tanaka, TRGCDC classes modified by y.iwasaki
 //
 // Revision 1.17  1998/09/24 22:56:40  yiwasaki
 // Trasan 1.1 alpha 2 release
@@ -158,7 +158,7 @@
 // Trasan 1 alpha 1 release
 //
 // Revision 1.2  1998/04/10 09:36:28  yiwasaki
-// TTrack added, CDCTrigger becomes Singleton
+// TTrack added, TRGCDC becomes Singleton
 //
 // Revision 1.1  1998/04/10 00:50:16  yiwasaki
 // TCircle, TConformalFinder, TConformalLink, TFinderBase, THistogram, TLink, TTrackBase classes added
@@ -173,11 +173,11 @@
 #include "tracking/modules/trasan/Strings.h"
 #include "tracking/modules/trasan/TTrackBase.h"
 #include "tracking/modules/trasan/TLink.h"
-#include "trigger/cdc/CDCTriggerWire.h"
-#include "trigger/cdc/CDCTriggerWireHit.h"
-#include "trigger/cdc/CDCTriggerWireHitMC.h"
+#include "trg/cdc/Wire.h"
+#include "trg/cdc/WireHit.h"
+#include "trg/cdc/WireHitMC.h"
 
-#include "trigger/cdc/CDCTriggerTrackMC.h"
+#include "trg/cdc/TrackMC.h"
 #include "tracking/modules/trasan/TFitter.h"
 #ifdef TRASAN_DEBUG
 #include "tracking/modules/trasan/TTrack.h"
@@ -232,7 +232,7 @@ TTrackBase::update(void) const {
     unsigned n = _links.length();
     for (unsigned i = 0; i < n; i++) {
 	TLink * l = _links[i];
-	const Belle2::CDCTriggerWireHit & h = * l->hit();
+	const Belle2::TRGCDCWireHit & h = * l->hit();
 	if (h.state() & WireHitInvalidForFit) continue;
 	if (! (h.state() & WireHitFittingValid)) continue;
 	_cores.append(l);
@@ -359,7 +359,7 @@ void
 TTrackBase::refine(double sigma) {
     AList<TLink> bad = refineMain(sigma);
 //      for (unsigned i = 0; i < bad.length(); i++) {
-//  	const Belle2::CDCTriggerWireHit * hit = bad[i]->hit();
+//  	const Belle2::TRGCDCWireHit * hit = bad[i]->hit();
 //  	hit->state(hit->state() | WireHitInvalidForFit);
 //      }
 
@@ -446,7 +446,7 @@ TTrackBase::nLinks(unsigned mask) const {
     if (mask == 0) return n;
     unsigned nn = 0;
     for (unsigned i = 0; i < n; i++) {
-	const Belle2::CDCTriggerWireHit & h = * _links[i]->hit();
+	const Belle2::TRGCDCWireHit & h = * _links[i]->hit();
 	if (h.state() & mask) ++nn;
     }
     return nn;
@@ -474,7 +474,7 @@ TTrackBase::nCores(unsigned mask) const {
 //      unsigned n = _links.length();
 //      AList<TLink> tmp;
 //      for (unsigned i = 0; i < n; i++) {
-//  	const Belle2::CDCTriggerWireHit & h = * _links[i]->hit();
+//  	const Belle2::TRGCDCWireHit & h = * _links[i]->hit();
 //  	if (h.state() & mask) tmp.append(_links[i]);
 //      }
 //      return InnerMost(tmp);
@@ -486,7 +486,7 @@ TTrackBase::nCores(unsigned mask) const {
 //      unsigned n = _links.length();
 //      AList<TLink> tmp;
 //      for (unsigned i = 0; i < n; i++) {
-//  	const Belle2::CDCTriggerWireHit & h = * _links[i]->hit();
+//  	const Belle2::TRGCDCWireHit & h = * _links[i]->hit();
 //  	if (h.state() & mask) tmp.append(_links[i]);
 //      }
 //      return OuterMost(tmp);
@@ -532,13 +532,13 @@ TTrackBase::append(const AList<TLink> & a) {
 	append(* a[i]);
 }
 
-const Belle2::CDCTriggerTrackMC * const
+const Belle2::TRGCDCTrackMC * const
 TTrackBase::hep(void) const {
     unsigned n = _links.length();
-    CAList<Belle2::CDCTriggerTrackMC> hepList;
+    CAList<Belle2::TRGCDCTrackMC> hepList;
     CList<unsigned> hepCounter;
     for (unsigned i = 0; i < n; i++) {
-	const Belle2::CDCTriggerTrackMC * hep = _links[i]->hit()->mc()->hep();
+	const Belle2::TRGCDCTrackMC * hep = _links[i]->hit()->mc()->hep();
 	unsigned nH = hepList.length();
 	bool found = false;
 	for (unsigned j = 0; j < nH; j++) {
@@ -606,7 +606,7 @@ TTrackBase::nMissingSuperLayers(void) const {
     const unsigned inner = TLink::innerMost(_links)->wire()->superLayerId();
     const unsigned outer = TLink::outerMost(_links)->wire()->superLayerId();
 
-    static unsigned * nHits = new unsigned[Belle2::CDCTrigger::getCDCTrigger()->nSuperLayers()];
+    static unsigned * nHits = new unsigned[Belle2::TRGCDC::getTRGCDC()->nSuperLayers()];
     TLink::nHitsSuperLayer(_links, nHits);
 //     unsigned nHits[11] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 //     for (unsigned i = 0; i < nLinks; i++)

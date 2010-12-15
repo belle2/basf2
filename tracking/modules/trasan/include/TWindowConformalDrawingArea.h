@@ -23,7 +23,7 @@
 #include "tracking/modules/trasan/ConstAList.h"
 
 namespace Belle2 {
-    class CDCTriggerWireHit;
+    class TRGCDCWireHit;
 }
 
 namespace Belle {
@@ -55,7 +55,7 @@ class TWindowConformalDrawingArea : public Gtk::DrawingArea {
     bool wireName(bool);
 
     void clear(void);
-    void append(const CAList<Belle2::CDCTriggerWireHit> &,
+    void append(const CAList<Belle2::TRGCDCWireHit> &,
 		Gdk::Color color = Gdk::Color("grey"));
     void append(const AList<TLink> &,
 		Gdk::Color color = Gdk::Color("grey"));

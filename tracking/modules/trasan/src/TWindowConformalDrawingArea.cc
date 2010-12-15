@@ -20,7 +20,7 @@
 #include <iostream>
 #include "tracking/modules/trasan/TWindowConformalDrawingArea.h"
 #include "tracking/modules/trasan/Trasan.h"
-#include "trigger/cdc/CDCTriggerWireHit.h"
+#include "trg/cdc/WireHit.h"
 #include "tracking/modules/trasan/TLink.h"
 #include "tracking/modules/trasan/TTrackBase.h"
 #include "tracking/modules/trasan/TSegment.h"
@@ -401,7 +401,7 @@ TWindowConformalDrawingArea::resetPosition(void) {
 }
 
 void
-TWindowConformalDrawingArea::append(const CAList<Belle2::CDCTriggerWireHit> & list,
+TWindowConformalDrawingArea::append(const CAList<Belle2::TRGCDCWireHit> & list,
 				    Gdk::Color c) {
     AList<TLink> links;
     for (unsigned i = 0; i < (unsigned) list.length(); i++)

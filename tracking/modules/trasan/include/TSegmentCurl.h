@@ -13,7 +13,7 @@
 
 namespace Belle {
 
-  class CDCTrigger;
+  class TRGCDC;
 class TSegmentCurl
 {
 public:
@@ -69,7 +69,7 @@ public:
   static void set_superb(bool s) {
     ms_superb = s;
   }
-  friend class CDCTrigger;
+  friend class TRGCDC;
 
 private:
   struct LayerInfo {

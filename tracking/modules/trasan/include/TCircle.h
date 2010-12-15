@@ -41,7 +41,7 @@
 // Trasan 2.09 : TLink has drift time info.
 //
 // Revision 1.15  1999/11/23 10:30:21  yiwasaki
-// ALPHA in CDCTriggerUtil is replaced by THelix::ConstantAlpha
+// ALPHA in TRGCDCUtil is replaced by THelix::ConstantAlpha
 //
 // Revision 1.14  1999/10/30 10:12:45  yiwasaki
 // Trasan 1.65c : new conf finder with 3D
@@ -77,7 +77,7 @@
 // minor changes
 //
 // Revision 1.2  1998/04/10 09:38:18  yiwasaki
-// TTrack added, CDCTrigger becomes Singleton
+// TTrack added, TRGCDC becomes Singleton
 //
 // Revision 1.1  1998/04/10 00:51:13  yiwasaki
 // TCircle, TConformalFinder, TConformalLink, TFinderBase, THistogram, TLink, TTrackBase classes added

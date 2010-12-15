@@ -24,12 +24,12 @@
 #include "tracking/modules/trasan/TWindowSZDrawingArea.h"
 
 namespace Belle2 {
-    class CDCTriggerWireHit;
+    class TRGCDCWireHit;
 }
 
 namespace Belle {
 
-class CDCTriggerWireHit;
+class TRGCDCWireHit;
 class TLink;
 class TTrackBase;
 class TSegment;

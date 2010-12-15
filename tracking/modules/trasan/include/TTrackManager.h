@@ -101,7 +101,7 @@
 // Trasan 1.55b release : Curl finder # of hits protection, bug in TManager for MC, helix fitter # of hits protection, fast finder improved
 //
 // Revision 1.17  1999/07/01 08:15:26  yiwasaki
-// Trasan 1.51a release : builder bug fix, CDCTrigger bug fix again, T0 determination has more parameters
+// Trasan 1.51a release : builder bug fix, TRGCDC bug fix again, T0 determination has more parameters
 //
 // Revision 1.16  1999/06/17 09:45:02  yiwasaki
 // Trasan 1.45 release : T0 determination by 2D fitting
@@ -140,7 +140,7 @@
 // Trasan 1.1 RC 3 release : salvaging improved
 //
 // Revision 1.4  1998/11/10 09:09:29  yiwasaki
-// Trasan 1.1 beta 8 release : negative sqrt fixed, curl finder updated by j.tanaka, CDCTrigger classes modified by y.iwasaki
+// Trasan 1.1 beta 8 release : negative sqrt fixed, curl finder updated by j.tanaka, TRGCDC classes modified by y.iwasaki
 //
 // Revision 1.3  1998/09/25 02:14:46  yiwasaki
 // modification for cosmic
@@ -178,7 +178,7 @@ struct reccdc_mctrk;
 struct rectrk;
 
 namespace Belle2 {
-    class CDCTriggerWireHit;
+    class TRGCDCWireHit;
 }
 
 namespace Belle {
@@ -313,15 +313,15 @@ class TTrackManager : public TUpdater {
 
   public:// hit manipulations
     /// masks hits on found curl tracks.
-    void maskCurlHits(const CAList<Belle2::CDCTriggerWireHit> & axial,
-		      const CAList<Belle2::CDCTriggerWireHit> & stereo,
+    void maskCurlHits(const CAList<Belle2::TRGCDCWireHit> & axial,
+		      const CAList<Belle2::TRGCDCWireHit> & stereo,
 		      const AList<TTrack> & tracks) const;
 
     /// masks hits with large chisq as associated hits. Pull in TLink is used.
     static void maskBadHits(const AList<TTrack> &, float maxSigma2);
 
     /// salvages hits for dE/dx(not for track fitting).
-    void salvageAssociateHits(const CAList<Belle2::CDCTriggerWireHit> &,
+    void salvageAssociateHits(const CAList<Belle2::TRGCDCWireHit> &,
 			      float maxSigma2);
 
     /// associates SVD and then adds track information.
@@ -351,9 +351,9 @@ class TTrackManager : public TUpdater {
     TLink & divideByIp(const TTrack & t, AList<TLink> * l) const;
     void removeHitsAcrossOverIp(AList<TLink> &) const;
     /// returns a track which is the closest to a hit.
-    TTrack * closest(const AList<TTrack> &, const Belle2::CDCTriggerWireHit &) const;
+    TTrack * closest(const AList<TTrack> &, const Belle2::TRGCDCWireHit &) const;
     /// salvages remaining hits.
-    void salvage(const CAList<Belle2::CDCTriggerWireHit> &) const;
+    void salvage(const CAList<Belle2::TRGCDCWireHit> &) const;
     /// masks hits out which are in tail of curly tracks.
     void mask(void) const;
     void maskNormal(TTrack &) const;

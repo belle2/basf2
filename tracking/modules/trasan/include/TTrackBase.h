@@ -92,7 +92,7 @@
 // Trasan 1.1 RC 1 release : salvaging installed, basf_if/refit.cc added
 //
 // Revision 1.20  1998/11/10 09:09:28  yiwasaki
-// Trasan 1.1 beta 8 release : negative sqrt fixed, curl finder updated by j.tanaka, CDCTrigger classes modified by y.iwasaki
+// Trasan 1.1 beta 8 release : negative sqrt fixed, curl finder updated by j.tanaka, TRGCDC classes modified by y.iwasaki
 //
 // Revision 1.19  1998/10/09 03:01:13  yiwasaki
 // Trasan 1.1 beta 4 release : memory leak stopped, and minor changes
@@ -137,7 +137,7 @@
 // minor changes
 //
 // Revision 1.2  1998/04/10 09:38:20  yiwasaki
-// TTrack added, CDCTrigger becomes Singleton
+// TTrack added, TRGCDC becomes Singleton
 //
 // Revision 1.1  1998/04/10 00:51:16  yiwasaki
 // TCircle, TConformalFinder, TConformalLink, TFinderBase, THistogram, TLink, TTrackBase classes added
@@ -171,7 +171,7 @@
 #include "tracking/modules/trasan/AList.h"
 
 namespace Belle2 {
-    class CDCTriggerTrackMC;
+    class TRGCDCTrackMC;
 }
 
 namespace Belle {
@@ -280,10 +280,10 @@ class TTrackBase {
     TLink * operator[](unsigned i) const;
 
   public:// MC information
-    /// returns Belle2::CDCTriggerTrackMC.
-    const Belle2::CDCTriggerTrackMC * const hep(void) const;
+    /// returns Belle2::TRGCDCTrackMC.
+    const Belle2::TRGCDCTrackMC * const hep(void) const;
 
-    /// returns \# of contributed Belle2::CDCTriggerTrackMC tracks.
+    /// returns \# of contributed Belle2::TRGCDCTrackMC tracks.
     unsigned nHeps(void) const;
 
     /// returns a pointer to TTrackMC.
@@ -320,7 +320,7 @@ class TTrackBase {
     mutable AList<TLink> _cores;
 
   private:// Always updated when accessed 
-    mutable const Belle2::CDCTriggerTrackMC * _hep;
+    mutable const Belle2::TRGCDCTrackMC * _hep;
     mutable unsigned _nHeps;
 
   private:

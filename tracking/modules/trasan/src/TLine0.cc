@@ -86,10 +86,10 @@
 
 #include "tracking/modules/trasan/TLine0.h"
 
-#include "trigger/cdc/CDCTriggerWire.h"
-#include "trigger/cdc/CDCTriggerWireHit.h"
-#include "trigger/cdc/CDCTriggerWireHitMC.h"
-#include "trigger/cdc/CDCTriggerTrackMC.h"
+#include "trg/cdc/Wire.h"
+#include "trg/cdc/WireHit.h"
+#include "trg/cdc/WireHitMC.h"
+#include "trg/cdc/TrackMC.h"
 
 namespace Belle {
 

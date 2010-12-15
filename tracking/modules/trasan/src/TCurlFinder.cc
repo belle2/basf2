@@ -40,11 +40,11 @@
 
 
 
-#include "trigger/cdc/CDCTrigger.h"
-#include "trigger/cdc/CDCTriggerWire.h"
-#include "trigger/cdc/CDCTriggerWireHit.h"
-#include "trigger/cdc/CDCTriggerWireHitMC.h"
-#include "trigger/cdc/CDCTriggerTrackMC.h"
+#include "trg/cdc/TRGCDC.h"
+#include "trg/cdc/Wire.h"
+#include "trg/cdc/WireHit.h"
+#include "trg/cdc/WireHitMC.h"
+#include "trg/cdc/TrackMC.h"
 
 //#include "panther/panther.h"
 #include "tracking/modules/trasan/Strings.h"
@@ -149,8 +149,8 @@ struct reccdc_wirhit {
   float m_adc;
 };
 #endif
-#ifndef PANTHER_DACDCTrigger_MCWIRHIT_
-#define PANTHER_DACDCTrigger_MCWIRHIT_
+#ifndef PANTHER_DATRGCDC_MCWIRHIT_
+#define PANTHER_DATRGCDC_MCWIRHIT_
 struct datcdc_mcwirhit {
   int m_panther_dummy_;
   int m_ID;
@@ -256,7 +256,7 @@ struct reccdc_timing {
 #define DEBUG_CURL_MC 0
 
 #if (TRASAN_DEBUG_DETAIL+DEBUG_CURL_GNUPLOT+DEBUG_CURL_MC)
-//cnv #include "trigger/cdc/CDCTriggerWireHitMC.h"
+//cnv #include "trg/cdc/WireHitMC.h"
 // #include "tracking/modules/trasan/TTrackHEP.h"
 #include <set>
 // #include <algorithm>
@@ -546,8 +546,8 @@ unsigned
 TCurlFinder::offset(const unsigned layerId) const {
 //cnv
 
-//   const Belle2::CDCTrigger &cdc = *Belle2::CDCTrigger::getCDCTrigger();
-//   const Belle2::CDCTriggerLayer &l=*cdc.layer(layerId);
+//   const Belle2::TRGCDC &cdc = *Belle2::TRGCDC::getTRGCDC();
+//   const Belle2::TRGCDCLayer &l=*cdc.layer(layerId);
 //   //  if(ms_superb) {
 //     if(l.offset()==0.0) return 0;
 //     return 1;
@@ -574,7 +574,7 @@ unsigned
 TCurlFinder::layerId(const double &R) const {
   // R is radius for CDC but is 2*radius for track
   double r = R*10.;// cm -> mm
-  const Belle2::CDCTrigger &cdc = *Belle2::CDCTrigger::getCDCTrigger();
+  const Belle2::TRGCDC &cdc = *Belle2::TRGCDC::getTRGCDC();
 //   if(ms_superb) {
 //     static bool init(true);
 //     static std::vector<unsigned>rtol;
@@ -630,8 +630,8 @@ unsigned
 TCurlFinder::maxLocalLayerId(const unsigned superLayerId) const {
 //cnv
 
-//   const Belle2::CDCTrigger &cdc = *Belle2::CDCTrigger::getCDCTrigger();
-//   const AList<Belle2::CDCTriggerLayer> &sl=*cdc.superLayer(superLayerId);
+//   const Belle2::TRGCDC &cdc = *Belle2::TRGCDC::getTRGCDC();
+//   const AList<Belle2::TRGCDCLayer> &sl=*cdc.superLayer(superLayerId);
 // //   if(ms_superb) {
 // //     return sl.length()-1;
 // //   }
@@ -661,8 +661,8 @@ TCurlFinder::nextSuperAxialLayerId(const unsigned superLayerId, const int in) co
 //   //	            ex2. If superLayerID = 2, in = -1, return 4 
 //   // output  - return 0, 2, 4, 6, 8, 10 = no error
 //   //                                 -1 = error
-//   const Belle2::CDCTrigger &cdc = *Belle2::CDCTrigger::getCDCTrigger();
-//   const AList<Belle2::CDCTriggerLayer> &sl=*cdc.superLayer(superLayerId);
+//   const Belle2::TRGCDC &cdc = *Belle2::TRGCDC::getTRGCDC();
+//   const AList<Belle2::TRGCDCLayer> &sl=*cdc.superLayer(superLayerId);
 //   const int ns = cdc.nSuperLayers();
 
 // //   if(ms_superb) {
@@ -751,8 +751,8 @@ TCurlFinder::nextSuperStereoLayerId(const unsigned superLayerId, const int in) c
 //   //	            ex2. If superLayerID = 2, in = -1, return 3 
 //   // output  - return 1, 3, 5, 7, 9 = no error
 //   //                             -1 = error
-//   const Belle2::CDCTrigger &cdc = *Belle2::CDCTrigger::getCDCTrigger();
-//   const AList<Belle2::CDCTriggerLayer> &sl=*cdc.superLayer(superLayerId);
+//   const Belle2::TRGCDC &cdc = *Belle2::TRGCDC::getTRGCDC();
+//   const AList<Belle2::TRGCDCLayer> &sl=*cdc.superLayer(superLayerId);
 //   const int ns = cdc.nSuperLayers();
 
 // //   if(ms_superb) {
@@ -902,10 +902,10 @@ TCurlFinder::makeList(AList<TLink> &madeList,
 void
 TCurlFinder::clear(void) {
 //cnv
-// //  const Belle2::CDCTrigger *pcdc = Belle2::CDCTrigger::getCDCTrigger0();
-//   const Belle2::CDCTrigger *pcdc = Belle2::CDCTrigger::getCDCTrigger();
+// //  const Belle2::TRGCDC *pcdc = Belle2::TRGCDC::getTRGCDC0();
+//   const Belle2::TRGCDC *pcdc = Belle2::TRGCDC::getTRGCDC();
 //   if(NULL==pcdc) return;
-//   const Belle2::CDCTrigger &cdc = *pcdc;
+//   const Belle2::TRGCDC &cdc = *pcdc;
 //   // This is to clear this Class(TCurlFinder) in Trasan.cc . 
 //   // Private members are cleaned.
 //   HepAListDeleteAll(m_allAxialHitsOriginal);
@@ -939,8 +939,8 @@ TCurlFinder::clear(void) {
 // ... doit .. Section ... This is a main section.
 //
 int
-TCurlFinder::doit(const CAList<Belle2::CDCTriggerWireHit> & axialHits,
-		  const CAList<Belle2::CDCTriggerWireHit> & stereoHits,
+TCurlFinder::doit(const CAList<Belle2::TRGCDCWireHit> & axialHits,
+		  const CAList<Belle2::TRGCDCWireHit> & stereoHits,
 		  AList<TTrack> & tracks,
 		  AList<TTrack> & tracks2D) {
 
@@ -962,7 +962,7 @@ TCurlFinder::doit(const CAList<Belle2::CDCTriggerWireHit> & axialHits,
     _cWindow.skipAllWindow(false);
 #endif
     if(m_unusedAxialHitsOnEachLayer==NULL) {
-      const Belle2::CDCTrigger &cdc = *Belle2::CDCTrigger::getCDCTrigger();
+      const Belle2::TRGCDC &cdc = *Belle2::TRGCDC::getTRGCDC();
       m_unusedAxialHitsOnEachLayer = new AList<TLink> [cdc.nAxialLayers()];
       m_unusedStereoHitsOnEachLayer = new AList<TLink> [cdc.nStereoLayers()];
       m_unusedAxialHitsOnEachSuperLayer = new AList<TLink> [cdc.nAxialSuperLayers()];
@@ -1060,9 +1060,9 @@ TCurlFinder::doit(const CAList<Belle2::CDCTriggerWireHit> & axialHits,
 // ... fuction name = "TMakeUnusedWireHitsList"
 //
 void
-TCurlFinder::makeWireHitsListsSegments(const CAList<Belle2::CDCTriggerWireHit> &axialList, 
-				       const CAList<Belle2::CDCTriggerWireHit> &stereoList) {  
-  const Belle2::CDCTrigger &cdc = *Belle2::CDCTrigger::getCDCTrigger();
+TCurlFinder::makeWireHitsListsSegments(const CAList<Belle2::TRGCDCWireHit> &axialList, 
+				       const CAList<Belle2::TRGCDCWireHit> &stereoList) {  
+  const Belle2::TRGCDC &cdc = *Belle2::TRGCDC::getTRGCDC();
   // A sub main function ... called by "doit".
   // #0 makes lists.
   // #1 makes segments.
@@ -1126,7 +1126,7 @@ TCurlFinder::makeWireHitsListsSegments(const CAList<Belle2::CDCTriggerWireHit> &
   
   //...For small cell (iw)...
   bool newcdc = false;
-  if (Belle2::CDCTrigger::getCDCTrigger()->versionCDC() == "small cell")
+  if (Belle2::TRGCDC::getTRGCDC()->versionCDC() == "small cell")
       newcdc = true;
 
   //...sets pointers to neighboring hit wires of each TLink
@@ -1159,7 +1159,7 @@ TCurlFinder::makeWireHitsListsSegments(const CAList<Belle2::CDCTriggerWireHit> &
 
 void
 TCurlFinder::linkNeighboringWires(AList<TLink> *list, const unsigned num, bool stereo) {
-//  const Belle2::CDCTrigger &cdc = *Belle2::CDCTrigger::getCDCTrigger();
+//  const Belle2::TRGCDC &cdc = *Belle2::TRGCDC::getTRGCDC();
 
 //cnv
 // #ifdef TRASAN_DEBUG_DETAIL
@@ -1178,12 +1178,12 @@ TCurlFinder::linkNeighboringWires(AList<TLink> *list, const unsigned num, bool s
   
 //   //...For small cell (iw)...
 //   bool newcdc = false;
-//   if (Belle2::CDCTrigger::getCDCTrigger()->versionCDC() == "small cell")
+//   if (Belle2::TRGCDC::getTRGCDC()->versionCDC() == "small cell")
 //       newcdc = true;
 
 //   for(int i=0;i< (int) num;++i){
 //     const unsigned layerid = cdc.layerId(stereo?1:0, i);
-//     const Belle2::CDCTriggerWire &w0 = *cdc.wire(layerid, 0);
+//     const Belle2::TRGCDCWire &w0 = *cdc.wire(layerid, 0);
 //     const unsigned superlayerid = w0.superLayerId();
 //     const unsigned locallayerid = w0.localLayerId();
 //     const unsigned nlocallayer = cdc.nLocalLayer(superlayerid);
@@ -1310,7 +1310,7 @@ TCurlFinder::linkNeighboringWiresSmallCell(AList<TLink> *list,
     }
 #endif
 
-    const Belle2::CDCTrigger * const CDC = Belle2::CDCTrigger::getCDCTrigger();
+    const Belle2::TRGCDC * const CDC = Belle2::TRGCDC::getTRGCDC();
     for (unsigned i = 0; i < num; ++i) {
 	if (list[i].length() == 0) continue;
 	for (unsigned j = 0; j < (unsigned) list[i].length(); ++j) {
@@ -1353,7 +1353,7 @@ TCurlFinder::setNeighboringWires(TLink *list, const TLink *next) {
 
 void
 TCurlFinder::createSuperLayer(void) {
-  const Belle2::CDCTrigger &cdc = *Belle2::CDCTrigger::getCDCTrigger();
+  const Belle2::TRGCDC &cdc = *Belle2::TRGCDC::getTRGCDC();
   //  if(ms_superb) {
     for(int i=0;i<cdc.nAxialLayers(); ++i) {
       if(m_unusedAxialHitsOnEachLayer[i].length() > 0) {
@@ -2423,7 +2423,7 @@ void
 TCurlFinder::mask3DTrack(TTrack *track,
 			 AList<TLink> &maskList) {
 //cnv  double r(fabs(track->helix().radius()));
-//   const Belle2::CDCTrigger &cdc = *Belle2::CDCTrigger::getCDCTrigger();
+//   const Belle2::TRGCDC &cdc = *Belle2::TRGCDC::getTRGCDC();
 // //   double cx(track->helix().center().x());
 // //   double cy(track->helix().center().y());
 
@@ -3197,7 +3197,7 @@ TCurlFinder::fitWDD(TCircle &c,
   for(int i=0;i<c.links().length();++i){
     TLink * l = c.links()[i];
     if(l == 0)continue;   
-    const Belle2::CDCTriggerWireHit * h = l->hit();
+    const Belle2::TRGCDCWireHit * h = l->hit();
     if(h == 0)continue;    
     double q = (center.cross(h->xyPosition())).z();
     if(q > 0.)qSum += 1;
@@ -3419,8 +3419,8 @@ TCurlFinder::findCloseHits(AList<TLink> &links,
 
 #if DEBUG_CURL_MC
 int 
-TCurlFinder::makeWithMC(const AList<Belle2::CDCTriggerWireHit> & axialHits,
-			const AList<Belle2::CDCTriggerWireHit> & stereoHits,
+TCurlFinder::makeWithMC(const AList<Belle2::TRGCDCWireHit> & axialHits,
+			const AList<Belle2::TRGCDCWireHit> & stereoHits,
 			AList<TTrack> & tracks) {
 #define MAX_INDEX_MAKEMC 100
 #if TRASAN_DEBUG_DETAIL

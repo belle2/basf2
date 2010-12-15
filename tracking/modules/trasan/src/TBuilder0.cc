@@ -80,10 +80,10 @@
 // Trasan 1.53a release : cathode updates by T.Matsumoto, minor change of Conformal finder
 //
 // Revision 1.33  1999/07/01 08:15:21  yiwasaki
-// Trasan 1.51a release : builder bug fix, CDCTrigger bug fix again, T0 determination has more parameters
+// Trasan 1.51a release : builder bug fix, TRGCDC bug fix again, T0 determination has more parameters
 //
 // Revision 1.32  1999/06/15 06:33:40  yiwasaki
-// Trasan 1.43 release : minor changes in CDCTriggerClust and TBuilder
+// Trasan 1.43 release : minor changes in TRGCDCClust and TBuilder
 //
 // Revision 1.31  1999/06/14 12:40:20  yiwasaki
 // Trasan 1.42 release : bug in findCloseHits fixed, sakura 1.06
@@ -116,7 +116,7 @@
 // stereo building modified by J.Suzuki
 //
 // Revision 1.21  1998/11/10 09:08:55  yiwasaki
-// Trasan 1.1 beta 8 release : negative sqrt fixed, curl finder updated by j.tanaka, CDCTrigger classes modified by y.iwasaki
+// Trasan 1.1 beta 8 release : negative sqrt fixed, curl finder updated by j.tanaka, TRGCDC classes modified by y.iwasaki
 //
 // Revision 1.20  1998/10/09 17:35:31  yiwasaki
 // Trasan 1.1 beta 6 release : TBuilder::buildStereo bug, introduced by y.iwasaki, removed.
@@ -174,10 +174,10 @@
 
 
 #include "tracking/modules/trasan/TBuilder0.h"
-#include "trigger/cdc/CDCTrigger.h"
-#include "trigger/cdc/CDCTriggerLayer.h"
-#include "trigger/cdc/CDCTriggerWire.h"
-#include "trigger/cdc/CDCTriggerWireHit.h"
+#include "trg/cdc/TRGCDC.h"
+#include "trg/cdc/Layer.h"
+#include "trg/cdc/Wire.h"
+#include "trg/cdc/WireHit.h"
 #include "tracking/modules/trasan/TLink.h"
 #include "tracking/modules/trasan/TCircle.h"
 #include "tracking/modules/trasan/TLine0.h"
@@ -915,9 +915,9 @@ TBuilder0::buildStereo(TTrack & track, const AList<TLink> & list) const {
 	if (isl < 2) {
 
 	    //...Initialize...
-// 	    unsigned ily1 = CDCTrigger::getCDCTrigger("1.0")->superLayer(isl * 2 + 1)
+// 	    unsigned ily1 = TRGCDC::getTRGCDC("1.0")->superLayer(isl * 2 + 1)
 // 		->first()->axialStereoLayerId();
-	    unsigned ily1 = (* Belle2::CDCTrigger::getCDCTrigger("1.0")->superLayer(isl * 2 + 1))[0]->axialStereoLayerId();
+	    unsigned ily1 = (* Belle2::TRGCDC::getTRGCDC("1.0")->superLayer(isl * 2 + 1))[0]->axialStereoLayerId();
 	    unsigned ily2 = ily1 + 1; 
 	    unsigned ily3 = ily2 + 1; 
 
@@ -1110,9 +1110,9 @@ TBuilder0::buildStereo(TTrack & track, const AList<TLink> & list) const {
 
 	    //...Initialize
 	    // unsigned ily1 = firstStlayer(isl);
-	    unsigned ily1 = (* Belle2::CDCTrigger::getCDCTrigger("1.0")->superLayer(isl * 2 + 1))[0]
+	    unsigned ily1 = (* Belle2::TRGCDC::getTRGCDC("1.0")->superLayer(isl * 2 + 1))[0]
 		->axialStereoLayerId();
-// 	    unsigned ily1 = CDCTrigger::getCDCTrigger("1.0")->superLayer(isl * 2 + 1)
+// 	    unsigned ily1 = TRGCDC::getTRGCDC("1.0")->superLayer(isl * 2 + 1)
 // 		->first()->axialStereoLayerId();
 	    unsigned ily2 = ily1 + 1; 
 	    unsigned ily3 = ily2 + 1; 
@@ -1657,7 +1657,7 @@ TBuilder0::salvage(TTrack & t, AList<TLink> & hits) const {
     AList<TLink> candidates;
     for (unsigned i = 0; i < nHits; i++) {
 	TLink & l = * hits[i];
-	const Belle2::CDCTriggerWireHit & h = * l.hit();
+	const Belle2::TRGCDCWireHit & h = * l.hit();
 
 	//...Already used?...
 	if (h.state() & WireHitUsed) continue;
@@ -1693,7 +1693,7 @@ TBuilder0::salvageNormal(TTrack & t, AList<TLink> & hits) const {
     AList<TLink> candidates;
     for (unsigned i = 0; i < nHits; i++) {
 	TLink & l = * hits[i];
-	const Belle2::CDCTriggerWireHit & h = * l.hit();
+	const Belle2::TRGCDCWireHit & h = * l.hit();
 	if (a.cross(h.xyPosition()).z() * t.charge() > 0.) continue;
 
 	//...Already used?...
@@ -1826,8 +1826,8 @@ TBuilder0::consectiveHits(TLink & l, TLink & s, int ichg) const {
 			      0.,0.,0.,0.,0.,
 			      0.901912,0.920841,0.940382,0.959312,
 			      0.,0.,0.,0.,0.};
-    const Belle2::CDCTriggerWire & wire = l.hit()->wire();
-    const Belle2::CDCTriggerWire & next = s.hit()->wire();
+    const Belle2::TRGCDCWire & wire = l.hit()->wire();
+    const Belle2::TRGCDCWire & next = s.hit()->wire();
 
     //...Check same layer ?...
     if (wire.layerId() != next.layerId()) return -1;

@@ -149,7 +149,7 @@
 // Trasan 1 beta 1 release
 //
 // Revision 1.10  1998/06/03 17:16:54  yiwasaki
-// const added to CDCTrigger::hits,axialHits,stereoHits,hitsMC, symbols WireHitNeghborHit* added in CDCTriggerWireHit, TCluster::innerWidth,outerWidth,innerMostLayer,outerMostLayer,type,split,split2,widht,outer,updateType added, TLink::conf added, TTrack::appendStereo3,refineStereo2,aa,bb,Zchisqr added
+// const added to TRGCDC::hits,axialHits,stereoHits,hitsMC, symbols WireHitNeghborHit* added in TRGCDCWireHit, TCluster::innerWidth,outerWidth,innerMostLayer,outerMostLayer,type,split,split2,widht,outer,updateType added, TLink::conf added, TTrack::appendStereo3,refineStereo2,aa,bb,Zchisqr added
 //
 // Revision 1.9  1998/05/26 05:09:16  yiwasaki
 // cvs repair
@@ -170,10 +170,10 @@
 // minor changes
 //
 // Revision 1.3  1998/04/14 01:05:53  yiwasaki
-// CDCTriggerWireHitMC added
+// TRGCDCWireHitMC added
 //
 // Revision 1.2  1998/04/10 09:38:19  yiwasaki
-// TTrack added, CDCTrigger becomes Singleton
+// TTrack added, TRGCDC becomes Singleton
 //
 // Revision 1.1  1998/04/10 00:51:14  yiwasaki
 // TCircle, TConformalFinder, TConformalLink, TFinderBase, THistogram, TLink, TTrackBase classes added
@@ -203,7 +203,7 @@
 #endif
 
 namespace Belle2 {
-    class CDCTrigger;
+    class TRGCDC;
 }
 
 namespace Belle {
@@ -257,8 +257,8 @@ class TConformalFinder : public TFinderBase {
     void init(void);
 
     /// finds tracks.
-    int doit(const CAList<Belle2::CDCTriggerWireHit> & axialHits,
-	     const CAList<Belle2::CDCTriggerWireHit> & stereoHits,
+    int doit(const CAList<Belle2::TRGCDCWireHit> & axialHits,
+	     const CAList<Belle2::TRGCDCWireHit> & stereoHits,
 	     AList<TTrack> & tracks,
 	     AList<TTrack> & tracks2D);
 
@@ -343,7 +343,7 @@ class TConformalFinder : public TFinderBase {
     Vector3D direction(const TSegment &) const;
 
   public:// Utility functions
-    static const Belle2::CDCTriggerWire * conformal2Wire(const HepGeom::Point3D<double> & conformalPoint);
+    static const Belle2::TRGCDCWire * conformal2Wire(const HepGeom::Point3D<double> & conformalPoint);
 
   private:// Parameters given by arguments
     const bool _fastFinder;

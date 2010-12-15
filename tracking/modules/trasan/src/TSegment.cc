@@ -62,7 +62,7 @@
 // Fix it right
 //
 // Revision 1.4  1998/11/10 09:09:07  yiwasaki
-// Trasan 1.1 beta 8 release : negative sqrt fixed, curl finder updated by j.tanaka, CDCTrigger classes modified by y.iwasaki
+// Trasan 1.1 beta 8 release : negative sqrt fixed, curl finder updated by j.tanaka, TRGCDC classes modified by y.iwasaki
 //
 // Revision 1.3  1998/07/29 04:34:54  yiwasaki
 // Trasan 1.06 release : back to Trasan 1.02
@@ -79,8 +79,8 @@
 #include "tracking/modules/trasan/TSegment.h"
 
 #include "tracking/modules/trasan/TLink.h"
-#include "trigger/cdc/CDCTriggerWire.h"
-#include "trigger/cdc/CDCTriggerWireHit.h"
+#include "trg/cdc/Wire.h"
+#include "trg/cdc/WireHit.h"
 #include "tracking/modules/trasan/Range.h"
 
 #ifdef TRASAN_DEBUG
@@ -509,7 +509,7 @@ TSegment::splitComplicated(void) const {
     AList<TLink> goodHits;
     unsigned n = _links.length();
     for (unsigned i = 0; i < n; i++) {
-	const Belle2::CDCTriggerWireHit * h = _links[i]->hit();
+	const Belle2::TRGCDCWireHit * h = _links[i]->hit();
 	unsigned state = h->state();
 	if (! (state & WireHitContinuous)) continue;
 	if (! (state & WireHitIsolated)) continue;
@@ -526,13 +526,13 @@ TSegment::splitComplicated(void) const {
 
 	//...Select an edge hit...
 	TLink * seed = goodHits.last();
-	const Belle2::CDCTriggerWire * wire = seed->wire();
+	const Belle2::TRGCDCWire * wire = seed->wire();
 	unsigned localId = wire->localId();
 	AList<TLink> used;
 	unsigned nn = _links.length();
 	for (unsigned i = 0; i < nn; i++) {
 	    TLink * t = _links[i];
-	    const Belle2::CDCTriggerWire * w = t->wire();
+	    const Belle2::TRGCDCWire * w = t->wire();
 
 	    //...Straight?...
 	    if (abs((int) w->localId() - (int) localId) < 2) used.append(t);
@@ -600,8 +600,8 @@ TSegment::splitParallel(void) const {
 	seeds[1].append(outerList[1]);
 	if (list.length() == 2) continue;
 
-	const Belle2::CDCTriggerWire & wire0 = * outerList[0]->wire();
-	const Belle2::CDCTriggerWire & wire1 = * outerList[1]->wire();
+	const Belle2::TRGCDCWire & wire0 = * outerList[0]->wire();
+	const Belle2::TRGCDCWire & wire1 = * outerList[1]->wire();
 	for (unsigned k = 0; k < (unsigned) list.length(); k++) {
 	    TLink * t = list[k];
 	    if (t == outerList[0]) continue;
@@ -664,8 +664,8 @@ TSegment::updateDuality(void) const {
 
 	if (list.length() == 2) {
 	    if (TLink::width(list) != 2) continue;
-	    const Belle2::CDCTriggerWireHit * h0 = list[0]->hit();
-	    const Belle2::CDCTriggerWireHit * h1 = list[1]->hit();
+	    const Belle2::TRGCDCWireHit * h0 = list[0]->hit();
+	    const Belle2::TRGCDCWireHit * h1 = list[1]->hit();
 
 	    double distance = (h0->xyPosition() - h1->xyPosition()).mag();
 	    distance = fabs(distance - list[0]->drift() - list[1]->drift());
@@ -749,8 +749,8 @@ TSegment::solveDualHits(void) {
 	}
 	else if (list.length() == 2) {
 	    if (TLink::width(list) > 1) {
-		const Belle2::CDCTriggerWireHit * h0 = list[0]->hit();
-		const Belle2::CDCTriggerWireHit * h1 = list[1]->hit();
+		const Belle2::TRGCDCWireHit * h0 = list[0]->hit();
+		const Belle2::TRGCDCWireHit * h1 = list[1]->hit();
 		double distance = (h0->xyPosition() - h1->xyPosition()).mag();
 		distance = fabs(distance - 
 				list[0]->drift() - 

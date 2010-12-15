@@ -230,10 +230,10 @@
 // Trasan 1.53a release : cathode updates by T.Matsumoto, minor change of Conformal finder
 //
 // Revision 1.36  1999/07/06 10:41:10  yiwasaki
-// Trasan 1.52a release : CDCTrigger bug fix, associated hits output
+// Trasan 1.52a release : TRGCDC bug fix, associated hits output
 //
 // Revision 1.35  1999/07/01 08:15:24  yiwasaki
-// Trasan 1.51a release : builder bug fix, CDCTrigger bug fix again, T0 determination has more parameters
+// Trasan 1.51a release : builder bug fix, TRGCDC bug fix again, T0 determination has more parameters
 //
 // Revision 1.34  1999/06/26 07:05:43  yiwasaki
 // Trasan 1.47a release : hit and tracking efficiency improved
@@ -245,7 +245,7 @@
 // Trasan 1.45 release : T0 determination by 2D fitting
 //
 // Revision 1.31  1999/06/15 06:33:41  yiwasaki
-// Trasan 1.43 release : minor changes in CDCTriggerClust and TBuilder
+// Trasan 1.43 release : minor changes in TRGCDCClust and TBuilder
 //
 // Revision 1.30  1999/06/09 15:09:53  yiwasaki
 // Trasan 1.38 release : changes for lp
@@ -323,7 +323,7 @@
 // Trasan 1.1 RC 1 release : salvaging installed, basf_if/refit.cc added
 //
 // Revision 1.5  1998/11/10 09:09:13  yiwasaki
-// Trasan 1.1 beta 8 release : negative sqrt fixed, curl finder updated by j.tanaka, CDCTrigger classes modified by y.iwasaki
+// Trasan 1.1 beta 8 release : negative sqrt fixed, curl finder updated by j.tanaka, TRGCDC classes modified by y.iwasaki
 //
 // Revision 1.4  1998/09/29 01:24:27  yiwasaki
 // Trasan 1.1 beta 1 relase : TBuilderCurl added
@@ -367,9 +367,9 @@
 
 #include "tracking/modules/trasan/Strings.h"
 
-#include "trigger/cdc/CDCTriggerWireHit.h"
-#include "trigger/cdc/CDCTriggerWireHitMC.h"
-#include "trigger/cdc/CDCTriggerTrackMC.h"
+#include "trg/cdc/WireHit.h"
+#include "trg/cdc/WireHitMC.h"
+#include "trg/cdc/TrackMC.h"
 #include "tracking/modules/trasan/Trasan.h"
 #include "tracking/modules/trasan/TTrack.h"
 #include "tracking/modules/trasan/TTrackMC.h"
@@ -475,8 +475,8 @@ struct reccdc_wirhit {
   float m_adc;
 };
 #endif
-#ifndef PANTHER_DACDCTrigger_MCWIRHIT_
-#define PANTHER_DACDCTrigger_MCWIRHIT_
+#ifndef PANTHER_DATRGCDC_MCWIRHIT_
+#define PANTHER_DATRGCDC_MCWIRHIT_
 struct datcdc_mcwirhit {
   int m_panther_dummy_;
   int m_ID;
@@ -873,15 +873,15 @@ struct summary r;
 }
 
 void 
-TTrackManager::maskCurlHits(const CAList<Belle2::CDCTriggerWireHit> &axial,
-			    const CAList<Belle2::CDCTriggerWireHit> &stereo,
+TTrackManager::maskCurlHits(const CAList<Belle2::TRGCDCWireHit> &axial,
+			    const CAList<Belle2::TRGCDCWireHit> &stereo,
 			    const AList<TTrack> &tracks) const {
 //...Coded by jtanaka...
 
   int i = 0;
   while(const TTrack *t = tracks[i++]){
     int j = 0;
-    while(const Belle2::CDCTriggerWireHit * a = axial[j++]){
+    while(const Belle2::TRGCDCWireHit * a = axial[j++]){
       double x = t->helix().center().x() - a->xyPosition().x();
       double y = t->helix().center().y() - a->xyPosition().y();
       double r = sqrt(x*x+y*y);
@@ -894,7 +894,7 @@ TTrackManager::maskCurlHits(const CAList<Belle2::CDCTriggerWireHit> &axial,
       }
     }
     j = 0;
-    while(const Belle2::CDCTriggerWireHit * s = stereo[j++]){
+    while(const Belle2::TRGCDCWireHit * s = stereo[j++]){
       double x = t->helix().center().x() - s->xyPosition().x();
       double y = t->helix().center().y() - s->xyPosition().y();
       double r = sqrt(x*x+y*y);
@@ -910,7 +910,7 @@ TTrackManager::maskCurlHits(const CAList<Belle2::CDCTriggerWireHit> &axial,
 }
 
 void
-TTrackManager::salvage(const CAList<Belle2::CDCTriggerWireHit> & hits) const {
+TTrackManager::salvage(const CAList<Belle2::TRGCDCWireHit> & hits) const {
 
 #ifdef TRASAN_DEBUG_DETAIL
     std::cout << name() << " ... salvaging" << std::endl;
@@ -925,7 +925,7 @@ TTrackManager::salvage(const CAList<Belle2::CDCTriggerWireHit> & hits) const {
 
     //...Hit loop...
     for (unsigned i = 0; i < nHits; i++) {
-	const Belle2::CDCTriggerWireHit & h = * hits[i];
+	const Belle2::TRGCDCWireHit & h = * hits[i];
 
 	//...Already used?...
 	if (h.state() & WireHitUsed) continue;
@@ -954,7 +954,7 @@ TTrackManager::salvage(const CAList<Belle2::CDCTriggerWireHit> & hits) const {
 
 TTrack *
 TTrackManager::closest(const AList<TTrack> & tracks,
-		       const Belle2::CDCTriggerWireHit & hit) const {
+		       const Belle2::TRGCDCWireHit & hit) const {
 
     TLink t;
     t.hit(& hit);
@@ -1311,7 +1311,7 @@ TTrackManager::mask(void) const {
 //cnv #ifdef TRASAN_DEBUG_DETAIL
 //     std::cout << name() << " ... masking" << std::endl;
 // #endif
-//     static const unsigned nLayers = Belle2::CDCTrigger::getCDCTrigger()->nLayers();
+//     static const unsigned nLayers = Belle2::TRGCDC::getTRGCDC()->nLayers();
 //     static unsigned * nHits = new unsigned[nLayers];
 
 //     unsigned n = _tracks.length();
@@ -1323,7 +1323,7 @@ TTrackManager::mask(void) const {
 // 	if (! t.cores().length()) continue;
 
 // 	//...Counts # of hits per layer...
-// 	static unsigned * nHits = new unsigned[Belle2::CDCTrigger::getCDCTrigger()->nLayers()];
+// 	static unsigned * nHits = new unsigned[Belle2::TRGCDC::getTRGCDC()->nLayers()];
 // //	unsigned nHits[50];
 // 	TLink::nHits(t.cores(), nHits);
 
@@ -1441,7 +1441,7 @@ TTrackManager::removeHitsAcrossOverIp(AList<TLink> & l) const {
     unsigned n = l.length();
     float phiSum = 0.;
     for (unsigned i = 0; i < n; i++) {
-	const Belle2::CDCTriggerWire & w = l[i]->hit()->wire();
+	const Belle2::TRGCDCWire & w = l[i]->hit()->wire();
 	unsigned j = w.localId();
 	unsigned nWire = w.layer().nWires();
 
@@ -1452,7 +1452,7 @@ TTrackManager::removeHitsAcrossOverIp(AList<TLink> & l) const {
 
     AList<TLink> cross;
     for (unsigned i = 0; i < n; i++) {
-	const Belle2::CDCTriggerWire & w = l[i]->hit()->wire();
+	const Belle2::TRGCDCWire & w = l[i]->hit()->wire();
 	unsigned j = w.localId();
 	unsigned nWire = w.layer().nWires();
 
@@ -1479,7 +1479,7 @@ TTrackManager::maskOut(TTrack & t, const AList<TLink> & links) const {
     unsigned n = links.length();
     if (! n) return;
     for (unsigned i = 0; i < n; i++) {
-	const Belle2::CDCTriggerWireHit & hit = * links[i]->hit();
+	const Belle2::TRGCDCWireHit & hit = * links[i]->hit();
 	hit.state(hit.state() | WireHitInvalidForFit);
     }
     t._fitted = false;
@@ -1903,7 +1903,7 @@ TTrackManager::merge(void) {
 	    Noverlap = 0;
 	    for (unsigned j = 0; j < Nall; j++) {
 		TLink & l =  * t1.links()[j];
-		const Belle2::CDCTriggerWireHit & whit =  * l.hit();
+		const Belle2::TRGCDCWireHit & whit =  * l.hit();
 		double load(2.);
 		if (whit.state() & WireHitStereo) load = 3.;
 
@@ -2013,7 +2013,7 @@ TTrackManager::merge(void) {
 	TTrack & t = * _tracks[i];
 	for( unsigned j=0;j<(unsigned) t.links().length();j++){
 	    TLink & l =  * t.links()[j];
-	    const Belle2::CDCTriggerWireHit & whit =  * l.hit();
+	    const Belle2::TRGCDCWireHit & whit =  * l.hit();
 	   
 	    if( !(whit.state() & WireHitFittingValid) ) continue;
 	   
@@ -2649,16 +2649,16 @@ TTrackManager::tagReccdc(unsigned * id0, unsigned nTrk) const {
 //     std::cout << "TTrackManager::tagReccdc ... RECCDC_WIRHIT done" << std::endl;
 // #endif
 
-//     n = BsCouTab(DACDCTrigger_MCWIRHIT);
+//     n = BsCouTab(DATRGCDC_MCWIRHIT);
 //     for (unsigned i = 0; i < n; i++) {
 // 	datcdc_mcwirhit & m =
-// 	    * (datcdc_mcwirhit *) BsGetEnt(DACDCTrigger_MCWIRHIT,i + 1,BBS_No_Index);
+// 	    * (datcdc_mcwirhit *) BsGetEnt(DATRGCDC_MCWIRHIT,i + 1,BBS_No_Index);
 // 	if (m.m_trk == 0) continue;
 // 	m.m_trk = id[m.m_trk - 1] + 1;
 //     }
 
 // #ifdef TRASAN_DEBUG_DETAIL
-//     std::cout << "TTrackManager::tagReccdc ... DACDCTrigger_MCWIRHIT done" << std::endl;
+//     std::cout << "TTrackManager::tagReccdc ... DATRGCDC_MCWIRHIT done" << std::endl;
 // #endif
 
 //     n = BsCouTab(RECTRK);
@@ -2738,7 +2738,7 @@ TTrackManager::setCurlerFlags(void) {
 }
 
 void
-TTrackManager::salvageAssociateHits(const CAList<Belle2::CDCTriggerWireHit> & hits,
+TTrackManager::salvageAssociateHits(const CAList<Belle2::TRGCDCWireHit> & hits,
 				    float maxSigma2) {
 #ifdef TRASAN_DEBUG_DETAIL
     const std::string stage = "TRKMGR::salvage";
@@ -2766,7 +2766,7 @@ TTrackManager::salvageAssociateHits(const CAList<Belle2::CDCTriggerWireHit> & hi
 
     //...Hit loop...
     for (unsigned i = 0; i < nHits; i++) {
-	const Belle2::CDCTriggerWireHit & h = * hits[i];
+	const Belle2::TRGCDCWireHit & h = * hits[i];
 
 	//...Already used ?...
 	if (h.state() & WireHitUsed) continue;
@@ -2901,10 +2901,10 @@ TTrackManager::clearTables(void) const {
 // 	    BsGetEnt(RECCDC_WIRHIT, i + 1, BBS_No_Index);
 // 	h.m_trk = 0;
 //     }
-//     n = BsCouTab(DACDCTrigger_MCWIRHIT);
+//     n = BsCouTab(DATRGCDC_MCWIRHIT);
 //     for (unsigned i = 0; i < n; i++) {
 // 	datcdc_mcwirhit & h = * (datcdc_mcwirhit *)
-// 	    BsGetEnt(DACDCTrigger_MCWIRHIT, i + 1, BBS_No_Index);
+// 	    BsGetEnt(DATRGCDC_MCWIRHIT, i + 1, BBS_No_Index);
 // 	h.m_trk = 0;
 //     }
 }

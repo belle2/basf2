@@ -24,7 +24,7 @@
 #include "tracking/modules/trasan/TWindowConformalDrawingArea.h"
 
 namespace Belle2 {
-    class CDCTriggerWireHit;
+    class TRGCDCWireHit;
 }
 
 namespace Belle {
@@ -49,7 +49,7 @@ class TWindowGTKConformal : public TWindowGTK {
 
   public: // Tracking stuff
     void clear(void);
-    void append(const CAList<Belle2::CDCTriggerWireHit> &,
+    void append(const CAList<Belle2::TRGCDCWireHit> &,
 		Gdk::Color color = Gdk::Color("grey"));
     void append(const AList<TLink> &,
 		Gdk::Color color = Gdk::Color("grey"));

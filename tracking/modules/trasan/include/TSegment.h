@@ -96,7 +96,7 @@ template <class T> class CAList;
 
 #define TSegmentCrowd 8
 
-/// A class to relate CDCTriggerWireHit and TTrack objects.
+/// A class to relate TRGCDCWireHit and TTrack objects.
 class TSegment : public TTrackBase {
 
   public:

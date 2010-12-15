@@ -102,7 +102,7 @@
 
 
 #include "tracking/modules/trasan/Strings.h"
-#include "trigger/cdc/CDCTrigger.h"
+#include "trg/cdc/TRGCDC.h"
 #include "tracking/modules/trasan/TWindow.h"
 #include "tracking/modules/trasan/TLink.h"
 #include "tracking/modules/trasan/TTrack.h"
@@ -110,7 +110,7 @@
 #include "tracking/modules/trasan/TSegment.h"
 #include "tracking/modules/trasan/TSegmentCurl.h"
 #include "tracking/modules/trasan/TCircle.h"
-#include "trigger/cdc/CDCTriggerWireHitMC.h"
+#include "trg/cdc/WireHitMC.h"
 #include "tracking/modules/trasan/TTrackHEP.h"
 #include "tracking/modules/trasan/TConformalFinder0.h"
 
@@ -421,8 +421,8 @@ TWindow::drawBase(const TTrackBase & base, leda_color c) {
 	else if (_mode == 1) {
 
 	    //...Transformation...
-	    AList<CDCTriggerWireHit> list;
-	    list.append((CDCTriggerWireHit *) links[i]->hit());
+	    AList<TRGCDCWireHit> list;
+	    list.append((TRGCDCWireHit *) links[i]->hit());
 	    AList<TLink> list2;
 	    TConformalFinder0::conformalTransformationRphi(ORIGIN, list,list2);
 
@@ -496,8 +496,8 @@ TWindow::drawSegment(const TSegment & base, leda_color c) {
 	else if (_mode == 1) {
 
 	    //...Transformation...
-	    AList<CDCTriggerWireHit> list;
-	    list.append((CDCTriggerWireHit *) links[i]->hit());
+	    AList<TRGCDCWireHit> list;
+	    list.append((TRGCDCWireHit *) links[i]->hit());
 	    AList<TLink> list2;
 	    TConformalFinder0::conformalTransformationRphi(ORIGIN, list,list2);
 
@@ -518,8 +518,8 @@ TWindow::drawSegment(const TSegment & base, leda_color c) {
 	else if (_mode == 3) {
 
 	    //...Transformation...
-	    AList<CDCTriggerWireHit> list;
-	    list.append((CDCTriggerWireHit *) links[i]->hit());
+	    AList<TRGCDCWireHit> list;
+	    list.append((TRGCDCWireHit *) links[i]->hit());
 	    AList<TLink> list2;
 	    TConformalFinder0::conformalTransformation(ORIGIN, list, list2);
 
@@ -577,9 +577,9 @@ TWindow::drawSegment(const TSegment & base, leda_color c) {
 	else if (_mode == 1) {
 
 	    //...Transformation...
-	    AList<CDCTriggerWireHit> list;
-	    list.append((CDCTriggerWireHit *) links[0]->hit());
-	    list.append((CDCTriggerWireHit *) innerTLinks.last()->hit());
+	    AList<TRGCDCWireHit> list;
+	    list.append((TRGCDCWireHit *) links[0]->hit());
+	    list.append((TRGCDCWireHit *) innerTLinks.last()->hit());
 	    AList<TLink> list2;
 	    TConformalFinder0::conformalTransformation(ORIGIN, list, list2);
 
@@ -595,9 +595,9 @@ TWindow::drawSegment(const TSegment & base, leda_color c) {
 	else if (_mode == 3) {
 
 	    //...Transformation...
-	    AList<CDCTriggerWireHit> list;
-	    list.append((CDCTriggerWireHit *) links[0]->hit());
-	    list.append((CDCTriggerWireHit *) innerTLinks.last()->hit());
+	    AList<TRGCDCWireHit> list;
+	    list.append((TRGCDCWireHit *) links[0]->hit());
+	    list.append((TRGCDCWireHit *) innerTLinks.last()->hit());
 	    AList<TLink> list2;
 	    TConformalFinder0::conformalTransformation(ORIGIN, list, list2);
 
@@ -695,8 +695,8 @@ TWindow::drawTrack(const TTrack & t, leda_color c) {
 	else if (_mode == 1) {
 
 	    //...Transformation...
-	    AList<CDCTriggerWireHit> list;
-	    list.append((CDCTriggerWireHit *) links[i]->hit());
+	    AList<TRGCDCWireHit> list;
+	    list.append((TRGCDCWireHit *) links[i]->hit());
 	    AList<TLink> list2;
 	    TConformalFinder0::conformalTransformationRphi(ORIGIN, list,list2);
 
@@ -714,8 +714,8 @@ TWindow::drawTrack(const TTrack & t, leda_color c) {
 	else if (_mode == 3) {
 
 	    //...Transformation...
-	    AList<CDCTriggerWireHit> list;
-	    list.append((CDCTriggerWireHit *) links[i]->hit());
+	    AList<TRGCDCWireHit> list;
+	    list.append((TRGCDCWireHit *) links[i]->hit());
 	    AList<TLink> list2;
 	    TConformalFinder0::conformalTransformation(ORIGIN, list, list2);
 
@@ -847,7 +847,7 @@ TWindow::clear(void) {
 }
 
 void
-TWindow::append(const AList<CDCTriggerWireHit> & list, leda_color c) {
+TWindow::append(const AList<TRGCDCWireHit> & list, leda_color c) {
     AList<TLink> links;
     for (unsigned i = 0; i < (unsigned) list.length(); i++)
 	links.append(new TLink(NULL, list[i]));

@@ -1,5 +1,5 @@
-#ifndef TSEGMENCDCTrigger_FLAG
-#define TSEGMENCDCTrigger_FLAG
+#ifndef TSEGMENTRGCDC_FLAG
+#define TSEGMENTRGCDC_FLAG
 
 #include "tracking/modules/trasan/TLink.h"
 #if defined(BELLE_NAMESPACE)
@@ -51,4 +51,4 @@ private:
 #if defined(BELLE_NAMESPACE)
 } // namespace Belle
 #endif
-#endif /* TSEGMENCDCTrigger_FLAG */
+#endif /* TSEGMENTRGCDC_FLAG */

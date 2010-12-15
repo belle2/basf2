@@ -42,9 +42,9 @@
 #include "tracking/modules/trasan/TCurlFinderParameters.h"
 
 namespace Belle2 {
-    class CDCTrigger;
-    class CDCTriggerWire;
-    class CDCTriggerWireHit;
+    class TRGCDC;
+    class TRGCDCWire;
+    class TRGCDCWireHit;
 }
 
 namespace Belle {
@@ -102,8 +102,8 @@ public:
 	      int turnOffInnermost3Layers);
 
   /// main function
-  int doit(const CAList<Belle2::CDCTriggerWireHit> & axialHits,
-	   const CAList<Belle2::CDCTriggerWireHit> & stereoHits,
+  int doit(const CAList<Belle2::TRGCDCWireHit> & axialHits,
+	   const CAList<Belle2::TRGCDCWireHit> & stereoHits,
 	   AList<TTrack> & tracks,
 	   AList<TTrack> & tracks2D);
 
@@ -120,7 +120,7 @@ public:
   static void set_superb(bool s) {
     ms_superb = s;
   }
-  friend class Belle2::CDCTrigger;
+  friend class Belle2::TRGCDC;
 
 
 private:
@@ -136,7 +136,7 @@ private:
   unsigned nAxialHits(const double&) const;
 
   /// Sub Main Section #1
-  void makeWireHitsListsSegments(const CAList<Belle2::CDCTriggerWireHit>&, const CAList<Belle2::CDCTriggerWireHit>&);
+  void makeWireHitsListsSegments(const CAList<Belle2::TRGCDCWireHit>&, const CAList<Belle2::TRGCDCWireHit>&);
   
   /// Sub Main Section #2
   int checkSortSegments(void);
@@ -191,7 +191,7 @@ private:
 
   /// MC
 #ifdef DEBUG_CURL_MC
-  int makeWithMC(const AList<Belle2::CDCTriggerWireHit>&, const AList<Belle2::CDCTriggerWireHit>&,AList<TTrack>&);
+  int makeWithMC(const AList<Belle2::TRGCDCWireHit>&, const AList<Belle2::TRGCDCWireHit>&,AList<TTrack>&);
 #endif
 
   /// Plot
@@ -230,7 +230,7 @@ private:
   AList<TTrack>  m_svdTracks;
   AList<TTrack>  m_2dTracks;
 
-  CAList<Belle2::CDCTriggerWireHit>   m_hitsOnInnerSuperLayer;
+  CAList<Belle2::TRGCDCWireHit>   m_hitsOnInnerSuperLayer;
 
   AList<TLink> *m_unusedAxialHitsOnEachLayer;
   AList<TLink> *m_unusedStereoHitsOnEachLayer;

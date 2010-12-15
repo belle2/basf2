@@ -38,7 +38,7 @@
 // Trasan 1 alpha 1 release
 //
 // Revision 1.2  1998/04/10 09:36:27  yiwasaki
-// TTrack added, CDCTrigger becomes Singleton
+// TTrack added, TRGCDC becomes Singleton
 //
 // Revision 1.1  1998/04/10 00:50:15  yiwasaki
 // TCircle, TConformalFinder, TConformalLink, TFinderBase, THistogram, TLink, TTrackBase classes added
@@ -49,7 +49,7 @@
 
 #include <iostream>
 #include "tracking/modules/trasan/TFinderBase.h"
-#include "trigger/cdc/CDCTrigger.h"
+#include "trg/cdc/TRGCDC.h"
 #include "tracking/modules/trasan/TCircle.h"
 #include "tracking/modules/trasan/TTrack.h"
 #include "tracking/modules/trasan/TPoint2D.h"
@@ -149,7 +149,7 @@ TFinderBase::crossPointsBySuperLayer(const TCircle & circle,
     const double sl = - c.x() / c.y();
 
     //...Calculate points...
-    const Belle2::CDCTrigger & cdc = * Belle2::CDCTrigger::getCDCTrigger();
+    const Belle2::TRGCDC & cdc = * Belle2::TRGCDC::getTRGCDC();
     unsigned nOk = 0;
     //    for (unsigned i = 0; i < 12; i++) {
     for (unsigned i = 0; i <= cdc.nSuperLayers(); i++) {
@@ -202,7 +202,7 @@ TFinderBase::pickUpLinks(const TCircle & circle,
 			 unsigned axialStereoSwitch) {
 
     AList<TLink> outList;
-    const Belle2::CDCTrigger & cdc = * Belle2::CDCTrigger::getCDCTrigger();
+    const Belle2::TRGCDC & cdc = * Belle2::TRGCDC::getTRGCDC();
 //  TPoint2D points[cdc.nSuperLayers()+1];
 //  _points0 = new TPoint2D[cdc.nSuperLayers() + 1];
     int err = crossPointsBySuperLayer(circle, _points0);
@@ -214,7 +214,7 @@ TFinderBase::pickUpLinks(const TCircle & circle,
 	return outList;
     }
 
-    //    const Belle2::CDCTrigger & cdc = * Belle2::CDCTrigger::getCDCTrigger();
+    //    const Belle2::TRGCDC & cdc = * Belle2::TRGCDC::getTRGCDC();
     unsigned nBad = links.length();
     for (unsigned i = 0; i < nBad; i++) {
 	unsigned sl = links[i]->wire()->superLayerId();
@@ -271,7 +271,7 @@ TFinderBase::crossPointsByLayer(const TCircle & circle,
 				TPoint2D * points) {
 
     //...Check CDC version...
-    const Belle2::CDCTrigger & cdc = * Belle2::CDCTrigger::getCDCTrigger();
+    const Belle2::TRGCDC & cdc = * Belle2::TRGCDC::getTRGCDC();
     bool scdc = false;
     if (cdc.versionCDC() == "small cell") scdc = true;
 
@@ -285,7 +285,7 @@ TFinderBase::crossPointsByLayer(const TCircle & circle,
       RR = new float [cdc.nLayers()];
       RR2 = new float [cdc.nLayers()];
 	for (unsigned i = i0; i < cdc.nLayers(); i++) {
-	    const Belle2::CDCTriggerWire & w = * (* cdc.layer(i))[0];
+	    const Belle2::TRGCDCWire & w = * (* cdc.layer(i))[0];
 	    RR[i] = w.xyPosition().perp();
 	    RR2[i] = RR[i] * RR[i];
 	}
@@ -363,7 +363,7 @@ TFinderBase::pickUpLinks2(const TCircle & circle,
 #endif
 
     AList<TLink> outList;
-    const Belle2::CDCTrigger & cdc = * Belle2::CDCTrigger::getCDCTrigger();
+    const Belle2::TRGCDC & cdc = * Belle2::TRGCDC::getTRGCDC();
 //  TPoint2D points[cdc.nSuperLayers()+1];
 //  _points1 = new TPoint2D[cdc.nSuperLayers() + 1];
     const int err = crossPointsBySuperLayer(circle, _points1);
@@ -376,7 +376,7 @@ TFinderBase::pickUpLinks2(const TCircle & circle,
 	return outList;
     }
 
-    //    const Belle2::CDCTrigger & cdc = * Belle2::CDCTrigger::getCDCTrigger();
+    //    const Belle2::TRGCDC & cdc = * Belle2::TRGCDC::getTRGCDC();
     unsigned nBad = links.length();
     for (unsigned i = 0; i < nBad; i++) {
 	const unsigned sl = links[i]->wire()->superLayerId();
@@ -477,7 +477,7 @@ TFinderBase::pickUpLinksDetail(const TCircle & circle,
 #endif
 
     AList<TLink> outList;
-    const Belle2::CDCTrigger & cdc = * Belle2::CDCTrigger::getCDCTrigger();
+    const Belle2::TRGCDC & cdc = * Belle2::TRGCDC::getTRGCDC();
 //  TPoint2D points[cdc.nLayers()+1];
 //  _points2 = new TPoint2D[cdc.nLayers() + 1];
     int err = crossPointsByLayer(circle, _points2);

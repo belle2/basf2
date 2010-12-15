@@ -6,7 +6,7 @@
 // Owner    : Yoshihito Iwasaki
 // Email    : yoshihito.iwasaki@kek.jp
 //-----------------------------------------------------------------------------
-// Description : A class to relate CDCTriggerWireHit and TTrack objects.
+// Description : A class to relate TRGCDCWireHit and TTrack objects.
 //               See http://bsunsrv1.kek.jp/~yiwasaki/tracking/
 //-----------------------------------------------------------------------------
 // $Log$
@@ -140,7 +140,7 @@
 // minor changes
 //
 // Revision 1.2  1998/04/10 09:36:27  yiwasaki
-// TTrack added, CDCTrigger becomes Singleton
+// TTrack added, TRGCDC becomes Singleton
 //
 // Revision 1.1  1998/04/10 00:50:16  yiwasaki
 // TCircle, TConformalFinder, TConformalLink, TFinderBase, THistogram, TLink, TTrackBase classes added
@@ -153,10 +153,10 @@
 #include "tracking/modules/trasan/ConstAList.h"
 #include "tracking/modules/trasan/Strings.h"
 #include "tracking/modules/trasan/TLink.h"
-#include "trigger/cdc/CDCTriggerWireHit.h"
-#include "trigger/cdc/CDCTriggerWireHitMC.h"
+#include "trg/cdc/WireHit.h"
+#include "trg/cdc/WireHitMC.h"
 
-#include "trigger/cdc/CDCTriggerTrackMC.h"
+#include "trg/cdc/TrackMC.h"
 #include "tracking/modules/trasan/TTrack.h"
 
 namespace Belle {
@@ -183,7 +183,7 @@ unsigned TLink::_nSL = 0;
 unsigned TLink::_nSLA = 0;
 unsigned * TLink::_nHitsSL = 0;
 
-TLink::TLink(TTrack * t, const Belle2::CDCTriggerWireHit * h, const HepGeom::Point3D<double> & p)
+TLink::TLink(TTrack * t, const Belle2::TRGCDCWireHit * h, const HepGeom::Point3D<double> & p)
 : _track(t),
   _hit(h),
   _position(p),
@@ -319,7 +319,7 @@ TLink::dump(const std::string & msg, const std::string & pre) const {
 unsigned
 TLink::nLayers(const AList<TLink> & list) {
 #ifdef TRASAN_DEBUG
-    const Belle2::CDCTrigger & cdc = * Belle2::CDCTrigger::getCDCTrigger();
+    const Belle2::TRGCDC & cdc = * Belle2::TRGCDC::getTRGCDC();
     if (cdc.nLayers() > 64)
 	std::cout << "TLink::nLayers !!! #layers should be less than 64"
 	       << std::endl;
@@ -479,13 +479,13 @@ TLink::dump(const CAList<TLink> & links,
 
     //...Parent...
     if (mc) {
-	std::vector<const Belle2::CDCTriggerTrackMC *> list = Belle2::CDCTriggerTrackMC::list();
+	std::vector<const Belle2::TRGCDCTrackMC *> list = Belle2::TRGCDCTrackMC::list();
 	if (! list.size()) return;
 	std::cout << pre;
 	unsigned nMC = 0;
 	for (unsigned i = 0; i < MCC_MAX; i++) {
 	    if (MCC0[i] > 0) {
-		const Belle2::CDCTriggerTrackMC * h = list[i];
+		const Belle2::TRGCDCTrackMC * h = list[i];
 //		std::cout << ", mc" << i << "(" << h->pType() << ")";
 		std::cout << ", mc" << i << "(";
 		if (h)
@@ -493,7 +493,7 @@ TLink::dump(const CAList<TLink> & links,
 		else
 		    std::cout << "?)";
 		while (h) {
-		    const Belle2::CDCTriggerTrackMC * m = h->mother();
+		    const Belle2::TRGCDCTrackMC * m = h->mother();
 		    if (m) {
 			std::cout << "<-mc" << m->id();
 			h = m;
@@ -598,7 +598,7 @@ TLink::separateCores(const AList<TLink> & input,
     unsigned n = input.length();
     for (unsigned i = 0; i < n; i++) {
 	TLink & t = * input[i];
-	const Belle2::CDCTriggerWireHit & h = * t.hit();
+	const Belle2::TRGCDCWireHit & h = * t.hit();
 	if (h.state() & WireHitFittingValid)
 	    cores.append(t);
 	else
@@ -612,7 +612,7 @@ TLink::cores(const AList<TLink> & input) {
     unsigned n = input.length();
     for (unsigned i = 0; i < n; i++) {
 	TLink & t = * input[i];
-	const Belle2::CDCTriggerWireHit & h = * t.hit();
+	const Belle2::TRGCDCWireHit & h = * t.hit();
 	if (h.state() & WireHitFittingValid)
 	    a.append(t);
     }
@@ -661,7 +661,7 @@ TLink::width(const AList<TLink> & list) {
     const unsigned n = list.length();
     if (n < 2) return n;
 
-    const Belle2::CDCTriggerWire * const w0 = list[0]->wire();
+    const Belle2::TRGCDCWire * const w0 = list[0]->wire();
     const unsigned sId = w0->superLayerId();
     unsigned nWires = w0->layer().nWires();
     unsigned center = w0->localId();
@@ -681,7 +681,7 @@ TLink::width(const AList<TLink> & list) {
     unsigned left = 0;
     unsigned right = 0;
     for (unsigned i = 1; i < n; i++) {
-	const Belle2::CDCTriggerWire * const w = list[i]->wire();
+	const Belle2::TRGCDCWire * const w = list[i]->wire();
 	unsigned id = w->localId();
 
 	if (ms_smallcell && w->layerId() < 3)
@@ -726,7 +726,7 @@ TLink::edges(const AList<TLink> & list) {
     if (n < 2) return a;
     else if (n == 2) return list;
 
-    const Belle2::CDCTriggerWire * w = list[0]->wire();
+    const Belle2::TRGCDCWire * w = list[0]->wire();
     unsigned nWires = w->layer().nWires();
     unsigned center = w->localId();
 
@@ -833,7 +833,7 @@ TLink::inOut(const AList<TLink> & list) {
 unsigned
 TLink::superLayer(const AList<TLink> & list) {
 #ifdef TRASAN_DEBUG
-    const Belle2::CDCTrigger & cdc = * Belle2::CDCTrigger::getCDCTrigger();
+    const Belle2::TRGCDC & cdc = * Belle2::TRGCDC::getTRGCDC();
     if (cdc.nSuperLayers() > 32)
 	std::cout << "TLink::superLayer !!! #super layers should be less than 32"
 	       << std::endl;
@@ -849,7 +849,7 @@ TLink::superLayer(const AList<TLink> & list) {
 unsigned
 TLink::superLayer(const AList<TLink> & links, unsigned minN) {
 #ifdef TRASAN_DEBUG
-    const Belle2::CDCTrigger & cdc = * Belle2::CDCTrigger::getCDCTrigger();
+    const Belle2::TRGCDC & cdc = * Belle2::TRGCDC::getTRGCDC();
     if (cdc.nSuperLayers() > 32)
 	std::cout
 	    << "#super layers should be less than 32" << std::endl;
@@ -869,7 +869,7 @@ TLink::superLayer(const AList<TLink> & links, unsigned minN) {
 unsigned
 TLink::nSuperLayers(const AList<TLink> & list) {
 #ifdef TRASAN_DEBUG
-    const Belle2::CDCTrigger & cdc = * Belle2::CDCTrigger::getCDCTrigger();
+    const Belle2::TRGCDC & cdc = * Belle2::TRGCDC::getTRGCDC();
     if (cdc.nSuperLayers() > 32)
 	std::cout
 	    << "#super layers should be less than 32" << std::endl;
@@ -925,10 +925,10 @@ TLink::nMissingAxialSuperLayers(const AList<TLink> & links) {
     return nMax;
 }
 
-const Belle2::CDCTriggerTrackMC &
+const Belle2::TRGCDCTrackMC &
 TLink::links2HEP(const AList<TLink> & links) {
-    const Belle2::CDCTriggerTrackMC * best = NULL;
-    const std::vector<const Belle2::CDCTriggerTrackMC *> list = Belle2::CDCTriggerTrackMC::list();
+    const Belle2::TRGCDCTrackMC * best = NULL;
+    const std::vector<const Belle2::TRGCDCTrackMC *> list = Belle2::TRGCDCTrackMC::list();
     unsigned nHep = list.size();
 
     if (! nHep) return * best;
@@ -942,7 +942,7 @@ TLink::links2HEP(const AList<TLink> & links) {
 
     for (unsigned i = 0; i < (unsigned) links.length(); i++) {
 	const TLink & l = * links[i];
-	const Belle2::CDCTriggerTrackMC & hep = * l.hit()->mc()->hep();
+	const Belle2::TRGCDCTrackMC & hep = * l.hit()->mc()->hep();
 	for (unsigned j = 0; j < nHep; j++)
 	    if (list[j] == & hep)
 		++N[j];
@@ -969,7 +969,7 @@ TLink::nHitsSuperLayer(const AList<TLink> & links, AList<TLink> * list) {
 std::string
 TLink::layerUsage(const AList<TLink> & links) {
 //  unsigned n[11];
-    static unsigned * n = new unsigned[Belle2::CDCTrigger::getCDCTrigger()->nSuperLayers()];
+    static unsigned * n = new unsigned[Belle2::TRGCDC::getTRGCDC()->nSuperLayers()];
     nHitsSuperLayer(links, n);
     std::string nh;
     for (unsigned i = 0; i < _nSL; i++) {
@@ -1000,7 +1000,7 @@ void
 TLink::initializeBuffers(void) {
     static bool first = true;
     if (first) {
-	const Belle2::CDCTrigger & cdc = * Belle2::CDCTrigger::getCDCTrigger();
+	const Belle2::TRGCDC & cdc = * Belle2::TRGCDC::getTRGCDC();
 	_nL = cdc.nLayers();
 	_nSL = cdc.nSuperLayers();
 	_nSLA = cdc.nAxialSuperLayers();

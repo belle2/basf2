@@ -2,7 +2,7 @@
 // $Id$
 //-----------------------------------------------------------------------------
 // Filename : TrasanModule.cc
-// Section  : Trigger CDC
+// Section  : TRG CDC
 // Owner    : Yoshihito Iwasaki
 // Email    : yoshihito.iwasaki@kek.jp
 //-----------------------------------------------------------------------------

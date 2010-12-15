@@ -89,10 +89,10 @@
 
 #include "tracking/modules/trasan/TLine.h"
 
-#include "trigger/cdc/CDCTriggerWire.h"
-#include "trigger/cdc/CDCTriggerWireHit.h"
-#include "trigger/cdc/CDCTriggerWireHitMC.h"
-#include "trigger/cdc/CDCTriggerTrackMC.h"
+#include "trg/cdc/Wire.h"
+#include "trg/cdc/WireHit.h"
+#include "trg/cdc/WireHitMC.h"
+#include "trg/cdc/TrackMC.h"
 
 namespace Belle {
 
@@ -253,7 +253,7 @@ int
 TLine::fit2() {
   //    if (_fitted) return 0;
 
-    static const Belle2::CDCTrigger & cdc = * Belle2::CDCTrigger::getCDCTrigger();
+    static const Belle2::TRGCDC & cdc = * Belle2::TRGCDC::getTRGCDC();
 
     unsigned n = _links.length();
     int mask[100] = {0};
@@ -486,7 +486,7 @@ int
 TLine::fit2p() {
   //    if (_fitted) return 0;
 
-    static const Belle2::CDCTrigger & cdc = * Belle2::CDCTrigger::getCDCTrigger();
+    static const Belle2::TRGCDC & cdc = * Belle2::TRGCDC::getTRGCDC();
 
     unsigned n = _links.length();
     int mask[100] = {0};

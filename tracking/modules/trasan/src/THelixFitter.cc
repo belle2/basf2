@@ -74,7 +74,7 @@
 // track charge is determined by fitting
 //
 // Revision 1.21  1999/11/23 10:30:19  yiwasaki
-// ALPHA in CDCTriggerUtil is replaced by THelix::ConstantAlpha
+// ALPHA in TRGCDCUtil is replaced by THelix::ConstantAlpha
 //
 // Revision 1.20  1999/11/19 09:13:08  yiwasaki
 // Trasan 1.65d : new conf. finder updates, no change in default conf. finder
@@ -98,10 +98,10 @@
 // Trasan 1.55b release : Curl finder # of hits protection, bug in TManager for MC, helix fitter # of hits protection, fast finder improved
 //
 // Revision 1.13  1999/07/01 08:15:24  yiwasaki
-// Trasan 1.51a release : builder bug fix, CDCTrigger bug fix again, T0 determination has more parameters
+// Trasan 1.51a release : builder bug fix, TRGCDC bug fix again, T0 determination has more parameters
 //
 // Revision 1.12  1999/06/29 05:14:40  yiwasaki
-// Trasan 1.49a release : minor change : Support for invalid hits in CDCTrigger
+// Trasan 1.49a release : minor change : Support for invalid hits in TRGCDC
 //
 // Revision 1.11  1999/06/17 01:39:18  yiwasaki
 // Trasan 1.441 release : default mom. cut = 0. to recon. cosmics
@@ -131,7 +131,7 @@
 // flag bug fix
 //
 // Revision 1.2  1999/03/03 09:14:50  yiwasaki
-// CDCTriggerWireHit::WireHitValid -> WireHitFindingValid, WireHitFittingValid flag is checked in THelixFitter::fit
+// TRGCDCWireHit::WireHitValid -> WireHitFindingValid, WireHitFittingValid flag is checked in THelixFitter::fit
 //
 // Revision 1.1  1999/01/11 03:03:11  yiwasaki
 // Fitters added
@@ -254,8 +254,8 @@ struct reccdc_wirhit {
   float m_adc;
 };
 #endif
-#ifndef PANTHER_DACDCTrigger_MCWIRHIT_
-#define PANTHER_DACDCTrigger_MCWIRHIT_
+#ifndef PANTHER_DATRGCDC_MCWIRHIT_
+#define PANTHER_DATRGCDC_MCWIRHIT_
 struct datcdc_mcwirhit {
   int m_panther_dummy_;
   int m_ID;
@@ -361,7 +361,7 @@ struct reccdc_timing {
 
 #include "tracking/modules/trasan/TDebugUtilities.h"
 #include "tracking/modules/trasan/TConformalFinder.h"
-#include "trigger/cdc/CDCTriggerWireHitMC.h"
+#include "trg/cdc/WireHitMC.h"
 #endif
 
 namespace Belle {
@@ -631,7 +631,7 @@ THelixFitter::main(TTrackBase & b, float t0Offset,
 	//...Loop with hits...
 	unsigned i = 0;
 	while (TLink * l = cores[i++]) {
-	    const Belle2::CDCTriggerWireHit & h = * l->hit();
+	    const Belle2::TRGCDCWireHit & h = * l->hit();
 
 	    //...Cal. closest points...
 	    t.approach(* l, _sag);
@@ -1019,7 +1019,7 @@ THelixFitter::main(TTrackBase & b, float t0Offset,
 	//...Loop with hits...
 	unsigned i = 0;
 	while (TLink * l = cores[i++]) {
-	    const Belle2::CDCTriggerWireHit & h = * l->hit();
+	    const Belle2::TRGCDCWireHit & h = * l->hit();
 
 	    //...Cal. closest points...
 	    t.approach(* l, _sag);
@@ -1217,7 +1217,7 @@ THelixFitter::dxda(const TLink & link,
                    CLHEP::HepVector & dzda) const {
 
     //...Setup...
-    const Belle2::CDCTriggerWire & w = * link.wire();
+    const Belle2::TRGCDCWire & w = * link.wire();
     const CLHEP::HepVector & a = h.a();
     const double dRho  = a[0];
     const double phi0  = a[1];
@@ -1420,7 +1420,7 @@ THelixFitter::dxda(const TLink & link,
 		   CLHEP::HepVector & dzda) const {
 
     //...Setup...
-    const Belle2::CDCTriggerWire & w = * link.wire();
+    const Belle2::TRGCDCWire & w = * link.wire();
     const CLHEP::HepVector & a = h.a();
     double dRho  = a[0];
     double phi0  = a[1];
@@ -1590,7 +1590,7 @@ THelixFitter::drift(const TTrack & t,
 		    double & distance,
 		    double & err) const {
 
-    const Belle2::CDCTriggerWireHit & h = * l.hit();
+    const Belle2::TRGCDCWireHit & h = * l.hit();
     const HepGeom::Point3D<double> & onTrack = l.positionOnTrack();
     const HepGeom::Point3D<double> & onWire = l.positionOnWire();
     unsigned leftRight = WireHitRight;
@@ -1718,7 +1718,7 @@ THelixFitter::main(TTrackBase & b, float & tev, float & tev_err,
 	//...Loop with hits...
 	unsigned i = 0;
 	while (TLink * l = cores[i++]) {
-	    const Belle2::CDCTriggerWireHit & h = * l->hit();
+	    const Belle2::TRGCDCWireHit & h = * l->hit();
 
 	    //...Cal. closest points...
 	    t.approach(* l, _sag);
@@ -1979,7 +1979,7 @@ THelixFitter::main(TTrackBase & b, float & tev, float & tev_err,
 	//...Loop with hits...
 	unsigned i = 0;
 	while (TLink * l = cores[i++]) {
-	    const Belle2::CDCTriggerWireHit & h = * l->hit();
+	    const Belle2::TRGCDCWireHit & h = * l->hit();
 
 	    //...Cal. closest points...
 	    t.approach(* l, _sag);
@@ -2169,7 +2169,7 @@ THelixFitter::drift(const TTrack & t,
 		    double & dddt) const {
 //=========================================
 
-    const Belle2::CDCTriggerWireHit & h = * l.hit();
+    const Belle2::TRGCDCWireHit & h = * l.hit();
     const HepGeom::Point3D<double> & onTrack = l.positionOnTrack();
     const HepGeom::Point3D<double> & onWire = l.positionOnWire();
     unsigned leftRight = WireHitRight;

@@ -57,7 +57,7 @@
 #include "tracking/modules/trasan/TUtilities.h"
 
 namespace Belle2 {
-    class CDCTrigger;
+    class TRGCDC;
 }
 
 namespace Belle {
@@ -122,25 +122,25 @@ class THoughFinder : public TFinderBase {
     void init(void);
 
     /// finds tracks.
-    int doit(const CAList<Belle2::CDCTriggerWireHit> & axialHits,
-	     const CAList<Belle2::CDCTriggerWireHit> & stereoHits,
+    int doit(const CAList<Belle2::TRGCDCWireHit> & axialHits,
+	     const CAList<Belle2::TRGCDCWireHit> & stereoHits,
 	     AList<TTrack> & tracks,
 	     AList<TTrack> & tracks2D);
-    int doit0(const CAList<Belle2::CDCTriggerWireHit> & axialHits,
-	      const CAList<Belle2::CDCTriggerWireHit> & stereoHits,
+    int doit0(const CAList<Belle2::TRGCDCWireHit> & axialHits,
+	      const CAList<Belle2::TRGCDCWireHit> & stereoHits,
 	      AList<TTrack> & tracks,
 	      AList<TTrack> & tracks2D);
-    int doit1(const CAList<Belle2::CDCTriggerWireHit> & axialHits,
-	      const CAList<Belle2::CDCTriggerWireHit> & stereoHits,
+    int doit1(const CAList<Belle2::TRGCDCWireHit> & axialHits,
+	      const CAList<Belle2::TRGCDCWireHit> & stereoHits,
 	      AList<TTrack> & tracks,
 	      AList<TTrack> & tracks2D);
-    int doit2(const CAList<Belle2::CDCTriggerWireHit> & axialHits,
-	      const CAList<Belle2::CDCTriggerWireHit> & stereoHits,
+    int doit2(const CAList<Belle2::TRGCDCWireHit> & axialHits,
+	      const CAList<Belle2::TRGCDCWireHit> & stereoHits,
 	      AList<TTrack> & tracks,
 	      AList<TTrack> & tracks2D);
     /// Prepared to reduce duplicated tracks.
-    int doit3(const CAList<Belle2::CDCTriggerWireHit> & axialHits,
-	      const CAList<Belle2::CDCTriggerWireHit> & stereoHits,
+    int doit3(const CAList<Belle2::TRGCDCWireHit> & axialHits,
+	      const CAList<Belle2::TRGCDCWireHit> & stereoHits,
 	      AList<TTrack> & tracks,
 	      AList<TTrack> & tracks2D);
 
@@ -148,8 +148,8 @@ class THoughFinder : public TFinderBase {
 		   AList<TTrack> & tracks2D);
 
   private:// Modifiers
-    void selectGoodHits(const CAList<Belle2::CDCTriggerWireHit> & axial,
-			const CAList<Belle2::CDCTriggerWireHit> & stereo);
+    void selectGoodHits(const CAList<Belle2::TRGCDCWireHit> & axial,
+			const CAList<Belle2::TRGCDCWireHit> & stereo);
 
     /// transforms wire hits.
     void houghTransformation(const AList<TLink> & hits,

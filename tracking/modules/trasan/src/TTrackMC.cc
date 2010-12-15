@@ -71,7 +71,7 @@
 // 0 div again
 //
 // Revision 1.15  1998/12/04 15:11:02  yiwasaki
-// CDCTrigger creation timing changed, zero-division protection for TTrackMC
+// TRGCDC creation timing changed, zero-division protection for TTrackMC
 //
 // Revision 1.14  1998/11/27 08:15:36  yiwasaki
 // Trasan 1.1 RC 3 release : salvaging improved
@@ -95,7 +95,7 @@
 // Trasan 1.1 beta 9 release : more protections for negative sqrt and zero division
 //
 // Revision 1.7  1998/11/10 09:09:12  yiwasaki
-// Trasan 1.1 beta 8 release : negative sqrt fixed, curl finder updated by j.tanaka, CDCTrigger classes modified by y.iwasaki
+// Trasan 1.1 beta 8 release : negative sqrt fixed, curl finder updated by j.tanaka, TRGCDC classes modified by y.iwasaki
 //
 // Revision 1.6  1998/09/28 16:11:13  yiwasaki
 // fitter with cathode added
@@ -141,10 +141,10 @@
 #endif
 
 
-#include "trigger/cdc/CDCTrigger.h"
+#include "trg/cdc/TRGCDC.h"
 
-#include "trigger/cdc/CDCTriggerWireHitMC.h"
-#include "trigger/cdc/CDCTriggerTrackMC.h"
+#include "trg/cdc/WireHitMC.h"
+#include "trg/cdc/TrackMC.h"
 #include "tracking/modules/trasan/Trasan.h"
 #include "tracking/modules/trasan/TTrack.h"
 #include "tracking/modules/trasan/TTrackMC.h"
@@ -240,8 +240,8 @@ struct reccdc_wirhit {
   float m_adc;
 };
 #endif
-#ifndef PANTHER_DACDCTrigger_MCWIRHIT_
-#define PANTHER_DACDCTrigger_MCWIRHIT_
+#ifndef PANTHER_DATRGCDC_MCWIRHIT_
+#define PANTHER_DATRGCDC_MCWIRHIT_
 struct datcdc_mcwirhit {
   int m_panther_dummy_;
   int m_ID;
@@ -371,7 +371,7 @@ TTrackMC::update(void) {
     _quality = 0;
 
     //...Prepare counters...
-//cnv    unsigned nHep = Belle2::CDCTriggerTrackMC::list().length();
+//cnv    unsigned nHep = Belle2::TRGCDCTrackMC::list().length();
     unsigned nHep = 0;
 //  unsigned nTrk = Trasan::getTrasan()->tracks().length();
     unsigned * N1 = (unsigned *) malloc(nHep * sizeof(unsigned));
@@ -407,12 +407,12 @@ TTrackMC::update(void) {
 
     //...Check HEP...
     float F2 = 0.;
-    Belle2::CDCTriggerTrackMC * hep = 0;
+    Belle2::TRGCDCTrackMC * hep = 0;
     if (bestHep != -1) {
-//cnv 	hep = Belle2::CDCTriggerTrackMC::list()[bestHep];
+//cnv 	hep = Belle2::TRGCDCTrackMC::list()[bestHep];
 // 	unsigned nAll = 0;
 // 	for (unsigned i = 0; i < (unsigned) hep->hits().length(); i++) {
-// 	    const CDCTriggerWireHit * hit = hep->hits()[i]->hit();
+// 	    const TRGCDCWireHit * hit = hep->hits()[i]->hit();
 // 	    if (! hit) continue;
 // 	    if (hit->state() & WireHitInvalidForFit) continue;
 	    
@@ -452,7 +452,7 @@ TTrackMC::dump(const std::string & msg, const std::string & pre) const {
     else if (_quality & TTrackCharge) std::cout << "bad    :";
     else if (_quality & TTrackGarbage) std::cout << "garbage:";
     else std::cout << "classification error:";
-    Belle2::CDCTrigger::bitDisplay(_quality, 23, 15); std::cout << ":";
+    Belle2::TRGCDC::bitDisplay(_quality, 23, 15); std::cout << ":";
     std::cout << _hepID << ":";
     std::cout << _wireFraction << "," << _wireFractionHEP << ":";
     std::cout << _ptFraction << "," << _pzFraction;

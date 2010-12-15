@@ -212,7 +212,7 @@
 // Trasan 1.47a release : hit and tracking efficiency improved
 //
 // Revision 1.50  1999/06/15 06:33:41  yiwasaki
-// Trasan 1.43 release : minor changes in CDCTriggerClust and TBuilder
+// Trasan 1.43 release : minor changes in TRGCDCClust and TBuilder
 //
 // Revision 1.49  1999/06/14 12:40:21  yiwasaki
 // Trasan 1.42 release : bug in findCloseHits fixed, sakura 1.06
@@ -254,7 +254,7 @@
 // Trasan 1.1 beta 9 release : more protections for negative sqrt and zero division
 //
 // Revision 1.35  1998/11/10 09:09:05  yiwasaki
-// Trasan 1.1 beta 8 release : negative sqrt fixed, curl finder updated by j.tanaka, CDCTrigger classes modified by y.iwasaki
+// Trasan 1.1 beta 8 release : negative sqrt fixed, curl finder updated by j.tanaka, TRGCDC classes modified by y.iwasaki
 //
 // Revision 1.34  1998/10/13 04:04:45  yiwasaki
 // Trasan 1.1 beta 7 release : memory leak fixed by J.Tanaka, TCurlFinderParameters.h added by J.Tanaka
@@ -317,7 +317,7 @@
 // Trasan 1 alpha 8 release, Stereo append bug fixed, TCurlFinder added
 //
 // Revision 1.12  1998/06/03 17:17:37  yiwasaki
-// const added to CDCTrigger::hits,axialHits,stereoHits,hitsMC, symbols WireHitNeghborHit* added in CDCTriggerWireHit, TSegment::innerWidth,outerWidth,innerMostLayer,outerMostLayer,type,split,split2,widht,outer,updateType added, TLink::conf added, TTrack::appendStereo3,refineStereo2,aa,bb,Zchisqr added
+// const added to TRGCDC::hits,axialHits,stereoHits,hitsMC, symbols WireHitNeghborHit* added in TRGCDCWireHit, TSegment::innerWidth,outerWidth,innerMostLayer,outerMostLayer,type,split,split2,widht,outer,updateType added, TLink::conf added, TTrack::appendStereo3,refineStereo2,aa,bb,Zchisqr added
 //
 // Revision 1.11  1998/05/26 05:10:17  yiwasaki
 // cvs repair
@@ -332,7 +332,7 @@
 // preparation for alpha 3
 //
 // Revision 1.7  1998/05/11 10:16:56  yiwasaki
-// TTrack::assign -> TTrack::assert, WireHitUsedMask is set in CDCTriggerWireHit
+// TTrack::assign -> TTrack::assert, WireHitUsedMask is set in TRGCDCWireHit
 //
 // Revision 1.6  1998/05/08 09:45:43  yiwasaki
 // Trasan 1 alpha 2 relase, stereo recon. added, off-vtx recon. added
@@ -344,10 +344,10 @@
 // minor changes
 //
 // Revision 1.3  1998/04/14 01:04:48  yiwasaki
-// CDCTriggerWireHitMC added
+// TRGCDCWireHitMC added
 //
 // Revision 1.2  1998/04/10 09:36:27  yiwasaki
-// TTrack added, CDCTrigger becomes Singleton
+// TTrack added, TRGCDC becomes Singleton
 //
 // Revision 1.1  1998/04/10 00:50:14  yiwasaki
 // TCircle, TConformalFinder, TConformalLink, TFinderBase, THistogram, TLink, TTrackBase classes added
@@ -451,8 +451,8 @@ struct reccdc_wirhit {
   float m_adc;
 };
 #endif
-#ifndef PANTHER_DACDCTrigger_MCWIRHIT_
-#define PANTHER_DACDCTrigger_MCWIRHIT_
+#ifndef PANTHER_DATRGCDC_MCWIRHIT_
+#define PANTHER_DATRGCDC_MCWIRHIT_
 struct datcdc_mcwirhit {
   int m_panther_dummy_;
   int m_ID;
@@ -550,10 +550,10 @@ struct reccdc_timing {
 #endif
 #include "tracking/modules/trasan/Strings.h"
 
-#include "trigger/cdc/CDCTrigger.h"
+#include "trg/cdc/TRGCDC.h"
 
-#include "trigger/cdc/CDCTriggerTrackMC.h"
-#include "trigger/cdc/CDCTriggerWireHitMC.h"
+#include "trg/cdc/TrackMC.h"
+#include "trg/cdc/WireHitMC.h"
 #include "tracking/modules/trasan/TTrackManager.h"
 #include "tracking/modules/trasan/TConformalFinder.h"
 #include "tracking/modules/trasan/TConformalFinder0.h"
@@ -610,7 +610,7 @@ TConformalFinder::TConformalFinder(unsigned fastFinder,
   _T0ResetDone(false),
   _segmentSeparation(4),
   _minNLinksForSegmentInRefine(3),
-  //  _maxNLinksForSegment((Belle2::CDCTrigger::getCDCTrigger()->versionCDC()=="superb")?16:8),
+  //  _maxNLinksForSegment((Belle2::TRGCDC::getTRGCDC()->versionCDC()=="superb")?16:8),
   _maxNLinksForSegment(8),
   _maxWidthForSegment(4),
   _minUsedFractionSlow2D(0.5),
@@ -636,7 +636,7 @@ TConformalFinder::TConformalFinder(unsigned fastFinder,
 
 
 
-//     if(Belle2::CDCTrigger::getCDCTrigger()->versionCDC()=="superb") {
+//     if(Belle2::TRGCDC::getTRGCDC()->versionCDC()=="superb") {
 //       _maxNLinksForSegment=16;
 //     }
     
@@ -716,7 +716,7 @@ TConformalFinder::clear(void) {
 void
 TConformalFinder::selectGoodHits(void) {
     const bool ignoreSmallCell =
-	(Belle2::CDCTrigger::getCDCTrigger()->version() == "small cell") &&
+	(Belle2::TRGCDC::getTRGCDC()->version() == "small cell") &&
 	(! _useSmallCells);
 
     for (unsigned i = 0; i < 2; i++) {
@@ -767,7 +767,7 @@ TConformalFinder::selectGoodHits(void) {
 void
 TConformalFinder::findSegments(void) {
   // no_superlyr
-  const Belle2::CDCTrigger &cdc(*Belle2::CDCTrigger::getCDCTrigger());
+  const Belle2::TRGCDC &cdc(*Belle2::TRGCDC::getTRGCDC());
   unsigned nSuperLayers = cdc.nSuperLayers();
   unsigned maxNLinks = _maxNLinksForSegment;
   unsigned maxWidth = _maxWidthForSegment;
@@ -879,7 +879,7 @@ TConformalFinder::findSegments(void) {
 void
 TConformalFinder::linkSegments(unsigned level) {
   // no_superlyr
-  const Belle2::CDCTrigger &cdc(*Belle2::CDCTrigger::getCDCTrigger());
+  const Belle2::TRGCDC &cdc(*Belle2::TRGCDC::getTRGCDC());
   unsigned nSuperLayers = cdc.nSuperLayers();
 
     //...Clear old links...
@@ -1303,8 +1303,8 @@ TConformalFinder::updateTLinks(AList<TTrack> & tracks) {
 }
 
 int
-TConformalFinder::doit(const CAList<Belle2::CDCTriggerWireHit> & axial,
-		       const CAList<Belle2::CDCTriggerWireHit> & stereo,
+TConformalFinder::doit(const CAList<Belle2::TRGCDCWireHit> & axial,
+		       const CAList<Belle2::TRGCDCWireHit> & stereo,
 		       AList<TTrack> & tracks,
 		       AList<TTrack> & tracks2D) {
 
@@ -1779,7 +1779,7 @@ void
 
 TConformalFinder::fastFinding2D(unsigned level) {
   // no_superlyr
-  const Belle2::CDCTrigger &cdc(*Belle2::CDCTrigger::getCDCTrigger());
+  const Belle2::TRGCDC &cdc(*Belle2::TRGCDC::getTRGCDC());
   unsigned nSuperLayers = cdc.nSuperLayers();
 
 #ifdef TRASAN_DEBUG_DETAIL
@@ -1904,12 +1904,12 @@ TConformalFinder::fastFinding2D(unsigned level) {
 #endif
 }
 
-const Belle2::CDCTriggerWire *
+const Belle2::TRGCDCWire *
 TConformalFinder::conformal2Wire(const HepGeom::Point3D<double> & p) {
     std::cout << "p = " << p << std::endl;
     float r = sqrt(4. / p.mag2());
     float phi = p.phi();
-    return Belle2::CDCTrigger::getCDCTrigger()->wire(r, phi);
+    return Belle2::TRGCDC::getTRGCDC()->wire(r, phi);
 }
 
 AList<TSegment>
@@ -1919,7 +1919,7 @@ TConformalFinder::pickUpSegmentsInConformal(float phi[12],
     AList<TSegment> outList;
     HepGeom::Point3D<double> center(1., 1., 0.);
     center.setPhi(phi[0]);
-    const Belle2::CDCTrigger & cdc = * Belle2::CDCTrigger::getCDCTrigger();
+    const Belle2::TRGCDC & cdc = * Belle2::TRGCDC::getTRGCDC();
 
     //...Search for segments...
     for (unsigned sl = 0; sl < 2; sl++) {
@@ -1981,7 +1981,7 @@ TConformalFinder::pickUpLinksInConformal(float phi[12],
     HepGeom::Point3D<double> center(1., 1., 0.);
     center.setPhi(phi[0]);
 
-    const Belle2::CDCTrigger & cdc = * Belle2::CDCTrigger::getCDCTrigger();
+    const Belle2::TRGCDC & cdc = * Belle2::TRGCDC::getTRGCDC();
     AList<TLink> outList;
     unsigned nBad = _unused[2].length();
     for (unsigned i = 0; i < nBad; i++) {
@@ -2017,7 +2017,7 @@ int
 TConformalFinder::crossPointsInConformal(const AList<TSegment> & inList,
 					 HepGeom::Point3D<double> points[12]) const {
     // no_superlyr
-    const Belle2::CDCTrigger & cdc = * Belle2::CDCTrigger::getCDCTrigger();
+    const Belle2::TRGCDC & cdc = * Belle2::TRGCDC::getTRGCDC();
     unsigned nSuperLayers = cdc.nSuperLayers();
 
     //...Parameters...
@@ -2115,7 +2115,7 @@ TConformalFinder::crossPointsInConformal(const AList<TSegment> & inList,
 AList<TSegment>
 TConformalFinder::stereoSegments(const TTrack & t) const {
   // no_superlyr
-  const Belle2::CDCTrigger &cdc(*Belle2::CDCTrigger::getCDCTrigger());
+  const Belle2::TRGCDC &cdc(*Belle2::TRGCDC::getTRGCDC());
   unsigned nSuperLayers = cdc.nSuperLayers();
 
 #ifdef TRASAN_DEBUG_DETAIL
@@ -2351,7 +2351,7 @@ TConformalFinder::pickUpSegments(const TPoint2D x[12],
 				 float loadWidth,
 				 unsigned axialStereoSwitch) const {
     // no_superlyr
-    const Belle2::CDCTrigger & cdc = * Belle2::CDCTrigger::getCDCTrigger();
+    const Belle2::TRGCDC & cdc = * Belle2::TRGCDC::getTRGCDC();
     unsigned nSuperLayers = cdc.nSuperLayers();
     static const TPoint2D O(0., 0.);
     AList<TSegment> outList;
@@ -2444,7 +2444,7 @@ TConformalFinder::pickUpLinks(const TPoint2D x[12],
     static const TPoint2D O(0., 0.);
     AList<TLink> outList;
 
-    const Belle2::CDCTrigger & cdc = * Belle2::CDCTrigger::getCDCTrigger();
+    const Belle2::TRGCDC & cdc = * Belle2::TRGCDC::getTRGCDC();
     unsigned nBad = _unused[2].length();
     for (unsigned i = 0; i < nBad; i++) {
 	unsigned sl = _unused[2][i]->wire()->superLayerId();
@@ -2597,7 +2597,7 @@ TConformalFinder::expand(AList<TSegment> & seeds) const {
 TTrack *
 TConformalFinder::expand(TTrack & ti) const {
   // no_superlyr
-  const Belle2::CDCTrigger &cdc(*Belle2::CDCTrigger::getCDCTrigger());
+  const Belle2::TRGCDC &cdc(*Belle2::TRGCDC::getTRGCDC());
   unsigned nSuperLayers = cdc.nSuperLayers();
 #ifdef TRASAN_WINDOW
     displayStatus("Conf::expand ... seed track");
@@ -2751,7 +2751,7 @@ TConformalFinder::targetSuperLayer(unsigned sl,
 				   unsigned & inner,
 				   unsigned & outer) const {
   // no_superlyr
-  const Belle2::CDCTrigger &cdc(*Belle2::CDCTrigger::getCDCTrigger());
+  const Belle2::TRGCDC &cdc(*Belle2::TRGCDC::getTRGCDC());
   unsigned nSuperLayers = cdc.nSuperLayers();
     inner = nSuperLayers;
     outer = nSuperLayers;
@@ -2822,7 +2822,7 @@ TConformalFinder::targetLinks(const TTrack & t, unsigned sl) const {
 AList<TSegment>
 TConformalFinder::refineSegments(const TTrack & t) const {
   // no_superlyr
-  const Belle2::CDCTrigger &cdc(*Belle2::CDCTrigger::getCDCTrigger());
+  const Belle2::TRGCDC &cdc(*Belle2::TRGCDC::getTRGCDC());
   unsigned nSuperLayers = cdc.nSuperLayers();
     const AList<TSegment> & original = t.segments();
     AList<TSegment> outList;
@@ -2864,9 +2864,9 @@ TConformalFinder::refineSegments(const TTrack & t) const {
 
 #ifdef TRASAN_DEBUG_DETAIL
     std::cout << "... refine segments : orignal sl = ";
-    Belle2::CDCTrigger::bitDisplay(sl, nSuperLayers, 0);
+    Belle2::TRGCDC::bitDisplay(sl, nSuperLayers, 0);
     std::cout << ", output sl = ";
-    Belle2::CDCTrigger::bitDisplay(SuperLayer(outList), nSuperLayers, 0);
+    Belle2::TRGCDC::bitDisplay(SuperLayer(outList), nSuperLayers, 0);
     std::cout << std::endl;
 #endif
 
@@ -2898,7 +2898,7 @@ TConformalFinder::trackQuality(const TTrack & t) const {
 void
 TConformalFinder::refineLinks(TTrack & t, unsigned minN) const {
   // no_superlyr
-  const Belle2::CDCTrigger &cdc(*Belle2::CDCTrigger::getCDCTrigger());
+  const Belle2::TRGCDC &cdc(*Belle2::TRGCDC::getTRGCDC());
   unsigned nSuperLayers = cdc.nSuperLayers();
     const AList<TLink> & links = t.links();
     AList<TLink> *sl = new AList<TLink> [nSuperLayers];
@@ -3009,7 +3009,7 @@ AList<TSegment>
 TConformalFinder::stereoSegmentsFromBadHits(const TTrack & t) const {
 
     // no_superlyr
-    const Belle2::CDCTrigger & cdc = * Belle2::CDCTrigger::getCDCTrigger();
+    const Belle2::TRGCDC & cdc = * Belle2::TRGCDC::getTRGCDC();
     unsigned nSuperLayers = cdc.nSuperLayers();
 
     AList<TSegment> output;
@@ -3064,7 +3064,7 @@ TConformalFinder::stereoSegmentsFromBadHits(const TTrack & t) const {
 void
 TConformalFinder::findSegmentsPerfect(void) {
   // no_superlyr
-  const Belle2::CDCTrigger &cdc(*Belle2::CDCTrigger::getCDCTrigger());
+  const Belle2::TRGCDC &cdc(*Belle2::TRGCDC::getTRGCDC());
   unsigned nSuperLayers = cdc.nSuperLayers();
 
     //...Create lists of links for each super layer...
@@ -3076,7 +3076,7 @@ TConformalFinder::findSegmentsPerfect(void) {
     }
 
     //...MC tracks...
-    const unsigned nHep = Belle2::CDCTriggerTrackMC::list().size();
+    const unsigned nHep = Belle2::TRGCDCTrackMC::list().size();
 
     //...Loop over each super layer...
     for (unsigned i = 0; i < nSuperLayers; i++) {
@@ -3097,7 +3097,7 @@ TConformalFinder::findSegmentsPerfect(void) {
 	unsigned n = links[i].length();
 	for (unsigned j = 0; j < n; j++) {
 	    TLink & l = * links[i][j];
-	    const Belle2::CDCTriggerWireHitMC * mc = l.hit()->mc();
+	    const Belle2::TRGCDCWireHitMC * mc = l.hit()->mc();
 	    if (! l.hit()->mc()) {
 		std::cout << "TConformalFinder::findSegmentsPerfect !!! "
 			  << "no MC info. found ... aborted" << std::endl;

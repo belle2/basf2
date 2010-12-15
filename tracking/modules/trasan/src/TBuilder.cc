@@ -149,10 +149,10 @@
 // Trasan 1.53a release : cathode updates by T.Matsumoto, minor change of Conformal finder
 //
 // Revision 1.33  1999/07/01 08:15:21  yiwasaki
-// Trasan 1.51a release : builder bug fix, CDCTrigger bug fix again, T0 determination has more parameters
+// Trasan 1.51a release : builder bug fix, TRGCDC bug fix again, T0 determination has more parameters
 //
 // Revision 1.32  1999/06/15 06:33:40  yiwasaki
-// Trasan 1.43 release : minor changes in CDCTriggerClust and TBuilder
+// Trasan 1.43 release : minor changes in TRGCDCClust and TBuilder
 //
 // Revision 1.31  1999/06/14 12:40:20  yiwasaki
 // Trasan 1.42 release : bug in findCloseHits fixed, sakura 1.06
@@ -185,7 +185,7 @@
 // stereo building modified by J.Suzuki
 //
 // Revision 1.21  1998/11/10 09:08:55  yiwasaki
-// Trasan 1.1 beta 8 release : negative sqrt fixed, curl finder updated by j.tanaka, CDCTrigger classes modified by y.iwasaki
+// Trasan 1.1 beta 8 release : negative sqrt fixed, curl finder updated by j.tanaka, TRGCDC classes modified by y.iwasaki
 //
 // Revision 1.20  1998/10/09 17:35:31  yiwasaki
 // Trasan 1.1 beta 6 release : TBuilder::buildStereo bug, introduced by y.iwasaki, removed.
@@ -247,9 +247,9 @@
 
 #include "tracking/modules/trasan/Strings.h"
 #include "tracking/modules/trasan/TBuilder.h"
-#include "trigger/cdc/CDCTrigger.h"
-#include "trigger/cdc/CDCTriggerWire.h"
-#include "trigger/cdc/CDCTriggerWireHit.h"
+#include "trg/cdc/TRGCDC.h"
+#include "trg/cdc/Wire.h"
+#include "trg/cdc/WireHit.h"
 #include "tracking/modules/trasan/TLink.h"
 #include "tracking/modules/trasan/TCircle.h"
 #include "tracking/modules/trasan/TLine0.h"
@@ -264,8 +264,8 @@
 #include "tracking/modules/trasan/THoughPlaneMulti2.h"
 #include "tracking/modules/trasan/TPeakFinder.h"
 #ifdef TRASAN_DEBUG
-#include "trigger/cdc/CDCTriggerWireHitMC.h"
-#include "trigger/cdc/CDCTriggerTrackMC.h"
+#include "trg/cdc/WireHitMC.h"
+#include "trg/cdc/TrackMC.h"
 #include "tracking/modules/trasan/TDebugUtilities.h"
 #endif
 #ifdef TRASAN_WINDOW_GTK

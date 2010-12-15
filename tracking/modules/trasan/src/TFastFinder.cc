@@ -94,8 +94,8 @@ TFastFinder::clear(void) {
 }
 
 int
-TFastFinder::doit(const AList<Belle2::CDCTriggerWireHit> & axialHits,
-		  const AList<Belle2::CDCTriggerWireHit> & stereoHits,
+TFastFinder::doit(const AList<Belle2::TRGCDCWireHit> & axialHits,
+		  const AList<Belle2::TRGCDCWireHit> & stereoHits,
 		  AList<TTrack> & tracks) {
 
     //...Select good hits...
@@ -149,25 +149,25 @@ TFastFinder::doit(const AList<Belle2::CDCTriggerWireHit> & axialHits,
 }
 
 void
-TFastFinder::selectHits(const AList<Belle2::CDCTriggerWireHit> & axialHits,
-			const AList<Belle2::CDCTriggerWireHit> & stereoHits) {
+TFastFinder::selectHits(const AList<Belle2::TRGCDCWireHit> & axialHits,
+			const AList<Belle2::TRGCDCWireHit> & stereoHits) {
     unsigned n = axialHits.length();
     for (unsigned i = 0; i < n; i++) {
-	const Belle2::CDCTriggerWireHit & h = * axialHits[i];
+	const Belle2::TRGCDCWireHit & h = * axialHits[i];
 	if ((h.state() & WireHitIsolated) && (h.state() & WireHitContinuous))
-	    _axialHits.append((Belle2::CDCTriggerWireHit &) h);
+	    _axialHits.append((Belle2::TRGCDCWireHit &) h);
     }
     n = stereoHits.length();
     for (unsigned i = 0; i < n; i++) {
-	const Belle2::CDCTriggerWireHit & h = * stereoHits[i];
+	const Belle2::TRGCDCWireHit & h = * stereoHits[i];
 	if ((h.state() & WireHitIsolated) && (h.state() & WireHitContinuous))
-	    _stereoHits.append((Belle2::CDCTriggerWireHit &) h);
+	    _stereoHits.append((Belle2::TRGCDCWireHit &) h);
     }
 }
 
 void
-TFastFinder::selectHits2(const AList<Belle2::CDCTriggerWireHit> & axialHits,
-			 const AList<Belle2::CDCTriggerWireHit> & stereoHits) {
+TFastFinder::selectHits2(const AList<Belle2::TRGCDCWireHit> & axialHits,
+			 const AList<Belle2::TRGCDCWireHit> & stereoHits) {
     selectSimpleSegments(axialHits, _axialHits);
     selectSimpleSegments(stereoHits, _stereoHits);
 }
@@ -202,7 +202,7 @@ TFastFinder::findCloseHits(const AList<TLink> & links,
     unsigned nall = links.length();
     for (unsigned j = 0; j < nall; j++) {
 	TLink & t = * links[j];
-	const Belle2::CDCTriggerWire & w = * t.wire();
+	const Belle2::TRGCDCWire & w = * t.wire();
 	Vector3D X = w.xyPosition() - track.helix().center();
 	double Rmag2 = X.mag2();
 	double DR = fabs(sqrt(Rmag2) - fabs(R0));
@@ -218,20 +218,20 @@ TFastFinder::findCloseHits(const AList<TLink> & links,
 }
 
 void
-TFastFinder::selectSimpleSegments(const AList<Belle2::CDCTriggerWireHit> & in,
-				  AList<Belle2::CDCTriggerWireHit> & out) const {
-    AList<Belle2::CDCTriggerWireHit> hits = in;
+TFastFinder::selectSimpleSegments(const AList<Belle2::TRGCDCWireHit> & in,
+				  AList<Belle2::TRGCDCWireHit> & out) const {
+    AList<Belle2::TRGCDCWireHit> hits = in;
     while (hits.last()) {
-	Belle2::CDCTriggerWireHit & h = * hits.last();
+	Belle2::TRGCDCWireHit & h = * hits.last();
 
 	//...Start clustering...
-	// AList<Belle2::CDCTriggerWireHit> & cluster = * new AList<Belle2::CDCTriggerWireHit>();
-	AList<Belle2::CDCTriggerWireHit> cluster;
-	AList<Belle2::CDCTriggerWireHit> toBeChecked;
+	// AList<Belle2::TRGCDCWireHit> & cluster = * new AList<Belle2::TRGCDCWireHit>();
+	AList<Belle2::TRGCDCWireHit> cluster;
+	AList<Belle2::TRGCDCWireHit> toBeChecked;
 	bool ok = true;
 	toBeChecked.append(h);
 	while (toBeChecked.length()) {
-	    Belle2::CDCTriggerWireHit & a = * toBeChecked.last();
+	    Belle2::TRGCDCWireHit & a = * toBeChecked.last();
 	    toBeChecked.remove(a);
 	    if (cluster.hasMember(a)) continue;
 
@@ -248,8 +248,8 @@ TFastFinder::selectSimpleSegments(const AList<Belle2::CDCTriggerWireHit> & in,
 		(state & WireHitNeighborPatternMask) >> WireHitNeighborHit;
 	    for (unsigned i = 0; i < 7; i++) {
 		if ((ptn >> i) % 2) {
-		    const Belle2::CDCTriggerWireHit & b = * a.wire().neighbor(i)->hit();
-		    toBeChecked.append((Belle2::CDCTriggerWireHit &) b);
+		    const Belle2::TRGCDCWireHit & b = * a.wire().neighbor(i)->hit();
+		    toBeChecked.append((Belle2::TRGCDCWireHit &) b);
 		}
 	    }
 	}
@@ -269,7 +269,7 @@ TFastFinder::selectSimpleSegments(const AList<Belle2::CDCTriggerWireHit> & in,
 	std::cout << ok << " : ";
 #endif
 	for (unsigned i = 0; i < (unsigned) cluster.length(); i++) {
-	    Belle2::CDCTriggerWireHit & h = * cluster[i];
+	    Belle2::TRGCDCWireHit & h = * cluster[i];
 #ifdef TRASAN_DEBUG_DETAIL
 	    std::cout << h.wire()->name() << ",";
 #endif

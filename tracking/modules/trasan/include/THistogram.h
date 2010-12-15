@@ -59,7 +59,7 @@
 // minor changes
 //
 // Revision 1.2  1998/04/14 01:05:54  yiwasaki
-// CDCTriggerWireHitMC added
+// TRGCDCWireHitMC added
 //
 // Revision 1.1  1998/04/10 00:51:15  yiwasaki
 // TCircle, TConformalFinder, TConformalLink, TFinderBase, THistogram, TLink, TTrackBase classes added

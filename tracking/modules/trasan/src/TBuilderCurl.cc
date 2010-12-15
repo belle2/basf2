@@ -74,7 +74,7 @@
 // Trasan 1.60b release : curl finder updated, conformal accepts fitting flags
 //
 // Revision 1.10  1999/07/01 08:15:22  yiwasaki
-// Trasan 1.51a release : builder bug fix, CDCTrigger bug fix again, T0 determination has more parameters
+// Trasan 1.51a release : builder bug fix, TRGCDC bug fix again, T0 determination has more parameters
 //
 // Revision 1.9  1999/06/14 05:51:02  yiwasaki
 // Trasan 1.41 release : curl finder updates
@@ -95,7 +95,7 @@
 // Fitters added
 //
 // Revision 1.3  1998/11/10 09:08:57  yiwasaki
-// Trasan 1.1 beta 8 release : negative sqrt fixed, curl finder updated by j.tanaka, CDCTrigger classes modified by y.iwasaki
+// Trasan 1.1 beta 8 release : negative sqrt fixed, curl finder updated by j.tanaka, TRGCDC classes modified by y.iwasaki
 //
 // Revision 1.2  1998/10/06 02:30:03  yiwasaki
 // Trasan 1.1 beta 3 relase : only minor change
@@ -118,7 +118,7 @@
 //cnv #include "tracking/modules/trasan/TSvdHit.h"
 #include "tracking/modules/trasan/TLine.h"
 #include "tracking/modules/trasan/TRobustLineFitter.h"
-#include "trigger/cdc/CDCTrigger.h"
+#include "trg/cdc/TRGCDC.h"
 
 #ifdef TRASAN_DEBUG
 #include "tracking/modules/trasan/TDebugUtilities.h"
@@ -131,7 +131,7 @@
 #define DEBUG_CURL_MC 0
 
 #if (DEBUG_CURL_GNUPLOT+DEBUG_CURL_MC)
-#include "trigger/cdc/CDCTriggerWireHitMC.h"
+#include "trg/cdc/WireHitMC.h"
 #include "tracking/modules/trasan/TTrackHEP.h"
 #ifndef PANTHER_RECCDC_WIRHIT_
 #define PANTHER_RECCDC_WIRHIT_
@@ -224,8 +224,8 @@ struct reccdc_wirhit {
   float m_adc;
 };
 #endif
-#ifndef PANTHER_DACDCTrigger_MCWIRHIT_
-#define PANTHER_DACDCTrigger_MCWIRHIT_
+#ifndef PANTHER_DATRGCDC_MCWIRHIT_
+#define PANTHER_DATRGCDC_MCWIRHIT_
 struct datcdc_mcwirhit {
   int m_panther_dummy_;
   int m_ID;
@@ -1209,7 +1209,7 @@ TBuilderCurl::check(const TTrack &track) const {
 // checkBorder(AList<TLink> &layer0, 
 // 	    AList<TLink> &layer1, 
 // 	    AList<TLink> &layer2){
-//   const CDCTrigger &cdc = *CDCTrigger::getCDCTrigger();
+//   const TRGCDC &cdc = *TRGCDC::getTRGCDC();
 
 //   AList<TLink> list = layer0;
 //   list.append(layer1);
@@ -1220,7 +1220,7 @@ TBuilderCurl::check(const TTrack &track) const {
 //   int maxLocalId = 79;
 
 //   if(ms_superb) {
-//     const CDCTriggerLayer &l=*cdc.layer(layerId);
+//     const TRGCDCLayer &l=*cdc.layer(layerId);
 //     maxLocalId = l.nWires() - 1;
 //   } else {
 //     if(layerId >= 15)maxLocalId = 127;
@@ -1246,7 +1246,7 @@ TBuilderCurl::check(const TTrack &track) const {
 // 	    AList<TLink> &layer1, 
 // 	    AList<TLink> &layer2, 
 // 	    AList<TLink> &layer3){
-//   const CDCTrigger &cdc = *CDCTrigger::getCDCTrigger();
+//   const TRGCDC &cdc = *TRGCDC::getTRGCDC();
 
 //   AList<TLink> list = layer0;
 //   list.append(layer1);
@@ -1257,7 +1257,7 @@ TBuilderCurl::check(const TTrack &track) const {
 //   int layerId = list[0]->hit()->wire().layerId();
 //   int maxLocalId = 79;
 //   if(ms_superb) {
-//     const CDCTriggerLayer &l=*cdc.layer(layerId);
+//     const TRGCDCLayer &l=*cdc.layer(layerId);
 //     maxLocalId = l.nWires() - 1;
 //   } else {
 //     if(layerId >= 15)maxLocalId = 127;
@@ -1280,11 +1280,11 @@ TBuilderCurl::check(const TTrack &track) const {
 
 int
 TBuilderCurl::offsetBorder(TLink *l){
-  const Belle2::CDCTrigger &cdc = *Belle2::CDCTrigger::getCDCTrigger();
+  const Belle2::TRGCDC &cdc = *Belle2::TRGCDC::getTRGCDC();
 
   int layerId = l->hit()->wire().layerId();
   if(ms_superb) {
-    const Belle2::CDCTriggerLayer &l=*cdc.layer(layerId);
+    const Belle2::TRGCDCLayer &l=*cdc.layer(layerId);
     return l.nWires();
   } else {
     int maxLocalId = 79;
@@ -1329,14 +1329,14 @@ TBuilderCurl::makeList(AList<TLink> &layer, AList<TLink> &list, double q, int bo
 
 int
 TBuilderCurl::sortByLocalId(AList<TLink> &list) const{
-  const Belle2::CDCTrigger &cdc = *Belle2::CDCTrigger::getCDCTrigger();
+  const Belle2::TRGCDC &cdc = *Belle2::TRGCDC::getTRGCDC();
 
   int size = list.length();
   if(size <= 1)return 0;
   int layerId = list[0]->hit()->wire().layerId();
   int maxLocalId;
   if(ms_superb) {
-    const Belle2::CDCTriggerLayer &l=*cdc.layer(layerId);
+    const Belle2::TRGCDCLayer &l=*cdc.layer(layerId);
     maxLocalId = l.nWires() - 1;
   } else {
     if(layerId < 15)maxLocalId = 79;
@@ -1590,9 +1590,9 @@ TBuilderCurl::plotArcZ(AList<TLink> &tmpLine,
 
 unsigned
 TBuilderCurl::findMaxLocalId(unsigned superLayerId){
-  const Belle2::CDCTrigger &cdc = *Belle2::CDCTrigger::getCDCTrigger();
-//  const AList<Belle2::CDCTriggerLayer> &sl=*cdc.superLayer(superLayerId);
-  const std::vector<Belle2::CDCTriggerLayer *> & sl = * cdc.superLayer(superLayerId);
+  const Belle2::TRGCDC &cdc = *Belle2::TRGCDC::getTRGCDC();
+//  const AList<Belle2::TRGCDCLayer> &sl=*cdc.superLayer(superLayerId);
+  const std::vector<Belle2::TRGCDCLayer *> & sl = * cdc.superLayer(superLayerId);
   unsigned maxLocalId = 79;
   if(ms_superb) {
     maxLocalId = sl[0]->nWires() - 1;
@@ -1866,7 +1866,7 @@ TBuilderCurl::makeLine(TTrack &track,
 		       double &min_chi2, double &good_a, double &good_b,
 		       AList<Point3D> &goodPosition) const {
   if(list.length() == 0)return;
-  const Belle2::CDCTrigger &cdc = *Belle2::CDCTrigger::getCDCTrigger();
+  const Belle2::TRGCDC &cdc = *Belle2::TRGCDC::getTRGCDC();
   const unsigned nstereolayers = cdc.nStereoLayers();
   const unsigned nstereosuperlayers = cdc.nStereoSuperLayers();
 
@@ -2207,7 +2207,7 @@ TBuilderCurl::stereoHit(double &xc, double &yc, double &r, double &q,
   HepGeom::Point3D<double> center(xc, yc, 0.);
   HepGeom::Point3D<double> tmp(-999., -999., 0.);
   for(unsigned i = 0, size = list.length(); i < size; ++i){
-    Belle2::CDCTriggerWireHit &h = *const_cast<Belle2::CDCTriggerWireHit*>(list[i]->hit());
+    Belle2::TRGCDCWireHit &h = *const_cast<Belle2::TRGCDCWireHit*>(list[i]->hit());
     Vector3D X = 0.5*(h.wire().forwardPosition() +
                       h.wire().backwardPosition());
     Vector3D x     = Vector3D(X.x(), X.y(), 0.);

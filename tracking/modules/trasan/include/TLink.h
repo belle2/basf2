@@ -6,7 +6,7 @@
 // Owner    : Yoshihito Iwasaki
 // Email    : yoshihito.iwasaki@kek.jp
 //-----------------------------------------------------------------------------
-// Description : A class to relate CDCTriggerWireHit and TTrack objects.
+// Description : A class to relate TRGCDCWireHit and TTrack objects.
 //               See http://bsunsrv1.kek.jp/~yiwasaki/tracking/
 //-----------------------------------------------------------------------------
 // $Log$
@@ -107,7 +107,7 @@
 // Trasan 1.1 RC 3 release : salvaging improved
 //
 // Revision 1.19  1998/11/10 09:09:26  yiwasaki
-// Trasan 1.1 beta 8 release : negative sqrt fixed, curl finder updated by j.tanaka, CDCTrigger classes modified by y.iwasaki
+// Trasan 1.1 beta 8 release : negative sqrt fixed, curl finder updated by j.tanaka, TRGCDC classes modified by y.iwasaki
 //
 // Revision 1.18  1998/09/28 16:11:15  yiwasaki
 // fitter with cathode added
@@ -134,7 +134,7 @@
 // Trasan 1 alpha 8 release, Stereo append bug fixed, TCurlFinder added
 //
 // Revision 1.8  1998/06/03 17:16:55  yiwasaki
-// const added to CDCTrigger::hits,axialHits,stereoHits,hitsMC, symbols WireHitNeghborHit* added in CDCTriggerWireHit, TCluster::innerWidth,outerWidth,innerMostLayer,outerMostLayer,type,split,split2,widht,outer,updateType added, TLink::conf added, TTrack::appendStereo3,refineStereo2,aa,bb,Zchisqr added
+// const added to TRGCDC::hits,axialHits,stereoHits,hitsMC, symbols WireHitNeghborHit* added in TRGCDCWireHit, TCluster::innerWidth,outerWidth,innerMostLayer,outerMostLayer,type,split,split2,widht,outer,updateType added, TLink::conf added, TTrack::appendStereo3,refineStereo2,aa,bb,Zchisqr added
 //
 // Revision 1.7  1998/05/26 05:09:18  yiwasaki
 // cvs repair
@@ -152,7 +152,7 @@
 // minor changes
 //
 // Revision 1.2  1998/04/10 09:38:20  yiwasaki
-// TTrack added, CDCTrigger becomes Singleton
+// TTrack added, TRGCDC becomes Singleton
 //
 // Revision 1.1  1998/04/10 00:51:15  yiwasaki
 // TCircle, TConformalFinder, TConformalLink, TFinderBase, THistogram, TLink, TTrackBase classes added
@@ -178,13 +178,13 @@
 
 #include "tracking/modules/trasan/AList.h"
 #include "tracking/modules/trasan/ConstAList.h"
-#include "trigger/cdc/CDCTriggerWire.h"
-#include "trigger/cdc/CDCTriggerWireHit.h"
-//cnv #include "trigger/cdc/CDCTriggerClust.h"
+#include "trg/cdc/Wire.h"
+#include "trg/cdc/WireHit.h"
+//cnv #include "trg/cdc/Clust.h"
 
 namespace Belle2 {
-    class CDCTrigger;
-    class CDCTriggerTrackMC;
+    class TRGCDC;
+    class TRGCDCTrackMC;
 }
 
 namespace Belle {
@@ -193,13 +193,13 @@ typedef HepGeom::Point3D<double>  Point3D;
 template <class T> class CAList;
 class TTrack;
 
-/// A class to relate CDCTriggerWireHit and TTrack objects.
+/// A class to relate TRGCDCWireHit and TTrack objects.
 class TLink {
 
   public:
     /// Constructor.
     TLink(TTrack * track = 0,
-	  const Belle2::CDCTriggerWireHit * hit = 0,
+	  const Belle2::TRGCDCWireHit * hit = 0,
 	  const HepGeom::Point3D<double> & position = Point3D());
 
     /// Copy constructor.
@@ -214,10 +214,10 @@ class TLink {
 	      const std::string & prefix = std::string("")) const;
 
     /// returns a pointer to a hit.
-    const Belle2::CDCTriggerWireHit * hit(void) const;
+    const Belle2::TRGCDCWireHit * hit(void) const;
 
     /// returns a pointer to a wire.
-    const Belle2::CDCTriggerWire * const wire(void) const;
+    const Belle2::TRGCDCWire * const wire(void) const;
 
     /// returns a pointer to a track.
     TTrack * track(void) const;
@@ -263,7 +263,7 @@ class TLink {
     int usecathode(void) const;
 
     /// returns pointer to the cluster to be fit
-//cnv    Belle2::CDCTriggerClust * getmclust(void) const;
+//cnv    Belle2::TRGCDCClust * getmclust(void) const;
 // end S.Suzuki
 
     /// returns arc and Z for the curl finder.
@@ -281,7 +281,7 @@ class TLink {
 		double pull);
 
     /// sets a pointer to a hit.
-    const Belle2::CDCTriggerWireHit * hit(const Belle2::CDCTriggerWireHit *);
+    const Belle2::TRGCDCWireHit * hit(const Belle2::TRGCDCWireHit *);
 
     /// sets a pointer to a track.
     TTrack * track(TTrack *);
@@ -324,7 +324,7 @@ class TLink {
     void setusecathode(int);
 
     /// sets pointer to the cluster to be fit
-//cnv    void setmclust(Belle2::CDCTriggerClust *);
+//cnv    void setmclust(Belle2::TRGCDCClust *);
 
     /// sets z(phi) before cathode fit
     void setZphiBeforeCathode(float);
@@ -348,8 +348,8 @@ class TLink {
     float dDrift(float, unsigned);
 
   public:// Static utility functions
-    /// returns CDCTriggerTrackMC
-    static const Belle2::CDCTriggerTrackMC & links2HEP(const AList<TLink> & links);
+    /// returns TRGCDCTrackMC
+    static const Belle2::TRGCDCTrackMC & links2HEP(const AList<TLink> & links);
 
     /// returns \# of layers.
     static unsigned nSuperLayers(const AList<TLink> & links);
@@ -450,7 +450,7 @@ class TLink {
     static void set_superb(bool s) {
 	ms_superb = s;
     }
-    friend class Belle2::CDCTrigger;
+    friend class Belle2::TRGCDC;
 
   public:
     static void initializeBuffers(void);
@@ -460,7 +460,7 @@ class TLink {
 
   private:
     TTrack * _track;
-    const Belle2::CDCTriggerWireHit * _hit;
+    const Belle2::TRGCDCWireHit * _hit;
     HepGeom::Point3D<double> _onTrack;
     HepGeom::Point3D<double> _onWire;
     HepGeom::Point3D<double> _position;
@@ -481,7 +481,7 @@ class TLink {
    //-- S. Suzuki added -------
     int _usecathode;
     float _ZphiBeforeCathode;
-//cnv    Belle2::CDCTriggerClust * _mclust;
+//cnv    Belle2::TRGCDCClust * _mclust;
     //-- S. Suzuki added end ---
 
     HepGeom::Point3D<double> _arcZ[4];
@@ -520,7 +520,7 @@ class TLink {
 #ifdef TLink_INLINE_DEFINE_HERE
 
 inline
-const Belle2::CDCTriggerWireHit *
+const Belle2::TRGCDCWireHit *
 TLink::hit(void) const {
     return _hit;
 }
@@ -532,8 +532,8 @@ TLink::track(void) const {
 }
 
 inline
-const Belle2::CDCTriggerWireHit *
-TLink::hit(const Belle2::CDCTriggerWireHit * a) {
+const Belle2::TRGCDCWireHit *
+TLink::hit(const Belle2::TRGCDCWireHit * a) {
     return _hit = a;
 }
 
@@ -691,7 +691,7 @@ TLink::distance(void) const {
 }
 
 inline
-const Belle2::CDCTriggerWire * const
+const Belle2::TRGCDCWire * const
 TLink::wire(void) const {
     if (_hit) return & _hit->wire();
     return NULL;
@@ -741,14 +741,14 @@ TLink::setusecathode(int a) {
 }
 
 // inline 
-// Belle2::CDCTriggerClust *
+// Belle2::TRGCDCClust *
 // TLink::getmclust(void) const {
 //     return _mclust;
 // }
 
 // inline
 // void
-// TLink::setmclust(Belle2::CDCTriggerClust * a) {
+// TLink::setmclust(Belle2::TRGCDCClust * a) {
 //     _mclust = a ;
 // }
 

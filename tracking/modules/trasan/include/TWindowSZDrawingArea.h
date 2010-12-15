@@ -23,12 +23,12 @@
 #include "tracking/modules/trasan/ConstAList.h"
 
 namespace Belle2 {
-    class CDCTriggerWireHit;
+    class TRGCDCWireHit;
 }
 
 namespace Belle {
 
-class CDCTriggerWireHit;
+class TRGCDCWireHit;
 class TTrackBase;
 class TLine;
 class TLink;

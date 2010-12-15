@@ -52,7 +52,7 @@
 #include <cmath>
 #include <cstdlib>
 #include "tracking/modules/trasan/Strings.h"
-#include "trigger/cdc/CDCTrigger.h"
+#include "trg/cdc/TRGCDC.h"
 #include "tracking/modules/trasan/THoughFinder.h"
 #include "tracking/modules/trasan/THoughPlane.h"
 #include "tracking/modules/trasan/THoughPlaneMulti.h"
@@ -63,8 +63,8 @@
 #include "tracking/modules/trasan/TTrack.h"
 #ifdef TRASAN_DEBUG
 #include "tracking/modules/trasan/TDebugUtilities.h"
-#include "trigger/cdc/CDCTriggerWireHitMC.h"
-#include "trigger/cdc/CDCTriggerTrackMC.h"
+#include "trg/cdc/WireHitMC.h"
+#include "trg/cdc/TrackMC.h"
 #endif
 #ifdef TRASAN_WINDOW_GTK_HOUGH
 #include "tracking/modules/trasan/Trasan.h"
@@ -230,8 +230,8 @@ THoughFinder::clear(void) {
 }
 
 void
-THoughFinder::selectGoodHits(const CAList<Belle2::CDCTriggerWireHit> & axial,
-			     const CAList<Belle2::CDCTriggerWireHit> & stereo) {
+THoughFinder::selectGoodHits(const CAList<Belle2::TRGCDCWireHit> & axial,
+			     const CAList<Belle2::TRGCDCWireHit> & stereo) {
 #ifdef TRASAN_DEBUG
     const std::string stage = "selectGoodHits";
     EnterStage(stage);
@@ -239,14 +239,14 @@ THoughFinder::selectGoodHits(const CAList<Belle2::CDCTriggerWireHit> & axial,
 
     const unsigned na = axial.length();
     for (unsigned i = 0; i < na; i++) {
-	const Belle2::CDCTriggerWireHit & h = * axial[i];
+	const Belle2::TRGCDCWireHit & h = * axial[i];
 	const HepGeom::Point3D<double> & p = h.xyPosition();
 	_axial.append(new TLink(0, & h, p));
     }
 
     const unsigned ns = stereo.length();
     for (unsigned i = 0; i < ns; i++) {
-	const Belle2::CDCTriggerWireHit & h = * stereo[i];
+	const Belle2::TRGCDCWireHit & h = * stereo[i];
 	const HepGeom::Point3D<double> & p = h.xyPosition();
 	_stereo.append(new TLink(0, & h, p));
     }
@@ -257,8 +257,8 @@ THoughFinder::selectGoodHits(const CAList<Belle2::CDCTriggerWireHit> & axial,
 	if (i < na - 1) {
 	    TLink & t = * _axial[i];
 	    TLink & u = * _axial[i + 1];
-	    const Belle2::CDCTriggerWire & wt = * t.wire();
-	    const Belle2::CDCTriggerWire & wu = * u.wire();
+	    const Belle2::TRGCDCWire & wt = * t.wire();
+	    const Belle2::TRGCDCWire & wu = * u.wire();
 	    if (wt.layerId() != wu.layerId())
 		continue;
 	    const unsigned idt = wt.localId();
@@ -286,8 +286,8 @@ THoughFinder::selectGoodHits(const CAList<Belle2::CDCTriggerWireHit> & axial,
 	if (i < ns - 1) {
 	    TLink & t = * _stereo[i];
 	    TLink & u = * _stereo[i + 1];
-	    const Belle2::CDCTriggerWire & wt = * t.wire();
-	    const Belle2::CDCTriggerWire & wu = * u.wire();
+	    const Belle2::TRGCDCWire & wt = * t.wire();
+	    const Belle2::TRGCDCWire & wu = * u.wire();
 	    if (wt.layerId() != wu.layerId())
 		continue;
 	    const unsigned idt = wt.localId();
@@ -726,7 +726,7 @@ THoughFinder::build0(const TPoint2D & point,
 #endif
 
     //...2D hit pattern...
-//  static unsigned * nHits2D = new unsigned[Belle2::CDCTrigger::getCDCTrigger()->nSuperLayers()];
+//  static unsigned * nHits2D = new unsigned[Belle2::TRGCDC::getTRGCDC()->nSuperLayers()];
 //  unsigned nHits2D[11];
     TLink::nHitsSuperLayer(t->links(), _nHits2D);
 
@@ -752,7 +752,7 @@ THoughFinder::build0(const TPoint2D & point,
     delete t;
 
     //...Quality check...
-    // static const unsigned nsl = Belle2::CDCTrigger::getCDCTrigger()->nSuperLayers();
+    // static const unsigned nsl = Belle2::TRGCDC::getTRGCDC()->nSuperLayers();
     // static unsigned * nHits3D = new unsigned[nsl];
     // TLink::nHitsSuperLayer(s->links(), nHits3D);
     TLink::nHitsSuperLayer(s->links(), _nHits3D);
@@ -969,7 +969,7 @@ THoughFinder::build1(const TPoint2D & point,
 #endif
 
     //...2D hit pattern...
-//  static unsigned * nHits2D = new unsigned[Belle2::CDCTrigger::getCDCTrigger()->nSuperLayers()];
+//  static unsigned * nHits2D = new unsigned[Belle2::TRGCDC::getTRGCDC()->nSuperLayers()];
 //  unsigned nHits2D[11];
     TLink::nHitsSuperLayer(t->links(), _nHits2D);
 
@@ -995,7 +995,7 @@ THoughFinder::build1(const TPoint2D & point,
     delete t;
 
     //...Quality check...
-    // static const unsigned nsl = Belle2::CDCTrigger::getCDCTrigger()->nSuperLayers();
+    // static const unsigned nsl = Belle2::TRGCDC::getTRGCDC()->nSuperLayers();
     // static unsigned * nHits3D = new unsigned[nsl];
     // TLink::nHitsSuperLayer(s->links(), nHits3D);
     TLink::nHitsSuperLayer(s->links(), _nHits3D);
@@ -1222,7 +1222,7 @@ THoughFinder::build3(const TPoint2D & point,
 #endif
 
     //...2D hit pattern...
-//  static unsigned * nHits2D = new unsigned[Belle2::CDCTrigger::getCDCTrigger()->nSuperLayers()];
+//  static unsigned * nHits2D = new unsigned[Belle2::TRGCDC::getTRGCDC()->nSuperLayers()];
 //  unsigned nHits2D[11];
     TLink::nHitsSuperLayer(t->links(), _nHits2D);
 
@@ -1248,7 +1248,7 @@ THoughFinder::build3(const TPoint2D & point,
     delete t;
 
     //...Quality check...
-    // static const unsigned nsl = Belle2::CDCTrigger::getCDCTrigger()->nSuperLayers();
+    // static const unsigned nsl = Belle2::TRGCDC::getTRGCDC()->nSuperLayers();
     // static unsigned * nHits3D = new unsigned[nsl];
     // TLink::nHitsSuperLayer(s->links(), nHits3D);
     TLink::nHitsSuperLayer(s->links(), _nHits3D);
@@ -1402,7 +1402,7 @@ THoughFinder::buildCurl(const TPoint2D & point,
     }
 
     //...2D hit pattern...
-//  static unsigned * nHits2D = new unsigned[Belle2::CDCTrigger::getCDCTrigger()->nSuperLayers()];
+//  static unsigned * nHits2D = new unsigned[Belle2::TRGCDC::getTRGCDC()->nSuperLayers()];
 //  unsigned nHits2D[11];
 //  TLink::nHitsSuperLayer(t->links(), nHits2D);
     TLink::nHitsSuperLayer(t->links(), _nHits2D);
@@ -1441,7 +1441,7 @@ THoughFinder::buildCurl(const TPoint2D & point,
     delete t;
 
     //...Quality check...
-//  static const unsigned nsl = Belle2::CDCTrigger::getCDCTrigger()->nSuperLayers();
+//  static const unsigned nsl = Belle2::TRGCDC::getTRGCDC()->nSuperLayers();
 //  static unsigned * nHits3D = new unsigned[nsl];
 //  unsigned nHits3D[11];
     TLink::nHitsSuperLayer(s->links(), _nHits3D);
@@ -1557,7 +1557,7 @@ THoughFinder::goodTrack(const AList<TLink> & list) const {
     }
 
     //...Require at least two hits per axial super layer...
-//  static const unsigned nsl = Belle2::CDCTrigger::getCDCTrigger()->nSuperLayers();
+//  static const unsigned nsl = Belle2::TRGCDC::getTRGCDC()->nSuperLayers();
 //  static unsigned * nHits = new unsigned[nsl];
     TLink::nHitsSuperLayer(list, _nHitsG);
     for (unsigned i = 0; i < _nsl; i++) {
@@ -1601,7 +1601,7 @@ THoughFinder::goodTrackLowPt(const TTrack & t) const {
 #endif
 
     //...Require at least two hits per axial super layer...
-    static const unsigned nsl = Belle2::CDCTrigger::getCDCTrigger()->nSuperLayers();
+    static const unsigned nsl = Belle2::TRGCDC::getTRGCDC()->nSuperLayers();
     static unsigned * nHits = new unsigned[nsl];
 //  unsigned nHits[11];
     TLink::nHitsSuperLayer(t.links(), nHits);
@@ -1642,9 +1642,9 @@ THoughFinder::adjustAxialLinks(const AList<TLink> & list) const {
     EnterStage(stage);
 #endif
 
-//     static const unsigned nsl = Belle2::CDCTrigger::getCDCTrigger()->nSuperLayers();
+//     static const unsigned nsl = Belle2::TRGCDC::getTRGCDC()->nSuperLayers();
 //     static AList<TLink> * hits = new AList<TLink>[nsl];
-    const unsigned nsl = Belle2::CDCTrigger::getCDCTrigger()->nSuperLayers();
+    const unsigned nsl = Belle2::TRGCDC::getTRGCDC()->nSuperLayers();
     AList<TLink> * hits = new AList<TLink>[nsl];
 //     for (unsigned i = 0; i < nsl; i++)
 // 	hits[i].removeAll();
@@ -1705,8 +1705,8 @@ THoughFinder::adjustAxialLinks(const AList<TLink> & list) const {
 }
 
 int
-THoughFinder::doit(const CAList<Belle2::CDCTriggerWireHit> & axialHits,
-		   const CAList<Belle2::CDCTriggerWireHit> & stereoHits,
+THoughFinder::doit(const CAList<Belle2::TRGCDCWireHit> & axialHits,
+		   const CAList<Belle2::TRGCDCWireHit> & stereoHits,
 		   AList<TTrack> & tracks,
 		   AList<TTrack> & tracks2D) {
     if (_mode == 0)
@@ -1720,8 +1720,8 @@ THoughFinder::doit(const CAList<Belle2::CDCTriggerWireHit> & axialHits,
 }
 
 int
-THoughFinder::doit1(const CAList<Belle2::CDCTriggerWireHit> & axialHits,
-		    const CAList<Belle2::CDCTriggerWireHit> & stereoHits,
+THoughFinder::doit1(const CAList<Belle2::TRGCDCWireHit> & axialHits,
+		    const CAList<Belle2::TRGCDCWireHit> & stereoHits,
 		    AList<TTrack> & tracks,
 		    AList<TTrack> & tracks2D) {
 
@@ -1762,8 +1762,8 @@ THoughFinder::doit1(const CAList<Belle2::CDCTriggerWireHit> & axialHits,
     //...Select outside hits only...
 //  AList<TLink> superLayerHits[11];
     static AList<TLink> * superLayerHits =
-	new AList<TLink>[Belle2::CDCTrigger::getCDCTrigger()->nSuperLayers()];
-    for (unsigned i = 0; i < Belle2::CDCTrigger::getCDCTrigger()->nSuperLayers(); i++)
+	new AList<TLink>[Belle2::TRGCDC::getTRGCDC()->nSuperLayers()];
+    for (unsigned i = 0; i < Belle2::TRGCDC::getTRGCDC()->nSuperLayers(); i++)
 	superLayerHits[i].removeAll();
     TLink::nHitsSuperLayer(_axial, superLayerHits);
     AList<TLink> outerHits;
@@ -2014,8 +2014,8 @@ THoughFinder::doit1(const CAList<Belle2::CDCTriggerWireHit> & axialHits,
 }
 
 int
-THoughFinder::doit0(const CAList<Belle2::CDCTriggerWireHit> & axialHits,
-		    const CAList<Belle2::CDCTriggerWireHit> & stereoHits,
+THoughFinder::doit0(const CAList<Belle2::TRGCDCWireHit> & axialHits,
+		    const CAList<Belle2::TRGCDCWireHit> & stereoHits,
 		    AList<TTrack> & tracks,
 		    AList<TTrack> & tracks2D) {
 
@@ -2543,7 +2543,7 @@ THoughFinder::goodTrackHoughMatch(const THoughPlane & hp,
 
 void
 THoughFinder::init(void) {
-    const Belle2::CDCTrigger & cdc = * Belle2::CDCTrigger::getCDCTrigger();
+    const Belle2::TRGCDC & cdc = * Belle2::TRGCDC::getTRGCDC();
     const int nlayers(cdc.nLayers());
     _planeHP = new THoughPlaneMulti("circle Hough:high pt and pluse charge",
 				    _meshX, 0, 2 * M_PI, _meshY, _ptBoundaryInHough,
@@ -2583,13 +2583,13 @@ THoughFinder::init(void) {
     _nHitsG = new unsigned[_nsl];
 
     for (unsigned i = 0; i < cdc.nLayers(); i++) {
-	const Belle2::CDCTriggerLayer * l = cdc.layer(i);
+	const Belle2::TRGCDCLayer * l = cdc.layer(i);
 	const unsigned nWires = l->nWires();
 	if (! nWires) continue;
 	_planeHP2->preparePatterns(i, nWires);
 	_planeHM2->preparePatterns(i, nWires);
 	for (unsigned j = 0; j < nWires; j++) {
-	    const Belle2::CDCTriggerWire & w = * (* l)[j];
+	    const Belle2::TRGCDCWire & w = * (* l)[j];
 	    const float x = w.xyPosition().x();
 	    const float y = w.xyPosition().y();
 
@@ -2622,7 +2622,7 @@ THoughFinder::init(void) {
 // 	    const float phi = float(j) / float(nWires) * 2 * M_PI;
 // 	    const float x = r * cos(phi);
 // 	    const float y = r * sin(phi);
-	    const Belle2::CDCTriggerWire & w = * (* l)[j];
+	    const Belle2::TRGCDCWire & w = * (* l)[j];
 	    const float x = w.xyPosition().x();
 	    const float y = w.xyPosition().y();
 	    _tmp->clear();
@@ -2703,7 +2703,7 @@ THoughFinder::init(void) {
 // 	    const float phi = float(j) / float(nWires) * 2 * M_PI;
 // 	    const float x = r * cos(phi);
 // 	    const float y = r * sin(phi);
-	    const Belle2::CDCTriggerWire & w = * (* l)[j];
+	    const Belle2::TRGCDCWire & w = * (* l)[j];
 	    const float x = w.xyPosition().x();
 	    const float y = w.xyPosition().y();
 	    _tmp->clear();
@@ -2783,7 +2783,7 @@ THoughFinder::init(void) {
 
 #if 0
     for (unsigned i = 0; i < cdc.nLayers(); i++) {
-	const Belle2::CDCTriggerLayer * l = cdc.layer(i);
+	const Belle2::TRGCDCLayer * l = cdc.layer(i);
 	if (! l->nWires()) continue;
 	const float r = l->wire(0)->xyPosition().perp();
 	_planeHP.vote(r, 0, +1, _circleHough, 1, i);
@@ -2800,7 +2800,7 @@ THoughFinder::init(void) {
 // 	    const float phi = float(j) / float(nWires) * 2 * M_PI;
 // 	    const float x = r * cos(phi);
 // 	    const float y = r * sin(phi);
-	    const Belle2::CDCTriggerWire & w = * (* l)[j];
+	    const Belle2::TRGCDCWire & w = * (* l)[j];
 	    const float x = w.xyPosition().x();
 	    const float y = w.xyPosition().y();
 	    _tmp->clear();
@@ -2912,8 +2912,8 @@ THoughFinder::houghTransformation2(const AList<TLink> & hits,
 }
 
 int
-THoughFinder::doit2(const CAList<Belle2::CDCTriggerWireHit> & axialHits,
-		    const CAList<Belle2::CDCTriggerWireHit> & stereoHits,
+THoughFinder::doit2(const CAList<Belle2::TRGCDCWireHit> & axialHits,
+		    const CAList<Belle2::TRGCDCWireHit> & stereoHits,
 		    AList<TTrack> & tracks,
 		    AList<TTrack> & tracks2D) {
 
@@ -3182,8 +3182,8 @@ THoughFinder::doit2(const CAList<Belle2::CDCTriggerWireHit> & axialHits,
 }
 
 int
-THoughFinder::doit3(const CAList<Belle2::CDCTriggerWireHit> & axialHits,
-		    const CAList<Belle2::CDCTriggerWireHit> & stereoHits,
+THoughFinder::doit3(const CAList<Belle2::TRGCDCWireHit> & axialHits,
+		    const CAList<Belle2::TRGCDCWireHit> & stereoHits,
 		    AList<TTrack> & tracks,
 		    AList<TTrack> & tracks2D) {
 

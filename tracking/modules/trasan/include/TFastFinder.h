@@ -46,7 +46,7 @@
 #endif
 #endif
 
-#include "trigger/cdc/CDCTriggerWireHit.h"
+#include "trg/cdc/WireHit.h"
 #include "tracking/modules/trasan/TFinderBase.h"
 #include "tracking/modules/trasan/TBuilder0.h"
 
@@ -80,30 +80,30 @@ class TFastFinder : public TFinderBase {
     void clear(void);
 
     /// finds tracks.
-    int doit(const AList<Belle2::CDCTriggerWireHit> & axialHits,
-	     const AList<Belle2::CDCTriggerWireHit> & stereoHits,
+    int doit(const AList<Belle2::TRGCDCWireHit> & axialHits,
+	     const AList<Belle2::TRGCDCWireHit> & stereoHits,
 	     AList<TTrack> & tracks);
 
   private:
     /// selects isolated hits.(conf.finder type)
-    void selectHits(const AList<Belle2::CDCTriggerWireHit> & axialHits,
-		    const AList<Belle2::CDCTriggerWireHit> & stereoHits);
+    void selectHits(const AList<Belle2::TRGCDCWireHit> & axialHits,
+		    const AList<Belle2::TRGCDCWireHit> & stereoHits);
 
     /// selects isolated hits.(calling selectSimpleSegments)
-    void selectHits2(const AList<Belle2::CDCTriggerWireHit> & axialHits,
-		     const AList<Belle2::CDCTriggerWireHit> & stereoHits);
+    void selectHits2(const AList<Belle2::TRGCDCWireHit> & axialHits,
+		     const AList<Belle2::TRGCDCWireHit> & stereoHits);
 
     /// selects simple segments.
-    void selectSimpleSegments(const AList<Belle2::CDCTriggerWireHit> & hits,
-			      AList<Belle2::CDCTriggerWireHit> & output) const;
+    void selectSimpleSegments(const AList<Belle2::TRGCDCWireHit> & hits,
+			      AList<Belle2::TRGCDCWireHit> & output) const;
 
     /// finds close hits.
     AList<TLink> findCloseHits(const AList<TLink> & links,
 			       const TTrack & track) const;
 
   private:
-    AList<Belle2::CDCTriggerWireHit> _axialHits;
-    AList<Belle2::CDCTriggerWireHit> _stereoHits;
+    AList<Belle2::TRGCDCWireHit> _axialHits;
+    AList<Belle2::TRGCDCWireHit> _stereoHits;
     AList<TLink> _axialLinks;
     AList<TLink> _stereoLinks;
 

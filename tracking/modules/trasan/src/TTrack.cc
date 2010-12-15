@@ -123,7 +123,7 @@
 // Trasan 1.67h : new conf modified
 //
 // Revision 1.59  1999/11/23 10:30:19  yiwasaki
-// ALPHA in CDCTriggerUtil is replaced by THelix::ConstantAlpha
+// ALPHA in TRGCDCUtil is replaced by THelix::ConstantAlpha
 //
 // Revision 1.58  1999/11/19 09:13:10  yiwasaki
 // Trasan 1.65d : new conf. finder updates, no change in default conf. finder
@@ -219,7 +219,7 @@
 // Trasan 1.1 beta 9 release : more protections for negative sqrt and zero division
 //
 // Revision 1.27  1998/11/10 09:09:09  yiwasaki
-// Trasan 1.1 beta 8 release : negative sqrt fixed, curl finder updated by j.tanaka, CDCTrigger classes modified by y.iwasaki
+// Trasan 1.1 beta 8 release : negative sqrt fixed, curl finder updated by j.tanaka, TRGCDC classes modified by y.iwasaki
 //
 // Revision 1.26  1998/10/09 03:01:08  yiwasaki
 // Trasan 1.1 beta 4 release : memory leak stopped, and minor changes
@@ -267,7 +267,7 @@
 // Trasan 1 alpha 8 release, Stereo append bug fixed, TCurlFinder added
 //
 // Revision 1.9  1998/06/03 17:17:39  yiwasaki
-// const added to CDCTrigger::hits,axialHits,stereoHits,hitsMC, symbols WireHitNeghborHit* added in CDCTriggerWireHit, TCluster::innerWidth,outerWidth,innerMostLayer,outerMostLayer,type,split,split2,widht,outer,updateType added, TLink::conf added, TTrack::appendStereo3,refineStereo2,aa,bb,Zchisqr added
+// const added to TRGCDC::hits,axialHits,stereoHits,hitsMC, symbols WireHitNeghborHit* added in TRGCDCWireHit, TCluster::innerWidth,outerWidth,innerMostLayer,outerMostLayer,type,split,split2,widht,outer,updateType added, TLink::conf added, TTrack::appendStereo3,refineStereo2,aa,bb,Zchisqr added
 //
 // Revision 1.8  1998/05/26 05:10:18  yiwasaki
 // cvs repair
@@ -279,7 +279,7 @@
 // Trasan 1 alpha 4 release, TCluster added, TConformalLink no longer used
 //
 // Revision 1.5  1998/05/11 10:16:57  yiwasaki
-// TTrack::assign -> TTrack::assert, WireHitUsedMask is set in CDCTriggerWireHit
+// TTrack::assign -> TTrack::assert, WireHitUsedMask is set in TRGCDCWireHit
 //
 // Revision 1.4  1998/05/08 09:45:44  yiwasaki
 // Trasan 1 alpha 2 relase, stereo recon. added, off-vtx recon. added
@@ -291,7 +291,7 @@
 // minor changes
 //
 // Revision 1.1  1998/04/10 09:36:29  yiwasaki
-// TTrack added, CDCTrigger becomes Singleton
+// TTrack added, TRGCDC becomes Singleton
 //
 //-----------------------------------------------------------------------------
 
@@ -323,16 +323,16 @@
 #include "CLHEP/Matrix/SymMatrix.h"
 #include "CLHEP/Matrix/DiagMatrix.h"
 #include "CLHEP/Matrix/Matrix.h"
-#include "trigger/cdc/CDCTrigger.h"
+#include "trg/cdc/TRGCDC.h"
 #include "tracking/modules/trasan/TFinderBase.h"
 #include "tracking/modules/trasan/TCircle.h"
 #include "tracking/modules/trasan/TLine.h"
 #include "tracking/modules/trasan/TLink.h"
 
-#include "trigger/cdc/CDCTriggerWire.h"
-#include "trigger/cdc/CDCTriggerWireHit.h"
-#include "trigger/cdc/CDCTriggerWireHitMC.h"
-//cnv #include "trigger/cdc/CDCTriggerStrip.h"
+#include "trg/cdc/Wire.h"
+#include "trg/cdc/WireHit.h"
+#include "trg/cdc/WireHitMC.h"
+//cnv #include "trg/cdc/Strip.h"
 #include "tracking/modules/trasan/TTrack.h"
 #include "tracking/modules/trasan/TSegment.h"
 #include "tracking/modules/trasan/TUtilities.h"
@@ -431,8 +431,8 @@ struct reccdc_wirhit {
   float m_adc;
 };
 #endif
-#ifndef PANTHER_DACDCTrigger_MCWIRHIT_
-#define PANTHER_DACDCTrigger_MCWIRHIT_
+#ifndef PANTHER_DATRGCDC_MCWIRHIT_
+#define PANTHER_DATRGCDC_MCWIRHIT_
 struct datcdc_mcwirhit {
   int m_panther_dummy_;
   int m_ID;
@@ -1197,7 +1197,7 @@ void
 TTrack::findCatHit(unsigned trackid) {
 
 //cnv //  unsigned i = 0;
-//   //  while ( CDCTrigger01CatHit * chit = _cathits.last() ) {
+//   //  while ( TRGCDC01CatHit * chit = _cathits.last() ) {
 //   //    _cathits.remove(chit);
 //   //    delete chit;
 //   //  }
@@ -1219,13 +1219,13 @@ TTrack::findCatHit(unsigned trackid) {
 //   // 
 //   HepGeom::Point3D<double> xp ;
 //   double phi ;
-//   CDCTriggerCatHit * chit;
+//   TRGCDCCatHit * chit;
 
 //   // loop over layers and find cathits 
   
 //   for ( unsigned layer = 0 ; layer < 3 ; layer++ ) {
 //     if ( HelCyl (rhole, rcyl[layer], zb,zf,epsl, phi, xp ) == 1 ) {
-//       chit = new CDCTriggerCatHit( this, trackid, layer, xp.x(), xp.y(), xp.z()) ;
+//       chit = new TRGCDCCatHit( this, trackid, layer, xp.x(), xp.y(), xp.z()) ;
 //       _catHits.append(chit); 
 //     }
 //   }
@@ -1288,7 +1288,7 @@ TTrack::findCatHit(unsigned trackid) {
 //  	//...Loop with hits...
 //  	unsigned i = 0;
 //  	while (TLink * l = _links[i++]) {
-//  	    const CDCTriggerWireHit & h = * l->hit();
+//  	    const TRGCDCWireHit & h = * l->hit();
 
 //  	    //...Check state...
 //  	    if (h.state() & WireHitInvalidForFit) continue;
@@ -1370,7 +1370,7 @@ TTrack::findCatHit(unsigned trackid) {
 //            //...Loop with hits...
 //            unsigned i = 0;
 //            while (TLink * l = _links[i++]) {
-//  	      const CDCTriggerWireHit & h = * l->hit();
+//  	      const TRGCDCWireHit & h = * l->hit();
             
 //              //...Check wire...
 //              if (! nTrial)
@@ -1506,7 +1506,7 @@ TTrack::dxda(const TLink & link,
 	     CLHEP::HepVector & dzda) const {
 
     //...Setup...
-    const Belle2::CDCTriggerWire & w = * link.wire();
+    const Belle2::TRGCDCWire & w = * link.wire();
     CLHEP::HepVector a = _helix->a();
     double dRho  = a[0];
     double phi0  = a[1];
@@ -1685,7 +1685,7 @@ TTrack::fit2D(void) {
     //...Loop with hits...
     unsigned i = 0;
     while (TLink * l = _links[i++]) {
-      const Belle2::CDCTriggerWireHit & h = * l->hit();
+      const Belle2::TRGCDCWireHit & h = * l->hit();
       
       //...Cal. closest points...
       approach2D(* l);
@@ -1762,7 +1762,7 @@ TTrack::fit2D(void) {
       //...Loop with hits...
       unsigned i = 0;
       while (TLink * l = _links[i++]) {
-	const Belle2::CDCTriggerWireHit & h = * l->hit();
+	const Belle2::TRGCDCWireHit & h = * l->hit();
 	
 	//...Cal. closest points...
 	approach2D(* l);
@@ -1895,7 +1895,7 @@ int TTrack::fitWithCathode(float window, int SysCorr ) {
 //     int err = 0;
 //     double factor = 1.0;
 
-// //  const AList<CDCTriggerCatHit> & chits = _catHits;
+// //  const AList<TRGCDCCatHit> & chits = _catHits;
 
 //     CLHEP::HepVector maxDouble(5);
 //     for (unsigned i = 0; i < 5; i++) maxDouble[i] = (FLT_MAX);
@@ -1913,7 +1913,7 @@ int TTrack::fitWithCathode(float window, int SysCorr ) {
 //       unsigned i = 0;
 //       while (TLink * l = cores()[i++]) {
 
-// 	  const CDCTriggerWireHit & h = * l->hit();
+// 	  const TRGCDCWireHit & h = * l->hit();
 
 // 	// Check layer status ( cathode added ) 
 // 	LayerStat = 0;
@@ -1989,7 +1989,7 @@ int TTrack::fitWithCathode(float window, int SysCorr ) {
 
 // 	  if ( l->usecathode() >= 3 ) {
 
-// 	    CDCTriggerClust * mclust = l->getmclust();
+// 	    TRGCDCClust * mclust = l->getmclust();
 
 // 	      double dDistanceZ(this->helix().x(dPhi).z());
 
@@ -2068,7 +2068,7 @@ int TTrack::fitWithCathode(float window, int SysCorr ) {
 //           //...Loop with hits...
 //           unsigned i = 0;
 //           while (TLink * l = _links[i++]) {
-// 	      const CDCTriggerWireHit & h = * l->hit();
+// 	      const TRGCDCWireHit & h = * l->hit();
 
 //      // Check layer status ( cathode added ) 	      
 //         LayerStat = 0;
@@ -2139,7 +2139,7 @@ int TTrack::fitWithCathode(float window, int SysCorr ) {
 
 // 	  if( l->usecathode() == 4 ){
 	    
-// 	    CDCTriggerClust * mclust = l->getmclust();
+// 	    TRGCDCClust * mclust = l->getmclust();
 
 // 	    if( mclust ){
 //                 NusedCathode++;
@@ -2262,7 +2262,7 @@ TTrack::stereoHitForCurl(TLink & link, AList<Point3D> & arcZList) const
     */
   
     // std::cout << "\n\nWire ID = " << link.hit()->wire().id() << std::endl;
-    const Belle2::CDCTriggerWireHit &h = *link.hit();
+    const Belle2::TRGCDCWireHit &h = *link.hit();
     Vector3D X     = 0.5*(h.wire().forwardPosition() +
 				  h.wire().backwardPosition());
     
@@ -2723,7 +2723,7 @@ TTrack::stereoHitForCurl(AList<TLink> & list) const
   HepGeom::Point3D<double> tmp(-999., -999., 0.);
   double r  = fabs(_helix->curv());
   for(unsigned i = 0, size = list.length(); i < size; ++i){
-    Belle2::CDCTriggerWireHit &h = *const_cast<Belle2::CDCTriggerWireHit*>(list[i]->hit());
+    Belle2::TRGCDCWireHit &h = *const_cast<Belle2::TRGCDCWireHit*>(list[i]->hit());
     Vector3D X = 0.5*(h.wire().forwardPosition() +
 		      h.wire().backwardPosition());
     Vector3D x     = Vector3D(X.x(), X.y(), 0.);
@@ -3098,7 +3098,7 @@ int
 TTrack::approach2D(TLink & l) const {
 
   //...Setup...
-  const Belle2::CDCTriggerWire & w = * l.wire();
+  const Belle2::TRGCDCWire & w = * l.wire();
   CLHEP::HepVector a = _helix->a();
   double kappa = a[2];
   double phi0  = a[1];
@@ -3144,7 +3144,7 @@ TTrack::dxda2D(const TLink & link,
                CLHEP::HepVector & dzda) const {
   
   //...Setup...
-  const Belle2::CDCTriggerWire & w = * link.wire();
+  const Belle2::TRGCDCWire & w = * link.wire();
   CLHEP::HepVector a = _helix->a();
   double dRho  = a[0];
   double phi0  = a[1];
@@ -3280,7 +3280,7 @@ TTrack::fit2D(unsigned ipFlag, double ipDistance, double ipError) {
     unsigned i = 0;
     while (TLink * l = _links[i++]) {
       if(l->fit2D() == 0)continue;
-      const Belle2::CDCTriggerWireHit &h = *l->hit();
+      const Belle2::TRGCDCWireHit &h = *l->hit();
       
       //...Cal. closest points...
       if(approach2D(*l) != 0)continue;
@@ -3389,7 +3389,7 @@ TTrack::fit2D(unsigned ipFlag, double ipDistance, double ipError) {
       unsigned i = 0;
       while (TLink *l = _links[i++]) {
 	if(l->fit2D() == 0)continue;
-	const Belle2::CDCTriggerWireHit & h = * l->hit();
+	const Belle2::TRGCDCWireHit & h = * l->hit();
 	
 	//...Cal. closest points...
 	if(approach2D(*l) != 0)continue;
@@ -3595,7 +3595,7 @@ std::fprintf(data,"%lf, %lf\n",X,Y);
 int 
 TTrack::approach2D(TLink &l) const {
 
-  const Belle2::CDCTriggerWire &w = *l.wire();
+  const Belle2::TRGCDCWire &w = *l.wire();
 //double kappa = _helix->a()[2];
 //double phi0  = _helix->a()[1];
   HepGeom::Point3D<double> xc(_helix->center());
@@ -3629,7 +3629,7 @@ TTrack::dxda2D(const TLink & link,
     std::cout << "Error(?) : kappa == 0 in dxda2D of Trasan." << std::endl;
     return 1;
   }
-  const Belle2::CDCTriggerWire &w = *link.wire();
+  const Belle2::TRGCDCWire &w = *link.wire();
   double dRho  = (_helix->a())[0];
   double phi0  = (_helix->a())[1];
   double rho   = THelix::ConstantAlpha / kappa;
@@ -3753,7 +3753,7 @@ int
 TTrack::approach(TLink & link, bool doSagCorrection) const {
 
     //...Cal. dPhi to rotate...
-    const Belle2::CDCTriggerWire & w = * link.wire();
+    const Belle2::TRGCDCWire & w = * link.wire();
     double wp[3]; w.xyPosition(wp);
     double wb[3]; w.backwardPosition(wb);
     double v[3];
@@ -3942,7 +3942,7 @@ TTrack::relationClusterWithWire(){
 //    l->setZphiBeforeCathode( _helix->x(dPhi).z() );
 
 //    int k1  = 0;
-//    while( CDCTriggerCatHit *c = _catHits[k1] ){
+//    while( TRGCDCCatHit *c = _catHits[k1] ){
 
 //    // Matching of layer 
 //     if( c->layerID() != l->hit()->wire().layerId() ) {
@@ -3950,15 +3950,15 @@ TTrack::relationClusterWithWire(){
 //        }
 
 //    // Matching of wire hit 
-//     AList<CDCTriggerWireHit>& cwire = c->candwire();
-//     AList<CDCTriggerClust>&  cclust = c->candclust();
+//     AList<TRGCDCWireHit>& cwire = c->candwire();
+//     AList<TRGCDCClust>&  cclust = c->candclust();
 
 //     if( cwire.length() == 0 || cclust.length() == 0 ){
 // 	k1++; continue;
 //        }
 
 //     int k2 = 0;
-//     while( CDCTriggerWireHit *cw = cwire[k2] ){
+//     while( TRGCDCWireHit *cw = cwire[k2] ){
 //       if( cw == l->hit() ){  flag = 1; break; }
 // 	k2++;
 //      }
@@ -3983,10 +3983,10 @@ TTrack::relationClusterWithWire(){
 
 //     int count_at_boundary(0);
 //     float tmaxpad_at_boundary(0.);
-//     CDCTriggerClust * cc_at_boundary = NULL;
+//     TRGCDCClust * cc_at_boundary = NULL;
 
 //     k2 = 0;
-//     while( CDCTriggerClust *cc = cclust[k2] ){
+//     while( TRGCDCClust *cc = cclust[k2] ){
 
 //       unsigned cathit_sector = cc->maxpad()->sectorId();
       
@@ -4017,7 +4017,7 @@ TTrack::relationClusterWithWire(){
 // 	 k2++;
 // 	}
 //     k1++;
-//     } // CDCTriggerCatHit loop
+//     } // TRGCDCCatHit loop
 
 //    j++;
 //    } // TLink loop
@@ -4069,7 +4069,7 @@ void TTrack::relationClusterWithLayer( int SysCorr ){
 
 int
 TTrack::szPosition(TLink & link) const {
-    const Belle2::CDCTriggerWireHit & h = * link.hit();
+    const Belle2::TRGCDCWireHit & h = * link.hit();
     Vector3D X = 0.5 * (h.wire().forwardPosition()
 			+ h.wire().backwardPosition());
     //    double theta = atan2(X.y(), X.x());
@@ -4253,7 +4253,7 @@ TTrack::assign(unsigned hitMask) {
     unsigned n = _links.length();
     for (unsigned i = 0; i < n; i++) {
 	TLink * l = _links[i];
-	const Belle2::CDCTriggerWireHit * h = l->hit();
+	const Belle2::TRGCDCWireHit * h = l->hit();
 
 #ifdef TRASAN_DEBUG
 	if (h->track()) {
@@ -4605,7 +4605,7 @@ TTrack::distance(const TTrack & t0, const TTrack & t1) {
     const unsigned o1 = TLink::outerMost(t1.cores())->wire()->layerId();
 
     //...Clear inner and outer points...
-    const Belle2::CDCTrigger & cdc = * Belle2::CDCTrigger::getCDCTrigger();
+    const Belle2::TRGCDC & cdc = * Belle2::TRGCDC::getTRGCDC();
     const unsigned n = cdc.nLayers() + 1;
     for (unsigned i = 0; i < n; i++) {
 	if (i < i0)
@@ -4674,7 +4674,7 @@ TTrack::distanceB(const TTrack & t0, const TTrack & t1) {
     const unsigned o1 = TLink::outerMost(t1.cores())->wire()->layerId();
 
     //...Clear inner and outer points...
-    const Belle2::CDCTrigger & cdc = * Belle2::CDCTrigger::getCDCTrigger();
+    const Belle2::TRGCDC & cdc = * Belle2::TRGCDC::getTRGCDC();
     const unsigned n = cdc.nLayers() + 1;
     for (unsigned i = 0; i < n; i++) {
 	if (i < i0)

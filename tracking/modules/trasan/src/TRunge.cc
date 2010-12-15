@@ -29,7 +29,7 @@
 
 #include "tracking/modules/trasan/TRunge.h"
 #include "tracking/modules/trasan/TRungeFitter.h"
-#include "trigger/cdc/CDCTriggerWire.h"
+#include "trg/cdc/Wire.h"
 #include "tracking/modules/trasan/TTrack.h"
 
 namespace Belle {
@@ -366,7 +366,7 @@ int TRunge::approach(TLink& l,float& tof,HepGeom::Vector3D<double> & p,
 //   HepGeom::Point3D<double> onWire,onTrack;
 //   double onWire_y, onWire_z, zwf, zwb;
 
-//   const Belle2::CDCTriggerWire& w=*l.wire();
+//   const Belle2::TRGCDCWire& w=*l.wire();
 //   xw = w.xyPosition();
 //   wireBackwardPosition = w.backwardPosition();
 //   v = w.direction();
@@ -1107,7 +1107,7 @@ double TRunge::SetFlightLength(void){
 //   for(int j=0;j<cores.length();j++){
 //     TLink& l=*cores[j];
 //     // fitting valid?
-//     const Belle2::CDCTriggerWire& wire=*l.wire();
+//     const Belle2::TRGCDCWire& wire=*l.wire();
 //     double Wz=0;
 //     //double mindist;
 //     HepGeom::Point3D<double> onWire;

@@ -71,7 +71,7 @@
 // Fitters added
 //
 // Revision 1.4  1998/11/10 09:09:17  yiwasaki
-// Trasan 1.1 beta 8 release : negative sqrt fixed, curl finder updated by j.tanaka, CDCTrigger classes modified by y.iwasaki
+// Trasan 1.1 beta 8 release : negative sqrt fixed, curl finder updated by j.tanaka, TRGCDC classes modified by y.iwasaki
 //
 // Revision 1.3  1998/10/13 04:04:50  yiwasaki
 // Trasan 1.1 beta 7 release : memory leak fixed by J.Tanaka, TCurlFinderParameters.h added by J.Tanaka
@@ -105,7 +105,7 @@
 
 namespace Belle {
 
-  class CDCTrigger;
+  class TRGCDC;
 
 
 /// A class to build a Curl track.
@@ -151,7 +151,7 @@ class TBuilderCurl : public TBuilder0 {
   static void calVirtualCircle(const TLink &hit, const TTrack &track, const int LR, HepGeom::Point3D<double>  &center, double &radius);
   static void moveLR(AList<TLink> &hits, const AList<TLink> &hitsOnLayerOrg, const TTrack &track);
 
-  friend class CDCTrigger;
+  friend class TRGCDC;
 
 
   private:

@@ -44,7 +44,7 @@
 // Fitters added
 //
 // Revision 1.15  1998/11/10 09:09:03  yiwasaki
-// Trasan 1.1 beta 8 release : negative sqrt fixed, curl finder updated by j.tanaka, CDCTrigger classes modified by y.iwasaki
+// Trasan 1.1 beta 8 release : negative sqrt fixed, curl finder updated by j.tanaka, TRGCDC classes modified by y.iwasaki
 //
 // Revision 1.14  1998/11/06 02:31:49  yiwasaki
 // 0 div protection from Katayama san
@@ -80,7 +80,7 @@
 // minor changes
 //
 // Revision 1.2  1998/04/10 09:36:26  yiwasaki
-// TTrack added, CDCTrigger becomes Singleton
+// TTrack added, TRGCDC becomes Singleton
 //
 // Revision 1.1  1998/04/10 00:50:14  yiwasaki
 // TCircle, TConformalFinder, TConformalLink, TFinderBase, THistogram, TLink, TTrackBase classes added
@@ -91,9 +91,9 @@
 
 
 #include "tracking/modules/trasan/TCircle.h"
-#include "trigger/cdc/CDCTriggerWire.h"
-#include "trigger/cdc/CDCTriggerWireHit.h"
-#include "trigger/cdc/CDCTriggerWireHitMC.h"
+#include "trg/cdc/Wire.h"
+#include "trg/cdc/WireHit.h"
+#include "trg/cdc/WireHitMC.h"
 #include "tracking/modules/trasan/TTrack.h"
 #include "tracking/modules/trasan/TLink.h"
 #ifdef TRASAN_DEBUG
@@ -207,7 +207,7 @@ TCircle::dump(const std::string & msg, const std::string & pre) const {
 
 //      for (unsigned i = 0; i < n; i++) {
 //  	TLink * l = _links[i];
-//  	const CDCTriggerWireHit * h = l->hit();
+//  	const TRGCDCWireHit * h = l->hit();
 
 //  	//...Check next hit...
 //  	Point3D point;
@@ -235,7 +235,7 @@ TCircle::dump(const std::string & msg, const std::string & pre) const {
 //  	TLink * l = _links[i];
 //  	if (l == 0) continue;
 
-//  	const CDCTriggerWireHit * h = l->hit();
+//  	const TRGCDCWireHit * h = l->hit();
 //  	if (h == 0) continue;
 
 //  	float q = (_center.cross(h->xyPosition())).z();
@@ -298,7 +298,7 @@ TCircle::fitForCurl(int ipConst) {
         TLink * l = _links[i];
         if (l == 0) continue;
 
-        const Belle2::CDCTriggerWireHit * h = l->hit();
+        const Belle2::TRGCDCWireHit * h = l->hit();
         if (h == 0) continue;
 
         //...Check next hit...
@@ -326,7 +326,7 @@ TCircle::fitForCurl(int ipConst) {
         TLink * l = _links[i];
         if (l == 0) continue;
 
-        const Belle2::CDCTriggerWireHit * h = l->hit();
+        const Belle2::TRGCDCWireHit * h = l->hit();
         if (h == 0) continue;
 
         float q = (_center.cross(h->xyPosition())).z();

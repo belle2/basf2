@@ -70,7 +70,7 @@
 // Trasan 1.47a release : hit and tracking efficiency improved
 //
 // Revision 1.50  1999/06/15 06:33:41  yiwasaki
-// Trasan 1.43 release : minor changes in CDCTriggerClust and TBuilder
+// Trasan 1.43 release : minor changes in TRGCDCClust and TBuilder
 //
 // Revision 1.49  1999/06/14 12:40:21  yiwasaki
 // Trasan 1.42 release : bug in findCloseHits fixed, sakura 1.06
@@ -112,7 +112,7 @@
 // Trasan 1.1 beta 9 release : more protections for negative sqrt and zero division
 //
 // Revision 1.35  1998/11/10 09:09:05  yiwasaki
-// Trasan 1.1 beta 8 release : negative sqrt fixed, curl finder updated by j.tanaka, CDCTrigger classes modified by y.iwasaki
+// Trasan 1.1 beta 8 release : negative sqrt fixed, curl finder updated by j.tanaka, TRGCDC classes modified by y.iwasaki
 //
 // Revision 1.34  1998/10/13 04:04:45  yiwasaki
 // Trasan 1.1 beta 7 release : memory leak fixed by J.Tanaka, TCurlFinderParameters.h added by J.Tanaka
@@ -175,7 +175,7 @@
 // Trasan 1 alpha 8 release, Stereo append bug fixed, TCurlFinder added
 //
 // Revision 1.12  1998/06/03 17:17:37  yiwasaki
-// const added to CDCTrigger::hits,axialHits,stereoHits,hitsMC, symbols WireHitNeghborHit* added in CDCTriggerWireHit, TSegment::innerWidth,outerWidth,innerMostLayer,outerMostLayer,type,split,split2,widht,outer,updateType added, TLink::conf added, TTrack::appendStereo3,refineStereo2,aa,bb,Zchisqr added
+// const added to TRGCDC::hits,axialHits,stereoHits,hitsMC, symbols WireHitNeghborHit* added in TRGCDCWireHit, TSegment::innerWidth,outerWidth,innerMostLayer,outerMostLayer,type,split,split2,widht,outer,updateType added, TLink::conf added, TTrack::appendStereo3,refineStereo2,aa,bb,Zchisqr added
 //
 // Revision 1.11  1998/05/26 05:10:17  yiwasaki
 // cvs repair
@@ -190,7 +190,7 @@
 // preparation for alpha 3
 //
 // Revision 1.7  1998/05/11 10:16:56  yiwasaki
-// TTrack::assign -> TTrack::assert, WireHitUsedMask is set in CDCTriggerWireHit
+// TTrack::assign -> TTrack::assert, WireHitUsedMask is set in TRGCDCWireHit
 //
 // Revision 1.6  1998/05/08 09:45:43  yiwasaki
 // Trasan 1 alpha 2 relase, stereo recon. added, off-vtx recon. added
@@ -202,10 +202,10 @@
 // minor changes
 //
 // Revision 1.3  1998/04/14 01:04:48  yiwasaki
-// CDCTriggerWireHitMC added
+// TRGCDCWireHitMC added
 //
 // Revision 1.2  1998/04/10 09:36:27  yiwasaki
-// TTrack added, CDCTrigger becomes Singleton
+// TTrack added, TRGCDC becomes Singleton
 //
 // Revision 1.1  1998/04/10 00:50:14  yiwasaki
 // TCircle, TConformalFinder, TConformalLink, TFinderBase, THistogram, TLink, TTrackBase classes added
@@ -216,9 +216,9 @@
 
 
 
-#include "trigger/cdc/CDCTriggerWire.h"
-#include "trigger/cdc/CDCTriggerWireHit.h"
-#include "trigger/cdc/CDCTriggerWireHitMC.h"
+#include "trg/cdc/Wire.h"
+#include "trg/cdc/WireHit.h"
+#include "trg/cdc/WireHitMC.h"
 #include "tracking/modules/trasan/TConformalFinder0.h"
 #include "tracking/modules/trasan/TBuilderCosmic.h"
 #include "tracking/modules/trasan/TLink.h"
@@ -305,13 +305,13 @@ TConformalFinder0::clear(void) {
 
 void
 TConformalFinder0::conformalTransformation(const HepGeom::Point3D<double> & center,
-					   const CAList<Belle2::CDCTriggerWireHit> & hits,
+					   const CAList<Belle2::TRGCDCWireHit> & hits,
 					   AList<TLink> & links) {
 
     unsigned nHits = hits.length();
     if (center == ORIGIN) {
 	for (unsigned i = 0; i < nHits; i++) {
-	    const Belle2::CDCTriggerWireHit * h = hits[i];
+	    const Belle2::TRGCDCWireHit * h = hits[i];
 	    const HepGeom::Point3D<double> & p = h->xyPosition();
 	    HepGeom::Point3D<double> cp(2. * p.x() / p.mag2(), 2. * p.y() / p.mag2(), 0);
 	    links.append(new TLink(0, h, cp));
@@ -319,7 +319,7 @@ TConformalFinder0::conformalTransformation(const HepGeom::Point3D<double> & cent
     }
     else {
 	for (unsigned i = 0; i < nHits; i++) {
-	    const Belle2::CDCTriggerWireHit * h = hits[i];
+	    const Belle2::TRGCDCWireHit * h = hits[i];
 	    HepGeom::Point3D<double> p(h->xyPosition() - center);
 	    HepGeom::Point3D<double> cp(2. * p.x() / p.mag2(), 2. * p.y() / p.mag2(), 0);
 	    links.append(new TLink(0, h, cp));
@@ -329,13 +329,13 @@ TConformalFinder0::conformalTransformation(const HepGeom::Point3D<double> & cent
 
 void
 TConformalFinder0::conformalTransformationRphi(const HepGeom::Point3D<double> & center,
-					      const CAList<Belle2::CDCTriggerWireHit> & hits,
+					      const CAList<Belle2::TRGCDCWireHit> & hits,
 					      AList<TLink> & links) {
 
     unsigned nHits = hits.length();
     if (center == ORIGIN) {
 	for (unsigned i = 0; i < nHits; i++) {
-	    const Belle2::CDCTriggerWireHit * h = hits[i];
+	    const Belle2::TRGCDCWireHit * h = hits[i];
 	    const HepGeom::Point3D<double> & p = h->xyPosition();
 	    HepGeom::Point3D<double> cp(2. * p.x() / p.mag2(), 2. * p.y() / p.mag2(), 0);
 	    double r = log(cp.mag()) + 4.;
@@ -346,7 +346,7 @@ TConformalFinder0::conformalTransformationRphi(const HepGeom::Point3D<double> & 
     }
     else {
 	for (unsigned i = 0; i < nHits; i++) {
-	    const Belle2::CDCTriggerWireHit * h = hits[i];
+	    const Belle2::TRGCDCWireHit * h = hits[i];
 	    HepGeom::Point3D<double> p(h->xyPosition() - center);
 	    HepGeom::Point3D<double> cp(2. * p.x() / p.mag2(), 2. * p.y() / p.mag2(), 0);
 	    double r = log(cp.mag()) + 4.;
@@ -469,7 +469,7 @@ TConformalFinder0::findCloseHits(const AList<TLink> & links,
     unsigned nall = links.length();
     for (unsigned j = 0; j < nall; j++) {
 	TLink & t = * links[j];
-	const Belle2::CDCTriggerWire & w = * t.wire();
+	const Belle2::TRGCDCWire & w = * t.wire();
 	Vector3D X = w.xyPosition() - track.helix().center();
 	double Rmag2 = X.mag2();
 	double DR = fabs(sqrt(Rmag2) - fabs(R0));
@@ -714,8 +714,8 @@ TConformalFinder0::appendClusters2(TTrack & track,
 }
 
 int
-TConformalFinder0::doit(const CAList<Belle2::CDCTriggerWireHit> & axialHits,
-			const CAList<Belle2::CDCTriggerWireHit> & stereoHits,
+TConformalFinder0::doit(const CAList<Belle2::TRGCDCWireHit> & axialHits,
+			const CAList<Belle2::TRGCDCWireHit> & stereoHits,
 			AList<TTrack> & tracks,
 			AList<TTrack> &) {
 
@@ -751,7 +751,7 @@ TConformalFinder0::doit(const CAList<Belle2::CDCTriggerWireHit> & axialHits,
     unsigned nLinks = _axialConfLinks.length();
     for (unsigned i = 0; i < nLinks; i++) {
 	TLink * l = _axialConfLinks[i];
-	const Belle2::CDCTriggerWireHit & h = * l->hit();
+	const Belle2::TRGCDCWireHit & h = * l->hit();
 	if ((h.state() & WireHitIsolated) &&
 	    (h.state() & WireHitContinuous))
 	    goodHits.append(l);

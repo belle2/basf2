@@ -86,7 +86,7 @@
 struct reccdc_mctrk;
 
 namespace Belle {
-    class CDCTriggerTrackMC;
+    class TRGCDCTrackMC;
 }
 
 namespace Belle {
@@ -113,8 +113,8 @@ class TTrackMC {
     /// returns HEP ID.
     int hepId(void) const;
 
-    /// returns a pointer to Belle2::CDCTriggerTrackMC.
-    const Belle2::CDCTriggerTrackMC * const hep(void) const;
+    /// returns a pointer to Belle2::TRGCDCTrackMC.
+    const Belle2::TRGCDCTrackMC * const hep(void) const;
 
     /// returns charge matching.
     bool charge(void) const;
@@ -171,7 +171,7 @@ class TTrackMC {
     unsigned _quality;
 
     const TTrack & _t;
-    Belle2::CDCTriggerTrackMC * _hep;
+    Belle2::TRGCDCTrackMC * _hep;
     int _hepID;
     double _wireFraction;
     double _wireFractionHEP;
@@ -215,7 +215,7 @@ TTrackMC::hepId(void) const {
 }
 
 inline
-const Belle2::CDCTriggerTrackMC * const
+const Belle2::TRGCDCTrackMC * const
 TTrackMC::hep(void) const {
     return _hep;
 }

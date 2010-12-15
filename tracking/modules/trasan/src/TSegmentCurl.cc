@@ -2,8 +2,8 @@
 
 
 #include "tracking/modules/trasan/TSegmentCurl.h"
-#include "trigger/cdc/CDCTrigger.h"
-#include "trigger/cdc/CDCTriggerLayer.h"
+#include "trg/cdc/TRGCDC.h"
+#include "trg/cdc/Layer.h"
 #ifdef TRASAN_DEBUG
 #include "tracking/modules/trasan/TDebugUtilities.h"
 #endif
@@ -423,8 +423,8 @@ TSegmentCurl::wires(const unsigned superLayerId) const
 {
 //cnv
 
-//   const CDCTrigger &cdc = *CDCTrigger::getCDCTrigger();
-//   const AList<CDCTriggerLayer> &sl=*cdc.superLayer(superLayerId);
+//   const TRGCDC &cdc = *TRGCDC::getTRGCDC();
+//   const AList<TRGCDCLayer> &sl=*cdc.superLayer(superLayerId);
 //   if(ms_superb) {
 //     return sl[0]->nWires();
 //   } else {

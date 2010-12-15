@@ -17,7 +17,7 @@
 #include "framework/core/ModuleManager.h"
 #include "trg/trg/Signal.h"
 #include "trg/trg/Clock.h"
-#include "trg/modules/cdc/TRGCDCModule.h"
+#include "trg/modules/trgcdc/TRGCDCModule.h"
 #include "trg/cdc/Wire.h"
 #include "trg/cdc/Layer.h"
 #include "trg/cdc/TrackSegment.h"

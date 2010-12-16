@@ -148,9 +148,9 @@ void Framework::setPackageLogLevel(std::string package, int logLevel, int debugL
 }
 
 
-void Framework::addLoggingToShell()
+void Framework::addLoggingToShell(bool color)
 {
-  LogSystem::Instance().addLogConnection(new LogConnectionFilter(new LogConnectionIOStream(std::cout)));
+  LogSystem::Instance().addLogConnection(new LogConnectionFilter(new LogConnectionIOStream(std::cout, color)));
 }
 
 

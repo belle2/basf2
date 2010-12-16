@@ -182,8 +182,12 @@ namespace Belle2 {
      */
     void setPackageLogLevel(std::string package, int logLevel, int debugLevel);
 
-    /*! Adds the logging output to the shell (std::cout). */
-    void addLoggingToShell();
+    /**
+     * Adds the logging output to the shell (std::cout).
+     *
+     * @param color Enable color output if set to true. Default is color off.
+     */
+    void addLoggingToShell(bool color = false);
 
     /**
      * Adds the logging output to a text file.

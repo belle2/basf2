@@ -33,7 +33,7 @@ namespace Belle2 {
      *
      * @param outputStream The output stream.
      */
-    LogConnectionIOStream(std::ostream& outputStream);
+    LogConnectionIOStream(std::ostream& outputStream, bool color = false);
 
     /**
      * The LogConnectionIOStream destructor.
@@ -60,6 +60,7 @@ namespace Belle2 {
   private:
 
     std::ostream* m_stream;  /**< The output stream used for sending the log message.*/
+    bool m_color;            /**< Flag for color output.*/
 
   };
 

@@ -17,7 +17,7 @@
 #include <float.h>
 #include <string>
 
-#ifdef TRIGGER_SHORT_NAMES
+#ifdef TRGCDC_SHORT_NAMES
 #define TRGTime TRGTime
 #endif
 
@@ -96,7 +96,7 @@ class TRGTime {
 
 //-----------------------------------------------------------------------------
 
-#ifdef TRGTime_NO_INLINE
+#ifdef TRGCDC_NO_INLINE
 #define inline
 #else
 #undef inline

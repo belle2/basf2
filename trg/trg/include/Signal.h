@@ -17,7 +17,7 @@
 #include <vector>
 #include "trg/trg/Time.h"
 
-#ifdef TRIGGER_SHORT_NAMES
+#ifdef TRGCDC_SHORT_NAMES
 #define TRGSignal TRGSignal
 #endif
 
@@ -107,7 +107,7 @@ class TRGSignal {
 
 //-----------------------------------------------------------------------------
 
-#ifdef TRGSignal_NO_INLINE
+#ifdef TRGCDC_NO_INLINE
 #define inline
 #else
 #undef inline

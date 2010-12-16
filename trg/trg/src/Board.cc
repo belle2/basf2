@@ -12,7 +12,7 @@
 //-----------------------------------------------------------------------------
 
 #define TRGBoard_INLINE_DEFINE_HERE
-#define TRIGGER_SHORT_NAMES
+#define TRGCDC_SHORT_NAMES
 
 #include <iostream>
 #include "trg/trg/Board.h"

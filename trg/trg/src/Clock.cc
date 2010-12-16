@@ -12,7 +12,7 @@
 //-----------------------------------------------------------------------------
 
 #define TRGClock_INLINE_DEFINE_HERE
-#define TRIGGER_SHORT_NAMES
+#define TRGCDC_SHORT_NAMES
 
 #include <limits>
 #include <iostream>

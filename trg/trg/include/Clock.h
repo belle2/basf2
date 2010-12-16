@@ -16,7 +16,7 @@
 
 #include <string>
 
-#ifdef TRIGGER_SHORT_NAMES
+#ifdef TRGCDC_SHORT_NAMES
 #define TRGClock TRGClock
 #endif
 
@@ -94,7 +94,7 @@ class TRGClock {
 
 //-----------------------------------------------------------------------------
 
-#ifdef TRGClock_NO_INLINE
+#ifdef TRGCDC_NO_INLINE
 #define inline
 #else
 #undef inline

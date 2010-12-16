@@ -17,7 +17,7 @@
 #include <string>
 #include <vector>
 
-#ifdef TRIGGER_SHORT_NAMES
+#ifdef TRGCDC_SHORT_NAMES
 #define TRGLink TRGLink
 #endif
 
@@ -79,7 +79,7 @@ class TRGLink {
 
 //-----------------------------------------------------------------------------
 
-#ifdef TRGLink_NO_INLINE
+#ifdef TRGCDC_NO_INLINE
 #define inline
 #else
 #undef inline

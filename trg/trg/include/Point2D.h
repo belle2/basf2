@@ -18,7 +18,7 @@
 #include "CLHEP/Geometry/Point3D.h"
 #include "CLHEP/Geometry/Vector3D.h"
 
-#ifdef TRIGGER_SHORT_NAMES
+#ifdef TRGCDC_SHORT_NAMES
 #define TRGPoint2D TRGPoint2D
 #endif
 
@@ -72,7 +72,7 @@ operator << (std::ostream &, const TRGPoint2D &);
 
 //-----------------------------------------------------------------------------
 
-#ifdef TPOINT2D_NO_INLINE
+#ifdef TRGCDC_NO_INLINE
 #define inline
 #else
 #undef inline

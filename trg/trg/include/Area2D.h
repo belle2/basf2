@@ -16,7 +16,7 @@
 
 #include "trg/trg/Point2D.h"
 
-#ifdef TRIGGER_SHORT_NAMES
+#ifdef TRGCDC_SHORT_NAMES
 #define TRGArea2D TRGArea2D
 #endif
 

@@ -24,7 +24,7 @@
 #include "trg/cdc/HoughPlaneMulti2.h"
 #include "trg/cdc/HoughTransformationCircle.h"
 
-#ifdef CDCTRIGGER_DISPLAY
+#ifdef TRGCDC_DISPLAY
 #undef ERROR
 #include "trg/cdc/DisplayRphi.h"
 #include "trg/cdc/DisplayHough.h"
@@ -33,10 +33,10 @@
 #endif
 
 namespace Belle2_TRGCDC {
-#ifdef CDCTRIGGER_DISPLAY
-    Belle2::CTDisplayRphi * D = 0;
-    Belle2::CTDisplayHough * H0 = 0;
-    Belle2::CTDisplayHough * H1 = 0;
+#ifdef TRGCDC_DISPLAY
+    Belle2::TCDisplayRphi * D = 0;
+    Belle2::TCDisplayHough * H0 = 0;
+    Belle2::TCDisplayHough * H1 = 0;
 #endif
 }
 
@@ -67,13 +67,13 @@ TRGCDCModule::TRGCDCModule()
 	     string("TRGCDCConfig.dat"),
 	     "The filename of CDC trigger config file");
 
-#ifdef CDCTRIGGER_DEBUG
+#ifdef TRGCDC_DEBUG
     cout << "TRGCDCModule ... created" << endl;
 #endif
 }
 
 TRGCDCModule::~TRGCDCModule() {
-#ifdef CDCTRIGGER_DISPLAY
+#ifdef TRGCDC_DISPLAY
     if (D)
 	delete D;
     if (H0)
@@ -82,7 +82,7 @@ TRGCDCModule::~TRGCDCModule() {
 	delete H1;
     cout << "TRGCDCModule ... display deleted" << endl;
 #endif
-#ifdef CDCTRIGGER_DEBUG
+#ifdef TRGCDC_DEBUG
     cout << "TRGCDCModule ... destructed " << endl;
 #endif
 }
@@ -90,20 +90,20 @@ TRGCDCModule::~TRGCDCModule() {
 void
 TRGCDCModule::initialize() {
 
-#ifdef CDCTRIGGER_DISPLAY
+#ifdef TRGCDC_DISPLAY
     int argc = 0;
     char ** argv = 0;
     Gtk::Main main_instance(argc, argv);
     if (! D)
-	D = new CTDisplayRphi();
+	D = new TCDisplayRphi();
     D->clear();
     D->show();
     if (! H0)
-	H0 = new CTDisplayHough("Plus");
+	H0 = new TCDisplayHough("Plus");
     H0->clear();
     H0->show();
     if (! H1)
-	H1 = new CTDisplayHough("Minus");
+	H1 = new TCDisplayHough("Minus");
     H1->clear();
     H1->show();
     cout << "TRGCDCModule ... GTK initialized" << endl;
@@ -112,7 +112,7 @@ TRGCDCModule::initialize() {
 
 void
 TRGCDCModule::beginRun() {
-#ifdef CDCTRIGGER_DEBUG
+#ifdef TRGCDC_DEBUG
     cout << "TRGCDCModule ... beginRun called " << endl;
 #endif
 }
@@ -125,10 +125,10 @@ TRGCDCModule::event() {
 
     //...Make Hough planes...
     static bool first = true;
-    static CTHPlaneMulti2 * plane[2] = {0, 0};
-    static CTHTransformationCircle circleH("CircleHough");
+    static TCHPlaneMulti2 * plane[2] = {0, 0};
+    static TCHTransformationCircle circleH("CircleHough");
     if (first) {
-	plane[0] = new CTHPlaneMulti2("circle hough plus",
+	plane[0] = new TCHPlaneMulti2("circle hough plus",
 				      350,
 				      0,
 				      2 * M_PI,
@@ -136,7 +136,7 @@ TRGCDCModule::event() {
 				      0.7,
 				      3,
 				      5);
-	plane[1] = new CTHPlaneMulti2("circle hough minus",
+	plane[1] = new TCHPlaneMulti2("circle hough minus",
 				      350,
 				      0,
 				      2 * M_PI,
@@ -169,7 +169,7 @@ TRGCDCModule::event() {
 		plane[1]->vote(x, y, -1, circleH, axialSuperLayerId, 1);
 		plane[1]->registerPattern(axialSuperLayerId, j);
 
-#ifdef CDCTRIGGER_DISPLAY
+#ifdef TRGCDC_DISPLAY
 		string stg = "Hough Pattern Regstration";
 		string inf = "   ";
 
@@ -195,7 +195,7 @@ TRGCDCModule::event() {
 	first = false;
     }
 
-#ifdef CDCTRIGGER_DEBUG
+#ifdef TRGCDC_DEBUG
 //  cdc.dump("geometry superLayers layers wires detail");
     cdc.dump("geometry superLayers layers detail");
 #endif
@@ -218,7 +218,7 @@ TRGCDCModule::event() {
 	if ((* l)[0]->stereo()) continue;
 
 	for (unsigned j = 0; j < nWires; j++) {
-	    const CTTSegment & s = (CTTSegment &) * (* l)[j];
+	    const TCTSegment & s = (TCTSegment &) * (* l)[j];
 
 	    //...Select hit TS only...
 	    if (s.triggerOutput().active()) {
@@ -231,16 +231,16 @@ TRGCDCModule::event() {
     plane[0]->merge();
     plane[1]->merge();
 
-#ifdef CDCTRIGGER_DEBUG
+#ifdef TRGCDC_DEBUG
     cout << "TRGCDCModule ... event called " << endl;
     cout << "    TS hits" << endl;
     for (unsigned i = 0; i < cdc.nTrackSegments(); i++) {
-	const CTTSegment & s = * cdc.trackSegment(i);
+	const TCTSegment & s = * cdc.trackSegment(i);
 	if (s.triggerOutput().active())
 	    s.dump("detail", "        ");
     }
 #endif
-#ifdef CDCTRIGGER_DISPLAY
+#ifdef TRGCDC_DISPLAY
     plane[0]->dump();
     plane[1]->dump();
 
@@ -265,16 +265,16 @@ TRGCDCModule::event() {
     H1->show();
     H1->run();
 #endif
-#ifdef CDCTRIGGER_DISPLAY
+#ifdef TRGCDC_DISPLAY
 //     unsigned iFront = 0;
-//     while (const CTFrontEnd * f = cdc.frontEnd(iFront++)) {
+//     while (const TCFrontEnd * f = cdc.frontEnd(iFront++)) {
 // 	D->clear();
 // 	D->beginEvent();
 // 	D->area().append(* f);
 // 	D->run();
 //     }
 //     unsigned iMerger = 0;
-//     while (const CTMerger * f = cdc.merger(iMerger++)) {
+//     while (const TCMerger * f = cdc.merger(iMerger++)) {
 // 	D->clear();
 // 	D->beginEvent();
 // 	D->area().append(* f);
@@ -285,14 +285,14 @@ TRGCDCModule::event() {
 
 void
 TRGCDCModule::endRun() {
-#ifdef CDCTRIGGER_DEBUG
+#ifdef TRGCDC_DEBUG
     cout << "TRGCDCModule ... endRun called " << endl;
 #endif
 }
 
 void
 TRGCDCModule::terminate() {
-#ifdef CDCTRIGGER_DEBUG
+#ifdef TRGCDC_DEBUG
     cout << "TRGCDCModule ... terminate called " << endl;
 #endif
 }

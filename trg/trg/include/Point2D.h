@@ -18,10 +18,6 @@
 #include "CLHEP/Geometry/Point3D.h"
 #include "CLHEP/Geometry/Vector3D.h"
 
-#ifdef TRGCDC_SHORT_NAMES
-#define TRGPoint2D TRGPoint2D
-#endif
-
 namespace Belle2 {
 
 typedef HepGeom::Vector3D<double>  Vector3D;
@@ -72,12 +68,13 @@ operator << (std::ostream &, const TRGPoint2D &);
 
 //-----------------------------------------------------------------------------
 
-#ifdef TRGCDC_NO_INLINE
+#ifdef TRG_NO_INLINE
 #define inline
 #else
 #undef inline
 #define TPOINT2D_INLINE_DEFINE_HERE
 #endif
+
 #ifdef TPOINT2D_INLINE_DEFINE_HERE
 
 inline

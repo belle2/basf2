@@ -16,10 +16,6 @@
 
 #include <string>
 
-#ifdef TRGCDC_SHORT_NAMES
-#define TRGClock TRGClock
-#endif
-
 namespace Belle2 {
     class TRGClock;
     class TRGTime;
@@ -94,7 +90,7 @@ class TRGClock {
 
 //-----------------------------------------------------------------------------
 
-#ifdef TRGCDC_NO_INLINE
+#ifdef TRG_NO_INLINE
 #define inline
 #else
 #undef inline

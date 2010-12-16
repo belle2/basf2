@@ -17,10 +17,6 @@
 #include <string>
 #include <vector>
 
-#ifdef TRGCDC_SHORT_NAMES
-#define TRGBoard TRGBoard
-#endif
-
 namespace Belle2 {
 
 class TRGClock;
@@ -67,7 +63,7 @@ class TRGBoard {
 
 //-----------------------------------------------------------------------------
 
-#ifdef TRGCDC_NO_INLINE
+#ifdef TRG_NO_INLINE
 #define inline
 #else
 #undef inline

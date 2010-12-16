@@ -17,10 +17,6 @@
 #include <float.h>
 #include <string>
 
-#ifdef TRGCDC_SHORT_NAMES
-#define TRGTime TRGTime
-#endif
-
 namespace Belle2 {
 
 class TRGSignal;
@@ -96,7 +92,7 @@ class TRGTime {
 
 //-----------------------------------------------------------------------------
 
-#ifdef TRGCDC_NO_INLINE
+#ifdef TRG_NO_INLINE
 #define inline
 #else
 #undef inline

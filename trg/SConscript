@@ -2,9 +2,9 @@ Import('env')
 
 env['LIBS'] = ['cdc']
 #env.Append(CPPDEFINES = {'TRGCDC_NO_INLINE':None})
-env.Append(CPPDEFINES = {'TRGCDC_DEBUG':None,
-                         'TRGCDC_DISPLAY':None})
-env.ParseConfig('pkg-config --cflags --libs gtkmm-2.4')
+#env.Append(CPPDEFINES = {'TRGCDC_DEBUG':None,
+#                         'TRGCDC_DISPLAY':None})
+#env.ParseConfig('pkg-config --cflags --libs gtkmm-2.4')
 #print env.Dump()
 
 Return('env')

@@ -12,7 +12,6 @@
 //-----------------------------------------------------------------------------
 
 #define TRGTime_INLINE_DEFINE_HERE
-#define TRGCDC_SHORT_NAMES
 
 #include <iostream>
 #include "trg/trg/Clock.h"

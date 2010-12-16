@@ -17,10 +17,6 @@
 #include <vector>
 #include "trg/trg/Time.h"
 
-#ifdef TRGCDC_SHORT_NAMES
-#define TRGSignal TRGSignal
-#endif
-
 namespace Belle2 {
 
 class TRGTime;
@@ -107,7 +103,7 @@ class TRGSignal {
 
 //-----------------------------------------------------------------------------
 
-#ifdef TRGCDC_NO_INLINE
+#ifdef TRG_NO_INLINE
 #define inline
 #else
 #undef inline

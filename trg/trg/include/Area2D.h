@@ -16,10 +16,6 @@
 
 #include "trg/trg/Point2D.h"
 
-#ifdef TRGCDC_SHORT_NAMES
-#define TRGArea2D TRGArea2D
-#endif
-
 namespace Belle2 {
 
 /// A class to represent an 2D area.
@@ -47,6 +43,17 @@ class TRGArea2D {
     TRGPoint2D _c[2];
 };
 
+//-----------------------------------------------------------------------------
+
+#ifdef TRG_NO_INLINE
+#define inline
+#else
+#undef inline
+#define TRGArea2D_INLINE_DEFINE_HERE
+#endif
+
+#ifdef TRGArea2D_INLINE_DEFINE_HERE
+
 inline
 bool
 TRGArea2D::inArea(const TRGPoint2D & x) const {
@@ -56,6 +63,10 @@ TRGArea2D::inArea(const TRGPoint2D & x) const {
     return false;
 }
 
-}
-
 #endif
+
+#undef inline
+
+} // namespace Belle2
+
+#endif /* TRGArea2D_FLAG_ */

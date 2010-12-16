@@ -17,10 +17,6 @@
 #include <string>
 #include <vector>
 
-#ifdef TRGCDC_SHORT_NAMES
-#define TRGLink TRGLink
-#endif
-
 namespace Belle2 {
 
 class TRGSignal;
@@ -79,7 +75,7 @@ class TRGLink {
 
 //-----------------------------------------------------------------------------
 
-#ifdef TRGCDC_NO_INLINE
+#ifdef TRG_NO_INLINE
 #define inline
 #else
 #undef inline

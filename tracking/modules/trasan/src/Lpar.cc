@@ -145,8 +145,8 @@ void Lpar::circle(double x1, double y1, double x2, double y2,
     b = 0.5 * (- (x1-x3)*(r1sq-r2sq) + (x1-x2)*(r1sq-r3sq)) / delta;
     double csq = (x1-a)*(x1-a) + (y1-b)*(y1-b);
     c = sqrt(csq);
-    double csq2 = (x2-a)*(x2-a) + (y2-b)*(y2-b);
-    double csq3 = (x3-a)*(x3-a) + (y3-b)*(y3-b);
+//cnv    double csq2 = (x2-a)*(x2-a) + (y2-b)*(y2-b);
+//cnv    double csq3 = (x3-a)*(x3-a) + (y3-b)*(y3-b);
     m_kappa = 1 / (2 * c);
     m_alpha = - 2 * a * m_kappa;
     m_beta = - 2 * b * m_kappa;
@@ -301,11 +301,11 @@ int intersect(const Lpar&lp1, const Lpar&lp2, CLHEP::HepVector&v1, CLHEP::HepVec
           v2(1) = dinv * (ab1 + ac1 * rad2[1]);
           v2(2) = dinv * (ab2 + ac2 * rad2[1]);
           v2(3) = 0;
-	  double d1 = lp1.d(v1(1),v1(2));
-	  double d2 = lp2.d(v1(1),v1(2));
-	  double d3 = lp1.d(v2(1),v2(2));
-	  double d4 = lp2.d(v2(1),v2(2));
-          double r = sqrt(rad2[0]);
+//cnv	  double d1 = lp1.d(v1(1),v1(2));
+//cnv	  double d2 = lp2.d(v1(1),v1(2));
+//cnv	  double d3 = lp1.d(v2(1),v2(2));
+//cnv	  double d4 = lp2.d(v2(1),v2(2));
+//cnv          double r = sqrt(rad2[0]);
           Lpar::Cpar cp1(lp1);
           Lpar::Cpar cp2(lp2);
 	  for(int j=0;j<2;j++) {
@@ -317,12 +317,12 @@ int intersect(const Lpar&lp1, const Lpar&lp2, CLHEP::HepVector&v1, CLHEP::HepVec
 	      s1 = lp1.s(v2(1),v2(2));
 	      s2 = lp2.s(v2(1),v2(2));
 	    }
-	    double phi1 = cp1.fi() + 2 * cp1.cu() * s1;
-	    double phi2 = cp2.fi() + 2 * cp2.cu() * s2;
+//cnv	    double phi1 = cp1.fi() + 2 * cp1.cu() * s1;
+//cnv	    double phi2 = cp2.fi() + 2 * cp2.cu() * s2;
 	    double f = (1 + 2 * cp1.cu() * cp1.da()) *
 	      (1 + 2 * cp2.cu() * cp2.da()) * cos(cp1.fi()-cp2.fi());
 	    f -= 2 * (lp1.gamma() * lp2.kappa() + lp2.gamma() * lp1.kappa());
-	    double cosphi12 = f;
+//cnv	    double cosphi12 = f;
 	  }
 	  return 2;
         }

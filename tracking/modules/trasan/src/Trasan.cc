@@ -1368,8 +1368,8 @@ void
 Trasan::event() {
 
     static clock_t time_start = 0;
-    static clock_t time_end = 0;
-    static clock_t time_total = 0;
+//cnv    static clock_t time_end = 0;
+//cnv    static clock_t time_total = 0;
 
     ++_nEvents;
     if (b_debugLevel) {
@@ -1394,7 +1394,7 @@ Trasan::event() {
 #endif
 
     //...Starting point...
-trasan_start:
+//cnv trasan_start:
     
     //...Clear myself...
     clear();
@@ -1425,7 +1425,7 @@ trasan_start:
 	allHits.append(hits[i]);
     }
     allHits.sort(Belle2::TRGCDCWireHit::sortByWireId);
-    for (unsigned i = 0; i < allHits.length(); i++) {
+    for (unsigned i = 0; i < (unsigned) allHits.length(); i++) {
 	const Belle2::TRGCDCWireHit * hit = allHits[i];
 	if (hit->wire().axial())
 	    axialHits.append(hit);
@@ -2358,7 +2358,7 @@ Trasan::selectUnusedHits(const CAList<Belle2::TRGCDCWireHit> & hits,
     //...Pick up used hits (3D tracks only)...
     CAList<Belle2::TRGCDCWireHit> used;
     const AList<TTrack> & tracks = _trackManager.tracks();
-    for (unsigned i = 0; i < tracks.length(); i++) {
+    for (unsigned i = 0; i < (unsigned) tracks.length(); i++) {
 	const TTrack & t = * tracks[i];
 	const AList<TLink> & links = t.links();
 	const unsigned n = links.length();

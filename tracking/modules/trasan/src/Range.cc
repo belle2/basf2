@@ -59,6 +59,9 @@ Range::Range(const float iLow, const float iHigh) {
     }
 }
 
+Range::~Range() {
+}
+
 bool
 Range::operator == (const Range & a) const {
     if (_low != a.low()) return false;

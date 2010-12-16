@@ -56,6 +56,9 @@ class Range {
     /// Constructor
     Range(float low, float high);
 
+    /// Destructor
+    virtual ~Range();
+
   public:// Selectors
     /// returns lower limit.
     virtual float low(void) const;

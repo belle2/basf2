@@ -39,7 +39,8 @@ void HepAListBase::sort( AListSortCompareFunc compfunc ) {
 }
 
 void HepAListBase::realloc() {
-  if (NULL==n) {
+//cnv  if (NULL==n) {
+  if (0==n) {
     if(p) free(p);
     p = NULL;
   } else {
@@ -164,7 +165,7 @@ void HepAListBase::reverse() {
 }
 
 void HepAListBase::swap(unsigned i1, unsigned i2) {
-  if ( i1 >= n || i2 >= n || i1 == i2) return;
+    if ( i1 >= (unsigned) n || i2 >= (unsigned) n || i1 == i2) return;
   void * e = p[i1];
   p[i1]=p[i2];
   p[i2] = e;

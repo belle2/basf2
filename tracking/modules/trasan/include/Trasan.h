@@ -273,7 +273,7 @@ class TPMCurlFinder;
 
 extern float TrasanTHelixFitterChisqMax;
 extern int   TrasanTHelixFitterNtrialMax;
-extern const HepGeom::Point3D<double>  ORIGIN;
+extern const HepGeom::Point3D<double> ORIGIN;
 
 /// A tracking module.
 class Trasan : public Belle2::Module, TUpdater {
@@ -282,8 +282,9 @@ class Trasan : public Belle2::Module, TUpdater {
     /// returns Trasan.
     static Trasan * getTrasan(void);
 
-    virtual Belle2::ModulePtr newModule() { Belle2::ModulePtr nm(new Trasan()); return nm; };
-
+    virtual Belle2::ModulePtr newModule() {
+	Belle2::ModulePtr nm(new Trasan()); return nm;
+    };
 
 //cnv  private:
   public:

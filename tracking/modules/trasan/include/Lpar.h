@@ -288,7 +288,8 @@ inline int Lpar::sd(double r, double x, double y,
   s = std::fabs(rho)*phi;
   if(0.0==phi)return 0;
   d *= r/(std::fabs(rc)*std::sin(phi));
-  if (abs(d) > abs(limit)) return 0;
+//cnv  if (abs(d) > abs(limit)) return 0;
+  if (fabs(d) > fabs(limit)) return 0;
   d_cross_limit = d*limit;
   if (d_cross_limit > limit*limit) return 0;
   return 1;

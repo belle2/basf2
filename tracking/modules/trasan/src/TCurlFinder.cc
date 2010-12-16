@@ -268,7 +268,7 @@ namespace Belle {
 
 extern const HepGeom::Point3D<double>  ORIGIN;
 
-  static int debugMcFlag = 1;
+//cnv  static int debugMcFlag = 1;
   bool TCurlFinder::ms_smallcell(false);
   bool TCurlFinder::ms_superb(false);
   
@@ -339,15 +339,16 @@ extern const HepGeom::Point3D<double>  ORIGIN;
 // ... Constructor and Destructor Section ...
 //
 TCurlFinder::TCurlFinder(void)
-  : m_builder("CurlBuilder"),
-    m_fitter("TCurlFinder Fitter"),
-    m_debugCdcFrame(false),
-    m_debugPlotFlag(0),
-    m_debugFileNumber(0),
+  :
     m_unusedAxialHitsOnEachLayer(NULL),
     m_unusedStereoHitsOnEachLayer(NULL),
     m_unusedAxialHitsOnEachSuperLayer(NULL),
     m_unusedStereoHitsOnEachSuperLayer(NULL),
+    m_builder("CurlBuilder"),
+    m_fitter("TCurlFinder Fitter"),
+    m_debugCdcFrame(false),
+    m_debugPlotFlag(0),
+    m_debugFileNumber(0),
     _turnOffInnermost3Layers(0)
 #ifdef TRASAN_WINDOW
   , _cWindow("curl window")
@@ -399,15 +400,16 @@ TCurlFinder::TCurlFinder(const unsigned min_segment,
 			 const unsigned output_2dtracks,
 			 const unsigned curl_version,
 			 int turnOffInnermost3Layers)
-  : m_builder("CurlBuilder"),
-    m_fitter("TCurlFinder Fitter"),
-    m_debugCdcFrame(false),
-    m_debugPlotFlag(0),
-    m_debugFileNumber(0),
+  :
     m_unusedAxialHitsOnEachLayer(NULL),
     m_unusedStereoHitsOnEachLayer(NULL),
     m_unusedAxialHitsOnEachSuperLayer(NULL),
     m_unusedStereoHitsOnEachSuperLayer(NULL),
+    m_builder("CurlBuilder"),
+    m_fitter("TCurlFinder Fitter"),
+    m_debugCdcFrame(false),
+    m_debugPlotFlag(0),
+    m_debugFileNumber(0),
     _turnOffInnermost3Layers(turnOffInnermost3Layers)
 #ifdef TRASAN_WINDOW
   , _cWindow("curl window")
@@ -568,13 +570,15 @@ TCurlFinder::offset(const unsigned layerId) const {
 //       layerId == 49 ) return 1; // off set is 0.5
 //   return 0; // off set is 0
 // #endif
+
+    return 0;
 }
 
 unsigned
 TCurlFinder::layerId(const double &R) const {
   // R is radius for CDC but is 2*radius for track
   double r = R*10.;// cm -> mm
-  const Belle2::TRGCDC &cdc = *Belle2::TRGCDC::getTRGCDC();
+//cnv  const Belle2::TRGCDC &cdc = *Belle2::TRGCDC::getTRGCDC();
 //   if(ms_superb) {
 //     static bool init(true);
 //     static std::vector<unsigned>rtol;
@@ -647,6 +651,7 @@ TCurlFinder::maxLocalLayerId(const unsigned superLayerId) const {
 //   std::cout << "Error in the CurlFinder(maxLocalLayerId). superLayerId = " 
 //        << superLayerId  << std::endl;
 //   return 0;
+    return 0;
 }
 
 int
@@ -1026,7 +1031,7 @@ TCurlFinder::doit(const CAList<Belle2::TRGCDCWireHit> & axialHits,
 //#endif
 
     //...iw 2007/02/27...
-    for (unsigned i = 0; i < tracks.length(); i++)
+    for (unsigned i = 0; i < (unsigned) tracks.length(); i++)
 	if (tracks[i]->name() == "none")
 	    tracks[i]->name("c" + itostring(i) + "-3D");
     //...iw end...
@@ -1355,14 +1360,14 @@ void
 TCurlFinder::createSuperLayer(void) {
   const Belle2::TRGCDC &cdc = *Belle2::TRGCDC::getTRGCDC();
   //  if(ms_superb) {
-    for(int i=0;i<cdc.nAxialLayers(); ++i) {
+  for(int i=0;i<(int) cdc.nAxialLayers(); ++i) {
       if(m_unusedAxialHitsOnEachLayer[i].length() > 0) {
 //	int is = cdc.AxialSuperLayer(i);
 	int is = cdc.axialStereoSuperLayerId(0, i);
 	m_unusedAxialHitsOnEachSuperLayer[is].append(m_unusedAxialHitsOnEachLayer[i]);
       }
     }
-    for(int i=0;i<cdc.nStereoLayers(); ++i) {
+  for(int i=0;i<(int) cdc.nStereoLayers(); ++i) {
       if(m_unusedStereoHitsOnEachLayer[i].length() > 0) {
 //	int is = cdc.StereoSuperLayer(i);
 	int is = cdc.axialStereoSuperLayerId(1, i);

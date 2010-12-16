@@ -568,14 +568,14 @@ THelix::delApDelA(const CLHEP::HepVector & ap) const {
     const double & dr    = m_ac[0];
     const double & phi0  = m_ac[1];
     const double & cpa   = m_ac[2];
-    const double & dz    = m_ac[3];
+//cnv    const double & dz    = m_ac[3];
     const double & tnl   = m_ac[4];
 
     double drp   = ap[0];
     double phi0p = ap[1];
-    double cpap  = ap[2];
-    double dzp   = ap[3];
-    double tnlp  = ap[4];
+//cnv    double cpap  = ap[2];
+//cnv    double dzp   = ap[3];
+//cnv    double tnlp  = ap[4];
 
     double rdr   = m_r + dr;
     double rdrpr;
@@ -638,7 +638,7 @@ THelix::delXDelA(double phi) const {
     const double & dr      = m_ac[0];
     const double & phi0    = m_ac[1];
     const double & cpa     = m_ac[2];
-    const double & dz      = m_ac[3];
+//cnv    const double & dz      = m_ac[3];
     const double & tnl     = m_ac[4];
 
     double cosf0phi = cos(phi0 + phi);
@@ -780,7 +780,7 @@ THelix::del4MXDelA(double phi, double mass) const {
     const double & dr      = m_ac[0];
     const double & phi0    = m_ac[1];
     const double & cpa     = m_ac[2];
-    const double & dz      = m_ac[3];
+//cnv    const double & dz      = m_ac[3];
     const double & tnl     = m_ac[4];
 
     double cosf0phi = cos(phi0+phi);
@@ -863,8 +863,10 @@ void
 THelix::checkValid(void) {
 
   if(!ms_check_range) return;
-  const double adr   = abs(m_a[0]);
-  const double acpa   = abs(m_a[2]);
+//cnv  const double adr   = abs(m_a[0]);
+  const double adr   = fabs(m_a[0]);
+//cnv  const double acpa   = abs(m_a[2]);
+  const double acpa   = fabs(m_a[2]);
   if(!(adr>=ms_amin[0] && adr<=ms_amax[0])) {
     m_helixValid = false;
   } else if(!(acpa>=ms_amin[2] && acpa<=ms_amax[2])) {

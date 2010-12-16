@@ -482,7 +482,7 @@ TLink::dump(const CAList<TLink> & links,
 	std::vector<const Belle2::TRGCDCTrackMC *> list = Belle2::TRGCDCTrackMC::list();
 	if (! list.size()) return;
 	std::cout << pre;
-	unsigned nMC = 0;
+//cnv	unsigned nMC = 0;
 	for (unsigned i = 0; i < MCC_MAX; i++) {
 	    if (MCC0[i] > 0) {
 		const Belle2::TRGCDCTrackMC * h = list[i];
@@ -662,7 +662,7 @@ TLink::width(const AList<TLink> & list) {
     if (n < 2) return n;
 
     const Belle2::TRGCDCWire * const w0 = list[0]->wire();
-    const unsigned sId = w0->superLayerId();
+//cnv    const unsigned sId = w0->superLayerId();
     unsigned nWires = w0->layer().nWires();
     unsigned center = w0->localId();
 

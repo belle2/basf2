@@ -92,6 +92,7 @@ inline
 unsigned
 THoughPlaneMulti::nActiveCellsInPattern(unsigned id) const {
 //    return _layers[id]->nActiveCellsInPattern();
+    return 0;
 }
 
 inline

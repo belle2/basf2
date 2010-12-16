@@ -251,15 +251,15 @@ class THoughFinder : public TFinderBase {
     THoughPlane * _planes0[2];
     THoughPlaneMulti * _planes[2];
 
-  //    THoughPlaneMulti _tmp;
-    THoughPlaneMulti *_tmp;
-
 //     THoughPlaneMulti2 _planeHP2;
 //     THoughPlaneMulti2 _planeHM2;
   THoughPlaneMulti2 *_planeHP2;
   THoughPlaneMulti2 *_planeHM2;
     THoughPlane * _planes02[2];
     THoughPlaneMulti2 * _planes2[2];
+
+  //    THoughPlaneMulti _tmp;
+    THoughPlaneMulti *_tmp;
 
   private:
     unsigned _nsl;

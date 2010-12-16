@@ -445,6 +445,8 @@ TBuilderCurl::buildStereo(TTrack & track,
 //     return false;
 //   }
 // #endif
+
+  return false;
 }
 
 TTrack *
@@ -1955,7 +1957,7 @@ TBuilderCurl::makeLine(TTrack &track,
     // Q < 0 : Outer = R, Inner = L
     double Q = track.charge();
     unsigned isIncreased = 0;
-    for(int sl=0;sl<nstereosuperlayers;++sl){
+    for(int sl=0;sl<(int)nstereosuperlayers;++sl){
       if(fixedWires[sl].length()    >= 1 &&
 	 nonFixedWires[sl].length() >= 1){
 	isIncreased = 1;
@@ -2048,11 +2050,11 @@ TBuilderCurl::makeLine(TTrack &track,
     // = { -1, -1, -1, -1, -1 };
     int *maxLength = new int [nstereosuperlayers];
     //= { 0, 0, 0, 0, 0 };
-    for (int i=0;i<nstereosuperlayers;++i) {
+    for (int i=0;i<(int)nstereosuperlayers;++i) {
       maxNonFixedLayerIndex[i] = -1;
       maxLength[i] = 0;
     }
-    for(int l=0;l<nstereolayers;++l){
+    for(int l=0;l<(int)nstereolayers;++l){
       unsigned sl = 4; // superlayer id
       if(ms_superb) {
 	sl = cdc.axialStereoSuperLayerId(1, l);

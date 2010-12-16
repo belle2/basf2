@@ -235,9 +235,9 @@ THoughPlaneBase::dump(const std::string & message,
 	    std::cout << "no active cell";
     }
     std::cout << std::endl;
-    for (unsigned i = 0; i < _regions.length(); i++) {
+    for (unsigned i = 0; i < (unsigned) _regions.length(); i++) {
 	std::cout << prefix << "    region " << i << ":";
-	for (unsigned j = 0; j < _regions[i]->length(); j++) {
+	for (unsigned j = 0; j < (unsigned) _regions[i]->length(); j++) {
 	    const unsigned id = * (* _regions[i])[j];
 	    std::cout << id << "(" << entry(id) << "),";
 	}

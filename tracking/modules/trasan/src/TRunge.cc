@@ -417,6 +417,7 @@ int TRunge::approach(TLink& l,float& tof,HepGeom::Vector3D<double> & p,
 //   l.positionOnWire(onWire);
 //   l.positionOnTrack(onTrack);
 //   return(nTrial);
+    return 0;
 }
 
 int TRunge::approach_line(const Point3D& w0,const HepGeom::Vector3D<double> & v,

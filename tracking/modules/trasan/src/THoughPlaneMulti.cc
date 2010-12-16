@@ -71,7 +71,7 @@ THoughPlaneMulti::vote(float rx,
 //     const unsigned a = layerId / 32;
 //     _usage[a] |= (1 << (layerId % 32));
     _usage[layerId] = true;
-    _layers[layerId]->vote(rx, ry, targetCharge, hough, weight);
+    _layers[layerId]->vote(rx, ry, (int) targetCharge, hough, weight);
 }
 
 void

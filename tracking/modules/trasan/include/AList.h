@@ -183,7 +183,7 @@ inline void HepAListDeleteAll(HepAList<T> & l) {
 // NOTE! Use this function with care. Make sure that all elements in the
 // list has been allocated with 'new'
   T * e;
-  while ( e = l.last() ) {
+  while ( (e = l.last()) != 0 ) {
     l.remove(e);
     delete e;
   }

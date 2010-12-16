@@ -376,7 +376,7 @@ TTrackMC::update(void) {
 //  unsigned nTrk = Trasan::getTrasan()->tracks().length();
     unsigned * N1 = (unsigned *) malloc(nHep * sizeof(unsigned));
     float * F1 = (float *) malloc(nHep * sizeof(float));
-    unsigned N2 = 0;
+//cnv    unsigned N2 = 0;
     for (unsigned i = 0; i < nHep; i++) {
 	N1[i] = 0;
 	F1[i] = 0.;
@@ -387,7 +387,7 @@ TTrackMC::update(void) {
     const AList<TLink> & cores = _t.finalHits();
     unsigned nCores = cores.length();
     for (unsigned i = 0; i < nCores; i++) {
-	TLink * t = cores[i];
+//cnv	TLink * t = cores[i];
 //cnv 	if(t && t->hit() && t->hit()->mc() && t->hit()->mc()->hep() ) {
 // 	  int hepID = t->hit()->mc()->hep()->id();
 // 	  ++N1[hepID];

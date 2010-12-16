@@ -867,8 +867,8 @@ TBuilder::refine(TTrack & t, AList<TLink> & list, double maxSigma) const {
 	}
 
 	//...Remove the worst, and fit it again...
-	list.append((t.links())[iWorst]);
-	t.remove(* (t.links())[iWorst]);
+	list.append((t.links())[(int) iWorst]);
+	t.remove(* (t.links())[(int) iWorst]);
 	_fitter.fit(t);
     }
 
@@ -1117,8 +1117,8 @@ TBuilder::buildStereo(TTrack & track, const AList<TLink> & list) const {
     //...Select the best one...
     unsigned maxHits = 0;
     TTrack * best = 0;
-    for (unsigned i = 0; i < trackList.length(); i++) {
-	if (maxHits < trackList[i]->links().length()) {
+    for (unsigned i = 0; i < (unsigned) trackList.length(); i++) {
+	if (maxHits < (unsigned) trackList[i]->links().length()) {
 	    maxHits = trackList[i]->links().length();
 	    best = trackList[i];
 	}
@@ -1359,7 +1359,7 @@ TBuilder::initialLines2(const TTrack & t,
 //  plane.yMax(maxR);
     plane.clear();
 //  plane.dump();
-    for (unsigned i = 0; i < szLinks.length(); i++) {
+    for (unsigned i = 0; i < (unsigned) szLinks.length(); i++) {
 	const TLink & l = * szLinks[i];
 	const float x = l.position().x();
 	const float y = l.position().y();

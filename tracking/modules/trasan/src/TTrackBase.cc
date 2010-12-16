@@ -628,7 +628,7 @@ Dump(const AList<TTrackBase> & list,
     std::string tab;
     for (unsigned i = 0; i < pre.size(); i++)
 	tab += " ";
-    for (unsigned i = 0; i < list.length(); i++) {
+    for (unsigned i = 0; i < (unsigned) list.length(); i++) {
 	std::cout << pre << "[" << itostring(i) << "]";
 	list[i]->dump(msg, tab);
     }

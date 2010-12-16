@@ -783,7 +783,7 @@ TTrackManager::dump(const std::string & msg, const std::string & pref) const {
 	//       	bzero((char*)& s, sizeof(struct summary));
        	memset((char*)& s, 0, sizeof(struct summary));
 	for (int i = 0; i < 0; i++) {
-	    int size;
+//cnv	    int size;
 struct summary r;
 	    s._nEvents += r._nEvents;
 	    s._nToBeMerged += r._nToBeMerged;
@@ -1037,7 +1037,7 @@ TTrackManager::saveTables(void) {
 //  	if (t.daughter() && (_tracks.index(t.daughter()) >= 0))
 //  	    a->m_daughter = _tracks.index(t.daughter()) + 1;
 
-	    reccdc_svd_trk cs;
+//cnv	    reccdc_svd_trk cs;
 
     }
 
@@ -1147,7 +1147,7 @@ TTrackManager::saveMCTables(void) const {
 	const AList<TLink> & hits = t.finalHits();
 	unsigned nHits = hits.length();
 	for (unsigned j = 0; j < nHits;  j++) {
-	    TLink * l = hits[j];
+//cnv	    TLink * l = hits[j];
 //	    reccdc_wirhit * h = l->hit()->reccdc();
 	    reccdc_wirhit * h = 0;
 //	    datcdc_mcwirhit * m = l->hit()->mc()->datcdc();
@@ -1204,7 +1204,7 @@ TTrackManager::clear(bool termination) {
     static bool first = true;
     if (first && !termination) {
 	first = false;
-	int size;
+//cnv	int size;
 	_s = 0;
     }
 }
@@ -1715,7 +1715,7 @@ TTrackManager::determineT0(unsigned level, unsigned nMax) {
     else if (methode == 2) {
 //cnv 	struct reccdc_timing * r0 = (struct reccdc_timing *)
 //cnv 	    BsGetEnt(RECCDC_TIMING, BsCouTab(RECCDC_TIMING), BBS_No_Index);
-	struct reccdc_timing * r0 = 0;
+//cnv	struct reccdc_timing * r0 = 0;
 //cnv 	if (r0->m_quality == 102) {
 // 	  if (BsCouTab(BELLE_EVENT)) {
 // 	    struct belle_event * b0 = (struct belle_event *)
@@ -1823,7 +1823,7 @@ TTrackManager::T0Fit(unsigned n) {
       if( std::abs(hl.dr()) > 10.) continue;
       if( std::abs(hl.dz()) > 25.) continue;
       n_good++;
-      if(n_good > n) break;
+      if(n_good > (int)n) break;
       
       //      float pt = fabs(1./t.helix().a()[2]);
       // std::cout << "pt=" << pt << endl;
@@ -3693,7 +3693,7 @@ TTrackManager::mergeTracks(int level, float threshold) {
 	}
     }
 
-    for (unsigned i = 0; i < toBeRemoved.length(); i++) {
+    for (unsigned i = 0; i < (unsigned) toBeRemoved.length(); i++) {
 	_tracksAll.remove(* toBeRemoved[i]);
 	_tracks.remove(* toBeRemoved[i]);
 	_tracks2D.remove(* toBeRemoved[i]);

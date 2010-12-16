@@ -621,7 +621,7 @@ THelixFitter::main(TTrackBase & b, float t0Offset,
 //...Fitting loop...
     unsigned nTrial = 0;
     //    while (nTrial < NTrailMax) {
-    while (nTrial < TrasanTHelixFitterNtrialMax) {
+    while (nTrial < (unsigned) TrasanTHelixFitterNtrialMax) {
 
 	//...Set up...
 	chi2 = 0.;
@@ -1708,7 +1708,7 @@ THelixFitter::main(TTrackBase & b, float & tev, float & tev_err,
     //...Fitting loop...
     unsigned nTrial = 0;
     //    while (nTrial < NTrailMax) {
-    while (nTrial < TrasanTHelixFitterNtrialMax) {
+    while (nTrial < (unsigned) TrasanTHelixFitterNtrialMax) {
 
 	//...Set up...
 	chi2 = 0.;

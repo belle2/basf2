@@ -226,7 +226,7 @@ TBuilderCosmic::buildStereo(TTrack & track, const AList<TLink> & list) const {
 #ifdef TRASAN_DEBUG_DETAIL
     std::cout << name() << "(stereo) ... creating a new line" << std::endl;
 #endif	
-    unsigned nNewLine = forNewLine.length();
+//cnv    unsigned nNewLine = forNewLine.length();
     TLine0 newLine(forNewLine);
 
     //...Make a seed track again

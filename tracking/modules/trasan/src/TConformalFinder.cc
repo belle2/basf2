@@ -659,7 +659,7 @@ TConformalFinder::dump(const std::string & msg, const std::string & pre) const {
 	//  	bzero((char *) & s, sizeof(struct summary));
   	memset((char *) & s, 0, sizeof(struct summary));
 	for (int i = 0; i < 0; i++) {
-	    int size;
+//cnv	    int size;
 	    struct summary & r = s;
 	    s._nEvents += r._nEvents;
 	    s._nTracksFast3D += r._nTracksFast3D;
@@ -880,7 +880,7 @@ void
 TConformalFinder::linkSegments(unsigned level) {
   // no_superlyr
   const Belle2::TRGCDC &cdc(*Belle2::TRGCDC::getTRGCDC());
-  unsigned nSuperLayers = cdc.nSuperLayers();
+//cnv  unsigned nSuperLayers = cdc.nSuperLayers();
 
     //...Clear old links...
     unsigned superLayer = cdc.nAxialSuperLayers();
@@ -1324,7 +1324,7 @@ TConformalFinder::doit(const CAList<Belle2::TRGCDCWireHit> & axial,
     static bool first = true;
     if (first) {
 	first = false;
-	int size;
+//cnv	int size;
 	_s = 0;
     }
 
@@ -1780,7 +1780,7 @@ void
 TConformalFinder::fastFinding2D(unsigned level) {
   // no_superlyr
   const Belle2::TRGCDC &cdc(*Belle2::TRGCDC::getTRGCDC());
-  unsigned nSuperLayers = cdc.nSuperLayers();
+//cnv  unsigned nSuperLayers = cdc.nSuperLayers();
 
 #ifdef TRASAN_DEBUG_DETAIL
     const std::string stage = "2D level" + itostring(level);
@@ -2018,7 +2018,7 @@ TConformalFinder::crossPointsInConformal(const AList<TSegment> & inList,
 					 HepGeom::Point3D<double> points[12]) const {
     // no_superlyr
     const Belle2::TRGCDC & cdc = * Belle2::TRGCDC::getTRGCDC();
-    unsigned nSuperLayers = cdc.nSuperLayers();
+//cnv    unsigned nSuperLayers = cdc.nSuperLayers();
 
     //...Parameters...
     static const float confRadius2[] = {4. / ( 8.3 *  8.3),
@@ -2045,11 +2045,11 @@ TConformalFinder::crossPointsInConformal(const AList<TSegment> & inList,
 	}
       }
       init = false;
-      int ii=0;
+//cnv      int ii=0;
       for(std::vector<double>::const_iterator it = confRadius2vec.begin();
 	  it != confRadius2vec.end(); ++it) {
-	std::cout << "confRadius2[" << ii++ << "]=" << confRadius2[ii]
-	       << " " << *it << std::endl; 
+//cnv 	std::cout << "confRadius2[" << ii++ << "]=" << confRadius2[ii]
+// 	       << " " << *it << std::endl; 
       }
     }
     //...Get conformal points from segments as seeds...
@@ -2116,7 +2116,7 @@ AList<TSegment>
 TConformalFinder::stereoSegments(const TTrack & t) const {
   // no_superlyr
   const Belle2::TRGCDC &cdc(*Belle2::TRGCDC::getTRGCDC());
-  unsigned nSuperLayers = cdc.nSuperLayers();
+//cnv  unsigned nSuperLayers = cdc.nSuperLayers();
 
 #ifdef TRASAN_DEBUG_DETAIL
     std::cout << "... finding stereo segments" << std::endl;
@@ -2162,12 +2162,12 @@ TConformalFinder::stereoSegments(const TTrack & t) const {
 
     //...Cal. direction if empty...
     const int n6 = cdc.nAxialSuperLayers();
-    for (unsigned i = 0; i < n6; i++) {
+    for (unsigned i = 0; i < (unsigned) n6; i++) {
 	if (dir[i].mag() < .5) {
 	    unsigned j = i;
-	    while ((j < n6) && (dir[j].mag() < .5))
+	    while ((j < (unsigned) n6) && (dir[j].mag() < .5))
 		++j;
-	    if (j > (n6-1)) j = n6-1;
+	    if (j > (unsigned) (n6-1)) j = n6-1;
 	    if (dir[j].mag() < .5) {
 		j = i;
 		while ((j > 0) && (dir[j].mag() < .5))
@@ -2352,7 +2352,7 @@ TConformalFinder::pickUpSegments(const TPoint2D x[12],
 				 unsigned axialStereoSwitch) const {
     // no_superlyr
     const Belle2::TRGCDC & cdc = * Belle2::TRGCDC::getTRGCDC();
-    unsigned nSuperLayers = cdc.nSuperLayers();
+//cnv    unsigned nSuperLayers = cdc.nSuperLayers();
     static const TPoint2D O(0., 0.);
     AList<TSegment> outList;
 
@@ -2823,7 +2823,7 @@ AList<TSegment>
 TConformalFinder::refineSegments(const TTrack & t) const {
   // no_superlyr
   const Belle2::TRGCDC &cdc(*Belle2::TRGCDC::getTRGCDC());
-  unsigned nSuperLayers = cdc.nSuperLayers();
+//cnv  unsigned nSuperLayers = cdc.nSuperLayers();
     const AList<TSegment> & original = t.segments();
     AList<TSegment> outList;
     unsigned n = original.length();
@@ -3010,7 +3010,7 @@ TConformalFinder::stereoSegmentsFromBadHits(const TTrack & t) const {
 
     // no_superlyr
     const Belle2::TRGCDC & cdc = * Belle2::TRGCDC::getTRGCDC();
-    unsigned nSuperLayers = cdc.nSuperLayers();
+//cnv    unsigned nSuperLayers = cdc.nSuperLayers();
 
     AList<TSegment> output;
     for (unsigned i = 0; i < cdc.nStereoSuperLayers(); i++)

@@ -1056,6 +1056,8 @@ TCosmicFitter::fitWithCathode( TTrackBase &b, float t0Offset,
     return err;
       }
     }
+
+    return err;
 }
 
 // end of addition

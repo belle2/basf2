@@ -2245,6 +2245,7 @@ int TTrack::fitWithCathode(float window, int SysCorr ) {
 //     _fittedWithCathode = true;
     
 //     return err;
+    return -1;
 }
 
 #if OLD_STEREO

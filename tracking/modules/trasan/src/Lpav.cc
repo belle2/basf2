@@ -319,8 +319,8 @@ double Lpav::solve_lambda3(void) {
   if (m_rscale<=0) return -1;
   double xrrxrr = m_xrravp * m_xrravp;
   double yrryrr = m_yrravp * m_yrravp;
-  double rrrrm1 = m_rrrravp - 1;
-  double xxyy = m_xxavp * m_yyavp;
+//cnv  double rrrrm1 = m_rrrravp - 1;
+//cnv  double xxyy = m_xxavp * m_yyavp;
 
   double a = m_rrrravp;
   double b = xrrxrr + yrryrr - m_rrrravp * (m_xxavp + m_yyavp);
@@ -676,8 +676,8 @@ return la;
 double Lpav::prob() const {
   if (m_nc<=3) return 0;
   if (m_chisq<0) return 0;
-  float c = m_chisq;
-  int nci = (int)m_nc - 3;
+//cnv  float c = m_chisq;
+//cnv  int nci = (int)m_nc - 3;
   // temporarily commented out
   //  double p = (double) prob_(&c, &nci);
   double p = 0;

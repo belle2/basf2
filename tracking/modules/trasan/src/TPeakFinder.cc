@@ -396,7 +396,8 @@ TPeakFinder::peaks6(THoughPlane & hp,
 //     EnterStage(stage);
 // #endif
 
-//     AList<TPoint2D> list;
+     AList<TPoint2D> list;
+     return list;
 
 //     //...Search for locak peaks...
 //     const unsigned nCells = hp.nX() * hp.nY();

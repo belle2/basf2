@@ -2,7 +2,7 @@
 // $Id$
 //-----------------------------------------------------------------------------
 // Filename : DisplayDrawingAreaRphi.cc
-// Section  : Tracking CDC
+// Section  : TRG CDC
 // Owner    : Yoshihito Iwasaki
 // Email    : yoshihito.iwasaki@kek.jp
 //-----------------------------------------------------------------------------
@@ -11,9 +11,10 @@
 // $Log$
 //-----------------------------------------------------------------------------
 
-#ifdef CDCTRIGGER_DISPLAY
+#ifdef TRGCDC_DISPLAY
 
 #define TRGCDC_SHORT_NAMES
+#define TRGCDCDisplayDrawingAreaRphi_INLINE_DEFINE_HERE
 
 #include <iostream>
 #include <pangomm/init.h>
@@ -225,7 +226,7 @@ TRGCDCDisplayDrawingAreaRphi::drawHits(void) {
  		continue;
 
 	//...Points...
-	const CTWire & w = _hits[i]->wire();
+	const TCWire & w = _hits[i]->wire();
 	const HepGeom::Point3D<double> & p = w.forwardPosition();
 	double radius = _hits[i]->drift();
 
@@ -253,7 +254,7 @@ TRGCDCDisplayDrawingAreaRphi::drawHits(void) {
 }
 
 void
-TRGCDCDisplayDrawingAreaRphi::drawWire(const CTWire & w,
+TRGCDCDisplayDrawingAreaRphi::drawWire(const TCWire & w,
 				       int lineWidth,
 				       Gdk::Color & c,
 				       Gdk::LineStyle s) {
@@ -306,11 +307,11 @@ TRGCDCDisplayDrawingAreaRphi::drawWire(const CTWire & w,
 }
 
 void
-TRGCDCDisplayDrawingAreaRphi::drawTrackSegment(const CTTSegment & w,
+TRGCDCDisplayDrawingAreaRphi::drawTrackSegment(const TCTSegment & w,
 					       int lineWidth,
 					       Gdk::Color & c,
 					       Gdk::LineStyle s) {
-    const std::vector<const CTWire *> wires = w.wires();
+    const std::vector<const TCWire *> wires = w.wires();
     const unsigned n = wires.size();
     for (unsigned i = 0; i < n; i++) {
 	drawWire(* wires[i], lineWidth, c, s);
@@ -318,7 +319,7 @@ TRGCDCDisplayDrawingAreaRphi::drawTrackSegment(const CTTSegment & w,
 }
 
 void
-TRGCDCDisplayDrawingAreaRphi::drawFrontEnd(const CTFrontEnd & w,
+TRGCDCDisplayDrawingAreaRphi::drawFrontEnd(const TCFrontEnd & w,
 					   int lineWidth,
 					   Gdk::Color & c,
 					   Gdk::LineStyle s) {
@@ -329,7 +330,7 @@ TRGCDCDisplayDrawingAreaRphi::drawFrontEnd(const CTFrontEnd & w,
 }
 
 void
-TRGCDCDisplayDrawingAreaRphi::drawMerger(const CTMerger & w,
+TRGCDCDisplayDrawingAreaRphi::drawMerger(const TCMerger & w,
 					 int lineWidth,
 					 Gdk::Color & c,
 					 Gdk::LineStyle s) {
@@ -435,7 +436,7 @@ TRGCDCDisplayDrawingAreaRphi::resetPosition(void) {
 }
 
 void
-TRGCDCDisplayDrawingAreaRphi::append(const std::vector<const CTWHit *> & l,
+TRGCDCDisplayDrawingAreaRphi::append(const std::vector<const TCWHit *> & l,
 				     Gdk::Color c) {
     const unsigned n = l.size();
     for (unsigned i = 0; i < n; i++) {
@@ -446,7 +447,7 @@ TRGCDCDisplayDrawingAreaRphi::append(const std::vector<const CTWHit *> & l,
 }
 
 void
-TRGCDCDisplayDrawingAreaRphi::append(const CTTSegment & s,
+TRGCDCDisplayDrawingAreaRphi::append(const TCTSegment & s,
 				     Gdk::Color c) {
     _segments.push_back(& s);
     _segmentsColor.push_back(c);
@@ -454,7 +455,7 @@ TRGCDCDisplayDrawingAreaRphi::append(const CTTSegment & s,
 }
 
 void
-TRGCDCDisplayDrawingAreaRphi::append(const std::vector<const CTTSegment *> & l,
+TRGCDCDisplayDrawingAreaRphi::append(const std::vector<const TCTSegment *> & l,
 				     Gdk::Color c) {
     const unsigned n = l.size();
     for (unsigned i = 0; i < n; i++) {
@@ -465,7 +466,7 @@ TRGCDCDisplayDrawingAreaRphi::append(const std::vector<const CTTSegment *> & l,
 }
 
 void
-TRGCDCDisplayDrawingAreaRphi::append(const CTFrontEnd & s,
+TRGCDCDisplayDrawingAreaRphi::append(const TCFrontEnd & s,
 				     Gdk::Color c) {
     _fronts.push_back(& s);
     _frontColors.push_back(c);
@@ -473,7 +474,7 @@ TRGCDCDisplayDrawingAreaRphi::append(const CTFrontEnd & s,
 }
 
 void
-TRGCDCDisplayDrawingAreaRphi::append(const CTMerger & s,
+TRGCDCDisplayDrawingAreaRphi::append(const TCMerger & s,
 				     Gdk::Color c) {
     _mergers.push_back(& s);
     _mergerColors.push_back(c);

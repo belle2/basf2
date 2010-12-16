@@ -20,7 +20,7 @@
 #include "CLHEP/Geometry/Vector3D.h"
 
 #ifdef TRGCDC_SHORT_NAMES
-#define CTWHitMC TRGCDCWireHitMC
+#define TCWHitMC TRGCDCWireHitMC
 #endif
 
 namespace Belle2 {
@@ -84,7 +84,7 @@ class TRGCDCWireHitMC {
 
 //-----------------------------------------------------------------------------
 
-#ifdef TRGCDCWireHitMC_NO_INLINE
+#ifdef TRGCDC_NO_INLINE
 #define inline
 #else
 #undef inline

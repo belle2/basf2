@@ -11,6 +11,8 @@
 // $Log$
 //-----------------------------------------------------------------------------
 
+#define TRGCDCTrackMC_INLINE_DEFINE_HERE
+
 #include "trg/cdc/TRGCDC.h"
 #include "trg/cdc/TrackMC.h"
 

@@ -11,27 +11,20 @@
 // $Log$
 //-----------------------------------------------------------------------------
 
-#ifdef CDCTRIGGER_DISPLAY
+#ifdef TRGCDC_DISPLAY
 
 #ifndef TRGCDCDisplayDrawingAreaHough_FLAG_
 #define TRGCDCDisplayDrawingAreaHough_FLAG_
 
-#include <vector>
-#include <gtkmm.h>
 #include "trg/cdc/DisplayDrawingArea.h"
-#include "trg/cdc/HoughPlane.h"
 
 #ifdef TRGCDC_SHORT_NAMES
-#define CTDDAreaHough TRGCDCDisplayDrawingAreaHough
+#define TCDDAreaHough TRGCDCDisplayDrawingAreaHough
 #endif
 
 namespace Belle2 {
 
-class TRGCDCWire;
-class TRGCDCWireHit;
-class TRGCDCTrackSegment;
-class TRGCDCFrontEnd;
-class TRGCDCMerger;
+class TRGCDCHoughPlane;
 
 /// Actual class to display trigger objects
 class TRGCDCDisplayDrawingAreaHough : public TRGCDCDisplayDrawingArea {
@@ -90,13 +83,13 @@ class TRGCDCDisplayDrawingAreaHough : public TRGCDCDisplayDrawingArea {
 
 //-----------------------------------------------------------------------------
 
-#ifdef TRASAN_NO_INLINE
+#ifdef TRGCDC_NO_INLINE
 #define inline
 #else
 #undef inline
-#define TWINDOWGTK_INLINE_DEFINE_HERE
+#define TRGCDCDisplayDrawingAreaHough_INLINE_DEFINE_HERE
 #endif
-#ifdef TWINDOWGTK_INLINE_DEFINE_HERE
+#ifdef TRGCDCDisplayDrawingAreaHough_INLINE_DEFINE_HERE
 
 inline
 double

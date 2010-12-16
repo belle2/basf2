@@ -14,7 +14,6 @@
 #ifndef TRGCDCWire_FLAG_
 #define TRGCDCWire_FLAG_
 
-#include <iostream>
 #include <vector>
 #include "CLHEP/Geometry/Vector3D.h"
 #include "CLHEP/Geometry/Point3D.h"
@@ -22,7 +21,7 @@
 #include "trg/cdc/Layer.h"
 
 #ifdef TRGCDC_SHORT_NAMES
-#define CTWire TRGCDCWire
+#define TCWire TRGCDCWire
 #endif
 
 namespace Belle2 {
@@ -182,7 +181,7 @@ class TRGCDCWire {
 
 //-----------------------------------------------------------------------------
 
-#ifdef TRGCDCWire_NO_INLINE
+#ifdef TRGCDC_NO_INLINE
 #define inline
 #else
 #undef inline

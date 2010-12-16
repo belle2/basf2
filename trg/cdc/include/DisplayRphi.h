@@ -11,7 +11,7 @@
 // $Log$
 //-----------------------------------------------------------------------------
 
-#ifdef CDCTRIGGER_DISPLAY
+#ifdef TRGCDC_DISPLAY
 
 #ifndef TRGCDCDisplayRphi_FLAG_
 #define TRGCDCDisplayRphi_FLAG_
@@ -21,7 +21,7 @@
 #include "trg/cdc/DisplayDrawingAreaRphi.h"
 
 #ifdef TRGCDC_SHORT_NAMES
-#define CTDisplayRphi TRGCDCDisplayRphi
+#define TCDisplayRphi TRGCDCDisplayRphi
 #endif
 
 namespace Belle2 {
@@ -55,13 +55,13 @@ class TRGCDCDisplayRphi : public TRGCDCDisplay {
 
 //-----------------------------------------------------------------------------
 
-#ifdef TRASAN_NO_INLINE
+#ifdef TRGCDC_NO_INLINE
 #define inline
 #else
 #undef inline
-#define TWINDOWGTK_INLINE_DEFINE_HERE
+#define TRGCDCDisplayRphi_INLINE_DEFINE_HERE
 #endif
-#ifdef TWINDOWGTK_INLINE_DEFINE_HERE
+#ifdef TRGCDCDisplayRphi_INLINE_DEFINE_HERE
 
 inline
 TRGCDCDisplayDrawingAreaRphi &

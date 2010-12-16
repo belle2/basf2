@@ -2,7 +2,7 @@
 // $Id$
 //-----------------------------------------------------------------------------
 // Filename : DisplayHough.cc
-// Section  : Tracking CDC
+// Section  : TRG CDC
 // Owner    : Yoshihito Iwasaki
 // Email    : yoshihito.iwasaki@kek.jp
 //-----------------------------------------------------------------------------
@@ -11,7 +11,9 @@
 // $Log$
 //-----------------------------------------------------------------------------
 
-#ifdef CDCTRIGGER_DISPLAY
+#ifdef TRGCDC_DISPLAY
+
+#define TRGCDCDisplayHough_INLINE_DEFINE_HERE
 
 #include "trg/cdc/DisplayHough.h"
 

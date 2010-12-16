@@ -17,7 +17,7 @@
 #include <string>
 
 #ifdef TRGCDC_SHORT_NAMES
-#define CTHTransformation TRGCDCHoughTransformation
+#define TCHTransformation TRGCDCHoughTransformation
 #endif
 
 namespace Belle2 {

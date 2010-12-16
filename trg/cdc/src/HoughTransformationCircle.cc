@@ -11,6 +11,7 @@
 // $Log$
 //-----------------------------------------------------------------------------
 
+#define TRGCDCHoughTransformationCircle_INLINE_DEFINE_HERE
 
 #include <math.h>
 #include "trg/trg/Point2D.h"

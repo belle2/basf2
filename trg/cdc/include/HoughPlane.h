@@ -14,11 +14,10 @@
 #ifndef TRGCDCHoughPlane_FLAG_
 #define TRGCDCHoughPlane_FLAG_
 
-//#include <string>
 #include "trg/cdc/HoughPlaneBase.h"
 
 #ifdef TRGCDC_SHORT_NAMES
-#define CTHPlane TRGCDCHoughPlane
+#define TCHPlane TRGCDCHoughPlane
 #endif
 
 namespace Belle2 {

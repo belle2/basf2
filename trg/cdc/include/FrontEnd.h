@@ -2,7 +2,7 @@
 // $Id$
 //-----------------------------------------------------------------------------
 // Filename : FrontEnd.h
-// Section  : TRG
+// Section  : TRG CDC
 // Owner    : Yoshihito Iwasaki
 // Email    : yoshihito.iwasaki@kek.jp
 //-----------------------------------------------------------------------------
@@ -20,7 +20,7 @@
 #include "trg/trg/Link.h"
 
 #ifdef TRGCDC_SHORT_NAMES
-#define CTFrontEnd TRGCDCFrontEnd
+#define TCFrontEnd TRGCDCFrontEnd
 #endif
 
 namespace Belle2 {
@@ -53,7 +53,7 @@ class TRGCDCFrontEnd
 
 //-----------------------------------------------------------------------------
 
-#ifdef TRGCDCFrontEnd_NO_INLINE
+#ifdef TRGCDC_NO_INLINE
 #define inline
 #else
 #undef inline

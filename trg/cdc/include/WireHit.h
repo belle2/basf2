@@ -18,7 +18,7 @@
 #include "CLHEP/Geometry/Point3D.h"
 
 #ifdef TRGCDC_SHORT_NAMES
-#define CTWHit TRGCDCWireHit
+#define TCWHit TRGCDCWireHit
 #endif
 
 #define WireHitLeft                0
@@ -192,7 +192,7 @@ class TRGCDCWireHit {
 
 //-----------------------------------------------------------------------------
 
-#ifdef TRGCDCWireHit_NO_INLINE
+#ifdef TRGCDC_NO_INLINE
 #define inline
 #else
 #undef inline

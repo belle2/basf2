@@ -17,7 +17,7 @@
 #include "trg/cdc/HoughPlane.h"
 
 #ifdef TRGCDC_SHORT_NAMES
-#define CTHPlaneMulti TRGCDCHoughPlaneMulti
+#define TCHPlaneMulti TRGCDCHoughPlaneMulti
 #endif
 
 namespace Belle2 {

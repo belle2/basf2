@@ -14,12 +14,11 @@
 #ifndef TRGCDCTrackSegment_FLAG_
 #define TRGCDCTrackSegment_FLAG_
 
-#include <iostream>
 #include <vector>
 #include "trg/cdc/Wire.h"
 
 #ifdef TRGCDC_SHORT_NAMES
-#define CTTSegment TRGCDCTrackSegment
+#define TCTSegment TRGCDCTrackSegment
 #endif
 
 namespace Belle2 {
@@ -98,7 +97,7 @@ class TRGCDCTrackSegment : public TRGCDCWire {
 
 //-----------------------------------------------------------------------------
 
-#ifdef TRGCDCTrackSegment_NO_INLINE
+#ifdef TRGCDC_NO_INLINE
 #define inline
 #else
 #undef inline

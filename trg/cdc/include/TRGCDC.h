@@ -1,7 +1,7 @@
 //-----------------------------------------------------------------------------
 // $Id$
 //-----------------------------------------------------------------------------
-// Filename : .h
+// Filename : TRGCDC.h
 // Section  : TRG CDC
 // Owner    : Yoshihito Iwasaki
 // Email    : yoshihito.iwasaki@kek.jp

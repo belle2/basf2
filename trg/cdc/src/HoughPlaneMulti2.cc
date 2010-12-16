@@ -11,10 +11,10 @@
 // $Log$
 //-----------------------------------------------------------------------------
 
-//#include <iostream>
+#define TRGCDCHoughPlaneMulti2_INLINE_DEFINE_HERE
+
 #include "trg/cdc/TRGCDC.h"
 #include "trg/cdc/HoughPlaneMulti2.h"
-//#include "tracking/modules/trasan/Strings.h"
 
 namespace Belle2 {
 

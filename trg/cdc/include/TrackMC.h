@@ -19,7 +19,7 @@
 #include "trg/cdc/TRGCDC.h"
 
 #ifdef TRGCDC_SHORT_NAMES
-#define CTTrackMC TRGCDCTrackMC
+#define TCTrackMC TRGCDCTrackMC
 #endif
 
 namespace Belle2 {
@@ -94,7 +94,7 @@ class TRGCDCTrackMC {
 
 //-----------------------------------------------------------------------------
 
-#ifdef TRASAN_NO_INLINE
+#ifdef TRGCDC_NO_INLINE
 #define inline
 #else
 #undef inline

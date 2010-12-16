@@ -12,7 +12,6 @@
 //-----------------------------------------------------------------------------
 
 #define TRGCDCTrackSegment_INLINE_DEFINE_HERE
-#define TRIGGER_SHORT_NAMES
 #define TRGCDC_SHORT_NAMES
 
 #include <iostream>
@@ -26,11 +25,11 @@ using namespace std;
 namespace Belle2 {
 
 TRGCDCTrackSegment::TRGCDCTrackSegment(unsigned id,
-					       const CTWire & w,
+					       const TCWire & w,
 					       const TRGCDCLayer * layer,
 			     const std::vector<const TRGCDCWire *> & cells)
 
-    : CTWire::CTWire(w),
+    : TCWire::TCWire(w),
       _state(0),
       _id(id),
       _localId(w.localId()),
@@ -89,9 +88,9 @@ TRGCDCTrackSegment::name(void) const {
 }
 
 void
-CTTSegment::simulate(void) {
+TCTSegment::simulate(void) {
 
-#ifdef CDCTRIGGER_DEBUG
+#ifdef TRGCDC_DEBUG
 //    cout << name() << endl;
 #endif
 
@@ -105,7 +104,7 @@ CTTSegment::simulate(void) {
 
 	if (s.active()) {
 	    ++nHits;
-#ifdef CDCTRIGGER_DEBUG
+#ifdef TRGCDC_DEBUG
 //	    s->dump("", "    ");
 #endif
 	}
@@ -120,7 +119,7 @@ CTTSegment::simulate(void) {
 	TRGCDC::getTRGCDC()->systemClock().unit(400);
     for (unsigned i = 0; i < n; i++) {
 	signals[i].widen(width);
-#ifdef CDCTRIGGER_DEBUG
+#ifdef TRGCDC_DEBUG
 //	signals[i].dump("", "    ");
 #endif
     }
@@ -138,7 +137,7 @@ CTTSegment::simulate(void) {
     if (all.nEdges())
 	_signal = all;
 
-#ifdef CDCTRIGGER_DEBUG
+#ifdef TRGCDC_DEBUG
 //     l0.dump("", "       -> ");
 //     l1.dump("", "       -> ");
 //     l2.dump("", "       -> ");

@@ -17,7 +17,7 @@
 #include "trg/cdc/HoughTransformation.h"
 
 #ifdef TRGCDC_SHORT_NAMES
-#define CTHTransformationCircle TRGCDCHoughTransformationCircle
+#define TCHTransformationCircle TRGCDCHoughTransformationCircle
 #endif
 
 namespace Belle2 {

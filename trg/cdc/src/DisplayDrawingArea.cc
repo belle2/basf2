@@ -2,7 +2,7 @@
 // $Id$
 //-----------------------------------------------------------------------------
 // Filename : DisplayDrawingArea.cc
-// Section  : Tracking CDC
+// Section  : TRG CDC
 // Owner    : Yoshihito Iwasaki
 // Email    : yoshihito.iwasaki@kek.jp
 //-----------------------------------------------------------------------------
@@ -11,17 +11,13 @@
 // $Log$
 //-----------------------------------------------------------------------------
 
-#ifdef CDCTRIGGER_DISPLAY
+#ifdef TRGCDC_DISPLAY
 
 #define TRGCDC_SHORT_NAMES
+#define TRGCDCDisplayDrawingArea_INLINE_DEFINE_HERE
 
 #include <iostream>
 #include <pangomm/init.h>
-// #include "trg/cdc/Wire.h"
-// #include "trg/cdc/WireHit.h"
-// #include "trg/cdc/TrackSegment.h"
-// #include "trg/cdc/FrontEnd.h"
-// #include "trg/cdc/Merger.h"
 #include "trg/cdc/DisplayDrawingAreaRphi.h"
 
 using namespace std;

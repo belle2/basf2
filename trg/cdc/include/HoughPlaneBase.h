@@ -20,10 +20,8 @@
 #include "trg/trg/Area2D.h"
 #include "trg/cdc/HoughTransformation.h"
 
-#define HEP_SHORT_NAMES
-//#include "tracking/modules/trasan/CList.h"
-#ifdef TRASAN_WINDOW
-#include "tracking/modules/trasan/TWindow.h"
+#ifdef TRGCDC_SHORT_NAMES
+#define TCHPlaneBase TRGCDCHoughPlaneBase
 #endif
 
 namespace Belle2 {

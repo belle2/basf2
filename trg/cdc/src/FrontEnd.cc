@@ -11,9 +11,8 @@
 // $Log$
 //-----------------------------------------------------------------------------
 
-#define TRGCDCFrontEnd_INLINE_DEFINE_HERE
-#define TRIGGER_SHORT_NAMES
 #define TRGCDC_SHORT_NAMES
+#define TRGCDCFrontEnd_INLINE_DEFINE_HERE
 
 #include "trg/cdc/FrontEnd.h"
 

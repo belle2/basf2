@@ -15,7 +15,6 @@
 #ifndef TRGCDCHoughPlaneBoolean_FLAG_
 #define TRGCDCHoughPlaneBoolean_FLAG_
 
-//#include <string>
 #include "trg/cdc/HoughPlaneBase.h"
 
 namespace Belle2 {

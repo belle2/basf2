@@ -18,7 +18,7 @@
 #include "trg/cdc/HoughPlaneBoolean.h"
 
 #ifdef TRGCDC_SHORT_NAMES
-#define CTHPlaneMulti2 TRGCDCHoughPlaneMulti2
+#define TCHPlaneMulti2 TRGCDCHoughPlaneMulti2
 #endif
 
 #define N_LAYERS 6

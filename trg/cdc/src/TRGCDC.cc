@@ -1,7 +1,7 @@
 //-----------------------------------------------------------------------------
 // $Id$
 //-----------------------------------------------------------------------------
-// Filename : .cc
+// Filename : TRGCDC.cc
 // Section  : TRG CDC
 // Owner    : Yoshihito Iwasaki
 // Email    : yoshihito.iwasaki@kek.jp
@@ -11,7 +11,7 @@
 // $Log$
 //-----------------------------------------------------------------------------
 
-#define TRIGGER_SHORT_NAMES
+#define TRGCDC_INLINE_DEFINE_HERE
 #define TRGCDC_SHORT_NAMES
 
 #include <fstream>
@@ -282,13 +282,13 @@ TRGCDC::initialize(void) {
 	if (i == (nSuperLayers() - 1)) {
 	    _r[i + 1] = slayer.back()->outerRadius();
  	    _r2[i + 1] = _r[i + 1] * _r[i + 1];
-// #ifdef CDCTRIGGER_DEBUG
+// #ifdef TRGCDC_DEBUG
 // 	cout << "    super layer " << i << " outer radius=" << _r[i]
 // 	       << "(r^2=" << _r2[i] << ")" << std::endl;
 // #endif
 	}
 
-#ifdef CDCTRIGGER_DEBUG
+#ifdef TRGCDC_DEBUG
 	const TRGCDCWire & wi = * slayer[0]->front();
 	const unsigned layerId = wi.layerId();
 	cout << layerId << "," << cdc2.senseWireR(layerId) << ","
@@ -610,7 +610,7 @@ TRGCDC::updateMC(void) {
 // // 	  cout << "TRGCDC::updateMC !!! mission impossible" << std::endl;
 // // 	  cout << "                   This error will cause trasan crush";
 // // 	  cout << std::endl;
-// // #ifdef CDCTRIGGER_DEBUG_DETAIL
+// // #ifdef TRGCDC_DEBUG_DETAIL
 // // 	  cout << "    h->m_hep, h->m_hep -1 = " << h->m_hep;
 // // 	  cout << ", " << h->m_hep - 1 << std::endl;
 // // 	  cout << "    TRGCDCTrackMC list length = ";
@@ -1083,7 +1083,7 @@ void
 TRGCDC::simulate(void) {
     const unsigned n = _tss.size();
     for (unsigned i = 0; i < n; i++) {
-	CTTSegment & s = * _tss[i];
+	TCTSegment & s = * _tss[i];
 	s.simulate();
 	if (s.triggerOutput().active())
  	    _tsHits.push_back(& s);
@@ -1156,7 +1156,7 @@ TRGCDC::configure(void) {
 	if (lines != wid)
 	    continue;
 
-#ifdef CDCTRIGGER_DEBUG
+#ifdef TRGCDC_DEBUG
 // 	cout << lines
 // 	     << " " << wid
 // 	     << " " << lid
@@ -1167,24 +1167,24 @@ TRGCDC::configure(void) {
 #endif
 
 	//...Make a front-end board if necessary...
-	CTFrontEnd * f = 0;
+	TCFrontEnd * f = 0;
 	if (fid < _fronts.size())
 	    f = _fronts[fid];
 	if (! f) {
 	    const string name = "CDCFrontEnd_" + itostring(fid);
-	    f = new CTFrontEnd(name, _clock);
+	    f = new TCFrontEnd(name, _clock);
 	    _fronts.push_back(f);
 	}
 	f->push_back(_wires[wid]);
 
 	//...Make a merger board if necessary...
-	CTMerger * m = 0;
+	TCMerger * m = 0;
 	if (mid != 99999) {
 	    if (mid < _mergers.size())
 		m = _mergers[mid];
 	    if (! m) {
 		const string name = "CDCMerger_" + itostring(mid);
-		m = new CTMerger(name, _clock);
+		m = new TCMerger(name, _clock);
 		_mergers.push_back(m);
 	    }
 	    m->push_back(f);
@@ -1198,7 +1198,7 @@ TRGCDC::configure(void) {
     //...Make a link in each front-end...
     const unsigned nFronts = _fronts.size();
     for (unsigned i = 0; i < nFronts; i++) {
-	CTFrontEnd & f = * _fronts[i];
+	TCFrontEnd & f = * _fronts[i];
 	TRGLink * fl = new TRGLink(f.name(), f.clock());
 	f.append(fl);
  	const unsigned nWires = f.size();
@@ -1213,7 +1213,7 @@ TRGCDC::configure(void) {
 //     for (unsigned j = 0; j < 3; j++)
 // 	for (unsigned i = 0; i < 16; i++)
 // 	    fl->append(& (* _layers[j])[i]->triggerOutput());
-//     CTFrontEnd f("CDCFrontEnd_0", _clock);
+//     TCFrontEnd f("CDCFrontEnd_0", _clock);
 //     f.append(fl);
 
     

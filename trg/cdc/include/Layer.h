@@ -18,7 +18,7 @@
 #include <vector>
 
 #ifdef TRGCDC_SHORT_NAMES
-#define CTLayer TRGCDCLayer
+#define TCLayer TRGCDCLayer
 #endif
 
 namespace Belle2 {
@@ -118,7 +118,7 @@ class TRGCDCLayer : public std::vector<TRGCDCWire *> {
 
 //-----------------------------------------------------------------------------
 
-#ifdef TRGCDCLayer_NO_INLINE
+#ifdef TRGCDC_NO_INLINE
 #define inline
 #else
 #undef inline

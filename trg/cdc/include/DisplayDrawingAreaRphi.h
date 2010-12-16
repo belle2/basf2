@@ -11,17 +11,15 @@
 // $Log$
 //-----------------------------------------------------------------------------
 
-#ifdef CDCTRIGGER_DISPLAY
+#ifdef TRGCDC_DISPLAY
 
 #ifndef TRGCDCDisplayDrawingAreaRphi_FLAG_
 #define TRGCDCDisplayDrawingAreaRphi_FLAG_
 
-#include <vector>
-#include <gtkmm.h>
 #include "trg/cdc/DisplayDrawingArea.h"
 
 #ifdef TRGCDC_SHORT_NAMES
-#define CTDDAreaRphi TRGCDCDisplayDrawingAreaRphi
+#define TCDDAreaRphi TRGCDCDisplayDrawingAreaRphi
 #endif
 
 namespace Belle2 {
@@ -68,17 +66,6 @@ class TRGCDCDisplayDrawingAreaRphi : public TRGCDCDisplayDrawingArea {
     void append(const TRGCDCMerger &,
   		Gdk::Color color = Gdk::Color("grey"));
 
-//     void append(const std::vector<const Belle2::TRGCDCWireHit *> &,
-// 		Gdk::Color color = Gdk::Color("grey"));
-//     void append(const AList<TLink> &,
-// 		Gdk::Color color = Gdk::Color("grey"));
-//     void append(const AList<TSegment> &,
-// 		Gdk::Color color = Gdk::Color("grey"));
-//     void append(const AList<TTrack> &,
-// 		Gdk::Color color = Gdk::Color("grey"));
-//     void append(const AList<TCircle> &,
-// 		Gdk::Color color = Gdk::Color("grey"));
-
     virtual bool on_expose_event(GdkEventExpose *);
     virtual bool on_button_press_event(GdkEventButton *);
 
@@ -104,12 +91,6 @@ class TRGCDCDisplayDrawingAreaRphi : public TRGCDCDisplayDrawingArea {
 		    int lineWidth,
 		    Gdk::Color & c,
 		    Gdk::LineStyle s);
-
-//     void drawBase(const TTrackBase &, Gdk::Color & c);
-//     void drawSegment(const TSegment &, Gdk::Color & c);
-//     void drawTrack(const TTrack &, Gdk::Color & c);
-//     void drawLine(const TLine &, Gdk::Color & c);
-//    void drawCircle(const TCircle &, Gdk::Color & c);
 
     /// Coordinate transformations.
     int x(double x) const;
@@ -139,12 +120,6 @@ class TRGCDCDisplayDrawingAreaRphi : public TRGCDCDisplayDrawingArea {
     std::vector<const TRGCDCMerger *> _mergers;
     std::vector<Gdk::Color> _mergerColors;
 
-//    Gtk::Main * GtkMain;
-//     CAList<TTrackBase> _objects;
-//     AList<Gdk::Color> _colors;
-//     AList<TTrackBase> _selfObjects;
-//     AList<TLink> _selfTLinks;
-
     Glib::RefPtr<Gdk::Window> _window;
     int _winx, _winy, _winw, _winh, _wind;
 
@@ -156,13 +131,13 @@ class TRGCDCDisplayDrawingAreaRphi : public TRGCDCDisplayDrawingArea {
 
 //-----------------------------------------------------------------------------
 
-#ifdef TRASAN_NO_INLINE
+#ifdef TRGCDC_NO_INLINE
 #define inline
 #else
 #undef inline
-#define TWINDOWGTK_INLINE_DEFINE_HERE
+#define TRGCDCDisplayDrawingAreaRphi_INLINE_DEFINE_HERE
 #endif
-#ifdef TWINDOWGTK_INLINE_DEFINE_HERE
+#ifdef TRGCDCDisplayDrawingAreaRphi_INLINE_DEFINE_HERE
 
 inline
 double

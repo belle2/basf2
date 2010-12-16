@@ -11,7 +11,7 @@
 // $Log$
 //-----------------------------------------------------------------------------
 
-#ifdef CDCTRIGGER_DISPLAY
+#ifdef TRGCDC_DISPLAY
 
 #ifndef TRGCDCDisplayHough_FLAG_
 #define TRGCDCDisplayHough_FLAG_
@@ -21,7 +21,7 @@
 #include "trg/cdc/DisplayDrawingAreaHough.h"
 
 #ifdef TRGCDC_SHORT_NAMES
-#define CTDisplayHough TRGCDCDisplayHough
+#define TCDisplayHough TRGCDCDisplayHough
 #endif
 
 namespace Belle2 {
@@ -55,13 +55,13 @@ class TRGCDCDisplayHough : public TRGCDCDisplay {
 
 //-----------------------------------------------------------------------------
 
-#ifdef TRASAN_NO_INLINE
+#ifdef TRGCDC_NO_INLINE
 #define inline
 #else
 #undef inline
-#define TWINDOWGTK_INLINE_DEFINE_HERE
+#define TRGCDCDisplayHough_INLINE_DEFINE_HERE
 #endif
-#ifdef TWINDOWGTK_INLINE_DEFINE_HERE
+#ifdef TRGCDCDisplayHough_INLINE_DEFINE_HERE
 
 inline
 TRGCDCDisplayDrawingAreaHough &

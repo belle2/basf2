@@ -11,7 +11,7 @@
 // $Log$
 //-----------------------------------------------------------------------------
 
-#ifdef CDCTRIGGER_DISPLAY
+#ifdef TRGCDC_DISPLAY
 
 #ifndef TRGCDCDisplayDrawingArea_FLAG_
 #define TRGCDCDisplayDrawingArea_FLAG_
@@ -20,7 +20,7 @@
 #include <gtkmm.h>
 
 #ifdef TRGCDC_SHORT_NAMES
-#define CTDDArea TRGCDCDisplayDrawingArea
+#define TCDDArea TRGCDCDisplayDrawingArea
 #endif
 
 namespace Belle2 {
@@ -65,13 +65,13 @@ class TRGCDCDisplayDrawingArea : public Gtk::DrawingArea {
 
 //-----------------------------------------------------------------------------
 
-#ifdef TRASAN_NO_INLINE
+#ifdef TRGCDC_NO_INLINE
 #define inline
 #else
 #undef inline
-#define TWINDOWGTK_INLINE_DEFINE_HERE
+#define TRGCDCDisplayDrawingArea_INLINE_DEFINE_HERE
 #endif
-#ifdef TWINDOWGTK_INLINE_DEFINE_HERE
+#ifdef TRGCDCDisplayDrawingArea_INLINE_DEFINE_HERE
 
 inline
 double

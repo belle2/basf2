@@ -11,12 +11,9 @@
 // $Log$
 //-----------------------------------------------------------------------------
 
+#define TRGCDCHoughPlaneBase_INLINE_DEFINE_HERE
+
 #include "trg/cdc/HoughPlaneBase.h"
-// #include "tracking/modules/trasan/THoughPlane.h"
-// #include "tracking/modules/trasan/TRGPoint2D.h"
-// #ifdef TRASAN_DEBUG
-// #include "tracking/modules/trasan/TDebugUtilities.h"
-// #endif
 
 namespace Belle2 {
 

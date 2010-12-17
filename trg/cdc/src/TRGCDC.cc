@@ -46,7 +46,7 @@ TRGCDC::name(void) const {
 
 std::string
 TRGCDC::version(void) const {
-    return "5.01";
+    return "5.02";
 }
 
 TRGCDC *
@@ -420,8 +420,11 @@ TRGCDC::wire(unsigned layerId, int localId) const {
 //     return wire(r, phi);
 // }
 
-// const TRGCDCWire * const
-// TRGCDC::wire(float r, float p) const {
+const TRGCDCWire * const
+TRGCDC::wire(float r, float p) const {
+
+    //...Not implemented yet...
+    return _wires[0];
 
 // //     cout << "r,phi = " << r << "," << p << std::endl;
 
@@ -442,7 +445,7 @@ TRGCDC::wire(unsigned layerId, int localId) const {
 // //     unsigned localId = unsigned(phi(p) / dPhi);
 // //     return l->wire(localId);
 // }
-
+}
 void
 TRGCDC::clear(void) {
     unsigned i = 0;

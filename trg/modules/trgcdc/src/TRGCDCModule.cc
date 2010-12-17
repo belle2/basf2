@@ -49,7 +49,7 @@ REG_MODULE(TRGCDCModule, "TRGCDC");
 
 string
 TRGCDCModule::version() const {
-    return "0.01";
+    return "0.02";
 }
 
 TRGCDCModule::TRGCDCModule()
@@ -119,6 +119,10 @@ TRGCDCModule::beginRun() {
 
 void
 TRGCDCModule::event() {
+
+#ifdef TRGCDC_DISPLAY
+    D->beginningOfEvent();
+#endif
 
     //...CDC trigger...
     TRGCDC & cdc = * TRGCDC::getTRGCDC(_configFilename);
@@ -250,7 +254,6 @@ TRGCDCModule::event() {
     D->stage(stg);
     D->information(inf);
     D->clear();
-    D->beginEvent();
     D->area().append(cdc.hits());
     D->area().append(cdc.tsHits(), Gdk::Color("#6600FF009900"));
     H0->stage(stg);
@@ -264,6 +267,7 @@ TRGCDCModule::event() {
     H1->area().append(plane[1]);
     H1->show();
     H1->run();
+//    D->run();
 #endif
 #ifdef TRGCDC_DISPLAY
 //     unsigned iFront = 0;
@@ -280,6 +284,10 @@ TRGCDCModule::event() {
 // 	D->area().append(* f);
 // 	D->run();
 //     }
+#endif
+
+#ifdef TRGCDC_DISPLAY
+    D->endOfEvent();
 #endif
 }
 

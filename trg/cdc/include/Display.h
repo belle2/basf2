@@ -31,15 +31,11 @@ class TRGCDCDisplay : public Gtk::Window {
   public:
     /// Default constructor
     TRGCDCDisplay(const std::string & name,
-		      int sizeWindow = 600,
-	              int sizeMax = 600);
+		  int sizeWindow = 600,
+		  int sizeMax = 600);
 
     /// Destructor
     virtual ~TRGCDCDisplay();
-
-    /// Initializes.
-    void initialize(TRGCDCDisplayDrawingArea & w,
-		    int sizeWindow);
 
   public: // display control
 
@@ -50,7 +46,7 @@ class TRGCDCDisplay : public Gtk::Window {
     virtual void clear(void);
 
     /// tells window here is the beginning of an event.
-    void beginEvent(void);
+    void beginningOfEvent(void);
 
     /// tells window here is the end of an event.
     void endOfEvent(void);
@@ -60,18 +56,6 @@ class TRGCDCDisplay : public Gtk::Window {
 
     /// sets and returns skip flag.
     bool skip(bool);
-
-    /// returns scaler value.
-    double scale(void) const;
-
-    /// sets and returns scaler value.
-    double scale(double);
-
-    /// returns present condition for axial wire display.
-    bool axial(void) const;
-
-    /// returns present condition for stereo wire display.
-    bool stereo(void) const;
 
     /// returns present condition for wire name display.
     bool wireName(void) const;
@@ -87,18 +71,14 @@ class TRGCDCDisplay : public Gtk::Window {
   public: // Access to drawing area.
 
     /// returns drawing area.
-//    TRGCDCDisplayDrawingArea & area(void);
+    virtual TRGCDCDisplayDrawingArea & area(void) = 0;
 
   private: // Actions
     virtual void on_next(void);
     virtual void on_endOfEvent(void);
     virtual void on_nextEvent(void);
     virtual void on_positionReset(void);
-    virtual void on_scale_value_changed(void);
-    virtual void on_axial(void);
-    virtual void on_stereo(void);
     virtual void on_wireName(void);
-    virtual void on_BelleCDC(void);
 
   private: // Objects to display and control
     std::string _stage;
@@ -109,8 +89,6 @@ class TRGCDCDisplay : public Gtk::Window {
     static bool _skipEvent;
 
   private: // GTK stuff
-    bool _axial;
-    bool _stereo;
     bool _wireName;
     bool _oldCDC;
     Gtk::VBox _box0;
@@ -119,15 +97,12 @@ class TRGCDCDisplay : public Gtk::Window {
     Gtk::Button _buttonEndOfEvent;
     Gtk::Button _buttonNextEvent;
     Gtk::Label _label;
-    Gtk::HBox _scale;
-    Gtk::Adjustment _adjustment;
-    Gtk::HScale _scaler;
+    Gtk::HBox _bottom;
     Gtk::Button _buttonPositionReset;
-    Gtk::CheckButton _buttonAxial;
-    Gtk::CheckButton _buttonStereo;
     Gtk::CheckButton _buttonWireName;
-    Gtk::CheckButton _buttonBelleCDC;
-    TRGCDCDisplayDrawingArea * _w;
+
+    friend class TRGCDCDisplayRphi;
+    friend class TRGCDCDisplayHough;
 };
 
 //-----------------------------------------------------------------------------
@@ -169,31 +144,6 @@ TRGCDCDisplay::skip(bool a) {
 }
 
 inline
-double
-TRGCDCDisplay::scale(void) const {
-    return _scaler.get_value();
-}
-
-inline
-double
-TRGCDCDisplay::scale(double a) {
-    _scaler.set_value(a);
-    return _scaler.get_value();
-}
-
-inline
-bool
-TRGCDCDisplay::axial(void) const {
-    return _axial;
-}
-
-inline
-bool
-TRGCDCDisplay::stereo(void) const {
-    return _stereo;
-}
-
-inline
 bool
 TRGCDCDisplay::wireName(void) const {
     return _wireName;
@@ -201,7 +151,7 @@ TRGCDCDisplay::wireName(void) const {
 
 inline
 void
-TRGCDCDisplay::beginEvent(void) {
+TRGCDCDisplay::beginningOfEvent(void) {
     _skipEvent = false;
     _endOfEvent = false;
 }

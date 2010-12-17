@@ -30,7 +30,7 @@ class TRGCDCDisplayDrawingArea : public Gtk::DrawingArea {
 
   public:
     /// Default constructor
-    TRGCDCDisplayDrawingArea(int size, double innerR, double outerR);
+    TRGCDCDisplayDrawingArea(int size, double outerR);
     
     /// Destructor
     virtual ~TRGCDCDisplayDrawingArea();

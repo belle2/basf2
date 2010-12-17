@@ -30,19 +30,13 @@ using namespace std;
 
 namespace Belle2 {
 
-TRGCDCDisplayDrawingAreaHough::TRGCDCDisplayDrawingAreaHough(int size,
-							   double innerR,
-							   double outerR)
-    : TRGCDCDisplayDrawingArea(size, innerR, outerR),
-      _scale(double(size) / outerR / 2),
-      _axial(true),
-      _stereo(false),
+TRGCDCDisplayDrawingAreaHough::TRGCDCDisplayDrawingAreaHough(int size)
+    : TRGCDCDisplayDrawingArea(size, 10),
+      _scale(1),
       _wireName(false),
       _oldCDC(false),
       _x(0),
       _y(0),
-      _innerR(innerR),
-      _outerR(outerR),
       _hp(0) {
 
     _blue = Gdk::Color("blue");
@@ -53,10 +47,6 @@ TRGCDCDisplayDrawingAreaHough::TRGCDCDisplayDrawingAreaHough(int size,
     _gray = Gdk::Color("gray");
     _yellow = Gdk::Color("yellow");
 
-//     _gray0 = Gdk::Color("dcdddd");
-//     _gray1 = Gdk::Color("afafb0");
-//     _gray2 = Gdk::Color("949495");
-//     _gray3 = Gdk::Color("595857");
     _gray0 = Gdk::Color("gray90");
     _gray1 = Gdk::Color("gray80");
     _gray2 = Gdk::Color("gray70");
@@ -76,8 +66,6 @@ TRGCDCDisplayDrawingAreaHough::TRGCDCDisplayDrawingAreaHough(int size,
     colormap->alloc_color(_gray3);
 
     add_events(Gdk::EXPOSURE_MASK | Gdk::BUTTON_PRESS_MASK);
-
-    cout << "Drawing called ..." << endl;
 }
 
 TRGCDCDisplayDrawingAreaHough::~TRGCDCDisplayDrawingAreaHough() {
@@ -87,6 +75,11 @@ void
 TRGCDCDisplayDrawingAreaHough::on_realize() {
     Gtk::DrawingArea::on_realize();
     _window = get_window();
+    _window->get_geometry(_winx, _winy, _winw, _winh, _wind);
+    if (_hp) {
+	_x = _hp->nX() / 2;
+	_y = _hp->nY() / 2;
+    }
     _gc = Gdk::GC::create(_window);
     _window->set_background(_white);
     _window->clear();
@@ -103,6 +96,9 @@ TRGCDCDisplayDrawingAreaHough::on_expose_event(GdkEventExpose *) {
 
 bool
 TRGCDCDisplayDrawingAreaHough::on_button_press_event(GdkEventButton * e) {
+    cout << "x=" << e->x << ",y=" << e->y << endl;
+    _x = xR(e->x);
+    _y = yR(e->y);
     on_expose_event((GdkEventExpose *) NULL);
     return true;
 }
@@ -122,8 +118,10 @@ TRGCDCDisplayDrawingAreaHough::draw(void) {
     const float xMax = _hp->xMax();
     const float yMin = _hp->yMin();
     const float yMax = _hp->yMax();
-    const float scaleX = 1 / (xMax - xMin) * _winw;
-    const float scaleY = 1 / (yMax - yMin) * _winh;
+//     const float scaleX = 1 / (xMax - xMin) * _winw;
+//     const float scaleY = 1 / (yMax - yMin) * _winh;
+    _scaleX = _scale / (xMax - xMin) * _winw;
+    _scaleY = _scale / (yMax - yMin) * _winh;
 
     //...Search maximum...
     unsigned nMax = 0;
@@ -142,19 +140,15 @@ TRGCDCDisplayDrawingAreaHough::draw(void) {
 	for (unsigned j = 0; j < _hp->nY(); j++) {
 	    const unsigned n = _hp->entry(i, j);
 	    if (n) {
-		const float x = float(i) * _hp->xSize() * scaleX;
-		const float y = float(j) * _hp->ySize() * scaleY;
+		const float x = float(i) * _hp->xSize() * _scaleX;
+		const float y = float(j) * _hp->ySize() * _scaleY;
 
 		const int x0 = int(x);
 		const int y0 = int(y);
 		const int z0 = toY(y0);
-		const int x1 = int(x + _hp->xSize() * scaleX) - x0;
-		const int y1 = int(y + _hp->ySize() * scaleY) - y0;
+		const int x1 = int(x + _hp->xSize() * _scaleX) - x0;
+		const int y1 = int(y + _hp->ySize() * _scaleY) - y0;
 		const float level = float(n) / float(nMax);
-
-// 		if (n == nMax)
-// 		    std::cout << "y=" << (_hp->yMin() + float(j) * _hp->ySize())
-// 			   << " ";
 
 		if (level < 0.25)
 		    _gc->set_foreground(_gray0);
@@ -169,12 +163,31 @@ TRGCDCDisplayDrawingAreaHough::draw(void) {
 
 		_window->draw_rectangle(_gc, true, x0, z0, x1, y1);
 
-// 		if (n == nMax) std::cout << "x0,y0,z0,x1,y1=" << x0 << ","
-// 				      << y0 << "," << z0 << "," << x1 << ","
-// 				      << y1 << ",level=" << level << std::endl;
+// 		const int x2 = x0 - int(_x - _winw / 2);
+// 		const int y2 = z0 - int(_y - _winh / 2);
+// 		const int x2 = xT(i);
+// 		const int y2 = yT(j);
+// 		_gc->set_foreground(_green);
+// 		_window->draw_rectangle(_gc, true, x2, y2, x1, y1);
+
+//  		std::cout << "x0,y0,z0,x1,y1=" << x0 << ","
+// 			  << y0 << "," << z0 << "," << x1 << ","
+// 			  << y1 << ",level=" << level << std::endl;
+// 		std::cout << "x2,y2,x3,y3=" << x2 << ","
+// 			  << y2 << "," << ",level=" << level << std::endl;
+		
 	    }
 	}
     }
+
+    //...Draw boundary...
+    const int x0 = 0;
+    const int y0 = 0;
+    const int z0 = toY(y0);
+    const int x1 = int(_hp->xSize() * _scaleX);
+    const int y1 = int(_hp->ySize() * _scaleY);
+    _gc->set_foreground(_gray0);
+    _window->draw_rectangle(_gc, true, x0, z0, x1, y1);
 
 //  std::cout << "TWHDArea ... xMin,xMax,yMin,yMax=" << xMin << "," << xMax
 // 	   << "," << yMin << "," << yMax << std::endl;
@@ -195,15 +208,15 @@ TRGCDCDisplayDrawingAreaHough::draw(void) {
 	    unsigned iy = 0;
 	    _hp->id(id, ix, iy);
 
-	    const float x = float(ix) * _hp->xSize() * scaleX;
-	    const float y = float(iy) * _hp->ySize() * scaleY;
+	    const float x = float(ix) * _hp->xSize() * _scaleX;
+	    const float y = float(iy) * _hp->ySize() * _scaleY;
 
 	    const int x0 = int(x);
 	    const int y0 = int(y);
 	    const int z0 = toY(y0);
 
-	    const int x1 = int(x + _hp->xSize() * scaleX);
-	    const int y1 = int(y + _hp->ySize() * scaleY) - y0;
+	    const int x1 = int(x + _hp->xSize() * _scaleX);
+	    const int y1 = int(y + _hp->ySize() * _scaleY) - y0;
 	    const int z1 = z0 + y1;
 
 // 	    std::cout << "TWH ... id=" << id
@@ -259,6 +272,30 @@ TRGCDCDisplayDrawingAreaHough::draw(void) {
 
 void
 TRGCDCDisplayDrawingAreaHough::resetPosition(void) {
+    _x = _winw / 2;
+    _y = _winh / 2;
+}
+
+int
+TRGCDCDisplayDrawingAreaHough::xT(double x) const {
+    const double xx = x - _x + double(_hp->nX()) / 2;
+    return int(xx * _hp->xSize() * _scaleX);
+}
+
+int
+TRGCDCDisplayDrawingAreaHough::yT(double y) const {
+    const double yy = y - _y + double(_hp->nY()) / 2;
+    return - int(yy * _hp->ySize() * _scaleY) + _winh;
+}
+
+int
+TRGCDCDisplayDrawingAreaHough::xR(double x) const {
+    return int(x / _hp->xSize() * _scaleX);
+}
+
+int
+TRGCDCDisplayDrawingAreaHough::yR(double y) const {
+    return - int((y - double(_winh)) / _hp->ySize() / _scaleY);
 }
 
 } // namespace Belle2

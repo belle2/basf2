@@ -32,7 +32,7 @@ namespace Belle2 {
 TRGCDCDisplayDrawingAreaRphi::TRGCDCDisplayDrawingAreaRphi(int size,
 							   double innerR,
 							   double outerR)
-    : TRGCDCDisplayDrawingArea(size, innerR, outerR),
+    : TRGCDCDisplayDrawingArea(size, outerR),
       _scale(double(size) / outerR / 2),
       _axial(true),
       _stereo(false),

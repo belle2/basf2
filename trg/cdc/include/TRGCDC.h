@@ -107,7 +107,7 @@ class TRGCDC {
 //    const TRGCDCWire * const wire(const HepGeom::Point3D<double> & point) const;
 
     /// returns a pointer to a wire.
-//    const TRGCDCWire * const wire(float r, float phi) const;
+    const TRGCDCWire * const wire(float r, float phi) const;
 
     /// returns a pointer to a layer. 0 will be returned if 'id' is invalid.
     const TRGCDCLayer * const layer(unsigned id) const;

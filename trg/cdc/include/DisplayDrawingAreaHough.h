@@ -31,7 +31,7 @@ class TRGCDCDisplayDrawingAreaHough : public TRGCDCDisplayDrawingArea {
 
   public:
     /// Default constructor
-    TRGCDCDisplayDrawingAreaHough(int size, double innerR, double outerR);
+    TRGCDCDisplayDrawingAreaHough(int size);
     
     /// Destructor
     virtual ~TRGCDCDisplayDrawingAreaHough();
@@ -39,10 +39,6 @@ class TRGCDCDisplayDrawingAreaHough : public TRGCDCDisplayDrawingArea {
     double scale(double);
     double scale(void) const;
     void resetPosition(void);
-    bool axial(void) const;
-    bool axial(bool);
-    bool stereo(void) const;
-    bool stereo(bool);
     bool wireName(void) const;
     bool wireName(bool);
     bool oldCDC(void) const;
@@ -60,17 +56,21 @@ class TRGCDCDisplayDrawingAreaHough : public TRGCDCDisplayDrawingArea {
     void draw(void);
 
     /// Coordinate transformations.
+    int xT(double x) const;
+    int yT(double y) const;
+    int xR(double x) const;
+    int yR(double y) const;
+
+    /// Coordinate transformations (obsolete).
     int toY(int y) const;
 
   private:
     double _scale;
-    bool _axial;
-    bool _stereo;
+    double _scaleX;
+    double _scaleY;
     bool _wireName;
     bool _oldCDC;
     double _x, _y;
-    double _innerR;
-    double _outerR;
     const TRGCDCHoughPlane * _hp;
 
     Glib::RefPtr<Gdk::Window> _window;
@@ -101,30 +101,6 @@ inline
 double
 TRGCDCDisplayDrawingAreaHough::scale(void) const {
     return _scale;
-}
-
-inline
-bool
-TRGCDCDisplayDrawingAreaHough::axial(void) const {
-    return _axial;
-}
-
-inline
-bool
-TRGCDCDisplayDrawingAreaHough::axial(bool a) {
-    return _axial = a;
-}
-
-inline
-bool
-TRGCDCDisplayDrawingAreaHough::stereo(void) const {
-    return _stereo;
-}
-
-inline
-bool
-TRGCDCDisplayDrawingAreaHough::stereo(bool a) {
-    return _stereo = a;
 }
 
 inline

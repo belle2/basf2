@@ -1218,10 +1218,30 @@ TRGCDC::configure(void) {
 // 	    fl->append(& (* _layers[j])[i]->triggerOutput());
 //     TCFrontEnd f("CDCFrontEnd_0", _clock);
 //     f.append(fl);
-
-    
-
+   
     infile.close();
+}
+
+string
+TRGCDC::dateString(void) {
+    time_t t;
+    time(& t);
+    struct tm * tl;
+    tl = localtime(& t);
+    char ts1[80];
+    strftime(ts1, sizeof(ts1), "%Y/%m/%d %H:%M %Z", tl);
+    return (ts1);
+}
+
+string
+TRGCDC::dateStringF(void) {
+    time_t t;
+    time(& t);
+    struct tm * tl;
+    tl = localtime(& t);
+    char ts0[80];
+    strftime(ts0, sizeof(ts0), "%Y%m%d_%H%M", tl);
+    return string(ts0);
 }
 
 } // namespace Belle2

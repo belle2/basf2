@@ -322,10 +322,10 @@ class TRGCDC {
 
   public: // Utility functions
 
-    /// Converts int to string.
+    /// converts int to string.
     static std::string itostring(int i);
 
-    /// Converts double to string.
+    /// converts double to string.
     static std::string dtostring(double d, unsigned int precision);
 
     /// CERNLIB car.
@@ -333,6 +333,12 @@ class TRGCDC {
 
     /// CERNLIB cdr.
     static std::string cdrstring(const std::string &s);
+
+    /// returns date string.
+    static std::string dateString(void);
+
+    /// returns date string for filename.
+    static std::string dateStringF(void);
 
     /// Dumps bit contents to cout.
     static void bitDisplay(unsigned);

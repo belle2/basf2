@@ -14,7 +14,7 @@
 #ifndef TRGCDCFrontEnd_FLAG_
 #define TRGCDCFrontEnd_FLAG_
 
-#include <float.h>
+#include <fstream>
 #include <string>
 #include "trg/trg/Board.h"
 #include "trg/trg/Link.h"
@@ -32,6 +32,13 @@ class TRGCDCFrontEnd
     : public TRGBoard,
       public std::vector<const TRGCDCWire *> {
     
+  public:// enum
+    enum boardType {
+	inner = 0,
+	outer = 1,
+	unknown = 999
+    };
+
   public:
     /// Constructor.
     TRGCDCFrontEnd(const std::string & name, const TRGClock &);
@@ -41,14 +48,24 @@ class TRGCDCFrontEnd
 
   public:// Selectors.
 
+    /// returns version.
+    static std::string version(void);
+
+    /// returns type.
+    boardType type(void) const;
+
+    /// make a VHDL component file. Non-zero value will be returned if errors occured.
+    static int implementation(const boardType & type, std::ofstream &);
+
+    /// writes a port map.
+    static int implementationPort(const boardType & type, std::ofstream &);
+
 //     /// dumps contents. "message" is to select information to dump. "pre" will be printed in head of each line.
 //     void dump(const std::string & message = "",
 // 	      const std::string & pre = "") const;
 
   public:// Modifiers
 
-    /// appends wire
-//    void append(const TRGCDCWire *);
 };
 
 //-----------------------------------------------------------------------------

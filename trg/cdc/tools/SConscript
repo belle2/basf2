@@ -1,3 +1,5 @@
 Import('env')
-env['TOOLS_LIBS']['CDCTriggerConfig'] = ['trg', 'framework', 'cdc']
+#env['TOOLS_LIBS']['TRGCDCConfig'] = ['trg', 'framework', 'cdc']
+env['TOOLS_LIBS']['TRGCDCConfig'] = ['trg']
+env['TOOLS_LIBS']['TRGCDCFrontEndImplementation'] = ['trg']
 Return('env')

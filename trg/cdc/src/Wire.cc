@@ -12,9 +12,11 @@
 //-----------------------------------------------------------------------------
 
 #define TRGCDCWire_INLINE_DEFINE_HERE
+#define TRG_SHORT_NAMES
 #define TRGCDC_SHORT_NAMES
 
 #include "trg/trg/Clock.h"
+#include "trg/trg/Utilities.h"
 #include "trg/cdc/TRGCDC.h"
 #include "trg/cdc/Wire.h"
 #include "trg/cdc/WireHit.h"
@@ -27,10 +29,10 @@ using namespace std;
 namespace Belle2 {
 
 TRGCDCWire::TRGCDCWire(unsigned id,
-		   unsigned localId,
-		   TRGCDCLayer * l,
-		   const P3D & fp,
-		   const P3D & bp)
+		       unsigned localId,
+		       TRGCDCLayer * l,
+		       const P3D & fp,
+		       const P3D & bp)
     : _id(id),
       _localId(localId),
       _layer(l),
@@ -62,7 +64,7 @@ TRGCDCWire::dump(const string & msg, const string & pre) const {
 	msg.find("detail") != string::npos) {
 	for (unsigned i = 0; i < 7; i++)
 	    if (neighbor(i))
-		neighbor(i)->dump("", pre + TRGCDC::itostring(i) + "   ");
+		neighbor(i)->dump("", pre + TRGUtil::itostring(i) + "   ");
     }    
 }
   
@@ -404,13 +406,13 @@ string
 TRGCDCWire::name(void) const {
     if (axial())
 	return string("w") +
-	    TRGCDC::itostring(layerId()) +
+	    TRGUtil::itostring(layerId()) +
 	    string("-") +
-	    TRGCDC::itostring(_localId);
+	    TRGUtil::itostring(_localId);
     return string("w") + 
-	TRGCDC::itostring(layerId()) +
+	TRGUtil::itostring(layerId()) +
 	string("=") +
-	TRGCDC::itostring(_localId);
+	TRGUtil::itostring(_localId);
 }
 
 const TRGSignal &

@@ -12,17 +12,16 @@
 //-----------------------------------------------------------------------------
 
 #define TRGCDC_INLINE_DEFINE_HERE
+#define TRG_SHORT_NAMES
 #define TRGCDC_SHORT_NAMES
 
-#include <fstream>
-#include <iomanip>
-#include <math.h>
 #include "framework/datastore/StoreArray.h"
 #include "cdc/hitcdc/HitCDC.h"
 #include "cdc/geocdc/CDCGeometryPar.h"
 #include "trg/trg/Time.h"
 #include "trg/trg/Signal.h"
 #include "trg/trg/Link.h"
+#include "trg/trg/Utilities.h"
 #include "trg/cdc/TRGCDC.h"
 #include "trg/cdc/Wire.h"
 #include "trg/cdc/Layer.h"
@@ -46,7 +45,7 @@ TRGCDC::name(void) const {
 
 std::string
 TRGCDC::version(void) const {
-    return "5.02";
+    return "5.03";
 }
 
 TRGCDC *
@@ -781,9 +780,9 @@ TRGCDC::wireName(unsigned wireId) const {
 	    as = "=";
     }
     else {
-	return "invalid_wire(" + itostring(wireId) + ")";
+	return "invalid_wire(" + TRGUtil::itostring(wireId) + ")";
     }
-    return itostring(layerId(wireId)) + as + itostring(localId(wireId));
+    return TRGUtil::itostring(layerId(wireId)) + as + TRGUtil::itostring(localId(wireId));
 }
 
 unsigned
@@ -1015,73 +1014,6 @@ TRGCDC::neighbor(const TRGCDCWire & w0, const TRGCDCWire & w1) const {
     return false;
 }
 
-std::string
-TRGCDC::itostring(int i) {
-  std::ostringstream s;
-  s << i;
-  return s.str();
-}
-
-std::string
-TRGCDC::dtostring(double d, unsigned int precision) {
-  std::ostringstream s;
-  s << std::setprecision(precision) << d;
-  return s.str();
-}
-
-std::string
-TRGCDC::carstring(const std::string &s) {
-    std::string ret;
-//    const char * p = str;
-//    while ( *p && isspace(*p) ) p++;
-//    while ( *p && !isspace(*p) ) ret += *(p++);
-  int i;
-  int len = s.length();
-  for (i = 0; i < len; i++) {
-    if ( !isspace(s[i]) ) break;
-  }
-  for (; i < len; i++) {
-    if ( !isspace(s[i]) ) {
-      ret += s[i];
-    } else break;
-  }
-  return ret;
-}
-
-std::string
-TRGCDC::cdrstring(const std::string &s) {
-//    const char * p = str;
-//    while ( *p && isspace(*p) ) p++;
-//    while ( *p && !isspace(*p) ) p++;
-//    while ( *p && isspace(*p) ) p++;
-  int i;
-  int len = s.length();
-  for (i = 0; i < len; i++) {
-    if ( !isspace(s[i]) ) break;
-  }
-  for (; i < len; i++) {
-    if ( isspace(s[i]) ) break;
-  }
-  for (; i < len; i++) {
-    if ( !isspace(s[i]) ) break;
-  }
-  return s.substr(i);
-}
-
-void
-TRGCDC::bitDisplay(unsigned val) {
-    bitDisplay(val, 31, 0);
-}
-
-void
-TRGCDC::bitDisplay(unsigned val, unsigned f, unsigned l) {
-    unsigned i;
-    for (i = 0; i < f - l; i++) {
-        if ((i % 8) == 0) cout << " ";
-	cout << (val >> (f - i)) % 2;
-    }
-}
-
 void
 TRGCDC::simulate(void) {
     const unsigned n = _tss.size();
@@ -1121,8 +1053,8 @@ TRGCDC::configure(void) {
 	unsigned mid = 0;
 	unsigned tid = 0;
 	for (unsigned i = 0; i < 5; i++) {
-	    const string car = TRGCDC::carstring(cdr);
-	    cdr = TRGCDC::cdrstring(cdr);
+	    const string car = TRGUtil::carstring(cdr);
+	    cdr = TRGUtil::cdrstring(cdr);
 
 	    if (car == "#") {
 		skip = true;
@@ -1174,7 +1106,7 @@ TRGCDC::configure(void) {
 	if (fid < _fronts.size())
 	    f = _fronts[fid];
 	if (! f) {
-	    const string name = "CDCFrontEnd_" + itostring(fid);
+	    const string name = "CDCFrontEnd_" + TRGUtil::itostring(fid);
 	    f = new TCFrontEnd(name, _clock);
 	    _fronts.push_back(f);
 	}
@@ -1186,7 +1118,7 @@ TRGCDC::configure(void) {
 	    if (mid < _mergers.size())
 		m = _mergers[mid];
 	    if (! m) {
-		const string name = "CDCMerger_" + itostring(mid);
+		const string name = "CDCMerger_" + TRGUtil::itostring(mid);
 		m = new TCMerger(name, _clock);
 		_mergers.push_back(m);
 	    }
@@ -1220,28 +1152,6 @@ TRGCDC::configure(void) {
 //     f.append(fl);
    
     infile.close();
-}
-
-string
-TRGCDC::dateString(void) {
-    time_t t;
-    time(& t);
-    struct tm * tl;
-    tl = localtime(& t);
-    char ts1[80];
-    strftime(ts1, sizeof(ts1), "%Y/%m/%d %H:%M %Z", tl);
-    return (ts1);
-}
-
-string
-TRGCDC::dateStringF(void) {
-    time_t t;
-    time(& t);
-    struct tm * tl;
-    tl = localtime(& t);
-    char ts0[80];
-    strftime(ts0, sizeof(ts0), "%Y%m%d_%H%M", tl);
-    return string(ts0);
 }
 
 } // namespace Belle2

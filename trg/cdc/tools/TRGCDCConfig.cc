@@ -11,13 +11,15 @@
 // $Log$
 //-----------------------------------------------------------------------------
 
+#define TRG_SHORT_NAMES
+
 #include <cstdlib>
 #include <ctime>
 #include <iostream>
 #include <fstream>
 #include <string>
 #include <vector>
-#include "trg/cdc/TRGCDC.h"
+#include "trg/trg/Utilities.h"
 
 using namespace std;
 using namespace Belle2;
@@ -44,8 +46,8 @@ main(int argc, char * argv[]) {
     }
 
     //...Date...
-    string ts0 = TRGCDC::dateStringF();
-    string ts1 = TRGCDC::dateString();
+    string ts0 = TRGUtil::dateStringF();
+    string ts1 = TRGUtil::dateString();
 
     //...2nd argument...
     const string version = argv[2];
@@ -89,8 +91,8 @@ main(int argc, char * argv[]) {
 
 	bool skip = false;
 	for (unsigned i = 0; i < 7; i++) {
-	    string car = TRGCDC::carstring(l);
-	    l = TRGCDC::cdrstring(l);
+	    string car = TRGUtil::carstring(l);
+	    l = TRGUtil::cdrstring(l);
 
 	    if (car == "#") {
 		skip = true;

@@ -12,7 +12,10 @@
 //-----------------------------------------------------------------------------
 
 #define TRGCDCHoughPlaneMulti2_INLINE_DEFINE_HERE
+#define TRG_SHORT_NAMES
+#define TRGCDC_SHORT_NAMES
 
+#include "trg/trg/Utilities.h"
 #include "trg/cdc/TRGCDC.h"
 #include "trg/cdc/HoughPlaneMulti2.h"
 
@@ -32,9 +35,15 @@ TRGCDCHoughPlaneMulti2::TRGCDCHoughPlaneMulti2(const std::string & name,
     for (unsigned i = 0; i < N_LAYERS; i++)
 	_usage[i] = false;
     for (unsigned i = 0; i < _nLayers; i++)
-	_layers[i] = new TRGCDCHoughPlaneBoolean(name + ":layer" + TRGCDC::itostring(i),
-					    nX, xMin, xMax,
-					    nY, yMin, yMax);
+	_layers[i] = new TCHPlaneBoolean(name +
+					 ":layer" +
+					 TRGUtil::itostring(i),
+					 nX,
+					 xMin,
+					 xMax,
+					 nY,
+					 yMin,
+					 yMax);
     if (nLayers > N_LAYERS)
 	std::cout
 	    << "Too many layers requested(" << _nLayers << ") : "

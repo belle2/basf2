@@ -12,9 +12,11 @@
 //-----------------------------------------------------------------------------
 
 #define TRGCDCTrackSegment_INLINE_DEFINE_HERE
+#define TRG_SHORT_NAMES
 #define TRGCDC_SHORT_NAMES
 
 #include <iostream>
+#include "trg/trg/Utilities.h"
 #include "trg/cdc/TRGCDC.h"
 #include "trg/cdc/TrackSegment.h"
 
@@ -25,8 +27,8 @@ using namespace std;
 namespace Belle2 {
 
 TRGCDCTrackSegment::TRGCDCTrackSegment(unsigned id,
-					       const TCWire & w,
-					       const TRGCDCLayer * layer,
+				       const TCWire & w,
+				       const TRGCDCLayer * layer,
 			     const std::vector<const TRGCDCWire *> & cells)
 
     : TCWire::TCWire(w),
@@ -35,7 +37,7 @@ TRGCDCTrackSegment::TRGCDCTrackSegment(unsigned id,
       _localId(w.localId()),
       _layer(layer),
       _wires(cells),
-      _signal(std::string("TS_") + TRGCDC::itostring(id)) {
+      _signal(std::string("TS_") + TRGUtil::itostring(id)) {
 }
 
 TRGCDCTrackSegment::~TRGCDCTrackSegment() {
@@ -82,8 +84,8 @@ TRGCDCTrackSegment::name(void) const {
 	t = "-";
     else
 	t = "=";
-    string n0 = string("TS") + TRGCDC::itostring(layerId());
-    string n1 = TRGCDC::itostring(_localId);
+    string n0 = string("TS") + TRGUtil::itostring(layerId());
+    string n1 = TRGUtil::itostring(_localId);
     return n0 + t + n1;
 }
 

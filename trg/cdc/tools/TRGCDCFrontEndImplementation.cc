@@ -11,13 +11,15 @@
 // $Log$
 //-----------------------------------------------------------------------------
 
+#define TRG_SHORT_NAMES
+
 #include <cstdlib>
 #include <ctime>
 #include <iostream>
 #include <fstream>
 #include <string>
 #include <vector>
-#include "trg/cdc/TRGCDC.h"
+#include "trg/trg/Utilities.h"
 #include "trg/cdc/FrontEnd.h"
 
 using namespace std;
@@ -26,7 +28,6 @@ using namespace Belle2;
 #define DEBUG_LEVEL   0
 #define NAME          "TRGCDCFrontEndImplementation"
 #define VERSION       "version 0.00"
-#define ENV_PATH      "BELLE2_LOCAL_DIR"
 #define NOT_CONNECTED 99999
 
 int
@@ -43,8 +44,8 @@ main(int argc, char * argv[]) {
     }
 
     //...Date...
-    string ts0 = TRGCDC::dateStringF();
-    string ts1 = TRGCDC::dateString();
+    string ts0 = TRGUtil::dateStringF();
+    string ts1 = TRGUtil::dateString();
 
     //...2nd argument...
     const string version = argv[1];

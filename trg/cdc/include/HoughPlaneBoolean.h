@@ -17,6 +17,10 @@
 
 #include "trg/cdc/HoughPlaneBase.h"
 
+#ifdef TRGCDC_SHORT_NAMES
+#define TCHPlaneBoolean TRGCDCHoughPlaneBoolean
+#endif
+
 namespace Belle2 {
 
 /// A class to represent a Hough parameter plane.

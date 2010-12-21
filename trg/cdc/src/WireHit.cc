@@ -12,7 +12,11 @@
 //-----------------------------------------------------------------------------
 
 #define TRGCDCWireHit_INLINE_DEFINE_HERE
+#define TRG_SHORT_NAMES
+#define TRGCDC_SHORT_NAMES
 
+
+#include "trg/trg/Utilities.h"
 #include "trg/cdc/Wire.h"
 #include "trg/cdc/WireHit.h"
 #include "trg/cdc/WireHitMC.h"
@@ -67,7 +71,7 @@ TRGCDCWireHit::dump(const std::string & msg,
     if (msg.find("state") != std::string::npos ||
 	msg.find("detail") != std::string::npos) {
 	std::cout << ",state";
-	TRGCDC::bitDisplay(_state);
+	TRGUtil::bitDisplay(_state);
 	if (track()) std::cout << ",trk ";
     }
     if (msg.find("drift") != std::string::npos ||

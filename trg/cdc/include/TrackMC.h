@@ -16,6 +16,7 @@
 
 #include <vector>
 #include "CLHEP/Vector/LorentzVector.h"
+#include "trg/trg/Utilities.h"
 #include "trg/cdc/TRGCDC.h"
 
 #ifdef TRGCDC_SHORT_NAMES
@@ -151,7 +152,7 @@ TRGCDCTrackMC::v(void) const {
 inline
 std::string
 TRGCDCTrackMC::name(void) const {
-    return "mc" + TRGCDC::itostring(id());
+    return "mc" + TRGUtilities::itostring(id());
 }
 
 #endif

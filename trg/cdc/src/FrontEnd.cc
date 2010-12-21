@@ -11,9 +11,11 @@
 // $Log$
 //-----------------------------------------------------------------------------
 
+#define TRG_SHORT_NAMES
 #define TRGCDC_SHORT_NAMES
 #define TRGCDCFrontEnd_INLINE_DEFINE_HERE
 
+#include "trg/trg/Utilities.h"
 #include "trg/cdc/TRGCDC.h"
 #include "trg/cdc/FrontEnd.h"
 #include "trg/cdc/Wire.h"
@@ -98,7 +100,7 @@ TRGCDCFrontEnd::implementationPort(const TRGCDCFrontEnd::boardType & type,
     //...Fine timing for each wire...
     outfile << "       -- Fine timing within 125MHz clock" << endl;
     for (unsigned i = 0; i < 48; i++) {
-	outfile << "          w" << TRGCDC::itostring(i)
+	outfile << "          w" << TRGUtil::itostring(i)
 		<< " : in std_logic_vector(0 to 3);" << endl;
     }
 

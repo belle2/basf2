@@ -140,7 +140,9 @@
 #  endif
 #endif
 
+#define TRG_SHORT_NAMES
 
+#include "trg/trg/Utilities.h"
 #include "trg/cdc/TRGCDC.h"
 
 #include "trg/cdc/WireHitMC.h"
@@ -452,7 +454,7 @@ TTrackMC::dump(const std::string & msg, const std::string & pre) const {
     else if (_quality & TTrackCharge) std::cout << "bad    :";
     else if (_quality & TTrackGarbage) std::cout << "garbage:";
     else std::cout << "classification error:";
-    Belle2::TRGCDC::bitDisplay(_quality, 23, 15); std::cout << ":";
+    Belle2::TRGUtil::bitDisplay(_quality, 23, 15); std::cout << ":";
     std::cout << _hepID << ":";
     std::cout << _wireFraction << "," << _wireFractionHEP << ":";
     std::cout << _ptFraction << "," << _pzFraction;

@@ -8,6 +8,7 @@
 # 2010-11
 
 import mdclient
+import mdinterface
 import sys
 
 sys.path.append('../')
@@ -39,15 +40,20 @@ class AmgaClient(object):
 
 ###############################################################################
 
-    def getSubdirectories(self, dir):
+    def getSubdirectories(self, dir, relative=False):
         '''
         Get subdirectories in metadata catalog.
         '''
 
         result = []
         self.client.execute('ls ' + dir)
-        while not self.client.eot():
-            result.append(dir + '/' + self.client.fetchRow().split('/')[-1])
+        if relative or dir == '/':
+            while not self.client.eot():
+                result.append(self.client.fetchRow().split('/')[-1])
+        else:
+            while not self.client.eot():
+                result.append(dir + '/' + self.client.fetchRow().split('/'
+                              )[-1])
         return result
 
 ###############################################################################

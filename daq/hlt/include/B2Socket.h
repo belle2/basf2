@@ -68,8 +68,6 @@ namespace Belle2 {
     //! Validation checking
     EStatus is_valid() const;
 
-    //void displayError(const std::string caller, int errno);
-
   private:
     int m_sock;               /*!< Socket identifier */
     sockaddr_in m_addr;       /*!< sockaddr_in structure for manipulating socket */

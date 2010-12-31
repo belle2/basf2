@@ -29,6 +29,8 @@ HLTFramework::HLTFramework(ENodeType nodeType, std::string xmlHLTInfo)
 
 HLTFramework::~HLTFramework()
 {
+  delete m_nodeManager;
+
   delete m_HLTManager;
   delete m_HLTProcess;
 }
@@ -52,20 +54,37 @@ EStatus HLTFramework::init()
 EStatus HLTFramework::initProcessNode()
 {
   m_nodeManager = new NodeManager();
-  m_nodeInfo = m_nodeManager->listen();
-  m_nodeManager->setNodeInfo(m_nodeInfo);
+  EStatus initCode = m_nodeManager->init("NDEF");
 
-  if (m_nodeManager->nodeInfo()->type() == "ES") {
-    B2INFO("Assignment as a event separator");
-  } else if (m_nodeManager->nodeInfo()->type() == "WN") {
-    B2INFO("Assignment as a worker node");
-  } else if (m_nodeManager->nodeInfo()->type() == "EM") {
-    B2INFO("Assignment as a event merger");
-  } else {
-    B2ERROR("Wrong node type");
+  // For the framework itself because forked EvtSender and EvtReceiver never return c_Success
+  if (initCode == c_Success) {
+    m_nodeInfo = m_nodeManager->listen();
+    m_nodeManager->setNodeInfo(m_nodeInfo);
+
+    if (m_nodeManager->nodeInfo()->type() == "ES") {
+      B2INFO("Assignment as a event separator");
+    } else if (m_nodeManager->nodeInfo()->type() == "WN") {
+      B2INFO("Assignment as a worker node");
+    } else if (m_nodeManager->nodeInfo()->type() == "EM") {
+      B2INFO("Assignment as a event merger");
+    } else {
+      B2ERROR("Wrong node type");
+    }
+
+    m_nodeManager->Print();
+
+    return c_Success;
   }
+  // For forked components (EvtSender and EvtReceiver)
+  else if (initCode == c_TermCalled) {
+    if (m_nodeManager->isEvtSender()) {
+      B2INFO("EvtSender termination...");
+    } else if (m_nodeManager->isEvtReceiver()) {
+      B2INFO("EvtReceiver termination...");
+    }
 
-  m_nodeManager->Print();
+    return c_TermCalled;
+  }
 }
 
 EStatus HLTFramework::initManager()

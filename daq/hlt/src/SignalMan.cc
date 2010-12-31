@@ -38,13 +38,6 @@ SignalMan::SignalMan(const int inPort, const int outPort, std::vector<std::strin
 
 SignalMan::~SignalMan(void)
 {
-  /*
-  B2INFO ("Killing EvtSender " << m_pidEvtSender);
-  kill (m_pidEvtSender, -9);
-  B2INFO ("Killing EvtReceiver " << m_pidEvtReceiver);
-  kill (m_pidEvtReceiver, -9);
-  */
-
   if (m_pidEvtSender != 0 && m_pidEvtReceiver != 0) {
     delete m_inBuf;
     delete m_outBuf;
@@ -59,9 +52,15 @@ EStatus SignalMan::init(void)
   m_inBuf = new RingBuffer(inBufName, 1024);
   m_outBuf = new RingBuffer(outBufName, 1024);
 
+  return doCommunication();
+}
+
+EStatus SignalMan::doCommunication(void)
+{
   // Forking off an event sender to send data
   m_pidEvtSender = fork();
   if (m_pidEvtSender == 0) {
+    m_pidEvtReceiver = 1;
     m_sender = EvtSender(m_dest[0], m_outPort);
     if (m_sender.init(m_outBuf) == c_InitFailed) {
       B2ERROR("Could not initialize EvtSender.");
@@ -87,6 +86,7 @@ EStatus SignalMan::init(void)
   // Forking off an event receiver to take data
   m_pidEvtReceiver = fork();
   if (m_pidEvtReceiver == 0) {
+    m_pidEvtSender = 1;
     m_receiver = EvtReceiver(m_inPort);
     if (m_receiver.init(m_inBuf) == c_InitFailed) {
       B2ERROR("Could not initialize EvtReceiver.");
@@ -157,30 +157,37 @@ std::vector<std::string> SignalMan::dest()
 
 int SignalMan::isMother()
 {
-  if ((m_pidEvtSender != 0) && (m_pidEvtReceiver != 0))
-    return 1;
-  else
-    return 0;
+  return (m_pidEvtSender && m_pidEvtReceiver);
+}
+
+int SignalMan::isEvtSender()
+{
+  return !(m_pidEvtSender);
+}
+
+int SignalMan::isEvtReceiver()
+{
+  return !(m_pidEvtReceiver);
 }
 
 std::string SignalMan::get(void)
 {
-  if (m_pidEvtSender != 0 && m_pidEvtReceiver != 0) {
-    while (1) {
-      if (m_inBuf->numq() > 0) {
-        char* tmp = new char[255];
-        m_inBuf->remq((int*)tmp);
-        std::string input(tmp);
+  //if (m_pidEvtSender != 0 && m_pidEvtReceiver != 0) {
+  while (1) {
+    if (m_inBuf->numq() > 0) {
+      char* tmp = new char[255];
+      m_inBuf->remq((int*)tmp);
+      std::string input(tmp);
 
-        /*
-           if (input == "EOF")
-           break;
-           */
+      /*
+         if (input == "EOF")
+         break;
+         */
 
-        return input;
-      }
+      return input;
     }
   }
+  //}
   /*
   if (m_outBuffer->ninsq () > 0) {
     return m_inBuf->get ();
@@ -206,13 +213,17 @@ void SignalMan::put(const std::string data)
   */
 }
 
+// unused?
 void SignalMan::broadCasting(void)
 {
   m_sender.connect();
 }
 
+// unused?
 std::string SignalMan::listening(void)
 {
+  B2INFO("m_pidEvtSender = " << m_pidEvtSender);
+  B2INFO("m_pidEvtReceiver = " << m_pidEvtReceiver);
   while (1) {
     if (m_inBuf->numq() > 0) {
       char* tmp = new char[255];

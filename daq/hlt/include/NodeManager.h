@@ -15,6 +15,7 @@
 #include <string>
 
 #include <framework/logging/Logger.h>
+
 #include <daq/hlt/HLTDefs.h>
 #include <daq/hlt/SignalMan.h>
 #include <daq/hlt/Node.h>
@@ -36,7 +37,7 @@ namespace Belle2 {
     ~NodeManager(void);
 
     //! Initializing the node information
-    int init(const std::string manager);
+    EStatus init(const std::string manager);
     void setNodeInfo(std::string nodeinfo);
 
     //! Setting unique unit number of this node
@@ -51,12 +52,15 @@ namespace Belle2 {
     void buildNodeInfo(void);
     NodeInfo* nodeInfo(void);
 
+    int isEvtSender(void);
+    int isEvtReceiver(void);
+
     //! Print information of the current node (only for internal testing)
     void Print(void);
 
   protected:
     //! Initializing SignalMan object for communications (protected)
-    int initSignalMan(void);
+    EStatus initSignalMan(void);
 
   private:
     std::string m_manager;        /*!< IP address of manager node */

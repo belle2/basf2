@@ -58,6 +58,8 @@ namespace Belle2 {
     std::vector<std::string> dest(void);
 
     int isMother(void);
+    int isEvtSender(void);
+    int isEvtReceiver(void);
 
     //! Get data from buffer
     std::string get(void);
@@ -69,6 +71,9 @@ namespace Belle2 {
 
     //! Print information of this SignalMan object (only for internal testing)
     const void Print(void);
+
+  protected:
+    EStatus doCommunication(void);
 
   private:
     int m_inPort, m_outPort;      /*!< Ports number for data communication */

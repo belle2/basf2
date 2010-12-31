@@ -15,6 +15,9 @@
 #include <libxml/parser.h>
 #include <libxml/tree.h>
 
+#include <framework/logging/Logger.h>
+
+#include <daq/hlt/HLTDefs.h>
 #include <daq/hlt/UnitInfo.h>
 #include <daq/hlt/UnitManager.h>
 
@@ -31,8 +34,8 @@ namespace Belle2 {
     XMLParser(char* filename);
     ~XMLParser(void);
 
-    int parsing(void);
-    int parsing(xmlNodePtr cur);
+    EStatus parsing(void);
+    EStatus parsing(xmlNodePtr cur);
     void unitParsing(xmlNodePtr cur, UnitInfo& unit);
 
     char* inputName(void);
@@ -46,7 +49,7 @@ namespace Belle2 {
     void Print(void);
 
   private:
-    int init(void);
+    EStatus init(void);
 
     int m_expNo;
     int m_runStart;

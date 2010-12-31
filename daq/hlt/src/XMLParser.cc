@@ -9,7 +9,6 @@
  **************************************************************************/
 
 #include <daq/hlt/XMLParser.h>
-#include <framework/logging/Logger.h>
 
 using namespace Belle2;
 
@@ -39,38 +38,36 @@ XMLParser::~XMLParser(void)
 }
 
 /// @brief Initialize the parsing
-/// @return 0 for success
-/// @return -1 for error (Wrong format)
-int XMLParser::init(void)
+/// @return c_Success Initialization sucess
+/// @return c_InitFailed Initialization failed (wrong format of xml)
+EStatus XMLParser::init(void)
 {
   m_docPtr = xmlParseFile(m_filename);
   m_curNode = xmlDocGetRootElement(m_docPtr);
 
   if (xmlStrcmp(m_curNode->name, (const xmlChar*)"HLT")) {
     B2ERROR("Wrong format input");
-    return -1;
+    return c_InitFailed;
   }
 
-  return 0;
+  return c_Success;
 }
 
 /// @brief Do parsing (Unnecessary function?)
-/// @return 0 for success
-/// @return -1 for error
+/// @return c_Success Parsing success
+/// @return c_FuncError Parsing failed
 /// @sa parsing
-int XMLParser::parsing(void)
+EStatus XMLParser::parsing(void)
 {
   return parsing(m_curNode);
 }
 
 /// @brief Actual parsing part
 /// @param cur Pointer to a node in XML tree
-/// @return 0 for success
-/// @return -1 for error
-int XMLParser::parsing(xmlNodePtr cur)
+/// @return c_Success Parsing success
+/// @return c_FuncError Parsing failed
+EStatus XMLParser::parsing(xmlNodePtr cur)
 {
-  //std::cout << "[\033[22;35mManager\033[0m] Starting to parse XML file" << std::endl;
-
   xmlChar* key;
   cur = cur->xmlChildrenNode;
 
@@ -82,7 +79,7 @@ int XMLParser::parsing(xmlNodePtr cur)
         m_expNo = atoi((char*)key);
       else {
         B2ERROR("Parsing Error: Redundant exp no.");
-        return -1;
+        return c_FuncError;
       }
     } else if (!xmlStrcmp(cur->name, (const xmlChar*)"RunStart")) {
       if (m_runStart < 0)
@@ -92,7 +89,7 @@ int XMLParser::parsing(xmlNodePtr cur)
         m_runEnd = atoi((char*)key);
       else if (m_runStart > atoi((char*)key)) {
         B2ERROR("Parsing Error: Wrong run no. range");
-        return -1;
+        return c_FuncError;
       }
     } else if (!xmlStrcmp(cur->name, (const xmlChar*)"Name")) {
       m_inputName = (char*)key;
@@ -112,7 +109,7 @@ int XMLParser::parsing(xmlNodePtr cur)
     cur = cur->next;
   }
 
-  return 0;
+  return c_Success;
 }
 
 /// @brief Parsing a single unit
@@ -187,15 +184,17 @@ std::vector<UnitInfo>::iterator XMLParser::unitInfo(void)
   return m_units.begin();
 }
 
-/// @brief Print the entire information
+/// @brief Print the entire information (only for debugging)
 void XMLParser::Print(void)
 {
-  std::cout << "Name = " << m_inputName << std::endl;
-  std::cout << "Description = " << m_inputDescription << std::endl;
-  std::cout << "ExpNo = " << m_expNo << std::endl;
-  std::cout << "RunNo = " << m_runStart << "-" << m_runEnd << std::endl;
-
-  std::cout << "# of Units = " << m_units.size() << std::endl;
+  B2INFO("=================================================");
+  B2INFO(" XMLParser Summary");
+  B2INFO("   Name        = " << m_inputName);
+  B2INFO("   Description = " << m_inputDescription);
+  B2INFO("   ExpNo       = " << m_expNo);
+  B2INFO("   RunNo       = " << m_runStart << " - " << m_runEnd);
+  B2INFO("   # of Units  = " << m_units.size());
   for (std::vector<UnitInfo>::iterator i = m_units.begin(); i != m_units.end(); i++)
     (*i).Print();
+  B2INFO("=================================================");
 }

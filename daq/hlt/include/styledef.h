@@ -1,9 +1,0 @@
-const std::string __RED = "\033[22;31m";
-const std::string __GREEN = "\033[22;32m";
-const std::string __YELLOW = "\033[22;33m";
-const std::string __BLUE = "\033[22;34m";
-const std::string __PUPPLE = "\033[22;35m";
-const std::string __DARKGREEN = "\033[22;36m";
-const std::string __WHITE = "\033[22;37m";
-const std::string __GREY = "\033[22;38m";
-const std::string __END = "\033[0m";

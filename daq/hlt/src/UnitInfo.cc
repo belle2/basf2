@@ -10,7 +10,7 @@
 
 #include <iostream>
 
-#include "framework/dcore/UnitInfo.h"
+#include <daq/hlt/UnitInfo.h>
 
 using namespace Belle2;
 

@@ -21,13 +21,35 @@ namespace Belle2 {
   class HLTFramework {
   public:
     HLTFramework(ENodeType nodeType = c_ProcessNode);
+    HLTFramework(ENodeType nodeType, std::string xmlHLTInfo);
     ~HLTFramework();
+
+    EStatus init(void);
+
+    EStatus initProcessNode(void);
+    EStatus initManager(void);
+
+    EStatus nodeType(ENodeType nodeType);
+    ENodeType nodeType(void);
+    EStatus xmlHLTInfo(std::string xmlHLTInfo);
+    std::string xmlHLTInfo(void);
+
+    // For processing node
+    EStatus beginRun(void);
+
   private:
     ENodeType m_nodeType;
 
     HLTManager* m_HLTManager;
     HLTProcess* m_HLTProcess;
+    NodeManager* m_nodeManager;
 
+    std::string m_nodeInfo;
+
+    std::string m_pidBasf2;
+    std::string m_pidNodeManager;
+
+    std::string m_xmlHLTInfo;
     std::string m_inputNodeInfo;
   };
 }

@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "framework/dcore/UnitManager.h"
+#include <daq/hlt/UnitManager.h>
 #include <framework/logging/Logger.h>
 
 using namespace Belle2;
@@ -62,6 +62,7 @@ NodeInfo* UnitManager::buildNodeInfo(const std::string type, const int nodeNo, U
 {
   NodeInfo* nodeinfo = new NodeInfo(type, unit.unitNo(), nodeNo);
   nodeinfo->setPortControl(CONTROLPORT);
+  nodeinfo->setPortControl(c_InfoInPort);
   nodeinfo->setManagerIP(unit.manager());
 
   if (type == "ES") {

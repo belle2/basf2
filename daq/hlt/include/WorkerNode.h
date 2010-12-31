@@ -15,9 +15,9 @@
 #include <string>
 #include <vector>
 
-#include "framework/dcore/Node.h"
-#include "framework/dcore/SignalMan.h"
-#include "framework/dcore/EventProcess.h"
+#include <daq/hlt/Node.h>
+#include <daq/hlt/SignalMan.h>
+#include <daq/hlt/EventProcess.h>
 
 namespace Belle2 {
 

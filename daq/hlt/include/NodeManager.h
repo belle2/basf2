@@ -14,9 +14,11 @@
 #include <iostream>
 #include <string>
 
-#include "framework/dcore/SignalMan.h"
-#include "framework/dcore/Node.h"
-#include "framework/dcore/NodeInfo.h"
+#include <framework/logging/Logger.h>
+#include <daq/hlt/HLTDefs.h>
+#include <daq/hlt/SignalMan.h>
+#include <daq/hlt/Node.h>
+#include <daq/hlt/NodeInfo.h>
 
 namespace Belle2 {
 

@@ -15,12 +15,10 @@
 #include <string>
 #include <vector>
 
-#include <framework/pcore/RingBuffer.h>
-
-#include "framework/dcore/B2SocketException.h"
-#include "framework/dcore/EvtSender.h"
-#include "framework/dcore/EvtReceiver.h"
-#include "framework/dcore/HLTBuffer.h"
+#include <daq/hlt/RingBuffer.h>
+#include <daq/hlt/B2SocketException.h>
+#include <daq/hlt/EvtSender.h>
+#include <daq/hlt/EvtReceiver.h>
 
 namespace Belle2 {
 
@@ -49,8 +47,6 @@ namespace Belle2 {
     //! Setting IP address of destination which should take data
     const void setDest(const std::string dest);
     const void setDest(std::vector<std::string> dest);
-    //! Connecting buffers which are initialized by Node class
-    const void setBuffer(HLTBuffer* inBuffer, HLTBuffer* outBuffer);
 
     RingBuffer* getInBuffer(void);
     RingBuffer* getOutBuffer(void);
@@ -75,9 +71,6 @@ namespace Belle2 {
     int m_inPort, m_outPort;      /*!< Ports number for data communication */
     std::vector<std::string> m_dest;
     std::string m_mode;           /*!< control / data */
-
-    HLTBuffer* m_inBuffer;        /*!< Incoming buffer */
-    HLTBuffer* m_outBuffer;       /*!< Outgoing buffer */
 
     pid_t m_pidEvtSender, m_pidEvtReceiver;
     RingBuffer* m_inBuf;

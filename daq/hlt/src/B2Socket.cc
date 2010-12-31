@@ -13,7 +13,7 @@
 #include "string.h"
 
 #include <framework/logging/Logger.h>
-#include "framework/dcore/B2Socket.h"
+#include <daq/hlt/B2Socket.h>
 
 using namespace Belle2;
 

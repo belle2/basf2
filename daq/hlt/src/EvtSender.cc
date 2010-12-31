@@ -10,9 +10,8 @@
 
 #include <cstdlib>
 
-#include "framework/dcore/EvtSender.h"
-#include "framework/dcore/B2SocketException.h"
-#include "framework/dcore/styledef.h"
+#include <daq/hlt/EvtSender.h>
+#include <daq/hlt/B2SocketException.h>
 #include "framework/logging/Logger.h"
 
 using namespace Belle2;

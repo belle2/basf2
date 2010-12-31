@@ -22,7 +22,7 @@
 #include <errno.h>
 #include <fcntl.h>
 
-#include "framework/dcore/NodeInfo.h"
+#include <daq/hlt/NodeInfo.h>
 
 #define DATAINPORT 20000
 #define DATAOUTPORT 30000

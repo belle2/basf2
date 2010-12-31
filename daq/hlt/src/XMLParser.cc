@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "framework/dcore/XMLParser.h"
+#include <daq/hlt/XMLParser.h>
 #include <framework/logging/Logger.h>
 
 using namespace Belle2;

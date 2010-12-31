@@ -15,8 +15,8 @@
 #include <libxml/parser.h>
 #include <libxml/tree.h>
 
-#include "framework/dcore/UnitInfo.h"
-#include "framework/dcore/UnitManager.h"
+#include <daq/hlt/UnitInfo.h>
+#include <daq/hlt/UnitManager.h>
 
 #ifndef XMLPARSER_H
 #define XMLPARSER_H

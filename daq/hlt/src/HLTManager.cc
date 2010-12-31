@@ -3,7 +3,7 @@
 /// @author Soohyung Lee
 /// @date Jul 14 2010
 
-#include "framework/dcore/HLTManager.h"
+#include <daq/hlt/HLTManager.h>
 
 using namespace Belle2;
 
@@ -78,12 +78,12 @@ void HLTManager::initUnit(void)
 /// @brief Printing internal information
 void HLTManager::Print(void)
 {
-  std::cout << "---------------- \033[22;31mHLT Manager Summary\033[0m ----------------" << std::endl;
-  std::cout << "  HLT Name        : " << m_inputName << std::endl;
-  std::cout << "  HLT Description : " << m_inputDescription << std::endl;
-  std::cout << "  Exp = " << m_expNo << " (Run = " << m_runStart << "-" << m_runEnd << ")" << std::endl;
-  std::cout << "  Units = " << m_units.size() << std::endl;
+  B2INFO("---------------- \033[22;31mHLT Manager Summary\033[0m ----------------");
+  B2INFO("  HLT Name        : " << m_inputName);
+  B2INFO("  HLT Description : " << m_inputDescription);
+  B2INFO("  Exp = " << m_expNo << " (Run = " << m_runStart << "-" << m_runEnd << ")");
+  B2INFO("  Units = " << m_units.size());
   for (std::vector<UnitManager>::iterator i = m_units.begin(); i != m_units.end(); i++)
     (*i).Print();
-  std::cout << "-----------------------------------------------------" << std::endl;
+  B2INFO("-----------------------------------------------------");
 }

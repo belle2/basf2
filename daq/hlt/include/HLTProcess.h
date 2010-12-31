@@ -11,19 +11,26 @@
 #ifndef HLTPROCESS_H
 #define HLTPROCESS_H
 
+#include <string>
+#include <vector>
+
+#include <daq/hlt/NodeInfo.h>
 #include <daq/hlt/HLTDefs.h>
-#include <daq/hlt/Node.h>
-#include <daq/hlt/NodeManager.h>
+#include <daq/hlt/SignalMan.h>
 
 namespace Belle2 {
   class HLTProcess {
   public:
-    HLTProcess();
-    ~HLTProcess();
+    HLTProcess(NodeInfo* nodeInfo);
+    ~HLTProcess(void);
+
+    EStatus init(void);
+
   private:
-    NodeManager* m_nodeManager;
+    NodeInfo* m_nodeInfo;
+
+    SignalMan* m_signalMan;
   };
 }
 
 #endif
-

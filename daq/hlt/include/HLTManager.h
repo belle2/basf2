@@ -14,8 +14,8 @@
 #include <iostream>
 #include <vector>
 
-#include "framework/dcore/XMLParser.h"
-#include "framework/dcore/UnitManager.h"
+#include <daq/hlt/XMLParser.h>
+#include <daq/hlt/UnitManager.h>
 
 namespace Belle2 {
 

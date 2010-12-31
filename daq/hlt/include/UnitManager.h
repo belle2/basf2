@@ -14,9 +14,9 @@
 #include <iostream>
 #include <vector>
 
-#include "framework/dcore/UnitInfo.h"
-#include "framework/dcore/NodeInfo.h"
-#include "framework/dcore/NodeManager.h"
+#include <daq/hlt/UnitInfo.h>
+#include <daq/hlt/NodeInfo.h>
+#include <daq/hlt/NodeManager.h>
 
 namespace Belle2 {
 

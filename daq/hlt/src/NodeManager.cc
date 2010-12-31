@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "framework/dcore/NodeManager.h"
+#include <daq/hlt/NodeManager.h>
 
 using namespace Belle2;
 
@@ -70,6 +70,7 @@ void NodeManager::broadCasting()
 
 std::string NodeManager::listen()
 {
+  B2INFO("Retreiving node infomation from manager node...");
   return m_infoSignalMan->listening();
 }
 
@@ -80,10 +81,12 @@ NodeInfo* NodeManager::nodeInfo()
 
 int NodeManager::initSignalMan()
 {
+  // For node mode, incoming port should be a control line and outgoing port should be a monitor line
   if (m_nodeinfo == NULL)
-    m_infoSignalMan = new SignalMan(CONTROLPORT, MONITORPORT, m_manager);
+    m_infoSignalMan = new SignalMan(c_ControlPort, c_MonitorPort, m_manager);
+  // For manager mode, incoming port should be a monitor line and outgoing port should be a control line
   else
-    m_infoSignalMan = new SignalMan(CONTROLPORT, MONITORPORT, m_nodeinfo->targetIP());
+    m_infoSignalMan = new SignalMan(c_MonitorPort, c_ControlPort, m_nodeinfo->targetIP());
   // To handle child process
   if (m_infoSignalMan->init() == 1)
     return 1;
@@ -93,11 +96,10 @@ int NodeManager::initSignalMan()
 
 void NodeManager::Print()
 {
-  std::cout << "   [NodeManager] ";
-  std::cout << "Unit# = " << m_unitNo;
-  std::cout << "   Node# = " << m_nodeNo << std::endl;;
-  std::cout << "                 ";
-  std::cout << "Manager = " << m_manager;
-  std::cout << std::endl;
+  B2INFO("   [NodeManager] ");
+  B2INFO("Unit# = " << m_unitNo);
+  B2INFO("   Node# = " << m_nodeNo);
+  B2INFO("                 ");
+  B2INFO("Manager = " << m_manager);
   m_nodeinfo->Print();
 }

@@ -12,7 +12,7 @@
 #include <sstream>
 #include <string>
 
-#include "framework/dcore/NodeInfo.h"
+#include <daq/hlt/NodeInfo.h>
 
 using namespace Belle2;
 

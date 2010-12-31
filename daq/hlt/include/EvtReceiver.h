@@ -11,9 +11,8 @@
 #ifndef EVTRECEIVER_H
 #define EVTRECEIVER_H
 
-#include "framework/pcore/RingBuffer.h"
-
-#include "framework/dcore/B2Socket.h"
+#include <daq/hlt/RingBuffer.h>
+#include <daq/hlt/B2Socket.h>
 
 namespace Belle2 {
 

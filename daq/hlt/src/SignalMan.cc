@@ -10,8 +10,7 @@
 
 #include <signal.h>
 
-#include "framework/dcore/SignalMan.h"
-#include "framework/dcore/styledef.h"
+#include <daq/hlt/SignalMan.h>
 #include <framework/logging/Logger.h>
 
 using namespace Belle2;
@@ -133,12 +132,6 @@ const void SignalMan::setDest(std::vector<std::string> dest)
 {
   m_dest.clear();
   m_dest = dest;
-}
-
-const void SignalMan::setBuffer(HLTBuffer* inBuffer, HLTBuffer* outBuffer)
-{
-  m_inBuffer = inBuffer;
-  m_outBuffer = outBuffer;
 }
 
 RingBuffer* SignalMan::getInBuffer()

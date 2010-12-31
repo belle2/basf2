@@ -11,6 +11,12 @@
 #ifndef EVTSENDER_H
 #define EVTSENDER_H
 
+#include <cstdlib>
+
+#include <framework/logging/Logger.h>
+
+#include <daq/hlt/B2SocketException.h>
+#include <daq/hlt/HLTDefs.h>
 #include <daq/hlt/RingBuffer.h>
 #include <daq/hlt/B2Socket.h>
 
@@ -27,13 +33,11 @@ namespace Belle2 {
     void init();
     void init(RingBuffer* buffer);
     void setDestination(std::string dest);
-    int connect();
+    EStatus connect();
     int broadCasting();
 
     const EvtSender& operator << (const std::string&) const;
-    const EvtSender& operator << (const NodeInfo&) const;
     const EvtSender& operator >> (std::string&) const;
-    const EvtSender& operator >> (NodeInfo&) const;
 
   private:
     int m_port;

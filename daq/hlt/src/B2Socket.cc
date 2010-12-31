@@ -12,7 +12,6 @@
 #include <fcntl.h>
 #include "string.h"
 
-#include <framework/logging/Logger.h>
 #include <daq/hlt/B2Socket.h>
 
 using namespace Belle2;
@@ -44,36 +43,35 @@ B2Socket::~B2Socket()
 }
 
 /// @brief Socket creator. Open socket as AF_INET
-/// @return true Socket creation success
-/// @return false Socket creation failed
-bool B2Socket::create()
+/// @return c_Success Socket creation success
+/// @return c_InitFailed Socket creation failed
+EStatus B2Socket::create()
 {
   m_sock = socket(AF_INET, SOCK_STREAM, 0);
 
   if (!is_valid()) {
-    //displayError ("socket", errno);
     B2ERROR("Socket creation failed");
-    return false;
+    return c_InitFailed;
   }
 
   int on = 1;
   if (setsockopt(m_sock, SOL_SOCKET, SO_REUSEADDR, (const char*)&on, sizeof(on)) == -1)
-    return false;
+    return c_InitFailed;
 
-  //std::cout << "[\033[22;35mB2Socket\033[0m] Created (m_sock = " << m_sock << ")" << std::endl;
+  B2DEBUG(50, "B2Socket created (m_sock = " << m_sock << ")");
 
-  return true;
+  return c_Success;
 }
 
 /// @brief Binding the socket created to specific port
 /// @param port Port number to bind the socket
-/// @return true Port binding success
-/// @return false Port binding failed
-bool B2Socket::bind(const int port)
+/// @return c_Success Port binding success
+/// @return c_InitFailed Port binding failed
+EStatus B2Socket::bind(const int port)
 {
   if (!is_valid()) {
     B2ERROR("Socket file descriptor doesn't exist!");
-    return false;
+    return c_InitFailed;
   }
 
   m_addr.sin_family = AF_INET;
@@ -83,32 +81,31 @@ bool B2Socket::bind(const int port)
   int bind_return = ::bind(m_sock, (struct sockaddr*) & m_addr, sizeof(m_addr));
 
   if (bind_return == -1) {
-    //displayError (errno);
     B2ERROR("Binding failed (code = " << errno << ")");
-    return false;
+    return c_InitFailed;
   }
 
-  //std::cout << "[\033[22;35mB2Socket\033[0m] Bound (bind_return = " << bind_return << ")" << std::endl;
+  B2DEBUG(50, "B2Socket bound (bind_return = " << bind_return << ")");
 
-  return true;
+  return c_Success;
 }
 
 /// @brief Listen to the socket
-/// @return true for success
-/// @return false for fail
-bool B2Socket::listen() const
+/// @return c_Success Listening success
+/// @return c_InitFailed Listening failed
+EStatus B2Socket::listen() const
 {
   if (!is_valid())
-    return false;
+    return c_InitFailed;
 
   int listen_return = ::listen(m_sock, m_maxcons);
 
   if (listen_return == -1)
-    return false;
+    return c_InitFailed;
 
-  //std::cout << "[\033[22;35mB2Socket\033[0m] Start to listening through m_sock = " << m_sock << " with max connections of " << m_maxcons << ")" << std::endl;
+  B2DEBUG(50, "Starting to listen through m_sock = " << m_sock << " with max connection of " << m_maxcons << ")");
 
-  return true;
+  return c_Success;
 }
 
 /// @brief Accept the socket
@@ -130,23 +127,26 @@ int B2Socket::accept(B2Socket& new_socket) const
 
 /// @brief Send string through the socket
 /// @param s String to be sent
-/// @return true for success
-/// @return false for fail
-bool B2Socket::send(const std::string s) const
+/// @return c_Success Sending success
+/// @return c_FuncError Sending failed
+EStatus B2Socket::send(const std::string s) const
 {
   int status = ::send(m_sock, s.c_str(), s.size(), MSG_NOSIGNAL);
   if (status == -1)
-    return false;
+    return c_FuncError;
   else
-    return true;
+    return c_Success;
 }
 
-bool B2Socket::send(NodeInfo* nodeinfo) const
+/// @brief Send NodeInfo object through the socket (for control)
+///        This implies the simple object serialization
+/// @param nodeinfo NodeInfo object
+/// @return c_Success Sending success
+/// @return c_InitFailed Sending failed
+EStatus B2Socket::send(NodeInfo* nodeinfo) const
 {
   const std::string serializedNodeInfo = nodeinfo->serializedNodeInfo();
-  send(serializedNodeInfo);
-
-  return true;
+  return  send(serializedNodeInfo);
 }
 
 /// @brief Receive string from the socket
@@ -176,13 +176,13 @@ int B2Socket::recv(std::string& s) const
 /// @brief Connect to a host
 /// @param host Host IP address to connect
 /// @param port Port number to use for the communication
-/// @return true for success
-/// @return false for fail
-bool B2Socket::connect(const std::string host, const int port)
+/// @return c_Success Connection success
+/// @return c_FuncError Connection failed
+EStatus B2Socket::connect(const std::string host, const int port)
 {
   if (!is_valid()) {
     B2ERROR("B2SOCKET: Invalid");
-    return false;
+    return c_FuncError;
   }
 
   m_addr.sin_family = AF_INET;
@@ -192,29 +192,31 @@ bool B2Socket::connect(const std::string host, const int port)
 
   if (errno == EAFNOSUPPORT) {
     B2ERROR("B2SOCKET: EAFNOSUPPORT");
-    return false;
+    return c_FuncError;
   }
 
   status = ::connect(m_sock, (sockaddr*) & m_addr, sizeof(m_addr));
 
   if (status == 0)
-    return true;
+    return c_Success;
   else {
-    //displayError ("connect", errno);
     if (errno != EALREADY && errno != EISCONN) {
       B2ERROR("Connection failed");
-      return false;
+      return c_FuncError;
     } else
-      return true;
+      return c_Success;
   }
 }
 
 /// @brief Validation check
-/// @return true for valid
-/// @return false for invalid
-bool B2Socket::is_valid() const
+/// @return c_Success Valid socket
+/// @return c_FuncError Invalid socket
+EStatus B2Socket::is_valid() const
 {
-  return m_sock != -1;
+  if (m_sock != -1)
+    return c_Success;
+  else
+    return c_FuncError;
 }
 
 /// @brief Set non blocking status

@@ -11,8 +11,13 @@
 #ifndef EVTRECEIVER_H
 #define EVTRECEIVER_H
 
+#include <cstdlib>
+
+#include <framework/logging/Logger.h>
+
 #include <daq/hlt/RingBuffer.h>
 #include <daq/hlt/B2Socket.h>
+#include <daq/hlt/B2SocketException.h>
 
 namespace Belle2 {
 
@@ -29,9 +34,7 @@ namespace Belle2 {
     void listen(void);
 
     const EvtReceiver& operator << (const std::string&) const;
-    const EvtReceiver& operator << (const NodeInfo&) const;
     const EvtReceiver& operator >> (std::string&) const;
-    const EvtReceiver& operator >> (NodeInfo&) const;
 
     void accept(EvtReceiver&);
 

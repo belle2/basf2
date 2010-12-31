@@ -22,12 +22,10 @@
 #include <errno.h>
 #include <fcntl.h>
 
+#include <framework/logging/Logger.h>
 #include <daq/hlt/NodeInfo.h>
+#include <daq/hlt/HLTDefs.h>
 
-#define DATAINPORT 20000
-#define DATAOUTPORT 30000
-#define CONTROLPORT 40000
-#define MONITORPORT 40000
 #define MAXPACKETSIZE 1024000
 
 namespace Belle2 {
@@ -44,21 +42,21 @@ namespace Belle2 {
     virtual ~B2Socket();
 
     //! Creating socket
-    bool create();
+    EStatus create();
     //! Binding to specific port the socket created
-    bool bind(const int port);
+    EStatus bind(const int port);
     //! Listening from the socket
-    bool listen() const;
+    EStatus listen() const;
     //! Accepting a socket request
     int accept(B2Socket&) const;
 
     //! Connecting function to a specific host through specific port
-    bool connect(const std::string host, const int port);
+    EStatus connect(const std::string host, const int port);
 
     ///! Sending data as a string format
-    bool send(const std::string) const;
+    EStatus send(const std::string) const;
     //! Sending node information as NodeInfo object
-    bool send(NodeInfo*) const;
+    EStatus send(NodeInfo*) const;
     //! Receiving data as a string format
     int recv(std::string&) const;
     //! Receiving node information as NodeInfo object
@@ -68,9 +66,9 @@ namespace Belle2 {
     void set_non_blocking(const bool);
 
     //! Validation checking
-    bool is_valid() const;
+    EStatus is_valid() const;
 
-    void displayError(const std::string caller, int errno);
+    //void displayError(const std::string caller, int errno);
 
   private:
     int m_sock;               /*!< Socket identifier */

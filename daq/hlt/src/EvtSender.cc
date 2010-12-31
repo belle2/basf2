@@ -8,11 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <cstdlib>
-
 #include <daq/hlt/EvtSender.h>
-#include <daq/hlt/B2SocketException.h>
-#include "framework/logging/Logger.h"
 
 using namespace Belle2;
 
@@ -25,18 +21,22 @@ EvtSender::EvtSender(std::string host, int port)
 {
 }
 
+/// @brief EvtSender destructor
+EvtSender::~EvtSender()
+{
+}
+
 void EvtSender::init()
 {
   B2INFO("Initializing EvtSender...");
   if (!B2Socket::create())
     throw B2SocketException("Could not create sending socket.");
-  //B2ERROR ("Could not create sending socket.");
 }
 
 void EvtSender::init(RingBuffer* buffer)
 {
-  init();
   m_buffer = buffer;
+  init();
 }
 
 void EvtSender::setDestination(std::string dest)
@@ -44,14 +44,13 @@ void EvtSender::setDestination(std::string dest)
   m_host = dest;
 }
 
-int EvtSender::connect()
+EStatus EvtSender::connect()
 {
   if (!B2Socket::connect(m_host, m_port)) {
-    //throw B2SocketException ("Could not bind to port.");
-    B2ERROR("Could not bind to port.");
-    return -1;
+    B2ERROR("Unable to connect to the destination.");
+    return c_FuncError;
   } else
-    return 1;
+    return c_Success;
 }
 
 int EvtSender::broadCasting()
@@ -76,11 +75,6 @@ int EvtSender::broadCasting()
       return -1;
     }
   }
-}
-
-/// @brief EvtSender destructor
-EvtSender::~EvtSender()
-{
 }
 
 /// @brief EvtSender << operator

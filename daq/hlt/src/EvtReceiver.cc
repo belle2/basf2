@@ -8,11 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <cstdlib>
-
 #include <daq/hlt/EvtReceiver.h>
-#include <daq/hlt/B2SocketException.h>
-#include <framework/logging/Logger.h>
 
 using namespace Belle2;
 
@@ -21,6 +17,11 @@ using namespace Belle2;
 /// @param port Port number for the communication
 EvtReceiver::EvtReceiver(int port)
     : m_port(port)
+{
+}
+
+/// @brief EvtReceiver class destructor
+EvtReceiver::~EvtReceiver()
 {
 }
 
@@ -52,11 +53,6 @@ void EvtReceiver::listen()
   if (!B2Socket::listen())
     B2FATAL("Could not listen to socket.");
   //throw B2SocketException ("Could not listen to socket.");
-}
-
-/// @brief EvtReceiver class destructor
-EvtReceiver::~EvtReceiver()
-{
 }
 
 /// @brief EvtReceiver << operator

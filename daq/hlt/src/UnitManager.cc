@@ -61,7 +61,6 @@ void UnitManager::broadCasting(void)
 NodeInfo* UnitManager::buildNodeInfo(const std::string type, const int nodeNo, UnitInfo& unit)
 {
   NodeInfo* nodeinfo = new NodeInfo(type, unit.unitNo(), nodeNo);
-  nodeinfo->setPortControl(CONTROLPORT);
   nodeinfo->setPortControl(c_InfoInPort);
   nodeinfo->setManagerIP(unit.manager());
 

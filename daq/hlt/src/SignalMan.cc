@@ -8,10 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <signal.h>
-
 #include <daq/hlt/SignalMan.h>
-#include <framework/logging/Logger.h>
 
 using namespace Belle2;
 
@@ -54,40 +51,53 @@ SignalMan::~SignalMan(void)
   }
 }
 
-int SignalMan::init(void)
+EStatus SignalMan::init(void)
 {
   char inBufName[] = "inBuffer";
   char outBufName[] = "outBuffer";
 
   m_inBuf = new RingBuffer(inBufName, 1024);
   m_outBuf = new RingBuffer(outBufName, 1024);
-  //m_inBuf = new RingBuffer ("inBuffer", 1024);
-  //m_outBuf = new RingBuffer ("outBuffer", 1024);
 
   // Forking off an event sender to send data
   m_pidEvtSender = fork();
   if (m_pidEvtSender == 0) {
     m_sender = EvtSender(m_dest[0], m_outPort);
-    m_sender.init(m_outBuf);
+    if (m_sender.init(m_outBuf) == c_InitFailed) {
+      B2ERROR("Could not initialize EvtSender.");
+      return c_InitFailed;
+    }
+
     B2INFO("EvtSender initialized");
 
     while (1) {
-      //if (m_outBuf->ninsq () > 0)
-      m_sender.broadCasting();
+      EStatus status = m_sender.broadCasting();
+
+      if (status == c_TermCalled) {
+        B2INFO("EvtSender terminates...");
+        return c_TermCalled;
+      }
+
       usleep(100);
     }
 
-    return 1;
+    return c_Success;
   }
 
   // Forking off an event receiver to take data
   m_pidEvtReceiver = fork();
   if (m_pidEvtReceiver == 0) {
     m_receiver = EvtReceiver(m_inPort);
-    m_receiver.init(m_inBuf);
+    if (m_receiver.init(m_inBuf) == c_InitFailed) {
+      B2ERROR("Could not initialize EvtReceiver.");
+      return c_InitFailed;
+    }
     B2INFO("EvtReceiver initialized");
 
-    m_receiver.listen();
+    if (m_receiver.listen() != c_Success) {
+      B2ERROR("Listening failed)");
+      return c_FuncError;
+    }
 
     EvtReceiver new_sock;
     m_receiver.accept(new_sock);
@@ -97,23 +107,19 @@ int SignalMan::init(void)
       new_sock >> data;
       if (data.size() > 0) {
         m_inBuf->insq((int*)(data.c_str()), data.size());
-        if (data == "EOF")
+        if (data == "EOF") {
           B2INFO("Destroying EvtReceiver..");
-        //break;
+          return c_TermCalled;
+        }
       }
 
       usleep(100);
     }
 
-    return 1;
+    return c_Success;
   }
 
-  return 0;
-}
-
-int SignalMan::clearBuffer(void)
-{
-  return 0;
+  return c_Success;
 }
 
 const void SignalMan::setPorts(const int inPort, const int outPort)

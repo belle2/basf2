@@ -26,17 +26,22 @@ EvtSender::~EvtSender()
 {
 }
 
-void EvtSender::init()
+EStatus EvtSender::init()
 {
   B2INFO("Initializing EvtSender...");
-  if (!B2Socket::create())
-    throw B2SocketException("Could not create sending socket.");
+
+  if (B2Socket::create() != c_Success) {
+    B2ERROR("Could not create sending socket.");
+    return c_InitFailed;
+  }
+
+  return c_Success;
 }
 
-void EvtSender::init(RingBuffer* buffer)
+EStatus EvtSender::init(RingBuffer* buffer)
 {
   m_buffer = buffer;
-  init();
+  return init();
 }
 
 void EvtSender::setDestination(std::string dest)
@@ -46,33 +51,36 @@ void EvtSender::setDestination(std::string dest)
 
 EStatus EvtSender::connect()
 {
-  if (!B2Socket::connect(m_host, m_port)) {
+  if (B2Socket::connect(m_host, m_port) != c_Success) {
     B2ERROR("Unable to connect to the destination.");
     return c_FuncError;
   } else
     return c_Success;
 }
 
-int EvtSender::broadCasting()
+EStatus EvtSender::broadCasting()
 {
   if (m_buffer->numq() > 0) {
-    if (connect()) {
+    if (connect() == c_Success) {
       char* tmp = new char[MAXPACKETSIZE];
       m_buffer->remq((int*)tmp);
       std::string input(tmp);
 
       //B2INFO ("Sending message: " << input);
-      if (B2Socket::send(input)) {
+      if (B2Socket::send(input) == c_Success) {
         if (input == "EOF") {
-          return 2;
+          return c_TermCalled;
         } else {
-          return 1;
+          return c_Success;
         }
-      } else
-        return -1;
+      } else {
+        B2ERROR("Sending data failed");
+        // If error occurs in data sending, put back the data into the ring buffer
+        m_buffer->insq((int*)(input.c_str()), input.size());
+        return c_FuncError;
+      }
     } else {
-      B2ERROR("Connection lost");
-      return -1;
+      return c_FuncError;
     }
   }
 }
@@ -82,7 +90,7 @@ int EvtSender::broadCasting()
 /// @param s String to send
 const EvtSender& EvtSender::operator << (const std::string& s) const
 {
-  if (!B2Socket::send(s))
+  if (B2Socket::send(s) != c_Success)
     throw B2SocketException("Could not write to socket.");
 
   return *this;

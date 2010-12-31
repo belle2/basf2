@@ -48,7 +48,7 @@ namespace Belle2 {
     //! Listening from the socket
     EStatus listen() const;
     //! Accepting a socket request
-    int accept(B2Socket&) const;
+    EStatus accept(B2Socket&) const;
 
     //! Connecting function to a specific host through specific port
     EStatus connect(const std::string host, const int port);

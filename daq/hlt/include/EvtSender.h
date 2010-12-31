@@ -30,11 +30,11 @@ namespace Belle2 {
     EvtSender() {};
     virtual ~EvtSender();
 
-    void init();
-    void init(RingBuffer* buffer);
+    EStatus init();
+    EStatus init(RingBuffer* buffer);
     void setDestination(std::string dest);
     EStatus connect();
-    int broadCasting();
+    EStatus broadCasting();
 
     const EvtSender& operator << (const std::string&) const;
     const EvtSender& operator >> (std::string&) const;

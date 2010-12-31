@@ -41,6 +41,7 @@ namespace Belle2 {
     c_FuncError,
     c_InitFailed,
     c_ProcFailed,
+    c_TermCalled,
     c_Success
   };
 }

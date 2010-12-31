@@ -112,17 +112,17 @@ EStatus B2Socket::listen() const
 /// @return 1 for success
 /// @return 0 for no accepted sockets
 /// @return -1 for error
-int B2Socket::accept(B2Socket& new_socket) const
+EStatus B2Socket::accept(B2Socket& new_socket) const
 {
   int addr_length = sizeof(m_addr);
   new_socket.m_sock = ::accept(m_sock, (sockaddr*) & m_addr, (socklen_t*) & addr_length);
 
   if (new_socket.m_sock < 0)
-    return -1;
+    return c_FuncError;
   else if (new_socket.m_sock == 0)
-    return 0;
+    return c_FuncError;
   else
-    return 1;
+    return c_Success;
 }
 
 /// @brief Send string through the socket

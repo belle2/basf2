@@ -25,34 +25,35 @@ EvtReceiver::~EvtReceiver()
 {
 }
 
-void EvtReceiver::init()
+EStatus EvtReceiver::init()
 {
-  if (!B2Socket::create()) {
-    B2FATAL("Could not create receiving socket.");
-    //throw B2SocketException("Could not create receiving socket.");
+  if (B2Socket::create() != c_Success) {
+    B2ERROR("Could not create receiving socket.");
+    return c_InitFailed;
   }
 
-  if (!B2Socket::bind(m_port))
-    B2FATAL("Could not bind to port " << m_port);
-  //throw B2SocketException("Could not bind to port.");
+  if (B2Socket::bind(m_port) != c_Success) {
+    B2ERROR("Could not bind to port " << m_port);
+    return c_InitFailed;
+  }
 
-  /*
-  if(!B2Socket::listen())
-          throw B2SocketException("Could not listen to socket.");
-          */
+  return c_Success;
 }
 
-void EvtReceiver::init(RingBuffer* buffer)
+EStatus EvtReceiver::init(RingBuffer* buffer)
 {
-  init();
   m_buffer = buffer;
+  return init();
 }
 
-void EvtReceiver::listen()
+EStatus EvtReceiver::listen()
 {
-  if (!B2Socket::listen())
-    B2FATAL("Could not listen to socket.");
-  //throw B2SocketException ("Could not listen to socket.");
+  if (B2Socket::listen() != c_Success) {
+    B2ERROR("Could not listen to socket.");
+    return c_FuncError;
+  }
+
+  return c_Success;
 }
 
 /// @brief EvtReceiver << operator
@@ -60,7 +61,7 @@ void EvtReceiver::listen()
 /// @param s String to send
 const EvtReceiver& EvtReceiver::operator << (const std::string& s) const
 {
-  if (!B2Socket::send(s))
+  if (B2Socket::send(s) != c_Success)
     throw B2SocketException("Could not write to socket.");
 
   return *this;
@@ -79,8 +80,12 @@ const EvtReceiver& EvtReceiver::operator >> (std::string& s) const
 
 /// @brief Accepts socket
 /// @param sock EvtReceiver to accept communication
-void EvtReceiver::accept(EvtReceiver& sock)
+EStatus EvtReceiver::accept(EvtReceiver& sock)
 {
-  if (!B2Socket::accept(sock))
-    throw B2SocketException("Could not accept socket.");
+  if (B2Socket::accept(sock) != c_Success) {
+    B2ERROR("Data transmission hasn't been accepted.");
+    return c_FuncError;
+  }
+
+  return c_Success;
 }

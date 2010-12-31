@@ -29,14 +29,14 @@ namespace Belle2 {
     EvtReceiver() {};
     virtual ~EvtReceiver();
 
-    void init(void);
-    void init(RingBuffer* buffer);
-    void listen(void);
+    EStatus init(void);
+    EStatus init(RingBuffer* buffer);
+    EStatus listen(void);
 
     const EvtReceiver& operator << (const std::string&) const;
     const EvtReceiver& operator >> (std::string&) const;
 
-    void accept(EvtReceiver&);
+    EStatus accept(EvtReceiver&);
 
   private:
     int m_port;

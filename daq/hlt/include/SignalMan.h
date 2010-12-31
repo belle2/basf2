@@ -15,6 +15,11 @@
 #include <string>
 #include <vector>
 
+#include <signal.h>
+
+#include <framework/logging/Logger.h>
+
+#include <daq/hlt/HLTDefs.h>
 #include <daq/hlt/RingBuffer.h>
 #include <daq/hlt/B2SocketException.h>
 #include <daq/hlt/EvtSender.h>
@@ -38,9 +43,7 @@ namespace Belle2 {
     ~SignalMan(void);
 
     //! Initializing this object
-    int init(void);
-    //! Clearing buffer
-    int clearBuffer(void);
+    EStatus init(void);
 
     //! Setting port numbers for the communications
     const void setPorts(const int inPort, const int outPort);

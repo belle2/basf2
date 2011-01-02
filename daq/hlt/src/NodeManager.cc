@@ -45,7 +45,6 @@ NodeManager::NodeManager(NodeInfo* nodeinfo)
 */
 NodeManager::~NodeManager()
 {
-  delete m_node;
   delete m_infoSignalMan;
 }
 

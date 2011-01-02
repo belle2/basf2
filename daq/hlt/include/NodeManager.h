@@ -18,7 +18,6 @@
 
 #include <daq/hlt/HLTDefs.h>
 #include <daq/hlt/SignalMan.h>
-#include <daq/hlt/Node.h>
 #include <daq/hlt/NodeInfo.h>
 
 namespace Belle2 {
@@ -67,7 +66,6 @@ namespace Belle2 {
     int m_unitNo;                 /*!< Unique unit number of this node */
     int m_nodeNo;                 /*!< Unique node number of this node */
 
-    Node* m_node;                 /*!< Pointer to actual node (only for node side, not for manager side) */
     NodeInfo* m_nodeinfo;
     SignalMan* m_infoSignalMan;   /*!< Pointer to SignalMan object */
   };

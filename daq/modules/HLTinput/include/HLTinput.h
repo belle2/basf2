@@ -19,10 +19,11 @@
 #include <framework/datastore/StoreDefs.h>
 
 #include <framework/core/Module.h>
-#include <framework/pcore/MsgHandler.h>
-#include <framework/pcore/EvtMessage.h>
-#include <framework/pcore/RingBuffer.h>
-#include <framework/dcore/EvtReceiver.h>
+#include <framework/core/MsgHandler.h>
+#include <framework/core/EvtMessage.h>
+#include <framework/core/RingBuffer.h>
+
+#include <daq/hlt/EvtReceiver.h>
 
 #define MAXPACKET 10000000 * 4
 

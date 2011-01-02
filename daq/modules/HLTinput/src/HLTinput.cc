@@ -9,12 +9,9 @@
  **************************************************************************/
 
 #include <sys/wait.h>
-#include <framework/modules/HLTinput/HLTinput.h>
+#include <daq/modules/HLTinput/HLTinput.h>
 
 #include <framework/core/ModuleManager.h>
-//#include <framework/dcore/RingBuffer.h>
-#include <framework/dcore/EvtReceiver.h>
-//#include <framework/dcore/SignalMan.h>
 
 using namespace std;
 using namespace Belle2;

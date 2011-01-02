@@ -10,12 +10,9 @@
 
 #include <sys/wait.h>
 #include <ctime>
-#include <framework/modules/HLToutput/HLToutput.h>
+#include <daq/modules/HLToutput/HLToutput.h>
 
 #include <framework/core/ModuleManager.h>
-//#include <framework/dcore/RingBuffer.h>
-#include <framework/dcore/EvtReceiver.h>
-//#include <framework/dcore/SignalMan.h>
 
 using namespace std;
 using namespace Belle2;

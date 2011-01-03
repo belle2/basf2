@@ -14,6 +14,8 @@
 #include <string>
 #include <vector>
 
+#include <framework/logging/Logger.h>
+
 #include <daq/hlt/NodeInfo.h>
 #include <daq/hlt/HLTDefs.h>
 #include <daq/hlt/SignalMan.h>

@@ -8,25 +8,30 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <framework/logging/Logger.h>
-#include <daq/hlt/HLTDefs.h>
 #include <daq/hlt/HLTFramework.h>
 
 using namespace Belle2;
 
-// Constructor for Node (default) or Manager side
+/* @brief HLTFramework constructor
+ * @param nodeType Type of this node
+*/
 HLTFramework::HLTFramework(ENodeType nodeType) : m_nodeType(nodeType)
 {
   m_HLTManager = NULL;
 }
 
-// Constructor for Manager side
+/* @brief HLTFramework constructor
+ * @param nodeType Type of this node
+ * @param xmlHLTInfo Input XML file of HLT farm
+*/
 HLTFramework::HLTFramework(ENodeType nodeType, std::string xmlHLTInfo)
     : m_nodeType(nodeType), m_xmlHLTInfo(xmlHLTInfo)
 {
   m_HLTProcess = NULL;
 }
 
+/* @brief HLTFramework destructor
+*/
 HLTFramework::~HLTFramework()
 {
   delete m_nodeManager;
@@ -35,6 +40,10 @@ HLTFramework::~HLTFramework()
   delete m_HLTProcess;
 }
 
+/* @brief Initializing HLTFramework
+ * @return c_Success Initializing success
+ * @return c_InitFailed Initializing failed
+*/
 EStatus HLTFramework::init()
 {
   EStatus returnCode;
@@ -51,6 +60,10 @@ EStatus HLTFramework::init()
   return returnCode;
 }
 
+/* @brief Initializing HLTFramework as a process node
+ * @return c_Success Initializing success
+ * @return c_InitFailed Initializing failed
+*/
 EStatus HLTFramework::initProcessNode()
 {
   m_nodeManager = new NodeManager();
@@ -87,13 +100,20 @@ EStatus HLTFramework::initProcessNode()
   }
 }
 
+/* @brief Initializing HLTFramework as a manager node
+ * @return c_Success Initializing success
+ * @return c_InitFailed Initializing failed
+*/
 EStatus HLTFramework::initManager()
 {
   m_HLTManager = new HLTManager(m_xmlHLTInfo);
-  //m_HLTManager->Print ();
   m_HLTManager->broadCasting();
 }
 
+/* @brief Set node type of this node
+ * @param nodeType Node type of this node
+ * @return c_Success Whenever at this moment
+*/
 EStatus HLTFramework::nodeType(ENodeType nodeType)
 {
   m_nodeType = nodeType;
@@ -101,11 +121,19 @@ EStatus HLTFramework::nodeType(ENodeType nodeType)
   return c_Success;
 }
 
+/* @brief Get node type of this node
+ * @return Node type of this node
+*/
 ENodeType HLTFramework::nodeType()
 {
   return m_nodeType;
 }
 
+/* @brief Set XML file of HLT information
+ * @param File name of XML file of HLT information
+ * @return c_Success Setting success
+ * @return c_FuncError When the file assigned to process node (it doesn't need it)
+*/
 EStatus HLTFramework::xmlHLTInfo(std::string xmlHLTInfo)
 {
   if (m_nodeType != c_ManagerNode) {

@@ -13,6 +13,8 @@
 
 #include <string>
 
+#include <framework/logging/Logger.h>
+
 #include <daq/hlt/HLTDefs.h>
 #include <daq/hlt/HLTManager.h>
 #include <daq/hlt/HLTProcess.h>

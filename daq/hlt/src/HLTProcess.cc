@@ -9,18 +9,26 @@
  **************************************************************************/
 
 #include <daq/hlt/HLTProcess.h>
-#include <framework/logging/Logger.h>
 
 using namespace Belle2;
 
+/* @brief HLTProcess constructor
+ * @param nodeInfo NodeInfo object
+*/
 HLTProcess::HLTProcess(NodeInfo* nodeInfo)
 {
 }
 
+/* @brief HLTProcess destructor
+*/
 HLTProcess::~HLTProcess()
 {
 }
 
+/* @brief Initializing HLTProcess
+ * @return c_Success Initializing success
+ * @return c_InitFailed Initializing failed
+*/
 EStatus HLTProcess::init()
 {
   if (m_signalMan != NULL) {

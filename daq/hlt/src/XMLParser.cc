@@ -12,17 +12,18 @@
 
 using namespace Belle2;
 
-/// @brief XMLParser constructor
-///        Initializes variables
+/* @brief XMLParser constructor
+*/
 XMLParser::XMLParser(void)
     : m_filename(NULL), m_expNo(-1), m_runStart(-1), m_runEnd(-1)
 {
   m_units.clear();
 }
 
-/// @brief XMLParser constructor
-///        Initializes variables and does XML parsing from input file
-/// @param filename File name to parse
+/* @brief XMLParser constructor
+ * Initializes variables and does XML parsing from input file
+ * @param filename File name to parse
+*/
 XMLParser::XMLParser(char* filename)
     : m_filename(filename), m_expNo(-1), m_runStart(-1), m_runEnd(-1)
 {
@@ -31,15 +32,17 @@ XMLParser::XMLParser(char* filename)
   init();
 }
 
-/// @brief XMLParser destructor
+/* @brief XMLParser destructor
+*/
 XMLParser::~XMLParser(void)
 {
   xmlCleanupParser();
 }
 
-/// @brief Initialize the parsing
-/// @return c_Success Initialization sucess
-/// @return c_InitFailed Initialization failed (wrong format of xml)
+/* @brief Initialize the parsing
+ * @return c_Success Initialization sucess
+ * @return c_InitFailed Initialization failed (wrong format of xml)
+*/
 EStatus XMLParser::init(void)
 {
   m_docPtr = xmlParseFile(m_filename);
@@ -53,19 +56,21 @@ EStatus XMLParser::init(void)
   return c_Success;
 }
 
-/// @brief Do parsing (Unnecessary function?)
-/// @return c_Success Parsing success
-/// @return c_FuncError Parsing failed
-/// @sa parsing
+/* @brief Do parsing (Unnecessary function?)
+ * @return c_Success Parsing success
+ * @return c_FuncError Parsing failed
+ * @sa parsing
+*/
 EStatus XMLParser::parsing(void)
 {
   return parsing(m_curNode);
 }
 
-/// @brief Actual parsing part
-/// @param cur Pointer to a node in XML tree
-/// @return c_Success Parsing success
-/// @return c_FuncError Parsing failed
+/* @brief Actual parsing part
+ * @param cur Pointer to a node in XML tree
+ * @return c_Success Parsing success
+ * @return c_FuncError Parsing failed
+*/
 EStatus XMLParser::parsing(xmlNodePtr cur)
 {
   xmlChar* key;
@@ -112,9 +117,10 @@ EStatus XMLParser::parsing(xmlNodePtr cur)
   return c_Success;
 }
 
-/// @brief Parsing a single unit
-/// @param cur Pointer to a node
-/// @param unit Container to take unit information
+/* @brief Parsing a single unit
+ * @param cur Pointer to a node
+ * @param unit Container to take unit information
+*/
 void XMLParser::unitParsing(xmlNodePtr cur, UnitInfo& unit)
 {
   xmlChar* key;
@@ -135,56 +141,64 @@ void XMLParser::unitParsing(xmlNodePtr cur, UnitInfo& unit)
   }
 }
 
-/// @brief Return input name
-/// @return Input name which is specified in XML input file
+/* @brief Return input name
+ * @return Input name which is specified in XML input file
+*/
 char* XMLParser::inputName(void)
 {
   return m_inputName;
 }
 
-/// @brief Return input description
-/// @return Input description which is specified in XML input file
+/* @brief Return input description
+ * @return Input description which is specified in XML input file
+*/
 char* XMLParser::inputDescription(void)
 {
   return m_inputDescription;
 }
 
-/// @brief Return experiment number
-/// @return Experiment number which is specified in XML input file
+/* @brief Return experiment number
+ * @return Experiment number which is specified in XML input file
+*/
 int XMLParser::expNo(void)
 {
   return m_expNo;
 }
 
-/// @brief Return start run number
-/// @return Run start number which is specified in XML input file
+/* @brief Return start run number
+ * @return Run start number which is specified in XML input file
+*/
 int XMLParser::runStart(void)
 {
   return m_runStart;
 }
 
-/// @brief Return end run number
-/// @return Run end number which is specified in XML input file
+/* @brief Return end run number
+ * @return Run end number which is specified in XML input file
+*/
 int XMLParser::runEnd(void)
 {
   return m_runEnd;
 }
 
-/// @brief Return the number of units
-/// @return The number of units assigned
+/* @brief Return the number of units
+ * @return The number of units assigned
+*/
 int XMLParser::NUnit(void)
 {
   return m_units.size();
 }
 
-/// @brief Return information of units
-/// @return Iterator (starting point) of the container which has unit information
+/* @brief Return information of units
+ * @return Iterator (starting point) of the container which has unit information
+*/
 std::vector<UnitInfo>::iterator XMLParser::unitInfo(void)
 {
   return m_units.begin();
 }
 
-/// @brief Print the entire information (only for debugging)
+/* @brief Print the entire information (only for debugging)
+*/
 void XMLParser::Print(void)
 {
   B2INFO("=================================================");

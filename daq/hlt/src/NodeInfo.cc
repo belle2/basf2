@@ -16,6 +16,8 @@
 
 using namespace Belle2;
 
+/* @brief NodeInfo constructor
+*/
 NodeInfo::NodeInfo()
     : m_type("NDEF"), m_unitNo(0), m_nodeNo(0),
     m_portBaseDataIn(0), m_portBaseDataOut(0), m_portBaseControl(0),
@@ -23,6 +25,11 @@ NodeInfo::NodeInfo()
 {
 }
 
+/* @brief NodeInfo constructor
+ * @param type Type of the node
+ * @param unitNo Unit number of the node
+ * @param nodeNo Node number of the node
+*/
 NodeInfo::NodeInfo(const std::string type, const int unitNo, const int nodeNo)
     : m_type(type), m_unitNo(unitNo), m_nodeNo(nodeNo),
     m_portBaseDataIn(0), m_portBaseDataOut(0), m_portBaseControl(0),
@@ -30,109 +37,174 @@ NodeInfo::NodeInfo(const std::string type, const int unitNo, const int nodeNo)
 {
 }
 
+/* @brief NodeInfo destructor
+*/
 NodeInfo::~NodeInfo()
 {
 }
 
+/* @brief Initializing NodeInfo
+ * Do nothing at this moment and maybe unnecessary
+*/
 void NodeInfo::init()
 {
 }
 
+/* @brief Get unit number of the node
+ * @return Unit number of the node
+*/
 int NodeInfo::unitNo()
 {
   return m_unitNo;
 }
 
+/* @brief Get node number of the node
+ * @return Node number of the node
+*/
 int NodeInfo::nodeNo()
 {
   return m_nodeNo;
 }
 
+/* @brief Get type of the node
+ * @return Type of the node
+*/
 std::string NodeInfo::type()
 {
   return m_type;
 }
 
+/* @brief Set ports for data communication
+ * @param inPort incoming port number
+ * @param outPort outgoing port number
+*/
 void NodeInfo::setPortData(int inPort, int outPort)
 {
   m_portBaseDataIn = inPort;
   m_portBaseDataOut = outPort;
 }
 
+/* @brief Set port for control
+ * @param port Control port number
+*/
 void NodeInfo::setPortControl(int port)
 {
   m_portBaseControl = port;
 }
 
+/* @brief Get port number for incoming data
+ * @return Port number for incoming data
+*/
 int NodeInfo::portBaseDataIn()
 {
   return m_portBaseDataIn;
 }
 
+/* @brief Get port number for outgoing data
+ * @return Port number for outgoing data
+*/
 int NodeInfo::portBaseDataOut()
 {
   return m_portBaseDataOut;
 }
 
+/* @brief Get port number for control
+ * @return Port number for control
+*/
 int NodeInfo::portBaseControl()
 {
   return m_portBaseControl;
 }
 
+/* @brief Set IP address of this node
+ * @param ip IP address of this node
+*/
 void NodeInfo::setThisIP(const std::string ip)
 {
   m_thisIP = ip;
 }
 
+/* @brief Set IP address of manager node
+ * @param ip IP address of manager node
+*/
 void NodeInfo::setManagerIP(const std::string ip)
 {
   m_managerIP = ip;
 }
 
+/* @brief Set IP addresses of sources of data
+ * @param ip Vector container which contains IP addresses of sources
+*/
 void NodeInfo::setSourceIP(std::vector<std::string> ip)
 {
   m_sourceIP.clear();
   m_sourceIP = ip;
 }
 
+/* @brief Set a IP address of a single source
+ * @param ip IP address of a source
+*/
 void NodeInfo::setSourceIP(std::string ip)
 {
   m_sourceIP.clear();
   m_sourceIP.push_back(ip);
 }
 
+/* @brief Set IP addresses of targets
+ * @param ip Vector container which contains IP addresses of targets
+*/
 void NodeInfo::setTargetIP(std::vector<std::string> ip)
 {
   m_targetIP.clear();
   m_targetIP = ip;
 }
 
+/* @brief Set a IP address of a single target
+ * @param ip IP address of a target
+*/
 void NodeInfo::setTargetIP(std::string ip)
 {
   m_targetIP.clear();
   m_targetIP.push_back(ip);
 }
 
+/* @brief Get IP address of this node
+ * @return IP address of this node
+*/
 std::string NodeInfo::thisIP()
 {
   return m_thisIP;
 }
 
+/* @brief Get IP address of manager node
+ * @return IP address of manager node
+*/
 std::string NodeInfo::managerIP()
 {
   return m_managerIP;
 }
 
+/* @brief Get IP addresses of sources
+ * @return Vector container which contains IP addresses of sources
+*/
 std::vector<std::string> NodeInfo::sourceIP()
 {
   return m_sourceIP;
 }
 
+/* @brief Get IP addresses of targets
+ * @return Vector container which contains IP addresses of targets
+*/
 std::vector<std::string> NodeInfo::targetIP()
 {
   return m_targetIP;
 }
 
+/* @brief Serializing the NodeInfo object
+ * This uses very simple serialization method called stringstream-based serialization.
+ * This approach is actually not good at all.
+ * @return Serialized object as a string
+*/
 std::string NodeInfo::serializedNodeInfo()
 {
   std::stringstream ss;
@@ -158,6 +230,9 @@ std::string NodeInfo::serializedNodeInfo()
   return ss.str();
 }
 
+/* @brief Deserializing the NodeInfo object
+ * @param nodeinfo Serialized NodeInfo object
+*/
 void NodeInfo::deserializedNodeInfo(const std::string nodeinfo)
 {
   std::string tmpSourceIP;
@@ -192,23 +267,25 @@ void NodeInfo::deserializedNodeInfo(const std::string nodeinfo)
   }
 }
 
+/* @brief Displaying NodeInfo object (only for debugging)
+*/
 void NodeInfo::Print()
 {
-  std::cout << "m_type = " << m_type << std::endl;
-  std::cout << "m_unitNo = " << m_unitNo << std::endl;
-  std::cout << "m_nodeNo = " << m_nodeNo << std::endl;
-  std::cout << "m_portBaseDataIn = " << m_portBaseDataIn << std::endl;
-  std::cout << "m_portBaseDataOut = " << m_portBaseDataOut << std::endl;
-  std::cout << "m_portBaseControl = " << m_portBaseControl << std::endl;
-  std::cout << "m_thisIP = " << m_thisIP << std::endl;
-  std::cout << "m_managerIP = " << m_managerIP << std::endl;
-  std::cout << "m_sourceIP (" << m_sourceIP.size() << ") = ";
+  B2INFO("=================================================");
+  B2INFO(" NodeInfo Summary");
+  B2INFO("   m_type = " << m_type);
+  B2INFO("   m_unitNo = " << m_unitNo);
+  B2INFO("   m_nodeNo = " << m_nodeNo);
+  B2INFO("   m_portBaseDataIn = " << m_portBaseDataIn);
+  B2INFO("   m_portBaseDataOut = " << m_portBaseDataOut);
+  B2INFO("   m_portBaseControl = " << m_portBaseControl);
+  B2INFO("   m_thisIP = " << m_thisIP);
+  B2INFO("   m_managerIP = " << m_managerIP);
+  B2INFO("   m_sourceIP (" << m_sourceIP.size() << ")");
   for (int i = 0; i < m_sourceIP.size(); i++)
-    std::cout << m_sourceIP[i] << " ";
-  std::cout << std::endl << "m_targetIP (" << m_targetIP.size() << ") = ";
+    B2INFO("     " << m_sourceIP[i]);
+  B2INFO("   m_targetIP (" << m_targetIP.size() << ")");
   for (int i = 0; i < m_targetIP.size(); i++)
-    std::cout << m_targetIP[i] << " ";
-  std::cout << std::endl;
-  //std::cout << "m_sourceIP = " << m_sourceIP << std::endl;
-  //std::cout << "m_targetIP = " << m_targetIP << std::endl;
+    B2INFO("     " << m_targetIP[i]);
+  B2INFO("=================================================");
 }

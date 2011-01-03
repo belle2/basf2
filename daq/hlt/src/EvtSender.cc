@@ -66,7 +66,6 @@ EStatus EvtSender::broadCasting()
       m_buffer->remq((int*)tmp);
       std::string input(tmp);
 
-      //B2INFO ("Sending message: " << input);
       if (B2Socket::send(input) == c_Success) {
         if (input == "EOF") {
           return c_TermCalled;

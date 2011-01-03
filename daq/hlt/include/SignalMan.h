@@ -15,6 +15,7 @@
 #include <string>
 #include <vector>
 
+#include <sys/wait.h>
 #include <signal.h>
 
 #include <framework/logging/Logger.h>

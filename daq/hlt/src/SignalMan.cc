@@ -61,6 +61,17 @@ SignalMan::SignalMan(const int inPort, const int outPort, std::vector<std::strin
 SignalMan::~SignalMan(void)
 {
   if (m_pidEvtSender != 0 && m_pidEvtReceiver != 0) {
+    int status1, status2;
+
+    std::string endOfRun("EOF");
+    B2INFO("Terminating EvtReceiver...");
+
+    B2INFO("Terminating EvtSender...");
+    m_outBuf->insq((int*)(endOfRun.c_str()), endOfRun.size());
+
+    waitpid(m_pidEvtSender, &status1, 0);
+    waitpid(m_pidEvtReceiver, &status2, 0);
+
     delete m_inBuf;
     delete m_outBuf;
   }
@@ -94,6 +105,7 @@ EStatus SignalMan::doCommunication(void)
   m_pidEvtSender = fork();
   if (m_pidEvtSender == 0) {
     m_pidEvtReceiver = 1;
+    // It should take care of multiple destinations somehow..
     m_sender = EvtSender(m_dest[0], m_outPort);
     if (m_sender.init(m_outBuf) == c_InitFailed) {
       B2ERROR("Could not initialize EvtSender.");
@@ -106,7 +118,7 @@ EStatus SignalMan::doCommunication(void)
       EStatus status = m_sender.broadCasting();
 
       if (status == c_TermCalled) {
-        B2INFO("EvtSender terminates...");
+        B2INFO("Destroying EvtSender..");
         return c_TermCalled;
       }
 

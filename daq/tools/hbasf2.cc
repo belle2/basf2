@@ -29,8 +29,8 @@ int main(int argc, char* argv[])
   // For Process node
   else if (!strcmp(argv[1], "node")) {
     HLTFramework* hltFramework = new HLTFramework(c_ProcessNode);
+    B2INFO("Process node initializing");
     hltFramework->init();
-    B2INFO("Process node initialized");
     delete hltFramework;
     return 0;
   }

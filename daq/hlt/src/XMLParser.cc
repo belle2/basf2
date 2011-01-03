@@ -15,8 +15,11 @@ using namespace Belle2;
 /* @brief XMLParser constructor
 */
 XMLParser::XMLParser(void)
-    : m_filename(NULL), m_expNo(-1), m_runStart(-1), m_runEnd(-1)
 {
+  m_filename = NULL;
+  m_expNo = -1;
+  m_runStart = -1;
+  m_runEnd = -1;
   m_units.clear();
 }
 
@@ -25,8 +28,11 @@ XMLParser::XMLParser(void)
  * @param filename File name to parse
 */
 XMLParser::XMLParser(char* filename)
-    : m_filename(filename), m_expNo(-1), m_runStart(-1), m_runEnd(-1)
 {
+  m_filename = filename;
+  m_expNo = -1;
+  m_runStart = -1;
+  m_runEnd = -1;
   m_units.clear();
 
   init();

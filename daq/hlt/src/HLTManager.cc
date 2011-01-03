@@ -102,7 +102,7 @@ void HLTManager::Print(void)
   B2INFO("   HLT Name: " << m_inputName);
   B2INFO("   HLT Description: " << m_inputDescription);
   B2INFO("   Exp = " << m_expNo << " (Run = " << m_runStart << " - " << m_runEnd << ")");
-  B2INFO("   Units = " << m_unit.size());
+  B2INFO("   Units = " << m_units.size());
   for (std::vector<UnitManager>::iterator i = m_units.begin(); i != m_units.end(); i++)
     (*i).Print();
   B2INFO("=================================================");

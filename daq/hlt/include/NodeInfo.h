@@ -15,6 +15,8 @@
 #include <string>
 #include <vector>
 
+#include <framework/logging/Logger.h>
+
 namespace Belle2 {
 
   class NodeInfo {

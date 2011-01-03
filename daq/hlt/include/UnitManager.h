@@ -14,6 +14,9 @@
 #include <iostream>
 #include <vector>
 
+#include <framework/logging/Logger.h>
+
+#include <daq/hlt/HLTDefs.h>
 #include <daq/hlt/UnitInfo.h>
 #include <daq/hlt/NodeInfo.h>
 #include <daq/hlt/NodeManager.h>
@@ -31,7 +34,7 @@ namespace Belle2 {
     ~UnitManager(void);
 
     //! Initializing the unit manager by referring unit information
-    int init(UnitInfo& unit);
+    EStatus init(UnitInfo& unit);
 
     //! Building node information based on unit information
     NodeInfo& buildNodeInfo(UnitInfo& unit);
@@ -44,11 +47,11 @@ namespace Belle2 {
   protected:
     NodeInfo* buildNodeInfo(const std::string type, const int nodeNo, UnitInfo& unit);
     //! Initializing an event separator
-    int initEventSeparator(UnitInfo& unit);
+    EStatus initEventSeparator(UnitInfo& unit);
     //! Initializing worker nodes
-    int initWorkerNode(UnitInfo& unit);
+    EStatus initWorkerNode(UnitInfo& unit);
     //! Initializing an event merger
-    int initEventMerger(UnitInfo& unit);
+    EStatus initEventMerger(UnitInfo& unit);
 
   private:
     int m_unitNo;                               /*!< Unique number of this unit */

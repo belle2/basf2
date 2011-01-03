@@ -9,10 +9,12 @@
  **************************************************************************/
 
 #include <daq/hlt/UnitManager.h>
-#include <framework/logging/Logger.h>
 
 using namespace Belle2;
 
+/* @brief UnitManager constructor
+ * @param unit UnitInfo object
+*/
 UnitManager::UnitManager(UnitInfo& unit)
 {
   m_unitNo = unit.unitNo();
@@ -25,26 +27,37 @@ UnitManager::UnitManager(UnitInfo& unit)
   init(unit);
 }
 
+/* @brief UnitManager destructor
+*/
 UnitManager::~UnitManager()
 {
-  //delete m_eventSeparator;
-  //delete m_eventMerger;
 }
 
-int UnitManager::init(UnitInfo& unit)
+/* @brief Initializing UnitManager
+ * @param unit UnitInfo object
+ * @return c_Success Initialization success
+ * @reuurn c_InitFailed Initialization failed
+*/
+EStatus UnitManager::init(UnitInfo& unit)
 {
-  if (initEventSeparator(unit) == 1)
-    return 1;
+  if (initEventSeparator(unit) != c_Success)
+    return c_InitFailed;
   //m_eventSeparator->nodeInfo ()->Print ();
   //initWorkerNode (unit);
   //m_workerNodes[0]->nodeInfo ()->Print ();
   //initEventMerger (unit);
 }
 
+/* @brief Building NodeInfo object
+ * Maybe unnecessary because doing nothing at this moment
+ * @param unit UnitInfo object
+*/
 NodeInfo& UnitManager::buildNodeInfo(UnitInfo& unit)
 {
 }
 
+/* @brief Broadcasting node information to all nodes inside this unit
+*/
 void UnitManager::broadCasting(void)
 {
   if (m_eventSeparator != NULL)
@@ -58,6 +71,12 @@ void UnitManager::broadCasting(void)
     */
 }
 
+/* @brief Building NodeInfo object
+ * @param type Type of the node
+ * @param nodeNo Node number of the node
+ * @param unit UnitInfo object
+ * @return NodeInfo object built
+*/
 NodeInfo* UnitManager::buildNodeInfo(const std::string type, const int nodeNo, UnitInfo& unit)
 {
   NodeInfo* nodeinfo = new NodeInfo(type, unit.unitNo(), nodeNo);
@@ -80,33 +99,50 @@ NodeInfo* UnitManager::buildNodeInfo(const std::string type, const int nodeNo, U
   return nodeinfo;
 }
 
-///* Event separator should have node # 0 all the time
-int UnitManager::initEventSeparator(UnitInfo& unit)
+/* @brief Initializing NodeManager for event separator
+ * Event separator should have node # 0 all the time
+ * @param unitinfo UnitInfo object
+ * @return c_Success Initialization success
+ * @return c_InitFailed Initialization failed
+*/
+EStatus UnitManager::initEventSeparator(UnitInfo& unit)
 {
   m_eventSeparator = new NodeManager(buildNodeInfo("ES", 0, unit));
-  //m_eventSeparator = new NodeManager (0, unit.unitNo ());
   return (m_eventSeparator->init(unit.manager()));
 }
 
-int UnitManager::initWorkerNode(UnitInfo& unit)
+/* @brief Initializing NodeManager for workernodes
+ * @param unitinfo UnitInfo object
+ * @return c_Success Initialization success
+ * @return c_InitFailed Initialization failed
+*/
+EStatus UnitManager::initWorkerNode(UnitInfo& unit)
 {
   for (int i = 0; i < unit.workerNodes().size(); i++) {
     NodeManager* wn = new NodeManager(buildNodeInfo("WN", i + 1, unit));
-    //NodeManager* wn = new NodeManager (i + 1, m_unitNo);
     wn->init(unit.manager());
     m_workerNodes.push_back(wn);
   }
+
+  return c_Success;
 }
 
-///* Event merger should have something for node #, 100 for now, arbitrary
-int UnitManager::initEventMerger(UnitInfo& unit)
+/* @brief Initializing NodeManager for event merger
+ * Event merger should have something for node #, 100 for now, arbitrary
+ * @param unitinfo UnitInfo object
+ * @return c_Success Initialization success
+ * @return c_InitFailed Initialization failed
+*/
+EStatus UnitManager::initEventMerger(UnitInfo& unit)
 {
   m_eventMerger = new NodeManager(buildNodeInfo("EM", 100, unit));
   m_eventMerger->Print();
-  //m_eventMerger = new NodeManager (100, m_unitNo);
-  m_eventMerger->init(unit.manager());
+  return (m_eventMerger->init(unit.manager()));
 }
 
+/* @brief Displaying UnitManager information
+ * but do nothing now
+*/
 void UnitManager::Print()
 {
 }

@@ -19,10 +19,15 @@ using namespace Belle2;
 /* @brief NodeInfo constructor
 */
 NodeInfo::NodeInfo()
-    : m_type("NDEF"), m_unitNo(0), m_nodeNo(0),
-    m_portBaseDataIn(0), m_portBaseDataOut(0), m_portBaseControl(0),
-    m_thisIP("NDEF"), m_managerIP("NDEF")
 {
+  m_type = "NDEF";
+  m_unitNo = 0;
+  m_nodeNo = 0;
+  m_portBaseDataIn = 0;
+  m_portBaseDataOut = 0;
+  m_portBaseControl = 0;
+  m_thisIP = "NDEF";
+  m_managerIP = "NDEF";
 }
 
 /* @brief NodeInfo constructor
@@ -31,10 +36,15 @@ NodeInfo::NodeInfo()
  * @param nodeNo Node number of the node
 */
 NodeInfo::NodeInfo(const std::string type, const int unitNo, const int nodeNo)
-    : m_type(type), m_unitNo(unitNo), m_nodeNo(nodeNo),
-    m_portBaseDataIn(0), m_portBaseDataOut(0), m_portBaseControl(0),
-    m_thisIP("NDEF"), m_managerIP("NDEF")
 {
+  m_type = type;
+  m_unitNo = unitNo;
+  m_nodeNo = nodeNo;
+  m_portBaseDataIn = 0;
+  m_portBaseDataOut = 0;
+  m_portBaseControl = 0;
+  m_thisIP = "NDEF";
+  m_managerIP = "NDEF";
 }
 
 /* @brief NodeInfo destructor
@@ -213,7 +223,7 @@ std::string NodeInfo::serializedNodeInfo()
   ss << " " << m_portBaseDataIn << " " << m_portBaseDataOut << " " << m_portBaseControl;
   ss << " " << m_thisIP << " " << m_managerIP << " ";
 
-  for (int i = 0; i < m_sourceIP.size(); i++) {
+  for (unsigned int i = 0; i < m_sourceIP.size(); i++) {
     ss << m_sourceIP[i];
     if (i == m_sourceIP.size() - 1)
       ss << " ";
@@ -221,7 +231,7 @@ std::string NodeInfo::serializedNodeInfo()
       ss << "_";
   }
 
-  for (int i = 0; i < m_targetIP.size(); i++) {
+  for (unsigned int i = 0; i < m_targetIP.size(); i++) {
     ss << m_targetIP[i];
     if (i != m_targetIP.size() - 1)
       ss << "_";
@@ -282,10 +292,10 @@ void NodeInfo::Print()
   B2INFO("   m_thisIP = " << m_thisIP);
   B2INFO("   m_managerIP = " << m_managerIP);
   B2INFO("   m_sourceIP (" << m_sourceIP.size() << ")");
-  for (int i = 0; i < m_sourceIP.size(); i++)
+  for (unsigned int i = 0; i < m_sourceIP.size(); i++)
     B2INFO("     " << m_sourceIP[i]);
   B2INFO("   m_targetIP (" << m_targetIP.size() << ")");
-  for (int i = 0; i < m_targetIP.size(); i++)
+  for (unsigned int i = 0; i < m_targetIP.size(); i++)
     B2INFO("     " << m_targetIP[i]);
   B2INFO("=================================================");
 }

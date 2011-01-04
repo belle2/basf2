@@ -101,6 +101,8 @@ EStatus HLTFramework::initProcessNode()
   } else {
     return c_InitFailed;
   }
+
+  return c_Success;
 }
 
 /* @brief Initializing HLTFramework as a manager node
@@ -146,13 +148,14 @@ EStatus HLTFramework::xmlHLTInfo(std::string xmlHLTInfo)
     return c_FuncError;
   } else {
     m_xmlHLTInfo = xmlHLTInfo;
-    return c_Success;
   }
+  return c_Success;
 }
 
 EStatus HLTFramework::beginRun()
 {
   m_HLTProcess = new HLTProcess(m_nodeManager->nodeInfo());
   m_HLTProcess->init();
+
   return m_HLTProcess->beginRun();
 }

@@ -17,8 +17,9 @@ using namespace Belle2;
 /// @param host Host IP address to send data
 /// @param port Port number for the communication
 EvtSender::EvtSender(std::string host, int port)
-    : m_host(host), m_port(port)
 {
+  m_host = host;
+  m_port = port;
 }
 
 /// @brief EvtSender destructor
@@ -82,6 +83,8 @@ EStatus EvtSender::broadCasting()
       return c_FuncError;
     }
   }
+
+  return c_Success;
 }
 
 /// @brief EvtSender << operator

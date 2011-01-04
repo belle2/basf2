@@ -36,9 +36,6 @@ namespace Belle2 {
     //! Initializing the unit manager by referring unit information
     EStatus init(UnitInfo& unit);
 
-    //! Building node information based on unit information
-    NodeInfo& buildNodeInfo(UnitInfo& unit);
-
     void broadCasting(void);
 
     //! Print information of the current unit (only for internal testing)

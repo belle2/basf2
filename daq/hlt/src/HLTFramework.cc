@@ -34,10 +34,14 @@ HLTFramework::HLTFramework(ENodeType nodeType, std::string xmlHLTInfo)
 */
 HLTFramework::~HLTFramework()
 {
-  delete m_nodeManager;
-
-  delete m_HLTManager;
-  delete m_HLTProcess;
+  if (m_nodeType == c_ManagerNode) {
+    B2INFO("Manager node terminates...");
+    delete m_HLTManager;
+  } else if (m_nodeType == c_ProcessNode) {
+    B2INFO("Process node terminates...");
+    delete m_HLTProcess;
+    delete m_nodeManager;
+  }
 }
 
 /* @brief Initializing HLTFramework
@@ -71,8 +75,11 @@ EStatus HLTFramework::initProcessNode()
 
   // For the framework itself because forked EvtSender and EvtReceiver never return c_Success
   if (initCode == c_Success) {
-    m_nodeInfo = m_nodeManager->listen();
-    m_nodeManager->setNodeInfo(m_nodeInfo);
+    m_nodeManager->setNodeInfo(m_nodeManager->listen());
+
+    EStatus returnCode = m_nodeManager->initEvtSender();
+    if (returnCode != c_Success)
+      return returnCode;
 
     if (m_nodeManager->nodeInfo()->type() == "ES") {
       B2INFO("Assignment as a event separator");
@@ -90,13 +97,9 @@ EStatus HLTFramework::initProcessNode()
   }
   // For forked components (EvtSender and EvtReceiver)
   else if (initCode == c_TermCalled) {
-    if (m_nodeManager->isEvtSender()) {
-      B2INFO("EvtSender termination...");
-    } else if (m_nodeManager->isEvtReceiver()) {
-      B2INFO("EvtReceiver termination...");
-    }
-
     return c_TermCalled;
+  } else {
+    return c_InitFailed;
   }
 }
 
@@ -108,6 +111,8 @@ EStatus HLTFramework::initManager()
 {
   m_HLTManager = new HLTManager(m_xmlHLTInfo);
   m_HLTManager->broadCasting();
+
+  return c_Success;
 }
 
 /* @brief Set node type of this node
@@ -147,5 +152,7 @@ EStatus HLTFramework::xmlHLTInfo(std::string xmlHLTInfo)
 
 EStatus HLTFramework::beginRun()
 {
-  m_nodeManager->setNodeInfo(m_nodeManager->listen());
+  m_HLTProcess = new HLTProcess(m_nodeManager->nodeInfo());
+  m_HLTProcess->init();
+  return m_HLTProcess->beginRun();
 }

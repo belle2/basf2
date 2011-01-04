@@ -38,6 +38,7 @@ namespace Belle2 {
     //! Initializing the node information
     EStatus init(const std::string manager);
     void setNodeInfo(std::string nodeinfo);
+    EStatus initEvtSender(void);
 
     //! Setting unique unit number of this node
     void setUnitNo(const int unitNo);

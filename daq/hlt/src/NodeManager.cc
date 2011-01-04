@@ -45,6 +45,7 @@ NodeManager::NodeManager(NodeInfo* nodeinfo)
 */
 NodeManager::~NodeManager()
 {
+  delete m_nodeinfo;
   delete m_infoSignalMan;
 }
 
@@ -68,6 +69,20 @@ void NodeManager::setNodeInfo(std::string nodeinfo)
   NodeInfo* tmp_node = new NodeInfo();
   tmp_node->deserializedNodeInfo(nodeinfo);
   m_nodeinfo = tmp_node;
+}
+
+/* @brief Initialize EvtSender only
+ * This is for the beginning of process node
+ * @return c_Success Initialization success
+ * @return c_InitFailed Initialization failed
+ * @return c_TermCalled Termination of EvtSender
+*/
+EStatus NodeManager::initEvtSender()
+{
+  if (m_nodeinfo == NULL)
+    return c_InitFailed;
+  else
+    return m_infoSignalMan->runEvtSender();
 }
 
 /* @brief Set unit number of this node
@@ -124,7 +139,14 @@ EStatus NodeManager::initSignalMan()
   else
     m_infoSignalMan = new SignalMan(c_MonitorPort, c_ControlPort, m_nodeinfo->targetIP());
 
-  return m_infoSignalMan->init();
+  m_infoSignalMan->init("B2ControlIn", "B2ControlOut");
+
+  // If there is no NodeInfo object, that is, a process node, runs EvtReceiver first because it doesn't know
+  // the IP address of manager node
+  if (m_nodeinfo == NULL)
+    return m_infoSignalMan->runEvtReceiver();
+  else
+    return m_infoSignalMan->doCommunication();
 }
 
 /* @brief Test if this process is EvtSender or not

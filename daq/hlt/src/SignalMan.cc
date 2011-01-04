@@ -56,11 +56,15 @@ SignalMan::SignalMan(const int inPort, const int outPort, std::vector<std::strin
 }
 
 /* @brief SignalMan destructor
+ * If the process is the framework, try to terminate EvtSender and EvtReceiver
+ * For EvtSender, put "EOF" into the ring buffer then EvtSender terminates
+ * For EvtReceiver, no idea so far (but should terminates somehow)
  * Ring buffers for IPC should be only managed by the framework
 */
 SignalMan::~SignalMan(void)
 {
   if (m_pidEvtSender != 0 && m_pidEvtReceiver != 0) {
+    B2INFO("[PID] pidEvtSender = " << m_pidEvtSender << " / pidEvtReceiver = " << m_pidEvtReceiver);
     int status1, status2;
 
     std::string endOfRun("EOF");
@@ -70,7 +74,7 @@ SignalMan::~SignalMan(void)
     m_outBuf->insq((int*)(endOfRun.c_str()), endOfRun.size());
 
     waitpid(m_pidEvtSender, &status1, 0);
-    waitpid(m_pidEvtReceiver, &status2, 0);
+    //waitpid(m_pidEvtReceiver, &status2, 0);
 
     delete m_inBuf;
     delete m_outBuf;
@@ -83,23 +87,35 @@ SignalMan::~SignalMan(void)
  * @return c_InitFailed Initialization failed
  * @return c_TermCalled Termination of forked processes (EvtSender and EvtReceiver)
 */
-EStatus SignalMan::init(void)
+EStatus SignalMan::init(const std::string inBufName, const std::string outBufName)
 {
-  char inBufName[] = "inBuffer";
-  char outBufName[] = "outBuffer";
+  B2INFO("Starting to initialize SignalMan");
+  m_inBuf = new RingBuffer(inBufName.c_str(), 1024);
+  m_outBuf = new RingBuffer(outBufName.c_str(), 1024);
 
-  m_inBuf = new RingBuffer(inBufName, 1024);
-  m_outBuf = new RingBuffer(outBufName, 1024);
-
-  return doCommunication();
+  return c_Success;
 }
 
-/* @brief Fork EvtSender and EvtReceiver and let them work
+/* @brief Run EvtSender and EvtReceiver both
  * @return c_Success Forking success (only framework returns this)
  * @return c_InitFailed Initialization failed (only EvtSender and EvtReceiver return this)
  * @return c_TermCalled Termination of forked processes (EvtSender and EvtReceiver)
 */
 EStatus SignalMan::doCommunication(void)
+{
+  EStatus returnCode = runEvtReceiver();
+  if (returnCode == c_Success)
+    returnCode = runEvtSender();
+
+  return returnCode;
+}
+
+/* @brief Run EvtSender only using forking
+ * @return c_Success Forking success (only framework returns this)
+ * @return c_InitFailed Initialization failed (only EvtSender returns this)
+ * @return c_TermCalled Termination of EvtSender
+*/
+EStatus SignalMan::runEvtSender(void)
 {
   // Forking off an event sender to send data
   m_pidEvtSender = fork();
@@ -128,6 +144,16 @@ EStatus SignalMan::doCommunication(void)
     return c_Success;
   }
 
+  return c_Success;
+}
+
+/* @brief Run EvtReceiver only using forking
+ * @return c_Success Forking success (only framework returns this)
+ * @return c_InitFailed Initialization failed (only Receiver returns this)
+ * @return c_TermCalled Termination of EvtReceiver
+*/
+EStatus SignalMan::runEvtReceiver(void)
+{
   // Forking off an event receiver to take data
   m_pidEvtReceiver = fork();
   if (m_pidEvtReceiver == 0) {

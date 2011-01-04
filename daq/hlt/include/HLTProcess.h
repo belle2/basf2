@@ -28,10 +28,12 @@ namespace Belle2 {
 
     EStatus init(void);
 
+    EStatus beginRun(void);
+
   private:
     NodeInfo* m_nodeInfo;
-
     SignalMan* m_signalMan;
+    pid_t m_pidBasf2;
   };
 }
 

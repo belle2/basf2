@@ -44,7 +44,11 @@ namespace Belle2 {
     ~SignalMan(void);
 
     //! Initializing this object
-    EStatus init(void);
+    EStatus init(const std::string inBufName, const std::string outBufName);
+
+    EStatus runEvtSender(void);
+    EStatus runEvtReceiver(void);
+    EStatus doCommunication(void);
 
     //! Setting port numbers for the communications
     const void setPorts(const int inPort, const int outPort);
@@ -74,7 +78,6 @@ namespace Belle2 {
     const void Print(void);
 
   protected:
-    EStatus doCommunication(void);
 
   private:
     int m_inPort, m_outPort;      /*!< Ports number for data communication */

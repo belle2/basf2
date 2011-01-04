@@ -30,7 +30,7 @@ namespace Belle2 {
   class RingBuffer {
   public:
     /*! Constructor by creating a new shared memory */
-    RingBuffer(char* name, int size);    // Create / Attach Ring buffer
+    RingBuffer(const char* name, int size);    // Create / Attach Ring buffer
     /*! Constructor by attaching to an existing shared memory */
     RingBuffer(int shmid);              // Attach Ring Buffer
     /*! Destructor */

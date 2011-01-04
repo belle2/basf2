@@ -46,14 +46,8 @@ EStatus UnitManager::init(UnitInfo& unit)
   //initWorkerNode (unit);
   //m_workerNodes[0]->nodeInfo ()->Print ();
   //initEventMerger (unit);
-}
 
-/* @brief Building NodeInfo object
- * Maybe unnecessary because doing nothing at this moment
- * @param unit UnitInfo object
-*/
-NodeInfo& UnitManager::buildNodeInfo(UnitInfo& unit)
-{
+  return c_Success;
 }
 
 /* @brief Broadcasting node information to all nodes inside this unit
@@ -118,7 +112,7 @@ EStatus UnitManager::initEventSeparator(UnitInfo& unit)
 */
 EStatus UnitManager::initWorkerNode(UnitInfo& unit)
 {
-  for (int i = 0; i < unit.workerNodes().size(); i++) {
+  for (unsigned int i = 0; i < unit.workerNodes().size(); i++) {
     NodeManager* wn = new NodeManager(buildNodeInfo("WN", i + 1, unit));
     wn->init(unit.manager());
     m_workerNodes.push_back(wn);

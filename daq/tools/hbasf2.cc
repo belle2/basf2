@@ -22,6 +22,7 @@ int main(int argc, char* argv[])
       HLTFramework* hltFramework = new HLTFramework(c_ManagerNode, argv[2]);
       hltFramework->init();
       B2INFO("Manager node initialized");
+
       delete hltFramework;
       return 0;
     }
@@ -30,7 +31,13 @@ int main(int argc, char* argv[])
   else if (!strcmp(argv[1], "node")) {
     HLTFramework* hltFramework = new HLTFramework(c_ProcessNode);
     B2INFO("Process node initializing");
-    hltFramework->init();
+
+    if (hltFramework->init() == c_TermCalled)
+      return 0;
+
+    if (hltFramework->beginRun() == c_TermCalled)
+      return 0;
+
     delete hltFramework;
     return 0;
   }

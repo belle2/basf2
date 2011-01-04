@@ -30,7 +30,7 @@ using namespace Belle2;
 
 // Constructor / Destructor
 
-RingBuffer::RingBuffer(char* name, int size)
+RingBuffer::RingBuffer(const char* name, int size)
 {
   // 1. Open shared memory
   m_shmid = shmget(IPC_PRIVATE, size * 4, IPC_CREAT | 0644);

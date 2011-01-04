@@ -213,6 +213,7 @@ std::vector<std::string> NodeInfo::targetIP()
 /* @brief Serializing the NodeInfo object
  * This uses very simple serialization method called stringstream-based serialization.
  * This approach is actually not good at all.
+ * @todo Changing object serialization part
  * @return Serialized object as a string
 */
 std::string NodeInfo::serializedNodeInfo()

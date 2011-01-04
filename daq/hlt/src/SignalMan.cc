@@ -60,6 +60,7 @@ SignalMan::SignalMan(const int inPort, const int outPort, std::vector<std::strin
  * For EvtSender, put "EOF" into the ring buffer then EvtSender terminates
  * For EvtReceiver, no idea so far (but should terminates somehow)
  * Ring buffers for IPC should be only managed by the framework
+ * @todo Implement EvtReceiver termination part
 */
 SignalMan::~SignalMan(void)
 {
@@ -83,6 +84,7 @@ SignalMan::~SignalMan(void)
 
 /* @brief Initialization of SignalMan
  * Buffer size is hard-coded now and it should be flexible somehow
+ * @todo Buffer size parameterize
  * @return c_Success Initialization success (only framework returns this)
  * @return c_InitFailed Initialization failed
  * @return c_TermCalled Termination of forked processes (EvtSender and EvtReceiver)
@@ -114,6 +116,7 @@ EStatus SignalMan::doCommunication(void)
  * @return c_Success Forking success (only framework returns this)
  * @return c_InitFailed Initialization failed (only EvtSender returns this)
  * @return c_TermCalled Termination of EvtSender
+ * @todo Implement a part of destination decider
 */
 EStatus SignalMan::runEvtSender(void)
 {
@@ -305,7 +308,7 @@ void SignalMan::broadCasting(void)
 }
 
 /* @brief I don't even remember the intension of this function now...
- * Maybe it should be removed (even worse this is the same with get() function
+ * Maybe it should be removed (even worse this is the same with get() function)
 */
 std::string SignalMan::listening(void)
 {

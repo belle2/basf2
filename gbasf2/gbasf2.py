@@ -184,6 +184,8 @@ def main():
                 print "Couldn't find a valid uploaded proxy, and couldn't upload one %s " \
                     % uploadResult['Value']
 
+  # FIXME - check for existing project name, and prevent additions unless forced
+
   # perform the metadata query
     asearch = AmgaSearch()
     asearch.setDataType(cliParams.getDataType())

@@ -30,9 +30,10 @@ class AmgaClient(object):
         Constructor - needs path of yaml file with configuration
         '''
 
-        # self.client = mdclient.MDClient('amga2.collab.unimelb.edu.au', 8822, '', '')
-        # self.client = mdclient.MDClient('uib2dev.ifj.edu.pl', 8822, '', '')
         try:
+            # self.client = mdclient.MDClient('amga.ijs.si', 8822, '', '')
+            # self.client = mdclient.MDClient('cgh10.collab.unimelb.edu.au', 8822, '', '')
+            # self.client = mdclient.MDClient('cgh7.collab.unimelb.edu.au', 8822, '', '')
             self.client = mdclient.MDClient('150.183.246.196', 8822,
                     'belle_user', 'belle')
         except Exception, ex:

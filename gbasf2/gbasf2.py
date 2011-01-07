@@ -49,8 +49,8 @@ def make_jdl(
     f.write('    JobName = ' + os.path.basename(lfn) + ';\n')
     f.write('    PilotType = "private";\n')
     f.write('    SystemConfig = ' + sysconfig + ';\n')
-    f.write('    Requirements = Member(GlueHostApplicationSoftwareRunTimeEnvironment, "VO-belle-'
-             + swver + '");\n')
+    f.write('    Requirements = Member(, "VO-belle-' + swver
+            + '", other.GlueHostApplicationSoftwareRunTimeEnvironment);\n')
     f.write('    InputSandbox = \n')
     f.write('    {\n')
     f.write('      "' + steering_file + '",\n')

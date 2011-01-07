@@ -43,8 +43,8 @@ def make_jdl(
 
     f = open(project + '-' + os.path.basename(lfn) + '.jdl', 'w')
     f.write('[\n')
-    f.write('    Executable = "basf2helper.sh ' + steering_file + ' '
-            + release + '";\n')
+    f.write('    Executable = "basf2helper.sh ' + steering_file + ' ' + swver
+            + '";\n')
     f.write('    JobGroup = ' + project + ';\n')
     f.write('    JobName = ' + os.path.basename(lfn) + ';\n')
     f.write('    PilotType = "private";\n')

@@ -20,7 +20,8 @@ class CLIParams:
     project = 'Ungrouped'
     priority = 0
     query = None
-    swver = 'Belle-v1r0'
+    swver = 'build_2010-12-13'
+    sysconfig = 'Belle-v2r1'
     datatype = None
     experiments = None
     inputsandboxfiles = None
@@ -70,6 +71,11 @@ class CLIParams:
         self.swver = arg
         return DIRAC.S_OK()
 
+    def setSysConfig(self, arg):
+    # FIXME: check swver is valid against list
+        self.sysconfig = arg
+        return DIRAC.S_OK()
+
     def setInputFiles(self, arg):
     # FIXME: check all files exist
         self.inputsandboxfiles = arg.rstrip().split(',')
@@ -109,6 +115,9 @@ class CLIParams:
     def getSwVer(self):
         return self.swver
 
+    def getSysConfig(self):
+        return self.sysconfig
+
     def getInputFiles(self):
         return self.inputsandboxfiles
 
@@ -137,6 +146,9 @@ class CLIParams:
                               self.setExperiments)
         Script.registerSwitch('l:', 'swver=', 'Software Version',
                               self.setSwVer)
+        Script.registerSwitch('b:', 'sysconfig=',
+                              '(Advanced) DIRAC System Configuration Version',
+                              self.setSysConfig)
         Script.registerSwitch('f:', 'inputsandboxfiles=',
                               '(optional) Files required for the job (comma separated list, max 10MB)'
                               , self.setInputFiles)

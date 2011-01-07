@@ -36,17 +36,21 @@ def make_jdl(
     CPUTime,
     priority,
     lfn,
+    sysconfig,
     swver,
     tar,
     ):
 
     f = open(project + '-' + os.path.basename(lfn) + '.jdl', 'w')
     f.write('[\n')
-    f.write('    Executable = "basf2 ' + steering_file + '";\n')
+    f.write('    Executable = "basf2helper.sh ' + steering_file + ' '
+            + release + '";\n')
     f.write('    JobGroup = ' + project + ';\n')
     f.write('    JobName = ' + os.path.basename(lfn) + ';\n')
     f.write('    PilotType = "private";\n')
-    f.write('    SystemConfig = ' + swver + ';\n')
+    f.write('    SystemConfig = ' + sysconfig + ';\n')
+    f.write('    Requirements = Member(GlueHostApplicationSoftwareRunTimeEnvironment, "VO-belle-'
+             + swver + '");\n')
     f.write('    InputSandbox = \n')
     f.write('    {\n')
     f.write('      "' + steering_file + '",\n')
@@ -102,8 +106,9 @@ def make_tar(project, files):
 # gBasf2 takes a number of options - either from the commandline or in a steering file (see
 # gbasf2utils.py) and uses them to (currently)
 # 1. conduct a metadata query to match appropriate data to work with - a set of LFNs
-# 2. construct a project based on the name provided and appropriate JDLs - presently just 1 per job
-# 3. submits the created jdls to the DIRAC Workload Management System
+# 2. performs all necessary tasks to get the user a proxy
+# 3. construct a project based on the name provided and appropriate JDLs - presently just 1 per job
+# 4. submits the created jdls to the DIRAC Workload Management System
 
 
 def main():
@@ -113,6 +118,8 @@ def main():
 
   # setup options
     cliParams = CLIParams()
+    if os.environ.has_key(BELLE2_RELEASE):
+        cliParams.setSwVer(os.environ['BELLE2_RELEASE'])
     cliParams.registerCLISwitches()
     Script.disableCS()
     Script.parseCommandLine(ignoreErrors=True)
@@ -201,6 +208,7 @@ def main():
                 / 60.0)),
             cliParams.getJobPriority(),
             results[result]['lfn'],
+            cliParams.getSysConfig(),
             cliParams.getSwVer(),
             tar,
             )

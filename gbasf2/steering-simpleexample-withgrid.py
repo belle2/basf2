@@ -16,8 +16,10 @@ experiments = '13,57'
 query = 'id > 10 and id < 15'
 # Type of Data ('data' or 'MC')
 type = 'data'
-# estimated Average Events per Minute (official MC = 40)
+# estimated Average Events per Minute (eg official MC = 40)
 evtpermin = '40'
+# Software Version
+swver = 'build_2010-12-13'
 # (optional) Files to be send with the job
 inputsandboxfiles = 'file1.txt,file2.txt'
 # (optional) max events - the maximum number of events to use

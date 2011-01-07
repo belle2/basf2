@@ -118,7 +118,7 @@ def main():
 
   # setup options
     cliParams = CLIParams()
-    if os.environ.has_key(BELLE2_RELEASE):
+    if os.environ.has_key('BELLE2_RELEASE'):
         cliParams.setSwVer(os.environ['BELLE2_RELEASE'])
     cliParams.registerCLISwitches()
     Script.disableCS()

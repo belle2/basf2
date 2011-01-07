@@ -7,13 +7,13 @@ from basf2 import *
 # gBasf2 configuration     #
 ############################
 # Name for project
-project = 'e055-test'
+project = 'e13-e57-test'
 # (optional) Job priority
 priority = '1'
 # Experiments (comma separated list)
 experiments = '13,57'
 # Metadata query
-query = 'id > 10 and id < 15'
+query = 'runL > 10 and runH < 15'
 # Type of Data ('data' or 'MC')
 type = 'data'
 # estimated Average Events per Minute (eg official MC = 40)

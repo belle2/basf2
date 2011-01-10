@@ -10,6 +10,7 @@
 import mdclient
 import mdinterface
 import sys
+import os
 
 sys.path.append('../')
 

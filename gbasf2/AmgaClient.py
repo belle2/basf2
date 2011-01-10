@@ -31,11 +31,17 @@ class AmgaClient(object):
         '''
 
         try:
-            # self.client = mdclient.MDClient('amga.ijs.si', 8822, '', '')
-            # self.client = mdclient.MDClient('cgh10.collab.unimelb.edu.au', 8822, '', '')
-            # self.client = mdclient.MDClient('cgh7.collab.unimelb.edu.au', 8822, '', '')
-            self.client = mdclient.MDClient('150.183.246.196', 8822,
-                    'belle_user', 'belle')
+            # First, try to connect a proxy
+            if os.environ.has_key('X509_USER_PROXY'):
+                self.client = mdclient.MDClient('150.183.246.196', 8822, '')
+                self.client = mdclient.requireSSL(os.environ['X509_USER_PROXY'
+                        ], os.environ['X509_USER_PROXY'])
+            else:
+              # self.client = mdclient.MDClient('amga.ijs.si', 8822, '', '')
+              # self.client = mdclient.MDClient('cgh10.collab.unimelb.edu.au', 8822, '', '')
+              # self.client = mdclient.MDClient('cgh7.collab.unimelb.edu.au', 8822, '', '')
+                self.client = mdclient.MDClient('150.183.246.196', 8822,
+                        'belle_user', 'belle')
         except Exception, ex:
             print 'Count not connect to AMGA server:', ex
 

@@ -112,23 +112,57 @@ class AmgaClient(object):
         '''
         Query with ability to define parameters in SQL way.
         Returns dict of attribute values, indexed by path and attribute names
+
+        Experiments come in as /VO/dataType/EXX/FC
+        Query is a string
+        attributes is an array of strings
         '''
 
-        tmp = []
+        attrpos = {}
+        lfnpos = 0
         results = {}
 
-        self.client.find(experiment, query)
-        while not self.client.eot():
-            tmp.append(experiment + '/' + self.client.fetchRow())
+        print 'SELECT ' + ', '.join(attributes) + ' FROM ' + experiment \
+            + ' WHERE ' + query.replace(' and ', ' AND ')
 
-        for t in tmp:
-            self.client.getattr(t, attributes)
-          # ignore the first row
-            self.client.fetchRow()
-          # attributes are returned as a dict (index is path) of dicts
-            results[t] = {}
-            for attribute in attributes:
-                results[t][attribute] = self.client.fetchRow()
+        self.client.execute('SELECT ' + ', '.join(attributes) + ' FROM '
+                            + experiment + ' WHERE ' + query.replace(' and ',
+                            ' AND '))
+
+        # get the attribute positions
+        for i in range(len(attributes)):
+            row = self.client.fetchRow()
+            attrpos[i] = row
+            if row == 'lfn':
+                lfnpos = i
+
+        while not self.client.eot():
+            tmp = {}
+            row = ''
+            tmplfn = None
+          # grab the next row
+            for i in range(len(attributes)):
+                row = self.client.fetchRow()
+                tmp[attrpos[i]] = row
+                if i == lfnpos:
+                    tmplfn = row
+
+            results[tmplfn] = tmp
+
+        # self.client.find(experiment, query)
+        # while not self.client.eot():
+        #    tmp.append(experiment + '/' + self.client.fetchRow())
+
+        # for t in tmp:
+        #    self.client.getattr(t, attributes)
+        #  # ignore the first row
+        #    self.client.fetchRow()
+        #  # attributes are returned as a dict (index is path) of dicts
+        #    results[t] = {}
+        #    for attribute in attributes:
+        #        results[t][attribute] = self.client.fetchRow()
+
+        print results
 
         return results
 

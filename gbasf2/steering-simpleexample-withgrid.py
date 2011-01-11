@@ -13,7 +13,7 @@ priority = '1'
 # Experiments (comma separated list)
 experiments = '13,57'
 # Metadata query
-query = 'id > 11 and id < 13'
+query = 'runL > 10 and runH < 15'
 # Type of Data ('data' or 'MC')
 type = 'data'
 # estimated Average Events per Minute (eg official MC = 40)

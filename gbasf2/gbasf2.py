@@ -50,7 +50,7 @@ def make_jdl(
     f.write('    PilotType = "private";\n')
     f.write('    SystemConfig = ' + sysconfig + ';\n')
     f.write('    Requirements = Member("VO-belle-' + swver
-            + '", other.GlueHostApplicationSoftwareRunTimeEnvironment);\n')
+            + '",other.GlueHostApplicationSoftwareRunTimeEnvironment);\n')
     f.write('    InputSandbox = \n')
     f.write('    {\n')
     f.write('      "' + steering_file + '",\n')
@@ -194,7 +194,9 @@ def main():
     asearch.setQuery(cliParams.getQuery())
     asearch.setAttributes(['lfn', 'events'])
     results = asearch.executeAmgaQueryWithAttributes()
-    print results
+    if results == {}:
+        print 'Query returned no results - no jobs to submit'
+        DIRAC.exit(1)
 
   # create the input sandbox
     tar = make_tar(cliParams.getProject(), cliParams.getInputFiles())
@@ -225,7 +227,8 @@ def main():
                 print 'Maximum number of events exceeded - skipping the other files'
                 break
         else:
-            errorList.append('[' + lfn + '] ' + subresult['Message'])
+            errorList.append('[' + results[result]['lfn'] + '] '
+                             + subresult['Message'])
             exitCode = 2
 
   # print any errors encountered during submission

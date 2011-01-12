@@ -37,13 +37,14 @@ namespace Belle2 {
     BELLE2_DEFINE_EXCEPTION(HepEvtCouldNotOpenFileError, "Could not open file %1% !");
     /** Excpetion is thrown if the given indices of the daughters are not valid. */
     BELLE2_DEFINE_EXCEPTION(HepEvtInvalidDaughterIndicesError, "Line %1%: Invalid daughter indices d1=%2%, d2=%3%, N=%4% (0<=d1<=d2<=N required)");
-    /** Excpetion is thrown if the header specifying the number of particles per event could not be parsed. */
+    /** Excpetion is thrown if the header specifying the event header could not be parsed. */
     BELLE2_DEFINE_EXCEPTION(HepEvtHeaderNotValidError, "Line %1%: Event header not understood: %2%");
     /** Excpetion is thrown if a field in the HepEvt file could not be converted to a number. */
     BELLE2_DEFINE_EXCEPTION(HepEvtConvertFieldError, "Line %1%: Could not convert field %2%: %3%");
     /** Excpetion is thrown if the format of a line of the HepEvt file could not be parsed. */
     BELLE2_DEFINE_EXCEPTION(HepEvtParticleFormatError, "Line %1%: Particle format not understood, got %2% fields !");
-
+    /** Exception is thrown if the number of particles for this event is 0 or less.  */
+    BELLE2_DEFINE_EXCEPTION(HepEvtEmptyEventError, "Line %1%: Number of particles in event is %2! (This could mean EOF is reached.) ");
     /**
      * Constructor.
      */
@@ -62,10 +63,10 @@ namespace Belle2 {
 
     /**
      * Reads the next event and stores the result in the given MCParticle graph.
-     * @param graph Reference to the graph which should be filled with the information from the Hepevt file.
-     * @return True if the event could be read.
+     * @param graph Reference to the graph which should be filled with the information from the Hepevt file and the Reference to the event weight which can be filled from the file.
+     * @return event numer if the event could be read and the number was provided in the file.
      */
-    bool getEvent(MCParticleGraph &graph) throw(HepEvtInvalidDaughterIndicesError);
+    int getEvent(MCParticleGraph &graph, double &weight) throw(HepEvtInvalidDaughterIndicesError, HepEvtEmptyEventError);
 
     /**
      * Skips a given number of events.
@@ -80,6 +81,10 @@ namespace Belle2 {
     int m_lineNr;          /**< The current line number within the ascii file. */
     std::ifstream m_input; /**< The input stream of the ascii file. */
 
+    //  /*   int eventID; /**< The event ID number if provided in HepEvtfile else -1.  */ */
+    ///*     double eventWeight; /**< The event weight if provided in HepEvtfile else 1.  */ */
+
+
     /**
      * Returns the current line from the Hepevt ascii file.
      * @return The current line as a string.
@@ -89,8 +94,9 @@ namespace Belle2 {
     /**
      * Reads the event header from the hepevt file.
      * @return The number of particles for the current event.
+     * @params: References to the eventID and the eventWeight which can both be read from the file.
      */
-    int readEventHeader() throw(HepEvtHeaderNotValidError);
+    int readEventHeader(int &eventID, double &eventWeight) throw(HepEvtHeaderNotValidError);
 
     /**
      * Reads the information for a single particle from the Hepevt file.

@@ -34,20 +34,22 @@ namespace Belle2 {
       PrimaryParticle = 1,    /**< bit 0: Particle is primary particle. */
       StableInGenerator = 2,  /**< bit 1: Particle is stable in the generator. */
       StableInSimulation = 4, /**< bit 2: Particle is stable in the simulation. */
-      DecayedInBeampipe = 8,  /**< bit 3: Particle decayed in the beampipe. */
-      DecayedInVTX = 16,      /**< bit 4: Particle decayed in the vertex detectors (PXD, SVD). */
-      DecayedInCDC = 32,      /**< bit 5: Particle decayed in the drift chamber (CDC). */
-      DecayedInPID = 64,      /**< bit 6: Particle decayed in the PID detectors. */
-      DecayedInECL = 128,     /**< bit 7: Particle decayed in the elm calorimeter. */
-      DecayedInKLM = 256      /**< bit 8: Particle decayed in the klm. */
+      LastSeenInBeampipe = 8,  /**< bit 3: Particle was last seen in the beampipe. */
+      LastSeenInVTX = 16,      /**< bit 4: Particle was last seen in the vertex detectors (PXD, SVD). */
+      LastSeenInCDC = 32,      /**< bit 5: Particle was last seen in the drift chamber (CDC). */
+      LastSeenInPID = 64,      /**< bit 6: Particle was last seen in the PID detectors. */
+      LastSeenInECL = 128,     /**< bit 7: Particle was last seen in the elm calorimeter. */
+      LastSeenInKLM = 256,     /**< bit 8: Particle was last seen in the klm. */
+      IsVirtual = 512          /**< bit 9: Particle is virtual and not going to Geant4 */
     };
 
     /**
      * Default constructor for ROOT.
      */
     MCParticle():
+
         m_plist(0), m_mother(0), m_index(0), m_status(0),
-        m_pdg(0), m_mass(0), m_momentum_x(0),
+        m_pdg(0), m_mass(0), m_energy(0), m_momentum_x(0),
         m_momentum_y(0), m_momentum_z(0),
         m_validVertex(false), m_productionTime(0),
         m_productionVertex_x(0), m_productionVertex_y(0),
@@ -106,7 +108,7 @@ namespace Belle2 {
      * Return actual particle energy in [GeV].
      * @return Returns the actual particle energy in [GeV].
      */
-    const float getEnergy()                  const { return std::sqrt(m_momentum_x*m_momentum_x + m_momentum_y*m_momentum_y + m_momentum_z*m_momentum_z + m_mass*m_mass); }
+    const float getEnergy()                  const { return m_energy; }
 
     /**
      * Indication whether vertex and time information is useful or just default.
@@ -198,10 +200,20 @@ namespace Belle2 {
      */
     MCParticle* getMother() const; //Need namespace qualifier because ROOT CINT as troubles otherwise
 
+
+
     /**
-     * Set PDG code of the particle.
-     * @param pdg The PDG code of the MonteCarlo particle.
-     */
+     *Check if particle is virtual
+     *
+    */
+    const bool isVirtual();
+
+
+
+    /**
+      * Set PDG code of the particle.
+      * @param pdg The PDG code of the MonteCarlo particle.
+      */
     void setPDG(int pdg);
 
     /**
@@ -232,7 +244,7 @@ namespace Belle2 {
      * Set energy.
      * @param energy The energy of the MonteCarlo particle.
      */
-    void setEnergy(float energy);
+    void setEnergy(float energy)                        { m_energy = energy; }
 
     /**
      * Set indication wether vertex and time information is valid or just default.
@@ -306,6 +318,13 @@ namespace Belle2 {
     void fixParticleList() const;
 
 
+    /**
+     * Set particle to virtual. (A bit more convinient)
+     */
+    void setVirtual()                                     {  addStatus(IsVirtual); }
+
+
+
   protected:
 
     /**
@@ -324,6 +343,7 @@ namespace Belle2 {
     unsigned int m_status;      /**< status code */
     int m_pdg;                  /**< PDG-Code of the particle */
     float m_mass;               /**< mass of the particle */
+    float m_energy;             /**< energy of the particle */
     float m_momentum_x;         /**< momentum of particle, x component */
     float m_momentum_y;         /**< momentum of particle, y component */
     float m_momentum_z;         /**< momentum of particle, z component */
@@ -347,19 +367,19 @@ namespace Belle2 {
     ClassDef(MCParticle, 1);
   };
 
-  inline void MCParticle::setEnergy(float energy)
+
+  inline const bool MCParticle::isVirtual()
   {
-    if (energy <= m_mass) {
-      m_momentum_x = 0;
-      m_momentum_y = 0;
-      m_momentum_z = 0;
-      return;
+    bool virtuality = hasStatus(IsVirtual);
+    if (!virtuality) {
+      double E2 = m_energy * m_energy;
+      double m2 = m_mass * m_mass;
+      double p2 = m_momentum_x * m_momentum_x;
+      p2 += m_momentum_y * m_momentum_y;
+      p2 += m_momentum_z * m_momentum_z;
+      virtuality = (E2 == p2 + m2);
     }
-    TVector3 p(m_momentum_x, m_momentum_y, m_momentum_z);
-    p.SetMag(sqrt(energy*energy - m_mass*m_mass));
-    m_momentum_x = p.X();
-    m_momentum_y = p.Y();
-    m_momentum_z = p.Z();
+    return virtuality;
   }
 
 } // end namespace Belle2

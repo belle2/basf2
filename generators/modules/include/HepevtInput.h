@@ -15,6 +15,7 @@
 
 #include <string>
 #include <generators/dataobjects/MCParticle.h>
+#include <generators/dataobjects/MCParticleGraph.h>
 #include <generators/hepevt/HepevtReader.h>
 
 namespace Belle2 {
@@ -47,6 +48,8 @@ namespace Belle2 {
     std::string m_inputFileName; /**< The filename of the input HepEvt file. */
     int m_skipEventNumber;       /**< The number of events which should be skipped at the start of reading. */
     HepevtReader m_hepevt;       /**< An instance of the HepEvt reader. */
+    MCParticleGraph mpg;
+    bool m_useWeights;           /**< Parameter to switch on/off weight propagation */
   };
 
 } // end namespace Belle2

@@ -35,6 +35,10 @@ if [ "$CE" == "" ]; then
   exit 1
 fi
 
+if [ "$LCG_GFAL_INFOSYS" == "is.grid.iu.edu" ]; then
+  export LCG_GFAL_INFOSYS=lcg-bdii.cern.ch
+fi
+
 ##############################################################################
 # Debugging information
 ##############################################################################
@@ -60,7 +64,6 @@ echo "end ls --------------"
 echo "start ls -l $VO_BELLE_SW_DIR--------------" 
 ls -l $VO_BELLE_SW_DIR 
 echo "end ls -l $VO_BELLE_SW_DIR--------------" 
-#find $VO_BELLE_SW_DIR -maxdepth 3
 ls -l $VO_BELLE_SW_DIR/../
 
 echo "start cpuinfo --------------" 
@@ -78,14 +81,6 @@ else
   echo "/proc/meminfo not found"
 fi
 echo "end meminfo--------------" 
-echo "" 
-echo "start gcc -v --------------" 
-gcc -v
-echo "end gcc -v -------------" 
-echo "" 
-echo "start gcc --version --------------" 
-gcc --version
-echo "end gcc --version -------------" 
 
 echo "start env----------------------"
 env

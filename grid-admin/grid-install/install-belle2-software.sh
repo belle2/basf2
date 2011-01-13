@@ -120,7 +120,7 @@ fi
 chmod -R 775 *
 lcg-ManageVOTag -host $CE  -vo $VO --add 
     -tag VO-$VO-$SOFTWARE_VERSION VO-$VO-Externals-$EXTERNALS_VERSION VO-$VO-Platform-$PLATFORM 
-if [ $? - ne 0 ]; then
+if [ $? -ne 0 ]; then
     lcg-tags --ce $CE  --vo $VO --add 
     --tags VO-$VO-$SOFTWARE_VERSION,VO-$VO-Externals-$EXTERNALS_VERSION,VO-$VO-Platform-$PLATFORM 
 fi

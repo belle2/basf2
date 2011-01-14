@@ -46,7 +46,8 @@ class AmgaClient(object):
         except Exception, ex:
             print 'Count not connect to AMGA server:', ex
 
-        print self.client.execute('whoami')
+        self.client.execute('whoami')
+        print self.client.fetchRow()
 
 ###############################################################################
 

@@ -11,7 +11,7 @@
 #include <simulation/kernel/MCParticleGenerator.h>
 
 #include <generators/dataobjects/MCParticle.h>
-#include <framework/datastore/Units.h>
+#include <framework/gearbox/Unit.h>
 #include <framework/datastore/StoreArray.h>
 
 #include <G4Event.hh>

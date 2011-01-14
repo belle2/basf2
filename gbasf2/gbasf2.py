@@ -129,6 +129,8 @@ def main():
     from DIRAC.Interfaces.API import Dirac
     dirac = Dirac.Dirac()
 
+  # FIXME - think about enableCS here.
+
   # check for proxy prescence and if not present, make it
   # FIXME - upload proxy for lifetime of certificate
   # FIXME - warn on certificate validity

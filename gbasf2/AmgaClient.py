@@ -46,6 +46,8 @@ class AmgaClient(object):
         except Exception, ex:
             print 'Count not connect to AMGA server:', ex
 
+        print self.client.execute('whoami')
+
 ###############################################################################
 
     def getSubdirectories(self, dir, relative=False):
@@ -179,6 +181,7 @@ class AmgaClient(object):
         except mdinterface.CommandException, ex:
         # it doesn't exist - create
             try:
+                self.checkDirectory('/'.join(path.split('/')[0:-1]))
                 self.client.createDir(path)
             except mdinterface.CommandException, ex2:
                 print 'Error:', ex2

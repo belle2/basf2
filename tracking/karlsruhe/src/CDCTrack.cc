@@ -31,6 +31,29 @@ CDCTrack::CDCTrack(int Id)
   m_direction.SetX(0);
   m_direction.SetY(0);
   m_direction.SetZ(0);
+  m_chi2 = 0;
+
+}
+
+CDCTrack::CDCTrack(CDCTrack &candidate, int Id)
+{
+
+  m_Id = Id;
+  m_nSegments = candidate.getNSegments();
+  m_nHits = candidate.getNHits();
+
+  m_Segments = candidate.getSegments();
+  m_TrackHits = candidate.getTrackHits();
+
+  m_direction = candidate.getDirection();
+
+  m_innerMostHit = candidate.getInnerMostHit();
+  m_outerMostHit = candidate.getOuterMostHit();
+  m_innerMostSegment = candidate.getInnerMostSegment();
+  m_outerMostSegment = candidate.getOuterMostSegment();
+
+  m_chi2 = candidate.getChiSquare();
+  m_momentumValue = candidate.getMomentumValue();
 
 }
 
@@ -51,6 +74,16 @@ void CDCTrack::addTrackHit(CDCTrackHit aTrackHit)
 {
   m_TrackHits.push_back(aTrackHit);
   update();
+}
+
+void CDCTrack::setChiSquare(double chi2)
+{
+  m_chi2 = chi2;
+}
+
+void CDCTrack::setMomentumValue(double momentum)
+{
+  m_momentumValue = momentum;
 }
 
 

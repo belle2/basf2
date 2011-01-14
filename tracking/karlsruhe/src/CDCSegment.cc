@@ -61,13 +61,36 @@ void CDCSegment::setIsGood(bool isGood) {m_isGood = isGood;}
 
 void CDCSegment::setIsUsed(bool isUsed)
 {
+
   m_isUsed = isUsed;
+
   for (int i = 0; i < m_nHits; i++) {
     m_TrackHits[i].setIsUsed(isUsed);
   }
 }
 
+void CDCSegment::setTrackCandId(int trackId)
+{
+  bool already = false ;
+  //check if there is already the same Id
+  //only add the new value if it is not already there
+  for (unsigned int i = 0; i < m_trackCandId.size(); i++) {
+    if (trackId == m_trackCandId.at(i)) {
+      already = true;
+    }
+  }
+  if (already == false) {
+    m_trackCandId.push_back(trackId);
+  }
+}
 
+void CDCSegment::setTrackCandId(vector<int> trackId)
+{
+
+  for (unsigned int i = 0; i < trackId.size(); i++) {
+    setTrackCandId(trackId.at(i));
+  }
+}
 
 void CDCSegment::update()
 {
@@ -83,7 +106,7 @@ void CDCSegment::update()
   y.resize(m_nHits);
   d.resize(m_nHits);
 
-  //search for the idex of the Hits with the minimum/maximum distance from the origin
+  //search for the index of the Hits with the minimum/maximum distance from the origin
   for (int i = 0; i < m_nHits; i++) {
     x[i] = m_TrackHits[i].getWirePosX();
     y[i] = m_TrackHits[i].getWirePosY();
@@ -151,6 +174,61 @@ void CDCSegment::update()
 //double norm = m_direction.Mag();
 
 }
+
+int CDCSegment::getWireIdDiff()
+{
+  int minWireId = 1000;
+  int maxWireId = 0;
+  //Number of wires per layer, hardcoded for now, has to come from the cdc database later
+  int NWires[10];
+  NWires[0] = 0;
+  NWires[1] = 160;
+  NWires[2] = 160;
+  NWires[3] = 192;
+  NWires[4] = 224;
+  NWires[5] = 256;
+  NWires[6] = 288;
+  NWires[7] = 320;
+  NWires[8] = 352;
+  NWires[9] = 384;
+
+  //Loop over all hits searching for minimal and maximal WireId
+  for (int i = 0; i < m_nHits; i++) {
+    if (m_TrackHits.at(i).getWireId() < minWireId) minWireId = m_TrackHits.at(i).getWireId();
+    if (m_TrackHits.at(i).getWireId() > maxWireId) maxWireId = m_TrackHits.at(i).getWireId();
+  }
+
+  //if the segment is 'crossing' WireId = 0, some recalculation is needed to get the correct difference
+  if (minWireId < 10 && maxWireId > (NWires[m_superlayerId] - 10)) {
+    minWireId = 1000;
+    maxWireId = 0;
+
+    for (int i = 0; i < m_nHits; i++) { //loop again over all hits
+      //if there is a WireId below 10, shift the values by the total number of wires in this layer
+      if (m_TrackHits.at(i).getWireId() < 10) {
+
+        if ((m_TrackHits.at(i).getWireId() + NWires[m_superlayerId]) < minWireId) minWireId = m_TrackHits.at(i).getWireId() + NWires[m_superlayerId];
+        if ((m_TrackHits.at(i).getWireId() + NWires[m_superlayerId]) > maxWireId) maxWireId = m_TrackHits.at(i).getWireId() + NWires[m_superlayerId];
+      } else {
+
+        if (m_TrackHits.at(i).getWireId() < minWireId) minWireId = m_TrackHits.at(i).getWireId();
+        if (m_TrackHits.at(i).getWireId() > maxWireId) maxWireId = m_TrackHits.at(i).getWireId();
+      }
+    }//end loop over all hits
+
+  }// endif the segment is 'crossing' WireId = 0
+
+  return abs(maxWireId - minWireId);
+}
+
+
+void CDCSegment::clearTrackCandId()
+{
+  m_trackCandId.erase(m_trackCandId.begin(), m_trackCandId.end());
+}
+
+
+
 
 int CDCSegment::shiftAlongZ(TVector3 trackDirection, CDCTrackHit trackHit)
 {

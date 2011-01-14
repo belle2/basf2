@@ -10,7 +10,7 @@
 
 #include <geometry/geodetector/GeoGlobalParams.h>
 #include <framework/gearbox/GearDir.h>
-#include <framework/datastore/Units.h>
+#include <framework/gearbox/Unit.h>
 
 #include <cmath>
 #include <boost/format.hpp>

@@ -25,7 +25,7 @@
 #include <framework/datastore/StoreArray.h>
 
 // framework aux
-#include <framework/datastore/Units.h>
+#include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 
 // ROOT
@@ -76,7 +76,7 @@ void SVDDigi::initialize()
   printModuleParams();
 
   // CPU time start
-  m_timeCPU = clock() * us;
+  m_timeCPU = clock() * Unit::us;
 }
 
 void SVDDigi::beginRun()
@@ -169,10 +169,10 @@ void SVDDigi::endRun()
 void SVDDigi::terminate()
 {
   // CPU time end
-  m_timeCPU = clock() * us - m_timeCPU;
+  m_timeCPU = clock() * Unit::us - m_timeCPU;
 
   // Announce
-  B2INFO("SVDDigi finished. Time per event: " << m_timeCPU / m_nEvent / ms << " ms.");
+  B2INFO("SVDDigi finished. Time per event: " << m_timeCPU / m_nEvent / Unit::ms << " ms.");
 }
 
 void SVDDigi::printModuleParams() const

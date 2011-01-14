@@ -14,7 +14,7 @@
 #include <svd/simsvd/SVDSensitiveDetector.h>
 
 #include <framework/gearbox/GearDir.h>
-#include <framework/datastore/Units.h>
+#include <framework/gearbox/Unit.h>
 
 #include <cmath>
 #include <boost/format.hpp>
@@ -57,7 +57,7 @@ GeoSVDBelleII::~GeoSVDBelleII()
 void GeoSVDBelleII::create(GearDir& content)
 {
   //         Get global parameters
-  double globalRotAngle = content.getParamAngle("Rotation") / deg;
+  double globalRotAngle = content.getParamAngle("Rotation") / Unit::deg;
   double globalOffsetZ  = content.getParamLength("OffsetZ");
 
   //        Add subdetector group

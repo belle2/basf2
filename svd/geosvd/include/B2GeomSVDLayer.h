@@ -10,7 +10,7 @@
 
 #include <svd/geosvd/B2GeomSVDLadder.h>
 #include <framework/gearbox/GearDir.h>
-#include <framework/datastore/Units.h>
+#include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 #include <boost/format.hpp>
 

@@ -17,13 +17,13 @@ double SVDcheater::getPitchZ(int iLayer, int iLadder, int iSensor) const
 {
   switch (iLayer) {
     case 3:
-      return m_pitchZ3 * um;
+      return m_pitchZ3 * Unit::um;
     case 4:
-      return m_pitchZ4 * um;
+      return m_pitchZ4 * Unit::um;
     case 5:
-      return m_pitchZ5 * um;
+      return m_pitchZ5 * Unit::um;
     case 6:
-      return m_pitchZ6 * um;
+      return m_pitchZ6 * Unit::um;
     default:
       B2FATAL("SVDcheater: Incorrect layer number - should not happen!");
   }
@@ -34,13 +34,13 @@ double SVDcheater::getPitchRPhi(int iLayer, int iLadder, int iSensor) const
 {
   switch (iLayer) {
     case 3:
-      return m_pitchRPhi3 * um;
+      return m_pitchRPhi3 * Unit::um;
     case 4:
-      return m_pitchRPhi4 * um;
+      return m_pitchRPhi4 * Unit::um;
     case 5:
-      return m_pitchRPhi5 * um;
+      return m_pitchRPhi5 * Unit::um;
     case 6:
-      return m_pitchRPhi6 * um;
+      return m_pitchRPhi6 * Unit::um;
     default:
       B2FATAL("SVDcheater: Incorrect layer number - should not happen!");
   }
@@ -52,13 +52,13 @@ double SVDcheater::getResolutionZ(int iLayer, int iLadder, int iSensor, double t
 {
   switch (iLayer) {
     case 3:
-      return SVD_ResFunc_z3(theta / deg) * um;
+      return SVD_ResFunc_z3(theta / Unit::deg) * Unit::um;
     case 4:
-      return SVD_ResFunc_z4(theta / deg) * um;
+      return SVD_ResFunc_z4(theta / Unit::deg) * Unit::um;
     case 5:
-      return SVD_ResFunc_z5(theta / deg) * um;
+      return SVD_ResFunc_z5(theta / Unit::deg) * Unit::um;
     case 6:
-      return SVD_ResFunc_z6(theta / deg) * um;
+      return SVD_ResFunc_z6(theta / Unit::deg) * Unit::um;
     default:
       B2FATAL("SVDcheater: Incorrect layer number - should not happen!");
   }
@@ -69,13 +69,13 @@ double SVDcheater::getResolutionRPhi(int iLayer, int iLadder, int iSensor, doubl
 {
   switch (iLayer) {
     case 3:
-      return SVD_ResFunc_rphi3(theta / deg) * um;
+      return SVD_ResFunc_rphi3(theta / Unit::deg) * Unit::um;
     case 4:
-      return SVD_ResFunc_rphi4(theta / deg) * um;
+      return SVD_ResFunc_rphi4(theta / Unit::deg) * Unit::um;
     case 5:
-      return SVD_ResFunc_rphi5(theta / deg) * um;
+      return SVD_ResFunc_rphi5(theta / Unit::deg) * Unit::um;
     case 6:
-      return SVD_ResFunc_rphi6(theta / deg) * um;
+      return SVD_ResFunc_rphi6(theta / Unit::deg) * Unit::um;
     default:
       B2FATAL("SVDcheater: Incorrect layer number - should not happen!");
   }

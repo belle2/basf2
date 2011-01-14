@@ -11,7 +11,7 @@
 #ifndef PXDCHEATER_H
 #define PXDCHEATER_H
 
-#include <framework/datastore/Units.h>
+#include <framework/gearbox/Unit.h>
 
 namespace Belle2 {
 

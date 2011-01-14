@@ -14,7 +14,7 @@
 #include <pxd/geopxd/B2GeomVolume.h>
 #include <pxd/geopxd/B2GeomPXDLadder.h>
 #include <framework/gearbox/GearDir.h>
-#include <framework/datastore/Units.h>
+#include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 #include <boost/format.hpp>
 

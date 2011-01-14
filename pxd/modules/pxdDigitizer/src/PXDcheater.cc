@@ -17,9 +17,9 @@ double PXDcheater::getPitchZ(int iLayer, int iLadder, int iSensor) const
 {
   switch (iLayer) {
     case 1:
-      return m_pitchZ1 * um;
+      return m_pitchZ1 * Unit::um;
     case 2:
-      return m_pitchZ2 * um;
+      return m_pitchZ2 * Unit::um;
     default:
       B2FATAL("PXDcheater: Incorrect layer number - should not happen!");
   }
@@ -30,9 +30,9 @@ double PXDcheater::getPitchRPhi(int iLayer, int iLadder, int iSensor) const
 {
   switch (iLayer) {
     case 1:
-      return m_pitchRPhi1 * um;
+      return m_pitchRPhi1 * Unit::um;
     case 2:
-      return m_pitchRPhi2 * um;
+      return m_pitchRPhi2 * Unit::um;
     default:
       B2FATAL("PXDcheater: Incorrect layer number - should not happen!");
   }
@@ -44,9 +44,9 @@ double PXDcheater::getResolutionZ(int iLayer, int iLadder, int iSensor, double t
 {
   switch (iLayer) {
     case 1:
-      return PXD_ResFunc_z1(theta / deg) * um;
+      return PXD_ResFunc_z1(theta / Unit::deg) * Unit::um;
     case 2:
-      return PXD_ResFunc_z2(theta / deg) * um;
+      return PXD_ResFunc_z2(theta / Unit::deg) * Unit::um;
     default:
       B2FATAL("PXDcheater: Incorrect layer number - should not happen!");
   }
@@ -57,9 +57,9 @@ double PXDcheater::getResolutionRPhi(int iLayer, int iLadder, int iSensor, doubl
 {
   switch (iLayer) {
     case 1:
-      return PXD_ResFunc_rphi1(theta / deg) * um;
+      return PXD_ResFunc_rphi1(theta / Unit::deg) * Unit::um;
     case 2:
-      return PXD_ResFunc_rphi2(theta / deg) * um;
+      return PXD_ResFunc_rphi2(theta / Unit::deg) * Unit::um;
     default:
       B2FATAL("PXDcheater: Incorrect layer number - should not happen!");
   }

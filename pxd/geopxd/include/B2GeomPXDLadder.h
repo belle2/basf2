@@ -13,7 +13,7 @@
 
 #include <pxd/geopxd/B2GeomPXDSensor.h>
 #include <framework/gearbox/GearDir.h>
-#include <framework/datastore/Units.h>
+#include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 #include <boost/format.hpp>
 #include <pxd/geopxd/B2GeomVolume.h>

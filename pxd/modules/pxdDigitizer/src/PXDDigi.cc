@@ -22,7 +22,7 @@
 #include <framework/datastore/StoreArray.h>
 
 // framework aux
-#include <framework/datastore/Units.h>
+#include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 
 // ROOT
@@ -73,7 +73,7 @@ void PXDDigi::initialize()
   printModuleParams();
 
   // CPU time start
-  m_timeCPU = clock() * us;
+  m_timeCPU = clock() * Unit::us;
 }
 
 void PXDDigi::beginRun()
@@ -166,10 +166,10 @@ void PXDDigi::endRun()
 void PXDDigi::terminate()
 {
   // CPU time end
-  m_timeCPU = clock() * us - m_timeCPU;
+  m_timeCPU = clock() * Unit::us - m_timeCPU;
 
   // Announce
-  B2INFO("PXDDigi finished. Time per event: " << m_timeCPU / m_nEvent / ms << " ms.");
+  B2INFO("PXDDigi finished. Time per event: " << m_timeCPU / m_nEvent / Unit::ms << " ms.");
 }
 
 void PXDDigi::printModuleParams() const

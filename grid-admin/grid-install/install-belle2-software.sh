@@ -35,7 +35,7 @@ if [ "$CE" == "" ]; then
   exit 1
 fi
 
-if [ "$LCG_GFAL_INFOSYS" == "is.grid.iu.edu" ]; then
+if [ "$LCG_GFAL_INFOSYS" == "is.grid.iu.edu" ] || [ "$LCG_GFAL_INFOSYS" == "" ]; then
   export LCG_GFAL_INFOSYS=lcg-bdii.cern.ch
 fi
 
@@ -93,6 +93,7 @@ if [ ! -d $VO_BELLE_SW_DIR/belle2 ]; then
   mkdir $VO_BELLE_SW_DIR/belle2
 fi
 
+chown `whoami` $VO_BELLE_SW_DIR/belle2
 chmod 775 $VO_BELLE_SW_DIR/belle2
 cd $VO_BELLE_SW_DIR/belle2
 
@@ -105,19 +106,18 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 
-tar -xvzf $SOFTWARE_TAR
+tar -xzf $SOFTWARE_TAR
 if [ $? -ne 0 ]; then
   echo "Problems untarring"
   exit 1
 fi
 
 
+chown -R `whoami` *
 chmod -R 775 *
-lcg-ManageVOTag -host $CE  -vo $VO --add 
-    -tag VO-$VO-$SOFTWARE_VERSION VO-$VO-Externals-$EXTERNALS_VERSION VO-$VO-Platform-$PLATFORM 
+lcg-ManageVOTag -host $CE  -vo $VO --add -tag VO-$VO-$SOFTWARE_VERSION VO-$VO-Externals-$EXTERNALS_VERSION VO-$VO-Platform-$PLATFORM 
 if [ $? -ne 0 ]; then
-    lcg-tags --ce $CE  --vo $VO --add 
-    --tags VO-$VO-$SOFTWARE_VERSION,VO-$VO-Externals-$EXTERNALS_VERSION,VO-$VO-Platform-$PLATFORM 
+    lcg-tags --ce $CE  --vo $VO --add --tags VO-$VO-$SOFTWARE_VERSION,VO-$VO-Externals-$EXTERNALS_VERSION,VO-$VO-Platform-$PLATFORM 
 fi
 
 ##############################################################################

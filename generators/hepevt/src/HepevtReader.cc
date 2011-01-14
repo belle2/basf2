@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <framework/datastore/Units.h>
+#include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 #include <generators/hepevt/HepevtReader.h>
 
@@ -192,8 +192,8 @@ void HepevtReader::readParticle(MCParticleGraph::GraphParticle &particle) throw(
       particle.setMomentum(TVector3(&fields[6]));
       //particle.setEnergy(fields[9]);
       particle.setMass(fields[10]);
-      particle.setProductionVertex(TVector3(&fields[11])*mm);
-      particle.setProductionTime(fields[14]*mm / speed_of_light);
+      particle.setProductionVertex(TVector3(&fields[11])*Unit::mm);
+      particle.setProductionTime(fields[14]*Unit::mm / Unit::speed_of_light);
       particle.setValidVertex(true);
       {
         //Warn if energy in Hepevt file differs from calculated energy by more than 0.1%

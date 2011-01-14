@@ -8,7 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <framework/datastore/Units.h>
 #include <framework/logging/Logger.h>
 #include <generators/pGun/ParticleGun.h>
 

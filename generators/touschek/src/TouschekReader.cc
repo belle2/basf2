@@ -11,7 +11,7 @@
 #include <generators/touschek/TouschekReader.h>
 
 #include <framework/logging/Logger.h>
-#include <framework/datastore/Units.h>
+#include <framework/gearbox/Unit.h>
 #include <geometry/geodetector/CreatorUtils.h>
 #include <generators/dataobjects/MCParticle.h>
 
@@ -89,8 +89,8 @@ int TouschekReader::getParticles(int number, MCParticleGraph &graph) throw(Tousc
 
     //Convert the position of the particle from local Touschek plane space to global geant4 space.
     //Flip the sign for the y and z component to go from the accelerator to the detector coordinate system
-    particlePosTouschek[0] = fields[2] * m;
-    particlePosTouschek[1] = -fields[3] * m;
+    particlePosTouschek[0] = fields[2] * Unit::m;
+    particlePosTouschek[1] = -fields[3] * Unit::m;
     particlePosTouschek[2] = 0.0;
     m_transMatrix->LocalToMaster(particlePosTouschek, particlePosGeant4);
 

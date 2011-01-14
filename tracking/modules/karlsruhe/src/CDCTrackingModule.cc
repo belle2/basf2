@@ -13,7 +13,9 @@
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreDefs.h>
-#include <framework/datastore/Units.h>
+//#include <framework/datastore/Units.h>
+
+#include <framework/gearbox/Unit.h>
 
 #include <framework/logging/Logger.h>
 #include <cdc/hitcdc/SimHitCDC.h>
@@ -158,28 +160,31 @@ void CDCTrackingModule::event()
 
 //create StoreArray for Tracks
   StoreArray<CDCTrack> cdcTracksArray(m_outTracksColName);
-//combinde Axial Segments to Tracks, fill cdcTracksArray with new Tracks
-  B2INFO("Connect axial Segments...");
-  AxialTrackFinder::ConnectSegments("AxialSegmentsCDCArray", m_outTracksColName); //assigns Segments to Tracks, returns a Tracks array
+//combine Axial Segments to Tracks, fill cdcTracksArray with new Tracks
+
+  B2INFO("Collect track candidates by connecting axial Segments...");
+  AxialTrackFinder::CollectTrackCandidates("AxialSegmentsCDCArray", m_outTracksColName); //assigns Segments to Tracks, returns a Tracks array
 
   B2INFO("Number of track candidates: " << cdcTracksArray.GetEntries());
-  B2INFO("Track Id  Nr of Segments  Nr of Hits: ");
+  B2INFO("Track Id  Nr of Segments  Nr of Hits   |p|[GeV]:");
 
 
   for (int j = 0; j < cdcTracksArray.GetEntries(); j++) { //loop over all Tracks
 
-    B2INFO("  " << cdcTracksArray[j]->getId()  << "             " << cdcTracksArray[j]->getNSegments() << "           " << cdcTracksArray[j]->getNHits());
+    B2INFO("  " << cdcTracksArray[j]->getId()  << "             " << cdcTracksArray[j]->getNSegments() << "           " << cdcTracksArray[j]->getNHits() << "         " << std::setprecision(3) << cdcTracksArray[j]->getMomentumValue());
 
   }//end loop over all Tracks
 
 //Append Stereo Segment to existing Tracks
   B2INFO("Append stereo Segments...");
   StereoFinder::AppendStereoSegments("StereoSegmentsCDCArray", m_outTracksColName);
-  B2INFO("Salvage axial Hits...");
-  HitSalvager::SalvageHits("AxialSegmentsCDCArray", m_outTracksColName, 0.0005);
-  B2INFO("Salvage stereo Hits...");
-  HitSalvager::SalvageHits("StereoSegmentsCDCArray", m_outTracksColName, 0.0005);
 
+//Not needed for the moment...
+  /* B2INFO("Salvage axial Hits...");
+    HitSalvager::SalvageHits("AxialSegmentsCDCArray", m_outTracksColName, 0.0005);
+    B2INFO("Salvage stereo Hits...");
+    HitSalvager::SalvageHits("StereoSegmentsCDCArray", m_outTracksColName, 0.0005);
+  */
   B2INFO("Track Id  Nr of Segments  Nr of Hits: ");
 
   for (int j = 0; j < cdcTracksArray.GetEntries(); j++) { //loop over all Tracks
@@ -189,13 +194,13 @@ void CDCTrackingModule::event()
 
 
   //calculate the fraction of used hits
-  int usedHits = 0;
-  for (int j = 0; j < cdcTracksArray.GetEntries(); j++) {
-    usedHits = usedHits + cdcTracksArray[j]->getNHits();
-  }
-  double fraction = double(usedHits) / double(NHits);
-  B2INFO(std::setprecision(3) << fraction*100 << " %" << "  of all hits were used to reconstruct " << cdcTracksArray.GetEntries() << " track candidates");
-
+  /* int usedHits = 0;
+   for (int j = 0; j < cdcTracksArray.GetEntries(); j++) {
+     usedHits = usedHits + cdcTracksArray[j]->getNHits();
+   }
+   double fraction = double(usedHits) / double(NHits);
+   B2INFO(std::setprecision(3) << fraction*100 << " %" << "  of all hits were used to reconstruct " << cdcTracksArray.GetEntries() << " track candidates");
+  */
 
 
   if (m_textFileOutput) {

@@ -11,7 +11,7 @@
 #ifndef CDCRECOHIT_H
 #define CDCRECOHIT_H
 
-#include <framework/datastore/Units.h>
+#include <framework/gearbox/Unit.h>
 #include <cdc/geocdc/CDCGeometryPar.h>
 
 #include <TVector3.h>

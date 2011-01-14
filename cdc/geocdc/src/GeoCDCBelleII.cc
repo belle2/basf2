@@ -12,7 +12,6 @@
 #include <cdc/simcdc/CDCSensitiveDetector.h>
 
 #include <framework/gearbox/GearDir.h>
-#include <framework/datastore/Units.h>
 #include <framework/logging/Logger.h>
 
 #include <cmath>

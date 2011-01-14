@@ -17,7 +17,7 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreDefs.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/Units.h>
+#include <framework/gearbox/Unit.h>
 
 #include <framework/logging/Logger.h>
 #include <cdc/hitcdc/HitCDC.h>
@@ -71,10 +71,10 @@ void CDCDigi::initialize()
   m_nEvent  = 0 ;
 
   // Set variables in appropriate physical units
-  m_mean1  *= cm;
-  m_mean2  *= cm;
-  m_resolution1  *= cm;
-  m_resolution2  *= cm;
+  m_mean1  *= Unit::cm;
+  m_mean2  *= Unit::cm;
+  m_resolution1  *= Unit::cm;
+  m_resolution2  *= Unit::cm;
 
   // Initialize random generator (engine, mean, sigma)
   m_random = new TRandom((UInt_t)m_randomSeed);
@@ -83,7 +83,7 @@ void CDCDigi::initialize()
   printModuleParams();
 
   // CPU time start
-  m_timeCPU = clock() * us;
+  m_timeCPU = clock() * Unit::us;
 }
 
 void CDCDigi::beginRun()
@@ -129,8 +129,8 @@ void CDCDigi::event()
     int hitWireId  =   aSimHitCDC->getWireId();
 
     // Hit phys. info
-    double hitdEdx        = aSimHitCDC->getEnergyDep() * GeV;
-    double hitDriftLength = aSimHitCDC->getDriftLength() * cm;
+    double hitdEdx        = aSimHitCDC->getEnergyDep() * Unit::GeV;
+    double hitDriftLength = aSimHitCDC->getDriftLength() * Unit::cm;
 
     if (iHits == 0) {
       // Save the first hit into signal map
@@ -202,9 +202,9 @@ double CDCDigi::smearDriftLength(double driftLength, double fraction, double mea
   }
 
   // Smear drift length
-  double newDL = m_random->Gaus(driftLength / cm + mean / cm, resolution / cm);
-  while (newDL <= 0.) newDL = m_random->Gaus(driftLength / cm + mean / cm, resolution / cm);
-  return newDL*cm;
+  double newDL = m_random->Gaus(driftLength / Unit::cm + mean / Unit::cm, resolution / Unit::cm);
+  while (newDL <= 0.) newDL = m_random->Gaus(driftLength / Unit::cm + mean / Unit::cm, resolution / Unit::cm);
+  return newDL*Unit::cm;
 }
 
 void CDCDigi::endRun()
@@ -214,7 +214,7 @@ void CDCDigi::endRun()
 void CDCDigi::terminate()
 {
   // CPU time end
-  m_timeCPU = clock() * us - m_timeCPU;
+  m_timeCPU = clock() * Unit::us - m_timeCPU;
 
   if (m_random)  delete m_random;
   // Print message
@@ -284,18 +284,18 @@ void CDCDigi::printSimCDCHitInfo(const SimHitCDC & aHit) const
   //----------------------
   // Printing a hit info.
   //----------------------
-  double depE = aHit.getEnergyDep() / keV;
+  double depE = aHit.getEnergyDep() / Unit::keV;
   B2INFO("    Hit:"
          << std::fixed
          << std::setprecision(1)
          << " DepE [keV]: "     << depE
          << std::setprecision(3)
          << std::setiosflags(std::ios::showpos)
-         << " Pos X [mm]: " << (aHit.getPosIn()[0] + aHit.getPosOut()[0]) / 2. / mm
-         << " Pos Y [mm]: " << (aHit.getPosIn()[1] + aHit.getPosOut()[1]) / 2. / mm
-         << " Pos Z [mm]: " << (aHit.getPosIn()[2] + aHit.getPosOut()[2]) / 2. / mm
-         << " DriftLength [mm]: "      << aHit.getDriftLength() / mm
-         << " Time of flight [ns]: "      << aHit.getFlightTime() / ns
+         << " Pos X [mm]: " << (aHit.getPosIn()[0] + aHit.getPosOut()[0]) / 2. / Unit::mm
+         << " Pos Y [mm]: " << (aHit.getPosIn()[1] + aHit.getPosOut()[1]) / 2. / Unit::mm
+         << " Pos Z [mm]: " << (aHit.getPosIn()[2] + aHit.getPosOut()[2]) / 2. / Unit::mm
+         << " DriftLength [mm]: "      << aHit.getDriftLength() / Unit::mm
+         << " Time of flight [ns]: "      << aHit.getFlightTime() / Unit::ns
          << " Position flag: "      << aHit.getPosFlag()
          << std::resetiosflags(std::ios::showpos)
          << std::setprecision(0));
@@ -343,10 +343,10 @@ void CDCDigi::printModuleParams() const
   //     << "  Electronics noise - ENC [fC]:          " << std::setw(6) << m_elNoise      << "\n");
 
   B2INFO("                                         " << "\n"
-         << "  Mean1 [um]:                     " << std::setw(6) << m_mean1 / um  << "\n"
-         << "  Resolution1 [um]:               " << std::setw(6) << m_resolution1 / um  << "\n"
-         << "  Mean2 [um]:                     " << std::setw(6) << m_mean2 / um  << "\n"
-         << "  Resolution2 [um]:               " << std::setw(6) << m_resolution2 / um  << "\n"
+         << "  Mean1 [um]:                     " << std::setw(6) << m_mean1 / Unit::um  << "\n"
+         << "  Resolution1 [um]:               " << std::setw(6) << m_resolution1 / Unit::um  << "\n"
+         << "  Mean2 [um]:                     " << std::setw(6) << m_mean2 / Unit::um  << "\n"
+         << "  Resolution2 [um]:               " << std::setw(6) << m_resolution2 / Unit::um  << "\n"
          << std::resetiosflags(std::ios::showpos)
          << std::setprecision(0)
          << "\n");
@@ -376,8 +376,8 @@ void CDCDigi::printCDCSignalInfo(std::string info, const CDCSignalMap & cdcSigna
     B2INFO("                 " << "\n"
            << std::setiosflags(std::ios::fixed | std::ios::internal)
            << std::setprecision(2)
-           << " Total charge [keV]: "  << iterCDCMap->second->getCharge() / keV
-           << " Drift length [mm]: " << iterCDCMap->second->getDriftLength() / mm
+           << " Total charge [keV]: "  << iterCDCMap->second->getCharge() / Unit::keV
+           << " Drift length [mm]: " << iterCDCMap->second->getDriftLength() / Unit::mm
            << std::setprecision(0));
   } // end loop
 }

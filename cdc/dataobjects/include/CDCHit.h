@@ -11,7 +11,7 @@
 #ifndef CDCHIT_H
 #define CDCHIT_H
 
-#include <framework/datastore/Units.h>
+#include <framework/gearbox/Unit.h>
 
 #include <TObject.h>
 
@@ -76,7 +76,7 @@ namespace Belle2 {
      *  @param driftTime Drift Length of electrons from closest ionisation cluster.
      */
     void setDriftTime(double driftTime) {
-      m_driftTime = static_cast<unsigned short int>(driftTime / um);
+      m_driftTime = static_cast<unsigned short int>(driftTime / Unit::um);
     }
 
     /** Setter for charge.
@@ -109,7 +109,7 @@ namespace Belle2 {
      *  Currently a drift length is given back, not a drift time!
      */
     double getdriftTime() const {
-      return (static_cast<double>(m_driftTime) * um);
+      return (static_cast<double>(m_driftTime) * Unit::um);
     }
 
     /** Getter for integrated charge.

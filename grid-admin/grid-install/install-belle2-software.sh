@@ -89,6 +89,7 @@ echo "end env----------------------"
 ##############################################################################
 # Installation steps
 ##############################################################################
+echo "start installation----------------------"
 if [ ! -d $VO_BELLE_SW_DIR/belle2 ]; then
   mkdir $VO_BELLE_SW_DIR/belle2
 fi
@@ -97,18 +98,27 @@ chown `whoami` $VO_BELLE_SW_DIR/belle2
 chmod 775 $VO_BELLE_SW_DIR/belle2
 cd $VO_BELLE_SW_DIR/belle2
 
+if [ -e "lock" ]; then
+  echo "Installation area is locked"
+  exit 1
+else
+  touch "lock"
+fi
+
 rm $SOFTWARE_TAR
 rm -rf releases/$SOFTWARE_VERSION
  
 lcg-cp  -n 1 lfn:/grid/$VO/software/$SOFTWARE_TAR $SOFTWARE_TAR
 if [ $? -ne 0 ]; then
   echo "Problems downloading tar"
+  rm "lock"
   exit 1
 fi
 
 tar -xzf $SOFTWARE_TAR
 if [ $? -ne 0 ]; then
   echo "Problems untarring"
+  rm "lock"
   exit 1
 fi
 
@@ -124,4 +134,5 @@ fi
 # Cleanup
 ##############################################################################
 rm $SOFTWARE_TAR
+rm "lock"
 ls -l 

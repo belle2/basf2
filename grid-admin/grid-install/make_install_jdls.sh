@@ -5,6 +5,10 @@ SOFTWARE_VERSION=$1
 VO=${2:-"belle2"}
 sites=`lcg-infosites -v 1 --vo belle ce | awk -F\: '{ print $1}' | sort |uniq`
 
+#JP-KEK-CRC-02 - ces share soft area.
+#prague_cesnet_lcg2 - ces share soft area, tags not propogated
+
+
 for i in $sites
 do
 cat  << EOF > jdls/$i.jdl

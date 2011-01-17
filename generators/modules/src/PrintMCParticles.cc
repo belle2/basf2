@@ -53,7 +53,7 @@ void PrintMCParticles::event()
   //Loop over the primary particles (no mother particle exists)
   for (int i = 0; i < MCParticles.GetEntries(); i++) {
     MCParticle &mc = *MCParticles[i];
-    if (mc.getMother() != NULL) break;
+    if (mc.getMother() != NULL) continue;
     printTree(mc, 0);
   }
 }

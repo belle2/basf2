@@ -250,7 +250,7 @@ namespace Belle2 {
   throw(MCParticleGraph::NotSameGraphError, MCParticleGraph::DaughterHasMotherError)
   {
     if (this != mother.m_graph || this != daughter.m_graph) throw NotSameGraphError();
-    if (daughter.getMother() != NULL) throw DaughterHasMotherError();
+    //if (daughter.getMother() != NULL) throw DaughterHasMotherError();
     m_decays.insert(DecayLine(mother.m_vertexId, daughter.m_vertexId));
     daughter.m_primary = false;
   }

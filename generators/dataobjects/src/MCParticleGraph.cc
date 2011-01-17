@@ -161,6 +161,7 @@ public:
         }
         //Set Vertex and time information if requested
         setVertexTime(mother, daughter);
+        daughter.m_mother = v;
       }
       //Mark particle as seen
       m_seen[nv] = true;
@@ -213,8 +214,8 @@ void MCParticleGraph::generateList(const string& name, int options)
   }
   Graph g(m_decays.begin(), m_decays.end(), m_particles.size() + 1);
 
+  //Check for cyclic dependency
   if (options & check_cyclic) {
-    //Check for cyclic dependency
     cycle_detector vis;
     depth_first_search(g, visitor(vis));
   }

@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2010-2011  Belle II Collaboration                         *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Martin Ritter                                            *
@@ -48,7 +48,7 @@ namespace Belle2 {
      */
     MCParticle():
 
-        m_plist(0), m_mother(0), m_index(0), m_status(0),
+        m_plist(0), m_index(0), m_status(0),
         m_pdg(0), m_mass(0), m_energy(0), m_momentum_x(0),
         m_momentum_y(0), m_momentum_z(0),
         m_validVertex(false), m_productionTime(0),
@@ -56,6 +56,7 @@ namespace Belle2 {
         m_productionVertex_z(0),
         m_decayTime(0), m_decayVertex_x(0),
         m_decayVertex_y(0), m_decayVertex_z(0),
+        m_mother(0),
         m_first_daughter(0), m_last_daughter(0) {}
 
     /**
@@ -67,7 +68,7 @@ namespace Belle2 {
      * @see class MCParticleGraph
      */
     MCParticle(TClonesArray* plist, const MCParticle& p):
-        m_plist(plist), m_mother(0), m_index(p.m_index), m_status(p.m_status),
+        m_plist(plist), m_index(p.m_index), m_status(p.m_status),
         m_pdg(p.m_pdg), m_mass(p.m_mass), m_momentum_x(p.m_momentum_x),
         m_momentum_y(p.m_momentum_y), m_momentum_z(p.m_momentum_z),
         m_validVertex(p.m_validVertex), m_productionTime(p.m_productionTime),
@@ -75,6 +76,7 @@ namespace Belle2 {
         m_productionVertex_z(p.m_productionVertex_z),
         m_decayTime(p.m_decayTime), m_decayVertex_x(p.m_decayVertex_x),
         m_decayVertex_y(p.m_decayVertex_y), m_decayVertex_z(p.m_decayVertex_z),
+        m_mother(p.m_mother),
         m_first_daughter(p.m_first_daughter), m_last_daughter(p.m_last_daughter) {}
 
     /**
@@ -200,15 +202,11 @@ namespace Belle2 {
      */
     MCParticle* getMother() const; //Need namespace qualifier because ROOT CINT as troubles otherwise
 
-
-
     /**
      *Check if particle is virtual
      *
     */
     const bool isVirtual();
-
-
 
     /**
       * Set PDG code of the particle.
@@ -317,12 +315,10 @@ namespace Belle2 {
      */
     void fixParticleList() const;
 
-
     /**
      * Set particle to virtual. (A bit more convinient)
      */
     void setVirtual()                                     {  addStatus(IsVirtual); }
-
 
 
   protected:
@@ -334,8 +330,6 @@ namespace Belle2 {
      * correctly on first access after deserialisation
      */
     TClonesArray* m_plist; //! transient pointer to particle list
-
-    MCParticle* m_mother; //! transient pointer to the mother particle
 
     /** 1-based index of the particle, will be set automatically after deserialisation if needed. */
     int m_index; //! transient 1-based index of particle
@@ -360,6 +354,7 @@ namespace Belle2 {
     float m_decayVertex_y;      /**< decay vertex of particle, y component */
     float m_decayVertex_z;      /**< decay vertex of particle, z component */
 
+    int m_mother;               /**< 1-based index of the mother particle */
     int m_first_daughter;       /**< 1-based index of first daughter particle in collection, 0 if no daughters */
     int m_last_daughter;        /**< 1-based index of last daughter particle in collection, 0 if no daughters */
 
@@ -380,6 +375,14 @@ namespace Belle2 {
       virtuality = (E2 == p2 + m2);
     }
     return virtuality;
+  }
+
+
+  inline MCParticle* MCParticle::getMother() const
+  {
+    fixParticleList();
+    if (m_mother == 0) return NULL;
+    return static_cast<MCParticle*>(m_plist->At(m_mother - 1));
   }
 
 } // end namespace Belle2

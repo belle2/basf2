@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2010-2011  Belle II Collaboration                         *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Martin Ritter                                            *
@@ -37,6 +37,7 @@ namespace Belle2 {
   BELLE2_DEFINE_EXCEPTION(ParticlePDGNotKnownError, "The pdg value (%1%) of the MCParticle is not known !");
 }
 
+
 void MCParticle::setPDG(int pdg)
 {
   m_pdg = pdg;
@@ -60,12 +61,6 @@ const vector<MCParticle*> MCParticle::getDaughters() const
   return result;
 }
 
-
-MCParticle* MCParticle::getMother() const
-{
-  fixParticleList();
-  return m_mother;
-}
 
 
 void MCParticle::fixParticleList() const
@@ -100,11 +95,6 @@ void MCParticle::fixParticleList() const
     MCParticle &mc = *(static_cast<MCParticle*>(plist->At(i)));
     mc.m_plist = plist;
     mc.m_index = i + 1;
-
-    //Loop over all daughters and set the mother particle
-    BOOST_FOREACH(MCParticle* currParticle, mc.getDaughters()) {
-      currParticle->m_mother = &mc;
-    }
   }
 }
 

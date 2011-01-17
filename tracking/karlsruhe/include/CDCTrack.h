@@ -19,6 +19,7 @@
 
 namespace Belle2 {
 
+  /** Class for track candidates after CDC pattern recognition. */
   class CDCTrack : public TObject {
   public:
 

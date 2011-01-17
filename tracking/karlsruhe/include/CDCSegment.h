@@ -21,6 +21,7 @@
 
 namespace Belle2 {
 
+  /** Class for CDC tracklets ('connected' hits from one superlayer). */
   class CDCSegment : public TObject {
   public:
 

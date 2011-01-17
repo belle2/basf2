@@ -16,7 +16,7 @@
 
 
 namespace Belle2 {
-
+  /** Class to create track candidates in the CDC by connecting segments from axial superlayers. */
   class AxialTrackFinder {
   public:
 

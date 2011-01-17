@@ -62,7 +62,7 @@ def main():
         # lcg-cr
         # entries[outputfile] = (['exp', 'run', 'guid', 'lfn', 'status', 'md5', 'adler32'],[cliParams.getExperiments()[0],'0', 'guid:', 'lfn:', 'good', 'abcdef0', 'abcdef0']
             print outputfile
-        if not bulkInsert(outputpath, entries):
+        if not aclient.bulkInsert(outputpath, entries):
             print 'Error inserting metadata'
             DIRAC.exit(1)
     else:

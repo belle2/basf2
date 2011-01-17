@@ -186,6 +186,18 @@ def main():
                 print "Couldn't find a valid uploaded proxy, and couldn't upload one %s " \
                     % uploadResult['Value']
 
+    # Finally, try to add the VOMS attributes
+    voms = VOMS()
+    VOMSresult = voms.setVOMSAttributes(proxyProps['chain'],
+            CS.getVOMSAttributeForGroup(proxyparams.diracGroup))
+    if not VOMSresult['OK']:
+        print 'Warning : Cannot add voms attribute to the proxy'
+        print '          Accessing data in the grid storage from the user interface will not be possible.'
+        print '          The grid jobs will not be affected.'
+
+    # set path of proxy so  AMGA client picks it up
+    os.environ['X509_USER_PROXY'] = proxyProps['path']
+
   # FIXME - check for existing project name, and prevent additions unless forced
 
   # perform the metadata query

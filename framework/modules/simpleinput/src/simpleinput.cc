@@ -10,7 +10,6 @@
 
 #include <framework/modules/simpleinput/simpleinput.h>
 
-#include <boost/shared_ptr.hpp>
 
 using namespace std;
 using namespace Belle2;
@@ -98,6 +97,8 @@ void SimpleInput::initialize()
           m_size[ii]++;
         }
       }
+      B2DEBUG(150, "m_sizeObj[" << ii << "] : " << m_sizeObj[ii]);
+      B2DEBUG(150, "m_size["    << ii << "] : " << m_size[ii]);
 
       //Create the TObject pointers
       m_objects[ii] = new TObject* [m_size[ii]];
@@ -108,20 +109,22 @@ void SimpleInput::initialize()
       //Go again over the branchlist and connect the branches with TObject pointers
       int iobject = 0;
       int iarray = 0;
+      m_objectNames[ii].resize(m_size[ii], "");
       for (int jj = 0; jj < branches->GetEntriesFast(); jj++) {
         branch = validBranch(jj, branches);
         if (branch) {
           if (static_cast<string>(branch->GetClassName()) == "TClonesArray") {
             branch->SetAddress(&(m_objects[ii][iarray + m_sizeObj[ii]]));
-            m_objectNames[ii].push_back(static_cast<string>(branch->GetName()));
+            m_objectNames[ii][iarray + m_sizeObj[ii]] = static_cast<string>(branch->GetName());
             iarray++;
             branch->GetEntry(0);
           } else {
             branch->SetAddress(&(m_objects[ii][iobject]));
-            m_objectNames[ii].push_back(static_cast<string>(branch->GetName()));
+            m_objectNames[ii][iobject] = static_cast<string>(branch->GetName());
             iobject++;
             branch->GetEntry(0);
           }
+          B2DEBUG(150, m_objectNames[ii][jj]);
         }
       }
     }
@@ -169,7 +172,7 @@ void SimpleInput::setupTFile()
 void SimpleInput::readTree(const EDurability& durability)
 {
   // Fill m_objects
-  B2WARNING("Durability" << durability)
+  B2DEBUG(200, "Durability" << durability)
   m_tree[durability]->GetEntry(m_eventNumber);
 
 
@@ -179,7 +182,7 @@ void SimpleInput::readTree(const EDurability& durability)
   }
   // Store arrays in the DataStore
   for (int jj = 0; jj < m_size[durability] - m_sizeObj[durability]; jj++) {
-    DataStore::Instance().storeArray(static_cast<TClonesArray*>(m_objects[durability][jj+m_sizeObj[durability]]), m_objectNames[durability][jj]);
+    DataStore::Instance().storeArray(static_cast<TClonesArray*>(m_objects[durability][jj+m_sizeObj[durability]]), m_objectNames[durability][jj+m_sizeObj[durability]]);
   }
 
 }

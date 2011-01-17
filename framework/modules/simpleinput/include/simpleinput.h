@@ -24,22 +24,24 @@
 
 namespace Belle2 {
 
-  /*! Module Simple Input */
-  /*! This module reads objects from a root file and writes them into the DataStore.
-      For more information consult the TWiki basf2 Software Portal.
-      You can specify different TTrees for different durabilities, and give lists, which objects
-      shall be read from the specific trees.
-      \sa EDurability
-      \author <a href="mailto:martin.heck@kit.edu?subject=Input Module">Martin Heck</a>
+  /** Module Simple Input.
+   *
+   *  This module reads objects from a root file and writes them into the DataStore.
+   *  For more information consult the TWiki basf2 Software Portal.
+   *  You can specify different TTrees for different durabilities, and give lists, which objects
+   *  shall be read from the specific trees.
+   *
+   *  @sa EDurability
+   *  @author <a href="mailto:martin.heck@kit.edu?subject=Input Module">Martin Heck</a>
   */
   class SimpleInput : public Module {
 
   public:
 
-    /*! Constructor */
+    /** Constructor. */
     SimpleInput();
 
-    /*! Destructor */
+    /** Destructor. */
     virtual ~SimpleInput();
 
     /*! Initialize the Module */

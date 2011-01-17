@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2010-2011  Belle II Collaboration                         *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Andreas Moll, Martin Ritter                              *
@@ -10,6 +10,8 @@
 
 #ifndef MCPARTICLEGENERATOR_H_
 #define MCPARTICLEGENERATOR_H_
+
+#include <generators/dataobjects/MCParticleGraph.h>
 
 #include <G4VPrimaryGenerator.hh>
 
@@ -47,7 +49,21 @@ namespace Belle2 {
 
     protected:
 
-      std::string m_mcCollectionName; /**< The name of the MCParticle collection from which the MCParticles should be read.*/
+      std::string m_mcCollectionName;    /**< The name of the MCParticle collection from which the MCParticles should be read.*/
+      MCParticleGraph m_mcParticleGraph; /**< The MCParticle Graph used to manage the MCParticles before and after the simulation.*/
+
+      /**
+       * Fills the MCParticle graph with the content of the MCParticle collection.
+       */
+      void fillGraphFromCollection();
+
+      /**
+       * Takes a MCParticle and creates a primary particle for Geant4.
+       * The daughters of the specified MCParticle are added recursively.
+       *
+       * @return Returns a pointer to the created primary particle. NULL if the primary particle could not be created.
+       */
+      //G4PrimaryParticle* addParticle(MCParticle& particle, const TVector3& boost, bool use_time = true);
 
     };
 

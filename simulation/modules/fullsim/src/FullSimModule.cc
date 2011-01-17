@@ -15,6 +15,8 @@
 #include <simulation/kernel/PrimaryGeneratorAction.h>
 
 #include <generators/dataobjects/MCParticle.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/datastore/EventMetaData.h>
 
 #include <QGSP_BERT.hh>
 
@@ -87,28 +89,39 @@ void FullSimModule::initialize()
   G4VUserPrimaryGeneratorAction* generatorAction = new PrimaryGeneratorAction(m_mcParticleCollectionName);
   runManager.SetUserAction(generatorAction);
 
+  //Initialize G4 kernel
+  runManager.Initialize();
 }
 
 
 void FullSimModule::beginRun()
 {
+  //Get the event meta data
+  StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", c_Event);
 
+  //Begin the Geant4 run
+  RunManager::Instance().beginRun(eventMetaDataPtr->getRun());
 }
 
 
 void FullSimModule::event()
 {
+  //Get the event meta data
+  StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", c_Event);
 
+  //Process the event
+  RunManager::Instance().processEvent(eventMetaDataPtr->getEvent());
 }
 
 
 void FullSimModule::endRun()
 {
-
+  //Terminate the Geant4 run
+  RunManager::Instance().endRun();
 }
 
 
 void FullSimModule::terminate()
 {
-
+  RunManager::Instance().destroy();
 }

@@ -34,6 +34,26 @@ namespace Belle2 {
        */
       static RunManager& Instance();
 
+      /** Prepares Geant4 for a new run.
+       *
+       * @param runNumber The current number of the run.
+       */
+      void beginRun(int runNumber);
+
+      /** Process a single event in Geant4.
+       *
+       * @param evtNumber The current number of the event.
+       */
+      void processEvent(int evtNumber);
+
+      /** Terminates a Geant4 run. */
+      void endRun();
+
+      /** Destroys the RunManager at the end of the simulation.
+       *
+       * Required by Geant4.
+       */
+      void destroy();
 
     protected:
 
@@ -49,12 +69,12 @@ namespace Belle2 {
       /** Disable/Hide the copy assignment operator. */
       RunManager& operator=(const RunManager&);
 
-      /** The LogSystem destructor. */
+      /** The RunManager destructor. */
       virtual ~RunManager();
 
       static RunManager* m_instance; /**< Pointer that saves the instance of this class. */
 
-      /** Destroyer class to delete the instance of the LogSystem class when the program terminates. */
+      /** Destroyer class to delete the instance of the RunManager class when the program terminates. */
       class SingletonDestroyer {
       public: ~SingletonDestroyer() {
           if (RunManager::m_instance != NULL) delete RunManager::m_instance;

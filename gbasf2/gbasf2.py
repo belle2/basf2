@@ -194,6 +194,9 @@ def main():
         print 'Warning : Cannot add voms attribute to the proxy'
         print '          Accessing data in the grid storage from the user interface will not be possible.'
         print '          The grid jobs will not be affected.'
+    else:
+        # dump VOMS proxy to file
+        print VOMSresult['Value'].dumpAllToFile(proxyProps['path'])
 
     # set path of proxy so  AMGA client picks it up
     os.environ['X509_USER_PROXY'] = proxyProps['path']

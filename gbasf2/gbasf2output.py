@@ -19,8 +19,11 @@ import DIRAC
 from DIRAC.Core.Base import Script
 from DIRAC.Core.Security.Misc import *
 from DIRAC.Core.Security import Properties
+from DIRAC.ResourceStatusSystem.Utilities.CS import *
 from DIRAC.FrameworkSystem.Client.ProxyGeneration import generateProxy
 from DIRAC.FrameworkSystem.Client.ProxyManagerClient import ProxyManagerClient
+from DIRAC.DataManagementSystem.Client.ReplicaManager import ReplicaManager
+
 # used for commandline and steeringfile option parsing
 from gbasf2util import CLIParams
 
@@ -57,14 +60,18 @@ def main():
 
     entries = {}
     if aclient.checkDirectory(outputpath):
-    # loop through the output files, uploading and registering
+        repman = ReplicaManager()
+      # loop through the output files, uploading and registering
+        se = repman._getSEProximity(getStorageElements()['Value'])['Value'][0]
+        print 'trying to use SE: ' + se
         for outputfile in glob.glob('*.txt'):
-        # lcg-cr
+            repman.putAndRegister(outputpath + '/' + outputfile, outputfile,
+                                  se)
         # entries[outputfile] = (['exp', 'run', 'guid', 'lfn', 'status', 'md5', 'adler32'],[cliParams.getExperiments()[0],'0', 'guid:', 'lfn:', 'good', 'abcdef0', 'abcdef0']
             print outputfile
-        if not aclient.bulkInsert(outputpath, entries):
-            print 'Error inserting metadata'
-            DIRAC.exit(1)
+            if not aclient.bulkInsert(outputpath, entries):
+                print 'Error inserting metadata'
+                DIRAC.exit(1)
     else:
         print 'Error with metadata path'
         DIRAC.exit(1)
@@ -74,9 +81,7 @@ def main():
         print 'ERROR %s' % error
 
   # clean temporary files
-    if exitCode != 2 and tar is not None:
-        os.remove(tar)
-    else:
+    if exitCode != 0:
         print 'Something went wrong'
 
     DIRAC.exit(exitCode)

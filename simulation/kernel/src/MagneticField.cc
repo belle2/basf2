@@ -3,34 +3,38 @@
  * Copyright(C) 2010-2011  Belle II Collaboration                         *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Andreas Moll, Martin Ritter                              *
+ * Contributors: Andreas Moll, Guofu Cao                                  *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <simulation/kernel/PrimaryGeneratorAction.h>
-#include <simulation/kernel/MCParticleGenerator.h>
+#include <simulation/kernel/MagneticField.h>
+#include <framework/gearbox/Unit.h>
+#include <framework/logging/Logger.h>
 
-#include <G4Event.hh>
+#include <globals.hh>
 
 using namespace std;
 using namespace Belle2;
 using namespace Belle2::Simulation;
 
 
-PrimaryGeneratorAction::PrimaryGeneratorAction(const string& mcCollectionName) : G4VUserPrimaryGeneratorAction()
+MagneticField::MagneticField(): G4MagneticField() //m_chordFinder(0), m_equation(0), m_stepper(0)
 {
-  m_mcParticleGenerator = new MCParticleGenerator(mcCollectionName);
+
 }
 
 
-PrimaryGeneratorAction::~PrimaryGeneratorAction()
+MagneticField::~MagneticField()
 {
-  delete m_mcParticleGenerator;
+
 }
 
 
-void PrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
+void MagneticField::GetFieldValue(const G4double Point[3], G4double *Bfield) const
 {
-  m_mcParticleGenerator->GeneratePrimaryVertex(event);
+  //const 1.5 Tesla magnetic field in z direction. Hard coded. Sorry.
+  Bfield[0] = 0;
+  Bfield[1] = 0;
+  Bfield[2] = 1.5 * tesla; //Use the Geant4 tesla unit here !
 }

@@ -17,6 +17,7 @@
 #include <G4DigiManager.hh>
 
 using namespace Belle2;
+using namespace Belle2::Simulation;
 
 
 EventAction::EventAction(): G4UserEventAction()

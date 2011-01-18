@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2010-2011  Belle II Collaboration                         *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Andreas Moll, Guofu Cao                                  *
@@ -20,8 +20,7 @@ namespace Belle2 {
     /**
      * The Class for Belle2 Detector Construction.
      *
-     * This class is called after the ROOT geometry has been
-     * converted to Geant4 native volumes.
+     * This class is called after the ROOT geometry has been converted to Geant4 native volumes.
      * It connects the sensitive volumes to the sensitive detector classes
      * and calls the initializeGeant4() method of all creators.
      */
@@ -42,7 +41,6 @@ namespace Belle2 {
        *           which correspond to TGeo objects.
        */
       virtual void Initialize(TG4RootDetectorConstruction *dc);
-
 
     private:
 

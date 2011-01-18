@@ -16,35 +16,38 @@
 
 namespace Belle2 {
 
-  //! The Event Action class.
-  /*! This class is invoked by G4EventManager for each event.
-  */
-  class EventAction : public G4UserEventAction {
+  namespace Simulation {
 
-  public:
-
-    //! Constructor
-    EventAction();
-
-    //! Destructor
-    virtual ~EventAction();
-
-    //! This method is invoked before converting the primary particles to G4Track objects.
-    /*!
-        /param event Pointer to the current G4Event object.
+    //! The Event Action class.
+    /*! This class is invoked by G4EventManager for each event.
     */
-    void BeginOfEventAction(const G4Event* event);
+    class EventAction : public G4UserEventAction {
 
-    //! This method is invoked at the very end of event processing.
-    /*!
-        /param event The pointer to the G4Event object which allows to access trajectories, hits collections and/or digits collections.
-    */
-    void EndOfEventAction(const G4Event* event);
+    public:
 
-  private:
+      //! Constructor
+      EventAction();
 
-  };
+      //! Destructor
+      virtual ~EventAction();
 
+      //! This method is invoked before converting the primary particles to G4Track objects.
+      /*!
+          /param event Pointer to the current G4Event object.
+      */
+      void BeginOfEventAction(const G4Event* event);
+
+      //! This method is invoked at the very end of event processing.
+      /*!
+          /param event The pointer to the G4Event object which allows to access trajectories, hits collections and/or digits collections.
+      */
+      void EndOfEventAction(const G4Event* event);
+
+    private:
+
+    };
+
+  }  // end namespace Simulation
 } // end namespace Belle2
 
 #endif /* EVENTACTION_H_ */

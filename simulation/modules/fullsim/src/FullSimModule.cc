@@ -12,6 +12,7 @@
 #include <simulation/kernel/RunManager.h>
 #include <simulation/kernel/DetectorConstruction.h>
 #include <simulation/kernel/PhysicsList.h>
+#include <simulation/kernel/MagneticField.h>
 #include <simulation/kernel/PrimaryGeneratorAction.h>
 #include <simulation/kernel/EventAction.h>
 
@@ -19,6 +20,7 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/EventMetaData.h>
 
+#include <G4TransportationManager.hh>
 #include <QGSP_BERT.hh>
 
 #include <TGeoManager.h>
@@ -85,6 +87,12 @@ void FullSimModule::initialize()
 
   //Create the Physics list
   runManager.SetUserInitialization(new PhysicsList<QGSP_BERT>);
+
+  //Create the magnetic field for the Geant4 simulation
+  MagneticField* magneticField = new MagneticField();
+  G4FieldManager* fieldManager = G4TransportationManager::GetTransportationManager()->GetFieldManager();
+  fieldManager->SetDetectorField(magneticField);
+  fieldManager->CreateChordFinder(magneticField);
 
   //Create the generator action which takes the MCParticle list and converts it to Geant4 primary vertices.
   G4VUserPrimaryGeneratorAction* generatorAction = new PrimaryGeneratorAction(m_mcParticleCollectionName);

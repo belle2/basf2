@@ -80,10 +80,11 @@ NodeInfo* UnitManager::buildNodeInfo(const std::string type, const int nodeNo, U
   if (type == "ES") {
     nodeinfo->setSourceIP(unit.workerNodes());
     nodeinfo->setTargetIP(unit.eventSeparator());
+    //nodeinfo->setSteering (unit.steering ());
     nodeinfo->Print();
-  } else if (type == "WN")
+  } else if (type == "WN") {
     nodeinfo->setTargetIP(unit.workerNodes()[nodeNo - 1]);
-  else if (type == "EM")
+  } else if (type == "EM")
     nodeinfo->setTargetIP(unit.eventMerger());
   else {
     B2ERROR("Wrong node type!");

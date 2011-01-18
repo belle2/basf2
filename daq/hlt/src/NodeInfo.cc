@@ -210,6 +210,29 @@ std::vector<std::string> NodeInfo::targetIP()
   return m_targetIP;
 }
 
+void NodeInfo::setSteering(const char* steering)
+{
+  std::ifstream input;
+  input.open(steering, std::ios::binary);
+
+  input.seekg(0, std::ios::end);
+  int size = input.tellg();
+  input.seekg(0, std::ios::beg);
+
+  m_steeringContents = new char[size];
+
+  input.read(m_steeringContents, size);
+  input.close();
+}
+
+void NodeInfo::getSteering()
+{
+  std::ofstream output;
+  output.open(m_steeringName, std::ios::binary);
+
+  output.write(m_steeringContents, strlen(m_steeringContents));
+}
+
 /* @brief Serializing the NodeInfo object
  * This uses very simple serialization method called stringstream-based serialization.
  * This approach is actually not good at all.
@@ -222,7 +245,8 @@ std::string NodeInfo::serializedNodeInfo()
   ss << m_unitNo << " " << m_nodeNo;
   ss << " " << m_type;
   ss << " " << m_portBaseDataIn << " " << m_portBaseDataOut << " " << m_portBaseControl;
-  ss << " " << m_thisIP << " " << m_managerIP << " ";
+  ss << " " << m_thisIP << " " << m_managerIP << " " << m_steeringName;
+  ss << " " << m_steeringContents;
 
   for (unsigned int i = 0; i < m_sourceIP.size(); i++) {
     ss << m_sourceIP[i];
@@ -254,7 +278,7 @@ void NodeInfo::deserializedNodeInfo(const std::string nodeinfo)
   std::stringstream ss(nodeinfo);
   ss >> m_unitNo >> m_nodeNo >> m_type >> m_portBaseDataIn >> m_portBaseDataOut
   >> m_portBaseControl >> m_thisIP >> m_managerIP
-  >> tmpTargetIP >> tmpSourceIP;
+  >> tmpTargetIP >> tmpSourceIP >> m_steeringName >> m_steeringContents;
 
   m_sourceIP.clear();
   m_targetIP.clear();
@@ -292,6 +316,8 @@ void NodeInfo::Print()
   B2INFO("   m_portBaseControl = " << m_portBaseControl);
   B2INFO("   m_thisIP = " << m_thisIP);
   B2INFO("   m_managerIP = " << m_managerIP);
+  B2INFO("   m_steeringName = " << m_steeringName);
+  B2INFO("   m_steeringContents = " << m_steeringContents);
   B2INFO("   m_sourceIP (" << m_sourceIP.size() << ")");
   for (unsigned int i = 0; i < m_sourceIP.size(); i++)
     B2INFO("     " << m_sourceIP[i]);

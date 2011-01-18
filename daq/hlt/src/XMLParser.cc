@@ -108,6 +108,8 @@ EStatus XMLParser::parsing(xmlNodePtr cur)
       m_inputDescription = (char*)key;
     } else if (!xmlStrcmp(cur->name, (const xmlChar*)"Manager")) {
       m_manager = (char*)key;
+    } else if (!xmlStrcmp(cur->name, (const xmlChar*)"Steering")) {
+      m_steeringName = (char*)key;
     } else if (!xmlStrcmp(cur->name, (const xmlChar*)"Unit")) {
       UnitInfo unit(atoi((char*)xmlGetProp(cur, (const xmlChar*)"no")));
 
@@ -116,7 +118,6 @@ EStatus XMLParser::parsing(xmlNodePtr cur)
 
       m_units.push_back(unit);
     }
-
     cur = cur->next;
   }
 
@@ -193,6 +194,11 @@ int XMLParser::runEnd(void)
 int XMLParser::NUnit(void)
 {
   return m_units.size();
+}
+
+char* XMLParser::steeringName(void)
+{
+  return m_steeringName;
 }
 
 /* @brief Return information of units

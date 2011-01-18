@@ -115,6 +115,11 @@ int UnitInfo::unitNo()
   return m_unitNo;
 }
 
+char* UnitInfo::steering()
+{
+  return m_steeringName;
+}
+
 /* @brief Displaying unit information of this unit (only for debugging)
 */
 void UnitInfo::Print()

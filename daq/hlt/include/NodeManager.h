@@ -45,6 +45,8 @@ namespace Belle2 {
     //! Setting unique node number of this node
     void setNodeNo(const int nodeNo);
 
+    void steeringReconstructor(void);
+
     std::string manager(void);
 
     void broadCasting(void);

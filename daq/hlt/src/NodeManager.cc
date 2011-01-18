@@ -101,6 +101,11 @@ void NodeManager::setNodeNo(const int nodeNo)
   m_nodeNo = nodeNo;
 }
 
+void NodeManager::steeringReconstructor()
+{
+  //m_nodeinfo->getSteering ();
+}
+
 /* @brief Put data into outgoing FIFO after serialization
 */
 void NodeManager::broadCasting()

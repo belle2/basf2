@@ -44,6 +44,7 @@ namespace Belle2 {
     int runStart(void);
     int runEnd(void);
     int NUnit(void);
+    char* steeringName(void);
     std::vector<UnitInfo>::iterator unitInfo(void);
 
     void Print(void);
@@ -61,6 +62,7 @@ namespace Belle2 {
     char* m_inputName;
     char* m_inputDescription;
     char* m_manager;
+    char* m_steeringName;
 
     xmlDocPtr m_docPtr;
     xmlNode* m_curNode;

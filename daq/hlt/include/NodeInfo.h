@@ -12,6 +12,8 @@
 #define NODEINFO_H
 
 #include <iostream>
+#include <fstream>
+#include <cstring>
 #include <string>
 #include <vector>
 
@@ -43,10 +45,14 @@ namespace Belle2 {
     void setSourceIP(std::vector<std::string> ip);
     void setTargetIP(std::string ip);
     void setTargetIP(std::vector<std::string> ip);
+
     std::string thisIP(void);
     std::string managerIP(void);
     std::vector<std::string> sourceIP(void);
     std::vector<std::string> targetIP(void);
+
+    void setSteering(const char* steering);
+    void getSteering(void);
 
     std::string serializedNodeInfo(void);
     void deserializedNodeInfo(const std::string nodeinfo);
@@ -64,6 +70,9 @@ namespace Belle2 {
     std::string m_managerIP;
     std::vector<std::string> m_sourceIP;
     std::vector<std::string> m_targetIP;
+
+    char* m_steeringName;
+    char* m_steeringContents;
   };
 }
 

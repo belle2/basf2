@@ -29,6 +29,7 @@ namespace Belle2 {
     EStatus init(void);
 
     EStatus beginRun(void);
+    EStatus steeringGenerator(void);
 
   private:
     NodeInfo* m_nodeInfo;

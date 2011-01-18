@@ -79,6 +79,7 @@ void HLTManager::initHLT(void)
   m_runEnd = m_XMLParser->runEnd();
   m_inputName = m_XMLParser->inputName();
   m_inputDescription = m_XMLParser->inputDescription();
+  m_steeringName = m_XMLParser->steeringName();
 }
 
 /* @brief Initialize units

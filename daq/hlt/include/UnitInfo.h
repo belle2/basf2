@@ -36,6 +36,7 @@ namespace Belle2 {
     std::string manager(void);
 
     int unitNo(void);
+    char* steering(void);
 
     void Print(void);
 
@@ -45,6 +46,7 @@ namespace Belle2 {
     std::string m_eventSeparator;
     std::vector<std::string> m_workerNodes;
     std::string m_eventMerger;
+    char* m_steeringName;
   };
 }
 

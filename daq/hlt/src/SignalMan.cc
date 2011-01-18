@@ -66,7 +66,7 @@ SignalMan::~SignalMan(void)
 {
   if (m_pidEvtSender != 0 && m_pidEvtReceiver != 0) {
     B2INFO("[PID] pidEvtSender = " << m_pidEvtSender << " / pidEvtReceiver = " << m_pidEvtReceiver);
-    int status1, status2;
+    int status1;
 
     std::string endOfRun("EOF");
     B2INFO("Terminating EvtReceiver...");

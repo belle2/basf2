@@ -13,6 +13,7 @@
 #include <simulation/kernel/DetectorConstruction.h>
 #include <simulation/kernel/PhysicsList.h>
 #include <simulation/kernel/PrimaryGeneratorAction.h>
+#include <simulation/kernel/EventAction.h>
 
 #include <generators/dataobjects/MCParticle.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -88,6 +89,10 @@ void FullSimModule::initialize()
   //Create the generator action which takes the MCParticle list and converts it to Geant4 primary vertices.
   G4VUserPrimaryGeneratorAction* generatorAction = new PrimaryGeneratorAction(m_mcParticleCollectionName);
   runManager.SetUserAction(generatorAction);
+
+  //Add the event action which saves the created hits to the DataStore after having processed the event.
+  G4UserEventAction* eventAction = new EventAction();
+  runManager.SetUserAction(eventAction);
 
   //Initialize G4 kernel
   runManager.Initialize();

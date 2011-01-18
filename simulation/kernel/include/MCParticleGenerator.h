@@ -14,6 +14,8 @@
 #include <generators/dataobjects/MCParticleGraph.h>
 
 #include <G4VPrimaryGenerator.hh>
+#include <G4PrimaryParticle.hh>
+#include <G4Event.hh>
 
 #include <string>
 
@@ -53,17 +55,13 @@ namespace Belle2 {
       MCParticleGraph m_mcParticleGraph; /**< The MCParticle Graph used to manage the MCParticles before and after the simulation.*/
 
       /**
-       * Fills the MCParticle graph with the content of the MCParticle collection.
-       */
-      void fillGraphFromCollection();
-
-      /**
        * Takes a MCParticle and creates a primary particle for Geant4.
        * The daughters of the specified MCParticle are added recursively.
        *
+       * @param motherIndex Graph MCParticle
        * @return Returns a pointer to the created primary particle. NULL if the primary particle could not be created.
        */
-      //G4PrimaryParticle* addParticle(MCParticle& particle, const TVector3& boost, bool use_time = true);
+      void addParticle(MCParticle &mcParticle, G4Event* event, G4PrimaryParticle* lastG4Mother, int motherIndex, bool useTime);
 
     };
 

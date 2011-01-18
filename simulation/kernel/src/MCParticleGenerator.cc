@@ -12,12 +12,11 @@
 
 #include <generators/dataobjects/MCParticle.h>
 #include <framework/gearbox/Unit.h>
+#include <framework/logging/Logger.h>
 #include <framework/datastore/StoreArray.h>
 
-#include <G4PrimaryParticle.hh>
 #include <G4ParticleTable.hh>
 #include <G4VUserPrimaryParticleInformation.hh>
-#include <G4Event.hh>
 
 #include <TLorentzVector.h>
 
@@ -40,123 +39,91 @@ MCParticleGenerator::~MCParticleGenerator()
 
 void MCParticleGenerator::GeneratePrimaryVertex(G4Event* event)
 {
-  //Create a MCParticle graph from the MCParticle collection
-  fillGraphFromCollection();
-
-  //For testing
-  m_mcParticleGraph.generateList("TestMCCol", MCParticleGraph::set_decay_info | MCParticleGraph::check_cyclic);
-
-  /*
-
-    for (int iPart = 0; iPart < mcParticles.GetEntries(); iPart++) {
-      MCParticle *currParticle = mcParticles[iPart];
-
-      //Make one primary vertex for each primary particle, the rest gets added recursively by addParticle
-      //The MCParticle collection has to be sorted breadth first: primary particles come first and then the daughters
-      if (currParticle->getMother() != NULL) break;
-
-      G4PrimaryParticle* primaryParticle = addParticle(*currParticle, TVector3(0,0,0), true);
-
-
-
-    }*/
-}
-
-/*
-G4PrimaryParticle* MCParticleGenerator::addParticle(MCParticle &mc, const TVector3& boost, bool use_time)
-{
-  TLorentzVector partMom4 = mc.get4Vector();
-
-  //Get the particle definition, check if the return value is not NULL
-  G4ParticleDefinition* pdef = G4ParticleTable::GetParticleTable()->FindParticle(mc.getPDG());
-  if (pdef == NULL) return NULL;
-
-  //Create a new Geant4 Primary particle and store the link to the MCParticle object as user info.
-  particle = new G4PrimaryParticle(pdef, partMom4.X() / Unit::MeV, partMom4.Y() / Unit::MeV, partMom4.Z() / Unit::MeV, partMom4.E() / Unit::MeV);
-  particle->SetMass(mc.getMass() / Unit::MeV);
-  particle->SetUserInformation(new ParticleInfo(mc));
-
-
-  G4PrimaryParticle *particle = m_seen[mc.getIndex()];
-  //Check if we already saw that particle and return it
-  //FIXME: Check if Geant4 can handle compound decays, i think not
-  if (particle) return particle;
-
-  G4ParticleDefinition* pdef = G4ParticleTable::GetParticleTable()->FindParticle(mc.getPDG());
-  //If Geant4 does not know our particle, set an unknown particle: Will decay immidiatly but
-  //leave a track for us to see
-  bool is_unknown(false);
-  if (!pdef) {
-    pdef = G4UnknownParticle::UnknownParticle();
-    is_unknown = true;
-  }
-
-  TLorentzVector p = mc.get4Vector();
-  //if (is_unknown) p.Boost(boost);
-
-  particle = new G4PrimaryParticle(mc.getPDG(), p.X() / MeV, p.Y() / MeV, p.Z() / MeV, p.E() / MeV);
-  particle->SetMass(mc.getMass() / MeV);
-  particle->SetUserInformation(new ParticleInfo(mc));
-
-  const TVector3 &dv = mc.getDecayVertex();
-  //Set propergation time only if use_time and, valid vertex, inside beampipe cut and if there are children
-  use_time &= mc.hasValidVertex() && dv.Perp() < m_rcut && fabs(dv.Z()) < m_zcut && mc.getFirstDaughter() > 0;
-  if (use_time) {
-    //ProperTime is in particle eigentime, so convert lab lifetime to eigentime
-    double propertime = mc.getLifetime() / mc.get4Vector().Gamma();
-    particle->SetProperTime(propertime);
-  }
-  //Set Propergation time for unknown particles, causes geant4 to boost decay particles
-  //if (is_unknown) particle->SetProperTime(1);
-  //Add all children
-  BOOST_FOREACH(MCParticle* daughter, mc.getDaughters()) {
-    G4PrimaryParticle* d = addParticle(*daughter, -mc.get4Vector().BoostVector(), use_time);
-    particle->SetDaughter(d);
-  }
-  m_seen[mc.getIndex()] = particle;
-  return particle;
-}*/
-
-
-//===================================================================
-//                       Protected methods
-//===================================================================
-
-void MCParticleGenerator::fillGraphFromCollection()
-{
   //Get the MCParticle collection from the DataStore
   StoreArray<MCParticle> mcParticles(m_mcCollectionName);
 
   //Prepare the MCParticle graph
   m_mcParticleGraph.clear();
 
-  //Make list of particles
-  for (int i = 0; i < mcParticles.GetEntries(); ++i) {
-    m_mcParticleGraph.addParticle();
-  }
-
-  //Read particles from the MCParticle collection and fill the graph
+  //Loop over the primary particles. The MCParticle collection has to be
+  //sorted breadth first: primary particles come first and then the daughters
   for (int iPart = 0; iPart < mcParticles.GetEntries(); iPart++) {
-    MCParticle& currParticle = *mcParticles[iPart];
-    MCParticleGraph::GraphParticle &graphParticle = m_mcParticleGraph[iPart];
+    MCParticle *currParticle = mcParticles[iPart];
+    if (currParticle->getMother() != NULL) break;
 
-    //Copy the properties of the MCParticle
-    graphParticle.setPDG(currParticle.getPDG());
-    graphParticle.setStatus(currParticle.getStatus());
-    graphParticle.setMass(currParticle.getMass());
-    graphParticle.setEnergy(currParticle.getEnergy());
-    graphParticle.setValidVertex(currParticle.hasValidVertex());
-    graphParticle.setProductionTime(currParticle.getProductionTime());
-    graphParticle.setDecayTime(currParticle.getDecayTime());
-    graphParticle.setProductionVertex(currParticle.getProductionVertex());
-    graphParticle.setMomentum(currParticle.getMomentum());
-    graphParticle.setDecayVertex(currParticle.getDecayVertex());
-    graphParticle.setFirstDaughter(currParticle.getFirstDaughter());
-    graphParticle.setLastDaughter(currParticle.getLastDaughter());
-
-    //Add decays
-    for (int index = currParticle.getFirstDaughter(); index <= currParticle.getLastDaughter(); ++index) {
-      if (index > 0) graphParticle.decaysInto(m_mcParticleGraph[index-1]);
-    }
+    //Add primary particle (+ daughters) and the vertex
+    addParticle(*currParticle, event, NULL, 0, true);
   }
 }
+
+
+void MCParticleGenerator::addParticle(MCParticle &mcParticle, G4Event* event, G4PrimaryParticle* lastG4Mother, int motherIndex, bool useTime)
+{
+  G4PrimaryParticle* g4Mother = lastG4Mother;
+
+  //Check if the particle should be added to Geant4
+  //Only add the particle if its pdg value is known to Geant4 and it is not flagged as virtual.
+  bool addToG4 = true;
+
+  G4ParticleDefinition* pdef = G4ParticleTable::GetParticleTable()->FindParticle(mcParticle.getPDG());
+  if (pdef == NULL) {
+    B2WARNING("PDG code " << mcParticle.getPDG() << " unknown to Geant4. Particle will be skipped.")
+    addToG4 = false;
+  }
+
+  addToG4 = addToG4 && (!mcParticle.isVirtual());
+
+  //Add the particle to the MCParticle graph
+  MCParticleGraph::GraphParticle& graphParticle = m_mcParticleGraph.addParticle();
+  graphParticle.setPDG(mcParticle.getPDG());
+  graphParticle.setStatus(mcParticle.getStatus());
+  graphParticle.setMass(mcParticle.getMass());
+  graphParticle.setEnergy(mcParticle.getEnergy());
+  graphParticle.setValidVertex(mcParticle.hasValidVertex());
+  graphParticle.setProductionTime(mcParticle.getProductionTime());
+  graphParticle.setDecayTime(mcParticle.getDecayTime());
+  graphParticle.setProductionVertex(mcParticle.getProductionVertex());
+  graphParticle.setMomentum(mcParticle.getMomentum());
+  graphParticle.setDecayVertex(mcParticle.getDecayVertex());
+  graphParticle.setFirstDaughter(mcParticle.getFirstDaughter());
+  graphParticle.setLastDaughter(mcParticle.getLastDaughter());
+  if (motherIndex > 0) graphParticle.comesFrom(m_mcParticleGraph[motherIndex-1]); //Add decay
+
+  //Create a new Geant4 Primary particle and store the link to the GraphMCParticle object as user info.
+  G4PrimaryParticle* newPart = NULL;
+
+  if (addToG4) {
+    TLorentzVector mcPartMom4 = mcParticle.get4Vector();
+
+    newPart = new G4PrimaryParticle(pdef, mcPartMom4.X() / Unit::MeV, mcPartMom4.Y() / Unit::MeV, mcPartMom4.Z() / Unit::MeV, mcPartMom4.E() / Unit::MeV);
+    newPart->SetMass(mcParticle.getMass() / Unit::MeV);
+    //newPart->SetUserInformation(new ParticleInfo(mc));
+    if (lastG4Mother != NULL) lastG4Mother->SetDaughter(newPart);
+    g4Mother = newPart;
+  } else {
+    B2DEBUG(100, "The particle " << mcParticle.getIndex() << " (PDG " << mcParticle.getPDG() << ") was not added to Geant4")
+  }
+
+  //If there is no Geant4 mother particle and the particle is added to Geant4, create a new primary vertex and assign the particle
+  if ((lastG4Mother == NULL) && (addToG4)) {
+    //Create the vertex
+    TVector3 mcProdVtx = mcParticle.getProductionVertex();
+    G4PrimaryVertex* vertex = new G4PrimaryVertex(mcProdVtx.X() / Unit::mm, mcProdVtx.Y() / Unit::mm, mcProdVtx.Z() / Unit::mm, mcParticle.getProductionTime());
+    vertex->SetPrimary(newPart);
+
+    //Add the vertex to the event
+    event->AddPrimaryVertex(vertex);
+    B2DEBUG(10, "Created the vertex (" << mcProdVtx.X() << "," << mcProdVtx.Y() << "," << mcProdVtx.Z() << ") with the primary particle " << mcParticle.getPDG())
+  }
+
+  //Add all children
+  int currMotherIndex = m_mcParticleGraph.size();
+  BOOST_FOREACH(MCParticle* daughter, mcParticle.getDaughters()) {
+    addParticle(*daughter, event, g4Mother, currMotherIndex, useTime);
+  }
+}
+
+
+//===================================================================
+//                       Protected methods
+//===================================================================

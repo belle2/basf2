@@ -10,7 +10,8 @@
 
 #include "../include/CDCSegment.h"
 
-#include "CLHEP/Geometry/Vector3D.h"
+#include<cmath>
+#include<cstdlib>
 
 
 

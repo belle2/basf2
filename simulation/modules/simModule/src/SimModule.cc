@@ -15,6 +15,7 @@
 #include <simulation/simkernel/B4PrimaryGeneratorAction.h>
 #include <simulation/simkernel/B4EventAction.h>
 #include <simulation/simkernel/B4SteppingAction.h>
+#include <simulation/simkernel/B4PhysicsList.h>
 
 #include <framework/core/ModuleManager.h>
 #include <framework/logging/Logger.h>
@@ -69,6 +70,7 @@ SimModule::SimModule() : Module(), m_run_mgr(NULL)
   addParam("MacroName", m_macroName, string("None"), "Macro name", true);
   addParam("MaxNumStep", m_maxNumberSteps, 100000, "The maximum number of steps before a track is stopped and killed");
   addParam("MaxZeroStep", m_maxZeroSteps, 100, "The maximum number of zero steps in a row before a track is stopped and killed");
+  addParam("RegisterOptics", m_optics, false, "If true, G4OpticalPhysics is registered in Geant4 PhysicsList.");
 }
 
 SimModule::~SimModule()
@@ -96,7 +98,10 @@ void SimModule::initialize()
   //--------------------------------------------------
 
   // Physics
-  m_run_mgr->SetUserInitialization(new QGSP_BERT);
+  // ---- add PhysicsList + register optics if selected ----
+  G4String physicsList = "QGSP_BERT";
+  m_run_mgr->SetUserInitialization(new B4PhysicsList(physicsList, m_optics));
+  // -------------------------------------------------------
 
   // Generator
   G4VUserPrimaryGeneratorAction* gen_action = new B4PrimaryGeneratorAction();

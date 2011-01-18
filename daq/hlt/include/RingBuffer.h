@@ -3,6 +3,8 @@
 /// @author Ryosuke Itoh
 /// @date Feb 22 2010
 
+#include <framework/logging/Logger.h>
+
 #ifndef RING_BUFFER_H
 #define RING_BUFFER_H
 

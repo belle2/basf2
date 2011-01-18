@@ -42,15 +42,17 @@ void HLTInput::initialize()
 {
   m_msgHandler = new MsgHandler(1);
 
-  char inBufName[] = "inBuffer";
-  int inPort = m_port;
+  //char inBufName[] = "inBuffer";
+  //int inPort = m_port;
 
-  m_inBuf = new RingBuffer(inBufName, MAXPACKETSIZE);
+  //m_inBuf = new RingBuffer(inBufName, MAXPACKETSIZE);
+  m_inBuf = new RingBuffer("B2DataIn", MAXPACKETSIZE);
 
   m_pidEvtReceiver = fork();
 
   if (m_pidEvtReceiver == 0) {
-    m_evtReceiver = new EvtReceiver(inPort);
+    //m_evtReceiver = new EvtReceiver(inPort);
+    m_evtReceiver = new EvtReceiver(c_DataInPort);
     m_evtReceiver->init(m_inBuf);
     B2INFO("EvtReceiver initialized");
 

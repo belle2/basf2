@@ -24,6 +24,7 @@
 #include <framework/pcore/RingBuffer.h>
 
 #include <daq/hlt/EvtReceiver.h>
+#include <daq/hlt/HLTDefs.h>
 
 #define MAXPACKET 10000000 * 4
 

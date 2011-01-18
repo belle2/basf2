@@ -13,6 +13,7 @@
       "AmgaSearch.py",
       "gbasf2.py",
       "gbasf2util.py",
+      "gbasf2output.py",
       "mdclient.py",
       "mdinterface.py",
       "mdparser.py",

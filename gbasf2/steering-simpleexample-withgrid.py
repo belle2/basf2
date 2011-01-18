@@ -25,14 +25,27 @@ inputsandboxfiles = 'file1.txt,file2.txt'
 # (optional) max events - the maximum number of events to use
 maxevents = '100000'
 
-# Create module
-test = fw.register_module('Hello')
+############################
+# Basf2 configuration     #
+############################
+# register modules
+evtmetagen = fw.register_module('EvtMetaGen')
+evtmetainfo = fw.register_module('EvtMetaInfo')
 
-# Create path
+# set parameters in modules
+param_evtmetagen = {
+    'ExpList': [1],
+    'RunList': [1],
+    'EvtStartList': [0],
+    'EvtEndList': [100],
+    }
+
+evtmetagen.param(param_evtmetagen)
+
+# create path and add modules
 main = fw.create_path()
+main.add_module(evtmetagen)
+main.add_module(evtmetainfo)
 
-# Add module to path
-main.add_module(test)
-
-# Start event processing
-fw.process(main, 100)
+# process
+fw.process(main)

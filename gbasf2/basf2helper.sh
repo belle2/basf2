@@ -19,7 +19,7 @@ cd $VO_BELLE2_SW_DIR/releases/$2
 setuprel
 cd $WORKDIR
 
-basf2 -i >/dev/null
+basf2 -i
 if [ $? -ne 0 ]; then
   echo "basf2 not installed correctly"
   exit 1
@@ -28,7 +28,7 @@ fi
 ##############################################################################
 # Runtime
 ##############################################################################
-basf2 -s $1
+basf2 $1
 
 ##############################################################################
 # Work with output files, metadata

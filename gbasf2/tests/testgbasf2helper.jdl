@@ -1,6 +1,6 @@
 [
     Executable = "basf2helper.sh";
-    Arguments  = "steering-simpleexample-withgrid.py build_2010-12-13";
+    Arguments  = "steering-simpleexample-withgrid.py build-2010-12-13";
     JobGroup = e13-e57-test;
     JobName = r000012-b20060529_2127-0.mdst;
     PilotType = "private";
@@ -33,4 +33,5 @@
       OutputData = "std.out";
       MaxCPUTime = 27000;
       Priority = 0 ;
+      GridRequiredCEs = "cgh2.collab.unimelb.edu.au";
 ]

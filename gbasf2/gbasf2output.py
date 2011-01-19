@@ -64,14 +64,34 @@ def main():
       # loop through the output files, uploading and registering
         se = repman._getSEProximity(getStorageElements()['Value'])['Value'][0]
         print 'trying to use SE: ' + se
-        for outputfile in glob.glob('*.txt'):
-            repman.putAndRegister(outputpath + '/' + outputfile, outputfile,
-                                  se)
-        # entries[outputfile] = (['exp', 'run', 'guid', 'lfn', 'status', 'md5', 'adler32'],[cliParams.getExperiments()[0],'0', 'guid:', 'lfn:', 'good', 'abcdef0', 'abcdef0']
-            print outputfile
-            if not aclient.bulkInsert(outputpath, entries):
-                print 'Error inserting metadata'
+        for outputfile in glob.glob('*.root'):
+            lfn = outputpath + '/' + outputfile
+            print 'trying to upload/register ' + lfn
+            # XXX - we're using belle VO for belle2 data. Badness.
+            cr_result = repman.putAndRegister(lfn.replace('belle2', 'belle'),
+                    outputfile, se)
+            if not cr_result['OK']:
+                print cr_result
                 DIRAC.exit(1)
+            else:
+                cr_result = cr_result['Value']['Successful'
+                        ][lfn.replace('belle2', 'belle')]
+                entries[lfn] = (['lfn', 'guid', 'adler32'], [lfn,
+                                cr_result['GUID'], cr_result['Addler']])
+                try:
+                    mfile = open(outputfile.rsplit('.', 1)[0] + '.metadata')
+                    for line in mfile:
+                        line_parts = split(': ', 1)
+                        # make sure we have both a key and a value!
+                        if len(line_parts) == 2:
+                            entries[lfn][0].append(line_parts[0])
+                            entries[lfn][1].append(line_parts[1])
+                except IOError:
+                    print 'no metadata file, using defaults'
+        print entries
+        if not aclient.bulkInsert(outputpath, entries):
+            print 'Error inserting metadata'
+            DIRAC.exit(1)
     else:
         print 'Error with metadata path'
         DIRAC.exit(1)

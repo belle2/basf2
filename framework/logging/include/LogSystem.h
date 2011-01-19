@@ -119,6 +119,17 @@ namespace Belle2 {
      */
     int getMessageCounter(LogConfig::ELogLevel logLevel);
 
+    /**
+     * Returns the current log level used by the logging system.
+     *
+     * If the current log configuration is set to a module
+     * log configuration, the log level of the module is returned.
+     * Otherwise the global log level is returned.
+     *
+     * @return The current log level of the logging system.
+     */
+    LogConfig::ELogLevel getCurrentLogLevel();
+
 
   private:
 

@@ -108,6 +108,16 @@ int LogSystem::getMessageCounter(LogConfig::ELogLevel logLevel)
 }
 
 
+LogConfig::ELogLevel LogSystem::getCurrentLogLevel()
+{
+  //Check if module specific logging is set
+  if (m_moduleLogConfig && (m_moduleLogConfig->getLogLevel() != LogConfig::c_Default)) {
+    return m_moduleLogConfig->getLogLevel();
+  }
+  return m_logConfig.getLogLevel();
+}
+
+
 //============================================================================
 //                              Private methods
 //============================================================================

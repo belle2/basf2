@@ -26,6 +26,8 @@
 #include <G4ParticleTable.hh>
 #include <G4DecayTable.hh>
 #include <QGSP_BERT.hh>
+#include <G4EventManager.hh>
+#include <G4RunManager.hh>
 
 #include <TGeoManager.h>
 #include <TG4RootNavMgr.h>
@@ -52,6 +54,7 @@ FullSimModule::FullSimModule() : Module()
   addParam("MCParticleCollection", m_mcParticleCollectionName, string(DEFAULT_MCPARTICLES), "The name of the input MCParticle collection.");
   addParam("ThresholdImportantEnergy", m_thresholdImportantEnergy, 0.250, "[GeV] A particle which got 'stuck' and has less than this energy will be killed after 'ThresholdTrials' trials.");
   addParam("ThresholdTrials", m_thresholdTrials, 10, "Geant4 will try 'ThresholdTrials' times to move a particle which got 'stuck' and has an energy less than 'ThresholdImportantEnergy'.");
+  addParam("TrackingVerbosity", m_trackingVerbosity, 0, "Tracking verbosity: 0=Silent; 1=Min info per step; 2=sec particles; 3=pre/post step info; 4=like 3 but more info; 5=proposed step length info.");
 }
 
 
@@ -124,9 +127,23 @@ void FullSimModule::initialize()
       if (transport != NULL) {
         transport->SetThresholdImportantEnergy(m_thresholdImportantEnergy / Unit::MeV); //Geant4 energy unit is MeV
         transport->SetThresholdTrials(m_thresholdTrials);
+        break;
       }
     }
   }
+
+  //Set the verbosity level of Geant4 according to the logging settings of the module
+  int g4VerboseLevel = 0;
+  switch (LogSystem::Instance().getCurrentLogLevel()) {
+    case LogConfig::c_Debug : g4VerboseLevel = 2;
+      break;
+    case LogConfig::c_Info  : g4VerboseLevel = 1;
+      break;
+    default: g4VerboseLevel = 0;
+  }
+  G4EventManager::GetEventManager()->SetVerboseLevel(g4VerboseLevel);
+  G4RunManager::GetRunManager()->SetVerboseLevel(g4VerboseLevel);
+  G4EventManager::GetEventManager()->GetTrackingManager()->SetVerboseLevel(m_trackingVerbosity); //turned out to be more useful as a parameter.
 }
 
 

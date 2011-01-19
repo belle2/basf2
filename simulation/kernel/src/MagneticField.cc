@@ -19,7 +19,7 @@ using namespace Belle2;
 using namespace Belle2::Simulation;
 
 
-MagneticField::MagneticField(): G4MagneticField() //m_chordFinder(0), m_equation(0), m_stepper(0)
+MagneticField::MagneticField(): G4MagneticField()
 {
 
 }

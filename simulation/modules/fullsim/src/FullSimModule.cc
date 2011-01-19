@@ -19,8 +19,12 @@
 #include <generators/dataobjects/MCParticle.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/EventMetaData.h>
+#include <framework/gearbox/Unit.h>
 
 #include <G4TransportationManager.hh>
+#include <G4Transportation.hh>
+#include <G4ParticleTable.hh>
+#include <G4DecayTable.hh>
 #include <QGSP_BERT.hh>
 
 #include <TGeoManager.h>
@@ -46,6 +50,8 @@ FullSimModule::FullSimModule() : Module()
 
   //Parameter definition
   addParam("MCParticleCollection", m_mcParticleCollectionName, string(DEFAULT_MCPARTICLES), "The name of the input MCParticle collection.");
+  addParam("ThresholdImportantEnergy", m_thresholdImportantEnergy, 0.250, "[GeV] A particle which got 'stuck' and has less than this energy will be killed after 'ThresholdTrials' trials.");
+  addParam("ThresholdTrials", m_thresholdTrials, 10, "Geant4 will try 'ThresholdTrials' times to move a particle which got 'stuck' and has an energy less than 'ThresholdImportantEnergy'.");
 }
 
 
@@ -104,6 +110,23 @@ void FullSimModule::initialize()
 
   //Initialize G4 kernel
   runManager.Initialize();
+
+  //Set the parameters for the G4Transportation system.
+  //To make sure we really change all G4Transportation classes, we loop over all particles
+  //even if the pointer to the G4Transportation object seems to be the same for all particles.
+  G4ParticleTable::G4PTblDicIterator* partIter = G4ParticleTable::GetParticleTable()->GetIterator();
+  partIter->reset();
+  while ((*partIter)()) {
+    G4ParticleDefinition* currParticle = partIter->value();
+    G4ProcessVector& currProcList = *currParticle->GetProcessManager()->GetProcessList();
+    for (int iProcess = 0; iProcess < currProcList.size(); ++iProcess) {
+      G4Transportation* transport = dynamic_cast<G4Transportation*>(currProcList[iProcess]);
+      if (transport != NULL) {
+        transport->SetThresholdImportantEnergy(m_thresholdImportantEnergy / Unit::MeV); //Geant4 energy unit is MeV
+        transport->SetThresholdTrials(m_thresholdTrials);
+      }
+    }
+  }
 }
 
 

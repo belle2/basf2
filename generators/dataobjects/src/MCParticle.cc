@@ -38,11 +38,10 @@ namespace Belle2 {
 }
 
 
-void MCParticle::setPDG(int pdg)
+void MCParticle::setMassFromPDG()
 {
-  m_pdg = pdg;
-  if (TDatabasePDG::Instance()->GetParticle(pdg) == NULL) throw(ParticlePDGNotKnownError() << pdg);
-  m_mass = TDatabasePDG::Instance()->GetParticle(pdg)->Mass();
+  if (TDatabasePDG::Instance()->GetParticle(m_pdg) == NULL) throw(ParticlePDGNotKnownError() << m_pdg);
+  m_mass = TDatabasePDG::Instance()->GetParticle(m_pdg)->Mass();
 }
 
 

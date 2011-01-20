@@ -105,6 +105,7 @@ int TouschekReader::getParticles(int number, MCParticleGraph &graph) throw(Tousc
     MCParticleGraph::GraphParticle &particle = graph.addParticle();
     particle.setStatus(MCParticle::PrimaryParticle);
     particle.setPDG(m_pdg);
+    particle.setMassFromPDG();
     particle.setMomentum(TVector3(particleMomGeant4));
     particle.setProductionVertex(TVector3(particlePosGeant4));
     particle.setProductionTime(0.0);

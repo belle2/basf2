@@ -212,7 +212,12 @@ namespace Belle2 {
       * Set PDG code of the particle.
       * @param pdg The PDG code of the MonteCarlo particle.
       */
-    void setPDG(int pdg);
+    void setPDG(int pdg)                               { m_pdg = pdg; }
+
+    /**
+      * Sets the mass for the particle from the particle's PDG code.
+      */
+    void setMassFromPDG();
 
     /**
      * Set Status code for the particle.

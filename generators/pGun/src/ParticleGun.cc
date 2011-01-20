@@ -38,6 +38,7 @@ bool ParticleGun::generateEvent(MCParticleGraph &graph)
       int index = m_grand.Uniform(m_PIDcodes.size());
       p.setPDG(m_PIDcodes[index]);
     }
+    p.setMassFromPDG();
     p.setFirstDaughter(0);
     p.setLastDaughter(0);
 

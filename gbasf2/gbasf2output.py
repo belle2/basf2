@@ -62,7 +62,13 @@ def main():
     if aclient.checkDirectory(outputpath):
         repman = ReplicaManager()
       # loop through the output files, uploading and registering
-        se = repman._getSEProximity(getStorageElements()['Value'])['Value'][0]
+        ses = getStorageElements()['Value']
+        ses.remove('SandboxSE')
+        ses.remove('CentralSE')
+        print ses
+        selist = repman._getSEProximity(ses)
+        print selist
+        se = selist['Value'][0]
         print 'trying to use SE: ' + se
         for outputfile in glob.glob('*.root'):
             lfn = outputpath + '/' + outputfile

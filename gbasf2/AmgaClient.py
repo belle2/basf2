@@ -35,7 +35,9 @@ class AmgaClient(object):
             # First, try to connect a proxy
             if os.environ.has_key('X509_USER_PROXY'):
                 print 'using X509 auth'
-                self.client = mdclient.MDClient('150.183.246.196', 8822, '')
+                # self.client = mdclient.MDClient('150.183.246.196', 8822, '')
+                self.client = mdclient.MDClient('cgh10.collab.unimelb.edu.au',
+                        8822, '')
                 self.client.requireSSL(os.environ['X509_USER_PROXY'],
                                        os.environ['X509_USER_PROXY'])
             else:

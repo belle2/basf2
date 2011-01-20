@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ParamSet type="Structure">
+	<Name>Belle II Structure</Name>
+	<Description>Belle II Structure geometry</Description>
+	<Version>0</Version>
+	<Creator>StructureBelleII</Creator>
+	<Content>
+		<Rotation desc="Rotation of the structure with respect to the Detector" unit="rad">0.0</Rotation>
+		<OffsetZ desc="The offset of the Structure in z with respect to the IP" unit="cm">47.0</OffsetZ>
+		<Material desc="Starting material of Structure Vessel">Air</Material>
+		
+		<ZBoundaries>
+			<ZBoundary id="1">
+				<Zposition unit="cm">-362.1</Zposition>
+				<InnerRadius unit="cm">128.0</InnerRadius>
+				<OuterRadius unit="cm">390.0</OuterRadius>
+			</ZBoundary>
+
+			<ZBoundary id="2">
+				<Zposition unit="cm">-230.0</Zposition>
+				<InnerRadius unit="cm">128.0</InnerRadius>
+				<OuterRadius unit="cm">390.0</OuterRadius>
+			</ZBoundary>
+
+			<ZBoundary id="3">
+				<Zposition unit="cm">-230.0</Zposition>
+				<InnerRadius unit="cm">200.0</InnerRadius>
+				<OuterRadius unit="cm">390.0</OuterRadius>
+			</ZBoundary>
+
+			<ZBoundary id="4">
+				<Zposition unit="cm">230.0</Zposition>
+				<InnerRadius unit="cm">200.0</InnerRadius>
+				<OuterRadius unit="cm">390.0</OuterRadius>
+			</ZBoundary>
+
+			<ZBoundary id="5">
+				<Zposition unit="cm">230.0</Zposition>
+				<InnerRadius unit="cm">128.0</InnerRadius>
+				<OuterRadius unit="cm">390.0</OuterRadius>
+			</ZBoundary>
+
+			<ZBoundary id="6">
+				<Zposition unit="cm">362.1</Zposition>
+				<InnerRadius unit="cm">128.0</InnerRadius>
+				<OuterRadius unit="cm">390.0</OuterRadius>
+			</ZBoundary>
+		</ZBoundaries>
+
+		<BarrelKLM>
+			<Material desc="Starting material of Barrel KLM Vessel">Iron</Material>
+			<Nsides desc="number of sides of Barrel KLM Vessel">8</Nsides>
+			<Phi unit="deg">-22.5</Phi>
+			<Dphi unit="deg">360.0</Dphi>
+			<ZBoundary id="1">
+				<Zposition unit="cm">-222.0</Zposition>
+				<InnerRadius unit="cm">201.9</InnerRadius>
+				<OuterRadius unit="cm">353.5</OuterRadius>
+			</ZBoundary>
+			<ZBoundary id="2">
+				<Zposition unit="cm">222.0</Zposition>
+				<InnerRadius unit="cm">201.9</InnerRadius>
+				<OuterRadius unit="cm">353.5</OuterRadius>
+			</ZBoundary>
+		</BarrelKLM>
+
+		<BarrelKLMSlot>
+			<Material desc="Starting material of Barrel KLM Slot">Iron</Material>
+			<MaterialModule desc="Starting material of Barrel KLM Module">Air</MaterialModule>
+			<Nmodule desc="number of KLM modules in one sector">15</Nmodule>
+			<THICK_BIRON unit="cm">4.7</THICK_BIRON>
+			<THICK_BIRON_MEAS unit="cm">4.6689</THICK_BIRON_MEAS>
+			<THICK_BSLOT0 unit="cm">4.1</THICK_BSLOT0>
+			<THICK_BSLOT unit="cm">4.4</THICK_BSLOT>
+			<RMIN_BSLOT0 unit="cm">201.9</RMIN_BSLOT0>
+			<LEN_BSLOT unit="cm">222.0</LEN_BSLOT>
+			<DSX_BSLOT0 unit="cm">7.94</DSX_BSLOT0>
+			<DSX_BSLOT unit="cm">3.0</DSX_BSLOT>
+			<THICK_BMOD unit="cm">4.0</THICK_BMOD>
+			<LEN_CHOLE unit="cm">55.0</LEN_CHOLE>
+			<COV_CHOLE unit="cm">12.0</COV_CHOLE>
+			<WID_CHOLE unit="cm">50.0</WID_CHOLE>
+		</BarrelKLMSlot>
+
+
+		<EndcapKLM>
+			<Material desc="Starting material of Endcap KLM Vessel">Iron</Material>
+			<Nsides desc="number of sides of Barrel KLM Vessel">8</Nsides>
+			<Phi unit="deg">-22.5</Phi>
+			<Dphi unit="deg">360.0</Dphi>
+			<ZBoundary id="1">
+				<Zposition unit="cm">-66.05</Zposition>
+				<InnerRadius unit="cm">111.0</InnerRadius>
+				<OuterRadius unit="cm">353.5</OuterRadius>
+			</ZBoundary>
+			<ZBoundary id="2">
+				<Zposition unit="cm">66.05</Zposition>
+				<InnerRadius unit="cm">111.0</InnerRadius>
+				<OuterRadius unit="cm">353.5</OuterRadius>
+			</ZBoundary>
+		</EndcapKLM>
+
+		<EndcapKLMsub>
+			<Material desc="Starting material of Endcap KLM Vessel">Iron</Material>
+			<Length unit="cm">66.1</Length>
+			<InnerRadius unit="cm">110.5</InnerRadius>
+			<OuterRadius unit="cm">128.0</OuterRadius>
+		</EndcapKLMsub>
+
+		<EndcapKLMSlot>
+			<Material desc="Starting material of Endcap KLM Slot">Iron</Material>
+			<MaterialModule desc="Starting material of Endcap KLM Module">Air</MaterialModule>
+			<THICK_EIRON unit="cm">4.7</THICK_EIRON>
+			<THICK_EIRON_MEAS unit="cm">4.7</THICK_EIRON_MEAS>
+			<THICK_ESLOT unit="cm">4.4</THICK_ESLOT>
+			<THICK_ESLOT_MEAS unit="cm">4.4</THICK_ESLOT_MEAS>
+			<THICK_EMOD unit="cm">4.0</THICK_EMOD>	
+			<RMIN_EMOD unit="cm">130.0</RMIN_EMOD>	
+			<RMAX_EMOD unit="cm">332.0</RMAX_EMOD>	
+			<RMIN_ESLOT unit="cm">130.0</RMIN_ESLOT>	
+			<RMAX_ESLOT unit="cm">334.0</RMAX_ESLOT>	
+			<RSHIFT_ESLOT unit="cm">5.0</RSHIFT_ESLOT>
+			<RMAX_GLASS unit="cm">320.0</RMAX_GLASS>
+		</EndcapKLMSlot>
+
+
+		<Poletip>
+			<Material desc="material of the Pole tip of the Belle II detector">Iron</Material>
+			<Phi unit="deg">0</Phi>
+			<Dphi unit="deg">360.0</Dphi>
+			<ZBoundary id="1">
+				<Zposition unit="cm">194.75</Zposition>
+				<InnerRadius unit="cm">50.0</InnerRadius>
+				<OuterRadius unit="cm">115.0</OuterRadius>
+			</ZBoundary>
+			<ZBoundary id="2">
+				<Zposition unit="cm">204.75</Zposition>
+				<InnerRadius unit="cm">50.0</InnerRadius>
+				<OuterRadius unit="cm">125.0</OuterRadius>
+			</ZBoundary>
+			<ZBoundary id="3">
+				<Zposition unit="cm">230.0</Zposition>
+				<InnerRadius unit="cm">50.0</InnerRadius>
+				<OuterRadius unit="cm">125.0</OuterRadius>
+			</ZBoundary>
+			<ZBoundary id="4">
+				<Zposition unit="cm">230.0</Zposition>
+				<InnerRadius unit="cm">50.0</InnerRadius>
+				<OuterRadius unit="cm">128.0</OuterRadius>
+			</ZBoundary>
+			<ZBoundary id="5">
+				<Zposition unit="cm">262.0</Zposition>
+				<InnerRadius unit="cm">50.0</InnerRadius>
+				<OuterRadius unit="cm">128.0</OuterRadius>
+			</ZBoundary>
+			<ZBoundary id="6">
+				<Zposition unit="cm">262.0</Zposition>
+				<InnerRadius unit="cm">55.0</InnerRadius>
+				<OuterRadius unit="cm">128.0</OuterRadius>
+			</ZBoundary>
+			<ZBoundary id="7">
+				<Zposition unit="cm">278.0</Zposition>
+				<InnerRadius unit="cm">55.0</InnerRadius>
+				<OuterRadius unit="cm">128.0</OuterRadius>
+			</ZBoundary>
+			<ZBoundary id="8">
+				<Zposition unit="cm">278.0</Zposition>
+				<InnerRadius unit="cm">60.0</InnerRadius>
+				<OuterRadius unit="cm">128.0</OuterRadius>
+			</ZBoundary>
+			<ZBoundary id="9">
+				<Zposition unit="cm">323.0</Zposition>
+				<InnerRadius unit="cm">60.0</InnerRadius>
+				<OuterRadius unit="cm">128.0</OuterRadius>
+			</ZBoundary>
+			<ZBoundary id="10">
+				<Zposition unit="cm">323.0</Zposition>
+				<InnerRadius unit="cm">85.0</InnerRadius>
+				<OuterRadius unit="cm">128.0</OuterRadius>
+			</ZBoundary>
+			<ZBoundary id="11">
+				<Zposition unit="cm">362.1</Zposition>
+				<InnerRadius unit="cm">85.0</InnerRadius>
+				<OuterRadius unit="cm">128.0</OuterRadius>
+			</ZBoundary>
+		</Poletip>
+	</Content>
+</ParamSet>

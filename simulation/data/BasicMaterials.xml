@@ -175,6 +175,14 @@
 			<InterLength>0</InterLength>
 		</Material>
 
+		<Material name="Iron">
+			<AtomNumber>26.0</AtomNumber>
+			<MassNumber unit="u">55.850</MassNumber>
+			<Density unit="g/cm3">7.870</Density>
+			<RadLength>1.0</RadLength>
+			<InterLength>0</InterLength>
+		</Material>
+
 		<Material name="Gold">
 			<AtomNumber>79.0</AtomNumber>
 			<MassNumber unit="u">196.966569</MassNumber>

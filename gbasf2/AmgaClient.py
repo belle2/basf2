@@ -256,10 +256,10 @@ class AmgaClient(object):
       '''
 
         if self.checkDirectory(basepath):
-            for key in user_dataset_attributes.keys():
+            for key in self.user_dataset_attributes.keys():
                 try:
                     self.client.addAttr(basepath, key,
-                            user_dataset_attributes[key])
+                            self.user_dataset_attributes[key])
                 except mdinterface.CommandException, ex:
                     print 'Error:', ex
                     return False

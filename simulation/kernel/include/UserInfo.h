@@ -22,6 +22,10 @@ namespace Belle2 {
 
   namespace Simulation {
 
+    //Define exceptions
+    /** Exception is thrown if no user information could be found. */
+    BELLE2_DEFINE_EXCEPTION(CouldNotFindUserInfo, "No User Information was found !");
+
     /**
      * UserInfo class which is used to attach additional information to Geant4 particles and tracks.
      * This class is designed as a template based payload class.
@@ -29,10 +33,6 @@ namespace Belle2 {
     template<class Info, class Payload> class UserInfo: public Info {
 
     public:
-
-      //Define exceptions
-      /** Exception is thrown if no user information could be found. */
-      BELLE2_DEFINE_EXCEPTION(CouldNotFindUserInfo, "No User Information was found !");
 
       /**
        * The constructor of the user info class.

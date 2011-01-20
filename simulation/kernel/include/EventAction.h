@@ -11,6 +11,8 @@
 #ifndef EVENTACTION_H_
 #define EVENTACTION_H_
 
+#include <generators/dataobjects/MCParticleGraph.h>
+
 #include <G4UserEventAction.hh>
 #include <G4Event.hh>
 
@@ -18,32 +20,43 @@ namespace Belle2 {
 
   namespace Simulation {
 
-    //! The Event Action class.
-    /*! This class is invoked by G4EventManager for each event.
-    */
+    /**
+     * The Event Action class.
+     * This class is invoked by G4EventManager for each event.
+     */
     class EventAction : public G4UserEventAction {
 
     public:
 
-      //! Constructor
-      EventAction();
+      /**
+       * Constructor.
+       */
+      EventAction(const std::string& mcCollectionName, MCParticleGraph& mcParticleGraph);
 
-      //! Destructor
+      /**
+       * Destructor.
+       */
       virtual ~EventAction();
 
-      //! This method is invoked before converting the primary particles to G4Track objects.
-      /*!
-          /param event Pointer to the current G4Event object.
-      */
+      /**
+       * This method is invoked before converting the primary particles to G4Track objects.
+       *
+       * @param event Pointer to the current G4Event object.
+       */
       void BeginOfEventAction(const G4Event* event);
 
-      //! This method is invoked at the very end of event processing.
-      /*!
-          /param event The pointer to the G4Event object which allows to access trajectories, hits collections and/or digits collections.
-      */
+      /**
+       * This method is invoked at the very end of event processing.
+       *
+       * @param event The pointer to the G4Event object which allows to access trajectories, hits collections and/or digits collections.
+       */
       void EndOfEventAction(const G4Event* event);
 
-    private:
+
+    protected:
+
+      std::string m_mcCollectionName;     /**< The name of the MCParticle collection to which the MCParticles should be written.*/
+      MCParticleGraph& m_mcParticleGraph; /**< Reference to the MCParticle graph which is converted to a MCParticle list by this class. */
 
     };
 

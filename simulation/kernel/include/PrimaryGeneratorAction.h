@@ -11,8 +11,9 @@
 #ifndef PRIMARYGENERATORACTION_H_
 #define PRIMARYGENERATORACTION_H_
 
-#include <G4VUserPrimaryGeneratorAction.hh>
+#include <generators/dataobjects/MCParticleGraph.h>
 
+#include <G4VUserPrimaryGeneratorAction.hh>
 #include <string>
 
 class G4Event;
@@ -33,9 +34,10 @@ namespace Belle2 {
     public:
 
       /** The constructor of the PrimaryGeneratorAction.
+       * @param mcParticleGraph Reference to the MCParticle Graph, which is filled by this class.
        * @param mcCollectionName The name of the MCParticle collection that should be used to create the MCParticle generator.
        */
-      PrimaryGeneratorAction(const std::string& mcCollectionName);
+      PrimaryGeneratorAction(const std::string& mcCollectionName, MCParticleGraph& mcParticleGraph);
 
       /** The destructor of the PrimaryGeneratorAction. */
       virtual ~PrimaryGeneratorAction();
@@ -51,7 +53,6 @@ namespace Belle2 {
     protected:
 
       MCParticleGenerator* m_mcParticleGenerator; /**< The instance of the MCParticle generator. */
-
     };
 
   } //end of Simulation namespace

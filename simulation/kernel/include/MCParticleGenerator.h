@@ -34,9 +34,10 @@ namespace Belle2 {
     public:
 
       /** The constructor of the MCParticleGenerator class.
+       * @param mcParticleGraph Reference to the MCParticle graph which is filled by this class.
        * @param mcCollectionName The name of the MCParticle collection from which the MCParticles should be read.
        */
-      MCParticleGenerator(const std::string& mcCollectionName);
+      MCParticleGenerator(const std::string& mcCollectionName, MCParticleGraph& mcParticleGraph);
 
       /** The destructor of the MCParticleGenerator class. */
       virtual ~MCParticleGenerator();
@@ -51,8 +52,8 @@ namespace Belle2 {
 
     protected:
 
-      std::string m_mcCollectionName;    /**< The name of the MCParticle collection from which the MCParticles should be read.*/
-      MCParticleGraph m_mcParticleGraph; /**< The MCParticle Graph used to manage the MCParticles before and after the simulation.*/
+      std::string m_mcCollectionName;     /**< The name of the MCParticle collection from which the MCParticles should be read.*/
+      MCParticleGraph& m_mcParticleGraph; /**< Reference to the MCParticle graph which is filled by this class. */
 
       /**
        * Takes a MCParticle and creates a primary particle for Geant4.

@@ -9,7 +9,6 @@
  **************************************************************************/
 
 #include <simulation/kernel/EventAction.h>
-//#include <simulation/kernel/SimHit.h>
 #include <simulation/simkernel/B4VHit.h>
 
 #include <G4UImanager.hh>
@@ -20,7 +19,8 @@ using namespace Belle2;
 using namespace Belle2::Simulation;
 
 
-EventAction::EventAction(): G4UserEventAction()
+EventAction::EventAction(const std::string& mcCollectionName, MCParticleGraph& mcParticleGraph):
+    G4UserEventAction(), m_mcCollectionName(mcCollectionName), m_mcParticleGraph(mcParticleGraph)
 {
 
 }
@@ -39,51 +39,56 @@ void EventAction::BeginOfEventAction(const G4Event* event)
 
 
 void EventAction::EndOfEventAction(const G4Event* event)
-/*{
-  //Get the pointer of the sensitive detector manager.
-  G4SDManager* SDman = G4SDManager::GetSDMpointer();
+{
+  //Create the final MCParticle list
+  m_mcParticleGraph.generateList(m_mcCollectionName, MCParticleGraph::set_decay_info | MCParticleGraph::check_cyclic);
 
-  //Get the pointer of the hits collection table.
-  G4HCtable* HCtable = SDman->GetHCtable();
 
-  //Get the pointer of the hits collection in this event.
-  G4HCofThisEvent* HCE = event->GetHCofThisEvent();
 
-  //Get the number of the hits collections.
-  G4int nCols = HCtable->entries();
+  /*  //Get the pointer of the sensitive detector manager.
+    G4SDManager* SDman = G4SDManager::GetSDMpointer();
 
-  //Loop over each hits collection and check if it is registered
-  //by a sensitive detector. If true, then save the hits.
-  for (G4int iCols = 0; iCols < nCols; ++iCols) {
+    //Get the pointer of the hits collection table.
+    G4HCtable* HCtable = SDman->GetHCtable();
 
-    //Get the hits collection name.
-    G4String colName = HCtable->GetHCname(iCols);
+    //Get the pointer of the hits collection in this event.
+    G4HCofThisEvent* HCE = event->GetHCofThisEvent();
 
-    //Get the sensitive detector name.
-    G4String SDName = HCtable->GetSDname(iCols);
+    //Get the number of the hits collections.
+    G4int nCols = HCtable->entries();
 
-    //Check if this sensitive detector is existing.
-    G4VSensitiveDetector* SD = SDman->FindSensitiveDetector(SDName, false);
+    //Loop over each hits collection and check if it is registered
+    //by a sensitive detector. If true, then save the hits.
+    for (G4int iCols = 0; iCols < nCols; ++iCols) {
 
-    if (SD != NULL) {
-      //Get the hits collection id.
-      G4int colID = SDman->GetCollectionID(colName);
+      //Get the hits collection name.
+      G4String colName = HCtable->GetHCname(iCols);
 
-      //Get the pointer of the hits collection.
-      HitsCollection* hitCol = (HitsCollection*) HCE->GetHC(colID);
+      //Get the sensitive detector name.
+      G4String SDName = HCtable->GetSDname(iCols);
 
-      //Get the number of the hits in this collection.
-      G4int nHits = hitCol->entries();
+      //Check if this sensitive detector is existing.
+      G4VSensitiveDetector* SD = SDman->FindSensitiveDetector(SDName, false);
 
-      //Loop over each hit and save the hit information into the DataStore.
-      for (G4int iHits = 0; iHits < nHits; ++iHits) {
-        (*hitCol)[iHits]->Save(iHits);
+      if (SD != NULL) {
+        //Get the hits collection id.
+        G4int colID = SDman->GetCollectionID(colName);
+
+        //Get the pointer of the hits collection.
+        HitsCollection* hitCol = (HitsCollection*) HCE->GetHC(colID);
+
+        //Get the number of the hits in this collection.
+        G4int nHits = hitCol->entries();
+
+        //Loop over each hit and save the hit information into the DataStore.
+        for (G4int iHits = 0; iHits < nHits; ++iHits) {
+          (*hitCol)[iHits]->Save(iHits);
+        }
       }
     }
-  }
-}*/
+  }*/
 
-{
+
   //------------------------------------------------
   // Get the pointer of sensitive detector manager.
   //------------------------------------------------

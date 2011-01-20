@@ -14,6 +14,7 @@
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 #include <framework/datastore/StoreArray.h>
+#include <simulation/kernel/UserInfo.h>
 
 #include <G4ParticleTable.hh>
 #include <G4VUserPrimaryParticleInformation.hh>
@@ -25,9 +26,10 @@ using namespace Belle2;
 using namespace Belle2::Simulation;
 
 
-MCParticleGenerator::MCParticleGenerator(const string& mcCollectionName) : G4VPrimaryGenerator()
+MCParticleGenerator::MCParticleGenerator(const string& mcCollectionName, MCParticleGraph& mcParticleGraph) :
+    G4VPrimaryGenerator(), m_mcCollectionName(mcCollectionName), m_mcParticleGraph(mcParticleGraph)
 {
-  m_mcCollectionName = mcCollectionName;
+
 }
 
 
@@ -97,7 +99,16 @@ void MCParticleGenerator::addParticle(MCParticle &mcParticle, G4Event* event, G4
 
     newPart = new G4PrimaryParticle(pdef, mcPartMom4.X() / Unit::MeV, mcPartMom4.Y() / Unit::MeV, mcPartMom4.Z() / Unit::MeV, mcPartMom4.E() / Unit::MeV);
     newPart->SetMass(mcParticle.getMass() / Unit::MeV);
-    //newPart->SetUserInformation(new ParticleInfo(mc));
+    newPart->SetUserInformation(new ParticleInfo(graphParticle));
+
+    //Set propagation time only if useTime is true, the MCparticle has a valid vertex and has children.
+    useTime &= mcParticle.hasValidVertex() && mcParticle.getFirstDaughter() > 0;
+    if (useTime) {
+      //ProperTime is in particle eigentime, so convert lab lifetime to eigentime
+      double propertime = mcParticle.getLifetime() / mcParticle.get4Vector().Gamma();
+      newPart->SetProperTime(propertime);
+    }
+
     if (lastG4Mother != NULL) lastG4Mother->SetDaughter(newPart);
     g4Mother = newPart;
   } else {

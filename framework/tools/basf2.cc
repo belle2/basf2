@@ -56,22 +56,15 @@ void executePythonFile(const string& pythonFile)
 {
   boost::filesystem::path fullPath(boost::filesystem::initial_path<boost::filesystem::path>());
 
-  try {
-    fullPath = boost::filesystem::system_complete(boost::filesystem::path(pythonFile));
-    if ((!(boost::filesystem::is_directory(fullPath))) && (boost::filesystem::exists(fullPath))) {
-      try {
-        object main_module = import("__main__");
-        object main_namespace = main_module.attr("__dict__");
+  fullPath = boost::filesystem::system_complete(boost::filesystem::path(pythonFile));
+  if ((!(boost::filesystem::is_directory(fullPath))) && (boost::filesystem::exists(fullPath))) {
 
-        exec_file(boost::python::str(fullPath.string()), main_namespace, main_namespace);
-      } catch (error_already_set const &) {
-        B2ERROR("An error occurred during the execution of the python file: " + pythonFile);
-      }
-    } else {
-      B2ERROR("The given filename and/or path is not valid: " + pythonFile);
-    }
-  } catch (...) {
-    B2ERROR("An error occurred during the execution of the python file: " + pythonFile);
+    object main_module = import("__main__");
+    object main_namespace = main_module.attr("__dict__");
+
+    exec_file(boost::python::str(fullPath.string()), main_namespace, main_namespace);
+  } else {
+    B2ERROR("The given filename and/or path is not valid: " + pythonFile);
   }
 }
 

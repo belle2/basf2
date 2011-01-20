@@ -166,7 +166,7 @@ RelationArray* StoreObjPtr<T>::relateTo(const StoreAccessorAbs<TClonesArray>& to
 template <class T>
 RelationArray* StoreObjPtr<T>::relateTo(const StoreAccessorAbs<TClonesArray>& to, const std::list<std::pair<int, float> > indexWeightList)
 {
-  return RelationArray(m_storeObjPtr, to.getPtr, indexWeightList);
+  return RelationArray(m_storeObjPtr, to.getPtr(), indexWeightList);
 }
 
 #endif

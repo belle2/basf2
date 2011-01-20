@@ -90,6 +90,15 @@ namespace Belle2 {
      */
     Relation* relateTo(StoreAccessorAbs<TObject>& to, const int& from = 0, float& weight = 1);
 
+
+    /** Convenient Relation Creating when pointing to part of TClonesArray.
+     *  @par to     StoreArray holding the relevant TClonesArray.
+     *  @par index  Index of object pointed to in the TClonesArray.
+     *              If you want to point to the whole TClonesArray, use the creator without the index argument.
+     *  @par        Assign a weight to the relation.
+     */
+    Relation* relateTo(StoreAccessorAbs<TClonesArray>& to, const int& index, const int& from = 0, const float& weight = 1);
+
     /** Convenient RelationArray creating.
      *
      *  This way of creation can be used, if all weights are the same.
@@ -140,6 +149,16 @@ Relation* StoreArray<T>::relateTo(StoreAccessorAbs<TObject>& to, const int& from
     return new Relation(m_storeArray, to.getPtr(), weight);
   } else {
     return new Relation(m_storeArray->At(from), to.getPtr());
+  }
+}
+
+template <class T>
+Relation* StoreArray<T>::relateTo(StoreAccessorAbs<TClonesArray>& to, const int& index, const int& from, const float& weight)
+{
+  if (from == 0) {
+    return new Relation(m_storeArray, to.getPtr()->At(index), weight);
+  } else {
+    return new Relation(m_storeArray->At(from), to.getPtr()->At(index), weight);
   }
 }
 

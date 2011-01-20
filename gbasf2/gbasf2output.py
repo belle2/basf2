@@ -86,18 +86,21 @@ def main():
                 #       returned by putAndRegister
                 # entries[lfn] = (['lfn', 'guid', 'adler32'], [lfn,
                 #                cr_result['GUID'], cr_result['Addler']])
-                entries[lfn] = (['lfn'], [lfn])
+                entries[outputfile] = (['lfn'], [lfn])
                 try:
                     mfile = open(outputfile.rsplit('.', 1)[0] + '.metadata')
                     for line in mfile:
                         line_parts = line.split(': ', 1)
                         # make sure we have both a key and a value!
                         if len(line_parts) == 2:
-                            entries[lfn][0].append(line_parts[0])
-                            entries[lfn][1].append(line_parts[1])
+                            entries[outputfile][0].append(line_parts[0])
+                            entries[outputfile][1].append(line_parts[1].rstrip())
                 except IOError:
                     print 'no metadata file, using defaults'
         print entries
+        # if this isn't an existing dataset, we need to set the attributes
+        if len(aclient.getAttributes(outputpath)[0]) == 0:
+            aclient.prepareUserDataset(outputpath)
         if not aclient.bulkInsert(outputpath, entries):
             print 'Error inserting metadata'
             DIRAC.exit(1)

@@ -21,6 +21,27 @@ class AmgaClient(object):
     Module to handle connection with AMGA metadata-base
     '''
 
+    user_dataset_attributes = {
+        'id': 'int',
+        'guid': 'varchar(32)',
+        'lfn': 'varchar(1024)',
+        'status': 'varchar(128)',
+        'events': 'int',
+        'experiment': 'int',
+        'stream': 'smallint',
+        'runL': 'smallint',
+        'eventL': 'int',
+        'runH': 'smallint',
+        'eventH': 'int',
+        'parentid': 'int',
+        'versionid': 'smallint',
+        'date': 'timestamp',
+        'site': 'varchar(32)',
+        'software': 'varchar(32)',
+        'user': 'varchar(32)',
+        'log': 'varchar(32)',
+        }
+
     config = None
     client = None
 
@@ -205,12 +226,43 @@ class AmgaClient(object):
         if self.checkDirectory(basepath):
             for entry in entries.keys():
                 try:
-                    client.addentries(basepath + '/' + entry,
-                                      entries[entry][0], entries[entry][1])
+                    self.client.addEntry(basepath + '/' + entry,
+                            entries[entry][0], entries[entry][1])
                 except mdinterface.CommandException, ex:
                     print 'Error:', ex
                     return False
             return True
+        else:
+            return False
+
+###############################################################################
+
+    def getAttributes(self, basepath):
+        '''
+      returns the attributes in a given directory, or False on failure
+      '''
+
+        try:
+            return self.client.listAttr(basepath)
+        except mdinterface.CommandException, ex:
+            print 'Error:', ex
+            return False
+
+###############################################################################
+
+    def prepareUserDataset(self, basepath):
+        '''
+      Adds the set of stock attributes to the given basepath
+      '''
+
+        if self.checkDirectory(basepath):
+            for key in user_dataset_attributes.keys():
+                try:
+                    self.client.addAttr(basepath, key,
+                            user_dataset_attributes[key])
+                except mdinterface.CommandException, ex:
+                    print 'Error:', ex
+                    return False
         else:
             return False
 

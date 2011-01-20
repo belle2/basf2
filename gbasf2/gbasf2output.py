@@ -82,12 +82,15 @@ def main():
             else:
                 cr_result = cr_result['Value']['Successful'
                         ][lfn.replace('belle2', 'belle')]
-                entries[lfn] = (['lfn', 'guid', 'adler32'], [lfn,
-                                cr_result['GUID'], cr_result['Addler']])
+                # XXX - need to get guid/checksum in another call, they are not
+                #       returned by putAndRegister
+                # entries[lfn] = (['lfn', 'guid', 'adler32'], [lfn,
+                #                cr_result['GUID'], cr_result['Addler']])
+                entries[lfn] = (['lfn'], [lfn])
                 try:
                     mfile = open(outputfile.rsplit('.', 1)[0] + '.metadata')
                     for line in mfile:
-                        line_parts = split(': ', 1)
+                        line_parts = line.split(': ', 1)
                         # make sure we have both a key and a value!
                         if len(line_parts) == 2:
                             entries[lfn][0].append(line_parts[0])

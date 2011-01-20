@@ -10,8 +10,10 @@
 #include <eklm/geoeklm/GeoEKLMBelleII.h>
 #include <eklm/simeklm/EKLMSensetiveDetector.h>
 
+#include <structure/geostructure/StructureEndcap.h>
+
 #include <framework/gearbox/GearDir.h>
-#include <framework/datastore/Units.h>
+#include <framework/gearbox/Unit.h>
 
 #include <cmath>
 #include <boost/format.hpp>
@@ -23,6 +25,7 @@
 #include <TGeoVolume.h>
 #include <TGeoBBox.h>
 #include <TGeoPcon.h>
+#include <TGeoPgon.h>
 #include "TGeoCompositeShape.h"
 #include "TGeoTube.h"
 #include "TGeoCone.h"
@@ -152,18 +155,41 @@ void GeoEKLMBelleII::create(GearDir& content)
   TGeoRotation* geoRot = new TGeoRotation("EKLMRot", 0.0, 0, 0.0);
   volGrpEKLM = addSubdetectorGroup("EKLM", new TGeoCombiTrans(0.0, 0.0, 0.0, geoRot));
 
+  StructureEndcap EndcapMgr;
+  EndcapMgr.read();
+
   //  Build EndCaps
   for (int iEndcap  = 0; iEndcap < nEndcap; ++iEndcap) {
 
     string Endcap_Name  = "Endcap_" + lexical_cast<string>(iEndcap);
 
+    //Get Material
+    TGeoMedium* strMed4EKLM = gGeoManager->GetMedium(EndcapMgr.matname().c_str());
 
+    TGeoVolume* strTemp = gGeoManager->MakePgon("TempOct", strMed4EKLM,
+                                                EndcapMgr.phi() / Unit::deg, EndcapMgr.dphi() / Unit::deg,
+                                                EndcapMgr.nsides(), EndcapMgr.nBoundary());
+
+    for (int iSet = 0; iSet < EndcapMgr.nBoundary() ; iSet++) {
+      ((TGeoPgon*)strTemp->GetShape())->DefineSection(iSet, EndcapMgr.z(iSet),
+                                                      EndcapMgr.rmin(iSet), EndcapMgr.rmax(iSet));
+    }
+
+    TGeoVolume* strsubtube = gGeoManager->MakeTube("subtube", strMed4EKLM,
+                                                   EndcapMgr.rminsub(), EndcapMgr.rmaxsub(), EndcapMgr.zsub());
+    TGeoCompositeShape* EndcapVessel = new TGeoCompositeShape("EKLMVessel", "TempOct-subtube");
+
+    /*
     TGeoVolume* volEndcap =
       gGeoManager->MakeTube(Endcap_Name.c_str(), medFe,
                             Endcap_InnerR,
                             Endcap_OuterR,
                             Endcap_length / 2);
-    volEndcap->SetLineColor(kRed);
+    */
+
+    TGeoVolume* volEndcap = new TGeoVolume(Endcap_Name.c_str(), EndcapVessel, strMed4EKLM);
+    volEndcap->SetLineColor(kBlue - 9);
+    //volEndcap->SetLineColor(kRed);
 
     TGeoRotation* EndcapRot = new TGeoRotation("EndcapRot", 0.0, 0, 0.0);
     TGeoTranslation* EndcapTrans ;
@@ -171,13 +197,14 @@ void GeoEKLMBelleII::create(GearDir& content)
       EndcapTrans = new TGeoTranslation("EndcapTrans",
                                         Endcap_positionX,
                                         Endcap_positionY,
-                                        Endcap_positionZ);
+                                        Endcap_positionZ); //Endcap_positionZ = 343.05cm
     } else {
       EndcapRot->ReflectZ(true);
       EndcapTrans = new TGeoTranslation("EndcapTrans",
                                         Endcap_positionX,
                                         Endcap_positionY,
-                                        -Endcap_positionZ);
+                                        //-Endcap_positionZ); //Endcap_positionZ != -343.05cm : should be shifted by 47.0 x 2 = 94cm
+                                        -Endcap_positionZ + 47.0 * 2.);
     }
 
 
@@ -201,8 +228,10 @@ void GeoEKLMBelleII::create(GearDir& content)
       //   volLayer->SetLineColor(kBlack);
       double  Layer_positionZ  = -Endcap_length / 2.0 + (iLayer + 1) * Layer_shiftZ + (iLayer + 0.5) *  Layer_length ;
       volEndcap->AddNode(volLayer, iLayer ,
-                         new TGeoTranslation(Layer_positionX,
-                                             Layer_positionY,
+                         //new TGeoTranslation(Layer_positionX,
+                         //                    Layer_positionY,
+                         new TGeoTranslation(0.0,
+                                             0.0,
                                              Layer_positionZ));
 
 
@@ -295,7 +324,7 @@ void GeoEKLMBelleII::create(GearDir& content)
             */
 
 
-            volStrip->SetInvisible();
+            //hara            volStrip->SetInvisible();
             /*
                   if (iStrip % 2)
                     volStrip->SetLineColor(kRed);

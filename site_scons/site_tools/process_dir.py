@@ -133,6 +133,8 @@ def process_dir(
             'tests',
             'scripts',
             'data',
+            'doc',
+            'examples',
             ]:
             process_dir(env, os.path.join(dir_name, entry), entry == 'modules'
                         or is_module_dir, release_dir)

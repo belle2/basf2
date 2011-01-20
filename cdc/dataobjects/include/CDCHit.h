@@ -12,6 +12,8 @@
 #define CDCHIT_H
 
 #include <framework/gearbox/Unit.h>
+#include <framework/logging/Logger.h>
+
 
 #include <TObject.h>
 
@@ -38,7 +40,9 @@ namespace Belle2 {
   public:
 
     /** Empty constructor for ROOT IO. */
-    CDCHit() {;}
+    CDCHit() {
+      DEBUG(150, "Empty CDCHit Constructor called.");
+    }
 
     /** Useful Constructor.
      *
@@ -52,11 +56,7 @@ namespace Belle2 {
      *  @param iWire       Wire number in the Layer.
      */
     CDCHit(const double& driftTime, const double& charge,
-           const int& iSuperLayer, const int& iLayer, int iWire) {
-      setDriftTime(driftTime);
-      setCharge(charge);
-      setWireId(iSuperLayer, iLayer, iWire);
-    }
+           const int& iSuperLayer, const int& iLayer, int iWire);
 
     /** Setter for Wire ID.
      *
@@ -65,6 +65,7 @@ namespace Belle2 {
      *  @param iWire       Values should be between [0, 511], depending on the wire radius.
      */
     void setWireId(const int& iSuperLayer, const int& iLayer, const int& iWire) {
+      DEBUG(150, "setWireId called with" << iSuperLayer << ", " << iLayer << ", " << iWire);
       m_wireId = static_cast<unsigned short int>(iWire + 512 * iLayer + 4096 * iSuperLayer);
     }
 
@@ -76,6 +77,7 @@ namespace Belle2 {
      *  @param driftTime Drift Length of electrons from closest ionisation cluster.
      */
     void setDriftTime(double driftTime) {
+      DEBUG(150, "setDriftTime called with " << driftTime);
       m_driftTime = static_cast<unsigned short int>(driftTime / Unit::um);
     }
 
@@ -85,6 +87,7 @@ namespace Belle2 {
      *  No special theoretical evaluation.
      */
     void setCharge(double charge) {
+      DEBUG(150, "setCharge called with " << charge);
       m_charge = static_cast<unsigned short int>(charge * 1e7);
     }
 
@@ -128,7 +131,7 @@ namespace Belle2 {
     /** Layer encoding.
      *
      *  SuperLayer: bits 1 -  4 (/4096)          <br>
-     *  Layer:      bits 5 -  7 (%4096, / 512)   <br>
+     *  Layer:      bits 5 -  7 (% 4096, / 512)   <br>
      *  Wire:       bits 8 - 16 (% 512)
      */
     unsigned short int m_wireId;

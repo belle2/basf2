@@ -15,3 +15,11 @@ using namespace Belle2;
 
 ClassImp(CDCHit)
 
+CDCHit::CDCHit(const double& driftTime, const double& charge,
+               const int& iSuperLayer, const int& iLayer, int iWire)
+{
+  B2INFO("Complexer Konstruktor aufgerufen.")
+  setDriftTime(driftTime);
+  setCharge(charge);
+  setWireId(iSuperLayer, iLayer, iWire);
+}

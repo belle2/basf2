@@ -12,6 +12,11 @@
 #define CDCCOLOURS_H
 
 namespace Belle2 {
+  /** @file
+   *  @todo Remove this file. You can configure the logging system to write out logging only for your
+   *        module. Colors for different types of logging are as well possible to configure.
+   */
+
 
 // If a terminal doesn't support any colors, comment following line
 #define TERM_COLOR

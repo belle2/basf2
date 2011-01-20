@@ -3,29 +3,34 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Guofu Cao                                                *
+ * Contributors: Guofu Cao, Martin Heck                                   *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
 #include <cdc/modules/cdcDigitizer/CDCDigi.h>
-#include <cdc/modules/cdcDigitizer/CDCColours.h>
 
-#include <framework/core/ModuleManager.h>
-//#include <boost/format.hpp>
-
+//framework headers
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreDefs.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Unit.h>
-
+#include <framework/datastore/RelationArray.h>
 #include <framework/logging/Logger.h>
+
+//cdc package headers
+#include <cdc/modules/cdcDigitizer/CDCColours.h>
+#include <cdc/dataobjects/CDCHit.h>
 #include <cdc/hitcdc/HitCDC.h>
 
+//C++ STL
 #include <cstdlib>
 #include <iomanip>
 #include <math.h>
 #include <time.h>
+#include <utility> //contains pair
+
+
 
 using namespace std;
 using namespace boost;
@@ -46,18 +51,24 @@ CDCDigi::CDCDigi() : Module()
   setDescription("CDCDigitizer");
 
   // Add parameters
-  addParam("RandomSeed", m_randomSeed, 12345, "Random seed");
-  addParam("InputColName", m_inColName, string("SimHitCDCArray"), "Input collection name");
-  addParam("OutputColName", m_outColName, string("HitCDCArray"), "Output collection name");
-  addParam("Fraction", m_fraction, 1.0, "The fraction of the first Gaussian used to smear drift length, set in cm");
-  addParam("Mean1", m_mean1, 0.0, "The mean value of the first Gaussian used to smear drift length, set in cm");
-  addParam("Resolution1", m_resolution1, 0.013, "Resolution of the first Gaussian used to smear drift length, set in cm");
-  addParam("Mean2", m_mean1, 0.0, "The mean value of the second Gaussian used to smear drift length, set in cm");
-  addParam("Resolution2", m_resolution2, 0.013, "Resolution of the second Gaussian used to smear drift length, set in cm");
-  addParam("ElectronicEffects", m_electronicEffects, 0, "Apply electronic effects?");
-  addParam("ElectronicsNoise", m_elNoise, 1000.0, "Noise added by the electronics, set in ENC");
-  addParam("RelCollectionNameMCToSimHit", m_relColNameMCToSim, string("MCToSimHitCDCRel"), "Name of relation collection - MCParticle to SimCDCHit (if nonzero, created)");
-  addParam("RelCollectionNameHitCDCToMC", m_relColNamePlsToMC, string("HitCDCToMCRel"), "Name of relation collection - Hit CDC to MCParticle (if nonzero, created)");
+  // I/O
+  addParam("InputColName",                m_inColName, string("SimHitCDCArray"), "Input collection name");
+  addParam("OutputColName",               m_outColName, string("HitCDCArray"), "Output collection name");
+  addParam("CDCHitOutColName",            m_cdcHitOutColName, string("CDCHitArray"), "Output collection name");
+  //Parameters for Digitization
+  addParam("RandomSeed",                  m_randomSeed, 12345, "Random seed");
+  addParam("Fraction",                    m_fraction, 0.571, "The fraction of the first Gaussian used to smear drift length, set in cm");
+  addParam("Mean1",                       m_mean1, 0.0, "The mean value of the first Gaussian used to smear drift length, set in cm");
+  addParam("Resolution1",                 m_resolution1, 0.0089, "Resolution of the first Gaussian used to smear drift length, set in cm");
+  addParam("Mean2",                       m_mean1, 0.0, "The mean value of the second Gaussian used to smear drift length, set in cm");
+  addParam("Resolution2",                 m_resolution2, 0.0188, "Resolution of the second Gaussian used to smear drift length, set in cm");
+  addParam("ElectronicEffects",           m_electronicEffects, 0, "Apply electronic effects?");
+  addParam("ElectronicsNoise",            m_elNoise, 1000.0, "Noise added by the electronics, set in ENC");
+  //Relations
+  addParam("RelCollectionName_MCPartToSimHit", m_relColNameMCToSim,    string("MCPartToCDCSimHit"),
+           "Name of relation collection - MCParticle to SimCDCHit (if nonzero, created)");
+  addParam("RelCollectionName_SimHitToCDCHit", m_relColNameSimHitToHit, string("SimHitToCDCHit"),
+           "Name of relation collection - Hit CDC to MCParticle (if nonzero, created)");
 }
 
 CDCDigi::~CDCDigi()
@@ -77,7 +88,7 @@ void CDCDigi::initialize()
   m_resolution2  *= Unit::cm;
 
   // Initialize random generator (engine, mean, sigma)
-  m_random = new TRandom((UInt_t)m_randomSeed);
+  m_random = new TRandom3((UInt_t)m_randomSeed);
 
   // Print set parameters
   printModuleParams();
@@ -88,12 +99,6 @@ void CDCDigi::initialize()
 
 void CDCDigi::beginRun()
 {
-  // Print run number
-  B2INFO(" Processing run: "
-         << ENDCOLOR
-         << m_nRun);
-
-  m_nRun++;
 }
 
 void CDCDigi::event()
@@ -103,8 +108,7 @@ void CDCDigi::event()
   //------------------------------------------
   StoreArray<SimHitCDC> cdcArray(m_inColName);
   if (!cdcArray) {
-    B2ERROR("Can not find " << m_inColName << ", exit.");
-    exit(-1);
+    B2ERROR("Can not find " << m_inColName << ".");
   }
 
   //---------------------------------------------------------------------
@@ -112,7 +116,7 @@ void CDCDigi::event()
   //---------------------------------------------------------------------
 
   // Get number of hits in this event
-  int nHits = cdcArray->GetEntries();
+  int nHits = cdcArray->GetEntriesFast();
 
   // Define signal map
   CDCSignalMap cdcSignalMap;
@@ -132,55 +136,76 @@ void CDCDigi::event()
     double hitdEdx        = aSimHitCDC->getEnergyDep() * Unit::GeV;
     double hitDriftLength = aSimHitCDC->getDriftLength() * Unit::cm;
 
-    if (iHits == 0) {
-      // Save the first hit into signal map
+    bool ifNewDigi = true;
+    // The first SimHit is always a new digit, but the looping will anyhow end immediately.
+    for (iterCDCMap = cdcSignalMap.begin(); iterCDCMap != cdcSignalMap.end(); iterCDCMap++) {
+
+      // Check if new SimHit is in cell of existing Signal.
+      if ((iterCDCMap->second->getLayerId() == hitLayerId) && (iterCDCMap->second->getWireId() == hitWireId)) {
+
+        // If true, the SimHit doesn't create a new digit, ...
+        ifNewDigi = false;
+
+        // ... smallest drift time has to be checked, ...
+        if (hitDriftLength < iterCDCMap->second->getDriftLength()) {
+          iterCDCMap->second->setDriftLength(hitDriftLength);
+        }
+
+        // ... total charge has to be updated.
+        iterCDCMap->second->updateCharge(hitdEdx);
+
+        //A SimHit will not be in more than one cell.
+        break;
+      }
+    } // End loop over previously stored Signal.
+
+    // If it is a new hit, save it to signal map.
+    if (ifNewDigi == true) {
       CDCSignal* signal = new CDCSignal(hitLayerId, hitWireId, hitdEdx, hitDriftLength);
       cdcSignalMap.insert(vpair(iHits, signal));
-    } else {
-      bool ifNewDigi = true;
-      for (iterCDCMap = cdcSignalMap.begin(); iterCDCMap != cdcSignalMap.end(); iterCDCMap++) {
-
-        // Check if in the same cell
-        if ((iterCDCMap->second->getLayerId() == hitLayerId) && (iterCDCMap->second->getWireId() == hitWireId)) {
-          ifNewDigi = false;
-
-          // If true, update drift length
-          if (hitDriftLength < iterCDCMap->second->getDriftLength()) {
-            iterCDCMap->second->setDriftLength(hitDriftLength);
-          }
-
-          // Update signal magnitude (add current charge to the total)
-          iterCDCMap->second->updateCharge(hitdEdx);
-
-        }
-      }
-
-      // If it is a new hit, save it to signal map
-      if (ifNewDigi == true) {
-        CDCSignal* signal = new CDCSignal(hitLayerId, hitWireId, hitdEdx, hitDriftLength);
-        cdcSignalMap.insert(vpair(iHits, signal));
-      }
     }
-  } // end loop
+  } // end loop over SimHits.
 
 
   //-----------------------------------------------------
   // Smear drift length and save digits into data store.
   //-----------------------------------------------------
   int iDigits = 0;
+  // Arrays for CDCHits and Relations between SimHit and CDCHit.
+  StoreArray<CDCHit> cdcHitArray(m_cdcHitOutColName);
+  StoreArray<Relation> cdcSimRelation(m_relColNameSimHitToHit);
+
   for (iterCDCMap = cdcSignalMap.begin(); iterCDCMap != cdcSignalMap.end(); iterCDCMap++) {
+
     // Smear drift length using double  Gaussion, based on spatial resolution.
-    double hitNewDriftLength =  smearDriftLength(iterCDCMap->second->getDriftLength(), m_fraction, m_mean1, m_resolution1, m_mean2, m_resolution2);
+    double hitNewDriftLength =  smearDriftLength(iterCDCMap->second->getDriftLength(),
+                                                 m_fraction, m_mean1, m_resolution1, m_mean2, m_resolution2);
     iterCDCMap->second->setDriftLength(hitNewDriftLength);
 
     // Save digits into data store
-    StoreArray<HitCDC> cdcArray(m_outColName);
-    new(cdcArray->AddrAt(iDigits)) HitCDC();
-    cdcArray[iDigits]->setLayerId(iterCDCMap->second->getLayerId());
-    cdcArray[iDigits]->setWireId(iterCDCMap->second->getWireId());
-    cdcArray[iDigits]->setLeftDriftLength(iterCDCMap->second->getDriftLength());
-    cdcArray[iDigits]->setRightDriftLength(iterCDCMap->second->getDriftLength());
-    cdcArray[iDigits]->setCharge(iterCDCMap->second->getCharge());
+    // Next lines are the storage for HitCDC connected to trasan, which will eventually become obsolete.
+    StoreArray<HitCDC> NNcdcArray(m_outColName);
+    new(NNcdcArray->AddrAt(iDigits)) HitCDC();
+    NNcdcArray[iDigits]->setLayerId(iterCDCMap->second->getLayerId());
+    NNcdcArray[iDigits]->setWireId(iterCDCMap->second->getWireId());
+    NNcdcArray[iDigits]->setLeftDriftLength(iterCDCMap->second->getDriftLength());
+    NNcdcArray[iDigits]->setRightDriftLength(iterCDCMap->second->getDriftLength());
+    NNcdcArray[iDigits]->setCharge(iterCDCMap->second->getCharge());
+    // End Lines referring to HitCDC.
+
+    // Save digits into the DataStore as CDCHit TClonesArray.
+
+    // The next two lines are geometry dependent. It seems very reasonable to save layers dependent on their
+    // belonging to a SuperLayer. So perhaps this can be somehow incorporated earlier...
+    int iSuperLayer = (iterCDCMap->second->getLayerId() - 2) / 6;
+    int iLayer = (iterCDCMap->second->getLayerId() - 2) % 6;
+    if (iSuperLayer == 0) {iLayer += 2;}
+
+    new(cdcHitArray->AddrAt(iDigits)) CDCHit(iterCDCMap->second->getDriftLength(), iterCDCMap->second->getCharge(),
+                                             iSuperLayer, iLayer, iterCDCMap->second->getWireId());
+
+    // Creation of Relation between SimHit, that has smalles drift length in each cell and the CDCHit.
+    new(cdcSimRelation->AddrAt(iDigits)) Relation(*cdcArray.relateTo(cdcHitArray, iterCDCMap->first, iDigits));
 
     // Count number of digits
     iDigits++;

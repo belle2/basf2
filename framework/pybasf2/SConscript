@@ -5,6 +5,6 @@ env['LIBS'] = ['framework',
                'boost_python',
                '$PYTHON_LIBS',
                'ir', 'pxd', 'svd', 'cdc', 'top', 'arich', 'eklm',
-                'structure']
+                'ecl', 'structure']
 
 Return('env')

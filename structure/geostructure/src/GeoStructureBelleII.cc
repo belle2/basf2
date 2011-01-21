@@ -30,6 +30,8 @@
 #include <TGeoBBox.h>
 #include <TGeoPcon.h>
 #include <TGeoPgon.h>
+#include <TGeoTube.h>
+#include <TGeoCone.h>
 #include "TGeoCompositeShape.h"
 
 #include <iostream>
@@ -60,8 +62,6 @@ GeoStructureBelleII::~GeoStructureBelleII()
 
 }
 
-#include "TGeoTube.h"
-#include "TGeoCone.h"
 // -----------------------------------------------------------
 // --- TGeoShape function for BelleII Pipe segment ---
 // --

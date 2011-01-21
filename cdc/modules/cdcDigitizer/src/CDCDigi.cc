@@ -54,7 +54,7 @@ CDCDigi::CDCDigi() : Module()
   // I/O
   addParam("InputColName",                m_inColName, string("SimHitCDCArray"), "Input collection name");
   addParam("OutputColName",               m_outColName, string("HitCDCArray"), "Output collection name");
-  addParam("CDCHitOutColName",            m_cdcHitOutColName, string("CDCHitArray"), "Output collection name");
+  addParam("CDCHitOutColName",            m_cdcHitOutColName, string("CDCHitCollection"), "Output collection name");
   //Parameters for Digitization
   addParam("RandomSeed",                  m_randomSeed, 12345, "Random seed");
   addParam("Fraction",                    m_fraction, 0.571, "The fraction of the first Gaussian used to smear drift length, set in cm");
@@ -65,9 +65,9 @@ CDCDigi::CDCDigi() : Module()
   addParam("ElectronicEffects",           m_electronicEffects, 0, "Apply electronic effects?");
   addParam("ElectronicsNoise",            m_elNoise, 1000.0, "Noise added by the electronics, set in ENC");
   //Relations
-  addParam("RelCollectionName_MCPartToSimHit", m_relColNameMCToSim,    string("MCPartToCDCSimHit"),
+  addParam("RelCollectionName_MCPartToSimHit", m_relColNameMCToSim,    string("MCPartToCDCSimHitCollection"),
            "Name of relation collection - MCParticle to SimCDCHit (if nonzero, created)");
-  addParam("RelCollectionName_SimHitToCDCHit", m_relColNameSimHitToHit, string("SimHitToCDCHit"),
+  addParam("RelCollectionName_SimHitToCDCHit", m_relColNameSimHitToHit, string("SimHitToCDCHitCollection"),
            "Name of relation collection - Hit CDC to MCParticle (if nonzero, created)");
 }
 
@@ -205,7 +205,7 @@ void CDCDigi::event()
                                              iSuperLayer, iLayer, iterCDCMap->second->getWireId());
 
     // Creation of Relation between SimHit, that has smalles drift length in each cell and the CDCHit.
-    new(cdcSimRelation->AddrAt(iDigits)) Relation(*cdcArray.relateTo(cdcHitArray, iterCDCMap->first, iDigits));
+    new(cdcSimRelation->AddrAt(iDigits)) Relation(*cdcArray.relateTo(cdcHitArray, iDigits, iterCDCMap->first));
 
     // Count number of digits
     iDigits++;

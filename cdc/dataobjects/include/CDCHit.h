@@ -111,7 +111,7 @@ namespace Belle2 {
      *  CAUTION! <br>
      *  Currently a drift length is given back, not a drift time!
      */
-    double getdriftTime() const {
+    double getDriftTime() const {
       return (static_cast<double>(m_driftTime) * Unit::um);
     }
 

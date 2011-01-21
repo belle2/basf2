@@ -18,12 +18,9 @@
 #include <cmath>
 #include <boost/format.hpp>
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <iostream.h>
-#include <math.h>
-#include <iomanip.h>
+#include <string>
+#include <iostream>
+#include <iomanip>
 
 
 #include <TMath.h>

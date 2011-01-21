@@ -44,6 +44,9 @@ namespace Belle2 {
      */
     void addSegment(CDCSegment aSegment);
 
+    /**Removes a segment with a given Id from the track. */
+    void removeSegment(int Id);
+
     /** Adds a TrackHit object to the track. */
     void addTrackHit(CDCTrackHit aTrackHit);
 
@@ -67,6 +70,14 @@ namespace Belle2 {
 
     /** Returns the total number hits in the Track. */
     int getNHits() const {return m_nHits;};
+
+    int getNAxialHits();
+
+    int getNStereoHits();
+
+    int getNAxialSegments();
+
+    int getNStereoSegments();
 
     /** Returns the direction of the track in the conformal plane.
      * This direction is the sum of segment`s directions.

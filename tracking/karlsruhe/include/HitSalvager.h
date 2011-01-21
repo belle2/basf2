@@ -21,10 +21,10 @@ namespace Belle2 {
   class HitSalvager {
   public:
 
-    /*! Constructor. */
+    /** Constructor. */
     HitSalvager();
 
-    /*! Destructor.*/
+    /** Destructor.*/
     ~HitSalvager();
 
     /*!Calculates the shortest distance between one Hit and the straight line build through the outer most point of the Track and his direction in the conformal plane. */

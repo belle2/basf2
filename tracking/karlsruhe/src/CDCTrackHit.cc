@@ -12,7 +12,7 @@
 #include "../include/CDCTrackHit.h"
 
 #include <cdc/geocdc/CDCGeometryPar.h>
-#include "CLHEP/Geometry/Vector3D.h"
+#include <cmath>
 
 #define pi 3.141592654
 
@@ -144,7 +144,7 @@ void CDCTrackHit::setStereoPosition(TVector3 position)
   m_posWireZ = position.z();
 }
 
-int CDCTrackHit::shiftAlongZ(TVector3 trackDirection, CDCTrackHit trackHit)
+void CDCTrackHit::shiftAlongZ(TVector3 trackDirection, CDCTrackHit trackHit)
 {
   TVector3 StereoHitPos;   //conformal position of this hit
   TVector3 TrackHitPos;    //conformal position of the given TrackHit (starting point for the "track straight line")
@@ -223,7 +223,6 @@ int CDCTrackHit::shiftAlongZ(TVector3 trackDirection, CDCTrackHit trackHit)
   m_conformalX = cx;
   m_conformalY = cy;
 
-  return bestIndex;
 }
 
 

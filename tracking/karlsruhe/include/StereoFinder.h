@@ -17,24 +17,58 @@
 
 namespace Belle2 {
 
+  /** Class to assign segments from stereo superlayers to already existing track candidates.*/
   class StereoFinder {
   public:
 
-    /*! Constructor. */
+    /** Constructor. */
     StereoFinder();
 
-    /*! Destructor. */
+    /** Destructor. */
     ~StereoFinder();
 
+    /** Returns the distance between the centers of the outermost track segment and the other segment in the normal plane. */
+    static double SimpleDistance(CDCTrack track, CDCSegment segment);
 
-    /*!Find for a given Track a matching stereo Segment in the given superlayer. If a matching segment is found: returns his index in the StoreArray. If no mathing Segment is found: returns 9999. */
-    /*!Seaches for a matching Segment for a given Track in a given superlayer. Two cuts are used: maxSimpleDistance: distance in the normal planebetween the innermost track point and the outermost segment point, angle between track and segment direction in the conformal plane. The algorithm cuts on angle and searches for segments with minimal distance (it loops also over all segments in the track). The index of the best segment found in the StoreArray is returned. If no segment within the given cuts is found, 9999 is returned.
-    */
-    static int FindNextStereoSegment(CDCTrack startTrack, std::string SegmentsCDCArray, int superlayerId, double maxSimpleDistance, double maxAngle);
+    /** Returns the shortest distance between the track and the segment in the conformal plane.
+     * ShortestDistance - method from AxialTrackFinder ist called.
+     * The returned distance is very small if the segment belong to the track.
+     */
+    static double ShortestDistance(CDCTrack track, CDCSegment segment);
 
-    /*!Appends stereo Segments to a Track according to the direction information of the Segments.*/
-    /*!Uses as input a StereoSegmentsCDCArray and a TracksCDCArray, output is a changed TracksCDCArray with new stereo segments appended to existing tracks. Search starts in the outermost stereo superlayer and the FindNextStereoSegment method is applied to find mathing segments in the following superlayers. As soon as a segment is found, his coordinates are shifted along the wire (shiftAlongZ method of the CDCSegment class) to find best matching to the track. The index gained by this shift is used to shift all other segment in a way to simplify the search for further segments for this track. This is performed for each Track. Each Segment can be used only once. */
+    /**Function to check if there are more than one segment from one superlayer in this track candidate.
+     * With the given track candidate and the index of a segment, it is checked if there are other segments with the same superlayer in this track candidate.
+     * Returns false is the given segment is the only one. Returns true if there is more than one.
+     */
+    static bool SegmentFromOvercrowdedSL(CDCTrack track, int SegmentIndex) ;
+
+    /**Fits a track candidate and removes segments with bad 'residuals'.
+     * Performs a simple straight line fit in the conformal plane.
+     * In the case of bad Chi2, the distance between the segments and the fit line is checked.
+     * If this distance is above a given cut, the segment is removed and the candidate is refited.
+     */
+    static void FitCandidates(CDCTrack & candidate);
+
+    /**Searches for matching stereo segments for the given track candidate.
+     * First parameter: track candidate
+     * Second parameter: name of the CDCSegments array.
+     * Third parameter: cut on the distance between the track and the segment in the normal plane.
+     * Fourth parameter: cut an the 'shortest' distance between the track and the segment in the conformal plane.
+     * Fifth parameter: superlayer to be searched.
+     */
+    static void FindStereoSegments(CDCTrack startTrack, std::string SegmentsCDCArray, double SimpleDistanceCut, double ShortDistanceCut, int SLId);
+
+
+    /**Main method to append the stereo segments to the track candidates.
+     * First parameter is the name of the CDCSegments array ('input'), second the name of the CDCTracks array ('output').
+     * For each superlayer the possible track candidates are found (FindStereoSegments).
+     * In the next step the segment coordinates are moved (shiftAlongZ) according to the direction information of the track candidate they may belong to.
+     * After the 'best matching' coordinates are found, the segments have to pass another more strict cut to be assigned to the track candidate.
+     * At the end the (stereo) candidates are fittet and segments too far away from the fit line are removed.
+     */
     static void AppendStereoSegments(std::string StereoSegmentsCDCArray, std::string TracksCDCArray);
+
+
 
   private:
 

@@ -10,17 +10,16 @@
 
 #include "../include/AxialTrackFinder.h"
 
-#include "CLHEP/Geometry/Point3D.h"
+
+#include <cmath>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreDefs.h>
 #include <framework/logging/Logger.h>
 
-//#include "TCanvas.h"
-#include "TFile.h"
+
 #include "TGraph.h"
 #include "TAxis.h"
-//#include "TH1F.h"
 #include "TF1.h"
 
 #define pi 3.141592654
@@ -38,41 +37,34 @@ AxialTrackFinder::~AxialTrackFinder()
 }
 
 
-double AxialTrackFinder::ShortestDistance(CDCTrack track, CDCSegment segment)
+double AxialTrackFinder::ShortestDistance(TVector3 firstPoint, TVector3 firstDirection, TVector3 secondPoint)
 {
-  TVector3 trackPoint;   //starting point of the track
-  TVector3 segmentPoint;  //point of the segment
-  TVector3 trackDirection = track.getDirection(); //track direction, builds together with track point a "track straight line"
-  TVector3 perpDir; //direction perpendicular to track direction
-  TVector3 perpPoint; //intersection from "track line" with a to it perpendicular line through segment point
 
-  trackPoint.SetX(track.getOuterMostHit().getConformalX());
-  trackPoint.SetY(track.getOuterMostHit().getConformalY());
-  trackPoint.SetZ(0);
+  TVector3 perpDir; //direction perpendicular to firstDirection
+  TVector3 perpPoint; //intersection from "first line" with a to it perpendicular line through second point
 
-  segmentPoint.SetX(segment.getOuterMostHit().getConformalX());
-  segmentPoint.SetY(segment.getOuterMostHit().getConformalY());
-  segmentPoint.SetZ(0);
-
-  //direction perpendicular to track direction
-  double perpDirY = -trackDirection.x() / trackDirection.y();
+  //direction perpendicular to first line direction
+  double perpDirY = -firstDirection.x() / firstDirection.y();
   perpDir.SetX(1);
   perpDir.SetY(perpDirY);
   perpDir.SetZ(0);
 
   //calculate the intersection point
-  double relation = trackDirection.y() / trackDirection.x();
+  double relation = firstDirection.y() / firstDirection.x();
 
-  double enumerator = (segmentPoint.y() - trackPoint.y()) + (trackPoint.x() - segmentPoint.x()) * relation;
+  double enumerator = (secondPoint.y() - firstPoint.y())
+                      + (firstPoint.x() - secondPoint.x()) * relation;
   double denominator = perpDir.x() * relation - perpDir.y();
 
   double factor = enumerator / denominator;
-  perpPoint.SetX(segmentPoint.x() + factor*perpDir.x());
-  perpPoint.SetY(segmentPoint.y() + factor*perpDir.y());
+  perpPoint.SetX(secondPoint.x() + factor * perpDir.x());
+  perpPoint.SetY(secondPoint.y() + factor * perpDir.y());
   perpPoint.SetZ(0);
 
-  //distance between the segment point und the intersection point ( =shortest distance from segment to "track line")
-  double distance = (segmentPoint - perpPoint).Mag();
+  //B2INFO("Intersection Point: "<<perpPoint.X()<<"  "<<perpPoint.Y()<<"  "<<perpPoint.Z());
+
+  //distance between the second point und the intersection point ( = shortest distance from second point to "first line")
+  double distance = (secondPoint - perpPoint).Mag();
 
   return distance;
 }
@@ -84,8 +76,7 @@ double AxialTrackFinder::ShortestDistance(CDCSegment segment1,
   TVector3 FirstSegmentPoint; //starting point of the one segment
   TVector3 SecondSegmentPoint; //point of the  other segment
   TVector3 FirstSegmentDirection = segment1.getDirection(); //direction of the first segment, builds together with starting point a "segment straight line" in the conformal plane
-  TVector3 perpDir; //direction perpendicular to segment1 direction
-  TVector3 perpPoint; //intersection from "segment1 line" with a to it perpendicular line through segment2 point
+
 
   FirstSegmentPoint.SetX(segment1.getOuterMostHit().getConformalX());
   FirstSegmentPoint.SetY(segment1.getOuterMostHit().getConformalY());
@@ -96,31 +87,13 @@ double AxialTrackFinder::ShortestDistance(CDCSegment segment1,
   SecondSegmentPoint.SetY(segment2.getOuterMostHit().getConformalY());
   SecondSegmentPoint.SetZ(0);
 
-  //direction perpendicular to track direction
-  double perpDirY = -FirstSegmentDirection.x() / FirstSegmentDirection.y();
-  perpDir.SetX(1);
-  perpDir.SetY(perpDirY);
-  perpDir.SetZ(0);
+  double distance = ShortestDistance(FirstSegmentPoint, FirstSegmentDirection, SecondSegmentPoint);
 
-  //calculate the intersection point
-  double relation = FirstSegmentDirection.y() / FirstSegmentDirection.x();
+  return distance ;
 
-  double enumerator = (SecondSegmentPoint.y() - FirstSegmentPoint.y())
-                      + (FirstSegmentPoint.x() - SecondSegmentPoint.x()) * relation;
-  double denominator = perpDir.x() * relation - perpDir.y();
-
-  double factor = enumerator / denominator;
-  perpPoint.SetX(SecondSegmentPoint.x() + factor * perpDir.x());
-  perpPoint.SetY(SecondSegmentPoint.y() + factor * perpDir.y());
-  perpPoint.SetZ(0);
-
-  //B2INFO("Intersection Point: "<<perpPoint.X()<<"  "<<perpPoint.Y()<<"  "<<perpPoint.Z());
-
-  //distance between the segment2 point und the intersection point ( = shortest distance from segment2 to "segment1 line")
-  double distance = (SecondSegmentPoint - perpPoint).Mag();
-
-  return distance;
 }
+
+
 
 double AxialTrackFinder::SimpleDistance(CDCSegment segment1,
                                         CDCSegment segment2)
@@ -384,11 +357,10 @@ void AxialTrackFinder::CollectTrackCandidates(string SegmentsCDCArray,
 
     FitTrackCandidates(TrackCandidates);
 
-    //Discard bad chi2
+    //Discard bad chi2 and tracks with unrealistic momentum
     for (int i = 0; i < NTracks; i++) {
       //B2INFO("Track Nr "<<i<<"  Chi2: "<<TrackCandidates.at(i).getChiSquare());
-      if (TrackCandidates.at(i).getChiSquare() < 0.0002) { //what value???
-
+      if (TrackCandidates.at(i).getChiSquare() < 0.00009 && TrackCandidates.at(i).getMomentumValue() < 15) { //what value???
         FinalTrackCandidates.push_back(TrackCandidates.at(i));
       }
 
@@ -479,6 +451,7 @@ void AxialTrackFinder::CollectTrackCandidates(string SegmentsCDCArray,
         //Finally add the candidate to the StoreArray
         new(cdcTracksArray->AddrAt(counter)) CDCTrack(
           FinalTrackCandidates.at(i), counter);
+        B2INFO("Candidate " << counter << " added to final array ...");
       }
     } //end for loop over all candidates
 

@@ -70,6 +70,18 @@ void CDCTrack::addSegment(CDCSegment aSegment)
   update();
 }
 
+void CDCTrack::removeSegment(int Id)
+{
+
+  for (int i = 0; i < m_nSegments; i++) {
+    if (m_Segments.at(i).getId() == Id) {
+      m_Segments.erase(m_Segments.begin() + i);
+      //B2INFO("Remove segment from candidate!");
+      update();
+    }
+  }
+}
+
 void CDCTrack::addTrackHit(CDCTrackHit aTrackHit)
 {
   m_TrackHits.push_back(aTrackHit);
@@ -142,6 +154,50 @@ void CDCTrack::update()
   m_outerMostSegment = m_Segments.at(max_indexSeg);
 
 
+}
+
+int CDCTrack::getNAxialHits()
+{
+  int nAxialHits = 0;
+  for (int i = 0; i < m_nHits; i++) {
+    if (m_TrackHits.at(i).getIsAxial() == true) nAxialHits ++ ;
+  }
+  return nAxialHits;
 
 }
+
+int CDCTrack::getNStereoHits()
+{
+  int nStereoHits = 0;
+  for (int i = 0; i < m_nHits; i++) {
+    if (m_TrackHits.at(i).getIsAxial() == false) nStereoHits ++ ;
+  }
+  return nStereoHits;
+
+}
+
+int CDCTrack::getNAxialSegments()
+{
+
+  int nAxialSegments = 0;
+  for (int i = 0; i < m_nSegments; i++) {
+    if (m_Segments.at(i).getIsAxial() == true) nAxialSegments ++ ;
+  }
+  return nAxialSegments;
+
+}
+
+int CDCTrack::getNStereoSegments()
+{
+  int nStereoSegments = 0;
+  for (int i = 0; i < m_nSegments; i++) {
+    if (m_Segments.at(i).getIsAxial() == false) nStereoSegments ++ ;
+  }
+  return nStereoSegments;
+
+}
+
+
+
+
 

@@ -17,6 +17,7 @@
 
 namespace Belle2 {
 
+  /** CDC Hit Class used for pattern recognition, will soon be changed an updated. */
   class CDCTrackHit : public HitCDC {
   public:
 
@@ -82,7 +83,7 @@ namespace Belle2 {
 
     /*!Searches for the best position (z coordinate) of a stereo hit and overwites the position coordinates with new values. */
     /*! This method searches for a given track (direction and one 'starting' hit) and this (stereo) hit for the z-coordinate of this hit, which fits best to the given track. For this the wire length is parametrised and for each point the 'fitting' of this new position is checked by calculating the shortest (perpendicular) distance between this hit and the track. After the optimal wire position is found, the coordinates (member variables) are overwritten according to it (!). The return value is the index from the wire parametrisation, by using the same paramatrisation for another (stereo) segments and hits can be shiftet to new positions without further calculations.*/
-    int shiftAlongZ(TVector3 trackDirection, CDCTrackHit trackHit);
+    void shiftAlongZ(TVector3 trackDirection, CDCTrackHit trackHit);
 
     /*!Set function to overwrite the hit position calculated by setWirePosition.*/
     /*!This function should be only used for stereo Hits in CDCSegment class, when the coordinates of the whole segment are shifted to other values (along the z wire). */

@@ -10,11 +10,13 @@
 
 #include "../include/HitSalvager.h"
 
-#include "CLHEP/Geometry/Point3D.h"
+#include <cmath>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreDefs.h>
 #include <framework/logging/Logger.h>
+
+#include <tracking/karlsruhe/AxialTrackFinder.h>
 
 
 using namespace std;
@@ -34,8 +36,6 @@ double HitSalvager::ShortestDistance(CDCTrack track, CDCTrackHit hit)
   TVector3 trackPoint;   //starting point of the track
   TVector3 hitPoint;  //hit position
   TVector3 trackDirection = track.getDirection(); //track direction, builds together with track point a "track straight line"
-  TVector3 perpDir; //direction perpendicular to track direction
-  TVector3 perpPoint; //intersection from "track line" with a to it perpendicular line through the hit
 
   trackPoint.SetX(track.getOuterMostHit().getConformalX());
   trackPoint.SetY(track.getOuterMostHit().getConformalY());
@@ -45,26 +45,7 @@ double HitSalvager::ShortestDistance(CDCTrack track, CDCTrackHit hit)
   hitPoint.SetY(hit.getConformalY());
   hitPoint.SetZ(0);
 
-  //direction perpendicular to track direction
-  double perpDirY = -trackDirection.x() / trackDirection.y();
-  perpDir.SetX(1);
-  perpDir.SetY(perpDirY);
-  perpDir.SetZ(0);
-
-  //calculate the intersection point
-  double relation = trackDirection.y() / trackDirection.x();
-
-  double enumerator = (hitPoint.y() - trackPoint.y()) + (trackPoint.x() - hitPoint.x()) * relation;
-  double denominator = perpDir.x() * relation - perpDir.y();
-
-  double factor = enumerator / denominator;
-
-  perpPoint.SetX(hitPoint.x() + factor*perpDir.x());
-  perpPoint.SetY(hitPoint.y() + factor*perpDir.y());
-  perpPoint.SetZ(0);
-
-  //distance between the hit point und the intersection point ( = shortest distance from hit to "track line")
-  double distance = (hitPoint - perpPoint).Mag();
+  double distance = AxialTrackFinder::ShortestDistance(trackPoint, trackDirection, hitPoint);
 
   return distance;
 }
@@ -119,7 +100,7 @@ void HitSalvager::SalvageHits(string SegmentsCDCArray, string TracksCDCArray, do
 
 //shift the position of the stereo hit, so that it fits better to the corresponding track
           if (aHit.getIsAxial() == false) {
-            int shift = aHit.shiftAlongZ(cdcTracksArray[bestCandidate]->getDirection(), cdcTracksArray[bestCandidate]->getOuterMostHit());
+            aHit.shiftAlongZ(cdcTracksArray[bestCandidate]->getDirection(), cdcTracksArray[bestCandidate]->getOuterMostHit());
           }
 
           cdcTracksArray[bestCandidate]->addTrackHit(aHit);

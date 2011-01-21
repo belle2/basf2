@@ -6,12 +6,15 @@
  * Contributors: Oksana Brovchenko                          *
  *                                    *
  * This software is provided "as is" without any warranty.          *
-**************************************************************************/
-
+ **************************************************************************/
 
 #include "../include/StereoFinder.h"
 
-#include "CLHEP/Geometry/Point3D.h"
+#include <cmath>
+
+#include "TGraph.h"
+#include "TAxis.h"
+#include "TF1.h"
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreDefs.h>
@@ -19,6 +22,7 @@
 
 #include <tracking/karlsruhe/AxialTrackFinder.h>
 
+#define pi 3.141592654
 
 using namespace std;
 using namespace Belle2;
@@ -31,111 +35,230 @@ StereoFinder::~StereoFinder()
 {
 }
 
-int StereoFinder::FindNextStereoSegment(CDCTrack startTrack, string SegmentsCDCArray, int superlayerId, double maxDistance, double maxAngle)
+double StereoFinder::ShortestDistance(CDCTrack track, CDCSegment segment)
 {
-//INFO("***** Search for Track "<<startTrack.getId());
-  StoreArray<CDCSegment> cdcSegmentsArray(SegmentsCDCArray.c_str());
-
-  double minDistance = 0.1; //start value for minimizing the distance
-  double minAngle = 1;
-  int nSegments = cdcSegmentsArray->GetEntries();
-  int  bestCandidate;
-  for (int i = 0; i < nSegments; i++) { //loop over all segments
-
-    double angle = startTrack.getDirection().Angle(cdcSegmentsArray[i]->getDirection());
-    double distance = AxialTrackFinder::ShortestDistance(startTrack, *cdcSegmentsArray[i]);
-
-    if (cdcSegmentsArray[i]->getSuperlayerId() == superlayerId) {
-      // INFO("         Sl and ID  "<< cdcSegmentsArray[i]->getSuperlayerId()<<" "<<cdcSegmentsArray[i]->getId());
-
-      if (cdcSegmentsArray[i]->getIsGood() == true && cdcSegmentsArray[i]->getIsUsed() == false) {
-        // INFO("Angle: "<<angle);
-        // INFO("Distance "<<distance);
-        if (angle < maxAngle && distance < maxDistance) {
-          if (angle < minAngle || distance < minDistance) {
-            minDistance = distance;
-            minAngle = angle;
-            bestCandidate = i;
-          }
-        }
-      }
-    }
-  }//end loop over all segments
-  if (minDistance < maxDistance) {
-    // INFO("BestCandidate: "<<cdcSegmentsArray[bestCandidate]->getSuperlayerId()<<" "<<cdcSegmentsArray[bestCandidate]->getId());
-    return bestCandidate;
-  }
-
-  return 9999;
+  return AxialTrackFinder::ShortestDistance(track.getOuterMostSegment(),
+                                            segment);
 }
 
-
-
-void StereoFinder::AppendStereoSegments(string StereoSegmentsCDCArray, string TracksCDCArray)
+double StereoFinder::SimpleDistance(CDCTrack track, CDCSegment segment)
 {
-  StoreArray<CDCSegment> cdcStereoSegmentsArray(StereoSegmentsCDCArray.c_str());
-  StoreArray<CDCTrack> cdcTracksArray(TracksCDCArray.c_str());
+  return AxialTrackFinder::SimpleDistance(track.getOuterMostSegment(),
+                                          segment);
+}
+
+void StereoFinder::FindStereoSegments(CDCTrack startTrack,
+                                      string SegmentsCDCArray, double SimpleDistanceCut,
+                                      double ShortDistanceCut, int SLId)
+{
+
+  StoreArray<CDCSegment> cdcSegmentsArray(SegmentsCDCArray.c_str()); //Input segments
+  int nSegments = cdcSegmentsArray.GetEntries();
+
+  for (int i = 0; i < nSegments; i++) { //loop over all segments
+    //B2INFO("SL: "<<cdcSegmentsArray[i]->getSuperlayerId()<<"  Simple Distance: "<<SimpleDistance(startTrack, *cdcSegmentsArray[i]));
+    //first necessary neighbouring condition and check the correct superlayer
+    if (cdcSegmentsArray[i]->getSuperlayerId() == SLId && SimpleDistance(
+          startTrack, *cdcSegmentsArray[i]) < SimpleDistanceCut
+        && cdcSegmentsArray[i]->getIsGood() == true) {
+      //the decisive neighbouring condition
+      if (ShortestDistance(startTrack, *cdcSegmentsArray[i])
+          < ShortDistanceCut) {
+        //add the Id of the track candidate to the segment
+        cdcSegmentsArray[i]->setTrackCandId(startTrack.getId());
+        //B2INFO("Possible stereo Candidate for track "<<startTrack.getId()<<"  in SL "<<SLId);
+
+      }
+    }
+
+  }//end loop over all segments
+}
+
+bool StereoFinder::SegmentFromOvercrowdedSL(CDCTrack track, int SegmentIndex)
+{
+
+  bool overcrowded = false;
+  int counter = 0;
+  int SL = track.getSegments().at(SegmentIndex).getSuperlayerId();
+
+  for (int i = 0; i < track.getNSegments(); i++) { //count if there is more the one segment with the same SLId in this candidate
+    if (track.getSegments().at(i).getSuperlayerId() == SL) {
+      counter++;
+    }
+  }
+  if (counter > 1)
+    overcrowded = true;
+
+  return overcrowded;
+}
+
+void StereoFinder::FitCandidates(CDCTrack & candidate)
+{
+  if (candidate.getNSegments() > 0) {
+    TGraph * graph;
+    double x[100];
+    double y[100];
+    int nHits = candidate.getNHits(); //Nr of hits in a track
+    bool refit = true;
+
+    while (refit == true) { //while loop to refit the candidate if one segment is removed
+      refit = false;
+      //loop over all hits and get their conformal coordinates
+      for (int j = 0; j < nHits; j++) {
+        x[j] = candidate.getTrackHits().at(j).getConformalX();
+        y[j] = candidate.getTrackHits().at(j).getConformalY();
+      }
+
+      graph = new TGraph(nHits, x, y);
+
+      double min = graph->GetXaxis()->GetXmin();
+      double max = graph->GetXaxis()->GetXmax();
+
+      //Fit the conformal coordinates with simple linear fit
+      graph->Fit("pol1", "Q", "", min, max);
+      TF1 *fit = graph->GetFunction("pol1");
+
+      double Chi = fit->GetChisquare();
+
+      //candidate.setChiSquare(Chi);
+      //Check the Chi2 of the fit, if it is too bad search for segment to remove
+      if (Chi > 0.0000001) {
+        //B2INFO("Search for bad stereo segments to remove");
+        TVector3 fitPoint;   //some point on the fit line
+        fitPoint.SetX(x[0]);
+        fitPoint.SetY(fit->GetParameter(1) * x[0]);
+        fitPoint.SetZ(0);
+
+        for (int j = 0; j < candidate.getNSegments(); j++) { //loop over all segments and check their distance to the fit line
+
+          TVector3 segmentPoint;
+          segmentPoint.SetX(
+            candidate.getSegments().at(j).getOuterMostHit().getConformalX());
+          segmentPoint.SetY(
+            candidate.getSegments().at(j).getOuterMostHit().getConformalY());
+          segmentPoint.SetZ(0);
+          TVector3 segmentDirection =
+            candidate.getSegments().at(j).getDirection();
+
+          double distance = AxialTrackFinder::ShortestDistance(
+                              segmentPoint, segmentDirection, fitPoint);
+
+          //B2INFO("Distance: "<<distance);
+          //Check the distance. If there are several segments from this superlayer assigned to this candidate, more strict cut is applied.
+          if ((distance > 0.02 || (SegmentFromOvercrowdedSL(
+                                     candidate, j) == true && distance > 0.008))
+              && candidate.getNSegments() > 1) {
+
+            int badId = candidate.getSegments().at(j).getId();
+            //remove bad segment
+            candidate.removeSegment(badId);
+
+            //track to be fit again
+            refit = true;
+
+          }
+
+        }
+      }
+    }  //end while
+
+  }
+}
+
+void StereoFinder::AppendStereoSegments(string StereoSegmentsCDCArray,
+                                        string TracksCDCArray)
+{
+
+  StoreArray<CDCSegment> cdcStereoSegmentsArray(
+    StereoSegmentsCDCArray.c_str()); //input segments
+  StoreArray<CDCTrack> cdcTracksArray(TracksCDCArray.c_str()); //output track candidates
 
   int nSegments = cdcStereoSegmentsArray.GetEntries();
   int nTracks = cdcTracksArray.GetEntries();
-  int nextSegment = 0;
-  int index = 0;
 
-  for (int j = 0; j < nTracks; j++) {   //loop over all Tracks
-    cdcTracksArray[j]->update();
-    //search for matching stereo segments in superlayer 8
-    nextSegment = FindNextStereoSegment(*cdcTracksArray[j], StereoSegmentsCDCArray.c_str(), 8, 0.05, 0.3);
-    if (nextSegment != 9999) {
+  vector<CDCTrack> StereoCandidates; //vector to hold track candidates with only the stereo segments
 
-      //shift the position of each hit of the stereo segment, so that it fits better to the corresponding track
-      for (int i = 0; i < cdcStereoSegmentsArray[nextSegment]->getNHits(); i++) {
-        index = cdcStereoSegmentsArray[nextSegment]->getTrackHits().at(i).shiftAlongZ(cdcTracksArray[j]->getDirection(), cdcTracksArray[j]->getOuterMostHit());
-      }
-      //check is the segment if fullfilling a harder distance cut after beeing shifted, only then the segment is added to the track
-      nextSegment = FindNextStereoSegment(*cdcTracksArray[j], StereoSegmentsCDCArray.c_str(), 8, 0.0016, 0.3);
-      if (nextSegment != 9999) {
-        cdcTracksArray[j]->addSegment(*cdcStereoSegmentsArray[nextSegment]);
-        cdcStereoSegmentsArray[nextSegment]->setIsUsed(true);
+  //create a TrackCandidate with the same Id as in the given StoreArray and place it in vector
+  for (int i = 0; i < nTracks; i++) {
+    CDCTrack track(i);
+    StereoCandidates.push_back(track);
+  }
 
-//Unused segments are shifted corresponding to the shift of the first found stereo segment (e.g. its hits). In this way stereo segment belonging to this track can be found more easily
-        for (int i = 0; i < nSegments; i++) {//start loop over segments to shift them along the wire
-          if (cdcStereoSegmentsArray[nextSegment]->getIsUsed() == false) {
-            if (cdcStereoSegmentsArray[i]->getSuperlayerId() == 4) {
-              cdcStereoSegmentsArray[i]->shiftAlongZ(index);
-            }
-            if (cdcStereoSegmentsArray[i]->getSuperlayerId() == 6 || cdcStereoSegmentsArray[i]->getSuperlayerId() == 2) {
-              cdcStereoSegmentsArray[i]->shiftAlongZ(10 - index);
-            }
+  int SL = 8; //start superlayer
+  double simpleCut = 30; //cut on the simple distance
+  double shortDistanceCut = 0.05 ; //cut on the 'short' distance for the first search loop
+  double strictCut = 0.005 ; //cut on the 'short' distance for the final decision (after shifting the stereo segments)
+  double angleCut = 0.3 ; //cut on the angle between the track candidate and the segment
+  //int index = 0;
 
-          }
-        }//end loop over segment to shift them along the wire
-      }
+  while (SL > 1) { //loop over all stereo superlayers
+
+    for (int i = 0; i < nTracks; i++) { //loop over all Tracks
+
+      //recalculate the cut depending on the superlayer difference
+      int SLDiff = abs(cdcTracksArray[i]->getOuterMostSegment().getSuperlayerId() - SL);
+      simpleCut = 30 + (SLDiff * 10 - 10);
+
+      //search for matching stereo segments in the given superlayer
+      FindStereoSegments(*cdcTracksArray[i],
+                         StereoSegmentsCDCArray.c_str(), simpleCut, shortDistanceCut, SL);
+
+    } //end loop over all tracks
+
+    for (int j = 0; j < nSegments; j++) { //loop over all segments
+
+      CDCSegment segment = *cdcStereoSegmentsArray[j];
+
+
+      for (unsigned int k = 0; k < segment.getTrackCandId().size(); k++) { //loop over all track candidate to which this segment may belong
+        int trackId = segment.getTrackCandId().at(k);
+
+        //shift all hits in this segment according to the given track candidate
+        for (int i = 0; i < segment.getNHits(); i++) {
+
+          segment.getTrackHits().at(i).shiftAlongZ(
+            cdcTracksArray[segment.getTrackCandId().at(
+                             k)]->getDirection(),
+            cdcTracksArray[segment.getTrackCandId().at(
+                             k)]->getOuterMostHit());
+
+        }
+        //check if now the segment can pass more strict cuts
+
+        double angle = cdcTracksArray[trackId]->getOuterMostSegment().getDirection().Angle(segment.getDirection());
+        if (angle > pi / 2) angle = angle - pi; // -90 < angle < 90
+
+        if (ShortestDistance(*cdcTracksArray[trackId], segment) < strictCut
+            && abs(angle) < angleCut) {
+          //B2INFO("    stereo segment added")
+          StereoCandidates.at(trackId).addSegment(segment);
+        }
+
+      } //end loop over track candidates
+      cdcStereoSegmentsArray[j]->clearTrackCandId();
+
+    } //end loop over all segments
+
+    SL = SL - 2;
+
+  } //end while loop
+
+
+  //additional quality check: fit the temporarily created candidates consisting only from stereo segments
+  for (int i = 0; i < nTracks; i++) {
+
+    FitCandidates(StereoCandidates.at(i));
+    //B2INFO("Chi2: "<<StereoCandidates.at(i).getChiSquare());
+  }
+
+  //Add the final stereo segments to the corresponding track candidates
+  //B2INFO("Add stereo segments to the track candidates");
+  for (int i = 0; i < nTracks; i++) {
+    for (int j = 0; j < StereoCandidates.at(i).getNSegments(); j++) {
+      cdcTracksArray[i]->addSegment(
+        StereoCandidates.at(i).getSegments().at(j));
     }
-//search for matching stereo segments in superlayers 6, 4, 2
-    for (int sl = 6; sl > 1; sl = sl - 2) { //loop over stereo superlayers
-      nextSegment = FindNextStereoSegment(*cdcTracksArray[j], StereoSegmentsCDCArray.c_str(), sl, 0.05, 0.3);
-      if (nextSegment != 9999) {
-
-//shift the position of each hit of the stereo segment, so that it fits better to the corresponding track
-        for (int i = 0; i < cdcStereoSegmentsArray[nextSegment]->getNHits(); i++) {
-          index = cdcStereoSegmentsArray[nextSegment]->getTrackHits().at(i).shiftAlongZ(cdcTracksArray[j]->getDirection(), cdcTracksArray[j]->getOuterMostHit());
-        }
-//define different distance cut depending on superlayer
-        double maxDistance;
-        if (sl == 6) maxDistance = 0.003 ;
-        if (sl == 4) maxDistance = 0.007 ;
-        if (sl == 2) maxDistance = 0.01 ;
-
-        //check is the segment if fullfilling a harder distance cut after beeing shifted, only then the segment is added to the track
-        nextSegment = FindNextStereoSegment(*cdcTracksArray[j], StereoSegmentsCDCArray.c_str(), sl, maxDistance, 0.3);
-        if (nextSegment != 9999) {
-          cdcTracksArray[j]->addSegment(*cdcStereoSegmentsArray[nextSegment]);
-          cdcStereoSegmentsArray[nextSegment]->setIsUsed(true);
-
-        }
-      }
-    }  //end loop over stereo superlayers
-  }//end loop over all tracks
+  }
 
 }
 

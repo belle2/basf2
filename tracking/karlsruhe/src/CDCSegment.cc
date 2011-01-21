@@ -10,10 +10,10 @@
 
 #include "../include/CDCSegment.h"
 
-#include<cmath>
-#include<cstdlib>
+#include <tracking/karlsruhe/AxialTrackFinder.h>
 
-
+#include <cmath>
+#include <cstdlib>
 
 
 using namespace std;
@@ -50,7 +50,6 @@ CDCSegment::CDCSegment(int superlayerId, int Id)
   m_direction.SetZ(0);
 
 }
-
 
 void CDCSegment::addTrackHit(CDCTrackHit &aTrackHit)
 {
@@ -91,6 +90,36 @@ void CDCSegment::setTrackCandId(vector<int> trackId)
   for (unsigned int i = 0; i < trackId.size(); i++) {
     setTrackCandId(trackId.at(i));
   }
+}
+
+float CDCSegment::getCenterPosR()
+{
+
+  float average = 0;
+  for (int i = 0; i < m_nHits; i++) { //loop over all hits and sum their distance from the origin ind the r-phi plane
+    float x = m_TrackHits.at(i).getWirePosX();
+    float y = m_TrackHits.at(i).getWirePosY();
+    average = average + sqrt(x * x + y * y);
+  }
+  average = average / m_nHits;  //divide the sum by the total number of hits to get the average
+
+  return average;
+
+}
+
+float CDCSegment::getCenterPosZ()
+{
+
+  float average = 0;
+  for (int i = 0; i < m_nHits; i++) { //loop over all hits and sum their z position
+    float z = m_TrackHits.at(i).getWirePosZ();
+
+    average = average + z;
+  }
+  average = average / m_nHits; //divide the sum by the total number of hits to get the average
+
+  return average;
+
 }
 
 void CDCSegment::update()
@@ -230,8 +259,7 @@ void CDCSegment::clearTrackCandId()
 
 
 
-
-int CDCSegment::shiftAlongZ(TVector3 trackDirection, CDCTrackHit trackHit)
+void CDCSegment::shiftAlongZ(TVector3 trackDirection, CDCTrackHit trackHit)
 {
   TVector3 StereoHitPos; //conformal position of one point of the segment (outermost hit)
   TVector3 TrackHitPos;  //conformal position of the given TrackHit (starting point for the "track straight line")
@@ -241,7 +269,7 @@ int CDCSegment::shiftAlongZ(TVector3 trackDirection, CDCTrackHit trackHit)
   double distance;   //distance between the segment point und the intersection point ( =shortest distance from segment to "track line")
   double distanceMax = 10; //start value for the search
 
-  //create a vector with 10 aquidistant values from 0 to 1 to parametrise the wire vector
+  //create a vector with 100 aquidistant values from 0 to 1 to parametrise the wire vector
   double parameter[101];
   for (int i = 0 ; i < 101; i++) {
     parameter[i] = i * 0.01;
@@ -266,6 +294,8 @@ int CDCSegment::shiftAlongZ(TVector3 trackDirection, CDCTrackHit trackHit)
     confX_o = 2 * posX_o / (posX_o * posX_o + posY_o * posY_o);
     confY_o = 2 * posY_o / (posX_o * posX_o + posY_o * posY_o);
 
+
+
     //calculation of the shortest distance between the segment point and the track in the conformal plane
     StereoHitPos.SetX(confX_o);
     StereoHitPos.SetY(confY_o);
@@ -275,18 +305,7 @@ int CDCSegment::shiftAlongZ(TVector3 trackDirection, CDCTrackHit trackHit)
     TrackHitPos.SetY(trackHit.getConformalY());
     TrackHitPos.SetZ(0);
 
-    perpDir.SetX(1);
-    perpDir.SetY(-trackDirection.x() / trackDirection.y());
-    perpDir.SetZ(0);
-
-    double faktor = ((StereoHitPos.y() - TrackHitPos.y()) * trackDirection.x() + (TrackHitPos.x() - StereoHitPos.x()) * trackDirection.y()) / (trackDirection.y() * (perpDir.x() + perpDir.y()));
-
-    perpPoint.SetX(StereoHitPos.x() + faktor*perpDir.x());
-    perpPoint.SetY(StereoHitPos.y() + faktor*perpDir.y());
-    perpPoint.SetZ(0);
-
-    //finally the result
-    distance = (StereoHitPos - perpPoint).Mag();
+    distance = AxialTrackFinder::ShortestDistance(TrackHitPos, trackDirection, StereoHitPos);
 
     //search for the wire point which gives the shortest distance
     if (distance < distanceMax) {
@@ -314,39 +333,11 @@ int CDCSegment::shiftAlongZ(TVector3 trackDirection, CDCTrackHit trackHit)
     m_TrackHits[i].setConformalPosition(cx, cy);
 
   }
-  return bestIndex;
-}
-
-
-void CDCSegment::shiftAlongZ(int index)
-{
-
-//create a vector with 10 aquidistant values from 0 to 1 to parametrise the wire vector
-  double parameter[101];
-  for (int i = 0 ; i < 101; i++) {
-    parameter[i] = i * 0.01;
-  }
-
-//assign the new better wire points as hit positions
-  for (int i = 0; i < m_nHits; i++) {  //loop over all hits
-
-    TVector3 newPosition;
-    double x = m_TrackHits[i].getWirePosX_f() +  parameter[index] * m_TrackHits[i].getWireVector().x();
-    double y = m_TrackHits[i].getWirePosY_f() +  parameter[index] * m_TrackHits[i].getWireVector().y();
-    double z = m_TrackHits[i].getWirePosZ_f() +  parameter[index] * m_TrackHits[i].getWireVector().z();
-    double cx = 2 * x / (x * x + y * y);
-    double cy = 2 * y / (x * x + y * y);
-
-    newPosition.SetX(x);
-    newPosition.SetY(y);
-    newPosition.SetZ(z);
-
-//sets new position
-    m_TrackHits[i].setStereoPosition(newPosition);
-    m_TrackHits[i].setConformalPosition(cx, cy);
-  }
 
 }
+
+
+
 
 
 

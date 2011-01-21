@@ -50,22 +50,22 @@ namespace Belle2 {
     void setTrackCandId(std::vector<int> trackId);
 
     /** Returns the SuperlayerId.*/
-    int getSuperlayerId() const {return m_superlayerId;};
+    int getSuperlayerId() {return m_superlayerId;};
 
     /** Returns the Id of the Segment. */
-    int getId() const {return m_Id;};
+    int getId() {return m_Id;};
 
     /*!Returns number of TrackHit objects in the segment. */
-    int getNHits() const {return m_nHits;};
+    int getNHits()  {return m_nHits;};
 
     /** Is true if the segment is classified as good. */
-    bool getIsGood() const {return m_isGood;};
+    bool getIsGood() {return m_isGood;};
 
     /** Is true if the segment was already assigned to a track. */
-    bool getIsUsed()  {return m_isUsed;};
+    bool getIsUsed() {return m_isUsed;};
 
     /** Is true if the segment belongs to an axial superlayer. */
-    bool getIsAxial() const {return m_isAxial;};
+    bool getIsAxial() {return m_isAxial;};
 
     /** Return a vector with Ids of track candidates to which this segment may belong.  */
     std::vector<int>getTrackCandId() {return m_trackCandId;};
@@ -80,13 +80,19 @@ namespace Belle2 {
     /** Returns the direction of the segment.
      * The direction is calculated as a TVector3 of the innermost hit position relatively to the outermost hit position of the segment in the conformal plane.
      */
-    TVector3 getDirection() const {return m_direction;};
+    TVector3 getDirection() {return m_direction;};
 
     /** Returns the innermost hit (the one closest to the origin) of the segment. */
-    CDCTrackHit getInnerMostHit() const {return m_innerMostHit;};
+    CDCTrackHit getInnerMostHit() {return m_innerMostHit;};
 
     /** Returns the outermost hit (the one farthest from the origin) of the segment. */
-    CDCTrackHit getOuterMostHit() const {return m_outerMostHit;};
+    CDCTrackHit getOuterMostHit() {return m_outerMostHit;};
+
+    /** Returns the average r-phi position of the segment. */
+    float getCenterPosR();
+
+    /** Returns the average z position of the segment. */
+    float getCenterPosZ();
 
     /** Sets and updates some member variables of the segment.
      * This method is executed every time a new TrackHit is added to the Segment.
@@ -107,15 +113,9 @@ namespace Belle2 {
      * This method searches for a given track and this (stereo) segment for the z-coordinate of this segment (= hits in this segment), which fits best to the given track.
      * For this the wire length is parametrised and for each point the 'fitting' of this new position is checked by calculating the shortest (perpendicular) distance between one segment point and the track.
      * After the optimal wire position is found, the coordinates (member variables) of all TrackHits in this segment are overwritten according to it (!).
-     * The return value is the index from the wire parametrisation, by using the same parametrisation for another (stereo) segments can be shiftet to new positions without further calculations.
      */
-    int shiftAlongZ(TVector3 trackDirection, CDCTrackHit trackHit);
+    void shiftAlongZ(TVector3 trackDirection, CDCTrackHit trackHit);
 
-    /** Overwrites the position coordinates of this stereo segment with new values according to index.
-     * The wire lenght is parametrised und the input value index indicates the new wire point coordinates.
-     * The coordinates (member variables) of all Hits in this segment are overwritten according to it.
-     */
-    void shiftAlongZ(int index);
 
   private:
 

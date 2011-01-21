@@ -26,18 +26,18 @@ namespace Belle2 {
     /** Destructor.*/
     ~AxialTrackFinder();
 
+    /** Returns the shortest distance between the first point and the straight line in the given direction through this point and the other point.
+     * Performs some simple geometrical calculations.
+     * A perpendicular (to the given direction) line through the second point is formed, then the intersection point between this line and a line build through the first point and his direction is calculated.
+     * The distance between the second point and this intersection point is returned.
+     */
+    static double ShortestDistance(TVector3 firstPoint, TVector3 firstDirection, TVector3 secondPoint);
+
     /** Returns the shortest distance between one point of one segment and the straight line build through the outer most point of the other segment and his direction in the conformal plane.
-     * Performs some simple geometrical calculations in the conformal plane (where segments and tracks are assumed to form straight lines).
-     * A perpendicular (to the segment's direction) line through one segment point (outer most) is formed, then the intersection point between this line and a line build through the outer most point of the other segment and his direction is calculated.
-     * The distance between the segment point and this intersection point is returned.
-     * This distance is very small for segments belonging to the same track.
+     * Performs some simple geometrical calculations (see ShortestDistance(TVector3 firstPoint, TVector3 firstDirection, TVector3 secondPoint))in the conformal plane (where segments and tracks are assumed to form straight lines).
+     * This returned distance is very small for segments belonging to the same track.
      */
     static double ShortestDistance(CDCSegment segment1, CDCSegment segment2);
-
-    /** Returns the shortest distance between one point of one segment and the straight line build through the outer most point of the track and his direction in the conformal plane.
-     * ! Is still there because of the StereoFinder, will be removed soon!
-     */
-    static double ShortestDistance(CDCTrack track, CDCSegment segment);
 
     /** Returns the distance between the centers of both segments in the normal plane.  */
     static double SimpleDistance(CDCSegment segment1, CDCSegment segment2);

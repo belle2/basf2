@@ -43,8 +43,8 @@ def make_jdl(
 
     f = open(project + '-' + os.path.basename(lfn) + '.jdl', 'w')
     f.write('[\n')
-    f.write('    Executable = "basf2helper.sh ' + steering_file + ' ' + swver
-            + '";\n')
+    f.write('    Executable = "basf2helper.sh";\n')
+    f.write('    Arguments = "' + steering_file + ' ' + swver + '";\n')
     f.write('    JobGroup = ' + project + ';\n')
     f.write('    JobName = ' + os.path.basename(lfn) + ';\n')
     f.write('    PilotType = "private";\n')
@@ -223,12 +223,13 @@ def main():
   # for each of the lfns, make a job and submit it
     for result in results:
         jdl = make_jdl(  # Events/sec into CPUSecs
+                         # XXX
             cliParams.getSteeringFile(),
             cliParams.getProject(),
             int(float(results[result]['events']) / (cliParams.getEvtPerMin()
                 / 60.0)),
             cliParams.getJobPriority(),
-            results[result]['lfn'],
+            results[result]['lfn'].replace('belle2', 'belle'),
             cliParams.getSysConfig(),
             cliParams.getSwVer(),
             tar,

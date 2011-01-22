@@ -70,6 +70,7 @@ def main():
         print selist
         se = selist['Value'][0]
         print 'trying to use SE: ' + se
+        # XXX need a better way to determine output files
         for outputfile in glob.glob('*.root'):
             lfn = outputpath + '/' + outputfile
             print 'trying to upload/register ' + lfn

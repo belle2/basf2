@@ -1,0 +1,47 @@
+--- Configure	2009-12-18 18:23:01.000000000 +0100
++++ Configure	2011-01-22 16:56:36.311907513 +0100
+@@ -291,7 +291,7 @@
+ g4lib_build_dyn='n'
+ #INITIALIZE GLOBAL/GRANULAR LIBRARY OPTIONS
+ g4global='y'
+-g4granular='n'
++g4granular='y'
+ g4lib_use_granular='n'
+ #INITIALIZE DEBUGGING OPTIONS
+ g4debug='n'
+@@ -657,7 +657,7 @@
+ 	if test "x$g4query_conf" != "xyes" ; then
+ 	    if test ! -t 0; then
+ 		echo "Say 'sh Configure', not 'sh <Configure'"
+-		exit 1
++#		exit 1
+ 	    fi
+ 	fi
+ 	;;
+@@ -3146,7 +3146,7 @@
+ if test \( \( "X$g4system" = "XWIN32-VC" -o "X$g4system" = "XWIN32-VC7" \) -a "X$g4lib_build_dll" = "Xy" \) -o  \( "X$g4system" = "XDarwin-g++"  -a "X$g4lib_build_dyn" = "Xy" \) ; then
+ 
+ 	g4global=n
+-	g4granular=n
++	g4granular=y
+ 	g4lib_use_granular=n
+ 
+ fi
+@@ -3169,7 +3169,7 @@
+ 		;;
+ 	y*|Y*) 
+ 		g4global=y
+-		g4granular=n
++		g4granular=y
+ 		g4lib_use_granular=n
+ 		;;
+ 	esac
+@@ -3186,7 +3186,7 @@
+ 
+ 		case $gans in
+ 		n*|N*) 
+-			g4granular=n
++			g4granular=y
+ 			;;
+ 		y*|Y*) 
+ 			g4granular=y

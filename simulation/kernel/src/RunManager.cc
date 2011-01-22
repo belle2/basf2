@@ -11,6 +11,13 @@
 #include <simulation/kernel/RunManager.h>
 #include <framework/logging/Logger.h>
 
+#include <framework/datastore/DataStore.h>
+#include <framework/datastore/StoreDefs.h>
+#include <framework/datastore/StoreArray.h>
+#include <framework/datastore/RelationArray.h>
+
+#include <boost/foreach.hpp>
+
 using namespace std;
 using namespace Belle2;
 using namespace Belle2::Simulation;
@@ -43,6 +50,10 @@ void RunManager::beginRun(int runNumber)
 
 void RunManager::processEvent(int evtNumber)
 {
+  //Delete the hit track relation map
+  m_trackHitMap.clear();
+
+  //Geant4 simulation
   currentEvent = GenerateEvent(evtNumber);
   eventManager->ProcessOneEvent(currentEvent);
   AnalyzeEvent(currentEvent);
@@ -64,6 +75,56 @@ void RunManager::destroy()
 
   delete m_instance;
   m_instance = NULL;
+}
+
+
+bool RunManager::addRelation(TObject* hit, G4Step* step)
+{
+  bool result = true;
+
+  //Get the track ID
+  int trkID = step->GetTrack()->GetTrackID();
+
+  //Check if the track ID was already added to the map. If not add the track ID and the hit to the map.
+  map<int, set<TObject*> >::iterator mapIter = m_trackHitMap.find(trkID);
+  if (mapIter == m_trackHitMap.end()) {
+    m_trackHitMap[trkID].insert(hit);
+  } else {
+    //Check if the hit was already added. If not add the hit.
+    set<TObject*>::iterator setIter = mapIter->second.find(hit);
+    if (setIter == mapIter->second.end()) {
+      mapIter->second.insert(hit);
+    } else {
+      B2ERROR("Error adding a hit to the MCParticle<->hit relation. The hit has already been added to the track ID " << trkID << " !")
+      result = false;
+    }
+  }
+  return result;
+}
+
+
+void RunManager::buildRelations(MCParticleGraph& particleGraph, const string& mcCollectionName, const std::string& relCollectionName)
+{
+  StoreArray<MCParticle> mcParticles(mcCollectionName);
+  StoreArray<Relation> mcPartRelation(relCollectionName);
+  int iRel = 0;
+
+  //Loop over the MCParticle Graph
+  for (unsigned int iParticle = 0; iParticle < particleGraph.size(); ++iParticle) {
+    MCParticleGraph::GraphParticle& currParticle = particleGraph[iParticle];
+
+    //Get the MCParticle
+    MCParticle* mcPart = mcParticles[currParticle.getIndex()-1];
+
+    //Loop over the list of associated hits and create the relation objects
+    map<int, set<TObject*> >::iterator mapIter = m_trackHitMap.find(currParticle.getTrackID());
+    if (mapIter != m_trackHitMap.end()) {
+      BOOST_FOREACH(TObject* hit, mapIter->second) {
+        new(mcPartRelation->AddrAt(iRel)) Relation(hit, mcPart); //build relation hit -> MCParticle
+        iRel++;
+      }
+    }
+  }
 }
 
 

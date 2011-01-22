@@ -11,7 +11,15 @@
 #ifndef RUNMANAGER_H_
 #define RUNMANAGER_H_
 
+#include <generators/dataobjects/MCParticleGraph.h>
+
 #include <G4RunManager.hh>
+
+#include <TObject.h>
+
+#include <string>
+#include <map>
+#include <set>
 
 namespace Belle2 {
 
@@ -55,7 +63,32 @@ namespace Belle2 {
        */
       void destroy();
 
+      /**
+       * Adds a new relation between the MCParticle and the hit.
+       * Takes as an input a step, which represents the track the hit was created from.
+       * Later the track is replaced by the MCParticle which created the track and stored
+       * as a relation in the DataStore.
+       *
+       * @param hit Pointer to the hit which was created by the track.
+       * @param step The step representing the track which created the hit.
+       * @return True if the relation could be added.
+       */
+      bool addRelation(TObject* hit, G4Step* step);
+
+      /**
+       * Builds the relations between MCParticles and hits.
+       * It loops over the MCParticleGraph and builds the relation.
+       *
+       * @param particleGraph Reference to the MCParticle graph.
+       * @param mcCollectionName The name of the MCParticle collection.
+       * @param relCollectionName The name of the Relation (hit -> MCParticle) collection.
+       */
+      void buildRelations(MCParticleGraph& particleGraph, const std::string& mcCollectionName, const std::string& relCollectionName);
+
+
     protected:
+
+      std::map<int, std::set<TObject*> > m_trackHitMap; /**< Maps a track ID to a list of hits. Used to build the relations automatically.*/
 
 
     private:

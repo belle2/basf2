@@ -54,6 +54,7 @@ FullSimModule::FullSimModule() : Module()
   //Parameter definition
   addParam("InputMCParticleCollection", m_mcParticleInputColName, string(DEFAULT_MCPARTICLES), "The name of the input MCParticle collection.");
   addParam("OutputMCParticleCollection", m_mcParticleOutputColName, string(DEFAULT_MCPARTICLES), "The name of the output MCParticle collection.");
+  addParam("OutputRelationCollection", m_relationOutputColName, string("RelationHitMCP"), "The name of the output Relation (Hit -> MCParticle) collection.");
   addParam("ThresholdImportantEnergy", m_thresholdImportantEnergy, 0.250, "[GeV] A particle which got 'stuck' and has less than this energy will be killed after 'ThresholdTrials' trials.");
   addParam("ThresholdTrials", m_thresholdTrials, 10, "Geant4 will try 'ThresholdTrials' times to move a particle which got 'stuck' and has an energy less than 'ThresholdImportantEnergy'.");
   addParam("TrackingVerbosity", m_trackingVerbosity, 0, "Tracking verbosity: 0=Silent; 1=Min info per step; 2=sec particles; 3=pre/post step info; 4=like 3 but more info; 5=proposed step length info.");
@@ -110,8 +111,8 @@ void FullSimModule::initialize()
   G4VUserPrimaryGeneratorAction* generatorAction = new PrimaryGeneratorAction(m_mcParticleInputColName, m_mcParticleGraph);
   runManager.SetUserAction(generatorAction);
 
-  //Add the event action which saves the created hits to the DataStore after having processed the event.
-  G4UserEventAction* eventAction = new EventAction(m_mcParticleOutputColName, m_mcParticleGraph);
+  //Add the event action which creates the final MCParticle list and the Relation list.
+  G4UserEventAction* eventAction = new EventAction(m_mcParticleOutputColName, m_relationOutputColName, m_mcParticleGraph, m_createRelations);
   runManager.SetUserAction(eventAction);
 
   //Add the tracking action which handles the secondary particles created by Geant4.

@@ -53,6 +53,7 @@ void TrackingAction::PreUserTrackingAction(const G4Track* track)
     //Set the Values of the particle which are already known
     G4ThreeVector dpMom  = dynamicParticle->GetMomentum() * Unit::MeV;
     G4ThreeVector trVtxPos = track->GetVertexPosition() * Unit::mm;
+    currParticle.setTrackID(track->GetTrackID());
     currParticle.setPDG(dynamicParticle->GetPDGcode());
     currParticle.setMass(dynamicParticle->GetMass() * Unit::MeV);
     currParticle.setEnergy(dynamicParticle->GetTotalEnergy() * Unit::MeV);
@@ -67,7 +68,6 @@ void TrackingAction::PreUserTrackingAction(const G4Track* track)
 
 void TrackingAction::PostUserTrackingAction(const G4Track* track)
 {
-
   G4StepPoint* postStep = track->GetStep()->GetPostStepPoint();
 
   //Get particle of current track

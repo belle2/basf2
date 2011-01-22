@@ -30,8 +30,12 @@ namespace Belle2 {
 
       /**
        * Constructor.
+       * @param mcCollectionName The name of the MCParticle collection.
+       * @param relCollectionName The name of the Relation (hit -> MCParticle) collection.
+       * @param particleGraph Reference to the MCParticle graph.
+       * @param createRelation If set to true the relation collection Hit -> MCParticle is created.
        */
-      EventAction(const std::string& mcCollectionName, MCParticleGraph& mcParticleGraph);
+      EventAction(const std::string& mcCollectionName, const std::string& relCollectionName, MCParticleGraph& mcParticleGraph, bool createRelation);
 
       /**
        * Destructor.
@@ -56,7 +60,9 @@ namespace Belle2 {
     protected:
 
       std::string m_mcCollectionName;     /**< The name of the MCParticle collection to which the MCParticles should be written.*/
+      std::string m_relCollectionName;    /**< The name of the Relation (Hit -> MCParticle) collection to which the Relations should be written.*/
       MCParticleGraph& m_mcParticleGraph; /**< Reference to the MCParticle graph which is converted to a MCParticle list by this class. */
+      bool m_createRelation;              /**< If set to true the relation collection Hit -> MCParticle is created.*/
 
     };
 

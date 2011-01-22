@@ -114,6 +114,21 @@ namespace Belle2 {
        */
       void setIgnore(bool ignore = true) { m_ignore = ignore; }
 
+      /**
+       * Set the track ID for the particle.
+       *
+       * The track ID is used to build the relationship between MCParticles and created Hits.
+       * @param trackID The ID of the Geant4 track which created this MCParticle.
+       */
+      void setTrackID(int trackID) { m_trackID = trackID; }
+
+      /**
+       * Returns the track ID assigned to this MCParticle.
+       *
+       * @return The ID of the Geant4 track which created this particle.
+       */
+      int getTrackID() { return m_trackID; }
+
 
     private:
 
@@ -152,6 +167,7 @@ namespace Belle2 {
       unsigned int m_vertexId;  /**< vertex id in the graph */
       bool m_ignore;            /**< ignore particle when writing MCParticle list ? */
       bool m_primary;           /**< Is this a primary particle ? */
+      int m_trackID;            /**< The track ID from geant4 that created this particle. */
 
       friend class MCParticleGraph;
       friend class ParticleSorter;

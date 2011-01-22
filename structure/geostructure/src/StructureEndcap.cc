@@ -50,13 +50,9 @@ void StructureEndcap::read()
   m_matname = strContent.getParamString("EndcapKLM/Material");
   m_nsides = int(strContent.getParamLength("EndcapKLM/Nsides"));
 
-  // Get sense layers parameters
   m_nBoundary = strContent.getNumberNodes("EndcapKLM/ZBoundary");
 
-  // Loop over all sense layers
   for (int izBoundary  = 0; izBoundary < m_nBoundary; izBoundary++) {
-    int BoundaryId     = atoi((strContent.getParamString((format("EndcapKLM/ZBoundary[%1%]/@id") % (izBoundary + 1)).str())).c_str());
-
     m_z[izBoundary]    = strContent.getParamLength((format("EndcapKLM/ZBoundary[%1%]/Zposition") % (izBoundary + 1)).str());
     m_rmin[izBoundary] = strContent.getParamLength((format("EndcapKLM/ZBoundary[%1%]/InnerRadius") % (izBoundary + 1)).str());
     m_rmax[izBoundary] = strContent.getParamLength((format("EndcapKLM/ZBoundary[%1%]/OuterRadius") % (izBoundary + 1)).str());

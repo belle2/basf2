@@ -43,52 +43,49 @@ namespace Belle2 {
     //! Gets geometry parameters from gearbox.
     void read();
 
+    //! to get the material name for the Poletip
     const std::string &matname(void) const {return m_matname;}
+
+    //! to get the starting angle of the phi
     const double &phi(void) const {return m_phi;}
+
+    //! to get the opening angle (shape is extended from phi to phi+dphi)
     const double &dphi(void) const {return m_dphi;}
+
+    //! to get the number of boundaries perpendicular to the z-axis
     const int &nBoundary(void) const {return m_nBoundary;}
+
+    //! to get the z coordinate of the section specified by input id (=boundary id)
     const double &z(int id) const {return m_z[id];}
+
+    //! to get the inner radius of the section specified by input id (=boundary id)
     const double &rmin(int id) const {return m_rmin[id];}
+
+    //! to get the outer radius of the section specified by input id (=boundary id)
     const double &rmax(int id) const {return m_rmax[id];}
 
   private:
 
+    //! variable for the material name for the Poletip
     std::string m_matname;
+
+    //! variable for the starting angle of the phi
     double m_phi;
+
+    //! variable for the opening angle (shape is extended from phi to phi+dphi)
     double m_dphi;
+
+    //! variable for the number of boundaries perpendicular to the z-axis
     int m_nBoundary;
+
+    //! variable for the z coordinate of the section specified by input id (=boundary id)
     double m_z[11];
+
+    //! variable for the inner radius of the section specified by input id (=boundary id)
     double m_rmin[11];
+
+    //! variable for the outer radius of the section specified by input id (=boundary id)
     double m_rmax[11];
-
-    /*
-    const int &nBoundary(void) const {return m_nBoundary;}
-    const double &z (int id) const {return m_z[id];}
-    const double &rmin (int id) const {return m_rmin[id];}
-    const double &rmax (int id) const {return m_rmax[id];}
-    */
-
-    //std::string m_version; /*!< The version of geometry parameters. */
-    //int m_nSLayer;         /*!< The number of sense wire layer. */
-    //int m_nFLayer;         /*!< The number of field wire layer. */
-    //double m_rWall[4];     /*!< The array to store radius of inner wall and outer wall. */
-    //double m_zWall[4][2];  /*!< The array to store z position of inner wall and outer wall. */
-
-    //double m_rSLayer[MAX_N_SLAYERS];          /*!< The array to store radius of sense wire layers. */
-    //double m_zSForwardLayer[MAX_N_SLAYERS];   /*!< The array to store forward z position of sense wire layers. */
-    //double m_zSBackwardLayer[MAX_N_SLAYERS];  /*!< The array to store backward z position of sense wire layers. */
-    //double m_rFLayer[MAX_N_FLAYERS];          /*!< The array to store radius of field wire layers. */
-    //double m_zFForwardLayer[MAX_N_FLAYERS];   /*!< The array to store forward z position of field wire layers. */
-    //double m_zFBackwardLayer[MAX_N_FLAYERS];  /*!< The array to store backward z position of field wire layers. */
-    //double m_offSet[MAX_N_SLAYERS];           /*!< The array to store z offset of sense wire layers. */
-    //double m_cellSize[MAX_N_SLAYERS];         /*!< The array to store cell size in each sense wire layer. */
-    //int m_nShifts[MAX_N_SLAYERS];             /*!< The array to store shifted cell number in each sense wire layer. */
-    //unsigned m_nWires[MAX_N_SLAYERS];         /*!< The array to store the wire number in each sense wire layre. */
-
-    //double m_senseWireDiameter;                   /*!< The diameter of sense wires. */
-    //double m_fieldWireDiameter;                   /*!< The diameter of field wires. */
-
-    //static CDCGeometryPar* m_B4CDCGeometryParDB; /*!< Pointer that saves the instance of this class. */
   };
 
 //-----------------------------------------------------------------------------

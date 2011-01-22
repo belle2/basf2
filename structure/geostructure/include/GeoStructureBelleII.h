@@ -22,8 +22,8 @@
 
 #include "TVector3.h"
 
-#ifndef GeoStructureBelleII_H_
-#define GeoStructureBelleII_H_
+#ifndef GEOSTRUCTUREBELLEII_H_
+#define GEOSTRUCTUREBELLEII_H_
 
 namespace Belle2 {
 
@@ -49,10 +49,12 @@ namespace Belle2 {
     */
     virtual void create(GearDir& content);
 
-    void readParameters(GearDir& content);
-
+    /*! to get the center position of each Endcap KLM module
+      (make empty slot for Endcap KLM for future use)
     const TVector3 endcapModulePos(int, int) const;
+    */
 
+    /*
     double THICK_EIRON;
     double THICK_EIRON_MEAS;
     double THICK_ESLOT;
@@ -66,23 +68,23 @@ namespace Belle2 {
 
     double RSHIFT_ESLOT;
     double RMAX_GLASS;
-
-    //static const char Bironname;
-    //TGeoVolume* strBironname[15];
-
-    //static const char Bmodname;
-    //TGeoVolume* strBmodname[15];
+    */
 
   protected:
 
   private:
 
+    //! To get the geometrical paramters for the Structure Barrel part
     StructureBarrel BarrelMgr;
+
+    //! To get the geometrical paramters for the Structure Endcap part
     StructureEndcap EndcapMgr;
+
+    //! To get the geometrical paramters for the Structure Poletip part
     StructurePoletip PoletipMgr;
 
   };
 
 }
 
-#endif /* GeoStructureBelleII_H_ */
+#endif /* GEOSTRUCTUREBELLEII_H_ */

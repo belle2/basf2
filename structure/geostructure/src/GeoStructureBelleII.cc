@@ -107,8 +107,6 @@ void GeoStructureBelleII::create(GearDir& content)
   TGeoMedium* strMed4BKLMSlot = gGeoManager->GetMedium(BarrelMgr.matname4slot().c_str());
   TGeoMedium* strMed4BKLMMod  = gGeoManager->GetMedium(BarrelMgr.matname4module().c_str());
 
-  readParameters(content); //now only for Endcap
-
   TGeoVolume* strBironname[BarrelMgr.nmodule()];
   TGeoVolume* strBmodname[BarrelMgr.nmodule()];
 
@@ -266,6 +264,7 @@ void GeoStructureBelleII::create(GearDir& content)
 
 }
 
+/*
 const TVector3 GeoStructureBelleII::endcapModulePos(int sec, int mod) const
 {
   return(TVector3(RSHIFT_ESLOT *((sec == 0 || sec == 3) ? 1 : -1),
@@ -273,8 +272,9 @@ const TVector3 GeoStructureBelleII::endcapModulePos(int sec, int mod) const
                   -(362.1 - 230.0) / 2. +
                   (THICK_EIRON + THICK_ESLOT)*(mod + 1) - THICK_ESLOT / 2.));
 }
+*/
 
-
+/*
 void GeoStructureBelleII::readParameters(GearDir& content)
 {
   THICK_EIRON  = content.getParamLength("EndcapKLMSlot/THICK_EIRON");
@@ -291,3 +291,4 @@ void GeoStructureBelleII::readParameters(GearDir& content)
   RSHIFT_ESLOT  = content.getParamLength("EndcapKLMSlot/RSHIFT_ESLOT");
   RMAX_GLASS    = content.getParamLength("EndcapKLMSlot/RMAX_GLASS");
 }
+*/

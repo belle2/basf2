@@ -11,6 +11,7 @@
 #include "../include/StereoFinder.h"
 
 #include <cmath>
+#include <cstdlib>
 
 #include "TGraph.h"
 #include "TAxis.h"

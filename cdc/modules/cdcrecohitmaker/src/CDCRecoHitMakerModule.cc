@@ -8,8 +8,16 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "cdc/modules/cdcrecohitmaker/CDCRecoHitMakerModule.h"
+#include <cdc/modules/cdcrecohitmaker/CDCRecoHitMakerModule.h>
+#include <framework/datastore/SimpleVec.h>
+#include <cdc/hitcdc/SimHitCDC.h>
+#include <cdc/dataobjects/CDCHit.h>
+#include <TH1F.h>
+#include <TNtuple.h>
+#include <TCanvas.h>
+#include <iostream>
 
+#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreDefs.h>
 
@@ -52,6 +60,27 @@ void CDCRecoHitMakerModule::beginRun()
 
 void CDCRecoHitMakerModule::event()
 {
+  StoreArray<Relation> arraySimHitToCDCHit("SimHitToCDCHitCollection");
+  StoreObjPtr<SimpleVec<float> > c1("ResolutionCanvas", c_Persistent);
+
+  std::vector<float> myvector(arraySimHitToCDCHit.GetEntries());
+
+  for (int ii = 0; ii < arraySimHitToCDCHit.GetEntries(); ii++) {
+    SimHitCDC* simhitptr = static_cast<SimHitCDC*>(arraySimHitToCDCHit[ii]->getFrom());
+    if (!simhitptr) {B2WARNING("Should not work");}
+
+
+    float trueDriftTime      = (static_cast<SimHitCDC*>(arraySimHitToCDCHit[ii]->getFrom()))->getDriftLength();
+    float simulatedDriftTime = (static_cast<CDCHit*>(arraySimHitToCDCHit[ii]->getTo()))->getDriftTime();
+    myvector[ii] = simulatedDriftTime - trueDriftTime;
+    B2WARNING("True: " << trueDriftTime);
+    B2WARNING("Simulated: " << simulatedDriftTime);
+    B2WARNING("Simulated Value: " << simulatedDriftTime - trueDriftTime);
+
+  }
+  c1->setVector(myvector);
+
+
 }
 
 

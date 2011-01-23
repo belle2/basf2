@@ -58,10 +58,8 @@ namespace Belle2 {
     void terminate();
 
 
-  protected:
-
-
   private:
+
 
   };
 }

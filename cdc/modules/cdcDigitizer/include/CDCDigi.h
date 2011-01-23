@@ -39,6 +39,9 @@ namespace Belle2 {
    *  The signal amplitude is the sum of all hits deposited energy in this cell.
    *
    *  @todo More details will be considered soon, like X-T function, transfer time and so on.
+   *        There is a bug in the Relation between the first CDCHit and the CDCSignal.
+   *        This has to be corrected, but it is not critical for the current release.
+   *        Therefore I stop working on it for the moment and focus on the parts, that have to be finished this week.
    *
    *  @author  Guofu Cao;<br>
    *           Issues regarding the Relations between SimHits and Hits: Martin Heck;

@@ -74,14 +74,14 @@ void DataStore::clearMaps(const EDurability& durability)
 }
 
 
-StoreMapIter<StoreObjMap>*  DataStore:: getObjectIterator(const EDurability& durability)
+StoreMapIter<DataStore::StoreObjMap>*  DataStore:: getObjectIterator(const EDurability& durability)
 {
-  return new StoreMapIter <StoreObjMap> (&m_objectMap[durability]);
+  return new StoreMapIter <DataStore::StoreObjMap> (&m_objectMap[durability]);
 }
 
 
-StoreMapIter<StoreArrayMap>*  DataStore:: getArrayIterator(const EDurability& durability)
+StoreMapIter<DataStore::StoreArrayMap>*  DataStore:: getArrayIterator(const EDurability& durability)
 {
-  return new StoreMapIter <StoreArrayMap> (&m_arrayMap[durability]);
+  return new StoreMapIter <DataStore::StoreArrayMap> (&m_arrayMap[durability]);
 }
 

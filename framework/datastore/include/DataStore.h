@@ -23,12 +23,6 @@
 
 namespace Belle2 {
 
-  /** Convenient typedefs. */
-  typedef std::map<std::string, TObject*> StoreObjMap;         /**< Map for TObjects. */
-  typedef std::map<std::string, TClonesArray*> StoreArrayMap;  /**< Map for TClonesArrays. */
-  typedef StoreObjMap::iterator StoreObjIter;                  /**< Iterator for TObjectMap. */
-  typedef StoreArrayMap::iterator StoreArrayIter;              /**< Iterator for TClonesArraysMap.*/
-
   /** In the store you can park objects, that have to be accessed by various modules.
    *
    *  The store saves objects together with names in maps.
@@ -45,6 +39,12 @@ namespace Belle2 {
    */
   class DataStore {
   public:
+
+    /** Convenient typedefs. */
+    typedef std::map<std::string, TObject*> StoreObjMap;         /**< Map for TObjects. */
+    typedef std::map<std::string, TClonesArray*> StoreArrayMap;  /**< Map for TClonesArrays. */
+    typedef StoreObjMap::iterator StoreObjIter;                  /**< Iterator for TObjectMap. */
+    typedef StoreArrayMap::iterator StoreArrayIter;              /**< Iterator for TClonesArraysMap.*/
 
     /** Durability types.
      *

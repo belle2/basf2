@@ -27,7 +27,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(CDCRecoHitMakerModule, "CDCRecoHitMaker")
+REG_MODULE(CDCRecoHitMaker)
 
 //-----------------------------------------------------------------
 //                 Implementation

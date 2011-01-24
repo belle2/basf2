@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <cdc/modules/cdcDigitizer/CDCDigi.h>
+#include <cdc/modules/cdcDigitizer/CDCDigiModule.h>
 
 //framework headers
 #include <framework/datastore/StoreObjPtr.h>
@@ -38,43 +38,43 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(CDCDigi, "CDCDigitizer")
+REG_MODULE(CDCDigi)
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-CDCDigi::CDCDigi() : Module()
+CDCDigiModule::CDCDigiModule() : Module()
 {
   // Set description
-  setDescription("CDCDigitizer");
+  setDescription("CDCDigiModuletizer");
 
   // Add parameters
   // I/O
-  addParam("InputColName",                m_inColName, string("SimHitCDCArray"), "Input collection name");
-  addParam("OutputColName",               m_outColName, string("HitCDCArray"), "Output collection name");
-  addParam("CDCHitOutColName",            m_cdcHitOutColName, string("CDCHitCollection"), "Output collection name");
+  addParam("InputColName",                m_inColName, "Input collection name", string("SimHitCDCArray"));
+  addParam("OutputColName",               m_outColName, "Output collection name", string("HitCDCArray"));
+  addParam("CDCHitOutColName",            m_cdcHitOutColName, "Output collection name", string("CDCHitCollection"));
   //Parameters for Digitization
-  addParam("RandomSeed",                  m_randomSeed, 12345, "Random seed");
-  addParam("Fraction",                    m_fraction, 0.571, "The fraction of the first Gaussian used to smear drift length, set in cm");
-  addParam("Mean1",                       m_mean1, 0.0, "The mean value of the first Gaussian used to smear drift length, set in cm");
-  addParam("Resolution1",                 m_resolution1, 0.0089, "Resolution of the first Gaussian used to smear drift length, set in cm");
-  addParam("Mean2",                       m_mean1, 0.0, "The mean value of the second Gaussian used to smear drift length, set in cm");
-  addParam("Resolution2",                 m_resolution2, 0.0188, "Resolution of the second Gaussian used to smear drift length, set in cm");
-  addParam("ElectronicEffects",           m_electronicEffects, 0, "Apply electronic effects?");
-  addParam("ElectronicsNoise",            m_elNoise, 1000.0, "Noise added by the electronics, set in ENC");
+  addParam("RandomSeed",                  m_randomSeed, "Random seed", 12345);
+  addParam("Fraction",                    m_fraction, "The fraction of the first Gaussian used to smear drift length, set in cm", 0.571);
+  addParam("Mean1",                       m_mean1, "The mean value of the first Gaussian used to smear drift length, set in cm", 0.0);
+  addParam("Resolution1",                 m_resolution1, "Resolution of the first Gaussian used to smear drift length, set in cm", 0.0089);
+  addParam("Mean2",                       m_mean1, "The mean value of the second Gaussian used to smear drift length, set in cm", 0.0);
+  addParam("Resolution2",                 m_resolution2, "Resolution of the second Gaussian used to smear drift length, set in cm", 0.0188);
+  addParam("ElectronicEffects",           m_electronicEffects, "Apply electronic effects?", 0);
+  addParam("ElectronicsNoise",            m_elNoise, "Noise added by the electronics, set in ENC", 1000.0);
   //Relations
-  addParam("RelCollectionName_MCPartToSimHit", m_relColNameMCToSim,    string("MCPartToCDCSimHitCollection"),
-           "Name of relation collection - MCParticle to SimCDCHit (if nonzero, created)");
-  addParam("RelCollectionName_SimHitToCDCHit", m_relColNameSimHitToHit, string("SimHitToCDCHitCollection"),
-           "Name of relation collection - Hit CDC to MCParticle (if nonzero, created)");
+  addParam("RelCollectionName_MCPartToSimHit", m_relColNameMCToSim,
+           "Name of relation collection - MCParticle to SimCDCHit (if nonzero, created)", string("MCPartToCDCSimHitCollection"));
+  addParam("RelCollectionName_SimHitToCDCHit", m_relColNameSimHitToHit,
+           "Name of relation collection - Hit CDC to MCParticle (if nonzero, created)", string("SimHitToCDCHitCollection"));
 }
 
-CDCDigi::~CDCDigi()
+CDCDigiModule::~CDCDigiModule()
 {
 }
 
-void CDCDigi::initialize()
+void CDCDigiModule::initialize()
 {
   // Initialize variables
   m_nRun    = 0 ;
@@ -96,11 +96,11 @@ void CDCDigi::initialize()
   m_timeCPU = clock() * Unit::us;
 }
 
-void CDCDigi::beginRun()
+void CDCDigiModule::beginRun()
 {
 }
 
-void CDCDigi::event()
+void CDCDigiModule::event()
 {
   //------------------------------------------
   // Get CDC hits collection from data store.
@@ -216,7 +216,7 @@ void CDCDigi::event()
   m_nEvent++;
 }
 
-double CDCDigi::smearDriftLength(double driftLength, double fraction, double mean1, double resolution1, double mean2, double resolution2)
+double CDCDigiModule::smearDriftLength(double driftLength, double fraction, double mean1, double resolution1, double mean2, double resolution2)
 {
   // Smear drift length using double Gaussian function
   double mean, resolution;
@@ -234,11 +234,11 @@ double CDCDigi::smearDriftLength(double driftLength, double fraction, double mea
   return newDL*Unit::cm;
 }
 
-void CDCDigi::endRun()
+void CDCDigiModule::endRun()
 {
 }
 
-void CDCDigi::terminate()
+void CDCDigiModule::terminate()
 {
   // CPU time end
   m_timeCPU = clock() * Unit::us - m_timeCPU;
@@ -260,7 +260,7 @@ void CDCDigi::terminate()
   //     << ENDCOLOR);
 }
 
-void CDCDigi::genNoise(CDCSignalMap &) //cdcSignalMap)
+void CDCDigiModule::genNoise(CDCSignalMap &) //cdcSignalMap)
 {
   //-------------------------------------------------------------------------------
   // Method generating random noise using Gaussian distribution (input parameter:
@@ -298,7 +298,7 @@ void CDCDigi::genNoise(CDCSignalMap &) //cdcSignalMap)
   */
 }
 
-double CDCDigi::getDriftTime(double) //driftLength)
+double CDCDigiModule::getDriftTime(double) //driftLength)
 {
   //--------------------------------------------------------------------
   // Method returning electron drift time (parameters: position in cm)
@@ -306,7 +306,7 @@ double CDCDigi::getDriftTime(double) //driftLength)
   return 0;
 }
 
-void CDCDigi::printSimCDCHitInfo(const SimHitCDC & aHit) const
+void CDCDigiModule::printSimCDCHitInfo(const SimHitCDC & aHit) const
 {
   //----------------------
   // Printing a hit info.
@@ -328,7 +328,7 @@ void CDCDigi::printSimCDCHitInfo(const SimHitCDC & aHit) const
          << std::setprecision(0));
 }
 
-void CDCDigi::printSimCDCHitsInfo(std::string info, const SimHitCDCVec & hitVec) const
+void CDCDigiModule::printSimCDCHitsInfo(std::string info, const SimHitCDCVec & hitVec) const
 {
   //---------------------
   // Printing hits info.
@@ -341,7 +341,7 @@ void CDCDigi::printSimCDCHitsInfo(std::string info, const SimHitCDCVec & hitVec)
   }
 }
 
-void CDCDigi::printModuleParams() const
+void CDCDigiModule::printModuleParams() const
 {
   //-----------------------------
   // Printing module parameters.
@@ -349,7 +349,7 @@ void CDCDigi::printModuleParams() const
   B2INFO(" "
          << DUNDERL
          << DBLUE
-         << "CDCDigi parameters:"
+         << "CDCDigiModule parameters:"
          << ENDCOLOR
          << " "
          << "\n");
@@ -379,7 +379,7 @@ void CDCDigi::printModuleParams() const
          << "\n");
 }
 
-void CDCDigi::printCDCSignalInfo(std::string info, const CDCSignalMap & cdcSignalMap) const
+void CDCDigiModule::printCDCSignalInfo(std::string info, const CDCSignalMap & cdcSignalMap) const
 {
   //---------------------------------------------
   // Printing info about signals in each cell.

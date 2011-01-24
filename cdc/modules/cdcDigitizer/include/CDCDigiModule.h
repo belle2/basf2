@@ -48,7 +48,7 @@ namespace Belle2 {
    *
    */
 
-  class CDCDigi : public Module {
+  class CDCDigiModule : public Module {
 
   public:
 
@@ -57,10 +57,10 @@ namespace Belle2 {
     typedef std::pair< int, CDCSignal *> vpair;          /**< Pair of CDCSignalMap. */
 
     /** Constructor.*/
-    CDCDigi();
+    CDCDigiModule();
 
     /** Destructor.*/
-    virtual ~CDCDigi();
+    virtual ~CDCDigiModule();
 
     /** Initialize variables, print info, and start CPU clock. */
     virtual void initialize();

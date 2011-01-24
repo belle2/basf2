@@ -45,7 +45,7 @@ typedef HepGeom::Vector3D<double> HepVector3D;
 using namespace Belle2;
 
 CDCSensitiveDetector::CDCSensitiveDetector(G4String name, G4double thresholdEnergyDeposit, G4double thresholdKineticEnergy):
-    G4VSensitiveDetector(name), fThresholdEnergyDeposit(thresholdEnergyDeposit),
+    SensitiveDetectorBase(name), fThresholdEnergyDeposit(thresholdEnergyDeposit),
     fThresholdKineticEnergy(thresholdKineticEnergy), fHitCollection(0),
     fHCID(-1)
 {

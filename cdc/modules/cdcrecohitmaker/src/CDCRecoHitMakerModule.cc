@@ -19,7 +19,7 @@
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/StoreDefs.h>
+//#include <framework/datastore/StoreDefs.h>
 
 using namespace std;
 using namespace Belle2;
@@ -61,7 +61,7 @@ void CDCRecoHitMakerModule::beginRun()
 void CDCRecoHitMakerModule::event()
 {
   StoreArray<Relation> arraySimHitToCDCHit("SimHitToCDCHitCollection");
-  StoreObjPtr<SimpleVec<float> > c1("ResolutionCanvas", c_Persistent);
+  StoreObjPtr<SimpleVec<float> > c1("ResolutionCanvas", DataStore::c_Persistent);
 
   std::vector<float> myvector(arraySimHitToCDCHit.GetEntries());
 

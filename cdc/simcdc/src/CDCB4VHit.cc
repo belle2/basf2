@@ -13,7 +13,6 @@
 
 //DataStore classes
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/StoreDefs.h>
 #include <framework/datastore/StoreArray.h>
 
 //Geant4 classes

@@ -12,7 +12,6 @@
 
 //framework headers
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/StoreDefs.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/datastore/RelationArray.h>

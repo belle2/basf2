@@ -12,10 +12,9 @@
 #include "../include/CDCTrackHit.h"
 
 #include <cdc/geocdc/CDCGeometryPar.h>
+
 #include <cmath>
-
-#define pi 3.141592654
-
+#include <TMath.h>
 
 using namespace std;
 using namespace Belle2;
@@ -125,11 +124,11 @@ double CDCTrackHit::getPhi() const
   }
 
   if (m_posWireX < 0) {
-    phi = pi + atan(m_posWireY / m_posWireX);
+    phi = TMath::Pi() + atan(m_posWireY / m_posWireX);
   }
 
   if (m_posWireX >= 0 && m_posWireY < 0) {
-    phi = 2 * pi + atan(m_posWireY / m_posWireX);
+    phi = 2 * TMath::Pi() + atan(m_posWireY / m_posWireX);
   }
 
 

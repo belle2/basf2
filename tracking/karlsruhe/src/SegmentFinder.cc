@@ -10,15 +10,13 @@
 
 
 #include "../include/SegmentFinder.h"
-#include "TCanvas.h"
-#include "TFile.h"
 
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreDefs.h>
 #include <framework/logging/Logger.h>
 
-#define pi 3.141592654
-
+#include "TMath.h"
+#include "TCanvas.h"
+#include "TFile.h"
 
 using namespace std;
 using namespace Belle2;
@@ -94,7 +92,7 @@ void SegmentFinder::FindSegments(string CDCTrackHitArray, string SegmentsCDCArra
   TH1F * histo[10]; //array of histograms
 
   double histo_start = 0; //start value for the histograms
-  double histo_end = 2 * pi + 0.04; //end value for the histograms
+  double histo_end = 2 * TMath::Pi() + 0.04; //end value for the histograms
 
   //phi in radiant, end value chosen >2pi to be able to shift values and avoid edge effects
 
@@ -152,7 +150,7 @@ void SegmentFinder::FindSegments(string CDCTrackHitArray, string SegmentsCDCArra
         if (start > 1) {
           Phi.at(i) = Phi.at(i) - binWidth * (start - 1);
           if (Phi.at(i) <= 0) {
-            Phi.at(i) = Phi.at(i) + 2 * pi; //take care that all entries lie between 0 and 2pi
+            Phi.at(i) = Phi.at(i) + 2 * TMath::Pi(); //take care that all entries lie between 0 and 2pi
           }
         }
 

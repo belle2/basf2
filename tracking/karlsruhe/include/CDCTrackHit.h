@@ -12,7 +12,8 @@
 #define CDCTRACKHIT_H
 
 #include "TObject.h"
-#include<cdc/hitcdc/HitCDC.h>
+
+#include <cdc/hitcdc/HitCDC.h>
 
 
 namespace Belle2 {

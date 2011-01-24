@@ -10,19 +10,15 @@
 
 #include "../include/AxialTrackFinder.h"
 
+#include <framework/datastore/StoreArray.h>
+#include <framework/logging/Logger.h>
 
 #include <cmath>
 
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreDefs.h>
-#include <framework/logging/Logger.h>
-
-
+#include "TMath.h"
 #include "TGraph.h"
 #include "TAxis.h"
 #include "TF1.h"
-
-#define pi 3.141592654
 
 using namespace std;
 using namespace Belle2;
@@ -418,7 +414,7 @@ void AxialTrackFinder::CollectTrackCandidates(string SegmentsCDCArray,
 
                 //additional variable to check if the short tracks can be combined to one
                 double angle = FinalTrackCandidates.at(test).getSegments().at(0).getDirection().Angle(FinalTrackCandidates.at(i).getSegments().at(0).getDirection());
-                if (angle > pi / 2) angle = angle - pi ; // -90 < angle < 90
+                if (angle > TMath::Pi() / 2) angle = angle - TMath::Pi() ; // -90 < angle < 90
 
                 //check for shortest distance and angle
                 if (ShortestDistance(

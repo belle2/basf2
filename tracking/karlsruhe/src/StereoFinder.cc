@@ -12,20 +12,19 @@
 
 #include <cmath>
 
+#include "TMath.h"
 #include "TGraph.h"
 #include "TAxis.h"
 #include "TF1.h"
 
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreDefs.h>
 #include <framework/logging/Logger.h>
 
 #include <tracking/karlsruhe/AxialTrackFinder.h>
 
-#define pi 3.141592654
-
 using namespace std;
 using namespace Belle2;
+
 
 StereoFinder::StereoFinder()
 {
@@ -227,7 +226,7 @@ void StereoFinder::AppendStereoSegments(string StereoSegmentsCDCArray,
         //check if now the segment can pass more strict cuts
 
         double angle = cdcTracksArray[trackId]->getOuterMostSegment().getDirection().Angle(segment.getDirection());
-        if (angle > pi / 2) angle = angle - pi; // -90 < angle < 90
+        if (angle > TMath::Pi() / 2)  angle = angle - TMath::Pi(); // -90 < angle < 90
 
         if (ShortestDistance(*cdcTracksArray[trackId], segment) < strictCut
             && abs(angle) < angleCut) {

@@ -18,6 +18,7 @@
 #include <simulation/kernel/TrackingAction.h>
 
 #include <generators/dataobjects/MCParticle.h>
+#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/EventMetaData.h>
 #include <framework/gearbox/Unit.h>
@@ -40,7 +41,7 @@ using namespace Belle2::Simulation;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(FullSimModule, "FullSim")
+REG_MODULE(FullSim)
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -52,13 +53,16 @@ FullSimModule::FullSimModule() : Module()
   setDescription("Performs the full Geant4 detector simulation. Requires a valid geometry in memory.");
 
   //Parameter definition
-  addParam("InputMCParticleCollection", m_mcParticleInputColName, string(DEFAULT_MCPARTICLES), "The name of the input MCParticle collection.");
-  addParam("OutputMCParticleCollection", m_mcParticleOutputColName, string(DEFAULT_MCPARTICLES), "The name of the output MCParticle collection.");
-  addParam("OutputRelationCollection", m_relationOutputColName, string("RelationHitMCP"), "The name of the output Relation (Hit -> MCParticle) collection.");
-  addParam("ThresholdImportantEnergy", m_thresholdImportantEnergy, 0.250, "[GeV] A particle which got 'stuck' and has less than this energy will be killed after 'ThresholdTrials' trials.");
-  addParam("ThresholdTrials", m_thresholdTrials, 10, "Geant4 will try 'ThresholdTrials' times to move a particle which got 'stuck' and has an energy less than 'ThresholdImportantEnergy'.");
-  addParam("TrackingVerbosity", m_trackingVerbosity, 0, "Tracking verbosity: 0=Silent; 1=Min info per step; 2=sec particles; 3=pre/post step info; 4=like 3 but more info; 5=proposed step length info.");
-  addParam("CreateRelations", m_createRelations, true, "Set to true to create relations between Hits and MCParticles.");
+  addParam("InputMCParticleCollection", m_mcParticleInputColName, "The name of the input MCParticle collection.", string(DEFAULT_MCPARTICLES));
+  addParam("OutputMCParticleCollection", m_mcParticleOutputColName, "The name of the output MCParticle collection.", string(DEFAULT_MCPARTICLES));
+  addParam("OutputRelationCollection", m_relationOutputColName, "The name of the output Relation (Hit -> MCParticle) collection.", string("RelationHitMCP"));
+  addParam("ThresholdImportantEnergy", m_thresholdImportantEnergy, "[GeV] A particle which got 'stuck' and has less than this energy will be killed after 'ThresholdTrials' trials.", 0.250);
+  addParam("ThresholdTrials", m_thresholdTrials, "Geant4 will try 'ThresholdTrials' times to move a particle which got 'stuck' and has an energy less than 'ThresholdImportantEnergy'.", 10);
+  addParam("TrackingVerbosity", m_trackingVerbosity, "Tracking verbosity: 0=Silent; 1=Min info per step; 2=sec particles; 3=pre/post step info; 4=like 3 but more info; 5=proposed step length info.", 0);
+  addParam("CreateRelations", m_createRelations, "Set to true to create relations between Hits and MCParticles.", true);
+  addParam("PhysicsList", m_physicsList, "The name of the physics list which is used for the simulation.", string("QGSP_BERT"));
+  addParam("RegisterOptics", m_optics, "If true, G4OpticalPhysics is registered in Geant4 PhysicsList.", false);
+  addParam("ProductionCut", m_productionCut, "Apply continuous energy loss to primary particle which has no longer enough energy to produce secondaries which travel at least the specified productionCut distance.", 0.07);
 }
 
 
@@ -99,7 +103,12 @@ void FullSimModule::initialize()
   g4rootNavMgr->ConnectToG4();
 
   //Create the Physics list
-  runManager.SetUserInitialization(new PhysicsList<QGSP_BERT>);
+  PhysicsList* physicsList = new PhysicsList(m_physicsList);
+  physicsList->setProductionCutValue(m_productionCut);
+  if (m_optics) physicsList->registerOpticalPhysicsList();
+
+  runManager.SetUserInitialization(physicsList);
+
 
   //Create the magnetic field for the Geant4 simulation
   MagneticField* magneticField = new MagneticField();
@@ -158,7 +167,7 @@ void FullSimModule::initialize()
 void FullSimModule::beginRun()
 {
   //Get the event meta data
-  StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", c_Event);
+  StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
 
   //Begin the Geant4 run
   RunManager::Instance().beginRun(eventMetaDataPtr->getRun());
@@ -168,7 +177,7 @@ void FullSimModule::beginRun()
 void FullSimModule::event()
 {
   //Get the event meta data
-  StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", c_Event);
+  StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
 
   //Process the event
   RunManager::Instance().processEvent(eventMetaDataPtr->getEvent());

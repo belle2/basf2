@@ -29,7 +29,7 @@ SensitiveDetectorBase::~SensitiveDetectorBase()
 }
 
 
-bool SensitiveDetectorBase::addRelation(TObject* hit, G4Step* step)
+/*bool SensitiveDetectorBase::addRelation(TObject* hit, G4Step* step)
 {
   return RunManager::Instance().addRelation(hit, step);
-}
+}*/

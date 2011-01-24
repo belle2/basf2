@@ -3,7 +3,7 @@
  * Copyright(C) 2010-2011  Belle II Collaboration                         *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Martin Ritter, Andreas Moll                              *
+ * Contributors: Luka Santelj, Andreas Moll                               *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -13,10 +13,8 @@
 
 #include <globals.hh>
 #include <G4VModularPhysicsList.hh>
-#include <CompileTimeConstraints.hh>
-#include <G4UnknownParticle.hh>
-#include <G4UnknownDecay.hh>
-#include <G4ProcessManager.hh>
+
+#include <string>
 
 namespace Belle2 {
 
@@ -24,45 +22,42 @@ namespace Belle2 {
 
     /**
      * The basf2 physics list.
-     * Takes an existing physics list as template and adds the
-     * G4UnknownParticle to it.
+     * Uses the Geant4 standard lists, specified by a string and adds optical processes
+     * if requested.
      */
-    template<class T> class PhysicsList: public T {
+    class PhysicsList: public G4VModularPhysicsList {
 
     public:
 
       /**
        * The PhysicsList constructor.
-       * @param ver The verbosity level of the physics list.
+       * Loads the physics list specified by its name.
+       * @param physicsListName The name of the physics list which should be loaded.
        */
-      PhysicsList(G4int ver = 1) : T(ver) {}
+      PhysicsList(const std::string& physicsListName);
+
+      /** The PhysicsList destructor. */
+      virtual ~PhysicsList();
+
+      /** Sets the Cuts on the physics list. */
+      void SetCuts();
 
       /**
-       * Instantiates each particle type.
+       * Sets the production cut value.
+       * If a primary particle has no longer enough energy to produce secondaries
+       * which travel at least the specified productionCut distance, two things happen:
+       * 1) Discrete energy loss ceases (no more secondaries will be produced)
+       * 2) The primary particle is tracked down to zero energy using continuous energy loss
+       * @param productionCut The production cut value in [cm].
        */
-      virtual void ConstructParticle() {
-        T::ConstructParticle();
-        G4UnknownParticle::UnknownParticleDefinition();
-      }
+      void setProductionCutValue(double productionCut);
 
-      /**
-       * Instantiates each physics process and registers it to the process manager of each particle type.
-       */
-      virtual void ConstructProcess() {
-        T::ConstructProcess();
-        G4ParticleDefinition* unknown = G4UnknownParticle::UnknownParticleDefinition();
-        G4ProcessManager* pmanager = unknown->GetProcessManager();
-        pmanager->AddProcess(&m_UnknownDecay);
-        pmanager->SetProcessOrdering(&m_UnknownDecay, idxPostStep);
-      }
+      /** Registers the optical physics list. */
+      void registerOpticalPhysicsList();
 
 
     private:
 
-      G4UnknownDecay m_UnknownDecay; /**< Object of an unknown decay. */
-
-      /**Enum to check for a valid class hierarchy at compile time. */
-      enum {ok = CompileTimeConstraints::IsA<T, G4VModularPhysicsList>::ok };
     };
 
   } //end namespace Simulation

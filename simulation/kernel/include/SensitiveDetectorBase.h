@@ -50,7 +50,7 @@ namespace Belle2 {
        * @param step The step representing the track which created the hit.
        * @return True if the relation could be added.
        */
-      bool addRelation(TObject* hit, G4Step* step);
+      //bool addRelation(TObject* hit, G4Step* step);
 
 
     protected:

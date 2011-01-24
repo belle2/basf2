@@ -52,6 +52,7 @@ echo "/bin/uname -a   -------------------"
 /bin/uname -a
 echo "I am `whoami`" 
 echo "WN = `hostname`" 
+id
 
 echo "df -h ----------------------------------" 
 df -h 
@@ -63,8 +64,10 @@ echo "end ls --------------"
 
 echo "start ls -l $VO_BELLE_SW_DIR--------------" 
 ls -l $VO_BELLE_SW_DIR 
+ls -ln $VO_BELLE_SW_DIR 
 echo "end ls -l $VO_BELLE_SW_DIR--------------" 
 ls -l $VO_BELLE_SW_DIR/../
+ls -ln $VO_BELLE_SW_DIR/../
 
 echo "start cpuinfo --------------" 
 if [ -f /proc/cpuinfo ]; then
@@ -107,6 +110,11 @@ fi
 
 rm $SOFTWARE_TAR
 rm -rf releases/$SOFTWARE_VERSION
+
+#For now we replace externals tools and subversion
+rm -rf releases/externals
+rm -rf releases/tools
+rm -rf releases/subversion
  
 lcg-cp  -n 1 lfn:/grid/$VO/software/$SOFTWARE_TAR $SOFTWARE_TAR
 if [ $? -ne 0 ]; then

@@ -40,12 +40,6 @@ PXDSensitiveDetector::~PXDSensitiveDetector()
 }
 
 
-void PXDSensitiveDetector::Initialize(G4HCofThisEvent* HCTE)
-{
-
-}
-
-
 G4bool PXDSensitiveDetector::ProcessHits(G4Step* aStep, G4TouchableHistory*)
 {
   //-------------------------------------------------------
@@ -103,7 +97,7 @@ G4bool PXDSensitiveDetector::ProcessHits(G4Step* aStep, G4TouchableHistory*)
   //-------------------------------------------------------
   //              Add SimHit to the DataStore
   //-------------------------------------------------------
-  /* Parse g4hit.volumeName for layer, ladder and sensor numbers */
+  /* Parse volume name for layer, ladder and sensor numbers */
   TString vname(vol.GetName().data());
   int layerID = TString(vname(vname.Index("Layer_") + 6)).Atoi();
   int ladderID = TString(vname(vname.Index("Ladder_") + 7)).Atoi();

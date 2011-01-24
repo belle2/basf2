@@ -36,9 +36,6 @@ namespace Belle2 {
     //! Destructor
     ~PXDSensitiveDetector();
 
-    //! Register PXDB4VHit collection into G4HCofThisEvent
-    void Initialize(G4HCofThisEvent* HCTE);
-
     //! Process each step and calculate variables defined in PXDB4VHit
     G4bool ProcessHits(G4Step* aStep, G4TouchableHistory*);
 
@@ -51,8 +48,7 @@ namespace Belle2 {
 
   private:
 
-    int m_hitNumber;         /**< The current number of created hits. Used to fill the DataStore PXD array.*/
-    PXDSimHit* m_currentHit;
+    int m_hitNumber; /**< The current number of created hits. Used to fill the DataStore PXD array.*/
 
   };
 

@@ -17,8 +17,6 @@
 
 namespace Belle2 {
 
-  class PXDB4VHit;
-
   /**
     * ClassPXDSimHit - Geant4 simulated hit for the PXD
     *

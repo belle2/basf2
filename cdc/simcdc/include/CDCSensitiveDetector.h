@@ -12,7 +12,8 @@
 #define CDCSensitiveDetector_H
 
 #include <cdc/simcdc/CDCB4VHit.h>
-#include "G4VSensitiveDetector.hh"
+#include <simulation/kernel/SensitiveDetectorBase.h>
+
 
 namespace Belle2 {
 
@@ -21,8 +22,7 @@ namespace Belle2 {
       And save CDCB4VHit into hits collection.
   */
 
-//class CDCSensitiveDetector: public B4SensitiveDetectorBase
-  class CDCSensitiveDetector: public G4VSensitiveDetector {
+  class CDCSensitiveDetector: public Simulation::SensitiveDetectorBase {
 
   public:
 

@@ -16,7 +16,7 @@
 
 namespace Belle2 {
 
-  /** Module CDCTrackingModule.
+  /** Module to perform pattern recognition in the CDC through conformal transformation.
    * The CDCTrackingModule performs the first pattern recognition step in the CDC through conformal transformation of hit coordinates.
    * First Digitized CDCHits (CDCDigitizer module should be executed before this module) are combined to segments.
    * Then segments from axial superlayers are combined to track candidates.

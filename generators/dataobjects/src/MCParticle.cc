@@ -73,7 +73,7 @@ void MCParticle::fixParticleList() const
     plist = MCParticles.getPtr();
   } else {
     //Search all StoreArrays which happen to store MCParticles
-    StoreMapIter<StoreArrayMap>* iter = DataStore::Instance().getArrayIterator(DataStore::c_Event);
+    StoreMapIter<DataStore::StoreArrayMap>* iter = DataStore::Instance().getArrayIterator(DataStore::c_Event);
     for (iter->first(); iter->isDone(); iter++) {
       TClonesArray &value = *(static_cast<TClonesArray*>(iter->value()));
       if (value.GetClass() == Class() && value.IndexOf(this) >= 0) {

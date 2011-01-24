@@ -14,10 +14,10 @@
 #include <framework/core/FrameworkExceptions.h>
 #include <framework/gearbox/GearDir.h>
 #include <geometry/geodetector/CreatorManager.h>
+#include <simulation/kernel/SensitiveDetectorBase.h>
 
 #include <TGeoMatrix.h>
 #include <TGeoVolume.h>
-#include <G4VSensitiveDetector.hh>
 #include <TG4RootDetectorConstruction.h>
 
 #include <string>
@@ -135,7 +135,7 @@ namespace Belle2 {
      * @param prefix The prefix which is used to identify the sensitive volumes.
      * @param sensitiveDetector A pointer to a sensitive detector handling class. The ownership if this class is taken !
      */
-    void addSensitiveDetector(const std::string prefix, G4VSensitiveDetector* sensitiveDetector);
+    void addSensitiveDetector(const std::string prefix, Simulation::SensitiveDetectorBase* sensitiveDetector);
 
 
   private:
@@ -146,7 +146,7 @@ namespace Belle2 {
     bool m_hasGroupName;         /**< True if the group name of the subdetector was set. */
     unsigned int m_senDetNumber; /**< The number of sensitive volumes which were found. */
 
-    std::map<std::string, G4VSensitiveDetector*> m_sensitiveDetMap; /**< Maps a prefix to its sensitive detector handling class. */
+    std::map<std::string, Simulation::SensitiveDetectorBase*> m_sensitiveDetMap; /**< Maps a prefix to its sensitive detector handling class. */
 
     /**
      * Loops through the volumes recursively and connects the found sensitive volumes to the sensitive detector classes.

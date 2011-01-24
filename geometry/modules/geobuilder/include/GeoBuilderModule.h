@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef GEOBUILDER_H_
-#define GEOBUILDER_H_
+#ifndef GEOBUILDERMODULE_H_
+#define GEOBUILDERMODULE_H_
 
 #include <framework/core/Module.h>
 
@@ -56,4 +56,4 @@ namespace Belle2 {
   };
 }
 
-#endif /* GEOBUILDER_H_ */
+#endif /* GEOBUILDERMODULE_H_ */

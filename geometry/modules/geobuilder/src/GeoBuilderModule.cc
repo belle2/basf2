@@ -18,7 +18,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(GeoBuilderModule, "GeoBuilder")
+REG_MODULE(GeoBuilder)
 
 //-----------------------------------------------------------------
 //                 Implementation

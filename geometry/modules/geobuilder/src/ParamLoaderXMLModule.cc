@@ -20,7 +20,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(ParamLoaderXMLModule, "ParamLoaderXML")
+REG_MODULE(ParamLoaderXML)
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -32,8 +32,8 @@ ParamLoaderXMLModule::ParamLoaderXMLModule() : Module()
   setDescription("Loads the Belle II detector parameters from a XML document.");
 
   //Parameter definition
-  addParam("InputFileXML",  m_filenameXML, string("Belle2.xml"), "The filename of the XML input file which should be loaded.");
-  addParam("ParamCheck",  m_paramCheck, true, "Turns on/off parameter validation. Turn it off for speedup.");
+  addParam("InputFileXML",  m_filenameXML, "The filename of the XML input file which should be loaded.");
+  addParam("ParamCheck",  m_paramCheck, "Turns on/off parameter validation. Turn it off for speedup.", true);
 }
 
 

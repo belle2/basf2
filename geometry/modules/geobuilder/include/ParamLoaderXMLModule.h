@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PARAMLOADERXML_H_
-#define PARAMLOADERXML_H_
+#ifndef PARAMLOADERXMLMODULE_H_
+#define PARAMLOADERXMLMODULE_H_
 
 #include <framework/core/Module.h>
 
@@ -60,4 +60,4 @@ namespace Belle2 {
   };
 }
 
-#endif /* PARAMLOADERXML_H_ */
+#endif /* PARAMLOADERXMLMODULE_H_ */

@@ -18,6 +18,7 @@
 
 using namespace std;
 using namespace Belle2;
+using namespace Simulation;
 
 
 CreatorBase::CreatorBase(const string& name) throw(CreatorManager::GeometryCreatorNameEmptyError)
@@ -96,7 +97,7 @@ TGeoVolumeAssembly* CreatorBase::addSubdetectorGroup(const std::string& groupNam
 }
 
 
-void CreatorBase::addSensitiveDetector(const std::string prefix, G4VSensitiveDetector* sensitiveDetector)
+void CreatorBase::addSensitiveDetector(const std::string prefix, SensitiveDetectorBase* sensitiveDetector)
 {
   //Sensitive detector class check
   if (sensitiveDetector == NULL) {
@@ -105,7 +106,7 @@ void CreatorBase::addSensitiveDetector(const std::string prefix, G4VSensitiveDet
   }
 
   //Check if prefix already exists
-  map<string, G4VSensitiveDetector*>::iterator foundIter = m_sensitiveDetMap.find(prefix);
+  map<string, SensitiveDetectorBase*>::iterator foundIter = m_sensitiveDetMap.find(prefix);
 
   if (foundIter != m_sensitiveDetMap.end()) {
     B2ERROR("The sensitive detector prefix " << prefix << " already exists in the Creator " << m_name << " !")
@@ -130,7 +131,7 @@ void CreatorBase::assignSensitiveVolumesRec(TGeoVolume* volume, TG4RootDetectorC
 
   //Check if current volume is a sensitive volume (search for a valid prefix)
   //If yes, connect the sensitive detector class to the sensitive volume.
-  for (map<string, G4VSensitiveDetector*>::iterator mapIter = m_sensitiveDetMap.begin(); mapIter != m_sensitiveDetMap.end(); mapIter++) {
+  for (map<string, SensitiveDetectorBase*>::iterator mapIter = m_sensitiveDetMap.begin(); mapIter != m_sensitiveDetMap.end(); mapIter++) {
     string currPrefix = mapIter->first;
     string detName(volume->GetName());
     if (detName.substr(0, currPrefix.length()).compare(currPrefix) == 0) {

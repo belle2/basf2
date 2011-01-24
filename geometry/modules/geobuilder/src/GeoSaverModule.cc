@@ -21,7 +21,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(GeoSaverModule, "GeoSaver")
+REG_MODULE(GeoSaver)
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -33,7 +33,7 @@ GeoSaverModule::GeoSaverModule() : Module()
   setDescription("Saves the Belle II detector geometry to a root file.");
 
   //Parameter definition
-  addParam("Filename",  m_filenameROOT, string("Belle2.root"), "The filename of the ROOT output file.");
+  addParam("Filename",  m_filenameROOT, "The filename of the ROOT output file.", string("Belle2.root"));
 }
 
 

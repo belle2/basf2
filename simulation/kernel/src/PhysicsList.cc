@@ -21,7 +21,7 @@ using namespace Belle2;
 using namespace Simulation;
 
 
-PhysicsList::PhysicsList(const string& physicsListName)
+PhysicsList::PhysicsList(const string& physicsListName) : G4VModularPhysicsList()
 {
   defaultCutValue  = 0.7 * mm; //Default production cut value. Unit given in Geant4 units.
 

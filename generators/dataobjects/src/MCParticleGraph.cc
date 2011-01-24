@@ -22,7 +22,6 @@
 #include <generators/dataobjects/MCParticleGraph.h>
 
 #include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreDefs.h>
 #include <framework/datastore/StoreArray.h>
 
 

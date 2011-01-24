@@ -11,7 +11,6 @@
 #include <generators/modules/PGunInputModule.h>
 
 #include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreDefs.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -26,7 +25,7 @@ using namespace Generators;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(PGunInputModule, "PGunInput")
+REG_MODULE(PGunInput)
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -40,26 +39,26 @@ PGunInputModule::PGunInputModule() : Module()
 
   //Set module properties
   setDescription("particle gun for tracks");
-  setPropertyFlags(c_TriggersEndOfData | c_ReadsDataSingleProcess | c_RequiresSingleProcess);
+  setPropertyFlags(c_TriggersEndOfData | c_Input);
 
   //Parameter definition
-  addParam("ntracks", m_ntracks, 1, "The number of tracks to be generated per event");
-  addParam("p_par1", m_p_par1, 0.2, "The first parameter for momentum distribution function");
-  addParam("p_par2", m_p_par2, 10.0,  "The second parameter for momentum distribution function");
-  addParam("ph_par1", m_ph_par1, 0.0, "The first parameter for the phi distribution function");
-  addParam("ph_par2", m_ph_par2, 360.0,  "The second parameter for the phi distribution function");
-  addParam("th_par1", m_th_par1, 17.0, "The first parameter for theta distribution function");
-  addParam("th_par2", m_th_par2, 150.0,  "The second parameter for theta distribution function");
-  addParam("x_par1", m_x_par1, 0.0, "The first parameter for vertex x-coordinate distribution function");
-  addParam("x_par2", m_x_par2, 0.7,  "The second parameter for x-coordinate distribution distribution function");
-  addParam("y_par1", m_y_par1, 0.0, "The first parameter for vertex y-coordinate distribution function");
-  addParam("y_par2", m_y_par2, 0.7,  "The second parameter for y-coordinate distribution distribution function");
-  addParam("z_par1", m_z_par1, 0.0, "The first parameter for vertex z-coordinate distribution function");
-  addParam("z_par2", m_z_par2,  1.0,  "The second parameter for z-coordinate distribution distribution function");
-  addParam("momentumGeneration", m_genMom, 0,  "Choice of distribution function for momentum generation");
-  addParam("vertexGeneration", m_genVert, 2,  "Choice of distribution function for vertex generation");
-  addParam("angleGeneration", m_genAngle, 0,  "Choice of distribution function for angle generation");
-  addParam("PIDcodes", m_PIDcodes, defaultPIDcodes, "PID codes for generated particles");
+  addParam("ntracks", m_ntracks, "The number of tracks to be generated per event", 1);
+  addParam("p_par1", m_p_par1, "The first parameter for momentum distribution function", 0.2);
+  addParam("p_par2", m_p_par2, "The second parameter for momentum distribution function", 10.0);
+  addParam("ph_par1", m_ph_par1, "The first parameter for the phi distribution function", 0.0);
+  addParam("ph_par2", m_ph_par2, "The second parameter for the phi distribution function", 360.0);
+  addParam("th_par1", m_th_par1, "The first parameter for theta distribution function", 17.0);
+  addParam("th_par2", m_th_par2, "The second parameter for theta distribution function", 150.0);
+  addParam("x_par1", m_x_par1, "The first parameter for vertex x-coordinate distribution function", 0.0);
+  addParam("x_par2", m_x_par2, "The second parameter for x-coordinate distribution distribution function", 0.7);
+  addParam("y_par1", m_y_par1, "The first parameter for vertex y-coordinate distribution function", 0.0);
+  addParam("y_par2", m_y_par2, "The second parameter for y-coordinate distribution distribution function", 0.7);
+  addParam("z_par1", m_z_par1, "The first parameter for vertex z-coordinate distribution function", 0.0);
+  addParam("z_par2", m_z_par2,  "The second parameter for z-coordinate distribution distribution function", 1.0);
+  addParam("momentumGeneration", m_genMom, "Choice of distribution function for momentum generation", 0);
+  addParam("vertexGeneration", m_genVert, "Choice of distribution function for vertex generation", 2);
+  addParam("angleGeneration", m_genAngle, "Choice of distribution function for angle generation", 0);
+  addParam("PIDcodes", m_PIDcodes, "PID codes for generated particles", defaultPIDcodes);
 }
 
 

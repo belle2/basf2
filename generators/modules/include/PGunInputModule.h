@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PGUNINPUT_H
-#define PGUNINPUT_H
+#ifndef PGUNINPUTMODULE_H
+#define PGUNINPUTMODULE_H
 
 #include <framework/core/Module.h>
 
@@ -21,8 +21,8 @@
 
 namespace Belle2 {
 
-
   namespace Generators {
+
     /** The pGunInput module.
      * Generate tracks with the particle gun and store them
      * into the MCParticle class.
@@ -73,4 +73,4 @@ namespace Belle2 {
 
 } // end namespace Belle2
 
-#endif // PGUNINPUT_H
+#endif // PGUNINPUTMODULE_H

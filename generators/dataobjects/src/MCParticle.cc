@@ -18,7 +18,6 @@
 #include <framework/core/FrameworkExceptions.h>
 #include <framework/logging/Logger.h>
 #include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreDefs.h>
 #include <framework/datastore/StoreArray.h>
 #include <generators/dataobjects/MCParticle.h>
 
@@ -74,7 +73,7 @@ void MCParticle::fixParticleList() const
     plist = MCParticles.getPtr();
   } else {
     //Search all StoreArrays which happen to store MCParticles
-    StoreMapIter<StoreArrayMap>* iter = DataStore::Instance().getArrayIterator(c_Event);
+    StoreMapIter<StoreArrayMap>* iter = DataStore::Instance().getArrayIterator(DataStore::c_Event);
     for (iter->first(); iter->isDone(); iter++) {
       TClonesArray &value = *(static_cast<TClonesArray*>(iter->value()));
       if (value.GetClass() == Class() && value.IndexOf(this) >= 0) {

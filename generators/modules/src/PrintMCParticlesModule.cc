@@ -8,10 +8,9 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <generators/modules/PrintMCParticles.h>
+#include <generators/modules/PrintMCParticlesModule.h>
 
 #include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreDefs.h>
 #include <framework/datastore/StoreArray.h>
 
 #include <boost/format.hpp>
@@ -21,29 +20,30 @@
 
 using namespace std;
 using namespace Belle2;
+using namespace Generators;
 
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(PrintMCParticles, "PrintMCParticles")
+REG_MODULE(PrintMCParticles)
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-PrintMCParticles::PrintMCParticles() : Module()
+PrintMCParticlesModule::PrintMCParticlesModule() : Module()
 {
   //Set module properties
   setDescription("Print an MCParticle Collection");
 
   //Parameter definition
-  addParam("collectionName", m_particleList, string(DEFAULT_MCPARTICLES), "Collection to print");
-  addParam("onlyPrimaries", m_onlyPrimaries, true, "Show only primary particles");
-  addParam("maxLevel", m_maxLevel, -1, "Show only up to specified depth level, -1 means no limit");
+  addParam("collectionName", m_particleList, "Collection to print", string(DEFAULT_MCPARTICLES));
+  addParam("onlyPrimaries", m_onlyPrimaries, "Show only primary particles", true);
+  addParam("maxLevel", m_maxLevel, "Show only up to specified depth level, -1 means no limit", -1);
 }
 
 
-void PrintMCParticles::event()
+void PrintMCParticlesModule::event()
 {
   StoreArray<MCParticle> MCParticles(m_particleList);
   m_seen.clear();
@@ -59,7 +59,7 @@ void PrintMCParticles::event()
 }
 
 
-void PrintMCParticles::printTree(const MCParticle &mc, int level)
+void PrintMCParticlesModule::printTree(const MCParticle &mc, int level)
 {
   if (m_onlyPrimaries && !mc.hasStatus(MCParticle::PrimaryParticle)) return;
 

@@ -20,11 +20,12 @@
 
 using namespace std;
 using namespace Belle2;
+using namespace Generators;
 
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(TouschekInputModule, "TouschekInput")
+REG_MODULE(TouschekInput)
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -34,14 +35,14 @@ TouschekInputModule::TouschekInputModule() : Module()
 {
   //Set module properties
   setDescription("Reads the Touschek data from a TURTLE file and stores it into the MCParticle collection.");
-  setPropertyFlags(c_TriggersEndOfData | c_ReadsDataSingleProcess | c_RequiresSingleProcess);
+  setPropertyFlags(c_TriggersEndOfData | c_Input);
 
   //Parameter definition
-  addParam("FilenameHER",  m_filenameHER, string("HER.dat"), "The filename of the HER TURTLE input file.", true);
-  addParam("FilenameLER",  m_filenameLER, string("LER.dat"), "The filename of the LER TURTLE input file.", true);
-  addParam("ReadHER", m_readHER, true, "Set to false to skip reading the HER data.");
-  addParam("ReadLER", m_readLER, true, "Set to false to skip reading the LER data.");
-  addParam("MaxParticles", m_maxParticles, -1, "The maximum number of particles per event that should be read. -1 means all of the particles are read.");
+  addParam("FilenameHER",  m_filenameHER, "The filename of the HER TURTLE input file.");
+  addParam("FilenameLER",  m_filenameLER, "The filename of the LER TURTLE input file.");
+  addParam("ReadHER", m_readHER, "Set to false to skip reading the HER data.", true);
+  addParam("ReadLER", m_readLER, "Set to false to skip reading the LER data.", true);
+  addParam("MaxParticles", m_maxParticles, "The maximum number of particles per event that should be read. -1 means all of the particles are read.", -1);
 
   //Create and initialize member variables
   m_herPipePartMatrix = new TGeoHMatrix("TouschekPlaneHER");

@@ -11,7 +11,6 @@
 #include "../include/StereoFinder.h"
 
 #include <cmath>
-#include <cstdlib>
 
 #include "TGraph.h"
 #include "TAxis.h"
@@ -222,6 +221,7 @@ void StereoFinder::AppendStereoSegments(string StereoSegmentsCDCArray,
                              k)]->getDirection(),
             cdcTracksArray[segment.getTrackCandId().at(
                              k)]->getOuterMostHit());
+          segment.update();
 
         }
         //check if now the segment can pass more strict cuts
@@ -260,6 +260,13 @@ void StereoFinder::AppendStereoSegments(string StereoSegmentsCDCArray,
         StereoCandidates.at(i).getSegments().at(j));
     }
   }
+
+  //Estimate momentum
+  for (int i = 0; i < nTracks; i++) {
+    cdcTracksArray[i]->estimateMomentum();
+  }
+
+
 
 }
 

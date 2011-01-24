@@ -62,6 +62,13 @@ namespace Belle2 {
      */
     void update();
 
+    /** Performs estimation of the momentum direction.
+     * Assuming the track starting point to be at (0,0,0), the direction of the track can be estimated as the position of the innermost hit.
+     * As for the moment only stereo hits have some meaningful z-coordinates, the coordinates of the innermost stereo hit are normalized and assigned to the momentum vector.
+     * (This is a very rough estimation, no drift time as taken into account but only the coordinates of the hit wire. The z-coordinate is also only a first estimation. It has to be checked if this is good enough for this tracking step.)
+     */
+    void estimateMomentum();
+
     /** Returns the Id of the Track. */
     int getId() const {return m_Id;};
 
@@ -70,14 +77,6 @@ namespace Belle2 {
 
     /** Returns the total number hits in the Track. */
     int getNHits() const {return m_nHits;};
-
-    int getNAxialHits();
-
-    int getNStereoHits();
-
-    int getNAxialSegments();
-
-    int getNStereoSegments();
 
     /** Returns the direction of the track in the conformal plane.
      * This direction is the sum of segment`s directions.
@@ -96,10 +95,10 @@ namespace Belle2 {
     /** Returns the outermost axial hit (farthest from the origin) of the track. */
     CDCTrackHit getOuterMostHit() const {return m_outerMostHit;};
 
-    /** Returns the innermost segment (closest to the origin) of the track. */
+    /** Returns the innermost axial segment (closest to the origin) of the track. */
     CDCSegment getInnerMostSegment() const {return m_innerMostSegment;};
 
-    /** Returns the outermost segment (farthest to the origin) of the track. */
+    /** Returns the outermost axial segment (farthest to the origin) of the track. */
     CDCSegment getOuterMostSegment() const {return m_outerMostSegment;};
 
     /** Returns a Chi2 value of the track. */
@@ -107,6 +106,9 @@ namespace Belle2 {
 
     /** Returns the absolute value of the momentum of the Track. */
     double getMomentumValue() {return m_momentumValue;}
+
+    /** Returns the momentum vector of the Track. */
+    TVector3 getMomentumVector() {return m_momentumVector;}
 
 
 
@@ -129,6 +131,7 @@ namespace Belle2 {
     double m_chi2; /**< Chi2 value to describe the quality of the Track */
 
     double m_momentumValue;  /**< Absolut momentum value of the Track */
+    TVector3 m_momentumVector; /**< 3D momentum vector of the Track */
 
     //! ROOT ClassDef macro to make this class a ROOT class.
     ClassDef(CDCTrack, 1);

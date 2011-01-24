@@ -261,6 +261,7 @@ void CDCSegment::clearTrackCandId()
 
 void CDCSegment::shiftAlongZ(TVector3 trackDirection, CDCTrackHit trackHit)
 {
+
   TVector3 StereoHitPos; //conformal position of one point of the segment (outermost hit)
   TVector3 TrackHitPos;  //conformal position of the given TrackHit (starting point for the "track straight line")
   TVector3 perpPoint;  //intersection from "track line" with a to it perpendicular line through segment point
@@ -331,7 +332,6 @@ void CDCSegment::shiftAlongZ(TVector3 trackDirection, CDCTrackHit trackHit)
 //sets new position
     m_TrackHits[i].setStereoPosition(newPosition);
     m_TrackHits[i].setConformalPosition(cx, cy);
-
   }
 
 }

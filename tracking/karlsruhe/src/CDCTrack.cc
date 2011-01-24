@@ -10,7 +10,7 @@
 
 
 #include "../include/CDCTrack.h"
-
+#include <cmath>
 
 using namespace std;
 using namespace Belle2;
@@ -153,49 +153,35 @@ void CDCTrack::update()
   m_innerMostSegment = m_Segments.at(min_indexSeg);
   m_outerMostSegment = m_Segments.at(max_indexSeg);
 
-
 }
 
-int CDCTrack::getNAxialHits()
+void CDCTrack::estimateMomentum()
 {
-  int nAxialHits = 0;
-  for (int i = 0; i < m_nHits; i++) {
-    if (m_TrackHits.at(i).getIsAxial() == true) nAxialHits ++ ;
-  }
-  return nAxialHits;
+  //Find the innermost *stereo* segment
+  int minSL = 10;
+  int min_index = 0;
 
-}
-
-int CDCTrack::getNStereoHits()
-{
-  int nStereoHits = 0;
-  for (int i = 0; i < m_nHits; i++) {
-    if (m_TrackHits.at(i).getIsAxial() == false) nStereoHits ++ ;
-  }
-  return nStereoHits;
-
-}
-
-int CDCTrack::getNAxialSegments()
-{
-
-  int nAxialSegments = 0;
   for (int i = 0; i < m_nSegments; i++) {
-    if (m_Segments.at(i).getIsAxial() == true) nAxialSegments ++ ;
+    if (m_Segments.at(i).getSuperlayerId() < minSL && m_Segments.at(i).getSuperlayerId() % 2 == 0) {
+      minSL = m_Segments.at(i).getSuperlayerId() ;
+      min_index = i;
+    }
   }
-  return nAxialSegments;
+  //The coordinates of the innermost stereo hit build the momentum vector (0,0,0 supposed to be the starting point of the track)
+  double x = m_Segments.at(min_index).getInnerMostHit().getWirePosX();
+  double y = m_Segments.at(min_index).getInnerMostHit().getWirePosY();
+  double z = m_Segments.at(min_index).getInnerMostHit().getWirePosZ();
+  double norm = sqrt(x * x + y * y + z * z);
+
+  m_momentumVector.SetX(x / norm);
+  m_momentumVector.SetY(y / norm);
+  m_momentumVector.SetZ(z / norm);
+
+  //B2INFO("Momentum vector: "<<m_momentumVector.X()<<"  "<<m_momentumVector.Y()<<"  "<<m_momentumVector.Z());
+
 
 }
 
-int CDCTrack::getNStereoSegments()
-{
-  int nStereoSegments = 0;
-  for (int i = 0; i < m_nSegments; i++) {
-    if (m_Segments.at(i).getIsAxial() == false) nStereoSegments ++ ;
-  }
-  return nStereoSegments;
-
-}
 
 
 

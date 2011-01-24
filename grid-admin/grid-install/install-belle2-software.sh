@@ -15,7 +15,7 @@ fi
 
 # Set software version and install location
 
-SOFTWARE_VERSION=${1:-"build_2010-12-13"}
+SOFTWARE_VERSION=${1:-"build-2010-12-13"}
 EXTERNALS_VERSION=v00-00-03
 SOFTWARE_TAR=belle2-$SOFTWARE_VERSION-$PLATFORM.tgz
 

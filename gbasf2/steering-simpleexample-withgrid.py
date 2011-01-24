@@ -19,7 +19,7 @@ type = 'data'
 # estimated Average Events per Minute (eg official MC = 40)
 evtpermin = '40'
 # Software Version
-swver = 'build_2010-12-13'
+swver = 'build-2010-12-13'
 # (optional) Files to be send with the job
 inputsandboxfiles = 'file1.txt,file2.txt'
 # (optional) max events - the maximum number of events to use

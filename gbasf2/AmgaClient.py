@@ -64,11 +64,12 @@ class AmgaClient(object):
             else:
                 print 'using password auth'
               # self.client = mdclient.MDClient('amga.ijs.si', 8822, '', '')
-              # self.client = mdclient.MDClient('cgh10.collab.unimelb.edu.au', 8822, '', '')
-              # self.client = mdclient.MDClient('cgh7.collab.unimelb.edu.au', 8822, '', '')
-                self.client = mdclient.MDClient('150.183.246.196', 8822,
-                        'belle_user', 'belle')
+                self.client = mdclient.MDClient('cgh10.collab.unimelb.edu.au',
+                        8822, 'belle_user', 'belle')
         except Exception, ex:
+              # self.client = mdclient.MDClient('cgh7.collab.unimelb.edu.au', 8822, '', '')
+              # self.client = mdclient.MDClient('150.183.246.196', 8822,
+              #         'belle_user', 'belle')
             print 'Count not connect to AMGA server:', ex
 
         self.client.execute('whoami')

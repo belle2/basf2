@@ -54,6 +54,7 @@ def make_jdl(
     f.write('    InputSandbox = \n')
     f.write('    {\n')
     f.write('      "' + steering_file + '",\n')
+    f.write('      "basf2helper.sh",\n')
     if tar is not None:
         f.write('      "' + tar + '",\n')
     f.write('      "LFN:' + lfn + '"\n')

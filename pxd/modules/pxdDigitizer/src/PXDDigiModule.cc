@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 // Own include
-#include <pxd/modules/pxdDigitizer/PXDDigi.h>
+#include <pxd/modules/pxdDigitizer/PXDDigiModule.h>
 
 #include <time.h>
 
@@ -17,8 +17,8 @@
 #include <pxd/hitpxd/PXDHit.h>
 
 // framework - DataStore
+#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/StoreDefs.h>
 #include <framework/datastore/StoreArray.h>
 
 // framework aux
@@ -26,7 +26,7 @@
 #include <framework/logging/Logger.h>
 
 // ROOT
-#include "TVector3.h"
+#include <TVector3.h>
 
 using namespace std;
 using namespace boost;
@@ -35,13 +35,13 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(PXDDigi, "PXDDigitizer")
+REG_MODULE(PXDDigi)
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-PXDDigi::PXDDigi() : Module(),
+PXDDigiModule::PXDDigiModule() : Module(),
     m_cheater(new PXDcheater()),
     m_cid(new CIDManager(0)),
     m_random(new TRandom3(0))
@@ -50,20 +50,20 @@ PXDDigi::PXDDigi() : Module(),
   setDescription("PXDDigitizer");
 
   // Add parameters
-  addParam("InputColName", m_inColName, string("PXDSimHitArray"), "Input collection name");
-  addParam("OutputColName", m_outColName, string("PXDHitArray"), "Output collection name");
-  //addParam("RelationColNameMC2Digi", m_relColNameMC2Digi, string("PXDMC2DigiHitRel"),
-  //      "Name of relation collection - MC hits to Digitizer hits. (created if non-null)");
+  addParam("InputColName", m_inColName, "Input collection name", string("PXDSimHitArray"));
+  addParam("OutputColName", m_outColName, "Output collection name", string("PXDHitArray"));
+  //addParam("RelationColNameMC2Digi", m_relColNameMC2Digi,
+  //      "Name of relation collection - MC hits to Digitizer hits. (created if non-null)", string("PXDMC2DigiHitRel"));
 }
 
-PXDDigi::~PXDDigi()
+PXDDigiModule::~PXDDigiModule()
 {
   if (m_random) delete m_random;
   if (m_cid) delete m_cid;
   if (m_cheater) delete m_cheater;
 }
 
-void PXDDigi::initialize()
+void PXDDigiModule::initialize()
 {
   // Initialize variables
   m_nRun    = 0 ;
@@ -76,13 +76,13 @@ void PXDDigi::initialize()
   m_timeCPU = clock() * Unit::us;
 }
 
-void PXDDigi::beginRun()
+void PXDDigiModule::beginRun()
 {
   // Print run number
   B2INFO("PXDDigi: Processing run: " << m_nRun);
 }
 
-void PXDDigi::event()
+void PXDDigiModule::event()
 {
   //------------------------------------------------------
   // Get the collection of PXDSimHits from the Data store.
@@ -158,12 +158,12 @@ void PXDDigi::event()
   m_nEvent++;
 }
 
-void PXDDigi::endRun()
+void PXDDigiModule::endRun()
 {
   m_nRun++;
 }
 
-void PXDDigi::terminate()
+void PXDDigiModule::terminate()
 {
   // CPU time end
   m_timeCPU = clock() * Unit::us - m_timeCPU;
@@ -172,7 +172,7 @@ void PXDDigi::terminate()
   B2INFO("PXDDigi finished. Time per event: " << m_timeCPU / m_nEvent / Unit::ms << " ms.");
 }
 
-void PXDDigi::printModuleParams() const
+void PXDDigiModule::printModuleParams() const
 {
   B2INFO("PXDDigi parameters:")
   B2INFO("  Input collection name:  " << m_inColName)

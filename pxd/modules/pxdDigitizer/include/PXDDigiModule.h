@@ -8,16 +8,16 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PXDDIGI_H
-#define PXDDIGI_H
+#ifndef PXDDIGIMODULE_H
+#define PXDDIGIMODULE_H
 
 #include <framework/core/Module.h>
-
-#include <string>
-
-#include "TRandom3.h"
 #include <pxd/hitpxd/CIDManager.h>
 #include <pxd/modules/pxdDigitizer/PXDcheater.h>
+
+#include <TRandom3.h>
+
+#include <string>
 
 namespace Belle2 {
 
@@ -32,15 +32,15 @@ namespace Belle2 {
    * A full digitization will be added later.
    */
 
-  class PXDDigi : public Module {
+  class PXDDigiModule : public Module {
 
   public:
 
     /** Constructor.*/
-    PXDDigi();
+    PXDDigiModule();
 
     /** Destructor.*/
-    virtual ~PXDDigi();
+    virtual ~PXDDigiModule();
 
     /**
      * Initialize the Module.
@@ -104,4 +104,4 @@ namespace Belle2 {
 
 } // Belle2 namespace
 
-#endif // PXDDigi
+#endif // PXDDIGIMODULE_H

@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2010-2011  Belle II Collaboration                         *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Andreas Moll                                             *
+ * Contributors: Peter Kvasnicka                                          *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -11,22 +11,22 @@
 #ifndef PXDSENSITIVEDETECTOR_H_
 #define PXDSENSITIVEDETECTOR_H_
 
-#include <pxd/simpxd/PXDB4VHit.h>
-#include "G4VSensitiveDetector.hh"
+#include <pxd/hitpxd/PXDSimHit.h>
+#include <simulation/kernel/SensitiveDetectorBase.h>
 
 namespace Belle2 {
 
   /**
    * The PXD Sensitive Detector class.
    *
-   * In this class, every variable defined in PXDB4VHit will be
-   * calculated, and the PXDB4VHit will be added into  collection.
+   * In this class, every variable defined in PXDSimHit will be
+   * calculated, and the PXDSimHit will be added to the DataStore.
    * This is a simplistic implementation usable only for the very
    * thin PXD detectors - a single GEANT4 step is assumed for each
    * pass through the active detector.
    */
 
-  class PXDSensitiveDetector: public G4VSensitiveDetector {
+  class PXDSensitiveDetector: public Simulation::SensitiveDetectorBase {
 
   public:
 
@@ -51,10 +51,8 @@ namespace Belle2 {
 
   private:
 
-    PXDB4VHitsCollection* m_hitCollection; /*!< The collection of hits in this sensitive detector. */
-    G4int m_hitColID;
-
-    PXDB4VHit* m_currentHit;
+    int m_hitNumber;         /**< The current number of created hits. Used to fill the DataStore PXD array.*/
+    PXDSimHit* m_currentHit;
 
   };
 

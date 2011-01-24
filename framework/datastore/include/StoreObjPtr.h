@@ -14,7 +14,6 @@
 #include <utility>
 
 #include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreDefs.h>
 #include <framework/datastore/Relation.h>
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/StoreAccessorAbs.h>
@@ -42,7 +41,7 @@ namespace Belle2 {
      *                    if one with given name AND type exists, and aborts otherwise. If false, it either points
      *                    to existing object with name AND type, or NULL.
      */
-    StoreObjPtr(const std::string& name, const EDurability& durability = c_Event, bool generate = true) {
+    StoreObjPtr(const std::string& name, const DataStore::EDurability& durability = DataStore::c_Event, bool generate = true) {
       if (assignObject(name, durability,  generate)) {
         B2DEBUG(100, name);
       };
@@ -64,7 +63,7 @@ namespace Belle2 {
      *                    if one with given name AND type exists, and aborts otherwise. If false, it either points
      *                    to existing object with name AND type, or NULL.
      */
-    bool assignObject(const std::string& name, const EDurability& durability = c_Event, bool generate = false);
+    bool assignObject(const std::string& name, const DataStore::EDurability& durability = DataStore::c_Event, bool generate = false);
 
     /** Store existing object.
      *
@@ -74,7 +73,7 @@ namespace Belle2 {
      *  @param name Name of the object to be stored.
      *  @param durability Decides durability map used to store the object.
      */
-    bool storeObject(T* AObject, const std::string& name, const EDurability& durability = c_Event);
+    bool storeObject(T* AObject, const std::string& name, const DataStore::EDurability& durability = DataStore::c_Event);
 
     /** Imitate pointer functionality. */
     T& operator *() const {return *m_storeObjPtr;};
@@ -119,7 +118,7 @@ namespace Belle2 {
 
 // ------------ Implementation of template class ------------------------------------------------
 template <class T>
-bool StoreObjPtr<T>::assignObject(const std::string& name, const EDurability& durability, bool generate)
+bool StoreObjPtr<T>::assignObject(const std::string& name, const DataStore::EDurability& durability, bool generate)
 {
   if (name == "") { B2FATAL("No Name was specified");}
 
@@ -137,7 +136,7 @@ bool StoreObjPtr<T>::assignObject(const std::string& name, const EDurability& du
 }
 
 template <class T>
-bool StoreObjPtr<T>::storeObject(T* AObject, const std::string& name, const EDurability& durability)
+bool StoreObjPtr<T>::storeObject(T* AObject, const std::string& name, const DataStore::EDurability& durability)
 {
   if (name == "") { B2FATAL("No Name was specified");}
 

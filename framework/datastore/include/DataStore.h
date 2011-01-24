@@ -12,7 +12,7 @@
 #define DATASTORE_H
 
 #include <framework/logging/Logger.h>
-#include <framework/datastore/StoreDefs.h>
+//#include <framework/datastore/StoreDefs.h>
 #include <framework/datastore/StoreMapIter.h>
 
 #include <TObject.h>
@@ -40,6 +40,30 @@ namespace Belle2 {
    */
   class DataStore {
   public:
+    typedef std::map<std::string, TObject*> StoreObjMap;         /**< Map for TObjects. */
+    typedef std::map<std::string, TClonesArray*> StoreArrayMap;  /**< Map for TClonesArrays. */
+    typedef StoreObjMap::iterator StoreObjIter;                  /**< Iterator for TObjectMap. */
+    typedef StoreArrayMap::iterator StoreArrayIter;              /**< Iterator for TClonesArraysMap.*/
+
+    /** Durability types.
+     *
+     *  These types are used to identify the map used in the DataStore.
+     *  @author <a href="mailto:martin.heck@kit.edu?subject=EDurability">Martin Heck</a>
+     */
+    enum EDurability {
+      c_Event,     /**< Object is deleted after event. */
+      c_Run,       /**< Object is deleted after run. */
+      c_Persistent /**< Object is persistent. */
+    };
+
+    /** Number of Durability Types.
+     *
+     *  Probably useless, but in principle additional maps are easily created this way.
+     */
+    enum ENDurabilityTypes {
+      c_NDurabilityTypes = 3 /**< Total number of durability types. */
+    };
+
 
     /** Instance of singleton Store.
      *

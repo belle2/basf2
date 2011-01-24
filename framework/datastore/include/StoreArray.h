@@ -14,7 +14,6 @@
 #include <framework/datastore/StoreAccessorAbs.h>
 #include <TClonesArray.h>
 #include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreDefs.h>
 #include <framework/datastore/Relation.h>
 #include <framework/datastore/RelationArray.h>
 
@@ -40,7 +39,7 @@ namespace Belle2 {
      *  @param durability Specifies lifetime of array in question.
      *  @param generate Shall array be created, if none with name exists so far.
      */
-    StoreArray(const std::string& name, const EDurability& durability = c_Event, bool generate = true) {
+    StoreArray(const std::string& name, const DataStore::EDurability& durability = DataStore::c_Event, bool generate = true) {
       if (assignArray(name, durability, generate)) {
         B2DEBUG(100, "A TClonesArray with name " + name + " has been generated");
       }
@@ -52,7 +51,7 @@ namespace Belle2 {
      *  @param durability Specifies lifetime of array in question.
      *  @param generate Shall array be created, if none with name exists so far.
      */
-    bool assignArray(const std::string& name, const EDurability& durability = c_Event, bool generate = false);
+    bool assignArray(const std::string& name, const DataStore::EDurability& durability = DataStore::c_Event, bool generate = false);
 
     /** Imitate array functionality. */
     TClonesArray& operator *() const {return *m_storeArray;}
@@ -124,7 +123,7 @@ using namespace std;
 
 
 template <class T>
-bool StoreArray<T>::assignArray(const std::string& name, const EDurability& durability, bool generate)
+bool StoreArray<T>::assignArray(const std::string& name, const DataStore::EDurability& durability, bool generate)
 {
   if (name == "") {B2FATAL("No name was specified!");}
 

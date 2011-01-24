@@ -94,16 +94,30 @@ namespace Belle2 {
      *
      * A parameter consists of a reference pointing to a member variable in the module
      * which stores and allows fast access to the parameter value. In addition the type
-     * of the parameter is saved and optionally a description can be given.
+     * of the parameter is saved and a description is given.
      *
      * @param name The unique name of the parameter.
      * @param paramVariable Reference to the variable which stores the parameter value.
+     * @param description An description of the parameter.
      * @param defaultValue The default value of the parameter.
-     * @param description An optional description of the parameter.
-     * @param force If set to true the parameter has to be defined in the steering file by the user.
      */
     template<typename T>
-    void addParameter(const std::string& name, T& paramVariable, const T& defaultValue, const std::string& description = "", bool force = false);
+    void addParameter(const std::string& name, T& paramVariable, const std::string& description, const T& defaultValue);
+
+    /**
+     * Adds a new enforced parameter to the module list.
+     *
+     * A parameter consists of a reference pointing to a member variable in the module
+     * which stores and allows fast access to the parameter value. In addition the type
+     * of the parameter is saved and a description is given.
+     * This parameter has to be set by the user in the steering file.
+     *
+     * @param name The unique name of the parameter.
+     * @param paramVariable Reference to the variable which stores the parameter value.
+     * @param description An description of the parameter.
+     */
+    template<typename T>
+    void addParameter(const std::string& name, T& paramVariable, const std::string& description);
 
     /**
      * Sets the value of a parameter given by its name.
@@ -274,9 +288,9 @@ namespace Belle2 {
   //======================================================
 
   template<typename T>
-  void ModuleParamList::addParameter(const std::string& name, T& paramVariable, const T& defaultValue, const std::string& description, bool force)
+  void ModuleParamList::addParameter(const std::string& name, T& paramVariable, const std::string& description, const T& defaultValue)
   {
-    ModuleParamPtr newParam(new ModuleParam<T>(paramVariable, description, force));
+    ModuleParamPtr newParam(new ModuleParam<T>(paramVariable, description, false));
 
     //Check if a parameter with the given name already exists
     std::map<std::string, ModuleParamPtr>::iterator mapIter;
@@ -286,6 +300,23 @@ namespace Belle2 {
       m_paramMap.insert(std::make_pair(name, newParam));
       ModuleParam<T>* explModParam = static_cast< ModuleParam<T>* >(newParam.get());
       explModParam->setDefaultValue(defaultValue);
+    } else {
+      B2ERROR("A parameter with the name '" + name + "' already exists ! The name of a module parameter must be unique within a module.")
+    }
+  }
+
+
+  template<typename T>
+  void ModuleParamList::addParameter(const std::string& name, T& paramVariable, const std::string& description)
+  {
+    ModuleParamPtr newParam(new ModuleParam<T>(paramVariable, description, true));
+
+    //Check if a parameter with the given name already exists
+    std::map<std::string, ModuleParamPtr>::iterator mapIter;
+    mapIter = m_paramMap.find(name);
+
+    if (mapIter == m_paramMap.end()) {
+      m_paramMap.insert(std::make_pair(name, newParam));
     } else {
       B2ERROR("A parameter with the name '" + name + "' already exists ! The name of a module parameter must be unique within a module.")
     }

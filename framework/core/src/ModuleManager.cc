@@ -167,9 +167,9 @@ void ModuleManager::fillModuleNameLibMap(boost::filesystem::directory_entry& map
   ifstream mapFile(mapPath.string().c_str());
   string currentLine;
 
-  //Read each line of the map file and use boost regular expression to find the quoted module name string
+  //Read each line of the map file and use boost regular expression to find the module name string in brackets.
   string::const_iterator start, end;
-  boost::regex expression("\"(.+)\"");
+  boost::regex expression("\\((.+)\\)");
   boost::match_results<std::string::const_iterator> matchResult;
   boost::match_flag_type flags = boost::match_default;
 

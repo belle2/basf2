@@ -16,12 +16,12 @@
 namespace Belle2 {
 
   /*! Class definition of HistoManager module */
-  class HistoManager : public Module {
+  class HistoManagerModule : public Module {
   public:
 
     //! Constructor and Destructor
-    HistoManager();
-    virtual ~HistoManager();
+    HistoManagerModule();
+    virtual ~HistoManagerModule();
 
     //! module functions
     virtual void initialize();

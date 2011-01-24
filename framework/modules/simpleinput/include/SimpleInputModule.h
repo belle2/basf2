@@ -8,12 +8,11 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef SIMPLEINPUT_H
-#define SIMPLEINPUT_H
+#ifndef SIMPLEINPUTMODULE_H
+#define SIMPLEINPUTMODULE_H
 
 #include <framework/core/Module.h>
 #include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreDefs.h>
 
 #include <string>
 #include <vector>
@@ -34,15 +33,15 @@ namespace Belle2 {
    *  @sa EDurability
    *  @author <a href="mailto:martin.heck@kit.edu?subject=Input Module">Martin Heck</a>
   */
-  class SimpleInput : public Module {
+  class SimpleInputModule : public Module {
 
   public:
 
     /** Constructor. */
-    SimpleInput();
+    SimpleInputModule();
 
     /** Destructor. */
-    virtual ~SimpleInput();
+    virtual ~SimpleInputModule();
 
     /*! Initialize the Module */
     /*!
@@ -81,7 +80,7 @@ namespace Belle2 {
     void setupTFile();
 
     /*! Function that actually performs the reading from the tree into m_objects. */
-    void readTree(const EDurability& durability);
+    void readTree(const DataStore::EDurability& durability);
 
 
     //first the steerable variables:
@@ -94,13 +93,13 @@ namespace Belle2 {
     /*! Name array for input tree names. */
     /*! Each element of the array is steerable as separate string.
     */
-    std::string m_treeNames[c_NDurabilityTypes];
+    std::string m_treeNames[DataStore::c_NDurabilityTypes];
 
     /*! Array for names of branches, that shall be written out. */
     /*! Empty vector results in all branches being read.
         These vectors can be configured in the steering file.
     */
-    std::vector<std::string> m_branchNames[c_NDurabilityTypes];
+    std::vector<std::string> m_branchNames[DataStore::c_NDurabilityTypes];
 
     /*! Event Number. */
     /*! Steerable number of events to be skipped before start.
@@ -111,22 +110,22 @@ namespace Belle2 {
     //then those for purely internal use:
 
     /*! Name of */
-    std::vector<std::string> m_objectNames[c_NDurabilityTypes];
+    std::vector<std::string> m_objectNames[DataStore::c_NDurabilityTypes];
 
     /*! TFile for input. */
     TFile* m_file;
 
     /*!  TTree for input. */
-    TTree* m_tree[c_NDurabilityTypes];
+    TTree* m_tree[DataStore::c_NDurabilityTypes];
 
     /*! Total number of branches. */
-    int m_size[c_NDurabilityTypes];
+    int m_size[DataStore::c_NDurabilityTypes];
 
     /*! Number of branches from non-array objects. */
-    int m_sizeObj[c_NDurabilityTypes];
+    int m_sizeObj[DataStore::c_NDurabilityTypes];
 
     /*! Pointer to pointer, that can be utilised by the TTree. */
-    TObject** m_objects[c_NDurabilityTypes];
+    TObject** m_objects[DataStore::c_NDurabilityTypes];
 
     /*! String vector with steering parameter Names for m_treeNames. */
     std::vector<std::string>  m_steerTreeNames;
@@ -138,4 +137,4 @@ namespace Belle2 {
 
 } // end namespace Belle2
 
-#endif // SIMPLEINPUT_H
+#endif // SIMPLEINPUTMODULE_H

@@ -6,7 +6,7 @@
 // Date : 13 - Aug - 2010
 //-
 
-#include <framework/modules/pseqrootoutput/pseqrootoutput.h>
+#include <framework/modules/pseqrootoutput/pseqrootoutputModule.h>
 #include <stdlib.h>
 
 using namespace std;
@@ -15,17 +15,17 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(pSeqRootOutput, "pSeqRootOutput")
+REG_MODULE(pSeqRootOutput)
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-pSeqRootOutput::pSeqRootOutput() : pOutputServer()
+pSeqRootOutputModule::pSeqRootOutputModule() : pOutputServer()
 {
   //Set module properties
   setDescription("SeqROOT output with parallel capability");
-  setPropertyFlags(c_WritesDataSingleProcess | c_WritesDataMultiProcess);
+  setPropertyFlags(c_Output | c_ParallelProcessingCertified);
 
   m_nsent = 0;
   m_nrecv = 0;
@@ -33,24 +33,24 @@ pSeqRootOutput::pSeqRootOutput() : pOutputServer()
   m_file = 0;
 
   //Parameter definition
-  addParam("outputFileName"  , m_outputFileName, string("pSeqRootOutput.root"), "SeqRoot file name.");
-  addParam("compressionLevel", m_compressionLevel, 1, "Compression Level: 0 for no, 1 for low, 9 for high compression.");
+  addParam("outputFileName"  , m_outputFileName, "SeqRoot file name.", string("pSeqRootOutput.root"));
+  addParam("compressionLevel", m_compressionLevel, "Compression Level: 0 for no, 1 for low, 9 for high compression.", 1);
 
   B2INFO("pSeqRootOutput: Constructor done.");
 }
 
 
-pSeqRootOutput::~pSeqRootOutput()
+pSeqRootOutputModule::~pSeqRootOutputModule()
 {
 }
 
-void pSeqRootOutput::initialize()
+void pSeqRootOutputModule::initialize()
 {
 
   // get iterators
-  for (int ii = 0; ii < c_NDurabilityTypes; ii++) {
-    m_obj_iter[ii]   = DataStore::Instance().getObjectIterator(static_cast<EDurability>(ii));
-    m_array_iter[ii] = DataStore::Instance().getArrayIterator(static_cast<EDurability>(ii));
+  for (int ii = 0; ii < DataStore::c_NDurabilityTypes; ii++) {
+    m_obj_iter[ii]   = DataStore::Instance().getObjectIterator(static_cast<DataStore::EDurability>(ii));
+    m_array_iter[ii] = DataStore::Instance().getArrayIterator(static_cast<DataStore::EDurability>(ii));
     //    m_done[ii]     = false;
   }
 
@@ -74,7 +74,7 @@ void pSeqRootOutput::initialize()
 }
 
 
-void pSeqRootOutput::beginRun()
+void pSeqRootOutputModule::beginRun()
 {
   EvtMessage* msg = buildMessage(MSG_BEGIN_RUN);
 
@@ -95,7 +95,7 @@ void pSeqRootOutput::beginRun()
   B2INFO("beginRun called.");
 }
 
-void pSeqRootOutput::event()
+void pSeqRootOutputModule::event()
 {
   EvtMessage* msg = buildMessage(MSG_EVENT);
 
@@ -115,7 +115,7 @@ void pSeqRootOutput::event()
   //  B2INFO ( "Event sent : " << m_nsent++ )
 }
 
-void pSeqRootOutput::endRun()
+void pSeqRootOutputModule::endRun()
 {
   //fill Run data
 
@@ -123,7 +123,7 @@ void pSeqRootOutput::endRun()
 }
 
 
-void pSeqRootOutput::terminate()
+void pSeqRootOutputModule::terminate()
 {
   // Single process mode
   if (Framework::nprocess() == 0)  {
@@ -142,14 +142,14 @@ void pSeqRootOutput::terminate()
 
 // Fill Datastore
 
-EvtMessage* pSeqRootOutput::buildMessage(RECORD_TYPE rectype)
+EvtMessage* pSeqRootOutputModule::buildMessage(RECORD_TYPE rectype)
 {
 
   m_msghandler->clear();
 
-  EDurability durability = c_Event;
+  DataStore::EDurability durability = DataStore::c_Event;
   if (rectype == MSG_BEGIN_RUN)
-    durability = c_Run;
+    durability = DataStore::c_Run;
 
 
   // Collect objects and place them in msghandler
@@ -186,7 +186,7 @@ EvtMessage* pSeqRootOutput::buildMessage(RECORD_TYPE rectype)
 
 
 // Output Server function
-void pSeqRootOutput::output_server(void)
+void pSeqRootOutputModule::output_server(void)
 {
   B2INFO("----> Output Server Invoked");
 

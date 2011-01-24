@@ -21,7 +21,6 @@
 #include <vector>
 
 #include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreDefs.h>
 
 #include <TFile.h>
 #include <TTree.h>
@@ -46,14 +45,14 @@ namespace Belle2 {
   /*! Class definition for pRootOutput module which substitutes SimpleOutput module. */
   /*! This module is capable of parallel processing. */
 
-  class pRootOutput : public pOutputServer {
+  class pRootOutputModule : public pOutputServer {
 
     // Public functions
   public:
 
     //! Constructor / Destructor
-    pRootOutput();
-    virtual ~pRootOutput();
+    pRootOutputModule();
+    virtual ~pRootOutputModule();
 
     //! Module functions to be called from main process
     virtual void initialize();
@@ -72,18 +71,18 @@ namespace Belle2 {
     void setupTFile();
 
     //! Initialize TTree by looking at the record
-    void setupTTree(const EDurability&);
+    void setupTTree(const DataStore::EDurability&);
 
     //! Fill TTree in single process mode
-    void fillTree(const EDurability&);
+    void fillTree(const DataStore::EDurability&);
 
     //! Fill RingBuffer in multiprocess mode
-    void fillRingBuf(const EDurability&);
+    void fillRingBuf(const DataStore::EDurability&);
 
     //! Get size of object
-    size_t getSizeOfObj(const EDurability&);
+    size_t getSizeOfObj(const DataStore::EDurability&);
     //! Get size of array
-    size_t getSizeOfArray(const EDurability&);
+    size_t getSizeOfArray(const DataStore::EDurability&);
 
     // Data members
   private:
@@ -100,31 +99,31 @@ namespace Belle2 {
     int m_compressionLevel;
 
     //! DataStore iterators
-    StoreIter* m_obj_iter[c_NDurabilityTypes];
-    StoreIter* m_array_iter[c_NDurabilityTypes];
+    StoreIter* m_obj_iter[DataStore::c_NDurabilityTypes];
+    StoreIter* m_array_iter[DataStore::c_NDurabilityTypes];
 
     //! TFile for output.
     TFile* m_file;
 
     //!  TTree for output.
-    TTree* m_tree[c_NDurabilityTypes];
+    TTree* m_tree[DataStore::c_NDurabilityTypes];
 
     //! Namess of TTrees and Branches
-    std::string m_treeNames[c_NDurabilityTypes];
-    std::vector<std::string> m_branchNames[c_NDurabilityTypes];
+    std::string m_treeNames[DataStore::c_NDurabilityTypes];
+    std::vector<std::string> m_branchNames[DataStore::c_NDurabilityTypes];
 
     //! List of objects in TTree
-    std::vector<std::string> m_objnames[c_NDurabilityTypes];
-    std::vector<TBranch*> m_objbrs[c_NDurabilityTypes];
-    std::vector<TObject*> m_objects[c_NDurabilityTypes];
+    std::vector<std::string> m_objnames[DataStore::c_NDurabilityTypes];
+    std::vector<TBranch*> m_objbrs[DataStore::c_NDurabilityTypes];
+    std::vector<TObject*> m_objects[DataStore::c_NDurabilityTypes];
 
     //! List of arrays in TTree
-    std::vector<std::string> m_arraynames[c_NDurabilityTypes];
-    std::vector<TBranch*> m_arraybrs[c_NDurabilityTypes];
-    std::vector<TClonesArray*> m_arrays[c_NDurabilityTypes];
+    std::vector<std::string> m_arraynames[DataStore::c_NDurabilityTypes];
+    std::vector<TBranch*> m_arraybrs[DataStore::c_NDurabilityTypes];
+    std::vector<TClonesArray*> m_arrays[DataStore::c_NDurabilityTypes];
 
     //! Has branch creation already happened?
-    bool m_done[c_NDurabilityTypes];
+    bool m_done[DataStore::c_NDurabilityTypes];
 
     // Parallel processing parameters
 

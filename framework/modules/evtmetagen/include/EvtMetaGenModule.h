@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EVTMETAGEN_H_
-#define EVTMETAGEN_H_
+#ifndef EVTMETAGENMODULE_H_
+#define EVTMETAGENMODULE_H_
 
 #include <framework/core/Module.h>
 #include <vector>
@@ -72,4 +72,4 @@ namespace Belle2 {
   };
 }
 
-#endif /* EVTMETAGEN_H_ */
+#endif /* EVTMETAGENMODULE_H_ */

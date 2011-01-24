@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <framework/modules/simpleinput/simpleinput.h>
+#include <framework/modules/simpleinput/SimpleInputModule.h>
 
 
 using namespace std;
@@ -17,20 +17,20 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(SimpleInput, "SimpleInput")
+REG_MODULE(SimpleInput)
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-SimpleInput::SimpleInput() : Module()
+SimpleInputModule::SimpleInputModule() : Module()
 {
   //Set module properties
   setDescription("simple input");
-  setPropertyFlags(c_TriggersNewRun | c_TriggersEndOfData | c_ReadsDataSingleProcess | c_RequiresSingleProcess);
+  setPropertyFlags(c_TriggersNewRun | c_TriggersEndOfData | c_Input);
 
   //Initialization of some member variables
-  for (int jj = 0; jj < c_NDurabilityTypes; jj++) {
+  for (int jj = 0; jj < DataStore::c_NDurabilityTypes; jj++) {
     m_size[jj]    = 0;
     m_sizeObj[jj] = 0;
     m_treeNames[jj]   = "NONE";
@@ -49,25 +49,25 @@ SimpleInput::SimpleInput() : Module()
 
 
   //Parameter definition
-  addParam("inputFileName", m_inputFileName, string("SimpleInput.root"), "TFile name.");
+  addParam("inputFileName", m_inputFileName, "TFile name.", string("SimpleInput.root"));
 
-  addParam(m_steerTreeNames[0], m_treeNames[0], string("tree"), "TTree name for event data. NONE for no input.");
-  addParam(m_steerTreeNames[1], m_treeNames[1], string("NONE"), "TTree name for run data. NONE for no input.");
-  addParam(m_steerTreeNames[2], m_treeNames[2], string("NONE"), "TTree name for persistent data. NONE for no input.");
+  addParam(m_steerTreeNames[0], m_treeNames[0], "TTree name for event data. NONE for no input.", string("tree"));
+  addParam(m_steerTreeNames[1], m_treeNames[1], "TTree name for run data. NONE for no input.", string("NONE"));
+  addParam(m_steerTreeNames[2], m_treeNames[2], "TTree name for persistent data. NONE for no input.", string("NONE"));
 
-  addParam("eventNumber", m_eventNumber, 0, "Skip this number of events before starting.");
+  addParam("eventNumber", m_eventNumber, "Skip this number of events before starting.", 0);
 
   vector<string> branchNames;
-  addParam(m_steerBranchNames[0], m_branchNames[0], branchNames, "Names of branches to be read into event map. Empty means all branches.");
-  addParam(m_steerBranchNames[1], m_branchNames[1], branchNames, "Names of branches to be read into run map. Empty means all branches.");
-  addParam(m_steerBranchNames[2], m_branchNames[2], branchNames, "Names of branches to be read into persistent map. Empty means all branches.");
+  addParam(m_steerBranchNames[0], m_branchNames[0], "Names of branches to be read into event map. Empty means all branches.", branchNames);
+  addParam(m_steerBranchNames[1], m_branchNames[1], "Names of branches to be read into run map. Empty means all branches.", branchNames);
+  addParam(m_steerBranchNames[2], m_branchNames[2], "Names of branches to be read into persistent map. Empty means all branches.", branchNames);
 }
 
 
-SimpleInput::~SimpleInput()
+SimpleInputModule::~SimpleInputModule()
 {}
 
-void SimpleInput::initialize()
+void SimpleInputModule::initialize()
 {
   //Open TFile
   m_file = new TFile(m_inputFileName.c_str(), "READ");
@@ -75,7 +75,7 @@ void SimpleInput::initialize()
   if (!m_file) {B2FATAL("Input file " + m_inputFileName + " doesn't exist");}
   B2INFO("Opened file " + m_inputFileName);
 
-  for (int ii = 0; ii < c_NDurabilityTypes; ++ii) {
+  for (int ii = 0; ii < DataStore::c_NDurabilityTypes; ++ii) {
     //Get TTree
     if (m_treeNames[ii] != "NONE") {
       m_tree[ii] = dynamic_cast<TTree*>(m_file->Get(m_treeNames[ii].c_str()));
@@ -130,46 +130,46 @@ void SimpleInput::initialize()
     }
   }
 
-  if (m_tree[c_Persistent]) {
-    readTree(c_Persistent);
+  if (m_tree[DataStore::c_Persistent]) {
+    readTree(DataStore::c_Persistent);
   }
 
 }
 
 
-void SimpleInput::beginRun()
+void SimpleInputModule::beginRun()
 {
   cout << "beginRun called" << endl;
 }
 
 
-void SimpleInput::event()
+void SimpleInputModule::event()
 {
   m_file->cd();
 
-  readTree(c_Event);
+  readTree(DataStore::c_Event);
   m_eventNumber++;
 }
 
 
-void SimpleInput::endRun()
+void SimpleInputModule::endRun()
 {
   cout << "endRun called" << endl;
 }
 
 
-void SimpleInput::terminate()
+void SimpleInputModule::terminate()
 {
   cout << "Term called" << endl;
 }
 
 
-void SimpleInput::setupTFile()
+void SimpleInputModule::setupTFile()
 {
 }
 
 
-void SimpleInput::readTree(const EDurability& durability)
+void SimpleInputModule::readTree(const DataStore::EDurability& durability)
 {
   // Fill m_objects
   B2DEBUG(200, "Durability" << durability)
@@ -187,7 +187,7 @@ void SimpleInput::readTree(const EDurability& durability)
 
 }
 
-TBranch* SimpleInput::validBranch(int& ibranch, TObjArray* branches)
+TBranch* SimpleInputModule::validBranch(int& ibranch, TObjArray* branches)
 {
   TBranch* branch = static_cast<TBranch*>(branches->At(ibranch));
   if (!branch) {

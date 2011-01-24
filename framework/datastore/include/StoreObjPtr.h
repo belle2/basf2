@@ -21,6 +21,7 @@
 #include <framework/logging/Logger.h>
 
 namespace Belle2 {
+
   /** Type save access pointer.
    *
    *  Use this, if you want to access or create a single object in the store.

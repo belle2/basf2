@@ -6,7 +6,7 @@
 // Date : 2 - Jun - 2010
 //-
 
-#include <framework/modules/prootinput/prootinput.h>
+#include <framework/modules/prootinput/prootinputModule.h>
 
 using namespace std;
 using namespace Belle2;
@@ -14,49 +14,49 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(pRootInput, "pRootInput")
+REG_MODULE(pRootInput)
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-pRootInput::pRootInput() : pEventServer()
+pRootInputModule::pRootInputModule() : pEventServer()
 {
   setDescription("pBasf2: ROOT input module");
-  setPropertyFlags(c_TriggersNewRun | c_TriggersEndOfData | c_ReadsDataMultiProcess);
+  setPropertyFlags(c_TriggersNewRun | c_TriggersEndOfData | c_Input | c_ParallelProcessingCertified);
 
   m_file = NULL;
 
   //Parameter definition
   // Input file Name
-  addParam("inputFileName", m_inputFileName, string("SimpleInput.root"), "TFile name.");
+  addParam("inputFileName", m_inputFileName, "TFile name.", string("SimpleInput.root"));
 
   // Event number to be skipped
-  addParam("eventNumber", m_eventNumber, 0, "Skip this number of events before starting.");
+  addParam("eventNumber", m_eventNumber, "Skip this number of events before starting.", 0);
 
   // Compression level for message passing
-  addParam("compLevel", m_complevel, 0, "Compression factor for msg_handler");
+  addParam("compLevel", m_complevel, "Compression factor for msg_handler", 0);
 
   // Tree names
-  addParam("EventTree", m_treeNames[0], string("tree"), "TTree name for event data. NONE for no input.");
-  addParam("RunTree", m_treeNames[1], string("NONE"), "TTree name for run data. NONE for no input.");
-  addParam("PersistentTree", m_treeNames[2], string("NONE"), "TTree name for persistent data. NONE for no input.");
+  addParam("EventTree", m_treeNames[0], "TTree name for event data. NONE for no input.", string("tree"));
+  addParam("RunTree", m_treeNames[1], "TTree name for run data. NONE for no input.", string("NONE"));
+  addParam("PersistentTree", m_treeNames[2], "TTree name for persistent data. NONE for no input.", string("NONE"));
 
   // Branch names
   vector<string> tmpbranch;
-  addParam("EventBranch", m_branchNames[0], tmpbranch, "Names of branches to be read into event map. Empty means all branches.");
-  addParam("RunBranch", m_branchNames[1], tmpbranch, "Names of branches to be read into run map. Empty means all branches.");
-  addParam("PersistentBranch", m_branchNames[2], tmpbranch, "Names of branches to be read into persistent map. Empty means all branches.");
+  addParam("EventBranch", m_branchNames[0], "Names of branches to be read into event map. Empty means all branches.", tmpbranch);
+  addParam("RunBranch", m_branchNames[1], "Names of branches to be read into run map. Empty means all branches.", tmpbranch);
+  addParam("PersistentBranch", m_branchNames[2], "Names of branches to be read into persistent map. Empty means all branches.", tmpbranch);
 
   B2INFO("pRootInput:Constructor done.")
 }
 
 
-pRootInput::~pRootInput()
+pRootInputModule::~pRootInputModule()
 {
 }
 
-void pRootInput::initialize()
+void pRootInputModule::initialize()
 {
   static TObject* sobj;
   static TClonesArray* sarray;
@@ -71,7 +71,7 @@ void pRootInput::initialize()
   B2INFO("Opened file " + m_inputFileName);
 
   // Setup TTrees
-  for (int ii = 0; ii < c_NDurabilityTypes; ++ii) { // Loop over durabilities
+  for (int ii = 0; ii < DataStore::c_NDurabilityTypes; ++ii) { // Loop over durabilities
     //Get TTree
     if (m_treeNames[ii] != "NONE") {
       m_tree[ii] = dynamic_cast<TTree*>(m_file->Get(m_treeNames[ii].c_str()));
@@ -108,7 +108,7 @@ void pRootInput::initialize()
   }
 
   // Number of events in c_Event tree
-  m_nevt = m_tree[c_Event]->GetEntries();
+  m_nevt = m_tree[DataStore::c_Event]->GetEntries();
 
   // Attach to ring buffer if nprocess > 0
   m_nproc = Framework::nprocess();
@@ -126,21 +126,21 @@ void pRootInput::initialize()
 }
 
 
-void pRootInput::beginRun()
+void pRootInputModule::beginRun()
 {
   //  cout << "beginRun called" << endl;
 }
 
 
-void pRootInput::event()
+void pRootInputModule::event()
 {
 
   int status;
   if (m_nproc == 0) {
     m_file->cd();
-    status = readTree(c_Event);
+    status = readTree(DataStore::c_Event);
   } else {
-    status = readRingBuf(c_Event);
+    status = readRingBuf(DataStore::c_Event);
   }
   if (status == MSG_TERMINATE)
     setProcessRecordType(prt_EndOfData); // EoF detected
@@ -148,24 +148,24 @@ void pRootInput::event()
 }
 
 
-void pRootInput::endRun()
+void pRootInputModule::endRun()
 {
   //  cout << "endRun called" << endl;
 }
 
 
-void pRootInput::terminate()
+void pRootInputModule::terminate()
 {
   //  cout << "Term called" << endl;
 }
 
 
-void pRootInput::setupTFile()
+void pRootInputModule::setupTFile()
 {
 }
 
 
-int pRootInput::readTree(const EDurability& durability)
+int pRootInputModule::readTree(const DataStore::EDurability& durability)
 {
   // Fill m_objects
   //  B2WARNING("Durability" << durability)
@@ -185,7 +185,7 @@ int pRootInput::readTree(const EDurability& durability)
                                      m_arraynames[durability].at(i));
   }
 
-  if (durability == c_Event) {
+  if (durability == DataStore::c_Event) {
     m_eventNumber++;
     if (m_eventNumber > m_nevt)
       return MSG_TERMINATE;
@@ -195,7 +195,7 @@ int pRootInput::readTree(const EDurability& durability)
     return MSG_BEGIN_RUN;
 }
 
-int pRootInput::readRingBuf(const EDurability& indurability)
+int pRootInputModule::readRingBuf(const DataStore::EDurability& indurability)
 {
   // Get a record from ringbuf
   int size;
@@ -215,7 +215,7 @@ int pRootInput::readRingBuf(const EDurability& indurability)
 
   // Get Object info
   RECORD_TYPE type = msg->type();
-  EDurability durability = (EDurability)(msg->header())->reserved[0];
+  DataStore::EDurability durability = (DataStore::EDurability)(msg->header())->reserved[0];
   int nobjs = (msg->header())->reserved[1];
   int narrays = (msg->header())->reserved[2];
 
@@ -235,7 +235,7 @@ int pRootInput::readRingBuf(const EDurability& indurability)
   return type;
 }
 
-TBranch* pRootInput::validBranch(int& ibranch, TObjArray* branches)
+TBranch* pRootInputModule::validBranch(int& ibranch, TObjArray* branches)
 {
   TBranch* branch = static_cast<TBranch*>(branches->At(ibranch));
   if (!branch) {
@@ -261,7 +261,7 @@ TBranch* pRootInput::validBranch(int& ibranch, TObjArray* branches)
 //
 // Event server which is executed in a separate process
 //
-void pRootInput::event_server(void)
+void pRootInputModule::event_server(void)
 {
   //  printf ( "----> Event Server Invoked\n" );
   B2INFO("----> Event Server Invoked");
@@ -279,7 +279,7 @@ void pRootInput::event_server(void)
       exit(0);
     }
 
-    EDurability durability = c_Event;
+    DataStore::EDurability durability = DataStore::c_Event;
     // Fill m_objects
     m_tree[durability]->GetEntry(m_eventNumber);
     //    m_tree->GetEntry(m_eventNumber);

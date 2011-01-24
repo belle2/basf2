@@ -59,14 +59,12 @@ namespace Belle2 {
 
     /** Each module can be tagged with property flags, which indicate certain features of the module. */
     enum EModulePropFlags {
-      c_TriggersNewRun          = 1,   /**< This module is able to trigger new runs. */
-      c_TriggersEndOfData       = 2,   /**< This module is able to send the message that there is no more data available. */
-      c_ReadsDataSingleProcess  = 4,   /**< This module is able to read data from a single data stream (disk/server). */
-      c_ReadsDataMultiProcess   = 8,   /**< This module is able to read data from an event streaming server. */
-      c_WritesDataSingleProcess = 16,  /**< This module is able to write data into a single data stream (disk/server). */
-      c_WritesDataMultiProcess  = 32,  /**< This module is able to write data to an event streaming server. */
-      c_RequiresSingleProcess   = 64,  /**< This module requires the framework to run in single processing mode. */
-      c_RequiresGUISupport      = 128  /**< This module requires the framework to have GUI support built-in. */
+      c_TriggersNewRun              = 1,   /**< This module is able to trigger new runs. */
+      c_TriggersEndOfData           = 2,   /**< This module is able to send the message that there is no more data available. */
+      c_Input                       = 4,   /**< This module is an input module (reads data). */
+      c_Output                      = 8,   /**< This module is an output module (writes data). */
+      c_ParallelProcessingCertified = 16,  /**< This module can be run in parallel processing mode safely (has to comply with certain standards). */
+      c_RequiresGUISupport          = 32   /**< This module requires the framework to have GUI support built-in. */
     };
 
     /**
@@ -297,12 +295,22 @@ namespace Belle2 {
      *
      * @param name The unique name of the parameter.
      * @param paramVariable The local member variable of the module to which the value from the steering file is written.
+     * @param description: a short description of the parameter.
      * @param defaultValue The default value of the parameter which is used if there was no value given in the steering file.
-     * @param description Optional: a short description of the parameter.
-     * @param force Optional: If set to true the parameter has to be set in the steering file by the user.
      */
     template<typename T>
-    void addParam(const std::string& name, T& paramVariable, const T& defaultValue, const std::string& description = "", bool force = false);
+    void addParam(const std::string& name, T& paramVariable, const std::string& description, const T& defaultValue);
+
+    /**
+     * Adds a new enforced parameter to the module. This method has to be called in the constructor of the module.
+     * The user has to set the value for this parameter in the steering file.
+     *
+     * @param name The unique name of the parameter.
+     * @param paramVariable The local member variable of the module to which the value from the steering file is written.
+     * @param description: a short description of the parameter.
+     */
+    template<typename T>
+    void addParam(const std::string& name, T& paramVariable, const std::string& description);
 
     /**
      * Returns a reference to a parameter. The returned parameter has already the correct type.
@@ -410,11 +418,17 @@ namespace Belle2 {
   //       Implementation of template based methods
   //------------------------------------------------------
   template<typename T>
-  void Module::addParam(const std::string& name, T& paramVariable, const T& defaultValue, const std::string& description, bool force)
+  void Module::addParam(const std::string& name, T& paramVariable, const std::string& description, const T& defaultValue)
   {
-    m_moduleParamList.addParameter(name, paramVariable, defaultValue, description, force);
+    m_moduleParamList.addParameter(name, paramVariable, description, defaultValue);
   }
 
+
+  template<typename T>
+  void Module::addParam(const std::string& name, T& paramVariable, const std::string& description)
+  {
+    m_moduleParamList.addParameter(name, paramVariable, description);
+  }
 
   template<typename T>
   ModuleParam<T>& Module::getParam(const std::string& name) const throw(ModuleParamList::ModuleParameterNotFoundError, ModuleParamList::ModuleParameterTypeError)
@@ -539,7 +553,7 @@ namespace Belle2 {
   //------------------------------------------------------
   //             Define convenient macros
   //------------------------------------------------------
-#define REG_MODULE(className, moduleName) ModuleProxy<className> regProxy##className(moduleName);
+#define REG_MODULE(moduleName) ModuleProxy<moduleName##Module> regProxy##moduleName(#moduleName);
 
   //-------------------------------
 

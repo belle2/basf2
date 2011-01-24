@@ -12,7 +12,6 @@
 
 #include <framework/core/ModuleManager.h>
 #include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreDefs.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/EventMetaData.h>
 #include <framework/logging/Logger.h>
@@ -58,7 +57,7 @@ void EventProcessor::process(PathPtr startPath, long maxEvent, long runNumber)
     }
   } else {
     //Store the run number in the MetaData object
-    StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", c_Persistent);
+    StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Persistent);
     eventMetaDataPtr->setRun(runNumber);
   }
 
@@ -182,7 +181,7 @@ void EventProcessor::processCore(PathPtr startPath, const ModulePtrList& moduleP
     }
 
     //Delete event related data in DataStore
-    DataStore::Instance().clearMaps(c_Event);
+    DataStore::Instance().clearMaps(DataStore::c_Event);
 
     currEvent++;
     if ((maxEvent > 0) && (currEvent >= maxEvent)) endProcess = true;
@@ -209,7 +208,7 @@ void EventProcessor::processTerminate(const ModulePtrList& modulePathList)
   }
 
   //Delete persistent data in DataStore
-  DataStore::Instance().clearMaps(c_Persistent);
+  DataStore::Instance().clearMaps(DataStore::c_Persistent);
 }
 
 
@@ -252,5 +251,5 @@ void EventProcessor::processEndRun(const ModulePtrList& modulePathList)
   }
 
   //Delete run related data in DataStore
-  DataStore::Instance().clearMaps(c_Run);
+  DataStore::Instance().clearMaps(DataStore::c_Run);
 }

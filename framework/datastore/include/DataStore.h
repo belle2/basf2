@@ -12,7 +12,6 @@
 #define DATASTORE_H
 
 #include <framework/logging/Logger.h>
-//#include <framework/datastore/StoreDefs.h>
 #include <framework/datastore/StoreMapIter.h>
 
 #include <TObject.h>
@@ -23,6 +22,12 @@
 #include <string>
 
 namespace Belle2 {
+
+  /** Convenient typedefs. */
+  typedef std::map<std::string, TObject*> StoreObjMap;         /**< Map for TObjects. */
+  typedef std::map<std::string, TClonesArray*> StoreArrayMap;  /**< Map for TClonesArrays. */
+  typedef StoreObjMap::iterator StoreObjIter;                  /**< Iterator for TObjectMap. */
+  typedef StoreArrayMap::iterator StoreArrayIter;              /**< Iterator for TClonesArraysMap.*/
 
   /** In the store you can park objects, that have to be accessed by various modules.
    *
@@ -40,10 +45,6 @@ namespace Belle2 {
    */
   class DataStore {
   public:
-    typedef std::map<std::string, TObject*> StoreObjMap;         /**< Map for TObjects. */
-    typedef std::map<std::string, TClonesArray*> StoreArrayMap;  /**< Map for TClonesArrays. */
-    typedef StoreObjMap::iterator StoreObjIter;                  /**< Iterator for TObjectMap. */
-    typedef StoreArrayMap::iterator StoreArrayIter;              /**< Iterator for TClonesArraysMap.*/
 
     /** Durability types.
      *
@@ -63,7 +64,6 @@ namespace Belle2 {
     enum ENDurabilityTypes {
       c_NDurabilityTypes = 3 /**< Total number of durability types. */
     };
-
 
     /** Instance of singleton Store.
      *

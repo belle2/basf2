@@ -6,7 +6,7 @@
 // Date : 13 - Aug - 2010
 //-
 
-#include <framework/modules/prootoutput/prootoutput.h>
+#include <framework/modules/prootoutput/prootoutputModule.h>
 
 #include <stdlib.h>
 
@@ -16,17 +16,17 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(pRootOutput, "pRootOutput")
+REG_MODULE(pRootOutput)
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-pRootOutput::pRootOutput() : pOutputServer()
+pRootOutputModule::pRootOutputModule() : pOutputServer()
 {
   //Set module properties
   setDescription("ROOT output with parallel capability");
-  setPropertyFlags(c_WritesDataSingleProcess | c_WritesDataMultiProcess);
+  setPropertyFlags(c_Output | c_ParallelProcessingCertified);
 
   m_steerTreeNames.push_back("treeName");
   m_steerTreeNames.push_back("treeNameRun");
@@ -37,34 +37,34 @@ pRootOutput::pRootOutput() : pOutputServer()
   m_steerBranchNames.push_back("branchNamesPersistent");
 
   //Parameter definition
-  addParam("outputFileName"  , m_outputFileName, string("pRootOutput.root"), "TFile name.");
-  addParam("compressionLevel", m_compressionLevel, 1, "Compression Level: 0 for no, 1 for low, 9 for high compression.");
+  addParam("outputFileName"  , m_outputFileName, "TFile name.", string("pRootOutput.root"));
+  addParam("compressionLevel", m_compressionLevel, "Compression Level: 0 for no, 1 for low, 9 for high compression.", 1);
 
-  addParam(m_steerTreeNames[0], m_treeNames[0], string("tree"), "TTree name for event data. NONE for no output.");
-  addParam(m_steerTreeNames[1], m_treeNames[1], string("NONE"), "TTree name for run data. NONE for no output.");
-  addParam(m_steerTreeNames[2], m_treeNames[2], string("NONE"), "TTree name for peristent data. NONE for no output.");
+  addParam(m_steerTreeNames[0], m_treeNames[0], "TTree name for event data. NONE for no output.", string("tree"));
+  addParam(m_steerTreeNames[1], m_treeNames[1], "TTree name for run data. NONE for no output.", string("NONE"));
+  addParam(m_steerTreeNames[2], m_treeNames[2], "TTree name for peristent data. NONE for no output.", string("NONE"));
 
   vector<string> branchNames;
-  addParam(m_steerBranchNames[0], m_branchNames[0], branchNames, "Names of branches to be written from event map. Empty means all branches.");
-  addParam(m_steerBranchNames[1], m_branchNames[1], branchNames, "Names of branches to be written from run map. Empty means all branches.");
-  addParam(m_steerBranchNames[2], m_branchNames[2], branchNames, "Names of branches to be written from persistent map. Empty means all branches.");
+  addParam(m_steerBranchNames[0], m_branchNames[0], "Names of branches to be written from event map. Empty means all branches.", branchNames);
+  addParam(m_steerBranchNames[1], m_branchNames[1], "Names of branches to be written from run map. Empty means all branches.", branchNames);
+  addParam(m_steerBranchNames[2], m_branchNames[2], "Names of branches to be written from persistent map. Empty means all branches.", branchNames);
 
 
   B2INFO("pRootOutput: Constructor done.");
 }
 
 
-pRootOutput::~pRootOutput()
+pRootOutputModule::~pRootOutputModule()
 {
 }
 
-void pRootOutput::initialize()
+void pRootOutputModule::initialize()
 {
 
   // get iterators
-  for (int ii = 0; ii < c_NDurabilityTypes; ii++) {
-    m_obj_iter[ii]   = DataStore::Instance().getObjectIterator(static_cast<EDurability>(ii));
-    m_array_iter[ii] = DataStore::Instance().getArrayIterator(static_cast<EDurability>(ii));
+  for (int ii = 0; ii < DataStore::c_NDurabilityTypes; ii++) {
+    m_obj_iter[ii]   = DataStore::Instance().getObjectIterator(static_cast<DataStore::EDurability>(ii));
+    m_array_iter[ii] = DataStore::Instance().getArrayIterator(static_cast<DataStore::EDurability>(ii));
     m_done[ii]     = false;
   }
 
@@ -88,24 +88,24 @@ void pRootOutput::initialize()
 }
 
 
-void pRootOutput::beginRun()
+void pRootOutputModule::beginRun()
 {
   B2INFO("beginRun called.");
 }
 
-void pRootOutput::event()
+void pRootOutputModule::event()
 {
   //fill Event data
   if (Framework::nprocess() == 0) {
-    fillTree(c_Event);
+    fillTree(DataStore::c_Event);
   } else {
-    fillRingBuf(c_Event);
+    fillRingBuf(DataStore::c_Event);
   }
 
   //  B2INFO ( "Event sent : " << m_nsent++ )
 }
 
-void pRootOutput::fillTree(const EDurability& durability)
+void pRootOutputModule::fillTree(const DataStore::EDurability& durability)
 {
   if (!m_done[durability]) {
     setupTTree(durability);
@@ -155,7 +155,7 @@ void pRootOutput::fillTree(const EDurability& durability)
 }
 
 
-void pRootOutput::fillRingBuf(const EDurability& durability)
+void pRootOutputModule::fillRingBuf(const DataStore::EDurability& durability)
 {
   m_msghandler->clear();
 
@@ -214,7 +214,7 @@ void pRootOutput::fillRingBuf(const EDurability& durability)
   //  B2INFO ( "Event sent : " << m_nsent++ )
 }
 
-void pRootOutput::endRun()
+void pRootOutputModule::endRun()
 {
   //fill Run data
 
@@ -222,13 +222,13 @@ void pRootOutput::endRun()
 }
 
 
-void pRootOutput::terminate()
+void pRootOutputModule::terminate()
 {
   // Single process mode
   if (Framework::nprocess() == 0)  {
     //write the trees
     m_file->cd();
-    for (int ii = 0; ii < c_NDurabilityTypes; ++ii) {
+    for (int ii = 0; ii < DataStore::c_NDurabilityTypes; ++ii) {
       if (m_treeNames[ii] != "NONE") {
         B2INFO("Write TTree " << m_treeNames[ii]);
         m_tree[ii]->Write();
@@ -247,7 +247,7 @@ void pRootOutput::terminate()
   B2INFO("terminate called")
 }
 
-size_t pRootOutput::getSizeOfObj(const EDurability& durability)
+size_t pRootOutputModule::getSizeOfObj(const DataStore::EDurability& durability)
 {
   int sizeCounter = 0;
   m_obj_iter[durability]->first();
@@ -266,7 +266,7 @@ size_t pRootOutput::getSizeOfObj(const EDurability& durability)
   return sizeCounter;
 }
 
-size_t pRootOutput::getSizeOfArray(const EDurability& durability)
+size_t pRootOutputModule::getSizeOfArray(const DataStore::EDurability& durability)
 {
   int sizeCounter = 0;
   m_array_iter[durability]->first();
@@ -285,12 +285,12 @@ size_t pRootOutput::getSizeOfArray(const EDurability& durability)
   return sizeCounter;
 }
 
-void pRootOutput::setupTFile()
+void pRootOutputModule::setupTFile()
 {
   m_file = new TFile(m_outputFileName.c_str(), "RECREATE", "basf2 Event File");
   m_file->SetCompressionLevel(m_compressionLevel);
 
-  for (int ii = 0; ii < c_NDurabilityTypes; ++ii) {
+  for (int ii = 0; ii < DataStore::c_NDurabilityTypes; ++ii) {
     if (m_treeNames[ii] != "NONE") {
       m_tree[ii] = new TTree(m_treeNames[ii].c_str(), m_treeNames[ii].c_str());
       m_tree[ii]->SetAutoSave(1000000000);
@@ -299,7 +299,7 @@ void pRootOutput::setupTFile()
 }
 
 // Setup ttree
-void pRootOutput::setupTTree(const EDurability& durability)
+void pRootOutputModule::setupTTree(const DataStore::EDurability& durability)
 {
   B2INFO("pRootOutput: TTree is being set up output server.");
 
@@ -368,7 +368,7 @@ void pRootOutput::setupTTree(const EDurability& durability)
 
 
 // Output Server function
-void pRootOutput::output_server(void)
+void pRootOutputModule::output_server(void)
 {
   B2INFO("----> Output Server Invoked");
 
@@ -398,7 +398,7 @@ void pRootOutput::output_server(void)
     // Check for termination
     if (msg->type() == MSG_TERMINATE) {
       m_file->cd();
-      for (int ii = 0; ii < c_NDurabilityTypes; ++ii) {
+      for (int ii = 0; ii < DataStore::c_NDurabilityTypes; ++ii) {
         if (m_treeNames[ii] != "NONE") {
           B2INFO("Write TTree " << m_treeNames[ii]);
           m_tree[ii]->Write();
@@ -415,7 +415,7 @@ void pRootOutput::output_server(void)
     int status = m_msghandler->decode_msg(msg, objlist, namelist);
 
     // Retrieve record info
-    EDurability durability = (EDurability)(msg->header())->reserved[0];
+    DataStore::EDurability durability = (DataStore::EDurability)(msg->header())->reserved[0];
     int nobj = (msg->header())->reserved[1];
     int narray = (msg->header())->reserved[2];
 

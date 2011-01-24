@@ -10,8 +10,8 @@
 
 #include "framework/modules/evtmetagen/EvtMetaInfoModule.h"
 
+#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/StoreDefs.h>
 #include <framework/datastore/EventMetaData.h>
 
 using namespace std;
@@ -20,7 +20,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(EvtMetaInfoModule, "EvtMetaInfo")
+REG_MODULE(EvtMetaInfo)
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -43,7 +43,7 @@ EvtMetaInfoModule::~EvtMetaInfoModule()
 
 void EvtMetaInfoModule::beginRun()
 {
-  StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", c_Event);
+  StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
   B2INFO("========================================================================");
   B2INFO(">>> Start new run: " << eventMetaDataPtr->getRun());
   B2INFO("------------------------------------------------------------------------");
@@ -53,7 +53,7 @@ void EvtMetaInfoModule::beginRun()
 void EvtMetaInfoModule::event()
 {
   //Print event meta data information
-  StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", c_Event);
+  StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
   B2INFO("EXP NUMBER: " << eventMetaDataPtr->getExperiment());
   B2INFO("RUN NUMBER: " << eventMetaDataPtr->getRun());
   B2INFO("EVT NUMBER: " << eventMetaDataPtr->getEvent());
@@ -62,7 +62,7 @@ void EvtMetaInfoModule::event()
 
 void EvtMetaInfoModule::endRun()
 {
-  StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", c_Event);
+  StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
   B2INFO("------------------------------------------------------------------------");
   B2INFO("<<< End run: " << eventMetaDataPtr->getRun());
   B2INFO("========================================================================");

@@ -6,7 +6,7 @@
 // Date : 27 - Jul - 2010
 //-
 
-#include <framework/modules/histomanager/HistoManager.h>
+#include <framework/modules/histomanager/HistoManagerModule.h>
 
 #include <framework/core/Framework.h>
 #include <framework/pcore/ProcHandler.h>
@@ -17,24 +17,23 @@ using namespace std;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(HistoManager, "HistoManager")
+REG_MODULE(HistoManager)
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
 // Implementations
-HistoManager::HistoManager() : Module(), m_initmain(false), m_initialized(false)
+HistoManagerModule::HistoManagerModule() : Module(), m_initmain(false), m_initialized(false)
 {
   // Module description
   setDescription("Module to manage histograms/Ntuples/TTrees");
 
   // Parameters
-  addParam("HistoFileName", m_histfile, string("histofile.root"),
-           "Histogram File Name");
+  addParam("HistoFileName", m_histfile, "Histogram File Name", string("histofile.root"));
 }
 
-HistoManager::~HistoManager()
+HistoManagerModule::~HistoManagerModule()
 {
   if (m_initmain) {
     cout << "HistoManager:: destructor called from pid=" << ProcHandler::EvtProcID() << endl;
@@ -45,7 +44,7 @@ HistoManager::~HistoManager()
   }
 }
 
-void HistoManager::initialize()
+void HistoManagerModule::initialize()
 {
   RbTupleManager::Instance().init(Framework::nprocess(), m_histfile.c_str());
 
@@ -54,7 +53,7 @@ void HistoManager::initialize()
 
 }
 
-void HistoManager::beginRun()
+void HistoManagerModule::beginRun()
 {
   if (!m_initialized) {
     cout << "HistoManager:: first pass" << endl;
@@ -63,7 +62,7 @@ void HistoManager::beginRun()
   }
 }
 
-void HistoManager::endRun()
+void HistoManagerModule::endRun()
 {
   if (!m_initialized) {
     cout << "HistoManager:: first pass" << endl;
@@ -72,7 +71,7 @@ void HistoManager::endRun()
   }
 }
 
-void HistoManager::event()
+void HistoManagerModule::event()
 {
   if (!m_initialized) {
     cout << "HistoManager:: first pass" << endl;
@@ -81,7 +80,7 @@ void HistoManager::event()
   }
 }
 
-void HistoManager::terminate()
+void HistoManagerModule::terminate()
 {
   if (m_initialized) {
     cout << "HistoManager::terminating event process : PID=" << ProcHandler::EvtProcID() << endl;

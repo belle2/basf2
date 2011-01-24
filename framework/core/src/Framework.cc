@@ -16,8 +16,8 @@
 #include <framework/logging/LogConnectionTxtFile.h>
 #include <framework/logging/LogConnectionFilter.h>
 
+#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/StoreDefs.h>
 #include <framework/datastore/EventMetaData.h>
 
 #include "TDatabasePDG.h"

@@ -23,7 +23,6 @@
 #include <vector>
 
 #include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreDefs.h>
 
 /*! RINBGBUF_SIZE and MAXEVTSIZE defines maximum size of IPC shared memory for RingBuffer */
 /*!
@@ -44,14 +43,14 @@ namespace Belle2 {
 
   /*! A class definition of an input module for Sequential ROOT I/O */
 
-  class pSeqRootInput : public pEventServer {
+  class pSeqRootInputModule : public pEventServer {
 
     // Public functions
   public:
 
     //! Constructor / Destructor
-    pSeqRootInput();
-    virtual ~pSeqRootInput();
+    pSeqRootInputModule();
+    virtual ~pSeqRootInputModule();
 
     //! Module functions to be called from main process
     virtual void initialize();
@@ -74,8 +73,8 @@ namespace Belle2 {
     int m_compressionLevel;
 
     //! DataStore iterators
-    StoreIter* m_obj_iter[c_NDurabilityTypes];
-    StoreIter* m_array_iter[c_NDurabilityTypes];
+    StoreIter* m_obj_iter[DataStore::c_NDurabilityTypes];
+    StoreIter* m_array_iter[DataStore::c_NDurabilityTypes];
 
 
     //! Blocked file handler

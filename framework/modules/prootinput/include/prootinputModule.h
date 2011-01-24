@@ -18,7 +18,6 @@
 #include <vector>
 
 #include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreDefs.h>
 
 #include <TFile.h>
 #include <TTree.h>
@@ -40,7 +39,7 @@
 
 
 namespace Belle2 {
-  class pRootInput : public pEventServer {
+  class pRootInputModule : public pEventServer {
 
     /*! Class definition for pRootInput module which substitute SimpleImput module */
     /*! This module is capable of parallel processiong */
@@ -49,8 +48,8 @@ namespace Belle2 {
   public:
 
     //! Constructor / Destructor
-    pRootInput();
-    virtual ~pRootInput();
+    pRootInputModule();
+    virtual ~pRootInputModule();
 
     //! Module functions to be called from main process
     virtual void initialize();
@@ -73,10 +72,10 @@ namespace Belle2 {
     void setupTFile();
 
     //! Function that actually performs the reading from tree into m_objects.
-    int readTree(const EDurability& durability);
+    int readTree(const DataStore::EDurability& durability);
 
     //! Function to read ringbuffer and place objects in DataStore
-    int readRingBuf(const EDurability& durability);
+    int readRingBuf(const DataStore::EDurability& durability);
 
 
     // Data members
@@ -104,20 +103,20 @@ namespace Belle2 {
     TFile* m_file;
 
     //!  TTree for input.
-    TTree* m_tree[c_NDurabilityTypes];
+    TTree* m_tree[DataStore::c_NDurabilityTypes];
 
 
     //! Namess of TTrees and Branches
-    std::string m_treeNames[c_NDurabilityTypes];
-    std::vector<std::string> m_branchNames[c_NDurabilityTypes];
+    std::string m_treeNames[DataStore::c_NDurabilityTypes];
+    std::vector<std::string> m_branchNames[DataStore::c_NDurabilityTypes];
 
     //! List of objects in TTree
-    std::vector<std::string> m_objnames[c_NDurabilityTypes];
-    std::vector<TObject*> m_objects[c_NDurabilityTypes];
+    std::vector<std::string> m_objnames[DataStore::c_NDurabilityTypes];
+    std::vector<TObject*> m_objects[DataStore::c_NDurabilityTypes];
 
     //! List of arrays in TTree
-    std::vector<std::string> m_arraynames[c_NDurabilityTypes];
-    std::vector<TClonesArray*> m_arrays[c_NDurabilityTypes];
+    std::vector<std::string> m_arraynames[DataStore::c_NDurabilityTypes];
+    std::vector<TClonesArray*> m_arrays[DataStore::c_NDurabilityTypes];
 
     //! Paralle processing parameters
 

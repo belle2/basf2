@@ -45,7 +45,7 @@ void pEventProcessor::process(PathPtr spath)
   m_input_list = ModuleManager::Instance().getModulesByProperties
                  (modulelist,
                   Module::c_TriggersNewRun | Module::c_TriggersEndOfData |
-                  Module::c_ReadsDataMultiProcess);
+                  Module::c_Input | Module::c_ParallelProcessingCertified);
 
   for (ModulePtrList::const_iterator listIter = m_input_list.begin();
        listIter != m_input_list.end(); listIter++) {
@@ -60,7 +60,7 @@ void pEventProcessor::process(PathPtr spath)
   // 3. Scan modules and find output modules with multi-process support
   m_output_list = ModuleManager::Instance().getModulesByProperties
                   (modulelist,
-                   Module::c_WritesDataMultiProcess);
+                   Module::c_Output | Module::c_ParallelProcessingCertified);
   int nout = 0;
   for (ModulePtrList::const_iterator listIter = m_output_list.begin();
        listIter != m_output_list.end(); listIter++) {

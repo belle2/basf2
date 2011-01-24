@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef SIMPLEOUTPUT_H
-#define SIMPLEOUTPUT_H
+#ifndef SIMPLEOUTPUTMODULE_H
+#define SIMPLEOUTPUTMODULE_H
 
 #include <framework/core/Module.h>
 
@@ -21,7 +21,6 @@
 
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreDefs.h>
 #include <framework/datastore/StoreMapIter.h>
 
 #include <TFile.h>
@@ -40,7 +39,7 @@ namespace Belle2 {
    *  @sa EDurability
    *  @author <a href="mailto:martin.heck@kit.edu?subject=Output Module">Martin Heck</a>
    */
-  class SimpleOutput : public Module {
+  class SimpleOutputModule : public Module {
 
   public:
 
@@ -48,13 +47,13 @@ namespace Belle2 {
      *
      *  The following module properties are set: <br>
      */
-    SimpleOutput();
+    SimpleOutputModule();
 
     /** Destructor.
      *
      *  Deletion of objects, that were created in the Constructor.
      */
-    virtual ~SimpleOutput();
+    virtual ~SimpleOutputModule();
 
     /** Setting up of various stuff.
      *
@@ -113,7 +112,7 @@ namespace Belle2 {
      *
      *  @par durability Specifies map and tree to be used.
      */
-    void fillTree(const EDurability& durability);
+    void fillTree(const DataStore::EDurability& durability);
 
     /** Switch branch name meaning function.
      *
@@ -124,7 +123,7 @@ namespace Belle2 {
      *
      *  @param durability Specifies branchNames to be taken.
      */
-    void switchBranchNameMeaning(const EDurability& durability);
+    void switchBranchNameMeaning(const DataStore::EDurability& durability);
 
 
     //first the steerable variables:
@@ -140,14 +139,14 @@ namespace Belle2 {
      *
      *  Each element of the array is steerable as separate string.
      */
-    std::string m_treeNames[c_NDurabilityTypes];
+    std::string m_treeNames[DataStore::c_NDurabilityTypes];
 
     /** Array for names of branches, that shall be written out.
      *
      *  Empty vectors result in all branches of the specific durability being written.
      *  These vectors can be configured in the steering file.
      */
-    std::vector<std::string> m_branchNames[c_NDurabilityTypes];
+    std::vector<std::string> m_branchNames[DataStore::c_NDurabilityTypes];
 
     /** Switch branchNames from exclusion to inclusion list.
      *
@@ -170,7 +169,7 @@ namespace Belle2 {
     TFile* m_file;
 
     /** TTree for output. */
-    TTree* m_tree[c_NDurabilityTypes];
+    TTree* m_tree[DataStore::c_NDurabilityTypes];
 
     /** Has branch creation already happened?
      *
@@ -178,19 +177,19 @@ namespace Belle2 {
      *  Therefore the branch creation can not happen before the event function.
      *  However, in the event function, the branches should be created just once.
      */
-    bool m_done[c_NDurabilityTypes];
+    bool m_done[DataStore::c_NDurabilityTypes];
 
     /** Total number of branches. */
-    size_t m_size[c_NDurabilityTypes];
+    size_t m_size[DataStore::c_NDurabilityTypes];
 
     /** Number of branches for non-array objects. */
-    size_t m_sizeObj[c_NDurabilityTypes];
+    size_t m_sizeObj[DataStore::c_NDurabilityTypes];
 
     /** Pointer to pointer, that can be utilised by the TTree.*/
-    TObject** m_objects[c_NDurabilityTypes];
+    TObject** m_objects[DataStore::c_NDurabilityTypes];
 
     /** Iterators over the maps.*/
-    StoreIter* m_iter[2*c_NDurabilityTypes];
+    StoreIter* m_iter[2*DataStore::c_NDurabilityTypes];
 
     /** ROOT Object ID Restore Counter.*/
     int m_nObjID;
@@ -204,4 +203,4 @@ namespace Belle2 {
 
 } // end namespace Belle2
 
-#endif // SIMPLEOUTPUT_H
+#endif // SIMPLEOUTPUTMODULE_H

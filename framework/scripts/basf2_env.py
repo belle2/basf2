@@ -9,7 +9,7 @@ from pybasf2 import *
 # -----------------------------------------------
 basf2label = 'BASF2 (Belle Analysis Framework 2)'
 basf2version = os.environ.get('BELLE2_RELEASE', 'unknown')
-basf2copyright = 'Copyright(C) 2010 - Belle II Collaboration'
+basf2copyright = 'Copyright(C) 2010-2011  Belle II Collaboration'
 basf2authors = [
     'Andreas Moll',
     'Martin Heck',

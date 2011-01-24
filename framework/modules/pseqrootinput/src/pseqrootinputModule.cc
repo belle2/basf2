@@ -6,7 +6,7 @@
 // Date : 13 - Aug - 2010
 //-
 
-#include <framework/modules/pseqrootinput/pseqrootinput.h>
+#include <framework/modules/pseqrootinput/pseqrootinputModule.h>
 #include <stdlib.h>
 
 using namespace std;
@@ -15,17 +15,17 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(pSeqRootInput, "pSeqRootInput")
+REG_MODULE(pSeqRootInput)
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-pSeqRootInput::pSeqRootInput() : pEventServer()
+pSeqRootInputModule::pSeqRootInputModule() : pEventServer()
 {
   //Set module properties
   setDescription("SeqROOT output with parallel capability");
-  setPropertyFlags(c_TriggersNewRun | c_TriggersEndOfData | c_ReadsDataMultiProcess);
+  setPropertyFlags(c_TriggersNewRun | c_TriggersEndOfData | c_Input | c_ParallelProcessingCertified);
 
   m_nsent = 0;
   m_nrecv = 0;
@@ -33,24 +33,24 @@ pSeqRootInput::pSeqRootInput() : pEventServer()
   m_file = 0;
 
   //Parameter definition
-  addParam("inputFileName"  , m_inputFileName, string("pSeqRootInput.root"), "SeqRoot file name.");
-  addParam("compressionLevel", m_compressionLevel, 1, "Compression Level: 0 for no, 1 for low, 9 for high compression.");
+  addParam("inputFileName"  , m_inputFileName, "SeqRoot file name.", string("pSeqRootInput.root"));
+  addParam("compressionLevel", m_compressionLevel, "Compression Level: 0 for no, 1 for low, 9 for high compression.", 1);
 
   B2INFO("pSeqRootInput: Constructor done.");
 }
 
 
-pSeqRootInput::~pSeqRootInput()
+pSeqRootInputModule::~pSeqRootInputModule()
 {
 }
 
-void pSeqRootInput::initialize()
+void pSeqRootInputModule::initialize()
 {
 
   // get iterators
-  for (int ii = 0; ii < c_NDurabilityTypes; ii++) {
-    m_obj_iter[ii]   = DataStore::Instance().getObjectIterator(static_cast<EDurability>(ii));
-    m_array_iter[ii] = DataStore::Instance().getArrayIterator(static_cast<EDurability>(ii));
+  for (int ii = 0; ii < DataStore::c_NDurabilityTypes; ii++) {
+    m_obj_iter[ii]   = DataStore::Instance().getObjectIterator(static_cast<DataStore::EDurability>(ii));
+    m_array_iter[ii] = DataStore::Instance().getArrayIterator(static_cast<DataStore::EDurability>(ii));
     //    m_done[ii]     = false;
   }
 
@@ -76,13 +76,13 @@ void pSeqRootInput::initialize()
 }
 
 
-void pSeqRootInput::beginRun()
+void pSeqRootInputModule::beginRun()
 {
   B2INFO("beginRun called.");
 }
 
 
-void pSeqRootInput::event()
+void pSeqRootInputModule::event()
 {
   m_msghandler->clear();
 
@@ -128,7 +128,7 @@ void pSeqRootInput::event()
 
 
   // Get number of objects
-  EDurability durability = (EDurability)(evtmsg->header())->reserved[0];
+  DataStore::EDurability durability = (DataStore::EDurability)(evtmsg->header())->reserved[0];
   int nobjs = (evtmsg->header())->reserved[1];
   int narrays = (evtmsg->header())->reserved[2];
 
@@ -153,7 +153,7 @@ void pSeqRootInput::event()
   //  B2INFO ( "Event received : " << m_nrecv++ )
 }
 
-void pSeqRootInput::endRun()
+void pSeqRootInputModule::endRun()
 {
   //fill Run data
 
@@ -161,13 +161,13 @@ void pSeqRootInput::endRun()
 }
 
 
-void pSeqRootInput::terminate()
+void pSeqRootInputModule::terminate()
 {
   B2INFO("terminate called")
 }
 
 // Input Server function
-void pSeqRootInput::event_server(void)
+void pSeqRootInputModule::event_server(void)
 {
   B2INFO("----> Input Server Invoked");
 

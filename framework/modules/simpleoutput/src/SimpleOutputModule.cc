@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <framework/modules/simpleoutput/simpleoutput.h>
+#include <framework/modules/simpleoutput/SimpleOutputModule.h>
 
 
 using namespace std;
@@ -17,20 +17,20 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(SimpleOutput, "SimpleOutput")
+REG_MODULE(SimpleOutput)
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-SimpleOutput::SimpleOutput() : Module()
+SimpleOutputModule::SimpleOutputModule() : Module()
 {
   //Set module properties
   setDescription("simple output");
-  setPropertyFlags(c_WritesDataSingleProcess | c_RequiresSingleProcess);
+  setPropertyFlags(c_Output);
 
   //Initialization of some member variables
-  for (int jj = 0; jj < c_NDurabilityTypes; jj++) {
+  for (int jj = 0; jj < DataStore::c_NDurabilityTypes; jj++) {
     m_size[jj] = 0;
     m_treeNames[jj]   = "NONE";
   }
@@ -47,29 +47,29 @@ SimpleOutput::SimpleOutput() : Module()
 
 
   //Parameter definition
-  addParam("outputFileName"  , m_outputFileName, string("SimpleOutput.root"), "TFile name.");
-  addParam("compressionLevel", m_compressionLevel, 1, "Compression Level: 0 for no, 1 for low, 9 for high compression.");
+  addParam("outputFileName"  , m_outputFileName, "TFile name.", string("SimpleOutput.root"));
+  addParam("compressionLevel", m_compressionLevel, "Compression Level: 0 for no, 1 for low, 9 for high compression.", 1);
 
-  addParam(m_steerTreeNames[0], m_treeNames[0], string("tree"), "TTree name for event data. NONE for no output.");
-  addParam(m_steerTreeNames[1], m_treeNames[1], string("NONE"), "TTree name for run data. NONE for no output.");
-  addParam(m_steerTreeNames[2], m_treeNames[2], string("NONE"), "TTree name for peristent data. NONE for no output.");
+  addParam(m_steerTreeNames[0], m_treeNames[0], "TTree name for event data. NONE for no output.", string("tree"));
+  addParam(m_steerTreeNames[1], m_treeNames[1], "TTree name for run data. NONE for no output.", string("NONE"));
+  addParam(m_steerTreeNames[2], m_treeNames[2], "TTree name for peristent data. NONE for no output.", string("NONE"));
 
   vector<string> branchNames;
-  addParam(m_steerBranchNames[0], m_branchNames[0], branchNames, "Names of branches to be written from event map. Empty means all branches.");
-  addParam(m_steerBranchNames[1], m_branchNames[1], branchNames, "Names of branches to be written from run map. Empty means all branches.");
-  addParam(m_steerBranchNames[2], m_branchNames[2], branchNames, "Names of branches to be written from persistent map. Empty means all branches.");
+  addParam(m_steerBranchNames[0], m_branchNames[0], "Names of branches to be written from event map. Empty means all branches.", branchNames);
+  addParam(m_steerBranchNames[1], m_branchNames[1], "Names of branches to be written from run map. Empty means all branches.", branchNames);
+  addParam(m_steerBranchNames[2], m_branchNames[2], "Names of branches to be written from persistent map. Empty means all branches.", branchNames);
 
-  addParam("switchBranchNameMeaning", m_switchBranchNameMeaning, false, "If true, given branch names are excluded instead of taken.");
+  addParam("switchBranchNameMeaning", m_switchBranchNameMeaning, "If true, given branch names are excluded instead of taken.", false);
 }
 
 
-SimpleOutput::~SimpleOutput()
+SimpleOutputModule::~SimpleOutputModule()
 {
   if (m_file) {
     delete m_file;
   }
 
-  for (size_t jj = 0; jj < c_NDurabilityTypes; jj++) {
+  for (size_t jj = 0; jj < DataStore::c_NDurabilityTypes; jj++) {
     for (size_t ii = 0; ii < m_size[jj]; ii++) {
       if (m_objects[jj]) {
         if (m_objects[jj][ii]) {
@@ -80,11 +80,11 @@ SimpleOutput::~SimpleOutput()
   }
 }
 
-void SimpleOutput::initialize()
+void SimpleOutputModule::initialize()
 {
   // check for same treeNames
-  for (int ii = 0; ii < c_NDurabilityTypes; ++ii) {
-    for (int jj = 0; jj < c_NDurabilityTypes; ++jj) {
+  for (int ii = 0; ii < DataStore::c_NDurabilityTypes; ++ii) {
+    for (int jj = 0; jj < DataStore::c_NDurabilityTypes; ++jj) {
       if ((ii != jj) && (m_treeNames[ii] != "NONE") && (m_treeNames[ii] == m_treeNames[jj])) {
         B2ERROR(m_steerTreeNames[ii] << " and " << m_steerTreeNames[jj] << " are the same: " << m_treeNames[ii]);
       }
@@ -95,14 +95,14 @@ void SimpleOutput::initialize()
   setupTFile();
 
   // get iterators
-  for (int ii = 0; ii < c_NDurabilityTypes; ii++) {
-    m_iter[2*ii]   = DataStore::Instance().getObjectIterator(static_cast<EDurability>(ii));
-    m_iter[2*ii+1] = DataStore::Instance().getArrayIterator(static_cast<EDurability>(ii));
+  for (int ii = 0; ii < DataStore::c_NDurabilityTypes; ii++) {
+    m_iter[2*ii]   = DataStore::Instance().getObjectIterator(static_cast<DataStore::EDurability>(ii));
+    m_iter[2*ii+1] = DataStore::Instance().getArrayIterator(static_cast<DataStore::EDurability>(ii));
     m_done[ii]     = false;
   }
 
   //warning for duplicates in the branchNames vectors
-  for (int jj = 0; jj < c_NDurabilityTypes; ++jj) {
+  for (int jj = 0; jj < DataStore::c_NDurabilityTypes; ++jj) {
     size_t size = m_branchNames[jj].size();
     m_branchNames[jj].resize(unique(m_branchNames[jj].begin(), m_branchNames[jj].end()) - m_branchNames[jj].begin());
 
@@ -115,16 +115,16 @@ void SimpleOutput::initialize()
 }
 
 
-void SimpleOutput::beginRun()
+void SimpleOutputModule::beginRun()
 {
   B2INFO("beginRun called.");
 }
 
 
-void SimpleOutput::event()
+void SimpleOutputModule::event()
 {
   //Restore Object Count:
-  if (!m_done[c_Event]) {
+  if (!m_done[DataStore::c_Event]) {
     m_nObjID = TProcessID::GetObjectCount();
   } else {
     TProcessID::SetObjectCount(m_nObjID);
@@ -132,38 +132,38 @@ void SimpleOutput::event()
 
   //fill Event data
   if (m_treeNames[0] != "NONE") {
-    fillTree(c_Event);
+    fillTree(DataStore::c_Event);
   }
 
   //make sure setup is done only once
-  m_done[c_Event] = true;
+  m_done[DataStore::c_Event] = true;
 }
 
 
-void SimpleOutput::endRun()
+void SimpleOutputModule::endRun()
 {
   //fill Run data
   if (m_treeNames[1] != "NONE") {
-    fillTree(c_Run);
+    fillTree(DataStore::c_Run);
   }
 
   //make sure setup is done only once
-  m_done[c_Run] = true;
+  m_done[DataStore::c_Run] = true;
 
   B2INFO("endRun done.");
 }
 
 
-void SimpleOutput::terminate()
+void SimpleOutputModule::terminate()
 {
   //fill Persistent data
   if (m_treeNames[2] != "NONE") {
-    fillTree(c_Persistent);
+    fillTree(DataStore::c_Persistent);
   }
 
   //write the trees
   m_file->cd();
-  for (int ii = 0; ii < c_NDurabilityTypes; ++ii) {
+  for (int ii = 0; ii < DataStore::c_NDurabilityTypes; ++ii) {
     if (m_treeNames[ii] != "NONE") {
       B2INFO("Write TTree " << m_treeNames[ii]);
       m_tree[ii]->Write();
@@ -173,7 +173,7 @@ void SimpleOutput::terminate()
   B2INFO("terminate called");
 }
 
-size_t SimpleOutput::getSize(const int& mapID)
+size_t SimpleOutputModule::getSize(const int& mapID)
 {
   int sizeCounter = 0;
   m_iter[mapID]->first();
@@ -192,12 +192,12 @@ size_t SimpleOutput::getSize(const int& mapID)
   return sizeCounter;
 }
 
-void SimpleOutput::setupTFile()
+void SimpleOutputModule::setupTFile()
 {
   m_file = new TFile(m_outputFileName.c_str(), "RECREATE", "basf2 Event File");
   m_file->SetCompressionLevel(m_compressionLevel);
 
-  for (int ii = 0; ii < c_NDurabilityTypes; ++ii) {
+  for (int ii = 0; ii < DataStore::c_NDurabilityTypes; ++ii) {
     if (m_treeNames[ii] != "NONE") {
       m_tree[ii] = new TTree(m_treeNames[ii].c_str(), m_treeNames[ii].c_str());
       m_tree[ii]->SetAutoSave(1000000000);
@@ -205,7 +205,7 @@ void SimpleOutput::setupTFile()
   }
 }
 
-void SimpleOutput::fillTree(const EDurability& durability)
+void SimpleOutputModule::fillTree(const DataStore::EDurability& durability)
 {
   size_t sizeCounter = 0;
 
@@ -279,7 +279,7 @@ void SimpleOutput::fillTree(const EDurability& durability)
 }
 
 
-void SimpleOutput::switchBranchNameMeaning(const EDurability& durability)
+void SimpleOutputModule::switchBranchNameMeaning(const DataStore::EDurability& durability)
 {
   vector<string> branchNameDummy;
   for (int ii = 2 * durability; ii < 2*durability + 2; ii++) {

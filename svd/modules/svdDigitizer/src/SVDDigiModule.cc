@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2010-2011  Belle II Collaboration                         *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Andreas Moll, Peter Kvasnicka, Zbynek Drasal             *
@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 // Own include
-#include <svd/modules/svdDigitizer/SVDDigi.h>
+#include <svd/modules/svdDigitizer/SVDDigiModule.h>
 
 #include <time.h>
 
@@ -20,8 +20,8 @@
 //#include <framework/core/ModuleManager.h>
 
 // framework - DataStore
+#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/StoreDefs.h>
 #include <framework/datastore/StoreArray.h>
 
 // framework aux
@@ -29,7 +29,7 @@
 #include <framework/logging/Logger.h>
 
 // ROOT
-#include "TVector3.h"
+#include <TVector3.h>
 
 using namespace std;
 using namespace boost;
@@ -38,13 +38,13 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(SVDDigi, "SVDDigitizer")
+REG_MODULE(SVDDigi)
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-SVDDigi::SVDDigi() : Module(),
+SVDDigiModule::SVDDigiModule() : Module(),
     m_cheater(new SVDcheater()),
     m_cid(new CIDManager(0)),
     m_random(new TRandom3(0))
@@ -53,20 +53,20 @@ SVDDigi::SVDDigi() : Module(),
   setDescription("SVDDigitizer");
 
   // Add parameters
-  addParam("InputColName", m_inColName, string("SVDSimHitArray"), "Input collection name");
-  addParam("OutputColName", m_outColName, string("SVDHitArray"), "Output collection name");
-  //addParam("RelationColNameMC2Digi", m_relColNameMC2Digi, string("SVDMC2DigiHitRel"),
-  //      "Name of relation collection - MC hits to Digitizer hits. (created if non-null)");
+  addParam("InputColName", m_inColName, "Input collection name", string("SVDSimHitArray"));
+  addParam("OutputColName", m_outColName, "Output collection name", string("SVDHitArray"));
+  //addParam("RelationColNameMC2Digi", m_relColNameMC2Digi,
+  //      "Name of relation collection - MC hits to Digitizer hits. (created if non-null)", string("SVDMC2DigiHitRel"));
 }
 
-SVDDigi::~SVDDigi()
+SVDDigiModule::~SVDDigiModule()
 {
   if (m_random) delete m_random;
   if (m_cid) delete m_cid;
   if (m_cheater) delete m_cheater;
 }
 
-void SVDDigi::initialize()
+void SVDDigiModule::initialize()
 {
   // Initialize variables
   m_nRun    = 0 ;
@@ -79,13 +79,13 @@ void SVDDigi::initialize()
   m_timeCPU = clock() * Unit::us;
 }
 
-void SVDDigi::beginRun()
+void SVDDigiModule::beginRun()
 {
   // Print run number
   B2INFO("SVDDigi: Processing run: " << m_nRun);
 }
 
-void SVDDigi::event()
+void SVDDigiModule::event()
 {
   //------------------------------------------------------
   // Get the collection of SVDSimHits from the Data store.
@@ -161,12 +161,12 @@ void SVDDigi::event()
   m_nEvent++;
 }
 
-void SVDDigi::endRun()
+void SVDDigiModule::endRun()
 {
   m_nRun++;
 }
 
-void SVDDigi::terminate()
+void SVDDigiModule::terminate()
 {
   // CPU time end
   m_timeCPU = clock() * Unit::us - m_timeCPU;
@@ -175,7 +175,7 @@ void SVDDigi::terminate()
   B2INFO("SVDDigi finished. Time per event: " << m_timeCPU / m_nEvent / Unit::ms << " ms.");
 }
 
-void SVDDigi::printModuleParams() const
+void SVDDigiModule::printModuleParams() const
 {
   B2INFO("SVDDigi parameters:")
   B2INFO("  Input collection name:  " << m_inColName)

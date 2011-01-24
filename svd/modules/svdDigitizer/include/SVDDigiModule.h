@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2010-2011  Belle II Collaboration                         *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Andreas Moll, Peter Kvasnicka, Zbynek Drasal             *
@@ -8,16 +8,16 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef SVDDIGI_H
-#define SVDDIGI_H
+#ifndef SVDDIGIMODULE_H
+#define SVDDIGIMODULE_H
 
 #include <framework/core/Module.h>
-
-#include <string>
-
-#include "TRandom3.h"
 #include <pxd/hitpxd/CIDManager.h>
 #include <svd/modules/svdDigitizer/SVDcheater.h>
+
+#include <string>
+#include <TRandom3.h>
+
 
 namespace Belle2 {
 
@@ -32,15 +32,15 @@ namespace Belle2 {
    * A full digitization will be added later.
    */
 
-  class SVDDigi : public Module {
+  class SVDDigiModule : public Module {
 
   public:
 
     /** Constructor.*/
-    SVDDigi();
+    SVDDigiModule();
 
     /** Destructor.*/
-    virtual ~SVDDigi();
+    virtual ~SVDDigiModule();
 
     /**
      * Initialize the Module.
@@ -104,4 +104,4 @@ namespace Belle2 {
 
 } // Belle2 namespace
 
-#endif // SVDDigi
+#endif // SVDDIGIMODULE_H

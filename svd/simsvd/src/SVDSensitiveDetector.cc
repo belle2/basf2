@@ -10,45 +10,32 @@
 
 #include <svd/simsvd/SVDSensitiveDetector.h>
 #include <framework/logging/Logger.h>
+#include <framework/datastore/DataStore.h>
+#include <framework/datastore/StoreArray.h>
 
-#include "G4Step.hh"
-#include "G4SteppingManager.hh"
-#include "G4SDManager.hh"
-#include "G4TransportationManager.hh"
+#include <TVector3.h>
+
+#include <G4Step.hh>
+#include <G4SteppingManager.hh>
+#include <G4SDManager.hh>
+#include <G4TransportationManager.hh>
 
 #include <cmath>
 
 using namespace Belle2;
+using namespace Simulation;
 
 const G4double c_Epsilon = 1.0e-8;
 
-SVDSensitiveDetector::SVDSensitiveDetector(G4String name) : G4VSensitiveDetector(name)
+SVDSensitiveDetector::SVDSensitiveDetector(G4String name) : SensitiveDetectorBase(name), m_hitNumber(0)
 {
-  G4String colName = name + "Collection";
-  collectionName.insert(colName);
 
-  m_hitColID = -1;
 }
 
 
 SVDSensitiveDetector::~SVDSensitiveDetector()
 {
 
-}
-
-
-void SVDSensitiveDetector::Initialize(G4HCofThisEvent* HCTE)
-{
-  //Create new B4VHit collection
-  m_hitCollection = new SVDB4VHitsCollection(SensitiveDetectorName, collectionName[0]);
-
-  // Assign a unique ID to the hits collection
-  if (m_hitColID < 0) {
-    m_hitColID = G4SDManager::GetSDMpointer()->GetCollectionID(m_hitCollection);
-  }
-
-  // Attach collection to the hits collections of this event (G4HCofThisEvent* eventHC)
-  HCTE->AddHitsCollection(m_hitColID, m_hitCollection);
 }
 
 
@@ -107,14 +94,29 @@ G4bool SVDSensitiveDetector::ProcessHits(G4Step* aStep, G4TouchableHistory*)
   double theta = midStepPos.theta();
 
   //-------------------------------------------------------
-  //                Add hit to collection
+  //              Add SimHit to the DataStore
   //-------------------------------------------------------
+  /* Parse volume name for layer, ladder and sensor numbers */
+  TString vname(vol.GetName().data());
+  int layerID = TString(vname(vname.Index("Layer_") + 6)).Atoi();
+  int ladderID = TString(vname(vname.Index("Ladder_") + 7)).Atoi();
+  int sensorID = TString(vname(vname.Index("Sensor_") + 7)).Atoi();
 
-  SVDB4VHit* newHit = new SVDB4VHit(preStepPosLocal, posStepPosLocal,
-                                    theta, momIn, partPDG, trackID,
-                                    depEnergy, stepLength, globalTime,
-                                    vol.GetName());
-  m_hitCollection->insert(newHit);
+  StoreArray<SVDSimHit> svdArray("SVDSimHitArray");
+
+  //Create new SVDSim hit. Convert Geant4 units into basf2 units.
+  TVector3 posIn(preStepPosLocal.x() / cm, preStepPosLocal.y() / cm, preStepPosLocal.z() / cm);
+  TVector3 posOut(posStepPosLocal.x() / cm, posStepPosLocal.y() / cm, posStepPosLocal.z() / cm);
+  TVector3 momInVec(momIn.x() / GeV, momIn.y() / GeV, momIn.z() / GeV);
+
+  new(svdArray->AddrAt(m_hitNumber)) SVDSimHit(layerID, ladderID, sensorID,
+                                               posIn, posOut, theta / radian,
+                                               momInVec, partPDG, trackID,
+                                               depEnergy / GeV,
+                                               stepLength / cm,
+                                               globalTime / ns);
+  m_hitNumber++;
+
   return true;
 }
 

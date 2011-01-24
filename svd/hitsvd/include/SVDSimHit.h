@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2010-2011  Belle II Collaboration                         *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Martin Heck, Peter Kvasnicka                             *
+ * Contributors: Peter Kvasnicka                                          *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -16,8 +16,6 @@
 #include <TVector3.h>
 
 namespace Belle2 {
-
-  class SVDB4VHit;
 
   /**
    * ClassSVDSimHit - Geant4 simulated hit for the SVD
@@ -47,7 +45,20 @@ namespace Belle2 {
       /*! Does nothing */
     }
 
-    /** Full constructor.*/
+    /** Full constructor.
+     * @param layerID ID of the layer in which the hit was created.
+     * @param ladderID ID of the ladder in which the hit was created.
+     * @param sensorID ID of the sensor in which the hit was created.
+     * @param posIn Point of entry into the detector, in local coordinates.
+     * @param posOut Point of exit from the detector, in local coordinates.
+     * @param theta Angle theta (wrt. the global z axis).
+     * @param momIn The momentum of particle on entry into the detector.
+     * @param PDGcode The PDG code of particle that produced this track.
+     * @param trackID ID of the track.
+     * @param energyDep Energy deposition by the particle in the detector.
+     * @param stepLength Length of G4 step.
+     * @param globalTime Global time.
+     */
     SVDSimHit(
       int layerID,
       int ladderID,
@@ -80,9 +91,6 @@ namespace Belle2 {
     ~SVDSimHit() {
       /* Does nothing. */
     }
-
-    /** Constructor from a G4 simhit.*/
-    SVDSimHit(const SVDB4VHit & g4hit);
 
     /** The method to set LayerID.*/
     void setLayerID(int layerID) { m_layerID = layerID; }

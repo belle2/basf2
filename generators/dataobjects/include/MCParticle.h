@@ -69,8 +69,8 @@ namespace Belle2 {
      */
     MCParticle(TClonesArray* plist, const MCParticle& p):
         m_plist(plist), m_index(p.m_index), m_status(p.m_status),
-        m_pdg(p.m_pdg), m_mass(p.m_mass), m_momentum_x(p.m_momentum_x),
-        m_momentum_y(p.m_momentum_y), m_momentum_z(p.m_momentum_z),
+        m_pdg(p.m_pdg), m_mass(p.m_mass), m_energy(p.m_energy),
+        m_momentum_x(p.m_momentum_x), m_momentum_y(p.m_momentum_y), m_momentum_z(p.m_momentum_z),
         m_validVertex(p.m_validVertex), m_productionTime(p.m_productionTime),
         m_productionVertex_x(p.m_productionVertex_x), m_productionVertex_y(p.m_productionVertex_y),
         m_productionVertex_z(p.m_productionVertex_z),

@@ -71,12 +71,6 @@ def make_jdl(
 \
         {
 \
-            #"*.his",
-\
-            #"*.root",
-\
-            #"*.log",
-\
             "std.err",
 \
             "std.out"

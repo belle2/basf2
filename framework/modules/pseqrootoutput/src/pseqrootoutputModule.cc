@@ -82,7 +82,7 @@ void pSeqRootOutputModule::beginRun()
 
   if (m_nproc == 0) {
     // Single process : Store the message if a SeqFile
-    int status = m_file->write(msg->buffer());
+    m_file->write(msg->buffer());
   } else {
     // Parallel process: Put the message in ring buffer up to m_nproc
     for (;;) {
@@ -103,7 +103,7 @@ void pSeqRootOutputModule::event()
 
   if (m_nproc == 0) {
     // Single process : Store the message if a SeqFile
-    int status = m_file->write(msg->buffer());
+    m_file->write(msg->buffer());
   } else {
     // Parallel process: Put the message in ring buffer
     for (;;) {
@@ -227,7 +227,7 @@ void pSeqRootOutputModule::output_server(void)
       nbgr++;
       cout << "====> Begin_Run found. count = " << count_bgr << endl;
       if (count_bgr == 0) {
-        int status = m_file->write(evtmsg->buffer());
+        m_file->write(evtmsg->buffer());
         count_bgr = m_nproc - 1;
         nwrote++;
       } else {
@@ -235,7 +235,7 @@ void pSeqRootOutputModule::output_server(void)
         count_bgr--;
       }
     } else if (evtmsg->type() == MSG_EVENT) {
-      int status = m_file->write(evtmsg->buffer());
+      m_file->write(evtmsg->buffer());
       nevt++;
       nwrote++;
     }

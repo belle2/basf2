@@ -13,9 +13,9 @@
 
 #include <framework/core/EventProcessor.h>
 
-#include <framework/pcore/ProcHandler.h>
 #include <framework/pcore/pEventServer.h>
 #include <framework/pcore/pOutputServer.h>
+#include <framework/pcore/ProcHandler.h>
 
 namespace Belle2 {
 

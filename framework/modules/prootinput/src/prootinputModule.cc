@@ -8,6 +8,8 @@
 
 #include <framework/modules/prootinput/prootinputModule.h>
 
+#include <boost/format.hpp>
+
 using namespace std;
 using namespace Belle2;
 
@@ -58,11 +60,9 @@ pRootInputModule::~pRootInputModule()
 
 void pRootInputModule::initialize()
 {
-  static TObject* sobj;
   static TClonesArray* sarray;
 
-  printf("address of sarray ptr of ptr = %8.8x, ptr = %8.8x\n",
-         &sarray, sarray);
+  B2INFO(boost::format("address of sarray ptr of ptr = %1%, ptr = %2%\n") % &sarray % sarray)
 
   //Open TFile
   m_file = new TFile(m_inputFileName.c_str(), "READ");
@@ -116,7 +116,8 @@ void pRootInputModule::initialize()
   //  printf ( "pRootInput : nproc = %d\n", m_nproc );
   B2WARNING("pRootInput : nproc = " << m_nproc)
   if (m_nproc > 0) {
-    m_rbuf = new RingBuffer("PRIN", RINGBUF_SIZE);
+    char rbName[] = "PRIN";
+    m_rbuf = new RingBuffer(rbName, RINGBUF_SIZE);
     m_msghandler = new MsgHandler(m_complevel);
   } else {
     m_rbuf = NULL;
@@ -180,7 +181,6 @@ int pRootInputModule::readTree(const DataStore::EDurability& durability)
   // Restore arrays in DataStore
   int narrays = m_arrays[durability].size();
   for (int i = 0; i < narrays; i++) {
-    TClonesArray* array = m_arrays[durability].at(i);
     DataStore::Instance().storeArray(m_arrays[durability].at(i),
                                      m_arraynames[durability].at(i));
   }
@@ -211,7 +211,7 @@ int pRootInputModule::readRingBuf(const DataStore::EDurability& indurability)
   EvtMessage* msg = new EvtMessage(evtbuf);    // Have EvtMessage by ptr cpy
   if (msg->type() == MSG_TERMINATE)
     return msg->type(); // EOF
-  int status = m_msghandler->decode_msg(msg, objlist, namelist);
+  m_msghandler->decode_msg(msg, objlist, namelist);
 
   // Get Object info
   RECORD_TYPE type = msg->type();

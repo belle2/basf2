@@ -3,6 +3,8 @@
 /// @author Soohyung Lee
 /// @date Jul 14 2008
 
+#include <framework/pcore/ProcHandler.h>
+
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/ipc.h>
@@ -13,7 +15,6 @@
 #include <errno.h>
 #include <string.h>
 
-#include "framework/pcore/ProcHandler.h"
 //#include "inc/evtprocess.h" // DEPRECATED
 //#include "shm.h"
 
@@ -192,10 +193,12 @@ int ProcHandler::isproc(int pid, char* exe)
 /// @brief Display the status of child processes
 void ProcHandler::display(void)
 {
+  char procStr[] = "basf2";
+
   // Update evtproc list
   int nEvtProc = 0;
   for (int i = 0; i < m_nEvtProc; i++) {
-    if (!isproc(m_lEvtProc[i], "basf2")) {
+    if (!isproc(m_lEvtProc[i], procStr)) {
       m_lEvtProc[i] = -1;
       nEvtProc++;
     }
@@ -204,7 +207,7 @@ void ProcHandler::display(void)
 
   int nOutputSrv = 0;
   for (int i = 0; i < m_nOutputSrv; i++) {
-    if (!isproc(m_lOutputSrv[i], "basf2")) {
+    if (!isproc(m_lOutputSrv[i], procStr)) {
       m_lOutputSrv[i] = -1;
       nOutputSrv++;
     }

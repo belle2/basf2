@@ -32,8 +32,8 @@ namespace Belle2 {
 
   private:
     std::string m_histfile;
-    bool        m_initialized;
     bool        m_initmain;
+    bool        m_initialized;
   };
 
 } // Namaspace Belle2

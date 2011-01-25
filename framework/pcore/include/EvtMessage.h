@@ -9,8 +9,10 @@
 #ifndef EVTMESSAGE_H
 #define EVTMESSAGE_H
 
+#include <framework/pcore/RingBuffer.h>
+
 #include "TMessage.h"
-#include "framework/pcore/RingBuffer.h"
+#include <sys/time.h>
 
 
 /* EvtMessage structure

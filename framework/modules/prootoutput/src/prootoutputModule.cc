@@ -121,7 +121,7 @@ void pRootOutputModule::fillTree(const DataStore::EDurability& durability)
       m_objbrs[durability][nobj]->SetAddress(&m_objects[durability][nobj]);
       nobj++;
     } else {
-      for (int i = 0; i < m_branchNames[durability].size(); i++) {
+      for (unsigned int i = 0; i < m_branchNames[durability].size(); i++) {
         if (m_branchNames[durability][i] == m_obj_iter[durability]->key()) {
           m_objects[durability][nobj] = m_obj_iter[durability]->value();
           m_objbrs[durability][nobj]->SetAddress(&m_objects[durability][nobj]);
@@ -141,7 +141,7 @@ void pRootOutputModule::fillTree(const DataStore::EDurability& durability)
       m_arraybrs[durability][narray]->SetAddress(&m_arrays[durability][nobj]);
       narray++;
     } else {
-      for (int i = 0; i < m_branchNames[durability].size(); i++) {
+      for (unsigned int i = 0; i < m_branchNames[durability].size(); i++) {
         if (m_branchNames[durability][i] == m_array_iter[durability]->key()) {
           m_arrays[durability][narray] = (TClonesArray*)m_array_iter[durability]->value();
           m_arraybrs[durability][narray]->SetAddress(&m_arrays[durability][nobj]);
@@ -169,7 +169,7 @@ void pRootOutputModule::fillRingBuf(const DataStore::EDurability& durability)
       m_msghandler->add(m_obj_iter[durability]->value(), m_obj_iter[durability]->key());
       nobj++;
     } else {
-      for (int i = 0; i < m_branchNames[durability].size(); i++) {
+      for (unsigned int i = 0; i < m_branchNames[durability].size(); i++) {
         if (m_branchNames[durability][i] == m_obj_iter[durability]->key()) {
           m_msghandler->add(m_obj_iter[durability]->value(), m_obj_iter[durability]->key());
           nobj++;
@@ -187,7 +187,7 @@ void pRootOutputModule::fillRingBuf(const DataStore::EDurability& durability)
       m_msghandler->add(m_array_iter[durability]->value(), m_array_iter[durability]->key());
       narray++;
     } else {
-      for (int i = 0; i < m_branchNames[durability].size(); i++) {
+      for (unsigned int i = 0; i < m_branchNames[durability].size(); i++) {
         if (m_branchNames[durability][i] == m_array_iter[durability]->key()) {
           m_msghandler->add(m_array_iter[durability]->value(), m_array_iter[durability]->key());
           narray++;
@@ -412,7 +412,7 @@ void pRootOutputModule::output_server(void)
     // Decode EvtMessage
     objlist.clear();
     namelist.clear();
-    int status = m_msghandler->decode_msg(msg, objlist, namelist);
+    m_msghandler->decode_msg(msg, objlist, namelist);
 
     // Retrieve record info
     DataStore::EDurability durability = (DataStore::EDurability)(msg->header())->reserved[0];

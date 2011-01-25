@@ -9,6 +9,8 @@
 // Modified : 27 - Jul - 2010, for pbasf2
 //-
 
+#include <framework/core/HistoModule.h>
+
 #include <vector>
 
 #include "TChain.h"
@@ -18,7 +20,6 @@
 #include "TKey.h"
 #include "Riostream.h"
 
-#include <framework/core/HistoModule.h>
 
 namespace Belle2 {
   /*! Class to manage histograms defined in registered modules */

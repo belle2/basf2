@@ -10,9 +10,10 @@
 #ifndef MSGHANDLER_H
 #define MSGHANDLER_H
 
+#include <framework/pcore/EvtMessage.h>
+
 #include <vector>
 #include "TObject.h"
-#include "framework/pcore/EvtMessage.h"
 
 #define MAXEVTMSG   4000000*4         // 4Mwords
 

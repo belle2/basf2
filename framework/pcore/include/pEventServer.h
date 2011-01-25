@@ -8,9 +8,9 @@
 // Date : 1 - Jun - 2010
 //-
 
-#include <string>
+#include <framework/core/Module.h>
 
-#include "framework/core/Module.h"
+#include <string>
 
 namespace Belle2 {
   /*! A base class to construct an event_server. Supposed to substitute Module.h. */

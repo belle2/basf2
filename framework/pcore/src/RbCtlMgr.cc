@@ -6,6 +6,8 @@
 // Date : 13 - Jan - 2010
 //-
 
+#include <framework/pcore/RbCtlMgr.h>
+
 #include <sys/types.h>
 #include <unistd.h>
 #include <string.h>
@@ -14,8 +16,6 @@
 #include <sys/shm.h>
 #include <sys/sem.h>
 #include <errno.h>
-
-#include "framework/pcore/RbCtlMgr.h"
 
 using namespace Belle2;
 using namespace std;

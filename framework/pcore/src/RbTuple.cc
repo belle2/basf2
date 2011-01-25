@@ -6,6 +6,8 @@
 // Date : 21 - Apr - 2009
 //-
 
+#include <framework/pcore/RbTuple.h>
+
 #include <sys/types.h>
 #include <unistd.h>
 #include <string.h>
@@ -16,8 +18,6 @@
 #include "TTree.h"
 #include "TKey.h"
 #include "Riostream.h"
-
-#include "framework/pcore/RbTuple.h"
 
 using namespace std;
 using namespace Belle2;

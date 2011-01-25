@@ -8,10 +8,11 @@
 // Date : 30 - Jul - 2010
 //-
 
+#include <framework/core/Module.h>
+#include <framework/pcore/RbTuple.h>
+
 #include <string>
 
-#include "framework/core/Module.h"
-#include "framework/pcore/RbTuple.h"
 
 #define REG_HISTOGRAM   RbTupleManager::Instance().register_module ( this );
 

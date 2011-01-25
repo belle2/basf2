@@ -11,6 +11,9 @@
 // Date : 29 - Apr - 2000
 //-
 
+#include <framework/pcore/RingBuffer.h>
+#include <framework/logging/Logger.h>
+
 #include <iostream>
 #include <errno.h>
 #include <sys/types.h>
@@ -21,7 +24,7 @@
 #include <unistd.h>
 #include <string.h>
 
-#include "framework/pcore/RingBuffer.h"
+#include <boost/format.hpp>
 
 #define REDZONE_FACTOR 0.8
 
@@ -74,7 +77,7 @@ RingBuffer::RingBuffer(char* name, int size)
 
   sem_unlock(m_semid);
   cout << "RingBuffer initialization done" << endl;
-  printf("buftop = %8.8x, end = %8.8x\n", m_buftop, m_buftop + m_bufinfo->size);
+  B2INFO(boost::format("buftop = %1%, end = %2%\n") % m_buftop % (m_buftop + m_bufinfo->size))
 }
 
 RingBuffer::RingBuffer(int shm_id)

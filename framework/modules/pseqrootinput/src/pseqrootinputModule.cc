@@ -135,7 +135,7 @@ void pSeqRootInputModule::event()
   // Decode message
   vector<TObject*> objlist;
   vector<string> namelist;
-  int status = m_msghandler->decode_msg(evtmsg, objlist, namelist);
+  m_msghandler->decode_msg(evtmsg, objlist, namelist);
 
   delete evtbuf;
 
@@ -178,7 +178,6 @@ void pSeqRootInputModule::event_server(void)
   int nevt = 0;
   int nbgr = 0;
 
-  int size;
   while (1) {
     // Read file
     int size = m_file->read(evtbuf, MAXEVTSIZE);

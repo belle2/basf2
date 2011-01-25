@@ -8,7 +8,7 @@
 // Date : 30 - Jun - 2010
 //-
 
-#include "framework/core/Module.h"
+#include <framework/core/Module.h>
 
 namespace Belle2 {
   /*! A base class to construct an output_server. Supposed to substitute Module.h.*/

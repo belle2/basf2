@@ -6,6 +6,8 @@
 // Date : 28 - Jun - 2008
 //-
 
+#include <framework/pcore/SeqFile.h>
+
 #include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -14,8 +16,6 @@
 #include <string.h>
 #include <errno.h>
 #include <netinet/in.h>
-
-#include "framework/pcore/SeqFile.h"
 
 using namespace Belle2;
 using namespace std;

@@ -7,13 +7,12 @@
 // Modified : 9 - Jun - 2010
 //-
 
+#include <framework/pcore/EvtMessage.h>
 
 #include <iostream>
 #include <cstdlib>
 #include <string>
-#include <sys/time.h>
 
-#include "framework/pcore/EvtMessage.h"
 //#include "event/Event.h"
 
 using namespace std;

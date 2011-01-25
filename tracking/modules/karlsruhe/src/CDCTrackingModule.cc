@@ -14,8 +14,7 @@
 #include <framework/gearbox/Unit.h>
 
 #include <framework/logging/Logger.h>
-#include <cdc/hitcdc/SimHitCDC.h>
-#include <cdc/simcdc/CDCB4VHit.h>
+#include <cdc/hitcdc/CDCSimHit.h>
 
 #include <tracking/karlsruhe/CDCTrackHit.h>
 #include <tracking/karlsruhe/CDCSegment.h>
@@ -41,7 +40,7 @@ CDCTrackingModule::CDCTrackingModule() : Module()
 {
   setDescription("The CDCTrackingModule performs the first rough pattern recognition step in the CDC. Digitized CDC Hits are combined to track candidates");
 
-  addParam("InputSimHitsColName", m_inSimHitsColName, "Input simulated hits collection name", string("SimHitCDCArray"));
+  addParam("InputSimHitsColName", m_inSimHitsColName, "Input simulated hits collection name", string("CDCSimHitArray"));
   addParam("InputHitsColName", m_inHitsColName, "Input digitized hits collection name", string("HitCDCArray"));
   addParam("OutputTrackHitsColName", m_outTrackHitsColName, "Output hits (slightly changed digitized hits) collection name", string("TrackHitCDCArray"));
   addParam("OutputSegmentsColName", m_outSegmentsColName, "Output segments collection name", string("SegmentCDCArray"));
@@ -76,7 +75,7 @@ void CDCTrackingModule::event()
 {
 
   //StoreArray with simulated CDCHits, should already be created by previous modules
-  StoreArray<SimHitCDC> cdcSimHitArray(m_inSimHitsColName);
+  StoreArray<CDCSimHit> cdcSimHitArray(m_inSimHitsColName);
   B2INFO("Number of simulated Hits:  " << cdcSimHitArray.GetEntries());
 
 
@@ -186,7 +185,7 @@ void CDCTrackingModule::event()
 
 //Dump the position information of simulated Hits to a textfile
     for (int i = 0; i < cdcSimHitArray.GetEntries(); i++) { //loop over all SimHits
-      SimHitCDC *aSimHit = cdcSimHitArray[i];
+      CDCSimHit *aSimHit = cdcSimHitArray[i];
       //prints the position of simulated axial Hits to a file
       SimHitsfile << std::setprecision(5) << (aSimHit->getPosIn()[0] + aSimHit->getPosOut()[0]) / 2. / Unit::mm << " \t"
       << (aSimHit->getPosIn()[1] + aSimHit->getPosOut()[1]) / 2. / Unit::mm << " \t"

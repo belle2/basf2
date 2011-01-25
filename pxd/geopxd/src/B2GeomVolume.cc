@@ -142,7 +142,7 @@ Bool_t B2GeomVolume::initBasicParameters(GearDir& con)
     // get outer radius if not defined before
     if ((fOuterRadius < 0) && content.isParamAvailable("OuterRadius")) fOuterRadius = content.getParamLength("OuterRadius");
     // get color if not defined before
-    if ((iColor < 0) && content.isParamAvailable("Color")) iColor = content.getParamNumValue("Color");
+    if ((iColor < 0) && content.isParamAvailable("Color")) iColor = static_cast<Int_t>(content.getParamNumValue("Color"));
     // go one node up in GearDir or exit this loop
     if (!goToParentNode(content)) break;
   }
@@ -163,7 +163,7 @@ Bool_t B2GeomVolume::correctDensity()
   // check if parameters are initialized
   if (!isInitBasicParameters) {
     B2ERROR("Please run initBasicParameters() before using correctDensity()!\n");
-    return NULL;
+    return false;
   }
 
   //check if density has already been corrected
@@ -345,7 +345,7 @@ string B2GeomVXDVolume::searchAndReplaceInName(string inputString)
 {
   char text[10];
   // position in the string
-  int pos = string::npos;
+  unsigned int pos = 0;
 
   pos = inputString.find("%Layer");
   if (pos != string::npos) {

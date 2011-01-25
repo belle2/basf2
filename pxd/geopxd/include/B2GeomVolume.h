@@ -100,6 +100,8 @@ namespace Belle2 {
   public:
     /** Reset all variables of this class. */
     B2GeomVolume();
+    /** Destructor. */
+    virtual ~B2GeomVolume() {}
     /** Calls correctDensity() and then returns tVolume. */
     TGeoVolume* getVol();
     /** Goes one node up in GearDir. */
@@ -151,6 +153,8 @@ namespace Belle2 {
   public:
     /** Constructor. */
     B2GeomVXDVolume();
+    /** Destructor. */
+    virtual ~B2GeomVXDVolume() {}
     /** Searches for %iLayer, %iLadder, %iSensor in string inputString and replaces them by the corresponding number */
     std::string searchAndReplaceInName(std::string inputString);
     /** Set the variables iLayer, iLadder and iSensor */
@@ -206,6 +210,8 @@ namespace Belle2 {
       isCalculatedOffset = false;
       nComponents = 0;
     }
+    /** Destructor. */
+    virtual ~B2GeomVXDStructVolume() { }
     /** returns the position of the volume with relation to the mother volume. */
     TGeoHMatrix* getPosition()  {
       // //B2METHOD();

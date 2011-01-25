@@ -38,6 +38,8 @@ namespace Belle2 {
   public:
     /** Constructor for the active sensor */
     B2GeomPXDSensorActive() { }
+    /** Destructor for the active sensor */
+    virtual ~B2GeomPXDSensorActive() { }
     /** Reads parameters for PXD active silicon from GearBox. */
     Bool_t init(GearDir& content);
   };
@@ -50,6 +52,8 @@ namespace Belle2 {
   public:
     /** Constructor for the Silicon of the PXD. */
     B2GeomPXDSensorSilicon();
+    /** Destructor for the Silicon of the PXD. */
+    virtual ~B2GeomPXDSensorSilicon() {}
     /** Reads Parameters for PXD Silicon from GearBox. */
     Bool_t init(GearDir& content);
     /** Builds the geometry of the PXD sensor silicon. */
@@ -68,7 +72,7 @@ namespace Belle2 {
     /** Constructor for PXD Sensor. */
     B2GeomPXDSensor();
     /** Destructor for PXD Sensor. */
-    ~B2GeomPXDSensor() { }
+    virtual ~B2GeomPXDSensor() { }
     /** Reads parameters from GearBox and creates objects for sub components. */
     Bool_t init(GearDir& content);
     /** Builds the PXD sensor geometry. */

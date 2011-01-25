@@ -41,6 +41,8 @@ namespace Belle2 {
   public:
     /** Constructor for a PXD layer */
     B2GeomPXDLayer() {}
+    /** Destructor for a PXD layer */
+    virtual ~B2GeomPXDLayer() {}
     /** initialize this ladder with parameters from GearDir. */
     Bool_t init(GearDir& content);
     /** Build a PXD ladder after initializing parameters */

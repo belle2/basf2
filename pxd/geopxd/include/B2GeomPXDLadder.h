@@ -35,6 +35,8 @@ namespace Belle2 {
   public:
     /** Constructor for a PXD ladder geometry object. */
     B2GeomPXDLadder() { }
+    /** Destructor for a PXD ladder geometry object. */
+    virtual ~B2GeomPXDLadder() { }
     /** init PXD ladder geometry object with parameters from GearDir. */
     Bool_t init(GearDir& content);
     /** create TGeoVolume from the parameters. */

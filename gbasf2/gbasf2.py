@@ -261,7 +261,7 @@ def main():
         print 'Something went wrong - leaving JDL and sandbox in place'
 
     print str(totalevents) + 'events to process!'
-    print 'Now visit https://kek2-uidev.cc.kek.jp:15043/DIRAC/jobs/JobMonitor/display and select Project ' \
+    print 'Now visit https://kek2-uidev.cc.kek.jp:15043/DIRAC/systems/projects/overview and select Project ' \
         + cliParams.getProject()
     DIRAC.exit(exitCode)
 

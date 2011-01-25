@@ -27,7 +27,7 @@ using namespace Simulation;
 
 const G4double c_Epsilon = 1.0e-8;
 
-SVDSensitiveDetector::SVDSensitiveDetector(G4String name) : SensitiveDetectorBase(name), m_hitNumber(0)
+SVDSensitiveDetector::SVDSensitiveDetector(G4String name) : SensitiveDetectorBase(name)
 {
 
 }
@@ -109,14 +109,12 @@ G4bool SVDSensitiveDetector::ProcessHits(G4Step* aStep, G4TouchableHistory*)
   TVector3 posOut(posStepPosLocal.x() / cm, posStepPosLocal.y() / cm, posStepPosLocal.z() / cm);
   TVector3 momInVec(momIn.x() / GeV, momIn.y() / GeV, momIn.z() / GeV);
 
-  new(svdArray->AddrAt(m_hitNumber)) SVDSimHit(layerID, ladderID, sensorID,
-                                               posIn, posOut, theta / radian,
-                                               momInVec, partPDG, trackID,
-                                               depEnergy / GeV,
-                                               stepLength / cm,
-                                               globalTime / ns);
-  m_hitNumber++;
-
+  new(svdArray->AddrAt(svdArray->GetLast() + 1)) SVDSimHit(layerID, ladderID, sensorID,
+                                                           posIn, posOut, theta / radian,
+                                                           momInVec, partPDG, trackID,
+                                                           depEnergy / GeV,
+                                                           stepLength / cm,
+                                                           globalTime / ns);
   return true;
 }
 

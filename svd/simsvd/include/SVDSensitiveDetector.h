@@ -48,8 +48,6 @@ namespace Belle2 {
 
   private:
 
-    int m_hitNumber; /**< The current number of created hits. Used to fill the DataStore SVD array.*/
-
   };
 
 } // end of namespace Belle2

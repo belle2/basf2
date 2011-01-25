@@ -72,8 +72,15 @@ def main():
         print selist
         se = selist['Value'][0]
         print 'trying to use SE: ' + se
+        inputfiles = []
+        for jdlline in open(glob.glob('../*.jdl')[0].rstrip()):
+            if 'LFN' in jdlline:
+                inputfiles.append(os.path.basename(jdlline)[0:-3])
         # XXX need a better way to determine output files
         for outputfile in glob.glob('*.root'):
+            if outputfile in cliParams.getInputFiles() or outputfile \
+                in inputfiles:
+                continue
             lfn = outputpath + '/' + outputfile
             print 'trying to upload/register ' + lfn
             # XXX - we're using belle VO for belle2 data. Badness.

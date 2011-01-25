@@ -111,35 +111,10 @@ def make_tar(project, files):
         return None
 
 
-# gBasf2 takes a number of options - either from the commandline or in a steering file (see
-# gbasf2utils.py) and uses them to (currently)
-# 1. conduct a metadata query to match appropriate data to work with - a set of LFNs
-# 2. performs all necessary tasks to get the user a proxy
-# 3. construct a project based on the name provided and appropriate JDLs - presently just 1 per job
-# 4. submits the created jdls to the DIRAC Workload Management System
+# check for proxy prescence and if not present, make it, upload it, VOMS it
 
 
-def main():
-    exitCode = 0
-    errorList = []
-    lfns = []
-
-  # setup options
-    cliParams = CLIParams()
-    if os.environ.has_key('BELLE2_RELEASE'):
-        cliParams.setSwVer(os.environ['BELLE2_RELEASE'])
-    cliParams.registerCLISwitches()
-    Script.disableCS()
-    Script.parseCommandLine(ignoreErrors=True)
-    cliParams.registerSteeringOptions()
-
-  # setup dirac - import here because it pwns everything
-    from DIRAC.Interfaces.API import Dirac
-    dirac = Dirac.Dirac()
-
-  # FIXME - think about enableCS here.
-
-  # check for proxy prescence and if not present, make it
+def prepareProxy():
   # FIXME - upload proxy for lifetime of certificate
   # FIXME - warn on certificate validity
     proxyinfo = getProxyInfo()
@@ -208,6 +183,38 @@ def main():
 
     # set path of proxy so  AMGA client picks it up
     os.environ['X509_USER_PROXY'] = proxyProps['path']
+
+
+# gBasf2 takes a number of options - either from the commandline or in a steering file (see
+# gbasf2utils.py) and uses them to (currently)
+# 1. conduct a metadata query to match appropriate data to work with - a set of LFNs
+# 2. performs all necessary tasks to get the user a proxy
+# 3. construct a project based on the name provided and appropriate JDLs - presently just 1 per job
+# 4. submits the created jdls to the DIRAC Workload Management System
+
+
+def main():
+    exitCode = 0
+    errorList = []
+    lfns = []
+
+  # setup options
+    cliParams = CLIParams()
+    if os.environ.has_key('BELLE2_RELEASE'):
+        cliParams.setSwVer(os.environ['BELLE2_RELEASE'])
+    cliParams.registerCLISwitches()
+    Script.disableCS()
+    Script.parseCommandLine(ignoreErrors=True)
+    cliParams.registerSteeringOptions()
+
+  # setup dirac - import here because it pwns everything
+    from DIRAC.Interfaces.API import Dirac
+    dirac = Dirac.Dirac()
+
+  # FIXME - think about enableCS here.
+
+  # completes all necessary steps to setup the proxy we need, or exits out
+    prepareProxy()
 
   # FIXME - check for existing project name, and prevent additions unless forced
 

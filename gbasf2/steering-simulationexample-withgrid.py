@@ -22,7 +22,7 @@ evtpermin = '40'
 # Software Version
 swver = 'build-2010-12-13'
 # (optional) Files to be send with the job
-inputsandboxfiles = 'file1.txt,file2.txt'
+inputsandboxfiles = 'g4sim.macro'
 # (optional) max events - the maximum number of events to use
 maxevents = '100000'
 

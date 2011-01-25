@@ -67,6 +67,7 @@ namespace Belle2 {
       int m_genMom;          /** Option to set the distribution function for the momentum */
       int m_genVert;          /** Option to set the distribution function for the vertex */
       int m_genAngle;        /** Option to set the distribution function for the angles */
+      int m_randomseed;        /** setting the random seed for the particle gun. This will disappear, once the central random generator is running **/
     };
 
   }//end namespace Generators

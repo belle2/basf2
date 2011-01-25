@@ -59,6 +59,7 @@ PGunInputModule::PGunInputModule() : Module()
   addParam("vertexGeneration", m_genVert, "Choice of distribution function for vertex generation", 2);
   addParam("angleGeneration", m_genAngle, "Choice of distribution function for angle generation", 0);
   addParam("PIDcodes", m_PIDcodes, "PID codes for generated particles", defaultPIDcodes);
+  addParam("Rseed", m_randomseed, "Randomseed for particle gun. (temporary solution)", 3452346);
 }
 
 
@@ -77,6 +78,7 @@ void PGunInputModule::initialize()
   m_pgun.m_y_par2 = m_y_par2;
   m_pgun.m_x_par1 = m_x_par1;
   m_pgun.m_x_par2 = m_x_par2;
+  m_pgun.SetRandomSeed(m_randomseed);
   if (m_PIDcodes.size() > 0)
     m_pgun.m_PIDcodes = m_PIDcodes;
   else {

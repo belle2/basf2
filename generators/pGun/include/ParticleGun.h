@@ -49,7 +49,7 @@ namespace Belle2 {//namespace Belle2
        */
       ParticleGun() {
 
-        m_grand.SetSeed(394695034); /** For the time being, always the same fixed seed is used. This will be changed when the random generator becomes a global object from the framework. */
+        // m_grand.SetSeed(m_randomseed); /** For the time being, always the same fixed seed is used. This will be changed when the random generator becomes a global object from the framework. */
 
       };
 
@@ -57,6 +57,14 @@ namespace Belle2 {//namespace Belle2
        * Destructor.
        */
       ~ParticleGun() {}
+
+
+      void SetRandomSeed(int seed) {
+
+        m_grand.SetSeed(seed);
+
+      }
+
 
       /**
        * Generate the next event and store the result in the given MCParticle graph.
@@ -82,7 +90,6 @@ namespace Belle2 {//namespace Belle2
       PGUNgenOpt m_genMom;          /** Option to set the distribution function for the momentum */
       PGUNgenOpt m_genVert;          /** Option to set the distribution function for the vertex */
       PGUNgenOpt m_genAngle;        /** Option to set the distribution function for the angles */
-
 
     protected:
 

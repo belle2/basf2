@@ -34,7 +34,7 @@
 using namespace std;
 using namespace Belle2;
 
-REG_MODULE(CDCTrackingModule)
+REG_MODULE(CDCTracking)
 
 
 CDCTrackingModule::CDCTrackingModule() : Module()
@@ -69,7 +69,7 @@ void CDCTrackingModule::initialize()
 
 void CDCTrackingModule::beginRun()
 {
-  B2INFO("CDCTrackingModule beginRun");
+  //B2INFO("CDCTrackingModule beginRun");
 }
 
 void CDCTrackingModule::event()

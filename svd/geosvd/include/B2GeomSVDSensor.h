@@ -36,6 +36,8 @@ namespace Belle2 {
   public:
     /** Constructor for geometry object representing the silicon of the SVD sensor. */
     B2GeomSVDSensorSilicon();
+    /** Destructor for geometry object representing the silicon of the SVD sensor. */
+    virtual ~B2GeomSVDSensorSilicon() {}
     /** Initialize Parameters from GearBox */
     Bool_t init(GearDir& content);
     /** Build TGeoVolume according to the parameters. */
@@ -54,6 +56,8 @@ namespace Belle2 {
   public:
     /** Constructor for geometry object representing the SVD active sensor. */
     B2GeomSVDSensor();
+    /** Destructor for geometry object representing the SVD active sensor. */
+    virtual ~B2GeomSVDSensor() {}
     /** Initialize Parameters from GearBox */
     Bool_t init(GearDir& content);
     /** Build TGeoVolume according to the parameters. */

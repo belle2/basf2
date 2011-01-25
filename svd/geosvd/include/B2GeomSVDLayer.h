@@ -39,6 +39,8 @@ namespace Belle2 {
   public:
     /** Constructor. */
     B2GeomSVDLayer();
+    /** Destructor. */
+    virtual ~B2GeomSVDLayer() {}
     /** Initialize parameters from GearBox. */
     Bool_t init(GearDir& content);
     /** Build the geometry. */

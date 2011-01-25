@@ -43,6 +43,8 @@ namespace Belle2 {
   public:
     /** Constructor */
     B2GeomSVDLadderRib();
+    /** Destructor */
+    virtual ~B2GeomSVDLadderRib() {}
     /** Initializes the parameters from GearBox */
     Bool_t init(GearDir& content);
     /** builds the geometry of the rib */
@@ -58,6 +60,8 @@ namespace Belle2 {
   public:
     /** Creator */
     B2GeomSVDLadderRibs();
+    /** Destructor */
+    virtual ~B2GeomSVDLadderRibs() {}
     /** Initializes the parameters from GearBox */
     Bool_t init(GearDir& content);
     /** builds the geometry of the ribs */
@@ -72,6 +76,8 @@ namespace Belle2 {
   public:
     /** Constructor. */
     B2GeomSVDLadderCoolingpipe();
+    /** Destructor. */
+    virtual ~B2GeomSVDLadderCoolingpipe() {}
     /** Initializes the parameters from GearBox */
     Bool_t init(GearDir& content);
     /** Builds the geometry of the cooling pipe. */
@@ -90,7 +96,7 @@ namespace Belle2 {
     /** Constructor. */
     B2GeomSVDLadder();
     /** Destructor. */
-    ~B2GeomSVDLadder() { }
+    virtual ~B2GeomSVDLadder() { }
     /** Initializes the parameters from GearBox. */
     Bool_t init(GearDir& content);
     /** Builds the geometry of the SVD ladder. */

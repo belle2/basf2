@@ -35,7 +35,7 @@ bool ParticleGun::generateEvent(MCParticleGraph &graph)
     if (m_PIDcodes.size() == 1)// only one PIDcode available, always take this one
       p.setPDG(m_PIDcodes[0]);
     else {//else choose randomly one of the available codes
-      int index = m_grand.Uniform(m_PIDcodes.size());
+      int index = static_cast<int>(m_grand.Uniform(m_PIDcodes.size()));
       p.setPDG(m_PIDcodes[index]);
     }
     p.setMassFromPDG();

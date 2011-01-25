@@ -71,11 +71,11 @@ def make_jdl(
 \
         {
 \
-            "*.his",
+            #"*.his",
 \
-            "*.root",
+            #"*.root",
 \
-            "*.log",
+            #"*.log",
 \
             "std.err",
 \

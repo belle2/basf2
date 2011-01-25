@@ -28,7 +28,7 @@ using namespace Simulation;
 const G4double c_Epsilon = 1.0e-8;
 
 
-PXDSensitiveDetector::PXDSensitiveDetector(G4String name) : SensitiveDetectorBase(name), m_hitNumber(0)
+PXDSensitiveDetector::PXDSensitiveDetector(G4String name) : SensitiveDetectorBase(name)
 {
 
 }
@@ -110,14 +110,12 @@ G4bool PXDSensitiveDetector::ProcessHits(G4Step* aStep, G4TouchableHistory*)
   TVector3 posOut(posStepPosLocal.x() / cm, posStepPosLocal.y() / cm, posStepPosLocal.z() / cm);
   TVector3 momInVec(momIn.x() / GeV, momIn.y() / GeV, momIn.z() / GeV);
 
-  new(pxdArray->AddrAt(m_hitNumber)) PXDSimHit(layerID, ladderID, sensorID,
-                                               posIn, posOut, theta / radian,
-                                               momInVec, partPDG, trackID,
-                                               depEnergy / GeV,
-                                               stepLength / cm,
-                                               globalTime / ns);
-  m_hitNumber++;
-
+  new(pxdArray->AddrAt(pxdArray->GetLast() + 1)) PXDSimHit(layerID, ladderID, sensorID,
+                                                           posIn, posOut, theta / radian,
+                                                           momInVec, partPDG, trackID,
+                                                           depEnergy / GeV,
+                                                           stepLength / cm,
+                                                           globalTime / ns);
   return true;
 }
 

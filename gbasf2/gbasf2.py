@@ -56,6 +56,11 @@ def make_jdl(
     f.write('      "' + steering_file + '",\n')
     f.write('      "basf2helper.sh",\n')
     f.write('      "gbasf2output.py",\n')
+    f.write('      "AmgaClient.py",\n')
+    f.write('      "mdinterface.py",\n')
+    f.write('      "mdstandalone.py",\n')
+    f.write('      "mdclient.py",\n')
+    f.write('      "mdparser.py",\n')
     if tar is not None:
         f.write('      "' + tar + '",\n')
     f.write('      "LFN:' + lfn + '"\n')

@@ -11,7 +11,7 @@
 #ifndef CDCSensitiveDetector_H
 #define CDCSensitiveDetector_H
 
-#include <cdc/simcdc/CDCB4VHit.h>
+//#include <cdc/simcdc/CDCB4VHit.h>
 #include <simulation/kernel/SensitiveDetectorBase.h>
 
 
@@ -33,19 +33,16 @@ namespace Belle2 {
     ~CDCSensitiveDetector() {}
 
     //! Register CDC hits collection into G4HCofThisEvent
-    void Initialize(G4HCofThisEvent *eventHC);
+    void Initialize(G4HCofThisEvent *);
 
     //! Process each step and calculate variables defined in CDCB4VHit
     G4bool ProcessHits(G4Step *aStep, G4TouchableHistory *history);
 
     //! Do what you want to do at the end of each event
-    void EndOfEvent(G4HCofThisEvent *eventHC);
+    void EndOfEvent(G4HCofThisEvent *);
 
-    //! Read hits information from text file
-    void LoadEvent(FILE *eventFile);
-
-    //! Save CDCB4VHit into hits collection
-    void makeRawHit(const G4int layerId,
+    //! Save CDCSimHit into datastore
+    void saveSimHit(const G4int layerId,
                     const G4int wireId,
                     const G4int trackID,
                     const G4int pid,
@@ -58,8 +55,6 @@ namespace Belle2 {
                     const G4ThreeVector & posIn,
                     const G4ThreeVector & posOut,
                     const G4int lr);
-
-    //void CreateCollection();
 
     //void AddbgOne(bool doit);
 
@@ -262,15 +257,15 @@ namespace Belle2 {
     //! Sort wire id
     std::vector<int>  WireId_in_hit_order(int id0, int id1, int nWires);
 
-    G4int _non_uniform_field;
+    G4int m_nonUniformField;
     G4double alpha, brot[3][3];
 
   private:
 
-    G4double fThresholdEnergyDeposit;
-    G4double fThresholdKineticEnergy;
-    CDCB4VHitsCollection *fHitCollection;
-    G4int fHCID;
+    G4double m_thresholdEnergyDeposit;
+    G4double m_thresholdKineticEnergy;
+
+    int m_hitNumber; /**< The current number of created hits in an event. Used to fill the DataStore CDC array.*/
   };
 
 } // end of namespace Belle2

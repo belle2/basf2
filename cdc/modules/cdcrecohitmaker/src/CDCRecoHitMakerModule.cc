@@ -10,7 +10,7 @@
 
 #include <cdc/modules/cdcrecohitmaker/CDCRecoHitMakerModule.h>
 #include <framework/datastore/SimpleVec.h>
-#include <cdc/hitcdc/SimHitCDC.h>
+#include <cdc/hitcdc/CDCSimHit.h>
 #include <cdc/dataobjects/CDCHit.h>
 #include <TH1F.h>
 #include <TNtuple.h>
@@ -66,11 +66,11 @@ void CDCRecoHitMakerModule::event()
   std::vector<float> myvector(arraySimHitToCDCHit.GetEntries());
 
   for (int ii = 0; ii < arraySimHitToCDCHit.GetEntries(); ii++) {
-    SimHitCDC* simhitptr = static_cast<SimHitCDC*>(arraySimHitToCDCHit[ii]->getFrom());
+    CDCSimHit* simhitptr = static_cast<CDCSimHit*>(arraySimHitToCDCHit[ii]->getFrom());
     if (!simhitptr) {B2WARNING("Should not work");}
 
 
-    float trueDriftTime      = (static_cast<SimHitCDC*>(arraySimHitToCDCHit[ii]->getFrom()))->getDriftLength();
+    float trueDriftTime      = (static_cast<CDCSimHit*>(arraySimHitToCDCHit[ii]->getFrom()))->getDriftLength();
     float simulatedDriftTime = (static_cast<CDCHit*>(arraySimHitToCDCHit[ii]->getTo()))->getDriftTime();
     myvector[ii] = simulatedDriftTime - trueDriftTime;
     B2WARNING("True: " << trueDriftTime);

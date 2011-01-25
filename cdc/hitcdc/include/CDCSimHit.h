@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef SIMHITCDC_H
-#define SIMHITCDC_H
+#ifndef CDCSIMHIT_H
+#define CDCSIMHIT_H
 
 #include <framework/datastore/DataStore.h>
 
@@ -19,7 +19,7 @@
 namespace Belle2 {
 
   //! Example Detector
-  class SimHitCDC : public TObject {
+  class CDCSimHit : public TObject {
   public:
 
     //! The layer id of this hit.
@@ -142,10 +142,10 @@ namespace Belle2 {
     //! Empty constructor
     /*! Recommended for ROOT IO
     */
-    SimHitCDC() {;}
+    CDCSimHit() {;}
 
     //! Useful Constructor
-    SimHitCDC(int layerId,
+    CDCSimHit(int layerId,
               int wireId,
               int trackId,
               int pdg,
@@ -173,7 +173,7 @@ namespace Belle2 {
       m_posFlag = posFlag;
     }
 
-    ClassDef(SimHitCDC, 1);
+    ClassDef(CDCSimHit, 1);
 
   };
 

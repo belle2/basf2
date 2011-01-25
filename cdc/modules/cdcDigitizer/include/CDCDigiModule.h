@@ -15,7 +15,7 @@
 #include <framework/core/Module.h>
 
 //cdc package headers
-#include <cdc/hitcdc/SimHitCDC.h>
+#include <cdc/hitcdc/CDCSimHit.h>
 #include <cdc/modules/cdcDigitizer/CDCSignal.h>
 
 //C++/C standard lib elements.
@@ -52,7 +52,7 @@ namespace Belle2 {
 
   public:
 
-    typedef std::vector<SimHitCDC*>      SimHitCDCVec;   /**< For input from Geant4 simulation.*/
+    typedef std::vector<CDCSimHit*>      CDCSimHitVec;   /**< For input from Geant4 simulation.*/
     typedef std::map< int, CDCSignal *>  CDCSignalMap;   /**< Map of Cell ID -> signal.*/
     typedef std::pair< int, CDCSignal *> vpair;          /**< Pair of CDCSignalMap. */
 
@@ -125,14 +125,14 @@ namespace Belle2 {
      *        of the SimHit and other hits.
      */
 
-    void printSimCDCHitInfo(const SimHitCDC & hit) const;
+    void printCDCSimHitInfo(const CDCSimHit & hit) const;
 
     /** Method to print SimHit information of many hits.
      *
      *  @param info Extra information.
      *  @param hitVec Vector to store SimHits.
      */
-    void printSimCDCHitsInfo(std::string info, const SimHitCDCVec & hitVec) const;
+    void printCDCSimHitsInfo(std::string info, const CDCSimHitVec & hitVec) const;
 
     /** Method to print module parameters.
      *

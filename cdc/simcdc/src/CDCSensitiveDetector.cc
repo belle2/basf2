@@ -13,15 +13,9 @@
 #include <cdc/simcdc/Helix.h>
 #include <cdc/geocdc/CDCGeometryPar.h>
 #include <framework/logging/Logger.h>
-
-/*
-#ifdef G4VIS_USE
-#include "G4VVisManager.hh"
-#include "G4Circle.hh"
-#include "G4Colour.hh"
-#include "G4VisAttributes.hh"
-#endif
-*/
+#include <framework/datastore/DataStore.h>
+#include <framework/datastore/StoreArray.h>
+#include <cdc/hitcdc/CDCSimHit.h>
 
 #include "G4Step.hh"
 #include "G4SteppingManager.hh"
@@ -45,30 +39,15 @@ typedef HepGeom::Vector3D<double> HepVector3D;
 using namespace Belle2;
 
 CDCSensitiveDetector::CDCSensitiveDetector(G4String name, G4double thresholdEnergyDeposit, G4double thresholdKineticEnergy):
-    SensitiveDetectorBase(name), fThresholdEnergyDeposit(thresholdEnergyDeposit),
-    fThresholdKineticEnergy(thresholdKineticEnergy), fHitCollection(0),
-    fHCID(-1)
+    SensitiveDetectorBase(name), m_thresholdEnergyDeposit(thresholdEnergyDeposit),
+    m_thresholdKineticEnergy(thresholdKineticEnergy), m_hitNumber(0)
 {
-
-  G4String CollName1 = name + "Collection";
-  collectionName.insert(CollName1);
 }
 
-void CDCSensitiveDetector::Initialize(G4HCofThisEvent * HCTE)
+void CDCSensitiveDetector::Initialize(G4HCofThisEvent *)
 {
-  // Create a new hit collection
-  fHitCollection = new CDCB4VHitsCollection(SensitiveDetectorName, collectionName[0]);
-
-  // Assign a unique ID to the hits collection
-  if (fHCID < 0) {
-    fHCID = G4SDManager::GetSDMpointer()->GetCollectionID(fHitCollection);
-  }
-
-  // Attach collections to HitsCollectionsofThisEvent
-  HCTE -> AddHitsCollection(fHCID, fHitCollection);
-
   // Initialize
-  _non_uniform_field = 0;
+  m_nonUniformField = 0;
 }
 
 //-----------------------------------------------------
@@ -144,10 +123,10 @@ G4bool CDCSensitiveDetector::ProcessHits(G4Step *aStep, G4TouchableHistory *)
         const G4Field* field = G4TransportationManager::GetTransportationManager()->GetFieldManager()->GetDetectorField();
         field->GetFieldValue(pos, Bfield);
 
-        _non_uniform_field = 1;
+        m_nonUniformField = 1;
         if (Bfield[0] == 0. &&
             Bfield[1] == 0. &&
-            Bfield[2] != 0.) _non_uniform_field = 0;
+            Bfield[2] != 0.) m_nonUniformField = 0;
 
         G4double B_kG[3] = {Bfield[0] / kilogauss,
                             Bfield[1] / kilogauss,
@@ -219,7 +198,7 @@ G4bool CDCSensitiveDetector::ProcessHits(G4Step *aStep, G4TouchableHistory *)
         if ((tryp.cross(onTrack)).z() < 0.) lr = 0;
 
         if (wires.size() == 1) {
-          makeRawHit(layerId, wires[i], trackID, pid, distance, tof, edep, s_in_layer*cm, momIn, posW, posIn, posOut, lr);
+          saveSimHit(layerId, wires[i], trackID, pid, distance, tof, edep, s_in_layer*cm, momIn, posW, posIn, posOut, lr);
         } else {
           // Cubic approximation of the track
           const G4int ic(3);
@@ -269,7 +248,7 @@ G4bool CDCSensitiveDetector::ProcessHits(G4Step *aStep, G4TouchableHistory *)
             G4double pmag = momIn.mag();
             const G4ThreeVector p_In(pmag*vent[3], pmag*vent[4], pmag*vent[5]);
 
-            makeRawHit(layerId, wires[i], trackID, pid, distance, tof, edep_in_cell, (sint - s1)*cm, p_In, posW, x_In, x_Out, lr);
+            saveSimHit(layerId, wires[i], trackID, pid, distance, tof, edep_in_cell, (sint - s1)*cm, p_In, posW, x_In, x_Out, lr);
           } else {  //the particle exits
 
             edep_in_cell = edep * (s2 - sint) / s_in_layer;
@@ -278,7 +257,7 @@ G4bool CDCSensitiveDetector::ProcessHits(G4Step *aStep, G4TouchableHistory *)
             G4double pmag = momIn.mag();
             const G4ThreeVector p_In(pmag*vent[3], pmag*vent[4], pmag*vent[5]);
 
-            makeRawHit(layerId, wires[i], trackID, pid, distance, tof, edep_in_cell, (s2 - sint)*cm, p_In, posW, x_In, posOut, lr);
+            saveSimHit(layerId, wires[i], trackID, pid, distance, tof, edep_in_cell, (s2 - sint)*cm, p_In, posW, x_In, posOut, lr);
           }
         }
       }
@@ -293,20 +272,8 @@ void CDCSensitiveDetector::EndOfEvent(G4HCofThisEvent *)
 {
 }
 
-void CDCSensitiveDetector::LoadEvent(FILE * theSubDetectorEventHitsFileInput)
-{
-  CDCB4VHit * newHit = new CDCB4VHit();
-
-  while (newHit->Load(theSubDetectorEventHitsFileInput)) {
-    fHitCollection->insert(newHit);
-    newHit = new CDCB4VHit();
-  }
-
-  delete newHit;
-}
-
 void
-CDCSensitiveDetector::makeRawHit(const G4int layerId,
+CDCSensitiveDetector::saveSimHit(const G4int layerId,
                                  const G4int wireId,
                                  const G4int trackID,
                                  const G4int pid,
@@ -320,8 +287,27 @@ CDCSensitiveDetector::makeRawHit(const G4int layerId,
                                  const G4ThreeVector & posOut,
                                  const G4int lr)
 {
-  CDCB4VHit * hit = new CDCB4VHit(layerId, wireId, trackID, pid, distance, tof, edep, stepLength, mom, posW, posIn, posOut, lr);
-  fHitCollection->insert(hit);
+  StoreArray<CDCSimHit> cdcArray("CDCSimHitArray");
+  new(cdcArray->AddrAt(m_hitNumber)) CDCSimHit();
+  cdcArray[m_hitNumber]->setLayerId(layerId);
+  cdcArray[m_hitNumber]->setWireId(wireId);
+  cdcArray[m_hitNumber]->setTrackId(trackID);
+  cdcArray[m_hitNumber]->setPDGCode(pid);
+  cdcArray[m_hitNumber]->setDriftLength(distance / cm);
+  cdcArray[m_hitNumber]->setFlightTime(tof / ns);
+  cdcArray[m_hitNumber]->setEnergyDep(edep / GeV);
+  cdcArray[m_hitNumber]->setStepLength(stepLength / cm);
+  TVector3 momentum(mom.getX() / GeV, mom.getY() / GeV, mom.getZ() / GeV);
+  cdcArray[m_hitNumber]->setMomentum(momentum);
+  TVector3 posWire(posW.getX() / cm, posW.getY() / cm, posW.getZ() / cm);
+  cdcArray[m_hitNumber]->setPosWire(posWire);
+  TVector3 positionIn(posIn.getX() / cm, posIn.getY() / cm, posIn.getZ() / cm);
+  cdcArray[m_hitNumber]->setPosIn(positionIn);
+  TVector3 positionOut(posOut.getX() / cm, posOut.getY() / cm, posOut.getZ() / cm);
+  cdcArray[m_hitNumber]->setPosOut(positionOut);
+  cdcArray[m_hitNumber]->setPosFlag(lr);
+
+  m_hitNumber++;
 }
 
 /*
@@ -831,7 +817,7 @@ CDCSensitiveDetector::for_Rotat(const G4double bfld[3])
   //frame in which only Bz-comp. is non-zero.
   //~dead copy of gsim_cdc_for_rotat.F in gsim-cdc for Belle (for tentaive use)
 
-  if (_non_uniform_field == 0) return;
+  if (m_nonUniformField == 0) return;
 
   G4double bx, by, bz;
   bx = bfld[0];
@@ -868,7 +854,7 @@ CDCSensitiveDetector::Rotat(G4double& x, G4double& y, G4double& z,
   //~dead copy (for tentaive use) of gsim_cdc_rotat/irotat.F in gsim-cdc
   //for Belle
 
-  if (_non_uniform_field == 0) return;
+  if (m_nonUniformField == 0) return;
 
   G4double x0(x), y0(y), z0(z);
 
@@ -895,7 +881,7 @@ CDCSensitiveDetector::Rotat(G4double x[3], const int mode)
   //~dead copy (for tentaive use) of gsim_cdc_rotat/irotat.F in gsim-cdc
   //for Belle
 
-  if (_non_uniform_field == 0) return;
+  if (m_nonUniformField == 0) return;
 
   G4double x0(x[0]), y0(x[1]), z0(x[2]);
 

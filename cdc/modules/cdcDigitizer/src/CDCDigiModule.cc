@@ -51,7 +51,7 @@ CDCDigiModule::CDCDigiModule() : Module()
 
   // Add parameters
   // I/O
-  addParam("InputColName",                m_inColName, "Input collection name", string("SimHitCDCArray"));
+  addParam("InputColName",                m_inColName, "Input collection name", string("CDCSimHitArray"));
   addParam("OutputColName",               m_outColName, "Output collection name", string("HitCDCArray"));
   addParam("CDCHitOutColName",            m_cdcHitOutColName, "Output collection name", string("CDCHitCollection"));
   //Parameters for Digitization
@@ -105,7 +105,7 @@ void CDCDigiModule::event()
   //------------------------------------------
   // Get CDC hits collection from data store.
   //------------------------------------------
-  StoreArray<SimHitCDC> cdcArray(m_inColName);
+  StoreArray<CDCSimHit> cdcArray(m_inColName);
   if (!cdcArray) {
     B2ERROR("Can not find " << m_inColName << ".");
   }
@@ -125,15 +125,15 @@ void CDCDigiModule::event()
   // Loop over all hits
   for (int iHits = 0; iHits < nHits; iHits++) {
     // Get a hit
-    SimHitCDC* aSimHitCDC = cdcArray[iHits];
+    CDCSimHit* aCDCSimHit = cdcArray[iHits];
 
     // Hit geom. info
-    int hitLayerId =   aSimHitCDC->getLayerId();
-    int hitWireId  =   aSimHitCDC->getWireId();
+    int hitLayerId =   aCDCSimHit->getLayerId();
+    int hitWireId  =   aCDCSimHit->getWireId();
 
     // Hit phys. info
-    double hitdEdx        = aSimHitCDC->getEnergyDep() * Unit::GeV;
-    double hitDriftLength = aSimHitCDC->getDriftLength() * Unit::cm;
+    double hitdEdx        = aCDCSimHit->getEnergyDep() * Unit::GeV;
+    double hitDriftLength = aCDCSimHit->getDriftLength() * Unit::cm;
 
     bool ifNewDigi = true;
     // The first SimHit is always a new digit, but the looping will anyhow end immediately.
@@ -306,7 +306,7 @@ double CDCDigiModule::getDriftTime(double) //driftLength)
   return 0;
 }
 
-void CDCDigiModule::printSimCDCHitInfo(const SimHitCDC & aHit) const
+void CDCDigiModule::printCDCSimHitInfo(const CDCSimHit & aHit) const
 {
   //----------------------
   // Printing a hit info.
@@ -328,16 +328,16 @@ void CDCDigiModule::printSimCDCHitInfo(const SimHitCDC & aHit) const
          << std::setprecision(0));
 }
 
-void CDCDigiModule::printSimCDCHitsInfo(std::string info, const SimHitCDCVec & hitVec) const
+void CDCDigiModule::printCDCSimHitsInfo(std::string info, const CDCSimHitVec & hitVec) const
 {
   //---------------------
   // Printing hits info.
   //---------------------
-  SimHitCDCVec::const_iterator iterHits;
+  CDCSimHitVec::const_iterator iterHits;
 
   B2INFO("   " << info << ":" << "\n");
   for (iterHits = hitVec.begin(); iterHits != hitVec.end(); iterHits++) {
-    printSimCDCHitInfo(**iterHits);
+    printCDCSimHitInfo(**iterHits);
   }
 }
 

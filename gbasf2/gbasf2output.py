@@ -19,7 +19,8 @@ import DIRAC
 from DIRAC.Core.Base import Script
 from DIRAC.Core.Security.Misc import *
 from DIRAC.Core.Security import Properties
-from DIRAC.ResourceStatusSystem.Utilities.CS import *
+# from DIRAC.ResourceStatusSystem.Utilities.CS import *
+from DIRAC.ConfigurationSystem.Client.Config import gConfig
 from DIRAC.FrameworkSystem.Client.ProxyGeneration import generateProxy
 from DIRAC.FrameworkSystem.Client.ProxyManagerClient import ProxyManagerClient
 from DIRAC.DataManagementSystem.Client.ReplicaManager import ReplicaManager
@@ -62,7 +63,8 @@ def main():
     if aclient.checkDirectory(outputpath):
         repman = ReplicaManager()
       # loop through the output files, uploading and registering
-        ses = getStorageElements()['Value']
+      #  ses = getStorageElements()['Value']
+        ses = gConfig.getSections('/Resources/StorageElements')['Value']
         ses.remove('SandboxSE')
         ses.remove('CentralSE')
         print ses

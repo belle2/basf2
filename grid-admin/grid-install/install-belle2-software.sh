@@ -94,7 +94,7 @@ echo "end env----------------------"
 ##############################################################################
 echo "start installation----------------------"
 if [ ! -d $VO_BELLE_SW_DIR/belle2 ]; then
-  mkdir $VO_BELLE_SW_DIR/belle2
+  mkdir -p $VO_BELLE_SW_DIR/belle2
 fi
 
 chown `whoami` $VO_BELLE_SW_DIR/belle2

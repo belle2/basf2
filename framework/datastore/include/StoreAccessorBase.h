@@ -31,7 +31,7 @@ namespace Belle2 {
      *
      *  Virtual because this is a base class.
      */
-    virtual ~StoreAccessorBase();
+    virtual ~StoreAccessorBase() {};
 
 
     /** Returns name under which stored object is saved.
@@ -47,12 +47,6 @@ namespace Belle2 {
 
   };
 }
-
-//------------------------Implementation of template class -----------------------------------------
-using namespace std;
-using namespace Belle2;
-
-StoreAccessorBase::~StoreAccessorBase() {}
 
 
 #endif // STOREACCESSORBASE_H

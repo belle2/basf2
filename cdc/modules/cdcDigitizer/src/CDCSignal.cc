@@ -9,7 +9,6 @@
  **************************************************************************/
 
 #include "cdc/modules/cdcDigitizer/CDCSignal.h"
-#include "cdc/modules/cdcDigitizer/CDCColours.h"
 
 #include <framework/logging/Logger.h>
 

@@ -18,7 +18,6 @@
 #include <framework/logging/Logger.h>
 
 //cdc package headers
-#include <cdc/modules/cdcDigitizer/CDCColours.h>
 #include <cdc/dataobjects/CDCHit.h>
 #include <cdc/hitcdc/HitCDC.h>
 

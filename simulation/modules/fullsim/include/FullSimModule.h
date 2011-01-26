@@ -88,6 +88,7 @@ namespace Belle2 {
     std::string m_physicsList;             /**< The name of the physics list which is used for the simulation. */
     bool m_optics;                         /*!< If set to true, registers the optical physics list. */
     double m_productionCut;                /*!< Apply continuous energy loss to primary particle which has no longer enough energy to produce secondaries which travel at least the specified productionCut distance. */
+    int m_maxNumberSteps;                  /*!< The maximum number of steps before the track transportation is stopped and the track is killed. */
 
   private:
 

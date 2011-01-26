@@ -29,6 +29,7 @@ namespace Belle2 {
 
       /**
        * Constructor.
+       * @param Reference to the MCParticle graph which is used to add secondary particles.
        */
       TrackingAction(MCParticleGraph& mcParticleGraph);
 

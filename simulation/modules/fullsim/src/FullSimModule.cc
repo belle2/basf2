@@ -16,6 +16,7 @@
 #include <simulation/kernel/PrimaryGeneratorAction.h>
 #include <simulation/kernel/EventAction.h>
 #include <simulation/kernel/TrackingAction.h>
+#include <simulation/kernel/SteppingAction.h>
 
 #include <generators/dataobjects/MCParticle.h>
 #include <framework/datastore/DataStore.h>
@@ -63,6 +64,7 @@ FullSimModule::FullSimModule() : Module()
   addParam("PhysicsList", m_physicsList, "The name of the physics list which is used for the simulation.", string("QGSP_BERT"));
   addParam("RegisterOptics", m_optics, "If true, G4OpticalPhysics is registered in Geant4 PhysicsList.", false);
   addParam("ProductionCut", m_productionCut, "Apply continuous energy loss to primary particle which has no longer enough energy to produce secondaries which travel at least the specified productionCut distance.", 0.07);
+  addParam("MaxNumberSteps", m_maxNumberSteps, "The maximum number of steps before the track transportation is stopped and the track is killed.", 100000);
 }
 
 
@@ -121,12 +123,16 @@ void FullSimModule::initialize()
   runManager.SetUserAction(generatorAction);
 
   //Add the event action which creates the final MCParticle list and the Relation list.
-  G4UserEventAction* eventAction = new EventAction(m_mcParticleOutputColName, m_relationOutputColName, m_mcParticleGraph, m_createRelations);
+  EventAction* eventAction = new EventAction(m_mcParticleOutputColName, m_relationOutputColName, m_mcParticleGraph, m_createRelations);
   runManager.SetUserAction(eventAction);
 
   //Add the tracking action which handles the secondary particles created by Geant4.
-  G4UserTrackingAction* trackingAction = new TrackingAction(m_mcParticleGraph);
+  TrackingAction* trackingAction = new TrackingAction(m_mcParticleGraph);
   runManager.SetUserAction(trackingAction);
+
+  SteppingAction* steppingAction = new SteppingAction();
+  steppingAction->setMaxNumberSteps(m_maxNumberSteps);
+  runManager.SetUserAction(steppingAction);
 
   //Initialize G4 kernel
   runManager.Initialize();

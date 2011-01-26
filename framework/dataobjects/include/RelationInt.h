@@ -7,6 +7,12 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+#ifndef RELATIONINT_H
+#define RELATIONINT_H
 
-#include <framework/datastore/StoreArray.h>
+#include <framework/dataobjects/RelationT.h>
 
+namespace Belle2 {
+  typedef RelationT<unsigned int> RelationInt;
+} // namespace Belle2
+#endif // RELATIONINT

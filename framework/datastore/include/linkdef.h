@@ -6,9 +6,6 @@
 #pragma link C++ nestedclasses;
 
 
-#pragma link C++ class Belle2::Relation;
-#pragma link C++ class Belle2::RelationArray;
-
 #pragma link C++ class Belle2::SimpleVec<int>;
 #pragma link C++ class Belle2::SimpleVec<double>;
 #pragma link C++ class Belle2::SimpleVec<float>;

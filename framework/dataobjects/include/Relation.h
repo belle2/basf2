@@ -7,25 +7,12 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+#ifndef RELATION_H
+#define RELATION_H
 
-#include <framework/datastore/RelationArray.h>
+#include <framework/dataobjects/RelationT.h>
 
-using namespace std;
-using namespace Belle2;
-
-ClassImp(RelationArray)
-
-
-RelationArray::RelationArray(TObject* from, TClonesArray* to, std::list<int>& indexList, float weight)
-{
-  m_from = from;
-  m_weight.push_back(weight);
-  for (list<int>::iterator iter = indexList.begin(), end = indexList.end(); iter != end; ++iter) {
-    m_to.Add(to->At(*iter));
-  }
-}
-
-RelationArray::RelationArray(TObject* from, TClonesArray* to, std::list<std::pair<int, float> > indexWeightList)
-{
-
-}
+namespace Belle2 {
+  typedef RelationT<unsigned short int> Relation;
+} // namespace Belle2
+#endif // RELATION

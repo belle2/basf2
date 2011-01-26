@@ -11,11 +11,10 @@
 #ifndef STOREARRAY_H
 #define STOREARRAY_H
 
-#include <framework/datastore/StoreAccessorAbs.h>
+#include <framework/datastore/StoreAccessorBase.h>
 #include <TClonesArray.h>
 #include <framework/datastore/DataStore.h>
-#include <framework/datastore/Relation.h>
-#include <framework/datastore/RelationArray.h>
+#include <utility>
 
 namespace Belle2 {
 
@@ -30,7 +29,7 @@ namespace Belle2 {
    *  @author <a href="mailto:martin.heck@kit.edu?subject=StoreArray">Martin Heck</a>
   */
   template <class T>
-  class StoreArray : public StoreAccessorAbs<TClonesArray> {
+  class StoreArray : public StoreAccessorBase {
   public:
 
     /** Constructor.
@@ -43,6 +42,10 @@ namespace Belle2 {
       if (assignArray(name, durability, generate)) {
         B2DEBUG(100, "A TClonesArray with name " + name + " has been generated");
       }
+    }
+
+    StoreArray(std::pair<std::string, DataStore::EDurability> accessorParams) {
+      assignArray(accessorParams.first, accessorParams.second, false);
     }
 
     /** Switch the array, the StoreArray points to.
@@ -58,6 +61,10 @@ namespace Belle2 {
 
     /** Imitate array functioanlity. */
     TClonesArray* operator ->() const {return m_storeArray;}
+
+    /** Returns name under which the object is saved in the DataStore.
+     */
+    std::pair<std::string, DataStore::EDurability> getAccessorParams() {return pair<std::string, DataStore::EDurability>(m_name, m_durability);};
 
     /** Return stored object. */
     TClonesArray* getPtr() {return m_storeArray;}
@@ -87,7 +94,7 @@ namespace Belle2 {
      *              0 means, the Relation has the whole TClonesArray stored in the StoreArray as from.
      *  @par weight Assign a weight to the Relation.
      */
-    Relation* relateTo(StoreAccessorAbs<TObject>& to, const int& from = 0, float& weight = 1);
+//    Relation* relateTo(StoreAccessorAbs<TObject>& to, const int& from = 0, float& weight = 1);
 
 
     /** Convenient Relation Creating when pointing to part of TClonesArray.
@@ -96,23 +103,30 @@ namespace Belle2 {
      *              If you want to point to the whole TClonesArray, use the creator without the index argument.
      *  @par        Assign a weight to the relation.
      */
-    Relation* relateTo(StoreAccessorAbs<TClonesArray>& to, const int& index, const int& from = 0, const float& weight = 1);
+//    Relation* relateTo(StoreAccessorAbs<TClonesArray>& to, const int& index, const int& from = 0, const float& weight = 1);
 
     /** Convenient RelationArray creating.
      *
      *  This way of creation can be used, if all weights are the same.
      */
-    RelationArray* relateTo(StoreAccessorAbs<TClonesArray>& to, std::list<int>& indexList, const int& from = 0, float& weight = 1);
+//    RelationArray* relateTo(StoreAccessorAbs<TClonesArray>& to, std::list<int>& indexList, const int& from = 0, float& weight = 1);
 
     /** RelationArray creation in case of multiple weights.
      */
-    RelationArray* relateTo(StoreAccessorAbs<TClonesArray>& to, std::list<std::pair<int, float> > indexWeightList, const int& from = 0);
+//    RelationArray* relateTo(StoreAccessorAbs<TClonesArray>& to, std::list<std::pair<int, float> > indexWeightList, const int& from = 0);
 
 
   private:
 
     /** Pointer that actually holds the TClonesArray. */
     TClonesArray* m_storeArray;
+
+    /** Store name under which TClonesArray is saved. */
+    std::string m_name;
+
+    /**Store durability under which the TClonesArray is saved. */
+    DataStore::EDurability m_durability;
+
   };
 
 
@@ -126,6 +140,8 @@ template <class T>
 bool StoreArray<T>::assignArray(const std::string& name, const DataStore::EDurability& durability, bool generate)
 {
   if (name == "") {B2FATAL("No name was specified!");}
+  m_name       = name;
+  m_durability = durability;
 
   m_storeArray =  DataStore::Instance().getArray<T>(name, durability);
 
@@ -140,7 +156,7 @@ bool StoreArray<T>::assignArray(const std::string& name, const DataStore::EDurab
   return (false);
 
 }
-
+/*
 template <class T>
 Relation* StoreArray<T>::relateTo(StoreAccessorAbs<TObject>& to, const int& from, float& weight)
 {
@@ -180,5 +196,5 @@ RelationArray* StoreArray<T>::relateTo(StoreAccessorAbs<TClonesArray>& to, std::
     return new RelationArray(m_storeArray->At(from), to.getPtr(), indexWeightList);
   }
 }
-
+*/
 #endif

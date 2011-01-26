@@ -8,8 +8,12 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef STOREACCESSORABS_H
-#define STOREACCESSORABS_H
+#ifndef STOREACCESSORBASE_H
+#define STOREACCESSORBASE_H
+
+#include <string>
+#include <utility>
+#include <framework/datastore/DataStore.h>
 
 
 namespace Belle2 {
@@ -20,23 +24,26 @@ namespace Belle2 {
    *
    *  @author <a href="mailto:martin.heck@kit.edu?subject=StoreAccessorAbs">Martin Heck</a>
    */
-  template <class T>
-  class StoreAccessorAbs {
+  class StoreAccessorBase {
   public:
 
     /** Destructor.
      *
      *  Virtual because this is a base class.
      */
-    virtual ~StoreAccessorAbs() = 0;
+    virtual ~StoreAccessorBase();
 
+
+    /** Returns name under which stored object is saved.
+     */
+    virtual std::pair<std::string, DataStore::EDurability> getAccessorParams() = 0;
 
     /** Returns the object, that holds the information.
      *
      *  For StoreObjPtr this will be a TObject. <br>
      *  For StoreArrays, this will give you back a TClonesArray.
      */
-    virtual T* getPtr() = 0;
+//    virtual T* getPtr() = 0;
 
   };
 }
@@ -45,8 +52,7 @@ namespace Belle2 {
 using namespace std;
 using namespace Belle2;
 
-template <class T>
-StoreAccessorAbs<T>::~StoreAccessorAbs() {}
+StoreAccessorBase::~StoreAccessorBase() {}
 
 
-#endif // STOREACCESSORABS_H
+#endif // STOREACCESSORBASE_H

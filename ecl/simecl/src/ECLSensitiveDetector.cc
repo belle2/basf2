@@ -12,30 +12,20 @@
 
 #include <framework/logging/Logger.h>
 
-/*
-#ifdef G4VIS_USE
-#include "G4VVisManager.hh"
-#include "G4Circle.hh"
-#include "G4Colour.hh"
-#include "G4VisAttributes.hh"
-#endif
-*/
+#include <G4Step.hh>
+#include <G4SteppingManager.hh>
+#include <G4SDManager.hh>
+#include <G4TransportationManager.hh>
+#include <G4FieldManager.hh>
+#include <G4MagneticField.hh>
 
-#include "G4Step.hh"
-#include "G4SteppingManager.hh"
-#include "G4SDManager.hh"
-#include "G4TransportationManager.hh"
-#include "G4FieldManager.hh"
-#include "G4MagneticField.hh"
-
-#include "TVector3.h"
+#include <TVector3.h>
 
 using namespace Belle2;
 
-ECLSensitiveDetector::ECLSensitiveDetector(G4String name) : G4VSensitiveDetector(name)
+ECLSensitiveDetector::ECLSensitiveDetector(G4String name) : Simulation::SensitiveDetectorBase(name)
 {
-  //G4String CollName = name + "Collection";
-  //collectionName.insert(CollName);
+
 }
 
 ECLSensitiveDetector::~ECLSensitiveDetector()

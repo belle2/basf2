@@ -11,12 +11,12 @@
 #ifndef ECLSENSITIVEDETECTOR_H_
 #define ECLSENSITIVEDETECTOR_H_
 
-#include "G4VSensitiveDetector.hh"
+#include <simulation/kernel/SensitiveDetectorBase.h>
 
 namespace Belle2 {
 
   //! The Class for ECL Sensitive Detector
-  class ECLSensitiveDetector: public G4VSensitiveDetector {
+  class ECLSensitiveDetector: public Simulation::SensitiveDetectorBase {
 
   public:
 

@@ -13,7 +13,6 @@
 
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/RelationArray.h>
 
 #include <boost/foreach.hpp>
 
@@ -104,7 +103,7 @@ bool RunManager::addRelation(TObject* hit, G4Step* step)
 
 void RunManager::buildRelations(MCParticleGraph& particleGraph, const string& mcCollectionName, const std::string& relCollectionName)
 {
-  StoreArray<MCParticle> mcParticles(mcCollectionName);
+  /*StoreArray<MCParticle> mcParticles(mcCollectionName);
   StoreArray<Relation> mcPartRelation(relCollectionName);
   int iRel = 0;
 
@@ -123,7 +122,7 @@ void RunManager::buildRelations(MCParticleGraph& particleGraph, const string& mc
         iRel++;
       }
     }
-  }
+  }*/
 }
 
 

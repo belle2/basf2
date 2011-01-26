@@ -19,8 +19,8 @@
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
-//#include <framework/datastore/StoreDefs.h>
 
+#include <framework/dataobjects/Relation.h>
 using namespace std;
 using namespace Belle2;
 
@@ -64,22 +64,22 @@ void CDCRecoHitMakerModule::event()
   StoreObjPtr<SimpleVec<float> > c1("ResolutionCanvas", DataStore::c_Persistent);
 
   std::vector<float> myvector(arraySimHitToCDCHit.GetEntries());
+  /*
+    for (int ii = 0; ii < arraySimHitToCDCHit.GetEntries(); ii++) {
+      CDCSimHit* simhitptr = static_cast<CDCSimHit*>(arraySimHitToCDCHit[ii]->getFrom());
+      if (!simhitptr) {B2WARNING("Should not work");}
 
-  for (int ii = 0; ii < arraySimHitToCDCHit.GetEntries(); ii++) {
-    CDCSimHit* simhitptr = static_cast<CDCSimHit*>(arraySimHitToCDCHit[ii]->getFrom());
-    if (!simhitptr) {B2WARNING("Should not work");}
 
+      float trueDriftTime      = (static_cast<CDCSimHit*>(arraySimHitToCDCHit[ii]->getFrom()))->getDriftLength();
+      float simulatedDriftTime = (static_cast<CDCHit*>(arraySimHitToCDCHit[ii]->getTo()))->getDriftTime();
+      myvector[ii] = simulatedDriftTime - trueDriftTime;
+      B2WARNING("True: " << trueDriftTime);
+      B2WARNING("Simulated: " << simulatedDriftTime);
+      B2WARNING("Simulated Value: " << simulatedDriftTime - trueDriftTime);
 
-    float trueDriftTime      = (static_cast<CDCSimHit*>(arraySimHitToCDCHit[ii]->getFrom()))->getDriftLength();
-    float simulatedDriftTime = (static_cast<CDCHit*>(arraySimHitToCDCHit[ii]->getTo()))->getDriftTime();
-    myvector[ii] = simulatedDriftTime - trueDriftTime;
-    B2WARNING("True: " << trueDriftTime);
-    B2WARNING("Simulated: " << simulatedDriftTime);
-    B2WARNING("Simulated Value: " << simulatedDriftTime - trueDriftTime);
-
-  }
-  c1->setVector(myvector);
-
+    }
+  //  c1->setVector(myvector);
+  */
 
 }
 

@@ -14,7 +14,7 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Unit.h>
-#include <framework/datastore/RelationArray.h>
+#include <framework/dataobjects/Relation.h>
 #include <framework/logging/Logger.h>
 
 //cdc package headers
@@ -207,7 +207,7 @@ void CDCDigiModule::event()
 
     // Creation of Relation between SimHit, that has smalles drift length in each cell and the CDCHit.
     B2DEBUG(150, "First: " << (iterCDCMap->first));
-    new(cdcSimRelation->AddrAt(iDigits)) Relation(*cdcArray.relateTo(cdcHitArray, iDigits, iterCDCMap->first));
+    new(cdcSimRelation->AddrAt(iDigits)) Relation(cdcArray, cdcHitArray, iDigits, iterCDCMap->first);
 
     // Count number of digits
     iDigits++;

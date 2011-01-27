@@ -10,9 +10,11 @@
 
 #include <arich/geoarich/GeoARICHBelleII.h>
 #include <arich/geoarich/ARICHGeometryPar.h>
+#include <arich/simarich/ARICHSensitiveDetector.h>
+#include <arich/simarich/ARICHSensitiveAero.h>
 
 #include <framework/gearbox/GearDir.h>
-#include <framework/datastore/Units.h>
+#include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 
 #include <cmath>
@@ -34,7 +36,6 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Creator
 //-----------------------------------------------------------------
-
 GeoARICHBelleII regGeoARICHBelleII;
 
 //-----------------------------------------------------------------
@@ -44,7 +45,9 @@ GeoARICHBelleII regGeoARICHBelleII;
 GeoARICHBelleII::GeoARICHBelleII() : CreatorBase("ARICHBelleII")
 {
   setDescription("Creates the TGeo objects for the aRICH geometry of the Belle II detector.");
-//  activateAutoSensitiveVolumes("SD_"); //The aRICH subdetector uses the "SD_" prefix to flag its sensitive volumes
+  addSensitiveDetector("SD_", new ARICHSensitiveDetector("ARICHSensitiveDetector"));
+  addSensitiveDetector("SA_", new ARICHSensitiveAero("ARICHSensitiveAero"));
+
 }
 
 
@@ -62,8 +65,31 @@ void GeoARICHBelleII::create(GearDir& content)
 
   double globalRotAngle = (180.0 / M_PI) * content.getParamAngle("Rotation");
   double globalOffsetZ  = content.getParamLength("OffsetZ");
-  TGeoRotation* geoRot = new TGeoRotation("aRichRot", 90.0, globalRotAngle, 0.0);
+  TGeoRotation* geoRot = new TGeoRotation("aRichRot", 0.0, globalRotAngle, 0.0);
   TGeoVolumeAssembly* volGrpARICH = addSubdetectorGroup("ARICH", new TGeoCombiTrans(0.0, 0.0, globalOffsetZ, geoRot));
+
+  /*------------------------------------------------*
+   *       Build aRICH container                    *
+   *------------------------------------------------*
+   *  aRICH container is a space available for      *
+   *  aRICH detector. It is filled with air that    *
+   *  has specified refractive index                *
+   *  (to enable propagation of photons).           *
+   *  Photons getting out of this volume are killed.*
+   *________________________________________________*/
+
+  // get aRICH container parameters
+  double zFront = content.getParamLength("ContainerZfront");
+  double zBack = content.getParamLength("ContainerZback");
+  double zCenter = (zFront + zBack) / 2. * mm ;
+  double contRadius = content.getParamLength("ContainerRadius");
+  string contMat = content.getParamString("ContainerMaterial");
+
+  // create aRICH container tube
+  TGeoMedium* contMed = gGeoManager->GetMedium(contMat.c_str());
+  TGeoTube* contTubeSh = new TGeoTube("contTubeSh", 0.0, contRadius, (zBack - zFront) / 2.);
+  TGeoVolume* contTube = new TGeoVolume("contTube", contTubeSh, contMed);
+  volGrpARICH->AddNode(contTube, 1, new TGeoTranslation(0.0, 0.0, zCenter));
 
   /*-------------------------------------------*
    *       Build aerogel planes                *
@@ -112,43 +138,44 @@ void GeoARICHBelleII::create(GearDir& content)
     double thickness = arichgp->GetAerogelThickness(iLayer - 1);
     double zPosition = arichgp->GetAerogelZPosition(iLayer - 1);
 
-    TGeoTube* tube = new TGeoTube("tube", TubeInnerRadius, TubeOuterRadius, thickness / 2);
+    TGeoTube* tube = new TGeoTube("tube", TubeInnerRadius, TubeOuterRadius, thickness / 2.);
     TGeoVolume* aeroTube = new TGeoVolume((format("aeroTube_%1%") % iLayer).str().c_str(), tube, TubeMed);
-    volGrpARICH->AddNode(aeroTube, iLayer, new TGeoTranslation(0.0, 0.0, zPosition + thickness / 2.));
+    contTube->AddNode(aeroTube, iLayer, new TGeoTranslation(0.0, 0.0, zPosition + thickness / 2.  - zCenter));
 
     // placing the aerogel support plate
-    if (iLayer == 1) volGrpARICH->AddNode(suppTube, 1, new TGeoTranslation(0.0, 0.0, zPosition - SuppThick / 2.));
+    if (iLayer == 1) contTube->AddNode(suppTube, 1, new TGeoTranslation(0.0, 0.0, zPosition - SuppThick / 2.  - zCenter));
 
     // aerogel tiles on the edges are build as a intersection between hexagon ant this tubee. It has to be thicker then hexagons otherwise root has drawing problems.
-    TGeoTube* tubee = new TGeoTube("tubee", TubeInnerRadius, TubeOuterRadius, thickness / 2 + 1*mm);
+    TGeoTube* tubee = new TGeoTube("tubee", TubeInnerRadius, TubeOuterRadius, thickness / 2. + 1*mm);
 
     hexagon->DefineSection(0, -thickness / 2., 0., TileSize);
-    hexagon->DefineSection(1, thickness / 2, 0., TileSize);
+    hexagon->DefineSection(1, thickness / 2., 0., TileSize);
 
     int nTile = arichgp->GetNACopies();
 
     // filling the aerogel tube with hexagon tiles, their positions are in ARICHGeometryPar
     for (int iTile = 0; iTile < nTile; ++iTile) {
       TVector2 tilePos = arichgp->GetTilePos(iTile);
+      string name = (format("AeroTile_%1%") % i).str();
+      if (iLayer == 1) name = (format("SA_AeroTile_%1%") % i).str();
       // if tile intersects aerogel tube it is cut to fit in
       if (tilePos.Mod() > TubeOuterRadius - TFSdiag || tilePos.Mod() < TubeInnerRadius + TFSdiag) {
         TGeoTranslation* m1 = new TGeoTranslation((format("AeroTrans_%1%") % i).str().c_str(), -tilePos.X(), -tilePos.Y() , 0.0);
         m1->RegisterYourself();
         TGeoCompositeShape* cut = new TGeoCompositeShape((format("AeroShape_%1%") % i).str().c_str(), (format("hexagon*tubee:AeroTrans_%1%") % i).str().c_str());
-        TGeoVolume* cutHexagon = new TGeoVolume((format("AeroTile_%1%") % i).str().c_str(), cut, AerogelMed);
+        TGeoVolume* cutHexagon = new TGeoVolume(name.c_str(), cut, AerogelMed);
         cutHexagon->SetLineColor(7);
         aeroTube->AddNode(cutHexagon, i, new TGeoTranslation("Trans", tilePos.X(), tilePos.Y() , 0.0));
       }
       // else whole hexagon is inserted
       else {
-        TGeoVolume* Hexagon = new TGeoVolume((format("AeroTile_%1%") % i).str().c_str(), hexagon, AerogelMed);
+        TGeoVolume* Hexagon = new TGeoVolume(name.c_str(), hexagon, AerogelMed);
         Hexagon->SetLineColor(7);
         aeroTube->AddNode(Hexagon, i, new TGeoTranslation("Trans", tilePos.X(), tilePos.Y(), 0.0));
       }
       i++;
     }
   }
-
 
   /*-------------------------------------------*
    *       Build detector module               *
@@ -190,7 +217,7 @@ void GeoARICHBelleII::create(GearDir& content)
 
   winMaterial->SetTransparency(50);
   TGeoVolumeAssembly* volGrpDetector = new TGeoVolumeAssembly("DetectorPlane");
-  volGrpARICH->AddNode(volGrpDetector, 1, new TGeoTranslation(0.0, 0.0, 0.0));
+  contTube->AddNode(volGrpDetector, 1, new TGeoTranslation(0.0, 0.0, 0.0));
   TGeoVolumeAssembly* volGrpModule = new TGeoVolumeAssembly("DetectorModule");
 
   // creating and placing detector wall
@@ -209,6 +236,7 @@ void GeoARICHBelleII::create(GearDir& content)
   // creating and placing sensitive surface
   TGeoBBox* sensShape = new TGeoBBox("sensShape", sensXsize / 2., sensXsize / 2., sensThick / 2);
   TGeoVolume* detSens = new TGeoVolume("SD_detSens", sensShape, sensMed);
+
   detSens->SetLineColor(29);
   volGrpModule->AddNode(detSens, 1, new TGeoTranslation(0.0, 0.0, -modZsize / 2. + winThick + sensThick / 2.));
 
@@ -240,12 +268,14 @@ void GeoARICHBelleII::create(GearDir& content)
   int nMod = arichgp->GetNMCopies();
   for (int iMod = 0; iMod < nMod; ++iMod) {
     TVector3 modPos = arichgp->GetOrigin(iMod);
+    double modAngle = arichgp->GetModAngle(iMod);
     TGeoRotation* modRot = new TGeoRotation((format("modRot_%1%") % (iMod)).str().c_str());
-    modRot->RotateZ(180. / M_PI*atan2(modPos.Y(), modPos.X()));
-    volGrpDetector->AddNode(volGrpModule, iMod, new TGeoCombiTrans(modPos.X(), modPos.Y(), modPos.Z(), modRot));
+    modRot->RotateZ(180. / M_PI*modAngle);
+    volGrpDetector->AddNode(volGrpModule, iMod, new TGeoCombiTrans(modPos.X(), modPos.Y(), modPos.Z() - zCenter, modRot));
     detSuppTube->AddNode(hole, iMod, new TGeoCombiTrans(modPos.X(), modPos.Y(), 0.0, modRot));
   }
-  volGrpDetector->AddNode(detSuppTube, 1, new TGeoTranslation(0.0, 0.0, zPosition + modZsize + detSuppThick / 2));
+  volGrpDetector->AddNode(detSuppTube, 1, new TGeoTranslation(0.0, 0.0, zPosition + modZsize + detSuppThick / 2. - zCenter));
+
 
   /*-------------------------------------------*
    *       Build mirrors                       *
@@ -275,7 +305,7 @@ void GeoARICHBelleII::create(GearDir& content)
   ngon->DefineSection(1, Length / 2, inRadius, inRadius + Thick);
   TGeoVolume* Mirrors  = new TGeoVolume("Mirrors", ngon, mirrMed);
   Mirrors->SetLineColor(15);
-  volGrpARICH->AddNode(Mirrors, 1, new TGeoTranslation(0.0, 0.0, zPos + Length / 2));
+  contTube->AddNode(Mirrors, 1, new TGeoTranslation(0.0, 0.0, zPos + Length / 2  - zCenter));
 
 }
 

@@ -225,14 +225,12 @@ namespace Belle2 {
 
 //---------------------------------------Implementation -------------------------------------------------
 
-using namespace Belle2;
-using namespace std;
 
 template <class T>
-T* DataStore::createObject(const std::string& name, const EDurability& durability)
+T* Belle2::DataStore::createObject(const std::string& name, const Belle2::DataStore::EDurability& durability)
 {
   //get iterator to object, if it already exists
-  StoreObjIter iter = m_objectMap[durability].find(name);
+  Belle2::DataStore::StoreObjIter iter = m_objectMap[durability].find(name);
 
   //if name already exists, iter does not point to the end of the map
   if (iter != m_objectMap[durability].end()) {
@@ -261,10 +259,10 @@ T* DataStore::createObject(const std::string& name, const EDurability& durabilit
 
 
 template <class T>
-T* DataStore::getObject(const std::string& name, const EDurability& durability)
+T* Belle2::DataStore::getObject(const std::string& name, const Belle2::DataStore::EDurability& durability)
 {
   //get iterator pointing to the existing object
-  StoreObjIter iter = m_objectMap[durability].find(name);
+  Belle2::DataStore::StoreObjIter iter = m_objectMap[durability].find(name);
 
   //if iter points to existing object, it doesn't point to end
   if (iter != m_objectMap[durability].end()) {
@@ -277,7 +275,7 @@ T* DataStore::getObject(const std::string& name, const EDurability& durability)
 
 
 template <class T>
-T* DataStore::createObjectRaw(const std::string& name, const EDurability& durability)
+T* Belle2::DataStore::createObjectRaw(const std::string& name, const Belle2::DataStore::EDurability& durability)
 {
   //create the new object
   T* object = new T;
@@ -291,10 +289,10 @@ T* DataStore::createObjectRaw(const std::string& name, const EDurability& durabi
 
 
 template <class T>
-TClonesArray* DataStore::getArray(const std::string& name, const EDurability& durability)
+TClonesArray* Belle2::DataStore::getArray(const std::string& name, const Belle2::DataStore::EDurability& durability)
 {
   //get iterator pointing to existing array
-  StoreArrayIter iter =  m_arrayMap[durability].find(name);
+  Belle2::DataStore::StoreArrayIter iter =  m_arrayMap[durability].find(name);
 
   if (iter != m_arrayMap[durability].end()) {
 
@@ -311,7 +309,7 @@ TClonesArray* DataStore::getArray(const std::string& name, const EDurability& du
 
 
 template <class T>
-TClonesArray* DataStore::createArray(const std::string& name, const EDurability& durability)
+TClonesArray* Belle2::DataStore::createArray(const std::string& name, const EDurability& durability)
 {
   //check; use getArray, as it checks for type safety.
   TClonesArray* array = getArray<T>(name, durability);

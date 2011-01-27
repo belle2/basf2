@@ -13,6 +13,6 @@
 #include <framework/dataobjects/RelationT.h>
 
 namespace Belle2 {
-  typedef RelationT<unsigned short int> Relation;
+  typedef RelationT<UShort_t> Relation;
 } // namespace Belle2
 #endif // RELATION

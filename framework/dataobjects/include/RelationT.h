@@ -49,7 +49,7 @@ namespace Belle2 {
 
     RelationT(StoreAccessorBase& from, StoreAccessorBase& to,
               const int& fromIndex, std::list<int> toIndices,
-              list<float> weight = std::list<float>());
+              std::list<float> weight = std::list<float>());
 
 
     /** Destructor. */
@@ -113,7 +113,7 @@ namespace Belle2 {
 
     /** Accessor Params of "from" end of Relation.
      */
-    std::pair<std::string, DataStore::EDurability> m_fromAccessorParams;
+    std::pair<std::string, Belle2::DataStore::EDurability> m_fromAccessorParams;
 
     /** Index for "from" end of the Relation.
      */
@@ -121,7 +121,7 @@ namespace Belle2 {
 
     /** Accessor Params of "to" end of Relation.
      */
-    std::pair<std::string, DataStore::EDurability> m_toAccessorParams;
+    std::pair<std::string, Belle2::DataStore::EDurability> m_toAccessorParams;
 
     /** Indices for "to" end of Relation.
      */
@@ -138,9 +138,9 @@ namespace Belle2 {
 //-------------------------------------Implementation of template functions--------
 
 template <class T>
-RelationT<T>::RelationT(StoreAccessorBase& from, StoreAccessorBase& to,
-                        const int& fromIndex, const int& toIndex,
-                        const float& weight)
+Belle2::RelationT<T>::RelationT(Belle2::StoreAccessorBase& from, Belle2::StoreAccessorBase& to,
+                                const int& fromIndex, const int& toIndex,
+                                const float& weight)
 {
   m_fromAccessorParams = from.getAccessorParams();
   m_toAccessorParams   = to.getAccessorParams();
@@ -154,20 +154,20 @@ RelationT<T>::RelationT(StoreAccessorBase& from, StoreAccessorBase& to,
 
 
 template <class T>
-RelationT<T>::RelationT(StoreAccessorBase& from, StoreAccessorBase& to,
-                        const int& fromIndex, std::list<int> toIndices,
-                        list<float> weight)
+Belle2::RelationT<T>::RelationT(Belle2::StoreAccessorBase& from, Belle2::StoreAccessorBase& to,
+                                const int& fromIndex, std::list<int> toIndices,
+                                std::list<float> weight)
 {
   m_fromAccessorParams = from.getAccessorParams();
   m_toAccessorParams   = to.getAccessorParams();
 
   m_index = fromIndex;
 
-  for (list<int>::iterator iter = toIndices.begin(); iter != toIndices.end(); iter++) {
+  for (std::list<int>::iterator iter = toIndices.begin(); iter != toIndices.end(); iter++) {
     m_indices.push_back(static_cast<T>((*iter)));
   }
 
-  for (list<int>::iterator iter = toIndices.begin(); iter != toIndices.end(); iter++) {
+  for (std::list<int>::iterator iter = toIndices.begin(); iter != toIndices.end(); iter++) {
     m_indices.push_back(static_cast<T>((*iter)));
   }
 

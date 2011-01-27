@@ -64,7 +64,7 @@ namespace Belle2 {
 
     /** Returns name under which the object is saved in the DataStore.
      */
-    std::pair<std::string, DataStore::EDurability> getAccessorParams() {return pair<std::string, DataStore::EDurability>(m_name, m_durability);};
+    std::pair<std::string, DataStore::EDurability> getAccessorParams() {return std::pair<std::string, DataStore::EDurability>(m_name, m_durability);};
 
     /** Return stored object. */
     TClonesArray* getPtr() {return m_storeArray;}
@@ -133,11 +133,9 @@ namespace Belle2 {
 } // end namespace Belle2
 
 //-------------------Implementation of template part of the class ---------------------------------
-using namespace std;
-
 
 template <class T>
-bool StoreArray<T>::assignArray(const std::string& name, const DataStore::EDurability& durability, bool generate)
+bool Belle2::StoreArray<T>::assignArray(const std::string& name, const DataStore::EDurability& durability, bool generate)
 {
   if (name == "") {B2FATAL("No name was specified!");}
   m_name       = name;

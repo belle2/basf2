@@ -90,7 +90,7 @@ namespace Belle2 {
 
     /** Returns name under which the object is saved in the DataStore.
      */
-    std::pair<std::string, DataStore::EDurability> getAccessorParams() {return pair<std::string, DataStore::EDurability>(m_name, m_durability);};
+    std::pair<std::string, DataStore::EDurability> getAccessorParams() {return std::pair<std::string, DataStore::EDurability>(m_name, m_durability);};
     /** Returns the object as TObject.
      *
      * This function overwrites the inherited virtual function.
@@ -132,7 +132,7 @@ namespace Belle2 {
 
 // ------------ Implementation of template class ------------------------------------------------
 template <class T>
-bool StoreObjPtr<T>::assignObject(const std::string& name, const DataStore::EDurability& durability, bool generate)
+bool Belle2::StoreObjPtr<T>::assignObject(const std::string& name, const Belle2::DataStore::EDurability& durability, bool generate)
 {
   if (name == "") { B2FATAL("No Name was specified");}
 
@@ -154,7 +154,7 @@ bool StoreObjPtr<T>::assignObject(const std::string& name, const DataStore::EDur
 }
 
 template <class T>
-bool StoreObjPtr<T>::storeObject(T* AObject, const std::string& name, const DataStore::EDurability& durability)
+bool Belle2::StoreObjPtr<T>::storeObject(T* AObject, const std::string& name, const DataStore::EDurability& durability)
 {
   if (name == "") { B2FATAL("No Name was specified");}
 

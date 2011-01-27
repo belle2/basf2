@@ -85,6 +85,11 @@ namespace Belle2 {
     static double keV; /**< [kiloelectronvolt] */
     static double MeV; /**< [megaelectronvolt] */
     static double TeV; /**< [megaelectronvolt] */
+    static double J;   /**< [joule] */
+
+    // charge units
+    static double C;   /**< [coulomb] */
+    static double fC;  /**< [femtocoulomb] */
 
     // density units
     static double mgcm3; /**< [mg/cm^3] */
@@ -95,6 +100,10 @@ namespace Belle2 {
 
     //Various constants
     static double speed_of_light; /**< [cm/ns] */
+    static double k_boltzmann;    /**< Boltzmann constant in GeV/K */
+    static double energy_eh;      /**< Energy needed to create an electron-hole pair in Si at std. T */
+    static double electron_mass;  /**< Electron mass in MeV */
+    static double fine_str_const; /**< The fine structure constant */
 
     /** Definition of the supported units. */
     enum EUnitTypes { c_UnitLength, /**< length unit, default [cm]. */
@@ -122,7 +131,8 @@ namespace Belle2 {
                             c_keV, /**< energy unit [keV]. */
                             c_MeV, /**< energy unit [MeV]. */
                             c_GeV, /**< energy unit [GeV]. */
-                            c_TeV  /**< energy unit [TeV]. */
+                            c_TeV, /**< energy unit [TeV]. */
+                            c_Joule /**< energy unit [J].  */
                           };
 
     /** Definition of the supported density units. */

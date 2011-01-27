@@ -67,6 +67,11 @@ double Unit::eV  = Unit::GeV * 1e-9; /**< [electronvolt] */
 double Unit::keV = Unit::eV  * 1e3;  /**< [kiloelectronvolt] */
 double Unit::MeV = Unit::eV  * 1e6;  /**< [megaelectronvolt] */
 double Unit::TeV = Unit::eV  * 1e9;  /**< [megaelectronvolt] */
+double Unit::J   = 1.0 / TMath::Qe() * Unit::eV; /**< [joule] */
+
+// charge units
+double Unit::C  = 1.0 / TMath::Qe() * Unit::e;
+double Unit::fC = Unit::C / 1.0e15;
 
 // density units
 double Unit::mgcm3  = Unit::gcm3 * 1e-3; /**< [mg/cm^3] */
@@ -77,6 +82,10 @@ double Unit::kgmm3  = Unit::kgcm3 / Unit::mm3; /**< [kg/mm^3] */
 
 //Various constants
 double Unit::speed_of_light = 29.9792458; /**< [cm/ns] */
+double Unit::k_boltzmann    = 8.617343 * 1.0e-5 * Unit::eV / Unit::K; /**< Boltzmann constant [GeV/K] */
+double Unit::energy_eh      = 3.65 * Unit::eV;  /**< Energy needed to create an electron-hole pair in Si at std. T */
+double Unit::electron_mass  = 0.510999 * MeV;   /**< Electron mass */
+double Unit::fine_str_const = 1.0 / 137.036;    /**< The fine structure constant */
 
 
 Unit& Unit::Instance()
@@ -190,6 +199,9 @@ double Unit::convertEnergy(double value, const std::string& unitString)
       break;
     case c_TeV:
       value *= TeV;
+      break;
+    case c_Joule:
+      value *= J;
       break;
   }
   return value;

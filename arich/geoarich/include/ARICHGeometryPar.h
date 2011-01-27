@@ -18,8 +18,6 @@
 #include "TVector2.h"
 #include <cmath>
 #include <boost/format.hpp>
-#include <iostream>
-#include <fstream>
 
 using namespace std;
 using namespace boost;
@@ -60,84 +58,157 @@ namespace Belle2 {
 
     //! These functions return parameters
 
+    //! Get size of aerogel hexagon tile (radius of hexagon inscribed circle)
     double GetAerogelTileSize() const;
+    //! Get outer radius of aerogel tube
     double GetAerogelTubeOuterRadius() const;
+    //! Get inner radius of arogel tube
     double GetAerogelTubeInnerRadius() const;
+    //! Get outer radius of detector tube
     double GetDetectorOuterRadius() const;
+    //! Get inner radius of detector tube
     double GetDetectorInnerRadius() const;
+    //! Get the gap between two aerogel tiles edges
     double GetAerogelTileGap() const;
-    double GetAerogelZPosition(int layerID) const;
-    double GetAerogelThickness(int layerID) const;
-    double GetAerogelRefractiveIndex(int layerID) ;
-    double GetDetectorZPosition() const;
-    double GetDetectorModuleSize() const;
-    double GetDetectorThickness() const;
-    double GetDetectorWindowThickness() const;
-    double GetDetectorWindowRefractiveIndex();
-    double GetSensitiveSurfaceSize() const;
-    double GetDetectorPadSize() const;
-    int GetDetectorBackgroundLevel() const;
+    //! Get number of aerogel layers
     int GetNumberOfAerogelRadiators() const;
+    //! Get z position of layerID aerogel layer (beginning)
+    double GetAerogelZPosition(int layerID) const;
+    //! Get thicknes of layerID aerogel layer
+    double GetAerogelThickness(int layerID) const;
+    //! Get refractive index of layerID aerogel layer
+    double GetAerogelRefractiveIndex(int layerID) const;
+    //! Get transmission length of layerID aerogel layer
+    double GetAerogelTransmissionLength(int layerID) const;
+    //! Get figure of merit of layerID aerogel layer
+    double GetAerogelFigureOfMerit(int layerID) const;
+    //! Get z position of photon detectors (begininng of HAPD window)
+    double GetDetectorZPosition() const;
+    //! Get size of the detector module (HAPD side size)
+    double GetDetectorModuleSize() const;
+    //! Get detector module thickness (HAPD height)
+    double GetDetectorThickness() const;
+    //! Get thickness of detector module window
+    double GetDetectorWindowThickness() const;
+    //! Get refractive index of detector module window
+    double GetDetectorWindowRefractiveIndex() const;
+    //! Get size of detector sensitive surface (size of two chips + gap between)
+    double GetSensitiveSurfaceSize() const;
+    //! Get detector pad size
+    double GetDetectorPadSize() const;
+    //! Get number of detector pads in one direction (all pads = this * this)
     int GetDetectorXPadNumber() const;
-    int GetDetectorYPadNumber() const;
+    //! Get radius of mirrors polygon outscribed circle
     double GetMirrorsOuterRadius() const;
+    //! Get the thickness of mirror plate
     double GetMirrorsThickness() const;
+    //! Get length of mirror plates ( ~ from end of aerogel tube to begininng of detector tube)
     double GetMirrorsLength() const;
+    //! Get z position of mirrors (starting point)
     double GetMirrorsZPosition() const;
+    //! Get track position resolution of tracking
+    double GetTrackPositionResolution() const;
+    //! Get track direction resolution of tracking
+    double GetTrackDirectionResolution() const;
+    //! Get single photon resolution without pad (spread of the Cerenkov photons on detector plane due to different emission points)
+    double GetSinglePhotonResolutionWoPad() const;
+    //! Get detector background level (number of photons / m^2)
+    double GetDetectorBackgroundLevel() const;
+    //! Get normalisation factor. Factor to adjust the expected number of photons.
+    double GetNormalisationFactor() const;
+    //! Get number of mirrors segments
     int GetNMirrors() const;
-    //! returns the total number of HAPD modules
+    //! Get the total number of HAPD modules
     int GetNMCopies() const;
-    //! returns the number of aerogel tiles in one layer
+    //! Get the number of aerogel tiles in one layer
     int GetNACopies() const;
-    //! returns the position of i-th aerogel tile
+    //! Get the position of i-th aerogel tile
     TVector2 GetTilePos(int i);
-    //! returns the copy number of HAPD module containing point "hit"
+    //! Get the copy number of HAPD module containing point "hit"
     int GetCopyNo(TVector3 hit);
-    //! returns the position of copyno-th HAPD module
+    //! Get the position of copyno-th HAPD module origin
     TVector3 GetOrigin(int copyno);
-    //! returns the ID of channel containing point "position"
-    int GetChannelID(TVector3 position);
-    //! returns the center position of channel
-    TVector3 GetChannelCenter(int chID);
+    //! Get the angle of copyno-th HAPD rotation
+    double GetModAngle(int copyno);
+    //! Get ID number of channel containing point "hit" (hit is in detector module local coordinates)
+    int GetChannelID(TVector2 hit);
+    //! Get center position of chID channel (in detector module local coordinates)
+    TVector2 GetChannelCenterLoc(int chID);
+    //! Get center position of chipID-th chip of detector module (in detector module local coordinates)
+    TVector2 GetChipLocPos(int chipID);
+    //! Get ID number of chip containing point "locpos"
+    int GetChipID(TVector2 locpos);
+    //! Get center of chanID channel of modID detector module (in global coordinates)
+    TVector3 GetChannelCenterGlob(int modID, int chanID);
+    //! Get normal vector of mirID-th mirror plate
+    TVector3 GetMirrorNormal(int mirID);
+    //! Get one point lying on mirID-th mirror plate
+    TVector3 GetMirrorPoint(int mirID);
 
   private:
 
-    std::string _version; /*!< The version of geometry parameters. */
-    double _padSize;
-    double _tileSize;
-    double _tubeInnerRadius;
-    double _tubeOuterRadius;
-    double _tileGap;
-    double _aeroZpos[MAX_N_ALAYERS];
-    double _aeroThick[MAX_N_ALAYERS];
-    double _detInnerRadius;
-    double _detOuterRadius;
-    double _detZpos;
-    double _modXSize, _modYSize, _modZSize;
-    double _winThick;
-    double _sensXSize, _sensYSize;
-    double _mirrorZpos;
-    double _mirrorLength;
-    double _mirrorOuterRad;
-    double _mirrorThickness;
+    std::string _version;       /*!< The version of geometry parameters. */
+    double _padSize;            /*!< Detector pad size */
+    double _chipGap;            /*!< Gap between chips in detector module */
+    double _tileSize;           /*!< Aerogel tile size (hexagon inscribed circle) */
+    double _tubeInnerRadius;    /*!< Inner radius of aerogel tube */
+    double _tubeOuterRadius;    /*!< Outer radius of aerogel tube */
+    double _tileGap;            /*!< Gap between the edges of neighbor aerogel tiles */
+    double _aeroZpos[MAX_N_ALAYERS];      /*!< Z position of aerogel layers */
+    double _aeroThick[MAX_N_ALAYERS];     /*!< Thickness of aerogel layers */
+    double _aeroRefInd[MAX_N_ALAYERS];    /*!< Refractive index of aerogel layers */
+    double _aeroTrLen[MAX_N_ALAYERS];     /*!< Transmission length of aerogel layers */
+    double _aeroFigMerit[MAX_N_ALAYERS];  /*!< Figure of merit of aerogel layers */
+    double _detInnerRadius;               /*!< Inner radius of detector tube */
+    double _detOuterRadius;               /*!< Outer radius of detector tube */
+    double _detZpos;                      /*!< Z position of detector plane */
+    double _modXSize, _modZSize;          /*!< Detector module length and height */
+    double _winThick;                     /*!< Thickness of detector module window */
+    double _winRefInd;                    /*!< Refractive index of detector module window */
+    double _mirrorZpos;                   /*!< Z position of mirrors structure (start point) */
+    double _mirrorLength;                 /*!< Length of mirror plates */
+    double _mirrorOuterRad;               /*!< Radius of circle outscribed to mirrors polygon */
+    double _mirrorThickness;              /*!< Thickness of mirror plates */
+    double _trackPosRes;                  /*!< Track position resolution from tracking */
+    double _trackAngRes;                  /*!< Track direction resolution from tracking */
+    double _photRes;                      /*!< Single photon resolution without pad */
+    double _detBack;                      /*!< Detector background level */
+    double _normFact;                     /*!< Normalisation factor (for expected number of photons) */
+    int _nMirrors;                        /*!< Number of mirrors segments */
+    int _nPadX;                           /*!< Number of detector module pads in one direction */
+    int _nRad;                            /*!< Number of aerogel layers */
 
-    int _nMirrors;
-    int _nPadX, _nPadY;
-    int _nRad;
     //! calculates the positions of HAPD modules, with the parameters from xml.
     void modules_position();
+
     //! calculates the positions of aerogel tiles. Hexagon tiles are placed as honeycomb structure into the aerogel tube. This computes the center of each hexagon.
     void aerotile_position();
 
+    //! calculates the centers of chips in detector module local coordinates
+
+    void chipLocPosition();
+    //! calculates the centers of channels in local (detector module) and global coordinates
+    void PadPositions();
+    //! calculates parameters of all mirror planes (normal vector and point on plane)
+    void MirrorPositions();
+
     static ARICHGeometryPar* p_B4ARICHGeometryParDB; /*!< Pointer that saves the instance of this class. */
+
     // vectors holding information on HAPDs and aergel tiles positions.
-    std::vector<int> _ncol;
-    std::vector<double> _fDFi;
-    std::vector<double> _fDR;
-    int _nrow;
-    std::vector<double> _fR;
-    std::vector<double> _fFi;
-    std::vector<TVector2> _tilePos;
+
+    std::vector<int> _ncol;         /*!<  _ncol[i] gives number of detector modules in i-th detector ring (first one is the outer most) */
+    std::vector<double> _fDFi;     /*!< angle covered by one detector module in ring */
+    std::vector<double> _fDR;      /*!< minimal distance between detector modules in radial direction */
+    int _nrow;                     /*!< number of detector rings */
+    std::vector<double> _fR;       /*!< radial coordinate of detector modules */
+    std::vector<double> _fFi;      /*!< angular coordinate of detector modules */
+    std::vector<TVector2> _tilePos;  /*!< vector holding aerogel tile center positions */
+    std::vector<TVector2> _chipLocPos;   /*!< vector holding chip positions (in detector module local coordinates) */
+    std::map<int, TVector2> _padLocPositions; /*!< map holding channel local positions (in detector module local coordinates) */
+    std::map<std::pair<int, int>, TVector3> _padWorldPositions;  /*!< map holding channel global positions  */
+    std::vector<TVector3> _mirrornorm;       /*!< vector holding normal vectors of mirror plates */
+    std::vector<TVector3> _mirrorpoint;      /*!< vector holding one point of each mirror plate */
+
   };
 
   //-----------------------------------------------------------------------------
@@ -172,6 +243,27 @@ namespace Belle2 {
     return _aeroThick[layerID];
   }
 
+  inline double ARICHGeometryPar::GetAerogelRefractiveIndex(int layerID) const
+  {
+    return _aeroRefInd[layerID];
+  }
+
+  inline double ARICHGeometryPar::GetDetectorWindowRefractiveIndex() const
+  {
+    return _winRefInd;
+  }
+
+  inline double ARICHGeometryPar::GetAerogelTransmissionLength(int layerID) const
+  {
+    return _aeroTrLen[layerID];
+  }
+
+  inline double ARICHGeometryPar::GetAerogelFigureOfMerit(int layerID) const
+  {
+    return _aeroFigMerit[layerID];
+  }
+
+
   inline double ARICHGeometryPar::GetDetectorInnerRadius() const
   {
     return _detInnerRadius;
@@ -204,7 +296,7 @@ namespace Belle2 {
 
   inline double ARICHGeometryPar::GetSensitiveSurfaceSize() const
   {
-    return _sensXSize;
+    return _nPadX*_padSize + _chipGap;
   }
 
   inline double ARICHGeometryPar::GetDetectorPadSize() const
@@ -215,11 +307,6 @@ namespace Belle2 {
   inline int ARICHGeometryPar::GetDetectorXPadNumber() const
   {
     return _nPadX;
-  }
-
-  inline int ARICHGeometryPar::GetDetectorYPadNumber() const
-  {
-    return _nPadY;
   }
 
   inline int ARICHGeometryPar::GetNumberOfAerogelRadiators() const
@@ -261,6 +348,35 @@ namespace Belle2 {
     return _nMirrors;
   }
 
+  inline TVector2 ARICHGeometryPar::GetChipLocPos(int chipID)
+  {
+    return _chipLocPos.at(chipID);
+  }
+  inline double ARICHGeometryPar::GetTrackPositionResolution() const
+  {
+    return _trackPosRes;
+  }
+  inline double ARICHGeometryPar::GetTrackDirectionResolution() const
+  {
+    return _trackAngRes;
+  }
+  inline double ARICHGeometryPar::GetSinglePhotonResolutionWoPad() const
+  {
+    return _photRes;
+  }
+  inline double ARICHGeometryPar::GetDetectorBackgroundLevel() const
+  {
+    return _detBack;
+  }
+
+  inline double ARICHGeometryPar::GetNormalisationFactor() const
+  {
+    return _normFact;
+  }
+
+
+
 } // end of namespace Belle2
 
 #endif
+

@@ -12,7 +12,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(EKLMReconstructionModule, "EKLMReconstruction")
+REG_MODULE(EKLMReconstruction)
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -20,7 +20,7 @@ REG_MODULE(EKLMReconstructionModule, "EKLMReconstruction")
 
 EKLMReconstructionModule::EKLMReconstructionModule() : Module()
 {
-  setDescription("Eklm reconstruction simple module for tests");
+  setDescription("EKLM reconstruction simple module for tests");
 
 }
 

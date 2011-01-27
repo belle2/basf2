@@ -30,7 +30,7 @@ namespace Belle2 {
 
 
   EKLMSensetiveDetector::EKLMSensetiveDetector(G4String name, G4double thresholdEnergyDeposit, G4double thresholdKineticEnergy):
-      G4VSensitiveDetector(name), m_ThresholdEnergyDeposit(thresholdEnergyDeposit),
+      SensitiveDetectorBase(name), m_ThresholdEnergyDeposit(thresholdEnergyDeposit),
       m_ThresholdKineticEnergy(thresholdKineticEnergy), m_HitCollection(0),
       m_HCID(-1)
   {

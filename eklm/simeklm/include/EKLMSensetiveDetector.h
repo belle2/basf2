@@ -12,7 +12,8 @@
 #define EKLMSENSETIVEDETECTOR_H
 
 #include <eklm/eklmhit/EKLMSimHit.h>
-#include "G4VSensitiveDetector.hh"
+#include <simulation/kernel/SensitiveDetectorBase.h>
+
 
 namespace Belle2 {
 
@@ -21,7 +22,7 @@ namespace Belle2 {
     EKLMSimHits are saved into hits collection.
   */
 
-  class EKLMSensetiveDetector: public G4VSensitiveDetector {
+  class EKLMSensetiveDetector: public Simulation::SensitiveDetectorBase  {
 
   public:
 

@@ -72,6 +72,8 @@ def make_jdl(
 \
         {
 \
+            "basf2.err",
+\
             "std.err",
 \
             "std.out"

@@ -64,7 +64,7 @@ def make_jdl(
     f.write('      "mdparser.py",\n')
     if tar is not None:
         f.write('      "' + tar + '",\n')
-    if lfn is not None:
+    if lfn != 'None':
         f.write('      "LFN:' + lfn + '"\n')
     f.write('''    };
 \
@@ -221,18 +221,8 @@ def main():
     asearch.setQuery(cliParams.getQuery())
     asearch.setAttributes(['lfn', 'events'])
     results = asearch.executeAmgaQueryWithAttributes()
-    if results == {}:
-        print 'Query returned no results - no jobs to submit'
-        DIRAC.exit(1)
-
-  # create the input sandbox
-    tar = make_tar(cliParams.getProject(), cliParams.getInputFiles())
-
-  # keep track of the number of events submitted
-    totalevents = 0
-
   # deal with empty queries
-    if len(results) == 0:
+    if results == {}:
         print 'Query returned no results - do you want to run with no input?'
         noinput = raw_input('Y/N')
         if noinput == 'Y':
@@ -240,11 +230,11 @@ def main():
             events = raw_input('How many events are you generating?')
             try:
                 int(events)
-            except TypeError:
+            except ValueError:
                 print 'Number of events needs to be an integer'
                 DIRAC.exit(1)
 
-            results[0]['lfn'] = None
+            results[0]['lfn'] = 'None'
             results[0]['events'] = events
         elif noinput == 'N':
 
@@ -252,6 +242,12 @@ def main():
         else:
             print 'Unhandled value. Exiting'
             DIRAC.exit(1)
+
+  # create the input sandbox
+    tar = make_tar(cliParams.getProject(), cliParams.getInputFiles())
+
+  # keep track of the number of events submitted
+    totalevents = 0
 
   # for each of the lfns, make a job and submit it
     for result in results:

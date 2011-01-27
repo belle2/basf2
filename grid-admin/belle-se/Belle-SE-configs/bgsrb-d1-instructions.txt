@@ -1,0 +1,4 @@
+yum --enablerepo=* install ig_SE_storm_backend ig_SE_storm_frontend
+yum --enablerepo=* install  ig_GRIDFTP
+/opt/glite/yaim/bin/ig_yaim -c -s /root/siteinfo/site-info.def -n ig_SE_storm_backend -n ig_SE_storm_frontend -n ig_GRIDFTP; chmod go+r /opt/storm/backend/etc/storm-yaim-variables.conf
+

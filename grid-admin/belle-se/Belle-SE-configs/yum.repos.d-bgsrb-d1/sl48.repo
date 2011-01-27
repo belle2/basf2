@@ -1,0 +1,4 @@
+[SL48]
+name=Scientific Linux 4.8
+baseurl=http://ftp.ne.jp/Linux/distributions/scientificlinux/48/$basearch/SL/RPMS/
+enabled=0

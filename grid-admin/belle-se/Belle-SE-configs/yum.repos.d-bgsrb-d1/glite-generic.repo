@@ -1,0 +1,21 @@
+#
+# gLite generic repositories
+#
+
+[glite-generic_sl4_i386_release]
+name    = gLite generic 3.1 i386 (release)
+baseurl = http://grid-it.cnaf.infn.it/mrepo/glite_sl4-i386/RPMS.generic-release/
+enabled = 0
+protect = 0
+
+[glite-generic_sl4_i386_updates]
+name    = gLite generic 3.1 i386 (updates)
+baseurl = http://grid-it.cnaf.infn.it/mrepo/glite_sl4-i386/RPMS.generic-updates/
+enabled = 0
+protect = 0
+
+[glite-generic_sl4_i386_externals]
+name    = gLite generic 3.1 i386 (externals)
+baseurl = http://grid-it.cnaf.infn.it/mrepo/glite_sl4-i386/RPMS.generic-externals/
+enabled = 0
+protect = 0

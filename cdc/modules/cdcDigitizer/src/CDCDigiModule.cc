@@ -346,10 +346,7 @@ void CDCDigiModule::printModuleParams() const
   // Printing module parameters.
   //-----------------------------
   B2INFO(" "
-         << DUNDERL
-         << DBLUE
          << "CDCDigiModule parameters:"
-         << ENDCOLOR
          << " "
          << "\n");
 

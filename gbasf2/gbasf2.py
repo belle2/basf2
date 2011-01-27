@@ -64,7 +64,8 @@ def make_jdl(
     f.write('      "mdparser.py",\n')
     if tar is not None:
         f.write('      "' + tar + '",\n')
-    f.write('      "LFN:' + lfn + '"\n')
+    if lfn is not None:
+        f.write('      "LFN:' + lfn + '"\n')
     f.write('''    };
 \
       OutputSandbox =
@@ -229,6 +230,29 @@ def main():
 
   # keep track of the number of events submitted
     totalevents = 0
+
+  # deal with empty queries
+    if len(results) == 0:
+        print 'Query returned no results - do you want to run with no input?'
+        noinput = raw_input('Y/N')
+        if noinput == 'Y':
+            results[0] = {}
+            events = raw_input('How many events are you generating?')
+            try:
+                int(events)
+            except TypeError:
+                print 'Number of events needs to be an integer'
+                DIRAC.exit(1)
+
+            results[0]['lfn'] = None
+            results[0]['events'] = events
+        elif noinput == 'N':
+
+            DIRAC.exit(1)
+        else:
+            print 'Unhandled value. Exiting'
+            DIRAC.exit(1)
+
   # for each of the lfns, make a job and submit it
     for result in results:
         jdl = make_jdl(  # Events/sec into CPUSecs

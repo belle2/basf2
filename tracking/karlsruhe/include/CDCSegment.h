@@ -75,7 +75,7 @@ namespace Belle2 {
      *  (The i's TrackHit can be accessed through getTrackHits()[i] or getTrackHits().at(i)).
      *
      */
-    std::vector<CDCTrackHit> & getTrackHits() {return m_TrackHits;};
+    std::vector<Belle2::CDCTrackHit> & getTrackHits() {return m_TrackHits;};
 
     /** Returns the direction of the segment.
      * The direction is calculated as a TVector3 of the innermost hit position relatively to the outermost hit position of the segment in the conformal plane.

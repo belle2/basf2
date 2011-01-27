@@ -48,7 +48,7 @@ namespace Belle2 {
     void removeSegment(int Id);
 
     /** Adds a TrackHit object to the track. */
-    void addTrackHit(CDCTrackHit aTrackHit);
+    void addTrackHit(Belle2::CDCTrackHit aTrackHit);
 
     /** Sets a Chi2 value to describe the quality of the Track. */
     void setChiSquare(double chi2);
@@ -84,10 +84,10 @@ namespace Belle2 {
     TVector3 getDirection() const {return m_direction;};
 
     /** Returns a vector with all segments in the Track. */
-    std::vector<CDCSegment> & getSegments() {return m_Segments;};
+    std::vector<Belle2::CDCSegment> & getSegments() {return m_Segments;};
 
     /** Returns a vector with all hits in the Track. */
-    std::vector<CDCTrackHit> getTrackHits() const {return m_TrackHits;};
+    std::vector<Belle2::CDCTrackHit> getTrackHits() const {return m_TrackHits;};
 
     /** Returns the innermost axial hit (closest to the origin) of the track. */
     CDCTrackHit getInnerMostHit() const {return m_innerMostHit;};

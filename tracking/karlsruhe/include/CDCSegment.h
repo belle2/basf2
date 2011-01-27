@@ -114,7 +114,7 @@ namespace Belle2 {
      * For this the wire length is parametrised and for each point the 'fitting' of this new position is checked by calculating the shortest (perpendicular) distance between one segment point and the track.
      * After the optimal wire position is found, the coordinates (member variables) of all TrackHits in this segment are overwritten according to it (!).
      */
-    void shiftAlongZ(TVector3 trackDirection, CDCTrackHit trackHit);
+    //void shiftAlongZ(TVector3 trackDirection, CDCTrackHit trackHit);
 
 
   private:

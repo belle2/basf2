@@ -11,6 +11,7 @@
 
 #include "../include/CDCTrackHit.h"
 
+#include <tracking/karlsruhe/AxialTrackFinder.h>
 #include <cdc/geocdc/CDCGeometryPar.h>
 
 #include <cmath>
@@ -82,29 +83,16 @@ void CDCTrackHit::setWirePosition()
   CDCGeometryPar & cdcg(*cdcgp);
 
   //center of the wire
-  m_posWireX = (cdcg.wireForwardPosition(m_layerId, m_wireId).x() + cdcg.wireBackwardPosition(m_layerId, m_wireId).x()) / 2;
-  m_posWireY = (cdcg.wireForwardPosition(m_layerId, m_wireId).y() + cdcg.wireBackwardPosition(m_layerId, m_wireId).y()) / 2;
-  m_posWireZ = (cdcg.wireForwardPosition(m_layerId, m_wireId).z() + cdcg.wireBackwardPosition(m_layerId, m_wireId).z()) / 2;
-
-  //forward end of the wire
-  m_posWireX_f = cdcg.wireForwardPosition(m_layerId, m_wireId).x();
-  m_posWireY_f = cdcg.wireForwardPosition(m_layerId, m_wireId).y();
-  m_posWireZ_f = cdcg.wireForwardPosition(m_layerId, m_wireId).z();
-
-  //backward end of the wire
-  m_posWireX_b = cdcg.wireBackwardPosition(m_layerId, m_wireId).x();
-  m_posWireY_b = cdcg.wireBackwardPosition(m_layerId, m_wireId).y();
-  m_posWireZ_b = cdcg.wireBackwardPosition(m_layerId, m_wireId).z();
-
-  //double norm = sqrt((m_posWireX_b - m_posWireX_f) * (m_posWireX_b - m_posWireX_f) + (m_posWireY_b - m_posWireY_f) * (m_posWireY_b - m_posWireY_f));
-  //Direction of the wire
-  m_wireVector.SetX((m_posWireX_b - m_posWireX_f));
-  m_wireVector.SetY((m_posWireY_b - m_posWireY_f));
-  m_wireVector.SetZ((m_posWireZ_b - m_posWireZ_f));
+  m_wirePosition.SetX((cdcg.wireForwardPosition(m_layerId, m_wireId).x() + cdcg.wireBackwardPosition(m_layerId, m_wireId).x()) / 2);
+  m_wirePosition.SetY((cdcg.wireForwardPosition(m_layerId, m_wireId).y() + cdcg.wireBackwardPosition(m_layerId, m_wireId).y()) / 2);
+  m_wirePosition.SetZ((cdcg.wireForwardPosition(m_layerId, m_wireId).z() + cdcg.wireBackwardPosition(m_layerId, m_wireId).z()) / 2);
 
 }
 
-void CDCTrackHit::setIsUsed(bool isUsed) { m_isUsed = isUsed;  }
+void CDCTrackHit::setIsUsed(bool isUsed)
+{
+  m_isUsed = isUsed;
+}
 
 
 void CDCTrackHit::setConformalPosition(double conformalX, double conformalY)
@@ -116,19 +104,19 @@ void CDCTrackHit::setConformalPosition(double conformalX, double conformalY)
 
 double CDCTrackHit::getPhi() const
 {
-  double phi = atan(m_posWireY / m_posWireX);
+  double phi = atan(m_wirePosition.y() / m_wirePosition.x());
 
 //distribute the phi values from 0 to 2pi
-  if (m_posWireX >= 0 && m_posWireY >= 0) {
-    phi = atan(m_posWireY / m_posWireX);
+  if (m_wirePosition.x() >= 0 && m_wirePosition.y() >= 0) {
+    phi = atan(m_wirePosition.y() / m_wirePosition.x());
   }
 
-  if (m_posWireX < 0) {
-    phi = TMath::Pi() + atan(m_posWireY / m_posWireX);
+  if (m_wirePosition.x() < 0) {
+    phi = TMath::Pi() + atan(m_wirePosition.y() / m_wirePosition.x());
   }
 
-  if (m_posWireX >= 0 && m_posWireY < 0) {
-    phi = 2 * TMath::Pi() + atan(m_posWireY / m_posWireX);
+  if (m_wirePosition.x() >= 0 && m_wirePosition.y() < 0) {
+    phi = 2 * TMath::Pi() + atan(m_wirePosition.y() / m_wirePosition.x());
   }
 
 
@@ -138,22 +126,42 @@ double CDCTrackHit::getPhi() const
 
 void CDCTrackHit::setStereoPosition(TVector3 position)
 {
-  m_posWireX = position.x();
-  m_posWireY = position.y();
-  m_posWireZ = position.z();
+  m_wirePosition.SetX(position.x());
+  m_wirePosition.SetY(position.y());
+  m_wirePosition.SetZ(position.z());
 }
 
 void CDCTrackHit::shiftAlongZ(TVector3 trackDirection, CDCTrackHit trackHit)
 {
+  //Get the necessary position of the hit wire from CDCGeometryParameters
+  CDCGeometryPar * cdcgp = CDCGeometryPar::Instance();
+  CDCGeometryPar & cdcg(*cdcgp);
+
+  TVector3 forwardWirePoint; //forward end of the wire
+  TVector3 backwardWirePoint; //backward end of the wire
+  TVector3 wireVector;  //direction of the wire
+
+  //forward end of the wire
+  forwardWirePoint.SetX(cdcg.wireForwardPosition(m_layerId, m_wireId).x());
+  forwardWirePoint.SetY(cdcg.wireForwardPosition(m_layerId, m_wireId).y());
+  forwardWirePoint.SetZ(cdcg.wireForwardPosition(m_layerId, m_wireId).z());
+
+  //backward end of the wire
+  backwardWirePoint.SetX(cdcg.wireBackwardPosition(m_layerId, m_wireId).x());
+  backwardWirePoint.SetY(cdcg.wireBackwardPosition(m_layerId, m_wireId).y());
+  backwardWirePoint.SetZ(cdcg.wireBackwardPosition(m_layerId, m_wireId).z());
+
+  //direction of the wire
+  wireVector = backwardWirePoint - forwardWirePoint;
+
+  //Get the coordinates for distance calculation
   TVector3 StereoHitPos;   //conformal position of this hit
   TVector3 TrackHitPos;    //conformal position of the given TrackHit (starting point for the "track straight line")
-  TVector3 perpPoint;      //intersection from "track line" with a to it perpendicular line through this hit
-  TVector3 perpDir;        //direction perpendicular to track direction
 
   double distance;     //distance between the hit und the intersection point ( = shortest distance from hit to "track line")
   double distanceMax = 0.3;  //start value for the search
 
-  //create a vector with 10 aquidistant values from 0 to 1 to parametrise the wire vector
+  //create a vector with 100 aquidistant values from 0 to 1 to parametrise the wire vector
   double parameter[101];
   for (int i = 0 ; i < 101; i++) {
     parameter[i] = i * 0.01;
@@ -171,9 +179,9 @@ void CDCTrackHit::shiftAlongZ(TVector3 trackDirection, CDCTrackHit trackHit)
   for (int i = 0; i < 101; i++) {  //loop over the parameter vector ( = loop over the lenght of the wire)
 
     //new point along the wire
-    posX = m_posWireX_f + parameter[i] * m_wireVector.x();
-    posY = m_posWireY_f + parameter[i] * m_wireVector.y();
-    posZ = m_posWireZ_f + parameter[i] * m_wireVector.z();
+    posX = forwardWirePoint.x() + parameter[i] * wireVector.x();
+    posY = forwardWirePoint.y() + parameter[i] * wireVector.y();
+    posZ = forwardWirePoint.z() + parameter[i] * wireVector.z();
 
     confX = 2 * posX / (posX * posX + posY * posY);
     confY = 2 * posY / (posX * posX + posY * posY);
@@ -187,18 +195,7 @@ void CDCTrackHit::shiftAlongZ(TVector3 trackDirection, CDCTrackHit trackHit)
     TrackHitPos.SetY(trackHit.getConformalY());
     TrackHitPos.SetZ(0);
 
-    perpDir.SetX(1);
-    perpDir.SetY(-trackDirection.x() / trackDirection.y());
-    perpDir.SetZ(0);
-
-    double factor = ((StereoHitPos.y() - TrackHitPos.y()) * trackDirection.x() + (TrackHitPos.x() - StereoHitPos.x()) * trackDirection.y()) / (trackDirection.y() * (perpDir.x() + perpDir.y()));
-
-    perpPoint.SetX(StereoHitPos.x() + factor*perpDir.x());
-    perpPoint.SetY(StereoHitPos.y() + factor*perpDir.y());
-    perpPoint.SetZ(0);
-
-    //finally the result
-    distance = (StereoHitPos - perpPoint).Mag();
+    distance = AxialTrackFinder::ShortestDistance(TrackHitPos, trackDirection, StereoHitPos);
 
     //search for the wire point which gives the shortest distance
     if (distance < distanceMax) {
@@ -209,16 +206,16 @@ void CDCTrackHit::shiftAlongZ(TVector3 trackDirection, CDCTrackHit trackHit)
   }
 
 //assign the new better wire point as hit position
-  TVector3 newPosition;
-  double x = m_posWireX_f +  parameter[bestIndex] * m_wireVector.x();
-  double y = m_posWireY_f +  parameter[bestIndex] * m_wireVector.y();
-  double z = m_posWireZ_f +  parameter[bestIndex] * m_wireVector.z();
+  double x = forwardWirePoint.x() +  parameter[bestIndex] * wireVector.x();
+  double y = forwardWirePoint.x() +  parameter[bestIndex] * wireVector.y();
+  double z = forwardWirePoint.x() +  parameter[bestIndex] * wireVector.z();
   double cx = 2 * x / (x * x + y * y);
   double cy = 2 * y / (x * x + y * y);
 
-  m_posWireX = x;
-  m_posWireY = y;
-  m_posWireZ = z;
+  m_wirePosition.SetX(x);
+  m_wirePosition.SetY(y);
+  m_wirePosition.SetZ(z);
+
   m_conformalX = cx;
   m_conformalY = cy;
 

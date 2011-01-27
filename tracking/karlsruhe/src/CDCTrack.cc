@@ -168,9 +168,9 @@ void CDCTrack::estimateMomentum()
     }
   }
   //The coordinates of the innermost stereo hit build the momentum vector (0,0,0 supposed to be the starting point of the track)
-  double x = m_Segments.at(min_index).getInnerMostHit().getWirePosX();
-  double y = m_Segments.at(min_index).getInnerMostHit().getWirePosY();
-  double z = m_Segments.at(min_index).getInnerMostHit().getWirePosZ();
+  double x = m_Segments.at(min_index).getInnerMostHit().getWirePosition().x();
+  double y = m_Segments.at(min_index).getInnerMostHit().getWirePosition().y();
+  double z = m_Segments.at(min_index).getInnerMostHit().getWirePosition().z();
   double norm = sqrt(x * x + y * y + z * z);
 
   m_momentumVector.SetX(x / norm);

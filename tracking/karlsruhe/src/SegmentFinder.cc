@@ -39,8 +39,8 @@ void SegmentFinder::ConformalTransformation(string CDCTrackHitArray)
 
   for (int i = 0; i < nHits ; i++) {
     CDCTrackHit *aTrackHit = cdcTrackHitArray[i];
-    double x = aTrackHit->getWirePosX();
-    double y = aTrackHit->getWirePosY();
+    double x = aTrackHit->getWirePosition().x();
+    double y = aTrackHit->getWirePosition().y();
     double cx = 2 * x / (x * x + y * y); //transformation of the coordinates from normal to conformal plane
     double cy = 2 * y / (x * x + y * y);
 
@@ -164,7 +164,6 @@ void SegmentFinder::FindSegments(string CDCTrackHitArray, string SegmentsCDCArra
 //Start cluster finding
 
     int bin = 1; //variable to count the bins
-    int Id = 0; //variable to count the segments within one superlayer
     bool startSegment = true; //boolean to define if a new segment should be started
 
     //Loop over all bins in the histogram
@@ -182,7 +181,6 @@ void SegmentFinder::FindSegments(string CDCTrackHitArray, string SegmentsCDCArra
         //Create new Segment
         if (startSegment == true) {
           counter ++;
-          Id++;
           new(cdcSegmentsArray->AddrAt(counter)) CDCSegment(j, counter);  //Achtung Achtung
 
           startSegment = false;

@@ -199,9 +199,9 @@ void CDCTrackingModule::event()
       CDCTrackHit *aTrackHit = cdcTrackHitArray[i];
 
       //Prints the Hit position to output files
-      Hitsfile << std::setprecision(5) << aTrackHit->getWirePosX() / Unit::mm << " \t"
-      <<  aTrackHit->getWirePosY() / Unit::mm << " \t"
-      <<  aTrackHit->getWirePosZ() / Unit::mm << " \t"
+      Hitsfile << std::setprecision(5) << aTrackHit->getWirePosition().x() / Unit::mm << " \t"
+      <<  aTrackHit->getWirePosition().y() / Unit::mm << " \t"
+      <<  aTrackHit->getWirePosition().z() / Unit::mm << " \t"
       << aTrackHit->getLeftDriftLength() / Unit::mm << " \t"
       << aTrackHit->getRightDriftLength() / Unit:: mm << endl;
 
@@ -216,9 +216,9 @@ void CDCTrackingModule::event()
 
       for (int hit = 0; hit < cdcTracksArray[j]->getNHits(); hit++) {//loop over all Hits
 
-        Tracksfile << "\t" << std::setprecision(5) << cdcTracksArray[j]->getTrackHits()[hit].getWirePosX() / Unit::mm << " \t"
-        <<  cdcTracksArray[j]->getTrackHits()[hit].getWirePosY() / Unit::mm << " \t"
-        <<  cdcTracksArray[j]->getTrackHits()[hit].getWirePosZ() / Unit::mm << endl;
+        Tracksfile << "\t" << std::setprecision(5) << cdcTracksArray[j]->getTrackHits()[hit].getWirePosition().x() / Unit::mm << " \t"
+        <<  cdcTracksArray[j]->getTrackHits()[hit].getWirePosition().y() / Unit::mm << " \t"
+        <<  cdcTracksArray[j]->getTrackHits()[hit].getWirePosition().z() / Unit::mm << endl;
 
         ConfTracksfile << "\t" << std::setprecision(5) << cdcTracksArray[j]->getTrackHits()[hit].getConformalX() / Unit::mm << " \t"
         <<  cdcTracksArray[j]->getTrackHits()[hit].getConformalY() / Unit::mm << " \t"

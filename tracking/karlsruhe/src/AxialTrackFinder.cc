@@ -95,15 +95,15 @@ double AxialTrackFinder::SimpleDistance(CDCSegment segment1,
                                         CDCSegment segment2)
 {
 
-  double segment1_X = (segment1.getOuterMostHit().getWirePosX()
-                       + segment1.getInnerMostHit().getWirePosX()) / 2;
-  double segment1_Y = (segment1.getOuterMostHit().getWirePosY()
-                       + segment1.getInnerMostHit().getWirePosY()) / 2;
+  double segment1_X = (segment1.getOuterMostHit().getWirePosition().x()
+                       + segment1.getInnerMostHit().getWirePosition().x()) / 2;
+  double segment1_Y = (segment1.getOuterMostHit().getWirePosition().y()
+                       + segment1.getInnerMostHit().getWirePosition().y()) / 2;
 
-  double segment2_X = (segment2.getOuterMostHit().getWirePosX()
-                       + segment2.getInnerMostHit().getWirePosX()) / 2;
-  double segment2_Y = (segment2.getOuterMostHit().getWirePosY()
-                       + segment2.getInnerMostHit().getWirePosY()) / 2;
+  double segment2_X = (segment2.getOuterMostHit().getWirePosition().x()
+                       + segment2.getInnerMostHit().getWirePosition().x()) / 2;
+  double segment2_Y = (segment2.getOuterMostHit().getWirePosition().y()
+                       + segment2.getInnerMostHit().getWirePosition().y()) / 2;
 
   double simpleDistance = sqrt(pow((segment1_X - segment2_X), 2) + pow(
                                  (segment1_Y - segment2_Y), 2));

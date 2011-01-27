@@ -97,8 +97,8 @@ float CDCSegment::getCenterPosR()
 
   float average = 0;
   for (int i = 0; i < m_nHits; i++) { //loop over all hits and sum their distance from the origin ind the r-phi plane
-    float x = m_TrackHits.at(i).getWirePosX();
-    float y = m_TrackHits.at(i).getWirePosY();
+    float x = m_TrackHits.at(i).getWirePosition().x();
+    float y = m_TrackHits.at(i).getWirePosition().y();
     average = average + sqrt(x * x + y * y);
   }
   average = average / m_nHits;  //divide the sum by the total number of hits to get the average
@@ -112,7 +112,7 @@ float CDCSegment::getCenterPosZ()
 
   float average = 0;
   for (int i = 0; i < m_nHits; i++) { //loop over all hits and sum their z position
-    float z = m_TrackHits.at(i).getWirePosZ();
+    float z = m_TrackHits.at(i).getWirePosition().z();
 
     average = average + z;
   }
@@ -138,8 +138,8 @@ void CDCSegment::update()
 
   //search for the index of the Hits with the minimum/maximum distance from the origin
   for (int i = 0; i < m_nHits; i++) {
-    x[i] = m_TrackHits[i].getWirePosX();
-    y[i] = m_TrackHits[i].getWirePosY();
+    x[i] = m_TrackHits[i].getWirePosition().x();
+    y[i] = m_TrackHits[i].getWirePosition().y();
     d[i] = sqrt(x[i] * x[i] + y[i] * y[i]);
 
     if (d[i] < d[min]) {
@@ -259,7 +259,7 @@ void CDCSegment::clearTrackCandId()
 
 
 
-void CDCSegment::shiftAlongZ(TVector3 trackDirection, CDCTrackHit trackHit)
+/*void CDCSegment::shiftAlongZ(TVector3 trackDirection, CDCTrackHit trackHit)
 {
 
   TVector3 StereoHitPos; //conformal position of one point of the segment (outermost hit)
@@ -334,7 +334,7 @@ void CDCSegment::shiftAlongZ(TVector3 trackDirection, CDCTrackHit trackHit)
     m_TrackHits[i].setConformalPosition(cx, cy);
   }
 
-}
+}*/
 
 
 

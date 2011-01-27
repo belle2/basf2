@@ -1,0 +1,30 @@
+VirtualOrganisation = "'belle'";
+Executable = "__jobscript_281__";
+Requirements = 
+   other.GlueCEUniqueID=="ce-4-fzk.gridka.de:2119/jobmanager-pbspro-belleXS";
+MyProxyServer = "myproxy.cern.ch";
+StdError = "stderr";
+DataAccessProtocol = {
+   "gsiftp"
+};
+InputSandbox = {
+   "/home/fifieldt/belle-monitoring/workspace/fifieldt/LocalAMGA/281/input/_input_sandbox_281.tgz",
+   "/home/fifieldt/belle-monitoring/workspace/fifieldt/LocalAMGA/281/input/_input_sandbox_281_master.tgz",
+   "/home/fifieldt/belle-monitoring/workspace/fifieldt/LocalAMGA/281/input/./__jobscript_281__"
+};
+ShallowRetryCount = 10;
+PerusalFileEnable = false;
+Environment = {
+   "GANGA_LCG_CE='ce-4-fzk.gridka.de:2119/jobmanager-pbspro-belleXS'",
+   "GANGA_LCG_VO=''belle''",
+   "LFC_HOST='kek2-lfc.cc.kek.jp'",
+   "GANGA_LOG_HANDLER='WMS'"
+};
+RetryCount = 3;
+OutputSandbox = {
+   "__jobscript__.log",
+   "stdout.gz",
+   "stderr.gz"
+};
+StdOutput = "stdout";
+JobType = "NORMAL";

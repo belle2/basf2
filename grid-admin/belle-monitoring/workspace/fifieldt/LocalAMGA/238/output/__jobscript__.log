@@ -1,0 +1,23 @@
+Mon Oct 12 23:59:39 2009  [Info] Job Wrapper start.
+Mon Oct 12 23:59:39 2009  [Info] Download inputsandbox from iocache passed.
+Mon Oct 12 23:59:39 2009  [Info] Unpack inputsandbox passed.
+Mon Oct 12 23:59:39 2009  [Info] Loading Python modules ...
+Mon Oct 12 23:59:39 2009  [Info]  ** PYTHONPATH: /opt/glite/lib/python:/opt/glite/lib/python2.3/site-packages:/opt/lcg/lib/python:/opt/lcg/lib/python2.3/site-packages:/opt/glite/lib/python2.3/site-packages/amga
+Mon Oct 12 23:59:39 2009  [Info]  ** sys.path: /home/belle018/globus-tmp.twn006.8705.0/https_3a_2f_2fkek2-lb.cc.kek.jp_3a9000_2fPZqOM8DoqeWCD3s493L22Q/_python
+Mon Oct 12 23:59:39 2009  [Info]  ** sys.path: /home/belle018/globus-tmp.twn006.8705.0/https_3a_2f_2fkek2-lb.cc.kek.jp_3a9000_2fPZqOM8DoqeWCD3s493L22Q
+Mon Oct 12 23:59:39 2009  [Info]  ** sys.path: /opt/glite/lib/python
+Mon Oct 12 23:59:39 2009  [Info]  ** sys.path: /opt/glite/lib/python2.3/site-packages
+Mon Oct 12 23:59:39 2009  [Info]  ** sys.path: /opt/lcg/lib/python
+Mon Oct 12 23:59:39 2009  [Info]  ** sys.path: /opt/lcg/lib/python2.3/site-packages
+Mon Oct 12 23:59:39 2009  [Info]  ** sys.path: /opt/glite/lib/python2.3/site-packages/amga
+Mon Oct 12 23:59:39 2009  [Info]  ** sys.path: /usr/lib/python23.zip
+Mon Oct 12 23:59:39 2009  [Info]  ** sys.path: /usr/lib/python2.3
+Mon Oct 12 23:59:39 2009  [Info]  ** sys.path: /usr/lib/python2.3/plat-linux2
+Mon Oct 12 23:59:39 2009  [Info]  ** sys.path: /usr/lib/python2.3/lib-tk
+Mon Oct 12 23:59:39 2009  [Info]  ** sys.path: /usr/lib/python2.3/lib-dynload
+Mon Oct 12 23:59:39 2009  [Info]  ** sys.path: /usr/lib/python2.3/site-packages
+Mon Oct 12 23:59:39 2009  [Info] Load application executable with subprocess module
+Mon Oct 12 23:59:39 2009  [Info] GZipping stdout and stderr...
+Mon Oct 12 23:59:39 2009  [Info] Application execution passed with exit code 0.
+Mon Oct 12 23:59:39 2009  [Info] Pack outputsandbox passed.
+Mon Oct 12 23:59:39 2009  [Info] Job Wrapper stop.

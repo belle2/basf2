@@ -1,0 +1,30 @@
+VirtualOrganisation = "'belle'";
+Executable = "__jobscript_106__";
+Requirements = 
+   other.GlueCEUniqueID=="dg10.cc.kek.jp:2119/jobmanager-lcgpbs-belle";
+MyProxyServer = "myproxy.cern.ch";
+StdError = "stderr";
+DataAccessProtocol = {
+   "gsiftp"
+};
+InputSandbox = {
+   "/home/fifieldt/belle-monitoring/workspace/fifieldt/LocalAMGA/106/input/_input_sandbox_106.tgz",
+   "/home/fifieldt/belle-monitoring/workspace/fifieldt/LocalAMGA/106/input/_input_sandbox_106_master.tgz",
+   "/home/fifieldt/belle-monitoring/workspace/fifieldt/LocalAMGA/106/input/./__jobscript_106__"
+};
+ShallowRetryCount = 10;
+PerusalFileEnable = false;
+Environment = {
+   "GANGA_LCG_CE='dg10.cc.kek.jp:2119/jobmanager-lcgpbs-belle'",
+   "GANGA_LCG_VO=''belle''",
+   "LFC_HOST='kek2-lfc.cc.kek.jp'",
+   "GANGA_LOG_HANDLER='WMS'"
+};
+RetryCount = 3;
+OutputSandbox = {
+   "__jobscript__.log",
+   "stdout.gz",
+   "stderr.gz"
+};
+StdOutput = "stdout";
+JobType = "NORMAL";

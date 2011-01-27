@@ -1,0 +1,24 @@
+Wed Oct 07 05:28:50 2009  [Info] Changed working directory to scratch directory /scratch/gangajob_EGMm7914
+Wed Oct 07 05:28:50 2009  [Info] Job Wrapper start.
+Wed Oct 07 05:28:50 2009  [Info] Download inputsandbox from iocache passed.
+Wed Oct 07 05:28:50 2009  [Info] Unpack inputsandbox passed.
+Wed Oct 07 05:28:50 2009  [Info] Loading Python modules ...
+Wed Oct 07 05:28:50 2009  [Info]  ** PYTHONPATH: /opt/glite/lib/python:/opt/glite/lib/python2.3/site-packages:/opt/lcg/lib/python:/opt/lcg/lib/python2.3/site-packages:/opt/glite/lib/python2.3/site-packages/amga
+Wed Oct 07 05:28:50 2009  [Info]  ** sys.path: /scratch/gangajob_EGMm7914/_python
+Wed Oct 07 05:28:50 2009  [Info]  ** sys.path: /scratch/pbstmp.682833.ce2.egee.cesnet.cz/https_3a_2f_2fwms01.grid.sinica.edu.tw_3a9000_2f0a2SpMlUd2i_5fGmfLQw_5f-Bg
+Wed Oct 07 05:28:50 2009  [Info]  ** sys.path: /opt/glite/lib/python
+Wed Oct 07 05:28:50 2009  [Info]  ** sys.path: /opt/glite/lib/python2.3/site-packages
+Wed Oct 07 05:28:50 2009  [Info]  ** sys.path: /opt/lcg/lib/python
+Wed Oct 07 05:28:50 2009  [Info]  ** sys.path: /opt/lcg/lib/python2.3/site-packages
+Wed Oct 07 05:28:50 2009  [Info]  ** sys.path: /opt/glite/lib/python2.3/site-packages/amga
+Wed Oct 07 05:28:50 2009  [Info]  ** sys.path: /usr/lib/python23.zip
+Wed Oct 07 05:28:50 2009  [Info]  ** sys.path: /usr/lib/python2.3
+Wed Oct 07 05:28:50 2009  [Info]  ** sys.path: /usr/lib/python2.3/plat-linux2
+Wed Oct 07 05:28:50 2009  [Info]  ** sys.path: /usr/lib/python2.3/lib-tk
+Wed Oct 07 05:28:50 2009  [Info]  ** sys.path: /usr/lib/python2.3/lib-dynload
+Wed Oct 07 05:28:50 2009  [Info]  ** sys.path: /usr/lib/python2.3/site-packages
+Wed Oct 07 05:28:50 2009  [Info] Load application executable with subprocess module
+Wed Oct 07 05:28:50 2009  [Info] GZipping stdout and stderr...
+Wed Oct 07 05:28:50 2009  [Info] Application execution passed with exit code 0.
+Wed Oct 07 05:28:50 2009  [Info] Pack outputsandbox passed.
+Wed Oct 07 05:28:50 2009  [Info] Job Wrapper stop.

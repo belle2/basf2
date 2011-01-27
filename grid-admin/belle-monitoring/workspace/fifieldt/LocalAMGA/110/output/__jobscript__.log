@@ -1,0 +1,24 @@
+Thu Oct 08 01:12:46 2009  [Info] Job Wrapper start.
+Thu Oct 08 01:12:46 2009  [Info] Download inputsandbox from iocache passed.
+Thu Oct 08 01:12:46 2009  [Info] Unpack inputsandbox passed.
+Thu Oct 08 01:12:46 2009  [Info] Loading Python modules ...
+Thu Oct 08 01:12:46 2009  [Info]  ** PYTHONPATH: /opt/glite/lib/python:/opt/glite/lib/python2.3/site-packages:/opt/lcg/lib/python:/opt/lcg/lib/python2.3/site-packages:/opt/glite/lib/python2.3/site-packages/amga
+Thu Oct 08 01:12:46 2009  [Info]  ** sys.path: /home/belle006/globus-tmp.cd248.5707.0/https_3a_2f_2fkek2-lb.cc.kek.jp_3a9000_2f_5fKf0vsZKFHOLMVoUCnUEWA/_python
+Thu Oct 08 01:12:46 2009  [Info]  ** sys.path: /home/belle006/globus-tmp.cd248.5707.0/https_3a_2f_2fkek2-lb.cc.kek.jp_3a9000_2f_5fKf0vsZKFHOLMVoUCnUEWA
+Thu Oct 08 01:12:46 2009  [Info]  ** sys.path: /opt/glite/lib/python
+Thu Oct 08 01:12:46 2009  [Info]  ** sys.path: /opt/glite/lib/python2.3/site-packages
+Thu Oct 08 01:12:46 2009  [Info]  ** sys.path: /opt/lcg/lib/python
+Thu Oct 08 01:12:46 2009  [Info]  ** sys.path: /opt/lcg/lib/python2.3/site-packages
+Thu Oct 08 01:12:46 2009  [Info]  ** sys.path: /opt/glite/lib/python2.3/site-packages/amga
+Thu Oct 08 01:12:46 2009  [Info]  ** sys.path: /usr/lib64/python23.zip
+Thu Oct 08 01:12:46 2009  [Info]  ** sys.path: /usr/lib64/python2.3
+Thu Oct 08 01:12:46 2009  [Info]  ** sys.path: /usr/lib64/python2.3/plat-linux2
+Thu Oct 08 01:12:46 2009  [Info]  ** sys.path: /usr/lib64/python2.3/lib-tk
+Thu Oct 08 01:12:46 2009  [Info]  ** sys.path: /usr/lib64/python2.3/lib-dynload
+Thu Oct 08 01:12:46 2009  [Info]  ** sys.path: /usr/lib64/python2.3/site-packages
+Thu Oct 08 01:12:46 2009  [Info]  ** sys.path: /usr/lib/python2.3/site-packages
+Thu Oct 08 01:12:46 2009  [Info] Load application executable with subprocess module
+Thu Oct 08 01:12:46 2009  [Info] GZipping stdout and stderr...
+Thu Oct 08 01:12:46 2009  [Info] Application execution passed with exit code 0.
+Thu Oct 08 01:12:46 2009  [Info] Pack outputsandbox passed.
+Thu Oct 08 01:12:46 2009  [Info] Job Wrapper stop.

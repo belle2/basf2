@@ -1,0 +1,17 @@
+lcgce.ijs.si:2119
+grid-lcgce.rzg.mpg.de:2119
+dg10.cc.kek.jp:2119
+agh5.atlas.unimelb.edu.au:8443
+kek2-ce01.cc.kek.jp:2119
+kek2-ce02.cc.kek.jp:2119
+ce.cc.ncu.edu.tw:2119
+ce-alice.sdfarm.kr:2119
+ce2.egee.cesnet.cz:2119
+agh2.atlas.unimelb.edu.au:2119
+cream-2-fzk.gridka.de:8443
+cream-1-fzk.gridka.de:8443
+ce-3-fzk.gridka.de:2119
+ce-2-fzk.gridka.de:2119
+ce-4-fzk.gridka.de:2119
+ce-1-fzk.gridka.de:2119
+ce.cyf-kr.edu.pl:2119

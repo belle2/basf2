@@ -1,0 +1,30 @@
+VirtualOrganisation = "'atlas'";
+Executable = "__jobscript_30__";
+Requirements = 
+   other.GlueCEUniqueID=="agh2.atlas.unimelb.edu.au:2119/jobmanager-lcgpbs-atlas";
+MyProxyServer = "myproxy.cern.ch";
+StdError = "stderr";
+DataAccessProtocol = {
+   "gsiftp"
+};
+InputSandbox = {
+   "/home/fifieldt/belle-monitoring/workspace/fifieldt/LocalAMGA/30/input/_input_sandbox_30.tgz",
+   "/home/fifieldt/belle-monitoring/workspace/fifieldt/LocalAMGA/30/input/_input_sandbox_30_master.tgz",
+   "/home/fifieldt/belle-monitoring/workspace/fifieldt/LocalAMGA/30/input/./__jobscript_30__"
+};
+ShallowRetryCount = 10;
+PerusalFileEnable = false;
+Environment = {
+   "GANGA_LCG_CE='agh2.atlas.unimelb.edu.au:2119/jobmanager-lcgpbs-atlas'",
+   "GANGA_LCG_VO=''atlas''",
+   "LFC_HOST='lfc.usatlas.bnl.gov'",
+   "GANGA_LOG_HANDLER='WMS'"
+};
+RetryCount = 3;
+OutputSandbox = {
+   "__jobscript__.log",
+   "stdout.gz",
+   "stderr.gz"
+};
+StdOutput = "stdout";
+JobType = "NORMAL";

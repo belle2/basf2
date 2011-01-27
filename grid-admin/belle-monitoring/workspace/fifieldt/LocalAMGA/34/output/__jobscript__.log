@@ -1,0 +1,23 @@
+Wed Oct 07 05:27:43 2009  [Info] Job Wrapper start.
+Wed Oct 07 05:27:43 2009  [Info] Download inputsandbox from iocache passed.
+Wed Oct 07 05:27:43 2009  [Info] Unpack inputsandbox passed.
+Wed Oct 07 05:27:43 2009  [Info] Loading Python modules ...
+Wed Oct 07 05:27:43 2009  [Info]  ** PYTHONPATH: /opt/lcg/lib:/opt/lcg/lib/python:/opt/glite/lib/python:/opt/edg/lib:/opt/edg/lib/python
+Wed Oct 07 05:27:43 2009  [Info]  ** sys.path: /home/belle005/globus-tmp.wn015.16751.0/https_3a_2f_2fwms01.grid.sinica.edu.tw_3a9000_2fL4Ibo8HwAZ-8JbDYp2Ydkw/_python
+Wed Oct 07 05:27:43 2009  [Info]  ** sys.path: .
+Wed Oct 07 05:27:43 2009  [Info]  ** sys.path: /opt/lcg/lib
+Wed Oct 07 05:27:43 2009  [Info]  ** sys.path: /opt/lcg/lib/python
+Wed Oct 07 05:27:43 2009  [Info]  ** sys.path: /opt/glite/lib/python
+Wed Oct 07 05:27:43 2009  [Info]  ** sys.path: /opt/edg/lib
+Wed Oct 07 05:27:43 2009  [Info]  ** sys.path: /opt/edg/lib/python
+Wed Oct 07 05:27:43 2009  [Info]  ** sys.path: /usr/lib/python2.2
+Wed Oct 07 05:27:43 2009  [Info]  ** sys.path: /usr/lib/python2.2/plat-linux2
+Wed Oct 07 05:27:43 2009  [Info]  ** sys.path: /usr/lib/python2.2/lib-tk
+Wed Oct 07 05:27:43 2009  [Info]  ** sys.path: /usr/lib/python2.2/lib-dynload
+Wed Oct 07 05:27:43 2009  [Info]  ** sys.path: /usr/lib/python2.2/site-packages
+Wed Oct 07 05:27:43 2009  [Info]  ** sys.path: /usr/lib/python2.2/site-packages/gtk-2.0
+Wed Oct 07 05:27:43 2009  [Info] Load application executable with subprocess module
+Wed Oct 07 05:27:43 2009  [Info] GZipping stdout and stderr...
+Wed Oct 07 05:27:43 2009  [Info] Application execution passed with exit code 0.
+Wed Oct 07 05:27:43 2009  [Info] Pack outputsandbox passed.
+Wed Oct 07 05:27:43 2009  [Info] Job Wrapper stop.

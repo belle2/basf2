@@ -1,0 +1,23 @@
+Thu Oct 08 04:59:08 2009  [Info] Changed working directory to scratch directory /tmp/pbs.5311953.pbs3/gangajob_zNw19840
+Thu Oct 08 04:59:08 2009  [Info] Job Wrapper start.
+Thu Oct 08 04:59:08 2009  [Info] Download inputsandbox from iocache passed.
+Thu Oct 08 04:59:08 2009  [Info] Unpack inputsandbox passed.
+Thu Oct 08 04:59:08 2009  [Info] Loading Python modules ...
+Thu Oct 08 04:59:08 2009  [Info]  ** PYTHONPATH: /opt/lcg/lib64/python:/opt/glite/lib/python2.3/site-packages/amga
+Thu Oct 08 04:59:08 2009  [Info]  ** sys.path: /tmp/pbs.5311953.pbs3/gangajob_zNw19840/_python
+Thu Oct 08 04:59:08 2009  [Info]  ** sys.path: /tmp/home/belle172/globus-tmp.c01-003-118.19405.0/https_3a_2f_2fkek2-lb.cc.kek.jp_3a9000_2fDnHkrpqxMhw-VDidx-c0qg
+Thu Oct 08 04:59:08 2009  [Info]  ** sys.path: /opt/lcg/lib64/python
+Thu Oct 08 04:59:08 2009  [Info]  ** sys.path: /opt/glite/lib/python2.3/site-packages/amga
+Thu Oct 08 04:59:08 2009  [Info]  ** sys.path: /usr/lib64/python24.zip
+Thu Oct 08 04:59:08 2009  [Info]  ** sys.path: /usr/lib64/python2.4
+Thu Oct 08 04:59:08 2009  [Info]  ** sys.path: /usr/lib64/python2.4/plat-linux2
+Thu Oct 08 04:59:08 2009  [Info]  ** sys.path: /usr/lib64/python2.4/lib-tk
+Thu Oct 08 04:59:08 2009  [Info]  ** sys.path: /usr/lib64/python2.4/lib-dynload
+Thu Oct 08 04:59:08 2009  [Info]  ** sys.path: /usr/lib64/python2.4/site-packages
+Thu Oct 08 04:59:08 2009  [Info]  ** sys.path: /usr/lib64/python2.4/site-packages/gtk-2.0
+Thu Oct 08 04:59:08 2009  [Info]  ** sys.path: /usr/lib/python2.4/site-packages
+Thu Oct 08 04:59:08 2009  [Info] Load application executable with subprocess module
+Thu Oct 08 04:59:08 2009  [Info] GZipping stdout and stderr...
+Thu Oct 08 04:59:08 2009  [Info] Application execution passed with exit code 0.
+Thu Oct 08 04:59:08 2009  [Info] Pack outputsandbox passed.
+Thu Oct 08 04:59:08 2009  [Info] Job Wrapper stop.

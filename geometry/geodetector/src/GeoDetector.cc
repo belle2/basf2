@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2010-2011  Belle II Collaboration                         *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Andreas Moll                                             *
@@ -116,6 +116,15 @@ void GeoDetector::saveToRootFile(const std::string& filename)
 const list<string>& GeoDetector::getCalledCreators() const
 {
   return m_calledCreators;
+}
+
+
+bool GeoDetector::hasVolumeUserInfo(TGeoVolume* geoVolume) const
+{
+  if (geoVolume == NULL) return false;
+
+  boost::unordered_map<TGeoVolume*, VolumeUserInfoBase*>::const_iterator mapIter = m_geoVolumeUserInfo.find(geoVolume);
+  return (mapIter != m_geoVolumeUserInfo.end());
 }
 
 

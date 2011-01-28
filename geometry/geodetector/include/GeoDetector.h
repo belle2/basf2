@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2010-2011  Belle II Collaboration                         *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Andreas Moll                                             *
@@ -11,8 +11,13 @@
 #ifndef GEODETECTOR_H_
 #define GEODETECTOR_H_
 
+#include <framework/core/FrameworkExceptions.h>
 #include <framework/gearbox/GearboxIOAbs.h>
+
 #include <geometry/geodetector/CreatorBase.h>
+#include <geometry/dataobjects/VolumeUserInfoBase.h>
+
+#include <boost/unordered_map.hpp>
 
 #include <TGeoVolume.h>
 
@@ -34,6 +39,12 @@ namespace Belle2 {
   class GeoDetector {
 
   public:
+
+    //Define exceptions
+    /** Exception is thrown if the specified TGeoVolume is NULL. */
+    BELLE2_DEFINE_EXCEPTION(GeoVolumeIsNULL, "getVolumeUserInfo: The specified TGeoVolume is NULL !");
+    /** Exception is thrown if the dynamic cast to a given UserInfo class didn't work. */
+    BELLE2_DEFINE_EXCEPTION(UserInfoDynamicCastError, "The dynamic cast from <VolumeUserInfoBase*> to <%1%*> is invalid !");
 
     /**
      * Static method to get a reference to the GeoDetector instance.
@@ -61,6 +72,24 @@ namespace Belle2 {
      */
     const std::list<std::string>& getCalledCreators() const;
 
+    /**
+     * Returns a reference to the volume user information, which is attached to the specified TGeoVolume.
+     * If the specified TGeoVolume has no user information attached, a new one is created.
+     *
+     * @param geoVolume Pointer to the TGeoVolume whose user information should be returned.
+     * @return Reference to the volume user information.
+     */
+    template <class UserInfoClass>
+    UserInfoClass& getVolumeUserInfo(TGeoVolume* geoVolume) throw(GeoVolumeIsNULL, UserInfoDynamicCastError);
+
+    /**
+     * Returns true if the specified TGeoVolume has user information attached to it.
+     *
+     * @param geoVolume Pointer to the TGeoVolume which should be checked for the user info.
+     * @return Reference to the volume user information.
+     */
+    bool hasVolumeUserInfo(TGeoVolume* geoVolume) const;
+
 
   protected:
 
@@ -69,6 +98,7 @@ namespace Belle2 {
 
     std::list<std::string> m_supportedSections; /**< List of all supported sections in the basic parameter hierarchy. */
     std::list<std::string> m_calledCreators;    /**< List of all creators which were called during the building process of the detector. */
+    boost::unordered_map<TGeoVolume*, VolumeUserInfoBase*> m_geoVolumeUserInfo; /**< Map of additional user information attached to a TGeoVolume. */
 
     /** The constructor is hidden to avoid that someone creates an instance of this class. */
     GeoDetector();
@@ -93,6 +123,30 @@ namespace Belle2 {
     friend class SingletonDestroyer;
 
   };
+
+
+  //======================================================
+  //       Implementation of template based methods
+  //======================================================
+
+  template <class UserInfoClass>
+  UserInfoClass& GeoDetector::getVolumeUserInfo(TGeoVolume* geoVolume) throw(GeoVolumeIsNULL, UserInfoDynamicCastError)
+  {
+    if (geoVolume == NULL) throw GeoVolumeIsNULL();
+    UserInfoClass* userInfo = NULL;
+
+    //Check if there has already been created a user info for the TGeoVolume. If yes, return its user info.
+    boost::unordered_map<TGeoVolume*, VolumeUserInfoBase*>::iterator mapIter = m_geoVolumeUserInfo.find(geoVolume);
+    if (mapIter == m_geoVolumeUserInfo.end()) {
+      userInfo = new UserInfoClass();
+      m_geoVolumeUserInfo.insert(make_pair(geoVolume, userInfo));
+    } else {
+      userInfo = dynamic_cast<UserInfoClass*>(mapIter->second);
+      if (userInfo == NULL) throw(UserInfoDynamicCastError() << typeid(UserInfoClass).name());
+    }
+    return *userInfo;
+  }
+
 }
 
 #endif /* GEODETECTOR_H_ */

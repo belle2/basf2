@@ -1,0 +1,74 @@
+# Generic
+SITE_NAME=AU-PPS
+SITE_BDII_HOST=cgh1.collab.unimelb.edu.au
+PX_HOST=lcg00127.grid.sinica.edu.tw
+RB_HOST=lcg00124.grid.sinica.edu.tw # irelevant, RB is unsupported
+BDII_HOST=agh1.atlas.unimelb.edu.au
+VOS="belle"
+VO_BELLE_VOMS_SERVERS='vomss://voms.cc.kek.jp:8443/voms/belle?/belle/'
+VO_BELLEVOMSES="belle voms.cc.kek.jp 15020 /C=JP/O=KEK/OU=CRC/CN=host/voms.cc.kek.jp belle"
+VO_BELLE_VOMS_CA_DN="'/C=JP/O=KEK/OU=CRC/CN=KEK GRID Certificate Authority'"
+
+VO_BELLE_WMS_HOSTS="kek2-wms.cc.kek.jp wms1.egee.cesnet.cz wms2.egee.cesnet.cz wms-6-kit.gridka.de wms-5-kit.gridka.de" # put to your NGI WMSes
+
+# Nagios
+NAGIOS_HOST=cgh4.collab.unimelb.edu.au
+NAGIOS_ADMIN_DNS="/C=AU/O=APACGrid/OU=The University of Melbourne/CN=Tom Fifield"
+NCG_NAGIOS_ADMIN=fifieldt@unimelb.edu.au
+NAGIOS_ROLE=VO
+NCG_PROBES_TYPE=all
+NCG_VO=bellle
+NAGIOS_HTTPD_ENABLE_CONFIG=true
+NAGIOS_NCG_ENABLE_CONFIG=true
+NAGIOS_SUDO_ENABLE_CONFIG=true
+NAGIOS_NAGIOS_ENABLE_CONFIG=true
+NAGIOS_CGI_ENABLE_CONFIG=true
+NAGIOS_NSCA_PASS=t0nghu4!
+
+# NGI/ROC Nagios
+COUNTRY_NAME=
+NAGIOS_NCG_ENABLE_CRON=true
+NCG_GOCDB_ROC_NAME=
+NCG_TOPOLOGY_USE_GOCDB=false
+NCG_TOPOLOGY_USE_ENOC=false
+NCG_TOPOLOGY_USE_LDAP=false
+NCG_REMOTE_USE_SAM=false
+NCG_REMOTE_USE_NAGIOS=false
+NCG_REMOTE_USE_ENOC=false
+NCG_TOPOLOGY_USE_SAM=false
+NCG_TOPOLOGY_USE_ATP=true
+NCG_TOPOLOGY_ATP_ROOT_URL="http://grid-monitoring.cern.ch/atp"
+NAGIOS_SUDO_ENABLE_CONFIG=true
+
+# DB data
+# individual components can have different user, but DB_NAME must be the same
+MYSQL_ADMIN="Du!M!4nD3NvH4!K4nGu0L4!"
+ATP_DB_USER="mrs"
+ATP_DB_NAME="mrs"
+ATP_DB_PASS="Du!M!4nD3NvH4!K4nGu0L4!"
+ATP_WEB_SECRET_KEY="Du!M!4nD3NvH4!K4nGu0L4!"
+MDDB_DB_USER="mrs"
+MDDB_DB_NAME="mrs"
+MDDB_DB_PASS="Du!M!4nD3NvH4!K4nGu0L4!"
+MS_DB_NAME="mrs"
+MS_DB_USER="mrs"
+MS_DB_PASS="Du!M!4nD3NvH4!K4nGu0L4!"
+MYEGEE_DB_TYPE="Pdo_Mysql"
+MYEGEE_DB_USER="mrs"
+MYEGEE_DB_SCHEMA="mrs"
+MYEGEE_DB_ATP="mrs"
+MYEGEE_DB_MS="mrs"
+MYEGEE_DB_MDDB="mrs"
+MYEGEE_DB_HOST="localhost"
+MYEGEE_DB_PASS="Du!M!4nD3NvH4!K4nGu0L4!"
+MYEGI_ADMIN_NAME="Admin Name"
+MYEGI_ADMIN_EMAIL="admin@address.hr"
+MYEGI_DEFAULT_PROFILE="ROC"
+MYEGI_REGION="NGI_HR"
+MYEGI_DATABASE_ENGINE="mysql"
+MYEGI_DATABASE_USER="mrs"
+MYEGI_DATABASE_NAME="mrs"
+MYEGI_DATABASE_HOST="localhost"
+MYEGI_DATABASE_PASSWORD="Du!M!4nD3NvH4!K4nGu0L4!"
+NCG_MDDB_SUPPORTED_PROFILES="ROC,ROC_CRITICAL,ROC_OPERATORS"
+

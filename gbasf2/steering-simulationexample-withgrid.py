@@ -48,8 +48,7 @@ param_evtmetagen = {
 
 evtmetagen.param(param_evtmetagen)
 
-paramloader.param('InputFileXML', os.path.join(basf2datadir,
-                  'simulation/Belle2.xml'))
+paramloader.param('InputFileXML', 'Belle2-buildfix-simulation.xml')
 
 param_g4sim = {'RandomSeed': 5486, 'MacroName': 'g4sim.macro'}
 g4sim.param(param_g4sim)

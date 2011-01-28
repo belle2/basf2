@@ -34,22 +34,44 @@ namespace Belle2 {
     RelationT()
         : m_weight(1.0) {}
 
-    /** Constuctor to create the actual relation.
+    /** Constuctor to create the actual relation - one:one.
      *
-     * The constructor has 'from' and 'to' sides, but the RelationT is in principle completely symmetric.
+     * The constructor has 'from' and 'to' sides, but this constructor is actually symmetric.
      *
-     * @param from   first side of the RelationT.
-     * @param to     second side of the RelationT.
-     * @param weight weight of the RelationT. Sometimes you might want to use this number to encode other information.
+     * @param from      StoreAccessor object that holds the object of the 'from' side.
+     * @param to        StoreAccessor object that holds the object of the 'to' side'.
+     * @param fromIndex If the object the Relation shall point to is not the full object hold by the StoreAccessor,
+     *                  you can add an index here.
+     * @param toIndex   Same as fromIndex for the 'to' side.
+     * @param weight    Weight of the RelationT. Sometimes you might want to use this number to encode other information.
      */
     RelationT(StoreAccessorBase& from, StoreAccessorBase& to,
               const int& fromIndex = -1, const int& toIndex = -1,
               const float& weight = 1.0);
 
-
+    /** Constuctor to create the actual relation - one:many with single weight.
+     *
+     * @param from      StoreAccessor object that holds the object of the 'from' side.
+     * @param to        StoreAccessor object that holds the object of the 'to' side'.
+     * @param fromIndex If the object the Relation shall point to is not the full object hold by the StoreAccessor,
+     *                  you can add an index here.
+     * @param toIndices Same as fromIndex for the 'to' side, but in this case you don't submit a single index, but a list of indices.
+     * @param weight    Weight of the RelationT. This constructor takes a single weight for the whole list.
+     */
     RelationT(StoreAccessorBase& from, StoreAccessorBase& to,
               const int& fromIndex, std::list<int> toIndices,
-              std::list<float> weight = std::list<float>());
+              const float& weight = 1.0);
+
+    /** Constructor to create the actual relation - one:many with individual weights.
+     *
+     * @param from      StoreAccessor object that holds the object of the 'from' side.
+     * @param to        StoreAccessor object that holds the object of the 'to' side'.
+     * @param fromIndex If the object the Relation shall point to is not the full object hold by the StoreAccessor,
+     *                  you can add an index here.
+     * @param toIndices In this case pairs of position indices and weights are submitted for the creation of the relation.
+     */
+    RelationT(StoreAccessorBase& from, StoreAccessorBase& to,
+              const int& fromIndex, std::list<std::pair<int, float> > toIndices);
 
 
     /** Destructor. */
@@ -156,7 +178,7 @@ Belle2::RelationT<T>::RelationT(Belle2::StoreAccessorBase& from, Belle2::StoreAc
 template <class T>
 Belle2::RelationT<T>::RelationT(Belle2::StoreAccessorBase& from, Belle2::StoreAccessorBase& to,
                                 const int& fromIndex, std::list<int> toIndices,
-                                std::list<float> weight)
+                                const float& weight)
 {
   m_fromAccessorParams = from.getAccessorParams();
   m_toAccessorParams   = to.getAccessorParams();
@@ -167,11 +189,23 @@ Belle2::RelationT<T>::RelationT(Belle2::StoreAccessorBase& from, Belle2::StoreAc
     m_indices.push_back(static_cast<T>((*iter)));
   }
 
-  for (std::list<int>::iterator iter = toIndices.begin(); iter != toIndices.end(); iter++) {
-    m_indices.push_back(static_cast<T>((*iter)));
-  }
-
-  m_weight = weight;
+  m_weight.push_back(weight);
 }
+
+template <class T>
+Belle2::RelationT<T>::RelationT(StoreAccessorBase& from, StoreAccessorBase& to,
+                                const int& fromIndex, std::list<std::pair<int, float> > toIndices)
+{
+  m_fromAccessorParams = from.getAccessorParams();
+  m_toAccessorParams   = to.getAccessorParams();
+
+  m_index = fromIndex;
+
+  for (std::list<std::pair<int, float> >::iterator iter = toIndices.begin(); iter != toIndices.end(); iter++) {
+    m_indices.push_back(static_cast<T>((*iter).first));
+    m_weight.push_back((*iter).second);
+  }
+}
+
 
 #endif // RELATIONT

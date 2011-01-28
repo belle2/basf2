@@ -32,34 +32,10 @@ EventProcessor::~EventProcessor()
 }
 
 
-void EventProcessor::process(PathPtr startPath, long maxEvent, long runNumber)
+void EventProcessor::process(PathPtr startPath, long maxEvent)
 {
-  ModuleManager& moduleManager = ModuleManager::Instance();
-
   //Get list of modules which could be executed during the data processing.
   ModulePtrList moduleList = m_pathManager.buildModulePathList(startPath);
-
-  //Check if there is at least one module in the chain, which can specify the end of the data flow (if maxEvent is <= 0).
-  if (maxEvent <= 0) {
-    ModulePtrList selEoDModuleList = moduleManager.getModulesByProperties(moduleList, Module::c_TriggersEndOfData);
-    if (selEoDModuleList.size() == 0) {
-      B2ERROR("There must be at least one module in the chain which can specify the end of the data flow.")
-      return;
-    }
-  }
-
-  //Check if there is exactly one module in the chain, which can specify the begin of a new run (if runNumber < 0).
-  if (runNumber < 0) {
-    ModulePtrList selBnRModuleList = moduleManager.getModulesByProperties(moduleList, Module::c_TriggersNewRun);
-    if (selBnRModuleList.size() != 1) {
-      B2ERROR("There are currently " << selBnRModuleList.size() << " modules in the chain which specify the beginning of a new run. There is exactly one module of this type allowed.")
-      return;
-    }
-  } else {
-    //Store the run number in the MetaData object
-    StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Persistent);
-    eventMetaDataPtr->setRun(runNumber);
-  }
 
   //Initialize modules
   processInitialize(moduleList);
@@ -67,7 +43,6 @@ void EventProcessor::process(PathPtr startPath, long maxEvent, long runNumber)
   //Check if errors appeared. If yes, don't start the event processing.
   int numLogError = LogSystem::Instance().getMessageCounter(LogConfig::c_Error);
   if (numLogError == 0) {
-    if (runNumber > -1) processBeginRun(moduleList); //If the run number was set, start a new run manually
     processCore(startPath, moduleList, maxEvent); //Do the event processing
 
   } else {
@@ -111,11 +86,17 @@ void EventProcessor::processInitialize(const ModulePtrList& modulePathList)
 void EventProcessor::processCore(PathPtr startPath, const ModulePtrList& modulePathList, long maxEvent)
 {
   long currEvent = 0;
-  bool normalEvent = true;
   bool endProcess = false;
   PathPtr currPath;
   ModulePtrList::const_iterator moduleIter;
   LogSystem& logSystem = LogSystem::Instance();
+
+  //Remember the previous event meta data, and identify end of data meta data
+  EventMetaData previousEventMetaData;
+  EventMetaData endEventMetaData;
+
+  //Pointer to master module;
+  Module* master = 0;
 
   //Loop over the events
   while (!endProcess) {
@@ -125,7 +106,6 @@ void EventProcessor::processCore(PathPtr startPath, const ModulePtrList& moduleP
     moduleIter = currPath->getModules().begin();
     while ((!endProcess) && (moduleIter != currPath->getModules().end())) {
       Module* module = moduleIter->get();
-      normalEvent = true;
 
       //Set the module dependent log level
       logSystem.setModuleLogConfig(module->getLogConfiguration());
@@ -136,48 +116,63 @@ void EventProcessor::processCore(PathPtr startPath, const ModulePtrList& moduleP
       //Set the global log level
       logSystem.setModuleLogConfig(NULL);
 
-      //Check the returned process record type
-      switch (module->getProcessRecordType()) {
-        case Module::prt_Event     :
-          break;
-
-        case Module::prt_BeginRun  :
-          //If the current module is allowed to trigger a new run, call the beginRun() methods of all modules
-          //and continue with the first module in the startPath.
-          if (module->hasProperties(Module::c_TriggersNewRun)) {
-            processBeginRun(modulePathList);
-            currPath = startPath;
-            moduleIter = currPath->getModules().begin();
-            normalEvent = false;
-          } else B2WARNING("Module " << module->getName() << "requested to start a new run, but doesn't have the necessary property set. Request was ignored.");
-          break;
-
-        case Module::prt_EndRun    :
-          //If the current module is allowed to trigger a new run, call the endRun() methods of all modules
-          //and continue with the first module in the startPath.
-          if (module->hasProperties(Module::c_TriggersNewRun)) {
-            processEndRun(modulePathList);
-            currPath = startPath;
-            moduleIter = currPath->getModules().begin();
-            normalEvent = false;
-          } else B2WARNING("Module " << module->getName() << "requested to end a run, but doesn't have the necessary property set. Request was ignored.");
-          break;
-
-        case Module::prt_EndOfData :
-          //If the current module is allowed to end the process and the end of data flow is reached, stop the event process.
-          if (module->hasProperties(Module::c_TriggersEndOfData)) {
-            endProcess = true;
-          } else B2WARNING("Module " << module->getName() << "requested to stop the event processing (end of data), but doesn't have the necessary property set. Request was ignored.");
-          break;
+      //Determine the master module
+      StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
+      if (!master && (currEvent == 0)) {
+        if (*eventMetaDataPtr != previousEventMetaData) {
+          master = module;
+        }
       }
 
-      if ((normalEvent) && (!endProcess)) {
+      //Handle event meta data changes of the master module
+      if (module == master) {
+
+        //Check for a change of the run
+        if ((eventMetaDataPtr->getExperiment() != previousEventMetaData.getExperiment()) ||
+            (eventMetaDataPtr->getRun() != previousEventMetaData.getRun())) {
+
+          //End the previous run
+          if (currEvent > 0) {
+            EventMetaData newEventMetaData = *eventMetaDataPtr;
+            *eventMetaDataPtr = previousEventMetaData;
+            processEndRun(modulePathList);
+            *eventMetaDataPtr = newEventMetaData;
+          }
+
+          //Check for end of data
+          if (*eventMetaDataPtr == endEventMetaData) {
+            endProcess = true;
+            break;
+          }
+
+          //Start a new run
+          processBeginRun(modulePathList);
+        }
+
+        previousEventMetaData = *eventMetaDataPtr;
+
+      } else {
+
+        //Check for a second master module
+        if (*eventMetaDataPtr != previousEventMetaData) {
+          B2FATAL("Two master modules were discovered: " << master->getName()
+                  << " and " << module->getName());
+        }
+      }
+
+      if (!endProcess) {
         //Check for a module condition, evaluate it and if it is true switch to a new path
         if (module->evalCondition()) {
           currPath = module->getConditionPath();
           moduleIter = currPath->getModules().begin();
         } else moduleIter++;
       }
+    }
+
+    //Stop processing in case of no master module
+    if (!master) {
+      B2WARNING("There is no module that provides event and run numbers. Stop processing");
+      endProcess = true;
     }
 
     //Delete event related data in DataStore

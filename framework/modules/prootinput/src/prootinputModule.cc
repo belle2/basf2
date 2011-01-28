@@ -25,7 +25,7 @@ REG_MODULE(pRootInput)
 pRootInputModule::pRootInputModule() : pEventServer()
 {
   setDescription("pBasf2: ROOT input module");
-  setPropertyFlags(c_TriggersNewRun | c_TriggersEndOfData | c_Input | c_ParallelProcessingCertified);
+  setPropertyFlags(c_Input | c_ParallelProcessingCertified);
 
   m_file = NULL;
 
@@ -143,8 +143,6 @@ void pRootInputModule::event()
   } else {
     status = readRingBuf(DataStore::c_Event);
   }
-  if (status == MSG_TERMINATE)
-    setProcessRecordType(prt_EndOfData); // EoF detected
 
 }
 
@@ -170,6 +168,7 @@ int pRootInputModule::readTree(const DataStore::EDurability& durability)
 {
   // Fill m_objects
   //  B2WARNING("Durability" << durability)
+  if (m_eventNumber >= m_tree[durability]->GetEntriesFast()) return MSG_TERMINATE;
   m_tree[durability]->GetEntry(m_eventNumber);
 
   // Restore objects in DataStore

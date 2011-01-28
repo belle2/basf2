@@ -47,7 +47,7 @@ namespace Belle2 {
      * @param maxEvent Optional: The maximum number of events that will be processed. If the number is smaller or equal 0, all events will be processed.
      * @param runNumber Optional: The number of the run which should be processed. If the number is smaller than 0, the run number has to be set externally by a module.
      */
-    void process(PathPtr startPath, long maxEvent = 0, long runNumber = -1);
+    void process(PathPtr startPath, long maxEvent = 0);
 
 
   protected:

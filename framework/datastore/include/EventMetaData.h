@@ -28,7 +28,7 @@ namespace Belle2 {
      *  Initilises meta data of event with Nulls.
      */
     EventMetaData(const unsigned long& event = 0, const unsigned long& run = 0, const unsigned long& experiment = 0)
-        : m_event(event), m_run(run), m_experiment(experiment) {}
+        : m_event(event), m_run(run), m_experiment(experiment), m_parent_index(-1), m_generated_weight(1) {}
 
     /** Destructor. */
     ~EventMetaData() {}
@@ -57,9 +57,17 @@ namespace Belle2 {
       m_experiment = experiment;
     }
 
+    /** Parent Index Setter.
+     *
+     *  @param index The index of the current parent file.
+     */
+    void setParentIndex(int index) {
+      m_parent_index = index;
+    }
+
     /** Generated Weight Setter.
      *
-     *  @param generated weight The weight produced by the event generator
+     *  @param weight The weight produced by the event generator
      */
     void setGeneratedWeight(const double& weight) {
       m_generated_weight = weight;
@@ -89,6 +97,14 @@ namespace Belle2 {
       return m_experiment;
     }
 
+    /** Parent Index Getter.
+     *
+     *  @return The index of the current parent file.
+     */
+    int getParentIndex() const {
+      return m_parent_index;
+    }
+
     /** Generated Weight Getter.
      *
      *  @return The weight produced by the event generator
@@ -97,6 +113,19 @@ namespace Belle2 {
       return m_generated_weight;
     }
 
+    /** Comparison Operator.
+     *
+     *  @param eventMetaData The event meta data to compare with.
+     *  @return True if event, run, and experiment numbers are the same
+     */
+    bool operator== (const EventMetaData& eventMetaData) const;
+
+    /** Comparison Operator.
+     *
+     *  @param eventMetaData The event meta data to compare with.
+     *  @return True if event, run, or experiment numbers are different
+     */
+    bool operator!= (const EventMetaData& eventMetaData) const;
 
   private:
 
@@ -112,10 +141,16 @@ namespace Belle2 {
      */
     unsigned long m_experiment;
 
-    /** ROOT Macro to make EventMetaData a ROOT class.
+    /** Experiment number.
+     */
+    int m_parent_index;
+
+    /** Generated weight.
      */
     double m_generated_weight;
 
+    /** ROOT Macro to make EventMetaData a ROOT class.
+     */
     ClassDef(EventMetaData, 1);
 
   }; //class

@@ -26,7 +26,6 @@ Module::Module() :
     m_logConfig(),
     m_hasReturnValue(false),
     m_returnValue(0),
-    m_processRecordType(prt_Event),
     m_hasCondition(false)
 {
 }
@@ -131,12 +130,6 @@ void Module::setReturnValue(bool value)
 {
   m_hasReturnValue = true;
   m_returnValue = value;
-}
-
-
-void Module::setProcessRecordType(EProcessRecordType processRecordType)
-{
-  m_processRecordType = processRecordType;
 }
 
 

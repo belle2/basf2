@@ -89,11 +89,6 @@ void Framework::process(PathPtr startPath, long maxEvent)
 }
 
 
-void Framework::process(PathPtr startPath, long maxEvent, long runNumber)
-{
-  m_eventProcessor->process(startPath, maxEvent, runNumber);
-}
-
 
 void Framework::set_nprocess(int nproc)
 {
@@ -227,7 +222,6 @@ void Framework::exposePythonAPI()
   ModulePtr(Framework::*registerModule2)(string, string) = &Framework::registerModule;
   void(Framework::*process1)(PathPtr) = &Framework::process;
   void(Framework::*process2)(PathPtr, long) = &Framework::process;
-  void(Framework::*process3)(PathPtr, long, long) = &Framework::process;
   void(Framework::*set_nprocess)(int) = &Framework::set_nprocess;
 
   //Expose framework class
@@ -241,7 +235,6 @@ void Framework::exposePythonAPI()
   .def("create_path", &Framework::createPath)
   .def("process", process1)
   .def("process", process2)
-  .def("process", process3)
   .def("set_nprocess", set_nprocess)
   .def("read_evtgen_table", &Framework::readEvtGenTableFromFile)
   .def("set_log_level", &Framework::setLogLevel)

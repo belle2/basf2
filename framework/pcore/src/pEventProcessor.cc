@@ -44,7 +44,6 @@ void pEventProcessor::process(PathPtr spath)
 
   m_input_list = ModuleManager::Instance().getModulesByProperties
                  (modulelist,
-                  Module::c_TriggersNewRun | Module::c_TriggersEndOfData |
                   Module::c_Input | Module::c_ParallelProcessingCertified);
 
   for (ModulePtrList::const_iterator listIter = m_input_list.begin();

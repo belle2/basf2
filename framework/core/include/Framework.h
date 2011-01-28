@@ -117,15 +117,6 @@ namespace Belle2 {
     void process(PathPtr startPath, long maxEvent);
 
     /**
-     * Processes up to maxEvent events using the specified run number by starting with the first module in the specified path.
-     *
-     * @param startPath The processing starts with the first module of this path.
-     * @param maxEvent The maximum number of events that will be processed. If the number is smaller than 1, all events will be processed.
-     * @param runNumber The number of the run which should be processed.
-     */
-    void process(PathPtr startPath, long maxEvent, long runNumber);
-
-    /**
      * Function to set number of processes for parallel processing.
      *
      * @param nproc Number of processes for parallel processing

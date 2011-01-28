@@ -25,7 +25,7 @@ pSeqRootInputModule::pSeqRootInputModule() : pEventServer()
 {
   //Set module properties
   setDescription("SeqROOT output with parallel capability");
-  setPropertyFlags(c_TriggersNewRun | c_TriggersEndOfData | c_Input | c_ParallelProcessingCertified);
+  setPropertyFlags(c_Input | c_ParallelProcessingCertified);
 
   m_nsent = 0;
   m_nrecv = 0;
@@ -94,7 +94,6 @@ void pSeqRootInputModule::event()
     size = m_file->read(evtbuf, MAXEVTSIZE);
     if (size == 0) {
       delete m_file;
-      setProcessRecordType(prt_EndOfData);
       return;
     } else {
       evtmsg = new EvtMessage(evtbuf);
@@ -105,17 +104,9 @@ void pSeqRootInputModule::event()
     }
     evtmsg = new EvtMessage(evtbuf);
     if (evtmsg->type() == MSG_TERMINATE) {
-      setProcessRecordType(prt_EndOfData);
       return;
     }
   }
-  // Set record type
-  if (evtmsg->type() == MSG_BEGIN_RUN)
-    setProcessRecordType(prt_BeginRun);
-  else if (evtmsg->type() == MSG_END_RUN)
-    setProcessRecordType(prt_EndRun);
-  else
-    setProcessRecordType(prt_Event);
 
   // Process synchronization for begin/end run recods (parallel case)
   if (m_nproc > 0 &&

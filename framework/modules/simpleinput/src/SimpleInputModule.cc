@@ -27,7 +27,7 @@ SimpleInputModule::SimpleInputModule() : Module()
 {
   //Set module properties
   setDescription("simple input");
-  setPropertyFlags(c_TriggersNewRun | c_TriggersEndOfData | c_Input);
+  setPropertyFlags(c_Input);
 
   //Initialization of some member variables
   for (int jj = 0; jj < DataStore::c_NDurabilityTypes; jj++) {
@@ -173,6 +173,7 @@ void SimpleInputModule::readTree(const DataStore::EDurability& durability)
 {
   // Fill m_objects
   B2DEBUG(200, "Durability" << durability)
+  if (m_eventNumber >= m_tree[durability]->GetEntriesFast()) return;
   m_tree[durability]->GetEntry(m_eventNumber);
 
 

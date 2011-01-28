@@ -43,24 +43,8 @@ namespace Belle2 {
 
   public:
 
-    /** The process record types. */
-    enum EProcessRecordType {
-      prt_Event,       /**< The default value: Marks event data. */
-      prt_BeginRun,    /**< Marks the beginning of a new run (only used for the first method in the chain). */
-      prt_EndRun,      /**< Marks the end of a new run (only used for the first method in the chain). */
-      prt_EndOfData    /**< Marks the end of the data. This will stop the
-                            processing of the events. This is especially useful
-                            for input modules which run out of events before the
-                            maximum number of events is reached. The processing of
-                            the events is stopped immediately after the module
-                            setting this EProcessRecordType has finished.
-                          */
-    };
-
     /** Each module can be tagged with property flags, which indicate certain features of the module. */
     enum EModulePropFlags {
-      c_TriggersNewRun              = 1,   /**< This module is able to trigger new runs. */
-      c_TriggersEndOfData           = 2,   /**< This module is able to send the message that there is no more data available. */
       c_Input                       = 4,   /**< This module is an input module (reads data). */
       c_Output                      = 8,   /**< This module is an output module (writes data). */
       c_ParallelProcessingCertified = 16,  /**< This module can be run in parallel processing mode safely (has to comply with certain standards). */
@@ -239,13 +223,6 @@ namespace Belle2 {
     bool hasProperties(unsigned int propertyFlags);
 
     /**
-     * Returns the current process record type.
-     *
-     * @return The current process record type.
-     */
-    EProcessRecordType getProcessRecordType() const {return m_processRecordType; };
-
-    /**
      * Returns true if the module has still unset parameters which the user has to set in the steering file.
      *
      * @return True if the module has still unset parameters which the user has to set in the steering file.
@@ -343,16 +320,6 @@ namespace Belle2 {
      */
     void setReturnValue(bool value);
 
-    /**
-     * Sets the process record type.
-     * Usually this method is used by data generating or data reading modules.
-     * Please note: Only for the first module in the chain the BEGIN_RUN and
-     * END_RUN process record types are checked.
-     *
-     * @param processRecordType The process record type to be returned.
-     */
-    void setProcessRecordType(EProcessRecordType processRecordType);
-
 
   private:
 
@@ -366,7 +333,6 @@ namespace Belle2 {
 
     bool m_hasReturnValue;     /**< True, if the default return value is set. */
     int  m_returnValue;        /**< The default return value. */
-    EProcessRecordType m_processRecordType;  /**< The current process record type. */
 
     bool m_hasCondition;     /**< True, if a condition was set for the module. */
     boost::shared_ptr<Path> m_conditionPath; /**< The path which which will be executed if the condition is evaluated to true. */

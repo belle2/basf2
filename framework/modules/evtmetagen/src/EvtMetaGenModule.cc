@@ -30,7 +30,6 @@ EvtMetaGenModule::EvtMetaGenModule() : Module()
 {
   //Set module properties
   setDescription("Sets the event meta data information (exp, run, evt).");
-  setPropertyFlags(c_TriggersNewRun | c_TriggersEndOfData);
 
   //Parameter definition
   addParam("ExpList",      m_expList,      "The list for the experiment numbers.");
@@ -65,49 +64,30 @@ void EvtMetaGenModule::initialize()
         }
       }
 
-      m_colIndex = -1;
-      setProcessRecordType(prt_EndRun);
+      m_evtNumber = m_evtStartList[0] - 1;
     } else B2ERROR("There are no events to be processed !")
     }
+  m_colIndex = 0;
 }
 
 
 void EvtMetaGenModule::event()
 {
-  bool storeMetaData = true;
+  if (m_colIndex > static_cast<int>(m_expList.size())) return;
 
-  switch (getProcessRecordType()) {
-    case prt_EndRun : //If the process record type is endRun, a run was finished last time, therefore start a new run if possible.
-      m_colIndex++;
-
-      if (m_colIndex >= static_cast<int>(m_expList.size())) {
-        setProcessRecordType(prt_EndOfData);
-        storeMetaData = false;
-      } else {
-        m_evtNumber = m_evtStartList[m_colIndex];
-        setProcessRecordType(prt_BeginRun);
-      }
-      break;
-    case prt_BeginRun : //If the process record type is beginRun, a new run was started last time, therefore change to event mode.
-      setProcessRecordType(prt_Event);
-      break;
-    case prt_Event : //Increase the event number. If the max. event number is reached stop the run.
-      if (m_evtNumber + 1 > m_evtEndList[m_colIndex]) {
-        setProcessRecordType(prt_EndRun);
-        storeMetaData = false;
-      } else m_evtNumber++;
-      break;
-    case prt_EndOfData :
-      B2ERROR("EndOfData record type in event() method !")
-      break;
+  m_evtNumber++;
+  if (m_evtNumber > m_evtEndList[m_colIndex]) {
+    m_colIndex++;
+    if (m_colIndex > static_cast<int>(m_expList.size())) {
+      return;
+    } else {
+      m_evtNumber = m_evtStartList[m_colIndex];
+    }
   }
 
-  //Store the event meta data information.
-  if (storeMetaData) {
-    StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
-    eventMetaDataPtr->setExperiment(m_expList[m_colIndex]);
-    eventMetaDataPtr->setRun(m_runList[m_colIndex]);
-    eventMetaDataPtr->setEvent(m_evtNumber);
-  }
-
+  StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
+  eventMetaDataPtr->setExperiment(m_expList[m_colIndex]);
+  eventMetaDataPtr->setRun(m_runList[m_colIndex]);
+  eventMetaDataPtr->setEvent(m_evtNumber);
+  return;
 }

@@ -73,12 +73,12 @@ void EvtMetaGenModule::initialize()
 
 void EvtMetaGenModule::event()
 {
-  if (m_colIndex > static_cast<int>(m_expList.size())) return;
+  if (m_colIndex >= static_cast<int>(m_expList.size())) return;
 
   m_evtNumber++;
   if (m_evtNumber > m_evtEndList[m_colIndex]) {
     m_colIndex++;
-    if (m_colIndex > static_cast<int>(m_expList.size())) {
+    if (m_colIndex >= static_cast<int>(m_expList.size())) {
       return;
     } else {
       m_evtNumber = m_evtStartList[m_colIndex];

@@ -30,7 +30,7 @@ double Unit::km  = Unit::cm * 1e5;   /**< [kilometers] */
 double Unit::m   = Unit::cm * 1e2;   /**< [meters] */
 double Unit::mm  = Unit::m  * 1e-3;  /**< [millimeters] */
 double Unit::um  = Unit::m  * 1e-6;  /**< [micrometers] */
-double Unit::nm  = Unit::m  * 1e-7;  /**< [nanometers] */
+double Unit::nm  = Unit::m  * 1e-9;  /**< [nanometers] */
 double Unit::fm  = Unit::m  * 1e-12; /**< [femtometers] */
 
 // area units

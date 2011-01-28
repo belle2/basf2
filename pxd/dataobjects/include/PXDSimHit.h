@@ -18,7 +18,7 @@
 namespace Belle2 {
 
   /**
-    * ClassPXDSimHit - Geant4 simulated hit for the PXD
+    * ClassPXDSimHit - Geant4 simulated hit for the PXD.
     *
     * This class holds particle hit data from geant4 simulation. As the simulated
     * hit classes are used to generate detector response, they contain _local_

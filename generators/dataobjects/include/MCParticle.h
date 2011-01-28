@@ -31,16 +31,17 @@ namespace Belle2 {
 
     /** The status information for the MCParticle. */
     enum StatusBit {
-      PrimaryParticle = 1,    /**< bit 0: Particle is primary particle. */
-      StableInGenerator = 2,  /**< bit 1: Particle is stable in the generator. */
-      StableInSimulation = 4, /**< bit 2: Particle is stable in the simulation. */
-      LastSeenInBeampipe = 8,  /**< bit 3: Particle was last seen in the beampipe. */
-      LastSeenInVTX = 16,      /**< bit 4: Particle was last seen in the vertex detectors (PXD, SVD). */
-      LastSeenInCDC = 32,      /**< bit 5: Particle was last seen in the drift chamber (CDC). */
-      LastSeenInPID = 64,      /**< bit 6: Particle was last seen in the PID detectors. */
-      LastSeenInECL = 128,     /**< bit 7: Particle was last seen in the elm calorimeter. */
-      LastSeenInKLM = 256,     /**< bit 8: Particle was last seen in the klm. */
-      IsVirtual = 512          /**< bit 9: Particle is virtual and not going to Geant4 */
+      PrimaryParticle   = 1,   /**< bit 0:  Particle is primary particle. */
+      StableInGenerator = 2,   /**< bit 1:  Particle is stable in the generator. */
+      LeftDetector      = 4,   /**< bit 2:  Particle left the detector. */
+      StoppedInDetector = 8,   /**< bit 3:  Particle was stopped in detector. */
+      SeenInPXD         = 16,  /**< bit 4:  Particle was seen in the PXD. */
+      SeenInSVD         = 32,  /**< bit 5:  Particle was seen in the SVD. */
+      SeenInCDC         = 64,  /**< bit 6:  Particle was seen in the drift chamber (CDC). */
+      SeenInTOP         = 128, /**< bit 7:  Particle was seen in the time of propagation counter. */
+      LastSeenInECL     = 256, /**< bit 8:  Particle was seen in the elm calorimeter. */
+      LastSeenInKLM     = 512, /**< bit 9:  Particle was seen in the klm. */
+      IsVirtual         = 1024 /**< bit 10: Particle is virtual and not going to Geant4 */
     };
 
     /**

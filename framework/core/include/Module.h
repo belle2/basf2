@@ -45,10 +45,10 @@ namespace Belle2 {
 
     /** Each module can be tagged with property flags, which indicate certain features of the module. */
     enum EModulePropFlags {
-      c_Input                       = 4,   /**< This module is an input module (reads data). */
-      c_Output                      = 8,   /**< This module is an output module (writes data). */
-      c_ParallelProcessingCertified = 16,  /**< This module can be run in parallel processing mode safely (has to comply with certain standards). */
-      c_RequiresGUISupport          = 32   /**< This module requires the framework to have GUI support built-in. */
+      c_Input                       = 1,  /**< This module is an input module (reads data). */
+      c_Output                      = 2,  /**< This module is an output module (writes data). */
+      c_ParallelProcessingCertified = 4,  /**< This module can be run in parallel processing mode safely (has to comply with certain standards). */
+      c_RequiresGUISupport          = 8   /**< This module requires the framework to have GUI support built-in. */
     };
 
     /**

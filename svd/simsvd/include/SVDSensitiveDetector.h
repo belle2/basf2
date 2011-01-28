@@ -11,7 +11,7 @@
 #ifndef SVDSENSITIVEDETECTOR_H_
 #define SVDSENSITIVEDETECTOR_H_
 
-#include <svd/hitsvd/SVDSimHit.h>
+#include <svd/dataobjects/SVDSimHit.h>
 #include <simulation/kernel/SensitiveDetectorBase.h>
 
 namespace Belle2 {

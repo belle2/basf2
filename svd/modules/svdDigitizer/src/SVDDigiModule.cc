@@ -13,8 +13,8 @@
 #include <time.h>
 
 // Hit classes
-#include <svd/hitsvd/SVDSimHit.h>
-#include <svd/hitsvd/SVDHit.h>
+#include <svd/dataobjects/SVDSimHit.h>
+#include <svd/dataobjects/SVDHit.h>
 
 // framework - module
 //#include <framework/core/ModuleManager.h>

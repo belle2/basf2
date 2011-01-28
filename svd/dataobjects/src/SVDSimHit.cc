@@ -9,7 +9,7 @@
  **************************************************************************/
 
 // basf2
-#include <svd/hitsvd/SVDSimHit.h>
+#include <svd/dataobjects/SVDSimHit.h>
 #include <framework/logging/Logger.h>
 
 // root

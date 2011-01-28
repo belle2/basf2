@@ -10,7 +10,9 @@
 
 #include <simulation/kernel/SensitiveDetectorBase.h>
 #include <simulation/kernel/RunManager.h>
+#include <simulation/kernel/UserInfo.h>
 #include <framework/logging/Logger.h>
+#include <generators/dataobjects/MCParticleGraph.h>
 
 using namespace std;
 using namespace Belle2;
@@ -33,3 +35,9 @@ SensitiveDetectorBase::~SensitiveDetectorBase()
 {
   return RunManager::Instance().addRelation(hit, step);
 }*/
+
+
+void SensitiveDetectorBase::setSeenInDetectorFlag(G4Step* step, MCParticle::StatusBit subdetectorBit)
+{
+  TrackInfo::getInfo(*step->GetTrack()).addStatus(subdetectorBit);
+}

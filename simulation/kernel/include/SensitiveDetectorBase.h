@@ -11,6 +11,8 @@
 #ifndef SENSITIVEDETECTOR_H_
 #define SENSITIVEDETECTOR_H_
 
+#include <generators/dataobjects/MCParticle.h>
+
 #include <G4VSensitiveDetector.hh>
 #include <G4Step.hh>
 
@@ -51,6 +53,15 @@ namespace Belle2 {
        * @return True if the relation could be added.
        */
       //bool addRelation(TObject* hit, G4Step* step);
+
+      /**
+       * Sets the SeenInDetector flag for the MCParticle which created the step.
+       * Each subdetector should set its flag to mark MCParticles that traversed the subdetector.
+       *
+       * @param step Pointer to the step representing the track which created the hit.
+       * @param subdetectorBit The subdetector specific bit. See the MCParticle class for the list of available bits.
+       */
+      void setSeenInDetectorFlag(G4Step* step, MCParticle::StatusBit subdetectorBit);
 
 
     protected:

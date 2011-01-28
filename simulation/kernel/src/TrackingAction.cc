@@ -88,7 +88,7 @@ void TrackingAction::PostUserTrackingAction(const G4Track* track)
     //Set the values for the particle
     G4ThreeVector decVtx = postStep->GetPosition() * Unit::mm;
     currParticle.setDecayVertex(decVtx.x(), decVtx.y(), decVtx.z());
-    currParticle.setDecayTime(postStep->GetGlobalTime());
+    currParticle.setDecayTime(postStep->GetGlobalTime() * Unit::ns);
     currParticle.setValidVertex(true);
 
     //Add particle and decay Information to all secondaries

@@ -39,7 +39,7 @@ PGunInputModule::PGunInputModule() : Module()
 
   //Set module properties
   setDescription("particle gun for tracks");
-  setPropertyFlags(c_TriggersEndOfData | c_Input);
+  setPropertyFlags(c_Input);
 
   //Parameter definition
   addParam("ntracks", m_ntracks, "The number of tracks to be generated per event", 1);

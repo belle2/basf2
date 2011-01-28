@@ -53,6 +53,8 @@ namespace Belle2 {
 
     protected:
 
+      int m_evtNumber; /**< The current event number. */
+
       TouschekReader* m_readerHER;      /**< The Touschek reader object for the HER data. */
       TouschekReader* m_readerLER;      /**< The Touschek reader object for the LER data. */
       TGeoHMatrix* m_herPipePartMatrix; /**< HER transformation matrix from TURTLE space into geant4 space. */

@@ -10,6 +10,10 @@
 
 #include <generators/modules/TouschekInputModule.h>
 
+#include <framework/datastore/DataStore.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/datastore/EventMetaData.h>
+
 #include <framework/core/ModuleUtils.h>
 
 #include <TGeoManager.h>
@@ -35,7 +39,7 @@ TouschekInputModule::TouschekInputModule() : Module()
 {
   //Set module properties
   setDescription("Reads the Touschek data from a TURTLE file and stores it into the MCParticle collection.");
-  setPropertyFlags(c_TriggersEndOfData | c_Input);
+  setPropertyFlags(c_Input);
 
   //Parameter definition
   addParam("FilenameHER",  m_filenameHER, "The filename of the HER TURTLE input file.");
@@ -45,6 +49,7 @@ TouschekInputModule::TouschekInputModule() : Module()
   addParam("MaxParticles", m_maxParticles, "The maximum number of particles per event that should be read. -1 means all of the particles are read.", -1);
 
   //Create and initialize member variables
+  m_evtNumber = 0;
   m_herPipePartMatrix = new TGeoHMatrix("TouschekPlaneHER");
   m_lerPipePartMatrix = new TGeoHMatrix("TouschekPlaneLER");
   m_readerHER = new TouschekReader(m_herPipePartMatrix, 11);  //HER: electrons
@@ -100,14 +105,17 @@ void TouschekInputModule::event()
     if (m_readHER) readHERParticles = m_readerHER->getParticles(m_maxParticles, mpg); //HER: electrons
     if (m_readLER) readLERParticles = m_readerLER->getParticles(m_maxParticles, mpg); //LER: positrons
 
-    if ((readHERParticles <= 0) && (readLERParticles <= 0)) {
-      setProcessRecordType(prt_EndOfData);
-    } else {
+    if ((readHERParticles > 0) || (readLERParticles > 0)) {
       //Generate MCParticle list
       mpg.generateList(DEFAULT_MCPARTICLES, MCParticleGraph::set_decay_info | MCParticleGraph::check_cyclic);
 
+      StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
+      eventMetaDataPtr->setEvent(m_evtNumber);
+
       B2INFO("Read " << readHERParticles << " e- particles (HER).")
       B2INFO("Read " << readLERParticles << " e+ particles (LER).")
+
+      m_evtNumber++;
     }
   } catch (runtime_error &exc) {
     B2ERROR(exc.what());

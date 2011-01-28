@@ -47,6 +47,8 @@ namespace Belle2 {
 
     protected:
 
+      int m_evtNumber;             /**< The current event number, used in the case that the HepEvt file doesn't provide it. */
+      bool m_evtIDUsed;            /**< True if the event number from the HepEvt file was used and therefore the internal event number can't be used anymore. */
       std::string m_inputFileName; /**< The filename of the input HepEvt file. */
       int m_skipEventNumber;       /**< The number of events which should be skipped at the start of reading. */
       HepevtReader m_hepevt;       /**< An instance of the HepEvt reader. */

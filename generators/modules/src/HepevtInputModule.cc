@@ -35,12 +35,15 @@ HepevtInputModule::HepevtInputModule() : Module()
 {
   //Set module properties
   setDescription("Hepevt file input");
-  setPropertyFlags(c_TriggersEndOfData | c_Input);
+  setPropertyFlags(c_Input);
 
   //Parameter definition
   addParam("inputFileName", m_inputFileName, "Hepevt filename");
   addParam("skipEvents", m_skipEventNumber, "Skip this number of events before starting.", 0);
   addParam("useWeights", m_useWeights, "Set to 'true' to if generator weights should be propagated.", false);
+
+  m_evtNumber = 0;
+  m_evtIDUsed = false;
 }
 
 
@@ -61,16 +64,24 @@ void HepevtInputModule::event()
     mpg.clear();
     double weight = 1;
     int id = m_hepevt.getEvent(mpg, weight);
+
+    StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
     if (id > -1) {
-      StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
+      m_evtIDUsed = true;
       eventMetaDataPtr->setEvent(id);
       if (m_useWeights)
         eventMetaDataPtr->setGeneratedWeight(weight);
+    } else {
+      if (!m_evtIDUsed) {
+        eventMetaDataPtr->setEvent(m_evtNumber);
+        m_evtNumber++;
+      } else {
+        B2FATAL("The event number is not available for this event, but was available for previous events !")
+      }
     }
     mpg.generateList(DEFAULT_MCPARTICLES, MCParticleGraph::set_decay_info | MCParticleGraph::check_cyclic);
   } catch (runtime_error &e) {
     B2ERROR(e.what());
-    setProcessRecordType(prt_EndOfData);
   }
 }
 

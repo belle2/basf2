@@ -9,8 +9,8 @@
 #  Number of events:      100
 #  Tracks per event:      10
 #  Particles:             electrons / positrons
-#  Theta:                 17 to 150 degree
-#  Phi:                   0 to 360 degree
+#  Theta [default]:       17 to 150 degree
+#  Phi [default]:         0 to 360 degree
 #  Momentum:              50 MeV to 3 GeV
 #
 # Example steering file - 2011 Belle II Collaboration
@@ -23,31 +23,34 @@ from basf2 import *
 # Set the log level to show only error and fatal messages
 set_log_level(3)
 
-# Register modules
+# Particle gun
 particlegun = register_module('PGunInput')
-paramloader = register_module('ParamLoaderXML')
-geobuilder = register_module('GeoBuilder')
-g4sim = register_module('FullSim')
-simpleoutput = register_module('SimpleOutput')
-
-# Set parameters
 intseed = random.randint(1, 10000000)
-
 particlegun.param('ntracks', 10)
 particlegun.param('PIDcodes', [11, -11])
 particlegun.param('p_par1', 0.05)
 particlegun.param('p_par2', 3)
 particlegun.param('Rseed', intseed)
 
+# Geometry parameter loader
+paramloader = register_module('ParamLoaderXML')
 paramloader.param('InputFileXML', os.path.join(basf2datadir,
                   'simulation/Belle2.xml'))
 
+# Geometry builder
+geobuilder = register_module('GeoBuilder')
+
+# Full Geant4 simulation
+g4sim = register_module('FullSim')
+
+# Root file output
+simpleoutput = register_module('SimpleOutput')
 simpleoutput.param('outputFileName', 'particleGunSimResult.root')
 
-# Create paths
+# Create main path
 main = create_path()
 
-# Add modules to paths
+# Add modules to main path
 main.add_module(particlegun)
 main.add_module(paramloader)
 main.add_module(geobuilder)

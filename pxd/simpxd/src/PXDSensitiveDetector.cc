@@ -116,6 +116,10 @@ G4bool PXDSensitiveDetector::ProcessHits(G4Step* aStep, G4TouchableHistory*)
                                                            depEnergy / GeV,
                                                            stepLength / cm,
                                                            globalTime / ns);
+
+  //Set the SeenInDetector flag
+  setSeenInDetectorFlag(aStep, MCParticle::SeenInPXD);
+
   return true;
 }
 

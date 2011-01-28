@@ -19,9 +19,8 @@
 
 from basf2 import *
 
-# Register modules
+# EvtMetaGen - generate event meta data
 evtmetagen = register_module('EvtMetaGen')
-evtmetainfo = register_module('EvtMetaInfo')
 
 evtruninfo = {
     'ExpList': [71, 71, 73, 73, 73],
@@ -29,13 +28,15 @@ evtruninfo = {
     'EvtStartList': [0, 10, 0, 30, 1],
     'EvtEndList': [3, 15, 1, 34, 5],
     }
-
 evtmetagen.param(evtruninfo)
 
-# Create path
+# EvtMetaInfo - show event meta info
+evtmetainfo = register_module('EvtMetaInfo')
+
+# Create main path
 main = create_path()
 
-# Add module to path
+# Add modules to main path
 main.add_module(evtmetagen)
 main.add_module(evtmetainfo)
 

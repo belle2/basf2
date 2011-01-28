@@ -115,6 +115,10 @@ G4bool SVDSensitiveDetector::ProcessHits(G4Step* aStep, G4TouchableHistory*)
                                                            depEnergy / GeV,
                                                            stepLength / cm,
                                                            globalTime / ns);
+
+  //Set the SeenInDetector flag
+  setSeenInDetectorFlag(aStep, MCParticle::SeenInSVD);
+
   return true;
 }
 

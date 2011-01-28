@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <pxd/hitpxd/PXDHit.h>
+#include <pxd/dataobjects/PXDHit.h>
 
 using namespace std;
 using namespace Belle2;

@@ -9,7 +9,7 @@
  **************************************************************************/
 
 // basf2
-#include <pxd/hitpxd/PXDSimHit.h>
+#include <pxd/dataobjects/PXDSimHit.h>
 #include <framework/logging/Logger.h>
 
 // root

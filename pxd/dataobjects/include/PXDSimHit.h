@@ -65,13 +65,13 @@ namespace Belle2 {
       int sensorID,
       TVector3 posIn,
       TVector3 posOut,
-      double theta,
+      float theta,
       TVector3 momIn,
       int PDGcode,
       int trackID,
-      double energyDep,
-      double stepLength,
-      double globalTime):
+      float energyDep,
+      float stepLength,
+      float globalTime):
         m_layerID(layerID),
         m_ladderID(ladderID),
         m_sensorID(sensorID),
@@ -102,16 +102,16 @@ namespace Belle2 {
     void setSensorID(int sensorID) { m_sensorID = sensorID; }
 
     /** The method to set entry position.*/
-    void setPosIn(double x, double y, double z) { m_posIn.SetXYZ(x, y, z); }
+    void setPosIn(float x, float y, float z) { m_posIn.SetXYZ(x, y, z); }
 
     /** The method to set exit position.*/
-    void setPosOut(double x, double y, double z) { m_posOut.SetXYZ(x, y, z); }
+    void setPosOut(float x, float y, float z) { m_posOut.SetXYZ(x, y, z); }
 
     /** The method to set theta.*/
-    void setTheta(double aTheta) { m_theta = aTheta; }
+    void setTheta(float aTheta) { m_theta = aTheta; }
 
     /** The method to set entry momentum.*/
-    void setMomIn(double px, double py, double pz) { m_momIn.SetXYZ(px, py, pz); }
+    void setMomIn(float px, float py, float pz) { m_momIn.SetXYZ(px, py, pz); }
 
     /** The method to set track id.*/
     void setTrackID(int trackID) { m_trackID = trackID; }
@@ -120,13 +120,13 @@ namespace Belle2 {
     void setPDGcode(int pdg) { m_PDGcode = pdg; }
 
     /** The method to set deposited energy.*/
-    void setEnergyDep(double energyDep) { m_energyDep = energyDep; }
+    void setEnergyDep(float energyDep) { m_energyDep = energyDep; }
 
     /** The method to set step length.*/
-    void setStepLength(double stepLength) { m_stepLength = stepLength; }
+    void setStepLength(float stepLength) { m_stepLength = stepLength; }
 
     /** The method to set GlobalTime.*/
-    void setGlobalTime(double globalTime) { m_globalTime = globalTime; }
+    void setGlobalTime(float globalTime) { m_globalTime = globalTime; }
 
 
     /** The method to get layer id.*/
@@ -145,7 +145,7 @@ namespace Belle2 {
     const TVector3& getPosOut() const { return m_posOut; }
 
     /** The method to get theta.*/
-    double getTheta() const { return m_theta; }
+    float getTheta() const { return m_theta; }
 
     /** The method to get entry momentum.*/
     const TVector3& getMomIn() const { return m_momIn; }
@@ -157,13 +157,13 @@ namespace Belle2 {
     int getPDGcode() const { return m_PDGcode; }
 
     /** The method to get deposited energy.*/
-    double getEnergyDep() const { return m_energyDep; }
+    float getEnergyDep() const { return m_energyDep; }
 
     /** The method to get step length.*/
-    double getStepLength() const { return m_stepLength; }
+    float getStepLength() const { return m_stepLength; }
 
     /** The method to get GlobalTime.*/
-    double getGlobalTime() const { return m_globalTime; }
+    float getGlobalTime() const { return m_globalTime; }
 
     /** Assingment operator.*/
     PXDSimHit& operator=(const PXDSimHit& other);
@@ -176,14 +176,14 @@ namespace Belle2 {
 
     TVector3 m_posIn;      /**< LRF position at entry. */
     TVector3 m_posOut;     /**< LRF position at exit. */
-    double m_theta;          /**< Theta angle (wrt global z). */
+    float m_theta;          /**< Theta angle (wrt global z). */
     TVector3 m_momIn;      /**< GRF Momentum at entry. */
 
     int m_PDGcode;         /**< The PDG value of the particle that created the hit. */
     int m_trackID;         /**< The ID of the track that created the hit. */
-    double m_energyDep;    /**< Deposited energy. */
-    double m_stepLength;   /**< Step length. */
-    double m_globalTime;   /**< Global time. */
+    float m_energyDep;    /**< Deposited energy. */
+    float m_stepLength;   /**< Step length. */
+    float m_globalTime;   /**< Global time. */
 
     ClassDef(PXDSimHit, 1)
 

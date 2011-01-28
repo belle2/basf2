@@ -13,8 +13,8 @@
 #include <time.h>
 
 // Hit classes
-#include <pxd/hitpxd/PXDSimHit.h>
-#include <pxd/hitpxd/PXDHit.h>
+#include <pxd/dataobjects/PXDSimHit.h>
+#include <pxd/dataobjects/PXDHit.h>
 
 // framework - DataStore
 #include <framework/datastore/DataStore.h>

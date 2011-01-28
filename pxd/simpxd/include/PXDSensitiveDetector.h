@@ -11,7 +11,7 @@
 #ifndef PXDSENSITIVEDETECTOR_H_
 #define PXDSENSITIVEDETECTOR_H_
 
-#include <pxd/hitpxd/PXDSimHit.h>
+#include <pxd/dataobjects/PXDSimHit.h>
 #include <simulation/kernel/SensitiveDetectorBase.h>
 
 namespace Belle2 {

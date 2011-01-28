@@ -102,7 +102,11 @@ def make_tar(project, files):
     if files is not None:
         tar = tarfile.open(project + '-inputsandbox.tar.bz2', 'w:bz2')
         for file in files:
-            tar.add(file)
+            try:
+                tar.add(file)
+            except OSError:
+                print 'No such input file: ' + file
+                DIRAC.exit(1)
         return project + '-inputsandbox.tar.bz2'
     else:
         return None

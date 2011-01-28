@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ParamSet type="IR">
+	<Name>Belle II IR</Name>
+	<Description>Belle II IR geometry - Symmetric</Description>
+	<Version>0</Version>
+	<Creator>IRBelleIISymm</Creator>
+	<Content>
+		<Rotation desc="Rotation of IP beampipe with respect to the Detector" unit="mrad">0.0</Rotation>
+		<Length desc="The full length of the IP beampipe" unit="mm">200</Length>
+		<OffsetZ desc="The offset of the IP beampipe in z with respect to the IP" unit="mm">10</OffsetZ>
+		
+		<Radius desc="Starting inner radius of the IP beampipe" unit="mm">10</Radius>
+		<Thickness desc="Starting thickness of outer IR beampipe" unit="mm">3.62</Thickness>
+		<Material desc="Starting material of outer IR beampipe">Tantalum</Material>
+
+		<RangeStart desc="Starting z-axis range (0=no limit)" unit="m">0</RangeStart>
+		<RangeEnd desc="Ending z-axis range (0=no limit)" unit="m">0</RangeEnd>
+		
+		<Shells>	
+			<Shell name="GoldLayer">
+				<InnerRadius unit="mm">10.0</InnerRadius>
+				<OuterRadius unit="mm">10.01</OuterRadius>
+				<Material>Gold</Material>
+			</Shell>
+                        
+			<Shell name="InnerShell">
+				<InnerRadius unit="mm">10.01</InnerRadius>
+				<OuterRadius unit="mm">10.61</OuterRadius>
+				<Material>Beryllium</Material>
+			</Shell>
+			
+			<Shell name="CoolingGap">
+				<InnerRadius unit="mm">10.61</InnerRadius>
+				<OuterRadius unit="mm">11.61</OuterRadius>
+				<Material>Paraffin</Material>
+			</Shell>
+			
+			<Shell name="OuterShell">
+				<InnerRadius unit="mm">11.61</InnerRadius>
+				<OuterRadius unit="mm">12.01</OuterRadius>
+				<Material>Beryllium</Material>
+			</Shell>
+		</Shells>
+		
+		<Shields>		
+			<Shield name="ShieldHER">
+				<Pos unit="mm" desc="Starting edge position on z-axis">115</Pos>
+				<Seg>
+					<z unit="mm">0</z> <rad unit="mm">18</rad>
+				</Seg>
+				<Seg>
+					<z unit="mm">400</z> <rad unit="mm">50</rad>
+				</Seg>
+				<Material>Tantalum</Material>	<!-- change to heavy metal -->
+			</Shield>
+			<Shield name="ShieldLER">
+				<Pos unit="mm" desc="Starting edge position on z-axis">-95</Pos>
+				<Seg>
+					<z unit="mm">0</z> <rad unit="mm">18</rad>
+				</Seg>
+				<Seg>
+					<z unit="mm">-400</z> <rad unit="mm">50</rad>
+				</Seg>
+				<Material>Tantalum</Material>	<!-- change to heavy metal -->
+			</Shield>
+		</Shields>
+		
+		<Streams>
+			<Stream name="HERDownstream">
+				<Direction desc="1 = positive z-axis, -1 = negative">1</Direction>
+				
+				<Section name="Inner">
+					<Thickness unit="mm">3.62</Thickness>
+					<Material>Tantalum</Material>
+					<Crotch desc="1 = Y-Crotch component">1</Crotch>
+					
+					<Pipe>
+						<Length desc="Length from centre end to centre end" 
+		                                        unit="mm">179.59</Length>
+						<Angle desc="Angle to previous pipe (-pi/2 to pi/2, positive points to +x-axis), default is 0" 
+		                                        unit="mrad">68.96</Angle>
+						<RadiusEnd desc = "Inner radius at the end of the pipe, default is same as previous pipe" 
+		                                        unit="mm">10</RadiusEnd>
+					</Pipe>
+					<Pipe>
+						<Length unit="mm">200.5</Length>
+						<Angle unit="mrad">-27.46</Angle>
+						<RadiusEnd unit="mm">10</RadiusEnd>
+					</Pipe>
+				</Section>
+				<Section name="Mid">
+					<Thickness unit="mm">3.62</Thickness>
+					<Material>Tantalum</Material>
+					<Crotch>0</Crotch>
+					
+					<Pipe>
+						<Length unit="mm">616</Length>
+						<Angle unit="mrad">0</Angle>
+						<RadiusEnd unit="mm">10</RadiusEnd>
+					</Pipe>
+					<Pipe>
+						<Length unit="mm">39.5</Length>
+						<Angle unit="mrad">0</Angle>
+						<RadiusEnd unit="mm">15</RadiusEnd>
+					</Pipe>		
+					<Pipe>
+						<Length unit="mm">460</Length>
+						<Angle unit="mrad">0</Angle>
+						<RadiusEnd unit="mm">15</RadiusEnd>
+					</Pipe>	
+					<Pipe>
+						<Length unit="mm">79.4</Length>
+						<Angle unit="mrad">0</Angle>
+						<RadiusEnd unit="mm">30</RadiusEnd>
+					</Pipe>	
+					<Pipe>
+						<Length unit="mm">1803</Length>
+						<Angle unit="mrad">0</Angle>
+						<RadiusEnd unit="mm">30</RadiusEnd>
+					</Pipe>
+				</Section>
+			</Stream>
+
+			<Stream name="LERUpstream">
+				<Direction desc="1 = positive z-axis, -1 = negative">1</Direction>
+				
+				<Section name="Inner">
+					<Thickness unit="mm">3.62</Thickness>
+					<Material>Tantalum</Material>
+					<Crotch>1</Crotch>
+					
+					<Pipe>
+						<Length unit="mm">179.59</Length>
+						<Angle unit="mrad">-68.96</Angle>
+						<RadiusEnd unit="mm">10</RadiusEnd>
+					</Pipe>
+					<Pipe>
+						<Length unit="mm">200.5</Length>
+						<Angle unit="mrad">27.46</Angle>
+						<RadiusEnd unit="mm">10</RadiusEnd>
+					</Pipe>
+				</Section>
+				<Section name="Mid">
+					<Thickness unit="mm">3.62</Thickness>
+					<Material>Tantalum</Material>
+					<Crotch>0</Crotch>
+					
+					<Pipe>
+						<Length unit="mm">616</Length>
+						<Angle unit="mrad">0</Angle>
+						<RadiusEnd unit="mm">10</RadiusEnd>
+					</Pipe>
+					<Pipe>
+						<Length unit="mm">39.5</Length>
+						<Angle unit="mrad">0</Angle>
+						<RadiusEnd unit="mm">15</RadiusEnd>
+					</Pipe>		
+					<Pipe>
+						<Length unit="mm">460</Length>
+						<Angle unit="mrad">0</Angle>
+						<RadiusEnd unit="mm">15</RadiusEnd>
+					</Pipe>	
+					<Pipe>
+						<Length unit="mm">79.4</Length>
+						<Angle unit="mrad">0</Angle>
+						<RadiusEnd unit="mm">30</RadiusEnd>
+					</Pipe>	
+					<Pipe>
+						<Length unit="mm">1803</Length>
+						<Angle unit="mrad">0</Angle>
+						<RadiusEnd unit="mm">30</RadiusEnd>
+					</Pipe>
+				</Section>
+			</Stream>
+			
+			<Stream name="LERDownstream">
+				<Direction desc="1 = positive z-axis, -1 = negative">-1</Direction>
+				
+				<Section name="Inner">
+					<Thickness unit="mm">3.62</Thickness>
+					<Material>Tantalum</Material>
+					<Crotch>1</Crotch>
+					
+					<Pipe>
+						<Length unit="mm">219.51</Length>
+						<Angle unit="mrad">56.72</Angle>
+						<RadiusEnd unit="mm">10</RadiusEnd>
+					</Pipe>
+					<Pipe>
+						<Length unit="mm">200.08</Length>
+						<Angle unit="mrad">-15.22</Angle>
+						<RadiusEnd unit="mm">10</RadiusEnd>
+					</Pipe>
+				</Section>
+				<Section name="Mid">
+					<Thickness unit="mm">3.62</Thickness>
+					<Material>Tantalum</Material>
+					<Crotch>0</Crotch>
+					
+					<Pipe>
+						<Length unit="mm">683</Length>
+						<Angle unit="mrad">0</Angle>
+						<RadiusEnd unit="mm">10</RadiusEnd>
+					</Pipe>
+					<Pipe>
+						<Length unit="mm">39.5</Length>
+						<Angle unit="mrad">0</Angle>
+						<RadiusEnd unit="mm">15</RadiusEnd>
+					</Pipe>		
+					<Pipe>
+						<Length unit="mm">465</Length>
+						<Angle unit="mrad">0</Angle>
+						<RadiusEnd unit="mm">15</RadiusEnd>
+					</Pipe>	
+					<Pipe>
+						<Length unit="mm">78.7</Length>
+						<Angle unit="mrad">0</Angle>
+						<RadiusEnd unit="mm">30</RadiusEnd>
+					</Pipe>	
+					<Pipe>
+						<Length unit="mm">1733</Length>
+						<Angle unit="mrad">0</Angle>
+						<RadiusEnd unit="mm">30</RadiusEnd>
+					</Pipe>
+				</Section>
+			</Stream>
+			
+			<Stream name="HERUpstream">
+				<Direction desc="1 = positive z-axis, -1 = negative">-1</Direction>
+				
+				<Section name="Inner">
+					<Thickness unit="mm">3.62</Thickness>
+					<Material>Tantalum</Material>
+					<Crotch>1</Crotch>
+					
+					<Pipe>
+						<Length unit="mm">219.51</Length>
+						<Angle unit="mrad">-56.72</Angle>
+						<RadiusEnd unit="mm">10</RadiusEnd>
+					</Pipe>
+					<Pipe>
+						<Length unit="mm">200.08</Length>
+						<Angle unit="mrad">15.22</Angle>
+						<RadiusEnd unit="mm">10</RadiusEnd>
+					</Pipe>
+				</Section>
+				<Section name="Mid">
+					<Thickness unit="mm">3.62</Thickness>
+					<Material>Tantalum</Material>
+					<Crotch>0</Crotch>
+					
+					<Pipe>
+						<Length unit="mm">683</Length>
+						<Angle unit="mrad">0</Angle>
+						<RadiusEnd unit="mm">10</RadiusEnd>
+					</Pipe>
+					<Pipe>
+						<Length unit="mm">39.5</Length>
+						<Angle unit="mrad">0</Angle>
+						<RadiusEnd unit="mm">15</RadiusEnd>
+					</Pipe>		
+					<Pipe>
+						<Length unit="mm">465</Length>
+						<Angle unit="mrad">0</Angle>
+						<RadiusEnd unit="mm">15</RadiusEnd>
+					</Pipe>	
+					<Pipe>
+						<Length unit="mm">78.7</Length>
+						<Angle unit="mrad">0</Angle>
+						<RadiusEnd unit="mm">30</RadiusEnd>
+					</Pipe>	
+					<Pipe>
+						<Length unit="mm">1733</Length>
+						<Angle unit="mrad">0</Angle>
+						<RadiusEnd unit="mm">30</RadiusEnd>
+					</Pipe>
+				</Section>
+			</Stream>
+		</Streams>
+
+	</Content>
+</ParamSet>
+

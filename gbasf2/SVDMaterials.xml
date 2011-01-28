@@ -1,0 +1,197 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!-- Notes:
+  RadLength, InterLength: If the values are negative, their absolute value
+                          is taken, otherwise radiation length is recomputed using G3 formula.
+-->
+<ParamSet type="MAT">
+  <Name>SVDMaterials</Name>
+  <Description>SVD material definitions</Description>
+  <Version>0</Version>
+  <Creator>GeoMaterials</Creator>
+  <Content>
+    <Mixture name="SVD_KaptonClean">
+      <Density unit="g/cm3">1.2</Density>
+      <Elements>
+        <Element name="H" weight="0.256410256410256">
+          <AtomNumber>1</AtomNumber>
+          <MassNumber>1.00794</MassNumber>
+        </Element>
+        <Element name="C" weight="0.564102564102564">
+          <AtomNumber>6</AtomNumber>
+          <MassNumber>12.0107</MassNumber>
+        </Element>
+        <Element name="N" weight="0.0512820512820513">
+          <AtomNumber>7</AtomNumber>
+          <MassNumber>14.00674</MassNumber>
+        </Element>
+        <Element name="O" weight="0.128205128205128">
+          <AtomNumber>8</AtomNumber>
+          <MassNumber>15.9994</MassNumber>
+        </Element>
+      </Elements>
+    </Mixture>
+
+    <Mixture name="SVD_Glue">
+      <Density unit="g/cm3">1.13</Density>
+      <Elements>
+        <Element name="C" weight="0.43902439">
+          <AtomNumber>6</AtomNumber>
+          <MassNumber>12.0107</MassNumber>
+        </Element>
+        <Element name="O" weight="0.073170732">
+          <AtomNumber>8</AtomNumber>
+          <MassNumber>15.9994</MassNumber>
+        </Element>
+        <Element name="H" weight="0.487804878">
+          <AtomNumber>1</AtomNumber>
+          <MassNumber>1.00794</MassNumber>
+        </Element>
+      </Elements>
+    </Mixture>
+
+    <Mixture name="SVD_Conductives">
+      <Density unit="g/cm3">8.96</Density>
+      <Elements>
+        <Element name="Cu" weight="0.898203593">
+          <AtomNumber>29</AtomNumber>
+          <MassNumber>63.546</MassNumber>
+        </Element>
+        <Element name="Ni" weight="0.077844311">
+          <AtomNumber>28</AtomNumber>
+          <MassNumber>58.6934</MassNumber>
+        </Element>
+        <Element name="Ag" weight="0.023952096">
+          <AtomNumber>47</AtomNumber>
+          <MassNumber>107.8682000</MassNumber>
+        </Element>
+      </Elements>
+    </Mixture>
+
+    <Mixture name="SVD_Conductives2">
+      <Density unit="g/cm3">8.96</Density>
+      <Elements>
+        <Element name="Cu" weight="0.746268657">
+          <AtomNumber>29</AtomNumber>
+          <MassNumber>63.546</MassNumber>
+        </Element>
+        <Element name="Ni" weight="0.194029851">
+          <AtomNumber>28</AtomNumber>
+          <MassNumber>58.6934</MassNumber>
+        </Element>
+        <Element name="Ag" weight="0.059701493">
+          <AtomNumber>47</AtomNumber>
+          <MassNumber>107.8682000</MassNumber>
+        </Element>
+      </Elements>
+    </Mixture>
+
+
+    <Mixture name="SVD_Rohacell">
+      <Density unit="g/cm3">0.032</Density>
+      <Elements>
+        <Element name="C" weight="0.2">
+          <AtomNumber>6</AtomNumber>
+          <MassNumber>12.0107</MassNumber>
+        </Element>
+        <Element name="H" weight="0.275">
+          <AtomNumber>1</AtomNumber>
+          <MassNumber>1.00794</MassNumber>
+        </Element>
+        <Element name="N" weight="0.025">
+          <AtomNumber>7</AtomNumber>
+          <MassNumber>14.00674</MassNumber>
+        </Element>
+        <Element name="O" weight="0.5">
+          <AtomNumber>8</AtomNumber>
+          <MassNumber>15.9994</MassNumber>
+        </Element>
+      </Elements>
+    </Mixture>
+
+    <Mixture name="SVD_Carbon">
+      <Density unit="g/cm3">2.0</Density>
+      <Elements>
+        <Element name="C" weight="1">
+          <AtomNumber>6</AtomNumber>
+          <MassNumber>12.0107</MassNumber>
+        </Element>
+      </Elements>
+    </Mixture>
+
+    <Mixture name="SVD_Aluminium">
+      <Density unit="g/cm3">2.699</Density>
+      <Elements>
+        <Element name="Al" weight="1">
+          <AtomNumber>13</AtomNumber>
+          <MassNumber>26.981538</MassNumber>
+        </Element>
+      </Elements>
+    </Mixture>
+
+    <Mixture name="SVD_CoolingLiquid">
+      <Density unit="g/cm3">1.0</Density>
+      <Elements>
+        <Element name="H" weight="0.666666666666667">
+          <AtomNumber>1</AtomNumber>
+          <MassNumber>1.00794</MassNumber>
+        </Element>
+        <Element name="O" weight="0.333333333333333">
+          <AtomNumber>8</AtomNumber>
+          <MassNumber>15.9994</MassNumber>
+        </Element>
+      </Elements>
+    </Mixture>
+
+    <Mixture name="SVD_Silicon">
+      <Density unit="g/cm3">2.33</Density>
+      <Elements>
+        <Element name="Si" weight="1">
+          <AtomNumber>14</AtomNumber>
+          <MassNumber>28.0855</MassNumber>
+        </Element>
+      </Elements>
+    </Mixture>
+
+    <Mixture name="SVD_KaptonFront">
+      <Density unit="g/cm3">1.4260</Density>
+      <Elements>
+        <Material name="SVD_KaptonClean" weight="0.970873786"/>
+        <Material name="SVD_Conductives2" weight="0.029126214"/>
+      </Elements>
+    </Mixture>
+
+    <Mixture name="SVD_RohacellPad">
+      <Density>1.</Density>
+      <Elements>
+        <Material name="SVD_Rohacell" weight="1"/>
+      </Elements>
+    </Mixture>
+
+    <Mixture name="SVD_Kapton">
+      <Density unit="g/cm3">1.6620</Density>
+      <Elements>
+        <Material name="SVD_KaptonClean" weight="0.897021887"/>
+        <Material name="SVD_Glue" weight="0.043057051"/>
+        <Material name="SVD_Conductives" weight="0.059921062"/>
+      </Elements>
+    </Mixture>
+
+    <Mixture name="SVD_SiliconChips">
+      <Density unit="g/cm3">2.33</Density>
+      <Elements>
+        <Element name="Si" weight="1">
+          <AtomNumber>14</AtomNumber>
+          <MassNumber>28.0855</MassNumber>
+        </Element>
+      </Elements>
+    </Mixture>
+
+    <Mixture name="SVD_KaptonFlex">
+      <Density unit="g/cm3">3.4203</Density>
+      <Elements>
+        <Material name="SVD_KaptonClean" weight="0.713877784"/>
+        <Material name="SVD_Conductives2" weight="0.286122216"/>
+      </Elements>
+    </Mixture>
+  </Content>
+</ParamSet>

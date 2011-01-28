@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<ParamSet type="MAT">
+	<Name>EKLMMaterials</Name>
+	<Description>EKLM material definitions</Description>
+	<Version>0</Version>
+	<Creator>GeoMaterials</Creator>
+	<Content>
+
+                <Mixture name="Polystyrene">
+                        <Density>1.05</Density>
+                        <Elements>
+                                <Element name="H" weight="0.08333">
+                                        <AtomNumber>1.0</AtomNumber>
+                                        <MassNumber>1.00794</MassNumber>
+                                </Element>
+                                <Element name="C" weight="0.91666">
+                                        <AtomNumber>6.0</AtomNumber>
+                                        <MassNumber>12.0107</MassNumber>
+                                </Element>
+                        </Elements>
+                </Mixture>
+
+	</Content>
+</ParamSet>

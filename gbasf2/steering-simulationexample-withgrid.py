@@ -22,7 +22,8 @@ evtpermin = '40'
 # Software Version
 swver = 'build-2010-12-13'
 # (optional) Files to be send with the job
-inputsandboxfiles = 'g4sim.macro'
+inputsandboxfiles = \
+    'g4sim.macro,Belle2-buildfix-simulation.xml,ARICHMaterials.xml,BasicMaterials.xml,CDCBelleII.xml,EKLMBelleII.xml,EKLMMaterials.xml,GlobalParams.xml,IRBelleIISymm.xml,PXDMaterials.xml,SVDMaterials.xml,TOPBelleII.xml,TOPMaterials.xml'
 # (optional) max events - the maximum number of events to use
 maxevents = '100000'
 

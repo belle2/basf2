@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ParamSet type="TOP">
+	<Name>TOP BelleII</Name>
+	<Description>Time Of Propagation counter geometry parameters</Description>
+	<Version>0.1</Version>
+	<Creator>TOPBelleII</Creator>
+	<Content>
+		
+		<Rotation desc="Rotation of the whole TOP detector (should be the same as beampipe)" unit="mrad">0.0</Rotation>
+		<OffsetZ desc="The offset of the whole TOP in z with respect to the IP (should be the same as beampipe)" unit="mm">0.0</OffsetZ>
+		
+		<Bars>
+			<BarMaterial>SiO2</BarMaterial>
+			<Nbar desc="Number of quartz bars">16</Nbar>
+			<Radius desc="The distance from the quartz bar to the IP" unit="cm">119.0</Radius>
+			<QWidth desc="Width of the quartz bar" unit="cm">44.3</QWidth>
+			<QThickness desc="Thickness of the quartz bar" unit="cm">2.0</QThickness>
+			<QZForward desc="Forward edge of the quartz bar" unit="cm">190.0</QZForward>
+			<QZBackward desc="Backward edge of the quartz bar" unit="cm">-75.0</QZBackward>
+			<QZext dest="Size of the extension volue of the quartz bar in the z direction" unit="cm">10.0</QZext>
+			<QYextup dest="Size of the extension volue of the quartz bar in the y direction upwards" unit="cm">0.0</QYextup>
+			<QYextdown dest="Size of the extension volue of the quartz bar in the y direction downwards" unit="cm">3.05</QYextdown>
+			
+		</Bars>
+		
+		<PMTs>
+			
+			<Xgap desc="Z position of detector plane" unit="mm">0.2</Xgap>
+			<Ygap desc="Z position of detector plane" unit="mm">0.2</Ygap>
+			<x0 desc="position of the edge of lower left PMT relative to quartz bar" unit="mm">0.0</x0>
+			<y0 desc="position of the edge of lower left PMT" unit="mm">-2.35</y0>
+			<nPMTx desc="Number of PMT modules columns">16</nPMTx>
+			<nPMTy desc="Number of PMT modules rows">2</nPMTy>
+			
+			<Module> 
+				<wallMaterial>TOPCeramic</wallMaterial>
+				<ModuleXSize desc="module size in X" unit="mm">27.5</ModuleXSize>
+				<ModuleYSize desc="module size in Y" unit="mm">27.5</ModuleYSize>
+				<ModuleZSize  desc="module size in Z" unit="mm">12.5</ModuleZSize>
+				
+				<SensXSize desc="Active surface x dimension" unit="mm">22</SensXSize>
+				<SensYSize desc="Active surface y dimension" unit="mm">22</SensYSize>
+				<SensThickness desc="Thickness of active surface" unit="mm">0.1</SensThickness>	
+				<sensMaterial desc="Active surface material">SiO2</sensMaterial>
+				
+				<winMaterial>SiO2</winMaterial>
+				<WindowThickness desc="Thickness of window" unit="mm">3</WindowThickness> 
+				
+				<PadXNum desc="Number of pads in x direction">1</PadXNum>
+				<PadYNum desc="Number of pads in y direction">4</PadYNum>
+				
+				<BottomThickness desc="Thickness of the reflective bottom" unit="mm">1</BottomThickness>
+				<botMaterial desc="Material of reflective bottom">TOPCeramic</botMaterial>
+				
+			</Module>
+			
+		</PMTs>
+	</Content>
+</ParamSet>
+

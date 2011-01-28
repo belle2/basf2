@@ -19,6 +19,7 @@
 #include <TGeoMedium.h>
 
 #include <boost/format.hpp>
+#include <boost/foreach.hpp>
 
 using namespace std;
 using namespace Belle2;
@@ -123,8 +124,16 @@ bool GeoDetector::hasVolumeUserInfo(TGeoVolume* geoVolume) const
 {
   if (geoVolume == NULL) return false;
 
-  boost::unordered_map<TGeoVolume*, VolumeUserInfoBase*>::const_iterator mapIter = m_geoVolumeUserInfo.find(geoVolume);
+  GeoVolumeUserInfoMap::const_iterator mapIter = m_geoVolumeUserInfo.find(geoVolume);
   return (mapIter != m_geoVolumeUserInfo.end());
+}
+
+
+void GeoDetector::clearGeoVolumeUserInfo()
+{
+  BOOST_FOREACH(GeoVolumeUserInfoMap::value_type item, m_geoVolumeUserInfo) {
+    delete item.second;
+  }
 }
 
 
@@ -143,5 +152,5 @@ GeoDetector::GeoDetector()
 
 GeoDetector::~GeoDetector()
 {
-
+  clearGeoVolumeUserInfo();
 }

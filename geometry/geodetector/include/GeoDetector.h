@@ -40,6 +40,8 @@ namespace Belle2 {
 
   public:
 
+    typedef boost::unordered_map<TGeoVolume*, VolumeUserInfoBase*> GeoVolumeUserInfoMap;
+
     //Define exceptions
     /** Exception is thrown if the specified TGeoVolume is NULL. */
     BELLE2_DEFINE_EXCEPTION(GeoVolumeIsNULL, "getVolumeUserInfo: The specified TGeoVolume is NULL !");
@@ -93,12 +95,17 @@ namespace Belle2 {
 
   protected:
 
+    /**
+     * Clears the geo volume user info map and releases the memory of the user info objects.
+     */
+    void clearGeoVolumeUserInfo();
+
 
   private:
 
     std::list<std::string> m_supportedSections; /**< List of all supported sections in the basic parameter hierarchy. */
     std::list<std::string> m_calledCreators;    /**< List of all creators which were called during the building process of the detector. */
-    boost::unordered_map<TGeoVolume*, VolumeUserInfoBase*> m_geoVolumeUserInfo; /**< Map of additional user information attached to a TGeoVolume. */
+    GeoVolumeUserInfoMap m_geoVolumeUserInfo;   /**< Map of additional user information attached to a TGeoVolume. */
 
     /** The constructor is hidden to avoid that someone creates an instance of this class. */
     GeoDetector();

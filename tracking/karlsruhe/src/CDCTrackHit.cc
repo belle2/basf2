@@ -1,13 +1,12 @@
 /**************************************************************************
- * BASF2 (Belle Analysis Framework 2)                   *
- * Copyright(C) 2010 - Belle II Collaboration                       *
- *                                    *
- * Author: The Belle II Collaboration                     *
- * Contributors: Oksana Brovchenko                          *
- *                                    *
- * This software is provided "as is" without any warranty.          *
-**************************************************************************/
-
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2010 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Oksana Brovchenko                                        *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
 
 #include "../include/CDCTrackHit.h"
 
@@ -124,12 +123,6 @@ double CDCTrackHit::getPhi() const
 
 }
 
-void CDCTrackHit::setStereoPosition(TVector3 position)
-{
-  m_wirePosition.SetX(position.x());
-  m_wirePosition.SetY(position.y());
-  m_wirePosition.SetZ(position.z());
-}
 
 void CDCTrackHit::shiftAlongZ(TVector3 trackDirection, CDCTrackHit trackHit)
 {
@@ -153,6 +146,7 @@ void CDCTrackHit::shiftAlongZ(TVector3 trackDirection, CDCTrackHit trackHit)
 
   //direction of the wire
   wireVector = backwardWirePoint - forwardWirePoint;
+  //B2INFO("Wire vector: "<<wireVector.x()<<"  "<<wireVector.y()<<"  "<<wireVector.z());
 
   //Get the coordinates for distance calculation
   TVector3 StereoHitPos;   //conformal position of this hit
@@ -207,15 +201,14 @@ void CDCTrackHit::shiftAlongZ(TVector3 trackDirection, CDCTrackHit trackHit)
 
 //assign the new better wire point as hit position
   double x = forwardWirePoint.x() +  parameter[bestIndex] * wireVector.x();
-  double y = forwardWirePoint.x() +  parameter[bestIndex] * wireVector.y();
-  double z = forwardWirePoint.x() +  parameter[bestIndex] * wireVector.z();
+  double y = forwardWirePoint.y() +  parameter[bestIndex] * wireVector.y();
+  double z = forwardWirePoint.z() +  parameter[bestIndex] * wireVector.z();
   double cx = 2 * x / (x * x + y * y);
   double cy = 2 * y / (x * x + y * y);
 
   m_wirePosition.SetX(x);
   m_wirePosition.SetY(y);
   m_wirePosition.SetZ(z);
-
   m_conformalX = cx;
   m_conformalY = cy;
 

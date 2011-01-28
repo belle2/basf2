@@ -1,12 +1,12 @@
 /**************************************************************************
- * BASF2 (Belle Analysis Framework 2)                   *
- * Copyright(C) 2010 - Belle II Collaboration                       *
- *                                    *
- * Author: The Belle II Collaboration                     *
- * Contributors: Oksana Brovchenko                          *
- *                                    *
- * This software is provided "as is" without any warranty.          *
-**************************************************************************/
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2010 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Oksana Brovchenko                                        *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
 
 #ifndef CDCTRACKINGMODULE_H
 #define CDCTRACKINGMODULE_H
@@ -18,7 +18,7 @@ namespace Belle2 {
 
   /** Module to perform pattern recognition in the CDC through conformal transformation.
    * The CDCTrackingModule performs the first pattern recognition step in the CDC through conformal transformation of hit coordinates.
-   * First Digitized CDCHits (CDCDigitizer module should be executed before this module) are combined to segments.
+   * First Digitized CDCHits (CDCDigi module should be executed before this module) are combined to segments.
    * Then segments from axial superlayers are combined to track candidates.
    * In the following step stereo segments are assigned to these candidates.
    */
@@ -83,7 +83,7 @@ namespace Belle2 {
     std::string m_outSegmentsColName; /**< Output segments collection name (tracklets within one superlayer) */
     std::string m_outTracksColName; /**< Output tracks collection name*/
 
-    bool m_textFileOutput;
+    bool m_textFileOutput; /**< Boolean to create output text files with hit coordinates (needed for development purposes, wont be needed later on)*/
 
     std::ofstream SimHitsfile; /**< Simple text file to write out the coordinates of the simulated hits*/
     std::ofstream Hitsfile;  /**< Simple text file to write out the coordinates of the digitized hits*/

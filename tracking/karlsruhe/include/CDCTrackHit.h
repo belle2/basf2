@@ -1,12 +1,12 @@
 /**************************************************************************
- * BASF2 (Belle Analysis Framework 2)                   *
- * Copyright(C) 2010 - Belle II Collaboration                       *
- *                                    *
- * Author: The Belle II Collaboration                     *
- * Contributors: Oksana Brovchenko                          *
- *                                    *
- * This software is provided "as is" without any warranty.          *
-**************************************************************************/
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2010 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Oksana Brovchenko                                        *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
 
 #ifndef CDCTRACKHIT_H
 #define CDCTRACKHIT_H
@@ -59,8 +59,10 @@ namespace Belle2 {
     /** Returns the position of the center(!!!) of the wire. */
     TVector3 getWirePosition() const {return m_wirePosition ;}
 
-    /** Returns the Hit position in the conformal plane.*/
+    /** Returns the Hit position (X coordinate) in the conformal plane.*/
     double getConformalX() const {return m_conformalX;};
+
+    /** Returns the Hit position (Y coordinate) in the conformal plane.*/
     double getConformalY() const {return m_conformalY;};
 
     /** Returns the phi angle of the center wire position.
@@ -74,11 +76,6 @@ namespace Belle2 {
      * After the optimal wire position is found, the coordinates (member variables) are overwritten according to it (!).
      */
     void shiftAlongZ(TVector3 trackDirection, CDCTrackHit trackHit);
-
-    /** Set function to overwrite the hit position calculated by setWirePosition.
-     * This function should be only used for stereo Hits in CDCSegment class, when the coordinates of the whole segment are shifted to other values (along the z wire).
-     */
-    void setStereoPosition(TVector3 position);
 
 
   private:

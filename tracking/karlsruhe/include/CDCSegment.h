@@ -1,12 +1,12 @@
 /**************************************************************************
- * BASF2 (Belle Analysis Framework 2)                   *
- * Copyright(C) 2010 - Belle II Collaboration                       *
- *                                    *
- * Author: The Belle II Collaboration                     *
- * Contributors: Oksana Brovchenko                          *
- *                                    *
- * This software is provided "as is" without any warranty.          *
-**************************************************************************/
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2010 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Oksana Brovchenko                                        *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
 
 
 #ifndef CDCSEGMENT_H
@@ -109,13 +109,6 @@ namespace Belle2 {
     /** Clears/Erases all stored Ids of track candidates. */
     void clearTrackCandId();
 
-    /** Searches for the best position (z coordinate) of a stereo segment and overwrites the position coordinates with new values.
-     * This method searches for a given track and this (stereo) segment for the z-coordinate of this segment (= hits in this segment), which fits best to the given track.
-     * For this the wire length is parametrised and for each point the 'fitting' of this new position is checked by calculating the shortest (perpendicular) distance between one segment point and the track.
-     * After the optimal wire position is found, the coordinates (member variables) of all TrackHits in this segment are overwritten according to it (!).
-     */
-    //void shiftAlongZ(TVector3 trackDirection, CDCTrackHit trackHit);
-
 
   private:
 
@@ -127,7 +120,7 @@ namespace Belle2 {
     std::vector<CDCTrackHit> m_TrackHits; /**< vector to store TrackHits belonging to this segment*/
     int m_nHits;  /**<Number of hits in the segment */
 
-    TVector3 m_direction; /**<Direction of the Ssgment in conformal plane */
+    TVector3 m_direction; /**<Direction of the Segment in conformal plane */
     CDCTrackHit m_innerMostHit; /**<Innermost (closest to the origin) hit of the segment*/
     CDCTrackHit m_outerMostHit; /**<Outermost (farthest to the origin) hit of the segment*/
 

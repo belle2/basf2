@@ -1,12 +1,12 @@
 /**************************************************************************
- * BASF2 (Belle Analysis Framework 2)                   *
- * Copyright(C) 2010 - Belle II Collaboration                       *
- *                                    *
- * Author: The Belle II Collaboration                     *
- * Contributors: Oksana Brovchenko                          *
- *                                    *
- * This software is provided "as is" without any warranty.          *
-**************************************************************************/
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2010 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Oksana Brovchenko                                        *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
 
 #include "../include/CDCSegment.h"
 
@@ -258,83 +258,6 @@ void CDCSegment::clearTrackCandId()
 }
 
 
-
-/*void CDCSegment::shiftAlongZ(TVector3 trackDirection, CDCTrackHit trackHit)
-{
-
-  TVector3 StereoHitPos; //conformal position of one point of the segment (outermost hit)
-  TVector3 TrackHitPos;  //conformal position of the given TrackHit (starting point for the "track straight line")
-  TVector3 perpPoint;  //intersection from "track line" with a to it perpendicular line through segment point
-  TVector3 perpDir;    //direction perpendicular to track direction
-
-  double distance;   //distance between the segment point und the intersection point ( =shortest distance from segment to "track line")
-  double distanceMax = 10; //start value for the search
-
-  //create a vector with 100 aquidistant values from 0 to 1 to parametrise the wire vector
-  double parameter[101];
-  for (int i = 0 ; i < 101; i++) {
-    parameter[i] = i * 0.01;
-  }
-
-  int bestIndex = 0; //index to indicate, which value from the parameter vector is the best
-
-  double posX_o; //position of the hit on the wire
-  double posY_o;
-  double posZ_o;
-
-  double confX_o; //position of the hit on the wire in the conformal plane
-  double confY_o;
-
-  for (int i = 0; i < 101; i++) { //loop over the parameter vector ( = loop over the lenght of the wire)
-
-    //new point along the wire
-    posX_o = m_outerMostHit.getWirePosX_f() + parameter[i] * m_outerMostHit.getWireVector().x();
-    posY_o = m_outerMostHit.getWirePosY_f() + parameter[i] * m_outerMostHit.getWireVector().y();
-    posZ_o = m_outerMostHit.getWirePosZ_f() + parameter[i] * m_outerMostHit.getWireVector().z();
-
-    confX_o = 2 * posX_o / (posX_o * posX_o + posY_o * posY_o);
-    confY_o = 2 * posY_o / (posX_o * posX_o + posY_o * posY_o);
-
-
-
-    //calculation of the shortest distance between the segment point and the track in the conformal plane
-    StereoHitPos.SetX(confX_o);
-    StereoHitPos.SetY(confY_o);
-    StereoHitPos.SetZ(0);
-
-    TrackHitPos.SetX(trackHit.getConformalX());
-    TrackHitPos.SetY(trackHit.getConformalY());
-    TrackHitPos.SetZ(0);
-
-    distance = AxialTrackFinder::ShortestDistance(TrackHitPos, trackDirection, StereoHitPos);
-
-    //search for the wire point which gives the shortest distance
-    if (distance < distanceMax) {
-      distanceMax = distance;
-      bestIndex = i;
-    }
-  }
-
-//assign the new better wire points as hit positions
-  for (int i = 0; i < m_nHits; i++) {  //loop over all Hits
-
-    TVector3 newPosition;
-    double x = m_TrackHits[i].getWirePosX_f() +  parameter[bestIndex] * m_TrackHits[i].getWireVector().x();
-    double y = m_TrackHits[i].getWirePosY_f() +  parameter[bestIndex] * m_TrackHits[i].getWireVector().y();
-    double z = m_TrackHits[i].getWirePosZ_f() +  parameter[bestIndex] * m_TrackHits[i].getWireVector().z();
-    double cx = 2 * x / (x * x + y * y);
-    double cy = 2 * y / (x * x + y * y);
-
-    newPosition.SetX(x);
-    newPosition.SetY(y);
-    newPosition.SetZ(z);
-
-//sets new position
-    m_TrackHits[i].setStereoPosition(newPosition);
-    m_TrackHits[i].setConformalPosition(cx, cy);
-  }
-
-}*/
 
 
 

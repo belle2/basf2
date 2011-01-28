@@ -1,12 +1,12 @@
 /**************************************************************************
- * BASF2 (Belle Analysis Framework 2)                   *
- * Copyright(C) 2010 - Belle II Collaboration                       *
- *                                    *
- * Author: The Belle II Collaboration                     *
- * Contributors: Oksana Brovchenko                          *
- *                                    *
- * This software is provided "as is" without any warranty.          *
-**************************************************************************/
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2010 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Oksana Brovchenko                                        *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
 
 #include <tracking/modules/karlsruhe/CDCTrackingModule.h>
 
@@ -14,7 +14,9 @@
 #include <framework/gearbox/Unit.h>
 
 #include <framework/logging/Logger.h>
+
 #include <cdc/hitcdc/CDCSimHit.h>
+#include <cdc/dataobjects/CDCHit.h>
 
 #include <tracking/karlsruhe/CDCTrackHit.h>
 #include <tracking/karlsruhe/CDCSegment.h>
@@ -38,14 +40,12 @@ REG_MODULE(CDCTracking)
 
 CDCTrackingModule::CDCTrackingModule() : Module()
 {
-  setDescription("The CDCTrackingModule performs the first rough pattern recognition step in the CDC. Digitized CDC Hits are combined to track candidates");
+  setDescription("Performs the first rough pattern recognition step in the CDC: digitized CDC Hits are combined to track candidates.");
 
-  addParam("InputSimHitsColName", m_inSimHitsColName, "Input simulated hits collection name", string("CDCSimHitArray"));
-  addParam("InputHitsColName", m_inHitsColName, "Input digitized hits collection name", string("HitCDCArray"));
-  addParam("OutputTrackHitsColName", m_outTrackHitsColName, "Output hits (slightly changed digitized hits) collection name", string("TrackHitCDCArray"));
-  addParam("OutputSegmentsColName", m_outSegmentsColName, "Output segments collection name", string("SegmentCDCArray"));
-  addParam("OutputTracksColName", m_outTracksColName, "Output tracks collection name", string("TrackCDCArray"));
-  addParam("TextFileOutput", m_textFileOutput, "Boolean to choose if some text files with hit coordinates should be created", false);
+  addParam("InputSimHitsColName", m_inSimHitsColName, "Input simulated hits collection name (only for crosschecking)", string("CDCSimHitArray"));
+  addParam("InputHitsColName", m_inHitsColName, "Input digitized hits collection name (has to match with the output of CDCDigi module)", string("HitCDCArray"));
+  addParam("OutputTracksColName", m_outTracksColName, "Output (track candidates) collection name", string("TrackCDCArray"));
+  addParam("TextFileOutput", m_textFileOutput, "Set to true if some text files with hit coordinates should be created", false);
 
 }
 
@@ -78,12 +78,11 @@ void CDCTrackingModule::event()
   StoreArray<CDCSimHit> cdcSimHitArray(m_inSimHitsColName);
   B2INFO("Number of simulated Hits:  " << cdcSimHitArray.GetEntries());
 
-
   //StoreArray with digitized CDCHits, should already be created by CDCDigitized module
   StoreArray<HitCDC> cdcHitArray(m_inHitsColName);
 
   //StoreArray with CDCTrackHits, a class derived from HitCDC but with additional member variables needed for tracking.
-  StoreArray<CDCTrackHit> cdcTrackHitArray(m_outTrackHitsColName);
+  StoreArray<CDCTrackHit> cdcTrackHitArray("TrackHitCDCArray");
 
   //Fill the new StoreArray with CDCTrackHits
   for (int i = 0; i < cdcHitArray.GetEntries(); i++) {
@@ -96,16 +95,17 @@ void CDCTrackingModule::event()
   int NHits = cdcTrackHitArray.GetEntries();
   B2INFO("Number of digitized Hits: " << NHits);
 
+
   //Calculates the coordinates in the conformal plane for each TrackHit in the StoreArray
-  SegmentFinder::ConformalTransformation(m_outTrackHitsColName);
+  SegmentFinder::ConformalTransformation("TrackHitCDCArray");
 
 
   //create StoreArray for CDCSegments
-  StoreArray<CDCSegment> cdcSegmentsArray(m_outSegmentsColName);
+  StoreArray<CDCSegment> cdcSegmentsArray("SegmentCDCArray");
 
   //Combine CDCTrackHits to CDCSegment, fill cdcSegmentsArray with new created Segments
   B2INFO("Searching for Segments... ");
-  SegmentFinder::FindSegments(m_outTrackHitsColName, m_outSegmentsColName);
+  SegmentFinder::FindSegments("TrackHitCDCArray", "SegmentCDCArray", false);
   //Count good and bad segments
   int goodSeg = 0;
   int badSeg = 0;
@@ -153,6 +153,7 @@ void CDCTrackingModule::event()
 
 //create StoreArray for Tracks
   StoreArray<CDCTrack> cdcTracksArray(m_outTracksColName);
+
 //combine Axial Segments to Tracks, fill cdcTracksArray with new Tracks
 
   B2INFO("Collect track candidates by connecting axial Segments...");

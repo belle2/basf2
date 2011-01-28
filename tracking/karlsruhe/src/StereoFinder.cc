@@ -1,11 +1,11 @@
 /**************************************************************************
- * BASF2 (Belle Analysis Framework 2)                   *
- * Copyright(C) 2010 - Belle II Collaboration                       *
- *                                    *
- * Author: The Belle II Collaboration                     *
- * Contributors: Oksana Brovchenko                          *
- *                                    *
- * This software is provided "as is" without any warranty.          *
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2010 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Oksana Brovchenko                                        *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
 #include "../include/StereoFinder.h"
@@ -188,7 +188,6 @@ void StereoFinder::AppendStereoSegments(string StereoSegmentsCDCArray,
   double shortDistanceCut = 0.05 ; //cut on the 'short' distance for the first search loop
   double strictCut = 0.005 ; //cut on the 'short' distance for the final decision (after shifting the stereo segments)
   double angleCut = 0.3 ; //cut on the angle between the track candidate and the segment
-  //int index = 0;
 
   while (SL > 1) { //loop over all stereo superlayers
 
@@ -227,7 +226,7 @@ void StereoFinder::AppendStereoSegments(string StereoSegmentsCDCArray,
 
         double angle = cdcTracksArray[trackId]->getOuterMostSegment().getDirection().Angle(segment.getDirection());
         if (angle > TMath::Pi() / 2)  angle = angle - TMath::Pi(); // -90 < angle < 90
-
+        //B2INFO("shortest Distance: "<<ShortestDistance(*cdcTracksArray[trackId], segment)<< "  angle: " <<abs(angle));
         if (ShortestDistance(*cdcTracksArray[trackId], segment) < strictCut
             && abs(angle) < angleCut) {
           //B2INFO("    stereo segment added")

@@ -10,8 +10,8 @@
 
 #include <arich/geoarich/GeoARICHBelleII.h>
 #include <arich/geoarich/ARICHGeometryPar.h>
-//#include <arich/simarich/ARICHSensitiveDetector.h>
-//#include <arich/simarich/ARICHSensitiveAero.h>
+#include <arich/simarich/ARICHSensitiveDetector.h>
+#include <arich/simarich/ARICHSensitiveAero.h>
 
 #include <framework/gearbox/GearDir.h>
 #include <framework/gearbox/Unit.h>
@@ -45,8 +45,8 @@ GeoARICHBelleII regGeoARICHBelleII;
 GeoARICHBelleII::GeoARICHBelleII() : CreatorBase("ARICHBelleII")
 {
   setDescription("Creates the TGeo objects for the aRICH geometry of the Belle II detector.");
-// addSensitiveDetector("SD_", new ARICHSensitiveDetector("ARICHSensitiveDetector"));
-// addSensitiveDetector("SA_", new ARICHSensitiveAero("ARICHSensitiveAero"));
+  addSensitiveDetector("SD_", new ARICHSensitiveDetector("ARICHSensitiveDetector"));
+  addSensitiveDetector("SA_", new ARICHSensitiveAero("ARICHSensitiveAero"));
 
 }
 

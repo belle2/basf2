@@ -131,18 +131,18 @@ void EventProcessor::processCore(PathPtr startPath, const ModulePtrList& moduleP
         if ((eventMetaDataPtr->getExperiment() != previousEventMetaData.getExperiment()) ||
             (eventMetaDataPtr->getRun() != previousEventMetaData.getRun())) {
 
+          //Check for end of data
+          if (*eventMetaDataPtr == endEventMetaData) {
+            endProcess = true;
+            break;
+          }
+
           //End the previous run
           if (currEvent > 0) {
             EventMetaData newEventMetaData = *eventMetaDataPtr;
             *eventMetaDataPtr = previousEventMetaData;
             processEndRun(modulePathList);
             *eventMetaDataPtr = newEventMetaData;
-          }
-
-          //Check for end of data
-          if (*eventMetaDataPtr == endEventMetaData) {
-            endProcess = true;
-            break;
           }
 
           //Start a new run
@@ -180,6 +180,13 @@ void EventProcessor::processCore(PathPtr startPath, const ModulePtrList& moduleP
 
     currEvent++;
     if ((maxEvent > 0) && (currEvent >= maxEvent)) endProcess = true;
+  }
+
+  //End last run
+  if (master && (currEvent > 0)) {
+    StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
+    *eventMetaDataPtr = previousEventMetaData;
+    processEndRun(modulePathList);
   }
 }
 

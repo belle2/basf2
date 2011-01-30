@@ -81,7 +81,7 @@ ARICHGeometryPar::clear(void)
     _aeroTrLen[i] = 0.0;
   }
   _ncol.clear(); _fDFi.clear(); _fDR.clear(); _fR.clear();
-  _fFi.clear(); _tilePos.clear(); _chipLocPos.clear(); _padWorldPositions.clear();
+  _fFi.clear(); _tilePos.clear(); _chipLocPos.clear(); _padWorldPositions.clear(); _mirrornorm.clear(); _mirrorpoint.clear();
 }
 
 void ARICHGeometryPar::read()
@@ -145,7 +145,6 @@ int ARICHGeometryPar::GetChannelID(TVector2 position)
   return chID;
 }
 
-
 void ARICHGeometryPar::modules_position()
 {
   GearDir gbxParams = Gearbox::Instance().getContent("ARICH");
@@ -175,7 +174,6 @@ void ARICHGeometryPar::modules_position()
     r -= (_modXSize + dR + r * (1 - cos(f / 2.)));
     iRing -= 1;
   }
-
 }
 
 void ARICHGeometryPar::aerotile_position()
@@ -234,11 +232,10 @@ double ARICHGeometryPar::GetModAngle(int copyno)
 void ARICHGeometryPar::chipLocPosition()
 {
   double xycenter =  _padSize * _nPadX / 4. + _chipGap / 2.;
-  TVector2 bb(- _padSize*_nPadX / 4., - _padSize*_nPadX / 4.);
-  for (int i = 0; i < 4; i++) {
-    TVector2 locpos(pow(-1, int(i / 2.))*xycenter, pow(-1, i)*xycenter);
-    _chipLocPos.push_back(locpos + bb);
-  }
+  _chipLocPos.push_back(TVector2(xycenter - _padSize*_nPadX / 4., xycenter - _padSize*_nPadX / 4.));
+  _chipLocPos.push_back(TVector2(xycenter - _padSize*_nPadX / 4., -xycenter - _padSize*_nPadX / 4.));
+  _chipLocPos.push_back(TVector2(-xycenter - _padSize*_nPadX / 4., xycenter - _padSize*_nPadX / 4.));
+  _chipLocPos.push_back(TVector2(-xycenter - _padSize*_nPadX / 4., -xycenter - _padSize*_nPadX / 4.));
 }
 
 
@@ -283,7 +280,7 @@ void ARICHGeometryPar::PadPositions()
     }
   }
   for (int iMod = 0; iMod < GetNMCopies(); iMod++) {
-    for (int iChan = 0; iChan < _padLocPositions.size(); iChan++) {
+    for (unsigned int iChan = 0; iChan < _padLocPositions.size(); iChan++) {
       TVector2 iModCenter;
       iModCenter.SetMagPhi(_fR[iMod], _fFi[iMod]);
       TVector2 iChanCenter = _padLocPositions[iChan];
@@ -292,15 +289,13 @@ void ARICHGeometryPar::PadPositions()
       ModChan.first = iMod; ModChan.second = iChan;
       _padWorldPositions[ModChan] = iWorld;
     }
-
   }
 }
 
 void ARICHGeometryPar::MirrorPositions()
 {
   double rmir = _mirrorOuterRad * cos(M_PI / _nMirrors) - _mirrorThickness;
-  for (unsigned int i = 0; i < _nMirrors; i++) {
-    // TVector3 point(rmir*cos(2.*M_PI/_nMirrors*(i+0.5)),rmir*sin(2.*M_PI/_nMirrors*(i+0.5)), _mirrorZpos);
+  for (int i = 0; i < _nMirrors; i++) {
     TVector3 norm(cos(2.*M_PI / _nMirrors*(i + 0.5)), sin(2.*M_PI / _nMirrors*(i + 0.5)), 0);
     _mirrornorm.push_back(norm);
     _mirrorpoint.push_back(rmir*norm);

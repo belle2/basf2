@@ -20,7 +20,7 @@ namespace Belle2 {
 
   /* Class ARICHSimHit - Geant4 simulated hit for ARICH.
 
-     This is a class to store ARICH geant4 hit (ARICHB4VHit) in datastore.
+     This is a class to store ARICH geant4 hit in datastore.
      It is also the input for digitization module (ARICHDigi).
   */
 
@@ -57,9 +57,6 @@ namespace Belle2 {
     ~ARICHSimHit() {
       /* Does nothing */
     }
-
-    //! Constructor from a G4 hit
-    ARICHSimHit(const ARICHB4VHit & g4hit);
 
     //! Get ID number of module that registered hit
     int getModuleID() const { return m_moduleID; }

@@ -162,7 +162,8 @@ namespace Belle2 {
     double _detInnerRadius;               /*!< Inner radius of detector tube */
     double _detOuterRadius;               /*!< Outer radius of detector tube */
     double _detZpos;                      /*!< Z position of detector plane */
-    double _modXSize, _modZSize;          /*!< Detector module length and height */
+    double _modXSize;                     /*!< Detector module length */
+    double _modZSize;                     /*!< Detector module height */
     double _winThick;                     /*!< Thickness of detector module window */
     double _winRefInd;                    /*!< Refractive index of detector module window */
     double _mirrorZpos;                   /*!< Z position of mirrors structure (start point) */
@@ -185,11 +186,13 @@ namespace Belle2 {
     void aerotile_position();
 
     //! calculates the centers of chips in detector module local coordinates
-
     void chipLocPosition();
+
     //! calculates the centers of channels in local (detector module) and global coordinates
     void PadPositions();
     //! calculates parameters of all mirror planes (normal vector and point on plane)
+
+    //! Calculates mirror positions (normal vectors and on point of every mirror plate) and stores them.
     void MirrorPositions();
 
     static ARICHGeometryPar* p_B4ARICHGeometryParDB; /*!< Pointer that saves the instance of this class. */
@@ -373,8 +376,6 @@ namespace Belle2 {
   {
     return _normFact;
   }
-
-
 
 } // end of namespace Belle2
 

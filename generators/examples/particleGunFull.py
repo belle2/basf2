@@ -18,6 +18,9 @@
 
 from basf2 import *
 
+# suppress messages and warnings during processing:
+set_log_level(3)
+
 # to run the framework the used modules need to be registered
 pguninput = register_module('PGunInput')
 
@@ -154,19 +157,25 @@ pguninput.param('z_par2', 2.5)
 
 # for a simple simulation job with output to a root file
 # these additional modules are needed
+evtmetagen = register_module('EvtMetaGen')
 paramloader = register_module('ParamLoaderXML')
 geobuilder = register_module('GeoBuilder')
 g4sim = register_module('FullSim')
 simpleoutput = register_module('SimpleOutput')
 
 # Setting the option for all non particle gun modules:
+# want to process 100 MC events
+evtmetagen.param('EvtNumList', [100])
+
 paramloader.param('InputFileXML', os.path.join(basf2datadir,
                   'simulation/Belle2.xml'))
+
 simpleoutput.param('outputFileName', 'ParticleGunOutput.root')
 
 # creating the path for the processing
 
 main = create_path()
+main.add_module(evtmetagen)
 
 # Add Particle Gun module to path:
 main.add_module(pguninput)
@@ -181,5 +190,5 @@ main.add_module(g4sim)
 main.add_module(simpleoutput)
 
 # Process events
-process(main, 10000, 1)
+process(main)
 

@@ -44,7 +44,7 @@ namespace Belle2 {
     /** Exception is thrown if the format of a line of the HepEvt file could not be parsed. */
     BELLE2_DEFINE_EXCEPTION(HepEvtParticleFormatError, "Line %1%: Particle format not understood, got %2% fields !");
     /** Exception is thrown if the number of particles for this event is 0 or less.  */
-    BELLE2_DEFINE_EXCEPTION(HepEvtEmptyEventError, "Line %1%: Number of particles in event is %2! (This could mean EOF is reached.) ");
+    BELLE2_DEFINE_EXCEPTION(HepEvtEmptyEventError, "Line %1%: Number of particles in event is %2% ! (This could mean EOF is reached.) ");
     /**
      * Constructor.
      */

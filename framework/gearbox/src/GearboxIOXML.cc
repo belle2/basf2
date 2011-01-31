@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2010-2011  Belle II Collaboration                         *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Andreas Moll                                             *
@@ -16,12 +16,13 @@
 #include <libxml/parser.h>
 #include <libxml/xinclude.h>
 #include <boost/lexical_cast.hpp>
-
+#include <boost/algorithm/string.hpp>
 #include <boost/format.hpp>
 
 #include <TMath.h>
 
 using namespace std;
+using namespace boost;
 using namespace Belle2;
 
 
@@ -237,13 +238,15 @@ throw(GearboxIOAbs::GearboxIONotConnectedError, GearboxIOAbs::GearboxPathNotVali
   xmlNodeSetPtr nodeSet = result->nodesetval;
 
   xmlChar *resultChar = xmlNodeListGetString(m_xmlDocument, nodeSet->nodeTab[0]->xmlChildrenNode, 1);
+  string trimmedStr((char*)resultChar);
+  trim(trimmedStr);
   double resultValue = 0.0;
 
   try {
-    resultValue = boost::lexical_cast<double>((char*)resultChar);
+    resultValue = boost::lexical_cast<double>(trimmedStr);
   } catch (boost::bad_lexical_cast &) {
     xmlXPathFreeObject(result);
-    throw(GearboxStringNumConversionError() << string((char*)resultChar));
+    throw(GearboxStringNumConversionError() << trimmedStr);
   }
 
   xmlXPathFreeObject(result);
@@ -326,13 +329,17 @@ throw(GearboxIOAbs::GearboxIONotConnectedError, GearboxIOAbs::GearboxPathNotVali
 
   //--- Get the value ---
   xmlChar *valueChar = xmlNodeListGetString(m_xmlDocument, nodeSet->nodeTab[0]->xmlChildrenNode, 1);
+
+  //--- Trim left and right spaces ---
+  string trimmedStr((char*)valueChar);
+  trim(trimmedStr);
   double value = 0.0;
 
   try {
-    value = boost::lexical_cast<double>((char*)valueChar);
+    value = boost::lexical_cast<double>(trimmedStr);
   } catch (boost::bad_lexical_cast &) {
     xmlXPathFreeObject(result);
-    throw(GearboxStringNumConversionError() << string((char*)valueChar));
+    throw(GearboxStringNumConversionError() << trimmedStr);
   }
 
   //--- Get the unit ---

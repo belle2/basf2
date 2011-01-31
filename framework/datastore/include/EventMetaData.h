@@ -57,6 +57,16 @@ namespace Belle2 {
       m_experiment = experiment;
     }
 
+    /** Marks the end of the data processing.
+     * Sets the values for the experiment, run and event to the
+     * default values.
+     */
+    void setEndOfData() {
+      m_event = -1;
+      m_run = -1;
+      m_experiment = -1;
+    }
+
     /** Parent Index Setter.
      *
      *  @param index The index of the current parent file.

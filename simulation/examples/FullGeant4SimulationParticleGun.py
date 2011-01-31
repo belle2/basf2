@@ -5,6 +5,8 @@
 # This steering file generates MCParticles, performs
 # a full Geant4 simulation and saves the result to disk.
 #
+# 100 events for experiment and run number 1 are created.
+#
 # The following parameters are used:
 #  Number of events:      100
 #  Tracks per event:      10
@@ -22,6 +24,16 @@ from basf2 import *
 
 # Set the log level to show only error and fatal messages
 set_log_level(3)
+
+# EvtMetaGen - generate event meta data
+evtmetagen = register_module('EvtMetaGen')
+evtruninfo = {
+    'ExpList': [1],
+    'RunList': [1],
+    'EvtStartList': [1],
+    'EvtEndList': [100],
+    }
+evtmetagen.param(evtruninfo)
 
 # Particle gun
 particlegun = register_module('PGunInput')
@@ -51,6 +63,7 @@ simpleoutput.param('outputFileName', 'particleGunSimResult.root')
 main = create_path()
 
 # Add modules to main path
+main.add_module(evtmetagen)
 main.add_module(particlegun)
 main.add_module(paramloader)
 main.add_module(geobuilder)
@@ -58,4 +71,4 @@ main.add_module(g4sim)
 main.add_module(simpleoutput)
 
 # Process 100 events with run number 1
-process(main, 100, 1)
+process(main)

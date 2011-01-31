@@ -124,18 +124,21 @@ void EventProcessor::processCore(PathPtr startPath, const ModulePtrList& moduleP
         }
       }
 
+      //Check for end of data
+      if (master && (*eventMetaDataPtr == endEventMetaData)) {
+        if (module != master) {
+          B2WARNING("Event processing stopped by non-master module " << module->getName());
+        }
+        endProcess = true;
+        break;
+      }
+
       //Handle event meta data changes of the master module
       if (module == master) {
 
         //Check for a change of the run
         if ((eventMetaDataPtr->getExperiment() != previousEventMetaData.getExperiment()) ||
             (eventMetaDataPtr->getRun() != previousEventMetaData.getRun())) {
-
-          //Check for end of data
-          if (*eventMetaDataPtr == endEventMetaData) {
-            endProcess = true;
-            break;
-          }
 
           //End the previous run
           if (currEvent > 0) {

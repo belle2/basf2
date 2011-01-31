@@ -95,8 +95,6 @@ void GeoDetector::createDetector()
     B2ERROR(exc.what())
   } catch (GearboxIOAbs::GearboxPathEmptyResultError& exc) {
     B2ERROR(exc.what())
-  } catch (...) {
-    B2ERROR("An error occurred during the creation of the detector geometry !")
   }
 }
 

@@ -10,11 +10,11 @@
 		<OffsetZ desc="The offset of the whole TOP in z with respect to the IP (should be the same as beampipe)" unit="mm">0.0</OffsetZ>
 		
 		<Bars>
-			<BarMaterial>SiO2</BarMaterial>
+			<BarMaterial>TOPSiO2</BarMaterial>
 			<Nbar desc="Number of quartz bars">16</Nbar>
-			<Radius desc="The distance from the quartz bar to the IP" unit="cm">119.0</Radius>
-			<QWidth desc="Width of the quartz bar" unit="cm">44.3</QWidth>
-			<QThickness desc="Thickness of the quartz bar" unit="cm">2.0</QThickness>
+			<Radius desc="The distance from the quartz bar to the IP (inner radius)" unit="cm">119.0</Radius>
+			<QWidth desc="Width of the quartz bar" unit="mm">450</QWidth>
+			<QThickness desc="Thickness of the quartz bar" unit="mm">20</QThickness>
 			<QZForward desc="Forward edge of the quartz bar" unit="cm">190.0</QZForward>
 			<QZBackward desc="Backward edge of the quartz bar" unit="cm">-75.0</QZBackward>
 			<QZext dest="Size of the extension volue of the quartz bar in the z direction" unit="cm">10.0</QZext>
@@ -25,17 +25,17 @@
 		
 		<PMTs>
 			
-			<Xgap desc="Z position of detector plane" unit="mm">0.2</Xgap>
-			<Ygap desc="Z position of detector plane" unit="mm">0.2</Ygap>
+			<Xgap desc="Gap between PMTs in x direction" unit="mm">0.6666</Xgap>
+			<Ygap desc="Gap between PMTs in y direction" unit="mm">0.5</Ygap>
 			<x0 desc="position of the edge of lower left PMT relative to quartz bar" unit="mm">0.0</x0>
-			<y0 desc="position of the edge of lower left PMT" unit="mm">-2.35</y0>
+			<y0 desc="position of the edge of lower left PMT" unit="mm">0.0</y0>
 			<nPMTx desc="Number of PMT modules columns">16</nPMTx>
 			<nPMTy desc="Number of PMT modules rows">2</nPMTy>
 			
 			<Module> 
 				<wallMaterial>TOPCeramic</wallMaterial>
 				<ModuleXSize desc="module size in X" unit="mm">27.5</ModuleXSize>
-				<ModuleYSize desc="module size in Y" unit="mm">27.5</ModuleYSize>
+				<ModuleYSize desc="module size in Y" unit="mm">25.0</ModuleYSize>
 				<ModuleZSize  desc="module size in Z" unit="mm">12.5</ModuleZSize>
 				
 				<SensXSize desc="Active surface x dimension" unit="mm">22</SensXSize>
@@ -43,7 +43,7 @@
 				<SensThickness desc="Thickness of active surface" unit="mm">0.1</SensThickness>	
 				<sensMaterial desc="Active surface material">SiO2</sensMaterial>
 				
-				<winMaterial>SiO2</winMaterial>
+				<winMaterial>TOPSiO2</winMaterial>
 				<WindowThickness desc="Thickness of window" unit="mm">3</WindowThickness> 
 				
 				<PadXNum desc="Number of pads in x direction">1</PadXNum>
@@ -51,10 +51,23 @@
 				
 				<BottomThickness desc="Thickness of the reflective bottom" unit="mm">1</BottomThickness>
 				<botMaterial desc="Material of reflective bottom">TOPCeramic</botMaterial>
-				
 			</Module>
 			
 		</PMTs>
+		
+		<Support>
+			<PannelMaterial desc="Material QBB support structure">TOPQBB</PannelMaterial>
+			<PannelThickness desc="Thickness of the QBB plate" unit="mm">10</PannelThickness>
+			<SidePannelThickness desc="Thickness of the QBB plate" unit="mm">1</SidePannelThickness>
+			<FrontPannelThickness desc="Thickness of the QBB plate" unit="mm">1</FrontPannelThickness>
+			<lowerGap desc="Air gap between lower plate and quartz" unit="mm">2</lowerGap>
+			<upperGap desc="Air gap between lower plate and quartz" unit="mm">2</upperGap>
+			<sideGap desc="Air gap between lower plate and quartz" unit="mm">1</sideGap>
+			<ZForward desc="Forward edge of the QBB box" unit="cm">193.0</ZForward>
+			<ZBackward desc="Backward edge of the QBB box" unit="cm">-94.0</ZBackward>
+		</Support>
+		
+		
 	</Content>
 </ParamSet>
 

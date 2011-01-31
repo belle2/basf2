@@ -3,15 +3,16 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors:                                                          *
+ * Contributors: Marko Petric                                             *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
 #include <top/geotop/GeoTOPBelleII.h>
+#include <top/geotop/TOPGeometryPar.h>
 
 #include <framework/gearbox/GearDir.h>
-#include <framework/datastore/Units.h>
+#include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 
 #include <cmath>
@@ -19,11 +20,11 @@
 
 #include <TMath.h>
 #include <TVector3.h>
+#include <TVector2.h>
 #include <TGeoMatrix.h>
 #include <TGeoManager.h>
 #include <TGeoVolume.h>
 #include <TGeoPgon.h>
-#include <TVector2.h>
 #include <TGeoTube.h>
 #include <TGeoBBox.h>
 #include <TGeoArb8.h>
@@ -47,153 +48,216 @@ GeoTOPBelleII regGeoTOPBelleII;
 GeoTOPBelleII::GeoTOPBelleII() : CreatorBase("TOPBelleII")
 {
   setDescription("Creates the TGeo objects for the TOP geometry of the Belle II detector.");
-//  activateAutoSensitiveVolumes("SD_");
+//  addSensitiveDetector("SD_", new TOPSensitiveDetector("TOPSensitiveDetector"));
+//  addSensitiveDetector("SQ_", new TOPSensitiveQuartz("TOPSensitiveQuartz"));
 }
 
 
 GeoTOPBelleII::~GeoTOPBelleII()
 {
-
 }
-
 
 void GeoTOPBelleII::create(GearDir& content)
 {
-
-  GearDir bars(content);
-  bars.append("Bars/");
-
   //----------------------------------------
   //         Get global parameters
   //----------------------------------------
 
-  double globalRotAngle = content.getParamAngle("Rotation") / deg; //global rotation of the detector
-  double globalOffsetZ  = content.getParamLength("OffsetZ"); //global offset in the Z direction
+  TOPGeometryPar* topgp = TOPGeometryPar::Instance(); //Object for reding parameters from xml
 
-  int N = bars.getParamLength("Nbar"); //Number of bars
-  double R = bars.getParamLength("Radius"); //Distance from the IP
-  double ZF = bars.getParamLength("QZForward"); //qurtz length=ZF-ZB
-  double ZB = bars.getParamLength("QZBackward"); //absolute position of the forward and backward edge of the quartz bar
-  double A = bars.getParamLength("QWidth"); //quartz width
-  double B = bars.getParamLength("QThickness"); //quartz thickness
-  double Ez = bars.getParamLength("QZext"); //quartz extension in z direction
-  double Eyup = bars.getParamLength("QYextup"); //quartz extension in y upwards directions
-  double Eydown = bars.getParamLength("QYextdown"); //quartz extension in y downwards direction
-  string BarMaterial =  bars.getParamString("BarMaterial");
+  double DetectorRotation = topgp->GetDetectorRotation() / Unit::deg; //Variables defined in TOPGeometryPar.h
+  double DetectorZShift = topgp->GetDetectorZShift();
+  int NumberOfBars = topgp->GetNumberOfBars();
+  double DetectorInnerRadius = topgp->GetDetectorInnerRadius();
+  double QuartzWidth = topgp->GetQuartzWidth();
+  double QuartzThickness = topgp->GetQuartzThickness();
+  double QuartzFPos = topgp->GetQuartzFPos();
+  double QuartzBPos = topgp->GetQuartzBPos();
+  double QuartzZExt = topgp->GetQuartzZExt();
+  double QuartzYExtUp = topgp->GetQuartzYExtUp();
+  double QuartzYExtDown = topgp->GetQuartzYExtDown();
+  double GapPMTX = topgp->GetGapPMTX();
+  double GapPMTY = topgp->GetGapPMTY();
+  double GapPMTX0 = topgp->GetGapPMTX0();
+  double GapPMTY0 = topgp->GetGapPMTY0();
+  int PMTNX = topgp->GetPMTNX();
+  int PMTNY = topgp->GetPMTNY();
+  double PMTSizeX = topgp->GetPMTSizeX();
+  double PMTSizeY = topgp->GetPMTSizeY();
+  double PMTSizeZ = topgp->GetPMTSizeZ();
+  double ActiveSizeX = topgp->GetActiveSizeX();
+  double ActiveSizeY = topgp->GetActiveSizeY();
+  double ActiveSizeZ = topgp->GetActiveSizeZ();
+  double WindowThickness = topgp->GetWindowThickness();
+  double BottomThickness = topgp->GetBottomThickness();
+  double QBBThickness = topgp->GetQBBThickness();
+  double QBBSideThickness = topgp->GetQBBSideThickness();
+  double QBBFronThickness = topgp->GetQBBFronThickness();
+  double AirGapUp = topgp->GetAirGapUp();
+  double AirGapDown = topgp->GetAirGapDown();
+  double AirGapSide = topgp->GetAirGapSide();
+  double QBBForwardPos = topgp->GetQBBForwardPos();
+  double QBBBackwardPos = topgp->GetQBBBackwardPos();
 
+  // Here we directly read the material of the detector since it's the only place we need this
+
+  string barMaterial =  content.getParamString("Bars/BarMaterial");
+  string wallMaterial =  content.getParamString("PMTs/Module/wallMaterial");
+  string sensMaterial = content.getParamString("PMTs/Module/sensMaterial");
+  string winMaterial = content.getParamString("PMTs/Module/winMaterial");
+  string botMaterial =  content.getParamString("PMTs/Module/botMaterial");
+  string pannelMaterial =  content.getParamString("Support/PannelMaterial");
 
   //----------------------------------------
   //        Add subdetector group
   //----------------------------------------
 
-  TGeoRotation* geoRot = new TGeoRotation("TOPRot", 90.0, globalRotAngle, 0.0);
-  TGeoVolumeAssembly* volTOP = addSubdetectorGroup("TOP", new TGeoCombiTrans(0.0, 0.0, globalOffsetZ, geoRot));
+  TGeoRotation* geoRot = new TGeoRotation("TOPRot", 90.0, DetectorRotation, 0.0);
+  TGeoVolumeAssembly* volGrpTOP = addSubdetectorGroup("TOP", new TGeoCombiTrans(0.0, 0.0, DetectorZShift, geoRot));
 
 
   //----------------------------------------
   //           Build quartz bar
   //----------------------------------------
 
-  TGeoMedium* boxMed = gGeoManager->GetMedium(BarMaterial.c_str());
-  TGeoVolumeAssembly* barsegment = new TGeoVolumeAssembly("TOPbarsegment");
+  TGeoMedium* barMedium = gGeoManager->GetMedium(barMaterial.c_str()); // Create the medium from database
+  TGeoVolumeAssembly* barsegment = new TGeoVolumeAssembly("TOPbarsegment"); //Difine assmbly in which the bar will be housed
 
-  TGeoXtru *box = new TGeoXtru(2);
-  //TGeoBBox* box2 = new TGeoBBox("test",A/2.,B/2.,-ZB/2.);
+  TGeoXtru *box = new TGeoXtru(2); //TGeoXtru the object with which the quartz bar is made
 
-  Double_t xv[6] = {ZB - Ez, ZB, ZF, ZF, ZB, ZB - Ez};
-  Double_t yv[6] = {B / 2.0 + Eydown, B / 2.0, B / 2.0, -B / 2.0, -B / 2.0, -B / 2.0 - Eyup};
+  // Difine the x and y vertices of the quartz box
+  Double_t xv[6] = {QuartzBPos - QuartzZExt, QuartzBPos, QuartzFPos, QuartzFPos, QuartzBPos, QuartzBPos - QuartzZExt};
+  Double_t yv[6] = {QuartzThickness / 2.0 + QuartzYExtDown, QuartzThickness / 2.0, QuartzThickness / 2.0, -QuartzThickness / 2.0, -QuartzThickness / 2.0, -QuartzThickness / 2.0 - QuartzYExtUp};
 
+
+
+  //Use the vertices to create shape
   box->DefinePolygon(6, xv, yv);
-  box->DefineSection(0, -A / 2.0, 0.0, 0.0, 1.0);
-  box->DefineSection(1, A / 2.0, 0.0, 0.0, 1.0);
+  box->DefineSection(0, -QuartzWidth / 2.0, 0.0, 0.0, 1.0); //Define the width of the quarz box
+  box->DefineSection(1, QuartzWidth / 2.0, 0.0, 0.0, 1.0);
 
-  TGeoVolume *quartzBox = new TGeoVolume("quartzBox", box, boxMed);
+  TGeoVolume *quartzBox = new TGeoVolume("quartzBox", box, barMedium); //Apply medium to quarz box
 
-  quartzBox->SetTransparency(80.0);
-  quartzBox->SetLineColor(38);
+  quartzBox->SetTransparency(80.0); //Corlour seting for visual representation no effect on simulation
+  quartzBox->SetLineColor(38); //Corlour seting for visual representation no effect on simulation
 
+  //----------------------------------------
+  //           Build support structure
+  //----------------------------------------
+
+  TGeoMedium* supportMedium = gGeoManager->GetMedium(pannelMaterial.c_str()); // Create the medium from database
+
+  TGeoXtru *QBB1 = new TGeoXtru(2); //TGeoXtru the object with which the QBB support structure is made
+  TGeoXtru *QBB2 = new TGeoXtru(2); //TGeoXtru the object with which the QBB support structure is made
+  QBB1->SetName("QBB1");
+  QBB2->SetName("QBB2");
+  // Difine the x and y vertices of the support structure outer side
+  Double_t xv2[8] = {QBBBackwardPos,
+                     QuartzBPos - QuartzZExt,
+                     QuartzBPos,
+                     QBBForwardPos,
+                     QBBForwardPos,
+                     QuartzBPos,
+                     QuartzBPos - QuartzZExt,
+                     QBBBackwardPos
+                    };
+
+  Double_t yv2[8] = {QuartzThickness / 2.0 + QuartzYExtDown + AirGapDown + QBBThickness,
+                     QuartzThickness / 2.0 + QuartzYExtDown + AirGapDown + QBBThickness,
+                     QuartzThickness / 2.0 + AirGapDown + QBBThickness,
+                     QuartzThickness / 2.0 + AirGapDown + QBBThickness,
+                     -QuartzThickness / 2.0 - AirGapUp - QBBThickness,
+                     -QuartzThickness / 2.0 - AirGapUp - QBBThickness,
+                     -QuartzThickness / 2.0 - QuartzYExtUp - AirGapUp - QBBThickness,
+                     -QuartzThickness / 2.0 - QuartzYExtUp - AirGapUp - QBBThickness
+                    };
+
+  // Difine the x and y vertices of the support structure inner side
+  Double_t xv3[8] = {QBBBackwardPos + QBBFronThickness,
+                     QuartzBPos - QuartzZExt,
+                     QuartzBPos,
+                     QBBForwardPos - QBBFronThickness,
+                     QBBForwardPos - QBBFronThickness,
+                     QuartzBPos,
+                     QuartzBPos - QuartzZExt,
+                     QBBBackwardPos + QBBFronThickness
+                    };
+
+  Double_t yv3[8] = {QuartzThickness / 2.0 + QuartzYExtDown + AirGapDown,
+                     QuartzThickness / 2.0 + QuartzYExtDown + AirGapDown,
+                     QuartzThickness / 2.0 + AirGapDown,
+                     QuartzThickness / 2.0 + AirGapDown,
+                     -QuartzThickness / 2.0 - AirGapUp,
+                     -QuartzThickness / 2.0 - AirGapUp,
+                     -QuartzThickness / 2.0 - QuartzYExtUp - AirGapUp,
+                     -QuartzThickness / 2.0 - QuartzYExtUp - AirGapUp
+                    };
+
+  //Use the vertices to create shape
+  QBB1->DefinePolygon(8, xv2, yv2);
+  QBB1->DefineSection(0, -QuartzWidth / 2.0 - QBBSideThickness - AirGapSide, 0.0, 0.0, 1.0); //Define the width of the quarz QBB support
+  QBB1->DefineSection(1, QuartzWidth / 2.0 + QBBSideThickness + AirGapSide, 0.0, 0.0, 1.0);
+
+  QBB2->DefinePolygon(8, xv3, yv3);
+  QBB2->DefineSection(0, -QuartzWidth / 2.0 - AirGapSide, 0.0, 0.0, 1.0); //Define the width of the quarz QBB support inner side
+  QBB2->DefineSection(1, QuartzWidth / 2.0 + AirGapSide, 0.0, 0.0, 1.0);
+
+  TGeoCompositeShape *QBBShell = new TGeoCompositeShape("QBBShell", "QBB1-QBB2");//Difference of outer in innner shells
+
+  TGeoVolume *support = new TGeoVolume("QBBSupport", QBBShell, supportMedium); //Apply medium QBB shell
+
+  support->SetTransparency(20.0); //Corlour seting for visual representation no effect on simulation
+  support->SetLineColor(17); //Corlour seting for visual representation no effect on simulation
 
   //----------------------------------------
   //           Build PMT
   //----------------------------------------
 
-  GearDir PMTs(content);
-  PMTs.append("PMTs/");
-  GearDir Module(PMTs);
-  Module.append("Module/");
-
-  double Xgap = PMTs.getParamLength("Xgap");
-  double Ygap = PMTs.getParamLength("Ygap");
-  double x0  = PMTs.getParamLength("x0");
-  double y0  = PMTs.getParamLength("y0");
-  int nPMTx = PMTs.getParamLength("nPMTx");
-  int nPMTy = PMTs.getParamLength("nPMTy");
-
-
-  string wallMaterial =  Module.getParamString("wallMaterial");
-  double ModuleXSize = Module.getParamLength("ModuleXSize");
-  double ModuleYSize  = Module.getParamLength("ModuleYSize");
-  double ModuleZSize = Module.getParamLength("ModuleZSize");
-
-  double SensXSize = Module.getParamLength("SensXSize");
-  double SensYSize = Module.getParamLength("SensYSize");
-  double SensThickness = Module.getParamLength("SensThickness");
-  string sensMaterial = Module.getParamString("sensMaterial");
-
-  string winMaterial = Module.getParamString("winMaterial");
-  double WindowThickness = Module.getParamLength("WindowThickness");
-
-  int PadXNum = Module.getParamLength("PadXNum");
-  int PadYNum = Module.getParamLength("PadYNum");
-
-  double BottomThickness = Module.getParamLength("BottomThickness");
-  string botMaterial =  Module.getParamString("botMaterial");
-
-
-  TGeoMedium* wallMed = gGeoManager->GetMedium(wallMaterial.c_str());
+  TGeoMedium* wallMed = gGeoManager->GetMedium(wallMaterial.c_str()); //Define all the necesary materials
   TGeoMedium* winMed = gGeoManager->GetMedium(winMaterial.c_str());
   TGeoMedium* sensMed = gGeoManager->GetMedium(sensMaterial.c_str());
   TGeoMedium* botMed = gGeoManager->GetMedium(botMaterial.c_str());
 
 
-  TGeoVolumeAssembly* PMT = new TGeoVolumeAssembly("PMT");
+  TGeoVolumeAssembly* PMT = new TGeoVolumeAssembly("PMT");//The volume assembly that will house the PMT
 
-  TGeoBBox* TOuterShell = new TGeoBBox("TOuterShell", ModuleXSize / 2., ModuleYSize / 2., ModuleZSize / 2.);
-  TGeoBBox* TInnerShell = new TGeoBBox("TInnerShell", SensXSize / 2., SensYSize / 2., ModuleZSize / 1.9);
-  TGeoCompositeShape *Tshell = new TGeoCompositeShape("Tshell", "TOuterShell-TInnerShell");
-  TGeoVolume* PMTshell = new TGeoVolume("PMTshell", Tshell, wallMed);
-  PMTshell->SetLineColor(2);
+  new TGeoBBox("TOuterShell", PMTSizeX / 2., PMTSizeY / 2., PMTSizeZ / 2.);//Outer cube
+  new TGeoBBox("TInnerShell", ActiveSizeX / 2., ActiveSizeY / 2., PMTSizeZ / 1.9);//inner Cube
+  TGeoCompositeShape *Tshell = new TGeoCompositeShape("Tshell", "TOuterShell-TInnerShell");//Difference of outer in innner shells
+  TGeoVolume* PMTshell = new TGeoVolume("PMTshell", Tshell, wallMed); //Assign medium to shell
+  PMTshell->SetLineColor(2); //Asign red colour to shell just for display in root
 
-  PMT->AddNode(PMTshell, 1);
+  PMT->AddNode(PMTshell, 1); //Add shell to asembley
 
-  TGeoBBox* winShape = new TGeoBBox("winShape", SensXSize / 2., SensYSize / 2., WindowThickness / 2.);
-  TGeoVolume* detWin = new TGeoVolume("detWin", winShape, winMed);
-  detWin->SetLineColor(38);
-  PMT->AddNode(detWin, 2, new TGeoTranslation(0.0, 0.0, (ModuleZSize - WindowThickness) / 2.));
+  TGeoBBox* winShape = new TGeoBBox("winShape", ActiveSizeX / 2., ActiveSizeY / 2., WindowThickness / 2.);//Construct window
+  TGeoVolume* detWin = new TGeoVolume("detWin", winShape, winMed);//Asign medium to window
+  detWin->SetLineColor(38); //Window color just for diplay in root
+  PMT->AddNode(detWin, 2, new TGeoTranslation(0.0, 0.0, (PMTSizeZ - WindowThickness) / 2.));// Position window
 
-  TGeoBBox* sensShape = new TGeoBBox("sensShape", SensXSize / 2., SensYSize / 2., SensThickness / 2.);
+  TGeoBBox* sensShape = new TGeoBBox("sensShape", ActiveSizeX / 2., ActiveSizeY / 2., ActiveSizeZ / 2.);
   TGeoVolume* detSens = new TGeoVolume("SD_detSens", sensShape, sensMed);
   detSens->SetLineColor(29);
-  PMT->AddNode(detSens, 3, new TGeoTranslation(0.0, 0.0, (ModuleZSize - SensThickness) / 2. - WindowThickness));
+  PMT->AddNode(detSens, 3, new TGeoTranslation(0.0, 0.0, (PMTSizeZ - ActiveSizeZ) / 2. - WindowThickness));
 
-  TGeoBBox* bottomShape = new TGeoBBox("sensShape", SensXSize / 2., SensYSize / 2., BottomThickness / 2.);
+  TGeoBBox* bottomShape = new TGeoBBox("sensShape", ActiveSizeX / 2., ActiveSizeY / 2., BottomThickness / 2.);
   TGeoVolume* detBot = new TGeoVolume("detBottom", bottomShape, botMed);
   detBot->SetLineColor(8);
-  PMT->AddNode(detBot, 4, new TGeoTranslation(0.0, 0.0, (-ModuleZSize + BottomThickness) / 2.));
+  PMT->AddNode(detBot, 4, new TGeoTranslation(0.0, 0.0, (-PMTSizeZ + BottomThickness) / 2.));
 
   //----------------------------------------
   //           Combine PMT and quartz bar
   //----------------------------------------
 
-  TGeoTranslation tPMTz("Transy", 0.0, 0.0, ZB - Ez - ModuleZSize / 2.);
+  TGeoTranslation tPMTz("Transy", 0.0, 0.0, QuartzBPos - QuartzZExt - PMTSizeZ / 2.);
 
   barsegment->AddNode(quartzBox, 1, new TGeoRotation("barrot", 90.0, 90.0, 90.0));
+  barsegment->AddNode(support, 1, new TGeoRotation("barrot", 90.0, 90.0, 90.0));
 
-  for (int i = 0; i < nPMTx; i++) {
-    for (int j = 0; j < nPMTy; j++) {
+  for (int i = 0; i < PMTNX; i++) {
+    for (int j = 0; j < PMTNY; j++) {
 
-      TGeoTranslation tPMTx("tPMTx", -1.0*A / 2 + x0 + ModuleXSize / 2. + (ModuleXSize + Xgap)*i, 0.0, 0.0);
-      TGeoTranslation tPMTy("tPMTy", 0.0, -B / 2. - Eydown + y0 + ModuleYSize / 2. + (ModuleYSize + Ygap)*j, 0.0);
+      TGeoTranslation tPMTx("tPMTx", -1.0*QuartzWidth / 2. + GapPMTX0 + PMTSizeX / 2. + (PMTSizeX + GapPMTX)*i, 0.0, 0.0);
+      TGeoTranslation tPMTy("tPMTy", 0.0, -QuartzThickness / 2. - QuartzYExtDown + GapPMTY0 + PMTSizeY / 2. + (PMTSizeY + GapPMTY)*j, 0.0);
 
       barsegment->AddNode(PMT, (i + 1)*(j + 1), new TGeoHMatrix(tPMTx*tPMTy*tPMTz));
 
@@ -204,14 +268,14 @@ void GeoTOPBelleII::create(GearDir& content)
   //    Position barsegments around CDC
   //----------------------------------------
 
-  TGeoTranslation t("tr", 0.0, R, 0.0);
+  TGeoTranslation t("tr", 0.0, DetectorInnerRadius + QuartzThickness / 2.0 , 0.0);
 
 //  int i=0;
-  for (int i = 0; i < N; i++) {
-    TGeoRotation r("gRot", 0.0, 0.0, 360*i / ((double)N));
+  for (int i = 0; i < NumberOfBars; i++) {
+    TGeoRotation r("gRot", 0.0, 0.0, 360*i / ((double)NumberOfBars));
 
-    volTOP->AddNode(barsegment, i + 1, new TGeoHMatrix(r*t));
+    volGrpTOP->AddNode(barsegment, i + 1, new TGeoHMatrix(r*t));
 
-  }
+  }/**/
 }
 

@@ -11,18 +11,10 @@
 	<Version>0</Version>
 	<Creator>GeoMaterials</Creator>
 	<Content>
-    
-    	   <Material name="Tantalum">
-             <AtomNumber>73.0</AtomNumber>
-             <MassNumber>180.94788</MassNumber>
-             <Density unit="g/cm3">16.69</Density>
-             <RadLength>1.0</RadLength>
-             <InterLength>0</InterLength>
-           </Material>
 		
 		<Mixture name="TOPSiO2">
-            <Density unit="g/cm3">2.20</Density>
-            <Elements>      
+			<Density unit="g/cm3">2.20</Density>
+			<Elements>      
 				<Element name="O" weight="0.5326">
 					<AtomNumber>8.0</AtomNumber>
 					<MassNumber>15.9994</MassNumber>
@@ -31,7 +23,31 @@
 					<AtomNumber>14.0</AtomNumber>
 					<MassNumber>28.0855</MassNumber>
 				</Element>  
-            </Elements> 
+			</Elements>
+			<Properties> 
+				<Property name="RINDEX" unit="eV"> 
+					<value energy="0.1">1.3</value> 
+					<value energy="0.5">1.3</value> 
+					<value energy="1.0">1.3</value> 
+					<value energy="1.5">1.3</value> 
+					<value energy="2.2">1.3</value> 
+					<value energy="2.9">1.3</value> 
+					<value energy="3.6">1.3</value> 
+					<value energy="4.3">1.3</value> 
+					<value energy="5">1.3</value> 
+				</Property> 
+				<Property name="ABSLENGTH" unit="eV"> 
+					<value energy="0.1">1000</value> 
+					<value energy="0.5">1000</value> 
+					<value energy="1.0">1000</value> 
+					<value energy="1.5">1000</value> 
+					<value energy="2.2">1000</value> 
+					<value energy="2.9">1000</value> 
+					<value energy="3.6">1000</value> 
+					<value energy="4.3">1000</value> 
+					<value energy="5">1000</value> 
+				</Property> 
+			</Properties> 
 		</Mixture>
 		
 		<Mixture name="TOPCeramic">
@@ -42,6 +58,28 @@
 					<MassNumber>15.9994</MassNumber>
 				</Element>
 				<Element name="Al" weight="0.52925">
+					<AtomNumber>13.0</AtomNumber>
+					<MassNumber>26.9815386</MassNumber>
+				</Element>  
+			</Elements>
+		</Mixture>
+		
+		<Mixture name="TOPBBQ">
+			<Density unit="kg/m3">53</Density>
+			<Elements> 
+				<Element name="N" weight="0.7635"> 
+					<AtomNumber>7.0</AtomNumber> 
+					<MassNumber>14.01</MassNumber> 
+				</Element> 
+				<Element name="O" weight="0.2056"> 
+					<AtomNumber>8.0</AtomNumber> 
+					<MassNumber>16.00</MassNumber> 
+				</Element> 
+				<Element name="Ar" weight="0.0098"> 
+					<AtomNumber>18.0</AtomNumber> 
+					<MassNumber>39.95</MassNumber> 
+				</Element> 
+				<Element name="Al" weight="0.0211">
 					<AtomNumber>13.0</AtomNumber>
 					<MassNumber>26.9815386</MassNumber>
 				</Element>  

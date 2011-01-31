@@ -133,17 +133,25 @@ namespace Belle2 {
     /** Second end of RelationT. */
 //    TObject** m_to;
 
-    /** Accessor Params of "from" end of Relation.
+    /** Collection Name of "from" end of Relation.
      */
-    std::pair<std::string, Belle2::DataStore::EDurability> m_fromAccessorParams;
+    std::string m_fromName;
+
+    /** Collection EDurability of 'from' end of Relation.
+     */
+    Belle2::DataStore::EDurability m_fromDurability;
 
     /** Index for "from" end of the Relation.
      */
     T m_index;
 
-    /** Accessor Params of "to" end of Relation.
+    /** Collection Name of "to" end of Relation.
      */
-    std::pair<std::string, Belle2::DataStore::EDurability> m_toAccessorParams;
+    std::string m_toName;
+
+    /** Collection EDurability of 'to' end of Relation.
+     */
+    Belle2::DataStore::EDurability m_toDurability;
 
     /** Indices for "to" end of Relation.
      */
@@ -164,8 +172,11 @@ Belle2::RelationT<T>::RelationT(Belle2::StoreAccessorBase& from, Belle2::StoreAc
                                 const int& fromIndex, const int& toIndex,
                                 const float& weight)
 {
-  m_fromAccessorParams = from.getAccessorParams();
-  m_toAccessorParams   = to.getAccessorParams();
+  m_fromName       = from.getAccessorParams().first;
+  m_fromDurability = from.getAccessorParams().second;
+
+  m_toName       = to.getAccessorParams().first;
+  m_toDurability = to.getAccessorParams().second;
 
   m_index = static_cast<T>(fromIndex);
 
@@ -180,8 +191,11 @@ Belle2::RelationT<T>::RelationT(Belle2::StoreAccessorBase& from, Belle2::StoreAc
                                 const int& fromIndex, std::list<int> toIndices,
                                 const float& weight)
 {
-  m_fromAccessorParams = from.getAccessorParams();
-  m_toAccessorParams   = to.getAccessorParams();
+  m_fromName       = from.getAccessorParams().first;
+  m_fromDurability = from.getAccessorParams().second;
+
+  m_toName       = to.getAccessorParams().first;
+  m_toDurability = to.getAccessorParams().second;
 
   m_index = fromIndex;
 
@@ -196,8 +210,11 @@ template <class T>
 Belle2::RelationT<T>::RelationT(StoreAccessorBase& from, StoreAccessorBase& to,
                                 const int& fromIndex, std::list<std::pair<int, float> > toIndices)
 {
-  m_fromAccessorParams = from.getAccessorParams();
-  m_toAccessorParams   = to.getAccessorParams();
+  m_fromName       = from.getAccessorParams().first;
+  m_fromDurability = from.getAccessorParams().second;
+
+  m_toName       = to.getAccessorParams().first;
+  m_toDurability = to.getAccessorParams().second;
 
   m_index = fromIndex;
 

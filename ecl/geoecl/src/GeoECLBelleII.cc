@@ -242,14 +242,14 @@ void GeoECLBelleII::makeENDCAP(GearDir& content, TGeoVolumeAssembly* group)
   matCsI->Print();
   TGeoMedium *CsI = new TGeoMedium("CsI", 1, matCsI);
 
-  TGeoMaterial *matAl = new TGeoMaterial("Al", 26.98, 13, 2.7);
-  TGeoMedium *Al = new TGeoMedium("Root Material", 2, matAl);
+  //TGeoMaterial *matAl = new TGeoMaterial("Al", 26.98, 13, 2.7);
+  //TGeoMedium *Al = new TGeoMedium("Root Material", 2, matAl);  // not used (by T.Hara)
 
 
 
 
   GearDir detcontent_ecap(content);
-  double fin_thickness = detcontent_ecap.getParamLength("k_fin_thickness");
+  //double fin_thickness = detcontent_ecap.getParamLength("k_fin_thickness"); // not used (by T.Hara)
   int    nblock = int(detcontent_ecap.getParamNumValue("k_endcap_Nblock"));
 
 
@@ -260,7 +260,7 @@ void GeoECLBelleII::makeENDCAP(GearDir& content, TGeoVolumeAssembly* group)
   double vtx[15];
   double transx, transy, transz, roty, rotz, halflength;
   char stemp_ecap[100];
-  TGeoVolume *counterbox[200];
+  //TGeoVolume *counterbox[200]; // not used (by T.Hara)
   TGeoVolume *boxcopy[8736];
   int box_id = 0;
   int box_id1 = 0;

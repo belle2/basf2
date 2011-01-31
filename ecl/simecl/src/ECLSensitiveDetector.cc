@@ -68,16 +68,16 @@ G4bool ECLSensitiveDetector::ProcessHits(G4Step *aStep, G4TouchableHistory *)
     return false;
   }
 
-  const G4int pid = track.GetDefinition()->GetPDGEncoding();
-  const G4int trackID = track.GetTrackID();
+  //const G4int pid = track.GetDefinition()->GetPDGEncoding();
+  //const G4int trackID = track.GetTrackID();
 
-  const G4VPhysicalVolume &vol = *track.GetVolume();
-  const G4StepPoint &PreStep  = *aStep->GetPreStepPoint();
-  const G4StepPoint &PostStep = *aStep->GetPostStepPoint();
-  const G4ThreeVector &posPreStep  = PreStep.GetPosition();
-  const G4ThreeVector &posPostStep = PostStep.GetPosition();
-  const G4ThreeVector momPreStep  = PreStep.GetMomentum();
-  const G4ThreeVector momPostStep = PostStep.GetMomentum();
+  //const G4VPhysicalVolume &vol = *track.GetVolume();
+  //const G4StepPoint &PreStep  = *aStep->GetPreStepPoint();
+  //const G4StepPoint &PostStep = *aStep->GetPostStepPoint();
+  //const G4ThreeVector &posPreStep  = PreStep.GetPosition();
+  //const G4ThreeVector &posPostStep = PostStep.GetPosition();
+  //const G4ThreeVector momPreStep  = PreStep.GetMomentum();
+  //const G4ThreeVector momPostStep = PostStep.GetMomentum();
 
   //  double radIn = sqrt(posPreStep[0] * posPreStep[0] + posPreStep[1] * posPreStep[1]);
 

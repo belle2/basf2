@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2010-2011  Belle II Collaboration                         *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Martin Ritter                                            *
@@ -42,8 +42,7 @@ HepevtInputModule::HepevtInputModule() : Module()
   addParam("skipEvents", m_skipEventNumber, "Skip this number of events before starting.", 0);
   addParam("useWeights", m_useWeights, "Set to 'true' to if generator weights should be propagated.", false);
 
-  m_evtNumber = 0;
-  m_evtIDUsed = false;
+  m_inputMode = c_NotSet;
 }
 
 
@@ -65,16 +64,21 @@ void HepevtInputModule::event()
     double weight = 1;
     int id = m_hepevt.getEvent(mpg, weight);
 
-    StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
     if (id > -1) {
-      m_evtIDUsed = true;
+      if (m_inputMode == c_NotSet) {
+        m_inputMode = c_EvtNumFile;
+      } else {
+        B2FATAL("The event number is taken from the HepEvt file, but was taken from an external source previously !")
+      }
+
+      StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
       eventMetaDataPtr->setEvent(id);
+
       if (m_useWeights)
         eventMetaDataPtr->setGeneratedWeight(weight);
     } else {
-      if (!m_evtIDUsed) {
-        eventMetaDataPtr->setEvent(m_evtNumber);
-        m_evtNumber++;
+      if (m_inputMode == c_NotSet) {
+        m_inputMode = c_EvtNumExternal;
       } else {
         B2FATAL("The event number is not available for this event, but was available for previous events !")
       }

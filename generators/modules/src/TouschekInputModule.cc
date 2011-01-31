@@ -49,7 +49,6 @@ TouschekInputModule::TouschekInputModule() : Module()
   addParam("MaxParticles", m_maxParticles, "The maximum number of particles per event that should be read. -1 means all of the particles are read.", -1);
 
   //Create and initialize member variables
-  m_evtNumber = 0;
   m_herPipePartMatrix = new TGeoHMatrix("TouschekPlaneHER");
   m_lerPipePartMatrix = new TGeoHMatrix("TouschekPlaneLER");
   m_readerHER = new TouschekReader(m_herPipePartMatrix, 11);  //HER: electrons
@@ -109,13 +108,8 @@ void TouschekInputModule::event()
       //Generate MCParticle list
       mpg.generateList(DEFAULT_MCPARTICLES, MCParticleGraph::set_decay_info | MCParticleGraph::check_cyclic);
 
-      StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
-      eventMetaDataPtr->setEvent(m_evtNumber);
-
       B2INFO("Read " << readHERParticles << " e- particles (HER).")
       B2INFO("Read " << readLERParticles << " e+ particles (LER).")
-
-      m_evtNumber++;
     }
   } catch (runtime_error &exc) {
     B2ERROR(exc.what());

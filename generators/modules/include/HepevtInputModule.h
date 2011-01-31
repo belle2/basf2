@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2010-2011  Belle II Collaboration                         *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Martin Ritter                                            *
@@ -30,6 +30,13 @@ namespace Belle2 {
 
     public:
 
+      /** The mode the HepEvtInputModule is running in. */
+      enum EInputMode {
+        c_NotSet,         /**< The mode was not set yet. */
+        c_EvtNumExternal, /**< The event number is taken from an external source (e.g. EvtMetaGen). */
+        c_EvtNumFile      /**< The event number is taken from the HepEvt file.. */
+      };
+
       /**
        * Constructor.
        * Sets the module parameters.
@@ -47,8 +54,7 @@ namespace Belle2 {
 
     protected:
 
-      int m_evtNumber;             /**< The current event number, used in the case that the HepEvt file doesn't provide it. */
-      bool m_evtIDUsed;            /**< True if the event number from the HepEvt file was used and therefore the internal event number can't be used anymore. */
+      EInputMode m_inputMode;      /**< The input mode of the module. Defines where the event number is taken from. */
       std::string m_inputFileName; /**< The filename of the input HepEvt file. */
       int m_skipEventNumber;       /**< The number of events which should be skipped at the start of reading. */
       HepevtReader m_hepevt;       /**< An instance of the HepEvt reader. */

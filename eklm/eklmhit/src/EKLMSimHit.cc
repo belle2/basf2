@@ -15,7 +15,7 @@
 
 using namespace Belle2;
 
-ClassImp(EKLMSimHit)
+ClassImp(Belle2::EKLMSimHit)
 
 G4Allocator<EKLMSimHit> EKLMSimHitAllocator;
 

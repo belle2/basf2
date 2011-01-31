@@ -11,7 +11,7 @@
 #include <eklm/eklmhit/EKLMHitBase.h>
 #include <framework/logging/Logger.h>
 
-#include <framework/datastore/StoreDefs.h>
+//#include <framework/datastore/StoreDefs.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 

@@ -12,7 +12,7 @@
 
 #include <framework/datastore/StoreIter.h>
 #include <framework/datastore/DataStore.h> // DataStore to ask it for the iterator
-#include <framework/datastore/StoreDefs.h> // to have the EDurability type available
+//#include <framework/datastore/StoreDefs.h> // to have the EDurability type available
 #include <eklm/eklmutils/EKLMutils.h>
 
 

@@ -14,7 +14,7 @@
 #include<iostream>
 #include<fstream>
 
-#include <framework/datastore/StoreDefs.h>
+//#include <framework/datastore/StoreDefs.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 

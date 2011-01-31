@@ -13,7 +13,7 @@
 
 //! Tools collections common for EKLM
 
-#include <framework/datastore/StoreDefs.h>
+//#include <framework/datastore/StoreDefs.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 

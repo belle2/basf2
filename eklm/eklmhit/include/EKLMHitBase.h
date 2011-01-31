@@ -12,9 +12,9 @@
 #define EKLMHITBASE_H
 
 #include <TObject.h>
-#include <simulation/simkernel/B4VHit.h>
+//#include <simulation/simkernel/B4VHit.h>
 
-#include <framework/datastore/StoreDefs.h>
+//#include <framework/datastore/StoreDefs.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 
@@ -54,7 +54,7 @@ namespace Belle2 {
 
   private:
     //! needed to make objects storable
-    ClassDef(EKLMHitBase, 1);
+    ClassDef(Belle2::EKLMHitBase, 1);
 
     //! name of the hit
     std::string m_Name;

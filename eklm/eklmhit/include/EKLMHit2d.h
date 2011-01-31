@@ -36,7 +36,7 @@ namespace Belle2 {
     EKLMHit2d(const std::string &);
 
     //! Constructor with two strips
-    EKLMHit2d(EKLMStripHit*, EKLMStripHit*);
+    EKLMHit2d(Belle2::EKLMStripHit*, Belle2::EKLMStripHit*);
 
     //! Destructor
     ~EKLMHit2d() {};
@@ -45,14 +45,14 @@ namespace Belle2 {
     void Print();
 
     //! add StripHit to 2dhit. returns false if impossible
-    bool addStripHit(EKLMStripHit *);
+    bool addStripHit(Belle2::EKLMStripHit *);
 
     //! returns pointer to the strip hit in X direction
-    inline EKLMStripHit* getXStripHit() const
+    inline Belle2::EKLMStripHit* getXStripHit() const
     {return m_XStrip;}
 
     //! returns pointer to the strip hit in Y direction
-    inline EKLMStripHit* getYStripHit() const
+    inline Belle2::EKLMStripHit* getYStripHit() const
     {return m_YStrip;}
 
     //! set coordinates of the crossing point
@@ -75,10 +75,10 @@ namespace Belle2 {
 
 
     //! reference to the X Strip hit
-    EKLMStripHit * m_XStrip;
+    Belle2::EKLMStripHit * m_XStrip;
 
     //! reference to the Y Strip hit
-    EKLMStripHit * m_YStrip;
+    Belle2::EKLMStripHit * m_YStrip;
 
     //! crossing point global coordinates
     CLHEP::Hep3Vector m_crossPoint;
@@ -86,8 +86,8 @@ namespace Belle2 {
     //! ChiSq of the hit
     double m_ChiSq;
 
-    //! Needed to make EKLMHit2d storable
-    ClassDef(EKLMHit2d, 1);
+    //! Needed to make Belle2::EKLMHit2d storable
+    ClassDef(Belle2::EKLMHit2d, 1);
   };
 
 

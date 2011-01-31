@@ -16,7 +16,7 @@
 using namespace Belle2;
 using namespace std;
 
-ClassImp(EKLMHit2d);
+ClassImp(Belle2::EKLMHit2d);
 
 EKLMHit2d::EKLMHit2d()
 {

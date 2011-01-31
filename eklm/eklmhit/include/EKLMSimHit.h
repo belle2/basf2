@@ -13,8 +13,9 @@
 
 
 #include <TObject.h>
-#include <simulation/simkernel/B4VHit.h>
+//#include <simulation/simkernel/B4VHit.h>
 
+#include "G4VHit.hh"
 
 //Geant4 classes
 #include "G4THitsCollection.hh"
@@ -26,7 +27,7 @@
 namespace Belle2 {
 
   //! Class to handle simulation hits
-  class EKLMSimHit  :  public B4VHit  {
+  class EKLMSimHit  : public G4VHit  {
 
   public:
 

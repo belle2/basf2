@@ -71,7 +71,7 @@ namespace Belle2 {
     {return m_LeadingParticlePDGCode;};
 
     //! returns true if strips intersects (does not pay attention to the layer)
-    bool doesIntersect(EKLMStripHit *, CLHEP::Hep3Vector &);
+    bool doesIntersect(Belle2::EKLMStripHit *, CLHEP::Hep3Vector &);
 
     //! returns distance btw. the hit and SiPM
     double getLightPropagationLength(CLHEP::Hep3Vector &);
@@ -91,7 +91,7 @@ namespace Belle2 {
     double m_LightPropagationLength;
 
     //! Makes objects storable
-    ClassDef(EKLMStripHit, 1);
+    ClassDef(Belle2::EKLMStripHit, 1);
 
 
   };

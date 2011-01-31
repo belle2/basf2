@@ -18,11 +18,11 @@ namespace Belle2 {
 
   class ARICHB4VHit;
 
-  /* Class ARICHSimHit - Geant4 simulated hit for ARICH.
-
-     This is a class to store ARICH geant4 hit in datastore.
-     It is also the input for digitization module (ARICHDigi).
-  */
+  /** Class ARICHSimHit - Geant4 simulated hit for ARICH.
+   *
+   *  This is a class to store ARICH geant4 hit in datastore.
+   *  It is also the input for digitization module (ARICHDigi).
+   */
 
   class ARICHSimHit : public TObject {
   public:
@@ -96,7 +96,7 @@ namespace Belle2 {
     double m_parentID;        /*!< G4 ID number of photons parent particle */
 
 
-    ClassDef(ARICHSimHit, 1);
+    ClassDef(ARICHSimHit, 1); /*!< the class title */
 
   };
 

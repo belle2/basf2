@@ -18,8 +18,8 @@
 
 namespace Belle2 {
 
-  /* Datastore class that holds information on track parameters at the entrance in aerogel.
-     For now this information comes from ("ARICHSensitiveAero" sensitive detector). This should be replaced with the information from tracking.
+  /** Datastore class that holds information on track parameters at the entrance in aerogel.
+   *  For now this information comes from ("ARICHSensitiveAero" sensitive detector). This should be replaced with the information from tracking.
    */
 
 
@@ -27,8 +27,7 @@ namespace Belle2 {
   public:
 
     //! Empty constructor
-    /*! Recommended for ROOT IO
-    */
+    /*! Recommended for ROOT IO */
     ARICHAeroHit() {;}
 
     //! Useful Constructor
@@ -77,7 +76,7 @@ namespace Belle2 {
     TVector3 m_momentum;       /*!< track position (at entrance in 1. aerogel plane) */
 
 
-    ClassDef(ARICHAeroHit, 1);
+    ClassDef(ARICHAeroHit, 1); /*!< the class title */
 
   };
 

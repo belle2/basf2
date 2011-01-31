@@ -73,6 +73,9 @@ namespace Belle2 {
      */
     virtual void terminate();
 
+    /**
+     *Prints module parameters.
+     */
     void printModuleParams() const;
 
   private:
@@ -81,7 +84,7 @@ namespace Belle2 {
     std::string m_outColName;        /**< Output collection name */
 
     /* Other members.*/
-    TRandom3* m_random;              /** Random number generator.*/
+    TRandom3* m_random;              /**< Random number generator.*/
     double m_timeCPU;                /**< CPU time.     */
     int    m_nRun;                   /**< Run number.   */
     int    m_nEvent;                 /**< Event number. */

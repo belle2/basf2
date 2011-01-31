@@ -10,13 +10,13 @@
 // Own include
 
 #include <arich/modules/arichReconstruction/ARICHRecModule.h>
+#include <time.h>
+
 #include <arich/hitarich/ARICHAeroHit.h>
 #include <arich/modules/arichReconstruction/ARICHTrack.h>
-#include <arich/modules/arichReconstruction/ARICHReconstruction.h>
 
 #include <framework/core/ModuleManager.h>
 
-#include <time.h>
 
 // framework - DataStore
 #include <framework/datastore/DataStore.h>

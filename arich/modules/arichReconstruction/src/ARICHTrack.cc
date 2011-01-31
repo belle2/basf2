@@ -38,7 +38,7 @@ int ARICHTrack::Lund2Type(int ipart)
   //        =3  kaon
   //        =4  proton
   //        =-1   ?
-  ipart = abs(double(ipart));
+  ipart = abs(ipart);
   switch (ipart) {
     case  11  :  return 0;
     case  13  :  return 1;

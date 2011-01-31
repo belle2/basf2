@@ -1,3 +1,14 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2010 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Luka Santelj, Rok Pestotnik                              *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
+
 #include "arich/modules/arichReconstruction/ARICHReconstruction.h"
 #include "arich/modules/arichReconstruction/Utility.h"
 #include "arich/geoarich/ARICHGeometryPar.h"
@@ -290,7 +301,7 @@ int ARICHReconstruction::Likelihood2()
   for (unsigned  int i = 0; i < tsize; i++) {
 
     ARICHTrack* track =  trackArray[i];
-    int iden = track->GetIdentity();
+    // int iden = track->GetIdenity();
 
     double padArea = pad_size / Unit::m * pad_size / Unit::m;
     int padNum = _arichgp->GetDetectorXPadNumber() * _arichgp->GetDetectorXPadNumber();
@@ -391,7 +402,7 @@ int ARICHReconstruction::Likelihood2()
           if (CherenkovPhoton(epoint, hitpos, initialrf, dirf, &refind[ar], &zaero[ar], asize - ar, 0) < 0)  continue;
 
           TVector3 dirch = TransformToFixed(edir) * dirf;
-          double th_cer = dirch.Theta();
+          // double th_cer = dirch.Theta();
           double fi_cer = dirch.Phi();
           if (fi_cer < 0) fi_cer += 2 * M_PI;
           double fii;

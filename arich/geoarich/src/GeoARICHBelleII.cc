@@ -146,7 +146,7 @@ void GeoARICHBelleII::create(GearDir& content)
     if (iLayer == 1) contTube->AddNode(suppTube, 1, new TGeoTranslation(0.0, 0.0, zPosition - SuppThick / 2.  - zCenter));
 
     // aerogel tiles on the edges are build as a intersection between hexagon ant this tubee. It has to be thicker then hexagons otherwise root has drawing problems.
-    TGeoTube* tubee = new TGeoTube("tubee", TubeInnerRadius, TubeOuterRadius, thickness / 2. + 1*mm);
+    new TGeoTube("tubee", TubeInnerRadius, TubeOuterRadius, thickness / 2. + 1*mm);
 
     hexagon->DefineSection(0, -thickness / 2., 0., TileSize);
     hexagon->DefineSection(1, thickness / 2., 0., TileSize);

@@ -102,12 +102,12 @@ void ARICHGeometryPar::read()
   _modZSize = gbxParams.getParamLength("Detector/Module/ModuleZSize");
   _winThick = gbxParams.getParamLength("Detector/Module/WindowThickness");
   _winRefInd = gbxParams.getParamNumValue("Detector/Module/WindowRefIndex");
-  _nPadX = gbxParams.getParamNumValue("Detector/Module/PadXNum");
+  _nPadX = int(gbxParams.getParamNumValue("Detector/Module/PadXNum"));
   _padSize = gbxParams.getParamLength("Detector/Module/PadSize");
   _chipGap = gbxParams.getParamLength("Detector/Module/ChipGap");
   _detInnerRadius = gbxParams.getParamLength("Detector/Plane/TubeInnerRadius");
   _detOuterRadius = gbxParams.getParamLength("Detector/Plane/TubeOuterRadius");
-  _nMirrors = gbxParams.getParamLength("Mirrors/nMirrors");
+  _nMirrors = int(gbxParams.getParamLength("Mirrors/nMirrors"));
   _mirrorZpos = gbxParams.getParamLength("Mirrors/Zposition");
   _mirrorLength = gbxParams.getParamLength("Mirrors/mirrorLength");
   _mirrorThickness =  gbxParams.getParamLength("Mirrors/mirrorThickness");
@@ -135,11 +135,11 @@ void ARICHGeometryPar::Print(void) const
 int ARICHGeometryPar::GetChannelID(TVector2 position)
 {
   int ChipID = GetChipID(position);
-  double Npad = _nPadX / 2.;
+  int Npad = int(_nPadX / 2);
   TVector2 chipPos = GetChipLocPos(ChipID);
   TVector2 locloc = position - chipPos;
-  int ix = locloc.X() / _padSize;
-  int iy = locloc.Y() / _padSize;
+  int ix = int(locloc.X() / _padSize);
+  int iy = int(locloc.Y() / _padSize);
   if (ix > Npad - 1 || iy > Npad - 1) return -1;
   int chID = ChipID * Npad * Npad + iy + ix * Npad;
   return chID;
@@ -155,7 +155,7 @@ void ARICHGeometryPar::modules_position()
   double dR = gbxParams.getParamLength((format("Rings/Ring[%1%]/dR") % (nRing)).str());
   double r = _detOuterRadius - _modXSize - dR;
   while (r > _detInnerRadius && iRing > 0) {
-    int nSeg = gbxParams.getParamNumValue((format("Rings/Ring[%1%]/nSegments") % (nRing)).str());
+    int nSeg = int(gbxParams.getParamNumValue((format("Rings/Ring[%1%]/nSegments") % (nRing)).str())) ;
     double dFi = gbxParams.getParamLength((format("Rings/Ring[%1%]/dFi") % (nRing)).str());
     _nrow += 1;
     double dR = gbxParams.getParamLength((format("Rings/Ring[%1%]/dR") % (nRing)).str());
@@ -265,7 +265,7 @@ TVector2 ARICHGeometryPar::GetChannelCenterLoc(int chID)
 
 void ARICHGeometryPar::PadPositions()
 {
-  int Npad = _nPadX / 2.;
+  int Npad = int(_nPadX / 2.);
   std::pair<int, int> ModChan;
   TVector2 xstart(_padSize / 2., _padSize / 2.);
   for (int chipID = 0; chipID < 4; chipID++) {

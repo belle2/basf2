@@ -20,9 +20,10 @@
 
 namespace Belle2 {
 
-  /* This is class for aRICH track.
-     This track class holds track parameters and track related routines needed by reconstruction. After reconstruction, values of likelihood function for different particle hypotheses associated with track are written.
-  */
+  /**
+   *  This is class for aRICH track.
+   *  This track class holds track parameters and track related routines needed by reconstruction. After reconstruction, values of likelihood function for different particle hypotheses associated with track are written.
+   */
 
   class ARICHTrack : public TObject {
   public:
@@ -59,16 +60,17 @@ namespace Belle2 {
     int  _PDGEncoding;                   /**< particle PDG id number */
     int  _G4TrackID;                     /**< track ID from geant4 simulation */
     int _Identity;                       /**< particle index (0 electron, 1 muon, 2 pion, 3 kaon, 4 proton, -1 else). */
-    int  _Tracked;
 
-    // converts PDG particle code to particle index
+    /**
+     *  converts PDG particle code to particle index
+     */
     int Lund2Type(int ipart);
 
     double  _lkh[MAXLKH];  /**< Value of likelihood function for different particle hypotheses. */
     double  _sfot[MAXLKH]; /**< Number of expected detected photons for different particle hypotheses.  */
     double  _acc[MAXLKH];  /**< Geometrical acceptance of expected cherenkov ring for different particle hypotheses. */
 
-    ClassDef(ARICHTrack, 1);
+    ClassDef(ARICHTrack, 1); /*!< the class title */
 
   public:
 
@@ -101,8 +103,6 @@ namespace Belle2 {
 
     //! return particle index (0 electron, 1 muon, 2 pion, 3 kaon, 4 proton, -1 else)
     int GetIdentity() const {return _Identity;};
-
-    int GetTracked() const {return _Tracked; };
 
     //! returns value of likelihood function for "i" particle hypothesis (here i is particle index: 0 electron, 1 muon, 2 pion, 3 kaon, 4 proton)
     double GetLikelihood(int i) const {return _lkh[i]; };

@@ -16,7 +16,7 @@
 
 namespace Belle2 {
 
-  /* This class holds the ARICH hit information after digitization (obtained from ARICHSimHit after ARICHDigi). Only module number, channel number and global time.
+  /** This class holds the ARICH hit information after digitization (obtained from ARICHSimHit after ARICHDigi). Only module number, channel number and global time.
   */
 
   class ARICHHit : public TObject {
@@ -58,7 +58,7 @@ namespace Belle2 {
     int m_channelID;          /*!< ID number of hit channel */
     double m_globalTime;      /*!< Global time of hit */
 
-    ClassDef(ARICHHit, 1);
+    ClassDef(ARICHHit, 1); /*!< the class title */
 
   };
 

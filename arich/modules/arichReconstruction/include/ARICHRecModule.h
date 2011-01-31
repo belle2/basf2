@@ -11,9 +11,9 @@
 #ifndef ARICHRECMODULE_H
 #define ARICHRECMODULE_H
 
-#include <arich/modules/arichReconstruction/ARICHReconstruction.h>
-
 #include <framework/core/Module.h>
+
+#include <arich/modules/arichReconstruction/ARICHReconstruction.h>
 
 #include <string>
 

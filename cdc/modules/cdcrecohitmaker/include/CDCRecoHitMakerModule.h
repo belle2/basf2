@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Andreas Moll                                             *
+ * Contributors: Martin Heck                                              *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -59,8 +59,10 @@ namespace Belle2 {
 
 
   private:
-
-
+    bool        m_mc;
+    std::string m_cdcHitCollectionName;
+    std::string m_simHitToCDCHitCollectionName;
+    std::string m_cdcRecoHitCollectionName;
   };
 }
 

@@ -20,12 +20,10 @@
 //base class headers
 #include <cdc/dataobjects/CDCHit.h>
 
+//genfit
 #include <genfit/GFRecoHitIfc.h>
 #include <genfit/GFWireHitPolicy.h>
 
-// other GenFit headers
-#include <genfit/RKTrackRep.h>
-#include <genfit/GFDetPlane.h>
 
 
 namespace Belle2 {
@@ -33,13 +31,16 @@ namespace Belle2 {
   /** This class is an enriched form of the CDCHit class.
    *
    *  It includes all information of CDCHit, plus it includes additional information
-   *  from geometry, calibration, GENFIT, etc.
+   *  from geometry, calibration, GENFIT, etc. <br>
+   *  I don't inherit from CDCHit, because inheriting twice from TObject through different routes
+   *  is potentially dangerous.
    *
    *  @author <a href="mailto:martin.heck@kit.edu?subject=DataStore">Martin Heck</a>
    *
    *  @todo So far this class is mostly a stumb...
    */
-  class CDCRecoHit : public GFRecoHitIfc<GFWireHitPolicy> {
+  class CDCRecoHit : public GFRecoHitIfc<GFWireHitPolicy>  {
+
   public:
 
     /** Default Constructor for ROOT IO.*/
@@ -49,7 +50,7 @@ namespace Belle2 {
      *
      *  @param cdcHit original CDCHit from the enriched hit will be constructed.
      */
-    CDCRecoHit(const CDCHit& cdcHit);
+    CDCRecoHit(const CDCHit& cdcHit, const float& resolution = 0.1);
 
     /** Destructor. */
     ~CDCRecoHit() {}
@@ -64,12 +65,46 @@ namespace Belle2 {
      *
      * This function overwrites a funtion that GFRecoHitIfc inherits from GFRecoHit.
      */
-    TMatrixD getHMatrix();
+    TMatrixD getHMatrix(const GFAbsTrackRep* stateVector);
 
 
   private:
 
+    /** A parameter for GENFIT.
+     */
     static const int m_nParHitRep = 7;
+
+    // Next two variables contain wire identification as used in cdc geometry.
+
+    /** The wire has this layer number.
+     */
+    unsigned short int m_layerId;
+    /** Within the layer, this is the wire ID.
+     */
+    unsigned short int m_wireId;
+
+    //Another useful layer identification for tracking.
+    /** Holds the SuperLayer.
+     *  A SuperLayer is defined by some consecutive layers, that are parallel.
+     */
+    unsigned short int m_superLayerId;
+    /** Number of Layer within a SuperLayer.
+    */
+    unsigned short int m_subLayerId;
+
+    /** Drift Time. As CDCHit for the moment holding the DRIFTLENGTH!
+     */
+    double m_driftTime;
+
+    /** Accumulated charge within one cell.
+    */
+    double m_charge;
+
+    /** HMatrix for RKTrackRepresentation.
+     */
+    TMatrixD m_hMatrix;
+
+    //NOTE: The endcap positions of the wire is stored in a variable inherited from GFRecoHitIfc<GFWireHitPolicy>.
 
     /** ROOT Macro.*/
     ClassDef(CDCRecoHit, 1);

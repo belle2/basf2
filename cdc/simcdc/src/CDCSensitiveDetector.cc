@@ -287,7 +287,9 @@ CDCSensitiveDetector::saveSimHit(const G4int layerId,
                                  const G4ThreeVector & posOut,
                                  const G4int lr)
 {
+  //change Later
   StoreArray<CDCSimHit> cdcArray("CDCSimHitArray");
+  m_hitNumber = cdcArray->GetLast() + 1;
   new(cdcArray->AddrAt(m_hitNumber)) CDCSimHit();
   cdcArray[m_hitNumber]->setLayerId(layerId);
   cdcArray[m_hitNumber]->setWireId(wireId);
@@ -308,6 +310,7 @@ CDCSensitiveDetector::saveSimHit(const G4int layerId,
   cdcArray[m_hitNumber]->setPosFlag(lr);
 
   m_hitNumber++;
+  B2DEBUG(150, "HitNumber: " << m_hitNumber);
 }
 
 /*

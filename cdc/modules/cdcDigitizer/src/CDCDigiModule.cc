@@ -63,9 +63,9 @@ CDCDigiModule::CDCDigiModule() : Module()
   addParam("ElectronicEffects",           m_electronicEffects, "Apply electronic effects?", 0);
   addParam("ElectronicsNoise",            m_elNoise, "Noise added by the electronics, set in ENC", 1000.0);
   //Relations
-  addParam("RelCollectionName_MCPartToSimHit", m_relColNameMCToSim,
+  addParam("MCPartToCDCSimHitCollectionName", m_relColNameMCToSim,
            "Name of relation collection - MCParticle to SimCDCHit (if nonzero, created)", string("MCPartToCDCSimHitCollection"));
-  addParam("RelCollectionName_SimHitToCDCHit", m_relColNameSimHitToHit,
+  addParam("SimHitToCDCHitCollectionName", m_relColNameSimHitToHit,
            "Name of relation collection - Hit CDC to MCParticle (if nonzero, created)", string("SimHitToCDCHitCollection"));
 }
 

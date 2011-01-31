@@ -64,7 +64,7 @@
 			</Elements>
 		</Mixture>
 		
-		<Mixture name="TOPBBQ">
+		<Mixture name="TOPQBB">
 			<Density unit="kg/m3">53</Density>
 			<Elements> 
 				<Element name="N" weight="0.7635"> 

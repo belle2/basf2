@@ -92,7 +92,7 @@ void TOPGeometryPar::read()
 
   _DetectorRotation = gbxParams.getParamLength("Rotation");
   _DetectorZShift = gbxParams.getParamLength("OffsetZ");
-  _NumberOfBars = gbxParams.getParamNumValue("Bars/Nbar");
+  _NumberOfBars = (int)gbxParams.getParamNumValue("Bars/Nbar");
   _DetectorInnerRadius = gbxParams.getParamLength("Bars/Radius");
   _QuartzWidth = gbxParams.getParamLength("Bars/QWidth");
   _QuartzThickness = gbxParams.getParamLength("Bars/QThickness");
@@ -105,8 +105,8 @@ void TOPGeometryPar::read()
   _GapPMTY = gbxParams.getParamLength("PMTs/Ygap");
   _GapPMTX0 = gbxParams.getParamLength("PMTs/x0");
   _GapPMTY0 = gbxParams.getParamLength("PMTs/y0");
-  _PMTNX = gbxParams.getParamNumValue("PMTs/nPMTx");
-  _PMTNY = gbxParams.getParamNumValue("PMTs/nPMTy");
+  _PMTNX = (int)gbxParams.getParamNumValue("PMTs/nPMTx");
+  _PMTNY = (int)gbxParams.getParamNumValue("PMTs/nPMTy");
   _PMTSizeX = gbxParams.getParamLength("PMTs/Module/ModuleXSize");
   _PMTSizeY = gbxParams.getParamLength("PMTs/Module/ModuleYSize");
   _PMTSizeZ = gbxParams.getParamLength("PMTs/Module/ModuleZSize");
@@ -114,8 +114,8 @@ void TOPGeometryPar::read()
   _ActiveSizeY = gbxParams.getParamLength("PMTs/Module/SensYSize");
   _ActiveSizeZ = gbxParams.getParamLength("PMTs/Module/SensThickness");
   _WindowThickness = gbxParams.getParamLength("PMTs/Module/WindowThickness");
-  _PadNX = gbxParams.getParamNumValue("PMTs/Module/PadXNum");
-  _PadNY = gbxParams.getParamNumValue("PMTs/Module/PadYNum");
+  _PadNX = (int)gbxParams.getParamNumValue("PMTs/Module/PadXNum");
+  _PadNY = (int)gbxParams.getParamNumValue("PMTs/Module/PadYNum");
   _BottomThickness = gbxParams.getParamLength("PMTs/Module/BottomThickness");
   _QBBThickness = gbxParams.getParamLength("Support/PannelThickness");
   _QBBSideThickness = gbxParams.getParamLength("Support/SidePannelThickness");

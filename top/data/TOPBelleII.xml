@@ -41,7 +41,7 @@
 				<SensXSize desc="Active surface x dimension" unit="mm">22</SensXSize>
 				<SensYSize desc="Active surface y dimension" unit="mm">22</SensYSize>
 				<SensThickness desc="Thickness of active surface" unit="mm">0.1</SensThickness>	
-				<sensMaterial desc="Active surface material">SiO2</sensMaterial>
+				<sensMaterial desc="Active surface material">TOPSiO2</sensMaterial>
 				
 				<winMaterial>TOPSiO2</winMaterial>
 				<WindowThickness desc="Thickness of window" unit="mm">3</WindowThickness> 

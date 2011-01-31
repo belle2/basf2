@@ -10,6 +10,8 @@
 
 #include <top/geotop/GeoTOPBelleII.h>
 #include <top/geotop/TOPGeometryPar.h>
+#include <top/simtop/TOPSensitiveDetector.h>
+#include <top/simtop/TOPSensitiveQuartz.h>
 
 #include <framework/gearbox/GearDir.h>
 #include <framework/gearbox/Unit.h>
@@ -48,8 +50,8 @@ GeoTOPBelleII regGeoTOPBelleII;
 GeoTOPBelleII::GeoTOPBelleII() : CreatorBase("TOPBelleII")
 {
   setDescription("Creates the TGeo objects for the TOP geometry of the Belle II detector.");
-//  addSensitiveDetector("SD_", new TOPSensitiveDetector("TOPSensitiveDetector"));
-//  addSensitiveDetector("SQ_", new TOPSensitiveQuartz("TOPSensitiveQuartz"));
+  addSensitiveDetector("SD_", new TOPSensitiveDetector("TOPSensitiveDetector"));
+  addSensitiveDetector("SQ_", new TOPSensitiveQuartz("TOPSensitiveQuartz"));
 }
 
 
@@ -138,7 +140,7 @@ void GeoTOPBelleII::create(GearDir& content)
 
   TGeoVolume *quartzBox = new TGeoVolume("quartzBox", box, barMedium); //Apply medium to quarz box
 
-  quartzBox->SetTransparency(80.0); //Corlour seting for visual representation no effect on simulation
+  quartzBox->SetTransparency(80); //Corlour seting for visual representation no effect on simulation
   quartzBox->SetLineColor(38); //Corlour seting for visual representation no effect on simulation
 
   //----------------------------------------
@@ -206,7 +208,7 @@ void GeoTOPBelleII::create(GearDir& content)
 
   TGeoVolume *support = new TGeoVolume("QBBSupport", QBBShell, supportMedium); //Apply medium QBB shell
 
-  support->SetTransparency(20.0); //Corlour seting for visual representation no effect on simulation
+  support->SetTransparency(20); //Corlour seting for visual representation no effect on simulation
   support->SetLineColor(17); //Corlour seting for visual representation no effect on simulation
 
   //----------------------------------------

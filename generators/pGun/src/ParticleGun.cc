@@ -25,6 +25,32 @@ using namespace Generators;
 bool ParticleGun::generateEvent(MCParticleGraph &graph)
 {
   int first = graph.size();
+
+  //generate the event vertex (the same for all particles in event)
+  double vx = 0;
+  double vy = 0;
+  double vz = 0;
+
+  switch (m_genVert) {
+    case gauss:
+      vx = m_grand.Gaus(m_x_par1, m_x_par2);
+      vy = m_grand.Gaus(m_y_par1, m_y_par2);
+      vz = m_grand.Gaus(m_z_par1, m_z_par2);
+      break;
+    case uniform:
+    default:
+      vx = m_grand.Uniform(m_x_par1, m_x_par2);
+      vy = m_grand.Uniform(m_y_par1, m_y_par2);
+      vz = m_grand.Uniform(m_z_par1, m_z_par2);
+      break;
+    case none:
+      vx = m_x_par1;
+      vy = m_y_par1;
+      vz = m_z_par1;
+      break;
+  }
+
+
   //Make list of particles
   for (int i = 0; i < m_ntracks; i++) {
     graph.addParticle();
@@ -83,29 +109,6 @@ bool ParticleGun::generateEvent(MCParticleGraph &graph)
     double e = sqrt(ptot * ptot + m * m);
     p.setEnergy(e);
 
-    //now the vertex:
-    double vx = 0;
-    double vy = 0;
-    double vz = 0;
-
-    switch (m_genVert) {
-      case gauss:
-        vx = m_grand.Gaus(m_x_par1, m_x_par2);
-        vy = m_grand.Gaus(m_y_par1, m_y_par2);
-        vz = m_grand.Gaus(m_z_par1, m_z_par2);
-        break;
-      case uniform:
-      default:
-        vx = m_grand.Uniform(m_x_par1, m_x_par2);
-        vy = m_grand.Uniform(m_y_par1, m_y_par2);
-        vz = m_grand.Uniform(m_z_par1, m_z_par2);
-        break;
-      case none:
-        vx = m_x_par1;
-        vy = m_y_par1;
-        vz = m_z_par1;
-        break;
-    }
     p.setProductionVertex(vx, vy, vz);
   }// end loop over particles in event
 

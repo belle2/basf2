@@ -44,7 +44,7 @@ PGunInputModule::PGunInputModule() : Module()
   //Parameter definition
   addParam("ntracks", m_ntracks, "The number of tracks to be generated per event", 1);
   addParam("p_par1", m_p_par1, "The first parameter for momentum distribution function", 0.2);
-  addParam("p_par2", m_p_par2, "The second parameter for momentum distribution function", 10.0);
+  addParam("p_par2", m_p_par2, "The second parameter for momentum distribution function", 1.0);
   addParam("ph_par1", m_ph_par1, "The first parameter for the phi distribution function", 0.0);
   addParam("ph_par2", m_ph_par2, "The second parameter for the phi distribution function", 360.0);
   addParam("th_par1", m_th_par1, "The first parameter for theta distribution function", 17.0);
@@ -65,7 +65,10 @@ PGunInputModule::PGunInputModule() : Module()
 
 void PGunInputModule::initialize()
 {
-  m_pgun.m_ntracks = m_ntracks;
+  if (m_ntracks > 0)
+    m_pgun.m_ntracks = m_ntracks;
+  else
+    B2ERROR("Number of tracks to be generated should be larger than 0!");
   m_pgun.m_p_par1 = m_p_par1;
   m_pgun.m_p_par2 = m_p_par2;
   m_pgun.m_th_par1 = m_th_par1;
@@ -88,13 +91,22 @@ void PGunInputModule::initialize()
 
   if (m_genMom<2 && m_genMom> -1)
     m_pgun.m_genMom = static_cast<PGUNgenOpt>(m_genMom);
-  else m_genMom = 0;
+  else {
+    m_genMom = 0;
+    B2ERROR("Invalide option for random generation of momenta in particle gun!");
+  }
   if (m_genVert<2 && m_genVert> -1)
     m_pgun.m_genVert = static_cast <PGUNgenOpt>(m_genVert);
-  else m_genVert = 2;
+  else {
+    m_genVert = 2;
+    B2ERROR("Invalid option for random generation of vertices in particle gun!");
+  }
   if (m_genAngle<2 && m_genAngle> -1)
     m_pgun.m_genAngle = static_cast <PGUNgenOpt>(m_genAngle);
-  else m_genMom = 0;
+  else {
+    m_genMom = 0;
+    B2ERROR("Invalid option for random generation of angles in particle gun!");
+  }
 
 }
 

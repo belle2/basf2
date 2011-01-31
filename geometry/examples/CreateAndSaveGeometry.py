@@ -15,6 +15,16 @@
 import os
 from basf2 import *
 
+# EvtMetaGen - generate event meta data
+evtmetagen = register_module('EvtMetaGen')
+evtruninfo = {
+    'ExpList': [0],
+    'RunList': [0],
+    'EvtStartList': [0],
+    'EvtEndList': [0],
+    }
+evtmetagen.param(evtruninfo)
+
 # Geometry parameter loader
 paramloader = register_module('ParamLoaderXML')
 paramloader.param('InputFileXML', os.path.join(basf2datadir,
@@ -35,10 +45,11 @@ geosaver.param('Filename', 'Belle2Geo.root')
 main = create_path()
 
 # Add modules to main path
+main.add_module(evtmetagen)
 main.add_module(paramloader)
 main.add_module(geobuilder)
 main.add_module(overlapchecker)
 main.add_module(geosaver)
 
 # Process one event
-process(main, 1, 1)
+process(main)

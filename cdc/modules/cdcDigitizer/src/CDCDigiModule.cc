@@ -147,7 +147,7 @@ void CDCDigiModule::event()
         // ... smallest drift time has to be checked, ...
         if (hitDriftLength < iterCDCMap->second->getDriftLength()) {
           iterCDCMap->second->setDriftLength(hitDriftLength);
-          B2DEBUG(150, "hitDriftLength: " << hitDriftLength);
+          B2DEBUG(250, "hitDriftLength: " << hitDriftLength);
         }
 
         // ... total charge has to be updated.
@@ -180,7 +180,7 @@ void CDCDigiModule::event()
     double hitNewDriftLength =  smearDriftLength(iterCDCMap->second->getDriftLength(),
                                                  m_fraction, m_mean1, m_resolution1, m_mean2, m_resolution2);
     iterCDCMap->second->setDriftLength(hitNewDriftLength);
-    B2DEBUG(150, "NewHitDriftLength " << iterCDCMap->second->getDriftLength());
+    B2DEBUG(250, "NewHitDriftLength " << iterCDCMap->second->getDriftLength());
 
     // Save digits into data store
     // Next lines are the storage for HitCDC connected to trasan, which will eventually become obsolete.
@@ -205,8 +205,12 @@ void CDCDigiModule::event()
                                              iSuperLayer, iLayer, iterCDCMap->second->getWireId());
 
     // Creation of Relation between SimHit, that has smalles drift length in each cell and the CDCHit.
-    B2DEBUG(150, "First: " << (iterCDCMap->first));
-    new(cdcSimRelation->AddrAt(iDigits)) Relation(cdcArray, cdcHitArray, iDigits, iterCDCMap->first);
+    B2DEBUG(150, "First: " << (iterCDCMap->first) << "iDigits" << iDigits);
+    new(cdcSimRelation->AddrAt(iDigits)) Relation(cdcArray, cdcHitArray, iterCDCMap->first, iDigits);
+    B2DEBUG(150, "START");
+    B2DEBUG(150, "SimHitDriftLength: " << cdcArray[iterCDCMap->first]->getDriftLength());
+    B2DEBUG(150, "CDCHitDriftLength: " << cdcHitArray[iDigits]->getDriftTime());
+    B2DEBUG(159, "END");
 
     // Count number of digits
     iDigits++;

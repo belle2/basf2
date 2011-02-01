@@ -24,44 +24,38 @@ namespace Belle2 {
 
   public:
 
-    /**
-     * Constructor of the module.
-     *
-     * Sets the description of the module.
+    /** Constructor.
      */
     CDCRecoHitMakerModule();
 
-    /** Destructor of the module. */
+    /** Destructor.
+     */
     ~CDCRecoHitMakerModule();
 
-    void initialize();
-
-    /**
-     * Prints a header for each new run.
-     *
-     * A header is printed which provides the information that a new
-     * run was started and which run number we are currently running on.
+    /** Creating the actual RecoHits.
      */
-    void beginRun();
-
-    /** Prints the full information about the event, run and experiment number. */
     void event();
-
-    /**
-     * Prints a footer for each run which ended.
-     *
-     * A footer is printed which provides the information that a run
-     * was ended and which run number we were running on.
-     */
-    void endRun();
-
-    void terminate();
 
 
   private:
+    /** Availability of relations.
+     *
+     *  Usually will be there in case of MonteCarlo.
+     */
     bool        m_mc;
+
+    /** Name of collection of CDCHits.
+     */
     std::string m_cdcHitCollectionName;
+
+    /** Name of collection of relations between SimHits and Hits.
+     *
+     *  This variable can only exist in MonteCarlo.
+     */
     std::string m_simHitToCDCHitCollectionName;
+
+    /** Name of output collection of this modul.
+     */
     std::string m_cdcRecoHitCollectionName;
   };
 }

@@ -66,13 +66,6 @@ CDCRecoHit::CDCRecoHit(const CDCHit& cdcHit, const float& resolution)
   m_driftTime = cdcHit.getDriftTime();
   m_charge    = cdcHit.getCharge();
 
-  m_hMatrix = TMatrixD(1, 5);
-
-  m_hMatrix[0][0] = 0.;
-  m_hMatrix[0][1] = 0.;
-  m_hMatrix[0][2] = 0.;
-  m_hMatrix[0][3] = 1.;
-  m_hMatrix[0][4] = 0.;
 }
 
 GFAbsRecoHit* CDCRecoHit::clone()
@@ -82,6 +75,13 @@ GFAbsRecoHit* CDCRecoHit::clone()
 
 TMatrixD CDCRecoHit::getHMatrix(const GFAbsTrackRep* stateVector)
 {
+  TMatrixD m_hMatrix(1, 5);
+  m_hMatrix[0][0] = 0.;
+  m_hMatrix[0][1] = 0.;
+  m_hMatrix[0][2] = 0.;
+  m_hMatrix[0][3] = 1.;
+  m_hMatrix[0][4] = 0.;
+
   //don't check for specific Track Representation at the moment, as RKTrackRep is the only one we are currently using.
   return (m_hMatrix);
 }

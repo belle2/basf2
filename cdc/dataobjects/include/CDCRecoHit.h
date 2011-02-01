@@ -35,7 +35,7 @@ namespace Belle2 {
    *  I don't inherit from CDCHit, because inheriting twice from TObject through different routes
    *  is potentially dangerous.
    *
-   *  @author <a href="mailto:martin.heck@kit.edu?subject=DataStore">Martin Heck</a>
+   *  @author <a href="mailto:martin.heck@kit.edu?subject=CDCRecoHit">Martin Heck</a>
    *
    *  @todo So far this class is mostly a stumb...
    */
@@ -100,9 +100,6 @@ namespace Belle2 {
     */
     double m_charge;
 
-    /** HMatrix for RKTrackRepresentation.
-     */
-    TMatrixD m_hMatrix;
 
     //NOTE: The endcap positions of the wire is stored in a variable inherited from GFRecoHitIfc<GFWireHitPolicy>.
 

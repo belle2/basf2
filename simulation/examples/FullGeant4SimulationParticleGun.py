@@ -27,22 +27,14 @@ set_log_level(3)
 
 # EvtMetaGen - generate event meta data
 evtmetagen = register_module('EvtMetaGen')
-evtruninfo = {
-    'ExpList': [1],
-    'RunList': [1],
-    'EvtStartList': [1],
-    'EvtEndList': [100],
-    }
-evtmetagen.param(evtruninfo)
+evtmetagen.param('EvtNumList', [100])
 
 # Particle gun
 particlegun = register_module('PGunInput')
-intseed = random.randint(1, 10000000)
 particlegun.param('ntracks', 10)
 particlegun.param('PIDcodes', [11, -11])
 particlegun.param('p_par1', 0.05)
 particlegun.param('p_par2', 3)
-particlegun.param('Rseed', intseed)
 
 # Geometry parameter loader
 paramloader = register_module('ParamLoaderXML')
@@ -70,5 +62,5 @@ main.add_module(geobuilder)
 main.add_module(g4sim)
 main.add_module(simpleoutput)
 
-# Process 100 events with run number 1
+# Process 100 events
 process(main)

@@ -121,6 +121,17 @@ void CreatorBase::addSensitiveDetector(const std::string prefix, SensitiveDetect
 }
 
 
+list<SensitiveDetectorBase*> CreatorBase::getSensitiveDetectorList()
+{
+  list<SensitiveDetectorBase*> result;
+  for (map<string, SensitiveDetectorBase*>::iterator mapIter = m_sensitiveDetMap.begin();
+       mapIter != m_sensitiveDetMap.end(); mapIter++) {
+    result.push_back(mapIter->second);
+  }
+  return result;
+}
+
+
 //====================================================================
 //                          Private methods
 //====================================================================

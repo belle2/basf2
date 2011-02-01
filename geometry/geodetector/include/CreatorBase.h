@@ -21,6 +21,7 @@
 #include <TG4RootDetectorConstruction.h>
 
 #include <string>
+#include <list>
 #include <map>
 
 
@@ -104,6 +105,13 @@ namespace Belle2 {
      * @return The group name of the subdetector in the TGeo hierarchy.
      */
     const std::string& getGeoGroupName() const {return m_geoGroupName; };
+
+    /**
+     * Returns a list with pointers to the registered sensitive detectors.
+     *
+     * @return List if pointers to the registered sensitive detectors.
+     */
+    std::list<Simulation::SensitiveDetectorBase*> getSensitiveDetectorList();
 
 
   protected:

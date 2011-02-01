@@ -37,7 +37,7 @@ namespace Belle2 {
     ~PXDSensitiveDetector();
 
     //! Process each step and calculate variables defined in PXDB4VHit
-    G4bool ProcessHits(G4Step* aStep, G4TouchableHistory*);
+    G4bool ProcessHits(G4Step* step, G4TouchableHistory*);
 
     //! Do what you want to do at the end of each event
     void EndOfEvent(G4HCofThisEvent *eventHC);

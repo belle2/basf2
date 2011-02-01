@@ -15,6 +15,9 @@
 #include <TObject.h>
 #include <TVector3.h>
 
+#define DEFAULT_PXDSIMHITS "PXDSimHits"
+#define DEFAULT_PXDSIMHITSREL "PXDSimHitMCParRel"
+
 namespace Belle2 {
 
   /**

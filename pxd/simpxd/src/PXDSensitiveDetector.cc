@@ -12,6 +12,7 @@
 #include <framework/logging/Logger.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
+#include <framework/dataobjects/Relation.h>
 
 #include <TVector3.h>
 
@@ -27,10 +28,11 @@ using namespace Simulation;
 
 const G4double c_Epsilon = 1.0e-8;
 
-
 PXDSensitiveDetector::PXDSensitiveDetector(G4String name) : SensitiveDetectorBase(name)
 {
-
+  //Tell the framework that this sensitive detector creates
+  //a relation Hits->MCParticle
+  addRelationCollection(DEFAULT_PXDSIMHITSREL);
 }
 
 
@@ -40,22 +42,22 @@ PXDSensitiveDetector::~PXDSensitiveDetector()
 }
 
 
-G4bool PXDSensitiveDetector::ProcessHits(G4Step* aStep, G4TouchableHistory*)
+G4bool PXDSensitiveDetector::ProcessHits(G4Step* step, G4TouchableHistory*)
 {
   //-------------------------------------------------------
   //               Some basic checks
   //-------------------------------------------------------
 
   //Get deposited energy (make sure energy was deposited in the sensitive volume)
-  const G4double depEnergy = aStep->GetTotalEnergyDeposit();
+  const G4double depEnergy = step->GetTotalEnergyDeposit();
   if (fabs(depEnergy) < c_Epsilon) return false;
 
   // Get step length (make sure step length is not zero)
-  const G4double stepLength = aStep->GetStepLength();
+  const G4double stepLength = step->GetStepLength();
   if (fabs(stepLength) < c_Epsilon) return false;
 
   //Get particle charge (only charged tracks produce a signal)
-  const G4Track& track  = *aStep->GetTrack();
+  const G4Track& track  = *step->GetTrack();
   const G4double charge = track.GetDefinition()->GetPDGCharge();
   if (fabs(charge) < c_Epsilon) return false;
 
@@ -71,8 +73,8 @@ G4bool PXDSensitiveDetector::ProcessHits(G4Step* aStep, G4TouchableHistory*)
   //-------------------------------------------------------
 
   // Get step information
-  const G4StepPoint& preStep      = *aStep->GetPreStepPoint();
-  const G4StepPoint& posStep      = *aStep->GetPostStepPoint();
+  const G4StepPoint& preStep      = *step->GetPreStepPoint();
+  const G4StepPoint& posStep      = *step->GetPostStepPoint();
 
   //Get additional information
   const G4int partPDG             = track.GetDefinition()->GetPDGEncoding();
@@ -103,22 +105,30 @@ G4bool PXDSensitiveDetector::ProcessHits(G4Step* aStep, G4TouchableHistory*)
   int ladderID = TString(vname(vname.Index("Ladder_") + 7)).Atoi();
   int sensorID = TString(vname(vname.Index("Sensor_") + 7)).Atoi();
 
-  StoreArray<PXDSimHit> pxdArray("PXDSimHitArray");
+  StoreArray<PXDSimHit> pxdArray(DEFAULT_PXDSIMHITS);
 
   //Create new PXDSim hit. Convert Geant4 units into basf2 units.
   TVector3 posIn(preStepPosLocal.x() / cm, preStepPosLocal.y() / cm, preStepPosLocal.z() / cm);
   TVector3 posOut(posStepPosLocal.x() / cm, posStepPosLocal.y() / cm, posStepPosLocal.z() / cm);
   TVector3 momInVec(momIn.x() / GeV, momIn.y() / GeV, momIn.z() / GeV);
 
-  new(pxdArray->AddrAt(pxdArray->GetLast() + 1)) PXDSimHit(layerID, ladderID, sensorID,
-                                                           posIn, posOut, theta / radian,
-                                                           momInVec, partPDG, trackID,
-                                                           depEnergy / GeV,
-                                                           stepLength / cm,
-                                                           globalTime / ns);
+  int hitIndex = pxdArray->GetLast() + 1;
+  new(pxdArray->AddrAt(hitIndex)) PXDSimHit(layerID, ladderID, sensorID,
+                                            posIn, posOut, theta / radian,
+                                            momInVec, partPDG, trackID,
+                                            depEnergy / GeV,
+                                            stepLength / cm,
+                                            globalTime / ns);
 
   //Set the SeenInDetector flag
-  setSeenInDetectorFlag(aStep, MCParticle::SeenInPXD);
+  setSeenInDetectorFlag(step, MCParticle::SeenInPXD);
+
+  //Add relation between the created hit and the MCParticle that caused it.
+  //The index of the MCParticle has to be set to the TrackID and will be
+  //replaced later by the correct MCParticle index automatically.
+  StoreArray<Relation> mcPartRelation(getRelationCollectionName());
+  StoreArray<MCParticle> mcPartArray(DEFAULT_MCPARTICLES);
+  new(mcPartRelation->AddrAt(hitIndex)) Relation(pxdArray, mcPartArray, hitIndex, trackID);
 
   return true;
 }

@@ -21,7 +21,7 @@ using namespace Belle2::Simulation;
 
 SensitiveDetectorBase::SensitiveDetectorBase(G4String name) : G4VSensitiveDetector(name)
 {
-
+  m_hitMCParticleColName = "";
 }
 
 
@@ -31,10 +31,10 @@ SensitiveDetectorBase::~SensitiveDetectorBase()
 }
 
 
-/*bool SensitiveDetectorBase::addRelation(TObject* hit, G4Step* step)
+void SensitiveDetectorBase::addRelationCollection(const std::string& hitMCParticleColName)
 {
-  return RunManager::Instance().addRelation(hit, step);
-}*/
+  m_hitMCParticleColName = hitMCParticleColName;
+}
 
 
 void SensitiveDetectorBase::setSeenInDetectorFlag(G4Step* step, MCParticle::StatusBit subdetectorBit)

@@ -13,6 +13,8 @@
 
 #include <generators/dataobjects/MCParticleGraph.h>
 
+#include <boost/unordered_map.hpp>
+
 #include <G4UserEventAction.hh>
 #include <G4Event.hh>
 
@@ -27,6 +29,8 @@ namespace Belle2 {
     class EventAction : public G4UserEventAction {
 
     public:
+
+      typedef boost::unordered_map<int, int> TrackIDMCPIndexMap;
 
       /**
        * Constructor.

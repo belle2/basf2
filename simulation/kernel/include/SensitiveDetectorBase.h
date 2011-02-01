@@ -15,8 +15,9 @@
 
 #include <G4VSensitiveDetector.hh>
 #include <G4Step.hh>
-
 #include <TObject.h>
+
+#include <string>
 
 
 namespace Belle2 {
@@ -43,16 +44,18 @@ namespace Belle2 {
       virtual ~SensitiveDetectorBase();
 
       /**
-       * Adds a new relation between the MCParticle and the hit.
-       * Takes as an input a step, which represents the track the hit was created from.
-       * Later the track is replaced by the MCParticle which created the track and stored
-       * as a relation in the DataStore.
+       * Adds a new relation collection for the relation Hit->MCParticle.
        *
-       * @param hit Pointer to the hit which was created by the track.
-       * @param step The step representing the track which created the hit.
-       * @return True if the relation could be added.
+       * @param hitMCParticleColName The name of the collection storing the relations of hits to MCParticles.
        */
-      //bool addRelation(TObject* hit, G4Step* step);
+      void addRelationCollection(const std::string& hitMCParticleColName);
+
+      /**
+       * Returns the name of the collection storing the relations between hits and MCParticles.
+       *
+       * @return The name of the collection storing the relations between hits and MCParticles.
+       */
+      std::string getRelationCollectionName() { return m_hitMCParticleColName; };
 
       /**
        * Sets the SeenInDetector flag for the MCParticle which created the step.
@@ -66,6 +69,7 @@ namespace Belle2 {
 
     protected:
 
+      std::string m_hitMCParticleColName; /**< The name of the collection storing the relations of hits to MCParticles.*/
     };
 
   }  // end namespace Simulation

@@ -8,7 +8,7 @@
 #
 # EvtMetaGen and EvtMetaInfo generates and shows event meta data (see example in the framework package).
 # ParamLoaderXML and GeoBuilder are used to create the Belle2 detector geometry.
-# The generator used in this example is geant4 particle gun (PGunInput) (see example in the simulation package how to set a random seed).
+# The generator used in this example is geant4 particle gun (PGunInput) (see example in the simulation or generator package how to set a random seed).
 # FullSim performs the full simulation and PrintMCParticles shows MCParticles information.
 # CDCDigi creates Hits in the CDC from simulated Hits.
 # CDCTracking performs pattern recognition in the CDC (the digitized Hits are collected to create Track Candidates).
@@ -40,17 +40,13 @@ cdctracking = register_module('CDCTracking')
 
 # Set parameters
 
-param_evtmetagen = {
-    'ExpList': [1],
-    'RunList': [1],
-    'EvtStartList': [0],
-    'EvtEndList': [0],
-    }
-evtmetagen.param(param_evtmetagen)
+# one event
+evtmetagen.param('EvtNumList', [1])
 
 paramloader.param('InputFileXML', os.path.join(basf2datadir,
                   'simulation/Belle2.xml'))
 
+# 3 particles with uniform momentum distribution between 0.9 an 1.1 GeV
 param_pGun = {'ntracks': 3, 'p_par1': 0.9, 'p_par2': 1.1}
 
 pGun.param(param_pGun)

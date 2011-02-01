@@ -12,7 +12,8 @@
 	  
 	  <ContainerZfront desc="Starting z position of aRICH container" unit="mm">1668</ContainerZfront>
 	  <ContainerZback desc="Ending z position of aRICH container" unit="mm">1900</ContainerZback>
-	  <ContainerRadius desc="Radius of aRICH container" unit="mm">1140</ContainerRadius> 
+	  <ContainerOuterRadius desc="Radius of aRICH container" unit="mm">1140</ContainerOuterRadius> 
+	  <ContainerInnerRadius desc="Radius of aRICH container" unit="mm">440</ContainerInnerRadius> 
 	  <ContainerMaterial desc="Air with refractive index">ARICH_Air</ContainerMaterial>
 
 	  <Aerogel>

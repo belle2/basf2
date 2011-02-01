@@ -82,12 +82,13 @@ void GeoARICHBelleII::create(GearDir& content)
   double zFront = content.getParamLength("ContainerZfront");
   double zBack = content.getParamLength("ContainerZback");
   double zCenter = (zFront + zBack) / 2. * mm ;
-  double contRadius = content.getParamLength("ContainerRadius");
+  double contOutRadius = content.getParamLength("ContainerOuterRadius");
+  double contInRadius = content.getParamLength("ContainerInnerRadius");
   string contMat = content.getParamString("ContainerMaterial");
 
   // create aRICH container tube
   TGeoMedium* contMed = gGeoManager->GetMedium(contMat.c_str());
-  TGeoTube* contTubeSh = new TGeoTube("contTubeSh", 0.0, contRadius, (zBack - zFront) / 2.);
+  TGeoTube* contTubeSh = new TGeoTube("contTubeSh", contInRadius, contOutRadius, (zBack - zFront) / 2.);
   TGeoVolume* contTube = new TGeoVolume("contTube", contTubeSh, contMed);
   volGrpARICH->AddNode(contTube, 1, new TGeoTranslation(0.0, 0.0, zCenter));
 

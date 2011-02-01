@@ -73,8 +73,8 @@ void GeoEKLMBelleII::create(GearDir& content)
 
   TGeoMedium* medPlastic = gGeoManager->GetMedium("Polystyrene");
 
-  TGeoMaterial *matFe = new TGeoMaterial("Fe", 55.845, 26, 7.87);
-  TGeoMedium *medFe = new TGeoMedium("Iron", 1, matFe);
+  //  TGeoMaterial *matFe = new TGeoMaterial("Fe", 55.845, 26, 7.87);
+  //  TGeoMedium *medFe = new TGeoMedium("Iron", 1, matFe);
 
 
   //----------------------------------------
@@ -84,8 +84,8 @@ void GeoEKLMBelleII::create(GearDir& content)
   int nEndcap = 2 ;
   GearDir EndCap(content);
   content.append("EndCap/");
-  double  Endcap_InnerR    = content.getParamLength("InnerR");
-  double  Endcap_OuterR    = content.getParamLength("OuterR");
+  //  double  Endcap_InnerR    = content.getParamLength("InnerR");
+  //  double  Endcap_OuterR    = content.getParamLength("OuterR");
   double  Endcap_length    = content.getParamLength("Length");
   double  Endcap_positionX    = content.getParamLength("PositionX");
   double  Endcap_positionY    = content.getParamLength("PositionY");
@@ -100,8 +100,8 @@ void GeoEKLMBelleII::create(GearDir& content)
   double  Layer_InnerR    = content.getParamLength("InnerR");
   double  Layer_OuterR    = content.getParamLength("OuterR");
   double  Layer_length    = content.getParamLength("Length");
-  double  Layer_positionX    = content.getParamLength("PositionX");
-  double  Layer_positionY    = content.getParamLength("PositionY");
+//   double  Layer_positionX    = content.getParamLength("PositionX");
+//   double  Layer_positionY    = content.getParamLength("PositionY");
   double  Layer_shiftZ       = content.getParamLength("ShiftZ");
 
   //----------------------
@@ -175,8 +175,8 @@ void GeoEKLMBelleII::create(GearDir& content)
                                                       EndcapMgr.rmin(iSet), EndcapMgr.rmax(iSet));
     }
 
-    TGeoVolume* strsubtube = gGeoManager->MakeTube("subtube", strMed4EKLM,
-                                                   EndcapMgr.rminsub(), EndcapMgr.rmaxsub(), EndcapMgr.zsub());
+//     TGeoVolume* strsubtube = gGeoManager->MakeTube("subtube", strMed4EKLM,
+//                                                    EndcapMgr.rminsub(), EndcapMgr.rmaxsub(), EndcapMgr.zsub());
     TGeoCompositeShape* EndcapVessel = new TGeoCompositeShape("EKLMVessel", "TempOct-subtube");
 
     /*

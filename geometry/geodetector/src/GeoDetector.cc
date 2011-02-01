@@ -121,9 +121,7 @@ const list<string>& GeoDetector::getCalledCreators() const
 bool GeoDetector::hasVolumeUserInfo(TGeoVolume* geoVolume) const
 {
   if (geoVolume == NULL) return false;
-
-  GeoVolumeUserInfoMap::const_iterator mapIter = m_geoVolumeUserInfo.find(geoVolume);
-  return (mapIter != m_geoVolumeUserInfo.end());
+  return (m_geoVolumeUserInfo.find(geoVolume) != m_geoVolumeUserInfo.end());
 }
 
 

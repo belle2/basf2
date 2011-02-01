@@ -62,13 +62,12 @@ namespace Belle2 {
 
   private:
 
-    int m_evtNumber; /**< The current event number. */
+    unsigned long m_evtNumber; /**< The current event number. */
     int m_colIndex;  /**< The current index for the exp and run lists. */
 
     std::vector<int> m_expList;      /**< The list (column) of experiments. */
     std::vector<int> m_runList;      /**< The list (column) of runs. */
-    std::vector<int> m_evtStartList; /**< The list (column) of event numbers to start with. */
-    std::vector<int> m_evtEndList;   /**< The list (column) of event numbers to end with. */
+    std::vector<int> m_evtNumList;   /**< The list (column) of the number of events which should be processed. */
   };
 }
 

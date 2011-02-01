@@ -22,8 +22,12 @@
 
 namespace Belle2 {
 
-  /** Use the constructor to create a connection between two objects, that are stored in the DataStore.
+  /** This storable class holds information about the relation of stored information.
    *
+   *  You may use this class for 1:1 relations or for 1:many relations.
+   *  Many:many relations usually don't make sense.
+   *  The structure is in such way, that the 'from' side always points only to a single entity,
+   *  while the 'to' side may point to various entities stored within one collection.
    *  @author <a href=mailto:"martin.heck@kit.edu?subject=RelationT">Martin Heck</a>
    */
   template <class T>
@@ -74,65 +78,72 @@ namespace Belle2 {
               const int& fromIndex, std::list<std::pair<int, float> > toIndices);
 
 
+    /** Getter for StoreAccessor Information of 'from' side.
+     */
+    std::pair<std::string, Belle2::DataStore::EDurability> getFromAccessorInfo() {
+      return (std::make_pair(m_fromName, m_fromDurability));
+    }
+
+    /** Getter for StoreAccessor Information of 'to' side.
+     */
+    std::pair<std::string, Belle2::DataStore::EDurability> getToAccessorInfo() {
+      return (std::make_pair(m_toName, m_toDurability));
+    }
+
+    /** Getter for 'from' side index.
+     */
+    T getFromIndex() {
+      return(m_index);
+    }
+
+    /** Getter for 'to' side index.
+     *
+     *  The 'to' side can contain more than one index.
+     *  This function simply returns the first one.
+     */
+    T getToIndex() {
+      return (*(m_indices.begin()));
+    }
+
+    /** Getter for 'to' side index.
+     *
+     *  Returning the complete list of indices.
+     */
+    std::list<T> getToIndices() {
+      return (m_indices);
+    }
+
+    /** Setter for the 'from' side index.
+     */
+    void setFromIndex(const int& fromIndex) {
+      m_index = static_cast<T>(fromIndex);
+    }
+
+    /** Setter for the 'to' side index.
+     *
+     *  This setter replaces all the indices with just a single number.
+     */
+    void setToIndex(const int& toIndex) {
+      m_indices.clear();
+      m_indices.push_back(static_cast<T>(toIndex));
+    }
+
+    /** Setter for name of 'from' side StoreAccessor.
+     */
+    void setFromName(const std::string& fromName) {
+      m_fromName = fromName;
+    }
+
+    /** Setter for name of 'from' side StoreAccessor.
+     */
+    void setToName(const std::string& toName) {
+      m_toName = toName;
+    }
+
     /** Destructor. */
     ~RelationT() {}
 
-    /** Setter for from.
-     *
-     * @param from Object for "from" end of relation.
-     */
-    /*    void setFrom(TObject* from) {
-          m_from = from;
-        }
-    */
-    /** Setter for to.
-     *
-     * @param to Object for "to" end of the relation.
-     */
-    /*    void setTo(TObject* to) {
-          m_to = to;
-        }*/
-
-    /** Getter for from.
-     *
-     * @return Object of "from" end of the relation.
-     */
-    /*    TObject* getFrom() {
-          return m_from.GetObject();
-        }*/
-
-    /** Getter for to.
-     *
-     *  @return Object of "to" end of the relation.
-     */
-    /*    TObject* getTo() {
-          return m_to.GetObject();
-        }*/
-
-    /** Setter for weight.
-     *
-     * @param weight value for the weight of the relation.
-     */
-    /*    void setWeight(const float& weight) {
-          m_weight = weight;
-        }*/
-
-    /** Getter for weight.
-     *
-     * @return Weight of relation.
-     */
-    /*    float getWeight() {
-          return m_weight;
-        }*/
-
-
   private:
-    /** First end of RelationT. */
-//    TObject* m_from;
-
-    /** Second end of RelationT. */
-//    TObject** m_to;
-
     /** Collection Name of "from" end of Relation.
      */
     std::string m_fromName;

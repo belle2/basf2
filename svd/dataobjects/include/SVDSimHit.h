@@ -15,6 +15,9 @@
 #include <TObject.h>
 #include <TVector3.h>
 
+#define DEFAULT_SVDSIMHITS "SVDSimHits"
+#define DEFAULT_SVDSIMHITSREL "SVDSimHitMCParRel"
+
 namespace Belle2 {
 
   /**

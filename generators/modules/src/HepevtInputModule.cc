@@ -71,6 +71,8 @@ void HepevtInputModule::event()
       if (m_inputMode != c_EvtNumFile) B2FATAL("The event number is taken from the HepEvt file, but was taken from an external source previously !")
 
         StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
+      eventMetaDataPtr->setExperiment(0);
+      eventMetaDataPtr->setRun(0);
       eventMetaDataPtr->setEvent(id);
 
       if (m_useWeights)

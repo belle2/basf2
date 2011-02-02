@@ -18,7 +18,7 @@ using namespace std;
 
 namespace Belle2 {
 
-REG_MODULE(TrasanModule, "Trasan");
+REG_MODULE(Trasan);
 
 TrasanModule::TrasanModule()
     : Module::Module(),
@@ -29,7 +29,7 @@ TrasanModule::TrasanModule()
     string desc = "TrasanModule(" + _tra.version() + ")";
     setDescription(desc);
 
-    addParam("testParamInt", _testParamInt, 20);
+    addParam("testParamInt", _testParamInt, "Test Parameter", 20);
 
 #ifdef TRASAN_DEBUG
     cout << "TrasanModule ... created" << endl;

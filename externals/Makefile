@@ -1,11 +1,16 @@
 
 # define directories
-export EXTDIR :=  $(shell pwd)
+export EXTDIR := $(BELLE2_EXTERNALS_DIR)
 export EXTINCDIR := $(EXTDIR)/include
 export EXTLIBDIR := $(EXTDIR)/lib/$(BELLE2_SUBDIR)
 export EXTBINDIR := $(EXTDIR)/bin/$(BELLE2_SUBDIR)
 
-export GENFIT := $(EXTDIR)/genfit
+export EXTDIRVAR := \$${BELLE2_EXTERNALS_DIR}
+export EXTINCDIRVAR := $(EXTDIRVAR)/include
+export EXTLIBDIRVAR := $(EXTDIRVAR)/lib/\$${BELLE2_SUBDIR}
+export EXTBINDIRVAR := $(EXTDIRVAR)/bin/\$${BELLE2_SUBDIR}
+
+export GENFIT := $(EXTDIRVAR)/genfit
 
 
 # all target
@@ -51,8 +56,8 @@ CLHEP/configure:
 # CLHEP build command
 CLHEP/config.log: CLHEP/configure
 	@echo "building CLHEP"
-	@cd CLHEP; ./configure --prefix=$(EXTDIR) \
-	--includedir=$(EXTINCDIR) --libdir=$(EXTLIBDIR) --bindir=$(EXTBINDIR); make; make install
+	@cd CLHEP; ./configure --prefix=$(EXTDIRVAR) \
+	--includedir=$(EXTINCDIRVAR) --libdir=$(EXTLIBDIRVAR) --bindir=$(EXTBINDIRVAR); make; make install
 
 # dependence for GEANT4 build
 geant4: geant4/env.sh
@@ -74,11 +79,11 @@ geant4/Configure:
 geant4/env.sh: CLHEP/config.log geant4/Configure
 	@echo "building geant4"
 	@-cd geant4; patch -Np0 < ../geant4.patch
-	@cd geant4; ./Configure -build -d -e -s -D d_portable=y -D g4includes_flag=y \
-	-D g4data=$(EXTDIR)/share/geant4/data -D g4clhep_base_dir=$(EXTDIR) \
-	-D g4clhep_include_dir=$(EXTINCDIR) -D g4clhep_lib_dir=$(EXTLIBDIR)
-	@-rm -rf geant4/env.*sh; cd geant4; ./Configure
-	@cd geant4; . ./env.sh; cd source; G4INCLUDE=$(EXTDIR)/include/geant4 make includes dependencies=""
+	@cd geant4; ./Configure -build -d -e -s -D d_portable='define' -D g4includes_flag=y \
+	-D g4data=$(EXTDIRVAR)/share/geant4/data -D g4clhep_base_dir=$(EXTDIR) \
+	-D g4clhep_include_dir=$(EXTINCDIRVAR) -D g4clhep_lib_dir=$(EXTLIBDIRVAR)
+	@cp geant4_env.sh geant4/env.sh; cp geant4_env.csh geant4/env.csh
+	@cd geant4; . ./env.sh; cd source; G4INCLUDE=$(EXTDIRVAR)/include/geant4 make includes dependencies=""
 	@cp -a $(EXTDIR)/geant4/lib/*/* $(EXTLIBDIR)
 
 
@@ -89,10 +94,12 @@ root: root/config/Makefile.config
 root/config/Makefile.config:
 	@echo "building root"
 	@-cd root; patch -Np0 < ../root.patch
-	@cd root; ./configure --incdir=$(EXTINCDIR)/root --libdir=$(EXTLIBDIR) --bindir=$(EXTBINDIR) \
-	--prefix=$(EXTDIR) --etcdir=$(EXTDIR)/share/etc --enable-gsl-shared \
+	@cd root; ./configure --enable-gsl-shared \
 	--with-g4-incdir=$(EXTINCDIR)/geant4 --with-g4-libdir=$(EXTLIBDIR) \
-	--with-clhep-incdir=$(EXTINCDIR); make; make install
+	--with-clhep-incdir=$(EXTINCDIR); make
+	@mkdir -p $(EXTINCDIR)/root
+	@cp -a $(EXTDIR)/root/include/* $(EXTINCDIR)/root
+	@cp -a $(EXTDIR)/root/lib/* $(EXTLIBDIR)
 
 
 # dependence for genfit build

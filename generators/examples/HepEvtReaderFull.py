@@ -45,15 +45,12 @@ hepevtreader.param('inputFileName', 'BhWide_10events.txt')
 
 # for a simple simulation job with output to a root file
 # these additional modules are needed
-evtmetagen = register_module('EvtMetaGen')
 paramloader = register_module('ParamLoaderXML')
 geobuilder = register_module('GeoBuilder')
 g4sim = register_module('FullSim')
 simpleoutput = register_module('SimpleOutput')
 
 # Setting the option for all non-hepevt reader modules:
-evtmetagen.param('EvtNumList', [100])
-
 paramloader.param('InputFileXML', os.path.join(basf2datadir,
                   'simulation/Belle2.xml'))
 
@@ -61,7 +58,6 @@ simpleoutput.param('outputFileName', 'HepEvTReaderOutput.root')
 
 # creating the path for the processing
 main = create_path()
-main.add_module(evtmetagen)
 
 # Add Particle Gun module to path:
 main.add_module(hepevtreader)
@@ -76,4 +72,4 @@ main.add_module(g4sim)
 main.add_module(simpleoutput)
 
 # Process events
-process(main)
+process(main, 100)

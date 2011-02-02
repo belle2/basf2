@@ -77,8 +77,6 @@ namespace Belle2 {//namespace Belle2
        */
       bool generateEvent(MCParticleGraph &graph);
 
-
-      std::vector <int>  m_PIDcodes;  /** the list of particle types to be produced */
       int m_ntracks;                  /** The number of particles to be produced per event */
       double m_p_par1;                /** The first parameter for momentum generation */
       double m_p_par2;                /** The second parameter for momentum generation */
@@ -95,6 +93,10 @@ namespace Belle2 {//namespace Belle2
       PGUNgenOpt m_genMom;            /** Option to set the distribution function for the momentum */
       PGUNgenOpt m_genVert;           /** Option to set the distribution function for the vertex */
       PGUNgenOpt m_genAngle;          /** Option to set the distribution function for the angles */
+
+      /** the list of particle types to be produced */
+      std::vector <int>  m_PIDcodes;
+
 
     protected:
 

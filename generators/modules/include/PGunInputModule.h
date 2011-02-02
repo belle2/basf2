@@ -50,7 +50,6 @@ namespace Belle2 {
 
       ParticleGun m_pgun;             /**< An instance of the particle gun itself. */
       MCParticleGraph mpg;            /**< An instance of the MCParticle graph. */
-      std::vector <int>  m_PIDcodes;  /** the list of particle types to be produced */
       int m_ntracks;                  /** The number of particles to be produced per event */
       double m_p_par1;                /** The first parameter for momentum generation */
       double m_p_par2;                /** The second parameter for momentum generation */
@@ -68,6 +67,11 @@ namespace Belle2 {
       int m_genVert;          /** Option to set the distribution function for the vertex */
       int m_genAngle;        /** Option to set the distribution function for the angles */
       int m_randomseed;        /** setting the random seed for the particle gun. This will disappear, once the central random generator is running **/
+
+
+
+      /** the list of particle types to be produced */
+      std::vector <int>  m_PIDcodes;
     };
 
   }//end namespace Generators

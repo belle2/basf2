@@ -45,7 +45,7 @@ using namespace Belle2_TRGCDC;
 
 namespace Belle2 {
 
-REG_MODULE(TRGCDCModule, "TRGCDC");
+REG_MODULE(TRGCDC);
 
 string
 TRGCDCModule::version() const {
@@ -61,11 +61,11 @@ TRGCDCModule::TRGCDCModule()
     string desc = "TRGCDCModule(" + version() + ")";
     setDescription(desc);
 
-    addParam("testParamInt", _testParamInt, 20);
+    addParam("testParamInt", _testParamInt, "Test Parameter", 20);
     addParam("ConfigFile",
 	     _configFilename,
-	     string("TRGCDCConfig.dat"),
-	     "The filename of CDC trigger config file");
+	     "The filename of CDC trigger config file",
+	     string("TRGCDCConfig.dat"));
 
 #ifdef TRGCDC_DEBUG
     cout << "TRGCDCModule ... created" << endl;

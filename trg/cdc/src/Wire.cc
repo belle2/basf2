@@ -109,13 +109,13 @@ TRGCDCWire::neighbor(unsigned i) const {
 	if (localLayerId == (nLayers - 1))
 	    return 0;
 	if (_layer->offset() != 0) {
-	    if (i == WireInnerLeft)
+	    if (i == WireOuterLeft)
 		return cdc.wire(layerId + 1, local);
 	    else
 		return cdc.wire(layerId + 1, local + 1);
 	}
 	else {
-	    if (i == WireInnerLeft)
+	    if (i == WireOuterLeft)
 		return cdc.wire(layerId + 1, local - 1);
 	    else
 		return cdc.wire(layerId + 1, local);

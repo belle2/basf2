@@ -99,7 +99,6 @@ root/config/Makefile.config:
 	--with-clhep-incdir=$(EXTINCDIR); make
 	@mkdir -p $(EXTINCDIR)/root
 	@cp -a $(EXTDIR)/root/include/* $(EXTINCDIR)/root
-	@cp -a $(EXTDIR)/root/lib/* $(EXTLIBDIR)
 
 
 # dependence for genfit build

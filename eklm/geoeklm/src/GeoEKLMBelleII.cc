@@ -175,8 +175,8 @@ void GeoEKLMBelleII::create(GearDir& content)
                                                       EndcapMgr.rmin(iSet), EndcapMgr.rmax(iSet));
     }
 
-//     TGeoVolume* strsubtube = gGeoManager->MakeTube("subtube", strMed4EKLM,
-//                                                    EndcapMgr.rminsub(), EndcapMgr.rmaxsub(), EndcapMgr.zsub());
+    TGeoVolume* strsubtube = gGeoManager->MakeTube("subtube", strMed4EKLM,
+                                                   EndcapMgr.rminsub(), EndcapMgr.rmaxsub(), EndcapMgr.zsub());
     TGeoCompositeShape* EndcapVessel = new TGeoCompositeShape("EKLMVessel", "TempOct-subtube");
 
     /*

@@ -206,7 +206,7 @@ void GeoTOPBelleII::create(GearDir& content)
 
   TGeoCompositeShape *QBBShell = new TGeoCompositeShape("QBBShell", "QBB1-QBB2");//Difference of outer in innner shells
 
-  TGeoVolume *support = new TGeoVolume("QBBSupport", QBBShell, supportMedium); //Apply medium QBB shell
+  TGeoVolume *support = new TGeoVolume("SQ_QBBSupport", QBBShell, supportMedium); //Apply medium QBB shell
 
   support->SetTransparency(20); //Corlour seting for visual representation no effect on simulation
   support->SetLineColor(17); //Corlour seting for visual representation no effect on simulation
@@ -278,6 +278,6 @@ void GeoTOPBelleII::create(GearDir& content)
 
     volGrpTOP->AddNode(barsegment, i + 1, new TGeoHMatrix(r*t));
 
-  }/**/
+  }
 }
 

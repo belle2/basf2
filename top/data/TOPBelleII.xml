@@ -11,6 +11,7 @@
 		
 		<Bars>
 			<BarMaterial>TOPSiO2</BarMaterial>
+			<DetectorGas>TOPAir</DetectorGas>
 			<Nbar desc="Number of quartz bars">16</Nbar>
 			<Radius desc="The distance from the quartz bar to the IP (inner radius)" unit="cm">119.0</Radius>
 			<QWidth desc="Width of the quartz bar" unit="mm">450</QWidth>

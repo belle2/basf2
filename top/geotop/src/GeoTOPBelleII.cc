@@ -138,7 +138,7 @@ void GeoTOPBelleII::create(GearDir& content)
   box->DefineSection(0, -QuartzWidth / 2.0, 0.0, 0.0, 1.0); //Define the width of the quarz box
   box->DefineSection(1, QuartzWidth / 2.0, 0.0, 0.0, 1.0);
 
-  TGeoVolume *quartzBox = new TGeoVolume("quartzBox", box, barMedium); //Apply medium to quarz box
+  TGeoVolume *quartzBox = new TGeoVolume("SQ_quartzBox", box, barMedium); //Apply medium to quarz box
 
   quartzBox->SetTransparency(80); //Corlour seting for visual representation no effect on simulation
   quartzBox->SetLineColor(38); //Corlour seting for visual representation no effect on simulation
@@ -206,7 +206,7 @@ void GeoTOPBelleII::create(GearDir& content)
 
   TGeoCompositeShape *QBBShell = new TGeoCompositeShape("QBBShell", "QBB1-QBB2");//Difference of outer in innner shells
 
-  TGeoVolume *support = new TGeoVolume("SQ_QBBSupport", QBBShell, supportMedium); //Apply medium QBB shell
+  TGeoVolume *support = new TGeoVolume("QBBSupport", QBBShell, supportMedium); //Apply medium QBB shell
 
   support->SetTransparency(20); //Corlour seting for visual representation no effect on simulation
   support->SetLineColor(17); //Corlour seting for visual representation no effect on simulation

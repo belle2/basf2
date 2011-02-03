@@ -15,6 +15,7 @@
 #include <framework/logging/Logger.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
+#include <framework/dataobjects/Relation.h>
 #include <cdc/hitcdc/CDCSimHit.h>
 
 #include "G4Step.hh"
@@ -42,6 +43,7 @@ CDCSensitiveDetector::CDCSensitiveDetector(G4String name, G4double thresholdEner
     SensitiveDetectorBase(name), m_thresholdEnergyDeposit(thresholdEnergyDeposit),
     m_thresholdKineticEnergy(thresholdKineticEnergy), m_hitNumber(0)
 {
+  addRelationCollection(DEFAULT_MCPART_TO_CDCSIMHITS);
 }
 
 void CDCSensitiveDetector::Initialize(G4HCofThisEvent *)
@@ -197,8 +199,9 @@ G4bool CDCSensitiveDetector::ProcessHits(G4Step *aStep, G4TouchableHistory *)
         lr = 1;
         if ((tryp.cross(onTrack)).z() < 0.) lr = 0;
 
+        int saveIndex = -999;
         if (wires.size() == 1) {
-          saveSimHit(layerId, wires[i], trackID, pid, distance, tof, edep, s_in_layer*cm, momIn, posW, posIn, posOut, lr);
+          saveIndex = saveSimHit(layerId, wires[i], trackID, pid, distance, tof, edep, s_in_layer * cm, momIn, posW, posIn, posOut, lr);
         } else {
           // Cubic approximation of the track
           const G4int ic(3);
@@ -248,7 +251,7 @@ G4bool CDCSensitiveDetector::ProcessHits(G4Step *aStep, G4TouchableHistory *)
             G4double pmag = momIn.mag();
             const G4ThreeVector p_In(pmag*vent[3], pmag*vent[4], pmag*vent[5]);
 
-            saveSimHit(layerId, wires[i], trackID, pid, distance, tof, edep_in_cell, (sint - s1)*cm, p_In, posW, x_In, x_Out, lr);
+            saveIndex = saveSimHit(layerId, wires[i], trackID, pid, distance, tof, edep_in_cell, (sint - s1) * cm, p_In, posW, x_In, x_Out, lr);
           } else {  //the particle exits
 
             edep_in_cell = edep * (s2 - sint) / s_in_layer;
@@ -257,9 +260,21 @@ G4bool CDCSensitiveDetector::ProcessHits(G4Step *aStep, G4TouchableHistory *)
             G4double pmag = momIn.mag();
             const G4ThreeVector p_In(pmag*vent[3], pmag*vent[4], pmag*vent[5]);
 
-            saveSimHit(layerId, wires[i], trackID, pid, distance, tof, edep_in_cell, (s2 - sint)*cm, p_In, posW, x_In, posOut, lr);
+            saveIndex = saveSimHit(layerId, wires[i], trackID, pid, distance, tof, edep_in_cell, (s2 - sint) * cm, p_In, posW, x_In, posOut, lr);
           }
         }
+        setSeenInDetectorFlag(aStep, MCParticle::SeenInCDC);
+
+        //Add relation between the created hit and the MCParticle that caused it.
+        //The index of the MCParticle has to be set to the TrackID and will be
+        //replaced later by the correct MCParticle index automatically.
+        StoreArray<Relation> mcPartToSimHits(getRelationCollectionName());
+        StoreArray<MCParticle> mcPartArray(DEFAULT_MCPARTICLES);
+        if (saveIndex < 0) {B2FATAL("SimHit wasn't saved despite charge != 0");}
+        StoreArray<CDCSimHit> cdcArray(DEFAULT_CDCSIMHITS);
+
+        new(mcPartToSimHits->AddrAt(saveIndex)) Relation(cdcArray, mcPartArray, saveIndex, trackID);
+
       }
     }
   }
@@ -272,7 +287,7 @@ void CDCSensitiveDetector::EndOfEvent(G4HCofThisEvent *)
 {
 }
 
-void
+int
 CDCSensitiveDetector::saveSimHit(const G4int layerId,
                                  const G4int wireId,
                                  const G4int trackID,
@@ -288,7 +303,7 @@ CDCSensitiveDetector::saveSimHit(const G4int layerId,
                                  const G4int lr)
 {
   //change Later
-  StoreArray<CDCSimHit> cdcArray("CDCSimHitArray");
+  StoreArray<CDCSimHit> cdcArray(DEFAULT_CDCSIMHITS);
   m_hitNumber = cdcArray->GetLast() + 1;
   new(cdcArray->AddrAt(m_hitNumber)) CDCSimHit();
   cdcArray[m_hitNumber]->setLayerId(layerId);
@@ -309,8 +324,8 @@ CDCSensitiveDetector::saveSimHit(const G4int layerId,
   cdcArray[m_hitNumber]->setPosOut(positionOut);
   cdcArray[m_hitNumber]->setPosFlag(lr);
 
-  m_hitNumber++;
   B2DEBUG(150, "HitNumber: " << m_hitNumber);
+  return (m_hitNumber);
 }
 
 /*

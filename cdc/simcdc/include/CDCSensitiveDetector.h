@@ -42,19 +42,19 @@ namespace Belle2 {
     void EndOfEvent(G4HCofThisEvent *);
 
     //! Save CDCSimHit into datastore
-    void saveSimHit(const G4int layerId,
-                    const G4int wireId,
-                    const G4int trackID,
-                    const G4int pid,
-                    const G4double distance,
-                    const G4double tof,
-                    const G4double edep,
-                    const G4double stepLength,
-                    const G4ThreeVector & mom,
-                    const G4ThreeVector & posW,
-                    const G4ThreeVector & posIn,
-                    const G4ThreeVector & posOut,
-                    const G4int lr);
+    int saveSimHit(const G4int layerId,
+                   const G4int wireId,
+                   const G4int trackID,
+                   const G4int pid,
+                   const G4double distance,
+                   const G4double tof,
+                   const G4double edep,
+                   const G4double stepLength,
+                   const G4ThreeVector & mom,
+                   const G4ThreeVector & posW,
+                   const G4ThreeVector & posIn,
+                   const G4ThreeVector & posOut,
+                   const G4int lr);
 
     //void AddbgOne(bool doit);
 

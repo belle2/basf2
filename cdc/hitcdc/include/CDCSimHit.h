@@ -16,6 +16,9 @@
 #include <TObject.h>
 #include <TVector3.h>
 
+#define DEFAULT_CDCSIMHITS           "CDCSimHits"
+#define DEFAULT_MCPART_TO_CDCSIMHITS "MCPartToCDCSimHits"
+
 namespace Belle2 {
 
   //! Example Detector

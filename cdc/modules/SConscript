@@ -1,6 +1,6 @@
 Import('env')
 
-env['LIBS'] = ['cdc', 'simulation', 'framework',
+env['LIBS'] = ['cdc', 'framework',
                '$ROOT_LIBS']
 
 Return('env')

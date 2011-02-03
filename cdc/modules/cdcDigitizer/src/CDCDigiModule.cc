@@ -50,9 +50,9 @@ CDCDigiModule::CDCDigiModule() : Module()
 
   // Add parameters
   // I/O
-  addParam("InputColName",                m_inColName, "Input collection name", string("CDCSimHitArray"));
+  addParam("InputColName",                m_inColName, "Input collection name", string("CDCSimHits"));
   addParam("OutputColName",               m_outColName, "Output collection name", string("HitCDCArray"));
-  addParam("CDCHitOutColName",            m_cdcHitOutColName, "Output collection name", string("CDCHitCollection"));
+  addParam("CDCHitOutColName",            m_cdcHitOutColName, "Output collection name", string("CDCHits"));
   //Parameters for Digitization
   addParam("RandomSeed",                  m_randomSeed, "Random seed", 12345);
   addParam("Fraction",                    m_fraction, "The fraction of the first Gaussian used to smear drift length, set in cm", 0.571);
@@ -64,9 +64,9 @@ CDCDigiModule::CDCDigiModule() : Module()
   addParam("ElectronicsNoise",            m_elNoise, "Noise added by the electronics, set in ENC", 1000.0);
   //Relations
   addParam("MCPartToCDCSimHitCollectionName", m_relColNameMCToSim,
-           "Name of relation collection - MCParticle to SimCDCHit (if nonzero, created)", string("MCPartToCDCSimHitCollection"));
+           "Name of relation collection - MCParticle to SimCDCHit (if nonzero, created)", string("MCPartToCDCSimHits"));
   addParam("SimHitToCDCHitCollectionName", m_relColNameSimHitToHit,
-           "Name of relation collection - Hit CDC to MCParticle (if nonzero, created)", string("SimHitToCDCHitCollection"));
+           "Name of relation collection - Hit CDC to MCParticle (if nonzero, created)", string("SimHitToCDCHits"));
 }
 
 CDCDigiModule::~CDCDigiModule()

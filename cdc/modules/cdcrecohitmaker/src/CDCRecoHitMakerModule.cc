@@ -40,13 +40,13 @@ CDCRecoHitMakerModule::CDCRecoHitMakerModule() : Module()
            "Is the Relation for CDCSimHits to CDCHits available?", false);
 
   addParam("CDCHitCollection", m_cdcHitCollectionName,
-           "Name of Collection holdung CDCHits.", string("CDCHitCollection"));
+           "Name of Collection holdung CDCHits.", string("CDCHits"));
 
   addParam("SimHitToCDCHitCollectionName", m_simHitToCDCHitCollectionName,
-           "Name of Collection holdung Relation from CDCSimHits to CDCHits.", string("SimHitToCDCHitCollection"));
+           "Name of Collection holdung Relation from CDCSimHits to CDCHits.", string("SimHitToCDCHits"));
 
   addParam("CDCRecoHitCollection", m_cdcRecoHitCollectionName,
-           "Name of Collection holdung CDCRecoHits//Output of this modul.", string("CDCRecoHitCollection"));
+           "Name of Collection holdung CDCRecoHits//Output of this modul.", string("CDCRecoHits"));
 
 }
 

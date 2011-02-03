@@ -166,18 +166,17 @@ void GeoEKLMBelleII::create(GearDir& content)
     //Get Material
     TGeoMedium* strMed4EKLM = gGeoManager->GetMedium(EndcapMgr.matname().c_str());
 
-    TGeoVolume* strTemp = gGeoManager->MakePgon("TempOct", strMed4EKLM,
-                                                EndcapMgr.phi() / Unit::deg, EndcapMgr.dphi() / Unit::deg,
-                                                EndcapMgr.nsides(), EndcapMgr.nBoundary());
-
+    TGeoPgon *boct = new TGeoPgon("tempoct", EndcapMgr.phi() / Unit::deg, EndcapMgr.dphi() / Unit::deg,
+                                  EndcapMgr.nsides(), EndcapMgr.nBoundary());
     for (int iSet = 0; iSet < EndcapMgr.nBoundary() ; iSet++) {
-      ((TGeoPgon*)strTemp->GetShape())->DefineSection(iSet, EndcapMgr.z(iSet),
-                                                      EndcapMgr.rmin(iSet), EndcapMgr.rmax(iSet));
+      boct->DefineSection(iSet, EndcapMgr.z(iSet),
+                          EndcapMgr.rmin(iSet), EndcapMgr.rmax(iSet));
     }
 
-    TGeoVolume* strsubtube = gGeoManager->MakeTube("subtube", strMed4EKLM,
-                                                   EndcapMgr.rminsub(), EndcapMgr.rmaxsub(), EndcapMgr.zsub());
-    TGeoCompositeShape* EndcapVessel = new TGeoCompositeShape("EKLMVessel", "TempOct-subtube");
+    TGeoTube *atube = new TGeoTube(EndcapMgr.rminsub(), EndcapMgr.rmaxsub(), EndcapMgr.zsub());
+    atube->SetName("subtube");
+
+    TGeoCompositeShape* EndcapVessel = new TGeoCompositeShape("EKLMVessel", "tempoct-subtube");
 
     /*
     TGeoVolume* volEndcap =

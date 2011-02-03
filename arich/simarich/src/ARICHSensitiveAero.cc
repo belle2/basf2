@@ -31,7 +31,6 @@ using namespace Simulation;
 
 ARICHSensitiveAero::ARICHSensitiveAero(G4String name) : SensitiveDetectorBase(name)
 {
-
 }
 
 
@@ -43,7 +42,6 @@ ARICHSensitiveAero::~ARICHSensitiveAero()
 
 void ARICHSensitiveAero::Initialize(G4HCofThisEvent* HCTE)
 {
-  B2INFO("SensitiveAERO initialized");
 }
 
 
@@ -64,13 +62,13 @@ G4bool ARICHSensitiveAero::ProcessHits(G4Step* aStep, G4TouchableHistory*)
   // Track parameters are saved at the entrance in aerogel
   if (((PrePosition->GetStepStatus() == fGeomBoundary)) && (momentum.z() > 0)) {
 
-    /*    B2INFO ("SensAero: " << aTrack->GetDefinition()->GetParticleName()
-    << " " << aTrack->GetTrackID()
-    << " " << aTrack->GetParentID()
-    << " " << G4BestUnit(worldPosition,"Length")
-    << " " << G4BestUnit(aTrack->GetMomentum(), "Energy")
-    << " " << G4BestUnit(aTrack->GetGlobalTime(), "Time")
-    << " Edep is " << G4BestUnit(aStep->GetTotalEnergyDeposit(),"Energy"));
+    /*       B2INFO ("SensAero: " << aTrack->GetDefinition()->GetParticleName()
+        << " " << aTrack->GetTrackID()
+        << " " << aTrack->GetParentID()
+        << " " << G4BestUnit(worldPosition,"Length")
+        << " " << G4BestUnit(aTrack->GetMomentum(), "Energy")
+        << " " << G4BestUnit(aTrack->GetGlobalTime(), "Time")
+        << " Edep is " << G4BestUnit(aStep->GetTotalEnergyDeposit(),"Energy"));
     */
     G4int  PDGEncoding = particle->GetPDGEncoding();
     G4ThreeVector localPosition = PrePosition->GetTouchableHandle()->GetHistory()->GetTopTransform().TransformPoint(worldPosition);

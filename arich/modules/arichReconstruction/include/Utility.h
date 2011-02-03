@@ -54,15 +54,15 @@ namespace Belle2 {
   //! this direction.
   /*
                                 /  /  /
-                       øøøøøøøøø
+                             øøøøøøøøø
                              ø/  /  /ø
-                       ø  /  / ø
+                             ø  /  / ø
                             /ø /  /  ø
                            / ø/  /   ø
                           /  øøøøøøøøø
                          /  /  /
-                     _
-                    / \ Gauss
+                           _
+                          / \ Gauss
                        __/   \_
   */
   double SquareInt(double aaa, double fi, double mean, double sigma);

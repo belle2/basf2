@@ -24,7 +24,6 @@ namespace Belle2 {
     const double HF = Z1 / 2;
     const double C1 = 0.56418958;
 
-
     const double P10 = +3.6767877;
     const double Q10 = +3.2584593;
     const double P11 = -9.7970465E-2;

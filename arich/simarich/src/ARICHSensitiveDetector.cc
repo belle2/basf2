@@ -40,8 +40,6 @@ ARICHSensitiveDetector::~ARICHSensitiveDetector()
 void ARICHSensitiveDetector::Initialize(G4HCofThisEvent* HCTE)
 {
 
-  B2INFO("SensitiveDetector initialized");
-
 }
 
 

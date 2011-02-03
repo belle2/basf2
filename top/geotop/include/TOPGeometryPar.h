@@ -128,41 +128,41 @@ namespace Belle2 {
   private:
 
 //! The naming of this variables is defines above
-    double _DetectorRotation; //stores the return value for the same name function defined above
-    double _DetectorZShift; //stores the return value for the same name function defined above
-    int _NumberOfBars; //stores the return value for the same name function defined above
-    double _DetectorInnerRadius; //stores the return value for the same name function defined above
-    double _QuartzWidth; //stores the return value for the same name function defined above
-    double _QuartzThickness; //stores the return value for the same name function defined above
-    double _QuartzFPos; //stores the return value for the same name function defined above
-    double _QuartzBPos; //stores the return value for the same name function defined above
-    double _QuartzZExt; //stores the return value for the same name function defined above
-    double _QuartzYExtUp; //stores the return value for the same name function defined above
-    double _QuartzYExtDown; //stores the return value for the same name function defined above
-    double _GapPMTX; //stores the return value for the same name function defined above
-    double _GapPMTY; //stores the return value for the same name function defined above
-    double _GapPMTX0; //stores the return value for the same name function defined above
-    double _GapPMTY0; //stores the return value for the same name function defined above
-    int _PMTNX; //stores the return value for the same name function defined above
-    int _PMTNY; //stores the return value for the same name function defined above
-    double _PMTSizeX; //stores the return value for the same name function defined above
-    double _PMTSizeY; //stores the return value for the same name function defined above
-    double _PMTSizeZ; //stores the return value for the same name function defined above
-    double _ActiveSizeX; //stores the return value for the same name function defined above
-    double _ActiveSizeY; //stores the return value for the same name function defined above
-    double _ActiveSizeZ; //stores the return value for the same name function defined above
-    double _WindowThickness; //stores the return value for the same name function defined above
-    int _PadNX; //stores the return value for the same name function defined above
-    int _PadNY; //stores the return value for the same name function defined above
-    double _BottomThickness; //stores the return value for the same name function defined above
-    double _QBBThickness; //stores the return value for the same name function defined above
-    double _QBBSideThickness; //stores the return value for the same name function defined above
-    double _QBBFronThickness; //stores the return value for the same name function defined above
-    double _AirGapUp; //stores the return value for the same name function defined above
-    double _AirGapDown; //stores the return value for the same name function defined above
-    double _AirGapSide; //stores the return value for the same name function defined above
-    double _QBBForwardPos; //stores the return value for the same name function defined above
-    double _QBBBackwardPos; //stores the return value for the same name function defined above
+    double _DetectorRotation;    //! Stors the return value for the same name function defined above
+    double _DetectorZShift;    //! Stors the return value for the same name function defined above
+    int _NumberOfBars;     //! Stors the return value for the same name function defined above
+    double _DetectorInnerRadius; //! Stors the return value for the same name function defined above
+    double _QuartzWidth;   //! Stors the return value for the same name function defined above
+    double _QuartzThickness;   //! Stors the return value for the same name function defined above
+    double _QuartzFPos;    //! Stors the return value for the same name function defined above
+    double _QuartzBPos;    //! Stors the return value for the same name function defined above
+    double _QuartzZExt;    //! Stors the return value for the same name function defined above
+    double _QuartzYExtUp;    //! Stors the return value for the same name function defined above
+    double _QuartzYExtDown;    //! Stors the return value for the same name function defined above
+    double _GapPMTX;     //! Stors the return value for the same name function defined above
+    double _GapPMTY;     //! Stors the return value for the same name function defined above
+    double _GapPMTX0;      //! Stors the return value for the same name function defined above
+    double _GapPMTY0;      //! Stors the return value for the same name function defined above
+    int _PMTNX;      //! Stors the return value for the same name function defined above
+    int _PMTNY;      //! Stors the return value for the same name function defined above
+    double _PMTSizeX;      //! Stors the return value for the same name function defined above
+    double _PMTSizeY;      //! Stors the return value for the same name function defined above
+    double _PMTSizeZ;      //! Stors the return value for the same name function defined above
+    double _ActiveSizeX;   //! Stors the return value for the same name function defined above
+    double _ActiveSizeY;   //! Stors the return value for the same name function defined above
+    double _ActiveSizeZ;   //! Stors the return value for the same name function defined above
+    double _WindowThickness;   //! Stors the return value for the same name function defined above
+    int _PadNX;      //! Stors the return value for the same name function defined above
+    int _PadNY;      //! Stors the return value for the same name function defined above
+    double _BottomThickness;   //! Stors the return value for the same name function defined above
+    double _QBBThickness;    //! Stors the return value for the same name function defined above
+    double _QBBSideThickness;    //! Stors the return value for the same name function defined above
+    double _QBBFronThickness;    //! Stors the return value for the same name function defined above
+    double _AirGapUp;      //! Stors the return value for the same name function defined above
+    double _AirGapDown;    //! Stors the return value for the same name function defined above
+    double _AirGapSide;    //! Stors the return value for the same name function defined above
+    double _QBBForwardPos;   //! Stors the return value for the same name function defined above
+    double _QBBBackwardPos;    //! Stors the return value for the same name function defined above
 
 
     static TOPGeometryPar* p_B4TOPGeometryParDB; /*!< Pointer that saves the instance of this class. */

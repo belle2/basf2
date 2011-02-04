@@ -204,6 +204,14 @@ namespace Belle2 {
      */
     MCParticle* getMother() const; //Need namespace qualifier because ROOT CINT as troubles otherwise
 
+
+    /**
+     * The index of the mother as stored in the member variable
+     * @return
+     */
+    int getMother(int reduceIndex) const;
+
+
     /**
      *Check if particle is virtual
      *
@@ -403,6 +411,16 @@ namespace Belle2 {
     if (m_mother == 0) return NULL;
     return static_cast<MCParticle*>(m_plist->At(m_mother - 1));
   }
+
+
+  inline int MCParticle::getMother(int reduceIndex) const
+  {
+    fixParticleList();
+    if (m_mother < reduceIndex) return m_mother;
+    return m_mother - reduceIndex;
+  }
+
+
 
 } // end namespace Belle2
 

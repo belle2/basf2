@@ -57,9 +57,11 @@ namespace Belle2 {
       EInputMode m_inputMode;      /**< The input mode of the module. Defines where the event number is taken from. */
       std::string m_inputFileName; /**< The filename of the input HepEvt file. */
       int m_skipEventNumber;       /**< The number of events which should be skipped at the start of reading. */
+      int m_Nvirtual;              /**< The number of particles in each event that should be made virtual */
       HepevtReader m_hepevt;       /**< An instance of the HepEvt reader. */
       MCParticleGraph mpg;         /**< The MCParticle graph object. */
       bool m_useWeights;           /**< Parameter to switch on/off weight propagation */
+      bool m_boost2LAB;           /**< Parameter to switch on/off boost to LAB system */
     };
 
   }//end namespace Generators

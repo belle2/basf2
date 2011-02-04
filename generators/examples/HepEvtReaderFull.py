@@ -43,6 +43,26 @@ hepevtreader.param('inputFileName', 'BhWide_10events.txt')
 # hepevtreader.param("useWeights", True)
 # default is useWeight = False, all events have the same weight
 
+# if some of the particles in the event of the HEPEVT file should not
+# be put to the simulation (incoming particles, virtual particles etc.)
+# you can specify the number of virtual particles in each event.
+# Uncomment the following line to set the first 2 particles to virtual
+# hepevtreader.param("nVirtualParticles", 2)
+# NOTE: this option always assumes that the virtual particles are the first
+# ones in the event and that there is a fixed number of them.
+# For more complexe cases, this information should be provided by
+# the generator inside the HEPEVT file. They will then require a
+# specific input module taking account the peculiarities of this
+# particular generator.
+
+# if the generator calculated the interaction in the
+# center of mass system, you can ask basf2 to boost
+# automatically all particles to the LAB frame of
+# BELLE2.
+# This option is switched on with this line
+# hepevtreader.param("boost2LAB", True)
+# default is boost2LAB = false.
+
 # for a simple simulation job with output to a root file
 # these additional modules are needed
 paramloader = register_module('ParamLoaderXML')

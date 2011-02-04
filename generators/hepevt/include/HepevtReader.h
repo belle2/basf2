@@ -17,6 +17,8 @@
 #include <string>
 #include <fstream>
 
+#include <TLorentzRotation.h>
+
 namespace Belle2 {
 
   /**
@@ -74,6 +76,9 @@ namespace Belle2 {
      * @return True if the events could be skipped.
      */
     bool skipEvents(int n);
+
+    int m_Nvirtual;        /**< The number of particles in each event with a set Virtual flag. */
+    TLorentzRotation m_labboost;     /**< Boost&rotation vector for boost from CM to LAB. */
 
 
   protected:

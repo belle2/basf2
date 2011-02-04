@@ -11,6 +11,7 @@
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 #include <generators/hepevt/HepevtReader.h>
+#include <generators/hepevt/cm2LabBoost.h>
 
 #include <string>
 #include <stdexcept>
@@ -19,6 +20,8 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/foreach.hpp>
 #include <boost/format.hpp>
+
+#include <TLorentzVector.h>
 
 using namespace std;
 using namespace Belle2;
@@ -53,6 +56,11 @@ int HepevtReader::getEvent(MCParticleGraph &graph, double & eventWeight) throw(H
     MCParticleGraph::GraphParticle &p = graph[first+i];
     readParticle(p);
 
+    //boost particles to lab frame:
+    TLorentzVector p4 = p.get4Vector();
+    p4 = m_labboost * p4;
+    p.set4Vector(p4);
+
     //Check for sensible daughter indices
     int d1 = p.getFirstDaughter();
     int d2 = p.getLastDaughter();
@@ -64,6 +72,11 @@ int HepevtReader::getEvent(MCParticleGraph &graph, double & eventWeight) throw(H
     for (int index = d1; index <= d2; ++index) {
       if (index > 0) p.decaysInto(graph[first+index-1]);
     }
+
+    //check if particle should be made virtual according to steering options:
+    if (i < m_Nvirtual)
+      p.setVirtual();
+
   }
   return eventID;
 }

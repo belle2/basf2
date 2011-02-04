@@ -9,11 +9,13 @@
  **************************************************************************/
 
 #include <generators/modules/HepevtInputModule.h>
+#include <generators/hepevt/cm2LabBoost.h>
 
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
+#include <framework/gearbox/Unit.h>
 
 #include <boost/format.hpp>
 #include <boost/foreach.hpp>
@@ -41,6 +43,8 @@ HepevtInputModule::HepevtInputModule() : Module()
   addParam("inputFileName", m_inputFileName, "Hepevt filename");
   addParam("skipEvents", m_skipEventNumber, "Skip this number of events before starting.", 0);
   addParam("useWeights", m_useWeights, "Set to 'true' to if generator weights should be propagated.", false);
+  addParam("nVirtualParticles", m_Nvirtual, "Number of particles at the beginning of the events that should be made virtual.", 0);
+  addParam("boost2LAB", m_boost2LAB, "Boolean to indicate whether the particles should be boosted from CM frame to lab frame", false);
 
   m_inputMode = c_NotSet;
 }
@@ -53,6 +57,17 @@ void HepevtInputModule::initialize()
     m_hepevt.skipEvents(m_skipEventNumber);
   } catch (runtime_error &e) {
     B2FATAL(e.what());
+  }
+  m_hepevt.m_Nvirtual = m_Nvirtual;
+
+  //Do we need to boost?
+  if (m_boost2LAB) {
+    // this is hard coded!!!!!! should be provided somewhere -> run meta data
+    double Eher = 7.0 * Unit::GeV;
+    double Eler = 4.0 * Unit::GeV;
+    double cross_angle = 83 * Unit::mrad;
+    double angle = 41.5 * Unit::mrad;
+    m_hepevt.m_labboost = getBoost(Eher, Eler, cross_angle, angle);
   }
 }
 

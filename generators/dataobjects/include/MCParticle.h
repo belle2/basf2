@@ -163,6 +163,7 @@ namespace Belle2 {
      */
     const TLorentzVector get4Vector()        const { TLorentzVector vec; vec.SetXYZM(m_momentum_x, m_momentum_y, m_momentum_z, m_mass); return vec; }
 
+
     /**
      * Return decay vertex.
      * @return The decay vertex of the MonteCarlo particle in [cm].
@@ -230,6 +231,8 @@ namespace Belle2 {
      * Add bitmask to current status.
      * @param bitmask The status code which should be added to the existing MonteCarlo particle status code.
      */
+
+
     void addStatus(unsigned int bitmask)                { m_status |= bitmask; }
 
     /**
@@ -297,6 +300,16 @@ namespace Belle2 {
      * @param pz The z component of the momentum vector.
      */
     void setMomentum(float px, float py, float pz)      { m_momentum_x = px, m_momentum_y = py; m_momentum_z = pz; }
+
+
+    /**
+     * Sets the 4Vector of particle.
+     * @param 4Vector
+     */
+    void set4Vector(const TLorentzVector P4)      { setMomentum(P4.Vect()); m_energy = P4.Energy(); }
+
+
+
 
     /**
      * Set decay vertex.

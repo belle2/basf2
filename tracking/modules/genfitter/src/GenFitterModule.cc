@@ -9,13 +9,20 @@
  **************************************************************************/
 
 #include <tracking/modules/genfitter/GenFitterModule.h>
+#include <tracking/dataobjects/Track.h>
 
-//#include <cdc/hitcdc/CDCSimHit.h>
-#include <cdc/dataobjects/CDCHit.h>
 #include <cdc/dataobjects/CDCRecoHit.h>
+#include"GFTrack.h"
+#include"GFKalman.h"
+
+#include"GFAbsTrackRep.h"
+#include<RKTrackRep.h>
+
+#include"GFConstField.h"
+#include"GFFieldManager.h"
 
 #include <framework/datastore/StoreArray.h>
-//#include <framework/dataobjects/Relation.h>
+#include <framework/dataobjects/Relation.h>
 
 using namespace std;
 using namespace Belle2;
@@ -36,7 +43,7 @@ GenFitterModule::GenFitterModule() : Module()
 
   //Parameter definition
   addParam("TrackToCDCRecoHitCollectionName", m_trackToCDCRecoHitCollectionName,
-           "Name of collection holding the relations between track and CDCRecoHit", string("TrackToCDCRecoHitCollection"));
+           "Name of collection holding the relations between track and CDCRecoHit", string("TrackToCDCRecoHits"));
 
 }
 
@@ -59,30 +66,38 @@ void GenFitterModule::beginRun()
 
 void GenFitterModule::event()
 {
+  StoreArray<Relation> trackToCDCRecoHits(m_trackToCDCRecoHitCollectionName);
+  if (trackToCDCRecoHits) {
+    StoreArray<CDCRecoHit> cdcRecoHits(trackToCDCRecoHits[0]->getToAccessorInfo());
+
+    for (int iPart = 0; iPart < trackToCDCRecoHits->GetEntriesFast(); iPart++) {
+      //aquire the list, which is associated with iPart:
+      list<unsigned short int> cdcRecoHitIndices =  trackToCDCRecoHits[iPart]->getToIndices();
+      if (cdcRecoHitIndices.empty()) {
+        continue;
+      }
+
+      // I need some starting values for the Fitter.
+      // Later taken from the Track associated with the Relation.
+      TVector3 vertex;
+      TVector3 momentumDirection(1., 1., 1.);
+
+      GFAbsTrackRep* trackRep = 0;
+      trackRep = new RKTrackRep(vertex, momentumDirection, 13);
+
+//      GFTrack fitTrack(trackRep);//initialized with smeared rep
+
+      /*    for(list<unsigned short int>::iterator iter = cdcRecoHitIndices.begin(); iter != cdcRecoHitIndices.end(); iter++){
+            fitTrack.addHit(cdcRecoHits[(*iter)]);
+          }*/
+
+      GFKalman k;
 
 
-  /*
-  StoreArray<Relation> arraySimHitToCDCHit("SimHitToCDCHitCollection");
-  StoreObjPtr<SimpleVec<float> > c1("ResolutionCanvas", DataStore::c_Persistent);
 
-  std::vector<float> myvector(arraySimHitToCDCHit.GetEntries());
-
-    for (int ii = 0; ii < arraySimHitToCDCHit.GetEntries(); ii++) {
-      CDCSimHit* simhitptr = static_cast<CDCSimHit*>(arraySimHitToCDCHit[ii]->getFrom());
-      if (!simhitptr) {B2WARNING("Should not work");}
-
-
-      float trueDriftTime      = (static_cast<CDCSimHit*>(arraySimHitToCDCHit[ii]->getFrom()))->getDriftLength();
-      float simulatedDriftTime = (static_cast<CDCHit*>(arraySimHitToCDCHit[ii]->getTo()))->getDriftTime();
-      myvector[ii] = simulatedDriftTime - trueDriftTime;
-      B2WARNING("True: " << trueDriftTime);
-      B2WARNING("Simulated: " << simulatedDriftTime);
-      B2WARNING("Simulated Value: " << simulatedDriftTime - trueDriftTime);
 
     }
-  //  c1->setVector(myvector);
-  */
-
+  }
 }
 
 

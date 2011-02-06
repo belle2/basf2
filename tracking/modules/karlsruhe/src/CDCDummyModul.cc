@@ -18,6 +18,9 @@
 #include <framework/dataobjects/Relation.h>
 #include <tracking/dataobjects/Track.h>
 
+#include <cdc/dataobjects/CDCHit.h>
+#include <cdc/hitcdc/CDCSimHit.h>
+
 using namespace std;
 using namespace Belle2;
 
@@ -29,9 +32,9 @@ CDCDummyModule::CDCDummyModule() : Module()
   setDescription("Add all CDCHits up as a single track");
 
   addParam("CDCRecoHitCollectionName", m_cdcRecoHitCollectionName,
-           "Name of the CDCRecoHitCollection", string("CDCRecoHitCollection"));
+           "Name of the CDCRecoHitCollection", string("CDCRecoHits"));
   addParam("TrackToCDCRecoHitCollectionName", m_trackToCDCRecoHitCollectionName,
-           "Name of relation between Track and CDCRecoHits.", string("TrackToCDCRecoHitCollection"));
+           "Name of relation between Track and CDCRecoHits.", string("TrackToCDCRecoHits"));
 
 }
 
@@ -49,7 +52,18 @@ void CDCDummyModule::beginRun()
 
 void CDCDummyModule::event()
 {
+  StoreArray<Relation> relations("SimHitToCDCHits");
+  if (relations->GetEntriesFast()) { //test if the collection includes at least one element - not so if e.g. particle didn't hit CDC
+    //The name and the durability of the corresponding StoreAccessor are the same for all the relations in question
+    //So I set them only once to save time:
+    StoreArray<CDCSimHit> simHits(relations[0]->getFromAccessorInfo());
+    StoreArray<CDCHit> cdcHits(relations[0]->getToAccessorInfo());
 
+    for (int ii = 0; ii < relations->GetEntriesFast(); ++ii) {
+      //print out the pull for the CDC Resolution
+      B2INFO("Pull: " << cdcHits[relations[ii]->getToIndex()]->getDriftTime() - simHits[relations[ii]->getFromIndex()]->getDriftLength());
+    }
+  }
 }
 
 void CDCDummyModule::endRun()

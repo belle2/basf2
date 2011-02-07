@@ -106,6 +106,8 @@ namespace Belle2 {
     double GetMirrorsLength() const;
     //! Get z position of mirrors (starting point)
     double GetMirrorsZPosition() const;
+    //! Get the angle of the first corner of mirror plates polygon.
+    double GetMirrorsStartAngle() const;
     //! Get track position resolution of tracking
     double GetTrackPositionResolution() const;
     //! Get track direction resolution of tracking
@@ -170,6 +172,7 @@ namespace Belle2 {
     double _mirrorLength;                 /*!< Length of mirror plates */
     double _mirrorOuterRad;               /*!< Radius of circle outscribed to mirrors polygon */
     double _mirrorThickness;              /*!< Thickness of mirror plates */
+    double _mirrorStartAng;               /*!< The angle of first corner of mirror plates polygon */
     double _trackPosRes;                  /*!< Track position resolution from tracking */
     double _trackAngRes;                  /*!< Track direction resolution from tracking */
     double _photRes;                      /*!< Single photon resolution without pad */
@@ -349,6 +352,11 @@ namespace Belle2 {
   inline int ARICHGeometryPar::GetNMirrors() const
   {
     return _nMirrors;
+  }
+
+  inline double ARICHGeometryPar::GetMirrorsStartAngle() const
+  {
+    return _mirrorStartAng;
   }
 
   inline TVector2 ARICHGeometryPar::GetChipLocPos(int chipID)

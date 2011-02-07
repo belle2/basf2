@@ -115,7 +115,7 @@
 	      <ModuleXSize desc="module size in X (length)" unit="mm">75</ModuleXSize>
 	      <ModuleZSize desc="module size in Z (height)" unit="mm">30</ModuleZSize>
 	      <ModuleWallThickness desc="Thickess of HAPD wall" unit="mm">3</ModuleWallThickness>	
-	      <winMaterial desc="Material of detector window">ARICH_Air</winMaterial> 
+	      <winMaterial desc="Material of detector window">ARICH_Quartz</winMaterial> 
 	      <WindowRefIndex desc="window quartz refractive index">1.3</WindowRefIndex>
 	      <WindowAbsorbLen sesc="Transmission length of window quartz" unit="m">1000</WindowAbsorbLen>
 	      
@@ -128,17 +128,17 @@
 	      <SensThickness desc="Thickness of active surface" unit="mm">0.1</SensThickness>
 	      <BottomThickness desc="Thickness of the HAPD reflective bottom" unit="mm">1</BottomThickness>
 	      <botMaterial desc="Material of HAPD reflective bottom">HAPD_Ceramic</botMaterial> 
-	    </Module>
-	    
+	    </Module>	    
 	  </Detector>
 	  
 	  <Mirrors>
-	    <Material>Air</Material>
+	    <Material>ARICH_Quartz</Material>
 	    <nMirrors desc="Mirrors are placed as regular nMirrors-sided polygon">16</nMirrors>
 	    <outerRadius desc="Radius of outscribed circle to mirrors polygon" unit="mm">1140</outerRadius>
 	    <mirrorThickness desc="Thickness of mirror plates" unit="mm">3</mirrorThickness>
 	    <mirrorLength desc="Length of mirror plates" unit="mm">148</mirrorLength>
 	    <Zposition desc="position of mirrors in Z direction (starting point)" unit="mm">1710</Zposition>
+	    <startAngle desc="Angle of the first corner of mirror plates polygon" unit="deg">11.25</startAngle>
 	  </Mirrors>
 	  
 	  <Reconstruction>

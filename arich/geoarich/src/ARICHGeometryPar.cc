@@ -62,6 +62,7 @@ ARICHGeometryPar::clear(void)
   _mirrorLength = 0.0;
   _mirrorOuterRad = 0.0;
   _mirrorThickness = 0.0;
+  _mirrorStartAng = 0.0;
   _trackPosRes = 0.0;
   _trackAngRes = 0.0;
   _photRes = 0.0;
@@ -112,6 +113,7 @@ void ARICHGeometryPar::read()
   _mirrorLength = gbxParams.getParamLength("Mirrors/mirrorLength");
   _mirrorThickness =  gbxParams.getParamLength("Mirrors/mirrorThickness");
   _mirrorOuterRad = gbxParams.getParamLength("Mirrors/outerRadius");
+  _mirrorStartAng = gbxParams.getParamAngle("Mirrors/startAngle");
   _trackPosRes =  gbxParams.getParamLength("Reconstruction/TrackPosResolution");
   _trackAngRes =  gbxParams.getParamAngle("Reconstruction/TrackAngResolution");
   _photRes = gbxParams.getParamLength("Reconstruction/PhotResolutionWoPad");
@@ -296,7 +298,7 @@ void ARICHGeometryPar::MirrorPositions()
 {
   double rmir = _mirrorOuterRad * cos(M_PI / _nMirrors) - _mirrorThickness;
   for (int i = 0; i < _nMirrors; i++) {
-    TVector3 norm(cos(2.*M_PI / _nMirrors*(i + 0.5)), sin(2.*M_PI / _nMirrors*(i + 0.5)), 0);
+    TVector3 norm(cos(2.*M_PI / double(_nMirrors)*(i + 0.5) + _mirrorStartAng), sin(2.*M_PI / double(_nMirrors)*(i + 0.5) + _mirrorStartAng), 0);
     _mirrornorm.push_back(norm);
     _mirrorpoint.push_back(rmir*norm);
   }

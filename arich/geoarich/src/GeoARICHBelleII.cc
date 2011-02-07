@@ -81,7 +81,7 @@ void GeoARICHBelleII::create(GearDir& content)
   // get aRICH container parameters
   double zFront = content.getParamLength("ContainerZfront");
   double zBack = content.getParamLength("ContainerZback");
-  double zCenter = (zFront + zBack) / 2. * mm ;
+  double zCenter = (zFront + zBack) / 2.;
   double contOutRadius = content.getParamLength("ContainerOuterRadius");
   double contInRadius = content.getParamLength("ContainerInnerRadius");
   string contMat = content.getParamString("ContainerMaterial");
@@ -231,7 +231,7 @@ void GeoARICHBelleII::create(GearDir& content)
 
   // creating ang placing detector window
   TGeoBBox* winShape = new TGeoBBox("winShape", modXsize / 2. - wallThick, modXsize / 2. - wallThick, winThick / 2.);
-  TGeoVolume* detWin = new TGeoVolume("SA_detWin", winShape, winMed);
+  TGeoVolume* detWin = new TGeoVolume("detWin", winShape, winMed);
   detWin->SetLineColor(38);
   volGrpModule->AddNode(detWin, 1, new TGeoTranslation(0.0, 0.0, (-modZsize + winThick) / 2.));
   // creating and placing sensitive surface
@@ -269,9 +269,9 @@ void GeoARICHBelleII::create(GearDir& content)
   int nMod = arichgp->GetNMCopies();
   for (int iMod = 0; iMod < nMod; ++iMod) {
     TVector3 modPos = arichgp->GetOrigin(iMod);
-    double modAngle = arichgp->GetModAngle(iMod);
+    double modAngle = arichgp->GetModAngle(iMod) / Unit::deg;
     TGeoRotation* modRot = new TGeoRotation((format("modRot_%1%") % (iMod)).str().c_str());
-    modRot->RotateZ(180. / M_PI*modAngle);
+    modRot->RotateZ(modAngle);
     volGrpDetector->AddNode(volGrpModule, iMod, new TGeoCombiTrans(modPos.X(), modPos.Y(), modPos.Z() - zCenter, modRot));
     detSuppTube->AddNode(hole, iMod, new TGeoCombiTrans(modPos.X(), modPos.Y(), 0.0, modRot));
   }
@@ -303,10 +303,13 @@ void GeoARICHBelleII::create(GearDir& content)
   TGeoMedium* mirrMed = gGeoManager->GetMedium(mirrMat.c_str());
   TGeoPgon* ngon = new TGeoPgon("mirrors_shape", 0., 360, nMirrors, 2);
   ngon->DefineSection(0, -Length / 2., inRadius, inRadius + Thick);
-  ngon->DefineSection(1, Length / 2, inRadius, inRadius + Thick);
+  ngon->DefineSection(1, Length / 2., inRadius, inRadius + Thick);
   TGeoVolume* Mirrors  = new TGeoVolume("Mirrors", ngon, mirrMed);
   Mirrors->SetLineColor(15);
-  contTube->AddNode(Mirrors, 1, new TGeoTranslation(0.0, 0.0, zPos + Length / 2  - zCenter));
+  TGeoRotation* mirRot = new TGeoRotation("mirrorRot");
+  double mirAngle = arichgp->GetMirrorsStartAngle() / Unit::deg;
+  mirRot->RotateZ(mirAngle);
+  contTube->AddNode(Mirrors, 1, new TGeoCombiTrans(0.0, 0.0, zPos + Length / 2.  - zCenter, mirRot));
 
 }
 

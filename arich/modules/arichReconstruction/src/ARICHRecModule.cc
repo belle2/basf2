@@ -28,11 +28,15 @@
 
 // ROOT
 #include <TVector3.h>
+#include <TH1F.h>
+#include <TFile.h>
 
 using namespace std;
 using namespace boost;
 using namespace Belle2;
 
+TH1F* refll;
+TH1F* norefl;
 
 //-----------------------------------------------------------------
 //                 Register the Module
@@ -44,7 +48,7 @@ REG_MODULE(ARICHRec)
 //                 Implementation
 //-----------------------------------------------------------------
 
-ARICHRecModule::ARICHRecModule() : Module()
+ARICHRecModule::ARICHRecModule() : Module(), m_ana(new ARICHReconstruction())
 {
   // Set description()
   setDescription("ARICHRec");
@@ -56,14 +60,13 @@ ARICHRecModule::ARICHRecModule() : Module()
 
 ARICHRecModule::~ARICHRecModule()
 {
-  if (m_ana) delete m_ana;
+  delete m_ana;
 }
 
 void ARICHRecModule::initialize()
 {
   // Initialize variables
 
-  m_ana = new ARICHReconstruction();
   m_nRun    = 0 ;
   m_nEvent  = 0 ;
 
@@ -72,6 +75,9 @@ void ARICHRecModule::initialize()
 
   // CPU time start
   m_timeCPU = clock() * Unit::us;
+
+  refll = new TH1F("refll", "refll", 200, 0, 1.5);
+  norefl = new TH1F("norefl", "norefl", 200, 0, 1.5);
 
 }
 
@@ -130,6 +136,11 @@ void ARICHRecModule::terminate()
 
   // Announce
   B2INFO("ARICHRecModule finished. Time per event: " << m_timeCPU / m_nEvent / Unit::ms << " ms.");
+
+  TFile* f = new TFile("testrefr.root", "RECREATE");
+  refll->Write();
+  norefl->Write();
+  f->Close();
 
 }
 

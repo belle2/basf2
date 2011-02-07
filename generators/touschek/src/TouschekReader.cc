@@ -12,7 +12,6 @@
 
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Unit.h>
-#include <geometry/geodetector/CreatorUtils.h>
 #include <generators/dataobjects/MCParticle.h>
 
 #include <boost/foreach.hpp>

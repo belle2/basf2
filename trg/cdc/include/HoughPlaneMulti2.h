@@ -31,13 +31,13 @@ class TRGCDCHoughPlaneMulti2 : public TRGCDCHoughPlane {
   public:
     /// Contructor.
     TRGCDCHoughPlaneMulti2(const std::string & name,
-			       unsigned nX,
-			       float xMin,
-			       float xMax,
-			       unsigned nY,
-			       float yMin,
-			       float yMax,
-			       unsigned nLayers);
+                               unsigned nX,
+                               float xMin,
+                               float xMax,
+                               unsigned nY,
+                               float yMin,
+                               float yMax,
+                               unsigned nLayers);
 
     /// Destructor
     virtual ~TRGCDCHoughPlaneMulti2();
@@ -45,7 +45,7 @@ class TRGCDCHoughPlaneMulti2 : public TRGCDCHoughPlane {
   public:// Selectors
     void dump(unsigned layerId) const;
     void dump(const std::string & message = std::string(""),
-	      const std::string & prefix = std::string("")) const;
+              const std::string & prefix = std::string("")) const;
 
   public:// Modifiers
     /// Clears all entries and regions.
@@ -57,17 +57,17 @@ class TRGCDCHoughPlaneMulti2 : public TRGCDCHoughPlane {
 
     /// vote
     void vote(float rx,
-	      float ry,
-	      int charge,
-	      const TRGCDCHoughTransformation & hough,
-	      unsigned layerId,
-	      int weight = 1);
+              float ry,
+              int charge,
+              const TRGCDCHoughTransformation & hough,
+              unsigned layerId,
+              int weight = 1);
     void vote(unsigned layerId, unsigned localId, int weight = 1);
     void vote(float rx,
-	      float ry,
-	      const TRGCDCHoughTransformation & hough,
-	      unsigned layerId,
-	      int weight = 1);
+              float ry,
+              const TRGCDCHoughTransformation & hough,
+              unsigned layerId,
+              int weight = 1);
     void merge(void);
 
     /// registers a pattern..
@@ -91,10 +91,10 @@ inline
 void
 TRGCDCHoughPlaneMulti2::clear(void) {
     for (unsigned i = 0; i < N_LAYERS; i++)
-	if (_usage[i]) {
-	    _layers[i]->clear();
-	    _usage[i] = false;
-	}
+        if (_usage[i]) {
+            _layers[i]->clear();
+            _usage[i] = false;
+        }
     TRGCDCHoughPlane::clear();
 }
 
@@ -102,10 +102,10 @@ inline
 void
 TRGCDCHoughPlaneMulti2::clearCells(void) {
     for (unsigned i = 0; i < N_LAYERS; i++)
-	if (_usage[i]) {
-	    _layers[i]->clear();
-	    _usage[i] = false;
-	}
+        if (_usage[i]) {
+            _layers[i]->clear();
+            _usage[i] = false;
+        }
     TRGCDCHoughPlane::clearCells();
 }
 
@@ -136,11 +136,11 @@ TRGCDCHoughPlaneMulti2::clear(unsigned a) {
 inline
 void
 TRGCDCHoughPlaneMulti2::vote(float rx,
-				 float ry,
-				 int charge,
-				 const TRGCDCHoughTransformation & hough,
-				 unsigned layerId,
-				 int weight) {
+                                 float ry,
+                                 int charge,
+                                 const TRGCDCHoughTransformation & hough,
+                                 unsigned layerId,
+                                 int weight) {
     _usage[layerId] = true;
     _layers[layerId]->vote(rx, ry, charge, hough, weight);
 }
@@ -148,10 +148,10 @@ TRGCDCHoughPlaneMulti2::vote(float rx,
 inline
 void
 TRGCDCHoughPlaneMulti2::vote(float rx,
-			float ry,
-			const TRGCDCHoughTransformation & hough,
-			unsigned layerId,
-			int weight) {
+                        float ry,
+                        const TRGCDCHoughTransformation & hough,
+                        unsigned layerId,
+                        int weight) {
     _usage[layerId] = true;
     _layers[layerId]->vote(rx, ry, hough, weight);
 }
@@ -179,18 +179,18 @@ inline
 void
 TRGCDCHoughPlaneMulti2::dump(const std::string & a, const std::string & b) const {
     if (a == "merged") {
-	TRGCDCHoughPlaneBase::dump(a, b);
+        TRGCDCHoughPlaneBase::dump(a, b);
     }
     else if (a == "region") {
-	TRGCDCHoughPlaneBase::dump(a, b);
+        TRGCDCHoughPlaneBase::dump(a, b);
     }
     else {
-	for (unsigned i = 0; i < _nLayers; i++) {
-	    std::cout << b << name() << " : layer " << i << std::endl;
-	    _layers[i]->dump();
-	}
-	std::cout << b << name() << " : merged plane " << std::endl;
-	TRGCDCHoughPlaneBase::dump(a, b);
+        for (unsigned i = 0; i < _nLayers; i++) {
+            std::cout << b << name() << " : layer " << i << std::endl;
+            _layers[i]->dump();
+        }
+        std::cout << b << name() << " : merged plane " << std::endl;
+        TRGCDCHoughPlaneBase::dump(a, b);
     }
 }
 

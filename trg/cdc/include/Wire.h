@@ -45,10 +45,10 @@ class TRGCDCWire {
   public:
     /// Constructor.
     TRGCDCWire(unsigned id,
-		   unsigned localId,
-		   TRGCDCLayer *,
-		   const HepGeom::Point3D<double> & forwardPosition,
-		   const HepGeom::Point3D<double> & backwardPosition);
+                   unsigned localId,
+                   TRGCDCLayer *,
+                   const HepGeom::Point3D<double> & forwardPosition,
+                   const HepGeom::Point3D<double> & backwardPosition);
 
     /// Destructor
     virtual ~TRGCDCWire();
@@ -127,9 +127,9 @@ class TRGCDCWire {
 
     /// calculates position and direction vector with sag correction.
 //     void wirePosition(float zPosition,
-// 		      HepGeom::Point3D<double>  & xyPosition,
-// 		      HepGeom::Point3D<double>  & backwardPosition,
-// 		      Vector3D & direction) const;
+//                       HepGeom::Point3D<double>  & xyPosition,
+//                       HepGeom::Point3D<double>  & backwardPosition,
+//                       Vector3D & direction) const;
 
     /// returns cell size in phi.
     float cellSize(void) const;
@@ -142,7 +142,7 @@ class TRGCDCWire {
 
     /// dumps debug information.
     void dump(const std::string & message = std::string(""),
-	      const std::string & prefix = std::string("")) const;
+              const std::string & prefix = std::string("")) const;
 
   public:// TRG
 
@@ -343,14 +343,14 @@ inline
 float
 TRGCDCWire::cellSize(void) const {
     if (_layer) {
-	return _layer->cellSize();
+        return _layer->cellSize();
     }
     else {
 #ifdef TRASAN_DEBUG
-	std::cout << "TRGCDCWire::cellSize !!! can't return cell size";
-	std::cout << " because no pointer to a layer" << std::endl;
+        std::cout << "TRGCDCWire::cellSize !!! can't return cell size";
+        std::cout << " because no pointer to a layer" << std::endl;
 #endif
-	return 0.;
+        return 0.;
     }
 }
 
@@ -366,8 +366,8 @@ inline
 bool
 TRGCDCWire::adjacent(const TRGCDCWire & w) const {
     for (unsigned i = 0; i < 7; i++)
-	if (neighbor(i) == & w)
-	    return true;
+        if (neighbor(i) == & w)
+            return true;
     return false;
 }
 

@@ -56,7 +56,7 @@ class TRGSignal {
 
     /// dumps contents. "message" is to select information to dump. "pre" will be printed in head of each line.
     void dump(const std::string & message = "",
-	      const std::string & pre = "") const;
+              const std::string & pre = "") const;
 
   public:// Modifiers
 
@@ -170,7 +170,7 @@ inline
 bool
 TRGSignal::active(void) const {
     if (_history.size())
-	return true;
+        return true;
     return false;
 }
 

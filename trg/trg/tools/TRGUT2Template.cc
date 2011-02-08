@@ -40,23 +40,23 @@ main(int argc, char * argv[]) {
 
     //...Check arguments...
     if (argc > 2) {
-	cout << NAME << " !!! two many arguments" << endl
-	     << tab << " 1 : template version" << endl;
-	return -1;
+        cout << NAME << " !!! two many arguments" << endl
+             << tab << " 1 : template version" << endl;
+        return -1;
     }
 
     //...Template version...
     string version = "latest";
     if (argc == 2)
-	version = argv[1];
+        version = argv[1];
     if (version == "latest")
-	version = "0";
+        version = "0";
 
     //...Version check...
     if (version != "0") {
-	cout << NAME << " !!! no such a version" << endl
-	     << tab << " 0 : 1st version" << endl;
-	return -1;
+        cout << NAME << " !!! no such a version" << endl
+             << tab << " 0 : 1st version" << endl;
+        return -1;
     }
 
     //...Date...
@@ -70,9 +70,9 @@ main(int argc, char * argv[]) {
     //...Open vhdl file...
     ofstream vout(vname.c_str(), ios::out);
     if (vout.fail()) {
-	cout << NAME << " !!! can not open file" << endl
-	     << "    " << vname << endl;
-	return -2;
+        cout << NAME << " !!! can not open file" << endl
+             << "    " << vname << endl;
+        return -2;
     }
 
     //...Main...
@@ -87,9 +87,9 @@ main(int argc, char * argv[]) {
     //...Open ucf file...
     ofstream uout(uname.c_str(), ios::out);
     if (uout.fail()) {
-	cout << NAME << " !!! can not open file" << endl
-	     << "    " << uname << endl;
-	return -3;
+        cout << NAME << " !!! can not open file" << endl
+             << "    " << uname << endl;
+        return -3;
     }
 
     //...Main...

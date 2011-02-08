@@ -26,6 +26,7 @@
 
 namespace Belle2 {
 
+class TRGCDCDisplay;
 class TRGCDCWireHit;
 
 /// A class to display CDC trigger information.
@@ -34,9 +35,9 @@ class TRGCDCDisplayRphi : public TRGCDCDisplay {
   public:
     /// Default constructor
     TRGCDCDisplayRphi(const std::string & name = "TRGCDCDisplayRphi",
-		      double innerR = 160,
-		      double outerR = 1137,
-		      int size = 600);
+                      double innerR = 160,
+                      double outerR = 1137,
+                      int size = 600);
 
     /// Destructor
     virtual ~TRGCDCDisplayRphi();

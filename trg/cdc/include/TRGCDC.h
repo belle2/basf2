@@ -41,6 +41,7 @@ class TRGCDCWireHitMC;
 class TRGCDCTrackSegment;
 class TRGCDCFrontEnd;
 class TRGCDCMerger;
+class TRGCDCHoughFinder;
 
 /** A class to represent CDC.
 
@@ -186,7 +187,7 @@ class TRGCDC {
 
     /// returns layer ID from axialStereoLayerId. This function is expensive.
     unsigned layerId(unsigned axialStereoSwitch,
-		     unsigned axialStereoLayerId) const;
+                     unsigned axialStereoLayerId) const;
 
     /// returns super layer ID. This function is expensive.
     unsigned superLayerId(unsigned wireId) const;
@@ -196,16 +197,16 @@ class TRGCDC {
 
     /// returns axialStereo super layer ID. This function is expensive.
     unsigned axialStereoSuperLayerId(unsigned axialStereo,
-				     unsigned axialStereoLayerId) const;
+                                     unsigned axialStereoLayerId) const;
 
     /// returns true if w0 and w1 are neighbor.
     bool neighbor(const TRGCDCWire & w0, const TRGCDCWire & w1) const;
 
     /// calculates corrected drift time. correctionFlag(bit 0:tof, 1:T0 offset, 2:propagation delay, 3:tan(lambda) correction)
 //     static void driftDistance(TLink & link,
-// 			      const TTrack & track,
-// 			      unsigned correctionFlag = 0,
-// 			      float T0Offset = 0.);
+//                               const TTrack & track,
+//                               unsigned correctionFlag = 0,
+//                               float T0Offset = 0.);
 
   public:// TRG information
 
@@ -319,6 +320,9 @@ class TRGCDC {
 
     /// CDC trigger merger boards.
     std::vector<TRGCDCMerger *> _mergers;
+
+    /// Hough finder.
+    TRGCDCHoughFinder * _hFinder;
 };
 
 //-----------------------------------------------------------------------------
@@ -490,7 +494,7 @@ inline
 const TRGCDCLayer *
 TRGCDC::trackSegmentLayer(unsigned id) const {
     if (id < _tsLayers.size())
-	return _tsLayers[id];
+        return _tsLayers[id];
     return 0;
 }
 

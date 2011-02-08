@@ -27,9 +27,9 @@ using namespace std;
 namespace Belle2 {
 
 TRGCDCTrackSegment::TRGCDCTrackSegment(unsigned id,
-				       const TCWire & w,
-				       const TRGCDCLayer * layer,
-			     const std::vector<const TRGCDCWire *> & cells)
+                                       const TCWire & w,
+                                       const TRGCDCLayer * layer,
+                             const std::vector<const TRGCDCWire *> & cells)
 
     : TCWire::TCWire(w),
       _state(0),
@@ -45,29 +45,29 @@ TRGCDCTrackSegment::~TRGCDCTrackSegment() {
  
 void
 TRGCDCTrackSegment::dump(const string & msg,
-			     const string & pre) const {
+                             const string & pre) const {
     cout << pre << name() << endl;
     if ((msg.find("geometry") != string::npos) ||
-	(msg.find("detail") != string::npos)) {
-	cout << pre << "w " << _id;
-	cout << ",local " << _localId;
-	cout << ",layer " << layerId();
-	cout << ",super layer " << superLayerId();
-	cout << ",local layer " << localLayerId();
-	cout << endl;
+        (msg.find("detail") != string::npos)) {
+        cout << pre << "w " << _id;
+        cout << ",local " << _localId;
+        cout << ",layer " << layerId();
+        cout << ",super layer " << superLayerId();
+        cout << ",local layer " << localLayerId();
+        cout << endl;
     }
 //     if (msg.find("neighbor") != string::npos ||
-// 	msg.find("detail") != string::npos) {
-// 	for (unsigned i = 0; i < 7; i++)
-// 	    if (neighbor(i))
-// 		neighbor(i)->dump("", pre + TRGCDC::itostring(i) + "   ");
+//         msg.find("detail") != string::npos) {
+//         for (unsigned i = 0; i < 7; i++)
+//             if (neighbor(i))
+//                 neighbor(i)->dump("", pre + TRGCDC::itostring(i) + "   ");
 //     }
     if ((msg.find("trigger") != string::npos) ||
-	(msg.find("detail") != string::npos) ){
-	if (_signal.active())
-	    _signal.dump(msg, pre);
-	else
-	    cout << pre << "no trigger signal" << endl;
+        (msg.find("detail") != string::npos) ){
+        if (_signal.active())
+            _signal.dump(msg, pre);
+        else
+            cout << pre << "no trigger signal" << endl;
     }
 }
   
@@ -81,9 +81,9 @@ string
 TRGCDCTrackSegment::name(void) const {
     string t;
     if (axial())
-	t = "-";
+        t = "-";
     else
-	t = "=";
+        t = "=";
     string n0 = string("TS") + TRGUtil::itostring(layerId());
     string n1 = TRGUtil::itostring(_localId);
     return n0 + t + n1;
@@ -101,28 +101,28 @@ TCTSegment::simulate(void) {
     unsigned nHits = 0;
     vector<TRGSignal> signals;
     for (unsigned i = 0; i < n; i++) {
-	const TRGSignal & s = _wires[i]->triggerOutput();
-	signals.push_back(s);
+        const TRGSignal & s = _wires[i]->triggerOutput();
+        signals.push_back(s);
 
-	if (s.active()) {
-	    ++nHits;
+        if (s.active()) {
+            ++nHits;
 #ifdef TRGCDC_DEBUG
-//	    s->dump("", "    ");
+//            s->dump("", "    ");
 #endif
-	}
+        }
     }
 
     //...Check number of hit wires...
     if (nHits < 4)
-	return;
+        return;
 
     //...Widen signal...400 ns
     static const unsigned width =
-	TRGCDC::getTRGCDC()->systemClock().unit(400);
+        TRGCDC::getTRGCDC()->systemClock().unit(400);
     for (unsigned i = 0; i < n; i++) {
-	signals[i].widen(width);
+        signals[i].widen(width);
 #ifdef TRGCDC_DEBUG
-//	signals[i].dump("", "    ");
+//        signals[i].dump("", "    ");
 #endif
     }
 
@@ -137,7 +137,7 @@ TCTSegment::simulate(void) {
     TRGSignal all = l0 & l1 & l2 & l3 & l4;
 
     if (all.nEdges())
-	_signal = all;
+        _signal = all;
 
 #ifdef TRGCDC_DEBUG
 //     l0.dump("", "       -> ");
@@ -146,7 +146,7 @@ TCTSegment::simulate(void) {
 //     l3.dump("", "       -> ");
 //     l4.dump("", "       -> ");
 //     if (all.nEdges())
-// 	cout << "===========" << endl;
+//         cout << "===========" << endl;
 //     all.dump("", "    ----> ");
 #endif
     

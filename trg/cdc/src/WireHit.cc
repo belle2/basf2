@@ -25,11 +25,11 @@
 namespace Belle2 {
 
 TRGCDCWireHit::TRGCDCWireHit(const TRGCDCWire & w,
-				     float driftLeft,
-				     float driftLeftError,
-				     float driftRight,
-				     float driftRightError,
-				     float fudgeFactor)
+                                     float driftLeft,
+                                     float driftLeftError,
+                                     float driftRight,
+                                     float driftRightError,
+                                     float fudgeFactor)
     :  _state(0),
        _wire(w),
        _xyPosition(w.xyPosition()),
@@ -65,32 +65,32 @@ TRGCDCWireHit::~TRGCDCWireHit() {
 
 void
 TRGCDCWireHit::dump(const std::string & msg,
-			const std::string & pre) const {
+                        const std::string & pre) const {
     std::cout << pre;
     std::cout << _wire.name();
     if (msg.find("state") != std::string::npos ||
-	msg.find("detail") != std::string::npos) {
-	std::cout << ",state";
-	TRGUtil::bitDisplay(_state);
-	if (track()) std::cout << ",trk ";
+        msg.find("detail") != std::string::npos) {
+        std::cout << ",state";
+        TRGUtil::bitDisplay(_state);
+        if (track()) std::cout << ",trk ";
     }
     if (msg.find("drift") != std::string::npos ||
-	msg.find("detail") != std::string::npos) {
-	if (_state & WireHitLeftMask) std::cout << ", L";
-	if (_state & WireHitRightMask) std::cout << ", R";
-	std::cout << ",dl " << _drift[0] << "+-" << _driftError[0];
-	std::cout << ",dr " << _drift[1] << "+-" << _driftError[1];
+        msg.find("detail") != std::string::npos) {
+        if (_state & WireHitLeftMask) std::cout << ", L";
+        if (_state & WireHitRightMask) std::cout << ", R";
+        std::cout << ",dl " << _drift[0] << "+-" << _driftError[0];
+        std::cout << ",dr " << _drift[1] << "+-" << _driftError[1];
     }
     if (msg.find("mc") != std::string::npos ||
-	msg.find("detail") != std::string::npos) {
-	std::cout << ",hep ";
-	if (mc()) {
-	    if (mc()->hep()) std::cout << mc()->hep()->id();
-	    else std::cout << "0";
-	}
-	else {
-	    std::cout << "0";
-	}
+        msg.find("detail") != std::string::npos) {
+        std::cout << ",hep ";
+        if (mc()) {
+            if (mc()->hep()) std::cout << mc()->hep()->id();
+            else std::cout << "0";
+        }
+        else {
+            std::cout << "0";
+        }
     }
     std::cout << std::endl;
 }
@@ -103,26 +103,26 @@ TRGCDCWireHit::position(unsigned lr) const {
 
     //...Left...
     if (lr == WireHitLeft) {
-	return _xyPosition
-	    - _drift[WireHitLeft] * HepZHat.cross(_xyPosition.unit());
+        return _xyPosition
+            - _drift[WireHitLeft] * HepZHat.cross(_xyPosition.unit());
     }
 
     //...Right case...
     else {
-	return _xyPosition
-	    + _drift[WireHitRight] * HepZHat.cross(_xyPosition.unit());
+        return _xyPosition
+            + _drift[WireHitRight] * HepZHat.cross(_xyPosition.unit());
     }
 }
 
 int
 TRGCDCWireHit::sortByWireId(const TRGCDCWireHit ** a,
-				const TRGCDCWireHit ** b) {
+                                const TRGCDCWireHit ** b) {
     if ((* a)->wire().id() > (* b)->wire().id())
-	return 1;
+        return 1;
     else if ((* a)->wire().id() == (* b)->wire().id())
-	return 0;
+        return 0;
     else
-	return -1;
+        return -1;
 }
 
 } // namespace Belle2

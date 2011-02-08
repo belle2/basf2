@@ -32,7 +32,7 @@ class TRGCDCDisplayHough : public TRGCDCDisplay {
   public:
     /// Default constructor
     TRGCDCDisplayHough(const std::string & name = "TRGCDCDisplayHough",
-		       int size = 600);
+                       int size = 600);
 
     /// Destructor
     virtual ~TRGCDCDisplayHough();

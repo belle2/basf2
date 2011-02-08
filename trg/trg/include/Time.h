@@ -31,9 +31,9 @@ class TRGTime {
 
     /// Constructor wich clock. For rising edge, edge must be true. Given timing is syncronized to clock.
     TRGTime(double timing,
-	    bool edge,
-	    const TRGClock & clock,
-	    const std::string & name = "signal");
+            bool edge,
+            const TRGClock & clock,
+            const std::string & name = "signal");
 
     /// Destructor
     virtual ~TRGTime();
@@ -57,7 +57,7 @@ class TRGTime {
 
     /// dumps contents. "message" is to select information to dump. "pre" will be printed in head of each line.
     void dump(const std::string & message = "",
-	      const std::string & pre = "") const;
+              const std::string & pre = "") const;
 
   public:// Operators
 

@@ -32,20 +32,20 @@ class TRGCDCLayer : public std::vector<TRGCDCWire *> {
   public:
     /// Constructor.
     TRGCDCLayer(unsigned id,
-		    unsigned superLayerId,
-		    unsigned localLayerId,
-		    unsigned axialStereoLayerId,
-		    unsigned axialStereoSuperLayerId,
-		    float offset,
-		    int nShifts,
-		    float cellSize,
-		    unsigned nWires,
-		    float innerRadius,
-		    float outerRadius);
+                    unsigned superLayerId,
+                    unsigned localLayerId,
+                    unsigned axialStereoLayerId,
+                    unsigned axialStereoSuperLayerId,
+                    float offset,
+                    int nShifts,
+                    float cellSize,
+                    unsigned nWires,
+                    float innerRadius,
+                    float outerRadius);
 
     /// Constructor for track segments.
     TRGCDCLayer(unsigned id,
-		    const TRGCDCWire & w);
+                    const TRGCDCWire & w);
 
     /// Destructor
     virtual ~TRGCDCLayer();
@@ -95,7 +95,7 @@ class TRGCDCLayer : public std::vector<TRGCDCWire *> {
 
     /// dumps debug information.
     void dump(const std::string & message = std::string(""),
-	      const std::string & prefix = std::string("")) const;
+              const std::string & prefix = std::string("")) const;
 
     /// returns "A" or "U" or "V" depending on stereo type.
     const std::string stereoType(void) const;
@@ -199,11 +199,11 @@ inline
 const std::string
 TRGCDCLayer::stereoType(void) const {
     if (axial())
-	return "A";
+        return "A";
     else if (nShifts() > 0)
-	return "U";
+        return "U";
     else
-	return "V";
+        return "V";
 }
 
 inline

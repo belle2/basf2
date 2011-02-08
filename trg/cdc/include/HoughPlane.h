@@ -28,12 +28,12 @@ class TRGCDCHoughPlane : public TRGCDCHoughPlaneBase {
   public:
     /// Contructor.
     TRGCDCHoughPlane(const std::string & name,
-			 unsigned nX,
-			 float xMin,
-			 float xMax,
-			 unsigned nY,
-			 float yMin,
-			 float yMax);
+                         unsigned nX,
+                         float xMin,
+                         float xMax,
+                         unsigned nY,
+                         float yMin,
+                         float yMax);
 
     /// Destructor
     virtual ~TRGCDCHoughPlane();
@@ -87,7 +87,7 @@ void
 TRGCDCHoughPlane::clear(void) {
     bzero(_cell, nX() * nY() * sizeof(int));
 //     for (unsigned i = 0; i < nX() * nY(); i++)
-// 	_cell[i] = 0;
+//         _cell[i] = 0;
     TRGCDCHoughPlaneBase::clear();
 }
 
@@ -108,8 +108,8 @@ inline
 unsigned
 TRGCDCHoughPlane::entry(unsigned x, unsigned y) const {
     if (x < nX())
-	if (y < nY())
-	    return _cell[nY() * x + y];
+        if (y < nY())
+            return _cell[nY() * x + y];
     return 0;
 }
 
@@ -118,8 +118,8 @@ int
 TRGCDCHoughPlane::maxEntry(void) const {
     int m = 0;
     for (unsigned i = 0; i < nX() * nY(); i++)
-	if (_cell[i] > m)
-	    m = _cell[i];
+        if (_cell[i] > m)
+            m = _cell[i];
     return m;
 }
 
@@ -134,7 +134,7 @@ void
 TRGCDCHoughPlane::add(unsigned a, int w) {
     _cell[a] += w;
     if (_cell[a] < 0)
-	_cell[a] = 0;
+        _cell[a] = 0;
 }
 
 } // namespace Belle2

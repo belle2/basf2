@@ -24,7 +24,7 @@ class TRGArea2D {
   public:
     /// Contructor.
     TRGArea2D(const TRGPoint2D & leftBottom,
-		  const TRGPoint2D & rightUpper);
+                  const TRGPoint2D & rightUpper);
 
     /// Destructor
     virtual ~TRGArea2D();
@@ -35,9 +35,9 @@ class TRGArea2D {
 
     /// returns cross-points.
     void cross(const TRGPoint2D & x0,
-	       const TRGPoint2D & x1,
-	       unsigned & nFound,
-	       TRGPoint2D crossPoint[2]) const;
+               const TRGPoint2D & x1,
+               unsigned & nFound,
+               TRGPoint2D crossPoint[2]) const;
 
   private:
     TRGPoint2D _c[2];
@@ -58,8 +58,8 @@ inline
 bool
 TRGArea2D::inArea(const TRGPoint2D & x) const {
     if ((x.x() >= _c[0].x()) && (x.x() <= _c[1].x()))
-	if ((x.y() >= _c[0].y()) && (x.y() <= _c[1].y()))
-	    return true;
+        if ((x.y() >= _c[0].y()) && (x.y() <= _c[1].y()))
+            return true;
     return false;
 }
 

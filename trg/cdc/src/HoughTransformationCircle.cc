@@ -30,13 +30,13 @@ TRGCDCHoughTransformationCircle::~TRGCDCHoughTransformationCircle() {
 float
 TRGCDCHoughTransformationCircle::y(float xReal, float yReal, float x) const {
 //    return log10((xReal * xReal + yReal * yReal) /
-//	(2 * xReal * cos(x) + 2 * yReal * sin(x)));
+//        (2 * xReal * cos(x) + 2 * yReal * sin(x)));
     const float r = (xReal * xReal + yReal * yReal) /
-	(2 * xReal * cos(x) + 2 * yReal * sin(x));
+        (2 * xReal * cos(x) + 2 * yReal * sin(x));
     if (r > 0)
-	return log10(r);
+        return log10(r);
     else
-	return 0;
+        return 0;
 }
 
 TRGPoint2D
@@ -52,9 +52,9 @@ TRGCDCHoughTransformationCircle::convert(const TRGPoint2D & p) const {
 
 bool
 TRGCDCHoughTransformationCircle::diverge(float xReal,
-				    float yReal,
-				    float x0,
-				    float x1) const {
+                                    float yReal,
+                                    float x0,
+                                    float x1) const {
     static const float PI2 = 2 * M_PI;
 
     //...Divergence points...
@@ -72,17 +72,17 @@ TRGCDCHoughTransformationCircle::diverge(float xReal,
 
 bool
 TRGCDCHoughTransformationCircle::positiveDiverge(float xReal,
-					    float yReal,
-					    float x0,
-					    float x1) const {
+                                            float yReal,
+                                            float x0,
+                                            float x1) const {
     return diverge(xReal, yReal, x0, x1);
 }
 
 bool
 TRGCDCHoughTransformationCircle::negativeDiverge(float xReal,
-					    float yReal,
-					    float x0,
-					    float x1) const {
+                                            float yReal,
+                                            float x0,
+                                            float x1) const {
     return diverge(xReal, yReal, x0, x1);
 }
 

@@ -30,9 +30,9 @@ TRGTime::TRGTime(const TRGTime & t) :
 }
 
 TRGTime::TRGTime(double timing,
-		 bool edge,
-		 const TRGClock & clock,
-		 const std::string & name) :
+                 bool edge,
+                 const TRGClock & clock,
+                 const std::string & name) :
     _time(clock.time(timing)),
     _edge(edge),
     _clock(& clock),
@@ -70,31 +70,31 @@ TRGTime::operator|(const TRGSignal & left) const {
 
 void
 TRGTime:: dump(const std::string & msg,
-	       const std::string & pre) const {
+               const std::string & pre) const {
     cout << pre << "time(clock):";
 
     if (_edge)
-	cout << " o ";
+        cout << " o ";
     else
-	cout << " . ";
+        cout << " . ";
 
     cout << _time;
     if (msg.find("name") != string::npos ||
-	msg.find("detail") != string::npos)
-	cout << "(" << _name << ")";
+        msg.find("detail") != string::npos)
+        cout << "(" << _name << ")";
     cout << endl;
 }
 
 bool
 TRGTime::sortByTime(const TRGTime & a, const TRGTime & b) {
     if (a.time() < b.time()) {
-	return true;
+        return true;
     }
     else if (a.time() == b.time()) {
-	if (a.edge() & (! b.edge()))
-	    return true;
-	else if (a.edge() == b.edge())
-	    return true;
+        if (a.edge() & (! b.edge()))
+            return true;
+        else if (a.edge() == b.edge())
+            return true;
     }
     return false;
 }

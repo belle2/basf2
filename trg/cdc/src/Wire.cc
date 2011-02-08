@@ -29,10 +29,10 @@ using namespace std;
 namespace Belle2 {
 
 TRGCDCWire::TRGCDCWire(unsigned id,
-		       unsigned localId,
-		       TRGCDCLayer * l,
-		       const P3D & fp,
-		       const P3D & bp)
+                       unsigned localId,
+                       TRGCDCLayer * l,
+                       const P3D & fp,
+                       const P3D & bp)
     : _id(id),
       _localId(localId),
       _layer(l),
@@ -61,10 +61,10 @@ TRGCDCWire::dump(const string & msg, const string & pre) const {
     cout << ",local layer " << localLayerId();
     cout << endl;
     if (msg.find("neighbor") != string::npos ||
-	msg.find("detail") != string::npos) {
-	for (unsigned i = 0; i < 7; i++)
-	    if (neighbor(i))
-		neighbor(i)->dump("", pre + TRGUtil::itostring(i) + "   ");
+        msg.find("detail") != string::npos) {
+        for (unsigned i = 0; i < 7; i++)
+            if (neighbor(i))
+                neighbor(i)->dump("", pre + TRGUtil::itostring(i) + "   ");
     }    
 }
   
@@ -72,9 +72,9 @@ const TRGCDCWire * const
 TRGCDCWire::neighbor(unsigned i) const {
     static bool first = false;
     if (first)
-	cout << "TRGCDCWire::neighbor !!! "
-		  << "this function is not tested yet"
-		  << endl;
+        cout << "TRGCDCWire::neighbor !!! "
+                  << "this function is not tested yet"
+                  << endl;
 
     const TRGCDC & cdc = * TRGCDC::getTRGCDC();
     const unsigned layerId = _layer->id();
@@ -84,42 +84,42 @@ TRGCDCWire::neighbor(unsigned i) const {
     const int local = int(_localId);
 
     if (i == WireInnerLeft || i == WireInnerRight) {
-	if (localLayerId == 0)
-	    return 0;
-	if (_layer->offset() != 0) {
-	    if (i == WireInnerLeft)
-		return cdc.wire(layerId - 1, local);
-	    else
-		return cdc.wire(layerId - 1, local + 1);
-	}
-	else {
-	    if (i == WireInnerLeft)
-		return cdc.wire(layerId - 1, local - 1);
-	    else
-		return cdc.wire(layerId - 1, local);
-	}
+        if (localLayerId == 0)
+            return 0;
+        if (_layer->offset() != 0) {
+            if (i == WireInnerLeft)
+                return cdc.wire(layerId - 1, local);
+            else
+                return cdc.wire(layerId - 1, local + 1);
+        }
+        else {
+            if (i == WireInnerLeft)
+                return cdc.wire(layerId - 1, local - 1);
+            else
+                return cdc.wire(layerId - 1, local);
+        }
     }
     else if (i == WireLeft || i == WireRight) {
-	if (i == WireLeft)
-	    return cdc.wire(layerId, local - 1);
-	else
-	    return cdc.wire(layerId, local + 1);
+        if (i == WireLeft)
+            return cdc.wire(layerId, local - 1);
+        else
+            return cdc.wire(layerId, local + 1);
     }
     else if (i == WireOuterLeft || i == WireOuterRight) {
-	if (localLayerId == (nLayers - 1))
-	    return 0;
-	if (_layer->offset() != 0) {
-	    if (i == WireOuterLeft)
-		return cdc.wire(layerId + 1, local);
-	    else
-		return cdc.wire(layerId + 1, local + 1);
-	}
-	else {
-	    if (i == WireOuterLeft)
-		return cdc.wire(layerId + 1, local - 1);
-	    else
-		return cdc.wire(layerId + 1, local);
-	}
+        if (localLayerId == (nLayers - 1))
+            return 0;
+        if (_layer->offset() != 0) {
+            if (i == WireOuterLeft)
+                return cdc.wire(layerId + 1, local);
+            else
+                return cdc.wire(layerId + 1, local + 1);
+        }
+        else {
+            if (i == WireOuterLeft)
+                return cdc.wire(layerId + 1, local - 1);
+            else
+                return cdc.wire(layerId + 1, local);
+        }
     }
     return 0;
 }
@@ -141,17 +141,17 @@ TRGCDCWire::neighbor(unsigned i) const {
 // #if 0
 //     if (ms_smallcell) {
 //       if ((li == 1) || (li == 2)) {
-// 	if (_localId == 127) return -1;
-// 	else return _localId;
+//         if (_localId == 127) return -1;
+//         else return _localId;
 //       }
 //       if(_localId == 63) return -1;
 //       else return _localId;
 //     }
 //     else {
 //       if (li <= 5) {
-// 	if(_localId == 63)
-// 	  return -1;
-// 	else return _localId;
+//         if(_localId == 63)
+//           return -1;
+//         else return _localId;
 //       }
 //     }
 
@@ -236,17 +236,17 @@ TRGCDCWire::neighbor(unsigned i) const {
 // #if 0
 //     if (ms_smallcell) {
 //       if ((li == 1) || (li == 2)) {
-// 	if (_localId == 0) return 128;
-// 	else return _localId;
+//         if (_localId == 0) return 128;
+//         else return _localId;
 //       }
 //       if(_localId == 63) return -1;
 //       else return _localId;
 //     }
 //     else {
 //       if (li <= 5){
-// 	if(_localId == 0)
-// 	  return 64;
-// 	else return _localId;
+//         if(_localId == 0)
+//           return 64;
+//         else return _localId;
 //       }
 //     }
 
@@ -316,18 +316,18 @@ TRGCDCWire::neighbor(unsigned i) const {
 
 // void
 // TRGCDCWire::wirePosition(float z,
-// 		       HepGeom::Point3D<double> & xy,
-// 		       HepGeom::Point3D<double> & back,
-// 		       Vector3D & dir) const {
+//                        HepGeom::Point3D<double> & xy,
+//                        HepGeom::Point3D<double> & back,
+//                        Vector3D & dir) const {
 //     cout << "TRGCDCWire::wirePosition !!! this function is not test yet"
-// 	      << endl;
+//               << endl;
 
 //     back = _backwardPosition;
 
 //     //...Check z position...
 //     if (! (z > _backwardPosition.z() && z < _forwardPosition.z())) {
-// 	xy = _xyPosition;
-// 	dir = _direction;
+//         xy = _xyPosition;
+//         dir = _direction;
 //     }
 
 //     //...Setup...
@@ -359,8 +359,8 @@ TRGCDCWire::neighbor(unsigned i) const {
 //     xy.setZ((double) wirePosition[2]);
 //     back.setY((double) ybSag);
 //     Vector3D v_aux(_forwardPosition.x() - _backwardPosition.x(),
-// 		   yfSag - ybSag,
-// 		   _forwardPosition.z() - _backwardPosition.z());
+//                    yfSag - ybSag,
+//                    _forwardPosition.z() - _backwardPosition.z());
 //     dir = v_aux.unit();
 
 //     return;
@@ -371,22 +371,22 @@ TRGCDCWire::localIdDifference(const TRGCDCWire & a) const {
 
 #ifdef CDCTRG_DEBUG_DETAIL
     if (superLayerId() != a.superLayerId()) {
-	cout << "TRGCDCWire::localIdDifference !!!";
-	cout << "super layer assumption violation" << endl;
+        cout << "TRGCDCWire::localIdDifference !!!";
+        cout << "super layer assumption violation" << endl;
     }
 #endif
 
     int diff = int(a.localId()) - int(localId());
     unsigned nWires = layer().nWires();
     if (diff > 0) {
-	int difR = nWires - diff;
-	if (diff < difR) return diff;
-	else return - difR;
+        int difR = nWires - diff;
+        if (diff < difR) return diff;
+        else return - difR;
     }
     else {
-	int difR = nWires + diff;
-	if (- diff < difR) return diff;
-	else return difR;
+        int difR = nWires + diff;
+        if (- diff < difR) return diff;
+        else return difR;
     }
 }
 
@@ -396,7 +396,7 @@ TRGCDCWire::clear(void) {
     _hit = 0;
 
     for (unsigned i = 0; i < _mcHits.size(); i++)
-	delete _mcHits[i];
+        delete _mcHits[i];
     _mcHits.clear();
 
     _triggerOutput.clear();
@@ -405,68 +405,68 @@ TRGCDCWire::clear(void) {
 string
 TRGCDCWire::name(void) const {
     if (axial())
-	return string("w") +
-	    TRGUtil::itostring(layerId()) +
-	    string("-") +
-	    TRGUtil::itostring(_localId);
+        return string("w") +
+            TRGUtil::itostring(layerId()) +
+            string("-") +
+            TRGUtil::itostring(_localId);
     return string("w") + 
-	TRGUtil::itostring(layerId()) +
-	string("=") +
-	TRGUtil::itostring(_localId);
+        TRGUtil::itostring(layerId()) +
+        string("=") +
+        TRGUtil::itostring(_localId);
 }
 
 const TRGSignal &
 TRGCDCWire::triggerOutput(void) const {
     if (! _hit) {
-	return _triggerOutput;
+        return _triggerOutput;
     }
     else {
 
-	//...Clock...
-	const TRGClock & clock = TRGCDC::getTRGCDC()->systemClock();
+        //...Clock...
+        const TRGClock & clock = TRGCDC::getTRGCDC()->systemClock();
 
-	//...Drift legnth(micron) to drift time(ns)...
-	//   coefficient used here must be re-calculated.
-	float driftTime = _hit->drift() * 10 * 1000 / 40;
-	
-//	cout << name() << " drift=" << _hit->drift() << endl;
+        //...Drift legnth(micron) to drift time(ns)...
+        //   coefficient used here must be re-calculated.
+        float driftTime = _hit->drift() * 10 * 1000 / 40;
+        
+//        cout << name() << " drift=" << _hit->drift() << endl;
 
- 	TRGTime rise = TRGTime(driftTime, true, clock, name() + string("trg"));
-	TRGTime fall = rise;
-	fall.shift(1).reverse();
-	_triggerOutput = TRGSignal(rise & fall);
-//	_triggerOutput->name(name() + string("to"));
-//	_triggerOutput->dump();
-	
-	return _triggerOutput;
+         TRGTime rise = TRGTime(driftTime, true, clock, name() + string("trg"));
+        TRGTime fall = rise;
+        fall.shift(1).reverse();
+        _triggerOutput = TRGSignal(rise & fall);
+//        _triggerOutput->name(name() + string("to"));
+//        _triggerOutput->dump();
+        
+        return _triggerOutput;
 
     }
 
 //     if (! _hit)
-// 	return 0;
+//         return 0;
 
 //     if (_triggerOutput) {
-// 	return _triggerOutput;
+//         return _triggerOutput;
 //     }
 //     else {
 
-// 	//...Clock...
-// 	const TRGClock & clock = TRGCDC::getTRGCDC()->systemClock();
+//         //...Clock...
+//         const TRGClock & clock = TRGCDC::getTRGCDC()->systemClock();
 
-// 	//...Drift legnth(micron) to drift time(ns)...
-// 	//   coefficient used here must be re-calculated.
-// 	float driftTime = _hit->drift() * 10 * 1000 / 40;
-	
-// //	cout << name() << " drift=" << _hit->drift() << endl;
+//         //...Drift legnth(micron) to drift time(ns)...
+//         //   coefficient used here must be re-calculated.
+//         float driftTime = _hit->drift() * 10 * 1000 / 40;
+        
+// //        cout << name() << " drift=" << _hit->drift() << endl;
 
-// 	TRGTime rise = TRGTime(driftTime, true, clock, name() + string("trg"));
-// 	TRGTime fall = rise;
-// 	fall.shift(1).reverse();
-// 	_triggerOutput = new TRGSignal(rise & fall);
-// 	_triggerOutput->name(name() + string("to"));
-// //	_triggerOutput->dump();
-	
-// 	return _triggerOutput;
+//         TRGTime rise = TRGTime(driftTime, true, clock, name() + string("trg"));
+//         TRGTime fall = rise;
+//         fall.shift(1).reverse();
+//         _triggerOutput = new TRGSignal(rise & fall);
+//         _triggerOutput->name(name() + string("to"));
+// //        _triggerOutput->dump();
+        
+//         return _triggerOutput;
 //     }
 }
 

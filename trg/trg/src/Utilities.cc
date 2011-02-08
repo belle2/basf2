@@ -109,7 +109,7 @@ TRGUtil::bitDisplay(unsigned val, unsigned f, unsigned l) {
     unsigned i;
     for (i = 0; i < f - l; i++) {
         if ((i % 8) == 0) cout << " ";
-	cout << (val >> (f - i)) % 2;
+        cout << (val >> (f - i)) % 2;
     }
 }
 

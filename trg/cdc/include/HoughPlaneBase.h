@@ -32,12 +32,12 @@ class TRGCDCHoughPlaneBase {
   public:
     /// Contructor.
     TRGCDCHoughPlaneBase(const std::string & name,
-			     unsigned nX,
-			     float xMin,
-			     float xMax,
-			     unsigned nY,
-			     float yMin,
-			     float yMax);
+                             unsigned nX,
+                             float xMin,
+                             float xMax,
+                             unsigned nY,
+                             float yMin,
+                             float yMax);
 
     /// Destructor
     virtual ~TRGCDCHoughPlaneBase();
@@ -68,30 +68,30 @@ class TRGCDCHoughPlaneBase {
     TRGPoint2D position(unsigned x, unsigned y) const;
     unsigned neighbor(unsigned serialID, unsigned direction) const;
     std::vector<unsigned> neighbors(unsigned serialID,
-			      unsigned windowSize = 1) const;
+                              unsigned windowSize = 1) const;
     const std::vector<std::vector<unsigned> *> & regions(void) const;
 
     /// returns cell positions in the region.
     void locationInPlane(float x0, float y0, float x1, float y1,
-			 unsigned & nFound,
-			 unsigned & iX0, unsigned & iY0,
-			 unsigned & iX1, unsigned & iY1) const;
+                         unsigned & nFound,
+                         unsigned & iX0, unsigned & iY0,
+                         unsigned & iX1, unsigned & iY1) const;
 
     virtual void dump(const std::string & message = std::string(""),
-		      const std::string & prefix = std::string("")) const;
+                      const std::string & prefix = std::string("")) const;
 
   public:// Modifiers
 //    virtual void vote(float x, float y) = 0;
 //    virtual void vote(float x0, float y0, float x1, float y1) = 0;
     virtual void vote(float rx,
-		      float ry,
-		      const TRGCDCHoughTransformation & hough,
-		      int weight = 1);
+                      float ry,
+                      const TRGCDCHoughTransformation & hough,
+                      int weight = 1);
     virtual void vote(float rx,
-		      float ry,
-		      int charge,
-		      const TRGCDCHoughTransformation & hough,
-		      int weight = 1);
+                      float ry,
+                      int charge,
+                      const TRGCDCHoughTransformation & hough,
+                      int weight = 1);
 
     /// Votes using a pattern.
     virtual void vote(float xOffset, int weight = 1);
@@ -243,11 +243,11 @@ TRGCDCHoughPlaneBase::position(unsigned x, unsigned y) const {
 #ifdef TRASAN_DEBUG_DETAIL
 //   std::cout << "x,y=" << x << "," << y
 //             << ":_xMin,_yMin=" << _xMin << "," << _yMin
-//	       << ":_xSize,_ySize=" << _xSize << "," << _ySize << std::endl;
-#endif	    
+//               << ":_xSize,_ySize=" << _xSize << "," << _ySize << std::endl;
+#endif            
 
     return TRGPoint2D(_xMin + (float(x) + 0.5) * _xSize,
-		    _yMin + (float(y) + 0.5) * _ySize);
+                    _yMin + (float(y) + 0.5) * _ySize);
 }
 
 inline
@@ -268,14 +268,14 @@ TRGCDCHoughPlaneBase::neighbors(unsigned a, unsigned windowSize) const {
     if (((int) y + ymax) >= (int) _nY) ymax = _nY - (int) y;
 
     for (int i = xmin; i <= xmax; i++) {
-	for (int j = ymin; j <= ymax; j++) {
-	    int ii = a + i * _nY + j;
-	    if (ii == (int) a) continue;
-	    if (ii < 0) ii += maxi;
-	    if (ii >= maxi) ii -= maxi;
-//	    tmp.append(ii);
-	    tmp.push_back(ii);
-	}
+        for (int j = ymin; j <= ymax; j++) {
+            int ii = a + i * _nY + j;
+            if (ii == (int) a) continue;
+            if (ii < 0) ii += maxi;
+            if (ii >= maxi) ii -= maxi;
+//            tmp.append(ii);
+            tmp.push_back(ii);
+        }
     }
     return tmp;
 }
@@ -298,62 +298,62 @@ unsigned
 TRGCDCHoughPlaneBase::neighbor(unsigned id, unsigned dir) const {
     const unsigned maxi = _nY * _nX;
     if (dir == 0) { // top
-	if ((id % _nY) != _nY - 1)
-	    return id + 1;
+        if ((id % _nY) != _nY - 1)
+            return id + 1;
     }
     else if (dir == 1) { // top right
-	if ((id % _nY) != _nY - 1) {
-	    const unsigned i = id + _nY + 1;
-	    if (i < maxi)
-		return i;
-	    else
-		return i - maxi;
-	}
+        if ((id % _nY) != _nY - 1) {
+            const unsigned i = id + _nY + 1;
+            if (i < maxi)
+                return i;
+            else
+                return i - maxi;
+        }
     }
     else if (dir == 2) { // right
-	const unsigned i = id + _nY;
-	if (i < maxi)
-	    return i;
-	else
-	    return i - maxi;
+        const unsigned i = id + _nY;
+        if (i < maxi)
+            return i;
+        else
+            return i - maxi;
     }
     else if (dir == 3) { // bottom right
-	if ((id % _nY) != 0) {
-	    const unsigned i = id + _nY - 1;
-	    if (i < maxi) 
-		return i;
-	    else
-		return i - maxi;
-	}
+        if ((id % _nY) != 0) {
+            const unsigned i = id + _nY - 1;
+            if (i < maxi) 
+                return i;
+            else
+                return i - maxi;
+        }
     }
     else if (dir == 4) { // bottom
-	if ((id % _nY) != 0)
-	    return id - 1;
+        if ((id % _nY) != 0)
+            return id - 1;
     }
     else if (dir == 5) { // bottom left
-	if ((id % _nY) != 0) {
-	    const int i = id + _nY - 1;
-	    if (i > 0)
-		return (unsigned) i;
-	    else
-		return (unsigned) i + maxi;
-	}
+        if ((id % _nY) != 0) {
+            const int i = id + _nY - 1;
+            if (i > 0)
+                return (unsigned) i;
+            else
+                return (unsigned) i + maxi;
+        }
     }
     else if (dir == 6) { // left
-	const int i = id - _nY;
-	if (i > 0)
-	    return (unsigned) i;
-	else
-	    return (unsigned) i + maxi;
+        const int i = id - _nY;
+        if (i > 0)
+            return (unsigned) i;
+        else
+            return (unsigned) i + maxi;
     }
     else if (dir == 7) { // top left
-	if ((id % _nY) != _nY - 1) {
-	    const int i = id - _nY + 1;
-	    if (i > 0)
-		return (unsigned) i;
-	    else
-		return (unsigned) i + maxi;
-	}
+        if ((id % _nY) != _nY - 1) {
+            const int i = id - _nY + 1;
+            if (i > 0)
+                return (unsigned) i;
+            else
+                return (unsigned) i + maxi;
+        }
     }
 
     return id;
@@ -382,9 +382,9 @@ TRGCDCHoughPlaneBase::clear(void) {
 inline
 void
 TRGCDCHoughPlaneBase::vote(float rx,
-		      float ry,
-		      const TRGCDCHoughTransformation & hough,
-		      int weight) {
+                      float ry,
+                      const TRGCDCHoughTransformation & hough,
+                      int weight) {
     vote(rx, ry, 0, hough, weight);
 }
 

@@ -42,11 +42,11 @@ class TRGCDCHoughTransformationCircle
 
     /// returns true if Y diverges in given region.
     virtual bool positiveDiverge(float xReal, float yReal, float x0, float x1)
-	const;
+        const;
 
     /// returns true if Y diverges in given region.
     virtual bool negativeDiverge(float xReal, float yReal, float x0, float x1)
-	const;
+        const;
 
     /// returns Point2D(phi, r) of a circle in real plane.
     virtual TRGPoint2D circleCenter(const TRGPoint2D &) const;

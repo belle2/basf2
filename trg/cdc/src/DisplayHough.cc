@@ -23,7 +23,7 @@ using namespace std;
 namespace Belle2 {
 
 TRGCDCDisplayHough::TRGCDCDisplayHough(const std::string & name,
-				       int size)
+                                       int size)
     : TRGCDCDisplay(name, size, 10),
       _w(size),
       _adjustment(1., 1., 50.0, 0.1),
@@ -37,9 +37,9 @@ TRGCDCDisplayHough::TRGCDCDisplayHough(const std::string & name,
     _scaler.set_draw_value();
     _scaler.set_size_request(200, 30);
     _scaler
-	.signal_value_changed()
-	.connect(sigc::mem_fun(* this,
-			       & TRGCDCDisplayHough::on_scale_value_changed));
+        .signal_value_changed()
+        .connect(sigc::mem_fun(* this,
+                               & TRGCDCDisplayHough::on_scale_value_changed));
 
     _bottom.pack_start(_scaler, Gtk::PACK_SHRINK, 5);
     _bottom.pack_start(_buttonPositionReset, Gtk::PACK_EXPAND_WIDGET, 2);

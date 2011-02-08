@@ -29,12 +29,12 @@ class TRGCDCHoughPlaneBoolean : public TRGCDCHoughPlaneBase {
   public:
     /// Contructor.
     TRGCDCHoughPlaneBoolean(const std::string & name,
-		       unsigned nX,
-		       float xMin,
-		       float xMax,
-		       unsigned nY,
-		       float yMin,
-		       float yMax);
+                       unsigned nX,
+                       float xMin,
+                       float xMax,
+                       unsigned nY,
+                       float yMin,
+                       float yMax);
 
     /// Destructor
     virtual ~TRGCDCHoughPlaneBoolean();
@@ -53,14 +53,14 @@ class TRGCDCHoughPlaneBoolean : public TRGCDCHoughPlaneBase {
 
     /// Votes.
     void vote(float rx,
-	      float ry,
-	      const TRGCDCHoughTransformation & hough,
-	      int weight = 1);
+              float ry,
+              const TRGCDCHoughTransformation & hough,
+              int weight = 1);
     void vote(float rx,
-	      float ry,
-	      float charge,
-	      const TRGCDCHoughTransformation & hough,
-	      int weight = 1);
+              float ry,
+              float charge,
+              const TRGCDCHoughTransformation & hough,
+              int weight = 1);
     void vote(unsigned patternId, int weight);
 
     /// registers a pattern..
@@ -91,14 +91,14 @@ TRGCDCHoughPlaneBoolean::setEntry(unsigned serialId, unsigned n) {
 
 #ifdef TRASAN_DEBUG
     if (b0 >= _n)
-	std::cout << "TRGCDCHoughPlaneBoolean !!! given serialId is too large : "
-	       << "max=" << _n * 32 << ",serialId=" << serialId << std::endl;
+        std::cout << "TRGCDCHoughPlaneBoolean !!! given serialId is too large : "
+               << "max=" << _n * 32 << ",serialId=" << serialId << std::endl;
 #endif
 
     if (n > 0)
-	_cell[b0] |= (1 << b1);
+        _cell[b0] |= (1 << b1);
     else
-	_cell[b0] &= (~(1 << b1));
+        _cell[b0] &= (~(1 << b1));
 
     return (_cell[b0] >> b1) & 1;
 }
@@ -113,9 +113,9 @@ TRGCDCHoughPlaneBoolean::clear(void) {
 inline
 void
 TRGCDCHoughPlaneBoolean::vote(float rx,
-				  float ry,
-				  const TRGCDCHoughTransformation & hough,
-				  int weight) {
+                                  float ry,
+                                  const TRGCDCHoughTransformation & hough,
+                                  int weight) {
     vote(rx, ry, 0, hough, weight);
 }
 
@@ -127,9 +127,9 @@ TRGCDCHoughPlaneBoolean::entry(unsigned serialId) const {
 
 #ifdef TRASAN_DEBUG
     if (b0 >= _n)
-	std::cout << "TRGCDCHoughPlaneBoolean::entry !!! given serialId is too large"
-	       << " : "
-	       << "max=" << _n * 32 << ",serialId=" << serialId << std::endl;
+        std::cout << "TRGCDCHoughPlaneBoolean::entry !!! given serialId is too large"
+               << " : "
+               << "max=" << _n * 32 << ",serialId=" << serialId << std::endl;
 #endif
 
     return (_cell[b0] >> b1) & 1;
@@ -146,8 +146,8 @@ int
 TRGCDCHoughPlaneBoolean::maxEntry(void) const {
 #ifdef TRASAN_DEBUG
     std::cout << "TRGCDCHoughPlaneBoolean::maxEntry !!! "
-	   << " this function has no meaning for TRGCDCHoughPlaneBooolean object"
-	   << std::endl;
+           << " this function has no meaning for TRGCDCHoughPlaneBooolean object"
+           << std::endl;
 #endif
     return 1;
 }
@@ -156,9 +156,9 @@ inline
 void
 TRGCDCHoughPlaneBoolean::add(unsigned a, int b) {
     if (b > 0)
-	setEntry(a, 1);
+        setEntry(a, 1);
     else
-	setEntry(a, 0);
+        setEntry(a, 0);
 }
 
 } // namespace Belle2

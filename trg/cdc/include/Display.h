@@ -17,11 +17,16 @@
 #define TRGCDCDisplay_FLAG_
 
 #include <gtkmm.h>
-#include "trg/cdc/DisplayDrawingArea.h"
 
 #ifdef TRGCDC_SHORT_NAMES
 #define TCDisplay TRGCDCDisplay
 #endif
+
+namespace Belle2 {
+    class TRGCDCDisplayDrawingArea;
+    class TRGCDCDisplayRphi;
+    class TRGCDCDisplayHough;
+}
 
 namespace Belle2 {
 
@@ -31,8 +36,8 @@ class TRGCDCDisplay : public Gtk::Window {
   public:
     /// Default constructor
     TRGCDCDisplay(const std::string & name,
-		  int sizeWindow = 600,
-		  int sizeMax = 600);
+                  int sizeWindow = 600,
+                  int sizeMax = 600);
 
     /// Destructor
     virtual ~TRGCDCDisplay();

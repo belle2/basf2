@@ -21,16 +21,16 @@
 namespace Belle2 {
 
 TRGCDCLayer::TRGCDCLayer(unsigned id,
-				 unsigned superLayerId,
-				 unsigned localLayerId,
-				 unsigned axialStereoLayerId,
-				 unsigned axialStereoSuperLayerId,
-				 float offset,
-				 int nShifts,
-				 float cellSize,
-				 unsigned nWires,
-				 float innerRadius,
-				 float outerRadius)
+                                 unsigned superLayerId,
+                                 unsigned localLayerId,
+                                 unsigned axialStereoLayerId,
+                                 unsigned axialStereoSuperLayerId,
+                                 float offset,
+                                 int nShifts,
+                                 float cellSize,
+                                 unsigned nWires,
+                                 float innerRadius,
+                                 float outerRadius)
 :  _id(id),
    _superLayerId(superLayerId),
    _localLayerId(localLayerId),
@@ -45,7 +45,7 @@ TRGCDCLayer::TRGCDCLayer(unsigned id,
 }
 
 TRGCDCLayer::TRGCDCLayer(unsigned id,
-				 const TRGCDCWire & w)
+                                 const TRGCDCWire & w)
 :  _id(id),
    _superLayerId(w.superLayerId()),
    _localLayerId(0),
@@ -83,11 +83,11 @@ TRGCDCLayer::wire(int id) const {
     if (_nWires == 0) return 0;
 
     if (id < 0)
-	while (id < 0)
-	    id += _nWires;
+        while (id < 0)
+            id += _nWires;
 
     if (id >= (int) _nWires)
-	id %= (int) _nWires;
+        id %= (int) _nWires;
 
     return (* this)[id];
 }

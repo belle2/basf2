@@ -32,9 +32,9 @@ class TRGCDCTrackSegment : public TRGCDCWire {
   public:
     /// Constructor.
     TRGCDCTrackSegment(unsigned id,
-			   const TRGCDCWire & w,
-			   const TRGCDCLayer * layer,
-			   const std::vector<const TRGCDCWire *> & cells);
+                           const TRGCDCWire & w,
+                           const TRGCDCLayer * layer,
+                           const std::vector<const TRGCDCWire *> & cells);
 
     /// Destructor
     virtual ~TRGCDCTrackSegment();
@@ -73,7 +73,7 @@ class TRGCDCTrackSegment : public TRGCDCWire {
 
     /// dumps debug information.
     void dump(const std::string & message = std::string(""),
-	      const std::string & prefix = std::string("")) const;
+              const std::string & prefix = std::string("")) const;
 
   public:// Modifiers
 

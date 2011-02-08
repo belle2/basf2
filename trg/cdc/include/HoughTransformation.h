@@ -43,15 +43,15 @@ class TRGCDCHoughTransformation {
 
     /// returns true if Y diverges in given region.
     virtual bool diverge(float xReal, float yReal, float x0, float x1)
-	const = 0;
+        const = 0;
 
     /// returns true if Y diverges in given region.
     virtual bool positiveDiverge(float xReal, float yReal, float x0, float x1)
-	const = 0;
+        const = 0;
 
     /// returns true if Y diverges in given region.
     virtual bool negativeDiverge(float xReal, float yReal, float x0, float x1)
-	const = 0;
+        const = 0;
 
 //     /// returns a gradient at given regsion.
 //     virtual float gradient(float xReal, float yReal, float x) const = 0;

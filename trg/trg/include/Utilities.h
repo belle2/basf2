@@ -50,8 +50,8 @@ class TRGUtilities {
 
     /// Dumps bit contents to cout.
     static void bitDisplay(unsigned val,
-			   unsigned firstDigit,
-			   unsigned lastDigit);
+                           unsigned firstDigit,
+                           unsigned lastDigit);
 };
 
 //-----------------------------------------------------------------------------

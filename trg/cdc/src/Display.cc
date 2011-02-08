@@ -17,6 +17,7 @@
 
 #include <iostream>
 #include "trg/cdc/Display.h"
+#include "trg/cdc/DisplayDrawingArea.h"
 
 using namespace std;
 
@@ -28,8 +29,8 @@ bool TRGCDCDisplay::_endOfEvent = false;
 bool TRGCDCDisplay::_endOfEventFlag = false;
 
 TRGCDCDisplay::TRGCDCDisplay(const string & name,
-			     int sizeWindow,
-			     int sizeMax)
+                             int sizeWindow,
+                             int sizeMax)
     : _skip(false),
       _wireName(false),
       _oldCDC(false),
@@ -39,8 +40,8 @@ TRGCDCDisplay::TRGCDCDisplay(const string & name,
       _buttonEndOfEvent("End of Event"),
       _buttonNextEvent("Next Event"),
       _label("Stage : TRGing not started\nInformation :",
-	     Gtk::ALIGN_LEFT,
-	     Gtk::ALIGN_TOP),
+             Gtk::ALIGN_LEFT,
+             Gtk::ALIGN_TOP),
       _buttonPositionReset("Reset position"),
       _buttonWireName("Wire Name") {
 
@@ -50,24 +51,24 @@ TRGCDCDisplay::TRGCDCDisplay(const string & name,
     _wireName = _buttonWireName.get_active();
 
     _buttonNext
-	.signal_clicked()
-	.connect(sigc::mem_fun(* this, & TRGCDCDisplay::on_next));
+        .signal_clicked()
+        .connect(sigc::mem_fun(* this, & TRGCDCDisplay::on_next));
     _menuButtons.pack_start(_buttonNext, Gtk::PACK_EXPAND_WIDGET, 2);
     _buttonEndOfEvent
-	.signal_clicked()
-	.connect(sigc::mem_fun(* this, & TRGCDCDisplay::on_endOfEvent));
+        .signal_clicked()
+        .connect(sigc::mem_fun(* this, & TRGCDCDisplay::on_endOfEvent));
     _menuButtons.pack_start(_buttonEndOfEvent, Gtk::PACK_EXPAND_WIDGET, 2);
     _buttonNextEvent
-	.signal_clicked()
-	.connect(sigc::mem_fun(* this, & TRGCDCDisplay::on_nextEvent));
+        .signal_clicked()
+        .connect(sigc::mem_fun(* this, & TRGCDCDisplay::on_nextEvent));
     _menuButtons.pack_start(_buttonNextEvent, Gtk::PACK_EXPAND_WIDGET, 2);
 
     _buttonPositionReset
-	.signal_clicked()
-	.connect(sigc::mem_fun(* this, & TRGCDCDisplay::on_positionReset));
+        .signal_clicked()
+        .connect(sigc::mem_fun(* this, & TRGCDCDisplay::on_positionReset));
     _buttonWireName
-	.signal_clicked()
-	.connect(sigc::mem_fun(* this, & TRGCDCDisplay::on_wireName));
+        .signal_clicked()
+        .connect(sigc::mem_fun(* this, & TRGCDCDisplay::on_wireName));
 }
 
 TRGCDCDisplay::~TRGCDCDisplay() {
@@ -111,8 +112,8 @@ TRGCDCDisplay::run(void) {
     Gtk::Main main_instance(argc, argv);
     show();
     if (((! _skip) && (! _skipEvent)) ||
-	(_endOfEventFlag && _endOfEvent))
-	Gtk::Main::run();
+        (_endOfEventFlag && _endOfEvent))
+        Gtk::Main::run();
 }
 
 void

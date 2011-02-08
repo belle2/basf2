@@ -35,8 +35,8 @@ class TRGClock {
   public:
     /// Constructor. "offset" is in unit of ns. "frequency" is in unit of MHz.
     TRGClock(double offset,
-	     double frequency,
-	     const std::string & name = "a clock");
+             double frequency,
+             const std::string & name = "a clock");
 
     /// Destructor
     virtual ~TRGClock();
@@ -57,7 +57,7 @@ class TRGClock {
 
     /// dumps contents. "message" is to select information to dump. "pre" will be printed in head of each line.
     void dump(const std::string & message = "",
-	      const std::string & pre = "") const;
+              const std::string & pre = "") const;
 
   public://
 

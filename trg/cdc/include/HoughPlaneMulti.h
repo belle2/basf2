@@ -31,13 +31,13 @@ class TRGCDCHoughPlaneMulti : public TRGCDCHoughPlane {
   public:
     /// Contructor.
     TRGCDCHoughPlaneMulti(const std::string & name,
-		     unsigned nX,
-		     float xMin,
-		     float xMax,
-		     unsigned nY,
-		     float yMin,
-		     float yMax,
-		     unsigned nLayers);
+                     unsigned nX,
+                     float xMin,
+                     float xMax,
+                     unsigned nY,
+                     float yMin,
+                     float yMax,
+                     unsigned nLayers);
 
     /// Destructor
     virtual ~TRGCDCHoughPlaneMulti();
@@ -47,7 +47,7 @@ class TRGCDCHoughPlaneMulti : public TRGCDCHoughPlane {
     virtual unsigned nActiveCellsInPattern(unsigned layerId) const;
 
     void dump(const std::string & message = std::string(""),
-	      const std::string & prefix = std::string("")) const;
+              const std::string & prefix = std::string("")) const;
 
   public:// Modifiers
     /// Clears all entries.
@@ -55,11 +55,11 @@ class TRGCDCHoughPlaneMulti : public TRGCDCHoughPlane {
 
     /// vote
     void vote(float rx,
-	      float ry,
-	      float charge,
-	      const TRGCDCHoughTransformation & hough,
-	      unsigned weight,
-	      unsigned layerId);
+              float ry,
+              float charge,
+              const TRGCDCHoughTransformation & hough,
+              unsigned weight,
+              unsigned layerId);
     void vote(float phi, unsigned layerId, int weight);
     void merge(void);
 
@@ -77,8 +77,8 @@ inline
 void
 TRGCDCHoughPlaneMulti::clear(void) {
     for (unsigned i = 0; i < N_LAYERS; i++)
-	if (_usage[i])
-	    _layers[i]->clear();
+        if (_usage[i])
+            _layers[i]->clear();
     TRGCDCHoughPlane::clear();
 }
 

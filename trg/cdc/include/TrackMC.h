@@ -71,7 +71,7 @@ class TRGCDCTrackMC {
 
     /// dumps debug information.
     void dump(const std::string & message = std::string(""),
-	      const std::string & prefix = std::string("")) const;
+              const std::string & prefix = std::string("")) const;
 
     /// returns a list of TRGCDCWireHitMC.
     std::vector<const TRGCDCWireHitMC *> hits(void) const;

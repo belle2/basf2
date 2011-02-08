@@ -29,8 +29,8 @@ namespace Belle2_GDL {
 namespace Belle2 {
 
 TRGClock::TRGClock(double offset,
-		   double frequency,
-		   const std::string & name) :
+                   double frequency,
+                   const std::string & name) :
     _offset(offset),
     _frequency(frequency),
     _cycle(1000 / frequency),
@@ -43,10 +43,10 @@ TRGClock::TRGClock(double offset,
     _name(name) {
 
     if (this != & Belle2_GDL::GDLSystemClock) {
-	if (Belle2_GDL::GDLSystemClock.minTiming() > minTiming())
-	    _min = int(Belle2_GDL::GDLSystemClock.minTiming() / _cycle);
-	if (Belle2_GDL::GDLSystemClock.maxTiming() < maxTiming())
-	    _max = int(Belle2_GDL::GDLSystemClock.maxTiming() / _cycle);
+        if (Belle2_GDL::GDLSystemClock.minTiming() > minTiming())
+            _min = int(Belle2_GDL::GDLSystemClock.minTiming() / _cycle);
+        if (Belle2_GDL::GDLSystemClock.maxTiming() < maxTiming())
+            _max = int(Belle2_GDL::GDLSystemClock.maxTiming() / _cycle);
     }
 }
 
@@ -55,18 +55,18 @@ TRGClock::~TRGClock() {
 
 void
 TRGClock::dump(const std::string & message,
-	       const std::string & pre) const {
+               const std::string & pre) const {
     cout << pre << _name << ":" << endl
-	 << pre << "    offset   :" << _offset << endl
-	 << pre << "    freq(MHz):" << _frequency << endl
-	 << pre << "    cycle(ns):" << _cycle << endl
-	 << pre << "    min pos  :" << _min << endl
-	 << pre << "    max pos  :" << _max << endl
-	 << pre << "    min(ns)  :" << minTiming() << endl
-	 << pre << "    max(ns)  :" << maxTiming() << endl;
+         << pre << "    offset   :" << _offset << endl
+         << pre << "    freq(MHz):" << _frequency << endl
+         << pre << "    cycle(ns):" << _cycle << endl
+         << pre << "    min pos  :" << _min << endl
+         << pre << "    max pos  :" << _max << endl
+         << pre << "    min(ns)  :" << minTiming() << endl
+         << pre << "    max(ns)  :" << maxTiming() << endl;
 
     cout << "min,max=" << numeric_limits<int>::min() << ","
-	 << numeric_limits<int>::max() << endl;
+         << numeric_limits<int>::max() << endl;
 
 
 }
@@ -74,9 +74,9 @@ TRGClock::dump(const std::string & message,
 int
 TRGClock::time(double t) const {
     if ((t < minTiming()) || (t > maxTiming()))
-	cout << "TRGClock::unit(" << _name
-	     << ") !!! out of time window : min=" << minTiming()
-	     << ",max=" << maxTiming() << ",given value=" << t << endl;
+        cout << "TRGClock::unit(" << _name
+             << ") !!! out of time window : min=" << minTiming()
+             << ",max=" << maxTiming() << ",given value=" << t << endl;
 
 //     cout << "t,offset,unit=" << t << "," << _offset << "," << int((t - _offset) / _cycle) << endl;
 

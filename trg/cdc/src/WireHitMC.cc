@@ -18,7 +18,7 @@
 namespace Belle2 {
 
 TRGCDCWireHitMC::TRGCDCWireHitMC(const TRGCDCWire * w,
-			     const TRGCDCWireHit * wh)
+                             const TRGCDCWireHit * wh)
 : _wire(w),
   _hit(wh) {
 }

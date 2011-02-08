@@ -77,8 +77,8 @@ TRGCDCDisplayDrawingAreaHough::on_realize() {
     _window = get_window();
     _window->get_geometry(_winx, _winy, _winw, _winh, _wind);
     if (_hp) {
-	_x = _hp->nX() / 2;
-	_y = _hp->nY() / 2;
+        _x = _hp->nX() / 2;
+        _y = _hp->nY() / 2;
     }
     _gc = Gdk::GC::create(_window);
     _window->set_background(_white);
@@ -109,9 +109,9 @@ TRGCDCDisplayDrawingAreaHough::draw(void) {
 
     Glib::RefPtr<Gdk::Colormap> colormap = get_default_colormap();
     _gc->set_line_attributes(1,
-			     Gdk::LINE_SOLID,
-			     Gdk::CAP_NOT_LAST,
-			     Gdk::JOIN_MITER);
+                             Gdk::LINE_SOLID,
+                             Gdk::CAP_NOT_LAST,
+                             Gdk::JOIN_MITER);
 
     //...Cal. scale for y coordinate...
     const float xMin = _hp->xMin();
@@ -126,58 +126,58 @@ TRGCDCDisplayDrawingAreaHough::draw(void) {
     //...Search maximum...
     unsigned nMax = 0;
     for (unsigned i = 0; i < _hp->nX(); i++) {
-	for (unsigned j = 0; j < _hp->nY(); j++) {
-	    const unsigned n = _hp->entry(i, j);
-	    if (n > nMax) nMax = n;
-	}
+        for (unsigned j = 0; j < _hp->nY(); j++) {
+            const unsigned n = _hp->entry(i, j);
+            if (n > nMax) nMax = n;
+        }
     }
 
     if (nMax == 0)
-	std::cout << "max entry=" << nMax << std::endl;
+        std::cout << "max entry=" << nMax << std::endl;
 
     //...Draw...
     for (unsigned i = 0; i < _hp->nX(); i++) {
-	for (unsigned j = 0; j < _hp->nY(); j++) {
-	    const unsigned n = _hp->entry(i, j);
-	    if (n) {
-		const float x = float(i) * _hp->xSize() * _scaleX;
-		const float y = float(j) * _hp->ySize() * _scaleY;
+        for (unsigned j = 0; j < _hp->nY(); j++) {
+            const unsigned n = _hp->entry(i, j);
+            if (n) {
+                const float x = float(i) * _hp->xSize() * _scaleX;
+                const float y = float(j) * _hp->ySize() * _scaleY;
 
-		const int x0 = int(x);
-		const int y0 = int(y);
-		const int z0 = toY(y0);
-		const int x1 = int(x + _hp->xSize() * _scaleX) - x0;
-		const int y1 = int(y + _hp->ySize() * _scaleY) - y0;
-		const float level = float(n) / float(nMax);
+                const int x0 = int(x);
+                const int y0 = int(y);
+                const int z0 = toY(y0);
+                const int x1 = int(x + _hp->xSize() * _scaleX) - x0;
+                const int y1 = int(y + _hp->ySize() * _scaleY) - y0;
+                const float level = float(n) / float(nMax);
 
-		if (level < 0.25)
-		    _gc->set_foreground(_gray0);
- 		else if (level < 0.5)
- 		    _gc->set_foreground(_gray1);
- 		else if (level < 0.75)
- 		    _gc->set_foreground(_gray2);
- 		else if (level > 0.90)
- 		    _gc->set_foreground(_red);
- 		else
- 		    _gc->set_foreground(_gray3);
+                if (level < 0.25)
+                    _gc->set_foreground(_gray0);
+                 else if (level < 0.5)
+                     _gc->set_foreground(_gray1);
+                 else if (level < 0.75)
+                     _gc->set_foreground(_gray2);
+                 else if (level > 0.90)
+                     _gc->set_foreground(_red);
+                 else
+                     _gc->set_foreground(_gray3);
 
-		_window->draw_rectangle(_gc, true, x0, z0, x1, y1);
+                _window->draw_rectangle(_gc, true, x0, z0, x1, y1);
 
-// 		const int x2 = x0 - int(_x - _winw / 2);
-// 		const int y2 = z0 - int(_y - _winh / 2);
-// 		const int x2 = xT(i);
-// 		const int y2 = yT(j);
-// 		_gc->set_foreground(_green);
-// 		_window->draw_rectangle(_gc, true, x2, y2, x1, y1);
+//                 const int x2 = x0 - int(_x - _winw / 2);
+//                 const int y2 = z0 - int(_y - _winh / 2);
+//                 const int x2 = xT(i);
+//                 const int y2 = yT(j);
+//                 _gc->set_foreground(_green);
+//                 _window->draw_rectangle(_gc, true, x2, y2, x1, y1);
 
-//  		std::cout << "x0,y0,z0,x1,y1=" << x0 << ","
-// 			  << y0 << "," << z0 << "," << x1 << ","
-// 			  << y1 << ",level=" << level << std::endl;
-// 		std::cout << "x2,y2,x3,y3=" << x2 << ","
-// 			  << y2 << "," << ",level=" << level << std::endl;
-		
-	    }
-	}
+//                  std::cout << "x0,y0,z0,x1,y1=" << x0 << ","
+//                           << y0 << "," << z0 << "," << x1 << ","
+//                           << y1 << ",level=" << level << std::endl;
+//                 std::cout << "x2,y2,x3,y3=" << x2 << ","
+//                           << y2 << "," << ",level=" << level << std::endl;
+                
+            }
+        }
     }
 
     //...Draw boundary...
@@ -190,66 +190,66 @@ TRGCDCDisplayDrawingAreaHough::draw(void) {
     _window->draw_rectangle(_gc, true, x0, z0, x1, y1);
 
 //  std::cout << "TWHDArea ... xMin,xMax,yMin,yMax=" << xMin << "," << xMax
-// 	   << "," << yMin << "," << yMax << std::endl;
+//            << "," << yMin << "," << yMax << std::endl;
 //  std::cout << "TWHDArea ... winx,winy,winw,winh,wind=" << _winx << "," << _winy
-// 	   << "," << _winw << "," << _winh << "," << _wind << std::endl;
+//            << "," << _winw << "," << _winh << "," << _wind << std::endl;
 
     //...Draw region...
     _gc->set_foreground(_green);
     const std::vector<std::vector<unsigned> *> & regions = _hp->regions();
     for (unsigned i = 0; i < (unsigned) regions.size(); i++) {
 
-//	std::cout << "TWH ... region " << i << std::endl;
+//        std::cout << "TWH ... region " << i << std::endl;
 
-	for (unsigned j = 0; j < (unsigned) regions[i]->size(); j++) {
-//	    const unsigned id = * (* regions[i])[j];
-	    const unsigned id = (* regions[i])[j];
-	    unsigned ix = 0;
-	    unsigned iy = 0;
-	    _hp->id(id, ix, iy);
+        for (unsigned j = 0; j < (unsigned) regions[i]->size(); j++) {
+//            const unsigned id = * (* regions[i])[j];
+            const unsigned id = (* regions[i])[j];
+            unsigned ix = 0;
+            unsigned iy = 0;
+            _hp->id(id, ix, iy);
 
-	    const float x = float(ix) * _hp->xSize() * _scaleX;
-	    const float y = float(iy) * _hp->ySize() * _scaleY;
+            const float x = float(ix) * _hp->xSize() * _scaleX;
+            const float y = float(iy) * _hp->ySize() * _scaleY;
 
-	    const int x0 = int(x);
-	    const int y0 = int(y);
-	    const int z0 = toY(y0);
+            const int x0 = int(x);
+            const int y0 = int(y);
+            const int z0 = toY(y0);
 
-	    const int x1 = int(x + _hp->xSize() * _scaleX);
-	    const int y1 = int(y + _hp->ySize() * _scaleY) - y0;
-	    const int z1 = z0 + y1;
+            const int x1 = int(x + _hp->xSize() * _scaleX);
+            const int y1 = int(y + _hp->ySize() * _scaleY) - y0;
+            const int z1 = z0 + y1;
 
-// 	    std::cout << "TWH ... id=" << id
-// 						<< std::endl;
+//             std::cout << "TWH ... id=" << id
+//                                                 << std::endl;
 
-	    for (unsigned k = 0; k < 8; k++) {
-		if (k % 2) continue;
-		unsigned idx = _hp->neighbor(id, k);
+            for (unsigned k = 0; k < 8; k++) {
+                if (k % 2) continue;
+                unsigned idx = _hp->neighbor(id, k);
 
-		if (idx == id) continue;
-		bool found = false;
-		for (unsigned l = 0;
-		     l < (unsigned) regions[i]->size();
-		     l++) {
-//		    if (idx == * (* regions[i])[l]) {
-		    if (idx == (* regions[i])[l]) {
-//			std::cout << "        " << idx << " is neighbor " << k << std::endl;
-			found = true;
-			break;
-		    }
-//		    std::cout << "        " << idx << " is not neighbor " << k << std::endl;
-		}
-		if (found) continue;
-		if (k == 0)
-		    _window->draw_line(_gc, x0, z0, x1, z0);
-		else if (k == 2)
-		    _window->draw_line(_gc, x1, z0, x1, z1);
-		else if (k == 4)
-		    _window->draw_line(_gc, x0, z1, x1, z1);
-		else if (k == 6)
-		    _window->draw_line(_gc, x0, z0, x0, z1);
-	    }
-	}
+                if (idx == id) continue;
+                bool found = false;
+                for (unsigned l = 0;
+                     l < (unsigned) regions[i]->size();
+                     l++) {
+//                    if (idx == * (* regions[i])[l]) {
+                    if (idx == (* regions[i])[l]) {
+//                        std::cout << "        " << idx << " is neighbor " << k << std::endl;
+                        found = true;
+                        break;
+                    }
+//                    std::cout << "        " << idx << " is not neighbor " << k << std::endl;
+                }
+                if (found) continue;
+                if (k == 0)
+                    _window->draw_line(_gc, x0, z0, x1, z0);
+                else if (k == 2)
+                    _window->draw_line(_gc, x1, z0, x1, z1);
+                else if (k == 4)
+                    _window->draw_line(_gc, x0, z1, x1, z1);
+                else if (k == 6)
+                    _window->draw_line(_gc, x0, z0, x0, z1);
+            }
+        }
     }
 
     //...Draw text...

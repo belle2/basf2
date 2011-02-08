@@ -28,17 +28,17 @@ namespace Belle2 {
 // bool TRGCDCDisplayRphi::_endOfEventFlag = false;
 
 TRGCDCDisplayRphi::TRGCDCDisplayRphi(const string & name,
-				     double innerR,
-				     double outerR,
-				     int size)
+                                     double innerR,
+                                     double outerR,
+                                     int size)
     : TRGCDCDisplay(name, size, int(outerR)),
       _axial(true),
       _stereo(false),
       _w(size, innerR, outerR),
       _adjustment(double(size) / outerR / 2,
-		  double(size) / outerR / 2,
-		  10.0,
-		  0.1),
+                  double(size) / outerR / 2,
+                  10.0,
+                  0.1),
       _scaler(_adjustment),
       _buttonAxial("Axial"),
       _buttonStereo("Stereo"),
@@ -53,14 +53,14 @@ TRGCDCDisplayRphi::TRGCDCDisplayRphi(const string & name,
     _buttonBelleCDC.set_active(false);
 
     _buttonAxial
-	.signal_clicked()
-	.connect(sigc::mem_fun(* this, & TRGCDCDisplayRphi::on_axial));
+        .signal_clicked()
+        .connect(sigc::mem_fun(* this, & TRGCDCDisplayRphi::on_axial));
     _buttonStereo
-	.signal_clicked()
-	.connect(sigc::mem_fun(* this, & TRGCDCDisplayRphi::on_stereo));
+        .signal_clicked()
+        .connect(sigc::mem_fun(* this, & TRGCDCDisplayRphi::on_stereo));
     _buttonBelleCDC
-	.signal_clicked()
-	.connect(sigc::mem_fun(* this, & TRGCDCDisplayRphi::on_BelleCDC));
+        .signal_clicked()
+        .connect(sigc::mem_fun(* this, & TRGCDCDisplayRphi::on_BelleCDC));
 
     _scaler.set_update_policy(Gtk::UPDATE_CONTINUOUS);
     _scaler.set_digits(3);
@@ -68,9 +68,9 @@ TRGCDCDisplayRphi::TRGCDCDisplayRphi(const string & name,
     _scaler.set_draw_value();
     _scaler.set_size_request(200, 30);
     _scaler
-	.signal_value_changed()
-	.connect(sigc::mem_fun(* this,
-			       & TRGCDCDisplayRphi::on_scale_value_changed));
+        .signal_value_changed()
+        .connect(sigc::mem_fun(* this,
+                               & TRGCDCDisplayRphi::on_scale_value_changed));
 
     _bottom.pack_start(_scaler, Gtk::PACK_SHRINK, 5);
     _bottom.pack_start(_buttonPositionReset, Gtk::PACK_EXPAND_WIDGET, 2);

@@ -24,27 +24,27 @@ TRGCDCTrackMC::_list = std::vector<const TRGCDCTrackMC *>();
 void
 TRGCDCTrackMC::update(void) {
     if (_list.size()) {
-	for (unsigned i = 0; i < _list.size(); i++)
-	    delete _list[i];
-	_list.clear();
+        for (unsigned i = 0; i < _list.size(); i++)
+            delete _list[i];
+        _list.clear();
     }
 
 //    unsigned n = 0;
 
 //     for (unsigned i = 0; i < n; i++) {
-//	struct gen_hepevt * h = 0;
-// 	if (! h) {
-// 	    std::cout << "TRGCDCTrackMC::update !!! can not access to GEN_HEPEVT";
-// 	    std::cout << std::endl;
-// 	    break;
-// 	}
-// // 	if (h->m_P[3] != 0.0 && (h->m_P[0] * h->m_P[0] + h->m_P[1] * h->m_P[1]
-// // 				 + h->m_P[2] * h->m_P[2]) != 0.0) {
-// 	    _list.push_back(new TRGCDCTrackMC(h));
-// // 	} else {
-// // 	    std::cout << "TRGCDCTrackMC::update !!! momentum/energy is zero";
-// // 	    std::cout << std::endl;
-// // 	}
+//        struct gen_hepevt * h = 0;
+//         if (! h) {
+//             std::cout << "TRGCDCTrackMC::update !!! can not access to GEN_HEPEVT";
+//             std::cout << std::endl;
+//             break;
+//         }
+// //         if (h->m_P[3] != 0.0 && (h->m_P[0] * h->m_P[0] + h->m_P[1] * h->m_P[1]
+// //                                  + h->m_P[2] * h->m_P[2]) != 0.0) {
+//             _list.push_back(new TRGCDCTrackMC(h));
+// //         } else {
+// //             std::cout << "TRGCDCTrackMC::update !!! momentum/energy is zero";
+// //             std::cout << std::endl;
+// //         }
 //     }
 }
 
@@ -54,8 +54,8 @@ TRGCDCTrackMC::update(void) {
 //   _p(h->m_P[0], h->m_P[1], h->m_P[2], h->m_P[3]),
 //   _v(h->m_V[0], h->m_V[1], h->m_V[2]) {
 //     if (_hep->m_mother != 0) {
-// 	_mother = _list[_hep->m_mother - 1];
-// 	_mother->_children.push_back(this);
+//         _mother = _list[_hep->m_mother - 1];
+//         _mother->_children.push_back(this);
 //     }
 // }
 
@@ -64,9 +64,9 @@ TRGCDCTrackMC::TRGCDCTrackMC() {
 
 TRGCDCTrackMC::~TRGCDCTrackMC() {
     if (_list.size()) {
-	for (unsigned i = 0; i < _list.size(); i++)
-	    delete _list[i];
-	_list.clear();
+        for (unsigned i = 0; i < _list.size(); i++)
+            delete _list[i];
+        _list.clear();
     }
 }
 

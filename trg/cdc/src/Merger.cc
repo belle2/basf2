@@ -21,7 +21,7 @@ using namespace std;
 namespace Belle2 {
 
 TRGCDCMerger::TRGCDCMerger(const std::string & name,
-				   const TRGClock & clock)
+                                   const TRGClock & clock)
     : TRGBoard(name, clock) {
 }
 

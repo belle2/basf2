@@ -56,15 +56,15 @@ class TRGCDCDisplayDrawingAreaRphi : public TRGCDCDisplayDrawingArea {
 
     /// appends wire hits to display.
     void append(const std::vector<const TRGCDCWireHit *> &,
- 		Gdk::Color color = Gdk::Color("grey"));
+                 Gdk::Color color = Gdk::Color("grey"));
     void append(const TRGCDCTrackSegment &,
-  		Gdk::Color color = Gdk::Color("grey"));
+                  Gdk::Color color = Gdk::Color("grey"));
     void append(const std::vector<const TRGCDCTrackSegment *> &,
-  		Gdk::Color color = Gdk::Color("grey"));
+                  Gdk::Color color = Gdk::Color("grey"));
     void append(const TRGCDCFrontEnd &,
-  		Gdk::Color color = Gdk::Color("grey"));
+                  Gdk::Color color = Gdk::Color("grey"));
     void append(const TRGCDCMerger &,
-  		Gdk::Color color = Gdk::Color("grey"));
+                  Gdk::Color color = Gdk::Color("grey"));
 
     virtual bool on_expose_event(GdkEventExpose *);
     virtual bool on_button_press_event(GdkEventButton *);
@@ -76,21 +76,21 @@ class TRGCDCDisplayDrawingAreaRphi : public TRGCDCDisplayDrawingArea {
     void drawHits(void);
 
     void drawWire(const TRGCDCWire & w,
-		  int lineWidth,
-		  Gdk::Color & c,
-		  Gdk::LineStyle s);
+                  int lineWidth,
+                  Gdk::Color & c,
+                  Gdk::LineStyle s);
     void drawTrackSegment(const TRGCDCTrackSegment & w,
-			  int lineWidth,
-			  Gdk::Color & c,
-			  Gdk::LineStyle s);
+                          int lineWidth,
+                          Gdk::Color & c,
+                          Gdk::LineStyle s);
     void drawFrontEnd(const TRGCDCFrontEnd & w,
-		      int lineWidth,
-		      Gdk::Color & c,
-		      Gdk::LineStyle s);
+                      int lineWidth,
+                      Gdk::Color & c,
+                      Gdk::LineStyle s);
     void drawMerger(const TRGCDCMerger & w,
-		    int lineWidth,
-		    Gdk::Color & c,
-		    Gdk::LineStyle s);
+                    int lineWidth,
+                    Gdk::Color & c,
+                    Gdk::LineStyle s);
 
     /// Coordinate transformations.
     int x(double x) const;
@@ -203,7 +203,7 @@ inline
 int
 TRGCDCDisplayDrawingAreaRphi::x(double a) const {
 /*     std::cout << "_x,_scale,_winw/2,a=" << _x << "," << _scale << "," */
-/* 	      << _winw/2 << "," << a << std::endl; */
+/*               << _winw/2 << "," << a << std::endl; */
     return int((a - _x) * _scale + _winw / 2);
 }
 

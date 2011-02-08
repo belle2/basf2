@@ -71,11 +71,11 @@ class TRGCDCWireHit {
   public:
     /// Constructor.
     TRGCDCWireHit(const TRGCDCWire &,
-		float driftLeft,
-		float driftLeftError,
-		float driftRight,
-		float driftRightError,
-		float fudgeFacgtor = 1);
+                float driftLeft,
+                float driftLeftError,
+                float driftRight,
+                float driftRightError,
+                float fudgeFacgtor = 1);
 
     /// Destructor
     virtual ~TRGCDCWireHit();
@@ -83,7 +83,7 @@ class TRGCDCWireHit {
   public:// Selectors
     /// dumps debug information.
     void dump(const std::string & message = std::string(""),
-	      const std::string & prefix = std::string("")) const;
+              const std::string & prefix = std::string("")) const;
 
     /// returns a pointer to a TRGCDCWire.
 //  const TRGCDCWire * const wire(void) const;

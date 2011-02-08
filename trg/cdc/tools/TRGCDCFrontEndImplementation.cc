@@ -38,9 +38,9 @@ main(int argc, char * argv[]) {
 
     //...Check arguments...
     if (argc < 2) {
-	cout << NAME << " !!! one argument necessary" << endl
-	     << tab << " 1 : Version for new config file" << endl;
-	return -1;
+        cout << NAME << " !!! one argument necessary" << endl
+             << tab << " 1 : Version for new config file" << endl;
+        return -1;
     }
 
     //...Date...
@@ -52,14 +52,14 @@ main(int argc, char * argv[]) {
 
     //...1st argument...
     const string outname = "TRGCDCFrontEndImplementation_" + version + "_"
-	+ ts0 + ".vhdl";
+        + ts0 + ".vhdl";
 
     //...Open configuration data...
     ofstream outfile(outname.c_str(), ios::out);
     if (outfile.fail()) {
-	cout << NAME << " !!! can not open file" << endl
-	     << "    " << outname << endl;
-	return -2;
+        cout << NAME << " !!! can not open file" << endl
+             << "    " << outname << endl;
+        return -2;
     }
 
     //...Inner...

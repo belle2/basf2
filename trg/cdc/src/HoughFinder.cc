@@ -30,7 +30,9 @@ namespace Belle2_TRGCDC {
 #endif
 
 using namespace std;
+#ifdef TRGCDC_DISPLAY
 using namespace Belle2_TRGCDC;
+#endif
 
 namespace Belle2 {
 

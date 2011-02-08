@@ -46,7 +46,9 @@ namespace Belle2_TRGCDC {
 #define P3D HepGeom::Point3D<double>
 
 using namespace std;
+#ifdef TRGCDC_DISPLAY
 using namespace Belle2_TRGCDC;
+#endif
 
 namespace Belle2 {
 

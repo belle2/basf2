@@ -93,7 +93,7 @@ namespace Belle2 {
     TVector3 m_position;      /*!< Local position of hit (in module coordinates) */
     double m_globalTime;      /*!< Global time of hit */
     double m_energy;          /*!< Energy of detected photon */
-    double m_parentID;        /*!< G4 ID number of photons parent particle */
+    int m_parentID;        /*!< G4 ID number of photons parent particle */
 
 
     ClassDef(ARICHSimHit, 1); /*!< the class title */

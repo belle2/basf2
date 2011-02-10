@@ -74,7 +74,7 @@ void GeoStructureBelleII::create(GearDir& content)
 
   // --- Collect global parameters
   double GlobalRotAngle = content.getParamAngle("Rotation") / Unit::rad;
-  double GlobalOffsetZ  = content.getParamAngle("OffsetZ") / Unit::rad;
+  double GlobalOffsetZ  = content.getParamLength("OffsetZ") / Unit::cm;
   B2INFO("Structure : GlobalRotAngle (rad) =" << GlobalRotAngle);
   B2INFO("Structure : GlobalOffsetZ (cm)   =" << GlobalOffsetZ);
 

@@ -67,7 +67,7 @@ void GeoCoilBelleII::create(GearDir& content)
 
   // --- Collect global parameters
   double GlobalRotAngle = content.getParamAngle("Rotation") / Unit::rad;
-  double GlobalOffsetZ  = content.getParamAngle("OffsetZ") / Unit::rad;
+  double GlobalOffsetZ  = content.getParamLength("OffsetZ") / Unit::cm;
   B2INFO("Coil : GlobalRotAngle (rad) =" << GlobalRotAngle);
   B2INFO("Coil : GlobalOffsetZ (cm)   =" << GlobalOffsetZ);
 

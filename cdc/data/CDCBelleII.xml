@@ -84,7 +84,7 @@
         <BackwardZ desc="z position of this wire layer at backward endplate" unit="mm">-445.137</BackwardZ>
         <ForwardZ desc="z position of this wire layer at forward endplate" unit="mm">840.609</ForwardZ>
         <NHoles desc="the number of holes in this layer, 2*(cell number)">320</NHoles>
-        <NShift desc="the shifted hole number of each wire in this layer">13</NShift>
+        <NShift desc="the shifted hole number of each wire in this layer">18</NShift>
         <Offset desc="wire offset in phi direction at endplate">0</Offset>
       </SLayer>
       <SLayer id="9">
@@ -92,7 +92,7 @@
         <BackwardZ desc="z position of this wire layer at backward endplate" unit="mm">-476.661</BackwardZ>
         <ForwardZ desc="z position of this wire layer at forward endplate" unit="mm">900.139</ForwardZ>
         <NHoles desc="the number of holes in this layer, 2*(cell number)">320</NHoles>
-        <NShift desc="the shifted hole number of each wire in this layer">13</NShift>
+        <NShift desc="the shifted hole number of each wire in this layer">18</NShift>
         <Offset desc="wire offset in phi direction at endplate">0.5</Offset>
       </SLayer>
       <SLayer id="10">
@@ -100,7 +100,7 @@
         <BackwardZ desc="z position of this wire layer at backward endplate" unit="mm">-508.184</BackwardZ>
         <ForwardZ desc="z position of this wire layer at forward endplate" unit="mm">959.668</ForwardZ>
         <NHoles desc="the number of holes in this layer, 2*(cell number)">320</NHoles>
-        <NShift desc="the shifted hole number of each wire in this layer">13</NShift>
+        <NShift desc="the shifted hole number of each wire in this layer">18</NShift>
         <Offset desc="wire offset in phi direction at endplate">0</Offset>
       </SLayer>
       <SLayer id="11">
@@ -108,7 +108,7 @@
         <BackwardZ desc="z position of this wire layer at backward endplate" unit="mm">-539.707</BackwardZ>
         <ForwardZ desc="z position of this wire layer at forward endplate" unit="mm">1019.2</ForwardZ>
         <NHoles desc="the number of holes in this layer, 2*(cell number)">320</NHoles>
-        <NShift desc="the shifted hole number of each wire in this layer">13</NShift>
+        <NShift desc="the shifted hole number of each wire in this layer">18</NShift>
         <Offset desc="wire offset in phi direction at endplate">0.5</Offset>
       </SLayer>
       <SLayer id="12">
@@ -116,7 +116,7 @@
         <BackwardZ desc="z position of this wire layer at backward endplate" unit="mm">-571.231</BackwardZ>
         <ForwardZ desc="z position of this wire layer at forward endplate" unit="mm">1078.73</ForwardZ>
         <NHoles desc="the number of holes in this layer, 2*(cell number)">320</NHoles>
-        <NShift desc="the shifted hole number of each wire in this layer">13</NShift>
+        <NShift desc="the shifted hole number of each wire in this layer">18</NShift>
         <Offset desc="wire offset in phi direction at endplate">0</Offset>
       </SLayer>
       <SLayer id="13">
@@ -124,7 +124,7 @@
         <BackwardZ desc="z position of this wire layer at backward endplate" unit="mm">-602.754</BackwardZ>
         <ForwardZ desc="z position of this wire layer at forward endplate" unit="mm">1138.26</ForwardZ>
         <NHoles desc="the number of holes in this layer, 2*(cell number)">320</NHoles>
-        <NShift desc="the shifted hole number of each wire in this layer">13</NShift>
+        <NShift desc="the shifted hole number of each wire in this layer">18</NShift>
         <Offset desc="wire offset in phi direction at endplate">0.5</Offset>
       </SLayer>
       <SLayer id="14">

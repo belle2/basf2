@@ -6,8 +6,8 @@
 // Date : 3 - Sep - 2010
 //-
 
-#ifndef GEN_RAWDATA_H
-#define GEN_RAWDATA_H
+#ifndef GEN_RAWDATAMODULE_H
+#define GEN_RAWDATAODULE_H
 
 #include <framework/core/Module.h>
 #include <framework/datastore/DataStore.h>
@@ -16,15 +16,15 @@
 
 namespace Belle2 {
 
-  class GenRawData : public Module {
+  class GenRawDataModule : public Module {
 
   public:
 
     //! Constructor
-    GenRawData();
+    GenRawDataModule();
 
     //! Destructor
-    virtual ~GenRawData();
+    virtual ~GenRawDataModule();
 
     //! Initialize the Module
     virtual void initialize();

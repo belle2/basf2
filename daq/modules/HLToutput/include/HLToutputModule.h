@@ -8,33 +8,33 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef HLTINPUT_H
-#define HLTINPUT_H
+#ifndef HLTOUTPUTMODULE_H
+#define HLTOUTPUTMODULE_H
 
 #include <vector>
+#include <string>
+
+#include <boost/shared_ptr.hpp>
 
 #include <framework/core/Module.h>
 
 #include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreDefs.h>
 
-#include <framework/core/Module.h>
-#include <framework/pcore/MsgHandler.h>
 #include <framework/pcore/EvtMessage.h>
+#include <framework/pcore/MsgHandler.h>
 #include <framework/pcore/RingBuffer.h>
 
-#include <daq/hlt/EvtReceiver.h>
-#include <daq/hlt/HLTDefs.h>
+#include <daq/hlt/EvtSender.h>
 
 #define MAXPACKET 10000000 * 4
 
 namespace Belle2 {
 
-  class HLTInput : public Module {
+  class HLTOutputModule : public Module {
 
   public:
-    HLTInput();
-    virtual ~HLTInput();
+    HLTOutputModule();
+    virtual ~HLTOutputModule();
 
     virtual void initialize();
     virtual void beginRun();
@@ -42,23 +42,27 @@ namespace Belle2 {
     virtual void endRun();
     virtual void terminate();
 
-    int readData(const EDurability&);
+    void putData(const std::string);
+    void putData(const DataStore::EDurability&);
 
   protected:
 
 
   private:
-    EvtReceiver* m_evtReceiver;
-    RingBuffer* m_inBuf;
-    pid_t m_pidEvtReceiver;
+    EvtSender* m_evtSender;
+    RingBuffer* m_outBuf;
+    pid_t m_pidEvtSender;
     int m_port;
+    std::string m_dest;
 
-    std::vector<std::string> m_objnames[c_NDurabilityTypes];
-    std::vector<std::string> m_arraynames[c_NDurabilityTypes];
+    std::vector<std::string> m_branchNames[DataStore::c_NDurabilityTypes];
+    bool m_done[DataStore::c_NDurabilityTypes];
+    StoreIter* m_obj_iter[DataStore::c_NDurabilityTypes];
+    StoreIter* m_array_iter[DataStore::c_NDurabilityTypes];
 
     MsgHandler* m_msgHandler;
   };
 
 } // end namespace Belle2
 
-#endif // SIMPLEINPUT_H
+#endif // HLTOUTPUTMODULE_H

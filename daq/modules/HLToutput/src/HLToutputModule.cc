@@ -10,7 +10,7 @@
 
 #include <sys/wait.h>
 #include <ctime>
-#include <daq/modules/HLToutput/HLToutput.h>
+#include <daq/modules/HLToutput/HLToutputModule.h>
 
 #include <framework/core/ModuleManager.h>
 
@@ -20,40 +20,41 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(HLTOutput, "HLTOutput")
+REG_MODULE(HLTOutput)
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-HLTOutput::HLTOutput() : Module()
+HLTOutputModule::HLTOutputModule() : Module()
 {
   setDescription("HLTOutput module");
   //setPropertyFlags(c_TriggersNewRun | c_TriggersEndOfData | c_ReadsDataSingleProcess);
   //setPropertyFlags(c_TriggersNewRun | c_TriggersEndOfData);
-  setPropertyFlags(c_WritesDataSingleProcess | c_RequiresSingleProcess);
+  //setPropertyFlags(c_WritesDataSingleProcess | c_RequiresSingleProcess);
+  setPropertyFlags(c_Input);
 
-  addParam("dest", m_dest, string("localhost"), "Destination IP address");
-  addParam("port", m_port, 20000, "Port number for the communication");
+  addParam("dest", m_dest, string("localhost"), string("Destination IP address"));
+  //addParam("port", m_port, 20000, "Port number for the communication");
 
   vector<std::string> branchNames;
-  addParam("branchNames", m_branchNames[0], branchNames, "Names of branches to be written from event");
-  addParam("branchNamesRun", m_branchNames[1], branchNames, "Names of branches to be written from run");
-  addParam("branchNamesPersistent", m_branchNames[2], branchNames, "Names of branches to be written from persistent");
+  addParam("branchNames", m_branchNames[0], string("Names of branches to be written from event"), branchNames);
+  addParam("branchNamesRun", m_branchNames[1], string("Names of branches to be written from run"), branchNames);
+  addParam("branchNamesPersistent", m_branchNames[2], string("Names of branches to be written from persistent"), branchNames);
 }
 
-HLTOutput::~HLTOutput()
+HLTOutputModule::~HLTOutputModule()
 {
 }
 
-void HLTOutput::initialize()
+void HLTOutputModule::initialize()
 {
   m_msgHandler = new MsgHandler(1);
 
   // Set data
-  for (int i = 0; i < c_NDurabilityTypes; i++) {
-    m_obj_iter[i] = DataStore::Instance().getObjectIterator(static_cast<EDurability>(i));
-    m_array_iter[i] = DataStore::Instance().getArrayIterator(static_cast<EDurability>(i));
+  for (int i = 0; i < DataStore::c_NDurabilityTypes; i++) {
+    m_obj_iter[i] = DataStore::Instance().getObjectIterator(static_cast<DataStore::EDurability>(i));
+    m_array_iter[i] = DataStore::Instance().getArrayIterator(static_cast<DataStore::EDurability>(i));
     m_done[i] = false;
   }
 
@@ -83,13 +84,13 @@ void HLTOutput::initialize()
   }
 }
 
-void HLTOutput::beginRun()
+void HLTOutputModule::beginRun()
 {
   if (m_pidEvtSender > 0)
     B2INFO("Begin a new run...");
 }
 
-void HLTOutput::event()
+void HLTOutputModule::event()
 {
   if (m_pidEvtSender > 0) {
     /*
@@ -101,21 +102,21 @@ void HLTOutput::event()
     //std::string dummyData (m_dummySize, 'c');
     //B2INFO ("Available string length = " << dummyData.max_size ());
     //putData (dummyData);
-    putData(c_Event);
+    putData(DataStore::c_Event);
     putData("EOF");
 
     //B2INFO ("HLTOutput module: event () ends");
   }
 }
 
-void HLTOutput::endRun()
+void HLTOutputModule::endRun()
 {
   if (m_pidEvtSender > 0) {
     //B2INFO ("HLTOutput module: endRun () called");
   }
 }
 
-void HLTOutput::terminate()
+void HLTOutputModule::terminate()
 {
   if (m_pidEvtSender > 0) {
     B2INFO("HLTOutput module: terminate () called");
@@ -129,13 +130,13 @@ void HLTOutput::terminate()
     B2INFO("EvtSender dies");
 }
 
-void HLTOutput::putData(const std::string data)
+void HLTOutputModule::putData(const std::string data)
 {
   if (data.size() > 0)
     m_outBuf->insq((int*)(data.c_str()), data.size());
 }
 
-void HLTOutput::putData(const EDurability& durability)
+void HLTOutputModule::putData(const DataStore::EDurability& durability)
 {
   B2INFO("HLTOutput: putData () function starts");
   B2INFO("   MsgHandler initialized.");

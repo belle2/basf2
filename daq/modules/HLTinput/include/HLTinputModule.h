@@ -8,34 +8,32 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef HLTOUTPUT_H
-#define HLTOUTPUT_H
+#ifndef HLTINPUTMODULE_H
+#define HLTINPUTMODULE_H
 
 #include <vector>
-#include <string>
-
-#include <boost/shared_ptr.hpp>
 
 #include <framework/core/Module.h>
 
 #include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreDefs.h>
 
-#include <framework/pcore/EvtMessage.h>
+#include <framework/core/Module.h>
 #include <framework/pcore/MsgHandler.h>
+#include <framework/pcore/EvtMessage.h>
 #include <framework/pcore/RingBuffer.h>
 
-#include <daq/hlt/EvtSender.h>
+#include <daq/hlt/EvtReceiver.h>
+#include <daq/hlt/HLTDefs.h>
 
 #define MAXPACKET 10000000 * 4
 
 namespace Belle2 {
 
-  class HLTOutput : public Module {
+  class HLTInputModule : public Module {
 
   public:
-    HLTOutput();
-    virtual ~HLTOutput();
+    HLTInputModule();
+    virtual ~HLTInputModule();
 
     virtual void initialize();
     virtual void beginRun();
@@ -43,27 +41,23 @@ namespace Belle2 {
     virtual void endRun();
     virtual void terminate();
 
-    void putData(const std::string);
-    void putData(const EDurability&);
+    int readData(const DataStore::EDurability&);
 
   protected:
 
 
   private:
-    EvtSender* m_evtSender;
-    RingBuffer* m_outBuf;
-    pid_t m_pidEvtSender;
+    EvtReceiver* m_evtReceiver;
+    RingBuffer* m_inBuf;
+    pid_t m_pidEvtReceiver;
     int m_port;
-    std::string m_dest;
 
-    std::vector<std::string> m_branchNames[c_NDurabilityTypes];
-    bool m_done[c_NDurabilityTypes];
-    StoreIter* m_obj_iter[c_NDurabilityTypes];
-    StoreIter* m_array_iter[c_NDurabilityTypes];
+    std::vector<std::string> m_objnames[DataStore::c_NDurabilityTypes];
+    std::vector<std::string> m_arraynames[DataStore::c_NDurabilityTypes];
 
     MsgHandler* m_msgHandler;
   };
 
 } // end namespace Belle2
 
-#endif // SIMPLEINPUT_H
+#endif // HLTINPUTMODULE_H

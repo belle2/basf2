@@ -9,7 +9,7 @@
  **************************************************************************/
 
 #include <sys/wait.h>
-#include <daq/modules/HLTinput/HLTinput.h>
+#include <daq/modules/HLTinput/HLTinputModule.h>
 
 #include <framework/core/ModuleManager.h>
 
@@ -19,26 +19,27 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(HLTInput, "HLTInput")
+REG_MODULE(HLTInput)
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-HLTInput::HLTInput() : Module()
+HLTInputModule::HLTInputModule() : Module()
 {
   setDescription("HLTInput module");
   //setPropertyFlags(c_TriggersNewRun | c_TriggersEndOfData | c_ReadsDataSingleProcess);
-  setPropertyFlags(c_TriggersNewRun | c_TriggersEndOfData);
+  //setPropertyFlags(DataStore::c_TriggersNewRun | DataStore::c_TriggersEndOfData);
+  setPropertyFlags(c_Input);
   //setPropertyFlags(c_WritesDataSingleProcess | c_RequiresSingleProcess);
-  addParam("port", m_port, 20000, "Port number for the communication");
+  //addParam("port", m_port, 20000, string ("Port number for the communication"));
 }
 
-HLTInput::~HLTInput()
+HLTInputModule::~HLTInputModule()
 {
 }
 
-void HLTInput::initialize()
+void HLTInputModule::initialize()
 {
   m_msgHandler = new MsgHandler(1);
 
@@ -62,17 +63,17 @@ void HLTInput::initialize()
   }
 }
 
-void HLTInput::beginRun()
+void HLTInputModule::beginRun()
 {
 }
 
-void HLTInput::event()
+void HLTInputModule::event()
 {
   if (m_pidEvtReceiver > 0) {
     while (1) {
       if (m_inBuf->numq() > 0) {
         B2INFO("Starting to process in HLTInput module");
-        int type = readData(c_Event);
+        int type = readData(DataStore::c_Event);
         if (type == -1) {
           B2INFO("HLTInput module: EOF detected!");
           break;
@@ -121,14 +122,14 @@ void HLTInput::event()
   }
 }
 
-void HLTInput::endRun()
+void HLTInputModule::endRun()
 {
   if (m_pidEvtReceiver > 0) {
     //B2INFO ("HLTInput module: endRun () called");
   }
 }
 
-void HLTInput::terminate()
+void HLTInputModule::terminate()
 {
   if (m_pidEvtReceiver > 0) {
     B2INFO("HLTInput module: terminate () called");
@@ -142,7 +143,7 @@ void HLTInput::terminate()
     B2INFO("EvtReceiver dies");
 }
 
-int HLTInput::readData(const EDurability& indurability)
+int HLTInputModule::readData(const DataStore::EDurability& indurability)
 {
   int size;
 
@@ -166,7 +167,7 @@ int HLTInput::readData(const EDurability& indurability)
   B2INFO("Reading data from ring buffer (size = " << msg->size() << ")");
 
   RECORD_TYPE type = msg->type();
-  EDurability durability = (EDurability)(msg->header())->reserved[0];
+  DataStore::EDurability durability = (DataStore::EDurability)(msg->header())->reserved[0];
   int nobjs = msg->header()->reserved[1];
   int narrays = msg->header()->reserved[2];
 

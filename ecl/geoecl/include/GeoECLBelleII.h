@@ -39,7 +39,14 @@ namespace Belle2 {
     */
     virtual void create(GearDir& content);
 //    virtual void printtest(GearDir& content);
+
+    /*!
+      \create endcap crystal
+    */
     virtual void makeENDCAP(GearDir& content, TGeoVolumeAssembly* group);
+    /*!
+      \create Barrel  crystal
+    */
     virtual void makeBarrel(GearDir& content, TGeoVolumeAssembly* group);
 
 

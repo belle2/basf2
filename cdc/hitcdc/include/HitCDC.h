@@ -34,6 +34,12 @@ namespace Belle2 {
     //! Right drift length of this digit.
     double m_rightDriftLength;
 
+    //! Left drift time of this digit.
+    double m_leftDriftTime;
+
+    //! Right drift time of this digit.
+    double m_rightDriftTime;
+
     //! Charge of this digit.
     double m_charge;
 
@@ -48,6 +54,12 @@ namespace Belle2 {
 
     //! The method to set right drift length
     void setRightDriftLength(double rightDriftLength) { m_rightDriftLength = rightDriftLength; }
+
+    //! The method to set left drift time
+    void setLeftDriftTime(double leftDriftTime) { m_leftDriftTime = leftDriftTime; }
+
+    //! The method to set right drift time
+    void setRightDriftTime(double rightDriftTime) { m_rightDriftTime = rightDriftTime; }
 
     //! The method to set charge
     void setCharge(double charge) { m_charge = charge; }
@@ -64,6 +76,12 @@ namespace Belle2 {
     //! The method to get right drift length
     double getRightDriftLength() const { return m_rightDriftLength; }
 
+    //! The method to get left drift time
+    double getLeftDriftTime() const { return m_leftDriftTime; }
+
+    //! The method to get right drift time
+    double getRightDriftTime() const { return m_rightDriftTime; }
+
     //! The method to get charge
     double getCharge() const { return m_charge; }
 
@@ -77,11 +95,15 @@ namespace Belle2 {
            int wireId,
            double leftDriftLength,
            double rightDriftLength,
+           double leftDriftTime,
+           double rightDriftTime,
            double charge) {
       m_layerId = layerId;
       m_wireId = wireId;
-      m_leftDriftLength = leftDriftLength;
+      m_leftDriftLength  = leftDriftLength;
       m_rightDriftLength = rightDriftLength;
+      m_leftDriftTime    = leftDriftTime;
+      m_rightDriftTime   = rightDriftTime;
       m_charge = charge;
     }
 

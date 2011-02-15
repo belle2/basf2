@@ -31,7 +31,7 @@ namespace Belle2 {
         \param charge The charge of this signal.
         \param driftLength Drift length of this signal.
     */
-    CDCSignal(int layerId, int wireId, double charge, double driftLength) : m_layerId(layerId), m_wireId(wireId), m_charge(charge), m_driftLength(driftLength) {;}
+    CDCSignal(int layerId, int wireId, double charge, double driftLength, double driftTime) : m_layerId(layerId), m_wireId(wireId), m_charge(charge), m_driftLength(driftLength), m_driftTime(driftTime) {;}
 
     //CDCSignal(int layerId, int wireId, double charge, double driftLength, EVENT::MCParticle * mcPart) : m_layerId(layerId), m_wireId(wireId), m_charge(charge),
     //       m_driftLength(driftLength) { m_MCPartVec.push_back(mcPart); m_MCWeightVec.push_back(charge);}
@@ -72,6 +72,12 @@ namespace Belle2 {
     */
     inline void setDriftLength(double driftLength) { m_driftLength = driftLength; }
 
+    //! Set drift time when signal was created
+    /*!
+        \param driftTime Drift time when signal was created.
+    */
+    inline void setDriftTime(double driftTime) { m_driftTime = driftTime; }
+
     //! Update MC truth information
     //void updateMCParticles(EVENT::MCParticle * mcPart, float weight);
 
@@ -103,6 +109,12 @@ namespace Belle2 {
     */
     inline double getDriftLength() const {return m_driftLength;}
 
+    //! Get drift time when signal was created
+    /*!
+        \return Drift time of current signal.
+    */
+    inline double getDriftTime() const {return m_driftTime;}
+
     //! Get MC truth information - particle pointers
     //inline MCPartVec getMCPartVec() const {return m_MCPartVec;}
 
@@ -117,7 +129,8 @@ namespace Belle2 {
     int m_layerId;   /*!< Layer id */
     int m_wireId;    /*!< Wire id */
     double m_charge; /*!< Charge of CDC signal */
-    double m_driftLength;    /*!< Left drift length when signal has been created */
+    double m_driftLength;    /*!< Drift length when signal has been created */
+    double m_driftTime;    /*!< Drift time when signal has been created */
 
   };
 

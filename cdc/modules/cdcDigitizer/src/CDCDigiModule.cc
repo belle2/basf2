@@ -20,6 +20,10 @@
 //cdc package headers
 #include <cdc/dataobjects/CDCHit.h>
 #include <cdc/hitcdc/HitCDC.h>
+#include <cdc/geocdc/CDCGeometryPar.h>
+
+//root
+#include <TVector3.h>
 
 //C++ STL
 #include <cstdlib>
@@ -62,6 +66,10 @@ CDCDigiModule::CDCDigiModule() : Module()
   addParam("Resolution2",                 m_resolution2, "Resolution of the second Gaussian used to smear drift length, set in cm", 0.0188);
   addParam("ElectronicEffects",           m_electronicEffects, "Apply electronic effects?", 0);
   addParam("ElectronicsNoise",            m_elNoise, "Noise added by the electronics, set in ENC", 1000.0);
+  addParam("AddTrueDriftTime",            m_addTrueDriftTime, "A switch used to control adding the true drift time into the total drift time or not", true);
+  addParam("AddPropagationDelay",         m_addPropagationDelay, "A switch used to control adding propagation delay into the total drift time or not", true);
+  addParam("AddTimeOfFlight",             m_addTimeOfFlight, "A switch used to control adding time of flight into the total drift time or not", true);
+  addParam("EventTime",                   m_eventTime, "It is a timing of event, which includes a time jitter due to the trigger system, set in ns", 0.0);
   //Relations
   addParam("MCPartToCDCSimHitCollectionName", m_relColNameMCToSim,
            "Name of relation collection - MCParticle to SimCDCHit (if nonzero, created)", string("MCPartToCDCSimHits"));
@@ -121,18 +129,33 @@ void CDCDigiModule::event()
   cdcSignalMap.clear();
   CDCSignalMap::const_iterator iterCDCMap;
 
+  // Get instance of cdc geometry parameters
+  CDCGeometryPar * cdcp = CDCGeometryPar::Instance();
+
   // Loop over all hits
   for (int iHits = 0; iHits < nHits; iHits++) {
     // Get a hit
     CDCSimHit* aCDCSimHit = cdcArray[iHits];
 
     // Hit geom. info
-    int hitLayerId =   aCDCSimHit->getLayerId();
-    int hitWireId  =   aCDCSimHit->getWireId();
+    int hitLayerId       =   aCDCSimHit->getLayerId();
+    int hitWireId        =   aCDCSimHit->getWireId();
+    TVector3 hitPosWire  =   aCDCSimHit->getPosWire();
+    TVector3 backWirePos =   cdcp->wireBackwardPosition(hitLayerId, hitWireId);
 
     // Hit phys. info
     double hitdEdx        = aCDCSimHit->getEnergyDep() * Unit::GeV;
     double hitDriftLength = aCDCSimHit->getDriftLength() * Unit::cm;
+    double hitTOF         = aCDCSimHit->getFlightTime() * Unit::ns;
+
+    // calculate signal propagation length in the wire
+    double propLength     = (hitPosWire - backWirePos).Mag();
+
+    // smear drift length
+    hitDriftLength        = smearDriftLength(hitDriftLength, m_fraction, m_mean1, m_resolution1, m_mean2, m_resolution2);
+
+    // calculate drift time
+    double hitDriftTime   = getDriftTime(hitDriftLength, hitTOF, propLength);
 
     bool ifNewDigi = true;
     // The first SimHit is always a new digit, but the looping will anyhow end immediately.
@@ -145,8 +168,10 @@ void CDCDigiModule::event()
         ifNewDigi = false;
 
         // ... smallest drift time has to be checked, ...
-        if (hitDriftLength < iterCDCMap->second->getDriftLength()) {
+        if (hitDriftTime < iterCDCMap->second->getDriftTime()) {
+          iterCDCMap->second->setDriftTime(hitDriftTime);
           iterCDCMap->second->setDriftLength(hitDriftLength);
+          B2DEBUG(250, "hitDriftTime: " << hitDriftTime);
           B2DEBUG(250, "hitDriftLength: " << hitDriftLength);
         }
 
@@ -160,7 +185,7 @@ void CDCDigiModule::event()
 
     // If it is a new hit, save it to signal map.
     if (ifNewDigi == true) {
-      CDCSignal* signal = new CDCSignal(hitLayerId, hitWireId, hitdEdx, hitDriftLength);
+      CDCSignal* signal = new CDCSignal(hitLayerId, hitWireId, hitdEdx, hitDriftLength, hitDriftTime);
       cdcSignalMap.insert(vpair(iHits, signal));
     }
   } // end loop over SimHits.
@@ -177,10 +202,10 @@ void CDCDigiModule::event()
   for (iterCDCMap = cdcSignalMap.begin(); iterCDCMap != cdcSignalMap.end(); iterCDCMap++) {
 
     // Smear drift length using double  Gaussion, based on spatial resolution.
-    double hitNewDriftLength =  smearDriftLength(iterCDCMap->second->getDriftLength(),
-                                                 m_fraction, m_mean1, m_resolution1, m_mean2, m_resolution2);
-    iterCDCMap->second->setDriftLength(hitNewDriftLength);
-    B2DEBUG(250, "NewHitDriftLength " << iterCDCMap->second->getDriftLength());
+    //double hitNewDriftLength =  smearDriftLength(iterCDCMap->second->getDriftLength(),
+    //                                             m_fraction, m_mean1, m_resolution1, m_mean2, m_resolution2);
+    //iterCDCMap->second->setDriftLength(hitNewDriftLength);
+    //B2DEBUG(250, "NewHitDriftLength " << iterCDCMap->second->getDriftLength());
 
     // Save digits into data store
     // Next lines are the storage for HitCDC connected to trasan, which will eventually become obsolete.
@@ -190,6 +215,8 @@ void CDCDigiModule::event()
     NNcdcArray[iDigits]->setWireId(iterCDCMap->second->getWireId());
     NNcdcArray[iDigits]->setLeftDriftLength(iterCDCMap->second->getDriftLength());
     NNcdcArray[iDigits]->setRightDriftLength(iterCDCMap->second->getDriftLength());
+    NNcdcArray[iDigits]->setLeftDriftTime(iterCDCMap->second->getDriftTime());
+    NNcdcArray[iDigits]->setRightDriftTime(iterCDCMap->second->getDriftTime());
     NNcdcArray[iDigits]->setCharge(iterCDCMap->second->getCharge());
     // End Lines referring to HitCDC.
 
@@ -301,12 +328,24 @@ void CDCDigiModule::genNoise(CDCSignalMap &) //cdcSignalMap)
   */
 }
 
-double CDCDigiModule::getDriftTime(double) //driftLength)
+double CDCDigiModule::getDriftTime(double driftLength, double tof, double propLength)
 {
-  //--------------------------------------------------------------------
+  //---------------------------------------------------------------------------------
   // Method returning electron drift time (parameters: position in cm)
-  //--------------------------------------------------------------------
-  return 0;
+  // T(drift) = TOF + T(true drift time) + T(propagation delay in wire) - T(event),
+  // T(event) is a timing of event, which includes a time jitter due to
+  // the trigger system.
+  //---------------------------------------------------------------------------------
+  double driftTimeFactor = 1.0;
+  double propagationDelayFactor = 1.0;
+  double tofFactor = 1.0;
+
+  if (!m_addTrueDriftTime)     driftTimeFactor = 0;
+  if (!m_addPropagationDelay)  propagationDelayFactor = 0;
+  if (!m_addTimeOfFlight)      tofFactor = 0;
+
+  //drift speed: 4.0cm/us, propagation speed: 27.25cm/ns, provided by iwasaki-san and hard-coded here.
+  return (1000*driftTimeFactor*(driftLength / Unit::cm) / 4.0 + tofFactor*tof / Unit::ns + propagationDelayFactor*(propLength / Unit::cm) / 27.25 + m_eventTime);
 }
 
 void CDCDigiModule::printCDCSimHitInfo(const CDCSimHit & aHit) const

@@ -110,12 +110,14 @@ namespace Belle2 {
      *  In this method, X-T function will be used to calculate drift time.
      *
      *  @param driftLength The value of drift length.
+     *  @param tof The value of time of flight.
+     *  @param propLength The length that signal needs to propagation in the wire.
      *
      *  @return Drift time.
      *
      *  @todo implementation of non-cicular surfaces of constant drift time (in reverse).
      */
-    double getDriftTime(double driftLength);
+    double getDriftTime(double driftLength, double tof, double propLength);
 
     /** Method to print SimHit information.
      *
@@ -162,6 +164,11 @@ namespace Belle2 {
     double m_resolution1;       /**< Resolution of the first Gassian used to smear drift length */
     double m_mean2;             /**< Mean value of the second Gassian used to smear drift length */
     double m_resolution2;       /**< Resolution of the second Gassian used to smear drift length */
+
+    bool m_addTrueDriftTime;  /**< A switch used to control adding the true drift time into the total drift time or not */
+    bool m_addPropagationDelay; /**< A switch used to control adding propagation delay into the total drift time or not */
+    bool m_addTimeOfFlight;     /**< A switch used to control adding time of flight into the total drift time or not */
+    double m_eventTime;           /**< It is a timing of event, which includes a time jitter due to the trigger system */
 
     int   m_electronicEffects;       /*!< Add noise? */
     double m_elNoise;                 /*!< Noise added to the signal */

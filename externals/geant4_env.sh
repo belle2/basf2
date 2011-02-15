@@ -90,7 +90,7 @@ echo "On this machine the G4INCLUDE=$G4INCLUDE"
 fi
 
 #+
-G4LIB="${BELLE2_EXTERNALS_DIR}/externals/${BELLE2_SUBDIR}"
+G4LIB="${BELLE2_EXTERNALS_DIR}/lib/${BELLE2_SUBDIR}"
 export G4LIB
 if [ X$g4non_display = X ] ; then
 echo "On this machine the G4LIB=$G4LIB"

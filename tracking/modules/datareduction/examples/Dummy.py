@@ -25,7 +25,7 @@ output = register_module('SimpleOutput')
 
 # Parameter
 
-evtmetagen.param('EvtNumList', [1])
+evtmetagen.param('EvtNumList', [2])
 
 paramloader.param('InputFileXML', os.path.join(basf2datadir,
                   'simulation/Belle2.xml'))

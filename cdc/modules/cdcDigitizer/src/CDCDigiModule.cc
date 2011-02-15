@@ -66,9 +66,9 @@ CDCDigiModule::CDCDigiModule() : Module()
   addParam("Resolution2",                 m_resolution2, "Resolution of the second Gaussian used to smear drift length, set in cm", 0.0188);
   addParam("ElectronicEffects",           m_electronicEffects, "Apply electronic effects?", 0);
   addParam("ElectronicsNoise",            m_elNoise, "Noise added by the electronics, set in ENC", 1000.0);
-  addParam("AddTrueDriftTime",            m_addTrueDriftTime, "A switch used to control adding the true drift time into the total drift time or not", true);
-  addParam("AddPropagationDelay",         m_addPropagationDelay, "A switch used to control adding propagation delay into the total drift time or not", true);
-  addParam("AddTimeOfFlight",             m_addTimeOfFlight, "A switch used to control adding time of flight into the total drift time or not", true);
+  addParam("AddTrueDriftTime",            m_addTrueDriftTime, "A switch used to control adding the true drift time into the final drift time or not", true);
+  addParam("AddPropagationDelay",         m_addPropagationDelay, "A switch used to control adding propagation delay into the final drift time or not", true);
+  addParam("AddTimeOfFlight",             m_addTimeOfFlight, "A switch used to control adding time of flight into the final drift time or not", true);
   addParam("EventTime",                   m_eventTime, "It is a timing of event, which includes a time jitter due to the trigger system, set in ns", 0.0);
   //Relations
   addParam("MCPartToCDCSimHitCollectionName", m_relColNameMCToSim,

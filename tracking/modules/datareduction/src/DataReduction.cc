@@ -4,6 +4,7 @@
 #include <iomanip>
 
 //Include LCIO/Marlin header files
+
 #include <EVENT/LCCollection.h>
 #include <EVENT/SimTrackerHit.h>
 #include <EVENT/TrackerHit.h>
@@ -27,17 +28,21 @@
 using namespace lcio;
 using namespace marlin;
 using namespace std;
+using namespace Belle2;
+
+REG_MODULE(DataReduction);
 
 
 DataReduction aDataReduction;
 
 
-DataReduction::DataReduction() : Processor("DataReduction")
+DataReductionModule::DataReductionModule() : Module()
 {
   //Processor description
-  _description = "DataReduction of PXD readout by using the concept of fast hough transformation on digitized SVD hits";
+  setDescription("DataReduction of PXD readout by using the concept of fast hough transformation on digitized SVD hits");
 
   //Input Collections
+  /*
   registerInputCollection(LCIO::TRACKERHIT, "InputDigiSVDCollection", "Name of tracker hits collection with digitized SVDHits",
                           _colNameDigiSVDHits, std::string("SVDTrackerHits"));
 
@@ -46,8 +51,19 @@ DataReduction::DataReduction() : Processor("DataReduction")
 
   registerInputCollection(LCIO::SIMTRACKERHIT, "InputSimPXDCollection", "Name of tracker hits collection with digitized PXDHits",
                           _colNameSimPXDHits, std::string("PXDCollection"));
+  */
+
+  addParam("InputDigiSVDCollection", _colNameDigiSVDHits,
+           "Name of the SVDHitCollection", string("SVDHitArray"));
+
+  addParam("InputDigiPXDCollection", _colNameDigiPXDHits,
+           "Name of the PXDHitCollection", string("PXDHitArray"));
+
+  addParam("InputSimPXDCollection", _colNameSimPXDHits,
+           "Name of the PXDSimHitCollection", string("PXDSimHitArray"));
 
   _sectorList = new SectorList();
+
   _pxdLadderList = new PXDLadderList();
 }
 

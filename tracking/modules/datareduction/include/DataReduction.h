@@ -1,13 +1,15 @@
-#ifndef DATAREDUCTION_H_
-#define DATAREDUCTION_H_
+#ifndef DATAREDUCTION_H
+#define DATAREDUCTION_H
 
 //Marlin and LCIO includes
-#include "marlin/Processor.h"
-#include "lcio.h"
+//#include "marlin/Processor.h"
+//#include "lcio.h"
 #include <EVENT/MCParticle.h>
 
 #include "SectorList.h"
 #include "PXDLadderList.h"
+
+#include <framework/core/Module.h>
 
 #ifdef CAIRO_OUTPUT
 #include <cairo.h>
@@ -17,55 +19,63 @@
 //#include <boost/foreach.hpp>
 #endif
 
-//==========================================================================================
-//                                      Processor
-//==========================================================================================
+namespace Belle2 {
+  //==========================================================================================
+  //                                      Processor
+  //==========================================================================================
 
-class DataReduction : public marlin::Processor {
-public:
+  class DataReductionModule : public Module {
+  public:
+    /*
+        virtual marlin::Processor* newProcessor() { return new DataReduction; }
 
-  virtual marlin::Processor* newProcessor() { return new DataReduction; }
+          virtual void init();
+        virtual void processRunHeader(lcio::LCRunHeader* run);
+        virtual void processEvent(lcio::LCEvent* evt);
 
-  DataReduction();
-  virtual ~DataReduction();
-  virtual void init();
-  virtual void processRunHeader(lcio::LCRunHeader* run);
-  virtual void processEvent(lcio::LCEvent* evt);
-
-  virtual void check(lcio::LCEvent* evt);
-  virtual void end();
+        virtual void check(lcio::LCEvent* evt);
+        virtual void end();
+    */
 
 
-protected:
+    DataReductionModule();
+    virtual ~DataReductionModule();
+    virtual void initialize();
+    virtual void beginRun();
+    virtual void event();
+    virtual void endRun();
+    virtual void terminate();
 
-  int _nRun;
-  int _nEvt;
+  protected:
 
-  std::string _colNameDigiSVDHits; //Name of the digitized SVD hit input collection
-  std::string _colNameDigiPXDHits; //Name of the digitized PXD hit input collection
-  std::string _colNameSimPXDHits; //Name of the digitized PXD hit input collection
+    int _nRun;
+    int _nEvt;
 
-  SectorList* _sectorList;
-  PXDLadderList* _pxdLadderList;
+    std::string _colNameDigiSVDHits; //Name of the digitized SVD hit input collection
+    std::string _colNameDigiPXDHits; //Name of the digitized PXD hit input collection
+    std::string _colNameSimPXDHits; //Name of the digitized PXD hit input collection
 
-  int _numberPXDHitsTotal;
-  int _numberPXDHitsFound;
-  int _numberSimPXDHitsTotal;
-  int _numberSimPXDHitsFound;
+    SectorList* _sectorList;
+    PXDLadderList* _pxdLadderList;
 
-  enum LayerType { pixel = 0, strip = 1, slanted = 2 };
+    int _numberPXDHitsTotal;
+    int _numberPXDHitsFound;
+    int _numberSimPXDHitsTotal;
+    int _numberSimPXDHitsFound;
 
-private:
+    enum LayerType { pixel = 0, strip = 1, slanted = 2 };
 
-  //debug output methods
-  void printSectorInfo();
+  private:
+
+    //debug output methods
+    void printSectorInfo();
 
 #ifdef CAIRO_OUTPUT
-  cairo_t *cairo;
-  cairo_surface_t *cairo_surface;
-  void makePDF(bool split = true, int group = 1);
+    cairo_t *cairo;
+    cairo_surface_t *cairo_surface;
+    void makePDF(bool split = true, int group = 1);
 #endif
 
-};
-
-#endif /* DATAREDUCTION_H_ */
+  };
+} //Namespace
+#endif /* DATAREDUCTION_H */

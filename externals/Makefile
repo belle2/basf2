@@ -17,9 +17,9 @@ export GENFIT := $(EXTDIRVAR)/genfit
 all: boost clhep geant4 root genfit evtgen
 
 # clean up target
-clean:
-	@cd root; make clean
-	@cd boost; ./bjam --clean
+clean: boost.clean clhep.clean geant4.clean root.clean genfit.clean evtgen.clean
+	@rm -f make.log
+
 
 # directory creation
 $(EXTINCDIR):
@@ -41,7 +41,14 @@ boost: boost/project-config.jam
 # boost build command
 boost/project-config.jam:
 	@echo "building boost"
-	@cd boost; ./bootstrap.sh --includedir=$(EXTINCDIR) --libdir=$(EXTLIBDIR); ./bjam install
+	@cd boost; ./bootstrap.sh --includedir=$(EXTINCDIR) --libdir=$(EXTLIBDIR); ./bjam install $(BOOST_OPTION)
+
+# boost clean command
+boost.clean:
+	@echo "cleaning boost"
+	@cd boost; ./bjam --clean $(BOOST_OPTION)
+	@rm -f boost/project-config.jam
+
 
 # dependence for CLHEP build
 clhep: CLHEP/config.log
@@ -58,6 +65,13 @@ CLHEP/config.log: CLHEP/configure
 	@echo "building CLHEP"
 	@cd CLHEP; ./configure --prefix=$(EXTDIRVAR) \
 	--includedir=$(EXTINCDIRVAR) --libdir=$(EXTLIBDIRVAR) --bindir=$(EXTBINDIRVAR); make; make install
+
+# CLHEP clean command
+clhep.clean:
+	@echo "cleaning CLHEP"
+	@cd CLHEP; make clean
+	@rm -f CLHEP/config.log
+
 
 # dependence for GEANT4 build
 geant4: geant4/env.sh
@@ -80,11 +94,17 @@ geant4/env.sh: CLHEP/config.log geant4/Configure
 	@echo "building geant4"
 	@-cd geant4; patch -Np0 < ../geant4.patch
 	@cd geant4; ./Configure -build -d -e -s -D d_portable='define' -D g4includes_flag=y \
-	-D g4data=$(EXTDIRVAR)/share/geant4/data -D g4clhep_base_dir=$(EXTDIR) \
+	$(GEANT4_OPTION) -D g4data=$(EXTDIRVAR)/share/geant4/data -D g4clhep_base_dir=$(EXTDIR) \
 	-D g4clhep_include_dir=$(EXTINCDIRVAR) -D g4clhep_lib_dir=$(EXTLIBDIRVAR)
 	@cp geant4_env.sh geant4/env.sh; cp geant4_env.csh geant4/env.csh
 	@cd geant4; . ./env.sh; cd source; G4INCLUDE=$(EXTDIRVAR)/include/geant4 make includes dependencies=""
 	@cp -a $(EXTDIR)/geant4/lib/*/* $(EXTLIBDIR)
+
+# GEANT4 clean command
+geant4.clean:
+	@echo "cleaning geant4"
+	@cd geant4; rm -rf tmp lib bin .config
+	@rm -f geant4/env.sh geant4/env.csh
 
 
 # dependence for root build
@@ -100,6 +120,12 @@ root/config/Makefile.config:
 	@mkdir -p $(EXTINCDIR)/root
 	@cp -a $(EXTDIR)/root/include/* $(EXTINCDIR)/root
 
+# root clean command
+root.clean:
+	@echo "cleaning root"
+	@cd root; make clean
+	@rm -f root/config/Makefile.config
+
 
 # dependence for genfit build
 genfit: include/genfit/RKTrackRep.h
@@ -110,6 +136,12 @@ include/genfit/RKTrackRep.h:
 	@cd genfit; SCONSFLAGS="" scons
 	@cp genfit/lib/* $(EXTLIBDIR)/ # copy the libraries
 	@cp -r genfit/include/* $(EXTINCDIR)/ # copy the installed files
+
+# genfit clean command
+genfit.clean:
+	@echo "cleaning genfit"
+	@cd genfit; SCONSFLAGS="" scons -c
+	@rm -f include/genfit/RKTrackRep.h
 
 
 # dependence for EvtGen build
@@ -126,5 +158,11 @@ evtgen/configure:
 # EvtGen build command
 evtgen/config.mk: evtgen/configure
 	@echo "building EvtGen"
-	@cd evtgen; ./configure --lcgplatform=x86_64-slc5-gcc43-opt; make
+	@cd evtgen; ./configure --lcgplatform=x86_64-slc5-gcc43-opt $(EVTGEN_OPTION); make
 	@cd evtgen; cp lib/* $(EXTLIBDIR)/; mkdir $(EXTINCDIR)/evtgen; cp -r EvtGen* $(EXTINCDIR)/evtgen
+
+# EvtGen clean command
+evtgen.clean:
+	@echo "cleaning EvtGen"
+	@cd evtgen; make clean
+	@rm -f evtgen/config.mk

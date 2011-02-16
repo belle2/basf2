@@ -2,6 +2,27 @@ import os
 
 Import('env')
 
+# check whether the externals dir is set
+if not os.environ.has_key('BELLE2_EXTERNALS_DIR'):
+    print 'Belle II externals directory is not set up.'
+    print '-> Execute "setuprel" in your local release directory.'
+    Exit(1)
+
+# build options
+option = os.environ['BELLE2_OPTION']
+if option == 'debug':
+    env['ENV']['BOOST_OPTION'] = 'variant=debug'
+    env['ENV']['CXXFLAGS'] = '-g'
+    env['ENV']['GEANT4_OPTION'] = '-D g4debug=y'
+    env['ENV']['ROOTBUILD'] = 'debug'
+    env['ENV']['EVTGEN_OPTION'] = '--enable-debug'
+elif option == 'opt':
+    env['ENV']['BOOST_OPTION'] = 'variant=release'
+    env['ENV']['CXXFLAGS'] = '-O3'
+    env['ENV']['GEANT4_OPTION'] = '-D g4debug=n'
+    env['ENV']['ROOTBUILD'] = ''
+    env['ENV']['EVTGEN_OPTION'] = ''
+
 # wrapper to make
 make_builder = Builder(action = 'cd externals; make | tee make.log')
 env['BUILDERS']['make_externals'] = make_builder

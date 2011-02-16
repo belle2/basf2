@@ -90,19 +90,19 @@ void PGunInputModule::initialize()
   }
 
   if (m_genMom<3 && m_genMom> -1)
-    m_pgun.m_genMom = static_cast<PGUNgenOpt>(m_genMom);
+    m_pgun.m_genMom = static_cast<EPGUNgenOpt>(m_genMom);
   else {
     m_genMom = 0;
     B2ERROR("Invalide option for random generation of momenta in particle gun!");
   }
   if (m_genVert<3 && m_genVert> -1)
-    m_pgun.m_genVert = static_cast <PGUNgenOpt>(m_genVert);
+    m_pgun.m_genVert = static_cast <EPGUNgenOpt>(m_genVert);
   else {
     m_genVert = 2;
     B2ERROR("Invalid option for random generation of vertices in particle gun!");
   }
   if (m_genAngle<3 && m_genAngle> -1)
-    m_pgun.m_genAngle = static_cast <PGUNgenOpt>(m_genAngle);
+    m_pgun.m_genAngle = static_cast <EPGUNgenOpt>(m_genAngle);
   else {
     m_genMom = 0;
     B2ERROR("Invalid option for random generation of angles in particle gun!");

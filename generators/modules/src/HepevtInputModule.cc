@@ -45,6 +45,7 @@ HepevtInputModule::HepevtInputModule() : Module()
   addParam("useWeights", m_useWeights, "Set to 'true' to if generator weights should be propagated.", false);
   addParam("nVirtualParticles", m_Nvirtual, "Number of particles at the beginning of the events that should be made virtual.", 0);
   addParam("boost2LAB", m_boost2LAB, "Boolean to indicate whether the particles should be boosted from CM frame to lab frame", false);
+  addParam("wrongSignPz", m_wrongSignPz, "Boolean to signal that directions of HER and LER were switched", false);
 
   m_inputMode = c_NotSet;
 }
@@ -59,6 +60,7 @@ void HepevtInputModule::initialize()
     B2FATAL(e.what());
   }
   m_hepevt.m_Nvirtual = m_Nvirtual;
+  m_hepevt.m_wrongSignPz = m_wrongSignPz;
 
   //Do we need to boost?
   if (m_boost2LAB) {

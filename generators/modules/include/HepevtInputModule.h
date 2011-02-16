@@ -62,6 +62,7 @@ namespace Belle2 {
       MCParticleGraph mpg;         /**< The MCParticle graph object. */
       bool m_useWeights;           /**< Parameter to switch on/off weight propagation */
       bool m_boost2LAB;           /**< Parameter to switch on/off boost to LAB system */
+      bool m_wrongSignPz;           /**< Parameter to signal that direction of LER and HER was switched*/
     };
 
   }//end namespace Generators

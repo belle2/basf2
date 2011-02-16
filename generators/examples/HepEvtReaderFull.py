@@ -29,8 +29,11 @@ hepevtreader = register_module('HepevtInput')
 # indicate the filename where the hepevtreader
 # should read events from
 hepevtreader.param('inputFileName', 'BhWide_10events.txt')
+
 # this file is in the same directory. For more and different
-# hepevt files look and download from the Twiki.
+# hepevt files look and download from the Twiki. On the Twiki
+# you will also find which options are needed for which
+# hepevt file.
 
 # in case you don't want to process the first events
 # but only all events after event 1000
@@ -46,8 +49,11 @@ hepevtreader.param('inputFileName', 'BhWide_10events.txt')
 # if some of the particles in the event of the HEPEVT file should not
 # be put to the simulation (incoming particles, virtual particles etc.)
 # you can specify the number of virtual particles in each event.
-# Uncomment the following line to set the first 2 particles to virtual
-# hepevtreader.param("nVirtualParticles", 2)
+# The BhWide generator from the input file used in this example
+# gives first the two beam particles. So the first two particles
+# should be treated as virtual particles.
+hepevtreader.param('nVirtualParticles', 2)
+# The default for this option is nVirtualParticles=0
 # NOTE: this option always assumes that the virtual particles are the first
 # ones in the event and that there is a fixed number of them.
 # For more complexe cases, this information should be provided by
@@ -60,8 +66,19 @@ hepevtreader.param('inputFileName', 'BhWide_10events.txt')
 # automatically all particles to the LAB frame of
 # BELLE2.
 # This option is switched on with this line
-# hepevtreader.param("boost2LAB", True)
+hepevtreader.param('boost2LAB', True)
+# For BhWide this option is needed.
 # default is boost2LAB = false.
+
+# if the generator uses a wrong convention for the directions of
+# the positron and electron beams (wrong sign of Pz)
+# and you want to use the boost to the LAB frame
+# you should set the option wrongSignPz to true.
+# Otherwise the boost goes wrong.
+# This option is switched on with this line
+hepevtreader.param('wrongSignPz', True)
+# For BhWide this option is needed.
+# default is wrongSignPz = false.
 
 # for a simple simulation job with output to a root file
 # these additional modules are needed
@@ -91,5 +108,7 @@ main.add_module(geobuilder)
 main.add_module(g4sim)
 main.add_module(simpleoutput)
 
-# Process events
+# Process 100 events
 process(main, 100)
+# if there are less events in the input file
+# the processing will be stopped at EOF.

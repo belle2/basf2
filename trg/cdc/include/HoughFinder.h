@@ -47,6 +47,11 @@ class TRGCDCHoughFinder {
     /// do track finding.
     int doit(void);
 
+    /// finds peaks in a Hough plane.
+    std::vector<TRGPoint2D *> peaks5(TRGCDCHoughPlane & plane,
+                                     const unsigned threshold,
+                                     bool centerIsPeak = false) const;
+
   private:
     /// Name
     const std::string _name;

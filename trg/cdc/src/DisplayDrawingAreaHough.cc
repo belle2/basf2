@@ -136,6 +136,7 @@ TRGCDCDisplayDrawingAreaHough::draw(void) {
         std::cout << "max entry=" << nMax << std::endl;
 
     //...Draw...
+    const bool drawLevel = false;
     for (unsigned i = 0; i < _hp->nX(); i++) {
         for (unsigned j = 0; j < _hp->nY(); j++) {
             const unsigned n = _hp->entry(i, j);
@@ -148,18 +149,33 @@ TRGCDCDisplayDrawingAreaHough::draw(void) {
                 const int z0 = toY(y0);
                 const int x1 = int(x + _hp->xSize() * _scaleX) - x0;
                 const int y1 = int(y + _hp->ySize() * _scaleY) - y0;
-                const float level = float(n) / float(nMax);
 
-                if (level < 0.25)
-                    _gc->set_foreground(_gray0);
-                 else if (level < 0.5)
-                     _gc->set_foreground(_gray1);
-                 else if (level < 0.75)
-                     _gc->set_foreground(_gray2);
-                 else if (level > 0.90)
-                     _gc->set_foreground(_red);
-                 else
-                     _gc->set_foreground(_gray3);
+                if (drawLevel) {
+                    const float level = float(n) / float(nMax);
+
+                    if (level < 0.25)
+                        _gc->set_foreground(_gray0);
+                    else if (level < 0.5)
+                        _gc->set_foreground(_gray1);
+                    else if (level < 0.75)
+                        _gc->set_foreground(_gray2);
+                    else if (level > 0.90)
+                        _gc->set_foreground(_red);
+                    else
+                        _gc->set_foreground(_gray3);
+                }
+                else {
+                    if (n == 1)
+                        _gc->set_foreground(_gray0);
+                    else if (n == 2)
+                        _gc->set_foreground(_gray1);
+                    else if (n == 3)
+                        _gc->set_foreground(_gray2);
+                    else if (n == 4)
+                        _gc->set_foreground(_blue);
+                    else
+                        _gc->set_foreground(_red);
+                }
 
                 _window->draw_rectangle(_gc, true, x0, z0, x1, y1);
 

@@ -20,8 +20,7 @@
 
 namespace Belle2 {
 
-typedef HepGeom::Vector3D<double>  Vector3D;
-
+typedef HepGeom::Vector3D<double> Vector3D;
 
 class CLHEP::Hep3Vector;
 

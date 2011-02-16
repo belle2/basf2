@@ -138,7 +138,7 @@ TRGCDCHoughFinder::doit(void) {
     _plane[0]->clear();
     _plane[1]->clear();
 
-    //...Hough studies : voting...
+    //...Voting...
     unsigned axialSuperLayerId = 0;
     for (unsigned i = 0; i < _cdc.nTrackSegmentLayers(); i++) {
         const Belle2::TRGCDCLayer * l = _cdc.trackSegmentLayer(i);
@@ -160,51 +160,218 @@ TRGCDCHoughFinder::doit(void) {
     _plane[0]->merge();
     _plane[1]->merge();
 
+    //...Look for peaks which have 5 hits...
+    vector<TRGPoint2D *> peaks0 = peaks5(* _plane[0], 5, false);
+    vector<TRGPoint2D *> peaks1 = peaks5(* _plane[1], 5, false);
+    vector<TRGPoint2D *> * peaks[2] = {& peaks0, & peaks1};
 
-#ifdef TRGCDC_DISPLAY_XXXX
-    plane[0]->dump();
-    plane[1]->dump();
 
+    //...Loop over charge + and -...
+    for (unsigned c = 0; c < 2; c++) {
+
+         //...Loop over all peaks...
+         for (unsigned i = 0; peaks[c]->size(); i++) {
+
+            //...Circle center...
+            const TRGPoint2D center = _circleH.circleCenter(* (* peaks[c])[i]);
+            const double ConstantAlpha = 222.376063; // for 1.5T
+            const double pt = center.mag() / ConstantAlpha;
+            
+          }
+    }
+
+#ifdef TRGCDC_DISPLAY
     string stg = "2D : Peak Finding";
     string inf = "   ";
-//  _cdc.dump("hits");
-    D->stage(stg);
-    D->information(inf);
-    D->clear();
-    D->area().append(_cdc.hits());
-    D->area().append(_cdc.tsHits(), Gdk::Color("#6600FF009900"));
     H0->stage(stg);
     H0->information(inf);
     H0->clear();
-    H0->area().append(plane[0]);
+    H0->area().append(_plane[0]);
     H0->show();
     H1->stage(stg);
     H1->information(inf);
     H1->clear();
-    H1->area().append(plane[1]);
+    H1->area().append(_plane[1]);
     H1->show();
-    H1->run();
-//    D->run();
 #endif
-#ifdef TRGCDC_DISPLAY
-//     unsigned iFront = 0;
-//     while (const TCFrontEnd * f = _cdc.frontEnd(iFront++)) {
-//         D->clear();
-//         D->beginEvent();
-//         D->area().append(* f);
-//         D->run();
-//     }
-//     unsigned iMerger = 0;
-//     while (const TCMerger * f = _cdc.merger(iMerger++)) {
-//         D->clear();
-//         D->beginEvent();
-//         D->area().append(* f);
-//         D->run();
-//     }
-#endif
-
 
     return 0;
+}
+
+vector<TRGPoint2D *>
+TRGCDCHoughFinder::peaks5(TRGCDCHoughPlane & hp,
+                          const unsigned threshold,
+                          bool centerIsPeak) const {
+    vector<TRGPoint2D *> list;
+
+    //...Search cells above threshold...
+    unsigned nCells = hp.nX() * hp.nY();
+    static unsigned * candidates =
+        (unsigned *) malloc(nCells * sizeof(unsigned));
+    unsigned nActive = 0;
+    for (unsigned j = 0; j < hp.nY(); j++) {
+        for (unsigned i = 0; i < hp.nX(); i++) {
+
+            //...Threshold check...        
+            const unsigned n = hp.entry(i, j);
+            if (n < threshold) continue;
+            candidates[nActive] = hp.serialID(i, j);
+            ++nActive;
+        }
+    }
+
+    //...Make connected regions (is this the best way???)...
+    const unsigned used = nCells;
+    for (unsigned i = 0; i < nActive; i++) {
+        if (candidates[i] == used) continue;
+        const unsigned id0 = candidates[i];
+        candidates[i] = used;
+
+        //...Make a new region...
+        vector<unsigned> * region = new vector<unsigned>;
+        region->push_back(id0);
+
+        //...Search neighbors...
+        for (unsigned j = 0; j < nActive; j++) {
+            if (candidates[j] == used) continue;
+            const unsigned id1 = candidates[j];
+
+            unsigned x1 = 0;
+            unsigned y1 = 0;
+            hp.id(id1, x1, y1);
+
+#ifdef TRGCDC_DEBUG_HOUGH
+//              std::cout << Tab() << "    region:x=" << x1 << ",y=" << y1
+//                        << std::endl;
+#endif            
+            for (unsigned k = 0; k < unsigned(region->size()); k++) {
+                unsigned id2 = (* region)[k];
+                unsigned x2 = 0;
+                unsigned y2 = 0;
+                hp.id(id2, x2, y2);
+                int difx = abs(int(x1) - int(x2));
+                int dify = abs(int(y1) - int(y2));
+                if (difx > (int) hp.nX() / 2) difx = hp.nX() - difx;
+                if (dify > (int) hp.nY() / 2) dify = hp.nY() - dify;
+#ifdef TRGCDC_DEBUG_HOUGH
+//                 std::cout << Tab() << "        :x=" << x2 << ",y=" << y2
+//                        << ":difx=" << difx << ",dify=" << dify;
+//                 if ((difx < 2) && (dify < 2))
+//                     std::cout << " ... connected" << std::endl;
+//                 else
+//                     std::cout << std::endl;
+#endif            
+                if ((difx < 2) && (dify < 2)) {
+                    region->push_back(id1);
+                    candidates[j] = used;
+                    break;
+                }
+
+            }
+        }
+        hp.setRegion(region);
+    }
+
+    //...Determine peaks...
+    const vector<vector<unsigned> *> & regions = hp.regions();
+//  const AList<CList<unsigned> > & regions = hp.regions();
+    for (unsigned i = 0; i < (unsigned) regions.size(); i++) {
+
+        //...Calculate size and center of a region...
+        const vector<unsigned> & r = * regions[i];
+//        const CList<unsigned> & r = * regions[i];
+        unsigned minX = hp.nX();
+        unsigned maxX = 0;
+        unsigned minY = hp.nY();
+        unsigned maxY = 0;
+        for (unsigned j = 0; j < (unsigned) r.size(); j++) {
+            const unsigned s = r[j];
+            unsigned x = 0;
+            unsigned y = 0;
+            hp.id(s, x, y);
+            if (x < minX) minX = x;
+            if (x > maxX) maxX = x;
+            if (y < minY) minY = y;
+            if (y > maxY) maxY = y;
+
+#ifdef TRGCDC_DEBUG_HOUGH
+//              std::cout << Tab() << "region " << i << ":x=" << x << ",y=" << y
+//                        << std::endl;
+#endif            
+        }
+        const unsigned cX = minX + (maxX - minX) / 2;
+        const unsigned cY = minY + (maxY - minY) / 2;
+
+        //...Determine a center of a region...
+        unsigned ncX = hp.nX() * hp.nY();
+        unsigned ncY = ncX;
+        if (! centerIsPeak) {
+
+            //...Search for a cell which is the closest to the center...
+            float minDiff2 = float(hp.nX() * hp.nX() + hp.nY() * hp.nY());
+            for (unsigned j = 0; j < (unsigned) r.size(); j++) {
+                const unsigned s = r[j];
+                unsigned x = 0;
+                unsigned y = 0;
+                hp.id(s, x, y);
+                
+                const float diff2 = (float(x) - float(cX)) *
+                    (float(x) - float(cX))
+                    + (float(y) - float(cY)) *
+                    (float(y) - float(cY));
+
+                if (diff2 < minDiff2) {
+                    minDiff2 = diff2;
+                    ncX = x;
+                    ncY = y;
+#ifdef TRGCDC_DEBUG_HOUGH
+//                     std::cout << Tab() << "region " << i << " center:x="
+//                            << ncX << ",y=" << ncY << "(" << j << ")"
+//                            << std::endl;
+#endif            
+                }
+            }
+        }
+        else {
+
+            //...Search for a peak...
+            float max = 0;
+            for (unsigned j = 0; j < (unsigned) r.size(); j++) {
+                const unsigned s = r[j];
+                const float entry = hp.entry(s);
+                if (max < entry) {
+                    max = entry;
+                    unsigned x = 0;
+                    unsigned y = 0;
+                    hp.id(s, x, y);
+                    ncX = x;
+                    ncY = y;
+                }
+            }
+        }
+
+        //...Store the center position....
+        list.push_back(new TRGPoint2D(hp.position(ncX, ncY)));
+#ifdef TRGCDC_DEBUG_HOUGH
+//         std::cout << Tab() << "region " << i << " final center:x="
+//                << hp.position(ncX, ncY).x() << ",y="
+//                << hp.position(ncX, ncY).y() << std::endl;
+#endif            
+    }
+
+#ifdef TRGCDC_DEBUG_HOUGH
+//     std::cout << Tab() << "Peak finding:threshold=" << threshold << ",nActive="
+//             << nActive << ",regions=" << hp.regions().length()
+//             << "," << hp.name() << std::endl;
+//     for (unsigned i = 0; i < (unsigned) hp.regions().length(); i++) {
+//          const CList<unsigned> & region = * (hp.regions())[i];
+//          for (unsigned j = 0; j < (unsigned) region.length(); j++)
+//              std::cout << Tab() << "    " << * region[j] << "="
+//                     << hp.entry(* region[j]) << std::endl;
+//     }
+#endif
+
+    return list;
 }
 
 } // namespace Belle2

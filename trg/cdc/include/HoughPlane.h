@@ -28,12 +28,12 @@ class TRGCDCHoughPlane : public TRGCDCHoughPlaneBase {
   public:
     /// Contructor.
     TRGCDCHoughPlane(const std::string & name,
-                         unsigned nX,
-                         float xMin,
-                         float xMax,
-                         unsigned nY,
-                         float yMin,
-                         float yMax);
+                     unsigned nX,
+                     float xMin,
+                     float xMax,
+                     unsigned nY,
+                     float yMin,
+                     float yMax);
 
     /// Destructor
     virtual ~TRGCDCHoughPlane();

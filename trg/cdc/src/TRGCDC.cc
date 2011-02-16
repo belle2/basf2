@@ -33,7 +33,10 @@
 #include "trg/cdc/Merger.h"
 #include "trg/cdc/HoughFinder.h"
 #ifdef TRGCDC_DEBUG
+#ifdef BUILD_2010_12_13
+#else
 #include "cdc/hitcdc/CDCSimHit.h"
+#endif
 #endif
 #ifdef TRGCDC_DISPLAY
 #include "trg/cdc/DisplayRphi.h"
@@ -324,7 +327,9 @@ TRGCDC::initialize(void) {
     }
 
     //...Hough Finder...
-    _hFinder = new TCHFinder("HoughFinder", * this, 350, 100);
+//  _hFinder = new TCHFinder("HoughFinder", * this, 350, 100);
+//  _hFinder = new TCHFinder("HoughFinder", * this, 160, 96);
+    _hFinder = new TCHFinder("HoughFinder", * this, 96, 96);
 
     //...For module simulation (Front-end)...
     configure();
@@ -536,11 +541,14 @@ TRGCDC::update(bool mcAnalysis) {
     clear();
 
 #ifdef TRGCDC_DEBUG
+#ifdef BUILD_2010_12_13
+#else
     StoreArray<CDCSimHit> cdcArray("CDCSimHit");
     if (!cdcArray) {
         cout << "TRGCDC !!! can not access to CDC sim hits" << std::endl;
     }
     const int n = cdcArray->GetEntriesFast();
+#endif
 #endif
 
     //...Loop over HitCDC...
@@ -594,7 +602,11 @@ TRGCDC::update(bool mcAnalysis) {
 //    TUpdater::update();
 
 #ifdef TRGCDC_DEBUG
+#ifdef BUILD_2010_12_13
+    cout << "TRGCDC ... #HitCDC=" << nHits << endl;
+#else
     cout << "TRGCDC ... #CDCSimHit=" << n << ",#HitCDC=" << nHits << endl;
+#endif
 #endif
 
 }
@@ -1101,6 +1113,29 @@ TRGCDC::simulate(void) {
 
 #ifdef TRGCDC_DISPLAY
     D->endOfEvent();
+    string stg = "2D : Peak Finding";
+    string inf = "   ";
+//  cdc.dump("hits");
+    D->stage(stg);
+    D->information(inf);
+    D->clear();
+    D->area().append(hits());
+    D->area().append(tsHits(), Gdk::Color("#6600FF009900"));
+    D->run();
+//     unsigned iFront = 0;
+//     while (const TCFrontEnd * f = _cdc.frontEnd(iFront++)) {
+//         D->clear();
+//         D->beginEvent();
+//         D->area().append(* f);
+//         D->run();
+//     }
+//     unsigned iMerger = 0;
+//     while (const TCMerger * f = _cdc.merger(iMerger++)) {
+//         D->clear();
+//         D->beginEvent();
+//         D->area().append(* f);
+//         D->run();
+//     }
 #endif
 
 }

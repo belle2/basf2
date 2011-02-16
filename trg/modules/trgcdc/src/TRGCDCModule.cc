@@ -12,7 +12,6 @@
 //-----------------------------------------------------------------------------
 
 #define TRGCDC_SHORT_NAMES
-#define BUILD_2010_12_13
 
 #include <iostream>
 #include "framework/core/ModuleManager.h"
@@ -23,7 +22,7 @@ using namespace std;
 namespace Belle2 {
 
 #ifdef BUILD_2010_12_13
-REG_MODULE(TRGCDCModule, "TRGCDC");
+REG_XXX_MODULE(TRGCDCModule, "TRGCDC");
 #else
 REG_MODULE(TRGCDC);
 #endif
@@ -45,9 +44,9 @@ TRGCDCModule::TRGCDCModule()
 #ifdef BUILD_2010_12_13
     addParam("testParamInt", _testParamInt, 20);
     addParam("ConfigFile",
-	     _configFilename,
-	     string("TRGCDCConfig.dat"),
-	     "The filename of CDC trigger config file");
+             _configFilename,
+             string("TRGCDCConfig.dat"),
+             "The filename of CDC trigger config file");
 #else
     addParam("testParamInt", _testParamInt, "Test Parameter", 20);
     addParam("ConfigFile",

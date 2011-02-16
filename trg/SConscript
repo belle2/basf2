@@ -1,11 +1,13 @@
 Import('env')
 
 env['LIBS'] = ['cdc']
-#env.Append(CPPDEFINES = {'TRG_DEBUG':None})
 #env.Append(CPPDEFINES = {'TRG_DISPLAY':None})
-#env.Append(CPPDEFINES = {'TRGCDC_DEBUG':None})
+#env.Append(CPPDEFINES = {'TRG_DEBUG':None})
 #env.Append(CPPDEFINES = {'TRGCDC_DISPLAY':None})
+#env.Append(CPPDEFINES = {'TRGCDC_DEBUG':None})
+#env.Append(CPPDEFINES = {'TRGCDC_DEBUG_HOUGH':None})
 #env.Append(CPPDEFINES = {'TRGCDC_NO_INLINE':None})
+#env.Append(CPPDEFINES = {'BUILD_2010_12_13':None})
 #env.ParseConfig('pkg-config --cflags --libs gtkmm-2.4')
 #print env.Dump()
 

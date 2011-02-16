@@ -14,6 +14,7 @@
 #define TRG_SHORT_NAMES
 #define TRGCDC_SHORT_NAMES
 
+#include <stdlib.h>
 #include "trg/cdc/TRGCDC.h"
 #include "trg/cdc/Layer.h"
 #include "trg/cdc/Wire.h"
@@ -164,7 +165,6 @@ TRGCDCHoughFinder::doit(void) {
     vector<TRGPoint2D *> peaks0 = peaks5(* _plane[0], 5, false);
     vector<TRGPoint2D *> peaks1 = peaks5(* _plane[1], 5, false);
     vector<TRGPoint2D *> * peaks[2] = {& peaks0, & peaks1};
-
 
     //...Loop over charge + and -...
     for (unsigned c = 0; c < 2; c++) {

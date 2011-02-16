@@ -81,7 +81,8 @@ TRGCDCHoughPlaneMulti::merge(void) {
 //          setEntry(i, n);
 //      }
 
-    bzero(_cell, nCells * sizeof(unsigned));
+//  bzero(_cell, nCells * sizeof(unsigned));
+    memset(_cell, 0, nCells * sizeof(unsigned));
 //  for (unsigned j = 0; j < _layers.length(); j++) {
     for (unsigned j = 0; j < _nLayers; j++) {
 //         const unsigned a = j / 32;

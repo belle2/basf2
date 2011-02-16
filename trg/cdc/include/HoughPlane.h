@@ -14,6 +14,7 @@
 #ifndef TRGCDCHoughPlane_FLAG_
 #define TRGCDCHoughPlane_FLAG_
 
+#include <string.h>
 #include "trg/cdc/HoughPlaneBase.h"
 
 #ifdef TRGCDC_SHORT_NAMES
@@ -85,7 +86,8 @@ TRGCDCHoughPlane::setEntry(unsigned serialId, unsigned n) {
 inline
 void
 TRGCDCHoughPlane::clear(void) {
-    bzero(_cell, nX() * nY() * sizeof(int));
+//  bzero(_cell, nX() * nY() * sizeof(int));
+    memset(_cell, 0, nX() * nY() * sizeof(int));
 //     for (unsigned i = 0; i < nX() * nY(); i++)
 //         _cell[i] = 0;
     TRGCDCHoughPlaneBase::clear();
@@ -94,7 +96,8 @@ TRGCDCHoughPlane::clear(void) {
 inline
 void
 TRGCDCHoughPlane::clearCells(void) {
-    bzero(_cell, nX() * nY() * sizeof(int));
+//  bzero(_cell, nX() * nY() * sizeof(int));
+    memset(_cell, 0, nX() * nY() * sizeof(int));
 }
 
 inline

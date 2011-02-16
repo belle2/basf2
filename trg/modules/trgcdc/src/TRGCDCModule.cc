@@ -13,6 +13,7 @@
 
 #define TRGCDC_SHORT_NAMES
 
+#include <stdlib.h>
 #include <iostream>
 #include "framework/core/ModuleManager.h"
 #include "trg/modules/trgcdc/TRGCDCModule.h"

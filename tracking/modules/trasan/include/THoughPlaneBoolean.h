@@ -16,8 +16,8 @@
 #ifndef THoughPlaneBoolean_FLAG_
 #define THoughPlaneBoolean_FLAG_
 
+#include <strings.h>
 #include <string>
-
 
 #include "tracking/modules/trasan/THoughPlaneBase.h"
 

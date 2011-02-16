@@ -168,6 +168,7 @@
 #endif
 #endif
 
+#include <strings.h>
 #include <iostream>
 
 #define HEP_SHORT_NAMES

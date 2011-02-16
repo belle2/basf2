@@ -14,7 +14,7 @@
 //-----------------------------------------------------------------------------
 
 
-
+#include <string.h>
 #include "tracking/modules/trasan/THoughPlaneBoolean.h"
 #include "tracking/modules/trasan/TPoint2D.h"
 #ifdef TRASAN_DEBUG

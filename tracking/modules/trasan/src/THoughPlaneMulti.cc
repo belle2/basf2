@@ -16,6 +16,7 @@
 //-----------------------------------------------------------------------------
 
 
+#include <strings.h>
 #include <iostream>
 
 #include "tracking/modules/trasan/THoughPlaneMulti.h"

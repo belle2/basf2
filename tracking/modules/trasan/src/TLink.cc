@@ -156,6 +156,7 @@
 #include "trg/cdc/WireHit.h"
 #include "trg/cdc/WireHitMC.h"
 
+#include <string.h>
 #include "trg/cdc/TrackMC.h"
 #include "tracking/modules/trasan/TTrack.h"
 
@@ -935,7 +936,7 @@ TLink::links2HEP(const AList<TLink> & links) {
 
     unsigned * N;
     if (NULL == (N= (unsigned *) malloc(nHep * sizeof(unsigned)))) {
-      perror("$Id: TLink.cc 11153 2010-04-28 03:36:53Z yiwasaki $:N:malloc");
+//      perror("$Id: TLink.cc 11153 2010-04-28 03:36:53Z yiwasaki $:N:malloc");
       exit(1);
     }  
     for (unsigned i = 0; i < nHep; i++) N[i] = 0;

@@ -219,7 +219,7 @@ double
 TRobustLineFitter::rofunc(const TTrackBase & t, double a) const {
     double * arr;
     if (NULL == (arr = (double *) malloc(_n * sizeof(double)))) {
-      perror("$Id: TRobustLineFitter.cc 10129 2007-05-18 12:44:41Z katayama $:arr:malloc");
+//      perror("$Id: TRobustLineFitter.cc 10129 2007-05-18 12:44:41Z katayama $:arr:malloc");
       exit(1);
     }  
     for (unsigned i = 0; i < _n; i++)

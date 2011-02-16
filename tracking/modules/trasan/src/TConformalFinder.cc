@@ -3087,7 +3087,7 @@ TConformalFinder::findSegmentsPerfect(void) {
 	AList<TLink> ** seeds;
 	if (NULL == (seeds =
 		     (AList<TLink> **) malloc(nHep * sizeof(AList<TLink> *)))) {
-	  perror("$Id: TConformalFinder.cc 11152 2010-04-28 01:24:38Z yiwasaki $:seeds:malloc");
+//	  perror("$Id: TConformalFinder.cc 11152 2010-04-28 01:24:38Z yiwasaki $:seeds:malloc");
 	  exit(1);
 	}  
 	for (unsigned j = 0; j < nHep; j++)

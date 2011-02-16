@@ -71,7 +71,7 @@ namespace Belle2 {
     double getEnergy() const { return m_energy; }
 
     //! Get G4 ID number of photons parent particle
-    int getParentID() const { return m_parentID; }
+    int getParentID() const { return (int)m_parentID; }
 
     //! Set ID number of module that registered hit
     void setModuleID(int moduleID) { m_moduleID = moduleID; }

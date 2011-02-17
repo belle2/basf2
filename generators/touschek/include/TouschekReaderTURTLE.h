@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2010-2011  Belle II Collaboration                         *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Andreas Moll                                             *
@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef TOUSCHEKREADER_H_
-#define TOUSCHEKREADER_H_
+#ifndef TOUSCHEKREADERTURTLE_H_
+#define TOUSCHEKREADERTURTLE_H_
 
 #include <framework/core/FrameworkExceptions.h>
 #include <generators/dataobjects/MCParticleGraph.h>
@@ -30,7 +30,7 @@ namespace Belle2 {
    * The reader reads either a specified number of particles from the file, or all
    * particles.
    */
-  class TouschekReader {
+  class TouschekReaderTURTLE {
 
   public:
 
@@ -45,12 +45,12 @@ namespace Belle2 {
      * @param transMatrix Pointer to the matrix which transforms the particles from the local Touschek to the global geant4 coordinate system.
      * @param pdg The pdg value of the type of particle that is read (e.g. 11 for e-, -11 for e+).
      */
-    TouschekReader(TGeoHMatrix* transMatrix, int pdg);
+    TouschekReaderTURTLE(TGeoHMatrix* transMatrix, int pdg);
 
     /**
      * Destructor.
      */
-    ~TouschekReader();
+    ~TouschekReaderTURTLE();
 
     /**
      * Opens an ascii file and prepares it for reading.
@@ -81,4 +81,4 @@ namespace Belle2 {
 
 }
 
-#endif /* TOUSCHEKREADER_H_ */
+#endif /* TOUSCHEKREADERTURTLE_H_ */

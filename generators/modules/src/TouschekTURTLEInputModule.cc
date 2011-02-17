@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2010-2011  Belle II Collaboration                         *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Andreas Moll                                             *
@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <generators/modules/TouschekInputModule.h>
+#include <generators/modules/TouschekTURTLEInputModule.h>
 
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -29,13 +29,13 @@ using namespace Generators;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(TouschekInput)
+REG_MODULE(TouschekTURTLEInput)
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-TouschekInputModule::TouschekInputModule() : Module()
+TouschekTURTLEInputModule::TouschekTURTLEInputModule() : Module()
 {
   //Set module properties
   setDescription("Reads the Touschek data from a TURTLE file and stores it into the MCParticle collection.");
@@ -51,19 +51,19 @@ TouschekInputModule::TouschekInputModule() : Module()
   //Create and initialize member variables
   m_herPipePartMatrix = new TGeoHMatrix("TouschekPlaneHER");
   m_lerPipePartMatrix = new TGeoHMatrix("TouschekPlaneLER");
-  m_readerHER = new TouschekReader(m_herPipePartMatrix, 11);  //HER: electrons
-  m_readerLER = new TouschekReader(m_herPipePartMatrix, -11); //LER: positrons
+  m_readerHER = new TouschekReaderTURTLE(m_herPipePartMatrix, 11);  //HER: electrons
+  m_readerLER = new TouschekReaderTURTLE(m_herPipePartMatrix, -11); //LER: positrons
 }
 
 
-TouschekInputModule::~TouschekInputModule()
+TouschekTURTLEInputModule::~TouschekTURTLEInputModule()
 {
   delete m_readerHER;
   delete m_readerLER;
 }
 
 
-void TouschekInputModule::initialize()
+void TouschekTURTLEInputModule::initialize()
 {
   //Check parameters
   if ((m_readHER) && (!ModuleUtils::fileNameExists(m_filenameHER))) {
@@ -93,7 +93,7 @@ void TouschekInputModule::initialize()
 }
 
 
-void TouschekInputModule::event()
+void TouschekTURTLEInputModule::event()
 {
   int readHERParticles = 0;
   int readLERParticles = 0;

@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2010-2011  Belle II Collaboration                         *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Andreas Moll                                             *
@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <generators/touschek/TouschekReader.h>
+#include <generators/touschek/TouschekReaderTURTLE.h>
 
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Unit.h>
@@ -23,7 +23,7 @@ using namespace std;
 using namespace Belle2;
 
 
-TouschekReader::TouschekReader(TGeoHMatrix* transMatrix, int pdg)
+TouschekReaderTURTLE::TouschekReaderTURTLE(TGeoHMatrix* transMatrix, int pdg)
 {
   m_lineNum = 0;
   m_filename = "";
@@ -32,13 +32,13 @@ TouschekReader::TouschekReader(TGeoHMatrix* transMatrix, int pdg)
 }
 
 
-TouschekReader::~TouschekReader()
+TouschekReaderTURTLE::~TouschekReaderTURTLE()
 {
   if (m_input) m_input.close();
 }
 
 
-void TouschekReader::open(const string& filename) throw(TouschekCouldNotOpenFileError)
+void TouschekReaderTURTLE::open(const string& filename) throw(TouschekCouldNotOpenFileError)
 {
   m_filename = filename;
   m_lineNum = 0;
@@ -47,7 +47,7 @@ void TouschekReader::open(const string& filename) throw(TouschekCouldNotOpenFile
 }
 
 
-int TouschekReader::getParticles(int number, MCParticleGraph &graph) throw(TouschekConvertFieldError)
+int TouschekReaderTURTLE::getParticles(int number, MCParticleGraph &graph) throw(TouschekConvertFieldError)
 {
   if (m_transMatrix == NULL) {
     B2ERROR("The transformation matrix is NULL !")

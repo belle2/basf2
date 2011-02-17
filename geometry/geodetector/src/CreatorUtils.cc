@@ -65,7 +65,7 @@ void CreatorUtils::addArrow(const TVector3& position, const TVector3& direction,
 
   s_arrowCount++;
 
-  TGeoVolume* arrowVol = gGeoManager->MakeTube((format("Arrow_%1%") % s_arrowCount).str().c_str(), NULL, 0.0, 0.15, dirMag);
+  TGeoVolume* arrowVol = gGeoManager->MakeCone((format("Arrow_%1%") % s_arrowCount).str().c_str(), NULL, dirMag, 0.0, 0.1, 0.0, 0.02);
   arrowVol->SetLineColor(3);
 
   //If the specified mother volume is not NULL, check if a subgroup

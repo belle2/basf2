@@ -68,8 +68,12 @@ int TouschekReaderSAD::getParticles(int number, double sRange, double beamEnergy
   while ((iEntry < number) && (m_readEntry < m_tree->GetEntries())) {
     m_tree->GetEntry(m_readEntry);
 
+    double lostX = m_lostX * Unit::m;
+    double lostY = m_lostY * Unit::m;
+    double lostS = m_lostS * Unit::m;
+
     //Check s range
-    if (fabs(m_lostS) > sRange) {
+    if (fabs(lostS) > sRange) {
       m_readEntry++;
       continue;
     }
@@ -82,9 +86,10 @@ int TouschekReaderSAD::getParticles(int number, double sRange, double beamEnergy
 
     //Convert the position of the particle from local Touschek space to global geant4 space.
     //Flip the sign for the y and z component to go from the accelerator to the detector coordinate system
-    particlePosTouschek[0] = m_lostX * Unit::m;
-    particlePosTouschek[1] = -m_lostY * Unit::m;
-    particlePosTouschek[2] = -m_lostS;
+    particlePosTouschek[0] = lostX;
+    particlePosTouschek[1] = -lostY;
+    particlePosTouschek[2] = -lostS;
+
     m_transMatrix->LocalToMaster(particlePosTouschek, particlePosGeant4);
 
     //Convert the momentum of the particle from local Touschek space to global geant4 space.

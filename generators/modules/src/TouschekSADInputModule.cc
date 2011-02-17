@@ -72,7 +72,7 @@ void TouschekSADInputModule::event()
   try {
     //Read the data
     MCParticleGraph mpg;
-    int readLERParticles = m_readerLER->getParticles(m_maxParticles, 3.0, 4.0, -11, mpg); //LER: positrons
+    int readLERParticles = m_readerLER->getParticles(m_maxParticles, 3.0 * Unit::m, 4.0 * Unit::GeV, -11, mpg); //LER: positrons
 
     if (readLERParticles > 0) {
       //Generate MCParticle list

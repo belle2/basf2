@@ -58,6 +58,7 @@ namespace Belle2 {
 
       std::string m_filenameLER; /**< The filename of the LER TURTLE Touschek file. */
       int  m_maxParticles; /**< The maximum number of particles per event that should be read. */
+      double m_RangeLER;   /**< All particles within the range around the IP are loaded. */
     };
 
   }//end namespace Generators

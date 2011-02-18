@@ -70,24 +70,11 @@ class TRGCDCFrontEnd
 
 //-----------------------------------------------------------------------------
 
-#ifdef TRGCDC_NO_INLINE
-#define inline
-#else
-#undef inline
-#define TRGCDCFrontEnd_INLINE_DEFINE_HERE
-#endif
-
-#ifdef TRGCDCFrontEnd_INLINE_DEFINE_HERE
-
 // inline
 // void
 // TRGCDCFrontEnd::append(const TRGCDCWire * w) {
 //     _wires.push_back(w);
 // }
-
-#endif
-
-#undef inline
 
 } // namespace Belle2
 

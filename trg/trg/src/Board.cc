@@ -11,8 +11,6 @@
 // $Log$
 //-----------------------------------------------------------------------------
 
-#define TRGBoard_INLINE_DEFINE_HERE
-
 #include <iostream>
 #include "trg/trg/Board.h"
 #include "trg/trg/Clock.h"

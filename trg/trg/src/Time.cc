@@ -11,8 +11,6 @@
 // $Log$
 //-----------------------------------------------------------------------------
 
-#define TRGTime_INLINE_DEFINE_HERE
-
 #include <iostream>
 #include "trg/trg/Clock.h"
 #include "trg/trg/Time.h"

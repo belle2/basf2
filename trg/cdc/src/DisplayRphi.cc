@@ -13,8 +13,6 @@
 
 #ifdef TRGCDC_DISPLAY
 
-#define TRGCDCDisplayRphi_INLINE_DEFINE_HERE
-
 #include <iostream>
 #include "trg/cdc/DisplayRphi.h"
 

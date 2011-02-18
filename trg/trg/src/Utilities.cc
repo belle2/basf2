@@ -11,7 +11,6 @@
 // $Log$
 //-----------------------------------------------------------------------------
 
-#define TRGUtilities_INLINE_DEFINE_HERE
 #define TRG_SHORT_NAMES
 
 #include <sstream>

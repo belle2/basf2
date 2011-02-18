@@ -45,15 +45,6 @@ class TRGArea2D {
 
 //-----------------------------------------------------------------------------
 
-#ifdef TRG_NO_INLINE
-#define inline
-#else
-#undef inline
-#define TRGArea2D_INLINE_DEFINE_HERE
-#endif
-
-#ifdef TRGArea2D_INLINE_DEFINE_HERE
-
 inline
 bool
 TRGArea2D::inArea(const TRGPoint2D & x) const {
@@ -62,10 +53,6 @@ TRGArea2D::inArea(const TRGPoint2D & x) const {
             return true;
     return false;
 }
-
-#endif
-
-#undef inline
 
 } // namespace Belle2
 

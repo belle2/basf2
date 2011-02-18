@@ -13,8 +13,6 @@
 
 #ifdef TRGCDC_DISPLAY
 
-#define TRGCDCDisplayHough_INLINE_DEFINE_HERE
-
 #include <iostream>
 #include "trg/cdc/DisplayHough.h"
 

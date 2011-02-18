@@ -63,15 +63,6 @@ class TRGBoard {
 
 //-----------------------------------------------------------------------------
 
-#ifdef TRG_NO_INLINE
-#define inline
-#else
-#undef inline
-#define TRGBoard_INLINE_DEFINE_HERE
-#endif
-
-#ifdef TRGBoard_INLINE_DEFINE_HERE
-
 inline
 const std::string &
 TRGBoard::name(void) const {
@@ -89,11 +80,6 @@ void
 TRGBoard::append(const TRGLink * a) {
     _links.push_back(a);
 }
-
-
-#endif
-
-#undef inline
 
 } // namespace Belle2
 

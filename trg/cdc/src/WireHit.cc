@@ -11,10 +11,8 @@
 // $Log$
 //-----------------------------------------------------------------------------
 
-#define TRGCDCWireHit_INLINE_DEFINE_HERE
 #define TRG_SHORT_NAMES
 #define TRGCDC_SHORT_NAMES
-
 
 #include "trg/trg/Utilities.h"
 #include "trg/cdc/Wire.h"

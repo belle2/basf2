@@ -51,19 +51,6 @@ class TRGCDCMerger
 
 //-----------------------------------------------------------------------------
 
-#ifdef TRGCDC_NO_INLINE
-#define inline
-#else
-#undef inline
-#define TRGCDCMerger_INLINE_DEFINE_HERE
-#endif
-
-#ifdef TRGCDCMerger_INLINE_DEFINE_HERE
-
-#endif
-
-#undef inline
-
 } // namespace Belle2
 
 #endif /* TRGCDCMerger_FLAG_ */

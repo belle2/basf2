@@ -103,15 +103,6 @@ class TRGSignal {
 
 //-----------------------------------------------------------------------------
 
-#ifdef TRG_NO_INLINE
-#define inline
-#else
-#undef inline
-#define TRGSignal_INLINE_DEFINE_HERE
-#endif
-
-#ifdef TRGSignal_INLINE_DEFINE_HERE
-
 inline
 const std::string &
 TRGSignal::name(void) const {
@@ -173,10 +164,6 @@ TRGSignal::active(void) const {
         return true;
     return false;
 }
-
-#endif
-
-#undef inline
 
 } // namespace Belle2
 

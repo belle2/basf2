@@ -67,15 +67,6 @@ operator << (std::ostream &, const TRGPoint2D &);
 
 //-----------------------------------------------------------------------------
 
-#ifdef TRG_NO_INLINE
-#define inline
-#else
-#undef inline
-#define TPOINT2D_INLINE_DEFINE_HERE
-#endif
-
-#ifdef TPOINT2D_INLINE_DEFINE_HERE
-
 inline
 double
 TRGPoint2D::x(void) const {
@@ -166,9 +157,6 @@ TRGPoint2D::unit(void) const {
     double sum = sqrt(sum2);
     return TRGPoint2D(_p[0] / sum, _p[1] / sum);
 }
-
-#endif
-#undef inline
 
 } // namespace Belle2k
 

@@ -112,14 +112,6 @@ class TRGCDCDisplay : public Gtk::Window {
 
 //-----------------------------------------------------------------------------
 
-#ifdef TRGCDC_NO_INLINE
-#define inline
-#else
-#undef inline
-#define TRGCDCDisplay_INLINE_DEFINE_HERE
-#endif
-#ifdef TRGCDCDisplay_INLINE_DEFINE_HERE
-
 inline
 void
 TRGCDCDisplay::stage(const std::string & a) {
@@ -166,9 +158,6 @@ void
 TRGCDCDisplay::endOfEvent(void) {
     _endOfEvent = true;
 }
-
-#endif
-#undef inline
 
 } // namespace Belle2
 

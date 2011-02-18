@@ -11,8 +11,6 @@
 // $Log$
 //-----------------------------------------------------------------------------
 
-#define TRGLink_INLINE_DEFINE_HERE
-
 #include <iostream>
 #include "trg/trg/Link.h"
 #include "trg/trg/Clock.h"

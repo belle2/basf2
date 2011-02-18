@@ -11,8 +11,6 @@
 // $Log$
 //-----------------------------------------------------------------------------
 
-#define TRGArea2D_INLINE_DEFINE_HERE
-
 #include "trg/trg/Area2D.h"
 
 namespace Belle2 {

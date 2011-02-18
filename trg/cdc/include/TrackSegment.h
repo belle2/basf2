@@ -97,15 +97,6 @@ class TRGCDCTrackSegment : public TRGCDCWire {
 
 //-----------------------------------------------------------------------------
 
-#ifdef TRGCDC_NO_INLINE
-#define inline
-#else
-#undef inline
-#define TRGCDCTrackSegment_INLINE_DEFINE_HERE
-#endif
-
-#ifdef TRGCDCTrackSegment_INLINE_DEFINE_HERE
-
 inline
 unsigned
 TRGCDCTrackSegment::id(void) const {
@@ -165,10 +156,6 @@ const TRGSignal &
 TRGCDCTrackSegment::triggerOutput(void) const {
     return _signal;
 }
-
-#endif
-
-#undef inline
 
 } // namespace Belle2
 

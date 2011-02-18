@@ -65,14 +65,6 @@ class TRGCDCDisplayDrawingArea : public Gtk::DrawingArea {
 
 //-----------------------------------------------------------------------------
 
-#ifdef TRGCDC_NO_INLINE
-#define inline
-#else
-#undef inline
-#define TRGCDCDisplayDrawingArea_INLINE_DEFINE_HERE
-#endif
-#ifdef TRGCDCDisplayDrawingArea_INLINE_DEFINE_HERE
-
 inline
 double
 TRGCDCDisplayDrawingArea::scale(double a) {
@@ -132,9 +124,6 @@ bool
 TRGCDCDisplayDrawingArea::oldCDC(bool a) {
     return _oldCDC = a;
 }
-
-#endif
-#undef inline
 
 } // namespace Belle2
 

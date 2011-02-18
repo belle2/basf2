@@ -84,15 +84,6 @@ class TRGCDCWireHitMC {
 
 //-----------------------------------------------------------------------------
 
-#ifdef TRGCDC_NO_INLINE
-#define inline
-#else
-#undef inline
-#define TRGCDCWireHitMC_INLINE_DEFINE_HERE
-#endif
-
-#ifdef TRGCDCWireHitMC_INLINE_DEFINE_HERE
-
 inline
 float
 TRGCDCWireHitMC::distance(void) const {
@@ -146,10 +137,6 @@ const CLHEP::Hep3Vector &
 TRGCDCWireHitMC::momentum(void) const {
     return _momentum;
 }
-
-#endif
-
-#undef inline
 
 } // namespace Belle2
 

@@ -13,7 +13,6 @@
 
 #define TRG_SHORT_NAMES
 #define TRGCDC_SHORT_NAMES
-#define TRGCDCFrontEnd_INLINE_DEFINE_HERE
 
 #include "trg/trg/Utilities.h"
 #include "trg/cdc/TRGCDC.h"

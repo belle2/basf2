@@ -327,15 +327,6 @@ class TRGCDC {
 
 //-----------------------------------------------------------------------------
 
-#ifdef TRGCDC_NO_INLINE
-#define inline
-#else
-#undef inline
-#define TRGCDC_INLINE_DEFINE_HERE
-#endif
-
-#ifdef TRGCDC_INLINE_DEFINE_HERE
-
 inline
 int
 TRGCDC::debugLevel(void) const {
@@ -503,10 +494,6 @@ unsigned
 TRGCDC::nTrackSegmentLayers(void) const {
     return _tsLayers.size();
 }
-
-#endif
-
-#undef inline
 
 } // namespace Belle2
 

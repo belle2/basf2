@@ -11,8 +11,6 @@
 // $Log$
 //-----------------------------------------------------------------------------
 
-#define TRGPoint2D_INLINE_DEFINE_HERE
-
 #include "trg/trg/Point2D.h"
 
 namespace Belle2 {

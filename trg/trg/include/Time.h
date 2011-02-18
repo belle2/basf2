@@ -92,15 +92,6 @@ class TRGTime {
 
 //-----------------------------------------------------------------------------
 
-#ifdef TRG_NO_INLINE
-#define inline
-#else
-#undef inline
-#define TRGTime_INLINE_DEFINE_HERE
-#endif
-
-#ifdef TRGTime_INLINE_DEFINE_HERE
-
 inline
 const std::string &
 TRGTime::name(void) const {
@@ -150,10 +141,6 @@ int
 TRGTime::time(int a) {
     return _time = a;
 }
-
-#endif
-
-#undef inline
 
 } // namespace Belle2
 

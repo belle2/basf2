@@ -118,15 +118,6 @@ class TRGCDCLayer : public std::vector<TRGCDCWire *> {
 
 //-----------------------------------------------------------------------------
 
-#ifdef TRGCDC_NO_INLINE
-#define inline
-#else
-#undef inline
-#define TRGCDCLayer_INLINE_DEFINE_HERE
-#endif
-
-#ifdef TRGCDCLayer_INLINE_DEFINE_HERE
-
 inline
 unsigned
 TRGCDCLayer::id(void) const {
@@ -217,10 +208,6 @@ float
 TRGCDCLayer::outerRadius(void) const {
     return _outerRadius;
 }
-
-#endif
-
-#undef inline
 
 } // namespace Belle2
 

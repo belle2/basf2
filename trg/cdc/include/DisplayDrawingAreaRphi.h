@@ -131,14 +131,6 @@ class TRGCDCDisplayDrawingAreaRphi : public TRGCDCDisplayDrawingArea {
 
 //-----------------------------------------------------------------------------
 
-#ifdef TRGCDC_NO_INLINE
-#define inline
-#else
-#undef inline
-#define TRGCDCDisplayDrawingAreaRphi_INLINE_DEFINE_HERE
-#endif
-#ifdef TRGCDCDisplayDrawingAreaRphi_INLINE_DEFINE_HERE
-
 inline
 double
 TRGCDCDisplayDrawingAreaRphi::scale(double a) {
@@ -224,9 +216,6 @@ int
 TRGCDCDisplayDrawingAreaRphi::yR(double a) const {
     return int((- a - _winh / 2) / _scale + _y);
 }
-
-#endif
-#undef inline
 
 } // namespace Belle2
 

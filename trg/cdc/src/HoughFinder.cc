@@ -170,13 +170,25 @@ TRGCDCHoughFinder::doit(void) {
     for (unsigned c = 0; c < 2; c++) {
 
          //...Loop over all peaks...
-         for (unsigned i = 0; peaks[c]->size(); i++) {
+         for (unsigned i = 0; i < peaks[c]->size(); i++) {
 
-            //...Circle center...
-            const TRGPoint2D center = _circleH.circleCenter(* (* peaks[c])[i]);
-            const double ConstantAlpha = 222.376063; // for 1.5T
-            const double pt = center.mag() / ConstantAlpha;
-            
+             //...Circle center...
+             const TRGPoint2D center =
+                 _circleH.circleCenter(* (* peaks[c])[i]);
+             const double ConstantAlpha = 222.376063; // for 1.5T
+             const double pt = center.mag() / ConstantAlpha;
+
+             //...Results...
+#ifdef TRGCDC_DEBUG
+             string charge = "+ charge";
+             if (c == 1)
+                 charge = "- charge";
+             cout << name() << " ... Peak finding 5" << endl;
+             cout << name() << "     " << charge
+                  << ", track# " << i << endl;
+             cout << name() << "     center = " << center
+                  << ", pt=" << pt << endl;
+#endif
           }
     }
 

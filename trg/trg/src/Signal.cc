@@ -11,8 +11,6 @@
 // $Log$
 //-----------------------------------------------------------------------------
 
-#define TRGSignal_INLINE_DEFINE_HERE
-
 #include <algorithm>
 #include <functional>
 #include <iostream>

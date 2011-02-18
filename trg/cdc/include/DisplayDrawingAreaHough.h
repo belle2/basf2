@@ -83,14 +83,6 @@ class TRGCDCDisplayDrawingAreaHough : public TRGCDCDisplayDrawingArea {
 
 //-----------------------------------------------------------------------------
 
-#ifdef TRGCDC_NO_INLINE
-#define inline
-#else
-#undef inline
-#define TRGCDCDisplayDrawingAreaHough_INLINE_DEFINE_HERE
-#endif
-#ifdef TRGCDCDisplayDrawingAreaHough_INLINE_DEFINE_HERE
-
 inline
 double
 TRGCDCDisplayDrawingAreaHough::scale(double a) {
@@ -133,9 +125,6 @@ TRGCDCDisplayDrawingAreaHough::append(const TRGCDCHoughPlane * const hp) {
     _hp = hp;
     on_expose_event((GdkEventExpose *) NULL);
 }
-
-#endif
-#undef inline
 
 } // namespace Belle2
 

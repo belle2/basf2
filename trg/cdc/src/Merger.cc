@@ -11,7 +11,6 @@
 // $Log$
 //-----------------------------------------------------------------------------
 
-#define TRGCDCMerger_INLINE_DEFINE_HERE
 #define TRGCDC_SHORT_NAMES
 
 #include "trg/cdc/Merger.h"

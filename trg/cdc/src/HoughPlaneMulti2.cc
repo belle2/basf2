@@ -11,7 +11,6 @@
 // $Log$
 //-----------------------------------------------------------------------------
 
-#define TRGCDCHoughPlaneMulti2_INLINE_DEFINE_HERE
 #define TRG_SHORT_NAMES
 #define TRGCDC_SHORT_NAMES
 

@@ -11,8 +11,6 @@
 // $Log$
 //-----------------------------------------------------------------------------
 
-#define TRGCDCWireHitMC_INLINE_DEFINE_HERE
-
 #include "trg/cdc/WireHitMC.h"
 
 namespace Belle2 {

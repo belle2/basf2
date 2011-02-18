@@ -192,15 +192,6 @@ class TRGCDCWireHit {
 
 //-----------------------------------------------------------------------------
 
-#ifdef TRGCDC_NO_INLINE
-#define inline
-#else
-#undef inline
-#define TRGCDCWireHit_INLINE_DEFINE_HERE
-#endif
-
-#ifdef TRGCDCWireHit_INLINE_DEFINE_HERE
-
 inline
 // const TRGCDCWire * const
 const TRGCDCWire &
@@ -299,10 +290,6 @@ unsigned
 TRGCDCWireHit::sequence(unsigned a) const {
     return _sequentialLength = a;
 }
-
-#endif
-
-#undef inline
 
 } // namespace Belle2
 

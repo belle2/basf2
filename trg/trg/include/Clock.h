@@ -90,15 +90,6 @@ class TRGClock {
 
 //-----------------------------------------------------------------------------
 
-#ifdef TRG_NO_INLINE
-#define inline
-#else
-#undef inline
-#define TRGClock_INLINE_DEFINE_HERE
-#endif
-
-#ifdef TRGClock_INLINE_DEFINE_HERE
-
 inline
 double
 TRGClock::offset(void) const {
@@ -128,10 +119,6 @@ int
 TRGClock::unit(double a) const {
     return int(a / _cycle) + 1;
 }
-
-#endif
-
-#undef inline
 
 } // namespace Belle2
 

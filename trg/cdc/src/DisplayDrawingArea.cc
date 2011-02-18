@@ -14,7 +14,6 @@
 #ifdef TRGCDC_DISPLAY
 
 #define TRGCDC_SHORT_NAMES
-#define TRGCDCDisplayDrawingArea_INLINE_DEFINE_HERE
 
 #include <iostream>
 #include <pangomm/init.h>

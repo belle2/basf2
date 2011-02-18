@@ -62,14 +62,6 @@ class TRGCDCDisplayHough : public TRGCDCDisplay {
 
 //-----------------------------------------------------------------------------
 
-#ifdef TRGCDC_NO_INLINE
-#define inline
-#else
-#undef inline
-#define TRGCDCDisplayHough_INLINE_DEFINE_HERE
-#endif
-#ifdef TRGCDCDisplayHough_INLINE_DEFINE_HERE
-
 inline
 TRGCDCDisplayDrawingAreaHough &
 TRGCDCDisplayHough::area(void) {
@@ -88,9 +80,6 @@ TRGCDCDisplayHough::scale(double a) {
     _scaler.set_value(a);
     return _scaler.get_value();
 }
-
-#endif
-#undef inline
 
 } // namespace Belle2
 

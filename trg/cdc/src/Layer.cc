@@ -11,8 +11,6 @@
 // $Log$
 //-----------------------------------------------------------------------------
 
-#define TRGCDCLayer_INLINE_DEFINE_HERE
-
 #include <iostream>
 #include "trg/cdc/TRGCDC.h"
 #include "trg/cdc/Wire.h"

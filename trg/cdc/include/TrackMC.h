@@ -95,15 +95,6 @@ class TRGCDCTrackMC {
 
 //-----------------------------------------------------------------------------
 
-#ifdef TRGCDC_NO_INLINE
-#define inline
-#else
-#undef inline
-#define TRGCDCTrackMC_INLINE_DEFINE_HERE
-#endif
-
-#ifdef TRGCDCTrackMC_INLINE_DEFINE_HERE
-
 inline
 unsigned
 TRGCDCTrackMC::id(void) const {
@@ -154,10 +145,6 @@ std::string
 TRGCDCTrackMC::name(void) const {
     return "mc" + TRGUtilities::itostring(id());
 }
-
-#endif
-
-#undef inline
 
 } // namespace Belle2
 

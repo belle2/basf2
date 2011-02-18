@@ -181,15 +181,6 @@ class TRGCDCWire {
 
 //-----------------------------------------------------------------------------
 
-#ifdef TRGCDC_NO_INLINE
-#define inline
-#else
-#undef inline
-#define TRGCDCWire_INLINE_DEFINE_HERE
-#endif
-
-#ifdef TRGCDCWire_INLINE_DEFINE_HERE
-
 inline
 unsigned
 TRGCDCWire::id(void) const {
@@ -370,10 +361,6 @@ TRGCDCWire::adjacent(const TRGCDCWire & w) const {
             return true;
     return false;
 }
-
-#endif
-
-#undef inline
 
 } // namespace Belle2
 

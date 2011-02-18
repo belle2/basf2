@@ -75,15 +75,6 @@ class TRGLink {
 
 //-----------------------------------------------------------------------------
 
-#ifdef TRG_NO_INLINE
-#define inline
-#else
-#undef inline
-#define TRGLink_INLINE_DEFINE_HERE
-#endif
-
-#ifdef TRGLink_INLINE_DEFINE_HERE
-
 inline
 const std::string &
 TRGLink::name(void) const {
@@ -113,10 +104,6 @@ void
 TRGLink::append(const TRGSignal * a) {
     _data.push_back(a);
 }
-
-#endif
-
-#undef inline
 
 } // namespace Belle2
 

@@ -56,21 +56,6 @@ class TRGUtilities {
 
 //-----------------------------------------------------------------------------
 
-#ifdef TRG_NO_INLINE
-#define inline
-#else
-#undef inline
-#define TRGUtilities_INLINE_DEFINE_HERE
-#endif
-
-#ifdef TRGUtilities_INLINE_DEFINE_HERE
-
-
-
-#endif
-
-#undef inline
-
 } // namespace Belle2
 
 #endif /* TRGUtilities_FLAG_ */

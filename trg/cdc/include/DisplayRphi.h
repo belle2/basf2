@@ -85,14 +85,6 @@ class TRGCDCDisplayRphi : public TRGCDCDisplay {
 
 //-----------------------------------------------------------------------------
 
-#ifdef TRGCDC_NO_INLINE
-#define inline
-#else
-#undef inline
-#define TRGCDCDisplayRphi_INLINE_DEFINE_HERE
-#endif
-#ifdef TRGCDCDisplayRphi_INLINE_DEFINE_HERE
-
 inline
 TRGCDCDisplayDrawingAreaRphi &
 TRGCDCDisplayRphi::area(void) {
@@ -123,9 +115,6 @@ TRGCDCDisplayRphi::scale(double a) {
     _scaler.set_value(a);
     return _scaler.get_value();
 }
-
-#endif
-#undef inline
 
 } // namespace Belle2
 

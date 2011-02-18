@@ -11,8 +11,6 @@
 // $Log$
 //-----------------------------------------------------------------------------
 
-#define TRGCDCHoughTransformation_INLINE_DEFINE_HERE
-
 #include "trg/trg/Point2D.h"
 #include "trg/cdc/HoughTransformation.h"
 

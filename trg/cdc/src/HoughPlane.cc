@@ -11,8 +11,6 @@
 // $Log$
 //-----------------------------------------------------------------------------
 
-#define TRGCDCHoughPlane_INLINE_DEFINE_HERE
-
 #include "trg/cdc/HoughPlane.h"
 
 namespace Belle2 {

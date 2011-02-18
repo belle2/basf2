@@ -13,8 +13,6 @@
 
 #ifdef TRGCDC_DISPLAY
 
-#define TRGCDCDisplay_INLINE_DEFINE_HERE
-
 #include <iostream>
 #include "trg/cdc/Display.h"
 #include "trg/cdc/DisplayDrawingArea.h"

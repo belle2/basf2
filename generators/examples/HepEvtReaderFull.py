@@ -8,7 +8,7 @@
 # fed through the Geant4 simulation and the output
 # is stored in a root file.
 #
-# The different options for the particle gun are explained
+# The different options for the HepEvtReader are explained
 # below.
 # Uncomment/comment different lines to get the wanted
 # settings
@@ -96,7 +96,7 @@ simpleoutput.param('outputFileName', 'HepEvTReaderOutput.root')
 # creating the path for the processing
 main = create_path()
 
-# Add Particle Gun module to path:
+# Add hepevtreader module to path:
 main.add_module(hepevtreader)
 # and print parameters for hepevtreader
 # on startup of process

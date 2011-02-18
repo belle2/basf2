@@ -37,7 +37,7 @@ TouschekSADInputModule::TouschekSADInputModule() : Module()
 
   //Parameter definition
   addParam("FilenameLER",  m_filenameLER, "The filename of the LER TURTLE input file.");
-  addParam("MaxParticles", m_maxParticles, "The maximum number of particles per event that should be read.");
+  addParam("MaxParticles", m_maxParticles, "The maximum number of particles per event that should be read.", 10);
   addParam("RangeLER",  m_RangeLER, "All particles within the range around the IP are loaded.", 3.0);
 
   //Create and initialize member variables

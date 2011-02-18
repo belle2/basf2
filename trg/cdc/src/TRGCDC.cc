@@ -125,8 +125,9 @@ TRGCDC::TRGCDC(const std::string & configFile) :
 
 void
 TRGCDC::initialize(void) {
-    Belle2::CDCGeometryPar & cdc2 = * Belle2::CDCGeometryPar::Instance();
 
+    //...CDC...
+    Belle2::CDCGeometryPar & cdc2 = * Belle2::CDCGeometryPar::Instance();
     const unsigned nLayers = cdc2.nWireLayers();
 
     //...Loop over layers...

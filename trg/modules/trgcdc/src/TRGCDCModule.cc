@@ -15,8 +15,10 @@
 
 #include <stdlib.h>
 #include <iostream>
+#include "G4RunManager.hh"
 #include "framework/core/ModuleManager.h"
 #include "trg/modules/trgcdc/TRGCDCModule.h"
+#include "trg/cdc/SteppingAction.h"
 
 using namespace std;
 
@@ -69,6 +71,12 @@ TRGCDCModule::~TRGCDCModule() {
 
 void
 TRGCDCModule::initialize() {
+
+    //...Stop curl buck...
+    G4RunManager * g4rm = G4RunManager::GetRunManager();
+    static TCSAction * sa = new TCSAction();
+    g4rm->SetUserAction(sa);
+
 }
 
 void

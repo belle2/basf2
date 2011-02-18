@@ -65,7 +65,7 @@ int TouschekReaderSAD::getParticles(int number, double sRange, double beamEnergy
   double particleMomGeant4[3] = {0.0, 0.0, 0.0};
 
   int iEntry = 0;
-  while ((iEntry < number) && (m_readEntry < m_tree->GetEntries())) {
+  while (((iEntry < number) || (number < 0)) && (m_readEntry < m_tree->GetEntries())) {
     m_tree->GetEntry(m_readEntry);
 
     double lostX = m_lostX * Unit::m;

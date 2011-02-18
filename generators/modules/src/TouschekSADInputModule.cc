@@ -36,9 +36,9 @@ TouschekSADInputModule::TouschekSADInputModule() : Module()
   setPropertyFlags(c_Input);
 
   //Parameter definition
-  addParam("FilenameLER",  m_filenameLER, "The filename of the LER TURTLE input file.");
-  addParam("MaxParticles", m_maxParticles, "The maximum number of particles per event that should be read.", 10);
-  addParam("RangeLER",  m_RangeLER, "All particles within the range around the IP are loaded.", 3.0);
+  addParam("FilenameLER",  m_filenameLER, "The filename of the LER SAD input file.");
+  addParam("MaxParticles", m_maxParticles, "The maximum number of particles per event that should be read. -1 means all particles are read.", 10);
+  addParam("RangeLER",  m_RangeLER, "All particles within the range around the IP are loaded [cm].", 300.0);
 
   //Create and initialize member variables
   m_lerPipePartMatrix = new TGeoHMatrix("TouschekSADTrafoLER");
@@ -73,7 +73,7 @@ void TouschekSADInputModule::event()
   try {
     //Read the data
     MCParticleGraph mpg;
-    int readLERParticles = m_readerLER->getParticles(m_maxParticles, m_RangeLER * Unit::m, 4.0 * Unit::GeV, -11, mpg); //LER: positrons with 4 GeV (sorry, hardcoded)
+    int readLERParticles = m_readerLER->getParticles(m_maxParticles, m_RangeLER * Unit::cm, 4.0 * Unit::GeV, -11, mpg); //LER: positrons with 4 GeV (sorry, hardcoded)
 
     if (readLERParticles > 0) {
       //Generate MCParticle list

@@ -26,6 +26,7 @@ namespace Belle2 {
    * Class to read Touschek files that were created by SAD and store their content in a MCParticle graph.
    *
    * The data is stored in a root file and contains only the particles lost by the Touschek effect.
+   * The reader reads either a specified number of particles from the file, or all particles.
    */
   class TouschekReaderSAD {
 

@@ -1,6 +1,6 @@
 #ifndef DATAREDUCTION_H
 #define DATAREDUCTION_H
-#define CAIRO_OUTPUT 0
+//#define CAIRO_OUTPUT 1
 
 //Marlin and LCIO includes
 //#include "marlin/Processor.h"

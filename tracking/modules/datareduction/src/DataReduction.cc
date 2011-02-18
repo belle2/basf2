@@ -1,10 +1,20 @@
-#include "DataReduction.h"
+#include <tracking/modules/datareduction/DataReduction.h>
 
 #include <cmath>
 #include <iomanip>
 
-//Include LCIO/Marlin header files
+//DataStore Objects
 
+#include <framework/datastore/StoreArray.h>
+#include <svd/dataobjects/SVDHit.h>
+#include <pxd/dataobjects/PXDHit.h>
+#include <pxd/dataobjects/PXDSimHit.h>
+#include <tracking/modules/datareduction/TrackerHit.h>
+
+
+
+//Include LCIO/Marlin header files
+/*
 #include <EVENT/LCCollection.h>
 #include <EVENT/SimTrackerHit.h>
 #include <EVENT/TrackerHit.h>
@@ -15,26 +25,21 @@
 #include <gear/GearParameters.h>
 #include <gear/VXDLayerLayout.h>
 #include <gear/VXDParameters.h>
-
+*/
 //Include ROOT header files
 #include <TVector3.h>
 #include <TVector2.h>
 
-#include "SectorStraight.h"
-#include "SectorArc.h"
-#include "HoughTransformStraight.h"
-#include "HoughTransformSine.h"
+#include <tracking/modules/datareduction/SectorStraight.h>
+#include <tracking/modules/datareduction/SectorArc.h>
+#include <tracking/modules/datareduction/HoughTransformStraight.h>
+#include <tracking/modules/datareduction/HoughTransformSine.h>
+#include <tracking/modules/datareduction/PXDLadder.h>
 
-using namespace lcio;
-using namespace marlin;
 using namespace std;
 using namespace Belle2;
 
 REG_MODULE(DataReduction);
-
-
-DataReduction aDataReduction;
-
 
 DataReductionModule::DataReductionModule() : Module()
 {
@@ -54,13 +59,13 @@ DataReductionModule::DataReductionModule() : Module()
   */
 
   addParam("InputDigiSVDCollection", _colNameDigiSVDHits,
-           "Name of the SVDHitCollection", string("SVDHitArray"));
+           "Name of the SVDHitCollection", string("SVDHits"));
 
   addParam("InputDigiPXDCollection", _colNameDigiPXDHits,
-           "Name of the PXDHitCollection", string("PXDHitArray"));
+           "Name of the PXDHitCollection", string("PXDHits"));
 
   addParam("InputSimPXDCollection", _colNameSimPXDHits,
-           "Name of the PXDSimHitCollection", string("PXDSimHitArray"));
+           "Name of the PXDSimHitCollection", string("PXDSimHits"));
 
   _sectorList = new SectorList();
 
@@ -68,14 +73,14 @@ DataReductionModule::DataReductionModule() : Module()
 }
 
 
-DataReduction::~DataReduction()
+DataReductionModule::~DataReductionModule()
 {
   delete _pxdLadderList;
   delete _sectorList;
 }
 
 
-void DataReduction::init()
+void DataReductionModule::initialize()
 {
   _nRun = 0;
   _nEvt = 0;
@@ -148,11 +153,14 @@ void DataReduction::init()
 
 
   //------- Add PXD ladders -------
+  /*
   const gear::VXDParameters  & gearVXD             = Global::GEAR->getVXDParameters();
   const gear::VXDLayerLayout & gearVXDLayerLayout  = gearVXD.getVXDLayerLayout();
   const gear::GearParameters & gearVXDParams       = Global::GEAR->getGearParameters("VXDParameters");
   std::vector<int>    vecLayerType                 = gearVXDParams.getIntVals("ActiveLayerType");
   std::vector<double> vecLayerOffsetZ              = gearVXDParams.getDoubleVals("ActiveLayerOffsetZ");
+  */
+
 
   int nLadders       = 0;
   float currentPhi   = 0.0;
@@ -166,23 +174,64 @@ void DataReduction::init()
   float ladderLength = 0.;
 
   // Get number of layers of VXD (PXD+SVD)
-  int nLayersVXD = gearVXDLayerLayout.getNLayers();
+  /* int nLayersVXD = gearVXDLayerLayout.getNLayers();
+
+   for (int iLayer = 0; iLayer < nLayersVXD; ++iLayer) {
+
+     if (vecLayerType[iLayer] != pixel) continue; //Only take PXD layers into account
+
+     //Get parameters
+     layerPhi0    = float(gearVXDLayerLayout.getPhi0(iLayer)) / 180.0 * M_PI;
+     layerRadius  = float(gearVXDLayerLayout.getSensitiveDistance(iLayer));
+     layerOffsetY = float(gearVXDLayerLayout.getSensitiveOffset(iLayer));
+     layerOffsetZ = float(vecLayerOffsetZ[iLayer]);
+     ladderThick  = float(gearVXDLayerLayout.getSensitiveThickness(iLayer));
+     ladderWidth  = float(gearVXDLayerLayout.getSensitiveWidth(iLayer));
+     ladderLength = float(gearVXDLayerLayout.getSensitiveLength(iLayer));
+
+     //get number of ladders per layer
+     nLadders = gearVXDLayerLayout.getNLadders(iLayer);
+     ladderPhiRot = 2.0 * M_PI / nLadders;
+
+     for (int iLadder = 0; iLadder < nLadders; ++iLadder) {
+       currentPhi = layerPhi0 + ladderPhiRot * iLadder;
+
+       TVector3 ladderPos(layerRadius, layerOffsetY, layerOffsetZ); // Ladder starting position
+       TVector3 ladderNorm(1.0, 0.0, 0.0);
+       TVector3 ladderSize(ladderWidth, ladderThick, ladderLength);
+       ladderPos.RotateZ(currentPhi);  //Ladder final position
+       ladderNorm.RotateZ(currentPhi); //Normal vector
+
+       _pxdLadderList->push_back(new PXDLadder(ladderPos, ladderNorm, ladderSize));
+     }
+   } */
+
+  // Only PXD Layers
+  int nLayersVXD = 2;
+
+  // Data taken from PXDBelleII_PXD1600.xml and PXDSensorBelleII.xml
+  float        vlayerPhi0[2] = {90.0 / 180.0 * M_PI, 90.0 / 180.0 * M_PI};
+  float        vlayerRadius[2] = {14.0, 22.0}; //whole ladder as sensitive area
+  float        vlayerOffsetY[2] = { -3.3, -3.3}; //whole ladder as sensitive area
+  float        vlayerOffsetZ[2] = {11.7, 18.1};
+  float        vladderThick[2] = {0.075, 0.075};
+  float        vladderWidth[2] = {12.5, 12.5};
+  float        vladderLength[2] = {44.725, 44.725};
+  int        vnLadders[2] = {8, 12};
 
   for (int iLayer = 0; iLayer < nLayersVXD; ++iLayer) {
 
-    if (vecLayerType[iLayer] != pixel) continue; //Only take PXD layers into account
-
     //Get parameters
-    layerPhi0    = float(gearVXDLayerLayout.getPhi0(iLayer)) / 180.0 * M_PI;
-    layerRadius  = float(gearVXDLayerLayout.getSensitiveDistance(iLayer));
-    layerOffsetY = float(gearVXDLayerLayout.getSensitiveOffset(iLayer));
-    layerOffsetZ = float(vecLayerOffsetZ[iLayer]);
-    ladderThick  = float(gearVXDLayerLayout.getSensitiveThickness(iLayer));
-    ladderWidth  = float(gearVXDLayerLayout.getSensitiveWidth(iLayer));
-    ladderLength = float(gearVXDLayerLayout.getSensitiveLength(iLayer));
+    layerPhi0    = vlayerPhi0[iLayer];
+    layerRadius  = vlayerRadius[iLayer];
+    layerOffsetY = vlayerOffsetY[iLayer];
+    layerOffsetZ = vlayerOffsetZ[iLayer];
+    ladderThick  = vladderThick[iLayer];
+    ladderWidth  = vladderWidth[iLayer];
+    ladderLength = vladderLength[iLayer];
 
     //get number of ladders per layer
-    nLadders = gearVXDLayerLayout.getNLadders(iLayer);
+    nLadders = vnLadders[iLayer];
     ladderPhiRot = 2.0 * M_PI / nLadders;
 
     for (int iLadder = 0; iLadder < nLadders; ++iLadder) {
@@ -210,45 +259,67 @@ void DataReduction::init()
 #endif
 }
 
-
-void DataReduction::processRunHeader(LCRunHeader* run)
+/*
+void DataReductionModule::processRunHeader(LCRunHeader* run)
 {
   _nRun++;
 }
+*/
 
+void DataReductionModule::beginRun()
+{
+}
 
-void DataReduction::processEvent(LCEvent* evt)
+void DataReductionModule::event()
 {
   _sectorList->clearAllHits(); //Clear all hits
   _pxdLadderList->clearAllRegions(); //Clear all regions
+  /*
+    //1) Prepare collections
+    LCCollection* digiSVDHitsCol = 0;
+    LCCollection* digiPXDHitsCol = 0;
+    LCCollection* simPXDHitsCol = 0;
+  */
+  StoreArray<PXDSimHit> pxdSimHitArray(_colNameSimPXDHits);
+  StoreArray<PXDHit>    pxdHitArray(_colNameDigiPXDHits);
+  StoreArray<SVDHit>    svdHitArray(_colNameDigiSVDHits);
+  B2INFO("Number of simulated SVDHits:  " << svdHitArray.GetEntries());
+  B2INFO("Number of simulated PXDSimHits:  " << pxdSimHitArray.GetEntries());
+  B2INFO("Number of simulated PXDHits:  " << pxdHitArray.GetEntries());
 
-  //1) Prepare collections
-  LCCollection* digiSVDHitsCol = 0;
-  LCCollection* digiPXDHitsCol = 0;
-  LCCollection* simPXDHitsCol = 0;
+  /*
+    //2) Assign digitized SVD Hits hits to Sectors
+    try {
+      digiSVDHitsCol = evt->getCollection(_colNameDigiSVDHits.c_str());
+      int ndigiSVDHits = digiSVDHitsCol->getNumberOfElements();
 
-  //2) Assign digitized SVD Hits hits to Sectors
-  try {
-    digiSVDHitsCol = evt->getCollection(_colNameDigiSVDHits.c_str());
-    int ndigiSVDHits = digiSVDHitsCol->getNumberOfElements();
+      digiPXDHitsCol = evt->getCollection(_colNameDigiPXDHits.c_str());
+      simPXDHitsCol = evt->getCollection(_colNameSimPXDHits.c_str());
 
-    digiPXDHitsCol = evt->getCollection(_colNameDigiPXDHits.c_str());
-    simPXDHitsCol = evt->getCollection(_colNameSimPXDHits.c_str());
+      for (int iHit = 0; iHit < ndigiSVDHits; ++iHit) {
+        TrackerHit* currentHit = dynamic_cast<TrackerHit*>(digiSVDHitsCol->getElementAt(iHit));
+        _sectorList->addHit(currentHit);
+      }
 
-    for (int iHit = 0; iHit < ndigiSVDHits; ++iHit) {
-      TrackerHit* currentHit = dynamic_cast<TrackerHit*>(digiSVDHitsCol->getElementAt(iHit));
-      _sectorList->addHit(currentHit);
+      printSectorInfo();
+
+    } catch (DataNotAvailableException &e) {
+      streamlog_out(MESSAGE4) << "Collection not found: " << _colNameDigiSVDHits << endl;
+      streamlog_out(MESSAGE4) << "Skip event: " << _nEvt << endl;
+      return;
     }
+  */
+  int ndigiSVDHits = svdHitArray.GetEntries();
 
-    printSectorInfo();
-
-  } catch (DataNotAvailableException &e) {
-    streamlog_out(MESSAGE4) << "Collection not found: " << _colNameDigiSVDHits << endl;
-    streamlog_out(MESSAGE4) << "Skip event: " << _nEvt << endl;
-    return;
+  for (int iHit = 0; iHit < ndigiSVDHits; ++iHit) {
+    TrackerHit* currentHit = new TrackerHit();
+    double hitPos[3] = {svdHitArray[iHit]->getU(), svdHitArray[iHit]->getV(), 0.0};
+    B2DEBUG(99, svdHitArray[iHit]->getU() << "  " << svdHitArray[iHit]->getV());
+    currentHit->setPosition(hitPos);
+    currentHit->setdEdx(svdHitArray[iHit]->getEnergyDep());
+    _sectorList->addHit(currentHit);
   }
-
-  //3)
+//3)
 #ifdef CAIRO_OUTPUT
   cairo_pdf_surface_set_size(cairo_surface, 2*CAIRO_SIZE, 2*CAIRO_SIZE);
 #endif
@@ -343,10 +414,14 @@ void DataReduction::processEvent(LCEvent* evt)
 
 
     //Draw PXD Hits
-    int ndigiPXDHits = digiPXDHitsCol->getNumberOfElements();
+    int ndigiPXDHits = pxdHitArray.GetEntries();
 
     for (int iHit = 0; iHit < ndigiPXDHits; ++iHit) {
-      TrackerHit* currentHit = dynamic_cast<TrackerHit*>(digiPXDHitsCol->getElementAt(iHit));
+      TrackerHit* currentHit = new TrackerHit();
+      double hitPos[3] = {pxdHitArray[iHit]->getU(), pxdHitArray[iHit]->getV(), 0.0};
+      currentHit->setPosition(hitPos);
+      currentHit->setdEdx(pxdHitArray[iHit]->getEnergyDep());
+
 
       //Shift center to local ladder frame
       if (!l.isInLadder(currentHit->getPosition())) continue;
@@ -374,16 +449,20 @@ void DataReduction::processEvent(LCEvent* evt)
 #endif
     }
     //Draw PXD SimHits
-    int nsimPXDHits = simPXDHitsCol->getNumberOfElements();
+    int nsimPXDHits = pxdSimHitArray.GetEntries();
 
     for (int iHit = 0; iHit < nsimPXDHits; ++iHit) {
-      SimTrackerHit* currentHit = dynamic_cast<SimTrackerHit*>(simPXDHitsCol->getElementAt(iHit));
+      TrackerHit* currentHit = new TrackerHit();
+      TVector3 posV =  pxdSimHitArray[iHit]->getPosIn();
+      double hitPos[3] = {posV(0), posV(1), 0.0};
+      currentHit->setPosition(hitPos);
 
-      EVENT::MCParticle &mcParticle = *currentHit->getMCParticle();
+
+      //EVENT::MCParticle &mcParticle = *currentHit->getMCParticle();
       /*streamlog_out(MESSAGE4) << mcParticle.getGeneratorStatus()
           << mcParticle.getPDG()
           << endl;*/
-      if (mcParticle.getGeneratorStatus() != 1) continue;
+      //if (mcParticle.getGeneratorStatus() != 1) continue;
 
 
       //Shift center to local ladder frame
@@ -417,7 +496,7 @@ void DataReduction::processEvent(LCEvent* evt)
 #endif
   }
 #ifdef CAIRO_OUTPUT
-  cairo_surface_show_page(cairo_surface);
+//cairo_surface_show_page(cairo_surface);
 #endif
   //getchar();
 
@@ -425,19 +504,19 @@ void DataReduction::processEvent(LCEvent* evt)
 }
 
 
-void DataReduction::end()
+void DataReductionModule::endRun()
 {
   _sectorList->deleteAllSectors();
   _pxdLadderList->deleteAllLadders();
 
-  streamlog_out(MESSAGE4) << "Number PXD Hits total: " << _numberPXDHitsTotal << endl;
-  streamlog_out(MESSAGE4) << "Number PXD Hits found: " << _numberPXDHitsFound << endl;
-  streamlog_out(MESSAGE4) << "Efficiency:            " << setprecision(5) << double(_numberPXDHitsFound) / double(_numberPXDHitsTotal) << endl;
-
-  streamlog_out(MESSAGE4) << "Number SimPXD Hits total: " << _numberSimPXDHitsTotal << endl;
-  streamlog_out(MESSAGE4) << "Number SimPXD Hits found: " << _numberSimPXDHitsFound << endl;
-  streamlog_out(MESSAGE4) << "Efficiency:            " << setprecision(5) << double(_numberSimPXDHitsFound) / double(_numberSimPXDHitsTotal) << endl;
-
+  B2INFO("Number PXD Hits total: " << _numberPXDHitsTotal << endl);
+  B2INFO("Number PXD Hits found: " << _numberPXDHitsFound << endl);
+  B2INFO("Efficiency:            " << setprecision(5) << double(_numberPXDHitsFound) / double(_numberPXDHitsTotal) << endl);
+  /*
+    streamlog_out(MESSAGE4) << "Number SimPXD Hits total: " << _numberSimPXDHitsTotal << endl;
+    streamlog_out(MESSAGE4) << "Number SimPXD Hits found: " << _numberSimPXDHitsFound << endl;
+    streamlog_out(MESSAGE4) << "Efficiency:            " << setprecision(5) << double(_numberSimPXDHitsFound) / double(_numberSimPXDHitsTotal) << endl;
+  */
 
 #ifdef CAIRO_OUTPUT
   cairo_destroy(cairo);
@@ -446,31 +525,34 @@ void DataReduction::end()
 #endif
 }
 
-
-void DataReduction::check(LCEvent * evt)
+void DataReductionModule::terminate()
 {
 }
-
+/*
+void DataReductionModule::check(LCEvent * evt)
+{
+}
+*/
 
 //=================================================================
 //                      Private methods
 //=================================================================
-void DataReduction::printSectorInfo()
+void DataReductionModule::printSectorInfo()
 {
   SectorList::iterator sectorIter;
   int iSector = 0;
 
-  streamlog_out(DEBUG) << "=== Sector Information (index,#Hits,#Ladders) ===" << endl;
+  B2INFO("=== Sector Information (index,#Hits,#Ladders) ===" << endl);
 
   for (sectorIter = _sectorList->begin(); sectorIter != _sectorList->end(); ++sectorIter) {
     SectorBasic* currSector = *sectorIter;
-    streamlog_out(DEBUG) << iSector << ": " << currSector->getHitNumber() << " " << currSector->getLadderNumber() << endl;
+    B2INFO(iSector << ": " << currSector->getHitNumber() << " " << currSector->getLadderNumber() << endl);
     iSector++;
   }
 }
 
 #ifdef CAIRO_OUTPUT
-void DataReduction::makePDF(bool split, int group)
+void DataReductionModule::makePDF(bool split, int group)
 {
   cairo_save(cairo);
   cairo_plot(cairo, -150, 150, -150, 150);

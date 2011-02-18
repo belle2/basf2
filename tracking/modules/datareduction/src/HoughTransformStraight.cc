@@ -1,11 +1,11 @@
-#include "HoughTransformStraight.h"
+#include <tracking/modules/datareduction/HoughTransformStraight.h>
 #include <cmath>
 
 #include <list>
 
 
 using namespace std;
-
+using namespace Belle2;
 
 HoughTransformStraight::HoughTransformStraight() : HoughTransformBasic()
 {

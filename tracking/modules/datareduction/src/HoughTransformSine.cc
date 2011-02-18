@@ -1,8 +1,9 @@
-#include "HoughTransformSine.h"
+#include <tracking/modules/datareduction/HoughTransformSine.h>
 #include <cmath>
 
 
 using namespace std;
+using namespace Belle2;
 
 
 HoughTransformSine::HoughTransformSine() : HoughTransformBasic()

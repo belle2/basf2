@@ -1,5 +1,7 @@
 Import('env')
 
-env['CONTINUE'] = False
+env['LIBS'] = ['pxd', 'svd', 'framework', 'geometry', 'simulation',
+               '$ROOT_LIBS', 'Geom', 'EG', 'G4root', 'tracking', 'cairo',
+               '$GEANT4_LIBS', 'CLHEP']
 
 Return('env')

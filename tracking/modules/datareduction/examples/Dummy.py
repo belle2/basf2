@@ -19,13 +19,15 @@ mcparticle = register_module('PrintMCParticles')
 
 # Digitizer and tracking in the CDC
 svddigi = register_module('SVDDigi')
-
-test = register_module('Test')
+pxddigi = register_module('PXDDigi')
+test = register_module('DataReduction')
 output = register_module('SimpleOutput')
+test.set_log_level(0)
+test.set_debug_level(50)
 
 # Parameter
 
-evtmetagen.param('EvtNumList', [2])
+evtmetagen.param('EvtNumList', [100])
 
 paramloader.param('InputFileXML', os.path.join(basf2datadir,
                   'simulation/Belle2.xml'))
@@ -33,6 +35,8 @@ paramloader.param('InputFileXML', os.path.join(basf2datadir,
 param_svd = {'InputColName': 'SVDSimHits', 'OutputColName': 'SVDHits'}
 svddigi.param(param_svd)
 
+param_pxd = {'InputColName': 'PXDSimHits', 'OutputColName': 'PXDHits'}
+pxddigi.param(param_pxd)
 # Create paths
 main = create_path()
 
@@ -45,7 +49,8 @@ main.add_module(geobuilder)
 main.add_module(pGun)
 main.add_module(g4sim)
 main.add_module(mcparticle)
-# main.add_module(svddigi)
+main.add_module(svddigi)
+main.add_module(pxddigi)
 main.add_module(test)
 main.add_module(output)
 

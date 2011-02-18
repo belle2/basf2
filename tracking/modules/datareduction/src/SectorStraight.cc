@@ -1,12 +1,13 @@
 
-#include "SectorStraight.h"
+#include <tracking/modules/datareduction/SectorStraight.h>
 #include <cmath>
 
-#include "HoughTransformStraight.h"
+#include <tracking/modules/datareduction/HoughTransformStraight.h>
 
 #include <TVector2.h>
 
 using namespace std;
+using namespace Belle2;
 
 
 SectorStraight::SectorStraight(double RotationAngle, double DownShift, double SectorWidth, double OpeningAngle):

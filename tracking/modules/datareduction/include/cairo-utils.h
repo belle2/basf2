@@ -1,8 +1,7 @@
 #ifndef CAIRO_UTILS_H
 #define CAIRO_UTILS_H
-
-#include "cairo.h"
-#include "cairo-pdf.h"
+#include <cairo.h>
+#include <cairo-pdf.h>
 
 #include <vector>
 #include <string>
@@ -47,7 +46,7 @@ public:
   static cairo_color sample(std::vector<cairo_color> cmap, double value, double min, double max) {
     int steps = cmap.size() - 1;
     double position = value / fabs(max - min) * steps;
-    int left = floor(position);
+    int left = (int)floor(position);
     position -= left;
     if (max < min) {
       left = steps - left - 1;

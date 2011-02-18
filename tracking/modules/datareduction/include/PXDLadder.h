@@ -2,60 +2,60 @@
 #define PXDLADDER_H_
 
 #ifdef CAIRO_OUTPUT
-#include "cairo-utils.h"
+#include <tracking/modules/datareduction/cairo-utils.h>
 #endif
 
 #include <list>
 
 //ROOT
 #include "TVector3.h"
+namespace Belle2 {
 
+  struct RegionOfInterest {
 
-struct RegionOfInterest {
+    RegionOfInterest(double widthStart, double widthEnd, double lengthStart, double lengthEnd) :
+        widthStart(widthStart), widthEnd(widthEnd), lengthStart(lengthStart), lengthEnd(lengthEnd) {};
 
-  RegionOfInterest(double widthStart, double widthEnd, double lengthStart, double lengthEnd) :
-      widthStart(widthStart), widthEnd(widthEnd), lengthStart(lengthStart), lengthEnd(lengthEnd) {};
-
-  double widthStart;
-  double widthEnd;
-  double lengthStart;
-  double lengthEnd;
+    double widthStart;
+    double widthEnd;
+    double lengthStart;
+    double lengthEnd;
 #ifdef CAIRO_OUTPUT
-  cairo_color color;
+    cairo_color color;
 #endif
-};
+  };
 
 
-class PXDLadder {
-public:
+  class PXDLadder {
+  public:
 
-  PXDLadder(TVector3& position, TVector3& normal, TVector3& size);
-  virtual ~PXDLadder();
+    PXDLadder(TVector3& position, TVector3& normal, TVector3& size);
+    virtual ~PXDLadder();
 
-  TVector3 getPosition() {return _position; };
-  TVector3 getNormal() {return _normal; };
-  TVector3 getSize() {return _size; };
+    TVector3 getPosition() {return _position; };
+    TVector3 getNormal() {return _normal; };
+    TVector3 getSize() {return _size; };
 
-  PXDLadder& addRegion(double widthStart, double widthEnd, double lengthStart, double lengthEnd);
-  std::list<RegionOfInterest*>& getRegionList() {return _regions; };
-  void clearRegions();
+    PXDLadder& addRegion(double widthStart, double widthEnd, double lengthStart, double lengthEnd);
+    std::list<RegionOfInterest*>& getRegionList() {return _regions; };
+    void clearRegions();
 
-  TVector3 convertToLocal(const double* pos);
-  TVector2 convertToRelative(const double* pos);
-  bool isInLadder(const double* pos);
-
-
-protected:
-
-  TVector3 _position;
-  TVector3 _normal;
-  TVector3 _size;
-
-  std::list<RegionOfInterest*> _regions;
+    TVector3 convertToLocal(const double* pos);
+    TVector2 convertToRelative(const double* pos);
+    bool isInLadder(const double* pos);
 
 
-private:
+  protected:
 
-};
+    TVector3 _position;
+    TVector3 _normal;
+    TVector3 _size;
 
+    std::list<RegionOfInterest*> _regions;
+
+
+  private:
+
+  };
+}
 #endif /* PXDLADDER_H_ */

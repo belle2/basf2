@@ -1,20 +1,19 @@
 #ifndef DATAREDUCTION_H
 #define DATAREDUCTION_H
+#define CAIRO_OUTPUT 0
 
 //Marlin and LCIO includes
 //#include "marlin/Processor.h"
 //#include "lcio.h"
-#include <EVENT/MCParticle.h>
-
-#include "SectorList.h"
-#include "PXDLadderList.h"
+#include <tracking/modules/datareduction/SectorList.h>
+#include <tracking/modules/datareduction/PXDLadderList.h>
 
 #include <framework/core/Module.h>
 
 #ifdef CAIRO_OUTPUT
 #include <cairo.h>
 #include <cairo-pdf.h>
-#include "cairo-utils.h"
+#include <tracking/modules/datareduction/cairo-utils.h>
 #include <boost/format.hpp>
 //#include <boost/foreach.hpp>
 #endif

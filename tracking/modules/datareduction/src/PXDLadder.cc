@@ -1,7 +1,8 @@
-#include "PXDLadder.h"
+#include <tracking/modules/datareduction/PXDLadder.h>
 #include <cmath>
 
 using namespace std;
+using namespace Belle2;
 
 PXDLadder::PXDLadder(TVector3& position, TVector3& normal, TVector3& size)
 {

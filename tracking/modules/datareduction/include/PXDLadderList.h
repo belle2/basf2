@@ -3,24 +3,24 @@
 
 #include <list>
 
-#include "PXDLadder.h"
+#include <tracking/modules/datareduction/PXDLadder.h>
+
+namespace Belle2 {
+  class PXDLadderList : public std::list<PXDLadder*> {
+  public:
+
+    PXDLadderList();
+    virtual ~PXDLadderList();
+
+    void deleteAllLadders();
+    void clearAllRegions();
 
 
-class PXDLadderList : public std::list<PXDLadder*> {
-public:
-
-  PXDLadderList();
-  virtual ~PXDLadderList();
-
-  void deleteAllLadders();
-  void clearAllRegions();
+  protected:
 
 
-protected:
+  private:
 
-
-private:
-
-};
-
+  };
+}
 #endif /* PXDLADDERLIST_H_ */

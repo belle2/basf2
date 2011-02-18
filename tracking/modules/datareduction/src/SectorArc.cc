@@ -1,12 +1,13 @@
 
-#include "SectorArc.h"
+#include <tracking/modules/datareduction/SectorArc.h>
 #include <cmath>
 
-#include "HoughTransformStraight.h"
+#include <tracking/modules/datareduction/HoughTransformStraight.h>
 
 #include "TVector2.h"
 
 using namespace std;
+using namespace Belle2;
 
 SectorArc::SectorArc(double RotationAngle, double DownShift, double SectorWidth, double RadiusSmall, double RadiusBig):
     SectorBasic(RotationAngle, DownShift, SectorWidth), _RadiusSmall(min(RadiusSmall, RadiusBig)), _RadiusBig(max(RadiusSmall, RadiusBig))

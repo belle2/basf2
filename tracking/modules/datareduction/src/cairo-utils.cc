@@ -1,5 +1,5 @@
 #ifdef CAIRO_OUTPUT
-#include "cairo-utils.h"
+#include <tracking/modules/datareduction/cairo-utils.h>
 
 #include <boost/format.hpp>
 

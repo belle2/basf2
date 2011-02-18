@@ -1,11 +1,11 @@
-#include "HoughTransformBasic.h"
+#include <tracking/modules/datareduction/HoughTransformBasic.h>
+#include <tracking/modules/datareduction/TrackerHit.h>
 #include <cmath>
 
-#include "marlin/Processor.h"
 #include <iomanip>
 
 using namespace std;
-using namespace lcio;
+using namespace Belle2;
 
 
 HoughTransformBasic::HoughTransformBasic()
@@ -115,14 +115,14 @@ void HoughTransformBasic::doHoughSearch(SectorBasic& sector)
 {
   clearLists();
 
-  list<EVENT::TrackerHit*>& hits = sector.getTrackerHitList();
+  list<TrackerHit*>& hits = sector.getTrackerHitList();
 
   if (hits.size() < _minNumberTrackerHits) return;
 
   //Transform Hits to rz hits
   double currR;
   double currZ;
-  list<EVENT::TrackerHit*>::iterator trackListIter;
+  list<TrackerHit*>::iterator trackListIter;
   for (trackListIter = hits.begin(); trackListIter != hits.end(); ++trackListIter) {
     TrackerHit* currHit = *trackListIter;
 
@@ -131,6 +131,8 @@ void HoughTransformBasic::doHoughSearch(SectorBasic& sector)
     currZ = currHit->getPosition()[2];
     _rzHits.push_back(new rzHit(currR, currZ));
   }
+
+
 
   //Add initial hough box
   list<rzHit*>::iterator hitIter;
@@ -239,7 +241,7 @@ void HoughTransformBasic::doHoughSearch(SectorBasic& sector)
     delete currBox;
   }
 
-  streamlog_out(DEBUG) << "ResultSetNumber:" << _resultSet.size() << endl;
+// B2INFO("ResultSetNumber:" << _resultSet.size() << endl);
 
   //Create regions of interest
   createRegionsOfInterest(sector);

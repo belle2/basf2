@@ -3,33 +3,32 @@
 
 #include <list>
 
-#include "lcio.h"
-#include <EVENT/MCParticle.h>
-#include <EVENT/TrackerHit.h>
+#include <tracking/modules/datareduction/TrackerHit.h>
 
-#include "SectorBasic.h"
-#include "PXDLadderList.h"
+#include <tracking/modules/datareduction/SectorBasic.h>
+#include <tracking/modules/datareduction/PXDLadderList.h>
 
+namespace Belle2 {
 
-class SectorList : public std::list<SectorBasic*> {
-public:
+  class SectorList : public std::list<SectorBasic*> {
+  public:
 
-  SectorList();
-  virtual ~SectorList();
+    SectorList();
+    virtual ~SectorList();
 
-  int addHit(EVENT::TrackerHit* hit);
-  void doLadderIntersect(PXDLadderList& pxdLadderList);
+    int addHit(TrackerHit* hit);
+    void doLadderIntersect(PXDLadderList& pxdLadderList);
 
-  void clearAllHits();
-  void clearAllLadders();
-  void deleteAllSectors();
-
-
-protected:
+    void clearAllHits();
+    void clearAllLadders();
+    void deleteAllSectors();
 
 
-private:
+  protected:
 
-};
 
+  private:
+
+  };
+}
 #endif /* SECTORLIST_H_ */

@@ -3,109 +3,110 @@
 
 #include <list>
 
-#include "lcio.h"
-#include <EVENT/MCParticle.h>
-#include <EVENT/TrackerHit.h>
 
-#include "SectorBasic.h"
+#include <tracking/modules/datareduction/TrackerHit.h>
+
+#include <tracking/modules/datareduction/SectorBasic.h>
 
 #ifdef CAIRO_OUTPUT
 #include <cairo.h>
-#include "cairo-utils.h"
+#include <tracking/modules/datareduction/cairo-utils.h>
 enum box_state {INITIAL, ITERATION, FINAL};
 #endif
 
-struct rzHit {
-  rzHit(double r, double z) : r(r), z(z) {};
+namespace Belle2 {
 
-  double r;
-  double z;
-};
+  struct rzHit {
+    rzHit(double r, double z) : r(r), z(z) {};
 
-
-struct HoughTransformBox {
-  HoughTransformBox(double left, double right, double bottom, double top) :
-      left(left), right(right), top(top), bottom(bottom) {};
-
-  double left; //left border of box
-  double right;
-  double top;
-  double bottom;
-  std::list<rzHit*> containedHits;
-  void setHits(std::list<rzHit*> source) {
-    containedHits.clear();
-    containedHits.insert(
-      containedHits.end(),
-      source.begin(),
-      source.end()
-    );
-  }
-};
+    double r;
+    double z;
+  };
 
 
-struct ResultItem {
-  ResultItem(double a, double b, double error_a, double error_b) :
-      a(a), b(b), error_a(error_a), error_b(error_b) {};
+  struct HoughTransformBox {
+    HoughTransformBox(double left, double right, double bottom, double top) :
+        left(left), right(right), top(top), bottom(bottom) {};
 
-  double a; //parameter a
-  double b; //parameter b
-  double error_a; //error of parameter a
-  double error_b; //error of parameter b
-};
+    double left; //left border of box
+    double right;
+    double top;
+    double bottom;
+    std::list<rzHit*> containedHits;
+    void setHits(std::list<rzHit*> source) {
+      containedHits.clear();
+      containedHits.insert(
+        containedHits.end(),
+        source.begin(),
+        source.end()
+      );
+    }
+  };
 
 
-class HoughTransformBasic {
-public:
+  struct ResultItem {
+    ResultItem(double a, double b, double error_a, double error_b) :
+        a(a), b(b), error_a(error_a), error_b(error_b) {};
 
-  HoughTransformBasic();
-  virtual ~HoughTransformBasic();
+    double a; //parameter a
+    double b; //parameter b
+    double error_a; //error of parameter a
+    double error_b; //error of parameter b
+  };
 
-  void setMinHoughBoxSizeParamA(double minSize);
-  void setMinHoughBoxSizeParamB(double minSize);
-  void setMinNumberTrackerHits(unsigned int minNumber);
 
-  void setRegionEnlargement(double widthStart, double widthEnd, double lengthStart, double lengthEnd);
+  class HoughTransformBasic {
+  public:
 
-  void doHoughSearch(SectorBasic& sector);
+    HoughTransformBasic();
+    virtual ~HoughTransformBasic();
 
-#ifdef CAIRO_OUTPUT
-  void setCairo(cairo_t* cairo) {this->cairo = cairo;};
-  void drawRZ(cairo_t* cairo);
-#endif
+    void setMinHoughBoxSizeParamA(double minSize);
+    void setMinHoughBoxSizeParamB(double minSize);
+    void setMinNumberTrackerHits(unsigned int minNumber);
 
-protected:
+    void setRegionEnlargement(double widthStart, double widthEnd, double lengthStart, double lengthEnd);
 
-  double _minHoughBoxSizeParamA;
-  double _minHoughBoxSizeParamB;
-
-  double _regionEnlWidthStart;
-  double _regionEnlWidthEnd;
-  double _regionEnlLengthStart;
-  double _regionEnlLengthEnd;
-
-  unsigned int _minNumberTrackerHits; //minimum number of tracker hits (and fcts. in the hough space).
-  std::list<rzHit*> _rzHits;
-  std::list<HoughTransformBox*> _houghBoxes;
-  std::list<ResultItem*> _resultSet;
-
-  void createRegionsOfInterest(SectorBasic& sector);
-
-  virtual void getInitialHoughBoxParams(double& min_a, double& max_a, double& min_b, double& max_b) {};
-  virtual bool isHitInHoughBox(HoughTransformBox& houghBox, rzHit& hit) {return false; };
-  virtual double getZValue(double a, double b, double r) {return 0.0; };
+    void doHoughSearch(SectorBasic& sector);
 
 #ifdef CAIRO_OUTPUT
-  cairo_t *cairo;
-  void drawBox(HoughTransformBox &box, box_state state);
-  virtual void drawResultItem(cairo_t* cairo, ResultItem &ri) {};
-  virtual void drawHits(double min_a, double max_a, double min_b, double max_b) {};
+    void setCairo(cairo_t* cairo) {this->cairo = cairo;};
+    void drawRZ(cairo_t* cairo);
+#endif
+
+  protected:
+
+    double _minHoughBoxSizeParamA;
+    double _minHoughBoxSizeParamB;
+
+    double _regionEnlWidthStart;
+    double _regionEnlWidthEnd;
+    double _regionEnlLengthStart;
+    double _regionEnlLengthEnd;
+
+    unsigned int _minNumberTrackerHits; //minimum number of tracker hits (and fcts. in the hough space).
+    std::list<rzHit*> _rzHits;
+    std::list<HoughTransformBox*> _houghBoxes;
+    std::list<ResultItem*> _resultSet;
+
+    void createRegionsOfInterest(SectorBasic& sector);
+
+    virtual void getInitialHoughBoxParams(double& min_a, double& max_a, double& min_b, double& max_b) {};
+    virtual bool isHitInHoughBox(HoughTransformBox& houghBox, rzHit& hit) {return false; };
+    virtual double getZValue(double a, double b, double r) {return 0.0; };
+
+#ifdef CAIRO_OUTPUT
+    cairo_t *cairo;
+    void drawBox(HoughTransformBox &box, box_state state);
+    virtual void drawResultItem(cairo_t* cairo, ResultItem &ri) {};
+    virtual void drawHits(double min_a, double max_a, double min_b, double max_b) {};
 #endif
 
 
-private:
+  private:
 
-  void clearLists();
+    void clearLists();
 
-};
-
+  };
+}
 #endif /* HOUGHTRANSFORMBASIC_H_ */

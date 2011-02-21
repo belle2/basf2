@@ -5,7 +5,7 @@ SOFTWARE_VERSION=$1
 VO=${2:-"belle2"}
 sites=`lcg-infosites -v 1 --vo belle ce | awk -F\: '{ print $1}' | sort |uniq`
 
-#JP-KEK-CRC-02 - ces share soft area.
+#JP-KEK-CRC-02 - ces share soft area, tags not propogated
 #prague_cesnet_lcg2 - ces share soft area, tags not propogated
 
 
@@ -19,7 +19,7 @@ cat  << EOF > jdls/$i.jdl
  Executable = "install-$VO-software.sh";
  OutputSandbox={"std.out","std.err"};
  GridRequiredCEs = "$i";   
- JobGroup = "installation";
+ JobGroup = "installation-$SOFTWARE_VERSION";
  RetryCount = 0;
  Rank = other.GlueCEStateFreeCPUs;
  Type = "Job";

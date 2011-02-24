@@ -263,7 +263,7 @@ G4bool CDCSensitiveDetector::ProcessHits(G4Step *aStep, G4TouchableHistory *)
             saveIndex = saveSimHit(layerId, wires[i], trackID, pid, distance, tof, edep_in_cell, (s2 - sint) * cm, p_In, posW, x_In, posOut, lr);
           }
         }
-        setSeenInDetectorFlag(aStep, MCParticle::SeenInCDC);
+        setSeenInDetectorFlag(aStep, MCParticle::c_SeenInCDC);
 
         //Add relation between the created hit and the MCParticle that caused it.
         //The index of the MCParticle has to be set to the TrackID and will be

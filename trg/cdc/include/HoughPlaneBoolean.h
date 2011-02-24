@@ -57,11 +57,22 @@ class TRGCDCHoughPlaneBoolean : public TRGCDCHoughPlaneBase {
               float ry,
               const TRGCDCHoughTransformation & hough,
               int weight = 1);
+
+    /// Votes with charge decision.
     void vote(float rx,
               float ry,
               float charge,
               const TRGCDCHoughTransformation & hough,
               int weight = 1);
+
+    /// Votes with charge decision.
+    void voteUsedInTrasan(float rx,
+			  float ry,
+			  float charge,
+			  const TRGCDCHoughTransformation & hough,
+			  int weight = 1);
+
+    /// Votes using registered pattern.
     void vote(unsigned patternId, int weight);
 
     /// registers a pattern..
@@ -115,9 +126,9 @@ TRGCDCHoughPlaneBoolean::clear(void) {
 inline
 void
 TRGCDCHoughPlaneBoolean::vote(float rx,
-                                  float ry,
-                                  const TRGCDCHoughTransformation & hough,
-                                  int weight) {
+			      float ry,
+			      const TRGCDCHoughTransformation & hough,
+			      int weight) {
     vote(rx, ry, 0, hough, weight);
 }
 

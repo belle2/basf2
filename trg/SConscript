@@ -1,6 +1,6 @@
 Import('env')
 
-env['LIBS'] = ['cdc']
+env['LIBS'] = ['cdc', 'framework']
 #env.Append(CPPDEFINES = {'TRG_DISPLAY':None})
 #env.Append(CPPDEFINES = {'TRG_DEBUG':None})
 #env.Append(CPPDEFINES = {'TRGCDC_DISPLAY':None})

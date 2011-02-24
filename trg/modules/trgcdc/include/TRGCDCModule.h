@@ -17,6 +17,7 @@
 #include <string>
 #include "framework/core/Module.h"
 #include "trg/cdc/TRGCDC.h"
+#include "trg/cdc/SteppingAction.h"
 
 namespace Belle2 {
 
@@ -25,12 +26,9 @@ class TRGCDCModule : public Module {
 
   public:
 
-//     /// returns a pointe to TRGCDCModule.
-//     virtual ModulePtr newModule();
-
     /// Constructor
     TRGCDCModule();
-//    TRGCDCModule(const std::string & type);
+//  TRGCDCModule(const std::string & type);
 
     /// Destructor
     virtual ~TRGCDCModule();
@@ -56,11 +54,21 @@ class TRGCDCModule : public Module {
     std::string version(void) const;
 
   private:
+
+    /// Debug level.
     int _debugLevel;
-//  const TRGCDC * _cdc;
-//  TRGCDC * _cdc;
-    int _testParamInt;
+
+    /// Config. file name.
     std::string _configFilename;
+
+    /// Curl back stop parameter. 0:do nothing, 1:stop curling. Default is 0.
+    int _curlBackStop;
+
+    /// A pointer to a TRGCDC;
+    TRGCDC * _cdc;
+
+    /// A pointer to a TRGCDCSteppingAction which stops curl backs.
+    TRGCDCSteppingAction * _sa;
 };
 
 } // namespace Belle2

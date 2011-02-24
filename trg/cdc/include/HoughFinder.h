@@ -18,6 +18,7 @@
 
 #include "trg/cdc/HoughPlaneMulti2.h"
 #include "trg/cdc/HoughTransformationCircle.h"
+#include "trg/cdc/PeakFinder.h"
 
 #ifdef TRGCDC_SHORT_NAMES
 #define TCHFinder TRGCDCHoughFinder
@@ -26,11 +27,13 @@
 namespace Belle2 {
 
 class TRGCDC;
+class TRGCDCPeakFinder;
 
 /// A class to find tracks using Hough algorithm
 class TRGCDCHoughFinder {
 
   public:
+
     /// Contructor.
     TRGCDCHoughFinder(const std::string & name,
                       const TRGCDC &,
@@ -41,26 +44,32 @@ class TRGCDCHoughFinder {
     virtual ~TRGCDCHoughFinder();
 
   public:
+
     /// returns name.
     std::string name(void) const;
+
+    /// returns version.
+    std::string version(void) const;
 
     /// do track finding.
     int doit(void);
 
-    /// finds peaks in a Hough plane.
-    std::vector<TRGPoint2D *> peaks5(TRGCDCHoughPlane & plane,
-                                     const unsigned threshold,
-                                     bool centerIsPeak = false) const;
-
   private:
+
     /// Name
     const std::string _name;
+
     /// CDCTRG
     const TRGCDC & _cdc;
+
     /// Hough planes, for + and - charges
     TRGCDCHoughPlaneMulti2 * _plane[2];
+
     /// Circle Hough transformtion
     TRGCDCHoughTransformationCircle _circleH;
+
+    /// Peak finder.
+    TRGCDCPeakFinder _peakFinder;
 };
 
 //-----------------------------------------------------------------------------

@@ -18,7 +18,6 @@
 #include "G4RunManager.hh"
 #include "framework/core/ModuleManager.h"
 #include "trg/modules/trgcdc/TRGCDCModule.h"
-#include "trg/cdc/SteppingAction.h"
 
 using namespace std;
 
@@ -32,14 +31,16 @@ REG_MODULE(TRGCDC);
 
 string
 TRGCDCModule::version() const {
-    return "0.02";
+    return "0.03";
 }
 
 TRGCDCModule::TRGCDCModule()
     : Module::Module(),
       _debugLevel(0),
-      _testParamInt(0),
-      _configFilename("TRGCDCConfig.dat") {
+      _configFilename("TRGCDCConfig.dat"),
+      _curlBackStop(0),
+      _cdc(0),
+      _sa(0) {
 
     string desc = "TRGCDCModule(" + version() + ")";
     setDescription(desc);
@@ -51,11 +52,11 @@ TRGCDCModule::TRGCDCModule()
              string("TRGCDCConfig.dat"),
              "The filename of CDC trigger config file");
 #else
-    addParam("testParamInt", _testParamInt, "Test Parameter", 20);
     addParam("ConfigFile",
              _configFilename,
              "The filename of CDC trigger config file",
              string("TRGCDCConfig.dat"));
+    addParam("CurlBackStop", _curlBackStop, "Curl back stop parameter", 0);
 #endif
 
 #ifdef TRGCDC_DEBUG
@@ -64,6 +65,14 @@ TRGCDCModule::TRGCDCModule()
 }
 
 TRGCDCModule::~TRGCDCModule() {
+
+    if (_cdc)
+	TRGCDC::getTRGCDC("good-bye");
+
+    //...Maybe G4RunManager delete it, so don't delete _sa.
+//  if (_sa)
+// 	delete _sa;
+
 #ifdef TRGCDC_DEBUG
     cout << "TRGCDCModule ... destructed " << endl;
 #endif
@@ -73,14 +82,23 @@ void
 TRGCDCModule::initialize() {
 
     //...Stop curl buck...
-    G4RunManager * g4rm = G4RunManager::GetRunManager();
-    static TCSAction * sa = new TCSAction();
-    g4rm->SetUserAction(sa);
-
+    if (_curlBackStop) {
+	G4RunManager * g4rm = G4RunManager::GetRunManager();
+	_sa = new TCSAction();
+	g4rm->SetUserAction(_sa);
+    }
 }
 
 void
 TRGCDCModule::beginRun() {
+
+    //...CDC trigger config. name...
+    static string cfn = _configFilename;
+
+    //...CDC trigger...
+    if ((cfn != _configFilename) || (_cdc == 0))
+	_cdc = TRGCDC::getTRGCDC(_configFilename);
+
 #ifdef TRGCDC_DEBUG
     cout << "TRGCDCModule ... beginRun called " << endl;
 #endif
@@ -89,17 +107,14 @@ TRGCDCModule::beginRun() {
 void
 TRGCDCModule::event() {
 
-    //...CDC trigger...
-    TRGCDC & cdc = * TRGCDC::getTRGCDC(_configFilename);
-
 #ifdef TRGCDC_DEBUG
-//  cdc.dump("geometry superLayers layers wires detail");
-//  cdc.dump("geometry superLayers layers detail");
+//  _cdc->dump("geometry superLayers layers wires detail");
+//  _cdc->dump("geometry superLayers layers detail");
 #endif
 
     //...CDC trigger simulation...
-    cdc.update();
-    cdc.simulate();
+    _cdc->update();
+    _cdc->simulate();
 }
 
 void

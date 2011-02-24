@@ -136,11 +136,11 @@ TRGCDCHoughPlaneMulti2::clear(unsigned a) {
 inline
 void
 TRGCDCHoughPlaneMulti2::vote(float rx,
-                                 float ry,
-                                 int charge,
-                                 const TRGCDCHoughTransformation & hough,
-                                 unsigned layerId,
-                                 int weight) {
+			     float ry,
+			     int charge,
+			     const TRGCDCHoughTransformation & hough,
+			     unsigned layerId,
+			     int weight) {
     _usage[layerId] = true;
     _layers[layerId]->vote(rx, ry, charge, hough, weight);
 }
@@ -148,10 +148,10 @@ TRGCDCHoughPlaneMulti2::vote(float rx,
 inline
 void
 TRGCDCHoughPlaneMulti2::vote(float rx,
-                        float ry,
-                        const TRGCDCHoughTransformation & hough,
-                        unsigned layerId,
-                        int weight) {
+			     float ry,
+			     const TRGCDCHoughTransformation & hough,
+			     unsigned layerId,
+			     int weight) {
     _usage[layerId] = true;
     _layers[layerId]->vote(rx, ry, hough, weight);
 }

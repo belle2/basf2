@@ -53,13 +53,19 @@ class TRGCDCHoughFinder;
 class TRGCDC {
 
   public:
-    /// returns TRGCDC object.
+
+    /// returns TRGCDC object with specific configuration.
     static TRGCDC * getTRGCDC(const std::string & configFile);
+
+    /// returns TRGCDC object. TRGCDC should be created with specific configuration before calling this function.
     static TRGCDC * getTRGCDC(void);
 
   private:
-    /// Constructor and destructor
+
+    /// Constructor
     TRGCDC(const std::string & configFile);
+
+    /// Destructor
     virtual ~TRGCDC();
 
     /// initializes CDC geometry.
@@ -119,12 +125,25 @@ class TRGCDC {
     /// returns \# of wire layers in a super layer. 0 will be returned if 'superLayerId' is invalid.
     unsigned nLocalLayer(unsigned superLayerId) const;
 
+    /// return \# of wires.
     unsigned nWires(void) const;
+
+    /// returns \# of super layers.
     unsigned nSuperLayers(void) const;
+
+    /// return \# of layers.
     unsigned nLayers(void) const;
+
+    /// return \# of axial layers.
     unsigned nAxialLayers(void) const;
+
+    /// returns \# of stereo layers.
     unsigned nStereoLayers(void) const;
+
+    /// return \# of axial super layers.
     unsigned nAxialSuperLayers(void) const;
+
+    /// returns \# of stereo super layers.
     unsigned nStereoSuperLayers(void) const;
 
     /// returns cell width in unit of radian.

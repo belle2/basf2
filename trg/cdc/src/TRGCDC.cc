@@ -69,21 +69,25 @@ TRGCDC::_cdc = 0;
 
 TRGCDC *
 TRGCDC::getTRGCDC(const std::string & configFile) {
-    if (! _cdc) {
-        _cdc = new TRGCDC(configFile);
+    if (_cdc)
+	delete _cdc;
+
+    if (configFile != "good-bye") {
+	_cdc = new TRGCDC(configFile);
     }
-//     else {
-//         if (version != _cdc->versionCDC()) {
-//             delete _cdc;
-//             _cdc = new TRGCDC(version);
-//         }
-//     }
+    else {
+	cout << "TRGCDC::getTRGCDC ... good-bye" << endl;
+	_cdc = 0;
+    }
+
     return _cdc;
 }
 
 TRGCDC *
 TRGCDC::getTRGCDC(void) {
-    return getTRGCDC("Belle2");
+    if (! _cdc)
+	cout << "TRGCDC::getTRGCDC !!! TRGCDC is not created yet" << endl;
+    return _cdc;
 }
 
 TRGCDC::TRGCDC(const std::string & configFile) :
@@ -108,19 +112,11 @@ TRGCDC::TRGCDC(const std::string & configFile) :
     cout << "TRGCDCModule ... GTK initialized" << endl;
 #endif
 
-    if (! _cdc) {
-        cout << "TRGCDC ... TRGCDC initializing for "
-                  << _configFilename << std::endl;
-        initialize();
-        Belle2_GDL::GDLSystemClock.dump();
-        _clock.dump();
-        cout << "TRGCDC ... TRGCDC created for "
-                  << _configFilename << std::endl;
-    }
-    else {
-        cout << "TRGCDC ... TRGCDC is already initialized for "
-                  << _configFilename << std::endl;
-    }
+    cout << "TRGCDC ... TRGCDC initializing for " << _configFilename << endl;
+    initialize();
+    Belle2_GDL::GDLSystemClock.dump();
+    _clock.dump();
+    cout << "TRGCDC ... TRGCDC created for " << _configFilename << endl;
 }
 
 void

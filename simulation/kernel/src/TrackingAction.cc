@@ -77,12 +77,12 @@ void TrackingAction::PostUserTrackingAction(const G4Track* track)
     //Check if particle left detector.
     //fWorldBoundary seems to be broken, check if poststep is on boundary and next volume is 0
     if (postStep->GetStepStatus() == fGeomBoundary && track->GetNextVolume() == NULL) {
-      currParticle.addStatus(MCParticle::LeftDetector);
+      currParticle.addStatus(MCParticle::c_LeftDetector);
     }
 
     //Check if particle was stopped in the detector
     if (track->GetKineticEnergy() <= 0.0) {
-      currParticle.addStatus(MCParticle::StoppedInDetector);
+      currParticle.addStatus(MCParticle::c_StoppedInDetector);
     }
 
     //Set the values for the particle

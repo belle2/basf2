@@ -283,7 +283,7 @@ namespace Belle2 {
      * Set production vertex position.
      * @param vertex The position of the production vertex given as TVector3.
      */
-    void setProductionVertex(const TVector3 &vertex)    { m_productionVertex_x = vertex.X(); m_productionVertex_y = vertex.Y(), m_productionVertex_z = vertex.Z(); }
+    void setProductionVertex(const TVector3& vertex)    { m_productionVertex_x = vertex.X(); m_productionVertex_y = vertex.Y(), m_productionVertex_z = vertex.Z(); }
 
     /**
      * Set production vertex position.
@@ -298,7 +298,7 @@ namespace Belle2 {
      * Set particle momentum.
      * @param momentum The momentum of the MonteCarlo particle given as TVector3.
      */
-    void setMomentum(const TVector3 &momentum)          { m_momentum_x = momentum.X(); m_momentum_y = momentum.Y(), m_momentum_z = momentum.Z(); }
+    void setMomentum(const TVector3& momentum)          { m_momentum_x = momentum.X(); m_momentum_y = momentum.Y(), m_momentum_z = momentum.Z(); }
 
     /**
      * Set particle momentum.
@@ -314,16 +314,13 @@ namespace Belle2 {
      * Sets the 4Vector of particle.
      * @param 4Vector
      */
-    void set4Vector(const TLorentzVector P4)      { setMomentum(P4.Vect()); m_energy = P4.Energy(); }
-
-
-
+    void set4Vector(const TLorentzVector& p4)      { setMomentum(p4.Vect()); m_energy = p4.Energy(); }
 
     /**
      * Set decay vertex.
      * @param vertex The position of the decay vertex given as TVector3.
      */
-    void setDecayVertex(const TVector3 &vertex)         { m_decayVertex_x = vertex.X(); m_decayVertex_y = vertex.Y(), m_decayVertex_z = vertex.Z(); }
+    void setDecayVertex(const TVector3& vertex)         { m_decayVertex_x = vertex.X(); m_decayVertex_y = vertex.Y(), m_decayVertex_z = vertex.Z(); }
 
     /**
      * Set decay vertex.

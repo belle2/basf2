@@ -99,7 +99,7 @@ namespace Belle2 {
      * @param bitmask The bitmask which is compared to the status of the particle.
      * @return Returns true if the bitmask matches the status code of the particle.
      */
-    bool hasStatus(unsigned int bitmask)     const { return m_status & bitmask; }
+    bool hasStatus(unsigned int bitmask)     const { return (m_status & bitmask) == bitmask; }
 
     /**
      * Return the particle mass in GeV.

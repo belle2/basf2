@@ -17,6 +17,7 @@
 #include <simulation/kernel/EventAction.h>
 #include <simulation/kernel/TrackingAction.h>
 #include <simulation/kernel/SteppingAction.h>
+#include <simulation/kernel/StackingAction.h>
 
 #include <generators/dataobjects/MCParticle.h>
 #include <framework/datastore/DataStore.h>
@@ -65,6 +66,7 @@ FullSimModule::FullSimModule() : Module()
   addParam("RegisterOptics", m_optics, "If true, G4OpticalPhysics is registered in Geant4 PhysicsList.", false);
   addParam("ProductionCut", m_productionCut, "Apply continuous energy loss to primary particle which has no longer enough energy to produce secondaries which travel at least the specified productionCut distance.", 0.07);
   addParam("MaxNumberSteps", m_maxNumberSteps, "The maximum number of steps before the track transportation is stopped and the track is killed.", 100000);
+  addParam("PhotonFraction", m_photonFraction, "The fraction of Cerenkov photons which will be kept and propagated.", 1.0);
 }
 
 
@@ -130,9 +132,15 @@ void FullSimModule::initialize()
   TrackingAction* trackingAction = new TrackingAction(m_mcParticleGraph);
   runManager.SetUserAction(trackingAction);
 
+  //Add the stepping action which provides additional security checks
   SteppingAction* steppingAction = new SteppingAction();
   steppingAction->setMaxNumberSteps(m_maxNumberSteps);
   runManager.SetUserAction(steppingAction);
+
+  //Add the stacking action which provides performance speed ups for the handling of optical photons
+  StackingAction* stackingAction = new StackingAction();
+  stackingAction->setPropagatedPhotonFraction(m_photonFraction);
+  runManager.SetUserAction(stackingAction);
 
   //Initialize G4 kernel
   runManager.Initialize();

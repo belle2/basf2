@@ -61,7 +61,7 @@ void PrintMCParticlesModule::event()
 
 void PrintMCParticlesModule::printTree(const MCParticle &mc, int level)
 {
-  if (m_onlyPrimaries && !mc.hasStatus(MCParticle::PrimaryParticle)) return;
+  if (m_onlyPrimaries && !mc.hasStatus(MCParticle::c_PrimaryParticle)) return;
 
   //Only show up to max level
   if (m_maxLevel >= 0 && level > m_maxLevel) return;

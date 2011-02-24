@@ -64,7 +64,7 @@ void DrawMCParticlesModule::event()
 
 void DrawMCParticlesModule::drawTree(const MCParticle &mc)
 {
-  if (m_onlyPrimaries && !mc.hasStatus(MCParticle::PrimaryParticle)) return;
+  if (m_onlyPrimaries && !mc.hasStatus(MCParticle::c_PrimaryParticle)) return;
   if (m_seen[mc.getIndex()]) return;
 
   CreatorUtils::addArrow(mc.getVertex(), mc.getMomentum());

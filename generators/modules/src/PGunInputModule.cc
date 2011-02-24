@@ -42,19 +42,19 @@ PGunInputModule::PGunInputModule() : Module()
   setPropertyFlags(c_Input);
 
   //Parameter definition
-  addParam("ntracks", m_ntracks, "The number of tracks to be generated per event", 1);
-  addParam("p_par1", m_p_par1, "The first parameter for momentum distribution function", 0.2);
-  addParam("p_par2", m_p_par2, "The second parameter for momentum distribution function", 1.0);
-  addParam("ph_par1", m_ph_par1, "The first parameter for the phi distribution function", 0.0);
-  addParam("ph_par2", m_ph_par2, "The second parameter for the phi distribution function", 360.0);
-  addParam("th_par1", m_th_par1, "The first parameter for theta distribution function", 17.0);
-  addParam("th_par2", m_th_par2, "The second parameter for theta distribution function", 150.0);
-  addParam("x_par1", m_x_par1, "The first parameter for vertex x-coordinate distribution function", 0.0);
-  addParam("x_par2", m_x_par2, "The second parameter for x-coordinate distribution distribution function", 0.7);
-  addParam("y_par1", m_y_par1, "The first parameter for vertex y-coordinate distribution function", 0.0);
-  addParam("y_par2", m_y_par2, "The second parameter for y-coordinate distribution distribution function", 0.7);
-  addParam("z_par1", m_z_par1, "The first parameter for vertex z-coordinate distribution function", 0.0);
-  addParam("z_par2", m_z_par2,  "The second parameter for z-coordinate distribution distribution function", 1.0);
+  addParam("nTracks", m_nTracks, "The number of tracks to be generated per event", 1);
+  addParam("pPar1", m_pPar1, "The first parameter for momentum distribution function", 0.2);
+  addParam("pPar2", m_pPar2, "The second parameter for momentum distribution function", 1.0);
+  addParam("phiPar1", m_phiPar1, "The first parameter for the phi distribution function", 0.0);
+  addParam("phiPar2", m_phiPar2, "The second parameter for the phi distribution function", 360.0);
+  addParam("thetaPar1", m_thetaPar1, "The first parameter for theta distribution function", 17.0);
+  addParam("thetaPar2", m_thetaPar2, "The second parameter for theta distribution function", 150.0);
+  addParam("xVertexPar1", m_xVertexPar1, "The first parameter for vertex x-coordinate distribution function", 0.0);
+  addParam("xVertexPar2", m_xVertexPar2, "The second parameter for x-coordinate distribution distribution function", 0.7);
+  addParam("yVertexPar1", m_yVertexPar1, "The first parameter for vertex y-coordinate distribution function", 0.0);
+  addParam("yVertexPar2", m_yVertexPar2, "The second parameter for y-coordinate distribution distribution function", 0.7);
+  addParam("zVertexPar1", m_zVertexPar1, "The first parameter for vertex z-coordinate distribution function", 0.0);
+  addParam("zVertexPar2", m_zVertexPar2,  "The second parameter for z-coordinate distribution distribution function", 1.0);
   addParam("momentumGeneration", m_genMom, "Choice of distribution function for momentum generation", 0);
   addParam("vertexGeneration", m_genVert, "Choice of distribution function for vertex generation", 2);
   addParam("angleGeneration", m_genAngle, "Choice of distribution function for angle generation", 0);
@@ -65,22 +65,22 @@ PGunInputModule::PGunInputModule() : Module()
 
 void PGunInputModule::initialize()
 {
-  if (m_ntracks > 0)
-    m_pgun.m_ntracks = m_ntracks;
+  if (m_nTracks > 0)
+    m_pgun.m_nTracks = m_nTracks;
   else
     B2ERROR("Number of tracks to be generated should be larger than 0!");
-  m_pgun.m_p_par1 = m_p_par1;
-  m_pgun.m_p_par2 = m_p_par2;
-  m_pgun.m_th_par1 = m_th_par1;
-  m_pgun.m_th_par2 = m_th_par2;
-  m_pgun.m_ph_par1 = m_ph_par1;
-  m_pgun.m_ph_par2 = m_ph_par2;
-  m_pgun.m_z_par1 = m_z_par1;
-  m_pgun.m_z_par2 = m_z_par2;
-  m_pgun.m_y_par1 = m_y_par1;
-  m_pgun.m_y_par2 = m_y_par2;
-  m_pgun.m_x_par1 = m_x_par1;
-  m_pgun.m_x_par2 = m_x_par2;
+  m_pgun.m_pPar1 = m_pPar1;
+  m_pgun.m_pPar2 = m_pPar2;
+  m_pgun.m_thetaPar1 = m_thetaPar1;
+  m_pgun.m_thetaPar2 = m_thetaPar2;
+  m_pgun.m_phiPar1 = m_phiPar1;
+  m_pgun.m_phiPar2 = m_phiPar2;
+  m_pgun.m_zVertexPar1 = m_zVertexPar1;
+  m_pgun.m_zVertexPar2 = m_zVertexPar2;
+  m_pgun.m_yVertexPar1 = m_yVertexPar1;
+  m_pgun.m_yVertexPar2 = m_yVertexPar2;
+  m_pgun.m_xVertexPar1 = m_xVertexPar1;
+  m_pgun.m_xVertexPar2 = m_xVertexPar2;
   m_pgun.SetRandomSeed(m_randomseed);
   if (m_PIDcodes.size() > 0)
     m_pgun.m_PIDcodes = m_PIDcodes;

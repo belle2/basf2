@@ -26,9 +26,9 @@ namespace Belle2 {//namespace Belle2
 
     /** This enum keeps track of the distributions that are supported for the random number generation. */
     enum EPGUNgenOpt {
-      uniform,
-      gauss,
-      none
+      c_uniform,
+      c_gauss,
+      c_none
     };
 
     /**
@@ -66,7 +66,7 @@ namespace Belle2 {//namespace Belle2
        */
       void SetRandomSeed(int seed) {
 
-        m_grand.SetSeed(seed);
+        m_gRand.SetSeed(seed);
 
       }
 
@@ -77,19 +77,19 @@ namespace Belle2 {//namespace Belle2
        */
       bool generateEvent(MCParticleGraph &graph);
 
-      int m_ntracks;                  /**< The number of particles to be produced per event */
-      double m_p_par1;                /**< The first parameter for momentum generation */
-      double m_p_par2;                /**< The second parameter for momentum generation */
-      double m_ph_par1;               /**< The first parameter for phi generation */
-      double m_ph_par2;               /**< The second parameter for phi generation */
-      double m_th_par1;               /**< The first parameter for theta generation */
-      double m_th_par2;               /**< The second parameter for theta generation */
-      double m_x_par1;                /**< The first parameter for vertex x coordinate generation */
-      double m_x_par2;                /**< The second parameter for vertex x coordinate generation */
-      double m_y_par1;                /**< The first parameter for vertex y coordinate generation */
-      double m_y_par2;                /**< The second parameter for vertex y coordinate generation */
-      double m_z_par1;                /**< The first parameter for vertex z coordinate generation */
-      double m_z_par2;                /**< The second parameter for vertex z coordinate generation */
+      int m_nTracks;                  /**< The number of particles to be produced per event */
+      double m_pPar1;                /**< The first parameter for momentum generation */
+      double m_pPar2;                /**< The second parameter for momentum generation */
+      double m_phiPar1;               /**< The first parameter for phi generation */
+      double m_phiPar2;               /**< The second parameter for phi generation */
+      double m_thetaPar1;               /**< The first parameter for theta generation */
+      double m_thetaPar2;               /**< The second parameter for theta generation */
+      double m_xVertexPar1;                /**< The first parameter for vertex x coordinate generation */
+      double m_xVertexPar2;                /**< The second parameter for vertex x coordinate generation */
+      double m_yVertexPar1;                /**< The first parameter for vertex y coordinate generation */
+      double m_yVertexPar2;                /**< The second parameter for vertex y coordinate generation */
+      double m_zVertexPar1;                /**< The first parameter for vertex z coordinate generation */
+      double m_zVertexPar2;                /**< The second parameter for vertex z coordinate generation */
       EPGUNgenOpt m_genMom;            /**< Option to set the distribution function for the momentum */
       EPGUNgenOpt m_genVert;           /**< Option to set the distribution function for the vertex */
       EPGUNgenOpt m_genAngle;          /**< Option to set the distribution function for the angles */
@@ -100,7 +100,7 @@ namespace Belle2 {//namespace Belle2
 
     protected:
 
-      TRandom3 m_grand;          /**< Instance of the random generator **** This will be moved to the framework eventually. */
+      TRandom3 m_gRand;          /**< Instance of the random generator **** This will be moved to the framework eventually. */
     };
 
   }//end namespace Generators

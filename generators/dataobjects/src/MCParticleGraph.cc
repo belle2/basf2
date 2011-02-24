@@ -125,8 +125,8 @@ public:
    */
   template <class Vertex, class Graph> void find_daughters(Vertex v, Graph &g, MCParticleGraph::GraphParticle &mother) {
     //References to the daughter information of the mother for easier access
-    int &d1 = mother.m_first_daughter;
-    int &d2 = mother.m_last_daughter;
+    int &d1 = mother.m_firstDaughter;
+    int &d2 = mother.m_lastDaughter;
 
     typename graph_traits<Graph>::out_edge_iterator j, j_end;
     for (tie(j, j_end) = out_edges(v, g); j != j_end; ++j) {

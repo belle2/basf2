@@ -64,12 +64,12 @@ int HepevtReader::getEvent(MCParticleGraph &graph, double & eventWeight) throw(H
     p.set4Vector(p4);
 
     //Check for sensible daughter indices
-    int d1 = p.getFirstDaughter();
-    int d2 = p.getLastDaughter();
+    int d1 = p.getFirstDaughterIndex() + 1; //add 1 because function returns 0-based value
+    int d2 = p.getLastDaughterIndex() + 1;  // but Graph uses 1 based value.
     if (d1 < 0 || d1 > nparticles || d2 < d1 || d2 > nparticles) {
       throw(HepEvtInvalidDaughterIndicesError() << m_lineNr << d1 << d2 << nparticles);
     }
-    if (d1 == 0) p.addStatus(MCParticle::StableInGenerator);
+    if (d1 == 0) p.addStatus(MCParticle::c_StableInGenerator);
     //Add decays
     for (int index = d1; index <= d2; ++index) {
       if (index > 0) p.decaysInto(graph[first+index-1]);
@@ -183,7 +183,7 @@ void HepevtReader::readParticle(MCParticleGraph::GraphParticle &particle) throw(
 
   switch (fields.size()) {
     case 8:
-      particle.setStatus(MCParticle::PrimaryParticle);
+      particle.setStatus(MCParticle::c_PrimaryParticle);
       particle.setPDG(static_cast<int>(fields[1]));
       particle.setFirstDaughter(static_cast<int>(fields[2]));
       particle.setLastDaughter(static_cast<int>(fields[3]));
@@ -191,7 +191,7 @@ void HepevtReader::readParticle(MCParticleGraph::GraphParticle &particle) throw(
       particle.setMass(fields[7]);
       break;
     case 6:
-      particle.setStatus(MCParticle::PrimaryParticle);
+      particle.setStatus(MCParticle::c_PrimaryParticle);
       particle.setPDG(static_cast<int>(fields[5]));
       particle.setFirstDaughter(0);
       particle.setLastDaughter(0);
@@ -200,7 +200,7 @@ void HepevtReader::readParticle(MCParticleGraph::GraphParticle &particle) throw(
       particle.setEnergy(fields[3]);
       break;
     case 15:
-      particle.setStatus(MCParticle::PrimaryParticle);
+      particle.setStatus(MCParticle::c_PrimaryParticle);
       particle.setPDG(static_cast<int>(fields[1]));
       particle.setFirstDaughter(static_cast<int>(fields[4]));
       particle.setLastDaughter(static_cast<int>(fields[5]));

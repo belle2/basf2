@@ -47,12 +47,12 @@ void MCParticle::setMassFromPDG()
 const vector<MCParticle*> MCParticle::getDaughters() const
 {
   vector<MCParticle*> result;
-  if (m_first_daughter > 0) {
+  if (m_firstDaughter > 0) {
     fixParticleList();
-    if (m_last_daughter > m_plist->GetEntriesFast()) throw LastChildIndexOutOfRangError();
+    if (m_lastDaughter > m_plist->GetEntriesFast()) throw LastChildIndexOutOfRangError();
     TClonesArray &plist = *m_plist;
-    result.reserve(m_last_daughter - m_first_daughter + 1);
-    for (int i = m_first_daughter - 1; i < m_last_daughter; i++) {
+    result.reserve(m_lastDaughter - m_firstDaughter + 1);
+    for (int i = m_firstDaughter - 1; i < m_lastDaughter; i++) {
       result.push_back(static_cast<MCParticle*>(plist[i]));
     }
   }

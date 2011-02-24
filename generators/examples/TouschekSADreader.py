@@ -25,20 +25,20 @@ set_log_level(4)
 touschekinput = register_module('TouschekSADInput')
 
 # setting the options for the TouschekSAD reader:
-touschekinput.param = ('FilenameLER',
-                       '/home/iwsatlas1/molland/Work/TouschekBackground/SAD/ler-data2/tree.root'
-                       )
+touschekinput.param('FilenameLER',
+                    '/home/iwsatlas1/molland/Work/TouschekBackground/SAD/ler-data2/tree.root'
+                    )
 
 # number of particles to be read in 1 go
 # for the time being, it is recommended to
 # process the particles in the same event.
 # at some point this will be refined.
-touschekinput.param = ('MaxParticles', 10000)
+touschekinput.param('MaxParticles', 200000)
 # default is MaxParticles = 10.
 
 # This parameter indicates how far around the IR
 # the touschekparticles should maximally originate
-touschekinput.param = ('RangeLER', 2.5)
+touschekinput.param('RangeLER', 2.5)
 # default is RangeLER = 3.0
 
 # for a simple simulation job with output to a root file
@@ -60,6 +60,9 @@ simpleoutput.param('outputFileName', 'TouschekReaderOutput.root')
 
 # creating the path for the processing
 main = create_path()
+main.add_module(evtmetagen)
+main.add_module(paramloader)
+main.add_module(geobuilder)
 
 # Add Particle Gun module to path:
 main.add_module(touschekinput)
@@ -68,8 +71,6 @@ main.add_module(touschekinput)
 print_params(touschekinput)
 
 # Add all other modules for simple processing to path
-main.add_module(paramloader)
-main.add_module(geobuilder)
 main.add_module(g4sim)
 main.add_module(simpleoutput)
 

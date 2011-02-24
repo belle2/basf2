@@ -94,7 +94,7 @@ namespace Belle2 {
        * to the information given with decaysInto() and comesFrom().
        * @param daughter The index of the first daughter particle. Set to 0 for no daughters.
        */
-      void setFirstDaughter(int daughter) { m_first_daughter = daughter; }
+      void setFirstDaughter(int daughter) { m_firstDaughter = daughter; }
 
       /**
        * Set the 1-based index of the last daughter, 0 means no daughters.
@@ -102,7 +102,7 @@ namespace Belle2 {
        * @see setFirstDaughter()
        * @param daughter The index of the last daughter particle. Set to 0 for no daughters.
        */
-      void setLastDaughter(int daughter) { m_last_daughter = daughter; }
+      void setLastDaughter(int daughter) { m_lastDaughter = daughter; }
 
       /**
        * Set or remove the ignore flag.

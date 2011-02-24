@@ -31,17 +31,17 @@ namespace Belle2 {
 
     /** The status information for the MCParticle. */
     enum StatusBit {
-      PrimaryParticle   = 1,   /**< bit 0:  Particle is primary particle. */
-      StableInGenerator = 2,   /**< bit 1:  Particle is stable in the generator. */
-      LeftDetector      = 4,   /**< bit 2:  Particle left the detector. */
-      StoppedInDetector = 8,   /**< bit 3:  Particle was stopped in detector. */
-      SeenInPXD         = 16,  /**< bit 4:  Particle was seen in the PXD. */
-      SeenInSVD         = 32,  /**< bit 5:  Particle was seen in the SVD. */
-      SeenInCDC         = 64,  /**< bit 6:  Particle was seen in the drift chamber (CDC). */
-      SeenInTOP         = 128, /**< bit 7:  Particle was seen in the time of propagation counter. */
-      LastSeenInECL     = 256, /**< bit 8:  Particle was seen in the elm calorimeter. */
-      LastSeenInKLM     = 512, /**< bit 9:  Particle was seen in the klm. */
-      IsVirtual         = 1024 /**< bit 10: Particle is virtual and not going to Geant4 */
+      c_PrimaryParticle   = 1,   /**< bit 0:  Particle is primary particle. */
+      c_StableInGenerator = 2,   /**< bit 1:  Particle is stable in the generator. */
+      c_LeftDetector      = 4,   /**< bit 2:  Particle left the detector. */
+      c_StoppedInDetector = 8,   /**< bit 3:  Particle was stopped in detector. */
+      c_SeenInPXD         = 16,  /**< bit 4:  Particle was seen in the PXD. */
+      c_SeenInSVD         = 32,  /**< bit 5:  Particle was seen in the SVD. */
+      c_SeenInCDC         = 64,  /**< bit 6:  Particle was seen in the drift chamber (CDC). */
+      c_SeenInTOP         = 128, /**< bit 7:  Particle was seen in the time of propagation counter. */
+      c_LastSeenInECL     = 256, /**< bit 8:  Particle was seen in the elm calorimeter. */
+      c_LastSeenInKLM     = 512, /**< bit 9:  Particle was seen in the klm. */
+      c_IsVirtual         = 1024 /**< bit 10: Particle is virtual and not going to Geant4 */
     };
 
     /**
@@ -58,7 +58,7 @@ namespace Belle2 {
         m_decayTime(0), m_decayVertex_x(0),
         m_decayVertex_y(0), m_decayVertex_z(0),
         m_mother(0),
-        m_first_daughter(0), m_last_daughter(0) {}
+        m_firstDaughter(0), m_lastDaughter(0) {}
 
     /**
      * Construct MCParticle from a another MCParticle and the TClonesArray it is stored in.
@@ -78,7 +78,7 @@ namespace Belle2 {
         m_decayTime(p.m_decayTime), m_decayVertex_x(p.m_decayVertex_x),
         m_decayVertex_y(p.m_decayVertex_y), m_decayVertex_z(p.m_decayVertex_z),
         m_mother(p.m_mother),
-        m_first_daughter(p.m_first_daughter), m_last_daughter(p.m_last_daughter) {}
+        m_firstDaughter(p.m_firstDaughter), m_lastDaughter(p.m_lastDaughter) {}
 
     /**
      * Return PDG code of particle.
@@ -102,14 +102,14 @@ namespace Belle2 {
     bool hasStatus(unsigned int bitmask)     const { return m_status & bitmask; }
 
     /**
-     * Return the actual particle mass in [GeV].
-     * @return The actual mass of the particle in [GeV].
+     * Return the particle mass in GeV.
+     * @return The mass of the particle in GeV.
      */
     const float getMass()                    const { return m_mass; }
 
     /**
-     * Return actual particle energy in [GeV].
-     * @return Returns the actual particle energy in [GeV].
+     * Return particle energy in GeV.
+     * @return Returns the particle energy in GeV.
      */
     const float getEnergy()                  const { return m_energy; }
 
@@ -120,40 +120,40 @@ namespace Belle2 {
     const bool hasValidVertex()              const { return m_validVertex; }
 
     /**
-     * Return production time in [s].
-     * @return The timestamp of the MonteCarlo particle production in [ns].
+     * Return production time in ns.
+     * @return The timestamp of the MonteCarlo particle production in ns.
      */
     const float getProductionTime()          const { return m_productionTime; }
 
     /**
-     * Return the decay time in [s].
-     * @return The timestamp of the decay of the MonteCarlo particle in [ns].
+     * Return the decay time in ns.
+     * @return The timestamp of the decay of the MonteCarlo particle in ns.
      *         If the particle is stable the time is set to infinity.
      */
     const float getDecayTime()               const { return m_decayTime; }
 
     /**
-     * Return the lifetime in [s].
+     * Return the lifetime in ns.
      * A convenient method to get the lifetime of the MonteCarlo particle.
-     * @return The lifetime of the MonteCarlo particle in [ns].
+     * @return The lifetime of the MonteCarlo particle in ns.
      */
     const float getLifetime()                const { return m_decayTime - m_productionTime; }
 
     /**
      * Return production vertex position, shorthand for getProductionVertex().
-     * @return The production vertex of the MonteCarlo particle in [cm].
+     * @return The production vertex of the MonteCarlo particle in cm.
      */
     const TVector3 getVertex()               const { return getProductionVertex(); }
 
     /**
      * Return production vertex position.
-     * @return The production vertex of the MonteCarlo particle in [cm].
+     * @return The production vertex of the MonteCarlo particle in cm.
      */
     const TVector3 getProductionVertex()     const { return TVector3(m_productionVertex_x, m_productionVertex_y, m_productionVertex_z); }
 
     /**
      * Return momentum.
-     * @return The momentum of the MonteCarlo particle in [GeV].
+     * @return The momentum of the MonteCarlo particle in GeV.
      */
     const TVector3 getMomentum()             const { return TVector3(m_momentum_x, m_momentum_y, m_momentum_z); }
 
@@ -166,29 +166,46 @@ namespace Belle2 {
 
     /**
      * Return decay vertex.
-     * @return The decay vertex of the MonteCarlo particle in [cm].
+     * @return The decay vertex of the MonteCarlo particle in cm.
      */
     const TVector3 getDecayVertex()          const { return TVector3(m_decayVertex_x, m_decayVertex_y, m_decayVertex_z); }
 
     /**
      * Get 1-based index of the particle in the corresponding MCParticle list.
+     * This is used by the MCParticle Graph.
      * @return The index of the MonteCarlo particle in the corresponding MCParticle list (starts with 1)
      */
     const int getIndex()                     const { return m_index; }
 
     /**
-     * Get 1-based index of first daughter, 0 if no daughters.
-     * @return The index of the first daughter of the MonteCarlo particle. The index is 0 if the
-     *         MonteCarlo particle doesn't have any daughters.
+     * Get 0-based index of the particle in the corresponding MCParticle list.
+     * This is the function for users who want to use mother, daughter etc. indices.
+     * @return The index of the MonteCarlo particle in the corresponding MCParticle array
+     * Careful: to have indices corresponding to the array position, the mother, daugther etc. indices
+     * do not follow the standard from (Fortran) generators, where the first particle has index 1.
+     * In the array the first particle has index 0.
      */
-    const int getFirstDaughter()             const { return m_first_daughter; }
+    const int getArrayIndex()                     const { return m_index - 1;  }
 
     /**
-     * Get 1-based index of last daughter, 0 if no daughters.
-     * @return The index of the last daughter of the MonteCarlo particle. The index is 0 if the
+     * Get index in MCParticle array of first daughter, -1 if no daughters.
+     * @return The index of the first daughter of the MonteCarlo particle. The index is -1 if the
      *         MonteCarlo particle doesn't have any daughters.
+     * Careful: to have indices corresponding to the array position, the mother, daugther etc. indices
+     * do not follow the standard from (Fortran) generators, where the first particle has index 1.
+     * In the array the first particle has index 0.
      */
-    const int getLastDaughter()              const { return m_last_daughter; }
+    int getFirstDaughterIndex()  const;
+
+    /**
+     * Get index in MCParticle array of last daughter, -1 if no daughters.
+     * @return The index of the last daughter of the MonteCarlo particle. The index is -1 if the
+     *         MonteCarlo particle doesn't have any daughters.
+     * Careful: to have indices corresponding to the array position, the mother, daugther etc. indices
+     * do not follow the standard from (Fortran) generators, where the first particle has index 1.
+     * In the array the first particle has index 0.
+     */
+    int getLastDaughterIndex() const;
 
     /**
      * Get vector of all daughter particles, empty vector if none.
@@ -196,20 +213,24 @@ namespace Belle2 {
      * @return A list of all daughter particles. The list is empty if
      *         the MonteCarlo particle doesn't have any daughters.
      */
-    const std::vector<Belle2::MCParticle*> getDaughters() const; //Need namespace qualifier because ROOT CINT as troubles otherwise
+    const std::vector<Belle2::MCParticle*> getDaughters() const; //Need namespace qualifier because ROOT CINT has troubles otherwise
 
     /**
      * Returns a pointer to the mother particle. NULL if the particle doesn't have a mother.
      * @return A pointer to the mother particle. NULL if no mother was defined for the particle.
      */
-    MCParticle* getMother() const; //Need namespace qualifier because ROOT CINT as troubles otherwise
+    MCParticle* getMother() const; //Need namespace qualifier because ROOT CINT has troubles otherwise
 
 
     /**
-     * The index of the mother as stored in the member variable
-     * @return
+     * Get index in MCParticle array of mother, -1 if there is no mother.
+     * @return The index of the mother of the MonteCarlo particle. The index is -1 if the
+     *         MonteCarlo particle doesn't have a mother.
+     * Careful: to have indices corresponding to the array position, the mother, daugther etc. indices
+     * do not follow the standard from (Fortran) generators, where the first particle has index 1.
+     * In the array the first particle has index 0.
      */
-    int getMother(int reduceIndex) const;
+    int getMotherIndex() const;
 
 
     /**
@@ -342,7 +363,7 @@ namespace Belle2 {
     /**
      * Set particle to virtual. (A bit more convinient)
      */
-    void setVirtual()                                     {  addStatus(IsVirtual); }
+    void setVirtual()                                     {  addStatus(c_IsVirtual); }
 
 
   protected:
@@ -379,8 +400,8 @@ namespace Belle2 {
     float m_decayVertex_z;      /**< decay vertex of particle, z component */
 
     int m_mother;               /**< 1-based index of the mother particle */
-    int m_first_daughter;       /**< 1-based index of first daughter particle in collection, 0 if no daughters */
-    int m_last_daughter;        /**< 1-based index of last daughter particle in collection, 0 if no daughters */
+    int m_firstDaughter;       /**< 1-based index of first daughter particle in collection, 0 if no daughters */
+    int m_lastDaughter;        /**< 1-based index of last daughter particle in collection, 0 if no daughters */
 
     /** Class definition required for the creation of the ROOT dictionary. */
     ClassDef(MCParticle, 1);
@@ -389,14 +410,14 @@ namespace Belle2 {
 
   inline const bool MCParticle::isVirtual()
   {
-    bool virtuality = hasStatus(IsVirtual);
+    bool virtuality = hasStatus(c_IsVirtual);
     if (!virtuality) {
       double E2 = m_energy * m_energy;
       double m2 = m_mass * m_mass;
       double p2 = m_momentum_x * m_momentum_x;
       p2 += m_momentum_y * m_momentum_y;
       p2 += m_momentum_z * m_momentum_z;
-      virtuality = (E2 == p2 + m2);
+      virtuality = (E2 != p2 + m2);
     }
     return virtuality;
   }
@@ -410,11 +431,22 @@ namespace Belle2 {
   }
 
 
-  inline int MCParticle::getMother(int reduceIndex) const
+  inline int MCParticle::getFirstDaughterIndex() const
   {
     fixParticleList();
-    if (m_mother < reduceIndex) return m_mother;
-    return m_mother - reduceIndex;
+    return m_firstDaughter - 1;
+  }
+
+  inline int MCParticle::getLastDaughterIndex() const
+  {
+    fixParticleList();
+    return m_firstDaughter - 1;
+  }
+
+  inline int MCParticle::getMotherIndex() const
+  {
+    fixParticleList();
+    return m_mother - 1;
   }
 
 

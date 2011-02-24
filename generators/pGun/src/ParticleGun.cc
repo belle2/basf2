@@ -32,36 +32,36 @@ bool ParticleGun::generateEvent(MCParticleGraph &graph)
   double vz = 0;
 
   switch (m_genVert) {
-    case gauss:
-      vx = m_grand.Gaus(m_x_par1, m_x_par2);
-      vy = m_grand.Gaus(m_y_par1, m_y_par2);
-      vz = m_grand.Gaus(m_z_par1, m_z_par2);
+    case c_gauss:
+      vx = m_gRand.Gaus(m_xVertexPar1, m_xVertexPar2);
+      vy = m_gRand.Gaus(m_yVertexPar1, m_yVertexPar2);
+      vz = m_gRand.Gaus(m_zVertexPar1, m_zVertexPar2);
       break;
-    case uniform:
+    case c_uniform:
     default:
-      vx = m_grand.Uniform(m_x_par1, m_x_par2);
-      vy = m_grand.Uniform(m_y_par1, m_y_par2);
-      vz = m_grand.Uniform(m_z_par1, m_z_par2);
+      vx = m_gRand.Uniform(m_xVertexPar1, m_xVertexPar2);
+      vy = m_gRand.Uniform(m_yVertexPar1, m_yVertexPar2);
+      vz = m_gRand.Uniform(m_zVertexPar1, m_zVertexPar2);
       break;
-    case none:
-      vx = m_x_par1;
-      vy = m_y_par1;
-      vz = m_z_par1;
+    case c_none:
+      vx = m_xVertexPar1;
+      vy = m_yVertexPar1;
+      vz = m_zVertexPar1;
       break;
   }
 
 
   //Make list of particles
-  for (int i = 0; i < m_ntracks; i++) {
+  for (int i = 0; i < m_nTracks; i++) {
     graph.addParticle();
 
     MCParticleGraph::GraphParticle &p = graph[first+i];
-    p.setStatus(MCParticle::PrimaryParticle);
+    p.setStatus(MCParticle::c_PrimaryParticle);
 
     if (m_PIDcodes.size() == 1)// only one PIDcode available, always take this one
       p.setPDG(m_PIDcodes[0]);
     else {//else choose randomly one of the available codes
-      int index = static_cast<int>(m_grand.Uniform(m_PIDcodes.size()));
+      int index = static_cast<int>(m_gRand.Uniform(m_PIDcodes.size()));
       p.setPDG(m_PIDcodes[index]);
     }
     p.setMassFromPDG();
@@ -71,32 +71,32 @@ bool ParticleGun::generateEvent(MCParticleGraph &graph)
     //lets generate the momentum vector:
     double ptot = 0;
     switch (m_genMom) {
-      case gauss:
-        ptot = m_grand.Gaus(m_p_par1, m_p_par2);
+      case c_gauss:
+        ptot = m_gRand.Gaus(m_pPar1, m_pPar2);
         break;
-      case uniform:
+      case c_uniform:
       default:
-        ptot = m_grand.Uniform(m_p_par1, m_p_par2);
+        ptot = m_gRand.Uniform(m_pPar1, m_pPar2);
         break;
-      case none:
-        ptot = m_p_par1;
+      case c_none:
+        ptot = m_pPar1;
         break;
     }
     double phi = 0;
     double theta = 0;
     switch (m_genAngle) {
-      case gauss:
-        phi = m_grand.Gaus(m_ph_par1, m_ph_par2);
-        theta = m_grand.Gaus(m_th_par1, m_th_par2);
+      case c_gauss:
+        phi = m_gRand.Gaus(m_phiPar1, m_phiPar2);
+        theta = m_gRand.Gaus(m_thetaPar1, m_thetaPar2);
         break;
-      case uniform:
+      case c_uniform:
       default:
-        theta = m_grand.Uniform(m_th_par1, m_th_par2);
-        phi = m_grand.Uniform(m_ph_par1, m_ph_par2);
+        theta = m_gRand.Uniform(m_thetaPar1, m_thetaPar2);
+        phi = m_gRand.Uniform(m_phiPar1, m_phiPar2);
         break;
-      case none:
-        phi = m_ph_par1;
-        theta = m_th_par1;
+      case c_none:
+        phi = m_phiPar1;
+        theta = m_thetaPar1;
         break;
     }
 

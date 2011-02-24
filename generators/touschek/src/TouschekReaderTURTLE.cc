@@ -102,7 +102,7 @@ int TouschekReaderTURTLE::getParticles(int number, MCParticleGraph &graph) throw
 
     //Add particles to MCParticle collection
     MCParticleGraph::GraphParticle &particle = graph.addParticle();
-    particle.setStatus(MCParticle::PrimaryParticle);
+    particle.setStatus(MCParticle::c_PrimaryParticle);
     particle.setPDG(m_pdg);
     particle.setMassFromPDG();
     particle.setMomentum(TVector3(particleMomGeant4));

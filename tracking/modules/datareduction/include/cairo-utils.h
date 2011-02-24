@@ -1,5 +1,5 @@
 #ifndef CAIRO_OUTPUT
-#define CAIRO_OUTPUT  //uncomment to get DataReduction.pdf cairo output.
+//#define CAIRO_OUTPUT  //uncomment to get DataReduction.pdf cairo output.
 #endif
 
 #ifndef CAIRO_UTILS_H

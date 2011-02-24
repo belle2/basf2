@@ -11,7 +11,10 @@
 #ifndef MAGNETICFIELD_H_
 #define MAGNETICFIELD_H_
 
+#include <geometry/bfieldmap/BFieldMap.h>
+
 #include <G4MagneticField.hh>
+
 
 namespace Belle2 {
 
@@ -34,6 +37,8 @@ namespace Belle2 {
       void GetFieldValue(const G4double Point[3], G4double *Bfield) const;
 
     private:
+
+      BFieldMap& m_bField; /**< Reference to the central magnetic field map.*/
 
     };
 

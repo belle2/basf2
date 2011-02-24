@@ -1,9 +1,10 @@
 #ifndef HOUGHTRANSFORMSTRAIGHT_H
 #define HOUGHTRANSFORMSTRAIGHT_H
+#include <tracking/modules/datareduction/HoughTransformBasic.h>
 
 #include <tracking/modules/datareduction/TrackerHit.h>
 #include <cmath>
-#include <tracking/modules/datareduction/HoughTransformBasic.h>
+
 
 //Parameterization: z = m*r + t
 // parameter: a=m, b=t
@@ -51,7 +52,6 @@ namespace Belle2 {
     };
 #endif
 
-
   private:
 
     double _acceptanceAngles[2]; //minAngle, maxAngle
@@ -60,4 +60,4 @@ namespace Belle2 {
   };
 }
 
-#endif /* HOUGHTRANSFORMSTRAIGHT_H_ */
+#endif /* HOUGHTRANSFORMSTRAIGHT_H */

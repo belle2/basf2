@@ -1,18 +1,13 @@
-#ifndef HOUGHTRANSFORMBASIC_H_
-#define HOUGHTRANSFORMBASIC_H_
+#ifndef HOUGHTRANSFORMBASIC_H
+#define HOUGHTRANSFORMBASIC_H
+#include <tracking/modules/datareduction/cairo-utils.h>
+
+#include <tracking/modules/datareduction/TrackerHit.h>
+#include <tracking/modules/datareduction/SectorBasic.h>
 
 #include <list>
 
-
-#include <tracking/modules/datareduction/TrackerHit.h>
-
-#include <tracking/modules/datareduction/SectorBasic.h>
-
-#ifdef CAIRO_OUTPUT
-#include <cairo.h>
-#include <tracking/modules/datareduction/cairo-utils.h>
 enum box_state {INITIAL, ITERATION, FINAL};
-#endif
 
 namespace Belle2 {
 
@@ -102,11 +97,10 @@ namespace Belle2 {
     virtual void drawHits(double min_a, double max_a, double min_b, double max_b) {};
 #endif
 
-
   private:
 
     void clearLists();
 
   };
 }
-#endif /* HOUGHTRANSFORMBASIC_H_ */
+#endif /* HOUGHTRANSFORMBASIC_H */

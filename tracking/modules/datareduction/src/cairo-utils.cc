@@ -1,6 +1,5 @@
-#ifdef CAIRO_OUTPUT
 #include <tracking/modules/datareduction/cairo-utils.h>
-
+#ifdef CAIRO_OUTPUT
 #include <boost/format.hpp>
 
 using namespace std;

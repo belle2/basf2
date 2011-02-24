@@ -1,9 +1,8 @@
-#ifndef PXDLADDERLIST_H_
-#define PXDLADDERLIST_H_
+#ifndef PXDLADDERLIST_H
+#define PXDLADDERLIST_H
+#include <tracking/modules/datareduction/PXDLadder.h>
 
 #include <list>
-
-#include <tracking/modules/datareduction/PXDLadder.h>
 
 namespace Belle2 {
   class PXDLadderList : public std::list<PXDLadder*> {

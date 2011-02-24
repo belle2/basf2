@@ -1,6 +1,4 @@
-
 #include <tracking/modules/datareduction/SectorList.h>
-
 #include <tracking/modules/datareduction/SectorStraight.h>
 #include <tracking/modules/datareduction/SectorArc.h>
 

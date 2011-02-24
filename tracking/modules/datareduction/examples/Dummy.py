@@ -23,11 +23,11 @@ pxddigi = register_module('PXDDigi')
 test = register_module('DataReduction')
 output = register_module('SimpleOutput')
 test.set_log_level(0)
-test.set_debug_level(50)
+test.set_debug_level(100)
 
 # Parameter
 
-evtmetagen.param('EvtNumList', [100])
+evtmetagen.param('EvtNumList', [1])
 
 paramloader.param('InputFileXML', os.path.join(basf2datadir,
                   'simulation/Belle2.xml'))
@@ -37,6 +37,10 @@ svddigi.param(param_svd)
 
 param_pxd = {'InputColName': 'PXDSimHits', 'OutputColName': 'PXDHits'}
 pxddigi.param(param_pxd)
+
+param_pGun = {'ntracks': 3, 'p_par1': 0.9, 'p_par2': 1.1}
+pGun.param(param_pGun)
+
 # Create paths
 main = create_path()
 

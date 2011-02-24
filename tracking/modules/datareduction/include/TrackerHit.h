@@ -1,4 +1,3 @@
-// -*- C++ -*-
 #ifndef TRACKERHIT_H
 #define TRACKERHIT_H
 

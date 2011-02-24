@@ -1,7 +1,10 @@
-
 #include <tracking/modules/datareduction/SectorBasic.h>
-#include <cmath>
 #include <tracking/modules/datareduction/TrackerHit.h>
+
+#include <framework/logging/Logger.h>
+
+#include <cmath>
+
 
 using namespace Belle2;
 using namespace std;
@@ -133,19 +136,8 @@ void SectorBasic::setMinMaxRadius(LadderEntry& ladderEntry)
   ladderEntry.maxRadius = max(StartRad, EndRad);
 }
 
-
 #ifdef CAIRO_OUTPUT
 #include <boost/format.hpp>
-/*
-#include <boost/random.hpp>
-#include <boost/random/poisson_distribution.hpp>
-#include <boost/random/normal_distribution.hpp>
-#include <boost/random/variate_generator.hpp>
-#include <boost/random/mersenne_twister.hpp>
-#include <boost/random/uniform_int.hpp>
-#include <boost/nondet_random.hpp>
-#include "marlin/Processor.h"
-#include <iomanip>*/
 
 string SectorBasic::name()
 {

@@ -1,12 +1,11 @@
-#ifndef SECTORLIST_H_
-#define SECTORLIST_H_
+#ifndef SECTORLIST_H
+#define SECTORLIST_H
+#include <tracking/modules/datareduction/PXDLadderList.h>
 
 #include <list>
-
 #include <tracking/modules/datareduction/TrackerHit.h>
-
 #include <tracking/modules/datareduction/SectorBasic.h>
-#include <tracking/modules/datareduction/PXDLadderList.h>
+
 
 namespace Belle2 {
 
@@ -31,4 +30,4 @@ namespace Belle2 {
 
   };
 }
-#endif /* SECTORLIST_H_ */
+#endif /* SECTORLIST_H */

@@ -1,7 +1,6 @@
 #include <tracking/modules/datareduction/HoughTransformBasic.h>
-#include <tracking/modules/datareduction/TrackerHit.h>
-#include <cmath>
 
+#include <cmath>
 #include <iomanip>
 
 using namespace std;
@@ -18,7 +17,6 @@ HoughTransformBasic::HoughTransformBasic()
   _regionEnlWidthEnd = 0.0;
   _regionEnlLengthStart = 0.0;
   _regionEnlLengthEnd = 0.0;
-
 #ifdef CAIRO_OUTPUT
   cairo = 0;
 #endif
@@ -57,7 +55,6 @@ void HoughTransformBasic::setRegionEnlargement(double widthStart, double widthEn
   _regionEnlLengthEnd = lengthEnd;
 }
 
-
 #ifdef CAIRO_OUTPUT
 void HoughTransformBasic::drawBox(HoughTransformBox &box, box_state state)
 {
@@ -69,11 +66,11 @@ void HoughTransformBasic::drawBox(HoughTransformBox &box, box_state state)
   double height = fabs(box.top - box.bottom);
   switch (state) {
     case INITIAL:
-      streamlog_out(MESSAGE4) << "box(" << setprecision(5);
-      streamlog_out(MESSAGE4) << x << ",";
-      streamlog_out(MESSAGE4) << y << ",";
-      streamlog_out(MESSAGE4) << width << ",";
-      streamlog_out(MESSAGE4) << height << ")" << endl;
+      /*      streamlog_out(MESSAGE4) << "box(" << setprecision(5);
+            streamlog_out(MESSAGE4) << x << ",";
+            streamlog_out(MESSAGE4) << y << ",";
+            streamlog_out(MESSAGE4) << width << ",";
+            streamlog_out(MESSAGE4) << height << ")" << endl;*/
       cairo_rectangle(cairo, 0.004, 0.001, 0.005, 0.004);
       cairo_set_source_rgb(cairo, 1, 0, 0);
       cairo_fill(cairo);
@@ -109,7 +106,6 @@ void HoughTransformBasic::drawRZ(cairo_t* cairo)
   }
 }
 #endif
-
 
 void HoughTransformBasic::doHoughSearch(SectorBasic& sector)
 {
@@ -163,12 +159,6 @@ void HoughTransformBasic::doHoughSearch(SectorBasic& sector)
     bufferHits.clear();
     HoughTransformBox* currBox = _houghBoxes.front();
     _houghBoxes.pop_front();
-    //Check if box still exceeds the given limits
-    /*streamlog_out(DEBUG) << setprecision(3);
-    streamlog_out(DEBUG) << boost::format("box: (%.2f,%.2f,%.2f,%.2f)")
-      % currBox->top % currBox->right % currBox->bottom % currBox->left << endl;
-    streamlog_out(DEBUG) << "width:" << (currBox->right-currBox->left) << endl;
-    streamlog_out(DEBUG) << "height:" << (currBox->top-currBox->bottom) << endl;*/
 
     for (hitIter = currBox->containedHits.begin(); hitIter != currBox->containedHits.end(); ++hitIter) {
       rzHit* currHit = *hitIter;
@@ -227,11 +217,13 @@ void HoughTransformBasic::doHoughSearch(SectorBasic& sector)
 #ifdef CAIRO_OUTPUT
         drawBox(*currBox, ITERATION);
 #endif
+
       } else {
         //Add box to the result set
 #ifdef CAIRO_OUTPUT
         drawBox(*currBox, FINAL);
 #endif
+
         _resultSet.push_back(new ResultItem(0.5*(currBox->right + currBox->left),
                                             0.5*(currBox->bottom + currBox->top),
                                             0.5*fabs(currBox->right - currBox->left),
@@ -245,11 +237,9 @@ void HoughTransformBasic::doHoughSearch(SectorBasic& sector)
 
   //Create regions of interest
   createRegionsOfInterest(sector);
-
 #ifdef CAIRO_OUTPUT
   drawHits(min_a, max_a, min_b, max_b);
 #endif
-
 }
 
 
@@ -281,17 +271,14 @@ void HoughTransformBasic::createRegionsOfInterest(SectorBasic& sector)
         ladderIter->start - _regionEnlWidthStart, ladderIter->end + _regionEnlWidthEnd,
         min(minZValue, maxZValue) - _regionEnlLengthStart, max(minZValue, maxZValue) + _regionEnlLengthEnd
       );
+
 #ifdef CAIRO_OUTPUT
       currLadder->getRegionList().back()->color = cairo_color(sector.color[0], sector.color[1], sector.color[2]);
 #endif
+
     }
   }
 }
-
-
-//============================================================================
-//                           Private methods
-//============================================================================
 
 void HoughTransformBasic::clearLists()
 {

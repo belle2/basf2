@@ -1,8 +1,8 @@
-
 #include <tracking/modules/datareduction/SectorStraight.h>
-#include <cmath>
-
 #include <tracking/modules/datareduction/HoughTransformStraight.h>
+
+#include <framework/logging/Logger.h>
+#include <cmath>
 
 #include <TVector2.h>
 
@@ -92,7 +92,6 @@ int SectorStraight::checkPoint(double x, double y)
   if (yrot > ymin) return 1;
   return -1;
 }
-
 
 #ifdef CAIRO_OUTPUT
 void SectorStraight::draw(cairo_t* cairo)

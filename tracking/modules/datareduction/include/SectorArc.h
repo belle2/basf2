@@ -1,12 +1,12 @@
-#ifndef SECTORARC_H_
-#define SECTORARC_H_
-
-#include <tracking/modules/datareduction/TrackerHit.h>
-#include <cmath>
-#include "TVector2.h"
+#ifndef SECTORARC_H
+#define SECTORARC_H
+#include <tracking/modules/datareduction/PXDLadder.h>
 
 #include <tracking/modules/datareduction/SectorBasic.h>
-#include <tracking/modules/datareduction/PXDLadder.h>
+#include <tracking/modules/datareduction/TrackerHit.h>
+
+#include <cmath>
+#include "TVector2.h"
 
 namespace Belle2 {
 
@@ -34,9 +34,8 @@ namespace Belle2 {
     virtual void draw(cairo_t* cairo);
 #endif
 
-
   private:
 
   };
 }
-#endif /* SECTORARC_H_ */
+#endif /* SECTORARC_H */

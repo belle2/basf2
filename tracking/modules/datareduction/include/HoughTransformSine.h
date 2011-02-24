@@ -1,11 +1,10 @@
-#ifndef HOUGHTRANSFORMSINE_H_
-#define HOUGHTRANSFORMSINE_H_
-
-#include <tracking/modules/datareduction/TrackerHit.h>
-#include <cmath>
+#ifndef HOUGHTRANSFORMSINE_H
+#define HOUGHTRANSFORMSINE_H
 
 #include <tracking/modules/datareduction/HoughTransformBasic.h>
+#include <tracking/modules/datareduction/TrackerHit.h>
 
+#include <cmath>
 
 namespace Belle2 {
 
@@ -32,6 +31,7 @@ namespace Belle2 {
     double _radius[2]; //minRadius, maxRadius
 
 #ifdef CAIRO_OUTPUT
+
     virtual void drawResultItem(cairo_t* cairo, ResultItem &ri) {
       double min_z = std::max(-M_PI / 2 / ri.a, -300.0);
       double max_z = std::min(M_PI / 2 / ri.a, 350.0);
@@ -50,6 +50,7 @@ namespace Belle2 {
         }
       }
     };
+
 #endif
 
   };

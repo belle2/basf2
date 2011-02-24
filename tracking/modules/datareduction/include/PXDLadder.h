@@ -1,9 +1,6 @@
-#ifndef PXDLADDER_H_
-#define PXDLADDER_H_
-
-#ifdef CAIRO_OUTPUT
+#ifndef PXDLADDER_H
+#define PXDLADDER_H
 #include <tracking/modules/datareduction/cairo-utils.h>
-#endif
 
 #include <list>
 
@@ -20,9 +17,11 @@ namespace Belle2 {
     double widthEnd;
     double lengthStart;
     double lengthEnd;
+
 #ifdef CAIRO_OUTPUT
     cairo_color color;
 #endif
+
   };
 
 

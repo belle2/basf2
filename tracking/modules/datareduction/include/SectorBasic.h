@@ -1,17 +1,9 @@
-#ifndef SECTORBASIC_H_
-#define SECTORBASIC_H_
-
-#include <list>
-
-
+#ifndef SECTORBASIC_H
+#define SECTORBASIC_H
+#include <tracking/modules/datareduction/PXDLadder.h>
 #include <tracking/modules/datareduction/TrackerHit.h>
 
-#include <tracking/modules/datareduction/PXDLadder.h>
-
-
-#ifdef CAIRO_OUTPUT
-#include <cairo.h>
-#endif
+#include <list>
 
 namespace Belle2 {
 
@@ -52,6 +44,7 @@ namespace Belle2 {
     virtual void makePoint(cairo_t* cairo, double x, double y, int status = -10);
     virtual std::string name();
 #endif
+
     double color[3];
     void setColor(double red, double green, double blue) {
       color[0] = red;
@@ -83,4 +76,4 @@ namespace Belle2 {
 
   };
 }
-#endif /* SECTORBASIC_H_ */
+#endif /* SECTORBASIC_H */

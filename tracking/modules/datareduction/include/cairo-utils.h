@@ -1,7 +1,13 @@
+#ifndef CAIRO_OUTPUT
+#define CAIRO_OUTPUT  //uncomment to get DataReduction.pdf cairo output.
+#endif
+
 #ifndef CAIRO_UTILS_H
 #define CAIRO_UTILS_H
-#include <cairo.h>
-#include <cairo-pdf.h>
+#ifdef CAIRO_OUTPUT
+
+#include <cairo/cairo.h>
+#include <cairo/cairo-pdf.h>
 
 #include <vector>
 #include <string>
@@ -68,4 +74,5 @@ void cairo_set_source_rgb(cairo_t* ctx, cairo_color c);
 void cairo_set_source_rgba(cairo_t* ctx, cairo_color c, double alpha = 1);
 void cairo_stroke_abs(cairo_t* ctx, bool preserve = false);
 
+#endif
 #endif

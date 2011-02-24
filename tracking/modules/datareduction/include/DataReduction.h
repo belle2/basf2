@@ -1,41 +1,19 @@
 #ifndef DATAREDUCTION_H
 #define DATAREDUCTION_H
-//#define CAIRO_OUTPUT 1
-
-//Marlin and LCIO includes
-//#include "marlin/Processor.h"
-//#include "lcio.h"
-#include <tracking/modules/datareduction/SectorList.h>
-#include <tracking/modules/datareduction/PXDLadderList.h>
+#include <tracking/modules/datareduction/cairo-utils.h> // first to avoid ifdef problems
 
 #include <framework/core/Module.h>
 
-#ifdef CAIRO_OUTPUT
-#include <cairo.h>
-#include <cairo-pdf.h>
-#include <tracking/modules/datareduction/cairo-utils.h>
+#include <tracking/modules/datareduction/SectorList.h>
+#include <tracking/modules/datareduction/PXDLadderList.h>
+
 #include <boost/format.hpp>
-//#include <boost/foreach.hpp>
-#endif
 
 namespace Belle2 {
-  //==========================================================================================
-  //                                      Processor
-  //==========================================================================================
+
 
   class DataReductionModule : public Module {
   public:
-    /*
-        virtual marlin::Processor* newProcessor() { return new DataReduction; }
-
-          virtual void init();
-        virtual void processRunHeader(lcio::LCRunHeader* run);
-        virtual void processEvent(lcio::LCEvent* evt);
-
-        virtual void check(lcio::LCEvent* evt);
-        virtual void end();
-    */
-
 
     DataReductionModule();
     virtual ~DataReductionModule();
@@ -52,7 +30,7 @@ namespace Belle2 {
 
     std::string _colNameDigiSVDHits; //Name of the digitized SVD hit input collection
     std::string _colNameDigiPXDHits; //Name of the digitized PXD hit input collection
-    std::string _colNameSimPXDHits; //Name of the digitized PXD hit input collection
+    std::string _colNameSimPXDHits;  //Name of the simulated PXD hit input collection
 
     SectorList* _sectorList;
     PXDLadderList* _pxdLadderList;
@@ -68,7 +46,6 @@ namespace Belle2 {
 
     //debug output methods
     void printSectorInfo();
-
 #ifdef CAIRO_OUTPUT
     cairo_t *cairo;
     cairo_surface_t *cairo_surface;

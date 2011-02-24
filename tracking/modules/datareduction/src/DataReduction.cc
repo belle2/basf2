@@ -2,7 +2,7 @@
 
 #include <cmath>
 #include <iomanip>
-
+//
 //DataStore Objects
 
 #include <framework/datastore/StoreArray.h>
@@ -10,8 +10,6 @@
 #include <pxd/dataobjects/PXDHit.h>
 #include <pxd/dataobjects/PXDSimHit.h>
 #include <tracking/modules/datareduction/TrackerHit.h>
-
-
 
 //Include LCIO/Marlin header files
 /*
@@ -259,13 +257,6 @@ void DataReductionModule::initialize()
 #endif
 }
 
-/*
-void DataReductionModule::processRunHeader(LCRunHeader* run)
-{
-  _nRun++;
-}
-*/
-
 void DataReductionModule::beginRun()
 {
 }
@@ -320,9 +311,11 @@ void DataReductionModule::event()
     _sectorList->addHit(currentHit);
   }
 //3)
+
 #ifdef CAIRO_OUTPUT
   cairo_pdf_surface_set_size(cairo_surface, 2*CAIRO_SIZE, 2*CAIRO_SIZE);
 #endif
+
 
   HoughTransformSine sinehough;
   HoughTransformStraight straighthough;
@@ -371,13 +364,11 @@ void DataReductionModule::event()
   int nl = 0;
 #endif
 
-
   for (PXDLadderList::iterator it = _pxdLadderList->begin(); it != _pxdLadderList->end(); it++) {
     PXDLadder &l = **it;
     TVector3 p = l.getPosition();
     TVector3 s = 0.5 * l.getSize();
     TVector3 n = l.getNormal();
-
 #ifdef CAIRO_OUTPUT
     cairo_save(cairo);
     cairo_set_line_width(cairo, 1);
@@ -403,15 +394,11 @@ void DataReductionModule::event()
       //streamlog_out(DEBUG) << r.widthEnd << " " << r.lengthEnd << endl;
       cairo_rectangle(cairo, r.widthStart, r.lengthStart, r.widthEnd - r.widthStart, r.lengthEnd - r.lengthStart);
       cairo_set_source_rgba(cairo, 0, 0, 0.8, 0.2);
-      //cairo_fill(cairo);
-      //cairo_set_source_rgb(cairo,0,0,0.8);
-      //cairo_stroke_abs(cairo);
     }
     cairo_set_source_rgba(cairo, color, 0.2);
     cairo_fill(cairo);
     cairo_set_source_rgba(cairo, 1, 0, 0, 1);
 #endif
-
 
     //Draw PXD Hits
     int ndigiPXDHits = pxdHitArray.GetEntries();
@@ -439,7 +426,6 @@ void DataReductionModule::event()
           break;
         }
       }
-
 #ifdef CAIRO_OUTPUT
       cairo_save(cairo);
       cairo_scale(cairo, 1.0 / 250, 1.0 / 1600);
@@ -496,9 +482,8 @@ void DataReductionModule::event()
 #endif
   }
 #ifdef CAIRO_OUTPUT
-//cairo_surface_show_page(cairo_surface);
+  cairo_surface_show_page(cairo_surface);
 #endif
-  //getchar();
 
   _nEvt++;
 }
@@ -512,12 +497,9 @@ void DataReductionModule::endRun()
   B2INFO("Number PXD Hits total: " << _numberPXDHitsTotal << endl);
   B2INFO("Number PXD Hits found: " << _numberPXDHitsFound << endl);
   B2INFO("Efficiency:            " << setprecision(5) << double(_numberPXDHitsFound) / double(_numberPXDHitsTotal) << endl);
-  /*
-    streamlog_out(MESSAGE4) << "Number SimPXD Hits total: " << _numberSimPXDHitsTotal << endl;
-    streamlog_out(MESSAGE4) << "Number SimPXD Hits found: " << _numberSimPXDHitsFound << endl;
-    streamlog_out(MESSAGE4) << "Efficiency:            " << setprecision(5) << double(_numberSimPXDHitsFound) / double(_numberSimPXDHitsTotal) << endl;
-  */
-
+  B2INFO("Number SimPXD Hits total: " << _numberSimPXDHitsTotal << endl);
+  B2INFO("Number SimPXD Hits found: " << _numberSimPXDHitsFound << endl);
+  B2INFO("Efficiency:               " << setprecision(5) << double(_numberSimPXDHitsFound) / double(_numberSimPXDHitsTotal) << endl);
 #ifdef CAIRO_OUTPUT
   cairo_destroy(cairo);
   cairo_surface_finish(cairo_surface);
@@ -528,15 +510,7 @@ void DataReductionModule::endRun()
 void DataReductionModule::terminate()
 {
 }
-/*
-void DataReductionModule::check(LCEvent * evt)
-{
-}
-*/
 
-//=================================================================
-//                      Private methods
-//=================================================================
 void DataReductionModule::printSectorInfo()
 {
   SectorList::iterator sectorIter;
@@ -550,7 +524,6 @@ void DataReductionModule::printSectorInfo()
     iSector++;
   }
 }
-
 #ifdef CAIRO_OUTPUT
 void DataReductionModule::makePDF(bool split, int group)
 {
@@ -565,7 +538,9 @@ void DataReductionModule::makePDF(bool split, int group)
       cairo_save(cairo);
       cairo_plot(cairo, -150, 150, -150, 150);
     }
+
     SectorBasic* currSector = *sectorIter;
+
     currSector->draw(cairo);
     n++;
   }

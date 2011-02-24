@@ -1,9 +1,9 @@
-
 #include <tracking/modules/datareduction/SectorArc.h>
-#include <cmath>
-
 #include <tracking/modules/datareduction/HoughTransformStraight.h>
 
+#include <framework/logging/Logger.h>
+
+#include <cmath>
 #include "TVector2.h"
 
 using namespace std;
@@ -108,7 +108,6 @@ int SectorArc::checkPoint(double x, double y)
 }
 
 #ifdef CAIRO_OUTPUT
-
 void SectorArc::draw(cairo_t* cairo)
 {
   double ymin = _CenterSmall.Y();
@@ -138,5 +137,4 @@ void SectorArc::draw(cairo_t* cairo)
   SectorBasic::draw(cairo);
 }
 #endif
-
 

@@ -3,6 +3,7 @@
 
 
 using namespace Belle2;
+using namespace std;
 
 
 TrackerHit::TrackerHit() :
@@ -68,7 +69,7 @@ void TrackerHit::setType(int type)
 
 void TrackerHit::setPosition(double pos[3])
 {
-  B2DEBUG(99, "Pos: " << pos[0] << "  " << pos[1] << "  " << pos[2]);
+  //B2DEBUG(99, "Pos: " << pos[0] << "  " << pos[1] << "  " << pos[2]);
   _pos[0] = pos[0] ;
   _pos[1] = pos[1] ;
   _pos[2] = pos[2] ;

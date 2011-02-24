@@ -1,14 +1,12 @@
-#ifndef SECTORSTRAIGHT_H_
-#define SECTORSTRAIGHT_H_
+#ifndef SECTORSTRAIGHT_H
+#define SECTORSTRAIGHT_H
 
+#include <tracking/modules/datareduction/PXDLadder.h>
 #include <tracking/modules/datareduction/TrackerHit.h>
+#include <tracking/modules/datareduction/SectorBasic.h>
+
 #include <cmath>
 
-#include <tracking/modules/datareduction/SectorBasic.h>
-#include <tracking/modules/datareduction/PXDLadder.h>
-#ifdef CAIRO_OUTPUT
-#include <cairo.h>
-#endif
 
 
 namespace Belle2 {
@@ -36,4 +34,4 @@ namespace Belle2 {
 
   };
 }
-#endif /* SECTORSTRAIGHT_H_ */
+#endif /* SECTORSTRAIGHT_H */

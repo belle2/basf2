@@ -121,7 +121,7 @@ G4bool SVDSensitiveDetector::ProcessHits(G4Step* step, G4TouchableHistory*)
                                             globalTime / ns);
 
   //Set the SeenInDetector flag
-  setSeenInDetectorFlag(step, MCParticle::SeenInSVD);
+  setSeenInDetectorFlag(step, MCParticle::c_SeenInSVD);
 
   //Add relation between the created hit and the MCParticle that caused it.
   //The index of the MCParticle has to be set to the TrackID and will be

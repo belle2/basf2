@@ -25,7 +25,7 @@
 
 from basf2 import *
 
-set_log_level(3)
+set_log_level(4)
 
 # Register modules
 evtmetagen = register_module('EvtMetaGen')
@@ -52,7 +52,7 @@ import random
 intseed = random.randint(1, 10000000)
 
 ## Particle Gun Parameters
-pguninput.param('ntracks', 10)
+pguninput.param('nTracks', 10)
 pguninput.param('PIDcodes', [
     11,
     -11,
@@ -61,11 +61,14 @@ pguninput.param('PIDcodes', [
     2212,
     -2212,
     ])
-pguninput.param('p_par1', 0.200)
-pguninput.param('p_par2', 1)
+pguninput.param('pPar1', 0.200)
+pguninput.param('pPar2', 1)
 pguninput.param('Rseed', intseed)
 # for random generation of angles and vertex coordinates the standard
 # settings for the particle gun are used.
+
+# change verbosity for the particle gun only
+pguninput.set_log_level(2)
 
 # Set parameters for paramloader:
 paramloader.param('InputFileXML', os.path.join(basf2datadir,

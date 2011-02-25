@@ -34,7 +34,7 @@ pguninput.param('Rseed', 1028307)
 # setting the number of tracks to be generated per event:
 # this number can be any int>0
 # default is 1
-pguninput.param('ntracks', 10)
+pguninput.param('nTracks', 10)
 
 # setting the list of particle codes (PDG codes) for the generated particles
 # the codes are given in an array,
@@ -52,24 +52,24 @@ pguninput.param('PIDcodes', [11, -11])
 # uniform momentum distribution (this is set by default)
 pguninput.param('momentumGeneration', 0)
 # in this case the two parameters for the momentum are
-# used as lower (p_par1) and upper (p_par2) limits
-pguninput.param('p_par1', 0.05)
-pguninput.param('p_par2', 3)
-# defaults are p_par1 = 0.2 and p_par2 = 1 GeV
+# used as lower (pPar1) and upper (pPar2) limits
+pguninput.param('pPar1', 0.05)
+pguninput.param('pPar2', 3)
+# defaults are pPar1 = 0.2 and pPar2 = 1 GeV
 
 # gaussion momentum distribution
 # pguninput.param('momentumGeneration',1)
 # in this case the two parameters for the momentum are
-# used as mean (p_par1) and sigma (p_par2) of the gauss
-# pguninput.param('p_par1',0.2)
-# pguninput.param('p_par2',0.02)
+# used as mean (pPar1) and sigma (pPar2) of the gauss
+# pguninput.param('pPar1',0.2)
+# pguninput.param('pPar2',0.02)
 
 # fixed momentum distribution
 # pguninput.param('momentumGeneration',2)
 # in this case the first parameter for the momentum is
-# used to fix the momentum (p_par1). p_par2 is not used
-# pguninput.param('p_par1',1)
-# pguninput.param('p_par2',1010101)
+# used to fix the momentum (pPar1). pPar2 is not used
+# pguninput.param('pPar1',1)
+# pguninput.param('pPar2',1010101)
 
 # setting the parameters for the random generation
 # of the particle direction:
@@ -79,36 +79,36 @@ pguninput.param('p_par2', 3)
 # uniform distribution of angles
 pguninput.param('angleGeneration', 0)  # (this is default)
 # in this case the two parameters for each angle are
-# used as lower (ph_par1,th_par1) and upper (ph_par2,th_par2) limits
-pguninput.param('th_par1', 37)
-pguninput.param('th_par2', 120)
-pguninput.param('ph_par1', 90)
-pguninput.param('ph_par2', 95)
+# used as lower (phiPar1,thetaPar1) and upper (phiPar2,thetaPar2) limits
+pguninput.param('thetaPar1', 37)
+pguninput.param('thetaPar2', 120)
+pguninput.param('phiPar1', 90)
+pguninput.param('phiPar2', 95)
 # default values are:
-# ph_par1 = 0   ph_par2 = 360
-# th_par1 = 17  th_par2 = 150
+# phiPar1 = 0   phiPar2 = 360
+# thetaPar1 = 17  thetaPar2 = 150
 
 # gaussian angle distribution
 # pguninput.param('angleGeneration',1)
 # in this case the two parameters for each angle are
-# used as mean (ph_par1,th_par1) and sigma (ph_par2,th_par2).
-pguninput.param('th_par1', 39)
-pguninput.param('th_par2', 2)
-pguninput.param('ph_par1', 331)
-pguninput.param('ph_par2', 10)
+# used as mean (phiPar1,thetaPar1) and sigma (phiPar2,thetaPar2).
+# pguninput.param('thetaPar1', 39)
+# pguninput.param('thetaPar2', 2)
+# pguninput.param('phiPar1', 331)
+# pguninput.param('phiPar2', 10)
 # default values are:
-# ph_par1 = 0   ph_par2 = 360
-# th_par1 = 17  th_par2 = 150
+# phiPar1 = 0   phiPar2 = 360
+# thetaPar1 = 17  thetaPar2 = 150
 
 # fixed angles
 # pguninput.param('angleGeneration',2)
 # in this case only the first parameter for each angle is
-# used (ph_par1,th_par1) and the second is ignored.
-pguninput.param('th_par1', 35)
-pguninput.param('ph_par1', 263)
+# used (phiPar1,thetaPar1) and the second is ignored.
+# pguninput.param('thetaPar1', 35)
+# pguninput.param('phiPar1', 263)
 # default values are:
-# ph_par1 = 0
-# th_par1 = 17
+# phiPar1 = 0
+# thetaPar1 = 17
 
 # setting the parameters for the random generation
 # of event vertex:
@@ -118,42 +118,42 @@ pguninput.param('ph_par1', 263)
 # uniform position distribution
 pguninput.param('vertexGeneration', 0)
 # in this case the two parameters for each coordinate are
-# used as lower (x_par1) and upper (x_par2) limits
-pguninput.param('x_par1', -0.5)
-pguninput.param('x_par2', 0.5)
-pguninput.param('y_par1', -0.5)
-pguninput.param('y_par2', 0.5)
-pguninput.param('z_par1', -2.5)
-pguninput.param('z_par2', 2.5)
+# used as lower (xVertexPar1) and upper (xVertexPar2) limits
+pguninput.param('xVertexPar1', -0.5)
+pguninput.param('xVertexPar2', 0.5)
+pguninput.param('yVertexPar1', -0.5)
+pguninput.param('yVertexPar2', 0.5)
+pguninput.param('zVertexPar1', -2.5)
+pguninput.param('zVertexPar2', 2.5)
 # default values are:
-# x_par1 = y_par1 = z_par1= 0.0
-# x_par2 = y_par2 = 0.7
-# z_par2 = 1
+# xVertexPar1 = yVertexPar1 = zVertexPar1= 0.0
+# xVertexPar2 = yVertexPar2 = 0.7
+# zVertexPar2 = 1
 
 # gaussian position distribution
 # pguninput.param('vertexGeneration',1)
 # in this case the two parameters for each coordinate are
-# used as mean (x_par1) and sigma (x_par2) of the gaussian
-# pguninput.param('x_par1',0.0)
-# pguninput.param('x_par2',0.2)
-# pguninput.param('y_par1',0.0)
-# pguninput.param('y_par2',0.2)
-# pguninput.param('z_par1',0)
-# pguninput.param('z_par2',2)
+# used as mean (xVertexPar1) and sigma (xVertexPar2) of the gaussian
+# pguninput.param('xVertexPar1',0.0)
+# pguninput.param('xVertexPar2',0.2)
+# pguninput.param('yVertexPar1',0.0)
+# pguninput.param('yVertexPar2',0.2)
+# pguninput.param('zVertexPar1',0)
+# pguninput.param('zVertexPar2',2)
 # default values are:
-# x_par1 = y_par1 = z_par1= 0.0
-# x_par2 = y_par2 = 0.7
-# z_par2 = 1
+# xVertexPar1 = yVertexPar1 = zVertexPar1= 0.0
+# xVertexPar2 = yVertexPar2 = 0.7
+# zVertexPar2 = 1
 
 # fixed  position
 # pguninput.param('vertexGeneration',2) (this is the default)
 # in this case only the first parameter for each coordinate are
 # used. The second parameters are ignored and don't need to be set.
-# pguninput.param('x_par1',0.0)
-# pguninput.param('y_par1',0.0)
-# pguninput.param('z_par1',0)
+# pguninput.param('xVertexPar1',0.0)
+# pguninput.param('yVertexPar1',0.0)
+# pguninput.param('zVertexPar1',0)
 # default values are:
-# x_par1 = y_par1 = z_par1= 0.0
+# xVertexPar1 = yVertexPar1 = zVertexPar1= 0.0
 
 # for a simple simulation job with output to a root file
 # these additional modules are needed

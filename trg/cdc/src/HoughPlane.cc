@@ -11,18 +11,22 @@
 // $Log$
 //-----------------------------------------------------------------------------
 
+#define TRGCDC_SHORT_NAMES
+
+#include <cstdlib>
 #include "trg/cdc/HoughPlane.h"
 
 namespace Belle2 {
 
 TRGCDCHoughPlane::TRGCDCHoughPlane(const std::string & name,
-                         unsigned nX,
-                         float xMin,
-                         float xMax,
-                         unsigned nY,
-                         float yMin,
-                         float yMax)
-    : TRGCDCHoughPlaneBase(name, nX, xMin, xMax, nY, yMin, yMax),
+                                   const TCHTransformation & trans,
+                                   unsigned nX,
+                                   float xMin,
+                                   float xMax,
+                                   unsigned nY,
+                                   float yMin,
+                                   float yMax)
+    : TRGCDCHoughPlaneBase(name, trans, nX, xMin, xMax, nY, yMin, yMax),
 //    _cell(new unsigned[nX * nY * sizeof(unsigned)]),
       _cell(new int[nX * nY]),
       _patterns(0),

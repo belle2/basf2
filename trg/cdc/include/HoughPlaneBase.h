@@ -30,45 +30,87 @@ namespace Belle2 {
 class TRGCDCHoughPlaneBase {
 
   public:
+
     /// Contructor.
     TRGCDCHoughPlaneBase(const std::string & name,
-                             unsigned nX,
-                             float xMin,
-                             float xMax,
-                             unsigned nY,
-                             float yMin,
-                             float yMax);
+                         const TRGCDCHoughTransformation & transformation,
+                         unsigned nX,
+                         float xMin,
+                         float xMax,
+                         unsigned nY,
+                         float yMin,
+                         float yMax);
 
     /// Destructor
     virtual ~TRGCDCHoughPlaneBase();
 
   public:// Selectors
+
     /// returns name.
     std::string name(void) const;
 
+    /// returns Hough transformation object.
+    const TRGCDCHoughTransformation & transformation(void) const;
+
+    /// returns charge for this plane.
+    float charge(void) const;
+
+    /// returns \# of x bins.
     unsigned nX(void) const;
+
+    /// returns min. of x.
     float xMin(void) const;
-    float xMin(float newXMin);
+
+    /// returns max. of x.
     float xMax(void) const;
-    float xMax(float newXMax);
+
+    /// returns size of x bin.
     float xSize(void) const;
+
+    /// return \# of y bins.
     unsigned nY(void) const;
+
+    /// returns min. of y.
     float yMin(void) const;
-    float yMin(float newYMin);
+
+    /// returns max. of y.
     float yMax(void) const;
-    float yMax(float newYMax);
+
+    /// returns size of y bin.
     float ySize(void) const;
+
+    /// returns count of a cell.
     virtual unsigned entry(unsigned id) const = 0;
+
+    /// returns count of a cell.
     virtual unsigned entry(unsigned x, unsigned y) const = 0;
+
+    /// returns max. count in a plane.
     virtual int maxEntry(void) const = 0;
+
+    /// returns max. count in region.
     int maxEntryInRegion(unsigned id) const;
+
+    /// returns serial ID for position (x, y).
     unsigned serialID(unsigned x, unsigned y) const;
+
+    /// returns serial ID for position p.
     unsigned serialID(const TRGPoint2D & p) const;
+
+    /// returns x and y for serialID.
     void id(unsigned serialId, unsigned & x, unsigned & y) const;
+
+    /// returns position for (x, y).
     TRGPoint2D position(unsigned x, unsigned y) const;
+
+    /// returns neighbor cell.
     unsigned neighbor(unsigned serialID, unsigned direction) const;
+
+    /// returns neighbors.
     std::vector<unsigned> neighbors(unsigned serialID,
-                              unsigned windowSize = 1) const;
+                                    unsigned windowSize = 1) const;
+
+    /// returns regions.
     const std::vector<std::vector<unsigned> *> & regions(void) const;
 
     /// returns cell positions in the region.
@@ -77,20 +119,36 @@ class TRGCDCHoughPlaneBase {
                          unsigned & iX0, unsigned & iY0,
                          unsigned & iX1, unsigned & iY1) const;
 
+    /// dumps debug information.
     virtual void dump(const std::string & message = std::string(""),
                       const std::string & prefix = std::string("")) const;
 
   public:// Modifiers
-//    virtual void vote(float x, float y) = 0;
-//    virtual void vote(float x0, float y0, float x1, float y1) = 0;
+
+    /// sets and returns charge for this plane.
+    float charge(float charge);
+
+    /// sets and returns min. of x.
+    float xMin(float newXMin);
+
+    /// sets and returns max. of x.
+    float xMax(float newXMax);
+
+    /// sets and returns min. of y.
+    float yMin(float newYMin);
+
+    /// sets and returns max. of y.
+    float yMax(float newYMax);
+
+    /// Voring.
     virtual void vote(float rx,
                       float ry,
-                      const TRGCDCHoughTransformation & hough,
                       int weight = 1);
+
+    /// Voring.
     virtual void vote(float rx,
                       float ry,
                       int charge,
-                      const TRGCDCHoughTransformation & hough,
                       int weight = 1);
 
     /// Votes using a pattern.
@@ -107,30 +165,73 @@ class TRGCDCHoughPlaneBase {
 
     /// Sets region.
     void setRegion(std::vector<unsigned> *);
+
+    /// Clears regions.
     void clearRegions(void);
 
     /// Clears all entries.
     virtual void clear(void) = 0;
 
   protected:
+
     /// Add to a cell.
     virtual void add(unsigned cellId, int weight) = 0;
 
   private:
-    const std::string _name;
-    const unsigned _nX;
-    float _xMin;
-    float _xMax;
-    float _xSize;
-    const unsigned _nY;
-    float _yMin;
-    float _yMax;
-    float _ySize;
-    const TRGArea2D _area;
-    std::vector<std::vector<unsigned> *> _regions;
 
-//  friend class THoughPlaneMulti;
+    /// Name.
+    const std::string _name;
+
+    /// Hough transformation.
+    const TRGCDCHoughTransformation & _trans;
+
+    /// Track charge for this plane.
+    float _charge;
+
+    /// \# of x bins.
+    const unsigned _nX;
+
+    /// x min.
+    float _xMin;
+
+    /// x max.
+    float _xMax;
+
+    /// Size of x bin.
+    float _xSize;
+
+    /// \# of y bins.
+    const unsigned _nY;
+
+    /// y min.
+    float _yMin;
+
+    /// y max.
+    float _yMax;
+
+    /// Size of y bin.
+    float _ySize;
+
+    /// Area.
+    const TRGArea2D _area;
+
+    /// Regions.
+    std::vector<std::vector<unsigned> *> _regions;
 };
+
+//-----------------------------------------------------------------------------
+
+inline
+float
+TRGCDCHoughPlaneBase::charge(void) const {
+    return _charge;
+}
+
+inline
+float
+TRGCDCHoughPlaneBase::charge(float a) {
+    return _charge = a;
+}
 
 inline
 std::string
@@ -382,16 +483,21 @@ TRGCDCHoughPlaneBase::clear(void) {
 inline
 void
 TRGCDCHoughPlaneBase::vote(float rx,
-                      float ry,
-                      const TRGCDCHoughTransformation & hough,
-                      int weight) {
-    vote(rx, ry, 0, hough, weight);
+                           float ry,
+                           int weight) {
+    vote(rx, ry, 0, weight);
 }
 
 inline
 void
 TRGCDCHoughPlaneBase::vote(float xOffset, int weight) {
 // do nothing
+}
+
+inline
+const  TRGCDCHoughTransformation &
+TRGCDCHoughPlaneBase::transformation(void) const {
+    return _trans;
 }
 
 } // namespace Belle

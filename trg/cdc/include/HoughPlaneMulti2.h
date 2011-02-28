@@ -31,13 +31,14 @@ class TRGCDCHoughPlaneMulti2 : public TRGCDCHoughPlane {
   public:
     /// Contructor.
     TRGCDCHoughPlaneMulti2(const std::string & name,
-                               unsigned nX,
-                               float xMin,
-                               float xMax,
-                               unsigned nY,
-                               float yMin,
-                               float yMax,
-                               unsigned nLayers);
+                           const TRGCDCHoughTransformation & transformation,
+                           unsigned nX,
+                           float xMin,
+                           float xMax,
+                           unsigned nY,
+                           float yMin,
+                           float yMax,
+                           unsigned nLayers);
 
     /// Destructor
     virtual ~TRGCDCHoughPlaneMulti2();
@@ -59,13 +60,11 @@ class TRGCDCHoughPlaneMulti2 : public TRGCDCHoughPlane {
     void vote(float rx,
               float ry,
               int charge,
-              const TRGCDCHoughTransformation & hough,
               unsigned layerId,
               int weight = 1);
     void vote(unsigned layerId, unsigned localId, int weight = 1);
     void vote(float rx,
               float ry,
-              const TRGCDCHoughTransformation & hough,
               unsigned layerId,
               int weight = 1);
     void merge(void);
@@ -136,24 +135,22 @@ TRGCDCHoughPlaneMulti2::clear(unsigned a) {
 inline
 void
 TRGCDCHoughPlaneMulti2::vote(float rx,
-			     float ry,
-			     int charge,
-			     const TRGCDCHoughTransformation & hough,
-			     unsigned layerId,
-			     int weight) {
+                             float ry,
+                             int charge,
+                             unsigned layerId,
+                             int weight) {
     _usage[layerId] = true;
-    _layers[layerId]->vote(rx, ry, charge, hough, weight);
+    _layers[layerId]->vote(rx, ry, charge, weight);
 }
 
 inline
 void
 TRGCDCHoughPlaneMulti2::vote(float rx,
-			     float ry,
-			     const TRGCDCHoughTransformation & hough,
-			     unsigned layerId,
-			     int weight) {
+                             float ry,
+                             unsigned layerId,
+                             int weight) {
     _usage[layerId] = true;
-    _layers[layerId]->vote(rx, ry, hough, weight);
+    _layers[layerId]->vote(rx, ry, weight);
 }
 
 inline

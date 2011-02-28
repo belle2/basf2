@@ -20,12 +20,13 @@
 #include "trg/cdc/Wire.h"
 #include "trg/cdc/HoughFinder.h"
 #include "trg/cdc/TrackSegment.h"
+#include "trg/cdc/Circle.h"
+#include "trg/cdc/Track.h"
 
 #ifdef TRGCDC_DISPLAY
 #include "trg/cdc/DisplayRphi.h"
 #include "trg/cdc/DisplayHough.h"
 namespace Belle2_TRGCDC {
-    extern Belle2::TRGCDCDisplayRphi * D;
     Belle2::TRGCDCDisplayHough * H0 = 0;
     Belle2::TRGCDCDisplayHough * H1 = 0;
 }
@@ -49,11 +50,13 @@ TRGCDCHoughFinder::TRGCDCHoughFinder(const string & name,
                                      unsigned nY)
     : _name(name),
       _cdc(TRGCDC),
+      _perfect(false),
       _circleH("CircleHough"),
       _peakFinder("PeakFinder") {
 
     //...Make Hough planes...
     _plane[0] = new TCHPlaneMulti2("circle hough plus",
+                                   _circleH,
                                    nX,
                                    0,
                                    2 * M_PI,
@@ -62,6 +65,7 @@ TRGCDCHoughFinder::TRGCDCHoughFinder(const string & name,
                                    3,
                                    5);
     _plane[1] = new TCHPlaneMulti2("circle hough minus",
+                                   _circleH,
                                    nX,
                                    0,
                                    2 * M_PI,
@@ -69,6 +73,10 @@ TRGCDCHoughFinder::TRGCDCHoughFinder(const string & name,
                                    0.7,
                                    3,
                                    5);
+
+    //...Set charge...
+    _plane[0]->charge(1);
+    _plane[1]->charge(-1);
 
 #ifdef TRGCDC_DISPLAY
     if (! H0)
@@ -98,11 +106,11 @@ TRGCDCHoughFinder::TRGCDCHoughFinder(const string & name,
             const float y = w.xyPosition().y();
                 
             _plane[0]->clear();
-            _plane[0]->vote(x, y, +1, _circleH, axialSuperLayerId, 1);
+            _plane[0]->vote(x, y, +1, axialSuperLayerId, 1);
             _plane[0]->registerPattern(axialSuperLayerId, j);
                 
             _plane[1]->clear();
-            _plane[1]->vote(x, y, -1, _circleH, axialSuperLayerId, 1);
+            _plane[1]->vote(x, y, -1, axialSuperLayerId, 1);
             _plane[1]->registerPattern(axialSuperLayerId, j);
 
 #ifdef TRGCDC_DISPLAY
@@ -140,7 +148,10 @@ TRGCDCHoughFinder::~TRGCDCHoughFinder() {
 }
 
 int
-TRGCDCHoughFinder::doit(void) {
+TRGCDCHoughFinder::doit(vector<TCTrack *> & trackList) {
+
+    if (_perfect)
+        return doitPerfectly(trackList);
 
     //...Initialization...
     _plane[0]->clear();
@@ -168,37 +179,6 @@ TRGCDCHoughFinder::doit(void) {
     _plane[0]->merge();
     _plane[1]->merge();
 
-    //...Look for peaks which have 5 hits...
-    vector<TRGPoint2D *> peaks0 = _peakFinder.doit(* _plane[0], 5, false);
-    vector<TRGPoint2D *> peaks1 = _peakFinder.doit(* _plane[1], 5, false);
-    vector<TRGPoint2D *> * peaks[2] = {& peaks0, & peaks1};
-
-    //...Loop over charge + and -...
-    for (unsigned c = 0; c < 2; c++) {
-
-         //...Loop over all peaks...
-         for (unsigned i = 0; i < peaks[c]->size(); i++) {
-
-             //...Circle center...
-             const TRGPoint2D center =
-                 _circleH.circleCenter(* (* peaks[c])[i]);
-             const double ConstantAlpha = 222.376063; // for 1.5T
-             const double pt = center.mag() / ConstantAlpha;
-
-             //...Results...
-#ifdef TRGCDC_DEBUG
-             string charge = "+ charge";
-             if (c == 1)
-                 charge = "- charge";
-             cout << name() << " ... Peak finding 5" << endl;
-             cout << name() << "     " << charge
-                  << ", track# " << i << endl;
-             cout << name() << "     center = " << center
-                  << ", pt=" << pt << endl;
-#endif
-          }
-    }
-
 #ifdef TRGCDC_DISPLAY
     string stg = "2D : Peak Finding";
     string inf = "   ";
@@ -213,6 +193,75 @@ TRGCDCHoughFinder::doit(void) {
     H1->area().append(_plane[1]);
     H1->show();
 #endif
+
+    //...Look for peaks which have 5 hits...
+    vector<TCCircle *> circles;
+    _peakFinder.doit(circles, * _plane[0], 5, false);
+    _peakFinder.doit(circles, * _plane[1], 5, false);
+
+#ifdef TRGCDC_DISPLAY
+    vector<const TCCircle *> cc;
+    cc.assign(circles.begin(), circles.end());
+    stg = "2D : Peak Finding";
+    inf = "   ";
+    D->clear();
+    D->stage(stg);
+    D->information(inf);
+    D->area().append(cc, Gdk::Color("#FF0066009900"));
+    D->area().append(_cdc.hits());
+    D->area().append(_cdc.tsHits());
+    D->show();
+    D->run();
+#endif
+
+    //...2D fitting...
+
+    //...Select stereo TSs...
+
+    return 0;
+}
+
+int
+TRGCDCHoughFinder::doitPerfectly(vector<TRGCDCTrack *> & trackList) {
+
+    cout << "Perfect finder called" << endl;
+
+    //...Make a track...
+    TCTrack * track = new TCTrack();
+    trackList.push_back(track);
+
+    //...TS hit loop...
+    //   Presently assuming single track event.
+    //   Select the best TS(the fastest hit) in eash super layer.
+    //
+    for (unsigned i = 0; i < _cdc.nTrackSegmentLayers(); i++) {
+        const Belle2::TRGCDCLayer * l = _cdc.trackSegmentLayer(i);
+        const unsigned nWires = l->nWires();
+        if (! nWires) continue;
+
+        int timeMin = 99999;
+        const TCTSegment * best = 0;
+        for (unsigned j = 0; j < nWires; j++) {
+            const TCTSegment & s = (TCTSegment &) * (* l)[j];
+
+            //...Select hit TS only...
+            const TRGSignal & timing = s.triggerOutput();
+            if (! timing.active())
+                continue;
+
+            //...Select TS with the shortest drift time.
+            const TRGTime & t = * timing[0];
+            if (t.time() < timeMin) {
+                timeMin = t.time();
+                best = & s;
+            }
+        }
+
+        if (best)
+            track->append(best);
+    }
+
+    track->dump();
 
     return 0;
 }

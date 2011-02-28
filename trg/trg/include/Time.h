@@ -29,7 +29,7 @@ class TRGTime {
     /// Copy constructor.
     TRGTime(const TRGTime &);
 
-    /// Constructor wich clock. For rising edge, edge must be true. Given timing is syncronized to clock.
+    /// Constructor with clock. For rising edge, edge must be true. Given timing is syncronized to clock.
     TRGTime(double timing,
             bool edge,
             const TRGClock & clock,
@@ -84,9 +84,17 @@ class TRGTime {
     static bool sortByTime(const TRGTime & a, const TRGTime & b);
 
   private:
+
+    /// Time in clock unit.
     int _time;
-    bool _edge;                              // true : rising, false : falling
+
+    /// Edge type. true : rising, false : falling.
+    bool _edge;
+
+    /// Clock.
     const TRGClock * _clock;
+
+    /// Name.
     std::string _name;
 };
 

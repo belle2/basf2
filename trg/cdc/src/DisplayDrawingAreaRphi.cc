@@ -15,11 +15,14 @@
 
 #define TRGCDC_SHORT_NAMES
 
+#include <cstdlib>
 #include <iostream>
 #include <pangomm/init.h>
 #include "trg/cdc/Wire.h"
 #include "trg/cdc/WireHit.h"
 #include "trg/cdc/TrackSegment.h"
+#include "trg/cdc/Circle.h"
+#include "trg/cdc/Track.h"
 #include "trg/cdc/FrontEnd.h"
 #include "trg/cdc/Merger.h"
 #include "trg/cdc/DisplayDrawingAreaRphi.h"
@@ -181,6 +184,10 @@ TRGCDCDisplayDrawingAreaRphi::draw(void) {
                          1,
                          _segmentsColor[i],
                          Gdk::LINE_SOLID);
+    for (unsigned i = 0; i < _circles.size(); i++)
+        drawCircle(* _circles[i], 1, _circlesColor[i], Gdk::LINE_SOLID);
+    for (unsigned i = 0; i < _tracks.size(); i++)
+        drawTrack(* _tracks[i], 1, _tracksColor[i], Gdk::LINE_SOLID);
     for (unsigned i = 0; i < _fronts.size(); i++)
         drawFrontEnd(* _fronts[i],
                      1,
@@ -192,24 +199,6 @@ TRGCDCDisplayDrawingAreaRphi::draw(void) {
                    1,
                    _mergerColors[i],
                    Gdk::LINE_SOLID);
-
-//     unsigned n = _objects.length();
-//     for (unsigned i = 0; i < n; i++) {
-//         const TTrackBase & track = * _objects[i];
-//         if (track.objectType() == TrackBase)
-//             drawBase(track, * _colors[i]);
-// //         else if (track.objectType() == Line)
-// //             drawLine((const TLine &) track, * _colors[i]);
-//          else if (track.objectType() == Track)
-//              drawTrack((const TTrack &) track, * _colors[i]);
-//          else if (track.objectType() == Segment)
-//              drawSegment((const TSegment &) track, * _colors[i]);
-//          else if (track.objectType() == Circle)
-//              drawCircle((const TCircle &) track, * _colors[i]);
-//         else
-//             std::cout << "TRGCDCDisplayDrawingAreaRphi::draw !!! can't display"
-//                       << std::endl;
-//     }
 }
 
 void
@@ -318,6 +307,70 @@ TRGCDCDisplayDrawingAreaRphi::drawTrackSegment(const TCTSegment & w,
 }
 
 void
+TRGCDCDisplayDrawingAreaRphi::drawCircle(const TCCircle & t,
+                                         int lineWidth,
+                                         Gdk::Color & c,
+                                         Gdk::LineStyle s) {
+
+    Glib::RefPtr<Gdk::Colormap> colormap = get_default_colormap();
+    colormap->alloc_color(c);
+    _gc->set_foreground(c);
+    _gc->set_line_attributes(1,
+                             Gdk::LINE_SOLID,
+                             Gdk::CAP_NOT_LAST,
+                             Gdk::JOIN_MITER);
+
+    //...Draw a circle...
+    const TRGPoint2D & h = t.center();
+    double radius = fabs(t.radius());
+    _window->draw_arc(_gc,
+                      0,
+                      x((h.x() - radius) * 10),
+                      y((h.y() + radius) * 10),
+                      int(2 * radius * 10 * _scale),
+                      int(2 * radius * 10 * _scale),
+                      0,
+                      360 * 64);
+    colormap->free_color(c);
+}
+
+void
+TRGCDCDisplayDrawingAreaRphi::drawTrack(const TCTrack & t,
+                                        int lineWidth,
+                                        Gdk::Color & c,
+                                        Gdk::LineStyle s) {
+
+    Glib::RefPtr<Gdk::Colormap> colormap = get_default_colormap();
+    colormap->alloc_color(c);
+    _gc->set_foreground(c);
+    _gc->set_line_attributes(1,
+                             Gdk::LINE_SOLID,
+                             Gdk::CAP_NOT_LAST,
+                             Gdk::JOIN_MITER);
+
+    //...Draw segments first...
+    for (unsigned i = 0; i < TRGCDCTrackBase_Max_Layers; i++) {
+        const vector<const TCTSegment *> & segments = t.trackSegments(i);
+        for (unsigned j = 0; j < segments.size(); j++) {
+            drawTrackSegment(* segments[j], lineWidth, c, s);
+        }
+    }
+
+    //...Draw a circle...
+//     const TRGPoint2D & h = t.center();
+//     double radius = fabs(t.radius());
+//     _window->draw_arc(_gc,
+//                       0,
+//                       x((h.x() - radius) * 10),
+//                       y((h.y() + radius) * 10),
+//                       int(2 * radius * 10 * _scale),
+//                       int(2 * radius * 10 * _scale),
+//                       0,
+//                       360 * 64);
+    colormap->free_color(c);
+}
+
+void
 TRGCDCDisplayDrawingAreaRphi::drawFrontEnd(const TCFrontEnd & w,
                                            int lineWidth,
                                            Gdk::Color & c,
@@ -338,90 +391,6 @@ TRGCDCDisplayDrawingAreaRphi::drawMerger(const TCMerger & w,
         drawFrontEnd(* w[i], lineWidth, c, s);
     }
 }
-
-// void
-// TRGCDCDisplayDrawingAreaRphi::drawTrack(const TTrack & t, Gdk::Color & c) {
-//     Glib::RefPtr<Gdk::Colormap> colormap = get_default_colormap();
-//     colormap->alloc_color(c);
-//     _gc->set_foreground(c);
-//     _gc->set_line_attributes(1,
-//                              Gdk::LINE_SOLID,
-//                              Gdk::CAP_NOT_LAST,
-//                              Gdk::JOIN_MITER);
-
-//     const AList<TLink> & links = t.links();
-//     unsigned n = links.length();
-//     for (unsigned i = 0; i < n; i++) {
-//         if (links[i]->wire() == NULL) continue;
-//          if (! _stereo)
-//              if (links[i]->wire()->stereo())
-//                  continue;
-//          if (! _axial)
-//              if (links[i]->wire()->axial())
-//                  continue;
-
-//         //...Points...
-//         //        const HepGeom::Point3D<double> & p = links[i]->wire()->forwardPosition();
-//         const HepGeom::Point3D<double> & p = links[i]->positionOnWire();
-//         double radius = links[i]->hit()->drift();
-//         _window->draw_arc(_gc,
-//                           0,
-//                           x((p.x() - radius) * 10),
-//                           y((p.y() + radius) * 10),
-//                           int(2 * radius * 10 * _scale),
-//                           int(2 * radius * 10 * _scale),
-//                           0,
-//                           360 * 64);
-//          if (_wireName) {
-//             Glib::ustring wn = links[i]->wire()->name().c_str();
-//             _pl->set_text(wn);
-//             _window->draw_layout(_gc, x(p.x() * 10.), y(p.y() * 10.), _pl);
-//         }
-//     }
-
-//     //...Check a track...
-//     if (t.cores().length() == 0) {
-//         t.dump("detail", "");
-//         colormap->free_color(c);
-//         return;
-//     }
-
-//     //...Draw a track...
-//     THelix hIp = t.helix();
-//     hIp.pivot(ORIGIN);
-//     const HepGeom::Point3D<double> & h = hIp.center();
-//     double radius = fabs(t.radius());
-//     const HepGeom::Point3D<double> pIn = TLink::innerMost(t.cores())->positionOnTrack() - h;
-//     const HepGeom::Point3D<double> pOut = TLink::outerMost(t.cores())->positionOnTrack() - h;
-//     double a0 = atan2(pIn.y(), pIn.x()) / M_PI * 180;
-//     double a1 = atan2(pOut.y(), pOut.x()) / M_PI * 180;
-// //     std::cout << "h=" << h << ",r=" << radius
-// //                                       << ",a0=" << a0 << ",a1=" << a1
-// //                                       << std::endl;
-//     double d = a1 - a0;
-//     if (d > 180) d -= 360;
-//     else if (d < -180) d += 360;
-//     _window->draw_arc(_gc,
-//                       0,
-//                       x((h.x() - radius) * 10),
-//                       y((h.y() + radius) * 10),
-//                       int(2 * radius * 10 * _scale),
-//                       int(2 * radius * 10 * _scale),
-//                       int(a0 * 64),
-//                       int(d * 64));
-
-//     //...Track name...
-//     const HepGeom::Point3D<double> pn = TLink::outerMost(t.cores())->positionOnTrack();
-//     Glib::ustring wn = t.name();
-//     _pl->set_text(wn);
-//     _window->draw_layout(_gc, x(pn.x() * 10.), y(pn.y() * 10.), _pl);
-
-// //     std::cout << "h=" << h << ",r=" << radius
-// //                                       << ",a0=" << a0 << ",a1=" << a1
-// //                                       << std::endl;
-
-//     colormap->free_color(c);
-// }
 
 void
 TRGCDCDisplayDrawingAreaRphi::resetPosition(void) {
@@ -465,6 +434,44 @@ TRGCDCDisplayDrawingAreaRphi::append(const std::vector<const TCTSegment *> & l,
 }
 
 void
+TRGCDCDisplayDrawingAreaRphi::append(const TCCircle & s,
+                                     Gdk::Color c) {
+    _circles.push_back(& s);
+    _circlesColor.push_back(c);
+    on_expose_event((GdkEventExpose *) NULL);
+}
+
+void
+TRGCDCDisplayDrawingAreaRphi::append(const std::vector<const TCCircle *> & l,
+                                     Gdk::Color c) {
+    const unsigned n = l.size();
+    for (unsigned i = 0; i < n; i++) {
+        _circles.push_back(l[i]);
+        _circlesColor.push_back(c);
+    }
+    on_expose_event((GdkEventExpose *) NULL);
+}
+
+void
+TRGCDCDisplayDrawingAreaRphi::append(const TCTrack & s,
+                                     Gdk::Color c) {
+    _tracks.push_back(& s);
+    _tracksColor.push_back(c);
+    on_expose_event((GdkEventExpose *) NULL);
+}
+
+void
+TRGCDCDisplayDrawingAreaRphi::append(const std::vector<const TCTrack *> & l,
+                                     Gdk::Color c) {
+    const unsigned n = l.size();
+    for (unsigned i = 0; i < n; i++) {
+        _tracks.push_back(l[i]);
+        _tracksColor.push_back(c);
+    }
+    on_expose_event((GdkEventExpose *) NULL);
+}
+
+void
 TRGCDCDisplayDrawingAreaRphi::append(const TCFrontEnd & s,
                                      Gdk::Color c) {
     _fronts.push_back(& s);
@@ -480,105 +487,16 @@ TRGCDCDisplayDrawingAreaRphi::append(const TCMerger & s,
     on_expose_event((GdkEventExpose *) NULL);
 }
 
-// void
-// TRGCDCDisplayDrawingAreaRphi::append(const AList<TLink> & list, Gdk::Color c) {
-//     TTrackBase * t = new TTrackBase(list);
-//     _selfObjects.append(t);
-//     _objects.append(t);
-//     _colors.append(new Gdk::Color(c));
-//     on_expose_event((GdkEventExpose *) NULL);
-// }
-
-// void
-// TRGCDCDisplayDrawingAreaRphi::append(const AList<TSegment> & list,
-//                                     Gdk::Color c) {
-//     for (unsigned i = 0; i < list.length(); i++) {
-//         TSegment * s = new TSegment(* list[i]);
-//         _selfObjects.append(s);
-//         _objects.append(s);
-//         _colors.append(new Gdk::Color(c));
-//     }
-//     on_expose_event((GdkEventExpose *) NULL);
-// }
-
-// void
-// TRGCDCDisplayDrawingAreaRphi::append(const AList<TTrack> & list, Gdk::Color c) {
-//     for (unsigned i = 0; i < list.length(); i++) {
-//         TTrack * s = new TTrack(* list[i]);
-//         _selfObjects.append(s);
-//         _objects.append(s);
-//         _colors.append(new Gdk::Color(c));
-//     }
-//     on_expose_event((GdkEventExpose *) NULL);
-// }
-
-// void
-// TRGCDCDisplayDrawingAreaRphi::drawCircle(const TCircle & t, Gdk::Color & c) {
-//     Glib::RefPtr<Gdk::Colormap> colormap = get_default_colormap();
-//     colormap->alloc_color(c);
-//     _gc->set_foreground(c);
-//     _gc->set_line_attributes(1,
-//                              Gdk::LINE_SOLID,
-//                              Gdk::CAP_NOT_LAST,
-//                              Gdk::JOIN_MITER);
-
-//     const AList<TLink> & links = t.links();
-//     unsigned n = links.length();
-//     for (unsigned i = 0; i < n; i++) {
-//         if (links[i]->wire() == NULL) continue;
-//          if (! _stereo)
-//              if (links[i]->wire()->stereo())
-//                  continue;
-//          if (! _axial)
-//              if (links[i]->wire()->axial())
-//                  continue;
-
-//         //...Points...
-//         //        const HepGeom::Point3D<double> & p = links[i]->wire()->forwardPosition();
-//         const HepGeom::Point3D<double> & p = links[i]->positionOnWire();
-//         double radius = links[i]->hit()->drift();
-//         _window->draw_arc(_gc,
-//                           0,
-//                           x((p.x() - radius) * 10),
-//                           y((p.y() + radius) * 10),
-//                           int(2 * radius * 10 * _scale),
-//                           int(2 * radius * 10 * _scale),
-//                           0,
-//                           360 * 64);
-//     }
-
-//     //...Draw a circle...
-//     const HepGeom::Point3D<double> & h = t.center();
-//     double radius = fabs(t.radius());
-//     _window->draw_arc(_gc,
-//                       0,
-//                       x((h.x() - radius) * 10),
-//                       y((h.y() + radius) * 10),
-//                       int(2 * radius * 10 * _scale),
-//                       int(2 * radius * 10 * _scale),
-//                       0,
-//                       360 * 64);
-//     colormap->free_color(c);
-// }
-
-// void
-// TRGCDCDisplayDrawingAreaRphi::append(const AList<TCircle> & list,
-//                                     Gdk::Color c) {
-//     for (unsigned i = 0; i < list.length(); i++) {
-//         TCircle * s = new TCircle(* list[i]);
-//         _selfObjects.append(s);
-//         _objects.append(s);
-//         _colors.append(new Gdk::Color(c));
-//     }
-//     on_expose_event((GdkEventExpose *) NULL);
-// }
-
 void
 TRGCDCDisplayDrawingAreaRphi::clear(void) {
     _hits.clear();
     _hitsColor.clear();
     _segments.clear();
     _segmentsColor.clear();
+    _circles.clear();
+    _circlesColor.clear();
+    _tracks.clear();
+    _tracksColor.clear();
     _fronts.clear();
     _frontColors.clear();
     _mergers.clear();

@@ -31,13 +31,14 @@ class TRGCDCHoughPlaneMulti : public TRGCDCHoughPlane {
   public:
     /// Contructor.
     TRGCDCHoughPlaneMulti(const std::string & name,
-                     unsigned nX,
-                     float xMin,
-                     float xMax,
-                     unsigned nY,
-                     float yMin,
-                     float yMax,
-                     unsigned nLayers);
+                          const TRGCDCHoughTransformation & transformation,
+                          unsigned nX,
+                          float xMin,
+                          float xMax,
+                          unsigned nY,
+                          float yMin,
+                          float yMax,
+                          unsigned nLayers);
 
     /// Destructor
     virtual ~TRGCDCHoughPlaneMulti();

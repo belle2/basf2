@@ -30,12 +30,13 @@ class TRGCDCHoughPlaneBoolean : public TRGCDCHoughPlaneBase {
   public:
     /// Contructor.
     TRGCDCHoughPlaneBoolean(const std::string & name,
-                       unsigned nX,
-                       float xMin,
-                       float xMax,
-                       unsigned nY,
-                       float yMin,
-                       float yMax);
+                            const TRGCDCHoughTransformation & transformation,
+                            unsigned nX,
+                            float xMin,
+                            float xMax,
+                            unsigned nY,
+                            float yMin,
+                            float yMax);
 
     /// Destructor
     virtual ~TRGCDCHoughPlaneBoolean();
@@ -55,22 +56,19 @@ class TRGCDCHoughPlaneBoolean : public TRGCDCHoughPlaneBase {
     /// Votes.
     void vote(float rx,
               float ry,
-              const TRGCDCHoughTransformation & hough,
               int weight = 1);
 
     /// Votes with charge decision.
     void vote(float rx,
               float ry,
               float charge,
-              const TRGCDCHoughTransformation & hough,
               int weight = 1);
 
     /// Votes with charge decision.
     void voteUsedInTrasan(float rx,
-			  float ry,
-			  float charge,
-			  const TRGCDCHoughTransformation & hough,
-			  int weight = 1);
+                          float ry,
+                          float charge,
+                          int weight = 1);
 
     /// Votes using registered pattern.
     void vote(unsigned patternId, int weight);
@@ -126,10 +124,9 @@ TRGCDCHoughPlaneBoolean::clear(void) {
 inline
 void
 TRGCDCHoughPlaneBoolean::vote(float rx,
-			      float ry,
-			      const TRGCDCHoughTransformation & hough,
-			      int weight) {
-    vote(rx, ry, 0, hough, weight);
+                              float ry,
+                              int weight) {
+    vote(rx, ry, 0, weight);
 }
 
 inline

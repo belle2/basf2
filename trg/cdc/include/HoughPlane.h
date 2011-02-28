@@ -27,8 +27,10 @@ namespace Belle2 {
 class TRGCDCHoughPlane : public TRGCDCHoughPlaneBase {
 
   public:
+
     /// Contructor.
     TRGCDCHoughPlane(const std::string & name,
+                     const TRGCDCHoughTransformation & transformation,
                      unsigned nX,
                      float xMin,
                      float xMax,
@@ -40,14 +42,21 @@ class TRGCDCHoughPlane : public TRGCDCHoughPlaneBase {
     virtual ~TRGCDCHoughPlane();
 
   public:// Selectors
+
+    /// returns entry in a cell.
     unsigned entry(unsigned id) const;
+
+    /// returns entry in a cell.
     unsigned entry(unsigned x, unsigned y) const;
+
+    /// returns max. entry in a plane.
     int maxEntry(void) const;
 
     /// returns # of active cells in the pattern.
     virtual unsigned nActiveCellsInPattern(void) const;
 
   public:// Modifiers
+
     /// Sets entry.
     unsigned setEntry(unsigned serialId, unsigned n);
 
@@ -64,12 +73,19 @@ class TRGCDCHoughPlane : public TRGCDCHoughPlaneBase {
     virtual void voteByPattern(float xOffset, int weight = 1);
 
   protected:
+
     /// Add to a cell.
     void add(unsigned cellId, int weight);
 
   private:
+
+    /// Counters.
     int * const _cell;
+
+    /// Curve patterns.
     unsigned * _patterns;
+
+    /// \# of curve patterns.
     unsigned _nPatterns;
 
     friend class TRGCDCHoughPlaneMulti;
@@ -86,17 +102,13 @@ TRGCDCHoughPlane::setEntry(unsigned serialId, unsigned n) {
 inline
 void
 TRGCDCHoughPlane::clear(void) {
-//  bzero(_cell, nX() * nY() * sizeof(int));
     memset(_cell, 0, nX() * nY() * sizeof(int));
-//     for (unsigned i = 0; i < nX() * nY(); i++)
-//         _cell[i] = 0;
     TRGCDCHoughPlaneBase::clear();
 }
 
 inline
 void
 TRGCDCHoughPlane::clearCells(void) {
-//  bzero(_cell, nX() * nY() * sizeof(int));
     memset(_cell, 0, nX() * nY() * sizeof(int));
 }
 

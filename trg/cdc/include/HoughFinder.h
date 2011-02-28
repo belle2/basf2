@@ -15,7 +15,6 @@
 #define TRGCDCHoughFinder_FLAG_
 
 #include <string>
-
 #include "trg/cdc/HoughPlaneMulti2.h"
 #include "trg/cdc/HoughTransformationCircle.h"
 #include "trg/cdc/PeakFinder.h"
@@ -28,6 +27,7 @@ namespace Belle2 {
 
 class TRGCDC;
 class TRGCDCPeakFinder;
+class TRGCDCTrack;
 
 /// A class to find tracks using Hough algorithm
 class TRGCDCHoughFinder {
@@ -52,20 +52,36 @@ class TRGCDCHoughFinder {
     std::string version(void) const;
 
     /// do track finding.
-    int doit(void);
+    int doit(std::vector<TRGCDCTrack *> & trackList);
+
+    /// returns switch to do perfect finding.
+    bool perfect(void) const;
+
+  public:
+
+    /// sets and returns switch to do perfect finding.
+    bool perfect(bool);
 
   private:
 
-    /// Name
+    /// do perfect finding.
+    int doitPerfectly(std::vector<TRGCDCTrack *> & trackList);
+
+  private:
+
+    /// Name.
     const std::string _name;
 
-    /// CDCTRG
+    /// CDCTRG.
     const TRGCDC & _cdc;
 
-    /// Hough planes, for + and - charges
+    /// Switch to do perfect finding.
+    bool _perfect;
+
+    /// Hough planes, for + and - charges.
     TRGCDCHoughPlaneMulti2 * _plane[2];
 
-    /// Circle Hough transformtion
+    /// Circle Hough transformtion.
     TRGCDCHoughTransformationCircle _circleH;
 
     /// Peak finder.
@@ -78,6 +94,18 @@ inline
 std::string
 TRGCDCHoughFinder::name(void) const {
     return _name;
+}
+
+inline
+bool
+TRGCDCHoughFinder::perfect(void) const {
+    return _perfect;
+}
+
+inline
+bool
+TRGCDCHoughFinder::perfect(bool a) {
+    return _perfect = a;
 }
 
 } // namespace Belle2

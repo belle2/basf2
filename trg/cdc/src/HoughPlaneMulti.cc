@@ -11,27 +11,35 @@
 // $Log$
 //-----------------------------------------------------------------------------
 
+#define TRGCDC_SHORT_NAMES
+
 #include "trg/cdc/HoughPlaneMulti.h"
 
 namespace Belle2 {
 
 TRGCDCHoughPlaneMulti::TRGCDCHoughPlaneMulti(const std::string & name,
-                                   unsigned nX,
-                                   float xMin,
-                                   float xMax,
-                                   unsigned nY,
-                                   float yMin,
-                                   float yMax,
-                                   unsigned nLayers)
-: TRGCDCHoughPlane(name, nX, xMin, xMax, nY, yMin, yMax),
-  _nLayers(nLayers) {
-//  bzero(_usage, N_LAYERS * sizeof(unsigned));
+                                             const TCHTransformation & trans,
+                                             unsigned nX,
+                                             float xMin,
+                                             float xMax,
+                                             unsigned nY,
+                                             float yMin,
+                                             float yMax,
+                                             unsigned nLayers)
+    : TRGCDCHoughPlane(name, trans, nX, xMin, xMax, nY, yMin, yMax),
+      _nLayers(nLayers) {
+
     for (unsigned i = 0; i < N_LAYERS; i++)
         _usage[i] = false;
-//  for (unsigned i = 0; i < nLayers; i++)
-//         _layers.append(new TRGCDCHoughPlane(name, nX, xMin, xMax, nY, yMin, yMax));
     for (unsigned i = 0; i < _nLayers; i++)
-        _layers[i] = new TRGCDCHoughPlane(name, nX, xMin, xMax, nY, yMin, yMax);
+        _layers[i] = new TRGCDCHoughPlane(name,
+                                          trans,
+                                          nX,
+                                          xMin,
+                                          xMax,
+                                          nY,
+                                          yMin,
+                                          yMax);
     if (nLayers > N_LAYERS)
         std::cout << "Too many layers requested("
                                                 << _nLayers << ") : "
@@ -40,7 +48,6 @@ TRGCDCHoughPlaneMulti::TRGCDCHoughPlaneMulti(const std::string & name,
 }
 
 TRGCDCHoughPlaneMulti::~TRGCDCHoughPlaneMulti() {
-//  HepAListDeleteAll(_layers);
     for (unsigned i = 0; i < _nLayers; i++)
         delete _layers[i];
 }
@@ -63,7 +70,7 @@ TRGCDCHoughPlaneMulti::vote(float rx,
 //     const unsigned a = layerId / 32;
 //     _usage[a] |= (1 << (layerId % 32));
     _usage[layerId] = true;
-    _layers[layerId]->vote(rx, ry, (int) targetCharge, hough, weight);
+    _layers[layerId]->vote(rx, ry, (int) targetCharge, weight);
 }
 
 void

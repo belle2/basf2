@@ -27,6 +27,8 @@ namespace Belle2 {
 class TRGCDCWire;
 class TRGCDCWireHit;
 class TRGCDCTrackSegment;
+class TRGCDCCircle;
+class TRGCDCTrack;
 class TRGCDCFrontEnd;
 class TRGCDCMerger;
 
@@ -56,15 +58,23 @@ class TRGCDCDisplayDrawingAreaRphi : public TRGCDCDisplayDrawingArea {
 
     /// appends wire hits to display.
     void append(const std::vector<const TRGCDCWireHit *> &,
-                 Gdk::Color color = Gdk::Color("grey"));
+                Gdk::Color color = Gdk::Color("grey"));
     void append(const TRGCDCTrackSegment &,
-                  Gdk::Color color = Gdk::Color("grey"));
+                Gdk::Color color = Gdk::Color("#6600FF009900"));
     void append(const std::vector<const TRGCDCTrackSegment *> &,
-                  Gdk::Color color = Gdk::Color("grey"));
+                Gdk::Color color = Gdk::Color("#6600FF009900"));
+    void append(const TRGCDCCircle &,
+                Gdk::Color color = Gdk::Color("#FF0066009900"));
+    void append(const std::vector<const TRGCDCCircle *> &,
+                Gdk::Color color = Gdk::Color("#FF0066009900"));
+    void append(const TRGCDCTrack &,
+                Gdk::Color color = Gdk::Color("#99006600FF00"));
+    void append(const std::vector<const TRGCDCTrack *> &,
+                Gdk::Color color = Gdk::Color("#99006600FF00"));
     void append(const TRGCDCFrontEnd &,
-                  Gdk::Color color = Gdk::Color("grey"));
+                Gdk::Color color = Gdk::Color("grey"));
     void append(const TRGCDCMerger &,
-                  Gdk::Color color = Gdk::Color("grey"));
+                Gdk::Color color = Gdk::Color("grey"));
 
     virtual bool on_expose_event(GdkEventExpose *);
     virtual bool on_button_press_event(GdkEventButton *);
@@ -83,6 +93,14 @@ class TRGCDCDisplayDrawingAreaRphi : public TRGCDCDisplayDrawingArea {
                           int lineWidth,
                           Gdk::Color & c,
                           Gdk::LineStyle s);
+    void drawCircle(const TRGCDCCircle & w,
+                    int lineWidth,
+                    Gdk::Color & c,
+                    Gdk::LineStyle s);
+    void drawTrack(const TRGCDCTrack & w,
+                    int lineWidth,
+                    Gdk::Color & c,
+                    Gdk::LineStyle s);
     void drawFrontEnd(const TRGCDCFrontEnd & w,
                       int lineWidth,
                       Gdk::Color & c,
@@ -113,6 +131,12 @@ class TRGCDCDisplayDrawingAreaRphi : public TRGCDCDisplayDrawingArea {
 
     std::vector<const TRGCDCTrackSegment *> _segments;
     std::vector<Gdk::Color> _segmentsColor;
+
+    std::vector<const TRGCDCCircle *> _circles;
+    std::vector<Gdk::Color> _circlesColor;
+
+    std::vector<const TRGCDCTrack *> _tracks;
+    std::vector<Gdk::Color> _tracksColor;
 
     std::vector<const TRGCDCFrontEnd *> _fronts;
     std::vector<Gdk::Color> _frontColors;

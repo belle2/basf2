@@ -26,16 +26,13 @@ TRGCDCSteppingAction::~TRGCDCSteppingAction() {
 
 void
 TRGCDCSteppingAction::UserSteppingAction(const G4Step * aStep) {
-#ifdef TRGCDC_DEBUG    
-    cout << "TRGCDCSteppingAction::UserSteppingAction ... called" << endl;
-#endif
     const G4StepPoint & in = * aStep->GetPreStepPoint();
     const G4StepPoint & out = * aStep->GetPostStepPoint();
     const double rIn = in.GetPosition().r();
     const double rOut = out.GetPosition().r();
     const bool curlBack = rIn > rOut;
     if (curlBack)
-	aStep->GetTrack()->SetTrackStatus(fKillTrackAndSecondaries);
+        aStep->GetTrack()->SetTrackStatus(fKillTrackAndSecondaries);
 };
 
 } // namespace Belle2

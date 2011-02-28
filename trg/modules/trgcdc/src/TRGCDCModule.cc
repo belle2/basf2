@@ -67,11 +67,11 @@ TRGCDCModule::TRGCDCModule()
 TRGCDCModule::~TRGCDCModule() {
 
     if (_cdc)
-	TRGCDC::getTRGCDC("good-bye");
+        TRGCDC::getTRGCDC("good-bye");
 
     //...Maybe G4RunManager delete it, so don't delete _sa.
 //  if (_sa)
-// 	delete _sa;
+//         delete _sa;
 
 #ifdef TRGCDC_DEBUG
     cout << "TRGCDCModule ... destructed " << endl;
@@ -83,9 +83,9 @@ TRGCDCModule::initialize() {
 
     //...Stop curl buck...
     if (_curlBackStop) {
-	G4RunManager * g4rm = G4RunManager::GetRunManager();
-	_sa = new TCSAction();
-	g4rm->SetUserAction(_sa);
+        G4RunManager * g4rm = G4RunManager::GetRunManager();
+        _sa = new TCSAction();
+        g4rm->SetUserAction(_sa);
     }
 }
 
@@ -97,7 +97,7 @@ TRGCDCModule::beginRun() {
 
     //...CDC trigger...
     if ((cfn != _configFilename) || (_cdc == 0))
-	_cdc = TRGCDC::getTRGCDC(_configFilename);
+        _cdc = TRGCDC::getTRGCDC(_configFilename);
 
 #ifdef TRGCDC_DEBUG
     cout << "TRGCDCModule ... beginRun called " << endl;

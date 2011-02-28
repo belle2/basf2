@@ -14,8 +14,12 @@
 #define TRG_SHORT_NAMES
 #define TRGCDC_SHORT_NAMES
 
-#include <stdlib.h>
+#include <cstdlib>
+#include "trg/trg/Debug.h"
+#include "trg/cdc/Circle.h"
 #include "trg/cdc/PeakFinder.h"
+#include "trg/cdc/HoughPlane.h"
+#include "trg/cdc/HoughTransformationCircle.h"
 
 using namespace std;
 
@@ -33,19 +37,25 @@ TRGCDCPeakFinder::TRGCDCPeakFinder(const string & name)
 TRGCDCPeakFinder::~TRGCDCPeakFinder() {
 }
 
-vector<TRGPoint2D *>
-TRGCDCPeakFinder::doit(TRGCDCHoughPlane & hp,
-		       const unsigned threshold,
-		       const bool centerIsPeak) const {
-    return peaks5(hp, threshold, centerIsPeak);
+void
+TRGCDCPeakFinder::doit(vector<TRGCDCCircle *> & circles,
+                       TRGCDCHoughPlane & hp,
+                       const unsigned threshold,
+                       const bool centerIsPeak) const {
+    return peaks5(circles, hp, threshold, centerIsPeak);
 }
-
-vector<TRGPoint2D *>
-TRGCDCPeakFinder::peaks5(TRGCDCHoughPlane & hp,
-			 const unsigned threshold,
-			 const bool centerIsPeak) const {
-
-    vector<TRGPoint2D *> list;
+    
+void
+TRGCDCPeakFinder::peaks5(vector<TRGCDCCircle *> & circles,
+                         TRGCDCHoughPlane & hp,
+                         const unsigned threshold,
+                         const bool centerIsPeak) const {
+#ifdef TRG_DEBUG
+    TRGDebug::enterStage("Peak Finding (peaks5)");
+#endif
+#ifdef TRGCDC_DEBUG_HOUGH
+    const unsigned nCircles = circles.size();
+#endif
 
     //...Search cells above threshold...
     unsigned nCells = hp.nX() * hp.nY();
@@ -120,12 +130,10 @@ TRGCDCPeakFinder::peaks5(TRGCDCHoughPlane & hp,
 
     //...Determine peaks...
     const vector<vector<unsigned> *> & regions = hp.regions();
-//  const AList<CList<unsigned> > & regions = hp.regions();
     for (unsigned i = 0; i < (unsigned) regions.size(); i++) {
 
         //...Calculate size and center of a region...
         const vector<unsigned> & r = * regions[i];
-//      const CList<unsigned> & r = * regions[i];
         unsigned minX = hp.nX();
         unsigned maxX = 0;
         unsigned minY = hp.nY();
@@ -196,28 +204,45 @@ TRGCDCPeakFinder::peaks5(TRGCDCHoughPlane & hp,
             }
         }
 
-        //...Store the center position....
-        list.push_back(new TRGPoint2D(hp.position(ncX, ncY)));
+        //...Store a circle...
+        const TCHTransformationCircle * tc =
+            dynamic_cast<const TCHTransformationCircle *>
+            (& hp.transformation());
+        TRGPoint2D center =
+            tc->circleCenter(hp.position(ncX, ncY));
+        TRGPoint2D centerR(center.y(), center.x());
+        circles.push_back(new TCCircle(centerR, hp.charge(), hp));
+
 #ifdef TRGCDC_DEBUG_HOUGH
-//         std::cout << Tab() << "region " << i << " final center:x="
-//                << hp.position(ncX, ncY).x() << ",y="
-//                << hp.position(ncX, ncY).y() << std::endl;
+        cout << TRGDebug::tab() << "A circle made" << endl;
+        circles.back()->dump("", TRGDebug::tab() + "    ");
+//         cout << TRGDebug::tab() << "region " << i << " final center:x="
+//              << hp.position(ncX, ncY).x() << ",y="
+//              << hp.position(ncX, ncY).y() << endl;
 #endif            
     }
 
 #ifdef TRGCDC_DEBUG_HOUGH
-//     std::cout << Tab() << "Peak finding:threshold=" << threshold << ",nActive="
+//     cout << Tab() << "Peak finding:threshold=" << threshold << ",nActive="
 //             << nActive << ",regions=" << hp.regions().length()
-//             << "," << hp.name() << std::endl;
+//             << "," << hp.name() << endl;
 //     for (unsigned i = 0; i < (unsigned) hp.regions().length(); i++) {
 //          const CList<unsigned> & region = * (hp.regions())[i];
 //          for (unsigned j = 0; j < (unsigned) region.length(); j++)
-//              std::cout << Tab() << "    " << * region[j] << "="
-//                     << hp.entry(* region[j]) << std::endl;
+//              cout << Tab() << "    " << * region[j] << "="
+//                     << hp.entry(* region[j]) << endl;
 //     }
 #endif
 
-    return list;
+#ifdef TRGCDC_DEBUG_HOUGH
+    cout << TRGDebug::tab() << circles.size() - nCircles << " circle(s)"
+         << " made in total" << endl;
+#endif
+#ifdef TRG_DEBUG
+    TRGDebug::leaveStage("Peak Finding (peaks5)");
+#endif
+
+    return;
 }
 
 } // namespace Belle2

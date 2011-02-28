@@ -32,9 +32,9 @@ class TRGCDCTrackSegment : public TRGCDCWire {
   public:
     /// Constructor.
     TRGCDCTrackSegment(unsigned id,
-                           const TRGCDCWire & w,
-                           const TRGCDCLayer * layer,
-                           const std::vector<const TRGCDCWire *> & cells);
+                       const TRGCDCWire & w,
+                       const TRGCDCLayer * layer,
+                       const std::vector<const TRGCDCWire *> & cells);
 
     /// Destructor
     virtual ~TRGCDCTrackSegment();
@@ -87,11 +87,23 @@ class TRGCDCTrackSegment : public TRGCDCWire {
     void simulate(void);
 
   private:
+
+    /// State.
     unsigned _state;
+
+    /// ID.
     unsigned _id;
+
+    /// Local ID.
     unsigned _localId;
+
+    /// Layer.
     const TRGCDCLayer * _layer;
+
+    /// Wires.
     std::vector<const TRGCDCWire *> _wires;
+
+    /// Trigger signal.
     TRGSignal _signal;
 };
 

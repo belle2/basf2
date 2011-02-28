@@ -12,6 +12,8 @@
 // $Log$
 //-----------------------------------------------------------------------------
 
+#define TRGCDC_SHORT_NAMES
+
 #include <iostream>
 #include "trg/cdc/HoughPlaneBoolean.h"
 
@@ -20,13 +22,14 @@ using namespace std;
 namespace Belle2 {
 
 TRGCDCHoughPlaneBoolean::TRGCDCHoughPlaneBoolean(const std::string & name,
-						 unsigned nX,
-						 float xMin,
-						 float xMax,
-						 unsigned nY,
-						 float yMin,
-						 float yMax)
-    : TRGCDCHoughPlaneBase(name, nX, xMin, xMax, nY, yMin, yMax),
+                                               const TCHTransformation & trans,
+                                                 unsigned nX,
+                                                 float xMin,
+                                                 float xMax,
+                                                 unsigned nY,
+                                                 float yMin,
+                                                 float yMax)
+    : TRGCDCHoughPlaneBase(name, trans, nX, xMin, xMax, nY, yMin, yMax),
       _n(nX * nY / 32 + 1),
       _cell(new unsigned[_n]),
       _nPatterns(0),
@@ -45,10 +48,9 @@ TRGCDCHoughPlaneBoolean::~TRGCDCHoughPlaneBoolean() {
 
 void
 TRGCDCHoughPlaneBoolean::vote(float rx,
-			      float ry,
-			      float targetCharge,
-			      const TRGCDCHoughTransformation & hough,
-			      int weight) {
+                              float ry,
+                              float targetCharge,
+                              int weight) {
 
     const HepGeom::Point3D<double> r(rx, ry, 0);
 
@@ -58,53 +60,53 @@ TRGCDCHoughPlaneBoolean::vote(float rx,
 
     //...phi loop...
     for (unsigned i = 0; i < nX(); i++) {
-	const float x0 = xSize() * float(i);
-	const HepGeom::Point3D<double> center(cos(x0), sin(x0), 0);
+        const float x0 = xSize() * float(i);
+        const HepGeom::Point3D<double> center(cos(x0), sin(x0), 0);
         float charge = r.cross(center).z();
         if (targetCharge != 0)
             if (targetCharge * charge > 0)
                 continue;
 
-	float y0 = hough.y(rx, ry, x0);
+        float y0 = transformation().y(rx, ry, x0);
         const float x1 = xSize() * float(i + 1);
-	float y1 = hough.y(rx, ry, x1);
+        float y1 = transformation().y(rx, ry, x1);
 
 //
-	cout << "x0,x1,y0,y1=" << x0 << "," << x1 << "," << y0 << "," << y1
-	     << endl;
+        cout << "x0,x1,y0,y1=" << x0 << "," << x1 << "," << y0 << "," << y1
+             << endl;
 //
 
-	//...Check y position...
-	if ((y0 == 0) && (y1 == 0))
- 	    continue;
-	else if ((y0 > yMax()) && (y1 > yMax()))
-	    continue;
-	else if ((y0 < yMin()) && (y1 < yMin()))
-	    continue;
+        //...Check y position...
+        if ((y0 == 0) && (y1 == 0))
+             continue;
+        else if ((y0 > yMax()) && (y1 > yMax()))
+            continue;
+        else if ((y0 < yMin()) && (y1 < yMin()))
+            continue;
 
-	//...Divergence here...
-	if ((y0 == 0) && (y1 != 0))
-	    y0 = yMax();
-	else if ((y0 != 0) && (y1 == 0))
-	    y1 = yMax();
+        //...Divergence here...
+        if ((y0 == 0) && (y1 != 0))
+            y0 = yMax();
+        else if ((y0 != 0) && (y1 == 0))
+            y1 = yMax();
 
-	//...Adjust location...
-	if (y0 < yMin())
-	    y0 = yMin();
-	if (y1 < yMin())
-	    y1 = yMin();
-	if (y0 > yMax())
-	    y0 = yMax();
-	if (y1 > yMax())
-	    y1 = yMax();
+        //...Adjust location...
+        if (y0 < yMin())
+            y0 = yMin();
+        if (y1 < yMin())
+            y1 = yMin();
+        if (y0 > yMax())
+            y0 = yMax();
+        if (y1 > yMax())
+            y1 = yMax();
 
         //...Location in the plane...
         int iY0 = int((y0 - yMin()) / ySize());
         int iY1 = int((y1 - yMin()) / ySize());
 
 //
-	cout << "x0,x1,y0,y1=" << x0 << "," << x1 << "," << y0 << "," << y1
-	     << "," << iY0 << "," << iY1 << endl;
+        cout << "x0,x1,y0,y1=" << x0 << "," << x1 << "," << y0 << "," << y1
+             << "," << iY0 << "," << iY1 << endl;
 //
 
         //...Sorting...
@@ -129,32 +131,31 @@ TRGCDCHoughPlaneBoolean::vote(float rx,
 
 void
 TRGCDCHoughPlaneBoolean::voteUsedInTrasan(float rx,
-					  float ry,
-					  float targetCharge,
-					  const TRGCDCHoughTransformation & hough,
-					  int weight) {
+                                          float ry,
+                                          float targetCharge,
+                                          int weight) {
 
     const HepGeom::Point3D<double> r(rx, ry, 0);
 
     //...phi loop...
     for (unsigned i = 0; i < nX(); i++) {
-	const float x0 = xSize() * float(i);
-	const HepGeom::Point3D<double>  phi(cos(x0), sin(x0), 0);
+        const float x0 = xSize() * float(i);
+        const HepGeom::Point3D<double>  phi(cos(x0), sin(x0), 0);
         float charge = r.cross(phi).z();
         if (targetCharge != 0)
             if (targetCharge * charge > 0)
                 continue;
 
-        const float y0 = hough.y(rx, ry, x0);
+        const float y0 = transformation().y(rx, ry, x0);
         const float x1 = xSize() * float(i + 1);
-        const float y1 = hough.y(rx, ry, x1);
+        const float y1 = transformation().y(rx, ry, x1);
 
         //...Location in the plane...
         int iY0 = int((y0 - yMin()) / ySize());
         int iY1 = int((y1 - yMin()) / ySize());
 
         //...This is special implementation for Circle Hough...
-        if (hough.diverge(rx, ry, x0, x1)) {
+        if (transformation().diverge(rx, ry, x0, x1)) {
             if (iY0 > 0) {
                 if (iY0 >= (int) nY()) continue;
                 iY1 = nY() - 1;

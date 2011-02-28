@@ -50,9 +50,9 @@ TRGCDCHoughTransformationCircle::convert(const TRGPoint2D & p) const {
 
 bool
 TRGCDCHoughTransformationCircle::diverge(float xReal,
-					 float yReal,
-					 float x0,
-					 float x1) const {
+                                         float yReal,
+                                         float x0,
+                                         float x1) const {
     static const float PI2 = 2 * M_PI;
 
     //...Divergence points...

@@ -11,18 +11,22 @@
 // $Log$
 //-----------------------------------------------------------------------------
 
+#define TRGCDC_SHORT_NAMES
+
 #include "trg/cdc/HoughPlaneBase.h"
 
 namespace Belle2 {
 
 TRGCDCHoughPlaneBase::TRGCDCHoughPlaneBase(const std::string & name,
-                                 unsigned nX,
-                                 float xMin,
-                                 float xMax,
-                                 unsigned nY,
-                                 float yMin,
-                                 float yMax)
+                                           const TCHTransformation & trans,
+                                           unsigned nX,
+                                           float xMin,
+                                           float xMax,
+                                           unsigned nY,
+                                           float yMin,
+                                           float yMax)
     : _name(name),
+      _trans(trans),
       _nX(nX),
       _xMin(xMin),
       _xMax(xMax),
@@ -144,10 +148,9 @@ TRGCDCHoughPlaneBase::maxEntryInRegion(unsigned targetId) const {
 
 void
 TRGCDCHoughPlaneBase::vote(float rx,
-                      float ry,
-                      int targetCharge,
-                      const TRGCDCHoughTransformation & hough,
-                      int weight) {
+                           float ry,
+                           int targetCharge,
+                           int weight) {
                   
     const HepGeom::Point3D<double>  r(rx, ry, 0);
 
@@ -160,16 +163,16 @@ TRGCDCHoughPlaneBase::vote(float rx,
             if (targetCharge * charge > 0)
                 continue;
 
-        const float y0 = hough.y(rx, ry, x0);
+        const float y0 = _trans.y(rx, ry, x0);
         const float x1 = xSize() * float(i + 1);
-        const float y1 = hough.y(rx, ry, x1);
+        const float y1 = _trans.y(rx, ry, x1);
 
         //...Location in the plane...
         int iY0 = int((y0 - yMin()) / ySize());
         int iY1 = int((y1 - yMin()) / ySize());
 
         //...This is special implementation for Circle Hough...
-        if (hough.diverge(rx, ry, x0, x1)) {
+        if (_trans.diverge(rx, ry, x0, x1)) {
             if (iY0 > 0) {
                 if (iY0 >= (int) _nY) continue;
                 iY1 = _nY - 1;
@@ -210,7 +213,7 @@ TRGCDCHoughPlaneBase::vote(float rx,
 
 void
 TRGCDCHoughPlaneBase::dump(const std::string & message,
-                      const std::string & prefix) const {
+                           const std::string & prefix) const {
     std::cout << prefix << "dump of " << name() << ":" << message;
     if (message != "region") {
         bool first = true;

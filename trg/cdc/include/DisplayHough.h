@@ -24,6 +24,10 @@
 #define TCDisplayHough TRGCDCDisplayHough
 #endif
 
+namespace Belle2_TRGCDC {
+    extern Belle2::TRGCDCDisplayRphi * D;
+}
+
 namespace Belle2 {
 
 /// A class to display CDC trigger information.

@@ -21,22 +21,24 @@
 namespace Belle2 {
 
 TRGCDCHoughPlaneMulti2::TRGCDCHoughPlaneMulti2(const std::string & name,
-                                     unsigned nX,
-                                     float xMin,
-                                     float xMax,
-                                     unsigned nY,
-                                     float yMin,
-                                     float yMax,
-                                     unsigned nLayers)
-: TRGCDCHoughPlane(name, nX, xMin, xMax, nY, yMin, yMax),
-  _nLayers(nLayers) {
-//  bzero(_usage, N_LAYERS * sizeof(unsigned));
+                                               const TCHTransformation & trans,
+                                               unsigned nX,
+                                               float xMin,
+                                               float xMax,
+                                               unsigned nY,
+                                               float yMin,
+                                               float yMax,
+                                               unsigned nLayers)
+    : TRGCDCHoughPlane(name, trans, nX, xMin, xMax, nY, yMin, yMax),
+      _nLayers(nLayers) {
+
     for (unsigned i = 0; i < N_LAYERS; i++)
         _usage[i] = false;
     for (unsigned i = 0; i < _nLayers; i++)
         _layers[i] = new TCHPlaneBoolean(name +
                                          ":layer" +
                                          TRGUtil::itostring(i),
+                                         trans,
                                          nX,
                                          xMin,
                                          xMax,

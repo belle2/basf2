@@ -14,6 +14,7 @@
 #define TRG_SHORT_NAMES
 #define TRGCDC_SHORT_NAMES
 
+#include <cstdlib>
 #include "framework/datastore/StoreArray.h"
 #include "cdc/hitcdc/HitCDC.h"
 #include "cdc/geocdc/CDCGeometryPar.h"
@@ -27,6 +28,7 @@
 #include "trg/cdc/WireHit.h"
 #include "trg/cdc/WireHitMC.h"
 #include "trg/cdc/TrackMC.h"
+#include "trg/cdc/Track.h"
 #include "trg/cdc/TrackSegment.h"
 #include "trg/cdc/FrontEnd.h"
 #include "trg/cdc/Merger.h"
@@ -70,14 +72,14 @@ TRGCDC::_cdc = 0;
 TRGCDC *
 TRGCDC::getTRGCDC(const std::string & configFile) {
     if (_cdc)
-	delete _cdc;
+        delete _cdc;
 
     if (configFile != "good-bye") {
-	_cdc = new TRGCDC(configFile);
+        _cdc = new TRGCDC(configFile);
     }
     else {
-	cout << "TRGCDC::getTRGCDC ... good-bye" << endl;
-	_cdc = 0;
+        cout << "TRGCDC::getTRGCDC ... good-bye" << endl;
+        _cdc = 0;
     }
 
     return _cdc;
@@ -86,7 +88,7 @@ TRGCDC::getTRGCDC(const std::string & configFile) {
 TRGCDC *
 TRGCDC::getTRGCDC(void) {
     if (! _cdc)
-	cout << "TRGCDC::getTRGCDC !!! TRGCDC is not created yet" << endl;
+        cout << "TRGCDC::getTRGCDC !!! TRGCDC is not created yet" << endl;
     return _cdc;
 }
 
@@ -1100,23 +1102,29 @@ TRGCDC::simulate(void) {
     }
 #endif
 
-    //...Hough finder...
-    _hFinder->doit();
+    //...2D tracker : Hough finder...
+    vector<TRGCDCTrack *> trackList;
+    _hFinder->perfect(true);
+    _hFinder->doit(trackList);
 
-    //...3D finder here...
+    //...3D tracker here...
 
     //...End of simulation...
 
 #ifdef TRGCDC_DISPLAY
-    D->endOfEvent();
-    string stg = "2D : Peak Finding";
-    string inf = "   ";
 //  cdc.dump("hits");
+    vector<const TCTrack *> tt;
+    tt.assign(trackList.begin(), trackList.end());
+    D->endOfEvent();
+    string stg = "2D : Perfect Finding";
+    string inf = "   ";
+    D->clear();
     D->stage(stg);
     D->information(inf);
-    D->clear();
     D->area().append(hits());
-    D->area().append(tsHits(), Gdk::Color("#6600FF009900"));
+    D->area().append(tsHits());
+    D->area().append(tt);
+    D->show();
     D->run();
 //     unsigned iFront = 0;
 //     while (const TCFrontEnd * f = _cdc.frontEnd(iFront++)) {

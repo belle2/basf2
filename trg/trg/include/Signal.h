@@ -92,6 +92,9 @@ class TRGSignal {
     /// returns widen signals. Signals wider than "width" will be untouched.
     TRGSignal & widen(unsigned width);
 
+    /// returns timing of i'th edge.
+    const TRGTime * operator[](unsigned i) const;
+
   private:
     static std::vector<TRGTime> andOperation(const std::vector<TRGTime> &);
     static std::vector<TRGTime> orOperation(const std::vector<TRGTime> &);
@@ -163,6 +166,12 @@ TRGSignal::active(void) const {
     if (_history.size())
         return true;
     return false;
+}
+
+inline
+const TRGTime *
+TRGSignal::operator[](unsigned i) const {
+    return & _history[i];
 }
 
 } // namespace Belle2

@@ -24,6 +24,11 @@
 #define TCDisplayRphi TRGCDCDisplayRphi
 #endif
 
+namespace Belle2_TRGCDC {
+    extern Belle2::TRGCDCDisplayHough * H0;
+    extern Belle2::TRGCDCDisplayHough * H1;
+}
+
 namespace Belle2 {
 
 class TRGCDCDisplay;
@@ -68,9 +73,6 @@ class TRGCDCDisplayRphi : public TRGCDCDisplay {
 
     /// returns drawing area.
     virtual TRGCDCDisplayDrawingAreaRphi & area(void);
-
-  private: // Objects to display and control
-    std::vector<TRGCDCWireHit *> _hits;
 
   private: // GTK stuff
     bool _axial;

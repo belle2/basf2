@@ -89,8 +89,8 @@ namespace Belle2 {
     /**
      * Return status code of particle.
      * @param bitmask Takes an optional bitmask that is compared to the status of the particle.
-     * @return Returns the status code of the particle. If a bitmask is given it returns 1 if the
-     *                 bitmask matches the status and 0 if not.
+     * @return Returns the status code of the particle. If a bitmask is given and it matches the
+     * the status it returns the value of the bitmask and 0 if not.
      */
     const unsigned int getStatus(unsigned int bitmask = -1) const { return m_status & bitmask; }
 

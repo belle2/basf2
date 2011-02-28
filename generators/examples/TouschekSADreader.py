@@ -33,7 +33,7 @@ touschekinput.param('FilenameLER',
 # for the time being, it is recommended to
 # process the particles in the same event.
 # at some point this will be refined.
-touschekinput.param('MaxParticles', 200000)
+touschekinput.param('MaxParticles', 200)
 # default is MaxParticles = 10.
 
 # This parameter indicates how far around the IR

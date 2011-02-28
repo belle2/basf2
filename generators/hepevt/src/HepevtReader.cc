@@ -64,8 +64,8 @@ int HepevtReader::getEvent(MCParticleGraph &graph, double & eventWeight) throw(H
     p.set4Vector(p4);
 
     //Check for sensible daughter indices
-    int d1 = p.getFirstDaughterIndex() + 1; //add 1 because function returns 0-based value
-    int d2 = p.getLastDaughterIndex() + 1;  // but Graph uses 1 based value.
+    int d1 = p.getFirstDaughter();
+    int d2 = p.getLastDaughter();
     if (d1 < 0 || d1 > nparticles || d2 < d1 || d2 > nparticles) {
       throw(HepEvtInvalidDaughterIndicesError() << m_lineNr << d1 << d2 << nparticles);
     }

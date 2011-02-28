@@ -179,33 +179,28 @@ namespace Belle2 {
 
     /**
      * Get 0-based index of the particle in the corresponding MCParticle list.
-     * This is the function for users who want to use mother, daughter etc. indices.
+     * This is the function for users who want to use the indices of the TClonesArray. To get the
+     * corresponding mother and daughter indices use ->getMother()->getArrayIndex().
      * @return The index of the MonteCarlo particle in the corresponding MCParticle array
-     * Careful: to have indices corresponding to the array position, the mother, daugther etc. indices
-     * do not follow the standard from (Fortran) generators, where the first particle has index 1.
-     * In the array the first particle has index 0.
+     * Careful: These indices do not follow the standard from (Fortran) generators,
+     * where the first particle has index 1. In the array the first particle has index 0.
      */
     const int getArrayIndex()                     const { return m_index - 1;  }
 
     /**
-     * Get index in MCParticle array of first daughter, -1 if no daughters.
-     * @return The index of the first daughter of the MonteCarlo particle. The index is -1 if the
+     * Get 1-based index of first daughter, 0 if no daughters.
+     * @return The index of the first daughter of the MonteCarlo particle. The index is 0 if the
      *         MonteCarlo particle doesn't have any daughters.
-     * Careful: to have indices corresponding to the array position, the mother, daugther etc. indices
-     * do not follow the standard from (Fortran) generators, where the first particle has index 1.
-     * In the array the first particle has index 0.
      */
-    int getFirstDaughterIndex()  const;
+    int getFirstDaughter()                        const { return m_firstDaughter; }
+
 
     /**
-     * Get index in MCParticle array of last daughter, -1 if no daughters.
-     * @return The index of the last daughter of the MonteCarlo particle. The index is -1 if the
+     * Get 1-based index of last daughter, 0 if no daughters.
+     * @return The index of the last daughter of the MonteCarlo particle. The index is 0 if the
      *         MonteCarlo particle doesn't have any daughters.
-     * Careful: to have indices corresponding to the array position, the mother, daugther etc. indices
-     * do not follow the standard from (Fortran) generators, where the first particle has index 1.
-     * In the array the first particle has index 0.
      */
-    int getLastDaughterIndex() const;
+    int getLastDaughter()                        const { return m_lastDaughter; }
 
     /**
      * Get vector of all daughter particles, empty vector if none.
@@ -220,17 +215,6 @@ namespace Belle2 {
      * @return A pointer to the mother particle. NULL if no mother was defined for the particle.
      */
     MCParticle* getMother() const; //Need namespace qualifier because ROOT CINT has troubles otherwise
-
-
-    /**
-     * Get index in MCParticle array of mother, -1 if there is no mother.
-     * @return The index of the mother of the MonteCarlo particle. The index is -1 if the
-     *         MonteCarlo particle doesn't have a mother.
-     * Careful: to have indices corresponding to the array position, the mother, daugther etc. indices
-     * do not follow the standard from (Fortran) generators, where the first particle has index 1.
-     * In the array the first particle has index 0.
-     */
-    int getMotherIndex() const;
 
 
     /**
@@ -402,6 +386,7 @@ namespace Belle2 {
     int m_mother;               /**< 1-based index of the mother particle */
     int m_firstDaughter;       /**< 1-based index of first daughter particle in collection, 0 if no daughters */
     int m_lastDaughter;        /**< 1-based index of last daughter particle in collection, 0 if no daughters */
+    static const double c_epsilon = 10e-7;  /**< limit of precision for two doubles to be the same. */
 
     /** Class definition required for the creation of the ROOT dictionary. */
     ClassDef(MCParticle, 1);
@@ -417,7 +402,8 @@ namespace Belle2 {
       double p2 = m_momentum_x * m_momentum_x;
       p2 += m_momentum_y * m_momentum_y;
       p2 += m_momentum_z * m_momentum_z;
-      virtuality = (E2 != p2 + m2);
+
+      virtuality = (fabs(E2 - (p2 + m2)) > c_epsilon * E2);
     }
     return virtuality;
   }
@@ -429,27 +415,6 @@ namespace Belle2 {
     if (m_mother == 0) return NULL;
     return static_cast<MCParticle*>(m_plist->At(m_mother - 1));
   }
-
-
-  inline int MCParticle::getFirstDaughterIndex() const
-  {
-    fixParticleList();
-    return m_firstDaughter - 1;
-  }
-
-  inline int MCParticle::getLastDaughterIndex() const
-  {
-    fixParticleList();
-    return m_firstDaughter - 1;
-  }
-
-  inline int MCParticle::getMotherIndex() const
-  {
-    fixParticleList();
-    return m_mother - 1;
-  }
-
-
 
 } // end namespace Belle2
 

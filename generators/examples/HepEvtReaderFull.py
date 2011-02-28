@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 
 ########################################################
-# This steering file which shows all usage options for the
-# hepevt file reader moduile in the generators package.
+# This is a steering file which shows all usage options for the
+# hepevt file reader module in the generators package.
 # The generated particles are taken from an input file and
 # fed through the Geant4 simulation and the output
 # is stored in a root file.
@@ -12,6 +12,9 @@
 # below.
 # Uncomment/comment different lines to get the wanted
 # settings
+#
+# NOTE: if you want to use the event numbers from the
+# HepEvt file, have a look at HepEvtReaderMaster.py.
 #
 # Example steering file - 2011 Belle II Collaboration
 ########################################################
@@ -40,6 +43,8 @@ hepevtreader.param('inputFileName', 'BhWide_10events.txt')
 # uncomment the following line
 # hepevtreader.param("skipEvents", 1000)
 # default is skipEvents = 0
+# (This is useful, if you want to process the data from
+# the same HepEvtFile in more than 1 job)
 
 # if the events in the HepEvt file are weighted and
 # you want to use the event weights use this line
@@ -82,19 +87,25 @@ hepevtreader.param('wrongSignPz', True)
 
 # for a simple simulation job with output to a root file
 # these additional modules are needed
+evtmetagen = register_module('EvtMetaGen')
 paramloader = register_module('ParamLoaderXML')
 geobuilder = register_module('GeoBuilder')
 g4sim = register_module('FullSim')
 simpleoutput = register_module('SimpleOutput')
 
 # Setting the option for all non-hepevt reader modules:
+evtmetagen.param('EvtNumList', [100])  # we want to process 100 events
+evtmetagen.param('RunList', [1])  # from run number 1
+evtmetagen.param('ExpList', [1])  # and experiment number 1
+
 paramloader.param('InputFileXML', os.path.join(basf2datadir,
                   'simulation/Belle2.xml'))
 
-simpleoutput.param('outputFileName', 'HepEvTReaderOutput.root')
+simpleoutput.param('outputFileName', 'HepEvtReaderOutput.root')
 
 # creating the path for the processing
 main = create_path()
+main.add_module(evtmetagen)
 
 # Add hepevtreader module to path:
 main.add_module(hepevtreader)
@@ -108,7 +119,7 @@ main.add_module(geobuilder)
 main.add_module(g4sim)
 main.add_module(simpleoutput)
 
-# Process 100 events
-process(main, 100)
+# Process the events
+process(main)
 # if there are less events in the input file
 # the processing will be stopped at EOF.

@@ -100,6 +100,10 @@ int TouschekReaderTURTLE::getParticles(int number, MCParticleGraph &graph) throw
     particleMomTouschek[2] = -fields[6];
     m_transMatrix->LocalToMasterVect(particleMomTouschek, particleMomGeant4);
 
+    double totalMom2 = particlePosGeant4[0] * particlePosGeant4[0];
+    totalMom2 += particlePosGeant4[1] * particlePosGeant4[1];
+    totalMom2 += particlePosGeant4[2] * particlePosGeant4[2];
+
     //Add particles to MCParticle collection
     MCParticleGraph::GraphParticle &particle = graph.addParticle();
     particle.setStatus(MCParticle::c_PrimaryParticle);
@@ -107,6 +111,7 @@ int TouschekReaderTURTLE::getParticles(int number, MCParticleGraph &graph) throw
     particle.setMassFromPDG();
     particle.setMomentum(TVector3(particleMomGeant4));
     particle.setProductionVertex(TVector3(particlePosGeant4));
+    particle.setEnergy(totalMom2 + m_pdg*m_pdg);
     particle.setProductionTime(0.0);
     particle.setValidVertex(true);
 

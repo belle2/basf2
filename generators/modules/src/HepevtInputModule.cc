@@ -85,8 +85,6 @@ void HepevtInputModule::initialize()
 
 void HepevtInputModule::event()
 {
-  B2INFO("HEPEVTREADER processing next event from file.");
-
   try {
     mpg.clear();
     double weight = 1;

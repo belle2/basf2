@@ -12,6 +12,7 @@
 #define GEOREADER_H_
 
 #include <geometry/dataobjects/MaterialPropertyList.h>
+#include <geometry/dataobjects/OpticalUserInfo.h>
 
 #include <TGeoMaterial.h>
 #include <string>
@@ -93,6 +94,33 @@ namespace Belle2 {
      */
     static TGeoMaterial* readMaterial(GearDir& gearDir);
 
+    /**
+     * Reads an optical surface definition section and returns a pointer to the Optical surface user info.
+     *
+     * The following optical surface section is supported:
+     *
+     * <Mirror>
+         <Properties>
+     *     <Property name="" unit="eV">
+     *       <value energy=""></value>
+     *       <value energy=""></value>
+     *       <value energy=""></value>
+     *     </Property>
+     *     <Property name="" unit="eV">
+     *       <value energy=""></value>
+     *       <value energy=""></value>
+     *     </Property>
+     *   </Properties>
+     *   <Type>dielectric_metal</Type>
+     *   <Finish>ground</Finish>
+     *   <Model>glisur</Model>
+     * </Mirror>
+     *
+     * The property table is optional.
+     *
+     */
+    static OpticalUserInfo* readOpticalSurface(GearDir& gearDir);
+
 
   protected:
 
@@ -126,12 +154,62 @@ namespace Belle2 {
     /**
      * Reads a material property section.
      *
+     * The following section is supported:
+     *
+     * <Properties>
+     *   <Property name="" unit="eV">
+     *     <value energy=""></value>
+     *     <value energy=""></value>
+     *     <value energy=""></value>
+     *   </Property>
+     *   <Property name="" unit="eV">
+     *     <value energy=""></value>
+     *     <value energy=""></value>
+     *   </Property>
+     * </Properties>
+     *
+     * The number of properties as well as the number of values is not limited.
+     *
      * @param propertyContent The GearDir pointing to the material property section.
      * @return Pointer to the created MaterialPropertyList object. Ownership is given to the method receiving the pointer. Returns NULL if the MaterialProperties could not be created.
      */
     static MaterialPropertyList* readMaterialProperties(GearDir& propertyContent);
 
+    /**
+     * Reads a material property section and stores it into the list given as reference.
+     *
+     * The following section is supported:
+     *
+     * <Properties>
+     *   <Property name="" unit="eV">
+     *     <value energy=""></value>
+     *     <value energy=""></value>
+     *     <value energy=""></value>
+     *   </Property>
+     *   <Property name="" unit="eV">
+     *     <value energy=""></value>
+     *     <value energy=""></value>
+     *   </Property>
+     * </Properties>
+     *
+     * The number of properties as well as the number of values is not limited.
+     *
+     * @param propertyContent The GearDir pointing to the material property section.
+     * @return Pointer to the created MaterialPropertyList object. Ownership is given to the method receiving the pointer. Returns NULL if the MaterialProperties could not be created.
+     */
+    static void readMaterialProperties(GearDir& propertyContent, MaterialPropertyList& materialPropertyList);
+
+
   private:
+
+    /**
+     * Reads a material property section and stores it into the list given as reference.
+     *
+     * @param propertyContent The GearDir pointing to the material properties.
+     * @param materialPropertyList Reference to the material property object which should be filled with the information from the section.
+     * @return True if the material properties could be read.
+     */
+    static bool readMaterialPropertiesContent(GearDir& propertyContent, MaterialPropertyList& materialPropertyList);
 
   };
 

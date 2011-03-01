@@ -88,7 +88,11 @@ void OpticalUserInfo::updateG4Volume(G4LogicalVolume* g4Volume)
     g4PropTable->AddProperty(currProperty->getName().c_str(), energies, values, currProperty->getNumberValues());
   }
   delete propIter;
-  optSurf->SetMaterialPropertiesTable(g4PropTable);
+
+  //Only add the property table if it is not empty
+  if (m_materialPropertyList.GetSize() > 0) {
+    optSurf->SetMaterialPropertiesTable(g4PropTable);
+  }
 
   //Not a memory leak. Geant4 registers this object automatically to an internal table.
   new G4LogicalSkinSurface(m_name, g4Volume, optSurf);

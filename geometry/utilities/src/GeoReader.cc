@@ -45,6 +45,44 @@ TGeoMaterial* GeoReader::readMaterial(GearDir& gearDir)
 }
 
 
+OpticalUserInfo* GeoReader::readOpticalSurface(GearDir& gearDir)
+{
+  OpticalUserInfo* optUserInfo = new OpticalUserInfo();;
+
+  try {
+    //Read node name
+    string nodeName = gearDir.getNodeName();
+    gearDir.convertNodeToPath();
+
+    //Read properties
+    if (gearDir.isPathValid("Properties")) {
+      GearDir properties(gearDir, "Properties");
+      properties.convertNodeToPath();
+      readMaterialProperties(properties, optUserInfo->getMaterialPropertyList());
+    }
+
+    //Read surface type, finish and model
+    string surfType   = gearDir.getParamString("Type");
+    string surfFinish = gearDir.getParamString("Finish");
+    string surfModel  = gearDir.getParamString("Model");
+
+    optUserInfo->setName(nodeName);
+    optUserInfo->setSurfaceType(surfType);
+    optUserInfo->setSurfaceFinish(surfFinish);
+    optUserInfo->setSurfaceModel(surfModel);
+
+    gearDir.convertPathToNode();
+
+  } catch (std::runtime_error& exc) {
+    B2ERROR(exc.what())
+    delete optUserInfo;
+    optUserInfo = NULL;
+  }
+
+  return optUserInfo;
+}
+
+
 //=========================================================
 //                  Protected methods
 //=========================================================
@@ -230,8 +268,30 @@ TGeoMixture* GeoReader::readMixtureSection(GearDir& mixtureContent, double& weig
 
 MaterialPropertyList* GeoReader::readMaterialProperties(GearDir& propertyContent)
 {
-  MaterialPropertyList* propListResult = NULL;
+  MaterialPropertyList* propListResult = new MaterialPropertyList();
+  bool result = readMaterialPropertiesContent(propertyContent, *propListResult);
 
+  if (!result) {
+    delete propListResult;
+    propListResult = NULL;
+  }
+
+  return propListResult;
+}
+
+
+void GeoReader::readMaterialProperties(GearDir& propertyContent, MaterialPropertyList& materialPropertyList)
+{
+  readMaterialPropertiesContent(propertyContent, materialPropertyList);
+}
+
+
+//=================================================================
+//                      Private methods
+//=================================================================
+
+bool GeoReader::readMaterialPropertiesContent(GearDir& propertyContent, MaterialPropertyList& materialPropertyList)
+{
   //Get the number of properties
   int nProp = 0;
   GearDir properties(propertyContent);
@@ -240,64 +300,62 @@ MaterialPropertyList* GeoReader::readMaterialProperties(GearDir& propertyContent
     nProp = properties.getNumberNodes();
   }
 
-  //If there is at least one property defined, create the property list
-  if (nProp > 0) {
-    propListResult = new MaterialPropertyList();
+  if (nProp <= 0) {
+    B2ERROR("The material property list '" << propertyContent.getDirPath() << "' doesn't have any properties defined. The creation of the material properties was skipped !")
+    return false;
+  }
 
-    //Loop over all properties
-    for (int iProp = 1; iProp <= nProp; ++iProp) {
-      GearDir propContentIdx(properties, iProp);
+  //Loop over all properties
+  for (int iProp = 1; iProp <= nProp; ++iProp) {
+    GearDir propContentIdx(properties, iProp);
 
-      //Read the property attributes
-      string propName = GearReader::readNameAttribute(propContentIdx);
-      string unitName = GearReader::readUnitAttribute(propContentIdx);
+    //Read the property attributes
+    string propName = GearReader::readNameAttribute(propContentIdx);
+    string unitName = GearReader::readUnitAttribute(propContentIdx);
 
-      //Check if a name was specified
-      if (propName.empty()) {
-        B2ERROR("The property '" << propContentIdx.getDirPath() << "' has no name. The property was skipped !")
-        continue;
-      }
+    //Check if a name was specified
+    if (propName.empty()) {
+      B2ERROR("The property '" << propContentIdx.getDirPath() << "' has no name. The property was skipped !")
+      continue;
+    }
 
-      //Get the number of the values
-      int nValue = 0;
-      GearDir values(propContentIdx);
-      if (values.isPathValid("value")) {
-        values.append("value");
-        nValue = values.getNumberNodes();
-      }
+    //Get the number of the values
+    int nValue = 0;
+    GearDir values(propContentIdx);
+    if (values.isPathValid("value")) {
+      values.append("value");
+      nValue = values.getNumberNodes();
+    }
 
-      //If the property has at least one value, create it
-      if (nValue > 0) {
-        MaterialProperty& currProperty = propListResult->addProperty(propName);
+    //If the property has at least one value, create it
+    if (nValue > 0) {
+      MaterialProperty& currProperty = materialPropertyList.addProperty(propName);
 
-        //Loop over all values
-        for (int iValue = 1; iValue <= nValue; ++iValue) {
-          GearDir valueContentIdx(values, iValue);
+      //Loop over all values
+      for (int iValue = 1; iValue <= nValue; ++iValue) {
+        GearDir valueContentIdx(values, iValue);
 
-          //Read energy attribute, If it is not available, skip the value
-          if (valueContentIdx.isParamAvailable("attribute::energy")) {
-            double currEnergy = valueContentIdx.getParamNumValue("attribute::energy");
+        //Read energy attribute, If it is not available, skip the value
+        if (valueContentIdx.isParamAvailable("attribute::energy")) {
+          double currEnergy = valueContentIdx.getParamNumValue("attribute::energy");
 
-            //Use the property unit information to convert the energy value to the correct unit for Geant4
-            //The conversion method returns the basf2 standard unit [GeV]. Geant4 takes MeV for material properties.
-            currEnergy = Unit::convertValue(currEnergy, Unit::c_UnitEnergy, unitName) / Unit::MeV;
+          //Use the property unit information to convert the energy value to the correct unit for Geant4
+          //The conversion method returns the basf2 standard unit [GeV]. Geant4 takes MeV for material properties.
+          currEnergy = Unit::convertValue(currEnergy, Unit::c_UnitEnergy, unitName) / Unit::MeV;
 
-            valueContentIdx.convertPathToNode();
-            double currValue = valueContentIdx.getParamNumValue();
+          valueContentIdx.convertPathToNode();
+          double currValue = valueContentIdx.getParamNumValue();
 
-            //Add a new value to the property
-            if (!currProperty.addValue(currEnergy, currValue)) {
-              B2ERROR("The energy " << currEnergy << " for the value " << currValue << " was already set. The value was skipped !")
-            }
-          } else {
-            B2ERROR("The value '" << valueContentIdx.getDirPath() << "' has no energy defined. The value was skipped !")
-            continue;
+          //Add a new value to the property
+          if (!currProperty.addValue(currEnergy, currValue)) {
+            B2ERROR("The energy " << currEnergy << " for the value " << currValue << " was already set. The value was skipped !")
           }
+        } else {
+          B2ERROR("The value '" << valueContentIdx.getDirPath() << "' has no energy defined. The value was skipped !")
+          continue;
         }
       }
     }
-  } else {
-    B2ERROR("The material property list '" << propertyContent.getDirPath() << "' doesn't have any properties defined. The creation of the material properties was skipped !")
   }
-  return propListResult;
+  return true;
 }

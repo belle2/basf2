@@ -19,6 +19,7 @@
 #include <cmath>
 #include <vector>
 
+#include <framework/logging/Logger.h>
 #define DEFAULT_MCPARTICLES "MCParticles"
 
 namespace Belle2 {

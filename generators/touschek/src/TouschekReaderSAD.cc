@@ -105,6 +105,7 @@ int TouschekReaderSAD::getParticles(int number, double sRange, double beamEnergy
     particle.setMomentum(TVector3(particleMomGeant4));
     particle.setProductionVertex(TVector3(particlePosGeant4));
     particle.setProductionTime(0.0);
+    particle.setEnergy(beamEnergy);
     particle.setValidVertex(true);
 
     iEntry++;

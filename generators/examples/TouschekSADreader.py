@@ -38,8 +38,9 @@ touschekinput.param('MaxParticles', 200)
 
 # This parameter indicates how far around the IR
 # the touschekparticles should maximally originate
-touschekinput.param('RangeLER', 2.5)
-# default is RangeLER = 3.0
+# Remember that this is in cm while a good distance is about 2-3m!
+touschekinput.param('RangeLER', 250)
+# default is RangeLER = 300
 
 # for a simple simulation job with output to a root file
 # these additional modules are needed

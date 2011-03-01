@@ -151,16 +151,6 @@ throw(GearboxIOAbs::GearboxIONotConnectedError, GearboxIOAbs::GearboxPathNotVali
 }
 
 
-TGeoMaterial* GearDir::readMaterial(const string& path)
-throw(GearboxIOAbs::GearboxIONotConnectedError, GearboxIOAbs::GearboxPathNotValidError,
-      GearboxIOAbs::GearboxParamNotExistsError, GearboxIOAbs::GearboxPathEmptyResultError,
-      GearboxIOAbs::GearboxPathResultNotValidError)
-{
-  GearDir materialDir(*this, path);
-  return GearReader::readMaterial(materialDir);
-}
-
-
 void GearDir::setDirPath(const string& path)
 {
   m_dirPath = path;

@@ -13,6 +13,7 @@
 
 #include <geometry/dataobjects/MaterialProperty.h>
 #include <geometry/dataobjects/MaterialPropertyList.h>
+#include <geometry/dataobjects/VolumeUserInfoBase.h>
 
 #include <simulation/kernel/DetectorConstruction.h>
 
@@ -70,6 +71,7 @@ void DetectorConstruction::Initialize(TG4RootDetectorConstruction *dc)
     }
   }
 
+
   //--------------------------------------------------------------------
   // Get the list of created ROOT materials and read the Cerenkov
   // properties. If they exist, create a G4MaterialPropertiesTable,
@@ -109,4 +111,23 @@ void DetectorConstruction::Initialize(TG4RootDetectorConstruction *dc)
     }
   }
   delete matIter;
+
+
+  //----------------------------------------------------------------------
+  // Get the list of the created ROOT volumes and loop over them. Check if
+  // a user information was set and call the method updateG4Volume().
+  //----------------------------------------------------------------------
+  TIterator* volIter = gGeoManager->GetListOfVolumes()->MakeIterator();
+  TGeoVolume* currVolume;
+  while ((currVolume = dynamic_cast<TGeoVolume*>(volIter->Next()))) {
+
+    //Check if the volume has user information attached
+    if (currVolume->GetField() != NULL) {
+      VolumeUserInfoBase* volUserInfo = dynamic_cast<VolumeUserInfoBase*>(currVolume->GetField());
+      if (volUserInfo != NULL) {
+        volUserInfo->updateG4Volume(dc->GetG4Volume(currVolume));
+      }
+    }
+  }
+  delete volIter;
 }

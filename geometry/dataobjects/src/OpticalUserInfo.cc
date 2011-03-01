@@ -9,7 +9,13 @@
  **************************************************************************/
 
 #include <geometry/dataobjects/OpticalUserInfo.h>
+
 #include <framework/core/FrameworkExceptions.h>
+#include <framework/logging/Logger.h>
+
+#include <G4OpticalSurface.hh>
+#include <G4LogicalSkinSurface.hh>
+#include <G4MaterialPropertiesTable.hh>
 
 using namespace std;
 using namespace Belle2;
@@ -23,15 +29,6 @@ namespace Belle2 {
   BELLE2_DEFINE_EXCEPTION(SurfaceFinishNotFoundError, "The surface finish '%1%' was not defined in the optical user information class !");
   /** Exception is thrown if the requested surface model could not be found. */
   BELLE2_DEFINE_EXCEPTION(SurfaceModelNotFoundError, "The surface model '%1%' was not defined in the optical user information class !");
-}
-
-
-OpticalUserInfo& OpticalUserInfo::operator=(const OpticalUserInfo & other)
-{
-  this->m_surfaceType = other.m_surfaceType;
-  this->m_surfaceFinish = other.m_surfaceFinish;
-  this->m_surfaceModel = other.m_surfaceModel;
-  return *this;
 }
 
 
@@ -59,6 +56,42 @@ void OpticalUserInfo::setSurfaceModel(const string& surfaceModel)
   if (optSurfIter == m_surfaceModelNameMap.end()) throw(SurfaceModelNotFoundError() << surfaceModel);
 
   m_surfaceModel = optSurfIter->second;
+}
+
+
+void OpticalUserInfo::updateG4Volume(G4LogicalVolume* g4Volume)
+{
+  //!!! Call the mother class method !!!!
+  VolumeUserInfoBase::updateG4Volume(g4Volume);
+
+  if (m_name.empty()) {
+    B2ERROR("An optical surface for the volume '" << g4Volume->GetName() << "' could not be created. The name of the optical surface is empty !")
+    return;
+  }
+
+  //Create the optical surface
+  G4OpticalSurface* optSurf = new G4OpticalSurface(m_name);
+  optSurf->SetType(m_surfaceType);
+  optSurf->SetFinish(m_surfaceFinish);
+  optSurf->SetModel(m_surfaceModel);
+
+  //Create the material properties table and add it to the optical surface
+  G4MaterialPropertiesTable* g4PropTable = new G4MaterialPropertiesTable();
+  MaterialProperty* currProperty;
+  TIterator* propIter = m_materialPropertyList.MakeIterator();
+  while ((currProperty = dynamic_cast<MaterialProperty*>(propIter->Next()))) {
+    double energies[currProperty->getNumberValues()];
+    double values[currProperty->getNumberValues()];
+
+    //Fill the arrays of energies and values and use them to create a new property entry in the Geant4 table
+    currProperty->fillArrays(energies, values);
+    g4PropTable->AddProperty(currProperty->getName().c_str(), energies, values, currProperty->getNumberValues());
+  }
+  delete propIter;
+  optSurf->SetMaterialPropertiesTable(g4PropTable);
+
+  //Not a memory leak. Geant4 registers this object automatically to an internal table.
+  new G4LogicalSkinSurface(m_name, g4Volume, optSurf);
 }
 
 

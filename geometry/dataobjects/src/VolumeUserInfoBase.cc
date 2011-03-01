@@ -10,12 +10,18 @@
 
 #include <geometry/dataobjects/VolumeUserInfoBase.h>
 
+#include <globals.hh>
+#include <G4UserLimits.hh>
+
 using namespace std;
 using namespace Belle2;
 
 ClassImp(VolumeUserInfoBase)
 
-VolumeUserInfoBase& VolumeUserInfoBase::operator=(const VolumeUserInfoBase & other)
+
+void VolumeUserInfoBase::updateG4Volume(G4LogicalVolume* g4Volume)
 {
-  return *this;
+  if (m_stepSize > 0.0) {
+    g4Volume->SetUserLimits(new G4UserLimits(m_stepSize * cm)); //convert to Geant4 units
+  }
 }

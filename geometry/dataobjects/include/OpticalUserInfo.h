@@ -40,19 +40,17 @@ namespace Belle2 {
 
     /** Default constructor for ROOT. */
     OpticalUserInfo():
+        m_name(""),
         m_surfaceType(dielectric_metal), m_surfaceFinish(ground),
         m_surfaceModel(glisur) { fillEnumMaps(); }
 
-    /** Copy constructor. */
-    OpticalUserInfo(const OpticalUserInfo& opUInfo):
-        m_surfaceType(opUInfo.m_surfaceType), m_surfaceFinish(opUInfo.m_surfaceFinish),
-        m_surfaceModel(opUInfo.m_surfaceModel) { fillEnumMaps(); }
-
     /** Destructor */
-    ~OpticalUserInfo() { }
+    ~OpticalUserInfo() {}
 
-    /** Assignment operator.*/
-    OpticalUserInfo& operator=(const OpticalUserInfo& other);
+    /** Sets the name of the optical surface.
+     * @param name The name of the optical surface.
+     */
+    void setName(const std::string& name) { m_name = name; }
 
     /** Sets the surface type of the optical surface.
      * @param surfaceType The type of the optical surface.
@@ -84,6 +82,11 @@ namespace Belle2 {
      */
     void setSurfaceModel(const std::string& surfaceModel);
 
+    /** Returns the name of the optical surface.
+     * @return The name of the optical surface.
+     */
+    const std::string& getName() const { return m_name; }
+
     /** Returns the optical surface type.
      * @return The type of the optical surface.
      */
@@ -99,16 +102,33 @@ namespace Belle2 {
      */
     const G4OpticalSurfaceModel getSurfaceModel() const { return m_surfaceModel; }
 
+    /** Returns a reference to the material property list.
+     * @return Reference to the material property list.
+     */
+    MaterialPropertyList& getMaterialPropertyList() { return m_materialPropertyList; }
+
+    /** This method is called by the post TGeo to Geant4 conversion step.
+     * It allows the developer to set the Geant4 specific settings of the user information.
+     * Please note: Make sure to call the updateG4Volume() method of the base class of your inherited class !!!
+     * @param g4Volume Pointer to the Geant4 volume.
+     */
+    virtual void updateG4Volume(G4LogicalVolume* g4Volume);
+
 
   protected:
+
+    std::string m_name; /**< The name of the optical surface. */
 
     G4SurfaceType m_surfaceType;            /**< The type of the optical surface. */
     G4OpticalSurfaceFinish m_surfaceFinish; /**< The surface finish of the optical surface. */
     G4OpticalSurfaceModel m_surfaceModel;   /**< The model of the optical surface. */
 
+    MaterialPropertyList m_materialPropertyList; /**< The material property list of the optical surface. */
+
     SurfaceTypeNameMap   m_surfaceTypeNameMap;   //! Maps the name of a surface type to its enumeration value.
     SurfaceFinishNameMap m_surfaceFinishNameMap; //! Maps the name of a surface finish to its enumeration value.
     SurfaceModelNameMap  m_surfaceModelNameMap;  //! Maps the name of a surface model to its enumeration value.
+
 
   private:
 

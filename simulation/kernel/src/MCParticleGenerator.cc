@@ -87,8 +87,8 @@ void MCParticleGenerator::addParticle(MCParticle &mcParticle, G4Event* event, G4
   graphParticle.setProductionVertex(mcParticle.getProductionVertex());
   graphParticle.setMomentum(mcParticle.getMomentum());
   graphParticle.setDecayVertex(mcParticle.getDecayVertex());
-  graphParticle.setFirstDaughter(mcParticle.getFirstDaughterIndex() + 1);
-  graphParticle.setLastDaughter(mcParticle.getLastDaughterIndex() + 1);
+  graphParticle.setFirstDaughter(mcParticle.getFirstDaughter());
+  graphParticle.setLastDaughter(mcParticle.getLastDaughter());
   if (motherIndex > 0) graphParticle.comesFrom(m_mcParticleGraph[motherIndex-1]); //Add decay
 
   //Create a new Geant4 Primary particle and store the link to the GraphMCParticle object as user info.
@@ -102,7 +102,7 @@ void MCParticleGenerator::addParticle(MCParticle &mcParticle, G4Event* event, G4
     newPart->SetUserInformation(new ParticleInfo(graphParticle));
 
     //Set propagation time only if useTime is true, the MCparticle has a valid vertex and has children.
-    useTime &= mcParticle.hasValidVertex() && mcParticle.getFirstDaughterIndex() > -1;
+    useTime &= mcParticle.hasValidVertex() && mcParticle.getFirstDaughter() > 0;
     if (useTime) {
       //ProperTime is in particle eigentime, so convert lab lifetime to eigentime
       double propertime = mcParticle.getLifetime() / mcParticle.get4Vector().Gamma();

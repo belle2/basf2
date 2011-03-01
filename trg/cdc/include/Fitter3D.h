@@ -1,0 +1,72 @@
+//-----------------------------------------------------------------------------
+// $Id$
+//-----------------------------------------------------------------------------
+// Filename : Fitter3D.h
+// Section  : TRG CDC
+// Owner    :
+// Email    :
+//-----------------------------------------------------------------------------
+// Description : A class to fit tracks in 3D
+//-----------------------------------------------------------------------------
+// $Log$
+//-----------------------------------------------------------------------------
+
+#ifndef TRGCDCFitter3D_FLAG_
+#define TRGCDCFitter3D_FLAG_
+
+#include <string>
+#include <vector>
+
+#ifdef TRGCDC_SHORT_NAMES
+#define TCFitter3D TRGCDCFitter3D
+#endif
+
+namespace Belle2 {
+
+class TRGCDC;
+class TRGCDCTrack;
+
+/// A class to fit tracks in 3D
+class TRGCDCFitter3D {
+
+  public:
+
+    /// Contructor.
+    TRGCDCFitter3D(const std::string & name,
+                   const TRGCDC &);
+
+    /// Destructor
+    virtual ~TRGCDCFitter3D();
+
+  public:
+
+    /// returns name.
+    std::string name(void) const;
+
+    /// returns version.
+    std::string version(void) const;
+
+    /// do track fitting.
+    int doit(std::vector<TRGCDCTrack *> & trackListIn,
+             std::vector<TRGCDCTrack *> & trackListOut);
+
+  private:
+
+    /// Name.
+    const std::string _name;
+
+    /// CDCTRG.
+    const TRGCDC & _cdc;
+};
+
+//-----------------------------------------------------------------------------
+
+inline
+std::string
+TRGCDCFitter3D::name(void) const {
+    return _name;
+}
+
+} // namespace Belle2
+
+#endif

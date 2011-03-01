@@ -19,8 +19,6 @@
 #include "trg/trg/Utilities.h"
 #include "trg/cdc/TRGCDC.h"
 
-#define TRGCDCTrackBase_Max_Layers 9
-
 #ifdef TRGCDC_SHORT_NAMES
 #define TCTBase TRGCDCTrackBase
 #endif
@@ -91,7 +89,7 @@ class TRGCDCTrackBase {
     CLHEP::Hep3Vector _v;
 
     /// Track Segments.
-    std::vector<const TRGCDCTrackSegment *> _ts[TRGCDCTrackBase_Max_Layers];
+    std::vector<const TRGCDCTrackSegment *> * _ts;
 };
 
 //-----------------------------------------------------------------------------

@@ -18,6 +18,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <pangomm/init.h>
+#include "trg/cdc/TRGCDC.h"
 #include "trg/cdc/Wire.h"
 #include "trg/cdc/WireHit.h"
 #include "trg/cdc/TrackSegment.h"
@@ -348,8 +349,10 @@ TRGCDCDisplayDrawingAreaRphi::drawTrack(const TCTrack & t,
                              Gdk::CAP_NOT_LAST,
                              Gdk::JOIN_MITER);
 
+    const TRGCDC & cdc = * TRGCDC::getTRGCDC();
+
     //...Draw segments first...
-    for (unsigned i = 0; i < TRGCDCTrackBase_Max_Layers; i++) {
+    for (unsigned i = 0; i < cdc.nSuperLayers(); i++) {
         const vector<const TCTSegment *> & segments = t.trackSegments(i);
         for (unsigned j = 0; j < segments.size(); j++) {
             drawTrackSegment(* segments[j], lineWidth, c, s);

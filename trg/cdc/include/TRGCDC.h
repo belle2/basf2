@@ -42,6 +42,7 @@ class TRGCDCTrackSegment;
 class TRGCDCFrontEnd;
 class TRGCDCMerger;
 class TRGCDCHoughFinder;
+class TRGCDCFitter3D;
 
 /** A class to represent CDC.
 
@@ -342,6 +343,9 @@ class TRGCDC {
 
     /// Hough finder.
     TRGCDCHoughFinder * _hFinder;
+
+    /// 3D fitter.
+    TRGCDCFitter3D * _fitter3D;
 };
 
 //-----------------------------------------------------------------------------

@@ -33,6 +33,7 @@
 #include "trg/cdc/FrontEnd.h"
 #include "trg/cdc/Merger.h"
 #include "trg/cdc/HoughFinder.h"
+#include "trg/cdc/Fitter3D.h"
 #ifdef TRGCDC_DEBUG
 #ifdef BUILD_2010_12_13
 #else
@@ -101,7 +102,8 @@ TRGCDC::TRGCDC(const std::string & configFile) :
     _r2(0),
     _clock(TRGClock(2.7, 125.000, "CDCTrigge system clock")),
     _offset(5.3),
-    _hFinder(0) {
+    _hFinder(0),
+    _fitter3D(0) {
 
 #ifdef TRGCDC_DISPLAY
     int argc = 0;
@@ -328,6 +330,9 @@ TRGCDC::initialize(void) {
 //  _hFinder = new TCHFinder("HoughFinder", * this, 350, 100);
 //  _hFinder = new TCHFinder("HoughFinder", * this, 160, 96);
     _hFinder = new TCHFinder("HoughFinder", * this, 96, 96);
+
+    //...3D fitter...
+    _fitter3D = new TCFitter3D("Fitter3D", * this);
 
     //...For module simulation (Front-end)...
     configure();
@@ -1051,6 +1056,8 @@ TRGCDC::~TRGCDC() {
 
     if (_hFinder)
         delete _hFinder;
+    if (_fitter3D)
+        delete _fitter3D;
 
 #ifdef TRGCDC_DISPLAY
     if (D)
@@ -1103,13 +1110,16 @@ TRGCDC::simulate(void) {
 #endif
 
     //...2D tracker : Hough finder...
-    vector<TRGCDCTrack *> trackList;
+    vector<TCTrack *> trackList;
     _hFinder->perfect(true);
     _hFinder->doit(trackList);
 
-    //...3D tracker here...
+    //...3D tracker...
+    vector<TCTrack *> trackList3D;
+    _fitter3D->doit(trackList, trackList3D);
 
     //...End of simulation...
+
 
 #ifdef TRGCDC_DISPLAY
 //  cdc.dump("hits");

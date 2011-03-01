@@ -17,8 +17,6 @@
 #include <geometry/geodetector/CreatorBase.h>
 #include <geometry/dataobjects/VolumeUserInfoBase.h>
 
-#include <boost/unordered_map.hpp>
-
 #include <TGeoVolume.h>
 
 #include <list>
@@ -39,8 +37,6 @@ namespace Belle2 {
   class GeoDetector {
 
   public:
-
-    typedef boost::unordered_map<TGeoVolume*, VolumeUserInfoBase*> GeoVolumeUserInfoMap;
 
     //Define exceptions
     /** Exception is thrown if the specified TGeoVolume is NULL. */
@@ -74,38 +70,14 @@ namespace Belle2 {
      */
     const std::list<std::string>& getCalledCreators() const;
 
-    /**
-     * Returns a reference to the volume user information, which is attached to the specified TGeoVolume.
-     * If the specified TGeoVolume has no user information attached, a new one is created.
-     *
-     * @param geoVolume Pointer to the TGeoVolume whose user information should be returned.
-     * @return Reference to the volume user information.
-     */
-    template <class UserInfoClass>
-    UserInfoClass& getVolumeUserInfo(TGeoVolume* geoVolume) throw(GeoVolumeIsNULL, UserInfoDynamicCastError);
-
-    /**
-     * Returns true if the specified TGeoVolume has user information attached to it.
-     *
-     * @param geoVolume Pointer to the TGeoVolume which should be checked for the user info.
-     * @return Reference to the volume user information.
-     */
-    bool hasVolumeUserInfo(TGeoVolume* geoVolume) const;
-
 
   protected:
-
-    /**
-     * Clears the geo volume user info map and releases the memory of the user info objects.
-     */
-    void clearGeoVolumeUserInfo();
 
 
   private:
 
     std::list<std::string> m_supportedSections; /**< List of all supported sections in the basic parameter hierarchy. */
     std::list<std::string> m_calledCreators;    /**< List of all creators which were called during the building process of the detector. */
-    GeoVolumeUserInfoMap m_geoVolumeUserInfo;   /**< Map of additional user information attached to a TGeoVolume. */
 
     /** The constructor is hidden to avoid that someone creates an instance of this class. */
     GeoDetector();
@@ -130,29 +102,6 @@ namespace Belle2 {
     friend class SingletonDestroyer;
 
   };
-
-
-  //======================================================
-  //       Implementation of template based methods
-  //======================================================
-
-  template <class UserInfoClass>
-  UserInfoClass& GeoDetector::getVolumeUserInfo(TGeoVolume* geoVolume) throw(GeoVolumeIsNULL, UserInfoDynamicCastError)
-  {
-    if (geoVolume == NULL) throw GeoVolumeIsNULL();
-    UserInfoClass* userInfo = NULL;
-
-    //Check if there has already been created a user info for the TGeoVolume. If yes, return its user info.
-    boost::unordered_map<TGeoVolume*, VolumeUserInfoBase*>::iterator mapIter = m_geoVolumeUserInfo.find(geoVolume);
-    if (mapIter == m_geoVolumeUserInfo.end()) {
-      userInfo = new UserInfoClass();
-      m_geoVolumeUserInfo.insert(make_pair(geoVolume, userInfo));
-    } else {
-      userInfo = dynamic_cast<UserInfoClass*>(mapIter->second);
-      if (userInfo == NULL) throw(UserInfoDynamicCastError() << typeid(UserInfoClass).name());
-    }
-    return *userInfo;
-  }
 
 }
 

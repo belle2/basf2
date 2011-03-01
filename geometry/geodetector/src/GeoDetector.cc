@@ -118,21 +118,6 @@ const list<string>& GeoDetector::getCalledCreators() const
 }
 
 
-bool GeoDetector::hasVolumeUserInfo(TGeoVolume* geoVolume) const
-{
-  if (geoVolume == NULL) return false;
-  return (m_geoVolumeUserInfo.find(geoVolume) != m_geoVolumeUserInfo.end());
-}
-
-
-void GeoDetector::clearGeoVolumeUserInfo()
-{
-  BOOST_FOREACH(GeoVolumeUserInfoMap::value_type item, m_geoVolumeUserInfo) {
-    delete item.second;
-  }
-}
-
-
 //====================================================================
 //                          Private methods
 //====================================================================
@@ -148,5 +133,5 @@ GeoDetector::GeoDetector()
 
 GeoDetector::~GeoDetector()
 {
-  clearGeoVolumeUserInfo();
+
 }

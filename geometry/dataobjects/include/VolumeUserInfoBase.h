@@ -20,13 +20,12 @@ namespace Belle2 {
     * VolumeUserInfo base class.
     *
     * The base class for all classes, which are attached to TGeoVolumes and carry user information.
-    * This class provides support for optical surfaces.
     */
   class VolumeUserInfoBase : public TObject {
 
   public:
 
-    /** Empty constructor, required for ROOT IO.*/
+    /** Default constructor for ROOT. */
     VolumeUserInfoBase() {
       /*! Does nothing */
     }

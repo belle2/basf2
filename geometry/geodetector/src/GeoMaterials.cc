@@ -9,9 +9,9 @@
  **************************************************************************/
 
 #include <geometry/geodetector/GeoMaterials.h>
+#include <geometry/utilities/GeoReader.h>
 
 #include <framework/gearbox/GearDir.h>
-#include <framework/gearbox/GearReader.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 
@@ -69,7 +69,7 @@ void GeoMaterials::createMedia(GearDir& content, const string nodeName)
   for (int iMat = 1; iMat <= nMat; ++iMat) {
     GearDir matContentIdx(materials, iMat);
     matContentIdx.convertPathToNode();
-    TGeoMaterial* material = GearReader::readMaterial(matContentIdx);
+    TGeoMaterial* material = GeoReader::readMaterial(matContentIdx);
 
     //This might look like a memory leak, but ROOT takes care of deleting the object.
     new TGeoMedium(material->GetName(), m_matIndex++, material);

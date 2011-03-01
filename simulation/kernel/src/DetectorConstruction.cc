@@ -11,8 +11,8 @@
 #include <geometry/geodetector/GeoDetector.h>
 #include <geometry/geodetector/CreatorManager.h>
 
-#include <framework/gearbox/MaterialProperty.h>
-#include <framework/gearbox/MaterialPropertyList.h>
+#include <geometry/dataobjects/MaterialProperty.h>
+#include <geometry/dataobjects/MaterialPropertyList.h>
 
 #include <simulation/kernel/DetectorConstruction.h>
 

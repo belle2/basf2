@@ -13,6 +13,8 @@
 
 #include <geometry/dataobjects/VolumeUserInfoBase.h>
 
+#include <TGeoNode.h>
+
 #include <globals.hh>
 #include <G4OpticalSurface.hh>
 #include <G4SurfaceProperty.hh>
@@ -42,7 +44,7 @@ namespace Belle2 {
     OpticalUserInfo():
         m_name(""),
         m_surfaceType(dielectric_metal), m_surfaceFinish(ground),
-        m_surfaceModel(glisur) { fillEnumMaps(); }
+        m_surfaceModel(glisur), m_secondVolumeNode(NULL) { fillEnumMaps(); }
 
     /** Destructor */
     ~OpticalUserInfo() {}
@@ -82,6 +84,11 @@ namespace Belle2 {
      */
     void setSurfaceModel(const std::string& surfaceModel);
 
+    /** Sets the second volume which is used to create a G4LogicalBorderSurface.
+     * @param secondVolumeNode The second TGeoVolume node.
+     */
+    void setSecondVolumeNode(TGeoNode* secondVolumeNode) { m_secondVolumeNode = secondVolumeNode; }
+
     /** Returns the name of the optical surface.
      * @return The name of the optical surface.
      */
@@ -102,6 +109,11 @@ namespace Belle2 {
      */
     const G4OpticalSurfaceModel getSurfaceModel() const { return m_surfaceModel; }
 
+    /** Returns the second volume ndoe which is used to create a G4LogicalBorderSurface.
+     * @return The second TGeoVolume node.
+     */
+    TGeoNode* getSecondVolume() { return m_secondVolumeNode; }
+
     /** Returns a reference to the material property list.
      * @return Reference to the material property list.
      */
@@ -110,9 +122,11 @@ namespace Belle2 {
     /** This method is called by the post TGeo to Geant4 conversion step.
      * It allows the developer to set the Geant4 specific settings of the user information.
      * Please note: Make sure to call the updateG4Volume() method of the base class of your inherited class !!!
-     * @param g4Volume Pointer to the Geant4 volume.
+     * @param g4Volume Pointer to the physical Geant4 volume.
+     * @param detConstruct The pointer of TG4RootDetectorConstruction in g4root which provides methods to access GEANT4 created objects
+     *                     which correspond to TGeo objects.
      */
-    virtual void updateG4Volume(G4LogicalVolume* g4Volume);
+    virtual void updateG4Volume(G4VPhysicalVolume* g4Volume, TG4RootDetectorConstruction *detConstruct);
 
 
   protected:
@@ -122,6 +136,8 @@ namespace Belle2 {
     G4SurfaceType m_surfaceType;            /**< The type of the optical surface. */
     G4OpticalSurfaceFinish m_surfaceFinish; /**< The surface finish of the optical surface. */
     G4OpticalSurfaceModel m_surfaceModel;   /**< The model of the optical surface. */
+
+    TGeoNode* m_secondVolumeNode; /**< The second volume node which is used to create a G4LogicalBorderSurface if it is set.*/
 
     MaterialPropertyList m_materialPropertyList; /**< The material property list of the optical surface. */
 

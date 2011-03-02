@@ -13,8 +13,11 @@
 
 #include <geometry/dataobjects/MaterialPropertyList.h>
 
-#include <G4LogicalVolume.hh>
+#include <TG4RootDetectorConstruction.h>
 #include <TObject.h>
+
+#include <G4LogicalVolume.hh>
+
 
 namespace Belle2 {
 
@@ -48,9 +51,11 @@ namespace Belle2 {
     /** This method is called by the post TGeo to Geant4 conversion step.
      * It allows the developer to set the Geant4 specific settings of the user information.
      * Please note: Make sure to call the updateG4Volume() method of the base class of your inherited class !!!
-     * @param g4Volume Pointer to the Geant4 volume.
+     * @param g4Volume Pointer to the physical Geant4 volume.
+     * @param detConstruct The pointer of TG4RootDetectorConstruction in g4root which provides methods to access GEANT4 created objects
+     *                     which correspond to TGeo objects.
      */
-    virtual void updateG4Volume(G4LogicalVolume* g4Volume);
+    virtual void updateG4Volume(G4VPhysicalVolume* g4Volume, TG4RootDetectorConstruction *detConstruct);
 
 
   protected:

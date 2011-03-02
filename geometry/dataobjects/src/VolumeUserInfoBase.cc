@@ -19,9 +19,9 @@ using namespace Belle2;
 ClassImp(VolumeUserInfoBase)
 
 
-void VolumeUserInfoBase::updateG4Volume(G4LogicalVolume* g4Volume)
+void VolumeUserInfoBase::updateG4Volume(G4VPhysicalVolume* g4Volume, TG4RootDetectorConstruction *detConstruct)
 {
   if (m_stepSize > 0.0) {
-    g4Volume->SetUserLimits(new G4UserLimits(m_stepSize * cm)); //convert to Geant4 units
+    g4Volume->GetLogicalVolume()->SetUserLimits(new G4UserLimits(m_stepSize * cm)); //convert to Geant4 units
   }
 }

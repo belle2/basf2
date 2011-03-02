@@ -15,6 +15,7 @@
 
 #include <G4OpticalSurface.hh>
 #include <G4LogicalSkinSurface.hh>
+#include <G4LogicalBorderSurface.hh>
 #include <G4MaterialPropertiesTable.hh>
 
 using namespace std;
@@ -59,10 +60,10 @@ void OpticalUserInfo::setSurfaceModel(const string& surfaceModel)
 }
 
 
-void OpticalUserInfo::updateG4Volume(G4LogicalVolume* g4Volume)
+void OpticalUserInfo::updateG4Volume(G4VPhysicalVolume* g4Volume, TG4RootDetectorConstruction *detConstruct)
 {
   //!!! Call the mother class method !!!!
-  VolumeUserInfoBase::updateG4Volume(g4Volume);
+  VolumeUserInfoBase::updateG4Volume(g4Volume, detConstruct);
 
   if (m_name.empty()) {
     B2ERROR("An optical surface for the volume '" << g4Volume->GetName() << "' could not be created. The name of the optical surface is empty !")
@@ -94,8 +95,14 @@ void OpticalUserInfo::updateG4Volume(G4LogicalVolume* g4Volume)
     optSurf->SetMaterialPropertiesTable(g4PropTable);
   }
 
-  //Not a memory leak. Geant4 registers this object automatically to an internal table.
-  new G4LogicalSkinSurface(m_name, g4Volume, optSurf);
+  //If the second volume is set, create a G4LogicalBorderSurface, otherwise create a G4LogicalSkinSurface
+  if (m_secondVolumeNode != NULL) {
+    //Not a memory leak. Geant4 registers this object automatically to an internal table.
+    new G4LogicalBorderSurface(m_name, g4Volume, detConstruct->GetG4VPhysicalVolume(m_secondVolumeNode), optSurf);
+  } else {
+    //Not a memory leak. Geant4 registers this object automatically to an internal table.
+    new G4LogicalSkinSurface(m_name, g4Volume->GetLogicalVolume(), optSurf);
+  }
 }
 
 

@@ -11,7 +11,7 @@
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 #include <generators/hepevt/HepevtReader.h>
-#include <generators/hepevt/cm2LabBoost.h>
+#include <generators/utilities/cm2LabBoost.h>
 
 #include <string>
 #include <stdexcept>

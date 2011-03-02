@@ -22,6 +22,7 @@
 #include <G4Material.hh>
 #include <G4MaterialPropertiesTable.hh>
 
+#include <TGeoNode.h>
 #include <TCollection.h>
 #include <TList.h>
 
@@ -114,18 +115,18 @@ void DetectorConstruction::Initialize(TG4RootDetectorConstruction *dc)
 
 
   //----------------------------------------------------------------------
-  // Get the list of the created ROOT volumes and loop over them. Check if
-  // a user information was set and call the method updateG4Volume().
+  // Get the list of the created ROOT volume nodes and loop over them.
+  // Check if a user information was set and call the method updateG4Volume().
   //----------------------------------------------------------------------
-  TIterator* volIter = gGeoManager->GetListOfVolumes()->MakeIterator();
-  TGeoVolume* currVolume;
-  while ((currVolume = dynamic_cast<TGeoVolume*>(volIter->Next()))) {
+  TIterator* volIter = gGeoManager->GetListOfNodes()->MakeIterator();
+  TGeoNode* currNode;
+  while ((currNode = dynamic_cast<TGeoNode*>(volIter->Next()))) {
 
-    //Check if the volume has user information attached
-    if (currVolume->GetField() != NULL) {
-      VolumeUserInfoBase* volUserInfo = dynamic_cast<VolumeUserInfoBase*>(currVolume->GetField());
+    //Check if the volume of the node has user information attached
+    if (currNode->GetVolume()->GetField() != NULL) {
+      VolumeUserInfoBase* volUserInfo = dynamic_cast<VolumeUserInfoBase*>(currNode->GetVolume()->GetField());
       if (volUserInfo != NULL) {
-        volUserInfo->updateG4Volume(dc->GetG4Volume(currVolume));
+        volUserInfo->updateG4Volume(dc->GetG4VPhysicalVolume(currNode), dc);
       }
     }
   }

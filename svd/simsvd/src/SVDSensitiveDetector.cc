@@ -14,6 +14,11 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/dataobjects/Relation.h>
 
+#include <boost/foreach.hpp>
+#include <boost/lexical_cast.hpp>
+#include <boost/algorithm/string.hpp>
+#include <boost/tokenizer.hpp>
+
 #include <TVector3.h>
 
 #include <G4Step.hh>
@@ -21,8 +26,10 @@
 #include <G4SDManager.hh>
 #include <G4TransportationManager.hh>
 
+#include <string>
 #include <cmath>
 
+using namespace std;
 using namespace Belle2;
 using namespace Simulation;
 
@@ -31,9 +38,10 @@ const G4double c_Epsilon = 1.0e-8;
 SVDSensitiveDetector::SVDSensitiveDetector(G4String name) : SensitiveDetectorBase(name)
 {
   //Tell the framework that this sensitive detector creates
-  //a relation Hits->MCParticle
+  //a relation MCParticles->SVDSimHits
   addRelationCollection(DEFAULT_SVDSIMHITSREL);
 
+  StoreArray<Relation> mcPartRelation(getRelationCollectionName());
   StoreArray<SVDSimHit> svdArray(DEFAULT_SVDSIMHITS);
 }
 
@@ -102,10 +110,34 @@ G4bool SVDSensitiveDetector::ProcessHits(G4Step* step, G4TouchableHistory*)
   //              Add SimHit to the DataStore
   //-------------------------------------------------------
   /* Parse volume name for layer, ladder and sensor numbers */
-  TString vname(vol.GetName().data());
-  int layerID = TString(vname(vname.Index("Layer_") + 6)).Atoi();
-  int ladderID = TString(vname(vname.Index("Ladder_") + 7)).Atoi();
-  int sensorID = TString(vname(vname.Index("Sensor_") + 7)).Atoi();
+  /* Parse volume name for layer, ladder and sensor numbers */
+  //TString vname(vol.GetName().data());
+  //int layerID = TString(vname(vname.Index("Layer_") + 6)).Atoi();
+  //int ladderID = TString(vname(vname.Index("Ladder_") + 7)).Atoi();
+  //int sensorID = TString(vname(vname.Index("Sensor_") + 7)).Atoi();
+
+  //Fixes bug in the code above which only returned number from 0 to 9
+  //Should be replaced by user info in the future
+  int layerID = -1;
+  int ladderID = -1;
+  int sensorID = -1;
+
+  typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
+  boost::char_separator<char> sep("_");
+  tokenizer tokens(string(vol.GetName().data()), sep);
+
+  int index = 0;
+  BOOST_FOREACH(const string &tok, tokens) {
+    switch (index) {
+      case 3 : layerID  = boost::lexical_cast<int>(tok);
+        break;
+      case 5 : ladderID = boost::lexical_cast<int>(tok);
+        break;
+      case 7 : sensorID = boost::lexical_cast<int>(tok);
+        break;
+    }
+    index++;
+  }
 
   StoreArray<SVDSimHit> svdArray(DEFAULT_SVDSIMHITS);
 
@@ -125,12 +157,12 @@ G4bool SVDSensitiveDetector::ProcessHits(G4Step* step, G4TouchableHistory*)
   //Set the SeenInDetector flag
   setSeenInDetectorFlag(step, MCParticle::c_SeenInSVD);
 
-  //Add relation between the created hit and the MCParticle that caused it.
+  //Add relation between the MCParticle and the hit.
   //The index of the MCParticle has to be set to the TrackID and will be
   //replaced later by the correct MCParticle index automatically.
   StoreArray<Relation> mcPartRelation(getRelationCollectionName());
   StoreArray<MCParticle> mcPartArray(DEFAULT_MCPARTICLES);
-  new(mcPartRelation->AddrAt(hitIndex)) Relation(svdArray, mcPartArray, hitIndex, trackID);
+  new(mcPartRelation->AddrAt(hitIndex)) Relation(mcPartArray, svdArray, trackID, hitIndex);
 
   return true;
 }

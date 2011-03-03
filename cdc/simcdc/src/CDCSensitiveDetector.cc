@@ -265,7 +265,7 @@ G4bool CDCSensitiveDetector::ProcessHits(G4Step *aStep, G4TouchableHistory *)
         }
         setSeenInDetectorFlag(aStep, MCParticle::c_SeenInCDC);
 
-        //Add relation between the created hit and the MCParticle that caused it.
+        //Add relation between the MCParticle and the hit.
         //The index of the MCParticle has to be set to the TrackID and will be
         //replaced later by the correct MCParticle index automatically.
         StoreArray<Relation> mcPartToSimHits(getRelationCollectionName());
@@ -273,7 +273,7 @@ G4bool CDCSensitiveDetector::ProcessHits(G4Step *aStep, G4TouchableHistory *)
         if (saveIndex < 0) {B2FATAL("SimHit wasn't saved despite charge != 0");}
         StoreArray<CDCSimHit> cdcArray(DEFAULT_CDCSIMHITS);
 
-        new(mcPartToSimHits->AddrAt(saveIndex)) Relation(cdcArray, mcPartArray, saveIndex, trackID);
+        new(mcPartToSimHits->AddrAt(saveIndex)) Relation(mcPartArray, cdcArray, trackID, saveIndex);
 
       }
     }

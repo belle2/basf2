@@ -16,17 +16,17 @@
 #include <TVector3.h>
 
 #define DEFAULT_PXDSIMHITS "PXDSimHits"
-#define DEFAULT_PXDSIMHITSREL "PXDSimHitMCParRel"
+#define DEFAULT_PXDSIMHITSREL "MCParticlesToPXDSimHits"
 
 namespace Belle2 {
 
   /**
-    * ClassPXDSimHit - Geant4 simulated hit for the PXD.
-    *
-    * This class holds particle hit data from geant4 simulation. As the simulated
-    * hit classes are used to generate detector response, they contain _local_
-    * information.
-    */
+   * ClassPXDSimHit - Geant4 simulated hit for the PXD.
+   *
+   * This class holds particle hit data from geant4 simulation. As the simulated
+   * hit classes are used to generate detector response, they contain _local_
+   * information.
+   */
   class PXDSimHit : public TObject {
 
   public:

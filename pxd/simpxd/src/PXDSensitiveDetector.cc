@@ -38,9 +38,10 @@ const G4double c_Epsilon = 1.0e-8;
 PXDSensitiveDetector::PXDSensitiveDetector(G4String name) : SensitiveDetectorBase(name)
 {
   //Tell the framework that this sensitive detector creates
-  //a relation Hits->MCParticle
+  //a relation MCParticles->PXDSimHits
   addRelationCollection(DEFAULT_PXDSIMHITSREL);
 
+  StoreArray<Relation> mcPartRelation(getRelationCollectionName());
   StoreArray<PXDSimHit> pxdArray(DEFAULT_PXDSIMHITS);
 }
 
@@ -155,12 +156,12 @@ G4bool PXDSensitiveDetector::ProcessHits(G4Step* step, G4TouchableHistory*)
   //Set the SeenInDetector flag
   setSeenInDetectorFlag(step, MCParticle::c_SeenInPXD);
 
-  //Add relation between the created hit and the MCParticle that caused it.
+  //Add relation between the MCParticle and the hit.
   //The index of the MCParticle has to be set to the TrackID and will be
   //replaced later by the correct MCParticle index automatically.
   StoreArray<Relation> mcPartRelation(getRelationCollectionName());
   StoreArray<MCParticle> mcPartArray(DEFAULT_MCPARTICLES);
-  new(mcPartRelation->AddrAt(hitIndex)) Relation(pxdArray, mcPartArray, hitIndex, trackID);
+  new(mcPartRelation->AddrAt(hitIndex)) Relation(mcPartArray, pxdArray, trackID, hitIndex);
 
   return true;
 }

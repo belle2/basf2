@@ -80,6 +80,7 @@ namespace Belle2 {
     double m_lostS;             /**< lost position [m] along ring. 0 is ip. Range goes from -L/2 to L/2, where L is the ring circumference. */
     double m_lostPx;            /**< x momentum at lost position [m]. */
     double m_lostPy;            /**< y momentum at lost position [m]. */
+    double m_lostW;            /**< weight describing lost fraction. */
   };
 
 }

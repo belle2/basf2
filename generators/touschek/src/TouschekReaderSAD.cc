@@ -13,6 +13,8 @@
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Unit.h>
 #include <generators/dataobjects/MCParticle.h>
+#include <framework/datastore/EventMetaData.h>
+#include <framework/datastore/StoreObjPtr.h>
 
 using namespace std;
 using namespace Belle2;
@@ -52,6 +54,7 @@ void TouschekReaderSAD::open(const string& filename) throw(TouschekCouldNotOpenF
   m_tree->SetBranchAddress("s", &m_lostS);
   m_tree->SetBranchAddress("px", &m_lostPx);
   m_tree->SetBranchAddress("py", &m_lostPy);
+  m_tree->SetBranchAddress("w", &m_lostW);
 }
 
 
@@ -107,6 +110,12 @@ int TouschekReaderSAD::getParticles(int number, double sRange, double beamEnergy
     particle.setProductionTime(0.0);
     particle.setEnergy(beamEnergy);
     particle.setValidVertex(true);
+
+    //setting weight of track as event weight, if only one track is in event:
+    if (number == 1) {
+      StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
+      eventMetaDataPtr->setGeneratedWeight(m_lostW);
+    }
 
     iEntry++;
     m_readEntry++;

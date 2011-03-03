@@ -33,6 +33,8 @@ SVDSensitiveDetector::SVDSensitiveDetector(G4String name) : SensitiveDetectorBas
   //Tell the framework that this sensitive detector creates
   //a relation Hits->MCParticle
   addRelationCollection(DEFAULT_SVDSIMHITSREL);
+
+  StoreArray<SVDSimHit> svdArray(DEFAULT_SVDSIMHITS);
 }
 
 

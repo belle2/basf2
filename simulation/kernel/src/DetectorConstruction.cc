@@ -26,6 +26,7 @@
 #include <TCollection.h>
 #include <TList.h>
 
+#include <queue>
 
 using namespace std;
 using namespace Belle2;
@@ -115,20 +116,34 @@ void DetectorConstruction::Initialize(TG4RootDetectorConstruction *dc)
 
 
   //----------------------------------------------------------------------
-  // Get the list of the created ROOT volume nodes and loop over them.
-  // Check if a user information was set and call the method updateG4Volume().
+  // Get the top volume from the gGeoManager and but it into a queue.
+  // Then in a loop get the first element from the queue, get its daughters,
+  // push them on the queue and call the updateG4Volume() of the element
+  // taken from the queue.
   //----------------------------------------------------------------------
-  TIterator* volIter = gGeoManager->GetListOfNodes()->MakeIterator();
-  TGeoNode* currNode;
-  while ((currNode = dynamic_cast<TGeoNode*>(volIter->Next()))) {
+  TGeoNode* currNode = gGeoManager->GetTopNode();
+  if (currNode != NULL) {
+    queue<TGeoNode*> nodeQueue;
+    nodeQueue.push(currNode);
 
-    //Check if the volume of the node has user information attached
-    if (currNode->GetVolume()->GetField() != NULL) {
-      VolumeUserInfoBase* volUserInfo = dynamic_cast<VolumeUserInfoBase*>(currNode->GetVolume()->GetField());
-      if (volUserInfo != NULL) {
-        volUserInfo->updateG4Volume(dc->GetG4VPhysicalVolume(currNode), dc);
+    while (!nodeQueue.empty()) {
+      currNode = nodeQueue.front();
+      nodeQueue.pop();
+
+      int nDaughters = currNode->GetNdaughters();
+      for (int iDaughter = 0; iDaughter < nDaughters; ++iDaughter) {
+        nodeQueue.push(currNode->GetDaughter(iDaughter));
+      }
+
+      //Check if the volume of the node has user information attached
+      if (currNode->GetVolume()->GetField() != NULL) {
+        VolumeUserInfoBase* volUserInfo = dynamic_cast<VolumeUserInfoBase*>(currNode->GetVolume()->GetField());
+        if (volUserInfo != NULL) {
+          volUserInfo->updateG4Volume(dc->GetG4VPhysicalVolume(currNode), dc);
+        }
       }
     }
+  } else {
+    B2ERROR("No Top node was found ! Could not loop over all nodes in order to call the updateG4Volume() method.")
   }
-  delete volIter;
 }

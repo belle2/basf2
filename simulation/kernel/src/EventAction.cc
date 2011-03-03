@@ -58,10 +58,10 @@ void EventAction::EndOfEventAction(const G4Event* event)
   //Create the final MCParticle list and update the indices of the MCParticle graph particles.
   m_mcParticleGraph.generateList(m_mcCollectionName, MCParticleGraph::set_decay_info | MCParticleGraph::check_cyclic);
 
-  //Create the Hit -> MCParticle relations
+  //Create the MCParticles->Hits relations
   //Loop over all created instances of sensitive detector classes.
   //Get the relation collection from the DataStore for each sensitive detector
-  //and replace the TrackID set in the ToIndex by the proper MCParticle index.
+  //and replace the TrackID set in the FromIndex by the proper MCParticle index.
   if (m_createRelation) {
     //Build a TrackID to MCParticle index map for faster replacement in the second step
     TrackIDMCPIndexMap trackIDMCPIndexMap;
@@ -83,11 +83,11 @@ void EventAction::EndOfEventAction(const G4Event* event)
           StoreArray<Relation> mcPartRelation(relColName);
           for (int iRel = 0; iRel < mcPartRelation.GetEntries(); iRel++) {
             Relation *currRel = mcPartRelation[iRel];
-            TrackIDMCPIndexMap::iterator findIter = trackIDMCPIndexMap.find(currRel->getToIndex());
+            TrackIDMCPIndexMap::iterator findIter = trackIDMCPIndexMap.find(currRel->getFromIndex());
             if (findIter != trackIDMCPIndexMap.end()) {
-              currRel->setToIndex(findIter->second);
+              currRel->setFromIndex(findIter->second);
             } else {
-              B2ERROR("Building relation " << relColName << ": Could not find TrackID " << currRel->getToIndex())
+              B2ERROR("Building relation " << relColName << ": Could not find TrackID " << currRel->getFromIndex())
             }
           }
         }

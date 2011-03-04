@@ -11,6 +11,9 @@
 #ifndef FRAMEWORKEXCEPTIONS_H_
 #define FRAMEWORKEXCEPTIONS_H_
 
+//(ifndef required for the rootcint dictionary building)
+#ifndef __CINT__
+
 #include <boost/format.hpp>
 #include <string>
 
@@ -33,5 +36,10 @@ namespace Belle2 {
     boost::format m_format;\
   };
 }
+
+#else
+#define BELLE2_DEFINE_EXCEPTION(ClassName, Message)
+#endif
+
 
 #endif /* FRAMEWORKEXCEPTIONS_H_ */

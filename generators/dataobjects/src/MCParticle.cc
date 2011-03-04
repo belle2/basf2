@@ -15,7 +15,6 @@
 
 #include <TDatabasePDG.h>
 
-#include <framework/core/FrameworkExceptions.h>
 #include <framework/logging/Logger.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
@@ -25,16 +24,6 @@
 
 using namespace std;
 using namespace Belle2;
-
-//Define exceptions
-namespace Belle2 {
-  /** Exception is thrown if the requested index for the last child is out of range. */
-  BELLE2_DEFINE_EXCEPTION(LastChildIndexOutOfRangError, "Last child index out of range !");
-  /** Exception is thrown if no pointer to the particle list was set. */
-  BELLE2_DEFINE_EXCEPTION(NoParticleListSetError, "No Particle list set, cannot determine related particles !");
-  /** Exception is thrown if the pdg value of the MCParticle is not known to the internal database (TDatabasePDG). */
-  BELLE2_DEFINE_EXCEPTION(ParticlePDGNotKnownError, "The pdg value (%1%) of the MCParticle is not known !");
-}
 
 
 void MCParticle::setMassFromPDG()

@@ -27,7 +27,7 @@ namespace Belle2 {
 
 string
 TRGCDCPeakFinder::version(void) const {
-    return string("0.01");
+    return string("TRGCDCPeakFinder 5.04");
 }
 
 TRGCDCPeakFinder::TRGCDCPeakFinder(const string & name)
@@ -50,12 +50,13 @@ TRGCDCPeakFinder::peaks5(vector<TRGCDCCircle *> & circles,
                          TRGCDCHoughPlane & hp,
                          const unsigned threshold,
                          const bool centerIsPeak) const {
-#ifdef TRG_DEBUG
+
     TRGDebug::enterStage("Peak Finding (peaks5)");
-#endif
-#ifdef TRGCDC_DEBUG_HOUGH
+    if (TRGDebug::level())
+        cout << TRGDebug::tab() << "threshold=" << threshold
+             << ",plane name=[" << hp.name() << "]" << endl;
+
     const unsigned nCircles = circles.size();
-#endif
 
     //...Search cells above threshold...
     unsigned nCells = hp.nX() * hp.nY();
@@ -73,7 +74,12 @@ TRGCDCPeakFinder::peaks5(vector<TRGCDCCircle *> & circles,
         }
     }
 
+    if (TRGDebug::level())
+        cout << TRGDebug::tab() << "Active cells=" << nActive << endl;
+
     //...Make connected regions (is this the best way???)...
+    if (TRGDebug::level() > 2)
+        cout << TRGDebug::tab() << "Making regions ..." << endl;
     const unsigned used = nCells;
     for (unsigned i = 0; i < nActive; i++) {
         if (candidates[i] == used) continue;
@@ -83,6 +89,8 @@ TRGCDCPeakFinder::peaks5(vector<TRGCDCCircle *> & circles,
         //...Make a new region...
         vector<unsigned> * region = new vector<unsigned>;
         region->push_back(id0);
+        if (TRGDebug::level() > 2)
+            cout << TRGDebug::tab(4) << "new region made" << endl;
 
         //...Search neighbors...
         for (unsigned j = 0; j < nActive; j++) {
@@ -93,10 +101,9 @@ TRGCDCPeakFinder::peaks5(vector<TRGCDCCircle *> & circles,
             unsigned y1 = 0;
             hp.id(id1, x1, y1);
 
-#ifdef TRGCDC_DEBUG_HOUGH
-//              std::cout << Tab() << "    region:x=" << x1 << ",y=" << y1
-//                        << std::endl;
-#endif            
+            if (TRGDebug::level() > 2)
+                cout << TRGDebug::tab(8) << "cell:x=" << x1 << ",y=" << y1
+                     << endl;
 
             for (unsigned k = 0; k < unsigned(region->size()); k++) {
                 unsigned id2 = (* region)[k];
@@ -108,14 +115,14 @@ TRGCDCPeakFinder::peaks5(vector<TRGCDCCircle *> & circles,
                 if (difx > (int) hp.nX() / 2) difx = hp.nX() - difx;
                 if (dify > (int) hp.nY() / 2) dify = hp.nY() - dify;
 
-#ifdef TRGCDC_DEBUG_HOUGH
-//                 std::cout << Tab() << "        :x=" << x2 << ",y=" << y2
-//                        << ":difx=" << difx << ",dify=" << dify;
-//                 if ((difx < 2) && (dify < 2))
-//                     std::cout << " ... connected" << std::endl;
-//                 else
-//                     std::cout << std::endl;
-#endif            
+                if (TRGDebug::level() > 2) {
+                    cout << TRGDebug::tab(12) << "x=" << x2 << ",y=" << y2
+                         << ":difx=" << difx << ",dify=" << dify;
+                    if ((difx < 2) && (dify < 2))
+                        cout << " ... connected" << endl;
+                    else
+                        cout << endl;
+                }
 
                 if ((difx < 2) && (dify < 2)) {
                     region->push_back(id1);
@@ -128,9 +135,16 @@ TRGCDCPeakFinder::peaks5(vector<TRGCDCCircle *> & circles,
         hp.setRegion(region);
     }
 
+    if (TRGDebug::level())
+        cout << TRGDebug::tab() << "Regions=" << hp.regions().size() << endl;
+
     //...Determine peaks...
     const vector<vector<unsigned> *> & regions = hp.regions();
     for (unsigned i = 0; i < (unsigned) regions.size(); i++) {
+
+        TRGDebug::enterStage("Peak position determination");
+        if (TRGDebug::level() > 1)
+            cout << TRGDebug::tab() << "region " << i << " contents" << endl;
 
         //...Calculate size and center of a region...
         const vector<unsigned> & r = * regions[i];
@@ -148,10 +162,8 @@ TRGCDCPeakFinder::peaks5(vector<TRGCDCCircle *> & circles,
             if (y < minY) minY = y;
             if (y > maxY) maxY = y;
 
-#ifdef TRGCDC_DEBUG_HOUGH
-//          std::cout << Tab() << "region " << i << ":x=" << x << ",y=" << y
-//                    << std::endl;
-#endif            
+            if (TRGDebug::level() > 1)
+                cout << TRGDebug::tab(4) << "x=" << x << ",y=" << y << endl;
         }
         const unsigned cX = minX + (maxX - minX) / 2;
         const unsigned cY = minY + (maxY - minY) / 2;
@@ -159,8 +171,15 @@ TRGCDCPeakFinder::peaks5(vector<TRGCDCCircle *> & circles,
         //...Determine a center of a region...
         unsigned ncX = hp.nX() * hp.nY();
         unsigned ncY = ncX;
+        if (TRGDebug::level() > 1)
+            cout << TRGDebug::tab() << "center of region:x=" << cX << ",y="
+                 << cY << endl;
         if (! centerIsPeak) {
 
+            if (TRGDebug::level() > 1)
+                cout << TRGDebug::tab() << "Searching a cell closest to the "
+                     << "region center" << endl;
+            
             //...Search for a cell which is the closest to the center...
             float minDiff2 = float(hp.nX() * hp.nX() + hp.nY() * hp.nY());
             for (unsigned j = 0; j < (unsigned) r.size(); j++) {
@@ -178,12 +197,10 @@ TRGCDCPeakFinder::peaks5(vector<TRGCDCCircle *> & circles,
                     minDiff2 = diff2;
                     ncX = x;
                     ncY = y;
-#ifdef TRGCDC_DEBUG_HOUGH
-//                     std::cout << Tab() << "region " << i << " center:x="
-//                            << ncX << ",y=" << ncY << "(" << j << ")"
-//                            << std::endl;
-#endif            
                 }
+                if (TRGDebug::level() > 1)
+                    cout << TRGDebug::tab(4) << "x=" << ncX << ",y=" << ncY
+                         << ":diff2=" << diff2 << endl;
             }
         }
         else {
@@ -210,38 +227,29 @@ TRGCDCPeakFinder::peaks5(vector<TRGCDCCircle *> & circles,
             (& hp.transformation());
         TRGPoint2D center =
             tc->circleCenter(hp.position(ncX, ncY));
-        TRGPoint2D centerR(center.y(), center.x());
-        circles.push_back(new TCCircle(centerR, hp.charge(), hp));
+        circles.push_back(new TCCircle(center.y(),
+                                       center.x(),
+                                       hp.charge(),
+                                       hp));
 
-#ifdef TRGCDC_DEBUG_HOUGH
-        cout << TRGDebug::tab() << "A circle made" << endl;
-        circles.back()->dump("", TRGDebug::tab() + "    ");
-//         cout << TRGDebug::tab() << "region " << i << " final center:x="
-//              << hp.position(ncX, ncY).x() << ",y="
-//              << hp.position(ncX, ncY).y() << endl;
-#endif            
+        if (TRGDebug::level()) {
+            cout << TRGDebug::tab() << "region " << i << " final center:x="
+                 << ncX << ",y=" << ncY << endl
+                 << TRGDebug::tab(4) << "position in HP:x="
+                 << hp.position(ncX, ncY).x() << ",y="
+                 << hp.position(ncX, ncY).y() << endl;
+            cout << TRGDebug::tab() << "A circle made" << endl;
+            circles.back()->dump("", TRGDebug::tab(4));
+        }
+
+        TRGDebug::leaveStage("Peak position determination");
     }
 
-#ifdef TRGCDC_DEBUG_HOUGH
-//     cout << Tab() << "Peak finding:threshold=" << threshold << ",nActive="
-//             << nActive << ",regions=" << hp.regions().length()
-//             << "," << hp.name() << endl;
-//     for (unsigned i = 0; i < (unsigned) hp.regions().length(); i++) {
-//          const CList<unsigned> & region = * (hp.regions())[i];
-//          for (unsigned j = 0; j < (unsigned) region.length(); j++)
-//              cout << Tab() << "    " << * region[j] << "="
-//                     << hp.entry(* region[j]) << endl;
-//     }
-#endif
+    if (TRGDebug::level())
+        cout << TRGDebug::tab() << circles.size() - nCircles << " circle(s)"
+             << " made in total" << endl;
 
-#ifdef TRGCDC_DEBUG_HOUGH
-    cout << TRGDebug::tab() << circles.size() - nCircles << " circle(s)"
-         << " made in total" << endl;
-#endif
-#ifdef TRG_DEBUG
     TRGDebug::leaveStage("Peak Finding (peaks5)");
-#endif
-
     return;
 }
 

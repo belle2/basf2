@@ -79,6 +79,9 @@ class TRGCDCHoughPlaneBoolean : public TRGCDCHoughPlaneBase {
     /// allocate memory for patterns.
     void preparePatterns(unsigned nPatterns);
 
+    /// returns pattern ID which activates specified cell.
+    const std::vector<unsigned> & patternId(unsigned cellId) const;
+
   protected:
     /// Add to a cell.
     void add(unsigned cellId, int weight);
@@ -89,9 +92,12 @@ class TRGCDCHoughPlaneBoolean : public TRGCDCHoughPlaneBase {
     unsigned _nPatterns;
     unsigned ** _patterns;
     unsigned * _nActive;
+    std::vector<unsigned> * _reverse;
 
     friend class TRGCDCHoughPlaneMulti2;
 };
+
+//-----------------------------------------------------------------------------
 
 inline
 unsigned
@@ -116,7 +122,6 @@ TRGCDCHoughPlaneBoolean::setEntry(unsigned serialId, unsigned n) {
 inline
 void
 TRGCDCHoughPlaneBoolean::clear(void) {
-//  bzero(_cell, _n * sizeof(unsigned));
     memset(_cell, 0, _n * sizeof(unsigned));
     TRGCDCHoughPlaneBase::clear();
 }
@@ -169,6 +174,12 @@ TRGCDCHoughPlaneBoolean::add(unsigned a, int b) {
         setEntry(a, 1);
     else
         setEntry(a, 0);
+}
+
+inline
+const std::vector<unsigned> &
+TRGCDCHoughPlaneBoolean:: patternId(unsigned cellId) const {
+    return _reverse[cellId];
 }
 
 } // namespace Belle2

@@ -18,20 +18,17 @@
 #include "G4RunManager.hh"
 #include "framework/core/ModuleManager.h"
 #include "trg/modules/trgcdc/TRGCDCModule.h"
+#include "trg/trg/Debug.h"
 
 using namespace std;
 
 namespace Belle2 {
 
-#ifdef BUILD_2010_12_13
-REG_XXX_MODULE(TRGCDCModule, "TRGCDC");
-#else
 REG_MODULE(TRGCDC);
-#endif
 
 string
 TRGCDCModule::version() const {
-    return "0.03";
+    return string("TRGCDCModule 5.04");
 }
 
 TRGCDCModule::TRGCDCModule()
@@ -39,29 +36,39 @@ TRGCDCModule::TRGCDCModule()
       _debugLevel(0),
       _configFilename("TRGCDCConfig.dat"),
       _curlBackStop(0),
+      _hFinderPerfect(false),
+      _hFinderMeshX(96),
+      _hFinderMeshY(96),
       _cdc(0),
       _sa(0) {
 
     string desc = "TRGCDCModule(" + version() + ")";
     setDescription(desc);
 
-#ifdef BUILD_2010_12_13
-    addParam("testParamInt", _testParamInt, 20);
-    addParam("ConfigFile",
-             _configFilename,
-             string("TRGCDCConfig.dat"),
-             "The filename of CDC trigger config file");
-#else
+    addParam("DebugLevel", _debugLevel, "TRGCDC debug level", _debugLevel);
     addParam("ConfigFile",
              _configFilename,
              "The filename of CDC trigger config file",
-             string("TRGCDCConfig.dat"));
-    addParam("CurlBackStop", _curlBackStop, "Curl back stop parameter", 0);
-#endif
+             _configFilename);
+    addParam("CurlBackStop",
+             _curlBackStop,
+             "Curl back stop parameter",
+             _curlBackStop);
+    addParam("HoughFinderPerfect",
+             _hFinderPerfect,
+             "Hough finder perfect option",
+             _hFinderPerfect);
+    addParam("HoughFinderMeshX",
+             _hFinderMeshX,
+             "Hough finder # mesh in x",
+             _hFinderMeshX);
+    addParam("HoughFinderMeshY",
+             _hFinderMeshY,
+             "Hough finder # mesh in y",
+             _hFinderMeshY);
 
-#ifdef TRGCDC_DEBUG
-    cout << "TRGCDCModule ... created" << endl;
-#endif
+    if (TRGDebug::level())
+        cout << "TRGCDCModule ... created" << endl;
 }
 
 TRGCDCModule::~TRGCDCModule() {
@@ -73,9 +80,8 @@ TRGCDCModule::~TRGCDCModule() {
 //  if (_sa)
 //         delete _sa;
 
-#ifdef TRGCDC_DEBUG
-    cout << "TRGCDCModule ... destructed " << endl;
-#endif
+    if (TRGDebug::level())
+        cout << "TRGCDCModule ... destructed " << endl;
 }
 
 void
@@ -87,6 +93,20 @@ TRGCDCModule::initialize() {
         _sa = new TCSAction();
         g4rm->SetUserAction(_sa);
     }
+    TRGDebug::level(_debugLevel);
+
+    if (TRGDebug::level()) {
+        cout << "TRGCDCModule::initialize ... options" << endl;
+        cout << TRGDebug::tab(4) << "debug level = " << TRGDebug::level()
+             << endl;
+        cout << TRGDebug::tab(4) << "back stop = " << _curlBackStop << endl;
+        cout << TRGDebug::tab(4) << "finder perfect = " << _hFinderPerfect
+             << endl;
+        cout << TRGDebug::tab(4) << "Hough finder Mesh X = " << _hFinderMeshX
+             << endl;
+        cout << TRGDebug::tab(4) << "Hough finder Mesh Y = " << _hFinderMeshY
+             << endl;
+    }
 }
 
 void
@@ -97,20 +117,23 @@ TRGCDCModule::beginRun() {
 
     //...CDC trigger...
     if ((cfn != _configFilename) || (_cdc == 0))
-        _cdc = TRGCDC::getTRGCDC(_configFilename);
+        _cdc = TRGCDC::getTRGCDC(_configFilename,
+                                 _hFinderPerfect,
+                                 _hFinderMeshX,
+                                 _hFinderMeshY);
 
-#ifdef TRGCDC_DEBUG
-    cout << "TRGCDCModule ... beginRun called " << endl;
-#endif
+    if (TRGDebug::level())
+        cout << "TRGCDCModule ... beginRun called " << endl;
 }
 
 void
 TRGCDCModule::event() {
 
-#ifdef TRGCDC_DEBUG
-//  _cdc->dump("geometry superLayers layers wires detail");
-//  _cdc->dump("geometry superLayers layers detail");
-#endif
+    
+    if (TRGDebug::level()) {
+//      _cdc->dump("geometry superLayers layers wires detail");
+//      _cdc->dump("geometry superLayers layers detail");
+    }
 
     //...CDC trigger simulation...
     _cdc->update();
@@ -119,16 +142,14 @@ TRGCDCModule::event() {
 
 void
 TRGCDCModule::endRun() {
-#ifdef TRGCDC_DEBUG
-    cout << "TRGCDCModule ... endRun called " << endl;
-#endif
+    if (TRGDebug::level())
+        cout << "TRGCDCModule ... endRun called " << endl;
 }
 
 void
 TRGCDCModule::terminate() {
-#ifdef TRGCDC_DEBUG
-    cout << "TRGCDCModule ... terminate called " << endl;
-#endif
+    if (TRGDebug::level())
+        cout << "TRGCDCModule ... terminate called " << endl;
 }
 
 } // namespace Belle2

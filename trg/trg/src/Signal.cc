@@ -62,32 +62,51 @@ TRGSignal::~TRGSignal() {
 }
 
 void
-TRGSignal::dump(const std::string & msg,
-                const std::string & pre) const {
-    std::cout << pre << _name << ":";
+TRGSignal::dump(const string & msg,
+                const string & pre) const {
 
-    //...Clock check...
-    bool singleClock = true;
-    const TRGClock * clk0 = 0;
-    if (_history.size()) {
-        clk0 = & _history[0].clock();
-        for (unsigned i = 1; i < _history.size(); i++) {
-            const TRGClock * clk = & _history[i].clock();
-            if (clk != clk0)
-                singleClock = false;
-        }
+    bool first = true;
+
+    if (msg.find("detail") != string::npos) {
+        first = false;
+        cout << pre << _name;
     }
+
     if (msg.find("clock") != string::npos ||
-        msg.find("detail") != string::npos)
-        if (singleClock && clk0)
-            cout << "clock=" << clk0->name();
-    if (! singleClock)
-        cout << "there are multiple clock source";
-    cout << endl;
+        msg.find("detail") != string::npos) {
+
+        //...Clock check...
+        bool singleClock = true;
+        const TRGClock * clk0 = 0;
+        if (_history.size()) {
+            clk0 = & _history[0].clock();
+            for (unsigned i = 1; i < _history.size(); i++) {
+                const TRGClock * clk = & _history[i].clock();
+                if (clk != clk0)
+                    singleClock = false;
+            }
+        }
+
+        if (first)
+            cout << pre;
+        first = false;
+
+        if (! singleClock)
+            cout << ":there are multiple clock source";
+        else if (singleClock && clk0)
+            cout << ":clock=" << clk0->name();
+        else
+            cout << ":no clock assigned";
+
+        cout << endl;
+    }
 
     if (_history.size()) {
+        string tab = pre;
+        if (! first)
+            tab += "    ";
         for (unsigned i = 0; i < _history.size(); i++)
-            _history[i].dump(msg, pre + "    ");
+            _history[i].dump(msg, tab);
     }
 }
 
@@ -98,7 +117,7 @@ TRGSignal::operator&(const TRGSignal & left) const {
                       left._history.begin(),
                       left._history.end());
     t._name = "(" + t._name + ")&(" + left._name + ")";
-    std::sort(t._history.begin(), t._history.end(), TRGTime::sortByTime);
+    sort(t._history.begin(), t._history.end(), TRGTime::sortByTime);
 
     //...And operation...
     t._history = andOperation(t._history);
@@ -120,8 +139,8 @@ TRGSignal::operator&=(const TRGSignal & left) {
     return * this;
 }
 
-std::vector<TRGTime>
-TRGSignal::andOperation(const std::vector<TRGTime> & history) {
+vector<TRGTime>
+TRGSignal::andOperation(const vector<TRGTime> & history) {
 
     //...And operation...
     const unsigned n = history.size();
@@ -157,7 +176,7 @@ TRGSignal::operator|(const TRGSignal & left) const {
                       left._history.begin(),
                       left._history.end());
     t._name = "(" + t._name + ")|(" + left._name + ")";
-    std::sort(t._history.begin(), t._history.end(), TRGTime::sortByTime);
+    sort(t._history.begin(), t._history.end(), TRGTime::sortByTime);
 
     //...And operation...
     t._history = orOperation(t._history);
@@ -179,8 +198,8 @@ TRGSignal::operator|=(const TRGSignal & left) {
     return * this;
 }
 
-std::vector<TRGTime>
-TRGSignal::orOperation(const std::vector<TRGTime> & history) {
+vector<TRGTime>
+TRGSignal::orOperation(const vector<TRGTime> & history) {
 
     //...And operation...
     const unsigned n = history.size();

@@ -31,7 +31,8 @@ class TRGCDCCircle : public TRGCDCTrackBase {
   public:
 
     /// Constructor with a circle center, assuming the origin is on a circle.
-    TRGCDCCircle(const TRGPoint2D & center,
+    TRGCDCCircle(float r,
+                 float phi,
                  float charge,
                  const TRGCDCHoughPlane & plane);
 

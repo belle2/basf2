@@ -15,6 +15,7 @@
 #define TRGCDC_SHORT_NAMES
 
 #include <stdlib.h>
+#include "trg/trg/Debug.h"
 #include "trg/cdc/TRGCDC.h"
 #include "trg/cdc/Layer.h"
 #include "trg/cdc/Wire.h"
@@ -41,7 +42,7 @@ namespace Belle2 {
 
 string
 TRGCDCHoughFinder::version(void) const {
-    return string("0.01");
+    return string("TRGCDCHoughFinder 5.04");
 }
 
 TRGCDCHoughFinder::TRGCDCHoughFinder(const string & name,
@@ -81,10 +82,12 @@ TRGCDCHoughFinder::TRGCDCHoughFinder(const string & name,
 #ifdef TRGCDC_DISPLAY
     if (! H0)
         H0 = new TCDisplayHough("Plus");
+    H0->link(* D);
     H0->clear();
     H0->show();
     if (! H1)
         H1 = new TCDisplayHough("Minus");
+    H1->link(* D);
     H1->clear();
     H1->show();
 #endif
@@ -114,24 +117,21 @@ TRGCDCHoughFinder::TRGCDCHoughFinder(const string & name,
             _plane[1]->registerPattern(axialSuperLayerId, j);
 
 #ifdef TRGCDC_DISPLAY
-            string stg = "Hough Pattern Regstration";
-            string inf = "   ";
-
-            _plane[0]->dump();
-            _plane[0]->merge();
-            _plane[1]->dump();
-            _plane[1]->merge();
-            H0->stage(stg);
-            H0->information(inf);
-            H0->clear();
-            H0->area().append(_plane[0]);
-            H0->show();
-            H1->stage(stg);
-            H1->information(inf);
-            H1->clear();
-            H1->area().append(_plane[1]);
-            H1->show();
-            H1->run();
+//             string stg = "Hough Pattern Regstration";
+//             string inf = "   ";
+//             _plane[0]->merge();
+//             _plane[1]->merge();
+//             H0->stage(stg);
+//             H0->information(inf);
+//             H0->clear();
+//             H0->area().append(_plane[0]);
+//             H0->show();
+//             H1->stage(stg);
+//             H1->information(inf);
+//             H1->clear();
+//             H1->area().append(_plane[1]);
+//             H1->show();
+//             H1->run();
 #endif
         }
         ++axialSuperLayerId;
@@ -144,6 +144,7 @@ TRGCDCHoughFinder::~TRGCDCHoughFinder() {
         delete H0;
     if (H1)
         delete H1;
+    cout << "TRGCDCHoughFinder ... Hough displays deleted" << endl;
 #endif
 }
 
@@ -152,6 +153,8 @@ TRGCDCHoughFinder::doit(vector<TCTrack *> & trackList) {
 
     if (_perfect)
         return doitPerfectly(trackList);
+
+    TRGDebug::enterStage("Hough Finder");
 
     //...Initialization...
     _plane[0]->clear();
@@ -180,7 +183,7 @@ TRGCDCHoughFinder::doit(vector<TCTrack *> & trackList) {
     _plane[1]->merge();
 
 #ifdef TRGCDC_DISPLAY
-    string stg = "2D : Peak Finding";
+    string stg = "2D : Hough : Results of Peak Finding";
     string inf = "   ";
     H0->stage(stg);
     H0->information(inf);
@@ -218,13 +221,14 @@ TRGCDCHoughFinder::doit(vector<TCTrack *> & trackList) {
 
     //...Select stereo TSs...
 
+    TRGDebug::leaveStage("Hough Finder");
     return 0;
 }
 
 int
 TRGCDCHoughFinder::doitPerfectly(vector<TRGCDCTrack *> & trackList) {
 
-    cout << "Perfect finder called" << endl;
+    TRGDebug::enterStage("Perfect Finder");
 
     //...Make a track...
     TCTrack * track = new TCTrack();
@@ -261,8 +265,10 @@ TRGCDCHoughFinder::doitPerfectly(vector<TRGCDCTrack *> & trackList) {
             track->append(best);
     }
 
-    track->dump();
+    if (TRGDebug::level())
+        track->dump();
 
+    TRGDebug::leaveStage("Perfect Finder");
     return 0;
 }
 

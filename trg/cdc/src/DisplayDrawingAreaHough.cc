@@ -17,20 +17,27 @@
 
 #include <iostream>
 #include <pangomm/init.h>
+#include "trg/trg/Utilities.h"
+#include "trg/cdc/TRGCDC.h"
 #include "trg/cdc/Wire.h"
 #include "trg/cdc/WireHit.h"
 #include "trg/cdc/TrackSegment.h"
 #include "trg/cdc/FrontEnd.h"
 #include "trg/cdc/Merger.h"
 #include "trg/cdc/HoughPlane.h"
+#include "trg/cdc/HoughPlaneMulti2.h"
+#include "trg/cdc/Display.h"
+#include "trg/cdc/DisplayRphi.h"
 #include "trg/cdc/DisplayDrawingAreaHough.h"
 
 using namespace std;
 
 namespace Belle2 {
 
-TRGCDCDisplayDrawingAreaHough::TRGCDCDisplayDrawingAreaHough(int size)
-    : TRGCDCDisplayDrawingArea(size, 10),
+TRGCDCDisplayDrawingAreaHough::TRGCDCDisplayDrawingAreaHough(
+    TRGCDCDisplay & w,
+    int size)
+    : TRGCDCDisplayDrawingArea(w, size, 10),
       _scale(1),
       _wireName(false),
       _oldCDC(false),
@@ -95,10 +102,52 @@ TRGCDCDisplayDrawingAreaHough::on_expose_event(GdkEventExpose *) {
 
 bool
 TRGCDCDisplayDrawingAreaHough::on_button_press_event(GdkEventButton * e) {
-    cout << "x=" << e->x << ",y=" << e->y << endl;
+
+    //...Clear window as a default...
+    on_expose_event((GdkEventExpose *) NULL);
+
+    //...Get cell ID...
+    const int cx0 = int(float(e->x) / _scaleX / _hp->xSize());
+    const int cy0 = _hp->nY() - int(float(e->y) / _scaleY / _hp->ySize());
+    const unsigned sid = _hp->serialID(cx0, cy0);
+
+    //...Get entries...
+    const unsigned n = _hp->entry(cx0, cy0);
+
+    //...Information...
+    display().information("Cell(" + TRGUtilities::itostring(cx0) + "," +
+                          TRGUtilities::itostring(cy0) + ") " + 
+                          TRGUtilities::itostring(n) + "hits");
+
+    //...Draw cell...
+    _gc->set_foreground(_red);
+//  drawCell(cx0, cy0);
+    vector<unsigned> r;
+    r.push_back(sid);
+    drawRegion(r);
+
+    //...Draw TSs if rphi display exists...
+    if (display().rphi()) {
+        const TRGCDC & cdc = * TRGCDC::getTRGCDC();
+        const TCHPlaneMulti2 & hp =
+            * dynamic_cast<const TCHPlaneMulti2 *>(_hp);
+        vector<const TCTSegment *> list;
+        for (unsigned i = 0; i < 5; i++) {
+            const vector<unsigned> & l = hp.patternId(i, sid);
+            for (unsigned j = 0; j < l.size(); j++)
+                list.push_back(
+                    (TCTSegment *) cdc.trackSegmentLayer(i * 2)->wire(l[j]));
+        }
+        display().rphi()->area().on_expose_event(0);
+        display().rphi()->area().oneShot(list, _red);
+    }
+
+    //...Debug...
     _x = xR(e->x);
     _y = yR(e->y);
-    on_expose_event((GdkEventExpose *) NULL);
+//  cout << "x=" << e->x << ",y=" << e->y << endl;
+//  cout << "cx0=" << cx0 << ",cy0=" << cy0 << endl;
+    
     return true;
 }
 
@@ -132,66 +181,27 @@ TRGCDCDisplayDrawingAreaHough::draw(void) {
     }
 
     if (nMax == 0)
-        std::cout << "max entry=" << nMax << std::endl;
+        cout << "max entry=" << nMax << endl;
 
     //...Draw...
-    const bool drawLevel = false;
     for (unsigned i = 0; i < _hp->nX(); i++) {
         for (unsigned j = 0; j < _hp->nY(); j++) {
             const unsigned n = _hp->entry(i, j);
-            if (n) {
-                const float x = float(i) * _hp->xSize() * _scaleX;
-                const float y = float(j) * _hp->ySize() * _scaleY;
+            if (! n) continue;
 
-                const int x0 = int(x);
-                const int y0 = int(y);
-                const int z0 = toY(y0);
-                const int x1 = int(x + _hp->xSize() * _scaleX) - x0;
-                const int y1 = int(y + _hp->ySize() * _scaleY) - y0;
+            //...Decide color...
+            if (n == 1)
+                _gc->set_foreground(_gray0);
+            else if (n == 2)
+                _gc->set_foreground(_gray1);
+            else if (n == 3)
+                _gc->set_foreground(_gray2);
+            else if (n == 4)
+                _gc->set_foreground(_blue);
+            else
+                _gc->set_foreground(_red);
 
-                if (drawLevel) {
-                    const float level = float(n) / float(nMax);
-
-                    if (level < 0.25)
-                        _gc->set_foreground(_gray0);
-                    else if (level < 0.5)
-                        _gc->set_foreground(_gray1);
-                    else if (level < 0.75)
-                        _gc->set_foreground(_gray2);
-                    else if (level > 0.90)
-                        _gc->set_foreground(_red);
-                    else
-                        _gc->set_foreground(_gray3);
-                }
-                else {
-                    if (n == 1)
-                        _gc->set_foreground(_gray0);
-                    else if (n == 2)
-                        _gc->set_foreground(_gray1);
-                    else if (n == 3)
-                        _gc->set_foreground(_gray2);
-                    else if (n == 4)
-                        _gc->set_foreground(_blue);
-                    else
-                        _gc->set_foreground(_red);
-                }
-
-                _window->draw_rectangle(_gc, true, x0, z0, x1, y1);
-
-//                 const int x2 = x0 - int(_x - _winw / 2);
-//                 const int y2 = z0 - int(_y - _winh / 2);
-//                 const int x2 = xT(i);
-//                 const int y2 = yT(j);
-//                 _gc->set_foreground(_green);
-//                 _window->draw_rectangle(_gc, true, x2, y2, x1, y1);
-
-//                  std::cout << "x0,y0,z0,x1,y1=" << x0 << ","
-//                           << y0 << "," << z0 << "," << x1 << ","
-//                           << y1 << ",level=" << level << std::endl;
-//                 std::cout << "x2,y2,x3,y3=" << x2 << ","
-//                           << y2 << "," << ",level=" << level << std::endl;
-                
-            }
+            drawCell(i, j);
         }
     }
 
@@ -204,74 +214,26 @@ TRGCDCDisplayDrawingAreaHough::draw(void) {
     _gc->set_foreground(_gray0);
     _window->draw_rectangle(_gc, true, x0, z0, x1, y1);
 
-//  std::cout << "TWHDArea ... xMin,xMax,yMin,yMax=" << xMin << "," << xMax
-//            << "," << yMin << "," << yMax << std::endl;
-//  std::cout << "TWHDArea ... winx,winy,winw,winh,wind=" << _winx << "," << _winy
-//            << "," << _winw << "," << _winh << "," << _wind << std::endl;
+//  cout << "TWHDArea ... xMin,xMax,yMin,yMax=" << xMin << "," << xMax
+//            << "," << yMin << "," << yMax << endl;
+//  cout << "TWHDArea ... winx,winy,winw,winh,wind=" << _winx << "," << _winy
+//            << "," << _winw << "," << _winh << "," << _wind << endl;
 
-    //...Draw region...
+    //...Draw regions...
     _gc->set_foreground(_green);
-    const std::vector<std::vector<unsigned> *> & regions = _hp->regions();
-    for (unsigned i = 0; i < (unsigned) regions.size(); i++) {
-
-//        std::cout << "TWH ... region " << i << std::endl;
-
-        for (unsigned j = 0; j < (unsigned) regions[i]->size(); j++) {
-//            const unsigned id = * (* regions[i])[j];
-            const unsigned id = (* regions[i])[j];
-            unsigned ix = 0;
-            unsigned iy = 0;
-            _hp->id(id, ix, iy);
-
-            const float x = float(ix) * _hp->xSize() * _scaleX;
-            const float y = float(iy) * _hp->ySize() * _scaleY;
-
-            const int x0 = int(x);
-            const int y0 = int(y);
-            const int z0 = toY(y0);
-
-            const int x1 = int(x + _hp->xSize() * _scaleX);
-            const int y1 = int(y + _hp->ySize() * _scaleY) - y0;
-            const int z1 = z0 + y1;
-
-//             std::cout << "TWH ... id=" << id
-//                                                 << std::endl;
-
-            for (unsigned k = 0; k < 8; k++) {
-                if (k % 2) continue;
-                unsigned idx = _hp->neighbor(id, k);
-
-                if (idx == id) continue;
-                bool found = false;
-                for (unsigned l = 0;
-                     l < (unsigned) regions[i]->size();
-                     l++) {
-//                    if (idx == * (* regions[i])[l]) {
-                    if (idx == (* regions[i])[l]) {
-//                        std::cout << "        " << idx << " is neighbor " << k << std::endl;
-                        found = true;
-                        break;
-                    }
-//                    std::cout << "        " << idx << " is not neighbor " << k << std::endl;
-                }
-                if (found) continue;
-                if (k == 0)
-                    _window->draw_line(_gc, x0, z0, x1, z0);
-                else if (k == 2)
-                    _window->draw_line(_gc, x1, z0, x1, z1);
-                else if (k == 4)
-                    _window->draw_line(_gc, x0, z1, x1, z1);
-                else if (k == 6)
-                    _window->draw_line(_gc, x0, z0, x0, z1);
-            }
-        }
-    }
+    _gc->set_line_attributes(2,
+                             Gdk::LINE_SOLID,
+                             Gdk::CAP_NOT_LAST,
+                             Gdk::JOIN_MITER);
+    const vector<vector<unsigned> *> & regions = _hp->regions();
+    for (unsigned i = 0; i < (unsigned) regions.size(); i++)
+        drawRegion(* regions[i]);
 
     //...Draw text...
 //     _xPositionText = _hp->xMin() + _hp->xSize() * _hp->nX() * 0.1;
 //     _yPositionText = _hp->yMin() + _hp->ySize() * _hp->nY() * 0.9 * scale;
 //     _window.draw_text(_xPositionText, _yPositionText, _text.c_str());
-//     std::string text = " y_scale=" + dtostring(1/scale);
+//     string text = " y_scale=" + dtostring(1/scale);
 //     text += " max.peak=" + itostring(_hp->maxEntry());
 //     text += " #regions=" + itostring(_hp->regions().length());
 //     _yPositionText = _hp->yMin() + _hp->ySize() * _hp->nY() * 0.85 * scale;
@@ -311,6 +273,72 @@ TRGCDCDisplayDrawingAreaHough::xR(double x) const {
 int
 TRGCDCDisplayDrawingAreaHough::yR(double y) const {
     return - int((y - double(_winh)) / _hp->ySize() / _scaleY);
+}
+
+int
+TRGCDCDisplayDrawingAreaHough::drawCell(unsigned xCell, unsigned yCell) {
+    const float x = float(xCell) * _hp->xSize() * _scaleX;
+    const float y = float(yCell) * _hp->ySize() * _scaleY;
+
+    const int x0 = int(x);
+    const int y0 = int(y);
+    const int z0 = toY(y0);
+    const int x1 = int(x + _hp->xSize() * _scaleX) - x0;
+    const int y1 = int(y + _hp->ySize() * _scaleY) - y0;
+
+    _window->draw_rectangle(_gc, true, x0, z0, x1, y1);
+
+//     cout << "x0,y0,z0,x1,y1=" << x0 << ","
+//          << y0 << "," << z0 << "," << x1 << ","
+//          << y1 << endl;
+
+    return 0;
+}
+
+int
+TRGCDCDisplayDrawingAreaHough:: drawRegion(const std::vector<unsigned> & r) {
+    for (unsigned i = 0; i < r.size(); i++) {
+        const unsigned id = r[i];
+        unsigned ix = 0;
+        unsigned iy = 0;
+        _hp->id(id, ix, iy);
+
+        const float x = float(ix) * _hp->xSize() * _scaleX;
+        const float y = float(iy) * _hp->ySize() * _scaleY;
+
+        const int x0 = int(x);
+        const int y0 = int(y);
+        const int z0 = toY(y0);
+
+        const int x1 = int(x + _hp->xSize() * _scaleX);
+        const int y1 = int(y + _hp->ySize() * _scaleY) - y0;
+        const int z1 = z0 + y1;
+
+        for (unsigned k = 0; k < 8; k++) {
+            if (k % 2) continue;
+            unsigned idx = _hp->neighbor(id, k);
+
+            if (idx == id) continue;
+            bool found = false;
+            for (unsigned l = 0; l < (unsigned) r.size(); l++) {
+                if (idx == r[l]) {
+                    found = true;
+                    break;
+                }
+            }
+            if (found) continue;
+            if (k == 0)
+                _window->draw_line(_gc, x0, z0, x1, z0);
+            else if (k == 2)
+                _window->draw_line(_gc, x1, z0, x1, z1);
+            else if (k == 4)
+                _window->draw_line(_gc, x0, z1, x1, z1);
+            else if (k == 6)
+                _window->draw_line(_gc, x0, z0, x0, z1);
+        }
+    }
+
+    return 0;
 }
 
 } // namespace Belle2

@@ -11,8 +11,6 @@
 // $Log$
 //-----------------------------------------------------------------------------
 
-#ifdef TRG_DEBUG
-
 #ifndef TRGDebug_FLAG_
 #define TRGDebug_FLAG_
 
@@ -26,6 +24,12 @@ class TRGDebug {
 
   public:
 
+    /// returns the debug level.
+    static int level(void);
+
+    /// sets and returns the debug level.
+    static int level(int newLevel);
+
     /// Declare that you enter new stage.
     static void enterStage(const std::string & stageName);
 
@@ -35,10 +39,16 @@ class TRGDebug {
     /// returns tab spaces.
     static std::string tab(void);
 
+    /// returns tab spaces with extra spaces
+    static std::string tab(int extra);
+
   private:
 
     /// Storage for stages.
     static std::vector<std::string> _stages;
+
+    /// Debug level. 0:do nothing, 1:show you flow, 2:show you detail, 10:show you very detail
+    static int _level;
 };
 
 //-----------------------------------------------------------------------------
@@ -46,5 +56,3 @@ class TRGDebug {
 } // namespace Belle2
 
 #endif /* TRGDebug_FLAG_ */
-
-#endif

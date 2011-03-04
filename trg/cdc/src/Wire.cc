@@ -14,6 +14,7 @@
 #define TRG_SHORT_NAMES
 #define TRGCDC_SHORT_NAMES
 
+#include "trg/trg/Debug.h"
 #include "trg/trg/Clock.h"
 #include "trg/trg/Utilities.h"
 #include "trg/cdc/TRGCDC.h"
@@ -32,15 +33,16 @@ TRGCDCWire::TRGCDCWire(unsigned id,
                        TRGCDCLayer * l,
                        const P3D & fp,
                        const P3D & bp)
-    : _id(id),
+    : _state(0),
+      _hit(0),
+      _mcHits(),
+      _id(id),
       _localId(localId),
       _layer(l),
       _forwardPosition(fp),
       _backwardPosition(bp),
       _direction(fp - bp),
       _triggerOutput() {
-    _state = 0;
-    _hit = 0;
     _xyPosition = 0.5 * (_forwardPosition + _backwardPosition);
     _xyPosition.setZ(0.);
     _direction = _direction.unit();
@@ -368,12 +370,10 @@ TRGCDCWire::neighbor(unsigned i) const {
 int
 TRGCDCWire::localIdDifference(const TRGCDCWire & a) const {
 
-#ifdef CDCTRG_DEBUG_DETAIL
     if (superLayerId() != a.superLayerId()) {
         cout << "TRGCDCWire::localIdDifference !!!";
         cout << "super layer assumption violation" << endl;
     }
-#endif
 
     int diff = int(a.localId()) - int(localId());
     unsigned nWires = layer().nWires();

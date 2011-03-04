@@ -24,14 +24,16 @@
 
 namespace Belle2 {
 
+class TRGCDCDisplay;
 class TRGCDCHoughPlane;
 
 /// Actual class to display trigger objects
 class TRGCDCDisplayDrawingAreaHough : public TRGCDCDisplayDrawingArea {
 
   public:
+
     /// Default constructor
-    TRGCDCDisplayDrawingAreaHough(int size);
+    TRGCDCDisplayDrawingAreaHough(TRGCDCDisplay &, int size);
     
     /// Destructor
     virtual ~TRGCDCDisplayDrawingAreaHough();
@@ -63,6 +65,12 @@ class TRGCDCDisplayDrawingAreaHough : public TRGCDCDisplayDrawingArea {
 
     /// Coordinate transformations (obsolete).
     int toY(int y) const;
+
+    /// Draws a Hough cell.
+    int drawCell(unsigned xCell, unsigned yCell);
+
+    /// Draws a region.
+    int drawRegion(const std::vector<unsigned> & region);
 
   private:
     double _scale;

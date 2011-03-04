@@ -63,10 +63,9 @@ TRGClock::dump(const std::string & message,
          << pre << "    min(ns)  :" << minTiming() << endl
          << pre << "    max(ns)  :" << maxTiming() << endl;
 
-    cout << "min,max=" << numeric_limits<int>::min() << ","
-         << numeric_limits<int>::max() << endl;
-
-
+    cout << pre << "    numeric limit of int (min,max="
+         << numeric_limits<int>::min() << ","
+         << numeric_limits<int>::max() << ")" << endl;
 }
 
 int

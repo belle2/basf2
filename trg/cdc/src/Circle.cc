@@ -21,12 +21,13 @@ using namespace std;
 
 namespace Belle2 {
 
-TRGCDCCircle::TRGCDCCircle(const TRGPoint2D & center,
+TRGCDCCircle::TRGCDCCircle(float r,
+                           float phi,
                            float charge,
                            const TCHPlane & plane)
     : TCTBase("unknown", charge),
-      _center(center),
-      _radius(center.mag()),
+      _center(r * cos(phi), r * sin(phi)),
+      _radius(r),
       _plane(& plane) {
 }
 

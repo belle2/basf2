@@ -80,4 +80,10 @@ TRGCDCHoughPlaneMulti2::registerPattern(unsigned layerId, unsigned id) {
     _layers[layerId]->registerPattern(id);
 }
 
+const std::vector<unsigned> &
+TRGCDCHoughPlaneMulti2:: patternId(unsigned layer,
+                                   unsigned cellId) const {
+    return _layers[layer]->patternId(cellId);
+}
+
 } // namespace Belle2

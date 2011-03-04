@@ -23,7 +23,7 @@ namespace Belle2 {
 TRGCDCDisplayHough::TRGCDCDisplayHough(const std::string & name,
                                        int size)
     : TRGCDCDisplay(name, size, 10),
-      _w(size),
+      _w(* this, size),
       _adjustment(1., 1., 50.0, 0.1),
       _scaler(_adjustment) {
 

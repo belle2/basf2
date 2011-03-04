@@ -31,13 +31,18 @@ class TRGCDCCircle;
 class TRGCDCTrack;
 class TRGCDCFrontEnd;
 class TRGCDCMerger;
+class TRGCDCDisplay;
 
 /// Actual class to display trigger objects
 class TRGCDCDisplayDrawingAreaRphi : public TRGCDCDisplayDrawingArea {
 
   public:
+
     /// Default constructor
-    TRGCDCDisplayDrawingAreaRphi(int size, double innerR, double outerR);
+    TRGCDCDisplayDrawingAreaRphi(TRGCDCDisplay &,
+                                 int size,
+                                 double innerR,
+                                 double outerR);
     
     /// Destructor
     virtual ~TRGCDCDisplayDrawingAreaRphi();
@@ -75,6 +80,10 @@ class TRGCDCDisplayDrawingAreaRphi : public TRGCDCDisplayDrawingArea {
                 Gdk::Color color = Gdk::Color("grey"));
     void append(const TRGCDCMerger &,
                 Gdk::Color color = Gdk::Color("grey"));
+
+    /// Draws only once.
+    void oneShot(const std::vector<const TRGCDCTrackSegment *> &,
+                 Gdk::Color color = Gdk::Color("#6600FF009900"));
 
     virtual bool on_expose_event(GdkEventExpose *);
     virtual bool on_button_press_event(GdkEventButton *);

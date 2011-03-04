@@ -15,6 +15,7 @@
 #define TRGCDC_SHORT_NAMES
 
 #include <iostream>
+#include "trg/trg/Debug.h"
 #include "trg/cdc/Fitter3D.h"
 #include "trg/cdc/TrackSegment.h"
 #include "trg/cdc/Track.h"
@@ -25,7 +26,7 @@ namespace Belle2 {
 
 string
 TRGCDCFitter3D::version(void) const {
-    return string("0.00");
+    return string("TRGCDCFitter3D 5.04");
 }
 
 TRGCDCFitter3D::TRGCDCFitter3D(const string & name,
@@ -42,6 +43,8 @@ TRGCDCFitter3D::~TRGCDCFitter3D() {
 int
 TRGCDCFitter3D::doit(vector<TCTrack *> & trackListIn,
                      vector<TCTrack *> & trackListOut) {
+
+    TRGDebug::enterStage("Fitter 3D");
 
     //...Loop over track list...
     const unsigned nInput = trackListIn.size();
@@ -71,6 +74,7 @@ TRGCDCFitter3D::doit(vector<TCTrack *> & trackListIn,
     }
 
     //...Termination...
+    TRGDebug::leaveStage("Fitter 3D");
     return 0;
 }
 

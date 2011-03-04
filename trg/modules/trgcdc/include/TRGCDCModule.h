@@ -53,7 +53,7 @@ class TRGCDCModule : public Module {
     /// returns version of TRGCDCModule.
     std::string version(void) const;
 
-  private:
+  private: // Parameters
 
     /// Debug level.
     int _debugLevel;
@@ -63,6 +63,17 @@ class TRGCDCModule : public Module {
 
     /// Curl back stop parameter. 0:do nothing, 1:stop curling. Default is 0.
     int _curlBackStop;
+
+    /// Switch for the perfect finder.
+    bool _hFinderPerfect;
+
+    /// \# of X mesh for the Hough finder.
+    unsigned _hFinderMeshX;
+
+    /// \# of Y mesh for the Hough finder.
+    unsigned _hFinderMeshY;
+
+  private:
 
     /// A pointer to a TRGCDC;
     TRGCDC * _cdc;

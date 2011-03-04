@@ -29,6 +29,7 @@ namespace Belle2 {
 class TRGCDCHoughPlaneMulti2 : public TRGCDCHoughPlane {
 
   public:
+
     /// Contructor.
     TRGCDCHoughPlaneMulti2(const std::string & name,
                            const TRGCDCHoughTransformation & transformation,
@@ -44,47 +45,67 @@ class TRGCDCHoughPlaneMulti2 : public TRGCDCHoughPlane {
     virtual ~TRGCDCHoughPlaneMulti2();
 
   public:// Selectors
+
+    // Dumps debug information.
     void dump(unsigned layerId) const;
+
+    // Dumps debug information.
     void dump(const std::string & message = std::string(""),
               const std::string & prefix = std::string("")) const;
 
   public:// Modifiers
+
     /// Clears all entries and regions.
     void clear(void);
+
+    /// Clears only specified layer ID.
     void clear(unsigned layerId);
 
     /// Clears entires only.
     void clearCells(void);
 
-    /// vote
+    /// Voting.
     void vote(float rx,
               float ry,
               int charge,
               unsigned layerId,
               int weight = 1);
+
+    /// Voting.
     void vote(unsigned layerId, unsigned localId, int weight = 1);
+
+    /// Voting.
     void vote(float rx,
               float ry,
               unsigned layerId,
               int weight = 1);
+
+    /// Merge layers into one.
     void merge(void);
 
     /// registers a pattern..
-//  void registerPattern(unsigned id);
     void registerPattern(unsigned layerId, unsigned id);
 
     /// allocate memory for patterns.
     void preparePatterns(unsigned layerId, unsigned nPatterns);
 
-  protected:
-    /// Add to a cell.
-//    void add(unsigned cellId, int weight);
+    /// returns pattern ID in a layer which activates specified cell.
+    const std::vector<unsigned> & patternId(unsigned layer,
+                                            unsigned cellId) const;
 
   private:
+
+    /// \# of layers.
     unsigned _nLayers;
+
+    /// Hough plane for each layer.
     TRGCDCHoughPlaneBoolean * _layers[N_LAYERS];
+
+    /// Used or not.
     bool _usage[N_LAYERS];
 };
+
+//-----------------------------------------------------------------------------
 
 inline
 void
@@ -114,23 +135,6 @@ TRGCDCHoughPlaneMulti2::clear(unsigned a) {
     _layers[a]->clear();
     _usage[a] = false;
 }
-
-// inline
-// void
-// TRGCDCHoughPlaneMulti2::registerPattern(unsigned id) {
-//     _layers[id]->registerPattern();
-// }
-
-// void
-// TRGCDCHoughPlaneMulti2::registerPattern(void) {
-//     return;
-// }
-
-// inline
-// void
-// TRGCDCHoughPlaneMulti2::add(unsigned a, int weight) {
-
-// }
 
 inline
 void

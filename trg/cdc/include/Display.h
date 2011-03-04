@@ -78,6 +78,12 @@ class TRGCDCDisplay : public Gtk::Window {
     /// returns drawing area.
     virtual TRGCDCDisplayDrawingArea & area(void) = 0;
 
+    /// links R/phi display.
+    void link(TRGCDCDisplayRphi &);
+
+    /// returns R/phi display.
+    TRGCDCDisplayRphi * rphi(void);
+
   private: // Actions
     virtual void on_next(void);
     virtual void on_endOfEvent(void);
@@ -108,6 +114,9 @@ class TRGCDCDisplay : public Gtk::Window {
 
     friend class TRGCDCDisplayRphi;
     friend class TRGCDCDisplayHough;
+
+    /// Rphi display.
+    TRGCDCDisplayRphi * _rphi;
 };
 
 //-----------------------------------------------------------------------------
@@ -123,7 +132,8 @@ TRGCDCDisplay::stage(const std::string & a) {
 inline
 void
 TRGCDCDisplay::information(const std::string & a) {
-    _info += a;
+//  _info += a;
+    _info = a;
     Glib::ustring s = "Stage : " + _stage + "\nInformation : " + _info;
     _label.set_label(s);
 }
@@ -157,6 +167,18 @@ inline
 void
 TRGCDCDisplay::endOfEvent(void) {
     _endOfEvent = true;
+}
+
+inline
+void
+TRGCDCDisplay::link(TRGCDCDisplayRphi & a) {
+    _rphi = & a;
+}
+
+inline
+TRGCDCDisplayRphi *
+TRGCDCDisplay::rphi(void) {
+    return _rphi;
 }
 
 } // namespace Belle2

@@ -17,7 +17,9 @@
 #include <cstdlib>
 #include "framework/datastore/StoreArray.h"
 #include "cdc/hitcdc/HitCDC.h"
+#include "cdc/hitcdc/CDCSimHit.h"
 #include "cdc/geocdc/CDCGeometryPar.h"
+#include "trg/trg/Debug.h"
 #include "trg/trg/Time.h"
 #include "trg/trg/Signal.h"
 #include "trg/trg/Link.h"
@@ -34,12 +36,6 @@
 #include "trg/cdc/Merger.h"
 #include "trg/cdc/HoughFinder.h"
 #include "trg/cdc/Fitter3D.h"
-#ifdef TRGCDC_DEBUG
-#ifdef BUILD_2010_12_13
-#else
-#include "cdc/hitcdc/CDCSimHit.h"
-#endif
-#endif
 #ifdef TRGCDC_DISPLAY
 #include "trg/cdc/DisplayRphi.h"
 #include "trg/cdc/DisplayHough.h"
@@ -64,22 +60,29 @@ TRGCDC::name(void) const {
 
 std::string
 TRGCDC::version(void) const {
-    return "5.03";
+    return string("TRGCDC 5.04");
 }
 
 TRGCDC *
 TRGCDC::_cdc = 0;
 
 TRGCDC *
-TRGCDC::getTRGCDC(const std::string & configFile) {
+TRGCDC::getTRGCDC(const std::string & configFile,
+                  bool houghFinderPerfect,
+                  unsigned houghFinderMeshX,
+                  unsigned houghFinderMeshY) {
     if (_cdc)
         delete _cdc;
 
     if (configFile != "good-bye") {
-        _cdc = new TRGCDC(configFile);
+        _cdc = new TRGCDC(configFile,
+                          houghFinderPerfect,
+                          houghFinderMeshX,
+                          houghFinderMeshY);
     }
     else {
         cout << "TRGCDC::getTRGCDC ... good-bye" << endl;
+//        delete _cdc;
         _cdc = 0;
     }
 
@@ -93,17 +96,20 @@ TRGCDC::getTRGCDC(void) {
     return _cdc;
 }
 
-TRGCDC::TRGCDC(const std::string & configFile) :
-    _debugLevel(0),
-    _configFilename(configFile),
-    _fudgeFactor(1.),
-    _width(0),
-    _r(0),
-    _r2(0),
-    _clock(TRGClock(2.7, 125.000, "CDCTrigge system clock")),
-    _offset(5.3),
-    _hFinder(0),
-    _fitter3D(0) {
+TRGCDC::TRGCDC(const std::string & configFile,
+                  bool houghFinderPerfect,
+                  unsigned houghFinderMeshX,
+                  unsigned houghFinderMeshY) 
+    : _debugLevel(0),
+      _configFilename(configFile),
+      _fudgeFactor(1.),
+      _width(0),
+      _r(0),
+      _r2(0),
+      _clock(TRGClock(2.7, 125.000, "CDCTrigge system clock")),
+      _offset(5.3),
+      _hFinder(0),
+      _fitter3D(0) {
 
 #ifdef TRGCDC_DISPLAY
     int argc = 0;
@@ -113,18 +119,25 @@ TRGCDC::TRGCDC(const std::string & configFile) :
         D = new TCDisplayRphi();
     D->clear();
     D->show();
-    cout << "TRGCDCModule ... GTK initialized" << endl;
+    cout << "TRGCDC ... GTK initialized" << endl;
 #endif
 
-    cout << "TRGCDC ... TRGCDC initializing for " << _configFilename << endl;
-    initialize();
-    Belle2_GDL::GDLSystemClock.dump();
-    _clock.dump();
-    cout << "TRGCDC ... TRGCDC created for " << _configFilename << endl;
+    if (TRGDebug::level())
+        cout << "TRGCDC ... TRGCDC initializing for " << _configFilename
+             << endl;
+    initialize(houghFinderPerfect, houghFinderMeshX, houghFinderMeshY);
+
+    if (TRGDebug::level()) {
+        cout << "TRGCDC ... TRGCDC created for " << _configFilename << endl;
+        Belle2_GDL::GDLSystemClock.dump();
+        _clock.dump();
+    }
 }
 
 void
-TRGCDC::initialize(void) {
+TRGCDC::initialize(bool houghFinderPerfect,
+                   unsigned houghFinderMeshX,
+                   unsigned houghFinderMeshY) {
 
     //...CDC...
     Belle2::CDCGeometryPar & cdc2 = * Belle2::CDCGeometryPar::Instance();
@@ -190,23 +203,24 @@ TRGCDC::initialize(void) {
         const float innerRadius = swr - (fwr - swr);
         const float outerRadius = swr + (fwr - swr);
 
-
-        cout << "... " << i << ", in=" << innerRadius << ", out=" << outerRadius << ", swr=" << swr << ", fwr" << fwr << endl;
+        if (TRGDebug::level() > 9)
+            cout << "lyr " << i << ", in=" << innerRadius << ", out="
+                 << outerRadius << ", swr=" << swr << ", fwr" << fwr << endl;
 
         //...New layer...
         TRGCDCLayer * layer = new TRGCDCLayer(i,
-                                                      superLayerId,
+                                              superLayerId,
                                             _superLayers[superLayerId]->size(),
-                                                      axialStereoLayerId,
-                                                      axialStereoSuperLayerId,
-                                                      cdc2.zOffsetWireLayer(i),
-                                                      nShifts,
-                                                      M_PI * cdc2.senseWireR(i)
-                                                      * cdc2.senseWireR(i)
-                                                      / double(nWiresInLayer),
-                                                      nWiresInLayer,
-                                                      innerRadius,
-                                                      outerRadius);
+                                              axialStereoLayerId,
+                                              axialStereoSuperLayerId,
+                                              cdc2.zOffsetWireLayer(i),
+                                              nShifts,
+                                              M_PI * cdc2.senseWireR(i)
+                                              * cdc2.senseWireR(i)
+                                              / double(nWiresInLayer),
+                                              nWiresInLayer,
+                                              innerRadius,
+                                              outerRadius);
         _layers.push_back(layer);
         superLayer->push_back(layer);
         if (axial)
@@ -309,27 +323,30 @@ TRGCDC::initialize(void) {
         _r2[i] = _r[i] * _r[i];
         if (i == (nSuperLayers() - 1)) {
             _r[i + 1] = slayer.back()->outerRadius();
-             _r2[i + 1] = _r[i + 1] * _r[i + 1];
-// #ifdef TRGCDC_DEBUG
-//         cout << "    super layer " << i << " outer radius=" << _r[i]
-//                << "(r^2=" << _r2[i] << ")" << std::endl;
-// #endif
+            _r2[i + 1] = _r[i + 1] * _r[i + 1];
         }
 
-#ifdef TRGCDC_DEBUG
-        const TRGCDCWire & wi = * slayer[0]->front();
-        const unsigned layerId = wi.layerId();
-        cout << layerId << "," << cdc2.senseWireR(layerId) << ","
-                  << cdc2.fieldWireR(layerId) << std::endl;
-        cout << "    super layer " << i << " radius=" << _r[i] << "(r^2="
-                  << _r2[i] << ")" << std::endl;
-#endif
+        if (TRGDebug::level() > 9) {
+            const TRGCDCWire & wi = * slayer[0]->front();
+            const unsigned layerId = wi.layerId();
+            cout << layerId << "," << cdc2.senseWireR(layerId) << ","
+                 << cdc2.fieldWireR(layerId) << std::endl;
+            cout << "    super layer " << i << " radius=" << _r[i] << "(r^2="
+                 << _r2[i] << ")" << std::endl;
+        }
     }
 
     //...Hough Finder...
 //  _hFinder = new TCHFinder("HoughFinder", * this, 350, 100);
 //  _hFinder = new TCHFinder("HoughFinder", * this, 160, 96);
-    _hFinder = new TCHFinder("HoughFinder", * this, 96, 96);
+//  _hFinder = new TCHFinder("HoughFinder", * this, 96, 96);
+/// _hFinder = new TCHFinder("HoughFinder", * this, 128, 48);
+/// _hFinder = new TCHFinder("HoughFinder", * this, 384, 48);
+    _hFinder = new TCHFinder("HoughFinder",
+                             * this,
+                             houghFinderMeshX,
+                             houghFinderMeshY);
+    _hFinder->perfect(houghFinderPerfect);
 
     //...3D fitter...
     _fitter3D = new TCFitter3D("Fitter3D", * this);
@@ -536,6 +553,8 @@ TRGCDC::fastClear(void) {
 void
 TRGCDC::update(bool mcAnalysis) {
 
+    TRGDebug::enterStage("TRGCDC update");
+
     //...Already updated?...
 //  if (TUpdater::updated()) return;
 
@@ -543,21 +562,17 @@ TRGCDC::update(bool mcAnalysis) {
 //  fastClear();
     clear();
 
-#ifdef TRGCDC_DEBUG
-#ifdef BUILD_2010_12_13
-#else
     StoreArray<CDCSimHit> cdcArray("CDCSimHit");
-    if (!cdcArray) {
+    if (! cdcArray) {
         cout << "TRGCDC !!! can not access to CDC sim hits" << std::endl;
     }
     const int n = cdcArray->GetEntriesFast();
-#endif
-#endif
 
     //...Loop over HitCDC...
     StoreArray<HitCDC> cdcHits("HitCDCArray");
     if (! cdcHits) {
         cout << "TRGCDC !!! can not access to CDC hits" << std::endl;
+        TRGDebug::leaveStage("TRGCDC update");
         return;
     }
 
@@ -602,16 +617,13 @@ TRGCDC::update(bool mcAnalysis) {
     if (mcAnalysis) updateMC();
 
     //...Update information...
-//    TUpdater::update();
+//  TUpdater::update();
 
-#ifdef TRGCDC_DEBUG
-#ifdef BUILD_2010_12_13
-    cout << "TRGCDC ... #HitCDC=" << nHits << endl;
-#else
-    cout << "TRGCDC ... #CDCSimHit=" << n << ",#HitCDC=" << nHits << endl;
-#endif
-#endif
+    if (TRGDebug::level())
+        cout << TRGDebug::tab() << "#CDCSimHit=" << n << ",#HitCDC=" << nHits
+             << endl;
 
+    TRGDebug::leaveStage("TRGCDC update");
 }
 
 void
@@ -671,14 +683,12 @@ TRGCDC::updateMC(void) {
 // //           cout << "TRGCDC::updateMC !!! mission impossible" << std::endl;
 // //           cout << "                   This error will cause trasan crush";
 // //           cout << std::endl;
-// // #ifdef TRGCDC_DEBUG_DETAIL
 // //           cout << "    h->m_hep, h->m_hep -1 = " << h->m_hep;
 // //           cout << ", " << h->m_hep - 1 << std::endl;
 // //           cout << "    TRGCDCTrackMC list length = ";
 // // //cnv          cout << TRGCDCTrackMC::list().size() << std::endl;
 // // //cnv          BsShwDat(GEN_HEPEVT);
 // // //cnv          BsShwDat(DATRGCDC_MCWIRHIT);
-// // #endif
 // //        }
 //     }
 }
@@ -1091,6 +1101,8 @@ TRGCDC::simulate(void) {
     D->beginningOfEvent();
 #endif
 
+    TRGDebug::enterStage("TRGCDC simulation");
+
     //...TS hits...
     const unsigned n = _tss.size();
     for (unsigned i = 0; i < n; i++) {
@@ -1100,18 +1112,20 @@ TRGCDC::simulate(void) {
              _tsHits.push_back(& s);
     }
 
-#ifdef TRGCDC_DEBUG
-    cout << "TRGCDC ... TS hits" << endl;
-    for (unsigned i = 0; i < nTrackSegments(); i++) {
-        const TCTSegment & s = * trackSegment(i);
-        if (s.triggerOutput().active())
-            s.dump("detail", "        ");
+    if (TRGDebug::level() > 1) {
+        cout << TRGDebug::tab() << "TS hit list" << endl;
+        string dumpOption = "trigger";
+        if (TRGDebug::level() > 2)
+            dumpOption = "detail";
+        for (unsigned i = 0; i < nTrackSegments(); i++) {
+            const TCTSegment & s = * trackSegment(i);
+            if (s.triggerOutput().active())
+                s.dump(dumpOption, TRGDebug::tab(4));
+        }
     }
-#endif
 
     //...2D tracker : Hough finder...
     vector<TCTrack *> trackList;
-    _hFinder->perfect(true);
     _hFinder->doit(trackList);
 
     //...3D tracker...
@@ -1151,7 +1165,9 @@ TRGCDC::simulate(void) {
 //         D->run();
 //     }
 #endif
-
+    
+    TRGDebug::leaveStage("TRGCDC simulation");
+    return;
 }
 
 void
@@ -1219,16 +1235,6 @@ TRGCDC::configure(void) {
             continue;
         if (lines != wid)
             continue;
-
-#ifdef TRGCDC_DEBUG
-//         cout << lines
-//              << " " << wid
-//              << " " << lid
-//              << " " << fid
-//              << " " << mid
-//              << " " << tid
-//              << endl;
-#endif
 
         //...Make a front-end board if necessary...
         TCFrontEnd * f = 0;

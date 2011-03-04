@@ -41,7 +41,8 @@ TRGCDCDisplay::TRGCDCDisplay(const string & name,
              Gtk::ALIGN_LEFT,
              Gtk::ALIGN_TOP),
       _buttonPositionReset("Reset position"),
-      _buttonWireName("Wire Name") {
+      _buttonWireName("Wire Name"),
+      _rphi(0) {
 
     set_title(name);
 

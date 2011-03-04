@@ -25,15 +25,23 @@
 
 namespace Belle2 {
 
+class TRGCDCDisplay;
+
 /// Actual class to display trigger objects
 class TRGCDCDisplayDrawingArea : public Gtk::DrawingArea {
 
   public:
+
     /// Default constructor
-    TRGCDCDisplayDrawingArea(int size, double outerR);
+    TRGCDCDisplayDrawingArea(TRGCDCDisplay &, int size, double outerR);
     
     /// Destructor
     virtual ~TRGCDCDisplayDrawingArea();
+
+  public:
+
+    /// returns mother window.
+    TRGCDCDisplay & display(void);
 
     double scale(double);
     double scale(void) const;
@@ -56,6 +64,10 @@ class TRGCDCDisplayDrawingArea : public Gtk::DrawingArea {
     virtual void on_realize() = 0;
 
   private:
+
+    /// Mother window.
+    TRGCDCDisplay & _w;
+
     double _scale;
     bool _axial;
     bool _stereo;
@@ -123,6 +135,12 @@ inline
 bool
 TRGCDCDisplayDrawingArea::oldCDC(bool a) {
     return _oldCDC = a;
+}
+
+inline
+TRGCDCDisplay &
+TRGCDCDisplayDrawingArea::display(void) {
+    return _w;
 }
 
 } // namespace Belle2

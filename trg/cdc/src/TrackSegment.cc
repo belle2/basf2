@@ -44,7 +44,7 @@ TRGCDCTrackSegment::~TRGCDCTrackSegment() {
  
 void
 TRGCDCTrackSegment::dump(const string & msg,
-                             const string & pre) const {
+                         const string & pre) const {
     cout << pre << name() << endl;
     if ((msg.find("geometry") != string::npos) ||
         (msg.find("detail") != string::npos)) {
@@ -64,7 +64,7 @@ TRGCDCTrackSegment::dump(const string & msg,
     if ((msg.find("trigger") != string::npos) ||
         (msg.find("detail") != string::npos) ){
         if (_signal.active())
-            _signal.dump(msg, pre);
+            _signal.dump(msg, pre + "    ");
         else
             cout << pre << "no trigger signal" << endl;
     }
@@ -91,10 +91,6 @@ TRGCDCTrackSegment::name(void) const {
 void
 TCTSegment::simulate(void) {
 
-#ifdef TRGCDC_DEBUG
-//    cout << name() << endl;
-#endif
-
     //...Get wire informtion...
     const unsigned n = _wires.size();
     unsigned nHits = 0;
@@ -105,9 +101,6 @@ TCTSegment::simulate(void) {
 
         if (s.active()) {
             ++nHits;
-#ifdef TRGCDC_DEBUG
-//            s->dump("", "    ");
-#endif
         }
     }
 
@@ -120,9 +113,6 @@ TCTSegment::simulate(void) {
         TRGCDC::getTRGCDC()->systemClock().unit(400);
     for (unsigned i = 0; i < n; i++) {
         signals[i].widen(width);
-#ifdef TRGCDC_DEBUG
-//        signals[i].dump("", "    ");
-#endif
     }
 
     //...Simple simulation assuming 3:2:1:2:3 shape...
@@ -138,7 +128,6 @@ TCTSegment::simulate(void) {
     if (all.nEdges())
         _signal = all;
 
-#ifdef TRGCDC_DEBUG
 //     l0.dump("", "       -> ");
 //     l1.dump("", "       -> ");
 //     l2.dump("", "       -> ");
@@ -147,7 +136,6 @@ TCTSegment::simulate(void) {
 //     if (all.nEdges())
 //         cout << "===========" << endl;
 //     all.dump("", "    ----> ");
-#endif
     
 }
 

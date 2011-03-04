@@ -30,10 +30,13 @@ namespace Belle2_TRGCDC {
 
 namespace Belle2 {
 
+class TRGCDCDisplayRphi;
+
 /// A class to display CDC trigger information.
 class TRGCDCDisplayHough : public TRGCDCDisplay {
     
   public:
+
     /// Default constructor
     TRGCDCDisplayHough(const std::string & name = "TRGCDCDisplayHough",
                        int size = 600);
@@ -50,7 +53,11 @@ class TRGCDCDisplayHough : public TRGCDCDisplay {
     double scale(double);
 
   private: // Actions
+
+    /// On scale.
     virtual void on_scale_value_changed(void);
+
+    /// On position.
     virtual void on_positionReset(void);
 
   public: // Access to drawing area.
@@ -62,6 +69,7 @@ class TRGCDCDisplayHough : public TRGCDCDisplay {
     TRGCDCDisplayDrawingAreaHough _w;
     Gtk::Adjustment _adjustment;
     Gtk::HScale _scaler;
+
 };
 
 //-----------------------------------------------------------------------------

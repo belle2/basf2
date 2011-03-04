@@ -23,9 +23,11 @@ using namespace std;
 
 namespace Belle2 {
 
-TRGCDCDisplayDrawingArea::TRGCDCDisplayDrawingArea(int size,
+TRGCDCDisplayDrawingArea::TRGCDCDisplayDrawingArea(TRGCDCDisplay & w,
+                                                   int size,
                                                    double outerR)
-    : _scale(double(size) / outerR / 2),
+    : _w(w),
+      _scale(double(size) / outerR / 2),
       _axial(true),
       _stereo(false),
       _wireName(false),

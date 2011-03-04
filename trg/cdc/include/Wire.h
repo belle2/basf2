@@ -171,9 +171,9 @@ class TRGCDCWire {
     unsigned _id;
     unsigned _localId;
     const TRGCDCLayer * _layer;
-    HepGeom::Point3D<double>  _xyPosition;
-    HepGeom::Point3D<double>  _forwardPosition;
-    HepGeom::Point3D<double>  _backwardPosition;
+    HepGeom::Point3D<double> _xyPosition;
+    HepGeom::Point3D<double> _forwardPosition;
+    HepGeom::Point3D<double> _backwardPosition;
     Vector3D _direction;
 
     mutable TRGSignal _triggerOutput;

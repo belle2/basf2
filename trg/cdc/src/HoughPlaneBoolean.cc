@@ -34,7 +34,8 @@ TRGCDCHoughPlaneBoolean::TRGCDCHoughPlaneBoolean(const std::string & name,
       _cell(new unsigned[_n]),
       _nPatterns(0),
       _patterns(0),
-      _nActive(0) {
+      _nActive(0),
+      _reverse(0) {
     clear();
 }
 
@@ -44,6 +45,7 @@ TRGCDCHoughPlaneBoolean::~TRGCDCHoughPlaneBoolean() {
     delete [] _patterns;
     delete [] _nActive;
     delete [] _cell;
+    delete [] _reverse;
 }
 
 void
@@ -55,7 +57,7 @@ TRGCDCHoughPlaneBoolean::vote(float rx,
     const HepGeom::Point3D<double> r(rx, ry, 0);
 
 //
-    cout << "yMax=" << yMax() << endl;
+//  cout << "yMax=" << yMax() << endl;
 //
 
     //...phi loop...
@@ -72,8 +74,8 @@ TRGCDCHoughPlaneBoolean::vote(float rx,
         float y1 = transformation().y(rx, ry, x1);
 
 //
-        cout << "x0,x1,y0,y1=" << x0 << "," << x1 << "," << y0 << "," << y1
-             << endl;
+//      cout << "x0,x1,y0,y1=" << x0 << "," << x1 << "," << y0 << "," << y1
+//           << endl;
 //
 
         //...Check y position...
@@ -105,8 +107,8 @@ TRGCDCHoughPlaneBoolean::vote(float rx,
         int iY1 = int((y1 - yMin()) / ySize());
 
 //
-        cout << "x0,x1,y0,y1=" << x0 << "," << x1 << "," << y0 << "," << y1
-             << "," << iY0 << "," << iY1 << endl;
+//      cout << "x0,x1,y0,y1=" << x0 << "," << x1 << "," << y0 << "," << y1
+//           << "," << iY0 << "," << iY1 << endl;
 //
 
         //...Sorting...
@@ -199,6 +201,8 @@ TRGCDCHoughPlaneBoolean::voteUsedInTrasan(float rx,
 
 void
 TRGCDCHoughPlaneBoolean::registerPattern(unsigned id) {
+
+    //...Check status...
     if (_patterns[id]) {
         std::cout << "TRGCDCHoughPlaneBoolean::registerPattern !!! "
                << "a pattern(id=" << id << ") was already registered"
@@ -218,14 +222,14 @@ TRGCDCHoughPlaneBoolean::registerPattern(unsigned id) {
     for (unsigned i = 0; i < n; i++) {
         const unsigned j = i / 32;
         const unsigned k = i % 32;
-        if ((_cell[j] >> k) & 1)
+        if ((_cell[j] >> k) & 1) {
             ++nActive;
+            _reverse[i].push_back(id);
+        }
     }
     _nActive[id] = nActive;
 
-//  std::cout << "    id=" << id << ",nActive=" << nActive << std::endl;
-
-    //...Create array...
+    //...Create an array...
     _patterns[id] = new unsigned[nActive];
 
     //...Store them...
@@ -252,6 +256,7 @@ TRGCDCHoughPlaneBoolean::preparePatterns(unsigned nPatterns) {
     _patterns = new unsigned * [_nPatterns];
     _nActive = new unsigned[_nPatterns];
     memset(_patterns, 0, _nPatterns * sizeof(unsigned *));
+    _reverse = new vector<unsigned>[nX() * nY()];
 }
 
 void

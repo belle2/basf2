@@ -32,10 +32,11 @@ using namespace std;
 
 namespace Belle2 {
 
-TRGCDCDisplayDrawingAreaRphi::TRGCDCDisplayDrawingAreaRphi(int size,
+TRGCDCDisplayDrawingAreaRphi::TRGCDCDisplayDrawingAreaRphi(TRGCDCDisplay & w,
+                                                           int size,
                                                            double innerR,
                                                            double outerR)
-    : TRGCDCDisplayDrawingArea(size, outerR),
+    : TRGCDCDisplayDrawingArea(w, size, outerR),
       _scale(double(size) / outerR / 2),
       _axial(true),
       _stereo(false),
@@ -68,8 +69,6 @@ TRGCDCDisplayDrawingAreaRphi::TRGCDCDisplayDrawingAreaRphi(int size,
     _pl = create_pango_layout(wn);
 
     add_events(Gdk::EXPOSURE_MASK | Gdk::BUTTON_PRESS_MASK);
-
-    cout << "Drawing called ..." << endl;
 }
 
 TRGCDCDisplayDrawingAreaRphi::~TRGCDCDisplayDrawingAreaRphi() {
@@ -89,10 +88,6 @@ TRGCDCDisplayDrawingAreaRphi::on_expose_event(GdkEventExpose *) {
     Glib::RefPtr<Gdk::Window> window = get_window();
     window->get_geometry(_winx, _winy, _winw, _winh, _wind);
     window->clear();
-
-// std::cout << "_x,_y,_scale=" << _x << "," << _y << "," << _scale
-//               << std::endl;
-
     drawCDC();
     draw();
     return true;
@@ -333,6 +328,9 @@ TRGCDCDisplayDrawingAreaRphi::drawCircle(const TCCircle & t,
                       0,
                       360 * 64);
     colormap->free_color(c);
+
+    //...Draw text...
+    //_window.draw_text(_xPositionText, _yPositionText, _text.c_str());
 }
 
 void
@@ -504,6 +502,13 @@ TRGCDCDisplayDrawingAreaRphi::clear(void) {
     _frontColors.clear();
     _mergers.clear();
     _mergerColors.clear();
+}
+
+void
+TRGCDCDisplayDrawingAreaRphi::oneShot(const vector<const TCTSegment *> & l,
+                                      Gdk::Color color) {
+    for (unsigned i = 0; i < l.size(); i++)
+        drawTrackSegment(* l[i], 1, color, Gdk::LINE_SOLID);
 }
 
 } // namespace Belle2

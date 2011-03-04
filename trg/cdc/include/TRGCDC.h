@@ -56,26 +56,35 @@ class TRGCDC {
   public:
 
     /// returns TRGCDC object with specific configuration.
-    static TRGCDC * getTRGCDC(const std::string & configFile);
-
+    static TRGCDC * getTRGCDC(const std::string & configFile,
+                              bool houghFinderPerfect = false,
+                              unsigned houghFinderMeshX = 96,
+                              unsigned houghFinderMeshY = 96);
+    
     /// returns TRGCDC object. TRGCDC should be created with specific configuration before calling this function.
     static TRGCDC * getTRGCDC(void);
 
   private:
 
     /// Constructor
-    TRGCDC(const std::string & configFile);
+    TRGCDC(const std::string & configFile,
+           bool houghFinderPerfect,
+           unsigned houghFinderMeshX,
+           unsigned houghFinderMeshY);
 
     /// Destructor
     virtual ~TRGCDC();
 
     /// initializes CDC geometry.
-    void initialize(void);
+    void initialize(bool houghFinderPerfect,
+                    unsigned houghFinderMeshX,
+                    unsigned houghFinderMeshY);
 
     /// configures trigger modules for detail simulation.
     void configure(void);
 
   public:
+
     /// simulates CDC trigger.
     void simulate(void);
 

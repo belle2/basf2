@@ -51,8 +51,8 @@
       <Density unit="g/cm3">2.43133200795229</Density>
       <Elements>
         <Element name="Si" weight="0.99403578528827">
-          <AtomNumber>6</AtomNumber>
-          <MassNumber>12.0107</MassNumber>
+          <AtomNumber>14</AtomNumber>
+          <MassNumber>28.0855</MassNumber>
         </Element>
         <Element name="Au" weight="0.00596421471172962">
           <AtomNumber>79</AtomNumber>
@@ -65,8 +65,8 @@
       <Density unit="g/cm3">2.43133200795229</Density>
       <Elements>
         <Element name="Si" weight="0.99403578528827">
-          <AtomNumber>6</AtomNumber>
-          <MassNumber>12.0107</MassNumber>
+          <AtomNumber>14</AtomNumber>
+          <MassNumber>28.0855</MassNumber>
         </Element>
         <Element name="Au" weight="0.00596421471172962">
           <AtomNumber>79</AtomNumber>
@@ -79,8 +79,8 @@
       <Density unit="g/cm3">2.43133200795229</Density>
       <Elements>
         <Element name="Si" weight="0.99403578528827">
-          <AtomNumber>6</AtomNumber>
-          <MassNumber>12.0107</MassNumber>
+          <AtomNumber>14</AtomNumber>
+          <MassNumber>28.0855</MassNumber>
         </Element>
         <Element name="Au" weight="0.00596421471172962">
           <AtomNumber>79</AtomNumber>

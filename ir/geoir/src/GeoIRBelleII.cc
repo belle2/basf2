@@ -403,6 +403,7 @@ void GeoIRBelleII::create(GearDir& content)
   //                 Build shields
   //-----------------------------------------------------------------
 
+  /* //modify start nakano110308
   try {
     int nShield = content.getNumberNodes("Shields/Shield");
     for (int iShield = 1; iShield <= nShield; ++iShield) {
@@ -454,6 +455,7 @@ void GeoIRBelleII::create(GearDir& content)
   } catch (runtime_error& exc) {
     B2ERROR("No shields defined ! " << exc.what())
   }
+  */ //modify start nakano110308
 
   //-----------------------------------------------------------------
   //                 Build IP Chamber

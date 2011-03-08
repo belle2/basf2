@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ParamSet type="HOLDER">
+	<Name>Belle II Holder</Name>
+	<Description>Belle II Holder geometry</Description>
+	<Version>0</Version>
+	<Creator>HolderBelleII</Creator>
+	<Content>
+		<Rotation desc="Rotation of the Holder with respect to the Detector" unit="rad">0.0</Rotation>
+		<OffsetZ desc="The offset of the Holder in z with respect to the IP" unit="cm">0.0</OffsetZ>
+
+        <!-- SVD end ring R side -->
+		<R1hmm1>
+			<d1 unit="cm">21.0</d1>
+			<l1 unit="cm">9.36</l1>
+			<l2 unit="cm">6.10</l2>
+			<i1 unit="cm">3.0</i1>
+			<i2 unit="cm">4.4</i2>
+			<o1 unit="cm">3.445</o1>
+			<o2 unit="cm">5.0</o2>
+			<Material desc="description">Tungsten</Material>
+		</R1hmm1>
+
+		<R1hmm2>
+			<d1 unit="cm">30.36</d1>
+			<l1 unit="cm">6.2</l1>
+			<l2 unit="cm">3.4</l2>
+			<l3 unit="cm">5.5</l3>
+			<l4 unit="cm">5.0</l4>
+			<l5 unit="cm">2.0</l5>
+			<i1 unit="cm">6.0</i1>
+			<i2 unit="cm">9.55</i2>
+			<o1 unit="cm">6.8</o1>
+			<o2 unit="cm">7.0</o2>
+			<o3 unit="cm">10.55</o3>
+			<o4 unit="cm">11.35</o4>
+			<Material desc="description">Tungsten</Material>
+		</R1hmm2>
+
+        <!-- SVD end ring L side -->
+		<L1hmm1>
+			<d1 unit="cm">-14.4</d1>
+			<l1 unit="cm">-10.1</l1>
+			<l2 unit="cm">-9.0</l2>
+			<l3 unit="cm">-2.5</l3>
+			<l4 unit="cm">-0.5</l4>
+			<i1 unit="cm">3.0</i1>
+			<i2 unit="cm">4.7</i2>
+			<i3 unit="cm">4.1</i3>
+			<o1 unit="cm">3.445</o1>
+			<o2 unit="cm">5.7</o2>
+			<o3 unit="cm">6.2</o3>
+			<Material desc="description">Tungsten</Material>
+		</L1hmm1>
+
+		<L1hmm2>
+			<d1 unit="cm">-24.5</d1>
+			<l1 unit="cm">-10.0</l1>
+			<l2 unit="cm">-2.0</l2>
+			<i1 unit="cm">9.1</i1>
+			<o1 unit="cm">10.145</o1>
+			<o2 unit="cm">12.1</o2>
+			<Material desc="description">Tungsten</Material>
+		</L1hmm2>
+
+        <!-- End plate R side -->
+		<R1plt1>
+			<d1 unit="cm">52.46</d1>
+			<l1 unit="cm">2.0</l1>
+			<i1 unit="cm">7.0</i1>
+			<o1 unit="cm">11.35</o1>
+			<Material desc="description">Tungsten</Material>
+		</R1plt1>
+
+        <!-- End plate L side -->
+		<L1plt1>
+			<d1 unit="cm">-36.5</d1>
+			<l1 unit="cm">-2.0</l1>
+			<i1 unit="cm">4.1</i1>
+			<o1 unit="cm">12.1</o1>
+			<Material desc="description">Tungsten</Material>
+		</L1plt1>
+
+	</Content>
+</ParamSet>

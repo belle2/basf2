@@ -429,8 +429,7 @@ void GeoQCsBelleII::create(GearDir& content)
   geoC2spc1tub->DefineSection(1, zpos, C2spc1r3, C2spc1r4);
   geoC2spc1tub->SetName("geoC2spc1tubname");
 
-  //TGeoCompositeShape* geoC2spc1 = new TGeoCompositeShape("geoC2spc1name","geoC2spc1pconname - geoC2spc1tubname - geoA1wal1name - geoB1wal1name");
-  TGeoCompositeShape* geoC2spc1 = new TGeoCompositeShape("geoC2spc1name", "(geoC2spc1pconname - geoC2spc1tubname) * geoC1wal1name");
+  TGeoCompositeShape* geoC2spc1 = new TGeoCompositeShape("geoC2spc1name", "(geoC2spc1pconname - geoC2spc1tubname) - geoA1wal1name - geoB1wal1name");
   TGeoVolume *volC2spc1 = new TGeoVolume("volC2spc1name", geoC2spc1, strMedC2spc1);
 
   //-   put volume
@@ -475,7 +474,7 @@ void GeoQCsBelleII::create(GearDir& content)
   geoC3wal2pcon->SetName("geoC3wal2pconname");
 
   //-   Subtraction volume
-  TGeoCompositeShape* geoC3wal2 = new TGeoCompositeShape("geoC3wal2name", "geoC3wal2pconname * geoC2spc1name");
+  TGeoCompositeShape* geoC3wal2 = new TGeoCompositeShape("geoC3wal2name", "geoC3wal2pconname - geoA1wal1name - geoB1wal1name");
   TGeoVolume *volC3wal2 = new TGeoVolume("volC3wal2name", geoC3wal2, strMedC3wal2);
 
   //-   put volume
@@ -520,7 +519,7 @@ void GeoQCsBelleII::create(GearDir& content)
   geoC4spc2pcon->SetName("geoC4spc2pconname");
 
   //-   Subtraction volume
-  TGeoCompositeShape* geoC4spc2 = new TGeoCompositeShape("geoC4spc2name", "geoC4spc2pconname * geoC3wal2");
+  TGeoCompositeShape* geoC4spc2 = new TGeoCompositeShape("geoC4spc2name", "geoC4spc2pconname - geoA1wal1name - geoB1wal1name");
   TGeoVolume *volC4spc2 = new TGeoVolume("volC4spc2name", geoC4spc2, strMedC4spc2);
 
   //-   put volume
@@ -569,7 +568,7 @@ void GeoQCsBelleII::create(GearDir& content)
   geoC5wal3pcon->SetName("geoC5wal3pconname");
 
   //-   Subtraction volume
-  TGeoCompositeShape* geoC5wal3 = new TGeoCompositeShape("geoC5wal3name", "geoC5wal3pconname * geoC4spc2");
+  TGeoCompositeShape* geoC5wal3 = new TGeoCompositeShape("geoC5wal3name", "geoC5wal3pconname - geoA1wal1name - geoB1wal1name");
   TGeoVolume *volC5wal3 = new TGeoVolume("volC5wal3name", geoC5wal3, strMedC5wal3);
 
   //-   put volume
@@ -602,7 +601,7 @@ void GeoQCsBelleII::create(GearDir& content)
   geoC5wal5pcon->SetName("geoC5wal5pconname");
 
   //-   Subtraction volume
-  TGeoCompositeShape* geoC5wal5 = new TGeoCompositeShape("geoC5wal5name", "geoC5wal5pconname * geoC4spc2");
+  TGeoCompositeShape* geoC5wal5 = new TGeoCompositeShape("geoC5wal5name", "geoC5wal5pconname - geoA1wal1name - geoB1wal1name");
   TGeoVolume *volC5wal5 = new TGeoVolume("volC5wal5name", geoC5wal5, strMedC5wal5);
 
   //-   put volume
@@ -845,7 +844,7 @@ void GeoQCsBelleII::create(GearDir& content)
   geoC6spc3pcon->SetName("geoC6spc3pconname");
 
   //-   Subtraction volume
-  TGeoCompositeShape* geoC6spc3 = new TGeoCompositeShape("geoC6spc3name", "(geoC6spc3pconname * geoC5wal3) - geoC6tnl1pconname:rotHERname - geoC6tnl2pconname:rotLERname");
+  TGeoCompositeShape* geoC6spc3 = new TGeoCompositeShape("geoC6spc3name", "geoC6spc3pconname - geoC6tnl1pconname:rotHERname - geoC6tnl2pconname:rotLERname");
   TGeoVolume *volC6spc3 = new TGeoVolume("volC6spc3name", geoC6spc3, strMedC6spc3);
 
   //-   put volume
@@ -902,7 +901,7 @@ void GeoQCsBelleII::create(GearDir& content)
   geoC6spc6pcon->SetName("geoC6spc6pconname");
 
   //-   Subtraction volume
-  TGeoCompositeShape* geoC6spc6 = new TGeoCompositeShape("geoC6spc6name", "(geoC6spc6pconname * geoC5wal5) - geoC6tnl3pconname:rotHERname - geoC6tnl4pconname:rotLERname");
+  TGeoCompositeShape* geoC6spc6 = new TGeoCompositeShape("geoC6spc6name", "geoC6spc6pconname - geoC6tnl3pconname:rotHERname - geoC6tnl4pconname:rotLERname");
   TGeoVolume *volC6spc6 = new TGeoVolume("volC6spc6name", geoC6spc6, strMedC6spc6);
 
   //-   put volume
@@ -1609,7 +1608,7 @@ void GeoQCsBelleII::create(GearDir& content)
   geoF2spc1tub->DefineSection(1, zpos, F2spc1r4, F2spc1r5);
   geoF2spc1tub->SetName("geoF2spc1tubname");
 
-  TGeoCompositeShape* geoF2spc1 = new TGeoCompositeShape("geoF2spc1name", "(geoF2spc1pconname - geoF2spc1tubname) * geoF1wal1name");
+  TGeoCompositeShape* geoF2spc1 = new TGeoCompositeShape("geoF2spc1name", "(geoF2spc1pconname - geoF2spc1tubname) - geoD1wal1name - geoE1wal1name");
   TGeoVolume *volF2spc1 = new TGeoVolume("volF2spc1name", geoF2spc1, strMedF2spc1);
 
   //-   put volume
@@ -1654,7 +1653,7 @@ void GeoQCsBelleII::create(GearDir& content)
   geoF3wal2pcon->SetName("geoF3wal2pconname");
 
   //-   Subtraction volume
-  TGeoCompositeShape* geoF3wal2 = new TGeoCompositeShape("geoF3wal2name", "geoF3wal2pconname * geoF2spc1name");
+  TGeoCompositeShape* geoF3wal2 = new TGeoCompositeShape("geoF3wal2name", "geoF3wal2pconname - geoD1wal1name - geoE1wal1name");
   TGeoVolume *volF3wal2 = new TGeoVolume("volF3wal2name", geoF3wal2, strMedF3wal2);
 
   //-   put volume
@@ -1691,7 +1690,7 @@ void GeoQCsBelleII::create(GearDir& content)
   trnsF3wal3bbox->RegisterYourself();
 
   //Summation volume
-  TGeoCompositeShape* geoF3wal3 = new TGeoCompositeShape("geoF3wal3name", "(geoF3wal3tube1name:trnsF3wal3tube1name + geoF3wal3bboxname:trnsF3wal3bboxname + geoF3wal3tube2name:trnsF3wal3tube2name) * geoF2spc1name");
+  TGeoCompositeShape* geoF3wal3 = new TGeoCompositeShape("geoF3wal3name", "(geoF3wal3tube1name:trnsF3wal3tube1name + geoF3wal3bboxname:trnsF3wal3bboxname + geoF3wal3tube2name:trnsF3wal3tube2name) - geoD1wal1name");
   TGeoVolume *volF3wal3 = new TGeoVolume("volF3wal3name", geoF3wal3, strMedF3wal3);
 
   //put volume
@@ -1736,7 +1735,7 @@ void GeoQCsBelleII::create(GearDir& content)
   geoF4spc2pcon->SetName("geoF4spc2pconname");
 
   //-   Subtraction volume
-  TGeoCompositeShape* geoF4spc2 = new TGeoCompositeShape("geoF4spc2name", "geoF4spc2pconname * geoF3wal2name");
+  TGeoCompositeShape* geoF4spc2 = new TGeoCompositeShape("geoF4spc2name", "geoF4spc2pconname - geoD1wal1name - geoE1wal1name");
   TGeoVolume *volF4spc2 = new TGeoVolume("volF4spc2name", geoF4spc2, strMedF4spc2);
 
   //-   put volume
@@ -1758,20 +1757,20 @@ void GeoQCsBelleII::create(GearDir& content)
   //define geometry
   TGeoTube* geoF4spc3tube1 = new TGeoTube(0, F4spc3r1, F4spc3l1 / 2.0);
   geoF4spc3tube1->SetName("geoF4spc3tube1name");
-  TGeoTranslation* trnsF4spc3tube1 = new TGeoTranslation("trnsF4spc3tube1name", F3wal3t1 / 2.0, F3wal3o1, F3wal3d1 + F4spc3d1 - F4spc3l1 / 2.0);
+  TGeoTranslation* trnsF4spc3tube1 = new TGeoTranslation("trnsF4spc3tube1name", F3wal3o1, F3wal3t1 / 2.0, F3wal3d1 + F4spc3d1 - F4spc3l1 / 2.0);
   trnsF4spc3tube1->RegisterYourself();
   //
   TGeoTube* geoF4spc3tube2 = new TGeoTube(0, F4spc3r1, F4spc3l1 / 2.0);
   geoF4spc3tube2->SetName("geoF4spc3tube2name");
-  TGeoTranslation* trnsF4spc3tube2 = new TGeoTranslation("trnsF4spc3tube2name", -F3wal3t1 / 2.0, F3wal3o1, F3wal3d1 + F4spc3d1 - F4spc3l1 / 2.0);
+  TGeoTranslation* trnsF4spc3tube2 = new TGeoTranslation("trnsF4spc3tube2name", F3wal3o1, -F3wal3t1 / 2.0, F3wal3d1 + F4spc3d1 - F4spc3l1 / 2.0);
   trnsF4spc3tube2->RegisterYourself();
   //
   new TGeoBBox("geoF4spc3bboxname", F4spc3r1, F3wal3t1 / 2.0, F4spc3l1 / 2.0);
-  TGeoTranslation* trnsF4spc3bbox = new TGeoTranslation("trnsF4spc3bboxname", 0.0, F3wal3o1, F3wal3d1 + F4spc3d1 - F4spc3l1 / 2.0);
+  TGeoTranslation* trnsF4spc3bbox = new TGeoTranslation("trnsF4spc3bboxname", F3wal3o1, 0.0, F3wal3d1 + F4spc3d1 - F4spc3l1 / 2.0);
   trnsF4spc3bbox->RegisterYourself();
 
   //Summation volume
-  TGeoCompositeShape* geoF4spc3 = new TGeoCompositeShape("geoF4spc3name", "(geoF4spc3tube1name:trnsF4spc3tube1name + geoF4spc3bboxname:trnsF4spc3bboxname + geoF4spc3tube2name:trnsF4spc3tube2name) * geoF3wal3name");
+  TGeoCompositeShape* geoF4spc3 = new TGeoCompositeShape("geoF4spc3name", "(geoF4spc3tube1name:trnsF4spc3tube1name + geoF4spc3bboxname:trnsF4spc3bboxname + geoF4spc3tube2name:trnsF4spc3tube2name) - geoD1wal1name");
   TGeoVolume *volF4spc3 = new TGeoVolume("volF4spc3name", geoF4spc3, strMedF4spc3);
 
   //put volume
@@ -1820,7 +1819,7 @@ void GeoQCsBelleII::create(GearDir& content)
   geoF5wal4pcon->SetName("geoF5wal4pconname");
 
   //-   Subtraction volume
-  TGeoCompositeShape* geoF5wal4 = new TGeoCompositeShape("geoF5wal4name", "geoF5wal4pconname * geoF4spc2name");
+  TGeoCompositeShape* geoF5wal4 = new TGeoCompositeShape("geoF5wal4name", "geoF5wal4pconname - geoD1wal1name - geoE1wal1name");
   TGeoVolume *volF5wal4 = new TGeoVolume("volF5wal4name", geoF5wal4, strMedF5wal4);
 
   //-   put volume
@@ -2034,7 +2033,7 @@ void GeoQCsBelleII::create(GearDir& content)
   geoF6spc4pcon->SetName("geoF6spc4pconname");
 
   //-   Subtraction volume
-  TGeoCompositeShape* geoF6spc4 = new TGeoCompositeShape("geoF6spc4name", "(geoF6spc4pconname * geoF5wal4name) - geoF6tnl1pconname:rotHERname - geoF6tnl2pconname:rotLERname");
+  TGeoCompositeShape* geoF6spc4 = new TGeoCompositeShape("geoF6spc4name", "geoF6spc4pconname - geoF6tnl1pconname:rotHERname - geoF6tnl2pconname:rotLERname");
   TGeoVolume *volF6spc4 = new TGeoVolume("volF6spc4name", geoF6spc4, strMedF6spc4);
 
   //-   put volume
@@ -2371,7 +2370,7 @@ void GeoQCsBelleII::create(GearDir& content)
   geoF7hld1pcon->SetName("geoF7hld1pconname");
 
   //-   Intersection and Subtraction
-  TGeoCompositeShape* geoF7hld1 = new TGeoCompositeShape("geoF7hld1name", "(geoF7hld1pconname * geoF6spc4name) - geoF7mag1 - geoF7mag2 - geoF7mag3 - geoF7mag4 - geoF7mag5 - geoF7mag6");
+  TGeoCompositeShape* geoF7hld1 = new TGeoCompositeShape("geoF7hld1name", "(geoF7hld1pconname * geoF6spc4name) - geoF7mag1name - geoF7mag2name - geoF7mag3name - geoF7mag4name - geoF7mag5name - geoF7mag6name");
   TGeoVolume *volF7hld1 = new TGeoVolume("volF7hld1name", geoF7hld1, strMedF7hld1);
 
   //-   put volume
@@ -2413,7 +2412,7 @@ void GeoQCsBelleII::create(GearDir& content)
   geoF7cil1pcon->SetName("geoF7cil1pconname");
 
   //-   Intersection and Subtraction
-  TGeoCompositeShape* geoF7cil1 = new TGeoCompositeShape("geoF7cil1name", "((geoF7cil1pconname - geoF7hld1name) * geoF6spc4name) - geoF7mag1 - geoF7mag2 - geoF7mag3 - geoF7mag4 - geoF7mag5 - geoF7mag6");
+  TGeoCompositeShape* geoF7cil1 = new TGeoCompositeShape("geoF7cil1name", "((geoF7cil1pconname - geoF7hld1name) * geoF6spc4name) - geoF7mag1name - geoF7mag2name - geoF7mag3name - geoF7mag4name - geoF7mag5name - geoF7mag6name");
   TGeoVolume *volF7cil1 = new TGeoVolume("volF7cil1name", geoF7cil1, strMedF7cil1);
 
   //-   put volume

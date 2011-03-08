@@ -370,6 +370,7 @@ void GeoIRBelleIISymm::create(GearDir& content)
     //modify end nakano110307
   }
 
+  /* //modify start nakano110308
   // -------------------------------------------------
   // ---  Build shields ---
   // --
@@ -417,4 +418,5 @@ void GeoIRBelleIISymm::create(GearDir& content)
     shieldVol->SetLineColor(kCyan + 4);
     volGrpBP->AddNode(shieldVol, 1);
   }
+  */ //modify end nakano110308
 }

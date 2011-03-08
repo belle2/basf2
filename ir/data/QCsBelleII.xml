@@ -610,31 +610,31 @@
         </F6spc7>
 
         <F7hld1>
-            <t1 unit="cm">-0.84</t1>
-            <t2 unit="cm">-1.0</t2>
+            <t1 unit="cm">-0.775</t1>
+            <t2 unit="cm">-0.9</t2>
             <t3 unit="cm">-1.0</t3>
             <t4 unit="cm">-1.0</t4>
             <t5 unit="cm">-1.0</t5>
             <t6 unit="cm">-1.0</t6>
             <t7 unit="cm">-1.0</t7>
-            <d1 unit="cm">-5.25</d1>
-            <d2 unit="cm">-15.3</d2>
-            <d3 unit="cm">-9.75</d3>
-            <d4 unit="cm">-9.75</d4>
-            <d5 unit="cm">-9.75</d5> 
-            <d6 unit="cm">-9.75</d6>
-            <i1 unit="cm">6.7</i1>
-            <i2 unit="cm">7.36</i2>
-            <i3 unit="cm">8.34</i3>
-            <i4 unit="cm">9.33</i4>
-            <i5 unit="cm">10.78</i5>
-            <i6 unit="cm">11.25</i6>
-            <r1 unit="cm">7.36</r1>
-            <r2 unit="cm">8.02</r2>
-            <r3 unit="cm">9.05</r3>
-            <r4 unit="cm">9.98</r4>
-            <r5 unit="cm">11.44</r5>
-            <r6 unit="cm">11.95</r6>
+            <d1 unit="cm">-5.35</d1>
+            <d2 unit="cm">-15.75</d2>
+            <d3 unit="cm">-10.0</d3>
+            <d4 unit="cm">-10.0</d4>
+            <d5 unit="cm">-10.0</d5> 
+            <d6 unit="cm">-10.0</d6>
+            <i1 unit="cm">6.82</i1>
+            <i2 unit="cm">7.5</i2>
+            <i3 unit="cm">8.5</i3>
+            <i4 unit="cm">9.5</i4>
+            <i5 unit="cm">11.0</i5>
+            <i6 unit="cm">11.5</i6>
+            <r1 unit="cm">7.52</r1>
+            <r2 unit="cm">8.2</r2>
+            <r3 unit="cm">9.2</r3>
+            <r4 unit="cm">10.2</r4>
+            <r5 unit="cm">11.7</r5>
+            <r6 unit="cm">12.2</r6>
             <o1 unit="cm">10.17</o1>
             <o2 unit="cm">10.17</o2>
             <o3 unit="cm">11.25</o3>
@@ -656,7 +656,7 @@
         </F7cil1>
 
         <F7mag1>
-            <d1 unit="cm">-69.276</d1>
+            <d1 unit="cm">-69.1888</d1>
             <l1 unit="cm">-47.0</l1>
             <o1 unit="cm">2.6</o1>
 			<Material desc="Super conducting magnet">SC_COIL</Material>
@@ -669,7 +669,7 @@
         </F7mag2>
 
         <F7mag3>
-            <d1 unit="cm">-73.31</d1>
+            <d1 unit="cm">-73.3088</d1>
             <l1 unit="cm">-42.0</l1>
             <o1 unit="cm">3.55</o1>
 			<Material desc="Super conducting magnet">SC_COIL</Material>
@@ -682,7 +682,7 @@
         </F7mag4>
 
         <F7mag5>
-            <d1 unit="cm">-169.0</d1>
+            <d1 unit="cm">-171.8989</d1>
             <l1 unit="cm">-42.0</l1>
             <o1 unit="cm">7.0</o1>
 			<Material desc="Super conducting magnet">SC_COIL</Material>
@@ -696,7 +696,7 @@
         </F7mag6>
 
         <F7mag7>
-            <d1 unit="cm">-0.5</d1>
+            <d1 unit="cm">-235.0</d1>
             <l1 unit="cm">-70.0</l1>
             <o1 unit="cm">9.5</o1>
 			<Material desc="Super conducting magnet">SC_COIL</Material>

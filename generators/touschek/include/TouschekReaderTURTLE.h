@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef TOUSCHEKREADERTURTLE_H_
-#define TOUSCHEKREADERTURTLE_H_
+#ifndef TOUSCHEKREADERTURTLE_H
+#define TOUSCHEKREADERTURTLE_H
 
 #include <framework/core/FrameworkExceptions.h>
 #include <generators/dataobjects/MCParticleGraph.h>
@@ -67,7 +67,7 @@ namespace Belle2 {
      * @param graph Reference to the graph which should be filled with the information from the Touschek file.
      * @return The number of particles which were read.
      */
-    int getParticles(int number, MCParticleGraph &graph) throw(TouschekConvertFieldError);
+    int getParticles(int number, MCParticleGraph& graph) throw(TouschekConvertFieldError);
 
 
   protected:
@@ -81,4 +81,4 @@ namespace Belle2 {
 
 }
 
-#endif /* TOUSCHEKREADERTURTLE_H_ */
+#endif /* TOUSCHEKREADERTURTLE_H */

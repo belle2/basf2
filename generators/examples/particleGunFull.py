@@ -4,7 +4,7 @@
 ########################################################
 # This steering file which shows all usage options for the
 # particle gun module in the generators package.
-# The generated particles from the particle gun are the.
+# The generated particles from the particle gun are then
 # fed through a full Geant4 simulation and the output
 # is stored in a root file.
 #

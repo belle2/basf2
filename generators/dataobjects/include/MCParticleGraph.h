@@ -57,11 +57,11 @@ namespace Belle2 {
 
     /** Possible options for generating the MCParticle list. */
     enum GraphOptions {
-      set_nothing      = 0, /**< Do nothing special */
-      set_decay_vertex = 1, /**< Set the decay vertex to the production vertex of the last daughter (ordered by production time) */
-      set_decay_time   = 2, /**< Set decay time to the largest production time of the daughters */
-      set_decay_info   = 3, /**< Set decay time and vertex */
-      check_cyclic     = 4  /**< Check for cyclic dependencies */
+      c_setNothing      = 0, /**< Do nothing special */
+      c_setDecayVertex = 1, /**< Set the decay vertex to the production vertex of the last daughter (ordered by production time) */
+      c_setDecayTime   = 2, /**< Set decay time to the largest production time of the daughters */
+      c_setDecayInfo   = 3, /**< Set decay time and vertex */
+      c_checkCyclic     = 4  /**< Check for cyclic dependencies */
     };
 
     /**
@@ -189,7 +189,7 @@ namespace Belle2 {
      * Set the values of the returned reference to determine the particle parameters.
      * @return A reference to the added particle.
      */
-    GraphParticle &addParticle();
+    GraphParticle& addParticle();
 
     /**
      * Add decay information between two particles.
@@ -204,7 +204,7 @@ namespace Belle2 {
      * Return reference to added particle with range check.
      * @return A reference to the particle given by its index.
      */
-    GraphParticle &operator[](size_t i) { if (i < 0 || i >= m_particles.size()) throw OutOfRangeError(); return *m_particles[i]; }
+    GraphParticle& operator[](size_t i) { if (i < 0 || i >= m_particles.size()) throw OutOfRangeError(); return *m_particles[i]; }
 
     /**
      * Return the number of particles in the graph.
@@ -224,7 +224,7 @@ namespace Belle2 {
      * @param options Additional options which steer the creation of the StoreArray.
      * @see class MCParticle
      */
-    void generateList(const std::string& name = DEFAULT_MCPARTICLES, int options = set_nothing);
+    void generateList(const std::string& name = DEFAULT_MCPARTICLES, int options = c_setNothing);
 
     /**
      * Reset particles and decay information to make the class reusable.
@@ -262,7 +262,7 @@ namespace Belle2 {
   }
 
 
-  inline void MCParticleGraph::addDecay(MCParticleGraph::GraphParticle &mother, MCParticleGraph::GraphParticle &daughter)
+  inline void MCParticleGraph::addDecay(MCParticleGraph::GraphParticle& mother, MCParticleGraph::GraphParticle& daughter)
   throw(MCParticleGraph::NotSameGraphError, MCParticleGraph::DaughterHasMotherError)
   {
     if (this != mother.m_graph || this != daughter.m_graph) throw NotSameGraphError();

@@ -47,8 +47,8 @@ HepevtInputModule::HepevtInputModule() : Module()
   addParam("expNum", m_expNum, "ExpNum (should be set if makeMaster=true)", 0);
   addParam("skipEvents", m_skipEventNumber, "Skip this number of events before starting.", 0);
   addParam("useWeights", m_useWeights, "Set to 'true' to if generator weights should be propagated.", false);
-  addParam("nVirtualParticles", m_Nvirtual, "Number of particles at the beginning of the events that should be made virtual.", 0);
-  addParam("boost2LAB", m_boost2LAB, "Boolean to indicate whether the particles should be boosted from CM frame to lab frame", false);
+  addParam("nVirtualParticles", m_nVirtual, "Number of particles at the beginning of the events that should be made virtual.", 0);
+  addParam("boost2lab", m_boost2Lab, "Boolean to indicate whether the particles should be boosted from CM frame to lab frame", false);
   addParam("wrongSignPz", m_wrongSignPz, "Boolean to signal that directions of HER and LER were switched", false);
 }
 
@@ -58,14 +58,15 @@ void HepevtInputModule::initialize()
   try {
     m_hepevt.open(m_inputFileName);
     m_hepevt.skipEvents(m_skipEventNumber);
-  } catch (runtime_error &e) {
+  } catch (runtime_error& e) {
     B2FATAL(e.what());
   }
-  m_hepevt.m_Nvirtual = m_Nvirtual;
+  m_hepevt.m_nVirtual = m_nVirtual;
   m_hepevt.m_wrongSignPz = m_wrongSignPz;
 
   //Do we need to boost?
-  if (m_boost2LAB) {
+  if (m_boost2Lab) {
+    //@TODO: get this from a central place instead of hard coded: framework issue
     // this is hard coded!!!!!! should be provided somewhere -> run meta data
     double Eher = 7.0 * Unit::GeV;
     double Eler = 4.0 * Unit::GeV;
@@ -103,12 +104,12 @@ void HepevtInputModule::event()
       }
     if (m_useWeights)
       eventMetaDataPtr->setGeneratedWeight(weight);
-    mpg.generateList(DEFAULT_MCPARTICLES, MCParticleGraph::set_decay_info | MCParticleGraph::check_cyclic);
+    mpg.generateList(DEFAULT_MCPARTICLES, MCParticleGraph::c_setDecayInfo | MCParticleGraph::c_checkCyclic);
   } catch (HepevtReader::HepEvtEmptyEventError) {
     StoreObjPtr <EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
     eventMetaDataPtr->setEndOfData();
     B2DEBUG(100, "Reached end of HepEvt file.")
-  } catch (runtime_error &e) {
+  } catch (runtime_error& e) {
     B2ERROR(e.what());
   }
 }

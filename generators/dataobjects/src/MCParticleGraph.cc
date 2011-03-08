@@ -62,7 +62,7 @@ public:
    * @param setVertex Set to true if the vertex information should be saved.
    * @param setTime Set to true if the production time information should be saved.
    */
-  ParticleSorter(MemoryPool<MCParticleGraph::GraphParticle> &particles, TClonesArray* plist, bool setVertex, bool setTime):
+  ParticleSorter(MemoryPool<MCParticleGraph::GraphParticle>& particles, TClonesArray* plist, bool setVertex, bool setTime):
       m_index(0), m_particles(particles), m_plist(plist), m_setVertex(setVertex), m_setTime(setTime) {}
 
 
@@ -97,8 +97,8 @@ public:
    * @param v The vertex whose daughters are investigated.
    * @param g The graph in which the vertex lives.
    */
-  template <class Vertex, class Graph> void finish_vertex(Vertex v, Graph &g) {
-    MCParticleGraph::GraphParticle &p = *m_particles[v-1];
+  template <class Vertex, class Graph> void finish_vertex(Vertex v, Graph& g) {
+    MCParticleGraph::GraphParticle& p = *m_particles[v-1];
 
     //Reset daughter information, will be filled by find_daughters
     p.setFirstDaughter(0);
@@ -123,16 +123,16 @@ public:
    * @param g The graph in which the vertex lives.
    * @param mother Reference to the mother particle.
    */
-  template <class Vertex, class Graph> void find_daughters(Vertex v, Graph &g, MCParticleGraph::GraphParticle &mother) {
+  template <class Vertex, class Graph> void find_daughters(Vertex v, Graph& g, MCParticleGraph::GraphParticle& mother) {
     //References to the daughter information of the mother for easier access
-    int &d1 = mother.m_firstDaughter;
-    int &d2 = mother.m_lastDaughter;
+    int& d1 = mother.m_firstDaughter;
+    int& d2 = mother.m_lastDaughter;
 
     typename graph_traits<Graph>::out_edge_iterator j, j_end;
     for (tie(j, j_end) = out_edges(v, g); j != j_end; ++j) {
       //Get daughter particle from list
       Vertex nv = target(*j, g);
-      MCParticleGraph::GraphParticle &daughter = *m_particles[nv-1];
+      MCParticleGraph::GraphParticle& daughter = *m_particles[nv-1];
 
       if (daughter.m_ignore) {
         //daughter ignored, search its children and treat them as direct children of mother
@@ -173,7 +173,7 @@ public:
    * @param m Reference to the mother particle whose vertex and time information should be set.
    * @param d Reference to the daughter particle.
    */
-  void setVertexTime(MCParticleGraph::GraphParticle &m, MCParticleGraph::GraphParticle &d) {
+  void setVertexTime(MCParticleGraph::GraphParticle& m, MCParticleGraph::GraphParticle& d) {
     //Only set vertex information if both particles have a valid vertex set
     m.setValidVertex(m.hasValidVertex() &&  d.hasValidVertex());
     if (m.hasValidVertex() && d.getProductionTime() >= m.getDecayTime()) {
@@ -190,7 +190,7 @@ public:
 protected:
 
   int m_index;                                             /**< The latest index given to a particle. */
-  MemoryPool<MCParticleGraph::GraphParticle> &m_particles; /**< Reference to the list of particles which should be sorted. */
+  MemoryPool<MCParticleGraph::GraphParticle>& m_particles; /**< Reference to the list of particles which should be sorted. */
   TClonesArray *m_plist;                                   /**< The final array of sorted particles which is stored in the DataStore. */
   bool m_setVertex;                                        /**< True if the vertex information should be saved. */
   bool m_setTime;                                          /**< True if the production time information should be saved. */
@@ -214,7 +214,7 @@ void MCParticleGraph::generateList(const string& name, int options)
   Graph g(m_decays.begin(), m_decays.end(), m_particles.size() + 1);
 
   //Check for cyclic dependency
-  if (options & check_cyclic) {
+  if (options& c_checkCyclic) {
     cycle_detector vis;
     depth_first_search(g, visitor(vis));
   }
@@ -223,6 +223,6 @@ void MCParticleGraph::generateList(const string& name, int options)
   StoreArray<MCParticle> MCParticles(name);
   MCParticles->Clear();
   MCParticles->Expand(num_particles);
-  MCParticleGraph::ParticleSorter psorter(m_particles, MCParticles.getPtr(), options & set_decay_vertex, options & set_decay_time);
+  MCParticleGraph::ParticleSorter psorter(m_particles, MCParticles.getPtr(), options& c_setDecayVertex, options& c_setDecayTime);
   psorter.sort(g);
 }

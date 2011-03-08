@@ -77,7 +77,7 @@ void TouschekSADInputModule::event()
 
     if (readLERParticles > 0) {
       //Generate MCParticle list
-      mpg.generateList(DEFAULT_MCPARTICLES, MCParticleGraph::set_decay_info | MCParticleGraph::check_cyclic);
+      mpg.generateList(DEFAULT_MCPARTICLES, MCParticleGraph::c_setDecayInfo | MCParticleGraph::c_checkCyclic);
 
       B2INFO("Read " << readLERParticles << " e+ particles (LER).")
     }

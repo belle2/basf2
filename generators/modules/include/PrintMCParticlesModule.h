@@ -47,7 +47,7 @@ namespace Belle2 {
        * @param mc Reference to the MCParticle whose information should be printed and whose daughters should be visited.
        * @param level The current level of the recursive call of the method.
        */
-      void printTree(const MCParticle &mc, int level = 0);
+      void printTree(const MCParticle& mc, int level = 0);
 
       std::string m_particleList; /**< The name of the MCParticle collection. */
       std::vector<bool> m_seen;   /**< Tag the particles which were already visited using their index. */

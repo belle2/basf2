@@ -77,7 +77,7 @@ namespace Belle2 {
      */
     bool skipEvents(int n);
 
-    int m_Nvirtual;        /**< The number of particles in each event with a set Virtual flag. */
+    int m_nVirtual;        /**< The number of particles in each event with a set Virtual flag. */
     bool m_wrongSignPz;    /**< Bool to indicate that HER and LER were swapped. */
     TLorentzRotation m_labboost;     /**< Boost&rotation vector for boost from CM to LAB. */
 

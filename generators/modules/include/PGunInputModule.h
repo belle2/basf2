@@ -53,10 +53,10 @@ namespace Belle2 {
       int m_nTracks;                  /**< The number of particles to be produced per event */
       double m_pPar1;                /**< The first parameter for momentum generation */
       double m_pPar2;                /**< The second parameter for momentum generation */
-      double m_phiPar1;               /**< The first parameter for phi generation */
-      double m_phiPar2;               /**< The second parameter for phi generation */
-      double m_thetaPar1;               /**< The first parameter for theta generation */
-      double m_thetaPar2;               /**< The second parameter for theta generation */
+      double m_phiPar1Deg;               /**< The first parameter for phi generation */
+      double m_phiPar2Deg;               /**< The second parameter for phi generation */
+      double m_thetaPar1Deg;               /**< The first parameter for theta generation */
+      double m_thetaPar2Deg;               /**< The second parameter for theta generation */
       double m_xVertexPar1;                /**< The first parameter for vertex x coordinate generation */
       double m_xVertexPar2;                /**< The second parameter for vertex x coordinate generation */
       double m_yVertexPar1;                /**< The first parameter for vertex y coordinate generation */

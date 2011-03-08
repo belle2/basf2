@@ -45,10 +45,10 @@ PGunInputModule::PGunInputModule() : Module()
   addParam("nTracks", m_nTracks, "The number of tracks to be generated per event", 1);
   addParam("pPar1", m_pPar1, "The first parameter for momentum distribution function", 0.2);
   addParam("pPar2", m_pPar2, "The second parameter for momentum distribution function", 1.0);
-  addParam("phiPar1", m_phiPar1, "The first parameter for the phi distribution function", 0.0);
-  addParam("phiPar2", m_phiPar2, "The second parameter for the phi distribution function", 360.0);
-  addParam("thetaPar1", m_thetaPar1, "The first parameter for theta distribution function", 17.0);
-  addParam("thetaPar2", m_thetaPar2, "The second parameter for theta distribution function", 150.0);
+  addParam("phiPar1", m_phiPar1Deg, "The first parameter for the phi distribution function", 0.0);
+  addParam("phiPar2", m_phiPar2Deg, "The second parameter for the phi distribution function", 360.0);
+  addParam("thetaPar1", m_thetaPar1Deg, "The first parameter for theta distribution function", 17.0);
+  addParam("thetaPar2", m_thetaPar2Deg, "The second parameter for theta distribution function", 150.0);
   addParam("xVertexPar1", m_xVertexPar1, "The first parameter for vertex x-coordinate distribution function", 0.0);
   addParam("xVertexPar2", m_xVertexPar2, "The second parameter for x-coordinate distribution distribution function", 0.7);
   addParam("yVertexPar1", m_yVertexPar1, "The first parameter for vertex y-coordinate distribution function", 0.0);
@@ -71,10 +71,10 @@ void PGunInputModule::initialize()
     B2ERROR("Number of tracks to be generated should be larger than 0!");
   m_pgun.m_pPar1 = m_pPar1;
   m_pgun.m_pPar2 = m_pPar2;
-  m_pgun.m_thetaPar1 = m_thetaPar1;
-  m_pgun.m_thetaPar2 = m_thetaPar2;
-  m_pgun.m_phiPar1 = m_phiPar1;
-  m_pgun.m_phiPar2 = m_phiPar2;
+  m_pgun.m_thetaPar1 = TMath::DegToRad() * m_thetaPar1Deg;
+  m_pgun.m_thetaPar2 = TMath::DegToRad() * m_thetaPar2Deg;
+  m_pgun.m_phiPar1 = TMath::DegToRad() * m_phiPar1Deg;
+  m_pgun.m_phiPar2 = TMath::DegToRad() * m_phiPar2Deg;
   m_pgun.m_zVertexPar1 = m_zVertexPar1;
   m_pgun.m_zVertexPar2 = m_zVertexPar2;
   m_pgun.m_yVertexPar1 = m_yVertexPar1;
@@ -90,19 +90,19 @@ void PGunInputModule::initialize()
   }
 
   if (m_genMom<3 && m_genMom> -1)
-    m_pgun.m_genMom = static_cast<EPGUNgenOpt>(m_genMom);
+    m_pgun.m_genMom = static_cast<ParticleGun::EgenerationOption>(m_genMom);
   else {
     m_genMom = 0;
     B2ERROR("Invalide option for random generation of momenta in particle gun!");
   }
   if (m_genVert<3 && m_genVert> -1)
-    m_pgun.m_genVert = static_cast <EPGUNgenOpt>(m_genVert);
+    m_pgun.m_genVert = static_cast <ParticleGun::EgenerationOption>(m_genVert);
   else {
     m_genVert = 2;
     B2ERROR("Invalid option for random generation of vertices in particle gun!");
   }
   if (m_genAngle<3 && m_genAngle> -1)
-    m_pgun.m_genAngle = static_cast <EPGUNgenOpt>(m_genAngle);
+    m_pgun.m_genAngle = static_cast <ParticleGun::EgenerationOption>(m_genAngle);
   else {
     m_genMom = 0;
     B2ERROR("Invalid option for random generation of angles in particle gun!");
@@ -116,7 +116,7 @@ void PGunInputModule::event()
   try {
     mpg.clear();
     m_pgun.generateEvent(mpg);
-    mpg.generateList(DEFAULT_MCPARTICLES, MCParticleGraph::set_decay_info | MCParticleGraph::check_cyclic);
+    mpg.generateList(DEFAULT_MCPARTICLES, MCParticleGraph::c_setDecayInfo | MCParticleGraph::c_checkCyclic);
   } catch (runtime_error &e) {
     B2ERROR(e.what());
   }

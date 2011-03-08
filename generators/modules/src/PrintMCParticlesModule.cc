@@ -52,14 +52,14 @@ void PrintMCParticlesModule::event()
 
   //Loop over the primary particles (no mother particle exists)
   for (int i = 0; i < MCParticles.GetEntries(); i++) {
-    MCParticle &mc = *MCParticles[i];
+    MCParticle& mc = *MCParticles[i];
     if (mc.getMother() != NULL) continue;
     printTree(mc, 0);
   }
 }
 
 
-void PrintMCParticlesModule::printTree(const MCParticle &mc, int level)
+void PrintMCParticlesModule::printTree(const MCParticle& mc, int level)
 {
   if (m_onlyPrimaries && !mc.hasStatus(MCParticle::c_PrimaryParticle)) return;
 

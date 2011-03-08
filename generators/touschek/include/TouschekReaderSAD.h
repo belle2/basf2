@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef TOUSCHEKREADERSAD_H_
-#define TOUSCHEKREADERSAD_H_
+#ifndef TOUSCHEKREADERSAD_H
+#define TOUSCHEKREADERSAD_H
 
 #include <framework/core/FrameworkExceptions.h>
 #include <generators/dataobjects/MCParticleGraph.h>
@@ -65,7 +65,7 @@ namespace Belle2 {
      * @param pdg The pdg value of the type of particle that is read (e.g. 11 for e-, -11 for e+).
      * @return The number of particles which were read.
      */
-    int getParticles(int number, double sRange, double beamEnergy, int pdg, MCParticleGraph &graph);
+    int getParticles(int number, double sRange, double beamEnergy, int pdg, MCParticleGraph& graph);
 
 
   protected:
@@ -85,4 +85,4 @@ namespace Belle2 {
 
 }
 
-#endif /* TOUSCHEKREADERSAD_H_ */
+#endif /* TOUSCHEKREADERSAD_H */

@@ -76,7 +76,7 @@ int HepevtReader::getEvent(MCParticleGraph &graph, double & eventWeight) throw(H
     }
 
     //check if particle should be made virtual according to steering options:
-    if (i < m_Nvirtual)
+    if (i < m_nVirtual)
       p.setVirtual();
 
   }

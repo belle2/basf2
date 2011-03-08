@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Martin Ritter                                            *
+ * Contributors: Susanne Koblitz                                          *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -20,7 +20,6 @@
 
 using namespace std;
 using namespace Belle2;
-using namespace Generators;
 
 bool ParticleGun::generateEvent(MCParticleGraph &graph)
 {
@@ -100,10 +99,10 @@ bool ParticleGun::generateEvent(MCParticleGraph &graph)
         break;
     }
 
-    double pz = ptot * cos(TMath::DegToRad() * theta);
-    double pt = ptot * sin(TMath::DegToRad() * theta);
-    double px = pt * cos(TMath::DegToRad() * phi);
-    double py = pt * sin(TMath::DegToRad() * phi);
+    double pz = ptot * cos(theta);
+    double pt = ptot * sin(theta);
+    double px = pt * cos(phi);
+    double py = pt * sin(phi);
     p.setMomentum(px, py, pz);
     double m = p.getMass();
     double e = sqrt(ptot * ptot + m * m);

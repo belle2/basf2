@@ -379,9 +379,21 @@ void GeoIRBelleII::create(GearDir& content)
     B2INFO("IR Chamber defined: returned - " << overlap[0] << ": " << overlap[1])
 
     for (int i = 0; i < (int)IRPipe.size(); i++) {
-      TGeoVolume* IRPipeVol = new TGeoVolume(IRPipe[i]->GetName(), IRPipe[i], IRMed[i]);
-      IRPipeVol->SetLineColor(kTeal + 3);
-      volGrpBP->AddNode(IRPipeVol, 1, IRTrans[i]);
+      //TGeoVolume* IRPipeVol = new TGeoVolume(IRPipe[i]->GetName(), IRPipe[i], IRMed[i]);
+      //IRPipeVol->SetLineColor(kTeal + 3);
+      //volGrpBP->AddNode(IRPipeVol, 1, IRTrans[i]);
+
+      //modify start nakano110307
+      TGeoPcon* IRTube = new TGeoPcon(0, 360, 2);
+      IRTube->DefineSection(0, -62.725, 0, 10);
+      IRTube->DefineSection(1,  63.35, 0, 10);
+      IRTube->SetName("IRTubename");
+      string arg2 = string(IRPipe[i]->GetName()) + ":" + string(IRTrans[i]->GetName()) + "*IRTubename";
+      TGeoCompositeShape* IRPipeComp = new TGeoCompositeShape("IRPipeCompName", arg2.c_str());
+      TGeoVolume* IRPipeCompVol = new TGeoVolume("IRPipeCompVolName", IRPipeComp, IRMed[i]);
+      IRPipeCompVol->SetLineColor(kTeal + 3);
+      volGrpBP->AddNode(IRPipeCompVol, 1);
+      //modify end nakano110307
     }
   } catch (runtime_error& exc) {
     B2ERROR("No IR chamber streams defined ! " << exc.what())

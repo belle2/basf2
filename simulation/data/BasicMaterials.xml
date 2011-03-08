@@ -107,19 +107,19 @@
                         </Elements>
                 </Mixture>
 
-		<Mixture name="Paraffin">
-			<Density>0.93</Density>
-			<Elements>
-				<Element name="H" weight="0.15">
-					<AtomNumber>1.0</AtomNumber>
-					<MassNumber>1.00794</MassNumber>
-				</Element>
-				<Element name="C" weight="0.85">
-					<AtomNumber>6.0</AtomNumber>
-					<MassNumber>12.0107</MassNumber>
-				</Element>
-			</Elements>
-		</Mixture>
+        		<Mixture name="Paraffin">
+    	        		<Density>0.93</Density>
+    		        	<Elements>
+         			        	<Element name="H" weight="0.15">
+              	        				<AtomNumber>1.0</AtomNumber>
+    	                				<MassNumber>1.00794</MassNumber>
+    		             		</Element>
+    			             	<Element name="C" weight="0.85">
+         			             		<AtomNumber>6.0</AtomNumber>
+    	                				<MassNumber>12.0107</MassNumber>
+    		             		</Element>
+             			</Elements>
+	        	</Mixture>
 
                 <Mixture name="NEMA_G10_Plate">
                         <Density>1.70</Density>
@@ -143,6 +143,60 @@
                         </Elements>     
                 </Mixture> 
 
+                <Mixture name="SUS316L">
+                        <Density unit="g/cm3">8.03</Density>
+                        <Elements>
+                                <Element name="Fe" weight="0.7347">
+                                        <AtomNumber>26</AtomNumber>
+                                        <MassNumber>55.845</MassNumber>
+                                </Element>
+                                <Element name="Cr" weight="0.1200">
+                                        <AtomNumber>24</AtomNumber>
+                                        <MassNumber>51.9961</MassNumber>
+                                </Element>
+                                <Element name="Ni" weight="0.1200">
+                                        <AtomNumber>28</AtomNumber>
+                                        <MassNumber>58.6934</MassNumber>
+                                </Element>
+                                <Element name="Mo" weight="0.0250">
+                                        <AtomNumber>42</AtomNumber>
+                                        <MassNumber>95.96</MassNumber>
+                                </Element>
+                                <Element name="C" weight="0.0003">
+                                        <AtomNumber>6.0</AtomNumber>
+                                        <MassNumber>12.011</MassNumber>
+                                </Element>
+                        </Elements>
+                </Mixture>
+
+                <Mixture name="SC_COIL">
+                        <Density unit="g/cm3">8.0</Density><!--tmp-->
+                        <Elements>
+                                <Element name="Cu" weight="0.67">
+                                        <AtomNumber>29</AtomNumber>
+                                        <MassNumber>63.546</MassNumber>
+                                </Element>
+                                <Element name="Nb" weight="0.1584">
+                                        <AtomNumber>41</AtomNumber>
+                                        <MassNumber>92.90638</MassNumber>
+                                </Element>
+                                <Element name="Ti" weight="0.1716">
+                                        <AtomNumber>22</AtomNumber>
+                                        <MassNumber>47.867</MassNumber>
+                                </Element>
+                        </Elements>
+                </Mixture>
+
+                <Mixture name="Liq_He">
+                        <Density unit="g/cm3">0.125</Density>
+                        <Elements>
+                                <Element name="He" weight="1.0">
+                                        <AtomNumber>2.0</AtomNumber>
+                                        <MassNumber>4.002602</MassNumber>
+                                </Element>
+                        </Elements>
+                </Mixture>
+
                 <Material name="Aluminum">
                         <AtomNumber>13.0</AtomNumber>
                         <MassNumber>26.9815386</MassNumber>
@@ -159,44 +213,44 @@
                         <InterLength>0</InterLength>
                 </Material>
 
-		<Material name="Silicon">
-			<AtomNumber>14.0</AtomNumber>
-			<MassNumber>28.0855</MassNumber>
-			<Density>2.329</Density>
-			<RadLength>1.0</RadLength>
-			<InterLength>0</InterLength>
-		</Material>
+        		<Material name="Silicon">
+	        		    <AtomNumber>14.0</AtomNumber>
+		        	    <MassNumber>28.0855</MassNumber>
+			            <Density>2.329</Density>
+			            <RadLength>1.0</RadLength>
+			            <InterLength>0</InterLength>
+		        </Material>
 
-		<Material name="Beryllium">
-			<AtomNumber>4.0</AtomNumber>
-			<MassNumber unit="u">9.01218</MassNumber>
-			<Density unit="g/cm3">1.848</Density>
-			<RadLength>1.0</RadLength>
-			<InterLength>0</InterLength>
-		</Material>
+		        <Material name="Beryllium">
+			            <AtomNumber>4.0</AtomNumber>
+			            <MassNumber unit="u">9.01218</MassNumber>
+			            <Density unit="g/cm3">1.848</Density>
+			            <RadLength>1.0</RadLength>
+			            <InterLength>0</InterLength>
+		        </Material>
+        
+		        <Material name="Iron">
+			            <AtomNumber>26.0</AtomNumber>
+			            <MassNumber unit="u">55.850</MassNumber>
+			            <Density unit="g/cm3">7.870</Density>
+			            <RadLength>1.0</RadLength>
+			            <InterLength>0</InterLength>
+		        </Material>
 
-		<Material name="Iron">
-			<AtomNumber>26.0</AtomNumber>
-			<MassNumber unit="u">55.850</MassNumber>
-			<Density unit="g/cm3">7.870</Density>
-			<RadLength>1.0</RadLength>
-			<InterLength>0</InterLength>
-		</Material>
+		        <Material name="Gold">
+			            <AtomNumber>79.0</AtomNumber>
+			            <MassNumber unit="u">196.966569</MassNumber>
+			            <Density unit="g/cm3">19.3</Density>
+			            <RadLength>1.0</RadLength>
+			            <InterLength>0</InterLength>
+		        </Material>
 
-		<Material name="Gold">
-			<AtomNumber>79.0</AtomNumber>
-			<MassNumber unit="u">196.966569</MassNumber>
-			<Density unit="g/cm3">19.3</Density>
-			<RadLength>1.0</RadLength>
-			<InterLength>0</InterLength>
-		</Material>
-
-		<Material name="Tantalum">
-			<AtomNumber>73.0</AtomNumber>
-			<MassNumber>180.94788</MassNumber>
-			<Density unit="g/cm3">16.69</Density>
-			<RadLength>1.0</RadLength>
-			<InterLength>0</InterLength>
-		</Material>
+		        <Material name="Tantalum">
+			            <AtomNumber>73.0</AtomNumber>
+			            <MassNumber>180.94788</MassNumber>
+			            <Density unit="g/cm3">16.69</Density>
+			            <RadLength>1.0</RadLength>
+			            <InterLength>0</InterLength>
+		        </Material>
 	</Content>
 </ParamSet>

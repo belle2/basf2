@@ -18,6 +18,7 @@
     <xi:include href="../structure/CoilBelleII.xml"/>
     <xi:include href="../structure/StructureBelleII.xml"/>
     <xi:include href="../ir/IRBelleIISymm.xml"/>
+    <xi:include href="../ir/QCsBelleII.xml"/>
     <!--xi:include href="../ir/IRBelleII.xml"/-->
     <xi:include href="../pxd/PXDBelleII_PXD1600.xml"/>
     <xi:include href="../svd/SVDBelleII.xml"/>

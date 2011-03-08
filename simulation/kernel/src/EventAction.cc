@@ -56,7 +56,7 @@ void EventAction::BeginOfEventAction(const G4Event* event)
 void EventAction::EndOfEventAction(const G4Event* event)
 {
   //Create the final MCParticle list and update the indices of the MCParticle graph particles.
-  m_mcParticleGraph.generateList(m_mcCollectionName, MCParticleGraph::set_decay_info | MCParticleGraph::check_cyclic);
+  m_mcParticleGraph.generateList(m_mcCollectionName, MCParticleGraph::c_setDecayInfo | MCParticleGraph::c_checkCyclic);
 
   //Create the MCParticles->Hits relations
   //Loop over all created instances of sensitive detector classes.

@@ -8,18 +8,16 @@
   </Global>
   <MaterialSets>
     <xi:include href="BasicMaterials.xml"/>
-    <xi:include href="../arich/ARICHMaterials.xml"/>
-    <xi:include href="../top/TOPMaterials.xml"/>
     <xi:include href="../pxd/PXDMaterials.xml"/>
     <xi:include href="../svd/SVDMaterials.xml"/>
+    <xi:include href="../arich/ARICHMaterials.xml"/>
+    <xi:include href="../top/TOPMaterials.xml"/>
     <xi:include href="../eklm/EKLMMaterials.xml"/>
   </MaterialSets>
   <Subdetectors>
-    <xi:include href="../structure/CoilBelleII.xml"/>
-    <xi:include href="../structure/StructureBelleII.xml"/>
-    <xi:include href="../ir/IRBelleIISymm.xml"/>
+    <xi:include href="../ir/IRBelleII.xml"/>
+    <xi:include href="../ir/HolderBelleII.xml"/>
     <xi:include href="../ir/QCsBelleII.xml"/>
-    <!--xi:include href="../ir/IRBelleII.xml"/-->
     <xi:include href="../pxd/PXDBelleII_PXD1600.xml"/>
     <xi:include href="../svd/SVDBelleII.xml"/>
     <xi:include href="../cdc/CDCBelleII.xml"/>
@@ -27,5 +25,7 @@
     <xi:include href="../top/TOPBelleII.xml"/>
     <xi:include href="../ecl/ECLBelleII.xml"/>
     <xi:include href="../eklm/EKLMBelleII.xml"/>
+    <xi:include href="../structure/CoilBelleII.xml"/>
+    <xi:include href="../structure/StructureBelleII.xml"/>
   </Subdetectors>
 </Detector>

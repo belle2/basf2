@@ -14,13 +14,13 @@
 #include <framework/gearbox/Unit.h>
 #include <generators/dataobjects/MCParticle.h>
 
-
 using namespace std;
 using namespace Belle2;
 
 
 TouschekReaderSAD::TouschekReaderSAD(): m_file(NULL), m_tree(NULL), m_transMatrix(NULL),
-    m_sRange(300.0), m_pdg(-11), m_touschekToRealFactor(0), m_realPartNum(0),
+    m_sRange(300.0), m_pdg(-11), m_beamenergy(4.0), m_pxRes(0.01), m_pyRes(0.01),
+    m_touschekToRealFactor(5.76e6), m_realPartNum(0),
     m_realPartEntry(0), m_readEntry(0)
 {
 
@@ -95,10 +95,11 @@ double TouschekReaderSAD::getParticle(MCParticleGraph& graph)
     //Read only SAD particles which are inside the chosen sRange
     do {
       m_tree->GetEntry(m_readEntry);
+      convertParamsToSADUnits();
 
-      m_lostX = m_lostX * Unit::m; //Convert SAD units to basf2 units
-      m_lostY = m_lostY * Unit::m;
-      m_lostS = m_lostS * Unit::m;
+      //Do a Gaussian smearing of the px and py value
+      m_lostPx = m_random.Gaus(m_lostPx, m_pxRes * m_lostPx); //1% px resolution
+      m_lostPy = m_random.Gaus(m_lostPy, m_pyRes * m_lostPy);
 
       B2DEBUG(10, "> Read particle " << m_readEntry + 1 << "/" << m_tree->GetEntries() << " with s = " << m_lostS << " cm")
       m_readEntry++;
@@ -129,12 +130,7 @@ void TouschekReaderSAD::addAllSADParticles(MCParticleGraph& graph)
 
   for (int iPart = 0; iPart < nPart; ++iPart) {
     m_tree->GetEntry(iPart);
-
-    //Convert SAD units to basf2 units
-    m_lostX = m_lostX * Unit::m;
-    m_lostY = m_lostY * Unit::m;
-    m_lostS = m_lostS * Unit::m;
-
+    convertParamsToSADUnits();
     if (fabs(m_lostS) <= m_sRange) addParticleToMCParticles(graph);
   }
 }
@@ -143,6 +139,16 @@ void TouschekReaderSAD::addAllSADParticles(MCParticleGraph& graph)
 //======================================================================
 //                         Private methods
 //======================================================================
+
+void TouschekReaderSAD::convertParamsToSADUnits()
+{
+  m_lostX = m_lostX * Unit::m;
+  m_lostY = m_lostY * Unit::m;
+  m_lostS = m_lostS * Unit::m;
+  m_lostPx = m_lostPx * Unit::GeV;
+  m_lostPy = m_lostPy * Unit::GeV;
+}
+
 
 void TouschekReaderSAD::addParticleToMCParticles(MCParticleGraph& graph)
 {
@@ -189,8 +195,16 @@ int TouschekReaderSAD::calculateRealParticleNumber(double weight)
 
   //For a value smaller than one do a random choice if the particle should be kept
   if (numPart < 1.0) {
-    numPart = 1.0;
-  }
+    double rnd = m_random.Uniform(); //returns a random number in the interval ]0, 1]
+    B2DEBUG(10, " Real particle number is smaller than 1. Random generator output is" << rnd << " real number is " << numPart)
 
-  return static_cast<int>(numPart);
+    if (rnd < numPart) {
+      numPart = 1.0;
+      B2DEBUG(10, " => Particle is kept.")
+    } else {
+      numPart = 0.0;
+      B2DEBUG(10, " => Particle is discarded.")
+    }
+  }
+  return static_cast<int>(floor(numPart + 0.5));
 }

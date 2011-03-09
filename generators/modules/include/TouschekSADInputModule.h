@@ -62,6 +62,8 @@ namespace Belle2 {
     double m_beamEnergyLER; /**< The beam energy of the LER [GeV]. */
     double m_currentLER;    /**< The current of the LER [A]. */
     double m_lifetimeLER;   /**< The Touschek lifetime of the LER [ns]. */
+    double m_pxResLER;      /**< The resolution for the x momentum component of the Touschek LER real particle. */
+    double m_pyResLER;      /**< The resolution for the y momentum component of the Touschek LER real particle. */
 
 
   private:

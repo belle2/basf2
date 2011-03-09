@@ -18,6 +18,7 @@
 #include <TGeoMatrix.h>
 #include <TFile.h>
 #include <TTree.h>
+#include <TRandom3.h>
 
 #include <string>
 
@@ -70,6 +71,13 @@ namespace Belle2 {
     void open(const std::string& filename) throw(TouschekCouldNotOpenFileError);
 
     /**
+     * Sets the resolution of the momentum for the Touschek real particles.
+     * @param pxRes The resolution for the x momentum component.
+     * @param pyRes The resolution for the y momentum component.
+     */
+    void setMomentumRes(double pxRes, double pyRes) { m_pxRes = pxRes; m_pyRes = pyRes; }
+
+    /**
      * Reads one SAD particle from the file, calculates the number of real particles which are represented by the SAD particle
      * and creates one event per real particle.
      *
@@ -88,6 +96,8 @@ namespace Belle2 {
 
   protected:
 
+    TRandom3 m_random;             /**< The internal random number generator. */
+
     TFile* m_file;                 /**< The input root file. */
     TTree* m_tree;                 /**< The input root tree. */
 
@@ -95,6 +105,8 @@ namespace Belle2 {
     double m_sRange;               /**< The +- range for the s value for which particles are loaded. */
     int m_pdg;                     /**< The pdg code of the Touschek particles. */
     double m_beamenergy;           /**< The beam energy in [GeV]. */
+    double m_pxRes;                /**< The resolution for the x momentum component of the Touschek real particle. */
+    double m_pyRes;                /**< The resolution for the y momentum component of the Touschek real particle. */
 
     double m_touschekToRealFactor; /**< The factor to calculate the number of real particles from a SAD Touschek particle. */
     unsigned int m_realPartNum;    /**< The current number of the created real particles. */
@@ -110,6 +122,9 @@ namespace Belle2 {
 
 
   private:
+
+    /** Convert the parameters from the SAD units to the basf2 units. */
+    void convertParamsToSADUnits();
 
     /** Adds the current particle described by the member variables to the MCParticles collection.
      *

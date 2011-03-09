@@ -40,13 +40,15 @@ TouschekSADInputModule::TouschekSADInputModule() : Module()
   setPropertyFlags(c_Input);
 
   //Parameter definition
-  addParam("ReadoutTime",   m_readoutTime,   "The readout time of the detector [ns]", 20 * Unit::us);
-  addParam("ReadMode",      m_readMode,      "The read mode: 0 = one real particle per event, 1 = all SAD particles per event", 0);
-  addParam("FilenameLER",   m_filenameLER,   "The filename of the LER SAD input file.");
-  addParam("RangeLER",      m_rangeLER,      "All particles within the range around the IP are loaded [cm].", 300.0 * Unit::cm);
-  addParam("BeamEnergyLER", m_beamEnergyLER, "The beam energy of the LER [GeV].", 4.0 * Unit::GeV);
-  addParam("CurrentLER",    m_currentLER,    "The current of the LER [A].", 3.6);
-  addParam("LifetimeLER",   m_lifetimeLER,   "The Touschek lifetime of the LER [ns].", 600 * Unit::s);
+  addParam("ReadoutTime",     m_readoutTime,   "The readout time of the detector [ns]", 20 * Unit::us);
+  addParam("ReadMode",        m_readMode,      "The read mode: 0 = one real particle per event, 1 = all SAD particles per event", 0);
+  addParam("FilenameLER",     m_filenameLER,   "The filename of the LER SAD input file.");
+  addParam("RangeLER",        m_rangeLER,      "All particles within the range around the IP are loaded [cm].", 300.0 * Unit::cm);
+  addParam("BeamEnergyLER",   m_beamEnergyLER, "The beam energy of the LER [GeV].", 4.0 * Unit::GeV);
+  addParam("CurrentLER",      m_currentLER,    "The current of the LER [A].", 3.6);
+  addParam("LifetimeLER",     m_lifetimeLER,   "The Touschek lifetime of the LER [ns].", 600 * Unit::s);
+  addParam("PxResolutionLER", m_pxResLER,      "The resolution for the x momentum component of the Touschek real particle.", 0.01);
+  addParam("PyResolutionLER", m_pyResLER,      "The resolution for the y momentum component of the Touschek real particle.", 0.01);
 }
 
 

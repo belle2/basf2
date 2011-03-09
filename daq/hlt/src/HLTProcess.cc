@@ -61,8 +61,12 @@ EStatus HLTProcess::beginRun()
   m_pidBasf2 = fork();
 
   if (m_pidBasf2 == 0) {
-    system("basf2 -i");
-    return c_TermCalled;
+    if (m_nodeInfo->type() == "ES")
+      system("basf2 $BELLE2_LOCAL_DIR/data/daq/hlt/evtseparator.py");
+    if (m_nodeInfo->type() == "WN")
+      system("basf2 $BELLE2_LOCAL_DIR/data/daq/hlt/workernode.py");
+
+    //return c_TermCalled;
   }
 
   return c_Success;

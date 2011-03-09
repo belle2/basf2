@@ -210,8 +210,20 @@ std::vector<std::string> NodeInfo::targetIP()
   return m_targetIP;
 }
 
-void NodeInfo::setSteering(const char* steering)
+void NodeInfo::setSteeringName(char* steering)
 {
+  std::string tmp(steering);
+  m_steeringName = tmp;
+}
+
+std::string NodeInfo::getSteeringName(void)
+{
+  return m_steeringName;
+}
+
+void NodeInfo::setSteering(char* steering)
+{
+  /*
   std::ifstream input;
   input.open(steering, std::ios::binary);
 
@@ -223,14 +235,17 @@ void NodeInfo::setSteering(const char* steering)
 
   input.read(m_steeringContents, size);
   input.close();
+  */
 }
 
 void NodeInfo::getSteering()
 {
+  /*
   std::ofstream output;
   output.open(m_steeringName, std::ios::binary);
 
   output.write(m_steeringContents, strlen(m_steeringContents));
+  */
 }
 
 /* @brief Serializing the NodeInfo object
@@ -245,16 +260,8 @@ std::string NodeInfo::serializedNodeInfo()
   ss << m_unitNo << " " << m_nodeNo;
   ss << " " << m_type;
   ss << " " << m_portBaseDataIn << " " << m_portBaseDataOut << " " << m_portBaseControl;
-  ss << " " << m_thisIP << " " << m_managerIP << " " << m_steeringName;
-  ss << " " << m_steeringContents;
-
-  for (unsigned int i = 0; i < m_sourceIP.size(); i++) {
-    ss << m_sourceIP[i];
-    if (i == m_sourceIP.size() - 1)
-      ss << " ";
-    else
-      ss << "_";
-  }
+  ss << " " << m_thisIP << " " << m_managerIP << " " << m_steeringName << " ";
+  //ss << " " << m_steeringContents;
 
   for (unsigned int i = 0; i < m_targetIP.size(); i++) {
     ss << m_targetIP[i];
@@ -270,7 +277,7 @@ std::string NodeInfo::serializedNodeInfo()
 */
 void NodeInfo::deserializedNodeInfo(const std::string nodeinfo)
 {
-  std::string tmpSourceIP;
+  //std::string tmpSourceIP;
   std::string tmpTargetIP;
 
   // Since the targetIP is opposite between NodeManagers in Manager node and Nodes,
@@ -278,11 +285,13 @@ void NodeInfo::deserializedNodeInfo(const std::string nodeinfo)
   std::stringstream ss(nodeinfo);
   ss >> m_unitNo >> m_nodeNo >> m_type >> m_portBaseDataIn >> m_portBaseDataOut
   >> m_portBaseControl >> m_thisIP >> m_managerIP
-  >> tmpTargetIP >> tmpSourceIP >> m_steeringName >> m_steeringContents;
+  //>> tmpTargetIP >> tmpSourceIP >> m_steeringName >> m_steeringContents;
+  >> m_steeringName >> tmpTargetIP;
 
   m_sourceIP.clear();
   m_targetIP.clear();
 
+  /*
   std::string::size_type index = tmpSourceIP.find_first_not_of("_", 0);
   std::string::size_type first = tmpSourceIP.find_first_of("_", index);
 
@@ -291,9 +300,10 @@ void NodeInfo::deserializedNodeInfo(const std::string nodeinfo)
     index = tmpSourceIP.find_first_not_of(" ", first);
     first = tmpSourceIP.find_first_of(" ", index);
   }
+  */
 
-  index = tmpTargetIP.find_first_not_of("_", 0);
-  first = tmpTargetIP.find_first_of("_", index);
+  std::string::size_type index = tmpTargetIP.find_first_not_of("_", 0);
+  std::string::size_type first = tmpTargetIP.find_first_of("_", index);
 
   while (std::string::npos != first || std::string::npos != index) {
     m_targetIP.push_back(tmpTargetIP.substr(index, first - index));
@@ -317,7 +327,7 @@ void NodeInfo::Print()
   B2INFO("   m_thisIP = " << m_thisIP);
   B2INFO("   m_managerIP = " << m_managerIP);
   B2INFO("   m_steeringName = " << m_steeringName);
-  B2INFO("   m_steeringContents = " << m_steeringContents);
+  //B2INFO("   m_steeringContents = " << m_steeringContents);
   B2INFO("   m_sourceIP (" << m_sourceIP.size() << ")");
   for (unsigned int i = 0; i < m_sourceIP.size(); i++)
     B2INFO("     " << m_sourceIP[i]);

@@ -34,8 +34,7 @@ HLTOutputModule::HLTOutputModule() : Module()
   //setPropertyFlags(c_WritesDataSingleProcess | c_RequiresSingleProcess);
   setPropertyFlags(c_Input);
 
-  addParam("dest", m_dest, string("localhost"), string("Destination IP address"));
-  //addParam("port", m_port, 20000, "Port number for the communication");
+  addParam("outBufferName", m_outBufferName, string("Outgoing buffer name"), string("B2DataOut"));
 
   vector<std::string> branchNames;
   addParam("branchNames", m_branchNames[0], string("Names of branches to be written from event"), branchNames);
@@ -49,6 +48,13 @@ HLTOutputModule::~HLTOutputModule()
 
 void HLTOutputModule::initialize()
 {
+  /*
+  if (m_outBufferName.size () == 0) {
+    B2ERROR ("Ring buffer is not set");
+    return;
+  }
+  */
+
   m_msgHandler = new MsgHandler(1);
 
   // Set data
@@ -58,76 +64,25 @@ void HLTOutputModule::initialize()
     m_done[i] = false;
   }
 
-  // Set ring buffer
-  char outBufName[] = "outBuffer";
-
-  m_outBuf = new RingBuffer(outBufName, MAXPACKETSIZE);
-
-  // Forking EvtSender
-  m_pidEvtSender = fork();
-
-  if (m_pidEvtSender == 0) {
-    m_evtSender = new EvtSender(m_dest, m_port);
-    m_evtSender->init(m_outBuf);
-    B2INFO("EvtSender initialized");
-
-    while (1) {
-      int broadCastCode = m_evtSender->broadCasting();
-      if (broadCastCode == 2) {
-        B2INFO("EvtSender: EOF detected");
-        break;
-      }
-      usleep(100);
-    }
-  } else {
-    m_evtSender = NULL;
-  }
+  m_outBuf = new RingBuffer((char*)m_outBufferName.c_str(), MAXPACKETSIZE);
 }
 
 void HLTOutputModule::beginRun()
 {
-  if (m_pidEvtSender > 0)
-    B2INFO("Begin a new run...");
 }
 
 void HLTOutputModule::event()
 {
-  if (m_pidEvtSender > 0) {
-    /*
-    struct timeval nowTime;
-    gettimeofday (&nowTime, NULL);
-    std::cout << "LOL = " << nowTime.tv_usec << std::endl;
-    */
-
-    //std::string dummyData (m_dummySize, 'c');
-    //B2INFO ("Available string length = " << dummyData.max_size ());
-    //putData (dummyData);
-    putData(DataStore::c_Event);
-    putData("EOF");
-
-    //B2INFO ("HLTOutput module: event () ends");
-  }
+  putData(DataStore::c_Event);
+  //putData("EOF");
 }
 
 void HLTOutputModule::endRun()
 {
-  if (m_pidEvtSender > 0) {
-    //B2INFO ("HLTOutput module: endRun () called");
-  }
 }
 
 void HLTOutputModule::terminate()
 {
-  if (m_pidEvtSender > 0) {
-    B2INFO("HLTOutput module: terminate () called");
-
-    int stat_val;
-    pid_t child_pid;
-    child_pid = wait(&stat_val);
-
-    delete m_outBuf;
-  } else
-    B2INFO("EvtSender dies");
 }
 
 void HLTOutputModule::putData(const std::string data)

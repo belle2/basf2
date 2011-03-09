@@ -92,8 +92,11 @@ SignalMan::~SignalMan(void)
 EStatus SignalMan::init(const std::string inBufName, const std::string outBufName)
 {
   B2INFO("Starting to initialize SignalMan");
-  m_inBuf = new RingBuffer(inBufName.c_str(), 1024);
-  m_outBuf = new RingBuffer(outBufName.c_str(), 1024);
+  m_inBuf = new RingBuffer(inBufName.c_str(), gBufferSize);
+  m_outBuf = new RingBuffer(outBufName.c_str(), gBufferSize);
+
+  m_inBuf->clear();
+  m_outBuf->clear();
 
   return c_Success;
 }
@@ -136,10 +139,12 @@ EStatus SignalMan::runEvtSender(void)
     while (1) {
       EStatus status = m_sender.broadCasting();
 
+      /*
       if (status == c_TermCalled) {
         B2INFO("Destroying EvtSender..");
         return c_TermCalled;
       }
+      */
 
       usleep(100);
     }
@@ -181,10 +186,12 @@ EStatus SignalMan::runEvtReceiver(void)
       new_sock >> data;
       if (data.size() > 0) {
         m_inBuf->insq((int*)(data.c_str()), data.size());
+        /*
         if (data == "EOF") {
           B2INFO("Destroying EvtReceiver..");
           return c_TermCalled;
         }
+        */
       }
 
       usleep(100);
@@ -282,7 +289,8 @@ std::string SignalMan::get(void)
 {
   while (1) {
     if (m_inBuf->numq() > 0) {
-      char* tmp = new char[255];
+      char tmp[400000];
+      //B2INFO ("AHYO");
       m_inBuf->remq((int*)tmp);
       std::string input(tmp);
 

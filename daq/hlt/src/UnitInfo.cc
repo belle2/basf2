@@ -115,6 +115,11 @@ int UnitInfo::unitNo()
   return m_unitNo;
 }
 
+void UnitInfo::steering(char* steering)
+{
+  m_steeringName = steering;
+}
+
 char* UnitInfo::steering()
 {
   return m_steeringName;

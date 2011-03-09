@@ -53,10 +53,12 @@ void EvtSender::setDestination(std::string dest)
 EStatus EvtSender::connect()
 {
   if (B2Socket::connect(m_host, m_port) != c_Success) {
-    B2ERROR("Unable to connect to the destination.");
+    //B2ERROR("Unable to connect to the destination.");
     return c_FuncError;
-  } else
+  } else {
+    B2INFO("EvtSender: Connection to " << m_host << " established!");
     return c_Success;
+  }
 }
 
 EStatus EvtSender::broadCasting()
@@ -69,8 +71,10 @@ EStatus EvtSender::broadCasting()
 
       if (B2Socket::send(input) == c_Success) {
         if (input == "EOF") {
+          B2INFO("EvtSender: EOF taken");
           return c_TermCalled;
         } else {
+          B2INFO("EvtSender: Sending data to " << m_host << " size=" << input.size());
           return c_Success;
         }
       } else {

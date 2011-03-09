@@ -49,11 +49,8 @@ namespace Belle2 {
 
 
   private:
-    EvtSender* m_evtSender;
     RingBuffer* m_outBuf;
-    pid_t m_pidEvtSender;
-    int m_port;
-    std::string m_dest;
+    std::string m_outBufferName;
 
     std::vector<std::string> m_branchNames[DataStore::c_NDurabilityTypes];
     bool m_done[DataStore::c_NDurabilityTypes];

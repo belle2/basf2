@@ -56,7 +56,6 @@ namespace Belle2 {
     int m_runEnd;                           /*!< End run number that is assigned from XML file */
     char* m_inputName;                      /*!< Input name (human readable) from XML file */
     char* m_inputDescription;               /*!< Description (human readable) of this assignment from XML file */
-    char* m_steeringName;
   };
 }
 

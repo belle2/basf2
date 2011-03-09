@@ -42,10 +42,11 @@ EStatus UnitManager::init(UnitInfo& unit)
 {
   if (initEventSeparator(unit) != c_Success)
     return c_InitFailed;
-  //m_eventSeparator->nodeInfo ()->Print ();
-  //initWorkerNode (unit);
-  //m_workerNodes[0]->nodeInfo ()->Print ();
-  //initEventMerger (unit);
+  if (initEventMerger(unit) != c_Success)
+    return c_InitFailed;
+  for (int i = 0; i < m_WNs; i++)
+    if (initWorkerNode(unit) != c_Success)
+      return c_InitFailed;
 
   return c_Success;
 }
@@ -56,13 +57,11 @@ void UnitManager::broadCasting(void)
 {
   if (m_eventSeparator != NULL)
     m_eventSeparator->broadCasting();
-  /*
-  for (int i = 0; i < m_workerNodes.size (); i++)
-    if (m_workerNodes.size () == 0)
-      m_workerNodes[i]->broadCasting ();
+  for (int i = 0; i < m_workerNodes.size(); i++)
+    if (m_workerNodes[i] != NULL)
+      m_workerNodes[i]->broadCasting();
   if (m_eventMerger != NULL)
-    m_eventMerger->broadCasting ();
-    */
+    m_eventMerger->broadCasting();
 }
 
 /* @brief Building NodeInfo object
@@ -74,19 +73,24 @@ void UnitManager::broadCasting(void)
 NodeInfo* UnitManager::buildNodeInfo(const std::string type, const int nodeNo, UnitInfo& unit)
 {
   NodeInfo* nodeinfo = new NodeInfo(type, unit.unitNo(), nodeNo);
+  nodeinfo->setPortData(c_DataInPort, c_DataOutPort);
   nodeinfo->setPortControl(c_InfoInPort);
   nodeinfo->setManagerIP(unit.manager());
+  nodeinfo->setSteeringName(unit.steering());
 
   if (type == "ES") {
-    nodeinfo->setSourceIP(unit.workerNodes());
-    nodeinfo->setTargetIP(unit.eventSeparator());
-    //nodeinfo->setSteering (unit.steering ());
+    nodeinfo->setThisIP(unit.eventSeparator());
+    nodeinfo->setTargetIP(unit.workerNodes());
     nodeinfo->Print();
   } else if (type == "WN") {
-    nodeinfo->setTargetIP(unit.workerNodes()[nodeNo - 1]);
-  } else if (type == "EM")
+    nodeinfo->setThisIP(unit.workerNodes()[nodeNo - 1]);
     nodeinfo->setTargetIP(unit.eventMerger());
-  else {
+    nodeinfo->Print();
+  } else if (type == "EM") {
+    nodeinfo->setThisIP(unit.eventMerger());
+    nodeinfo->setTargetIP("");
+    nodeinfo->Print();
+  } else {
     B2ERROR("Wrong node type!");
     return NULL;
   }
@@ -113,7 +117,7 @@ EStatus UnitManager::initEventSeparator(UnitInfo& unit)
 */
 EStatus UnitManager::initWorkerNode(UnitInfo& unit)
 {
-  for (unsigned int i = 0; i < unit.workerNodes().size(); i++) {
+  for (unsigned int i = 0; i < m_WNs; i++) {
     NodeManager* wn = new NodeManager(buildNodeInfo("WN", i + 1, unit));
     wn->init(unit.manager());
     m_workerNodes.push_back(wn);
@@ -131,7 +135,7 @@ EStatus UnitManager::initWorkerNode(UnitInfo& unit)
 EStatus UnitManager::initEventMerger(UnitInfo& unit)
 {
   m_eventMerger = new NodeManager(buildNodeInfo("EM", 100, unit));
-  m_eventMerger->Print();
+  //m_eventMerger->Print();
   return (m_eventMerger->init(unit.manager()));
 }
 

@@ -59,7 +59,9 @@ void HLTManager::init(void)
 */
 void HLTManager::broadCasting(void)
 {
-  m_units[0].broadCasting();
+  for (int i = 0; i < (int)m_units.size(); i++) {
+    broadCasting(i);
+  }
 }
 
 /* @brief Broadcasting node information to all nodes in a specific node
@@ -67,7 +69,7 @@ void HLTManager::broadCasting(void)
 */
 void HLTManager::broadCasting(int unitNo)
 {
-
+  m_units[unitNo].broadCasting();
 }
 
 /* @brief Initialize HLT farm information
@@ -79,7 +81,6 @@ void HLTManager::initHLT(void)
   m_runEnd = m_XMLParser->runEnd();
   m_inputName = m_XMLParser->inputName();
   m_inputDescription = m_XMLParser->inputDescription();
-  m_steeringName = m_XMLParser->steeringName();
 }
 
 /* @brief Initialize units

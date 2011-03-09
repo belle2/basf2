@@ -143,6 +143,7 @@ void XMLParser::unitParsing(xmlNodePtr cur, UnitInfo& unit)
       unit.workerNodes((char*)key);
 
     unit.manager(m_manager);
+    unit.steering(m_steeringName);
 
     cur = cur->next;
   }

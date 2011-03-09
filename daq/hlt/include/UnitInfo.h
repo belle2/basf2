@@ -36,6 +36,8 @@ namespace Belle2 {
     std::string manager(void);
 
     int unitNo(void);
+
+    void steering(char* steering);
     char* steering(void);
 
     void Print(void);

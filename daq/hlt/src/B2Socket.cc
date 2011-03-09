@@ -200,7 +200,7 @@ EStatus B2Socket::connect(const std::string host, const int port)
     return c_Success;
   else {
     if (errno != EALREADY && errno != EISCONN) {
-      B2ERROR("Connection failed");
+      //B2ERROR("Connection failed");
       return c_FuncError;
     } else
       return c_Success;

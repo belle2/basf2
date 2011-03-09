@@ -47,10 +47,8 @@ namespace Belle2 {
 
 
   private:
-    EvtReceiver* m_evtReceiver;
     RingBuffer* m_inBuf;
-    pid_t m_pidEvtReceiver;
-    int m_port;
+    std::string m_inBufferName;
 
     std::vector<std::string> m_objnames[DataStore::c_NDurabilityTypes];
     std::vector<std::string> m_arraynames[DataStore::c_NDurabilityTypes];

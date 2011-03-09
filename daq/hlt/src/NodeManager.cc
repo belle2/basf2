@@ -142,7 +142,7 @@ EStatus NodeManager::initSignalMan()
     m_infoSignalMan = new SignalMan(c_ControlPort, c_MonitorPort, m_manager);
   // For manager mode, incoming port should be a monitor line and outgoing port should be a control line
   else
-    m_infoSignalMan = new SignalMan(c_MonitorPort, c_ControlPort, m_nodeinfo->targetIP());
+    m_infoSignalMan = new SignalMan(c_MonitorPort, c_ControlPort, m_nodeinfo->thisIP());
 
   m_infoSignalMan->init("B2ControlIn", "B2ControlOut");
 

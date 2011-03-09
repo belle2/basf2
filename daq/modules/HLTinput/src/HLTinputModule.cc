@@ -33,6 +33,7 @@ HLTInputModule::HLTInputModule() : Module()
   setPropertyFlags(c_Input);
   //setPropertyFlags(c_WritesDataSingleProcess | c_RequiresSingleProcess);
   //addParam("port", m_port, 20000, string ("Port number for the communication"));
+  addParam("inBufferName", m_inBufferName, string("Incoming buffer name"), string("B2DataIn"));
 }
 
 HLTInputModule::~HLTInputModule()
@@ -43,24 +44,7 @@ void HLTInputModule::initialize()
 {
   m_msgHandler = new MsgHandler(1);
 
-  //char inBufName[] = "inBuffer";
-  //int inPort = m_port;
-
-  //m_inBuf = new RingBuffer(inBufName, MAXPACKETSIZE);
-  m_inBuf = new RingBuffer("B2DataIn", MAXPACKETSIZE);
-
-  m_pidEvtReceiver = fork();
-
-  if (m_pidEvtReceiver == 0) {
-    //m_evtReceiver = new EvtReceiver(inPort);
-    m_evtReceiver = new EvtReceiver(c_DataInPort);
-    m_evtReceiver->init(m_inBuf);
-    B2INFO("EvtReceiver initialized");
-
-    m_evtReceiver->listen();
-  } else {
-    m_evtReceiver = NULL;
-  }
+  m_inBuf = new RingBuffer((char*)m_inBufferName.c_str(), MAXPACKETSIZE);
 }
 
 void HLTInputModule::beginRun()
@@ -69,78 +53,49 @@ void HLTInputModule::beginRun()
 
 void HLTInputModule::event()
 {
-  if (m_pidEvtReceiver > 0) {
-    while (1) {
-      if (m_inBuf->numq() > 0) {
-        B2INFO("Starting to process in HLTInput module");
-        int type = readData(DataStore::c_Event);
-        if (type == -1) {
-          B2INFO("HLTInput module: EOF detected!");
-          break;
-        }
-        /*
-        int size;
-        char* tmp = new char[MAXPACKETSIZE];
-        while ((size = m_inBuf->remq ((int*)tmp)) == 0) {
-          usleep (100);
-        }
-
-        std::string input (tmp);
-
-        B2INFO ("Message got (size = " << input.size () << ")");
-        B2INFO ("Message got: " << input);
-
-        if (input == "EOF") {
-          B2INFO ("HLTInput module: EOF detected!");
-
-          break;
-        }
-          */
-
-        //delete input;
+  while (1) {
+    if (m_inBuf->numq() > 0) {
+      B2INFO("Starting to process in HLTInput module");
+      int type = readData(DataStore::c_Event);
+      if (type == -1) {
+        B2INFO("HLTInput module: EOF detected!");
+        break;
+      }
+      /*
+      int size;
+      char* tmp = new char[MAXPACKETSIZE];
+      while ((size = m_inBuf->remq ((int*)tmp)) == 0) {
+        usleep (100);
       }
 
-      usleep(100);
+      std::string input (tmp);
+
+      B2INFO ("Message got (size = " << input.size () << ")");
+      B2INFO ("Message got: " << input);
+
+      if (input == "EOF") {
+        B2INFO ("HLTInput module: EOF detected!");
+
+        break;
+      }
+        */
+
+      //delete input;
     }
+
+    usleep(100);
 
     //B2INFO ("HLTInput module: event () ends");
-  } else {
-    EvtReceiver new_sock;
-    m_evtReceiver->accept(new_sock);
-    std::string data;
-
-    while (1) {
-      new_sock >> data;
-      if (data.size() > 0) {
-        m_inBuf->insq((int*)(data.c_str()), data.size());
-        if (data == "EOF") {
-          B2INFO("EvtReceiver: EOF detected!");
-          break;
-        }
-      }
-    }
   }
 }
 
 void HLTInputModule::endRun()
 {
-  if (m_pidEvtReceiver > 0) {
-    //B2INFO ("HLTInput module: endRun () called");
-  }
 }
 
 void HLTInputModule::terminate()
 {
-  if (m_pidEvtReceiver > 0) {
-    B2INFO("HLTInput module: terminate () called");
-
-    int stat_val;
-    pid_t child_pid;
-    child_pid = wait(&stat_val);
-
-    delete m_inBuf;
-  } else
-    B2INFO("EvtReceiver dies");
+  B2INFO("HLTInput module: terminate () called");
 }
 
 int HLTInputModule::readData(const DataStore::EDurability& indurability)

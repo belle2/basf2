@@ -56,6 +56,8 @@ namespace Belle2 {
     c_TermCalled,       /**< Termination requested */
     c_Success           /**< Everything's ok :D */
   };
+
+  const int gBufferSize = 10000000 * 4;
 }
 
 #endif

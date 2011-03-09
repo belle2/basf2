@@ -51,7 +51,10 @@ namespace Belle2 {
     std::vector<std::string> sourceIP(void);
     std::vector<std::string> targetIP(void);
 
-    void setSteering(const char* steering);
+    void setSteeringName(char* steering);
+    std::string getSteeringName(void);
+
+    void setSteering(char* steering);
     void getSteering(void);
 
     std::string serializedNodeInfo(void);
@@ -71,7 +74,7 @@ namespace Belle2 {
     std::vector<std::string> m_sourceIP;
     std::vector<std::string> m_targetIP;
 
-    char* m_steeringName;
+    std::string m_steeringName;
     char* m_steeringContents;
   };
 }

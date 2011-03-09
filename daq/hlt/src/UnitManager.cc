@@ -57,7 +57,7 @@ void UnitManager::broadCasting(void)
 {
   if (m_eventSeparator != NULL)
     m_eventSeparator->broadCasting();
-  for (int i = 0; i < m_workerNodes.size(); i++)
+  for (int i = 0; (int)i < m_workerNodes.size(); i++)
     if (m_workerNodes[i] != NULL)
       m_workerNodes[i]->broadCasting();
   if (m_eventMerger != NULL)
@@ -117,7 +117,7 @@ EStatus UnitManager::initEventSeparator(UnitInfo& unit)
 */
 EStatus UnitManager::initWorkerNode(UnitInfo& unit)
 {
-  for (unsigned int i = 0; i < m_WNs; i++) {
+  for (unsigned int i = 0; (int)i < m_WNs; i++) {
     NodeManager* wn = new NodeManager(buildNodeInfo("WN", i + 1, unit));
     wn->init(unit.manager());
     m_workerNodes.push_back(wn);

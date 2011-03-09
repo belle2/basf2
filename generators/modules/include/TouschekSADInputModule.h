@@ -21,61 +21,57 @@ namespace Belle2 {
 
   class MCParticleGraph;
 
-  namespace Generators {
+  /**
+   * The TouschekSAD Input module.
+   *
+   * Reads in the Touschek data from a SAD file and stores it into
+   * the MCParticle collection.
+  */
+  class TouschekSADInputModule : public Module {
+
+  public:
 
     /**
-     * The TouschekSAD Input module.
-     *
-     * Reads in the Touschek data from a SAD file and stores it into
-     * the MCParticle collection.
-    */
-    class TouschekSADInputModule : public Module {
+     * Constructor.
+     * Sets the description and the parameters of the module.
+     */
+    TouschekSADInputModule();
 
-    public:
+    /** Destructor. */
+    virtual ~TouschekSADInputModule();
 
-      /**
-       * Constructor.
-       * Sets the description and the parameters of the module.
-       */
-      TouschekSADInputModule();
+    /**
+     * Checks the validity of the module parameters.
+     * Checks if the filepath of the given filename exists.
+     */
+    virtual void initialize();
 
-      /** Destructor. */
-      virtual ~TouschekSADInputModule();
-
-      /**
-       * Checks the validity of the module parameters.
-       * Checks if the filepath of the given filename exists.
-       */
-      virtual void initialize();
-
-      /** Reads the data and stores it into the MCParticle collection. */
-      virtual void event();
+    /** Reads the data and stores it into the MCParticle collection. */
+    virtual void event();
 
 
-    protected:
+  protected:
 
-      TouschekReaderSAD m_readerLER;    /**< The Touschek reader object for the LER data. */
-      TGeoHMatrix* m_lerPipePartMatrix; /**< LER transformation matrix from Touschek space into geant4 space. */
+    TouschekReaderSAD m_readerLER;    /**< The Touschek reader object for the LER data. */
+    TGeoHMatrix* m_lerPipePartMatrix; /**< LER transformation matrix from Touschek space into geant4 space. */
 
-      double m_readoutTime;   /**< The readout time of the detector [ns]. */
-      int m_readMode;         /**< The read mode: 0 = one real particle per event, 1 = all SAD particles per event. */
-      std::string m_filenameLER; /**< The filename of the LER TURTLE Touschek file. */
-      double m_rangeLER;      /**< All particles within the range around the IP are loaded. */
-      double m_beamEnergyLER; /**< The beam energy of the LER [GeV]. */
-      double m_currentLER;    /**< The current of the LER [A]. */
-      double m_lifetimeLER;   /**< The Touschek lifetime of the LER [ns]. */
+    double m_readoutTime;   /**< The readout time of the detector [ns]. */
+    int m_readMode;         /**< The read mode: 0 = one real particle per event, 1 = all SAD particles per event. */
+    std::string m_filenameLER; /**< The filename of the LER TURTLE Touschek file. */
+    double m_rangeLER;      /**< All particles within the range around the IP are loaded. */
+    double m_beamEnergyLER; /**< The beam energy of the LER [GeV]. */
+    double m_currentLER;    /**< The current of the LER [A]. */
+    double m_lifetimeLER;   /**< The Touschek lifetime of the LER [ns]. */
 
 
-    private:
+  private:
 
-      /** Reads one real particle per event into the MCParticle graph.
-       * @param reader Reference to the Touschek SAD reader from which the data is read.
-       * @param mpg Reference to the MCParticle Graph which is filled for each event.
-       */
-      void readRealParticle(TouschekReaderSAD& reader, MCParticleGraph& mpg);
-    };
-
-  }//end namespace Generators
+    /** Reads one real particle per event into the MCParticle graph.
+     * @param reader Reference to the Touschek SAD reader from which the data is read.
+     * @param mpg Reference to the MCParticle Graph which is filled for each event.
+     */
+    void readRealParticle(TouschekReaderSAD& reader, MCParticleGraph& mpg);
+  };
 
 } // end namespace Belle2
 

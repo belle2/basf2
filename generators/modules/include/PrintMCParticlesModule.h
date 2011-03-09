@@ -21,44 +21,39 @@ namespace Belle2 {
 
   class MCParticle;
 
-  namespace Generators {
+  /** The PrintMCParticles module.
+   * Prints the content of the MCParticle collection
+   * as tree using the B2INFO message to the logging system.
+   */
+  class PrintMCParticlesModule : public Module {
 
+  public:
 
-    /** The PrintMCParticles module.
-     * Prints the content of the MCParticle collection
-     * as tree using the B2INFO message to the logging system.
+    /**
+     * Constructor.
+     * Sets the module parameters.
      */
-    class PrintMCParticlesModule : public Module {
+    PrintMCParticlesModule();
 
-    public:
+    /** Destructor. */
+    virtual ~PrintMCParticlesModule() {}
 
-      /**
-       * Constructor.
-       * Sets the module parameters.
-       */
-      PrintMCParticlesModule();
+    /** Method is called for each event. */
+    virtual void event();
 
-      /** Destructor. */
-      virtual ~PrintMCParticlesModule() {}
+  protected:
 
-      /** Method is called for each event. */
-      virtual void event();
+    /** Loops recursively over the MCParticle list and prints information about each particle.
+     * @param mc Reference to the MCParticle whose information should be printed and whose daughters should be visited.
+     * @param level The current level of the recursive call of the method.
+     */
+    void printTree(const MCParticle& mc, int level = 0);
 
-    protected:
-
-      /** Loops recursively over the MCParticle list and prints information about each particle.
-       * @param mc Reference to the MCParticle whose information should be printed and whose daughters should be visited.
-       * @param level The current level of the recursive call of the method.
-       */
-      void printTree(const MCParticle& mc, int level = 0);
-
-      std::string m_particleList; /**< The name of the MCParticle collection. */
-      std::vector<bool> m_seen;   /**< Tag the particles which were already visited using their index. */
-      bool m_onlyPrimaries;       /**< Print only primary particles. */
-      int m_maxLevel;             /**< Show only up to specified depth level. */
-    };
-
-  }//end namespace Generators
+    std::string m_particleList; /**< The name of the MCParticle collection. */
+    std::vector<bool> m_seen;   /**< Tag the particles which were already visited using their index. */
+    bool m_onlyPrimaries;       /**< Print only primary particles. */
+    int m_maxLevel;             /**< Show only up to specified depth level. */
+  };
 
 } // end namespace Belle2
 

@@ -16,40 +16,36 @@
 
 namespace Belle2 {
 
-  namespace Generators {
+  /** The DrawMCParticles module.
+   * Draws the content of the MCParticle collection into the gGeoManager geometry.
+   * For each MCParticle an arrow is drawn at its vertex position and pointing into
+   * its momentum direction.
+   */
+  class DrawMCParticlesModule : public Module {
 
-    /** The DrawMCParticles module.
-     * Draws the content of the MCParticle collection into the gGeoManager geometry.
-     * For each MCParticle an arrow is drawn at its vertex position and pointing into
-     * its momentum direction.
+  public:
+
+    /** Constructor. */
+    DrawMCParticlesModule();
+
+    /** Destructor. */
+    virtual ~DrawMCParticlesModule() {}
+
+    /** Method is called for each event. */
+    virtual void event();
+
+
+  protected:
+
+    /** Loops recursively over the MCParticle list and draws each particle.
+     * @param mc Reference to the MCParticle which should be drawn and whose daughters should be visited.
      */
-    class DrawMCParticlesModule : public Module {
+    void drawTree(const MCParticle &mc);
 
-    public:
-
-      /** Constructor. */
-      DrawMCParticlesModule();
-
-      /** Destructor. */
-      virtual ~DrawMCParticlesModule() {}
-
-      /** Method is called for each event. */
-      virtual void event();
-
-
-    protected:
-
-      /** Loops recursively over the MCParticle list and draws each particle.
-       * @param mc Reference to the MCParticle which should be drawn and whose daughters should be visited.
-       */
-      void drawTree(const MCParticle &mc);
-
-      std::string m_particleList; /**< The name of the MCParticle collection. */
-      std::vector<bool> m_seen;   /**< Tag the particles which were already visited using their index. */
-      bool m_onlyPrimaries;       /**< Print only primary particles. */
-    };
-
-  }//end namespace Generators
+    std::string m_particleList; /**< The name of the MCParticle collection. */
+    std::vector<bool> m_seen;   /**< Tag the particles which were already visited using their index. */
+    bool m_onlyPrimaries;       /**< Print only primary particles. */
+  };
 
 } // end namespace Belle2
 

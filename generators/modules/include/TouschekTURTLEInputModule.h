@@ -20,52 +20,48 @@
 
 namespace Belle2 {
 
-  namespace Generators {
+  /**
+   * The TouschekTURTLE Input module.
+   *
+   * Reads in the Touschek data from a TURTLE file and stores it into
+   * the MCParticle collection.
+  */
+  class TouschekTURTLEInputModule : public Module {
+
+  public:
 
     /**
-     * The TouschekTURTLE Input module.
-     *
-     * Reads in the Touschek data from a TURTLE file and stores it into
-     * the MCParticle collection.
-    */
-    class TouschekTURTLEInputModule : public Module {
+     * Constructor.
+     * Sets the description and the parameters of the module.
+     */
+    TouschekTURTLEInputModule();
 
-    public:
+    /** Destructor. */
+    virtual ~TouschekTURTLEInputModule();
 
-      /**
-       * Constructor.
-       * Sets the description and the parameters of the module.
-       */
-      TouschekTURTLEInputModule();
+    /**
+     * Checks the validity of the module parameters.
+     * Checks if the filepath of the given filename exists.
+     */
+    virtual void initialize();
 
-      /** Destructor. */
-      virtual ~TouschekTURTLEInputModule();
-
-      /**
-       * Checks the validity of the module parameters.
-       * Checks if the filepath of the given filename exists.
-       */
-      virtual void initialize();
-
-      /** Reads the data and stores it into the MCParticle collection. */
-      virtual void event();
+    /** Reads the data and stores it into the MCParticle collection. */
+    virtual void event();
 
 
-    protected:
+  protected:
 
-      TouschekReaderTURTLE* m_readerHER; /**< The Touschek reader object for the HER data. */
-      TouschekReaderTURTLE* m_readerLER; /**< The Touschek reader object for the LER data. */
-      TGeoHMatrix* m_herPipePartMatrix;  /**< HER transformation matrix from TURTLE space into geant4 space. */
-      TGeoHMatrix* m_lerPipePartMatrix;  /**< LER transformation matrix from TURTLE space into geant4 space. */
+    TouschekReaderTURTLE* m_readerHER; /**< The Touschek reader object for the HER data. */
+    TouschekReaderTURTLE* m_readerLER; /**< The Touschek reader object for the LER data. */
+    TGeoHMatrix* m_herPipePartMatrix;  /**< HER transformation matrix from TURTLE space into geant4 space. */
+    TGeoHMatrix* m_lerPipePartMatrix;  /**< LER transformation matrix from TURTLE space into geant4 space. */
 
-      std::string m_filenameHER; /**< The filename of the HER TURTLE Touschek file. */
-      std::string m_filenameLER; /**< The filename of the LER TURTLE Touschek file. */
-      bool m_readHER;            /**< If set to true reads the HER data and adds it to the MCParticle collection. */
-      bool m_readLER;            /**< If set to true reads the LER data and adds it to the MCParticle collection. */
-      int  m_maxParticles;       /**< The maximum number of particles per event that should be read. -1 means all of the particles are read. */
-    };
-
-  }//end namespace Generators
+    std::string m_filenameHER; /**< The filename of the HER TURTLE Touschek file. */
+    std::string m_filenameLER; /**< The filename of the LER TURTLE Touschek file. */
+    bool m_readHER;            /**< If set to true reads the HER data and adds it to the MCParticle collection. */
+    bool m_readLER;            /**< If set to true reads the LER data and adds it to the MCParticle collection. */
+    int  m_maxParticles;       /**< The maximum number of particles per event that should be read. -1 means all of the particles are read. */
+  };
 
 } // end namespace Belle2
 

@@ -74,7 +74,7 @@ void TouschekReaderSAD::open(const string& filename) throw(TouschekCouldNotOpenF
 }
 
 
-double TouschekReaderSAD::getParticle(MCParticleGraph &graph)
+double TouschekReaderSAD::getParticle(MCParticleGraph& graph)
 {
   if (m_tree == NULL) {
     B2ERROR("The SAD tree doesn't exist !")
@@ -118,7 +118,7 @@ double TouschekReaderSAD::getParticle(MCParticleGraph &graph)
 }
 
 
-void TouschekReaderSAD::addAllSADParticles(MCParticleGraph &graph)
+void TouschekReaderSAD::addAllSADParticles(MCParticleGraph& graph)
 {
   if (m_tree == NULL) {
     B2ERROR("The SAD tree doesn't exist !")
@@ -144,7 +144,7 @@ void TouschekReaderSAD::addAllSADParticles(MCParticleGraph &graph)
 //                         Private methods
 //======================================================================
 
-void TouschekReaderSAD::addParticleToMCParticles(MCParticleGraph &graph)
+void TouschekReaderSAD::addParticleToMCParticles(MCParticleGraph& graph)
 {
   double particlePosTouschek[3] = {0.0, 0.0, 0.0};
   double particlePosGeant4[3] = {0.0, 0.0, 0.0};

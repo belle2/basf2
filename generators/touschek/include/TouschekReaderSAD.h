@@ -76,14 +76,14 @@ namespace Belle2 {
      * @param graph Reference to the graph which should be filled with the information from the Touschek file.
      * @return The weight of the SAD particle which was read. Returns -1 if an error occured.
      */
-    double getParticle(MCParticleGraph &graph);
+    double getParticle(MCParticleGraph& graph);
 
     /**
      * Reads all SAD particles from the file into the MCParticles collection which are inside the specified s range.
      *
      * @param graph Reference to the graph which should be filled with the information from the Touschek file.
      */
-    void addAllSADParticles(MCParticleGraph &graph);
+    void addAllSADParticles(MCParticleGraph& graph);
 
 
   protected:
@@ -115,7 +115,7 @@ namespace Belle2 {
      *
      * @param graph Reference to the graph which should be filled with the information from the Touschek file.
      */
-    void addParticleToMCParticles(MCParticleGraph &graph);
+    void addParticleToMCParticles(MCParticleGraph& graph);
 
     /**
      * Calculates the number of real particles for a Touschek particle.

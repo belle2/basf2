@@ -20,48 +20,44 @@
 
 namespace Belle2 {
 
-  namespace Generators {
+  /** The HepevtInput module.
+   * Loads events from a HepEvt file and stores the content
+   * into the MCParticle class.
+   */
+  class HepevtInputModule : public Module {
 
-    /** The HepevtInput module.
-     * Loads events from a HepEvt file and stores the content
-     * into the MCParticle class.
+  public:
+
+    /**
+     * Constructor.
+     * Sets the module parameters.
      */
-    class HepevtInputModule : public Module {
+    HepevtInputModule();
 
-    public:
+    /** Destructor. */
+    virtual ~HepevtInputModule() {}
 
-      /**
-       * Constructor.
-       * Sets the module parameters.
-       */
-      HepevtInputModule();
+    /** Initializes the module. */
+    virtual void initialize();
 
-      /** Destructor. */
-      virtual ~HepevtInputModule() {}
+    /** Method is called for each event. */
+    virtual void event();
 
-      /** Initializes the module. */
-      virtual void initialize();
+  protected:
 
-      /** Method is called for each event. */
-      virtual void event();
+    std::string m_inputFileName; /**< The filename of the input HepEvt file. */
+    int m_skipEventNumber;       /**< The number of events which should be skipped at the start of reading. */
+    int m_nVirtual;              /**< The number of particles in each event that should be made virtual */
+    HepevtReader m_hepevt;       /**< An instance of the HepEvt reader. */
+    MCParticleGraph mpg;         /**< The MCParticle graph object. */
+    bool m_useWeights;           /**< Parameter to switch on/off weight propagation */
+    bool m_boost2Lab;           /**< Parameter to switch on/off boost to LAB system */
+    bool m_wrongSignPz;           /**< Parameter to signal that direction of LER and HER was switched*/
+    bool m_makeMaster;           /**< Parameter to signal if the modul should act as master */
+    int m_runNum;               /**< The run number that should be used if the reader acts as master */
+    int m_expNum;               /**< The experiment number that should be used if the reader acts as master */
 
-    protected:
-
-      std::string m_inputFileName; /**< The filename of the input HepEvt file. */
-      int m_skipEventNumber;       /**< The number of events which should be skipped at the start of reading. */
-      int m_nVirtual;              /**< The number of particles in each event that should be made virtual */
-      HepevtReader m_hepevt;       /**< An instance of the HepEvt reader. */
-      MCParticleGraph mpg;         /**< The MCParticle graph object. */
-      bool m_useWeights;           /**< Parameter to switch on/off weight propagation */
-      bool m_boost2Lab;           /**< Parameter to switch on/off boost to LAB system */
-      bool m_wrongSignPz;           /**< Parameter to signal that direction of LER and HER was switched*/
-      bool m_makeMaster;           /**< Parameter to signal if the modul should act as master */
-      int m_runNum;               /**< The run number that should be used if the reader acts as master */
-      int m_expNum;               /**< The experiment number that should be used if the reader acts as master */
-
-    };
-
-  }//end namespace Generators
+  };
 
 } // end namespace Belle2
 

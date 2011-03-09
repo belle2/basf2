@@ -53,12 +53,15 @@ namespace Belle2 {
 
     protected:
 
-      TouschekReaderSAD* m_readerLER;   /**< The Touschek reader object for the LER data. */
+      TouschekReaderSAD m_readerLER;    /**< The Touschek reader object for the LER data. */
       TGeoHMatrix* m_lerPipePartMatrix; /**< LER transformation matrix from Touschek space into geant4 space. */
 
       std::string m_filenameLER; /**< The filename of the LER TURTLE Touschek file. */
-      int  m_maxParticles; /**< The maximum number of particles per event that should be read. */
-      double m_RangeLER;   /**< All particles within the range around the IP are loaded. */
+      double m_rangeLER;      /**< All particles within the range around the IP are loaded. */
+      double m_beamEnergyLER; /**< The beam energy of the LER [GeV]. */
+      double m_currentLER;    /**< The current of the LER [A]. */
+      double m_lifetimeLER;   /**< The Touschek lifetime of the LER [ns]. */
+      double m_readoutTime;   /**< The readout time of the detector [ns]. */
     };
 
   }//end namespace Generators

@@ -23,12 +23,9 @@ using namespace std;
 using namespace Belle2;
 
 
-TouschekReaderTURTLE::TouschekReaderTURTLE(TGeoHMatrix* transMatrix, int pdg)
+TouschekReaderTURTLE::TouschekReaderTURTLE(TGeoHMatrix* transMatrix, int pdg): m_transMatrix(transMatrix), m_pdg(pdg),
+    m_lineNum(0)
 {
-  m_lineNum = 0;
-  m_filename = "";
-  m_transMatrix = transMatrix;
-  m_pdg = pdg;
 }
 
 
@@ -40,7 +37,6 @@ TouschekReaderTURTLE::~TouschekReaderTURTLE()
 
 void TouschekReaderTURTLE::open(const string& filename) throw(TouschekCouldNotOpenFileError)
 {
-  m_filename = filename;
   m_lineNum = 0;
   m_input.open(filename.c_str());
   if (!m_input) throw(TouschekCouldNotOpenFileError() << filename);

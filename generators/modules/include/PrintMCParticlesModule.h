@@ -15,11 +15,14 @@
 
 #include <string>
 #include <vector>
-#include <generators/dataobjects/MCParticle.h>
+
 
 namespace Belle2 {
 
+  class MCParticle;
+
   namespace Generators {
+
 
     /** The PrintMCParticles module.
      * Prints the content of the MCParticle collection

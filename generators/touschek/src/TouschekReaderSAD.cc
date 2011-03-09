@@ -13,25 +13,41 @@
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Unit.h>
 #include <generators/dataobjects/MCParticle.h>
-#include <framework/datastore/EventMetaData.h>
-#include <framework/datastore/StoreObjPtr.h>
+
 
 using namespace std;
 using namespace Belle2;
 
 
-TouschekReaderSAD::TouschekReaderSAD(TGeoHMatrix* transMatrix)
+TouschekReaderSAD::TouschekReaderSAD(): m_file(NULL), m_tree(NULL), m_transMatrix(NULL),
+    m_sRange(300.0), m_pdg(-11), m_touschekToRealFactor(0), m_realPartNum(0),
+    m_realPartEntry(0), m_readEntry(0)
 {
-  m_file = NULL;
-  m_tree = NULL;
-  m_transMatrix = transMatrix;
-  m_readEntry = 0;
+
 }
 
 
 TouschekReaderSAD::~TouschekReaderSAD()
 {
   if (m_file != NULL) m_file->Close();
+}
+
+
+void TouschekReaderSAD::initialize(TGeoHMatrix* transMatrix, double sRange, int pdg, double beamEnergy, double current, double lifetime, double readoutTime)
+{
+  m_transMatrix = transMatrix;
+  m_sRange = sRange;
+  m_pdg = pdg;
+  m_beamenergy = beamEnergy;
+
+  //Calculate the Touschek to real particle number factor (assumes the accelerator to be 2.3 km long)
+  double totalCurrentLoss   = current / lifetime;
+  double timePartRound      = (2.3 * Unit::km) / (Unit::speed_of_light);
+  double totalLossPerRound  = totalCurrentLoss * timePartRound;
+  double lossPerRound       = (totalLossPerRound / Unit::s) / 1.6e-19; //The unit is required because [A] = [C]/[s]
+  m_touschekToRealFactor    = lossPerRound * readoutTime;
+
+  B2DEBUG(10, "The Touschek particle to real particle weight factor: " << m_touschekToRealFactor)
 }
 
 
@@ -58,47 +74,70 @@ void TouschekReaderSAD::open(const string& filename) throw(TouschekCouldNotOpenF
 }
 
 
-int TouschekReaderSAD::getParticles(int number, double sRange, double beamEnergy, int pdg, MCParticleGraph &graph)
+double TouschekReaderSAD::getParticle(MCParticleGraph &graph)
 {
-  if (m_tree == NULL) return 0;
+  if (m_tree == NULL) {
+    B2ERROR("The SAD tree doesn't exist !")
+    return -1;
+  }
+
+  //Check for end of file
+  if (m_readEntry >= m_tree->GetEntries()) {
+    throw TouschekEndOfFile();
+  }
 
   double particlePosTouschek[3] = {0.0, 0.0, 0.0};
   double particlePosGeant4[3] = {0.0, 0.0, 0.0};
   double particleMomTouschek[3] = {0.0, 0.0, 0.0};
   double particleMomGeant4[3] = {0.0, 0.0, 0.0};
 
-  int iEntry = 0;
-  while (((iEntry < number) || (number < 0)) && (m_readEntry < m_tree->GetEntries())) {
-    m_tree->GetEntry(m_readEntry);
+  if (m_realPartEntry >= m_realPartNum) {
+    m_realPartEntry = 0;
+    m_realPartNum   = 0;
+  }
 
-    double lostX = m_lostX * Unit::m;
-    double lostY = m_lostY * Unit::m;
-    double lostS = m_lostS * Unit::m;
+  //Check if a new SAD particle has to be read from the file
+  if (m_realPartNum == 0) {
 
-    //Check s range
-    if (fabs(lostS) > sRange) {
+    //Read only SAD particles which are inside the chosen sRange
+    do {
+      m_tree->GetEntry(m_readEntry);
+
+      //Convert SAD units to basf2 units
+      m_lostX = m_lostX * Unit::m;
+      m_lostY = m_lostY * Unit::m;
+      m_lostS = m_lostS * Unit::m;
+
+      B2DEBUG(10, "> Read particle " << m_readEntry + 1 << "/" << m_tree->GetEntries() << " with s = " << m_lostS << " cm")
+
       m_readEntry++;
-      continue;
-    }
+    } while ((fabs(m_lostS) > m_sRange) && (m_readEntry <= m_tree->GetEntries()));
 
-    //Add particles to MCParticle collection
+    m_realPartNum = calculateRealParticleNumber(m_lostW);
+  }
+
+
+  //Create a new real particle from the SAD particle
+  if ((fabs(m_lostS) <= m_sRange) && (m_realPartNum > 0)) {
+
+    //Add particle to MCParticle collection
     MCParticleGraph::GraphParticle &particle = graph.addParticle();
     particle.setStatus(MCParticle::c_PrimaryParticle);
-    particle.setPDG(pdg);
+    particle.setPDG(m_pdg);
     particle.setMassFromPDG();
 
     //Convert the position of the particle from local Touschek space to global geant4 space.
     //Flip the sign for the y and z component to go from the accelerator to the detector coordinate system
-    particlePosTouschek[0] = lostX;
-    particlePosTouschek[1] = -lostY;
-    particlePosTouschek[2] = -lostS;
+    particlePosTouschek[0] = m_lostX;
+    particlePosTouschek[1] = -m_lostY;
+    particlePosTouschek[2] = -m_lostS;
 
     m_transMatrix->LocalToMaster(particlePosTouschek, particlePosGeant4);
 
     //Convert the momentum of the particle from local Touschek space to global geant4 space.
     //Flip the sign for the y and z component to go from the accelerator to the detector coordinate system
     //Calculate the missing pz by using the nominal beam energy
-    double totalMomSqr = (beamEnergy * beamEnergy) - (particle.getMass() * particle.getMass());
+    double totalMomSqr = (m_beamenergy * m_beamenergy) - (particle.getMass() * particle.getMass());
     particleMomTouschek[0] = m_lostPx * Unit::GeV;
     particleMomTouschek[1] = -m_lostPy * Unit::GeV;
     particleMomTouschek[2] = -sqrt(totalMomSqr - (m_lostPx * m_lostPx) - (m_lostPy * m_lostPy));
@@ -108,18 +147,31 @@ int TouschekReaderSAD::getParticles(int number, double sRange, double beamEnergy
     particle.setMomentum(TVector3(particleMomGeant4));
     particle.setProductionVertex(TVector3(particlePosGeant4));
     particle.setProductionTime(0.0);
-    particle.setEnergy(beamEnergy);
+    particle.setEnergy(m_beamenergy);
     particle.setValidVertex(true);
 
-    //setting weight of track as event weight, if only one track is in event:
-    if (number == 1) {
-      StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
-      eventMetaDataPtr->setGeneratedWeight(m_lostW);
-    }
-
-    iEntry++;
-    m_readEntry++;
+    B2DEBUG(10, "* Created real particle " << m_realPartEntry + 1 << "/" << m_realPartNum << " for SAD particle " << m_readEntry << "/" << m_tree->GetEntries())
   }
 
-  return iEntry;
+  m_realPartEntry++;
+
+  return m_lostW;
+}
+
+
+
+//======================================================================
+//                         Private methods
+//======================================================================
+
+int TouschekReaderSAD::calculateRealParticleNumber(double weight)
+{
+  double numPart = weight * m_touschekToRealFactor;
+
+  //For a value smaller than one do a random choice if the particle should be kept
+  if (numPart < 1.0) {
+    numPart = 1.0;
+  }
+
+  return static_cast<int>(numPart);
 }

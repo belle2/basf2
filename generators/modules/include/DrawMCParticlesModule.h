@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef DRAWMCPARTICLESMODULE_H_
-#define DRAWMCPARTICLESMODULE_H_
+#ifndef DRAWMCPARTICLESMODULE_H
+#define DRAWMCPARTICLESMODULE_H
 
 #include <framework/core/Module.h>
 #include <generators/dataobjects/MCParticle.h>
@@ -53,4 +53,4 @@ namespace Belle2 {
 
 } // end namespace Belle2
 
-#endif /* DRAWMCPARTICLESMODULE_H_ */
+#endif /* DRAWMCPARTICLESMODULE_H */

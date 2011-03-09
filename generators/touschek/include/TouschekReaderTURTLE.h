@@ -74,7 +74,6 @@ namespace Belle2 {
 
     TGeoHMatrix* m_transMatrix; /**< Transformation matrix from local Touschek to global geant4 space. */
     int m_pdg;                  /**< The pdg value of the type of particle that is read (e.g. 11 for e-, -11 for e+).*/
-    std::string m_filename;     /**< The filename (path+name) of the Touschek ascii file. */
     std::ifstream m_input;      /**< The input stream of the ascii file. */
     int m_lineNum;              /**< The line number in the ascii file of the last particle which was read. */
   };

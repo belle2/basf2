@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include <generators/modules/TouschekSADInputModule.h>
+#include <generators/dataobjects/MCParticleGraph.h>
 
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Gearbox.h>
@@ -40,12 +41,13 @@ TouschekSADInputModule::TouschekSADInputModule() : Module()
   setPropertyFlags(c_Input);
 
   //Parameter definition
+  addParam("ReadoutTime",   m_readoutTime,   "The readout time of the detector [ns]", 20 * Unit::us);
+  addParam("ReadMode",      m_readMode,      "The read mode: 0 = one real particle per event, 1 = all SAD particles per event", 0);
   addParam("FilenameLER",   m_filenameLER,   "The filename of the LER SAD input file.");
   addParam("RangeLER",      m_rangeLER,      "All particles within the range around the IP are loaded [cm].", 300.0 * Unit::cm);
   addParam("BeamEnergyLER", m_beamEnergyLER, "The beam energy of the LER [GeV].", 4.0 * Unit::GeV);
   addParam("CurrentLER",    m_currentLER,    "The current of the LER [A].", 3.6);
   addParam("LifetimeLER",   m_lifetimeLER,   "The Touschek lifetime of the LER [ns].", 600 * Unit::s);
-  addParam("ReadoutTime",   m_readoutTime,   "The readout time of the detector [ns]", 20 * Unit::us);
 }
 
 
@@ -84,27 +86,43 @@ void TouschekSADInputModule::event()
     MCParticleGraph mpg;
     StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
 
-    //----------------------------------
-    //       Read the LER data
-    //----------------------------------
     try {
-      double weight = m_readerLER.getParticle(mpg);
+      //----------------------------------
+      //       Read the LER data
+      //----------------------------------
+      switch (m_readMode) {
+        case 0:  readRealParticle(m_readerLER, mpg);
+          break;
+        case 1:  m_readerLER.addAllSADParticles(mpg);
+          break;
+        default: readRealParticle(m_readerLER, mpg);
+          break;
+      }
 
-      if (weight < 0) return;
-      eventMetaDataPtr->setGeneratedWeight(weight);
+      //----------------------------------
+      // Generate MCParticles collection
+      //----------------------------------
+      mpg.generateList(DEFAULT_MCPARTICLES, MCParticleGraph::c_setDecayInfo | MCParticleGraph::c_checkCyclic);
 
     } catch (TouschekReaderSAD::TouschekEndOfFile& exc) {
       B2DEBUG(10, exc.what())
       eventMetaDataPtr->setEndOfData();
       return;
     }
-
-    //----------------------------------
-    // Generate MCParticles collection
-    //----------------------------------
-    mpg.generateList(DEFAULT_MCPARTICLES, MCParticleGraph::c_setDecayInfo | MCParticleGraph::c_checkCyclic);
-
   } catch (runtime_error &exc) {
     B2ERROR(exc.what());
   }
+}
+
+
+//====================================================================
+//                       Private methods
+//====================================================================
+
+void TouschekSADInputModule::readRealParticle(TouschekReaderSAD& reader, MCParticleGraph& mpg)
+{
+  StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
+  double weight = reader.getParticle(mpg);
+  if (weight < 0) return;
+  eventMetaDataPtr->setGeneratedWeight(weight);
 }

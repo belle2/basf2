@@ -78,6 +78,7 @@ void TouschekSADInputModule::initialize()
   // Initialize LER reader
   //-----------------------
   m_readerLER.initialize(m_lerPipePartMatrix, m_rangeLER, -11, m_beamEnergyLER, m_currentLER, m_lifetimeLER, m_readoutTime);
+  m_readerLER.setMomentumRes(m_pxResLER, m_pyResLER);
 }
 
 

@@ -196,14 +196,14 @@ int TouschekReaderSAD::calculateRealParticleNumber(double weight)
   //For a value smaller than one do a random choice if the particle should be kept
   if (numPart < 1.0) {
     double rnd = m_random.Uniform(); //returns a random number in the interval ]0, 1]
-    B2DEBUG(10, " Real particle number is smaller than 1. Random generator output is" << rnd << " real number is " << numPart)
+    B2DEBUG(10, "  Real particle number is smaller than 1. Random generator output is" << rnd << " real number is " << numPart)
 
     if (rnd < numPart) {
       numPart = 1.0;
-      B2DEBUG(10, " => Particle is kept.")
+      B2DEBUG(10, "  => Particle is kept.")
     } else {
       numPart = 0.0;
-      B2DEBUG(10, " => Particle is discarded.")
+      B2DEBUG(10, "  => Particle is discarded.")
     }
   }
   return static_cast<int>(floor(numPart + 0.5));

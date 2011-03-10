@@ -9,6 +9,8 @@
  **************************************************************************/
 
 #include <pxd/geopxd/B2GeomPXDSensor.h>
+#include <pxd/dataobjects/PXDVolumeUserInfo.h>
+
 using namespace boost;
 using namespace Belle2;
 
@@ -98,7 +100,6 @@ Bool_t B2GeomPXDSensorSilicon::init(GearDir& content)
 
 Bool_t B2GeomPXDSensorSilicon::make()
 {
-  B2METHOD();
   if (!makeGeneric()) {
     B2FATAL("Cannot build silicon of PXD sensor");
     return false;
@@ -135,6 +136,14 @@ Bool_t B2GeomPXDSensorActive::init(GearDir& content)
     if (content.isParamAvailable("ReflectZ")) isReflectZ = !isReflectZ;
   }
   return true;
+}
+
+Bool_t B2GeomPXDSensorActive::make()
+{
+  Bool_t res = makeGeneric();
+  if (res)
+    tVolume->SetField(new PXDVolumeUserInfo(iLayer, iLadder, iSensor));
+  return res;
 }
 
 

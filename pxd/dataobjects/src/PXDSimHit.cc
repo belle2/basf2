@@ -10,14 +10,6 @@
 
 // basf2
 #include <pxd/dataobjects/PXDSimHit.h>
-#include <framework/logging/Logger.h>
-
-// root
-#include <TString.h>
-
-// Geant
-#include <G4ThreeVector.hh>
-#include <G4String.hh>
 
 using namespace std;
 using namespace Belle2;
@@ -34,6 +26,8 @@ PXDSimHit& PXDSimHit::operator=(const PXDSimHit & other)
   this->m_theta = other.getTheta();
   this->m_momIn = other.getMomIn();
   this->m_PDGcode = other.getPDGcode();
+  this->m_PDGmass = other.getPDGmass();
+  this->m_PDGcharge = other.getPDGcharge();
   this->m_trackID = other.getTrackID();
   this->m_energyDep = other.getEnergyDep();
   this->m_stepLength = other.getStepLength();

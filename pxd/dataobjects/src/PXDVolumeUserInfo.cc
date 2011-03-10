@@ -10,6 +10,11 @@
 
 #include <pxd/dataobjects/PXDVolumeUserInfo.h>
 
+#include <framework/logging/Logger.h>
+
+#include <G4VPhysicalVolume.hh>
+#include <TG4RootDetectorConstruction.h>
+
 using namespace std;
 using namespace Belle2;
 
@@ -22,3 +27,4 @@ PXDVolumeUserInfo& PXDVolumeUserInfo::operator=(const PXDVolumeUserInfo & other)
   this->m_sensorID = other.getSensorID();
   return *this;
 }
+

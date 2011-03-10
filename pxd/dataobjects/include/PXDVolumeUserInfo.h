@@ -12,9 +12,12 @@
 #define PXDVOLUMEUSERINFO_H_
 
 #include <geometry/dataobjects/VolumeUserInfoBase.h>
+#include <framework/gearbox/Unit.h>
 
 #include <TObject.h>
-#include <TVector3.h>
+
+class G4VPhysicalVolume;
+class TG4RootDetectorConstruction;
 
 namespace Belle2 {
 
@@ -33,7 +36,7 @@ namespace Belle2 {
         m_layerID(-1),    /* Layer ID. */
         m_ladderID(-1),   /* Ladder ID. */
         m_sensorID(-1) {  /* Sensor ID. */
-      /*! Does nothing */
+      m_stepSize = 5.0 * Unit::um;
     }
 
     /** Full constructor.
@@ -48,7 +51,7 @@ namespace Belle2 {
         m_layerID(layerID),
         m_ladderID(ladderID),
         m_sensorID(sensorID) {
-      /* Does nothing. */
+      m_stepSize = 5.0 * Unit::um;
     }
 
     /** Destructor */
@@ -57,8 +60,8 @@ namespace Belle2 {
     }
 
     /** Sets the layer ID.
-     * @param layerID The layer ID of the sensitive volume.
-     */
+      * @param layerID The layer ID of the sensitive volume.
+      */
     void setLayerID(int layerID) { m_layerID = layerID; }
 
     /** The method to set LadderID.*/

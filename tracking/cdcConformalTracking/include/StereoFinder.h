@@ -12,8 +12,8 @@
 #define STEREOFINDER_H
 
 
-#include <tracking/karlsruhe/CDCSegment.h>
-#include <tracking/karlsruhe/CDCTrackCandidate.h>
+#include <tracking/cdcConformalTracking/CDCSegment.h>
+#include <tracking/cdcConformalTracking/CDCTrackCandidate.h>
 
 namespace Belle2 {
 

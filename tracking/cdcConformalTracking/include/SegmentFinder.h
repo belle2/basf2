@@ -14,8 +14,8 @@
 
 #include "TH1F.h"
 
-#include <tracking/karlsruhe/CDCTrackHit.h>
-#include <tracking/karlsruhe/CDCSegment.h>
+#include <tracking/cdcConformalTracking/CDCTrackHit.h>
+#include <tracking/cdcConformalTracking/CDCSegment.h>
 
 
 

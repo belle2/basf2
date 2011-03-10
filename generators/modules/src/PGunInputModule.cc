@@ -44,10 +44,10 @@ PGunInputModule::PGunInputModule() : Module()
   addParam("nTracks", m_nTracks, "The number of tracks to be generated per event", 1);
   addParam("pPar1", m_pPar1, "The first parameter for momentum distribution function", 0.2);
   addParam("pPar2", m_pPar2, "The second parameter for momentum distribution function", 1.0);
-  addParam("phiPar1", m_phiPar1Deg, "The first parameter for the phi distribution function", 0.0);
-  addParam("phiPar2", m_phiPar2Deg, "The second parameter for the phi distribution function", 360.0);
-  addParam("thetaPar1", m_thetaPar1Deg, "The first parameter for theta distribution function", 17.0);
-  addParam("thetaPar2", m_thetaPar2Deg, "The second parameter for theta distribution function", 150.0);
+  addParam("phiPar1", m_phiPar1Deg, "The first parameter for the phi distribution function (Unit: Degrees)", 0.0);
+  addParam("phiPar2", m_phiPar2Deg, "The second parameter for the phi distribution function (Unit: Degrees)", 360.0);
+  addParam("thetaPar1", m_thetaPar1Deg, "The first parameter for theta distribution function (Unit: Degrees)", 17.0);
+  addParam("thetaPar2", m_thetaPar2Deg, "The second parameter for theta distribution function (Unit: Degrees)", 150.0);
   addParam("xVertexPar1", m_xVertexPar1, "The first parameter for vertex x-coordinate distribution function", 0.0);
   addParam("xVertexPar2", m_xVertexPar2, "The second parameter for x-coordinate distribution distribution function", 0.7);
   addParam("yVertexPar1", m_yVertexPar1, "The first parameter for vertex y-coordinate distribution function", 0.0);

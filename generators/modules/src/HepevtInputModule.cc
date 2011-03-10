@@ -47,7 +47,7 @@ HepevtInputModule::HepevtInputModule() : Module()
   addParam("skipEvents", m_skipEventNumber, "Skip this number of events before starting.", 0);
   addParam("useWeights", m_useWeights, "Set to 'true' to if generator weights should be propagated.", false);
   addParam("nVirtualParticles", m_nVirtual, "Number of particles at the beginning of the events that should be made virtual.", 0);
-  addParam("boost2lab", m_boost2Lab, "Boolean to indicate whether the particles should be boosted from CM frame to lab frame", false);
+  addParam("boost2Lab", m_boost2Lab, "Boolean to indicate whether the particles should be boosted from CM frame to lab frame", false);
   addParam("wrongSignPz", m_wrongSignPz, "Boolean to signal that directions of HER and LER were switched", false);
 }
 
@@ -85,12 +85,18 @@ void HepevtInputModule::initialize()
 
 void HepevtInputModule::event()
 {
+
+  StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
+  B2INFO("HEPEVT processes event NR " << eventMetaDataPtr->getEvent() << "!");
+
+
+
   try {
     mpg.clear();
     double weight = 1;
     int id = m_hepevt.getEvent(mpg, weight);
 
-    StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
+    //  StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
     if (m_makeMaster) {
 
       if (id > -1) {

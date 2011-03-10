@@ -71,7 +71,7 @@ hepevtreader.param('nVirtualParticles', 2)
 # automatically all particles to the LAB frame of
 # BELLE2.
 # This option is switched on with this line
-hepevtreader.param('boost2LAB', True)
+hepevtreader.param('boost2Lab', True)
 # For BhWide this option is needed.
 # default is boost2LAB = false.
 

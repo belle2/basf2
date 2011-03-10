@@ -48,7 +48,7 @@ hepevtreader.param('useWeights', True)
 
 # Specific options for the processing of files from the BhWide generator:
 hepevtreader.param('nVirtualParticles', 2)
-hepevtreader.param('boost2LAB', True)
+hepevtreader.param('boost2Lab', True)
 hepevtreader.param('wrongSignPz', True)
 
 # for a simple simulation job with output to a root file

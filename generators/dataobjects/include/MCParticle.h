@@ -56,6 +56,25 @@ namespace Belle2 {
       c_IsVirtual         = 1024 /**< bit 10: Particle is virtual and not going to Geant4 */
     };
 
+    /** This enum is more a less a copy from EvtSpinType. Except we explicitly set the
+     numbers of the standard spin states such, that they represent 2 x S */
+    enum EspinType {
+      c_SCALAR          = 0,
+      c_STRING          = 0,
+      c_DIRAC           = 1,
+      c_NEUTRINO        = 1,
+      c_VECTOR          = 2,
+      c_PHOTON          = 2,
+      c_RARITASCHWINGER = 3,
+      c_TENSOR          = 4,
+      c_SPIN5HALF       = 5,
+      c_SPIN3           = 6,
+      c_SPIN7HALF       = 7,
+      c_SPIN4           = 8,
+      c_NOTSET          = -1
+    };
+
+
     /**
      * Default constructor for ROOT.
      */
@@ -70,7 +89,7 @@ namespace Belle2 {
         m_decayTime(0), m_decayVertex_x(0),
         m_decayVertex_y(0), m_decayVertex_z(0),
         m_mother(0),
-        m_firstDaughter(0), m_lastDaughter(0) {}
+        m_firstDaughter(0), m_lastDaughter(0), m_spinType(c_NOTSET) {}
 
     /**
      * Construct MCParticle from a another MCParticle and the TClonesArray it is stored in.
@@ -230,6 +249,18 @@ namespace Belle2 {
 
 
     /**
+     *Returns the SpinType of the particle.
+     *@return The spinType of the particle.
+     */
+    EspinType getSpinType() {return m_spinType;}
+
+    /**
+     *Returns the SpinType of the particle as integer number.
+     *@return The spinType of the particle as integer number.
+     */
+    int getSpinTypeInteger() {return (int)m_spinType;}
+
+    /**
      *Check if particle is virtual
      *
     */
@@ -334,6 +365,18 @@ namespace Belle2 {
     void set4Vector(const TLorentzVector& p4)      { setMomentum(p4.Vect()); m_energy = p4.Energy(); }
 
     /**
+     * Sets the spin type of the particle.
+     * @param spin type (integer)
+     */
+    void setSpinType(int IspinType)      { m_spinType = (EspinType)IspinType; }
+
+    /**
+     * Sets the spin type of the particle.
+     * @param spin type (EspinType)
+     */
+    void setSpinType(EspinType NewSpinType)      { m_spinType = NewSpinType; }
+
+    /**
      * Set decay vertex.
      * @param vertex The position of the decay vertex given as TVector3.
      */
@@ -400,6 +443,7 @@ namespace Belle2 {
     int m_lastDaughter;        /**< 1-based index of last daughter particle in collection, 0 if no daughters */
     static const double c_epsilon = 10e-7;  /**< limit of precision for two doubles to be the same. */
 
+    EspinType m_spinType;        /**< Spin type of the particle as provided by the generator. */
     /** Class definition required for the creation of the ROOT dictionary. */
     ClassDef(MCParticle, 1);
   };

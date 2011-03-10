@@ -34,15 +34,10 @@ namespace Belle2 {
     /** Utility function: checks if the given value is between min and max. */
     static bool IsValueWithinRange(double value, double min, double max);
 
-
-    /**Calculates the conformal coordinates of a CDCTrackHitArray and adds the results to the member variables of the TrackHits. */
-    static void ConformalTransformation(std::string CDCTrackHitArray);
-
-
     /** Classifies the Segments as good or bad.
      * Segments with number of hits between minHits and maxHits and WireId difference below nWires are classified as good.
      * */
-    static void ClassifySegments(std::string SegmentsCDCArray, int minHits, int maxHits, int nWires);
+    static void ClassifySegments(std::string CDCSegments, int minHits, int maxHits, int nWires);
 
     /** Collects the TrackHits to Segments for each axial superlayer.
      * Uses as Input an CDCTrackHitArray and as output an SegmentsCDCArray.
@@ -51,8 +46,24 @@ namespace Belle2 {
      * Then clusters in this histograms are found and the corresponding TrackHits are grouped in a Segment object.
      * root_output: boolean to define if some output files with the histograms should be created (one .root and one .pdf file)
      */
-    static void FindSegments(std::string CDCTrackHitArray, std::string SegmentsCDCArray, bool root_output = true);
+    static void FindSegments(std::string CDCTrackHits, std::string CDCSegments, bool root_output = false);
 
+    // Methods for Segment Fitting
+    //--------------------------------------------------------------------------------------
+    /** Searches for layers within the Segment which contain to many hits.
+     *  All layers from this segment are retrieved and the number of hits in each layer is counted.
+     *  If there are more hits in this layer than given number (nWires), the layer is classified as overcrowded.
+     *  A vector with Id's of overcrowded layers is returned.
+     */
+    //static std::vector<int> FindOvercrowdedLayers(CDCSegment segment, int nWires) ;
+    /** Fits a the segments in the conformal plane and removes bad Hits.
+     * A simple linear fit in the conformal plane is performed.
+     * Distance from each hit point to the fit line is calculated.
+     * Those hits for which this distance is above given cuts (still under developement) are removed from segment, afterwards the segment is refitted.
+     * When a layer is overcrowded with hits (too many hits in same layer), the cuts are more strict.
+     */
+    //static void FitSegments(std::string CDCSegments);
+    //--------------------------------------------------------------------------------------
 
   private:
 

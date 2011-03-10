@@ -7,6 +7,6 @@
 
 #pragma link C++ class Belle2::CDCTrackHit;
 #pragma link C++ class Belle2::CDCSegment;
-#pragma link C++ class Belle2::CDCTrack;
+#pragma link C++ class Belle2::CDCTrackCandidate;
 
 #endif

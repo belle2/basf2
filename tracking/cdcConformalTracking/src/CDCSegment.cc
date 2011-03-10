@@ -10,7 +10,7 @@
 
 #include "../include/CDCSegment.h"
 
-#include <tracking/karlsruhe/AxialTrackFinder.h>
+#include <tracking/cdcConformalTracking/AxialTrackFinder.h>
 
 #include <cmath>
 #include <cstdlib>
@@ -49,6 +49,12 @@ CDCSegment::CDCSegment(int superlayerId, int Id)
   m_direction.SetY(0);
   m_direction.SetZ(0);
 
+  //-------------------------------
+  //m_chi2 = 0;
+  //m_tempCellState = 1;
+  //m_cellState = 1;
+  //-------------------------------
+
 }
 
 void CDCSegment::addTrackHit(CDCTrackHit &aTrackHit)
@@ -64,9 +70,9 @@ void CDCSegment::setIsUsed(bool isUsed)
 
   m_isUsed = isUsed;
 
-  for (int i = 0; i < m_nHits; i++) {
-    m_TrackHits[i].setIsUsed(isUsed);
-  }
+// for (int i = 0; i < m_nHits; i++) {
+//   m_TrackHits[i].setIsUsed(isUsed);
+// }
 }
 
 void CDCSegment::setTrackCandId(int trackId)
@@ -92,34 +98,10 @@ void CDCSegment::setTrackCandId(vector<int> trackId)
   }
 }
 
-float CDCSegment::getCenterPosR()
+void CDCSegment::clearTrackCandId()
 {
 
-  float average = 0;
-  for (int i = 0; i < m_nHits; i++) { //loop over all hits and sum their distance from the origin ind the r-phi plane
-    float x = m_TrackHits.at(i).getWirePosition().x();
-    float y = m_TrackHits.at(i).getWirePosition().y();
-    average = average + sqrt(x * x + y * y);
-  }
-  average = average / m_nHits;  //divide the sum by the total number of hits to get the average
-
-  return average;
-
-}
-
-float CDCSegment::getCenterPosZ()
-{
-
-  float average = 0;
-  for (int i = 0; i < m_nHits; i++) { //loop over all hits and sum their z position
-    float z = m_TrackHits.at(i).getWirePosition().z();
-
-    average = average + z;
-  }
-  average = average / m_nHits; //divide the sum by the total number of hits to get the average
-
-  return average;
-
+  m_trackCandId.erase(m_trackCandId.begin(), m_trackCandId.end());
 }
 
 void CDCSegment::update()
@@ -182,31 +164,17 @@ void CDCSegment::update()
     }
   }*/
 
-
-//Calculate the average position of all Hits
-  /*   double x_ave = 0;
-     double y_ave = 0;
-     double z_ave = 0;
-
-    for (int i=0; i<m_nHits; i++){
-    x_ave = x_ave + m_TrackHits.at(i).getConformalX();
-    y_ave = y_ave + m_TrackHits.at(i).getConformalY();
-    }
-    x_ave = x_ave/m_nHits;
-    y_ave = y_ave/m_nHits;
-   */
-
-
   m_direction.SetX(innerX - outerX);
   m_direction.SetY(innerY - outerY);
   m_direction.SetZ(0);  //conformal plane
 
-//double norm = m_direction.Mag();
+  //double norm = m_direction.Mag();
 
 }
 
 int CDCSegment::getWireIdDiff()
 {
+
   int minWireId = 1000;
   int maxWireId = 0;
   //Number of wires per layer, hardcoded for now, has to come from the cdc database later
@@ -252,16 +220,63 @@ int CDCSegment::getWireIdDiff()
 }
 
 
-void CDCSegment::clearTrackCandId()
+
+
+float CDCSegment::getCenterPosR()
 {
-  m_trackCandId.erase(m_trackCandId.begin(), m_trackCandId.end());
+
+  float average = 0;
+  for (int i = 0; i < m_nHits; i++) { //loop over all hits and sum their distance from the origin in the r-phi plane
+    float x = m_TrackHits.at(i).getWirePosition().x();
+    float y = m_TrackHits.at(i).getWirePosition().y();
+    average = average + sqrt(x * x + y * y);
+  }
+  average = average / m_nHits;  //divide the sum by the total number of hits to get the average
+
+  return average;
+
 }
 
+float CDCSegment::getCenterPosZ()
+{
 
+  float average = 0;
+  for (int i = 0; i < m_nHits; i++) { //loop over all hits and sum their z position
+    float z = m_TrackHits.at(i).getWirePosition().z();
 
+    average = average + z;
+  }
+  average = average / m_nHits; //divide the sum by the total number of hits to get the average
 
+  return average;
 
+}
 
+//Methods for segment fitting
+//-----------------------------------------------------
+/*void CDCSegment::setChiSquare(double chi2)
+{
+  m_chi2 = chi2;
+}
+
+void CDCSegment::removeTrackHit(int index){
+  m_TrackHits.erase(m_TrackHits.begin()+index);
+  update();
+}*/
+//------------------------------------------------------
+
+//Methods for CellularAxialTrackFinder
+//------------------------------------------------------
+/*
+void CDCSegment::setTempCellState(int tempCellState){
+  m_tempCellState = tempCellState;
+}
+
+void CDCSegment::updateCellState(){
+  m_cellState = m_tempCellState;
+}
+*/
+//------------------------------------------------------
 
 
 

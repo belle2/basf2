@@ -112,13 +112,13 @@ double AxialTrackFinder::SimpleDistance(CDCSegment segment1,
 }
 
 
-float AxialTrackFinder::UsedSegmentsFraction(CDCTrack track,
+float AxialTrackFinder::UsedSegmentsFraction(CDCTrackCandidate track,
                                              vector<int> & UsedSegmentId)
 {
 
   int used = 0;
 
-  for (int i = 0; i < track.getNSegments(); i++) { //loop over alle segment and compare their Ids to those which were already used
+  for (int i = 0; i < track.getNSegments(); i++) { //loop over all segments and compare their Id's to those which were already used
     for (unsigned int j = 0; j < UsedSegmentId.size(); j++) {
 
       if (track.getSegments().at(i).getId() == UsedSegmentId.at(j)) {
@@ -134,14 +134,12 @@ float AxialTrackFinder::UsedSegmentsFraction(CDCTrack track,
 }
 
 
-vector<CDCTrack> AxialTrackFinder:: FindTrackCandidates(string SegmentsCDCArray, double SimpleDistanceCut, double ShortDistanceCut, int StartSLId)
+vector<CDCTrackCandidate> AxialTrackFinder:: FindTrackCandidates(vector<CDCSegment> & cdcAxialSegments, double SimpleDistanceCut, double AngleCut, double ShortDistanceCut, int StartSLId)
 {
 
-  vector<CDCTrack> TrackCandidates;
+  vector<CDCTrackCandidate> TrackCandidates;
 
-  StoreArray<CDCSegment> cdcSegmentsArray(SegmentsCDCArray.c_str()); //Input segments
-
-  int nSegments = cdcSegmentsArray.GetEntries();
+  int nSegments = cdcAxialSegments.size();
   int NTracks = 0;
   int SLId = StartSLId; //start value for the superlayerId
   int trackcounter = -1; //count the number of track candidates
@@ -150,29 +148,28 @@ vector<CDCTrack> AxialTrackFinder:: FindTrackCandidates(string SegmentsCDCArray,
 
   //loop over all segment and count good segments in the given superlayer ( = starting points for the track candidates)
   for (int i = 0; i < nSegments; i++) {
-    CDCSegment* segmentCandidate = cdcSegmentsArray[i];
+    CDCSegment* segmentCandidate = & cdcAxialSegments[i];
     if (segmentCandidate->getSuperlayerId() == StartSLId && segmentCandidate->getIsGood() == true) {
 
       trackcounter++;
       segmentCandidate->setTrackCandId(trackcounter);
-
     }
   }//end loop over all segments
 
   //B2INFO("****Create Tracks****");
   for (int i = 0; i <= trackcounter; i++) {
     //create a TrackCandidate and place it in the corresponding vector
-    CDCTrack track(i);
+    CDCTrackCandidate track(i);
     TrackCandidates.push_back(track);
 
     //loop over all segments, add segments with correct SLId (= StartSlId) and corresponding TrackCandId to created track
     for (int j = 0; j < nSegments; j++) {
-      for (unsigned k = 0; k  < cdcSegmentsArray[j]->getTrackCandId().size(); k++) {
+      for (unsigned k = 0; k  < cdcAxialSegments[j].getTrackCandId().size(); k++) {
 
-        if (cdcSegmentsArray[j]->getSuperlayerId() == StartSLId
-            && cdcSegmentsArray[j]->getTrackCandId().at(k) == i) {
-
-          TrackCandidates.at(i).addSegment(*cdcSegmentsArray[j]);
+        if (cdcAxialSegments[j].getSuperlayerId() == StartSLId
+            && cdcAxialSegments[j].getTrackCandId().at(k) == i) {
+          TrackCandidates.at(i).addSegment(cdcAxialSegments[j]);
+          //B2INFO("Create Track "<<i<<"  with Segment "<<cdcSegmentsArray[j]->getId()<<"  from SL "<<cdcSegmentsArray[j]->getSuperlayerId());
         }
       }
     }//end loop over all segments
@@ -185,19 +182,24 @@ vector<CDCTrack> AxialTrackFinder:: FindTrackCandidates(string SegmentsCDCArray,
 
     //loop over all Segments, if two neighbouring segments are found, the TrackCandId from the 'higher' one is assigned to the 'lower' one
     for (int i = 0; i < nSegments; i++) {
-      CDCSegment* segmentCandidate = cdcSegmentsArray[i];
+      // B2INFO("Candidate Segment "<<cdcSegmentsArray[i]->getId()<<" from SL "<<cdcSegmentsArray[i]->getSuperlayerId());
+      CDCSegment* segmentCandidate = & cdcAxialSegments[i];
 
       for (int j = 0; j < nSegments; j++) {
+        // B2INFO("Check Segment "<<cdcSegmentsArray[j]->getId()<<" from SL "<<cdcSegmentsArray[j]->getSuperlayerId());
+        double angle = segmentCandidate->getDirection().Angle(cdcAxialSegments[j].getDirection());
+        if (angle > TMath::Pi() / 2)  angle = angle - TMath::Pi(); // -90 < angle < 90
         //first necessary neighbouring conditions
-        if (cdcSegmentsArray[j]->getSuperlayerId()
+        //B2INFO("SimpleDistance: "<<SimpleDistance(*segmentCandidate, *cdcSegmentsArray[j])<<"  Angle: "<<angle<<"  ShortestDistance: "<<ShortestDistance(*segmentCandidate,*cdcSegmentsArray[j]));
+        if (cdcAxialSegments[j].getSuperlayerId()
             == segmentCandidate->getSuperlayerId() - 2
-            && SimpleDistance(*segmentCandidate, *cdcSegmentsArray[j]) < SimpleDistanceCut
-            && cdcSegmentsArray[j]->getIsGood() == true) {
+            && SimpleDistance(*segmentCandidate, cdcAxialSegments[j]) < SimpleDistanceCut
+            && angle < AngleCut && cdcAxialSegments[j].getIsGood() == true) {
           //the decisive neighbouring condition
           if (ShortestDistance(*segmentCandidate,
-                               *cdcSegmentsArray[j]) < ShortDistanceCut) {
+                               cdcAxialSegments[j]) < ShortDistanceCut) {
 
-            cdcSegmentsArray[j]->setTrackCandId(segmentCandidate->getTrackCandId()); //copy the TrackCandId from one segment to another
+            cdcAxialSegments[j].setTrackCandId(segmentCandidate->getTrackCandId()); //copy the TrackCandId from one segment to another
           }
         }
 
@@ -210,21 +212,22 @@ vector<CDCTrack> AxialTrackFinder:: FindTrackCandidates(string SegmentsCDCArray,
     //Now after the correct TrackCandIds are assigned, the corresponding segments can be added to the tracks
 
     for (int i = 0; i < NTracks; i++) { //loop over all track candidates
-      CDCTrack candidate = TrackCandidates.at(i);
-
+      CDCTrackCandidate candidate = TrackCandidates.at(i);
+      //B2INFO("Track "<<i);
       for (int j = 0; j < nSegments; j++) { //loop over all segments
 
         //boolean to mark the case, when two different segments from the same superlayer are matching the same track candidate
         //if already == true, the track candidate should be split in two different candidates
         bool already = false;
         for (unsigned k = 0; k
-             < cdcSegmentsArray[j]->getTrackCandId().size(); k++) { //loop over all TrackCandIds assigned to this segment
-          if (cdcSegmentsArray[j]->getSuperlayerId() == SLId - 2
-              && cdcSegmentsArray[j]->getTrackCandId().at(k) == i) {
+             < cdcAxialSegments[j].getTrackCandId().size(); k++) { //loop over all TrackCandIds assigned to this segment
+          // B2INFO("TrackIds from segment: "<<cdcSegmentsArray[j]->getTrackCandId().at(k));
+          if (cdcAxialSegments[j].getSuperlayerId() == SLId - 2
+              && cdcAxialSegments[j].getTrackCandId().at(k) == i) {
 
             for (int sl = 0; sl
                  < TrackCandidates.at(i).getNSegments(); sl++) { //check, if there were already another segment from the same superlayer assigned to this candidate
-              if (cdcSegmentsArray[j]->getSuperlayerId()
+              if (cdcAxialSegments[j].getSuperlayerId()
                   == TrackCandidates.at(i).getSegments().at(
                     sl).getSuperlayerId()) {
 
@@ -232,23 +235,27 @@ vector<CDCTrack> AxialTrackFinder:: FindTrackCandidates(string SegmentsCDCArray,
               }
             }
 
+
             if (already == false) {
               TrackCandidates.at(i).addSegment(
-                *cdcSegmentsArray[j]);
+                cdcAxialSegments[j]);
+              //  B2INFO("Add to candidate "<<i<<" a segment with Id "<<cdcSegmentsArray[j]->getId()<<"  from SL "<<cdcSegmentsArray[j]->getSuperlayerId());
 
             } else { // Split the track candidate
 
               //create a new candidate by copying the old one (new Id) and adding to it the new segment
               trackcounter++;
 
-              CDCTrack SplitTrack(candidate, trackcounter);
+              CDCTrackCandidate SplitTrack(candidate, trackcounter);
               TrackCandidates.push_back(SplitTrack);
 
               TrackCandidates.at(trackcounter).addSegment(
-                *cdcSegmentsArray[j]);
-              cdcSegmentsArray[j]->setTrackCandId(trackcounter);
+                cdcAxialSegments[j]);
+              cdcAxialSegments[j].setTrackCandId(trackcounter);
+              //  B2INFO("Add to candidate "<<trackcounter<<" a segment with Id "<<cdcSegmentsArray[j]->getId()<<"  from SL "<<cdcSegmentsArray[j]->getSuperlayerId());
 
             }
+
           } //endif
 
         }  //end for loop over all TrackCandIds
@@ -265,7 +272,7 @@ vector<CDCTrack> AxialTrackFinder:: FindTrackCandidates(string SegmentsCDCArray,
 }
 
 
-void AxialTrackFinder::FitTrackCandidate(CDCTrack & candidate)
+void AxialTrackFinder::FitTrackCandidate(CDCTrackCandidate & candidate)
 {
 
   TGraph * graph;
@@ -303,33 +310,41 @@ void AxialTrackFinder::FitTrackCandidate(CDCTrack & candidate)
   double x0 = -fit->GetParameter(0) / fit->GetParameter(1);  // x- and y - axis section
   double y0 = fit->GetParameter(0);
   double R = sqrt(1 / x0 * 1 / x0 + 1 / y0 * 1 / y0); //Radius of the track circle in the normal plane
-  double p = R * 1.5 / 299.792458;  //Preliminary(!!!) calculation of momentum in GeV, magnetic field and c wont be hardcoded in the future
-  //B2INFO("x: "<<x0<<"  y: "<<y0<<"  R: "<<R<<"  p: "<<p);
+  double p = R * 1.5 / 299.792458;  //Preliminary(!) calculation of momentum in GeV, magnetic field and c hardcoded for now...
   candidate.setMomentumValue(p);
+
+  //Preliminary estimation of the charge of the track
+  double phi1 = candidate.getInnerMostSegment().getInnerMostHit().getPhi();
+  double phi2 = candidate.getOuterMostSegment().getOuterMostHit().getPhi();
+
+  if ((phi1 - phi2) > 0) candidate.setChargeSign(1);
+  else candidate.setChargeSign(-1);
 
 }
 
 
 
-void AxialTrackFinder::FitTrackCandidates(vector<CDCTrack> & candidates)
+void AxialTrackFinder::FitTrackCandidates(vector<CDCTrackCandidate> & candidates)
 {
 
   for (unsigned int i = 0; i < candidates.size(); i++) {
     FitTrackCandidate(candidates.at(i));
+
   }
 }
 
-void AxialTrackFinder::CollectTrackCandidates(string SegmentsCDCArray,
-                                              string TracksCDCArray)
+void AxialTrackFinder::CollectTrackCandidates(vector<CDCSegment> & cdcAxialSegments,
+                                              string CDCTrackCandidates)
 {
 
-  StoreArray<CDCSegment> cdcSegmentsArray(SegmentsCDCArray.c_str()); //Input Segments
-  StoreArray<CDCTrack> cdcTracksArray(TracksCDCArray.c_str()); //Output TrackCandidates
+  if (cdcAxialSegments.size() == 0) B2WARNING("AxialTrackFinder: cdcAxialSegments collection is empty!");
 
-  vector<CDCTrack> TrackCandidates;  //vector to hold Track Candidates, is emptied and refilled for each start superlayer
-  vector<CDCTrack> FinalTrackCandidates;  //vector to gather Track Candidates (who passed the Chi^2 test) from all start superlayers
+  StoreArray<CDCTrackCandidate> cdcTrackCandidates(CDCTrackCandidates.c_str());  //Output TrackCandidates
 
-  int nSegments = cdcSegmentsArray.GetEntries();
+  vector<CDCTrackCandidate> TrackCandidates;  //vector to hold Track Candidates, is emptied and refilled for each start superlayer
+  vector<CDCTrackCandidate> FinalTrackCandidates;  //vector to gather Track Candidates (who passed the Chi^2 test) from all start superlayers
+
+  int nSegments = cdcAxialSegments.size();
   int NTracks = 0;
 
   vector<int> UsedSegmentId; //vector to store the Ids of segments, which were already used to reconstruct a track candidate
@@ -345,7 +360,7 @@ void AxialTrackFinder::CollectTrackCandidates(string SegmentsCDCArray,
   //first all track candidates are found, after a simple fit those with too large Chi2 are discarded, all the other candidates are collected in FinalTrackCandidates
   while (startSLId > 1) {
 
-    TrackCandidates = FindTrackCandidates("AxialSegmentsCDCArray", 28, 0.005,
+    TrackCandidates = FindTrackCandidates(cdcAxialSegments, 28, 0.3, 0.005,
                                           startSLId);
 
     NTracks = TrackCandidates.size();
@@ -356,8 +371,9 @@ void AxialTrackFinder::CollectTrackCandidates(string SegmentsCDCArray,
     //Discard bad chi2 and tracks with unrealistic momentum
     for (int i = 0; i < NTracks; i++) {
       //B2INFO("Track Nr "<<i<<"  Chi2: "<<TrackCandidates.at(i).getChiSquare());
-      if (TrackCandidates.at(i).getChiSquare() < 0.00009 && TrackCandidates.at(i).getMomentumValue() < 15) { //what value???
+      if (TrackCandidates.at(i).getChiSquare() < 0.003 && TrackCandidates.at(i).getMomentumValue() < 10) { //what value???
         FinalTrackCandidates.push_back(TrackCandidates.at(i));
+
       }
 
     }
@@ -368,7 +384,7 @@ void AxialTrackFinder::CollectTrackCandidates(string SegmentsCDCArray,
     //cleanup
     TrackCandidates.erase(TrackCandidates.begin(), TrackCandidates.end());
     for (int i = 0; i < nSegments; i++) {
-      cdcSegmentsArray[i]->clearTrackCandId();
+      cdcAxialSegments[i].clearTrackCandId();
     }
 
   }//end while loop over superlayers
@@ -389,7 +405,7 @@ void AxialTrackFinder::CollectTrackCandidates(string SegmentsCDCArray,
           && UsedSegmentsFraction(FinalTrackCandidates.at(i),
                                   UsedSegmentId) < 0.3) {
         counter++;
-        //B2INFO("Nr "<<counter<<"   Final track with "<<NumberOfSegments<<" found");
+        B2INFO("Nr " << counter << "   Final track with " << NumberOfSegments << " found");
 
         //Add the Ids of all used segments to the UsedSegmentId vector
         for (int j = 0; j < FinalTrackCandidates.at(i).getNSegments(); j++) {
@@ -403,34 +419,46 @@ void AxialTrackFinder::CollectTrackCandidates(string SegmentsCDCArray,
           int additionalSegments = 2;
 
           while (additionalSegments > 0) { //while loop, to be performed two times, first searching for 2 segment tracks, then 1 segment tracks
-            for (int test = 0; test < NFinalTracks; test++) {  //loop over all candidates
+            bool sameSegment = false;
+            for (int i_add = 0; i_add < NFinalTracks; i_add++) {  //loop over all candidates
+              for (int id = 0; id < FinalTrackCandidates.at(i).getNSegments(); id++) { //check, if there were already the same segment assigned to this candidate
+                for (int id2 = 0; id2 < FinalTrackCandidates.at(i_add).getNSegments(); id2++)
+                  if (FinalTrackCandidates.at(i).getSegments().at(id).getId() == FinalTrackCandidates.at(i_add).getSegments().at(id2).getId()) {
+                    sameSegment = true;
+                    //B2INFO("This segment ist already there!!!");
+                  }
+              }
+
+
               //check for right segments number and used fraction
-              if (test != i
-                  && FinalTrackCandidates.at(test).getNSegments()
+              if (i_add != i && sameSegment == false
+                  && FinalTrackCandidates.at(i_add).getNSegments()
                   == additionalSegments
                   && UsedSegmentsFraction(
-                    FinalTrackCandidates.at(test),
+                    FinalTrackCandidates.at(i_add),
                     UsedSegmentId) < 0.3) {
 
                 //additional variable to check if the short tracks can be combined to one
-                double angle = FinalTrackCandidates.at(test).getSegments().at(0).getDirection().Angle(FinalTrackCandidates.at(i).getSegments().at(0).getDirection());
+                double angle = FinalTrackCandidates.at(i_add).getSegments().at(0).getDirection().Angle(FinalTrackCandidates.at(i).getSegments().at(0).getDirection());
                 if (angle > TMath::Pi() / 2) angle = angle - TMath::Pi() ; // -90 < angle < 90
 
                 //check for shortest distance and angle
                 if (ShortestDistance(
-                      FinalTrackCandidates.at(test).getSegments().at(
+                      FinalTrackCandidates.at(i_add).getSegments().at(
                         0),
                       FinalTrackCandidates.at(i).getSegments().at(
-                        0)) < 0.005 && abs(angle) < 0.3) {
-                  //B2INFO("One short track added to the candididate");
+                        0)) < 0.005 && abs(angle) < 0.3 && SimpleDistance(FinalTrackCandidates.at(i_add).getSegments().at(
+                                                                            0), FinalTrackCandidates.at(i).getSegments().at(
+                                                                            0)) < 70) {
+                  B2INFO("Two short tracks combined to one");
 
                   //Add all segment from one short track to the other and mark segment Ids as used
                   for (int s = 0; s
-                       < FinalTrackCandidates.at(test).getNSegments(); s++) {
+                       < FinalTrackCandidates.at(i_add).getNSegments(); s++) {
 
-                    FinalTrackCandidates.at(i).addSegment(FinalTrackCandidates.at(test).getSegments().at(s));
+                    FinalTrackCandidates.at(i).addSegment(FinalTrackCandidates.at(i_add).getSegments().at(s));
                     UsedSegmentId.push_back(
-                      FinalTrackCandidates.at(test).getSegments().at(
+                      FinalTrackCandidates.at(i_add).getSegments().at(
                         s).getId());
 
                   }
@@ -445,9 +473,10 @@ void AxialTrackFinder::CollectTrackCandidates(string SegmentsCDCArray,
         } //end extension
 
         //Finally add the candidate to the StoreArray
-        new(cdcTracksArray->AddrAt(counter)) CDCTrack(
+        new(cdcTrackCandidates->AddrAt(counter)) CDCTrackCandidate(
           FinalTrackCandidates.at(i), counter);
         B2INFO("Candidate " << counter << " added to final array ...");
+
       }
     } //end for loop over all candidates
 

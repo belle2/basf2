@@ -10,7 +10,7 @@
 
 #include "../include/CDCTrackHit.h"
 
-#include <tracking/karlsruhe/AxialTrackFinder.h>
+#include <tracking/cdcConformalTracking/AxialTrackFinder.h>
 #include <cdc/geocdc/CDCGeometryPar.h>
 
 #include <cmath>
@@ -26,54 +26,32 @@ CDCTrackHit::CDCTrackHit()
 }
 
 
-CDCTrackHit::CDCTrackHit(HitCDC&hitcdc)
+CDCTrackHit::CDCTrackHit(CDCHit *hit, int index)
 {
-  m_layerId = hitcdc.getLayerId();
-  m_wireId = hitcdc.getWireId();
-  m_leftDriftLength = hitcdc.getLeftDriftLength();
-  m_rightDriftLength = hitcdc.getRightDriftLength();
-  m_charge = hitcdc.getCharge();
+
+  cdcHit = hit;
+  m_storeIndex = index;
+  m_driftTime = hit->getDriftTime();
+  m_charge = hit->getCharge();
+
+  m_wireId = hit->getIWire();
+  // Change the variables saved within CDCHit to be compatible with the following pattern recognition steps, will be changed later to be consistent
+  m_superlayerId = hit ->getISuperLayer() + 1;
+  if (hit->getISuperLayer() == 0)   m_layerId = hit->getILayer();
+  else m_layerId = hit->getILayer() + hit->getISuperLayer() * 6 + 2 ;
+
+  if (m_superlayerId % 2 == 0) m_isAxial = false;
+  else m_isAxial = true ;
+
+  setWirePosition();
+  ConformalTransformation();
+
 }
 
 CDCTrackHit::~CDCTrackHit()
 {
 }
 
-
-CDCTrackHit CDCTrackHit::castTrackHit(HitCDC aHit)
-{
-  CDCTrackHit aTrackHit = static_cast<CDCTrackHit>(aHit);
-  aTrackHit.setSuperlayerId();
-  aTrackHit.setWirePosition();
-  aTrackHit.setConformalPosition(0., 0.); //dummy start value
-  aTrackHit.setIsUsed(false);
-  return aTrackHit;
-}
-
-void CDCTrackHit::setSuperlayerId()
-{
-//Hardcoded CDC Geometry, first and last superlayer have 8 layers, others have 6 layers
-  if (m_layerId >= 0 && m_layerId < 8) {
-    m_superlayerId = 1;
-  }
-
-  else if (m_layerId >= 8 && m_layerId < 50) {
-    m_superlayerId = (m_layerId - 2) / 6 + 1 ;
-  }
-
-  else if (m_layerId >= 50 && m_layerId < 58) {
-    m_superlayerId = 9;
-  }
-
-//Check if the superlayer is axial or stereo
-  if (m_superlayerId % 2 == 0) {
-    m_isAxial = false;
-  } else {
-    m_isAxial = true;
-  }
-
-
-}
 
 void CDCTrackHit::setWirePosition()
 {
@@ -86,18 +64,25 @@ void CDCTrackHit::setWirePosition()
   m_wirePosition.SetY((cdcg.wireForwardPosition(m_layerId, m_wireId).y() + cdcg.wireBackwardPosition(m_layerId, m_wireId).y()) / 2);
   m_wirePosition.SetZ((cdcg.wireForwardPosition(m_layerId, m_wireId).z() + cdcg.wireBackwardPosition(m_layerId, m_wireId).z()) / 2);
 
-}
 
-void CDCTrackHit::setIsUsed(bool isUsed)
-{
-  m_isUsed = isUsed;
 }
 
 
-void CDCTrackHit::setConformalPosition(double conformalX, double conformalY)
+void CDCTrackHit::ConformalTransformation()
 {
-  m_conformalX = conformalX;
-  m_conformalY = conformalY;
+  double x = m_wirePosition.x();
+  double y = m_wirePosition.y();
+
+  m_conformalX = 2 * x / (x * x + y * y); //transformation of the coordinates from normal to conformal plane
+  m_conformalY = 2 * y / (x * x + y * y);
+
+}
+
+
+void CDCTrackHit::addTrackIndex(int index)
+{
+
+  m_TrackIndices.push_back(index);
 }
 
 
@@ -126,6 +111,7 @@ double CDCTrackHit::getPhi() const
 
 void CDCTrackHit::shiftAlongZ(TVector3 trackDirection, CDCTrackHit trackHit)
 {
+
   //Get the necessary position of the hit wire from CDCGeometryParameters
   CDCGeometryPar * cdcgp = CDCGeometryPar::Instance();
   CDCGeometryPar & cdcg(*cdcgp);
@@ -146,7 +132,6 @@ void CDCTrackHit::shiftAlongZ(TVector3 trackDirection, CDCTrackHit trackHit)
 
   //direction of the wire
   wireVector = backwardWirePoint - forwardWirePoint;
-  //B2INFO("Wire vector: "<<wireVector.x()<<"  "<<wireVector.y()<<"  "<<wireVector.z());
 
   //Get the coordinates for distance calculation
   TVector3 StereoHitPos;   //conformal position of this hit
@@ -170,7 +155,7 @@ void CDCTrackHit::shiftAlongZ(TVector3 trackDirection, CDCTrackHit trackHit)
   double confX;  //position of the hit on the wire in the conformal plane
   double confY;
 
-  for (int i = 0; i < 101; i++) {  //loop over the parameter vector ( = loop over the lenght of the wire)
+  for (int i = 0; i < 101; i++) {  //loop over the parameter vector ( = loop over the length of the wire)
 
     //new point along the wire
     posX = forwardWirePoint.x() + parameter[i] * wireVector.x();
@@ -203,6 +188,7 @@ void CDCTrackHit::shiftAlongZ(TVector3 trackDirection, CDCTrackHit trackHit)
   double x = forwardWirePoint.x() +  parameter[bestIndex] * wireVector.x();
   double y = forwardWirePoint.y() +  parameter[bestIndex] * wireVector.y();
   double z = forwardWirePoint.z() +  parameter[bestIndex] * wireVector.z();
+
   double cx = 2 * x / (x * x + y * y);
   double cy = 2 * y / (x * x + y * y);
 
@@ -212,6 +198,10 @@ void CDCTrackHit::shiftAlongZ(TVector3 trackDirection, CDCTrackHit trackHit)
   m_conformalX = cx;
   m_conformalY = cy;
 
+
 }
+
+
+
 
 

@@ -11,8 +11,8 @@
 #ifndef AXIALTRACKFINDER_H
 #define AXIALTRACKFINDER_H
 
-#include <tracking/karlsruhe/CDCSegment.h>
-#include <tracking/karlsruhe/CDCTrack.h>
+#include <tracking/cdcConformalTracking/CDCSegment.h>
+#include <tracking/cdcConformalTracking/CDCTrackCandidate.h>
 
 
 namespace Belle2 {
@@ -42,41 +42,42 @@ namespace Belle2 {
     /** Returns the distance between the centers of both segments in the normal plane.  */
     static double SimpleDistance(CDCSegment segment1, CDCSegment segment2);
 
-    /** Returns a fraction of segment alredy used to reconstruct another track.
-     * First parameter ist a track which segments will be checked.
-     * Second parameter is a vector with Ids of already used segments.
+    /** Returns a fraction of segments already used to reconstruct another track.
+     * First parameter is a track which segments will be checked.
+     * Second parameter is a vector with Id's of already used segments.
      */
-    static float UsedSegmentsFraction(CDCTrack track, std::vector<int> & UsedSegmentId);
+    static float UsedSegmentsFraction(CDCTrackCandidate track, std::vector<int> & UsedSegmentId);
 
     /** Searchs for track candidates from given segments and within the given cuts.
-     * First parameter: name of the CDCSegments array.
+     * First parameter: vector with axial Segments.
      * Second parameter: cut on the distance between two segments in the normal plane (required condition for segments to be 'neighbours').
-     * Third parameter: cut an the 'shortest' distance between two segments in the conformal plane (essential condition for segments to be 'neighbours').
-     * Fourth parameter: superlayer in which the track candidates should start.
-     * First the method searchs for good segments in the given starting superlayer, creates an equal number of track candidates and adds these segments to these tracks.
-     * In the next step the method searchs for further segments for already existing track candidates in other superlayers.
+     * Third parameter: cut on the angle between the two segments in the conformal plane.
+     * Fourth parameter: cut an the 'shortest' distance between two segments in the conformal plane (essential condition for segments to be 'neighbours').
+     * Fifth parameter: superlayer in which the track candidates should start.
+     * First the method searches for good segments in the given starting superlayer, creates an equal number of track candidates and adds these segments to these tracks.
+     * In the next step the method searches for further segments for already existing track candidates in other superlayers.
      * If more then one segment from the same superlayer is 'neighbour' to another, the candidate is split and the two candidates are propagated independently.
      * A vector filled with found track candidates is returned.
      */
-    static std::vector<CDCTrack> FindTrackCandidates(std::string SegmentsCDCArray, double SimpleDistanceCut, double ShortDistanceCut, int StartSLId);
+    static std::vector<CDCTrackCandidate> FindTrackCandidates(std::vector<CDCSegment> & cdcAxialSegments, double SimpleDistanceCut, double AngleCut, double ShortDistanceCut, int StartSLId);
 
     /** Performs a simple linear fit of the track in the conformal plane, assigns Chi2 and p to the track.
      *  Conformal coordinates of all hits (excluding the first layer) of the given track candidate are fitted with a straight line.
-     *  Resulting chi2 value as well as a (very preliminary!) estimation of the absolute momentum value are assigned to the track candidate.
+     *  Resulting chi2 value as well as an estimation of the absolute momentum value are assigned to the track candidate.
      */
-    static void FitTrackCandidate(CDCTrack & candidate);
+    static void FitTrackCandidate(CDCTrackCandidate & candidate);
 
     /** Performs a simple linear fit of all the tracks in the conformal plane, assigns Chi2 and p to the tracks.*/
-    static void FitTrackCandidates(std::vector<CDCTrack> & candidates);
+    static void FitTrackCandidates(std::vector<CDCTrackCandidate> & candidates);
 
     /** Main method of to create track candidates from segments.
-     * First parameter is the name of the CDCSegments array ('input'), second the name of the CDCTracks array ('output').
+     * First parameter is a vector with axial Segments ('input'), second the name of the CDCTrackCandidates array ('output').
      * For each start superlayer the possible track candidates are found (FindTrackCandidates) and fitted (FitTrackCandidates). Those with bad Chi2 are rejected.
      * In the next step the best tracks are collected. When a track is added to the final array, 'his' segments are marked as used.
      * Only candidates with enough unused segments can be added to the final array. (The search starts with the longest candidates).
      * An additional step ist performed for 'short' (2 or 3 segments) candidates to find out if they can be combined to one 'long' (4 or 5 segments) candidate.
      */
-    static void CollectTrackCandidates(std::string SegmentsCDCArray, std::string TracksCDCArray);
+    static void CollectTrackCandidates(std::vector<CDCSegment> & cdcAxialSegments, std::string CDCTrackCandidates);
 
 
   private:

@@ -8,19 +8,20 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "../include/CDCTrack.h"
+#include "../include/CDCTrackCandidate.h"
+#include "tracking/cdcConformalTracking/AxialTrackFinder.h"
 #include <cmath>
 
 using namespace std;
 using namespace Belle2;
 
-ClassImp(CDCTrack)
+ClassImp(CDCTrackCandidate)
 
-CDCTrack::CDCTrack()
+CDCTrackCandidate::CDCTrackCandidate()
 {
 }
 
-CDCTrack::CDCTrack(int Id)
+CDCTrackCandidate::CDCTrackCandidate(int Id)
 {
   m_Id = Id;
 
@@ -31,10 +32,12 @@ CDCTrack::CDCTrack(int Id)
   m_direction.SetY(0);
   m_direction.SetZ(0);
   m_chi2 = 0;
+  m_momentumValue = 0;
+  m_chargeSign = 0;
 
 }
 
-CDCTrack::CDCTrack(CDCTrack &candidate, int Id)
+CDCTrackCandidate::CDCTrackCandidate(CDCTrackCandidate &candidate, int Id)
 {
 
   m_Id = Id;
@@ -53,14 +56,15 @@ CDCTrack::CDCTrack(CDCTrack &candidate, int Id)
 
   m_chi2 = candidate.getChiSquare();
   m_momentumValue = candidate.getMomentumValue();
+  m_chargeSign = candidate.getChargeSign();
 
 }
 
-CDCTrack::~CDCTrack()
+CDCTrackCandidate::~CDCTrackCandidate()
 {
 }
 
-void CDCTrack::addSegment(CDCSegment aSegment)
+void CDCTrackCandidate::addSegment(CDCSegment & aSegment)
 {
   m_Segments.push_back(aSegment);
   for (int i = 0; i < aSegment.getNHits(); i++) {
@@ -69,7 +73,7 @@ void CDCTrack::addSegment(CDCSegment aSegment)
   update();
 }
 
-void CDCTrack::removeSegment(int Id)
+void CDCTrackCandidate::removeSegment(int Id)
 {
 
   for (int i = 0; i < m_nSegments; i++) {
@@ -81,31 +85,25 @@ void CDCTrack::removeSegment(int Id)
   }
 }
 
-void CDCTrack::addTrackHit(CDCTrackHit aTrackHit)
-{
-  m_TrackHits.push_back(aTrackHit);
-  update();
-}
-
-void CDCTrack::setChiSquare(double chi2)
+void CDCTrackCandidate::setChiSquare(double chi2)
 {
   m_chi2 = chi2;
 }
 
-void CDCTrack::setMomentumValue(double momentum)
+void CDCTrackCandidate::setMomentumValue(double momentum)
 {
   m_momentumValue = momentum;
 }
 
 
-void CDCTrack::update()
+void CDCTrackCandidate::update()
 {
   m_nSegments = m_Segments.size();
   m_nHits = m_TrackHits.size();
 
 //Calculate the direction from the directions of axial segments
   for (int i = 0; i < m_nSegments; i++) {
-    if (m_Segments.at(i).getSuperlayerId() % 2 != 0) {
+    if (m_Segments.at(i).getIsAxial() == true) {
       m_direction = m_direction + m_Segments.at(i).getDirection();
     }
   }
@@ -121,11 +119,11 @@ void CDCTrack::update()
   int min_index = 0;
 
   for (unsigned i = 0; i < m_TrackHits.size(); i++) {
-    if (m_TrackHits.at(i).getSuperlayerId() > max && m_TrackHits.at(i).getSuperlayerId() % 2 != 0) {
+    if (m_TrackHits.at(i).getSuperlayerId() > max && m_TrackHits.at(i).getIsAxial() == true) {
       max = m_TrackHits.at(i).getSuperlayerId() ;
       max_index = i;
     }
-    if (m_TrackHits.at(i).getSuperlayerId() < min && m_TrackHits.at(i).getSuperlayerId() % 2 != 0) {
+    if (m_TrackHits.at(i).getSuperlayerId() < min && m_TrackHits.at(i).getIsAxial() == true) {
       min = m_TrackHits.at(i).getSuperlayerId() ;
       min_index = i;
     }
@@ -140,11 +138,11 @@ void CDCTrack::update()
   int min_indexSeg = 0;
 
   for (int i = 0; i < m_nSegments; i++) {
-    if (m_Segments.at(i).getSuperlayerId() > maxSL && m_Segments.at(i).getSuperlayerId() % 2 != 0) {
+    if (m_Segments.at(i).getSuperlayerId() > maxSL && m_Segments.at(i).getIsAxial() == true) {
       maxSL = m_Segments.at(i).getSuperlayerId() ;
       max_indexSeg = i;
     }
-    if (m_Segments.at(i).getSuperlayerId() < minSL && m_Segments.at(i).getSuperlayerId() % 2 != 0) {
+    if (m_Segments.at(i).getSuperlayerId() < minSL && m_Segments.at(i).getIsAxial() == true) {
       minSL = m_Segments.at(i).getSuperlayerId() ;
       min_indexSeg = i;
     }
@@ -154,14 +152,15 @@ void CDCTrack::update()
 
 }
 
-void CDCTrack::estimateMomentum()
+void CDCTrackCandidate::estimateMomentum()
 {
+
   //Find the innermost *stereo* segment
   int minSL = 10;
   int min_index = 0;
 
   for (int i = 0; i < m_nSegments; i++) {
-    if (m_Segments.at(i).getSuperlayerId() < minSL && m_Segments.at(i).getSuperlayerId() % 2 == 0) {
+    if (m_Segments.at(i).getSuperlayerId() < minSL && m_Segments.at(i).getIsAxial() == false) {
       minSL = m_Segments.at(i).getSuperlayerId() ;
       min_index = i;
     }
@@ -175,11 +174,73 @@ void CDCTrack::estimateMomentum()
   m_momentumVector.SetX(x / norm);
   m_momentumVector.SetY(y / norm);
   m_momentumVector.SetZ(z / norm);
+}
 
-  //B2INFO("Momentum vector: "<<m_momentumVector.X()<<"  "<<m_momentumVector.Y()<<"  "<<m_momentumVector.Z());
+void CDCTrackCandidate::setChargeSign(int sign)
+{
+
+  m_chargeSign = sign;
+
+}
+
+//Methods to match the tracks with mc particles, will be explain and used in the next commit...
+//--------------------------------------------------------------
+/*
+void CDCTrackCandidate::addMCParticle(int Id){
+
+  bool already = false;
+  for (unsigned int i = 0; i < m_mcParticles.size(); i++){
+
+    if (m_mcParticles.at(i).X() == Id){  //falls es bereits ein particle mit der id gibt
+      double count = m_mcParticles.at(i).Y() + 1;
+      m_mcParticles.at(i).Set(m_mcParticles.at(i).X(), count); //erhoehe deren anzahl
+      already = true;
+
+    }
+  }
+  if (already==false){
+    TVector2 newEntry(Id, 1);
+    m_mcParticles.push_back(newEntry);
+
+  }
+}
+
+void CDCTrackCandidate::evaluateMC(){
+  double max = 0;
+  int indexMax = 0;
+  for (unsigned int i = 0; i < m_mcParticles.size(); i++){
+    if (m_mcParticles.at(i).Y() > max){
+      max = m_mcParticles.at(i).Y();
+      indexMax = i;
+    }
+  }
+  //B2INFO("+++++++ Evaluate next Track");
+//  B2INFO("X: "<<m_mcParticles.at(indexMax).X()<<"  Y: "<<m_mcParticles.at(indexMax).Y() <<"  max: "<<max<< "  m_nHits: "<<m_nHits);
+  double fraction = double (max)/double (m_nHits) * 100;
+//  B2INFO("MCParticle "<<m_mcParticles.at(indexMax).X()<<"  has contributed "<<max<<" Hits  "<<fraction<<" %");
+  m_correctMC = fraction;
+  m_mcIndex = int (m_mcParticles.at(indexMax).X());
 
 
 }
+
+double CDCTrackCandidate::evaluateMC(int mcId){
+
+    double nHits = 0;
+  for (unsigned int i = 0; i < m_mcParticles.size(); i++){
+    if (m_mcParticles.at(i).X() == mcId){
+      nHits = m_mcParticles.at(i).Y();
+    }
+  }
+
+  double fraction = double (nHits)/double (m_nHits) * 100;
+
+  return fraction;
+
+
+}
+*/
+//--------------------------------------------------------------
 
 
 

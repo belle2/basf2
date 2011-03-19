@@ -38,8 +38,8 @@ Bool_t B2GeomPXDSensor::init(GearDir& sensorContent)
   }
 
   // Read parameters for Switchers
-  if (!initComponent<B2GeomVXDVolume>(&volSwitchers1, sensorContent, "Switchers1")) B2WARNING("No switchters created!");
-  if (!initComponent<B2GeomVXDVolume>(&volSwitchers2, sensorContent, "Switchers2"))  B2WARNING("No switchters created!");
+  if (!initComponent<B2GeomPXDSensorSwitchers1>(&volSwitchers1, sensorContent, "Switchers1"))  B2WARNING("No switchters created!");
+  if (!initComponent<B2GeomPXDSensorSwitchers2>(&volSwitchers2, sensorContent, "Switchers2"))  B2WARNING("No switchters created!");
 
   // Read offsets from XML file
   sensorContent.setDirPath((format("//Offsets/Sensor[@id=\'PXD_Offset_Layer_%1%_Ladder_%2%_Sensor_%3%\']/") % iLayer % iLadder % iSensor).str());
@@ -69,6 +69,137 @@ Bool_t B2GeomPXDSensor::make()
   makeAndAddComponent(volSwitchers1);
 
   makeAndAddComponent(volSwitchers2);
+
+  return true;
+}
+
+//--------------------------------------------------------------------------------
+//Switchers1 part - DCDs and DHPs
+//--------------------------------------------------------------------------------
+
+B2GeomPXDSensorSwitchers1::B2GeomPXDSensorSwitchers1()
+{
+  volDCD1 = NULL;
+  volDCD2 = NULL;
+  volDCD3 = NULL;
+  volDCD4 = NULL;
+  volDCD5 = NULL;
+  volDCD6 = NULL;
+
+  volDHP1 = NULL;
+  volDHP2 = NULL;
+  volDHP3 = NULL;
+  volDHP4 = NULL;
+  volDHP5 = NULL;
+  volDHP6 = NULL;
+}
+
+Bool_t B2GeomPXDSensorSwitchers1::init(GearDir& sensorContent)
+{
+  ////B2METHOD();
+  if (!initBasicParameters(sensorContent)) {
+    B2FATAL("Could not initialize basic parameters of PXD sensor");
+    return false;
+  }
+
+  // Read parameters for DCDs
+  if (!initComponent<B2GeomVXDVolume>(&volDCD1, sensorContent, "DCD1"))  B2WARNING("No DCD1 created!");
+  if (!initComponent<B2GeomVXDVolume>(&volDCD2, sensorContent, "DCD2"))  B2WARNING("No DCD2 created!");
+  if (!initComponent<B2GeomVXDVolume>(&volDCD3, sensorContent, "DCD3"))  B2WARNING("No DCD3 created!");
+  if (!initComponent<B2GeomVXDVolume>(&volDCD4, sensorContent, "DCD4"))  B2WARNING("No DCD4 created!");
+  if (!initComponent<B2GeomVXDVolume>(&volDCD5, sensorContent, "DCD5"))  B2WARNING("No DCD5 created!");
+  if (!initComponent<B2GeomVXDVolume>(&volDCD6, sensorContent, "DCD6"))  B2WARNING("No DCD6 created!");
+
+  // Read parameters for DHPs
+  if (!initComponent<B2GeomVXDVolume>(&volDHP1, sensorContent, "DHP1"))  B2WARNING("No DHP1 created!");
+  if (!initComponent<B2GeomVXDVolume>(&volDHP2, sensorContent, "DHP2"))  B2WARNING("No DHP2 created!");
+  if (!initComponent<B2GeomVXDVolume>(&volDHP3, sensorContent, "DHP3"))  B2WARNING("No DHP3 created!");
+  if (!initComponent<B2GeomVXDVolume>(&volDHP4, sensorContent, "DHP4"))  B2WARNING("No DHP4 created!");
+  if (!initComponent<B2GeomVXDVolume>(&volDHP5, sensorContent, "DHP5"))  B2WARNING("No DHP5 created!");
+  if (!initComponent<B2GeomVXDVolume>(&volDHP6, sensorContent, "DHP6"))  B2WARNING("No DHP6 created!");
+
+
+  return true;
+}
+
+
+Bool_t B2GeomPXDSensorSwitchers1::make()
+{
+  ////B2METHOD();
+
+  // Build the container for the sensor components
+  if (!makeGeneric()) {
+    B2FATAL("Creating PXD Sensor failed!");
+    return false;
+  }
+
+  //for(int iComponent = 0; iComponent != 6; ++iComponent) makeAndAddComponent(volDCD[iComponent]);
+  makeAndAddComponent(volDCD1);
+  makeAndAddComponent(volDCD2);
+  makeAndAddComponent(volDCD3);
+  makeAndAddComponent(volDCD4);
+  makeAndAddComponent(volDCD5);
+  makeAndAddComponent(volDCD6);
+
+  makeAndAddComponent(volDHP1);
+  makeAndAddComponent(volDHP2);
+  makeAndAddComponent(volDHP3);
+  makeAndAddComponent(volDHP4);
+  makeAndAddComponent(volDHP5);
+  makeAndAddComponent(volDHP6);
+
+  return true;
+}
+
+//--------------------------------------------------------------------------------
+//Switchers2 part - Switchers
+//--------------------------------------------------------------------------------
+
+B2GeomPXDSensorSwitchers2::B2GeomPXDSensorSwitchers2()
+{
+  volSwitcher1 = NULL;
+  volSwitcher2 = NULL;
+  volSwitcher3 = NULL;
+  volSwitcher4 = NULL;
+  volSwitcher5 = NULL;
+  volSwitcher6 = NULL;
+}
+
+Bool_t B2GeomPXDSensorSwitchers2::init(GearDir& sensorContent)
+{
+  ////B2METHOD();
+  if (!initBasicParameters(sensorContent)) {
+    B2FATAL("Could not initialize basic parameters of PXD sensor");
+    return false;
+  }
+
+  // read parameters for switchers
+  if (!initComponent<B2GeomVXDVolume>(&volSwitcher1, sensorContent, "Switcher1"))  B2WARNING("No Switcher1 created!");
+  if (!initComponent<B2GeomVXDVolume>(&volSwitcher2, sensorContent, "Switcher2"))  B2WARNING("No Switcher2 created!");
+  if (!initComponent<B2GeomVXDVolume>(&volSwitcher3, sensorContent, "Switcher3"))  B2WARNING("No Switcher3 created!");
+  if (!initComponent<B2GeomVXDVolume>(&volSwitcher4, sensorContent, "Switcher4"))  B2WARNING("No Switcher4 created!");
+  if (!initComponent<B2GeomVXDVolume>(&volSwitcher5, sensorContent, "Switcher5"))  B2WARNING("No Switcher5 created!");
+  if (!initComponent<B2GeomVXDVolume>(&volSwitcher6, sensorContent, "Switcher6"))  B2WARNING("No Switcher6 created!");
+
+  return true;
+}
+
+Bool_t B2GeomPXDSensorSwitchers2::make()
+{
+  ////B2METHOD();
+
+  // Build the container for the sensor components
+  if (!makeGeneric()) {
+    B2FATAL("Creating PXD Sensor failed!");
+    return false;
+  }
+
+  makeAndAddComponent(volSwitcher1);
+  makeAndAddComponent(volSwitcher2);
+  makeAndAddComponent(volSwitcher3);
+  makeAndAddComponent(volSwitcher4);
+  makeAndAddComponent(volSwitcher5);
+  makeAndAddComponent(volSwitcher6);
 
   return true;
 }
@@ -145,11 +276,3 @@ Bool_t B2GeomPXDSensorActive::make()
     tVolume->SetField(new PXDVolumeUserInfo(iLayer, iLadder, iSensor));
   return res;
 }
-
-
-
-
-
-
-
-

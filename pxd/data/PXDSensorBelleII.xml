@@ -9,31 +9,232 @@
     <ReflectY>1</ReflectY>
     <Switchers1>
       <Shape>Box</Shape>
-      <Material>PXD_SiliconDCD</Material>
-      <Mass unit="g">0.0155605248508946</Mass>
-      <DensityFactor>12</DensityFactor>
+      <Material>Air</Material>
       <Name>PXD_Layer_1_Switchers1</Name>
       <!-- These parameters are only estimation from drawing, please fill exact values! /-->
-      <Thickness unit="mm">0.3</Thickness>
+      <Thickness unit="mm">0.25</Thickness>
       <Width unit="mm">12</Width>
       <Length unit="mm">10</Length>
       <WPosition unit="mm">0.15</WPosition>
       <UPosition unit="mm">-1</UPosition>
       <VPosition unit="mm">-15.9875</VPosition>
+      <DCD1>
+        <Shape>Box</Shape>
+        <Material>PXD_SiliconDCD</Material>
+        <Mass unit="g">0.0155605248508946</Mass>
+        <Name>PXD_Layer_1_Switchers1_DCD_1</Name>
+        <!-- These parameters are only estimation from drawing, please fill exact values! /-->
+        <Width unit="mm">1.9</Width>
+        <Length unit="mm">4.9</Length>
+        <WPosition unit="mm">0</WPosition>
+        <UPosition unit="mm">5</UPosition>
+        <VPosition unit="mm">2.5</VPosition>
+      </DCD1>
+      <DCD2>
+        <Shape>Box</Shape>
+        <Material>PXD_SiliconDCD</Material>
+        <Mass unit="g">0.0155605248508946</Mass>
+        <Name>PXD_Layer_1_Switchers1_DCD_2</Name>
+        <!--These parameters are only estimation from drawing, please fill exact values! /-->
+        <Width unit="mm">1.9</Width>
+        <Length unit="mm">4.9</Length>
+        <WPosition unit="mm">0</WPosition>
+        <UPosition unit="mm">3</UPosition>
+        <VPosition unit="mm">2.5</VPosition>
+      </DCD2>
+      <DCD3>
+        <Shape>Box</Shape>
+        <Material>PXD_SiliconDCD</Material>
+        <Mass unit="g">0.0155605248508946</Mass>
+        <Name>PXD_Layer_1_Switchers1_DCD_3</Name>
+        <!--These parameters are only estimation from drawing, please fill exact values! /-->
+        <Width unit="mm">1.9</Width>
+        <Length unit="mm">4.9</Length>
+        <WPosition unit="mm">0</WPosition>
+        <UPosition unit="mm">1</UPosition>
+        <VPosition unit="mm">2.5</VPosition>
+      </DCD3>
+      <DCD4>
+        <Shape>Box</Shape>
+        <Material>PXD_SiliconDCD</Material>
+        <Mass unit="g">0.0155605248508946</Mass>
+        <Name>PXD_Layer_1_Switchers1_DCD_4</Name>
+        <!--These parameters are only estimation from drawing, please fill exact values! /-->
+        <Width unit="mm">1.9</Width>
+        <Length unit="mm">4.9</Length>
+        <WPosition unit="mm">0</WPosition>
+        <UPosition unit="mm">-1</UPosition>
+        <VPosition unit="mm">2.5</VPosition>
+      </DCD4>
+      <DCD5>
+        <Shape>Box</Shape>
+        <Material>PXD_SiliconDCD</Material>
+        <Mass unit="g">0.0155605248508946</Mass>
+        <Name>PXD_Layer_1_Switchers1_DCD_5</Name>
+        <!--These parameters are only estimation from drawing, please fill exact values! /-->
+        <Width unit="mm">1.9</Width>
+        <Length unit="mm">4.9</Length>
+        <WPosition unit="mm">0</WPosition>
+        <UPosition unit="mm">-3</UPosition>
+        <VPosition unit="mm">2.5</VPosition>
+      </DCD5>
+      <DCD6>
+        <Shape>Box</Shape>
+        <Material>PXD_SiliconDCD</Material>
+        <Mass unit="g">0.0155605248508946</Mass>
+        <Name>PXD_Layer_1_Switchers1_DCD_6</Name>
+        <!--These parameters are only estimation from drawing, please fill exact values! /-->
+        <Width unit="mm">1.9</Width>
+        <Length unit="mm">4.9</Length>
+        <WPosition unit="mm">0</WPosition>
+        <UPosition unit="mm">-5</UPosition>
+        <VPosition unit="mm">2.5</VPosition>
+      </DCD6>
+      <DHP1>
+        <Shape>Box</Shape>
+        <Material>PXD_SiliconDHP</Material>
+        <Mass unit="g">0.0155605248508946</Mass>
+        <!--DensityFactor>12</DensityFactor/-->
+        <Name>PXD_Layer_1_Switchers1_DHP_1</Name>
+        <!-- These parameters are only estimation from drawing, please fill exact values! /-->
+        <Width unit="mm">1.9</Width>
+        <Length unit="mm">4.9</Length>
+        <WPosition unit="mm">0</WPosition>
+        <UPosition unit="mm">5</UPosition>
+        <VPosition unit="mm">-2.5</VPosition>
+      </DHP1>
+      <DHP2>
+        <Shape>Box</Shape>
+        <Material>PXD_SiliconDHP</Material>
+        <Mass unit="g">0.0155605248508946</Mass>
+        <Name>PXD_Layer_1_Switchers1_DHP_2</Name>
+        <!--These parameters are only estimation from drawing, please fill exact values! /-->
+        <Width unit="mm">1.9</Width>
+        <Length unit="mm">4.9</Length>
+        <WPosition unit="mm">0</WPosition>
+        <UPosition unit="mm">3</UPosition>
+        <VPosition unit="mm">-2.5</VPosition>
+      </DHP2>
+      <DHP3>
+        <Shape>Box</Shape>
+        <Material>PXD_SiliconDHP</Material>
+        <Mass unit="g">0.0155605248508946</Mass>
+        <Name>PXD_Layer_1_Switchers1_DHP_3</Name>
+        <!--These parameters are only estimation from drawing, please fill exact values! /-->
+        <Width unit="mm">1.9</Width>
+        <Length unit="mm">4.9</Length>
+        <WPosition unit="mm">0</WPosition>
+        <UPosition unit="mm">1</UPosition>
+        <VPosition unit="mm">-2.5</VPosition>
+      </DHP3>
+      <DHP4>
+        <Shape>Box</Shape>
+        <Material>PXD_SiliconDHP</Material>
+        <Mass unit="g">0.0155605248508946</Mass>
+        <Name>PXD_Layer_1_Switchers1_DHP_4</Name>
+        <!--These parameters are only estimation from drawing, please fill exact values! /-->
+        <Width unit="mm">1.9</Width>
+        <Length unit="mm">4.9</Length>
+        <WPosition unit="mm">0</WPosition>
+        <UPosition unit="mm">-1</UPosition>
+        <VPosition unit="mm">-2.5</VPosition>
+      </DHP4>
+      <DHP5>
+        <Shape>Box</Shape>
+        <Material>PXD_SiliconDHP</Material>
+        <Mass unit="g">0.0155605248508946</Mass>
+        <Name>PXD_Layer_1_Switchers1_DHP_5</Name>
+        <!--These parameters are only estimation from drawing, please fill exact values! /-->
+        <Width unit="mm">1.9</Width>
+        <Length unit="mm">4.9</Length>
+        <WPosition unit="mm">0</WPosition>
+        <UPosition unit="mm">-3</UPosition>
+        <VPosition unit="mm">-2.5</VPosition>
+      </DHP5>
+      <DHP6>
+        <Shape>Box</Shape>
+        <Material>PXD_SiliconDHP</Material>
+        <Mass unit="g">0.0155605248508946</Mass>
+        <Name>PXD_Layer_1_Switchers1_DHP_6</Name>
+        <!--These parameters are only estimation from drawing, please fill exact values! /-->
+        <Width unit="mm">1.9</Width>
+        <Length unit="mm">4.9</Length>
+        <WPosition unit="mm">0</WPosition>
+        <UPosition unit="mm">-5</UPosition>
+        <VPosition unit="mm">-2.5</VPosition>
+      </DHP6>
     </Switchers1>
     <Switchers2>
       <Shape>Box</Shape>
-      <Material>PXD_SiliconSwitcher</Material>
-      <Mass unit="g">0.00919043499005964</Mass>
-      <DensityFactor>6</DensityFactor>
+      <Material>Air</Material>
       <Name>PXD_Layer_1_Switchers2</Name>
       <!-- These parameters are only estimation from drawing, please fill exact values! /-->
-      <Thickness unit="mm">0.3</Thickness>
+      <Thickness unit="mm">0.25</Thickness>
       <Width unit="mm">2</Width>
       <Length unit="mm">44.725</Length>
       <WPosition unit="mm">0.15</WPosition>
       <UPosition unit="mm">6.5</UPosition>
       <VPosition unit="mm">11.625</VPosition>
+      <Switcher1>
+        <Shape>Box</Shape>
+        <Name>PXD_Layer_1_Switchers2_Switcher_1</Name>
+        <Material>PXD_SiliconSwitcher</Material>
+        <Mass unit="g">0.00919043499005964</Mass>
+        <Length unit="mm">5</Length>
+        <WPosition unit="mm">0</WPosition>
+        <UPosition unit="mm">0</UPosition>
+        <VPosition unit="mm">-19.5</VPosition>
+      </Switcher1>
+      <Switcher2>
+        <Shape>Box</Shape>
+        <Name>PXD_Layer_1_Switchers2_Switcher_2</Name>
+        <Material>PXD_SiliconSwitcher</Material>
+        <Mass unit="g">0.00919043499005964</Mass>
+        <Length unit="mm">5</Length>
+        <WPosition unit="mm">0</WPosition>
+        <UPosition unit="mm">0</UPosition>
+        <VPosition unit="mm">-11.7</VPosition>
+      </Switcher2>
+      <Switcher3>
+        <Shape>Box</Shape>
+        <Name>PXD_Layer_1_Switchers2_Switcher_3</Name>
+        <Material>PXD_SiliconSwitcher</Material>
+        <Mass unit="g">0.00919043499005964</Mass>
+        <Length unit="mm">5</Length>
+        <WPosition unit="mm">0</WPosition>
+        <UPosition unit="mm">0</UPosition>
+        <VPosition unit="mm">-3.9</VPosition>
+      </Switcher3>
+      <Switcher4>
+        <Shape>Box</Shape>
+        <Name>PXD_Layer_1_Switchers2_Switcher_4</Name>
+        <Material>PXD_SiliconSwitcher</Material>
+        <Mass unit="g">0.00919043499005964</Mass>
+        <Length unit="mm">5</Length>
+        <WPosition unit="mm">0</WPosition>
+        <UPosition unit="mm">0</UPosition>
+        <VPosition unit="mm">3.9</VPosition>
+      </Switcher4>
+      <Switcher5>
+        <Shape>Box</Shape>
+        <Name>PXD_Layer_1_Switchers2_Switcher_5</Name>
+        <Material>PXD_SiliconSwitcher</Material>
+        <Mass unit="g">0.00919043499005964</Mass>
+        <Length unit="mm">5</Length>
+        <WPosition unit="mm">0</WPosition>
+        <UPosition unit="mm">0</UPosition>
+        <VPosition unit="mm">11.7</VPosition>
+      </Switcher5>
+      <Switcher6>
+        <Shape>Box</Shape>
+        <Name>PXD_Layer_1_Switchers2_Switcher_6</Name>
+        <Material>PXD_SiliconSwitcher</Material>
+        <Mass unit="g">0.00919043499005964</Mass>
+        <Length unit="mm">5</Length>
+        <WPosition unit="mm">0</WPosition>
+        <UPosition unit="mm">0</UPosition>
+        <VPosition unit="mm">19.5</VPosition>
+      </Switcher6>
     </Switchers2>
     <Silicon>
     <Name>PXD_Layer_%Layer_Ladder_%Ladder_Sensor_%Sensor_Silicon</Name>
@@ -90,31 +291,231 @@
     <ReflectY>1</ReflectY>
     <Switchers1>
       <Shape>Box</Shape>
-      <Material>PXD_SiliconDCD</Material>
-      <Mass unit="g">0.0155605248508946</Mass>
-      <DensityFactor>12</DensityFactor>
+      <Material>Air</Material>
       <Name>PXD_Layer_2_Switchers1</Name>
       <!-- These parameters are only estimation from drawing, please fill exact values! /-->
-      <Thickness unit="mm">0.3</Thickness>
+      <Thickness unit="mm">0.25</Thickness>
       <Width unit="mm">12</Width>
       <Length unit="mm">10</Length>
       <WPosition unit="mm">0.15</WPosition>
       <UPosition unit="mm">-1</UPosition>
       <VPosition unit="mm">-24.4875</VPosition>
+      <DCD1>
+        <Shape>Box</Shape>
+        <Material>PXD_SiliconDCD</Material>
+        <Mass unit="g">0.0155605248508946</Mass>
+        <Name>PXD_Layer_2_Switchers1_DCD_1</Name>
+        <!-- These parameters are only estimation from drawing, please fill exact values! /-->
+        <Width unit="mm">1.9</Width>
+        <Length unit="mm">4.9</Length>
+        <WPosition unit="mm">0</WPosition>
+        <UPosition unit="mm">5</UPosition>
+        <VPosition unit="mm">2.5</VPosition>
+      </DCD1>
+      <DCD2>
+        <Shape>Box</Shape>
+        <Material>PXD_SiliconDCD</Material>
+        <Mass unit="g">0.0155605248508946</Mass>
+        <Name>PXD_Layer_2_Switchers1_DCD_2</Name>
+        <!--These parameters are only estimation from drawing, please fill exact values! /-->
+        <Width unit="mm">1.9</Width>
+        <Length unit="mm">4.9</Length>
+        <WPosition unit="mm">0</WPosition>
+        <UPosition unit="mm">3</UPosition>
+        <VPosition unit="mm">2.5</VPosition>
+      </DCD2>
+      <DCD3>
+        <Shape>Box</Shape>
+        <Material>PXD_SiliconDCD</Material>
+        <Mass unit="g">0.0155605248508946</Mass>
+        <Name>PXD_Layer_2_Switchers1_DCD_3</Name>
+        <!--These parameters are only estimation from drawing, please fill exact values! /-->
+        <Width unit="mm">1.9</Width>
+        <Length unit="mm">4.9</Length>
+        <WPosition unit="mm">0</WPosition>
+        <UPosition unit="mm">1</UPosition>
+        <VPosition unit="mm">2.5</VPosition>
+      </DCD3>
+      <DCD4>
+        <Shape>Box</Shape>
+        <Material>PXD_SiliconDCD</Material>
+        <Mass unit="g">0.0155605248508946</Mass>
+        <Name>PXD_Layer_2_Switchers1_DCD_4</Name>
+        <!--These parameters are only estimation from drawing, please fill exact values! /-->
+        <Width unit="mm">1.9</Width>
+        <Length unit="mm">4.9</Length>
+        <WPosition unit="mm">0</WPosition>
+        <UPosition unit="mm">-1</UPosition>
+        <VPosition unit="mm">2.5</VPosition>
+      </DCD4>
+      <DCD5>
+        <Shape>Box</Shape>
+        <Material>PXD_SiliconDCD</Material>
+        <Mass unit="g">0.0155605248508946</Mass>
+        <Name>PXD_Layer_2_Switchers1_DCD_5</Name>
+        <!--These parameters are only estimation from drawing, please fill exact values! /-->
+        <Width unit="mm">1.9</Width>
+        <Length unit="mm">4.9</Length>
+        <WPosition unit="mm">0</WPosition>
+        <UPosition unit="mm">-3</UPosition>
+        <VPosition unit="mm">2.5</VPosition>
+      </DCD5>
+      <DCD6>
+        <Shape>Box</Shape>
+        <Material>PXD_SiliconDCD</Material>
+        <Mass unit="g">0.0155605248508946</Mass>
+        <Name>PXD_Layer_2_Switchers1_DCD_6</Name>
+        <!--These parameters are only estimation from drawing, please fill exact values! /-->
+        <Width unit="mm">1.9</Width>
+        <Length unit="mm">4.9</Length>
+        <WPosition unit="mm">0</WPosition>
+        <UPosition unit="mm">-5</UPosition>
+        <VPosition unit="mm">2.5</VPosition>
+      </DCD6>
+      <DHP1>
+        <Shape>Box</Shape>
+        <Material>PXD_SiliconDHP</Material>
+        <Mass unit="g">0.0155605248508946</Mass>
+        <Name>PXD_Layer_2_Switchers1_DHP_1</Name>
+        <!-- These parameters are only estimation from drawing, please fill exact values! /-->
+        <Width unit="mm">1.9</Width>
+        <Length unit="mm">4.9</Length>
+        <WPosition unit="mm">0</WPosition>
+        <UPosition unit="mm">5</UPosition>
+        <VPosition unit="mm">-2.5</VPosition>
+      </DHP1>
+      <DHP2>
+        <Shape>Box</Shape>
+        <Material>PXD_SiliconDHP</Material>
+        <Mass unit="g">0.0155605248508946</Mass>
+        <Name>PXD_Layer_2_Switchers1_DHP_2</Name>
+        <!--These parameters are only estimation from drawing, please fill exact values! /-->
+        <Width unit="mm">1.9</Width>
+        <Length unit="mm">4.9</Length>
+        <WPosition unit="mm">0</WPosition>
+        <UPosition unit="mm">3</UPosition>
+        <VPosition unit="mm">-2.5</VPosition>
+      </DHP2>
+      <DHP3>
+        <Shape>Box</Shape>
+        <Material>PXD_SiliconDHP</Material>
+        <Mass unit="g">0.0155605248508946</Mass>
+        <Name>PXD_Layer_2_Switchers1_DHP_3</Name>
+        <!--These parameters are only estimation from drawing, please fill exact values! /-->
+        <Width unit="mm">1.9</Width>
+        <Length unit="mm">4.9</Length>
+        <WPosition unit="mm">0</WPosition>
+        <UPosition unit="mm">1</UPosition>
+        <VPosition unit="mm">-2.5</VPosition>
+      </DHP3>
+      <DHP4>
+        <Shape>Box</Shape>
+        <Material>PXD_SiliconDHP</Material>
+        <Mass unit="g">0.0155605248508946</Mass>
+        <Name>PXD_Layer_2_Switchers1_DHP_4</Name>
+        <!--These parameters are only estimation from drawing, please fill exact values! /-->
+        <Width unit="mm">1.9</Width>
+        <Length unit="mm">4.9</Length>
+        <WPosition unit="mm">0</WPosition>
+        <UPosition unit="mm">-1</UPosition>
+        <VPosition unit="mm">-2.5</VPosition>
+      </DHP4>
+      <DHP5>
+        <Shape>Box</Shape>
+        <Material>PXD_SiliconDHP</Material>
+        <Mass unit="g">0.0155605248508946</Mass>
+        <Name>PXD_Layer_2_Switchers1_DHP_5</Name>
+        <!--These parameters are only estimation from drawing, please fill exact values! /-->
+        <Width unit="mm">1.9</Width>
+        <Length unit="mm">4.9</Length>
+        <WPosition unit="mm">0</WPosition>
+        <UPosition unit="mm">-3</UPosition>
+        <VPosition unit="mm">-2.5</VPosition>
+      </DHP5>
+      <DHP6>
+        <Shape>Box</Shape>
+        <Material>PXD_SiliconDHP</Material>
+        <Mass unit="g">0.0155605248508946</Mass>
+        <Name>PXD_Layer_2_Switchers1_DHP_6</Name>
+        <!--These parameters are only estimation from drawing, please fill exact values! /-->
+        <Width unit="mm">1.9</Width>
+        <Length unit="mm">4.9</Length>
+        <WPosition unit="mm">0</WPosition>
+        <UPosition unit="mm">-5</UPosition>
+        <VPosition unit="mm">-2.5</VPosition>
+      </DHP6>
     </Switchers1>
     <Switchers2>
       <Shape>Box</Shape>
-      <Material>PXD_SiliconSwitcher</Material>
-      <Mass unit="g">0.00919043499005964</Mass>
-      <DensityFactor>6</DensityFactor>
+      <Material>Air</Material>
       <Name>PXD_Layer_2_Switchers2</Name>
       <!-- These parameters are only estimation from drawing, please fill exact values! /-->
-      <Thickness unit="mm">0.3</Thickness>
+      <Thickness unit="mm">0.25</Thickness>
       <Width unit="mm">2</Width>
       <Length unit="mm">61.725</Length>
       <WPosition unit="mm">0.15</WPosition>
       <UPosition unit="mm">6.5</UPosition>
       <VPosition unit="mm">11.625</VPosition>
+      <Switcher1>
+        <Shape>Box</Shape>
+        <Name>PXD_Layer_2_Switchers2_Switcher_1</Name>
+        <Material>PXD_SiliconSwitcher</Material>
+        <Mass unit="g">0.00919043499005964</Mass>
+        <Length unit="mm">5</Length>
+        <WPosition unit="mm">0</WPosition>
+        <UPosition unit="mm">0</UPosition>
+        <VPosition unit="mm">-28</VPosition>
+      </Switcher1>
+      <Switcher2>
+        <Shape>Box</Shape>
+        <Name>PXD_Layer_2_Switchers2_Switcher_2</Name>
+        <Material>PXD_SiliconSwitcher</Material>
+        <Mass unit="g">0.00919043499005964</Mass>
+        <Length unit="mm">5</Length>
+        <WPosition unit="mm">0</WPosition>
+        <UPosition unit="mm">0</UPosition>
+        <VPosition unit="mm">-16.8</VPosition>
+      </Switcher2>
+      <Switcher3>
+        <Shape>Box</Shape>
+        <Name>PXD_Layer_2_Switchers2_Switcher_3</Name>
+        <Material>PXD_SiliconSwitcher</Material>
+        <Mass unit="g">0.00919043499005964</Mass>
+        <Length unit="mm">5</Length>
+        <WPosition unit="mm">0</WPosition>
+        <UPosition unit="mm">0</UPosition>
+        <VPosition unit="mm">-5.6</VPosition>
+      </Switcher3>
+      <Switcher4>
+        <Shape>Box</Shape>
+        <Name>PXD_Layer_2_Switchers2_Switcher_4</Name>
+        <Material>PXD_SiliconSwitcher</Material>
+        <Mass unit="g">0.00919043499005964</Mass>
+        <Length unit="mm">5</Length>
+        <WPosition unit="mm">0</WPosition>
+        <UPosition unit="mm">0</UPosition>
+        <VPosition unit="mm">5.6</VPosition>
+      </Switcher4>
+      <Switcher5>
+        <Shape>Box</Shape>
+        <Name>PXD_Layer_2_Switchers2_Switcher_5</Name>
+        <Material>PXD_SiliconSwitcher</Material>
+        <Mass unit="g">0.00919043499005964</Mass>
+        <Length unit="mm">5</Length>
+        <WPosition unit="mm">0</WPosition>
+        <UPosition unit="mm">0</UPosition>
+        <VPosition unit="mm">16.8</VPosition>
+      </Switcher5>
+      <Switcher6>
+        <Shape>Box</Shape>
+        <Name>PXD_Layer_2_Switchers2_Switcher_6</Name>
+        <Material>PXD_SiliconSwitcher</Material>
+        <Mass unit="g">0.00919043499005964</Mass>
+        <Length unit="mm">5</Length>
+        <WPosition unit="mm">0</WPosition>
+        <UPosition unit="mm">0</UPosition>
+        <VPosition unit="mm">28</VPosition>
+      </Switcher6>
     </Switchers2>
     <Silicon>
     <Name>PXD_Layer_%Layer_Ladder_%Ladder_Sensor_%Sensor_Silicon</Name>

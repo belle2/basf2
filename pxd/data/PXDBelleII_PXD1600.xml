@@ -10,16 +10,12 @@
     <OffsetZ unit="mm">0</OffsetZ>
     <Layers>
       <Layer id="PXD_Layer_1">
-        <Material>Vacuum</Material>
+        <Material>Air</Material>
         <Name>PXD_Layer_1</Name>
-        <Shape>Assembly</Shape>
-        <!--
         <Shape>Tube</Shape>
-        <InnerRadius unit="mm">11</InnerRadius>
-        <OuterRadius unit="mm">19</OuterRadius>
-        <Length unit ="mm">220</Length>
-        /-->
-
+        <InnerRadius unit="mm">12.5</InnerRadius>
+        <OuterRadius unit="mm">21</OuterRadius>
+        <Length unit ="mm">170</Length>
         <Phi0 desc="The starting angle of the layer in the r-phi plane" unit="deg">90.0</Phi0>
         <NumberOfLadders desc="Number of ladders in this layer">8</NumberOfLadders>
         <Ladder desc="The silicon modules the detector is made of">
@@ -44,15 +40,12 @@
         </Ladder>
       </Layer>
       <Layer id="PXD_Layer_2">
-        <Material>Vacuum</Material>
+        <Material>Air</Material>
         <Name>PXD_Layer_2</Name>
-        <Shape>Assembly</Shape>
-        <!--
         <Shape>Tube</Shape>
-        <InnerRadius unit="mm">19</InnerRadius>
+        <InnerRadius unit="mm">21</InnerRadius>
         <OuterRadius unit="mm">26</OuterRadius>
         <Length unit ="mm">220</Length>
-        /-->
         <Phi0 desc="The starting angle of the layer in the r-phi plane" unit="deg">90.0</Phi0>
         <NumberOfLadders desc="Number of ladders in this layer">12</NumberOfLadders>
         <Ladder desc="The silicon modules the detector is made of">

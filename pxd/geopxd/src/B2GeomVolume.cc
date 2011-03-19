@@ -298,8 +298,8 @@ Bool_t B2GeomVolume::makeGeneric()
     return true;
   } else if (strncmp(shape, "Tube", 4) == 0) {
     tVolume = gGeoManager->MakeTube(name, tMedium,
-                                    0.5 * fInnerRadius,
-                                    0.5 * fOuterRadius,
+                                    fInnerRadius,
+                                    fOuterRadius,
                                     0.5 * fLength);
     if (iColor > 0) tVolume->SetLineColor(iColor);
     return true;

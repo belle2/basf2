@@ -40,7 +40,7 @@ namespace Belle2 {
     B2GeomPXDSensorActive() { }
     /** Destructor for the active sensor */
     virtual ~B2GeomPXDSensorActive() { }
-    /** Reads parameters for PXD active silicon from GearBox. */
+    /** Reads parameters for PXD active silicon (inclusive UserInfo) from GearBox. */
     Bool_t init(GearDir& content);
     /** Build the geometry and adds PXDUserInfo for the active silicon. */
     Bool_t make();

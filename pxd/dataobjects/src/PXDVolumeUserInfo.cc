@@ -22,6 +22,7 @@ ClassImp(PXDVolumeUserInfo)
 
 PXDVolumeUserInfo& PXDVolumeUserInfo::operator=(const PXDVolumeUserInfo & other)
 {
+  VolumeUserInfoBase::operator=(other);
   this->m_layerID = other.getLayerID();
   this->m_ladderID = other.getLadderID();
   this->m_sensorID = other.getSensorID();

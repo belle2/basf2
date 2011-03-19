@@ -36,7 +36,7 @@ namespace Belle2 {
         m_layerID(-1),    /* Layer ID. */
         m_ladderID(-1),   /* Ladder ID. */
         m_sensorID(-1) {  /* Sensor ID. */
-      m_stepSize = 5.0 * Unit::um;
+      m_stepSize = 10.0 * Unit::um;
     }
 
     /** Full constructor.
@@ -51,7 +51,7 @@ namespace Belle2 {
         m_layerID(layerID),
         m_ladderID(ladderID),
         m_sensorID(sensorID) {
-      m_stepSize = 5.0 * Unit::um;
+      m_stepSize = 10.0 * Unit::um;
     }
 
     /** Destructor */

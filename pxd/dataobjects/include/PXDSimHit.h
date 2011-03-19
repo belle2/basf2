@@ -3,7 +3,7 @@
  * Copyright(C) 2010-2011  Belle II Collaboration                         *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Peter Kvasnicka                                          *
+ * Contributors: Andreas Moll, Peter Kvasnicka                                          *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/

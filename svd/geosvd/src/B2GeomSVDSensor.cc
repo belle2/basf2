@@ -9,6 +9,8 @@
  **************************************************************************/
 
 #include <svd/geosvd/B2GeomSVDSensor.h>
+#include <svd/dataobjects/SVDVolumeUserInfo.h>
+
 using namespace boost;
 using namespace Belle2;
 using namespace std;
@@ -127,6 +129,8 @@ Bool_t B2GeomSVDSensorSilicon::make()
   if (!makeAndAddComponent(volActive)) {
     B2FATAL("Cannot build TGeoVolume for SVD active silicon!");
     return false;
+  } else {
+    volActive->getVol()->SetField(new SVDVolumeUserInfo(iLayer, iLadder, iSensor));
   }
   return true;
 }

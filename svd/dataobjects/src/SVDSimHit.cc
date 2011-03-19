@@ -3,27 +3,18 @@
  * Copyright(C) 2010-2011  Belle II Collaboration                         *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Peter Kvasnicka                                          *
+ * Contributors: Andreas Moll, Peter Kvasnicka                                          *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
 // basf2
 #include <svd/dataobjects/SVDSimHit.h>
-#include <framework/logging/Logger.h>
-
-// root
-#include <TString.h>
-
-// Geant
-#include <G4ThreeVector.hh>
-#include <G4String.hh>
 
 using namespace std;
 using namespace Belle2;
 
 ClassImp(SVDSimHit)
-
 
 SVDSimHit& SVDSimHit::operator=(const SVDSimHit & other)
 {
@@ -35,6 +26,8 @@ SVDSimHit& SVDSimHit::operator=(const SVDSimHit & other)
   this->m_theta = other.getTheta();
   this->m_momIn = other.getMomIn();
   this->m_PDGcode = other.getPDGcode();
+  this->m_PDGmass = other.getPDGmass();
+  this->m_PDGcharge = other.getPDGcharge();
   this->m_trackID = other.getTrackID();
   this->m_energyDep = other.getEnergyDep();
   this->m_stepLength = other.getStepLength();

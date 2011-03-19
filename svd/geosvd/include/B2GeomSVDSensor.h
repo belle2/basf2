@@ -8,6 +8,9 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+#ifndef B2GEOMSVDSENSOR_H_
+#define B2GEOMSVDSENSOR_H_
+
 #include <framework/gearbox/GearDir.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
@@ -21,8 +24,6 @@
 #include "TGeoVolume.h"
 #include "TROOT.h"
 
-#ifndef B2GEOMSVDSENSOR_H_
-#define B2GEOMSVDSENSOR_H_
 
 using namespace std;
 

@@ -3,7 +3,7 @@
  * Copyright(C) 2010-2011  Belle II Collaboration                         *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Peter Kvasnicka                                          *
+ * Contributors: Andreas Moll, Peter Kvasnicka                                          *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -16,17 +16,17 @@
 #include <TVector3.h>
 
 #define DEFAULT_SVDSIMHITS "SVDSimHits"
-#define DEFAULT_SVDSIMHITSREL "MCParticlesToSVDSimHits"
+#define DEFAULT_SVDSIMHITSREL "SVDSimHitsToMCParticles"
 
 namespace Belle2 {
 
   /**
-   * ClassSVDSimHit - Geant4 simulated hit for the SVD
-   *
-   * This class holds particle hit data from geant4 simulation. As the simulated
-   * hit classes are used to generate detector response, they contain _local_
-   * information.
-   */
+    * ClassSVDSimHit - Geant4 simulated hit for the SVD.
+    *
+    * This class holds particle hit data from geant4 simulation. As the simulated
+    * hit classes are used to generate detector response, they contain _local_
+    * information.
+    */
   class SVDSimHit : public TObject {
 
   public:
@@ -39,8 +39,10 @@ namespace Belle2 {
         m_posIn(0, 0, 0),    /* Position at entry. */
         m_posOut(0, 0, 0),   /* Position at exit. */
         m_theta(0),          /* Theta angle. */
-        m_momIn(0, 0, 0),    /* Momentum at entry (GRF). */
+        m_momIn(0, 0, 0),    /* Momentum at entry. */
         m_PDGcode(0),        /* The PDG value of the particle that created the hit. */
+        m_PDGmass(0.0),    /* The PDG mass of the particle. */
+        m_PDGcharge(0.0),  /* The PDG charge of the particle. */
         m_trackID(0),        /* The ID of the track that created the hit. */
         m_energyDep(0),      /* Deposited energy. */
         m_stepLength(0),     /* Step length. */
@@ -55,8 +57,10 @@ namespace Belle2 {
      * @param posIn Point of entry into the detector, in local coordinates.
      * @param posOut Point of exit from the detector, in local coordinates.
      * @param theta Angle theta (wrt. the global z axis).
-     * @param momIn The momentum of particle on entry into the detector.
+     * @param momIn The momentum of particle on entry into the detector, in local coordinates.
      * @param PDGcode The PDG code of particle that produced this track.
+     * @param PDGmass The PDG mass of the particle that produced the track.
+     * @param PDGcharge The PDG charge of the particle that produced the track.
      * @param trackID ID of the track.
      * @param energyDep Energy deposition by the particle in the detector.
      * @param stepLength Length of G4 step.
@@ -71,6 +75,8 @@ namespace Belle2 {
       float theta,
       TVector3 momIn,
       int PDGcode,
+      double PDGmass,
+      double PDGcharge,
       int trackID,
       float energyDep,
       float stepLength,
@@ -83,6 +89,8 @@ namespace Belle2 {
         m_theta(theta),             /* Theta angle.*/
         m_momIn(momIn),             /* Momentum at entry. */
         m_PDGcode(PDGcode),         /* The PDG value of the particle that created the hit. */
+        m_PDGmass(PDGmass),     /* The PDG mass of the particle that produced the hit. */
+        m_PDGcharge(PDGcharge),   /* The PDG charge of the particle that produced the hit. */
         m_trackID(trackID),         /* The ID of the track that created the hit. */
         m_energyDep(energyDep),     /* Deposited energy. */
         m_stepLength(stepLength),   /* Step length. */
@@ -90,7 +98,7 @@ namespace Belle2 {
       /* Does nothing. */
     }
 
-    /** Destructor.*/
+    //! Destructor
     ~SVDSimHit() {
       /* Does nothing. */
     }
@@ -122,6 +130,12 @@ namespace Belle2 {
     /** The method to set PDG code.*/
     void setPDGcode(int pdg) { m_PDGcode = pdg; }
 
+    /** The method to set PDG mass.*/
+    void setPDGmass(double pdgmass) { m_PDGmass = pdgmass; }
+
+    /** The method to set PDG charge.*/
+    void setPDGcharge(double pdgcharge) { m_PDGcharge = pdgcharge; }
+
     /** The method to set deposited energy.*/
     void setEnergyDep(float energyDep) { m_energyDep = energyDep; }
 
@@ -130,7 +144,6 @@ namespace Belle2 {
 
     /** The method to set GlobalTime.*/
     void setGlobalTime(float globalTime) { m_globalTime = globalTime; }
-
 
     /** The method to get layer id.*/
     int getLayerID() const { return m_layerID; }
@@ -159,6 +172,12 @@ namespace Belle2 {
     /** The method to get PDG code.*/
     int getPDGcode() const { return m_PDGcode; }
 
+    /** The method to get PDG mass.*/
+    double getPDGmass() const { return m_PDGmass; }
+
+    /** The method to get PDG charge.*/
+    double getPDGcharge() const { return m_PDGcharge; }
+
     /** The method to get deposited energy.*/
     float getEnergyDep() const { return m_energyDep; }
 
@@ -180,9 +199,11 @@ namespace Belle2 {
     TVector3 m_posIn;      /**< LRF position at entry. */
     TVector3 m_posOut;     /**< LRF position at exit. */
     float m_theta;          /**< Theta angle (wrt global z). */
-    TVector3 m_momIn;      /**< GRF Momentum at entry. */
+    TVector3 m_momIn;      /**< LRF Momentum at entry. */
 
     int m_PDGcode;         /**< The PDG value of the particle that created the hit. */
+    double m_PDGmass;    /**< The PDG mass of the particle that produced the hit. */
+    double m_PDGcharge;    /**< The PDG charge of the particle that produced the hit. */
     int m_trackID;         /**< The ID of the track that created the hit. */
     float m_energyDep;    /**< Deposited energy. */
     float m_stepLength;   /**< Step length. */

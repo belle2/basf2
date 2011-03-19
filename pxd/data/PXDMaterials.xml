@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!-- Notes:
   RadLength, InterLength: If the values are negative, their absolute value
                           is taken, otherwise radiation length is recomputed using G3 formula.

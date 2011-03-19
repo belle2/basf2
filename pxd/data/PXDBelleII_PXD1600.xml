@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <ParamSet type="PXD">
   <Name>PXD BelleII</Name>
   <Description>The famous RedBull can</Description>
@@ -19,7 +19,7 @@
         <OuterRadius unit="mm">19</OuterRadius>
         <Length unit ="mm">220</Length>
         /-->
-        
+
         <Phi0 desc="The starting angle of the layer in the r-phi plane" unit="deg">90.0</Phi0>
         <NumberOfLadders desc="Number of ladders in this layer">8</NumberOfLadders>
         <Ladder desc="The silicon modules the detector is made of">

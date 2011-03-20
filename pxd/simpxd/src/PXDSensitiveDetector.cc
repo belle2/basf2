@@ -127,7 +127,7 @@ G4bool PXDSensitiveDetector::ProcessHits(G4Step* step, G4TouchableHistory*)
   // check that user limits are set properly
   G4UserLimits* userLimits = g4Volume.GetLogicalVolume()->GetUserLimits();
   if (userLimits) {
-    B2INFO("Volume " << g4Volume.GetName() << ": m	ax. allowed step set to " << userLimits->GetMaxAllowedStep(track))
+    B2INFO("Volume " << g4Volume.GetName() << ": max. allowed step set to " << userLimits->GetMaxAllowedStep(track))
   }
 
   const G4ThreeVector momIn(preStep.GetMomentum());

@@ -44,6 +44,11 @@ namespace Belle2 {
     Bool_t init(GearDir& content);
     /** Build the geometry and adds PXDUserInfo for the active silicon. */
     Bool_t make();
+  private:
+    double m_uPitch;      /** < detector pitch in U direction. */
+    int m_uCells;       /** < number of cells in U direction. */
+    double m_vPitch;      /** < detector pitch in V direction. */
+    int m_vCells;       /** < number of cells in V direction. */
   };
 
   /** Class to build the silicon of the PXD Sensor. */

@@ -26,6 +26,10 @@ PXDVolumeUserInfo& PXDVolumeUserInfo::operator=(const PXDVolumeUserInfo & other)
   this->m_layerID = other.getLayerID();
   this->m_ladderID = other.getLadderID();
   this->m_sensorID = other.getSensorID();
+  this->m_uPitch = other.getUPitch();
+  this->m_uCells = other.getUCells();
+  this->m_vPitch = other.getVPitch();
+  this->m_vCells = other.getVCells();
   return *this;
 }
 

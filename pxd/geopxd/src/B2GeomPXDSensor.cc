@@ -258,6 +258,20 @@ Bool_t B2GeomPXDSensorActive::init(GearDir& content)
     return false;
   }
 
+  // Read user parameters
+  if (content.isParamAvailable("UPitch")) {
+    m_uPitch = content.getParamLength("UPitch");
+  }
+  if (content.isParamAvailable("UCells")) {
+    m_uCells = atoi(content.getParamString("UCells").c_str());
+  }
+  if (content.isParamAvailable("VPitch")) {
+    m_vPitch = content.getParamLength("VPitch");
+  }
+  if (content.isParamAvailable("VCells")) {
+    m_vCells = atoi(content.getParamString("VCells").c_str());
+  }
+
   // check if the sensor or the ladder is mirrored!
   // then the active sensor has also to be mirrored in order to keep the right coordinates
   while (true) {
@@ -266,6 +280,7 @@ Bool_t B2GeomPXDSensorActive::init(GearDir& content)
     if (content.isParamAvailable("ReflectY")) isReflectY = !isReflectY;
     if (content.isParamAvailable("ReflectZ")) isReflectZ = !isReflectZ;
   }
+
   return true;
 }
 
@@ -273,6 +288,6 @@ Bool_t B2GeomPXDSensorActive::make()
 {
   Bool_t res = makeGeneric();
   if (res)
-    tVolume->SetField(new PXDVolumeUserInfo(iLayer, iLadder, iSensor));
+    tVolume->SetField(new PXDVolumeUserInfo(iLayer, iLadder, iSensor, m_uPitch, m_uCells, m_vPitch, m_vCells));
   return res;
 }

@@ -35,7 +35,11 @@ namespace Belle2 {
     PXDVolumeUserInfo(): VolumeUserInfoBase(),
         m_layerID(-1),    /* Layer ID. */
         m_ladderID(-1),   /* Ladder ID. */
-        m_sensorID(-1) {  /* Sensor ID. */
+        m_sensorID(-1),
+        m_uPitch(0),
+        m_uCells(1),
+        m_vPitch(0),
+        m_vCells(1) {  /* Sensor ID. */
       m_stepSize = 10.0 * Unit::um;
     }
 
@@ -43,14 +47,26 @@ namespace Belle2 {
      * @param layerID ID of the layer.
      * @param ladderID ID of the ladder.
      * @param sensorID ID of the sensor.
+     * @param uPitch sensor pitch in u ("z") direciton.
+     * @param uCells number of cells in u ("z") direction.
+     * @param vPitch sensor pitch in v ("r-phi") direction.
+     * @param vCells number of cells in v ("r-phi") direction.
      */
     PXDVolumeUserInfo(
       int layerID,
       int ladderID,
-      int sensorID): VolumeUserInfoBase(),
+      int sensorID,
+      double uPitch,
+      int uCells,
+      double vPitch,
+      int vCells): VolumeUserInfoBase(),
         m_layerID(layerID),
         m_ladderID(ladderID),
-        m_sensorID(sensorID) {
+        m_sensorID(sensorID),
+        m_uPitch(uPitch),
+        m_uCells(uCells),
+        m_vPitch(vPitch),
+        m_vCells(vCells) {
       m_stepSize = 10.0 * Unit::um;
     }
 
@@ -70,6 +86,18 @@ namespace Belle2 {
     /** The method to set SensorID.*/
     void setSensorID(int sensorID) { m_sensorID = sensorID; }
 
+    /** The method to set u pitch.*/
+    void setUPitch(double uPitch) { m_uPitch = uPitch; }
+
+    /** The method to set number of cells in u.*/
+    void setUCells(int uCells) { m_uCells = uCells; }
+
+    /** The method to set v pitch.*/
+    void setVPitch(double vPitch) { m_vPitch = vPitch; }
+
+    /** The method to set number of cells in v.*/
+    void setVCells(int vCells) { m_vCells = vCells; }
+
     /** The method to get layer id.*/
     int getLayerID() const { return m_layerID; }
 
@@ -79,6 +107,18 @@ namespace Belle2 {
     /** The method to get sensor id.*/
     int getSensorID() const { return m_sensorID; }
 
+    /** The method to get u pitch.*/
+    double getUPitch() const { return m_uPitch; }
+
+    /** The method to get number of cells in u.*/
+    int getUCells() const { return m_uCells; }
+
+    /** The method to get v pitch.*/
+    double getVPitch() const { return m_vPitch; }
+
+    /** The method to get number of cells in v.*/
+    int getVCells() const { return m_vCells; }
+
     /** Assignment operator.*/
     PXDVolumeUserInfo& operator=(const PXDVolumeUserInfo& other);
 
@@ -87,6 +127,10 @@ namespace Belle2 {
     int m_layerID;           /**< Layer number. */
     int m_ladderID;          /**< Ladder number. */
     int m_sensorID;          /**< Sensor number. */
+    double m_uPitch;        /**< Pitch in u ("z"). */
+    int m_uCells;         /**< Number of cells in u ("z"). */
+    double m_vPitch;        /**< Pitch in v ("r-phi"). */
+    int m_vCells;         /**< Number of cells in v ("r-phi"). */
 
     ClassDef(PXDVolumeUserInfo, 1)
 

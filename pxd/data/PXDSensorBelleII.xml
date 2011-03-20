@@ -259,7 +259,7 @@
         <UPosition unit="mm">-0.75</UPosition>
         <VPosition unit="mm">11.375</VPosition>
         <!-- Readout structure  /-->
-        <UPitch desc="Pitch in U direction" unit="um">58,24</UPitch>
+        <UPitch desc="Pitch in U direction" unit="um">58.24</UPitch>
         <UCells desc="Number of cells in U direction">768</UCells>
         <VPitch desc="Pitch in V direction" unit="um">50</VPitch>
         <VCells desc="Number of cells in V direction">250</VCells>

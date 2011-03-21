@@ -171,9 +171,9 @@ void CDCTrackCandidate::estimateMomentum()
   double z = m_Segments.at(min_index).getInnerMostHit().getWirePosition().z();
   double norm = sqrt(x * x + y * y + z * z);
 
-  m_momentumVector.SetX(x / norm);
-  m_momentumVector.SetY(y / norm);
-  m_momentumVector.SetZ(z / norm);
+  m_momentumVector.SetX((x / norm)*m_momentumValue);
+  m_momentumVector.SetY((y / norm)*m_momentumValue);
+  m_momentumVector.SetZ((z / norm)*m_momentumValue);
 }
 
 void CDCTrackCandidate::setChargeSign(int sign)

@@ -17,6 +17,7 @@
 
 #include "TMath.h"
 #include "TGraph.h"
+#include "TFile.h"
 #include "TAxis.h"
 #include "TF1.h"
 
@@ -289,6 +290,7 @@ void AxialTrackFinder::FitTrackCandidate(CDCTrackCandidate & candidate)
       temp_nHits++;
       x[j] = candidate.getTrackHits().at(j).getConformalX();
       y[j] = candidate.getTrackHits().at(j).getConformalY();
+      //B2INFO("x: "<<x[j]<<"  y: "<<y[j]);
 
     }
   }
@@ -302,6 +304,8 @@ void AxialTrackFinder::FitTrackCandidate(CDCTrackCandidate & candidate)
   graph->Fit("pol1", "Q", "", min, max);
   TF1 *fit = graph->GetFunction("pol1");
 
+  //TFile * output = new TFile("Warum.root", "RECREATE");
+
   double Chi = fit->GetChisquare();
 
   candidate.setChiSquare(Chi);
@@ -309,8 +313,10 @@ void AxialTrackFinder::FitTrackCandidate(CDCTrackCandidate & candidate)
   //First estimation of the absolut momentum value
   double x0 = -fit->GetParameter(0) / fit->GetParameter(1);  // x- and y - axis section
   double y0 = fit->GetParameter(0);
+  //B2INFO("x0: "<<x0<<"  y0: "<<y0);
   double R = sqrt(1 / x0 * 1 / x0 + 1 / y0 * 1 / y0); //Radius of the track circle in the normal plane
   double p = R * 1.5 / 299.792458;  //Preliminary(!) calculation of momentum in GeV, magnetic field and c hardcoded for now...
+  //B2INFO("Radius: "<<R<<"  Momentum: "<<p);
   candidate.setMomentumValue(p);
 
   //Preliminary estimation of the charge of the track
@@ -405,7 +411,7 @@ void AxialTrackFinder::CollectTrackCandidates(vector<CDCSegment> & cdcAxialSegme
           && UsedSegmentsFraction(FinalTrackCandidates.at(i),
                                   UsedSegmentId) < 0.3) {
         counter++;
-        B2INFO("Nr " << counter << "   Final track with " << NumberOfSegments << " found");
+        //B2INFO("Nr "<<counter<<"   Final track with "<<NumberOfSegments<<" found");
 
         //Add the Ids of all used segments to the UsedSegmentId vector
         for (int j = 0; j < FinalTrackCandidates.at(i).getNSegments(); j++) {
@@ -475,7 +481,7 @@ void AxialTrackFinder::CollectTrackCandidates(vector<CDCSegment> & cdcAxialSegme
         //Finally add the candidate to the StoreArray
         new(cdcTrackCandidates->AddrAt(counter)) CDCTrackCandidate(
           FinalTrackCandidates.at(i), counter);
-        B2INFO("Candidate " << counter << " added to final array ...");
+        B2INFO("Candidate " << counter << " with " << cdcTrackCandidates[counter]->getNSegments() << " Segments added to final array ...");
 
       }
     } //end for loop over all candidates

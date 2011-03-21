@@ -62,7 +62,7 @@ namespace Belle2 {
 
     /** Performs estimation of the momentum direction.
      * Assuming the TrackCandidate starting point to be at (0,0,0), the direction of the TrackCandidate can be estimated as the position of the innermost hit.
-     * As for the moment only stereo hits have some meaningful z-coordinates, the coordinates of the innermost stereo hit are normalized and assigned to the momentum vector.
+     * As for the moment only stereo hits have some meaningful z-coordinates, the coordinates of the innermost stereo hit are normalized  with the momentum value and assigned to the momentum vector.
      * (This is a very rough estimation, no drift time as taken into account but only the coordinates of the hit wire. The z-coordinate is also only a first estimation. It has to be checked if this is good enough for this tracking step.)
      */
     void estimateMomentum();
@@ -153,7 +153,7 @@ namespace Belle2 {
     double m_chi2;                          /**< Chi2 value to describe the quality of the TrackCandidate */
 
     double m_momentumValue;                 /**< Absolut momentum value of the TrackCandidate */
-    TVector3 m_momentumVector;              /**< 3D momentum vector of the TrackCandidate (unit vector)*/
+    TVector3 m_momentumVector;              /**< 3D momentum vector of the TrackCandidate */
 
     int m_chargeSign;                       /**< Charge of the TrackCandidate. (+1 or -1)*/
 

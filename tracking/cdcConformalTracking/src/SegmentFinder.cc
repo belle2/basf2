@@ -209,8 +209,9 @@ void SegmentFinder::FindSegments(string CDCTrackHits, string CDCSegments, bool r
       histo[j]->GetXaxis()->SetTitle("#phi [rad]");
     }
 
-//Creates a pdf with all histograms
+    //Creates a pdf with all histograms
     TCanvas *canvas = new TCanvas("canvas", "#phi distribution", 100, 10, 600, 400);
+
     canvas->SetFillColor(0);
     canvas->SetFillStyle(4000);
     canvas->Divide(3, 3);

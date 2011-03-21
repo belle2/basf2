@@ -23,9 +23,9 @@ import random
 from basf2 import *
 
 # Set the log level to show only error and fatal messages
-set_log_level(1000)
+set_log_level(0)
 
-tracks = 10000
+tracks = 100
 pGSeed = 0
 g4Seed = 0
 
@@ -50,7 +50,7 @@ particlegun.param('yVertexPar2', 0)  # max y in cm
 particlegun.param('yVertexPar1', 0)  # min z in cm
 particlegun.param('yVertexPar2', 0)  # max z in cm
 
-particlegun.param('RSeed', pGSeed)
+particlegun.param('Rseed', pGSeed)
 
 # Geometry parameter loader
 paramloader = register_module('ParamLoaderXML')
@@ -69,7 +69,7 @@ g4sim = register_module('FullSim')
 svdHits = register_module('svdHitCounter')
 svdHits.param('tracks', tracks)
 
-svdHits.param('outputFileName', 'overlap2')
+svdHits.param('outputFileName', 'testpt')
 svdHits.param('svdLayerId', 6)
 # svdHits.param(  'option' , 'notEven')
 

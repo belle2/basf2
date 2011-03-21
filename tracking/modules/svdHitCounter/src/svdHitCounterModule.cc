@@ -110,8 +110,8 @@ void svdHitCounterModule::event()
       for (int j = 0; j not_eq nRels; ++j) {
         int layerNumber = -1;
         //int trackId = -1;
-        if (relationArray[j]->getToIndex() == i) {
-          int indexToSvdHits = relationArray[j]->getFromIndex();
+        if (relationArray[j]->getFromIndex() == i) {
+          int indexToSvdHits = relationArray[j]->getToIndex();
           layerNumber = aSvdSimHitArray[indexToSvdHits]->getLayerID();
           //trackId = aSvdSimHitArray[indexToSvdHits]->getTrackID();
           //m_dataOut2 << layerNumber;
@@ -125,7 +125,7 @@ void svdHitCounterModule::event()
         //m_dataOut << trackId << " ";
       }
       //convTrId << "\n";
-      //double pT = 0;
+      double pT = 0;
       double pTot = 0; //length of momentum vector
       double theta = 0;
 
@@ -146,9 +146,9 @@ void svdHitCounterModule::event()
           TVector3 p = aMCParticle->getMomentum();
           pTot = p.Mag();
           theta = p.Theta();
-          //pT = p.Perp();
+          pT = p.Perp();
           //m_dataOut << theta / Unit::deg << "\t" << pTot << "\t" << convLyId.str() << convTrId.str() << " i: " << i << "\n";
-          m_dataOut << theta / Unit::deg << "\t" << pTot << "\n";
+          m_dataOut << theta / Unit::deg << "\t" << pTot << "\t" << pT << "\n";
           ++goodTracks;
         }
       } else {
@@ -165,8 +165,8 @@ void svdHitCounterModule::event()
           TVector3 p = aMCParticle->getMomentum();
           pTot = p.Mag();
           theta = p.Theta();
-          //pT = p.Perp();
-          m_dataOut << theta / Unit::deg << "\t" << pTot << "\n";
+          pT = p.Perp();
+          m_dataOut << theta / Unit::deg << "\t" << pTot << "\t" << pT << "\n";
           //m_dataOut << theta / Unit::deg << "\t" << pTot << "\t" << convLyId.str() << convTrId.str() << " i: " << i << "\n";
           ++goodTracks;
 

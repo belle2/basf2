@@ -3,62 +3,75 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Martin Heck                                              *
+ * Contributors: Martin Heck & Oksana Brovchenko                          *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
-#ifndef GENFITTERMODULE_H_
-#define GENFITTERMODULE_H_
+#ifndef GENFITTERMODULE_H
+#define GENFITTERMODULE_H
 
 #include <framework/core/Module.h>
+#include <fstream>
 
 namespace Belle2 {
 
-  /** Module for fitting tracks using the GENFIT package.
-   *
-   */
+
   class GenFitterModule : public Module {
 
   public:
 
-    /**
-     * Constructor of the module.
-     *
-     * Sets the description of the module.
+    /** Constructor .
      */
     GenFitterModule();
 
-    /** Destructor of the module. */
-    ~GenFitterModule();
-
-    void initialize();
-
-    /**
-     * Prints a header for each new run.
-     *
-     * A header is printed which provides the information that a new
-     * run was started and which run number we are currently running on.
+    /** Destructor.
      */
-    void beginRun();
+    virtual ~GenFitterModule();
 
-    /** Prints the full information about the event, run and experiment number. */
-    void event();
-
-    /**
-     * Prints a footer for each run which ended.
-     *
-     * A footer is printed which provides the information that a run
-     * was ended and which run number we were running on.
+    /** Initialize the Module.
+     * This method is called only once before the actual event processing starts.
      */
-    void endRun();
+    virtual void initialize();
 
-    void terminate();
+    /** Called when entering a new run.
+     */
+    virtual void beginRun();
+
+    /** This method is the core of the module.
+     * This method is called for each event. All processing of the event has to take place in this method.
+     */
+    virtual void event();
+
+    /** This method is called if the current run ends.
+     */
+    virtual void endRun();
+
+    /** This method is called at the end of the event processing.
+     */
+    virtual void terminate();
+
+  protected:
 
 
   private:
-    std::string m_trackToCDCRecoHitCollectionName;
-  };
-}
 
-#endif /* GENFITTERMODULE_H_ */
+    std::string m_mcParticlesCollectionName;             /**< MC particle collection name */
+    std::string m_cdcRecoHitsCollectionName;             /**< CDCRecoHits collection name */
+
+    std::string m_tracksCollectionName;                  /**< Tracks collection name */
+    std::string m_trackToCDCRecoHitCollectionName;       /**< Tracks to CDCRecoHits relation name */
+    std::string m_trackToMCParticleCollectionName;       /**< Tracks to MCParticles relation name  */
+
+    std::string m_cdcTrackCandsColName;                  /**< CDCTrackCandidates collection name */
+    std::string m_cdcTrackCandsToRecoHits;               /**< CDCTrackCandidates to CDCRecoHits relation name */
+    std::string m_cdcTrackCandsToMCParticles;            /**< CDCTrackCandidates to MCParticles relation name */
+
+    bool m_fitMCTracks;                                  /**< True if MC tracks should be fitted */
+    bool m_fitRecoTracks;                                /**< True if track candidates from pattern recognition should be fitted */
+
+
+  };
+} // end namespace Belle2
+
+
+#endif /* GENFITTERMODULE_H */

@@ -3,108 +3,241 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Martin Heck                                              *
+ * Contributors: Martin Heck & Oksana Brovchenko                          *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #include <tracking/modules/genfitter/GenFitterModule.h>
+
+#include <framework/dataobjects/Relation.h>
+#include <framework/datastore/StoreArray.h>
+#include <framework/gearbox/Unit.h>
+
+#include <framework/logging/Logger.h>
+
+#include <generators/dataobjects/MCParticle.h>
+
+#include <cdc/dataobjects/CDCHit.h>
+#include <cdc/dataobjects/CDCRecoHit.h>
+
+#include <tracking/cdcConformalTracking/CDCTrackHit.h>
+#include <tracking/cdcConformalTracking/CDCTrackCandidate.h>
+//#include <tracking/karlsruhe/MCMatchParticle.h>
 #include <tracking/dataobjects/Track.h>
 
-#include <cdc/dataobjects/CDCRecoHit.h>
-#include"GFTrack.h"
-#include"GFKalman.h"
+#include "GFTrack.h"
+#include "GFKalman.h"
+//#include "GFDaf.h"
 
-#include"GFAbsTrackRep.h"
-#include<RKTrackRep.h>
+#include "GFAbsTrackRep.h"
+#include "RKTrackRep.h"
 
-#include"GFConstField.h"
-#include"GFFieldManager.h"
+#include "GFConstField.h"
+#include "GFFieldManager.h"
 
-#include <framework/datastore/StoreArray.h>
-#include <framework/dataobjects/Relation.h>
+#include <cstdlib>
+#include <iomanip>
+#include <string>
+
+#include <iostream>
 
 using namespace std;
 using namespace Belle2;
 
-//-----------------------------------------------------------------
-//                 Register the Module
-//-----------------------------------------------------------------
 REG_MODULE(GenFitter)
 
-//-----------------------------------------------------------------
-//                 Implementation
-//-----------------------------------------------------------------
-
-GenFitterModule::GenFitterModule() : Module()
+GenFitterModule::GenFitterModule() :
+    Module()
 {
-  //Set module properties
-  setDescription("Creates CDCRecoHits from CDCHits.");
 
-  //Parameter definition
-  addParam("TrackToCDCRecoHitCollectionName", m_trackToCDCRecoHitCollectionName,
-           "Name of collection holding the relations between track and CDCRecoHit", string("TrackToCDCRecoHits"));
+  setDescription("Uses GenFit to fit tracks within the CDC. Can fit the MCTracks or Tracks provided by the CDCTrackingModule.");
 
+  addParam("MCParticlesColName", m_mcParticlesCollectionName, "Name of collection holding the MCParticles", string("MCParticles"));
+  addParam("CDCRecoHitsColName", m_cdcRecoHitsCollectionName, "CDCRecoHits collection (should be created by CDCRecoHitMaker module)", string("CDCRecoHits"));
+
+  addParam("TracksColName", m_tracksCollectionName, "Name of collection holding the Tracks (for MCTracks: should be created by MCTrackFinderModule and filled with 'content' after the fit, for recoTracks: will be created after the fit)", string("Tracks"));
+  addParam("TrackToCDCRecoHitColName",  m_trackToCDCRecoHitCollectionName, "Name of collection holding the relations between Tracks and CDCRecoHits (should be created by MCTrackFinderModule)", string("TrackToCDCRecoHits"));
+  addParam("TrackToMCParticleColName", m_trackToMCParticleCollectionName, "Name of collection holding the relations between Tracks and MCParticles (should be created by MCTrackFinderModule)", string("TrackToMCParticle"));
+
+  addParam("CDCTrackCandidatesColName", m_cdcTrackCandsColName, "Name of collection holding the CDCTrackCandidates (output of the pattern recognition, should be created by CDCTrackingModule)", string("CDCTrackCandidates"));
+  addParam("CDCTrackCandsToCDCRecoHitsColName", m_cdcTrackCandsToRecoHits, "Name of collection holding the relations between CDCTrackCandidates and CDCRecoHits (should be created by CDCTrackingModule)", string("CDCTrackCandidatesToCDCRecoHits"));
+  addParam("CDCTrackCandsToMCParticlesColName", m_cdcTrackCandsToMCParticles, "Relation of CDCTracks to MCParticles (should be created by CDCTrackingModule)", string("CDCTrackToMCParticle"));
+
+  addParam("FitMCTracks", m_fitMCTracks, "True if MC tracks should be fitted", true);
+  addParam("FitRecoTracks", m_fitRecoTracks, "True if track candidates from pattern recognition should be fitted", false);
 }
-
 
 GenFitterModule::~GenFitterModule()
 {
-
 }
-
 
 void GenFitterModule::initialize()
 {
-}
 
+}
 
 void GenFitterModule::beginRun()
 {
-}
 
+}
 
 void GenFitterModule::event()
 {
-  StoreArray<Relation> trackToCDCRecoHits(m_trackToCDCRecoHitCollectionName);
-  if (trackToCDCRecoHits) {
-    StoreArray<CDCRecoHit> cdcRecoHits(trackToCDCRecoHits[0]->getToAccessorInfo());
+  B2INFO("**********   GenFitterModule  ************");
+  StoreArray<MCParticle> mcParticles(m_mcParticlesCollectionName);
+  B2INFO("GenFitter: total Number of MCParticles: " << mcParticles.GetEntries());
+  if (mcParticles.GetEntries() == 0) B2WARNING("GenFitter: MCParticlesCollection is empty!");
 
-    for (int iPart = 0; iPart < trackToCDCRecoHits->GetEntriesFast(); iPart++) {
-      //aquire the list, which is associated with iPart:
-      list<unsigned short int> cdcRecoHitIndices =  trackToCDCRecoHits[iPart]->getToIndices();
-      if (cdcRecoHitIndices.empty()) {
-        continue;
-      }
+  StoreArray<CDCRecoHit> cdcRecoHits(m_cdcRecoHitsCollectionName);
+  B2INFO("GenFitter: Number of CDCRecoHits: " << cdcRecoHits.GetEntries());
+  if (cdcRecoHits.GetEntries() == 0) B2WARNING("GenFitter: CDCRecoHitsCollection is empty!");
 
-      // I need some starting values for the Fitter.
-      // Later taken from the Track associated with the Relation.
-      TVector3 vertex;
-      TVector3 momentumDirection(1., 1., 1.);
+  //StoreArray<MCMatchParticle> mcMatchParticles("MCMatchParticles");
 
-      GFAbsTrackRep* trackRep = 0;
-      trackRep = new RKTrackRep(vertex, momentumDirection, 13);
+  //Give Genfit the magnetic field, should come from the common database later...
+  GFFieldManager::getInstance()->init(new GFConstField(0., 0., 15.));
 
-//      GFTrack fitTrack(trackRep);//initialized with smeared rep
+  if (m_fitMCTracks == true) {
 
-      /*    for(list<unsigned short int>::iterator iter = cdcRecoHitIndices.begin(); iter != cdcRecoHitIndices.end(); iter++){
-            fitTrack.addHit(cdcRecoHits[(*iter)]);
-          }*/
+    B2INFO("-------   Fitting using true MCparticle tracks  ---------------");
 
+    StoreArray<Track> tracks(m_tracksCollectionName);
+    B2INFO("GenFitter: Number of Tracks: " << tracks.GetEntries());
+    if (tracks.GetEntries() == 0) B2WARNING("GenFitter: TracksCollection is empty!");
+
+    StoreArray<Relation> trackToCDCRecoHits(m_trackToCDCRecoHitCollectionName);
+    B2INFO("GenFitter: Number of relations between Tracks and CDCRecoHits: " << trackToCDCRecoHits.GetEntries());
+    if (trackToCDCRecoHits.GetEntries() == 0) B2WARNING("GenFitter: TrackToCDCRecoHitsCollection is empty!");
+
+    StoreArray<Relation> trackToMCPart(m_trackToMCParticleCollectionName);
+    B2INFO("GenFitter: Number of relations between Tracks and MCParticles: " << trackToMCPart.GetEntries());
+    if (trackToMCPart.GetEntries() == 0) B2WARNING("GenFitter: TrackToMCParticlesCollection is empty!");
+
+    //loop over all tracks
+    for (int i = 0; i < tracks->GetEntries(); i++) {
+      B2INFO("#### Fit track Nr. : " << i);
+      //get the index of the MCParticle which produced this track
+      int mcindex = trackToMCPart[i]->getToIndex();
+
+      //get fit starting values from the MCParticle
+      TVector3 vertex = mcParticles[mcindex]->getProductionVertex();
+      TVector3 momentum = mcParticles[mcindex]->getMomentum();
+      int pdg = mcParticles[mcindex]->getPDG();
+
+      //B2INFO("MCIndex: "<<mcindex);
+      B2INFO("Start values: momentum: " << momentum.x() << "  " << momentum.y() << "  " << momentum.z());
+      B2INFO("Start values: vertex:   " << vertex.x() << "  " << vertex.y() << "  " << vertex.z());
+      B2INFO("Start values: pdg:      " << pdg);
+
+      //Now create a GenFit track with this representation
+      GFAbsTrackRep* trackRep = new RKTrackRep(vertex, momentum, pdg);
+      GFTrack track(trackRep);
+
+      //Collect all RecoHits for this track
+      //Caution: for the moment RecoHits are not sorted, but GenFit needs them in a certain order.
+      //It seems that that order is by chance correct for simple single tracks, but the fit may fail for more complicated events.
+      list<short unsigned int> indexList = trackToCDCRecoHits[i]->getToIndices();
+      for (int j = 0; j < cdcRecoHits->GetEntries(); j++) {
+        int counter = -1;
+        list<short unsigned int>::iterator iter;
+        for (iter = indexList.begin(); iter != indexList.end(); iter++) {
+          if (j == *iter) {
+            //B2INFO("Add Reco Hit");
+            counter++;
+            track.addHit(cdcRecoHits[j], 0, counter);
+          }
+        }
+      }//end loop over RecoHits
+
+      B2INFO("Number of hits assigned to the track to be fitted: " << track.getNumHits());
+
+      //Initialize fitting algorithm and process track
       GFKalman k;
+      //GFDaf daf;
+      //k.setNumIterations(1);
+      //k.setInitialDirection(-1);
+      k.processTrack(&track);
+      //track.Print();
+      B2INFO("-----> Fit Result: momentum: " << track.getMom().x() << "  " << track.getMom().y() << "  " << track.getMom().z());
+      //mcMatchParticles[mcindex]->setFitMCMomentum(track.getMom());
+      B2INFO("----> Chi2 of the fit: " << track.getChiSqu());
+      //mcMatchParticles[mcindex]->setChi2(track.getChiSqu());
+
+      track.releaseHits();
+
+    }//end loop over tracks
+
+  }//endif m_fitMCTracks
+
+  if (m_fitRecoTracks == true) {
+
+    B2INFO("Fitting using PatternReco tracks is still under development ...");
+    /*
+    B2INFO("-------   Fitting using PatternReco tracks  ---------------");
+
+    StoreArray<CDCTrack> cdcTracksArray("TrackCDCArray");
+    //StoreArray<CDCTrackHit> cdcTrackHitArray("TrackHitCDCArray");
+    StoreArray<Relation> trackToMC ("CDCTracksToMCParticles");
+    StoreArray<Relation> tracksToHits ("CDCTracksToCDCRecoHits");
 
 
+    for (int i = 0; i< cdcTracksArray->GetEntries(); i++){ //loop over all tracks
 
+    TVector3 vertex(0.,0.,0.);
+    TVector3 momentum_reco = cdcTracksArray[i]->getMomentumVector()*cdcTracksArray[i]->getMomentumValue();
+    B2INFO("Momentum from pattern recognition: "<<momentum_reco.x()<<"  "<<momentum_reco.y()<<"  "<<momentum_reco.z());
+    int charge = cdcTracksArray[i]->getChargeSign();
+    TVector3 momentum_sim;
 
-    }
+    int mcindex = trackToMC[i]->getToIndex();
+    momentum_sim = mcParticles[mcindex]->getMomentum();
+    B2INFO("mc momentum: "<<momentum_sim.x()<<"  "<<momentum_sim.y()<<"  "<<momentum_sim.z());
+
+    GFAbsTrackRep* trackRep = new RKTrackRep(vertex, momentum_reco, 211*charge);
+    GFTrack track(trackRep);
+
+    //get all RecoHits for this track
+    list<short unsigned int> indexList = tracksToHits[i]->getToIndices();
+    for (int j = 0; j < recoHits->GetEntries(); j++){
+      int counter = -1;
+      list<short unsigned int>::iterator iter;
+      for (iter = indexList.begin(); iter != indexList.end(); iter++) {
+           if (j==*iter){
+               //B2INFO("Add Reco Hit");
+               counter++;
+               track.addHit(recoHits[j],0,counter);
+           }
+        }
+    }//end loop over RecoHits
+
+        B2INFO("Nr of hits in the track to fit: "<<track.getNumHits());
+        GFKalman k;
+        GFDaf daf;
+        //k.setNumIterations(1);
+        k.processTrack(&track);
+        //track.Print();
+        B2INFO("fitted Momentum: "<<track.getMom().x()<<"  "<<track.getMom().y()<<"  "<<track.getMom().z());
+        mcMatchParticles[mcindex]->setFitRecoMomentum(track.getMom());
+        B2INFO("Chi2 of the fit: "<<track.getChiSqu());
+        mcMatchParticles[mcindex]->setChi2(track.getChiSqu());
+
+      track.releaseHits();
+
+    }//end loop over tracks
+    */
+
   }
 }
 
-
 void GenFitterModule::endRun()
 {
+
 }
 
 void GenFitterModule::terminate()
 {
+
 }
+
+
+

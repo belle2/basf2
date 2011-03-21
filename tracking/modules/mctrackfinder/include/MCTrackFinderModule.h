@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Martin Heck                                              *
+ * Contributors: Martin Heck & Oksana Brovchenko                          *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -42,17 +42,21 @@ namespace Belle2 {
 
     void initialize();
 
-    /** Here the actual work is done.
-     */
+    /** Here the actual work is done. */
     void event();
 
+    /** End of the event processing. */
     void terminate();
 
 
   private:
 
+    /** Returns the list of 'from' indices for the given 'to' index for the given relation.
+     */
     std::list<int> getFromForTo(const std::string& relationName, const unsigned short int& toIndex);
 
+    /** Returns the 'to' index for the given 'from' index for the given relation.
+     */
     int getToForFrom(const std::string relationName, int fromIndex) {
       StoreArray<Relation> relations(relationName);
       for (int ii = 0; ii < relations->GetEntriesFast(); ii++) {
@@ -63,8 +67,14 @@ namespace Belle2 {
       return (-999);
     }
 
-    std::string m_trackToCDCRecoHitCollectionName;
+    std::string m_mcParticlesCollectionName;                /**< MCParticles collection name */
+    std::string m_mcPartToCDCSimHitsCollectionName;         /**< MCParticles to CDCSimHits relation name */
+    std::string m_cdcRecoHitsCollectionName;                /**< CDCRecoHits collection name */
+    std::string m_cdcSimHitToCDCHitCollectioName;           /**< CDCSimHits to CDCHits relation name */
+    std::string m_tracksCollectionName;                     /**< Tracks collection name */
+    std::string m_trackToMCParticleCollectionName;          /**< Tracks to MCParticles relation name */
+    std::string m_trackToCDCRecoHitCollectionName;          /**< Tracks to CDCRecoHits relation name */
   };
 }
 
-#endif /* GENFITTERMODULE_H_ */
+#endif /* MCTRACKFINDERMODULE_H_ */

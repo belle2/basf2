@@ -44,11 +44,13 @@ CDCTrackingModule::CDCTrackingModule() : Module()
 {
   setDescription("Performs the first rough pattern recognition step in the CDC: digitized CDC Hits are combined to track candidates.");
 
-  addParam("CDCSimHitsColName", m_inCDCSimHitsColName, "Input simulated hits collection name (only for crosschecking)", string("CDCSimHits"));
-  addParam("CDCHitsColName", m_inCDCHitsColName, "Input digitized hits collection name (has to match with the output of CDCDigi module)", string("CDCHits"));
-  addParam("CDCRecoHitsColName", m_inCDCRecoHitsColName, "Input reco hits collection name (needed for relation creation)", string("CDCRecoHits"));
-  addParam("TrackCandidatesColName", m_outCDCTrackCandsColName, "Output collection  (track candidates) name", string("CDCTrackCandidates"));
-  addParam("TrackCandsToCDCRecoHitsRelName", m_outCDCTrackCandsToRecoHits, "Output relation (track candidates to cdc recohits) name", string("CDCTrackCandidatesToCDCRecoHits"));
+  addParam("CDCSimHitsColName", m_cdcSimHitsColName, "Name of collection holding the CDCSimHits (only for crosschecking)", string("CDCSimHits"));
+  addParam("CDCHitsColName", m_cdcHitsColName, "Name of collection holding the digitized CDCHits (should be created by CDCDigi module)", string("CDCHits"));
+  addParam("CDCRecoHitsColName", m_cdcRecoHitsColName, "Name of collection holding the CDCRecoHits (should be created by CDCRecoHitMaker module)", string("CDCRecoHits"));
+
+  addParam("CDCTrackCandidatesColName", m_cdcTrackCandsColName, "Name of collection holding the CDCTrackCandidates (output)", string("CDCTrackCandidates"));
+  addParam("CDCTrackCandsToCDCRecoHitsColName", m_cdcTrackCandsToRecoHits, "Name of collection holding the relations between CDCTrackCandidates and CDCRecoHits (output)", string("CDCTrackCandidatesToCDCRecoHits"));
+
   addParam("TextFileOutput", m_textFileOutput, "Set to true if some text files with hit coordinates should be created", false);
 
 }
@@ -79,12 +81,14 @@ void CDCTrackingModule::event()
 {
 
   //StoreArray with simulated CDCHits, should already be created by previous modules
-  StoreArray<CDCSimHit> cdcSimHits(m_inCDCSimHitsColName);
-  B2INFO("Number of simulated Hits:  " << cdcSimHits.GetEntries());
+  StoreArray<CDCSimHit> cdcSimHits(m_cdcSimHitsColName);
+  B2INFO("CDCTracking: Number of simulated Hits:  " << cdcSimHits.GetEntries());
+  if (cdcSimHits.GetEntries() == 0) B2WARNING("CDCTracking: cdcSimHitsCollection is empty!");
 
   //StoreArray with digitized CDCHits, should already be created by CDCDigitized module
-  StoreArray<CDCHit> cdcHits(m_inCDCHitsColName);
-  B2INFO("Number of digitized Hits: " << cdcHits.GetEntries());
+  StoreArray<CDCHit> cdcHits(m_cdcHitsColName);
+  B2INFO("CDCTracking: Number of digitized Hits: " << cdcHits.GetEntries());
+  if (cdcHits.GetEntries() == 0) B2WARNING("CDCTracking: cdcHitsCollection is empty!");
 
   //StoreArray with CDCTrackHits, a class which has a pointer to the original CDCHit, but also additional member variables and methods needed for tracking.
   StoreArray<CDCTrackHit> cdcTrackHits("CDCTrackHits");
@@ -139,12 +143,12 @@ void CDCTrackingModule::event()
   }
 
 //create StoreArray for CDCTrackCandidates
-  StoreArray<CDCTrackCandidate> cdcTrackCandidates(m_outCDCTrackCandsColName);
+  StoreArray<CDCTrackCandidate> cdcTrackCandidates(m_cdcTrackCandsColName);
 
 //combine Axial Segments to Tracks, fill cdcTracksArray with new Tracks
 
   B2INFO("Collect track candidates by connecting axial Segments...");
-  AxialTrackFinder::CollectTrackCandidates(cdcAxialSegments, m_outCDCTrackCandsColName); //assigns Segments to Tracks, returns a Tracks array
+  AxialTrackFinder::CollectTrackCandidates(cdcAxialSegments, m_cdcTrackCandsColName); //assigns Segments to Tracks, returns a Tracks array
 
   B2INFO("Number of track candidates: " << cdcTrackCandidates.GetEntries());
   B2INFO("Track Id  Nr of Segments  Nr of Hits   |p|[GeV]:");
@@ -158,9 +162,9 @@ void CDCTrackingModule::event()
 
 //Append Stereo Segment to existing Tracks
   B2INFO("Append stereo Segments...");
-  StereoFinder::AppendStereoSegments(cdcStereoSegments, m_outCDCTrackCandsColName);
+  StereoFinder::AppendStereoSegments(cdcStereoSegments, m_cdcTrackCandsColName);
 
-  B2INFO("Track Id  Nr of Segments  Nr of Hits   |p|[GeV]         p(x,y,z)                charge  :");
+  B2INFO("Track Id  Nr of Segments  Nr of Hits   |p|[GeV]         p(x,y,z)               charge  :");
 
   for (int j = 0; j < cdcTrackCandidates.GetEntries(); j++) { //loop over all Tracks
 
@@ -183,8 +187,8 @@ void CDCTrackingModule::event()
 
   //Create relations between TrackCandidates and CDCRecoHits
   B2INFO("Create Relations between TrackCandidates and CDCRecoHits...");
-  StoreArray<Relation> trackCandsToRecoHits(m_outCDCTrackCandsToRecoHits);
-  StoreArray<CDCRecoHit> cdcRecoHits(m_inCDCRecoHitsColName);
+  StoreArray<Relation> trackCandsToRecoHits(m_cdcTrackCandsToRecoHits);
+  StoreArray<CDCRecoHit> cdcRecoHits(m_cdcRecoHitsColName);
 
   for (int i = 0 ; i < cdcTrackCandidates->GetEntries(); i++) {
     list<int> indexList;
@@ -197,7 +201,7 @@ void CDCTrackingModule::event()
     indexList.clear();
   }
 
-
+  B2INFO(trackCandsToRecoHits->GetEntries() << "  relations created");
 
   if (m_textFileOutput) {
 

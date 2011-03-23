@@ -10,10 +10,10 @@
 
 #include <svd/dataobjects/SVDVolumeUserInfo.h>
 
-#include <framework/logging/Logger.h>
+//#include <framework/logging/Logger.h>
 
-#include <G4VPhysicalVolume.hh>
-#include <TG4RootDetectorConstruction.h>
+//#include <G4VPhysicalVolume.hh>
+//#include <TG4RootDetectorConstruction.h>
 
 using namespace std;
 using namespace Belle2;

@@ -16,10 +16,17 @@
 
 #include <TObject.h>
 
-class G4VPhysicalVolume;
-class TG4RootDetectorConstruction;
+//class G4VPhysicalVolume;
+//class TG4RootDetectorConstruction;
 
 namespace Belle2 {
+
+  /** Default step size.
+   *  This is now the only place where Geant4 step length limit can be
+   *  defined. Set to something positive to make step limit active.
+   *  Will be fixed in future.
+   */
+  const double stepLengthInSVD = -1.0 * Unit::um;
 
   /**
     * SVDVolumeUserInfo - Additional information for a SVD sensitive volume.
@@ -36,7 +43,7 @@ namespace Belle2 {
         m_layerID(-1),    /* Layer ID. */
         m_ladderID(-1),   /* Ladder ID. */
         m_sensorID(-1) {  /* Sensor ID. */
-      m_stepSize = 10.0 * Unit::um;
+      m_stepSize = stepLengthInSVD;
     }
 
     /** Full constructor.
@@ -51,7 +58,7 @@ namespace Belle2 {
         m_layerID(layerID),
         m_ladderID(ladderID),
         m_sensorID(sensorID) {
-      m_stepSize = 10.0 * Unit::um;
+      m_stepSize = stepLengthInSVD;
     }
 
     /** Destructor */

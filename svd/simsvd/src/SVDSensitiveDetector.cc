@@ -19,7 +19,6 @@
 
 #include <TVector3.h>
 #include <TGeoManager.h>
-#include <TG4RootNavMgr.h>
 
 // Geant4
 #include <G4Types.hh>
@@ -57,16 +56,7 @@ SVDSensitiveDetector::SVDSensitiveDetector(G4String name) :
 
 void SVDSensitiveDetector::Initialize(G4HCofThisEvent* HCTE)
 {
-  // Get DetectorConstruction class to map G4 volumes to TGeo - for UserInfo.
-  TG4RootNavMgr* navMgr = TG4RootNavMgr::GetInstance(gGeoManager);
-  if (navMgr == NULL) {
-    B2ERROR("Could not retrieve an instance of the TG4RootNavMgr !")
-  } else {
-    m_detMap = navMgr->GetDetConstruction();
-  }
-  if (m_detMap == NULL) {
-    B2ERROR("Detector Construction unavailable!!!")
-  };
+
 }
 
 SVDSensitiveDetector::~SVDSensitiveDetector()
@@ -127,7 +117,7 @@ G4bool SVDSensitiveDetector::ProcessHits(G4Step* step, G4TouchableHistory*)
   // check that user limits are set properly
   G4UserLimits* userLimits = g4Volume.GetLogicalVolume()->GetUserLimits();
   if (userLimits) {
-    B2INFO("Volume " << g4Volume.GetName() << ": m	ax. allowed step set to " << userLimits->GetMaxAllowedStep(track))
+    B2DEBUG(100, "Volume " << g4Volume.GetName() << ": m	ax. allowed step set to " << userLimits->GetMaxAllowedStep(track))
   }
 
   const G4ThreeVector momIn(preStep.GetMomentum());
@@ -151,7 +141,7 @@ G4bool SVDSensitiveDetector::ProcessHits(G4Step* step, G4TouchableHistory*)
   int ladderID = -1;
   int sensorID = -1;
 
-  const TGeoVolume* tGeoVolume = m_detMap->GetVolume(g4Volume.GetLogicalVolume());
+  const TGeoVolume* tGeoVolume = gGeoManager->FindVolumeFast(g4Volume.GetName());
   if (tGeoVolume == NULL) {
     B2ERROR("Cannot retrieve logical volume!")
     return false;

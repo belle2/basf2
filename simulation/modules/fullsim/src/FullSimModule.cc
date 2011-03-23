@@ -32,6 +32,7 @@
 #include <QGSP_BERT.hh>
 #include <G4EventManager.hh>
 #include <G4RunManager.hh>
+#include <G4StepLimiter.hh>
 
 #include <TGeoManager.h>
 #include <TG4RootNavMgr.h>
@@ -160,6 +161,12 @@ void FullSimModule::initialize()
         transport->SetThresholdTrials(m_thresholdTrials);
         break;
       }
+    }
+    // Add StepLimiter process for charged tracks.
+    double zeroChargeTol = 0.01 * Unit::e;
+    if (fabs(currParticle->GetPDGCharge()) > zeroChargeTol) {
+      currParticle->GetProcessManager()->AddDiscreteProcess(new G4StepLimiter());
+      B2DEBUG(100, "Added StepLimiter process for " << currParticle->GetParticleName())
     }
   }
 

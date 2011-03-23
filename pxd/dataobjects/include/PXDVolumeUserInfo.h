@@ -16,10 +16,17 @@
 
 #include <TObject.h>
 
-class G4VPhysicalVolume;
-class TG4RootDetectorConstruction;
+//class G4VPhysicalVolume;
+//class TG4RootDetectorConstruction;
 
 namespace Belle2 {
+
+  /** Default step size.
+   *  This is now the only place where Geant4 step length limit can be
+   *  defined. Set to something positive to make step limit active.
+   *  Will be fixed in future.
+   */
+  const double stepLengthInPXD = -1.0 * Unit::um;
 
   /**
     * PXDVolumeUserInfo - Additional information for a PXD sensitive volume.
@@ -33,14 +40,14 @@ namespace Belle2 {
 
     /** Empty constructor, required for ROOT IO.*/
     PXDVolumeUserInfo(): VolumeUserInfoBase(),
-        m_layerID(-1),    /* Layer ID. */
-        m_ladderID(-1),   /* Ladder ID. */
+        m_layerID(-1),
+        m_ladderID(-1),
         m_sensorID(-1),
         m_uPitch(0),
         m_uCells(1),
         m_vPitch(0),
-        m_vCells(1) {  /* Sensor ID. */
-      m_stepSize = 10.0 * Unit::um;
+        m_vCells(1) {
+      m_stepSize = stepLengthInPXD;
     }
 
     /** Full constructor.
@@ -67,7 +74,7 @@ namespace Belle2 {
         m_uCells(uCells),
         m_vPitch(vPitch),
         m_vCells(vCells) {
-      m_stepSize = 10.0 * Unit::um;
+      m_stepSize = stepLengthInPXD;
     }
 
     /** Destructor */

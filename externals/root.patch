@@ -1,6 +1,6 @@
 Index: montecarlo/eg/src/TDatabasePDG.cxx
 ===================================================================
---- montecarlo/eg/src/TDatabasePDG.cxx	(revision 32327)
+--- montecarlo/eg/src/TDatabasePDG.cxx	(revision 38397)
 +++ montecarlo/eg/src/TDatabasePDG.cxx	(working copy)
 @@ -19,6 +19,7 @@
  #include "TDecayChannel.h"
@@ -10,7 +10,7 @@ Index: montecarlo/eg/src/TDatabasePDG.cxx
  
  
  ////////////////////////////////////////////////////////////////////////
-@@ -679,6 +680,73 @@
+@@ -703,6 +704,73 @@
  
  
  //______________________________________________________________________________
@@ -86,7 +86,7 @@ Index: montecarlo/eg/src/TDatabasePDG.cxx
     //browse data base
 Index: montecarlo/eg/inc/TDatabasePDG.h
 ===================================================================
---- montecarlo/eg/inc/TDatabasePDG.h	(revision 32327)
+--- montecarlo/eg/inc/TDatabasePDG.h	(revision 38397)
 +++ montecarlo/eg/inc/TDatabasePDG.h	(working copy)
 @@ -82,6 +82,8 @@
     virtual void   ReadPDGTable (const char *filename = "");

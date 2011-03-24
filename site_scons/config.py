@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 from SCons.Script import *
@@ -179,6 +179,9 @@ def configure_externals(conf):
         print 'root configuration tool missing'
         print '-> create it with the command "scons externals"'
         return False
+
+    # geant4_vmc
+    conf.env.Append(CPPPATH=os.path.join(conf.env['EXTINCDIR'], 'geant4_vmc'))
 
     # genfit
     conf.env.Append(CPPPATH=os.path.join(conf.env['EXTINCDIR'], 'genfit'))

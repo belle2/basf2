@@ -36,10 +36,10 @@ ModuleParamList::~ModuleParamList()
 }
 
 
-ParamTypeInfo::ParamTypeInfo ModuleParamList::getParamTypeInfo(const std::string& name) const
+ParamTypeInfo ModuleParamList::getParamTypeInfo(const std::string& name) const
 {
   string typeName = getParamTypeString(name);
-  ParamTypeInfo::ParamTypeInfo notSupportedType(ParamTypeInfo::c_NotSupportedPBT, ParamTypeInfo::c_NotSupportedPVT, "Not supported");
+  ParamTypeInfo notSupportedType(ParamTypeInfo::c_NotSupportedPBT, ParamTypeInfo::c_NotSupportedPVT, "Not supported");
 
   if (!typeName.empty()) {
     map<string, ParamTypeInfo>::const_iterator mapIter = m_paramTypeInfoMap.find(typeName);
@@ -90,7 +90,7 @@ boost::python::list ModuleParamList::getParamInfoListPython() const
 
 void ModuleParamList::setParamObjectPython(const std::string& name, const boost::python::object& pyObj)
 {
-  ParamTypeInfo::ParamTypeInfo paramInfo = getParamTypeInfo(name);
+  ParamTypeInfo paramInfo = getParamTypeInfo(name);
 
   if (paramInfo.m_paramBasicType != ParamTypeInfo::c_SingleParam) {
     B2ERROR("The parameter type of parameter '" + name + "' is not a single parameter value !")
@@ -118,7 +118,7 @@ void ModuleParamList::setParamObjectPython(const std::string& name, const boost:
 
 void ModuleParamList::setParamListPython(const std::string& name, const boost::python::list& pyList)
 {
-  ParamTypeInfo::ParamTypeInfo paramInfo = getParamTypeInfo(name);
+  ParamTypeInfo paramInfo = getParamTypeInfo(name);
 
   if (paramInfo.m_paramBasicType != ParamTypeInfo::c_ListParam) {
     B2ERROR("The parameter type of parameter '" + name + "' is not a list parameter value !")
@@ -171,7 +171,7 @@ std::string ModuleParamList::getParamTypeString(const std::string& name) const
 
 void ModuleParamList::getParamValuesPython(const std::string& name, boost::python::list& outputList, bool defaultValues) const
 {
-  ParamTypeInfo::ParamTypeInfo paramInfo = getParamTypeInfo(name);
+  ParamTypeInfo paramInfo = getParamTypeInfo(name);
 
   switch (paramInfo.m_paramBasicType) {
     case ParamTypeInfo::c_SingleParam:

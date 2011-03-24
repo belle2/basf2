@@ -13,10 +13,10 @@
 using namespace std;
 using namespace Belle2;
 
-DataStore::DataStore* DataStore::m_instance = 0;
+DataStore* DataStore::m_instance = 0;
 
 
-DataStore::DataStore& DataStore::Instance()
+DataStore& DataStore::Instance()
 {
   //Access to singleton
   if (!m_instance) { m_instance = new DataStore;}

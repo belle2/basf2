@@ -148,7 +148,7 @@ namespace Belle2 {
      * @param name The unique name of the parameter.
      * @return The parameter type information.
      */
-    ParamTypeInfo::ParamTypeInfo getParamTypeInfo(const std::string& name) const;
+    ParamTypeInfo getParamTypeInfo(const std::string& name) const;
 
     /**
      * Returns true if unset parameters exist which the user has to set in the steering file.
@@ -392,7 +392,7 @@ namespace Belle2 {
   {
     try {
       ModuleParam<T>& explModParam = getParameter<T>(name);
-      ParamTypeInfo::ParamTypeInfo paramInfo = getParamTypeInfo(name);
+      ParamTypeInfo paramInfo = getParamTypeInfo(name);
 
       if (paramInfo.m_paramBasicType != ParamTypeInfo::c_SingleParam) {
         B2ERROR("The parameter type of parameter '" + name + "' is not a single parameter value !")
@@ -417,7 +417,7 @@ namespace Belle2 {
   {
     try {
       ModuleParam<T>& explModParam = getParameter<T>(name);
-      ParamTypeInfo::ParamTypeInfo paramInfo = getParamTypeInfo(name);
+      ParamTypeInfo paramInfo = getParamTypeInfo(name);
 
       if (paramInfo.m_paramBasicType != ParamTypeInfo::c_ListParam) {
         B2ERROR("The parameter type of parameter '" + name + "' is not a list parameter value !")

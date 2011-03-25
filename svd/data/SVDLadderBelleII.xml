@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <Ladder>
   <Ribs>
   <Material>Air</Material>
@@ -21,11 +21,11 @@
 <Shape>Trd2</Shape>
 <Color>391</Color>
   <Thickness unit="mm">6.5</Thickness>
-  <Width unit="mm">3</Width>  
-  </Foam>    
-</Rib>  
+  <Width unit="mm">3</Width>
+  </Foam>
+</Rib>
 </Ribs>
-  
+
 <CoolingPipe>
 <Name>SVD_Layer_%Layer_Cooling_Pipe</Name>
       <Material>SVD_Aluminium</Material>
@@ -35,7 +35,7 @@
       <OuterRadius desc="The outer radius of the cooling pipe" unit="mm">0.7</OuterRadius>
       <InnerRadius desc="The inner radius of the cooling pipe" unit="mm">0.65</InnerRadius>
       <UPosition desc="The position of the cooling pipe in u direction" unit="mm">17.2</UPosition>
-<!-- The following parameters are NOT CORRECT!!!! /!-->      
+<!-- The following parameters are NOT CORRECT!!!! /!-->
       <WPosition desc="Distance between center of the sensor and center of cooling pipe " unit="mm">4</WPosition>
       </CoolingPipe>
 </Ladder>

@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <ParamSet type="SVD">
   <Name>SVD</Name>
   <Description>The key component of the tracking system</Description>
@@ -14,9 +14,10 @@
       <Layer id="SVD_Layer_3">
         <Name>SVD_Layer_%Layer</Name>
         <Material>Air</Material>
-        <Shape>Assembly</Shape>
         <Shape>Tube</Shape>
-        <!-- <InnerRadius unit="mm">35</InnerRadius><OuterRadius unit="mm">49</OuterRadius><Length unit="mm">310</Length> /-->
+        <InnerRadius unit="mm">36</InnerRadius>
+        <OuterRadius unit="mm">50</OuterRadius>
+        <Length unit="mm">300</Length>
         <Phi0 desc="The starting angle of the layer in the r-phi plane" unit="deg">-8</Phi0>
         <NumberOfLadders desc="Number of Ladder in this layer">8</NumberOfLadders>
         <Ladder>
@@ -40,7 +41,7 @@
                 <KaptonFront>
                 <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//KaptonFront/*)"/>
                 <Mass unit="g">0.369843269592233</Mass>
-              </KaptonFront>                            
+              </KaptonFront>
             </Sensor>
           </Sensors>
         </Ladder>
@@ -48,7 +49,14 @@
       <Layer id="SVD_Layer_4">
         <Name>SVD_Layer_%Layer</Name>
         <Material>Air</Material>
-        <Shape>Assembly</Shape>
+        <Shape>Polycone</Shape>
+        <InnerRadiusHER unit="mm">56</InnerRadiusHER>
+        <OuterRadiusHER unit="mm">94</OuterRadiusHER>
+        <InnerRadiusLER unit="mm">45</InnerRadiusLER>
+        <OuterRadiusLER unit="mm">65</OuterRadiusLER>
+        <Z0 unit="mm">-170</Z0>
+        <Z1 unit="mm">88.63</Z1>
+        <Z2 unit="mm">225</Z2>
         <Phi0 desc="The starting angle of the layer in the r-phi plane" unit="deg">-6</Phi0>
         <NumberOfLadders desc="Number of Ladder in this layer">10</NumberOfLadders>
         <Ladder>
@@ -118,7 +126,14 @@
       <Layer id="SVD_Layer_5">
         <Name>SVD_Layer_%Layer</Name>
         <Material>Air</Material>
-        <Shape>Assembly</Shape>
+        <Shape>Polycone</Shape>
+        <InnerRadiusHER unit="mm">96</InnerRadiusHER>
+        <OuterRadiusHER unit="mm">128</OuterRadiusHER>
+        <InnerRadiusLER unit="mm">66</InnerRadiusLER>
+        <OuterRadiusLER unit="mm">85</OuterRadiusLER>
+        <Z0 unit="mm">-224</Z0>
+        <Z1 unit="mm">156.24</Z1>
+        <Z2 unit="mm">300</Z2>
         <Phi0 desc="The starting angle of the layer in the r-phi plane" unit="deg">-7</Phi0>
         <NumberOfLadders desc="Number of Ladder in this layer">14</NumberOfLadders>
         <Ladder>
@@ -201,9 +216,16 @@
       <Layer id="SVD_Layer_6">
         <Name>SVD_Layer_%Layer</Name>
         <Material>Air</Material>
+        <Shape>Polycone</Shape>
+        <InnerRadiusHER unit="mm">128</InnerRadiusHER>
+        <OuterRadiusHER unit="mm">150</OuterRadiusHER>
+        <InnerRadiusLER unit="mm">86</InnerRadiusLER>
+        <OuterRadiusLER unit="mm">102</OuterRadiusLER>
+        <Z0 unit="mm">-265</Z0>
+        <Z1 unit="mm">240</Z1>
+        <Z2 unit="mm">360</Z2>
         <Phi0 desc="The starting angle of the layer in the r-phi plane" unit="deg">-7</Phi0>
         <NumberOfLadders desc="Number of Ladder in this layer">17</NumberOfLadders>
-        <Shape>Assembly</Shape>
         <Ladder>
           <Name>SVD_Layer_%Layer_Ladder_%Ladder</Name>
           <Shape>Assembly</Shape>

@@ -159,12 +159,12 @@ void ModuleManager::fillModuleNameLibMap(boost::filesystem::directory_entry& map
   //Check if the associated shared library file exists
   string sharedLibPath = boost::filesystem::change_extension(mapPath, LIB_FILE_EXTENSION).string();
   if (!ModuleUtils::fileNameExists(sharedLibPath)) {
-    B2ERROR("The shared library file: " << sharedLibPath << " doesn't exist, but is required by " << mapPath.string())
+    B2ERROR("The shared library file: " << sharedLibPath << " doesn't exist, but is required by " << mapPath.path().string())
     return;
   }
 
   //Open the map file and parse the content line by line
-  ifstream mapFile(mapPath.string().c_str());
+  ifstream mapFile(mapPath.path().string().c_str());
   string currentLine;
 
   //Read each line of the map file and use boost regular expression to find the module name string in brackets.

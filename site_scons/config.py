@@ -181,7 +181,8 @@ def configure_externals(conf):
         return False
 
     # geant4_vmc
-    conf.env.Append(CPPPATH=os.path.join(conf.env['EXTINCDIR'], 'geant4_vmc'))
+    conf.env.Append(CPPPATH=os.path.join(conf.env['EXTINCDIR'],
+                    'geant4_vmc/g4root'))
 
     # genfit
     conf.env.Append(CPPPATH=os.path.join(conf.env['EXTINCDIR'], 'genfit'))

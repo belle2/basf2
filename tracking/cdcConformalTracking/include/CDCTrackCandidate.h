@@ -14,8 +14,6 @@
 #include "TObject.h"
 #include <tracking/cdcConformalTracking/CDCTrackHit.h>
 #include <tracking/cdcConformalTracking/CDCSegment.h>
-//#include "TVector2.h"
-
 
 
 namespace Belle2 {
@@ -114,24 +112,34 @@ namespace Belle2 {
     /** Returns the estimated charge of the track . */
     int getChargeSign() { return m_chargeSign; }
 
+    // The following methods are used to match the CDCTrackCandidate with MCParticles
 
-    //Methods to match the tracks with mc particles, will be explain and used in the next commit...
-    //------------------------------------------------------------
-    /*
-    std::vector<TVector2> getMCParticles(){ return m_mcParticles;}
+    /** Adds an MCParticle to the collection of MCParticles which produced the Hits of this TrackCandidate.
+     *  The Id of the MCParticle is added to the m_mcParticles vector.
+     *  If this MCParticle has already contributed to this TrackCandidate, the corresponding number of Hits is augmented by 1.
+     */
+    void addMCParticle(int id);
 
-    void addMCParticle(int Id);
-
+    /** Matches the TrackCandidate with an MCParticle.
+     *  This method selects the largest contribution in m_mcParticle and assigns the Id of the matched MCParticle and the purity of the TrackCandidate.
+     */
     void evaluateMC();
 
-    double evaluateMC(int mcId);
+    /** Returns a vector of pairs: MCParticleId & Number of Hits produced by this MCParticle. */
+    std::vector<std::pair<int, int> > getMCParticles() { return m_mcParticles; }
 
-    double getCorrectMC(){ return m_correctMC; }
+    /** Returns the Id of the MCParticle matched to this TrackCandidate. */
+    int getMCId() { return m_mcId; }
 
-    double getMCIndex(){return m_mcIndex;}
-    */
-    //--------------------------------------------------------------
+    /** Returns the purity of this TrackCandidate.
+     *  Purity means in this case: number of Hits contributed by the matched MCParticle/total number of Hits * 100 .
+     */
+    double getPurity() { return m_purity; }
 
+    /** Returns the contribution of the given MCParticle to this TrackCandidate.
+     *  Return value is: number of Hits contributed by the given MCParticle/total number of Hits * 100 .
+     */
+    double getRatioForMCP(int mcId);
 
 
   private:
@@ -145,25 +153,24 @@ namespace Belle2 {
 
     TVector3 m_direction;                   /**< Direction of the TrackCandidate in the conformal plane */
 
-    CDCTrackHit m_innerMostHit;           /**< Innermost (closest to the origin) hit of the TrackCandidate */
+    CDCTrackHit m_innerMostHit;             /**< Innermost (closest to the origin) hit of the TrackCandidate */
     CDCTrackHit m_outerMostHit;             /**< Outermost (farthest to the origin) hit of the TrackCandidate */
     CDCSegment m_innerMostSegment;          /**< Innermost (closest to the origin) segment of the TrackCandidate */
     CDCSegment m_outerMostSegment;          /**< Outermost (farthest to the origin) segment of the TrackCandidate */
 
     double m_chi2;                          /**< Chi2 value to describe the quality of the TrackCandidate */
 
-    double m_momentumValue;                 /**< Absolut momentum value of the TrackCandidate */
+    double m_momentumValue;                 /**< Absolute momentum value of the TrackCandidate */
     TVector3 m_momentumVector;              /**< 3D momentum vector of the TrackCandidate */
 
     int m_chargeSign;                       /**< Charge of the TrackCandidate. (+1 or -1)*/
 
+    //The following member variables are used to match the CDCTrackCandidate with MCParticles
 
-    //Member variables to match the tracks with mc particles
-    //----------------------------------------------------------------
-    //std::vector<TVector2> m_mcParticles;
-    //double m_correctMC;
-    //int m_mcIndex;
-    //---------------------------------------------------------------
+    std:: vector <std::pair<int, int> > m_mcParticles;  /**< vector to store pairs <MCParticleId, Number of Hits from this MCParticle> */
+    int m_mcId;                                         /**< Id of the MCParticle matched to this TrackCandidate */
+    double m_purity;                                    /**< Purity of this TrackCandidate: contribution from the matched MCParticle */
+
 
     /** ROOT ClassDef macro to make this class a ROOT class.*/
     ClassDef(CDCTrackCandidate, 1);

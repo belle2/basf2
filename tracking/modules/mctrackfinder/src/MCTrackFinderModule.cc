@@ -66,19 +66,19 @@ void MCTrackFinderModule::event()
 {
   B2INFO("*******   MCTrackFinderModule  *******");
   StoreArray<MCParticle> mcParticles(m_mcParticlesCollectionName);
-  B2INFO("MCTrackFinder: total Number of MCParticles: " << mcParticles.GetEntries());
+  //B2INFO("MCTrackFinder: total Number of MCParticles: "<<mcParticles.GetEntries());
   if (mcParticles.GetEntries() == 0) B2WARNING("MCTrackFinder: MCParticlesCollection is empty!");
 
   StoreArray<Relation>   mcPartToSimHits(m_mcPartToCDCSimHitsCollectionName);
-  B2INFO("MCTrackFinder: Number of relations between MCParticles and SimHits: " << mcPartToSimHits.GetEntries());
+  //B2INFO("MCTrackFinder: Number of relations between MCParticles and SimHits: "<<mcPartToSimHits.GetEntries());
   if (mcPartToSimHits.GetEntries() == 0) B2WARNING("MCTrackFinder: MCParticlesToSimHitsCollection is empty!");
 
   StoreArray<Relation>  cdcSimHitToCDCHits(m_cdcSimHitToCDCHitCollectioName);
-  B2INFO("MCTrackFinder: Number of relations between SimHits and CDCHits: " << cdcSimHitToCDCHits.GetEntries());
+  //B2INFO("MCTrackFinder: Number of relations between SimHits and CDCHits: "<<cdcSimHitToCDCHits.GetEntries());
   if (cdcSimHitToCDCHits.GetEntries() == 0) B2WARNING("MCTrackFinder: SimHitsToCDCHitsCollection is empty!");
 
   StoreArray<CDCRecoHit> cdcRecoHits(m_cdcRecoHitsCollectionName);
-  B2INFO("MCTrackFinder: Number of CDCRecoHits: " << cdcRecoHits.GetEntries());
+  //B2INFO("MCTrackFinder: Number of CDCRecoHits: "<<cdcRecoHits.GetEntries());
   if (cdcRecoHits.GetEntries() == 0) B2WARNING("MCTrackFinder: CDCRecoHitsCollection is empty!");
 
   B2INFO("-> Create relations for primary particles");
@@ -131,7 +131,7 @@ void MCTrackFinderModule::event()
       B2INFO("Create relation between Track " << counter << "  and  " << otherList.size() << "  RecoHits");
       //create relation between th track and the mcParticle
       new(trackToMCParticles->AddrAt(counter)) Relation(tracks, mcParticles, counter, iPart);
-      B2INFO(" --- Create relation between Track " << counter << "  and MCParticle " << iPart);
+      //B2INFO(" --- Create relation between Track "<<counter<<"  and MCParticle "<<iPart);
 
 
     } //endif

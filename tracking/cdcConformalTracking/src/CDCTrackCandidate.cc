@@ -58,6 +58,8 @@ CDCTrackCandidate::CDCTrackCandidate(CDCTrackCandidate &candidate, int Id)
   m_momentumValue = candidate.getMomentumValue();
   m_chargeSign = candidate.getChargeSign();
 
+  m_mcParticles = candidate.getMCParticles();
+
 }
 
 CDCTrackCandidate::~CDCTrackCandidate()
@@ -183,64 +185,63 @@ void CDCTrackCandidate::setChargeSign(int sign)
 
 }
 
-//Methods to match the tracks with mc particles, will be explain and used in the next commit...
-//--------------------------------------------------------------
-/*
-void CDCTrackCandidate::addMCParticle(int Id){
+void CDCTrackCandidate::addMCParticle(int Id)
+{
 
   bool already = false;
-  for (unsigned int i = 0; i < m_mcParticles.size(); i++){
+  for (unsigned int i = 0; i < m_mcParticles.size(); i++) { //loop over mcParticles which are already there
 
-    if (m_mcParticles.at(i).X() == Id){  //falls es bereits ein particle mit der id gibt
-      double count = m_mcParticles.at(i).Y() + 1;
-      m_mcParticles.at(i).Set(m_mcParticles.at(i).X(), count); //erhoehe deren anzahl
+    if (m_mcParticles.at(i).first == Id) { //if there is already an entry for this mcParticleId
+      m_mcParticles.at(i).second = m_mcParticles.at(i).second + 1;  //increase the number of hits from this mcParticle by 1
       already = true;
-
     }
-  }
-  if (already==false){
-    TVector2 newEntry(Id, 1);
-    m_mcParticles.push_back(newEntry);
+  }// end loop over mcParticles
 
+  if (already == false) {                 //if this is the first entry for thi mcParticleId, create new entry
+    pair <int, int> newEntry(Id, 1);
+    m_mcParticles.push_back(newEntry);
   }
 }
 
-void CDCTrackCandidate::evaluateMC(){
-  double max = 0;
-  int indexMax = 0;
-  for (unsigned int i = 0; i < m_mcParticles.size(); i++){
-    if (m_mcParticles.at(i).Y() > max){
-      max = m_mcParticles.at(i).Y();
+void CDCTrackCandidate::evaluateMC()
+{
+
+  double max = 0;     //variable to mark the highest number of hits
+  int indexMax = 0;   //variable to mart the index of the mcParticle which contributed the highest number of hits
+
+  //Search for maximum
+  for (unsigned int i = 0; i < m_mcParticles.size(); i++) {
+    if (m_mcParticles.at(i).second > max) {
+      max = m_mcParticles.at(i).second;
       indexMax = i;
     }
   }
-  //B2INFO("+++++++ Evaluate next Track");
-//  B2INFO("X: "<<m_mcParticles.at(indexMax).X()<<"  Y: "<<m_mcParticles.at(indexMax).Y() <<"  max: "<<max<< "  m_nHits: "<<m_nHits);
-  double fraction = double (max)/double (m_nHits) * 100;
-//  B2INFO("MCParticle "<<m_mcParticles.at(indexMax).X()<<"  has contributed "<<max<<" Hits  "<<fraction<<" %");
-  m_correctMC = fraction;
-  m_mcIndex = int (m_mcParticles.at(indexMax).X());
 
+  //Assign results
+  double fraction = double(max) / double(m_nHits) * 100;
+  m_purity = fraction;
+  m_mcId = m_mcParticles.at(indexMax).first;
 
 }
 
-double CDCTrackCandidate::evaluateMC(int mcId){
+double CDCTrackCandidate::getRatioForMCP(int mcId)
+{
 
-    double nHits = 0;
-  for (unsigned int i = 0; i < m_mcParticles.size(); i++){
-    if (m_mcParticles.at(i).X() == mcId){
-      nHits = m_mcParticles.at(i).Y();
+  double nHits = 0;
+
+  //Search for number of Hits contributed by this mcParticleId
+  for (unsigned int i = 0; i < m_mcParticles.size(); i++) {
+    if (m_mcParticles.at(i).first == mcId) {
+      nHits = m_mcParticles.at(i).second;
     }
   }
 
-  double fraction = double (nHits)/double (m_nHits) * 100;
+  double fraction = double(nHits) / double(m_nHits) * 100;
 
   return fraction;
 
-
 }
-*/
-//--------------------------------------------------------------
+
 
 
 

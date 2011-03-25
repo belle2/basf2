@@ -55,19 +55,19 @@ namespace Belle2 {
 
   private:
 
-    std::string m_mcParticlesCollectionName;             /**< MC particle collection name */
-    std::string m_cdcRecoHitsCollectionName;             /**< CDCRecoHits collection name */
+    std::string m_mcParticlesCollectionName;                /**< MC particle collection name */
+    std::string m_cdcRecoHitsCollectionName;                /**< CDCRecoHits collection name */
 
-    std::string m_tracksCollectionName;                  /**< Tracks collection name */
-    std::string m_trackToCDCRecoHitCollectionName;       /**< Tracks to CDCRecoHits relation name */
-    std::string m_trackToMCParticleCollectionName;       /**< Tracks to MCParticles relation name  */
+    std::string m_tracksCollectionName;                     /**< Tracks collection name */
+    std::string m_trackToCDCRecoHitCollectionName;          /**< Tracks to CDCRecoHits relation name */
+    std::string m_trackToMCParticleCollectionName;          /**< Tracks to MCParticles relation name  */
 
-    std::string m_cdcTrackCandsColName;                  /**< CDCTrackCandidates collection name */
-    std::string m_cdcTrackCandsToRecoHits;               /**< CDCTrackCandidates to CDCRecoHits relation name */
-    std::string m_cdcTrackCandsToMCParticles;            /**< CDCTrackCandidates to MCParticles relation name */
+    std::string m_cdcTrackCandsCollectionName;              /**< CDCTrackCandidates collection name */
+    std::string m_cdcTrackCandToRecoHitsCollectionName;     /**< CDCTrackCandidates to CDCRecoHits relation name */
+    std::string m_cdcTrackCandToMCParticleCollectionName;   /**< CDCTrackCandidates to MCParticles relation name */
 
-    bool m_fitMCTracks;                                  /**< True if MC tracks should be fitted */
-    bool m_fitRecoTracks;                                /**< True if track candidates from pattern recognition should be fitted */
+    bool m_fitMCTracks;                                     /**< True if MC tracks should be fitted */
+    bool m_fitRecoTracks;                                   /**< True if track candidates from pattern recognition should be fitted */
 
 
   };

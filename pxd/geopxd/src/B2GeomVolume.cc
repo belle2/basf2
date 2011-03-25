@@ -47,6 +47,13 @@ B2GeomVolume::B2GeomVolume()
   fPhiLocal = 0;
   fThetaLocal = 0;
   fPsiLocal = 0;
+  fInnerRadiusHER = -1;
+  fOuterRadiusHER = -1;
+  fInnerRadiusLER = -1;
+  fOuterRadiusLER = -1;
+  fZ0 = -1;
+  fZ1 = -1;
+  fZ2 = -1;
   iColor = -1;
   isReflectX = false;
   isReflectY = false;
@@ -141,6 +148,20 @@ Bool_t B2GeomVolume::initBasicParameters(GearDir& con)
     if ((fInnerRadius < 0) && content.isParamAvailable("InnerRadius")) fInnerRadius = content.getParamLength("InnerRadius");
     // get outer radius if not defined before
     if ((fOuterRadius < 0) && content.isParamAvailable("OuterRadius")) fOuterRadius = content.getParamLength("OuterRadius");
+    // get InnerRadiusHER if not defined before
+    if ((fInnerRadiusHER < 0) && content.isParamAvailable("InnerRadiusHER")) fInnerRadiusHER = content.getParamLength("InnerRadiusHER");
+    // get OuterRadiusHER if not defined before
+    if ((fOuterRadiusHER < 0) && content.isParamAvailable("OuterRadiusHER")) fOuterRadiusHER = content.getParamLength("OuterRadiusHER");
+    // get InnerRadiusLER if not defined before
+    if ((fInnerRadiusLER < 0) && content.isParamAvailable("InnerRadiusLER")) fInnerRadiusLER = content.getParamLength("InnerRadiusLER");
+    // get InnerRadiusLER if not defined before
+    if ((fOuterRadiusLER < 0) && content.isParamAvailable("OuterRadiusLER")) fOuterRadiusLER = content.getParamLength("OuterRadiusLER");
+    // get Z0 if not defined before
+    if ((fZ0 < 0) && content.isParamAvailable("Z0")) fZ0 = content.getParamLength("Z0");
+    // get Z1 if not defined before
+    if ((fZ1 < 0) && content.isParamAvailable("Z1")) fZ1 = content.getParamLength("Z1");
+    // get Z2 if not defined before
+    if ((fZ2 < 0) && content.isParamAvailable("Z2")) fZ2 = content.getParamLength("Z2");
     // get color if not defined before
     if ((iColor < 0) && content.isParamAvailable("Color")) iColor = static_cast<Int_t>(content.getParamNumValue("Color"));
     // go one node up in GearDir or exit this loop
@@ -301,6 +322,16 @@ Bool_t B2GeomVolume::makeGeneric()
                                     fInnerRadius,
                                     fOuterRadius,
                                     0.5 * fLength);
+    if (iColor > 0) tVolume->SetLineColor(iColor);
+    return true;
+  } else if (strncmp(shape, "Polycone", 8) == 0) {
+
+    TGeoPcon* shapeOfLayer = new TGeoPcon(0, 360, 3);
+    shapeOfLayer->DefineSection(0, fZ0, fInnerRadiusHER, fOuterRadiusHER);
+    shapeOfLayer->DefineSection(1, fZ1, fInnerRadiusHER, fOuterRadiusHER);
+    shapeOfLayer->DefineSection(2, fZ2, fInnerRadiusLER, fOuterRadiusLER);
+    tVolume = new TGeoVolume(name, shapeOfLayer, tMedium);
+
     if (iColor > 0) tVolume->SetLineColor(iColor);
     return true;
   } else if (strncmp(shape, "Assembly", 8) == 0) {

@@ -13,6 +13,7 @@
 
 #include "TGeoManager.h"
 #include "TGeoVolume.h"
+#include "TGeoPcon.h"
 #include "TGeoMaterial.h"
 #include "TGeoMatrix.h"
 #include "TMath.h"
@@ -48,6 +49,13 @@ namespace Belle2 {
     Double_t fPhiLocal; /** < Phi Angle of the volume in the coordinate system of the mother volume (TGeoRotation with Euler angles). */
     Double_t fThetaLocal; /** < Theta Angle of the volume in the coordinate system of the mother volume (TGeoRotation with Euler angles). */
     Double_t fPsiLocal; /** < Psi Angle of the volume in the coordinate system of the mother volume (TGeoRotation with Euler angles). */
+    Double_t fInnerRadiusHER;
+    Double_t fOuterRadiusHER;
+    Double_t fInnerRadiusLER;
+    Double_t fOuterRadiusLER;
+    Double_t fZ0;
+    Double_t fZ1;
+    Double_t fZ2;
 
     Int_t iColor; /** < The color as integer from the ROOT color wheel. */
     Bool_t isReflectX; /** Reflect the volume about W (=x) axis of the mother volume. */

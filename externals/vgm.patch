@@ -1,0 +1,26 @@
+Index: packages/Geant4GM/source/solids/Polycone.cxx
+===================================================================
+--- packages/Geant4GM/source/solids/Polycone.cxx	(revision 691)
++++ packages/Geant4GM/source/solids/Polycone.cxx	(working copy)
+@@ -31,7 +31,7 @@
+ #include "G4Tubs.hh"
+ #include "G4ReflectedSolid.hh"
+ 
+-const int Geant4GM::Polycone::fgkMaxNofZPlanes = 50;
++const int Geant4GM::Polycone::fgkMaxNofZPlanes = 100;
+ double*   Geant4GM::Polycone::fgZBuffer = 0;
+ double*   Geant4GM::Polycone::fgRinBuffer = 0;
+ double*   Geant4GM::Polycone::fgRoutBuffer = 0;
+Index: packages/RootGM/source/solids/Polycone.cxx
+===================================================================
+--- packages/RootGM/source/solids/Polycone.cxx	(revision 691)
++++ packages/RootGM/source/solids/Polycone.cxx	(working copy)
+@@ -24,7 +24,7 @@
+ 
+ #include <iostream>
+ 
+-const int RootGM::Polycone::fgkMaxNofZPlanes = 50;
++const int RootGM::Polycone::fgkMaxNofZPlanes = 100;
+ double*   RootGM::Polycone::fgZBuffer = 0;
+ double*   RootGM::Polycone::fgRinBuffer = 0;
+ double*   RootGM::Polycone::fgRoutBuffer = 0;

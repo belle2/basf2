@@ -180,6 +180,9 @@ def configure_externals(conf):
         print '-> create it with the command "scons externals"'
         return False
 
+    # vgm
+    conf.env.Append(CPPPATH=os.path.join(conf.env['EXTINCDIR'], 'vgm'))
+
     # geant4_vmc
     conf.env.Append(CPPPATH=os.path.join(conf.env['EXTINCDIR'],
                     'geant4_vmc/g4root'))

@@ -98,7 +98,8 @@ geant4/env.sh: CLHEP/config.log geant4/Configure
 	@echo "building geant4"
 	@#-cd geant4; patch -Np0 < ../geant4.patch
 	@-rm geant4/.config/bin/Linux-g++/config.sh
-	@cd geant4; ./Configure -build -d -e -s -D d_portable='define' -D g4includes_flag=y \
+	@cd geant4; ./Configure -build -d -e -s \
+	-D g4query_conf=yes -D d_portable='define' -D g4includes_flag=y \
 	-D g4granular='y' -D g4wlib_build_g3tog4='y' -D g4wlib_use_g3tog4='y' \
 	$(GEANT4_OPTION) -D g4data=$(EXTDIRVAR)/share/geant4/data -D g4clhep_base_dir=$(EXTDIR) \
 	-D g4clhep_include_dir=$(EXTINCDIRVAR) -D g4clhep_lib_dir=$(EXTLIBDIRVAR) \
@@ -106,7 +107,8 @@ geant4/env.sh: CLHEP/config.log geant4/Configure
 	@-rm -rf geant4/env.*sh; cd geant4; ./Configure
 	@sed -f geant4.sed -e "s;${BELLE2_EXTERNALS_DIR};\${BELLE2_EXTERNALS_DIR};g" geant4/env.sh > env.new; mv env.new geant4/env.sh
 	@sed -f geant4.sed -e "s;${BELLE2_EXTERNALS_DIR};\${BELLE2_EXTERNALS_DIR};g" geant4/env.csh > env.new; mv env.new geant4/env.csh
-	@cd geant4; . ./env.sh; cd source; G4INCLUDE=$(EXTDIRVAR)/include/geant4 make includes dependencies=""
+	@#cd geant4; . ./env.sh; cd source; G4INCLUDE=$(EXTDIRVAR)/include/geant4 make includes dependencies=""
+	@cd geant4/source; CLHEP_BASE_DIR=$(EXTDIR) G4INSTALL=$(EXTDIR)/geant4 G4SYSTEM=Linux-g++ G4INCLUDE=$(EXTDIRVAR)/include/geant4 make includes dependencies=""
 	@cp -a $(EXTDIR)/geant4/lib/*/* $(EXTLIBDIR)
 
 # GEANT4 clean command

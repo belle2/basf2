@@ -41,21 +41,10 @@ CDCRecoHit::CDCRecoHit(const CDCHit& cdcHit, const float& resolution)
   CDCGeometryPar * cdcgp = CDCGeometryPar::Instance();
   CDCGeometryPar & cdcg(*cdcgp);
 
-  fHitCoord[0][0] = cdcg.wireForwardPosition(m_layerId, m_wireId).x(); // x backward position
-  fHitCoord[1][0] = cdcg.wireForwardPosition(m_layerId, m_wireId).y();
-  fHitCoord[2][0] = cdcg.wireForwardPosition(m_layerId, m_wireId).z();
-  fHitCoord[3][0] = cdcg.wireBackwardPosition(m_layerId, m_wireId).x();
-  fHitCoord[4][0] = cdcg.wireBackwardPosition(m_layerId, m_wireId).y();
-  fHitCoord[5][0] = cdcg.wireBackwardPosition(m_layerId, m_wireId).z();
-  fHitCoord[6][0] = cdcHit.getDriftTime();
-
-  fHitCov[6][6] = resolution;
-
-
   if (cdcHit.getISuperLayer() == 0) {
     m_layerId = cdcHit.getILayer();
   } else {
-    m_layerId = 8 + (cdcHit.getILayer() - 1) * 6 + cdcHit.getILayer();
+    m_layerId = 8 + (cdcHit.getISuperLayer() - 1) * 6 + cdcHit.getILayer();
   }
 
   m_wireId = cdcHit.getIWire();
@@ -65,6 +54,16 @@ CDCRecoHit::CDCRecoHit(const CDCHit& cdcHit, const float& resolution)
 
   m_driftTime = cdcHit.getDriftTime();
   m_charge    = cdcHit.getCharge();
+
+  fHitCoord[0][0] = cdcg.wireForwardPosition(m_layerId, m_wireId).x(); // x backward position
+  fHitCoord[1][0] = cdcg.wireForwardPosition(m_layerId, m_wireId).y();
+  fHitCoord[2][0] = cdcg.wireForwardPosition(m_layerId, m_wireId).z();
+  fHitCoord[3][0] = cdcg.wireBackwardPosition(m_layerId, m_wireId).x();
+  fHitCoord[4][0] = cdcg.wireBackwardPosition(m_layerId, m_wireId).y();
+  fHitCoord[5][0] = cdcg.wireBackwardPosition(m_layerId, m_wireId).z();
+  fHitCoord[6][0] = cdcHit.getDriftTime();
+
+  fHitCov[6][6] = resolution;
 
 }
 

@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 // Own include
-#include <pxd/modules/pxdDigitizer/PXDDigiModule.h>
+#include <pxd/modules/pxdDigitizer/PXDDigiSimpleModule.h>
 
 #include <time.h>
 
@@ -35,19 +35,19 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(PXDDigi)
+REG_MODULE(PXDDigiSimple)
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-PXDDigiModule::PXDDigiModule() : Module(),
+PXDDigiSimpleModule::PXDDigiSimpleModule() : Module(),
     m_cheater(new PXDcheater()),
     m_cid(new CIDManager(0)),
     m_random(new TRandom3(0))
 {
   // Set description()
-  setDescription("PXDDigitizer");
+  setDescription("PXD simple digitizer");
 
   // Add parameters
   addParam("InputColName", m_inColName, "Input collection name", string("PXDSimHitArray"));
@@ -56,14 +56,14 @@ PXDDigiModule::PXDDigiModule() : Module(),
   //      "Name of relation collection - MC hits to Digitizer hits. (created if non-null)", string("PXDMC2DigiHitRel"));
 }
 
-PXDDigiModule::~PXDDigiModule()
+PXDDigiSimpleModule::~PXDDigiSimpleModule()
 {
   if (m_random) delete m_random;
   if (m_cid) delete m_cid;
   if (m_cheater) delete m_cheater;
 }
 
-void PXDDigiModule::initialize()
+void PXDDigiSimpleModule::initialize()
 {
   // Initialize variables
   m_nRun    = 0 ;
@@ -76,20 +76,20 @@ void PXDDigiModule::initialize()
   m_timeCPU = clock() * Unit::us;
 }
 
-void PXDDigiModule::beginRun()
+void PXDDigiSimpleModule::beginRun()
 {
   // Print run number
-  B2INFO("PXDDigi: Processing run: " << m_nRun);
+  B2INFO("PXDDigiSimple: Processing run: " << m_nRun);
 }
 
-void PXDDigiModule::event()
+void PXDDigiSimpleModule::event()
 {
   //------------------------------------------------------
   // Get the collection of PXDSimHits from the Data store.
   //------------------------------------------------------
   StoreArray<PXDSimHit> pxdInArray(m_inColName);
   if (!pxdInArray) {
-    B2ERROR("PXDDigi: Input collection " << m_inColName << " unavailable.");
+    B2ERROR("PXDDigiSimple: Input collection " << m_inColName << " unavailable.");
   }
 
   //-----------------------------------------------------
@@ -98,7 +98,7 @@ void PXDDigiModule::event()
   //-----------------------------------------------------
   StoreArray<PXDHit> pxdOutArray(m_outColName);
   if (!pxdOutArray) {
-    B2ERROR("PXDDigi: Output collection " << m_inColName << " unavailable.");
+    B2ERROR("PXDDigiSimple: Output collection " << m_inColName << " unavailable.");
   }
 
   //---------------------------------------------------------------------
@@ -158,23 +158,23 @@ void PXDDigiModule::event()
   m_nEvent++;
 }
 
-void PXDDigiModule::endRun()
+void PXDDigiSimpleModule::endRun()
 {
   m_nRun++;
 }
 
-void PXDDigiModule::terminate()
+void PXDDigiSimpleModule::terminate()
 {
   // CPU time end
   m_timeCPU = clock() * Unit::us - m_timeCPU;
 
   // Announce
-  B2INFO("PXDDigi finished. Time per event: " << m_timeCPU / m_nEvent / Unit::ms << " ms.");
+  B2INFO("PXDDigiSimple finished. Time per event: " << m_timeCPU / m_nEvent / Unit::ms << " ms.");
 }
 
-void PXDDigiModule::printModuleParams() const
+void PXDDigiSimpleModule::printModuleParams() const
 {
-  B2INFO("PXDDigi parameters:")
+  B2INFO("PXDDigiSimple parameters:")
   B2INFO("  Input collection name:  " << m_inColName)
   B2INFO("  Output collection name: " << m_outColName)
 }

@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PXDDIGIMODULE_H
-#define PXDDIGIMODULE_H
+#ifndef PXDDIGISIMPLEMODULE_H
+#define PXDDIGISIMPLEMODULE_H
 
 #include <framework/core/Module.h>
 #include <pxd/hitpxd/CIDManager.h>
@@ -32,15 +32,15 @@ namespace Belle2 {
    * A full digitization will be added later.
    */
 
-  class PXDDigiModule : public Module {
+  class PXDDigiSimpleModule : public Module {
 
   public:
 
     /** Constructor.*/
-    PXDDigiModule();
+    PXDDigiSimpleModule();
 
     /** Destructor.*/
-    virtual ~PXDDigiModule();
+    virtual ~PXDDigiSimpleModule();
 
     /**
      * Initialize the Module.

@@ -7,6 +7,7 @@
 
 #pragma link C++ class Belle2::PXDVolumeUserInfo;
 #pragma link C++ class Belle2::PXDSimHit;
+#pragma link C++ class Belle2::PXDDigit;
 #pragma link C++ class Belle2::PXDHit;
 
 #endif

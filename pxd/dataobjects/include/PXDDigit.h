@@ -13,6 +13,10 @@
 
 #include <TObject.h>
 
+#define DEFAULT_PXDDIGITS "PXDDigits"
+#define DEFAULT_PXDDIGITSREL "PXDDigitsToMCParticles"
+
+
 namespace Belle2 {
 
   /*
@@ -38,8 +42,8 @@ namespace Belle2 {
      * @param sensorID Sensor compact ID.
      * @param uCellID Cell ID in "z".
      * @param vCellID Cell ID in "r-phi".
-     * @param uCell Cell centre u coordinate.
-     * @param vCell Cell centre v coordinate.
+     * @param uCell Cell center u coordinate.
+     * @param vCell Cell center v coordinate.
      * @param charge The charge collected in the cell.
      */
     PXDDigit(int sensorID, short uCellID, short vCellID, float uCellPosition, float vCellPosition, float charge):
@@ -57,22 +61,22 @@ namespace Belle2 {
     /** Set u ID of a cell.
      * @param uCellID Cell number in u.
      */
-    void setUCellID(float uCellID) { m_uCellID = uCellID; }
+    void setUCellID(short uCellID) { m_uCellID = uCellID; }
 
     /** Set v ID of a cell.
      * @param vCellID Cell number in v.
      */
-    void setVCellID(float vCellID) { m_vCellID = vCellID; }
+    void setVCellID(short vCellID) { m_vCellID = vCellID; }
 
     /** Set u cell coordinate.
-     * @param uCell Cell centre u coordinate.
+     * @param uCellPosition Cell center u coordinate.
      */
-    void setUCellPosition(float uCell) { m_uCellPosition = uCell; }
+    void setUCellPosition(float uCellPosition) { m_uCellPosition = uCellPosition; }
 
     /** Set v cell coordinate.
-    * @param vCell Cell centre v coordinate.
+    * @param vCellPosition Cell center v coordinate.
     */
-    void setVCellPosition(float vCell) { m_vCellPosition = vCell; }
+    void setVCellPosition(float vCellPosition) { m_vCellPosition = vCellPosition; }
 
     /** Set cell charge.
      * @param charge Cell charge.
@@ -113,9 +117,9 @@ namespace Belle2 {
 
     int m_sensorID;                 /**< Compressed sensor identifier.*/
     short m_uCellID;        /**< Cell z-coordinate in pitch units. */
-    short m_vCellID;        /**< Cell r-phi cooridnate in pitch units. */
+    short m_vCellID;        /**< Cell r-phi coordinate in pitch units. */
     float m_uCellPosition;          /**< Absolute cell position in z. */
-    float m_vCellPosition;          /**< Aboslute cell position in r-phi. */
+    float m_vCellPosition;          /**< Absolute cell position in r-phi. */
     float m_charge;         /**< Deposited charge (units depend on user selection). */
 
     ClassDef(PXDDigit, 1);

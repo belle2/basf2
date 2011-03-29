@@ -1,6 +1,6 @@
 Import('env')
 
 env['LIBS'] = ['pxd', 'svd', 'framework', 'geometry', 'simulation',
-               '$ROOT_LIBS', 'Geom', 'EG', 'G4root', 'tracking']
+               '$ROOT_LIBS', 'Geom', 'EG', 'g4root', 'tracking']
 
 Return('env')

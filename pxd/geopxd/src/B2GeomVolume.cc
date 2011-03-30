@@ -325,13 +325,11 @@ Bool_t B2GeomVolume::makeGeneric()
     if (iColor > 0) tVolume->SetLineColor(iColor);
     return true;
   } else if (strncmp(shape, "Polycone", 8) == 0) {
-
     TGeoPcon* shapeOfLayer = new TGeoPcon(0, 360, 3);
     shapeOfLayer->DefineSection(0, fZ0, fInnerRadiusHER, fOuterRadiusHER);
     shapeOfLayer->DefineSection(1, fZ1, fInnerRadiusHER, fOuterRadiusHER);
     shapeOfLayer->DefineSection(2, fZ2, fInnerRadiusLER, fOuterRadiusLER);
     tVolume = new TGeoVolume(name, shapeOfLayer, tMedium);
-
     if (iColor > 0) tVolume->SetLineColor(iColor);
     return true;
   } else if (strncmp(shape, "Assembly", 8) == 0) {

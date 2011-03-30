@@ -20,7 +20,7 @@
         <NumberOfLadders desc="Number of ladders in this layer">8</NumberOfLadders>
         <Ladder desc="The silicon modules the detector is made of">
         <Name>PXD_Layer_%Layer_Ladder_%Ladder</Name>
-          <Material>Vacuum</Material>
+          <Material>Air</Material>
           <Shape>Assembly</Shape>
           <WPosition desc="The distance between interaction point and ladder (radius)" unit="mm">14</WPosition>
           <UPosition desc="The offset of the center of the layer in Y direction (Wind Mill structure)" unit="mm">-3.3</UPosition>
@@ -50,7 +50,7 @@
         <NumberOfLadders desc="Number of ladders in this layer">12</NumberOfLadders>
         <Ladder desc="The silicon modules the detector is made of">
         <Name>PXD_Layer_%Layer_Ladder_%Ladder</Name>
-          <Material>Vacuum</Material>
+          <Material>Air</Material>
           <Shape>Assembly</Shape>
           <WPosition desc="The distance between interaction point and ladder (radius)" unit="mm">22</WPosition>
           <UPosition desc="The offset of the center of the layer in Y direction (Wind Mill structure)" unit="mm">-3.3</UPosition>

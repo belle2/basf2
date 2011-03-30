@@ -49,13 +49,13 @@ namespace Belle2 {
     Double_t fPhiLocal; /** < Phi Angle of the volume in the coordinate system of the mother volume (TGeoRotation with Euler angles). */
     Double_t fThetaLocal; /** < Theta Angle of the volume in the coordinate system of the mother volume (TGeoRotation with Euler angles). */
     Double_t fPsiLocal; /** < Psi Angle of the volume in the coordinate system of the mother volume (TGeoRotation with Euler angles). */
-    Double_t fInnerRadiusHER;
-    Double_t fOuterRadiusHER;
-    Double_t fInnerRadiusLER;
-    Double_t fOuterRadiusLER;
-    Double_t fZ0;
-    Double_t fZ1;
-    Double_t fZ2;
+    Double_t fInnerRadiusHER; /** First inner radius of this volume. */
+    Double_t fOuterRadiusHER; /** First outer radius of this volume. */
+    Double_t fInnerRadiusLER; /** Second inner radius of this volume. */
+    Double_t fOuterRadiusLER; /** Second outer radius of this volume. */
+    Double_t fZ0; /** Position of zeroth section of this volume (position where the volume starts). */
+    Double_t fZ1; /** Position of first section of this volume. */
+    Double_t fZ2; /** Position of second section of this volume (position where the volume ends). */
 
     Int_t iColor; /** < The color as integer from the ROOT color wheel. */
     Bool_t isReflectX; /** Reflect the volume about W (=x) axis of the mother volume. */

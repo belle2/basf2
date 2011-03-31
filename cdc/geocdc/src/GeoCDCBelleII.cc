@@ -21,6 +21,8 @@
 #include <TGeoMatrix.h>
 #include <TGeoManager.h>
 #include <TGeoTrd1.h>
+#include <TGeoTube.h>
+#include <TGeoCone.h>
 
 #include <iostream>
 
@@ -187,37 +189,41 @@ void GeoCDCBelleII::create(GearDir& content)
   // Construct outer wall
   //----------------------
   TGeoVolumeAssembly* volGrpOuterWall = new TGeoVolumeAssembly("OuterWall");
-  volGrpCDC->AddNode(volGrpOuterWall, 1, new TGeoTranslation(0.0, 0.0, 0.0));
   for (int iOuterWall = 0; iOuterWall < nOuterWall; ++iOuterWall) {
     double length = (outerWallFZ[iOuterWall] - outerWallBZ[iOuterWall]) / 2.0;
     if (strstr((outerWallName[iOuterWall]).c_str(), "MiddleWall") != NULL) {
-      TGeoVolume* outerWallTube = gGeoManager->MakeTube((outerWallName[iOuterWall]).c_str(), medCFRP, outerWallInnerR[iOuterWall], outerWallOuterR[iOuterWall], length);
+      TGeoTube* outerWallTubeShape = new TGeoTube(outerWallInnerR[iOuterWall], outerWallOuterR[iOuterWall], length);
+      TGeoVolume* outerWallTube = new TGeoVolume((outerWallName[iOuterWall]).c_str(), outerWallTubeShape, medCFRP);
       outerWallTube->SetLineColor(kGray + 3);
       volGrpOuterWall->AddNode(outerWallTube, iOuterWall, new TGeoTranslation(0.0, 0.0, (length + outerWallBZ[iOuterWall])));
     } else {
-      TGeoVolume* outerWallTube = gGeoManager->MakeTube((outerWallName[iOuterWall]).c_str(), medAluminum, outerWallInnerR[iOuterWall], outerWallOuterR[iOuterWall], length);
+      TGeoTube* outerWallTubeShape = new TGeoTube(outerWallInnerR[iOuterWall], outerWallOuterR[iOuterWall], length);
+      TGeoVolume* outerWallTube = new TGeoVolume((outerWallName[iOuterWall]).c_str(), outerWallTubeShape, medAluminum);
       outerWallTube->SetLineColor(kGray);
       volGrpOuterWall->AddNode(outerWallTube, iOuterWall, new TGeoTranslation(0.0, 0.0, (length + outerWallBZ[iOuterWall])));
     }
   }
+  volGrpCDC->AddNode(volGrpOuterWall, 1, new TGeoTranslation(0.0, 0.0, 0.0));
 
   //-----------------------
   // Construct inner wall
   //-----------------------
   TGeoVolumeAssembly* volGrpInnerWall = new TGeoVolumeAssembly("InnerWall");
-  volGrpCDC->AddNode(volGrpInnerWall, 1, new TGeoTranslation(0.0, 0.0, 0.0));
   for (int iInnerWall = 0; iInnerWall < nInnerWall; ++iInnerWall) {
     double length = (innerWallFZ[iInnerWall] - innerWallBZ[iInnerWall]) / 2.0;
     if (strstr((innerWallName[iInnerWall]).c_str(), "MiddleWall") != NULL) {
-      TGeoVolume* innerWallTube = gGeoManager->MakeTube((innerWallName[iInnerWall]).c_str(), medCFRP, innerWallInnerR[iInnerWall], innerWallOuterR[iInnerWall], length);
+      TGeoTube* innerWallTubeShape = new TGeoTube(innerWallInnerR[iInnerWall], innerWallOuterR[iInnerWall], length);
+      TGeoVolume* innerWallTube = new TGeoVolume((innerWallName[iInnerWall]).c_str(), innerWallTubeShape, medCFRP);
       innerWallTube->SetLineColor(kGray + 3);
       volGrpInnerWall->AddNode(innerWallTube, iInnerWall, new TGeoTranslation(0.0, 0.0, (length + innerWallBZ[iInnerWall])));
     } else {
-      TGeoVolume* innerWallTube = gGeoManager->MakeTube((innerWallName[iInnerWall]).c_str(), medAluminum, innerWallInnerR[iInnerWall], innerWallOuterR[iInnerWall], length);
+      TGeoTube* innerWallTubeShape = new TGeoTube(innerWallInnerR[iInnerWall], innerWallOuterR[iInnerWall], length);
+      TGeoVolume* innerWallTube = new TGeoVolume((innerWallName[iInnerWall]).c_str(), innerWallTubeShape, medAluminum);
       innerWallTube->SetLineColor(kGray);
       volGrpInnerWall->AddNode(innerWallTube, iInnerWall, new TGeoTranslation(0.0, 0.0, (length + innerWallBZ[iInnerWall])));
     }
   }
+  volGrpCDC->AddNode(volGrpInnerWall, 1, new TGeoTranslation(0.0, 0.0, 0.0));
 
   //-----------------------
   // Get number of layers
@@ -337,7 +343,6 @@ void GeoCDCBelleII::create(GearDir& content)
     //}
 
     TGeoVolumeAssembly* volGrpLayer = new TGeoVolumeAssembly((format("CDCLayer_%1%") % iSLayer).str().c_str());
-    volGrpCDC->AddNode(volGrpLayer, iSLayer, new TGeoTranslation(0.0, 0.0, 0.0));
 
     // Get parameters for sensitive layer: left, middle and right.
     double rmin_sensitive_left, rmax_sensitive_left, rmin_sensitive_middle, rmax_sensitive_middle, rmin_sensitive_right, rmax_sensitive_right;
@@ -454,13 +459,13 @@ void GeoCDCBelleII::create(GearDir& content)
       //==========================================================
 
       // Build a tube with metarial cdcMed for area 1
-      TGeoVolume* leftTube = gGeoManager->MakeTube((format("CDCLayer_%1%_leftTube") % iSLayer).str().c_str(),
-                                                   cdcMed, rmin_sensitive_left, rmax_sensitive_left, length_feedthrough / 2.0);
+      TGeoTube* leftTubeShape = new TGeoTube(rmin_sensitive_left, rmax_sensitive_left, length_feedthrough / 2.0);
+      TGeoVolume* leftTube = new TGeoVolume((format("CDCLayer_%1%_leftTube") % iSLayer).str().c_str(), leftTubeShape, cdcMed);
       volGrpLayer->AddNode(leftTube, iSLayer, new TGeoTranslation(0.0, 0.0, (zback_sensitive_left + length_feedthrough / 2.0)));
 
       // Build left sensitive tube (area 2)
-      TGeoVolume* leftSensitiveTube = gGeoManager->MakeTube((format("SD_CDCLayer_%1%_left") % iSLayer).str().c_str(),
-                                                            cdcMed, rmin_sensitive_left, rmax_sensitive_left, (zfor_sensitive_left - zback_sensitive_left - length_feedthrough) / 2.0);
+      TGeoTube* leftSensitiveTubeShape = new TGeoTube(rmin_sensitive_left, rmax_sensitive_left, (zfor_sensitive_left - zback_sensitive_left - length_feedthrough) / 2.0);
+      TGeoVolume* leftSensitiveTube = new TGeoVolume((format("SD_CDCLayer_%1%_left") % iSLayer).str().c_str(), leftSensitiveTubeShape, cdcMed);
       volGrpLayer->AddNode(leftSensitiveTube, iSLayer, new TGeoTranslation(0.0, 0.0, (zfor_sensitive_left + zback_sensitive_left + length_feedthrough) / 2.0));
     } else {
       //==========================================================
@@ -478,14 +483,13 @@ void GeoCDCBelleII::create(GearDir& content)
       //==========================================================
 
       // Build a tube with metarial cdcMed for area 1
-      TGeoVolume* leftTube = gGeoManager->MakeTube((format("CDCLayer_%1%_leftTube") % iSLayer).str().c_str(),
-                                                   cdcMed, rmin_sensitive_left, rmax_sensitive_left, (zfor_sensitive_left - zback_sensitive_left) / 2.0);
+      TGeoTube* leftTubeShape = new TGeoTube(rmin_sensitive_left, rmax_sensitive_left, (zfor_sensitive_left - zback_sensitive_left) / 2.0);
+      TGeoVolume* leftTube = new TGeoVolume((format("CDCLayer_%1%_leftTube") % iSLayer).str().c_str(), leftTubeShape, cdcMed);
       volGrpLayer->AddNode(leftTube, iSLayer, new TGeoTranslation(0.0, 0.0, (zfor_sensitive_left + zback_sensitive_left) / 2.0));
 
       // Build a tube with metarial cdcMed for area 2
-      TGeoVolume* leftMidTube = gGeoManager->MakeTube((format("CDCLayer_%1%_leftMidTube") % iSLayer).str().c_str(),
-                                                      cdcMed, rmin_sensitive_middle, rmax_sensitive_middle,
-                                                      (length_feedthrough - zfor_sensitive_left + zback_sensitive_left) / 2.0);
+      TGeoTube* leftMidTubeShape = new TGeoTube(rmin_sensitive_middle, rmax_sensitive_middle, (length_feedthrough - zfor_sensitive_left + zback_sensitive_left) / 2.0);
+      TGeoVolume* leftMidTube = new TGeoVolume((format("CDCLayer_%1%_leftMidTube") % iSLayer).str().c_str(), leftMidTubeShape, cdcMed);
       volGrpLayer->AddNode(leftMidTube, iSLayer, new TGeoTranslation(0.0, 0.0, (length_feedthrough + zfor_sensitive_left + zback_sensitive_left) / 2.0));
 
       // Reset zback_sensitive_middle
@@ -509,13 +513,13 @@ void GeoCDCBelleII::create(GearDir& content)
       //==========================================================
 
       // Build a tube with metarial cdcMed for area 1
-      TGeoVolume* rightTube = gGeoManager->MakeTube((format("CDCLayer_%1%_rightTube") % iSLayer).str().c_str(),
-                                                    cdcMed, rmin_sensitive_right, rmax_sensitive_right, length_feedthrough / 2.0);
+      TGeoTube* rightTubeShape = new TGeoTube(rmin_sensitive_right, rmax_sensitive_right, length_feedthrough / 2.0);
+      TGeoVolume* rightTube = new TGeoVolume((format("CDCLayer_%1%_rightTube") % iSLayer).str().c_str(), rightTubeShape, cdcMed);
       volGrpLayer->AddNode(rightTube, iSLayer, new TGeoTranslation(0.0, 0.0, (zfor_sensitive_right - length_feedthrough / 2.0)));
 
       // Build right sensitive tube (area 2)
-      TGeoVolume* rightSensitiveTube = gGeoManager->MakeTube((format("SD_CDCLayer_%1%_right") % iSLayer).str().c_str(),
-                                                             cdcMed, rmin_sensitive_right, rmax_sensitive_right, (zfor_sensitive_right - zback_sensitive_right - length_feedthrough) / 2.0);
+      TGeoTube* rightSensitiveTubeShape = new TGeoTube(rmin_sensitive_right, rmax_sensitive_right, (zfor_sensitive_right - zback_sensitive_right - length_feedthrough) / 2.0);
+      TGeoVolume* rightSensitiveTube = new TGeoVolume((format("SD_CDCLayer_%1%_right") % iSLayer).str().c_str(), rightSensitiveTubeShape, cdcMed);
       volGrpLayer->AddNode(rightSensitiveTube, iSLayer, new TGeoTranslation(0.0, 0.0, (zfor_sensitive_right + zback_sensitive_right - length_feedthrough) / 2.0));
     } else {
       //==========================================================
@@ -533,14 +537,13 @@ void GeoCDCBelleII::create(GearDir& content)
       //==========================================================
 
       // Build a tube with metarial cdcMed for area 1
-      TGeoVolume* rightTube = gGeoManager->MakeTube((format("CDCLayer_%1%_rightTube") % iSLayer).str().c_str(),
-                                                    cdcMed, rmin_sensitive_right, rmax_sensitive_right, (zfor_sensitive_right - zback_sensitive_right) / 2.0);
+      TGeoTube* rightTubeShape = new TGeoTube(rmin_sensitive_right, rmax_sensitive_right, (zfor_sensitive_right - zback_sensitive_right) / 2.0);
+      TGeoVolume* rightTube = new TGeoVolume((format("CDCLayer_%1%_rightTube") % iSLayer).str().c_str(), rightTubeShape, cdcMed);
       volGrpLayer->AddNode(rightTube, iSLayer, new TGeoTranslation(0.0, 0.0, (zfor_sensitive_right + zback_sensitive_right) / 2.0));
 
       // Build a tube with metarial cdcMed for area 2
-      TGeoVolume* rightMidTube = gGeoManager->MakeTube((format("CDCLayer_%1%_rightMidTube") % iSLayer).str().c_str(),
-                                                       cdcMed, rmin_sensitive_middle, rmax_sensitive_middle,
-                                                       (length_feedthrough - zfor_sensitive_right + zback_sensitive_right) / 2.0);
+      TGeoTube* rightMidTubeShape = new TGeoTube(rmin_sensitive_middle, rmax_sensitive_middle, (length_feedthrough - zfor_sensitive_right + zback_sensitive_right) / 2.0);
+      TGeoVolume* rightMidTube = new TGeoVolume((format("CDCLayer_%1%_rightMidTube") % iSLayer).str().c_str(), rightMidTubeShape, cdcMed);
       volGrpLayer->AddNode(rightMidTube, iSLayer, new TGeoTranslation(0.0, 0.0, (zback_sensitive_right - length_feedthrough + zfor_sensitive_right) / 2.0));
 
       // Reset zback_sensitive_middle
@@ -548,8 +551,8 @@ void GeoCDCBelleII::create(GearDir& content)
     }
 
     // Middle sensitive tube
-    TGeoVolume* middleSensitiveTube = gGeoManager->MakeTube((format("SD_CDCLayer_%1%_middle") % iSLayer).str().c_str(),
-                                                            cdcMed, rmin_sensitive_middle, rmax_sensitive_middle, (zfor_sensitive_middle - zback_sensitive_middle) / 2.0);
+    TGeoTube* middleSensitiveTubeShape = new TGeoTube(rmin_sensitive_middle, rmax_sensitive_middle, (zfor_sensitive_middle - zback_sensitive_middle) / 2.0);
+    TGeoVolume* middleSensitiveTube = new TGeoVolume((format("SD_CDCLayer_%1%_middle") % iSLayer).str().c_str(), middleSensitiveTubeShape, cdcMed);
     volGrpLayer->AddNode(middleSensitiveTube, iSLayer, new TGeoTranslation(0.0, 0.0, (zfor_sensitive_middle + zback_sensitive_middle) / 2.0));
 
     // Endplates
@@ -557,11 +560,12 @@ void GeoCDCBelleII::create(GearDir& content)
       std::ostringstream endplateName;
       endplateName << "CDCLayer_" << iSLayer << "_" << epName[iSLayer][iEPLayer] << "_" << iEPLayer;
       double length_endplate = (epFZ[iSLayer][iEPLayer] - epBZ[iSLayer][iEPLayer]) / 2.0;
-      TGeoVolume* endplateTube = gGeoManager->MakeTube(endplateName.str().c_str(),
-                                                       medAluminum, epInnerR[iSLayer][iEPLayer], epOuterR[iSLayer][iEPLayer], length_endplate);
+      TGeoTube* endplateTubeShape = new TGeoTube(epInnerR[iSLayer][iEPLayer], epOuterR[iSLayer][iEPLayer], length_endplate);
+      TGeoVolume* endplateTube = new TGeoVolume(endplateName.str().c_str(), endplateTubeShape, medAluminum);
       endplateTube->SetLineColor(kGray);
       volGrpLayer->AddNode(endplateTube, iSLayer, new TGeoTranslation(0.0, 0.0, (epFZ[iSLayer][iEPLayer] + epBZ[iSLayer][iEPLayer]) / 2.0));
     }
+    volGrpCDC->AddNode(volGrpLayer, iSLayer, new TGeoTranslation(0.0, 0.0, 0.0));
   }
 
   //--------------------------------------------------
@@ -569,7 +573,6 @@ void GeoCDCBelleII::create(GearDir& content)
   //--------------------------------------------------
   int nEB = content.getNumberNodes("ElectronicsBoards/ElectronicsBoard");
   TGeoVolumeAssembly* volGrpEB = new TGeoVolumeAssembly("ElectronicsBoards");
-  volGrpCDC->AddNode(volGrpEB, 1, new TGeoTranslation(0.0, 0.0, 0.0));
   for (int iEB = 0; iEB < nEB; ++iEB) {
     // Get parameters
     GearDir ebContent(content);
@@ -582,18 +585,18 @@ void GeoCDCBelleII::create(GearDir& content)
     double ebFZ = ebContent.getParamLength("EBForwardZ");
 
     // Construct electronics boards
-    TGeoVolume* ebTube = gGeoManager->MakeTube((format("ElectronicsBoard_Layer%1%") % ebID).str().c_str(),
-                                               medNEMA_G10_Plate, ebInnerR, ebOuterR, (ebFZ - ebBZ) / 2.0);
+    TGeoTube* ebTubeShape = new TGeoTube(ebInnerR, ebOuterR, (ebFZ - ebBZ) / 2.0);
+    TGeoVolume* ebTube = new TGeoVolume((format("ElectronicsBoard_Layer%1%") % ebID).str().c_str(), ebTubeShape, medNEMA_G10_Plate);
     ebTube->SetLineColor(kGreen);
     volGrpEB->AddNode(ebTube, ebID, new TGeoTranslation(0.0, 0.0, (ebFZ + ebBZ) / 2.0));
   }
+  volGrpCDC->AddNode(volGrpEB, 1, new TGeoTranslation(0.0, 0.0, 0.0));
 
   //--------------------------------------
   // Get parameters and construct covers
   //--------------------------------------
   int nCover = content.getNumberNodes("Covers/Cover");
   TGeoVolumeAssembly* volGrpCover = new TGeoVolumeAssembly("Covers");
-  volGrpCDC->AddNode(volGrpCover, 1, new TGeoTranslation(0.0, 0.0, 0.0));
   for (int iCover = 0; iCover < nCover; ++iCover) {
     // Get parameters
     GearDir coverContent(content);
@@ -614,8 +617,8 @@ void GeoCDCBelleII::create(GearDir& content)
       double rmax1 = rmin1 + coverThick / std::cos(coverAngle);
       double coverLength = (rmin1 - rmin2) / std::tan(coverAngle);
       // Construct covers
-      TGeoVolume* coverCone = gGeoManager->MakeCone((format("BackwardCover%1%") % coverID).str().c_str(),
-                                                    medAluminum, coverLength / 2.0, rmin1, rmax1, rmin2, rmax2);
+      TGeoCone* coverConeShape = new TGeoCone(coverLength / 2.0, rmin1, rmax1, rmin2, rmax2);
+      TGeoVolume* coverCone = new TGeoVolume((format("BackwardCover%1%") % coverID).str().c_str(), coverConeShape, medAluminum);
       coverCone->SetLineColor(kGray);
       volGrpCover->AddNode(coverCone, coverID, new TGeoTranslation(0.0, 0.0, coverPosZ - coverLength / 2.0));
     } else {
@@ -625,10 +628,11 @@ void GeoCDCBelleII::create(GearDir& content)
       double rmax2 = rmin2 + coverThick / std::cos(coverAngle);
       double coverLength = (rmin2 - rmin1) / std::tan(coverAngle);
       // Construct covers
-      TGeoVolume* coverCone = gGeoManager->MakeCone((format("ForwardCover%1%") % coverID).str().c_str(),
-                                                    medAluminum, coverLength / 2.0, rmin1, rmax1, rmin2, rmax2);
+      TGeoCone* coverConeShape = new TGeoCone(coverLength / 2.0, rmin1, rmax1, rmin2, rmax2);
+      TGeoVolume* coverCone = new TGeoVolume((format("ForwardCover%1%") % coverID).str().c_str(), coverConeShape, medAluminum);
       coverCone->SetLineColor(kGray);
       volGrpCover->AddNode(coverCone, coverID, new TGeoTranslation(0.0, 0.0, coverPosZ + coverLength / 2.0));
     }
   }
+  volGrpCDC->AddNode(volGrpCover, 1, new TGeoTranslation(0.0, 0.0, 0.0));
 }

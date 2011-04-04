@@ -105,6 +105,7 @@ int TouschekReaderTURTLE::getParticles(int number, MCParticleGraph &graph) throw
     particle.setStatus(MCParticle::c_PrimaryParticle);
     particle.setPDG(m_pdg);
     particle.setMassFromPDG();
+    particle.setChargeFromPDG();
     particle.setMomentum(TVector3(particleMomGeant4));
     particle.setProductionVertex(TVector3(particlePosGeant4));
     particle.setEnergy(totalMom2 + m_pdg*m_pdg);

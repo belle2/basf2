@@ -139,6 +139,12 @@ namespace Belle2 {
     const float getMass()                    const { return m_mass; }
 
     /**
+     * Return the particle charge.
+     * @return The charge of the particle in units of q(positron).
+     */
+    const float getCharge()                    const { return m_charge; }
+
+    /**
      * Return particle energy in GeV.
      * @return Returns the particle energy in GeV.
      */
@@ -278,6 +284,11 @@ namespace Belle2 {
     void setMassFromPDG();
 
     /**
+      * Sets the charge for the particle from the particle's PDG code.
+      */
+    void setChargeFromPDG();
+
+    /**
      * Set Status code for the particle.
      * @param status The status code of the MonteCarlo particle.
      */
@@ -302,6 +313,12 @@ namespace Belle2 {
      * @param mass The MonteCarlo particle mass.
      */
     void setMass(float mass)                            { m_mass = mass; }
+
+    /**
+     * Set particle charge.
+     * @param charge The MonteCarlo particle charge.
+     */
+    void setCharge(float charge)                            { m_charge = charge; }
 
     /**
      * Set energy.
@@ -420,6 +437,7 @@ namespace Belle2 {
 
     unsigned int m_status;      /**< status code */
     int m_pdg;                  /**< PDG-Code of the particle */
+    float m_charge;               /**< charge of the particle */
     float m_mass;               /**< mass of the particle */
     float m_energy;             /**< energy of the particle */
     float m_momentum_x;         /**< momentum of particle, x component */

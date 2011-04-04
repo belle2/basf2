@@ -32,6 +32,13 @@ void MCParticle::setMassFromPDG()
   m_mass = TDatabasePDG::Instance()->GetParticle(m_pdg)->Mass();
 }
 
+void MCParticle::setChargeFromPDG()
+{
+  if (TDatabasePDG::Instance()->GetParticle(m_pdg) == NULL) throw(ParticlePDGNotKnownError() << m_pdg);
+  m_charge = 3 * TDatabasePDG::Instance()->GetParticle(m_pdg)->Charge();
+}
+
+
 
 const vector<MCParticle*> MCParticle::getDaughters() const
 {

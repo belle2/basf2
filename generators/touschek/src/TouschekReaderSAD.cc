@@ -162,6 +162,7 @@ void TouschekReaderSAD::addParticleToMCParticles(MCParticleGraph& graph)
   particle.setStatus(MCParticle::c_PrimaryParticle);
   particle.setPDG(m_pdg);
   particle.setMassFromPDG();
+  particle.setChargeFromPDG();
 
   //Convert the position of the particle from local Touschek space to global geant4 space.
   //Flip the sign for the y and z component to go from the accelerator to the detector coordinate system

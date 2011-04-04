@@ -79,6 +79,8 @@ int HepevtReader::getEvent(MCParticleGraph &graph, double & eventWeight) throw(H
     if (i < m_nVirtual)
       p.setVirtual();
 
+    //set the particle charge:
+    p.setChargeFromPDG();
   }
   return eventID;
 }

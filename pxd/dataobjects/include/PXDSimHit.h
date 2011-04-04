@@ -16,7 +16,7 @@
 #include <TVector3.h>
 
 #define DEFAULT_PXDSIMHITS "PXDSimHits"
-#define DEFAULT_PXDSIMHITSREL "PXDSimHitsToMCParticles"
+#define DEFAULT_PXDSIMHITSREL "MCParticlesToPXDSimHits"
 
 namespace Belle2 {
 

@@ -50,8 +50,8 @@ PXDDigiSimpleModule::PXDDigiSimpleModule() : Module(),
   setDescription("PXD simple digitizer");
 
   // Add parameters
-  addParam("InputColName", m_inColName, "Input collection name", string("PXDSimHitArray"));
-  addParam("OutputColName", m_outColName, "Output collection name", string("PXDHitArray"));
+  addParam("InputColName", m_inColName, "Input collection name", string(DEFAULT_PXDSIMHITS));
+  addParam("OutputColName", m_outColName, "Output collection name", string(DEFAULT_PXDHITS));
   //addParam("RelationColNameMC2Digi", m_relColNameMC2Digi,
   //      "Name of relation collection - MC hits to Digitizer hits. (created if non-null)", string("PXDMC2DigiHitRel"));
 }

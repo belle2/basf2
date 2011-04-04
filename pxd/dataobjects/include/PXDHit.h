@@ -15,6 +15,9 @@
 
 #include <TObject.h>
 
+#define DEFAULT_PXDHITS "PXDHits"
+#define DEFAULT_PXDHITSREL "MCParticlesToPXDHits"
+
 namespace Belle2 {
 
   /*

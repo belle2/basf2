@@ -15,6 +15,9 @@
 
 #include <TObject.h>
 
+#define DEFAULT_SVDHITS "SVDHits"
+#define DEFAULT_SVDHITSREL "MCParticlesToSVDHits"
+
 namespace Belle2 {
 
   /*

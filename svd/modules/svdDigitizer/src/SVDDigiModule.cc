@@ -53,8 +53,8 @@ SVDDigiModule::SVDDigiModule() : Module(),
   setDescription("SVDDigitizer");
 
   // Add parameters
-  addParam("InputColName", m_inColName, "Input collection name", string("SVDSimHitArray"));
-  addParam("OutputColName", m_outColName, "Output collection name", string("SVDHitArray"));
+  addParam("InputColName", m_inColName, "Input collection name", string(DEFAULT_SVDSIMHITS));
+  addParam("OutputColName", m_outColName, "Output collection name", string(DEFAULT_SVDHITS));
   //addParam("RelationColNameMC2Digi", m_relColNameMC2Digi,
   //      "Name of relation collection - MC hits to Digitizer hits. (created if non-null)", string("SVDMC2DigiHitRel"));
 }

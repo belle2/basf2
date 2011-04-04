@@ -16,7 +16,7 @@
 #include <TVector3.h>
 
 #define DEFAULT_SVDSIMHITS "SVDSimHits"
-#define DEFAULT_SVDSIMHITSREL "SVDSimHitsToMCParticles"
+#define DEFAULT_SVDSIMHITSREL "MCParticlesToSVDSimHits"
 
 namespace Belle2 {
 

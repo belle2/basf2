@@ -23,6 +23,8 @@
 #include <tracking/cdcConformalTracking/CDCTrackCandidate.h>
 #include <tracking/dataobjects/Track.h>
 
+#include <tracking/karlsruhe/MCMatchParticle.h>
+
 #include "GFTrack.h"
 #include "GFKalman.h"
 //#include "GFDaf.h"
@@ -61,7 +63,9 @@ GenFitterModule::GenFitterModule() :
 
   addParam("CDCTrackCandidatesColName", m_cdcTrackCandsCollectionName, "Name of collection holding the CDCTrackCandidates (output of the pattern recognition, should be created by CDCTrackingModule)", string("CDCTrackCandidates"));
   addParam("CDCTrackCandsToCDCRecoHitsColName", m_cdcTrackCandToRecoHitsCollectionName, "Name of collection holding the relations between CDCTrackCandidates and CDCRecoHits (should be created by CDCTrackingModule)", string("CDCTrackCandidatesToCDCRecoHits"));
-  addParam("CDCTrackCandsToMCParticlesColName", m_cdcTrackCandToMCParticleCollectionName, "Relation of CDCTracks to MCParticles (should be created by CDCTrackingModule)", string("CDCTrackCandidateToMCParticle"));
+  addParam("CDCTrackCandsToMCParticlesColName", m_cdcTrackCandToMCParticleCollectionName, "Relation of CDCTrackCandidates to MCParticles (should be created by CDCMCMatchingModule)", string("CDCTrackCandidateToMCParticle"));
+
+  addParam("MCMatchParticlesColName", m_mcMatchParticlesCollectionName, "Name of collection holding the MCMatchParticles (should be created by CDCMCMatchingModule)", string("MCMatchParticles"));
 
   addParam("FitMCTracks", m_fitMCTracks, "True if MC tracks should be fitted", true);
   addParam("FitRecoTracks", m_fitRecoTracks, "True if track candidates from pattern recognition should be fitted", false);
@@ -91,6 +95,9 @@ void GenFitterModule::event()
   StoreArray<CDCRecoHit> cdcRecoHits(m_cdcRecoHitsCollectionName);
   B2INFO("GenFitter: Number of CDCRecoHits: " << cdcRecoHits.GetEntries());
   if (cdcRecoHits.GetEntries() == 0) B2WARNING("GenFitter: CDCRecoHitsCollection is empty!");
+
+  //The use of MCMatchParticles is optional, the fitting of MCtruth should work without CDCMCMatchingModule
+  StoreArray<MCMatchParticle> mcMatchParticles(m_mcMatchParticlesCollectionName);
 
   //Give Genfit the magnetic field, should come from the common database later...
   GFFieldManager::getInstance()->init(new GFConstField(0., 0., 15.));
@@ -158,6 +165,12 @@ void GenFitterModule::event()
       //track.Print();
       B2INFO("-----> Fit Result: momentum: " << track.getMom().x() << "  " << track.getMom().y() << "  " << track.getMom().z());
       B2INFO("----> Chi2 of the fit: " << track.getChiSqu());
+
+      //if the MCMatchParticles were created, assign the fitted momentum
+      if (mcMatchParticles->GetEntries() != 0) {
+        mcMatchParticles[mcindex]->setFitMCMomentum(track.getMom());
+        mcMatchParticles[mcindex]->setChi2(track.getChiSqu());
+      }
 
       track.releaseHits();
 
@@ -227,6 +240,11 @@ void GenFitterModule::event()
       k.processTrack(&track);
       B2INFO("-----> Fit Result: momentum: " << track.getMom().x() << "  " << track.getMom().y() << "  " << track.getMom().z());
       B2INFO("----> Chi2 of the fit: " << track.getChiSqu());
+
+      //if the MCMatchParticles were created, assign the fitted momentum
+      if (mcMatchParticles->GetEntries() != 0) {
+        mcMatchParticles[mcindex]->setFitRecoMomentum(track.getMom());
+      }
 
       track.releaseHits();
 

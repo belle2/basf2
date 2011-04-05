@@ -9,7 +9,6 @@
  **************************************************************************/
 
 #include <tracking/modules/karlsruhe/CDCMCMatchingModule.h>
-//#include <tracking/modules/karlsruhe/include/CDCMCMatchingModule.h>
 
 #include <framework/dataobjects/Relation.h>
 #include <framework/datastore/StoreArray.h>
@@ -18,12 +17,14 @@
 #include <framework/logging/Logger.h>
 
 #include <generators/dataobjects/MCParticle.h>
+
 #include <cdc/hitcdc/CDCSimHit.h>
 #include <cdc/dataobjects/CDCHit.h>
 #include <cdc/dataobjects/CDCRecoHit.h>
 
-#include <tracking/cdcConformalTracking/CDCSegment.h>
 #include <tracking/cdcConformalTracking/CDCTrackCandidate.h>
+
+#include <tracking/karlsruhe/MCMatchParticle.h>
 
 #include <cstdlib>
 #include <iomanip>
@@ -40,7 +41,7 @@ REG_MODULE(CDCMCMatching)
 CDCMCMatchingModule::CDCMCMatchingModule() :
     Module()
 {
-  setDescription("Matches the CDCTrackCandidates with MCTruth to evaluate the performance of the pattern recognition (CDCTrackingModule).");
+  setDescription("Matches the CDCTrackCandidates with MCTruth to evaluate the performance of the pattern recognition (CDCTrackingModule). Creates as Output a relation between MCParticles and matched TrackCandidates as well as a MCMatchParticles Collection.");
 
   addParam("MCParticlesColName", m_mcParticlesCollectionName, "Name of collection holding the MCParticles", string("MCParticles"));
   addParam("MCParticleToCDCSimHitsColName", m_mcPartToCDCSimHitsCollectionName, "Name of collection holding the relations the MCParticles and the CDCSimHits (should be created during the simulation within CDCSensitiveDetector)", string("MCPartToCDCSimHits"));
@@ -52,6 +53,7 @@ CDCMCMatchingModule::CDCMCMatchingModule() :
   addParam("CDCTrackCandsToCDCRecoHitsColName", m_cdcTrackCandsToRecoHits, "Name of collection holding the relations between CDCTrackCandidates and CDCRecoHits (should be created by CDCTrackingModule)", string("CDCTrackCandidatesToCDCRecoHits"));
 
   addParam("CDCTrackCandsToMCParticlesColName", m_cdcTrackCandsToMCParticles, "Name of collection holding the relations between the CDCTrackCandidates and the matched MCParticles (output of this module)", string("CDCTrackCandidateToMCParticle"));
+  addParam("MCMatchParticlesColName", m_mcMatchParticlesCollectionName, "Name of collection holding the MCMatchParticles (output of this module)", string("MCMatchParticles"));
 
 }
 
@@ -95,7 +97,7 @@ void CDCMCMatchingModule::event()
 
   StoreArray<Relation> cdcTrackCandsToRecoHits(m_cdcTrackCandsToRecoHits);
   //B2INFO("CDCMCMatching: Number of relations between CDCTrackCandidates and CDCRecoHits: "<<cdcTrackCandsToRecoHits.GetEntries());
-  if (cdcTrackCandsToRecoHits.GetEntries() == 0) B2WARNING("CDCMCMatching: CDCTRackCandidatesToCDCRecoHitsCollection is empty!");
+  if (cdcTrackCandsToRecoHits.GetEntries() == 0) B2WARNING("CDCMCMatching: CDCTrackCandidatesToCDCRecoHitsCollection is empty!");
 
 
   //Create a relation between the track candidate and their most probable 'mother' MC particle
@@ -115,7 +117,7 @@ void CDCMCMatchingModule::event()
     //B2INFO("Track "<<i<<"  "<<RecoHitsList.size()<<" RecoHits assigned");
 
     list<short unsigned int> SimHitsList;
-    //use the RecoHitList to create a List with SimHit for this TrackCandidate
+    //use the RecoHitList to create a List with SimHits for this TrackCandidate
     for (int k = 0; k < cdcSimHitToCDCHits->GetEntries(); k++) {
       BOOST_FOREACH(int hit, RecoHitsList) {
         if (cdcSimHitToCDCHits[k]->getToIndex() == hit) {
@@ -139,100 +141,90 @@ void CDCMCMatchingModule::event()
 
       }
     }
-    for (unsigned int test = 0 ; test < cdcTrackCandidates[i]->getMCParticles().size(); test++) {
-      //B2INFO("This Track has "<<cdcTrackCandidates[i]->getMCParticles().at(test).second<<" Hits from MCP "<<cdcTrackCandidates[i]->getMCParticles().at(test).first);
-    }
+
     //Evaluate the MCParticle with the largest contribution
     cdcTrackCandidates[i]->evaluateMC();
-    B2INFO("-------> Track " << i << " has " << cdcTrackCandidates[i]->getPurity() << "% of Hits from MCParticle " << cdcTrackCandidates[i]->getMCId());
     //Create Relation
     new(cdcTrackCandToMCPart->AddrAt(i)) Relation(cdcTrackCandidates, mcParticles, i, cdcTrackCandidates[i]->getMCId());
 
+    //Some prompt info output
+    B2INFO("-------> TrackCandidate " << i << " has " << cdcTrackCandidates[i]->getPurity() << "% of Hits from MCParticle " << cdcTrackCandidates[i]->getMCId());
+    B2INFO("        (TrackCandidate charge: " << cdcTrackCandidates[i]->getChargeSign() << "  : MCParticle pdg: " << mcParticles[cdcTrackCandidates[i]->getMCId()]->getPDG() << " )");
+
+
   }//end loop over all TrackCandidates
 
-  //Now the evaltuation is performed from the other side
-
-  /*
-    B2INFO("Transform MCParticle to MCMatchParticles");
-    StoreArray<MCMatchParticle> mcMatchParticles("MCMatchParticles");
-    for (int i = 0; i < mcParticles->GetEntries(); i++) {
-      MCMatchParticle matchparticle(mcParticles[i]);
-      new (mcMatchParticles->AddrAt(i)) MCMatchParticle(matchparticle);
-    }
-  //  B2INFO("Loop over MCMatch particles "<<mcMatchParticles->GetEntries())
-    int hitCounter = 0;
-    for (int i = 0; i < mcMatchParticles->GetEntries(); i++) {
-      list<short unsigned int> SimList;
-      hitCounter = 0;
-
-      if (mcMatchParticles[i]->getMother()) mcMatchParticles[i]->setPrimary(false);
-      else mcMatchParticles[i]->setPrimary(true);
+  //Now the evaluation is performed 'from the other side'
+  //Create a StoreArray with MCMatchParticles, where the output can be stored
+  //I think this part wont be needed in the future, but it is convenient for the moment...
 
 
-   //       B2INFO("Loop over relations SimHit->MC "<<cdcSimHitToMC->GetEntries());
-      for (int j = 0; j < cdcSimHitToMC->GetEntries(); j++) {
+  StoreArray<MCMatchParticle> mcMatchParticles(m_mcMatchParticlesCollectionName);
+  //Create MCMatchParticle for each MCParticle (-> keep same StoreArray indices)
+  for (int i = 0; i < mcParticles->GetEntries(); i++) {
+    new(mcMatchParticles->AddrAt(i)) MCMatchParticle(mcParticles[i]);
+  }
 
-        if (cdcSimHitToMC[j]->getToIndex() == i) {
-          SimList.push_back(cdcSimHitToMC[j]->getFromIndex());
+  //B2INFO("Nr of created MCMatchParticles: "<<mcMatchParticles->GetEntries())
+  if (mcMatchParticles->GetEntries() == 0) B2WARNING("CDCMCMatching: No MCMatchParticles were created!");
+
+  int hitCounter = 0;
+  for (int i = 0; i < mcMatchParticles->GetEntries(); i++) {
+    //create a list with SimHits created by this MCParticle
+    list<short unsigned int> SimHitsList;
+    hitCounter = 0;
+
+    //fill the SimHitsList
+    for (int j = 0; j < mcPartToSimHits->GetEntries(); j++) {
+      if (mcPartToSimHits[j]->getFromIndex() == i) {
+        BOOST_FOREACH(int index, mcPartToSimHits[j]->getToIndices()) {
+          SimHitsList.push_back(index);
         }
       }
-
-    //  B2INFO("Particle "<<i<<"  created SimHits: ");
-      list<short unsigned int>::iterator iter;
-
-      for (iter = SimList.begin(); iter != SimList.end(); iter++) {
-    //    B2INFO(" iter: "<<*iter);
-
-        for (int hit = 0; hit < cdcSimRelation->GetEntries(); hit ++){
-        if (cdcSimRelation[hit]->getFromIndex() == *iter){
-        //if (cdcSimRelation[*iter]) {  //!!!!!!!!!!!!!!!!
-          int trackHitIndex = cdcSimRelation[hit]->getToIndex();
-        //  B2INFO("And this SimHit created Track Hit "<<trackHitIndex);
-          hitCounter++;
-          //if (cdcTrackHitArray[trackHitIndex]->getTrackIndices().size()> 0) {
-            for (int k = 0; k < cdcTrackHitArray[trackHitIndex]->getTrackIndices().size(); k++) {
-              int trackIndex =
-                      cdcTrackHitArray[trackHitIndex]->getTrackIndices().at(
-                          k);
-            //  B2INFO("+++ And this Track Hit belongs to Track "<<trackIndex);
-              mcMatchParticles[i]->addTrack(trackIndex);
-            }
-        }
-        //else B2INFO("----------------No relation to TrackHit for this SimHit");
-
-        //}
-      }
-      }
-      SimList.clear();
-      mcMatchParticles[i]->setNHits(hitCounter);
-      if (mcMatchParticles[i]->getNHits() > 0){
-  //    B2INFO("particle "<<i<<" produced "<<mcMatchParticles[i]->getNHits()<<"  TrackHits");
-      if (mcMatchParticles[i]->getTracks().size()>0){
-  //    for (int k = 0; k < mcMatchParticles[i]->getTracks().size(); k++) {
-  //      B2INFO("**** This particle has "<<mcMatchParticles[i]->getTracks().at(k).Y()<<" Hits in Track: "<<mcMatchParticles[i]->getTracks().at(k).X());
-  //    }
-
-      mcMatchParticles[i]->evaluateMC();
-      mcMatchParticles[i]->evaluatePRes(cdcTracksArray[mcMatchParticles[i]->getTrackId()]->getMomentumValue());
-
-
-      mcMatchParticles[i]->setPurity(cdcTracksArray[mcMatchParticles[i]->getTrackId()]->evaluateMC(i));
-      if (mcMatchParticles[i]->getPrimary()== true){
-      B2INFO("MC Particle "<<i<<" ("<<mcMatchParticles[i]->getPrimary()<<") :  "<<mcMatchParticles[i]->getCorrectMC()<<" %  of its hits are in the track "<<mcMatchParticles[i]->getTrackId() );
-      B2INFO("---------------- and it corresponds to "<<mcMatchParticles[i]->getPurity()<<" % of the hits in this track");
-      B2INFO("MC Particle PDG: "<<mcMatchParticles[i]->getPDG()<<"  Track Charge: "<<cdcTracksArray[mcMatchParticles[i]->getTrackId()]->getChargeSign());
-      if (mcMatchParticles[i]->getPDG()*mcMatchParticles[i]->getPDG()>0 )
-      { mcMatchParticles[i]->setCorrectCharge(1);
-        }
-      else mcMatchParticles[i]->setCorrectCharge(0);
-      }
-      }
-
     }
 
+    //create a list with RecoHits from the SimHitsList
+    list<short unsigned int> RecoHitsList;
+
+    //fill the RecoHitsList
+    for (int k = 0; k < cdcSimHitToCDCHits->GetEntries(); k++) {
+      BOOST_FOREACH(int simhit, SimHitsList) {
+        if (cdcSimHitToCDCHits[k]->getFromIndex() == simhit) {
+          RecoHitsList.push_back(cdcSimHitToCDCHits[k]->getToIndex());
+          hitCounter ++;
+        }
+      }
     }
 
-  */
+    mcMatchParticles[i]->setNHits(hitCounter); //Assign number of RecoHits produced by this particle
+
+    //find out to which TrackCandidate the RecoHits were assigned
+    for (int l = 0; l < cdcTrackCandsToRecoHits->GetEntries(); l++) {
+      BOOST_FOREACH(int hit, RecoHitsList) {
+        BOOST_FOREACH(int toIndex, cdcTrackCandsToRecoHits[l]->getToIndices()) {
+          if (hit == toIndex) {
+            //add the index of TrackCandidate to the particle
+            mcMatchParticles[i]->addTrackCandidate(cdcTrackCandsToRecoHits[l]->getFromIndex());
+          }
+        }
+      }
+    }
+    //Evaluate which Track has the most RecoHits from this particle
+    mcMatchParticles[i]->evaluateMC();
+
+    //Assign the momentum of the matched Track to the MCMatchParticle
+    mcMatchParticles[i]->setRecoMomentum(cdcTrackCandidates[mcMatchParticles[i]->getTrackCandId()]->getMomentumVector());
+
+    //Some prompt info output
+    if (SimHitsList.size() != 0) {
+      B2INFO("MCParticle " << i << " created " << SimHitsList.size() << "  SimHits and " << RecoHitsList.size() << " RecoHits ");
+      if (RecoHitsList.size() != 0) {
+        B2INFO("-----> " << mcMatchParticles[i]->getEfficiency() << " %  in TrackCandidate " << mcMatchParticles[i]->getTrackCandId());
+      }
+    }
+
+  }//end loop over MCMatchParticles
+
 }
 
 void CDCMCMatchingModule::endRun()

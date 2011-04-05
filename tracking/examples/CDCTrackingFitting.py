@@ -93,17 +93,6 @@ param_cdctracking = {
     }
 cdctracking.param(param_cdctracking)
 
-param_cdcmcmatching = {
-    'MCParticlesColName': 'MCParticles',
-    'MCParticleToCDCSimHitsColName': 'MCPartToCDCSimHits',
-    'CDCSimHitToCDCHitColName': 'SimHitToCDCHits',
-    'CDCRecoHitsColName': 'CDCRecoHits',
-    'CDCTrackCandidatesColName': 'CDCTrackCandidates',
-    'CDCTrackCandsToCDCRecoHitsColName': 'CDCTrackCandidatesToCDCRecoHits',
-    'CDCTrackCandsToMCParticlesColName': 'CDCTrackCandidateToMCParticle',
-    }
-cdcmcmatching.param(param_cdcmcmatching)
-
 param_mctrackfinder = {
     'MCParticlesColName': 'MCParticles',
     'MCParticleToCDCSimHitsColName': 'MCPartToCDCSimHits',
@@ -115,6 +104,18 @@ param_mctrackfinder = {
     }
 mctrackfinder.param(param_mctrackfinder)
 
+param_cdcmcmatching = {
+    'MCParticlesColName': 'MCParticles',
+    'MCParticleToCDCSimHitsColName': 'MCPartToCDCSimHits',
+    'CDCSimHitToCDCHitColName': 'SimHitToCDCHits',
+    'CDCRecoHitsColName': 'CDCRecoHits',
+    'CDCTrackCandidatesColName': 'CDCTrackCandidates',
+    'CDCTrackCandsToCDCRecoHitsColName': 'CDCTrackCandidatesToCDCRecoHits',
+    'CDCTrackCandsToMCParticlesColName': 'CDCTrackCandidateToMCParticle',
+    'MCMatchParticlesColName': 'MCMatchParticles',
+    }
+cdcmcmatching.param(param_cdcmcmatching)
+
 param_cdcfitting = {
     'MCParticlesColName': 'MCParticles',
     'CDCRecoHitsColName': 'CDCRecoHits',
@@ -124,6 +125,7 @@ param_cdcfitting = {
     'CDCTrackCandidatesColName': 'CDCTrackCandidates',
     'CDCTrackCandsToCDCRecoHitsColName': 'CDCTrackCandidatesToCDCRecoHits',
     'CDCTrackCandsToMCParticlesColName': 'CDCTrackCandidateToMCParticle',
+    'MCMatchParticlesColName': 'MCMatchParticles',
     'FitMCTracks': 1,
     'FitRecoTracks': 1,
     }
@@ -145,10 +147,10 @@ main.add_module(mcparticle)
 main.add_module(cdcdigitizer)
 main.add_module(recohitmaker)
 main.add_module(cdctracking)
-main.add_module(cdcmcmatching)
 main.add_module(mctrackfinder)
+main.add_module(cdcmcmatching)
 main.add_module(cdcfitting)
-# main.add_module(output)
+main.add_module(output)
 
 # Process events
 process(main)

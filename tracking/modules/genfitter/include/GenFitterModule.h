@@ -66,6 +66,8 @@ namespace Belle2 {
     std::string m_cdcTrackCandToRecoHitsCollectionName;     /**< CDCTrackCandidates to CDCRecoHits relation name */
     std::string m_cdcTrackCandToMCParticleCollectionName;   /**< CDCTrackCandidates to MCParticles relation name */
 
+    std::string m_mcMatchParticlesCollectionName;           /**< MCMatchParticles collection name */
+
     bool m_fitMCTracks;                                     /**< True if MC tracks should be fitted */
     bool m_fitRecoTracks;                                   /**< True if track candidates from pattern recognition should be fitted */
 

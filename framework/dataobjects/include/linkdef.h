@@ -10,6 +10,8 @@
 #pragma link C++ class Belle2::RelationT<UInt_t>;
 #pragma link C++ class Belle2::RelationT<UShort_t>;
 
+#pragma link C++ class Belle2::RunMetaData;
+
 
 
 

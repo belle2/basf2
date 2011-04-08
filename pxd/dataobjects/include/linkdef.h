@@ -9,5 +9,7 @@
 #pragma link C++ class Belle2::PXDSimHit;
 #pragma link C++ class Belle2::PXDDigit;
 #pragma link C++ class Belle2::PXDHit;
+#pragma link C++ class Belle2::PXDRecoHit;
+#pragma link C++ class Belle2::SiSensorPlane;
 
 #endif

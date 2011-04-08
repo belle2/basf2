@@ -3,64 +3,52 @@
  * Copyright(C) 2010-2011  Belle II Collaboration                         *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Andreas Moll, Peter Kvasnicka, Zbynek Drasal             *
+ * Contributors: Peter Kvasnicka                                          *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PXDDIGISIMPLEMODULE_H
-#define PXDDIGISIMPLEMODULE_H
+#ifndef PXDRECOHITMAKERMODULE_H
+#define PXDRECOHITMAKERMODULE_H
 
 #include <framework/core/Module.h>
-#include <pxd/geopxd/CIDManager.h>
-#include <pxd/modules/pxdDigitizer/PXDcheater.h>
-
-#include <TRandom3.h>
-
-#include <string>
 
 namespace Belle2 {
 
   /**
-   * Gaussian-smearing PXD digitizer.
+   * PXDRecoHit maker module.
    *
-   * Now, I only use pre-set simulation-based resolutions provided by the
-   * PXDcheater class to randomize hit positions. Error matrices of hit positions
-   * are calculated from the same resolutions.
-   * The deposited energy is not smeared and no error is given for it.
-   * Also, there is now no combination of near hits.
-   * A full digitization will be added later.
+   * This simple module takes a DataStore array of PXDHits as input and converts
+   * it to an array of PXDRecoHits - enriched hits containing also detector plane
+   * information.
    */
 
-  class PXDDigiSimpleModule : public Module {
+  class PXDRecoHitMakerModule : public Module {
 
   public:
 
     /** Constructor.*/
-    PXDDigiSimpleModule();
+    PXDRecoHitMakerModule();
 
     /** Destructor.*/
-    virtual ~PXDDigiSimpleModule();
+    virtual ~PXDRecoHitMakerModule();
 
     /**
      * Initialize the Module.
-     *
-     * This method is called at the beginning of data processing.
-     * Initialize the cheater, collect geometry information etc.
      */
     virtual void initialize();
 
     /**
      * Called when entering a new run.
      *
-     * Set run dependent things like run header parameters, alignment, etc.
+     * Refresh SiGeoCache.
      */
     virtual void beginRun();
 
     /**
      * Event processor.
      *
-     * Convert PXDSimHits of the event to PXDHits.
+     * Convert PXDHits of the event to PXDRecoHits.
      */
     virtual void event();
 
@@ -83,19 +71,12 @@ namespace Belle2 {
     /** Print module parameters.*/
     void printModuleParams() const;
 
-//    /** Print run statistics.*/
-//    void printRunStats() const;
 
   private:
 
     std::string m_inColName;         /**< Input collection name */
     std::string m_outColName;        /**< Output collection name */
-//    std::string m_relColNameMC2Digi; /**< Relation collection name (MC hits to Digi hits)*/
-
-    /* Other members.*/
-    PXDcheater* m_cheater;  /**< Cheater provides resolutions and pitch data.*/
-    SensorUIDManager* m_cid;      /**< Convert between compact ID and layer/ladder/sensor IDs.*/
-    TRandom3* m_random;     /** Random number generator.*/
+    std::string m_relColName;        /**< Relation collection name (MC particles to RecoHits. */
 
     double m_timeCPU;                /**< CPU time.     */
     int    m_nRun;                   /**< Run number.   */

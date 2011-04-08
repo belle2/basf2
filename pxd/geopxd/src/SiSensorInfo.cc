@@ -9,10 +9,11 @@
  **************************************************************************/
 
 
-#include <pxd/modules/pxdDigitizer/SiSensorInfo.h>
+#include <pxd/geopxd/SiSensorInfo.h>
 
 #include <pxd/dataobjects/PXDVolumeUserInfo.h>
-#include <pxd/hitpxd/CIDManager.h>
+#include <svd/dataobjects/SVDVolumeUserInfo.h>
+#include <pxd/geopxd/CIDManager.h>
 
 #include <string>
 
@@ -29,9 +30,10 @@ using namespace Belle2;
 SiSensorInfo::SiSensorInfo(TGeoNode* pNode)
 {
   // Initialize from the gGeoManager:
-
-  // Get transformation matrix from the node.
-  m_transform = pNode->GetMatrix();
+  // Get transformation matrix from the gGeoManager
+  // Caution:
+  // This uses TGeoNavigator! Can be dangerous to Geant4 tracking?!
+  m_transform = dynamic_cast<TGeoHMatrix*>(gGeoManager->GetCurrentMatrix()->Clone());
 
   // To which detector this belongs
   TGeoVolume* pVolume = pNode->GetVolume();
@@ -44,28 +46,45 @@ SiSensorInfo::SiSensorInfo(TGeoNode* pNode)
     m_detectorType = c_otherDetector;
 
   // Basic data from UserInfo
-  PXDVolumeUserInfo* info = dynamic_cast<PXDVolumeUserInfo*>(pVolume->GetField());
-  m_layerID = info->getLayerID();
-  m_ladderID = info->getLadderID();
-  m_sensorID = info->getSensorID();
-  CIDManager cid;
+  if (m_detectorType == c_PXD) {
+    PXDVolumeUserInfo* info =
+      dynamic_cast<PXDVolumeUserInfo*>(pVolume->GetField());
+    m_layerID = info->getLayerID();
+    m_ladderID = info->getLadderID();
+    m_sensorID = info->getSensorID();
+    // Readout geometry data from UserInfo
+    m_uPitch = info->getUPitch();
+    m_vPitch = info->getVPitch();
+    m_vPitch2 = m_vPitch;
+    m_uCells = info->getUCells();
+    m_vCells = info->getVCells();
+  } else {
+    SVDVolumeUserInfo* info =
+      dynamic_cast<SVDVolumeUserInfo*>(pVolume->GetField());
+    m_layerID = info->getLayerID();
+    m_ladderID = info->getLadderID();
+    m_sensorID = info->getSensorID();
+    // Readout geometry data from UserInfo
+    /* Not implemented.
+    m_uPitch = info->getUPitch();
+    m_vPitch = info->getVPitch();
+    m_vPitch2 = m_vPitch;
+    m_uCells = info->getUCells();
+    m_vCells = info->getVCells();
+    */
+  }
+
+  SensorUIDManager cid;
   cid.setLayerID(m_layerID);
   cid.setLadderID(m_ladderID);
   cid.setSensorID(m_sensorID);
-  m_CID = cid.getCID();
-
-  // Readout geometry data from UserInfo
-  m_uPitch = info->getUPitch();
-  m_vPitch = info->getVPitch();
-  m_vPitch2 = m_vPitch; //info->getVPitch2();
-  m_uCells = info->getUCells();
-  m_vCells = info->getVCells();
+  m_SensorUID = cid.getSensorUID();
 
   // Shape information
   TGeoShape* pShape = pVolume->GetShape();
   string classname(pShape->ClassName());
 
-  if (classname == "TGeoTrd2") {   // trapezoid - SVD
+  if (classname == "TGeoTrd2") { // trapezoid - SVD
     m_shape = c_trapezoidal;
     TGeoTrd2 *shape = dynamic_cast<TGeoTrd2*>(pShape);
     m_thickness = 2.0 * shape->GetDx1();

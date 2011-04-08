@@ -43,7 +43,7 @@ REG_MODULE(PXDDigiSimple)
 
 PXDDigiSimpleModule::PXDDigiSimpleModule() : Module(),
     m_cheater(new PXDcheater()),
-    m_cid(new CIDManager(0)),
+    m_cid(new SensorUIDManager(0)),
     m_random(new TRandom3(0))
 {
   // Set description()
@@ -128,7 +128,7 @@ void PXDDigiSimpleModule::event()
     m_cid->setLayerID(layerID);
     m_cid->setLadderID(ladderID);
     m_cid->setSensorID(sensorID);
-    newHit->setSensorCID(m_cid->getCID());
+    newHit->setSensorCID(m_cid->getSensorUID());
 
     // Position + smear + errors
     TVector3 posIn = aSimHit->getPosIn();

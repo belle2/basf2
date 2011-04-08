@@ -50,7 +50,7 @@ namespace Belle2 {
      */
     SiSensorInfo():
         m_detectorType(c_otherDetector),
-        m_layerID(-1), m_ladderID(-1), m_sensorID(-1), m_CID(-1),
+        m_layerID(-1), m_ladderID(-1), m_sensorID(-1), m_SensorUID(-1),
         m_shape(c_otherShape), m_uSize(0), m_vSize(0), m_vSize2(0), m_thickness(0),
         m_uPitch(1), m_vPitch(1), m_vPitch2(1), m_uCells(1), m_vCells(1)
     {;}
@@ -100,7 +100,7 @@ namespace Belle2 {
      * Get sensor CID.
      * @return CID (compact layer/ladder/sensor ID of the sensor.
      */
-    int getCID() const { return m_CID; }
+    int getSensorUID() const { return m_SensorUID; }
 
 
     //Sensor shape and dimension getters
@@ -306,7 +306,7 @@ namespace Belle2 {
     int m_layerID;      /**< Layer ID of the sensor. */
     int m_ladderID;     /**< Ladder ID of the sensor. */
     int m_sensorID;     /**< Sensor ID of the sensor. */
-    int m_CID;        /**< Compact ID of the sensor. */
+    int m_SensorUID;        /**< Compact ID of the sensor. */
 
     // Dimensions and shape.
     SensorShape m_shape;  /**< c_rectangular or c_trapezoidal. */
@@ -323,7 +323,7 @@ namespace Belle2 {
     int m_vCells;     /**< number of cells in v. */
 
     // Transform
-    const TGeoMatrix* m_transform;  /**< Pointer to the sensor's transformation matrix. */
+    const TGeoHMatrix* m_transform;  /**< Pointer to the sensor's transformation matrix. */
 
   }; // class SiSensorInfo
 

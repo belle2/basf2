@@ -1,6 +1,6 @@
 Import('env')
 
-env['LIBS'] = ['pxd', 'framework',
+env['LIBS'] = ['pxd', 'framework', 
                '$ROOT_LIBS']
 
 Return('env')

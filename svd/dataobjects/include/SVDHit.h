@@ -11,7 +11,7 @@
 #ifndef SVDHIT_H
 #define SVDHIT_H
 
-#include <pxd/hitpxd/CIDManager.h>
+#include <pxd/geopxd/CIDManager.h>
 
 #include <TObject.h>
 
@@ -29,15 +29,6 @@ namespace Belle2 {
    * A first attempt is made to create a lean sensor identifier storing
    * layer/ladder/sensor info. To keep this hit class free of additonal members,
    * the coding/decoding is done via a separate class CIDManager.
-   * Just
-   *    #include <pxd/hitpxd/CIDManager.h>,
-   * and, to decode, do
-   *    CIDManager cid(hit.getSensorCID());
-   *    int layerID = cid.getLayerID(); etc.,
-   * or, to encode, do
-   *    CIDManager cid();
-   *    cid.setLayerID(myLayerID); etc.,
-   *    short int myCID = cid.getCID();
    * For normalization of spatial data, a precision of 1 um should be
    * satisfactory (expected resolutions are ~4 um and more). A 4-byte
    * integer would be more than enough (but a 2-byte int will not). For energy,
@@ -63,7 +54,7 @@ namespace Belle2 {
            float uvCov,
            float energyDep,
            float energyDepError):
-        m_sensorCID(sensorCID),
+        m_sensorUID(sensorCID),
         m_u(u), m_uError(uError),
         m_v(v), m_vError(vError),
         m_uvCov(uvCov),
@@ -73,7 +64,7 @@ namespace Belle2 {
     }
 
     /** Set compressed layer/ladder/sensor id.*/
-    void setSensorCID(int CID) { m_sensorCID = CID; }
+    void setSensorCID(int CID) { m_sensorUID = CID; }
 
     /** Set u coordinate.*/
     void setU(float u) { m_u = u; }
@@ -98,7 +89,7 @@ namespace Belle2 {
     { m_energyDepError = energyDepError; }
 
     /** Get the compact ID.*/
-    int getSensorCID() const { return m_sensorCID; }
+    int getSensorUID() const { return m_sensorUID; }
 
     /** Get u coordinate.*/
     float getU() const { return m_u; }
@@ -123,7 +114,7 @@ namespace Belle2 {
 
   private:
 
-    int m_sensorCID;                /**< Compressed sensor identifier.*/
+    int m_sensorUID;                /**< Compressed sensor identifier.*/
     float m_u;                      /**< u (azimuthal) coordinate of the hit.*/
     float m_uError;                 /**< u coordinate error.*/
     float m_v;                      /**< v (axial) coordinate of the hit.*/

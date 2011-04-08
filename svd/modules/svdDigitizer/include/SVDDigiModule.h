@@ -12,7 +12,7 @@
 #define SVDDIGIMODULE_H
 
 #include <framework/core/Module.h>
-#include <pxd/hitpxd/CIDManager.h>
+#include <pxd/geopxd/CIDManager.h>
 #include <svd/modules/svdDigitizer/SVDcheater.h>
 
 #include <string>
@@ -94,7 +94,7 @@ namespace Belle2 {
 
     /* Other members.*/
     SVDcheater* m_cheater;  /**< Cheater provides resolutions and pitch data.*/
-    CIDManager* m_cid;      /**< Convert between compact ID and layer/ladder/sensor IDs.*/
+    SensorUIDManager* m_cid;      /**< Convert between compact ID and layer/ladder/sensor IDs.*/
     TRandom3* m_random;     /** Random number generator.*/
 
     double m_timeCPU;                /**< CPU time.     */

@@ -46,7 +46,7 @@ REG_MODULE(SVDDigi)
 
 SVDDigiModule::SVDDigiModule() : Module(),
     m_cheater(new SVDcheater()),
-    m_cid(new CIDManager(0)),
+    m_cid(new SensorUIDManager(0)),
     m_random(new TRandom3(0))
 {
   // Set description()
@@ -131,7 +131,7 @@ void SVDDigiModule::event()
     m_cid->setLayerID(layerID);
     m_cid->setLadderID(ladderID);
     m_cid->setSensorID(sensorID);
-    newHit->setSensorCID(m_cid->getCID());
+    newHit->setSensorCID(m_cid->getSensorUID());
 
     // Position + smear + errors
     TVector3 posIn = aSimHit->getPosIn();

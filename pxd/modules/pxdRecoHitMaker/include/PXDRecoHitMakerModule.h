@@ -74,9 +74,11 @@ namespace Belle2 {
 
   private:
 
-    std::string m_inColName;         /**< Input collection name */
-    std::string m_outColName;        /**< Output collection name */
-    std::string m_relColName;        /**< Relation collection name (MC particles to RecoHits. */
+    std::string m_mcColName;         /**< Name of MCParticles collection. */
+    std::string m_inColName;         /**< PXDHits collection name */
+    std::string m_outColName;        /**< PXDRecoHits collection name */
+    std::string m_relHitName;        /**< Relation collection name (MC hits to PXD Hits)*/
+    std::string m_relRecName;        /**< Relation collection name (MC hits to Reco hits)*/
 
     double m_timeCPU;                /**< CPU time.     */
     int    m_nRun;                   /**< Run number.   */

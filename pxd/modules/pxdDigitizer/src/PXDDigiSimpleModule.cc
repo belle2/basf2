@@ -10,15 +10,18 @@
 // Own include
 #include <pxd/modules/pxdDigitizer/PXDDigiSimpleModule.h>
 
+
 #include <time.h>
 
 // Hit classes
 #include <pxd/dataobjects/PXDSimHit.h>
 #include <pxd/dataobjects/PXDHit.h>
+#include <pxd/dataobjects/RelationHolder.h>
+#include <generators/dataobjects/MCParticle.h>
 
 // framework - DataStore
+#include <framework/dataobjects/Relation.h>
 #include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 
 // framework aux
@@ -28,9 +31,17 @@
 // ROOT
 #include <TVector3.h>
 
+// STL
+#include <utility>
+#include <list>
+
 using namespace std;
 using namespace boost;
 using namespace Belle2;
+
+typedef list<unsigned short> RelList;
+typedef list<unsigned short>::iterator RelListItr;
+
 
 //-----------------------------------------------------------------
 //                 Register the Module
@@ -50,10 +61,16 @@ PXDDigiSimpleModule::PXDDigiSimpleModule() : Module(),
   setDescription("PXD simple digitizer");
 
   // Add parameters
-  addParam("InputColName", m_inColName, "Input collection name", string(DEFAULT_PXDSIMHITS));
-  addParam("OutputColName", m_outColName, "Output collection name", string(DEFAULT_PXDHITS));
-  //addParam("RelationColNameMC2Digi", m_relColNameMC2Digi,
-  //      "Name of relation collection - MC hits to Digitizer hits. (created if non-null)", string("PXDMC2DigiHitRel"));
+  addParam("MCPartColName", m_mcColName, "MCParticles collection name",
+           string(DEFAULT_MCPARTICLES));
+  addParam("InputColName", m_inColName, "Input collection name",
+           string(DEFAULT_PXDSIMHITS));
+  addParam("OutputColName", m_outColName, "Output collection name",
+           string(DEFAULT_PXDHITS));
+  addParam("MCParticlesToPXDSimHits", m_relSimName, "Relation MCPart-to-PXDSimHits",
+           string(DEFAULT_PXDSIMHITSREL));
+  addParam("MCParticlesToPXDHits", m_relHitName, "Relation MCPart-to-PXDHits",
+           string(DEFAULT_PXDHITSREL));
 }
 
 PXDDigiSimpleModule::~PXDDigiSimpleModule()
@@ -87,9 +104,17 @@ void PXDDigiSimpleModule::event()
   //------------------------------------------------------
   // Get the collection of PXDSimHits from the Data store.
   //------------------------------------------------------
+  StoreArray<MCParticle> mcPartArray(m_mcColName);
+  if (!mcPartArray) {
+    B2ERROR("PXDDigiSimple: Cannot get collection " << m_mcColName << " from the DataStore.");
+  }
+
+  //------------------------------------------------------
+  // Get the collection of PXDSimHits from the Data store.
+  //------------------------------------------------------
   StoreArray<PXDSimHit> pxdInArray(m_inColName);
   if (!pxdInArray) {
-    B2ERROR("PXDDigiSimple: Input collection " << m_inColName << " unavailable.");
+    B2ERROR("PXDDigiSimple: Cannot get collection " << m_inColName << " from the DataStore.");
   }
 
   //-----------------------------------------------------
@@ -98,7 +123,44 @@ void PXDDigiSimpleModule::event()
   //-----------------------------------------------------
   StoreArray<PXDHit> pxdOutArray(m_outColName);
   if (!pxdOutArray) {
-    B2ERROR("PXDDigiSimple: Output collection " << m_inColName << " unavailable.");
+    B2ERROR("PXDDigiSimple: Cannot get collection " << m_outColName << " from the DataStore.");
+  }
+
+  //-----------------------------------------------------
+  // Get the MCParticles-to-PXDSimHits collection from
+  // the Data store, and initialize the RelationHolder.
+  //-----------------------------------------------------
+  StoreArray<Relation> mcSimArray(m_relSimName);
+  if (!mcSimArray) {
+    B2ERROR("PXDDigiSimple: Cannot get collection " << m_relSimName << " from the DataStore.");
+  }
+  // Create the relaiton holder:
+  TwoSidedRelationSet relMCSim;
+
+  // Fill with relation data
+  int nMCSimRels = mcSimArray.GetEntries();
+  for (int iRel = 0; iRel < nMCSimRels; ++iRel) {
+    Relation* rel = mcSimArray[iRel];
+    AtomicRelation arel;
+    arel.m_from = rel->getFromIndex();
+    RelList toIndices = rel->getToIndices();
+    for (RelListItr idx = toIndices.begin(); idx != toIndices.end(); ++idx) {
+      arel.m_to = (*idx);
+      arel.m_weight = 1.0; // no way to retrieve weights.
+      relMCSim.insert(arel);
+    }
+  }
+
+  // Get the "to-side" index to relations.
+  ToSideIndex& simIndex = relMCSim.get<ToSide>();
+
+  //-----------------------------------------------------
+  // Get the MCParticles-to-PXDHits collection
+  // from the Data store (or have one created).
+  //-----------------------------------------------------
+  StoreArray<Relation> mcHitArray(m_relHitName);
+  if (!mcHitArray) {
+    B2ERROR("PXDDigiSimple: Cannot get collection " << m_relHitName << " from the DataStore.");
   }
 
   //---------------------------------------------------------------------
@@ -153,6 +215,14 @@ void PXDDigiSimpleModule::event()
     double eDep = aSimHit->getEnergyDep();
     double deDep = 0;
     newHit->setEnergyDep(eDep); newHit->setEnergyDepError(deDep);
+
+    // get source MCParticles and save (atomic) relation(s) to mcHitArray
+    pair<ToSideItr, ToSideItr> eqRange = simIndex.equal_range(iHit);
+    for (ToSideItr mcHit = eqRange.first; mcHit != eqRange.second; ++mcHit) {
+      new(mcHitArray->AddrAt(iHit))
+      Relation(mcPartArray, pxdOutArray, mcHit->m_from, iHit, mcHit->m_weight);
+    }
+
   } // for iHit
 
   m_nEvent++;

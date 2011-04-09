@@ -88,9 +88,11 @@ namespace Belle2 {
 
   private:
 
+    std::string m_mcColName;         /**< Name of MCParticles collection. */
     std::string m_inColName;         /**< Input collection name */
     std::string m_outColName;        /**< Output collection name */
-//    std::string m_relColNameMC2Digi; /**< Relation collection name (MC hits to Digi hits)*/
+    std::string m_relSimName;        /**< Relation collection name (MC hits to SimHits)*/
+    std::string m_relHitName;        /**< Relation collection name (MC hits to PXD hits)*/
 
     /* Other members.*/
     PXDcheater* m_cheater;  /**< Cheater provides resolutions and pitch data.*/

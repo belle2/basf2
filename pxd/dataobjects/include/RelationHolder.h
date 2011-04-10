@@ -70,11 +70,19 @@ namespace Belle2 {
   boost::multi_index::indexed_by <
   boost::multi_index::ordered_non_unique <
   boost::multi_index::tag<FromSide>,
-  boost::multi_index::member<AtomicRelation, unsigned short, &AtomicRelation::m_from >
+  boost::multi_index::member <
+  AtomicRelation,
+  unsigned short,
+  &AtomicRelation::m_from
+  >
   > ,
   boost::multi_index::ordered_non_unique <
   boost::multi_index::tag<ToSide>,
-  boost::multi_index::member<AtomicRelation, unsigned short, &AtomicRelation::m_to>
+  boost::multi_index::member <
+  AtomicRelation,
+  unsigned short,
+  &AtomicRelation::m_to
+  >
   >
   >
   > TwoSidedRelationSet;
@@ -83,6 +91,10 @@ namespace Belle2 {
   typedef TwoSidedRelationSet::index<FromSide>::type::iterator FromSideItr;
   typedef TwoSidedRelationSet::index<ToSide>::type ToSideIndex;
   typedef TwoSidedRelationSet::index<ToSide>::type::iterator ToSideItr;
+
+// for reading relations
+  typedef std::list<unsigned short> RelList;
+  typedef std::list<unsigned short>::iterator RelListItr;
 
 
 }

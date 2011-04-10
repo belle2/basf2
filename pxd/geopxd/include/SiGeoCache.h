@@ -163,46 +163,52 @@ namespace Belle2 {
     /* Sensor dimension getters.*/
 
     /**
-     * Get sensor width in u (Z) by the sensor's UID.
+     * Get sensor width in v (Z) by the sensor's UID.
      * @param aSensorUID sensor UID.
      * @return width in Z (beam direction).
      */
-    double getUSensorSize(int aSensorUID) {
+    double getVSensorSize(int aSensorUID) {
       getSensor(aSensorUID);
-      return m_currentSensor.getUSize();
+      return m_currentSensor.getVSize();
     }
 
     /**
-     * Get sensor width in u (Z).
+     * Get sensor width in v (Z).
      * @param iLayer layer number.
      * @param iLadder ladder number in a given layer.
      * @param iSensor sensor number in a given ladder.
      * @return width in Z (beam direction).
      */
-    double getUSensorSize(int iLayer, int iLadder, int iSensor) {
+    double getVSensorSize(int iLayer, int iLadder, int iSensor) {
       getSensor(iLayer, iLadder, iSensor);
-      return m_currentSensor.getUSize();
+      return m_currentSensor.getVSize();
     }
 
     /**
-     * Get sensor width in v (R-Phi).
+     * Get sensor width in u (R-Phi).
      * @param iLayer layer number.
      * @param iLadder ladder number in a given layer.
-     * @param iSensor sensor number in a given ladder.
-     * @param u position in the sensor, for trapezoidal sensors.
-     * @return width in R-Phi (perpendicular to the beam direction).
+     * @param iSensor sensor numbeadder.
+     * @param v (optional) position r in a given lin the sensor.
+     * @return width in R-Phi (at given v).
      */
-    double getVSensorSize(int aSensorUID, double u = 0);
+    double getUSensorSize(int aSensorUID, double v = 0) {
+      getSensor(aSensorUID);
+      return m_currentSensor.getUSize(v);
+    }
 
     /**
-     * Get sensor width in v (R-Phi).
+     * Get sensor width in u (R-Phi).
      * @param iLayer layer number.
      * @param iLadder ladder number in a given layer.
      * @param iSensor sensor number in a given ladder.
-     * @param u position in the sensor, for trapezoidal sensors.
-     * @return width in R-Phi (perpendicular to the beam direction).
+     * @param v (optional) position in the sensor.
+     * @return width in R-Phi.
      */
-    double getVSensorSize(int iLayer, int iLadder, int iSensor, double u = 0);
+    double getUSensorSize(int iLayer, int iLadder, int iSensor, double v = 0) {
+      getSensor(iLayer, iLadder, iSensor);
+      return m_currentSensor.getUSize(v);
+    }
 
     /**
      * Get sensor thickness by the sensor's UID.
@@ -228,35 +234,37 @@ namespace Belle2 {
     /* Pitch getters.*/
 
     /**
-     * Get sensor pitch in u (Z) by the sensor's UID.
+     * Get sensor pitch in v (Z) by the sensor's UID.
      * @param aSensorUID sensor UID.
      * @return pitch in Z (beam direction)
      */
-    double getUSensorPitch(int aSensorUID) {
+    double getVSensorPitch(int aSensorUID) {
       getSensor(aSensorUID);
-      return m_currentSensor.getUPitch();
+      return m_currentSensor.getVPitch();
     }
 
     /**
-     * Get sensor pitch in u (Z).
+     * Get sensor pitch in v (Z).
      * @param iLayer layer number.
      * @param iLadder ladder number in a given layer.
      * @param iSensor sensor number in a given ladder.
      * @return pitch in Z (beam direction)
      */
-    double getUSensorPitch(int iLayer, int iLadder, int iSensor) {
+    double getVSensorPitch(int iLayer, int iLadder, int iSensor) {
       getSensor(iLayer, iLadder, iSensor);
-      return m_currentSensor.getUPitch();
+      return m_currentSensor.getVPitch();
     }
 
     /**
-     * Get sensor pitch in v (RPhi).
+     * Get sensor pitch in u (RPhi).
      * @param aSensorUID sensor UID.
-     * @param z Z coordinate, meaningful for fan strip sensors.
-     * @return pitch in r-phi (perpendicular to the beam axis); for sensors
-     * with fan strips, the pitch at z (minimum pitch if z omitted!)
+     * @param v Z coordinate.
+     * @return pitch in r-phi (perpendicular to the beam axis)
      */
-    double getVSensorPitch(int aSensorUID, double u = 0);
+    double getUSensorPitch(int aSensorUID, double v = 0) {
+      getSensor(aSensorUID);
+      return m_currentSensor.getUPitch(v);
+    }
 
     /**
      * Get sensor pitch in v (RPhi).
@@ -265,7 +273,10 @@ namespace Belle2 {
      * @return pitch in r-phi (perpendicular to the beam axis); for sensors
      * with fan strips, the pitch at z (minimum pitch if z omitted!)
      */
-    double getVSensorPitch(int iLayer, int iLadder, int iSensor, double u = 0);
+    double getUSensorPitch(int iLayer, int iLadder, int iSensor, double v = 0) {
+      getSensor(iLayer, iLadder, iSensor);
+      return m_currentSensor.getUPitch(v);
+    }
 
     /* Pixel dim getters.*/
 
@@ -316,13 +327,14 @@ namespace Belle2 {
     /**
      * Find cell number corresponding to a given Z coordinate.
      * @param aSensorUID sensor UID.
-     * @param u Z coordinate in the sensor.
+     * @param u R-Phi coordinate in the sensor.
+     * @param v (optional) Z coordinate in the sensor.
      * @return cell number (strip number or pixel row) corresponding to the given Z coordinate,
      * -1 if no such cell.
      */
-    int getUSensorCellID(int aSensorUID, double u) {
+    int getUSensorCellID(int aSensorUID, double u, double v = 0) {
       getSensor(aSensorUID);
-      return m_currentSensor.getUCellID(u);
+      return m_currentSensor.getUCellID(u, v);
     }
 
     /**
@@ -330,13 +342,14 @@ namespace Belle2 {
      * @param iLayer layer number.
      * @param iLadder ladder number in a given layer.
      * @param iSensor sensor number in a given ladder.
-     * @param u Z coordinate in the sensor.
+     * @param u R-Phi coordinate in the sensor.
+     * @param v (optional) Z coordinate in the sensor.
      * @return cell number (strip number or pixel row) corresponding to the given Z coordinate,
      * -1 if no such cell.
      */
-    int getUSensorCellID(int iLayer, int iLadder, int iSensor, double u) {
+    int getUSensorCellID(int iLayer, int iLadder, int iSensor, double u, double v = 0) {
       getSensor(iLayer, iLadder, iSensor);
-      return m_currentSensor.getUCellID(u);
+      return m_currentSensor.getUCellID(u, v);
     }
 
     /**
@@ -344,7 +357,7 @@ namespace Belle2 {
      * @param aSensorUID sensor UID.
      * @param v R-Phi coordinate in the sensor.
      * @return cell number (strip number or pixel row) corresponding to the given Z coordinate,
-     * -1 if no such cell.
+     * -1 if no such cell exists.
      */
     int getVSensorCellID(int aSensorUID, double v) {
       getSensor(aSensorUID);
@@ -366,114 +379,55 @@ namespace Belle2 {
     }
 
     /**
-     * Find cell number corresponding to a given v (R-Phi) coordinate.
-     * This version is for trapezoidal sensors, but will work with rectangles, too.
-     * @param aSensorUID sensor UID.
-     * @param u Z coordinate in the sensor.
-     * @param v R-Phi coordinate in the sensor.
-     * @return cell number (strip number or pixel column) corresponding to the given R-Phi coordinate,
-     * -1 if no such cell.
-     */
-    int getVSensorCellID(int aSensorUID, double u, double v) {
-      getSensor(aSensorUID);
-      return m_currentSensor.getVCellID(u, v);
-    }
-
-    /**
-     * Find cell number corresponding to a given v (R-Phi) coordinate.
-     * This version is for trapezoidal sensors, but will work with rectangles, too.
-     * @param iLayer layer number.
-     * @param iLadder ladder number in a given layer.
-     * @param iSensor sensor number in a given ladder.
-     * @param u Z coordinate in the sensor.
-     * @param v R-Phi coordinate in the sensor.
-     * @return cell number (strip number or pixel column) corresponding to the given R-Phi coordinate,
-     * -1 if no such cell.
-     */
-    int getVSensorCellID(int iLayer, int iLadder, int iSensor, double u,
-                         double v) {
-      getSensor(iLayer, iLadder, iSensor);
-      return m_currentSensor.getVCellID(u, v);
-    }
-
-    /**
      * Find center coordinate of a given cell in Z.
      * @param aSensorUID sensor UID.
-     * @param uID cell number in Z.
-     * @return u (Z) coordinate of the cell's center.
-     */
-    double getUCellPosition(int aSensorUID, int uID) {
-      getSensor(aSensorUID);
-      return m_currentSensor.getUCellPosition(uID);
-    }
-
-    /**
-     * Find center coordinate of a given cell in Z.
-     * @param iLayer layer number.
-     * @param iLadder ladder number in a given layer.
-     * @param iSensor sensor number in a given ladder.
-     * @param uID cell number in Z.
-     * @return u (Z) coordinate of the cell's center.
-     */
-    double getUCellPosition(int iLayer, int iLadder, int iSensor, int uID) {
-      getSensor(iLayer, iLadder, iSensor);
-      return m_currentSensor.getUCellPosition(uID);
-    }
-
-    /**
-     *  Find center coordinate of a given cell in v (R-Phi).
-     * @param aSensorUID sensor UID.
-     * @param vID cell number in r-phi.
-     * @return v (r-phi) coordinate of the cell's center.
+     * @param vID cell number in Z.
+     * @return v (Z) coordinate of the cell's center.
      */
     double getVCellPosition(int aSensorUID, int vID) {
       getSensor(aSensorUID);
-      // Will throw B2ERROR when called for a trapezoidal sensor!
       return m_currentSensor.getVCellPosition(vID);
     }
 
     /**
-     *  Find center coordinate of a given cell in v (R-Phi).
+     * Find center coordinate of a given cell in Z.
      * @param iLayer layer number.
      * @param iLadder ladder number in a given layer.
      * @param iSensor sensor number in a given ladder.
-     * @param vID cell number in r-phi.
-     * @return v (r-phi) coordinate of the cell's center.
+     * @param vID cell number in Z.
+     * @return v (Z) coordinate of the cell's center.
      */
     double getVCellPosition(int iLayer, int iLadder, int iSensor, int vID) {
       getSensor(iLayer, iLadder, iSensor);
-      // Will throw B2ERROR when called for a trapezoidal sensor!
       return m_currentSensor.getVCellPosition(vID);
     }
 
     /**
-     *  Find center coordinate of a given cell in v (R-Phi).
-     *  For trapezoidal sensors.
+     *  Find center coordinate of a given cell in u (R-Phi).
      * @param aSensorUID sensor UID.
-     * @param uID cell number in u (z).
-     * @param vID cell number in v (r-phi).
-     * @return v (r-phi) coordinate of the cell's center.
+     * @param uID cell number in r-phi.
+     * @param vID (optional) cell number in Z.
+     * @return u (r-phi) coordinate of the cell's center.
      */
-    double getVCellPosition(int aSensorUID, int uID, int vID) {
+    double getUCellPosition(int aSensorUID, int uID, int vID = -1) {
       getSensor(aSensorUID);
-      return m_currentSensor.getVCellPosition(uID, vID);
+      return m_currentSensor.getUCellPosition(uID, vID);
     }
 
     /**
-     *  Find center coordinate of a given cell in v (R-Phi).
-     *  For trapezoidal sensors.
+     *  Find center coordinate of a given cell in u (R-Phi).
      * @param iLayer layer number.
      * @param iLadder ladder number in a given layer.
      * @param iSensor sensor number in a given ladder.
-     * @param uID cell number in u (z).
-     * @param vID cell number in v (r-phi).
-     * @return v (r-phi) coordinate of the cell's center.
+     * @param uID cell number in R-Phi.
+     * @param vID (optional) cell number in Z.
+     * @return u (R-Phi) coordinate of the cell's center.
      */
-    double getVCellPosition(int iLayer, int iLadder, int iSensor, int uID,
-                            int vID) {
+    double getUCellPosition(int iLayer, int iLadder, int iSensor, int uID, int vID = -1) {
       getSensor(iLayer, iLadder, iSensor);
-      return m_currentSensor.getVCellPosition(uID, vID);
+      return m_currentSensor.getUCellPosition(uID, vID);
     }
+
 
     /* Cell UIDs - currently common to all sensors. */
 

@@ -50,16 +50,16 @@ namespace Belle2 {
      */
     SiSensorInfo():
         m_detectorType(c_otherDetector),
-        m_layerID(-1), m_ladderID(-1), m_sensorID(-1), m_SensorUID(-1),
-        m_shape(c_otherShape), m_uSize(0), m_vSize(0), m_vSize2(0), m_thickness(0),
-        m_uPitch(1), m_vPitch(1), m_vPitch2(1), m_uCells(1), m_vCells(1)
+        m_layerID(-1), m_ladderID(-1), m_sensorID(-1), m_sensorUID(-1),
+        m_shape(c_otherShape), m_vSize(0), m_uSize(0), m_uSizeD(0), m_thickness(0),
+        m_vPitch(1), m_uPitch(1), m_uPitchD(1), m_vCells(1), m_uCells(1)
     {;}
 
 
     /**
      * Constructor.
      *
-     * @param a TGeoNode from which to make a new entry.
+     * @param a TGeoNode from which to make a new active sensor entry.
      */
     SiSensorInfo(TGeoNode* pNode);
 
@@ -94,13 +94,11 @@ namespace Belle2 {
      */
     int getSensorID() const { return m_sensorID; }
 
-
-
     /**
      * Get sensor CID.
      * @return CID (compact layer/ladder/sensor ID of the sensor.
      */
-    int getSensorUID() const { return m_SensorUID; }
+    int getSensorUID() const { return m_sensorUID; }
 
 
     //Sensor shape and dimension getters
@@ -116,29 +114,15 @@ namespace Belle2 {
      * Get sensor width in Z.
      * @return width in Z (beam direction).
      */
-    double getUSize() const { return m_uSize; }
-
-
-    /**
-     * Get sensor width in Z.
-     * @return width in Z (beam direction).
-     */
-    double getVSize() const {
-      if (m_shape != c_rectangular) {
-        B2ERROR("Incorrect SiSensorInfo method for non-rectangular detector !!!")
-        return -1;
-      } else
-        return m_vSize;
-    }
-
+    double getVSize() const { return m_vSize; }
 
     /**
      * Get sensor width in R-Phi.
      * @param u R-Phi coordinate, at which the width is desired (for trapezoidal sensors)
      * @return width in R-Phi (perpendicular to the beam direction).
      */
-    double getVSize(double u) const {
-      return m_vSize *(0.5*m_uSize + u) + m_vSize2 *(0.5*m_uSize - u);
+    double getUSize(double v = 0) const {
+      return m_uSize + m_uSizeD * v;
     }
 
 
@@ -155,29 +139,16 @@ namespace Belle2 {
      * Get sensor pitch in Z.
      * @return pitch in Z (beam direction)
      */
-    double getUPitch() const { return m_uPitch; }
+    double getVPitch() const { return m_vPitch; }
 
 
     /**
-     * Get sensor pitch in R-Phi. For rectangular sensors.
-     * @return pitch in v (R-Phi)
+     * Get sensor pitch in RPhi.
+     * @param v "Z" coordinate.
+     * @return pitch in u (R-Phi)
      */
-    double getVPitch() const {
-      if (m_shape != c_rectangular) {
-        B2ERROR("Incorrect SiSensorInfo method for non-rectangular detector !!!")
-        return -1;
-      } else
-        return m_vPitch;
-    }
-
-
-    /**
-     * Get sensor pitch in RPhi. For trapezoidal sensors.
-     * @param u U ("Z") coordinate.
-     * @return pitch in v (R-Phi) (perpendicular to the beam axis).
-     */
-    double getVPitch(double u) const {
-      return m_vPitch *(0.5*m_uSize + u) + m_vPitch2 *(0.5*m_uSize - u);
+    double getUPitch(double v = 0) const {
+      return m_uPitch + m_uPitchD * v;
     }
 
 
@@ -187,44 +158,34 @@ namespace Belle2 {
      * Get number of cells (pixels/strips) in Z.
      * @return number of cells in Z direction
      */
-    int getUCells() const { return m_uCells; }
+    int getVCells() const { return m_vCells; }
 
 
     /**
      * Get number of cells in R-Phi in a given sensor.
      * @return number of cells in R-Phi direction.
      */
-    int getVCells() const { return m_vCells; }
+    int getUCells() const { return m_uCells; }
 
 
     // Cell IDs to coordinates and v.v.
 
     /**
      * Find cell number corresponding to a given Z coordinate.
-     * @param u Z coordinate in the sensor.
+     * @param v Z coordinate in the sensor.
      * @return cell number (strip number or pixel row) corresponding to the given Z coordinate,
-     * -1 if no such cell.
-     */
-    int getUCellID(double u) const ;
-
-
-    /**
-     * Find cell number corresponding to a given R-Phi coordinate.
-     * @param v R-Phi coordinate in the sensor.
-     * @return cell number (strip number or pixel column) corresponding to the given R-Phi coordinate,
      * -1 if no such cell.
      */
     int getVCellID(double v) const ;
 
-
     /**
      * Find cell number corresponding to a given R-Phi coordinate.
-     * @param u Z cooridnate in the sensor, needed for trapezoidal sensors.
-     * @param v R-Phi coordinate in the sensor.
+     * @param u R-Phi coordinate in the sensor.
+     * @param v Z coordinate in the sensor, needed for trapezoidal sensors.
      * @return cell number (strip number or pixel column) corresponding to the given R-Phi coordinate,
      * -1 if no such cell.
      */
-    int getVCellID(double u, double v) const ;
+    int getUCellID(double u, double v = 0) const ;
 
 
     /**
@@ -232,22 +193,8 @@ namespace Belle2 {
      * @param uID cell number in Z.
      * @return u (Z) coordinate of the cell's center.
      */
-    double getUCellPosition(int uID) const {
-      return (uID + 0.5) * m_uPitch - 0.5*m_uSize;
-    }
-
-
-    /**
-     * Find R-Phi coordinate of the centre of a given cell.
-     * @param vID cell number in r-phi.
-     * @return v (r-phi) coordinate of the cell's center.
-     */
     double getVCellPosition(int vID) const {
-      if (m_shape != c_rectangular) {
-        B2ERROR("Incorrect SiSensorInfo method for non-rectangular detector !!!")
-        return 0;
-      }
-      return (vID + 0.5) * m_vPitch - 0.5*m_vSize;
+      return (vID + 0.5) * m_vPitch - 0.5 * m_vSize;
     }
 
 
@@ -257,10 +204,7 @@ namespace Belle2 {
      * @param vID cell number in r-phi.
      * @return v (r-phi) coordinate of the cell's center.
      */
-    double getVCellPosition(int uID, int vID) const {
-      double u = getUCellPosition(uID);
-      return (vID + 0.5) * getVPitch(u) - 0.5 * getVSize(u);
-    }
+    double getUCellPosition(int uID, int vID = -1) const;
 
 
     // Transforms
@@ -303,31 +247,29 @@ namespace Belle2 {
     DetectorType m_detectorType; /**< PXD or SVD. */
 
     // Sensor IDs
-    int m_layerID;      /**< Layer ID of the sensor. */
-    int m_ladderID;     /**< Ladder ID of the sensor. */
-    int m_sensorID;     /**< Sensor ID of the sensor. */
-    int m_SensorUID;        /**< Compact ID of the sensor. */
+    int m_layerID; /**< Layer ID of the sensor. */
+    int m_ladderID; /**< Ladder ID of the sensor. */
+    int m_sensorID; /**< Sensor ID of the sensor. */
+    int m_sensorUID; /**< Compact ID of the sensor. */
 
     // Dimensions and shape.
     SensorShape m_shape;  /**< c_rectangular or c_trapezoidal. */
-    double m_uSize;     /**< width of sensor in u (Z). */
-    double m_vSize;     /**< width of sensor in v (R-Phi). */
-    double m_vSize2;    /**< width of sensor in v (R-Phi) for trapezoidal sensors. */
+    double m_vSize;     /**< width of sensor in v (Z). */
+    double m_uSize;     /**< (mean) width of sensor in u (R-Phi) at v=0. */
+    double m_uSizeD;    /**< gradient of width in u (R-Phi) along v. */
     double m_thickness;   /**< sensor thickness. */
 
     // Readout
-    double m_uPitch;    /**< pitch in U (Z). */
-    double m_vPitch;    /**< pitch in V (R-Phi). */
-    double m_vPitch2;   /**< other pitch in V (R-Phi) for trapezoidal sensors. */
-    int m_uCells;     /**< number of cells in u. */
+    double m_vPitch;    /**< pitch in v (Z). */
+    double m_uPitch;    /**< pitch in u (R-Phi) at v=0. */
+    double m_uPitchD;   /**< gradient of u pitch along v.*/
     int m_vCells;     /**< number of cells in v. */
+    int m_uCells;     /**< number of cells in u. */
 
     // Transform
     const TGeoHMatrix* m_transform;  /**< Pointer to the sensor's transformation matrix. */
 
   }; // class SiSensorInfo
-
-
 
 } // mamespace Belle2
 

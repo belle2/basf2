@@ -44,7 +44,7 @@ SiGeoCache::SiGeoCache() :
 
 SiGeoCache::~SiGeoCache()
 {
-  //m_sensors.clear();
+  m_sensors.clear();
   m_names.clear();
   if (m_cellUIDManager != NULL)
     delete m_cellUIDManager;
@@ -84,7 +84,7 @@ void SiGeoCache::scanCurrentNode()
     string volName = node->GetVolume()->GetName();
     m_names[volName] = newCID;
   }
-  // Check daughters, but only if we are in a PXD or an SVD branch.
+  // Check daughters, but only if we are at the top or in a PXD or an SVD branch.
   if ((nodeName.find(pxdGeoTag) != string::npos)
       || (nodeName.find(svdGeoTag) != string::npos)
       || (nodeName.find(topGeoTag) != string::npos)
@@ -191,57 +191,4 @@ void SiGeoCache::getSensor(int aSensorUID)
   return;
 }
 
-double SiGeoCache::getVSensorSize(int aSensorUID, double u)
-{
-  getSensor(aSensorUID);
-  switch (m_currentSensor.getShape()) {
-    case SiSensorInfo::c_rectangular:
-      return m_currentSensor.getVSize();
-    case SiSensorInfo::c_trapezoidal:
-      return m_currentSensor.getVSize(u);
-    default:
-      return 0;
-  } // switch
-}
-
-double SiGeoCache::getVSensorSize(int iLayer, int iLadder, int iSensor,
-                                  double u)
-{
-  getSensor(iLayer, iLadder, iSensor);
-  switch (m_currentSensor.getShape()) {
-    case SiSensorInfo::c_rectangular:
-      return m_currentSensor.getVSize();
-    case SiSensorInfo::c_trapezoidal:
-      return m_currentSensor.getVSize(u);
-    default:
-      return 0;
-  } // switch
-}
-
-double SiGeoCache::getVSensorPitch(int aSensorUID, double u)
-{
-  getSensor(aSensorUID);
-  switch (m_currentSensor.getShape()) {
-    case SiSensorInfo::c_rectangular:
-      return m_currentSensor.getVPitch();
-    case SiSensorInfo::c_trapezoidal:
-      return m_currentSensor.getVPitch(u);
-    default:
-      return 0;
-  } // switch
-}
-
-double SiGeoCache::getVSensorPitch(int iLayer, int iLadder, int iSensor,
-                                   double u)
-{
-  getSensor(iLayer, iLadder, iSensor);
-  switch (m_currentSensor.getShape()) {
-    case SiSensorInfo::c_rectangular:
-      return m_currentSensor.getVPitch();
-    case SiSensorInfo::c_trapezoidal:
-      return m_currentSensor.getVPitch(u);
-    default:
-      return 0;
-  } // switch
-}
 

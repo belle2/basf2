@@ -52,12 +52,12 @@ SiSensorInfo::SiSensorInfo(TGeoNode* pNode)
     m_layerID = info->getLayerID();
     m_ladderID = info->getLadderID();
     m_sensorID = info->getSensorID();
-    // Readout geometry data from UserInfo
-    m_uPitch = info->getUPitch();
-    m_vPitch = info->getVPitch();
-    m_vPitch2 = m_vPitch;
-    m_uCells = info->getUCells();
-    m_vCells = info->getVCells();
+    // Readout geometry data: read from UserInfo
+    m_vPitch = info->getUPitch();
+    m_uPitch = info->getVPitch();
+    m_uPitchD = 0;
+    m_vCells = info->getUCells();
+    m_uCells = info->getVCells();
   } else {
     SVDVolumeUserInfo* info =
       dynamic_cast<SVDVolumeUserInfo*>(pVolume->GetField());
@@ -66,11 +66,11 @@ SiSensorInfo::SiSensorInfo(TGeoNode* pNode)
     m_sensorID = info->getSensorID();
     // Readout geometry data from UserInfo
     /* Not implemented.
-    m_uPitch = info->getUPitch();
-    m_vPitch = info->getVPitch();
-    m_vPitch2 = m_vPitch;
-    m_uCells = info->getUCells();
-    m_vCells = info->getVCells();
+    m_vPitch = info->getUPitch();
+    m_uPitch = info->getVPitch();
+    m_uPitch2 = m_uPitch;
+    m_vCells = info->getUCells();
+    m_uCells = info->getVCells();
     */
   }
 
@@ -78,7 +78,7 @@ SiSensorInfo::SiSensorInfo(TGeoNode* pNode)
   cid.setLayerID(m_layerID);
   cid.setLadderID(m_ladderID);
   cid.setSensorID(m_sensorID);
-  m_SensorUID = cid.getSensorUID();
+  m_sensorUID = cid.getSensorUID();
 
   // Shape information
   TGeoShape* pShape = pVolume->GetShape();
@@ -88,23 +88,32 @@ SiSensorInfo::SiSensorInfo(TGeoNode* pNode)
     m_shape = c_trapezoidal;
     TGeoTrd2 *shape = dynamic_cast<TGeoTrd2*>(pShape);
     m_thickness = 2.0 * shape->GetDx1();
-    m_vSize = 2.0 * shape->GetDy1();
-    m_vSize2 = 2.0 * shape->GetDy2();
-    m_uSize = 2.0 * shape->GetDz();
+    double uSize = 2.0 * shape->GetDy1();
+    double uSize2 = 2.0 * shape->GetDy2();
+    m_uSize = 0.5 * (uSize + uSize2);
+    m_vSize = 2.0 * shape->GetDz();
+    m_uSizeD = 2.0 * (uSize2 - uSize) / m_vSize;
 
   } else if (classname == "TGeoBBox") { // bounding box - PXD
     m_shape = c_rectangular;
     TGeoBBox *shape = dynamic_cast<TGeoBBox*>(pShape);
     m_thickness = 2.0 * shape->GetDX();
-    m_vSize = 2.0 * shape->GetDY();
-    m_vSize2 = m_vSize;
-    m_uSize = 2.0 * shape->GetDZ();
+    m_uSize = 2.0 * shape->GetDY();
+    m_uSizeD = 0;
+    m_vSize = 2.0 * shape->GetDZ();
 
   } else {
     B2ERROR("Unknown shape of active Si sensor detected: " << classname.c_str());
     m_shape = c_otherShape;
-    return;
+    m_uSize = 1.0;
+    m_uSizeD = 0.0;
+    m_vSize = 1.0;
   } // if classname
+
+  // Consolidate: adapt cell size to pitch and number of cells.
+  // To be removed once geometry is consistent.
+  m_uSize = m_uPitch * m_uCells;
+  m_vSize = m_vPitch * m_vCells;
 
 } // constructor
 
@@ -112,36 +121,30 @@ SiSensorInfo::~SiSensorInfo() {;}
 
 // Cell IDs to coordinates and v.v.
 
-int SiSensorInfo::getUCellID(double u) const
-{
-  if (fabs(u) > 0.5*m_uSize) return -1;
-  else {
-    return static_cast<int>((0.5*m_uSize + u) / m_uPitch);
-  }
-}
-
-
 int SiSensorInfo::getVCellID(double v) const
 {
-  if (m_shape != c_rectangular) {
-    B2ERROR("Incorrect SiSensorInfo method for non-rectangular detector !!!")
-    return -1;
-  }
   if (fabs(v) > 0.5*m_vSize) return -1;
   else {
-    return static_cast<int>((0.5*m_vSize + v) / m_vPitch);
+    return static_cast<int>((0.5 * m_vSize + v) / m_vPitch);
   }
 }
 
 
-int SiSensorInfo::getVCellID(double u, double v) const
+int SiSensorInfo::getUCellID(double u, double v) const
 {
-  double vSize = getVSize(u);
-  if (fabs(v) > 0.5*vSize) return -1;
+  double uSize = getUSize(v);
+  if (fabs(u) > 0.5*uSize) return -1;
   else {
-    double vPitch = getVPitch(u);
-    return static_cast<int>((vSize + v) / vPitch);
+    double uPitch = getUPitch(v);
+    return static_cast<int>((uSize + u) / uPitch);
   }
+}
+
+double SiSensorInfo::getUCellPosition(int uID, int vID) const
+{
+  double v = 0;
+  if (vID > -1) v = getVCellPosition(vID);
+  return (uID + 0.5) * getUPitch(v) - 0.5 * getUSize(v);
 }
 
 

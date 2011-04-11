@@ -35,7 +35,9 @@ void MCParticle::setMassFromPDG()
 void MCParticle::setChargeFromPDG()
 {
   if (TDatabasePDG::Instance()->GetParticle(m_pdg) == NULL) throw(ParticlePDGNotKnownError() << m_pdg);
-  m_charge = 3 * TDatabasePDG::Instance()->GetParticle(m_pdg)->Charge();
+  m_charge = TDatabasePDG::Instance()->GetParticle(m_pdg)->Charge() / 3.0;
+  //  B2INFO("inside setting charge function: return value  "<<m_pdg<<"   "<<TDatabasePDG::Instance()->GetParticle(m_pdg)->Charge()<<"  "<<m_charge);
+
 }
 
 

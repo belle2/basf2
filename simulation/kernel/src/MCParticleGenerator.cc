@@ -80,6 +80,7 @@ void MCParticleGenerator::addParticle(MCParticle &mcParticle, G4Event* event, G4
   graphParticle.setPDG(mcParticle.getPDG());
   graphParticle.setStatus(mcParticle.getStatus());
   graphParticle.setMass(mcParticle.getMass());
+  graphParticle.setCharge(mcParticle.getCharge());
   graphParticle.setEnergy(mcParticle.getEnergy());
   graphParticle.setValidVertex(mcParticle.hasValidVertex());
   graphParticle.setProductionTime(mcParticle.getProductionTime());

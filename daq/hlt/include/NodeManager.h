@@ -49,7 +49,7 @@ namespace Belle2 {
 
     std::string manager(void);
 
-    void broadCasting(void);
+    EStatus broadCasting(void);
     std::string listen(void);
     void buildNodeInfo(void);
     NodeInfo* nodeInfo(void);

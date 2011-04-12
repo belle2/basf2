@@ -32,10 +32,10 @@ namespace Belle2 {
     ~HLTManager(void);
 
     //! Initializing the HLT manager
-    void init(void);
+    EStatus init(void);
 
-    void broadCasting(void);
-    void broadCasting(int unitNo);
+    EStatus broadCasting(void);
+    EStatus broadCasting(int unitNo);
 
     //! Print information of the HLT farm (only for internal testing)
     void Print(void);
@@ -44,7 +44,7 @@ namespace Belle2 {
     //! Initializing the HLT manager (protected)
     void initHLT(void);
     //! Initializing the units inside the HLT
-    void initUnit(void);
+    EStatus initUnit(void);
 
   private:
     std::vector<UnitManager> m_units;       /*!< vector container to pointers to units inside HLT */

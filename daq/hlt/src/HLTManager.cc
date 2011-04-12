@@ -33,7 +33,6 @@ HLTManager::HLTManager(char* input)
 HLTManager::HLTManager(std::string& input)
 {
   m_inputXML = (char*)(input.c_str());
-  init();
 }
 
 /* @brief HLTManager destructor
@@ -44,7 +43,7 @@ HLTManager::~HLTManager(void)
 
 /* @brief Initializing HLTManager
 */
-void HLTManager::init(void)
+EStatus HLTManager::init(void)
 {
   m_units.clear();
 
@@ -52,24 +51,28 @@ void HLTManager::init(void)
   m_XMLParser->parsing();
 
   initHLT();
-  initUnit();
+  return initUnit();
 }
 
 /* @brief Broadcasting node information to all nodes in HLT farm
 */
-void HLTManager::broadCasting(void)
+EStatus HLTManager::broadCasting(void)
 {
   for (int i = 0; i < (int)m_units.size(); i++) {
-    broadCasting(i);
+    EStatus returnCode = broadCasting(i);
+    if (returnCode != c_Success)
+      return returnCode;
   }
+
+  return c_Success;
 }
 
 /* @brief Broadcasting node information to all nodes in a specific node
  * For extension of functionality and doing nothing at this moment
 */
-void HLTManager::broadCasting(int unitNo)
+EStatus HLTManager::broadCasting(int unitNo)
 {
-  m_units[unitNo].broadCasting();
+  return m_units[unitNo].broadCasting();
 }
 
 /* @brief Initialize HLT farm information
@@ -85,14 +88,18 @@ void HLTManager::initHLT(void)
 
 /* @brief Initialize units
 */
-void HLTManager::initUnit(void)
+EStatus HLTManager::initUnit(void)
 {
   std::vector<UnitInfo>::iterator i = m_XMLParser->unitInfo();
   for (int j = 0; j < m_XMLParser->NUnit(); j++) {
     UnitManager unitManager(*i);
+    if (unitManager.init(*i) != c_Success)
+      return c_InitFailed;
     m_units.push_back(unitManager);
     i++;
   }
+
+  return c_Success;
 }
 
 /* @brief Displaying HLT manager information (only for debugging)

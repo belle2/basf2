@@ -54,7 +54,13 @@ namespace Belle2 {
     c_InitFailed,       /**< Initialization failure (for initialization functions) */
     c_ProcFailed,       /**< Process failure */
     c_TermCalled,       /**< Termination requested */
-    c_Success           /**< Everything's ok :D */
+    c_Success,          /**< Everything's ok :D */
+
+    c_ChildFuncError,   /**< Functional error from children */
+    c_ChildInitFailed,  /**< Initialization error from children */
+    c_ChildProcFailed,  /**< Process failure from children */
+    c_ChildTermCalled,  /**< Termination requested from children */
+    c_ChildSuccess      /**< Everything's ok from children */
   };
 
   const int gBufferSize = 10000000 * 4;

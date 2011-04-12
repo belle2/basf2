@@ -35,10 +35,10 @@ HLTFramework::HLTFramework(ENodeType nodeType, std::string xmlHLTInfo)
 HLTFramework::~HLTFramework()
 {
   if (m_nodeType == c_ManagerNode) {
-    B2INFO("Manager node terminates...");
+    //B2INFO("Manager node terminates...");
     delete m_HLTManager;
   } else if (m_nodeType == c_ProcessNode) {
-    B2INFO("Process node terminates...");
+    //B2INFO("Process node terminates...");
     delete m_HLTProcess;
     delete m_nodeManager;
   }
@@ -70,6 +70,7 @@ EStatus HLTFramework::init()
 */
 EStatus HLTFramework::initProcessNode()
 {
+  B2INFO("Starting process node...");
   m_nodeManager = new NodeManager();
   EStatus initCode = m_nodeManager->init("NDEF");
 
@@ -112,7 +113,13 @@ EStatus HLTFramework::initProcessNode()
 EStatus HLTFramework::initManager()
 {
   m_HLTManager = new HLTManager(m_xmlHLTInfo);
+
+  if (m_HLTManager->init() != c_Success)
+    return c_InitFailed;
+
   m_HLTManager->broadCasting();
+
+  m_HLTManager->Print();
 
   return c_Success;
 }

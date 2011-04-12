@@ -4,6 +4,7 @@
 /// @date Feb 22 2010
 
 #include <framework/logging/Logger.h>
+#include <daq/hlt/HLTDefs.h>
 
 #ifndef RING_BUFFER_H
 #define RING_BUFFER_H

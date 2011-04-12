@@ -74,9 +74,7 @@ RingBuffer::RingBuffer(const char* name, int size)
 
   sem_unlock(m_semid);
 
-  B2INFO("RingBuffer initialization done");
-  //cout << "RingBuffer initialization done" << endl;
-  //printf("buftop = %8.8x, end = %8.8x\n", m_buftop, m_buftop + m_bufinfo->size);
+  //B2INFO("RingBuffer initialization done");
 }
 
 RingBuffer::RingBuffer(int shm_id)

@@ -108,9 +108,9 @@ void NodeManager::steeringReconstructor()
 
 /* @brief Put data into outgoing FIFO after serialization
 */
-void NodeManager::broadCasting()
+EStatus NodeManager::broadCasting()
 {
-  m_infoSignalMan->put(m_nodeinfo->serializedNodeInfo());
+  return m_infoSignalMan->put(m_nodeinfo->serializedNodeInfo());
 }
 
 /* @brief Get data from incoming FIFO as serialized one
@@ -118,7 +118,7 @@ void NodeManager::broadCasting()
 */
 std::string NodeManager::listen()
 {
-  B2INFO("Retreiving node infomation from manager node...");
+  //B2INFO("Retreiving node infomation from manager node...");
   return m_infoSignalMan->get();
 }
 

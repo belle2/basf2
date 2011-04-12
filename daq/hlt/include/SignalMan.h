@@ -69,7 +69,7 @@ namespace Belle2 {
     //! Get data from buffer
     std::string get(void);
     //! Put data into buffer
-    void put(const std::string data);
+    EStatus put(const std::string data);
 
     void broadCasting(void);
     std::string listening(void);

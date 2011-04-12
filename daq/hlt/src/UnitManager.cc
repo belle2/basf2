@@ -23,8 +23,6 @@ UnitManager::UnitManager(UnitInfo& unit)
   m_eventSeparator = NULL;
   m_workerNodes.clear();
   m_eventMerger = NULL;
-
-  init(unit);
 }
 
 /* @brief UnitManager destructor
@@ -44,24 +42,37 @@ EStatus UnitManager::init(UnitInfo& unit)
     return c_InitFailed;
   if (initEventMerger(unit) != c_Success)
     return c_InitFailed;
-  for (int i = 0; i < m_WNs; i++)
-    if (initWorkerNode(unit) != c_Success)
-      return c_InitFailed;
+  if (initWorkerNode(unit) != c_Success)
+    return c_InitFailed;
 
   return c_Success;
 }
 
 /* @brief Broadcasting node information to all nodes inside this unit
 */
-void UnitManager::broadCasting(void)
+EStatus UnitManager::broadCasting(void)
 {
-  if (m_eventSeparator != NULL)
-    m_eventSeparator->broadCasting();
-  for (int i = 0; (int)i < m_workerNodes.size(); i++)
-    if (m_workerNodes[i] != NULL)
-      m_workerNodes[i]->broadCasting();
-  if (m_eventMerger != NULL)
-    m_eventMerger->broadCasting();
+  EStatus returnCode;
+
+  if (m_eventSeparator != NULL) {
+    returnCode = m_eventSeparator->broadCasting();
+    if (returnCode != c_Success)
+      return returnCode;
+  }
+  for (int i = 0; (int)i < m_workerNodes.size(); i++) {
+    if (m_workerNodes[i] != NULL) {
+      returnCode = m_workerNodes[i]->broadCasting();
+      if (returnCode != c_Success)
+        return returnCode;
+    }
+  }
+  if (m_eventMerger != NULL) {
+    returnCode = m_eventMerger->broadCasting();
+    if (returnCode != c_Success)
+      return returnCode;
+  }
+
+  return c_Success;
 }
 
 /* @brief Building NodeInfo object
@@ -119,7 +130,8 @@ EStatus UnitManager::initWorkerNode(UnitInfo& unit)
 {
   for (unsigned int i = 0; (int)i < m_WNs; i++) {
     NodeManager* wn = new NodeManager(buildNodeInfo("WN", i + 1, unit));
-    wn->init(unit.manager());
+    if (wn->init(unit.manager()) != c_Success)
+      return c_InitFailed;
     m_workerNodes.push_back(wn);
   }
 
@@ -144,5 +156,8 @@ EStatus UnitManager::initEventMerger(UnitInfo& unit)
 */
 void UnitManager::Print()
 {
+  B2INFO("   unit#     = " << m_unitNo);
+  B2INFO("   # of WNs  = " << m_WNs);
+  B2INFO("   ES        = " << m_eventSeparator->nodeInfo()->thisIP());
 }
 

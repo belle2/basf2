@@ -29,7 +29,7 @@ EvtSender::~EvtSender()
 
 EStatus EvtSender::init()
 {
-  B2INFO("Initializing EvtSender...");
+  //B2INFO("Initializing EvtSender...");
 
   if (B2Socket::create() != c_Success) {
     B2ERROR("Could not create sending socket.");
@@ -53,7 +53,7 @@ void EvtSender::setDestination(std::string dest)
 EStatus EvtSender::connect()
 {
   if (B2Socket::connect(m_host, m_port) != c_Success) {
-    //B2ERROR("Unable to connect to the destination.");
+    //B2ERROR("Unable to connect to the destination (" << m_host << ":" << m_port << ")");
     return c_FuncError;
   } else {
     B2INFO("EvtSender: Connection to " << m_host << " established!");

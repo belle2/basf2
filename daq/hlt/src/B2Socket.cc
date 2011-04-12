@@ -94,13 +94,17 @@ EStatus B2Socket::bind(const int port)
 /// @return c_InitFailed Listening failed
 EStatus B2Socket::listen() const
 {
-  if (!is_valid())
+  if (!is_valid()) {
+    B2ERROR("is_valid() error");
     return c_InitFailed;
+  }
 
   int listen_return = ::listen(m_sock, m_maxcons);
 
-  if (listen_return == -1)
+  if (listen_return == -1) {
+    B2ERROR("listen error");
     return c_InitFailed;
+  }
 
   B2DEBUG(50, "Starting to listen through m_sock = " << m_sock << " with max connection of " << m_maxcons << ")");
 
@@ -114,13 +118,22 @@ EStatus B2Socket::listen() const
 EStatus B2Socket::accept(B2Socket& new_socket) const
 {
   int addr_length = sizeof(m_addr);
-  new_socket.m_sock = ::accept(m_sock, (sockaddr*) & m_addr, (socklen_t*) & addr_length);
 
-  if (new_socket.m_sock < 0)
+  /*
+  int flags = fcntl (m_sock, F_GETFL, 0);
+  fcntl (m_sock, F_SETFL, O_NONBLOCK|flags);
+  */
+
+  new_socket.m_sock = ::accept(m_sock, (sockaddr*) & m_addr, (socklen_t*) & addr_length);
+  B2INFO("lkajhwejfnalwn3lfanwl3f = " << new_socket.m_sock);
+
+  if (new_socket.m_sock < 0) {
+    B2ERROR("Accept failed (code = " << errno << ")");
     return c_FuncError;
-  else if (new_socket.m_sock == 0)
+  } else if (new_socket.m_sock == 0) {
+    B2ERROR("Accept failed (code = " << errno << ")");
     return c_FuncError;
-  else
+  } else
     return c_Success;
 }
 

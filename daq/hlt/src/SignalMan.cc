@@ -65,13 +65,13 @@ SignalMan::SignalMan(const int inPort, const int outPort, std::vector<std::strin
 SignalMan::~SignalMan(void)
 {
   if (m_pidEvtSender != 0 && m_pidEvtReceiver != 0) {
-    B2INFO("[PID] pidEvtSender = " << m_pidEvtSender << " / pidEvtReceiver = " << m_pidEvtReceiver);
+    //B2INFO("[PID] pidEvtSender = " << m_pidEvtSender << " / pidEvtReceiver = " << m_pidEvtReceiver);
     int status1;
 
     std::string endOfRun("EOF");
-    B2INFO("Terminating EvtReceiver...");
+    //B2INFO("Terminating EvtReceiver...");
 
-    B2INFO("Terminating EvtSender...");
+    //B2INFO("Terminating EvtSender...");
     m_outBuf->insq((int*)(endOfRun.c_str()), endOfRun.size());
 
     waitpid(m_pidEvtSender, &status1, 0);
@@ -91,7 +91,7 @@ SignalMan::~SignalMan(void)
 */
 EStatus SignalMan::init(const std::string inBufName, const std::string outBufName)
 {
-  B2INFO("Starting to initialize SignalMan");
+  //B2INFO("Starting to initialize SignalMan");
   m_inBuf = new RingBuffer(inBufName.c_str(), gBufferSize);
   m_outBuf = new RingBuffer(outBufName.c_str(), gBufferSize);
 
@@ -134,10 +134,10 @@ EStatus SignalMan::runEvtSender(void)
       return c_InitFailed;
     }
 
-    B2INFO("EvtSender initialized");
+    B2INFO("EvtSender initialized to " << m_dest[0] << ":" << m_outPort << "(pid=" << m_pidEvtSender << ")");
 
     while (1) {
-      //EStatus status = m_sender.broadCasting();
+      EStatus status = m_sender.broadCasting();
 
       /*
       if (status == c_TermCalled) {
@@ -149,7 +149,7 @@ EStatus SignalMan::runEvtSender(void)
       usleep(100);
     }
 
-    return c_Success;
+    return c_ChildSuccess;
   }
 
   return c_Success;
@@ -181,6 +181,7 @@ EStatus SignalMan::runEvtReceiver(void)
     EvtReceiver new_sock;
     m_receiver.accept(new_sock);
     std::string data;
+    B2INFO("listening incomings...");
 
     while (1) {
       new_sock >> data;
@@ -197,7 +198,7 @@ EStatus SignalMan::runEvtReceiver(void)
       usleep(100);
     }
 
-    return c_Success;
+    return c_ChildSuccess;
   }
 
   return c_Success;
@@ -302,9 +303,12 @@ std::string SignalMan::get(void)
 /* @brief Put data into outgoing buffer
  * @param data Serialized data to be transferred
 */
-void SignalMan::put(const std::string data)
+EStatus SignalMan::put(const std::string data)
 {
-  m_outBuf->insq((int*)(data.c_str()), data.size());
+  if (m_outBuf->insq((int*)(data.c_str()), data.size()) == -1)
+    return c_FuncError;
+  else
+    return c_Success;
 }
 
 /* @brief I don't even remember the intension of this function now...

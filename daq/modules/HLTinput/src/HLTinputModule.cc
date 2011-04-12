@@ -44,15 +44,25 @@ void HLTInputModule::initialize()
 {
   m_msgHandler = new MsgHandler(1);
 
+  B2INFO("HLTInput: ring buffer initializing...");
   m_inBuf = new RingBuffer((char*)m_inBufferName.c_str(), MAXPACKETSIZE);
 }
 
 void HLTInputModule::beginRun()
 {
+  while (1) {
+    if (m_inBuf->numq() > 0) {
+      B2INFO("HLTInput: Data comes in");
+      break;
+    }
+
+    usleep(100);
+  }
 }
 
 void HLTInputModule::event()
 {
+  B2INFO("NUMQ = " << m_inBuf->numq());
   while (1) {
     if (m_inBuf->numq() > 0) {
       B2INFO("Starting to process in HLTInput module");
@@ -85,7 +95,7 @@ void HLTInputModule::event()
 
     usleep(100);
 
-    //B2INFO ("HLTInput module: event () ends");
+    B2INFO("HLTInput module: event () ends");
   }
 }
 

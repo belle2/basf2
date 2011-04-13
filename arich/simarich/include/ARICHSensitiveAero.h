@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ARICHSENSITIVEAERO_H_
-#define ARICHSENSITIVEAERO_H_
+#ifndef ARICHSENSITIVEAERO_H
+#define ARICHSENSITIVEAERO_H
 
 #include <simulation/kernel/SensitiveDetectorBase.h>
 
@@ -30,7 +30,7 @@ namespace Belle2 {
     //! Register AeroHit collection into G4HCofThisEvent
     void Initialize(G4HCofThisEvent* HCTE);
 
-    //! Process each step and calculate variables defined in AEROHitARICH
+    //! Process each step and calculate variables defined in ARICHAeroHit
     G4bool ProcessHits(G4Step* aStep, G4TouchableHistory*);
 
     //! Do what you want to do at the end of each event
@@ -40,4 +40,4 @@ namespace Belle2 {
 
 } // end of namespace Belle2
 
-#endif /* ARICHSENSITIVEAERO_H_ */
+#endif /* ARICHSENSITIVEAERO_H */

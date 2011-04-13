@@ -38,7 +38,7 @@
  			    <value energy="2.9">1.055</value> 
  			    <value energy="3.6">1.055</value> 
  			    <value energy="4.3">1.055</value> 
- 			    <value energy="5">1.055</value> 
+ 			    <value energy="5.0">1.055</value> 
  			  </Property> 
  			  <Property name="ABSLENGTH" unit="eV"> 
  			    <value energy="1.5">100</value> 
@@ -46,15 +46,15 @@
  			    <value energy="2.9">100</value> 
  			    <value energy="3.6">100</value> 
  			    <value energy="4.3">100</value> 
- 			    <value energy="5">100</value> 
+ 			    <value energy="5.0">100</value> 
  			  </Property> 
  			  <Property name="RAYLEIGH" unit="eV"> 
- 			    <value energy="1.5">72000.9696</value>
- 			    <value energy="2.2">15000.7694</value>
- 			    <value energy="2.9">5000.22294</value>
- 			    <value energy="3.6">2000.19936</value>
- 			    <value energy="4.3">1000.08052</value>
- 			    <value energy="5">1000.591053</value>
+ 			    <value energy="1.5">729.696</value>
+ 			    <value energy="2.2">157.694</value>
+ 			    <value energy="2.9">52.2294</value>
+ 			    <value energy="3.6">21.9936</value>
+ 			    <value energy="4.3">10.8052</value>
+ 			    <value energy="5.0">5.91053</value>
  			  </Property> 
  			</Properties> 
  	  </Mixture> 
@@ -86,7 +86,7 @@
  			    <value energy="2.9">1.065</value> 
  			    <value energy="3.6">1.065</value> 
  			    <value energy="4.3">1.065</value> 
- 			    <value energy="5">1.065</value> 
+ 			    <value energy="5.0">1.065</value> 
  			  </Property> 
  			  <Property name="ABSLENGTH" unit="eV"> 
  			    <value energy="1.5">100</value> 
@@ -94,20 +94,20 @@
  			    <value energy="2.9">100</value> 
  			    <value energy="3.6">100</value> 
  			    <value energy="4.3">100</value> 
- 			    <value energy="5">100</value> 
+ 			    <value energy="5.0">100</value> 
  			  </Property> 
  			  <Property name="RAYLEIGH" unit="eV"> 
- 			    <value energy="1.5">72000.9696</value>
- 			    <value energy="2.2">15000.7694</value>
- 			    <value energy="2.9">5000.22294</value>
- 			    <value energy="3.6">2000.19936</value>
- 			    <value energy="4.3">1000.08052</value>
- 			    <value energy="5">1000.591053</value>
+ 			    <value energy="1.5">729.696</value>
+ 			    <value energy="2.2">157.694</value>
+ 			    <value energy="2.9">52.2294</value>
+ 			    <value energy="3.6">21.9936</value>
+ 			    <value energy="4.3">10.8052</value>
+ 			    <value energy="5.0">5.91053</value>
  			  </Property> 
  			</Properties> 
  	  </Mixture> 
   
- 	  <Mixture name="ARICH_Quartz"> 
+ 	  <Mixture name="ARICH_HAPDQuartz"> 
              <Density unit="g/cm3">2.20</Density> 
              <Elements>       
                <Element name="O" weight="0.5326"> 
@@ -139,7 +139,7 @@
  	    </Properties> 
  	  </Mixture> 
  	   
- 	  <Mixture name="HAPD_Ceramic"> 
+ 	  <Mixture name="ARICH_Ceramic"> 
  	    <Density unit="g/cm3">4.1</Density> 
  	    <Elements> 
  	      <Element name="O" weight="0.47075"> 
@@ -222,6 +222,22 @@
                  <value energy="5.0">1.0</value> 
                </Property> 
              </Properties> 
- 	  </Mixture> 
+ 	  </Mixture>
+
+	   <Mixture name="ARICH_MirrorQuartz"> 
+             <Density unit="g/cm3">2.20</Density> 
+             <Elements>       
+               <Element name="O" weight="0.5326"> 
+                 <AtomNumber>8.0</AtomNumber> 
+                 <MassNumber>15.9994</MassNumber> 
+               </Element> 
+               <Element name="Si" weight="0.4674"> 
+                 <AtomNumber>14.0</AtomNumber> 
+                 <MassNumber>28.0855</MassNumber> 
+               </Element>   
+             </Elements>  
+ 	   </Mixture> 
+	  
+ 
  </Content> 
  </ParamSet> 

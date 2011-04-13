@@ -36,9 +36,9 @@ namespace Belle2 {
     const double P31 = -9.6821036E-2;
 
     double V = fabs(x);
-    double H;
-    double Y;
-    int c1;
+    double H = 0;
+    double Y = 0;
+    int c1 = 0;
 
     if (V < HF) {
       Y = V * V;

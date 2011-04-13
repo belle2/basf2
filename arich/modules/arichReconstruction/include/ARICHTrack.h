@@ -20,149 +20,178 @@
 
 namespace Belle2 {
 
-  /**
-   *  This is class for aRICH track.
-   *  This track class holds track parameters and track related routines needed by reconstruction. After reconstruction, values of likelihood function for different particle hypotheses associated with track are written.
+
+  //!  This is class for aRICH track.
+  /*!  This track class holds track parameters and track related routines needed by reconstruction. After reconstruction, values of likelihood function for different particle hypotheses associated with track are written. This should be changed with more general track class eventually.
    */
 
   class ARICHTrack : public TObject {
   public:
 
-    /** Default constructor for ROOT IO. */
-    ARICHTrack() {;}
+    //! Default constructor for ROOT IO. */
+    ARICHTrack():
+        m_originalPosition(0, 0, 0),
+        m_originalDirection(0, 0, 0),
+        m_originalMomentum(0),
+        m_reconstructedPosition(0, 0, 0),
+        m_reconstructedDirection(0, 0, 0),
+        m_reconstructedMomentum(0),
+        m_PDGCharge(0),
+        m_PDGEncoding(-1),
+        m_G4TrackID(-1),
+        m_identity(-1) {
+      /*! does nothing */
+    }
 
-    /** Constructor from track hit on aerogel plane */
+    //! Constructor from track hit on aerogel plane */
+    /*!
+      \param aeroHit track hit on aerogel plane (ARICHAeroHit)
+    */
     ARICHTrack(const ARICHAeroHit &aeroHit);
 
-    /** Useful constructor */
+    //! Useful constructor */
+    /*!
+      \param r vector of track position on aerogel plane
+      \param dir vector of track direction on aerogel plane
+      \param p momentum of track on aerogel plane
+      \param type PDG id of particle
+      \param trackID geant4 track id
+     */
+
     ARICHTrack(TVector3 r, TVector3 dir, double p, int type, int trackID) {
-      _OriginalPosition  =  r;
-      _OriginalDirection =  dir;
-      _OriginalMomentum  =  p;
-      _PDGEncoding = type;
-      _G4TrackID = trackID;
+      m_originalPosition  =  r;
+      m_originalDirection =  dir;
+      m_originalMomentum  =  p;
+      m_PDGEncoding = type;
+      m_G4TrackID = trackID;
     };
 
-  private:
 
-
-    // track parameter from geant4 simulation
-    TVector3 _OriginalPosition;          /**< Original position on aerogel plane. */
-    TVector3 _OriginalDirection;         /**< Original direction on aerogel plane. */
-    double   _OriginalMomentum;          /**< Original momentum on aerogel plane. */
-
-    // track parameter from tracking (for now just "smeared" parameters from simulation)
-    TVector3 _ReconstructedPosition;     /**< Reconstructed position.  */
-    TVector3 _ReconstructedDirection;    /**< Reconstructed direction. */
-    double   _ReconstructedMomentum;     /**< Reconstructed momentum. */
-
-    double _PDGCharge;                   /**< particle charge */
-    int  _PDGEncoding;                   /**< particle PDG id number */
-    int  _G4TrackID;                     /**< track ID from geant4 simulation */
-    int _Identity;                       /**< particle index (0 electron, 1 muon, 2 pion, 3 kaon, 4 proton, -1 else). */
-
-    /**
-     *  converts PDG particle code to particle index
-     */
-    int Lund2Type(int ipart);
-
-    double  _lkh[MAXLKH];  /**< Value of likelihood function for different particle hypotheses. */
-    double  _sfot[MAXLKH]; /**< Number of expected detected photons for different particle hypotheses.  */
-    double  _acc[MAXLKH];  /**< Geometrical acceptance of expected cherenkov ring for different particle hypotheses. */
-
-    ClassDef(ARICHTrack, 1); /*!< the class title */
-
-  public:
+    //! destructor
+    ~ARICHTrack() {
+      /*! does nothing */
+    }
 
     //! returns original track position (from geant4 simulation)
-    const TVector3 &GetOriginalPosition() const { return  _OriginalPosition;};
+    const TVector3 &getOriginalPosition() const { return  m_originalPosition;};
 
     //! returns original track direction (from geant4 simulation)
-    const TVector3 &GetOriginalDirection() const { return _OriginalDirection;} ;
+    const TVector3 &getOriginalDirection() const { return m_originalDirection;} ;
 
     //! returns original track momentum (from geant4 simulation)
-    double GetOriginalMomentum() const { return _OriginalMomentum;};
+    double getOriginalMomentum() const { return m_originalMomentum;};
 
     //! returns reconstructed track position
-    const TVector3 &GetReconstructedPosition() const { return  _ReconstructedPosition;};
+    const TVector3 &getReconstructedPosition() const { return  m_reconstructedPosition;};
 
     //! returns original track direction
-    const TVector3 &GetReconstructedDirection() const { return _ReconstructedDirection;} ;
+    const TVector3 &getReconstructedDirection() const { return m_reconstructedDirection;} ;
 
     //! returns original track momentum
-    double GetReconstructedMomentum() const { return _ReconstructedMomentum;};
+    double getReconstructedMomentum() const { return m_reconstructedMomentum;};
 
     //! returns charge of particle
-    double  GetPDGCharge() const { return  _PDGCharge; };
+    double  getPDGCharge() const { return  m_PDGCharge; };
 
     //! returns PDG id number of particle
-    int  GetPDGEncoding() const { return _PDGEncoding;};
+    int  getPDGEncoding() const { return m_PDGEncoding;};
 
     //! returns track id from geant4 simulation
-    int  GetG4TrackID() const {return _G4TrackID;};
+    int  getG4TrackID() const {return m_G4TrackID;};
 
     //! return particle index (0 electron, 1 muon, 2 pion, 3 kaon, 4 proton, -1 else)
-    int GetIdentity() const {return _Identity;};
+    int getIdentity() const {return m_identity;};
 
     //! returns value of likelihood function for "i" particle hypothesis (here i is particle index: 0 electron, 1 muon, 2 pion, 3 kaon, 4 proton)
-    double GetLikelihood(int i) const {return _lkh[i]; };
+    double getLikelihood(int i) const {return m_lkh[i]; };
 
     //! returns expected number of detected photons for "i" particle hypothesis (here i is particle index: 0 electron, 1 muon, 2 pion, 3 kaon, 4 proton)
-    double GetExpectedNOfPhotons(int i) const {return _sfot[i]; };
+    double getExpectedNOfPhotons(int i) const {return m_sfot[i]; };
 
     //! returns geometrical acceptance of emitted Cherenkov photos by particle "i"(here i is particle index: 0 electron, 1 muon, 2 pion, 3 kaon, 4 proton)
-    double GetGeometricalAcceptance(int i) const {return _acc[i]; };
+    double getGeometricalAcceptance(int i) const {return m_acc[i]; };
 
-    //! Sets value of likelihood function for particle hypothesis "i" to "val" (here i is particle index: 0 electron, 1 muon, 2 pion, 3 kaon, 4 proton)
-    void SetLikelihood(int i, double val) {_lkh[i] = val; };
+    //! sets value of likelihood function for particle hypothesis "i" to "val" (here i is particle index: 0 electron, 1 muon, 2 pion, 3 kaon, 4 proton)
+    void setLikelihood(int i, double val) {m_lkh[i] = val; };
 
-    //!  Sets value of likelihood function for all particle hypotheses. "imax" is number of particle hypotheses, "val" is array of hypotheses values (val[0] electron, 1 muon, 2 pion, 3 kaon, 4 proton)
-    void SetLikelihood(int imax, double *val) {for (int i = 0; i < imax; i++)_lkh[i] = val[i];};
+    //!  sets value of likelihood function for all particle hypotheses. "imax" is number of particle hypotheses, "val" is array of hypotheses values (val[0] electron, 1 muon, 2 pion, 3 kaon, 4 proton)
+    void setLikelihood(int imax, double *val) {for (int i = 0; i < imax; i++) m_lkh[i] = val[i];};
 
-    //! Sets expected number of detected photons for "i" particle hypothesis (here i is particle index: 0 electron, 1 muon, 2 pion, 3 kaon, 4 proton)
-    void SetExpectedNOfPhotons(int i, double val) {_sfot[i] = val; };
+    //! sets expected number of detected photons for "i" particle hypothesis (here i is particle index: 0 electron, 1 muon, 2 pion, 3 kaon, 4 proton)
+    void setExpectedNOfPhotons(int i, double val) {m_sfot[i] = val; };
 
-    //! Sets the reconstructed value of track parameters.
+    //! sets the reconstructed value of track parameters.
     // "r" is position of track, "dir" direction and "p" momentum of track on aerogel plane.
-    void   SetReconstructedValues(TVector3 r, TVector3 dir, double p) {
-      _ReconstructedPosition = r;
-      _ReconstructedDirection = dir;
-      _ReconstructedMomentum = p;
+    void   setReconstructedValues(TVector3 r, TVector3 dir, double p) {
+      m_reconstructedPosition = r;
+      m_reconstructedDirection = dir;
+      m_reconstructedMomentum = p;
     }
 
     //! Returns mean emission position of Cherenkov photons from i-th aerogel layer.
-    TVector3 GetMeanEmissionPosition(int i) const;
+    TVector3 getMeanEmissionPosition(int i) const;
 
     //! Returns the distance between the point of mean emission position from i-th aerogel layer and the track exit point from that layer.
-    double   GetMeanEmissionLength(int i) const;
+    double   getMeanEmissionLength(int i) const;
 
     //! Returns original mean emission direction of Cherenkov photons (same as track direction from geant4 simulation)
-    const TVector3 & GetOriginalMeanEmissionDirection() const {return _OriginalDirection;};
+    const TVector3 & getOriginalMeanEmissionDirection() const {return m_originalDirection;};
 
     //! Returns mean emission direction of Cherenkov photons (same as reconstructed track direction)
-    const TVector3 & GetMeanEmissionDirection() const {return _ReconstructedDirection;};
+    const TVector3 & getMeanEmissionDirection() const {return m_reconstructedDirection;};
 
     //! Returns mean emission direction of Cherenkov photons from i-th aerogel (same as reconstructed track direction)
-    const TVector3 & GetMeanEmissionDirection(int i) const {return _ReconstructedDirection;};
+    const TVector3 & getMeanEmissionDirection(int i) const {return m_reconstructedDirection;};
 
     //! Returns track position at the aergel exit (exit from last layer).
-    const TVector3 GetAerogelExit(void) const {
-      return GetAerogelExit(2);
+    const TVector3 getAerogelExit(void) const {
+      return getAerogelExit(2);
     }
 
     //! Returns track position at the exit of i-th aerogel layer.
-    const TVector3 GetAerogelExit(int i) const ;
+    const TVector3 getAerogelExit(int i) const ;
 
     //! Returns track position at the entrance in i-th aerogel layer.
-    const TVector3 GetAerogelInput(int i) const ;
+    const TVector3 getAerogelInput(int i) const ;
 
     //! Returns track direction at point with z coordinate "zout" (assumes straight track).
-    const TVector3 & GetDirectionAtZ(double zout) const {
-      return _OriginalDirection;
+    const TVector3 & getDirectionAtZ(double zout) const {
+      return m_originalDirection;
     }
 
     //! Returns track position at point with z coordinate "zout" (assumes straight track).
-    const TVector3 GetPositionAtZ(double zout) const;
+    const TVector3 getPositionAtZ(double zout) const;
+
+
+
+  private:
+
+    // track parameter from geant4 simulation
+    TVector3 m_originalPosition;          /**< Original position on aerogel plane. */
+    TVector3 m_originalDirection;         /**< Original direction on aerogel plane. */
+    double   m_originalMomentum;          /**< Original momentum on aerogel plane. */
+
+    // track parameter from tracking (for now just "smeared" parameters from simulation)
+    TVector3 m_reconstructedPosition;     /**< Reconstructed position.  */
+    TVector3 m_reconstructedDirection;    /**< Reconstructed direction. */
+    double   m_reconstructedMomentum;     /**< Reconstructed momentum. */
+
+    double m_PDGCharge;                   /**< particle charge */
+    int  m_PDGEncoding;                   /**< particle PDG id number */
+    int  m_G4TrackID;                     /**< track ID from geant4 simulation */
+    int m_identity;                       /**< particle index (0 electron, 1 muon, 2 pion, 3 kaon, 4 proton, -1 else). */
+
+    //! converts PDG particle code to particle index
+    /*
+      \param PDG particle code
+     */
+    int Lund2Type(int ipart);
+
+    double  m_lkh[MAXLKH];  /**< Value of likelihood function for different particle hypotheses. */
+    double  m_sfot[MAXLKH]; /**< Number of expected detected photons for different particle hypotheses.  */
+    double  m_acc[MAXLKH];  /**< Geometrical acceptance of expected cherenkov ring for different particle hypotheses. */
+
+    ClassDef(ARICHTrack, 1); /**< the class title */
 
   };
 }

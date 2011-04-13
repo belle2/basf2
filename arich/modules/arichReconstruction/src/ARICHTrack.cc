@@ -19,13 +19,13 @@ using namespace Belle2;
 ARICHTrack::ARICHTrack(const ARICHAeroHit &aeroHit)
 {
 
-  _OriginalPosition = aeroHit.getPosition();
-  _OriginalDirection = aeroHit.getMomentum();
-  _OriginalMomentum =   _OriginalDirection.Mag();
-  _OriginalDirection =  _OriginalDirection.Unit();
-  _PDGEncoding = aeroHit.getParticleID();
-  _G4TrackID = aeroHit.getTrackID();
-  _Identity = Lund2Type(_PDGEncoding);
+  m_originalPosition = aeroHit.getPosition();
+  m_originalDirection = aeroHit.getMomentum();
+  m_originalMomentum =   m_originalDirection.Mag();
+  m_originalDirection =  m_originalDirection.Unit();
+  m_PDGEncoding = aeroHit.getParticleID();
+  m_G4TrackID = aeroHit.getTrackID();
+  m_identity = Lund2Type(m_PDGEncoding);
 
 }
 
@@ -49,50 +49,50 @@ int ARICHTrack::Lund2Type(int ipart)
   }
 }
 
-double ARICHTrack::GetMeanEmissionLength(int i) const
+double ARICHTrack::getMeanEmissionLength(int i) const
 {
   // Emission length measured from aerogel exit
   static ARICHGeometryPar *arichgp = ARICHGeometryPar::Instance();
 
-  TVector3 dir = GetMeanEmissionDirection(i);
+  TVector3 dir = getMeanEmissionDirection(i);
   if (dir.Z() == 0) return 0;
-  double atl = arichgp->GetAerogelTransmissionLength(i);
-  double d   = arichgp->GetAerogelThickness(i) / dir.Z() / atl;
+  double atl = arichgp->getAerogelTransmissionLength(i);
+  double d   = arichgp->getAerogelThickness(i) / dir.Z() / atl;
   double dmean = 1 - d / (exp(d) - 1);
   return (dmean*atl);
 }
 
-TVector3 ARICHTrack::GetMeanEmissionPosition(int i) const
+TVector3 ARICHTrack::getMeanEmissionPosition(int i) const
 {
 
-  TVector3 dir = GetMeanEmissionDirection(i);
+  TVector3 dir = getMeanEmissionDirection(i);
   if (dir.Z() == 0) return TVector3();
-  return (GetAerogelExit(i) - GetMeanEmissionLength(i)*dir);
+  return (getAerogelExit(i) - getMeanEmissionLength(i)*dir);
 }
 
 
-const TVector3 ARICHTrack::GetAerogelExit(int i) const
+const TVector3 ARICHTrack::getAerogelExit(int i) const
 {
 
   static ARICHGeometryPar *arichgp = ARICHGeometryPar::Instance();
-  double z = arichgp->GetAerogelZPosition(i) + arichgp->GetAerogelThickness(i);
-  return  GetPositionAtZ(z);
+  double z = arichgp->getAerogelZPosition(i) + arichgp->getAerogelThickness(i);
+  return  getPositionAtZ(z);
 }
 
-const TVector3 ARICHTrack::GetAerogelInput(int i) const
+const TVector3 ARICHTrack::getAerogelInput(int i) const
 {
 
   static ARICHGeometryPar *arichgp = ARICHGeometryPar::Instance();
-  double z = arichgp->GetAerogelZPosition(i);
-  return  GetPositionAtZ(z);
+  double z = arichgp->getAerogelZPosition(i);
+  return  getPositionAtZ(z);
 }
 
-const TVector3 ARICHTrack::GetPositionAtZ(double zout) const
+const TVector3 ARICHTrack::getPositionAtZ(double zout) const
 {
 
-  if (_ReconstructedDirection.Z() == 0) return _ReconstructedPosition;
-  double path = (zout - _ReconstructedPosition.Z()) / _ReconstructedDirection.Z();
-  return _ReconstructedPosition + _ReconstructedDirection*path;
+  if (m_reconstructedDirection.Z() == 0) return m_reconstructedPosition;
+  double path = (zout - m_reconstructedPosition.Z()) / m_reconstructedDirection.Z();
+  return m_reconstructedPosition + m_reconstructedDirection*path;
 }
 
 

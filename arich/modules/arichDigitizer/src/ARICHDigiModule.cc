@@ -122,7 +122,7 @@ void ARICHDigiModule::event()
     TVector2 locpos(aSimHit->getLocalPosition().X(), aSimHit->getLocalPosition().Y());
 
     // Get id number of hit channel
-    int channelID = arichgp->GetChannelID(locpos);
+    int channelID = arichgp->getChannelID(locpos);
     if (channelID < 0) continue;
 
     double globaltime = aSimHit->getGlobalTime();

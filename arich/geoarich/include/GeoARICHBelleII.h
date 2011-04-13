@@ -12,8 +12,8 @@
 
 #include <string>
 
-#ifndef GEOARICHBELLEII_H_
-#define GEOARICHBELLEII_H_
+#ifndef GEOARICHBELLEII_H
+#define GEOARICHBELLEII_H
 
 namespace Belle2 {
 
@@ -48,4 +48,4 @@ namespace Belle2 {
 
 }
 
-#endif /* GEOARICHBELLEII_H_ */
+#endif /* GEOARICHBELLEII_H */

@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ARICHSENSITIVEDETECTOR_H_
-#define ARICHSENSITIVEDETECTOR_H_
+#ifndef ARICHSENSITIVEDETECTOR_H
+#define ARICHSENSITIVEDETECTOR_H
 
 #include "simulation/kernel/SensitiveDetectorBase.h"
 
@@ -43,4 +43,4 @@ namespace Belle2 {
   };
 } // end of namespace Belle2
 
-#endif /* ARICHSENSITIVEDETECTOR_H_ */
+#endif /* ARICHSENSITIVEDETECTOR_H */

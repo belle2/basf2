@@ -33,11 +33,10 @@ ARICHGeometryPar::ARICHGeometryPar()
 {
   clear();
   read();
-  modules_position();
-  aerotile_position();
+  modulesPosition();
   chipLocPosition();
-  PadPositions();
-  MirrorPositions();
+  padPositions();
+  mirrorPositions();
 }
 
 ARICHGeometryPar::~ARICHGeometryPar()
@@ -48,11 +47,9 @@ void
 ARICHGeometryPar::clear(void)
 {
   _version = "unknown";
-  _tileSize = 0.0;
   _chipGap = 0.0;
   _tubeInnerRadius = 0.0;
   _tubeOuterRadius = 0.0;
-  _tileGap = 0.0;
   _detZpos = 0.0;
   _modXSize = 0.0;
   _modZSize = 0.0;
@@ -82,7 +79,7 @@ ARICHGeometryPar::clear(void)
     _aeroTrLen[i] = 0.0;
   }
   _ncol.clear(); _fDFi.clear(); _fDR.clear(); _fR.clear();
-  _fFi.clear(); _tilePos.clear(); _chipLocPos.clear(); _padWorldPositions.clear(); _mirrornorm.clear(); _mirrorpoint.clear();
+  _fFi.clear(); _chipLocPos.clear(); _padWorldPositions.clear(); _mirrornorm.clear(); _mirrorpoint.clear();
 }
 
 void ARICHGeometryPar::read()
@@ -94,10 +91,8 @@ void ARICHGeometryPar::read()
   // Get ARICH geometry parameters
   //------------------------------
 
-  _tileSize    = gbxParams.getParamLength("Aerogel/TileSize");
   _tubeInnerRadius = gbxParams.getParamLength("Aerogel/TubeInnerRadius");
   _tubeOuterRadius = gbxParams.getParamLength("Aerogel/TubeOuterRadius");
-  _tileGap = gbxParams.getParamLength("Aerogel/TileGap");
   _detZpos = gbxParams.getParamLength("Detector/Plane/zPosition");
   _modXSize = gbxParams.getParamLength("Detector/Module/ModuleXSize");
   _modZSize = gbxParams.getParamLength("Detector/Module/ModuleZSize");
@@ -134,11 +129,11 @@ void ARICHGeometryPar::Print(void) const
 {
 }
 
-int ARICHGeometryPar::GetChannelID(TVector2 position)
+int ARICHGeometryPar::getChannelID(TVector2 position)
 {
-  int ChipID = GetChipID(position);
+  int ChipID = getChipID(position);
   int Npad = int(_nPadX / 2);
-  TVector2 chipPos = GetChipLocPos(ChipID);
+  TVector2 chipPos = getChipLocPos(ChipID);
   TVector2 locloc = position - chipPos;
   int ix = int(locloc.X() / _padSize);
   int iy = int(locloc.Y() / _padSize);
@@ -147,13 +142,12 @@ int ARICHGeometryPar::GetChannelID(TVector2 position)
   return chID;
 }
 
-void ARICHGeometryPar::modules_position()
+void ARICHGeometryPar::modulesPosition()
 {
   GearDir gbxParams = Gearbox::Instance().getContent("ARICH");
   gbxParams.append("Detector/Plane/");
   int nRing = gbxParams.getNumberNodes("Rings/Ring");
   int iRing = nRing;
-  _nrow = 0;
   double dR = gbxParams.getParamLength((format("Rings/Ring[%1%]/dR") % (nRing)).str());
   double r = _detOuterRadius - _modXSize - dR;
   while (r > _detInnerRadius && iRing > 0) {
@@ -178,26 +172,7 @@ void ARICHGeometryPar::modules_position()
   }
 }
 
-void ARICHGeometryPar::aerotile_position()
-{
-  double TileFrameSize = _tileSize + _tileGap / 2.;
-  double TFSdiag = TileFrameSize * 2. / sqrt(3.);
-  TVector2 dx(sqrt(3.)*TileFrameSize, TileFrameSize);
-  TVector2 xstart(- _tubeOuterRadius - TFSdiag, -_tubeOuterRadius - TFSdiag);
-  TVector2 x = xstart;
-  int j = 1;
-  while (x.X() < _tubeOuterRadius + TFSdiag) {
-    while (x.Y() < _tubeOuterRadius + TFSdiag) {
-      if (sqrt(x*x) < _tubeOuterRadius + TFSdiag && sqrt(x*x) > _tubeInnerRadius - TFSdiag) _tilePos.push_back(x);
-      x.Set(x.X(), x.Y() + 2*TileFrameSize);
-    }
-    j *= -1;
-    xstart.Set(xstart.X() + dx.X(), xstart.Y() + j*dx.Y());
-    x = xstart;
-  }
-}
-
-int ARICHGeometryPar::GetCopyNo(TVector3 hit)
+int ARICHGeometryPar::getCopyNo(TVector3 hit)
 {
   double x = hit.X();
   double y = hit.Y();
@@ -214,19 +189,14 @@ int ARICHGeometryPar::GetCopyNo(TVector3 hit)
   return -1;
 }
 
-TVector3 ARICHGeometryPar::GetOrigin(int copyNo)
+TVector3 ARICHGeometryPar::getOrigin(int copyNo)
 {
   TVector2 origin;
   origin.SetMagPhi(_fR[copyNo], _fFi[copyNo]);
   return TVector3(origin.X(), origin.Y(), _detZpos + _modZSize / 2.);
 }
 
-TVector2 ARICHGeometryPar::GetTilePos(int i)
-{
-  return _tilePos.at(i);
-}
-
-double ARICHGeometryPar::GetModAngle(int copyno)
+double ARICHGeometryPar::getModAngle(int copyno)
 {
   return _fFi[copyno];
 }
@@ -241,7 +211,7 @@ void ARICHGeometryPar::chipLocPosition()
 }
 
 
-int ARICHGeometryPar::GetChipID(TVector2 locpos)
+int ARICHGeometryPar::getChipID(TVector2 locpos)
 {
   if (locpos.X() > 0) {
     if (locpos.Y() > 0) return 0;
@@ -252,26 +222,25 @@ int ARICHGeometryPar::GetChipID(TVector2 locpos)
 }
 
 
-TVector3 ARICHGeometryPar::GetChannelCenterGlob(int modID, int chanID)
+TVector3 ARICHGeometryPar::getChannelCenterGlob(int modID, int chanID)
 {
   std::pair<int, int> ModChan;
   ModChan.first = modID; ModChan.second = chanID;
   return _padWorldPositions[ModChan];
 }
 
-TVector2 ARICHGeometryPar::GetChannelCenterLoc(int chID)
+TVector2 ARICHGeometryPar::getChannelCenterLoc(int chID)
 {
   return _padLocPositions[chID];
 }
 
 
-void ARICHGeometryPar::PadPositions()
+void ARICHGeometryPar::padPositions()
 {
   int Npad = int(_nPadX / 2.);
-  std::pair<int, int> ModChan;
   TVector2 xstart(_padSize / 2., _padSize / 2.);
   for (int chipID = 0; chipID < 4; chipID++) {
-    TVector2 chipPos = GetChipLocPos(chipID);
+    TVector2 chipPos = getChipLocPos(chipID);
     for (int ix = 0; ix < Npad; ix++) {
       for (int iy = 0; iy < Npad; iy++) {
         int chanID = chipID * Npad * Npad + ix * Npad + iy;
@@ -281,20 +250,21 @@ void ARICHGeometryPar::PadPositions()
       }
     }
   }
-  for (int iMod = 0; iMod < GetNMCopies(); iMod++) {
+  for (int iMod = 0; iMod < getNMCopies(); iMod++) {
     for (unsigned int iChan = 0; iChan < _padLocPositions.size(); iChan++) {
       TVector2 iModCenter;
       iModCenter.SetMagPhi(_fR[iMod], _fFi[iMod]);
       TVector2 iChanCenter = _padLocPositions[iChan];
       iChanCenter = iChanCenter.Rotate(_fFi[iMod]);
       TVector3 iWorld((iModCenter + iChanCenter).X(), (iModCenter + iChanCenter).Y(), _detZpos + _winThick);
+      std::pair<int, int> ModChan;
       ModChan.first = iMod; ModChan.second = iChan;
       _padWorldPositions[ModChan] = iWorld;
     }
   }
 }
 
-void ARICHGeometryPar::MirrorPositions()
+void ARICHGeometryPar::mirrorPositions()
 {
   double rmir = _mirrorOuterRad * cos(M_PI / _nMirrors) - _mirrorThickness;
   for (int i = 0; i < _nMirrors; i++) {
@@ -304,12 +274,12 @@ void ARICHGeometryPar::MirrorPositions()
   }
 }
 
-TVector3 ARICHGeometryPar::GetMirrorNormal(int mirID)
+TVector3 ARICHGeometryPar::getMirrorNormal(int mirID)
 {
   return _mirrornorm[mirID];
 }
 
-TVector3 ARICHGeometryPar::GetMirrorPoint(int mirID)
+TVector3 ARICHGeometryPar::getMirrorPoint(int mirID)
 {
   return _mirrorpoint[mirID];
 }

@@ -17,8 +17,6 @@
 
 #include <string>
 
-#include <TRandom3.h>
-
 namespace Belle2 {
 
   /**
@@ -34,10 +32,10 @@ namespace Belle2 {
   public:
 
 
-    /** Constructor.*/
+    /*! Constructor.*/
     ARICHRecModule();
 
-    /** Destructor.*/
+    /*! Destructor.*/
     virtual ~ARICHRecModule();
 
     /**
@@ -74,7 +72,7 @@ namespace Belle2 {
 
   protected:
 
-    /** Print module parameters.*/
+    /*! Print module parameters.*/
     void printModuleParams() const;
 
   private:
@@ -82,9 +80,8 @@ namespace Belle2 {
     std::string m_inColName;         /**< Input collection name */
     std::string m_outColName;        /**< Output collection name */
 
-    /* Other members.*/
-    ARICHReconstruction* m_ana; /**< Class with reconstruction tools */
-    TRandom3* m_random;     /**< Random number generator.*/
+    /** Other members.*/
+    ARICHReconstruction* m_ana;      /**< Class with reconstruction tools */
     double m_timeCPU;                /**< CPU time.     */
     int    m_nRun;                   /**< Run number.   */
     int    m_nEvent;                 /**< Event number. */

@@ -16,7 +16,9 @@
 
 namespace Belle2 {
 
-  /** This class holds the ARICH hit information after digitization (obtained from ARICHSimHit after ARICHDigi). Only module number, channel number and global time.
+  //! ARIHCHit class for storing photon hit information.
+
+  /*! This class holds the ARICH hit information after digitization (obtained from ARICHSimHit after ARICHDigi module). Contains only module number, channel number and global time.
   */
 
   class ARICHHit : public TObject {
@@ -24,13 +26,28 @@ namespace Belle2 {
   public:
 
     //! Default constructor for ROOT IO.
-    ARICHHit() {;}
+    ARICHHit():
+        m_moduleID(-1),
+        m_channelID(-1),
+        m_globalTime(0) {
+      /*! does nothing */
+    }
 
     //! Useful constructor
+    /*!
+      \param moduleID Id number of module containing hit
+      \param channelID Id number of hit channel
+      \param globalTime global time of hit
+     */
     ARICHHit(int moduleID, int channelID, double globalTime):
         m_moduleID(moduleID),
         m_channelID(channelID),
         m_globalTime(globalTime) {
+      /*! Does nothing */
+    }
+
+    //! Destructor
+    ~ARICHHit() {
       /*! Does nothing */
     }
 
@@ -54,11 +71,11 @@ namespace Belle2 {
 
   private:
 
-    int m_moduleID;           /*!< ID number of module that registered hit */
-    int m_channelID;          /*!< ID number of hit channel */
-    double m_globalTime;      /*!< Global time of hit */
+    int m_moduleID;           /**< ID number of module that registered hit */
+    int m_channelID;          /**< ID number of hit channel */
+    double m_globalTime;      /**< Global time of hit */
 
-    ClassDef(ARICHHit, 1); /*!< the class title */
+    ClassDef(ARICHHit, 1); /**< the class title */
 
   };
 

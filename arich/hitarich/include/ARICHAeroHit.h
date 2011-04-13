@@ -18,9 +18,9 @@
 
 namespace Belle2 {
 
-  /** Datastore class that holds information on track parameters at the entrance in aerogel.
-   *  For now this information comes from ("ARICHSensitiveAero" sensitive detector). This should be replaced with the information from tracking.
-   */
+  //! Datastore class that holds information on track parameters at the entrance in aerogel.
+  /*!  For now this information comes from ("ARICHSensitiveAero" sensitive detector). This should be replaced with the information from tracking.
+  */
 
 
   class ARICHAeroHit : public TObject {
@@ -28,9 +28,21 @@ namespace Belle2 {
 
     //! Empty constructor
     /*! Recommended for ROOT IO */
-    ARICHAeroHit() {;}
+    ARICHAeroHit():
+        m_trackID(-1),
+        m_particleID(-1),
+        m_position(0, 0, 0),
+        m_momentum(0, 0, 0) {
+      /*! does nothing */
+    }
 
     //! Useful Constructor
+    /*!
+      \param trackId geant4 track id
+      \param particleId particle PDG id number
+      \param position vector of track position on aerogel plane
+      \param momentum vector of track momentum on aerogel plane
+    */
     ARICHAeroHit(
       int trackId,
       int particleId,
@@ -43,6 +55,10 @@ namespace Belle2 {
       m_momentum = momentum;
     }
 
+    //! Destructor
+    ~ARICHAeroHit() {
+      /* Does nothing */
+    }
 
     //! Set Geant4 track ID
     void setTrackID(int trackId) { m_trackID = trackId; }
@@ -70,13 +86,13 @@ namespace Belle2 {
 
   private:
 
-    int m_trackID;             /*!< G4 id of track */
-    int m_particleID;          /*!< particle PDG id number */
-    TVector3 m_position;       /*!< track position (at entrance in 1. aerogel plane) */
-    TVector3 m_momentum;       /*!< track position (at entrance in 1. aerogel plane) */
+    int m_trackID;             /**< G4 id of track */
+    int m_particleID;          /**< particle PDG id number */
+    TVector3 m_position;       /**< track position (at entrance in 1. aerogel plane) */
+    TVector3 m_momentum;       /**< track position (at entrance in 1. aerogel plane) */
 
 
-    ClassDef(ARICHAeroHit, 1); /*!< the class title */
+    ClassDef(ARICHAeroHit, 1); /**< the class title */
 
   };
 

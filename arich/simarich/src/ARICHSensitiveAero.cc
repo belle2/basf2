@@ -84,9 +84,8 @@ G4bool ARICHSensitiveAero::ProcessHits(G4Step* aStep, G4TouchableHistory*)
     TVector3 TMomentum(momentum.x(), momentum.y(), momentum.z());
     trackArray[nentr]->setMomentum(TMomentum);
 
-    return true;
   }
-  return false;
+  return true;
 }
 
 void ARICHSensitiveAero::EndOfEvent(G4HCofThisEvent*)

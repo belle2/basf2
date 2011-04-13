@@ -19,23 +19,21 @@
 
 namespace Belle2 {
 
-  /**
-   * ARICH digitizer module.
-   *
-   * Takes the hits form G4 simulation (ARICHSimHit), applies q.e. of HAPDs,
-   * calculates and saves hit channel numbers (ARICHHit).
-   * If channel has multiple hits, only one is saved.
-   */
+  //! ARICH digitizer module.
+  /*!
+    This module takes the hits form G4 simulation (ARICHSimHit), applies q.e. of HAPDs, calculates and saves hit channel numbers (ARICHHit).
+    If channel has multiple hits, only one is saved.
+  */
 
   class ARICHDigiModule : public Module {
 
   public:
 
 
-    /** Constructor.*/
+    //! Constructor.
     ARICHDigiModule();
 
-    /** Destructor.*/
+    //! Destructor.
     virtual ~ARICHDigiModule();
 
     /**
@@ -90,9 +88,15 @@ namespace Belle2 {
     int    m_nEvent;                 /**< Event number. */
 
     //! Returns q.e. of detector at given photon energy
+    /*!
+      \param energy energy at which q.e. is returned
+     */
     double QESuperBialkali(double energy);
 
     //! Apply q.e., returns 1 if photon is detected and 0 if not.
+    /*!
+      \param energy energy of photon
+     */
     int DetectorQE(double energy);
 
   };

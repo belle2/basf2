@@ -16,18 +16,17 @@
 
 namespace Belle2 {
 
-  class ARICHB4VHit;
 
-  /** Class ARICHSimHit - Geant4 simulated hit for ARICH.
-   *
-   *  This is a class to store ARICH geant4 hit in datastore.
-   *  It is also the input for digitization module (ARICHDigi).
+  //! Class ARICHSimHit - Geant4 simulated hit for ARICH.
+  /*!
+    This is a class to store ARICH geant4 hit in datastore.
+    It is also the input for digitization module (ARICHDigi).
    */
 
   class ARICHSimHit : public TObject {
   public:
 
-    /* Default constructor */
+    //! Default constructor
     ARICHSimHit():
         m_moduleID(0),
         m_position(0, 0, 0),
@@ -37,7 +36,15 @@ namespace Belle2 {
       /*! Does nothing */
     }
 
-    /** Full constructor.*/
+    //! Full constructor.
+    /*!
+      \param moduleID ID of hapd module containing hit
+      \param position vector of hit local position (in module coor. sys.)
+      \param globalTime global time of photon hit
+      \param energy energy of photon
+      \param parentID geant4 id of photon parent particle
+    */
+
     ARICHSimHit(
       int moduleID,
       TVector3 position,
@@ -89,14 +96,14 @@ namespace Belle2 {
     void setParentID(int parentID) { m_parentID = parentID; }
 
   private:
-    int m_moduleID;           /*!< ID number of module that registered hit*/
-    TVector3 m_position;      /*!< Local position of hit (in module coordinates) */
-    double m_globalTime;      /*!< Global time of hit */
-    double m_energy;          /*!< Energy of detected photon */
-    int m_parentID;        /*!< G4 ID number of photons parent particle */
+    int m_moduleID;           /**< ID number of module that registered hit*/
+    TVector3 m_position;      /**< Local position of hit (in module coordinates) */
+    double m_globalTime;      /**< Global time of hit */
+    double m_energy;          /**< Energy of detected photon */
+    int m_parentID;        /**< G4 ID number of photons parent particle */
 
 
-    ClassDef(ARICHSimHit, 1); /*!< the class title */
+    ClassDef(ARICHSimHit, 1); /**< the class title */
 
   };
 

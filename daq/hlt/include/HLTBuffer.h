@@ -1,18 +1,18 @@
-/// @file ring_bugger.h
-/// @brief Ring buffer definition
+/// @file HLT_bugger.h
+/// @brief HLT buffer definition
 /// @author Ryosuke Itoh
 /// @date Feb 22 2010
 
 #include <framework/logging/Logger.h>
 #include <daq/hlt/HLTDefs.h>
 
-#ifndef RING_BUFFER_H
-#define RING_BUFFER_H
+#ifndef HLTBUFFER_H
+#define HLTBUFFER_H
 
 namespace Belle2 {
 
-  /*! A structure to manage ring buffer. Placed on top of the shared memory. */
-  struct RingBufInfo {
+  /*! A structure to manage HLT buffer. Placed on top of the shared memory. */
+  struct HLTBufInfo {
     int size;
     int remain;
     int wptr;
@@ -29,25 +29,25 @@ namespace Belle2 {
     int nremq;
   };
 
-  /*! Class to manage a Ring Buffer placed in an IPC shared memory */
-  class RingBuffer {
+  /*! Class to manage a HLT Buffer placed in an IPC shared memory */
+  class HLTBuffer {
   public:
     /*! Constructor by creating a new shared memory */
-    RingBuffer(const char* name, int size);    // Create / Attach Ring buffer
+    HLTBuffer(const char* name, int size);    // Create / Attach HLT buffer
     /*! Constructor by attaching to an existing shared memory */
-    RingBuffer(int shmid);              // Attach Ring Buffer
+    HLTBuffer(int shmid);              // Attach HLT Buffer
     /*! Destructor */
-    ~RingBuffer();
+    ~HLTBuffer();
     /*! Function to detach and remove shared memory*/
     void cleanup(void);
 
-    /*! Append a buffer in the RingBuffer */
+    /*! Append a buffer in the HLTBuffer */
     int insq(int* buf, int size);
-    /*! Pick up a buffer from the RingBuffer */
+    /*! Pick up a buffer from the HLTBuffer */
     int remq(int* buf);
-    /*! Returns number of buffers in the RingBuffer */
+    /*! Returns number of buffers in the HLTBuffer */
     int numq(void);
-    /*! Clear the RingBuffer */
+    /*! Clear the HLTBuffer */
     int clear(void);
 
     /*! Return ID of the shared memory */
@@ -70,7 +70,7 @@ namespace Belle2 {
     int  m_shmid;
     int* m_shmadr;
     int  m_shmsize;
-    struct RingBufInfo* m_bufinfo;
+    struct HLTBufInfo* m_bufinfo;
     int* m_buftop;
     int  m_semid;
     int  m_msgid;

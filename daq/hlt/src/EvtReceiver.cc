@@ -40,7 +40,7 @@ EStatus EvtReceiver::init()
   return c_Success;
 }
 
-EStatus EvtReceiver::init(RingBuffer* buffer)
+EStatus EvtReceiver::init(HLTBuffer* buffer)
 {
   m_buffer = buffer;
   return init();

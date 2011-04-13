@@ -15,7 +15,7 @@
 
 #include <framework/logging/Logger.h>
 
-#include <daq/hlt/RingBuffer.h>
+#include <daq/hlt/HLTBuffer.h>
 #include <daq/hlt/B2Socket.h>
 #include <daq/hlt/B2SocketException.h>
 
@@ -30,7 +30,7 @@ namespace Belle2 {
     virtual ~EvtReceiver();
 
     EStatus init(void);
-    EStatus init(RingBuffer* buffer);
+    EStatus init(HLTBuffer* buffer);
     EStatus listen(void);
 
     const EvtReceiver& operator << (const std::string&) const;
@@ -40,7 +40,7 @@ namespace Belle2 {
 
   private:
     int m_port;
-    RingBuffer* m_buffer;
+    HLTBuffer* m_buffer;
   };
 }
 

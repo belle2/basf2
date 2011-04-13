@@ -35,8 +35,8 @@ namespace Belle2 {
     //! Initializing the event separator node
     int init(void);
 
-    virtual RingBuffer* getInBuffer(void);
-    virtual RingBuffer* getOutBuffer(void);
+    virtual HLTBuffer* getInBuffer(void);
+    virtual HLTBuffer* getOutBuffer(void);
 
     //! Assinging an IP address of event builder
     void eventBuilder(const std::string EB);

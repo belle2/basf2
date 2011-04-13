@@ -59,7 +59,7 @@ SignalMan::SignalMan(const int inPort, const int outPort, std::vector<std::strin
  * If the process is the framework, try to terminate EvtSender and EvtReceiver
  * For EvtSender, put "EOF" into the ring buffer then EvtSender terminates
  * For EvtReceiver, no idea so far (but should terminates somehow)
- * Ring buffers for IPC should be only managed by the framework
+ * HLT buffers for IPC should be only managed by the framework
  * @todo Implement EvtReceiver termination part
 */
 SignalMan::~SignalMan(void)
@@ -92,8 +92,8 @@ SignalMan::~SignalMan(void)
 EStatus SignalMan::init(const std::string inBufName, const std::string outBufName)
 {
   //B2INFO("Starting to initialize SignalMan");
-  m_inBuf = new RingBuffer(inBufName.c_str(), gBufferSize);
-  m_outBuf = new RingBuffer(outBufName.c_str(), gBufferSize);
+  m_inBuf = new HLTBuffer(inBufName.c_str(), gBufferSize);
+  m_outBuf = new HLTBuffer(outBufName.c_str(), gBufferSize);
 
   m_inBuf->clear();
   m_outBuf->clear();
@@ -239,7 +239,7 @@ const void SignalMan::setDest(std::vector<std::string> dest)
 /* @brief Get incoming buffer
  * @return Pointer to the incoming buffer
 */
-RingBuffer* SignalMan::getInBuffer()
+HLTBuffer* SignalMan::getInBuffer()
 {
   return m_inBuf;
 }
@@ -247,7 +247,7 @@ RingBuffer* SignalMan::getInBuffer()
 /* @brief Get outgoing buffer
  * @return Pointer to the outgoing buffer
 */
-RingBuffer* SignalMan::getOutBuffer()
+HLTBuffer* SignalMan::getOutBuffer()
 {
   return m_outBuf;
 }

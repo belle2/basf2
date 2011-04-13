@@ -1,11 +1,11 @@
 /// @file ring_bugger.cc
-/// @brief Ring_bugger class implementation
+/// @brief HLT_bugger class implementation
 /// @author Ryosuke Itoh
 /// @date Feb. 22, 2010
 
 //+
 // File : ring_buffer.cc
-// Description : Ring Buffer manager on shared memory
+// Description : HLT Buffer manager on shared memory
 //
 // Author : Ryosuke Itoh, IPNS, KEK
 // Date : 29 - Apr - 2000
@@ -21,7 +21,7 @@
 #include <unistd.h>
 #include <string.h>
 
-#include <daq/hlt/RingBuffer.h>
+#include <daq/hlt/HLTBuffer.h>
 
 #define REDZONE_FACTOR 0.8
 
@@ -30,17 +30,17 @@ using namespace Belle2;
 
 // Constructor / Destructor
 
-RingBuffer::RingBuffer(const char* name, int size)
+HLTBuffer::HLTBuffer(const char* name, int size)
 {
   // 1. Open shared memory
   m_shmid = shmget(IPC_PRIVATE, size * 4, IPC_CREAT | 0644);
   if (m_shmid < 0) {
-    perror("RingBuffer::shmget");
+    perror("HLTBuffer::shmget");
     return;
   }
   m_shmadr = (int *) shmat(m_shmid, 0, 0);
   if (m_shmadr == (int*) - 1) {
-    perror("RingBuffer::shmat");
+    perror("HLTBuffer::shmat");
     return;
   }
   //  cout << "Shared Memory created" << endl;
@@ -48,16 +48,16 @@ RingBuffer::RingBuffer(const char* name, int size)
   // 2. Open Semaphore
   m_semid = semget(IPC_PRIVATE, 1, IPC_CREAT | 0644);
   if (m_semid < 0) {
-    perror("RingBuffer::semget");
+    perror("HLTBuffer::semget");
     return;
   }
   //  cout << "Semaphore created" << endl;
 
   // 3. Initialize control parameters
   m_shmsize = size;
-  m_bufinfo = (struct RingBufInfo*) m_shmadr;
-  m_buftop = m_shmadr + sizeof(struct RingBufInfo);
-  m_bufinfo->size = m_shmsize - sizeof(struct RingBufInfo);
+  m_bufinfo = (struct HLTBufInfo*) m_shmadr;
+  m_buftop = m_shmadr + sizeof(struct HLTBufInfo);
+  m_bufinfo->size = m_shmsize - sizeof(struct HLTBufInfo);
   m_bufinfo->remain = m_bufinfo->size;
   m_bufinfo->wptr = 0;
   m_bufinfo->prevwptr = 0;
@@ -74,19 +74,19 @@ RingBuffer::RingBuffer(const char* name, int size)
 
   sem_unlock(m_semid);
 
-  B2INFO("RingBuffer initialization done (shmid=" << m_shmid << ")");
+  B2INFO("HLTBuffer initialization done (shmid=" << m_shmid << ")");
 }
 
-RingBuffer::RingBuffer(int shm_id)
+HLTBuffer::HLTBuffer(int shm_id)
 {
   m_shmid = shm_id;
   m_shmadr = (int *) shmat(m_shmid, 0, 0);
   if (m_shmadr == (int*) - 1) {
-    perror("RingBuffer::shmat");
+    perror("HLTBuffer::shmat");
     return;
   }
-  m_bufinfo = (struct RingBufInfo*) m_shmadr;
-  m_buftop = m_shmadr + sizeof(RingBufInfo);
+  m_bufinfo = (struct HLTBufInfo*) m_shmadr;
+  m_buftop = m_shmadr + sizeof(HLTBufInfo);
   m_semid = m_bufinfo->semid;
   m_bufinfo->nattached++;
 
@@ -95,21 +95,21 @@ RingBuffer::RingBuffer(int shm_id)
 
 }
 
-RingBuffer::~RingBuffer(void)
+HLTBuffer::~HLTBuffer(void)
 {
   cleanup();
 }
 
-void RingBuffer::cleanup(void)
+void HLTBuffer::cleanup(void)
 {
   shmdt((char*)m_shmadr);
-  printf("RingBuffer: Cleaning up IPC\n");
+  printf("HLTBuffer: Cleaning up IPC\n");
   shmctl(m_shmid, IPC_RMID, (struct shmid_ds*) 0);
   struct sembuf arg;
   semctl(m_semid, 1, IPC_RMID, arg);
 }
 
-void RingBuffer::dump_db(void)
+void HLTBuffer::dump_db(void)
 {
   printf("bufsize=%d, remain=%d, wptr=%d, rptr=%d, nbuf=%d\n",
          m_bufinfo->size, m_bufinfo->remain,
@@ -118,11 +118,11 @@ void RingBuffer::dump_db(void)
 
 // Func
 
-int RingBuffer::insq(int* buf, int size)
+int HLTBuffer::insq(int* buf, int size)
 {
   //  printf ( "insq: requesting : %d, nbuf = %d\n", size, m_bufinfo->nbuf );
   if (size < 0) {
-    printf("RingBuffer::insq : buffer size = %d, not queued.\n", size);
+    printf("HLTBuffer::insq : buffer size = %d, not queued.\n", size);
     return -1;
   }
   sem_lock(m_semid);
@@ -246,7 +246,7 @@ int RingBuffer::insq(int* buf, int size)
   }
 }
 
-int RingBuffer::remq(int* buf)
+int HLTBuffer::remq(int* buf)
 {
   sem_lock(m_semid);
   if (m_bufinfo->nbuf <= 0) {
@@ -257,7 +257,7 @@ int RingBuffer::remq(int* buf)
   int* r_ptr = m_buftop + m_bufinfo->rptr;
   int nw = *r_ptr;
   if (nw <= 0) {
-    printf("RingBuffer::remq : buffer size = %d, skipped\n", nw);
+    printf("HLTBuffer::remq : buffer size = %d, skipped\n", nw);
     sem_unlock(m_semid);
     return 0;
   }
@@ -275,35 +275,35 @@ int RingBuffer::remq(int* buf)
   return nw;
 }
 
-int RingBuffer::numq(void)
+int HLTBuffer::numq(void)
 {
   return m_bufinfo->nbuf;
 }
 
-int RingBuffer::ninsq(void)
+int HLTBuffer::ninsq(void)
 {
   return m_bufinfo->ninsq;
 }
 
-int RingBuffer::nremq(void)
+int HLTBuffer::nremq(void)
 {
   return m_bufinfo->nremq;
 }
 
-int RingBuffer::insq_counter(void)
+int HLTBuffer::insq_counter(void)
 {
   return m_insq_counter;
 }
 
-int RingBuffer::remq_counter(void)
+int HLTBuffer::remq_counter(void)
 {
   return m_remq_counter;
 }
 
-int RingBuffer::clear(void)
+int HLTBuffer::clear(void)
 {
   sem_lock(m_semid);
-  //  m_bufinfo->size = m_shmsize - sizeof ( struct RingBufInfo );
+  //  m_bufinfo->size = m_shmsize - sizeof ( struct HLTBufInfo );
   m_bufinfo->remain = m_bufinfo->size;
   m_bufinfo->wptr = 0;
   m_bufinfo->prevwptr = 0;
@@ -316,26 +316,26 @@ int RingBuffer::clear(void)
   return 0;
 }
 
-int RingBuffer::shmid(void)
+int HLTBuffer::shmid(void)
 {
   return m_shmid;
 }
 
-int RingBuffer::sem_lock(int sid)
+int HLTBuffer::sem_lock(int sid)
 {
   struct sembuf sb;
   sb.sem_num = 0;
   sb.sem_op = -1;
   sb.sem_flg = 0;
   if (semop(sid, &sb, 1) == -1)
-    fprintf(stderr, "Ringbuffer: error in sem_lock(semop) %d, %s\n",
+    fprintf(stderr, "HLTbuffer: error in sem_lock(semop) %d, %s\n",
             sid, strerror(errno));
 
   //  printf ( "semaphore locked.....\n" );
   return 0;
 }
 
-int RingBuffer::sem_unlock(int sid)
+int HLTBuffer::sem_unlock(int sid)
 {
   struct sembuf sb;
   sb.sem_num = 0;
@@ -343,7 +343,7 @@ int RingBuffer::sem_unlock(int sid)
   sb.sem_flg = 0;
   if (semop(sid, &sb, 1) == -1)
     if (semop(sid, &sb, 1) == -1)
-      fprintf(stderr, "Ringbuffer: error in sem_lock(semop) %d, %s\n",
+      fprintf(stderr, "HLTbuffer: error in sem_lock(semop) %d, %s\n",
               sid, strerror(errno));
   //    perror ("semop");
   //  printf ( "semaphore unlocked.....\n" );

@@ -17,7 +17,7 @@
 
 #include <daq/hlt/B2SocketException.h>
 #include <daq/hlt/HLTDefs.h>
-#include <daq/hlt/RingBuffer.h>
+#include <daq/hlt/HLTBuffer.h>
 #include <daq/hlt/B2Socket.h>
 
 namespace Belle2 {
@@ -31,7 +31,7 @@ namespace Belle2 {
     virtual ~EvtSender();
 
     EStatus init();
-    EStatus init(RingBuffer* buffer);
+    EStatus init(HLTBuffer* buffer);
     void setDestination(std::string dest);
     EStatus connect();
     EStatus broadCasting();
@@ -42,7 +42,7 @@ namespace Belle2 {
   private:
     int m_port;
     std::string m_host;
-    RingBuffer* m_buffer;
+    HLTBuffer* m_buffer;
   };
 }
 

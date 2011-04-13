@@ -21,7 +21,7 @@
 #include <framework/logging/Logger.h>
 
 #include <daq/hlt/HLTDefs.h>
-#include <daq/hlt/RingBuffer.h>
+#include <daq/hlt/HLTBuffer.h>
 #include <daq/hlt/B2SocketException.h>
 #include <daq/hlt/EvtSender.h>
 #include <daq/hlt/EvtReceiver.h>
@@ -56,8 +56,8 @@ namespace Belle2 {
     const void setDest(const std::string dest);
     const void setDest(std::vector<std::string> dest);
 
-    RingBuffer* getInBuffer(void);
-    RingBuffer* getOutBuffer(void);
+    HLTBuffer* getInBuffer(void);
+    HLTBuffer* getOutBuffer(void);
 
     //! Returns IP address of destination which should take data
     std::vector<std::string> dest(void);
@@ -85,8 +85,8 @@ namespace Belle2 {
     std::string m_mode;           /*!< control / data */
 
     pid_t m_pidEvtSender, m_pidEvtReceiver;
-    RingBuffer* m_inBuf;
-    RingBuffer* m_outBuf;
+    HLTBuffer* m_inBuf;
+    HLTBuffer* m_outBuf;
 
     EvtSender m_sender;           /*!< Event sender */
     EvtReceiver m_receiver;       /*!< Event receiver */

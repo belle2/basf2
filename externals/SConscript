@@ -24,7 +24,7 @@ elif option == 'opt':
     env['ENV']['EVTGEN_OPTION'] = ''
 
 # enable OpenGL graphics if available
-if env['HAS_GRAPHICS']:
+if env.Dictionary().has_key('HAS_GRAPHICS') and env['HAS_GRAPHICS']:
     env['ENV'].Append(GEANT4_OPTION = '-D g4vis_build_openglx_driver=\'y\' -D g4vis_use_openglx=\'y\'')
 
 # wrapper to make

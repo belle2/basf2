@@ -95,7 +95,7 @@ void HLTInputModule::event()
 
     usleep(100);
 
-    B2INFO("HLTInput module: event () ends");
+    //B2INFO("HLTInput module: event () ends");
   }
 }
 

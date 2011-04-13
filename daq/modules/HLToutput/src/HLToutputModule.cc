@@ -75,6 +75,7 @@ void HLTOutputModule::event()
 {
   putData(DataStore::c_Event);
   //putData("EOF");
+  B2INFO("NUMQ = " << m_outBuf->numq());
 }
 
 void HLTOutputModule::endRun()

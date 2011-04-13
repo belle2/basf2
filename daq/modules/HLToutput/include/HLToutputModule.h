@@ -22,9 +22,9 @@
 
 #include <framework/pcore/EvtMessage.h>
 #include <framework/pcore/MsgHandler.h>
-#include <framework/pcore/RingBuffer.h>
 
 #include <daq/hlt/EvtSender.h>
+#include <daq/hlt/RingBuffer.h>
 
 #define MAXPACKET 10000000 * 4
 

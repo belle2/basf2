@@ -45,16 +45,18 @@ namespace Belle2 {
 
   protected:
 
-    std::string m_inputFileName; /**< The filename of the input HepEvt file. */
-    int m_skipEventNumber;       /**< The number of events which should be skipped at the start of reading. */
-    int m_nVirtual;              /**< The number of particles in each event that should be made virtual */
-    HepevtReader m_hepevt;       /**< An instance of the HepEvt reader. */
-    MCParticleGraph mpg;         /**< The MCParticle graph object. */
-    bool m_useWeights;           /**< Parameter to switch on/off weight propagation */
-    bool m_boost2Lab;           /**< Parameter to switch on/off boost to LAB system */
-    bool m_wrongSignPz;           /**< Parameter to signal that direction of LER and HER was switched*/
-    bool m_makeMaster;           /**< Parameter to signal if the modul should act as master */
-    int m_runNum;               /**< The run number that should be used if the reader acts as master */
+    std::vector <std::string>  m_inputFileNames; /**< The list of filenames of input HepEvtfile. */
+    std::string m_inputFileName;   /**< The Name of the current input HepEvt file. */
+    int m_iFile;                     /**< Index of the current HepEvt input file. */
+    int m_skipEventNumber;           /**< The number of events which should be skipped at the start of reading. */
+    int m_nVirtual;                  /**< The number of particles in each event that should be made virtual */
+    HepevtReader m_hepevt;           /**< An instance of the HepEvt reader. */
+    MCParticleGraph mpg;             /**< The MCParticle graph object. */
+    bool m_useWeights;               /**< Parameter to switch on/off weight propagation */
+    bool m_boost2Lab;                /**< Parameter to switch on/off boost to LAB system */
+    bool m_wrongSignPz;              /**< Parameter to signal that direction of LER and HER was switched*/
+    bool m_makeMaster;               /**< Parameter to signal if the modul should act as master */
+    int m_runNum;                    /**< The run number that should be used if the reader acts as master */
     int m_expNum;               /**< The experiment number that should be used if the reader acts as master */
 
   };

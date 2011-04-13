@@ -87,18 +87,20 @@ int TouschekReaderTURTLE::getParticles(int number, MCParticleGraph &graph) throw
     particlePosTouschek[0] = fields[2] * Unit::m;
     particlePosTouschek[1] = -fields[3] * Unit::m;
     particlePosTouschek[2] = 0.0;
-    m_transMatrix->LocalToMaster(particlePosTouschek, particlePosGeant4);
+
+    //    m_transMatrix->LocalToMaster(particlePosTouschek, particlePosGeant4);
 
     //Convert the momentum of the particle from local Touschek plane space to global geant4 space.
     //Flip the sign for the y and z component to go from the accelerator to the detector coordinate system
     particleMomTouschek[0] = fields[4];
     particleMomTouschek[1] = -fields[5];
     particleMomTouschek[2] = -fields[6];
+
     m_transMatrix->LocalToMasterVect(particleMomTouschek, particleMomGeant4);
 
-    double totalMom2 = particlePosGeant4[0] * particlePosGeant4[0];
-    totalMom2 += particlePosGeant4[1] * particlePosGeant4[1];
-    totalMom2 += particlePosGeant4[2] * particlePosGeant4[2];
+    double totalMom2 = particleMomGeant4[0] * particleMomGeant4[0];
+    totalMom2 += particleMomGeant4[1] * particleMomGeant4[1];
+    totalMom2 += particleMomGeant4[2] * particleMomGeant4[2];
 
     //Add particles to MCParticle collection
     MCParticleGraph::GraphParticle &particle = graph.addParticle();
@@ -108,7 +110,7 @@ int TouschekReaderTURTLE::getParticles(int number, MCParticleGraph &graph) throw
     particle.setChargeFromPDG();
     particle.setMomentum(TVector3(particleMomGeant4));
     particle.setProductionVertex(TVector3(particlePosGeant4));
-    particle.setEnergy(totalMom2 + m_pdg*m_pdg);
+    particle.setEnergy(sqrt(totalMom2 + particle.getMass()*particle.getMass()));
     particle.setProductionTime(0.0);
     particle.setValidVertex(true);
 

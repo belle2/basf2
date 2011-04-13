@@ -64,6 +64,11 @@ namespace Belle2 {
     void open(const std::string& filename) throw(HepEvtCouldNotOpenFileError);
 
     /**
+     * Closes the current input file to allow opening the next one.
+     */
+    void closeCurrentInputFile() {m_input.close();}
+
+    /**
      * Reads the next event and stores the result in the given MCParticle graph.
      * @param graph Reference to the graph which should be filled with the information from the Hepevt file and the Reference to the event weight which can be filled from the file.
      * @return event numer if the event could be read and the number was provided in the file.

@@ -40,7 +40,7 @@ HepevtInputModule::HepevtInputModule() : Module()
   setPropertyFlags(c_Input);
 
   //Parameter definition
-  addParam("inputFileName", m_inputFileName, "Hepevt filename");
+  addParam("inputFileList", m_inputFileNames, "List of names of Hepevt files");
   addParam("makeMaster", m_makeMaster, "Boolean to indicate whether the event numbers from input file should be used.", false);
   addParam("runNum", m_runNum, "run number (should be set if makeMaster=true)", 0);
   addParam("expNum", m_expNum, "ExpNum (should be set if makeMaster=true)", 0);
@@ -54,6 +54,14 @@ HepevtInputModule::HepevtInputModule() : Module()
 
 void HepevtInputModule::initialize()
 {
+  m_iFile = 0;
+  if (m_iFile > m_inputFileNames.size()) {
+    //something is wrong with the file list.
+    B2FATAL("invalid list of input files. No entries found.");
+  } else {
+    //let's start with the first file:
+    m_inputFileName = m_inputFileNames[m_iFile];
+  }
   try {
     m_hepevt.open(m_inputFileName);
     m_hepevt.skipEvents(m_skipEventNumber);
@@ -87,9 +95,7 @@ void HepevtInputModule::event()
 {
 
   StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
-  B2INFO("HEPEVT processes event NR " << eventMetaDataPtr->getEvent() << "!");
-
-
+  B2INFO("HEPEVT processes event NR " << eventMetaDataPtr->getEvent());
 
   try {
     mpg.clear();
@@ -111,12 +117,25 @@ void HepevtInputModule::event()
       eventMetaDataPtr->setGeneratedWeight(weight);
     mpg.generateList(DEFAULT_MCPARTICLES, MCParticleGraph::c_setDecayInfo | MCParticleGraph::c_checkCyclic);
   } catch (HepevtReader::HepEvtEmptyEventError) {
-    StoreObjPtr <EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
-    eventMetaDataPtr->setEndOfData();
-    B2DEBUG(100, "Reached end of HepEvt file.")
+    B2DEBUG(100, "Reached end of HepEvt file.");
+    if (m_iFile < m_inputFileNames.size()) {
+      try {
+        m_hepevt.closeCurrentInputFile();
+        m_inputFileName = m_inputFileNames[m_iFile];
+        B2DEBUG(100, "Opening next file: " << m_inputFileName);
+        m_hepevt.open(m_inputFileName);
+      } catch (runtime_error& e) {
+        B2FATAL(e.what());
+      }
+    } else {
+      StoreObjPtr <EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
+      eventMetaDataPtr->setEndOfData();
+      B2DEBUG(100, "Reached end of all HepEvt files.")
+    }
   } catch (runtime_error& e) {
     B2ERROR(e.what());
   }
+
 }
 
 

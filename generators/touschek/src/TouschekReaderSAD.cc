@@ -97,9 +97,11 @@ double TouschekReaderSAD::getParticle(MCParticleGraph& graph)
       m_tree->GetEntry(m_readEntry);
       convertParamsToSADUnits();
 
-      //Do a Gaussian smearing of the px and py value
-      m_lostPx = m_random.Gaus(m_lostPx, m_pxRes * m_lostPx); //1% px resolution
-      m_lostPy = m_random.Gaus(m_lostPy, m_pyRes * m_lostPy);
+
+      // bug fix from Susanne, to be checked with Andreas!!!
+//       //Do a Gaussian smearing of the px and py value
+//       m_lostPx = m_random.Gaus(m_lostPx, m_pxRes * m_lostPx); //1% px resolution
+//       m_lostPy = m_random.Gaus(m_lostPy, m_pyRes * m_lostPy);
 
       B2DEBUG(10, "> Read particle " << m_readEntry + 1 << "/" << m_tree->GetEntries() << " with s = " << m_lostS << " cm")
       m_readEntry++;
@@ -176,9 +178,13 @@ void TouschekReaderSAD::addParticleToMCParticles(MCParticleGraph& graph)
   //Flip the sign for the y and z component to go from the accelerator to the detector coordinate system
   //Calculate the missing pz by using the nominal beam energy
   double totalMomSqr = (m_beamenergy * m_beamenergy) - (particle.getMass() * particle.getMass());
-  particleMomTouschek[0] = m_lostPx * Unit::GeV;
-  particleMomTouschek[1] = -m_lostPy * Unit::GeV;
-  particleMomTouschek[2] = -sqrt(totalMomSqr - (m_lostPx * m_lostPx) - (m_lostPy * m_lostPy));
+  //Bug fix from Susanne, should be checked by Andreas!!!
+  particleMomTouschek[0] = m_random.Gaus(m_lostPx, m_pxRes * m_lostPx); //1% px resolution
+  particleMomTouschek[1] = -1.0 * m_random.Gaus(m_lostPy, m_pyRes * m_lostPy);
+//     particleMomTouschek[0]= m_lostPx * Unit::GeV;
+//     particleMomTouschek[1]= -m_lostPy * Unit::GeV;
+  particleMomTouschek[2] = -sqrt(totalMomSqr - (particleMomTouschek[0] *  particleMomTouschek[0]) - (particleMomTouschek[1] *  particleMomTouschek[1]));
+  //    particleMomTouschek[2] = -sqrt(totalMomSqr - (m_lostPx * m_lostPx) - (m_lostPy * m_lostPy));
   m_transMatrix->LocalToMasterVect(particleMomTouschek, particleMomGeant4);
 
   //Set missing particle information

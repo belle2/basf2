@@ -172,7 +172,8 @@ EStatus SignalMan::runEvtReceiver(void)
       B2ERROR("Could not initialize EvtReceiver.");
       return c_InitFailed;
     }
-    B2INFO("EvtReceiver initialized");
+
+    B2INFO("EvtReceiver initialized to port " << m_inPort << "(pid=" << m_pidEvtSender << ")");
 
     if (m_receiver.listen() != c_Success) {
       B2ERROR("Listening failed)");
@@ -182,7 +183,9 @@ EStatus SignalMan::runEvtReceiver(void)
     EvtReceiver new_sock;
     m_receiver.accept(new_sock);
     std::string data;
+
     B2INFO("listening incomings...");
+
 
     while (1) {
       new_sock >> data;

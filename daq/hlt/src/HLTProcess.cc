@@ -45,7 +45,7 @@ EStatus HLTProcess::init()
       return c_InitFailed;
     } else {
       B2INFO("HLTProcess: SignalMan initialized with destination " << m_nodeInfo->targetIP()[0]);
-      m_signalMan = new SignalMan(c_DataInPort, c_DataOutPort, m_nodeInfo->targetIP()[0]);
+      m_signalMan = new SignalMan(m_nodeInfo->portBaseDataIn(), m_nodeInfo->portBaseDataOut(), m_nodeInfo->targetIP()[0]);
       m_signalMan->init("B2DataIn", "B2DataOut");
       m_signalMan->doCommunication();
 
@@ -64,11 +64,11 @@ EStatus HLTProcess::beginRun()
   if (m_pidBasf2 == 0) {
     B2INFO("HLTProcess: dest = " << m_nodeInfo->targetIP()[0]);
     if (m_nodeInfo->type() == "ES")
-      system("basf2 $BELLE2_LOCAL_DIR/data/daq/hlt/eventSeparator.py");
+      system("basf2 $BELLE2_LOCAL_DIR/daq/data/eventSeparator.py");
     if (m_nodeInfo->type() == "WN")
-      system("basf2 $BELLE2_LOCAL_DIR/data/daq/hlt/workerNode.py");
+      system("basf2 $BELLE2_LOCAL_DIR/daq/data/workerNode.py");
 
-    //return c_TermCalled;
+    return c_TermCalled;
   }
 
   return c_Success;

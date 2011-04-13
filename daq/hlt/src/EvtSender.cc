@@ -52,11 +52,14 @@ void EvtSender::setDestination(std::string dest)
 
 EStatus EvtSender::connect()
 {
+  if (m_port != 35000)
+    B2INFO("EvtSender: Trying to connect to " << m_host << ":" << m_port);
   if (B2Socket::connect(m_host, m_port) != c_Success) {
-    //B2ERROR("Unable to connect to the destination (" << m_host << ":" << m_port << ")");
+    if (m_port != 35000)
+      B2ERROR("Unable to connect to the destination (" << m_host << ":" << m_port << ")");
     return c_FuncError;
   } else {
-    B2INFO("EvtSender: Connection to " << m_host << " established!");
+    B2INFO("EvtSender: Connection to " << m_host << ":" << m_port << " established!");
     return c_Success;
   }
 }

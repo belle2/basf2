@@ -84,7 +84,7 @@ EStatus UnitManager::broadCasting(void)
 NodeInfo* UnitManager::buildNodeInfo(const std::string type, const int nodeNo, UnitInfo& unit)
 {
   NodeInfo* nodeinfo = new NodeInfo(type, unit.unitNo(), nodeNo);
-  nodeinfo->setPortData(c_DataInPort, c_DataOutPort);
+  //nodeinfo->setPortData(c_DataInPort, c_DataOutPort);
   nodeinfo->setPortControl(c_InfoInPort);
   nodeinfo->setManagerIP(unit.manager());
   nodeinfo->setSteeringName(unit.steering());
@@ -92,14 +92,17 @@ NodeInfo* UnitManager::buildNodeInfo(const std::string type, const int nodeNo, U
   if (type == "ES") {
     nodeinfo->setThisIP(unit.eventSeparator());
     nodeinfo->setTargetIP(unit.workerNodes());
+    nodeinfo->setPortData(c_DataInPort, c_DataOutPort);
     nodeinfo->Print();
   } else if (type == "WN") {
     nodeinfo->setThisIP(unit.workerNodes()[nodeNo - 1]);
     nodeinfo->setTargetIP(unit.eventMerger());
+    nodeinfo->setPortData(c_DataOutPort, c_DataInPort);
     nodeinfo->Print();
   } else if (type == "EM") {
     nodeinfo->setThisIP(unit.eventMerger());
     nodeinfo->setTargetIP("");
+    nodeinfo->setPortData(c_DataInPort, c_DataOutPort);
     nodeinfo->Print();
   } else {
     B2ERROR("Wrong node type!");

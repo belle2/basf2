@@ -29,9 +29,9 @@ hepevtreader = register_module('HepevtInput')
 
 # setting the options for the HEPEVT reader:
 
-# indicate the filename where the hepevtreader
+# indicate the list of filenames where the hepevtreader
 # should read events from
-hepevtreader.param('inputFileName', 'BhWide_10events.txt')
+hepevtreader.param('inputFileList', ['BhWide_10events.txt'])
 
 # this file is in the same directory. For more and different
 # hepevt files look and download from the Twiki. On the Twiki

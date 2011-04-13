@@ -47,7 +47,7 @@ namespace Belle2 {
 
     std::vector <std::string>  m_inputFileNames; /**< The list of filenames of input HepEvtfile. */
     std::string m_inputFileName;   /**< The Name of the current input HepEvt file. */
-    int m_iFile;                     /**< Index of the current HepEvt input file. */
+    uint m_iFile;                     /**< Index of the current HepEvt input file. */
     int m_skipEventNumber;           /**< The number of events which should be skipped at the start of reading. */
     int m_nVirtual;                  /**< The number of particles in each event that should be made virtual */
     HepevtReader m_hepevt;           /**< An instance of the HepEvt reader. */

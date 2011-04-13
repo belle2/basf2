@@ -37,9 +37,9 @@ hepevtreader.param('expNum', 5)
 # calibration and alignment parameters.
 # The default values are runNum = 0 and expNum = 0
 
-# indicate the filename where the hepevtreader
+# indicate the list of filenames where the hepevtreader
 # should read events from
-hepevtreader.param('inputFileName', 'BhWide_10events.txt')
+hepevtreader.param('inputFileList', ['BhWide_10events.txt'])
 
 # if the events in the HepEvt file are weighted and
 # you want to use the event weights use this line

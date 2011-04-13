@@ -23,7 +23,7 @@
 
 #include <daq/hlt/EvtReceiver.h>
 #include <daq/hlt/HLTDefs.h>
-#include <daq/hlt/RingBuffer.h>
+#include <daq/hlt/HLTBuffer.h>
 
 #define MAXPACKET 10000000 * 4
 
@@ -47,7 +47,7 @@ namespace Belle2 {
 
 
   private:
-    RingBuffer* m_inBuf;
+    HLTBuffer* m_inBuf;
     std::string m_inBufferName;
 
     std::vector<std::string> m_objnames[DataStore::c_NDurabilityTypes];

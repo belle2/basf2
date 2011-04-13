@@ -24,7 +24,7 @@
 #include <framework/pcore/MsgHandler.h>
 
 #include <daq/hlt/EvtSender.h>
-#include <daq/hlt/RingBuffer.h>
+#include <daq/hlt/HLTBuffer.h>
 
 #define MAXPACKET 10000000 * 4
 
@@ -49,7 +49,7 @@ namespace Belle2 {
 
 
   private:
-    RingBuffer* m_outBuf;
+    HLTBuffer* m_outBuf;
     std::string m_outBufferName;
 
     std::vector<std::string> m_branchNames[DataStore::c_NDurabilityTypes];

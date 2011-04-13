@@ -50,7 +50,7 @@ void HLTOutputModule::initialize()
 {
   /*
   if (m_outBufferName.size () == 0) {
-    B2ERROR ("Ring buffer is not set");
+    B2ERROR ("HLT buffer is not set");
     return;
   }
   */
@@ -64,7 +64,7 @@ void HLTOutputModule::initialize()
     m_done[i] = false;
   }
 
-  m_outBuf = new RingBuffer((char*)m_outBufferName.c_str(), MAXPACKETSIZE);
+  m_outBuf = new HLTBuffer((char*)m_outBufferName.c_str(), MAXPACKETSIZE);
 }
 
 void HLTOutputModule::beginRun()

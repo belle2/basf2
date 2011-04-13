@@ -105,7 +105,7 @@ void HLTOutputModule::putData(const DataStore::EDurability& durability)
       m_msgHandler->add(m_obj_iter[durability]->value(), m_obj_iter[durability]->key());
       nobj++;
     } else {
-      for (int i = 0; i < m_branchNames[durability].size(); i++) {
+      for (unsigned int i = 0; i < m_branchNames[durability].size(); i++) {
         if (m_branchNames[durability][i] == m_obj_iter[durability]->key()) {
           m_msgHandler->add(m_obj_iter[durability]->value(), m_obj_iter[durability]->key());
           nobj++;
@@ -124,7 +124,7 @@ void HLTOutputModule::putData(const DataStore::EDurability& durability)
       m_msgHandler->add(m_array_iter[durability]->value(), m_array_iter[durability]->key());
       narray++;
     } else {
-      for (int i = 0; i < m_branchNames[durability].size(); i++) {
+      for (unsigned int i = 0; i < m_branchNames[durability].size(); i++) {
         if (m_branchNames[durability][i] == m_array_iter[durability]->key()) {
           m_msgHandler->add(m_array_iter[durability]->value(), m_array_iter[durability]->key());
           narray++;

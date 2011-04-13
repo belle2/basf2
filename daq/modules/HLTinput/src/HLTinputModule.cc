@@ -118,20 +118,24 @@ int HLTInputModule::readData(const DataStore::EDurability& indurability)
     usleep(100);
   }
 
+  /*
   B2INFO("EOF Detected!");
   if (tmp == "EOF")
     return -1;
+  */
 
   std::vector<TObject*> objlist;
   std::vector<std::string> namelist;
 
   B2INFO("Decoding data...");
   EvtMessage* msg = new EvtMessage(tmp);
-  int status = m_msgHandler->decode_msg(msg, objlist, namelist);
+  //int status = m_msgHandler->decode_msg(msg, objlist, namelist);
+  m_msgHandler->decode_msg(msg, objlist, namelist);
 
   B2INFO("Reading data from ring buffer (size = " << msg->size() << ")");
 
-  RECORD_TYPE type = msg->type();
+  //RECORD_TYPE type = msg->type();
+  msg->type();
   DataStore::EDurability durability = (DataStore::EDurability)(msg->header())->reserved[0];
   int nobjs = msg->header()->reserved[1];
   int narrays = msg->header()->reserved[2];

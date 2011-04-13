@@ -59,7 +59,7 @@ EStatus UnitManager::broadCasting(void)
     if (returnCode != c_Success)
       return returnCode;
   }
-  for (int i = 0; (int)i < m_workerNodes.size(); i++) {
+  for (unsigned int i = 0; i < m_workerNodes.size(); i++) {
     if (m_workerNodes[i] != NULL) {
       returnCode = m_workerNodes[i]->broadCasting();
       if (returnCode != c_Success)

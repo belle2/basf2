@@ -137,7 +137,8 @@ EStatus SignalMan::runEvtSender(void)
     B2INFO("EvtSender initialized to " << m_dest[0] << ":" << m_outPort << "(pid=" << m_pidEvtSender << ")");
 
     while (1) {
-      EStatus status = m_sender.broadCasting();
+      //EStatus status = m_sender.broadCasting();
+      m_sender.broadCasting();
 
       /*
       if (status == c_TermCalled) {

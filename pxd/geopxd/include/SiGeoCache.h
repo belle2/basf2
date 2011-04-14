@@ -281,9 +281,9 @@ namespace Belle2 {
     /* Pixel dim getters.*/
 
     /**
-     * Get number of cells (pixels/strips) in Z in a given sensor.
+     * Get number of cells (pixels/strips) in R-Phi in a given sensor.
      * @param aSensorUID sensor UID.
-     * @return number of cells in Z direction
+     * @return number of cells in R-Phi direction
      */
     int getUSensorCells(int aSensorUID) {
       getSensor(aSensorUID);
@@ -291,11 +291,11 @@ namespace Belle2 {
     }
 
     /**
-     * Get number of cells (pixels/strips) in Z in a given sensor.
+     * Get number of cells (pixels/strips) in R-Phi in a given sensor.
      * @param iLayer layer number.
      * @param iLadder ladder number in a given layer.
      * @param iSensor sensor number in a given ladder.
-     * @return number of cells in Z direction
+     * @return number of cells in R-Phi direction
      */
     int getUSensorCells(int iLayer, int iLadder, int iSensor) {
       getSensor(iLayer, iLadder, iSensor);
@@ -303,9 +303,9 @@ namespace Belle2 {
     }
 
     /**
-     * Get number of cells in R-Phi in a given sensor.
+     * Get number of cells in Z in a given sensor.
      * @param aSensorUID sensor UID.
-     * @return number of cells in R-Phi direction.
+     * @return number of cells in Z direction.
      */
     int getVSensorCells(int aSensorUID) {
       getSensor(aSensorUID);
@@ -313,11 +313,11 @@ namespace Belle2 {
     }
 
     /**
-     * Get number of cells in R-Phi in a given sensor.
+     * Get number of cells in Z in a given sensor.
      * @param iLayer layer number.
      * @param iLadder ladder number in a given layer.
      * @param iSensor sensor number in a given ladder.
-     * @return number of cells in R-Phi direction.
+     * @return number of cells in Z direction.
      */
     int getVSensorCells(int iLayer, int iLadder, int iSensor) {
       getSensor(iLayer, iLadder, iSensor);

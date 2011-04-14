@@ -174,7 +174,7 @@ namespace Belle2 {
      * Find cell number corresponding to a given Z coordinate.
      * @param v Z coordinate in the sensor.
      * @return cell number (strip number or pixel row) corresponding to the given Z coordinate,
-     * -1 if no such cell.
+     * Extrapolates outside sensor range.
      */
     int getVCellID(double v) const ;
 
@@ -183,7 +183,7 @@ namespace Belle2 {
      * @param u R-Phi coordinate in the sensor.
      * @param v Z coordinate in the sensor, needed for trapezoidal sensors.
      * @return cell number (strip number or pixel column) corresponding to the given R-Phi coordinate,
-     * -1 if no such cell.
+     * Extrapolates outside sensor range.
      */
     int getUCellID(double u, double v = 0) const ;
 

@@ -130,7 +130,7 @@ void PXDDigiSimpleModule::event()
   if (!mcSimArray) {
     B2ERROR("PXDDigiSimple: Cannot get collection " << m_relSimName << " from the DataStore.");
   }
-  // Create the relaiton holder:
+  // Create the relation holder:
   TwoSidedRelationSet relMCSim;
 
   // Fill with relation data

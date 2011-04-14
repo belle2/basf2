@@ -123,21 +123,15 @@ SiSensorInfo::~SiSensorInfo() {;}
 
 int SiSensorInfo::getVCellID(double v) const
 {
-  if (fabs(v) > 0.5*m_vSize) return -1;
-  else {
-    return static_cast<int>((0.5 * m_vSize + v) / m_vPitch);
-  }
+  return static_cast<int>((0.5 * m_vSize + v) / m_vPitch);
 }
 
 
 int SiSensorInfo::getUCellID(double u, double v) const
 {
   double uSize = getUSize(v);
-  if (fabs(u) > 0.5*uSize) return -1;
-  else {
-    double uPitch = getUPitch(v);
-    return static_cast<int>((uSize + u) / uPitch);
-  }
+  double uPitch = getUPitch(v);
+  return static_cast<int>((uSize + u) / uPitch);
 }
 
 double SiSensorInfo::getUCellPosition(int uID, int vID) const

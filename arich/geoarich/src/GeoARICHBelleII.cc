@@ -272,8 +272,9 @@ void GeoARICHBelleII::create(GearDir& content)
 
   // get mirrors parameters
   GearDir MirrorsCont(content);
+  GearDir Mirror(content);
   MirrorsCont.append("Mirrors/");
-  GearDir Mirror("/Detector/Subdetectors/ParamSet[1]/Content/Mirrors");
+  Mirror.append("Mirrors");
   OpticalUserInfo* surfaceInfo = GeoReader::readOpticalSurface(Mirror);
   string mirrMat =  MirrorsCont.getParamString("Material");
   int nMirrors = arichgp->getNMirrors();

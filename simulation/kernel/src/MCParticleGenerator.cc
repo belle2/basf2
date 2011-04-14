@@ -100,6 +100,7 @@ void MCParticleGenerator::addParticle(MCParticle &mcParticle, G4Event* event, G4
 
     newPart = new G4PrimaryParticle(pdef, mcPartMom4.X() / Unit::MeV, mcPartMom4.Y() / Unit::MeV, mcPartMom4.Z() / Unit::MeV, mcPartMom4.E() / Unit::MeV);
     newPart->SetMass(mcParticle.getMass() / Unit::MeV);
+    newPart->SetCharge(mcParticle.getCharge());
     newPart->SetUserInformation(new ParticleInfo(graphParticle));
 
     //Set propagation time only if useTime is true, the MCparticle has a valid vertex and has children.

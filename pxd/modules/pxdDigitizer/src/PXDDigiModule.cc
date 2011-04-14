@@ -176,8 +176,8 @@ void PXDDigiModule::initialize()
   m_sensorLength = -1.;
 
   // Parameters are entered in basf2 unit system.
-  m_ADCRange *= Unit::e;
-  m_ADCUnit = m_ADCRange / pow(2, m_ADCBits);
+  m_ADCRange = static_cast<int>(m_ADCRange * Unit::e);
+  m_ADCUnit = m_ADCRange / pow(2.0, static_cast<double>(m_ADCBits));
   m_prodThreshOnDeltaRays *= Unit::keV;
   m_diffusionCoefficient *= Unit::mm;
   m_elNoise *= Unit::e;

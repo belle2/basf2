@@ -25,27 +25,42 @@
 
 from basf2 import *
 
-set_log_level(3)
+set_log_level(4)
 
-# Register modules that will be called
+# Register modules
 evtmetagen = register_module('EvtMetaGen')
-hepevtreader = register_module('HepevtInput')
+pguninput = register_module('PGunInput')
 paramloader = register_module('ParamLoaderXML')
 geobuilder = register_module('GeoBuilder')
 g4sim = register_module('FullSim')
+simtree = register_module('makeSimulationTree')
 simpleoutput = register_module('SimpleOutput')
+mcprint = register_module('PrintMCParticles')
 
-# setting the options for the HEPEVT reader:
-# this is the path to an example steering file in the
-# generators package. It contains 10 QED background events
-hepevtreader.param('inputFileList',
-                   ['../../generators/examples/BhWide_10events.txt'])
-# You can find and download more Hepevt files from the Twiki page.
+# setting infos for evtmetagen module
+# Here we can set how many events should be processed per
+# run or experiment.
+evtmetagen.param('EvtNumList', [10])
+# see the example for EvtMetaDataGen in the framework package
+# for more details.
 
-# Setting the option for the EvtMetaGenModule reader modules:
-evtmetagen.param('EvtNumList', [100, 200])  # we want to process 100 events un the first run, 200 in the second
-evtmetagen.param('RunList', [11, 2])  # run number of the first run is 11, for the second run it is 2
-evtmetagen.param('ExpList', [1, 1])  # and for both runs the experiment number is 1
+# preparing the particle gun
+# get the random seed from a random number, so you don't have to update
+# it for every job.
+import random
+intseed = random.randint(1, 10000000)
+
+## Particle Gun Parameters
+pguninput.param('nTracks', 10)
+pguninput.param('PIDcodes', [11, -11])
+pguninput.param('pPar1', 0.200)
+pguninput.param('pPar2', 1)
+pguninput.param('Rseed', intseed)
+# for random generation of angles and vertex coordinates the standard
+# settings for the particle gun are used.
+
+# change verbosity for the particle gun only
+pguninput.set_log_level(2)
 
 # Set parameters for paramloader:
 paramloader.param('InputFileXML', os.path.join(basf2datadir,
@@ -54,23 +69,27 @@ paramloader.param('InputFileXML', os.path.join(basf2datadir,
 # setting verbosity for simulation (5 very high, 0 low)
 # this sets how verbose the Geant4 simulation is
 g4sim.param('TrackingVerbosity', 0)
-
+mcprint.param('onlyPrimaries', True)
 # Set parameters for simpleoutput:
 # simpleoutput creates a simple root files where a tree structure gives
 # access to all containers in the data store at the moment
 # the module is called
-simpleoutput.param('outputFileName', 'simpleHepEvtReaderOutput.root')
+simpleoutput.param('outputFileName', 'simpleParticleGun_output.root')
+
+simtree.set_log_level(1)
 
 # the path sets the order of the module execution
 # Create paths
 main = create_path()
-main.add_module(evtmetagen)  # the event meta module
-main.add_module(hepevtreader)  # the hepevt reader module
+main.add_module(evtmetagen)  # this module coordinates the event loop
+main.add_module(pguninput)  # generate particles for simulation
+main.add_module(mcprint)  # printing out particles
 main.add_module(paramloader)  # get the geometry parameters
 main.add_module(geobuilder)  # build the geometry
 main.add_module(g4sim)  # run the simulation
-main.add_module(simpleoutput)  # put the information from datastore to root file
+main.add_module(simtree)
+# main.add_module(simpleoutput)  # put the information from datastore to root file
 
-# start processing of 10 events
-process(main, 10)
+# Process events
+process(main)
 

@@ -57,6 +57,12 @@ pguninput.param('pPar1', 0.05)
 pguninput.param('pPar2', 3)
 # defaults are pPar1 = 0.2 and pPar2 = 1 GeV
 
+# There is the possibility to generate the Pt instead of the P.
+# This was implemented for people doing Pt-dependent tracking studies
+# In order to activate this option use:
+# pguninput.param('fixPt', True)
+# The default here is fixPt = False
+
 # gaussion momentum distribution
 # pguninput.param('momentumGeneration',1)
 # in this case the two parameters for the momentum are

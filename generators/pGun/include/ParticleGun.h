@@ -94,6 +94,7 @@ namespace Belle2 {//namespace Belle2
     EgenerationOption m_genMom;            /**< Option to set the distribution function for the momentum */
     EgenerationOption m_genVert;           /**< Option to set the distribution function for the vertex */
     EgenerationOption m_genAngle;          /**< Option to set the distribution function for the angles */
+    bool m_fixedPt;                      /**< Option to choose whether Pt or P should be fixed in the generation. */
 
     /** the list of particle types to be produced */
     std::vector <int>  m_PIDcodes;

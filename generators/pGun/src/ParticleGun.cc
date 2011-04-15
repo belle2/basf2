@@ -100,8 +100,13 @@ bool ParticleGun::generateEvent(MCParticleGraph &graph)
         break;
     }
 
-    double pz = ptot * cos(theta);
     double pt = ptot * sin(theta);
+    if (m_fixedPt) {//this means we are actually simulating the Pt and not the P
+      pt = ptot;
+      if (sin(theta) != 0) { ptot = pt / sin(theta);} else ptot = 20; //here 20GeV replace "infinitely large"
+    }
+
+    double pz = ptot * cos(theta);
     double px = pt * cos(phi);
     double py = pt * sin(phi);
     p.setMomentum(px, py, pz);

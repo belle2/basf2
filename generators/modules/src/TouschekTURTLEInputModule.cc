@@ -45,6 +45,7 @@ TouschekTURTLEInputModule::TouschekTURTLEInputModule() : Module()
   addParam("FilenameLER",  m_filenameLER, "The filename of the LER TURTLE input file.");
   addParam("ReadHER", m_readHER, "Set to false to skip reading the HER data.", true);
   addParam("ReadLER", m_readLER, "Set to false to skip reading the LER data.", true);
+  addParam("zCoordinate", m_zPos, "Indicates the z-coordinate of the TURTLE particles in the file. (default is 50cm, 400cm is also implemented.)", 50.0);
   addParam("MaxParticles", m_maxParticles, "The maximum number of particles per event that should be read. -1 means all of the particles are read.", -1);
 
   //Create and initialize member variables
@@ -75,18 +76,37 @@ void TouschekTURTLEInputModule::initialize()
 
   //Get the transformation from local Touschek plane space to global geant4 space
   //For the HER
-  gGeoManager->CdTop();
-  gGeoManager->cd("/IR_1/HERUpstreamFlange1_1Tube_1");
   double herTouschekPlaneTrans[3] = {0.0, 0.0, 0.0};
-  herTouschekPlaneTrans[2] = gGeoManager->GetCurrentMatrix()->GetTranslation()[2] + 50.0; //TURTLE data is at -50 cm
+
+  gGeoManager->CdTop();
+
+  if (m_zPos == 50) {
+    gGeoManager->cd("/IR_1/HERUpstreamFlange1_1Tube_1");
+    herTouschekPlaneTrans[2] = gGeoManager->GetCurrentMatrix()->GetTranslation()[2] + 50.0; //TURTLE data is at -50 cm
+  } else if (m_zPos == 400) {
+    gGeoManager->cd("/IR_1/D1wal1");
+    herTouschekPlaneTrans[2] = gGeoManager->GetCurrentMatrix()->GetTranslation()[2] + 400.0; //TURTLE data is at -400 cm
+  } else {
+    B2ERROR("TouschekTURTLEInput: The zCoordinate = " << m_zPos << " is not implemented. Please use either 50cm or 400cm.");
+  }
+
   m_herPipePartMatrix->SetTranslation(herTouschekPlaneTrans);
   m_herPipePartMatrix->MultiplyLeft(gGeoManager->GetCurrentMatrix());
 
+
   //For the LER
-  gGeoManager->CdTop();
-  gGeoManager->cd("/IR_1/LERUpstreamFlange1_1Tube_1");
   double lerTouschekPlaneTrans[3] = {0.0, 0.0, 0.0};
-  lerTouschekPlaneTrans[2] = -gGeoManager->GetCurrentMatrix()->GetTranslation()[2] + 50.0; //TURTLE data is at 50 cm
+  gGeoManager->CdTop();
+  if (m_zPos == 50) {
+    gGeoManager->cd("/IR_1/LERUpstreamFlange1_1Tube_1");
+    lerTouschekPlaneTrans[2] = -gGeoManager->GetCurrentMatrix()->GetTranslation()[2] + 50.0; //TURTLE data is at 50 cm
+  } else if (m_zPos == 400) {
+    gGeoManager->cd("/IR_1/B1wal1");
+    lerTouschekPlaneTrans[2] = -gGeoManager->GetCurrentMatrix()->GetTranslation()[2] + 400.0; //TURTLE data is at 400 cm
+  } else {
+    B2ERROR("TouschekTURTLEInput: The zCoordinate = " << m_zPos << " is not implemented. Please use either 50cm or 400cm.");
+  }
+
   m_lerPipePartMatrix->SetTranslation(lerTouschekPlaneTrans);
   m_lerPipePartMatrix->MultiplyLeft(gGeoManager->GetCurrentMatrix());
 }

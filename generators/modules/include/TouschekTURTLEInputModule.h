@@ -61,6 +61,7 @@ namespace Belle2 {
     bool m_readHER;            /**< If set to true reads the HER data and adds it to the MCParticle collection. */
     bool m_readLER;            /**< If set to true reads the LER data and adds it to the MCParticle collection. */
     int  m_maxParticles;       /**< The maximum number of particles per event that should be read. -1 means all of the particles are read. */
+    double m_zPos;              /**< The z Coordinate for all particles in the list in the file. */
   };
 
 } // end namespace Belle2

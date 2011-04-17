@@ -28,7 +28,7 @@ namespace Belle2 {
    * (co-)variance, and of energy and its error.
    * A first attempt is made to create a lean sensor identifier storing
    * layer/ladder/sensor info. To keep this hit class free of additonal members,
-   * the coding/decoding is done via a separate class CIDManager.
+   * the coding/decoding is done via a separate class UniIDManager.
    * For normalization of spatial data, a precision of 1 um should be
    * satisfactory (expected resolutions are ~4 um and more). A 4-byte
    * integer would be more than enough (but a 2-byte int will not). For energy,
@@ -46,7 +46,7 @@ namespace Belle2 {
     SVDHit() {;}
 
     /** Useful Constructor. */
-    SVDHit(int sensorCID,
+    SVDHit(int sensorUniID,
            float u,
            float uError,
            float v,
@@ -54,7 +54,7 @@ namespace Belle2 {
            float uvCov,
            float energyDep,
            float energyDepError):
-        m_sensorUID(sensorCID),
+        m_sensorUID(sensorUniID),
         m_u(u), m_uError(uError),
         m_v(v), m_vError(vError),
         m_uvCov(uvCov),
@@ -64,7 +64,7 @@ namespace Belle2 {
     }
 
     /** Set compressed layer/ladder/sensor id.*/
-    void setSensorCID(int CID) { m_sensorUID = CID; }
+    void setSensorUniID(int uniID) { m_sensorUID = uniID; }
 
     /** Set u coordinate.*/
     void setU(float u) { m_u = u; }
@@ -89,7 +89,7 @@ namespace Belle2 {
     { m_energyDepError = energyDepError; }
 
     /** Get the compact ID.*/
-    int getSensorUID() const { return m_sensorUID; }
+    int getSensorUniID() const { return m_sensorUID; }
 
     /** Get u coordinate.*/
     float getU() const { return m_u; }

@@ -46,7 +46,7 @@ REG_MODULE(SVDDigi)
 
 SVDDigiModule::SVDDigiModule() : Module(),
     m_cheater(new SVDcheater()),
-    m_cid(new SensorUIDManager(0)),
+    m_uniID(new SensorUniIDManager(0)),
     m_random(new TRandom3(0))
 {
   // Set description()
@@ -62,7 +62,7 @@ SVDDigiModule::SVDDigiModule() : Module(),
 SVDDigiModule::~SVDDigiModule()
 {
   if (m_random) delete m_random;
-  if (m_cid) delete m_cid;
+  if (m_uniID) delete m_uniID;
   if (m_cheater) delete m_cheater;
 }
 
@@ -123,15 +123,15 @@ void SVDDigiModule::event()
     SVDHit* newHit = svdOutArray[iHit];
 
     // Geometry
-    m_cid->setCID(0);
+    m_uniID->setUniID(0);
     short int layerID = aSimHit->getLayerID();
     short int ladderID = aSimHit->getLadderID();
     short int sensorID = aSimHit->getSensorID();
 
-    m_cid->setLayerID(layerID);
-    m_cid->setLadderID(ladderID);
-    m_cid->setSensorID(sensorID);
-    newHit->setSensorCID(m_cid->getSensorUID());
+    m_uniID->setLayerID(layerID);
+    m_uniID->setLadderID(ladderID);
+    m_uniID->setSensorID(sensorID);
+    newHit->setSensorUniID(m_uniID->getSensorUniID());
 
     // Position + smear + errors
     TVector3 posIn = aSimHit->getPosIn();

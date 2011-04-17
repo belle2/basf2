@@ -94,7 +94,7 @@ namespace Belle2 {
 
     /* Other members.*/
     SVDcheater* m_cheater;  /**< Cheater provides resolutions and pitch data.*/
-    SensorUIDManager* m_cid;      /**< Convert between compact ID and layer/ladder/sensor IDs.*/
+    SensorUniIDManager* m_uniID;      /**< Convert between compact ID and layer/ladder/sensor IDs.*/
     TRandom3* m_random;     /** Random number generator.*/
 
     double m_timeCPU;                /**< CPU time.     */

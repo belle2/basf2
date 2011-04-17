@@ -23,7 +23,7 @@
 // A calibration run will be done each time with the Digitizer. "Each time" means each time
 // the simulation changes. Otherwise, the available resolution calibration will be re-used, to the
 // responsibility of  the user.
-#define ROOT_OUTPUT
+#undef ROOT_OUTPUT
 
 #include <framework/core/Module.h>
 
@@ -55,20 +55,26 @@ namespace Belle2 {
 // Typedefs
 
   typedef std::map<StoreIndex, float> HitRelationMap;   // weight by hit
-  typedef std::map<StoreIndex, float>::iterator HitRelationMapItr;
+  typedef std::map<StoreIndex, float>::const_iterator HitRelationMapItr;
 
   /**
    * Digit structure - will go to PXDDigits and relations.
    */
   struct Digit {
-    int cellIDZ;
-    int cellIDRPhi;
-    double cellPosZ;
-    double cellPosRPhi;
+    Digit(): charge(0), sourceHits() {;}
+    void add(double aCharge, StoreIndex aHit)
+    { charge += aCharge; sourceHits[aHit] += aCharge; }
+    void print() const;
     double charge;
-
-    HitRelationMap pxdSimHitMap;
+    HitRelationMap sourceHits;
   };
+
+  void Digit::print() const
+  {
+    B2INFO(" Digit: charge = " << charge)
+    for (HitRelationMapItr iHit = sourceHits.begin(); iHit != sourceHits.end(); ++iHit)
+      B2INFO("   hit: " << iHit->first << " charge: " << iHit->second);
+  }
 
   /**
    * Ionization point is an amount of charge generated along a short track segment,
@@ -91,16 +97,13 @@ namespace Belle2 {
     double charge;
   };
 
-  /**
-   * A space point of a track
-   */
-  struct TrackPoint {
-    TVector3 position;
-    TVector3 direction;
-  };
 
   typedef std::vector<IonizationPoint> IonizationPointVec;
+  typedef std::vector<IonizationPoint>::const_iterator IonizationPointVecItr;
+
   typedef std::vector<SignalPoint> SignalPointVec;
+  typedef std::vector<SignalPoint>::const_iterator SignalPointVecItr;
+
 
   /** Digits by pixel ID. */
   typedef std::map<int, Digit> DigitMap;
@@ -227,6 +230,9 @@ namespace Belle2 {
 
     // PRINT METHODS
 
+    /** Print digits map. */
+    void printDigits(DigitMap& digits) const;
+
     /** Print module parameters. */
     void printModuleParams() const;
 
@@ -283,13 +289,15 @@ namespace Belle2 {
     double  m_eStepTime;          /**< Time step for tracking electron groups in readout plane (in ns). */
 
     // Current sensor parameters from geometry
-    short int m_currentLayerID;       /**< Actual layer ID. */
-    short int m_currentLadderID;      /**< Actual ladder ID. */
-    short int m_currentSensorID;      /**< Actual sensor ID. */
-    short int m_currentSensorUID;         /**< Actual compact ID (layer/ladder/sensor). */
-    float m_sensorThick;          /**< Actual sensor - Si wafer thickness in system length units. */
-    float m_sensorWidth;          /**< Actual sensor width in system length units. */
-    float m_sensorLength;         /**< Actual sensor length in system length units. */
+    short int m_currentLayerID;       /**< Current layer ID. */
+    short int m_currentLadderID;      /**< Current ladder ID. */
+    short int m_currentSensorID;      /**< Current sensor ID. */
+    short int m_currentSensorUniID;     /**< Current compact ID (layer/ladder/sensor). */
+    float m_sensorThick;          /**< Current sensor - Si wafer thickness in system length units. */
+    float m_sensorWidth;          /**< Current sensor width in system length units. */
+    float m_sensorLength;         /**< Current sensor length in system length units. */
+    float m_sensorUPitch;         /**< Current sensor pitch in U (r-phi). */
+    float m_sensorVPitch;         /**< Current sensor pitch in V (Z). */
 
     TVector3 m_magField;          /**< Magnetic field in T in detector LRF!! Not used. */
 

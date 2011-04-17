@@ -37,7 +37,7 @@ SiGeoCache* SiGeoCache::instance()
 SiGeoCache::SiGeoCache() :
     m_iLaddersLayerID(-1), m_iSensorsLayerID(-1), m_iSensorsLadderID(-1),
     m_currentLayerID(-1), m_currentLadderID(-1), m_currentSensorID(-1),
-    m_currentSensorUID(-1), m_cellUIDManager(new CellUIDManager(0))
+    m_currentSensorUniID(-1), m_cellUniIDManager(new CellUniIDManager(0))
 {
   refresh();
 }
@@ -46,8 +46,8 @@ SiGeoCache::~SiGeoCache()
 {
   m_sensors.clear();
   m_names.clear();
-  if (m_cellUIDManager != NULL)
-    delete m_cellUIDManager;
+  if (m_cellUniIDManager != NULL)
+    delete m_cellUniIDManager;
 }
 
 void SiGeoCache::refresh()
@@ -78,11 +78,11 @@ void SiGeoCache::scanCurrentNode()
   if (nodeName.find(activeSensorTag) != string::npos) {
     // Make an entry into the SiSensorInfoMap
     SiSensorInfo newsensor(node);
-    int newCID = newsensor.getSensorUID();
-    m_sensors[newCID] = newsensor;
+    int newUniID = newsensor.getSensorUniID();
+    m_sensors[newUniID] = newsensor;
     // Make an entry into the name map.
     string volName = node->GetVolume()->GetName();
-    m_names[volName] = newCID;
+    m_names[volName] = newUniID;
   }
   // Check daughters, but only if we are at the top or in a PXD or an SVD branch.
   if ((nodeName.find(pxdGeoTag) != string::npos)
@@ -139,23 +139,23 @@ const set<int>& SiGeoCache::getSensorIDs(int iLayer, int iLadder)
   return m_iSensors;
 }
 
-int SiGeoCache::getCellUID(short int uCellID, short int vCellID)
+int SiGeoCache::getCellUniID(short int uCellID, short int vCellID)
 {
-  m_cellUIDManager->setUCellID(uCellID);
-  m_cellUIDManager->setVCellID(vCellID);
-  return m_cellUIDManager->getCellUID();
+  m_cellUniIDManager->setUCellID(uCellID);
+  m_cellUniIDManager->setVCellID(vCellID);
+  return m_cellUniIDManager->getCellUniID();
 }
 
-short int SiGeoCache::getUCellID(int cellUID)
+short int SiGeoCache::getUCellID(int cellUniID)
 {
-  m_cellUIDManager->setCellUID(cellUID);
-  return m_cellUIDManager->getUCellID();
+  m_cellUniIDManager->setCellUniID(cellUniID);
+  return m_cellUniIDManager->getUCellID();
 }
 
-short int SiGeoCache::getVCellID(int cellUID)
+short int SiGeoCache::getVCellID(int cellUniID)
 {
-  m_cellUIDManager->setCellUID(cellUID);
-  return m_cellUIDManager->getVCellID();
+  m_cellUniIDManager->setCellUniID(cellUniID);
+  return m_cellUniIDManager->getVCellID();
 }
 
 void SiGeoCache::getSensor(int iLayer, int iLadder, int iSensor)
@@ -165,28 +165,28 @@ void SiGeoCache::getSensor(int iLayer, int iLadder, int iSensor)
     m_currentLayerID = iLayer;
     m_currentLadderID = iLadder;
     m_currentSensorID = iSensor;
-    // update CID
-    SensorUIDManager cidMan(0);
-    cidMan.setLayerID(iLayer);
-    cidMan.setLadderID(iLadder);
-    cidMan.setSensorID(iSensor);
-    m_currentSensorUID = cidMan.getSensorUID();
+    // update UniID
+    SensorUniIDManager uniIDMan(0);
+    uniIDMan.setLayerID(iLayer);
+    uniIDMan.setLadderID(iLadder);
+    uniIDMan.setSensorID(iSensor);
+    m_currentSensorUniID = uniIDMan.getSensorUniID();
     // get the desired sensor, invoke B2ERROR if not found.
-    m_currentSensor = m_sensors[m_currentSensorUID];
+    m_currentSensor = m_sensors[m_currentSensorUniID];
   }
   return;
 }
 
-void SiGeoCache::getSensor(int aSensorUID)
+void SiGeoCache::getSensor(int aSensorUniID)
 {
-  if (!isSameSensor(aSensorUID)) {
+  if (!isSameSensor(aSensorUniID)) {
     // update current layer/ladder/sensor values
-    m_currentSensorUID = aSensorUID;
-    SensorUIDManager cidMan(aSensorUID);
-    m_currentLayerID = cidMan.getLayerID();
-    m_currentLadderID = cidMan.getLadderID();
-    m_currentSensorID = cidMan.getSensorID();
-    m_currentSensor = m_sensors[m_currentSensorUID];
+    m_currentSensorUniID = aSensorUniID;
+    SensorUniIDManager uniIDMan(aSensorUniID);
+    m_currentLayerID = uniIDMan.getLayerID();
+    m_currentLadderID = uniIDMan.getLadderID();
+    m_currentSensorID = uniIDMan.getSensorID();
+    m_currentSensor = m_sensors[m_currentSensorUniID];
   }
   return;
 }

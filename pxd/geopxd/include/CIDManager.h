@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef SD_CID_H
-#define SD_CID_H
+#ifndef SD_UNIID_H
+#define SD_UNIID_H
 
 #include <framework/logging/Logger.h>
 
@@ -19,28 +19,28 @@ namespace Belle2 {
    * A simple utility class to manage layer/ladder/sensor IDs.
    *
    * The class compresses integer (ladderID, layerID, sensorID) to
-   * a short compressed ID (CID). It provides the corresponding
-   * getters and setters to make the use of CIDs in lean SD hits
+   * a short unique ID (UniID). It provides the corresponding
+   * getters and setters to make the use of UniIDs in lean SD hits
    * convenient.
    * <p>
    * Bit layout data of the class are static and are initialized to reasonable
    * defaults for current PXD/SVD design, but in principle can be changed with
    * the constraint of total number of bits being at most 15.
    */
-  class SensorUIDManager {
+  class SensorUniIDManager {
 
   public:
 
     /**
      * Constructor.
      *
-     * @param aCID An existing CID to decode. If omitted or zero, IDs are expected
+     * @param aUniID An existing UniID to decode. If omitted or zero, IDs are expected
      * to be set by the user.
      */
-    SensorUIDManager(short int aCID = 0);
+    SensorUniIDManager(short int aUniID = 0);
 
-    /** Set CID.*/
-    void setCID(short int aCID) { m_SensorUID = aCID; }
+    /** Set UniID.*/
+    void setUniID(short int aUniID) { m_SensorUniID = aUniID; }
 
     /** Set layer ID.*/
     void setLayerID(short int layerID);
@@ -61,7 +61,7 @@ namespace Belle2 {
     static void setBitsSensor(int nbits);
 
     /** Get encoded ID.*/
-    short int getSensorUID() const { return m_SensorUID; }
+    short int getSensorUniID() const { return m_SensorUniID; }
 
     /** Get decoded layer ID.*/
     short int getLayerID() const;
@@ -82,34 +82,34 @@ namespace Belle2 {
     short int m_shiftLadder;         /**< Bit shift of ladder bit-field.*/
     short int m_shiftSensor;         /**< Bit shift of sensor bit-field.*/
 
-    short int m_SensorUID;                /**< The compressed ID.*/
+    short int m_SensorUniID;                /**< The compressed ID.*/
 
     static int m_nbitsLayer;       /**< Number of bits occupied by Layer ID.*/
     static int m_nbitsLadder;      /**< Number of bits occupied by Ladder ID.*/
     static int m_nbitsSensor;      /**< Number of bits occupied by Sensor ID.*/
 
-  }; // class Sensor UID Manager
+  }; // class Sensor UniID Manager
 
   /**
-   * CellUID manager class: encode and decode pixel/strip IDs.
-   * The implementation is the same as for the CID manager, except that the CellUID
+   * CellUniID manager class: encode and decode pixel/strip IDs.
+   * The implementation is the same as for the UniID manager, except that the CellUniID
    * is an int. Again, widths of bit fields can be set through static setters,
    * but there are reasonable defaults in place.
    */
-  class CellUIDManager {
+  class CellUniIDManager {
 
   public:
 
     /**
      * Constructor.
      *
-     * @param aCellUID An existing CellUID to decode. If omitted or zero, IDs are expected
+     * @param aCell An existing Cell to decode. If omitted or zero, IDs are expected
      * to be set by the user.
      */
-    CellUIDManager(int aCellUID = 0);
+    CellUniIDManager(int aCellUniID = 0);
 
-    /** Set CellUID.*/
-    void setCellUID(int aCellUID) { m_CellUID = aCellUID; }
+    /** Set Cell.*/
+    void setCellUniID(int aCellUniID) { m_CellUniID = aCellUniID; }
 
     /** Set u cell ID.*/
     void setUCellID(short int uCellID);
@@ -124,7 +124,7 @@ namespace Belle2 {
     static void setBitsVCellID(int nbits);
 
     /** Get encoded ID.*/
-    int getCellUID() const { return m_CellUID; }
+    int getCellUniID() const { return m_CellUniID; }
 
     /** Get decoded u cell ID.*/
     short int getUCellID() const;
@@ -140,12 +140,12 @@ namespace Belle2 {
     short int m_shiftUCellID;         /**< Bit shift of uCellID bit-field.*/
     short int m_shiftVCellID;         /**< Bit shift of vCellID bit-field.*/
 
-    int m_CellUID;                /**< The compressed ID.*/
+    int m_CellUniID;                /**< The compressed ID.*/
 
     static int m_nbitsUCellID;      /**< Number of bits occupied by Layer ID.*/
     static int m_nbitsVCellID;      /**< Number of bits occupied by Ladder ID.*/
 
-  }; // class Cell UID Manager
+  }; // class Cell  Manager
 
 
 

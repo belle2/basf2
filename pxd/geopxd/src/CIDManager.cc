@@ -14,29 +14,29 @@ using namespace Belle2;
 
 /* Statics. */
 
-int SensorUIDManager::m_nbitsLayer = 3;       /**< Number of bits occupied by Layer ID.*/
-int SensorUIDManager::m_nbitsLadder = 5;      /**< Number of bits occupied by Ladder ID.*/
-int SensorUIDManager::m_nbitsSensor = 3;      /**< Number of bits occupied by Sensor ID.*/
+int SensorUniIDManager::m_nbitsLayer = 3;       /**< Number of bits occupied by Layer ID.*/
+int SensorUniIDManager::m_nbitsLadder = 5;      /**< Number of bits occupied by Ladder ID.*/
+int SensorUniIDManager::m_nbitsSensor = 3;      /**< Number of bits occupied by Sensor ID.*/
 
 /* Set number of layer bits.*/
-void SensorUIDManager::setBitLayer(int nbits) { m_nbitsLayer = nbits; }
+void SensorUniIDManager::setBitLayer(int nbits) { m_nbitsLayer = nbits; }
 
 /* Set number of ladder bits.*/
-void SensorUIDManager::setBitsLadder(int nbits) { m_nbitsLadder = nbits; }
+void SensorUniIDManager::setBitsLadder(int nbits) { m_nbitsLadder = nbits; }
 
 /* Set number of sensor bits.*/
-void SensorUIDManager::setBitsSensor(int nbits) { m_nbitsSensor = nbits; }
+void SensorUniIDManager::setBitsSensor(int nbits) { m_nbitsSensor = nbits; }
 
 /* Constructor. */
-SensorUIDManager::SensorUIDManager(short int aCID):
+SensorUniIDManager::SensorUniIDManager(short int aUniID):
     m_maskLayer(0),
     m_maskLadder(0),
     m_maskSensor(0),
-    m_SensorUID(aCID)
+    m_SensorUniID(aUniID)
 {
   // Check input settings
   if ((m_nbitsLayer + m_nbitsLadder + m_nbitsSensor) > 15)
-    B2ERROR("CIDManager: Size of bit fields exceeds short int!")
+    B2ERROR("UniIDManager: Size of bit fields exceeds short int!")
 
     // Set shifts
     m_shiftSensor = 0;
@@ -62,86 +62,86 @@ SensorUIDManager::SensorUIDManager(short int aCID):
 /* Setters.*/
 
 /* Set layer ID.*/
-void SensorUIDManager::setLayerID(short int layerID)
+void SensorUniIDManager::setLayerID(short int layerID)
 {
   // Clear current layer bits
-  short int newCID = m_SensorUID & (~m_maskLayer);
+  short int newUniID = m_SensorUniID & (~m_maskLayer);
   // Make mask with new bits
   short int mask = (layerID << m_shiftLayer) & m_maskLayer;
   // Apply
-  m_SensorUID = newCID | mask;
+  m_SensorUniID = newUniID | mask;
 }
 
 /* Set ladder ID.*/
-void SensorUIDManager::setLadderID(short int ladderID)
+void SensorUniIDManager::setLadderID(short int ladderID)
 {
   // Clear current ladder bits
-  short int newCID = m_SensorUID & (~m_maskLadder);
+  short int newUniID = m_SensorUniID & (~m_maskLadder);
   // Make mask with new bits
   short int mask = (ladderID << m_shiftLadder) & m_maskLadder;
   // Apply
-  m_SensorUID = newCID | mask;
+  m_SensorUniID = newUniID | mask;
 }
 
 /* Set sensor ID.*/
-void SensorUIDManager::setSensorID(short int sensorID)
+void SensorUniIDManager::setSensorID(short int sensorID)
 {
   // Clear current sensor bits
-  short int newCID = m_SensorUID & (~m_maskSensor);
+  short int newUniID = m_SensorUniID & (~m_maskSensor);
   // Make mask with new bits
   short int mask = (sensorID << m_shiftSensor) & m_maskSensor;
   // Apply
-  m_SensorUID = newCID | mask;
+  m_SensorUniID = newUniID | mask;
 }
 
 /** Getters.*/
 
 /** Get decoded layer ID.*/
-short int SensorUIDManager::getLayerID() const
+short int SensorUniIDManager::getLayerID() const
 {
   // Get the requested bits
-  short int result = m_SensorUID & m_maskLayer;
+  short int result = m_SensorUniID & m_maskLayer;
   // bit-shift back
   return result >> m_shiftLayer;
 }
 
 /** Get decoded ladder ID.*/
-short int SensorUIDManager::getLadderID() const
+short int SensorUniIDManager::getLadderID() const
 {
-  short int result = m_SensorUID & m_maskLadder;
+  short int result = m_SensorUniID & m_maskLadder;
   return result >> m_shiftLadder;
 }
 
 /** Get decoded sensor ID.*/
-short int SensorUIDManager::getSensorID() const
+short int SensorUniIDManager::getSensorID() const
 {
-  short int result = m_SensorUID & m_maskSensor;
+  short int result = m_SensorUniID & m_maskSensor;
   return result >> m_shiftSensor;
 }
 //*****************************************************************************
-// CellUID Manager
+// Cell Manager
 //****************************************************************************
 
 /* Statics. */
 
-int CellUIDManager::m_nbitsUCellID = 11;       /**< Number of bits occupied by UCellID.*/
-int CellUIDManager::m_nbitsVCellID = 11;       /**< Number of bits occupied by VCellID.*/
+int CellUniIDManager::m_nbitsUCellID = 11;       /**< Number of bits occupied by UCellID.*/
+int CellUniIDManager::m_nbitsVCellID = 11;       /**< Number of bits occupied by VCellID.*/
 
 /* Set number of u cellID bits.*/
-void CellUIDManager::setBitsUCellID(int nbits) { m_nbitsUCellID = nbits; }
+void CellUniIDManager::setBitsUCellID(int nbits) { m_nbitsUCellID = nbits; }
 
 /* Set number of ladder bits.*/
-void CellUIDManager::setBitsVCellID(int nbits) { m_nbitsVCellID = nbits; }
+void CellUniIDManager::setBitsVCellID(int nbits) { m_nbitsVCellID = nbits; }
 
 /* Constructor. */
-CellUIDManager::CellUIDManager(int aCellUID):
+CellUniIDManager::CellUniIDManager(int aCellUniID):
     m_maskUCellID(0),
     m_maskVCellID(0),
-    m_CellUID(aCellUID)
+    m_CellUniID(aCellUniID)
 {
   // Check input settings
   if ((m_nbitsUCellID + m_nbitsVCellID) > 31)
-    B2ERROR("CellUIDManager: Size of bit fields exceeds int!")
+    B2ERROR("CellManager: Size of bit fields exceeds int!")
 
     // Set shifts
     m_shiftVCellID = 0;
@@ -162,41 +162,41 @@ CellUIDManager::CellUIDManager(int aCellUID):
 /* Setters.*/
 
 /* Set u cell ID.*/
-void CellUIDManager::setUCellID(short int uCellID)
+void CellUniIDManager::setUCellID(short int uCellID)
 {
   // Clear current uCellID bits
-  int newCellUID = m_CellUID & (~m_maskUCellID);
+  int newCell = m_CellUniID & (~m_maskUCellID);
   // Make mask with new bits
   int mask = (uCellID << m_shiftUCellID) & m_maskUCellID;
   // Apply
-  m_CellUID = newCellUID | mask;
+  m_CellUniID = newCell | mask;
 }
 
 /* Set v cell ID.*/
-void CellUIDManager::setVCellID(short int vCellID)
+void CellUniIDManager::setVCellID(short int vCellID)
 {
   // Clear current ladder bits
-  int newCellUID = m_CellUID & (~m_maskVCellID);
+  int newCell = m_CellUniID & (~m_maskVCellID);
   // Make mask with new bits
   short int mask = (vCellID << m_shiftVCellID) & m_maskVCellID;
   // Apply
-  m_CellUID = newCellUID | mask;
+  m_CellUniID = newCell | mask;
 }
 
 /** Getters.*/
 
 /** Get decoded u cell ID.*/
-short int CellUIDManager::getUCellID() const
+short int CellUniIDManager::getUCellID() const
 {
   // Get the requested bits
-  int result = m_CellUID & m_maskUCellID;
+  int result = m_CellUniID & m_maskUCellID;
   // bit-shift back
   return static_cast<short>(result >> m_shiftUCellID);
 }
 
 /** Get decoded v cell ID.*/
-short int CellUIDManager::getVCellID() const
+short int CellUniIDManager::getVCellID() const
 {
-  int result = m_CellUID & m_maskVCellID;
+  int result = m_CellUniID & m_maskVCellID;
   return static_cast<short>(result >> m_shiftVCellID);
 }

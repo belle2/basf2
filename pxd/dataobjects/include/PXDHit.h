@@ -29,7 +29,7 @@ namespace Belle2 {
    * (co-)variance, and of energy and its error.
    * A first attempt is made to create a lean sensor identifier storing
    * layer/ladder/sensor info. To keep this hit class free of additonal members,
-   * the coding/decoding is done via a separate class SensorUIDManager.
+   * the coding/decoding is done via a separate class SensorUniIDManager.
    * For normalization of spatial data, a precision of 1 um should be
    * satisfactory (expected resolutions are ~4 um and more). A 4-byte
    * integer would be more than enough (but a 2-byte int will not). For energy,
@@ -47,7 +47,7 @@ namespace Belle2 {
     PXDHit() {;}
 
     /** Useful Constructor. */
-    PXDHit(int sensorUID,
+    PXDHit(int sensorUniID,
            float u,
            float uError,
            float v,
@@ -55,7 +55,7 @@ namespace Belle2 {
            float uvCov,
            float energyDep,
            float energyDepError):
-        m_sensorUID(sensorUID),
+        m_sensorUniID(sensorUniID),
         m_u(u), m_uError(uError),
         m_v(v), m_vError(vError),
         m_uvCov(uvCov),
@@ -65,7 +65,7 @@ namespace Belle2 {
     }
 
     /** Set compressed layer/ladder/sensor id.*/
-    void setSensorCID(int CID) { m_sensorUID = CID; }
+    void setSensorUniID(int uniID) { m_sensorUniID = uniID; }
 
     /** Set u coordinate.*/
     void setU(float u) { m_u = u; }
@@ -90,7 +90,7 @@ namespace Belle2 {
     { m_energyDepError = energyDepError; }
 
     /** Get the compact ID.*/
-    int getSensorUID() const { return m_sensorUID; }
+    int getSensorUniID() const { return m_sensorUniID; }
 
     /** Get u coordinate.*/
     float getU() const { return m_u; }
@@ -115,7 +115,7 @@ namespace Belle2 {
 
   private:
 
-    int m_sensorUID;                /**< Compressed sensor identifier.*/
+    int m_sensorUniID;                /**< Compressed sensor identifier.*/
     float m_u;                      /**< u (azimuthal) coordinate of the hit.*/
     float m_uError;                 /**< u coordinate error.*/
     float m_v;                      /**< v (axial) coordinate of the hit.*/

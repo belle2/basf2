@@ -85,7 +85,7 @@ namespace Belle2 {
      * et al. NIM A362, p.416 (1995) and Geant4 - Physics
      * Reference Manual.
      */
-    double SampleFluctuations(const MCParticle * part, const double length);
+    double SampleFluctuations(const MCParticle * part, double length);
 
   protected:
 

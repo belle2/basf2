@@ -53,11 +53,11 @@ SiSensorInfo::SiSensorInfo(TGeoNode* pNode)
     m_ladderID = info->getLadderID();
     m_sensorID = info->getSensorID();
     // Readout geometry data: read from UserInfo
-    m_vPitch = info->getUPitch();
-    m_uPitch = info->getVPitch();
+    m_vPitch = info->getVPitch();
+    m_uPitch = info->getUPitch();
     m_uPitchD = 0;
-    m_vCells = info->getUCells();
-    m_uCells = info->getVCells();
+    m_vCells = info->getVCells();
+    m_uCells = info->getUCells();
   } else {
     SVDVolumeUserInfo* info =
       dynamic_cast<SVDVolumeUserInfo*>(pVolume->GetField());
@@ -74,11 +74,11 @@ SiSensorInfo::SiSensorInfo(TGeoNode* pNode)
     */
   }
 
-  SensorUIDManager cid;
+  SensorUniIDManager cid;
   cid.setLayerID(m_layerID);
   cid.setLadderID(m_ladderID);
   cid.setSensorID(m_sensorID);
-  m_sensorUID = cid.getSensorUID();
+  m_sensorUniID = cid.getSensorUniID();
 
   // Shape information
   TGeoShape* pShape = pVolume->GetShape();
@@ -123,7 +123,7 @@ SiSensorInfo::~SiSensorInfo() {;}
 
 int SiSensorInfo::getVCellID(double v) const
 {
-  return static_cast<int>((0.5 * m_vSize + v) / m_vPitch);
+  return (static_cast<int>((0.5 * m_vSize + v) / m_vPitch));
 }
 
 
@@ -131,7 +131,12 @@ int SiSensorInfo::getUCellID(double u, double v) const
 {
   double uSize = getUSize(v);
   double uPitch = getUPitch(v);
-  return static_cast<int>((uSize + u) / uPitch);
+  return (static_cast<int>((0.5 * uSize + u) / uPitch));
+}
+
+double SiSensorInfo::getVCellPosition(int vID) const
+{
+  return (vID + 0.5) * m_vPitch - 0.5 * m_vSize;
 }
 
 double SiSensorInfo::getUCellPosition(int uID, int vID) const

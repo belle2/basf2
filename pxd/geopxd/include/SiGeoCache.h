@@ -85,9 +85,9 @@ namespace Belle2 {
      */
     void refresh();
 
-    short int getSensorUID(int iLayer, int iLadder, int iSensor) {
+    short int getSensorUniID(int iLayer, int iLadder, int iSensor) {
       getSensor(iLayer, iLadder, iSensor);
-      return m_currentSensor.getSensorUID();
+      return m_currentSensor.getSensorUniID();
     }
 
     /**
@@ -437,18 +437,18 @@ namespace Belle2 {
      * @param vCellID cell number in v (R-Phi).
      * @return cell unique ID.
      */
-    int getCellUID(short int uCellID, short int vCellID);
+    int getCellUniID(short int uCellID, short int vCellID);
 
     /**
-     * Get cell u ID from a UID.
+     * Get cell u ID from a Unique ID.
      * @param cellUID UID of the cell.
      * @return cell ID (number) in u (Z).
      */
-    short int getUCellID(int aCellUID);
+    short int getUCellID(int aCellUniID);
 
     /**
-     * Get cell v ID from a UID.
-     * @param cellUID UID of the cell.
+     * Get cell v ID from a UniID.
+     * @param cellUID UniID of the cell.
      * @return cell ID (number) in v (R-Phi).
      */
     short int getVCellID(int aCellUID);
@@ -513,7 +513,7 @@ namespace Belle2 {
 
     /**
         * Transform a position vector from local (sensor plane) to global frame.
-        * @param aSensorUID sensor UID.
+        * @param aSensorUID sensor UniID.
         * @param local TVector3 of local position coordinates.
         * @param master TVector3 of global position coordinates.
         */
@@ -524,7 +524,7 @@ namespace Belle2 {
 
     /**
      * Transform a vector from local (sensor plane) to global frame.
-     * @param aSensorUID sensor UID.
+     * @param aSensorUID sensor UniID.
      * @param local TVector3 in local coordinates.
      * @param master TVector3 in global coordinates.
      */
@@ -535,7 +535,7 @@ namespace Belle2 {
 
     /**
      * Transform a position vector from global local frame.
-     * @param aSensorUID sensor UID.
+     * @param aSensorUID sensor UniID.
      * @param master TVector3 of global position coordinates.
      * @param local TVector3 of local position coordinates.
      */
@@ -546,7 +546,7 @@ namespace Belle2 {
 
     /**
      * Transform a vector from global to local (sensor) frame.
-     * @param aSensorUID sensor UID.
+     * @param aSensorUID sensor UniID.
      * @param local TVector3 in global coordinates.
      * @param master TVector3 in local coordinates.
      */
@@ -566,11 +566,11 @@ namespace Belle2 {
 
     /**
      * Returns true if the most recently referenced sensor is required.
-     * @param aSensorUID UID of the required sensor.
+     * @param aSensorUID UniID of the required sensor.
      * @return true, if m_currentSensor required.
      */
     bool isSameSensor(int aSensorUID) const {
-      return (aSensorUID == m_currentSensorUID);
+      return (aSensorUID == m_currentSensorUniID);
     }
 
     /**
@@ -586,17 +586,17 @@ namespace Belle2 {
     }
 
     /**
-     * Get sensor by UID.
+     * Get sensor by UniID.
      * Sets m_currentLayerID/LadderID/SensorID and m_currentSensor.
-     * @param aSensorUID UID of the sensor.
+     * @param aSensorUID UniID of the sensor.
      * @return const reference to the required sensor, otherwise B2ERROR.
      */
-    void getSensor(int aSensorUID);
+    void getSensor(int aSensorUniID);
 
     /**
      * Get sensor by iLadder/iLayer/iSensor.
      * Sets m_currentLayerID/LadderID/SensorID and m_currentSensor.
-     * @param CID of the sensor.
+     * @param UniID of the sensor.
      * @return const reference to the required sensor, otherwise B2ERROR.
      */
     void getSensor(int iLayer, int iLadder, int iSensor);
@@ -616,14 +616,14 @@ namespace Belle2 {
     int m_currentLadderID; /**< ID of the most recently referenced ladder. */
     int m_currentSensorID; /**< ID of the most recently referenced sensor. */
 
-    int m_currentSensorUID; /**< CID of the most recently used sensor. */
+    int m_currentSensorUniID; /**< UniID of the most recently used sensor. */
 
     SiSensorInfo m_currentSensor; /**< reference to the most recently used sensor. */
 
-    SiSensorInfoMap m_sensors; /**< map <CID, SiSensorInfo>. */
-    SiSensorNameMap m_names; /**< map <name, CID>. */
+    SiSensorInfoMap m_sensors; /**< map <UniID, SiSensorInfo>. */
+    SiSensorNameMap m_names; /**< map <name, UniID>. */
 
-    CellUIDManager* m_cellUIDManager; /**< Cell UID codec is currently common to all sensors! */
+    CellUniIDManager* m_cellUniIDManager; /**< Cell UniID codec is currently common to all sensors! */
 
     static SiGeoCache* m_instance;   /**< Static pointer to the instance of the class.*/
 

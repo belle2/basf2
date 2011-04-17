@@ -75,6 +75,7 @@ SiEnergyFluct::SiEnergyFluct(double cutOnDeltaRays) :
     m_random(0),
     m_cutOnDeltaRays(cutOnDeltaRays)
 {
+  m_cutOnDeltaRays *= SiDigi::GeV; // came from basf2
   // Variables used to reduce recalculation of mean dE/dx
   m_prevMCPart   = 0;
   m_charge       = 0.;
@@ -121,6 +122,8 @@ SiEnergyFluct::SiEnergyFluct(double cutOnDeltaRays) :
   m_ipotFluct    = 173. * SiDigi::eV;     // material->GetIonisation()->GetLogMeanExcEnergy();
   m_ipotLogFluct = log(m_ipotFluct);
   m_e0           = 10 * SiDigi::eV;       // material->GetIonisation()->GetEnergy0fluct();
+
+  m_cutOnDeltaRays *= SiDigi::GeV;        // We bring it from basf2.
 }
 
 //
@@ -134,8 +137,10 @@ SiEnergyFluct::~SiEnergyFluct() {}
 // library W5013, phys332). L. Urban et al. NIM A362, p.416 (1995) and Geant4
 // Physics Reference Manual
 //
-double SiEnergyFluct::SampleFluctuations(const MCParticle * part, const double length)
+double SiEnergyFluct::SampleFluctuations(const MCParticle * part, double length)
 {
+  // Form basf2, we get length in cm
+  length *= SiDigi::cm;
   // Calculate particle related quantities
   double mass          = part->getMass() * SiDigi::GeV;
   double momentum2     = part->getMomentum().Mag2() * SiDigi::GeV * SiDigi::GeV;
@@ -158,15 +163,7 @@ double SiEnergyFluct::SampleFluctuations(const MCParticle * part, const double l
 
   if (part != m_prevMCPart) {
 
-    // Recalculate charge2 - we have a different particle.
-    // Get MCParticle charge in PDG database - it is not stored in the MCParticle object.
-
-    TParticlePDG* pdgPart = TDatabasePDG::Instance()->GetParticle(pdg);
-    if (pdgPart == NULL) {
-      B2ERROR("SiEnergyFluct: Cannot retrieve PDG information for pdg = "
-              << pdg);
-    } else
-      m_charge = pdgPart->Charge();
+    m_charge = part->getCharge(); // Thanks, Susanne.
 
     chargeSquare = m_charge * m_charge;
 
@@ -375,7 +372,6 @@ double SiEnergyFluct::getHadronDEDX(const MCParticle * part)
 
   // Start with dE/dx
   double dedx = log(2.0 * SiDigi::e_mass * bg2 * cutEnergy / m_eexc2) - (1.0 + cutEnergy / maxT) * beta2;
-
   // Spin 0.5 particles
   if (0.5 == spin) {
 

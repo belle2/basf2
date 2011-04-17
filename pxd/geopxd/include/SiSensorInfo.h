@@ -50,7 +50,7 @@ namespace Belle2 {
      */
     SiSensorInfo():
         m_detectorType(c_otherDetector),
-        m_layerID(-1), m_ladderID(-1), m_sensorID(-1), m_sensorUID(-1),
+        m_layerID(-1), m_ladderID(-1), m_sensorID(-1), m_sensorUniID(-1),
         m_shape(c_otherShape), m_vSize(0), m_uSize(0), m_uSizeD(0), m_thickness(0),
         m_vPitch(1), m_uPitch(1), m_uPitchD(1), m_vCells(1), m_uCells(1)
     {;}
@@ -95,10 +95,10 @@ namespace Belle2 {
     int getSensorID() const { return m_sensorID; }
 
     /**
-     * Get sensor CID.
-     * @return CID (compact layer/ladder/sensor ID of the sensor.
+     * Get sensor unique ID.
+     * @return UniID (unique layer/ladder/sensor ID of the sensor.
      */
-    int getSensorUID() const { return m_sensorUID; }
+    int getSensorUniID() const { return m_sensorUniID; }
 
 
     //Sensor shape and dimension getters
@@ -122,7 +122,7 @@ namespace Belle2 {
      * @return width in R-Phi (perpendicular to the beam direction).
      */
     double getUSize(double v = 0) const {
-      return m_uSize + m_uSizeD * v;
+      return (m_uSize + m_uSizeD * v);
     }
 
 
@@ -148,7 +148,7 @@ namespace Belle2 {
      * @return pitch in u (R-Phi)
      */
     double getUPitch(double v = 0) const {
-      return m_uPitch + m_uPitchD * v;
+      return (m_uPitch + m_uPitchD * v);
     }
 
 
@@ -193,9 +193,7 @@ namespace Belle2 {
      * @param uID cell number in Z.
      * @return u (Z) coordinate of the cell's center.
      */
-    double getVCellPosition(int vID) const {
-      return (vID + 0.5) * m_vPitch - 0.5 * m_vSize;
-    }
+    double getVCellPosition(int vID) const;
 
 
     /**
@@ -250,7 +248,7 @@ namespace Belle2 {
     int m_layerID; /**< Layer ID of the sensor. */
     int m_ladderID; /**< Ladder ID of the sensor. */
     int m_sensorID; /**< Sensor ID of the sensor. */
-    int m_sensorUID; /**< Compact ID of the sensor. */
+    int m_sensorUniID; /**< Compact ID of the sensor. */
 
     // Dimensions and shape.
     SensorShape m_shape;  /**< c_rectangular or c_trapezoidal. */

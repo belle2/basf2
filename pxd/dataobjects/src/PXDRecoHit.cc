@@ -34,7 +34,7 @@ PXDRecoHit::PXDRecoHit(const PXDHit* hit) :
     m_energyDep(0), m_energyDepError(1)
 {
   // Set the sensor UID
-  m_sensorUID = hit->getSensorUID();
+  m_sensorUID = hit->getSensorUniID();
 
   // Set positions
   fHitCoord(0, 0) = hit->getU();

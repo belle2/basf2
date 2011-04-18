@@ -44,7 +44,8 @@ namespace Belle2 {
     ~SignalMan(void);
 
     //! Initializing this object
-    EStatus init(const std::string inBufName, const std::string outBufName);
+    //EStatus init(const std::string inBufName, const std::string outBufName);
+    EStatus init(EHLTPort inBufKey, EHLTPort outBufKey);
 
     EStatus runEvtSender(void);
     EStatus runEvtReceiver(void);

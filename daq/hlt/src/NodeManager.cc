@@ -144,7 +144,8 @@ EStatus NodeManager::initSignalMan()
   else
     m_infoSignalMan = new SignalMan(c_MonitorPort, c_ControlPort, m_nodeinfo->thisIP());
 
-  m_infoSignalMan->init("B2ControlIn", "B2ControlOut");
+  //m_infoSignalMan->init("B2ControlIn", "B2ControlOut");
+  m_infoSignalMan->init(c_MonitorPort, c_ControlPort);
 
   // If there is no NodeInfo object, that is, a process node, runs EvtReceiver first because it doesn't know
   // the IP address of manager node

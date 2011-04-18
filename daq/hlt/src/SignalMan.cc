@@ -89,11 +89,14 @@ SignalMan::~SignalMan(void)
  * @return c_InitFailed Initialization failed
  * @return c_TermCalled Termination of forked processes (EvtSender and EvtReceiver)
 */
-EStatus SignalMan::init(const std::string inBufName, const std::string outBufName)
+//EStatus SignalMan::init(const std::string inBufName, const std::string outBufName)
+EStatus SignalMan::init(EHLTPort inBufKey, EHLTPort outBufKey)
 {
   //B2INFO("Starting to initialize SignalMan");
-  m_inBuf = new HLTBuffer(inBufName.c_str(), gBufferSize);
-  m_outBuf = new HLTBuffer(outBufName.c_str(), gBufferSize);
+  //m_inBuf = new HLTBuffer(inBufName.c_str(), gBufferSize);
+  //m_outBuf = new HLTBuffer(outBufName.c_str(), gBufferSize);
+  m_inBuf = new HLTBuffer(inBufKey, gBufferSize);
+  m_outBuf = new HLTBuffer(outBufKey, gBufferSize);
 
   m_inBuf->clear();
   m_outBuf->clear();

@@ -46,7 +46,8 @@ EStatus HLTProcess::init()
     } else {
       B2INFO("HLTProcess: SignalMan initialized with destination " << m_nodeInfo->targetIP()[0]);
       m_signalMan = new SignalMan(m_nodeInfo->portBaseDataIn(), m_nodeInfo->portBaseDataOut(), m_nodeInfo->targetIP()[0]);
-      m_signalMan->init("B2DataIn", "B2DataOut");
+      //m_signalMan->init("B2DataIn", "B2DataOut");
+      m_signalMan->init(c_DataInPort, c_DataOutPort);
       m_signalMan->doCommunication();
 
       B2INFO("HLTProcess: Return c_Success");

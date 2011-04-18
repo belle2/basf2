@@ -1,7 +1,7 @@
 /// @file ring_bugger.cc
 /// @brief HLT_bugger class implementation
-/// @author Ryosuke Itoh
-/// @date Feb. 22, 2010
+/// @author Ryosuke Itoh and Soohyung Lee
+/// @date Apr. 13, 2011
 
 //+
 // File : ring_buffer.cc
@@ -30,10 +30,12 @@ using namespace Belle2;
 
 // Constructor / Destructor
 
-HLTBuffer::HLTBuffer(const char* name, int size)
+//HLTBuffer::HLTBuffer(const char* name, int size)
+HLTBuffer::HLTBuffer(int key, int size)
 {
   // 1. Open shared memory
-  m_shmid = shmget(IPC_PRIVATE, size * 4, IPC_CREAT | 0644);
+  //m_shmid = shmget(IPC_PRIVATE, size * 4, IPC_CREAT | 0644);
+  m_shmid = shmget((key_t)key, size * 4, IPC_CREAT | 0666);
   if (m_shmid < 0) {
     perror("HLTBuffer::shmget");
     return;
@@ -46,7 +48,8 @@ HLTBuffer::HLTBuffer(const char* name, int size)
   //  cout << "Shared Memory created" << endl;
 
   // 2. Open Semaphore
-  m_semid = semget(IPC_PRIVATE, 1, IPC_CREAT | 0644);
+  //m_semid = semget(IPC_PRIVATE, 1, IPC_CREAT | 0644);
+  m_semid = semget((key_t)key, 1, IPC_CREAT | 0666);
   if (m_semid < 0) {
     perror("HLTBuffer::semget");
     return;
@@ -75,6 +78,11 @@ HLTBuffer::HLTBuffer(const char* name, int size)
   sem_unlock(m_semid);
 
   B2INFO("HLTBuffer initialization done (shmid=" << m_shmid << ")");
+  //B2INFO ("HLTBuffer: key = " << name << " ("<< (key_t)name << ")");
+}
+
+HLTBuffer::HLTBuffer(const char* name)
+{
 }
 
 HLTBuffer::HLTBuffer(int shm_id)

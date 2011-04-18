@@ -33,7 +33,9 @@ namespace Belle2 {
   class HLTBuffer {
   public:
     /*! Constructor by creating a new shared memory */
-    HLTBuffer(const char* name, int size);    // Create / Attach HLT buffer
+    //HLTBuffer(const char* name, int size);    // Create / Attach HLT buffer
+    HLTBuffer(int key, int size);    // Create / Attach HLT buffer
+    HLTBuffer(const char* name);
     /*! Constructor by attaching to an existing shared memory */
     HLTBuffer(int shmid);              // Attach HLT Buffer
     /*! Destructor */

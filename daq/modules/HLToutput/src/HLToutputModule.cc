@@ -64,7 +64,7 @@ void HLTOutputModule::initialize()
     m_done[i] = false;
   }
 
-  m_outBuf = new HLTBuffer((char*)m_outBufferName.c_str(), MAXPACKETSIZE);
+  m_outBuf = new HLTBuffer(c_DataOutPort, MAXPACKETSIZE);
 }
 
 void HLTOutputModule::beginRun()

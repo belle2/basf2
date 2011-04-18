@@ -45,7 +45,8 @@ void HLTInputModule::initialize()
   m_msgHandler = new MsgHandler(1);
 
   B2INFO("HLTInput: ring buffer initializing...");
-  m_inBuf = new HLTBuffer((char*)m_inBufferName.c_str(), MAXPACKETSIZE);
+  //m_inBuf = new HLTBuffer((char*)m_inBufferName.c_str(), MAXPACKETSIZE);
+  m_inBuf = new HLTBuffer(c_DataInPort, MAXPACKETSIZE);
 }
 
 void HLTInputModule::beginRun()

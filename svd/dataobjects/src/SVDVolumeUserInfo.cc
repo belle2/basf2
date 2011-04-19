@@ -26,6 +26,11 @@ SVDVolumeUserInfo& SVDVolumeUserInfo::operator=(const SVDVolumeUserInfo & other)
   this->m_layerID = other.getLayerID();
   this->m_ladderID = other.getLadderID();
   this->m_sensorID = other.getSensorID();
+  this->m_uPitch = other.getUPitch();
+  this->m_uPitch2 = other.getUPitch2();
+  this->m_uCells = other.getUCells();
+  this->m_vPitch = other.getVPitch();
+  this->m_vCells = other.getVCells();
   return *this;
 }
 

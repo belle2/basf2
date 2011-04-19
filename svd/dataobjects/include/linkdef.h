@@ -8,5 +8,6 @@
 #pragma link C++ class Belle2::SVDVolumeUserInfo;
 #pragma link C++ class Belle2::SVDSimHit;
 #pragma link C++ class Belle2::SVDHit;
+#pragma link C++ class Belle2::VXDSpacePoint;
 
 #endif

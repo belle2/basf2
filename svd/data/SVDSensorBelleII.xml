@@ -19,8 +19,13 @@
         <Material>SVD_Silicon</Material>
         <Color>590</Color>
         <Length desc="The over all length of the active sensor" unit="mm">122</Length>
-        <Thickness desc="Thickness of the active sensors" unit="um">300</Thickness>
+        <Thickness desc="Thickness of the active sensors" unit="um">320</Thickness>
         <Width desc="The over all width of active the sensor" unit="mm">38.4</Width>
+        <!--Readout data-->
+        <UPitch desc="Sensor pitch in R-Phi (p-side)" unit="um">50</UPitch>
+        <UCells desc="Number of strips in R-Phi (p-side)">768</UCells>
+        <VPitch desc="Sensor pitch in Z (n-side)" unit="um">160</VPitch>
+        <VCells desc="Number of strips in Z (n-side)">768</VCells>
       </Active>
     </Silicon>
         <Foam>
@@ -53,8 +58,13 @@
         <Material>SVD_Silicon</Material>
         <Shape>Trd2</Shape>
         <Color>590</Color>
-        <Thickness desc="Thickness of the active sensors" unit="um">300</Thickness>
+        <Thickness desc="Thickness of the active sensors" unit="um">320</Thickness>
         <Width desc="Width of the active sensor" unit="mm">57.72</Width>
+        <!--Readout data-->
+        <UPitch desc="Sensor pitch in R-Phi (p-side)" unit="um">75</UPitch>
+        <UCells desc="Number of strips in R-Phi (p-side)">768</UCells>
+        <VPitch desc="Sensor pitch in Z (n-side)" unit="um">240</VPitch>
+        <VCells desc="Number of strips in Z (n-side)">512</VCells>
       </Active>
     </Silicon>
     <Foam>
@@ -88,10 +98,16 @@
         <Material>SVD_Silicon</Material>
         <Color>590</Color>
         <Shape>Trd2</Shape>
-        <Thickness desc="Thickness of the active sensors" unit="um">300</Thickness>
+        <Thickness desc="Thickness of the active sensors" unit="um">320</Thickness>
         <Width desc="Width of the active sensor" unit="mm">57.59</Width>
         <Width2 desc="Width2 of the active sensor" unit="mm">38.42</Width2>
         <Length desc="Length of the active sensor" unit="mm">122.76</Length>
+        <!--Readout data-->
+        <UPitch desc="Sensor pitch in R-Phi (p-side)" unit="um">75</UPitch>
+        <UPitch2 desc="Sensor pitch2 in R-Phi (p-side)" unit="um">50</UPitch2>
+        <UCells desc="Number of strips in R-Phi (p-side)">768</UCells>
+        <VPitch desc="Sensor pitch in Z (n-side)" unit="um">240</VPitch>
+        <VCells desc="Number of strips in Z (n-side)">512</VCells>
       </Active>
     </Silicon>
     <Foam>

@@ -34,76 +34,82 @@ namespace Belle2 {
   public:
 
     // standard units
-    static double cm;   /**< Standard of [length] */
-    static double ns;   /**< Standard of [time] */
-    static double rad;  /**< Standard of [angle] */
-    static double GeV;  /**< Standard of [energy, momentum, mass] */
-    static double K;    /**< Standard of [temperature] */
-    static double T;    /**< Standard of [magnetic field] */
-    static double e;    /**< Standard of [electric charge] */
-    static double gcm3; /**< Standard of [density] */
+    static const double cm;   /**< Standard of [length] */
+    static const double ns;   /**< Standard of [time] */
+    static const double rad;  /**< Standard of [angle] */
+    static const double GeV;  /**< Standard of [energy, momentum, mass] */
+    static const double K;    /**< Standard of [temperature] */
+    static const double T;    /**< Standard of [magnetic field] */
+    static const double e;    /**< Standard of [electric charge] */
+    static const double gcm3; /**< Standard of [density] */
 
     // length units
-    static double km; /**< [kilometers] */
-    static double m;  /**< [meters] */
-    static double mm; /**< [millimeters] */
-    static double um; /**< [micrometers] */
-    static double nm; /**< [nanometers] */
-    static double fm; /**< [femtometers] */
+    static const double km; /**< [kilometers] */
+    static const double m;  /**< [meters] */
+    static const double mm; /**< [millimeters] */
+    static const double um; /**< [micrometers] */
+    static const double nm; /**< [nanometers] */
+    static const double fm; /**< [femtometers] */
 
     // area units
-    static double m2;  /**< [square meters] */
-    static double cm2; /**< [square centimeters] */
-    static double mm2; /**< [square millimeters] */
+    static const double m2;  /**< [square meters] */
+    static const double cm2; /**< [square centimeters] */
+    static const double mm2; /**< [square millimeters] */
 
-    static double b;  /**< [barn] */
-    static double mb; /**< [millibarn] */
-    static double ub; /**< [microbarn] */
-    static double nb; /**< [nanobarn] */
-    static double pb; /**< [picobarn] */
-    static double fb; /**< [femtobarn] */
-    static double ab; /**< [atobarn] */
+    static const double b;  /**< [barn] */
+    static const double mb; /**< [millibarn] */
+    static const double ub; /**< [microbarn] */
+    static const double nb; /**< [nanobarn] */
+    static const double pb; /**< [picobarn] */
+    static const double fb; /**< [femtobarn] */
+    static const double ab; /**< [atobarn] */
 
     // volume units
-    static double m3;  /**< [cubic meters] */
-    static double cm3; /**< [cubic centimeters] */
-    static double mm3; /**< [cubic millimeters] */
+    static const double m3;  /**< [cubic meters] */
+    static const double cm3; /**< [cubic centimeters] */
+    static const double mm3; /**< [cubic millimeters] */
 
     // time units
-    static double s;   /**< [second] */
-    static double ms;  /**< [millisecond] */
-    static double us;  /**< [microsecond] */
-    static double ps;  /**< [picosecond] */
-    static double fs;  /**< [femtosecond] */
+    static const double s;   /**< [second] */
+    static const double ms;  /**< [millisecond] */
+    static const double us;  /**< [microsecond] */
+    static const double ps;  /**< [picosecond] */
+    static const double fs;  /**< [femtosecond] */
 
     // angle units
-    static double mrad; /**< [millirad] */
-    static double deg;  /**< degree to radians */
+    static const double mrad; /**< [millirad] */
+    static const double deg;  /**< degree to radians */
 
     // energy units
-    static double eV;  /**< [electronvolt] */
-    static double keV; /**< [kiloelectronvolt] */
-    static double MeV; /**< [megaelectronvolt] */
-    static double TeV; /**< [megaelectronvolt] */
-    static double J;   /**< [joule] */
+    static const double eV;  /**< [electronvolt] */
+    static const double keV; /**< [kiloelectronvolt] */
+    static const double MeV; /**< [megaelectronvolt] */
+    static const double TeV; /**< [megaelectronvolt] */
+    static const double J;   /**< [joule] */
 
     // charge units
-    static double C;   /**< [coulomb] */
-    static double fC;  /**< [femtocoulomb] */
+    static const double C;   /**< [coulomb] */
+    static const double fC;  /**< [femtocoulomb] */
 
     // density units
-    static double mgcm3; /**< [mg/cm^3] */
-    static double kgcm3; /**< [kg/cm^3] */
-    static double gmm3;  /**< [g/mm^3] */
-    static double mgmm3; /**< [mg/mm^3] */
-    static double kgmm3; /**< [kg/mm^3] */
+    static const double mgcm3; /**< [mg/cm^3] */
+    static const double kgcm3; /**< [kg/cm^3] */
+    static const double gmm3;  /**< [g/mm^3] */
+    static const double mgmm3; /**< [mg/mm^3] */
+    static const double kgmm3; /**< [kg/mm^3] */
 
     //Various constants
-    static double speed_of_light; /**< [cm/ns] */
-    static double k_boltzmann;    /**< Boltzmann constant in GeV/K */
-    static double energy_eh;      /**< Energy needed to create an electron-hole pair in Si at std. T */
-    static double electron_mass;  /**< Electron mass in MeV */
-    static double fine_str_const; /**< The fine structure constant */
+    static double speed_of_light;     /**< [cm/ns] */
+    static const double speedOfLight; /**< [cm/ns] */
+    static double k_boltzmann;        /**< Boltzmann constant in GeV/K */
+    static const double kBoltzmann;   /**< Boltzmann constant in GeV/K. */
+    static double energy_eh;          /**< Energy needed to create an electron-hole pair in Si at std. T */
+    static const double ehEnergy;     /**< Energy needed to create an electron-hole pair in Si at std. T. */
+    static double electron_mass;      /**< Electron mass in MeV */
+    static const double electronMass; /**< Electron mass in MeV. */
+    static double fine_str_const;     /**< The fine structure constant. */
+    static const double fineStrConst; /**< The fine structure constant. */
+
 
     /** Definition of the supported units. */
     enum EUnitTypes { c_UnitLength, /**< length unit, default [cm]. */

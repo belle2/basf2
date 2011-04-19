@@ -16,76 +16,81 @@ using namespace std;
 Unit* Unit::m_instance = NULL;
 
 // standard units
-double Unit::cm   = 1.; /**< Standard of [length] */
-double Unit::ns   = 1.; /**< Standard of [time] */
-double Unit::rad  = 1.; /**< Standard of [angle] */
-double Unit::GeV  = 1.; /**< Standard of [energy, momentum, mass] */
-double Unit::K    = 1.; /**< Standard of [temperature] */
-double Unit::T    = 1.; /**< Standard of [magnetic field] */
-double Unit::e    = 1.; /**< Standard of [electric charge] */
-double Unit::gcm3 = 1.; /**< Standard of [density] */
+const double Unit::cm   = 1.; /**< Standard of [length] */
+const double Unit::ns   = 1.; /**< Standard of [time] */
+const double Unit::rad  = 1.; /**< Standard of [angle] */
+const double Unit::GeV  = 1.; /**< Standard of [energy, momentum, mass] */
+const double Unit::K    = 1.; /**< Standard of [temperature] */
+const double Unit::T    = 1.; /**< Standard of [magnetic field] */
+const double Unit::e    = 1.; /**< Standard of [electric charge] */
+const double Unit::gcm3 = 1.; /**< Standard of [density] */
 
 // length units
-double Unit::km  = Unit::cm * 1e5;   /**< [kilometers] */
-double Unit::m   = Unit::cm * 1e2;   /**< [meters] */
-double Unit::mm  = Unit::m  * 1e-3;  /**< [millimeters] */
-double Unit::um  = Unit::m  * 1e-6;  /**< [micrometers] */
-double Unit::nm  = Unit::m  * 1e-9;  /**< [nanometers] */
-double Unit::fm  = Unit::m  * 1e-12; /**< [femtometers] */
+const double Unit::km  = Unit::cm * 1e5;   /**< [kilometers] */
+const double Unit::m   = Unit::cm * 1e2;   /**< [meters] */
+const double Unit::mm  = Unit::m  * 1e-3;  /**< [millimeters] */
+const double Unit::um  = Unit::m  * 1e-6;  /**< [micrometers] */
+const double Unit::nm  = Unit::m  * 1e-9;  /**< [nanometers] */
+const double Unit::fm  = Unit::m  * 1e-12; /**< [femtometers] */
 
 // area units
-double Unit::m2  = Unit::m * Unit::m;      /**< [square meters] */
-double Unit::cm2 = Unit::cm * Unit::cm;    /**< [square centimeters] */
-double Unit::mm2 = Unit::mm * Unit::mm;    /**< [square millimeters] */
+const double Unit::m2  = Unit::m * Unit::m;      /**< [square meters] */
+const double Unit::cm2 = Unit::cm * Unit::cm;    /**< [square centimeters] */
+const double Unit::mm2 = Unit::mm * Unit::mm;    /**< [square millimeters] */
 
-double Unit::b   = Unit::m2 * 1e-28; /**< [barn] */
-double Unit::mb  = Unit::b  * 1e-3;  /**< [millibarn] */
-double Unit::ub  = Unit::b  * 1e-6;  /**< [microbarn] */
-double Unit::nb  = Unit::b  * 1e-9;  /**< [nanobarn] */
-double Unit::pb  = Unit::b  * 1e-12; /**< [picobarn] */
-double Unit::fb  = Unit::b  * 1e-15; /**< [femtobarn] */
-double Unit::ab  = Unit::b  * 1e-18; /**< [atobarn] */
+const double Unit::b   = Unit::m2 * 1e-28; /**< [barn] */
+const double Unit::mb  = Unit::b  * 1e-3;  /**< [millibarn] */
+const double Unit::ub  = Unit::b  * 1e-6;  /**< [microbarn] */
+const double Unit::nb  = Unit::b  * 1e-9;  /**< [nanobarn] */
+const double Unit::pb  = Unit::b  * 1e-12; /**< [picobarn] */
+const double Unit::fb  = Unit::b  * 1e-15; /**< [femtobarn] */
+const double Unit::ab  = Unit::b  * 1e-18; /**< [atobarn] */
 
 // volume units
-double Unit::m3  = Unit::m * Unit::m * Unit::m;    /**< [cubic meters] */
-double Unit::cm3 = Unit::cm * Unit::cm * Unit::cm; /**< [cubic centimeters] */
-double Unit::mm3 = Unit::mm * Unit::mm * Unit::mm; /**< [cubic millimeters] */
+const double Unit::m3  = Unit::m * Unit::m * Unit::m;    /**< [cubic meters] */
+const double Unit::cm3 = Unit::cm * Unit::cm * Unit::cm; /**< [cubic centimeters] */
+const double Unit::mm3 = Unit::mm * Unit::mm * Unit::mm; /**< [cubic millimeters] */
 
 // time units
-double Unit::s   = Unit::ns * 1e9;   /**< [second] */
-double Unit::ms  = Unit::s  * 1e-3;  /**< [millisecond] */
-double Unit::us  = Unit::s  * 1e-6;  /**< [microsecond] */
-double Unit::ps  = Unit::s  * 1e-12; /**< [picosecond] */
-double Unit::fs  = Unit::s  * 1e-15; /**< [femtosecond] */
+const double Unit::s   = Unit::ns * 1e9;   /**< [second] */
+const double Unit::ms  = Unit::s  * 1e-3;  /**< [millisecond] */
+const double Unit::us  = Unit::s  * 1e-6;  /**< [microsecond] */
+const double Unit::ps  = Unit::s  * 1e-12; /**< [picosecond] */
+const double Unit::fs  = Unit::s  * 1e-15; /**< [femtosecond] */
 
 // angle units
-double Unit::mrad = Unit::rad * 1e-3;  /**< [millirad] */
-double Unit::deg  = TMath::DegToRad(); /**< degree to radians */
+const double Unit::mrad = Unit::rad * 1e-3;  /**< [millirad] */
+const double Unit::deg  = TMath::DegToRad(); /**< degree to radians */
 
 // energy units
-double Unit::eV  = Unit::GeV * 1e-9; /**< [electronvolt] */
-double Unit::keV = Unit::eV  * 1e3;  /**< [kiloelectronvolt] */
-double Unit::MeV = Unit::eV  * 1e6;  /**< [megaelectronvolt] */
-double Unit::TeV = Unit::eV  * 1e9;  /**< [megaelectronvolt] */
-double Unit::J   = 1.0 / TMath::Qe() * Unit::eV; /**< [joule] */
+const double Unit::eV  = Unit::GeV * 1e-9; /**< [electronvolt] */
+const double Unit::keV = Unit::eV  * 1e3;  /**< [kiloelectronvolt] */
+const double Unit::MeV = Unit::eV  * 1e6;  /**< [megaelectronvolt] */
+const double Unit::TeV = Unit::eV  * 1e9;  /**< [megaelectronvolt] */
+const double Unit::J   = 1.0 / TMath::Qe() * Unit::eV; /**< [joule] */
 
 // charge units
-double Unit::C  = 1.0 / TMath::Qe() * Unit::e;
-double Unit::fC = Unit::C / 1.0e15;
+const double Unit::C  = 1.0 / TMath::Qe() * Unit::e;
+const double Unit::fC = Unit::C / 1.0e15;
 
 // density units
-double Unit::mgcm3  = Unit::gcm3 * 1e-3; /**< [mg/cm^3] */
-double Unit::kgcm3  = Unit::gcm3 * 1e3;  /**< [kg/cm^3] */
-double Unit::gmm3   = Unit::gcm3 / Unit::mm3;  /**< [g/mm^3] */
-double Unit::mgmm3  = Unit::mgcm3 / Unit::mm3; /**< [mg/mm^3] */
-double Unit::kgmm3  = Unit::kgcm3 / Unit::mm3; /**< [kg/mm^3] */
+const double Unit::mgcm3  = Unit::gcm3 * 1e-3; /**< [mg/cm^3] */
+const double Unit::kgcm3  = Unit::gcm3 * 1e3;  /**< [kg/cm^3] */
+const double Unit::gmm3   = Unit::gcm3 / Unit::mm3;  /**< [g/mm^3] */
+const double Unit::mgmm3  = Unit::mgcm3 / Unit::mm3; /**< [mg/mm^3] */
+const double Unit::kgmm3  = Unit::kgcm3 / Unit::mm3; /**< [kg/mm^3] */
 
 //Various constants
-double Unit::speed_of_light = 29.9792458; /**< [cm/ns] */
-double Unit::k_boltzmann    = 8.617343 * 1.0e-5 * Unit::eV / Unit::K; /**< Boltzmann constant [GeV/K] */
-double Unit::energy_eh      = 3.65 * Unit::eV;  /**< Energy needed to create an electron-hole pair in Si at std. T */
-double Unit::electron_mass  = 0.510999 * MeV;   /**< Electron mass */
-double Unit::fine_str_const = 1.0 / 137.036;    /**< The fine structure constant */
+double Unit::speed_of_light       = 29.9792458; /**< [cm/ns] */
+const double Unit::speedOfLight   = 29.9792458; /**< [cm/ns] */
+double Unit::k_boltzmann          = 8.617343 * 1.0e-5 * Unit::eV / Unit::K; /**< Boltzmann constant [GeV/K] */
+const double Unit::kBoltzmann     = 8.617343 * 1.0e-5 * Unit::eV / Unit::K; /**< Boltzmann constant [GeV/K] */
+double Unit::energy_eh            = 3.65 * Unit::eV;  /**< Energy needed to create an electron-hole pair in Si at std. T */
+const double Unit::ehEnergy       = 3.65 * Unit::eV;  /**< Energy needed to create an electron-hole pair in Si at std. T */
+double Unit::electron_mass        = 0.510999 * MeV;   /**< Electron mass */
+const double Unit::electronMass   = 0.510999 * MeV;   /**< Electron mass */
+double Unit::fine_str_const       = 1.0 / 137.036;    /**< The fine structure constant */
+const double Unit::fineStrConst = 1.0 / 137.036;    /**< The fine structure constant */
 
 
 Unit& Unit::Instance()

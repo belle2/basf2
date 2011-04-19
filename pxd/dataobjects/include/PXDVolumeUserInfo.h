@@ -43,9 +43,9 @@ namespace Belle2 {
         m_layerID(-1),
         m_ladderID(-1),
         m_sensorID(-1),
-        m_uPitch(0),
+        m_uPitch(1),
         m_uCells(1),
-        m_vPitch(0),
+        m_vPitch(1),
         m_vCells(1) {
       m_stepSize = stepLengthInPXD;
     }
@@ -54,10 +54,10 @@ namespace Belle2 {
      * @param layerID ID of the layer.
      * @param ladderID ID of the ladder.
      * @param sensorID ID of the sensor.
-     * @param uPitch sensor pitch in u ("z") direciton.
-     * @param uCells number of cells in u ("z") direction.
-     * @param vPitch sensor pitch in v ("r-phi") direction.
-     * @param vCells number of cells in v ("r-phi") direction.
+     * @param uPitch sensor pitch in u ("r-phi") direciton.
+     * @param uCells number of cells in u ("r-phi") direction.
+     * @param vPitch sensor pitch in v ("z") direction.
+     * @param vCells number of cells in v ("z") direction.
      */
     PXDVolumeUserInfo(
       int layerID,
@@ -131,13 +131,13 @@ namespace Belle2 {
 
   private:
 
-    int m_layerID;           /**< Layer number. */
-    int m_ladderID;          /**< Ladder number. */
-    int m_sensorID;          /**< Sensor number. */
-    double m_uPitch;        /**< Pitch in u ("z"). */
-    int m_uCells;         /**< Number of cells in u ("z"). */
-    double m_vPitch;        /**< Pitch in v ("r-phi"). */
-    int m_vCells;         /**< Number of cells in v ("r-phi"). */
+    int m_layerID; /**< Layer number. */
+    int m_ladderID; /**< Ladder number. */
+    int m_sensorID; /**< Sensor number. */
+    double m_uPitch; /**< Pitch in u ("r-phi"). */
+    int m_uCells; /**< Number of cells in u ("r-phi"). */
+    double m_vPitch; /**< Pitch in v ("z"). */
+    int m_vCells; /**< Number of cells in v ("z"). */
 
     ClassDef(PXDVolumeUserInfo, 1)
 

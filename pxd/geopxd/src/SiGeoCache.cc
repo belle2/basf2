@@ -21,7 +21,7 @@ using namespace Belle2;
 
 const string activeSensorTag = "Silicon_Active";
 const string pxdGeoTag = "PXD";
-const string svdGeoTag = "SVD:not implemented.";
+const string svdGeoTag = "SVD";
 const string topGeoTag = "Top";
 
 SiGeoCache* SiGeoCache::m_instance = NULL;

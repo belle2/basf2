@@ -65,7 +65,7 @@ SiSensorInfo::SiSensorInfo(TGeoNode* pNode)
     m_ladderID = info->getLadderID();
     m_sensorID = info->getSensorID();
     // Readout geometry data from UserInfo
-    /* Not implemented.
+    /* Not implemented for SVD yet.
     m_vPitch = info->getUPitch();
     m_uPitch = info->getVPitch();
     m_uPitch2 = m_uPitch;
@@ -93,6 +93,10 @@ SiSensorInfo::SiSensorInfo(TGeoNode* pNode)
     m_uSize = 0.5 * (uSize + uSize2);
     m_vSize = 2.0 * shape->GetDz();
     m_uSizeD = 2.0 * (uSize2 - uSize) / m_vSize;
+    // Consolidate: adapt cell size to pitch and number of cells.
+    // To be removed once geometry is consistent.
+    m_uSize = m_uPitch * m_uCells;
+    m_vSize = m_vPitch * m_vCells;
 
   } else if (classname == "TGeoBBox") { // bounding box - PXD
     m_shape = c_rectangular;
@@ -109,11 +113,6 @@ SiSensorInfo::SiSensorInfo(TGeoNode* pNode)
     m_uSizeD = 0.0;
     m_vSize = 1.0;
   } // if classname
-
-  // Consolidate: adapt cell size to pitch and number of cells.
-  // To be removed once geometry is consistent.
-  m_uSize = m_uPitch * m_uCells;
-  m_vSize = m_vPitch * m_vCells;
 
 } // constructor
 

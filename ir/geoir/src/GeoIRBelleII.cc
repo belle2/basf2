@@ -13,6 +13,7 @@
 //    to replace the pass vector to function method, which creates inaccessible new pointers etc
 
 #include <ir/geoir/GeoIRBelleII.h>
+#include <ir/simir/IRSensitiveDetector.h>
 
 #include <framework/gearbox/GearDir.h>
 #include <framework/gearbox/GearboxIOAbs.h>
@@ -52,6 +53,9 @@ GeoIRBelleII regGeoIRBelleII;
 GeoIRBelleII::GeoIRBelleII() : CreatorBase("IRBelleII")
 {
   setDescription("Creates the TGeo objects for the IR geometry of the Belle II detector.");
+
+  //The IR subdetector uses the "SD_" prefix to flag its sensitive volumes
+  addSensitiveDetector("SD_", new IRSensitiveDetector("IRSensitiveDetector"));
 }
 
 

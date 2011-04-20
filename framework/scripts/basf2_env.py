@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+import signal
 from pybasf2 import *
 
 # -----------------------------------------------
@@ -25,6 +26,9 @@ basf2authors = [
 # -----------------------------------------------
 #               Prepare basf2
 # -----------------------------------------------
+
+# Reset the signal handler to allow the framework execution to be stopped with Ctrl-c
+signal.signal(signal.SIGINT, signal.SIG_DFL)
 
 # Check for environment variables set by the belle 2 release script
 envarReleaseDir = os.environ.get('BELLE2_RELEASE_DIR', None)

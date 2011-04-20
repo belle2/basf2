@@ -13,6 +13,12 @@
         <AngleHER desc="HER beam pipe angle" unit="rad">0.0415</AngleHER>
         <AngleLER desc="LER beam pipe angle" unit="rad">-0.0415</AngleLER>
 
+    <!-- ############################################################  -->
+    <!-- for your information, please see BelleII computing homepage and -->
+    <!-- see /~twiki/bin/view/Computing/InteractionRegionPackages -->
+    <!-- (basf2 Software Portal >> Interaction Region(IR) >> QCSgeom.pdf) -->
+    <!-- ############################################################ -->
+
         <!--Cryo R-->
 		<A1wal1>
 			<l1 unit="cm">116</l1>
@@ -43,7 +49,7 @@
 			<l6 unit="cm">12.0</l6>
 			<l7 unit="cm">92.5</l7>
 			<l8 unit="cm">5.0</l8>
-			<l9 unit="cm">91.5</l9>
+			<l9 unit="cm">127.5</l9>
 			<r1 unit="cm">1.45</r1>
 			<r2 unit="cm">1.8</r2>
 			<r3 unit="cm">2.6</r3>
@@ -392,7 +398,7 @@
 			<l4 unit="cm">-18.0</l4>
 			<l5 unit="cm">-53.9</l5>
 			<l6 unit="cm">-5.0</l6>
-			<l7 unit="cm">-91.5</l7>
+			<l7 unit="cm">-160.0</l7>
 			<r1 unit="cm">1.45</r1>
 			<r2 unit="cm">2.1</r2>
 			<r3 unit="cm">3.9</r3>

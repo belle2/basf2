@@ -3,10 +3,16 @@
  *  Copyright(C) 2010 - Belle II Collaboration                            *
  *                                                                        *
  *  Author: The Belle II Collaboration                                    *
- *  Contributors:                                                         *
+ *  Contributors: Hiroshi Nakano                                          *
  *                                                                        *
  *  This software is provided "as is" without any warranty.               *
  **************************************************************************/
+
+// ############################################################
+// for your information, please see BelleII computing homepage and
+// see /~twiki/bin/view/Computing/InteractionRegionPackages
+// (basf2 Software Portal >> Interaction Region(IR) >> QCSgeom.pdf)
+// ############################################################
 
 #include <ir/geoir/GeoQCsBelleII.h>
 
@@ -101,18 +107,19 @@ void GeoQCsBelleII::create(GearDir& content)
   //-   A1wal1
 
   //get parameters from .xml file
-  double A1wal1l1 = content.getParamLength("A1wal1/l1");
-  double A1wal1l2 = content.getParamLength("A1wal1/l2");
-  double A1wal1l3 = content.getParamLength("A1wal1/l3");
-  double A1wal1l4 = content.getParamLength("A1wal1/l4");
-  double A1wal1l5 = content.getParamLength("A1wal1/l5");
-  double A1wal1l6 = content.getParamLength("A1wal1/l6");
-  double A1wal1l7 = content.getParamLength("A1wal1/l7");
-  double A1wal1r1 = content.getParamLength("A1wal1/r1");
-  double A1wal1r2 = content.getParamLength("A1wal1/r2");
-  double A1wal1r3 = content.getParamLength("A1wal1/r3");
-  double A1wal1r4 = content.getParamLength("A1wal1/r4");
-  string strMatA1wal1 = content.getParamString("A1wal1/Material");
+  GearDir cA1wal1(content, "A1wal1/");
+  double A1wal1l1 = cA1wal1.getParamLength("l1");
+  double A1wal1l2 = cA1wal1.getParamLength("l2");
+  double A1wal1l3 = cA1wal1.getParamLength("l3");
+  double A1wal1l4 = cA1wal1.getParamLength("l4");
+  double A1wal1l5 = cA1wal1.getParamLength("l5");
+  double A1wal1l6 = cA1wal1.getParamLength("l6");
+  double A1wal1l7 = cA1wal1.getParamLength("l7");
+  double A1wal1r1 = cA1wal1.getParamLength("r1");
+  double A1wal1r2 = cA1wal1.getParamLength("r2");
+  double A1wal1r3 = cA1wal1.getParamLength("r3");
+  double A1wal1r4 = cA1wal1.getParamLength("r4");
+  string strMatA1wal1 = cA1wal1.getParamString("Material");
   TGeoMedium* strMedA1wal1 = gGeoManager->GetMedium(strMatA1wal1.c_str());
 
   //define geometry
@@ -152,7 +159,8 @@ void GeoQCsBelleII::create(GearDir& content)
   //-   A2spc1
 
   //get parameters from .xml file
-  bpthick = content.getParamLength("A2spc1/bpthick");
+  GearDir cA2spc1(content, "A2spc1/");
+  bpthick = cA2spc1.getParamLength("bpthick");
   //double A2spc1l1 = A1wal1l1;
   //double A2spc1l2 = A1wal1l2;
   //double A2spc1l3 = A1wal1l3;
@@ -164,7 +172,7 @@ void GeoQCsBelleII::create(GearDir& content)
   double A2spc1r2 = A1wal1r2 - bpthick;
   double A2spc1r3 = A1wal1r3 - bpthick;
   double A2spc1r4 = A1wal1r4 - bpthick;
-  string strMatA2spc1 = content.getParamString("A2spc1/Material");
+  string strMatA2spc1 = cA2spc1.getParamString("Material");
   TGeoMedium* strMedA2spc1 = gGeoManager->GetMedium(strMatA2spc1.c_str());
 
   //define geometry
@@ -205,23 +213,24 @@ void GeoQCsBelleII::create(GearDir& content)
   //-   B1wal1
 
   //get parameters from .xml file
-  double B1wal1l1 = content.getParamLength("B1wal1/l1");
-  double B1wal1l2 = content.getParamLength("B1wal1/l2");
-  double B1wal1l3 = content.getParamLength("B1wal1/l3");
-  double B1wal1l4 = content.getParamLength("B1wal1/l4");
-  double B1wal1l5 = content.getParamLength("B1wal1/l5");
-  double B1wal1l6 = content.getParamLength("B1wal1/l6");
-  double B1wal1l7 = content.getParamLength("B1wal1/l7");
-  double B1wal1l8 = content.getParamLength("B1wal1/l8");
-  double B1wal1l9 = content.getParamLength("B1wal1/l9");
+  GearDir cB1wal1(content, "B1wal1/");
+  double B1wal1l1 = cB1wal1.getParamLength("l1");
+  double B1wal1l2 = cB1wal1.getParamLength("l2");
+  double B1wal1l3 = cB1wal1.getParamLength("l3");
+  double B1wal1l4 = cB1wal1.getParamLength("l4");
+  double B1wal1l5 = cB1wal1.getParamLength("l5");
+  double B1wal1l6 = cB1wal1.getParamLength("l6");
+  double B1wal1l7 = cB1wal1.getParamLength("l7");
+  double B1wal1l8 = cB1wal1.getParamLength("l8");
+  double B1wal1l9 = cB1wal1.getParamLength("l9");
   //
-  double B1wal1r1 = content.getParamLength("B1wal1/r1");
-  double B1wal1r2 = content.getParamLength("B1wal1/r2");
-  double B1wal1r3 = content.getParamLength("B1wal1/r3");
-  double B1wal1r4 = content.getParamLength("B1wal1/r4");
-  double B1wal1r5 = content.getParamLength("B1wal1/r5");
-  double B1wal1r6 = content.getParamLength("B1wal1/r6");
-  string strMatB1wal1 = content.getParamString("B1wal1/Material");
+  double B1wal1r1 = cB1wal1.getParamLength("r1");
+  double B1wal1r2 = cB1wal1.getParamLength("r2");
+  double B1wal1r3 = cB1wal1.getParamLength("r3");
+  double B1wal1r4 = cB1wal1.getParamLength("r4");
+  double B1wal1r5 = cB1wal1.getParamLength("r5");
+  double B1wal1r6 = cB1wal1.getParamLength("r6");
+  string strMatB1wal1 = cB1wal1.getParamString("Material");
   TGeoMedium* strMedB1wal1 = gGeoManager->GetMedium(strMatB1wal1.c_str());
 
   //define geometry
@@ -262,7 +271,8 @@ void GeoQCsBelleII::create(GearDir& content)
   //-   B2spc1
 
   //get parameters from .xml file
-  bpthick = content.getParamLength("B2spc1/bpthick");
+  GearDir cB2spc1(content, "B2spc1/");
+  bpthick = cB2spc1.getParamLength("bpthick");
   //double B2spc1d1 = B1wal1d1;
   //double B2spc1l1 = B1wal1l1;
   //double B2spc1l2 = B1wal1l2;
@@ -277,7 +287,7 @@ void GeoQCsBelleII::create(GearDir& content)
   double B2spc1r4 = B1wal1r4 - bpthick;
   double B2spc1r5 = B1wal1r5 - bpthick;
   double B2spc1r6 = B1wal1r6 - bpthick;
-  string strMatB2spc1 = content.getParamString("B2spc1/Material");
+  string strMatB2spc1 = cB2spc1.getParamString("Material");
   TGeoMedium* strMedB2spc1 = gGeoManager->GetMedium(strMatB2spc1.c_str());
 
   //define geometry
@@ -321,23 +331,24 @@ void GeoQCsBelleII::create(GearDir& content)
   //-   C1wal1
 
   //get parameters from .xml file
+  GearDir cC1wal1(content, "C1wal1/");
   double C1wal1d1 = GlobalDistanceR;
   //
-  double C1wal1l1 = content.getParamLength("C1wal1/l1");
-  double C1wal1l2 = content.getParamLength("C1wal1/l2");
-  double C1wal1l3 = content.getParamLength("C1wal1/l3");
-  double C1wal1l4 = content.getParamLength("C1wal1/l4");
-  double C1wal1l5 = content.getParamLength("C1wal1/l5");
-  double C1wal1l6 = content.getParamLength("C1wal1/l6");
-  double C1wal1l7 = content.getParamLength("C1wal1/l7");
+  double C1wal1l1 = cC1wal1.getParamLength("l1");
+  double C1wal1l2 = cC1wal1.getParamLength("l2");
+  double C1wal1l3 = cC1wal1.getParamLength("l3");
+  double C1wal1l4 = cC1wal1.getParamLength("l4");
+  double C1wal1l5 = cC1wal1.getParamLength("l5");
+  double C1wal1l6 = cC1wal1.getParamLength("l6");
+  double C1wal1l7 = cC1wal1.getParamLength("l7");
   //
-  double C1wal1r1 = content.getParamLength("C1wal1/r1");
-  double C1wal1r2 = content.getParamLength("C1wal1/r2");
-  double C1wal1r3 = content.getParamLength("C1wal1/r3");
-  double C1wal1r4 = content.getParamLength("C1wal1/r4");
-  double C1wal1r5 = content.getParamLength("C1wal1/r5");
-  double C1wal1r6 = content.getParamLength("C1wal1/r6");
-  string strMatC1wal1 = content.getParamString("C1wal1/Material");
+  double C1wal1r1 = cC1wal1.getParamLength("r1");
+  double C1wal1r2 = cC1wal1.getParamLength("r2");
+  double C1wal1r3 = cC1wal1.getParamLength("r3");
+  double C1wal1r4 = cC1wal1.getParamLength("r4");
+  double C1wal1r5 = cC1wal1.getParamLength("r5");
+  double C1wal1r6 = cC1wal1.getParamLength("r6");
+  string strMatC1wal1 = cC1wal1.getParamString("Material");
   TGeoMedium* strMedC1wal1 = gGeoManager->GetMedium(strMatC1wal1.c_str());
 
   //define geometry
@@ -378,24 +389,25 @@ void GeoQCsBelleII::create(GearDir& content)
   //-   C2spc1
 
   //get parameters from .xml file
-  double C2spc1d1 = content.getParamLength("C2spc1/d1");
+  GearDir cC2spc1(content, "C2spc1/");
+  double C2spc1d1 = cC2spc1.getParamLength("d1");
   //
-  double C2spc1l1 = content.getParamLength("C2spc1/l1");
-  double C2spc1l2 = content.getParamLength("C2spc1/l2");
-  double C2spc1l3 = content.getParamLength("C2spc1/l3");
-  double C2spc1l4 = content.getParamLength("C2spc1/l4");
-  double C2spc1l5 = content.getParamLength("C2spc1/l5");
-  double C2spc1l6 = content.getParamLength("C2spc1/l6");
-  double C2spc1l7 = content.getParamLength("C2spc1/l7");
-  double C2spc1l8 = content.getParamLength("C2spc1/l8");
+  double C2spc1l1 = cC2spc1.getParamLength("l1");
+  double C2spc1l2 = cC2spc1.getParamLength("l2");
+  double C2spc1l3 = cC2spc1.getParamLength("l3");
+  double C2spc1l4 = cC2spc1.getParamLength("l4");
+  double C2spc1l5 = cC2spc1.getParamLength("l5");
+  double C2spc1l6 = cC2spc1.getParamLength("l6");
+  double C2spc1l7 = cC2spc1.getParamLength("l7");
+  double C2spc1l8 = cC2spc1.getParamLength("l8");
   //
-  double C2spc1r1 = content.getParamLength("C2spc1/r1");
-  double C2spc1r2 = content.getParamLength("C2spc1/r2");
-  double C2spc1r3 = content.getParamLength("C2spc1/r3");
-  double C2spc1r4 = content.getParamLength("C2spc1/r4");
-  double C2spc1r5 = content.getParamLength("C2spc1/r5");
-  double C2spc1r6 = content.getParamLength("C2spc1/r6");
-  string strMatC2spc1 = content.getParamString("C2spc1/Material");
+  double C2spc1r1 = cC2spc1.getParamLength("r1");
+  double C2spc1r2 = cC2spc1.getParamLength("r2");
+  double C2spc1r3 = cC2spc1.getParamLength("r3");
+  double C2spc1r4 = cC2spc1.getParamLength("r4");
+  double C2spc1r5 = cC2spc1.getParamLength("r5");
+  double C2spc1r6 = cC2spc1.getParamLength("r6");
+  string strMatC2spc1 = cC2spc1.getParamString("Material");
   TGeoMedium* strMedC2spc1 = gGeoManager->GetMedium(strMatC2spc1.c_str());
 
   //define geometry
@@ -442,17 +454,18 @@ void GeoQCsBelleII::create(GearDir& content)
   //-   C3wal2
 
   //get parameters from .xml file
-  double C3wal2d1 = content.getParamLength("C3wal2/d1");
-  double C3wal2l1 = content.getParamLength("C3wal2/l1");
-  double C3wal2l2 = content.getParamLength("C3wal2/l2");
-  double C3wal2l3 = content.getParamLength("C3wal2/l3");
-  double C3wal2l4 = content.getParamLength("C3wal2/l4");
-  double C3wal2l5 = content.getParamLength("C3wal2/l5");
-  double C3wal2r1 = content.getParamLength("C3wal2/r1");
-  double C3wal2r2 = content.getParamLength("C3wal2/r2");
-  double C3wal2r3 = content.getParamLength("C3wal2/r3");
-  double C3wal2r4 = content.getParamLength("C3wal2/r4");
-  string strMatC3wal2 = content.getParamString("C3wal2/Material");
+  GearDir cC3wal2(content, "C3wal2/");
+  double C3wal2d1 = cC3wal2.getParamLength("d1");
+  double C3wal2l1 = cC3wal2.getParamLength("l1");
+  double C3wal2l2 = cC3wal2.getParamLength("l2");
+  double C3wal2l3 = cC3wal2.getParamLength("l3");
+  double C3wal2l4 = cC3wal2.getParamLength("l4");
+  double C3wal2l5 = cC3wal2.getParamLength("l5");
+  double C3wal2r1 = cC3wal2.getParamLength("r1");
+  double C3wal2r2 = cC3wal2.getParamLength("r2");
+  double C3wal2r3 = cC3wal2.getParamLength("r3");
+  double C3wal2r4 = cC3wal2.getParamLength("r4");
+  string strMatC3wal2 = cC3wal2.getParamString("Material");
   TGeoMedium* strMedC3wal2 = gGeoManager->GetMedium(strMatC3wal2.c_str());
 
   //define geometry
@@ -487,17 +500,18 @@ void GeoQCsBelleII::create(GearDir& content)
   //-   C4spc2
 
   //get parameters from .xml file
-  double C4spc2d1 = content.getParamLength("C4spc2/d1");
-  double C4spc2l1 = content.getParamLength("C4spc2/l1");
-  double C4spc2l2 = content.getParamLength("C4spc2/l2");
-  double C4spc2l3 = content.getParamLength("C4spc2/l3");
-  double C4spc2l4 = content.getParamLength("C4spc2/l4");
-  double C4spc2l5 = content.getParamLength("C4spc2/l5");
-  double C4spc2r1 = content.getParamLength("C4spc2/r1");
-  double C4spc2r2 = content.getParamLength("C4spc2/r2");
-  double C4spc2r3 = content.getParamLength("C4spc2/r3");
-  double C4spc2r4 = content.getParamLength("C4spc2/r4");
-  string strMatC4spc2 = content.getParamString("C4spc2/Material");
+  GearDir cC4spc2(content, "C4spc2/");
+  double C4spc2d1 = cC4spc2.getParamLength("d1");
+  double C4spc2l1 = cC4spc2.getParamLength("l1");
+  double C4spc2l2 = cC4spc2.getParamLength("l2");
+  double C4spc2l3 = cC4spc2.getParamLength("l3");
+  double C4spc2l4 = cC4spc2.getParamLength("l4");
+  double C4spc2l5 = cC4spc2.getParamLength("l5");
+  double C4spc2r1 = cC4spc2.getParamLength("r1");
+  double C4spc2r2 = cC4spc2.getParamLength("r2");
+  double C4spc2r3 = cC4spc2.getParamLength("r3");
+  double C4spc2r4 = cC4spc2.getParamLength("r4");
+  string strMatC4spc2 = cC4spc2.getParamString("Material");
   TGeoMedium* strMedC4spc2 = gGeoManager->GetMedium(strMatC4spc2.c_str());
 
   //define geometry
@@ -532,19 +546,20 @@ void GeoQCsBelleII::create(GearDir& content)
   //-   C5wal3
 
   //get parameters from .xml file
-  double C5wal3d1 = content.getParamLength("C5wal3/d1");
-  double C5wal3l1 = content.getParamLength("C5wal3/l1");
-  double C5wal3l2 = content.getParamLength("C5wal3/l2");
-  double C5wal3l3 = content.getParamLength("C5wal3/l3");
-  double C5wal3l4 = content.getParamLength("C5wal3/l4");
-  double C5wal3l5 = content.getParamLength("C5wal3/l5");
-  double C5wal3l6 = content.getParamLength("C5wal3/l6");
-  double C5wal3r1 = content.getParamLength("C5wal3/r1");
-  double C5wal3r2 = content.getParamLength("C5wal3/r2");
-  double C5wal3r3 = content.getParamLength("C5wal3/r3");
-  double C5wal3r4 = content.getParamLength("C5wal3/r4");
-  double C5wal3r5 = content.getParamLength("C5wal3/r5");
-  string strMatC5wal3 = content.getParamString("C5wal3/Material");
+  GearDir cC5wal3(content, "C5wal3/");
+  double C5wal3d1 = cC5wal3.getParamLength("d1");
+  double C5wal3l1 = cC5wal3.getParamLength("l1");
+  double C5wal3l2 = cC5wal3.getParamLength("l2");
+  double C5wal3l3 = cC5wal3.getParamLength("l3");
+  double C5wal3l4 = cC5wal3.getParamLength("l4");
+  double C5wal3l5 = cC5wal3.getParamLength("l5");
+  double C5wal3l6 = cC5wal3.getParamLength("l6");
+  double C5wal3r1 = cC5wal3.getParamLength("r1");
+  double C5wal3r2 = cC5wal3.getParamLength("r2");
+  double C5wal3r3 = cC5wal3.getParamLength("r3");
+  double C5wal3r4 = cC5wal3.getParamLength("r4");
+  double C5wal3r5 = cC5wal3.getParamLength("r5");
+  string strMatC5wal3 = cC5wal3.getParamString("Material");
   TGeoMedium* strMedC5wal3 = gGeoManager->GetMedium(strMatC5wal3.c_str());
 
   //define geometry
@@ -581,12 +596,13 @@ void GeoQCsBelleII::create(GearDir& content)
   //-   C5wal5
 
   //get parameters from .xml file
-  double C5wal5d1 = content.getParamLength("C5wal5/d1");
-  double C5wal5l1 = content.getParamLength("C5wal5/l1");
-  double C5wal5l2 = content.getParamLength("C5wal5/l2");
-  double C5wal5r1 = content.getParamLength("C5wal5/r1");
-  double C5wal5r2 = content.getParamLength("C5wal5/r2");
-  string strMatC5wal5 = content.getParamString("C5wal5/Material");
+  GearDir cC5wal5(content, "C5wal5/");
+  double C5wal5d1 = cC5wal5.getParamLength("d1");
+  double C5wal5l1 = cC5wal5.getParamLength("l1");
+  double C5wal5l2 = cC5wal5.getParamLength("l2");
+  double C5wal5r1 = cC5wal5.getParamLength("r1");
+  double C5wal5r2 = cC5wal5.getParamLength("r2");
+  string strMatC5wal5 = cC5wal5.getParamString("Material");
   TGeoMedium* strMedC5wal5 = gGeoManager->GetMedium(strMatC5wal5.c_str());
 
   //define geometry
@@ -614,16 +630,17 @@ void GeoQCsBelleII::create(GearDir& content)
   //-   C6spc4
 
   //get parameters from .xml file
-  double C6spc4l1 = content.getParamLength("C6spc4/l1");
-  double C6spc4l2 = content.getParamLength("C6spc4/l2");
-  double C6spc4l3 = content.getParamLength("C6spc4/l3");
-  double C6spc4l4 = content.getParamLength("C6spc4/l4");
-  double C6spc4l5 = content.getParamLength("C6spc4/l5");
+  GearDir cC6spc4(content, "C6spc4/");
+  double C6spc4l1 = cC6spc4.getParamLength("l1");
+  double C6spc4l2 = cC6spc4.getParamLength("l2");
+  double C6spc4l3 = cC6spc4.getParamLength("l3");
+  double C6spc4l4 = cC6spc4.getParamLength("l4");
+  double C6spc4l5 = cC6spc4.getParamLength("l5");
   //
-  double C6spc4r1 = content.getParamLength("C6spc4/r1");
-  double C6spc4r2 = content.getParamLength("C6spc4/r2");
-  double C6spc4r3 = content.getParamLength("C6spc4/r3");
-  string strMatC6spc4 = content.getParamString("C6spc4/Material");
+  double C6spc4r1 = cC6spc4.getParamLength("r1");
+  double C6spc4r2 = cC6spc4.getParamLength("r2");
+  double C6spc4r3 = cC6spc4.getParamLength("r3");
+  string strMatC6spc4 = cC6spc4.getParamString("Material");
   TGeoMedium* strMedC6spc4 = gGeoManager->GetMedium(strMatC6spc4.c_str());
 
   //define geometry
@@ -656,20 +673,21 @@ void GeoQCsBelleII::create(GearDir& content)
   //-   C6spc5
 
   //get parameters from .xml file
-  double C6spc5l1 = content.getParamLength("C6spc5/l1");
-  double C6spc5l2 = content.getParamLength("C6spc5/l2");
-  double C6spc5l3 = content.getParamLength("C6spc5/l3");
-  double C6spc5l4 = content.getParamLength("C6spc5/l4");
-  double C6spc5l5 = content.getParamLength("C6spc5/l5");
-  double C6spc5l6 = content.getParamLength("C6spc5/l6");
-  double C6spc5l7 = content.getParamLength("C6spc5/l7");
+  GearDir cC6spc5(content, "C6spc5/");
+  double C6spc5l1 = cC6spc5.getParamLength("l1");
+  double C6spc5l2 = cC6spc5.getParamLength("l2");
+  double C6spc5l3 = cC6spc5.getParamLength("l3");
+  double C6spc5l4 = cC6spc5.getParamLength("l4");
+  double C6spc5l5 = cC6spc5.getParamLength("l5");
+  double C6spc5l6 = cC6spc5.getParamLength("l6");
+  double C6spc5l7 = cC6spc5.getParamLength("l7");
   //
-  double C6spc5r1 = content.getParamLength("C6spc5/r1");
-  double C6spc5r2 = content.getParamLength("C6spc5/r2");
-  double C6spc5r3 = content.getParamLength("C6spc5/r3");
-  double C6spc5r4 = content.getParamLength("C6spc5/r4");
-  double C6spc5r5 = content.getParamLength("C6spc5/r5");
-  string strMatC6spc5 = content.getParamString("C6spc5/Material");
+  double C6spc5r1 = cC6spc5.getParamLength("r1");
+  double C6spc5r2 = cC6spc5.getParamLength("r2");
+  double C6spc5r3 = cC6spc5.getParamLength("r3");
+  double C6spc5r4 = cC6spc5.getParamLength("r4");
+  double C6spc5r5 = cC6spc5.getParamLength("r5");
+  string strMatC6spc5 = cC6spc5.getParamString("Material");
   TGeoMedium* strMedC6spc5 = gGeoManager->GetMedium(strMatC6spc5.c_str());
 
   //define geometry
@@ -706,10 +724,11 @@ void GeoQCsBelleII::create(GearDir& content)
   //-   C6spc7
 
   //get parameters from .xml file
-  double C6spc7d1 = content.getParamLength("C6spc7/d1");
-  double C6spc7l1 = content.getParamLength("C6spc7/l1");
-  double C6spc7r1 = content.getParamLength("C6spc7/r1");
-  string strMatC6spc7 = content.getParamString("C6spc7/Material");
+  GearDir cC6spc7(content, "C6spc7/");
+  double C6spc7d1 = cC6spc7.getParamLength("d1");
+  double C6spc7l1 = cC6spc7.getParamLength("l1");
+  double C6spc7r1 = cC6spc7.getParamLength("r1");
+  string strMatC6spc7 = cC6spc7.getParamString("Material");
   TGeoMedium* strMedC6spc7 = gGeoManager->GetMedium(strMatC6spc7.c_str());
 
   //define geometry
@@ -735,10 +754,11 @@ void GeoQCsBelleII::create(GearDir& content)
   //-   C6spc8
 
   //get parameters from .xml file
-  double C6spc8d1 = content.getParamLength("C6spc8/d1");
-  double C6spc8l1 = content.getParamLength("C6spc8/l1");
-  double C6spc8r1 = content.getParamLength("C6spc8/r1");
-  string strMatC6spc8 = content.getParamString("C6spc8/Material");
+  GearDir cC6spc8(content, "C6spc8/");
+  double C6spc8d1 = cC6spc8.getParamLength("d1");
+  double C6spc8l1 = cC6spc8.getParamLength("l1");
+  double C6spc8r1 = cC6spc8.getParamLength("r1");
+  string strMatC6spc8 = cC6spc8.getParamString("Material");
   TGeoMedium* strMedC6spc8 = gGeoManager->GetMedium(strMatC6spc8.c_str());
 
   //define geometry
@@ -765,9 +785,10 @@ void GeoQCsBelleII::create(GearDir& content)
 
   //--- C6tnl1 ---
   //get parameters from .xml file
-  double C6tnl1r1 = content.getParamLength("C6tnl1/r1");
-  double C6tnl1r2 = content.getParamLength("C6tnl1/r2");
-  double C6tnl1r3 = content.getParamLength("C6tnl1/r3");
+  GearDir cC6tnl1(content, "C6tnl1/");
+  double C6tnl1r1 = cC6tnl1.getParamLength("r1");
+  double C6tnl1r2 = cC6tnl1.getParamLength("r2");
+  double C6tnl1r3 = cC6tnl1.getParamLength("r3");
   //define geometry
   TGeoPcon* geoC6tnl1pcon = new TGeoPcon(0, 360, 6);
   zpos = 0.0;
@@ -786,11 +807,12 @@ void GeoQCsBelleII::create(GearDir& content)
 
   //--- C6tnl2 ---
   //get parameters from .xml file
-  double C6tnl2r1 = content.getParamLength("C6tnl2/r1");
-  double C6tnl2r2 = content.getParamLength("C6tnl2/r2");
-  double C6tnl2r3 = content.getParamLength("C6tnl2/r3");
-  double C6tnl2r4 = content.getParamLength("C6tnl2/r4");
-  double C6tnl2r5 = content.getParamLength("C6tnl2/r5");
+  GearDir cC6tnl2(content, "C6tnl2/");
+  double C6tnl2r1 = cC6tnl2.getParamLength("r1");
+  double C6tnl2r2 = cC6tnl2.getParamLength("r2");
+  double C6tnl2r3 = cC6tnl2.getParamLength("r3");
+  double C6tnl2r4 = cC6tnl2.getParamLength("r4");
+  double C6tnl2r5 = cC6tnl2.getParamLength("r5");
   //define geometry
   zpos = 0.0;
   TGeoPcon* geoC6tnl2pcon = new TGeoPcon(0, 360, 8);
@@ -812,17 +834,18 @@ void GeoQCsBelleII::create(GearDir& content)
   geoC6tnl2pcon->SetName("geoC6tnl2pconname");
 
   //get parameters from .xml file
-  double C6spc3d1 = content.getParamLength("C6spc3/d1");
-  double C6spc3l1 = content.getParamLength("C6spc3/l1");
-  double C6spc3l2 = content.getParamLength("C6spc3/l2");
-  double C6spc3l3 = content.getParamLength("C6spc3/l3");
-  double C6spc3l4 = content.getParamLength("C6spc3/l4");
-  double C6spc3l5 = content.getParamLength("C6spc3/l5");
-  double C6spc3r1 = content.getParamLength("C6spc3/r1");
-  double C6spc3r2 = content.getParamLength("C6spc3/r2");
-  double C6spc3r3 = content.getParamLength("C6spc3/r3");
-  double C6spc3r4 = content.getParamLength("C6spc3/r4");
-  string strMatC6spc3 = content.getParamString("C6spc3/Material");
+  GearDir cC6spc3(content, "C6spc3/");
+  double C6spc3d1 = cC6spc3.getParamLength("d1");
+  double C6spc3l1 = cC6spc3.getParamLength("l1");
+  double C6spc3l2 = cC6spc3.getParamLength("l2");
+  double C6spc3l3 = cC6spc3.getParamLength("l3");
+  double C6spc3l4 = cC6spc3.getParamLength("l4");
+  double C6spc3l5 = cC6spc3.getParamLength("l5");
+  double C6spc3r1 = cC6spc3.getParamLength("r1");
+  double C6spc3r2 = cC6spc3.getParamLength("r2");
+  double C6spc3r3 = cC6spc3.getParamLength("r3");
+  double C6spc3r4 = cC6spc3.getParamLength("r4");
+  string strMatC6spc3 = cC6spc3.getParamString("Material");
   TGeoMedium* strMedC6spc3 = gGeoManager->GetMedium(strMatC6spc3.c_str());
 
   //define geometry
@@ -881,12 +904,13 @@ void GeoQCsBelleII::create(GearDir& content)
   geoC6tnl4pcon->SetName("geoC6tnl4pconname");
 
   //get parameters from .xml file
-  double C6spc6d1 = content.getParamLength("C6spc6/d1");
-  double C6spc6l1 = content.getParamLength("C6spc6/l1");
-  double C6spc6l2 = content.getParamLength("C6spc6/l2");
-  double C6spc6r1 = content.getParamLength("C6spc6/r1");
-  double C6spc6r2 = content.getParamLength("C6spc6/r2");
-  string strMatC6spc6 = content.getParamString("C6spc6/Material");
+  GearDir cC6spc6(content, "C6spc6/");
+  double C6spc6d1 = cC6spc6.getParamLength("d1");
+  double C6spc6l1 = cC6spc6.getParamLength("l1");
+  double C6spc6l2 = cC6spc6.getParamLength("l2");
+  double C6spc6r1 = cC6spc6.getParamLength("r1");
+  double C6spc6r2 = cC6spc6.getParamLength("r2");
+  string strMatC6spc6 = cC6spc6.getParamString("Material");
   TGeoMedium* strMedC6spc6 = gGeoManager->GetMedium(strMatC6spc6.c_str());
 
   //define geometry
@@ -914,10 +938,11 @@ void GeoQCsBelleII::create(GearDir& content)
   //-   C7mag1
 
   //get parameters from .xml file
-  double C7mag1d1 = content.getParamLength("C7mag1/d1");
-  double C7mag1l1 = content.getParamLength("C7mag1/l1");
-  double C7mag1o1 = content.getParamLength("C7mag1/o1");
-  string strMatC7mag1 = content.getParamString("C7mag1/Material");
+  GearDir cC7mag1(content, "C7mag1/");
+  double C7mag1d1 = cC7mag1.getParamLength("d1");
+  double C7mag1l1 = cC7mag1.getParamLength("l1");
+  double C7mag1o1 = cC7mag1.getParamLength("o1");
+  string strMatC7mag1 = cC7mag1.getParamString("Material");
   TGeoMedium* strMedC7mag1 = gGeoManager->GetMedium(strMatC7mag1.c_str());
 
   //define geometry
@@ -943,10 +968,11 @@ void GeoQCsBelleII::create(GearDir& content)
   //-   C7mag2
 
   //get parameters from .xml file
+  GearDir cC7mag2(content, "C7mag2/");
   double C7mag2d1 = C6spc4l1 + C6spc4l2;
-  double C7mag2l1 = content.getParamLength("C7mag2/l1");
-  double C7mag2o1 = content.getParamLength("C7mag2/o1");
-  string strMatC7mag2 = content.getParamString("C7mag2/Material");
+  double C7mag2l1 = cC7mag2.getParamLength("l1");
+  double C7mag2o1 = cC7mag2.getParamLength("o1");
+  string strMatC7mag2 = cC7mag2.getParamString("Material");
   TGeoMedium* strMedC7mag2 = gGeoManager->GetMedium(strMatC7mag2.c_str());
 
   //define geometry
@@ -972,10 +998,11 @@ void GeoQCsBelleII::create(GearDir& content)
   //-   C7mag3
 
   //get parameters from .xml file
+  GearDir cC7mag3(content, "C7mag3/");
   double C7mag3d1 = C6spc4l1 + C6spc4l2 + C6spc4l3 + C6spc4l4;
-  double C7mag3l1 = content.getParamLength("C7mag3/l1");
-  double C7mag3o1 = content.getParamLength("C7mag3/o1");
-  string strMatC7mag3 = content.getParamString("C7mag3/Material");
+  double C7mag3l1 = cC7mag3.getParamLength("l1");
+  double C7mag3o1 = cC7mag3.getParamLength("o1");
+  string strMatC7mag3 = cC7mag3.getParamString("Material");
   TGeoMedium* strMedC7mag3 = gGeoManager->GetMedium(strMatC7mag3.c_str());
 
   //define geometry
@@ -1001,10 +1028,11 @@ void GeoQCsBelleII::create(GearDir& content)
   //-   C7mag4
 
   //get parameters from .xml file
-  double C7mag4d1 = content.getParamLength("C7mag4/d1");
-  double C7mag4l1 = content.getParamLength("C7mag4/l1");
-  double C7mag4o1 = content.getParamLength("C7mag4/o1");
-  string strMatC7mag4 = content.getParamString("C7mag4/Material");
+  GearDir cC7mag4(content, "C7mag4/");
+  double C7mag4d1 = cC7mag4.getParamLength("d1");
+  double C7mag4l1 = cC7mag4.getParamLength("l1");
+  double C7mag4o1 = cC7mag4.getParamLength("o1");
+  string strMatC7mag4 = cC7mag4.getParamString("Material");
   TGeoMedium* strMedC7mag4 = gGeoManager->GetMedium(strMatC7mag4.c_str());
 
   //define geometry
@@ -1017,7 +1045,7 @@ void GeoQCsBelleII::create(GearDir& content)
   geoC7mag4pcon->SetName("geoC7mag4pconname");
 
   //-   Intersection volume
-  TGeoCompositeShape* geoC7mag4 = new TGeoCompositeShape("geoC7mag4name", "geoC7mag4pconname:rotLERname * geoC6spc3name");
+  TGeoCompositeShape* geoC7mag4 = new TGeoCompositeShape("geoC7mag4name", "geoC7mag4pconname:rotLERname * geoC6spc3name - geoC7mag1name");
   TGeoVolume *volC7mag4 = new TGeoVolume("volC7mag4name", geoC7mag4, strMedC7mag4);
 
   //-   put volume
@@ -1030,10 +1058,11 @@ void GeoQCsBelleII::create(GearDir& content)
   //-   C7mag5
 
   //get parameters from .xml file
+  GearDir cC7mag5(content, "C7mag5/");
   double C7mag5d1 = C6spc5l1 + C6spc5l2 + C6spc5l3;
-  double C7mag5l1 = content.getParamLength("C7mag5/l1");
-  double C7mag5o1 = content.getParamLength("C7mag5/o1");
-  string strMatC7mag5 = content.getParamString("C7mag5/Material");
+  double C7mag5l1 = cC7mag5.getParamLength("l1");
+  double C7mag5o1 = cC7mag5.getParamLength("o1");
+  string strMatC7mag5 = cC7mag5.getParamString("Material");
   TGeoMedium* strMedC7mag5 = gGeoManager->GetMedium(strMatC7mag5.c_str());
 
   //define geometry
@@ -1059,10 +1088,11 @@ void GeoQCsBelleII::create(GearDir& content)
   //-   C7mag6
 
   //get parameters from .xml file
+  GearDir cC7mag6(content, "C7mag6/");
   double C7mag6d1 = C6spc5l1 + C6spc5l2 + C6spc5l3 + C6spc5l4 + C6spc5l5 + C6spc5l6;
-  double C7mag6l1 = content.getParamLength("C7mag6/l1");
-  double C7mag6o1 = content.getParamLength("C7mag6/o1");
-  string strMatC7mag6 = content.getParamString("C7mag6/Material");
+  double C7mag6l1 = cC7mag6.getParamLength("l1");
+  double C7mag6o1 = cC7mag6.getParamLength("o1");
+  string strMatC7mag6 = cC7mag6.getParamString("Material");
   TGeoMedium* strMedC7mag6 = gGeoManager->GetMedium(strMatC7mag6.c_str());
 
   //define geometry
@@ -1088,10 +1118,11 @@ void GeoQCsBelleII::create(GearDir& content)
   //-   C7mag7
 
   //get parameters from .xml file
+  GearDir cC7mag7(content, "C7mag7/");
   double C7mag7d1 = A1wal1l1 + A1wal1l2 + A1wal1l3 + A1wal1l4 + A1wal1l5 + A1wal1l6 + 7.773;
-  double C7mag7l1 = content.getParamLength("C7mag7/l1");
-  double C7mag7o1 = content.getParamLength("C7mag7/o1");
-  string strMatC7mag7 = content.getParamString("C7mag7/Material");
+  double C7mag7l1 = cC7mag7.getParamLength("l1");
+  double C7mag7o1 = cC7mag7.getParamLength("o1");
+  string strMatC7mag7 = cC7mag7.getParamString("Material");
   TGeoMedium* strMedC7mag7 = gGeoManager->GetMedium(strMatC7mag7.c_str());
 
   //define geometry
@@ -1118,84 +1149,85 @@ void GeoQCsBelleII::create(GearDir& content)
 
   //get parameters from .xml file
   double C7hld1t[16], C7hld1d[15], C7hld1i[15], C7hld1o[16], C7hld1r[15];
-  C7hld1t[0] = content.getParamLength("C7hld1/t1");
-  C7hld1t[1] = content.getParamLength("C7hld1/t2");
-  C7hld1t[2] = content.getParamLength("C7hld1/t3");
-  C7hld1t[3] = content.getParamLength("C7hld1/t4");
-  C7hld1t[4] = content.getParamLength("C7hld1/t5");
-  C7hld1t[5] = content.getParamLength("C7hld1/t6");
-  C7hld1t[6] = content.getParamLength("C7hld1/t7");
-  C7hld1t[7] = content.getParamLength("C7hld1/t8");
-  C7hld1t[8] = content.getParamLength("C7hld1/t9");
-  C7hld1t[9] = content.getParamLength("C7hld1/t10");
-  C7hld1t[10] = content.getParamLength("C7hld1/t11");
-  C7hld1t[11] = content.getParamLength("C7hld1/t12");
-  C7hld1t[12] = content.getParamLength("C7hld1/t13");
-  C7hld1t[13] = content.getParamLength("C7hld1/t14");
-  C7hld1t[14] = content.getParamLength("C7hld1/t15");
-  C7hld1t[15] = content.getParamLength("C7hld1/t16");
-  C7hld1d[0] = content.getParamLength("C7hld1/d1");
-  C7hld1d[1] = content.getParamLength("C7hld1/d2");
-  C7hld1d[2] = content.getParamLength("C7hld1/d3");
-  C7hld1d[3] = content.getParamLength("C7hld1/d4");
-  C7hld1d[4] = content.getParamLength("C7hld1/d5");
-  C7hld1d[5] = content.getParamLength("C7hld1/d6");
-  C7hld1d[6] = content.getParamLength("C7hld1/d7");
-  C7hld1d[7] = content.getParamLength("C7hld1/d8");
-  C7hld1d[8] = content.getParamLength("C7hld1/d9");
-  C7hld1d[9] = content.getParamLength("C7hld1/d10");
-  C7hld1d[10] = content.getParamLength("C7hld1/d11");
-  C7hld1d[11] = content.getParamLength("C7hld1/d12");
-  C7hld1d[12] = content.getParamLength("C7hld1/d13");
-  C7hld1d[13] = content.getParamLength("C7hld1/d14");
-  C7hld1d[14] = content.getParamLength("C7hld1/d15");
-  C7hld1i[0] = content.getParamLength("C7hld1/i1");
-  C7hld1i[1] = content.getParamLength("C7hld1/i2");
-  C7hld1i[2] = content.getParamLength("C7hld1/i3");
-  C7hld1i[3] = content.getParamLength("C7hld1/i4");
-  C7hld1i[4] = content.getParamLength("C7hld1/i5");
-  C7hld1i[5] = content.getParamLength("C7hld1/i6");
-  C7hld1i[6] = content.getParamLength("C7hld1/i7");
-  C7hld1i[7] = content.getParamLength("C7hld1/i8");
-  C7hld1i[8] = content.getParamLength("C7hld1/i9");
-  C7hld1i[9] = content.getParamLength("C7hld1/i10");
-  C7hld1i[10] = content.getParamLength("C7hld1/i11");
-  C7hld1i[11] = content.getParamLength("C7hld1/i12");
-  C7hld1i[12] = content.getParamLength("C7hld1/i13");
-  C7hld1i[13] = content.getParamLength("C7hld1/i14");
-  C7hld1i[14] = content.getParamLength("C7hld1/i15");
-  C7hld1r[0] = content.getParamLength("C7hld1/r1");
-  C7hld1r[1] = content.getParamLength("C7hld1/r2");
-  C7hld1r[2] = content.getParamLength("C7hld1/r3");
-  C7hld1r[3] = content.getParamLength("C7hld1/r4");
-  C7hld1r[4] = content.getParamLength("C7hld1/r5");
-  C7hld1r[5] = content.getParamLength("C7hld1/r6");
-  C7hld1r[6] = content.getParamLength("C7hld1/r7");
-  C7hld1r[7] = content.getParamLength("C7hld1/r8");
-  C7hld1r[8] = content.getParamLength("C7hld1/r9");
-  C7hld1r[9] = content.getParamLength("C7hld1/r10");
-  C7hld1r[10] = content.getParamLength("C7hld1/r11");
-  C7hld1r[11] = content.getParamLength("C7hld1/r12");
-  C7hld1r[12] = content.getParamLength("C7hld1/r13");
-  C7hld1r[13] = content.getParamLength("C7hld1/r14");
-  C7hld1r[14] = content.getParamLength("C7hld1/r15");
-  C7hld1o[0] = content.getParamLength("C7hld1/o1");
-  C7hld1o[1] = content.getParamLength("C7hld1/o2");
-  C7hld1o[2] = content.getParamLength("C7hld1/o3");
-  C7hld1o[3] = content.getParamLength("C7hld1/o4");
-  C7hld1o[4] = content.getParamLength("C7hld1/o5");
-  C7hld1o[5] = content.getParamLength("C7hld1/o6");
-  C7hld1o[6] = content.getParamLength("C7hld1/o7");
-  C7hld1o[7] = content.getParamLength("C7hld1/o8");
-  C7hld1o[8] = content.getParamLength("C7hld1/o9");
-  C7hld1o[9] = content.getParamLength("C7hld1/o10");
-  C7hld1o[10] = content.getParamLength("C7hld1/o11");
-  C7hld1o[11] = content.getParamLength("C7hld1/o12");
-  C7hld1o[12] = content.getParamLength("C7hld1/o13");
-  C7hld1o[13] = content.getParamLength("C7hld1/o14");
-  C7hld1o[14] = content.getParamLength("C7hld1/o15");
-  C7hld1o[15] = content.getParamLength("C7hld1/o16");
-  string strMatC7hld1 = content.getParamString("C7hld1/Material");
+  GearDir cC7hld1(content, "C7hld1/");
+  C7hld1t[0] = cC7hld1.getParamLength("t1");
+  C7hld1t[1] = cC7hld1.getParamLength("t2");
+  C7hld1t[2] = cC7hld1.getParamLength("t3");
+  C7hld1t[3] = cC7hld1.getParamLength("t4");
+  C7hld1t[4] = cC7hld1.getParamLength("t5");
+  C7hld1t[5] = cC7hld1.getParamLength("t6");
+  C7hld1t[6] = cC7hld1.getParamLength("t7");
+  C7hld1t[7] = cC7hld1.getParamLength("t8");
+  C7hld1t[8] = cC7hld1.getParamLength("t9");
+  C7hld1t[9] = cC7hld1.getParamLength("t10");
+  C7hld1t[10] = cC7hld1.getParamLength("t11");
+  C7hld1t[11] = cC7hld1.getParamLength("t12");
+  C7hld1t[12] = cC7hld1.getParamLength("t13");
+  C7hld1t[13] = cC7hld1.getParamLength("t14");
+  C7hld1t[14] = cC7hld1.getParamLength("t15");
+  C7hld1t[15] = cC7hld1.getParamLength("t16");
+  C7hld1d[0] = cC7hld1.getParamLength("d1");
+  C7hld1d[1] = cC7hld1.getParamLength("d2");
+  C7hld1d[2] = cC7hld1.getParamLength("d3");
+  C7hld1d[3] = cC7hld1.getParamLength("d4");
+  C7hld1d[4] = cC7hld1.getParamLength("d5");
+  C7hld1d[5] = cC7hld1.getParamLength("d6");
+  C7hld1d[6] = cC7hld1.getParamLength("d7");
+  C7hld1d[7] = cC7hld1.getParamLength("d8");
+  C7hld1d[8] = cC7hld1.getParamLength("d9");
+  C7hld1d[9] = cC7hld1.getParamLength("d10");
+  C7hld1d[10] = cC7hld1.getParamLength("d11");
+  C7hld1d[11] = cC7hld1.getParamLength("d12");
+  C7hld1d[12] = cC7hld1.getParamLength("d13");
+  C7hld1d[13] = cC7hld1.getParamLength("d14");
+  C7hld1d[14] = cC7hld1.getParamLength("d15");
+  C7hld1i[0] = cC7hld1.getParamLength("i1");
+  C7hld1i[1] = cC7hld1.getParamLength("i2");
+  C7hld1i[2] = cC7hld1.getParamLength("i3");
+  C7hld1i[3] = cC7hld1.getParamLength("i4");
+  C7hld1i[4] = cC7hld1.getParamLength("i5");
+  C7hld1i[5] = cC7hld1.getParamLength("i6");
+  C7hld1i[6] = cC7hld1.getParamLength("i7");
+  C7hld1i[7] = cC7hld1.getParamLength("i8");
+  C7hld1i[8] = cC7hld1.getParamLength("i9");
+  C7hld1i[9] = cC7hld1.getParamLength("i10");
+  C7hld1i[10] = cC7hld1.getParamLength("i11");
+  C7hld1i[11] = cC7hld1.getParamLength("i12");
+  C7hld1i[12] = cC7hld1.getParamLength("i13");
+  C7hld1i[13] = cC7hld1.getParamLength("i14");
+  C7hld1i[14] = cC7hld1.getParamLength("i15");
+  C7hld1r[0] = cC7hld1.getParamLength("r1");
+  C7hld1r[1] = cC7hld1.getParamLength("r2");
+  C7hld1r[2] = cC7hld1.getParamLength("r3");
+  C7hld1r[3] = cC7hld1.getParamLength("r4");
+  C7hld1r[4] = cC7hld1.getParamLength("r5");
+  C7hld1r[5] = cC7hld1.getParamLength("r6");
+  C7hld1r[6] = cC7hld1.getParamLength("r7");
+  C7hld1r[7] = cC7hld1.getParamLength("r8");
+  C7hld1r[8] = cC7hld1.getParamLength("r9");
+  C7hld1r[9] = cC7hld1.getParamLength("r10");
+  C7hld1r[10] = cC7hld1.getParamLength("r11");
+  C7hld1r[11] = cC7hld1.getParamLength("r12");
+  C7hld1r[12] = cC7hld1.getParamLength("r13");
+  C7hld1r[13] = cC7hld1.getParamLength("r14");
+  C7hld1r[14] = cC7hld1.getParamLength("r15");
+  C7hld1o[0] = cC7hld1.getParamLength("o1");
+  C7hld1o[1] = cC7hld1.getParamLength("o2");
+  C7hld1o[2] = cC7hld1.getParamLength("o3");
+  C7hld1o[3] = cC7hld1.getParamLength("o4");
+  C7hld1o[4] = cC7hld1.getParamLength("o5");
+  C7hld1o[5] = cC7hld1.getParamLength("o6");
+  C7hld1o[6] = cC7hld1.getParamLength("o7");
+  C7hld1o[7] = cC7hld1.getParamLength("o8");
+  C7hld1o[8] = cC7hld1.getParamLength("o9");
+  C7hld1o[9] = cC7hld1.getParamLength("o10");
+  C7hld1o[10] = cC7hld1.getParamLength("o11");
+  C7hld1o[11] = cC7hld1.getParamLength("o12");
+  C7hld1o[12] = cC7hld1.getParamLength("o13");
+  C7hld1o[13] = cC7hld1.getParamLength("o14");
+  C7hld1o[14] = cC7hld1.getParamLength("o15");
+  C7hld1o[15] = cC7hld1.getParamLength("o16");
+  string strMatC7hld1 = cC7hld1.getParamString("Material");
   TGeoMedium* strMedC7hld1 = gGeoManager->GetMedium(strMatC7hld1.c_str());
 
   //define geometry
@@ -1231,22 +1263,23 @@ void GeoQCsBelleII::create(GearDir& content)
 
   //get parameters from .xml file
   double C7cil1l[15];
-  C7cil1l[0] = content.getParamLength("C7cil1/l1");
-  C7cil1l[1] = content.getParamLength("C7cil1/l2");
-  C7cil1l[2] = content.getParamLength("C7cil1/l3");
-  C7cil1l[3] = content.getParamLength("C7cil1/l4");
-  C7cil1l[4] = content.getParamLength("C7cil1/l5");
-  C7cil1l[5] = content.getParamLength("C7cil1/l6");
-  C7cil1l[6] = content.getParamLength("C7cil1/l7");
-  C7cil1l[7] = content.getParamLength("C7cil1/l8");
-  C7cil1l[8] = content.getParamLength("C7cil1/l9");
-  C7cil1l[9] = content.getParamLength("C7cil1/l10");
-  C7cil1l[10] = content.getParamLength("C7cil1/l11");
-  C7cil1l[11] = content.getParamLength("C7cil1/l12");
-  C7cil1l[12] = content.getParamLength("C7cil1/l13");
-  C7cil1l[13] = content.getParamLength("C7cil1/l14");
-  C7cil1l[14] = content.getParamLength("C7cil1/l15");
-  string strMatC7cil1 = content.getParamString("C7cil1/Material");
+  GearDir cC7cil1(content, "C7cil1/");
+  C7cil1l[0] = cC7cil1.getParamLength("l1");
+  C7cil1l[1] = cC7cil1.getParamLength("l2");
+  C7cil1l[2] = cC7cil1.getParamLength("l3");
+  C7cil1l[3] = cC7cil1.getParamLength("l4");
+  C7cil1l[4] = cC7cil1.getParamLength("l5");
+  C7cil1l[5] = cC7cil1.getParamLength("l6");
+  C7cil1l[6] = cC7cil1.getParamLength("l7");
+  C7cil1l[7] = cC7cil1.getParamLength("l8");
+  C7cil1l[8] = cC7cil1.getParamLength("l9");
+  C7cil1l[9] = cC7cil1.getParamLength("l10");
+  C7cil1l[10] = cC7cil1.getParamLength("l11");
+  C7cil1l[11] = cC7cil1.getParamLength("l12");
+  C7cil1l[12] = cC7cil1.getParamLength("l13");
+  C7cil1l[13] = cC7cil1.getParamLength("l14");
+  C7cil1l[14] = cC7cil1.getParamLength("l15");
+  string strMatC7cil1 = cC7cil1.getParamString("Material");
   TGeoMedium* strMedC7cil1 = gGeoManager->GetMedium(strMatC7cil1.c_str());
 
   //define geometry
@@ -2190,7 +2223,7 @@ void GeoQCsBelleII::create(GearDir& content)
   geoF7mag3pcon->SetName("geoF7mag3pconname");
 
   //-   Intersection volume
-  TGeoCompositeShape* geoF7mag3 = new TGeoCompositeShape("geoF7mag3name", "geoF7mag3pconname:rotLERname * geoF6spc4name");
+  TGeoCompositeShape* geoF7mag3 = new TGeoCompositeShape("geoF7mag3name", "geoF7mag3pconname:rotLERname * geoF6spc4name - geoF7mag1name");
   TGeoVolume *volF7mag3 = new TGeoVolume("volF7mag3name", geoF7mag3, strMedF7mag3);
 
   //-   put volume

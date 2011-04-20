@@ -3,10 +3,16 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors:                                                          *
+ * Contributors: Hiroshi Nakano                                           *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+
+// ############################################################
+// for your information, please see BelleII computing homepage and
+// see /~twiki/bin/view/Computing/InteractionRegionPackages
+// (basf2 Software Portal >> Interaction Region(IR) >> QCSgeom.pdf)
+// ############################################################
 
 #include <geometry/geodetector/CreatorBase.h>
 

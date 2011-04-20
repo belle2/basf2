@@ -8,6 +8,12 @@
 		<Rotation desc="Rotation of the Holder with respect to the Detector" unit="rad">0.0</Rotation>
 		<OffsetZ desc="The offset of the Holder in z with respect to the IP" unit="cm">0.0</OffsetZ>
 
+    <!-- ############################################################  -->
+    <!-- for your information, please see BelleII computing homepage and -->
+    <!-- see /~twiki/bin/view/Computing/InteractionRegionPackages -->
+    <!-- (basf2 Software Portal >> Interaction Region(IR) >> HOLDERgeom.pdf) -->
+    <!-- ############################################################ -->
+
         <!-- SVD end ring R side -->
 		<R1hmm1>
 			<d1 unit="cm">21.0</d1>

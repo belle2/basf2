@@ -17,6 +17,8 @@
 #include <map>
 #include <cmath>
 
+#include <framework/utilities/SingletonDestroyerT.h>
+
 namespace Belle2 {
 
   /**
@@ -244,12 +246,15 @@ namespace Belle2 {
     static Unit* m_instance; /**< Pointer that saves the instance of this class. */
 
     /** Destroyer class to delete the instance of the Gearbox class when the program terminates. */
-    class SingletonDestroyer {
+    /*class SingletonDestroyer {
     public: ~SingletonDestroyer() {
         if (Unit::m_instance != NULL) delete Unit::m_instance;
       }
     };
-    friend class SingletonDestroyer;
+    friend class SingletonDestroyer;*/
+    friend class SingletonDestroyerT<Unit>;
+    typedef      SingletonDestroyerT<Unit> UnitDestroyer;
+
 
 
   };

@@ -95,10 +95,11 @@ const double Unit::fineStrConst = 1.0 / 137.036;    /**< The fine structure cons
 
 Unit& Unit::Instance()
 {
-  static SingletonDestroyer siDestroyer;
+  //static SingletonDestroyer siDestroyer;
   if (!m_instance) {
     m_instance = new Unit();
   }
+  static UnitDestroyer uDestroyer(m_instance);
   return *m_instance;
 }
 

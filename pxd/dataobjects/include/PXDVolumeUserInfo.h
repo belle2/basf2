@@ -16,9 +16,6 @@
 
 #include <TObject.h>
 
-//class G4VPhysicalVolume;
-//class TG4RootDetectorConstruction;
-
 namespace Belle2 {
 
   /** Default step size.

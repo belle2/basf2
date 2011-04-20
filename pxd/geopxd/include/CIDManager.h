@@ -11,7 +11,6 @@
 #ifndef SD_UNIID_H
 #define SD_UNIID_H
 
-#include <framework/logging/Logger.h>
 
 namespace Belle2 {
 

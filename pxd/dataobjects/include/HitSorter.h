@@ -10,12 +10,8 @@
 #ifndef HITSORTER_H
 #define HITSORTER_H
 
-// framework - DataStore
-#include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreArray.h>
-
-// framework aux
-#include <framework/logging/Logger.h>
+// stl
+#include <set>
 
 // boost
 #include <boost/multi_index_container.hpp>
@@ -23,20 +19,27 @@
 #include <boost/multi_index/member.hpp>
 
 namespace Belle2 {
+
 //-----------------------------------------------------------------
-//         A structure to slice hits according to sensors.
+//         StoreIndex and sets of StoreIndices.
 //-----------------------------------------------------------------
+
 
   /** Index into StoreArray. */
   typedef unsigned int StoreIndex;
 
   /** Set of indices into StoreArray. */
-  typedef std::set<StoreIndex> PXDSimHitSet;
-  typedef std::set<StoreIndex>::iterator PXDSimHitSetItr;
+  typedef std::set<StoreIndex> StoreIndexSet;
+  typedef std::set<StoreIndex>::iterator StoreIndexSetItr;
 
-  /** HitRecord holds index of a hit in its StoreArray, and UID of its detector.*/
-  struct HitRecord {
-    int m_sensorUID;
+
+  //-----------------------------------------------------------------
+  //         A structure to slice hits according to sensors.
+  //-----------------------------------------------------------------
+
+  /** StoreRecord holds index of a hit in its StoreArray, and UniID of its detector.*/
+  struct StoreRecord {
+    int m_sensorUniID;
     StoreIndex m_index;
   };
 
@@ -45,19 +48,19 @@ namespace Belle2 {
   typedef std::set<int>::iterator SensorSetItr;
 
   /** Index tag for access using hit number.*/
-  struct HitIndexSide {};
+  struct StoreIndexSide {};
 
-  /** Index tag for access using sensor UID. */
-  struct SensorUIDSide {};
+  /** Index tag for access using sensor UniID. */
+  struct SensorUniIDSide {};
 
   /**
-   * HitRecordSet - a doubly-indexed set of StoreArray indices and sensor UIDs.
+   * StoreRecordSet - a doubly-indexed set of StoreArray indices and sensor UIDs.
    *
    * The container is intended for optimization of processing by slicing sets
    * of hits by sensor UID, so that hits in a sensor can be processed together.
    * Intended use:
    *
-   * HitRecordSet hitSorter;
+   * StoreRecordSet hitSorter;
    * SensorUIDSet usedSensors;
    *
    * Fill the container:
@@ -67,29 +70,29 @@ namespace Belle2 {
    */
 
   typedef boost::multi_index_container <
-  HitRecord,
+  StoreRecord,
   boost::multi_index::indexed_by <
   boost::multi_index::ordered_unique <
-  boost::multi_index::tag<HitIndexSide>,
+  boost::multi_index::tag<StoreIndexSide>,
   boost::multi_index::member <
-  HitRecord, StoreIndex, &HitRecord::m_index >
+  StoreRecord, StoreIndex, &StoreRecord::m_index >
   > ,
   boost::multi_index::ordered_non_unique <
-  boost::multi_index::tag<SensorUIDSide>,
+  boost::multi_index::tag<SensorUniIDSide>,
   boost::multi_index::member <
-  HitRecord, int, &HitRecord::m_sensorUID
+  StoreRecord, int, &StoreRecord::m_sensorUniID
   >
   >
   >
-  >  HitRecordSet;
+  >  StoreRecordSet;
 
 
   // Typedefs for indices
-  typedef HitRecordSet::index<HitIndexSide>::type HitSideIndex;
-  typedef HitRecordSet::index<HitIndexSide>::type::iterator HitSideItr;
-  typedef HitRecordSet::index<SensorUIDSide>::type SensorSideIndex;
-  typedef HitRecordSet::index<SensorUIDSide>::type::iterator SensorSideItr;
+  typedef StoreRecordSet::index<StoreIndexSide>::type StoreSideIndex;
+  typedef StoreRecordSet::index<StoreIndexSide>::type::iterator StoreSideItr;
+  typedef StoreRecordSet::index<SensorUniIDSide>::type SensorSideIndex;
+  typedef StoreRecordSet::index<SensorUniIDSide>::type::iterator SensorSideItr;
 
-}
+} // namespace Belle2
 
 #endif

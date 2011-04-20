@@ -33,18 +33,16 @@
 
 // DataStore
 #include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/dataobjects/Relation.h>
 
 // Data objects
 #include <generators/dataobjects/MCParticle.h>
-#include <pxd/dataobjects/PXDSimHit.h>
 #include <pxd/dataobjects/PXDDigit.h>
+#include <pxd/dataobjects/PXDSimHit.h>
 
 // Framework utils
 #include <framework/gearbox/Unit.h>
-#include <pxd/modules/pxdDigitizer/PhysicalConstants.h>
 #include <geometry/bfieldmap/BFieldMap.h>
 #include <framework/logging/Logger.h>
 
@@ -62,8 +60,6 @@
 #include <TVector3.h>
 #include <TRandom3.h>
 #include <TGeoManager.h>
-
-#undef ROOT_OUTPUT
 
 // Used namespaces
 using namespace std;
@@ -297,23 +293,23 @@ void PXDDigiModule::event()
   if (nSimHits == 0) return;
 
   // Create HitSorter structure and fill it
-  HitRecordSet simHitSet;
+  StoreRecordSet simHitSet;
   SensorSet sensorSet;
   SensorUniIDManager uidCodec(0);
   for (StoreIndex iHit = 0; iHit < nSimHits; ++iHit) {
     PXDSimHit* hit = storeSimHits[iHit];
-    HitRecord aHitRec;
+    StoreRecord aHitRec;
     aHitRec.m_index = iHit;
     uidCodec.setLayerID(hit->getLayerID());
     uidCodec.setLadderID(hit->getLadderID());
     uidCodec.setSensorID(hit->getSensorID());
-    aHitRec.m_sensorUID = uidCodec.getSensorUniID();
+    aHitRec.m_sensorUniID = uidCodec.getSensorUniID();
     simHitSet.insert(aHitRec);
-    sensorSet.insert(aHitRec.m_sensorUID);
+    sensorSet.insert(aHitRec.m_sensorUniID);
   }
 
   // get the sensor-side index
-  SensorSideIndex& sensorIndex = simHitSet.get<SensorUIDSide>();
+  SensorSideIndex& sensorIndex = simHitSet.get<SensorUniIDSide>();
 
   //------------------------------------------------------
   // Get the MCParticle->PXDSimHit relations from the
@@ -978,7 +974,7 @@ void PXDDigiModule::saveDigits(DigitMap & digits)
     m_nDigitsSaved++;
 
     // Turn the list of hits and weights into relations.
-    for (HitRelationMapItr iLink = digit.sourceHits.begin();
+    for (StoreRelationMapItr iLink = digit.sourceHits.begin();
          iLink != digit.sourceHits.end(); ++iLink) {
 
       // Get hit index and weight
@@ -1002,7 +998,7 @@ void PXDDigiModule::saveDigits(DigitMap & digits)
         m_nRelationsSaved++;
       } // if iMCPart
 
-    } // for HitRelationMapItr
+    } // for StoreRelationMapItr
   } // for digit
 } // saveDigits
 

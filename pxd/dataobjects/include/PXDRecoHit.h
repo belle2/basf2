@@ -64,8 +64,8 @@ namespace Belle2 {
     /// A dozen getters...
 
     /** Get the compact ID.*/
-    int getSensorUID() const {
-      return m_sensorUID;
+    int getSensorUniID() const {
+      return m_sensorUniID;
     }
 
     /** Get u coordinate.*/
@@ -107,7 +107,7 @@ namespace Belle2 {
 
     static const int m_nParHitRep = 2; /**< Dimension parameter for GenFit.*/
 
-    int m_sensorUID; /**< Unique sensor identifier.*/
+    int m_sensorUniID; /**< Unique sensor identifier.*/
     float m_energyDep; /**< deposited energy.*/
     float m_energyDepError; /**< error in dep. energy.*/
 

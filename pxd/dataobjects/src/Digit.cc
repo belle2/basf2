@@ -8,11 +8,20 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <pxd/dataobjects/PXDDigit.h>
+#include <pxd/dataobjects/Digit.h>
+#include <framework/logging/Logger.h>
 
+using namespace std;
 using namespace Belle2;
 
-ClassImp(PXDDigit)
 
-
+//------------------------------------------------------------------------------
+// ProtoDigit class
+//------------------------------------------------------------------------------
+void Digit::print() const
+{
+  B2INFO(" Digit: charge = " << charge)
+  for (StoreRelationMapItr iHit = sourceHits.begin(); iHit != sourceHits.end(); ++iHit)
+    B2INFO("   hit: " << iHit->first << " charge: " << iHit->second);
+}
 

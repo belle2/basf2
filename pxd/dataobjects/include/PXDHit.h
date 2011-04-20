@@ -11,9 +11,9 @@
 #ifndef PXDHIT_H
 #define PXDHIT_H
 
-#include <pxd/geopxd/CIDManager.h>
-
 #include <TObject.h>
+
+#include <pxd/geopxd/CIDManager.h>
 
 #define DEFAULT_PXDHITS "PXDHits"
 #define DEFAULT_PXDCLUSTERS "PXDClusters"

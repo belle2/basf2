@@ -23,21 +23,24 @@
 // A calibration run will be done each time with the Digitizer. "Each time" means each time
 // the simulation changes. Otherwise, the available resolution calibration will be re-used, to the
 // responsibility of  the user.
-#undef ROOT_OUTPUT
+#define ROOT_OUTPUT
 
 #include <framework/core/Module.h>
-
-// Include basic C++
-#include <string>
-#include <vector>
-#include <map>
 
 // Include Digi header files
 #include <pxd/geopxd/SiGeoCache.h>
 #include <pxd/modules/pxdDigitizer/SiEnergyFluct.h>
 
+// PXDDigit and Digit objects
+#include <pxd/dataobjects/Digit.h>
+
 #include <pxd/dataobjects/HitSorter.h>
 #include <pxd/dataobjects/RelationHolder.h>
+
+// Include basic C++
+#include <string>
+#include <vector>
+#include <map>
 
 // Include ROOT classes
 #ifdef ROOT_OUTPUT
@@ -54,28 +57,6 @@ namespace Belle2 {
 
 // Typedefs
 
-  typedef std::map<StoreIndex, float> HitRelationMap;   // weight by hit
-  typedef std::map<StoreIndex, float>::const_iterator HitRelationMapItr;
-
-  /**
-   * Digit structure - will go to PXDDigits and relations.
-   */
-  struct Digit {
-    Digit(): charge(0), sourceHits() {;}
-    void add(double aCharge, StoreIndex aHit)
-    { charge += aCharge; sourceHits[aHit] += aCharge; }
-    void print() const;
-    double charge;
-    HitRelationMap sourceHits;
-  };
-
-  void Digit::print() const
-  {
-    B2INFO(" Digit: charge = " << charge)
-    for (HitRelationMapItr iHit = sourceHits.begin(); iHit != sourceHits.end(); ++iHit)
-      B2INFO("   hit: " << iHit->first << " charge: " << iHit->second);
-  }
-
   /**
    * Ionization point is an amount of charge generated along a short track segment,
    * located at the centre of the track segment.
@@ -87,6 +68,9 @@ namespace Belle2 {
     double eLoss;
   };
 
+  typedef std::vector<IonizationPoint> IonizationPointVec;
+  typedef std::vector<IonizationPoint>::const_iterator IonizationPointVecItr;
+
   /**
    * A signal point is a charge cloud at the face of the sensor.
    * It is formed by drift/diffusion of an ionization point.
@@ -97,17 +81,8 @@ namespace Belle2 {
     double charge;
   };
 
-
-  typedef std::vector<IonizationPoint> IonizationPointVec;
-  typedef std::vector<IonizationPoint>::const_iterator IonizationPointVecItr;
-
   typedef std::vector<SignalPoint> SignalPointVec;
   typedef std::vector<SignalPoint>::const_iterator SignalPointVecItr;
-
-
-  /** Digits by pixel ID. */
-  typedef std::map<int, Digit> DigitMap;
-  typedef std::map<int, Digit>::iterator DigitMapItr;
 
   /**
    * PXDDigiModule - basf2 PXD Digitizer/Clusterizer Module.

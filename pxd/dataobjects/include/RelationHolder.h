@@ -10,14 +10,10 @@
 #ifndef RELATIONHOLDER_H
 #define RELATIONHOLDER_H
 
-// framework - DataStore
-#include <framework/dataobjects/Relation.h>
-#include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreArray.h>
-#include <generators/dataobjects/MCParticle.h>
+#include <pxd/dataobjects/HitSorter.h>
 
-// framework aux
-#include <framework/logging/Logger.h>
+#include <map>
+#include <list>
 
 // boost
 #include <boost/multi_index_container.hpp>
@@ -25,6 +21,7 @@
 #include <boost/multi_index/member.hpp>
 
 namespace Belle2 {
+
 //-----------------------------------------------------------------
 //                 Relation manager
 //-----------------------------------------------------------------

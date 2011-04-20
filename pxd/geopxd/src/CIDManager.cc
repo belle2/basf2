@@ -10,6 +10,8 @@
 
 #include <pxd/geopxd/CIDManager.h>
 
+#include <framework/logging/Logger.h>
+
 using namespace Belle2;
 
 /* Statics. */

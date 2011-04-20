@@ -629,6 +629,6 @@ namespace Belle2 {
 
   }; // class SiGeoCache
 
-} // end namespace
+} // end namespace Belle2
 
 #endif

@@ -23,18 +23,18 @@ using namespace Belle2;
 ClassImp(PXDRecoHit)
 
 PXDRecoHit::PXDRecoHit() :
-    GFRecoHitIfc<GFPlanarHitPolicy> (m_nParHitRep), m_sensorUID(0),
+    GFRecoHitIfc<GFPlanarHitPolicy> (m_nParHitRep), m_sensorUniID(0),
     m_energyDep(0), m_energyDepError(1)
 {
   ;
 }
 
 PXDRecoHit::PXDRecoHit(const PXDHit* hit) :
-    GFRecoHitIfc<GFPlanarHitPolicy> (m_nParHitRep), m_sensorUID(0),
+    GFRecoHitIfc<GFPlanarHitPolicy> (m_nParHitRep), m_sensorUniID(0),
     m_energyDep(0), m_energyDepError(1)
 {
   // Set the sensor UID
-  m_sensorUID = hit->getSensorUniID();
+  m_sensorUniID = hit->getSensorUniID();
 
   // Set positions
   fHitCoord(0, 0) = hit->getU();
@@ -56,18 +56,18 @@ PXDRecoHit::PXDRecoHit(const PXDHit* hit) :
   // Construct vectors o, u, v
   TVector3 oLocal(1, 0, 0);
   TVector3 oGlobal(0, 0, 0);
-  geometry->localToMasterVec(m_sensorUID, oLocal, oGlobal);// oGlobal.Print();
+  geometry->localToMasterVec(m_sensorUniID, oLocal, oGlobal);// oGlobal.Print();
   TVector3 uLocal(0, 1, 0);
   TVector3 uGlobal(0, 0, 0);
-  geometry->localToMasterVec(m_sensorUID, uLocal, uGlobal);// uGlobal.Print();
+  geometry->localToMasterVec(m_sensorUniID, uLocal, uGlobal);// uGlobal.Print();
   TVector3 vLocal(0, 0, 1);
   TVector3 vGlobal(0, 0, 0);
-  geometry->localToMasterVec(m_sensorUID, vLocal, vGlobal);// vGlobal.Print();
+  geometry->localToMasterVec(m_sensorUniID, vLocal, vGlobal);// vGlobal.Print();
 
   // Construct finite plane - we can do with RectFinitPlanes for PXD
-  double u1 = -0.5 * geometry->getUSensorSize(m_sensorUID);
+  double u1 = -0.5 * geometry->getUSensorSize(m_sensorUniID);
   double u2 = - u1;
-  double v1 = -0.5 * geometry->getVSensorSize(m_sensorUID);
+  double v1 = -0.5 * geometry->getVSensorSize(m_sensorUniID);
   double v2 = - v1;
   GFDetPlane detPlane(oGlobal, uGlobal, vGlobal, new GFRectFinitePlane(u1, u2, v1, v2));
   // Set in policy

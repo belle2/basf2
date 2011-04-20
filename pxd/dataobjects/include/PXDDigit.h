@@ -122,9 +122,10 @@ namespace Belle2 {
     float m_vCellPosition;          /**< Absolute cell position in r-phi. */
     float m_charge;         /**< Deposited charge (units depend on user selection). */
 
-    ClassDef(PXDDigit, 1);
+    ClassDef(PXDDigit, 1)
 
   }; // class PXDDigit
+
 
 } // end namespace Belle2
 

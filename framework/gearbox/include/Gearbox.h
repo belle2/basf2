@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2010-2011  Belle II Collaboration                         *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Andreas Moll                                             *
@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef GEARBOX_H_
-#define GEARBOX_H_
+#ifndef GEARBOX_H
+#define GEARBOX_H
 
 #include <boost/python.hpp>
 
@@ -187,4 +187,4 @@ namespace Belle2 {
 
 }
 
-#endif /* GEARBOX_H_ */
+#endif /* GEARBOX_H */

@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef GEARREADER_H_
-#define GEARREADER_H_
+#ifndef GEARREADER_H
+#define GEARREADER_H
 
 #include <TGeoMaterial.h>
 #include <string>
@@ -55,4 +55,4 @@ namespace Belle2 {
 
 }
 
-#endif /* GEARREADER_H_ */
+#endif /* GEARREADER_H */

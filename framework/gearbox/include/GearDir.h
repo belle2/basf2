@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2010-2011  Belle II Collaboration                         *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Andreas Moll                                             *
@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef GEARDIR_H_
-#define GEARDIR_H_
+#ifndef GEARDIR_H
+#define GEARDIR_H
 
 #include <framework/gearbox/GearboxIOAbs.h>
 
@@ -246,7 +246,7 @@ namespace Belle2 {
           GearboxIOAbs::GearboxPathResultNotValidError, GearboxIOAbs::GearboxStringNumConversionError);
 
     /**
-     * Returns a parameter, given by the path, which describes a general numerical value.
+     * Returns a parameter, given by the path, which describes a general floating point numerical value.
      *
      * The path specifies the node, which value should be returned. Instead of a single
      * node, a Path statement can also be used.
@@ -260,9 +260,33 @@ namespace Belle2 {
      * GearboxStringNumConversionError: if the conversion of a string to a numerical value failed.
      *
      * @param path The path to the node which should be returned.
-     * @return The numerical value.
+     * @return The floating point numerical value.
      */
     double getParamNumValue(const std::string& path = "") const
+    throw(GearboxIOAbs::GearboxIONotConnectedError, GearboxIOAbs::GearboxPathNotValidError,
+          GearboxIOAbs::GearboxParamNotExistsError, GearboxIOAbs::GearboxPathEmptyResultError,
+          GearboxIOAbs::GearboxPathResultNotValidError, GearboxIOAbs::GearboxStringNumConversionError);
+
+    /**
+     * Returns a parameter, given by the path, which describes a general integer numerical value.
+     *
+     * If the value specified by the path is a floating point value, the value is rounded (like floor()).
+     *
+     * The path specifies the node, which value should be returned. Instead of a single
+     * node, a Path statement can also be used.
+     *
+     * Different types of exceptions can be thrown:
+     * GearboxIONotConnectedError: if the GearboxIO is not connected to a storage medium.
+     * GearboxPathNotValidError: if the path statement is not valid.
+     * GearboxParamNotExistsError: if the parameter does not exist and the parameter check is enabled.
+     * GearboxPathEmptyResultError: if the returned result of the path query is empty.
+     * GearboxPathResultNotValidError: if the returned type of the path query is not supported.
+     * GearboxStringNumConversionError: if the conversion of a string to a numerical value failed.
+     *
+     * @param path The path to the node which should be returned.
+     * @return The integer numerical value.
+     */
+    virtual int getParamIntValue(const std::string& path = "") const
     throw(GearboxIOAbs::GearboxIONotConnectedError, GearboxIOAbs::GearboxPathNotValidError,
           GearboxIOAbs::GearboxParamNotExistsError, GearboxIOAbs::GearboxPathEmptyResultError,
           GearboxIOAbs::GearboxPathResultNotValidError, GearboxIOAbs::GearboxStringNumConversionError);
@@ -374,4 +398,4 @@ namespace Belle2 {
 
 }
 
-#endif /* GEARDIR_H_ */
+#endif /* GEARDIR_H */

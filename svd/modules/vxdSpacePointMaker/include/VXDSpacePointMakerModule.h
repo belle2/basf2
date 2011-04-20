@@ -97,8 +97,8 @@ namespace Belle2 {
 
     int m_nPointsSaved;         /**< Number of saved points per event. */
     int m_nRelationsSaved;      /**< Number of saved relations per event. */
-    TwoSidedRelationSet m_relMCPXD; /**< A structure to handle MCPart->PXDSimHit relations.*/
-    TwoSidedRelationSet m_relMCSVD; /**< A structure to handle MCPart->SVDSimHit relations.*/
+    TwoSidedRelationSet relMCPXD; /**< A structure to handle MCPart->PXDSimHit relations.*/
+    TwoSidedRelationSet relMCSVD; /**< A structure to handle MCPart->SVDSimHit relations.*/
 
     /* State variables. */
     // Current sensor parameters from geometry

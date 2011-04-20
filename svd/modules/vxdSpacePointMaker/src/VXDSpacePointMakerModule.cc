@@ -145,34 +145,40 @@ void VXDSpacePointMakerModule::event()
   if (nSimHits == 0) return; // no hits to process
 
   // Create HitSorter structure and fill it
-  HitRecordSet simHitSet; // Contains pairs SensorUniID - SimHit
-  SensorSet sensorSet;    // Lists all SensorUniIDs that contain hits
+  SensorSet sensorSet;    // Lists all SensorUniIDs that contain hits, common!
   SensorUniIDManager uidCodec(0);
+
+  StoreRecordSet pxdHitSet; // Contains pairs SensorUniID - PXDSimHit
+
   for (StoreIndex iHit = 0; iHit < nPXDSimHits; ++iHit) {
     PXDSimHit* hit = storePXDHits[iHit];
-    HitRecord aHitRec;
+    StoreRecord aHitRec;
     aHitRec.m_index = iHit;
     uidCodec.setLayerID(hit->getLayerID());
     uidCodec.setLadderID(hit->getLadderID());
     uidCodec.setSensorID(hit->getSensorID());
-    aHitRec.m_sensorUID = uidCodec.getSensorUniID();
-    simHitSet.insert(aHitRec);
-    sensorSet.insert(aHitRec.m_sensorUID);
+    aHitRec.m_sensorUniID = uidCodec.getSensorUniID();
+    pxdHitSet.insert(aHitRec);
+    sensorSet.insert(aHitRec.m_sensorUniID);
   }
+  // get the sensor-side index
+  SensorSideIndex& pxdSensorIndex = pxdHitSet.get<SensorUniIDSide>();
+
+  StoreRecordSet svdHitSet; // Contains pairs SensorUniID - SVDSimHit
+
   for (StoreIndex iHit = 0; iHit < nSVDSimHits; ++iHit) {
     SVDSimHit* hit = storeSVDHits[iHit];
-    HitRecord aHitRec;
+    StoreRecord aHitRec;
     aHitRec.m_index = iHit;
     uidCodec.setLayerID(hit->getLayerID());
     uidCodec.setLadderID(hit->getLadderID());
     uidCodec.setSensorID(hit->getSensorID());
-    aHitRec.m_sensorUID = uidCodec.getSensorUniID();
-    simHitSet.insert(aHitRec);
-    sensorSet.insert(aHitRec.m_sensorUID);
+    aHitRec.m_sensorUniID = uidCodec.getSensorUniID();
+    svdHitSet.insert(aHitRec);
+    sensorSet.insert(aHitRec.m_sensorUniID);
   }
-
   // get the sensor-side index
-  SensorSideIndex& sensorIndex = simHitSet.get<SensorUIDSide>();
+  SensorSideIndex& svdSensorIndex = svdHitSet.get<SensorUniIDSide>();
 
 
   //------------------------------------------------------
@@ -194,12 +200,11 @@ void VXDSpacePointMakerModule::event()
     for (RelListItr idx = toIndices.begin(); idx != toIndices.end(); ++idx) {
       arel.m_to = (*idx);
       arel.m_weight = 1.0; // no way to retrieve weights.
-      m_relMCPXD.insert(arel);
+      relMCPXD.insert(arel);
     }
   }
-
   // Get the "to-side" index to relations.
-  ToSideIndex& pxdIndex = m_relMCPXD.get<ToSide>();
+  ToSideIndex& pxdIndex = relMCPXD.get<ToSide>();
 
 
   //------------------------------------------------------
@@ -221,12 +226,11 @@ void VXDSpacePointMakerModule::event()
     for (RelListItr idx = toIndices.begin(); idx != toIndices.end(); ++idx) {
       arel.m_to = (*idx);
       arel.m_weight = 1.0; // no way to retrieve weights.
-      m_relMCSVD.insert(arel);
+      relMCSVD.insert(arel);
     }
   }
-
   // Get the "to-side" index to relations.
-  ToSideIndex& svdIndex = m_relMCSVD.get<ToSide>();
+  ToSideIndex& svdIndex = relMCSVD.get<ToSide>();
 
 
   //-----------------------------------------------------
@@ -268,8 +272,13 @@ void VXDSpacePointMakerModule::event()
     //------------------------------------------------------------------------
     // Construct the set of hits that lie within this sensor
     //------------------------------------------------------------------------
-    std::pair<SensorSideItr, SensorSideItr> sensorHits =
-      sensorIndex.equal_range(m_currentSensorUniID);
+
+    std::pair<SensorSideItr, SensorSideItr> sensorHits;
+
+    if (detType == SiGeoCache::c_pixel)
+      sensorHits = pxdSensorIndex.equal_range(m_currentSensorUniID);
+    else if (detType == SiGeoCache::c_strip)
+      sensorHits = svdSensorIndex.equal_range(m_currentSensorUniID);
 
     //------------------------------------------------------------------------
     // Loop over hits in the current sensor
@@ -297,7 +306,7 @@ void VXDSpacePointMakerModule::event()
       TVector3 posGlobal;
       m_geometry->localToMaster(m_currentSensorUniID, posLocal, posGlobal);
 
-      // save the spacepoint into output array
+      // save the space point into output array
       int ptIndex = storeVXDPts->GetLast() + 1;
       new(storeVXDPts->AddrAt(ptIndex)) VXDSpacePoint(
         m_currentSensorUniID,
@@ -344,8 +353,8 @@ void VXDSpacePointMakerModule::event()
   } // for SensorSetItr
 
   m_nEvent++;
-  m_relMCPXD.clear();
-  m_relMCSVD.clear();
+  relMCPXD.clear();
+  relMCSVD.clear();
 }
 
 void VXDSpacePointMakerModule::endRun()

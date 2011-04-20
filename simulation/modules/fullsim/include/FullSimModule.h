@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2010-2011  Belle II Collaboration                         *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Andreas Moll, Guofu Cao                                  *
@@ -14,7 +14,10 @@
 #include <framework/core/Module.h>
 #include <generators/dataobjects/MCParticleGraph.h>
 
+#include <G4VisManager.hh>
+
 #include <string>
+#include <vector>
 
 namespace Belle2 {
 
@@ -78,6 +81,8 @@ namespace Belle2 {
 
     MCParticleGraph m_mcParticleGraph;     /**< The MCParticle Graph used to manage the MCParticles before and after the simulation.*/
 
+    G4VisManager* m_visManager;
+
     std::string m_mcParticleInputColName;  /**< The parameter variable for the name of the input MCParticle collection. */
     std::string m_mcParticleOutputColName; /**< The parameter variable for the name of the output MCParticle collection. */
     std::string m_relationOutputColName;   /**< The parameter variable for the name of the output Relation (Hit -> MCParticle) collection. */
@@ -90,7 +95,9 @@ namespace Belle2 {
     double m_productionCut;                /*!< Apply continuous energy loss to primary particle which has no longer enough energy to produce secondaries which travel at least the specified productionCut distance. */
     int m_maxNumberSteps;                  /*!< The maximum number of steps before the track transportation is stopped and the track is killed. */
     double m_photonFraction;               /**< The fraction of Cerenkov photons which will be kept and propagated. */
-
+    bool m_useNativeGeant4;                /**< If set to true, uses the Geant4 navigator and native detector construction class. */
+    std::vector<std::string> m_uiCommands; /**< A list of Geant4 UI commands that should be applied before the simulation starts. */
+    bool m_EnableVisualization;            /**< If set to true the Geant4 visualization support is enabled. */
 
   private:
 

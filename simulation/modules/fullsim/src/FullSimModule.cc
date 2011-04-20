@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2010-2011  Belle II Collaboration                         *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Andreas Moll, Guofu Cao                                  *
@@ -11,6 +11,7 @@
 #include <simulation/modules/fullsim/FullSimModule.h>
 #include <simulation/kernel/RunManager.h>
 #include <simulation/kernel/DetectorConstruction.h>
+#include <simulation/kernel/VGMDetectorConstruction.h>
 #include <simulation/kernel/PhysicsList.h>
 #include <simulation/kernel/MagneticField.h>
 #include <simulation/kernel/PrimaryGeneratorAction.h>
@@ -32,6 +33,8 @@
 #include <QGSP_BERT.hh>
 #include <G4EventManager.hh>
 #include <G4RunManager.hh>
+#include <G4UImanager.hh>
+#include <G4VisExecutive.hh>
 #include <G4StepLimiter.hh>
 
 #include <TGeoManager.h>
@@ -50,7 +53,7 @@ REG_MODULE(FullSim)
 //                 Implementation
 //-----------------------------------------------------------------
 
-FullSimModule::FullSimModule() : Module()
+FullSimModule::FullSimModule() : Module(), m_visManager(NULL)
 {
   //Set module properties and the description
   setDescription("Performs the full Geant4 detector simulation. Requires a valid geometry in memory.");
@@ -62,12 +65,17 @@ FullSimModule::FullSimModule() : Module()
   addParam("ThresholdImportantEnergy", m_thresholdImportantEnergy, "[GeV] A particle which got 'stuck' and has less than this energy will be killed after 'ThresholdTrials' trials.", 0.250);
   addParam("ThresholdTrials", m_thresholdTrials, "Geant4 will try 'ThresholdTrials' times to move a particle which got 'stuck' and has an energy less than 'ThresholdImportantEnergy'.", 10);
   addParam("TrackingVerbosity", m_trackingVerbosity, "Tracking verbosity: 0=Silent; 1=Min info per step; 2=sec particles; 3=pre/post step info; 4=like 3 but more info; 5=proposed step length info.", 0);
-  addParam("CreateRelations", m_createRelations, "Set to true to create relations between Hits and MCParticles.", true);
+  addParam("CreateRelations", m_createRelations, "Set to True to create relations between Hits and MCParticles.", true);
   addParam("PhysicsList", m_physicsList, "The name of the physics list which is used for the simulation.", string("QGSP_BERT"));
   addParam("RegisterOptics", m_optics, "If true, G4OpticalPhysics is registered in Geant4 PhysicsList.", false);
   addParam("ProductionCut", m_productionCut, "Apply continuous energy loss to primary particle which has no longer enough energy to produce secondaries which travel at least the specified productionCut distance.", 0.07);
   addParam("MaxNumberSteps", m_maxNumberSteps, "The maximum number of steps before the track transportation is stopped and the track is killed.", 100000);
   addParam("PhotonFraction", m_photonFraction, "The fraction of Cerenkov photons which will be kept and propagated.", 1.0);
+  addParam("UseNativeGeant4", m_useNativeGeant4, "If set to True, uses the Geant4 navigator and native detector construction class.", false);
+  addParam("EnableVisualization", m_EnableVisualization, "If set to True the Geant4 visualization support is enabled.", false);
+
+  vector<string> defaultCommands;
+  addParam("UICommands", m_uiCommands, "A list of Geant4 UI commands that should be applied before the simulation starts.", defaultCommands);
 }
 
 
@@ -90,22 +98,31 @@ void FullSimModule::initialize()
     return;
   }
 
-  //Create an instance of the G4Root Navigation manager.
-  TG4RootNavMgr* g4rootNavMgr = TG4RootNavMgr::GetInstance(gGeoManager);
+  //Create an instance of the G4Root Navigation manager if the simulation is not run in native Geant4 mode.
+  TG4RootNavMgr* g4rootNavMgr = NULL;
+  if (!m_useNativeGeant4) {
+    g4rootNavMgr = TG4RootNavMgr::GetInstance(gGeoManager);
 
-  if (g4rootNavMgr == NULL) {
-    B2ERROR("Could not retrieve an instance of the TG4RootNavMgr !")
-    return;
+    if (g4rootNavMgr == NULL) {
+      B2ERROR("Could not retrieve an instance of the TG4RootNavMgr !")
+      return;
+    }
   }
 
   //Get the instance of the run manager.
   RunManager& runManager = RunManager::Instance();
 
-  //Convert the TGeo volumes/materials to Geant4 volumes/materials and then
+  //If the simulation is not run in native Geant4 mode,
+  //convert the TGeo volumes/materials to Geant4 volumes/materials and then
   //call the DetectorConstruction class to allow the user based modification
   //of the created geant4 volumes/materials.
-  g4rootNavMgr->Initialize(new DetectorConstruction());
-  g4rootNavMgr->ConnectToG4();
+  //Otherwise build the VGMDetectorConstruction class
+  if (!m_useNativeGeant4) {
+    g4rootNavMgr->Initialize(new DetectorConstruction());
+    g4rootNavMgr->ConnectToG4();
+  } else {
+    runManager.SetUserInitialization(new VGMDetectorConstruction());
+  }
 
   //Create the Physics list
   PhysicsList* physicsList = new PhysicsList(m_physicsList);
@@ -182,6 +199,19 @@ void FullSimModule::initialize()
   G4EventManager::GetEventManager()->SetVerboseLevel(g4VerboseLevel);
   G4RunManager::GetRunManager()->SetVerboseLevel(g4VerboseLevel);
   G4EventManager::GetEventManager()->GetTrackingManager()->SetVerboseLevel(m_trackingVerbosity); //turned out to be more useful as a parameter.
+
+  if (m_EnableVisualization) {
+    m_visManager = new G4VisExecutive;
+    m_visManager->Initialize();
+  }
+
+  //Apply the Geant4 UI commands
+  if (m_uiCommands.size() > 0) {
+    G4UImanager* uiManager = G4UImanager::GetUIpointer();
+    for (vector<string>::iterator iter = m_uiCommands.begin(); iter != m_uiCommands.end(); iter++) {
+      uiManager->ApplyCommand(*iter);
+    }
+  }
 }
 
 
@@ -214,5 +244,6 @@ void FullSimModule::endRun()
 
 void FullSimModule::terminate()
 {
+  if (m_visManager != NULL) delete m_visManager;
   RunManager::Instance().destroy();
 }

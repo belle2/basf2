@@ -23,20 +23,31 @@ namespace Belle2 {
      * Useful constructor.
      * Constructs the plane from central point and sizes. Trapezoidal detectors
      * are acceptable.
+     * @param u u-coordinate of sensor center.
+     * @param v v-ccordinate of sensor center.
+     * @param du (mean) width in u.
+     * @param dv width in v.
+     * @param dudv du/dv for trapezoidal sensors.
      */
-    SiSensorPlane(double u, double v, double du, double dv, double dv2 = -1);
+    SiSensorPlane(double u, double v, double du, double dv, double dudv = 0):
+        m_u(u), m_v(v), m_du(du), m_dv(dv), m_dudv(dudv)
+    {;}
 
     /**
      * Default constructor.
      * Constructs a default plane and inActive returns false for any point.
      */
-    SiSensorPlane();
+    SiSensorPlane(): m_u(0), m_v(0), m_du(0), m_dv(0), m_dudv(0)
+    {;}
 
     /**
      * inActive is true if point (u,v) in the plane is inside the finite region.
+     * @param u u-coordinate of the point.
+     * @param v v-coordinate of the point.
+     * @return true if (u,v) is within the sensor plane, otherwise false.
      */
     bool inActive(const double& u, const double& v) const {
-      return ((fabs(u - m_u) < m_du) && (fabs(v - m_v) < m_dv0 + m_dvSlope *(u - m_u)));
+      return ((fabs(u - m_u) < m_du + m_dudv *(v - m_v)) && (fabs(v - m_v) < m_dv));
     }
 
     /**
@@ -46,8 +57,9 @@ namespace Belle2 {
 
     /**
      * Deep copy of the object.
+     * @return Pointer to a deep copy of the object.
      */
-    virtual SiSensorPlane* clone() const {
+    virtual GFAbsFinitePlane* clone() const {
       return new SiSensorPlane(*this);
     }
 
@@ -61,11 +73,9 @@ namespace Belle2 {
   private:
     double m_u;          /**< u coordinate of center. */
     double m_v;          /**< v coordinate of center. */
-    double m_du;         /**< size along u coordinate. */
-    double m_dv;         /**< size along v at minimal u. */
-    double m_dv2;        /**< size along v at maximal u. */
-    double m_dv0;        /**< mean width in v. */
-    double m_dvSlope;    /**< edge slope along u. */
+    double m_du;         /**< (mean) half-width along u coordinate. */
+    double m_dv;         /**< half-width along v coordinate. */
+    double m_dudv;       /**< du/dv for trapezoidal sensor. */
 
     ClassDef(SiSensorPlane, 1)
   };

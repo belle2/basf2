@@ -37,8 +37,6 @@ using namespace std;
 using namespace boost;
 using namespace Belle2;
 
-typedef list<unsigned short> RelList;
-typedef list<unsigned short>::iterator RelListItr;
 
 
 //-----------------------------------------------------------------

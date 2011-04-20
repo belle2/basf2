@@ -7,7 +7,7 @@ from basf2 import *
 avModList = fw.list_available_modules()
 
 # Loop over the list of available modules, register them and print their information
-for (moduleName, sharedLib) in avModList.iteritems():
+for (moduleName, sharedLib) in sorted(avModList.iteritems()):
     current_module = register_module(moduleName)
     print_params(current_module, False, sharedLib)
 

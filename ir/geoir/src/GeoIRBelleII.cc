@@ -389,8 +389,8 @@ void GeoIRBelleII::create(GearDir& content)
       IRTube->DefineSection(1,  63.35, 0, 10);
       IRTube->SetName("IRTubename");
       string arg2 = string(IRPipe[i]->GetName()) + ":" + string(IRTrans[i]->GetName()) + "*IRTubename";
-      TGeoCompositeShape* IRPipeComp = new TGeoCompositeShape("IRPipeCompName", arg2.c_str());
-      TGeoVolume* IRPipeCompVol = new TGeoVolume("IRPipeCompVolName", IRPipeComp, IRMed[i]);
+      TGeoCompositeShape* IRPipeComp = new TGeoCompositeShape(((format("IRPipeCompName%1%") % i).str()).c_str(), arg2.c_str());
+      TGeoVolume* IRPipeCompVol = new TGeoVolume(((format("IRPipeCompVolName%1%") % i).str()).c_str(), IRPipeComp, IRMed[i]);
       IRPipeCompVol->SetLineColor(kTeal + 3);
       volGrpBP->AddNode(IRPipeCompVol, 1);
       //modify end nakano110307

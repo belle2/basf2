@@ -27,7 +27,6 @@ namespace Belle2 {
 
     ~SingletonDestroyerT() {
       if (m_doomed != NULL) delete m_doomed;
-      delete m_doomed;
     }
 
     void setDoomed(T* doomed) {

@@ -30,7 +30,6 @@
 #include <G4Transportation.hh>
 #include <G4ParticleTable.hh>
 #include <G4DecayTable.hh>
-#include <QGSP_BERT.hh>
 #include <G4EventManager.hh>
 #include <G4RunManager.hh>
 #include <G4UImanager.hh>
@@ -128,9 +127,7 @@ void FullSimModule::initialize()
   PhysicsList* physicsList = new PhysicsList(m_physicsList);
   physicsList->setProductionCutValue(m_productionCut);
   if (m_optics) physicsList->registerOpticalPhysicsList();
-
   runManager.SetUserInitialization(physicsList);
-
 
   //Create the magnetic field for the Geant4 simulation
   MagneticField* magneticField = new MagneticField();

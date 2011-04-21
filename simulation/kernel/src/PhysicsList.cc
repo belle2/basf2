@@ -28,17 +28,16 @@ PhysicsList::PhysicsList(const string& physicsListName) : G4VModularPhysicsList(
   //First register the physics form Geant4 predefined PhysicsList.
   G4PhysListFactory physListFactory;
   G4VModularPhysicsList* physList = NULL;
-  if (physListFactory.IsReferencePhysList(physicsListName)) physList = physListFactory.GetReferencePhysList(physicsListName);
 
+  if (physListFactory.IsReferencePhysList(physicsListName)) physList = physListFactory.GetReferencePhysList(physicsListName);
   if (physList == NULL) B2FATAL("Could not load the physics list " << physicsListName)
 
-    G4VPhysicsConstructor* regPhys = const_cast<G4VPhysicsConstructor*>(physList->GetPhysics(0));
-  int iPhysList = 1;
+    int iPhysList = 1;
+  G4VPhysicsConstructor* regPhys = const_cast<G4VPhysicsConstructor*>(physList->GetPhysics(0));
   while (regPhys != NULL) {
     B2DEBUG(10, "RegisterPhysics: " << regPhys->GetPhysicsName())
     RegisterPhysics(regPhys);
-    iPhysList++;
-    regPhys = const_cast<G4VPhysicsConstructor*>(physList->GetPhysics(iPhysList));
+    regPhys = const_cast<G4VPhysicsConstructor*>(physList->GetPhysics(iPhysList++));
   }
 }
 

@@ -12,7 +12,7 @@
  * This file implements the main executable "basf2".                      *
  *                                                                        *
  *                                                                        *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2010-2011  Belle II Collaboration                         *
  *                                                                        *
  * Contributing authors :                                                 *
  * (main framework)                                                       *
@@ -36,7 +36,9 @@
 
 #include <boost/program_options.hpp>
 #include <boost/filesystem.hpp>
+#include <boost/foreach.hpp>
 
+#include <signal.h>
 #include <cstdlib>
 #include <sys/utsname.h>
 #include <iostream>
@@ -93,6 +95,7 @@ int main(int argc, char* argv[])
   libPath /=  belle2SubDir;
 
   bool runInteractiveMode = true;
+  vector<string> arguments;
 
   try {
     //---------------------------------------------------
@@ -115,6 +118,7 @@ int main(int argc, char* argv[])
     prog::options_description config("Configuration");
     config.add_options()
     ("steering", prog::value<string>(), "the python steering file")
+    ("arg", prog::value<vector<string> >(&arguments), "Additional arguments to be passed to the steering file")
     ;
 
     prog::options_description cmdlineOptions;
@@ -122,6 +126,7 @@ int main(int argc, char* argv[])
 
     prog::positional_options_description posOptDesc;
     posOptDesc.add("steering", 1);
+    posOptDesc.add("arg", -1);
 
     prog::variables_map varMap;
     prog::store(prog::command_line_parser(argc, argv).
@@ -175,7 +180,15 @@ int main(int argc, char* argv[])
 
     try {
       //Init Python interpreter
-      Py_Initialize();
+      Py_InitializeEx(0);
+
+      //Pass python filename and additional arguments to python
+      const char *pyargs[arguments.size()+1];
+      pyargs[0] = pythonFile.c_str();
+      for (size_t i = 0; i < arguments.size(); i++) {
+        pyargs[i+1] = arguments[i].c_str();
+      }
+      PySys_SetArgv(arguments.size() + 1, const_cast<char**>(pyargs));
 
       //Embedd Python modules
       PyBasf2::embedPythonModule();

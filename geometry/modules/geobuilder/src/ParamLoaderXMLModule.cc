@@ -33,7 +33,7 @@ ParamLoaderXMLModule::ParamLoaderXMLModule() : Module()
 
   //Parameter definition
   addParam("InputFileXML",  m_filenameXML, "The filename of the XML input file which should be loaded.");
-  addParam("ParamCheck",  m_paramCheck, "Turns on/off parameter validation. Turn it off for speedup.", true);
+  addParam("ParamCheck",  m_paramCheck, "Turns on/off parameter validation. Turn it on for debugging.", false);
 }
 
 

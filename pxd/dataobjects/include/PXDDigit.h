@@ -32,7 +32,7 @@ namespace Belle2 {
 
     /** Default constructor for the ROOT IO. */
     PXDDigit():
-        m_sensorID(-1),
+        m_sensorUniID(-1),
         m_uCellID(-1), m_vCellID(-1),
         m_uCellPosition(0), m_vCellPosition(0),
         m_charge(0)
@@ -47,7 +47,7 @@ namespace Belle2 {
      * @param charge The charge collected in the cell.
      */
     PXDDigit(int sensorID, short uCellID, short vCellID, float uCellPosition, float vCellPosition, float charge):
-        m_sensorID(sensorID),
+        m_sensorUniID(sensorID),
         m_uCellID(uCellID), m_vCellID(vCellID),
         m_uCellPosition(uCellPosition), m_vCellPosition(vCellPosition),
         m_charge(charge)
@@ -56,7 +56,7 @@ namespace Belle2 {
     /** Set compressed layer/ladder/sensor id.
      * @param sensorID Compressed ID of the sensor.
      */
-    void setSensorID(int sensorID) { m_sensorID = sensorID; }
+    void setSensorID(int sensorID) { m_sensorUniID = sensorID; }
 
     /** Set u ID of a cell.
      * @param uCellID Cell number in u.
@@ -86,7 +86,7 @@ namespace Belle2 {
     /** Get the sensor compact ID.
      * @return compact ID of the sensor.
      */
-    int getSensorID() const { return m_sensorID; }
+    int getSensorID() const { return m_sensorUniID; }
 
     /** Get cell ID in u.
      * @return u ID of the cell.
@@ -115,7 +115,7 @@ namespace Belle2 {
 
   private:
 
-    int m_sensorID;                 /**< Compressed sensor identifier.*/
+    int m_sensorUniID;                 /**< Compressed sensor identifier.*/
     short m_uCellID;        /**< Cell z-coordinate in pitch units. */
     short m_vCellID;        /**< Cell r-phi coordinate in pitch units. */
     float m_uCellPosition;          /**< Absolute cell position in z. */

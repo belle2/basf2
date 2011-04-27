@@ -11,7 +11,7 @@
 
 // /////////////////////////////////////////////////////////////////////// //
 //                                                                         //
-// PXDDigiModule - basf2 Digitizer/Clusterizer for the DEPFET pixel sensors //
+// PXDDigiModule - basf2 Digitizer for the DEPFET pixel sensors            //
 //                                                                         //
 // /////////////////////////////////////////////////////////////////////// //
 
@@ -20,9 +20,6 @@
 
 // Define ROOT output if needed
 // PQ??: Can we turn it into a parameter?
-// A calibration run will be done each time with the Digitizer. "Each time" means each time
-// the simulation changes. Otherwise, the available resolution calibration will be re-used, to the
-// responsibility of  the user.
 #define ROOT_OUTPUT
 
 #include <framework/core/Module.h>
@@ -85,10 +82,10 @@ namespace Belle2 {
   typedef std::vector<SignalPoint>::const_iterator SignalPointVecItr;
 
   /**
-   * PXDDigiModule - basf2 PXD Digitizer/Clusterizer Module.
+   * PXDDigiModule - basf2 PXD Digitizer Module.
    *
    * The PXDDigiModule code is a basf2 module that carries out a detailed DEPFET PXD
-   * digitization and hit reconstruction. <br>
+   * digitization. <br>
    * For each simulated PXDSimHit, obtained from Geant4 and created by a particle (delta
    * electrons are handled separately), intersection points with the inner and outer boundary
    * of the respective silicon layer are calculated; within these boundaries, the track segment
@@ -104,25 +101,6 @@ namespace Belle2 {
    * readout plane until the internal gate area of a pixel cell is hit. Thus, for each electrode one
    * gets a digit (with either a zero or non-zero signal, depending on how many ionization points
    * contributed).
-   * Finally, the digits are converted into real hits (clustering procedure + hit resolution calculation).
-   *  Within the clustering procedure, one can define if bricked structure in R-Phi is used (even rows are
-   * shifted with respect to odd rows by half a pitch). As a clustering algorithm either a center of
-   * gravity (for clusters consisting of 1 or 2 pixels, each direction is taken separately) or
-   * analog head-tail algorithm (for clusters larger than 2 pixels) is used.
-   * In order to simulate the procedure correctly, first the sensor is populated with all the hits,
-   * that is, by random noise hits, signal hits, and background hits, and then clustering is performed.
-   * As the Analog-To-Digital converter is going to be used in the data processing pipeline, the analog
-   * signals are converted first into digital values and then based on seed cuts and neighbor pixel
-   * cuts (user-adjustable), the clustering is performed. The output of the processor is a collection
-   * of PXDHits, where each reconstructed hit has a defined position, total collected charge (either
-   * analog signal (no ADC) in [electrons] or digital (with ADC) in [ADU] (1 ADU = ADCRange/2^nADCBits),
-   * covariance matrix (position resolution, which has to be calculated separately from results obtained
-   * with ROOT_OUTPUT on), sensor identifier (from which ladder/layer/sensor the hit comes from), and a
-   * vector of PXDSimHits that contributed. The position is corrected for the mean Lorentz shift. By default,
-   * the input collection is "PXDSimHitCollection", and that of the output is "PXDHitCollection". As the
-   * hit resolution is given as an external parameter and is not calculated automatically, one has to
-   * perform the digitization with #define ROOT_OUTPUT set first, analyse the histograms, calculate
-   * resolutions and supply them back as input parameters. This procedure is hard to automate.
    */
 
   class PXDDigiModule : public Module {
@@ -184,10 +162,6 @@ namespace Belle2 {
     /** Calculate digits from signal points - diffusion, Poisson and electronics effects added. */
     void produceDigits(const SignalPointVec & signalPoints, StoreIndex simHitIdx, DigitMap & digits);
 
-    /** Simulate the effect of ganged pixels (upper half of the sensor mapped to the lower half and vice versa). */
-    // Not implemented for basf2 yet.
-    //void simulateGangedPixels(DigitMap & digitMap);
-
     /** Add noise to collected digits. */
     void addPixelNoise(DigitMap & digits);
 
@@ -234,7 +208,6 @@ namespace Belle2 {
     bool  m_electronicEffects;  /**< Add noise or not. */
     double  m_elNoise;        /**< Electronic noise of individual pixels in e. */
     bool  m_PoissonSmearing;    /**< Set Poisson smearing or not (applies only if electronics effects set). */
-    int m_gangedPixels;     /**< Ganged pixels mode (0 - off, 1 - on, 2 - on, R/O with special algorithm). */
     bool  m_integrationWindow;  /**< Use integration window?. */
     double m_SNAdjacent; /**< Threshold signal/noise level for zero suppression.*/
 

@@ -106,8 +106,6 @@ PXDDigiModule::PXDDigiModule() :
   addParam("ADCBits", m_ADCBits, "Set how many bits the ADC uses", int(8));
   addParam("Diffusion", m_diffusionCoefficient,
            "Diffusion coefficient (in mm)", double(0.00008617));
-  addParam("GangedPixels", m_gangedPixels, "Use ganged pixels? (0 - no, 1 - yes, 2 - yes, special readout algorithm)",
-           int(0));
   addParam("ElectronicEffects", m_electronicEffects,
            "Apply electronic effects?", bool(true));
   addParam("ElectronicNoise", m_elNoise,
@@ -351,8 +349,8 @@ void PXDDigiModule::event()
   // No need of support structure.
   //------------------------------------------------------
   StoreArray<Relation> storeMCToDigits(m_relDigitName);
-  if (!storeMCToSimHits) {
-    B2ERROR("PXDDigi: Input collection " << m_relSimName << " unavailable.");
+  if (!storeMCToDigits) {
+    B2ERROR("PXDDigi: Input collection " << m_relDigitName << " unavailable.");
   }
 
   //------------------------------------------------------
@@ -491,8 +489,6 @@ void PXDDigiModule::event()
     // Produce noise digits
     //------------------------------------------------------------------------
     addNoiseDigits(digits);
-
-    B2INFO("Total simulation + noise digits: " << digits.size())
 
     //------------------------------------------------------------------------
     // Save digits and relations to DataStore.
@@ -891,9 +887,14 @@ void PXDDigiModule::addNoiseDigits(DigitMap & digits)
 
   // Zero-suppress existing digits.
   double threshold_charge = m_SNAdjacent * m_elNoise;
-  for (DigitMapItr iDigit = digits.begin(); iDigit != digits.end(); ++iDigit)
+
+  DigitMapItr iDigit = digits.begin();
+  while (iDigit != digits.end())
     if (iDigit->second.charge < threshold_charge)
-      digits.erase(iDigit);
+      digits.erase(iDigit++);
+    else
+      ++iDigit;
+
 
   // Calculate the fraction of pixels that will be above threshold.
   double fraction = 1.0 - TMath::Freq(m_SNAdjacent);
@@ -954,7 +955,6 @@ void PXDDigiModule::saveDigits(DigitMap & digits)
 
 
   CellUniIDManager codec(0);
-
   for (DigitMapItr iDigit = digits.begin(); iDigit != digits.end(); ++iDigit) {
 
     int cellUniID = iDigit->first;
@@ -967,9 +967,13 @@ void PXDDigiModule::saveDigits(DigitMap & digits)
     float u = static_cast<float>(m_geometry->getUCellPosition(m_currentSensorUniID, iU));
     float v = static_cast<float>(m_geometry->getVCellPosition(m_currentSensorUniID, iV));
 
+    double charge = digit.charge;
+    if (m_ADC) // convert to ADU
+      charge = getInADCUnits(digit.charge);
+
     int digIndex = storeDigits->GetLast() + 1;
     new(storeDigits->AddrAt(digIndex)) PXDDigit(
-      m_currentSensorUniID, iU, iV, u, v, digit.charge
+      m_currentSensorUniID, iU, iV, u, v, charge
     );
     m_nDigitsSaved++;
 
@@ -980,6 +984,7 @@ void PXDDigiModule::saveDigits(DigitMap & digits)
       // Get hit index and weight
       StoreIndex iHit = iLink->first;
       double weight = iLink->second;
+      // I don't convert to ADC units here. Shall I?
 
       // Get the hit's MCParticle: should be at most one!
       StoreIndex iMCPart = 0;
@@ -1026,7 +1031,6 @@ void PXDDigiModule::printModuleParams() const
 {
   B2INFO("\nPXDDigiModule parameters: " << endl)
   B2INFO("  DiffusionCoefficient[um]:          " << m_diffusionCoefficient / Unit::um);
-  B2INFO("  Ganged pixels option:              " << m_gangedPixels);
   if (m_electronicEffects) {
     B2INFO("  El. noise [fC]:                    " << m_elNoise / Unit::fC)
   }

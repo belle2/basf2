@@ -109,12 +109,12 @@ namespace Belle2 {
      */
     double m_energyHER;
 
+    /** Angle between beams. */
+    double m_crossAngle;
+
     /** Angle in the lab system
      */
     double m_angleLER;
-
-    /** Angle between beams. */
-    double m_crossAngle;
 
     /** ROOT Macro to make RunMetaData a ROOT class.
      */

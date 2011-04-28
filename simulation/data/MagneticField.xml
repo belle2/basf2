@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ParamSet type="MagneticField">
+	<Name>MagneticField</Name>
+	<Description>The magnetic field description for the Belle II Detector</Description>
+	<Version>0</Version>
+        <Creator>GeoMagneticField</Creator>
+	<Content>
+		<!-- The components of the Belle II magnetic field -->		
+		<Components>
+			<Component type="Constant">
+				<X>0.0</X>
+				<Y>0.0</Y>
+				<Z>1.5</Z>
+			</Component>
+			<!--Component type="Radial">
+
+			</Component-->
+		</Components>
+	</Content>
+</ParamSet>

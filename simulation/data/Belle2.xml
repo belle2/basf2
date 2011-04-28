@@ -4,7 +4,7 @@
   <Description>The Belle II detector</Description>
   <Global>
     <xi:include href="GlobalParams.xml"/>
-    <!--xi:include href="FieldBelleII.xml"/-->
+    <xi:include href="MagneticField.xml"/>
   </Global>
   <MaterialSets>
     <xi:include href="BasicMaterials.xml"/>

@@ -7,13 +7,33 @@
 	<Content>
 		<!-- The components of the Belle II magnetic field -->		
 		<Components>
+			<!-- Homogeneous magnetic field -->		
 			<Component type="Constant">
 				<X>0.0</X>
 				<Y>0.0</Y>
 				<Z>1.5</Z>
 			</Component>
-			<!--Component type="Radial">
 
+			<!-- Radial solenoid magnetic field map
+			     The magnetic field map is stored as a grid in cylindrical coordinates.
+			     It is defined by a minimum radius and a maximum radius, a minimum z and
+			     a maximum z value, a pitch size in both, r and z, and the number of grid
+			     points. The ZOffset is used to account for the fact that the acceleration
+			     group defines 0 to be in the center of the detector, while the detector
+			     group defines the IP to be the center. The filename points to the zip file
+			     containing the magnetic field map.
+			-->
+			<!--Component type="Radial">
+				<NumberGridPointsR>175</NumberGridPointsR>
+				<GridPitchR unit="cm">1.0</GridPitchR>
+				<RadiusMin unit="cm">0.0</RadiusMin>
+				<RadiusMax unit="cm">174.0</RadiusMax>
+				<NumberGridPointsZ>801</NumberGridPointsZ>
+				<GridPitchZ unit="cm">1.0</GridPitchZ>
+				<ZMin unit="cm">0.0</ZMin>
+				<ZMax unit="cm">174.0</ZMax>
+				<ZOffset unit="cm">47.0</ZOffset>
+				<MapFilename>simulation/SolenoidFieldMap.dat.gz</MapFilename>
 			</Component-->
 		</Components>
 	</Content>

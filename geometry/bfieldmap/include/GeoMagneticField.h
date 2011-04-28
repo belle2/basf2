@@ -63,6 +63,12 @@ namespace Belle2 {
      */
     void readConstantBField(GearDir& component);
 
+    /**
+     * Reads the parameters for a radial magnetic field and adds the component to the global magnetic field.
+     * @param component The GearDir pointing to the component parameter block from which the parameters should be read.
+     */
+    void readRadialBField(GearDir& component);
+
 
   private:
 

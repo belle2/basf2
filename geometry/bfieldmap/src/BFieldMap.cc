@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include <geometry/bfieldmap/BFieldMap.h>
+#include <framework/logging/Logger.h>
 
 #include <boost/foreach.hpp>
 
@@ -28,9 +29,19 @@ BFieldMap& BFieldMap::Instance()
 }
 
 
-const TVector3 BFieldMap::getBField(const TVector3& point) const
+const TVector3 BFieldMap::getBField(const TVector3& point)
 {
   TVector3 magFieldVec(0.0, 0.0, 0.0);
+
+  //Check if the map has been initialized yet. If not, initialize all components of the map.
+  if (!m_isMapInitialized) {
+    BOOST_FOREACH(BFieldComponentAbs* comp, m_components) {
+      comp->initialize();
+    }
+
+    m_isMapInitialized = true;
+    B2DEBUG(10, "The magnetic field map has been initialized.")
+  }
 
   //Loop over all magnetic field components and add their magnetic field vectors
   BOOST_FOREACH(BFieldComponentAbs* comp, m_components) {
@@ -45,7 +56,7 @@ const TVector3 BFieldMap::getBField(const TVector3& point) const
 //                          Private methods
 //====================================================================
 
-BFieldMap::BFieldMap()
+BFieldMap::BFieldMap() : m_isMapInitialized(false)
 {
 
 }

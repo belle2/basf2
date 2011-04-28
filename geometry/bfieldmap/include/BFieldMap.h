@@ -48,7 +48,7 @@ namespace Belle2 {
      * @param point The space point in Cartesian coordinates.
      * @return A three vector of the magnetic field in [T] at the specified space point.
      */
-    const TVector3 getBField(const TVector3& point) const;
+    const TVector3 getBField(const TVector3& point);
 
     /**
      * Adds a new BField component to the Belle II magnetic field.
@@ -64,6 +64,8 @@ namespace Belle2 {
 
 
   private:
+
+    bool m_isMapInitialized; /**< If false the map hasn't been initialized yet.*/
 
     /** The constructor is hidden to avoid that someone creates an instance of this class. */
     BFieldMap();
@@ -97,7 +99,6 @@ namespace Belle2 {
   {
     BFIELDCOMP* newComponent = new BFIELDCOMP;
     m_components.push_back(newComponent);
-    newComponent->initialize();
     return *newComponent;
   }
 

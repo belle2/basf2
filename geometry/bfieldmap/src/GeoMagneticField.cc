@@ -10,7 +10,9 @@
 
 #include <geometry/bfieldmap/GeoMagneticField.h>
 #include <geometry/bfieldmap/BFieldMap.h>
+
 #include <geometry/bfieldmap/BFieldComponentConstant.h>
+#include <geometry/bfieldmap/BFieldComponentRadial.h>
 
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/GearDir.h>
@@ -38,6 +40,7 @@ GeoMagneticField::GeoMagneticField() : CreatorBase("GeoMagneticField")
 
   //Add the function pointers called for reading the components to the map
   m_componentTypeMap.insert(make_pair("Constant", boost::bind(&GeoMagneticField::readConstantBField, this, _1)));
+  m_componentTypeMap.insert(make_pair("Radial",   boost::bind(&GeoMagneticField::readRadialBField,   this, _1)));
 }
 
 
@@ -82,4 +85,25 @@ void GeoMagneticField::readConstantBField(GearDir& component)
 
   BFieldComponentConstant& bComp = BFieldMap::Instance().addBFieldComponent<BFieldComponentConstant>();
   bComp.setMagneticFieldValues(xValue, yValue, zValue);
+}
+
+
+void GeoMagneticField::readRadialBField(GearDir& component)
+{
+  string mapFilename   = component.getParamString("MapFilename");
+  int mapSizeR         = component.getParamIntValue("NumberGridPointsR");
+  int mapSizeZ         = component.getParamIntValue("NumberGridPointsZ");
+
+  double mapRegionMinZ = component.getParamLength("ZMin");
+  double mapRegionMaxZ = component.getParamLength("ZMax");
+  double mapOffset   = component.getParamLength("ZOffset");
+
+  double mapRegionMinR = component.getParamLength("RadiusMin");
+  double mapRegionMaxR = component.getParamLength("RadiusMax");
+
+  BFieldComponentRadial& bComp = BFieldMap::Instance().addBFieldComponent<BFieldComponentRadial>();
+  bComp.setMapFilename(mapFilename);
+  bComp.setMapSize(mapSizeR, mapSizeZ);
+  bComp.setMapRegionZ(mapRegionMinZ, mapRegionMaxZ, mapOffset);
+  bComp.setMapRegionR(mapRegionMinR, mapRegionMaxR);
 }

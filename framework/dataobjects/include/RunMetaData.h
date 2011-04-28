@@ -11,6 +11,9 @@
 #define RUNMETADATA_H
 
 #include <TObject.h>
+#include <framework/utilities/Boosts.h>
+#include <framework/gearbox/Unit.h>
+
 
 namespace Belle2 {
 
@@ -18,55 +21,68 @@ namespace Belle2 {
    *
    *  This object is supposed to be updated during the beginRun function.
    *  Currently stored information: <br>
-   *  Center of mass energy <br>
-   *  \f$\gamma\f$ factor of the initial resonance in the lab frame. <br>
+   *  LER beam energy, HER beam energy, crossing angle of the beams, and angle between LER beam and solenoid axis. <br>
+   *  The latter two are probably constants during the lifetime of the experiment, but maybe changed for design studies. <br>
+   *  The Center of Mass energy and the \f$\gamma\f$ factor of the initial resonance in the lab frame can be calculated from the
+   *  these variables.
    *
    *  @author <a href="mailto:martin.heck@kit.edu?subject=RunMetaData">Martin Heck</a>
    */
   class RunMetaData : public TObject {
   public:
 
+
     /** Constructor.
      *
-     *  @param cmsEnergy Energy in the center of mass system, by default set to the Y(4S) mass.
-     *  @param labGamma  \f$\gamma\f$ factor in the lab frame, by default set to the value for the Y(4S) at beam energies of 4 vs. 7 GeV.
+     *  @param LER            Energy of the positron beam.
+     *  @param HER            Energy of the electron beam.
+     *  @param crossingAngle  Angle of crossing between the two beams
+     *  @param angleLER       Angle between the LER beam and the solenoid axis, defining the axis of the Belle II detector.
      */
-    RunMetaData(const double& cmsEnergy = 10.5794 , const double& labGamma = 1.0398)
-        : m_cmsEnergy(cmsEnergy), m_labGamma(labGamma) {}
+    RunMetaData(const float& energyLER = 4.0, const float& energyHER = 7.0,
+                const float& crossAngle = 83 * Unit::mrad,
+                const float& angleLER = 41.5 * Unit::mrad)
+        : m_energyLER(energyLER), m_energyHER(energyHER), m_crossAngle(crossAngle), m_angleLER(angleLER) {}
 
     /** Destructor. */
     ~RunMetaData() {}
 
-    /** Center of mass energy setter.
-     *
-     *  @param cmsEnergy Center of mass energy.
-     */
-    void setCmsEnergy(const double& cmsEnergy) {
-      m_cmsEnergy = cmsEnergy;
-    }
-
-    /** \f$\gamma\f$ factor setter.
-     *
-     *  @param gammaLab \f$\gamma\f$ factor in the lab frame.
-     */
-    void setLabGamma(const double& labGamma) {
-      m_labGamma = labGamma;
-    }
-
     /** Center of mass energy getter.
      *
+     *  Will be implemented soon.
      *  @return Center of mass ernergy of the current run.
      */
-    unsigned long getCmsEnergy() const {
-      return m_cmsEnergy;
+    float getCmsEnergy() {
+      return -999.;
     }
 
     /** \f$\gamma\f$ factor getter.
      *
+     *  Will be implemented soon.
      *  @return \f$\gamma\f$ factor of the initial resonance in the lab frame.
      */
-    unsigned long getLabGamma() const {
-      return m_labGamma;
+    float getLabGamma() {
+      return -999;
+    }
+
+    /** LER energy getter. */
+    float getEnergyLER() {
+      return m_energyLER;
+    }
+
+    /** HER energy getter. */
+    float getEnergyHER() {
+      return m_energyHER;
+    }
+
+    /** Crossing angle getter. */
+    float getCrossingAngle() {
+      return m_crossAngle;
+    }
+
+    /** LER angle getter. */
+    float getAngleLER() {
+      return m_angleLER;
     }
 
     /** Comparison Operator.
@@ -87,11 +103,18 @@ namespace Belle2 {
 
     /** Center of Mass Energy.
      */
-    double m_cmsEnergy;
+    double m_energyLER;
 
     /** \f$\gamma\f$ factor in the lab frame.
      */
-    double m_labGamma;
+    double m_energyHER;
+
+    /** Angle in the lab system
+     */
+    double m_angleLER;
+
+    /** Angle between beams. */
+    double m_crossAngle;
 
     /** ROOT Macro to make RunMetaData a ROOT class.
      */

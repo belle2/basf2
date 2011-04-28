@@ -11,9 +11,13 @@
 #ifndef BFIELDMAP_H_
 #define BFIELDMAP_H_
 
+#include <geometry/bfieldmap/BFieldComponentAbs.h>
+
 #include <TVector3.h>
 
 #include <string>
+#include <list>
+
 
 namespace Belle2 {
 
@@ -23,6 +27,7 @@ namespace Belle2 {
    * This class represents the magnetic field of the Belle II detector.
    * Its main method is getBField() which returns the Bfield vector at the
    * specified space point.
+   *
    * It is designed as a singleton.
    */
   class BFieldMap {
@@ -45,8 +50,17 @@ namespace Belle2 {
      */
     const TVector3 getBField(const TVector3& point) const;
 
+    /**
+     * Adds a new BField component to the Belle II magnetic field.
+     * The class of the magnetic field component has to inherit from BFieldComponentAbs.
+     * @return A reference to the added magnetic field component.
+     */
+    template<class BFIELDCOMP> BFIELDCOMP& addBFieldComponent();
+
 
   protected:
+
+    std::list<BFieldComponentAbs*> m_components; /**< The components of the magnetic field. */
 
 
   private:
@@ -74,6 +88,19 @@ namespace Belle2 {
     friend class SingletonDestroyer;
 
   };
+
+
+  //------------------------------------------------------
+  //       Implementation of template based methods
+  //------------------------------------------------------
+  template<class BFIELDCOMP> BFIELDCOMP&  BFieldMap::addBFieldComponent()
+  {
+    BFIELDCOMP* newComponent = new BFIELDCOMP;
+    m_components.push_back(newComponent);
+    newComponent->initialize();
+    return *newComponent;
+  }
+
 
 } //end of namespace Belle2
 

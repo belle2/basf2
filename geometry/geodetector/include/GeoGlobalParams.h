@@ -10,8 +10,8 @@
 
 #include <geometry/geodetector/CreatorBase.h>
 
-#ifndef GEOGLOBALPARAMS_H_
-#define GEOGLOBALPARAMS_H_
+#ifndef GEOGLOBALPARAMS_H
+#define GEOGLOBALPARAMS_H
 
 
 namespace Belle2 {
@@ -54,4 +54,4 @@ namespace Belle2 {
 
 }
 
-#endif /* GEOGLOBALPARAMS_H_ */
+#endif /* GEOGLOBALPARAMS_H */

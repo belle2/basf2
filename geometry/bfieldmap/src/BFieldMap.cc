@@ -10,6 +10,7 @@
 
 #include <geometry/bfieldmap/BFieldMap.h>
 
+#include <boost/foreach.hpp>
 
 using namespace std;
 using namespace Belle2;
@@ -29,8 +30,13 @@ BFieldMap& BFieldMap::Instance()
 
 const TVector3 BFieldMap::getBField(const TVector3& point) const
 {
-  //const 1.5 Tesla magnetic field in z direction. Hard coded. Sorry.
-  return TVector3(0.0, 0.0, 1.5);
+  TVector3 magFieldVec(0.0, 0.0, 0.0);
+
+  //Loop over all magnetic field components and add their magnetic field vectors
+  BOOST_FOREACH(BFieldComponentAbs* comp, m_components) {
+    magFieldVec += comp->calculate(point);
+  }
+  return magFieldVec;
 }
 
 
@@ -46,5 +52,9 @@ BFieldMap::BFieldMap()
 
 BFieldMap::~BFieldMap()
 {
-
+  //Delete the magnetic field components by calling their terminate() method and freeing their memory.
+  BOOST_FOREACH(BFieldComponentAbs* comp, m_components) {
+    comp->terminate();
+    delete comp;
+  }
 }

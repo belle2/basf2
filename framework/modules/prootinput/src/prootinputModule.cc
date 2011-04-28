@@ -7,6 +7,7 @@
 //-
 
 #include <framework/modules/prootinput/prootinputModule.h>
+#include <framework/core/Environment.h>
 
 #include <boost/format.hpp>
 
@@ -111,7 +112,7 @@ void pRootInputModule::initialize()
   m_nevt = m_tree[DataStore::c_Event]->GetEntries();
 
   // Attach to ring buffer if nprocess > 0
-  m_nproc = Framework::nprocess();
+  m_nproc = Environment::Instance().getNumberProcesses();
 
   //  printf ( "pRootInput : nproc = %d\n", m_nproc );
   B2WARNING("pRootInput : nproc = " << m_nproc)

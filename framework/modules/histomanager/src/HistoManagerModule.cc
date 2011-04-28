@@ -7,6 +7,7 @@
 //-
 
 #include <framework/modules/histomanager/HistoManagerModule.h>
+#include <framework/core/Environment.h>
 
 #include <framework/core/Framework.h>
 #include <framework/pcore/ProcHandler.h>
@@ -37,7 +38,7 @@ HistoManagerModule::~HistoManagerModule()
 {
   if (m_initmain) {
     cout << "HistoManager:: destructor called from pid=" << ProcHandler::EvtProcID() << endl;
-    if (Framework::nprocess() > 0 && ProcHandler::EvtProcID() == -1) {
+    if (Environment::Instance().getNumberProcesses() > 0 && ProcHandler::EvtProcID() == -1) {
       cout << "HistoManager:: adding histogram files" << endl;
       RbTupleManager::Instance().hadd();
     }
@@ -46,7 +47,7 @@ HistoManagerModule::~HistoManagerModule()
 
 void HistoManagerModule::initialize()
 {
-  RbTupleManager::Instance().init(Framework::nprocess(), m_histfile.c_str());
+  RbTupleManager::Instance().init(Environment::Instance().getNumberProcesses(), m_histfile.c_str());
 
   m_initmain = true;
   cout << "HistoManager::initialization done" << endl;

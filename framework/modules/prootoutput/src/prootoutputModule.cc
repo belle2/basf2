@@ -7,6 +7,7 @@
 //-
 
 #include <framework/modules/prootoutput/prootoutputModule.h>
+#include <framework/core/Environment.h>
 
 #include <stdlib.h>
 
@@ -69,7 +70,7 @@ void pRootOutputModule::initialize()
   }
 
   // Attach to ring buffer if nprocess > 0
-  m_nproc = Framework::nprocess();
+  m_nproc = Environment::Instance().getNumberProcesses();
 
   //  printf ( "pRootInput : nproc = %d\n", m_nproc );
   B2WARNING("pRootInput : nproc = " << m_nproc)
@@ -96,7 +97,7 @@ void pRootOutputModule::beginRun()
 void pRootOutputModule::event()
 {
   //fill Event data
-  if (Framework::nprocess() == 0) {
+  if (Environment::Instance().getNumberProcesses() == 0) {
     fillTree(DataStore::c_Event);
   } else {
     fillRingBuf(DataStore::c_Event);
@@ -225,7 +226,7 @@ void pRootOutputModule::endRun()
 void pRootOutputModule::terminate()
 {
   // Single process mode
-  if (Framework::nprocess() == 0)  {
+  if (Environment::Instance().getNumberProcesses() == 0)  {
     //write the trees
     m_file->cd();
     for (int ii = 0; ii < DataStore::c_NDurabilityTypes; ++ii) {

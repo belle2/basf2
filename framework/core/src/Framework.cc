@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2010-2011  Belle II Collaboration                         *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Andreas Moll                                             *
@@ -10,6 +10,7 @@
  **************************************************************************/
 
 #include <framework/core/Framework.h>
+#include <framework/core/Environment.h>
 
 #include <framework/logging/Logger.h>
 #include <framework/logging/LogConnectionIOStream.h>
@@ -28,16 +29,12 @@ using namespace Belle2;
 
 using namespace boost::python;
 
-// Static variable
-int Framework::m_nproc = 0;
-
 
 Framework::Framework()
 {
   m_pathManager = new PathManager();
   m_eventProcessor = new EventProcessor(*m_pathManager);
   m_peventProcessor = new pEventProcessor(*m_pathManager);
-  m_nproc = 0;
 }
 
 
@@ -52,6 +49,12 @@ Framework::~Framework()
 void Framework::addModuleSearchPath(const string& path)
 {
   ModuleManager::Instance().addModuleSearchPath(path);
+}
+
+
+void Framework::setDataSearchPath(const std::string& path)
+{
+  Environment::Instance().setDataSearchPath(path);
 }
 
 
@@ -75,7 +78,7 @@ PathPtr Framework::createPath() throw(PathManager::PathNotCreatedError)
 
 void Framework::process(PathPtr startPath)
 {
-  if (m_nproc == 0)
+  if (Environment::Instance().getNumberProcesses() == 0)
     m_eventProcessor->process(startPath);
   else
     m_peventProcessor->process(startPath);
@@ -89,16 +92,16 @@ void Framework::process(PathPtr startPath, long maxEvent)
 }
 
 
-
-void Framework::set_nprocess(int nproc)
+void Framework::setNumberProcesses(int number)
 {
-  m_nproc = nproc;
-  m_peventProcessor->nprocess(nproc);
+  Environment::Instance().setNumberProcesses(number);
+  m_peventProcessor->nprocess(number);
 }
 
-int Framework::nprocess(void)
+
+int Framework::getNumberProcesses()
 {
-  return m_nproc;
+  return Environment::Instance().getNumberProcesses();
 }
 
 
@@ -222,11 +225,11 @@ void Framework::exposePythonAPI()
   ModulePtr(Framework::*registerModule2)(string, string) = &Framework::registerModule;
   void(Framework::*process1)(PathPtr) = &Framework::process;
   void(Framework::*process2)(PathPtr, long) = &Framework::process;
-  void(Framework::*set_nprocess)(int) = &Framework::set_nprocess;
 
   //Expose framework class
   class_<Framework>("Framework")
   .def("add_module_search_path", &Framework::addModuleSearchPath)
+  .def("set_data_search_path", &Framework::setDataSearchPath)
   .def("list_module_search_paths", &Framework::getModuleSearchPathsPython)
   .def("list_available_modules", &Framework::getAvailableModulesPython)
   .def("register_module", registerModule1)
@@ -235,7 +238,7 @@ void Framework::exposePythonAPI()
   .def("create_path", &Framework::createPath)
   .def("process", process1)
   .def("process", process2)
-  .def("set_nprocess", set_nprocess)
+  .def("set_nprocess", &Framework::setNumberProcesses)
   .def("read_evtgen_table", &Framework::readEvtGenTableFromFile)
   .def("set_log_level", &Framework::setLogLevel)
   .def("set_debug_level", &Framework::setDebugLevel)

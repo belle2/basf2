@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2010-2011  Belle II Collaboration                         *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Andreas Moll                                             *
@@ -58,6 +58,13 @@ namespace Belle2 {
      * @param path The module search path which should be added to the list of paths.
     */
     void addModuleSearchPath(const std::string& path);
+
+    /**
+     * Sets the path in which the data for the framework, such as geometry information, is located.
+     *
+     * @param path The path in which the data for the framework is located.
+    */
+    void setDataSearchPath(const std::string& path);
 
     /**
      * Registers a new module to the framework and returns a shared pointer.
@@ -119,14 +126,16 @@ namespace Belle2 {
     /**
      * Function to set number of processes for parallel processing.
      *
-     * @param nproc Number of processes for parallel processing
+     * @param number Number of processes for parallel processing
     */
-    void set_nprocess(int nproc);
+    void setNumberProcesses(int number);
 
     /**
      * Function to get number of processes for parallel processing.
+     *
+     * @return Number of processes for parallel processing
     */
-    static int nprocess(void);
+    int getNumberProcesses();
 
     /**
      * Reads the particle information from the evtgen table file specified by its filename.

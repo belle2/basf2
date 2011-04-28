@@ -7,6 +7,7 @@
 //-
 
 #include <framework/modules/pseqrootinput/pseqrootinputModule.h>
+#include <framework/core/Environment.h>
 #include <stdlib.h>
 
 using namespace std;
@@ -55,7 +56,7 @@ void pSeqRootInputModule::initialize()
   }
 
   // Attach to ring buffer if nprocess > 0
-  m_nproc = Framework::nprocess();
+  m_nproc = Environment::Instance().getNumberProcesses();
 
   //  printf ( "pRootInput : nproc = %d\n", m_nproc );
   B2WARNING("pRootInput : nproc = " << m_nproc)

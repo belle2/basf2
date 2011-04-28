@@ -61,6 +61,9 @@ fw = Framework()
 # Add the module search path pointing to the modules shipped with the framework
 fw.add_module_search_path(basf2moddir)
 
+# Sets the data path in which the data files for the framework are located
+fw.set_data_search_path(basf2datadir)
+
 # -----------------------------------------------
 #         Load evtgen particle tables
 # -----------------------------------------------

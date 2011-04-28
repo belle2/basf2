@@ -7,6 +7,7 @@
 //-
 
 #include <framework/modules/pseqrootoutput/pseqrootoutputModule.h>
+#include <framework/core/Environment.h>
 #include <stdlib.h>
 
 using namespace std;
@@ -55,7 +56,7 @@ void pSeqRootOutputModule::initialize()
   }
 
   // Attach to ring buffer if nprocess > 0
-  m_nproc = Framework::nprocess();
+  m_nproc = Environment::Instance().getNumberProcesses();
 
   //  printf ( "pRootInput : nproc = %d\n", m_nproc );
   B2WARNING("pRootInput : nproc = " << m_nproc)
@@ -126,7 +127,7 @@ void pSeqRootOutputModule::endRun()
 void pSeqRootOutputModule::terminate()
 {
   // Single process mode
-  if (Framework::nprocess() == 0)  {
+  if (Environment::Instance().getNumberProcesses() == 0)  {
     delete m_file;
   } else { // Parallel processing
     // Send termination packet to output server

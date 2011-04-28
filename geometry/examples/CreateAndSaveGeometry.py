@@ -22,8 +22,6 @@ evtmetagen.param(evtruninfo)
 
 # Geometry parameter loader
 paramloader = register_module('ParamLoaderXML')
-paramloader.param('InputFileXML', os.path.join(basf2datadir,
-                  'simulation/Belle2.xml'))
 
 # Geometry builder
 geobuilder = register_module('GeoBuilder')

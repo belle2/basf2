@@ -10,6 +10,7 @@
 
 #include <geometry/modules/geobuilder/ParamLoaderXMLModule.h>
 
+#include <framework/core/Environment.h>
 #include <framework/core/ModuleUtils.h>
 #include <framework/gearbox/Gearbox.h>
 #include <framework/gearbox/GearboxIOXML.h>
@@ -32,7 +33,8 @@ ParamLoaderXMLModule::ParamLoaderXMLModule() : Module()
   setDescription("Loads the Belle II detector parameters from a XML document.");
 
   //Parameter definition
-  addParam("InputFileXML",  m_filenameXML, "The filename of the XML input file which should be loaded.");
+  addParam("InputFileXML",  m_filenameXML, "The filename of the XML input file which should be loaded.",
+           Environment::Instance().getDataSearchPath() + "/simulation/Belle2.xml");
   addParam("ParamCheck",  m_paramCheck, "Turns on/off parameter validation. Turn it on for debugging.", false);
 }
 

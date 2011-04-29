@@ -68,6 +68,12 @@ namespace Belle2 {
 
   private:
 
+    /** Reads one SAD particle per event into the MCParticle graph.
+     * @param reader Reference to the Touschek SAD reader from which the data is read.
+     * @param mpg Reference to the MCParticle Graph which is filled for each event.
+     */
+    void readSADParticle(TouschekReaderSAD& reader, MCParticleGraph& mpg);
+
     /** Reads one real particle per event into the MCParticle graph.
      * @param reader Reference to the Touschek SAD reader from which the data is read.
      * @param mpg Reference to the MCParticle Graph which is filled for each event.

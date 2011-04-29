@@ -71,10 +71,34 @@ void TouschekReaderSAD::open(const string& filename) throw(TouschekCouldNotOpenF
   m_tree->SetBranchAddress("px", &m_lostPx);
   m_tree->SetBranchAddress("py", &m_lostPy);
   m_tree->SetBranchAddress("w", &m_lostW);
+
+  m_readEntry = 0;
 }
 
 
-double TouschekReaderSAD::getParticle(MCParticleGraph& graph)
+double TouschekReaderSAD::getSADParticle(MCParticleGraph& graph)
+{
+  if (m_tree == NULL) {
+    B2ERROR("The SAD tree doesn't exist !")
+    return -1;
+  }
+
+  do {
+    //Check for end of file
+    if (m_readEntry >= m_tree->GetEntries()) throw TouschekEndOfFile();
+
+    //Load the SAD particle
+    m_tree->GetEntry(m_readEntry);
+    convertParamsToSADUnits();
+    m_readEntry++;
+  } while (fabs(m_lostS) > m_sRange);
+
+  addParticleToMCParticles(graph);
+  return m_lostW;
+}
+
+
+double TouschekReaderSAD::getRealParticle(MCParticleGraph& graph)
 {
   if (m_tree == NULL) {
     B2ERROR("The SAD tree doesn't exist !")
@@ -106,7 +130,7 @@ double TouschekReaderSAD::getParticle(MCParticleGraph& graph)
 
   //Create a new real particle from the SAD particle
   if ((fabs(m_lostS) <= m_sRange) && (m_realPartNum > 0)) {
-    addParticleToMCParticles(graph);
+    addParticleToMCParticles(graph, true);
     B2DEBUG(10, "* Created real particle " << m_realPartEntry + 1 << "/" << m_realPartNum << " for SAD particle " << m_readEntry << "/" << m_tree->GetEntries())
   }
 
@@ -146,7 +170,7 @@ void TouschekReaderSAD::convertParamsToSADUnits()
 }
 
 
-void TouschekReaderSAD::addParticleToMCParticles(MCParticleGraph& graph)
+void TouschekReaderSAD::addParticleToMCParticles(MCParticleGraph& graph, bool gaussSmearing)
 {
   double particlePosTouschek[3] = {0.0, 0.0, 0.0};
   double particlePosGeant4[3] = {0.0, 0.0, 0.0};
@@ -172,8 +196,14 @@ void TouschekReaderSAD::addParticleToMCParticles(MCParticleGraph& graph)
   //Flip the sign for the y and z component to go from the accelerator to the detector coordinate system
   //Calculate the missing pz by using the nominal beam energy
   double totalMomSqr = (m_beamenergy * m_beamenergy) - (particle.getMass() * particle.getMass());
-  particleMomTouschek[0] = m_random.Gaus(m_lostPx, m_pxRes * m_lostPx); //1% px resolution
-  particleMomTouschek[1] = -1.0 * m_random.Gaus(m_lostPy, m_pyRes * m_lostPy);
+
+  if (gaussSmearing) {
+    particleMomTouschek[0] = m_random.Gaus(m_lostPx, m_pxRes * m_lostPx); //1% px resolution
+    particleMomTouschek[1] = -1.0 * m_random.Gaus(m_lostPy, m_pyRes * m_lostPy);
+  } else {
+    particleMomTouschek[0] = m_lostPx;
+    particleMomTouschek[1] = -m_lostPy;
+  }
   particleMomTouschek[2] = -sqrt(totalMomSqr - (particleMomTouschek[0] *  particleMomTouschek[0]) - (particleMomTouschek[1] *  particleMomTouschek[1]));
   m_transMatrix->LocalToMasterVect(particleMomTouschek, particleMomGeant4);
 

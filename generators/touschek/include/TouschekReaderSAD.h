@@ -78,13 +78,22 @@ namespace Belle2 {
     void setMomentumRes(double pxRes, double pyRes) { m_pxRes = pxRes; m_pyRes = pyRes; }
 
     /**
+     * Reads one SAD particle from the file and creates one event per SAD particle.
+     * The weight of the SAD particle is stored in the weight attribute of the event meta info.
+     *
+     * @param graph Reference to the graph which should be filled with the information from the Touschek file.
+     * @return The weight of the SAD particle which was read. Returns -1 if an error occurred.
+     */
+    double getSADParticle(MCParticleGraph& graph);
+
+    /**
      * Reads one SAD particle from the file, calculates the number of real particles which are represented by the SAD particle
      * and creates one event per real particle.
      *
      * @param graph Reference to the graph which should be filled with the information from the Touschek file.
-     * @return The weight of the SAD particle which was read. Returns -1 if an error occured.
+     * @return The weight of the SAD particle which was read. Returns -1 if an error occurred.
      */
-    double getParticle(MCParticleGraph& graph);
+    double getRealParticle(MCParticleGraph& graph);
 
     /**
      * Reads all SAD particles from the file into the MCParticles collection which are inside the specified s range.
@@ -129,8 +138,9 @@ namespace Belle2 {
     /** Adds the current particle described by the member variables to the MCParticles collection.
      *
      * @param graph Reference to the graph which should be filled with the information from the Touschek file.
+     * @param gaussSmearing If set to true the particle momentum is smeared using a Gaussian.
      */
-    void addParticleToMCParticles(MCParticleGraph& graph);
+    void addParticleToMCParticles(MCParticleGraph& graph, bool gaussSmearing = false);
 
     /**
      * Calculates the number of real particles for a Touschek particle.

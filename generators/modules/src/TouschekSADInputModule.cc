@@ -41,7 +41,7 @@ TouschekSADInputModule::TouschekSADInputModule() : Module()
 
   //Parameter definition
   addParam("ReadoutTime",     m_readoutTime,   "The readout time of the detector [ns]", 20 * Unit::us);
-  addParam("ReadMode",        m_readMode,      "The read mode: 0 = one real particle per event, 1 = all SAD particles per event", 0);
+  addParam("ReadMode",        m_readMode,      "The read mode: 0 = one SAD particle per event, 1 = one real particle per event, 2 = all SAD particles per event", 0);
   addParam("FilenameLER",     m_filenameLER,   "The filename of the LER SAD input file.");
   addParam("RangeLER",        m_rangeLER,      "All particles within the range around the IP are loaded [cm].", 300.0 * Unit::cm);
   addParam("BeamEnergyLER",   m_beamEnergyLER, "The beam energy of the LER [GeV].", 4.0 * Unit::GeV);
@@ -93,11 +93,13 @@ void TouschekSADInputModule::event()
       //       Read the LER data
       //----------------------------------
       switch (m_readMode) {
-        case 0:  readRealParticle(m_readerLER, mpg);
+        case 0:  readSADParticle(m_readerLER, mpg);
           break;
-        case 1:  m_readerLER.addAllSADParticles(mpg);
+        case 1:  readRealParticle(m_readerLER, mpg);
           break;
-        default: readRealParticle(m_readerLER, mpg);
+        case 2:  m_readerLER.addAllSADParticles(mpg);
+          break;
+        default: readSADParticle(m_readerLER, mpg);
           break;
       }
 
@@ -121,10 +123,19 @@ void TouschekSADInputModule::event()
 //                       Private methods
 //====================================================================
 
+void TouschekSADInputModule::readSADParticle(TouschekReaderSAD& reader, MCParticleGraph& mpg)
+{
+  StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
+  double weight = reader.getSADParticle(mpg);
+  if (weight < 0) return;
+  eventMetaDataPtr->setGeneratedWeight(weight);
+}
+
+
 void TouschekSADInputModule::readRealParticle(TouschekReaderSAD& reader, MCParticleGraph& mpg)
 {
   StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
-  double weight = reader.getParticle(mpg);
+  double weight = reader.getRealParticle(mpg);
   if (weight < 0) return;
   eventMetaDataPtr->setGeneratedWeight(weight);
 }

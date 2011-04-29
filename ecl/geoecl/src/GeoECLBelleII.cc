@@ -23,6 +23,8 @@
 #include <iomanip>
 
 
+#include <TGeoArb8.h>
+
 #include <TMath.h>
 #include <TVector3.h>
 #include <TGeoMatrix.h>
@@ -65,12 +67,6 @@ void GeoECLBelleII::create(GearDir& content)
   TGeoVolumeAssembly* volECL = addSubdetectorGroup("ECL", new TGeoCombiTrans(0.0, 0.0, 0.0, geoRot));
 
   //Add the TGeo creating code here
-  GearDir detcontent(content);
-  B2INFO("detcontent = " << detcontent.getDirPath().c_str());
-  detcontent.append("BarrelCrystals/");
-  int Ncounters = detcontent.getNumberNodes("BarrelCrystal");
-  B2INFO("detcontent = " << detcontent.getDirPath().c_str() << " with " << Ncounters << "  nodes");
-
 
   TGeoMixture *matCsI = new TGeoMixture("CsI", 2, 4.510);
   TGeoElementTable *eltable = gGeoManager->GetElementTable();
@@ -78,17 +74,7 @@ void GeoECLBelleII::create(GearDir& content)
   TGeoElement *iodine = eltable->GetElement(55);
   matCsI->AddElement(cesium, 0.4885);
   matCsI->AddElement(iodine, 0.5115);
-  matCsI->Print();
-  /*
-          TGeoMedium *CsI = new TGeoMedium("CsI", 1, matCsI);
-          TGeoMaterial *matAl = new TGeoMaterial("Al", 26.98,13,2.7);
-          TGeoMedium *Al = new TGeoMedium("Root Material",2, matAl);
-  */
 
-
-  //TGeoVolumeAssembly* group = addSubdetectorGroup("TUT");
-  //makeENDCAP(content, group);
-  //makeBarrel(content, group);
   makeENDCAP(content, volECL);
   makeBarrel(content, volECL);
 
@@ -206,16 +192,17 @@ void GeoECLBelleII::makeBarrel(GearDir& content, TGeoVolumeAssembly* group)
     pos_phi.RotateZ(k_phiC);//
 
 
-//  for (int iBox=0; iBox<70; ++iBox) {//total 72
     for (int iBox = 0; iBox < nblock; ++iBox) {//total 72
 
       int cry_id1 = 2 * nblock * (iBrCry - 1) + 2 * iBox + 1152;
       int cry_id2 = 2 * nblock * (iBrCry - 1) + 2 * iBox + 1 + 1152;
       sprintf(stemp, "SD_cid_%04d", cry_id1);
-      boxcopy[cry_id1] = gGeoManager->MakeArb8(stemp, CsI, cDz, vtx);
+//      boxcopy[cry_id1] = gGeoManager->MakeArb8(stemp, CsI, cDz, vtx);
+      boxcopy[cry_id1] = gGeoManager->MakeTrap(stemp, CsI, cDz , 0 , 0, cDy1, cDx2, cDx1, 0, cDy2 , cDx4, cDx3, 0);
 
       sprintf(stemp, "SD_cid_%04d", cry_id2);
-      boxcopy[cry_id2] = gGeoManager->MakeArb8(stemp, CsI, cDz, vtx);
+//      boxcopy[cry_id2] = gGeoManager->MakeArb8(stemp, CsI, cDz, vtx);
+      boxcopy[cry_id2] = gGeoManager->MakeTrap(stemp, CsI, cDz , 0 , 0, cDy1, cDx2, cDx1, 0, cDy2 , cDx4, cDx3, 0);
       TGeoRotation    r("gRot", 0.0, 0.0, 360.*iBox / nblock);
       TGeoRotation    rr("gRot", 0.0, 0.0, 360.*iBox / nblock - 2.494688);
 
@@ -249,97 +236,105 @@ void GeoECLBelleII::makeENDCAP(GearDir& content, TGeoVolumeAssembly* group)
 
 
   GearDir detcontent_ecap(content);
-  //double fin_thickness = detcontent_ecap.getParamLength("k_fin_thickness"); // not used (by T.Hara)
   int    nblock = int(detcontent_ecap.getParamNumValue("k_endcap_Nblock"));
-
+  double halflength = double(detcontent_ecap.getParamLength("k_Crystall_HalfLength"));
 
   detcontent_ecap.append("EndCapCrystals/");
   int Ncounters_ecap = detcontent_ecap.getNumberNodes("EndCapCrystal");
   B2INFO("detcontent_ecap = " << detcontent_ecap.getDirPath().c_str() << " with " << Ncounters_ecap << "nodes");
 
-  double vtx[15];
-  double transx, transy, transz, roty, rotz, halflength;
+  double h1, h2, bl1, bl2, tl1, tl2, alpha1, alpha2, Rphi1, Rphi2, Rtheta, Pr, Ptheta, Pphi;
   char stemp_ecap[100];
   //TGeoVolume *counterbox[200]; // not used (by T.Hara)
   TGeoVolume *boxcopy[8736];
   int box_id = 0;
   int box_id1 = 0;
 
-//        for (int i = 1 ; i <= 132 ; ++i) {//total 132
   for (int i = 1 ; i <= Ncounters_ecap ; ++i) {
     if (i % 100 == 0) B2INFO("ECL counter " << i << "read");
-    for (int j = 0 ; j < 15 ; ++j) vtx[j] = 0;
     GearDir counter(detcontent_ecap);
     sprintf(stemp_ecap, "EndCapCrystal[%d]/", i);
     counter.append(stemp_ecap);
-    halflength = 15.0;
 //              printf ("HalfLength = %f\n", counter.getParamLength("HalfLength"));
-    vtx[0] = counter.getParamLength("vx0");
-    vtx[1] = counter.getParamLength("vy0");
-    vtx[2] = counter.getParamLength("vx1");
-    vtx[3] = counter.getParamLength("vy1");
-    vtx[4] = counter.getParamLength("vx2");
-    vtx[5] = counter.getParamLength("vy2");
-    vtx[6] = counter.getParamLength("vx3");
-    vtx[7] = counter.getParamLength("vy3");
-    vtx[8] = counter.getParamLength("vx4");
-    vtx[9] = counter.getParamLength("vy4");
-    vtx[10] = counter.getParamLength("vx5");
-    vtx[11] = counter.getParamLength("vy5");
-    vtx[12] = counter.getParamLength("vx6");
-    vtx[13] = counter.getParamLength("vy6");
-    vtx[14] = counter.getParamLength("vx7");
-    vtx[15] = counter.getParamLength("vy7");
-    transx = counter.getParamLength("TransX");
-    transy = counter.getParamLength("TransY");
-    transz = counter.getParamLength("TransZ");
-    roty = counter.getParamAngle("RotateY") / deg;
-    rotz = counter.getParamAngle("RotateZ") / deg;
+
+    h1 = counter.getParamLength("K_h1");
+    h2 = counter.getParamLength("K_h2");
+    bl1 = counter.getParamLength("K_bl1");
+    bl2 = counter.getParamLength("K_bl2");
+    tl1 = counter.getParamLength("K_tl1");
+    tl2 = counter.getParamLength("K_tl2");
+    alpha1 = counter.getParamAngle("K_alpha1");
+    alpha2 = counter.getParamAngle("K_alpha2");
+    Ptheta = counter.getParamAngle("K_Ptheta") ;
+    Rphi1 = counter.getParamAngle("K_Rphi1") ;
+    Rtheta = counter.getParamAngle("K_Ptheta") ;
+    Rphi2 = counter.getParamAngle("K_Rphi2")  ;
+    Pr = counter.getParamLength("K_Pr");
+    Ptheta = counter.getParamAngle("K_Ptheta") ;
+    Pphi = counter.getParamAngle("K_Pphi") ;
 
 
 
-    TGeoRotation *rot1 = new TGeoRotation(stemp_ecap);
-    rot1->RotateY(roty);
-    rot1->RotateZ(rotz);
-    TGeoCombiTrans m1(transx, transy, transz, rot1);
+    /*
+       fDz = 15;
+       fTheta = 0;
+       fPhi = 0;
+       fH1 = ;
+       fH2 = h2;
+       fBl1 = bl1;
+       fBl2 = bl2;
+       fTl1 = tl1;
+       fTl2 = tl2;
+       fAlpha1 = alpha1;
+       fAlpha2 = alpha2;
+       Double_t tx = TMath::Tan(theta*TMath::DegToRad())*TMath::Cos(phi*TMath::DegToRad());
+       Double_t ty = TMath::Tan(theta*TMath::DegToRad())*TMath::Sin(phi*TMath::DegToRad());
+       Double_t ta1 = TMath::Tan(alpha1*TMath::DegToRad());
+       Double_t ta2 = TMath::Tan(alpha2*TMath::DegToRad());
+       fXY[0][0] = -dz*tx-h1*ta1-bl1;    fXY[0][1] = -dz*ty-h1;
+       fXY[1][0] = -dz*tx+h1*ta1-tl1;    fXY[1][1] = -dz*ty+h1;
+       fXY[2][0] = -dz*tx+h1*ta1+tl1;    fXY[2][1] = -dz*ty+h1;
+       fXY[3][0] = -dz*tx-h1*ta1+bl1;    fXY[3][1] = -dz*ty-h1;
+       fXY[4][0] = dz*tx-h2*ta2-bl2;    fXY[4][1] = dz*ty-h2;
+       fXY[5][0] = dz*tx+h2*ta2-tl2;    fXY[5][1] = dz*ty+h2;
+       fXY[6][0] = dz*tx+h2*ta2+tl2;    fXY[6][1] = dz*ty+h2;
+       fXY[7][0] = dz*tx-h2*ta2+bl2;    fXY[7][1] = dz*ty-h2;
+    */
 
 
 
-
-//           r1.SetAngles(90,0,30);        // rotation defined by Euler angles
-//           r2.SetAngles(90,90,90,180,0,0); // rotation defined by GEANT3 angles
-//           TGeoTranslation t1(-10,10,0);
-//           TGeoTranslation t2(10,-10,5);
-//           TGeoCombiTrans c1(t1,r1);
-//           TGeoCombiTrans c2(t2,r2);
-//           TGeoHMatrix h = c1 * c2; // composition is done via TGeoHMatrix class
-//   root[7] TGeoHMatrix *ph = new TGeoHMatrix(hm); // this is the one we want to
-
-
+    TGeoRotation m1, m2, m3;
+    m1.RotateZ(Rphi1);
+    m2.RotateY(Rtheta);//m2 = HepRotateY3D( (90-crystal_rotate*zsign)/180*PI );
+    m3.RotateZ(Rphi2);//m3 = HepRotateZ3D(k_phi_TILTED);
+    TGeoTranslation  position("gTrans", Pr*sin(Ptheta*PI / 180)*cos(Pphi*PI / 180)  , Pr*sin(Ptheta*PI / 180)*sin(Pphi*PI / 180) , Pr*cos(Ptheta*PI / 180));
 
 
     if (i <= 72) {
       for (int iBox = 0; iBox < nblock; ++iBox) {//total 16
+//   for (int iBox = 0; iBox < 1; ++iBox) {//total 16
         int cry_id = box_id * nblock + iBox;
         sprintf(stemp_ecap, "SD_cid_%04d", cry_id);
-        boxcopy[cry_id] = gGeoManager->MakeArb8(stemp_ecap, CsI, halflength, vtx);
+//        boxcopy[cry_id] = gGeoManager->MakeArb8(stemp_ecap, CsI, halflength, vtx);
+        boxcopy[cry_id] = gGeoManager->MakeTrap(stemp_ecap, CsI, halflength , 0 , 0, h1 ,   bl1, tl1 , alpha2 , h2   , bl2, tl2, alpha2);
         TGeoRotation    r("gRot", 0.0, 0.0, 360.*iBox / nblock);
-        group->AddNode(boxcopy[cry_id], cry_id, new TGeoHMatrix(r*m1));
+        group->AddNode(boxcopy[cry_id], cry_id, new TGeoHMatrix(r* position*m3*m2*m1));
+
       }
       box_id++;
 
     }
+
     if (i > 72) {
       for (int iBox = 0; iBox < nblock; ++iBox) {//total 16
         int cry_id = box_id1 * nblock + iBox + 7776;
         sprintf(stemp_ecap, "SD_cid_%04d", cry_id);
-        boxcopy[cry_id] = gGeoManager->MakeArb8(stemp_ecap, CsI, halflength, vtx);
+        boxcopy[cry_id] = gGeoManager->MakeTrap(stemp_ecap, CsI, halflength , 0 , 0, h1 ,   bl1, tl1 , alpha2, h2   , bl2, tl2, alpha2);
         TGeoRotation    r("gRot", 0.0, 0.0, 360.*iBox / nblock);
-        group->AddNode(boxcopy[cry_id], cry_id, new TGeoHMatrix(r*m1));
+        group->AddNode(boxcopy[cry_id], cry_id, new TGeoHMatrix(r* position*m3*m2*m1));
       }
       box_id1++;
     }
-
 
   }//Ncounters
   /*

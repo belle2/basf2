@@ -20,8 +20,10 @@
 			     a maximum z value, a pitch size in both, r and z, and the number of grid
 			     points. The ZOffset is used to account for the fact that the acceleration
 			     group defines 0 to be in the center of the detector, while the detector
-			     group defines the IP to be the center. The filename points to the zip file
-			     containing the magnetic field map.
+			     group defines the IP to be the center. This offset will shift the values
+                             from the magnetic field map file to fit inside the region given by the
+                             ZMin and ZMax values. The filename points to the zip file containing the
+                             magnetic field map.
 			-->
 			<!--Component type="Radial">
 				<NumberGridPointsR>175</NumberGridPointsR>
@@ -30,8 +32,8 @@
 				<RadiusMax unit="cm">174.0</RadiusMax>
 				<NumberGridPointsZ>801</NumberGridPointsZ>
 				<GridPitchZ unit="cm">1.0</GridPitchZ>
-				<ZMin unit="cm">0.0</ZMin>
-				<ZMax unit="cm">174.0</ZMax>
+				<ZMin unit="cm">-353.0</ZMin>
+				<ZMax unit="cm">447.0</ZMax>
 				<ZOffset unit="cm">47.0</ZOffset>
 				<MapFilename>simulation/SolenoidFieldMap.dat.gz</MapFilename>
 			</Component-->

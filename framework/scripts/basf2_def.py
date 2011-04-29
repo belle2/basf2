@@ -145,3 +145,13 @@ def reset_log():
     fw.reset_log()
 
 
+def set_data_search_path(datapath):
+    """
+    Sets the path which points to the data directory of the framework.
+    This method can be used to redirect the default data directory to a user specified one.
+    datapath: The direcotry in which the data for the framework is located.
+    """
+
+    fw.set_data_search_path(datapath)
+
+

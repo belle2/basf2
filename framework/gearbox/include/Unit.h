@@ -3,7 +3,7 @@
  * Copyright(C) 2010-2011  Belle II Collaboration                         *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Andreas Moll                                             *
+ * Contributors: Andreas Moll, Martin Heck                                *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -111,6 +111,9 @@ namespace Belle2 {
     static const double electronMass; /**< Electron mass in MeV. */
     static double fine_str_const;     /**< The fine structure constant. */
     static const double fineStrConst; /**< The fine structure constant. */
+
+    //SuperKEKB and Belle II constants
+    static const double ringCircumference; /**< The circumference of the SuperKEKB ring. */
 
 
     /** Definition of the supported units. */

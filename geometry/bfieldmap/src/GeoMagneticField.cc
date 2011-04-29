@@ -63,6 +63,8 @@ void GeoMagneticField::create(GearDir& content)
 
     //Get the type of the magnetic field and call the appropriate function
     string compType = component.getParamString("attribute::type");
+    B2DEBUG(10, "GeoMagneticField creator: Loading the parameters for the component type'" << compType << "'")
+
     findIter = m_componentTypeMap.find(compType);
     if (findIter != m_componentTypeMap.end()) {
       findIter->second(component);
@@ -101,9 +103,13 @@ void GeoMagneticField::readRadialBField(GearDir& component)
   double mapRegionMinR = component.getParamLength("RadiusMin");
   double mapRegionMaxR = component.getParamLength("RadiusMax");
 
+  double gridPitchR    = component.getParamLength("GridPitchR");
+  double gridPitchZ    = component.getParamLength("GridPitchZ");
+
   BFieldComponentRadial& bComp = BFieldMap::Instance().addBFieldComponent<BFieldComponentRadial>();
   bComp.setMapFilename(mapFilename);
   bComp.setMapSize(mapSizeR, mapSizeZ);
   bComp.setMapRegionZ(mapRegionMinZ, mapRegionMaxZ, mapOffset);
   bComp.setMapRegionR(mapRegionMinR, mapRegionMaxR);
+  bComp.setGridPitch(gridPitchR, gridPitchZ);
 }

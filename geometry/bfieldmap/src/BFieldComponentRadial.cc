@@ -18,6 +18,7 @@
 #include <boost/iostreams/device/file.hpp>
 #include <boost/iostreams/filter/gzip.hpp>
 
+#include <cmath>
 
 using namespace std;
 using namespace Belle2;
@@ -56,6 +57,7 @@ void BFieldComponentRadial::initialize()
   fieldMapFile.push(io::file_source(fullPath));
 
   //Create the magnetic field map [r,z] and read the data from the file
+  B2DEBUG(10, "Loading the radial magnetic field from file '" << m_mapFilename << "' in to the memory...")
   m_mapBuffer = new BFieldPoint*[m_mapSize[0]];
   for (int i = 0; i < m_mapSize[0]; ++i)
     m_mapBuffer[i] = new BFieldPoint[m_mapSize[1]];
@@ -74,17 +76,61 @@ void BFieldComponentRadial::initialize()
       m_mapBuffer[i][j].z = Bz;
     }
   }
+
+  B2DEBUG(10, "... loaded " << m_mapSize[0] << "x" << m_mapSize[1] << " (r,z) elements.")
 }
 
 
 TVector3 BFieldComponentRadial::calculate(const TVector3& point) const
 {
-  return TVector3(0.0, 0.0, 0.0);
+  //Get the r and z component
+  double r = point.Perp();
+  double z = point.Z();
+
+  //Check if the point lies inside the magnetic field boundaries
+  if ((r < m_mapRegionR[0]) || (r > m_mapRegionR[1]) ||
+      (z < m_mapRegionZ[0]) || (z > m_mapRegionZ[1])) {
+    return TVector3(0.0, 0.0, 0.0);
+  }
+
+  //Calculate the lower index of the point in the grid
+  int ir = static_cast<int>(floor((r - m_mapRegionR[0]) / m_gridPitchR));
+  int iz = static_cast<int>(floor((z - m_mapRegionZ[0]) / m_gridPitchZ));
+
+  //Check if the index values are within the range
+  if (((ir + 1) >= m_mapSize[0]) || ((iz + 1) >= m_mapSize[1])) {
+    B2ERROR("The index values for the radial magnetic field map are out of bounds !")
+    return TVector3(0.0, 0.0, 0.0);
+  }
+
+  //Calculate the distance to the lower grid point
+  double dr = r - floor(r / m_gridPitchR) * m_gridPitchR;
+  double dz = z - floor(z / m_gridPitchZ) * m_gridPitchZ;
+
+  //Calculate the linear approx. of the magnetic field vector
+  double Br1 = m_mapBuffer[ir][iz].r;
+  double Br2 = m_mapBuffer[ir][iz+1].r;
+  double Br3 = m_mapBuffer[ir+1][iz].r;
+  double Br4 = m_mapBuffer[ir+1][iz+1].r;
+  double Br = (Br1 * (m_gridPitchZ - dz) + Br2 * dz) * (m_gridPitchR - dr) + (Br3 * (m_gridPitchZ - dz) + Br4 * dz) * dr;
+
+  double Bz1 = m_mapBuffer[ir][iz].z;
+  double Bz2 = m_mapBuffer[ir][iz+1].z;
+  double Bz3 = m_mapBuffer[ir+1][iz].z;
+  double Bz4 = m_mapBuffer[ir+1][iz+1].z;
+  double Bz = (Bz1 * (m_gridPitchZ - dz) + Bz2 * dz) * (m_gridPitchR - dr) + (Bz3 * (m_gridPitchZ - dz) + Bz4 * dz) * dr;
+
+  double Bx = (r > 0.0) ? Br * point.X() / r : 0.0;
+  double By = (r > 0.0) ? Br * point.Y() / r : 0.0;
+
+  return TVector3(Bx, By, Bz);
 }
 
 
 void BFieldComponentRadial::terminate()
 {
+  B2DEBUG(10, "De-allocating the memory for the radial magnetic field map loaded from the file '" << m_mapFilename << "'")
+
   //De-Allocate memory to prevent memory leak
   for (int i = 0; i < m_mapSize[0]; ++i)
     delete [] m_mapBuffer[i];

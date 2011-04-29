@@ -193,6 +193,8 @@ void PXDDigiModule::initialize()
   if (m_landauFluct)
     m_fluctuate = new SiEnergyFluct(m_prodThreshOnDeltaRays);
 
+  //Register PXDDigit collection
+  StoreArray<PXDDigit> storeDigits(m_digitColName);
 
   //
   // ROOT variables

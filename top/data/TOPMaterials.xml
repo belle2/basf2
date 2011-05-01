@@ -26,40 +26,243 @@
 			</Elements>
 			<Properties> 
 				<Property name="RINDEX" unit="eV"> 
-					<value energy="0.1">1.5</value> 
-					<value energy="0.5">1.5</value> 
-					<value energy="1.0">1.5</value> 
-					<value energy="1.5">1.5</value> 
-					<value energy="2.2">1.5</value> 
-					<value energy="2.9">1.5</value> 
-					<value energy="3.6">1.5</value> 
-					<value energy="4.3">1.5</value> 
-					<value energy="5">1.5</value> 
+					<value energy="4.95937">1.45</value>
+					<value energy="4.85937">1.45</value>
+					<value energy="4.75937">1.45</value>
+					<value energy="4.65937">1.45</value>
+					<value energy="4.55937">1.45</value>
+					<value energy="4.45937">1.45</value>
+					<value energy="4.35937">1.45</value>
+					<value energy="4.25937">1.45</value>
+					<value energy="4.15937">1.45</value>
+					<value energy="4.05937">1.45</value>
+					<value energy="3.95937">1.45</value>
+					<value energy="3.85937">1.45</value>
+					<value energy="3.75937">1.45</value>
+					<value energy="3.65937">1.45</value>
+					<value energy="3.55937">1.45</value>
+					<value energy="3.45937">1.45</value>
+					<value energy="3.35937">1.45</value>
+					<value energy="3.25937">1.45</value>
+					<value energy="3.15937">1.45</value>
+					<value energy="3.05937">1.45</value>
+					<value energy="2.95937">1.45</value>
+					<value energy="2.85937">1.45</value>
+					<value energy="2.75937">1.45</value>
+					<value energy="2.65937">1.45</value>
+					<value energy="2.55937">1.45</value>
+					<value energy="2.45937">1.45</value>
+					<value energy="2.35937">1.45</value>
+					<value energy="2.25937">1.45</value>
+					<value energy="2.15937">1.45</value>
+					<value energy="2.05937">1.45</value>
+					<value energy="1.95937">1.45</value>
+					<value energy="1.85937">1.45</value>
+					<value energy="1.75937">1.45</value>
 				</Property> 
 				<Property name="ABSLENGTH" unit="eV"> 
-					<value energy="0.1">100000000</value> 
-					<value energy="0.5">100000000</value> 
-					<value energy="1.0">100000000</value> 
-					<value energy="1.5">100000000</value> 
-					<value energy="2.2">100000000</value> 
-					<value energy="2.9">100000000</value> 
-					<value energy="3.6">100000000</value> 
-					<value energy="4.3">100000000</value> 
-					<value energy="5">100000000</value> 
+					<value energy="4.95937">100000000</value>
+					<value energy="4.85937">100000000</value>
+					<value energy="4.75937">100000000</value>
+					<value energy="4.65937">100000000</value>
+					<value energy="4.55937">100000000</value>
+					<value energy="4.45937">100000000</value>
+					<value energy="4.35937">100000000</value>
+					<value energy="4.25937">100000000</value>
+					<value energy="4.15937">100000000</value>
+					<value energy="4.05937">100000000</value>
+					<value energy="3.95937">100000000</value>
+					<value energy="3.85937">100000000</value>
+					<value energy="3.75937">100000000</value>
+					<value energy="3.65937">100000000</value>
+					<value energy="3.55937">100000000</value>
+					<value energy="3.45937">100000000</value>
+					<value energy="3.35937">100000000</value>
+					<value energy="3.25937">100000000</value>
+					<value energy="3.15937">100000000</value>
+					<value energy="3.05937">100000000</value>
+					<value energy="2.95937">100000000</value>
+					<value energy="2.85937">100000000</value>
+					<value energy="2.75937">100000000</value>
+					<value energy="2.65937">100000000</value>
+					<value energy="2.55937">100000000</value>
+					<value energy="2.45937">100000000</value>
+					<value energy="2.35937">100000000</value>
+					<value energy="2.25937">100000000</value>
+					<value energy="2.15937">100000000</value>
+					<value energy="2.05937">100000000</value>
+					<value energy="1.95937">100000000</value>
+					<value energy="1.85937">100000000</value>
+					<value energy="1.75937">100000000</value>
+
 				</Property> 
 				<Property name="RAYLEIGH" unit="eV"> 
-					<value energy="0.1">100000000</value> 
-					<value energy="0.5">100000000</value> 
-					<value energy="1.0">100000000</value> 
-					<value energy="1.5">100000000</value> 
-					<value energy="2.2">100000000</value> 
-					<value energy="2.9">100000000</value> 
-					<value energy="3.6">100000000</value> 
-					<value energy="4.3">100000000</value> 
-					<value energy="5">100000000</value> 
+					<value energy="4.95937">100000000</value>
+					<value energy="4.85937">100000000</value>
+					<value energy="4.75937">100000000</value>
+					<value energy="4.65937">100000000</value>
+					<value energy="4.55937">100000000</value>
+					<value energy="4.45937">100000000</value>
+					<value energy="4.35937">100000000</value>
+					<value energy="4.25937">100000000</value>
+					<value energy="4.15937">100000000</value>
+					<value energy="4.05937">100000000</value>
+					<value energy="3.95937">100000000</value>
+					<value energy="3.85937">100000000</value>
+					<value energy="3.75937">100000000</value>
+					<value energy="3.65937">100000000</value>
+					<value energy="3.55937">100000000</value>
+					<value energy="3.45937">100000000</value>
+					<value energy="3.35937">100000000</value>
+					<value energy="3.25937">100000000</value>
+					<value energy="3.15937">100000000</value>
+					<value energy="3.05937">100000000</value>
+					<value energy="2.95937">100000000</value>
+					<value energy="2.85937">100000000</value>
+					<value energy="2.75937">100000000</value>
+					<value energy="2.65937">100000000</value>
+					<value energy="2.55937">100000000</value>
+					<value energy="2.45937">100000000</value>
+					<value energy="2.35937">100000000</value>
+					<value energy="2.25937">100000000</value>
+					<value energy="2.15937">100000000</value>
+					<value energy="2.05937">100000000</value>
+					<value energy="1.95937">100000000</value>
+					<value energy="1.85937">100000000</value>
+					<value energy="1.75937">100000000</value>
+
 				</Property> 
 			</Properties> 
 		</Mixture>
+
+
+
+		<Mixture name="TOPEpox">
+			<Density unit="g/cm3">2.20</Density>
+			<Elements>      
+				<Element name="O" weight="0.5326">
+					<AtomNumber>8.0</AtomNumber>
+					<MassNumber>15.9994</MassNumber>
+				</Element>
+				<Element name="Si" weight="0.4674">
+					<AtomNumber>14.0</AtomNumber>
+					<MassNumber>28.0855</MassNumber>
+				</Element>  
+			</Elements>
+			<Properties> 
+				<Property name="RINDEX" unit="eV"> 
+					<value energy="4.95937">1.45</value>
+					<value energy="4.85937">1.45</value>
+					<value energy="4.75937">1.45</value>
+					<value energy="4.65937">1.45</value>
+					<value energy="4.55937">1.45</value>
+					<value energy="4.45937">1.45</value>
+					<value energy="4.35937">1.45</value>
+					<value energy="4.25937">1.45</value>
+					<value energy="4.15937">1.45</value>
+					<value energy="4.05937">1.45</value>
+					<value energy="3.95937">1.45</value>
+					<value energy="3.85937">1.45</value>
+					<value energy="3.75937">1.45</value>
+					<value energy="3.65937">1.45</value>
+					<value energy="3.55937">1.45</value>
+					<value energy="3.45937">1.45</value>
+					<value energy="3.35937">1.45</value>
+					<value energy="3.25937">1.45</value>
+					<value energy="3.15937">1.45</value>
+					<value energy="3.05937">1.45</value>
+					<value energy="2.95937">1.45</value>
+					<value energy="2.85937">1.45</value>
+					<value energy="2.75937">1.45</value>
+					<value energy="2.65937">1.45</value>
+					<value energy="2.55937">1.45</value>
+					<value energy="2.45937">1.45</value>
+					<value energy="2.35937">1.45</value>
+					<value energy="2.25937">1.45</value>
+					<value energy="2.15937">1.45</value>
+					<value energy="2.05937">1.45</value>
+					<value energy="1.95937">1.45</value>
+					<value energy="1.85937">1.45</value>
+					<value energy="1.75937">1.45</value>
+				</Property> 
+				<Property name="ABSLENGTH" unit="eV"> 
+					<value energy="4.95937">100000000</value>
+					<value energy="4.85937">100000000</value>
+					<value energy="4.75937">100000000</value>
+					<value energy="4.65937">100000000</value>
+					<value energy="4.55937">100000000</value>
+					<value energy="4.45937">100000000</value>
+					<value energy="4.35937">100000000</value>
+					<value energy="4.25937">100000000</value>
+					<value energy="4.15937">100000000</value>
+					<value energy="4.05937">100000000</value>
+					<value energy="3.95937">100000000</value>
+					<value energy="3.85937">100000000</value>
+					<value energy="3.75937">100000000</value>
+					<value energy="3.65937">100000000</value>
+					<value energy="3.55937">100000000</value>
+					<value energy="3.45937">100000000</value>
+					<value energy="3.35937">100000000</value>
+					<value energy="3.25937">100000000</value>
+					<value energy="3.15937">100000000</value>
+					<value energy="3.05937">100000000</value>
+					<value energy="2.95937">100000000</value>
+					<value energy="2.85937">100000000</value>
+					<value energy="2.75937">100000000</value>
+					<value energy="2.65937">100000000</value>
+					<value energy="2.55937">100000000</value>
+					<value energy="2.45937">100000000</value>
+					<value energy="2.35937">100000000</value>
+					<value energy="2.25937">100000000</value>
+					<value energy="2.15937">100000000</value>
+					<value energy="2.05937">100000000</value>
+					<value energy="1.95937">100000000</value>
+					<value energy="1.85937">100000000</value>
+					<value energy="1.75937">100000000</value>
+
+				</Property> 
+				<Property name="RAYLEIGH" unit="eV"> 
+					<value energy="4.95937">100000000</value>
+					<value energy="4.85937">100000000</value>
+					<value energy="4.75937">100000000</value>
+					<value energy="4.65937">100000000</value>
+					<value energy="4.55937">100000000</value>
+					<value energy="4.45937">100000000</value>
+					<value energy="4.35937">100000000</value>
+					<value energy="4.25937">100000000</value>
+					<value energy="4.15937">100000000</value>
+					<value energy="4.05937">100000000</value>
+					<value energy="3.95937">100000000</value>
+					<value energy="3.85937">100000000</value>
+					<value energy="3.75937">100000000</value>
+					<value energy="3.65937">100000000</value>
+					<value energy="3.55937">100000000</value>
+					<value energy="3.45937">100000000</value>
+					<value energy="3.35937">100000000</value>
+					<value energy="3.25937">100000000</value>
+					<value energy="3.15937">100000000</value>
+					<value energy="3.05937">100000000</value>
+					<value energy="2.95937">100000000</value>
+					<value energy="2.85937">100000000</value>
+					<value energy="2.75937">100000000</value>
+					<value energy="2.65937">100000000</value>
+					<value energy="2.55937">100000000</value>
+					<value energy="2.45937">100000000</value>
+					<value energy="2.35937">100000000</value>
+					<value energy="2.25937">100000000</value>
+					<value energy="2.15937">100000000</value>
+					<value energy="2.05937">100000000</value>
+					<value energy="1.95937">100000000</value>
+					<value energy="1.85937">100000000</value>
+					<value energy="1.75937">100000000</value>
+
+				</Property> 
+			</Properties> 
+		</Mixture>
+
+
+
+
 		
 		<Mixture name="TOPCeramic">
 			<Density unit="g/cm3">4.1</Density>
@@ -115,37 +318,112 @@
 			</Elements> 
 			<Properties> 
 				<Property name="RINDEX" unit="eV"> 
-					<value energy="0.1">1.0</value> 
-					<value energy="0.5">1.0</value> 
-					<value energy="1.0">1.0</value> 
-					<value energy="1.5">1.0</value> 
-					<value energy="2.2">1.0</value> 
-					<value energy="2.9">1.0</value> 
-					<value energy="3.6">1.0</value> 
-					<value energy="4.3">1.0</value> 
-					<value energy="5">1.0</value> 
+					<value energy="4.95937">1.0</value>
+					<value energy="4.85937">1.0</value>
+					<value energy="4.75937">1.0</value>
+					<value energy="4.65937">1.0</value>
+					<value energy="4.55937">1.0</value>
+					<value energy="4.45937">1.0</value>
+					<value energy="4.35937">1.0</value>
+					<value energy="4.25937">1.0</value>
+					<value energy="4.15937">1.0</value>
+					<value energy="4.05937">1.0</value>
+					<value energy="3.95937">1.0</value>
+					<value energy="3.85937">1.0</value>
+					<value energy="3.75937">1.0</value>
+					<value energy="3.65937">1.0</value>
+					<value energy="3.55937">1.0</value>
+					<value energy="3.45937">1.0</value>
+					<value energy="3.35937">1.0</value>
+					<value energy="3.25937">1.0</value>
+					<value energy="3.15937">1.0</value>
+					<value energy="3.05937">1.0</value>
+					<value energy="2.95937">1.0</value>
+					<value energy="2.85937">1.0</value>
+					<value energy="2.75937">1.0</value>
+					<value energy="2.65937">1.0</value>
+					<value energy="2.55937">1.0</value>
+					<value energy="2.45937">1.0</value>
+					<value energy="2.35937">1.0</value>
+					<value energy="2.25937">1.0</value>
+					<value energy="2.15937">1.0</value>
+					<value energy="2.05937">1.0</value>
+					<value energy="1.95937">1.0</value>
+					<value energy="1.85937">1.0</value>
+					<value energy="1.75937">1.0</value>
+
 				</Property> 
 				<Property name="ABSLENGTH" unit="eV"> 
-					<value energy="0.1">100000000</value> 
-					<value energy="0.5">100000000</value> 
-					<value energy="1.0">100000000</value> 
-					<value energy="1.5">100000000</value> 
-					<value energy="2.2">100000000</value> 
-					<value energy="2.9">100000000</value> 
-					<value energy="3.6">100000000</value> 
-					<value energy="4.3">100000000</value> 
-					<value energy="5">100000000</value> 
+					<value energy="4.95937">100000000</value>
+					<value energy="4.85937">100000000</value>
+					<value energy="4.75937">100000000</value>
+					<value energy="4.65937">100000000</value>
+					<value energy="4.55937">100000000</value>
+					<value energy="4.45937">100000000</value>
+					<value energy="4.35937">100000000</value>
+					<value energy="4.25937">100000000</value>
+					<value energy="4.15937">100000000</value>
+					<value energy="4.05937">100000000</value>
+					<value energy="3.95937">100000000</value>
+					<value energy="3.85937">100000000</value>
+					<value energy="3.75937">100000000</value>
+					<value energy="3.65937">100000000</value>
+					<value energy="3.55937">100000000</value>
+					<value energy="3.45937">100000000</value>
+					<value energy="3.35937">100000000</value>
+					<value energy="3.25937">100000000</value>
+					<value energy="3.15937">100000000</value>
+					<value energy="3.05937">100000000</value>
+					<value energy="2.95937">100000000</value>
+					<value energy="2.85937">100000000</value>
+					<value energy="2.75937">100000000</value>
+					<value energy="2.65937">100000000</value>
+					<value energy="2.55937">100000000</value>
+					<value energy="2.45937">100000000</value>
+					<value energy="2.35937">100000000</value>
+					<value energy="2.25937">100000000</value>
+					<value energy="2.15937">100000000</value>
+					<value energy="2.05937">100000000</value>
+					<value energy="1.95937">100000000</value>
+					<value energy="1.85937">100000000</value>
+					<value energy="1.75937">100000000</value>
+
 				</Property> 
 				<Property name="RAYLEIGH" unit="eV"> 
-					<value energy="0.1">100000000</value> 
-					<value energy="0.5">100000000</value> 
-					<value energy="1.0">100000000</value> 
-					<value energy="1.5">100000000</value> 
-					<value energy="2.2">100000000</value> 
-					<value energy="2.9">100000000</value> 
-					<value energy="3.6">100000000</value> 
-					<value energy="4.3">100000000</value> 
-					<value energy="5">100000000</value> 
+					<value energy="4.95937">100000000</value>
+					<value energy="4.85937">100000000</value>
+					<value energy="4.75937">100000000</value>
+					<value energy="4.65937">100000000</value>
+					<value energy="4.55937">100000000</value>
+					<value energy="4.45937">100000000</value>
+					<value energy="4.35937">100000000</value>
+					<value energy="4.25937">100000000</value>
+					<value energy="4.15937">100000000</value>
+					<value energy="4.05937">100000000</value>
+					<value energy="3.95937">100000000</value>
+					<value energy="3.85937">100000000</value>
+					<value energy="3.75937">100000000</value>
+					<value energy="3.65937">100000000</value>
+					<value energy="3.55937">100000000</value>
+					<value energy="3.45937">100000000</value>
+					<value energy="3.35937">100000000</value>
+					<value energy="3.25937">100000000</value>
+					<value energy="3.15937">100000000</value>
+					<value energy="3.05937">100000000</value>
+					<value energy="2.95937">100000000</value>
+					<value energy="2.85937">100000000</value>
+					<value energy="2.75937">100000000</value>
+					<value energy="2.65937">100000000</value>
+					<value energy="2.55937">100000000</value>
+					<value energy="2.45937">100000000</value>
+					<value energy="2.35937">100000000</value>
+					<value energy="2.25937">100000000</value>
+					<value energy="2.15937">100000000</value>
+					<value energy="2.05937">100000000</value>
+					<value energy="1.95937">100000000</value>
+					<value energy="1.85937">100000000</value>
+					<value energy="1.75937">100000000</value>
+
 				</Property> 
 			</Properties> 
 		</Mixture> 

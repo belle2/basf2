@@ -15,12 +15,50 @@
 			<Nbar desc="Number of quartz bars">16</Nbar>
 			<Radius desc="The distance from the quartz bar to the IP (inner radius)" unit="cm">119.0</Radius>
 			<QWidth desc="Width of the quartz bar" unit="mm">450</QWidth>
+			<QWidthExt desc="Width of the quartz bar extension" unit="mm">450</QWidthExt>
 			<QThickness desc="Thickness of the quartz bar" unit="mm">20</QThickness>
-			<QZForward desc="Forward edge of the quartz bar" unit="cm">190.0</QZForward>
 			<QZBackward desc="Backward edge of the quartz bar" unit="cm">-75.0</QZBackward>
+			<QBar1Length desc="Length of the first bar segment which starts at QZBackward" unit="cm">122.5</QBar1Length>
+			<QBar2Length desc="Length of the second bar segment which starts at QZBackward+QBar1Length" unit="cm">122.5</QBar2Length>
+			<QBarMirror desc="Length of the quarz sedment to which the mirror is attached" unit="mm">20</QBarMirror>
 			<QZext dest="Size of the extension volue of the quartz bar in the z direction" unit="cm">10.0</QZext>
 			<QYextup dest="Size of the extension volue of the quartz bar in the y direction upwards" unit="cm">0.0</QYextup>
-			<QYextdown dest="Size of the extension volue of the quartz bar in the y direction downwards" unit="cm">3.05</QYextdown>
+			<QYextdown dest="Size of the extension volue of the quartz bar in the y direction downwards" unit="cm">0.0</QYextdown>
+
+			<Glue>
+				<GlueMaterial>TOPEpox</GlueMaterial>
+				<Thicknes1 desc="thicknes of glue between quartz and extension volume" unit="mm">0.5</Thicknes1>
+				<Thicknes2 desc="thicknes of glue between quartz and quartz" unit="mm">0.5</Thicknes2>
+				<Thicknes3 desc="thicknes of glue between quartz and mirror volume" unit="mm">0.5</Thicknes3>
+			</Glue>
+
+			<Mirror>
+				<Material desc="material of the mirror">TOPSiO2</Material>
+				<Xpos desc="origin of the spherical mirror x coordinate" unit="cm">0.0</Xpos>
+				<Ypos desc="origin of the spherical mirror y coordinate" unit="cm">10</Ypos>
+				<Radius desc="Radius of the spherical mirror" unit="cm">700</Radius>
+				<mirrorThickness desc="Thickness of mirror coating" unit="mm">0.1</mirrorThickness>
+				<Properties>
+					<Property name="REFLECTIVITY" unit="eV">
+						<value energy="1.0">1.0</value> 
+						<value energy="2.0">1.0</value> 
+						<value energy="3.0">1.0</value> 
+						<value energy="4.0">1.0</value> 
+						<value energy="5.0">1.0</value> 
+					</Property>
+					<Property name="EFFICIENCY" unit="eV">
+						<value energy="1.0">1.0</value> 
+						<value energy="2.0">1.0</value> 
+						<value energy="3.0">1.0</value> 
+						<value energy="4.0">1.0</value> 
+						<value energy="5.0">1.0</value>
+					</Property>
+				</Properties>
+
+				<Type>dielectric_metal</Type>
+				<Finish>polished</Finish>
+				<Model>glisur</Model>
+			</Mirror>
 			
 		</Bars>
 		
@@ -28,19 +66,19 @@
 			
 			<Xgap desc="Gap between PMTs in x direction" unit="mm">0.6666</Xgap>
 			<Ygap desc="Gap between PMTs in y direction" unit="mm">0.5</Ygap>
-			<x0 desc="position of the edge of lower left PMT relative to quartz bar" unit="mm">0.0</x0>
-			<y0 desc="position of the edge of lower left PMT" unit="mm">0.0</y0>
-			<nPMTx desc="Number of PMT modules columns">16</nPMTx>
-			<nPMTy desc="Number of PMT modules rows">2</nPMTy>
+			<x0 desc="position of the edge of lower left PMT relative to quartz bar" unit="mm">-1.0</x0>
+			<y0 desc="position of the edge of lower left PMT" unit="mm">-1.0</y0>
+			<nPMTx desc="Number of PMT modules columns">1</nPMTx>
+			<nPMTy desc="Number of PMT modules rows">1</nPMTy>
 			
 			<Module> 
 				<wallMaterial>TOPCeramic</wallMaterial>
-				<ModuleXSize desc="module size in X" unit="mm">27.5</ModuleXSize>
-				<ModuleYSize desc="module size in Y" unit="mm">25.0</ModuleYSize>
+				<ModuleXSize desc="module size in X" unit="mm">452</ModuleXSize>
+				<ModuleYSize desc="module size in Y" unit="mm">22.</ModuleYSize>
 				<ModuleZSize  desc="module size in Z" unit="mm">12.5</ModuleZSize>
 				
-				<SensXSize desc="Active surface x dimension" unit="mm">22</SensXSize>
-				<SensYSize desc="Active surface y dimension" unit="mm">22</SensYSize>
+				<SensXSize desc="Active surface x dimension" unit="mm">450</SensXSize>
+				<SensYSize desc="Active surface y dimension" unit="mm">20.0</SensYSize>
 				<SensThickness desc="Thickness of active surface" unit="mm">0.1</SensThickness>	
 				<sensMaterial desc="Active surface material">TOPSiO2</sensMaterial>
 				

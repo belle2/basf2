@@ -91,12 +91,12 @@ namespace Belle2 {
     /** Get cell ID in u.
      * @return u ID of the cell.
      */
-    float getUCellID() const { return m_uCellID; }
+    short int getUCellID() const { return m_uCellID; }
 
     /** Get cell ID in v.
      * @return v ID of the cell.
      */
-    float getVCellID() const { return m_vCellID; }
+    short int getVCellID() const { return m_vCellID; }
 
     /** Get u coordinate of cell center.
      * @return u coordinate of cell center.

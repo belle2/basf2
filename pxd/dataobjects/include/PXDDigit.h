@@ -86,7 +86,7 @@ namespace Belle2 {
     /** Get the sensor compact ID.
      * @return compact ID of the sensor.
      */
-    int getSensorID() const { return m_sensorUniID; }
+    int getSensorUniID() const { return m_sensorUniID; }
 
     /** Get cell ID in u.
      * @return u ID of the cell.

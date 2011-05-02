@@ -89,9 +89,9 @@ namespace Belle2 {
 
   // Typedefs for indices
   typedef StoreRecordSet::index<StoreIndexSide>::type StoreSideIndex;
-  typedef StoreRecordSet::index<StoreIndexSide>::type::iterator StoreSideItr;
+  typedef StoreRecordSet::index_iterator<StoreIndexSide>::type StoreSideItr;
   typedef StoreRecordSet::index<SensorUniIDSide>::type SensorSideIndex;
-  typedef StoreRecordSet::index<SensorUniIDSide>::type::iterator SensorSideItr;
+  typedef StoreRecordSet::index_iterator<SensorUniIDSide>::type SensorSideItr;
 
 } // namespace Belle2
 

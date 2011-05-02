@@ -13,7 +13,7 @@
 
 using namespace Belle2;
 
-double PXDcheater::getPitchZ(int iLayer, int iLadder, int iSensor) const
+double PXDCheater::getPitchZ(int iLayer, int iLadder, int iSensor) const
 {
   switch (iLayer) {
     case 1:
@@ -26,7 +26,7 @@ double PXDcheater::getPitchZ(int iLayer, int iLadder, int iSensor) const
   return 0.0; // in case...
 }
 
-double PXDcheater::getPitchRPhi(int iLayer, int iLadder, int iSensor) const
+double PXDCheater::getPitchRPhi(int iLayer, int iLadder, int iSensor) const
 {
   switch (iLayer) {
     case 1:
@@ -40,7 +40,7 @@ double PXDcheater::getPitchRPhi(int iLayer, int iLadder, int iSensor) const
 }
 
 
-double PXDcheater::getResolutionZ(int iLayer, int iLadder, int iSensor, double theta) const
+double PXDCheater::getResolutionZ(int iLayer, int iLadder, int iSensor, double theta) const
 {
   switch (iLayer) {
     case 1:
@@ -53,7 +53,7 @@ double PXDcheater::getResolutionZ(int iLayer, int iLadder, int iSensor, double t
   return 0.0; // in case...
 }
 
-double PXDcheater::getResolutionRPhi(int iLayer, int iLadder, int iSensor, double theta) const
+double PXDCheater::getResolutionRPhi(int iLayer, int iLadder, int iSensor, double theta) const
 {
   switch (iLayer) {
     case 1:
@@ -68,7 +68,7 @@ double PXDcheater::getResolutionRPhi(int iLayer, int iLadder, int iSensor, doubl
 
 /* Machine-generated spline interpolants */
 
-double PXDcheater::PXD_ResFunc_rphi1(double x) const
+double PXDCheater::PXD_ResFunc_rphi1(double x) const
 {
   const int fNp = 33, fKstep = 0;
   const double fDelta = -1, fXmin = -180, fXmax = 180;
@@ -133,7 +133,7 @@ double PXDcheater::PXD_ResFunc_rphi1(double x) const
   return (fY[klow] + dx*(fB[klow] + dx*(fC[klow] + dx*fD[klow])));
 }
 
-double PXDcheater::PXD_ResFunc_rphi2(double x) const
+double PXDCheater::PXD_ResFunc_rphi2(double x) const
 {
   const int fNp = 31, fKstep = 0;
   const double fDelta = -1, fXmin = -180, fXmax = 160;
@@ -198,7 +198,7 @@ double PXDcheater::PXD_ResFunc_rphi2(double x) const
   return (fY[klow] + dx*(fB[klow] + dx*(fC[klow] + dx*fD[klow])));
 }
 
-double PXDcheater::PXD_ResFunc_z1(double x) const
+double PXDCheater::PXD_ResFunc_z1(double x) const
 {
   const int fNp = 33, fKstep = 0;
   const double fDelta = -1, fXmin = -180, fXmax = 180;
@@ -263,7 +263,7 @@ double PXDcheater::PXD_ResFunc_z1(double x) const
   return (fY[klow] + dx*(fB[klow] + dx*(fC[klow] + dx*fD[klow])));
 }
 
-double PXDcheater::PXD_ResFunc_z2(double x) const
+double PXDCheater::PXD_ResFunc_z2(double x) const
 {
   const int fNp = 33, fKstep = 0;
   const double fDelta = -1, fXmin = -180, fXmax = 180;

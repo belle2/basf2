@@ -25,7 +25,7 @@ namespace Belle2 {
    * Gaussian-smearing PXD digitizer.
    *
    * Now, I only use pre-set simulation-based resolutions provided by the
-   * PXDcheater class to randomize hit positions. Error matrices of hit positions
+   * PXDCheater class to randomize hit positions. Error matrices of hit positions
    * are calculated from the same resolutions.
    * The deposited energy is not smeared and no error is given for it.
    * Also, there is now no combination of near hits.
@@ -95,7 +95,7 @@ namespace Belle2 {
     std::string m_relHitName;        /**< Relation collection name (MC hits to PXD hits)*/
 
     /* Other members.*/
-    PXDcheater* m_cheater;  /**< Cheater provides resolutions and pitch data.*/
+    PXDCheater* m_cheater;  /**< Cheater provides resolutions and pitch data.*/
     SensorUniIDManager* m_uniID;      /**< Convert between unique ID and layer/ladder/sensor IDs.*/
     TRandom3* m_random;     /** Random number generator.*/
 

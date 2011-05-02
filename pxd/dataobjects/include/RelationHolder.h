@@ -85,9 +85,9 @@ namespace Belle2 {
   > TwoSidedRelationSet;
 
   typedef TwoSidedRelationSet::index<FromSide>::type FromSideIndex;
-  typedef TwoSidedRelationSet::index<FromSide>::type::iterator FromSideItr;
+  typedef TwoSidedRelationSet::index_iterator<FromSide>::type FromSideItr;
   typedef TwoSidedRelationSet::index<ToSide>::type ToSideIndex;
-  typedef TwoSidedRelationSet::index<ToSide>::type::iterator ToSideItr;
+  typedef TwoSidedRelationSet::index_iterator<ToSide>::type ToSideItr;
 
 // for reading relations
   typedef std::list<unsigned short> RelList;

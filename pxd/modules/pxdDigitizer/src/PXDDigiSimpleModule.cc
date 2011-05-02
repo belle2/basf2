@@ -49,7 +49,7 @@ REG_MODULE(PXDDigiSimple)
 //-----------------------------------------------------------------
 
 PXDDigiSimpleModule::PXDDigiSimpleModule() : Module(),
-    m_cheater(new PXDcheater()),
+    m_cheater(new PXDCheater()),
     m_uniID(new SensorUniIDManager(0)),
     m_random(new TRandom3(0))
 {

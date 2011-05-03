@@ -116,13 +116,13 @@ namespace Belle2 {
   typedef boost::multi_index_container <
   ClsDigitRecord,
   boost::multi_index::indexed_by <
-  boost::multi_index::ordered_unique <
+  boost::multi_index::ordered_non_unique <
   boost::multi_index::tag<USide>,
   boost::multi_index::member <
   ClsDigitRecord, int, &ClsDigitRecord::m_uCellID
   >
   > ,
-  boost::multi_index::ordered_unique <
+  boost::multi_index::ordered_non_unique <
   boost::multi_index::tag<VSide>,
   boost::multi_index::member <
   ClsDigitRecord, int, &ClsDigitRecord::m_vCellID

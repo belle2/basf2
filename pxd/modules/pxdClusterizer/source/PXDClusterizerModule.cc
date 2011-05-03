@@ -211,7 +211,7 @@ void PXDClusterizerModule::initialize()
 void PXDClusterizerModule::beginRun()
 {
   // Print run number
-  B2INFO("PXDClusterizer: Processing run: " << m_nRun);
+  B2INFO("PXDClusterizer: Processing run: " << m_nRun)
 
   // Re-initialize geometry cache
   m_geometry = SiGeoCache::instance();
@@ -540,13 +540,6 @@ void PXDClusterizerModule::event()
       std::pair<ClusterSideItr, ClusterSideItr> clsRange =
         clusters.equal_range(currentClusterNo);
 
-      /*
-      for (ClusterSideItr ic = clsRange.first; ic != clsRange.second; ++ic) {
-         B2INFO("   Digit: (" << ic->m_uCellID << ", " << ic->m_vCellID <<
-                  ", charge = " << ic->m_charge);
-      }
-      */
-
       // Apply cut on cluster charge.
       float clusterCharge = accumulate(clsRange.first, clsRange.second, 0,
                                        (boost::lambda::_1 + ret<float>(bind(&ClsDigitRecord::m_charge, boost::lambda::_2))));
@@ -573,14 +566,14 @@ void PXDClusterizerModule::event()
       for (ClusterSideItr idigit = clsRange.first; idigit != clsRange.second; ++idigit) {
         int iRel = storeClusters->GetLast() + 1;
         new(storeClusters->AddrAt(iRel)) Relation(
-          storeHits, storeDigits, idigit->m_index, iHit
+          storeHits, storeDigits, iHit, idigit->m_index, idigit->m_charge
         );
       }
 
       // Save PXDHit relations to MCParticles.
 
       // Create the set of contributing MC particles: for each MCParticle, sum
-      // its contributions over all digits forming the hit.
+      // its contributions over all digits that contribute to the hit.
       map<StoreIndex, float> mcWeight;
 
       for (ClusterSideItr idigit = clsRange.first; idigit != clsRange.second; ++idigit) {

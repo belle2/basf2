@@ -115,6 +115,9 @@ bool ParticleGun::generateEvent(MCParticleGraph &graph)
     p.setEnergy(e);
 
     p.setProductionVertex(vx, vy, vz);
+
+    p.addStatus(MCParticle::c_StableInGenerator);
+
   }// end loop over particles in event
 
   return true;

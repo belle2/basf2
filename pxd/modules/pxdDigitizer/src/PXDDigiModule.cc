@@ -890,6 +890,9 @@ void PXDDigiModule::addNoiseDigits(DigitMap & digits)
   // Zero-suppress existing digits.
   double threshold_charge = m_SNAdjacent * m_elNoise;
 
+  // No digits and no zero suppression if there is zero noise
+  if (threshold_charge <= 0.0) return;
+
   DigitMapItr iDigit = digits.begin();
   while (iDigit != digits.end())
     if (iDigit->second.charge < threshold_charge)
@@ -897,6 +900,9 @@ void PXDDigiModule::addNoiseDigits(DigitMap & digits)
     else
       ++iDigit;
 
+
+  // Only produce noise digits if simulating electronics noise.
+  if (!m_electronicEffects) return;
 
   // Calculate the fraction of pixels that will be above threshold.
   double fraction = 1.0 - TMath::Freq(m_SNAdjacent);

@@ -79,6 +79,10 @@ void SVDRecoHitMakerModule::initialize()
   // Print set parameters
   // printModuleParams();
 
+  // Initialize collections
+  StoreArray<SVDRecoHit> svdOutArray(m_outColName);
+  StoreArray<Relation> mcRecArray(m_relRecName);
+
   // CPU time start
   m_timeCPU = clock() * Unit::us;
 }
@@ -87,6 +91,7 @@ void SVDRecoHitMakerModule::beginRun()
 {
   // Print run number
   B2INFO("SVDRecoHitMaker: Processing run: " << m_nRun);
+
 
   // Re-read geometry for a new run
   SiGeoCache::instance()->refresh();

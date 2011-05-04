@@ -67,7 +67,7 @@ SVDRecoHit::SVDRecoHit(const SVDHit* hit) :
   // Construct finite plane - we use Trapezoidal plane for SVD
   double du = 0.5 * geometry->getUSensorSize(m_sensorUniID, 0);
   double dv = 0.5 * geometry->getVSensorSize(m_sensorUniID);
-  double dudv = geometry->getUSensorSize(m_sensorUniID, dv) - du;
+  double dudv = 0.5 * geometry->getUSensorSize(m_sensorUniID, dv) - du;
   if (dv > 0) dudv /= dv; else dudv = 0;
   GFDetPlane detPlane(oGlobal, uGlobal, vGlobal, new SiSensorPlane(0, 0, du, dv, dudv));
   // Set in policy

@@ -95,8 +95,8 @@ SiSensorInfo::SiSensorInfo(TGeoNode* pNode)
     m_uSizeD = 2.0 * (uSize2 - uSize) / m_vSize;
     // Consolidate: adapt cell size to pitch and number of cells.
     // To be removed once geometry is consistent.
-    m_uSize = m_uPitch * m_uCells;
-    m_vSize = m_vPitch * m_vCells;
+    //m_uSize = m_uPitch * m_uCells;
+    //m_vSize = m_vPitch * m_vCells;
 
   } else if (classname == "TGeoBBox") { // bounding box - PXD
     m_shape = c_rectangular;

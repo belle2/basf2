@@ -63,9 +63,11 @@ BFieldMap::BFieldMap() : m_isMapInitialized(false)
 
 BFieldMap::~BFieldMap()
 {
-  //Delete the magnetic field components by calling their terminate() method and freeing their memory.
-  BOOST_FOREACH(BFieldComponentAbs* comp, m_components) {
-    comp->terminate();
-    delete comp;
+  if (m_isMapInitialized) {
+    //Delete the magnetic field components by calling their terminate() method and freeing their memory.
+    BOOST_FOREACH(BFieldComponentAbs* comp, m_components) {
+      comp->terminate();
+      delete comp;
+    }
   }
 }

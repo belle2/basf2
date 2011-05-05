@@ -100,7 +100,7 @@ void SVDRecoHitMakerModule::beginRun()
 void SVDRecoHitMakerModule::event()
 {
   //------------------------------------------------------
-  // Get the collection of SVDSimHits from the Data store.
+  // Get the collection of MCParticles from the Data store.
   //------------------------------------------------------
   StoreArray<MCParticle> mcPartArray(m_mcColName);
   if (!mcPartArray) {
@@ -134,7 +134,7 @@ void SVDRecoHitMakerModule::event()
   if (!mcHitArray) {
     B2ERROR("SVDRecoHitMaker: Cannot get collection " << m_relHitName << " from the DataStore.");
   }
-  // Create the relaiton holder:
+  // Create the relation holder:
   TwoSidedRelationSet relMCHit;
 
   // Fill with relation data
@@ -178,7 +178,7 @@ void SVDRecoHitMakerModule::event()
     // get source MCParticles and save (atomic) relation(s) to mcRecArray
     pair<ToSideItr, ToSideItr> eqRange = hitIndex.equal_range(iHit);
     for (ToSideItr mcHit = eqRange.first; mcHit != eqRange.second; ++mcHit) {
-      new(mcRecArray->AddrAt(iHit))
+      new(mcRecArray->AddrAt(mcRecArray->GetLast() + 1))
       Relation(mcPartArray, svdOutArray, mcHit->m_from, iHit, mcHit->m_weight);
     }
   }

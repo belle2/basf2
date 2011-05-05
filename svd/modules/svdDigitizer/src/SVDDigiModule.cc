@@ -12,12 +12,12 @@
 
 #include <time.h>
 
-// Hit classes
+// Data objects
+#include <generators/dataobjects/MCParticle.h>
+#include <framework/dataobjects/Relation.h>
 #include <svd/dataobjects/SVDSimHit.h>
 #include <svd/dataobjects/SVDHit.h>
-
-// framework - module
-//#include <framework/core/ModuleManager.h>
+#include <pxd/dataobjects/RelationHolder.h>
 
 // framework - DataStore
 #include <framework/datastore/DataStore.h>
@@ -53,10 +53,16 @@ SVDDigiModule::SVDDigiModule() : Module(),
   setDescription("SVDDigitizer");
 
   // Add parameters
-  addParam("InputColName", m_inColName, "Input collection name", string(DEFAULT_SVDSIMHITS));
-  addParam("OutputColName", m_outColName, "Output collection name", string(DEFAULT_SVDHITS));
-  //addParam("RelationColNameMC2Digi", m_relColNameMC2Digi,
-  //      "Name of relation collection - MC hits to Digitizer hits. (created if non-null)", string("SVDMC2DigiHitRel"));
+  addParam("MCPartColName", m_mcColName, "MCParticles collection name",
+           string(DEFAULT_MCPARTICLES));
+  addParam("InputColName", m_inColName, "Input collection name",
+           string(DEFAULT_SVDSIMHITS));
+  addParam("OutputColName", m_outColName, "Output collection name",
+           string(DEFAULT_SVDHITS));
+  addParam("MCParticlesToSVDSimHits", m_relSimName, "Relation MCPart-to-SVDSimHits",
+           string(DEFAULT_SVDSIMHITSREL));
+  addParam("MCParticlesToSVDHits", m_relHitName, "Relation MCPart-to-SVDHits",
+           string(DEFAULT_SVDHITSREL));
 }
 
 SVDDigiModule::~SVDDigiModule()
@@ -75,6 +81,10 @@ void SVDDigiModule::initialize()
   // Print set parameters
   printModuleParams();
 
+  // Initialize new StoreArrays
+  StoreArray<SVDHit> svdOutArray(m_outColName);
+  StoreArray<Relation> mcHitArray(m_relHitName);
+
   // CPU time start
   m_timeCPU = clock() * Unit::us;
 }
@@ -88,20 +98,66 @@ void SVDDigiModule::beginRun()
 void SVDDigiModule::event()
 {
   //------------------------------------------------------
+  // Get the collection of MCParticles from the Data store.
+  //------------------------------------------------------
+  StoreArray<MCParticle> mcPartArray(m_mcColName);
+  if (!mcPartArray) {
+    B2ERROR("SVDDigi: Cannot get collection " << m_mcColName << " from the DataStore.");
+  }
+
+  //------------------------------------------------------
   // Get the collection of SVDSimHits from the Data store.
   //------------------------------------------------------
-  StoreArray<SVDSimHit> svdInArray(m_inColName);
-  if (!svdInArray) {
+  StoreArray<SVDSimHit> svdSimArray(m_inColName);
+  if (!svdSimArray) {
     B2ERROR("SVDDigi: Input collection " << m_inColName << " unavailable.");
   }
+
+  //-----------------------------------------------------
+  // Get the MCParticles-to-SVDSimHits collection from
+  // the Data store, and initialize the RelationHolder.
+  //-----------------------------------------------------
+  StoreArray<Relation> mcSimArray(m_relSimName);
+  if (!mcSimArray) {
+    B2ERROR("SVDDigi: Cannot get collection " << m_relSimName << " from the DataStore.");
+  }
+  // Create the relation holder:
+  TwoSidedRelationSet relMCSim;
+
+  // Fill with relation data
+  int nMCSimRels = mcSimArray.GetEntries();
+  for (int iRel = 0; iRel < nMCSimRels; ++iRel) {
+    Relation* rel = mcSimArray[iRel];
+    AtomicRelation arel;
+    arel.m_from = rel->getFromIndex();
+    RelList toIndices = rel->getToIndices();
+    for (RelListItr idx = toIndices.begin(); idx != toIndices.end(); ++idx) {
+      arel.m_to = (*idx);
+      arel.m_weight = 1.0; // no way to retrieve weights.
+      relMCSim.insert(arel);
+    }
+  }
+
+  // Get the "to-side" index to relations.
+  ToSideIndex& simIndex = relMCSim.get<ToSide>();
+
 
   //-----------------------------------------------------
   // Get the collection of SVDHits from the Data store,
   // (or have one created)
   //-----------------------------------------------------
-  StoreArray<SVDHit> svdOutArray(m_outColName);
-  if (!svdOutArray) {
-    B2ERROR("SVDDigi: Output collection " << m_inColName << " unavailable.");
+  StoreArray<SVDHit> svdHitArray(m_outColName);
+  if (!svdHitArray) {
+    B2ERROR("SVDDigi: Output collection " << m_outColName << " unavailable.");
+  }
+
+  //-----------------------------------------------------
+  // Get the MCParticles-to-SVDHits collection
+  // from the Data store (or have one created).
+  //-----------------------------------------------------
+  StoreArray<Relation> mcHitArray(m_relHitName);
+  if (!mcHitArray) {
+    B2ERROR("SVDDigi: Cannot get collection " << m_relHitName << " from the DataStore.");
   }
 
   //---------------------------------------------------------------------
@@ -109,18 +165,18 @@ void SVDDigiModule::event()
   //---------------------------------------------------------------------
 
   // Get number of hits in this event
-  int nHits = svdInArray->GetEntries();
+  int nHits = svdSimArray->GetEntries();
 
   // Loop over all hits
   for (int iHit = 0; iHit < nHits; ++iHit) {
     // Get a simhit
-    SVDSimHit* aSimHit = svdInArray[iHit];
+    SVDSimHit* aSimHit = svdSimArray[iHit];
 
     // The processing is simplistic here, one in / one out.
 
     // Create a digi hit
-    new(svdOutArray->AddrAt(iHit)) SVDHit();
-    SVDHit* newHit = svdOutArray[iHit];
+    new(svdHitArray->AddrAt(iHit)) SVDHit();
+    SVDHit* newHit = svdHitArray[iHit];
 
     // Geometry
     m_uniID->setUniID(0);
@@ -156,6 +212,13 @@ void SVDDigiModule::event()
     double eDep = aSimHit->getEnergyDep();
     double deDep = 0;
     newHit->setEnergyDep(eDep); newHit->setEnergyDepError(deDep);
+
+    // get source MCParticles and save (atomic) relation(s) to mcHitArray
+    pair<ToSideItr, ToSideItr> eqRange = simIndex.equal_range(iHit);
+    for (ToSideItr mcSimHit = eqRange.first; mcSimHit != eqRange.second; ++mcSimHit) {
+      new(mcHitArray->AddrAt(mcHitArray->GetLast() + 1))
+      Relation(mcPartArray, svdHitArray, mcSimHit->m_from, iHit, mcSimHit->m_weight);
+    }
   } // for iHit
 
   m_nEvent++;
@@ -178,8 +241,11 @@ void SVDDigiModule::terminate()
 void SVDDigiModule::printModuleParams() const
 {
   B2INFO("SVDDigi parameters:")
+  B2INFO("  MCParticles coll name:  " << m_mcColName)
   B2INFO("  Input collection name:  " << m_inColName)
+  B2INFO("  MCPart->SimHits name:   " << m_relSimName)
   B2INFO("  Output collection name: " << m_outColName)
+  B2INFO("  MCPart->SVDHits name:   " << m_relHitName)
 }
 
 

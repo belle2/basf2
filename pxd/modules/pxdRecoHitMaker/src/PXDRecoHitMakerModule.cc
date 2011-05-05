@@ -80,6 +80,10 @@ void PXDRecoHitMakerModule::initialize()
   // Print set parameters
   // printModuleParams();
 
+  // Initialize StoreArrays
+  StoreArray<PXDRecoHit> pxdOutArray(m_outColName);
+  StoreArray<Relation> mcRecArray(m_relRecName);
+
   // CPU time start
   m_timeCPU = clock() * Unit::us;
 }
@@ -174,7 +178,7 @@ void PXDRecoHitMakerModule::event()
     // get source MCParticles and save (atomic) relation(s) to mcRecArray
     pair<ToSideItr, ToSideItr> eqRange = hitIndex.equal_range(iHit);
     for (ToSideItr mcHit = eqRange.first; mcHit != eqRange.second; ++mcHit) {
-      new(mcRecArray->AddrAt(iHit))
+      new(mcRecArray->AddrAt(mcRecArray->GetLast() + 1))
       Relation(mcPartArray, pxdOutArray, mcHit->m_from, iHit, mcHit->m_weight);
     }
   }

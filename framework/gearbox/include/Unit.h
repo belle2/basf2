@@ -247,14 +247,6 @@ namespace Belle2 {
     ~Unit();
 
     static Unit* m_instance; /**< Pointer that saves the instance of this class. */
-
-    /** Destroyer class to delete the instance of the Gearbox class when the program terminates. */
-    /*class SingletonDestroyer {
-    public: ~SingletonDestroyer() {
-        if (Unit::m_instance != NULL) delete Unit::m_instance;
-      }
-    };
-    friend class SingletonDestroyer;*/
     friend class SingletonDestroyerT<Unit>;
     typedef      SingletonDestroyerT<Unit> UnitDestroyer;
 

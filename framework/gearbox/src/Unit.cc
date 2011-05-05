@@ -98,11 +98,10 @@ const double Unit::ringCircumference = 3016.360049 * Unit::m;  /**< The circumfe
 
 Unit& Unit::Instance()
 {
-  //static SingletonDestroyer siDestroyer;
   if (!m_instance) {
     m_instance = new Unit();
+    static UnitDestroyer uDestroyer(m_instance);
   }
-  static UnitDestroyer uDestroyer(m_instance);
   return *m_instance;
 }
 

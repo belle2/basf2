@@ -1,5 +1,5 @@
 Import('env')
 
-env['LIBS'] = ['framework', 'generators']
+env['LIBS'] = ['framework', 'generators','geometry']
 
 Return('env')

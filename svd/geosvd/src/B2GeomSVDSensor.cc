@@ -110,7 +110,7 @@ Bool_t B2GeomSVDSensorSilicon::init(GearDir& siliconContent)
 
   // initialize the contained active volume
   // Read parameters for active sensor
-  if (!initComponent<B2GeomVXDVolume>(&volActive, siliconContent, "Active")) {
+  if (!initComponent<B2GeomSVDSensorActive>(&volActive, siliconContent, "Active")) {
     B2FATAL("Parameter reading for SVD active silicon failed!");
     return false;
   }
@@ -129,24 +129,44 @@ Bool_t B2GeomSVDSensorSilicon::make()
   if (!makeAndAddComponent(volActive)) {
     B2FATAL("Cannot build TGeoVolume for SVD active silicon!");
     return false;
-  } else {
-    volActive->getVol()->SetField(new SVDVolumeUserInfo(iLayer, iLadder, iSensor));
   }
   return true;
 }
 
+// ------------------------------------------------------------------------------------------------
+// Active Silicon part of the sensor
+// ------------------------------------------------------------------------------------------------
 
+Bool_t B2GeomSVDSensorActive::init(GearDir& content)
+{
+  if (!initBasicParameters(content)) {
+    B2FATAL("Could not read parameters for PXD sensitive volume!!!!")
+    return false;
+  }
 
+  // Read user parameters
+  if (content.isParamAvailable("UPitch")) {
+    m_uPitch = content.getParamLength("UPitch");
+  }
+  if (content.isParamAvailable("UPitch2")) {
+    m_uPitch2 = content.getParamLength("UPitch2");
+  }
+  if (content.isParamAvailable("UCells")) {
+    m_uCells = atoi(content.getParamString("UCells").c_str());
+  }
+  if (content.isParamAvailable("VPitch")) {
+    m_vPitch = content.getParamLength("VPitch");
+  }
+  if (content.isParamAvailable("VCells")) {
+    m_vCells = atoi(content.getParamString("VCells").c_str());
+  }
+  return true;
+}
 
-
-
-
-
-
-
-
-
-
-
-
-
+Bool_t B2GeomSVDSensorActive::make()
+{
+  Bool_t res = makeGeneric();
+  if (res)
+    tVolume->SetField(new SVDVolumeUserInfo(iLayer, iLadder, iSensor, m_uPitch, m_uPitch2, m_uCells, m_vPitch, m_vCells));
+  return res;
+}

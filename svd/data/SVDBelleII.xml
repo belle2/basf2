@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ParamSet type="SVD">
   <Name>SVD</Name>
-  <Description>The key component of the tracking system</Description>
+  <Description>Silicon Vertex Detector geometry parameters</Description>
   <Version>0</Version>
   <Creator>SVDBelleII</Creator>
   <Content xmlns:xi="http://www.w3.org/2001/XInclude">
@@ -38,7 +38,7 @@
             <Sensor id="SVD_Layer_3_Ladder_Sensor_1">
               <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//Sensor[@type=0]/*)"/>
               <VPosition desc="sensor position (middle of the volume) in V (local coordinate system of ladder)" unit="mm">88</VPosition>
-                <KaptonFront>
+              <KaptonFront>
                 <xi:include href="SVDSensorBelleII.xml" xpointer="xpointer(//KaptonFront/*)"/>
                 <Mass unit="g">0.369843269592233</Mass>
               </KaptonFront>
@@ -67,7 +67,7 @@
           <Shape>Assembly</Shape>
           <Barrel>
             <Ribs>
-            <Name>SVD_Layer_%Layer_Ladder_Ribs_Barrel</Name>
+              <Name>SVD_Layer_%Layer_Ladder_Ribs_Barrel</Name>
               <xi:include href="SVDLadderBelleII.xml" xpointer="xpointer(/*/Ribs/*)"/>
               <Length desc="Length of the Ribs in the Barrel Region" unit="mm">249.88</Length>
               <VPosition desc="The position of the ribs in V direction" unit="mm">-41.43</VPosition>
@@ -144,7 +144,7 @@
           <Material>Air</Material>
           <Barrel>
             <Ribs>
-            <Name>SVD_Layer_%Layer_Ladder_Ribs_Barrel</Name>
+              <Name>SVD_Layer_%Layer_Ladder_Ribs_Barrel</Name>
               <xi:include href="SVDLadderBelleII.xml" xpointer="xpointer(/*/Ribs/*)"/>
               <Length desc="Length of the Ribs in the Barrel Region" unit="mm">374.88</Length>
               <VPosition desc="The position of the ribs in V direction" unit="mm">-21.08</VPosition>
@@ -234,7 +234,7 @@
           <Material>Air</Material>
           <Barrel>
             <Ribs>
-            <Name>SVD_Layer_%Layer_Ladder_Ribs_Barrel</Name>
+              <Name>SVD_Layer_%Layer_Ladder_Ribs_Barrel</Name>
               <xi:include href="SVDLadderBelleII.xml" xpointer="xpointer(/*/Ribs/*)"/>
               <Length desc="Length of the Ribs in the Barrel Region" unit="mm">499.88</Length>
               <VPosition desc="The position of the ribs in V direction" unit="mm">-10.06</VPosition>

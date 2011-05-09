@@ -15,18 +15,11 @@ using namespace Belle2;
 
 ClassImp(RunMetaData)
 
-
-bool RunMetaData::operator== (const RunMetaData& eventMetaData) const
+bool RunMetaData::operator== (const RunMetaData& runMetaData) const
 {
-  return (/*(m_event == eventMetaData.getEvent()) &&
-          (m_run == eventMetaData.getRun()) &&
-          (m_experiment == eventMetaData.getExperiment())*/
-           true
+  return ((m_energyLER     == runMetaData.getEnergyLER())    &&
+          (m_energyHER     == runMetaData.getEnergyHER())    &&
+          (m_crossingAngle == runMetaData.getCrossingAngle()) &&
+          (m_angleLER      == runMetaData.getAngleLER())
          );
-}
-
-bool RunMetaData::operator!= (const RunMetaData& eventMetaData) const
-{
-  return !(/* *this == eventMetaData*/
-           true);
 }

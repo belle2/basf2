@@ -11,7 +11,6 @@
 #define RUNMETADATA_H
 
 #include <TObject.h>
-#include <framework/utilities/Boosts.h>
 #include <framework/gearbox/Unit.h>
 
 
@@ -34,87 +33,63 @@ namespace Belle2 {
 
     /** Constructor.
      *
-     *  @param LER            Energy of the positron beam.
-     *  @param HER            Energy of the electron beam.
+     *  @param energyLER            Energy of the positron beam.
+     *  @param energyHER            Energy of the electron beam.
      *  @param crossingAngle  Angle of crossing between the two beams
      *  @param angleLER       Angle between the LER beam and the solenoid axis, defining the axis of the Belle II detector.
      */
     RunMetaData(const float& energyLER = 4.0, const float& energyHER = 7.0,
-                const float& crossAngle = 83 * Unit::mrad,
-                const float& angleLER = 41.5 * Unit::mrad)
-        : m_energyLER(energyLER), m_energyHER(energyHER), m_crossAngle(crossAngle), m_angleLER(angleLER) {}
+                const float& crossingAngle = 83   * Unit::mrad,
+                const float& angleLER      = 41.5 * Unit::mrad)
+        : m_energyLER(energyLER), m_energyHER(energyHER), m_crossingAngle(crossingAngle), m_angleLER(angleLER) {}
 
     /** Destructor. */
     ~RunMetaData() {}
 
-    /** Center of mass energy getter.
-     *
-     *  Will be implemented soon.
-     *  @return Center of mass ernergy of the current run.
-     */
-    float getCmsEnergy() {
-      return -999.;
-    }
-
-    /** \f$\gamma\f$ factor getter.
-     *
-     *  Will be implemented soon.
-     *  @return \f$\gamma\f$ factor of the initial resonance in the lab frame.
-     */
-    float getLabGamma() {
-      return -999;
-    }
-
     /** LER energy getter. */
-    float getEnergyLER() {
+    float getEnergyLER() const {
       return m_energyLER;
     }
 
     /** HER energy getter. */
-    float getEnergyHER() {
+    float getEnergyHER() const {
       return m_energyHER;
     }
 
     /** Crossing angle getter. */
-    float getCrossingAngle() {
-      return m_crossAngle;
+    float getCrossingAngle() const {
+      return m_crossingAngle;
     }
 
     /** LER angle getter. */
-    float getAngleLER() {
+    float getAngleLER() const {
       return m_angleLER;
     }
 
     /** Comparison Operator.
      *
-     *  @param eventMetaData The event meta data to compare with.
-     *  @return True if event, run, and experiment numbers are the same
+     *  @param  runMetaData Object to compare this one with.
+     *  @return Is true, if all DataMembers are the same.
      */
-    bool operator== (const RunMetaData& eventMetaData) const;
+    bool operator== (const RunMetaData& runMetaData) const;
 
-    /** Comparison Operator.
-     *
-     *  @param eventMetaData The event meta data to compare with.
-     *  @return True if event, run, or experiment numbers are different
-     */
-    bool operator!= (const RunMetaData& eventMetaData) const;
 
   private:
 
     /** Center of Mass Energy.
      */
-    double m_energyLER;
+    float m_energyLER;
 
     /** \f$\gamma\f$ factor in the lab frame.
      */
-    double m_energyHER;
+    float m_energyHER;
 
     /** Angle between beams. */
-    double m_crossAngle;
+    float m_crossingAngle;
 
     /** Angle in the lab system
      */
-    double m_angleLER;
+    float m_angleLER;
 
     /** ROOT Macro to make RunMetaData a ROOT class.
      */

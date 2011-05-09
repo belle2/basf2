@@ -14,17 +14,17 @@
 
 using namespace Belle2;
 
-inline TLorentzRotation Boosts::getLab2CMSBoost(const float& energyHER, const float& energyLER, const float& crossAngle, const float& angleLER)
+inline TLorentzRotation Boosts::getCMS2LabBoost(const float& energyLER, const float& energyHER, const float& crossingAngle, const float& angleLER)
 {
-  return getLab2CMSBoost(energyHER, energyLER, crossAngle, angleLER).Inverse();
+  return getLab2CMSBoost(energyLER, energyHER, crossingAngle, angleLER).Inverse();
 }
 
-TLorentzRotation Boosts::getCMS2LabBoost(const float& energyHER, const float& energyLER, const float& crossAngle, const float& angleLER)
+TLorentzRotation Boosts::getLab2CMSBoost(const float& energyLER, const float& energyHER, const float& crossingAngle, const float& angleLER)
 {
   // Lab frame Z axis is defined by B field;
   // its positive direction close to direction of
   // high energy beam, i.e. e- beam.
-  double angleHerToB = crossAngle  - angleLER;
+  double angleHerToB = crossingAngle  - angleLER;
   double angleLerToB = TMath::Pi() - angleLER;
 
   // Getting the various LorentzVectors.
@@ -34,10 +34,11 @@ TLorentzRotation Boosts::getCMS2LabBoost(const float& energyHER, const float& en
   TLorentzVector lorentzVecHER;
   lorentzVecHER.SetXYZM(energyHER * sin(angleHerToB), 0., energyHER * cos(angleHerToB), Unit::electronMass);
 
-  TLorentzVector vectorLorentzY4S = lorentzVecHER + lorentzVecLER;
+  TLorentzVector lorentzVecY4S = lorentzVecHER + lorentzVecLER;
+  B2DEBUG(250, "lorentzVecY4S (or other resonance): Gamma " << lorentzVecY4S.Gamma() << ", Mass " << lorentzVecY4S.M());
 
   // Transformation from Lab system to CMS system
-  TLorentzRotation lab2cmsBoost(vectorLorentzY4S.BoostVector());
+  TLorentzRotation lab2cmsBoost(lorentzVecY4S.BoostVector());
 
   // boost HER e- from Lab system to CMS system
   const TLorentzVector lorentzVecElectronCMS = lab2cmsBoost * lorentzVecHER;

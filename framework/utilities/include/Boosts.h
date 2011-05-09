@@ -52,27 +52,27 @@ namespace Belle2 {
      *
      *  @param energyHER        Energy of high energy beam. The default value is for running on Y(4S).
      *  @param energyLER        Energy of low energy beam. The default value is for running on Y(4S).
-     *  @param crossAngle       Crossing Angle of the two beams. The default value is the design parameter.
+     *  @param crossingAngle    Crossing Angle of the two beams. The default value is the design parameter.
      *  @param angleLER         Angle between the inverse direction of the LER and the solenoid magnetic field axis.
      *  @return                 <a href="http://root.cern.ch/root/html/TLorentzRotation.html">TLorentzRotation</a>
      *                          from the ROOT::physics Vector package, that translates a TLorentzVector from
      *                          the center of mass system of the beam interaction into the laboratory system.
      */
-    TLorentzRotation getCMS2LabBoost(const float& energyHER  = 7. * Unit::GeV,  const float& energyLER = 4.  * Unit::GeV,
-                                     const float& crossAngle = 83 * Unit::mrad, const float& angleLER = 41.5 * Unit::mrad);
+    static inline TLorentzRotation getCMS2LabBoost(const float& energyLER     = 4. * Unit::GeV,  const float& energyHER = 7.   * Unit::GeV,
+                                                   const float& crossingAngle = 83.* Unit::mrad, const float& angleLER  = 41.5 * Unit::mrad);
 
     /** Get Lorentz boost for transformation from lab to CMS system.
      *
      *  @param energyHER        Energy of high energy beam. The default value is for running on Y(4S).
      *  @param energyLER        Energy of low energy beam. The default value is for running on Y(4S).
-     *  @param crossAngle       Crossing Angle of the two beams. The default value is the design parameter.
+     *  @param crossingAngle    Crossing Angle of the two beams. The default value is the design parameter.
      *  @param angleLER         Angle between the inverse direction of the LER and the solenoid magnetic field axis.
      *  @return                 <a href="http://root.cern.ch/root/html/TLorentzRotation.html">TLorentzRotation</a>
      *                          from the ROOT::physics Vector package, that translates a TLorentzVector from
      *                          the laboratory system into the center of mass system of the beam interaction.
      */
-    inline TLorentzRotation getLab2CMSBoost(const float& energyHER  = 7. * Unit::GeV,  const float& energyLER = 4.  * Unit::GeV,
-                                            const float& crossAngle = 83 * Unit::mrad, const float& angleLER = 41.5 * Unit::mrad);
+    static TLorentzRotation getLab2CMSBoost(const float& energyLER     = 4. * Unit::GeV,  const float& energyHER = 7.   * Unit::GeV,
+                                            const float& crossingAngle = 83.* Unit::mrad, const float& angleLER  = 41.5 * Unit::mrad);
   };
 }
 

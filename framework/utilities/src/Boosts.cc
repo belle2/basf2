@@ -11,6 +11,7 @@
 #include <TLorentzVector.h>
 #include <TLorentzRotation.h>
 #include <framework/utilities/Boosts.h>
+#include <framework/logging/Logger.h>
 
 using namespace Belle2;
 

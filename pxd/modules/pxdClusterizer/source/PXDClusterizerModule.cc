@@ -346,6 +346,10 @@ void PXDClusterizerModule::event()
   // - then clusterize digits in individual sensors.
   //------------------------------------------------------
 
+  // cluster counter - it is not safe to have the same cluster numbers in
+  // different sensors.
+  short int currentClusterNumber = 0; // all numbers are currently set to 0.
+
   for (SensorSetItr iSensor = sensorSet.begin(); iSensor != sensorSet.end(); ++iSensor) {
 
     //------------------------------------------------------------------------
@@ -405,7 +409,7 @@ void PXDClusterizerModule::event()
 
       StoreIndex idigit = digitItr->m_index;
       PXDDigit* pxdDigit = storeDigits[idigit];
-      if (!pxdDigit) continue; // skip empty records
+      if (!pxdDigit) continue; // skip empty records in StoreArray
 
       ClsDigitRecord newdigit;
       newdigit.m_uCellID = pxdDigit->getUCellID();
@@ -425,7 +429,6 @@ void PXDClusterizerModule::event()
     // Get the cluster side index
     ClusterSideIndex& clusters = digitSet.get<ClusterSide>();
 
-    short int currentClusterNumber = 0; // all numbers are currently set to 0.
     //----------------------------------------------------------------------
     // Go through seed digits and clusterize
     //----------------------------------------------------------------------
@@ -500,13 +503,13 @@ void PXDClusterizerModule::event()
         } else if (idigit->m_cluster == proposedClusterNumber) {
           continue;
         } else {
-          // modify the whole cluster
+          // digit already in a cluster: merge the whole cluster
           std::pair<ClusterSideItr, ClusterSideItr> clRange =
             clusters.equal_range(idigit->m_cluster);
-          for (ClusterSideItr icluster = clRange.first;
-               icluster != clRange.second; ++icluster)
+          ClusterSideItr icluster = clRange.first;
+          while (icluster != clRange.second)
             clusters.modify_key(
-              icluster,
+              icluster++,
               boost::lambda::_1 = proposedClusterNumber
             );
         }
@@ -541,7 +544,7 @@ void PXDClusterizerModule::event()
         clusters.equal_range(currentClusterNo);
 
       // Apply cut on cluster charge.
-      float clusterCharge = accumulate(clsRange.first, clsRange.second, 0,
+      float clusterCharge = accumulate(clsRange.first, clsRange.second, 0.0,
                                        (boost::lambda::_1 + ret<float>(bind(&ClsDigitRecord::m_charge, boost::lambda::_2))));
 
       if (clusterCharge < m_clusterChargeCut) {
@@ -662,7 +665,7 @@ void PXDClusterizerModule::terminate()
 void PXDClusterizerModule::makePXDHit(ClusterDigits& cluster, PXDHit* storeHit)
 {
   //---------------------------------------------------------------------------
-  // Find cluster edges and middle zone in both coordinates.
+  // Find cluster edges and middle zone in u and v coordinates.
   //---------------------------------------------------------------------------
 
   // U coordinate
@@ -670,12 +673,20 @@ void PXDClusterizerModule::makePXDHit(ClusterDigits& cluster, PXDHit* storeHit)
   USideIndex& uIndex = cluster.get<USide>();
 
   USideItr iULow = uIndex.begin();
-  short int uLow = iULow->m_uCellID;
+  unsigned short uLow = iULow->m_uCellID;
 
   USideItr iUHi  = --uIndex.end();
-  short int uHi  = iUHi->m_uCellID;
+  unsigned short uHi  = iUHi->m_uCellID;
 
-  short int uClusterSize = uHi - uLow + 1;
+  unsigned short uClusterSize = uHi - uLow + 1;
+
+  // Sanity check: uIndex must be connected.
+  if (uClusterSize > uIndex.size()) { // do some noise
+    B2INFO("PXDClusterizer: Found cluster with disconnected u index")
+    for (USideItr uItr = uIndex.begin(); uItr != uIndex.end(); ++uItr)
+      B2INFO("u: " << uItr->m_uCellID << ", v: " << uItr->m_vCellID
+             << ", clNo: " << uItr->m_cluster);
+  }
 
   if (uClusterSize == 1) { // The estimate is mid-position in the pixel
 
@@ -686,14 +697,14 @@ void PXDClusterizerModule::makePXDHit(ClusterDigits& cluster, PXDHit* storeHit)
     float chargeHi = accumulate(
                        uIndex.lower_bound(uHi),
                        uIndex.upper_bound(uHi),
-                       0,
+                       0.0,
                        (boost::lambda::_1 + ret<float>(bind(&ClsDigitRecord::m_charge, boost::lambda::_2)))
                      );
 
     float chargeLow = accumulate(
                         uIndex.lower_bound(uLow),
                         uIndex.upper_bound(uLow),
-                        0,
+                        0.0,
                         (boost::lambda::_1 + ret<float>(bind(&ClsDigitRecord::m_charge, boost::lambda::_2)))
                       );
 
@@ -711,7 +722,7 @@ void PXDClusterizerModule::makePXDHit(ClusterDigits& cluster, PXDHit* storeHit)
     float chargeHi = accumulate(
                        uIndex.lower_bound(uHi),
                        uIndex.upper_bound(uHi),
-                       0,
+                       0.0,
                        (boost::lambda::_1 + ret<float>(bind(&ClsDigitRecord::m_charge, boost::lambda::_2)))
                      );
 
@@ -720,7 +731,7 @@ void PXDClusterizerModule::makePXDHit(ClusterDigits& cluster, PXDHit* storeHit)
     float chargeCentre = accumulate(
                            uIndex.upper_bound(uLow),
                            uIndex.lower_bound(uHi),
-                           0,
+                           0.0,
                            (boost::lambda::_1 + ret<float>(bind(&ClsDigitRecord::m_charge, boost::lambda::_2)))
                          );
     chargeCentre /= (uHi - uLow - 1.0);
@@ -728,7 +739,7 @@ void PXDClusterizerModule::makePXDHit(ClusterDigits& cluster, PXDHit* storeHit)
     float chargeLow = accumulate(
                         uIndex.lower_bound(uLow),
                         uIndex.upper_bound(uLow),
-                        0,
+                        0.0,
                         (boost::lambda::_1 + ret<float>(bind(&ClsDigitRecord::m_charge, boost::lambda::_2)))
                       );
 
@@ -746,12 +757,20 @@ void PXDClusterizerModule::makePXDHit(ClusterDigits& cluster, PXDHit* storeHit)
   VSideIndex& vIndex = cluster.get<VSide>();
 
   VSideItr iVLow = vIndex.begin();
-  short int vLow = iVLow->m_vCellID;
+  unsigned short vLow = iVLow->m_vCellID;
 
   VSideItr iVHi  = --vIndex.end();
-  short int vHi  = iVHi->m_vCellID;
+  unsigned short vHi  = iVHi->m_vCellID;
 
-  short int vClusterSize = vHi - vLow + 1;
+  unsigned short vClusterSize = vHi - vLow + 1;
+
+  // Sanity check: vIndex must be connected.
+  if (vClusterSize > vIndex.size()) { // do some noise
+    B2INFO("PXDClusterizer: Found cluster with disconnected v index")
+    for (VSideItr vItr = vIndex.begin(); vItr != vIndex.end(); ++vItr)
+      B2INFO("u: " << vItr->m_uCellID << ", v: "  << vItr->m_vCellID
+             << ", clNo: " << vItr->m_cluster);
+  }
 
   if (vClusterSize == 1) {  // The estimate is mid-position in the pixel
 
@@ -762,14 +781,14 @@ void PXDClusterizerModule::makePXDHit(ClusterDigits& cluster, PXDHit* storeHit)
     float chargeHi = accumulate(
                        vIndex.lower_bound(vHi),
                        vIndex.upper_bound(vHi),
-                       0,
+                       0.0,
                        (boost::lambda::_1 + ret<float>(bind(&ClsDigitRecord::m_charge, boost::lambda::_2)))
                      );
 
     float chargeLow = accumulate(
                         vIndex.lower_bound(vLow),
                         vIndex.upper_bound(vLow),
-                        0,
+                        0.0,
                         (boost::lambda::_1 + ret<float>(bind(&ClsDigitRecord::m_charge, boost::lambda::_2)))
                       );
 
@@ -787,7 +806,7 @@ void PXDClusterizerModule::makePXDHit(ClusterDigits& cluster, PXDHit* storeHit)
     float chargeHi = accumulate(
                        vIndex.lower_bound(vHi),
                        vIndex.upper_bound(vHi),
-                       0,
+                       0.0,
                        (boost::lambda::_1 + ret<float>(bind(&ClsDigitRecord::m_charge, boost::lambda::_2)))
                      );
 
@@ -796,7 +815,7 @@ void PXDClusterizerModule::makePXDHit(ClusterDigits& cluster, PXDHit* storeHit)
     float chargeCentre = accumulate(
                            vIndex.upper_bound(vLow),
                            vIndex.lower_bound(vHi),
-                           0,
+                           0.0,
                            (boost::lambda::_1 + ret<float>(bind(&ClsDigitRecord::m_charge, boost::lambda::_2)))
                          );
     chargeCentre /= (vHi - vLow - 1.0);
@@ -804,7 +823,7 @@ void PXDClusterizerModule::makePXDHit(ClusterDigits& cluster, PXDHit* storeHit)
     float chargeLow = accumulate(
                         vIndex.lower_bound(vLow),
                         vIndex.upper_bound(vLow),
-                        0,
+                        0.0,
                         (boost::lambda::_1 + ret<float>(bind(&ClsDigitRecord::m_charge, boost::lambda::_2)))
                       );
 
@@ -859,12 +878,13 @@ void PXDClusterizerModule::makePXDHit(ClusterDigits& cluster, PXDHit* storeHit)
   storeHit->setUVCov(0.0);
 
   // Deposited energy
-  float clusterCharge = accumulate(cluster.begin(), cluster.end(), 0,
+  float clusterCharge = accumulate(cluster.begin(), cluster.end(), 0.0,
                                    boost::lambda::_1 + bind<float>(&ClsDigitRecord::m_charge, boost::lambda::_2)
                                   );
   storeHit->setEnergyDep(clusterCharge);
 
 } // PXDClusterizerModule::makeHit
+
 
 
 //---------------------------------------------------------------------

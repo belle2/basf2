@@ -124,8 +124,6 @@ root: root/config/Makefile.config
 root/config/Makefile.config:
 	@echo "building root"
 	@-cd root; patch -Np0 < ../root.patch
-	@cd root/geom/geom/src; \
-	svn switch http://root.cern.ch/svn/root/trunk/geom/geom/src/TGeoBoolNode.cxx@38558 TGeoBoolNode.cxx 
 	@cd root; ./configure --enable-gsl-shared --enable-roofit; make -j $(NPROCESSES)
 	@mkdir -p $(EXTINCDIR)/root
 	@cp -a $(EXTDIR)/root/include/* $(EXTINCDIR)/root

@@ -83,6 +83,9 @@ namespace Belle2 {
     /** Get the number of occupied slots in the array. */
     int GetEntries() const {return m_storeArray->GetEntriesFast();}
 
+    /** Get the number of occupied slots in the array. */
+    int getEntries() const {return m_storeArray->GetEntriesFast();}
+
     /** Convinient Relation creating.
      *
      *  Using this way to create Relations is safer than direct creation,

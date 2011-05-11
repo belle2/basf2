@@ -41,10 +41,10 @@ SVDRecoHit::SVDRecoHit(const SVDHit* hit) :
   fHitCoord(1, 0) = hit->getV();
 
   // Set the error covariance matrix
-  fHitCov(0, 0) = hit->getUError();
+  fHitCov(0, 0) = hit->getUError() * hit->getUError();
   fHitCov(0, 1) = hit->getUVCov();
   fHitCov(1, 0) = hit->getUVCov();
-  fHitCov(1, 1) = hit->getVError();
+  fHitCov(1, 1) = hit->getVError() * hit->getVError();
 
   // Set physical parameters
   m_energyDep = hit->getEnergyDep();
@@ -54,9 +54,9 @@ SVDRecoHit::SVDRecoHit(const SVDHit* hit) :
   SiGeoCache* geometry = SiGeoCache::instance();
 
   // Construct vectors o, u, v
-  TVector3 oLocal(1, 0, 0);
+  TVector3 oLocal(0, 0, 0);
   TVector3 oGlobal(0, 0, 0);
-  geometry->localToMasterVec(m_sensorUniID, oLocal, oGlobal);
+  geometry->localToMaster(m_sensorUniID, oLocal, oGlobal);
   TVector3 uLocal(0, 1, 0);
   TVector3 uGlobal(0, 0, 0);
   geometry->localToMasterVec(m_sensorUniID, uLocal, uGlobal);

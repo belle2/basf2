@@ -113,6 +113,18 @@ namespace Belle2 {
       return (m_indices);
     }
 
+    /** Getter for weight.
+     */
+    float getWeight() {
+      return *(m_weight.begin());
+    }
+
+    /** Getter for weight list.
+     */
+    std::list<float> getWeights() {
+      return m_weight;
+    }
+
     /** Setter for the 'from' side index.
      */
     void setFromIndex(const int& fromIndex) {

@@ -69,6 +69,12 @@ namespace Belle2 {
      */
     void readRadialBField(GearDir& component);
 
+    /**
+     * Reads the parameters for a quadrupole magnetic field inside beam pipes and adds the component to the global magnetic field.
+     * @param component The GearDir pointing to the component parameter block from which the parameters should be read.
+     */
+    void readQuadBField(GearDir& component);
+
 
   private:
 

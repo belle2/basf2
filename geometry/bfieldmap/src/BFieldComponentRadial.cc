@@ -13,6 +13,7 @@
 #include <framework/core/Environment.h>
 #include <framework/core/ModuleUtils.h>
 #include <framework/logging/Logger.h>
+#include <framework/gearbox/Unit.h>
 
 #include <boost/iostreams/filtering_stream.hpp>
 #include <boost/iostreams/device/file.hpp>
@@ -122,6 +123,8 @@ TVector3 BFieldComponentRadial::calculate(const TVector3& point) const
 
   double Bx = (r > 0.0) ? Br * point.X() / r : 0.0;
   double By = (r > 0.0) ? Br * point.Y() / r : 0.0;
+
+  //B2DEBUG(20, "B Radial field is calculated: z= " << z/Unit::m <<"[m] By= "<< By <<"[Tesla].")
 
   return TVector3(Bx, By, Bz);
 }

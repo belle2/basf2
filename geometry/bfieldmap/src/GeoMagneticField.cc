@@ -13,6 +13,7 @@
 
 #include <geometry/bfieldmap/BFieldComponentConstant.h>
 #include <geometry/bfieldmap/BFieldComponentRadial.h>
+#include <geometry/bfieldmap/BFieldComponentQuad.h>
 
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/GearDir.h>
@@ -41,6 +42,7 @@ GeoMagneticField::GeoMagneticField() : CreatorBase("GeoMagneticField")
   //Add the function pointers called for reading the components to the map
   m_componentTypeMap.insert(make_pair("Constant", boost::bind(&GeoMagneticField::readConstantBField, this, _1)));
   m_componentTypeMap.insert(make_pair("Radial",   boost::bind(&GeoMagneticField::readRadialBField,   this, _1)));
+  m_componentTypeMap.insert(make_pair("Quad",     boost::bind(&GeoMagneticField::readQuadBField,     this, _1)));
 }
 
 
@@ -112,4 +114,33 @@ void GeoMagneticField::readRadialBField(GearDir& component)
   bComp.setMapRegionZ(mapRegionMinZ, mapRegionMaxZ, mapOffset);
   bComp.setMapRegionR(mapRegionMinR, mapRegionMaxR);
   bComp.setGridPitch(gridPitchR, gridPitchZ);
+}
+
+void GeoMagneticField::readQuadBField(GearDir& component)
+{
+  string mapFilenameHER = component.getParamString("MapFilenameHER");
+  string mapFilenameLER = component.getParamString("MapFilenameLER");
+  string apertFilenameHER = component.getParamString("ApertFilenameHER");
+  string apertFilenameLER = component.getParamString("ApertFilenameLER");
+
+  int mapSizeHER        = component.getParamIntValue("MapSizeHER");
+  int mapSizeLER        = component.getParamIntValue("MapSizeLER");
+  int apertSizeHER      = component.getParamIntValue("ApertSizeHER");
+  int apertSizeLER      = component.getParamIntValue("ApertSizeLER");
+
+  /* save circumference in [m] */
+  double circumferenceHER = component.getParamLength("CircumferenceHER") / Unit::m ;
+  double circumferenceLER = component.getParamLength("CircumferenceLER") / Unit::m ;
+
+  /* save beam energy in [eV] */
+  double beamEnergyHER    = component.getParamEnergy("BeamEnergyHER") / Unit::eV ;
+  double beamEnergyLER    = component.getParamEnergy("BeamEnergyLER") / Unit::eV ;
+
+  BFieldComponentQuad& bComp = BFieldMap::Instance().addBFieldComponent<BFieldComponentQuad>();
+  bComp.setMapFilename(mapFilenameHER, mapFilenameLER);
+  bComp.setApertFilename(apertFilenameHER, apertFilenameLER);
+  bComp.setMapSize(mapSizeHER, mapSizeLER);
+  bComp.setApertSize(apertSizeHER, apertSizeLER);
+  bComp.setCircumference(circumferenceHER, circumferenceLER);
+  bComp.setBeamEnergy(beamEnergyHER, beamEnergyLER);
 }

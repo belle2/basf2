@@ -90,6 +90,8 @@ double TouschekReaderSAD::getSADParticle(MCParticleGraph& graph)
     //Load the SAD particle
     m_tree->GetEntry(m_readEntry);
     convertParamsToSADUnits();
+
+    B2DEBUG(10, "> Read particle " << m_readEntry + 1 << "/" << m_tree->GetEntries() << " with s = " << m_lostS << " cm")
     m_readEntry++;
   } while (fabs(m_lostS) > m_sRange);
 
@@ -130,7 +132,7 @@ double TouschekReaderSAD::getRealParticle(MCParticleGraph& graph)
 
   //Create a new real particle from the SAD particle
   if ((fabs(m_lostS) <= m_sRange) && (m_realPartNum > 0)) {
-    addParticleToMCParticles(graph, true);
+    addParticleToMCParticles(graph);
     B2DEBUG(10, "* Created real particle " << m_realPartEntry + 1 << "/" << m_realPartNum << " for SAD particle " << m_readEntry << "/" << m_tree->GetEntries())
   }
 

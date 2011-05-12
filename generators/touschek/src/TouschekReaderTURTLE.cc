@@ -86,15 +86,19 @@ int TouschekReaderTURTLE::getParticles(int number, MCParticleGraph &graph) throw
     //Flip the sign for the y and z component to go from the accelerator to the detector coordinate system
     particlePosTouschek[0] = fields[2] * Unit::m;
     particlePosTouschek[1] = -fields[3] * Unit::m;
-    particlePosTouschek[2] = 0.0;
+    if (m_pdg == -11) particlePosTouschek[2] = 400.0; //forLER
+    else if (m_pdg == 11) particlePosTouschek[2] = -400.0; //forHER
+    else { std::cout << "m_pdg is not 11/-11" << std::endl; break;}
 
-    //    m_transMatrix->LocalToMaster(particlePosTouschek, particlePosGeant4);
+    m_transMatrix->LocalToMaster(particlePosTouschek, particlePosGeant4);
 
     //Convert the momentum of the particle from local Touschek plane space to global geant4 space.
     //Flip the sign for the y and z component to go from the accelerator to the detector coordinate system
     particleMomTouschek[0] = fields[4];
     particleMomTouschek[1] = -fields[5];
-    particleMomTouschek[2] = -fields[6];
+    if (m_pdg == -11) particleMomTouschek[2] = -fields[6]; //forLER
+    else if (m_pdg == 11) particleMomTouschek[2] = fields[6]; //forHER
+    else { std::cout << "m_pdg is not 11/-11" << std::endl; break;}
 
     m_transMatrix->LocalToMasterVect(particleMomTouschek, particleMomGeant4);
 

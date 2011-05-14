@@ -12,7 +12,7 @@ B1;2501;0c<?xml version="1.0" encoding="UTF-8"?>
 				<X>0.0</X>
 				<Y>0.0</Y>
 				<Z>1.5</Z>
-			</Component-->
+			</Component>
 
 			<!-- Radial solenoid magnetic field map
 			     The magnetic field map is stored as a grid in cylindrical coordinates.

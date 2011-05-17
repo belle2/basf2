@@ -58,6 +58,7 @@ namespace Belle2 {
     bool m_makeMaster;               /**< Parameter to signal if the modul should act as master */
     int m_runNum;                    /**< The run number that should be used if the reader acts as master */
     int m_expNum;               /**< The experiment number that should be used if the reader acts as master */
+    int m_evtNum;
 
   };
 

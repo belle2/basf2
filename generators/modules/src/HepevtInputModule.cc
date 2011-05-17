@@ -33,7 +33,7 @@ REG_MODULE(HepevtInput)
 //                 Implementation
 //-----------------------------------------------------------------
 
-HepevtInputModule::HepevtInputModule() : Module()
+HepevtInputModule::HepevtInputModule() : Module(), m_evtNum(-1)
 {
   //Set module properties
   setDescription("Hepevt file input");
@@ -104,15 +104,16 @@ void HepevtInputModule::event()
 
     //  StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
     if (m_makeMaster) {
-
       if (id > -1) {
-        eventMetaDataPtr->setExperiment(m_expNum);
-        eventMetaDataPtr->setRun(m_runNum);
-        eventMetaDataPtr->setEvent(id);
-      } else
-        B2FATAL("The HepEvtReader is running in Master mode BUT he can't find the event number in the file!")
-
+        m_evtNum = id;
+      } else {
+        id = ++m_evtNum;
       }
+
+      eventMetaDataPtr->setExperiment(m_expNum);
+      eventMetaDataPtr->setRun(m_runNum);
+      eventMetaDataPtr->setEvent(id);
+    }
     if (m_useWeights)
       eventMetaDataPtr->setGeneratedWeight(weight);
     mpg.generateList(DEFAULT_MCPARTICLES, MCParticleGraph::c_setDecayInfo | MCParticleGraph::c_checkCyclic);

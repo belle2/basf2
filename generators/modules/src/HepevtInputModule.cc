@@ -55,7 +55,7 @@ HepevtInputModule::HepevtInputModule() : Module(), m_evtNum(-1)
 void HepevtInputModule::initialize()
 {
   m_iFile = 0;
-  if (m_iFile > m_inputFileNames.size()) {
+  if (m_inputFileNames.size() == 0) {
     //something is wrong with the file list.
     B2FATAL("invalid list of input files. No entries found.");
   } else {
@@ -119,9 +119,10 @@ void HepevtInputModule::event()
     mpg.generateList(DEFAULT_MCPARTICLES, MCParticleGraph::c_setDecayInfo | MCParticleGraph::c_checkCyclic);
   } catch (HepevtReader::HepEvtEmptyEventError) {
     B2DEBUG(100, "Reached end of HepEvt file.");
+    m_hepevt.closeCurrentInputFile();
+    m_iFile++;
     if (m_iFile < m_inputFileNames.size()) {
       try {
-        m_hepevt.closeCurrentInputFile();
         m_inputFileName = m_inputFileNames[m_iFile];
         B2DEBUG(100, "Opening next file: " << m_inputFileName);
         m_hepevt.open(m_inputFileName);

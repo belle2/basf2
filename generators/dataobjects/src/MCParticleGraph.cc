@@ -160,7 +160,7 @@ public:
         }
         //Set Vertex and time information if requested
         setVertexTime(mother, daughter);
-        daughter.m_mother = v;
+        daughter.m_mother = mother.getIndex();
       }
       //Mark particle as seen
       m_seen[nv] = true;

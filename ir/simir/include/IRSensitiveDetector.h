@@ -11,6 +11,7 @@
 #ifndef IRSENSITIVEDETECTOR_H
 #define IRSENSITIVEDETECTOR_H
 
+#include <ir/dataobjects/IRSimHit.h>
 #include <simulation/kernel/SensitiveDetectorBase.h>
 #include <TG4RootDetectorConstruction.h>
 
@@ -22,7 +23,6 @@ namespace Belle2 {
 
   /**
    * The IR Sensitive Detector class.
-   *
    * This class stores Geant4 steps (pieces of tracks) in the IR active sensors.
    */
 

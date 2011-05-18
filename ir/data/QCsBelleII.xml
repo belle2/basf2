@@ -1,17 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ParamSet type="QCS">
-	<Name>Belle II QCs</Name>
-	<Description>Belle II QCs geometry</Description>
-	<Version>0</Version>
-	<Creator>QCsBelleII</Creator>
-	<Content>
-		<Rotation desc="Rotation of the QCs with respect to the Detector" unit="rad">0.0</Rotation>
-		<OffsetZ desc="The offset of the QCs in z with respect to the IP" unit="cm">0.0</OffsetZ>
-		
+    <Name>Belle II QCs</Name>
+    <Description>Belle II QCs geometry</Description>
+    <Version>0</Version>
+    <Creator>QCsBelleII</Creator>
+    <Content>
+        <Rotation desc="Rotation of the QCs with respect to the Detector" unit="rad">0.0</Rotation>
+        <OffsetZ desc="The offset of the QCs in z with respect to the IP" unit="cm">0.0</OffsetZ>
+
         <DistanceR desc="" unit="cm">63.35</DistanceR>
         <DistanceL desc="" unit="cm">-62.725</DistanceL>
         <AngleHER desc="HER beam pipe angle" unit="rad">0.0415</AngleHER>
         <AngleLER desc="LER beam pipe angle" unit="rad">-0.0415</AngleLER>
+        <SDFlag desc="Sensitive Detector Flag">0</SDFlag>
+        <!-- [SDFlag] To activate, put nonzero integer -->
+        <!-- 0: off, 1: on, 2: outer cryostat on -->
 
     <!-- ############################################################  -->
     <!-- for your information, please see BelleII computing homepage and -->

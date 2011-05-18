@@ -9,14 +9,16 @@
 		<Length desc="The full length of the IP beampipe" unit="mm">200</Length>
 		<OffsetZ desc="The offset of the IP beampipe in z with respect to the IP" unit="mm">10</OffsetZ>
 		<Radius desc="Default inner radius of outer IR beampipe" unit="mm">10</Radius>
+    <SDFlag desc="Sensitive Detector Flag">0</SDFlag>
+    <!-- [SDFlag] To activate, put nonzero integer -->
                 
 		<Thickness desc="Default thickness of outer IR beampipe" unit="mm">4.2</Thickness>
 		<Material desc="Default material of outer IR beampipe">Tantalum</Material>
 
 		<RangeStart desc="Include geometry from z-axis pos (0=no limit, does not apply to IP beampipe)" 
-                            unit="m">0</RangeStart>
+                            unit="m">-0.65</RangeStart>
 		<RangeEnd desc="Include geometry to z-axis pos (0=no limit, does not apply to IP beampipe)" 
-                            unit="m">0</RangeEnd>
+                            unit="m">0.65</RangeEnd>
 		
 		<Shells>	
 			<Shell name="GoldLayer">
@@ -84,12 +86,9 @@
 					<Crotch desc="Crotch section: 0 = false, 1 = aligned at IP chamber end, 2 = aligned at IP; default is 0">1</Crotch>
 					
 					<Pipe>
-						<Length desc="Length from centre end to centre end" 
-		                                        unit="mm">140.17</Length>
-						<Angle desc="Angle to previous pipe (-pi/2 to pi/2, positive points to +x-axis), default is 0" 
-		                                        unit="mrad">74.06</Angle>
-						<RadiusEnd desc = "Radius at the end of the pipe, default is same as previous pipe" 
-		                                        unit="mm">10</RadiusEnd>
+						<Length desc="Length from centre end to centre end" unit="mm">140.17</Length>
+						<Angle desc="Angle to previous pipe (-pi/2 to pi/2, positive points to +x-axis), default is 0" unit="mrad">74.06</Angle>
+						<RadiusEnd desc = "Radius at the end of the pipe, default is same as previous pipe" unit="mm">10</RadiusEnd>
 					</Pipe>
 					<Pipe>
 						<Length unit="mm">250</Length>
@@ -254,6 +253,127 @@
 					</Pipe>
 				</Section>
 			</Stream>
+
+			<!--Stream name="HERDownstreamVacuum">
+				<Direction desc="1 = positive z-axis, -1 = negative">1</Direction>
+				
+				<Section name="Crotch">
+					<Thickness desc="Default is same as previous" unit="mm">10.0</Thickness>
+					<Material desc="Default is same as previous">Vacuum</Material>
+					<Crotch desc="Crotch section: 0 = false, 1 = aligned at IP chamber end, 2 = aligned at IP; default is 0">1</Crotch>
+					
+					<Pipe>
+						<RadiusStart desc="Start radius for asym. crotch pipe" unit="mm">0.0</RadiusStart>
+						<Length desc="Length from centre end to centre end" unit="mm">140.17</Length>
+						<Angle desc="Angle to previous pipe (-pi/2 to pi/2, positive points to +x-axis), default is 0" unit="mrad">74.06</Angle>
+					</Pipe>
+					<Pipe>
+						<Length unit="mm">250</Length>
+						<Angle unit="mrad">-32.56</Angle>
+					</Pipe>
+				</Section>
+				<Section name="Flange1_">
+					<Pipe>
+						<Length unit="mm">100</Length>
+					</Pipe>
+				</Section>
+				<Section name="Mid">
+					<Pipe>
+						<Length unit="mm">616</Length>
+					</Pipe>
+				</Section>
+			</Stream>
+
+			<Stream name="LERUpstreamVacuum">
+				<Direction desc="1 = positive z-axis, -1 = negative">1</Direction>
+				
+				<Section name="Crotch">
+					<Thickness desc="Default is same as previous" unit="mm">4.87</Thickness>
+					<Crotch>2</Crotch>
+					
+					<Pipe>
+						<RadiusStart desc="Start radius for asym. crotch pipe" unit="mm">0.0</RadiusStart>
+						<Length unit="mm">89.26</Length>
+						<Angle unit="mrad">-41.5</Angle>
+					</Pipe>
+					<Pipe>
+						<Length unit="mm">150.74</Length>
+					</Pipe>
+					<Pipe>
+						<Length unit="mm">150</Length>
+					</Pipe>
+				</Section>
+				<Section name="Flange1_">
+					<Pipe>
+						<Length unit="mm">100</Length>
+					</Pipe>
+				</Section>
+				<Section name="Mid">
+					<Pipe>
+						<Length unit="mm">616</Length>
+					</Pipe>
+				</Section>
+			</Stream>
+
+			<Stream name="LERDownstreamVacuum">
+				<Direction desc="1 = positive z-axis, -1 = negative">-1</Direction>
+				
+				<Section name="Crotch">
+					<Thickness desc="Default is same as previous" unit="mm">10.0</Thickness>
+					<Crotch>1</Crotch>
+					
+					<Pipe>
+						<RadiusStart desc="Start radius for asym. crotch pipe" unit="mm">0.0</RadiusStart>
+						<Length unit="mm">160.12</Length>
+						<Angle unit="mrad">64.82</Angle>
+					</Pipe>
+					<Pipe>
+						<Length unit="mm">250.0</Length>
+						<Angle unit="mrad">-23.32</Angle>
+					</Pipe>
+				</Section>
+				<Section name="Flange1_">
+					<Pipe>
+						<Length unit="mm">160.9</Length>
+					</Pipe>
+				</Section>
+				<Section name="Mid">
+					<Pipe>
+						<Length unit="mm">683</Length>
+					</Pipe>
+				</Section>
+			</Stream>
+			
+			<Stream name="HERUpstreamVacuum">
+				<Direction desc="1 = positive z-axis, -1 = negative">-1</Direction>
+				
+				<Section name="Crotch">
+					<Thickness desc="Default is same as previous" unit="mm">4.51</Thickness>
+					<Crotch>2</Crotch>
+					
+					<Pipe>
+						<RadiusStart desc="Start radius for asym. crotch pipe" unit="mm">0.0</RadiusStart>
+						<Length unit="mm">101.44</Length>
+						<Angle unit="mrad">-41.5</Angle>
+					</Pipe>
+					<Pipe>
+						<Length unit="mm">158.56</Length>
+					</Pipe>
+					<Pipe>
+						<Length unit="mm">150.0</Length>
+					</Pipe>
+				</Section>
+				<Section name="Flange1_">
+					<Pipe>
+						<Length unit="mm">160.9</Length>
+					</Pipe>
+				</Section>
+				<Section name="Mid">
+					<Pipe>
+						<Length unit="mm">683</Length>
+					</Pipe>
+				</Section>
+			</Stream-->
 		</Streams>
 
 	</Content>

@@ -15,6 +15,8 @@
 // ############################################################
 
 #include <ir/geoir/GeoQCsBelleII.h>
+#include <ir/simir/IRSensitiveDetector.h>
+#include <ir/dataobjects/IRVolumeUserInfo.h>
 
 #include <framework/gearbox/GearDir.h>
 #include <framework/gearbox/Unit.h>
@@ -64,6 +66,68 @@ GeoQCsBelleII::~GeoQCsBelleII()
 
 void GeoQCsBelleII::create(GearDir& content)
 {
+  // -Index-
+  // Collection global parameters
+  // Cryo R
+  // #Group A
+  // +- A1wal1
+  //      +- A2spc1
+  //         +- Achecker
+  // #Group B
+  // +- B1wal1
+  //    +- B2spc1
+  // #Group C
+  // +- C1wal1
+  //    +- C2spc1
+  //       +- C3wal2
+  //          +- C4spc2
+  //             +- C5wal3
+  //             +- C5wal5
+  //                +- C6spc4
+  //                +- C6spc5
+  //                +- C6spc7
+  //                +- C6spc8
+  //                +- C6spc3
+  //                +- C6spc6
+  //                   +- C7mag1
+  //                   +- C7mag2
+  //                   +- C7mag3
+  //                   +- C7mag4
+  //                   +- C7mag5
+  //                   +- C7mag6
+  //                   +- C7mag7
+  //                   +- C7hld1
+  //                   +- C7cil1
+  // Cryo L
+  // #Group D
+  // +- D1wal1
+  //    +- D2spc1
+  // #Group E
+  // +- E1wal1
+  //    +- E2spc1
+  // #Group F
+  // +- F1wal1
+  //    +- F2spc1
+  //       +- F3wal2
+  //       +- F3wal3
+  //          +- F4spc2
+  //          +- F4spc3
+  //             +- F5wal4
+  //             +- F5wal5
+  //                +- F6spc5
+  //                +- F6spc6
+  //                +- F6spc4
+  //                +- F6spc8
+  //                +- F6spc7
+  //                   +- F7mag1
+  //                   +- F7mag2
+  //                   +- F7mag3
+  //                   +- F7mag4
+  //                   +- F7mag5
+  //                   +- F7mag6
+  //                   +- F7mag7
+  //                   +- F7hld1
+  //                   +- F7cil1
 
   TGeoRotation* geoRot = new TGeoRotation("QCSRot", 0.0, 0.0, 0.0);
   TGeoVolumeAssembly* volQCS = addSubdetectorGroup("QCS", new TGeoCombiTrans(0.0, 0.0, 0.0, geoRot));
@@ -83,9 +147,20 @@ void GeoQCsBelleII::create(GearDir& content)
   double GlobalDistanceL  = content.getParamLength("DistanceL");
   double GlobalAngleHER = content.getParamAngle("AngleHER") / Unit::deg;
   double GlobalAngleLER = content.getParamAngle("AngleLER") / Unit::deg;
+  int    GlobalSDFlag = content.getParamIntValue("SDFlag");
   // Unit::rad = 1, Unit::deg = 0.0174533 = pi/180
   //#
   //#################################
+
+  string crown = "";
+  string crown2 = "";
+  if (GlobalSDFlag != 0) {
+    //The IR subdetector uses the "SD_" prefix to flag its sensitive volumes
+    addSensitiveDetector("SD_", new IRSensitiveDetector("IRSensitiveDetector"));
+
+    crown = "SD_";
+    if (GlobalSDFlag >= 2) crown2 = "SD_";
+  }
 
   //variables
   double bpthick;
@@ -147,8 +222,8 @@ void GeoQCsBelleII::create(GearDir& content)
   geoA1wal1tub->SetName("geoA1wal1tubname");
 
   TGeoCompositeShape* geoA1wal1 = new TGeoCompositeShape("geoA1wal1name", "geoA1wal1pconname:rotHERname - geoA1wal1tubname");
-  TGeoVolume *volA1wal1 = new TGeoVolume("volA1wal1name", geoA1wal1, strMedA1wal1);
-
+  TGeoVolume *volA1wal1 = new TGeoVolume((format("%1%volA1wal1name") % crown).str().c_str(), geoA1wal1, strMedA1wal1);
+  B2INFO("volA1wal1's name is " << volA1wal1->GetName());
   //-   put volume
   volA1wal1->SetLineColor(kGray + 3);
   volQCS->AddNode(volA1wal1, 1, new TGeoTranslation(0.0, 0.0, 0.0));
@@ -198,12 +273,30 @@ void GeoQCsBelleII::create(GearDir& content)
   //-   Intersection volume
   TGeoCompositeShape* geoA2spc1 = new TGeoCompositeShape("geoA2spc1name", "geoA2spc1pconname:rotHERname * geoA1wal1name");
   TGeoVolume *volA2spc1 = new TGeoVolume("volA2spc1name", geoA2spc1, strMedA2spc1);
+  volA2spc1->SetField(new IRVolumeUserInfo());
 
   //-   put volume
   volA2spc1->SetLineColor(kGray + 1);
   volA1wal1->AddNode(volA2spc1, 1, new TGeoTranslation(0.0, 0.0, 0.0));
   //-
   //--------------
+
+  /*//--------------
+  //-   Achecker
+  if(GlobalSDFlag >= 10)
+  {
+    TGeoMedium* strMedAchecker = gGeoManager->GetMedium("Vacuum");
+    TGeoPcon* geoAcheckerpcon = new TGeoPcon( 0, 360, 2);
+      geoAcheckerpcon->DefineSection(0, 199.999, 0, 4.0);
+      geoAcheckerpcon->DefineSection(1, 200.000, 0, 4.0);
+      geoAcheckerpcon->SetName("geoAcheckerpconname");
+    TGeoCompositeShape* geoAchecker = new TGeoCompositeShape("geoAcheckername", "geoAcheckerpconname:rotHERname * geoA2spc1name");
+    TGeoVolume *volAchecker = new TGeoVolume("SD_volAcheckername", geoAchecker, strMedAchecker);
+    volAchecker->SetLineColor(kRed);
+    volA2spc1->AddNode(volAchecker, 1, new TGeoTranslation(0.0, 0.0, 0.0));
+  }
+  //-
+  //--------------*/
 
   //==============
   //    Group B
@@ -259,7 +352,8 @@ void GeoQCsBelleII::create(GearDir& content)
 
   //-   Subtraction volume
   TGeoCompositeShape* geoB1wal1 = new TGeoCompositeShape("geoB1wal1name", "geoB1wal1pconname:rotLERname - geoA1wal1tubname");
-  TGeoVolume *volB1wal1 = new TGeoVolume("volB1wal1name", geoB1wal1, strMedB1wal1);
+  TGeoVolume *volB1wal1 = new TGeoVolume((format("%1%volB1wal1name") % crown).str().c_str(), geoB1wal1, strMedB1wal1);
+  B2INFO("volB1wal1's name is " << volB1wal1->GetName());
 
   //-   put volume
   volB1wal1->SetLineColor(kGray + 3);
@@ -317,12 +411,30 @@ void GeoQCsBelleII::create(GearDir& content)
   //-   Intersection volume
   TGeoCompositeShape* geoB2spc1 = new TGeoCompositeShape("geoB2spc1name", "geoB2spc1pconname:rotLERname * geoB1wal1name");
   TGeoVolume *volB2spc1 = new TGeoVolume("volB2spc1name", geoB2spc1, strMedB2spc1);
+  volB2spc1->SetField(new IRVolumeUserInfo());
 
   //-   put volume
   volB2spc1->SetLineColor(kGray + 1);
   volB1wal1->AddNode(volB2spc1, 1, new TGeoTranslation(0.0, 0.0, 0.0));
   //-
   //--------------
+
+  /*//--------------
+  //-   Bchecker
+  if(GlobalSDFlag >= 10)
+  {
+    TGeoMedium* strMedBchecker = gGeoManager->GetMedium("Vacuum");
+    TGeoPcon* geoBcheckerpcon = new TGeoPcon( 0, 360, 2);
+      geoBcheckerpcon->DefineSection(0, 199.999, 0, 4.0);
+      geoBcheckerpcon->DefineSection(1, 200.000, 0, 4.0);
+      geoBcheckerpcon->SetName("geoBcheckerpconname");
+    TGeoCompositeShape* geoBchecker = new TGeoCompositeShape("geoBcheckername", "geoBcheckerpconname:rotLERname * geoB2spc1name");
+    TGeoVolume *volBchecker = new TGeoVolume("SD_volBcheckername", geoBchecker, strMedBchecker);
+    volBchecker->SetLineColor(kRed);
+    volB2spc1->AddNode(volBchecker, 1, new TGeoTranslation(0.0, 0.0, 0.0));
+  }
+  //-
+  //--------------*/
 
   //==============
   //=   Group C
@@ -377,7 +489,8 @@ void GeoQCsBelleII::create(GearDir& content)
 
   //-   Subtraction volume
   TGeoCompositeShape* geoC1wal1 = new TGeoCompositeShape("geoC1wal1name", "geoC1wal1pconname - geoA1wal1name - geoB1wal1name");
-  TGeoVolume *volC1wal1 = new TGeoVolume("volC1wal1name", geoC1wal1, strMedC1wal1);
+  TGeoVolume *volC1wal1 = new TGeoVolume((format("%1%volC1wal1name") % crown2).str().c_str(), geoC1wal1, strMedC1wal1);
+  B2INFO("volC1wal1's name is " << volC1wal1->GetName());
 
   //-   put volume
   volC1wal1->SetLineColor(kGray + 3);
@@ -1361,7 +1474,8 @@ void GeoQCsBelleII::create(GearDir& content)
   geoD1wal1tub->SetName("geoD1wal1tubname");
 
   TGeoCompositeShape* geoD1wal1 = new TGeoCompositeShape("geoD1wal1name", "geoD1wal1pconname:rotHERname - geoD1wal1tubname");
-  TGeoVolume *volD1wal1 = new TGeoVolume("volD1wal1name", geoD1wal1, strMedD1wal1);
+  TGeoVolume *volD1wal1 = new TGeoVolume((format("%1%volD1wal1name") % crown).str().c_str(), geoD1wal1, strMedD1wal1);
+  B2INFO("volD1wal1's name is " << volD1wal1->GetName());
 
   //-   put volume
   volD1wal1->SetLineColor(kGray + 3);
@@ -1404,12 +1518,30 @@ void GeoQCsBelleII::create(GearDir& content)
   //-   Intersection volume
   TGeoCompositeShape* geoD2spc1 = new TGeoCompositeShape("geoD2spc1name", "geoD2spc1pconname:rotHERname * geoD1wal1name");
   TGeoVolume *volD2spc1 = new TGeoVolume("volD2spc1name", geoD2spc1, strMedD2spc1);
+  volD2spc1->SetField(new IRVolumeUserInfo());
 
   //-   put volume
   volD2spc1->SetLineColor(kGray + 1);
   volD1wal1->AddNode(volD2spc1, 1, new TGeoTranslation(0.0, 0.0, 0.0));
   //-
   //--------------
+
+  /*//--------------
+  //-   Dchecker
+  if(GlobalSDFlag >= 10)
+  {
+    TGeoMedium* strMedDchecker = gGeoManager->GetMedium("Vacuum");
+    TGeoPcon* geoDcheckerpcon = new TGeoPcon( 0, 360, 2);
+      geoDcheckerpcon->DefineSection(0, -199.999, 0, 4.0);
+      geoDcheckerpcon->DefineSection(1, -200.000, 0, 4.0);
+      geoDcheckerpcon->SetName("geoDcheckerpconname");
+    TGeoCompositeShape* geoDchecker = new TGeoCompositeShape("geoDcheckername", "geoDcheckerpconname:rotHERname * geoD2spc1name");
+    TGeoVolume *volDchecker = new TGeoVolume("SD_volDcheckername", geoDchecker, strMedDchecker);
+    volDchecker->SetLineColor(kRed);
+    volD2spc1->AddNode(volDchecker, 1, new TGeoTranslation(0.0, 0.0, 0.0));
+  }
+  //-
+  //--------------*/
 
   //==============
   //    Group E
@@ -1464,7 +1596,8 @@ void GeoQCsBelleII::create(GearDir& content)
 
   //-   Subtraction volume
   TGeoCompositeShape* geoE1wal1 = new TGeoCompositeShape("geoE1wal1name", "geoE1wal1pconname:rotLERname - geoD1wal1tubname");
-  TGeoVolume *volE1wal1 = new TGeoVolume("volE1wal1name", geoE1wal1, strMedE1wal1);
+  TGeoVolume *volE1wal1 = new TGeoVolume((format("%1%volE1wal1name") % crown).str().c_str(), geoE1wal1, strMedE1wal1);
+  B2INFO("volE1wal1's name is " << volE1wal1->GetName());
 
   //-   put volume
   volE1wal1->SetLineColor(kGray + 3);
@@ -1513,12 +1646,30 @@ void GeoQCsBelleII::create(GearDir& content)
   //-   Intersection volume
   TGeoCompositeShape* geoE2spc1 = new TGeoCompositeShape("geoE2spc1name", "geoE2spc1pconname:rotLERname * geoE1wal1name");
   TGeoVolume *volE2spc1 = new TGeoVolume("volE2spc1name", geoE2spc1, strMedE2spc1);
+  volE2spc1->SetField(new IRVolumeUserInfo());
 
   //-   put volume
   volE2spc1->SetLineColor(kGray + 1);
   volE1wal1->AddNode(volE2spc1, 1, new TGeoTranslation(0.0, 0.0, 0.0));
   //-
   //--------------
+
+  /*//--------------
+  //-   Echecker
+  if(GlobalSDFlag >= 10)
+  {
+    TGeoMedium* strMedEchecker = gGeoManager->GetMedium("Vacuum");
+    TGeoPcon* geoEcheckerpcon = new TGeoPcon( 0, 360, 2);
+      geoEcheckerpcon->DefineSection(0, -199.999, 0, 4.0);
+      geoEcheckerpcon->DefineSection(1, -200.000, 0, 4.0);
+      geoEcheckerpcon->SetName("geoEcheckerpconname");
+    TGeoCompositeShape* geoEchecker = new TGeoCompositeShape("geoEcheckername", "geoEcheckerpconname:rotLERname * geoE2spc1name");
+    TGeoVolume *volEchecker = new TGeoVolume("SD_volEcheckername", geoEchecker, strMedEchecker);
+    volEchecker->SetLineColor(kRed);
+    volE2spc1->AddNode(volEchecker, 1, new TGeoTranslation(0.0, 0.0, 0.0));
+  }
+  //-
+  //--------------*/
 
   //==============
   //=   Group F
@@ -1577,7 +1728,8 @@ void GeoQCsBelleII::create(GearDir& content)
 
   //-   Subtraction volume
   TGeoCompositeShape* geoF1wal1 = new TGeoCompositeShape("geoF1wal1name", "geoF1wal1pconname - geoD1wal1name - geoE1wal1name");
-  TGeoVolume *volF1wal1 = new TGeoVolume("volF1wal1name", geoF1wal1, strMedF1wal1);
+  TGeoVolume *volF1wal1 = new TGeoVolume((format("%1%volF1wal1name") % crown2).str().c_str(), geoF1wal1, strMedF1wal1);
+  B2INFO("volF1wal1's name is " << volF1wal1->GetName());
 
   //-   put volume
   volF1wal1->SetLineColor(kGray + 3);

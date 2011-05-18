@@ -14,6 +14,7 @@
 
 #include <ir/geoir/GeoIRBelleII.h>
 #include <ir/simir/IRSensitiveDetector.h>
+#include <ir/dataobjects/IRVolumeUserInfo.h>
 
 #include <framework/gearbox/GearDir.h>
 #include <framework/gearbox/GearboxIOAbs.h>
@@ -53,9 +54,6 @@ GeoIRBelleII regGeoIRBelleII;
 GeoIRBelleII::GeoIRBelleII() : CreatorBase("IRBelleII")
 {
   setDescription("Creates the TGeo objects for the IR geometry of the Belle II detector.");
-
-  //The IR subdetector uses the "SD_" prefix to flag its sensitive volumes
-  addSensitiveDetector("SD_", new IRSensitiveDetector("IRSensitiveDetector"));
 }
 
 
@@ -78,12 +76,15 @@ TGeoShape* GeoIRBelleII::GeoBelleIIPipe(const char* name_,
   double cost2 = cos(0.5 * theta2_ * deg);
   double sint2 = sin(0.5 * theta2_ * deg);
 
-  double radinn2 = radinn1_ + radchange_;
+  double radinn2;
+  radinn2 = radinn1_ + radchange_;
+  if (radinn1_ == 0) radinn2 = 0.0; //nakano110505
   double radout2 = radout1_ + radchange_;
 
   string tubeName = string(name_) + "Tube";
   TGeoShape* tube;
-  if (radinn2 != radinn1_) {
+  //if (radinn2 != radinn1_)
+  if (radchange_ != 0) { //nakano110505
     // --- Form conical pipe
     if (theta1_ != theta2_) {
       B2WARNING("Warning: different end-angled cone pipes not supported: ignoring end-angles." <<
@@ -357,6 +358,7 @@ void GeoIRBelleII::create(GearDir& content)
   double rotAngle = 0;
   double zMin     = 0;
   double zMax     = 0;
+  int    GlobalSDFlag = content.getParamIntValue("SDFlag");
   if (content.isParamAvailable("Rotation")) rotAngle = content.getParamAngle("Rotation") / deg;
   if (content.isParamAvailable("RangeStart")) zMin = content.getParamLength("RangeStart");
   if (content.isParamAvailable("RangeEnd")) zMax = content.getParamLength("RangeEnd");
@@ -366,6 +368,12 @@ void GeoIRBelleII::create(GearDir& content)
   TGeoRotation* geoRot = new TGeoRotation("BeamPipeRot", 90.0, rotAngle, -90.0);
   TGeoVolumeAssembly* volGrpBP = addSubdetectorGroup("IR", new TGeoCombiTrans(0.0, 0.0, 0.0, geoRot));
 
+  string crown = "";
+  if (GlobalSDFlag != 0) {
+    //The IR subdetector uses the "SD_" prefix to flag its sensitive volumes
+    addSensitiveDetector("SD_", new IRSensitiveDetector("IRSensitiveDetector"));
+    crown = "SD_";
+  }
 
   //-----------------------------------------------------------------
   //                 Build IR chamber streams
@@ -394,7 +402,7 @@ void GeoIRBelleII::create(GearDir& content)
       IRTube->SetName("IRTubename");
       string arg2 = string(IRPipe[i]->GetName()) + ":" + string(IRTrans[i]->GetName()) + "*IRTubename";
       TGeoCompositeShape* IRPipeComp = new TGeoCompositeShape(((format("IRPipeCompName%1%") % i).str()).c_str(), arg2.c_str());
-      TGeoVolume* IRPipeCompVol = new TGeoVolume(((format("IRPipeCompVolName%1%") % i).str()).c_str(), IRPipeComp, IRMed[i]);
+      TGeoVolume* IRPipeCompVol = new TGeoVolume(((format("%1%IRPipeCompVolName%2%") % crown % i).str()).c_str(), IRPipeComp, IRMed[i]);
       IRPipeCompVol->SetLineColor(kTeal + 3);
       volGrpBP->AddNode(IRPipeCompVol, 1);
       //modify end nakano110307
@@ -403,11 +411,47 @@ void GeoIRBelleII::create(GearDir& content)
     B2ERROR("No IR chamber streams defined ! " << exc.what())
   }
 
+  //addition start nakano110505
+  //-----------------------------------------------------------------
+  //                 Build Vacuum volume of IR chamber streams
+  //-----------------------------------------------------------------
+
+  vector<TGeoShape*>IRPipe_Vac;
+  vector<TGeoMedium*>IRMed_Vac;
+  vector<TGeoCombiTrans*>IRTrans_Vac;
+  TGeoMedium* strMedVacuum = gGeoManager->GetMedium("Vacuum");
+
+  double *overlap_Vac = new double[2];
+  overlap_Vac[0] = 0;
+  overlap_Vac[1] = 0;
+  try {
+    overlap_Vac = createPipe("Vac", IRPipe_Vac, IRMed_Vac, IRTrans_Vac, content, zMin, zMax, 1); //solid_=1
+    B2INFO("Vacuum volume defined: returned - " << overlap_Vac[0] << ": " << overlap_Vac[1])
+
+    for (int i = 0; i < (int)IRPipe_Vac.size(); i++) {
+      TGeoPcon* IRTube_Vac = new TGeoPcon(0, 360, 2);
+      IRTube_Vac->DefineSection(0, -62.725, 0, 10);
+      IRTube_Vac->DefineSection(1,  63.35, 0, 10);
+      IRTube_Vac->SetName("IRTube_Vacname");
+      string arg2_Vac = "(" + string(IRPipe_Vac[i]->GetName()) + ":" + string(IRTrans[i]->GetName()) + "*IRTube_Vacname) -" + string(IRPipe[i]->GetName()) + ":" + string(IRTrans[i]->GetName()); //subtract
+      TGeoCompositeShape* IRPipeComp_Vac = new TGeoCompositeShape(((format("IRPipeComp_VacName%1%") % i).str()).c_str(), arg2_Vac.c_str());
+      TGeoVolume* IRPipeComp_VacVol = new TGeoVolume(((format("IRPipeComp_VacVolName%1%") % i).str()).c_str(), IRPipeComp_Vac, strMedVacuum);
+      //B2INFO("Vacuum volume name is " << IRPipeComp_VacVol->GetName());
+      IRPipeComp_VacVol->SetField(new IRVolumeUserInfo());
+      IRPipeComp_VacVol->SetLineColor(kTeal + 3);
+      volGrpBP->AddNode(IRPipeComp_VacVol, 1);
+    }
+  } catch (runtime_error& exc) {
+    B2ERROR("No Vacuum volume streams defined ! " << exc.what())
+  }
+  //addition end nakano110505
+
+
   //-----------------------------------------------------------------
   //                 Build shields
   //-----------------------------------------------------------------
 
-  /* //modify start nakano110308
+  /* //erase start nakano110308
   try {
     int nShield = content.getNumberNodes("Shields/Shield");
     for (int iShield = 1; iShield <= nShield; ++iShield) {
@@ -459,7 +503,7 @@ void GeoIRBelleII::create(GearDir& content)
   } catch (runtime_error& exc) {
     B2ERROR("No shields defined ! " << exc.what())
   }
-  */ //modify start nakano110308
+  */ //erase start nakano110308
 
   //-----------------------------------------------------------------
   //                 Build IP Chamber
@@ -487,11 +531,30 @@ void GeoIRBelleII::create(GearDir& content)
       TGeoMedium* shellMed = gGeoManager->GetMedium(shellMatName.c_str());
 
       //Create Tube
-      TGeoVolume* shellTube = gGeoManager->MakeTube(shellName.c_str(), shellMed, innerRadius, outerRadius, 0.5 * length);
+      //TGeoVolume* shellTube = gGeoManager->MakeTube(                                 shellName.c_str(), shellMed, innerRadius, outerRadius, 0.5 * length);
+      TGeoVolume* shellTube = gGeoManager->MakeTube((format("%1%%2%") % crown % shellName).str().c_str(), shellMed, innerRadius, outerRadius, 0.5 * length);
+      B2INFO("Shell Tube name is " << shellTube->GetName());
       shellTube->SetLineColor(kOrange + 3);
       volGrpBP->AddNode(shellTube, 1, new TGeoTranslation(0.0, 0.0, offsetZ));    //translation moved to here
     }
+    //addition start nakano110505
+    TGeoTube* geoIPvacuum = new TGeoTube(0, 1.0, 0.5 * length);
+    TGeoMedium* strMedIPvacuum = gGeoManager->GetMedium("Vacuum");
+    TGeoVolume *volIPvacuum = new TGeoVolume("volIPvacuumname", geoIPvacuum, strMedIPvacuum);
+    volIPvacuum->SetField(new IRVolumeUserInfo());
+    volIPvacuum->SetLineColor(kOrange + 3);
+    volGrpBP->AddNode(volIPvacuum, 1, new TGeoTranslation(0.0, 0.0, offsetZ));
+    if (GlobalSDFlag >= 10) {
+      TGeoTube* geoIPchecker = new TGeoTube(0, 1.0, 0.001 / 10.);
+      string strMatIPchecker = "Vacuum";
+      TGeoMedium* strMedIPchecker = gGeoManager->GetMedium(strMatIPchecker.c_str());
+      TGeoVolume *volIPchecker = new TGeoVolume("SD_volIPcheckername", geoIPchecker, strMedIPchecker);
+      volIPchecker->SetLineColor(kRed);
+      volIPvacuum->AddNode(volIPchecker, 1, new TGeoTranslation(0.0, 0.0, -offsetZ));
+    }
+    //addition end nakano110505
   } catch (runtime_error& exc) {
     B2ERROR("No IP chamber defined ! " << exc.what())
   }
+
 }

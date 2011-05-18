@@ -1,4 +1,4 @@
-B1;2501;0c<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <ParamSet type="MagneticField">
 	<Name>MagneticField</Name>
 	<Description>The magnetic field description for the Belle II Detector</Description>

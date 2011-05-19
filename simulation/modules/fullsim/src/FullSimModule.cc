@@ -35,6 +35,8 @@
 #include <G4UImanager.hh>
 #include <G4VisExecutive.hh>
 #include <G4StepLimiter.hh>
+#include <G4LossTableManager.hh>
+#include <G4HadronicProcessStore.hh>
 
 #include <TGeoManager.h>
 #include <TG4RootNavMgr.h>
@@ -196,6 +198,9 @@ void FullSimModule::initialize()
   G4EventManager::GetEventManager()->SetVerboseLevel(g4VerboseLevel);
   G4RunManager::GetRunManager()->SetVerboseLevel(g4VerboseLevel);
   G4EventManager::GetEventManager()->GetTrackingManager()->SetVerboseLevel(m_trackingVerbosity); //turned out to be more useful as a parameter.
+  G4HadronicProcessStore::Instance()->SetVerbose(g4VerboseLevel);
+  G4LossTableManager::Instance()->SetVerbose(g4VerboseLevel);
+
 
   if (m_EnableVisualization) {
     m_visManager = new G4VisExecutive;

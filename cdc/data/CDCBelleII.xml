@@ -3888,7 +3888,7 @@
         <InnerR2 desc="Inner radius far from IP" unit="mm">1137.1</InnerR2>
         <Thickness desc="The thickness of the cover" unit="mm">0.5</Thickness>
         <Angle desc="The angle between the cover and z axis" unit="rad">1.37881</Angle>
-        <PosZ desc="Z position near IP" unit="mm">-936.402</PosZ>
+        <PosZ desc="Z position near IP" unit="mm">-851.56</PosZ>
       </Cover>
       <Cover id="2">
         <Name>ForwardCover</Name>

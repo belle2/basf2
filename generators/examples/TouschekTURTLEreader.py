@@ -19,7 +19,7 @@
 from basf2 import *
 
 # suppress messages and warnings during processing:
-set_log_level(2)
+set_log_level(LogLevel.WARNING)
 
 # to run the framework the used module needs to be registered
 touschekinput = register_module('TouschekTURTLEInput')

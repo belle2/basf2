@@ -19,7 +19,7 @@
 from basf2 import *
 
 # suppress messages and warnings during processing:
-set_log_level(3)
+set_log_level(LogLevel.ERROR)
 
 # to run the framework the used modules need to be registered
 pguninput = register_module('PGunInput')

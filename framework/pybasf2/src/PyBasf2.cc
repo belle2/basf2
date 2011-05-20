@@ -16,6 +16,7 @@
 #include <framework/core/Path.h>
 #include <framework/core/Framework.h>
 #include <framework/core/ModuleParam.h>
+#include <framework/logging/LogPythonInterface.h>
 
 using namespace Belle2;
 using namespace boost::python;
@@ -30,6 +31,7 @@ BOOST_PYTHON_MODULE(pybasf2)
   Path::exposePythonAPI();
   Framework::exposePythonAPI();
   ModuleParamInfoPython::exposePythonAPI();
+  LogPythonInterface::exposePythonAPI();
 }
 
 

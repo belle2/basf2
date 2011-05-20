@@ -3,6 +3,7 @@
 
 import os
 import signal
+import inspect
 from pybasf2 import *
 
 # -----------------------------------------------

@@ -133,7 +133,14 @@ namespace Belle2 {
      *
      * @return The log system configuration.
      */
-    LogConfig* getLogConfiguration() {return &m_logConfig;}
+    LogConfig& getLogConfig() {return m_logConfig;}
+
+    /**
+     * Set the log system configuration.
+     *
+     * @param logConfig The log system configuration.
+     */
+    void setLogConfig(const LogConfig& logConfig) {m_logConfig = logConfig;}
 
     /**
      * Configure the log level.

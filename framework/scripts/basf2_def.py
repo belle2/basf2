@@ -101,10 +101,10 @@ def set_log_level(level):
     """
     Sets the global log level which specifies up to which level the logging messages will be shown
 
-    level: The level as a number: 0=Debug, 1=Info, 2=Warning, 3=Error, 4=Fatal
+    level: LogLevel.DEBUG/INFO/WARNING/ERROR/FATAL
     """
 
-    fw.set_log_level(level)
+    logging.log_level = level
 
 
 def set_debug_level(level):
@@ -114,19 +114,19 @@ def set_debug_level(level):
     level: The debug level. The default value is 100
     """
 
-    fw.set_debug_level(level)
+    logging.debug_level = level
 
 
-def log_to_shell():
+def log_to_console(color=False):
     """
     Adds the standard output stream to the list of logging destinations. The shell logging destination is
     added to the list by the framework by default.
     """
 
-    fw.log_to_shell()
+    logging.add_console(color)
 
 
-def log_to_txtfile(filename, append=False):
+def log_to_file(filename, append=False):
     """
     Adds a text file to the list of logging destinations.
 
@@ -134,7 +134,7 @@ def log_to_txtfile(filename, append=False):
     append: Should the logging system append the messages to the end of the file (True) or create a new file for each event processing session (False). Default is False.
     """
 
-    fw.log_to_txtfile(filename, append)
+    logging.add_file(filename, append)
 
 
 def reset_log():
@@ -142,7 +142,7 @@ def reset_log():
     Resets the logging by removing all logging destinations
     """
 
-    fw.reset_log()
+    logging.reset()
 
 
 def set_data_search_path(datapath):

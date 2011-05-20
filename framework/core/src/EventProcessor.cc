@@ -72,7 +72,7 @@ void EventProcessor::processInitialize(const ModulePtrList& modulePathList)
     }
 
     //Set the module dependent log level
-    logSystem.setModuleLogConfig(module->getLogConfiguration());
+    logSystem.setModuleLogConfig(&(module->getLogConfig()));
 
     //Do initialization
     module->initialize();
@@ -108,7 +108,7 @@ void EventProcessor::processCore(PathPtr startPath, const ModulePtrList& moduleP
       Module* module = moduleIter->get();
 
       //Set the module dependent log level
-      logSystem.setModuleLogConfig(module->getLogConfiguration());
+      logSystem.setModuleLogConfig(&(module->getLogConfig()));
 
       //Call the event method of the module
       module->event();
@@ -203,7 +203,7 @@ void EventProcessor::processTerminate(const ModulePtrList& modulePathList)
     Module* module = listIter->get();
 
     //Set the module dependent log level
-    logSystem.setModuleLogConfig(module->getLogConfiguration());
+    logSystem.setModuleLogConfig(&(module->getLogConfig()));
 
     //Do termination
     module->terminate();
@@ -226,7 +226,7 @@ void EventProcessor::processBeginRun(const ModulePtrList& modulePathList)
     Module* module = listIter->get();
 
     //Set the module dependent log level
-    logSystem.setModuleLogConfig(module->getLogConfiguration());
+    logSystem.setModuleLogConfig(&(module->getLogConfig()));
 
     //Do beginRun() call
     module->beginRun();
@@ -246,7 +246,7 @@ void EventProcessor::processEndRun(const ModulePtrList& modulePathList)
     Module* module = listIter->get();
 
     //Set the module dependent log level
-    logSystem.setModuleLogConfig(module->getLogConfiguration());
+    logSystem.setModuleLogConfig(&(module->getLogConfig()));
 
     //Do endRun() call
     module->endRun();

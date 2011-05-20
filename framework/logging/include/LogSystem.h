@@ -91,6 +91,15 @@ namespace Belle2 {
     void addPackageLogConfig(std::string package, LogConfig logConfig) {m_packageLogConfigs[package] = logConfig; };
 
     /**
+     * Get the log configuration for the package with the given name.
+     * If no package specific configuration exists a new one is created.
+     *
+     * @param package The name of the package whose log configuration should be returned
+     * @return The log configuration of the given package
+     */
+    LogConfig& getPackageLogConfig(std::string package) {return m_packageLogConfigs[package]; };
+
+    /**
      * Returns true if the log level of the log system is greater or equal the given level.
      *
      * @param level The log level which should be compared with the log level of the log system

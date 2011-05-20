@@ -144,63 +144,6 @@ namespace Belle2 {
     */
     bool readEvtGenTableFromFile(const std::string& filename);
 
-    /**
-     * Configure the log level.
-     *
-     * @param logLevel The log level.
-     */
-    void setLogLevel(int logLevel);
-
-    /**
-     * Configure the debug messaging level.
-     *
-     * @param debugLevel The debug level.
-     */
-    void setDebugLevel(int debugLevel);
-
-    /**
-     * Configure the abort log level.
-     *
-     * @param abortLevel The abort log level.
-     */
-    void setAbortLevel(int abortLevel);
-
-    /**
-     * Configure the printed log information for the given level.
-     *
-     * @param logLevel The log level.
-     * @param logInfo The log information that should be printed.
-     */
-    void setLogInfo(int logLevel, unsigned int logInfo);
-
-    /**
-     * Sets the log level and debug level for a package.
-     *
-     * @param package The package name.
-     * @param logLevel The log level.
-     * @param debugLevel The debug level.
-     */
-    void setPackageLogLevel(std::string package, int logLevel, int debugLevel);
-
-    /**
-     * Adds the logging output to the shell (std::cout).
-     *
-     * @param color Enable color output if set to true. Default is color off.
-     */
-    void addLoggingToShell(bool color = false);
-
-    /**
-     * Adds the logging output to a text file.
-     *
-     * @param filename The path and name of the text file.
-     * @param append If this value is set to true, an existing file will not be overridden,
-     *               but instead the log messages will be added to the end of the file.
-     */
-    void addLoggingToTxtFile(const std::string& filename, bool append);
-
-    /*! Removes all logging output. */
-    void resetLogging();
-
 
     //--------------------------------------------------
     //                   Python API
@@ -226,13 +169,6 @@ namespace Belle2 {
      * @return A python list containing all registered modules.
      */
     boost::python::list getRegisteredModulesPython() const;
-
-    /**
-     * Returns a summary of the log message calls.
-     *
-     * @return A python dictionary containing the log levels as (string) key and the number of calls per level as integer.
-     */
-    boost::python::dict getLogStatisticPython() const;
 
     /**
      * Exposes methods of the Framework class to Python.

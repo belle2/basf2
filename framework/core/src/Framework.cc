@@ -116,54 +116,6 @@ bool Framework::readEvtGenTableFromFile(const std::string& filename)
 }
 
 
-void Framework::setLogLevel(int logLevel)
-{
-  LogSystem::Instance().getLogConfig()->setLogLevel(static_cast<LogConfig::ELogLevel>(logLevel));
-}
-
-
-void Framework::setDebugLevel(int debugLevel)
-{
-  LogSystem::Instance().getLogConfig()->setDebugLevel(debugLevel);
-}
-
-
-void Framework::setAbortLevel(int abortLevel)
-{
-  LogSystem::Instance().getLogConfig()->setAbortLevel(static_cast<LogConfig::ELogLevel>(abortLevel));
-}
-
-
-void Framework::setLogInfo(int logLevel, unsigned int logInfo)
-{
-  LogSystem::Instance().getLogConfig()->setLogInfo(static_cast<LogConfig::ELogLevel>(logLevel), logInfo);
-}
-
-
-void Framework::setPackageLogLevel(std::string package, int logLevel, int debugLevel)
-{
-  LogSystem::Instance().addPackageLogConfig(package, LogConfig(static_cast<LogConfig::ELogLevel>(logLevel), debugLevel));
-}
-
-
-void Framework::addLoggingToShell(bool color)
-{
-  LogSystem::Instance().addLogConnection(new LogConnectionFilter(new LogConnectionIOStream(std::cout, color)));
-}
-
-
-void Framework::addLoggingToTxtFile(const std::string& filename, bool append)
-{
-  LogSystem::Instance().addLogConnection(new LogConnectionFilter(new LogConnectionTxtFile(filename, append)));
-}
-
-
-void Framework::resetLogging()
-{
-  LogSystem::Instance().resetLogConnections();
-}
-
-
 //=====================================================================
 //                          Python API
 //=====================================================================
@@ -204,19 +156,6 @@ boost::python::list Framework::getRegisteredModulesPython() const
 }
 
 
-boost::python::dict Framework::getLogStatisticPython() const
-{
-  boost::python::dict returnDict;
-  LogSystem& logSys = LogSystem::Instance();
-
-  for (int iLevel = 0; iLevel < LogConfig::c_Default; ++iLevel) {
-    LogConfig::ELogLevel logLevel = static_cast<LogConfig::ELogLevel>(iLevel);
-    returnDict[boost::python::object(LogConfig::logLevelToString(logLevel))] = boost::python::object(logSys.getMessageCounter(logLevel));
-  }
-
-  return returnDict;
-}
-
 
 void Framework::exposePythonAPI()
 {
@@ -240,14 +179,5 @@ void Framework::exposePythonAPI()
   .def("process", process2)
   .def("set_nprocess", &Framework::setNumberProcesses)
   .def("read_evtgen_table", &Framework::readEvtGenTableFromFile)
-  .def("set_log_level", &Framework::setLogLevel)
-  .def("set_debug_level", &Framework::setDebugLevel)
-  .def("set_abort_level", &Framework::setAbortLevel)
-  .def("set_log_info", &Framework::setLogInfo)
-  .def("set_log_package", &Framework::setPackageLogLevel)
-  .def("log_to_shell", &Framework::addLoggingToShell)
-  .def("log_to_txtfile", &Framework::addLoggingToTxtFile)
-  .def("reset_log", &Framework::resetLogging)
-  .def("get_log_statistics", &Framework::getLogStatisticPython)
   ;
 }

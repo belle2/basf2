@@ -197,6 +197,9 @@ void Module::exposePythonAPI()
   .def("param", &Module::setParamList)
   .def("param", &Module::setParamDict)
   .def("available_params", &Module::getParamInfoListPython)
+  .add_property("logging",
+                make_function(&Module::getLogConfig, return_value_policy<reference_existing_object>()),
+                &Module::setLogConfig)
   .def("set_log_level", &Module::setLogLevel)
   .def("set_debug_level", &Module::setDebugLevel)
   .def("set_abort_level", &Module::setAbortLevel)

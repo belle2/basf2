@@ -37,7 +37,7 @@ namespace Belle2 {
    * This module also allows to send log messages directly from python to ease
    * consistent error reporting througout the framework
    *
-   * >>> logging.warn("This is a warning message")
+   * >>> B2WARNING("This is a warning message")
    *
    * For all features, see the logging.py in the framework/examples folder
    */

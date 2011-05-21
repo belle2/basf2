@@ -88,38 +88,40 @@ void BFieldComponentQuad::initialize()
   fieldMapFileLER.push(io::file_source(fullPathMapLER));
 
   string name;
-  double s, L, K0, K1, SK0, SK1;
+  double s, L, K0, K1, SK0, SK1, ROTATE;
 
   //Create the parameter map and read the data from the file
   B2DEBUG(10, "Loading the HER quadrupole magnetic field from file '" << m_mapFilenameHER << "' in to the memory...")
   m_mapBufferHER = new ParamPoint[m_mapSizeHER];
   for (int i = 0; i < m_mapSizeHER; ++i) {
-    fieldMapFileHER >> name >> s >> L >> K0 >> K1 >> SK0 >> SK1;
+    fieldMapFileHER >> name >> s >> L >> K0 >> K1 >> SK0 >> SK1 >> ROTATE;
     if (s > m_circumferenceHER / 2) s -= m_circumferenceHER;
     /* Save parametors in unit [m], not in unit [cm].*/
-    m_mapBufferHER[i].s   = s;   // [m]
-    m_mapBufferHER[i].L   = L;   // [m]
-    m_mapBufferHER[i].K0  = K0;  // [dimensionless]
-    m_mapBufferHER[i].K1  = K1;  // [1/m]
-    m_mapBufferHER[i].SK0 = SK0; // [dimensionless]
-    m_mapBufferHER[i].SK1 = SK1; // [1/m]
-    //B2DEBUG(10, "... loaded HER SAD element " << name << " at s= " << s << "[m].")
+    m_mapBufferHER[i].s      = s;   // [m]
+    m_mapBufferHER[i].L      = L;   // [m]
+    m_mapBufferHER[i].K0     = K0;  // [dimensionless]
+    m_mapBufferHER[i].K1     = K1;  // [1/m]
+    m_mapBufferHER[i].SK0    = SK0; // [dimensionless]
+    m_mapBufferHER[i].SK1    = SK1; // [1/m]
+    m_mapBufferHER[i].ROTATE = ROTATE; // [radian]
+    B2DEBUG(10, "... loaded HER SAD element " << name << " at s= " << s << "[m].")
   }
   B2DEBUG(10, "... loaded " << m_mapSizeHER << " elements.")
 
   B2DEBUG(10, "Loading the LER quadrupole magnetic field from file '" << m_mapFilenameLER << "' in to the memory...")
   m_mapBufferLER = new ParamPoint[m_mapSizeLER];
   for (int i = 0; i < m_mapSizeLER; ++i) {
-    fieldMapFileLER >> name >> s >> L >> K0 >> K1 >> SK0 >> SK1;
+    fieldMapFileLER >> name >> s >> L >> K0 >> K1 >> SK0 >> SK1 >> ROTATE;
     if (s > m_circumferenceLER / 2) s -= m_circumferenceLER;
     /* Save parametors in unit [m], not in unit [cm].*/
-    m_mapBufferLER[i].s   = s;   // [m]
-    m_mapBufferLER[i].L   = L;   // [m]
-    m_mapBufferLER[i].K0  = K0;  // [dimensionless]
-    m_mapBufferLER[i].K1  = K1;  // [1/m]
-    m_mapBufferLER[i].SK0 = SK0; // [dimensionless]
-    m_mapBufferLER[i].SK1 = SK1; // [1/m]
-    //B2DEBUG(10, "... loaded LER SAD element " << name << " at s= " << s << "[m].")
+    m_mapBufferLER[i].s      = s;   // [m]
+    m_mapBufferLER[i].L      = L;   // [m]
+    m_mapBufferLER[i].K0     = K0;  // [dimensionless]
+    m_mapBufferLER[i].K1     = K1;  // [1/m]
+    m_mapBufferLER[i].SK0    = SK0; // [dimensionless]
+    m_mapBufferLER[i].SK1    = SK1; // [1/m]
+    m_mapBufferLER[i].ROTATE = ROTATE; // [radian]
+    B2DEBUG(10, "... loaded LER SAD element " << name << " at s= " << s << "[m].")
   }
   B2DEBUG(10, "... loaded " << m_mapSizeLER << " elements.")
 
@@ -142,7 +144,7 @@ void BFieldComponentQuad::initialize()
     /* Save parametors in unit [mm], not in unit [cm].*/
     m_apertBufferHER[i].s   = s;
     m_apertBufferHER[i].r   = r;
-    //B2DEBUG(10, "... loaded HER aperture at s = " << s << "[mm].")
+    B2DEBUG(10, "... loaded HER aperture at s = " << s << "[mm].")
   }
   B2DEBUG(10, "... loaded " << m_apertSizeHER << " elements.")
 
@@ -153,7 +155,7 @@ void BFieldComponentQuad::initialize()
     /* Save parametors in unit [mm], not in unit [cm].*/
     m_apertBufferLER[i].s   = s;
     m_apertBufferLER[i].r   = r;
-    //B2DEBUG(10, "... loaded LER aperture at s = " << s << "[mm].")
+    B2DEBUG(10, "... loaded LER aperture at s = " << s << "[mm].")
   }
   B2DEBUG(10, "... loaded " << m_apertSizeLER << " elements.")
 
@@ -209,14 +211,14 @@ TVector3 BFieldComponentQuad::calculate(const TVector3& point) const
   if (getApertureHER(s_HER) > r_HER) HERflag = true;
 
   bool LERflag = false;
-  double angle_LER = 0.0415 - 3.14159; //H.Nakayama: hard-coded parameters should be moved to XML
+  double angle_LER = 0.0415 - 3.141592; //H.Nakayama: hard-coded parameters should be moved to XML
   TVector3 pLER(point.X(), point.Y(), point.Z()); pLER.RotateY(angle_LER);
   double s_LER = pLER.Z() / Unit::mm;
   double r_LER = sqrt(pLER.X() * pLER.X() + pLER.Y() * pLER.Y()) / Unit::mm;
   if (getApertureLER(s_LER) > r_LER) LERflag = true;
 
   double x, y, s; // [m]
-  double K0, K1, SK0, SK1, L;
+  double K0, K1, SK0, SK1, L, ROTATE;
   double p0_HER = 7.0e+9; // [eV] //H.Nakayama: hard-coded parameters should be moved to XML
   double p0_LER = 4.0e+9; // [eV] //H.Nakayama: hard-coded parameters should be moved to XML
   double c = 3.0e+8;// [m/s]      //H.Nakayama: hard-coded parameters should be moved to XML
@@ -239,11 +241,12 @@ TVector3 BFieldComponentQuad::calculate(const TVector3& point) const
     //H.Nakayama: this loop could be modified to binary-search
     for (int i = 0; i < m_mapSizeHER; i++) {
       if ((m_mapBufferHER[i].s < s) && (s < m_mapBufferHER[i].s + m_mapBufferHER[i].L)) {
-        K0  = m_mapBufferHER[i].K0;
-        K1  = m_mapBufferHER[i].K1;
-        SK0 = m_mapBufferHER[i].SK0;
-        SK1 = m_mapBufferHER[i].SK1;
-        L   = m_mapBufferHER[i].L;
+        K0     = m_mapBufferHER[i].K0;
+        K1     = m_mapBufferHER[i].K1;
+        SK0    = m_mapBufferHER[i].SK0;
+        SK1    = m_mapBufferHER[i].SK1;
+        L      = m_mapBufferHER[i].L;
+        ROTATE = m_mapBufferHER[i].ROTATE;
         foundflag = true;
         break;
       }
@@ -275,11 +278,12 @@ TVector3 BFieldComponentQuad::calculate(const TVector3& point) const
     //H.Nakayama: this loop could be modified to binary-search
     for (int i = 0; i < m_mapSizeLER; i++) {
       if ((m_mapBufferLER[i].s < s) && (s < m_mapBufferLER[i].s + m_mapBufferLER[i].L)) {
-        K0  = m_mapBufferLER[i].K0;
-        K1  = m_mapBufferLER[i].K1;
-        SK0 = m_mapBufferLER[i].SK0;
-        SK1 = m_mapBufferLER[i].SK1;
-        L   = m_mapBufferLER[i].L;
+        K0     = m_mapBufferLER[i].K0;
+        K1     = m_mapBufferLER[i].K1;
+        SK0    = m_mapBufferLER[i].SK0;
+        SK1    = m_mapBufferLER[i].SK1;
+        L      = m_mapBufferLER[i].L;
+        ROTATE = m_mapBufferLER[i].ROTATE;
         foundflag = true;
         break;
       }

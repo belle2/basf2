@@ -68,6 +68,7 @@ const double Unit::keV = Unit::eV  * 1e3;  /**< [kiloelectronvolt] */
 const double Unit::MeV = Unit::eV  * 1e6;  /**< [megaelectronvolt] */
 const double Unit::TeV = Unit::eV  * 1e9;  /**< [megaelectronvolt] */
 const double Unit::J   = 1.0 / TMath::Qe() * Unit::eV; /**< [joule] */
+const double Unit::V   = Unit::eV / Unit::e; /**< Standard of [voltage] */
 
 // charge units
 const double Unit::C  = 1.0 / TMath::Qe() * Unit::e;
@@ -90,7 +91,10 @@ const double Unit::ehEnergy       = 3.65 * Unit::eV;  /**< Energy needed to crea
 double Unit::electron_mass        = 0.510999 * MeV;   /**< Electron mass */
 const double Unit::electronMass   = 0.510999 * MeV;   /**< Electron mass */
 double Unit::fine_str_const       = 1.0 / 137.036;    /**< The fine structure constant */
-const double Unit::fineStrConst = 1.0 / 137.036;    /**< The fine structure constant */
+const double Unit::fineStrConst   = 1.0 / 137.036;    /**< The fine structure constant */
+const double Unit::permSi         = 11.9 * 8.8542 * 1e-18 * Unit::C / Unit::V / Unit::um;  /**< Permittivity of Silicon */
+const double Unit::uTherm         = 0.026 * Unit::V;                                   /**< Thermal Voltage at room temperature */
+const double Unit::eMobilitySi    = 1415 * Unit::cm2 / Unit::V / Unit::s;               /**< Electron mobility in intinsic Silicon at room temperature */
 
 //SuperKEKB and Belle II constants
 const double Unit::ringCircumference = 3016.360049 * Unit::m;  /**< The circumference of the SuperKEKB ring. */

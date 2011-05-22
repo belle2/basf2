@@ -88,6 +88,7 @@ namespace Belle2 {
     static const double MeV; /**< [megaelectronvolt] */
     static const double TeV; /**< [megaelectronvolt] */
     static const double J;   /**< [joule] */
+    static const double V;   /**< [voltage] */
 
     // charge units
     static const double C;   /**< [coulomb] */
@@ -111,6 +112,9 @@ namespace Belle2 {
     static const double electronMass; /**< Electron mass in MeV. */
     static double fine_str_const;     /**< The fine structure constant. */
     static const double fineStrConst; /**< The fine structure constant. */
+    static const double permSi;       /**< Permittivity of Silicon */
+    static const double uTherm;       /**< Thermal Voltage at room temperature */
+    static const double eMobilitySi;  /**< Electron mobility in intinsic Silicon at room temperature */
 
     //SuperKEKB and Belle II constants
     static const double ringCircumference; /**< The circumference of the SuperKEKB ring. */

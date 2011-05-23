@@ -128,10 +128,6 @@ void GeoMagneticField::readQuadBField(GearDir& component)
   int apertSizeHER      = component.getParamIntValue("ApertSizeHER");
   int apertSizeLER      = component.getParamIntValue("ApertSizeLER");
 
-  /* save circumference in [m] */
-  double circumferenceHER = component.getParamLength("CircumferenceHER") / Unit::m ;
-  double circumferenceLER = component.getParamLength("CircumferenceLER") / Unit::m ;
-
   /* save beam energy in [eV] */
   double beamEnergyHER    = component.getParamEnergy("BeamEnergyHER") / Unit::eV ;
   double beamEnergyLER    = component.getParamEnergy("BeamEnergyLER") / Unit::eV ;
@@ -141,6 +137,5 @@ void GeoMagneticField::readQuadBField(GearDir& component)
   bComp.setApertFilename(apertFilenameHER, apertFilenameLER);
   bComp.setMapSize(mapSizeHER, mapSizeLER);
   bComp.setApertSize(apertSizeHER, apertSizeLER);
-  bComp.setCircumference(circumferenceHER, circumferenceLER);
   bComp.setBeamEnergy(beamEnergyHER, beamEnergyLER);
 }

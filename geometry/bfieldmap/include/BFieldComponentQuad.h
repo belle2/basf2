@@ -122,13 +122,6 @@ namespace Belle2 {
     void setApertSize(int sizeHER, int sizeLER) { m_apertSizeHER = sizeHER; m_apertSizeLER = sizeLER; }
 
     /**
-     * Sets the length of circumference
-     * @param circumferenceHER The circmference of HER ring [m].
-     * @param circumferenceLER The circmference of LER ring [m].
-     */
-    void setCircumference(double circumferenceHER, double circumferenceLER) { m_circumferenceHER = circumferenceHER; m_circumferenceLER = circumferenceLER; }
-
-    /**
      * Sets the standard beam energy used for B calculation from K parameters
      * @param beamEnergyHER The beam energy of HER.
      * @param beamEnergyLER The beam energy of LER.
@@ -143,7 +136,6 @@ namespace Belle2 {
     std::string m_apertFilenameHER, m_apertFilenameLER; /**< The filename of the aperture*/
     int m_mapSizeHER, m_mapSizeLER;                /**< The size of the map*/
     int m_apertSizeHER, m_apertSizeLER;            /**< The size of the aperture*/
-    double m_circumferenceHER, m_circumferenceLER; /**< The circumference*/
     double m_beamEnergyHER, m_beamEnergyLER;       /**< The beamEnergy*/
 
     ParamPoint *m_mapBufferHER, *m_mapBufferLER;    /**< The memory buffer for the field parameters. */

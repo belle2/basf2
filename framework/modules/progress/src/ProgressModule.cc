@@ -7,7 +7,7 @@
  *                                                                        *
  **************************************************************************/
 
-#include <framework/modules/ProgressModule.h>
+#include <framework/modules/progress/ProgressModule.h>
 #include <framework/logging/Logger.h>
 #include <cmath>
 

@@ -229,6 +229,8 @@ TVector3 BFieldComponentQuad::calculate(const TVector3& point) const
   if ((HERflag) && (LERflag)) return TVector3(0, 0, 0);
 
   bool ROTATEflag = false;
+  bool OFFSETflag = false;
+  double OrbitOffsetHER = 0.0007;
 
   /* in case the point is inside HER*/
   if (HERflag) {
@@ -250,6 +252,9 @@ TVector3 BFieldComponentQuad::calculate(const TVector3& point) const
         break;
       }
     }
+
+    if (OFFSETflag) x -= OrbitOffsetHER;
+
     TVector3 p_tmp(x, y, s); p_tmp.RotateZ(ROTATE);
     if (ROTATEflag) x = p_tmp.X();
     if (ROTATEflag) y = p_tmp.Y();

@@ -253,7 +253,7 @@ TVector3 BFieldComponentQuad::calculate(const TVector3& point) const
       }
     }
 
-    if ((OFFSETflag) && (abs(z) > 1.18)) x -= OrbitOffsetHER;
+    if ((OFFSETflag) && (abs(s) > 1.18)) x -= OrbitOffsetHER;
 
     TVector3 p_tmp(x, y, s); p_tmp.RotateZ(ROTATE);
     if (ROTATEflag) x = p_tmp.X();

@@ -125,7 +125,7 @@ void svdHitCounterModule::event()
         //m_dataOut << trackId << " ";
       }
       //convTrId << "\n";
-      double pT = 0;
+      double pT = 0; //sqrt(x^2 + y^2)
       double pTot = 0; //length of momentum vector
       double theta = 0;
 

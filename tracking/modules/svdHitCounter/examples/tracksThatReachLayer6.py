@@ -3,27 +3,16 @@
 
 ########################################################
 # This steering file generates MCParticles, performs
-# a full Geant4 simulation and saves the result to disk.
-#
-# 100 events for experiment and run number 1 are created.
-#
-# The following parameters are used:
-#  Number of events:      100
-#  Tracks per event:      10
-#  Particles:             electrons / positrons
-#  Theta [default]:       17 to 150 degree
-#  Phi [default]:         0 to 360 degree
-#  Momentum:              50 MeV to 3 GeV
-#
-# Example steering file - 2011 Belle II Collaboration
+# a full Geant4 simulation and saves the result to disk
+# and tests which layers of the SVD were hit by the particles
 ########################################################
 
 import os
 import random
 from basf2 import *
 
-# Set the log level to show only error and fatal messages
-set_log_level(0)
+# Set the log level to show everything
+set_log_level(LogLevel.INFO)
 
 tracks = 100
 pGSeed = 0
@@ -31,7 +20,7 @@ g4Seed = 0
 
 # EvtMetaGen - generate event meta data
 evtmetagen = register_module('EvtMetaGen')
-evtmetagen.param('EvtNumList', [1])
+evtmetagen.param('EvtNumList', [1])  # ONLY TESTED WITH NUMBER OF EVENTS = 1
 
 # Particle gun
 particlegun = register_module('PGunInput')

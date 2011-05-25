@@ -13,7 +13,7 @@
 # CDCDigi creates Hits in the CDC from simulated Hits.
 # CDCRecoHitMaker creates RecoHits, which are needed and used during the fit.
 # CDCTracking performs pattern recognition in the CDC (the digitized Hits are collected to create CDCTrackCandidates).
-# CDCMCMatching matches to each CDCTrackCandidate the corresponding MCParticle.
+# CDCMCMatching matches to each CDCTrackCandidate the corresponding MCParticle (only needed to evaluate the efficiency of the CDCTracking).
 # MCTrackFinder creates relations between MCParticles and CDCRecoHits produced by it.
 # GenFitter fits the found tracks (MCTracks as well as CDCTrackCandidates)
 #
@@ -53,7 +53,11 @@ cdcmcmatching = register_module('CDCMCMatching')
 mctrackfinder = register_module('MCTrackFinder')
 
 # Fitting
+# Fit MCTracks
 cdcfitting = register_module('GenFitter')
+
+# Fit Tracks from pattern recognition
+cdcPRfitting = register_module('GenFitter')
 
 # Output
 output = register_module('SimpleOutput')
@@ -88,7 +92,8 @@ param_cdctracking = {
     'CDCHitsColName': 'CDCHits',
     'CDCRecoHitsColName': 'CDCRecoHits',
     'CDCTrackCandidatesColName': 'CDCTrackCandidates',
-    'CDCTrackCandsToCDCRecoHitsColName': 'CDCTrackCandidatesToCDCRecoHits',
+    'GFTrackCandidatesColName': 'GFTrackCandidates_conformal',
+    'GFTrackCandToCDCRecoHitsColName': 'GFTrackCandidateToCDCRecoHits_conformal',
     'TextFileOutput': 0,
     }
 cdctracking.param(param_cdctracking)
@@ -98,9 +103,9 @@ param_mctrackfinder = {
     'MCParticleToCDCSimHitsColName': 'MCPartToCDCSimHits',
     'CDCSimHitToCDCHitColName': 'SimHitToCDCHits',
     'CDCRecoHitsColName': 'CDCRecoHits',
-    'TracksColName': 'Tracks',
-    'TrackToCDCRecoHitColName': 'TrackToCDCRecoHits',
-    'TrackToMCParticleColName': 'TrackToMCParticle',
+    'GFTrackCandidatesColName': 'GFTrackCandidates',
+    'GFTrackCandToCDCRecoHitsColName': 'GFTrackCandidateToCDCRecoHits',
+    'GFTrackCandToMCParticleColName': 'GFTrackCandidateToMCParticle',
     }
 mctrackfinder.param(param_mctrackfinder)
 
@@ -116,20 +121,15 @@ param_cdcmcmatching = {
     }
 cdcmcmatching.param(param_cdcmcmatching)
 
-param_cdcfitting = {
-    'MCParticlesColName': 'MCParticles',
-    'CDCRecoHitsColName': 'CDCRecoHits',
-    'TracksColName': 'Tracks',
-    'TrackToCDCRecoHitColName': 'TrackToCDCRecoHits',
-    'TrackToMCParticleColName': 'TrackToMCParticle',
-    'CDCTrackCandidatesColName': 'CDCTrackCandidates',
-    'CDCTrackCandsToCDCRecoHitsColName': 'CDCTrackCandidatesToCDCRecoHits',
-    'CDCTrackCandsToMCParticlesColName': 'CDCTrackCandidateToMCParticle',
-    'MCMatchParticlesColName': 'MCMatchParticles',
-    'FitMCTracks': 1,
-    'FitRecoTracks': 1,
-    }
+param_cdcfitting = {'CDCRecoHitsColName': 'CDCRecoHits',
+                    'TracksColName': 'Tracks',
+                    'GFTrackCandidatesColName': 'GFTrackCandidates'}
 cdcfitting.param(param_cdcfitting)
+
+param_cdcPRfitting = {'CDCRecoHitsColName': 'CDCRecoHits',
+                      'TracksColName': 'Tracks_conformal',
+                      'GFTrackCandidatesColName': 'GFTrackCandidates_conformal'}
+cdcPRfitting.param(param_cdcPRfitting)
 
 output.param('outputFileName', 'CDCTrackFitOutput.root')
 
@@ -143,13 +143,14 @@ main.add_module(paramloader)
 main.add_module(geobuilder)
 main.add_module(pGun)
 main.add_module(g4sim)
-main.add_module(mcparticle)
+# main.add_module(mcparticle)
 main.add_module(cdcdigitizer)
 main.add_module(recohitmaker)
 main.add_module(cdctracking)
 main.add_module(mctrackfinder)
-main.add_module(cdcmcmatching)
+# main.add_module(cdcmcmatching)
 main.add_module(cdcfitting)
+main.add_module(cdcPRfitting)
 main.add_module(output)
 
 # Process events

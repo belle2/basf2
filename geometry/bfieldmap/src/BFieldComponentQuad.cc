@@ -102,7 +102,7 @@ void BFieldComponentQuad::initialize()
     m_mapBufferHER[i].K1     = K1;  // [1/m]
     m_mapBufferHER[i].SK0    = SK0; // [dimensionless]
     m_mapBufferHER[i].SK1    = SK1; // [1/m]
-    m_mapBufferHER[i].ROTATE = ROTATE; // [radian]
+    m_mapBufferHER[i].ROTATE = ROTATE; // [degree]
     B2DEBUG(10, "... loaded HER SAD element " << name << " at s= " << s << "[m].")
   }
   B2DEBUG(10, "... loaded " << m_mapSizeHER << " elements.")
@@ -118,7 +118,7 @@ void BFieldComponentQuad::initialize()
     m_mapBufferLER[i].K1     = K1;  // [1/m]
     m_mapBufferLER[i].SK0    = SK0; // [dimensionless]
     m_mapBufferLER[i].SK1    = SK1; // [1/m]
-    m_mapBufferLER[i].ROTATE = ROTATE; // [radian]
+    m_mapBufferLER[i].ROTATE = ROTATE; // [degree]
     B2DEBUG(10, "... loaded LER SAD element " << name << " at s= " << s << "[m].")
   }
   B2DEBUG(10, "... loaded " << m_mapSizeLER << " elements.")
@@ -255,7 +255,7 @@ TVector3 BFieldComponentQuad::calculate(const TVector3& point) const
 
     if ((OFFSETflag) && (abs(s) > 1.18)) x -= OrbitOffsetHER;
 
-    TVector3 p_tmp(x, y, s); p_tmp.RotateZ(ROTATE);
+    TVector3 p_tmp(x, y, s); p_tmp.RotateZ(ROTATE / 180.*3.14159265);
     if (ROTATEflag) x = p_tmp.X();
     if (ROTATEflag) y = p_tmp.Y();
 
@@ -264,7 +264,7 @@ TVector3 BFieldComponentQuad::calculate(const TVector3& point) const
       double Bx = (p0_HER / c / L) * (K1 * y - SK1 * x - SK0);
       double By = (p0_HER / c / L) * (K1 * x + SK1 * y + K0);
       TVector3 B(Bx, By, Bz);
-      if (ROTATEflag) B.RotateZ(-ROTATE);
+      if (ROTATEflag) B.RotateZ(-ROTATE / 180.*3.14159265);
       B.RotateY(-angle_HER);
       B2DEBUG(20, "HER quadrupole fields calculated at (x,y,z)=("
               << point.X() / Unit::m << "," << point.Y() / Unit::m << "," << point.Z() / Unit::m
@@ -297,7 +297,7 @@ TVector3 BFieldComponentQuad::calculate(const TVector3& point) const
         break;
       }
     }
-    TVector3 p_tmp(x, y, s); p_tmp.RotateZ(ROTATE);
+    TVector3 p_tmp(x, y, s); p_tmp.RotateZ(ROTATE / 180.*3.14159265);
     if (ROTATEflag) x = p_tmp.X();
     if (ROTATEflag) y = p_tmp.Y();
 
@@ -306,7 +306,7 @@ TVector3 BFieldComponentQuad::calculate(const TVector3& point) const
       double Bx = (p0_LER / c / L) * (K1 * y - SK1 * x - SK0);
       double By = (p0_LER / c / L) * (K1 * x + SK1 * y + K0);
       TVector3 B(Bx, By, Bz);
-      if (ROTATEflag) B.RotateZ(-ROTATE);
+      if (ROTATEflag) B.RotateZ(-ROTATE / 180.*3.14159265);
       B.RotateY(-angle_LER);
       B2DEBUG(20, "LER quadrupole fields calculated at (x,y,z)=("
               << point.X() / Unit::m << "," << point.Y() / Unit::m << "," << point.Z() / Unit::m

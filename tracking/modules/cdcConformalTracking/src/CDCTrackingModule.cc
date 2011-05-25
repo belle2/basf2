@@ -24,6 +24,8 @@
 #include <tracking/cdcConformalTracking/CDCSegment.h>
 #include <tracking/cdcConformalTracking/CDCTrackCandidate.h>
 
+#include "GFTrackCand.h"
+
 #include <tracking/cdcConformalTracking/AxialTrackFinder.h>
 #include <tracking/cdcConformalTracking/SegmentFinder.h>
 #include <tracking/cdcConformalTracking/StereoFinder.h>
@@ -31,6 +33,8 @@
 #include <cstdlib>
 #include <iomanip>
 #include <string>
+
+#include <boost/foreach.hpp>
 
 #include <iostream>
 
@@ -49,7 +53,8 @@ CDCTrackingModule::CDCTrackingModule() : Module()
   addParam("CDCRecoHitsColName", m_cdcRecoHitsColName, "Name of collection holding the CDCRecoHits (should be created by CDCRecoHitMaker module)", string("CDCRecoHits"));
 
   addParam("CDCTrackCandidatesColName", m_cdcTrackCandsColName, "Name of collection holding the CDCTrackCandidates (output)", string("CDCTrackCandidates"));
-  addParam("CDCTrackCandsToCDCRecoHitsColName", m_cdcTrackCandsToRecoHits, "Name of collection holding the relations between CDCTrackCandidates and CDCRecoHits (output)", string("CDCTrackCandidatesToCDCRecoHits"));
+  addParam("GFTrackCandidatesColName", m_gfTrackCandsColName, "Name of collection holding the GFTrackCandidates (output)", string("GFTrackCandidates_conformal"));
+  addParam("GFTrackCandToCDCRecoHitsColName", m_gfTrackCandToRecoHits, "Name of collection holding the relations between GFTrackCandidates and CDCRecoHits (output)", string("GFTrackCandidateToCDCRecoHits_conformal"));
 
   addParam("TextFileOutput", m_textFileOutput, "Set to true if some text files with hit coordinates should be created", false);
 
@@ -79,15 +84,16 @@ void CDCTrackingModule::beginRun()
 
 void CDCTrackingModule::event()
 {
+  B2INFO("**********   CDCTrackingModule  ************");
 
   //StoreArray with simulated CDCHits, should already be created by previous modules
   StoreArray<CDCSimHit> cdcSimHits(m_cdcSimHitsColName);
-  B2INFO("CDCTracking: Number of simulated Hits:  " << cdcSimHits.GetEntries());
+  //B2INFO("CDCTracking: Number of simulated Hits:  " << cdcSimHits.GetEntries());
   if (cdcSimHits.GetEntries() == 0) B2WARNING("CDCTracking: cdcSimHitsCollection is empty!");
 
   //StoreArray with digitized CDCHits, should already be created by CDCDigitized module
   StoreArray<CDCHit> cdcHits(m_cdcHitsColName);
-  B2INFO("CDCTracking: Number of digitized Hits: " << cdcHits.GetEntries());
+  //B2INFO("CDCTracking: Number of digitized Hits: " << cdcHits.GetEntries());
   if (cdcHits.GetEntries() == 0) B2WARNING("CDCTracking: cdcHitsCollection is empty!");
 
   //StoreArray with CDCTrackHits, a class which has a pointer to the original CDCHit, but also additional member variables and methods needed for tracking.
@@ -184,27 +190,47 @@ void CDCTrackingModule::event()
 
   }//end loop over all Tracks
 
-
-  //Create relations between TrackCandidates and CDCRecoHits
-  B2INFO("Create Relations between TrackCandidates and CDCRecoHits...");
-  StoreArray<Relation> trackCandsToRecoHits(m_cdcTrackCandsToRecoHits);
+  //create GFTrackCandidates, one for each CDCTrackCandidate
+  StoreArray <GFTrackCand> trackCandidates(m_gfTrackCandsColName);
   StoreArray<CDCRecoHit> cdcRecoHits(m_cdcRecoHitsColName);
+  StoreArray<Relation> gfTrackCandToRecoHits(m_gfTrackCandToRecoHits);
 
   for (int i = 0 ; i < cdcTrackCandidates->GetEntries(); i++) {
+
+    new(trackCandidates->AddrAt(i)) GFTrackCand();
+    //set the values needed as start values for the fit in the GFTrackCandidate from the CDCTrackCandidate information
+    //variables stored in the GFTrackCandidates are: vertex position, track direction, charge/total momentum, indices for the RecoHits
+
+    TVector3 position = (0., 0., 0); //no better vertex determination available for the moment....
+    TVector3 direction;
+    direction.SetX(cdcTrackCandidates[i]->getMomentumVector().x() / cdcTrackCandidates[i]->getMomentumValue());
+    direction.SetY(cdcTrackCandidates[i]->getMomentumVector().y() / cdcTrackCandidates[i]->getMomentumValue());
+    direction.SetZ(cdcTrackCandidates[i]->getMomentumVector().z() / cdcTrackCandidates[i]->getMomentumValue());
+    double chargeOverP = cdcTrackCandidates[i]->getChargeSign() / cdcTrackCandidates[i]->getMomentumValue();
+
+    trackCandidates[i]->setTrackSeed(position, direction, chargeOverP);
+
+    //find indices of the RecoHits
     list<int> indexList;
     for (int j = 0; j < cdcTrackCandidates[i]->getNHits(); j++) {
       indexList.push_back(cdcTrackCandidates[i]->getTrackHits().at(j).getStoreIndex());
     }
 
-    new(trackCandsToRecoHits->AddrAt(i)) Relation(cdcTrackCandidates, cdcRecoHits, i, indexList);
+    BOOST_FOREACH(int hitID, indexList) {
+      trackCandidates[i]->addHit(1, hitID);
+    }
+
+    //Create also a relation between the GFTrackCandidate and the RecoHits
+    new(gfTrackCandToRecoHits->AddrAt(i)) Relation(trackCandidates, cdcRecoHits, i, indexList);
     //B2INFO("******* New relation created");
     indexList.clear();
   }
 
-  B2INFO(trackCandsToRecoHits->GetEntries() << "  relations created");
+  B2INFO(trackCandidates->GetEntries() << "  GFTrackCandidates created");
+  B2INFO(gfTrackCandToRecoHits->GetEntries() << "  Relations between GFTrackCandidates and CDCRecoHits created");
+
 
   if (m_textFileOutput) {
-
 
 //Dump the position information of simulated Hits to a textfile
     for (int i = 0; i < cdcSimHits.GetEntries(); i++) { //loop over all SimHits

@@ -79,9 +79,10 @@ namespace Belle2 {
 
     std::string m_cdcSimHitsColName;              /**< Input simulated hits collection name (should already be used by the CDCDigitizer module) */
     std::string m_cdcHitsColName;                 /**< Input digitized hits collection name (output of CDCDigitizer module) */
-    std::string m_cdcTrackCandsColName;          /**< Output tracks collection name*/
+    std::string m_cdcTrackCandsColName;           /**< Output tracks collection name*/
+    std::string m_gfTrackCandsColName;           /**< Output genfit track candidates collection name*/
     std::string m_cdcRecoHitsColName;             /**< Input reco hits collection name (needed for relation creation)*/
-    std::string m_cdcTrackCandsToRecoHits;       /**< Output relation (track candidates to cdc recohits) name */
+    std::string m_gfTrackCandToRecoHits;         /**< Output relation (gf track candidates to cdc recohits) name */
 
     bool m_textFileOutput;                          /**< Boolean to create output text files with hit coordinates (needed for development purposes, wont be needed later on)*/
 

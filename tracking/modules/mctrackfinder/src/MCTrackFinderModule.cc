@@ -9,13 +9,15 @@
  **************************************************************************/
 
 #include <tracking/modules/mctrackfinder/MCTrackFinderModule.h>
-#include <tracking/dataobjects/Track.h>
-
 
 #include <generators/dataobjects/MCParticle.h>
 
 #include <cdc/dataobjects/CDCHit.h>
 #include <cdc/dataobjects/CDCRecoHit.h>
+
+#include "GFTrackCand.h"
+
+#include <boost/foreach.hpp>
 
 #include <utility>
 #include <list>
@@ -36,7 +38,7 @@ REG_MODULE(MCTrackFinder)
 MCTrackFinderModule::MCTrackFinderModule() : Module()
 {
   //Set module properties
-  setDescription("Uses the MC information to create Relations between MCParticles and corresponding Tracks and between these Tracks and CDCRecoHits.");
+  setDescription("Uses the MC information to create GFTrackCandidates from MCParticles and Relations between them.  Creates als a Relation between GFTrackCandidates and CDCRecoHits.");
 
   //Parameter definition
   addParam("MCParticlesColName", m_mcParticlesCollectionName, "Name of collection holding the MCParticles", string("MCParticles"));
@@ -44,9 +46,9 @@ MCTrackFinderModule::MCTrackFinderModule() : Module()
   addParam("CDCRecoHitsColName", m_cdcRecoHitsCollectionName, "Name of collection holding the CDCRecoHits (should be created by CDCRecoHitMaker module)", string("CDCRecoHits"));
   addParam("CDCSimHitToCDCHitColName", m_cdcSimHitToCDCHitCollectioName, "Name of collection holding the relations between CDCSimHits and CDCHits (CDCHit index = CDCRecoHit index) (should be created by CDCDigi module)", string("SimHitToCDCHits"));
 
-  addParam("TracksColName", m_tracksCollectionName, "Name of collection holding the Tracks (output)", string("Tracks"));
-  addParam("TrackToMCParticleColName", m_trackToMCParticleCollectionName, "Name of collection holding the relations between Tracks and MCParticles (output)", string("TrackToMCParticle"));
-  addParam("TrackToCDCRecoHitColName", m_trackToCDCRecoHitCollectionName, "Name of collection holding the relations between Tracks and CDCRecoHits (output)", string("TrackToCDCRecoHits"));
+  addParam("GFTrackCandidatesColName", m_gfTrackCandsCollectionName, "Name of collection holding the GFTrackCandidates (output)", string("GFTrackCandidates"));
+  addParam("GFTrackCandToMCParticleColName", m_gfTrackCandToMCParticleCollectionName, "Name of collection holding the relations between GFTrackCandidates and MCParticles (output)", string("GFTrackCandidateToMCParticle"));
+  addParam("GFTrackCandToCDCRecoHitsColName", m_gfTrackCandToCDCRecoHitsCollectionName, "Name of collection holding the relations between GFTrackCandidates and CDCRecoHits (output)", string("GFTrackCandidateToCDCRecoHits"));
 }
 
 
@@ -81,14 +83,14 @@ void MCTrackFinderModule::event()
   //B2INFO("MCTrackFinder: Number of CDCRecoHits: "<<cdcRecoHits.GetEntries());
   if (cdcRecoHits.GetEntries() == 0) B2WARNING("MCTrackFinder: CDCRecoHitsCollection is empty!");
 
-  B2INFO("-> Create relations for primary particles");
+  //B2INFO("-> Create relations for primary particles");
   // loop over MCParticles.
   for (unsigned short int iPart = 0; iPart < mcParticles->GetEntriesFast(); iPart++) {
 
     //make links only for interesting MCParticles, for the moment take only primary particle
     if (mcParticles[iPart]->getMother() == NULL) {
       B2DEBUG(149, "iPart: " << iPart);
-
+      //B2INFO("Primary particle!");
       //Get indices of the SimHits from this MCParticle
       list<short unsigned int> myList;
 
@@ -117,21 +119,46 @@ void MCTrackFinderModule::event()
       //Therefore I should now be able to create a Relation, that points to the RecoHits, that really belong to the same track.
 
       //Now create Tracks and the relations
-      StoreArray<Track> tracks(m_tracksCollectionName);
-      StoreArray<Relation> trackToCDCRecoHits(m_trackToCDCRecoHitCollectionName);
-      StoreArray<Relation> trackToMCParticles(m_trackToMCParticleCollectionName);
+      StoreArray<GFTrackCand> trackCandidates(m_gfTrackCandsCollectionName);
+      StoreArray<Relation> trackCandsToCDCRecoHits(m_gfTrackCandToCDCRecoHitsCollectionName);
+      StoreArray<Relation> trackCandsToMCParticles(m_gfTrackCandToMCParticleCollectionName);
 
-      int counter = tracks->GetLast() + 1;
+
+      int counter = trackCandidates->GetLast() + 1;
       B2DEBUG(100, counter);
 
-      //create Track
-      new(tracks->AddrAt(counter)) Track();
-      //create relation between the track and cdcRecoHits
-      new(trackToCDCRecoHits->AddrAt(counter)) Relation(tracks, cdcRecoHits, counter, otherList);
-      B2INFO("Create relation between Track " << counter << "  and  " << otherList.size() << "  RecoHits");
-      //create relation between th track and the mcParticle
-      new(trackToMCParticles->AddrAt(counter)) Relation(tracks, mcParticles, counter, iPart);
-      //B2INFO(" --- Create relation between Track "<<counter<<"  and MCParticle "<<iPart);
+      //create TrackCandidate
+      new(trackCandidates->AddrAt(counter)) GFTrackCand();
+
+      //set the values needed as start values for the fit in the GFTrackCandidate from the MCParticle information
+      //variables stored in the GFTrackCandidates are: vertex position, track direction, charge/total momentum, indices for the RecoHits
+
+      TVector3 position = mcParticles[iPart]->getProductionVertex();
+      TVector3 direction;
+      direction.SetX(mcParticles[iPart]->getMomentum().x() / mcParticles[iPart]->getMomentum().Mag());
+      direction.SetY(mcParticles[iPart]->getMomentum().y() / mcParticles[iPart]->getMomentum().Mag());
+      direction.SetZ(mcParticles[iPart]->getMomentum().z() / mcParticles[iPart]->getMomentum().Mag());
+      double chargeOverP = mcParticles[iPart]->getCharge() / mcParticles[iPart]->getMomentum().Mag();
+      //B2INFO("Momentum: "<<mcParticles[iPart]->getMomentum().x()<<"  "<<mcParticles[iPart]->getMomentum().y()<<"  "<<mcParticles[iPart]->getMomentum().z());
+      //B2INFO("Absolut momentum: "<<mcParticles[iPart]->getMomentum().Mag());
+      //B2INFO("Position: "<<position.x()<<"  "<<position.y()<<"  "<<position.z());
+      //B2INFO("Direction: "<<direction.x()<<"  "<<direction.y()<<"  "<<direction.z());
+      //B2INFO("Charge over P: "<<chargeOverP);
+
+      trackCandidates[counter]->setTrackSeed(position, direction, chargeOverP);
+
+      BOOST_FOREACH(int hitID, otherList) {
+        trackCandidates[counter]->addHit(1, hitID);
+      }
+      //B2INFO("Total NR of assigned RecoHits: "<<trackCandidates[counter]->getNHits());
+
+
+      //create relation between the track candidate and cdcRecoHits
+      new(trackCandsToCDCRecoHits->AddrAt(counter)) Relation(trackCandidates, cdcRecoHits, counter, otherList);
+      B2INFO("Create relation between Track Candidate " << counter << "  and  " << otherList.size() << "  RecoHits");
+      //create relation between the track candidates and the mcParticle
+      new(trackCandsToMCParticles->AddrAt(counter)) Relation(trackCandidates, mcParticles, counter, iPart);
+      //B2INFO(" --- Create relation between Track Candidate"<<counter<<"  and MCParticle "<<iPart);
 
 
     } //endif

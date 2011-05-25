@@ -67,13 +67,14 @@ namespace Belle2 {
       return (-999);
     }
 
-    std::string m_mcParticlesCollectionName;                /**< MCParticles collection name */
-    std::string m_mcPartToCDCSimHitsCollectionName;         /**< MCParticles to CDCSimHits relation name */
-    std::string m_cdcRecoHitsCollectionName;                /**< CDCRecoHits collection name */
-    std::string m_cdcSimHitToCDCHitCollectioName;           /**< CDCSimHits to CDCHits relation name */
-    std::string m_tracksCollectionName;                     /**< Tracks collection name */
-    std::string m_trackToMCParticleCollectionName;          /**< Tracks to MCParticles relation name */
-    std::string m_trackToCDCRecoHitCollectionName;          /**< Tracks to CDCRecoHits relation name */
+    std::string m_mcParticlesCollectionName;                          /**< MCParticles collection name */
+    std::string m_mcPartToCDCSimHitsCollectionName;                   /**< MCParticles to CDCSimHits relation name */
+    std::string m_cdcRecoHitsCollectionName;                          /**< CDCRecoHits collection name */
+    std::string m_cdcSimHitToCDCHitCollectioName;                     /**< CDCSimHits to CDCHits relation name */
+
+    std::string m_gfTrackCandsCollectionName;                         /**< TrackCandidates collection name */
+    std::string m_gfTrackCandToMCParticleCollectionName;              /**< TrackCandidates to MCParticles relation name */
+    std::string m_gfTrackCandToCDCRecoHitsCollectionName;             /**< TrackCandidates to CDCRecoHits relation name */
   };
 }
 

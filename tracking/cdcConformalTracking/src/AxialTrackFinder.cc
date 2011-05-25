@@ -315,7 +315,7 @@ void AxialTrackFinder::FitTrackCandidate(CDCTrackCandidate & candidate)
   double y0 = fit->GetParameter(0);
   //B2INFO("x0: "<<x0<<"  y0: "<<y0);
   double R = sqrt(1 / x0 * 1 / x0 + 1 / y0 * 1 / y0); //Radius of the track circle in the normal plane
-  double p = R * 1.5 / 299.792458;  //Preliminary(!) calculation of momentum in GeV, magnetic field and c hardcoded for now...
+  double p = R * 1.5 * 0.00299792458;  //Preliminary(!) calculation of momentum in GeV, magnetic field and c hardcoded for now...
   //B2INFO("Radius: "<<R<<"  Momentum: "<<p);
   candidate.setMomentumValue(p);
 

@@ -201,7 +201,7 @@ void CDCTrackingModule::event()
     //set the values needed as start values for the fit in the GFTrackCandidate from the CDCTrackCandidate information
     //variables stored in the GFTrackCandidates are: vertex position, track direction, charge/total momentum, indices for the RecoHits
 
-    TVector3 position = (0., 0., 0); //no better vertex determination available for the moment....
+    TVector3 position = (0.0, 0.0, 0.0); //no better vertex determination available for the moment....
     TVector3 direction;
     direction.SetX(cdcTrackCandidates[i]->getMomentumVector().x() / cdcTrackCandidates[i]->getMomentumValue());
     direction.SetY(cdcTrackCandidates[i]->getMomentumVector().y() / cdcTrackCandidates[i]->getMomentumValue());

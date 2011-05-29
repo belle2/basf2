@@ -61,7 +61,7 @@ namespace Belle2 {
      *
      * @param logLevel The log level.
      */
-    void setLogLevel(ELogLevel logLevel) {m_logLevel = logLevel; };
+    void setLogLevel(ELogLevel logLevel);
 
     /**
      * Returns the configured log level.

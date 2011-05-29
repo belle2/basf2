@@ -62,10 +62,10 @@ for (level, num) in logging.log_stats.items():
     print 'Messages for level %8s: %2d' % (level.name, num)
 
 # configure logging for the EvtMetaGen module:
-# loglevel FATAL and info for FATAL message is file name and line number
+# loglevel ERROR and info for ERROR message is file name and line number
 evtmetagen = register_module('EvtMetaGen')
-evtmetagen.logging.log_level = LogLevel.FATAL
-evtmetagen.logging.set_info(LogLevel.FATAL, LogInfo.FILE | LogInfo.LINE)
+evtmetagen.logging.log_level = LogLevel.ERROR
+evtmetagen.logging.set_info(LogLevel.ERROR, LogInfo.FILE | LogInfo.LINE)
 # or alternatively:
-evtmetagen.set_log_level(LogLevel.FATAL)
-evtmetagen.set_log_info(LogLevel.FATAL, LogInfo.FILE | LogInfo.LINE)
+evtmetagen.set_log_level(LogLevel.ERROR)
+evtmetagen.set_log_info(LogLevel.ERROR, LogInfo.FILE | LogInfo.LINE)

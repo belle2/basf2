@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include <framework/logging/LogConfig.h>
+#include <framework/logging/Logger.h>
 
 
 using namespace std;
@@ -23,6 +24,16 @@ LogConfig::LogConfig(LogConfig::ELogLevel logLevel, int debugLevel) :
   for (int level = 0; level < LogConfig::c_Default; level++) {
     m_logInfo[level] = 0;
   }
+}
+
+
+void LogConfig::setLogLevel(ELogLevel logLevel)
+{
+  if (logLevel == c_Fatal) {
+    B2WARNING("Error messages cannot be switched off. The log level is set to ERROR instead of FATAL.");
+    logLevel = c_Error;
+  }
+  m_logLevel = logLevel;
 }
 
 

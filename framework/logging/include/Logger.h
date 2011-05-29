@@ -66,9 +66,8 @@ namespace Belle2 {
 #endif
 
 // error messages
-#define B2ERROR(streamText) { if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Error,0,PACKAGENAME())) { \
-      std::ostringstream stringBuffer; stringBuffer << streamText; \
-      LogSystem::Instance().sendMessage(LogMessage(LogConfig::c_Error,stringBuffer.rdbuf()->str(),PACKAGENAME(),FUNCTIONNAME(),__FILE__,__LINE__)); } }
+#define B2ERROR(streamText) { std::ostringstream stringBuffer; stringBuffer << streamText; \
+    LogSystem::Instance().sendMessage(LogMessage(LogConfig::c_Error,stringBuffer.rdbuf()->str(),PACKAGENAME(),FUNCTIONNAME(),__FILE__,__LINE__));}
 
 // fatal messages
 #define B2FATAL(streamText) { std::ostringstream stringBuffer; stringBuffer << streamText; \

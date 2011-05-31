@@ -45,17 +45,29 @@ void LogSystem::resetLogConnections()
 
 bool LogSystem::isLevelEnabled(LogConfig::ELogLevel level, int debugLevel, std::string package)
 {
-  LogConfig::ELogLevel logLevelLimit = m_logConfig.getLogLevel();
-  int debugLevelLimit = m_logConfig.getDebugLevel();
 
+  LogConfig::ELogLevel logLevelLimit = LogConfig::c_Default;
+  int debugLevelLimit = 0;
+
+  // first check whether the log level of the current package is set
   map<string, LogConfig>::iterator packageLogConfig = m_packageLogConfigs.find(package);
   if (packageLogConfig != m_packageLogConfigs.end()) {
     LogConfig& logConfig = packageLogConfig->second;
-    logLevelLimit = logConfig.getLogLevel();
-    debugLevelLimit = logConfig.getDebugLevel();
-  } else if (m_moduleLogConfig && (m_moduleLogConfig->getLogLevel() != LogConfig::c_Default)) {
-    logLevelLimit = m_moduleLogConfig->getLogLevel();
-    debugLevelLimit = m_moduleLogConfig->getDebugLevel();
+    if (logConfig.getLogLevel() != LogConfig::c_Default) {
+      logLevelLimit = logConfig.getLogLevel();
+      debugLevelLimit = logConfig.getDebugLevel();
+    }
+  }
+
+  // if there's no package log level set, take it either from the module or the global settings
+  if (logLevelLimit == LogConfig::c_Default) {
+    if (m_moduleLogConfig && (m_moduleLogConfig->getLogLevel() != LogConfig::c_Default)) {
+      logLevelLimit = m_moduleLogConfig->getLogLevel();
+      debugLevelLimit = m_moduleLogConfig->getDebugLevel();
+    } else {
+      logLevelLimit = m_logConfig.getLogLevel();
+      debugLevelLimit = m_logConfig.getDebugLevel();
+    }
   }
 
   return ((level != LogConfig::c_Debug) && (logLevelLimit <= level)) ||
@@ -67,13 +79,15 @@ bool LogSystem::sendMessage(LogMessage message)
 {
   LogConfig::ELogLevel logLevel = message.getLogLevel();
   map<string, LogConfig>::iterator packageLogConfig = m_packageLogConfigs.find(message.getPackage());
-  if (packageLogConfig != m_packageLogConfigs.end()) {
+  if ((packageLogConfig != m_packageLogConfigs.end()) && packageLogConfig->second.getLogInfo(logLevel)) {
     message.setLogInfo(packageLogConfig->second.getLogInfo(logLevel));
   } else if (m_moduleLogConfig && m_moduleLogConfig->getLogInfo(logLevel)) {
     message.setLogInfo(m_moduleLogConfig->getLogInfo(logLevel));
   } else {
     message.setLogInfo(m_logConfig.getLogInfo(logLevel));
   }
+
+  message.setModule(m_moduleName);
 
   bool messageSent = false;
   for (unsigned int i = 0; i < m_logConnections.size(); i++) {

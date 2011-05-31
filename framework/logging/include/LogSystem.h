@@ -73,13 +73,14 @@ namespace Belle2 {
     LogConfig* getLogConfig() {return &m_logConfig;}
 
     /**
-     * Sets the log configuration to the given module log configuration.
+     * Sets the log configuration to the given module log configuration and sets the module name
      * This method should _only_ be called by the EventProcessor.
      *
      * @param moduleLogConfig Pointer to the logging configuration object of the module.
      *                        Set to NULL to use the global log configuration.
+     * @param moduleName Name of the module.
      */
-    void setModuleLogConfig(LogConfig* moduleLogConfig) {m_moduleLogConfig = moduleLogConfig; };
+    void setModuleLogConfig(LogConfig* moduleLogConfig = 0, std::string moduleName = "-global-") {m_moduleLogConfig = moduleLogConfig; m_moduleName = moduleName; };
 
     /**
      * Add the per package log configuration.
@@ -145,6 +146,7 @@ namespace Belle2 {
     std::vector<LogConnectionBase*> m_logConnections;     /**< Stores the pointers to the log connection objects. */
     LogConfig m_logConfig;                                /**< The global log system configuration. */
     LogConfig* m_moduleLogConfig;                         /**< The current module log system configuration. */
+    std::string m_moduleName;                             /**< The current module name. */
     std::map<std::string, LogConfig> m_packageLogConfigs; /**< Stores the log configuration objects for packages. */
 
     int m_messageCounter[LogConfig::c_Default]; /**< Counts the number of messages sent per message level. */

@@ -75,7 +75,7 @@ void EventProcessor::processInitialize(const ModulePtrList& modulePathList)
     }
 
     //Set the module dependent log level
-    logSystem.setModuleLogConfig(&(module->getLogConfig()));
+    logSystem.setModuleLogConfig(&(module->getLogConfig()), module->getName());
 
     //Do initialization
     stats.startModule(*module, ModuleStatistics::c_Init);
@@ -117,7 +117,7 @@ void EventProcessor::processCore(PathPtr startPath, const ModulePtrList& moduleP
       Module* module = moduleIter->get();
 
       //Set the module dependent log level
-      logSystem.setModuleLogConfig(&(module->getLogConfig()));
+      logSystem.setModuleLogConfig(&(module->getLogConfig()), module->getName());
 
       //Call the event method of the module
       stats.startModule(*module, ModuleStatistics::c_Event);
@@ -221,7 +221,7 @@ void EventProcessor::processTerminate(const ModulePtrList& modulePathList)
     Module* module = listIter->get();
 
     //Set the module dependent log level
-    logSystem.setModuleLogConfig(&(module->getLogConfig()));
+    logSystem.setModuleLogConfig(&(module->getLogConfig()), module->getName());
 
     //Do termination
     stats.startModule(*module, ModuleStatistics::c_Term);
@@ -249,7 +249,7 @@ void EventProcessor::processBeginRun(const ModulePtrList& modulePathList)
     Module* module = listIter->get();
 
     //Set the module dependent log level
-    logSystem.setModuleLogConfig(&(module->getLogConfig()));
+    logSystem.setModuleLogConfig(&(module->getLogConfig()), module->getName());
 
     //Do beginRun() call
     stats.startModule(*module, ModuleStatistics::c_BeginRun);
@@ -274,7 +274,7 @@ void EventProcessor::processEndRun(const ModulePtrList& modulePathList)
     Module* module = listIter->get();
 
     //Set the module dependent log level
-    logSystem.setModuleLogConfig(&(module->getLogConfig()));
+    logSystem.setModuleLogConfig(&(module->getLogConfig()), module->getName());
 
     //Do endRun() call
     stats.startModule(*module, ModuleStatistics::c_EndRun);

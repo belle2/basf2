@@ -38,46 +38,55 @@ namespace Belle2 {
 #define FUNCTIONNAME() "???"
 #endif
 
+// send generic log message
+#define B2LOGMESSAGE(loglevel, debuglevel, streamText, package, function, file, line) { \
+    std::ostringstream stringBuffer; stringBuffer << streamText;        \
+    LogSystem::Instance().sendMessage(LogMessage(loglevel, stringBuffer.rdbuf()->str(), package, function, file, line)); \
+  }
+
+// send generic log message if the log level is enabled
+#define B2LOGMESSAGE_IFENABLED(loglevel, debuglevel, streamText, package, function, file, line) { \
+    if (LogSystem::Instance().isLevelEnabled(loglevel, debuglevel, package)) { \
+      B2LOGMESSAGE(loglevel, debuglevel, streamText, package, function, file, line); \
+    } }
+
 // debug messages
 #ifdef LOG_NO_B2DEBUG
 #define B2DEBUG(level, streamText)
 #else
-#define B2DEBUG(level, streamText) { if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug,level,PACKAGENAME())) { \
-      std::ostringstream stringBuffer; stringBuffer << streamText; \
-      LogSystem::Instance().sendMessage(LogMessage(LogConfig::c_Debug,stringBuffer.rdbuf()->str(),PACKAGENAME(),FUNCTIONNAME(),__FILE__,__LINE__)); } }
+#define B2DEBUG(level, streamText) \
+  B2LOGMESSAGE_IFENABLED(LogConfig::c_Debug, level, streamText, PACKAGENAME(), FUNCTIONNAME(), __FILE__, __LINE__)
 #endif
 
 // info messages
 #ifdef LOG_NO_B2INFO
 #define B2INFO(streamText)
 #else
-#define B2INFO(streamText) { if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Info,0,PACKAGENAME())) { \
-      std::ostringstream stringBuffer; stringBuffer << streamText; \
-      LogSystem::Instance().sendMessage(LogMessage(LogConfig::c_Info,stringBuffer.rdbuf()->str(),PACKAGENAME(),FUNCTIONNAME(),__FILE__,__LINE__)); } }
+#define B2INFO(streamText) \
+  B2LOGMESSAGE_IFENABLED(LogConfig::c_Info, 0, streamText, PACKAGENAME(), FUNCTIONNAME(), __FILE__, __LINE__)
 #endif
 
 // warning messages
 #ifdef LOG_NO_B2WARNING
 #define B2WARNING(streamText)
 #else
-#define B2WARNING(streamText) { if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Warning,0,PACKAGENAME())) { \
-      std::ostringstream stringBuffer; stringBuffer << streamText; \
-      LogSystem::Instance().sendMessage(LogMessage(LogConfig::c_Warning,stringBuffer.rdbuf()->str(),PACKAGENAME(),FUNCTIONNAME(),__FILE__,__LINE__)); } }
+#define B2WARNING(streamText) \
+  B2LOGMESSAGE_IFENABLED(LogConfig::c_Warning, 0, streamText, PACKAGENAME(), FUNCTIONNAME(), __FILE__, __LINE__)
 #endif
 
 // error messages
-#define B2ERROR(streamText) { std::ostringstream stringBuffer; stringBuffer << streamText; \
-    LogSystem::Instance().sendMessage(LogMessage(LogConfig::c_Error,stringBuffer.rdbuf()->str(),PACKAGENAME(),FUNCTIONNAME(),__FILE__,__LINE__));}
+#define B2ERROR(streamText) \
+  B2LOGMESSAGE(LogConfig::c_Error, 0, streamText, PACKAGENAME(), FUNCTIONNAME(), __FILE__, __LINE__)
 
 // fatal messages
-#define B2FATAL(streamText) { std::ostringstream stringBuffer; stringBuffer << streamText; \
-    LogSystem::Instance().sendMessage(LogMessage(LogConfig::c_Fatal,stringBuffer.rdbuf()->str(),PACKAGENAME(),FUNCTIONNAME(),__FILE__,__LINE__));}
+#define B2FATAL(streamText) \
+  B2LOGMESSAGE(LogConfig::c_Fatal, 0, streamText, PACKAGENAME(), FUNCTIONNAME(), __FILE__, __LINE__)
 
 // scoped logging for entering/leaving methods
 #ifdef LOG_NO_B2METHOD
 #define B2METHOD()
 #else
-#define B2METHOD() LogMethod logMethod(PACKAGENAME(),FUNCTIONNAME(),__FILE__,__LINE__);
+#define B2METHOD() LogMethod logMethod(PACKAGENAME(), FUNCTIONNAME(), __FILE__, __LINE__);
 #endif
 
 }  // end namespace Belle2

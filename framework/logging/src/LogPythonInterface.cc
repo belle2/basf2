@@ -110,6 +110,8 @@ void LogPythonInterface::exposePythonAPI()
 
   scope global;
 
+  global.attr("inspect") = import("inspect");
+
   //Interface LogLevel enum
   enum_<LogConfig::ELogLevel>("LogLevel")
   .value(LogConfig::logLevelToString(LogConfig::c_Debug), LogConfig::c_Debug)
@@ -171,39 +173,52 @@ void LogPythonInterface::exposePythonAPI()
   global.attr("logging") = object(ptr(&interface));
 }
 
+//
+//This macro is a wrapper around the generic B2LOGMESSAGE macro to supply most
+//of the arguments using information from the python interpreter. It is only
+//used by the log* Messages of the LogPythonInterface to show meaningful log
+//message information for messages sent from the steering file
+//
+#define PYTHON_LOG(loglevel, debuglevel, text) \
+  B2LOGMESSAGE(loglevel, debuglevel, text, "steering", \
+               extract<std::string>(eval("inspect.currentframe().f_back.f_code.co_name")), \
+               extract<std::string>(eval("inspect.currentframe().f_back.f_code.co_filename")), \
+               extract<int>(eval("inspect.currentframe().f_back.f_lineno")))
 
-//
-// The following preprocessor macro redefinitions have the effect that the
-// information from the python steering file is used in the log messages
-// and not the information of this C++ source file.
-// *** No other code should be placed below the log methods! ***
-//
-#define _PACKAGE_ "steering"
-#define FUNCTIONNAME() extract<std::string>(eval("inspect.currentframe().f_back.f_code.co_name"))
-#define __FILE__ extract<std::string>(eval("inspect.currentframe().f_back.f_code.co_filename"))
-#define __LINE__ extract<int>(eval("inspect.currentframe().f_back.f_lineno"))
+#define PYTHON_LOG_IFENABLED(loglevel, debuglevel, text) \
+  B2LOGMESSAGE_IFENABLED(loglevel, debuglevel, text, "steering", \
+                         extract<std::string>(eval("inspect.currentframe().f_back.f_code.co_name")), \
+                         extract<std::string>(eval("inspect.currentframe().f_back.f_code.co_filename")), \
+                         extract<int>(eval("inspect.currentframe().f_back.f_lineno")))
+
 
 void LogPythonInterface::logDebug(int level, const std::string& msg)
 {
-  B2DEBUG(level, msg);
+#ifndef LOG_NO_B2DEBUG
+  PYTHON_LOG_IFENABLED(LogConfig::c_Debug, level, msg);
+#endif
 }
 
 void LogPythonInterface::logInfo(const std::string& msg)
 {
-  B2INFO(msg);
+#ifndef LOG_NO_B2INFO
+  PYTHON_LOG_IFENABLED(LogConfig::c_Info, 0, msg);
+#endif
 }
 
 void LogPythonInterface::logWarning(const std::string& msg)
 {
-  B2WARNING(msg);
+#ifndef LOG_NO_B2WARNING
+  PYTHON_LOG_IFENABLED(LogConfig::c_Warning, 0, msg);
+#endif
 }
 
 void LogPythonInterface::logError(const std::string& msg)
 {
-  B2ERROR(msg);
+  PYTHON_LOG(LogConfig::c_Error, 0, msg);
 }
 
 void LogPythonInterface::logFatal(const std::string& msg)
 {
-  B2FATAL(msg);
+  PYTHON_LOG(LogConfig::c_Fatal, 0, msg);
 }

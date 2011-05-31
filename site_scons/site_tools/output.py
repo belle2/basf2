@@ -10,6 +10,7 @@ from SCons.Script import GetOption
 # install: purple
 # map    : cyan
 # dict   : yellow
+# cleanup: black/white
 
 color_map_none = {
     'end': '',
@@ -18,6 +19,7 @@ color_map_none = {
     'install': '',
     'map': '',
     'dict': '',
+    'cleanup': '',
     }
 color_map_light = {
     'end': '\033[0m',
@@ -26,6 +28,7 @@ color_map_light = {
     'install': '\033[95m',
     'map': '\033[96m',
     'dict': '\033[93m',
+    'cleanup': '\033[37m',
     }
 color_map_dark = {
     'end': '\033[0m',
@@ -34,6 +37,7 @@ color_map_dark = {
     'install': '\033[2m\033[35m',
     'map': '\033[2m\033[36m',
     'dict': '\033[2m\033[33m',
+    'cleanup': '\033[30m',
     }
 
 
@@ -57,6 +61,8 @@ def generate(env):
             MAPCOMSTR=color_map['map'] + '*** map        : ${TARGET}'
                 + color_map['end'],
             ROOTCINTCOMSTR=color_map['dict'] + '*** dictionary : ${TARGET}'
+                + color_map['end'],
+            CLEANUPCOMSTR=color_map['cleanup'] + '*** removing   : %s'
                 + color_map['end'],
             )
 

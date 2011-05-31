@@ -17,7 +17,7 @@ subdir = os.environ['BELLE2_SUBDIR']
 
 # create construction environment
 global_env = Environment(ENV = os.environ,
-                         tools = ['default', 'root_dict', 'process_dir', 'reg_map', 'output'],
+                         tools = ['default', 'root_dict', 'process_dir', 'reg_map', 'output', 'autoclean_dir'],
                          BUILDERS = {},
                          BUILDDIR = os.path.join('#build', subdir),
                          INCDIR = '#include',
@@ -94,3 +94,15 @@ if len(global_env['TEST_FILES']) > 0:
                               global_env['TEST_FILES'], LIBS = global_env['TEST_LIBS'])
     global_env.Alias('test_all', test)
     global_env.Alias('tests', test)
+
+# auto clean include and modules dir
+#
+# If one renames header files, scons will install the new header but leave the
+# old one since it no longer knows about it This can lead to problems because
+# if one forgets to fix all includes of that file it will still build/run fine
+# on that system but break on other systems. To get rid of this problem, we
+# search the include folder and delete all files which would not be
+# built/installed by scons
+
+global_env.RemoveNonTargets(global_env["INCDIR"])
+global_env.RemoveNonTargets(global_env["MODDIR"])

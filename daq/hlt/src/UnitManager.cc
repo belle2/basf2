@@ -90,16 +90,19 @@ NodeInfo* UnitManager::buildNodeInfo(const std::string type, const int nodeNo, U
   nodeinfo->setSteeringName(unit.steering());
 
   if (type == "ES") {
+    B2INFO("Building NodeInfo for ES (" << unit.eventSeparator() << ")...");
     nodeinfo->setThisIP(unit.eventSeparator());
     nodeinfo->setTargetIP(unit.workerNodes());
     nodeinfo->setPortData(c_DataInPort, c_DataOutPort);
     nodeinfo->Print();
   } else if (type == "WN") {
+    B2INFO("Building NodeInfo for WN (" << unit.workerNodes()[nodeNo - 1] << ")...");
     nodeinfo->setThisIP(unit.workerNodes()[nodeNo - 1]);
     nodeinfo->setTargetIP(unit.eventMerger());
     nodeinfo->setPortData(c_DataOutPort, c_DataInPort);
     nodeinfo->Print();
   } else if (type == "EM") {
+    B2INFO("Building NodeInfo for EM (" << unit.eventMerger() << ")...");
     nodeinfo->setThisIP(unit.eventMerger());
     nodeinfo->setTargetIP("");
     nodeinfo->setPortData(c_DataInPort, c_DataOutPort);

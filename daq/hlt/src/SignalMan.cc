@@ -68,11 +68,13 @@ SignalMan::~SignalMan(void)
     //B2INFO("[PID] pidEvtSender = " << m_pidEvtSender << " / pidEvtReceiver = " << m_pidEvtReceiver);
     int status1;
 
-    std::string endOfRun("EOF");
+    //std::string endOfRun("EOF");
     //B2INFO("Terminating EvtReceiver...");
 
     //B2INFO("Terminating EvtSender...");
-    m_outBuf->insq((int*)(endOfRun.c_str()), endOfRun.size());
+    char* endOfRun = "EOF";
+    m_outBuf->insq((int*)endOfRun, 3 / 4 + 1);
+    //m_outBuf->insq((int*)(endOfRun.c_str()), endOfRun.size());
 
     waitpid(m_pidEvtSender, &status1, 0);
     //waitpid(m_pidEvtReceiver, &status2, 0);
@@ -90,7 +92,8 @@ SignalMan::~SignalMan(void)
  * @return c_TermCalled Termination of forked processes (EvtSender and EvtReceiver)
 */
 //EStatus SignalMan::init(const std::string inBufName, const std::string outBufName)
-EStatus SignalMan::init(EHLTPort inBufKey, EHLTPort outBufKey)
+//EStatus SignalMan::init(EHLTPort inBufKey, EHLTPort outBufKey)
+EStatus SignalMan::init(int inBufKey, int outBufKey)
 {
   //B2INFO("Starting to initialize SignalMan");
   //m_inBuf = new HLTBuffer(inBufName.c_str(), gBufferSize);
@@ -317,7 +320,10 @@ std::string SignalMan::get(void)
 */
 EStatus SignalMan::put(const std::string data)
 {
-  if (m_outBuf->insq((int*)(data.c_str()), data.size()) == -1)
+  char* dataPut = new char [data.size() + 1];
+  strcpy(dataPut, data.c_str());
+  if (m_outBuf->insq((int*)dataPut, data.size() / 4 + 1) == -1)
+    //if (m_outBuf->insq((int*)(data.c_str()), data.size()) == -1)
     return c_FuncError;
   else
     return c_Success;

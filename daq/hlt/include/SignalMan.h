@@ -45,7 +45,8 @@ namespace Belle2 {
 
     //! Initializing this object
     //EStatus init(const std::string inBufName, const std::string outBufName);
-    EStatus init(EHLTPort inBufKey, EHLTPort outBufKey);
+    //EStatus init(EHLTPort inBufKey, EHLTPort outBufKey);
+    EStatus init(int inBufKey, int outBufKey);
 
     EStatus runEvtSender(void);
     EStatus runEvtReceiver(void);

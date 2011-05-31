@@ -70,6 +70,7 @@ EStatus EvtSender::broadCasting()
     if (connect() == c_Success) {
       char* tmp = new char[MAXPACKETSIZE];
       m_buffer->remq((int*)tmp);
+      B2INFO("EvtSender: Intermediate check: size = " << strlen(tmp));
       std::string input(tmp);
 
       if (B2Socket::send(input) == c_Success) {

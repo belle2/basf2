@@ -32,6 +32,7 @@ GearboxIOXML::GearboxIOXML() : GearboxIOAbs()
   LIBXML_TEST_VERSION
 
   m_xmlDocument = NULL;
+  m_xPathContext = NULL;
   m_enableParamCheck = true;
 }
 
@@ -53,13 +54,24 @@ bool GearboxIOXML::open(const string& filename)
   xmlXPathOrderDocElems(m_xmlDocument);
 
   if (m_xmlDocument == NULL) return false;
-  else return true;
+
+  m_xPathContext = xmlXPathNewContext(m_xmlDocument);
+
+  //It would be possible to enable internal caching of the xpath objects, but there
+  //doesn't seem to be a big benefit so we leave it disabled for now.
+  //xmlXPathContextSetCache(m_xPathContext,1,-1,0);
+  return true;
 }
 
 
 bool GearboxIOXML::close()
 {
   if (m_xmlDocument != NULL) {
+    if (m_xPathContext != NULL) {
+      xmlXPathFreeContext(m_xPathContext);
+      m_xPathContext = NULL;
+    }
+
     xmlFreeDoc(m_xmlDocument);
     xmlCleanupParser();
     m_xmlDocument = NULL;
@@ -80,7 +92,7 @@ throw(GearboxIOAbs::GearboxIONotConnectedError)
   if (!isOpen()) throw GearboxIONotConnectedError();
   if (path.empty()) return false;
 
-  xmlXPathObjectPtr result = getNodeSet(m_xmlDocument, (xmlChar*)path.c_str());
+  xmlXPathObjectPtr result = getNodeSet(path);
 
   if (result == NULL) return false;
 
@@ -122,7 +134,7 @@ throw(GearboxIOAbs::GearboxIONotConnectedError, GearboxIOAbs::GearboxPathNotVali
     if (!isPathValid(path)) throw(GearboxPathNotValidError() << path);
   }
 
-  xmlXPathObjectPtr result = getNodeSet(m_xmlDocument, (xmlChar*)path.c_str());
+  xmlXPathObjectPtr result = getNodeSet(path);
 
   if (result == NULL) throw(GearboxPathEmptyResultError() << path);
   if (result->type != XPATH_NODESET) throw(GearboxPathResultNotValidError() << path);
@@ -151,7 +163,7 @@ throw(GearboxIOAbs::GearboxIONotConnectedError, GearboxIOAbs::GearboxPathNotVali
   boost::format queryString("count(%1%)");
   queryString % path;
 
-  xmlXPathObjectPtr result = getNodeSet(m_xmlDocument, (xmlChar*)queryString.str().c_str());
+  xmlXPathObjectPtr result = getNodeSet(queryString.str());
 
   if (result == NULL) throw(GearboxPathEmptyResultError() << queryString.str());
   if (result->type != XPATH_NUMBER) {
@@ -226,7 +238,7 @@ throw(GearboxIOAbs::GearboxIONotConnectedError, GearboxIOAbs::GearboxPathNotVali
     if (!isParamAvailable(path)) throw(GearboxParamNotExistsError() << path);
   }
 
-  xmlXPathObjectPtr result = getNodeSet(m_xmlDocument, (xmlChar*)path.c_str());
+  xmlXPathObjectPtr result = getNodeSet(path);
 
   if (result == NULL) throw(GearboxPathEmptyResultError() << path);
   if (result->type != XPATH_NODESET) throw(GearboxPathResultNotValidError() << path);
@@ -275,7 +287,7 @@ throw(GearboxIOAbs::GearboxIONotConnectedError, GearboxIOAbs::GearboxPathNotVali
     if (!isParamAvailable(path)) throw(GearboxParamNotExistsError() << path);
   }
 
-  xmlXPathObjectPtr result = getNodeSet(m_xmlDocument, (xmlChar*)path.c_str());
+  xmlXPathObjectPtr result = getNodeSet(path);
 
   if (result == NULL) throw(GearboxPathEmptyResultError() << path);
 
@@ -301,13 +313,10 @@ throw(GearboxIOAbs::GearboxIONotConnectedError, GearboxIOAbs::GearboxPathNotVali
 //                              Private methods
 //============================================================================
 
-xmlXPathObjectPtr GearboxIOXML::getNodeSet(xmlDocPtr document, xmlChar *xpath) const
+xmlXPathObjectPtr GearboxIOXML::getNodeSet(const std::string &xpath) const
 {
-  xmlXPathContextPtr context = xmlXPathNewContext(document);
-  if (context == NULL) return NULL;
-
-  xmlXPathObjectPtr result = xmlXPathEvalExpression(xpath, context);
-  xmlXPathFreeContext(context);
+  if (m_xPathContext == NULL) return NULL;
+  xmlXPathObjectPtr result = xmlXPathEvalExpression((xmlChar*) xpath.c_str(), m_xPathContext);
   if (result == NULL) return NULL;
   return result;
 }
@@ -320,7 +329,7 @@ throw(GearboxIOAbs::GearboxIONotConnectedError, GearboxIOAbs::GearboxPathNotVali
   if (!isOpen()) throw GearboxIONotConnectedError();
   if (xpath.empty()) throw(GearboxPathNotValidError() << "");
 
-  xmlXPathObjectPtr result = getNodeSet(m_xmlDocument, (xmlChar*)xpath.c_str());
+  xmlXPathObjectPtr result = getNodeSet(xpath);
 
   if (result == NULL) throw(GearboxPathEmptyResultError() << xpath);
 

@@ -300,6 +300,7 @@ namespace Belle2 {
   protected:
 
     xmlDocPtr m_xmlDocument;                    /**< The XML document. */
+    xmlXPathContextPtr m_xPathContext;          /**< The XPath context */
 
     bool m_enableParamCheck; /**< If set to true, performs a check of the path/parameter each time it is accessed. */
 
@@ -312,7 +313,7 @@ namespace Belle2 {
      * @param xpath The XPath query which should be carried out.
      * @return The result set of the XPath query.
      */
-    xmlXPathObjectPtr getNodeSet(xmlDocPtr document, xmlChar *xpath) const;
+    xmlXPathObjectPtr getNodeSet(const std::string& xpath) const;
 
     /**
      * Returns a parameter as double value converted into the framework default unit.

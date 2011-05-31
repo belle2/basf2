@@ -68,6 +68,8 @@ EStatus HLTProcess::beginRun()
       system("basf2 $BELLE2_LOCAL_DIR/daq/data/eventSeparator.py");
     if (m_nodeInfo->type() == "WN")
       system("basf2 $BELLE2_LOCAL_DIR/daq/data/workerNode.py");
+    if (m_nodeInfo->type() == "EM")
+      system("basf2 $BELLE2_LOCAL_DIR/daq/data/eventMerger.py");
 
     return c_TermCalled;
   }

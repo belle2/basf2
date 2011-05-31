@@ -125,7 +125,6 @@ EStatus B2Socket::accept(B2Socket& new_socket) const
   */
 
   new_socket.m_sock = ::accept(m_sock, (sockaddr*) & m_addr, (socklen_t*) & addr_length);
-  B2INFO("lkajhwejfnalwn3lfanwl3f = " << new_socket.m_sock);
 
   if (new_socket.m_sock < 0) {
     B2ERROR("Accept failed (code = " << errno << ")");

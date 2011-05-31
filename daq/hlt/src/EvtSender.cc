@@ -83,7 +83,8 @@ EStatus EvtSender::broadCasting()
       } else {
         B2ERROR("Sending data failed");
         // If error occurs in data sending, put back the data into the ring buffer
-        m_buffer->insq((int*)(input.c_str()), input.size());
+        //m_buffer->insq ((int*)tmp, (strlen (tmp) - 1) / 4 + 1);
+        //m_buffer->insq((int*)(input.c_str()), input.size());
         return c_FuncError;
       }
     } else {

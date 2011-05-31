@@ -193,7 +193,12 @@ EStatus SignalMan::runEvtReceiver(void)
     while (1) {
       new_sock >> data;
       if (data.size() > 0) {
-        m_inBuf->insq((int*)(data.c_str()), data.size());
+        char* dataTaken = new char [data.size() + 1];
+        strcpy(dataTaken, data.c_str());
+        B2INFO("Message taken: " << dataTaken << " (size = " << data.size() << ")");
+        m_inBuf->insq((int*)dataTaken, (data.size() / 4 + 1));
+
+        //m_inBuf->insq((int*)(data.c_str()), data.size());
         /*
         if (data == "EOF") {
           B2INFO("Destroying EvtReceiver..");

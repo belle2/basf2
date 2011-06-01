@@ -26,7 +26,38 @@ SVDRecoHit::SVDRecoHit() :
     GFRecoHitIfc<GFPlanarHitPolicy> (m_nParHitRep), m_sensorUniID(0),
     m_energyDep(0), m_energyDepError(1)
 {
-  ;
+  // Must be created using fake data
+
+  // Set positions
+  fHitCoord(0, 0) = 0;
+  fHitCoord(1, 0) = 0;
+
+  // Set the error covariance matrix
+  fHitCov(0, 0) = 1;
+  fHitCov(0, 1) = 0;
+  fHitCov(1, 0) = 0;
+  fHitCov(1, 1) = 1;
+
+  // Set physical parameters
+  m_energyDep = 0;
+  m_energyDepError = 1;
+
+  // Construct a finite detector plane and set in the policy class.
+  SiGeoCache* geometry = SiGeoCache::instance();
+
+  // Construct vectors o, u, v
+  TVector3 oGlobal(0, 0, 0);
+  TVector3 uGlobal(0, 1, 0);
+  TVector3 vGlobal(0, 0, 1);
+
+  // Construct finite plane - we use Trapezoidal plane for SVD
+  double du = 0.5;
+  double dv = 0.5;
+  double dudv = 0;
+  if (dv > 0) dudv /= dv; else dudv = 0;
+  GFDetPlane detPlane(oGlobal, uGlobal, vGlobal, new SiSensorPlane(0, 0, du, dv, dudv));
+  // Set in policy
+  fPolicy.setDetPlane(detPlane);
 }
 
 SVDRecoHit::SVDRecoHit(const SVDHit* hit) :
@@ -76,6 +107,7 @@ SVDRecoHit::SVDRecoHit(const SVDHit* hit) :
 
 GFAbsRecoHit* SVDRecoHit::clone()
 {
+  // TODO: Do a real deep copy so that the clone does not share the finite plane with *this.
   return new SVDRecoHit(*this);
 }
 

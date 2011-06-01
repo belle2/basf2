@@ -94,6 +94,18 @@ void VXDSpacePointMakerModule::initialize()
   // Print set parameters
   printModuleParams();
 
+  //-----------------------------------------------------
+  // Register the collection of VXDSpacePoints in the
+  // Data store.
+  //-----------------------------------------------------
+  StoreArray<VXDSpacePoint> storeVXDPts(m_outColName);
+
+  //-----------------------------------------------------
+  // Register the collection of MCParticle-to-VXDSpacePoints
+  // in the Data store.
+  //-----------------------------------------------------
+  StoreArray<Relation> storeMCToVXDPts(m_outRelName);
+
   // CPU time start
   m_timeCPU = clock() * Unit::us;
 }

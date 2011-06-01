@@ -17,6 +17,8 @@
 
 
 namespace Belle2 {
+  typedef std::pair<std::string, DataStore::EDurability> AccessorParams;
+
   /** Abstract base class for the StoreObjPtr and the StoreArray for easier common treatment by the Relation class.
    *
    *  This class is purely virtual. It is the recommended access to the DataStore in case you have
@@ -36,7 +38,7 @@ namespace Belle2 {
 
     /** Returns name under which stored object is saved.
      */
-    virtual std::pair<std::string, DataStore::EDurability> getAccessorParams() = 0;
+    virtual AccessorParams getAccessorParams() const = 0;
 
     /** Returns the object, that holds the information.
      *

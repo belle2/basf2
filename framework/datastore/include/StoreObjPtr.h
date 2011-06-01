@@ -40,21 +40,20 @@ namespace Belle2 {
      *                    if one with given name AND type exists, and aborts otherwise. If false, it either points
      *                    to existing object with name AND type, or NULL.
      */
-    StoreObjPtr(const std::string& name, const DataStore::EDurability& durability = DataStore::c_Event, bool generate = true) {
-      if (assignObject(name, durability,  generate)) {
-        B2DEBUG(100, name);
-      };
+    StoreObjPtr(const std::string& name = "", const DataStore::EDurability& durability = DataStore::c_Event, bool generate = true) {
+      assignObject(name, durability,  generate);
     }
 
-    StoreObjPtr(std::pair<std::string, DataStore::EDurability> accessorParams) {
+    StoreObjPtr(AccessorParams accessorParams) {
       assignObject(accessorParams.first, accessorParams.second, false);
     }
 
     /** Constructor, no assignment.
      *
      *  This contructor doesn't request a name. You can later assign an object to it, if you like.
+     *  The ptr argument is needed to distinguish between normal constructor
      */
-    StoreObjPtr()
+    StoreObjPtr(int dummy)
         : m_storeObjPtr(0), m_name("NONE"), m_durability(DataStore::c_Event) {}
 
     /** Assigning an object to the pointer.
@@ -66,7 +65,7 @@ namespace Belle2 {
      *                    if one with given name AND type exists, and aborts otherwise. If false, it either points
      *                    to existing object with name AND type, or NULL.
      */
-    bool assignObject(const std::string& name, const DataStore::EDurability& durability = DataStore::c_Event, bool generate = false);
+    bool assignObject(const std::string& name = "", const DataStore::EDurability& durability = DataStore::c_Event, bool generate = false);
 
     /** Store existing object.
      *
@@ -76,7 +75,7 @@ namespace Belle2 {
      *  @param name Name of the object to be stored.
      *  @param durability Decides durability map used to store the object.
      */
-    bool storeObject(T* AObject, const std::string& name, const DataStore::EDurability& durability = DataStore::c_Event);
+    bool storeObject(T* AObject, const std::string& name = "", const DataStore::EDurability& durability = DataStore::c_Event);
 
     /** Imitate pointer functionality. */
     T& operator *() const {return *m_storeObjPtr;};
@@ -88,33 +87,13 @@ namespace Belle2 {
     operator bool() const {return m_storeObjPtr;};
 
 
-    /** Returns name under which the object is saved in the DataStore.
-     */
-    std::pair<std::string, DataStore::EDurability> getAccessorParams() {return std::pair<std::string, DataStore::EDurability>(m_name, m_durability);};
-    /** Returns the object as TObject.
-     *
-     * This function overwrites the inherited virtual function.
-     */
-    //TObject* getPtr() {return m_storeObjPtr;}
-
-    /** Convinient Relation creating.
-     *
-     *  Using this way to create Relations is safer than direct creation,
-     *  because in this case you use definitively an object, that is already stored
-     *  in the DataStore.
-     */
-//    Relation* relateTo(const StoreAccessorAbs<TObject>& to, const float& weight = 1);
-
-    /** Convenient RelationArray creating.
-     *
-     *  This way of creation can be used, if all weights are the same.
-     */
-//    RelationArray* relateTo(const StoreAccessorAbs<TClonesArray>& to, const std::list<int>& indexList, const float& weight = 1);
-
-    /** RelationArray creation in case of multiple weights. */
-//    RelationArray* relateTo(const StoreAccessorAbs<TClonesArray>& to, const std::list<std::pair<int, float> > indexWeightList);
-
-  private:
+    /** Returns name and durability under which the object is saved in the DataStore. */
+    AccessorParams getAccessorParams() const {return AccessorParams(m_name, m_durability);};
+    /** Return  name under which the object is saved in the DataStore. */
+    std::string getName() const { return m_name; }
+    /** Return  durability with which the object is saved in the DataStore. */
+    DataStore::EDurability getDurability() const { return m_durability; }
+  protected:
 
     /** Store of actual pointer. */
     T* m_storeObjPtr;
@@ -134,59 +113,40 @@ namespace Belle2 {
 template <class T>
 bool Belle2::StoreObjPtr<T>::assignObject(const std::string& name, const Belle2::DataStore::EDurability& durability, bool generate)
 {
-  if (name == "") { B2FATAL("No Name was specified");}
-
-  m_name = name;
+  if (name == "") {
+    m_name = DataStore::defaultObjectName<T>();
+  } else {
+    m_name = name;
+  }
   m_durability = durability;
-  m_storeObjPtr =  DataStore::Instance().getObject<T>(name, durability);
+  m_storeObjPtr =  DataStore::Instance().getObject<T>(m_name, durability);
 
   if (m_storeObjPtr) {
-    return (false);
+    return false;
   }
 
   if (generate) {
-    m_storeObjPtr = DataStore::Instance().createObject<T>(name, durability);
-    return(true);
-  } else {
-    m_storeObjPtr = 0;
-  }
-  return (false);
-}
-
-template <class T>
-bool Belle2::StoreObjPtr<T>::storeObject(T* AObject, const std::string& name, const DataStore::EDurability& durability)
-{
-  if (name == "") { B2FATAL("No Name was specified");}
-
-  m_name = name;
-  m_durability = durability;
-  m_storeObjPtr =  AObject;
-  if (DataStore::Instance().storeObject(AObject, name, durability)) {
+    m_storeObjPtr = DataStore::Instance().createObject<T>(m_name, durability);
+    B2DEBUG(100, "Object with name '" << m_name << "' created");
     return true;
   }
   return false;
 }
 
-/*
 template <class T>
-Relation* StoreObjPtr<T>::relateTo(const StoreAccessorAbs<TObject>& to, const float& weight)
+bool Belle2::StoreObjPtr<T>::storeObject(T* AObject, const std::string& name, const DataStore::EDurability& durability)
 {
-  return new Relation(m_storeObjPtr, to.getPtr(), weight);
+  if (name == "") {
+    m_name = DataStore::defaultObjectName<T>();
+  } else {
+    m_name = name;
+  }
+  m_durability = durability;
+  m_storeObjPtr =  AObject;
+  if (DataStore::Instance().storeObject(AObject, m_name, durability)) {
+    return true;
+  }
+  return false;
 }
-
-
-template <class T>
-RelationArray* StoreObjPtr<T>::relateTo(const StoreAccessorAbs<TClonesArray>& to, const std::list<int>& indexList, const float& weight)
-{
-  return RelationArray(m_storeObjPtr, to.getPtr(), indexList, weight);
-}
-
-
-template <class T>
-RelationArray* StoreObjPtr<T>::relateTo(const StoreAccessorAbs<TClonesArray>& to, const std::list<std::pair<int, float> > indexWeightList)
-{
-  return RelationArray(m_storeObjPtr, to.getPtr(), indexWeightList);
-}
-*/
 
 #endif

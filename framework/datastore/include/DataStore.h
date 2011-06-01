@@ -71,6 +71,26 @@ namespace Belle2 {
      */
     static DataStore& Instance();
 
+    /** Return the default storage name for an object of the given type */
+    template<class T> static const std::string defaultObjectName() {
+      std::string classname = (T::Class()->GetName());
+      //Strip qualifiers like namespaces
+      size_t colon = classname.rfind("::");
+      if (colon != std::string::npos) {
+        classname = classname.substr(colon + 2);
+      }
+      return classname;
+    }
+
+    /** Return the default storage name for an array of the given type */
+    template<class T> static const std::string defaultArrayName() {
+      return defaultObjectName<T>() + 's';
+    }
+
+    /** Return the default storage name for an relation between the given types */
+    template<class FROM, class TO> static const std::string defaultRelationName() {
+      return defaultArrayName<FROM>() + "To" + defaultArrayName<TO>();
+    }
 
     /** Create new object with check of existence.
      *
@@ -295,12 +315,13 @@ TClonesArray* Belle2::DataStore::getArray(const std::string& name, const Belle2:
   Belle2::DataStore::StoreArrayIter iter =  m_arrayMap[durability].find(name);
 
   if (iter != m_arrayMap[durability].end()) {
-
+    TClonesArray* ptr = iter->second;
     //only return, if type matches
-    if (T::Class() != iter->second->GetClass()) {
-      B2FATAL("Array contains elements of different type than expected; " + name);
+    if (T::Class() != ptr->GetClass()) {
+      B2FATAL("Array '" << name << "' contains elements of " << ptr->GetClass()->GetName()
+              << ", requested was " << T::Class()->GetName());
     }
-    return (iter->second);
+    return ptr;
   }
 
   //if object doesn't exist

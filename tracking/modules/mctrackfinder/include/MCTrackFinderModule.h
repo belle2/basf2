@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Martin Heck & Oksana Brovchenko                          *
+ * Contributors: Martin Heck & Oksana Brovchenko & Moritz Nadler          *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -20,11 +20,12 @@ namespace Belle2 {
 
   /** This module tries to use Relations to define which hits belong to which particles and writes track candidates into the DataStore.
    *
-   *  The Relations between MCParticles <-> SimHits <-> Hits <-> RecoHits have to be used for this purpose.
+   *  The Relations between MCParticles <-> SimHits <-> Hits <-> RecoHits have to be used for this purpose in case of the CDC Hits
+   *  for the PXD and SVD htis the direct relations MCParticles -> RecoHits are used
    *
    *  @author <a href="mailto:martin.heck@kit.edu?subject=MCTrackFinder">Martin Heck</a>
    *
-   *  @todo   Currently only the CDC is used in this module. This is mainly for testing purposes. Once everything is defined nicely, SVD and PXD will be added.
+   *  @todo futher testing of the code. Maybe clean up and more consistendy in varable names
    */
   class MCTrackFinderModule : public Module {
 
@@ -72,9 +73,16 @@ namespace Belle2 {
     std::string m_cdcRecoHitsCollectionName;                          /**< CDCRecoHits collection name */
     std::string m_cdcSimHitToCDCHitCollectioName;                     /**< CDCSimHits to CDCHits relation name */
 
+    std::string m_mcPartToPxdSimHitsColName;                          /**< MCParticles to PXDRecoHits relation name */
+    std::string m_mcPartToSvdSimHitsColName;                          /**< MCParticles to SVDRecoHits relation name */
+    std::string m_pxdRecoHitColName;                                  /**< PXDRecoHits collection name */
+    std::string m_svdRecoHitColName;                                  /**< SVDRecoHits collection name */
+
     std::string m_gfTrackCandsCollectionName;                         /**< TrackCandidates collection name */
     std::string m_gfTrackCandToMCParticleCollectionName;              /**< TrackCandidates to MCParticles relation name */
     std::string m_gfTrackCandToCDCRecoHitsCollectionName;             /**< TrackCandidates to CDCRecoHits relation name */
+    std::string m_gfTrackCandToPxdRecoHitsColName;                    /**< TrackCandidates to PXDRecoHits relation name */
+    std::string m_gfTrackCandToSvdRecoHitsColName;                    /**< TrackCandidates to SVDRecoHits relation name */
   };
 }
 

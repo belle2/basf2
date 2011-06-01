@@ -100,7 +100,7 @@ void PXDRecoHitMakerModule::beginRun()
 void PXDRecoHitMakerModule::event()
 {
   //------------------------------------------------------
-  // Get the collection of PXDSimHits from the Data store.
+  // Get the collection of MCParticles from the Data store.
   //------------------------------------------------------
   StoreArray<MCParticle> mcPartArray(m_mcColName);
   if (!mcPartArray) {
@@ -134,7 +134,7 @@ void PXDRecoHitMakerModule::event()
   if (!mcHitArray) {
     B2ERROR("PXDRecoHitMaker: Cannot get collection " << m_relHitName << " from the DataStore.");
   }
-  // Create the relaiton holder:
+  // Create the relation holder:
   TwoSidedRelationSet relMCHit;
 
   // Fill with relation data

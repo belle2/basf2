@@ -14,7 +14,7 @@
 #include <TObject.h>
 
 #define DEFAULT_PXDDIGITS "PXDDigits"
-#define DEFAULT_PXDDIGITSREL "PXDDigitsToMCParticles"
+#define DEFAULT_PXDDIGITSREL "MCParticlesToPXDDigits"
 
 
 namespace Belle2 {

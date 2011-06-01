@@ -87,6 +87,20 @@ void PXDDigiSimpleModule::initialize()
 
   // CPU time start
   m_timeCPU = clock() * Unit::us;
+
+  //-----------------------------------------------------
+  // Register the collection of PXDHits with the Data store.
+  //-----------------------------------------------------
+  StoreArray<PXDHit> pxdOutArray(m_outColName);
+
+  //-----------------------------------------------------
+  // Register the MCParticles-to-PXDHits collection
+  // with the Data store.
+  //-----------------------------------------------------
+  StoreArray<Relation> mcHitArray(m_relHitName);
+
+
+
 }
 
 void PXDDigiSimpleModule::beginRun()
@@ -98,7 +112,7 @@ void PXDDigiSimpleModule::beginRun()
 void PXDDigiSimpleModule::event()
 {
   //------------------------------------------------------
-  // Get the collection of PXDSimHits from the Data store.
+  // Get the collection of MCParticles from the Data store.
   //------------------------------------------------------
   StoreArray<MCParticle> mcPartArray(m_mcColName);
   if (!mcPartArray) {

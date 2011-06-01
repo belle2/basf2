@@ -92,7 +92,7 @@ SiSensorInfo::SiSensorInfo(TGeoNode* pNode)
     double uSize2 = 2.0 * shape->GetDy2();
     m_uSize = 0.5 * (uSize + uSize2);
     m_vSize = 2.0 * shape->GetDz();
-    m_uSizeD = 2.0 * (uSize2 - uSize) / m_vSize;
+    m_uSizeD = (uSize2 - uSize) / m_vSize;
     // Consolidate: adapt cell size to pitch and number of cells.
     // To be removed once geometry is consistent.
     //m_uSize = m_uPitch * m_uCells;

@@ -1,9 +1,9 @@
-/**************************************************************************
+/********************************** ****************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
  * Copyright(C) 2010-2011  Belle II Collaboration                         *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Andreas Moll                                             *
+ * Contributors: Andreas Moll, Peter Kvasnicka                                           *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -16,6 +16,12 @@
 
 #include <TObject.h>
 
+class G4LogicalVolume;
+class TG4ROOTDetectorConstruction;
+
+/** Default name of the G4 region of PXD active silicons. */
+#define PXDACTIVE_G4REGION_NAME "PXD_Active_Region"
+
 namespace Belle2 {
 
   /** Default step size.
@@ -24,6 +30,16 @@ namespace Belle2 {
    *  Will be fixed in future.
    */
   const double stepLengthInPXD = -1.0 * Unit::um;
+
+  /**
+   * Default range cut.
+   * The range cut defines minimum energy (expressed as path length in Si)
+   * for a knock-on (delta) electron to be explicitly simulated by Geant4.
+   * We need this value to be set for Si detectors, as it must be smaller than
+   * the Geant4 default for the whole BelleII detector. The rule of thumb is to
+   * take a value close to the typical charge spread in the sensor.
+   */
+  const double rangeCutInPXD = -1.0 * Unit::um;
 
   /**
     * PXDVolumeUserInfo - Additional information for a PXD sensitive volume.
@@ -45,12 +61,13 @@ namespace Belle2 {
         m_vPitch(1),
         m_vCells(1) {
       m_stepSize = stepLengthInPXD;
+      m_rangeCut = rangeCutInPXD;
     }
 
     /** Full constructor.
      * @param layerID ID of the layer.
      * @param ladderID ID of the ladder.
-     * @param sensorID ID of the sensor.
+     * @param sensorID ID of th1e sensor.
      * @param uPitch sensor pitch in u ("r-phi") direciton.
      * @param uCells number of cells in u ("r-phi") direction.
      * @param vPitch sensor pitch in v ("z") direction.
@@ -72,6 +89,7 @@ namespace Belle2 {
         m_vPitch(vPitch),
         m_vCells(vCells) {
       m_stepSize = stepLengthInPXD;
+      m_rangeCut = rangeCutInPXD;
     }
 
     /** Destructor */
@@ -102,6 +120,9 @@ namespace Belle2 {
     /** The method to set number of cells in v.*/
     void setVCells(int vCells) { m_vCells = vCells; }
 
+    // NOTE: There is no setter for range cut. I don't want it to be set
+    // detector-wise in the geometry xml.
+
     /** The method to get layer id.*/
     int getLayerID() const { return m_layerID; }
 
@@ -123,8 +144,16 @@ namespace Belle2 {
     /** The method to get number of cells in v.*/
     int getVCells() const { return m_vCells; }
 
+    /** The method to get range cut value. */
+    double getRangeCut() const {return m_rangeCut; }
+
     /** Assignment operator.*/
     PXDVolumeUserInfo& operator=(const PXDVolumeUserInfo& other);
+
+    /**
+     * Overloaded to create the Geant4 region for active PXD volumes and set appropriate range cut.
+     */
+    void updateG4Volume(G4VPhysicalVolume* g4Volume, TG4RootDetectorConstruction *detConstruct);
 
   private:
 
@@ -135,6 +164,7 @@ namespace Belle2 {
     int m_uCells; /**< Number of cells in u ("r-phi"). */
     double m_vPitch; /**< Pitch in v ("z"). */
     int m_vCells; /**< Number of cells in v ("z"). */
+    double m_rangeCut; /**< Range cut determines the minimum path/energy of delta e- that are explicitly simulated.*/
 
     ClassDef(PXDVolumeUserInfo, 1)
 

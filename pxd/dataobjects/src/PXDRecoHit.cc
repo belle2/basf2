@@ -15,6 +15,9 @@
 #include <GFDetPlane.h>
 #include <GFRectFinitePlane.h>
 
+
+#include <framework/logging/Logger.h>
+
 #include <TVector3.h>
 
 using namespace std;
@@ -26,7 +29,31 @@ PXDRecoHit::PXDRecoHit() :
     GFRecoHitIfc<GFPlanarHitPolicy> (m_nParHitRep), m_sensorUniID(0),
     m_energyDep(0), m_energyDepError(1)
 {
-  ;
+  // We must construct things using fake data.
+
+  // Set positions
+  fHitCoord(0, 0) = 0;
+  fHitCoord(1, 0) = 0;
+
+  // Set the error covariance matrix
+  fHitCov(0, 0) = 1;
+  fHitCov(0, 1) = 0;
+  fHitCov(1, 0) = 0;
+  fHitCov(1, 1) = 1;
+
+  // Construct vectors o, u, v
+  TVector3 oGlobal(0, 0, 0);
+  TVector3 uGlobal(0, 1, 0);
+  TVector3 vGlobal(0, 0, 1);
+
+  // Construct finite plane - we can do with RectFinitPlanes for PXD
+  double u1 = -0.5;
+  double u2 = - u1;
+  double v1 = -0.5;
+  double v2 = - v1;
+  GFDetPlane detPlane(oGlobal, uGlobal, vGlobal, new GFRectFinitePlane(u1, u2, v1, v2));
+  // Set in policy
+  fPolicy.setDetPlane(detPlane);
 }
 
 PXDRecoHit::PXDRecoHit(const PXDHit* hit) :
@@ -69,9 +96,8 @@ PXDRecoHit::PXDRecoHit(const PXDHit* hit) :
   double u2 = - u1;
   double v1 = -0.5 * geometry->getVSensorSize(m_sensorUniID);
   double v2 = - v1;
-  GFDetPlane detPlane(oGlobal, uGlobal, vGlobal, new GFRectFinitePlane(u1, u2, v1, v2));
   // Set in policy
-  fPolicy.setDetPlane(detPlane);
+  fPolicy.setDetPlane(GFDetPlane(oGlobal, uGlobal, vGlobal, new GFRectFinitePlane(u1, u2, v1, v2)));
 }
 
 GFAbsRecoHit* PXDRecoHit::clone()

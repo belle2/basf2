@@ -27,6 +27,8 @@
 #include <G4VPhysicalVolume.hh>
 #include <G4Step.hh>
 #include <G4UserLimits.hh>
+#include <G4Region.hh>
+#include <G4ProductionCuts.hh>
 
 #include <string>
 #include <cmath>

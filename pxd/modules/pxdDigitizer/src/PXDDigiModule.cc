@@ -196,6 +196,9 @@ void PXDDigiModule::initialize()
   //Register PXDDigit collection
   StoreArray<PXDDigit> storeDigits(m_digitColName);
 
+  //Register MCParticles-to-PXDDigits collection
+  StoreArray<Relation> storeMCToDigits(m_relDigitName);
+
   //
   // ROOT variables
   //
@@ -1001,15 +1004,11 @@ void PXDDigiModule::saveDigits(DigitMap & digits)
         iMCPart = mcItr->m_from;
 
       // Save the relation
-      // Note: Do we save "no relations" to MCParticles as relations to
-      // MCParticle[0]?
-      if (iMCPart > 0) {
-        int relIndex = storeDigitsRel->GetLast() + 1;
-        new(storeDigitsRel->AddrAt(relIndex)) Relation(
-          storeMCParticles, storeDigits, iMCPart, digIndex, weight
-        );
-        m_nRelationsSaved++;
-      } // if iMCPart
+      int relIndex = storeDigitsRel->GetLast() + 1;
+      new(storeDigitsRel->AddrAt(relIndex)) Relation(
+        storeMCParticles, storeDigits, iMCPart, digIndex, weight
+      );
+      m_nRelationsSaved++;
 
     } // for StoreRelationMapItr
   } // for digit

@@ -54,7 +54,7 @@ namespace Belle2 {
      *                    the given types
      *  @param durability Durabiliy of the relation
      */
-    RelationIndex(std::string name = DataStore::defaultRelationName<FROM, TO>(), DataStore::EDurability durability = DataStore::c_Event):
+    RelationIndex(std::string name = (DataStore::defaultRelationName<FROM, TO>()), DataStore::EDurability durability = DataStore::c_Event):
         m_index(RelationIndexManager::get<FROM, TO>(RelationArray(name, durability))),
         m_from(m_index.index().template get<FROM>()),
         m_to(m_index.index().template get<TO>()) {}

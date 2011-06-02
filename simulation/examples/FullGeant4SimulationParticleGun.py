@@ -23,7 +23,7 @@ import random
 from basf2 import *
 
 # Set the log level to show only error and fatal messages
-set_log_level(3)
+set_log_level(LogLevel.ERROR)
 
 # EvtMetaGen - generate event meta data
 evtmetagen = register_module('EvtMetaGen')
@@ -31,10 +31,10 @@ evtmetagen.param('EvtNumList', [100])
 
 # Particle gun
 particlegun = register_module('PGunInput')
-particlegun.param('ntracks', 10)
+particlegun.param('nTracks', 10)
 particlegun.param('PIDcodes', [11, -11])
-particlegun.param('p_par1', 0.05)
-particlegun.param('p_par2', 3)
+particlegun.param('pPar1', 0.05)
+particlegun.param('pPar2', 3)
 
 # Geometry parameter loader
 paramloader = register_module('ParamLoaderXML')

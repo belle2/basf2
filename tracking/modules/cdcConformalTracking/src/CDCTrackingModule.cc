@@ -48,13 +48,14 @@ CDCTrackingModule::CDCTrackingModule() : Module()
 {
   setDescription("Performs the first rough pattern recognition step in the CDC: digitized CDC Hits are combined to track candidates.");
 
-  addParam("CDCSimHitsColName", m_cdcSimHitsColName, "Name of collection holding the CDCSimHits (only for crosschecking)", string("CDCSimHits"));
+  addParam("CDCSimHitsColName", m_cdcSimHitsColName, "Name of collection holding the CDCSimHits (only for cross check)", string("CDCSimHits"));
   addParam("CDCHitsColName", m_cdcHitsColName, "Name of collection holding the digitized CDCHits (should be created by CDCDigi module)", string("CDCHits"));
   addParam("CDCRecoHitsColName", m_cdcRecoHitsColName, "Name of collection holding the CDCRecoHits (should be created by CDCRecoHitMaker module)", string("CDCRecoHits"));
 
   addParam("CDCTrackCandidatesColName", m_cdcTrackCandsColName, "Name of collection holding the CDCTrackCandidates (output)", string("CDCTrackCandidates"));
   addParam("GFTrackCandidatesColName", m_gfTrackCandsColName, "Name of collection holding the GFTrackCandidates (output)", string("GFTrackCandidates_conformal"));
   addParam("GFTrackCandToCDCRecoHitsColName", m_gfTrackCandToRecoHits, "Name of collection holding the relations between GFTrackCandidates and CDCRecoHits (output)", string("GFTrackCandidateToCDCRecoHits_conformal"));
+  addParam("CDCTrackCandToCDCRecoHitsColName", m_cdcTrackCandToRecoHits, "Name of collection holding the relations between CDCTrackCandidates and CDCRecoHits (output)", string("CDCTrackCandidateToCDCRecoHits"));
 
   addParam("TextFileOutput", m_textFileOutput, "Set to true if some text files with hit coordinates should be created", false);
 
@@ -88,19 +89,19 @@ void CDCTrackingModule::event()
 
   //StoreArray with simulated CDCHits, should already be created by previous modules
   StoreArray<CDCSimHit> cdcSimHits(m_cdcSimHitsColName);
-  //B2INFO("CDCTracking: Number of simulated Hits:  " << cdcSimHits.GetEntries());
-  if (cdcSimHits.GetEntries() == 0) B2WARNING("CDCTracking: cdcSimHitsCollection is empty!");
+  B2DEBUG(149, "CDCTracking: Number of simulated Hits:  " << cdcSimHits.getEntries());
+  if (cdcSimHits.getEntries() == 0) B2WARNING("CDCTracking: cdcSimHitsCollection is empty!");
 
   //StoreArray with digitized CDCHits, should already be created by CDCDigitized module
   StoreArray<CDCHit> cdcHits(m_cdcHitsColName);
-  //B2INFO("CDCTracking: Number of digitized Hits: " << cdcHits.GetEntries());
-  if (cdcHits.GetEntries() == 0) B2WARNING("CDCTracking: cdcHitsCollection is empty!");
+  B2DEBUG(149, "CDCTracking: Number of digitized Hits: " << cdcHits.getEntries());
+  if (cdcHits.getEntries() == 0) B2WARNING("CDCTracking: cdcHitsCollection is empty!");
 
   //StoreArray with CDCTrackHits, a class which has a pointer to the original CDCHit, but also additional member variables and methods needed for tracking.
   StoreArray<CDCTrackHit> cdcTrackHits("CDCTrackHits");
 
   //Create a CDCTrackHits from the CDCHits and store them in the same order in the new StoreArray
-  for (int i = 0; i < cdcHits.GetEntries(); i++) {
+  for (int i = 0; i < cdcHits.getEntries(); i++) {
     CDCTrackHit trackHit(cdcHits[i], i);
     new(cdcTrackHits->AddrAt(i)) CDCTrackHit(trackHit);
   }
@@ -115,29 +116,27 @@ void CDCTrackingModule::event()
   int goodSeg = 0;
   int badSeg = 0;
 
-  for (int i = 0; i < cdcSegments.GetEntries(); i++) {
+  for (int i = 0; i < cdcSegments.getEntries(); i++) {
     if (cdcSegments[i]->getIsGood() == true) goodSeg++;
     else badSeg++;
   }
 
-  B2INFO("Number of found Segments: " << cdcSegments.GetEntries() << " (good: " << goodSeg << ", bad: " << badSeg << " )");
+  B2INFO("Number of found Segments: " << cdcSegments.getEntries() << " (good: " << goodSeg << ", bad: " << badSeg << " )");
 
 
   B2INFO("Superlayer Segment Id  Nr of Hits ");
 
-  for (int j = 0; j < cdcSegments.GetEntries(); j++) {
+  for (int j = 0; j < cdcSegments.getEntries(); j++) {
 
     B2INFO("     " << cdcSegments[j]->getSuperlayerId() << "           " << cdcSegments[j]->getId() << "         " << cdcSegments[j]->getNHits());
   }
 
 //Divide Segments into Axial and Stereo, create and fill two vectors
-
-
   vector<CDCSegment> cdcAxialSegments;
   vector<CDCSegment> cdcStereoSegments;
 
 
-  for (int i = 0; i < cdcSegments.GetEntries(); i++) {
+  for (int i = 0; i < cdcSegments.getEntries(); i++) {
 
     if (cdcSegments[i]->getIsAxial()) {
       cdcAxialSegments.push_back(*cdcSegments[i]);
@@ -156,11 +155,11 @@ void CDCTrackingModule::event()
   B2INFO("Collect track candidates by connecting axial Segments...");
   AxialTrackFinder::CollectTrackCandidates(cdcAxialSegments, m_cdcTrackCandsColName); //assigns Segments to Tracks, returns a Tracks array
 
-  B2INFO("Number of track candidates: " << cdcTrackCandidates.GetEntries());
+  B2INFO("Number of track candidates: " << cdcTrackCandidates.getEntries());
   B2INFO("Track Id  Nr of Segments  Nr of Hits   |p|[GeV]:");
 
 
-  for (int j = 0; j < cdcTrackCandidates.GetEntries(); j++) { //loop over all Tracks
+  for (int j = 0; j < cdcTrackCandidates.getEntries(); j++) { //loop over all Tracks
 
     B2INFO("  " << cdcTrackCandidates[j]->getId()  << "             " << cdcTrackCandidates[j]->getNSegments() << "           " << cdcTrackCandidates[j]->getNHits() << "         " << std::setprecision(3) << cdcTrackCandidates[j]->getMomentumValue());
 
@@ -172,7 +171,7 @@ void CDCTrackingModule::event()
 
   B2INFO("Track Id  Nr of Segments  Nr of Hits   |p|[GeV]         p(x,y,z)               charge  :");
 
-  for (int j = 0; j < cdcTrackCandidates.GetEntries(); j++) { //loop over all Tracks
+  for (int j = 0; j < cdcTrackCandidates.getEntries(); j++) { //loop over all Tracks
 
     B2INFO("  " << cdcTrackCandidates[j]->getId() << "             " << cdcTrackCandidates[j]->getNSegments() << "           " << cdcTrackCandidates[j]->getNHits() << "         " << std::setprecision(3) << cdcTrackCandidates[j]->getMomentumValue() << "         (" << std::setprecision(3) << cdcTrackCandidates[j]->getMomentumVector().X() << ", " << std::setprecision(3) << cdcTrackCandidates[j]->getMomentumVector().Y() << ", " << std::setprecision(3) << cdcTrackCandidates[j]->getMomentumVector().Z() << ")       " << cdcTrackCandidates[j]->getChargeSign());
     //   for (int seg = 0; seg < cdcTrackCandidates[j]->getNSegments(); seg++){
@@ -194,8 +193,9 @@ void CDCTrackingModule::event()
   StoreArray <GFTrackCand> trackCandidates(m_gfTrackCandsColName);
   StoreArray<CDCRecoHit> cdcRecoHits(m_cdcRecoHitsColName);
   StoreArray<Relation> gfTrackCandToRecoHits(m_gfTrackCandToRecoHits);
+  StoreArray<Relation> cdcTrackCandToRecoHits(m_cdcTrackCandToRecoHits);
 
-  for (int i = 0 ; i < cdcTrackCandidates->GetEntries(); i++) {
+  for (int i = 0 ; i < cdcTrackCandidates.getEntries(); i++) {
 
     new(trackCandidates->AddrAt(i)) GFTrackCand();
     //set the values needed as start values for the fit in the GFTrackCandidate from the CDCTrackCandidate information
@@ -223,11 +223,14 @@ void CDCTrackingModule::event()
     //Create also a relation between the GFTrackCandidate and the RecoHits
     new(gfTrackCandToRecoHits->AddrAt(i)) Relation(trackCandidates, cdcRecoHits, i, indexList);
     //B2INFO("******* New relation created");
+    //Create a relation between CDCTrackCanddidate and the RecoHits for the MCMatching
+    new(cdcTrackCandToRecoHits->AddrAt(i)) Relation(cdcTrackCandidates, cdcRecoHits, i, indexList);
+
     indexList.clear();
   }
 
-  B2INFO(trackCandidates->GetEntries() << "  GFTrackCandidates created");
-  B2INFO(gfTrackCandToRecoHits->GetEntries() << "  Relations between GFTrackCandidates and CDCRecoHits created");
+  B2INFO(trackCandidates.getEntries() << "  GFTrackCandidates created");
+  B2INFO(gfTrackCandToRecoHits.getEntries() << "  Relations between GFTrackCandidates and CDCRecoHits created");
 
 
   if (m_textFileOutput) {

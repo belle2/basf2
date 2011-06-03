@@ -233,7 +233,7 @@ def process_dir(
             result = SConscript(sconscript_name, exports='env')
             if isinstance(result, Environment):
                 test_env = result
-        test_env.Append(LIBS=['gtest'])
+        test_env.Append(LIBS=['gtest', lib_name])
         env.AppendUnique(TEST_LIBS=test_env['LIBS'])
         env['TEST_FILES'] = test_env.SharedObject(local_test_files)
         test = test_env.Program(os.path.join(test_env['BINDIR'],

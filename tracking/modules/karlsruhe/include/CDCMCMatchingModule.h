@@ -71,7 +71,7 @@ namespace Belle2 {
     std::string m_cdcRecoHitsCollectionName;             /**< CDCRecoHits collection name */
 
     std::string m_cdcTrackCandsCollectionName;           /**< CDCTrackCandidates collection name */
-    std::string m_cdcTrackCandsToRecoHits;               /**< CDCTrackCandidates to CDCRecoHits relation name */
+    std::string m_cdcTrackCandToRecoHits;               /**< CDCTrackCandidates to CDCRecoHits relation name */
 
     std::string m_cdcTrackCandsToMCParticles;            /**< CDCTrackCandidates to MCParticles relation name */
     std::string m_mcMatchParticlesCollectionName;        /**< MCMatchParticles collection name */

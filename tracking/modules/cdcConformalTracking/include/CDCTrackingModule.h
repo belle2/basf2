@@ -83,6 +83,7 @@ namespace Belle2 {
     std::string m_gfTrackCandsColName;           /**< Output genfit track candidates collection name*/
     std::string m_cdcRecoHitsColName;             /**< Input reco hits collection name (needed for relation creation)*/
     std::string m_gfTrackCandToRecoHits;         /**< Output relation (gf track candidates to cdc recohits) name */
+    std::string m_cdcTrackCandToRecoHits;         /**< Output relation (cdc track candidates to cdc recohits) name */
 
     bool m_textFileOutput;                          /**< Boolean to create output text files with hit coordinates (needed for development purposes, wont be needed later on)*/
 

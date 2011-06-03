@@ -187,8 +187,8 @@ void CDCMCMatchingModule::event()
         }
       }
 
-      B2INFO("Efficiency: " << cdcTrackCandidates[i]->getEfficiency(hitCounter));
-      gfTrackCandidates[i]->setDip(cdcTrackCandidates[i]->getEfficiency(hitCounter));
+      //B2INFO("Efficiency: "<<cdcTrackCandidates[i]->getEfficiency(hitCounter));
+      //gfTrackCandidates[i]->setDip(cdcTrackCandidates[i]->getEfficiency(hitCounter));
 
 
 

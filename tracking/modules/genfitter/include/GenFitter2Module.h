@@ -84,6 +84,8 @@ namespace Belle2 {
     //std::vector<double> absMoms;
     //std::vector<int> ndfs;
     ofstream dataOut;
+    int m_failedFitCounter;
+    int m_fitCounter;
     // bool m_fitMCTracks;                                     /**< True if MC tracks should be fitted */
     //bool m_fitRecoTracks;                                   /**< True if track candidates from pattern recognition should be fitted */
 

@@ -216,11 +216,11 @@ void MCTrackFinderModule::event()
       }
       int hitCounterOffset = nPxdRecoHits;
       BOOST_FOREACH(int hitID, indicesOfGoodSvdHits) {
-        trackCandidates[counter]->addHit(1, hitCounterOffset + hitID);
+        trackCandidates[counter]->addHit(1,  hitID);
       }
       hitCounterOffset = nPxdRecoHits + nSvdRecoHits;
       BOOST_FOREACH(int hitID, indicesOfGoodCdcHits) {
-        trackCandidates[counter]->addHit(2, hitCounterOffset + hitID);
+        trackCandidates[counter]->addHit(2, hitID);
       }
       //B2INFO("Total NR of assigned RecoHits: "<<trackCandidates[counter]->getNHits());
 

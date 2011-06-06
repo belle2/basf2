@@ -20,12 +20,10 @@ namespace Belle2 {
 
   /** This module tries to use Relations to define which hits belong to which particles and writes track candidates into the DataStore.
    *
-   *  The Relations between MCParticles <-> SimHits <-> Hits <-> RecoHits have to be used for this purpose in case of the CDC Hits
-   *  for the PXD and SVD htis the direct relations MCParticles -> RecoHits are used
+   *  The Relations MCParticles -> RecoHits for PXD, SVD and CDC are used.
    *
-   *  @author <a href="mailto:martin.heck@kit.edu?subject=MCTrackFinder">Martin Heck</a>
    *
-   *  @todo futher testing of the code. Maybe clean up and more consistendy in varable names
+   *  @todo further testing of the code. Maybe clean up and more consistency in variable names
    */
   class MCTrackFinderModule : public Module {
 
@@ -68,21 +66,22 @@ namespace Belle2 {
       return (-999);
     }
 
-    std::string m_mcParticlesCollectionName;                          /**< MCParticles collection name */
-    std::string m_mcPartToCDCSimHitsCollectionName;                   /**< MCParticles to CDCSimHits relation name */
-    std::string m_cdcRecoHitsCollectionName;                          /**< CDCRecoHits collection name */
-    std::string m_cdcSimHitToCDCHitCollectioName;                     /**< CDCSimHits to CDCHits relation name */
+    std::string m_mcParticlesColName;                           /**< MCParticles collection name */
 
-    std::string m_mcPartToPxdSimHitsColName;                          /**< MCParticles to PXDRecoHits relation name */
-    std::string m_mcPartToSvdSimHitsColName;                          /**< MCParticles to SVDRecoHits relation name */
-    std::string m_pxdRecoHitColName;                                  /**< PXDRecoHits collection name */
-    std::string m_svdRecoHitColName;                                  /**< SVDRecoHits collection name */
+    std::string m_cdcRecoHitColName;                            /**< CDCRecoHits collection name */
+    std::string m_mcParticleToCdcRecoHits;                      /**< MCParticles -> CDCRecoHits relation name */
 
-    std::string m_gfTrackCandsCollectionName;                         /**< TrackCandidates collection name */
-    std::string m_gfTrackCandToMCParticleCollectionName;              /**< TrackCandidates to MCParticles relation name */
-    std::string m_gfTrackCandToCDCRecoHitsCollectionName;             /**< TrackCandidates to CDCRecoHits relation name */
-    std::string m_gfTrackCandToPxdRecoHitsColName;                    /**< TrackCandidates to PXDRecoHits relation name */
-    std::string m_gfTrackCandToSvdRecoHitsColName;                    /**< TrackCandidates to SVDRecoHits relation name */
+    std::string m_pxdRecoHitColName;                            /**< PXDRecoHits collection name */
+    std::string m_mcParticleToPxdRecoHits;                      /**< MCParticles -> PXDRecoHits relation name */
+
+    std::string m_svdRecoHitColName;                            /**< SVDRecoHits collection name */
+    std::string m_mcParticleToSvdRecoHits;                      /**< MCParticles -> SVDRecoHits relation name */
+
+    std::string m_gfTrackCandsColName;                          /**< TrackCandidates collection name */
+    std::string m_gfTrackCandToMCParticleColName;               /**< TrackCandidates to MCParticles relation name */
+    std::string m_gfTrackCandToCdcRecoHitsColName;              /**< TrackCandidates to CDCRecoHits relation name */
+    std::string m_gfTrackCandToPxdRecoHitsColName;              /**< TrackCandidates to PXDRecoHits relation name */
+    std::string m_gfTrackCandToSvdRecoHitsColName;              /**< TrackCandidates to SVDRecoHits relation name */
   };
 }
 

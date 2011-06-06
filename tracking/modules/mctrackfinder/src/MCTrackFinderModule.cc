@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Martin Heck & Oksana Brovchenko                          *
+ * Contributors: Martin Heck & Oksana Brovchenko & Moritz Nadler          *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -12,7 +12,6 @@
 
 #include <generators/dataobjects/MCParticle.h>
 
-#include <cdc/dataobjects/CDCHit.h>
 #include <cdc/dataobjects/CDCRecoHit.h>
 #include <pxd/dataobjects/PXDRecoHit.h>
 #include <svd/dataobjects/SVDRecoHit.h>
@@ -39,26 +38,26 @@ REG_MODULE(MCTrackFinder)
 MCTrackFinderModule::MCTrackFinderModule() : Module()
 {
   //Set module properties
-  setDescription("Uses the MC information to create GFTrackCandidates from MCParticles and Relations between them.  Creates als a Relation between GFTrackCandidates and CDCRecoHits.");
+  setDescription("Uses the MC information to create GFTrackCandidates from MCParticles and Relations between them.  Creates also a Relation between GFTrackCandidates and CDCRecoHits.");
 
   //Parameter definition
 
   // names of input containers
-  addParam("MCParticlesColName", m_mcParticlesCollectionName, "Name of collection holding the MCParticles", string("MCParticles"));
-  // cdc spesific
-  addParam("MCParticleToCDCSimHitsColName", m_mcPartToCDCSimHitsCollectionName, "Name of collection holding the relations the MCParticles and the CDCSimHits (should be created during the simulation within CDCSensitiveDetector)", string("MCPartToCDCSimHits"));
-  addParam("CDCRecoHitsColName", m_cdcRecoHitsCollectionName, "Name of collection holding the CDCRecoHits (should be created by CDCRecoHitMaker module)", string("CDCRecoHits"));
-  addParam("CDCSimHitToCDCHitColName", m_cdcSimHitToCDCHitCollectioName, "Name of collection holding the relations between CDCSimHits and CDCHits (CDCHit index = CDCRecoHit index) (should be created by CDCDigi module)", string("SimHitToCDCHits"));
-  //pxd spesific
+  addParam("MCParticlesColName", m_mcParticlesColName, "Name of collection holding the MCParticles", string("MCParticles"));
+  // cdc specific
+  addParam("CDCRecoHitsColName", m_cdcRecoHitColName, "Name of collection holding the CDCRecoHits", string("CDCRecoHits"));
+  addParam("MCParticlesToCDCRecoHitsColName", m_mcParticleToCdcRecoHits, "Name of collection holding the Relations  MCParticles->CDCRecoHits..", string("MCParticleToCDCRecoHits"));
+  //pxd specific
   addParam("PXDRecoHitsColName", m_pxdRecoHitColName, "Name of collection holding the PXDRecoHits", string(DEFAULT_PXDRECOHITS));
-
-  // svd spesific
+  addParam("MCParticlesToPXDRecoHitsColName", m_mcParticleToPxdRecoHits, "Name of collection holding the Relations  MCParticles->PXDRecoHits.", string(DEFAULT_PXDRECOHITSREL));
+  // svd specific
   addParam("SVDRecoHitsColName", m_svdRecoHitColName, "Name of collection holding the SVDRecoHits", string(DEFAULT_SVDRECOHITS));
-  //addParam("MCParticleToSVDSimHitsColName", m_mcPartToSvdSimHitsColName, "Name of collection holding the relations MCParticles->SVDSimHits", string(DEFAULT_SVDSIMHITSREL));
+  addParam("MCParticlesToSVDRecoHitsColName", m_mcParticleToSvdRecoHits, "Name of collection holding the Relations  MCParticles->SVDRecoHits.", string(DEFAULT_SVDRECOHITSREL));
+
   // names of output containers
-  addParam("GFTrackCandidatesColName", m_gfTrackCandsCollectionName, "Name of collection holding the GFTrackCandidates (output)", string("GFTrackCandidates"));
-  addParam("GFTrackCandToMCParticleColName", m_gfTrackCandToMCParticleCollectionName, "Name of collection holding the relations between GFTrackCandidates and MCParticles (output)", string("GFTrackCandidateToMCParticle"));
-  addParam("GFTrackCandToCDCRecoHitsColName", m_gfTrackCandToCDCRecoHitsCollectionName, "Name of collection holding the relations between GFTrackCandidates and CDCRecoHits (output)", string("GFTrackCandidateToCDCRecoHits"));
+  addParam("GFTrackCandidatesColName", m_gfTrackCandsColName, "Name of collection holding the GFTrackCandidates (output)", string("GFTrackCandidates"));
+  addParam("GFTrackCandToMCParticleColName", m_gfTrackCandToMCParticleColName, "Name of collection holding the relations between GFTrackCandidates and MCParticles (output)", string("GFTrackCandidateToMCParticle"));
+  addParam("GFTrackCandToCDCRecoHitsColName", m_gfTrackCandToCdcRecoHitsColName, "Name of collection holding the relations between GFTrackCandidates and CDCRecoHits (output)", string("GFTrackCandidateToCDCRecoHits"));
   addParam("GFTrackCandToPXDRecoHitsColName", m_gfTrackCandToPxdRecoHitsColName, "Name of collection holding the relations between GFTrackCandidates and PXDRecoHits (output)", string("GFTrackCandidateToPXDRecoHits"));
   addParam("GFTrackCandToSVDRecoHitsColName", m_gfTrackCandToSvdRecoHitsColName, "Name of collection holding the relations between GFTrackCandidates and SVDRecoHits (output)", string("GFTrackCandidateToSVDRecoHits"));
 }
@@ -79,28 +78,21 @@ void MCTrackFinderModule::initialize()
 void MCTrackFinderModule::event()
 {
   B2INFO("*******   MCTrackFinderModule  *******");
-  StoreArray<MCParticle> mcParticles(m_mcParticlesCollectionName);
+  StoreArray<MCParticle> mcParticles(m_mcParticlesColName);
   int nMcParticles = mcParticles.getEntries();
   B2DEBUG(149, "MCTrackFinder: total Number of MCParticles: " << nMcParticles);
   if (nMcParticles == 0) B2WARNING("MCTrackFinder: MCParticlesCollection is empty!");
 
   //get stuff for the CDC
-  StoreArray<CDCRecoHit> cdcRecoHits(m_cdcRecoHitsCollectionName);
+  StoreArray<CDCRecoHit> cdcRecoHits(m_cdcRecoHitColName);
   int nCdcRecoHits = cdcRecoHits.getEntries();
   B2DEBUG(149, "MCTrackFinder: Number of CDCRecoHits: " << nCdcRecoHits);
   if (nCdcRecoHits == 0) B2WARNING("MCTrackFinder: CDCRecoHitsCollection is empty!");
 
-  StoreArray<Relation>   mcPartToCdcSimHits(m_mcPartToCDCSimHitsCollectionName);
-  int nMcPartToCdcSimHits = mcPartToCdcSimHits.getEntries();
-  B2DEBUG(149, "MCTrackFinder: Number of relations between MCParticles and SimHits: " << nMcPartToCdcSimHits);
-  if (nMcPartToCdcSimHits == 0) B2WARNING("MCTrackFinder: MCParticlesToSimHitsCollection is empty!");
-
-  StoreArray<Relation>  cdcSimHitToCDCHits(m_cdcSimHitToCDCHitCollectioName);
-  int nCdcSimHitToCDCHits = cdcSimHitToCDCHits.getEntries();
-  B2DEBUG(149, "MCTrackFinder: Number of relations between SimHits and CDCHits: " << nCdcSimHitToCDCHits);
-  if (nCdcSimHitToCDCHits == 0) B2WARNING("MCTrackFinder: SimHitsToCDCHitsCollection is empty!");
-
-
+  StoreArray<Relation>   mcParticleToCdcRecoHits(m_mcParticleToCdcRecoHits);
+  int nMcPartToCdcRecoHits = mcParticleToCdcRecoHits.getEntries();
+  B2DEBUG(149, "MCTrackFinder: Number of relations between MCParticles and SimHits: " << nMcPartToCdcRecoHits);
+  if (nMcPartToCdcRecoHits == 0) B2WARNING("MCTrackFinder: MCParticlesToCDCRecoHitsCollection is empty!");
 
   //get stuff for pxd
   StoreArray<PXDRecoHit> pxdRecoHits(m_pxdRecoHitColName);
@@ -108,8 +100,8 @@ void MCTrackFinderModule::event()
   B2DEBUG(149, "MCTrackFinder: Number of PXDRecoHits: " << nPxdRecoHits);
   if (nPxdRecoHits == 0) B2WARNING("MCTrackFinder: PXDRecoHitsCollection is empty!");
 
-  StoreArray<Relation>   mcPartToPxdRecoHits(DEFAULT_PXDRECOHITSREL);
-  int nMcPartToPxdRecoHits = mcPartToPxdRecoHits.getEntries();
+  StoreArray<Relation>   mcParticleToPxdRecoHits(m_mcParticleToPxdRecoHits);
+  int nMcPartToPxdRecoHits = mcParticleToPxdRecoHits.getEntries();
   B2DEBUG(149, "MCTrackFinder: Number of relations between MCParticles and PXDRecoHits: " << nMcPartToPxdRecoHits);
   if (nMcPartToPxdRecoHits == 0) B2WARNING("MCTrackFinder: MCParticlesToPXDRecoHitsCollection is empty!");
 
@@ -119,77 +111,62 @@ void MCTrackFinderModule::event()
   B2DEBUG(149, "MCTrackFinder: Number of SVDRecoHits: " << nSvdRecoHits);
   if (nSvdRecoHits == 0) B2WARNING("MCTrackFinder: SVDRecoHitsCollection is empty!");
 
-  StoreArray<Relation>   mcPartToSvdRecoHits(DEFAULT_SVDRECOHITSREL);
-  int nMcPartToSvdRecoHits = mcPartToSvdRecoHits.getEntries();
+  StoreArray<Relation>   mcParticleToSvdRecoHits(m_mcParticleToSvdRecoHits);
+  int nMcPartToSvdRecoHits = mcParticleToSvdRecoHits.getEntries();
   B2DEBUG(149, "MCTrackFinder: Number of relations between MCParticles and SVDRecoHits: " << nMcPartToSvdRecoHits);
   if (nMcPartToSvdRecoHits == 0) B2WARNING("MCTrackFinder: MCParticlesToSVDRecoHitsCollection is empty!");
 
-  //B2INFO("-> Create relations for primary particles");
   // loop over MCParticles.
+  // it would be nice to optimize this, because there are actually ~1000 secondary MCParticles for each primary MCParticle
   for (int iPart = 0; iPart < nMcParticles; iPart++) {
 
     //make links only for interesting MCParticles, for the moment take only primary particle
+    //this method seems to be quite time consuming, maybe there is a better way to find out if it was a primary particle...
     if (mcParticles[iPart]->getMother() == NULL) {
-      B2DEBUG(149, "iPart: " << iPart);
-      //B2INFO("Primary particle!");
-      //Get indices of the SimHits from this MCParticle
+      B2DEBUG(149, "Search a  track for the MCParticle with index: " << iPart);
 
       // create a list containing the indices to the CDCRecoHits that belong to one track
-      // mybe it would be better to have direct relations from mcParticles to CdcRecoHits
-      // the the code for pxd svd and cdc would look the same
-      list<short unsigned int> myList;
-      for (int i = 0; i < nMcPartToCdcSimHits; i++) {
-        if (mcPartToCdcSimHits[i]->getFromIndex() == iPart) {
-          myList.push_back(mcPartToCdcSimHits[i]->getToIndex()); //this was different before, as the relation in CDCSensitiveCetector was created other way round
-        }
-      }
-      //B2INFO("Nr of SimHits: "<<myList.size());
-      //Now get all digitized Hits for this MCParticle
       list<int> indicesOfGoodCdcHits;
-      // Not all SimHits have corresponding real hit. Find real CDCHits associated with the MCParticles:
-      // Therefore I try to change the numbers in the list associated with each hit to the ones of the real CDCHits.
-      for (list<short unsigned int>::iterator iter = myList.begin(), iterEnd = myList.end(); iter != iterEnd; iter++) {
-        int cdcHit = getToForFrom(m_cdcSimHitToCDCHitCollectioName, (*iter));
-        if (cdcHit >= 0) {
-          B2DEBUG(149, cdcHit);
-          indicesOfGoodCdcHits.push_back(cdcHit);
+      int nMcPartToCdcRecoHits =  mcParticleToCdcRecoHits.getEntries();
+      for (int i = 0; i not_eq nMcPartToCdcRecoHits; i++) {
+        if (mcParticleToCdcRecoHits[i]->getFromIndex() == iPart) {
+          int cdcRecoHitIndex = mcParticleToCdcRecoHits[i]->getToIndex();
+          indicesOfGoodCdcHits.push_back(cdcRecoHitIndex);
         }
       }
-      //B2INFO("Nr of Hits: "<<indicesOfGoodCdcHits.size());
-      //every CDCHit will have a CDCRecoHit.
-      //Therefore I should now be able to create a Relation, that points to the RecoHits, that really belong to the same track.
 
       // create a list containing the indices to the PXDRecoHits that belong to one track
-      // because there are direct relations between mcParticles and the recoHits this is a bit shorter
       list<int> indicesOfGoodPxdHits;
-      int nMcPartToPxdRecoHits =  mcPartToPxdRecoHits.getEntries();
+      int nMcPartToPxdRecoHits =  mcParticleToPxdRecoHits.getEntries();
       //dataOutPxd << "nRecoRel " << nMcPartToPxdRecoHits << "\n";
       for (int i = 0; i not_eq nMcPartToPxdRecoHits; i++) {
-        if (mcPartToPxdRecoHits[i]->getFromIndex() == iPart) {
-          int pxdRecoHitIndex = mcPartToPxdRecoHits[i]->getToIndex();
+        if (mcParticleToPxdRecoHits[i]->getFromIndex() == iPart) {
+          int pxdRecoHitIndex = mcParticleToPxdRecoHits[i]->getToIndex();
           indicesOfGoodPxdHits.push_back(pxdRecoHitIndex);
         }
       }
       // create a list containing the indices to the SVDRecoHits that belong to one track
       list<int> indicesOfGoodSvdHits;
-      int nMcPartToSvdRecoHits =  mcPartToSvdRecoHits.getEntries();
+      int nMcPartToSvdRecoHits =  mcParticleToSvdRecoHits.getEntries();
       //dataOutSvd << "nRecoRel " << nMcPartToSvdRecoHits << "\n";
       for (int i = 0; i not_eq nMcPartToSvdRecoHits; i++) {
-        if (mcPartToSvdRecoHits[i]->getFromIndex() == iPart) {
-          int svdRecoHitIndex = mcPartToSvdRecoHits[i]->getToIndex();
+        if (mcParticleToSvdRecoHits[i]->getFromIndex() == iPart) {
+          int svdRecoHitIndex = mcParticleToSvdRecoHits[i]->getToIndex();
           indicesOfGoodSvdHits.push_back(svdRecoHitIndex);
         }
       }
-      //Now create Tracks and the relations
-      StoreArray<GFTrackCand> trackCandidates(m_gfTrackCandsCollectionName);
-      StoreArray<Relation> trackCandsToCDCRecoHits(m_gfTrackCandToCDCRecoHitsCollectionName);
-      StoreArray<Relation> trackCandsToMCParticles(m_gfTrackCandToMCParticleCollectionName);
 
+      //Now create TrackCandidate and the relations
+      //If the indices of the RecoHits are assigned to TrackCandidates, there may be no need for these Relations, but for the moment it is nice to have several options to do studies
+      StoreArray<GFTrackCand> trackCandidates(m_gfTrackCandsColName);
+      StoreArray<Relation> trackCandsToCdcRecoHits(m_gfTrackCandToCdcRecoHitsColName);
       StoreArray<Relation> trackCandsToPxdRecoHits(m_gfTrackCandToPxdRecoHitsColName);
       StoreArray<Relation> trackCandsToSvdRecoHits(m_gfTrackCandToSvdRecoHitsColName);
 
+      StoreArray<Relation> trackCandsToMCParticles(m_gfTrackCandToMCParticleColName);
+
       int counter = trackCandidates->GetLast() + 1;
-      B2DEBUG(100, counter);
+      B2DEBUG(100, "Create TrackCandidate  " << counter);
 
       //create TrackCandidate
       new(trackCandidates->AddrAt(counter)) GFTrackCand();
@@ -203,44 +180,40 @@ void MCTrackFinderModule::event()
       direction.SetY(mcParticles[iPart]->getMomentum().y() / mcParticles[iPart]->getMomentum().Mag());
       direction.SetZ(mcParticles[iPart]->getMomentum().z() / mcParticles[iPart]->getMomentum().Mag());
       double chargeOverP = double(mcParticles[iPart]->getCharge()) / mcParticles[iPart]->getMomentum().Mag();
-      //B2INFO("Momentum: "<<mcParticles[iPart]->getMomentum().x()<<"  "<<mcParticles[iPart]->getMomentum().y()<<"  "<<mcParticles[iPart]->getMomentum().z());
-      //B2INFO("Absolut momentum: "<<mcParticles[iPart]->getMomentum().Mag());
-      //B2INFO("Position: "<<position.x()<<"  "<<position.y()<<"  "<<position.z());
-      //B2INFO("Direction: "<<direction.x()<<"  "<<direction.y()<<"  "<<direction.z());
-      //B2INFO("Charge over P: "<<chargeOverP);
 
       trackCandidates[counter]->setTrackSeed(position, direction, chargeOverP);
 
+      //assign indices of the RecoHits from all detectors, their are distinguishable by their DetID:
+      // pxd 0
+      //   svd 1
+      //     cdc 2
       BOOST_FOREACH(int hitID, indicesOfGoodPxdHits) {
         trackCandidates[counter]->addHit(0, hitID);
       }
-      int hitCounterOffset = nPxdRecoHits;
+      //int hitCounterOffset = nPxdRecoHits;
       BOOST_FOREACH(int hitID, indicesOfGoodSvdHits) {
-        trackCandidates[counter]->addHit(1,  hitID);
+        trackCandidates[counter]->addHit(1, hitID);
       }
-      hitCounterOffset = nPxdRecoHits + nSvdRecoHits;
+      //hitCounterOffset = nPxdRecoHits + nSvdRecoHits;
       BOOST_FOREACH(int hitID, indicesOfGoodCdcHits) {
         trackCandidates[counter]->addHit(2, hitID);
       }
-      //B2INFO("Total NR of assigned RecoHits: "<<trackCandidates[counter]->getNHits());
-
 
       //create relation between the track candidate and cdcRecoHits
-      new(trackCandsToCDCRecoHits->AddrAt(counter)) Relation(trackCandidates, cdcRecoHits, counter, indicesOfGoodCdcHits);
-      B2INFO("Create relation between Track Candidate " << counter << "  and  " << indicesOfGoodCdcHits.size() << "  RecoHits");
+      new(trackCandsToCdcRecoHits->AddrAt(counter)) Relation(trackCandidates, cdcRecoHits, counter, indicesOfGoodCdcHits);
+      B2INFO("Create relation between Track Candidate " << counter << "  and  " << indicesOfGoodCdcHits.size() << "  CDCRecoHits");
       new(trackCandsToPxdRecoHits->AddrAt(counter)) Relation(trackCandidates, pxdRecoHits, counter, indicesOfGoodPxdHits);
-      B2INFO("Create relation between Track Candidate " << counter << "  and  " << indicesOfGoodPxdHits.size() << "  RecoHits");
+      B2INFO("Create relation between Track Candidate " << counter << "  and  " << indicesOfGoodPxdHits.size() << "  PXDRecoHits");
       new(trackCandsToSvdRecoHits->AddrAt(counter)) Relation(trackCandidates, svdRecoHits, counter, indicesOfGoodSvdHits);
-      B2INFO("Create relation between Track Candidate " << counter << "  and  " << indicesOfGoodSvdHits.size() << "  RecoHits");
+      B2INFO("Create relation between Track Candidate " << counter << "  and  " << indicesOfGoodSvdHits.size() << "  SVDRecoHits");
       //create relation between the track candidates and the mcParticle
       new(trackCandsToMCParticles->AddrAt(counter)) Relation(trackCandidates, mcParticles, counter, iPart);
-      //B2INFO(" --- Create relation between Track Candidate"<<counter<<"  and MCParticle "<<iPart);
+      B2DEBUG(149, " --- Create relation between Track Candidate" << counter << "  and MCParticle " << iPart);
 
 
     } //endif
 
   }//end loop over MCParticles
-
 
 
 }

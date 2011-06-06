@@ -36,7 +36,7 @@
 #include <TGeoTube.h>
 #include <TGeoXtru.h>
 #include <TGeoCone.h>
-#include "TGeoCompositeShape.h"
+#include <TGeoCompositeShape.h>
 
 #include <iostream>
 
@@ -281,22 +281,31 @@ void GeoQCsBelleII::create(GearDir& content)
   //-
   //--------------
 
-  /*//--------------
+  //--------------
   //-   Achecker
-  if(GlobalSDFlag >= 10)
-  {
-    TGeoMedium* strMedAchecker = gGeoManager->GetMedium("Vacuum");
-    TGeoPcon* geoAcheckerpcon = new TGeoPcon( 0, 360, 2);
-      geoAcheckerpcon->DefineSection(0, 199.999, 0, 4.0);
-      geoAcheckerpcon->DefineSection(1, 200.000, 0, 4.0);
-      geoAcheckerpcon->SetName("geoAcheckerpconname");
-    TGeoCompositeShape* geoAchecker = new TGeoCompositeShape("geoAcheckername", "geoAcheckerpconname:rotHERname * geoA2spc1name");
-    TGeoVolume *volAchecker = new TGeoVolume("SD_volAcheckername", geoAchecker, strMedAchecker);
-    volAchecker->SetLineColor(kRed);
-    volA2spc1->AddNode(volAchecker, 1, new TGeoTranslation(0.0, 0.0, 0.0));
+  if (GlobalSDFlag >= 10) {
+    TGeoMedium* strMedAchecker1 = gGeoManager->GetMedium("Vacuum");
+    TGeoPcon* geoAchecker1pcon = new TGeoPcon(0, 360, 2);
+    geoAchecker1pcon->DefineSection(0, 304.000, 0, 4.0);
+    geoAchecker1pcon->DefineSection(1, 303.999, 0, 4.0);
+    geoAchecker1pcon->SetName("geoAchecker1pconname");
+    TGeoCompositeShape* geoAchecker1 = new TGeoCompositeShape("geoAchecker1name", "geoAchecker1pconname:rotHERname * geoA2spc1name");
+    TGeoVolume *volAchecker1 = new TGeoVolume("SD_volAchecker1name", geoAchecker1, strMedAchecker1);
+    volAchecker1->SetLineColor(kRed);
+    volA2spc1->AddNode(volAchecker1, 1, new TGeoTranslation(0.0, 0.0, 0.0));
+
+    TGeoMedium* strMedAchecker2 = gGeoManager->GetMedium("Vacuum");
+    TGeoPcon* geoAchecker2pcon = new TGeoPcon(0, 360, 2);
+    geoAchecker2pcon->DefineSection(0, 164.999, 0, 4.0);
+    geoAchecker2pcon->DefineSection(1, 165.000, 0, 4.0);
+    geoAchecker2pcon->SetName("geoAchecker2pconname");
+    TGeoCompositeShape* geoAchecker2 = new TGeoCompositeShape("geoAchecker2name", "geoAchecker2pconname:rotHERname * geoA2spc1name");
+    TGeoVolume *volAchecker2 = new TGeoVolume("SD_volAchecker2name", geoAchecker2, strMedAchecker2);
+    volAchecker2->SetLineColor(kRed);
+    volA2spc1->AddNode(volAchecker2, 1, new TGeoTranslation(0.0, 0.0, 0.0));
   }
   //-
-  //--------------*/
+  //--------------
 
   //==============
   //    Group B
@@ -419,22 +428,32 @@ void GeoQCsBelleII::create(GearDir& content)
   //-
   //--------------
 
-  /*//--------------
+  //--------------
   //-   Bchecker
-  if(GlobalSDFlag >= 10)
-  {
-    TGeoMedium* strMedBchecker = gGeoManager->GetMedium("Vacuum");
-    TGeoPcon* geoBcheckerpcon = new TGeoPcon( 0, 360, 2);
-      geoBcheckerpcon->DefineSection(0, 199.999, 0, 4.0);
-      geoBcheckerpcon->DefineSection(1, 200.000, 0, 4.0);
-      geoBcheckerpcon->SetName("geoBcheckerpconname");
-    TGeoCompositeShape* geoBchecker = new TGeoCompositeShape("geoBcheckername", "geoBcheckerpconname:rotLERname * geoB2spc1name");
-    TGeoVolume *volBchecker = new TGeoVolume("SD_volBcheckername", geoBchecker, strMedBchecker);
-    volBchecker->SetLineColor(kRed);
-    volB2spc1->AddNode(volBchecker, 1, new TGeoTranslation(0.0, 0.0, 0.0));
+  if (GlobalSDFlag >= 10) {
+    TGeoMedium* strMedBchecker1 = gGeoManager->GetMedium("Vacuum");
+    TGeoPcon* geoBchecker1pcon = new TGeoPcon(0, 360, 2);
+    geoBchecker1pcon->DefineSection(0, 223.599, 0, 4.0);
+    geoBchecker1pcon->DefineSection(1, 223.600, 0, 4.0);
+    geoBchecker1pcon->SetName("geoBchecker1pconname");
+    TGeoCompositeShape* geoBchecker1 = new TGeoCompositeShape("geoBchecker1name", "geoBchecker1pconname:rotLERname * geoB2spc1name");
+    TGeoVolume *volBchecker1 = new TGeoVolume("SD_volBchecker1name", geoBchecker1, strMedBchecker1);
+    volBchecker1->SetLineColor(kRed);
+    volB2spc1->AddNode(volBchecker1, 1, new TGeoTranslation(0.0, 0.0, 0.0));
+
+    TGeoMedium* strMedBchecker2 = gGeoManager->GetMedium("Vacuum");
+    TGeoPcon* geoBchecker2pcon = new TGeoPcon(0, 360, 2);
+    geoBchecker2pcon->DefineSection(0, 163.999, 0, 4.0);
+    geoBchecker2pcon->DefineSection(1, 164.000, 0, 4.0);
+    geoBchecker2pcon->SetName("geoBchecker2pconname");
+    TGeoCompositeShape* geoBchecker2 = new TGeoCompositeShape("geoBchecker2name", "geoBchecker2pconname:rotLERname * geoB2spc1name");
+    TGeoVolume *volBchecker2 = new TGeoVolume("SD_volBchecker2name", geoBchecker2, strMedBchecker2);
+    volBchecker2->SetLineColor(kRed);
+    volB2spc1->AddNode(volBchecker2, 1, new TGeoTranslation(0.0, 0.0, 0.0));
+
   }
   //-
-  //--------------*/
+  //--------------
 
   //==============
   //=   Group C
@@ -1526,22 +1545,31 @@ void GeoQCsBelleII::create(GearDir& content)
   //-
   //--------------
 
-  /*//--------------
+  //--------------
   //-   Dchecker
-  if(GlobalSDFlag >= 10)
-  {
-    TGeoMedium* strMedDchecker = gGeoManager->GetMedium("Vacuum");
-    TGeoPcon* geoDcheckerpcon = new TGeoPcon( 0, 360, 2);
-      geoDcheckerpcon->DefineSection(0, -199.999, 0, 4.0);
-      geoDcheckerpcon->DefineSection(1, -200.000, 0, 4.0);
-      geoDcheckerpcon->SetName("geoDcheckerpconname");
-    TGeoCompositeShape* geoDchecker = new TGeoCompositeShape("geoDcheckername", "geoDcheckerpconname:rotHERname * geoD2spc1name");
-    TGeoVolume *volDchecker = new TGeoVolume("SD_volDcheckername", geoDchecker, strMedDchecker);
-    volDchecker->SetLineColor(kRed);
-    volD2spc1->AddNode(volDchecker, 1, new TGeoTranslation(0.0, 0.0, 0.0));
+  if (GlobalSDFlag >= 10) {
+    TGeoMedium* strMedDchecker1 = gGeoManager->GetMedium("Vacuum");
+    TGeoPcon* geoDchecker1pcon = new TGeoPcon(0, 360, 2);
+    geoDchecker1pcon->DefineSection(0, -304.000, 0, 4.0);
+    geoDchecker1pcon->DefineSection(1, -303.999, 0, 4.0);
+    geoDchecker1pcon->SetName("geoDchecker1pconname");
+    TGeoCompositeShape* geoDchecker1 = new TGeoCompositeShape("geoDchecker1name", "geoDchecker1pconname:rotHERname * geoD2spc1name");
+    TGeoVolume *volDchecker1 = new TGeoVolume("SD_volDchecker1name", geoDchecker1, strMedDchecker1);
+    volDchecker1->SetLineColor(kRed);
+    volD2spc1->AddNode(volDchecker1, 1, new TGeoTranslation(0.0, 0.0, 0.0));
+
+    TGeoMedium* strMedDchecker2 = gGeoManager->GetMedium("Vacuum");
+    TGeoPcon* geoDchecker2pcon = new TGeoPcon(0, 360, 2);
+    geoDchecker2pcon->DefineSection(0, -165.000, 0, 4.0);
+    geoDchecker2pcon->DefineSection(1, -164.999, 0, 4.0);
+    geoDchecker2pcon->SetName("geoDchecker2pconname");
+    TGeoCompositeShape* geoDchecker2 = new TGeoCompositeShape("geoDchecker2name", "geoDchecker2pconname:rotHERname * geoD2spc1name");
+    TGeoVolume *volDchecker2 = new TGeoVolume("SD_volDchecker2name", geoDchecker2, strMedDchecker2);
+    volDchecker2->SetLineColor(kRed);
+    volD2spc1->AddNode(volDchecker2, 1, new TGeoTranslation(0.0, 0.0, 0.0));
   }
   //-
-  //--------------*/
+  //--------------
 
   //==============
   //    Group E
@@ -1654,22 +1682,31 @@ void GeoQCsBelleII::create(GearDir& content)
   //-
   //--------------
 
-  /*//--------------
+  //--------------
   //-   Echecker
-  if(GlobalSDFlag >= 10)
-  {
-    TGeoMedium* strMedEchecker = gGeoManager->GetMedium("Vacuum");
-    TGeoPcon* geoEcheckerpcon = new TGeoPcon( 0, 360, 2);
-      geoEcheckerpcon->DefineSection(0, -199.999, 0, 4.0);
-      geoEcheckerpcon->DefineSection(1, -200.000, 0, 4.0);
-      geoEcheckerpcon->SetName("geoEcheckerpconname");
-    TGeoCompositeShape* geoEchecker = new TGeoCompositeShape("geoEcheckername", "geoEcheckerpconname:rotLERname * geoE2spc1name");
-    TGeoVolume *volEchecker = new TGeoVolume("SD_volEcheckername", geoEchecker, strMedEchecker);
-    volEchecker->SetLineColor(kRed);
-    volE2spc1->AddNode(volEchecker, 1, new TGeoTranslation(0.0, 0.0, 0.0));
+  if (GlobalSDFlag >= 10) {
+    TGeoMedium* strMedEchecker1 = gGeoManager->GetMedium("Vacuum");
+    TGeoPcon* geoEchecker1pcon = new TGeoPcon(0, 360, 2);
+    geoEchecker1pcon->DefineSection(0, -223.600, 0, 4.0);
+    geoEchecker1pcon->DefineSection(1, -225.599, 0, 4.0);
+    geoEchecker1pcon->SetName("geoEchecker1pconname");
+    TGeoCompositeShape* geoEchecker1 = new TGeoCompositeShape("geoEchecker1name", "geoEchecker1pconname:rotLERname * geoE2spc1name");
+    TGeoVolume *volEchecker1 = new TGeoVolume("SD_volEchecker1name", geoEchecker1, strMedEchecker1);
+    volEchecker1->SetLineColor(kRed);
+    volE2spc1->AddNode(volEchecker1, 1, new TGeoTranslation(0.0, 0.0, 0.0));
+
+    TGeoMedium* strMedEchecker2 = gGeoManager->GetMedium("Vacuum");
+    TGeoPcon* geoEchecker2pcon = new TGeoPcon(0, 360, 2);
+    geoEchecker2pcon->DefineSection(0, -164.000, 0, 4.0);
+    geoEchecker2pcon->DefineSection(1, -163.999, 0, 4.0);
+    geoEchecker2pcon->SetName("geoEchecker2pconname");
+    TGeoCompositeShape* geoEchecker2 = new TGeoCompositeShape("geoEchecker2name", "geoEchecker2pconname:rotLERname * geoE2spc1name");
+    TGeoVolume *volEchecker2 = new TGeoVolume("SD_volEchecker2name", geoEchecker2, strMedEchecker2);
+    volEchecker2->SetLineColor(kRed);
+    volE2spc1->AddNode(volEchecker2, 1, new TGeoTranslation(0.0, 0.0, 0.0));
   }
   //-
-  //--------------*/
+  //--------------
 
   //==============
   //=   Group F

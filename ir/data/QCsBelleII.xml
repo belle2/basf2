@@ -12,7 +12,7 @@
         <DistanceL desc="" unit="cm">-62.725</DistanceL>
         <AngleHER desc="HER beam pipe angle" unit="rad">0.0415</AngleHER>
         <AngleLER desc="LER beam pipe angle" unit="rad">-0.0415</AngleLER>
-        <SDFlag desc="Sensitive Detector Flag">0</SDFlag>
+        <SDFlag desc="Sensitive Detector Flag">10</SDFlag>
         <!-- [SDFlag] To activate, put nonzero integer -->
         <!-- 0: off, 1: on, 2: outer cryostat on -->
 

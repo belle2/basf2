@@ -54,9 +54,25 @@ namespace Belle2 {
      */
     std::string m_simHitToCDCHitCollectionName;
 
-    /** Name of output collection of this modul.
-     */
+    /** Name of collection of relations between MCParticles and SimHits.
+      *
+      *  This variable can only exist in MonteCarlo.
+      */
+    std::string m_mcPartToCDCSimHitsCollectionName;
+
+    /** Name of MCParticle collection (needed for relation creation).
+      */
+    std::string m_mcParticlesCollectionName;
+
+    /** Name of output collection of this module.
+      */
     std::string m_cdcRecoHitCollectionName;
+
+    /** Name of output relation collection of this module.
+     */
+    std::string m_mcParticleToCDCRecoHits;
+
+
   };
 }
 

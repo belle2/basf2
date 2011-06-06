@@ -9,7 +9,7 @@
 		<Length desc="The full length of the IP beampipe" unit="mm">200</Length>
 		<OffsetZ desc="The offset of the IP beampipe in z with respect to the IP" unit="mm">10</OffsetZ>
 		<Radius desc="Default inner radius of outer IR beampipe" unit="mm">10</Radius>
-    <SDFlag desc="Sensitive Detector Flag">10</SDFlag>
+    <SDFlag desc="Sensitive Detector Flag">0</SDFlag>
     <!-- [SDFlag] To activate, put nonzero integer -->
                 
 		<Thickness desc="Default thickness of outer IR beampipe" unit="mm">4.2</Thickness>

@@ -24,8 +24,8 @@ namespace Belle2 {
    *  defined. Set to something positive to make step limit active.
    *  Will be fixed in future.
    */
-  //const double stepLengthInIR = -1.0 * Unit::um;
-  const double stepLengthInIR = 10.0 * Unit::mm;
+  const double stepLengthInIR = -1.0 * Unit::um;
+  //const double stepLengthInIR = 10.0 * Unit::mm;
 
   /**
     * IRVolumeUserInfo - Additional information for a IR sensitive volume.

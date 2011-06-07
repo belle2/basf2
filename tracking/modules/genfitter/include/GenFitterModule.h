@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Martin Heck & Oksana Brovchenko                          *
+ * Contributors: Martin Heck & Oksana Brovchenko & Moritz Nadler           *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -56,19 +56,24 @@ namespace Belle2 {
 
   private:
 
-
-    std::string m_cdcRecoHitsCollectionName;                /**< CDCRecoHits collection name */
-
-    std::string m_tracksCollectionName;                     /**< Tracks collection name */
-
-
-    std::string m_gfTrackCandsCollectionName;              /**< CDCTrackCandidates collection name */
+    bool m_useCdcHits;                              /**< True if CDCHits should be used in the fit. */
+    bool m_useSvdHits;                              /**< True if SVDHits should be used in the fit. */
+    bool m_usePxdHits;                              /**< True if PXDHits should be used in the fit. */
 
 
-    std::string m_mcMatchParticlesCollectionName;           /**< MCMatchParticles collection name */
+    std::string m_cdcRecoHitsColName;                /**< CDCRecoHits collection name */
+    std::string m_svdRecoHitsColName;                /**< SVDRecoHits collection name */
+    std::string m_pxdRecoHitsColName;                /**< PXDRecoHits collection name */
+    std::string m_gfTrackCandsColName;               /**< GFTrackCandidates collection name */
 
+    std::string m_tracksColName;                     /**< Tracks collection name */
+    std::string m_gfTracksColName;                   /**< GFTracks collection name */
 
-    std::ofstream HelixParam;
+    std::string m_helixParamFileName;                /**< Helix Parameters file name */
+    std::ofstream HelixParam;                        /**< Text output file name */
+
+    int m_failedFitCounter;                          /**< Number of failed fits. */
+    int m_successfulFitCounter;                      /**< Number of successfully fitted tracks. */
 
 
   };

@@ -89,6 +89,7 @@ void GenFitterModule::initialize()
 
   m_failedFitCounter = 0;
   m_successfulFitCounter = 0;
+
 }
 
 void GenFitterModule::beginRun()
@@ -164,7 +165,7 @@ void GenFitterModule::event()
     GFTrack gfTrack(trackRep, false);
 
     //iterators needed to collect RecoHits
-    int hitCounter;
+    int hitCounter = -1;
     vector<unsigned int>::const_iterator iter;
     vector<unsigned int>::const_iterator iterMax;
 
@@ -176,7 +177,6 @@ void GenFitterModule::event()
       vector<unsigned int> cdcIndexList = trackCandidates[i]->GetHitIDs(2);
       B2DEBUG(100, "Size of cdcIndex list: " << cdcIndexList.size());
 
-      hitCounter = -1;
       iter = cdcIndexList.begin();
       iterMax = cdcIndexList.end();
       while (iter != iterMax) {
@@ -201,13 +201,12 @@ void GenFitterModule::event()
       }
       B2DEBUG(100, endl);
 
-      hitCounter = -1;
       iter = svdIndexList.begin();
       iterMax = svdIndexList.end();
       B2DEBUG(100, "==== SVD Hits " << "iterator " << "layerId " << "ladderId " << "sensorId");
       while (iter != iterMax) {
         ++hitCounter;
-        gfTrack.addHit(svdRecoHits[*iter], 0, hitCounter);
+        gfTrack.addHit(svdRecoHits[*iter], 1, hitCounter);
         int aSensorUniID = svdRecoHits[*iter]->getSensorUniID();
         SensorUniIDManager aIdConverter(aSensorUniID);
         int layerId = aIdConverter.getLayerID();
@@ -235,7 +234,6 @@ void GenFitterModule::event()
       }
       B2DEBUG(100, endl);
 
-      hitCounter = -1;
       iter = pxdIndexList.begin();
       iterMax = pxdIndexList.end();
       B2DEBUG(100, "==== PXD Hits " << "iterator " << "layerId " << "ladderId " << "sensorId");

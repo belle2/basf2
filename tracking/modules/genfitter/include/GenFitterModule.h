@@ -69,9 +69,6 @@ namespace Belle2 {
     std::string m_tracksColName;                     /**< Tracks collection name */
     std::string m_gfTracksColName;                   /**< GFTracks collection name */
 
-    std::string m_helixParamFileName;                /**< Helix Parameters file name */
-    std::ofstream HelixParam;                        /**< Text output file name */
-
     int m_failedFitCounter;                          /**< Number of failed fits. */
     int m_successfulFitCounter;                      /**< Number of successfully fitted tracks. */
 

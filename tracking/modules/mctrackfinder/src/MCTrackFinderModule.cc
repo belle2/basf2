@@ -123,7 +123,7 @@ void MCTrackFinderModule::event()
     //make links only for interesting MCParticles, for the moment take only primary particle
     //this method seems to be quite time consuming, maybe there is a better way to find out if it was a primary particle...
     if (mcParticles[iPart]->getMother() == NULL) {
-      B2DEBUG(149, "Search a  track for the MCParticle with index: " << iPart);
+      B2DEBUG(149, "Search a  track for the MCParticle with index: " << iPart << " (PDG: " << mcParticles[iPart]->getPDG() << ")");
 
       // create a list containing the indices to the CDCRecoHits that belong to one track
       list<int> indicesOfGoodCdcHits;
@@ -198,6 +198,9 @@ void MCTrackFinderModule::event()
       BOOST_FOREACH(int hitID, indicesOfGoodCdcHits) {
         trackCandidates[counter]->addHit(2, hitID);
       }
+
+      //Save the MCParticleID in the TrackCandidate
+      trackCandidates[counter]->setMcTrackId(iPart);
 
       //create relation between the track candidate and cdcRecoHits
       new(trackCandsToCdcRecoHits->AddrAt(counter)) Relation(trackCandidates, cdcRecoHits, counter, indicesOfGoodCdcHits);

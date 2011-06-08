@@ -77,8 +77,6 @@ GenFitterModule::GenFitterModule() :
            "Name of collection holding the final GFTracks (will be created by this module)", string("GFTracks"));
   addParam("TracksColName", m_tracksColName,
            "Name of collection holding the final Tracks (will be created by this module)", string("Tracks"));
-  addParam("HelixParamFileName", m_helixParamFileName,
-           "Name of a file with helix parameters (will be created by this module)", string("HelixParam.txt"));
 
 }
 
@@ -91,7 +89,6 @@ void GenFitterModule::initialize()
 
   m_failedFitCounter = 0;
   m_successfulFitCounter = 0;
-  HelixParam.open(m_helixParamFileName.c_str());
 }
 
 void GenFitterModule::beginRun()
@@ -137,25 +134,20 @@ void GenFitterModule::event()
   //counter for fitted tracks, the number of fitted tracks may differ from the number of trackCandidates if the fit fails for some of them
   int trackCounter = -1;
 
-  for (int i = 0; i < trackCandidates.GetEntries(); i++) { //loop over all track candidates
+  for (int i = 0; i < trackCandidates.GetEntries(); ++i) { //loop over all track candidates
     B2INFO("#############  Fit track Nr. : " << i << "  ################")
-
 
 
     //Get starting values for the fit
     TVector3 vertex = trackCandidates[i]->getPosSeed();
     TVector3 momentum = trackCandidates[i]->getDirSeed() * abs(1 / trackCandidates[i]->getQoverPseed());
     int pdg;
-    //Get the PGD value for the track, should be stored in the track candidate in the future like other variables...
+    //Get the PGD value for the track, should be stored in the track candidate in the future like other variables, for the momentum only the index of the MCParticle is stored
     //This part will be changed in the future
     //------------------------------------------------------------------------
     if (gfTrackCandToMCParticle.getEntries() != 0) {
-      for (int k = 0; k < gfTrackCandToMCParticle.getEntries(); k++) {
-        if (gfTrackCandToMCParticle[k]->getFromIndex() == i) {
-          pdg = mcParticles[gfTrackCandToMCParticle[k]->getToIndex()]->getPDG();
-          B2DEBUG(100, "Got correct PDG (" << pdg << ") for TrackCand " << i << " from the corresponding MCParticle with index " << gfTrackCandToMCParticle[k]->getToIndex());
-        }
-      }
+      pdg = mcParticles[trackCandidates[i]->getMcTrackId()]->getPDG();
+      B2DEBUG(100, "Got correct PDG (" << pdg << ") for TrackCand " << i << " from the corresponding MCParticle with index " << trackCandidates[i]->getMcTrackId());
     }
     //for pattern recognition tracks, only the charge of the track is known, but not the PDG value, so one has to test the fit for some different PDG values
     else {
@@ -176,6 +168,8 @@ void GenFitterModule::event()
     vector<unsigned int>::const_iterator iter;
     vector<unsigned int>::const_iterator iterMax;
 
+    //GenFit needs the Hits in a correct order, they are not sorted at the moment but their order seems to be correct (due to simulation), it should however be checked and an ordering parameter be added soon
+
     if (m_useCdcHits) {
       B2INFO("...... add CDCRecoHits");
       //Get the indices for the CDCRecoHits
@@ -185,8 +179,8 @@ void GenFitterModule::event()
       hitCounter = -1;
       iter = cdcIndexList.begin();
       iterMax = cdcIndexList.end();
-      while (iter not_eq iterMax) {
-        hitCounter++;
+      while (iter != iterMax) {
+        ++hitCounter;
         gfTrack.addHit(cdcRecoHits[*iter], 2, hitCounter);
         //B2DEBUG(100,"====== NEXT CDC RecoHit added");
         ++iter;
@@ -202,7 +196,7 @@ void GenFitterModule::event()
       B2DEBUG(100, "Size of svdIndex list: " << svdIndexList.size());
 
       B2DEBUG(100, "svd hitIds");
-      for (unsigned int ii = 0; ii not_eq svdIndexList.size(); ++ii) {
+      for (unsigned int ii = 0; ii != svdIndexList.size(); ++ii) {
         B2DEBUG(100, svdIndexList[ii] << " ");
       }
       B2DEBUG(100, endl);
@@ -211,8 +205,8 @@ void GenFitterModule::event()
       iter = svdIndexList.begin();
       iterMax = svdIndexList.end();
       B2DEBUG(100, "==== SVD Hits " << "iterator " << "layerId " << "ladderId " << "sensorId");
-      while (iter not_eq iterMax) {
-        hitCounter++;
+      while (iter != iterMax) {
+        ++hitCounter;
         gfTrack.addHit(svdRecoHits[*iter], 0, hitCounter);
         int aSensorUniID = svdRecoHits[*iter]->getSensorUniID();
         SensorUniIDManager aIdConverter(aSensorUniID);
@@ -236,7 +230,7 @@ void GenFitterModule::event()
       B2DEBUG(100, "Size of pxdIndex list: " << pxdIndexList.size());
 
       B2DEBUG(100, "pxd hitIds");
-      for (unsigned int ii = 0; ii not_eq pxdIndexList.size(); ++ii) {
+      for (unsigned int ii = 0; ii != pxdIndexList.size(); ++ii) {
         B2DEBUG(100, pxdIndexList[ii] << " ");
       }
       B2DEBUG(100, endl);
@@ -245,8 +239,8 @@ void GenFitterModule::event()
       iter = pxdIndexList.begin();
       iterMax = pxdIndexList.end();
       B2DEBUG(100, "==== PXD Hits " << "iterator " << "layerId " << "ladderId " << "sensorId");
-      while (iter not_eq iterMax) {
-        hitCounter++;
+      while (iter != iterMax) {
+        ++hitCounter;
         gfTrack.addHit(pxdRecoHits[*iter], 0, hitCounter);
         int aSensorUniID = pxdRecoHits[*iter]->getSensorUniID();
         SensorUniIDManager aIdConverter(aSensorUniID);
@@ -281,10 +275,10 @@ void GenFitterModule::event()
 
         if (genfitStatusFlag != 0) {
           B2WARNING("Genfit returned an error (with status flag " << genfitStatusFlag << ") during the fit!");
-          m_failedFitCounter++;
+          ++m_failedFitCounter;
         } else {
-          m_successfulFitCounter++;
-          trackCounter++;
+          ++m_successfulFitCounter;
+          ++trackCounter;
           //Create output tracks
           new(gfTracks->AddrAt(trackCounter)) GFTrack(gfTrack);  //GFTrack can be assigned directly
           new(tracks->AddrAt(trackCounter)) Track();  //Track is created empty, parameters are set later on
@@ -348,18 +342,6 @@ void GenFitterModule::event()
             //Additional check
             //B2INFO("Check: recalculate momentum  px: "<<abs(1.5*0.00299792458/(2*tracks[trackCounter]->getOmega()))*cos(tracks[trackCounter]->getPhi())<<"  py: "<<abs(1.5*0.00299792458/(2*tracks[trackCounter]->getOmega()))*sin(tracks[trackCounter]->getPhi())<<"  pz: "<<abs(1.5*0.00299792458/(2*tracks[trackCounter]->getOmega()))*tracks[trackCounter]->getCotTheta());
 
-            //print helix parameter in file
-            //usefull if one like to quickly plot track trajectories
-            //just comment this part out if you do not want to create/fill this file
-            //-------------------------------------
-            HelixParam << tracks[trackCounter]->getD0() << " \t"
-            << tracks[trackCounter]->getPhi() << " \t"
-            << tracks[trackCounter]->getOmega() << " \t"
-            << tracks[trackCounter]->getZ0() << " \t"
-            << tracks[trackCounter]->getCotTheta() << "\t" << poca.x()
-            << "\t" << poca.y() << "\t" << poca.z() << endl;
-            //----------------------------------------
-
           }
 
           catch (...) {
@@ -389,6 +371,5 @@ void GenFitterModule::endRun()
 void GenFitterModule::terminate()
 {
 
-  HelixParam.close();
 }
 

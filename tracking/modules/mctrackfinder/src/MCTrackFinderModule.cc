@@ -118,7 +118,7 @@ void MCTrackFinderModule::event()
 
   // loop over MCParticles.
   // it would be nice to optimize this, because there are actually ~1000 secondary MCParticles for each primary MCParticle
-  for (int iPart = 0; iPart < nMcParticles; iPart++) {
+  for (int iPart = 0; iPart < nMcParticles; ++iPart) {
 
     //make links only for interesting MCParticles, for the moment take only primary particle
     //this method seems to be quite time consuming, maybe there is a better way to find out if it was a primary particle...
@@ -128,7 +128,7 @@ void MCTrackFinderModule::event()
       // create a list containing the indices to the CDCRecoHits that belong to one track
       list<int> indicesOfGoodCdcHits;
       int nMcPartToCdcRecoHits =  mcParticleToCdcRecoHits.getEntries();
-      for (int i = 0; i not_eq nMcPartToCdcRecoHits; i++) {
+      for (int i = 0; i < nMcPartToCdcRecoHits; ++i) {
         if (mcParticleToCdcRecoHits[i]->getFromIndex() == iPart) {
           int cdcRecoHitIndex = mcParticleToCdcRecoHits[i]->getToIndex();
           indicesOfGoodCdcHits.push_back(cdcRecoHitIndex);
@@ -139,7 +139,7 @@ void MCTrackFinderModule::event()
       list<int> indicesOfGoodPxdHits;
       int nMcPartToPxdRecoHits =  mcParticleToPxdRecoHits.getEntries();
       //dataOutPxd << "nRecoRel " << nMcPartToPxdRecoHits << "\n";
-      for (int i = 0; i not_eq nMcPartToPxdRecoHits; i++) {
+      for (int i = 0; i < nMcPartToPxdRecoHits; ++i) {
         if (mcParticleToPxdRecoHits[i]->getFromIndex() == iPart) {
           int pxdRecoHitIndex = mcParticleToPxdRecoHits[i]->getToIndex();
           indicesOfGoodPxdHits.push_back(pxdRecoHitIndex);
@@ -149,7 +149,7 @@ void MCTrackFinderModule::event()
       list<int> indicesOfGoodSvdHits;
       int nMcPartToSvdRecoHits =  mcParticleToSvdRecoHits.getEntries();
       //dataOutSvd << "nRecoRel " << nMcPartToSvdRecoHits << "\n";
-      for (int i = 0; i not_eq nMcPartToSvdRecoHits; i++) {
+      for (int i = 0; i < nMcPartToSvdRecoHits; ++i) {
         if (mcParticleToSvdRecoHits[i]->getFromIndex() == iPart) {
           int svdRecoHitIndex = mcParticleToSvdRecoHits[i]->getToIndex();
           indicesOfGoodSvdHits.push_back(svdRecoHitIndex);
@@ -231,7 +231,7 @@ list<int> MCTrackFinderModule::getFromForTo(const std::string& relationName, con
 {
   StoreArray<Relation> relations(relationName);
   list<int> myList;
-  for (int ii = 0; ii < relations->GetEntriesFast(); ii++) {
+  for (int ii = 0; ii < relations->GetEntriesFast(); ++ii) {
     if (relations[ii]->getToIndex() == toIndex) {
       myList.push_back(relations[ii]->getFromIndex());
       B2DEBUG(250, relations[ii]->getFromIndex());

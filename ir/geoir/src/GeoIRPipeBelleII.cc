@@ -87,6 +87,7 @@ void GeoIRPipeBelleII::create(GearDir& content)
   double ctubsin1, ctubcos1;
   double ctubsin2, ctubcos2;
   double coneradius1, coneradius2, conehalflen;
+  double marginlength = 0.0001; //[cm] = 1 um
 
   /*########## Index ##########
   # "IP pipe" -9.0 cm to 13.85 cm
@@ -108,7 +109,6 @@ void GeoIRPipeBelleII::create(GearDir& content)
   #     Ta pipe
   #         Vacuum
   ############################*/
-
 
   //==========
   //- IP pipe
@@ -180,7 +180,7 @@ void GeoIRPipeBelleII::create(GearDir& content)
   TGeoVolume *volLv1SUS = new TGeoVolume((format("%1%volLv1SUSname") % crown).str().c_str(), geoLv1SUSpcon, strMedLv1SUS);
 
   //-   put volume
-  volLv1SUS->SetLineColor(kGray);
+  volLv1SUS->SetLineColor(kGray + 2);
   volIRPipe->AddNode(volLv1SUS, 1, new TGeoTranslation(0.0, 0.0, 0.0));
 
   //-
@@ -353,7 +353,7 @@ void GeoIRPipeBelleII::create(GearDir& content)
   TGeoPcon* geoLv2Vacuumpart1 = new TGeoPcon(0, 360, 2);//### NEW! ###
   zpos = -Lv2VacuumL1;
   geoLv2Vacuumpart1->DefineSection(0, zpos, 0.0, Lv2VacuumR1);
-  zpos = Lv2VacuumL2;
+  zpos = Lv2VacuumL2 + marginlength;
   geoLv2Vacuumpart1->DefineSection(1, zpos, 0.0, Lv2VacuumR1);
   geoLv2Vacuumpart1->SetName("geoLv2Vacuumpart1name");  //### SET! ###
   // ##### part1 end #####
@@ -398,8 +398,37 @@ void GeoIRPipeBelleII::create(GearDir& content)
   //-
   //----------
 
+  //----------
+  //- Lv3. AuCoat
+
+  //get parameters from .xml file
+  GearDir cLv3AuCoat(content, "Lv3AuCoat/");
+  double Lv3AuCoatL1 = cLv3AuCoat.getParamLength("L1");
+  double Lv3AuCoatL2 = cLv3AuCoat.getParamLength("L2");
+  double Lv3AuCoatR1 = cLv3AuCoat.getParamLength("R1");
+  double Lv3AuCoatR2 = cLv3AuCoat.getParamLength("R2");
+  string strMatLv3AuCoat = cLv3AuCoat.getParamString("Material");
+  TGeoMedium* strMedLv3AuCoat = gGeoManager->GetMedium(strMatLv3AuCoat.c_str());
+
+  //define geometry
+  TGeoPcon* geoLv3AuCoatpcon = new TGeoPcon(0, 360, 2);//### NEW! ###
+  zpos = -Lv3AuCoatL1;
+  geoLv3AuCoatpcon->DefineSection(0, zpos, Lv3AuCoatR1, Lv3AuCoatR2);
+  zpos = Lv3AuCoatL2;
+  geoLv3AuCoatpcon->DefineSection(1, zpos, Lv3AuCoatR1, Lv3AuCoatR2);
+  geoLv3AuCoatpcon->SetName("geoLv3AuCoatpconname");         //### SET! ###
+
+  //-   define volume
+  TGeoVolume *volLv3AuCoat = new TGeoVolume("volLv3AuCoatname", geoLv3AuCoatpcon, strMedLv3AuCoat);
+
+  //-   put volume
+  volLv3AuCoat->SetLineColor(kOrange);
+  volLv2Vacuum->AddNode(volLv3AuCoat, 1, new TGeoTranslation(0.0, 0.0, 0.0));
+
+  //-
+  //----------
   if (GlobalSDFlag >= 10) {
-    TGeoTube* geoIPchecker = new TGeoTube(0, 1.0, 0.001 / 10.);
+    TGeoTube* geoIPchecker = new TGeoTube(0, 1.0 - (Lv3AuCoatR2 - Lv3AuCoatR1), 0.001 / 10.);
     string strMatIPchecker = "Vacuum";
     TGeoMedium* strMedIPchecker = gGeoManager->GetMedium(strMatIPchecker.c_str());
     TGeoVolume *volIPchecker = new TGeoVolume("SD_volIPcheckername", geoIPchecker, strMedIPchecker);
@@ -516,15 +545,14 @@ void GeoIRPipeBelleII::create(GearDir& content)
   transLv2VacFwdpart2->RegisterYourself();
   // ##### part2 end #####
   // ##### part3 start #####
-  coneradius1 = Lv2VacFwdR[2];
-  coneradius2 = Lv2VacFwdR[2];
-  conehalflen = (Lv2VacFwdD[2] - Lv2VacFwdL[1]) / 2.0;
-  TGeoCone* geoLv2VacFwdpart3 = new TGeoCone(conehalflen, 0, coneradius1, 0, coneradius2);
-  geoLv2VacFwdpart3->SetName("geoLv2VacFwdpart3name");         //### SET! ###
-  TVector3 posLv2VacFwdpart3(conehalflen*sin(-Lv2VacFwdA[0]), 0., conehalflen*cos(-Lv2VacFwdA[0]));
-  //B2INFO("@Lv2VacFwdpart3 Position is " << posLv2VacFwdpart3.x() <<" "<< posLv2VacFwdpart3.y() <<" "<< posLv2VacFwdpart3.z() );
-  TGeoRotation* rotLv2VacFwdpart3 = new TGeoRotation("rotLv2VacFwdpart3name", 90., -Lv2VacFwdA[0] / Unit::deg, -90.);
-  TGeoCombiTrans* transLv2VacFwdpart3 = new TGeoCombiTrans("transLv2VacFwdpart3name", posLv2VacFwdpart3.x(), 0.0, posLv2VacFwdpart3.z(), rotLv2VacFwdpart3);
+  TGeoPcon* geoLv2VacFwdpart3 = new TGeoPcon(0, 360, 2);
+  zpos = 0.0;
+  geoLv2VacFwdpart3->DefineSection(0, zpos, 0.0, Lv2VacFwdR[2]);
+  zpos = Lv2VacFwdD[2] - Lv2VacFwdL[1] + marginlength;
+  geoLv2VacFwdpart3->DefineSection(1, zpos, 0.0, Lv2VacFwdR[2]);
+  geoLv2VacFwdpart3->SetName("geoLv2VacFwdpart3name");
+  TGeoRotation* rotLv2VacFwdpart3 = new TGeoRotation("rotLv2VacFwdpart3name", 90., -Lv2VacFwdA[0] / Unit::deg , -90.);
+  TGeoCombiTrans* transLv2VacFwdpart3 = new TGeoCombiTrans("transLv2VacFwdpart3name", 0.0, 0.0, 0.0, rotLv2VacFwdpart3);
   transLv2VacFwdpart3->RegisterYourself();
   // ##### part3 end #####
   // ##### part4 start #####
@@ -543,7 +571,7 @@ void GeoIRPipeBelleII::create(GearDir& content)
   coneradius1 = Lv2VacFwdR[3];
   coneradius2 = Lv2VacFwdR[3];
   conehalflen = Lv2VacFwdL[2] / 2.0;
-  TGeoCone* geoLv2VacFwdpart5 = new TGeoCone(conehalflen, 0, coneradius1, 0, coneradius2);
+  TGeoCone* geoLv2VacFwdpart5 = new TGeoCone(conehalflen + marginlength, 0, coneradius1, 0, coneradius2);
   geoLv2VacFwdpart5->SetName("geoLv2VacFwdpart5name");         //### SET! ###
   TVector3 posLv2VacFwdpart5((Lv2VacFwdD[2] + conehalflen)*sin(-Lv2VacFwdA[0]), 0., (Lv2VacFwdD[2] + conehalflen)*cos(-Lv2VacFwdA[0]));
   //B2INFO("@Lv2VacFwdpart5 Position is " << posLv2VacFwdpart5.x() <<" "<< posLv2VacFwdpart5.y() <<" "<< posLv2VacFwdpart5.z() );
@@ -628,57 +656,55 @@ void GeoIRPipeBelleII::create(GearDir& content)
   for (int tmpn = 0; tmpn < 4; tmpn++) {
     Lv2VacBwdR[tmpn] = cLv2VacBwd.getParamLength((format("R%1%") % (tmpn + 1)).str().c_str());
   }
-  double Lv2VacBwdA[2];
-  for (int tmpn = 0; tmpn < 2; tmpn++) {
-    Lv2VacBwdA[tmpn] = cLv2VacBwd.getParamAngle((format("A%1%") % (tmpn + 1)).str().c_str());
-  }
+  double Lv2VacBwdA1 = cLv2VacBwd.getParamAngle("A1");
   string strMatLv2VacBwd = cLv2VacBwd.getParamString("Material");
   TGeoMedium* strMedLv2VacBwd = gGeoManager->GetMedium(strMatLv2VacBwd.c_str());
 
   //define geometry
   // ##### part1 start #####
   ctubradius = Lv2VacBwdR[0];
-  ctubhalflen = sqrt(Lv2VacBwdD[0] * Lv2VacBwdD[0] + Lv2VacBwdD[1] * Lv2VacBwdD[1] - 2.0 * Lv2VacBwdD[0] * Lv2VacBwdD[1] * cos(Lv2VacBwdA[0])) / 2.0;
-  ctubcos1 = cos(0.5 * Lv2VacBwdA[1]);
-  ctubsin1 = sin(0.5 * Lv2VacBwdA[1]);
-  ctubcos2 = cos(0.5 * (Lv2VacBwdA[0] - Lv2VacBwdA[1]));
-  ctubsin2 = sin(0.5 * (Lv2VacBwdA[0] - Lv2VacBwdA[1]));
+  ctubhalflen = sqrt(Lv2VacBwdD[0] * Lv2VacBwdD[0] + Lv2VacBwdD[1] * Lv2VacBwdD[1] - 2.0 * Lv2VacBwdD[0] * Lv2VacBwdD[1] * cos(Lv2VacBwdA1)) / 2.0;
+  double Lv2VacBwdA2 = asin(Lv2VacBwdD[1] * sin(Lv2VacBwdA1) / (ctubhalflen * 2.0));
+  ctubcos1 = cos(-Lv2VacBwdA2);
+  ctubsin1 = sin(-Lv2VacBwdA2);
+  ctubcos2 = cos(-0.5 * (Lv2VacBwdA1 - Lv2VacBwdA2));
+  ctubsin2 = sin(-0.5 * (Lv2VacBwdA1 - Lv2VacBwdA2));
   TGeoCtub* geoLv2VacBwdpart1 = new TGeoCtub(0, ctubradius, ctubhalflen,
                                              0, 360,
                                              ctubsin1, 0, -ctubcos1,
                                              ctubsin2, 0, ctubcos2);//### NEW! ###
   geoLv2VacBwdpart1->SetName("geoLv2VacBwdpart1name");         //### SET! ###
-  TVector3 posLv2VacBwdpart1(ctubhalflen*sin(Lv2VacBwdA[1]), 0., -Lv2VacBwdD[0] - ctubhalflen*cos(Lv2VacBwdA[1]));
-  TGeoRotation* rotLv2VacBwdpart1 = new TGeoRotation("rotLv2VacBwdpart1name", 90., -Lv2VacBwdA[1] / Unit::deg + 180.0, -90.);
+  TVector3 posLv2VacBwdpart1(Lv2VacBwdD[1]*sin(Lv2VacBwdA1) / 2.0, 0., -(Lv2VacBwdD[1]*cos(Lv2VacBwdA1) + Lv2VacBwdD[0]) / 2.0);
+  TGeoRotation* rotLv2VacBwdpart1 = new TGeoRotation("rotLv2VacBwdpart1name", 90., -Lv2VacBwdA2 / Unit::deg + 180.0, -90.);
   TGeoCombiTrans* transLv2VacBwdpart1 = new TGeoCombiTrans("transLv2VacBwdpart1name", posLv2VacBwdpart1.x(), 0.0, posLv2VacBwdpart1.z(), rotLv2VacBwdpart1);
   transLv2VacBwdpart1->RegisterYourself();
   // ##### part1 end #####
   // ##### part2 start #####
   ctubradius = Lv2VacBwdR[1];
   ctubhalflen = Lv2VacBwdL[0] / 2.0;
-  ctubcos1 = cos(0.5 * (Lv2VacBwdA[0] - Lv2VacBwdA[1]));
-  ctubsin1 = sin(0.5 * (Lv2VacBwdA[0] - Lv2VacBwdA[1]));
+  ctubcos1 = cos(-0.5 * (Lv2VacBwdA1 - Lv2VacBwdA2));
+  ctubsin1 = sin(-0.5 * (Lv2VacBwdA1 - Lv2VacBwdA2));
   ctubcos2 = 1.0;
   ctubsin2 = 0.0;
-  TGeoCtub* geoLv2VacBwdpart2 = new TGeoCtub(0, ctubradius, ctubhalflen,
+  TGeoCtub* geoLv2VacBwdpart2 = new TGeoCtub(0, ctubradius, ctubhalflen + marginlength,
                                              0, 360,
                                              ctubsin1, 0, -ctubcos1,
                                              ctubsin2, 0, ctubcos2);//### NEW! ###
   geoLv2VacBwdpart2->SetName("geoLv2VacBwdpart2name");         //### SET! ###
-  TVector3 posLv2VacBwdpart2((Lv2VacBwdD[1] + ctubhalflen)*sin(Lv2VacBwdA[0]), 0., -(Lv2VacBwdD[1] + ctubhalflen)*cos(Lv2VacBwdA[0]));
-  TGeoRotation* rotLv2VacBwdpart2 = new TGeoRotation("rotLv2VacBwdpart2name", 90., -Lv2VacBwdA[0] / Unit::deg + 180.0, -90.);
+  TVector3 posLv2VacBwdpart2((Lv2VacBwdD[1] + ctubhalflen)*sin(Lv2VacBwdA1), 0., -(Lv2VacBwdD[1] + ctubhalflen)*cos(Lv2VacBwdA1));
+  TGeoRotation* rotLv2VacBwdpart2 = new TGeoRotation("rotLv2VacBwdpart2name", 90., -Lv2VacBwdA1 / Unit::deg + 180.0, -90.);
   TGeoCombiTrans* transLv2VacBwdpart2 = new TGeoCombiTrans("transLv2VacBwdpart2name", posLv2VacBwdpart2.x(), 0.0, posLv2VacBwdpart2.z(), rotLv2VacBwdpart2);
   transLv2VacBwdpart2->RegisterYourself();
   // ##### part2 end #####
   // ##### part3 start #####
-  coneradius1 = Lv2VacBwdR[2];
-  coneradius2 = Lv2VacBwdR[2];
-  conehalflen = (Lv2VacBwdD[2] - Lv2VacBwdL[1]) / 2.0;
-  TGeoCone* geoLv2VacBwdpart3 = new TGeoCone(conehalflen, 0, coneradius1, 0, coneradius2);
-  geoLv2VacBwdpart3->SetName("geoLv2VacBwdpart3name");         //### SET! ###
-  TVector3 posLv2VacBwdpart3(conehalflen*sin(-Lv2VacBwdA[0]), 0., -conehalflen*cos(-Lv2VacBwdA[0]));
-  TGeoRotation* rotLv2VacBwdpart3 = new TGeoRotation("rotLv2VacBwdpart3name", 90., Lv2VacBwdA[0] / Unit::deg + 180.0, -90.);
-  TGeoCombiTrans* transLv2VacBwdpart3 = new TGeoCombiTrans("transLv2VacBwdpart3name", posLv2VacBwdpart3.x(), 0.0, posLv2VacBwdpart3.z(), rotLv2VacBwdpart3);
+  TGeoPcon* geoLv2VacBwdpart3 = new TGeoPcon(0, 360, 2);
+  zpos = -Lv2VacBwdD[2] + Lv2VacBwdL[1] - marginlength;
+  geoLv2VacBwdpart3->DefineSection(0, zpos, 0.0, Lv2VacBwdR[2]);
+  zpos = 0.0;
+  geoLv2VacBwdpart3->DefineSection(1, zpos, 0.0, Lv2VacBwdR[2]);
+  geoLv2VacBwdpart3->SetName("geoLv2VacBwdpart3name");
+  TGeoRotation* rotLv2VacBwdpart3 = new TGeoRotation("rotLv2VacBwdpart3name", 90., Lv2VacBwdA1 / Unit::deg , -90.);
+  TGeoCombiTrans* transLv2VacBwdpart3 = new TGeoCombiTrans("transLv2VacBwdpart3name", 0.0, 0.0, 0.0, rotLv2VacBwdpart3);
   transLv2VacBwdpart3->RegisterYourself();
   // ##### part3 end #####
   // ##### part4 start #####
@@ -687,22 +713,22 @@ void GeoIRPipeBelleII::create(GearDir& content)
   conehalflen = Lv2VacBwdL[1] / 2.0;
   TGeoCone* geoLv2VacBwdpart4 = new TGeoCone(conehalflen, 0, coneradius1, 0, coneradius2);
   geoLv2VacBwdpart4->SetName("geoLv2VacBwdpart4name");         //### SET! ###
-  TVector3 posLv2VacBwdpart4((Lv2VacBwdD[2] - conehalflen)*sin(-Lv2VacBwdA[0]), 0., -(Lv2VacBwdD[2] - conehalflen)*cos(-Lv2VacBwdA[0]));
-  TGeoRotation* rotLv2VacBwdpart4 = new TGeoRotation("rotLv2VacBwdpart4name", 90., Lv2VacBwdA[0] / Unit::deg + 180.0, -90.);
+  TVector3 posLv2VacBwdpart4((Lv2VacBwdD[2] - conehalflen)*sin(-Lv2VacBwdA1), 0., -(Lv2VacBwdD[2] - conehalflen)*cos(-Lv2VacBwdA1));
+  TGeoRotation* rotLv2VacBwdpart4 = new TGeoRotation("rotLv2VacBwdpart4name", 90., Lv2VacBwdA1 / Unit::deg + 180.0, -90.);
   TGeoCombiTrans* transLv2VacBwdpart4 = new TGeoCombiTrans("transLv2VacBwdpart4name", posLv2VacBwdpart4.x(), 0.0, posLv2VacBwdpart4.z(), rotLv2VacBwdpart4);
   transLv2VacBwdpart4->RegisterYourself();
   // ##### part4 end #####
-  // ##### part5 start #####
-  coneradius1 = Lv2VacBwdR[3];
-  coneradius2 = Lv2VacBwdR[3];
-  conehalflen = Lv2VacBwdL[2] / 2.0;
-  TGeoCone* geoLv2VacBwdpart5 = new TGeoCone(conehalflen, 0, coneradius1, 0, coneradius2);
-  geoLv2VacBwdpart5->SetName("geoLv2VacBwdpart5name");         //### SET! ###
-  TVector3 posLv2VacBwdpart5((Lv2VacBwdD[2] + conehalflen)*sin(-Lv2VacBwdA[0]), 0., -(Lv2VacBwdD[2] + conehalflen)*cos(-Lv2VacBwdA[0]));
-  TGeoRotation* rotLv2VacBwdpart5 = new TGeoRotation("rotLv2VacBwdpart5name", 90., Lv2VacBwdA[0] / Unit::deg + 180.0, -90.);
-  TGeoCombiTrans* transLv2VacBwdpart5 = new TGeoCombiTrans("transLv2VacBwdpart5name", posLv2VacBwdpart5.x(), 0.0, posLv2VacBwdpart5.z(), rotLv2VacBwdpart5);
+  // ##### test part5 start #####
+  TGeoPcon* geoLv2VacBwdpart5 = new TGeoPcon(0, 360, 2);
+  zpos = -Lv2VacBwdD[2] - Lv2VacBwdL[2];
+  geoLv2VacBwdpart5->DefineSection(0, zpos, 0.0, Lv2VacBwdR[3]);
+  zpos = -Lv2VacBwdD[2] + marginlength;
+  geoLv2VacBwdpart5->DefineSection(1, zpos, 0.0, Lv2VacBwdR[3]);
+  geoLv2VacBwdpart5->SetName("geoLv2VacBwdpart5name");
+  TGeoRotation* rotLv2VacBwdpart5 = new TGeoRotation("rotLv2VacBwdpart5name", 90., Lv2VacBwdA1 / Unit::deg , -90.);
+  TGeoCombiTrans* transLv2VacBwdpart5 = new TGeoCombiTrans("transLv2VacBwdpart5name", 0.0, 0.0, 0.0, rotLv2VacBwdpart5);
   transLv2VacBwdpart5->RegisterYourself();
-  // ##### part5 end #####
+  // ##### test part5 end #####
 
   //-   define volume
   TGeoCompositeShape* geoLv2VacBwd = new TGeoCompositeShape("geoLv2VacBwdname",
@@ -1015,5 +1041,4 @@ void GeoIRPipeBelleII::create(GearDir& content)
 
   //=
   //==========
-
 }

@@ -105,10 +105,18 @@
         <R1 unit="cm">1.0</R1>
         <R2 unit="cm">1.0</R2>
         <R3 unit="cm">0.493</R3>
-        <A1 unit="rad">0.0451</A1>
+        <A1 unit="rad">0.0415</A1>
         <A2 unit="rad">0.069</A2>
         <Material>Vacuum</Material>
     </Lv2Vacuum>
+
+    <Lv3AuCoat>
+        <L1 unit="cm">4.00</L1>
+        <L2 unit="cm">6.20</L2>
+        <R1 unit="cm">0.999</R1>
+        <R2 unit="cm">1.000</R2>
+        <Material>Gold</Material>
+    </Lv3AuCoat>
 
     <!-- ########## Ta pipe Forward ########## -->
     <Lv1TaFwd>

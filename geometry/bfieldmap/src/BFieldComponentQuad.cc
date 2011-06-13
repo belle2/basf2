@@ -209,7 +209,7 @@ TVector3 BFieldComponentQuad::calculate(const TVector3& point) const
   if (getApertureHER(s_HER) > r_HER) HERflag = true;
 
   bool LERflag = false;
-  double angle_LER = 0.0415 - 3.141592; //H.Nakayama: hard-coded parameters should be moved to XML
+  double angle_LER = 0.0415 - M_PI; //H.Nakayama: hard-coded parameters should be moved to XML
   TVector3 pLER(point.X(), point.Y(), point.Z()); pLER.RotateY(angle_LER);
   double s_LER = pLER.Z() / Unit::mm;
   double r_LER = sqrt(pLER.X() * pLER.X() + pLER.Y() * pLER.Y()) / Unit::mm;
@@ -217,8 +217,8 @@ TVector3 BFieldComponentQuad::calculate(const TVector3& point) const
 
   double x, y, s; // [m]
   double K0, K1, SK0, SK1, L, ROTATE;
-  double p0_HER = 7.0e+9; // [eV] //H.Nakayama: hard-coded parameters should be moved to XML
-  double p0_LER = 4.0e+9; // [eV] //H.Nakayama: hard-coded parameters should be moved to XML
+  double p0_HER = 7.00729e+9; // [eV] //H.Nakayama: hard-coded parameters should be moved to XML
+  double p0_LER = 4.00000e+9; // [eV] //H.Nakayama: hard-coded parameters should be moved to XML
   double c = 3.0e+8;// [m/s]      //H.Nakayama: hard-coded parameters should be moved to XML
 
   /* in case the point is outside of both LER and HER, returns zero field*/
@@ -253,9 +253,10 @@ TVector3 BFieldComponentQuad::calculate(const TVector3& point) const
       }
     }
 
-    if ((OFFSETflag) && (abs(s) > 1.18)) x -= OrbitOffsetHER;
+    if ((OFFSETflag) && (s >  1.18)) x += OrbitOffsetHER; //H.Nakayama: hard-coded parameters should be moved to XML
+    if ((OFFSETflag) && (s < -1.18)) x -= OrbitOffsetHER; //H.Nakayama: hard-coded parameters should be moved to XML
 
-    TVector3 p_tmp(x, y, s); p_tmp.RotateZ(ROTATE / 180.*3.14159265);
+    TVector3 p_tmp(x, y, s); p_tmp.RotateZ(ROTATE / 180.*M_PI);
     if (ROTATEflag) x = p_tmp.X();
     if (ROTATEflag) y = p_tmp.Y();
 
@@ -264,7 +265,7 @@ TVector3 BFieldComponentQuad::calculate(const TVector3& point) const
       double Bx = (p0_HER / c / L) * (K1 * y - SK1 * x - SK0);
       double By = (p0_HER / c / L) * (K1 * x + SK1 * y + K0);
       TVector3 B(Bx, By, Bz);
-      if (ROTATEflag) B.RotateZ(-ROTATE / 180.*3.14159265);
+      if (ROTATEflag) B.RotateZ(-ROTATE / 180.*M_PI);
       B.RotateY(-angle_HER);
       B2DEBUG(20, "HER quadrupole fields calculated at (x,y,z)=("
               << point.X() / Unit::m << "," << point.Y() / Unit::m << "," << point.Z() / Unit::m
@@ -297,7 +298,7 @@ TVector3 BFieldComponentQuad::calculate(const TVector3& point) const
         break;
       }
     }
-    TVector3 p_tmp(x, y, s); p_tmp.RotateZ(ROTATE / 180.*3.14159265);
+    TVector3 p_tmp(x, y, s); p_tmp.RotateZ(ROTATE / 180.*M_PI);
     if (ROTATEflag) x = p_tmp.X();
     if (ROTATEflag) y = p_tmp.Y();
 
@@ -306,7 +307,7 @@ TVector3 BFieldComponentQuad::calculate(const TVector3& point) const
       double Bx = (p0_LER / c / L) * (K1 * y - SK1 * x - SK0);
       double By = (p0_LER / c / L) * (K1 * x + SK1 * y + K0);
       TVector3 B(Bx, By, Bz);
-      if (ROTATEflag) B.RotateZ(-ROTATE / 180.*3.14159265);
+      if (ROTATEflag) B.RotateZ(-ROTATE / 180.*M_PI);
       B.RotateY(-angle_LER);
       B2DEBUG(20, "LER quadrupole fields calculated at (x,y,z)=("
               << point.X() / Unit::m << "," << point.Y() / Unit::m << "," << point.Z() / Unit::m

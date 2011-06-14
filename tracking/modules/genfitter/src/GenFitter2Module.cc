@@ -44,7 +44,7 @@
 #include <boost/foreach.hpp>
 
 #include <GFDetPlane.h>
-
+#include "GFTools.h"
 using namespace std;
 using namespace Belle2;
 
@@ -83,13 +83,13 @@ void GenFitter2Module::initialize()
   //dataOut.open("kaltest");
   // Initialize Output StoreArray. It contains the GFTracks
   //StoreArray<GFTrack> fittedTracks("fittedTracks");
-  m_failedFitCounter = 0;
-  m_fitCounter = 0;
+
 }
 
 void GenFitter2Module::beginRun()
 {
-
+  m_failedFitCounter = 0;
+  m_fitCounter = 0;
 }
 
 void GenFitter2Module::event()
@@ -103,10 +103,10 @@ void GenFitter2Module::event()
 
   StoreArray<PXDRecoHit> pxdRecoHits(DEFAULT_PXDRECOHITS);
   B2INFO("GenFitter2: Number of PXDRecoHits: " << pxdRecoHits.GetEntries());
-  if (pxdRecoHits.GetEntries() == 0) B2WARNING("GenFitter2: PXDRecoHitsCollection is empty!");
+  if (pxdRecoHits.GetEntries() == 0) B2INFO("GenFitter2: PXDRecoHitsCollection is empty!");
   StoreArray<SVDRecoHit> svdRecoHits(m_svdRecoHitsColName);
   B2INFO("GenFitter2: Number of SVDRecoHits: " << svdRecoHits.GetEntries());
-  if (svdRecoHits.GetEntries() == 0) B2WARNING("GenFitter2: SVDRecoHitsCollection is empty!");
+  if (svdRecoHits.GetEntries() == 0) B2INFO("GenFitter2: SVDRecoHitsCollection is empty!");
   //The use of MCMatchParticles is optional, the fitting of MCtruth should work without CDCMCMatchingModule
   //StoreArray<MCMatchParticle> mcMatchParticles(m_mcMatchParticlesCollectionName);
   //Give Genfit the magnetic field, should come from the common database later...
@@ -192,7 +192,13 @@ void GenFitter2Module::event()
     int layerId = aIdConverter.getLayerID();
     int ladderId = aIdConverter.getLadderID();
     int sensorId = aIdConverter.getSensorID();
+    double varU = pxdRecoHits[*iter]->getUError();
+    double varV = pxdRecoHits[*iter]->getVError();
+    double U = pxdRecoHits[*iter]->getU();
+    double V = pxdRecoHits[*iter]->getV();
     B2INFO("====== NEXT HIT pxd " << *iter << " " << layerId << " " << ladderId << " " << sensorId);
+    B2INFO("vars: " << varU << " " << varV << " " << sqrt(varU) << " " << sqrt(varV));
+    B2INFO("m: " << U << " " << V);
     //GFDetPlane aGFDetPlane = pxdRecoHits[j]->getDetPlane(trackRep);
     //cout << "print pxd plane" << flush;
     //aGFDetPlane.Print();
@@ -219,6 +225,10 @@ void GenFitter2Module::event()
     //cerr << *iter << " ";
     SVDRecoHit* aSVDRecoHit = svdRecoHits[*iter];
     //aSVDRecoHit->Print();
+    double varU = aSVDRecoHit->getUError();
+    double varV = aSVDRecoHit->getVError();
+    double U = aSVDRecoHit->getU();
+    double V = aSVDRecoHit->getV();
     track.addHit(aSVDRecoHit, 1, hitCounter);
     //cerr << "after addHit" << endl;
     int aSensorUniID = svdRecoHits[*iter]->getSensorUniID();
@@ -227,6 +237,8 @@ void GenFitter2Module::event()
     int ladderId = aIdConverter.getLadderID();
     int sensorId = aIdConverter.getSensorID();
     B2INFO("====== NEXT HIT svd " << *iter << " " << layerId << " " << ladderId << " " << sensorId);
+    B2INFO("vars: " << varU << " " << varV << " " << sqrt(varU) << " " << sqrt(varV));
+    B2INFO("m: " << U << " " << V);
     //GFDetPlane aGFDetPlane = svdRecoHits[j]->getDetPlane(trackRep);
     //cout << "print svd plane" << flush;
 // aGFDetPlane.Print();
@@ -278,18 +290,30 @@ void GenFitter2Module::event()
   //Initialize fitting algorithm and process track
   GFKalman k;
   //GFDaf daf;
-  k.setNumIterations(2);
+  k.setNumIterations(1);
+  //k.setBlowUpFactor(10000);
   k.processTrack(&track);
   //track.Print();
   //cerr << "1";
   B2INFO("----> Status of fit: " << trackRep->getStatusFlag());
   B2INFO("-----> Fit Result: momentum: " << track.getMom().x() << "  " << track.getMom().y() << "  " << track.getMom().z() << " " << track.getMom().Mag());
+  B2INFO("-----> Fit Result: vertex: " << track.getPos().x() << "  " << track.getPos().y() << "  " << track.getPos().z());
   B2INFO("----> Chi2 of the fit: " << track.getChiSqu());
   B2INFO("----> NDF of the fit: " << track.getNDF());
   int genfitStatusFlag = trackRep->getStatusFlag();
   if (genfitStatusFlag == 0) {
     new(fittedTracks->AddrAt(0)) GFTrack(track);
     ++m_fitCounter;
+    /*cout << "test of chi2sm function" << "\n";
+    double chi2sm = GFTools::getSmoothedChiSqu(&track,0,0);
+    cout << "test of chi2sm function" << "\n";
+    chi2sm = GFTools::getSmoothedChiSqu(&track,0,1);
+    cout << "test of chi2sm function" << "\n";
+    chi2sm = GFTools::getSmoothedChiSqu(&track,0,2);
+    cout << "test of chi2sm function" << "\n";
+    chi2sm = GFTools::getSmoothedChiSqu(&track,0,3);
+    cout << "test of chi2sm function" << "\n";
+    chi2sm = GFTools::getSmoothedChiSqu(&track,0,4);*/
     //chi2values.push_back(track.getChiSqu());
     //ndfs.push_back(track.getNDF());
     //absMoms.push_back(track.getMom().Mag());
@@ -314,7 +338,9 @@ void GenFitter2Module::event()
 
 void GenFitter2Module::endRun()
 {
-  B2WARNING(m_failedFitCounter << " of " << m_fitCounter + m_failedFitCounter << " tracks could not be fitted in this run");
+  if (m_failedFitCounter not_eq 0) {
+    B2WARNING(m_failedFitCounter << " of " << m_fitCounter + m_failedFitCounter << " tracks could not be fitted in this run");
+  }
 }
 
 void GenFitter2Module::terminate()

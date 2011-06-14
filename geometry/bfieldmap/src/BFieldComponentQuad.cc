@@ -264,8 +264,8 @@ TVector3 BFieldComponentQuad::calculate(const TVector3& point) const
 
     if (foundflag) {
       double Bs = 0;
-      double BX = (p0_HER / c / L) * (K1 * Y - SK1 * X - SK0);
-      double BY = (p0_HER / c / L) * (K1 * X + SK1 * Y + K0);
+      double BX = (p0_HER / c / L) * (K1 * Y + SK1 * X + SK0);
+      double BY = (p0_HER / c / L) * (K1 * X - SK1 * Y + K0);
       TVector3 B(BX, BY, Bs);
       if (ROTATEflag) B.RotateZ(-ROTATE / 180.*M_PI);
       B.RotateX(-M_PI); B.RotateY(-angle_HER);
@@ -308,7 +308,7 @@ TVector3 BFieldComponentQuad::calculate(const TVector3& point) const
 
     if (foundflag) {
       double Bs = 0;
-      double BX = (p0_LER / c / L) * (K1 * Y - SK1 * X - SK0);
+      double BX = (p0_LER / c / L) * (K1 * Y - SK1 * X + SK0);
       double BY = (p0_LER / c / L) * (K1 * X + SK1 * Y + K0);
       TVector3 B(BX, BY, Bs);
       if (ROTATEflag) B.RotateZ(-ROTATE / 180.*M_PI);

@@ -203,7 +203,7 @@ TVector3 BFieldComponentQuad::calculate(const TVector3& point) const
   double angle_crossing = 0.083; //H.Nakayama: sorry, hard-coded
   double angle_HER = - angle_crossing / 2.;
   TVector3 pHER(point.X(), point.Y(), point.Z()); pHER.RotateY(angle_HER); pHER.RotateX(M_PI);
-  double angle_LER = - angle_crossing / 2.;
+  double angle_LER =  angle_crossing / 2.;
   TVector3 pLER(point.X(), point.Y(), point.Z()); pLER.RotateY(angle_LER); pLER.RotateX(M_PI);
 
   //Check if the point lies inside HER or LER beam pipe

@@ -199,27 +199,29 @@ double BFieldComponentQuad::getApertureLER(double s) const
 
 TVector3 BFieldComponentQuad::calculate(const TVector3& point) const
 {
+  //Conversion to LER/HER SAD coordinates
+  double angle_crossing = 0.083; //H.Nakayama: sorry, hard-coded
+  double angle_HER = - angle_crossing / 2.;
+  TVector3 pHER(point.X(), point.Y(), point.Z()); pHER.RotateY(angle_HER); pHER.RotateX(M_PI);
+  double angle_LER = - angle_crossing / 2.;
+  TVector3 pLER(point.X(), point.Y(), point.Z()); pLER.RotateY(angle_LER); pLER.RotateX(M_PI);
 
   //Check if the point lies inside HER or LER beam pipe
-  double angle_HER = -0.0415;   //H.Nakayama: hard-coded parameters should be moved to XML
-  TVector3 pHER(point.X(), point.Y(), point.Z()); pHER.RotateY(angle_HER);
   bool HERflag = false;
-  double s_HER = pHER.Z() / Unit::mm;
+  double s_HER = - pHER.Z() / Unit::mm; // inverse s-direction in SAD and ApertHER.dat
   double r_HER = sqrt(pHER.X() * pHER.X() + pHER.Y() * pHER.Y()) / Unit::mm;
   if (getApertureHER(s_HER) > r_HER) HERflag = true;
 
   bool LERflag = false;
-  double angle_LER = 0.0415 - 3.141592; //H.Nakayama: hard-coded parameters should be moved to XML
-  TVector3 pLER(point.X(), point.Y(), point.Z()); pLER.RotateY(angle_LER);
   double s_LER = pLER.Z() / Unit::mm;
   double r_LER = sqrt(pLER.X() * pLER.X() + pLER.Y() * pLER.Y()) / Unit::mm;
   if (getApertureLER(s_LER) > r_LER) LERflag = true;
 
-  double x, y, s; // [m]
+  double X, Y, s; // [m]
   double K0, K1, SK0, SK1, L, ROTATE;
-  double p0_HER = 7.00729e+9; // [eV] //H.Nakayama: hard-coded parameters should be moved to XML
-  double p0_LER = 4.00000e+9; // [eV] //H.Nakayama: hard-coded parameters should be moved to XML
-  double c = 3.0e+8;// [m/s]      //H.Nakayama: hard-coded parameters should be moved to XML
+  double p0_HER = 7.00729e+9; // [eV] //H.Nakayama: sorry, hard-coded
+  double p0_LER = 4.00000e+9; // [eV] //H.Nakayama: sorry, hard-coded
+  double c = 3.0e+8;// [m/s]          //H.Nakayama: sorry, hard-coded
 
   /* in case the point is outside of both LER and HER, returns zero field*/
   if ((!HERflag) && (!LERflag)) return TVector3(0, 0, 0);
@@ -230,12 +232,12 @@ TVector3 BFieldComponentQuad::calculate(const TVector3& point) const
 
   bool ROTATEflag = false;
   bool OFFSETflag = false;
-  double OrbitOffsetHER = 0.0007;
+  double OrbitOffsetHER = 0.0007; //H.Nakayama: sorry, hard-coded
 
   /* in case the point is inside HER*/
   if (HERflag) {
-    x = pHER.X() / Unit::m; // in [m]
-    y = pHER.Y() / Unit::m; // in [m]
+    X = pHER.X() / Unit::m; // in [m]
+    Y = pHER.Y() / Unit::m; // in [m]
     s = pHER.Z() / Unit::m; // in [m]
 
     bool foundflag = false;
@@ -253,24 +255,26 @@ TVector3 BFieldComponentQuad::calculate(const TVector3& point) const
       }
     }
 
-    if ((OFFSETflag) && (s >  1.18)) x += OrbitOffsetHER; //H.Nakayama: hard-coded parameters should be moved to XML
-    if ((OFFSETflag) && (s < -1.18)) x -= OrbitOffsetHER; //H.Nakayama: hard-coded parameters should be moved to XML
+    if ((OFFSETflag) && (s >  1.18)) X += OrbitOffsetHER; //H.Nakayama: sorry, hard-coded
+    if ((OFFSETflag) && (s < -1.18)) X -= OrbitOffsetHER; //H.Nakayama: sorry, hard-coded
 
-    TVector3 p_tmp(x, y, s); p_tmp.RotateZ(ROTATE / 180.*3.14159265);
-    if (ROTATEflag) x = p_tmp.X();
-    if (ROTATEflag) y = p_tmp.Y();
+    TVector3 p_tmp(X, Y, s); p_tmp.RotateZ(ROTATE / 180.*M_PI);
+    if (ROTATEflag) X = p_tmp.X();
+    if (ROTATEflag) Y = p_tmp.Y();
 
     if (foundflag) {
-      double Bz = 0;
-      double Bx = (p0_HER / c / L) * (K1 * y - SK1 * x - SK0);
-      double By = (p0_HER / c / L) * (K1 * x + SK1 * y + K0);
-      TVector3 B(Bx, By, Bz);
-      if (ROTATEflag) B.RotateZ(-ROTATE / 180.*3.14159265);
-      B.RotateY(-angle_HER);
+      double Bs = 0;
+      double BX = (p0_HER / c / L) * (K1 * Y - SK1 * X - SK0);
+      double BY = (p0_HER / c / L) * (K1 * X + SK1 * Y + K0);
+      TVector3 B(BX, BY, Bs);
+      if (ROTATEflag) B.RotateZ(-ROTATE / 180.*M_PI);
+      B.RotateX(-M_PI); B.RotateY(-angle_HER);
+
       B2DEBUG(20, "HER quadrupole fields calculated at (x,y,z)=("
               << point.X() / Unit::m << "," << point.Y() / Unit::m << "," << point.Z() / Unit::m
-              << " i.e. (x',y',s)=(" << x << "," << y << "," << s
+              << " i.e. (X,Y,s)=(" << X << "," << Y << "," << s
               << ") is (Bx,By,Bz)=(" << B.X() << "," << B.Y() << "," << B.Z() << ").")
+
       return B;
     } else {
       return TVector3(0, 0, 0);
@@ -280,8 +284,8 @@ TVector3 BFieldComponentQuad::calculate(const TVector3& point) const
   /* in case the point is inside LER*/
   if (LERflag) {
 
-    x = pLER.X() / Unit::m; // in [m];
-    y = pLER.Y() / Unit::m; // in [m];
+    X = pLER.X() / Unit::m; // in [m];
+    Y = pLER.Y() / Unit::m; // in [m];
     s = pLER.Z() / Unit::m; // in [m];
 
     bool foundflag = false;
@@ -298,21 +302,23 @@ TVector3 BFieldComponentQuad::calculate(const TVector3& point) const
         break;
       }
     }
-    TVector3 p_tmp(x, y, s); p_tmp.RotateZ(ROTATE / 180.*3.14159265);
-    if (ROTATEflag) x = p_tmp.X();
-    if (ROTATEflag) y = p_tmp.Y();
+    TVector3 p_tmp(X, Y, s); p_tmp.RotateZ(ROTATE / 180.*M_PI);
+    if (ROTATEflag) X = p_tmp.X();
+    if (ROTATEflag) Y = p_tmp.Y();
 
     if (foundflag) {
-      double Bz = 0;
-      double Bx = (p0_LER / c / L) * (K1 * y - SK1 * x - SK0);
-      double By = (p0_LER / c / L) * (K1 * x + SK1 * y + K0);
-      TVector3 B(Bx, By, Bz);
-      if (ROTATEflag) B.RotateZ(-ROTATE / 180.*3.14159265);
-      B.RotateY(-angle_LER);
+      double Bs = 0;
+      double BX = (p0_LER / c / L) * (K1 * Y - SK1 * X - SK0);
+      double BY = (p0_LER / c / L) * (K1 * X + SK1 * Y + K0);
+      TVector3 B(BX, BY, Bs);
+      if (ROTATEflag) B.RotateZ(-ROTATE / 180.*M_PI);
+      B.RotateX(-M_PI); B.RotateY(-angle_LER);
+
       B2DEBUG(20, "LER quadrupole fields calculated at (x,y,z)=("
               << point.X() / Unit::m << "," << point.Y() / Unit::m << "," << point.Z() / Unit::m
-              << " i.e. (x',y',s)=(" << x << "," << y << "," << s
+              << " i.e. (X,Y,s)=(" << X << "," << Y << "," << s
               << ") is (Bx,By,Bz)=(" << B.X() << "," << B.Y() << "," << B.Z() << ").")
+
       return B;
     } else {
       return TVector3(0, 0, 0);

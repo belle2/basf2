@@ -9,12 +9,12 @@
  **************************************************************************/
 
 #include <tracking/modules/trackFitChecker/trackFitCheckerModule.h>
+//#include "RooDouble.h"
 
-#include <numeric>
 
 using namespace std;
 using namespace Belle2;
-
+using namespace boost::accumulators;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
@@ -30,7 +30,8 @@ trackFitCheckerModule::trackFitCheckerModule() : Module()
   setDescription("trackFitCheckerMod module");
 
   //Parameter definition
-  addParam("outputFileName", m_dataOutFileName, "Output file name", string("fuckingShit.txt"));
+  addParam("outputFileName", m_dataOutFileName, "Output file name", string("tfc.txt"));
+  addParam("outputFileName2", m_dataOutFileName2, "Output file name2", string("tfcpvalues.txt"));
   addParam("cdcSimColName", m_cdcSimHitColName, "Name of collection of simulated CDC hits", string(DEFAULT_CDCSIMHITS));
   addParam("pxdSimColName", m_pxdSimHitColName, "Name of collection of simulated PXD hits", string(DEFAULT_PXDSIMHITS));
   addParam("svdSimColName", m_svdSimHitColName, "Name of collection of simulated SVD hits", string(DEFAULT_SVDSIMHITS));
@@ -46,7 +47,8 @@ trackFitCheckerModule::~trackFitCheckerModule()
 
 void trackFitCheckerModule::initialize()
 {
-  m_dataOut.open("trackFitCheckerTests.txt");
+  m_dataOut.open(m_dataOutFileName.c_str());
+  m_dataOut2.open(m_dataOutFileName2.c_str());
 
 }
 
@@ -85,51 +87,60 @@ void trackFitCheckerModule::event()
   m_dataOut << "mcParticle->cdcSimHit " << MCPartToCDCSimHits->GetEntries() << "\n";
 
   StoreArray<GFTrack> fittedTracks("fittedTracks");
-  B2INFO("sollte 1 sein: " << fittedTracks.getEntries())
 
+
+  //StoreArray<RooDouble> pValueData("pValues");
   int nFittedTracks = fittedTracks.getEntries(); //number of fitted tracks in one event always 1 at the moment
-
+  m_dataOut << "sollte 1 sein: " << fittedTracks.getEntries() << "\n";
+  //unsigned int irep = 0;
+  m_dataOut << "chi2totWerte: ";
   for (int i = 0; i not_eq nFittedTracks; ++i) {
     GFTrack* aTrack = fittedTracks[i];
-    int nHits = aTrack->getNumHits();
-    TMatrixT<double> smoothed_state;
-    TMatrixT<double> smoothed_cov;
+    //int nHits = aTrack->getNumHits();
     double chi2tot = aTrack->getChiSqu();
-    double ndf = aTrack->getNDF();
-    double pValue = TMath::Prob(chi2tot, ndf);
-    m_pValues.push_back(pValue);
-    /*for ( int j = 0; j not_eq nHits; ++j ){
-      bool status = GFTools::getSmoothedData(aTrack, 0, j, smoothed_state, smoothed_cov);
-      B2INFO("did getSmoothedData work? " << status << " was it j? " << j);
-      smoothed_state.Print();
-      smoothed_cov.Print();
-    }*/
+    m_dataOut << chi2tot << " ";
+    int ndf = aTrack->getNDF();
+    double pValue = 1.0 - TMath::Prob(chi2tot, ndf);
+    m_dataOut2 << chi2tot << '\t' << ndf << '\t' << pValue << '\n';
+    //new(pValueData->AddrAt(i)) RooDouble(pValue);
+    m_pValues(pValue);
+    double absMom = aTrack->getMom().Mag();
+    m_absMoms(absMom);
+    double x = aTrack->getPos().X();
+    m_vertexX(x);
+    double y = aTrack->getPos().Y();
+    m_vertexY(y);
+    double z = aTrack->getPos().Z();
+    m_vertexZ(z);
+
+    //TVector3 pos;
+    //TVector3 mom;
+    //TMatrixT<double> cov(6,6);
+    //aTrack->getPosMomCov( pos, mom, cov);
+
+
   }
-
-
-
-
+  m_dataOut << "\n";
 }
-
 
 void trackFitCheckerModule::endRun()
 {
-  vector<double>::size_type nPValues = m_pValues.size();
-  double meanPValues = accumulate(m_pValues.begin(), m_pValues.end(), 0.0) / double(nPValues);
-  double stdPValues = 0.0;
-  for (int i = 0; i not_eq nPValues; ++i) {
-    double diffSq = m_pValues[i] - meanPValues;
-    diffSq = diffSq * diffSq;
-    stdPValues += diffSq;
-  }
-  stdPValues = sqrt(stdPValues) / (nPValues - 1);
-  //B2INFO("mean and std of p values from total chi2 of tracks. mean = " << meanPValues << " should be 0.5. std = " << stdPValues << "should be 0.288675" );
+  double meanPValues = mean(m_pValues);
+  double stdPValues = sqrt(variance(m_pValues));
 
-  cout << "mean and std of p values from total chi2 of tracks. mean = " << meanPValues << " should be 0.5. std = " << stdPValues << "should be 0.288675" << endl;
+  B2INFO("mean and std of p values from total chi2 of tracks. mean = " << meanPValues << " should be 0.5. std = " << stdPValues << " should be 0.288675");
+  double meanAbsMom = mean(m_absMoms);
+  B2INFO("mean of absolut of intitial track momentum = " << meanAbsMom << " (only makes sence when all tracks have the same momentum)");
+  double meanX = mean(m_vertexX);
+  double meanY = mean(m_vertexY);
+  double meanZ = mean(m_vertexZ);
+  B2INFO("mean of vertex postition: " << meanX << " " << meanY << " " << meanZ << " ");
+
 }
 
 
 void trackFitCheckerModule::terminate()
 {
-
+  m_dataOut2.close();
+  m_dataOut.close();
 }

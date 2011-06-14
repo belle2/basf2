@@ -10,7 +10,7 @@
 
 /* this is some kind of alpha version of a track fit tester. It is _planned_ that
  * this module will _at least_ be albe to calculate the p values of reconstructed
- * tracks (should be uniformly distributet) form the total chi2 values, the chi2
+ * tracks (should be uniformly distributet) from the total chi2 values, the chi2
  * values of the smoother with respect to the measurements for
  * every sillicon layer (should be chi2(2) distributed for every layer), the
  * normalized residuals of the smoother for every layer (should ben standart
@@ -39,6 +39,12 @@
 
 #include "GFTrack.h"
 #include "GFTools.h"
+
+// to get statistics functions of boost
+#include <boost/accumulators/accumulators.hpp>
+#include <boost/accumulators/statistics/stats.hpp>
+#include <boost/accumulators/statistics/mean.hpp>
+#include <boost/accumulators/statistics/variance.hpp>
 
 namespace Belle2 {
 
@@ -104,12 +110,17 @@ namespace Belle2 {
     std::string m_fittedTracksName;
   private:
     std::string m_dataOutFileName;
+    std::string m_dataOutFileName2;
     std::ofstream m_dataOut;
     std::ofstream m_dataOut2;
     std::vector<double> m_testVec;
-    std::vector<double> m_pValues;
-    //std::vector<T> m_testVec;
-    //std::vector<double> m_testVec;
+    boost::accumulators::accumulator_set < double, boost::accumulators::stats < boost::accumulators::tag::mean, boost::accumulators::tag::variance(boost::accumulators::lazy) > > m_pValues;
+    boost::accumulators::accumulator_set < double, boost::accumulators::stats < boost::accumulators::tag::mean, boost::accumulators::tag::variance(boost::accumulators::lazy) > > m_absMoms;
+
+    boost::accumulators::accumulator_set<double, boost::accumulators::stats< boost::accumulators::tag::mean> > m_vertexX;
+    boost::accumulators::accumulator_set<double, boost::accumulators::stats< boost::accumulators::tag::mean> > m_vertexY;
+    boost::accumulators::accumulator_set<double, boost::accumulators::stats< boost::accumulators::tag::mean> > m_vertexZ;
+
   };
 }
 

@@ -230,7 +230,8 @@ TVector3 BFieldComponentQuad::calculate(const TVector3& point) const
      this happenes around IP where no quadrupole field exists, returns zero field*/
   if ((HERflag) && (LERflag)) return TVector3(0, 0, 0);
 
-  bool ROTATEflag = false;
+  int ROTATE_DIRECTION = 1; // 1: default, 0: rotate-off, -1: inversely rotate
+
   bool OFFSETflag = false;
   double OrbitOffsetHER = 0.0007; //H.Nakayama: sorry, hard-coded
 
@@ -250,6 +251,7 @@ TVector3 BFieldComponentQuad::calculate(const TVector3& point) const
         SK1    = m_mapBufferHER[i].SK1;
         L      = m_mapBufferHER[i].L;
         ROTATE = m_mapBufferHER[i].ROTATE;
+        ROTATE *= ROTATE_DIRECTION;
         foundflag = true;
         break;
       }
@@ -258,16 +260,16 @@ TVector3 BFieldComponentQuad::calculate(const TVector3& point) const
     if ((OFFSETflag) && (s >  1.18)) X += OrbitOffsetHER; //H.Nakayama: sorry, hard-coded
     if ((OFFSETflag) && (s < -1.18)) X -= OrbitOffsetHER; //H.Nakayama: sorry, hard-coded
 
-    TVector3 p_tmp(X, Y, s); p_tmp.RotateZ(ROTATE / 180.*M_PI);
-    if (ROTATEflag) X = p_tmp.X();
-    if (ROTATEflag) Y = p_tmp.Y();
+    TVector3 p_tmp(X, Y, s); p_tmp.RotateZ(-ROTATE / 180.*M_PI);
+    X = p_tmp.X();
+    Y = p_tmp.Y();
 
     if (foundflag) {
       double Bs = 0;
       double BX = (p0_HER / c / L) * (K1 * Y + SK1 * X + SK0);
       double BY = (p0_HER / c / L) * (K1 * X - SK1 * Y + K0);
       TVector3 B(BX, BY, Bs);
-      if (ROTATEflag) B.RotateZ(-ROTATE / 180.*M_PI);
+      B.RotateZ(ROTATE / 180.*M_PI);
       B.RotateX(-M_PI); B.RotateY(-angle_HER);
 
       B2DEBUG(20, "HER quadrupole fields calculated at (x,y,z)=("
@@ -298,20 +300,22 @@ TVector3 BFieldComponentQuad::calculate(const TVector3& point) const
         SK1    = m_mapBufferLER[i].SK1;
         L      = m_mapBufferLER[i].L;
         ROTATE = m_mapBufferLER[i].ROTATE;
+        ROTATE *= ROTATE_DIRECTION;
         foundflag = true;
         break;
       }
     }
-    TVector3 p_tmp(X, Y, s); p_tmp.RotateZ(ROTATE / 180.*M_PI);
-    if (ROTATEflag) X = p_tmp.X();
-    if (ROTATEflag) Y = p_tmp.Y();
+    TVector3 p_tmp(X, Y, s); p_tmp.RotateZ(-ROTATE / 180.*M_PI);
+    X = p_tmp.X();
+    Y = p_tmp.Y();
 
+    //hoge
     if (foundflag) {
       double Bs = 0;
-      double BX = (p0_LER / c / L) * (K1 * Y - SK1 * X + SK0);
-      double BY = (p0_LER / c / L) * (K1 * X + SK1 * Y + K0);
+      double BX = (p0_LER / c / L) * (K1 * Y + SK1 * X + SK0);
+      double BY = (p0_LER / c / L) * (K1 * X - SK1 * Y + K0);
       TVector3 B(BX, BY, Bs);
-      if (ROTATEflag) B.RotateZ(-ROTATE / 180.*M_PI);
+      B.RotateZ(ROTATE / 180.*M_PI);
       B.RotateX(-M_PI); B.RotateY(-angle_LER);
 
       B2DEBUG(20, "LER quadrupole fields calculated at (x,y,z)=("

@@ -113,16 +113,51 @@ TVector3 BFieldComponentRadial::calculate(const TVector3& point) const
   double Br2 = m_mapBuffer[ir][iz+1].r;
   double Br3 = m_mapBuffer[ir+1][iz].r;
   double Br4 = m_mapBuffer[ir+1][iz+1].r;
-  double Br = (Br1 * (m_gridPitchZ - dz) + Br2 * dz) * (m_gridPitchR - dr) + (Br3 * (m_gridPitchZ - dz) + Br4 * dz) * dr;
+  double Br = ((Br1 * (m_gridPitchZ - dz) + Br2 * dz) * (m_gridPitchR - dr) + (Br3 * (m_gridPitchZ - dz) + Br4 * dz) * dr) / m_gridPitchZ / m_gridPitchR;
 
   double Bz1 = m_mapBuffer[ir][iz].z;
   double Bz2 = m_mapBuffer[ir][iz+1].z;
   double Bz3 = m_mapBuffer[ir+1][iz].z;
   double Bz4 = m_mapBuffer[ir+1][iz+1].z;
-  double Bz = (Bz1 * (m_gridPitchZ - dz) + Bz2 * dz) * (m_gridPitchR - dr) + (Bz3 * (m_gridPitchZ - dz) + Bz4 * dz) * dr;
+  double Bz = ((Bz1 * (m_gridPitchZ - dz) + Bz2 * dz) * (m_gridPitchR - dr) + (Bz3 * (m_gridPitchZ - dz) + Bz4 * dz) * dr) / m_gridPitchZ / m_gridPitchR;;
 
   double Bx = (r > 0.0) ? Br * point.X() / r : 0.0;
   double By = (r > 0.0) ? Br * point.Y() / r : 0.0;
+
+  //Near-axis approximation
+  if (false) {
+    //if (true) {
+    Br = - (m_mapBuffer[0][iz+1].z - m_mapBuffer[0][iz].z) / m_gridPitchZ * r / 2;
+    Bz = (m_mapBuffer[0][iz].z * (m_gridPitchZ - dz) + m_mapBuffer[0][iz+1].z * dz) / m_gridPitchZ;
+    Bx = (r > 0.0) ? Br * point.X() / r : 0.0;
+    By = (r > 0.0) ? Br * point.Y() / r : 0.0;
+  }
+
+  //Treatment for unrealistic QC2 iron shape used for 2D-map calculation
+  if (false) {
+    if (((250 < z) && (z < 320)) or((-220 < z) && (z < -160))) {
+      double angle_crossing = 0.0830;
+
+      double angle_HER = - angle_crossing / 2.;
+      TVector3 pHER(point.X(), point.Y(), point.Z()); pHER.RotateY(angle_HER); pHER.RotateX(M_PI);
+      double rHER = pHER.Perp();
+
+      double angle_LER =  angle_crossing / 2.;
+      TVector3 pLER(point.X(), point.Y(), point.Z()); pLER.RotateY(angle_LER); pLER.RotateX(M_PI);
+      double rLER = pLER.Perp();
+
+      Bz = (m_mapBuffer[0][iz].z * (m_gridPitchZ - dz) + m_mapBuffer[0][iz+1].z * dz) / m_gridPitchZ;
+      if (point.X()*point.Z() > 0) {
+        Br = - (m_mapBuffer[0][iz+1].z - m_mapBuffer[0][iz].z) / m_gridPitchZ * rHER / 2;
+        Bx = (rHER > 0.0) ? Br * pHER.X() / rHER : 0.0;
+        By = (rHER > 0.0) ? Br * pHER.Y() / rHER : 0.0;
+      } else {
+        Br = - (m_mapBuffer[0][iz+1].z - m_mapBuffer[0][iz].z) / m_gridPitchZ * rLER / 2;
+        Bx = (rLER > 0.0) ? Br * pLER.X() / rLER : 0.0;
+        By = (rLER > 0.0) ? Br * pLER.Y() / rLER : 0.0;
+      }
+    }
+  }
 
   //B2DEBUG(20, "B Radial field is calculated: z= " << z/Unit::m <<"[m] By= "<< By <<"[Tesla].")
 

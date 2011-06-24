@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+relative coordinates, will be translated into absolute values 
+during creation of sectors in the trackfinder
+
+u0 = smallest (most negative) u-value of actual sensor
+u1 = lies in positive u-direction compared to u0
+v0 = smallest (most negative) v-value of actual sensor
+v1 = lies in positive u-direction compared to v0
+
+schematic view (define u0|v0 as upper-left corner)
+
+u: |
+   v
+
+v: ->
+
+one section:
+
+(u0|v0) ____ (u0|v1)
+       |    |
+(u1|v0)|____|(u1|v1)
+
+total sensor:
+_____________________
+|   |   |   |   |   |
+| 1 | 2 | 3 | 4 | 5 |
+|___|___|___|___|___|
+|   |   |   |   |   |
+| 6 | 7 | 8 | 9 | 10|
+|___|___|___|___|___|
+|   |   |   |   |   |
+| 11| 12| 13| 14| 15|
+|___|___|___|___|___|
+
+actual version works with 3(rphi)x5(z) sectors per sensor
+/-->
+
+<!-- to begin with we are testing the system with only 3 sectors per sensor (3(rphi)x1(z))
+so please correct this value/-->
+<CATFParameters xmlns:xi="http://www.w3.org/2001/XInclude">
+<Sector type="SVD">
+	<sID id="1">
+		<u0>0</u0>
+		<u1>0.33</u1>
+		<v0>0</v0>
+		<v1>0.2</v1>
+	</sID>
+	<sID id="2">
+		<u0>0</u0>
+		<u1>0.33</u1>
+		<v0>0.2</v0>
+		<v1>0.4</v1>
+	</sID>
+	<sID id="3">
+		<u0>0</u0>
+		<u1>0.33</u1>
+		<v0>0.4</v0>
+		<v1>0.6</v1>
+	</sID>
+	<sID id="4">
+		<u0>0</u0>
+		<u1>0.33</u1>
+		<v0>0.6</v0>
+		<v1>0.8</v1>
+	</sID>
+	<sID id="5">
+		<u0>0</u0>
+		<u1>0.33</u1>
+		<v0>0.8</v0>
+		<v1>1</v1>
+	</sID>
+	<sID id="6">
+		<u0>0.33</u0>
+		<u1>0.33</u1>
+		<v0>0</v0>
+		<v1>0.2</v1>
+	</sID>
+	<sID id="7">
+		<u0>0.33</u0>
+		<u1>0.67</u1>
+		<v0>0.2</v0>
+		<v1>0.4</v1>
+	</sID>
+	<sID id="8">
+		<u0>0.33</u0>
+			<u1>0.67</u1>
+			<v0>0.4</v0>
+			<v1>0.6</v1>
+	</sID>
+	<sID id="9">
+			<u0>0.33</u0>
+			<u1>0.67</u1>
+			<v0>0.6</v0>
+			<v1>0.8</v1>
+	</sID>
+	<sID id="10">
+			<u0>0.33</u0>
+			<u1>0.67</u1>
+			<v0>0.8</v0>
+			<v1>1</v1>
+	<sID id="11">
+			<u0>0.67</u0>
+			<u1>1</u1>
+			<v0>0</v0>
+			<v1>0.2</v1>
+	</sID>
+	<sID id="12">
+			<u0>0.67</u0>
+			<u1>1</u1>
+			<v0>0.2</v0>
+			<v1>0.4</v1>
+	</sID>
+	<sID id="13">
+			<u0>0.67</u0>
+			<u1>1</u1>
+			<v0>0.4</v0>
+			<v1>0.6</v1>
+	</sID>
+	<sID id="14">
+			<u0>0.67</u0>
+			<u1>1</u1>
+			<v0>0.6</v0>
+			<v1>0.8</v1>
+	</sID>
+	<sID id="15">
+			<u0>0.67</u0>
+			<u1>1</u1>
+			<v0>0.8</v0>
+			<v1>1</v1>
+	</sID>
+</Sector>
+	<xi:include href="SVDCompatibleSectorsLayer.xml"/> <!-- wird sowieso per MC generiert, da isses egal wie groß das File ist...
+	<xi:include href="SVDCompatibleSectorsLayer3.xml"/>
+	<xi:include href="SVDCompatibleSectorsLayer3.xml"/>
+	<xi:include href="SVDCompatibleSectorsLayer3.xml"/> /-->
+</CATFParameters>

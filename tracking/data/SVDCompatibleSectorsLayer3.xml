@@ -1,0 +1,959 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+here every section within a sensor gets its compatible sections (friends).
+The CATF checks only these sections for possible partners to create Cells (segments).
+
+relative coordinates:
+
+schematic view (define u0|v0 as upper-left corner)
+
+u: |
+   v
+
+v: ->
+
+one section:
+
+(u0|v0) ____ (u0|v1)
+       |    |
+(u1|v0)|____|(u1|v1)
+
+total sensor:
+_____________________
+|   |   |   |   |   |
+| 1 | 2 | 3 | 4 | 5 |
+|___|___|___|___|___|
+|   |   |   |   |   |
+| 6 | 7 | 8 | 9 | 10|
+|___|___|___|___|___|
+|   |   |   |   |   |
+| 11| 12| 13| 14| 15|
+|___|___|___|___|___|
+
+actual version works with 3(rphi)x5(z) sectors per sensor
+/-->
+
+<!--=== LAYER 3  /-->
+<Layer id="3">
+<!--== LADDER 1  /-->
+	<Ladder id="1">
+		<Sensor id="1">
+			<Sector id="1">
+				<Friends id="1">3.8.1#11</Friends>
+				<Friends id="2">3.8.1#12</Friends>
+			</Sector>
+			<Sector id="2">
+				<Friends id="1">3.8.1#11</Friends>
+				<Friends id="2">3.8.1#12</Friends>
+				<Friends id="3">3.8.1#13</Friends>
+			</Sector>
+			<Sector id="3">
+				<Friends id="1">3.8.1#12</Friends>
+				<Friends id="2">3.8.1#13</Friends>
+				<Friends id="3">3.8.1#14</Friends>
+			</Sector>
+			<Sector id="4">
+				<Friends id="1">3.8.1#13</Friends>
+				<Friends id="2">3.8.1#14</Friends>
+				<Friends id="3">3.8.1#15</Friends>
+			</Sector>
+			<Sector id="5">
+				<Friends id="1">3.8.1#14</Friends>
+				<Friends id="2">3.8.1#15</Friends>
+				<Friends id="3">3.8.2#11</Friends>
+			</Sector>
+			<Sector id="6">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="7">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="8">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="9">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="10">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="11">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="12">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="13">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="14">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="15">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+		</Sensor>
+			<Sensor id="2">
+			<Sector id="1">
+				<Friends id="1">3.8.1#15</Friends>
+				<Friends id="2">3.8.2#11</Friends>
+				<Friends id="3">3.8.2#12</Friends>
+			</Sector>
+			<Sector id="2">
+				<Friends id="1">3.8.2#11</Friends>
+				<Friends id="2">3.8.2#12</Friends>
+				<Friends id="3">3.8.2#13</Friends>
+			</Sector>
+			<Sector id="3">
+				<Friends id="1">3.8.2#12</Friends>
+				<Friends id="2">3.8.2#13</Friends>
+				<Friends id="3">3.8.2#14</Friends>
+			</Sector>
+			<Sector id="4">
+				<Friends id="1">3.8.2#13</Friends>
+				<Friends id="2">3.8.2#14</Friends>
+				<Friends id="3">3.8.2#15</Friends>
+			</Sector>
+			<Sector id="5">
+				<Friends id="1">3.8.2#14</Friends>
+				<Friends id="2">3.8.2#15</Friends>
+			</Sector>
+			<Sector id="6">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="7">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="8">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="9">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="10">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="11">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="12">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="13">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="14">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="15">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+		</Sensor>
+	</Ladder>
+	<!--== LADDER 2  /-->
+	<Ladder id="2">
+		<Sensor id="1">
+			<Sector id="1">
+				<Friends id="1">3.1.1#11</Friends>
+				<Friends id="2">3.1.1#12</Friends>
+			</Sector>
+			<Sector id="2">
+				<Friends id="1">3.1.1#11</Friends>
+				<Friends id="2">3.1.1#12</Friends>
+				<Friends id="3">3.1.1#13</Friends>
+			</Sector>
+			<Sector id="3">
+				<Friends id="1">3.1.1#12</Friends>
+				<Friends id="2">3.1.1#13</Friends>
+				<Friends id="3">3.1.1#14</Friends>
+			</Sector>
+			<Sector id="4">
+				<Friends id="1">3.1.1#13</Friends>
+				<Friends id="2">3.1.1#14</Friends>
+				<Friends id="3">3.1.1#15</Friends>
+			</Sector>
+			<Sector id="5">
+				<Friends id="1">3.1.1#14</Friends>
+				<Friends id="2">3.1.1#15</Friends>
+				<Friends id="3">3.1.2#11</Friends>
+			</Sector>
+			<Sector id="6">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="7">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="8">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="9">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="10">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="11">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="12">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="13">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="14">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="15">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+		</Sensor>
+			<Sensor id="2">
+			<Sector id="1">
+				<Friends id="1">3.1.1#15</Friends>
+				<Friends id="2">3.1.2#11</Friends>
+				<Friends id="3">3.1.2#12</Friends>
+			</Sector>
+			<Sector id="2">
+				<Friends id="1">3.1.2#11</Friends>
+				<Friends id="2">3.1.2#12</Friends>
+				<Friends id="3">3.1.2#13</Friends>
+			</Sector>
+			<Sector id="3">
+				<Friends id="1">3.1.2#12</Friends>
+				<Friends id="2">3.1.2#13</Friends>
+				<Friends id="3">3.1.2#14</Friends>
+			</Sector>
+			<Sector id="4">
+				<Friends id="1">3.1.2#13</Friends>
+				<Friends id="2">3.1.2#14</Friends>
+				<Friends id="3">3.1.2#15</Friends>
+			</Sector>
+			<Sector id="5">
+				<Friends id="1">3.1.2#14</Friends>
+				<Friends id="2">3.1.2#15</Friends>
+			</Sector>
+			<Sector id="6">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="7">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="8">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="9">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="10">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="11">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="12">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="13">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="14">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="15">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+		</Sensor>
+		</Sensor>
+	</Ladder>
+	<!--== LADDER 3  /-->
+	<Ladder id="3">
+		<Sensor id="1">
+			<Sector id="1">
+				<Friends id="1">3.2.1#11</Friends>
+				<Friends id="2">3.2.1#12</Friends>
+			</Sector>
+			<Sector id="2">
+				<Friends id="1">3.2.1#11</Friends>
+				<Friends id="2">3.2.1#12</Friends>
+				<Friends id="3">3.2.1#13</Friends>
+			</Sector>
+			<Sector id="3">
+				<Friends id="1">3.2.1#12</Friends>
+				<Friends id="2">3.2.1#13</Friends>
+				<Friends id="3">3.2.1#14</Friends>
+			</Sector>
+			<Sector id="4">
+				<Friends id="1">3.2.1#13</Friends>
+				<Friends id="2">3.2.1#14</Friends>
+				<Friends id="3">3.2.1#15</Friends>
+			</Sector>
+			<Sector id="5">
+				<Friends id="1">3.2.1#14</Friends>
+				<Friends id="2">3.2.1#15</Friends>
+				<Friends id="3">3.2.2#11</Friends>
+			</Sector>
+			<Sector id="6">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="7">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="8">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="9">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="10">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="11">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="12">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="13">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="14">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="15">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+		</Sensor>
+			<Sensor id="2">
+			<Sector id="1">
+				<Friends id="1">3.2.1#15</Friends>
+				<Friends id="2">3.2.2#11</Friends>
+				<Friends id="3">3.2.2#12</Friends>
+			</Sector>
+			<Sector id="2">
+				<Friends id="1">3.2.2#11</Friends>
+				<Friends id="2">3.2.2#12</Friends>
+				<Friends id="3">3.2.2#13</Friends>
+			</Sector>
+			<Sector id="3">
+				<Friends id="1">3.2.2#12</Friends>
+				<Friends id="2">3.2.2#13</Friends>
+				<Friends id="3">3.2.2#14</Friends>
+			</Sector>
+			<Sector id="4">
+				<Friends id="1">3.2.2#13</Friends>
+				<Friends id="2">3.2.2#14</Friends>
+				<Friends id="3">3.2.2#15</Friends>
+			</Sector>
+			<Sector id="5">
+				<Friends id="1">3.2.2#14</Friends>
+				<Friends id="2">3.2.2#15</Friends>
+			</Sector>
+			<Sector id="6">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="7">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="8">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="9">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="10">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="11">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="12">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="13">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="14">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="15">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+		</Sensor>
+	</Ladder>
+	<!--== LADDER 4  /-->
+	<Ladder id="4">
+		<Sensor id="1">
+			<Sector id="1">
+				<Friends id="1">3.3.1#11</Friends>
+				<Friends id="2">3.3.1#12</Friends>
+			</Sector>
+			<Sector id="2">
+				<Friends id="1">3.3.1#11</Friends>
+				<Friends id="2">3.3.1#12</Friends>
+				<Friends id="3">3.3.1#13</Friends>
+			</Sector>
+			<Sector id="3">
+				<Friends id="1">3.3.1#12</Friends>
+				<Friends id="2">3.3.1#13</Friends>
+				<Friends id="3">3.3.1#14</Friends>
+			</Sector>
+			<Sector id="4">
+				<Friends id="1">3.3.1#13</Friends>
+				<Friends id="2">3.3.1#14</Friends>
+				<Friends id="3">3.3.1#15</Friends>
+			</Sector>
+			<Sector id="5">
+				<Friends id="1">3.3.1#14</Friends>
+				<Friends id="2">3.3.1#15</Friends>
+				<Friends id="3">3.3.2#11</Friends>
+			</Sector>
+			<Sector id="6">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="7">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="8">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="9">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="10">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="11">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="12">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="13">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="14">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="15">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+		</Sensor>
+			<Sensor id="2">
+			<Sector id="1">
+				<Friends id="1">3.3.1#15</Friends>
+				<Friends id="2">3.3.2#11</Friends>
+				<Friends id="3">3.3.2#12</Friends>
+			</Sector>
+			<Sector id="2">
+				<Friends id="1">3.3.2#11</Friends>
+				<Friends id="2">3.3.2#12</Friends>
+				<Friends id="3">3.3.2#13</Friends>
+			</Sector>
+			<Sector id="3">
+				<Friends id="1">3.3.2#12</Friends>
+				<Friends id="2">3.3.2#13</Friends>
+				<Friends id="3">3.3.2#14</Friends>
+			</Sector>
+			<Sector id="4">
+				<Friends id="1">3.3.2#13</Friends>
+				<Friends id="2">3.3.2#14</Friends>
+				<Friends id="3">3.3.2#15</Friends>
+			</Sector>
+			<Sector id="5">
+				<Friends id="1">3.3.2#14</Friends>
+				<Friends id="2">3.3.2#15</Friends>
+			</Sector>
+			<Sector id="6">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="7">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="8">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="9">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="10">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="11">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="12">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="13">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="14">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="15">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+		</Sensor>
+	</Ladder>
+	<!--== LADDER 5  /-->
+	<Ladder id="5">
+		<Sensor id="1">
+			<Sector id="1">
+				<Friends id="1">3.4.1#11</Friends>
+				<Friends id="2">3.4.1#12</Friends>
+			</Sector>
+			<Sector id="2">
+				<Friends id="1">3.4.1#11</Friends>
+				<Friends id="2">3.4.1#12</Friends>
+				<Friends id="3">3.4.1#13</Friends>
+			</Sector>
+			<Sector id="3">
+				<Friends id="1">3.4.1#12</Friends>
+				<Friends id="2">3.4.1#13</Friends>
+				<Friends id="3">3.4.1#14</Friends>
+			</Sector>
+			<Sector id="4">
+				<Friends id="1">3.4.1#13</Friends>
+				<Friends id="2">3.4.1#14</Friends>
+				<Friends id="3">3.4.1#15</Friends>
+			</Sector>
+			<Sector id="5">
+				<Friends id="1">3.4.1#14</Friends>
+				<Friends id="2">3.4.1#15</Friends>
+				<Friends id="3">3.4.2#11</Friends>
+			</Sector>
+			<Sector id="6">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="7">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="8">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="9">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="10">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="11">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="12">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="13">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="14">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="15">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+		</Sensor>
+			<Sensor id="2">
+			<Sector id="1">
+				<Friends id="1">3.4.1#15</Friends>
+				<Friends id="2">3.4.2#11</Friends>
+				<Friends id="3">3.4.2#12</Friends>
+			</Sector>
+			<Sector id="2">
+				<Friends id="1">3.4.2#11</Friends>
+				<Friends id="2">3.4.2#12</Friends>
+				<Friends id="3">3.4.2#13</Friends>
+			</Sector>
+			<Sector id="3">
+				<Friends id="1">3.4.2#12</Friends>
+				<Friends id="2">3.4.2#13</Friends>
+				<Friends id="3">3.4.2#14</Friends>
+			</Sector>
+			<Sector id="4">
+				<Friends id="1">3.4.2#13</Friends>
+				<Friends id="2">3.4.2#14</Friends>
+				<Friends id="3">3.4.2#15</Friends>
+			</Sector>
+			<Sector id="5">
+				<Friends id="1">3.4.2#14</Friends>
+				<Friends id="2">3.4.2#15</Friends>
+			</Sector>
+			<Sector id="6">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="7">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="8">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="9">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="10">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="11">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="12">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="13">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="14">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="15">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+		</Sensor>
+	</Ladder>
+	<!--== LADDER 6  /-->
+	<Ladder id="6">
+		<Sensor id="1">
+			<Sector id="1">
+				<Friends id="1">3.5.1#11</Friends>
+				<Friends id="2">3.5.1#12</Friends>
+			</Sector>
+			<Sector id="2">
+				<Friends id="1">3.5.1#11</Friends>
+				<Friends id="2">3.5.1#12</Friends>
+				<Friends id="3">3.5.1#13</Friends>
+			</Sector>
+			<Sector id="3">
+				<Friends id="1">3.5.1#12</Friends>
+				<Friends id="2">3.5.1#13</Friends>
+				<Friends id="3">3.5.1#14</Friends>
+			</Sector>
+			<Sector id="4">
+				<Friends id="1">3.5.1#13</Friends>
+				<Friends id="2">3.5.1#14</Friends>
+				<Friends id="3">3.5.1#15</Friends>
+			</Sector>
+			<Sector id="5">
+				<Friends id="1">3.5.1#14</Friends>
+				<Friends id="2">3.5.1#15</Friends>
+				<Friends id="3">3.5.2#11</Friends>
+			</Sector>
+			<Sector id="6">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="7">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="8">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="9">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="10">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="11">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="12">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="13">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="14">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="15">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+		</Sensor>
+			<Sensor id="2">
+			<Sector id="1">
+				<Friends id="1">3.5.1#15</Friends>
+				<Friends id="2">3.5.2#11</Friends>
+				<Friends id="3">3.5.2#12</Friends>
+			</Sector>
+			<Sector id="2">
+				<Friends id="1">3.5.2#11</Friends>
+				<Friends id="2">3.5.2#12</Friends>
+				<Friends id="3">3.5.2#13</Friends>
+			</Sector>
+			<Sector id="3">
+				<Friends id="1">3.5.2#12</Friends>
+				<Friends id="2">3.5.2#13</Friends>
+				<Friends id="3">3.5.2#14</Friends>
+			</Sector>
+				<Sector id="4">
+				<Friends id="1">3.5.2#13</Friends>
+				<Friends id="2">3.5.2#14</Friends>
+				<Friends id="3">3.5.2#15</Friends>
+			</Sector>
+			<Sector id="5">
+				<Friends id="1">3.5.2#14</Friends>
+				<Friends id="2">3.5.2#15</Friends>
+			</Sector>
+			<Sector id="6">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="7">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="8">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="9">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="10">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="11">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="12">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="13">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="14">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="15">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+		</Sensor>
+	</Ladder>
+	<!--== LADDER 7  /-->
+	<Ladder id="7">
+		<Sensor id="1">
+			<Sector id="1">
+				<Friends id="1">3.6.1#11</Friends>
+				<Friends id="2">3.6.1#12</Friends>
+			</Sector>
+			<Sector id="2">
+				<Friends id="1">3.6.1#11</Friends>
+				<Friends id="2">3.6.1#12</Friends>
+				<Friends id="3">3.6.1#13</Friends>
+			</Sector>
+			<Sector id="3">
+				<Friends id="1">3.6.1#12</Friends>
+				<Friends id="2">3.6.1#13</Friends>
+				<Friends id="3">3.6.1#14</Friends>
+			</Sector>
+			<Sector id="4">
+				<Friends id="1">3.6.1#13</Friends>
+				<Friends id="2">3.6.1#14</Friends>
+				<Friends id="3">3.6.1#15</Friends>
+			</Sector>
+			<Sector id="5">
+				<Friends id="1">3.6.1#14</Friends>
+				<Friends id="2">3.6.1#15</Friends>
+				<Friends id="3">3.6.2#11</Friends>
+			</Sector>
+			<Sector id="6">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="7">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="8">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="9">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="10">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="11">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="12">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="13">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="14">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="15">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+		</Sensor>
+			<Sensor id="2">
+			<Sector id="1">
+				<Friends id="1">3.6.1#15</Friends>
+				<Friends id="2">3.6.2#11</Friends>
+				<Friends id="3">3.6.2#12</Friends>
+			</Sector>
+			<Sector id="2">
+				<Friends id="1">3.6.2#11</Friends>
+				<Friends id="2">3.6.2#12</Friends>
+				<Friends id="3">3.6.2#13</Friends>
+			</Sector>
+			<Sector id="3">
+				<Friends id="1">3.6.2#12</Friends>
+				<Friends id="2">3.6.2#13</Friends>
+				<Friends id="3">3.6.2#14</Friends>
+			</Sector>
+			<Sector id="4">
+				<Friends id="1">3.6.2#13</Friends>
+				<Friends id="2">3.6.2#14</Friends>
+				<Friends id="3">3.6.2#15</Friends>
+			</Sector>
+			<Sector id="5">
+				<Friends id="1">3.6.2#14</Friends>
+				<Friends id="2">3.6.2#15</Friends>
+			</Sector>
+			<Sector id="6">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="7">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="8">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="9">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="10">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="11">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="12">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="13">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="14">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="15">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+		</Sensor>
+	</Ladder>
+	<!--== LADDER 8  /-->
+	<Ladder id="8">
+		<Sensor id="1">
+			<Sector id="1">
+				<Friends id="1">3.7.1#11</Friends>
+				<Friends id="2">3.7.1#12</Friends>
+			</Sector>
+			<Sector id="2">
+				<Friends id="1">3.7.1#11</Friends>
+				<Friends id="2">3.7.1#12</Friends>
+				<Friends id="3">3.7.1#13</Friends>
+			</Sector>
+			<Sector id="3">
+				<Friends id="1">3.7.1#12</Friends>
+				<Friends id="2">3.7.1#13</Friends>
+				<Friends id="3">3.7.1#14</Friends>
+			</Sector>
+			<Sector id="4">
+				<Friends id="1">3.7.1#13</Friends>
+				<Friends id="2">3.7.1#14</Friends>
+				<Friends id="3">3.7.1#15</Friends>
+			</Sector>
+			<Sector id="5">
+				<Friends id="1">3.7.1#14</Friends>
+				<Friends id="2">3.7.1#15</Friends>
+				<Friends id="3">3.7.2#11</Friends>
+			</Sector>
+			<Sector id="6">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="7">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="8">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="9">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="10">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="11">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="12">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="13">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="14">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="15">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+		</Sensor>
+			<Sensor id="2">
+			<Sector id="1">
+				<Friends id="1">3.7.1#15</Friends>
+				<Friends id="2">3.7.2#11</Friends>
+				<Friends id="3">3.7.2#12</Friends>
+			</Sector>
+			<Sector id="2">
+				<Friends id="1">3.7.2#11</Friends>
+				<Friends id="2">3.7.2#12</Friends>
+				<Friends id="3">3.7.2#13</Friends>
+			</Sector>
+			<Sector id="3">
+				<Friends id="1">3.7.2#12</Friends>
+				<Friends id="2">3.7.2#13</Friends>
+				<Friends id="3">3.7.2#14</Friends>
+			</Sector>
+			<Sector id="4">
+				<Friends id="1">3.7.2#13</Friends>
+				<Friends id="2">3.7.2#14</Friends>
+				<Friends id="3">3.7.2#15</Friends>
+			</Sector>
+			<Sector id="5">
+				<Friends id="1">3.7.2#14</Friends>
+				<Friends id="2">3.7.2#15</Friends>
+			</Sector>
+			<Sector id="6">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="7">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="8">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="9">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="10">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="11">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="12">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="13">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="14">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+			<Sector id="15">
+				<!-- this sector has no friends! :( /-->
+			</Sector>
+		</Sensor>
+	</Ladder>
+<Layer>

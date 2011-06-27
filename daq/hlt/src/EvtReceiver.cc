@@ -56,6 +56,15 @@ EStatus EvtReceiver::listen()
   return c_Success;
 }
 
+int EvtReceiver::recv(char* data)
+{
+  int receivedSize = B2Socket::recv(data);
+  B2INFO("[EvtReceiver] " << receivedSize << " bytes received");
+  B2INFO("[EvtReceiver] " << data << " received");
+
+  return receivedSize;
+}
+
 /// @brief EvtReceiver << operator
 ///        Sends string to socket
 /// @param s String to send

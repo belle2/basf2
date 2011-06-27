@@ -188,18 +188,25 @@ EStatus SignalMan::runEvtReceiver(void)
 
     EvtReceiver new_sock;
     m_receiver.accept(new_sock);
-    std::string data;
+    char* data = new char [MAXPACKETSIZE];
+    //std::string data;
 
     B2INFO("listening incomings...");
 
 
     while (1) {
-      new_sock >> data;
-      if (data.size() > 0) {
-        char* dataTaken = new char [data.size() + 1];
-        strcpy(dataTaken, data.c_str());
-        B2INFO("Message taken: " << dataTaken << " (size = " << data.size() << ")");
-        m_inBuf->insq((int*)dataTaken, (data.size() / 4 + 1));
+      int size = new_sock.recv(data);
+      //new_sock >> data;
+      //if (data.size() > 0) {
+      if (size > 0) {
+        char* dataTaken = new char [size + 1];
+        //strcpy(dataTaken, data.c_str());
+        //memcpy (dataTaken, data, size);
+        strcpy(dataTaken, data);
+        //B2INFO("Message taken: " << dataTaken << " (size = " << data.size() << ")");
+        B2INFO("Message taken: " << data << " (size = " << size << ")");
+        //m_inBuf->insq((int*)dataTaken, (data.size() / 4 + 1));
+        m_inBuf->insq((int*)dataTaken, (size / 4 + 1));
 
         //m_inBuf->insq((int*)(data.c_str()), data.size());
         /*
@@ -305,10 +312,11 @@ std::string SignalMan::get(void)
 {
   while (1) {
     if (m_inBuf->numq() > 0) {
-      char tmp[400000];
-      //B2INFO ("AHYO");
+      char tmp[MAXPACKETSIZE];
+      B2INFO("AHYO");
       m_inBuf->remq((int*)tmp);
       std::string input(tmp);
+      B2INFO(input);
 
       return input;
     }

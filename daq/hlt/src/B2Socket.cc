@@ -143,6 +143,17 @@ EStatus B2Socket::accept(B2Socket& new_socket) const
 EStatus B2Socket::send(const std::string s) const
 {
   int status = ::send(m_sock, s.c_str(), s.size(), MSG_NOSIGNAL);
+
+  if (status == -1)
+    return c_FuncError;
+  else
+    return c_Success;
+}
+
+EStatus B2Socket::send(const char* data, int size) const
+{
+  int status = ::send(m_sock, data, size, MSG_NOSIGNAL);
+
   if (status == -1)
     return c_FuncError;
   else
@@ -180,6 +191,28 @@ int B2Socket::recv(std::string& s) const
     return 0;
   } else {
     s = buf;
+    return status;
+  }
+}
+
+int B2Socket::recv(char* data) const
+{
+  char buf[m_maxrecv + 1];
+  //data = new char[m_maxrecv + 1];
+
+  memset(buf, 0, m_maxrecv + 1);
+
+  int status = ::recv(m_sock, buf, m_maxrecv, 0);
+
+  B2INFO("B2SOCKET got " << buf);
+  B2INFO("B2SOCKET has maxrecv " << m_maxrecv);
+
+  if (status == -1) {
+    return 0;
+  } else if (status == 0) {
+    return 0;
+  } else {
+    memcpy(data, buf, status);
     return status;
   }
 }

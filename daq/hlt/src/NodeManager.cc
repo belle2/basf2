@@ -66,6 +66,7 @@ EStatus NodeManager::init(const std::string manager)
 */
 void NodeManager::setNodeInfo(std::string nodeinfo)
 {
+  B2INFO("NodeManager got " << nodeinfo);
   NodeInfo* tmp_node = new NodeInfo();
   tmp_node->deserializedNodeInfo(nodeinfo);
   m_nodeinfo = tmp_node;

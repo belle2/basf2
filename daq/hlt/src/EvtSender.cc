@@ -9,6 +9,8 @@
  **************************************************************************/
 
 #include <daq/hlt/EvtSender.h>
+#include <framework/pcore/EvtMessage.h>
+#include <framework/pcore/MsgHandler.h>
 
 using namespace Belle2;
 
@@ -69,16 +71,27 @@ EStatus EvtSender::broadCasting()
   if (m_buffer->numq() > 0) {
     if (connect() == c_Success) {
       char* tmp = new char[MAXPACKETSIZE];
-      m_buffer->remq((int*)tmp);
-      B2INFO("EvtSender: Intermediate check: size = " << strlen(tmp));
-      std::string input(tmp);
+      int size = 4 * (m_buffer->remq((int*)tmp) - 1) + 1;
 
-      if (B2Socket::send(input) == c_Success) {
-        if (input == "EOF") {
+      /*
+      EvtMessage* testMsg = new EvtMessage (tmp);
+      MsgHanlder* msgHandler = new MsgHandler (1);
+      msgHandler->clear ();
+      */
+
+      B2INFO("EvtSender: Widthraw data from ring buffer " << m_buffer->shmid());
+      B2INFO("EvtSender: Intermediate check: " << tmp << " size = " << size);
+
+      if (B2Socket::send(tmp, size) == c_Success) {
+        //std::string input(tmp);
+
+        //if (B2Socket::send(input) == c_Success) {
+        //if (input == "EOF") {
+        if (tmp == "EOF") {
           B2INFO("EvtSender: EOF taken");
           return c_TermCalled;
         } else {
-          B2INFO("EvtSender: Sending data to " << m_host << " size=" << input.size());
+          B2INFO("EvtSender: Sending data to " << m_host << " size=" << size);
           return c_Success;
         }
       } else {

@@ -32,6 +32,7 @@ namespace Belle2 {
     EStatus init(void);
     EStatus init(HLTBuffer* buffer);
     EStatus listen(void);
+    int recv(char*);
 
     const EvtReceiver& operator << (const std::string&) const;
     const EvtReceiver& operator >> (std::string&) const;

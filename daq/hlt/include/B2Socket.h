@@ -55,10 +55,12 @@ namespace Belle2 {
 
     ///! Sending data as a string format
     EStatus send(const std::string) const;
+    EStatus send(const char*, int) const;
     //! Sending node information as NodeInfo object
     EStatus send(NodeInfo*) const;
     //! Receiving data as a string format
     int recv(std::string&) const;
+    int recv(char*) const;
     //! Receiving node information as NodeInfo object
     int recv(NodeInfo&) const;
 

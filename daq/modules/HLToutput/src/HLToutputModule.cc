@@ -65,6 +65,7 @@ void HLTOutputModule::initialize()
   }
 
   m_outBuf = new HLTBuffer(c_DataOutPort, MAXPACKETSIZE);
+  m_testBuf = new HLTBuffer(c_DataInPort, MAXPACKETSIZE);
 }
 
 void HLTOutputModule::beginRun()
@@ -143,14 +144,60 @@ void HLTOutputModule::putData(const DataStore::EDurability& durability)
   (msg->header())->reserved[2] = narray;
 
   B2INFO("   Encoding summary: " << msg->header()->reserved[1] << " objects / "
-         << msg->header()->reserved[2] << "arrays");
+         << msg->header()->reserved[2] << " arrays");
 
   while (1) {
-    B2INFO("Writing data into ring buffer (size = " << msg->size() << ")");
-    int stat = m_outBuf->insq((int*)msg->buffer(), (msg->size() - 1) / 4 + 1);
+    B2INFO("Writing data into ring buffer (" << m_outBuf->shmid() << ") (size = " << msg->size() << ")");
+    B2INFO("    real size = " << msg->buffer());
+    //int stat = m_outBuf->insq((int*)msg->buffer(), (msg->size() - 1) / 4 + 1);
+    std::string sentMsg(msg->buffer());
+    int stat = m_outBuf->insq((int*)(msg->buffer()), (msg->header()->size - 1) / 4 + 1);
+
+    //char testMessage[100000] = "Hello this is a test message and this should be replaced to realistic message in future...";
+    //int stat = m_outBuf->insq((int*)(testMessage), (strlen (testMessage) - 1) / 4 + 1);
+
+    //int stat2 = m_testBuf->insq ((int*)(sentMsg.c_str ()), (sentMsg.size () - 1) / 4 + 1);
+    m_testBuf->insq((int*)(msg->buffer()), (msg->header()->size - 1) / 4 + 1);
     if (stat >= 0)
       break;
     usleep(100);
+  }
+
+  // Checking the encoded data
+  std::vector<TObject*> testObjListDirect, testObjListTransfer;
+  std::vector<std::string> testNameListDirect, testNameListTransfer;
+
+  MsgHandler* msgHandlerDirect = new MsgHandler(1);
+  msgHandlerDirect->clear();
+  EvtMessage* testMsgDirect = new EvtMessage(msg->buffer());
+  msgHandlerDirect->decode_msg(testMsgDirect, testObjListDirect, testNameListDirect);
+  testMsgDirect->type();
+
+  MsgHandler* msgHandlerTransfer = new MsgHandler(1);
+  msgHandlerTransfer->clear();
+  char* tmpMessage = new char[MAXPACKETSIZE];
+  strcpy(tmpMessage, "8!");
+  //m_testBuf->remq((int*)tmpMessage);
+  EvtMessage* testMsgTransfer = new EvtMessage(tmpMessage);
+  msgHandlerTransfer->decode_msg(testMsgTransfer, testObjListTransfer, testNameListTransfer);
+  testMsgTransfer->type();
+
+  B2INFO("=====Encoding/decoding test summary======");
+  B2INFO("raw: Direct=" << msg->buffer() << "(" << strlen(msg->buffer()) << ")"
+         << " Transfer=" << tmpMessage << "(" << strlen(tmpMessage) << ")");
+  B2INFO(" Direct: " << testMsgDirect->header()->reserved[1] << " objs / "
+         << testMsgDirect->header()->reserved[2] << " arrays / size = "
+         << testMsgDirect->header()->size);
+  B2INFO(" Transfer: " << testMsgTransfer->header()->reserved[1] << " objs / "
+         << testMsgTransfer->header()->reserved[2] << " arrays / size = "
+         << testMsgTransfer->header()->size);
+  B2INFO("msg: Direct=" << strlen(testMsgDirect->msg()) << " Transfer=" << strlen(testMsgTransfer->msg()));
+  if (!strcmp(testMsgDirect->msg(), testMsgTransfer->msg())) {
+    B2INFO(" Two messages are identical");
+  } else {
+    B2WARNING(" Two messages are different!");
+    B2WARNING("    Direct: " << testMsgDirect->msg());
+    B2WARNING("    Transfer: " << testMsgTransfer->msg());
   }
 
   B2INFO("HLTOutput: putData () function done!");

@@ -50,6 +50,7 @@ namespace Belle2 {
 
   private:
     HLTBuffer* m_outBuf;
+    HLTBuffer* m_testBuf;
     std::string m_outBufferName;
 
     std::vector<std::string> m_branchNames[DataStore::c_NDurabilityTypes];

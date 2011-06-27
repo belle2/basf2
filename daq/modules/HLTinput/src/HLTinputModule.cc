@@ -130,8 +130,10 @@ int HLTInputModule::readData(const DataStore::EDurability& indurability)
 
   B2INFO("Decoding data...");
   EvtMessage* msg = new EvtMessage(tmp);
+  B2INFO("Still working...");
   //int status = m_msgHandler->decode_msg(msg, objlist, namelist);
   m_msgHandler->decode_msg(msg, objlist, namelist);
+  B2INFO("Hang on...");
 
   B2INFO("Reading data from ring buffer (size = " << msg->size() << ")");
 

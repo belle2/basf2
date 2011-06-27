@@ -195,18 +195,17 @@ TBranch* SimpleInputModule::validBranch(int& ibranch, TObjArray* branches)
     return 0;
   }
 
-  // if there is a branch list, count only, if the name is on the list.
-  string name = "";
-  name = static_cast<string>(branch->GetName());
-  string branchNames = "";
-  vector<string>::iterator it;
-  for (it = m_branchNames[0].begin(); it < m_branchNames[0].end(); it++) {
-    branchNames = *it + " ";
-  }
+  // check if the branch is in the corresponding branch list
+  // an empty list will cause all branches to be accepted
+  string name = branch->GetName();
+  DataStore::EDurability durability = DataStore::c_Event; // TODO
 
-  if ((m_branchNames[0].size()) && (branchNames.find(name) == string::npos)) {
+  vector<string>::iterator found_itr = find(m_branchNames[durability].begin(), m_branchNames[durability].end(), name);
+  const bool found = (found_itr != m_branchNames[durability].end());
+
+  if (m_branchNames[durability].size() != 0 && !found)
     return 0;
-  }
+
 
   return branch;
 }

@@ -56,6 +56,13 @@ EStatus EvtReceiver::listen()
   return c_Success;
 }
 
+int EvtReceiver::recv(std::string& s)
+{
+  int receivedSize = B2Socket::recv(s);
+
+  return receivedSize;
+}
+
 int EvtReceiver::recv(char* data)
 {
   int receivedSize = B2Socket::recv(data);

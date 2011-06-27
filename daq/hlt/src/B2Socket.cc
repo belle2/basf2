@@ -142,7 +142,7 @@ EStatus B2Socket::accept(B2Socket& new_socket) const
 /// @return c_FuncError Sending failed
 EStatus B2Socket::send(const std::string s) const
 {
-  int status = ::send(m_sock, s.c_str(), s.size(), MSG_NOSIGNAL);
+  int status = ::send(m_sock, s.c_str(), s.size(), 0);
 
   if (status == -1)
     return c_FuncError;
@@ -152,7 +152,8 @@ EStatus B2Socket::send(const std::string s) const
 
 EStatus B2Socket::send(const char* data, int size) const
 {
-  int status = ::send(m_sock, data, size, MSG_NOSIGNAL);
+  //int status = ::send(m_sock, data, size, MSG_NOSIGNAL);
+  int status = ::send(m_sock, data, size, 0);
 
   if (status == -1)
     return c_FuncError;
@@ -202,6 +203,7 @@ int B2Socket::recv(char* data) const
 
   memset(buf, 0, m_maxrecv + 1);
 
+  //int status = ::recv(m_sock, buf, m_maxrecv, MSG_WAITALL);
   int status = ::recv(m_sock, buf, m_maxrecv, 0);
 
   B2INFO("B2SOCKET got " << buf);

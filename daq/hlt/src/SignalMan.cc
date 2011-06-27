@@ -199,14 +199,15 @@ EStatus SignalMan::runEvtReceiver(void)
       //new_sock >> data;
       //if (data.size() > 0) {
       if (size > 0) {
-        char* dataTaken = new char [size + 1];
+        //char* dataTaken = new char [MAXPACKETSIZE];
         //strcpy(dataTaken, data.c_str());
         //memcpy (dataTaken, data, size);
-        strcpy(dataTaken, data);
+        //strcpy(dataTaken, data);
         //B2INFO("Message taken: " << dataTaken << " (size = " << data.size() << ")");
         B2INFO("Message taken: " << data << " (size = " << size << ")");
         //m_inBuf->insq((int*)dataTaken, (data.size() / 4 + 1));
-        m_inBuf->insq((int*)dataTaken, (size / 4 + 1));
+        //m_inBuf->insq((int*)dataTaken, ((data.size () - 1) / 4 + 1));
+        m_inBuf->insq((int*)data, (size - 1) / 4 + 1);
 
         //m_inBuf->insq((int*)(data.c_str()), data.size());
         /*

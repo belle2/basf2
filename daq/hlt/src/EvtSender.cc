@@ -81,6 +81,7 @@ EStatus EvtSender::broadCasting()
 
       B2INFO("EvtSender: Widthraw data from ring buffer " << m_buffer->shmid());
       B2INFO("EvtSender: Intermediate check: " << tmp << " size = " << size);
+      B2INFO("msg = " << tmp << " size = " << strlen(tmp));
 
       if (B2Socket::send(tmp, size) == c_Success) {
         //std::string input(tmp);

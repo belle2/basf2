@@ -21,8 +21,8 @@
 #include <cdc/dataobjects/CDCHit.h>
 
 //genfit
-#include <genfit/GFRecoHitIfc.h>
-#include <genfit/GFWireHitPolicy.h>
+#include <GFRecoHitIfc.h>
+#include <GFWireHitPolicy.h>
 
 
 

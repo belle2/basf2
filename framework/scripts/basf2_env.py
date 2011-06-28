@@ -42,6 +42,11 @@ if envarSubDir is None:
     print """The environment variable BELLE2_SUBDIR is not set. Please execute the 'setuprel' script first."""
     Exit(1)
 
+envarExtDir = os.environ.get('BELLE2_EXTERNALS_DIR', None)
+if envarExtDir is None:
+    print """The environment variable BELLE2_EXTERNALS_DIR is not set. Please execute the 'setuprel' script first."""
+    Exit(1)
+
 # Get the architecture of the computer
 unamelist = os.uname()
 archstring = unamelist[0] + '_' + unamelist[4]
@@ -67,12 +72,8 @@ fw.set_data_search_path(basf2datadir)
 # -----------------------------------------------
 #         Load evtgen particle tables
 # -----------------------------------------------
-evtgen_loaded = fw.read_evtgen_table(os.path.join(envarLocalDir,
-                                     'externals/evtgen/DecFiles/scripts/evt.pdl'
-                                     ))
-if evtgen_loaded is not True:
-    evtgen_loaded = fw.read_evtgen_table(os.path.join(envarReleaseDir,
-            'externals/evtgen/DecFiles/scripts/evt.pdl'))
+evtgen_loaded = fw.read_evtgen_table(os.path.join(envarExtDir,
+                                     'evtgen/DecFiles/scripts/evt.pdl'))
 
 if evtgen_loaded is not True:
     print """ERROR: Could not load the evtgen table file !"""

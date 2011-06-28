@@ -15,6 +15,12 @@ if not os.environ.has_key('BELLE2_SUBDIR'):
     Exit(1)
 subdir = os.environ['BELLE2_SUBDIR']
 
+# check for the externals
+if not os.environ.has_key('BELLE2_EXTERNALS_DIR'):
+    print 'externals are not set up.'
+    print '-> Execute "setuprel" in your local release directory.'
+    Exit(1)
+
 # create construction environment
 global_env = Environment(ENV = os.environ,
                          tools = ['default', 'root_dict', 'process_dir', 'reg_map', 'output', 'autoclean_dir'],
@@ -25,7 +31,7 @@ global_env = Environment(ENV = os.environ,
                          BINDIR = os.path.join('#bin', subdir),
                          MODDIR = os.path.join('#modules', subdir),
                          DATADIR = '#data',
-                         EXTDIR = '#externals',
+                         EXTDIR = os.environ['BELLE2_EXTERNALS_DIR'],
                          EXTINCDIR = os.path.join('$EXTDIR', 'include'),
                          EXTLIBDIR = os.path.join('$EXTDIR', 'lib', subdir),
                          EXTBINDIR = os.path.join('$EXTDIR', 'bin', subdir),

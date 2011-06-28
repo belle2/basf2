@@ -86,6 +86,11 @@ def configure_system(conf):
         print '-> install the libxml2 development package'
         return False
 
+    conf.env.ParseConfig('xml2-config --cflags')
+    xml_env = Environment(ENV=os.environ)
+    xml_env.ParseConfig('xml2-config --libs')
+    conf.env['XML_LIBS'] = xml_env['LIBS']
+
     # graphics packages: OpenGL, OpenSceneGraph, Qt
     conf.env['HAS_GRAPHICS'] = False
     conf.env['GRAPHICS_LIBS'] = []
@@ -99,160 +104,21 @@ def configure_system(conf):
         graphics_env.ParseConfig('pkg-config %s --libs' % graphics_packages)
         conf.env['GRAPHICS_LIBS'] = graphics_env['LIBS']
 
-    conf.env.ParseConfig('xml2-config --cflags')
-    xml_env = Environment(ENV=os.environ)
-    xml_env.ParseConfig('xml2-config --libs')
-    conf.env['XML_LIBS'] = xml_env['LIBS']
-
-    return True
-
-
-def check_system(conf):
-    """check the system packages"""
-
-    if not conf.CheckLib('xml'):
-        print 'XML library missing'
-        print '-> install the libxml2 package'
-        return False
-    if not conf.CheckCHeader('libxml/xmlversion.h'):
-        print 'XML header files missing'
-        print '-> install the libxml2 development package'
-        return False
-
     return True
 
 
 def configure_externals(conf):
     """configure the external packages"""
 
-    # configure externals only after they have been built
-    if BUILD_TARGETS == ['externals']:
-        return True
+    try:
+        extdir = conf.env['EXTDIR']
+        sys.path[:0] = [os.environ['BELLE2_TOOLS'], extdir]
+        from externals import config_externals
+        return config_externals(conf)
+    except:
 
-    # boost
-    conf.env.Append(CPPPATH=os.path.join(conf.env['EXTINCDIR'], 'boost'))
-
-    # CLHEP
-    conf.env.Append(CPPPATH=os.path.join(conf.env['EXTINCDIR'], 'CLHEP'))
-
-    # geant4
-    conf.env.Append(CPPPATH=os.path.join(conf.env['EXTINCDIR'], 'geant4'))
-    conf.env['GEANT4_LIBS'] = [
-        'G4digits_hits',
-        'G4error_propagation',
-        'G4event',
-        'G4FR',
-        'G4geometry',
-        'G4global',
-        'G4graphics_reps',
-        'G4intercoms',
-        'G4interfaces',
-        'G4materials',
-        'G4modeling',
-        'G4parmodels',
-        'G4particles',
-        'G4physicslists',
-        'G4processes',
-        'G4RayTracer',
-        'G4readout',
-        'G4run',
-        'G4track',
-        'G4tracking',
-        'G4Tree',
-        'G4visHepRep',
-        'G4vis_management',
-        'G4visXXX',
-        'G4VRML',
-        ]
-
-    # root
-    conf.env.Append(CPPPATH=os.path.join(conf.env['EXTINCDIR'], 'root'))
-
-    conf.env['ROOT_LIBS'] = conf.env['ROOT_GLIBS'] = []
-    if conf.CheckConfigTool('root-config'):
-        root_env = Environment(ENV=os.environ)
-        root_env.ParseConfig('root-config --libs')
-        conf.env['ROOT_LIBS'] = root_env['LIBS']
-        root_env.ParseConfig('root-config --glibs')
-        conf.env['ROOT_GLIBS'] = root_env['LIBS']
-    else:
-        print 'root configuration tool missing'
-        print '-> create it with the command "scons externals"'
+        print 'Configuration of externals failed.'
         return False
-
-    # vgm
-    conf.env.Append(CPPPATH=os.path.join(conf.env['EXTINCDIR'], 'vgm'))
-
-    # geant4_vmc
-    conf.env.Append(CPPPATH=os.path.join(conf.env['EXTINCDIR'],
-                    'geant4_vmc/g4root'))
-
-    # genfit
-    conf.env.Append(CPPPATH=os.path.join(conf.env['EXTINCDIR'], 'genfit'))
-
-    return True
-
-
-def check_externals(conf):
-    """check the external packages"""
-
-    # boost
-    if not conf.CheckFile('externals/include/boost/version.hpp', 'boost'):
-        if not conf.CheckFile('externals/boost/bootstrap.sh',
-                              'boost source code'):
-            print 'boost is missing'
-            print '-> add and build the externals package'
-            return False
-        if BUILD_TARGETS[0] not in ['externals', 'externals.boost']:
-            print 'boost is not built'
-            print '-> build it with the command "scons externals"'
-            return False
-
-    # CLHEP
-    if not conf.CheckFile('externals/include/CLHEP/ClhepVersion.h', 'CLHEP'):
-        if not conf.CheckFile('externals/Makefile', 'externals package'):
-            print 'CLHEP is missing'
-            print '-> add and build the externals package'
-            return False
-        if BUILD_TARGETS[0] not in ['externals', 'externals.CLHEP']:
-            print 'CLHEP is not built'
-            print '-> build it with the command "scons externals"'
-            return False
-
-    # geant4
-    if not conf.CheckFile('externals/include/geant4/G4Version.hh', 'geant4'):
-        if not conf.CheckFile('externals/Makefile', 'externals package'):
-            print 'geant4 is missing'
-            print '-> add and build the externals package'
-            return False
-        if BUILD_TARGETS[0] not in ['externals', 'externals.geant4']:
-            print 'geant4 is not built'
-            print '-> build it with the command "scons externals"'
-            return False
-
-    # root
-    root_target = len(BUILD_TARGETS) == 1 and BUILD_TARGETS[0] in ['externals'
-            , 'externals.root']
-    if not conf.CheckFile('externals/include/root/RVersion.h', 'root'):
-        if not conf.CheckFile('externals/root/configure', 'root source code'):
-            print 'root is missing'
-            print '-> add and build the externals package'
-            return False
-        if not root_target:
-            print 'root is not built'
-            print '-> build it with the command "scons externals"'
-            return False
-
-    # genfit
-    if not conf.CheckFile('externals/include/genfit/GFTrack.h', 'genfit'):
-        if not conf.CheckFile('externals/Makefile', 'externals package'):
-            print 'genfit is missing'
-            print '-> add and build the externals package'
-            return False
-        if BUILD_TARGETS[0] not in ['externals', 'externals.genfit']:
-            print 'genfit is not built'
-            print '-> build it with the command "scons externals"'
-            return False
 
     return True
 

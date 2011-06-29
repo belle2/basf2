@@ -334,32 +334,28 @@ void VXDSpacePointMakerModule::event()
       // Now there are relations to save.
       if (detType == SiGeoCache::c_pixel) {
         // Get the index of MCParticle corresponding to this SimHit.
-        // Should be at most one. Then save the relation.
-        StoreIndex iMCPart = 0;
+        // Then save the relation.
         ToSideItr mcItr = pxdIndex.find(iHit);
-        if (mcItr != pxdIndex.end())
-          iMCPart = mcItr->m_from;
-        if (iMCPart > 0) {
+        if (mcItr != pxdIndex.end()) {
+          StoreIndex iMCPart = mcItr->m_from;
           int relIndex = storeMCToVXDPts->GetLast() + 1;
           new(storeMCToVXDPts->AddrAt(relIndex)) Relation(
             storeMCParticles, storeVXDPts, iMCPart, ptIndex, 1.0
           );
           m_nRelationsSaved++;
-        }
+        } // index found
       } else if (detType == SiGeoCache::c_strip) {
         // Get the index of MCParticle corresponding to this SimHit.
-        // Should be at most one. Then save the relation.
-        StoreIndex iMCPart = 0;
+        // Then save the relation.
         ToSideItr mcItr = svdIndex.find(iHit);
-        if (mcItr != svdIndex.end())
-          iMCPart = mcItr->m_from;
-        if (iMCPart > 0) {
+        if (mcItr != svdIndex.end()) {
+          StoreIndex iMCPart = mcItr->m_from;
           int relIndex = storeMCToVXDPts->GetLast() + 1;
           new(storeMCToVXDPts->AddrAt(relIndex)) Relation(
             storeMCParticles, storeVXDPts, iMCPart, ptIndex, 1.0
           );
           m_nRelationsSaved++;
-        }
+        } // index found
       } // detType
     } // for iHit
   } // for SensorSetItr

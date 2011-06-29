@@ -63,6 +63,7 @@ SVDDigiModule::SVDDigiModule() : Module(),
            string(DEFAULT_SVDSIMHITSREL));
   addParam("MCParticlesToSVDHits", m_relHitName, "Relation MCPart-to-SVDHits",
            string(DEFAULT_SVDHITSREL));
+  addParam("RandomSeed", m_randSeed, "User-supplied random seed", (unsigned int)(0));
 }
 
 SVDDigiModule::~SVDDigiModule()
@@ -84,6 +85,9 @@ void SVDDigiModule::initialize()
   // Initialize new StoreArrays
   StoreArray<SVDHit> svdOutArray(m_outColName);
   StoreArray<Relation> mcHitArray(m_relHitName);
+
+  // Set the random generator seed
+  if (m_randSeed > 0) m_random->SetSeed(m_randSeed);
 
   // CPU time start
   m_timeCPU = clock() * Unit::us;

@@ -67,6 +67,7 @@ PXDDigiSimpleModule::PXDDigiSimpleModule() : Module(),
            string(DEFAULT_PXDSIMHITSREL));
   addParam("MCParticlesToPXDHits", m_relHitName, "Relation MCPart-to-PXDHits",
            string(DEFAULT_PXDHITSREL));
+  addParam("RandomSeed", m_randSeed, "User-supplied random seed", (unsigned int)(0));
 }
 
 PXDDigiSimpleModule::~PXDDigiSimpleModule()
@@ -84,6 +85,9 @@ void PXDDigiSimpleModule::initialize()
 
   // Print set parameters
   printModuleParams();
+
+  // Set the random generator seed
+  if (m_randSeed > 0) m_random->SetSeed(m_randSeed);
 
   // CPU time start
   m_timeCPU = clock() * Unit::us;

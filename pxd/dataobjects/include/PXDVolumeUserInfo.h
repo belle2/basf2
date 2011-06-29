@@ -29,7 +29,7 @@ namespace Belle2 {
    *  defined. Set to something positive to make step limit active.
    *  Will be fixed in future.
    */
-  const double stepLengthInPXD = -1.0 * Unit::um;
+  const double stepLengthInPXD = 5.0 * Unit::um;
 
   /**
    * Default range cut.

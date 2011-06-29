@@ -97,7 +97,8 @@ namespace Belle2 {
     /* Other members.*/
     PXDCheater* m_cheater;  /**< Cheater provides resolutions and pitch data.*/
     SensorUniIDManager* m_uniID;      /**< Convert between unique ID and layer/ladder/sensor IDs.*/
-    TRandom3* m_random;     /** Random number generator.*/
+    unsigned int m_randSeed;    /**< User-supplied random seed, default is 0. */
+    TRandom3* m_random;     /**< Random number generator.*/
 
     double m_timeCPU;                /**< CPU time.     */
     int    m_nRun;                   /**< Run number.   */

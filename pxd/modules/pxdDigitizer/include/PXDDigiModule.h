@@ -251,6 +251,7 @@ namespace Belle2 {
 
     SiGeoCache * m_geometry;        /**< Geometry data on active sensors. */
 
+    unsigned int m_randSeed;      /**< User-supplied random seed, default is 0. */
     TRandom3 * m_random;          /**< Random generator, original name m_gslRandGen. */
 
     SiEnergyFluct * m_fluctuate;      /**< Landau fluctuation simulator. */

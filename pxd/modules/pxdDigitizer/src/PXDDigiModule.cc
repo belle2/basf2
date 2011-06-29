@@ -142,6 +142,7 @@ PXDDigiModule::PXDDigiModule() :
   addParam("StopIntegrationOtherLayer", m_stopIntegrationOtherLayer,
            "SimHits that appear after this time (ns) will be thrown away",
            double(10000.0));
+  addParam("RandomSeed", m_randSeed, "User-supplied random seed", (unsigned int)(0));
 } // PXDDigiModule c'tor
 
 PXDDigiModule::~PXDDigiModule()
@@ -185,6 +186,9 @@ void PXDDigiModule::initialize()
 
   // Print set parameters
   printModuleParams();
+
+  // Set the random generator seed
+  if (m_randSeed > 0) m_random->SetSeed(m_randSeed);
 
   // CPU time start
   m_timeCPU = clock() * Unit::ms / 1000;

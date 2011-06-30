@@ -3,8 +3,8 @@
 //-----------------------------------------------------------------------------
 // Filename : Fitter3D.h
 // Section  : TRG CDC
-// Owner    :
-// Email    :
+// Owner    : KyungTae KIM (K.U.)
+// Email    : ktkim@hep.korea.ac.kr
 //-----------------------------------------------------------------------------
 // Description : A class to fit tracks in 3D
 //-----------------------------------------------------------------------------
@@ -50,6 +50,9 @@ class TRGCDCFitter3D {
     int doit(std::vector<TRGCDCTrack *> & trackListIn,
              std::vector<TRGCDCTrack *> & trackListOut);
 
+    /// initializes Look Up Table (LUT)
+    void callLUT(void);
+
   private:
 
     /// Name.
@@ -57,6 +60,30 @@ class TRGCDCFitter3D {
 
     /// CDCTRG.
     const TRGCDC & _cdc;
+
+    /// LUTs
+    int lut00[4096];
+
+    /// LUTs
+    int lut01[4096];
+
+    /// LUTs
+    int lut02[4096];
+
+    /// LUTs
+    int lut03[4096];
+
+    /// LUTs
+    int zz_0_lut[1024];
+
+    /// LUTs
+    int zz_1_lut[1024];
+
+    /// LUTs
+    int zz_2_lut[1024];
+
+    /// LUTs
+    int zz_3_lut[1024];
 };
 
 //-----------------------------------------------------------------------------

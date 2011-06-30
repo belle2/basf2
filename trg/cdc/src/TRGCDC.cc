@@ -350,9 +350,11 @@ TRGCDC::initialize(bool houghFinderPerfect,
 
     //...3D fitter...
     _fitter3D = new TCFitter3D("Fitter3D", * this);
+	_fitter3D->callLUT();
 
     //...For module simulation (Front-end)...
     configure();
+
 }
 
 void

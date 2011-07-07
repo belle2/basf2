@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Notes:
+     1) "weight" is determined by MassNumber unit="u"*(# of atoms) / total
+     2) Air is defined in BasicMaterials.xml
+     3) Polystyrene is Cx Hx (equal #'s)
+     4) Mylar is C22 H10 N2 O5
+     5) RPCReadout is a composite of styrofoam, copper, and mylar  (density = 0.3659487)
+           Styrofoam:  volume = 7        density = 0.05414   vol*rho = 0.37898  weight = 0.12084128
+           Copper:     volume = 0.035*2  density = 8.960     vol*rho = 0.62720  weight = 0.19998852
+           Mylar:      volume = 0.75*2   density = 1.420     vol*rho = 2.13000  weight = 0.67917020
+     6) RPCGlass is a composite of 77% SiO2, 14% Na2O, 9% CaO (fractions are by mass)
+     7) ArgonGas is defined here
+     8) ButaneGas is C4 H10
+     9) FreonGas is C2 H2 F4
+    10) RPCGas is 30% argon, 8% butane, 62% freon (fractions are by VOLUME) with density computed from pV=nRT @ STP
+-->
+
+<ParamSet type="MAT">
+	<Name>BKLMMaterials</Name>
+	<Description>BKLM material definitions</Description>
+	<Version>0</Version>
+	<Creator>GeoMaterials</Creator>
+	<Content>
+                <Mixture name="Polystyrene">
+                        <Density unit="g/cm3">1.06</Density>
+                        <Elements>
+                                <Element name="C" weight="0.92257717">
+                                        <AtomNumber>6</AtomNumber>
+                                        <MassNumber unit="u">12.0107</MassNumber>
+                                </Element>
+                                <Element name="H" weight="0.07742283">
+                                        <AtomNumber>1</AtomNumber>
+                                        <MassNumber unit="u">1.00794</MassNumber>
+                                </Element>
+                        </Elements>
+                </Mixture>
+                <Mixture name="Styrofoam">
+                        <Density unit="g/cm3">0.05414</Density>
+                        <Elements>
+                                <Material name="Polystyrene" weight="0.978943480"/>
+                                <Material name="Air"         weight="0.021056520"/>
+                        </Elements>
+                </Mixture>
+                <Mixture name="Mylar">
+                        <Density unit="g/cm3">1.420</Density>
+                        <Elements>
+                                <Element name="C" weight="0.691127199">
+                                        <AtomNumber>6</AtomNumber>
+                                        <MassNumber unit="u">12.0107</MassNumber>
+                                </Element>
+                                <Element name="H" weight="0.026363416">
+                                        <AtomNumber>1</AtomNumber>
+                                        <MassNumber unit="u">1.00794</MassNumber>
+                                </Element>
+                                <Element name="N" weight="0.073271325">
+                                        <AtomNumber>7</AtomNumber>
+                                        <MassNumber unit="u">14.00674</MassNumber>
+                                </Element>
+                                <Element name="O" weight="0.209238060">
+                                        <AtomNumber>8</AtomNumber>
+                                        <MassNumber unit="u">15.9994</MassNumber>
+                                </Element>
+                        </Elements>
+                </Mixture>
+                <Mixture name="RPCReadout">
+                        <Density unit="g/cm3">0.3659487</Density>
+                        <Elements>
+                                <Material name="Styrofoam" weight="0.12084128"/>
+                                <Element  name="Cu"        weight="0.19998852">
+                                        <AtomNumber>29</AtomNumber>
+                                        <MassNumber unit="u">63.546</MassNumber>
+                                </Element>
+                                <Material name="Mylar"     weight="0.67917020"/>
+                        </Elements>
+                </Mixture>
+                <Mixture name="RPCGlass">
+                        <Density unit="g/cm3">2.40</Density>
+                        <Elements>
+                                <Element  name="Si"        weight="0.35992488886">
+                                        <AtomNumber>14</AtomNumber>
+                                        <MassNumber unit="u">28.0855</MassNumber>
+                                </Element>
+                                <Element  name="Na"        weight="0.10386031488">
+                                        <AtomNumber>11</AtomNumber>
+                                        <MassNumber unit="u">22.990</MassNumber>
+                                </Element>
+                                <Element  name="Ca"        weight="0.06432216900">
+                                        <AtomNumber>20</AtomNumber>
+                                        <MassNumber unit="u">40.078</MassNumber>
+                                </Element>
+                                <Element  name="O"         weight="0.47189262726">
+                                        <AtomNumber>8</AtomNumber>
+                                        <MassNumber unit="u">15.9994</MassNumber>
+                                </Element>
+                        </Elements>
+                </Mixture>
+                <Material name="ArgonGas">
+                        <AtomNumber>18</AtomNumber>
+                        <MassNumber unit="u">39.948</MassNumber>
+                        <Density unit="g/cm3">0.001783393</Density>
+                        <RadLength>1.0</RadLength>
+                        <InterLength>0</InterLength>
+                </Material>
+                <Mixture name="ButaneGas">
+                        <Density unit="g/cm3">0.002594732</Density>
+                        <Elements>
+                                <Element  name="C"        weight="0.82658261387">
+                                        <AtomNumber>6</AtomNumber>
+                                        <MassNumber unit="u">12.0107</MassNumber>
+                                </Element>
+                                <Element  name="H"        weight="0.17341738613">
+                                        <AtomNumber>1</AtomNumber>
+                                        <MassNumber unit="u">1.00794</MassNumber>
+                                </Element>
+                        </Elements>
+                </Mixture>
+                <Mixture name="FreonGas">
+                        <Density unit="g/cm3">0.004554955</Density>
+                        <Elements>
+                                <Element  name="C"        weight="0.23543633749">
+                                        <AtomNumber>6</AtomNumber>
+                                        <MassNumber unit="u">12.0107</MassNumber>
+                                </Element>
+                                <Element  name="H"        weight="0.01975785774">
+                                        <AtomNumber>1</AtomNumber>
+                                        <MassNumber unit="u">1.00794</MassNumber>
+                                </Element>
+                                <Element  name="F"        weight="0.74480580477">
+                                        <AtomNumber>9</AtomNumber>
+                                        <MassNumber unit="u">18.998</MassNumber>
+                                </Element>
+                        </Elements>
+                </Mixture>
+                <Mixture name="RPCGas">
+                        <Density unit="g/cm3">0.003566669</Density>
+                        <Elements>
+                                <Material name="ArgonGas"  weight="0.15000492"/>
+                                <Material name="ButaneGas" weight="0.05819957"/>
+                                <Material name="FreonGas"  weight="0.79179551"/>
+                        </Elements>
+                </Mixture>
+	</Content>
+</ParamSet>

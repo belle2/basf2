@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ParamSet type="BKLM">
+  <Name>BKLM BelleII</Name>
+  <Description>Belle II BKLM geometry</Description>
+  <Version>0</Version>
+  <Creator>BKLMBelleII</Creator>
+  <Content>
+    <Rotation desc="Rotation of the BKLM with respect to the Detector"  unit="mrad">0.0</Rotation>
+    <OffsetZ  desc="The offset of the BKLM in z with respect to the IP" unit="cm">47.0</OffsetZ>
+    <Phi desc="The starting angle of the BKLM polygon" unit="deg">-22.5</Phi>
+    <Nsides desc="number of sides of BKLM polygon">8</Nsides>
+    <SolenoidRadius unit="cm">200.0</SolenoidRadius>
+    <OuterRadius unit="cm">353.5</OuterRadius>
+    <Length unit="cm">230.0</Length>
+    <ThicknessRib unit="cm">10.0</ThicknessRib>
+    <WidthCables unit="cm">150.66</WidthCables>
+    <WidthBrace unit="cm">10.0</WidthBrace>
+    <WidthBraceChimney unit="cm">62.6</WidthBraceChimney>
+    <WidthSupportPlate unit="cm">152.5</WidthSupportPlate>
+    <HeightSupportPlate unit="cm">1.0</HeightSupportPlate>
+    <Nlayer desc="number of layers in one sector">15</Nlayer>
+    <Layer>
+            <HeightIron unit="cm">4.7</HeightIron>
+            <HeightIronMeas unit="cm">4.6689</HeightIronMeas>
+            <HeightGap0 unit="cm">4.1</HeightGap0>
+            <HeightGap unit="cm">4.4</HeightGap>
+            <RminGap0 unit="cm">201.9</RminGap0>
+            <DSXGap0 unit="cm">7.94</DSXGap0>
+            <DSXGap unit="cm">3.0</DSXGap>
+            <Length unit="cm">222.0</Length>
+    </Layer>
+    <Module>
+            <HeightCover unit="cm">0.08</HeightCover>
+            <HeightCopper unit="cm">0.0035</HeightCopper>
+            <HeightFoam unit="cm">0.7</HeightFoam>
+            <HeightMylar unit="cm">0.075</HeightMylar>
+            <HeightGlass unit="cm">0.238125</HeightGlass>
+            <HeightGas unit="cm">0.2</HeightGas>
+            <Length unit="cm">220.0</Length>
+            <LengthChimney unit="cm">157.0</LengthChimney>
+            <WidthFrame unit="cm">0.125</WidthFrame>
+            <WidthSpacer unit="cm">0.6</WidthSpacer>
+    </Module>
+    <Chimney>
+            <Length unit="cm">55.0</Length>
+            <Width  unit="cm">50.0</Width>
+            <Cover  unit="cm">12.0</Cover>
+            <HousingRmin unit="cm">15.475</HousingRmin>
+            <HousingRmax unit="cm">15.925</HousingRmax>
+            <ShieldRmin unit="cm">10.8</ShieldRmin>
+            <ShieldRmax unit="cm">11.0</ShieldRmax>
+            <PipeRmin unit="cm">0.0</PipeRmin>
+            <PipeRmax unit="cm">4.0</PipeRmax>
+    </Chimney>
+</Content>
+</ParamSet>

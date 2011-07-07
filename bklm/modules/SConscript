@@ -1,0 +1,6 @@
+Import('env')
+
+env['LIBS'] = ['bklm', 'geometry', 'framework','simulation','generators',
+               '$ROOT_LIBS']
+
+Return('env')

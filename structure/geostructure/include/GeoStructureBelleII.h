@@ -9,7 +9,6 @@
  **************************************************************************/
 
 #include <geometry/geodetector/CreatorBase.h>
-#include <structure/geostructure/StructureBarrel.h>
 #include <structure/geostructure/StructureEndcap.h>
 #include <structure/geostructure/StructurePoletip.h>
 
@@ -49,33 +48,9 @@ namespace Belle2 {
     */
     virtual void create(GearDir& content);
 
-    /*! to get the center position of each Endcap KLM module
-      (make empty slot for Endcap KLM for future use)
-    const TVector3 endcapModulePos(int, int) const;
-    */
-
-    /*
-    double THICK_EIRON;
-    double THICK_EIRON_MEAS;
-    double THICK_ESLOT;
-    double THICK_ESLOT_MEAS;
-
-    double THICK_EMOD;
-    double RMIN_EMOD;
-    double RMAX_EMOD;
-    double RMIN_ESLOT;
-    double RMAX_ESLOT;
-
-    double RSHIFT_ESLOT;
-    double RMAX_GLASS;
-    */
-
   protected:
 
   private:
-
-    //! To get the geometrical paramters for the Structure Barrel part
-    StructureBarrel BarrelMgr;
 
     //! To get the geometrical paramters for the Structure Endcap part
     StructureEndcap EndcapMgr;

@@ -58,12 +58,12 @@ namespace Belle2 {
 
 
 
-  const char *  EKLMNameManipulator::getNodePath(const char * stripName)
+  std::string  EKLMNameManipulator::getNodePath(const char * stripName)
   {
     return getNodePath(std::string(stripName));
   }
 
-  const char * EKLMNameManipulator::getNodePath(std::string stripName)
+  std::string EKLMNameManipulator::getNodePath(std::string stripName)
   {
     std::string path = \
                        std::string("/Top_1/EKLM_1") +          \
@@ -80,6 +80,6 @@ namespace Belle2 {
     // tempopary. Used for the procedure checks
     if (!gGeoManager->CheckPath(path.c_str()))
       B2ERROR("Something goes wrong! Strip path is not found!");
-    return path.c_str();
+    return path;
   }
 }

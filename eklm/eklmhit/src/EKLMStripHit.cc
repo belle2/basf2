@@ -45,7 +45,8 @@ double EKLMStripHit::getLightPropagationLength(CLHEP::Hep3Vector &pos)
   double local[3] = {0, 0, 0};
   double min = 0;
   double max = 0;
-  gGeoManager->cd(EKLMNameManipulator::getNodePath(m_Name));
+
+  gGeoManager->cd((EKLMNameManipulator::getNodePath(m_Name)).c_str());
   gGeoManager->MasterToLocal(global, local);
   gGeoManager->GetCurrentVolume()->GetShape()->GetAxisRange(1, min, max);
   m_LightPropagationLength = max - local[0];
@@ -62,12 +63,12 @@ bool EKLMStripHit::doesIntersect(EKLMStripHit * hit, CLHEP::Hep3Vector & crossPo
 
 
   double global1[3] = {0, 0, 0};
-  gGeoManager->cd(EKLMNameManipulator::getNodePath(hit->getName()));
+  gGeoManager->cd((EKLMNameManipulator::getNodePath(hit->getName())).c_str());
   gGeoManager->LocalToMaster(local, global1);
   gGeoManager->GetCurrentVolume()->GetShape()->GetAxisRange(1, min, max1);
 
   double global2[3] = {0, 0, 0};
-  gGeoManager->cd(EKLMNameManipulator::getNodePath(m_Name));
+  gGeoManager->cd((EKLMNameManipulator::getNodePath(m_Name)).c_str());
   gGeoManager->LocalToMaster(local, global2);
   gGeoManager->GetCurrentVolume()->GetShape()->GetAxisRange(1, min, max2);
 

@@ -47,10 +47,10 @@ namespace Belle2 {
 
 
     //! returns path from the top to the volume with given name
-    static const char * getNodePath(const char *);
+    static std::string getNodePath(const char *);
 
     //! returns path from the top to the volume with given name
-    static const char * getNodePath(std::string);
+    static std::string getNodePath(std::string);
 
 
     //! returns true if the strip is along X otherwise returns false

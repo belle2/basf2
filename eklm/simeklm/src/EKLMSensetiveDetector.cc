@@ -10,7 +10,7 @@
 
 
 #include <eklm/simeklm/EKLMSensetiveDetector.h>
-#include <eklm/simeklm/EKLMDigitizer.h>
+
 #include <framework/logging/Logger.h>
 
 
@@ -31,26 +31,25 @@ namespace Belle2 {
 
   EKLMSensetiveDetector::EKLMSensetiveDetector(G4String name, G4double thresholdEnergyDeposit, G4double thresholdKineticEnergy):
       SensitiveDetectorBase(name), m_ThresholdEnergyDeposit(thresholdEnergyDeposit),
-      m_ThresholdKineticEnergy(thresholdKineticEnergy), m_HitCollection(0),
-      m_HCID(-1)
+      m_ThresholdKineticEnergy(thresholdKineticEnergy)
   {
-
-    G4String CollName1 = name + "_Collection";
-    collectionName.insert(CollName1);
+//     G4String CollName1 = name + "_Collection";
+//     collectionName.insert(CollName1);
   }
 
   void EKLMSensetiveDetector::Initialize(G4HCofThisEvent * HCTE)
   {
+
     // Create a new hit collection
-    m_HitCollection = new EKLMSimHitsCollection(SensitiveDetectorName, collectionName[0]);
+    //    m_HitCollection = new EKLMSimHitsCollection(SensitiveDetectorName, collectionName[0]);
 
     // Assign a unique ID to the hits collection
-    if (m_HCID < 0) {
-      m_HCID = G4SDManager::GetSDMpointer()->GetCollectionID(m_HitCollection);
-    }
+//     if (m_HCID < 0) {
+//       m_HCID = G4SDManager::GetSDMpointer()->GetCollectionID(m_HitCollection);
+//     }
 
     // Attach collections to HitsCollectionsOfThisEvent
-    HCTE -> AddHitsCollection(m_HCID, m_HitCollection);
+    //    HCTE -> AddHitsCollection(m_HCID, m_HitCollection);
 
   }
 
@@ -106,24 +105,17 @@ namespace Belle2 {
     //creates hit
     EKLMSimHit *hit = new  EKLMSimHit(position,  hitTime, PDGcode,  eDep);
 
+    // store hit
+    storeEKLMObject("SimHitsEKLMArray", hit);
+
     // insert hit to the hit collection
-    m_HitCollection->insert(hit);
+    //    m_HitCollection->insert(hit);
 
     return true;
   }
 
-
   void EKLMSensetiveDetector::EndOfEvent(G4HCofThisEvent *)
   {
-    B2DEBUG(1, " START DIGITIZATION");
-
-    EKLMDigitizer *digi = new EKLMDigitizer(m_HitCollection);
-
-    digi->getSimHits();
-    digi->mergeSimHitsToStripHits();
-    digi->saveStripHits();
-
-    //    delete(digi);
   }
 
 } //namespace Belle II

@@ -52,10 +52,10 @@ namespace Belle2 {
     G4double m_ThresholdKineticEnergy;
 
     //! sim hits collection
-    EKLMSimHitsCollection *m_HitCollection;
+    //    EKLMSimHitsCollection *m_HitCollection;
 
     //! hit colleation ID
-    G4int m_HCID;
+    //    G4int m_HCID;
 
   };
 

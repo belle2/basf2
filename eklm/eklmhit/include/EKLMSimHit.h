@@ -13,21 +13,20 @@
 
 
 #include <TObject.h>
-//#include <simulation/simkernel/B4VHit.h>
-
-#include "G4VHit.hh"
 
 //Geant4 classes
 #include "G4THitsCollection.hh"
 #include "G4Allocator.hh"
 #include "G4ThreeVector.hh"
 
+#include "eklm/eklmhit/EKLMHitBase.h"
 
-
+#include "G4VHit.hh"
 namespace Belle2 {
 
   //! Class to handle simulation hits
-  class EKLMSimHit  : public G4VHit  {
+  //  class EKLMSimHit  : public G4VHit  {
+  class EKLMSimHit : public EKLMHitBase  {
 
   public:
 
@@ -83,7 +82,7 @@ namespace Belle2 {
   };
 
   //! define collections of Sim Hits
-  typedef G4THitsCollection<EKLMSimHit> EKLMSimHitsCollection;
+  //  typedef G4THitsCollection<EKLMSimHit> EKLMSimHitsCollection;
 
 } // end of namespace Belle2
 

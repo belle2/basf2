@@ -39,10 +39,20 @@ namespace Belle2 {
   G4Allocator<EKLMDigitizer> EKLMDigitizerAllocator;
 
 
+
+
+  void EKLMDigitizer::readSimHits()
+  {
+    StoreArray<EKLMSimHit> array("SimHitsEKLMArray");
+    for (int i = 0; i < array.GetEntries(); i++)
+      m_simHitsVector.push_back(array[i]);
+  }
+
+
   void EKLMDigitizer::getSimHits()
   {
-    for (std::vector<EKLMSimHit*>::iterator iHit = m_HitCollection->GetVector()->begin();
-         iHit != m_HitCollection->GetVector()->end(); ++iHit) {
+    for (std::vector<EKLMSimHit*>::iterator iHit = m_simHitsVector.begin();
+         iHit != m_simHitsVector.end(); ++iHit) {
 
       gGeoManager->SetCurrentPoint((*iHit)->getPos().x(), (*iHit)->getPos().y(), (*iHit)->getPos().z());
       gGeoManager->FindNode();
@@ -53,13 +63,14 @@ namespace Belle2 {
       std::map<std::string, std::vector<EKLMSimHit*> >::iterator it = m_HitStripMap.find(StripName);
 
       if (it == m_HitStripMap.end()) { //  new entry
-        std::vector<EKLMSimHit*> *vectorHits = new std::vector<EKLMSimHit*> (1, *iHit);
+        std::vector<EKLMSimHit*> *vectorHits = new std::vector<EKLMSimHit*> (1, (*iHit));
         m_HitStripMap.insert(std::pair<std::string, std::vector<EKLMSimHit*> >(StripName, *vectorHits));
       } else {
         it->second.push_back(*iHit);
       }
 
     }
+
   }
   //!  This function is intended to form StripHits from SimHits.
   void EKLMDigitizer::mergeSimHitsToStripHits()

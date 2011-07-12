@@ -29,12 +29,13 @@ namespace Belle2 {
 
 
     //! Constructor
-    EKLMDigitizer(EKLMSimHitsCollection* col) {
-      m_HitCollection = col;
-    };
+    EKLMDigitizer() {};
 
     //! Destructor
-    ~EKLMDigitizer();
+    ~EKLMDigitizer() {};
+
+    //! Read hits from the store
+    void readSimHits();
 
     //! Get hits from the collection
     void getSimHits();
@@ -61,8 +62,8 @@ namespace Belle2 {
     //! vector of EKLMStripHits
     std::vector<EKLMStripHit*> m_HitVector;
 
-    //! sim hits collection
-    EKLMSimHitsCollection* m_HitCollection;
+    //! sim hits vector
+    std::vector<EKLMSimHit*> m_simHitsVector;
 
     //! converts energy depostion to the number of photo electrons. Not fully implemented yet
     int energyToPhotoElectrons(double  , double , bool isMirrored = false);

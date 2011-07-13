@@ -44,6 +44,7 @@
 #include <boost/foreach.hpp>
 
 #include "TMath.h"
+#include <math.h>
 
 using namespace std;
 using namespace Belle2;
@@ -270,6 +271,9 @@ void GenFitterModule::event()
         B2INFO("       Status of fit: " << genfitStatusFlag);
         B2INFO("       Chi2 of the fit: " << gfTrack.getChiSqu());
         B2INFO("       NDF of the fit: " << gfTrack.getNDF());
+        //Calculate probability
+        double pValue = TMath::Prob(gfTrack.getChiSqu(), gfTrack.getNDF());
+        B2INFO("       pValue of the fit: " << pValue);
 
         if (genfitStatusFlag != 0) {
           B2WARNING("Genfit returned an error (with status flag " << genfitStatusFlag << ") during the fit!");
@@ -294,7 +298,7 @@ void GenFitterModule::event()
             B2DEBUG(100, "Track direction in POCA: " << dirInPoca.x() << "  " << dirInPoca.y() << "  " << dirInPoca.z());
             //Now choose a correct reference plane to get the momentum
             GFDetPlane plane(poca, dirInPoca);
-            B2INFO("       Momentum: " << gfTrack.getMom(plane).x() << "  " << gfTrack.getMom(plane).y() << "  " << gfTrack.getMom(plane).z());
+            //B2INFO("       Momentum: " << gfTrack.getMom(plane).x() << "  " << gfTrack.getMom(plane).y() << "  " << gfTrack.getMom(plane).z());
 
             //Now calculate the parameters needed for helix parametrization to fill the Track objects
             //determine track radius for the curvature
@@ -307,38 +311,34 @@ void GenFitterModule::event()
             B2DEBUG(100, "Track radius: " << R);
 
             //determine the angle phi, distribute it from -pi to pi
-            double phi;
-            if (dirInPoca.x() >= 0 && dirInPoca.y() >= 0)
-              phi = atan(dirInPoca.y() / dirInPoca.x());
-            if (dirInPoca.x() < 0 && dirInPoca.y() > 0)
-              phi = atan(dirInPoca.y() / dirInPoca.x()) + TMath::Pi();
-            if (dirInPoca.x() < 0 && dirInPoca.y() < 0)
-              phi = atan(dirInPoca.y() / dirInPoca.x()) - TMath::Pi();
-            if (dirInPoca.x() >= 0 && dirInPoca.y() < 0)
-              phi = atan(dirInPoca.y() / dirInPoca.x());
+            double phi = atan2(dirInPoca.y() , dirInPoca.x());
 
             //determine sign of d0
-
+            //calculate the sign of the projection of pt(dirInPoca) at d0(poca)
             double d0Sign = TMath::Sign(1., poca.x() * dirInPoca.x()
                                         + poca.y() * dirInPoca.y());
+
             B2DEBUG(100, "D0 sign " << d0Sign);
 
             //Now set the helix parameters
             tracks[trackCounter]->setD0(d0Sign * sqrt(poca.x() * poca.x()
                                                       + poca.y() * poca.y()));
             tracks[trackCounter]->setPhi(phi);
-            tracks[trackCounter]->setOmega(1 / (2 * R) * gfTrack.getCharge());
+            tracks[trackCounter]->setOmega((gfTrack.getCharge() / R));
             tracks[trackCounter]->setZ0(poca.z());
             tracks[trackCounter]->setCotTheta(dirInPoca.z() / (sqrt(dirInPoca.x()
                                                                     * dirInPoca.x() + dirInPoca.y() * dirInPoca.y())));
+            //Set non-helix parameters
             tracks[trackCounter]->setChi2(gfTrack.getChiSqu());
+            tracks[trackCounter]->setNHits(gfTrack.getNumHits());
+
 
             //Print helix parameters
             B2INFO(">>>>>>> Helix Parameters <<<<<<<");
             B2INFO("D0: " << std::setprecision(3) << tracks[trackCounter]->getD0() << "  Phi: " << std::setprecision(3) << tracks[trackCounter]->getPhi() << "  Omega: " << std::setprecision(3) << tracks[trackCounter]->getOmega() << "  Z0: " << std::setprecision(3) << tracks[trackCounter]->getZ0() << "  CotTheta: " << std::setprecision(3) << tracks[trackCounter]->getCotTheta());
             B2INFO("<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>");
             //Additional check
-            //B2INFO("Check: recalculate momentum  px: "<<abs(1.5*0.00299792458/(2*tracks[trackCounter]->getOmega()))*cos(tracks[trackCounter]->getPhi())<<"  py: "<<abs(1.5*0.00299792458/(2*tracks[trackCounter]->getOmega()))*sin(tracks[trackCounter]->getPhi())<<"  pz: "<<abs(1.5*0.00299792458/(2*tracks[trackCounter]->getOmega()))*tracks[trackCounter]->getCotTheta());
+            B2INFO("Check: recalculate momentum  px: " << abs(1.5*0.00299792458 / (tracks[trackCounter]->getOmega()))*cos(tracks[trackCounter]->getPhi()) << "  py: " << abs(1.5*0.00299792458 / (tracks[trackCounter]->getOmega()))*sin(tracks[trackCounter]->getPhi()) << "  pz: " << abs(1.5*0.00299792458 / (tracks[trackCounter]->getOmega()))*tracks[trackCounter]->getCotTheta());
 
           }
 

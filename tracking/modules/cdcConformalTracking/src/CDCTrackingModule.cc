@@ -217,7 +217,7 @@ void CDCTrackingModule::event()
     }
 
     BOOST_FOREACH(int hitID, indexList) {
-      trackCandidates[i]->addHit(1, hitID);
+      trackCandidates[i]->addHit(2, hitID);
     }
 
     //Create also a relation between the GFTrackCandidate and the RecoHits

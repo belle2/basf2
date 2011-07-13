@@ -13,6 +13,9 @@
 #include <framework/dataobjects/RelationT.h>
 
 namespace Belle2 {
+
+  /** This implementation of Relations is soon to be obsolete. Please use the new Relations system.
+   */
   typedef RelationT<UShort_t> Relation;
 } // namespace Belle2
 #endif // RELATION

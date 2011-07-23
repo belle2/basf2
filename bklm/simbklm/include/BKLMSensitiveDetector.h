@@ -8,18 +8,18 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef BKLMSENSETIVEDETECTOR_H
-#define BKLMSENSETIVEDETECTOR_H
+#ifndef BKLMSENSITIVEDETECTOR_H
+#define BKLMSENSITIVEDETECTOR_H
 
-#include <bklm/bklmhit/BKLMSimHit.h>
+#include <bklm/hitbklm/BKLMSimHit.h>
 #include <simulation/kernel/SensitiveDetectorBase.h>
 
+#include <TRandom3.h>
 
 namespace Belle2 {
 
   //! The Class for BKLM Sensitive Detector
-  //! Each qualified simulation step is saved into a collection of BKLMSimHits.
-
+  //! Each qualified simulation step is saved into a StoreArray of BKLMSimHits.
   class BKLMSensitiveDetector: public Simulation::SensitiveDetectorBase {
 
   public:
@@ -28,9 +28,9 @@ namespace Belle2 {
     BKLMSensitiveDetector(G4String name);
 
     //! Destructor
-    ~BKLMSensitiveDetector() {};
+    ~BKLMSensitiveDetector() {}
 
-    //! Register BKLM hits collection
+    //! Initialize storage of hits for one event
     void Initialize(G4HCofThisEvent*);
 
     //! Process each step in the BKLM
@@ -40,33 +40,33 @@ namespace Belle2 {
     void EndOfEvent(G4HCofThisEvent*);
 
     //! Overlay one random background event
-    void AddbgOne(bool);
+    //void AddbgOne( bool );
 
   private:
 
-    //! Get HEP particle ID of this track's oldest ancestor
-    G4int  GetAncestorPID(G4Track*);
+    //! Find and record matching RPC strips for each simHit
+    void convertHitToRPCStrips(BKLMSimHit*);
 
-    //! Get HEP particle ID of the event-level parent of this track
-    G4int  GetFirstPID();
-
-    //! simulated-hits collection
-    BKLMSimHitsCollection* m_HitsCollection;
-
-    //! unique ID for simulated-hits collection
-    G4int m_HCID;
-
-    //! identifier of RPC gas material
-    G4Material* m_RPCGas;
+    //! Flag to say whether background study will be done or not
+    bool m_DoBackgroundStudy;
 
     //! PDG encoding for neutron
-    G4int m_neutronPID;
+    int m_NeutronPID;
 
     //! maximum permissible hit time (based on overflow of LeCroy 1877 TDC)
-    G4double m_hitTimeMax;
+    double m_HitTimeMax;
+
+    //! Random number generator
+    TRandom3* m_Random;
+
+    //! Hit number within one event
+    int m_HitNumber;
+
+    //! Flag to enforce once-only initializations in Initialize()
+    bool m_FirstCall;
 
   };
 
 } // end of namespace Belle2
 
-#endif
+#endif // BKLMSENSITIVEDETECTOR_H

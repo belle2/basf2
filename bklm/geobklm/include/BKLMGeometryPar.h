@@ -11,378 +11,373 @@
 #ifndef BKLMGEOMETRYPAR_H
 #define BKLMGEOMETRYPAR_H
 
-#include <vector>
-#include <string>
+#include "bklm/geobklm/BKLMSector.h"
+#include "bklm/geobklm/BKLMModule.h"
 
-#include "TVector3.h"
+#include <vector>
+
+#include "CLHEP/Vector/ThreeVector.h"
 
 namespace Belle2 {
 
-//! The Class for BKLM Geometry Parameters
-  /*! This class provides BKLM geometry parameters for simulation, reconstruction and so on.
-      These parameters are obtained from Gearbox.
-      Length is measured along the z axis.
-      Height is measured in the xy plane along a radial axis at the centre of a polygon side.
-      Width is measured in the xy plane along the tangent to a polygon side.
+  //! Provides BKLM geometry parameters for simulation, reconstruction etc (from Gearbox)
+  /*! Length is measured along the z axis.
+      Height is measured in the r-phi plane along a radial axis at the centre of a polygon side.
+      Width is measured in the r-phi plane along the tangent to a polygon side.
   */
   class BKLMGeometryPar {
 
+    //! Output function
+    //friend std::ostream& operator<<( std::ostream& out, const KlmGeo& geo );
+
   public:
 
-    //! Constructor
-    BKLMGeometryPar();
-
-    //! Destructor
-    virtual ~BKLMGeometryPar();
-
-    //! Static method to get a reference to the BKLMGeometryPar instance.
-    /*!
-        \return A reference to an instance of this class.
-    */
-
-    static BKLMGeometryPar* Instance();
+    //! Static method to get a reference to the singleton BKLMGeometryPar instance
+    static BKLMGeometryPar* instance();
 
     //! Clear all geometry parameters
     void clear();
 
-    //! Get geometry parameters from Gearbox.
+    //! Get geometry parameters from Gearbox
     void read();
 
-    //! to get the inner radius of specified (int input) layer
-    const double layerRmin(int) const;
+    //! Get the inner radius of specified layer
+    const double getLayerInnerRadius(int layer) const;
 
-    //! to get the outer radius of specified (int input) layer
-    const double layerRmax(int) const;
+    //! Get the outer radius of specified layer
+    const double getLayerOuterRadius(int layer) const;
 
-    //! To get the sizes (x,y,z) of the gap [=slot] of specified (int input) layer
-    const TVector3 gapSize(int, bool) const;
+    //! Get the size (dx,dy,dz) of the gap [=slot] of specified layer
+    const CLHEP::Hep3Vector getGapSize(int layer, bool hasChimney) const;
 
-    //! To get the sizes (x,y,z) of the detector module of specified (int input) layer
-    const TVector3 moduleSize(int, bool) const;
+    //! Get the size (dx,dy,dz) of the detector module of specified layer
+    const CLHEP::Hep3Vector getModuleSize(int layer, bool hasChimney) const;
 
-    //! To get the sizes (x,y,z) of the detector module's readout of specified (int input) layer
-    const TVector3 readoutSize(int, bool) const;
+    //! Get the size (dx,dy,dz) of the detector module's readout of specified layer
+    const CLHEP::Hep3Vector getReadoutSize(int layer, bool hasChimney) const;
 
-    //! To get the sizes (x,y,z) of the detector module's electrode of specified (int input) layer
-    const TVector3 electrodeSize(int, bool) const;
+    //! Get the size (dx,dy,dz) of the detector module's electrode of specified layer
+    const CLHEP::Hep3Vector getElectrodeSize(int layer, bool hasChimney) const;
 
-    //! To get the sizes (x,y,z) of the detector module's gas gap (2 per module) of specified (int input) layer
-    const TVector3 gasSize(int, bool) const;
+    //! Get the size (dx,dy,dz) of the detector module's gas gaps of specified layer
+    const CLHEP::Hep3Vector getGasSize(int layer, bool hasChimney) const;
 
-    //! to get the midpoint radius of the gap [=slot] of specified (int input) layer
-    const double gapR(int) const;
+    //! Get the radial midpoint of the gap of specified layer
+    const double getGapMiddleRadius(int layer) const;
 
-    //! to get the midpoint radius of the detector module of specified (int input) layer
-    const double moduleR(int) const;
+    //! Get the radial midpoint of the detector module of specified layer
+    const double getModuleMiddleRadius(int layer) const;
 
-    //! to get the global rotation about Z of the entire BKLM
-    const double &rotation(void) const {return m_rotation;}
+    //! Get the global rotation angle about z of the entire BKLM
+    const double getRotation(void) const { return m_Rotation; }
 
-    //! to get the global shift along Z of the entire BKLM
-    const double &offsetZ(void) const {return m_offsetZ;}
+    //! Get the global shift along a of the entire BKLM
+    const double getOffsetZ(void) const { return m_OffsetZ; }
 
-    //! to get the starting angle of the polygon shape
-    const double &phi(void) const {return m_phi;}
+    //! Get the starting angle of the BKLM's polygon shape
+    const double getPhi(void) const { return m_Phi; }
 
-    //! to get the outer radius of the solenoid
-    const double &rsolenoid(void) const {return m_rsolenoid;}
+    //! Get the outer radius of the solenoid
+    const double getSolenoidOuterRadius(void) const { return m_SolenoidOuterRadius; }
 
-    //! to get the number of sides of the polygon [8]
-    const int &nsides(void) const {return m_nsides;}
+    //! Get the number of sectors of the BKLM
+    const int getNSector(void) const { return m_NSector; }
 
-    //! to get the half-length along Z of the BKLM
-    const double &length(void) const {return m_length;}
+    //! Get the half-length along z of the BKLM
+    const double getHalfLength(void) const { return m_HalfLength; }
 
-    //! to get the radius of the circle tangent to the sides of the outer polygon
-    const double &rmax(void) const {return m_rmax;}
+    //! Get the radius of the inscribed circle of the outer polygon
+    const double getOuterRadius(void) const { return m_OuterRadius; }
 
-    //! to get the number of sectors(=nsides) of the BKLM
-    const int &nsector(void) const {return m_nsides;}
+    //! Get the number of modules in one sector
+    const int getNLayer(void) const { return m_NLayer; }
 
-    //! to get the number of modules in one sector
-    const int &nlayer(void) const {return m_nlayer;}
+    //! Get the nominal height of a layer's structural iron
+    const double getIronNominalHeight(void) const { return m_IronNominalHeight; }
 
-    //! to get the nominal height of a layer's structural iron
-    const double &height_iron(void) const {return m_height_iron;}
+    //! Get the actual height of a layer's structural iron
+    const double getIronActualHeight(void) const { return m_IronActualHeight; }
 
-    //! to get the measured height of a layer's structural iron
-    const double &height_iron_meas(void) const {return m_height_iron_meas;}
+    //! Get the radius of the inner tangent circle of gap 0 (innermost)
+    const double getGap0InnerRadius(void) const { return m_Gap0InnerRadius; }
 
-    //! to get the radius of the inner tangent circle of gap 0 (innermost)
-    const double &rmin_gap0(void) const {return m_rmin_gap0;}
+    //! Get the nominal height of the innermost gap
+    const double getGap0NominalHeight(void) const { return m_Gap0NominalHeight; }
 
-    //! to get the nominal height of the innermost gap
-    const double &height_gap0(void) const {return m_height_gap0;}
+    //! Get the actual height of the innermost gap
+    const double getGap0ActualHeight(void) const { return m_Gap0ActualHeight; }
 
-    //! to get the measured height of the innermost gap
-    const double &height_gap0_meas(void) const {return m_height_gap0_meas;}
+    //! Get the width (at the outer radius) of the adjacent structural iron on either side of innermost gap
+    const double getGap0IronWidth(void) const { return m_Gap0IronWidth; }
 
-    //! to get the half-width of the adjacent structural iron at the inner radius of innermost gap
-    const double &dsx_gap0(void) const {return m_dsx_gap0;}
+    //! Get the length along z of the module gap
+    const double getGapLength(void) const { return m_GapLength; }
 
-    //! to get the length along Z of the module gap
-    const double &length_gap(void) const {return m_length_gap;}
+    //! Get the nominal height of the outer gaps
+    const double getGapNominalHeight(void) const { return m_GapNominalHeight; }
 
-    //! to get the nominal height of the outer gaps
-    const double &height_gap(void) const {return m_height_gap;}
+    //! Get the actual height of the outer gaps
+    const double getGapActualHeight(void) const { return m_GapActualHeight; }
 
-    //! to get the measured height of the outer gaps
-    const double &height_gap_meas(void) const {return m_height_gap_meas;}
+    //! Get the width (at the outer radius) of the adjacent structural iron on either side of a gap
+    const double getGapIronWidth(void) const { return m_GapIronWidth; }
 
-    //! to get the half-width of the adjacent structural iron at the inner radius of the outer gaps
-    const double &dsx_gap(void) const {return m_dsx_gap;}
+    //! Get the radius of the inner tangent circle of gap 1 (next-to-innermost)
+    const double getGapInnerRadius(void) { return m_GapInnerRadius; }
 
-    //! to get the radius of the inner tangent circle of gap 1 (next-to-innermost)
-    const double &rmin_gap1(void) {return m_rmin_gap1;}
+    //! Get the length along z of the module
+    const double getModuleLength(void) { return m_ModuleLength; }
 
-    //! to get the length along Z of the module
-    const double &length_mod(void) {return m_length_mod;}
+    //! Get the length along z of the module
+    const double getModuleLengthChimney(void) { return m_ModuleLengthChimney; }
 
-    //! to get the length along Z of the module
-    const double &length_mod_chimney(void) {return m_length_mod_chimney;}
+    //! Get the height of the module's aluminum cover (2 per module)
+    const double getModuleCoverHeight(void) { return m_ModuleCoverHeight; }
 
-    //! to get the height of the module's aluminum cover (2 per module)
-    const double &height_cover(void) {return m_height_cover;}
+    //! Get the height of the module's readout or ground copper plane (4 per module)
+    const double getModuleCopperHeight(void) { return m_ModuleCopperHeight; }
 
-    //! to get the height of the module's readout or ground copper plane (2 per module)
-    const double &height_copper(void) {return m_height_copper;}
+    //! Get the height of the module's transmission-line foam (2 per module)
+    const double getModuleFoamHeight(void) { return m_ModuleFoamHeight; }
 
-    //! to get the height of the module's transmission-line foam (2 per module)
-    const double &height_foam(void) {return m_height_foam;}
+    //! Get the height of the module's insulating mylar (2 per module)
+    const double getModuleMylarHeight(void) { return m_ModuleMylarHeight; }
 
-    //! to get the height of the module's insulating mylar (2 per module)
-    const double &height_mylar(void) {return m_height_mylar;}
+    //! Get the height of the module's glass electrode (4 per module)
+    const double getModuleGlassHeight(void) { return m_ModuleGlassHeight; }
 
-    //! to get the height of the module's glass electrode (4 per module)
-    const double &height_glass(void) {return m_height_glass;}
+    //! Get the height of the module's gas gap (2 per module)
+    const double getModuleGasHeight(void) { return m_ModuleGasHeight; }
 
-    //! to get the height of the module's gas gap (2 per module)
-    const double &height_gas(void) {return m_height_gas;}
+    //! Get the height of the module
+    const double getModuleHeight(void) { return m_ModuleHeight; }
 
-    //! to get the height of the module
-    const double &height_mod(void) {return m_height_mod;}
+    //! Get the width of the module's perimeter aluminum frame
+    const double getModuleFrameWidth(void) { return m_ModuleFrameWidth; }
 
-    //! to get the width of the module's perimeter aluminum frame
-    const double &width_frame(void) {return m_width_frame;}
+    //! Get the width of the module's gas-gap's perimeter spacer
+    const double getModuleGasSpacerWidth(void) { return m_ModuleGasSpacerWidth; }
 
-    //! to get the width of the module's gas-gap's perimeter spacer
-    const double &width_spacer(void) {return m_width_spacer;}
+    //! Get the size of the border between a detector module's perimeter and electrode
+    const double getModuleElectrodeBorder(void) { return m_ModuleElectrodeBorder; }
 
-    //! to get the size of the chimney hole by layer
-    const TVector3 size_chimney(int) const;
+    //! Get the size of the chimney hole in the specified layer
+    const CLHEP::Hep3Vector getChimneySize(int layer) const;
 
-    //! to get the position of the chimney hole by layer
-    const TVector3 pos_chimney(int) const;
+    //! Get the position of the chimney hole in the specified layer
+    const CLHEP::Hep3Vector getChimneyPosition(int layer) const;
 
-    //! to get the thickness of the chimney cover plate
-    const double &cover_chimney(void) {return m_cover_chimney;}
+    //! Get the thickness of the chimney cover plate
+    const double getChimneyCoverThickness(void) { return m_ChimneyCoverThickness; }
 
-    //! to get the inner radius of the chimney housing
-    const double &chimney_housing_rmin(void) {return m_chimney_housing_rmin;}
+    //! Get the inner radius of the chimney housing
+    const double getChimneyHousingInnerRadius(void) { return m_ChimneyHousingInnerRadius; }
 
-    //! to get the outer radius of the chimney housing
-    const double &chimney_housing_rmax(void) {return m_chimney_housing_rmax;}
+    //! Get the outer radius of the chimney housing
+    const double getChimneyHousingOuterRadius(void) { return m_ChimneyHousingOuterRadius; }
 
-    //! to get the inner radius of the chimney radiation shield
-    const double &chimney_shield_rmin(void) {return m_chimney_shield_rmin;}
+    //! Get the inner radius of the chimney radiation shield
+    const double getChimneyShieldInnerRadius(void) { return m_ChimneyShieldInnerRadius; }
 
-    //! to get the outer radius of the chimney radiation shield
-    const double &chimney_shield_rmax(void) {return m_chimney_shield_rmax;}
+    //! Get the outer radius of the chimney radiation shield
+    const double getChimneyShieldOuterRadius(void) { return m_ChimneyShieldOuterRadius; }
 
-    //! to get the inner radius of the chimney pipe
-    const double &chimney_pipe_rmin(void) {return m_chimney_pipe_rmin;}
+    //! Get the inner radius of the chimney pipe
+    const double getChimneyPipeInnerRadius(void) { return m_ChimneyPipeInnerRadius; }
 
-    //! to get the outer radius of the chimney pipe
-    const double &chimney_pipe_rmax(void) {return m_chimney_pipe_rmax;}
+    //! Get the outer radius of the chimney pipe
+    const double getChimneyPipeOuterRadius(void) { return m_ChimneyPipeOuterRadius; }
 
-    //! to get the thickness of the radial rib that supports the solenoid / inner detectors
-    const double &thickness_rib(void) {return m_thickness_rib;}
+    //! Get the thickness of the radial rib that supports the solenoid / inner detectors
+    const double getRibThickness(void) { return m_RibThickness; }
 
-    //! to get the width of the cable-services channel at each end
-    const double &width_cables(void) {return m_width_cables;}
+    //! Get the width of the cable-services channel at each end
+    const double getCablesWidth(void) { return m_CablesWidth; }
 
-    //! to get the width of the brace in the middle of the cable-services channel
-    const double &width_brace(void) {return m_width_brace;}
+    //! Get the width of the brace in the middle of the cable-services channel
+    const double getBraceWidth(void) { return m_BraceWidth; }
 
-    //! to get the width of the brace in the middle of the cable-services channel in the chimney sector
-    const double &width_brace_chimney(void) {return m_width_brace_chimney;}
+    //! Get the width of the brace in the middle of the cable-services channel in the chimney sector
+    const double getBraceWidthChimney(void) { return m_BraceWidthChimney; }
 
-    //! to get the size of the layer-0 support plate
-    const TVector3 size_support_plate(bool) const;
+    //! Get the size of the layer-0 support plate
+    const CLHEP::Hep3Vector getSupportPlateSize(bool) const;
+
+    //! Get the pointer to the definition of a sector
+    const BKLMSector* findSector(int frontBack, int sector) const;
+
+    //! Print all sector and module definitions
+    void printTree(void) const;
 
   private:
 
-    //
-    //Vessel
-    //
+    //! Hidden constructor
+    BKLMGeometryPar();
 
-    //! variable for the global rotation about Z of the BKLM
-    double m_rotation;
+    //! Hidden copy constructor
+    BKLMGeometryPar(BKLMGeometryPar&);
 
-    //! variable for the global offset along Z of the BKLM
-    double m_offsetZ;
+    //! Hidden copy assignment
+    BKLMGeometryPar& operator=(const BKLMGeometryPar&);
+
+    //! Hidden destructor
+    ~BKLMGeometryPar();
+
+    //! variable for the global rotation about z of the BKLM
+    double m_Rotation;
+
+    //! variable for the global offset along z of the BKLM
+    double m_OffsetZ;
 
     //! variable for the starting angle of the polygon shape
-    double m_phi;
+    double m_Phi;
 
-    //! variable for the number of sides (=8 : octagonal)
-    int m_nsides;
+    //! variable for the number of sectors (=8 : octagonal)
+    int m_NSector;
 
     //! variable for the outer radius of the solenoid
-    double m_rsolenoid;
+    double m_SolenoidOuterRadius;
 
     //! variable for the radius of the circle tangent to the sides of the outer polygon
-    double m_rmax;
+    double m_OuterRadius;
 
-    //! variable for the half-length along Z of the BKLM
-    double m_length;
-
-    //
-    //BKLM layer
-    //
+    //! variable for the half-length along z of the BKLM
+    double m_HalfLength;
 
     //! variable for the number of layers in one sector
-    int m_nlayer;
+    int m_NLayer;
 
     //! variable for the nominal height of a layer's structural iron
-    double m_height_iron;
+    double m_IronNominalHeight;
 
-    //! variable for the measured height of a layer's stuctural iron
-    double m_height_iron_meas;
+    //! variable for the actual height of a layer's stuctural iron
+    double m_IronActualHeight;
 
     //! variable for the radius of the inner tangent circle of the innermost gap
-    double m_rmin_gap0;
+    double m_Gap0InnerRadius;
 
     //! variable for the nominal height of the innermost gap
-    double m_height_gap0;
+    double m_Gap0NominalHeight;
 
-    //! variable for the measured height of the innermost gap
-    double m_height_gap0_meas;
+    //! variable for the actual height of the innermost gap
+    double m_Gap0ActualHeight;
 
     //! variable for the height of layer 0: internal use only
-    double m_height_layer0;
+    double m_Layer0Height;
 
     //! variable for the height of a layer: internal use only
-    double m_height_layer;
+    double m_LayerHeight;
 
-    //! variable for half-width of the adjacent structural iron at the inner radius of the innermost gap
-    double m_dsx_gap0;
+    //! variable for width (at the outer radius) of the adjacent structural iron on either side of innermost gap
+    double m_Gap0IronWidth;
 
-    //! variable for the length along Z of each gap
-    double m_length_gap;
+    //! variable for the length along z of each gap
+    double m_GapLength;
 
     //! variable for the nominal height of outer gaps
-    double m_height_gap;
+    double m_GapNominalHeight;
 
-    //! variable for the measured height of outer gaps
-    double m_height_gap_meas;
+    //! variable for the actual height of outer gaps
+    double m_GapActualHeight;
 
-    //! variable for the half-width of the adjacent structural iron at the inner radius of outer gaps
-    double m_dsx_gap;
+    //! variable for the width (at the outer radius) of the adjacent structural iron on either side of a gap
+    double m_GapIronWidth;
 
-    //! variable for the radius of the inner tangent circle of gap 1 (next-to-innermost)
-    double m_rmin_gap1;
+    //! variable for the radius of the inner tangent circle of virtual gap 0 (assuming equal-height layers)
+    double m_GapInnerRadius;
 
-    //! variable for the length along Z of the module
-    double m_length_mod;
+    //! variable for the length along z of the module
+    double m_ModuleLength;
 
-    //! variable for the length along Z of the module in the chimney sector
-    double m_length_mod_chimney;
+    //! variable for the length along z of the module in the chimney sector
+    double m_ModuleLengthChimney;
 
     //! variable for the height of a detector module's aluminum cover
-    double m_height_cover;
+    double m_ModuleCoverHeight;
 
     //! variable for the height of a detector module's copper readout or ground plane
-    double m_height_copper;
+    double m_ModuleCopperHeight;
 
     //! variable for the height of a detector module's transmission-line foam
-    double m_height_foam;
+    double m_ModuleFoamHeight;
 
     //! variable for the height of a detector module's mylar insulation
-    double m_height_mylar;
+    double m_ModuleMylarHeight;
 
     //! variable for the height of a detector module's readout
-    double m_height_readout;
+    double m_ModuleReadoutHeight;
 
     //! variable for the height of a detector module's glass electrode
-    double m_height_glass;
+    double m_ModuleGlassHeight;
 
     //! variable for the height of a detector module's gas gap
-    double m_height_gas;
+    double m_ModuleGasHeight;
 
     //! variable for the height of a detector module
-    double m_height_mod;
+    double m_ModuleHeight;
 
     //! variable for the width of a detector module's frame
-    double m_width_frame;
+    double m_ModuleFrameWidth;
 
     //! variable for the width of a detector module's spacer
-    double m_width_spacer;
+    double m_ModuleGasSpacerWidth;
 
-    //! variable for the length along Z of the chimney hole
-    double m_length_chimney;
+    //! variable for the size of the border between a detector module's perimeter and electrode
+    double m_ModuleElectrodeBorder;
 
-    //! variable for the height (per layer) of the chimney hole
-    double m_height_chimney;
+    //! variable for the length along z of the chimney hole
+    double m_ChimneyLength;
 
     //! variable for the width of the chimney hole
-    double m_width_chimney;
+    double m_ChimneyWidth;
 
     //! variable for the thickness of the chimney's iron cover plate
-    double m_cover_chimney;
-
-    //! variable for the x position of the chimney hole
-    double m_x_chimney;
-
-    //! variable for the y position of the chimney hole
-    double m_y_chimney;
-
-    //! variable for the z position of the chimney hole
-    double m_z_chimney;
+    double m_ChimneyCoverThickness;
 
     //! variable for the inner radius of the chimney housing
-    double m_chimney_housing_rmin;
+    double m_ChimneyHousingInnerRadius;
 
     //! variable for the outer radius of the chimney housing
-    double m_chimney_housing_rmax;
+    double m_ChimneyHousingOuterRadius;
 
     //! variable for the inner radius of the chimney shield
-    double m_chimney_shield_rmin;
+    double m_ChimneyShieldInnerRadius;
 
     //! variable for the outer radius of the chimney shield
-    double m_chimney_shield_rmax;
+    double m_ChimneyShieldOuterRadius;
 
     //! variable for the inner radius of the chimney pipe
-    double m_chimney_pipe_rmin;
+    double m_ChimneyPipeInnerRadius;
 
     //! variable for the outer radius of the chimney pipe
-    double m_chimney_pipe_rmax;
+    double m_ChimneyPipeOuterRadius;
 
     //! variable for the thickness of the radial rib that supports the solenoid / inner detectors
-    double m_thickness_rib;
+    double m_RibThickness;
 
     //! variable for the width of the cable-services channel at each end
-    double m_width_cables;
+    double m_CablesWidth;
 
     //! variable for the width of the central brace in the middle of the cable-services channel
-    double m_width_brace;
+    double m_BraceWidth;
 
     //! variable for the width of the central brace in the middle of the cable-services channel in the chimney sector
-    double m_width_brace_chimney;
+    double m_BraceWidthChimney;
 
     //! variable for the width of the innermost-module support plate
-    double m_width_support_plate;
+    double m_SupportPlateWidth;
 
     //! variable for the height of the innermost-module support plate
-    double m_height_support_plate;
+    double m_SupportPlateHeight;
+
+    //! vector of pointers to defined sectors
+    std::vector<BKLMSector*> m_Sectors;
 
     //! static pointer to the singleton instance of this class
-    static BKLMGeometryPar* m_BKLMGeometryParDB;
+    static BKLMGeometryPar* m_Instance;
 
   };
 
-//-----------------------------------------------------------------------------
-
 } // end of namespace Belle2
 
-#endif
+#endif // BKLMGEOMETRYPAR_H

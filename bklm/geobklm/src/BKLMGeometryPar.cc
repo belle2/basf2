@@ -8,27 +8,21 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+#include <bklm/geobklm/BKLMGeometryPar.h>
+
 #include <framework/gearbox/Gearbox.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
 
-#include <bklm/geobklm/BKLMGeometryPar.h>
-
-#include <cmath>
-#include <boost/format.hpp>
-#include <iostream>
-#include <fstream>
-
 using namespace std;
-using namespace boost;
 using namespace Belle2;
 
-BKLMGeometryPar* BKLMGeometryPar::m_BKLMGeometryParDB = 0;
+BKLMGeometryPar* BKLMGeometryPar::m_Instance = NULL;
 
-BKLMGeometryPar* BKLMGeometryPar::Instance()
+BKLMGeometryPar* BKLMGeometryPar::instance()
 {
-  if (!m_BKLMGeometryParDB) m_BKLMGeometryParDB = new BKLMGeometryPar();
-  return m_BKLMGeometryParDB;
+  if (!m_Instance) m_Instance = new BKLMGeometryPar();
+  return m_Instance;
 }
 
 BKLMGeometryPar::BKLMGeometryPar()
@@ -43,230 +37,254 @@ BKLMGeometryPar::~BKLMGeometryPar()
 
 void BKLMGeometryPar::clear()
 {
-  m_rotation         = 0.0;
-  m_offsetZ          = 0.0;
-  m_phi              = 0.0;
-  m_nsides           = 0;
-  m_rsolenoid        = 0.0;
-  m_rmax             = 0.0;
-  m_length           = 0.0;
-  m_nlayer           = 0;
-  m_height_iron      = 0.0;
-  m_height_iron_meas = 0.0;
-  m_height_gap0      = 0.0;
-  m_height_gap0_meas = 0.0;
-  m_height_gap       = 0.0;
-  m_height_gap_meas  = 0.0;
-  m_height_layer     = 0.0;
-  m_rmin_gap0        = 0.0;
-  m_rmin_gap1        = 0.0;
-  m_dsx_gap0         = 0.0;
-  m_dsx_gap          = 0.0;
-  m_length_gap       = 0.0;
-  m_length_mod       = 0.0;
-  m_length_mod_chimney = 0.0;
-  m_height_cover     = 0.0;
-  m_height_copper    = 0.0;
-  m_height_foam      = 0.0;
-  m_height_mylar     = 0.0;
-  m_height_glass     = 0.0;
-  m_height_gas       = 0.0;
-  m_height_readout   = 0.0;
-  m_height_mod       = 0.0;
-  m_width_frame      = 0.0;
-  m_width_spacer     = 0.0;
-  m_length_chimney   = 0.0;
-  m_height_chimney   = 0.0;
-  m_width_chimney    = 0.0;
-  m_cover_chimney    = 0.0;
-  m_x_chimney        = 0.0;
-  m_y_chimney        = 0.0;
-  m_z_chimney        = 0.0;
-  m_thickness_rib    = 0.0;
-  m_width_cables     = 0.0;
-  m_width_brace      = 0.0;
-  m_width_brace_chimney = 0.0;
-  m_width_support_plate  = 0.0;
-  m_height_support_plate = 0.0;
 }
 
 void BKLMGeometryPar::read()
 {
   // Get Gearbox parameters for BKLM
+  // NOTE:  Layer id="n" is referenced here as Layer[n+1]
   GearDir content = Gearbox::Instance().getContent("BKLM");
 
-  //Polygonal vessel
-  m_rotation = content.getParamAngle("Rotation");
-  m_offsetZ = content.getParamLength("OffsetZ");
-  m_phi = content.getParamLength("Phi");
-  m_nsides = int(content.getParamLength("Nsides"));
-  m_rsolenoid = content.getParamLength("SolenoidRadius");
-  m_rmax = content.getParamLength("OuterRadius");
-  m_length = content.getParamLength("Length");
-  m_nlayer = int(content.getParamLength("Nlayer"));
+  m_Rotation = content.getParamAngle("Rotation");
+  m_OffsetZ = content.getParamLength("OffsetZ");
+  m_Phi = content.getParamLength("Phi");
+  m_NSector = content.getNumberNodes("Sectors/Forward/Sector");
+  m_SolenoidOuterRadius = content.getParamLength("SolenoidOuterRadius");
+  m_OuterRadius = content.getParamLength("OuterRadius");
+  m_HalfLength = content.getParamLength("HalfLength");
+  m_NLayer = content.getNumberNodes("Layers/Layer");
 
-  //Each layer
+  m_IronNominalHeight = content.getParamLength("Layers/IronNominalHeight");
+  m_IronActualHeight = content.getParamLength("Layers/IronActualHeight");
 
-  m_height_iron      = content.getParamLength("Layer/HeightIron");
-  m_height_iron_meas = content.getParamLength("Layer/HeightIronMeas");
+  m_Gap0NominalHeight = content.getParamLength("Layers/Layer[1]/GapNominalHeight");
+  m_Gap0ActualHeight = m_Gap0NominalHeight + (m_IronNominalHeight - m_IronActualHeight) / 2.0;
 
+  m_GapNominalHeight = content.getParamLength("Layers/GapNominalHeight");
+  m_GapActualHeight = m_GapNominalHeight + (m_IronNominalHeight - m_IronActualHeight);
 
-  m_height_gap0      = content.getParamLength("Layer/HeightGap0");
-  m_height_gap0_meas = m_height_gap0 + (m_height_iron - m_height_iron_meas) / 2.;
+  m_Layer0Height = m_IronNominalHeight + m_Gap0NominalHeight;
+  m_LayerHeight = m_IronNominalHeight + m_GapNominalHeight;
 
-  m_height_gap       = content.getParamLength("Layer/HeightGap");
-  m_height_gap_meas  = m_height_gap + (m_height_iron - m_height_iron_meas);
+  m_Gap0InnerRadius = content.getParamLength("Layers/InnerRadius");
+  m_GapInnerRadius = m_Gap0InnerRadius + m_Layer0Height - m_LayerHeight;
 
-  m_height_layer0    = m_height_iron + m_height_gap0;
-  m_height_layer     = m_height_iron + m_height_gap;
+  m_Gap0IronWidth = content.getParamLength("Layers/Layer[1]/GapIronWidth");
+  m_GapIronWidth = content.getParamLength("Layers/GapIronWidth");
 
-  m_rmin_gap0        = content.getParamLength("Layer/RminGap0");
-  m_rmin_gap1        = m_rmin_gap0 + m_height_layer0;
+  m_GapLength = content.getParamLength("Layers/GapLength");
 
-  m_dsx_gap0         = content.getParamLength("Layer/DSXGap0");
-  m_dsx_gap          = content.getParamLength("Layer/DSXGap");
+  m_ModuleLength = content.getParamLength("Module/Length");
+  m_ModuleLengthChimney = content.getParamLength("Module/LengthChimney");
+  m_ModuleCoverHeight = content.getParamLength("Module/CoverHeight");
+  m_ModuleCopperHeight = content.getParamLength("Module/CopperHeight");
+  m_ModuleFoamHeight = content.getParamLength("Module/FoamHeight");
+  m_ModuleMylarHeight = content.getParamLength("Module/MylarHeight");
+  m_ModuleGlassHeight = content.getParamLength("Module/GlassHeight");
+  m_ModuleGasHeight = content.getParamLength("Module/GasHeight");
+  m_ModuleReadoutHeight = m_ModuleFoamHeight + (m_ModuleCopperHeight + m_ModuleMylarHeight) * 2.0;
+  m_ModuleHeight = (m_ModuleCoverHeight + m_ModuleReadoutHeight + m_ModuleGasHeight + m_ModuleGlassHeight * 2.0) * 2.0;
+  m_ModuleFrameWidth = content.getParamLength("Module/FrameWidth");
+  m_ModuleGasSpacerWidth = content.getParamLength("Module/SpacerWidth");
+  m_ModuleElectrodeBorder = content.getParamLength(" Module/ElectrodeBorder");
 
-  m_length_gap       = content.getParamLength("Layer/Length");
+  m_ChimneyLength = content.getParamLength("Chimney/Length");
+  m_ChimneyWidth = content.getParamLength("Chimney/Width");
+  m_ChimneyCoverThickness = content.getParamLength("Chimney/CoverThickness");
+  m_ChimneyHousingInnerRadius = content.getParamLength("Chimney/HousingInnerRadius");
+  m_ChimneyHousingOuterRadius = content.getParamLength("Chimney/HousingOuterRadius");
+  m_ChimneyShieldInnerRadius = content.getParamLength("Chimney/ShieldInnerRadius");
+  m_ChimneyShieldOuterRadius = content.getParamLength("Chimney/ShieldOuterRadius");
+  m_ChimneyPipeInnerRadius = content.getParamLength("Chimney/PipeInnerRadius");
+  m_ChimneyPipeOuterRadius = content.getParamLength("Chimney/PipeOuterRadius");
+  m_RibThickness = content.getParamLength("RibThickness");
+  m_CablesWidth = content.getParamLength("CablesWidth");
+  m_BraceWidth = content.getParamLength("BraceWidth");
+  m_BraceWidthChimney = content.getParamLength("BraceWidthChimney");
+  m_SupportPlateWidth = content.getParamLength("SupportPlateWidth");
+  m_SupportPlateHeight = content.getParamLength("SupportPlateHeight");
 
-  m_length_mod       = content.getParamLength("Module/Length");
-  m_length_mod_chimney = content.getParamLength("Module/LengthChimney");
-  m_height_cover = content.getParamLength("Module/HeightCover");
-  m_height_copper = content.getParamLength("Module/HeightCopper");
-  m_height_foam = content.getParamLength("Module/HeightFoam");
-  m_height_mylar = content.getParamLength("Module/HeightMylar");
-  m_height_glass = content.getParamLength("Module/HeightGlass");
-  m_height_gas = content.getParamLength("Module/HeightGas");
-  m_height_readout = m_height_foam + (m_height_copper + m_height_mylar) * 2.0;
-  m_height_mod = (m_height_cover + m_height_readout + m_height_gas + m_height_glass * 2.0) * 2.0;
-  m_width_frame = content.getParamLength("Module/WidthFrame");
-  m_width_spacer = content.getParamLength("Module/WidthSpacer");
-
-  m_length_chimney   = content.getParamLength("Chimney/Length");
-  m_height_chimney   = m_rmax - m_rsolenoid;
-  m_width_chimney    = content.getParamLength("Chimney/Width");
-  m_cover_chimney    = content.getParamLength("Chimney/Cover");
-  m_z_chimney        = m_length_gap - m_length_chimney / 2.0;
-  m_chimney_housing_rmin = content.getParamLength("Chimney/HousingRmin");
-  m_chimney_housing_rmax = content.getParamLength("Chimney/HousingRmax");
-  m_chimney_shield_rmin = content.getParamLength("Chimney/ShieldRmin");
-  m_chimney_shield_rmax = content.getParamLength("Chimney/ShieldRmax");
-  m_chimney_pipe_rmin = content.getParamLength("Chimney/PipeRmin");
-  m_chimney_pipe_rmax = content.getParamLength("Chimney/PipeRmax");
-  m_thickness_rib = content.getParamLength("ThicknessRib");
-  m_width_cables = content.getParamLength("WidthCables");
-  m_width_brace = content.getParamLength("WidthBrace");
-  m_width_brace_chimney = content.getParamLength("WidthBraceChimney");
-  m_width_support_plate = content.getParamLength("WidthSupportPlate");
-  m_height_support_plate = content.getParamLength("HeightSupportPlate");
-
-}
-
-
-const double BKLMGeometryPar::layerRmin(int lyr) const
-{
-  if (lyr == 0) {
-    return (m_rmin_gap0);
+  double phiStripWidth[m_NLayer];
+  double phiStripLength[m_NLayer];
+  int    phiStripNumber[m_NLayer];
+  int    phiStripMin[m_NLayer];
+  int    phiStripMax[m_NLayer];
+  double zStripWidth[m_NLayer];
+  double zStripLength[m_NLayer];
+  int    zStripNumber[m_NLayer];
+  char name[40];
+  for (int layer = 0; layer < m_NLayer; ++layer) {
+    sprintf(name, "Layers/Layer[%d]", layer + 1);
+    GearDir layerContent(content);
+    layerContent.append(name);
+    phiStripWidth[layer] = layerContent.getParamLength("/PhiStrips/Width");
+    phiStripLength[layer] = layerContent.getParamLength("/PhiStrips/Length");
+    phiStripNumber[layer] = layerContent.getParamIntValue("/PhiStrips/NStrips");
+    phiStripMin[layer] = (layer == 0 ? 1 : 0);
+    phiStripMax[layer] = (layer == 0 ? phiStripNumber[layer] - 2 : phiStripNumber[layer] - 1);
+    zStripWidth[layer] = layerContent.getParamLength("/ZStrips/Width");
+    zStripLength[layer] = layerContent.getParamLength("/ZStrips/Length");
+    zStripNumber[layer] = layerContent.getParamIntValue("/ZStrips/NStrips");
   }
-  return (m_rmin_gap1 - (m_height_iron - m_height_iron_meas) / 2.0 + m_height_layer *(lyr - 1));
-}
 
-const double BKLMGeometryPar::layerRmax(int lyr) const
-{
-  if (lyr == m_nlayer - 1) {
-    return (m_rmax);
+  CLHEP::Hep3Vector rSector(m_GapInnerRadius + 0.5 * m_GapNominalHeight, 0.0, 0.0);
+  for (int fb = 0; fb < 2; ++fb) {
+    CLHEP::Hep3Vector deltaZ(0.0, 0.0, (fb == 0 ? m_ModuleElectrodeBorder : -m_ModuleElectrodeBorder));
+    for (int sector = 0; sector < m_NSector; ++sector) {
+      sprintf(name, "Sectors/%s/Sector[%d]", (fb == 0 ? "Forward" : "Backward"), sector + 1);
+      GearDir sectorContent(content);
+      sectorContent.append(name);
+      CLHEP::Hep3Vector shift(sectorContent.getParamLength("/Shift/X"),
+                              sectorContent.getParamLength("/Shift/Y"),
+                              sectorContent.getParamLength("/Shift/Z"));
+      CLHEP::HepRotation rotation;
+      if (fb == 1) rotation.rotateX(M_PI);
+      rotation.rotateZ(sectorContent.getParamAngle("/Phi"));
+      CLHEP::Hep3Vector translation(0.0, 0.0, m_OffsetZ);
+      translation += rotation(rSector) + deltaZ;
+      BKLMSector* pSector = new BKLMSector(fb, sector, m_NLayer, shift, translation, rotation);
+      m_Sectors.push_back(pSector);
+      for (int layer = 0; layer < m_NLayer; ++layer) {
+        int zStripMin = 0;
+        int zStripMax = zStripNumber[layer] - 1;
+        if ((fb == 1) && (sector == 2)) zStripMax = 33;
+        GearDir layerContent(sectorContent);
+        sprintf(name, "Layer[%d]", layer + 1);
+        layerContent.append(name);
+        CLHEP::Hep3Vector lshift(sectorContent.getParamLength("/Shift/X"),
+                                 sectorContent.getParamLength("/Shift/Y"),
+                                 sectorContent.getParamLength("/Shift/Z"));
+        double dr = (layer == 0 ? (m_GapNominalHeight - m_Gap0NominalHeight) * 0.5 : layer * m_LayerHeight);
+        pSector->addModule(new BKLMModule(fb, sector, layer, lshift, dr, pSector,
+                                          phiStripWidth[layer], phiStripLength[layer],
+                                          phiStripNumber[layer], phiStripMin[layer], phiStripMax[layer],
+                                          zStripWidth[layer], zStripLength[layer],
+                                          zStripNumber[layer], zStripMin, zStripMax));
+      }
+    }
   }
-  return (m_rmin_gap1 - (m_height_iron - m_height_iron_meas) / 2.0 + m_height_layer * lyr);
+
 }
 
-const TVector3 BKLMGeometryPar::gapSize(int lyr, bool flag) const
+const double BKLMGeometryPar::getLayerInnerRadius(int layer) const
+{
+  if (layer == 0) {
+    return m_Gap0InnerRadius;
+  }
+  return m_GapInnerRadius - (m_IronNominalHeight - m_IronActualHeight) / 2.0 + m_LayerHeight * layer;
+}
+
+const double BKLMGeometryPar::getLayerOuterRadius(int layer) const
+{
+  int nextLyr = layer + 1;
+  if (nextLyr == m_NLayer) {
+    return m_OuterRadius;
+  }
+  return getLayerInnerRadius(nextLyr);
+}
+
+const CLHEP::Hep3Vector BKLMGeometryPar::getGapSize(int layer, bool flag) const
 {
   double r, ds, dx;
-  if (lyr == 0) {
-    r  = m_rmin_gap0 + m_height_gap0;
-    ds = m_dsx_gap0;
-    dx = m_height_gap0_meas / 2.0;
+  if (layer == 0) {
+    r = m_Gap0InnerRadius + m_Gap0NominalHeight;
+    ds = m_Gap0IronWidth;
+    dx = m_Gap0ActualHeight / 2.0;
   } else {
-    r  = m_rmin_gap1 + m_height_gap + m_height_layer * (lyr - 1);
-    ds = m_dsx_gap;
-    dx = m_height_gap_meas / 2.0;
+    r = m_GapInnerRadius + m_GapNominalHeight + m_LayerHeight * layer;
+    ds = m_GapIronWidth;
+    dx = m_GapActualHeight / 2.0;
   }
-  double dz = (flag ? m_length_gap - m_length_chimney : m_length_gap) / 2.0;
-  return(TVector3(dx, r * tan(M_PI / m_nsides) - ds, dz));
+  double dz = (flag ? m_GapLength - m_ChimneyLength : m_GapLength) / 2.0;
+  return CLHEP::Hep3Vector(dx, r * tan(M_PI / m_NSector) - ds, dz);
+
 }
 
-const TVector3 BKLMGeometryPar::moduleSize(int lyr, bool flag) const
+const CLHEP::Hep3Vector BKLMGeometryPar::getModuleSize(int layer, bool flag) const
 {
-  TVector3 size = gapSize(lyr, flag);
-  size.SetX(m_height_mod / 2.0);
+  CLHEP::Hep3Vector size = getGapSize(layer, flag);
+  size.setX(m_ModuleHeight / 2.0);
   if (flag) {
-    size.SetZ(m_length_mod_chimney / 2.0);
+    size.setZ(m_ModuleLengthChimney / 2.0);
   } else {
-    size.SetZ(m_length_mod / 2.0);
+    size.setZ(m_ModuleLength / 2.0);
   }
-  return (size);
+  return size;
 }
 
-const TVector3 BKLMGeometryPar::readoutSize(int lyr, bool flag) const
+const CLHEP::Hep3Vector BKLMGeometryPar::getReadoutSize(int layer, bool flag) const
 {
-  TVector3 size = moduleSize(lyr, flag);
-  size.SetX(m_height_readout + m_height_glass * 2.0 + m_height_gas);
-  size.SetY(size.Y() - m_width_frame);
-  size.SetZ(size.Z() - m_width_frame);
-  return (size);
+  CLHEP::Hep3Vector size = getModuleSize(layer, flag);
+  size.setX(m_ModuleReadoutHeight + m_ModuleGlassHeight * 2.0 + m_ModuleGasHeight);
+  size.setY(size.y() - m_ModuleFrameWidth);
+  size.setZ(size.z() - m_ModuleFrameWidth);
+  return size;
 }
 
-const TVector3 BKLMGeometryPar::electrodeSize(int lyr, bool flag) const
+const CLHEP::Hep3Vector BKLMGeometryPar::getElectrodeSize(int layer, bool flag) const
 {
-  TVector3 size = readoutSize(lyr, flag);
-  size.SetX(m_height_glass * 2.0 + m_height_gas);
-  return (size);
+  CLHEP::Hep3Vector size = getReadoutSize(layer, flag);
+  size.setX(m_ModuleGlassHeight * 2.0 + m_ModuleGasHeight);
+  return size;
 }
 
-const TVector3 BKLMGeometryPar::gasSize(int lyr, bool flag) const
+const CLHEP::Hep3Vector BKLMGeometryPar::getGasSize(int layer, bool flag) const
 {
-  TVector3 size = electrodeSize(lyr, flag);
-  size.SetX(m_height_gas * 0.5);
-  size.SetY(size.Y() - m_width_spacer);
-  size.SetZ(size.Z() - m_width_spacer);
-  return (size);
+  CLHEP::Hep3Vector size = getElectrodeSize(layer, flag);
+  size.setX(m_ModuleGasHeight * 0.5);
+  size.setY(size.y() - m_ModuleGasSpacerWidth);
+  size.setZ(size.z() - m_ModuleGasSpacerWidth);
+  return size;
 }
 
-const double BKLMGeometryPar::gapR(int lyr) const
+const double BKLMGeometryPar::getGapMiddleRadius(int layer) const
 {
-  if (lyr == 0) {
-    return(m_rmin_gap0 + m_height_gap0_meas / 2.0);
+  if (layer == 0) {
+    return m_Gap0InnerRadius + m_Gap0ActualHeight / 2.0;
   }
-  return(m_rmin_gap1 + m_height_gap_meas / 2.0 + m_height_layer *(lyr - 1));
+  return m_GapInnerRadius + m_GapActualHeight / 2.0 + m_LayerHeight * layer;
 }
 
-const double BKLMGeometryPar::moduleR(int lyr) const
+const double BKLMGeometryPar::getModuleMiddleRadius(int layer) const
 {
-  if (lyr == 0) {
-    return(m_rmin_gap0 + m_height_gap0_meas / 2.0);
+  if (layer == 0) {
+    return m_Gap0InnerRadius + m_Gap0ActualHeight / 2.0;
   }
-  return(m_rmin_gap1 + m_height_gap / 2.0 + m_height_layer *(lyr - 1));
+  return m_GapInnerRadius + m_GapNominalHeight / 2.0 + m_LayerHeight * layer;
 }
 
-const TVector3 BKLMGeometryPar::size_chimney(int lyr) const
+const CLHEP::Hep3Vector BKLMGeometryPar::getChimneySize(int layer) const
 {
-  return(TVector3((layerRmax(lyr) - layerRmin(lyr)) / 2.0, m_width_chimney / 2.0, m_length_chimney / 2.0));
+  return CLHEP::Hep3Vector((getLayerOuterRadius(layer) - getLayerInnerRadius(layer)) / 2.0, m_ChimneyWidth / 2.0, m_ChimneyLength / 2.0);
 }
 
-const TVector3 BKLMGeometryPar::pos_chimney(int lyr) const
+const CLHEP::Hep3Vector BKLMGeometryPar::getChimneyPosition(int layer) const
 {
-  return(TVector3((layerRmax(lyr) + layerRmin(lyr)) / 2.0, m_y_chimney, m_z_chimney));
+  return CLHEP::Hep3Vector((getLayerOuterRadius(layer) + getLayerInnerRadius(layer)) / 2.0,
+                           0.0,
+                           m_GapLength - m_ChimneyLength / 2.0);
 }
 
-const TVector3 BKLMGeometryPar::size_support_plate(bool flag) const
+const CLHEP::Hep3Vector BKLMGeometryPar::getSupportPlateSize(bool flag) const
 {
-  TVector3 size;
-  size.SetX(m_height_support_plate / 2.0);
-  size.SetY(m_width_support_plate / 2.0);
+  CLHEP::Hep3Vector size;
+  size.setX(m_SupportPlateHeight / 2.0);
+  size.setY(m_SupportPlateWidth / 2.0);
   if (flag) {
-    size.SetZ((m_length_mod_chimney + 1.6) / 2.0);
+    size.setZ((m_ModuleLengthChimney + 1.6) / 2.0);
   } else {
-    size.SetZ(m_length_gap / 2.0);
+    size.setZ(m_GapLength / 2.0);
   }
-  return(size);
+  return size;
 }
 
+const BKLMSector* BKLMGeometryPar::findSector(int frontBack, int sector) const
+{
+  std::vector<BKLMSector*>::const_iterator iS;
+  for (iS = m_Sectors.begin(); iS != m_Sectors.end(); ++iS) {
+    if (((*iS)->getFrontBack() == frontBack) && ((*iS)->getSector() == sector)) {
+      break;
+    }
+  }
+  return (*iS);
+}

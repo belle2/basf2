@@ -10,126 +10,169 @@
 
 
 #include <bklm/simbklm/BKLMSensitiveDetector.h>
-#include <bklm/simbklm/BKLMDigitizer.h>
-#include <bklm/simbklm/BKLMDigitizerPar.h>
+#include <bklm/simbklm/BKLMSimulationPar.h>
+#include <bklm/geobklm/BKLMGeometryPar.h>
+#include <bklm/geobklm/BKLMSector.h>
+#include <bklm/geobklm/BKLMModule.h>
+#include <bklm/hitbklm/BKLMSimHit.h>
+
+#include <framework/datastore/StoreArray.h>
+#include <framework/dataobjects/Relation.h>
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Unit.h>
 
+#include <boost/lexical_cast.hpp>
+
+#include "CLHEP/Vector/ThreeVector.h"
+#include "CLHEP/Units/SystemOfUnits.h"
+
 #include "G4Step.hh"
-#include "G4SteppingManager.hh"
-#include "G4EventManager.hh"
-#include "G4SDManager.hh"
-#include "G4TransportationManager.hh"
-#include "G4Material.hh"
 #include "G4Event.hh"
+#include "G4EventManager.hh"
+#include "G4Neutron.hh"
 
-namespace Belle2 {
 
-  BKLMSensitiveDetector::BKLMSensitiveDetector(G4String name):
-      SensitiveDetectorBase(name),
-      m_HitsCollection(0),
-      m_HCID(-1)
-  {
-    collectionName.insert(name + "_HitsCollection");
-    //m_RPCGas = G4Material::GetMaterial( "RPCGas" );
-    m_neutronPID = 2112;
-    //BKLMDigitizerPar* digPar = BKLMDigitizerPar::Instance();
-    //m_hitTimeMax = digPar->hitTimeMax();
-    m_hitTimeMax = 32000.0;
-  }
+using namespace std;
+using namespace Belle2;
 
-  void BKLMSensitiveDetector::Initialize(G4HCofThisEvent* HCTE)
-  {
-    // Create a new hit collection for BKLM
-    m_HitsCollection = new BKLMSimHitsCollection(SensitiveDetectorName, collectionName[0]);
+BKLMSensitiveDetector::BKLMSensitiveDetector(G4String name) :
+    SensitiveDetectorBase(name)
+{
+  m_FirstCall = true;
+  BKLMSimHit::Class()->IgnoreTObjectStreamer(); // should I do this ??
+  addRelationCollection("MCParticlesToBKLMSimHits");
+}
 
-    // Assign a unique ID to the BKLM hits collection
-    if (m_HCID < 0) {
-      m_HCID = G4SDManager::GetSDMpointer()->GetCollectionID(m_HitsCollection);
+void BKLMSensitiveDetector::Initialize(G4HCofThisEvent*)
+{
+  m_HitNumber = 0;
+  // One-time initializations (constructor is called too early)
+  if (m_FirstCall) {
+    m_FirstCall = false;
+    m_NeutronPID = G4Neutron::Definition()->GetPDGEncoding(); // 2112
+    BKLMSimulationPar* simPar = BKLMSimulationPar::instance();
+    if (!simPar->isValid()) {
+      B2FATAL("BKLMSensitiveDetector: simulation-control parameters are not available from module BKLMParamLoader")
     }
-
-    // Attach the BKLM hits collection to the event's HitsCollectionsOfThisEvent
-    HCTE->AddHitsCollection(m_HCID, m_HitsCollection);
-
+    m_HitTimeMax = simPar->getHitTimeMax();
+    m_DoBackgroundStudy = simPar->getDoBackgroundStudy();
+    m_Random = new TRandom3(simPar->getRandomSeed());
   }
+}
 
 //-----------------------------------------------------
 // Method invoked for every step in sensitive detector
 //-----------------------------------------------------
-  G4bool BKLMSensitiveDetector::ProcessHits(G4Step* aStep, G4TouchableHistory*)
-  {
+G4bool BKLMSensitiveDetector::ProcessHits(G4Step* step, G4TouchableHistory*)
+{
 
-    // It is not necessary to detect motion from one volume to another (or track death
-    // in the RPC gas volume).  Experimentation shows that most tracks pass through the
-    // RPC gas volume in one step (although, on occasion, a delta ray will take a couple
-    // of short steps entirely within gas).  Therefore, save every step in the gas
-    // instead of trying to find entry and exit points and then saving only the midpoint.
-    // Do same for scintillators.
+  // It is not necessary to detect motion from one volume to another (or track death
+  // in the RPC gas volume).  Experimentation shows that most tracks pass through the
+  // RPC gas volume in one step (although, on occasion, a delta ray will take a couple
+  // of short steps entirely within gas).  Therefore, save every step in the gas
+  // instead of trying to find entry and exit points and then saving only the midpoint.
+  // Do same for scintillators.
 
-    G4double     deltaE     = aStep->GetTotalEnergyDeposit();
-    G4StepPoint* preStep    = aStep->GetPreStepPoint();
-    G4StepPoint* postStep   = aStep->GetPostStepPoint();
-    G4Track*     track      = aStep->GetTrack();
-    G4int        primaryPID = track->GetDefinition()->GetPDGEncoding();
+  double       deltaE     = step->GetTotalEnergyDeposit();  // GEANT4: in MeV
+  G4StepPoint* preStep    = step->GetPreStepPoint();
+  G4StepPoint* postStep   = step->GetPostStepPoint();
+  G4Track*     track      = step->GetTrack();
+  int          primaryPID = track->GetDefinition()->GetPDGEncoding();
 
-    // Record a step for a charged track that deposits some energy.
-    // Background study: Record every neutron passage, whether it deposits energy or not.
-    if (((deltaE > 0.0) && (postStep->GetCharge() == 0)) ||
-        (primaryPID == m_neutronPID)) {
-      G4ThreeVector hitPos  = 0.5 * (preStep->GetPosition() + postStep->GetPosition());
-      G4double      hitTime = 0.5 * (preStep->GetGlobalTime() + postStep->GetGlobalTime());
-      if (isnan(hitTime)) return false;             // sanity check
-      if (hitTime > m_hitTimeMax) return false;     // drop very late hits (due to fission)
-      G4bool decayed = false;
-      if (postStep->GetProcessDefinedStep() != 0) {
-        decayed = (postStep->GetProcessDefinedStep()->GetProcessType() == fDecay);
-      }
-      G4bool inRPCGas = (preStep->GetMaterial() == m_RPCGas);      // true: in gas, false: in scint
-      BKLMSimHit *hit = new BKLMSimHit(hitPos, hitTime, deltaE, inRPCGas, decayed,
-                                       track->GetTrackID(),
-                                       primaryPID, track->GetParentID(),
-                                       GetAncestorPID(track), GetFirstPID());
-      m_HitsCollection->insert(hit);
-      return true;
+  // Record a step for a charged track that deposits some energy.
+  // Background study: Record every neutron passage, whether it deposits energy or not.
+  if (((deltaE > 0.0) && (postStep->GetCharge() != 0)) ||
+      ((m_DoBackgroundStudy) && (primaryPID == m_NeutronPID))) {
+    const G4ThreeVector g4HitPos = 0.5 * (preStep->GetPosition() + postStep->GetPosition()) / cm; // GEANT4: in mm
+    const TVector3 hitPos(g4HitPos.x(), g4HitPos.y(), g4HitPos.z());
+    double hitTime = 0.5 * (preStep->GetGlobalTime() + postStep->GetGlobalTime());  // GEANT4: in ns
+    bool decayed = false;
+    if (postStep->GetProcessDefinedStep() != 0) {
+      decayed = (postStep->GetProcessDefinedStep()->GetProcessType() == fDecay);
     }
-    return false;
-  }
-
-  G4int BKLMSensitiveDetector::GetAncestorPID(G4Track* track)
-  {
-    if (track->GetParentID() != 0) {
-      const G4Event* event = G4EventManager::GetEventManager()->GetConstCurrentEvent();
-      const G4int nVtx = event->GetNumberOfPrimaryVertex();
-      for (G4int jVtx = 0; jVtx < nVtx; jVtx++) {
-        const G4PrimaryVertex* vtx = event->GetPrimaryVertex(jVtx);
-        const G4int nPart = vtx->GetNumberOfParticle();
-        for (G4int jPart = 0; jPart < nPart; jPart++) {
-          const G4PrimaryParticle* part = vtx->GetPrimary(jPart);
-          if (part->GetTrackID() == track->GetParentID()) {
-            return part->GetPDGcode();
-          }
-        }
+    const string volumeName = preStep->GetPhysicalVolume()->GetName();  // "klm_barrel_***_*_*_**_*"
+    if (volumeName.find("klm_barrel_") != 0) {
+      B2ERROR("BKLMSensitiveDetector: sensitive volume name (" << volumeName << ") is not \"klm_barrel_***_*_*_**_*\"");
+      return false;
+    }
+    bool inRPC = (volumeName.find("klm_barrel_gas_") == 0);    // true in gas, false in scint
+    int frontBack = boost::lexical_cast<int>(volumeName.substr(15, 1));
+    int sector = boost::lexical_cast<int>(volumeName.substr(17, 1));
+    int layer = boost::lexical_cast<int>(volumeName.substr(19, 2));
+    int plane = boost::lexical_cast<int>(volumeName.substr(22, 1));
+    StoreArray<BKLMSimHit> simHits("BKLMSimHits");
+    BKLMSimHit* simHit = new(simHits->AddrAt(m_HitNumber))
+    BKLMSimHit(hitPos, hitTime, deltaE, inRPC, decayed, frontBack, sector, layer, plane);
+    if (inRPC) {
+      convertHitToRPCStrips(simHit);
+    } else {
+      int strip = boost::lexical_cast<int>(volumeName.substr(12, 2));
+      if (plane == 0) {
+        simHit->appendPhiStrip(strip);
+      } else {
+        simHit->appendZStrip(strip);
       }
     }
-    return 0;
+    StoreArray<Relation> particleToSimHits(getRelationCollectionName());
+    StoreArray<MCParticle> particles(DEFAULT_MCPARTICLES);
+    new(particleToSimHits->AddrAt(m_HitNumber))
+    Relation(particles, simHits, track->GetTrackID(), m_HitNumber);
+    m_HitNumber++;
+    return true;
   }
+  return false;
+}
 
-  G4int BKLMSensitiveDetector::GetFirstPID()
-  {
-    // FirstPID should be saved by UserTrackingAction for original generator particle, but isn't yet :(
-    //return G4EventManager::GetEventManager()->GetUserTrackingAction()->GetFirstPID();
-    return 0;
+void BKLMSensitiveDetector::EndOfEvent(G4HCofThisEvent*)
+{
+}
+
+void BKLMSensitiveDetector::convertHitToRPCStrips(BKLMSimHit* simHit)
+{
+  const BKLMGeometryPar* geoPar = BKLMGeometryPar::instance();
+  const BKLMSimulationPar* simPar = BKLMSimulationPar::instance();
+  int frontBack = simHit->getFrontBack();
+  int sector = simHit->getSector();
+  int layer = simHit->getLayer();
+  const BKLMSector* pS = geoPar->findSector(frontBack, sector);
+  const BKLMModule* pM = pS->findModule(layer);
+  const TVector3 globalPos = simHit->getHitPosition();
+  const CLHEP::Hep3Vector localPos = pS->globalToLocal(globalPos.X(),
+                                                       globalPos.Y(),
+                                                       globalPos.Z());
+  int phiStrip = 0;
+  int zStrip = 0;
+  if (pM->isInActiveArea(localPos, phiStrip, zStrip)) {
+    simHit->appendPhiStrip(phiStrip);
+    simHit->appendZStrip(zStrip);
+    double phiStripDiv = 0.0; // between -0.5 and +0.5 within central phiStrip
+    double zStripDiv = 0.0;   // between -0.5 and +0.5 within central zStrip
+    pM->getStripDivisions(localPos, phiStripDiv, zStripDiv);
+    int n = 0;
+    double rand = m_Random->Uniform();
+    for (n = 1; n < simPar->getMaxMultiplicity(); ++n) {
+      if (simPar->getPhiMultiplicityCDF(phiStripDiv, n) > rand) break;
+    }
+    int nextStrip = (phiStripDiv > 0.0 ? 1 : -1);
+    while (--n > 0) {
+      phiStrip += nextStrip;
+      if ((phiStrip >= pM->getPhiStripMin()) && (phiStrip <= pM->getPhiStripMax())) {
+        simHit->appendPhiStrip(phiStrip);
+      }
+      nextStrip = (nextStrip > 0 ? -(1 + nextStrip) : 1 - nextStrip);
+    }
+    rand = m_Random->Uniform();
+    for (n = 1; n < simPar->getMaxMultiplicity(); ++n) {
+      if (simPar->getZMultiplicityCDF(zStripDiv, n) > rand) break;
+    }
+    nextStrip = (zStripDiv > 0.0 ? 1 : -1);
+    while (--n > 0) {
+      zStrip += nextStrip;
+      if ((zStrip >= pM->getZStripMin()) && (zStrip <= pM->getZStripMax())) {
+        simHit->appendZStrip(zStrip);
+      }
+      nextStrip = (nextStrip > 0 ? -(1 + nextStrip) : 1 - nextStrip);
+    }
   }
-
-  void BKLMSensitiveDetector::EndOfEvent(G4HCofThisEvent*)
-  {
-
-    B2INFO("BKLMSensitiveDetector::EndOfEvent called");
-    //This is duplicate?  is digitizer called automatically by geant4 at end of event?
-    //G4DigiManager* digiMgr = G4DigiManager::GetDMpointer();
-    //BKLMDigitizer* digitizer = (BKLMDigitizer*)digiMgr->FindDigitizerModule( "BKLMDigitizer" );
-    //digitizer->Digitize();
-
-  }
-
-} // end of namespace Belle2
+  return;
+}

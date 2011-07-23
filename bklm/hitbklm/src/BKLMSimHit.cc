@@ -8,29 +8,31 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <bklm/bklmhit/BKLMSimHit.h>
-#include <framework/logging/Logger.h>
-#include<iostream>
-#include<fstream>
+#include <bklm/hitbklm/BKLMSimHit.h>
 
 using namespace Belle2;
 
-ClassImp(Belle2::BKLMSimHit)
+ClassImp(BKLMSimHit)
 
-G4Allocator<BKLMSimHit> BKLMSimHitAllocator;
-
-void BKLMSimHit::Save(char* filename)
+//! empty constructor
+BKLMSimHit::BKLMSimHit()
 {
-  std::ofstream save_hit(filename, std::fstream::app);
-  save_hit << '\n';
-  save_hit << "BKLM Hit: \n" ;
-  save_hit << "Position: " << m_hitPos << '\n'  ;
-  save_hit << "Time: " << m_hitTime << '\n' ;
-  save_hit << "Energy Deposition: " <<  m_deltaE << '\n' ;
-  save_hit << "PDG code: " << m_primaryPID << '\n';
-  save_hit.close();
 }
 
-
-
-//} //end of Belle2 namespace
+//! Constructor with initial values
+BKLMSimHit::BKLMSimHit(TVector3 hitPosition, double hitTime, double deltaE,
+                       bool inRPC, bool decayed,
+                       int frontBack, int sector, int layer, int plane) :
+    m_HitPosition(hitPosition),
+    m_HitTime(hitTime),
+    m_DeltaE(deltaE),
+    m_InRPC(inRPC),
+    m_Decayed(decayed),
+    m_FrontBack(frontBack),
+    m_Sector(sector),
+    m_Layer(layer),
+    m_Plane(plane)
+{
+  m_PhiStrips.clear();
+  m_ZStrips.clear();
+}

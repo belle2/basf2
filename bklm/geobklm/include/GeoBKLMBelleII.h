@@ -8,52 +8,46 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+#ifndef GEOBKLMBELLEII_H
+#define GEOBKLMBELLEII_H
+
 #include <geometry/geodetector/CreatorBase.h>
 
-#include <TGeoShape.h>
-#include <TGeoMedium.h>
-#include <TGeoMatrix.h>
 #include <TGeoVolume.h>
-
-#include <string>
-#include <vector>
-
-#ifndef GEOBKLMBELLEII_H_
-#define GEOBKLMBELLEII_H_
 
 namespace Belle2 {
 
   class GearDir;
 
-  //!   The GeoBKLMBelleII class.
-  //!   The creator for the outer BKLM geometry of the Belle II detector.
+  //!   This class creates the BKLM geometry of the Belle II detector
 
   class GeoBKLMBelleII : public CreatorBase {
 
   public:
 
-    //! Constructor of the GeoBKLMBelleII class.
+    //! Constructor of the GeoBKLMBelleII class
     GeoBKLMBelleII();
 
-    //! The destructor of the GeoBKLMBelleII class.
+    //! The destructor of the GeoBKLMBelleII class
     virtual ~GeoBKLMBelleII();
 
-    //! Creates the ROOT Objects for the BKLM geometry.
-    virtual void create(GearDir& content);
+    //! Creates the ROOT Objects for the BKLM geometry
+    virtual void create(GearDir&);
 
     //! returns top volume for BKLM
     inline TGeoVolume * getTopmostVolume()
-    {return volGrpBKLM;}
+    { return volGrpBKLM; }
+
   protected:
 
   private:
 
     //! top volume in the BKLM hierarhy
-    TGeoVolumeAssembly* volGrpBKLM ;
+    TGeoVolumeAssembly* volGrpBKLM;
 
   };
 
 
-}
+}  // end of namespace Belle2
 
-#endif /* GEOBKLMBelleII_H_ */
+#endif // GEOBKLMBelleII_H

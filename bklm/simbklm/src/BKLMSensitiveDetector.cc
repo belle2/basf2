@@ -39,7 +39,6 @@ BKLMSensitiveDetector::BKLMSensitiveDetector(G4String name) :
     SensitiveDetectorBase(name)
 {
   m_FirstCall = true;
-  BKLMSimHit::Class()->IgnoreTObjectStreamer(); // should I do this ??
   addRelationCollection("MCParticlesToBKLMSimHits");
 }
 

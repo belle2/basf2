@@ -35,9 +35,34 @@ namespace Belle2 {
     //! Do what you want to do at the end of each event
     void EndOfEvent(G4HCofThisEvent *eventHC);
 
+
+    //! Save ECLSimHit into datastore
+    int saveSimHit(
+      const G4int cellId,
+      const G4int thetaId,
+      const G4int phiId,
+      const G4int trackID,
+      const G4int pid,
+      const G4double tof,
+      const G4double edep,
+      const G4double stepLength,
+      const G4ThreeVector & mom,
+      const G4ThreeVector & posW,
+      const G4ThreeVector & posIn,
+      const G4ThreeVector & posOut
+    );
+
+    //! Get cell, theta, phi Id from PhysicalVolume
+    int Mapping(const G4String VolumeName);
+    int m_phiID; /**< The current phi ID in an event. Used to fill the DataStore ECL array.*/
+    int m_thetaID; /**< The current theta ID in an event. Used to fill the DataStore ECL array.*/
+    int m_cellID; /**< The current cellID in an event. Used to fill the DataStore ECL array.*/
+
   protected:
 
   private:
+
+    int m_hitNumber; /**< The current number of created hits in an event. Used to fill the DataStore ECL array.*/
 
   };
 

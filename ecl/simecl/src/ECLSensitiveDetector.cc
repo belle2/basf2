@@ -251,7 +251,7 @@ int ECLSensitiveDetector::Mapping(const G4String VolumeName)
     if (iCry < 9) {
       m_thetaID = 59;
       m_phiID = (GSector - 88) * 9 + iCry - 0;
-      m_cellID = (GSector - 88) * 9 + iCry - 0;
+      m_cellID = (GSector - 88) * 9 + iCry - 0 + 7776;
     } else if (iCry < 18) {
       m_thetaID = 60;
       m_phiID = (GSector - 88) * 9 + (iCry - 9) ;

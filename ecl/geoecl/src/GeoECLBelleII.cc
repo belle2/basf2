@@ -148,7 +148,7 @@ void GeoECLBelleII::makeFWENDCAP(GearDir& content, TGeoVolumeAssembly* group)
 
       int cry_id = box_id  + iSector * nblock;
       TGeoRotation    r("gRot", 0.0, 0.0, 360.*iSector / nblock);
-      TGeoTrap* CrystalShape = new TGeoTrap(halflength , 0 , 0, h1 ,   bl1, tl1 , alpha2 , h2   , bl2, tl2, alpha2);
+      TGeoTrap* CrystalShape = new TGeoTrap(halflength , 0 , 0, h1 ,   bl1, tl1 , alpha1 , h2   , bl2, tl2, alpha2);
       TGeoVolume* CrystalTrap = new TGeoVolume((format("SD_Cid_%1%_%2%") % GSector % G1Cry).str().c_str(), CrystalShape, CsI);
       volGrpLayer->AddNode(CrystalTrap, cry_id, new TGeoHMatrix(r* position*m3*m2*m1));
 
@@ -246,22 +246,22 @@ void GeoECLBelleII::makeBarrel(GearDir& content, TGeoVolumeAssembly* group)
   double k_BA;
   double k_Bh;
   double k_BH;
-  double k_gamA;
-  double k_alpha;
-  double k_gamH;
+//  double k_gamA;
+//  double k_alpha;
+//  double k_gamH;
   double k_z_TILTED;
   double k_phi_TILTED;
   double k_perpC;
   double k_phiC;
   double k_zC;
-  double fin_thickness = 0.05 ;
+//  double fin_thickness = 0.05 ;
   double wrap_thickness = 0.025 ;
 
   double zsign = 1.;
 
 
   GearDir detcontent(content);
-  fin_thickness = detcontent.getParamLength("k_fin_thickness");
+//  fin_thickness = detcontent.getParamLength("k_fin_thickness");
   wrap_thickness = detcontent.getParamLength("k_wrap_thickness");
   int    nblock = int(detcontent.getParamNumValue("k_barrel_Nblock"));
 
@@ -299,19 +299,19 @@ void GeoECLBelleII::makeBarrel(GearDir& content, TGeoVolumeAssembly* group)
 
 
 
-      k_gamA = atan((k_Bb - k_Ba) / 2 / k_Bh) * 180 / PI;
-      k_alpha = atan(k_BLL / k_Bh) * 180 / PI ;
-      k_gamH = atan((k_BH - k_Bh) / 2 / k_BLL) * 180 / PI ;
+//      k_gamA = atan((k_Bb - k_Ba) / 2 / k_Bh) * 180 / PI;
+//      k_alpha = atan(k_BLL / k_Bh) * 180 / PI ;
+//      k_gamH = atan((k_BH - k_Bh) / 2 / k_BLL) * 180 / PI ;
 
 //          double wDx1=k_Ba/2;//same as cDx1
 //          double wDx2=k_Bb/2;//same as cDx2
-      double wDy1 = k_Bh / 2 + wrap_thickness * (1 / cos(k_gamH * PI / 180) - tan(k_gamH * PI / 180));
+//      double wDy1 = k_Bh / 2 + wrap_thickness * (1 / cos(k_gamH * PI / 180) - tan(k_gamH * PI / 180));
 //          double wDx3=k_BA/2;//same as cDx3
 //          double wDx4=k_Bb/2*k_BA/k_Ba;//same as cDx4
-      double wDy2 = k_BH / 2 + wrap_thickness * (1 / cos(k_gamH * PI / 180) + tan(k_gamH * PI / 180));
-      double wDz = k_BLL / 2 + wrap_thickness;
-      k_alpha = atan(wDz / wDy1) * 180 / PI ;
-      k_gamH = atan((wDy2 - wDy1) / 2 / wDz) * 180 / PI ;
+//      double wDy2 = k_BH / 2 + wrap_thickness * (1 / cos(k_gamH * PI / 180) + tan(k_gamH * PI / 180));
+//      double wDz = k_BLL / 2 + wrap_thickness;
+//      k_alpha = atan(wDz / wDy1) * 180 / PI ;
+//      k_gamH = atan((wDy2 - wDy1) / 2 / wDz) * 180 / PI ;
 
       double cDx1 = k_Ba / 2;
       double cDx2 = k_Bb / 2;
@@ -321,16 +321,17 @@ void GeoECLBelleII::makeBarrel(GearDir& content, TGeoVolumeAssembly* group)
       double cDy2 = k_BH / 2;
       double cDz = k_BLL / 2;
 
-      double vtx[15];
-      vtx[0] = cDx1; vtx[1] = cDy1;//HepPoint3D tmp0( cDx1, cDy1,-cDz);
-      vtx[2] = cDx2; vtx[3] = -cDy1;//HepPoint3D tmp1( cDx2,-cDy1,-cDz);
-      vtx[4] = -cDx2; vtx[5] = -cDy1;//HepPoint3D tmp2(-cDx2,-cDy1,-cDz);
-      vtx[6] = -cDx1; vtx[7] = cDy1;//HepPoint3D tmp3(-cDx1, cDy1,-cDz);
-      vtx[8] = cDx3; vtx[9] = cDy2;//HepPoint3D tmp4( cDx3, cDy2, cDz);
-      vtx[10] = cDx4; vtx[11] = -cDy2;//HepPoint3D tmp5( cDx4,-cDy2, cDz);
-      vtx[12] = -cDx4; vtx[13] = -cDy2;//HepPoint3D tmp6(-cDx4,-cDy2, cDz);
-      vtx[14] = -cDx3; vtx[15] = cDy2;//HepPoint3D tmp7(-cDx3, cDy2, cDz);
-
+      /*
+            double vtx[15];
+            vtx[0] = cDx1; vtx[1] = cDy1;//HepPoint3D tmp0( cDx1, cDy1,-cDz);
+            vtx[2] = cDx2; vtx[3] = -cDy1;//HepPoint3D tmp1( cDx2,-cDy1,-cDz);
+            vtx[4] = -cDx2; vtx[5] = -cDy1;//HepPoint3D tmp2(-cDx2,-cDy1,-cDz);
+            vtx[6] = -cDx1; vtx[7] = cDy1;//HepPoint3D tmp3(-cDx1, cDy1,-cDz);
+            vtx[8] = cDx3; vtx[9] = cDy2;//HepPoint3D tmp4( cDx3, cDy2, cDz);
+            vtx[10] = cDx4; vtx[11] = -cDy2;//HepPoint3D tmp5( cDx4,-cDy2, cDz);
+            vtx[12] = -cDx4; vtx[13] = -cDy2;//HepPoint3D tmp6(-cDx4,-cDy2, cDz);
+            vtx[14] = -cDx3; vtx[15] = cDy2;//HepPoint3D tmp7(-cDx3, cDy2, cDz);
+      */
 
       TGeoRotation r00, tilt_z, tilt_phi, pos_phi;
       r00.RotateZ(90.*zsign);//m1 = HepRotateZ3D(90./180*PI*zsign);
@@ -432,7 +433,7 @@ void GeoECLBelleII::makeBWENDCAP(GearDir& content, TGeoVolumeAssembly* group)
       int cry_id = box_id1 * nblock + iSector  + 7776;
 
       TGeoRotation    r("gRot", 0.0, 0.0, 360.*iSector  / nblock);
-      TGeoTrap* CrystalShape = new TGeoTrap(halflength , 0 , 0, h1 ,   bl1, tl1 , alpha2 , h2   , bl2, tl2, alpha2);
+      TGeoTrap* CrystalShape = new TGeoTrap(halflength , 0 , 0, h1 ,   bl1, tl1 , alpha1 , h2   , bl2, tl2, alpha2);
       TGeoVolume* CrystalTrap = new TGeoVolume((format("SD_Cid_%1%_%2%") % GSector % G1Cry).str().c_str(), CrystalShape, CsI);
       volGrpLayer->AddNode(CrystalTrap, cry_id, new TGeoHMatrix(r* position*m3*m2*m1));
       box_id1++;

@@ -19,6 +19,7 @@
 #include  "CLHEP/Vector/ThreeVector.h"
 
 
+
 namespace Belle2 {
 
 
@@ -31,14 +32,15 @@ namespace Belle2 {
     //! Constructor
     EKLMDigitizer() {};
 
+
     //! Destructor
     ~EKLMDigitizer() {};
 
     //! Read hits from the store
     void readSimHits();
 
-    //! Get hits from the collection
-    void getSimHits();
+    //! Sort Sim Hits and fill m_HitStripMap
+    void sortSimHits();
 
     //! merges hits from the same strip. Creates EKLMStripHits
     void mergeSimHitsToStripHits();
@@ -65,21 +67,11 @@ namespace Belle2 {
     //! sim hits vector
     std::vector<EKLMSimHit*> m_simHitsVector;
 
-    //! converts energy depostion to the number of photo electrons. Not fully implemented yet
-    int energyToPhotoElectrons(double  , double , bool isMirrored = false);
-
-    //! returns delay depending on the distance to the hit
-    double lightPropagationTime(double);
-
-    //! calculates 'distances' to the direct and mirrored hits
-    void lightPropagationDistance(double &firstHitDist, double &secondHitDist, CLHEP::Hep3Vector pos);
-
 
   };
 
   //! Extern allocator
   extern G4Allocator<EKLMDigitizer>   EKLMDigitizerAllocator;
-
 
   //! Operator new
   inline void* EKLMDigitizer::operator new(size_t)

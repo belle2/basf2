@@ -33,28 +33,14 @@ namespace Belle2 {
       SensitiveDetectorBase(name), m_ThresholdEnergyDeposit(thresholdEnergyDeposit),
       m_ThresholdKineticEnergy(thresholdKineticEnergy)
   {
-//     G4String CollName1 = name + "_Collection";
-//     collectionName.insert(CollName1);
   }
 
   void EKLMSensetiveDetector::Initialize(G4HCofThisEvent * HCTE)
   {
-
-    // Create a new hit collection
-    //    m_HitCollection = new EKLMSimHitsCollection(SensitiveDetectorName, collectionName[0]);
-
-    // Assign a unique ID to the hits collection
-//     if (m_HCID < 0) {
-//       m_HCID = G4SDManager::GetSDMpointer()->GetCollectionID(m_HitCollection);
-//     }
-
-    // Attach collections to HitsCollectionsOfThisEvent
-    //    HCTE -> AddHitsCollection(m_HCID, m_HitCollection);
-
   }
 
-//-----------------------------------------------------
-// Method invoked for every step in sensitive detector
+  //-----------------------------------------------------
+  // Method invoked for every step in sensitive detector
 //-----------------------------------------------------
   G4bool EKLMSensetiveDetector::ProcessHits(G4Step *aStep, G4TouchableHistory *)
   {
@@ -94,13 +80,9 @@ namespace Belle2 {
     // Get particle information
     const G4int PDGcode = track.GetDefinition()->GetPDGEncoding();
 
-
-
-
     const G4ThreeVector & position = 0.5 * (aStep->GetPostStepPoint()->GetPosition() +
                                             aStep->GetPreStepPoint()->GetPosition())
                                      * 0.1; // to convert to cm
-
 
     //creates hit
     EKLMSimHit *hit = new  EKLMSimHit(position,  hitTime, PDGcode,  eDep);
@@ -108,8 +90,6 @@ namespace Belle2 {
     // store hit
     storeEKLMObject("SimHitsEKLMArray", hit);
 
-    // insert hit to the hit collection
-    //    m_HitCollection->insert(hit);
 
     return true;
   }

@@ -29,7 +29,7 @@ set_log_level(LogLevel.INFO)
 
 # EvtMetaGen - generate event meta data
 evtmetagen = register_module('EvtMetaGen')
-evtmetagen.param('EvtNumList', [10])
+evtmetagen.param('EvtNumList', [1])
 
 # Particle gun
 particlegun = register_module('PGunInput')

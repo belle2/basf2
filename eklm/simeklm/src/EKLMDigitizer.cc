@@ -7,7 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
+#include <eklm/simeklm/EKLMFiberAndElectronics.h>
 #include <eklm/simeklm/EKLMDigitizer.h>
 #include <eklm/eklmutils/EKLMutils.h>
 #include <framework/logging/Logger.h>
@@ -21,6 +21,8 @@
 #include <framework/gearbox/Gearbox.h>
 #include <framework/gearbox/GearDir.h>
 
+#include <TRandom.h>
+
 
 
 
@@ -29,14 +31,13 @@
 
 #include<eklm/geoeklm/GeoEKLMBelleII.h>
 
-#include "boost/lexical_cast.hpp"
-
 
 using namespace CLHEP;
 
 namespace Belle2 {
 
   G4Allocator<EKLMDigitizer> EKLMDigitizerAllocator;
+
 
 
 
@@ -49,7 +50,7 @@ namespace Belle2 {
   }
 
 
-  void EKLMDigitizer::getSimHits()
+  void EKLMDigitizer::sortSimHits()
   {
     for (std::vector<EKLMSimHit*>::iterator iHit = m_simHitsVector.begin();
          iHit != m_simHitsVector.end(); ++iHit) {
@@ -72,89 +73,50 @@ namespace Belle2 {
     }
 
   }
-  //!  This function is intended to form StripHits from SimHits.
+
+  //!  This function is  to form StripHits from SimHits.
+  //!  Light propagation into the fiber, SiPM and electronics effects
+  //!  are simulated in EKLMFiberAndElectronics class
   void EKLMDigitizer::mergeSimHitsToStripHits()
   {
-    B2DEBUG(1, "STRAT MERGING HITS");
+    //    B2INFO( "STRAT MERGING HITS");
     for (std::map<std::string, std::vector<EKLMSimHit*> >::iterator it = m_HitStripMap.begin();
          it != m_HitStripMap.end(); it++) {
-      std::vector<EKLMSimHit*> vectorHits = it->second;
 
-      Hep3Vector hitPos(0, 0, 0);
-      double hitE = 0;
-      double hitTfirst = 100000;  // time of the first hit
-      int leadingParticlePDG = 0;
-      for (std::vector<EKLMSimHit*> ::iterator i = vectorHits.begin(); i != vectorHits.end(); i++) {
-        hitE += (*i)->getEDep();
-        hitPos += (*i)->getPos() * (*i)->getEDep();
-        if (hitTfirst > (*i)->getTime()) {
-          hitTfirst = (*i)->getTime();
-          leadingParticlePDG = (*i)->getPDGCode();
-        }
-      }
-      hitPos = hitPos / hitE;
+      //      B2DEBUG(1, "MAP ENTRY");
+      EKLMFiberAndElectronics * fiberAndElectronicsSimulator = new EKLMFiberAndElectronics(*it);
+      fiberAndElectronicsSimulator->processEntry();
 
 
-
-      double firstHitDist = 0;
-      double secondHitDist = 0;
-      lightPropagationDistance(firstHitDist, secondHitDist, hitPos);
-      gGeoManager->GetCurrentVolume()->SetVisibility(true);  // potentially dangerous!   use only after EKLMDigitizer::lightPropagationDistance
-
-
-      // Create hit
       EKLMStripHit *stripHit = new EKLMStripHit();
-      stripHit->setName(it->first);
-      stripHit->setNumberPhotoElectrons(energyToPhotoElectrons(hitE, firstHitDist));
-      stripHit->setTime(hitTfirst + lightPropagationTime(firstHitDist));  // convert to ns!
-      stripHit->setLeadingParticlePDGCode(leadingParticlePDG);
-      m_HitVector.push_back(stripHit);
 
-      // Create mirrored hit
-      /*
-      EKLMStripHit *mirroredStripHit = new EKLMStripHit();
-      mirroredStripHit->setName(it->first);
-      mirroredStripHit->setNumberPhotoElectrons(energyToPhotoElectrons(hitE, secondHitDist,true));
-      mirroredStripHit->setTime(lightPropagationTime(secondHitDist));
-      mirroredStripHit->setLeadingParticlePDGCode(leadingParticlePDG);
-      m_HitVector.push_back(mirroredStripHit);
-      */
+      stripHit->setName(it->first);
+
+      //stripHit->setHistogramm(cloneHist);
+
+      if (!fiberAndElectronicsSimulator->getFitStatus()) {
+        stripHit->setTime(fiberAndElectronicsSimulator->getFitResults(0));
+        stripHit->setNumberPhotoElectrons(fiberAndElectronicsSimulator->getFitResults(3));
+      } else {
+        stripHit->setNumberPhotoElectrons(-1);
+        stripHit->setTime(-1);
+      }
+
+      stripHit->setLeadingParticlePDGCode(0);
+
+      m_HitVector.push_back(stripHit);
+      delete fiberAndElectronicsSimulator;
     }
+    //    B2INFO( "STOP MERGING HITS");
   }
 
   void EKLMDigitizer::saveStripHits()
   {
+
     for (std::vector<EKLMStripHit*>::const_iterator iter = m_HitVector.begin();
          iter != m_HitVector.end(); ++iter)
       storeEKLMObject("StripHitsEKLMArray", *iter);
-  }
 
-  int EKLMDigitizer::energyToPhotoElectrons(double energy , double dist, bool isMirrored)
-  {
-    // nearly arbitrary function. to be updated
-    return static_cast<int>(energy*20);
   }
-  double EKLMDigitizer::lightPropagationTime(double L)
-  {
-    // nearly arbitrary function. to be updated
-    double speed = 17;// (cm/ns)   // should be accessible via xml!
-    return L / speed;
-  }
-
-  void EKLMDigitizer::lightPropagationDistance(double &firstHitDist, double &secondHitDist, Hep3Vector pos)
-  {
-    gGeoManager->SetCurrentPoint(pos.x(), pos.y(), pos.z());
-    gGeoManager->FindNode();
-    double globalPos[] = {pos.x(), pos.y(), pos.z()};
-    double localPos[3];
-    gGeoManager->MasterToLocal(globalPos, localPos);  // coordinates in the strip frame
-    double xmin = 0; // half of the strip length
-    double xmax = 0; // half of the strip length
-    gGeoManager->GetCurrentVolume()->GetShape()->GetAxisRange(1, xmin, xmax);  // set strip length
-    firstHitDist = xmax - localPos[0];     //  direct light hit
-    secondHitDist = 4 * xmax - firstHitDist;     //  reflected light hit
-  }
-
-
 }
 

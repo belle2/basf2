@@ -42,9 +42,10 @@ void EKLMDigitizationModule::event()
 
   B2DEBUG(1, " START DIGITIZATION");
 
+
   EKLMDigitizer *digi = new EKLMDigitizer();
   digi->readSimHits();
-  digi->getSimHits();
+  digi->sortSimHits();
   digi->mergeSimHitsToStripHits();
   digi->saveStripHits();
   delete digi;

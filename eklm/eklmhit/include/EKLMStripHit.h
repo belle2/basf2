@@ -12,11 +12,11 @@
 #define EKLMSTRIPHIT_H
 
 #include <framework/datastore/DataStore.h>
-#include <TObject.h>
 
 #include  <eklm/eklmhit/EKLMHitBase.h>
 #include  "globals.hh"
 #include  "CLHEP/Vector/ThreeVector.h"
+
 
 
 #include <string>
@@ -41,6 +41,10 @@ namespace Belle2 {
 
     //! Print stip name and some other useful info
     void Print();
+
+    /*     //! sets histograms */
+    /*     inline void setHistogramm( TH1D * his)  */
+    /*     {m_fitHistograms = his;}; */
 
     //! sets the number of photo electorns
     inline void setNumberPhotoElectrons(const double &npe)
@@ -89,6 +93,11 @@ namespace Belle2 {
 
     //! distance btw. the hit and SiPM
     double m_LightPropagationLength;
+
+    /*     //! fit results */
+    /*     TH1D * m_fitHistograms; */
+
+
 
     //! Makes objects storable
     ClassDef(Belle2::EKLMStripHit, 1);

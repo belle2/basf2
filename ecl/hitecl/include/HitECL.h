@@ -22,68 +22,45 @@ namespace Belle2 {
   class HitECL : public TObject {
   public:
 
-    //! The layer id of this digit.
-    int m_layerId;
 
-    //! The wire id of this digit.
-    int m_wireId;
+    //! The cell id of this hit.
+    int m_eventId;
 
-    //! Left drift length of this digit.
-    double m_leftDriftLength;
+    //! The cell id of this hit.
+    int m_cellId;
 
-    //! Right drift length of this digit.
-    double m_rightDriftLength;
+    //! Deposited energy of this hit.
+    double m_edep;
 
-    //! Left drift time of this digit.
-    double m_leftDriftTime;
+    //! Hit average time
+    double m_TimeAve;
 
-    //! Right drift time of this digit.
-    double m_rightDriftTime;
+    //! The method to set event id
+    void setEventId(int eventId) { m_eventId = eventId; }
 
-    //! Charge of this digit.
-    double m_charge;
+    //! The method to set cell id
+    void setCellId(int cellId) { m_cellId = cellId; }
 
-    //! The method to set layer id
-    void setLayerId(int layerId) { m_layerId = layerId; }
+    //! The method to set deposited energy
+    void setEnergyDep(double edep) { m_edep = edep; }
 
-    //! The method to set wire id
-    void setWireId(int wireId) { m_wireId = wireId; }
+    //! The method to set hit average time
+    void setTimeAve(double TimeAve) { m_TimeAve = TimeAve; }
 
-    //! The method to set left drift length
-    void setLeftDriftLength(double leftDriftLength) { m_leftDriftLength = leftDriftLength; }
+    //! The method to get event id
+    int getEventId() const { return m_eventId; }
 
-    //! The method to set right drift length
-    void setRightDriftLength(double rightDriftLength) { m_rightDriftLength = rightDriftLength; }
+    //! The method to get cell id
+    int getCellId() const { return m_cellId; }
 
-    //! The method to set left drift time
-    void setLeftDriftTime(double leftDriftTime) { m_leftDriftTime = leftDriftTime; }
+    //! The method to get deposited energy
+    double getEnergyDep() const { return m_edep; }
 
-    //! The method to set right drift time
-    void setRightDriftTime(double rightDriftTime) { m_rightDriftTime = rightDriftTime; }
+    //! The method to get hit average time
+    double getTimeAve() const {return m_TimeAve;}
 
-    //! The method to set charge
-    void setCharge(double charge) { m_charge = charge; }
 
-    //! The method to get layer id
-    int getLayerId() const { return m_layerId; }
 
-    //! The method to get wire id
-    int getWireId() const { return m_wireId; }
-
-    //! The method to get left drift length
-    double getLeftDriftLength() const { return m_leftDriftLength; }
-
-    //! The method to get right drift length
-    double getRightDriftLength() const { return m_rightDriftLength; }
-
-    //! The method to get left drift time
-    double getLeftDriftTime() const { return m_leftDriftTime; }
-
-    //! The method to get right drift time
-    double getRightDriftTime() const { return m_rightDriftTime; }
-
-    //! The method to get charge
-    double getCharge() const { return m_charge; }
 
     //! Empty constructor
     /*! Recommended for ROOT IO
@@ -91,20 +68,16 @@ namespace Belle2 {
     HitECL() {;}
 
     //! Useful Constructor
-    HitECL(int layerId,
-           int wireId,
-           double leftDriftLength,
-           double rightDriftLength,
-           double leftDriftTime,
-           double rightDriftTime,
-           double charge) {
-      m_layerId = layerId;
-      m_wireId = wireId;
-      m_leftDriftLength  = leftDriftLength;
-      m_rightDriftLength = rightDriftLength;
-      m_leftDriftTime    = leftDriftTime;
-      m_rightDriftTime   = rightDriftTime;
-      m_charge = charge;
+    HitECL(
+      int eventId,
+      int cellId,
+      double edep,
+      double TimeAve
+    ) {
+      m_eventId = eventId;
+      m_cellId = cellId;
+      m_edep = edep;
+      m_TimeAve = TimeAve;
     }
 
     ClassDef(HitECL, 1);

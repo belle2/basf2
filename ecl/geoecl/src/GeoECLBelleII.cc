@@ -255,14 +255,14 @@ void GeoECLBelleII::makeBarrel(GearDir& content, TGeoVolumeAssembly* group)
   double k_phiC;
   double k_zC;
 //  double fin_thickness = 0.05 ;
-  double wrap_thickness = 0.025 ;
+//  double wrap_thickness = 0.025 ;
 
   double zsign = 1.;
 
 
   GearDir detcontent(content);
 //  fin_thickness = detcontent.getParamLength("k_fin_thickness");
-  wrap_thickness = detcontent.getParamLength("k_wrap_thickness");
+//  wrap_thickness = detcontent.getParamLength("k_wrap_thickness");
   int    nblock = int(detcontent.getParamNumValue("k_barrel_Nblock"));
 
 

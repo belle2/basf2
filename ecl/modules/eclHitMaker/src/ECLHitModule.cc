@@ -126,7 +126,6 @@ void ECLHitModule::event()
     double hitTOF         = aECLSimHit->getFlightTime() * Unit::ns;
     TVector3 HitInPos  =   aECLSimHit->getPosIn();
     TVector3 HitOutPos  =   aECLSimHit->getPosOut();
-    int ParticleID = aECLSimHit->getPDGCode();
 
     eclp->Mapping(hitCellId);
     TVector3 PosCell =  eclp->GetCrystalPos();

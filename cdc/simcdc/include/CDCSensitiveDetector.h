@@ -56,6 +56,14 @@ namespace Belle2 {
                    const G4ThreeVector & posOut,
                    const G4int lr);
 
+    //! Save CDCEBSimHit into datastore
+    int saveEBSimHit(const G4int layerId,
+                     const G4double phi,
+                     const G4int trackID,
+                     const G4int pid,
+                     const G4double edep,
+                     const G4ThreeVector & mom);
+
     //void AddbgOne(bool doit);
 
   private:
@@ -266,6 +274,7 @@ namespace Belle2 {
     G4double m_thresholdKineticEnergy;
 
     int m_hitNumber; /**< The current number of created hits in an event. Used to fill the DataStore CDC array.*/
+    int m_EBhitNumber; /**< The current number of created hits in an event. Used to fill the DataStore CDC EB array.*/
   };
 
 } // end of namespace Belle2

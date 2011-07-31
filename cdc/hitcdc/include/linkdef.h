@@ -6,6 +6,7 @@
 #pragma link C++ nestedclasses;
 
 #pragma link C++ class Belle2::CDCSimHit;
+#pragma link C++ class Belle2::CDCEBSimHit;
 #pragma link C++ class Belle2::HitCDC;
 
 #endif

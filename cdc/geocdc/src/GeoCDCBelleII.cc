@@ -586,7 +586,7 @@ void GeoCDCBelleII::create(GearDir& content)
 
     // Construct electronics boards
     TGeoTube* ebTubeShape = new TGeoTube(ebInnerR, ebOuterR, (ebFZ - ebBZ) / 2.0);
-    TGeoVolume* ebTube = new TGeoVolume((format("ElectronicsBoard_Layer%1%") % ebID).str().c_str(), ebTubeShape, medNEMA_G10_Plate);
+    TGeoVolume* ebTube = new TGeoVolume((format("SD_ElectronicsBoard_Layer%1%") % ebID).str().c_str(), ebTubeShape, medNEMA_G10_Plate);
     ebTube->SetLineColor(kGreen);
     volGrpEB->AddNode(ebTube, ebID, new TGeoTranslation(0.0, 0.0, (ebFZ + ebBZ) / 2.0));
   }

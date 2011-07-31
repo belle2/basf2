@@ -17,6 +17,7 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/dataobjects/Relation.h>
 #include <cdc/hitcdc/CDCSimHit.h>
+#include <cdc/hitcdc/CDCEBSimHit.h>
 
 #include "G4Step.hh"
 #include "G4SteppingManager.hh"
@@ -41,7 +42,7 @@ using namespace Belle2;
 
 CDCSensitiveDetector::CDCSensitiveDetector(G4String name, G4double thresholdEnergyDeposit, G4double thresholdKineticEnergy):
     SensitiveDetectorBase(name), m_thresholdEnergyDeposit(thresholdEnergyDeposit),
-    m_thresholdKineticEnergy(thresholdKineticEnergy), m_hitNumber(0)
+    m_thresholdKineticEnergy(thresholdKineticEnergy), m_hitNumber(0), m_EBhitNumber(0)
 {
   addRelationCollection(DEFAULT_MCPART_TO_CDCSIMHITS);
 }
@@ -67,6 +68,7 @@ G4bool CDCSensitiveDetector::ProcessHits(G4Step *aStep, G4TouchableHistory *)
 
   // Get step information
   const G4Track & t = * aStep->GetTrack();
+
   const G4double charge = t.GetDefinition()->GetPDGCharge();
   if (charge == 0.) return false;
 
@@ -89,6 +91,16 @@ G4bool CDCSensitiveDetector::ProcessHits(G4Step *aStep, G4TouchableHistory *)
 
   // Get layer ID
   const unsigned layerId = v.GetCopyNo();
+
+  //--------------------------------------------------------------------------
+  // check if in electronics board, if true, CDCEBSimHit will be created.
+  //--------------------------------------------------------------------------
+  G4LogicalVolume* aLogicalVolume = v.GetLogicalVolume();
+  if ((aLogicalVolume->GetName()).find("Electronics") != std::string::npos) {
+    double phi = (posIn + posOut).phi();
+    saveEBSimHit(layerId, phi, trackID, pid, edep, momIn);
+    return true;
+  }
 
   // Calculate cell ID
   CDCGeometryPar * cdcgp = CDCGeometryPar::Instance();
@@ -326,6 +338,30 @@ CDCSensitiveDetector::saveSimHit(const G4int layerId,
 
   B2DEBUG(150, "HitNumber: " << m_hitNumber);
   return (m_hitNumber);
+}
+
+int
+CDCSensitiveDetector::saveEBSimHit(const G4int layerId,
+                                   const G4double phi,
+                                   const G4int trackID,
+                                   const G4int pid,
+                                   const G4double edep,
+                                   const G4ThreeVector & mom)
+{
+  //change Later
+  StoreArray<CDCEBSimHit> cdcEBArray(DEFAULT_CDCEBSIMHITS);
+  m_EBhitNumber = cdcEBArray->GetLast() + 1;
+  new(cdcEBArray->AddrAt(m_EBhitNumber)) CDCEBSimHit();
+  cdcEBArray[m_EBhitNumber]->setLayerId(layerId);
+  cdcEBArray[m_EBhitNumber]->setPhi(phi);
+  cdcEBArray[m_EBhitNumber]->setTrackId(trackID);
+  cdcEBArray[m_EBhitNumber]->setPDGCode(pid);
+  cdcEBArray[m_EBhitNumber]->setEnergyDep(edep / GeV);
+  TVector3 momentum(mom.getX() / GeV, mom.getY() / GeV, mom.getZ() / GeV);
+  cdcEBArray[m_EBhitNumber]->setMomentum(momentum);
+
+  B2DEBUG(150, "HitNumber: " << m_EBhitNumber);
+  return (m_EBhitNumber);
 }
 
 /*

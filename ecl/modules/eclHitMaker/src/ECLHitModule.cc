@@ -136,15 +136,11 @@ void ECLHitModule::event()
 
 
     for (int iECLCell = 0; iECLCell < 8736; iECLCell++) {
-
       if (hitCellId == iECLCell && hitTOF < 8000) {
         int TimeIndex = (int) hitTOF / 500;
         E_cell[iECLCell][TimeIndex] = E_cell[iECLCell][TimeIndex] + hitE;
         X_ave[iECLCell][TimeIndex] = X_ave[iECLCell][TimeIndex] + hitE * local_pos;
         Tof_ave[iECLCell][TimeIndex] = Tof_ave[iECLCell][TimeIndex] + hitE * hitTOF;
-
-        if (hitTOF > 500)cout << "cellid " << hitCellId << " Tof " << hitTOF << " TimeIndex " << TimeIndex << " ParticleID " << ParticleID << " Energy " << hitE << endl;
-
       }
     } // End loop crsyal 8736
 
@@ -168,7 +164,6 @@ void ECLHitModule::event()
         eclHitArray[m_hitNum]->setCellId(iECLCell);
         eclHitArray[m_hitNum]->setEnergyDep(E_cell[iECLCell][TimeIndex]);
         eclHitArray[m_hitNum]->setTimeAve(T_ave[iECLCell][TimeIndex] + Tof_ave[iECLCell][TimeIndex]);
-        cout << TimeIndex << " " << iECLCell << " " << E_cell[iECLCell][TimeIndex] << " Total T " << T_ave[iECLCell][TimeIndex] + Tof_ave[iECLCell][TimeIndex]  << " Tof: " << Tof_ave[iECLCell][TimeIndex] << " Tav" << T_ave[iECLCell][TimeIndex] << endl;
       }//if Energy > 0
     }//16 Time interval 16x 500 ns
   } //store  each crystal hit

@@ -169,7 +169,6 @@ void ECLHitModule::event()
   } //store  each crystal hit
 
   m_nEvent++;
-  B2ERROR("End of events " <<  m_nEvent);
 }
 
 

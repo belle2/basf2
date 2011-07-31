@@ -56,29 +56,29 @@ namespace Belle2 {
     void Mapping(int cid);
 
 
-    TVector3 GetCrystalPos();
+    TVector3 GetCrystalPos();  /** The Postion of crystal*/
 
-    TVector3 GetCrystalVec();
+    TVector3 GetCrystalVec();  /** The dection of crystal*/
 
   private:
 
-    double m_BLThetaCrystal[46];
-    double m_BLPhiCrystal[46];
-    double m_BLPreppos[46];
-    double m_BLPhipos[46];
-    double m_BLZpos[46];
+    double m_BLThetaCrystal[46];  /** The Theta angle of  crystal derection for Barrel crystals */
+    double m_BLPhiCrystal[46];    /** The Phi angle of  crystal derection  for Barrel crystals */
+    double m_BLPreppos[46];       /** The Prep of  crystal derection  for Barrel crystals */
+    double m_BLPhipos[46];        /** The Theta angle of  crystal position  for Barrel crystals */
+    double m_BLZpos[46];          /** The Z of  crystal position  for Barrel crystals */
 
-    double m_ECThetaCrystal[132];
-    double m_ECPhiCrystal[132];
-    double m_ECThetapos[132];
-    double m_ECPhipos[132];
-    double m_ECRpos[132];
+    double m_ECThetaCrystal[132]; /** The Theta angle of  crystal derection  for Endcap crystals */
+    double m_ECPhiCrystal[132];   /** The Phi angle of  crystal derection  for Endcap crystals */
+    double m_ECThetapos[132];     /** The Theta angle of  crystal position  for Endcap crystals */
+    double m_ECPhipos[132];       /** The Phi angle of  crystal position  for Endcap crystals */
+    double m_ECRpos[132];         /** The R angle of  crystal position  for Endcap crystals */
 
-    int mPar_cellID;
-    int mPar_thetaID;
-    int mPar_phiID;
-    int mPar_thetaIndex;
-    int mPar_phiIndex;
+    int mPar_cellID;           /** The Cell ID information*/
+    int mPar_thetaID;          /** The Theta ID information*/
+    int mPar_phiID;            /** The Phi ID information*/
+    int mPar_thetaIndex;       /** The Theta Index information*/
+    int mPar_phiIndex;         /** The Phi IndeX information*/
 
     static ECLGeometryPar* m_B4ECLGeometryParDB; /*!< Pointer that saves the instance of this class. */
   };

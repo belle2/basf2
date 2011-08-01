@@ -107,11 +107,13 @@ namespace Belle2 {
     //Copy could be expensive and this should be a corner-case anyway
     EXPECT_EQ(relIndex.size(), 4u);
 
+    double dummy(0);
     typedef const RelationIndex<EventMetaData, RunMetaData>::Element el_t;
     {
       int size(0);
       BOOST_FOREACH(el_t &e, relIndex.getFrom(evtData[0])) {
         ++size;
+        dummy += e.weight;
       }
       EXPECT_EQ(size, 3);
     }
@@ -119,6 +121,7 @@ namespace Belle2 {
       int size(0);
       BOOST_FOREACH(el_t &e, relIndex.getTo(runData[0])) {
         ++size;
+        dummy += e.weight;
       }
       EXPECT_EQ(size, 2);
     }

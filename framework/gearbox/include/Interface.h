@@ -31,6 +31,9 @@ namespace Belle2 {
       /** default constructor initializing to toplevel parameter space */
       Interface(): m_path("/") {}
 
+      /** empty, virtual destructor */
+      virtual ~Interface() {}
+
       /**
        * Return the number of nodes a given path will expand to
        * @return number of nodes, 0 if path does not exist

@@ -60,6 +60,10 @@ namespace Belle2 {
        * Parsing of this string is left to the actual implementation
        */
       InputHandler(const std::string& uri): m_uri(uri) {};
+
+      /** empty, virtual destructor */
+      virtual ~InputHandler() {}
+
       /**
        * Open an XML resource.
        *

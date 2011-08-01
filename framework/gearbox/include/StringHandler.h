@@ -40,6 +40,8 @@ namespace Belle2 {
     public:
       /** Create a new InputHandler which always returns uri as XML content */
       StringHandler(const std::string& uri): InputHandler(uri) {}
+      /** empty, virtual destructor */
+      virtual ~StringHandler() {}
       /** Create a new context, path will be ignored */
       virtual InputContext* open(const std::string &path) {
         return new StringContext(m_uri);

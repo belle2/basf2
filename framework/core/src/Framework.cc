@@ -11,6 +11,7 @@
 
 #include <framework/core/Framework.h>
 #include <framework/core/Environment.h>
+#include <framework/core/utilities.h>
 
 #include <framework/logging/Logger.h>
 #include <framework/logging/LogConnectionIOStream.h>
@@ -107,7 +108,7 @@ int Framework::getNumberProcesses()
 
 bool Framework::readEvtGenTableFromFile(const std::string& filename)
 {
-  if (ModuleUtils::isFile(filename)) {
+  if (FileSystem::isFile(filename)) {
     TDatabasePDG::Instance()->ReadEvtGenTable(filename.c_str());
   } else {
     return false;

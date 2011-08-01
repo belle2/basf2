@@ -3,7 +3,7 @@
  * Copyright(C) 2010-2011  Belle II Collaboration                         *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Andreas Moll                                             *
+ * Contributors: Martin Ritter                                            *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -11,180 +11,173 @@
 #ifndef GEARBOX_H
 #define GEARBOX_H
 
-#include <boost/python.hpp>
+#include <libxml/xpath.h>
 
-#include <framework/gearbox/GearboxIOAbs.h>
-#include <framework/gearbox/GearDir.h>
-
-#include <string>
+#include <framework/gearbox/Interface.h>
+#include <framework/gearbox/InputHandler.h>
+#include <framework/core/MRUCache.h>
 
 namespace Belle2 {
+  namespace gearbox {
+    void* openXmlUri(const char*);
+  }
 
-  /**
-   * The Gearbox class.
-   *
-   * The Gearbox class provides an interface to access the parameters
-   * describing the Belle II detector geometry. It uses the GearboxIOAbs
-   * interface to handle the user request for parameters and therefore allows
-   * to be connected to a wide variety of parameter sources (e.g. XML, databases).
-   * It is designed as a singleton.
-   */
-  class Gearbox {
-
+  class Gearbox: public gearbox::Interface {
   public:
+    /** Default cache size for the Gearbox */
+    enum { DefaultCacheSize = 200 };
 
-    /**
-     * The content return types.
-     */
-    enum EGearboxContentType {
-      c_GbxGlobal,       /**< The content section of the global parameters. */
-      c_GbxMaterial,     /**< The content section of the material sets. */
-      c_GbxSubdetectors  /**< The content section of the subdetector parameters. */
+    /** Struct for caching results from the xml file */
+    struct PathValue {
+      PathValue(): numNodes(0), value(""), unit("") {}
+      /** number of nodes corresponding to the path */
+      int numNodes;
+      /** value of the first node if present, otherwise "" */
+      std::string value;
+      /** unit attribute of the first node if present, otherwise "" */
+      std::string unit;
     };
 
-    /**
-     * Static method to get a reference to the Gearbox instance.
-     *
-     * @return A reference to an instance of this class.
-     */
-    static Gearbox& Instance();
+    /** Free structures on destruction */
+    ~Gearbox() { close(); clearBackends(); }
+
+    /** Return reference to the Gearbox instance */
+    static Gearbox& getInstance();
 
     /**
-     * Connects the Gearbox to a GearboxIO object.
-     *
-     * The GearboxIO object handles the parameters requests from the user.
-     * The connection to the parameter source is not opened by the gearbox,
-     * it has to be done externally.
-     * The Gearbox takes ownership of the GearboxIO object.
-     *
-     * @param gearboxIO Pointer to a GearboxIOAbs object. The Gearbox takes ownership of the GearboxIO object.
+     * Select the backends to use to find resources
+     * @param backends list of URIs identifying the backends starting with the
+     *                 handler prefix followed by a colon, the rest is handler
+     *                 specific
      */
-    void connect(GearboxIOAbs* gearboxIO);
+    void setBackends(const std::vector<std::string>& backends);
+
+    /** Clear list of backends */
+    void clearBackends();
 
     /**
-     * Returns a reference to the current GearboxIO object.
-     *
-     * If the GearboxIO object is not defined or not connected to a detector
-     * parameter source an exception of type GearboxIONotConnectedError is thrown.
-     *
-     * @return A reference to the current GearboxIO object.
+     * Open connection to backend and parse tree
+     * @param name Name of the tree to parse
+     * @param maximum cache size in entries
      */
-    GearboxIOAbs& getGearboxIO() const throw(GearboxIOAbs::GearboxIONotConnectedError);
+    void open(const std::string& name = "Belle2.xml", size_t cachSize = DefaultCacheSize);
+
+    /** Free internal structures of previously parsed tree and clear cache */
+    void close();
 
     /**
-     * Returns a GearDir pointing to the content section of the specified parameter set.
-     *
-     * @param paramSetType The name of the parameter set type.
-     * @return A GearDir object pointing to the content part of the specified parameter set.
+     * Return the number of nodes a given path will expand to
+     * @return number of nodes, 0 if path does not exist
      */
-    GearDir getContent(const std::string& paramSetType, EGearboxContentType contentType = c_GbxSubdetectors)
-    throw(GearboxIOAbs::GearboxIONotConnectedError);
+    virtual int getNumberNodes(const std::string &path = "") const {
+      return getPathValue(path).numNodes;
+    }
 
     /**
-     * Returns the path to the content section of the given global parameter set.
-     *
-     * @param globalParam The name of the global parameter set.
-     * @return The full path to the content section of the global parameter set.
+     * Get the parameter path as a string.
+     * @exception gearbox::PathEmptyError if path is empty or does not exist
+     * @param path Path of the parameter to get
+     * @return value of the parameter
      */
-    std::string getGlobalParamPath(const std::string& globalParam) const;
+    virtual std::string getString(const std::string &path = "") const throw(gearbox::PathEmptyError) {
+      PathValue p = getPathValue(path);
+      if (p.numNodes == 0) throw gearbox::PathEmptyError() << path;
+      return p.value;
+    }
+
+    std::string getString(const std::string &path, const std::string &defaultValue) const {
+      return gearbox::Interface::getString(path, defaultValue);
+    }
 
     /**
-     * Returns the path to the content section of the given material set.
+     * Get the parameter path as string and also return the unit it was defined with.
      *
-     * @param globalParam The name of the material set.
-     * @return The full path to the content section of the material set.
+     * If no unit was defined, an empty string will be returned for the unit.
+     * No parsing of the unit is performed, this funtion is primarily used by
+     * getWithUnit.
+     *
+     * @exception gearbox::PathEmptyError if path is empty or does not exist
+     * @param path Path of the parameter to get
+     * @return value of the parameter
      */
-    std::string getMaterialParamPath(const std::string& materialParam) const;
+    virtual std::pair<std::string, std::string> getStringWithUnit(const std::string &path = "") const throw(gearbox::PathEmptyError) {
+      PathValue p = getPathValue(path);
+      if (!p.numNodes) throw gearbox::PathEmptyError() << path;
+      return make_pair(p.value, p.unit);
+    }
 
     /**
-     * Returns the path to the content section of the given subdetector.
+     * Return GearDir representing a given DetectorComponent
      *
-     * @param subdetector The name of the subdetector.
-     * @return The full path to the content section of the subdetector.
+     * @param component Name of the DetectorComponent (e.g. IR, PXD)
      */
-    std::string getSubdetectorPath(const std::string& subdetector) const;
+    GearDir getContent(const std::string& component);
 
     /**
-     * Enables the validation of all paths and parameters.
-     *
-     * If set to true, a validity check of all paths and parameters is performed
-     * each time they are accessed. By default the check is turned on.
-     * Turn it off, in order to speed up the parameter access.
-     *
-     * Different types of exceptions can be thrown:
-     * GearboxIONotConnectedError: if the GearboxIO is not connected to a storage medium.
-     *
-     * @param pathCheck If set to true, a check of a path/parameter is performed each time it is accessed.
+     * Register a new input handler
+     * @param prefix prefix signaling which handler to use for a given
+     *               backend uri. The prefix is everything up to the first
+     *               colon in the backend uri
+     * @param factory Pointer to the factory function which will return an
+     *               instance of the handler
      */
-    void enableParamCheck(bool paramCheck)
-    throw(GearboxIOAbs::GearboxIONotConnectedError);
-
-    /**
-     * Checks if the given path is a valid path.
-     *
-     * Different types of exceptions can be thrown:
-     * GearboxIONotConnectedError: if the GearboxIO is not connected to a storage medium.
-     *
-     * @param path The path which should be validated.
-     * @return True if the path is valid.
-     */
-    bool isPathValid(const std::string& path) const
-    throw(GearboxIOAbs::GearboxIONotConnectedError);
-
-    /**
-     * Checks if a parameter given by the path is available.
-     *
-     * Different types of exceptions can be thrown:
-     * GearboxIONotConnectedError: if the GearboxIO is not connected to a storage medium.
-     * GearboxPathNotValidError: if the path statement is not valid.
-     *
-     * @param path The path to the node which should be checked for existence.
-     * @return True if the path to the node and the node (parameter) itself exists.
-     */
-    bool isParamAvailable(const std::string& path) const
-    throw(GearboxIOAbs::GearboxIONotConnectedError, GearboxIOAbs::GearboxPathNotValidError);
-
-
-  protected:
-
+    static void registerInputHandler(std::string prefix, gearbox::InputHandler::Factory *factory) {
+      getInstance().m_registeredHandlers[prefix] = factory;
+    }
 
   private:
-
-    GearboxIOAbs* m_gearboxIO; /**< Pointer to the current Gearbox IO object. */
-
-    /**
-     * Closes the connection to the current GearboxIO object.
-     *
-     * @return True if the connection could be closed.
-     */
-    bool close();
-
-    /**
-     * The constructor is hidden to avoid that someone creates an instance of this class.
-     */
+    /** Singleton: private constructor */
     Gearbox();
+    /** Singleton: private copy constructor */
+    Gearbox(const Gearbox &b): m_parameterCache(DefaultCacheSize) {}
 
-    /** Disable/Hide the copy constructor. */
-    Gearbox(const Gearbox&);
+    /** Function to be called when libxml requests a new input uri to be opened */
+    gearbox::InputContext* openXmlUri(const std::string &uri) const;
 
-    /** Disable/Hide the copy assignment operator. */
-    Gearbox& operator=(const Gearbox&);
+    /** Return the (cached) value of a given path */
+    PathValue getPathValue(const std::string &path) const;
 
-    /** The Gearbox destructor. */
-    ~Gearbox();
+    /** Pointer to the libxml Document structure */
+    xmlDocPtr m_xmlDocument;
+    /** Pointer to the libxml XPath context */
+    xmlXPathContextPtr m_xpathContext;
+    /** Cache for already queried paths */
+    mutable MRUCache<std::string, PathValue> m_parameterCache;
 
-    static Gearbox* m_instance; /**< Pointer that saves the instance of this class. */
+    /** List of input handlers which will be used to find resources. */
+    std::vector<gearbox::InputHandler*> m_handlers;
+    /** Map of registered InputHandlers */
+    std::map<std::string, gearbox::InputHandler::Factory*> m_registeredHandlers;
 
-    /** Destroyer class to delete the instance of the Gearbox class when the program terminates. */
-    class SingletonDestroyer {
-    public: ~SingletonDestroyer() {
-        if (Gearbox::m_instance != NULL) delete Gearbox::m_instance;
-      }
-    };
-    friend class SingletonDestroyer;
-
+    /**
+     * friend to internal c-like function to interface libxml2 callback
+     *
+     * This function is declared as friend since it needs access to
+     * Gearbox::openXmlUri, a function which should only be called by libxml2
+     * and thus is declared private.
+     */
+    friend void* gearbox::openXmlUri(const char*);
   };
 
+  /** Helper class to easily register new input handlers */
+  template<class T> struct InputHandlerFactory {
+    InputHandlerFactory(const std::string& prefix) {
+      Gearbox::registerInputHandler(prefix, factory);
+    }
+    static gearbox::InputHandler* factory(const std::string& uri) {
+      return new T(uri);
+    }
+  };
+
+  /**
+   * Helper macro to easily register new input handlers. It will create a factory function for
+   * the InputHandler and register it with the Gearbox instance
+   * @param classname Classname to create factory for
+   * @param prefix    Prefix to register the handler for, e.g. "file" to register
+   *                  a handler responsible for uris starting with file:
+   */
+#define B2_GEARBOX_REGISTER_INPUTHANDLER(classname,prefix)\
+  InputHandlerFactory<classname> Gearbox_InputHandlerFactory_##classname(prefix)
 }
 
-#endif /* GEARBOX_H */
+#endif

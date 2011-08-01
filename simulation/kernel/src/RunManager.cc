@@ -29,9 +29,19 @@ RunManager& RunManager::Instance()
   return *m_instance;
 }
 
+void RunManager::Initialize()
+{
+  SetGeometryToBeOptimized(true);
+  //Set geometry to be Initialized because there won't be any before the beginRun
+  geometryInitialized = true;
+  G4RunManager::Initialize();
+}
+
 
 void RunManager::beginRun(int runNumber)
 {
+  //Initialize Geometry
+  InitializeGeometry();
   //Check if all the necessary initializations have already be done.
   if (ConfirmBeamOnCondition()) {
     //Set run number

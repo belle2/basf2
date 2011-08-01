@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DetectorComponent name="PXD" xmlns:xi="http://www.w3.org/2001/XInclude">
+  <Creator library="pxd">PXDCreator</Creator>
+  <Content>
+    <xi:include href="PXD-Alignment.xml"/>
+    <xi:include href="PXD-Envelope.xml"/>
+    <xi:include href="PXD-Support.xml"/>
+    <xi:include href="PXD-Components.xml"/>
+    <HalfShell name="Ying">
+      <Support><phi unit="deg">0</phi></Support>
+      <Layer id="1">
+        <Ladder id="1"><phi unit="deg">0</phi></Ladder>
+        <Ladder id="2"><phi unit="deg">45</phi></Ladder>
+        <Ladder id="3"><phi unit="deg">90</phi></Ladder>
+        <Ladder id="4"><phi unit="deg">135</phi></Ladder>
+      </Layer>
+      <Layer id="2">
+        <Ladder id="1"><phi unit="deg">0</phi></Ladder>
+        <Ladder id="2"><phi unit="deg">30</phi></Ladder>
+        <Ladder id="3"><phi unit="deg">60</phi></Ladder>
+        <Ladder id="4"><phi unit="deg">90</phi></Ladder>
+        <Ladder id="5"><phi unit="deg">120</phi></Ladder>
+        <Ladder id="6"><phi unit="deg">150</phi></Ladder>
+      </Layer>
+    </HalfShell>
+    <HalfShell name="Yang">
+      <Support><phi unit="deg">180</phi></Support>
+      <Layer id="1">
+	<Ladder id="5"><phi unit="deg">180</phi></Ladder>
+        <Ladder id="6"><phi unit="deg">225</phi></Ladder>
+        <Ladder id="7"><phi unit="deg">270</phi></Ladder>
+        <Ladder id="8"><phi unit="deg">315</phi></Ladder>
+      </Layer>
+      <Layer id="2">
+        <Ladder id="7"><phi unit="deg">180</phi></Ladder>
+        <Ladder id="8"><phi unit="deg">210</phi></Ladder>
+        <Ladder id="9"><phi unit="deg">240</phi></Ladder>
+        <Ladder id="10"><phi unit="deg">270</phi></Ladder>
+        <Ladder id="11"><phi unit="deg">300</phi></Ladder>
+        <Ladder id="12"><phi unit="deg">330</phi></Ladder>
+      </Layer>
+    </HalfShell>
+  </Content>
+</DetectorComponent>

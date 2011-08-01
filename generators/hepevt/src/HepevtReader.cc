@@ -210,7 +210,7 @@ void HepevtReader::readParticle(MCParticleGraph::GraphParticle &particle) throw(
       //particle.setEnergy(fields[9]);
       particle.setMass(fields[10]);
       particle.setProductionVertex(TVector3(&fields[11])*Unit::mm);
-      particle.setProductionTime(fields[14]*Unit::mm / Unit::speed_of_light);
+      particle.setProductionTime(fields[14]*Unit::mm / Unit::speedOfLight);
       particle.setValidVertex(true);
       {
         //Warn if energy in Hepevt file differs from calculated energy by more than 0.1%

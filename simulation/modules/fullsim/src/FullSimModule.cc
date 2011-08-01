@@ -11,7 +11,6 @@
 #include <simulation/modules/fullsim/FullSimModule.h>
 #include <simulation/kernel/RunManager.h>
 #include <simulation/kernel/DetectorConstruction.h>
-#include <simulation/kernel/VGMDetectorConstruction.h>
 #include <simulation/kernel/PhysicsList.h>
 #include <simulation/kernel/MagneticField.h>
 #include <simulation/kernel/PrimaryGeneratorAction.h>
@@ -33,13 +32,11 @@
 #include <G4EventManager.hh>
 #include <G4RunManager.hh>
 #include <G4UImanager.hh>
+#include <G4UIExecutive.hh>
 #include <G4VisExecutive.hh>
 #include <G4StepLimiter.hh>
 #include <G4LossTableManager.hh>
 #include <G4HadronicProcessStore.hh>
-
-#include <TGeoManager.h>
-#include <TG4RootNavMgr.h>
 
 using namespace std;
 using namespace Belle2;
@@ -62,17 +59,14 @@ FullSimModule::FullSimModule() : Module(), m_visManager(NULL)
   //Parameter definition
   addParam("InputMCParticleCollection", m_mcParticleInputColName, "The name of the input MCParticle collection.", string(DEFAULT_MCPARTICLES));
   addParam("OutputMCParticleCollection", m_mcParticleOutputColName, "The name of the output MCParticle collection.", string(DEFAULT_MCPARTICLES));
-  addParam("OutputRelationCollection", m_relationOutputColName, "The name of the output Relation (Hit -> MCParticle) collection.", string("RelationHitMCP"));
   addParam("ThresholdImportantEnergy", m_thresholdImportantEnergy, "[GeV] A particle which got 'stuck' and has less than this energy will be killed after 'ThresholdTrials' trials.", 0.250);
   addParam("ThresholdTrials", m_thresholdTrials, "Geant4 will try 'ThresholdTrials' times to move a particle which got 'stuck' and has an energy less than 'ThresholdImportantEnergy'.", 10);
   addParam("TrackingVerbosity", m_trackingVerbosity, "Tracking verbosity: 0=Silent; 1=Min info per step; 2=sec particles; 3=pre/post step info; 4=like 3 but more info; 5=proposed step length info.", 0);
-  addParam("CreateRelations", m_createRelations, "Set to True to create relations between Hits and MCParticles.", true);
   addParam("PhysicsList", m_physicsList, "The name of the physics list which is used for the simulation.", string("QGSP_BERT"));
   addParam("RegisterOptics", m_optics, "If true, G4OpticalPhysics is registered in Geant4 PhysicsList.", false);
   addParam("ProductionCut", m_productionCut, "Apply continuous energy loss to primary particle which has no longer enough energy to produce secondaries which travel at least the specified productionCut distance.", 0.07);
   addParam("MaxNumberSteps", m_maxNumberSteps, "The maximum number of steps before the track transportation is stopped and the track is killed.", 100000);
   addParam("PhotonFraction", m_photonFraction, "The fraction of Cerenkov photons which will be kept and propagated.", 1.0);
-  addParam("UseNativeGeant4", m_useNativeGeant4, "If set to True, uses the Geant4 navigator and native detector construction class.", false);
   addParam("EnableVisualization", m_EnableVisualization, "If set to True the Geant4 visualization support is enabled.", false);
 
   vector<string> defaultCommands;
@@ -88,48 +82,17 @@ FullSimModule::~FullSimModule()
 
 void FullSimModule::initialize()
 {
-  //Perform some initial checks
-  if (gGeoManager == NULL) {
-    B2ERROR("No geometry was found in memory (gGeoManager is NULL) !")
-    return;
-  }
-
-  if (!gGeoManager->IsClosed()) {
-    B2ERROR("The geometry was not closed ! Make sure gGeoManager->CloseGeometry() was called.")
-    return;
-  }
-
-  //Create an instance of the G4Root Navigation manager if the simulation is not run in native Geant4 mode.
-  TG4RootNavMgr* g4rootNavMgr = NULL;
-  if (!m_useNativeGeant4) {
-    g4rootNavMgr = TG4RootNavMgr::GetInstance(gGeoManager);
-
-    if (g4rootNavMgr == NULL) {
-      B2ERROR("Could not retrieve an instance of the TG4RootNavMgr !")
-      return;
-    }
-  }
-
   //Get the instance of the run manager.
   RunManager& runManager = RunManager::Instance();
-
-  //If the simulation is not run in native Geant4 mode,
-  //convert the TGeo volumes/materials to Geant4 volumes/materials and then
-  //call the DetectorConstruction class to allow the user based modification
-  //of the created geant4 volumes/materials.
-  //Otherwise build the VGMDetectorConstruction class
-  if (!m_useNativeGeant4) {
-    g4rootNavMgr->Initialize(new DetectorConstruction());
-    g4rootNavMgr->ConnectToG4();
-  } else {
-    runManager.SetUserInitialization(new VGMDetectorConstruction());
-  }
 
   //Create the Physics list
   PhysicsList* physicsList = new PhysicsList(m_physicsList);
   physicsList->setProductionCutValue(m_productionCut);
   if (m_optics) physicsList->registerOpticalPhysicsList();
   runManager.SetUserInitialization(physicsList);
+
+  //Add Geometry
+  runManager.SetUserInitialization(new DetectorConstruction());
 
   //Create the magnetic field for the Geant4 simulation
   MagneticField* magneticField = new MagneticField();
@@ -142,7 +105,7 @@ void FullSimModule::initialize()
   runManager.SetUserAction(generatorAction);
 
   //Add the event action which creates the final MCParticle list and the Relation list.
-  EventAction* eventAction = new EventAction(m_mcParticleOutputColName, m_relationOutputColName, m_mcParticleGraph, m_createRelations);
+  EventAction* eventAction = new EventAction(m_mcParticleOutputColName, m_mcParticleGraph);
   runManager.SetUserAction(eventAction);
 
   //Add the tracking action which handles the secondary particles created by Geant4.
@@ -208,12 +171,12 @@ void FullSimModule::initialize()
   }
 
   //Apply the Geant4 UI commands
-  if (m_uiCommands.size() > 0) {
+  /*if (m_uiCommands.size() > 0) {
     G4UImanager* uiManager = G4UImanager::GetUIpointer();
     for (vector<string>::iterator iter = m_uiCommands.begin(); iter != m_uiCommands.end(); iter++) {
       uiManager->ApplyCommand(*iter);
     }
-  }
+  }*/
 }
 
 
@@ -224,6 +187,12 @@ void FullSimModule::beginRun()
 
   //Begin the Geant4 run
   RunManager::Instance().beginRun(eventMetaDataPtr->getRun());
+  if (m_uiCommands.size() > 0) {
+    G4UImanager* uiManager = G4UImanager::GetUIpointer();
+    for (vector<string>::iterator iter = m_uiCommands.begin(); iter != m_uiCommands.end(); iter++) {
+      uiManager->ApplyCommand(*iter);
+    }
+  }
 }
 
 
@@ -241,6 +210,10 @@ void FullSimModule::endRun()
 {
   //Terminate the Geant4 run
   RunManager::Instance().endRun();
+
+  //G4UIExecutive * ui = new G4UIExecutive(0,0);
+  //ui->SessionStart();
+  //delete ui;
 }
 
 

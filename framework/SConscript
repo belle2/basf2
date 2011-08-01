@@ -2,7 +2,12 @@ Import('env')
 
 env['LIBS'] = ['$ROOT_LIBS', 'Geom', 'EG',
                'g4root', '$GEANT4_LIBS', 'CLHEP',
-               'boost_python', 'boost_filesystem', 'boost_regex',
+               'boost_python', 'boost_filesystem', 'boost_regex', 'boost_iostreams',
                '$PYTHON_LIBS', '$XML_LIBS']
+
+conf = Configure(env)
+if conf.CheckHeader("sqlite3.h"):
+    conf.env.Append(CPPDEFINES="-DHAS_SQLITE")
+    env['LIBS'].append("sqlite3")
 
 Return('env')

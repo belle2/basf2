@@ -42,7 +42,7 @@ void TouschekReaderSAD::initialize(TGeoHMatrix* transMatrix, double sRange, int 
 
   //Calculate the Touschek to real particle number factor
   double totalCurrentLoss   = current / lifetime;
-  double timePartRound      = Unit::ringCircumference / Unit::speed_of_light;
+  double timePartRound      = Unit::ringCircumference / Unit::speedOfLight;
   double totalLossPerRound  = totalCurrentLoss * timePartRound;
   double lossPerRound       = (totalLossPerRound / Unit::s) / 1.6e-19; //The unit is required because [A] = [C]/[s]
   m_touschekToRealFactor    = lossPerRound * readoutTime;

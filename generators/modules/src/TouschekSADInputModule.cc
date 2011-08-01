@@ -13,7 +13,8 @@
 
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Gearbox.h>
-#include <framework/core/ModuleUtils.h>
+#include <framework/gearbox/GearDir.h>
+#include <framework/core/utilities.h>
 
 #include <framework/gearbox/Unit.h>
 
@@ -63,15 +64,15 @@ void TouschekSADInputModule::initialize()
   StoreArray<MCParticle> MCParticles(DEFAULT_MCPARTICLES);
 
   //Check parameters
-  if (!ModuleUtils::fileNameExists(m_filenameLER)) {
+  if (!FileSystem::fileExists(m_filenameLER)) {
     B2ERROR("Parameter <FilenameLER>: Could not open the file. The filename " << m_filenameLER << " does not exist !")
   } else m_readerLER.open(m_filenameLER);
 
   //Set the transformation from local Touschek plane space to global geant4 space
   //Get the parameters from the Gearbox
   m_lerPipePartMatrix = new TGeoHMatrix("TouschekSADTrafoLER");
-  GearDir irDir = Gearbox::Instance().getContent("IR");
-  double angle = irDir.getParamAngle("Streams/Stream[@name='LERUpstream']/Section[@name='Crotch']/Pipe[1]/Angle");
+  GearDir irDir = Gearbox::getInstance().getContent("IR");
+  double angle = irDir.getAngle("Streams/Stream[@name='LERUpstream']/Section[@name='Crotch']/Pipe[1]/Angle");
   m_lerPipePartMatrix->RotateY(angle / Unit::deg);
 
   //-----------------------

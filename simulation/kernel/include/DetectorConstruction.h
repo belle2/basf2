@@ -1,53 +1,37 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010-2011  Belle II Collaboration                         *
+ * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Andreas Moll, Guofu Cao                                  *
+ * Contributors: Martin Ritter                                            *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef DETECTORCONSTRUCTION_H_
-#define DETECTORCONSTRUCTION_H_
+#ifndef DETECTORCONSTRUCTION_H
+#define DETECTORCONSTRUCTION_H
 
-#include <TG4RootDetectorConstruction.h>
+#include <geometry/GeometryManager.h>
+#include "G4VUserDetectorConstruction.hh"
 
 namespace Belle2 {
 
-  namespace Simulation {
+  /**
+   * Class responsible to connect to geometry to simulation.
+   * Normally this class is responsible to build the geometry. In our case the
+   * geometry should already be built by the Geometry Module since it is also
+   * used for tracking and display, so we just hand over the pointer to Geant4
+   */
+  class DetectorConstruction: public G4VUserDetectorConstruction {
+  public:
+    /** Return pointer to top volume */
+    G4VPhysicalVolume* Construct() {
+      G4VPhysicalVolume* topVolume = geometry::GeometryManager::getInstance().getTopVolume();
+      if (!topVolume) B2FATAL("No Geometry defined, please create the geometry"
+                                " before doing simulation, normally by using the Geometry module.");
+      return topVolume;
+    }
+  };
 
-    /**
-     * The Class for Belle2 Detector Construction.
-     *
-     * This class is called after the ROOT geometry has been converted to Geant4 native volumes.
-     * It connects the sensitive volumes to the sensitive detector classes
-     * and calls the initializeGeant4() method of all creators.
-     */
-    class DetectorConstruction : public TVirtualUserPostDetConstruction {
-
-    public:
-
-      /** The DetectorConstruction constructor. */
-      DetectorConstruction();
-
-      /** The DetectorConstruction destructor. */
-      virtual ~DetectorConstruction();
-
-      /**
-       * Called by G4Root after the ROOT geometry was converted to native Geant4 volumes.
-       *
-       * @param dc The pointer of TG4RootDetectorConstruction in g4root which provides methods to access GEANT4 created objects
-       *           which correspond to TGeo objects.
-       */
-      virtual void Initialize(TG4RootDetectorConstruction *dc);
-
-    private:
-
-    };
-
-  } //end namespace Simulation
-
-} //end namespace Belle2
-
-#endif /* DETECTORCONSTRUCTION_H_ */
+} //Belle2 namespace
+#endif

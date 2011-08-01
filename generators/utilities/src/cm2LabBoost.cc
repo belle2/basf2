@@ -9,7 +9,7 @@ TLorentzRotation getBoost(double Eher, double Eler, double cross_angle, double a
 {
 
 // Beam parameter
-  double mEle = Unit::electron_mass;
+  double mEle = Unit::electronMass;
 
 // Lab frame Z axis is defined by B files
 // its positive direction close to direction of

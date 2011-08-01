@@ -1,6 +1,0 @@
-Import('env')
-
-env['LIBS'] = ['pxd', 'framework', 'generators', 'geometry',
-               '$ROOT_LIBS']
-
-Return('env')

@@ -13,11 +13,11 @@
 
 #include <map>
 #include <cstring>
-#include <sys/time.h>
 #include <string>
 #include <numeric>
 #include <framework/gearbox/Unit.h>
 #include <framework/core/Module.h>
+#include <framework/core/utilities.h>
 #include <boost/python.hpp>
 #include <boost/array.hpp>
 
@@ -150,7 +150,7 @@ namespace Belle2 {
      * @param mode    Which counter to increase
      */
     void startGlobal(ECounters mode = c_Event) {
-      m_globalStart = getTime();
+      m_globalStart = Utils::getClock();
     }
 
     /**
@@ -166,7 +166,7 @@ namespace Belle2 {
      * @param mode   Which counter to increase
      */
     void startModule(const Module &module, ECounters mode = c_Event) {
-      m_moduleStart = getTime();
+      m_moduleStart = Utils::getClock();
     }
 
     /**
@@ -233,13 +233,6 @@ namespace Belle2 {
     /** Singleton, hide assignment operator*/
     ModuleStatistics& operator=(ModuleStatistics &b) { return *this; }
 
-    /** Get current clock time using high precision realtime clock */
-    double getTime() {
-      timespec ts;
-      clock_gettime(CLOCK_REALTIME, &ts);
-      return (ts.tv_sec * Unit::s) + (ts.tv_nsec * Unit::ns);
-    }
-
     double m_moduleStart;
     double m_globalStart;
     /** Statistics for whole framework */
@@ -252,7 +245,7 @@ namespace Belle2 {
   inline void ModuleStatistics::stopModule(const Module &module, ECounters mode, bool suspend)
   {
     Statistics &stats = m_modules[&module];
-    double elapsed = (getTime() - m_moduleStart) / Unit::s;
+    double elapsed = (Utils::getClock() - m_moduleStart) / Unit::s;
     if (mode == c_Init && stats.m_name.empty()) stats.m_name = module.getName();
     stats.m_times[mode] += elapsed;
     if (!suspend) ++stats.m_calls[mode];
@@ -261,7 +254,7 @@ namespace Belle2 {
   /** Increase counters. Defined as inline to save some context switches */
   inline void ModuleStatistics::stopGlobal(ECounters mode, bool suspend)
   {
-    double elapsed = (getTime() - m_globalStart) / Unit::s;
+    double elapsed = (Utils::getClock() - m_globalStart) / Unit::s;
     m_global.m_times[mode] += elapsed;
     if (!suspend) ++m_global.m_calls[mode];
   }

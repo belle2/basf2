@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Materials>
+  <Material name="ColdAir">
+    <state>Gas</state>
+    <temperature>263.15</temperature>
+    <Components>
+      <Material>N</Material>
+    </Components>
+  </Material>
+
+  <!--g
+    There are some trenches in the PXD sensors left and right to the sensitive
+    area to reduce material. These are modelled by using a mixture of Air and
+    silicon. The fractions were calculated using the CAD models of the Sensor,
+    2011-08-01g
+  -->
+  <Material name="PXD-BorderThinning">
+    <state>Solid</state>
+    <Components>
+      <Material fraction="0.537">Si</Material>
+      <Material fraction="0.463">ColdAir</Material>
+    </Components>
+  </Material>
+
+  <Material name="PXD-SwitcherThinning">
+    <state>Solid</state>
+    <Components>
+      <Material fraction="0.428">Si</Material>
+      <Material fraction="0.572">ColdAir</Material>
+    </Components>
+  </Material>
+
+  <Material name="PXD-Support">
+    <state>Solid</state>
+    <temperature>243.15</temperature>
+    <Components>
+      <Material fraction="0.80">Fe</Material>
+      <Material fraction="0.20">ColdAir</Material>
+    </Components>
+  </Material>
+
+  <Material name="PXD-Glue">
+    <density unit="g/cm3">1.13</density>
+    <state>Solid</state>
+    <Components>
+      <Element fraction="0.4390">C</Element>
+      <Element fraction="0.0732">O</Element>
+      <Element fraction="0.4878">H</Element>
+    </Components>
+  </Material>
+
+  <Material name="PXD-Switcher">
+    <state>Solid</state>
+    <Components>
+      <Material fraction="0.9940">Si</Material>
+      <Material fraction="0.0060">Au</Material>
+    </Components>
+  </Material>
+
+  <Material name="PXD-DCD">
+    <state>Solid</state>
+    <Components>
+      <Material>PXD-Switcher</Material>
+    </Components>
+  </Material>
+
+  <Material name="PXD-DHP">
+    <state>Solid</state>
+    <Components>
+      <Material>PXD-Switcher</Material>
+    </Components>
+  </Material>
+</Materials>

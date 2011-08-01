@@ -5,11 +5,8 @@
 #pragma link off all functions;
 #pragma link C++ nestedclasses;
 
-#pragma link C++ class Belle2::PXDVolumeUserInfo;
 #pragma link C++ class Belle2::PXDSimHit;
 #pragma link C++ class Belle2::PXDDigit;
-#pragma link C++ class Belle2::PXDHit;
-#pragma link C++ class Belle2::PXDRecoHit;
-#pragma link C++ class Belle2::SiSensorPlane;
+#pragma link C++ class Belle2::PXDTrueHit;
 
 #endif

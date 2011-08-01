@@ -14,12 +14,15 @@
 #include <geometry/bfieldmap/BFieldComponentConstant.h>
 #include <geometry/bfieldmap/BFieldComponentRadial.h>
 #include <geometry/bfieldmap/BFieldComponentQuad.h>
+#include <geometry/CreatorFactory.h>
+
 
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/gearbox/Unit.h>
 
 #include <boost/bind.hpp>
+#include <boost/foreach.hpp>
 
 using namespace std;
 using namespace boost;
@@ -29,16 +32,14 @@ using namespace Belle2;
 //                 Register the Creator
 //-----------------------------------------------------------------
 
-GeoMagneticField regGeoMagneticField;
+geometry::CreatorFactory<GeoMagneticField> GeoMagneticFieldFactory("GeoMagneticField");
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-GeoMagneticField::GeoMagneticField() : CreatorBase("GeoMagneticField")
+GeoMagneticField::GeoMagneticField() : CreatorBase()
 {
-  setDescription("Sets the magnetic field for the Belle II detector.");
-
   //Add the function pointers called for reading the components to the map
   m_componentTypeMap.insert(make_pair("Constant", boost::bind(&GeoMagneticField::readConstantBField, this, _1)));
   m_componentTypeMap.insert(make_pair("Radial",   boost::bind(&GeoMagneticField::readRadialBField,   this, _1)));
@@ -52,19 +53,16 @@ GeoMagneticField::~GeoMagneticField()
 }
 
 
-void GeoMagneticField::create(GearDir& content)
+void GeoMagneticField::create(const GearDir& content, G4LogicalVolume &topVolume, geometry::GeometryTypes type)
 {
   //Read the magnetic field components
   GearDir components(content, "Components/Component");
 
   //Loop over all components of the magnetic field
   CompTypeMap::iterator findIter;
-  int nComp = components.getNumberNodes();
-  for (int iComp = 1; iComp <= nComp; ++iComp) {
-    GearDir component(components, iComp);
-
+  BOOST_FOREACH(const GearDir &component, content.getNodes("Components/Component")) {
     //Get the type of the magnetic field and call the appropriate function
-    string compType = component.getParamString("attribute::type");
+    string compType = component.getString("attribute::type");
     B2DEBUG(10, "GeoMagneticField creator: Loading the parameters for the component type'" << compType << "'")
 
     findIter = m_componentTypeMap.find(compType);
@@ -81,32 +79,32 @@ void GeoMagneticField::create(GearDir& content)
 //                   Protected methods
 //============================================================
 
-void GeoMagneticField::readConstantBField(GearDir& component)
+void GeoMagneticField::readConstantBField(const GearDir& component)
 {
-  double xValue = component.getParamNumValue("X");
-  double yValue = component.getParamNumValue("Y");
-  double zValue = component.getParamNumValue("Z");
+  double xValue = component.getDouble("X");
+  double yValue = component.getDouble("Y");
+  double zValue = component.getDouble("Z");
 
   BFieldComponentConstant& bComp = BFieldMap::Instance().addBFieldComponent<BFieldComponentConstant>();
   bComp.setMagneticFieldValues(xValue, yValue, zValue);
 }
 
 
-void GeoMagneticField::readRadialBField(GearDir& component)
+void GeoMagneticField::readRadialBField(const GearDir& component)
 {
-  string mapFilename   = component.getParamString("MapFilename");
-  int mapSizeR         = component.getParamIntValue("NumberGridPointsR");
-  int mapSizeZ         = component.getParamIntValue("NumberGridPointsZ");
+  string mapFilename   = component.getString("MapFilename");
+  int mapSizeR         = component.getInt("NumberGridPointsR");
+  int mapSizeZ         = component.getInt("NumberGridPointsZ");
 
-  double mapRegionMinZ = component.getParamLength("ZMin");
-  double mapRegionMaxZ = component.getParamLength("ZMax");
-  double mapOffset   = component.getParamLength("ZOffset");
+  double mapRegionMinZ = component.getLength("ZMin");
+  double mapRegionMaxZ = component.getLength("ZMax");
+  double mapOffset   = component.getLength("ZOffset");
 
-  double mapRegionMinR = component.getParamLength("RadiusMin");
-  double mapRegionMaxR = component.getParamLength("RadiusMax");
+  double mapRegionMinR = component.getLength("RadiusMin");
+  double mapRegionMaxR = component.getLength("RadiusMax");
 
-  double gridPitchR    = component.getParamLength("GridPitchR");
-  double gridPitchZ    = component.getParamLength("GridPitchZ");
+  double gridPitchR    = component.getLength("GridPitchR");
+  double gridPitchZ    = component.getLength("GridPitchZ");
 
   BFieldComponentRadial& bComp = BFieldMap::Instance().addBFieldComponent<BFieldComponentRadial>();
   bComp.setMapFilename(mapFilename);
@@ -116,21 +114,21 @@ void GeoMagneticField::readRadialBField(GearDir& component)
   bComp.setGridPitch(gridPitchR, gridPitchZ);
 }
 
-void GeoMagneticField::readQuadBField(GearDir& component)
+void GeoMagneticField::readQuadBField(const GearDir& component)
 {
-  string mapFilenameHER = component.getParamString("MapFilenameHER");
-  string mapFilenameLER = component.getParamString("MapFilenameLER");
-  string apertFilenameHER = component.getParamString("ApertFilenameHER");
-  string apertFilenameLER = component.getParamString("ApertFilenameLER");
+  string mapFilenameHER = component.getString("MapFilenameHER");
+  string mapFilenameLER = component.getString("MapFilenameLER");
+  string apertFilenameHER = component.getString("ApertFilenameHER");
+  string apertFilenameLER = component.getString("ApertFilenameLER");
 
-  int mapSizeHER        = component.getParamIntValue("MapSizeHER");
-  int mapSizeLER        = component.getParamIntValue("MapSizeLER");
-  int apertSizeHER      = component.getParamIntValue("ApertSizeHER");
-  int apertSizeLER      = component.getParamIntValue("ApertSizeLER");
+  int mapSizeHER        = component.getInt("MapSizeHER");
+  int mapSizeLER        = component.getInt("MapSizeLER");
+  int apertSizeHER      = component.getInt("ApertSizeHER");
+  int apertSizeLER      = component.getInt("ApertSizeLER");
 
   /* save beam energy in [eV] */
-  double beamEnergyHER    = component.getParamEnergy("BeamEnergyHER") / Unit::eV ;
-  double beamEnergyLER    = component.getParamEnergy("BeamEnergyLER") / Unit::eV ;
+  double beamEnergyHER    = component.getEnergy("BeamEnergyHER") / Unit::eV ;
+  double beamEnergyLER    = component.getEnergy("BeamEnergyLER") / Unit::eV ;
 
   BFieldComponentQuad& bComp = BFieldMap::Instance().addBFieldComponent<BFieldComponentQuad>();
   bComp.setMapFilename(mapFilenameHER, mapFilenameLER);

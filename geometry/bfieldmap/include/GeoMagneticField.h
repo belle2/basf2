@@ -11,7 +11,7 @@
 #ifndef GEOMAGNETICFIELD_H
 #define GEOMAGNETICFIELD_H
 
-#include <geometry/geodetector/CreatorBase.h>
+#include <geometry/CreatorBase.h>
 
 #include <boost/function.hpp>
 #include <map>
@@ -30,7 +30,7 @@ namespace Belle2 {
    * for subdetectors should be added to the Belle II magnetic field inside the
    * subdetectors' creators.
    */
-  class GeoMagneticField : public CreatorBase {
+  class GeoMagneticField : public geometry::CreatorBase {
 
   public:
 
@@ -49,31 +49,31 @@ namespace Belle2 {
      *
      * @param content A reference to the content part of the parameter description, which should to be used to create the ROOT objects.
      */
-    virtual void create(GearDir& content);
+    virtual void create(const GearDir& content, G4LogicalVolume &topVolume, geometry::GeometryTypes type);
 
 
   protected:
 
-    typedef std::map < std::string, boost::function < void (GearDir&) > > CompTypeMap; /**< Typedef for the map connecting the name of the component to the method reading the parameters.*/
+    typedef std::map < std::string, boost::function < void (const GearDir&) > > CompTypeMap; /**< Typedef for the map connecting the name of the component to the method reading the parameters.*/
     CompTypeMap m_componentTypeMap; /**< Maps the name of the component to the function reading the parameters.*/
 
     /**
      * Reads the parameters for a homogeneous magnetic field and adds the component to the global magnetic field.
      * @param component The GearDir pointing to the component parameter block from which the parameters should be read.
      */
-    void readConstantBField(GearDir& component);
+    void readConstantBField(const GearDir& component);
 
     /**
      * Reads the parameters for a radial magnetic field and adds the component to the global magnetic field.
      * @param component The GearDir pointing to the component parameter block from which the parameters should be read.
      */
-    void readRadialBField(GearDir& component);
+    void readRadialBField(const GearDir& component);
 
     /**
      * Reads the parameters for a quadrupole magnetic field inside beam pipes and adds the component to the global magnetic field.
      * @param component The GearDir pointing to the component parameter block from which the parameters should be read.
      */
-    void readQuadBField(GearDir& component);
+    void readQuadBField(const GearDir& component);
 
 
   private:

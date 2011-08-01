@@ -25,8 +25,9 @@ namespace Belle2 {
     /**
      * The run manager controls the flow of the Geant4 program and manages the event loop(s) within a run.
      *
-     * The run manager is also responsible for managing initialization procedures, including methods in the user initialization classes.
-     * By definition of Geant4, this class has to be a singleton.
+     * The run manager is also responsible for managing initialization
+     * procedures, including methods in the user initialization classes.  By
+     * definition of Geant4, this class has to be a singleton.
      */
     class RunManager : public G4RunManager {
 
@@ -60,6 +61,8 @@ namespace Belle2 {
        */
       void destroy();
 
+      /** Initialize the Kernel */
+      void Initialize();
 
     private:
 

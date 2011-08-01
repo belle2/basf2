@@ -5,5 +5,6 @@ env['TOOLS_LIBS']['basf2'] = ['$XML_LIBS', 'framework_pybasf2', 'framework',
                               '$PYTHON_LIBS']
 
 env["TOOLS_LIBS"]["reltest"] = ["framework","gtest"]
+env["TOOLS_LIBS"]["vectors"] = ["framework"]
 
 Return('env')

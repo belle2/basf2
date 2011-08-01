@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Materials>
+  <Material name="Vaccum">
+    <state>Gas</state>
+    <density unit="g/cm3">1e-12</density>
+    <temperature>273</temperature>
+    <pressure>1.0</pressure>
+    <Components>
+      <Element fraction="0.78">N</Element>
+      <Element fraction="0.21">O</Element>
+      <Element fraction="0.01">Ar</Element>
+    </Components>
+  </Material>
+
+  <Material name="Ethane">
+    <state>Gas</state>
+    <density unit="g/cm3">1.356e-3</density>
+    <Components>
+      <Element fraction="0.7989">C</Element>
+      <Element fraction="0.2011">H</Element>
+    </Components>
+  </Material>
+
+  <Material name="CDCGas">
+    <state>Gas</state>
+    <density unit="g/cm3">7.67e-4</density>
+    <Components>
+      <Element fraction="0.500">He</Element>
+      <Material fraction="0.500">Ethane</Material>
+    </Components>
+  </Material>
+
+  <Material name="Paraffin">
+    <state>Liquid</state>
+    <density>0.93</density>
+    <Components>
+      <Element fraction="0.15">H</Element>
+      <Element fraction="0.85">O</Element>
+    </Components>
+  </Material>
+
+  <Material name="MatMixture">
+    <state>Solid</state>
+    <density>1</density>
+    <Components>
+      <Material fraction="0.5">Paraffin</Material>
+      <Material fraction="0.5">Air</Material>
+    </Components>
+  </Material>
+</Materials>

@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Peter Kvasnicka, Zbynek Drasal                           *
+ * Contributors: Peter Kvasnicka, Zbynek Drasal, Martin Ritter            *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -13,14 +13,10 @@
 
 #include <TObject.h>
 
-#define DEFAULT_PXDDIGITS "PXDDigits"
-#define DEFAULT_PXDDIGITSREL "MCParticlesToPXDDigits"
-
-
 namespace Belle2 {
 
-  /*
-   ** The PXD digit class.
+  /**
+   * The PXD digit class.
    *
    * This is a development implementation which is intentionally kept
    * somewhat bulky. The coordinates probably won't be kept in future.

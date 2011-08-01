@@ -10,9 +10,8 @@
 
 #include <framework/core/Module.h>
 #include <framework/core/ModuleManager.h>
-
+#include <framework/core/utilities.h>
 #include <framework/logging/Logger.h>
-#include <framework/core/ModuleUtils.h>
 
 #include <dlfcn.h>
 #include <iostream>
@@ -48,7 +47,7 @@ void ModuleManager::registerModuleProxy(ModuleProxyBase* moduleProxy)
 
 void ModuleManager::addModuleSearchPath(const string& path)
 {
-  if (ModuleUtils::isDirectory(path)) {
+  if (FileSystem::isDir(path)) {
     m_moduleSearchPathList.push_back(path);
 
     //Search the path for map files and add the contained module names to the known module names
@@ -92,8 +91,8 @@ ModulePtr ModuleManager::registerModule(const string& moduleName, const std::str
 
     //If a shared library path is given, load the library and search for the registered module.
     if (!sharedLibPath.empty()) {
-      if (ModuleUtils::isFile(sharedLibPath)) {
-        loadLibrary(sharedLibPath);
+      if (FileSystem::isFile(sharedLibPath)) {
+        FileSystem::loadLibrary(sharedLibPath);
         moduleIter =  m_registeredProxyMap.find(moduleName);
       } else B2WARNING("Could not load shared library " + sharedLibPath + ". File does not exist !");
 
@@ -107,7 +106,7 @@ ModulePtr ModuleManager::registerModule(const string& moduleName, const std::str
       map<string, string>::const_iterator libIter = m_moduleNameLibMap.find(moduleName);
 
       if (libIter != m_moduleNameLibMap.end()) {
-        loadLibrary(libIter->second);
+        FileSystem::loadLibrary(libIter->second);
         moduleIter =  m_registeredProxyMap.find(moduleName);
 
         //Check if the loaded shared library file contained the module
@@ -158,7 +157,7 @@ void ModuleManager::fillModuleNameLibMap(boost::filesystem::directory_entry& map
 {
   //Check if the associated shared library file exists
   string sharedLibPath = boost::filesystem::change_extension(mapPath, LIB_FILE_EXTENSION).string();
-  if (!ModuleUtils::fileNameExists(sharedLibPath)) {
+  if (!FileSystem::fileExists(sharedLibPath)) {
     B2ERROR("The shared library file: " << sharedLibPath << " doesn't exist, but is required by " << mapPath.path().string())
     return;
   }
@@ -189,18 +188,6 @@ void ModuleManager::fillModuleNameLibMap(boost::filesystem::directory_entry& map
   //Close the map file
   mapFile.close();
 }
-
-
-void ModuleManager::loadLibrary(const std::string& libraryPath)
-{
-  //Open the library. By opening the library, the module proxies register themselves.
-  void* libPointer = dlopen(libraryPath.c_str() , RTLD_LAZY | RTLD_GLOBAL);
-
-  if (libPointer == NULL) {
-    B2ERROR("Could not open shared library file (error in dlopen) : " + string(dlerror()));
-  }
-}
-
 
 ModuleManager::ModuleManager()
 {

@@ -11,7 +11,7 @@
 #include <geometry/bfieldmap/BFieldComponentQuad.h>
 
 #include <framework/core/Environment.h>
-#include <framework/core/ModuleUtils.h>
+#include <framework/core/utilities.h>
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Unit.h>
 
@@ -59,22 +59,22 @@ void BFieldComponentQuad::initialize()
 
   // check if input files exsits
   string fullPathMapHER = Environment::Instance().getDataSearchPath() + "/" + m_mapFilenameHER;
-  if (!ModuleUtils::fileNameExists(fullPathMapHER)) {
+  if (!FileSystem::fileExists(fullPathMapHER)) {
     B2FATAL("The HER quadrupole magnetic field map file '" << m_mapFilenameHER << "' could not be found !")
     return;
   }
   string fullPathMapLER = Environment::Instance().getDataSearchPath() + "/" + m_mapFilenameLER;
-  if (!ModuleUtils::fileNameExists(fullPathMapLER)) {
+  if (!FileSystem::fileExists(fullPathMapLER)) {
     B2FATAL("The LER quadrupole magnetic field map file '" << m_mapFilenameLER << "' could not be found !")
     return;
   }
   string fullPathApertHER = Environment::Instance().getDataSearchPath() + "/" + m_apertFilenameHER;
-  if (!ModuleUtils::fileNameExists(fullPathApertHER)) {
+  if (!FileSystem::fileExists(fullPathApertHER)) {
     B2FATAL("The HER aperture file '" << m_apertFilenameHER << "' could not be found !")
     return;
   }
   string fullPathApertLER = Environment::Instance().getDataSearchPath() + "/" + m_apertFilenameLER;
-  if (!ModuleUtils::fileNameExists(fullPathApertLER)) {
+  if (!FileSystem::fileExists(fullPathApertLER)) {
     B2FATAL("The LER aperture file '" << m_apertFilenameLER << "' could not be found !")
     return;
   }

@@ -15,7 +15,8 @@
 #include <framework/datastore/EventMetaData.h>
 
 #include <framework/gearbox/Gearbox.h>
-#include <framework/core/ModuleUtils.h>
+#include <framework/gearbox/GearDir.h>
+#include <framework/core/utilities.h>
 
 #include <framework/gearbox/Unit.h>
 
@@ -69,22 +70,22 @@ TouschekTURTLEInputModule::~TouschekTURTLEInputModule()
 void TouschekTURTLEInputModule::initialize()
 {
   //Check parameters
-  if ((m_readHER) && (!ModuleUtils::fileNameExists(m_filenameHER))) {
+  if ((m_readHER) && (!FileSystem::fileExists(m_filenameHER))) {
     B2ERROR("Parameter <FilenameHER>: Could not open the file. The filename " << m_filenameHER << " does not exist !")
   } else m_readerHER->open(m_filenameHER);
 
-  if ((m_readLER) && (!ModuleUtils::fileNameExists(m_filenameLER))) {
+  if ((m_readLER) && (!FileSystem::fileExists(m_filenameLER))) {
     B2ERROR("Parameter <FilenameLER>: Could not open the file. The filename " << m_filenameLER << " does not exist !")
   } else m_readerLER->open(m_filenameLER);
 
   //Get the transformation from local Touschek plane space to global geant4 space
   //For the HER
-  GearDir irDir = Gearbox::Instance().getContent("IR");
-  double angleher = irDir.getParamAngle("Streams/Stream[@name='HERUpstream']/Section[@name='Crotch']/Pipe[1]/Angle");
+  GearDir irDir = Gearbox::getInstance().getContent("IR");
+  double angleher = irDir.getAngle("Streams/Stream[@name='HERUpstream']/Section[@name='Crotch']/Pipe[1]/Angle");
   m_herPipePartMatrix->RotateY(angleher / Unit::deg);
 
   //For the LER
-  double angleler = irDir.getParamAngle("Streams/Stream[@name='LERUpstream']/Section[@name='Crotch']/Pipe[1]/Angle");
+  double angleler = irDir.getAngle("Streams/Stream[@name='LERUpstream']/Section[@name='Crotch']/Pipe[1]/Angle");
   m_lerPipePartMatrix->RotateY(angleler / Unit::deg);
 }
 

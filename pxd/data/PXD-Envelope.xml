@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Envelope description="Envelope Volume for PXD">
+  <Material>Air</Material>
+  <Plane>
+    <posZ unit="mm">-80.000</posZ>
+    <outerRadius unit="mm">30.000</outerRadius>
+    <innerRadius unit="mm">30.000</innerRadius>
+  </Plane>
+  <Plane>
+    <posZ unit="mm">-62.750</posZ>
+    <outerRadius unit="mm">30.000</outerRadius>
+    <innerRadius unit="mm">12.750</innerRadius>
+  </Plane>
+  <Plane>
+    <posZ unit="mm">90.000</posZ>
+    <outerRadius unit="mm">30.000</outerRadius>
+    <innerRadius unit="mm">12.750</innerRadius>
+  </Plane>
+  <Plane>
+    <posZ unit="mm">107.644</posZ>
+    <outerRadius unit="mm">30.000</outerRadius>
+    <innerRadius unit="mm">18.144</innerRadius>
+  </Plane>
+  <Plane>
+    <posZ unit="mm">119.500</posZ>
+    <outerRadius unit="mm">30.000</outerRadius>
+    <innerRadius unit="mm">30.000</innerRadius>
+  </Plane>
+</Envelope>

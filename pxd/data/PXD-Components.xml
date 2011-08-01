@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Components>
+  <Ladder layer="1">
+    <shift  unit="mm"> 3.300</shift>
+    <radius unit="mm">14.000</radius>
+    <Sensor id="1" unit="mm" flipW="true">-20.013</Sensor>
+    <Sensor id="2" unit="mm" flipW="true" flipV="true"> 48.013</Sensor>
+  </Ladder>
+  <Ladder layer="2">
+    <shift  unit="mm"> 3.300</shift>
+    <radius unit="mm">22.000</radius>
+    <Sensor id="1" unit="mm">-23.513</Sensor>
+    <Sensor id="2" unit="mm" flipV="true"> 61.513</Sensor>
+  </Ladder>
+
+  <Sensor layer="1">
+    <Color>#006699</Color>
+    <Material>Si</Material>
+    <width  unit="mm">15.000</width>
+    <length unit="mm">67.980</length>
+    <height unit="mm"> 0.420</height>
+    <Active>
+      <u unit="mm"> 0.500</u>
+      <v unit="mm">22.930</v>
+      <width  unit="mm">12.500</width>
+      <length unit="mm">44.800</length>
+      <height unit="mm"> 0.075</height>
+      <stepSize unit="um">5</stepSize>
+      <pixelsR>250</pixelsR>
+      <pixelsZ>768</pixelsZ>
+      <!--FIXME: Add segmented pixels in Z-->
+      <!--TODO: Add sensor properties needed by digitizer/clustering -->
+    </Active>
+    <!--TODO: Glue-->
+    <Component type="ThinningLayer1">
+      <u unit="mm"> 7.000</u><v unit="mm">45.390</v>
+    </Component>
+    <Component type="Reinforcement">
+      <u unit="mm"> 0.500</u><v unit="mm">66.480</v><w>bottom</w>
+      <u unit="mm">13.500</u><v unit="mm">66.480</v><w>bottom</w>
+      <u unit="mm">14.500</u><v unit="mm">66.480</v><w>bottom</w>
+    </Component>
+    <Component type="BorderThinningLayer1">
+      <u unit="mm"> 0.525</u><v unit="mm">44.105</v><w>bottom</w>
+    </Component>
+    <Component type="SwitcherThinningLayer1">
+      <u unit="mm">13.975</u><v unit="mm">44.105</v><w>bottom</w>
+    </Component>
+    <Component type="ReadoutChips">
+      <u unit="mm"> 7.500</u><v unit="mm">17.550</v><w>above</w>
+    </Component>
+    <Component type="SwitchersLayer1">
+      <u unit="mm">13.9825</u><v unit="mm">45.288</v><w>above</w>
+    </Component>
+  </Sensor>
+
+  <Sensor layer="2">
+    <Material>Si</Material>
+    <Color>#006699</Color>
+    <width  unit="mm">15.000</width>
+    <length unit="mm">84.980</length>
+    <height unit="mm"> 0.420</height>
+    <Active>
+      <u unit="mm"> 0.500</u>
+      <v unit="mm">23.290</v>
+      <width  unit="mm">12.500</width>
+      <length unit="mm">61.440</length>
+      <height unit="mm"> 0.075</height>
+      <stepSize unit="um">5</stepSize>
+      <pixelsR>250</pixelsR>
+      <pixelsZ>768</pixelsZ>
+      <!--FIXME: Add segmented pixels in Z-->
+      <!--TODO: Add sensor properties needed by digitizer/clustering -->
+    </Active>
+
+    <!--TODO: Glue-->
+    <Component type="ThinningLayer2">
+      <u unit="mm"> 7.000</u><v unit="mm">53.890</v>
+    </Component>
+    <Component type="Reinforcement">
+      <u unit="mm"> 0.500</u><v unit="mm">83.480</v>
+      <u unit="mm">13.500</u><v unit="mm">83.480</v>
+      <u unit="mm">14.500</u><v unit="mm">83.480</v>
+    </Component>
+    <Component type="BorderThinningLayer2">
+      <u unit="mm"> 0.525</u><v unit="mm">52.605</v><w>bottom</w>
+    </Component>
+    <Component type="SwitcherThinningLayer2">
+      <u unit="mm">13.975</u><v unit="mm">52.605</v><w>bottom</w>
+    </Component>
+    <Component type="ReadoutChips">
+      <u unit="mm"> 7.500</u><v unit="mm">17.550</v><w>above</w>
+    </Component>
+    <Component type="SwitchersLayer2">
+      <u unit="mm">13.9825</u><v unit="mm">54.148</v><w>above</w>
+    </Component>
+  </Sensor>
+
+  <Component name="ThinningLayer1">
+    <Material>ColdAir</Material>
+    <Color>#5599BB</Color>
+    <width  unit="mm">12.000</width>
+    <length unit="mm">44.780</length>
+    <height unit="mm"> 0.345</height>
+    <angle  unit="deg">54.7</angle>
+  </Component>
+
+  <Component name="ThinningLayer2">
+    <Material>ColdAir</Material>
+    <Color>#5599BB</Color>
+    <width  unit="mm">12.000</width>
+    <length unit="mm">61.780</length>
+    <height unit="mm"> 0.345</height>
+    <angle  unit="deg">54.7</angle>
+  </Component>
+
+  <Component name="Reinforcement">
+    <Material>Al</Material>
+    <Color>#CCCCCC</Color>
+    <width  unit="mm">0.600</width>
+    <length unit="mm">3.000</length>
+    <height unit="mm">0.345</height>
+    <angle  unit="deg">54.7</angle>
+  </Component>
+
+  <Component name="ReadoutChips">
+    <Component type="DCD">
+      <u unit="mm">-5.250</u><v unit="mm"> 2.625</v>
+      <u unit="mm">-1.750</u><v unit="mm"> 2.625</v>
+      <u unit="mm"> 1.750</u><v unit="mm"> 2.625</v>
+      <u unit="mm"> 5.250</u><v unit="mm"> 2.625</v>
+    </Component>
+    <Component type="DHP">
+      <u unit="mm">-5.250</u><v unit="mm">-2.625</v>
+      <u unit="mm">-1.750</u><v unit="mm">-2.625</v>
+      <u unit="mm"> 1.750</u><v unit="mm">-2.625</v>
+      <u unit="mm"> 5.250</u><v unit="mm">-2.625</v>
+    </Component>
+  </Component>
+
+  <Component name="SwitchersLayer1">
+    <Component type="Switcher">
+      <v unit="mm">-18.635</v>
+      <v unit="mm">-11.181</v>
+      <v unit="mm"> -3.727</v>
+      <v unit="mm">  3.727</v>
+      <v unit="mm"> 11.181</v>
+      <v unit="mm"> 18.635</v>
+    </Component>
+  </Component>
+
+  <Component name="SwitchersLayer2">
+    <Component type="Switcher">
+      <v unit="mm">-25.719</v>
+      <v unit="mm">-15.431</v>
+      <v unit="mm"> -5.144</v>
+      <v unit="mm">  5.144</v>
+      <v unit="mm"> 15.431</v>
+      <v unit="mm"> 25.719</v>
+    </Component>
+  </Component>
+
+  <Component name="SwitcherThinningLayer1">
+    <Material>PXD-SwitcherThinning</Material>
+    <Color>#5599BB</Color>
+    <width  unit="mm"> 1.850</width>
+    <length unit="mm">40.210</length>
+    <height unit="mm"> 0.345</height>
+    <angle unit="deg">54.7</angle>
+  </Component>
+
+  <Component name="BorderThinningLayer1">
+    <Material>PXD-BorderThinning</Material>
+    <Color>#5599BB</Color>
+    <width  unit="mm"> 0.850</width>
+    <length unit="mm">40.210</length>
+    <height unit="mm"> 0.345</height>
+    <angle unit="deg">54.7</angle>
+  </Component>
+
+  <Component name="SwitcherThinningLayer2">
+    <Material>PXD-SwitcherThinning</Material>
+    <Color>#5599BB</Color>
+    <width  unit="mm"> 1.850</width>
+    <length unit="mm">57.210</length>
+    <height unit="mm"> 0.345</height>
+    <angle unit="deg">54.7</angle>
+  </Component>
+
+  <Component name="BorderThinningLayer2">
+    <Material>PXD-BorderThinning</Material>
+    <Color>#5599BB</Color>
+    <width  unit="mm"> 0.850</width>
+    <length unit="mm">57.210</length>
+    <height unit="mm"> 0.345</height>
+    <angle unit="deg">54.7</angle>
+  </Component>
+
+  <Component name="DCD">
+    <Material>Si</Material>
+    <Color>#666633</Color>
+    <width  unit="mm">3.410</width>
+    <length unit="mm">5.310</length>
+    <height unit="mm">0.400</height>
+  </Component>
+
+  <Component name="DHP">
+    <Material>Si</Material>
+    <Color>#666666</Color>
+    <width  unit="mm">3.410</width>
+    <length unit="mm">5.130</length>
+    <height unit="mm">0.400</height>
+  </Component>
+
+  <Component name="Switcher">
+    <Material>Si</Material>
+    <Color>#660000</Color>
+    <width  unit="mm">2.035</width>
+    <length unit="mm">3.600</length>
+    <height unit="mm">0.400</height>
+  </Component>
+</Components>

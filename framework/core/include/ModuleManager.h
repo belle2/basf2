@@ -155,13 +155,6 @@ namespace Belle2 {
     void fillModuleNameLibMap(boost::filesystem::directory_entry& mapPath);
 
     /**
-     * Loads the shared library file given by the library path.
-     *
-     * @param libPath The path to the shared library file.
-     */
-    void loadLibrary(const std::string& libraryPath);
-
-    /**
      * The constructor is hidden to avoid that someone creates an instance of this class.
      */
     ModuleManager();

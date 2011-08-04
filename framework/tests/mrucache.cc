@@ -44,6 +44,20 @@ namespace Belle2 {
     EXPECT_EQ(var, -1);
   }
 
+  TEST(MRUCache, Update)
+  {
+    MRUCache<int, int> cache(5);
+    cache.insert(1, 1);
+    int var;
+    EXPECT_EQ(cache.size(), 1u);
+    EXPECT_TRUE(cache.retrieve(1, var));
+    EXPECT_EQ(var, 1);
+    cache.insert(1, 2);
+    EXPECT_EQ(cache.size(), 1u);
+    EXPECT_TRUE(cache.retrieve(1, var));
+    EXPECT_EQ(var, 2);
+  }
+
   TEST(MRUCache, Statistics)
   {
     MRUCache<int, int> cache(1);

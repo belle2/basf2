@@ -85,6 +85,7 @@ namespace Belle2 {
     void insert(const value_type &item) {
       std::pair<iterator, bool> p = m_container.push_front(item);
       if (!p.second) {  /* duplicate item, put existing in front */
+        m_container.replace(p.first, item);
         update(p.first);
       } else if (m_container.size() > m_maxSize) {  /* keep the length <= maxSize */
         ++m_overflows;

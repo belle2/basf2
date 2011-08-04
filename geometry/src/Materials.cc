@@ -21,6 +21,7 @@
 #include <G4Material.hh>
 #include <G4Element.hh>
 #include <G4NistManager.hh>
+#include <G4OpticalSurface.hh>
 
 using namespace std;
 
@@ -71,6 +72,12 @@ namespace Belle2 {
     {
       //Get straightforward parameters from gearbox
       string name = parameters.getString("@name");
+      G4Material* oldmat = getMaterial(name, false);
+      if (oldmat) {
+        //We cannot modify or delete materials, so we just use existing ones
+        B2DEBUG(100, "Material with name " << name << " already existing, using existing material");
+        return oldmat;
+      }
       B2INFO("Creating Material " << name);
       string stateStr = parameters.getString("state", "undefined");
       double density = parameters.getDensity("density", 0) * g / cm3;
@@ -146,10 +153,6 @@ namespace Belle2 {
       G4Material* mat = new G4Material(name, density, componentElements.size() + componentMaterials.size(),
                                        state, temperature, pressure);
 
-      //Remember that we created this material so we can delete it without
-      //affecting G4NistManager who keeps the indices of its own materials
-      m_createdMaterials.push_back(mat);
-
       for (size_t i = 0; i < componentMaterials.size(); ++i) {
         mat->AddMaterial(componentMaterials[i], fractionMaterials[i] / sumFractions);
       }
@@ -157,9 +160,19 @@ namespace Belle2 {
         mat->AddElement(componentElements[i], fractionElements[i] / sumFractions);
       }
 
-      //See if we have any properties
+      //check if we have properties defined for this material
+      G4MaterialPropertiesTable* g4PropTable = createProperties(parameters);
+      if (g4PropTable) mat->SetMaterialPropertiesTable(g4PropTable);
+
+      //Insert into cache and return
+      m_materialCache.insert(name, mat);
+      return mat;
+    }
+
+    G4MaterialPropertiesTable* Materials::createProperties(const gearbox::Interface &parameters)
+    {
       if (parameters.getNumberNodes("Property") > 0) {
-        //Apparantly we have, so lets add them to the Material
+        //Apparantly we have properties, so lets add them to the Material
         G4MaterialPropertiesTable* g4PropTable = new G4MaterialPropertiesTable();
         BOOST_FOREACH(const GearDir& property, parameters.getNodes("Property")) {
           string name;
@@ -182,25 +195,88 @@ namespace Belle2 {
           }
           g4PropTable->AddProperty(name.c_str(), energies, values, nValues);
         }
-        mat->SetMaterialPropertiesTable(g4PropTable);
+        return g4PropTable;
       }
-
-      //Insert into cache and return
-      m_materialCache.insert(name, mat);
-      return mat;
+      return 0;
     }
 
-    void Materials::clear()
+    G4OpticalSurface* Materials::createOpticalSurface(const gearbox::Interface &parameters)
     {
-      BOOST_FOREACH(G4Material* mat, m_createdMaterials) {
-        cout << "deleting Material: " << mat << endl;
-        //FIXME: it seems that deleting elements is not working in Geant4. For now
-        //we change the name so that it won't be found any longer
-        mat->SetName("--deleted--");
-      }
-      m_createdMaterials.clear();
-      m_materialCache.clear();
+      string name         = parameters.getString("@name", "OpticalSurface");
+      string modelString  = parameters.getString("Model", "glisur");
+      string finishString = parameters.getString("Finish", "polished");
+      string typeString   = parameters.getString("Type", "dielectric_dielectric");
+      double value        = parameters.getDouble("Value", 1.0);
+
+#define CHECK_ENUM_VALUE(name,value) if (name##String == #value) { name = value; }
+      G4OpticalSurfaceModel model;
+      boost::to_lower(modelString);
+      CHECK_ENUM_VALUE(model, glisur)
+      else CHECK_ENUM_VALUE(model, unified)
+        else CHECK_ENUM_VALUE(model, LUT)
+          else {
+            B2ERROR("Unknown Optical Surface Model: " << modelString);
+            return 0;
+          }
+
+      G4OpticalSurfaceFinish finish;
+      boost::to_lower(finishString);
+      CHECK_ENUM_VALUE(finish, polished)
+      else CHECK_ENUM_VALUE(finish, polishedfrontpainted)
+        else CHECK_ENUM_VALUE(finish, polishedbackpainted)
+          else CHECK_ENUM_VALUE(finish, ground)
+            else CHECK_ENUM_VALUE(finish, groundfrontpainted)
+              else CHECK_ENUM_VALUE(finish, groundbackpainted)
+                else CHECK_ENUM_VALUE(finish, polishedlumirrorair)
+                  else CHECK_ENUM_VALUE(finish, polishedlumirrorglue)
+                    else CHECK_ENUM_VALUE(finish, polishedair)
+                      else CHECK_ENUM_VALUE(finish, polishedteflonair)
+                        else CHECK_ENUM_VALUE(finish, polishedtioair)
+                          else CHECK_ENUM_VALUE(finish, polishedtyvekair)
+                            else CHECK_ENUM_VALUE(finish, polishedvm2000air)
+                              else CHECK_ENUM_VALUE(finish, polishedvm2000glue)
+                                else CHECK_ENUM_VALUE(finish, etchedlumirrorair)
+                                  else CHECK_ENUM_VALUE(finish, etchedlumirrorglue)
+                                    else CHECK_ENUM_VALUE(finish, etchedair)
+                                      else CHECK_ENUM_VALUE(finish, etchedteflonair)
+                                        else CHECK_ENUM_VALUE(finish, etchedtioair)
+                                          else CHECK_ENUM_VALUE(finish, etchedtyvekair)
+                                            else CHECK_ENUM_VALUE(finish, etchedvm2000air)
+                                              else CHECK_ENUM_VALUE(finish, etchedvm2000glue)
+                                                else CHECK_ENUM_VALUE(finish, groundlumirrorair)
+                                                  else CHECK_ENUM_VALUE(finish, groundlumirrorglue)
+                                                    else CHECK_ENUM_VALUE(finish, groundair)
+                                                      else CHECK_ENUM_VALUE(finish, groundteflonair)
+                                                        else CHECK_ENUM_VALUE(finish, groundtioair)
+                                                          else CHECK_ENUM_VALUE(finish, groundtyvekair)
+                                                            else CHECK_ENUM_VALUE(finish, groundvm2000air)
+                                                              else CHECK_ENUM_VALUE(finish, groundvm2000glue)
+                                                                else {
+                                                                  B2ERROR("Unknown Optical Surface Finish: " << finishString);
+                                                                  return 0;
+                                                                }
+
+      G4SurfaceType type;
+      boost::to_lower(typeString);
+      CHECK_ENUM_VALUE(type, dielectric_metal)
+      else CHECK_ENUM_VALUE(type, dielectric_dielectric)
+        else CHECK_ENUM_VALUE(type, dielectric_LUT)
+          else CHECK_ENUM_VALUE(type, firsov)
+            else CHECK_ENUM_VALUE(type, x_ray)
+              else {
+                B2ERROR("Unknown Optical Surface Type: " << typeString);
+                return 0;
+              }
+#undef CHECK_ENUM_VALUE
+
+      G4OpticalSurface* optSurf = new G4OpticalSurface(name, model, finish, type, value);
+
+      G4MaterialPropertiesTable* g4PropTable = createProperties(GearDir(parameters, "Properties"));
+      if (g4PropTable) optSurf->SetMaterialPropertiesTable(g4PropTable);
+
+      return optSurf;
     }
+
 
   } //geometry namespace
 } //Belle2 namespace

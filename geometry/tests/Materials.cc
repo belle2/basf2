@@ -8,6 +8,7 @@
 
 #include <G4Element.hh>
 #include <G4Material.hh>
+#include <G4OpticalSurface.hh>
 
 using namespace std;
 
@@ -70,10 +71,10 @@ namespace Belle2 {
       //have a density
       Gearbox &gb = Gearbox::getInstance();
       vector<string> backends;
-      backends.push_back("string:<Material name='Test1'><state>Solid</state><components>"
-                         "<material fraction='0.5'>Si</material>"
-                         "<element fraction='0.5'>Au</element>"
-                         "</components></Material>");
+      backends.push_back("string:<Material name='Test1'><state>Solid</state><Components>"
+                         "<Material fraction='0.5'>Si</Material>"
+                         "<Element fraction='0.5'>Au</Element>"
+                         "</Components></Material>");
       gb.setBackends(backends);
       gb.open();
 
@@ -88,10 +89,10 @@ namespace Belle2 {
       //Same as above, but with density so it should work
       Gearbox &gb = Gearbox::getInstance();
       vector<string> backends;
-      backends.push_back("string:<Material name='Test2'><state>Liquid</state><density>1</density><components>"
-                         "<material>Si</material>"
-                         "<element>Au</element>"
-                         "</components></Material>");
+      backends.push_back("string:<Material name='Test2'><state>Liquid</state><density>1</density><Components>"
+                         "<Material>Si</Material>"
+                         "<Element>Au</Element>"
+                         "</Components></Material>");
       gb.setBackends(backends);
       gb.open();
 
@@ -106,9 +107,9 @@ namespace Belle2 {
       //When adding unknown materials we should get NULL
       Gearbox &gb = Gearbox::getInstance();
       vector<string> backends;
-      backends.push_back("string:<Material name='Test3'><components>"
-                         "<material>Foo</material>"
-                         "</components></Material>");
+      backends.push_back("string:<Material name='Test3'><Components>"
+                         "<Material>Foo</Material>"
+                         "</Components></Material>");
       gb.setBackends(backends);
       gb.open();
 
@@ -123,9 +124,9 @@ namespace Belle2 {
       //When adding unknown elements we should get NULL
       Gearbox &gb = Gearbox::getInstance();
       vector<string> backends;
-      backends.push_back("string:<Material name='Test4'><density>1</density><components>"
-                         "<element>Foo</element>"
-                         "</components></Material>");
+      backends.push_back("string:<Material name='Test4'><density>1</density><Components>"
+                         "<Element>Foo</Element>"
+                         "</Components></Material>");
       gb.setBackends(backends);
       gb.open();
 
@@ -133,6 +134,46 @@ namespace Belle2 {
       G4Material* mat = m.createMaterial(GearDir("/Material"));
       ASSERT_FALSE(mat);
       gb.close();
+    }
+
+    TEST(Materials, OpticalSurface)
+    {
+      Gearbox &gb = Gearbox::getInstance();
+      vector<string> backends;
+      backends.push_back("string:<test><Surface/>"
+                         "<Surface name='test'><Model>unified</Model><Finish>Ground</Finish>"
+                         "<Type>x_ray</Type><Value>2.0</Value></Surface>"
+                         "<Surface><Model>not existing</Model></Surface>"
+                         "<Surface><Finish>not existing</Finish></Surface>"
+                         "<Surface><Type>not existing</Type></Surface></test>"
+                        );
+      gb.setBackends(backends);
+      gb.open();
+
+      Materials &m = Materials::getInstance();
+
+      G4OpticalSurface* surf1 = m.createOpticalSurface(GearDir("/test/Surface[1]"));
+      ASSERT_TRUE(surf1);
+      EXPECT_EQ("OpticalSurface", surf1->GetName());
+      EXPECT_EQ(glisur, surf1->GetModel());
+      EXPECT_EQ(polished, surf1->GetFinish());
+      EXPECT_EQ(dielectric_dielectric, surf1->GetType());
+      EXPECT_EQ(1.0, surf1->GetPolish());
+
+      G4OpticalSurface* surf2 = m.createOpticalSurface(GearDir("/test/Surface[2]"));
+      ASSERT_TRUE(surf2);
+      EXPECT_EQ("test", surf2->GetName());
+      EXPECT_EQ(unified, surf2->GetModel());
+      EXPECT_EQ(ground, surf2->GetFinish());
+      EXPECT_EQ(x_ray, surf2->GetType());
+      EXPECT_EQ(2.0, surf2->GetSigmaAlpha());
+
+      G4OpticalSurface* surf3 = m.createOpticalSurface(GearDir("/test/Surface[3]"));
+      EXPECT_FALSE(surf3);
+      G4OpticalSurface* surf4 = m.createOpticalSurface(GearDir("/test/Surface[4]"));
+      EXPECT_FALSE(surf4);
+      G4OpticalSurface* surf5 = m.createOpticalSurface(GearDir("/test/Surface[5]"));
+      EXPECT_FALSE(surf5);
     }
 
   }

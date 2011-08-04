@@ -17,6 +17,9 @@
 
 class G4Material;
 class G4Element;
+class G4MaterialPropertiesTable;
+class G4OpticalSurface;
+
 
 namespace Belle2 {
   namespace gearbox { class Interface; }
@@ -79,10 +82,19 @@ namespace Belle2 {
       G4Material* createMaterial(const gearbox::Interface &parameters);
 
       /**
-       * Delete all Materials created by calling createMaterial, leave all other
-       * materials and clean cache
+       * Create a list of Material properties from a set of parameters
+       * @param  parameters Material properties definition
+       * @return pointer to the newly created properties table, 0 if no
+       *         properties were found
        */
-      void clear();
+      G4MaterialPropertiesTable* createProperties(const gearbox::Interface &parameter);
+
+      /**
+       * Create an optical surface from parameters
+       * @param parameters Optical surface definition
+       * @return new optical surface, 0 on error
+       */
+      G4OpticalSurface* createOpticalSurface(const gearbox::Interface &parameters);
 
     protected:
       /** Singleton: hide constructor */
@@ -92,8 +104,6 @@ namespace Belle2 {
       /** Singleton: hide assignment operator */
       void operator=(const Materials&);
 
-      /** List of all created Materials */
-      std::vector<G4Material*> m_createdMaterials;
       /** Cache for already searched Materials */
       mutable MRUCache<std::string, G4Material*> m_materialCache;
     };

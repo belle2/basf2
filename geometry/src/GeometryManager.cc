@@ -26,6 +26,9 @@
 #include "G4LogicalVolumeStore.hh"
 #include "G4SolidStore.hh"
 #include "G4RegionStore.hh"
+#include "G4OpticalSurface.hh"
+#include "G4LogicalBorderSurface.hh"
+#include "G4LogicalSkinSurface.hh"
 
 #include <boost/foreach.hpp>
 #include <memory>
@@ -51,7 +54,10 @@ namespace Belle2 {
       G4PhysicalVolumeStore::Clean();
       G4LogicalVolumeStore::Clean();
       G4SolidStore::Clean();
-      //G4RegionStore::Clean();
+      G4LogicalBorderSurface::CleanSurfaceTable();
+      G4LogicalSkinSurface::CleanSurfaceTable();
+      //FIXME: The MaterialPropertyTables associated with the surfaces won't get deleted.
+      G4SurfaceProperty::CleanSurfacePropertyTable();
       BOOST_FOREACH(CreatorBase* creator, m_creators) delete creator;
       m_creators.clear();
       m_topVolume = 0;
@@ -69,8 +75,6 @@ namespace Belle2 {
       }
 
       Materials &materials = Materials::getInstance();
-      //Clean up Materials from old runs
-      materials.clear();
       //Set up Materials first since we possibly need them for the top volume
       BOOST_FOREACH(const GearDir& matlist, detectorDir.getNodes("Materials")) {
         BOOST_FOREACH(const GearDir& mat, matlist.getNodes("Material")) {

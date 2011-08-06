@@ -77,20 +77,23 @@ int main(int argc, char* argv[])
   string pythonFile;
 
   //Check for the Belle2 environment variable
-  char* belle2LocalDir = getenv("BELLE2_LOCAL_DIR");
-  if (belle2LocalDir == NULL) {
-    B2ERROR("The environment variable BELLE2_LOCAL_DIR is not set. Please execute the 'setuprel' script first.")
+  char* belle2Dir = getenv("BELLE2_LOCAL_DIR");
+  if (!belle2Dir) {
+    belle2Dir = getenv("BELLE2_RELEASE_DIR");
+  }
+  if (!belle2Dir) {
+    B2ERROR("The basf2 environment is not set up. Please execute the 'setuprel' script first.")
     return 1;
   }
 
   char* belle2SubDir = getenv("BELLE2_SUBDIR");
-  if (belle2LocalDir == NULL) {
+  if (!belle2SubDir) {
     B2ERROR("The environment variable BELLE2_SUBDIR is not set. Please execute the 'setuprel' script first.")
     return 1;
   }
 
   //Get the lib path
-  boost::filesystem::path libPath(belle2LocalDir);
+  boost::filesystem::path libPath(belle2Dir);
   libPath /= "lib";
   libPath /=  belle2SubDir;
 

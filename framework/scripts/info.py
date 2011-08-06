@@ -51,14 +51,15 @@ print basf2copyright.center(48)
 print ('Version ' + basf2version).center(48)
 print ''
 print '-------------------------------------------------'
+print 'BELLE2_RELEASE:      ', os.environ.get('BELLE2_RELEASE', '')
+print 'BELLE2_RELEASE_DIR:  ', envarReleaseDir
 print 'BELLE2_LOCAL_DIR:    ', envarLocalDir
 print 'BELLE2_SUBDIR:       ', envarSubDir
-print 'Machine architecture:', archstring
+print 'Machine architecture:', os.environ.get('BELLE2_ARCH', '')
 print 'Kernel version:      ', os.uname()[2]
 print 'Operating system:    ', os.uname()[3]
 print ''
-print 'basf2         directory:', basf2dir
-print 'basf2 modules directory:', basf2moddir
+print 'basf2 modules directory:', ':'.join(basf2moddir)
 print 'basf2 data    directory:', basf2datadir
 print '-------------------------------------------------'
 

@@ -65,6 +65,7 @@ void EventProcessor::processInitialize(const ModulePtrList& modulePathList)
   ModulePtrList::const_iterator listIter;
   ModuleStatistics &stats = ModuleStatistics::getInstance();
   stats.startGlobal(ModuleStatistics::c_Init);
+  DataStore::Instance().setInitializeActive(true);
 
   for (listIter = modulePathList.begin(); listIter != modulePathList.end(); listIter++) {
     Module* module = listIter->get();
@@ -85,6 +86,7 @@ void EventProcessor::processInitialize(const ModulePtrList& modulePathList)
     //Set the global log level
     logSystem.setModuleLogConfig(NULL);
   }
+  DataStore::Instance().setInitializeActive(false);
   stats.stopGlobal(ModuleStatistics::c_Init);
 }
 

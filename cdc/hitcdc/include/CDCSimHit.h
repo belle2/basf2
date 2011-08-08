@@ -11,8 +11,6 @@
 #ifndef CDCSIMHIT_H
 #define CDCSIMHIT_H
 
-#include <framework/datastore/DataStore.h>
-
 #include <TObject.h>
 #include <TVector3.h>
 

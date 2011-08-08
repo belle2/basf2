@@ -11,8 +11,6 @@
 #ifndef HITCDC_H
 #define HITCDC_H
 
-#include <framework/datastore/DataStore.h>
-
 #include <TObject.h>
 #include <TVector3.h>
 

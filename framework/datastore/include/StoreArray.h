@@ -38,12 +38,24 @@ namespace Belle2 {
      *  @param durability Specifies lifetime of array in question.
      *  @param generate Shall array be created, if none with name exists so far.
      */
-    StoreArray(const std::string& name = "", const DataStore::EDurability& durability = DataStore::c_Event, bool generate = true) {
-      assignArray(name, durability, generate);
+    StoreArray(const std::string& name = "", const DataStore::EDurability& durability = DataStore::c_Event) {
+      assignArray(name, durability);
+    }
+
+    /** Constructor for storage of TClonesArrays.
+     *
+     *  This is most likely needed for the multiprocessing implementation.
+     *  @param name        Key under which TClonesArray is stored.
+     *  @param durability  Lifetime of stored TClonesArray.
+     *  @param array       TClonesArray for storage.
+     */
+    StoreArray(TClonesArray* const array, const std::string& name , const DataStore::EDurability& durability = DataStore::c_Event)
+        : m_name(name), m_durability(durability), m_storeArray(array) {
+      DataStore::Instance().handleArray<T>(m_name, durability, m_storeArray);
     }
 
     StoreArray(std::pair<std::string, DataStore::EDurability> accessorParams) {
-      assignArray(accessorParams.first, accessorParams.second, false);
+      assignArray(accessorParams.first, accessorParams.second);
     }
 
     /** Switch the array, the StoreArray points to.
@@ -52,7 +64,7 @@ namespace Belle2 {
      *  @param durability Specifies lifetime of array in question.
      *  @param generate Shall array be created, if none with name exists so far.
      */
-    bool assignArray(const std::string& name, const DataStore::EDurability& durability = DataStore::c_Event, bool generate = false);
+    bool assignArray(const std::string& name, const DataStore::EDurability& durability = DataStore::c_Event);
 
     /** Imitate array functionality. */
     TClonesArray& operator *() const {return *m_storeArray;}
@@ -89,7 +101,10 @@ namespace Belle2 {
     T* operator [](int i) const {return static_cast<T*>(m_storeArray->At(i));}
 
     /** Get the number of occupied slots in the array. */
-    int GetEntries() const {return m_storeArray->GetEntriesFast();}
+    int GetEntries() const {
+      B2WARNING("This method is depreciated. Please use getEntries() instead!");
+      return m_storeArray->GetEntriesFast();
+    }
 
     /** Get the number of occupied slots in the array. */
     int getEntries() const {return m_storeArray->GetEntriesFast();}
@@ -112,7 +127,7 @@ namespace Belle2 {
 //-------------------Implementation of template part of the class ---------------------------------
 
 template <class T>
-bool Belle2::StoreArray<T>::assignArray(const std::string& name, const DataStore::EDurability& durability, bool generate)
+bool Belle2::StoreArray<T>::assignArray(const std::string& name, const DataStore::EDurability& durability)
 {
   if (name == "") {
     m_name = DataStore::defaultArrayName<T>();
@@ -120,20 +135,10 @@ bool Belle2::StoreArray<T>::assignArray(const std::string& name, const DataStore
     m_name       = name;
   }
   m_durability = durability;
+  m_storeArray = 0;
 
-  m_storeArray =  DataStore::Instance().getArray<T>(m_name, durability);
-
-  if (m_storeArray) {
-    return (false);
-  }
-
-  if (generate) {
-    m_storeArray = DataStore::Instance().createArray<T>(m_name, durability);
-    B2DEBUG(100, "A TClonesArray with name " + m_name + " has been generated");
-    return(true);
-  }
-  return (false);
-
+  B2DEBUG(250, "Calling DataStore from StoreArray " << name);
+  return DataStore::Instance().handleArray<T>(m_name, durability, m_storeArray);
 }
 
 #endif

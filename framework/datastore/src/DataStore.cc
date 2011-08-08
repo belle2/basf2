@@ -24,48 +24,26 @@ DataStore& DataStore::Instance()
 }
 
 
-DataStore::DataStore()
+DataStore::DataStore() : initializeActive(false)
 {
-}
-
-
-bool DataStore::storeObject(TObject* object, const std::string& name, const EDurability& durability)
-{
-  //check for existence
-  pair<StoreObjIter, bool> result = m_objectMap[durability].insert(make_pair(name, object));
-  if (!result.second) {
-    B2WARNING("An object named '" << name << "' already exists");
-    result.first->second = object;
-  }
-
-  m_objectMap[durability][name] = object;
-  return true;
-}
-
-
-bool DataStore::storeArray(TClonesArray* array, const std::string& name, const EDurability& durability)
-{
-  //check for existence
-  pair<StoreArrayIter, bool> result = m_arrayMap[durability].insert(make_pair(name, array));
-  if (!result.second) {
-    result.first->second = array;
-  }
-  return result.second;
 }
 
 
 void DataStore::clearMaps(const EDurability& durability)
 {
+  B2DEBUG(100, "Start deletion process of durability " << durability);
   for (StoreObjIter iter = m_objectMap[durability].begin(); iter != m_objectMap[durability].end(); iter++) {
-    iter->second->Clear();
-    m_objectMap[durability].erase(iter);
+    if (iter->second) {
+      delete iter->second; // delete object
+      iter->second = 0;    // make sure pointer isn't dangling
+      //    delete iter->second.get<1>();
+    }
   }
 
   TClonesArray* array;
   for (StoreArrayIter iter = m_arrayMap[durability].begin(); iter != m_arrayMap[durability].end(); iter++) {
     array = static_cast<TClonesArray*>(iter->second);
     if (array) {
-      //array->Clear("C");
       array->Delete();
     }
   }

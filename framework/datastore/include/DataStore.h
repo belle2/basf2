@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2011 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Martin Heck, Thomas Kuhr, Nobu Katayama,                 *
+ * Contributors: Martin Heck, Thomas Kuhr, Martin Ritter,                 *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -20,13 +20,16 @@
 
 #include <iostream>
 #include <string>
+#include <utility>
+
+//#include <boost/tuple/tuple.hpp>
 
 namespace Belle2 {
 
   /** In the store you can park objects, that have to be accessed by various modules.
    *
-   *  The store saves objects together with names in maps.
-   *  Normal users should try to access the store via StoreAccess classes like the
+   *  The store saves objects together with names and some flags in maps.
+   *  Normal users should try to access the store via StoreAccessor classes like the
    *  StoreObjPtr or the StoreArray. <br>
    *  Currently the store supports either the storage of single objects, that inherit from TObject,
    *  and TClonesArrays, which are faster, if you have to store a large number of objects from the same type.
@@ -39,17 +42,10 @@ namespace Belle2 {
    */
   class DataStore {
   public:
-
-    /** Convenient typedefs. */
-    typedef std::map<std::string, TObject*> StoreObjMap;         /**< Map for TObjects. */
-    typedef std::map<std::string, TClonesArray*> StoreArrayMap;  /**< Map for TClonesArrays. */
-    typedef StoreObjMap::iterator StoreObjIter;                  /**< Iterator for TObjectMap. */
-    typedef StoreArrayMap::iterator StoreArrayIter;              /**< Iterator for TClonesArraysMap.*/
-
+    //----------------------------------- enums and typedefs ---------------------------------------------------
     /** Durability types.
      *
      *  These types are used to identify the map used in the DataStore.
-     *  @author <a href="mailto:martin.heck@kit.edu?subject=EDurability">Martin Heck</a>
      */
     enum EDurability {
       c_Event,     /**< Object is deleted after event. */
@@ -65,13 +61,24 @@ namespace Belle2 {
       c_NDurabilityTypes = 3 /**< Total number of durability types. */
     };
 
+    // Convenient typedefs.
+//    For later:
+//    typedef std::map<std::string, boost::tuple<TObject*,      ECollectionPropFlags> > StoreObjMap;   /**< Map for TObjects. */
+//    typedef std::map<std::string, boost::tuple<TClonesArray*, ECollectionPropFlags> > StoreArrayMap; /**< Map for TClonesArrays. */
+    typedef std::map<std::string, TObject*> StoreObjMap;   /**< Map for TObjects. */
+    typedef std::map<std::string, TClonesArray*> StoreArrayMap; /**< Map for TClonesArrays. */
+    typedef StoreObjMap::iterator   StoreObjIter;             /**< Iterator for TObjectMap. */
+    typedef StoreArrayMap::iterator StoreArrayIter;           /**< Iterator for TClonesArraysMap.*/
+
+    //--------------------------------- Instance ---------------------------------------------------------------
     /** Instance of singleton Store.
      *
      *  This method is used to access the DataStore directly. It is used internally in the Store accessor classes.
      */
     static DataStore& Instance();
 
-    /** Return the default storage name for an object of the given type */
+    //--------------------------------- default name stuff -----------------------------------------------------
+    /** Return the default storage name for an object of the given type. */
     template<class T> static const std::string defaultObjectName() {
       std::string classname = (T::Class()->GetName());
       //Strip qualifiers like namespaces
@@ -82,62 +89,57 @@ namespace Belle2 {
       return classname;
     }
 
-    /** Return the default storage name for an array of the given type */
+    /** Return the default storage name for an array of the given type. */
     template<class T> static const std::string defaultArrayName() {
       return defaultObjectName<T>() + 's';
     }
 
-    /** Return the default storage name for an relation between the given types */
+    /** Return the default storage name for an relation between the given types. */
     template<class FROM, class TO> static const std::string defaultRelationName() {
       return defaultArrayName<FROM>() + "To" + defaultArrayName<TO>();
     }
 
-    /** Create new object with check of existence.
+    //------------------------------ Accessing objects and arrays ----------------------------------------------
+    /** Function to create, get or store object in the DataStore.
      *
-     *  Checks if object with given name already exists in corresponding map. If one of the given name, but different type exists,
-     *  the function will end the programm.
-     *
-     *  @return           If object of given name, type and durability exists, it is returned, otherwise the new object.
-     *  @param name       Name of the object to be created.
-     *  @param durability Decides when object shall be destroyed.
-     */
-    template <class T>
-    T* createObject(const std::string& name, const EDurability& durability = c_Event);
-
-
-    /** Get existing object.
-     *
-     *  Name, durability and type of object have to match. <br>
-     *  For matching the type of the object, however, derived classes are cast to their base classes.
-     *
-     *  @return Existing object, if all matches or NULL pointer. NULL is as well returned, when the object exists,
-     *          but type doesn't match.
+     *  If in the map of requested durability is already an object under the key name with a DIFFERENT type
+     *  than the template type one, the program ends. <br>
+     *  If this function is called for the first time with a given name and durability, a new map slot is created.
+     *  However, for I/O related reasons, this should be usually not done outside of the initialize functions of modules.
+     *  Therefore the latter condition is checked, and an error returned, if you try to create a new map slot at other
+     *  times.
+     *  @return           In case AObject has been NULL, true is returned, if a new object was created.
+     *                    In case AObject has been different from NULL, it is returned, if AObject could be stored
+     *                    successfully.
      *  @param name       Name of the object.
-     *  @param durability Looks up the object in respective map, where objects of the given
-     *                    durability are stored.
+     *  @param durability Looks up the object in respective map, where objects of the given durability are stored.
+     *  @param generate   In case AObject is NULL, this boolean decides, if a new object shall be created, if there is
+     *                    not already one occupying the requested slot.
+     *                    In case there is an AObject other than NULL pointer, this value is without consequences.
+     *  @param AObject    Object pointer reference for possible storage.<br>
+     *                    If an existing object is in the map of requested durability at the
+     *                    slot with key "name", this pointer is reassigned to that object.
+     *                    If the slot is free, AObject is a NULL pointer and the parameter generate is true it is
+     *                    reassigned to a new object created with the default constructor and returned.
      */
-    template <class T>
-    T* getObject(const std::string& name, const EDurability& durability = c_Event);
+    template <class T> bool handleObject(const std::string& name, const EDurability& durability,
+                                         bool generate, T*& AObject = static_cast<T*>(0));
 
-
-    /** Create new object without check of existence.
+    /** Store existing Object.
      *
-     *  The function just creates a new objects, even if one already exists with the same name.
-     *  It is faster than the other createObject function, but has the risk of a memory leak.
-     *
-     *  @return New object.
-     *  @param name       Name of the object to be created.
-     *  @param durability Decide when object shall be destroyed.
+     *  Stored object has to follow the usual rules, like inheritance from TObject, ClassDef Macro... <br>
+     *  This function just calls the handleObject function, and is used by some for direct access to the DataStore.
+     *  @return Was storing successful?
+     *  @param AObject    Object to be stored.
+     *  @param name       Name of object to be stored.
+     *  @param durability Decides when object is deleted from store again.
      */
-    template <class T>
-    T* createObjectRaw(const std::string& name, const EDurability& durability = c_Event);
+    template <class T> inline bool storeObject(T*& AObject, const std::string& name, const EDurability& durability = c_Event) {
+      return handleObject<T>(name, durability, true, AObject);
+    }
 
-
-    /** Create TClonesArray with check of existence.
+    /** NEEDS UPDATE
      *
-     *  First it is checked, if array of corresponding name, durability, and object type to be stored already exists,
-     *  and if so is returned. If not, a new object is returned.<br>
-     *  Note, that even arrays of durability "Event" are not destroyed, but just cleared.
      *  The TClonesArray has a mechanism to delete the objects without giving the memory free,
      *  and thereby allows faster recreation of objects with a mechanism described at
      *  <a href=http://root.cern.ch/root/html/TClonesArray.html> TClonesArray's root page</a>.
@@ -146,56 +148,23 @@ namespace Belle2 {
      *  @param name       Name of TClonesArray to be created.
      *  @param durability Decide when TClonesArray shall be destroyed.
      */
-    template <class T>
-    TClonesArray* createArray(const std::string& name, const EDurability& durability = c_Event);
-
-
-    /** Get existing TClonesArray with check of existence.
-     *  Aborts the programm, if object of name and durability, but different type already exists.
-     *
-     *  @return Existing TClonesArray, if one of corresponding name, durability and object type to be stored exists,
-     *          otherwise NULL.
-     *  @param name       Name of TClonesArray, that shall be returned.
-     *  @param durability Decide when TClonesArray shall be destroyed.
-     */
-    template <class T>
-    TClonesArray* getArray(const std::string& name, const EDurability& durability = c_Event);
-
-
-    /** Store existing Object.
-     *
-     *  Stored object has to follow the usual rules, like inheritance from TObject, ClassDef Macro...
-     *
-     *  @return Was storing successful?
-     *  @param object     Object to be stored.
-     *  @param name       Name of object to be stored.
-     *  @param durability Decides when object is deleted from store again.
-     */
-    bool storeObject(TObject* object, const std::string& name, const EDurability& durability = c_Event);
-
+    template <class T> bool handleArray(const std::string& name,
+                                        const EDurability& durability,
+                                        TClonesArray*& array = static_cast<TClonesArray*>(0));
 
     /** Store existing TClonesArray.
      *
      *  This function will overwrite the content of an potentially existing TClonesArray.
-     *
      *  @return Was storing successful?
      *  @param array      TClonesArray to be stored.
      *  @param name       Name of array to be stored.
      *  @param durability Decides when object is deleted from store again.
      */
-    bool storeArray(TClonesArray* array, const std::string& name, const EDurability& durability = c_Event);
-
-
-    /** Clearing Maps of a specified durability.
-     *
-     *  Called by the framework. Users should usually not use this function without a good reason.
-     *  Object Maps are just delted. ArrayMaps don't delete the TClonesArrays, but just their content.
-     *  The TClonesArray keeps the memory occupied and one can faster store objects into it.
-     *
-     *  @param durability Decides which Map is cleared.
-     */
-    void clearMaps(const EDurability& durability = c_Event);
-
+    inline bool storeArray(TClonesArray* array, const std::string& name, const EDurability& durability = c_Event) {
+      // use of TObject for template class is usually fine, because it is only checked, if there is already a corresponding slot.
+      B2DEBUG(250, "Storing will crash, if there is already an object with name " << name << ", durability " << durability);
+      return handleArray<TObject>(name, durability, array);
+    }
 
     /** Get an iterator for one of the object map.
      *
@@ -211,17 +180,33 @@ namespace Belle2 {
      */
     StoreMapIter<StoreArrayMap>* getArrayIterator(const EDurability& durability);
 
+    //------------------------------ Start and end procedures --------------------------------------------------
+    /** Setter for initializeActive. */
+    void setInitializeActive(const bool active) {
+      initializeActive = active;
+    }
+
+    /** Creating new map slots is only allowed, if this boolean is true. */
+    bool initializeActive;
+
+    /** Clearing Maps of a specified durability.
+     *
+     *  Called by the framework. Users should usually not use this function without a good reason.
+     *  Object Maps are just deleted. ArrayMaps don't delete the TClonesArrays, but just their content.
+     *  The TClonesArray keeps the memory occupied and one can faster store objects into it.
+     *  @param durability Decides which Map is cleared.
+     */
+    void clearMaps(const EDurability& durability = c_Event);
 
   protected:
-
-    /** Constructor is private, as it is a singleton.*/
+    /** Constructor is protected, as it is a singleton.*/
     explicit DataStore();
 
-
   private:
-
     /** Destructor */
     ~DataStore() {};
+
+    static DataStore* m_instance; /**< Pointer, that actually holds the store instance.*/
 
     /** Map for TObjects.
      *
@@ -233,117 +218,70 @@ namespace Belle2 {
 
     /** Map for TClonesArrays.
      *
-     *  Separe map because of the special properties of the TClonesArray.
+     *  Separate map because of the special properties of the TClonesArray.
      *  Otherwise same as map for the TObjects.
      */
     StoreArrayMap m_arrayMap[c_NDurabilityTypes];
 
-    static DataStore* m_instance; /**< Pointer, that actually holds the store instance.*/
-
   };
-}
+} // namespace Belle2
 
 //---------------------------------------Implementation -------------------------------------------------
-
-
-template <class T>
-T* Belle2::DataStore::createObject(const std::string& name, const Belle2::DataStore::EDurability& durability)
+template <class T> bool Belle2::DataStore::handleObject(const std::string& name,
+                                                        const Belle2::DataStore::EDurability& durability,
+                                                        bool generate, T*& AObject)
 {
-  //get iterator to object, if it already exists
-  Belle2::DataStore::StoreObjIter iter = m_objectMap[durability].find(name);
+  std::pair<Belle2::DataStore::StoreObjIter, bool> result = m_objectMap[durability].insert(make_pair(name, AObject));
 
-  //if name already exists, iter does not point to the end of the map
-  if (iter != m_objectMap[durability].end()) {
-    B2INFO("Called object, that already exists.");
-    //casting includes type check
-    T* corrObject = dynamic_cast<T*>(iter->second);
+  if (result.second && (!initializeActive)) {    // new slot in map was created, should only happen in the initialize phase
+    B2ERROR("initializeActive is false while you try to create an object " << name << " under EDurability " << durability << " for first time.");
+  }
 
-    //if type doesn't match, user probably messed up mightily
-    if (!corrObject) {
-      B2FATAL("Existing object is of different type than requested one. Name was: " + name);
+  if (result.first->second) {                                         // map slot is occupied
+    generate = result.second;                                         // True, if occupier is AObject, false otherwise
+    B2DEBUG(250, "Crash is coming if there is no valid object with name " << name << " and durability " << durability << ".");
+    if (!dynamic_cast<T*>(result.first->second)) {                    // object is of different type than requested
+      B2FATAL("Existing object is of different type than requested one. Name was: " <<  name << " EDurability was " << durability);
     }
+    AObject  = static_cast<T*>(result.first->second);                 // assignment in case there was already an object before function call
 
-    //return of the existing object
-    return corrObject;
+  } else if (AObject) {                                               // map slot is not occupied by an actual object, so ...
+    generate = true;
+    result.first->second = AObject;                                   // ... make use of existing map slot with NULL pointer for storage
+
+  } else if (generate) {                                              // ... or generate one if requested
+    AObject =  new T;
+    result.first->second = AObject;
+    B2DEBUG(100, "Object with name " << name << " and durability " << durability << " was created.");
   }
 
-  //no object, create it
-  T* corrObject = new T;
-
-  //saved in the map
-  m_objectMap[durability][name] = corrObject;
-
-  //and returened
-  return corrObject;
+  return generate;
 }
 
 
-template <class T>
-T* Belle2::DataStore::getObject(const std::string& name, const Belle2::DataStore::EDurability& durability)
+template <class T> bool Belle2::DataStore::handleArray(const std::string& name,
+                                                       const Belle2::DataStore::EDurability& durability,
+                                                       TClonesArray*& array)
 {
-  //get iterator pointing to the existing object
-  Belle2::DataStore::StoreObjIter iter = m_objectMap[durability].find(name);
+  std::pair<Belle2::DataStore::StoreArrayIter, bool> result = m_arrayMap[durability].insert(make_pair(name, array));
 
-  //if iter points to existing object, it doesn't point to end
-  if (iter != m_objectMap[durability].end()) {
-    return dynamic_cast<T*>(iter->second);
-  }
-
-  //if object doesn't exist
-  return 0;
-}
-
-
-template <class T>
-T* Belle2::DataStore::createObjectRaw(const std::string& name, const Belle2::DataStore::EDurability& durability)
-{
-  //create the new object
-  T* object = new T;
-
-  //add it to the map
-  m_objectMap[durability][name] = object;
-
-  //return it
-  return object;
-}
-
-
-template <class T>
-TClonesArray* Belle2::DataStore::getArray(const std::string& name, const Belle2::DataStore::EDurability& durability)
-{
-  //get iterator pointing to existing array
-  Belle2::DataStore::StoreArrayIter iter =  m_arrayMap[durability].find(name);
-
-  if (iter != m_arrayMap[durability].end()) {
-    TClonesArray* ptr = iter->second;
-    //only return, if type matches
-    if (T::Class() != ptr->GetClass()) {
-      B2FATAL("Array '" << name << "' contains elements of " << ptr->GetClass()->GetName()
-              << ", requested was " << T::Class()->GetName());
+  if (result.second) {                                         // new slot in map was created
+    if (!initializeActive) {                                   // should only happen in the initialize phase
+      //shall soon be replaced with an B2ERROR message
+      B2WARNING("initializeActive is false while you try to create an array " << name << " under EDurability " << durability);
     }
-    return ptr;
+    if (!(result.first->second)) {                                     // if given with array = 0, ...
+      result.first->second = new TClonesArray(T::Class());             // use default constructor
+      B2DEBUG(100, "Array with name " << name << " and durability " << durability << " was created.");
+    }
+  }
+  array = result.first->second;                               // This is never a NULL pointer at this point
+  B2DEBUG(250, "If someone deleted a TClonesArray under name " << name << " and durability " << durability << ", a crash is coming.");
+  if (T::Class() != result.first->second->GetClass()) {       // TClonesArray in map slot is for different type than requested one
+    B2FATAL("Existing array is for different type than requested one. Name was: " <<  name << " EDurability was " << durability);
   }
 
-  //if object doesn't exist
-  return 0;
-}
-
-
-template <class T>
-TClonesArray* Belle2::DataStore::createArray(const std::string& name, const EDurability& durability)
-{
-  //check; use getArray, as it checks for type safety.
-  TClonesArray* array = getArray<T>(name, durability);
-
-  if (array) {
-    B2WARNING("Array " + name + " already exists");
-    return array;
-  }
-
-  //make new one, if none exists
-  array = new TClonesArray(T::Class());
-  m_arrayMap[durability][name] = array;
-  return array;
+  return result.second;
 }
 
 #endif // DATASTORE_H

@@ -11,25 +11,25 @@
 #ifndef STOREOBJPTR_H
 #define STOREOBJPTR_H
 
-#include <utility>
-
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreAccessorBase.h>
 #include <framework/logging/Logger.h>
+
+#include <utility>
 
 namespace Belle2 {
 
   /** Type save access pointer.
    *
    *  Use this, if you want to access or create a single object in the store.
-   *  @author <a href="mailto:martin.heck@kit.edu?subject=StoreObjPtr">Martin Heck</a>
+   *  @author <a href="mailto:belle2_software@bpost.kek.jp?subject=StoreObjPtr">The basf2 developers</a>
    */
   template <class T> class StoreObjPtr : StoreAccessorBase {
   public:
     /** Constructor with assignment.
      *
      *  This constructor calls the assignObject function.
-     *  @param name       Name of the object to be hold by this pointer.
+     *  @param name       Name under which the object to be hold by this pointer is stored.
      *  @param durability Decides durability map used for getting or creating the accessed object.
      *  @param generate   Shall an object in the DataStore be created, if none exists with given name and durability?
      *  @sa assignObject
@@ -55,8 +55,8 @@ namespace Belle2 {
      *  If there is already a slot registered in the DataStore under the given name and durability, this slot is used. If the slot is
      *  occupied by an object of different type than the template class of StoreObjPtr, a B2FATAL error message is produced.
      *  If the slot isn't occupied so far by an object, you can create a new one.
-     *  @return Was a new object generated?
-     *  @param name       Name of the object to be assigned. An empty string is treated as name equal to the template class name.
+     *  @return           Was a new object generated?
+     *  @param name       Name under which the object to be assigned is stored. An empty string is treated as name equal to the template class name.
      *  @param durability Decides durability map used for getting or creating the accessed object.
      *  @param generate   Shall an object in the DataStore be created, if none occupies the slot with given name and durability?
      *                    For this purpose the default constructor of the template class is used and the created object assigned
@@ -66,31 +66,28 @@ namespace Belle2 {
 
     /** Store existing object.
      *
-     *  Instead of creating a new object, you can store an object, that already exists. If you try to store the object
-     *  @return Could object be stored? False in case an object with given name already exists.
-     *  @param name Name of the object to be stored.
+     *  Instead of creating a new object, you can store an object, that already exists.
+     *  @return           True, if object was stored successfully. This might not be the case, if the requested slot is already occupied.
+     *  @param name       Name under which the object shall be stored.
      *  @param durability Decides durability map used to store the object.
      */
     bool storeObject(T* const AObject, const std::string& name = "", const DataStore::EDurability& durability = DataStore::c_Event);
 
-    /** Imitate pointer functionality. */
-    T& operator *() const {return *m_storeObjPtr;};
+    //------------------------ Imitate pointer functionality -----------------------------------------------
+    T& operator *()  const {return *m_storeObjPtr;};  /**< Imitate pointer functionality. */
+    T* operator ->() const {return m_storeObjPtr;};   /**< Imitate pointer functionality. */
+    operator bool()  const {return m_storeObjPtr;};   /**< Imitate pointer functionality. */
 
-    /** Imitate pointer functionality. */
-    T* operator ->() const {return m_storeObjPtr;};
+    //------------------------ Getters for AccessorParams --------------------------------------------------
+    AccessorParams getAccessorParams() const {     /**< Returns name and durability under which the object is saved in the DataStore. */
+      return AccessorParams(m_name, m_durability);
+    }
+    std::string getName() const { return m_name; } /**< Return  name under which the object is saved in the DataStore. */
+    DataStore::EDurability getDurability() const { /**< Return  durability with which the object is saved in the DataStore. */
+      return m_durability;
+    }
 
-    /** Imitate pointer functionality. */
-    operator bool() const {return m_storeObjPtr;};
-
-
-    /** Returns name and durability under which the object is saved in the DataStore. */
-    AccessorParams getAccessorParams() const {return AccessorParams(m_name, m_durability);};
-    /** Return  name under which the object is saved in the DataStore. */
-    std::string getName() const { return m_name; }
-    /** Return  durability with which the object is saved in the DataStore. */
-    DataStore::EDurability getDurability() const { return m_durability; }
   protected:
-
     /** Store of actual pointer. */
     T* m_storeObjPtr;
 
@@ -99,13 +96,11 @@ namespace Belle2 {
 
     /**Store durability under which the TClonesArray is saved. */
     DataStore::EDurability m_durability;
-
   };
-
 } // end namespace Belle2
 
 
-// ------------ Implementation of template class ------------------------------------------------
+// ------------ Implementation of template class -----------------------------------------------------------
 template <class T> bool Belle2::StoreObjPtr<T>::assignObject(const std::string& name, const Belle2::DataStore::EDurability& durability, bool generate)
 {
   if (name == "") {

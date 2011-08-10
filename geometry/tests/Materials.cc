@@ -9,8 +9,16 @@
 #include <G4Element.hh>
 #include <G4Material.hh>
 #include <G4OpticalSurface.hh>
+#include <G4MaterialPropertiesTable.hh>
 
 using namespace std;
+
+/** stream operator for G4MPVEntry, needed for testing of PropertyTable */
+ostream& operator<<(ostream &out, G4MPVEntry entry)
+{
+  out << "G4MPVEntry(" << entry.GetPhotonEnergy() << "," << entry.GetProperty() << ")";
+  return out;
+}
 
 namespace Belle2 {
   namespace geometry {
@@ -176,5 +184,39 @@ namespace Belle2 {
       EXPECT_FALSE(surf5);
     }
 
-  }
-}  // namespace
+    TEST(Materials, Properties)
+    {
+      Gearbox &gb = Gearbox::getInstance();
+      vector<string> backends;
+      backends.push_back("string:<Material name='TestProperties'>"
+                         "<Components><Material>Si</Material></Components>"
+                         "<Property name='RINDEX' unit='eV'>"
+                         "<value energy='1.0'>1.40</value>"
+                         "<value energy='1.5'>1.41</value>"
+                         "<value energy='2.0'>1.42</value>"
+                         "<value energy='3.5'>1.43</value>"
+                         "</Property>"
+                         "</Material>");
+      gb.setBackends(backends);
+      gb.open();
+      Materials &m = Materials::getInstance();
+
+      G4Material* mat = m.createMaterial(GearDir("/Material"));
+      ASSERT_TRUE(mat);
+      G4MaterialPropertiesTable *properties = mat->GetMaterialPropertiesTable();
+      ASSERT_TRUE(properties);
+      G4MaterialPropertyVector *property = properties->GetProperty("RINDEX");
+      ASSERT_TRUE(property);
+      EXPECT_EQ(property->Entries(), 4);
+      EXPECT_DOUBLE_EQ(property->GetMinProperty(), 1.40);
+      EXPECT_DOUBLE_EQ(property->GetMaxProperty(), 1.43);
+      EXPECT_DOUBLE_EQ(property->GetMinPhotonEnergy(), 1*eV);
+      EXPECT_DOUBLE_EQ(property->GetMaxPhotonEnergy(), 3.5*eV);
+      EXPECT_EQ(property->GetEntry(0), G4MPVEntry(1.0*eV, 1.40));
+      EXPECT_EQ(property->GetEntry(1), G4MPVEntry(1.5*eV, 1.41));
+      EXPECT_EQ(property->GetEntry(2), G4MPVEntry(2.0*eV, 1.42));
+      EXPECT_EQ(property->GetEntry(3), G4MPVEntry(3.5*eV, 1.43));
+      gb.close();
+    }
+  } // namespace geometry
+}  // namespace Belle2

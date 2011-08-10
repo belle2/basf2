@@ -182,7 +182,7 @@ namespace Belle2 {
             B2ERROR("Property at " << property.getPath() << " does not have a name attribute, ignoring");
             continue;
           }
-          double conversionFactor = Unit::convertValue(1, parameters.getString("@unit", "GeV"));
+          double conversionFactor = Unit::convertValue(1, property.getString("@unit", "GeV"));
           //Geant4 uses MeV as default energy
           conversionFactor /= Unit::MeV;
           unsigned int nValues = property.getNumberNodes("value");

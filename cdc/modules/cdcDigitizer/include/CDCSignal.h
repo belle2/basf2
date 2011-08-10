@@ -31,7 +31,7 @@ namespace Belle2 {
         \param charge The charge of this signal.
         \param driftLength Drift length of this signal.
     */
-    CDCSignal(int layerId, int wireId, double charge, double driftLength, double driftTime) : m_layerId(layerId), m_wireId(wireId), m_charge(charge), m_driftLength(driftLength), m_driftTime(driftTime) {;}
+    CDCSignal(int hitNumber, int layerId, int wireId, double charge, double driftLength, double driftTime) : m_hitNumber(hitNumber), m_layerId(layerId), m_wireId(wireId), m_charge(charge), m_driftLength(driftLength), m_driftTime(driftTime) {;}
 
     //CDCSignal(int layerId, int wireId, double charge, double driftLength, EVENT::MCParticle * mcPart) : m_layerId(layerId), m_wireId(wireId), m_charge(charge),
     //       m_driftLength(driftLength) { m_MCPartVec.push_back(mcPart); m_MCWeightVec.push_back(charge);}
@@ -41,6 +41,12 @@ namespace Belle2 {
 
     //! Destructor
     ~CDCSignal() {};
+
+    //! Set hit number
+    /*!
+        \param hitNumber
+    */
+    inline void setHitNumber(int hitNumber) { m_hitNumber = hitNumber; }
 
     //! Set layer id
     /*!
@@ -85,6 +91,12 @@ namespace Belle2 {
     //void updateMCParticles(MCPartVec mcPartVec, MCWeightVec mcWeightVec);
 
 
+    //! Get Hit number
+    /*!
+        \return hit number.
+    */
+    inline int getHitNumber() const { return m_hitNumber; }
+
     //! Get layer id
     /*!
         \return Layer id.
@@ -126,6 +138,7 @@ namespace Belle2 {
 
   private:
 
+    int m_hitNumber;   /*!< The number of hit in CDCSimHitArray */
     int m_layerId;   /*!< Layer id */
     int m_wireId;    /*!< Wire id */
     double m_charge; /*!< Charge of CDC signal */

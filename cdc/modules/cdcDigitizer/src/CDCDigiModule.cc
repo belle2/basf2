@@ -169,6 +169,7 @@ void CDCDigiModule::event()
 
         // ... smallest drift time has to be checked, ...
         if (hitDriftTime < iterCDCMap->second->getDriftTime()) {
+          iterCDCMap->second->setHitNumber(iHits);
           iterCDCMap->second->setDriftTime(hitDriftTime);
           iterCDCMap->second->setDriftLength(hitDriftLength);
           B2DEBUG(250, "hitDriftTime: " << hitDriftTime);
@@ -185,7 +186,7 @@ void CDCDigiModule::event()
 
     // If it is a new hit, save it to signal map.
     if (ifNewDigi == true) {
-      CDCSignal* signal = new CDCSignal(hitLayerId, hitWireId, hitdEdx, hitDriftLength, hitDriftTime);
+      CDCSignal* signal = new CDCSignal(iHits, hitLayerId, hitWireId, hitdEdx, hitDriftLength, hitDriftTime);
       cdcSignalMap.insert(vpair(iHits, signal));
     }
   } // end loop over SimHits.
@@ -233,7 +234,7 @@ void CDCDigiModule::event()
 
     // Creation of Relation between SimHit, that has smalles drift length in each cell and the CDCHit.
     B2DEBUG(150, "First: " << (iterCDCMap->first) << "iDigits" << iDigits);
-    new(cdcSimRelation->AddrAt(iDigits)) Relation(cdcArray, cdcHitArray, iterCDCMap->first, iDigits);
+    new(cdcSimRelation->AddrAt(iDigits)) Relation(cdcArray, cdcHitArray, iterCDCMap->second->getHitNumber(), iDigits);
     B2DEBUG(150, "START");
     B2DEBUG(150, "SimHitDriftLength: " << cdcArray[iterCDCMap->first]->getDriftLength());
     B2DEBUG(150, "CDCHitDriftLength: " << cdcHitArray[iDigits]->getDriftTime());

@@ -16,11 +16,10 @@
 
 namespace Belle2 {
 
-  /** Module to match the CDCTrackCandidates with MCParticles and evaluate the performance of pattern recognition.
-   *  This modules perfoms MCMatching from 'two different sides'.
-   *  First it is checked which MCParticles contributed to CDCTrackCandidates, the Id of the matched MCParticle and the purity are then assigned to CDCTrackCandidates and a relation between MCParticle and TrackCandidate is created.
-   *  In the next step it is checked how well were the MCParticles reconstructed.
-   *  This is done by creating a Collection of MCMatchParticles, where the information about the matched track is stored.
+  /** Module to match the GFTrackCandidates with MCParticles to be able to evaluate the performance of pattern recognition.
+   *  It is checked which MCParticles created the CDCRecoHits assigned to this TrackCandidates.
+   *  The MCParticle with the largest contribution is evaluated and its ID is assigned to the GFTrackCandidate.
+   *  @todo: at the moment this module is only usable for CDC pattern recognition, at some point VTX detectors also should be included
    */
 
   class CDCMCMatchingModule : public Module {
@@ -59,22 +58,34 @@ namespace Belle2 {
      */
     virtual void terminate();
 
+    /** This method adds a new MCParticle Id to the pair vector mcParticleContributions.
+     *  This vector stores pairs <MCParticleId, Number of Hits from this MCParticle>.
+     *  If there are already entries from this MCId, the corresponding number of hits is increased by 1.
+     *  If there are no entries from this MCId, a new entry with 1 hit is created.
+     */
+    virtual void addMCParticle(std:: vector <std::pair<int, int> >  & mcParticleContributions, int mcId);
+
+    /** This method evaluates the MCParticle Id with the largest contribution from the vector mcParticleContributions.
+     *  This vector stores pairs <MCParticleId, Number of Hits from this MCParticle>.
+     *  The method returns the Id of the MCParticle with the most hits.
+     */
+    virtual int getBestMCId(std:: vector <std::pair<int, int> >  mcParticleContributions);
+
   protected:
 
 
   private:
 
     std::string m_mcParticlesCollectionName;             /**< MC particle collection name */
-    std::string m_mcPartToCDCSimHitsCollectionName;      /**< MC particle to CDCSimHits relation name */
-    std::string m_cdcSimHitToCDCHitCollectioName;        /**< CDCSimHits to CDCHits relation name */
 
     std::string m_cdcRecoHitsCollectionName;             /**< CDCRecoHits collection name */
 
-    std::string m_cdcTrackCandsCollectionName;           /**< CDCTrackCandidates collection name */
-    std::string m_cdcTrackCandToRecoHits;               /**< CDCTrackCandidates to CDCRecoHits relation name */
+    std::string m_mcPartToCDCRecoHits;                  /**< MCParticles to CDCRecoHits relation name */
 
-    std::string m_cdcTrackCandsToMCParticles;            /**< CDCTrackCandidates to MCParticles relation name */
-    std::string m_mcMatchParticlesCollectionName;        /**< MCMatchParticles collection name */
+    std::string m_gfTrackCandsCollectionName;           /**< GFTrackCandidates collection name */
+
+    std::string m_gfTrackCandsToMCParticles;            /**< GFTrackCandidates to MCParticles relation name */
+
 
 
   };
@@ -82,3 +93,4 @@ namespace Belle2 {
 
 
 #endif /* CDCMCMATCHINGMODULE_H */
+

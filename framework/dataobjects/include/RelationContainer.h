@@ -11,7 +11,8 @@
 #define RELATIONCONTAINER_H
 
 #include <framework/dataobjects/RelationElement.h>
-#include <framework/datastore/DataStore.h>
+
+#include <TClonesArray.h>
 
 #include <vector>
 #include <string>
@@ -29,13 +30,13 @@ namespace Belle2 {
         m_toName(""), m_toDurability(-1), m_modified(true) {}
 
     /** Get name of the StoreArray we relate from. */
-    const std::string getFromName()       const { return (std::string) m_fromName; }
+    const std::string getFromName()       const { return m_fromName; }
 
     /** Get durability of the StoreArray we relate from. */
     const int         getFromDurability() const { return m_fromDurability; }
 
     /** Get name of the StoreArray we relate to. */
-    const std::string getToName()         const { return (std::string) m_toName; }
+    const std::string getToName()         const { return m_toName; }
 
     /** Get durability of the StoreArray we relate to. */
     const int         getToDurability()   const { return m_toDurability; }
@@ -84,13 +85,13 @@ namespace Belle2 {
     TClonesArray m_elements;
 
     /** name of the StoreArray we relate from. */
-    TString m_fromName;
+    std::string m_fromName;
 
     /** durability of the StoreArray we relate from. */
     int m_fromDurability;
 
     /** name of the StoreArray we relate to. */
-    TString m_toName;
+    std::string  m_toName;
 
     /** durability of the StoreArray we relate to. */
     int m_toDurability;

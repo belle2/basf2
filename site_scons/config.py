@@ -106,11 +106,15 @@ def configure_system(conf):
 
     # sqlite3
     conf.env['HAS_SQLITE'] = False
+    conf.env['SQLITE_LIBS'] = []
     if conf.CheckLibWithHeader('sqlite3', 'sqlite3.h', 'C',
                                'sqlite3_open_v2(":memory:",0,SQLITE_OPEN_READONLY,0);'
                                ):
         conf.env['HAS_SQLITE'] = True
         conf.env.Append(CPPDEFINES='-DHAS_SQLITE')
+        sqlite_env = Environment(ENV=os.environ)
+        sqlite_env.ParseConfig('pkg-config sqlite3 --libs')
+        conf.env['SQLITE_LIBS'] = sqlite_env['LIBS']
 
     return True
 

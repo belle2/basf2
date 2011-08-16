@@ -10,6 +10,13 @@
 
 #include <framework/modules/simpleoutput/SimpleOutputModule.h>
 
+#include <framework/dataobjects/EventMetaData.h>
+#include <framework/dataobjects/FileMetaData.h>
+
+#include <TTreeIndex.h>
+#include <stdlib.h>
+#include <time.h>
+
 
 using namespace std;
 using namespace Belle2;
@@ -51,8 +58,8 @@ SimpleOutputModule::SimpleOutputModule() : Module()
   addParam("compressionLevel", m_compressionLevel, "Compression Level: 0 for no, 1 for low, 9 for high compression.", 1);
 
   addParam(m_steerTreeNames[0], m_treeNames[0], "TTree name for event data. NONE for no output.", string("tree"));
-  addParam(m_steerTreeNames[1], m_treeNames[1], "TTree name for run data. NONE for no output.", string("NONE"));
-  addParam(m_steerTreeNames[2], m_treeNames[2], "TTree name for peristent data. NONE for no output.", string("NONE"));
+  addParam(m_steerTreeNames[1], m_treeNames[1], "TTree name for run data. NONE for no output.", string("run"));
+  addParam(m_steerTreeNames[2], m_treeNames[2], "TTree name for peristent data. NONE for no output.", string("persistent"));
 
   vector<string> branchNames;
   addParam(m_steerBranchNames[0], m_branchNames[0], "Names of branches to be written from event map. Empty means all branches.", branchNames);
@@ -70,18 +77,17 @@ SimpleOutputModule::~SimpleOutputModule()
   }
 
   for (size_t jj = 0; jj < DataStore::c_NDurabilityTypes; jj++) {
-    for (size_t ii = 0; ii < m_size[jj]; ii++) {
-      if (m_objects[jj]) {
-        if (m_objects[jj][ii]) {
-          delete m_objects[jj][ii];
-        }
-      }
+    if (m_objects[jj]) {
+      delete[] m_objects[jj];
     }
   }
 }
 
 void SimpleOutputModule::initialize()
 {
+  //create a file level metadata object in the data store
+  StoreObjPtr<FileMetaData> fileMetaDataPtr("", DataStore::c_Persistent);
+
   // check for same treeNames
   for (int ii = 0; ii < DataStore::c_NDurabilityTypes; ++ii) {
     for (int jj = 0; jj < DataStore::c_NDurabilityTypes; ++jj) {
@@ -111,13 +117,13 @@ void SimpleOutputModule::initialize()
     }
   }
 
-  B2INFO("SimpleOutput initialised.");
+  B2DEBUG(1, "SimpleOutput initialised.");
 }
 
 
 void SimpleOutputModule::beginRun()
 {
-  B2INFO("beginRun called.");
+  B2DEBUG(1, "beginRun called.");
 }
 
 
@@ -137,6 +143,13 @@ void SimpleOutputModule::event()
 
   //make sure setup is done only once
   m_done[DataStore::c_Event] = true;
+
+  //check for new parent file
+  StoreObjPtr<FileMetaData> fileMetaDataPtr("", DataStore::c_Persistent);
+  int id = fileMetaDataPtr->getId();
+  if (id && (m_parents.empty() || (m_parents.back() != id))) {
+    m_parents.push_back(id);
+  }
 }
 
 
@@ -150,14 +163,54 @@ void SimpleOutputModule::endRun()
   //make sure setup is done only once
   m_done[DataStore::c_Run] = true;
 
-  B2INFO("endRun done.");
+  B2DEBUG(1, "endRun done.");
 }
 
 
 void SimpleOutputModule::terminate()
 {
+  //get pointer to event and file level metadata
+  StoreObjPtr<EventMetaData> eventMetaDataPtr;
+  StoreObjPtr<FileMetaData> fileMetaDataPtr("", DataStore::c_Persistent);
+
+  if (m_treeNames[DataStore::c_Event] != "NONE") {
+
+    //create an index for the event tree
+    TTree* tree = m_tree[DataStore::c_Event];
+    int nEntries = tree->BuildIndex("1000000*EventMetaData.m_experiment+EventMetaData.m_run",
+                                    "EventMetaData.m_event");
+    TTreeIndex* index = (TTreeIndex*) tree->GetTreeIndex();
+
+    //fill the file level metadata
+    fileMetaDataPtr->setEvents(tree->GetEntries());
+    tree->GetEntry(index->GetIndex()[0]);
+    fileMetaDataPtr->setExperiment(eventMetaDataPtr->getExperiment());
+    fileMetaDataPtr->setLow(eventMetaDataPtr->getRun(), eventMetaDataPtr->getEvent());
+    tree->GetEntry(index->GetIndex()[nEntries-1]);
+    if (fileMetaDataPtr->getExperiment() != eventMetaDataPtr->getExperiment()) {
+      B2ERROR("The output file " << m_outputFileName << " contains more than one experiment.");
+    }
+    fileMetaDataPtr->setHigh(eventMetaDataPtr->getRun(), eventMetaDataPtr->getEvent());
+  }
+
+  //fill more file level metadata
+  fileMetaDataPtr->setParents(m_parents);
+  const char* release = getenv("BELLE2_RELEASE");
+  if (!release) release = "unknown";
+  char* site = getenv("BELLE2_SITE");
+  if (!site) {
+    char hostname[1024];
+    gethostname(hostname, 1023);
+    site = static_cast<char*>(hostname);
+  }
+  const char* user = getenv("BELLE2_USER");
+  if (!user) user = getenv("USER");
+  if (!user) user = getlogin();
+  if (!user) user = "unknown";
+  fileMetaDataPtr->setCreationData(release, time(0), site, user);
+
   //fill Persistent data
-  if (m_treeNames[2] != "NONE") {
+  if (m_treeNames[DataStore::c_Persistent] != "NONE") {
     fillTree(DataStore::c_Persistent);
   }
 
@@ -170,7 +223,7 @@ void SimpleOutputModule::terminate()
     }
   }
 
-  B2INFO("terminate called");
+  B2DEBUG(1, "terminate called");
 }
 
 size_t SimpleOutputModule::getSize(const int& mapID)
@@ -220,9 +273,9 @@ void SimpleOutputModule::fillTree(const DataStore::EDurability& durability)
       sort(m_branchNames[durability].begin(), m_branchNames[durability].end());
 
       // print out branch names
-      B2INFO("Sorted list of branch names for EDurability map " << durability << ":");
+      B2DEBUG(2, "Sorted list of branch names for EDurability map " << durability << ":");
       for (vector<string>::iterator stringIter = m_branchNames[durability].begin(); stringIter != m_branchNames[durability].end(); ++stringIter) {
-        B2INFO(*stringIter)
+        B2DEBUG(2, *stringIter)
       }
     }
 

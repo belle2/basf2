@@ -8,5 +8,6 @@
 #pragma link C++ class Belle2::RelationElement;
 #pragma link C++ class Belle2::RelationContainer;
 #pragma link C++ class Belle2::RunMetaData;
+#pragma link C++ class Belle2::FileMetaData;
 
 #endif

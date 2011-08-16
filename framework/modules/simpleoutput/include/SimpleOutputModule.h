@@ -199,6 +199,9 @@ namespace Belle2 {
 
     /** String vector with steering parameter Names for m_branchNames. */
     std::vector<std::string>  m_steerBranchNames;
+
+    /** Vector of parent file IDs. */
+    std::vector<int> m_parents;
   };
 
 } // end namespace Belle2

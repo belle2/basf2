@@ -27,7 +27,7 @@ namespace Belle2 {
      *
      *  Initilises meta data of event with Nulls.
      */
-    EventMetaData(unsigned long event = -1, unsigned long run = -1, unsigned long experiment = -1)
+    EventMetaData(unsigned long event = 0, unsigned long run = 0, unsigned long experiment = 0)
         : m_event(event), m_run(run), m_experiment(experiment), m_parent_index(-1), m_generated_weight(1) {}
 
     /** Destructor. */
@@ -58,8 +58,8 @@ namespace Belle2 {
     }
 
     /** Marks the end of the data processing.
-     * Sets the values for the experiment, run and event to the
-     * default values.
+     * Sets the values for the experiment, run and event to
+     * values indicating the end of data.
      */
     void setEndOfData() {
       m_event = -1;

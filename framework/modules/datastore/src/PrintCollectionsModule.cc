@@ -12,7 +12,7 @@
 
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/EventMetaData.h>
+#include <framework/dataobjects/EventMetaData.h>
 
 #include <boost/format.hpp>
 

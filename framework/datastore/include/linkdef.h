@@ -11,8 +11,6 @@
 #pragma link C++ class Belle2::SimpleVec<float>;
 #pragma link C++ class Belle2::SimpleVec<char>;
 
-#pragma link C++ class Belle2::EventMetaData;
-
 
 
 #endif

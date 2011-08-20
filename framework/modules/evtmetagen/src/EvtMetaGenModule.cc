@@ -12,7 +12,7 @@
 
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/EventMetaData.h>
+#include <framework/dataobjects/EventMetaData.h>
 
 #include <vector>
 

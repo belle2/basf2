@@ -14,7 +14,7 @@
 #include <framework/core/ModuleStatistics.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/EventMetaData.h>
+#include <framework/dataobjects/EventMetaData.h>
 #include <framework/logging/Logger.h>
 
 using namespace std;
@@ -101,7 +101,9 @@ void EventProcessor::processCore(PathPtr startPath, const ModulePtrList& moduleP
 
   //Remember the previous event meta data, and identify end of data meta data
   EventMetaData previousEventMetaData;
+  EventMetaData noEventMetaData;
   EventMetaData endEventMetaData;
+  endEventMetaData.setEndOfData();
 
   //Pointer to master module;
   Module* master = 0;
@@ -138,7 +140,8 @@ void EventProcessor::processCore(PathPtr startPath, const ModulePtrList& moduleP
       }
 
       //Check for end of data
-      if (master && (*eventMetaDataPtr == endEventMetaData)) {
+      if ((*eventMetaDataPtr == endEventMetaData) ||
+          ((module == master) && (*eventMetaDataPtr == noEventMetaData))) {
         if (module != master) {
           B2WARNING("Event processing stopped by non-master module " << module->getName());
         }
@@ -173,7 +176,8 @@ void EventProcessor::processCore(PathPtr startPath, const ModulePtrList& moduleP
       } else {
 
         //Check for a second master module
-        if (*eventMetaDataPtr != previousEventMetaData) {
+        if ((*eventMetaDataPtr != noEventMetaData) &&
+            (*eventMetaDataPtr != previousEventMetaData)) {
           B2FATAL("Two master modules were discovered: " << master->getName()
                   << " and " << module->getName());
         }

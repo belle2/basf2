@@ -11,11 +11,12 @@
 #define TRACK_H
 
 #include <TObject.h>
+#include <TVector3.h>
 
 namespace Belle2 {
 
   /** Track parameters. */
-  /** This Track class is based on the perigee parametrisation.
+  /** This Track class is based on the perigee parametrisation and still not quiet finished The definition of the helix parameters might change. Currently some auxilially variables are stored which might not be necassary in the future.
    */
   class Track : public TObject {
   public:
@@ -23,7 +24,23 @@ namespace Belle2 {
     /** Constructor. */
     /** This is as well the parameter free I/O constructor.
      */
+    // Track() {
+    // }
+
     Track() {
+      m_d0 = -999;
+      m_phi = -999;
+      m_omega = -999;
+      m_z0 = -999;
+      m_cotTheta = -999;
+      m_chi2 = -999;
+      m_dEdx = -999;
+      m_dEdxSigma = -999;
+      m_nHits = -999;
+      m_radiusOfInnermostHit = -999;
+      m_pValue = -999;
+      m_mcId = -999;
+      m_purity = -999;
     }
 
     /** Destructor. */
@@ -154,6 +171,22 @@ namespace Belle2 {
       m_radiusOfInnermostHit = radiusOfInnermostHit;
     }
 
+    void setPValue(float pValue) {m_pValue = pValue;};
+
+    float getPValue() {return m_pValue;};
+
+    void setMCId(int mcId) {m_mcId = mcId;};
+
+    int getMCId() { return m_mcId; } ;
+
+    void setPDG(int pdg) { m_pdgHypo = pdg;};
+
+    int getPDG() {return m_pdgHypo;};
+
+    void setPurity(float purity) { m_purity = purity;};
+
+    float getPurity() { return m_purity;};
+
   private:
 
     /** Impact Parameter.
@@ -207,6 +240,22 @@ namespace Belle2 {
         This gives a hint, if we may have to do it with a track from a V0 particle.
     */
     float m_radiusOfInnermostHit;
+
+    /** Probability value of the track fit, is calculated from the chi2 and NDF after the fit.
+    */
+    float m_pValue;
+
+    /** StoreArray index of the corresponding MCParticle
+    */
+    int m_mcId;
+
+    /** PDG hypothetis under which this track was fitted
+     */
+    int m_pdgHypo;
+
+    /** Purity of the tracks. 100 % for MCTracks, for pattern reco tracks purity is calculated in the MCMatchingModule
+     */
+    float m_purity;
 
     /** ROOT Macro to make Track a ROOT class.*/
     ClassDef(Track, 1);

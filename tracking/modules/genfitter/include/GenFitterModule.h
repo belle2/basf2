@@ -56,14 +56,11 @@ namespace Belle2 {
 
   private:
 
-    bool m_useCdcHits;                              /**< True if CDCHits should be used in the fit. */
-    bool m_useSvdHits;                              /**< True if SVDHits should be used in the fit. */
-    bool m_usePxdHits;                              /**< True if PXDHits should be used in the fit. */
+    bool m_mcTracks;                                 /**< Boolean to set if MCTracks (1) or patter reco tracks (0) are used */
 
-
-    std::string m_cdcRecoHitsColName;                /**< CDCRecoHits collection name */
-    std::string m_svdRecoHitsColName;                /**< SVDRecoHits collection name */
-    std::string m_pxdRecoHitsColName;                /**< PXDRecoHits collection name */
+    std::string m_cdcHitsColName;                    /**< CDCHits collection name */
+    std::string m_svdHitsColName;                    /**< SVDHits collection name */
+    std::string m_pxdHitsColName;                    /**< PXDHits collection name */
     std::string m_gfTrackCandsColName;               /**< GFTrackCandidates collection name */
 
     std::string m_tracksColName;                     /**< Tracks collection name */

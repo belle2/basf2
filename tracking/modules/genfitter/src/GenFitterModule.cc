@@ -19,15 +19,23 @@
 
 #include <generators/dataobjects/MCParticle.h>
 
+#include <cdc/dataobjects/CDCHit.h>
+#include <svd/dataobjects/SVDHit.h>
+#include <pxd/dataobjects/PXDHit.h>
+
 #include <cdc/dataobjects/CDCRecoHit.h>
-#include <pxd/dataobjects/PXDRecoHit.h>
 #include <svd/dataobjects/SVDRecoHit.h>
+#include <pxd/dataobjects/PXDRecoHit.h>
+
 #include <tracking/dataobjects/Track.h>
 
 #include "GFTrack.h"
 #include "GFTrackCand.h"
 #include "GFKalman.h"
 #include "GFDaf.h"
+#include "GFRecoHitProducer.h"
+#include "GFRecoHitFactory.h"
+
 
 #include "GFAbsTrackRep.h"
 #include "RKTrackRep.h"
@@ -44,6 +52,7 @@
 #include <boost/foreach.hpp>
 
 #include "TMath.h"
+#include "TRandom3.h"
 #include <math.h>
 
 using namespace std;
@@ -58,26 +67,19 @@ GenFitterModule::GenFitterModule() :
   setDescription(
     "Uses GenFit to fit tracks. Needs GFTrackCands as input and provides GFTracks and Tracks as output.");
 
-  addParam("UseCDCHits", m_useCdcHits,
-           "Set true if CDCHits should be used by the fitting", bool(true));
-  addParam("UseSVDHits", m_useSvdHits,
-           "Set true if SVDHits should be used by the fitting", bool(true));
-  addParam("UsePXDHits", m_usePxdHits,
-           "Set true if PXDHits should be used by the fitting", bool(true));
+
+  addParam("mcTracks", m_mcTracks, "Set true if the track candidates are from MCTrackFinder, set false if they are coming from the pattern recognition", bool(true));
 
   //input
-  addParam(
-    "GFTrackCandidatesColName", m_gfTrackCandsColName,
-    "Name of collection holding the GFTrackCandidates (should be created by the pattern recognition or MCTrackFinderModule)", string("GFTrackCandidates"));
-  addParam("CDCRecoHitsColName", m_cdcRecoHitsColName, "CDCRecoHits collection", string("CDCRecoHits"));
-  addParam("SVDRecoHitsColName", m_svdRecoHitsColName, "SVDRecoHits collection", string(DEFAULT_SVDRECOHITS));
-  addParam("PXDRecoHitsColName", m_pxdRecoHitsColName, "PXDRecoHits collection", string(DEFAULT_PXDRECOHITS));
+  addParam("GFTrackCandidatesColName", m_gfTrackCandsColName,
+           "Name of collection holding the GFTrackCandidates (should be created by the pattern recognition or MCTrackFinderModule)", string("GFTrackCandidates"));
+  addParam("CDCHitsColName", m_cdcHitsColName, "CDCHits collection", string("CDCHits"));
+  addParam("SVDHitsColName", m_svdHitsColName, "SVDHits collection", string(DEFAULT_SVDHITS));
+  addParam("PXDHitsColName", m_pxdHitsColName, "PXDHits collection", string(DEFAULT_PXDHITS));
 
   //output
-  addParam("GFTracksColName", m_gfTracksColName,
-           "Name of collection holding the final GFTracks (will be created by this module)", string("GFTracks"));
-  addParam("TracksColName", m_tracksColName,
-           "Name of collection holding the final Tracks (will be created by this module)", string("Tracks"));
+  addParam("GFTracksColName", m_gfTracksColName, "Name of collection holding the final GFTracks (will be created by this module)", string("GFTracks"));
+  addParam("TracksColName", m_tracksColName, "Name of collection holding the final Tracks (will be created by this module)", string("Tracks"));
 
 }
 
@@ -90,7 +92,6 @@ void GenFitterModule::initialize()
 
   m_failedFitCounter = 0;
   m_successfulFitCounter = 0;
-
 }
 
 void GenFitterModule::beginRun()
@@ -107,28 +108,26 @@ void GenFitterModule::event()
   if (trackCandidates.GetEntries() == 0)
     B2WARNING("GenFitter: GFTrackCandidatesCollection is empty!");
 
-  StoreArray < CDCRecoHit > cdcRecoHits(m_cdcRecoHitsColName);
-  B2DEBUG(149, "GenFitter: Number of CDCRecoHits: " << cdcRecoHits.GetEntries());
-  if (cdcRecoHits.GetEntries() == 0)
-    B2WARNING("GenFitter: CDCRecoHitsCollection is empty!");
+  StoreArray < CDCHit > cdcHits(m_cdcHitsColName);
+  B2DEBUG(100, "GenFitter: Number of CDCHits: " << cdcHits.GetEntries());
+  if (cdcHits.GetEntries() == 0)
+    B2WARNING("GenFitter: CDCHitsCollection is empty!");
 
-  StoreArray < SVDRecoHit > svdRecoHits(m_svdRecoHitsColName);
-  B2DEBUG(149, "GenFitter: Number of SVDRecoHits: " << svdRecoHits.GetEntries());
-  if (svdRecoHits.GetEntries() == 0)
-    B2WARNING("GenFitter: SVDRecoHitsCollection is empty!");
+  StoreArray < SVDHit > svdHits(m_svdHitsColName);
+  B2DEBUG(100, "GenFitter: Number of SVDHits: " << svdHits.GetEntries());
+  if (svdHits.GetEntries() == 0)
+    B2WARNING("GenFitter: SVDHitsCollection is empty!");
 
-  StoreArray < PXDRecoHit > pxdRecoHits(m_pxdRecoHitsColName);
-  B2DEBUG(149, "GenFitter: Number of PXDRecoHits: " << pxdRecoHits.GetEntries());
-  if (pxdRecoHits.GetEntries() == 0)
-    B2WARNING("GenFitter: PXDRecoHitsCollection is empty!");
+  StoreArray < PXDHit > pxdHits(m_pxdHitsColName);
+  B2DEBUG(100, "GenFitter: Number of PXDHits: " << pxdHits.GetEntries());
+  if (pxdHits.GetEntries() == 0)
+    B2WARNING("GenFitter: PXDHitsCollection is empty!");
 
-  //This is only needed to recover PDG values for the particles, should be stored in the track candidate in the future
-  StoreArray < MCParticle > mcParticles("MCParticles");
-  StoreArray <Relation> gfTrackCandToMCParticle("GFTrackCandidateToMCParticle");
 
-  //Give Genfit the magnetic field, should come from the common database later...
+  //Give Genfit the magnetic field, should come from the common database later... And we have to think if and how we want to incorporate the realistic magnetic field map
   GFFieldManager::getInstance()->init(new GFConstField(0., 0., 15.));
 
+  //!!!!! will move to initialize
   //StoreArrays to store the fit results
   StoreArray < Track > tracks(m_tracksColName);
   StoreArray < GFTrack > gfTracks(m_gfTracksColName);
@@ -137,133 +136,84 @@ void GenFitterModule::event()
   int trackCounter = -1;
 
   for (int i = 0; i < trackCandidates.GetEntries(); ++i) { //loop over all track candidates
-    B2INFO("#############  Fit track Nr. : " << i << "  ################")
+    B2INFO("#############  Fit track candidate Nr. : " << i << "  ################")
 
+    GFAbsTrackRep* trackRep;  //initialize track representation
 
-    //Get starting values for the fit
-    TVector3 vertex = trackCandidates[i]->getPosSeed();
-    TVector3 momentum = trackCandidates[i]->getDirSeed() * abs(1 / trackCandidates[i]->getQoverPseed());
-    int pdg;
-    //Get the PGD value for the track, should be stored in the track candidate in the future like other variables, for the momentum only the index of the MCParticle is stored
-    //This part will be changed in the future
-    //------------------------------------------------------------------------
-    if (gfTrackCandToMCParticle.getEntries() != 0) {
-      pdg = mcParticles[trackCandidates[i]->getMcTrackId()]->getPDG();
-      B2DEBUG(100, "Got correct PDG (" << pdg << ") for TrackCand " << i << " from the corresponding MCParticle with index " << trackCandidates[i]->getMcTrackId());
+    //there is different information from mctracks and 'real' pattern recognition tracks, e.g. for PR tracks the PDG is unknown
+    //thats why the two cases are treated separately
+    if (m_mcTracks == true) {
+
+      //for GFTrackCandidates from MCTrackFinder all information is already there
+      trackRep = new RKTrackRep(trackCandidates[i]);
+      //trackRep = new RKTrackRep(trackCandidates[i]->getPosSeed(), trackCandidates[i]->getDirSeed(), trackCandidates[i]->getPdgCode());
+      B2INFO("Fit MCTrack with start values: ");
     }
-    //for pattern recognition tracks, only the charge of the track is known, but not the PDG value, so one has to test the fit for some different PDG values
+
     else {
+
+      //the idea is to use different possible pdg values (with correct charge)
+      //will be implemented later on ...
+      int pdg;
       int basicPDG = 211; //just choose some random common pdg, in this case pion
       pdg = int(TMath::Sign(1., trackCandidates[i]->getQoverPseed()) * basicPDG);
-    }
-    //------------------------------------------------------------------------
 
-    B2INFO("Start values: momentum: " << momentum.x() << "  " << momentum.y() << "  " << momentum.z());
-    B2INFO("Start values: vertex:   " << vertex.x() << "  " << vertex.y() << "  " << vertex.z());
-    B2INFO("Start values: pdg:      " << pdg);
+      trackCandidates[i]->setPdgCode(pdg);
 
-    GFAbsTrackRep* trackRep = new RKTrackRep(vertex, momentum, pdg);
-    GFTrack gfTrack(trackRep, false);
+      trackRep = new RKTrackRep(trackCandidates[i]);
 
-    //iterators needed to collect RecoHits
-    int hitCounter = -1;
-    vector<unsigned int>::const_iterator iter;
-    vector<unsigned int>::const_iterator iterMax;
+      //trackRep = new RKTrackRep(trackCandidates[i]->getPosSeed(), trackCandidates[i]->getDirSeed(), trackCandidates[i]->getPdgCode());
 
-    //GenFit needs the Hits in a correct order, they are not sorted at the moment but their order seems to be correct (due to simulation), it should however be checked and an ordering parameter be added soon
+      B2INFO("Fit pattern reco track with start values: ");
 
-    if (m_useCdcHits) {
-      B2INFO("...... add CDCRecoHits");
-      //Get the indices for the CDCRecoHits
-      vector<unsigned int> cdcIndexList = trackCandidates[i]->GetHitIDs(2);
-      B2DEBUG(100, "Size of cdcIndex list: " << cdcIndexList.size());
-
-      iter = cdcIndexList.begin();
-      iterMax = cdcIndexList.end();
-      while (iter != iterMax) {
-        ++hitCounter;
-        gfTrack.addHit(cdcRecoHits[*iter], 2, hitCounter);
-        //B2DEBUG(100,"====== NEXT CDC RecoHit added");
-        ++iter;
-      }//end loop over cdc RecoHits
-
-      B2INFO("Total Nr of Hits assigned to the Track: " << gfTrack.getNumHits());
     }
 
-    if (m_useSvdHits) {
-      B2INFO("...... add SVDRecoHits");
-      //Get the indices for the SVDRecoHits
-      vector<unsigned int> svdIndexList = trackCandidates[i]->GetHitIDs(1);
-      B2DEBUG(100, "Size of svdIndex list: " << svdIndexList.size());
+    B2INFO("            momentum: " << trackCandidates[i]->getDirSeed().x() / abs(trackCandidates[i]->getQoverPseed()) << "  " << trackCandidates[i]->getDirSeed().y() / abs(trackCandidates[i]->getQoverPseed()) << "  " << trackCandidates[i]->getDirSeed().z() / abs(trackCandidates[i]->getQoverPseed()));
+    B2INFO("            vertex:   " << trackCandidates[i]->getPosSeed().x() << "  " << trackCandidates[i]->getPosSeed().y() << "  " << trackCandidates[i]->getPosSeed().z());
+    B2INFO("             pdg:      " << trackCandidates[i]->getPdgCode());
 
-      B2DEBUG(100, "svd hitIds");
-      for (unsigned int ii = 0; ii != svdIndexList.size(); ++ii) {
-        B2DEBUG(100, svdIndexList[ii] << " ");
-      }
-      B2DEBUG(100, endl);
+    GFTrack gfTrack(trackRep, false);  //create the track with the corresponding track representation
 
-      iter = svdIndexList.begin();
-      iterMax = svdIndexList.end();
-      B2DEBUG(100, "==== SVD Hits " << "iterator " << "layerId " << "ladderId " << "sensorId");
-      while (iter != iterMax) {
-        ++hitCounter;
-        gfTrack.addHit(svdRecoHits[*iter], 1, hitCounter);
-        int aSensorUniID = svdRecoHits[*iter]->getSensorUniID();
-        SensorUniIDManager aIdConverter(aSensorUniID);
-        int layerId = aIdConverter.getLayerID();
-        int ladderId = aIdConverter.getLadderID();
-        int sensorId = aIdConverter.getSensorID();
+    GFRecoHitFactory factory;
 
-        B2DEBUG(100, "====== NEXT HIT " << *iter << "  " << layerId << "  " << ladderId << "  " << sensorId);
+    //create RecoHitProducers for PXD, SVD and CDC
+    GFRecoHitProducer <PXDHit, PXDRecoHit> * PXDProducer;
+    PXDProducer =  new GFRecoHitProducer <PXDHit, PXDRecoHit> (&*pxdHits);
 
-        ++iter;
-      }//end loop over svd RecoHits
+    GFRecoHitProducer <SVDHit, SVDRecoHit> * SVDProducer;
+    SVDProducer =  new GFRecoHitProducer <SVDHit, SVDRecoHit> (&*svdHits);
 
+    GFRecoHitProducer <CDCHit, CDCRecoHit> * CDCProducer;
+    CDCProducer =  new GFRecoHitProducer <CDCHit, CDCRecoHit> (&*cdcHits);
 
-      B2INFO("Total Nr of Hits assigned to the Track: " << gfTrack.getNumHits());
-    }
+    //add producers to the factory with correct detector Id
+    factory.addProducer(0, PXDProducer);
+    factory.addProducer(1, SVDProducer);
+    factory.addProducer(2, CDCProducer);
 
-    if (m_usePxdHits) {
-      B2INFO("...... add PXDRecoHits");
-      //Get the indices for the PXDRecoHits
-      vector<unsigned int> pxdIndexList = trackCandidates[i]->GetHitIDs(0);
-      B2DEBUG(100, "Size of pxdIndex list: " << pxdIndexList.size());
+    vector <GFAbsRecoHit *> factoryHits;
+    //use the factory to create RecoHits for all Hits stored in the track candidate
+    factoryHits = factory.createMany(*trackCandidates[i]);
+    //add created hits to the track
+    gfTrack.addHitVector(factoryHits);
+    gfTrack.setCandidate(*trackCandidates[i]);
 
-      B2DEBUG(100, "pxd hitIds");
-      for (unsigned int ii = 0; ii != pxdIndexList.size(); ++ii) {
-        B2DEBUG(100, pxdIndexList[ii] << " ");
-      }
-      B2DEBUG(100, endl);
+    B2INFO("Total Nr of Hits assigned to the Track: " << gfTrack.getNumHits());
 
-      iter = pxdIndexList.begin();
-      iterMax = pxdIndexList.end();
-      B2DEBUG(100, "==== PXD Hits " << "iterator " << "layerId " << "ladderId " << "sensorId");
-      while (iter != iterMax) {
-        ++hitCounter;
-        gfTrack.addHit(pxdRecoHits[*iter], 0, hitCounter);
-        int aSensorUniID = pxdRecoHits[*iter]->getSensorUniID();
-        SensorUniIDManager aIdConverter(aSensorUniID);
-        int layerId = aIdConverter.getLayerID();
-        int ladderId = aIdConverter.getLadderID();
-        int sensorId = aIdConverter.getSensorID();
-
-        B2DEBUG(100, "====== NEXT HIT " << *iter << "  " << layerId << "  " << ladderId << "  " << sensorId);
-
-        ++iter;
-      }//end loop over pxd RecoHits
-
-
-      B2INFO("Total Nr of Hits assigned to the Track: " << gfTrack.getNumHits());
-    }
-    if (gfTrack.getNumHits() == 0) {
-      B2WARNING("GenFitter: No Hits were assigned to the Track! This Track will not be fitted!");
-      //only stop GenFitter there, without counting this track fit as successful/failed
+    if (gfTrack.getNumHits() < 3) {
+      B2WARNING("GenFitter: only " << gfTrack.getNumHits() << " were assigned to the Track! This Track will not be fitted!");
+      ++m_failedFitCounter;
     } else {
+
       //now fit the track
-      GFKalman k; //use Kalman algorithm (DAF seems not to work properly at the moment...)
+      GFKalman k; //use Kalman algorithm
+      GFDaf daf;
       try {
-        k.setNumIterations(1);
+        k.setNumIterations(5);
+        //k.setInitialDirection(-1);
         k.processTrack(&gfTrack);
+        //daf.setProbCut(0.001);
+        //daf.processTrack(&gfTrack);
         //gfTrack.Print();
         int genfitStatusFlag = trackRep->getStatusFlag();
         //StatusFlag == 0 means fit was successful
@@ -274,6 +224,9 @@ void GenFitterModule::event()
         //Calculate probability
         double pValue = TMath::Prob(gfTrack.getChiSqu(), gfTrack.getNDF());
         B2INFO("       pValue of the fit: " << pValue);
+        B2INFO("       getRedChiSqu: " << gfTrack.getRedChiSqu());
+        B2INFO("       nFailedHits: " << gfTrack.getFailedHits());
+
 
         if (genfitStatusFlag != 0) {
           B2WARNING("Genfit returned an error (with status flag " << genfitStatusFlag << ") during the fit!");
@@ -330,7 +283,13 @@ void GenFitterModule::event()
                                                                     * dirInPoca.x() + dirInPoca.y() * dirInPoca.y())));
             //Set non-helix parameters
             tracks[trackCounter]->setChi2(gfTrack.getChiSqu());
+            tracks[trackCounter]->setPValue(pValue);
             tracks[trackCounter]->setNHits(gfTrack.getNumHits());
+
+            tracks[trackCounter]->setMCId(trackCandidates[i]->getMcTrackId());
+
+            tracks[trackCounter]->setPDG(trackCandidates[i]->getPdgCode());
+            tracks[trackCounter]->setPurity(trackCandidates[i]->getDip());
 
 
             //Print helix parameters
@@ -339,7 +298,6 @@ void GenFitterModule::event()
             B2INFO("<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>");
             //Additional check
             B2INFO("Check: recalculate momentum  px: " << abs(1.5*0.00299792458 / (tracks[trackCounter]->getOmega()))*cos(tracks[trackCounter]->getPhi()) << "  py: " << abs(1.5*0.00299792458 / (tracks[trackCounter]->getOmega()))*sin(tracks[trackCounter]->getPhi()) << "  pz: " << abs(1.5*0.00299792458 / (tracks[trackCounter]->getOmega()))*tracks[trackCounter]->getCotTheta());
-
           }
 
           catch (...) {
@@ -349,18 +307,24 @@ void GenFitterModule::event()
 
       } catch (...) {
         B2WARNING("Something went wrong during the fit!");
+        ++m_failedFitCounter;
       }
 
-      gfTrack.releaseHits(); //important because RecoHits are not owned by GFTrack
+
 
     } //end loop over all track candidates
 
+
+    factory.clear();
+
   }// end else (track has hits)
+  B2INFO("GenFitter event summary: " << trackCounter + 1 << " tracks were fitted");
+
 }
 
 void GenFitterModule::endRun()
 {
-  B2INFO("GenFitter: " << m_successfulFitCounter << "  tracks were fitted");
+  B2INFO("GenFitter run summary: " << m_successfulFitCounter << "  tracks were fitted");
   if (m_failedFitCounter > 0) {
     B2WARNING("GenFitter: " << m_failedFitCounter << " of " << m_successfulFitCounter + m_failedFitCounter << " tracks could not be fitted in this run");
   }

@@ -15,10 +15,6 @@
 # SVDDigi creates the detecotor response in the SVD for the simulated Hits.
 # PXDDigi creates the detecotor response in the PXD for the simulated Hits.
 
-# CDCRecoHitMaker creates RecoHits, which are needed and used during the fit.
-# SVDRecoHitMaker creates RecoHits, which are needed and used during the fit.
-# PXDRecoHitMaker creates RecoHits, which are needed and used during the fit.
-
 # MCTrackFinder creates relations between MCParticles and CDCRecoHits produced by it.
 # GenFitter fits the found MCTracks and created two track collections: GFTracks (Genfit class) and Tracks (class with helix parametrization)
 #
@@ -44,13 +40,9 @@ mcparticle = register_module('PrintMCParticles')
 
 # Digitizer
 cdcDigitizer = register_module('CDCDigi')
-pxdDigitizer = register_module('PXDDigiSimple')
+pxdDigitizer = register_module('PXDDigi')
+pxdClusterizer = register_module('PXDClusterizer')
 svdDigitizer = register_module('SVDDigi')
-
-# Create RecoHits
-cdcrecohitmaker = register_module('CDCRecoHitMaker')
-pxdrecohitmaker = register_module('PXDRecoHitMaker')
-svdrecohitmaker = register_module('SVDRecoHitMaker')
 
 # Find MCTracks
 mctrackfinder = register_module('MCTrackFinder')
@@ -88,35 +80,36 @@ param_pGun = {
 pGun.param(param_pGun)
 mcparticle.param('onlyPrimaries', 1)
 
-# Parameters of the MCTrackFinder are collection names.
-# Input collections: names for MCParticle collection as well as for the collections of RecoHits, which are produced by RecoHitMaker modules (here default values are taken).
-# Output collections: names for GFTrackCandidates, relations between GFTrackCandidates and RecoHits and GFTrackCandidates and MCParticles.
+# Parameters of the MCTrackFinder.
+# Input collections: names for MCParticle collection as well as for the collections of Hits.
+# Options: select hits from which detectors should be used (all hits selected here are then used in the fit)
+# Smearing: smear the true MCMomentum bevor set it as start values for the GFTrackCand (it has to be investigated if it is better for the fit)
+# Output collections: names for GFTrackCandidates, relations between GFTrackCandidates and Hits and GFTrackCandidates and MCParticles.
 param_mctrackfinder = {
     'MCParticlesColName': 'MCParticles',
-    'CDCRecoHitsColName': 'CDCRecoHits',
-    'SVDRecoHitsColName': 'SVDRecoHits',
-    'PXDRecoHitsColName': 'PXDRecoHits',
-    'GFTrackCandidatesColName': 'GFTrackCandidates',
-    'GFTrackCandToCDCRecoHitsColName': 'GFTrackCandidateToCDCRecoHits',
-    'GFTrackCandToSVDRecoHitsColName': 'GFTrackCandidateToSVDRecoHits',
-    'GFTrackCandToPXDRecoHitsColName': 'GFTrackCandidateToPXDRecoHits',
-    'GFTrackCandToMCParticleColName': 'GFTrackCandidateToMCParticle',
-    }
-mctrackfinder.param(param_mctrackfinder)
-
-# Input collections: names for RecoHits and GFTrackCandidates
-# Output collections: names for GFTracks and Tracks
-# You can also choose which Hits should be used for the fitting (1 for hits you would like to use, 0 for thoses you want to skip)
-param_cdcfitting = {
-    'GFTrackCandidatesColName': 'GFTrackCandidates',
-    'CDCRecoHitsColName': 'CDCRecoHits',
-    'SVDRecoHitsColName': 'SVDRecoHits',
-    'PXDRecoHitsColName': 'PXDRecoHits',
-    'TracksColName': 'Tracks',
-    'GFTracksColName': 'GFTracks',
+    'CDCHitsColName': 'CDCHits',
+    'SVDHitsColName': 'SVDHits',
+    'PXDHitsColName': 'PXDHits',
     'UseCDCHits': 1,
     'UseSVDHits': 1,
     'UsePXDHits': 1,
+    'GFTrackCandidatesColName': 'GFTrackCandidates',
+    'GFTrackCandToMCParticleColName': 'GFTrackCandidateToMCParticle',
+    'Smearing': 0,
+    }
+mctrackfinder.param(param_mctrackfinder)
+
+# Input collections: names for Hits and GFTrackCandidates
+# Output collections: names for GFTracks and Tracks
+# MCTrack and Tracks from pattern recognition have to be handled slightly different (unknown pdg for pattern reco tracks), so set 'mcTracks' to 1 if you are fitting Tracks from MCTrackFinderModule.
+param_cdcfitting = {
+    'GFTrackCandidatesColName': 'GFTrackCandidates',
+    'CDCHitsColName': 'CDCHits',
+    'SVDHitsColName': 'SVDHits',
+    'PXDHitsColName': 'PXDHits',
+    'TracksColName': 'Tracks',
+    'GFTracksColName': 'GFTracks',
+    'mcTracks': 1,
     }
 
 cdcfitting.param(param_cdcfitting)
@@ -139,10 +132,7 @@ main.add_module(g4sim)
 main.add_module(cdcDigitizer)
 main.add_module(svdDigitizer)
 main.add_module(pxdDigitizer)
-
-main.add_module(cdcrecohitmaker)
-main.add_module(pxdrecohitmaker)
-main.add_module(svdrecohitmaker)
+main.add_module(pxdClusterizer)
 
 main.add_module(mctrackfinder)
 main.add_module(cdcfitting)

@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <bklm/hitbklm/BKLMStrip.h>
+#include <bklm/dataobjects/BKLMStrip.h>
 
 #include <framework/logging/Logger.h>
 

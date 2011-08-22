@@ -11,16 +11,7 @@
 #ifndef BKLMDIGITIZERMODULE_H
 #define BKLMDIGITIZERMODULE_H
 
-#include <TRandom3.h>
-
 #include <framework/core/Module.h>
-
-#include <bklm/hitbklm/BKLMSimHit.h>
-
-#include <string>
-#include <vector>
-#include <queue>
-#include <map>
 
 namespace Belle2 {
 
@@ -56,12 +47,6 @@ namespace Belle2 {
     void printModuleParameters() const;
 
   private:
-
-    //! Simulation run number
-    int    m_Run;
-
-    //! Simulation event number
-    int    m_Event;
 
   };
 

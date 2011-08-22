@@ -1,13 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ParamSet type="BKLM">
-  <Name>BKLM BelleII</Name>
-  <Description>Belle II BKLM geometry</Description>
-  <Version>0</Version>
-  <Creator>BKLMBelleII</Creator>
+<DetectorComponent name="BKLM" xmlns:xi="http://www.w3.org/2001/XInclude">
+  <Creator library="bklm">BKLMCreator</Creator>
   <Content>
-    <Rotation desc="Rotation of the BKLM with respect to the Detector"  unit="mrad">0.0</Rotation>
-    <OffsetZ  desc="The offset of the BKLM in z with respect to the IP" unit="cm">47.0</OffsetZ>
-    <Phi desc="The starting angle of the BKLM polygon" unit="deg">-22.5</Phi>
+    <DoOverlapCheck desc="Flag to check for volume overlaps during geometry construction">1</DoOverlapCheck>
+    <Rotation desc="Rotation about z axis of the BKLM with respect to the Detector"  unit="mrad">0.0</Rotation>
+    <OffsetZ  desc="Offset of the BKLM along z with respect to the IP" unit="cm">47.0</OffsetZ>
+    <Phi desc="Starting azimuthal angle of the BKLM polygon" unit="deg">-22.5</Phi>
     <SolenoidOuterRadius unit="cm">200.0</SolenoidOuterRadius>
     <OuterRadius unit="cm">353.5</OuterRadius>
     <HalfLength unit="cm">230.0</HalfLength>
@@ -17,6 +15,16 @@
     <BraceWidthChimney unit="cm">62.6</BraceWidthChimney>
     <SupportPlateWidth unit="cm">152.5</SupportPlateWidth>
     <SupportPlateHeight unit="cm">1.0</SupportPlateHeight>
+    <SupportPlateLength unit="cm">222.0</SupportPlateLength>
+    <SupportPlateLengthChimney unit="cm">158.6</SupportPlateLengthChimney>
+    <BracketWidth unit="cm">48.23</BracketWidth>
+    <BracketThickness unit="cm">1.2</BracketThickness>
+    <BracketLength unit="cm">15.0</BracketLength>
+    <BracketRibWidth unit="cm">12.3</BracketRibWidth>
+    <BracketRibThickness unit="cm">2.8</BracketRibThickness>
+    <BracketInnerRadius unit="cm">201.18</BracketInnerRadius>
+    <BracketInset unit="cm">32.5</BracketInset>
+    <BracketCutoutDphi unit="deg">50.076196</BracketCutoutDphi>
     <Layers>
       <InnerRadius unit="cm">201.9</InnerRadius>
       <GapLength unit="cm">222.0</GapLength>
@@ -24,9 +32,10 @@
       <IronNominalHeight unit="cm">4.7</IronNominalHeight>
       <IronActualHeight unit="cm">4.6689</IronActualHeight>
       <GapIronWidth unit="cm">3.0</GapIronWidth>
-      <Layer id="0">
+      <Layer layer="0">
         <GapNominalHeight unit="cm">4.1</GapNominalHeight>
         <GapIronWidth unit="cm">7.94</GapIronWidth>
+        <HasRPCs desc="Flag to construct layer with RPCS or scintillators">1</HasRPCs>
         <PhiStrips>
           <NStrips>36</NStrips>
           <Width unit="cm">4.45</Width>
@@ -38,7 +47,8 @@
           <Length unit="cm">151.4</Length>
         </ZStrips>
       </Layer>
-      <Layer id="1">
+      <Layer layer="1">
+        <HasRPCs desc="Flag to construct layer with RPCS or scintillators">1</HasRPCs>
         <PhiStrips>
           <NStrips>36</NStrips>
           <Width unit="cm">4.69</Width>
@@ -50,7 +60,8 @@
           <Length unit="cm">168.8</Length>
         </ZStrips>
       </Layer>
-      <Layer id="2">
+      <Layer layer="2">
+        <HasRPCs desc="Flag to construct layer with RPCS or scintillators">1</HasRPCs>
         <PhiStrips>
           <NStrips>36</NStrips>
           <Width unit="cm">4.90</Width>
@@ -62,7 +73,8 @@
           <Length unit="cm">176.4</Length>
         </ZStrips>
       </Layer>
-      <Layer id="3">
+      <Layer layer="3">
+        <HasRPCs desc="Flag to construct layer with RPCS or scintillators">1</HasRPCs>
         <PhiStrips>
           <NStrips>36</NStrips>
           <Width unit="cm">5.11</Width>
@@ -74,7 +86,8 @@
           <Length unit="cm">183.9</Length>
         </ZStrips>
       </Layer>
-      <Layer id="4">
+      <Layer layer="4">
+        <HasRPCs desc="Flag to construct layer with RPCS or scintillators">1</HasRPCs>
         <PhiStrips>
           <NStrips>36</NStrips>
           <Width unit="cm">5.32</Width>
@@ -86,7 +99,8 @@
           <Length unit="cm">191.4</Length>
         </ZStrips>
       </Layer>
-      <Layer id="5">
+      <Layer layer="5">
+        <HasRPCs desc="Flag to construct layer with RPCS or scintillators">1</HasRPCs>
         <PhiStrips>
           <NStrips>36</NStrips>
           <Width unit="cm">5.53</Width>
@@ -98,7 +112,8 @@
           <Length unit="cm">199.0</Length>
         </ZStrips>
       </Layer>
-      <Layer id="6">
+      <Layer layer="6">
+        <HasRPCs desc="Flag to construct layer with RPCS or scintillators">1</HasRPCs>
         <PhiStrips>
           <NStrips>48</NStrips>
           <Width unit="cm">4.30</Width>
@@ -110,7 +125,8 @@
           <Length unit="cm">206.5</Length>
         </ZStrips>
       </Layer>
-      <Layer id="7">
+      <Layer layer="7">
+        <HasRPCs desc="Flag to construct layer with RPCS or scintillators">1</HasRPCs>
         <PhiStrips>
           <NStrips>48</NStrips>
           <Width unit="cm">4.46</Width>
@@ -122,7 +138,8 @@
           <Length unit="cm">214.1</Length>
         </ZStrips>
       </Layer>
-      <Layer id="8">
+      <Layer layer="8">
+        <HasRPCs desc="Flag to construct layer with RPCS or scintillators">1</HasRPCs>
         <PhiStrips>
           <NStrips>48</NStrips>
           <Width unit="cm">4.62</Width>
@@ -134,7 +151,8 @@
           <Length unit="cm">221.6</Length>
         </ZStrips>
       </Layer>
-      <Layer id="9">
+      <Layer layer="9">
+        <HasRPCs desc="Flag to construct layer with RPCS or scintillators">1</HasRPCs>
         <PhiStrips>
           <NStrips>48</NStrips>
           <Width unit="cm">4.77</Width>
@@ -146,7 +164,8 @@
           <Length unit="cm">229.1</Length>
         </ZStrips>
       </Layer>
-      <Layer id="10">
+      <Layer layer="10">
+        <HasRPCs desc="Flag to construct layer with RPCS or scintillators">1</HasRPCs>
         <PhiStrips>
           <NStrips>48</NStrips>
           <Width unit="cm">4.93</Width>
@@ -158,7 +177,8 @@
           <Length unit="cm">236.7</Length>
         </ZStrips>
       </Layer>
-      <Layer id="11">
+      <Layer layer="11">
+        <HasRPCs desc="Flag to construct layer with RPCS or scintillators">1</HasRPCs>
         <PhiStrips>
           <NStrips>48</NStrips>
           <Width unit="cm">5.09</Width>
@@ -170,7 +190,8 @@
           <Length unit="cm">244.2</Length>
         </ZStrips>
       </Layer>
-      <Layer id="12">
+      <Layer layer="12">
+        <HasRPCs desc="Flag to construct layer with RPCS or scintillators">1</HasRPCs>
         <PhiStrips>
           <NStrips>48</NStrips>
           <Width unit="cm">5.25</Width>
@@ -182,7 +203,8 @@
           <Length unit="cm">251.8</Length>
         </ZStrips>
       </Layer>
-      <Layer id="13">
+      <Layer layer="13">
+        <HasRPCs desc="Flag to construct layer with RPCS or scintillators">1</HasRPCs>
         <PhiStrips>
           <NStrips>48</NStrips>
           <Width unit="cm">5.40</Width>
@@ -194,7 +216,8 @@
           <Length unit="cm">259.3</Length>
         </ZStrips>
       </Layer>
-      <Layer id="14">
+      <Layer layer="14">
+        <HasRPCs desc="Flag to construct layer with RPCS or scintillators">1</HasRPCs>
         <PhiStrips>
           <NStrips>48</NStrips>
           <Width unit="cm">5.56</Width>
@@ -209,112 +232,112 @@
     </Layers>
     <Sectors>
       <Forward>
-        <Sector id="0">
+        <Sector sector="0">
           <Shift>
              <X unit="cm">0.0</X>
              <Y unit="cm">0.0</Y>
              <Z unit="cm">0.0</Z>
           </Shift>
           <Phi unit="deg">0</Phi>
-          <Layer id="0">
+          <Layer layer="0">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="1">
+          <Layer layer="1">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="2">
+          <Layer layer="2">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="3">
+          <Layer layer="3">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="4">
+          <Layer layer="4">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="5">
+          <Layer layer="5">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="6">
+          <Layer layer="6">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="7">
+          <Layer layer="7">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="8">
+          <Layer layer="8">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="9">
+          <Layer layer="9">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="10">
+          <Layer layer="10">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="11">
+          <Layer layer="11">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="12">
+          <Layer layer="12">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="13">
+          <Layer layer="13">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="14">
+          <Layer layer="14">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
@@ -322,112 +345,112 @@
             </Shift>
           </Layer>
         </Sector>
-        <Sector id="1">
+        <Sector sector="1">
           <Shift>
              <X unit="cm">0.0</X>
              <Y unit="cm">0.0</Y>
              <Z unit="cm">0.0</Z>
           </Shift>
           <Phi unit="deg">45</Phi>
-          <Layer id="0">
+          <Layer layer="0">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="1">
+          <Layer layer="1">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="2">
+          <Layer layer="2">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="3">
+          <Layer layer="3">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="4">
+          <Layer layer="4">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="5">
+          <Layer layer="5">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="6">
+          <Layer layer="6">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="7">
+          <Layer layer="7">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="8">
+          <Layer layer="8">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="9">
+          <Layer layer="9">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="10">
+          <Layer layer="10">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="11">
+          <Layer layer="11">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="12">
+          <Layer layer="12">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="13">
+          <Layer layer="13">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="14">
+          <Layer layer="14">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
@@ -435,112 +458,112 @@
             </Shift>
           </Layer>
         </Sector>
-        <Sector id="2">
+        <Sector sector="2">
           <Shift>
              <X unit="cm">0.0</X>
              <Y unit="cm">0.0</Y>
              <Z unit="cm">0.0</Z>
           </Shift>
           <Phi unit="deg">90</Phi>
-          <Layer id="0">
+          <Layer layer="0">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="1">
+          <Layer layer="1">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="2">
+          <Layer layer="2">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="3">
+          <Layer layer="3">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="4">
+          <Layer layer="4">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="5">
+          <Layer layer="5">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="6">
+          <Layer layer="6">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="7">
+          <Layer layer="7">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="8">
+          <Layer layer="8">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="9">
+          <Layer layer="9">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="10">
+          <Layer layer="10">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="11">
+          <Layer layer="11">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="12">
+          <Layer layer="12">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="13">
+          <Layer layer="13">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="14">
+          <Layer layer="14">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
@@ -548,112 +571,112 @@
             </Shift>
           </Layer>
         </Sector>
-        <Sector id="3">
+        <Sector sector="3">
           <Shift>
              <X unit="cm">0.0</X>
              <Y unit="cm">0.0</Y>
              <Z unit="cm">0.0</Z>
           </Shift>
           <Phi unit="deg">135</Phi>
-          <Layer id="0">
+          <Layer layer="0">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="1">
+          <Layer layer="1">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="2">
+          <Layer layer="2">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="3">
+          <Layer layer="3">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="4">
+          <Layer layer="4">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="5">
+          <Layer layer="5">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="6">
+          <Layer layer="6">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="7">
+          <Layer layer="7">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="8">
+          <Layer layer="8">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="9">
+          <Layer layer="9">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="10">
+          <Layer layer="10">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="11">
+          <Layer layer="11">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="12">
+          <Layer layer="12">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="13">
+          <Layer layer="13">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="14">
+          <Layer layer="14">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
@@ -661,112 +684,112 @@
             </Shift>
           </Layer>
         </Sector>
-        <Sector id="4">
+        <Sector sector="4">
           <Shift>
              <X unit="cm">0.0</X>
              <Y unit="cm">0.0</Y>
              <Z unit="cm">0.0</Z>
           </Shift>
           <Phi unit="deg">180</Phi>
-          <Layer id="0">
+          <Layer layer="0">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="1">
+          <Layer layer="1">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="2">
+          <Layer layer="2">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="3">
+          <Layer layer="3">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="4">
+          <Layer layer="4">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="5">
+          <Layer layer="5">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="6">
+          <Layer layer="6">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="7">
+          <Layer layer="7">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="8">
+          <Layer layer="8">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="9">
+          <Layer layer="9">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="10">
+          <Layer layer="10">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="11">
+          <Layer layer="11">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="12">
+          <Layer layer="12">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="13">
+          <Layer layer="13">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="14">
+          <Layer layer="14">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
@@ -774,112 +797,112 @@
             </Shift>
           </Layer>
         </Sector>
-        <Sector id="5">
+        <Sector sector="5">
           <Shift>
              <X unit="cm">0.0</X>
              <Y unit="cm">0.0</Y>
              <Z unit="cm">0.0</Z>
           </Shift>
           <Phi unit="deg">225</Phi>
-          <Layer id="0">
+          <Layer layer="0">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="1">
+          <Layer layer="1">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="2">
+          <Layer layer="2">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="3">
+          <Layer layer="3">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="4">
+          <Layer layer="4">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="5">
+          <Layer layer="5">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="6">
+          <Layer layer="6">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="7">
+          <Layer layer="7">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="8">
+          <Layer layer="8">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="9">
+          <Layer layer="9">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="10">
+          <Layer layer="10">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="11">
+          <Layer layer="11">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="12">
+          <Layer layer="12">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="13">
+          <Layer layer="13">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="14">
+          <Layer layer="14">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
@@ -887,112 +910,112 @@
             </Shift>
           </Layer>
         </Sector>
-        <Sector id="6">
+        <Sector sector="6">
           <Shift>
              <X unit="cm">0.0</X>
              <Y unit="cm">0.0</Y>
              <Z unit="cm">0.0</Z>
           </Shift>
           <Phi unit="deg">270</Phi>
-          <Layer id="0">
+          <Layer layer="0">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="1">
+          <Layer layer="1">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="2">
+          <Layer layer="2">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="3">
+          <Layer layer="3">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="4">
+          <Layer layer="4">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="5">
+          <Layer layer="5">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="6">
+          <Layer layer="6">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="7">
+          <Layer layer="7">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="8">
+          <Layer layer="8">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="9">
+          <Layer layer="9">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="10">
+          <Layer layer="10">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="11">
+          <Layer layer="11">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="12">
+          <Layer layer="12">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="13">
+          <Layer layer="13">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="14">
+          <Layer layer="14">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
@@ -1000,112 +1023,112 @@
             </Shift>
           </Layer>
         </Sector>
-        <Sector id="7">
+        <Sector sector="7">
           <Shift>
              <X unit="cm">0.0</X>
              <Y unit="cm">0.0</Y>
              <Z unit="cm">0.0</Z>
           </Shift>
           <Phi unit="deg">315</Phi>
-          <Layer id="0">
+          <Layer layer="0">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="1">
+          <Layer layer="1">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="2">
+          <Layer layer="2">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="3">
+          <Layer layer="3">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="4">
+          <Layer layer="4">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="5">
+          <Layer layer="5">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="6">
+          <Layer layer="6">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="7">
+          <Layer layer="7">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="8">
+          <Layer layer="8">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="9">
+          <Layer layer="9">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="10">
+          <Layer layer="10">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="11">
+          <Layer layer="11">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="12">
+          <Layer layer="12">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="13">
+          <Layer layer="13">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="14">
+          <Layer layer="14">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
@@ -1115,112 +1138,112 @@
         </Sector>
       </Forward>
       <Backward>
-        <Sector id="0">
+        <Sector sector="0">
           <Shift>
              <X unit="cm">0.0</X>
              <Y unit="cm">0.0</Y>
              <Z unit="cm">0.0</Z>
           </Shift>
           <Phi unit="deg">0</Phi>
-          <Layer id="0">
+          <Layer layer="0">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="1">
+          <Layer layer="1">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="2">
+          <Layer layer="2">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="3">
+          <Layer layer="3">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="4">
+          <Layer layer="4">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="5">
+          <Layer layer="5">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="6">
+          <Layer layer="6">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="7">
+          <Layer layer="7">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="8">
+          <Layer layer="8">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="9">
+          <Layer layer="9">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="10">
+          <Layer layer="10">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="11">
+          <Layer layer="11">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="12">
+          <Layer layer="12">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="13">
+          <Layer layer="13">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="14">
+          <Layer layer="14">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
@@ -1228,112 +1251,112 @@
             </Shift>
           </Layer>
         </Sector>
-        <Sector id="1">
+        <Sector sector="1">
           <Shift>
              <X unit="cm">0.0</X>
              <Y unit="cm">0.0</Y>
              <Z unit="cm">0.0</Z>
           </Shift>
           <Phi unit="deg">45</Phi>
-          <Layer id="0">
+          <Layer layer="0">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="1">
+          <Layer layer="1">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="2">
+          <Layer layer="2">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="3">
+          <Layer layer="3">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="4">
+          <Layer layer="4">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="5">
+          <Layer layer="5">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="6">
+          <Layer layer="6">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="7">
+          <Layer layer="7">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="8">
+          <Layer layer="8">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="9">
+          <Layer layer="9">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="10">
+          <Layer layer="10">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="11">
+          <Layer layer="11">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="12">
+          <Layer layer="12">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="13">
+          <Layer layer="13">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="14">
+          <Layer layer="14">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
@@ -1341,112 +1364,112 @@
             </Shift>
           </Layer>
         </Sector>
-        <Sector id="2">
+        <Sector sector="2">
           <Shift>
              <X unit="cm">0.0</X>
              <Y unit="cm">0.0</Y>
              <Z unit="cm">0.0</Z>
           </Shift>
           <Phi unit="deg">90</Phi>
-          <Layer id="0">
+          <Layer layer="0">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="1">
+          <Layer layer="1">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="2">
+          <Layer layer="2">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="3">
+          <Layer layer="3">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="4">
+          <Layer layer="4">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="5">
+          <Layer layer="5">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="6">
+          <Layer layer="6">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="7">
+          <Layer layer="7">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="8">
+          <Layer layer="8">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="9">
+          <Layer layer="9">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="10">
+          <Layer layer="10">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="11">
+          <Layer layer="11">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="12">
+          <Layer layer="12">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="13">
+          <Layer layer="13">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="14">
+          <Layer layer="14">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
@@ -1454,112 +1477,112 @@
             </Shift>
           </Layer>
         </Sector>
-        <Sector id="3">
+        <Sector sector="3">
           <Shift>
              <X unit="cm">0.0</X>
              <Y unit="cm">0.0</Y>
              <Z unit="cm">0.0</Z>
           </Shift>
           <Phi unit="deg">135</Phi>
-          <Layer id="0">
+          <Layer layer="0">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="1">
+          <Layer layer="1">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="2">
+          <Layer layer="2">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="3">
+          <Layer layer="3">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="4">
+          <Layer layer="4">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="5">
+          <Layer layer="5">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="6">
+          <Layer layer="6">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="7">
+          <Layer layer="7">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="8">
+          <Layer layer="8">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="9">
+          <Layer layer="9">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="10">
+          <Layer layer="10">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="11">
+          <Layer layer="11">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="12">
+          <Layer layer="12">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="13">
+          <Layer layer="13">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="14">
+          <Layer layer="14">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
@@ -1567,112 +1590,112 @@
             </Shift>
           </Layer>
         </Sector>
-        <Sector id="4">
+        <Sector sector="4">
           <Shift>
              <X unit="cm">0.0</X>
              <Y unit="cm">0.0</Y>
              <Z unit="cm">0.0</Z>
           </Shift>
           <Phi unit="deg">180</Phi>
-          <Layer id="0">
+          <Layer layer="0">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="1">
+          <Layer layer="1">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="2">
+          <Layer layer="2">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="3">
+          <Layer layer="3">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="4">
+          <Layer layer="4">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="5">
+          <Layer layer="5">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="6">
+          <Layer layer="6">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="7">
+          <Layer layer="7">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="8">
+          <Layer layer="8">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="9">
+          <Layer layer="9">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="10">
+          <Layer layer="10">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="11">
+          <Layer layer="11">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="12">
+          <Layer layer="12">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="13">
+          <Layer layer="13">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="14">
+          <Layer layer="14">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
@@ -1680,112 +1703,112 @@
             </Shift>
           </Layer>
         </Sector>
-        <Sector id="5">
+        <Sector sector="5">
           <Shift>
              <X unit="cm">0.0</X>
              <Y unit="cm">0.0</Y>
              <Z unit="cm">0.0</Z>
           </Shift>
           <Phi unit="deg">225</Phi>
-          <Layer id="0">
+          <Layer layer="0">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="1">
+          <Layer layer="1">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="2">
+          <Layer layer="2">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="3">
+          <Layer layer="3">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="4">
+          <Layer layer="4">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="5">
+          <Layer layer="5">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="6">
+          <Layer layer="6">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="7">
+          <Layer layer="7">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="8">
+          <Layer layer="8">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="9">
+          <Layer layer="9">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="10">
+          <Layer layer="10">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="11">
+          <Layer layer="11">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="12">
+          <Layer layer="12">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="13">
+          <Layer layer="13">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="14">
+          <Layer layer="14">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
@@ -1793,112 +1816,112 @@
             </Shift>
           </Layer>
         </Sector>
-        <Sector id="6">
+        <Sector sector="6">
           <Shift>
              <X unit="cm">0.0</X>
              <Y unit="cm">0.0</Y>
              <Z unit="cm">0.0</Z>
           </Shift>
           <Phi unit="deg">270</Phi>
-          <Layer id="0">
+          <Layer layer="0">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="1">
+          <Layer layer="1">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="2">
+          <Layer layer="2">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="3">
+          <Layer layer="3">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="4">
+          <Layer layer="4">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="5">
+          <Layer layer="5">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="6">
+          <Layer layer="6">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="7">
+          <Layer layer="7">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="8">
+          <Layer layer="8">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="9">
+          <Layer layer="9">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="10">
+          <Layer layer="10">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="11">
+          <Layer layer="11">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="12">
+          <Layer layer="12">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="13">
+          <Layer layer="13">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="14">
+          <Layer layer="14">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
@@ -1906,112 +1929,112 @@
             </Shift>
           </Layer>
         </Sector>
-        <Sector id="7">
+        <Sector sector="7">
           <Shift>
              <X unit="cm">0.0</X>
              <Y unit="cm">0.0</Y>
              <Z unit="cm">0.0</Z>
           </Shift>
           <Phi unit="deg">315</Phi>
-          <Layer id="0">
+          <Layer layer="0">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="1">
+          <Layer layer="1">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="2">
+          <Layer layer="2">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="3">
+          <Layer layer="3">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="4">
+          <Layer layer="4">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="5">
+          <Layer layer="5">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="6">
+          <Layer layer="6">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="7">
+          <Layer layer="7">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="8">
+          <Layer layer="8">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="9">
+          <Layer layer="9">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="10">
+          <Layer layer="10">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="11">
+          <Layer layer="11">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="12">
+          <Layer layer="12">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="13">
+          <Layer layer="13">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
                <Z unit="cm">0.0</Z>
             </Shift>
           </Layer>
-          <Layer id="14">
+          <Layer layer="14">
             <Shift>
                <X unit="cm">0.0</X>
                <Y unit="cm">0.0</Y>
@@ -2046,7 +2069,7 @@
       <PipeOuterRadius unit="cm">4.0</PipeOuterRadius>
     </Chimney>
   </Content>
-</ParamSet>
+</DetectorComponent>
 
 <!--  from klm_db.dat
 

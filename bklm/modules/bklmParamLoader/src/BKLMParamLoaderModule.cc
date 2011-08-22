@@ -11,12 +11,11 @@
 #include <bklm/modules/bklmParamLoader/BKLMParamLoaderModule.h>
 
 #include <framework/core/Environment.h>
-#include <framework/core/ModuleUtils.h>
-#include <framework/gearbox/GearboxIOXML.h>
+#include <framework/core/utilities.h>
 #include <framework/gearbox/Gearbox.h>
 #include <framework/gearbox/GearDir.h>
 
-#include <bklm/simbklm/BKLMSimulationPar.h>
+#include <bklm/simulation/SimulationPar.h>
 
 using namespace std;
 using namespace Belle2;
@@ -64,21 +63,15 @@ BKLMParamLoaderModule::~BKLMParamLoaderModule()
 void BKLMParamLoaderModule::initialize()
 {
 
-  BKLMSimulationPar* simPar = BKLMSimulationPar::instance();
+  bklm::SimulationPar* simPar = bklm::SimulationPar::instance();
 
-  if (!ModuleUtils::fileNameExists(m_Pathname)) {
+  if (!FileSystem::fileExists(m_Pathname)) {
     B2ERROR("BKLMParamLoader: file " << m_Pathname << " does not exist.")
   }
-  GearboxIOXML* gearboxIOXML = new GearboxIOXML();
-  if (gearboxIOXML->open(m_Pathname)) {
-    Gearbox& gearbox = Gearbox::Instance();
-    gearbox.connect(gearboxIOXML);
-    gearbox.enableParamCheck(m_ParamCheck);
-    GearDir content = GearDir("/ParamSet[@type=\"BKLM\"]/Content");
-    simPar->read(content, (unsigned int) m_RandomSeed, m_DoBackgroundStudy);
-    gearboxIOXML->close();
-  } else {
-    B2ERROR("BKLMParamLoader: file " << m_Pathname << " could not be opened.")
-  }
+  Gearbox& gearbox = Gearbox::getInstance();
+  gearbox.open(m_Pathname);
+  GearDir content = GearDir("/ParamSet[@type=\"BKLM\"]/Content");
+  simPar->read(content, (unsigned int) m_RandomSeed, m_DoBackgroundStudy);
+  gearbox.close();
 
 }

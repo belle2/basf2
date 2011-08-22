@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Notes:
+     1) "weight" is determined by MassNumber unit="u"*(# of atoms) / total
+     2) Air is defined in BasicMaterials.xml
+     3) Polystyrene is Cx Hx (equal #'s)
+     4) Mylar is C22 H10 N2 O5
+     5) RPCReadout is a composite of styrofoam, copper, and mylar  (density = 0.3659487)
+     Styrofoam:  volume = 7  density = 0.05414   vol*rho = 0.37898  weight = 0.12084128
+     Copper:     volume = 0.035*2  density = 8.960     vol*rho = 0.62720  weight = 0.19998852
+     Mylar:      volume = 0.75*2   density = 1.420     vol*rho = 2.13000  weight = 0.67917020
+     6) RPCGlass is a composite of 77% SiO2, 14% Na2O, 9% CaO (fractions are by mass)
+     7) ArgonGas is defined here
+     8) ButaneGas is C4 H10
+     9) FreonGas is C2 H2 F4
+    10) RPCGas is 30% argon, 8% butane, 62% freon (fractions are by VOLUME) with density computed from pV=nRT @ STP
+-->
+
+<Materials>
+  <!--
+  <Material name="Polystyrene">
+    <density unit="g/cm3">1.06</density>
+    <state>Solid</state>
+    <Components>
+      <Element fraction="0.92257717">C</Element>
+      <Element fraction="0.07742283">H</Element>
+    </Components>
+  </Material>
+  -->
+  
+  <Material name="Styrofoam">
+    <density unit="g/cm3">0.05414</density>
+    <Components>
+      <Material fraction="0.978943480">G4_POLYSTYRENE</Material>
+      <Material fraction="0.021056520">G4_AIR</Material>
+    </Components>
+  </Material>
+ 
+  <!-- 
+  <Material name="Mylar">
+    <density unit="g/cm3">1.420</density>
+    <Components>
+      <Element fraction="0.691127199">G4_C</Element>
+      <Element fraction="0.026363416">G4_H</Element>
+      <Element fraction="0.073271325">G4_N</Element>
+      <Element fraction="0.209238060">G4_O</Element>
+    </Components>
+  </Material>
+  -->
+  
+  <Material name="RPCReadout">
+    <density unit="g/cm3">0.3659487</density>
+    <Components>
+      <Material fraction="0.12084128">Styrofoam</Material>
+      <Material fraction="0.19998852">G4_Cu</Material>
+      <Material fraction="0.67917020">G4_MYLAR</Material>
+    </Components>
+  </Material>
+ 
+  <!-- 
+  <Material name="RPCGlass">
+    <density unit="g/cm3">2.40</density>
+    <Components>
+      <Element fraction="0.35992488886">G4_Si</Element>
+      <Element fraction="0.10386031488">G4_Na</Element>
+      <Element fraction="0.06432216900">G4_Ca</Element>
+      <Element fraction="0.47189262726">G4_O</Element>
+    </Components>
+  </Material>
+  -->
+  
+  <Material name="Freon134A">
+    <state>Gas</state>
+    <temperature>293.15</temperature>
+    <density unit="g/cm3">0.004554955</density>
+    <Components>
+      <Material fraction="0.23543633749">G4_C</Material>
+      <Material fraction="0.01975785774">G4_H</Material>
+      <Material fraction="0.74480580477">G4_F</Material>
+    </Components>
+  </Material>
+  
+  <Material name="RPCGas">
+    <state>Gas</state>
+    <temperature>293.15</temperature>
+    <density unit="g/cm3">0.003566669</density>
+    <Components>
+      <Material fraction="0.15000492">G4_Ar</Material>
+      <Material fraction="0.05819957">G4_BUTANE</Material>
+      <Material fraction="0.79179551">Freon134A</Material>
+    </Components>
+  </Material>
+</Materials>

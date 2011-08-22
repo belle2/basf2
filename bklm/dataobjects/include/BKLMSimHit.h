@@ -28,7 +28,7 @@ namespace Belle2 {
     BKLMSimHit();
 
     //! Constructor with initial values
-    BKLMSimHit(const TVector3, double, double, bool, bool, int, int, int, int);
+    BKLMSimHit(const TVector3, double, double, double, bool, bool, int, int, int, int);
 
     //! Destructor
     virtual ~BKLMSimHit() {}
@@ -41,6 +41,9 @@ namespace Belle2 {
 
     //! returns energy deposition
     double getDeltaE() const { return m_DeltaE; }
+
+    //! returns energy
+    double getKE() const { return m_KE; }
 
     //! returns flag whether hit is in RPC (true) or scintillator (false)
     bool getInRPC() const { return m_InRPC; }
@@ -80,6 +83,9 @@ namespace Belle2 {
 
     //! energy deposition (MeV)
     double m_DeltaE;
+
+    //! kinetic energy (MeV)
+    double m_KE;
 
     //! flag to say whether the hit is in RPC (true) or scintillator (false)
     bool m_InRPC;

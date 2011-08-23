@@ -18,7 +18,7 @@
 
 #include <framework/gearbox/Unit.h>
 
-#include <framework/datastore/EventMetaData.h>
+#include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 

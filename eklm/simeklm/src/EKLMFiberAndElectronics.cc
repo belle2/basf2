@@ -91,16 +91,18 @@ namespace Belle2 {
 
   void EKLMFiberAndElectronics::lightPropagationDistance(double &firstHitDist, double &secondHitDist, Hep3Vector pos)
   {
-    gGeoManager->SetCurrentPoint(pos.x(), pos.y(), pos.z());
-    gGeoManager->FindNode();
-    double globalPos[] = {pos.x(), pos.y(), pos.z()};
-    double localPos[3];
-    gGeoManager->MasterToLocal(globalPos, localPos);  // coordinates in the strip frame
-    double xmin = 0; // half of the strip length
-    double xmax = 0; // half of the strip length
-    gGeoManager->GetCurrentVolume()->GetShape()->GetAxisRange(1, xmin, xmax);  // set strip length
-    firstHitDist = xmax - localPos[0];     //  direct light hit
-    secondHitDist = 4 * xmax - firstHitDist;     //  reflected light hit
+    /*
+        gGeoManager->SetCurrentPoint(pos.x(), pos.y(), pos.z());
+        gGeoManager->FindNode();
+        double globalPos[] = {pos.x(), pos.y(), pos.z()};
+        double localPos[3];
+        gGeoManager->MasterToLocal(globalPos, localPos);  // coordinates in the strip frame
+        double xmin = 0; // half of the strip length
+        double xmax = 0; // half of the strip length
+        gGeoManager->GetCurrentVolume()->GetShape()->GetAxisRange(1, xmin, xmax);  // set strip length
+        firstHitDist = xmax - localPos[0];     //  direct light hit
+        secondHitDist = 4 * xmax - firstHitDist;     //  reflected light hit
+    */
   }
 
   double EKLMFiberAndElectronics::addRandomNoise(double ampl)

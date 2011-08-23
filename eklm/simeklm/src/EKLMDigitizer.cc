@@ -23,13 +23,10 @@
 
 #include <TRandom.h>
 
+#include <geometry/CreatorManager.h>
+#include <geometry/CreatorBase.h>
 
-
-
-#include<geometry/geodetector/CreatorManager.h>
-#include<geometry/geodetector/CreatorBase.h>
-
-#include<eklm/geoeklm/GeoEKLMBelleII.h>
+#include <eklm/geoeklm/GeoEKLMBelleII.h>
 
 
 using namespace CLHEP;
@@ -54,22 +51,22 @@ namespace Belle2 {
   {
     for (std::vector<EKLMSimHit*>::iterator iHit = m_simHitsVector.begin();
          iHit != m_simHitsVector.end(); ++iHit) {
+      /*
+            gGeoManager->SetCurrentPoint((*iHit)->getPos().x(), (*iHit)->getPos().y(), (*iHit)->getPos().z());
+            gGeoManager->FindNode();
+            std::string StripName = gGeoManager->GetCurrentVolume()->GetName();
 
-      gGeoManager->SetCurrentPoint((*iHit)->getPos().x(), (*iHit)->getPos().y(), (*iHit)->getPos().z());
-      gGeoManager->FindNode();
-      std::string StripName = gGeoManager->GetCurrentVolume()->GetName();
 
+            // search for entries of the same strip
+            std::map<std::string, std::vector<EKLMSimHit*> >::iterator it = m_HitStripMap.find(StripName);
 
-      // search for entries of the same strip
-      std::map<std::string, std::vector<EKLMSimHit*> >::iterator it = m_HitStripMap.find(StripName);
-
-      if (it == m_HitStripMap.end()) { //  new entry
-        std::vector<EKLMSimHit*> *vectorHits = new std::vector<EKLMSimHit*> (1, (*iHit));
-        m_HitStripMap.insert(std::pair<std::string, std::vector<EKLMSimHit*> >(StripName, *vectorHits));
-      } else {
-        it->second.push_back(*iHit);
-      }
-
+            if (it == m_HitStripMap.end()) { //  new entry
+              std::vector<EKLMSimHit*> *vectorHits = new std::vector<EKLMSimHit*> (1, (*iHit));
+              m_HitStripMap.insert(std::pair<std::string, std::vector<EKLMSimHit*> >(StripName, *vectorHits));
+            } else {
+              it->second.push_back(*iHit);
+            }
+      */
     }
 
   }

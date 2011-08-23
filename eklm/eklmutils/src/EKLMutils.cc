@@ -78,8 +78,8 @@ namespace Belle2 {
                        std::string("/") + getVolumeName(stripName, "Strip") +    \
                        std::string("_") + boost::lexical_cast<std::string>(getVolumeNumber(stripName, "Strip"));
     // tempopary. Used for the procedure checks
-    if (!gGeoManager->CheckPath(path.c_str()))
-      B2ERROR("Something goes wrong! Strip path is not found!");
+//    if (!gGeoManager->CheckPath(path.c_str()))
+//      B2ERROR("Something goes wrong! Strip path is not found!");
     return path;
   }
 }

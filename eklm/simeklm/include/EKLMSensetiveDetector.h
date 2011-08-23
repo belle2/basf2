@@ -22,7 +22,7 @@ namespace Belle2 {
     EKLMSimHits are saved into hits collection.
   */
 
-  class EKLMSensetiveDetector: public Simulation::SensitiveDetectorBase  {
+  class EKLMSensetiveDetector  {
 
   public:
 

@@ -13,12 +13,19 @@
 
 #include "CLHEP/Vector/ThreeVector.h"
 
+using namespace CLHEP;
+
 namespace Belle2 {
 
-  //! Define the positions of the four corners of a rectangle
-  struct BKLMRect {
-    CLHEP::Hep3Vector corner[4];
-  };
+  namespace bklm {
+
+    //! Define a rectangle (for a BKLM module or strip)
+    struct Rect {
+      //! Positions of the four corners of the rectangle
+      Hep3Vector corner[4];
+    };
+
+  } // end of namespace bklm
 
 } // end of namespace Belle2
 #endif // BKLMRECT_H

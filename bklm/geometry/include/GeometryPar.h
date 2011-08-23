@@ -11,8 +11,8 @@
 #ifndef BKLMGEOMETRYPAR_H
 #define BKLMGEOMETRYPAR_H
 
-#include "bklm/geometry/BKLMSector.h"
-#include "bklm/geometry/BKLMModule.h"
+#include "bklm/geometry/Sector.h"
+#include "bklm/geometry/Module.h"
 
 #include <vector>
 
@@ -232,7 +232,7 @@ namespace Belle2 {
       double getBracketCutoutDphi(void) const { return m_BracketCutoutDphi; }
 
       //! Get the pointer to the definition of a sector
-      const BKLMSector* findSector(int frontBack, int sector) const;
+      const Sector* findSector(int frontBack, int sector) const;
 
       //! Print all sector and module definitions
       void printTree(void) const;
@@ -441,7 +441,7 @@ namespace Belle2 {
       std::vector<bool> m_HasRPCs;
 
       //! vector of pointers to defined sectors
-      std::vector<BKLMSector*> m_Sectors;
+      std::vector<Sector*> m_Sectors;
 
       //! static pointer to the singleton instance of this class
       static GeometryPar* m_Instance;

@@ -19,16 +19,11 @@
 #include <bklm/dataobjects/BKLMSimHit.h>
 #include <bklm/dataobjects/BKLMStrip.h>
 
-#include <TVector3.h>
-
-#include <cstdlib>
-#include <iomanip>
-#include <math.h>
-#include <time.h>
-#include <utility> //contains pair
+//#include <cstdlib>
+//#include <iomanip>
+//#include <math.h>
 
 using namespace std;
-using namespace boost;
 using namespace Belle2;
 
 //-----------------------------------------------------------------
@@ -132,11 +127,9 @@ void BKLMDigitizerModule::event()
       reverseIndices[s].push_back(h);
     }
     simHitToStrip.add(h, indices);  // 1 hit to many strips
-    //new(simHitToStrip->AddrAt(h)) Relation(simHits, strips, h, indices);       // 1 hit to many strips
   }
   for (s = 0; s < nStrip; ++s) {
     stripToSimHits.add(s, reverseIndices[s]); // 1 strip to many hits
-    //new(stripToSimHits->AddrAt(s)) Relation(strips, simHits, s, reverseIndices[s]);        // 1 strip to many hits
   }
   delete strip;
 

@@ -44,18 +44,40 @@ namespace Belle2 {
 
     private:
 
-      //! Build and put elements within enclosing logical volumes
+      //! Put the forward and backward ends into the BKLM envelope
       void putEndsInEnvelope(G4LogicalVolume*);
+
+      //! Put each sector into the forward or backward end
       void putSectorsInEnd(G4LogicalVolume*, int);
+
+      //! Put the cap (at maximum |z|) into each sector
       void putCapInSector(G4LogicalVolume*, bool);
+
+      //! Put the inner-radius region into each sector
       void putInnerRegionInSector(G4LogicalVolume*, int, bool);
+
+      //! Put the air void into the inner-radius region
       void putVoidInInnerRegion(G4LogicalVolume*, int, bool);
+
+      //! Put the layer-0 support plate into the inner region's air void (sectors 0..4 only)
       void putLayer0SupportInInnerVoid(G4LogicalVolume*, bool);
+
+      //! Put the layer-0 support plate's brackets into the inner region's air void (sectors 0..4 only)
       void putLayer0BracketsInInnerVoid(G4LogicalVolume*, bool);
+
+      //! Put the layers into each sector
       void putLayersInSector(G4LogicalVolume*, int, int, bool);
+
+      //! Put the solenoid's cooling chimney into the backward top sector
       void putChimneyInLayer(G4LogicalVolume*, int);
+
+      //! Put the air gap into each layer
       void putGapInLayer(G4LogicalVolume*, int, int, int, bool);
+
+      //! Put the RPC module into each air gap
       void putRPCModuleInGap(G4LogicalVolume*, int, int, int, bool);
+
+      //! Put the scintillator module into each air gap
       void putScintModuleInGap(G4LogicalVolume*, int, int, int, bool);
 
       //! get shape corresponding to the solenoid (for subtraction)

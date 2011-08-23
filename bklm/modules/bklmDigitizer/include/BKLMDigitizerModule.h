@@ -50,6 +50,6 @@ namespace Belle2 {
 
   };
 
-} // end of Belle2 namespace
+} // end of namespace Belle2
 
 #endif // BKLMDIGITIZERMODULE_H

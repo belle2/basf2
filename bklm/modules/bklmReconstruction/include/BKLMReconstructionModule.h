@@ -2,11 +2,9 @@
 #define BKLMRECONSTRUCTIONMODULE_H
 
 #include <framework/datastore/StoreObjPtr.h>
-//#include <framework/datastore/StoreDefs.h>
 #include <framework/datastore/StoreArray.h>
 
 #include <framework/core/Module.h>
-#include <string>
 
 namespace Belle2 {
 

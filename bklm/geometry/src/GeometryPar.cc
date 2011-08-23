@@ -166,7 +166,7 @@ namespace Belle2 {
           rotation.rotateZ(sectorContent.getAngle("/Phi"));
           Hep3Vector translation(0.0, 0.0, m_OffsetZ);
           translation += rotation(rSector) + deltaZ;
-          BKLMSector* pSector = new BKLMSector(fb, sector, m_NLayer, shift, translation, rotation);
+          Sector* pSector = new Sector(fb, sector, m_NLayer, shift, translation, rotation);
           m_Sectors.push_back(pSector);
           for (int layer = 0; layer < m_NLayer; ++layer) {
             int zStripMin = 0;
@@ -179,11 +179,11 @@ namespace Belle2 {
                               sectorContent.getLength("/Shift/Y"),
                               sectorContent.getLength("/Shift/Z"));
             double dr = (layer == 0 ? (m_GapNominalHeight - m_Gap0NominalHeight) * 0.5 : layer * m_LayerHeight);
-            pSector->addModule(new BKLMModule(fb, sector, layer, lshift, dr, pSector,
-                                              phiStripWidth[layer], phiStripLength[layer],
-                                              phiStripNumber[layer], phiStripMin[layer], phiStripMax[layer],
-                                              zStripWidth[layer], zStripLength[layer],
-                                              zStripNumber[layer], zStripMin, zStripMax));
+            pSector->addModule(new Module(fb, sector, layer, lshift, dr, pSector,
+                                          phiStripWidth[layer], phiStripLength[layer],
+                                          phiStripNumber[layer], phiStripMin[layer], phiStripMax[layer],
+                                          zStripWidth[layer], zStripLength[layer],
+                                          zStripNumber[layer], zStripMin, zStripMax));
           }
         }
       }
@@ -318,9 +318,9 @@ namespace Belle2 {
       return m_HasRPCs[layer];
     }
 
-    const BKLMSector* GeometryPar::findSector(int frontBack, int sector) const
+    const Sector* GeometryPar::findSector(int frontBack, int sector) const
     {
-      std::vector<BKLMSector*>::const_iterator iS;
+      vector<Sector*>::const_iterator iS;
       for (iS = m_Sectors.begin(); iS != m_Sectors.end(); ++iS) {
         if (((*iS)->getFrontBack() == frontBack) && ((*iS)->getSector() == sector)) {
           break;

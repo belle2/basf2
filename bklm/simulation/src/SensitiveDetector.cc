@@ -12,8 +12,8 @@
 #include <bklm/simulation/SensitiveDetector.h>
 #include <bklm/simulation/SimulationPar.h>
 #include <bklm/geometry/GeometryPar.h>
-#include <bklm/geometry/BKLMSector.h>
-#include <bklm/geometry/BKLMModule.h>
+#include <bklm/geometry/Sector.h>
+#include <bklm/geometry/Module.h>
 #include <bklm/dataobjects/BKLMSimHit.h>
 
 #include <framework/datastore/StoreArray.h>
@@ -135,8 +135,8 @@ namespace Belle2 {
       int frontBack = simHit->getFrontBack();
       int sector = simHit->getSector();
       int layer = simHit->getLayer();
-      const BKLMSector* pS = geoPar->findSector(frontBack, sector);
-      const BKLMModule* pM = pS->findModule(layer);
+      const Sector* pS = geoPar->findSector(frontBack, sector);
+      const Module* pM = pS->findModule(layer);
       const TVector3 globalPos = simHit->getHitPosition();
       const CLHEP::Hep3Vector localPos = pS->globalToLocal(globalPos.X(),
                                                            globalPos.Y(),

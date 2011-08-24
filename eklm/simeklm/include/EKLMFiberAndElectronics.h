@@ -75,7 +75,8 @@ namespace Belle2 {
     double lightPropagationTime(double);
 
     //! calculates 'distances' to the direct and mirrored hits
-    void lightPropagationDistance(double &firstHitDist, double &secondHitDist, CLHEP::Hep3Vector pos);
+    void lightPropagationDistance(double &firstHitDist, double &secondHitDist,
+                                  CLHEP::Hep3Vector pos);
 
     //! number of ADC digitization steps
     //! should be accessible via XML

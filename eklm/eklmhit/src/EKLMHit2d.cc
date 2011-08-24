@@ -86,8 +86,10 @@ void EKLMHit2d::setChiSq()
 {
 
   double v = 17.0;  // 17cm/ns=speed of light; should be accessible via xml!
-  double tX = m_XStrip->getTime() - m_XStrip->getLightPropagationLength(m_crossPoint) / v;
-  double tY = m_YStrip->getTime() - m_YStrip->getLightPropagationLength(m_crossPoint) / v;
+  double tX = m_XStrip->getTime() -
+              m_XStrip->getLightPropagationLength(m_crossPoint) / v;
+  double tY = m_YStrip->getTime() -
+              m_YStrip->getLightPropagationLength(m_crossPoint) / v;
 
   double sigmaT = 1.;  // ns, smearing in time ; should be accessible via xml!
   m_ChiSq = (tX - tY) * (tX - tY) / sigmaT / sigmaT;

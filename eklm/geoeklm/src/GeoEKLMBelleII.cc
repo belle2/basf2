@@ -8,7 +8,7 @@
 *  This software is provided "as is" without any warranty.               *
 * ***********************************************************************/
 #include <eklm/geoeklm/GeoEKLMBelleII.h>
-#include <eklm/simeklm/EKLMSensetiveDetector.h>
+#include <eklm/simeklm/EKLMSensitiveDetector.h>
 
 #include <framework/gearbox/GearDir.h>
 #include <framework/gearbox/Unit.h>

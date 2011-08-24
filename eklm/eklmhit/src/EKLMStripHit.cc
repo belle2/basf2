@@ -46,14 +46,13 @@ double EKLMStripHit::getLightPropagationLength(CLHEP::Hep3Vector &pos)
   double min = 0;
   double max = 0;
 
-//  gGeoManager->cd((EKLMNameManipulator::getNodePath(m_Name)).c_str());
-//  gGeoManager->MasterToLocal(global, local);
-// gGeoManager->GetCurrentVolume()->GetShape()->GetAxisRange(1, min, max);
+  /*gGeoManager->GetCurrentVolume()->GetShape()->GetAxisRange(1, min, max);*/
   m_LightPropagationLength = max - local[0];
   return m_LightPropagationLength;
 }
 
-bool EKLMStripHit::doesIntersect(EKLMStripHit * hit, CLHEP::Hep3Vector & crossPoint)
+bool EKLMStripHit::doesIntersect(EKLMStripHit * hit,
+                                 CLHEP::Hep3Vector & crossPoint)
 {
 
   double local[3] = {0, 0, 0};
@@ -63,25 +62,23 @@ bool EKLMStripHit::doesIntersect(EKLMStripHit * hit, CLHEP::Hep3Vector & crossPo
 
 
   double global1[3] = {0, 0, 0};
-//  gGeoManager->cd((EKLMNameManipulator::getNodePath(hit->getName())).c_str());
-//  gGeoManager->LocalToMaster(local, global1);
-// gGeoManager->GetCurrentVolume()->GetShape()->GetAxisRange(1, min, max1);
+  /* gGeoManager->GetCurrentVolume()->GetShape()->GetAxisRange(1, min, max1);*/
 
   double global2[3] = {0, 0, 0};
-//  gGeoManager->cd((EKLMNameManipulator::getNodePath(m_Name)).c_str());
-//  gGeoManager->LocalToMaster(local, global2);
-//  gGeoManager->GetCurrentVolume()->GetShape()->GetAxisRange(1, min, max2);
+  /*gGeoManager->GetCurrentVolume()->GetShape()->GetAxisRange(1, min, max2);*/
 
   crossPoint.setZ((global1[2] + global2[2]) / 2);
 
   if (EKLMNameManipulator::isX(hit->getName())) {
-    if (abs(global1[0] - global2[0]) <= max1 &&  abs(global1[1] - global2[1]) <= max2) {
+    if (abs(global1[0] - global2[0]) <= max1 &&  abs(global1[1] - global2[1])
+        <= max2) {
       crossPoint.setX(global2[0]);
       crossPoint.setY(global1[1]);
       return true;
     }
   } else {
-    if (abs(global1[0] - global2[0]) <= max2 &&  abs(global1[1] - global2[1]) <= max1) {
+    if (abs(global1[0] - global2[0]) <= max2 &&  abs(global1[1] - global2[1])
+        <= max1) {
       crossPoint.setX(global1[0]);
       crossPoint.setY(global2[1]);
       return true;

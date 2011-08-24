@@ -19,7 +19,8 @@ using namespace CLHEP;
 
 namespace Belle2 {
 
-  EKLMFiberAndElectronics::EKLMFiberAndElectronics(std::pair<std::string, std::vector<EKLMSimHit*> > entry)
+  EKLMFiberAndElectronics::EKLMFiberAndElectronics(std::pair < std::string,
+                                                   std::vector<EKLMSimHit*> > entry)
   {
     timeDigitizationStep = 1; // 1 ns
     nTimeDigitizationSteps = 200; // 1000 steps
@@ -32,11 +33,16 @@ namespace Belle2 {
     fiberDeExcitationTime = 10.; //ns
 
     const char * stripName = entry.first.c_str();
-    digitizedAmplitudeDirect = new TH1D("digitizedAmplitudeDirect", "", nTimeDigitizationSteps, 0, nTimeDigitizationSteps*timeDigitizationStep);
-    digitizedAmplitudeDirect->SetNameTitle("digitizedAmplitudeDirect", stripName);
-    digitizedAmplitudeReflected = new TH1D("digitizedAmplitudeReflected", "", nTimeDigitizationSteps, 0, nTimeDigitizationSteps*timeDigitizationStep);
-    digitizedAmplitudeReflected->SetNameTitle("digitizedAmplitudeReflected", stripName);
-    digitizedAmplitude = new TH1D("digitizedAmplitude", "", nTimeDigitizationSteps, 0, nTimeDigitizationSteps*timeDigitizationStep);
+    digitizedAmplitudeDirect = new TH1D("digitizedAmplitudeDirect", "",
+                                        nTimeDigitizationSteps, 0, nTimeDigitizationSteps*timeDigitizationStep);
+    digitizedAmplitudeDirect->SetNameTitle("digitizedAmplitudeDirect",
+                                           stripName);
+    digitizedAmplitudeReflected = new TH1D("digitizedAmplitudeReflected", "",
+                                           nTimeDigitizationSteps, 0, nTimeDigitizationSteps*timeDigitizationStep);
+    digitizedAmplitudeReflected->SetNameTitle("digitizedAmplitudeReflected",
+                                              stripName);
+    digitizedAmplitude = new TH1D("digitizedAmplitude", "",
+                                  nTimeDigitizationSteps, 0, nTimeDigitizationSteps*timeDigitizationStep);
     digitizedAmplitude->SetNameTitle("digitizedAmplitude", stripName);
 
 
@@ -48,11 +54,12 @@ namespace Belle2 {
   void EKLMFiberAndElectronics::processEntry()
   {
 
-
-    for (std::vector<EKLMSimHit*> ::iterator iHit = vectorHits.begin(); iHit != vectorHits.end(); iHit++) {
+    for (std::vector<EKLMSimHit*> ::iterator iHit = vectorHits.begin();
+         iHit != vectorHits.end(); iHit++) {
 
       // calculate distance
-      lightPropagationDistance(forwardHitDist, backwardHitDist, (*iHit)->getPos());
+      lightPropagationDistance(forwardHitDist, backwardHitDist,
+                               (*iHit)->getPos());
 
       // calculate # of p.e.
       int nForwardPE = gRandom->Poisson((*iHit)->getEDep() * nPEperMeV);
@@ -60,7 +67,6 @@ namespace Belle2 {
 
       hitTimes(nForwardPE, false);
       hitTimes(nBackwardPE, true);
-
 
       timesToShape(&hitTimesVectorBackward, digitizedAmplitudeReflected);
       timesToShape(&hitTimesVectorForward, digitizedAmplitudeDirect);
@@ -84,25 +90,21 @@ namespace Belle2 {
     delete     fitFunction;
   }
 
-
   //***********************************************************
-
-
 
   void EKLMFiberAndElectronics::lightPropagationDistance(double &firstHitDist, double &secondHitDist, Hep3Vector pos)
   {
-    /*
-        gGeoManager->SetCurrentPoint(pos.x(), pos.y(), pos.z());
-        gGeoManager->FindNode();
-        double globalPos[] = {pos.x(), pos.y(), pos.z()};
-        double localPos[3];
-        gGeoManager->MasterToLocal(globalPos, localPos);  // coordinates in the strip frame
-        double xmin = 0; // half of the strip length
-        double xmax = 0; // half of the strip length
-        gGeoManager->GetCurrentVolume()->GetShape()->GetAxisRange(1, xmin, xmax);  // set strip length
-        firstHitDist = xmax - localPos[0];     //  direct light hit
-        secondHitDist = 4 * xmax - firstHitDist;     //  reflected light hit
-    */
+
+    double globalPos[] = {pos.x(), pos.y(), pos.z()};
+    double localPos[3];
+    // coordinates in the strip frame
+    //gGeoManager->MasterToLocal(globalPos, localPos);
+    double xmin = 0; // half of the strip length
+    double xmax = 0; // half of the strip length
+    // set strip length
+    // gGeoManager->GetCurrentVolume()->GetShape()->GetAxisRange(1, xmin, xmax);
+    firstHitDist = xmax - localPos[0];           //  direct light hit
+    secondHitDist = 4 * xmax - firstHitDist;     //  reflected light hit
   }
 
   double EKLMFiberAndElectronics::addRandomNoise(double ampl)
@@ -148,7 +150,8 @@ namespace Belle2 {
 
 
       // Scintillator de-excitation time  && Fiber  de-excitation time
-      double deExcitationTime = gRandom->Exp(scintillatorDeExcitationTime) + gRandom->Exp(fiberDeExcitationTime);
+      double deExcitationTime = gRandom->Exp(scintillatorDeExcitationTime)
+                                + gRandom->Exp(fiberDeExcitationTime);
       double hitTime = lightPropagationTime(hitDist) + deExcitationTime;
       if (isReflected)
         hitTimesVectorBackward.push_back(hitTime);
@@ -160,7 +163,8 @@ namespace Belle2 {
   {
     for (unsigned  i = 0; i < times->size(); i++)
       for (int iTimeStep = 0; iTimeStep < nTimeDigitizationSteps; iTimeStep++)
-        shape->AddBinContent(iTimeStep + 1, signalShape(iTimeStep*timeDigitizationStep - (*times)[i]));
+        shape->AddBinContent(iTimeStep + 1,
+                             signalShape(iTimeStep*timeDigitizationStep - (*times)[i]));
   }
 
   double EKLMFiberAndElectronics::lightPropagationTime(double L)

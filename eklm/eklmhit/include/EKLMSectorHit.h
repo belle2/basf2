@@ -22,7 +22,8 @@
 namespace Belle2 {
 
 
-  //! Class for handling hits in the whole sector. Needed to form 2d hits in a comfortable way
+  //! Class for handling hits in the whole sector. Needed to form 2d hits
+  //! in a comfortable way
   class EKLMSectorHit : public EKLMHitBase  {
 
   public:
@@ -46,14 +47,15 @@ namespace Belle2 {
     //! Adds Belle2::EKLMStripHit to the Belle2::EKLMSectorHit
     bool addStripHit(Belle2::EKLMStripHit *);
 
-    //! returns vector of pointers to the Belle2::EKLMStripHits included to the Belle2::EKLMSectorHit
+    //! returns vector of pointers to the Belle2::EKLMStripHits included to
+    //! the Belle2::EKLMSectorHit
     inline std::vector <Belle2::EKLMStripHit*> getStripHitVector() const
     {return m_stripHitVector;}
 
-    //! returns vector of pointers to 2d hits included to the Belle2::EKLMSectorHit
+    //! returns vector of pointers to 2d hits included to the
+    //! Belle2::EKLMSectorHit
     inline std::vector <Belle2::EKLMHit2d*> get2dHitVector() const
     {return m_hit2dVector;}
-
 
     //! creates 2d hits from the SectorHits of the current sector
     void create2dHits();
@@ -63,10 +65,11 @@ namespace Belle2 {
 
   private:
 
-    //! vector of pointers to the Belle2::EKLMStripHits included to the Belle2::EKLMSectorHit
+    //! vector of pointers to the Belle2::EKLMStripHits included to the
+    //! Belle2::EKLMSectorHit
     std::vector<Belle2::EKLMStripHit*> m_stripHitVector;
 
-    //!  vector of pointers to 2d hits included to the Belle2::EKLMSectorHit
+    //! vector of pointers to 2d hits included to the Belle2::EKLMSectorHit
     std::vector<Belle2::EKLMHit2d*> m_hit2dVector;
 
     //! Needed to make objects storable

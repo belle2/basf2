@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Timofey Uglov                                            *
+ * Contributors: Timofey Uglov, Kirill Chilikin                           *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -14,7 +14,7 @@
 
 #include <TObject.h>
 
-//Geant4 classes
+#include "G4VPhysicalVolume.hh"
 #include "G4THitsCollection.hh"
 #include "G4Allocator.hh"
 #include "G4ThreeVector.hh"
@@ -34,15 +34,21 @@ namespace Belle2 {
     inline EKLMSimHit() {};
 
     //! Constructor with initial values
-    inline EKLMSimHit(G4ThreeVector pos, G4double time, G4int PDGcode,  G4double eDep) {
-      m_pos = pos;
-      m_time = time;
-      m_PDGcode = PDGcode;
-      m_eDep = eDep;
+    inline EKLMSimHit(G4VPhysicalVolume *pv, G4ThreeVector pos, G4double time,
+                      G4int PDGcode,  G4double eDep) {
+      this->m_pv = pv;
+      this->m_pos = pos;
+      this->m_time = time;
+      this->m_PDGcode = PDGcode;
+      this->m_eDep = eDep;
     };
 
     //! Destructor
     ~EKLMSimHit() {};
+
+    //! returns physical volume
+    inline G4VPhysicalVolume *getPV() const
+    {return m_pv;}
 
     //! returns position of the hit
     inline G4ThreeVector getPos() const
@@ -64,6 +70,9 @@ namespace Belle2 {
     void Save(char * filename);
 
   private:
+    //! Physical volume
+    G4VPhysicalVolume *m_pv;
+
     //! hit position (in global reference frame)
     G4ThreeVector m_pos;
 

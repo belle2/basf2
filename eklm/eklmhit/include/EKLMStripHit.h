@@ -17,12 +17,13 @@
 #include  "globals.hh"
 #include  "CLHEP/Vector/ThreeVector.h"
 
-
+#include "G4VPhysicalVolume.hh"
 
 #include <string>
 namespace Belle2 {
 
-  //! Main reconstruction hit class. Containes infromation about the hitted strips
+  //! Main reconstruction hit class. Containes infromation about the
+  //! hitted strips
   class EKLMStripHit : public EKLMHitBase  {
 
   public:
@@ -74,6 +75,14 @@ namespace Belle2 {
     inline int getLeadingParticlePDGCode()const
     {return m_LeadingParticlePDGCode;};
 
+    //! returns physical volume
+    inline G4VPhysicalVolume *getPV() const
+    {return this->m_pv;};
+
+    //! set physical volume
+    inline void setPV(G4VPhysicalVolume *pv)
+    {this->m_pv = pv;};
+
     //! returns true if strips intersects (does not pay attention to the layer)
     bool doesIntersect(Belle2::EKLMStripHit *, CLHEP::Hep3Vector &);
 
@@ -93,6 +102,9 @@ namespace Belle2 {
 
     //! distance btw. the hit and SiPM
     double m_LightPropagationLength;
+
+    //! Physical volume (for simulation)
+    G4VPhysicalVolume *m_pv;
 
     /*     //! fit results */
     /*     TH1D * m_fitHistograms; */

@@ -3,10 +3,13 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Timofey Uglov                                            *
+ * Contributors: Timofey Uglov, Kirill Chilikin                           *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+
+#include "G4TransportationManager.hh"
+#include "G4Navigator.hh"
 
 #include <eklm/geoeklm/GeoEKLMBelleII.h>
 
@@ -18,44 +21,50 @@
 using namespace std;
 namespace Belle2 {
 
-
-  std::string EKLMNameManipulator::getVolumeName(const char * stripName, const char * elementName)
+  std::string EKLMNameManipulator::getVolumeName(const char * stripName,
+                                                 const char * elementName)
   {
     return getVolumeName(std::string(stripName), std::string(elementName));
   }
 
-  std::string EKLMNameManipulator::getVolumeName(std::string stripName, std::string elementName)
+  std::string EKLMNameManipulator::getVolumeName(std::string stripName,
+                                                 std::string elementName)
   {
     std::string str;
     try {
-      str = stripName.substr(stripName.find(elementName)); // get from elementName to the end
+      // get from elementName to the end
+      str = stripName.substr(stripName.find(elementName));
     } catch (exception& e) {
-      B2ERROR("exception caught:" << e.what() << " Strip name does not point " + elementName + "!");
+      B2ERROR("exception caught:" << e.what() << " Strip name does not point "
+              + elementName + "!");
     }
     //    std::cout << "EKLMNameManipulator::getName(" << stripName << "," << elementName << ")=" << str << std::endl;
     return str;
   }
 
 
-  int EKLMNameManipulator::getVolumeNumber(const char * stripName, const char * elementName)
+  int EKLMNameManipulator::getVolumeNumber(const char * stripName,
+                                           const char * elementName)
   {
     return getVolumeNumber(std::string(stripName), std::string(elementName));
   }
 
 
-  int EKLMNameManipulator::getVolumeNumber(std::string stripName, std::string elementName)
+  int EKLMNameManipulator::getVolumeNumber(std::string stripName,
+                                           std::string elementName)
   {
     std::string str;
     try {
       size_t pos1 = stripName.find(elementName + "_") + 1 + elementName.size();
       size_t pos2 = stripName.find("_", pos1 + 1);
-      str = stripName.substr(pos1, pos2 - pos1); // get string btw elementName_  and next _
+      // get string btw elementName_  and next _
+      str = stripName.substr(pos1, pos2 - pos1);
     } catch (exception& e) {
-      B2ERROR("exception caught:" << e.what() << elementName + " name does not point a number!");
+      B2ERROR("exception caught:" << e.what() << elementName +
+              " name does not point a number!");
     }
     return boost::lexical_cast<int>(str);
   }
-
 
 
   std::string  EKLMNameManipulator::getNodePath(const char * stripName)
@@ -68,18 +77,30 @@ namespace Belle2 {
     std::string path = \
                        std::string("/Top_1/EKLM_1") +          \
                        std::string("/") + getVolumeName(stripName, "Endcap") +   \
-                       std::string("_") + boost::lexical_cast<std::string>(getVolumeNumber(stripName, "Endcap")) + \
+                       std::string("_") + boost::lexical_cast<std::string>
+                       (getVolumeNumber(stripName, "Endcap")) + \
                        std::string("/") + getVolumeName(stripName, "Layer") +    \
-                       std::string("_") + boost::lexical_cast<std::string>(getVolumeNumber(stripName, "Layer")) + \
+                       std::string("_") + boost::lexical_cast<std::string>
+                       (getVolumeNumber(stripName, "Layer")) + \
                        std::string("/") + getVolumeName(stripName, "Sector") +   \
-                       std::string("_") + boost::lexical_cast<std::string>(getVolumeNumber(stripName, "Sector")) + \
+                       std::string("_") + boost::lexical_cast<std::string>
+                       (getVolumeNumber(stripName, "Sector")) + \
                        std::string("/") + getVolumeName(stripName, "Plane") +    \
-                       std::string("_") + boost::lexical_cast<std::string>(getVolumeNumber(stripName, "Plane")) + \
+                       std::string("_") + boost::lexical_cast<std::string>
+                       (getVolumeNumber(stripName, "Plane")) + \
                        std::string("/") + getVolumeName(stripName, "Strip") +    \
-                       std::string("_") + boost::lexical_cast<std::string>(getVolumeNumber(stripName, "Strip"));
+                       std::string("_") + boost::lexical_cast<std::string>
+                       (getVolumeNumber(stripName, "Strip"));
     // tempopary. Used for the procedure checks
-//    if (!gGeoManager->CheckPath(path.c_str()))
-//      B2ERROR("Something goes wrong! Strip path is not found!");
-    return path;
+    /*  if (!gGeoManager->CheckPath(path.c_str()))
+        B2ERROR("Something goes wrong! Strip path is not found!");
+      return path;*/
   }
+
+  G4VPhysicalVolume *GetPhysicalVolumeByPoint(const G4ThreeVector &point)
+  {
+    return G4TransportationManager::GetTransportationManager()->
+           GetNavigatorForTracking()->LocateGlobalPointAndSetup(point);
+  }
+
 }

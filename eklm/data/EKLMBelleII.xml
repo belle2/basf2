@@ -5,22 +5,24 @@
   <Version>0</Version>
   <Creator>EKLMBelleII</Creator>
   <Content>
-    <Rotation desc="Rotation of the EKLM with respect to the Detector"  unit="mrad">0.0</Rotation>
-    <OffsetZ  desc="The offset of the EKLM in z with respect to the IP" unit="mm">2770.0</OffsetZ>
+    <Rotation desc="Rotation of the EKLM with respect to the Detector"
+      unit="mrad">0.0</Rotation>
+    <OffsetZ  desc="The offset of the EKLM in z with respect to the IP"
+      unit="mm">2770.0</OffsetZ>
     <EndCap>
       <InnerR desc="Inner radius"   unit="mm">1306.0</InnerR>
       <OuterR desc="Outer radius"   unit="mm">3308.0</OuterR>
       <Length desc="Length"         unit="mm">1321.0</Length>
       <PositionX  desc="X position" unit="mm">0</PositionX>
       <PositionY  desc="Y position" unit="mm">0</PositionY>
-  <!--    <PositionZ  desc="Z position" unit="mm">0</PositionZ> -->
+      <PositionZ  desc="Z position" unit="mm">0</PositionZ>
       <Layer>	
 	<InnerR desc="Inner radius"   unit="mm">1326.0</InnerR>
 	<OuterR desc="Outer radius"   unit="mm">3288.0</OuterR>
 	<Length desc="Length"         unit="mm">44.0</Length>
 	<PositionX  desc="X position" unit="mm">62.0</PositionX>
 	<PositionY  desc="Y position" unit="mm">52.0</PositionY>
- <!--  	<PositionZ  desc="Z position" unit="mm">0</PositionZ> -->
+ -  	<PositionZ  desc="Z position" unit="mm">0</PositionZ>
 	<ShiftZ     desc="Z Shift"    unit="mm">47.0</ShiftZ>
 	<Sector>
 	  <InnerR desc="Inner radius"   unit="mm">1326</InnerR>

@@ -23,7 +23,8 @@
 
 namespace Belle2 {
 
-  //! Base Hit reconstruction class. inherit HitBase class from TObject to make all hits storable
+  //! Base Hit reconstruction class. inherit HitBase class from TObject
+  //! to make all hits storable
   class EKLMHitBase: public TObject  {
 
   public:

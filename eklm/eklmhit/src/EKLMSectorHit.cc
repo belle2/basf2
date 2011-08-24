@@ -33,7 +33,8 @@ void EKLMSectorHit::Print()
 {
   std::cout << "------------  Sector Hit  -------------- " << std::endl;
   std::cout << m_Name << std::endl;
-  for (std::vector<EKLMStripHit*>::iterator it = m_stripHitVector.begin(); it != m_stripHitVector.end(); ++it)
+  for (std::vector<EKLMStripHit*>::iterator it = m_stripHitVector.begin();
+       it != m_stripHitVector.end(); ++it)
     (*it)->Print();
 }
 
@@ -41,7 +42,8 @@ void EKLMSectorHit::Print()
 bool EKLMSectorHit::addStripHit(EKLMStripHit *stripHit)
 {
   // important! getName is case sensetive!!
-  if (EKLMNameManipulator::getVolumeName(stripHit->getName(), "Sector") == m_Name) {
+  if (EKLMNameManipulator::getVolumeName(stripHit->getName(), "Sector") ==
+      m_Name) {
     m_stripHitVector.push_back(stripHit);
     return true;
   }
@@ -54,12 +56,18 @@ void EKLMSectorHit::create2dHits()
 
   for (std::vector<EKLMStripHit*>::iterator itX = m_stripHitVector.begin();
        itX != m_stripHitVector.end(); ++itX) {
-    if (!EKLMNameManipulator::isX((*itX)->getName()))continue;  // only X strips
+    // only X strips
+    if (!EKLMNameManipulator::isX((*itX)->getName()))
+      continue;
     for (std::vector<EKLMStripHit*>::iterator itY = m_stripHitVector.begin();
          itY != m_stripHitVector.end(); ++itY) {
-      if (EKLMNameManipulator::isX((*itY)->getName())) continue; // only Y strips
+      // only Y strips
+      if (EKLMNameManipulator::isX((*itY)->getName()))
+        continue;
       CLHEP::Hep3Vector crossPoint(0, 0, 0);
-      if (!((*itX)->doesIntersect(*itY, crossPoint))) continue; // drop entries with non-intersected strips
+      // drop entries with non-intersected strips
+      if (!((*itX)->doesIntersect(*itY, crossPoint)))
+        continue;
       EKLMHit2d *hit2d = new EKLMHit2d(*itX, *itY);
       hit2d->setCrossPoint(crossPoint);
       hit2d->setChiSq();
@@ -77,3 +85,4 @@ void EKLMSectorHit::store2dHits()
        it != m_hit2dVector.end(); ++it)
     storeEKLMObject("Hits2dEKLMArray", *it);
 }
+

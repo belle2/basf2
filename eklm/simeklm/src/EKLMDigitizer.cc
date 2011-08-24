@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Timofey Uglov                                            *
+ * Contributors: Timofey Uglov, Kirill Chilikin                           *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -35,10 +35,6 @@ namespace Belle2 {
 
   G4Allocator<EKLMDigitizer> EKLMDigitizerAllocator;
 
-
-
-
-
   void EKLMDigitizer::readSimHits()
   {
     StoreArray<EKLMSimHit> array("SimHitsEKLMArray");
@@ -46,27 +42,24 @@ namespace Belle2 {
       m_simHitsVector.push_back(array[i]);
   }
 
-
   void EKLMDigitizer::sortSimHits()
   {
     for (std::vector<EKLMSimHit*>::iterator iHit = m_simHitsVector.begin();
          iHit != m_simHitsVector.end(); ++iHit) {
-      /*
-            gGeoManager->SetCurrentPoint((*iHit)->getPos().x(), (*iHit)->getPos().y(), (*iHit)->getPos().z());
-            gGeoManager->FindNode();
-            std::string StripName = gGeoManager->GetCurrentVolume()->GetName();
+      std::string StripName = (*iHit)->getPV()->GetName();
 
+      // search for entries of the same strip
+      std::map<std::string, std::vector<EKLMSimHit*> >::iterator
+      it = m_HitStripMap.find(StripName);
 
-            // search for entries of the same strip
-            std::map<std::string, std::vector<EKLMSimHit*> >::iterator it = m_HitStripMap.find(StripName);
-
-            if (it == m_HitStripMap.end()) { //  new entry
-              std::vector<EKLMSimHit*> *vectorHits = new std::vector<EKLMSimHit*> (1, (*iHit));
-              m_HitStripMap.insert(std::pair<std::string, std::vector<EKLMSimHit*> >(StripName, *vectorHits));
-            } else {
-              it->second.push_back(*iHit);
-            }
-      */
+      if (it == m_HitStripMap.end()) { //  new entry
+        std::vector<EKLMSimHit*> *vectorHits =
+          new std::vector<EKLMSimHit*> (1, (*iHit));
+        m_HitStripMap.insert(std::pair<std::string, std::vector<EKLMSimHit*> >
+                             (StripName, *vectorHits));
+      } else {
+        it->second.push_back(*iHit);
+      }
     }
 
   }
@@ -77,23 +70,26 @@ namespace Belle2 {
   void EKLMDigitizer::mergeSimHitsToStripHits()
   {
     //    B2INFO( "STRAT MERGING HITS");
-    for (std::map<std::string, std::vector<EKLMSimHit*> >::iterator it = m_HitStripMap.begin();
-         it != m_HitStripMap.end(); it++) {
+    for (std::map<std::string, std::vector<EKLMSimHit*> >::iterator it =
+           m_HitStripMap.begin(); it != m_HitStripMap.end(); it++) {
 
       //      B2DEBUG(1, "MAP ENTRY");
-      EKLMFiberAndElectronics * fiberAndElectronicsSimulator = new EKLMFiberAndElectronics(*it);
+      EKLMFiberAndElectronics * fiberAndElectronicsSimulator =
+        new EKLMFiberAndElectronics(*it);
       fiberAndElectronicsSimulator->processEntry();
 
-
+      EKLMSimHit *simHit = NULL;
       EKLMStripHit *stripHit = new EKLMStripHit();
 
       stripHit->setName(it->first);
+      stripHit->setPV(simHit->getPV());
 
       //stripHit->setHistogramm(cloneHist);
 
       if (!fiberAndElectronicsSimulator->getFitStatus()) {
         stripHit->setTime(fiberAndElectronicsSimulator->getFitResults(0));
-        stripHit->setNumberPhotoElectrons(fiberAndElectronicsSimulator->getFitResults(3));
+        stripHit->setNumberPhotoElectrons(fiberAndElectronicsSimulator->
+                                          getFitResults(3));
       } else {
         stripHit->setNumberPhotoElectrons(-1);
         stripHit->setTime(-1);

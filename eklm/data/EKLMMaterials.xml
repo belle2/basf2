@@ -1,13 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-
 <ParamSet type="MAT">
 	<Name>EKLMMaterials</Name>
 	<Description>EKLM material definitions</Description>
 	<Version>0</Version>
 	<Creator>GeoMaterials</Creator>
 	<Content>
-
                 <Mixture name="Polystyrene">
                         <Density>1.05</Density>
                         <Elements>
@@ -21,6 +19,14 @@
                                 </Element>
                         </Elements>
                 </Mixture>
-
+		<Mixture name="Iron">
+			<Density>7.87</Density>
+			<Elements>
+				<Element name="Fe" weight="7.87">
+					<AtomNumber>26</AtomNumber>
+					<MassNumber>55.845</MassNumber>
+				</Element>
+			</Elements>
+		</Mixture>
 	</Content>
 </ParamSet>

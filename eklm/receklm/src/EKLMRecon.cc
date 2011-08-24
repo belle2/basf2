@@ -11,18 +11,16 @@
 #include <eklm/receklm/EKLMRecon.h>
 
 #include <framework/datastore/StoreIter.h>
-#include <framework/datastore/DataStore.h> // DataStore to ask it for the iterator
-//#include <framework/datastore/StoreDefs.h> // to have the EDurability type available
+// DataStore to ask it for the iterator
+#include <framework/datastore/DataStore.h>
+// to have the EDurability type available
+//#include <framework/datastore/StoreDefs.h>
 #include <eklm/eklmutils/EKLMutils.h>
-
-
 
 
 
 using namespace std;
 namespace Belle2 {
-
-
 
 
   void EKLMRecon::readStripHits()
@@ -35,25 +33,29 @@ namespace Belle2 {
 
   void EKLMRecon::createSectorHits()
   {
-    for (std::vector<EKLMStripHit*>::iterator stripIter = m_StripHitVector.begin();
-         stripIter != m_StripHitVector.end(); ++stripIter) {
+    for (std::vector<EKLMStripHit*>::iterator stripIter =
+           m_StripHitVector.begin(); stripIter != m_StripHitVector.end();
+         ++stripIter) {
       bool sectorNotFound = true;
-      for (std::vector<EKLMSectorHit*>::iterator sectorIter = m_SectorHitVector.begin();
-           sectorIter != m_SectorHitVector.end(); sectorIter++) {
-        if ((*sectorIter)->addStripHit(*stripIter)) { // since every hit could be added only once
+      for (std::vector<EKLMSectorHit*>::iterator sectorIter =
+             m_SectorHitVector.begin(); sectorIter != m_SectorHitVector.end();
+           sectorIter++) {
+        // since every hit could be added only once
+        if ((*sectorIter)->addStripHit(*stripIter)) {
           sectorNotFound = false;
           break;
         }
       }
       if (sectorNotFound) {
-        EKLMSectorHit  *newSectorHit =
-          new EKLMSectorHit(EKLMNameManipulator::getVolumeName((*stripIter)->getName(), "Sector").c_str());
+        EKLMSectorHit  *newSectorHit = new EKLMSectorHit(EKLMNameManipulator::
+                                                         getVolumeName((*stripIter)->getName(), "Sector").c_str());
         newSectorHit->addStripHit(*stripIter);
         m_SectorHitVector.push_back(newSectorHit);
       }
     }
 
-    for (std::vector<EKLMSectorHit*>::iterator sectorIter = m_SectorHitVector.begin();
+    for (std::vector<EKLMSectorHit*>::iterator sectorIter =
+           m_SectorHitVector.begin();
          sectorIter != m_SectorHitVector.end(); sectorIter++) {
       storeEKLMObject("SectorHitsEKLMArray", *sectorIter);
       //  (*sectorIter)->Print();
@@ -62,20 +64,22 @@ namespace Belle2 {
 
   void EKLMRecon::create2dHits()
   {
-    for (std::vector<EKLMSectorHit*>::iterator sectorIter = m_SectorHitVector.begin();
-         sectorIter != m_SectorHitVector.end(); sectorIter++)  // loop over sectors
+    // loop over sectors
+    for (std::vector<EKLMSectorHit*>::iterator sectorIter =
+           m_SectorHitVector.begin(); sectorIter != m_SectorHitVector.end();
+         sectorIter++)
       (*sectorIter)->create2dHits();
   }
 
 
   void EKLMRecon::store2dHits()
   {
-    for (std::vector<EKLMSectorHit*>::iterator sectorIter = m_SectorHitVector.begin();
-         sectorIter != m_SectorHitVector.end(); sectorIter++)  // loop over sectors
+    // loop over sectors
+    for (std::vector<EKLMSectorHit*>::iterator sectorIter =
+           m_SectorHitVector.begin(); sectorIter != m_SectorHitVector.end();
+         sectorIter++)
       (*sectorIter)->store2dHits();
   }
-
-
 
 
 }//namespace

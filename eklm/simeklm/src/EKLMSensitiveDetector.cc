@@ -9,7 +9,7 @@
  **************************************************************************/
 
 
-#include <eklm/simeklm/EKLMSensetiveDetector.h>
+#include <eklm/simeklm/EKLMSensitiveDetector.h>
 
 #include <framework/logging/Logger.h>
 
@@ -29,18 +29,18 @@
 namespace Belle2 {
 
 
-  EKLMSensetiveDetector::EKLMSensetiveDetector(G4String name, G4double thresholdEnergyDeposit, G4double thresholdKineticEnergy)
+  EKLMSensitiveDetector::EKLMSensitiveDetector(G4String name, G4double thresholdEnergyDeposit, G4double thresholdKineticEnergy)
   {
   }
 
-  void EKLMSensetiveDetector::Initialize(G4HCofThisEvent * HCTE)
+  void EKLMSensitiveDetector::Initialize(G4HCofThisEvent * HCTE)
   {
   }
 
   //-----------------------------------------------------
   // Method invoked for every step in sensitive detector
 //-----------------------------------------------------
-  G4bool EKLMSensetiveDetector::ProcessHits(G4Step *aStep, G4TouchableHistory *)
+  G4bool EKLMSensitiveDetector::ProcessHits(G4Step *aStep, G4TouchableHistory *)
   {
     // Get deposited energy
     const G4double eDep = aStep->GetTotalEnergyDeposit();
@@ -63,12 +63,12 @@ namespace Belle2 {
 
     // drop hit if global time is nan or if it is  mothe than hitTimeThreshold (to avoid nuclei fission signals)
     if (isnan(hitTime)) {
-      B2ERROR("EKLMSensetiveDetector: global time is nan");
+      B2ERROR("EKLMSensitiveDetector: global time is nan");
       return false;
 
       double hitTimeThreshold = 500; // should be parameter or accessev via xml
       if (hitTime > hitTimeThreshold) {
-        B2INFO("EKLMSensetiveDetector:  ALL HITS WITH TIME > hitTimeThreshold ARE DROPPED!!!!!!!");
+        B2INFO("EKLMSensitiveDetector:  ALL HITS WITH TIME > hitTimeThreshold ARE DROPPED!!!!!!!");
         return false;
       }
 
@@ -83,16 +83,16 @@ namespace Belle2 {
                                      * 0.1; // to convert to cm
 
     //creates hit
-    EKLMSimHit *hit = new  EKLMSimHit(position,  hitTime, PDGcode,  eDep);
+    //    EKLMSimHit *hit = new  EKLMSimHit(position,  hitTime, PDGcode,  eDep);
 
     // store hit
-    storeEKLMObject("SimHitsEKLMArray", hit);
+    //    storeEKLMObject("SimHitsEKLMArray", hit);
 
 
     return true;
   }
 
-  void EKLMSensetiveDetector::EndOfEvent(G4HCofThisEvent *)
+  void EKLMSensitiveDetector::EndOfEvent(G4HCofThisEvent *)
   {
   }
 

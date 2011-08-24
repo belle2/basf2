@@ -22,15 +22,15 @@ namespace Belle2 {
     EKLMSimHits are saved into hits collection.
   */
 
-  class EKLMSensetiveDetector  {
+  class EKLMSensitiveDetector  {
 
   public:
 
     //! Constructor
-    EKLMSensetiveDetector(G4String name, G4double thresholdEnergyDeposit, G4double thresholdKineticEnergy);
+    EKLMSensitiveDetector(G4String name, G4double thresholdEnergyDeposit, G4double thresholdKineticEnergy);
 
     //! Destructor
-    ~EKLMSensetiveDetector() {};
+    ~EKLMSensitiveDetector() {};
 
     //! Register EKLM hits collection into G4HCofThisEvent
     void Initialize(G4HCofThisEvent *eventHC);

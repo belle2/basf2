@@ -22,9 +22,17 @@
 #include <vector>
 
 #include <framework/logging/Logger.h>
-#define DEFAULT_MCPARTICLES "MCParticles"
 
 namespace Belle2 {
+
+  //replacement function to warn users of the DEFAULT_MCPARTICLE macro that it is deprecated
+  //TODO: should be removed once all users of DEFAULT_MCPARTICLES have switched
+  inline std::string deprecated_DEFAULT_MCPARTICLES()
+  {
+    B2ERROR("DEFAULT_MCPARTICLES is deprecated, please use an empty string");
+    return "";
+  }
+#define DEFAULT_MCPARTICLES deprecated_DEFAULT_MCPARTICLES()
 
   /**
    * A Class to store the Monte Carlo particle information.
@@ -57,7 +65,7 @@ namespace Belle2 {
     };
 
     /** This enum is more a less a copy from EvtSpinType. Except we explicitly set the
-     numbers of the standard spin states such, that they represent 2 x S */
+      numbers of the standard spin states such, that they represent 2 x S */
     enum EspinType {
       c_SCALAR          = 0,
       c_STRING          = 0,
@@ -269,23 +277,23 @@ namespace Belle2 {
     /**
      *Check if particle is virtual
      *
-    */
+     */
     const bool isVirtual();
 
     /**
-      * Set PDG code of the particle.
-      * @param pdg The PDG code of the MonteCarlo particle.
-      */
+     * Set PDG code of the particle.
+     * @param pdg The PDG code of the MonteCarlo particle.
+     */
     void setPDG(int pdg)                               { m_pdg = pdg; }
 
     /**
-      * Sets the mass for the particle from the particle's PDG code.
-      */
+     * Sets the mass for the particle from the particle's PDG code.
+     */
     void setMassFromPDG();
 
     /**
-      * Sets the charge for the particle from the particle's PDG code.
-      */
+     * Sets the charge for the particle from the particle's PDG code.
+     */
     void setChargeFromPDG();
 
     /**

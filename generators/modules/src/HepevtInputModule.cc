@@ -88,6 +88,9 @@ void HepevtInputModule::initialize()
     if (m_runNum == 0 && m_expNum == 0)
       B2WARNING("HEPEVT reader acts as master module, but no run and experiment number set. Using defaults.");
   }
+
+  //Initialize MCParticle collection
+  StoreArray<MCParticle> MCParticles;
 }
 
 
@@ -116,7 +119,7 @@ void HepevtInputModule::event()
     }
     if (m_useWeights)
       eventMetaDataPtr->setGeneratedWeight(weight);
-    mpg.generateList(DEFAULT_MCPARTICLES, MCParticleGraph::c_setDecayInfo | MCParticleGraph::c_checkCyclic);
+    mpg.generateList("", MCParticleGraph::c_setDecayInfo | MCParticleGraph::c_checkCyclic);
   } catch (HepevtReader::HepEvtEmptyEventError) {
     B2DEBUG(100, "Reached end of HepEvt file.");
     m_hepevt.closeCurrentInputFile();

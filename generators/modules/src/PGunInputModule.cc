@@ -109,6 +109,8 @@ void PGunInputModule::initialize()
     B2ERROR("Invalid option for random generation of angles in particle gun!");
   }
 
+  //Initialize MCParticle collection
+  StoreArray<MCParticle> MCParticles;
 }
 
 
@@ -117,7 +119,7 @@ void PGunInputModule::event()
   try {
     mpg.clear();
     m_pgun.generateEvent(mpg);
-    mpg.generateList(DEFAULT_MCPARTICLES, MCParticleGraph::c_setDecayInfo | MCParticleGraph::c_checkCyclic);
+    mpg.generateList("", MCParticleGraph::c_setDecayInfo | MCParticleGraph::c_checkCyclic);
   } catch (runtime_error &e) {
     B2ERROR(e.what());
   }

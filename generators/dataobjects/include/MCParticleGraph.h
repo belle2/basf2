@@ -224,7 +224,7 @@ namespace Belle2 {
      * @param options Additional options which steer the creation of the StoreArray.
      * @see class MCParticle
      */
-    void generateList(const std::string& name = DEFAULT_MCPARTICLES, int options = c_setNothing);
+    void generateList(const std::string& name = "", int options = c_setNothing);
 
     /**
      * Reset particles and decay information to make the class reusable.

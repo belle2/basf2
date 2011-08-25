@@ -61,7 +61,7 @@ TouschekSADInputModule::~TouschekSADInputModule()
 void TouschekSADInputModule::initialize()
 {
   //Register collections
-  StoreArray<MCParticle> MCParticles(DEFAULT_MCPARTICLES);
+  StoreArray<MCParticle> MCParticles;
 
   //Check parameters
   if (!FileSystem::fileExists(m_filenameLER)) {
@@ -107,7 +107,7 @@ void TouschekSADInputModule::event()
       //----------------------------------
       // Generate MCParticles collection
       //----------------------------------
-      mpg.generateList(DEFAULT_MCPARTICLES, MCParticleGraph::c_setDecayInfo | MCParticleGraph::c_checkCyclic);
+      mpg.generateList("", MCParticleGraph::c_setDecayInfo | MCParticleGraph::c_checkCyclic);
 
     } catch (TouschekReaderSAD::TouschekEndOfFile& exc) {
       B2DEBUG(10, exc.what())

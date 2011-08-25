@@ -12,6 +12,7 @@
 
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
+#include <framework/datastore/StoreArray.h>
 #include <framework/dataobjects/EventMetaData.h>
 
 #include <framework/gearbox/Gearbox.h>
@@ -69,6 +70,9 @@ TouschekTURTLEInputModule::~TouschekTURTLEInputModule()
 
 void TouschekTURTLEInputModule::initialize()
 {
+  //Initialize MCParticle collection
+  StoreArray<MCParticle> MCParticles;
+
   //Check parameters
   if ((m_readHER) && (!FileSystem::fileExists(m_filenameHER))) {
     B2ERROR("Parameter <FilenameHER>: Could not open the file. The filename " << m_filenameHER << " does not exist !")
@@ -103,7 +107,7 @@ void TouschekTURTLEInputModule::event()
 
     if ((readHERParticles > 0) || (readLERParticles > 0)) {
       //Generate MCParticle list
-      mpg.generateList(DEFAULT_MCPARTICLES, MCParticleGraph::c_setDecayInfo | MCParticleGraph::c_checkCyclic);
+      mpg.generateList("", MCParticleGraph::c_setDecayInfo | MCParticleGraph::c_checkCyclic);
 
       B2INFO("Read " << readHERParticles << " e- particles (HER).")
       B2INFO("Read " << readLERParticles << " e+ particles (LER).")

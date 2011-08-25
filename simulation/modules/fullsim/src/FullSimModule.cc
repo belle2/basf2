@@ -22,7 +22,8 @@
 #include <generators/dataobjects/MCParticle.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/EventMetaData.h>
+#include <framework/datastore/StoreArray.h>
+#include <framework/dataobjects/EventMetaData.h>
 #include <framework/gearbox/Unit.h>
 
 #include <G4TransportationManager.hh>
@@ -57,8 +58,8 @@ FullSimModule::FullSimModule() : Module(), m_visManager(NULL)
   setDescription("Performs the full Geant4 detector simulation. Requires a valid geometry in memory.");
 
   //Parameter definition
-  addParam("InputMCParticleCollection", m_mcParticleInputColName, "The name of the input MCParticle collection.", string(DEFAULT_MCPARTICLES));
-  addParam("OutputMCParticleCollection", m_mcParticleOutputColName, "The name of the output MCParticle collection.", string(DEFAULT_MCPARTICLES));
+  addParam("InputMCParticleCollection", m_mcParticleInputColName, "The name of the input MCParticle collection.", string(""));
+  addParam("OutputMCParticleCollection", m_mcParticleOutputColName, "The name of the output MCParticle collection.", string(""));
   addParam("ThresholdImportantEnergy", m_thresholdImportantEnergy, "[GeV] A particle which got 'stuck' and has less than this energy will be killed after 'ThresholdTrials' trials.", 0.250);
   addParam("ThresholdTrials", m_thresholdTrials, "Geant4 will try 'ThresholdTrials' times to move a particle which got 'stuck' and has an energy less than 'ThresholdImportantEnergy'.", 10);
   addParam("TrackingVerbosity", m_trackingVerbosity, "Tracking verbosity: 0=Silent; 1=Min info per step; 2=sec particles; 3=pre/post step info; 4=like 3 but more info; 5=proposed step length info.", 0);
@@ -82,6 +83,10 @@ FullSimModule::~FullSimModule()
 
 void FullSimModule::initialize()
 {
+
+  StoreArray<MCParticle> mcParticlesIn(m_mcParticleInputColName);
+  StoreArray<MCParticle> mcParticlesOut(m_mcParticleOutputColName);
+
   //Get the instance of the run manager.
   RunManager& runManager = RunManager::Instance();
 
@@ -183,7 +188,7 @@ void FullSimModule::initialize()
 void FullSimModule::beginRun()
 {
   //Get the event meta data
-  StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
+  StoreObjPtr<EventMetaData> eventMetaDataPtr;
 
   //Begin the Geant4 run
   RunManager::Instance().beginRun(eventMetaDataPtr->getRun());
@@ -199,7 +204,7 @@ void FullSimModule::beginRun()
 void FullSimModule::event()
 {
   //Get the event meta data
-  StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
+  StoreObjPtr<EventMetaData> eventMetaDataPtr;
 
   //Process the event
   RunManager::Instance().processEvent(eventMetaDataPtr->getEvent());

@@ -66,7 +66,7 @@ void MCParticle::fixParticleList() const
   TClonesArray* plist(0);
 
   //Search default location
-  StoreArray<MCParticle> MCParticles(DEFAULT_MCPARTICLES);
+  StoreArray<MCParticle> MCParticles;
   if (MCParticles->IndexOf(this) >= 0) {
     plist = MCParticles.getPtr();
   } else {

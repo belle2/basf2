@@ -37,7 +37,7 @@ PrintMCParticlesModule::PrintMCParticlesModule() : Module()
   setDescription("Print an MCParticle Collection");
 
   //Parameter definition
-  addParam("collectionName", m_particleList, "Collection to print", string(DEFAULT_MCPARTICLES));
+  addParam("collectionName", m_particleList, "Collection to print", string(""));
   addParam("onlyPrimaries", m_onlyPrimaries, "Show only primary particles", true);
   addParam("maxLevel", m_maxLevel, "Show only up to specified depth level, -1 means no limit", -1);
 }

@@ -28,7 +28,7 @@ namespace Belle2 {
 
   }
 
-  void GeometryModule::beginRun()
+  void GeometryModule::initialize()
   {
     geometry::GeometryManager::getInstance().createGeometry(GearDir(m_geometryPath), geometry::FullGeometry);
   }

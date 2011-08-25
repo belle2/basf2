@@ -19,7 +19,7 @@ namespace Belle2 {
     GeometryModule();
     ~GeometryModule() {};
 
-    void beginRun();
+    void initialize();
   protected:
     std::string m_geometryPath;
     std::string m_geometryTypeString;

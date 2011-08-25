@@ -72,6 +72,9 @@ FullSimModule::FullSimModule() : Module(), m_visManager(NULL)
 
   vector<string> defaultCommands;
   addParam("UICommands", m_uiCommands, "A list of Geant4 UI commands that should be applied before the simulation starts.", defaultCommands);
+
+  //Make sure the instance of the run manager is created now to initialize some stuff we need for geometry
+  RunManager::Instance();
 }
 
 
@@ -83,21 +86,22 @@ FullSimModule::~FullSimModule()
 
 void FullSimModule::initialize()
 {
-
+  //Register the collections we want to use
+  StoreObjPtr<EventMetaData> eventMetaDataPtr;
   StoreArray<MCParticle> mcParticlesIn(m_mcParticleInputColName);
   StoreArray<MCParticle> mcParticlesOut(m_mcParticleOutputColName);
 
   //Get the instance of the run manager.
   RunManager& runManager = RunManager::Instance();
 
+  //Add Geometry
+  runManager.SetUserInitialization(new DetectorConstruction());
+
   //Create the Physics list
   PhysicsList* physicsList = new PhysicsList(m_physicsList);
   physicsList->setProductionCutValue(m_productionCut);
   if (m_optics) physicsList->registerOpticalPhysicsList();
   runManager.SetUserInitialization(physicsList);
-
-  //Add Geometry
-  runManager.SetUserInitialization(new DetectorConstruction());
 
   //Create the magnetic field for the Geant4 simulation
   MagneticField* magneticField = new MagneticField();

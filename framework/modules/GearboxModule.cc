@@ -41,6 +41,7 @@ void GearboxModule::initialize()
 {
   Gearbox &gearbox = Gearbox::getInstance();
   gearbox.setBackends(m_backends);
+  gearbox.open(m_filename);
 }
 
 void GearboxModule::beginRun()

@@ -33,15 +33,16 @@ void RunManager::Initialize()
 {
   SetGeometryToBeOptimized(true);
   //Set geometry to be Initialized because there won't be any before the beginRun
-  geometryInitialized = true;
+  //FIXME: reverted to run independent
+  //geometryInitialized = true;
   G4RunManager::Initialize();
 }
 
 
 void RunManager::beginRun(int runNumber)
 {
-  //Initialize Geometry
-  InitializeGeometry();
+  //Initialize Geometry FIXME: done run independent at the moment
+  //InitializeGeometry();
   //Check if all the necessary initializations have already be done.
   if (ConfirmBeamOnCondition()) {
     //Set run number

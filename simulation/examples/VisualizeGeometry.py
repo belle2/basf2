@@ -19,18 +19,29 @@ pguninput = register_module('PGunInput')
 g4sim = register_module('FullSim')
 
 evtmetagen.param('EvtNumList', [1])
+evtmetagen.param('RunList', [1])
 
 g4sim.param('EnableVisualization', True)
 g4sim.param('UICommands', ['/vis/open VRML2FILE', '/vis/drawVolume',
             '/vis/scene/add/axes 0 0 0 100 mm',
             '/vis/scene/add/trajectories smooth',
-            '/vis/modeling/trajectories/create/drawByCharge'])  # Use VRML2 backend
-                                                                # Draw the geometry
-                                                                # Draw coordinate axes at the origin with a length of 100mm in each direction
-                                                                # Draw simulated tracks
-# Uncomment the following two lines to have yellow dots at each step boundary along the trajectory
-#    '/vis/modeling/trajectories/drawByCharge-0/default/setDrawStepPts true',
-#    '/vis/modeling/trajectories/drawByCharge-0/default/setStepPtsSize 0.5',
+            '/vis/modeling/trajectories/create/drawByCharge'])
+
+# Stupid fixstyle breaks the comments, so here is the commented version of the code above:
+# g4sim.param('UICommands', [
+## Use VRML2 backend
+    # '/vis/open VRML2FILE',
+## Draw the geometry
+    # '/vis/drawVolume',
+## Draw coordinate axes at the origin with a length of 100mm in each direction
+    # '/vis/scene/add/axes 0 0 0 100 mm',
+## Draw simulated tracks
+    # '/vis/scene/add/trajectories smooth',
+    # '/vis/modeling/trajectories/create/drawByCharge'
+## Uncomment the following two lines to have yellow dots at each step boundary along the trajectory
+##    '/vis/modeling/trajectories/drawByCharge-0/default/setDrawStepPts true',
+##    '/vis/modeling/trajectories/drawByCharge-0/default/setStepPtsSize 0.5',
+# ])
 
 # Parameters for particle gun
 pguninput.param('nTracks', 1)

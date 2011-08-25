@@ -49,6 +49,8 @@ namespace Belle2 {
 
     void GeometryManager::clear()
     {
+      //FIXME: Geometry is now run independent, don't delete anything, let Geant4 care about freeing stuff
+      return;
       //Clean up existing Geometry
       G4GeometryManager::GetInstance()->OpenGeometry();
       G4PhysicalVolumeStore::Clean();

@@ -51,9 +51,10 @@ void EventAction::EndOfEventAction(const G4Event* event)
 
   //Build a TrackID to MCParticle index list
   vector<unsigned int> indices;
-  indices.resize(m_mcParticleGraph.size());
+  indices.resize(m_mcParticleGraph.size() + 1);
   for (unsigned int iParticle = 0; iParticle < m_mcParticleGraph.size(); ++iParticle) {
     MCParticleGraph::GraphParticle& currParticle = m_mcParticleGraph[iParticle];
+    //assert(currParticle.getTrackID()<indices.size());
     indices[currParticle.getTrackID()] = currParticle.getIndex() - 1;
   }
   RelationArray::ReplaceVec<> indexReplacement(indices);
@@ -62,7 +63,7 @@ void EventAction::EndOfEventAction(const G4Event* event)
   BOOST_FOREACH(const string &relName, SensitiveDetectorBase::getMCParticleRelations()) {
     if (!relName.empty()) {
       RelationArray mcPartRelation(relName);
-      mcPartRelation.consolidate(indexReplacement, RelationArray::Identity());
+      if (mcPartRelation) mcPartRelation.consolidate(indexReplacement, RelationArray::Identity());
     }
   }
 }

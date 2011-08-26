@@ -49,7 +49,8 @@ void MCParticleGenerator::GeneratePrimaryVertex(G4Event* event)
 
   //Loop over the primary particles. The MCParticle collection has to be
   //sorted breadth first: primary particles come first and then the daughters
-  for (int iPart = 0; iPart < mcParticles.GetEntries(); iPart++) {
+  int nPart = mcParticles.getEntries();
+  for (int iPart = 0; iPart < nPart; iPart++) {
     MCParticle *currParticle = mcParticles[iPart];
     if (currParticle->getMother() != NULL) break;
 

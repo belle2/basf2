@@ -158,6 +158,9 @@ namespace Belle2 {
       assignObject(params.first, params.second, false);
     }
 
+    /** Empty destructor */
+    ~RelationArray() {}
+
     /** Imitate array functionality. */
     const RelationElement& operator[](int i) const { check(); return m_storeObjPtr->elements(i);}
 

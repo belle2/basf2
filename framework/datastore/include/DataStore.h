@@ -277,7 +277,8 @@ template <class T> bool Belle2::DataStore::handleArray(const std::string& name,
       B2WARNING("initializeActive is false while you try to create an array " << name << " under EDurability " << durability);
     }
     if (!(result.first->second)) {                                     // if given with array = 0, ...
-      result.first->second = new TClonesArray(T::Class());             // use default constructor
+      array =  new TClonesArray(T::Class());                           // use default constructor
+      result.first->second = array;
       B2DEBUG(100, "Array with name " << name << " and durability " << durability << " was created.");
     }
   } else {                                                      // "else" because otherwise storing without knowing type doesn't work.

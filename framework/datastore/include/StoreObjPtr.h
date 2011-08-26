@@ -47,6 +47,25 @@ namespace Belle2 {
       assignObject(accessorParams.first, accessorParams.second, false);
     }
 
+    /** Constructor, no assignment.
+     *
+     *  The default constructor already assigns the TObject pointer. Since the
+     *  RelationArray needs to determine the name first and do some logic, we
+     *  need a constructor which does not do anything. Therefore this
+     *  constructor takes an int as argument to distuingish it from the default
+     *  constructor. DO NOT DELETE AGAIN.
+     *
+     *  This contructor doesn't request a name. You can later assign an object to it, if you like.
+     *
+     *  @param dummy This argument is ignored but required to distuingish
+     *  between the default constructor and this one
+     */
+    StoreObjPtr(int dummy)
+        : m_storeObjPtr(0), m_name(""), m_durability(DataStore::c_Event) {}
+
+    /** Virtual destructor for inherited classes */
+    virtual ~StoreObjPtr() {}
+
     /** Assigning an object to the pointer.
      *
      *  This function actually calls the DataStore. If the DataStore is called for the first time during an execution of basf2,

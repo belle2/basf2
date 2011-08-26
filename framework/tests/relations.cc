@@ -3,6 +3,8 @@
 #include <framework/dataobjects/RunMetaData.h>
 #include <gtest/gtest.h>
 #include <boost/foreach.hpp>
+#include <iostream>
+using namespace std;
 
 namespace Belle2 {
 #define EXPECT_FATAL(x) EXPECT_EXIT(x,::testing::KilledBySignal(SIGABRT),"");
@@ -44,7 +46,7 @@ namespace Belle2 {
   }
 
   //Test that adding to an invalid relation yields a FATAL
-  TEST_F(RelationTest, AddInvalid)
+  TEST_F(RelationTest, AddInvalidDeathTest)
   {
     RelationArray relation(evtData, runData, "", DataStore::c_Event, false);
     EXPECT_FALSE(relation);
@@ -165,9 +167,3 @@ namespace Belle2 {
   }
 
 }  // namespace
-
-int main(int argc, char **argv)
-{
-  ::testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
-}

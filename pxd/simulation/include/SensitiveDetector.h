@@ -4,16 +4,16 @@
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Andreas Moll, Zbynek Drasal, Peter Kvasnicka             *
+ *               Martin Ritter                                            *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PXDSENSITIVEDETECTOR_H_
-#define PXDSENSITIVEDETECTOR_H_
+#ifndef PXD_SENSITIVEDETECTOR_H_
+#define PXD_SENSITIVEDETECTOR_H_
 
 #include <pxd/dataobjects/PXDSimHit.h>
-#include <simulation/kernel/SensitiveDetectorBase.h>
-#include <TG4RootDetectorConstruction.h>
+#include <pxd/vxd/SensitiveDetectorBase.h>
 
 namespace Belle2 {
   namespace pxd {
@@ -39,15 +39,15 @@ namespace Belle2 {
      * @author P. Kvasnicka, Charles University Prague (basf2 implementation)
      */
 
-    class SensitiveDetector: public Simulation::SensitiveDetectorBase {
+    class SensitiveDetector: public VXD::SensitiveDetectorBase {
 
     public:
 
       /**
        * Constructor.
-       * @param name Name of the sensitive detector. Do we still need that?
+       * @param sensorInfo SensorInfo instance of the Sensor
        */
-      SensitiveDetector();
+      SensitiveDetector(VXD::SensorInfoBase* sensorInfo);
 
       /**
        * Process each step and calculate variables defined in PXDSimHit.
@@ -65,7 +65,7 @@ namespace Belle2 {
       double m_thresholdPXD;
 
     }; // SensitiveDetector class
-  } //end of namespace pxd
+  } //end of namespace PXD
 } // end of namespace Belle2
 
-#endif /* PXDSENSITIVEDETECTOR_H_ */
+#endif /* PXD_SENSITIVEDETECTOR_H_ */

@@ -8,6 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+#include <framework/logging/Logger.h>
 #include <pxd/vxd/VxdID.h>
 #include <sstream>
 #include <iostream>
@@ -68,12 +69,12 @@ namespace Belle2 {
       }
     } catch (runtime_error &e) {
       //Something went wrong parsing the parts
-      cout << "Could not parse VtxID '" << sensor << "'" << endl;
+      B2ERROR("Could not parse VtxID '" << sensor << "'");
       m_id.id = 0;
     }
     //There is stuff left, warn about it
     if (!in.eof()) {
-      cout << "Stuff at end of ID" << endl;
+      B2WARNING("VxdID did not consume complete string");
     }
   }
 

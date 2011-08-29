@@ -118,7 +118,7 @@ namespace Belle2 {
       GearDir m_components;
       std::map<std::string, GeoPXDComponent> m_componentCache;
       GeoPXDLadder m_ladder;
-      SensitiveDetector* m_sensitive;
+      std::vector<SensitiveDetector*> m_sensitive;
     };
 
   }

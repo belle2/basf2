@@ -3,7 +3,8 @@
  * Copyright(C) 2010-2011  Belle II Collaboration                         *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Andreas Moll, Zbynek Drasal, Peter Kvasnicka                                          *
+ * Contributors: Andreas Moll, Zbynek Drasal, Peter Kvasnicka             *
+ *               Martin Ritter                                            *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -37,8 +38,8 @@ using namespace std;
 namespace Belle2 {
   namespace pxd {
 
-    SensitiveDetector::SensitiveDetector():
-        Simulation::SensitiveDetectorBase("PXD", SensitiveDetector::PXD)
+    SensitiveDetector::SensitiveDetector(VXD::SensorInfoBase* sensorInfo):
+        VXD::SensitiveDetectorBase(sensorInfo)
     {
       StoreArray<MCParticle> mcParticles;
       StoreArray<PXDSimHit>  pxdSimHits;

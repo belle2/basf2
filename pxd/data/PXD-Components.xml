@@ -27,8 +27,9 @@
       <height unit="mm"> 0.075</height>
       <stepSize unit="um">5</stepSize>
       <pixelsR>250</pixelsR>
-      <pixelsZ>768</pixelsZ>
-      <!--FIXME: Add segmented pixels in Z-->
+      <pixelsZ>512</pixelsZ>
+      <pixelsZ>256</pixelsZ>
+      <splitLength unit="mm">30.720</splitLength>
       <!--TODO: Add sensor properties needed by digitizer/clustering -->
     </Active>
     <!--TODO: Glue-->
@@ -68,8 +69,9 @@
       <height unit="mm"> 0.075</height>
       <stepSize unit="um">5</stepSize>
       <pixelsR>250</pixelsR>
-      <pixelsZ>768</pixelsZ>
-      <!--FIXME: Add segmented pixels in Z-->
+      <pixelsZ>512</pixelsZ>
+      <pixelsZ>256</pixelsZ>
+      <splitLength unit="mm">43.520</splitLength>
       <!--TODO: Add sensor properties needed by digitizer/clustering -->
     </Active>
 

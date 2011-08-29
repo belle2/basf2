@@ -11,6 +11,8 @@
 
 #include <pxd/geometry/GeoPXDCreator.h>
 #include <pxd/vxd/VxdID.h>
+#include <pxd/vxd/GeoCache.h>
+#include <pxd/geometry/SensorInfo.h>
 
 #include <geometry/Materials.h>
 #include <geometry/CreatorFactory.h>
@@ -36,6 +38,7 @@
 #include <G4Polycone.hh>
 #include <G4SubtractionSolid.hh>
 #include <G4UserLimits.hh>
+#include <G4RegionStore.hh>
 
 using namespace std;
 using namespace boost;
@@ -59,12 +62,19 @@ namespace Belle2 {
 
     GeoPXDCreator::GeoPXDCreator()
     {
-      m_sensitive = new SensitiveDetector();
     }
 
     GeoPXDCreator::~GeoPXDCreator()
     {
-      delete m_sensitive;
+      //Lets assume that is impossible that SVD lives on while PXD gets destructed,
+      //so we can just clean the geometry cache here
+      VXD::GeoCache::getInstance().clear();
+
+      //Delete all sensitive detectors
+      BOOST_FOREACH(SensitiveDetector* sensitive, m_sensitive) {
+        delete sensitive;
+      }
+      m_sensitive.clear();
     }
 
     G4Transform3D GeoPXDCreator::getAlignment(const string& component)
@@ -308,17 +318,29 @@ namespace Belle2 {
         // local x (called u) should point in RPhi direction
         // local y (called v) should point in global z
         // local z (called w) should away from the origin
-        G4Box* activeShape = new G4Box(name + ".Active", s.active.width / 2.0, s.active.length / 2.0, s.active.height / 2.0);
-        G4LogicalVolume* active = new G4LogicalVolume(activeShape,  Materials::get(s.material), name + ".Active",
-                                                      0, m_sensitive);
-        active->SetUserLimits(new G4UserLimits(s.active.stepSize * cm));
+        G4Box* activeShape = new G4Box(
+          name + ".Active",
+          s.info.getWidth() / Unit::mm / 2.0,
+          s.info.getLength() / Unit::mm / 2.0,
+          s.info.getThickness() / Unit::mm / 2.0
+        );
+
+        //Create appropriate sensitive detector instance
+        SensorInfo* sensorInfo = new SensorInfo(s.info);
+        sensorInfo->setID(sensorID);
+        SensitiveDetector *sensitive = new SensitiveDetector(sensorInfo);
+        m_sensitive.push_back(sensitive);
+
+        G4LogicalVolume* active = new G4LogicalVolume(activeShape,  Materials::get(s.material),
+                                                      name + ".Active", 0, sensitive);
+        active->SetUserLimits(new G4UserLimits(s.active.stepSize));
         setColor(*active, "#ddd");
         //The coordinates of the active region are given relative to the corner of the sensor, not to the center
         //so we convert them. If the sensor is flipped, the sign of coordinates need to be inverted
-        double activeU = (s.active.u + (s.active.width - s.width) / 2.0) * (s.flipU ? -1 : 1);
-        double activeV = (s.active.v + (s.active.length - s.length) / 2.0) * (s.flipV ? -1 : 1);
+        double activeU = (s.active.u + (s.info.getWidth() / Unit::mm - s.width) / 2.0) * (s.flipU ? -1 : 1);
+        double activeV = (s.active.v + (s.info.getLength() / Unit::mm - s.length) / 2.0) * (s.flipV ? -1 : 1);
         //active area is always at the top, so active.w would be active.height, otherwise the same as above
-        double activeW = (s.height - s.active.height) / 2.0 * (s.flipW ? -1 : 1);
+        double activeW = (s.height - s.info.getThickness() / Unit::mm) / 2.0 * (s.flipW ? -1 : 1);
         //Place the active area
         new G4PVPlacement(G4Translate3D(activeU, activeV, activeW), active, name + ".Active",
                           s.volume, false, (int)sensorID);
@@ -458,18 +480,19 @@ namespace Belle2 {
       G4LogicalVolume* envelope(0);
       GearDir envelopeParams(content, "Envelope");
       if (!envelopeParams) {
-        B2WARNING("Could not find definition for PXD Envelope, continuing without envelope");
-        envelope = &topVolume;
-      } else {
-        double minZ(0), maxZ(0);
-        G4Polycone *envelopeCone = createPolyCone("Envelope", GearDir(content, "Envelope/"), minZ, maxZ);
-        string materialName = content.getString("Envelope/Material", "Air");
-        G4Material* material = Materials::get(materialName);
-        if (!material) B2FATAL("Material '" << materialName << "', required by PXD Envelope could not be found");
-        envelope = new G4LogicalVolume(envelopeCone, material, "Envelope");
-        setVisibility(*envelope, false);
-        new G4PVPlacement(G4Transform3D(), envelope, "PXD.Envelope", &topVolume, false, 1);
+        B2FATAL("Could not find definition for PXD Envelope");
       }
+      double minZ(0), maxZ(0);
+      G4Polycone *envelopeCone = createPolyCone("PXD", GearDir(content, "Envelope/"), minZ, maxZ);
+      string materialName = content.getString("Envelope/Material", "Air");
+      G4Material* material = Materials::get(materialName);
+      if (!material) B2FATAL("Material '" << materialName << "', required by PXD Envelope could not be found");
+      envelope = new G4LogicalVolume(envelopeCone, material, "PXD");
+      setVisibility(*envelope, false);
+      G4Region* pxdRegion = G4RegionStore::GetInstance()->FindOrCreateRegion("PXD");
+      envelope->SetRegion(pxdRegion);
+      pxdRegion->AddRootLogicalVolume(envelope);
+      G4VPhysicalVolume* physEnvelope = new G4PVPlacement(getAlignment("PXD"), envelope, "PXD", &topVolume, false, 1);
 
       //Build support
       G4AssemblyVolume* support = createSupport(GearDir(content, "Support/"));
@@ -502,6 +525,22 @@ namespace Belle2 {
           }
         }
       }
+
+      //Now build cache with all transformations
+      VXD::GeoCache::getInstance().findVolumes(physEnvelope);
+
+      //Check hierachy of PXD
+      /*VXD::GeoCache &geo = VXD::GeoCache::getInstance();
+      BOOST_FOREACH(VxdID layer, geo.getLayers()){
+        cout << "Layer " << layer << endl;
+        BOOST_FOREACH(VxdID ladder, geo.getLadders(layer)){
+          cout << "  Ladder " << ladder << ": ";
+          BOOST_FOREACH(VxdID sensor, geo.getSensors(ladder)){
+            cout << sensor << " ";
+          }
+          cout << endl;
+        }
+      }*/
     }
 
     void GeoPXDCreator::setLayer(int layer)
@@ -533,11 +572,19 @@ namespace Belle2 {
       sensor.active = GeoPXDActiveArea(
                         paramsSensor.getLength("Active/u") / Unit::mm,
                         paramsSensor.getLength("Active/v") / Unit::mm,
-                        paramsSensor.getLength("Active/width") / Unit::mm,
-                        paramsSensor.getLength("Active/length") / Unit::mm,
-                        paramsSensor.getLength("Active/height") / Unit::mm,
                         paramsSensor.getLength("Active/stepSize") / Unit::mm
                       );
+      sensor.info = SensorInfo(
+                      VxdID(layer, 0, 0),
+                      paramsSensor.getLength("Active/width"),
+                      paramsSensor.getLength("Active/length"),
+                      paramsSensor.getLength("Active/height"),
+                      paramsSensor.getInt("Active/pixelsR"),
+                      paramsSensor.getInt("Active/pixelsZ[1]"),
+                      paramsSensor.getLength("Active/splitLength", 0),
+                      paramsSensor.getInt("Active/pixelsZ[2]", 0)
+                    );
+
       sensor.components = getSubComponents(paramsSensor);
 
       BOOST_FOREACH(const GearDir &sensorInfo, paramsLadder.getNodes("Sensor")) {

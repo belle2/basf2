@@ -12,6 +12,8 @@
 #ifndef GEOPXDCOMPONENTS_H_
 #define GEOPXDCOMPONENTS_H_
 
+#include <pxd/geometry/SensorInfo.h>
+
 #include <string>
 #include <vector>
 
@@ -30,13 +32,10 @@ namespace Belle2 {
     };
 
     struct GeoPXDActiveArea {
-      GeoPXDActiveArea(double u = 0, double v = 0, double width = 0, double length = 0, double height = 0, double stepSize = 0):
-          u(u), v(v), width(width), length(length), height(height), stepSize(stepSize) {}
+      GeoPXDActiveArea(double u = 0, double v = 0, double stepSize = 0):
+          u(u), v(v), stepSize(stepSize) {}
       double u;
       double v;
-      double width;
-      double length;
-      double height;
       double stepSize;
     };
 
@@ -61,6 +60,7 @@ namespace Belle2 {
       int    sensorID;
       double z;
       GeoPXDActiveArea active;
+      SensorInfo info;
       std::vector<GeoPXDPlacement> components;
     };
 

@@ -94,12 +94,12 @@ void GeoARICHBelleII::create(GearDir& content)
   volGrpARICH->AddNode(contTube, 1, new TGeoTranslation(0.0, 0.0, zCenter));
 
   /*-------------------------------------------*
-    *       Build aerogel planes                *
-    *-------------------------------------------*
-    *  N aerogel layers of "wedge" tiles are    *
-    *  placed. There is an aluminum support     *
-    *  plate in front of the first layer.       *
-    *___________________________________________*/
+   *       Build aerogel planes                *
+   *-------------------------------------------*
+   *  N aerogel layers of "wedge" tiles are    *
+   *  placed. There is an aluminum support     *
+   *  plate in front of the first layer.       *
+   *___________________________________________*/
 
   // get aerogel parameters
   ARICHGeometryPar* arichgp = ARICHGeometryPar::Instance();

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Aerogel desc="Parameter of aRICH aerogel layers">
+  <tileXSize desc="Size of wedge aerogel tile (maximal size in r direction)" unit="mm">180</tileXSize> 	
+  <tileYSize desc="Size of wedge aerogel tile (maximal size in phi direction)" unit="mm">180</tileYSize> 	
+  <tubeInnerRadius desc="Inner radius of aerogel tube" unit="mm">440</tubeInnerRadius>
+  <tubeOuterRadius desc="Outer radius of aerogel tube" unit="mm">1137</tubeOuterRadius>
+  <tileGap desc="Gap between the edges of aerogel tiles" unit="mm">1</tileGap>
+  <tubeMaterial desc="Material that fills the gaps between aerogel tiles">ARICH_TileGapsFill</tubeMaterial>
+
+  <Layers>    
+    <Layer id="1">
+      <material>Aerogel1</material>
+      <zPosition desc="Z position of aerogel plane(beginning)" unit="mm">1670</zPosition>
+      <thickness desc="Thickness of aerogel layer (tiles)" unit="mm">20</thickness>
+    </Layer>
+    <Layer id="2">
+      <material>Aerogel2</material>
+      <zPosition desc="Z position of aerogel plane(beginning)" unit="mm">1690</zPosition>
+      <thickness desc="Thickness of aerogel tiles" unit="mm">20</thickness>
+    </Layer>
+  </Layers>
+  
+  <SupportPlate>
+    <material desc="Material of aerogel support plate">Al</material>
+    <thickness desc="Thickness of aerogel support plate" unit="mm">2</thickness>
+  </SupportPlate>
+  </Aerogel>

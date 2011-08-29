@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DetectorComponent name="ARICH" xmlns:xi="http://www.w3.org/2001/XInclude">
+  <Creator library="arich">ARICHCreator</Creator>
+  <Content>
+    <xi:include href="ARICH-Aerogel.xml"/>
+    <xi:include href="ARICH-Detectors.xml"/>
+    <xi:include href="ARICH-Mirrors.xml"/>
+    <Envelope>
+      <zFront desc="Starting z position of aRICH envelope" unit="mm">1668</zFront>
+      <zBack desc="Ending z position of aRICH envelope" unit="mm">1900</zBack>
+      <outerRadius desc="Outer radius of aRICH envelope" unit="mm">1140</outerRadius> 
+      <innerRadius desc="Inner radius of aRICH evnelope" unit="mm">440</innerRadius> 
+      <material desc="aRICH envelope material: should be air with specified refractive index">ARICH_Air</material>
+    </Envelope>
+  </Content>
+</DetectorComponent>

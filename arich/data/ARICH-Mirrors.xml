@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Mirrors>
+  <Material>ARICH_MirrorQuartz</Material>
+  <nMirrors desc="Mirrors are placed as regular nMirrors-sided polygon">16</nMirrors>
+  <outerRadius desc="Radius of outscribed circle to mirrors polygon" unit="mm">1137</outerRadius>
+  <mirrorThickness desc="Thickness of mirror plates" unit="mm">3</mirrorThickness>
+  <mirrorLength desc="Length of mirror plates" unit="mm">148</mirrorLength>
+  <Zposition desc="position of mirrors in Z direction (starting point)" unit="mm">1710</Zposition>
+  <startAngle desc="Angle of the first corner of mirror plates polygon" unit="deg">11.25</startAngle>
+  <Surface>
+    <Properties>
+      <Property name="REFLECTIVITY" unit="eV">
+	<value energy="1.0">0.78</value> 
+	<value energy="1.25">0.78</value> 
+	<value energy="1.45">0.83</value> 
+	<value energy="1.7">0.9</value> 
+	<value energy="2.1">0.95</value>
+	<value energy="2.7">0.96</value>
+	<value energy="3.1">0.93</value>
+	<value energy="3.5">0.8</value>
+	<value energy="3.66">0.23</value>
+	<value energy="4.1">0.31</value>
+	<value energy="5.8">0.14</value>
+      </Property>
+    </Properties>
+    <Type>dielectric_metal</Type>
+    <Finish>polished</Finish>
+    <Model>glisur</Model>
+  </Surface>
+</Mirrors>

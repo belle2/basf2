@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DetectorComponent name="ARICH_bt" xmlns:xi="http://www.w3.org/2001/XInclude">
+  <Creator library="arich">ARICHCreator</Creator>
+  <Content type="beamtest">
+   
+    <Envelope>
+      <xSize desc="Starting z position of aRICH envelope" unit="mm">1000</xSize>
+      <ySize desc="Ending z position of aRICH envelope" unit="mm">1000</ySize>
+      <zSize desc="Ending z position of aRICH envelope" unit="mm">1000</zSize>
+      <material desc="aRICH envelope material: should be air with specified refractive index">ARICH_Air</material>
+    </Envelope>
+    
+    <Detector>
+      <xi:include href="ARICH-Hapd.xml"/>
+      <zPosition unit="mm">0</zPosition>
+      <Modules>
+	<Module>
+	  <xPos unit="mm">0.0</xPos>
+	  <yPos unit="mm">0.0</yPos>
+	  <angle unit="deg">0.0</angle> 
+	</Module>
+	<Module>
+	  <xPos unit="mm">80</xPos>
+	  <yPos unit="mm">0.0</yPos>
+	  <angle unit="deg">0.0</angle> 
+	</Module>	
+      </Modules>
+    </Detector>
+    
+    <Aerogel desc="Parameter of aRICH aerogel layers">
+      <tileXSize desc="Size of wedge aerogel tile (maximal size in r direction)" unit="mm">180</tileXSize>  
+      <tileYSize desc="Size of wedge aerogel tile (maximal size in phi direction)" unit="mm">180</tileYSize>        
+      <tileXPos unit="mm">0.0</tileXPos>
+      <tileYPos unit="mm">0.0</tileYPos>
+      <Layers>    
+	<Layer id="1">
+	  <material>Aerogel1</material>
+	  <zPosition desc="Z position of aerogel plane(beginning)" unit="mm">200</zPosition>
+	  <thickness desc="Thickness of aerogel layer (tiles)" unit="mm">20</thickness>
+	</Layer>
+	<Layer id="2">
+	  <material>Aerogel2</material>
+	  <zPosition desc="Z position of aerogel plane(beginning)" unit="mm">220</zPosition>
+	  <thickness desc="Thickness of aerogel tiles" unit="mm">20</thickness>
+	</Layer>
+      </Layers>
+    </Aerogel>
+    
+    <Mirrors>
+      <height unit="mm">500</height>
+      <width unit="mm">200</width>      
+      <thickness unit="mm">5</thickness>
+      <material>ARICH_MirrorQuartz</material>      
+      <Mirror>
+	<xPos unit="mm">200</xPos>
+	<yPos unit="mm">0</yPos>
+	<zPos unit="mm">0</zPos>
+	<angle unit="deg">45</angle>
+      </Mirror>
+      <Surface>
+	<Properties>
+	  <Property name="REFLECTIVITY" unit="eV">
+	    <value energy="1.0">0.78</value> 
+	    <value energy="1.25">0.78</value> 
+	    <value energy="1.45">0.83</value> 
+	    <value energy="1.7">0.9</value> 
+	    <value energy="2.1">0.95</value>
+	    <value energy="2.7">0.96</value>
+	    <value energy="3.1">0.93</value>
+	    <value energy="3.5">0.8</value>
+	    <value energy="3.66">0.23</value>
+	    <value energy="4.1">0.31</value>
+	    <value energy="5.8">0.14</value>
+	  </Property>
+	</Properties>
+	<Type>dielectric_metal</Type>
+	<Finish>polished</Finish>
+	<Model>glisur</Model>
+      </Surface>
+    </Mirrors>
+    
+
+  </Content>
+</DetectorComponent>

@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Components>
+  <Version>1.0</Version>
+  <Ladder layer="3">
+    <shift  unit="mm"> 0.000</shift>
+    <radius unit="mm">38.000</radius>
+    <Sensor sensorType="1" id="1" unit="mm" >-34.200</Sensor>
+    <Sensor sensorType="1" id="2" unit="mm" > 88.000</Sensor>
+  </Ladder>
+  <Ladder layer="4">
+    <shift  unit="mm"> 0.000</shift>
+    <radius unit="mm">80.000</radius>
+    <slantedAngle unit="deg">11.9</slantedAngle>
+    <slantedV unit="mm">25.000</slantedV>
+    <Sensor sensorType="4" id="1" unit="mm">-98.810</Sensor>
+    <Sensor sensorType="3" id="2" unit="mm"> 26.190</Sensor>
+    <Sensor sensorType="2" id="3" unit="mm"> 146.010</Sensor>
+  </Ladder>
+  <Ladder layer="5">
+    <shift  unit="mm"> 0.000</shift>
+    <radius unit="mm">115.000</radius>
+    <slantedAngle unit="deg">17.2</slantedAngle>
+    <slantedV unit="mm">36.000</slantedV>
+    <Sensor sensorType="4" id="1" unit="mm">-146.080</Sensor>
+    <Sensor sensorType="3" id="2" unit="mm">-21.080</Sensor>
+    <Sensor sensorType="3" id="3" unit="mm"> 103.920</Sensor>
+    <Sensor sensorType="2" id="4" unit="mm"> 218.360</Sensor>
+  </Ladder>
+  <Ladder layer="6">
+    <shift  unit="mm"> 0.000</shift>
+    <radius unit="mm">140.000</radius>
+    <slantedAngle unit="deg">21.1</slantedAngle>
+    <slantedV unit="mm">41.991</slantedV>
+    <Sensor sensorType="4" id="1" unit="mm">-197.560</Sensor>
+    <Sensor sensorType="3" id="2" unit="mm">-72.560</Sensor>
+    <Sensor sensorType="3" id="3" unit="mm"> 52.440</Sensor>
+    <Sensor sensorType="3" id="4" unit="mm"> 177.440</Sensor>
+    <Sensor sensorType="2" id="5" unit="mm"> 289.325</Sensor>
+  </Ladder>
+
+  <!--FOR SENSOR TYPE DESCRIPTION SEE PETER KODYS'S FILE FROM B2GM 2010-->
+  <!--TODO -> Set properties of the sensors ie. number of strips. -->
+  <Sensor sensorType="1">
+    <Color>#006699</Color>
+    <Material>Si</Material>
+    <width  unit="mm">38.400</width>
+    <length unit="mm">124.880</length>
+    <height unit="mm"> 0.320</height>
+    <Active>
+      <u unit="mm"> 0.940</u>
+      <v unit="mm"> 0.990</v>
+      <width  unit="mm">36.520</width>
+      <length unit="mm">122.900</length>
+      <height unit="mm"> 0.320</height>
+      <stepSize unit="um">5</stepSize>
+    </Active>
+    <Component type="KaptonFrontSmallSensor">
+      <u unit="mm"> 19.200</u> <v unit="mm"> 62.440</v> <w unit="mm"> above</w>
+    </Component>
+  </Sensor>
+  <Sensor sensorType="2">
+    <Color>#006699</Color>
+    <Material>Si</Material>
+    <width  unit="mm">60.630</width>
+    <width2 unit="mm">41.020</width2>
+    <length unit="mm">125.580</length>
+    <height unit="mm">0.300</height>
+    <Active>
+      <u unit="mm"> 1.520</u>
+      <v unit="mm"> 1.300</v>
+      <width  unit="mm">57.590</width>
+      <width2 unit="mm">38.420</width2>
+      <length unit="mm">122.760</length>
+      <height unit="mm"> 0.300</height>
+      <stepSize unit="um">5</stepSize>
+    </Active>
+    <Component type="KaptonFrontSlanted">
+      <u unit="mm"> 30.315</u> <v unit="mm"> 62.790</v> <w unit="mm"> above </w>
+    </Component>
+    <Component type="KaptonSlanted">
+      <u unit="mm"> 30.315</u> <v unit="mm"> 62.790</v> <w unit="mm"> above</w>
+    </Component>
+  </Sensor>
+  <Sensor sensorType="3">
+    <Color>#006699</Color>
+    <Material>Si</Material>
+    <width  unit="mm">59.600</width>
+    <length unit="mm">124.880</length>
+    <height unit="mm"> 0.320</height>
+    <Active>
+      <u unit="mm"> 0.940</u>
+      <v unit="mm"> 0.990</v>
+      <width  unit="mm">57.720</width>
+      <length unit="mm">122.900</length>
+      <height unit="mm"> 0.320</height>
+      <stepSize unit="um">5</stepSize>
+    </Active>
+    <Component type="KaptonFlex">
+      <u unit="mm"> 29.800</u> <v unit="mm"> 62.440</v> <w unit="mm"> below </w>
+    </Component>
+    <Component type="RohacellPad">
+      <u unit="mm"> 29.800</u> <v unit="mm"> 62.440</v> <w unit="mm"> above </w>
+    </Component>
+    <Component type="Kapton">
+      <u unit="mm"> 29.800</u> <v unit="mm"> 62.440</v> <w unit="mm"> above </w>
+    </Component>
+    <Component type="Chips">
+      <u unit="mm"> 31.400</u> <v unit="mm"> 62.440</v> <w unit="mm"> above </w>
+    </Component>
+  </Sensor>
+  <Sensor sensorType="4">
+    <Color>#006699</Color>
+    <Material>Si</Material>
+    <width  unit="mm">59.600</width>
+    <length unit="mm">124.880</length>
+    <height unit="mm"> 0.320</height>
+    <Active>
+      <u unit="mm"> 0.940</u>
+      <v unit="mm"> 0.990</v>
+      <width  unit="mm">57.720</width>
+      <length unit="mm">122.900</length>
+      <height unit="mm"> 0.320</height>
+      <stepSize unit="um">5</stepSize>
+    </Active>
+    <Component type="KaptonFrontBigSensor">
+      <u unit="mm"> 29.800</u> <v unit="mm"> 62.440</v> <w unit="mm"> above</w>
+    </Component>
+    <Component type="Kapton">
+      <u unit="mm"> 29.800</u> <v unit="mm"> 62.440</v> <w unit="mm"> above</w>
+    </Component>
+  </Sensor>
+  <!-- Do we need sensor type 5? -->
+  <!--Sensor sensorType="5">
+    <Color>#006699</Color>
+    <Material>Si</Material>
+    <width  unit="mm">38.400</width>
+    <length unit="mm">124.880</length>
+    <height unit="mm"> 0.320</height>
+    <Active>
+      <u unit="mm"> 0.000</u>
+      <v unit="mm"> 0.000</v>
+      <width  unit="mm">36.520</width>
+      <length unit="mm">122.900</length>
+      <height unit="mm"> 0.320</height>
+      <stepSize unit="um">5</stepSize>
+    </Active>
+    <Component type="KaptonFrontLayer3">
+      <u unit="mm"> 19.000</u> <v unit="mm"> 62.440</v> <w unit="mm"> above</w>
+    </Component>
+  </Sensor-->
+
+  <Component name="KaptonFrontSmallSensor">
+    <Material>SVD_KaptonFront</Material>
+    <Color>#660000</Color>
+    <width  unit="mm">38.400</width>
+    <length unit="mm">124.880</length>
+    <height unit="mm">0.100</height>
+  </Component>
+  <Component name="KaptonFrontBigSensor">
+    <Material>SVD_KaptonFront</Material>
+    <Color>#660000</Color>
+    <width  unit="mm">59.600</width>
+    <length unit="mm">124.880</length>
+    <height unit="mm">0.100</height>
+  </Component>
+  <Component name="Kapton">
+    <Material>SVD_Kapton</Material>
+    <Color>#550011</Color>
+    <width  unit="mm">59.600</width>
+    <length unit="mm">124.880</length>
+    <height unit="mm">0.150</height>
+  </Component>
+  <Component name="KaptonFlex">
+    <Material>SVD_KaptonFlex</Material>
+    <Color>#110000</Color>
+    <width  unit="mm">59.600</width>
+    <length unit="mm">124.880</length>
+    <height unit="mm">0.025</height>
+  </Component>
+  <Component name="RohacellPad">
+    <Material>SVD_RohacellPad</Material>
+    <Color>#220000</Color>
+    <width  unit="mm">59.600</width>
+    <length unit="mm">124.880</length>
+    <height unit="mm">1.000</height>
+  </Component>
+  <Component name="Chips">
+    <Material>SVD_SiliconChips</Material>
+    <Color>#440000</Color>
+    <width  unit="mm">8.055</width>
+    <length unit="mm">124.880</length>
+    <height unit="mm">0.400</height>
+  </Component>
+  <Component name="KaptonFrontSlanted">
+    <Material>SVD_KaptonFront</Material>
+    <Color>#440000</Color>
+    <width  unit="mm">60.630</width>
+    <width2 unit="mm">41.020</width2>
+    <length unit="mm">125.580</length>
+    <height unit="mm">0.100</height>
+  </Component>
+  <Component name="KaptonSlanted">
+    <Material>SVD_Kapton</Material>
+    <Color>#440011</Color>
+    <width  unit="mm">60.630</width>
+    <width2 unit="mm">41.020</width2>
+    <length unit="mm">125.580</length>
+    <height unit="mm">0.150</height>
+  </Component>
+</Components>

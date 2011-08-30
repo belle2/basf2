@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DetectorComponent name="SVD" xmlns:xi="http://www.w3.org/2001/XInclude">
+  <Creator library="svd">SVDCreator</Creator>
+  <Content>
+    <!--TODO -> Add mechanical support and cooling -->
+    <xi:include href="SVD-Alignment.xml"/>
+    <xi:include href="SVD-Envelope.xml"/>
+    <xi:include href="SVD-Components.xml"/>
+    <HalfShell name="Pat">
+      <Layer id="3">
+        <Ladder id="1"><phi unit="deg">0</phi></Ladder>
+        <Ladder id="2"><phi unit="deg">45</phi></Ladder>
+        <Ladder id="3"><phi unit="deg">90</phi></Ladder>
+        <Ladder id="4"><phi unit="deg">135</phi></Ladder>
+      </Layer>
+      <Layer id="4">
+        <Ladder id="1"><phi unit="deg">0</phi></Ladder>
+        <Ladder id="2"><phi unit="deg">36</phi></Ladder>
+        <Ladder id="3"><phi unit="deg">72</phi></Ladder>
+        <Ladder id="4"><phi unit="deg">108</phi></Ladder>
+        <Ladder id="5"><phi unit="deg">144</phi></Ladder>
+      </Layer>
+      <Layer id="5">
+        <Ladder id="1"><phi unit="deg">0</phi></Ladder>
+        <Ladder id="2"><phi unit="deg">25.7143</phi></Ladder>
+        <Ladder id="3"><phi unit="deg">51.4286</phi></Ladder>
+        <Ladder id="4"><phi unit="deg">77.1429</phi></Ladder>
+        <Ladder id="5"><phi unit="deg">102.8572</phi></Ladder>
+        <Ladder id="6"><phi unit="deg">128.5715</phi></Ladder>
+        <Ladder id="7"><phi unit="deg">154.2858</phi></Ladder>
+      </Layer>
+      <Layer id="6">
+        <Ladder id="1"><phi unit="deg">0</phi></Ladder>
+        <Ladder id="2"><phi unit="deg">21.17647</phi></Ladder>
+        <Ladder id="3"><phi unit="deg">42.35294</phi></Ladder>
+        <Ladder id="4"><phi unit="deg">63.52941</phi></Ladder>
+        <Ladder id="5"><phi unit="deg">84.70588</phi></Ladder>
+        <Ladder id="6"><phi unit="deg">105.88235</phi></Ladder>
+        <Ladder id="7"><phi unit="deg">127.05882</phi></Ladder>
+        <Ladder id="8"><phi unit="deg">148.23529</phi></Ladder>
+        <Ladder id="9"><phi unit="deg">169.41176</phi></Ladder>
+      </Layer>
+    </HalfShell>
+    <HalfShell name="Mat">
+      <Layer id="3">
+        <Ladder id="5"><phi unit="deg">180</phi></Ladder>
+        <Ladder id="6"><phi unit="deg">225</phi></Ladder>
+        <Ladder id="7"><phi unit="deg">270</phi></Ladder>
+        <Ladder id="8"><phi unit="deg">315</phi></Ladder>
+      </Layer>
+      <Layer id="4">
+        <Ladder id="6"><phi unit="deg">180</phi></Ladder>
+        <Ladder id="7"><phi unit="deg">216</phi></Ladder>
+        <Ladder id="8"><phi unit="deg">252</phi></Ladder>
+        <Ladder id="9"><phi unit="deg">288</phi></Ladder>
+        <Ladder id="10"><phi unit="deg">324</phi></Ladder>
+      </Layer>
+      <Layer id="5">
+        <Ladder id="8"><phi unit="deg">180.0000</phi></Ladder>
+        <Ladder id="9"><phi unit="deg">205.7143</phi></Ladder>
+        <Ladder id="10"><phi unit="deg">231.4286</phi></Ladder>
+        <Ladder id="11"><phi unit="deg">257.1429</phi></Ladder>
+        <Ladder id="12"><phi unit="deg">282.8572</phi></Ladder>
+        <Ladder id="13"><phi unit="deg">308.5715</phi></Ladder>
+        <Ladder id="14"><phi unit="deg">334.2858</phi></Ladder>
+      </Layer>
+      <Layer id="6">
+        <Ladder id="10"><phi unit="deg">190.58823</phi></Ladder>
+        <Ladder id="11"><phi unit="deg">211.76470</phi></Ladder>
+        <Ladder id="12"><phi unit="deg">232.94117</phi></Ladder>
+        <Ladder id="13"><phi unit="deg">254.11764</phi></Ladder>
+        <Ladder id="14"><phi unit="deg">275.29411</phi></Ladder>
+        <Ladder id="15"><phi unit="deg">296.47058</phi></Ladder>
+        <Ladder id="16"><phi unit="deg">317.64705</phi></Ladder>
+        <Ladder id="17"><phi unit="deg">338.82352</phi></Ladder>
+      </Layer>
+    </HalfShell>
+  </Content>
+</DetectorComponent>

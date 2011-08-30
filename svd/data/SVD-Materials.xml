@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Materials>
+   <Material name="SVD_KaptonClean">
+    <state>Solid</state>
+    <Components>
+      <Material fraction="0.2564">H</Material>
+      <Material fraction="0.5641">C</Material>
+      <Material fraction="0.0513">O</Material>
+      <Material fraction="0.1282">N</Material>
+    </Components>
+  </Material>
+  <Material name="SVD_Conductives">
+    <state>Solid</state>
+    <Components>
+      <Material fraction="0.8982">Cu</Material>
+      <Material fraction="0.0778">Ni</Material>
+      <Material fraction="0.0240">Ag</Material>
+    </Components>
+  </Material>
+  <Material name="SVD_Conductives2">
+    <state>Solid</state>
+    <Components>
+      <Material fraction="0.7463">Cu</Material>
+      <Material fraction="0.2089">Ni</Material>
+      <Material fraction="0.0448">Ag</Material>
+    </Components>
+  </Material>
+  <Material name="SVD_Glue">
+    <state>Solid</state>
+    <Components>
+      <Material fraction="0.4390">C</Material>
+      <Material fraction="0.0732">O</Material>
+      <Material fraction="0.4878">H</Material>
+    </Components>
+  </Material>
+  <Material name="SVD_Rohacell">
+    <state>Solid</state>
+    <Components>
+      <Material fraction="0.3636">C</Material>
+      <Material fraction="0.0909">O</Material>
+      <Material fraction="0.5000">H</Material>
+      <Material fraction="0.0455">N</Material>
+    </Components>
+  </Material>
+  <Material name="SVD_KaptonFront">
+    <state>Solid</state>
+    <Components>
+      <Material fraction="0.9381">SVD_KaptonClean</Material>
+      <Material fraction="0.0281">SVD_Conductives2</Material>
+      <Material fraction="0.0338">SVD_Glue</Material>
+    </Components>
+  </Material>
+  <Material name="SVD_Kapton">
+    <state>Solid</state>
+    <Components>
+      <Material fraction="0.8970">SVD_KaptonClean</Material>
+      <Material fraction="0.0599">SVD_Conductives2</Material>
+      <Material fraction="0.0431">SVD_Glue</Material>
+    </Components>
+  </Material>
+  <Material name="SVD_KaptonFlex">
+    <state>Solid</state>
+    <Components>
+      <Material fraction="0.5921">SVD_KaptonClean</Material>
+      <Material fraction="0.2373">SVD_Conductives2</Material>
+      <Material fraction="0.1706">SVD_Glue</Material>
+    </Components>
+  </Material>
+  <Material name="SVD_RohacellPad">
+    <state>Solid</state>
+    <Components>
+      <Material fraction="1.000">SVD_Rohacell</Material>
+    </Components>
+  </Material>
+  <Material name="SVD_SiliconChips">
+    <state>Solid</state>
+    <Components>
+      <Material fraction="1.000">Si</Material>
+    </Components>
+  </Material>
+
+  <Material name="SVD_CoolingPipe">
+    <state>Solid</state>
+    <Components>
+      <Material fraction="1.000">Fe</Material>
+    </Components>
+  </Material>
+
+</Materials>

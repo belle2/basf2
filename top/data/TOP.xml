@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DetectorComponent name="TOP" xmlns:xi="http://www.w3.org/2001/XInclude">
+    <Creator library="top">TOPCreator</Creator>
+    <Content>
+        <xi:include href="TOP-Bars.xml"/>
+        <xi:include href="TOP-BarsAlignement.xml"/>
+        <xi:include href="TOP-Detector.xml"/>
+        <xi:include href="TOP-DetectorAlignement.xml"/>
+        <xi:include href="TOP-Materials.xml"/>
+        <xi:include href="TOP-Support.xml"/>
+        <xi:include href="TOP-Mirror.xml"/>
+        <xi:include href="TOP-SupportAlignement.xml"/>
+    </Content>
+</DetectorComponent>

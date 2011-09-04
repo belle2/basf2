@@ -12,16 +12,12 @@
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
-#include <framework/gearbox/Unit.h>
-#include <framework/logging/Logger.h>
 #include <generators/dataobjects/MCParticle.h>
+//#include <framework/gearbox/Unit.h>
+//#include <framework/logging/Logger.h>
 
 #include <bklm/dataobjects/BKLMSimHit.h>
 #include <bklm/dataobjects/BKLMStrip.h>
-
-//#include <cstdlib>
-//#include <iomanip>
-//#include <math.h>
 
 using namespace std;
 using namespace Belle2;

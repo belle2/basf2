@@ -12,6 +12,8 @@
 #define TOPSENSITIVEQUARTZ_H
 
 #include <simulation/kernel/SensitiveDetectorBase.h>
+#include <top/geometry/TOPGeometryPar.h>
+
 
 namespace Belle2 {
   namespace top {
@@ -29,12 +31,15 @@ namespace Belle2 {
       SensitiveQuartz();
 
       /**
-       * Process each step and calculate variables defined in PXDSimHit.
+       * Process each step and calculate variables defined in TOPSimHit.
        * @param aStep Current Geant4 step in the sensitive medium.
        * @result true if a hit was stored, o.w. false.
        */
       bool step(G4Step* aStep, G4TouchableHistory*);
 
+    protected:
+      //! used for reading parameters from the xml
+      TOPGeometryPar* m_topgp;
     };
 
   } // end of namespace top

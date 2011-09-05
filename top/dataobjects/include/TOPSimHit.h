@@ -19,8 +19,8 @@ namespace Belle2 {
 
   //! Class TOPSimHit - Geant4 simulated hit for TOP.
   /*!
-    This is a class to store TOP geant4 hit in datastore.
-    It is also the input for digitization module (TOPDigi).
+   This is a class to store TOP geant4 hit in datastore.
+   It is also the input for digitization module (TOPDigi).
    */
 
   class TOPSimHit : public TObject {
@@ -29,6 +29,7 @@ namespace Belle2 {
     //! Default constructor
     TOPSimHit():
         m_moduleID(0),
+        m_barID(0),
         m_position(0, 0, 0),
         m_globalTime(0),
         m_energy(0),
@@ -38,15 +39,16 @@ namespace Belle2 {
 
     //! Full constructor.
     /*!
-      \param moduleID ID of hapd module containing hit
-      \param position vector of hit local position (in module coor. sys.)
-      \param globalTime global time of photon hit
-      \param energy energy of photon
-      \param parentID geant4 id of photon parent particle
-    */
+     \param moduleID ID of hapd module containing hit
+     \param position vector of hit local position (in module coor. sys.)
+     \param globalTime global time of photon hit
+     \param energy energy of photon
+     \param parentID geant4 id of photon parent particle
+     */
 
     TOPSimHit(
       int moduleID,
+      int barID,
       TVector3 position,
       double globalTime,
       double energy,
@@ -61,6 +63,9 @@ namespace Belle2 {
 
     //! Get ID number of module that registered hit
     int getModuleID() const { return m_moduleID; }
+
+    //! Get ID number of bar that registered hit
+    int getBarID() const { return m_barID; }
 
     //! Get local position of hit (in module coordinates)
     const TVector3& getLocalPosition() const { return m_position; }
@@ -91,6 +96,7 @@ namespace Belle2 {
 
   private:
     int m_moduleID;           /**< ID number of module that registered hit*/
+    int m_barID;           /**< ID number of bar that registered hit*/
     TVector3 m_position;      /**< Local position of hit (in module coordinates) */
     double m_globalTime;      /**< Global time of hit */
     double m_energy;          /**< Energy of detected photon */

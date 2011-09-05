@@ -24,15 +24,13 @@ using namespace Belle2;
 
 TOPGeometryPar* TOPGeometryPar::p_B4TOPGeometryParDB = 0;
 
-TOPGeometryPar* TOPGeometryPar::Instance(const GearDir& content)
+TOPGeometryPar* TOPGeometryPar::Instance()
 {
   if (!p_B4TOPGeometryParDB) {
     p_B4TOPGeometryParDB = new TOPGeometryPar();
-    p_B4TOPGeometryParDB->Initialize(content);
   }
   return p_B4TOPGeometryParDB;
 }
-
 
 TOPGeometryPar::TOPGeometryPar()
 {

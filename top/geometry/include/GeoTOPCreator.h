@@ -31,7 +31,7 @@ namespace Belle2 {
     class SensitiveDetector;
     class SensitiveQuartz;
 
-    /** The creator for the PXD geometry of the Belle II detector.   */
+    /** The creator for the TOP geometry of the Belle II detector.   */
     class GeoTOPCreator : public geometry::CreatorBase {
 
     public:
@@ -58,18 +58,21 @@ namespace Belle2 {
        *         could not be found
        */
 
+      //! This function quartz bar
       G4AssemblyVolume* buildBar(const GearDir& content);
+      //! This function constructs the case for the quertz bar
       G4LogicalVolume* buildSupport(const GearDir& content);
+      //! This function constructs a stack of 2x16 PMTS
       G4LogicalVolume* buildPMTstack(const GearDir& content);
+      //! This function constructs one pmt
       G4LogicalVolume* buildPMT(const GearDir& content);
 
     protected:
-      //      GearDir m_alignment;
-      // GearDir m_components;
-      // std::map<std::string, GeoPXDComponent> m_componentCache;
-      //GeoPXDLadder m_ladder;
+      //! This sensitive volume is used to store hits in the PMT
       SensitiveDetector* m_sensitive;
+      //! This sensitive volume is used to store hits in the qurtz and is used as loong the trackign is not finished
       SensitiveQuartz* m_sensitiveQuartz;
+      //! used for reading parameters from the xml
       TOPGeometryPar* m_topgp;
     };
 

@@ -43,7 +43,7 @@ namespace Belle2 {
     /*!
      \return A reference to an instance of this class.
      */
-    static TOPGeometryPar* Instance(const GearDir& content);
+    static TOPGeometryPar* Instance();
 
     //! Initialize
     void Initialize(const GearDir& content);

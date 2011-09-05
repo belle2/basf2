@@ -11,6 +11,7 @@
 #include <top/simulation/SensitiveQuartz.h>
 #include <top/dataobjects/TOPQuartzHit.h>
 #include <framework/logging/Logger.h>
+#include <top/geometry/TOPGeometryPar.h>
 
 #include <G4Step.hh>
 #include <G4Track.hh>
@@ -30,15 +31,17 @@ namespace Belle2 {
   namespace top {
 
     SensitiveQuartz::SensitiveQuartz():
-        Simulation::SensitiveDetectorBase("TOP", SensitiveQuartz::TOP)
+        Simulation::SensitiveDetectorBase("TOP", SensitiveQuartz::TOP), m_topgp(TOPGeometryPar::Instance())
     {
       StoreArray<MCParticle> mcParticles;
       StoreArray<TOPQuartzHit>  topQuartzHits;
     }
 
+
     bool SensitiveQuartz::step(G4Step* aStep, G4TouchableHistory*)
     {
       // Get track parameters
+
 
       G4Track* aTrack = aStep->GetTrack();
       G4StepPoint* PrePosition =  aStep->GetPreStepPoint();
@@ -51,21 +54,33 @@ namespace Belle2 {
       if (PDGCharge == 0) return(true);
 
       // Track parameters are saved at the entrance in quarz bar
-      if (((PrePosition->GetStepStatus() == fGeomBoundary)) && (momentum.z() > 0)) {
 
-        /*       B2INFO ("SensQuartz: " << aTrack->GetDefinition()->GetParticleName()
+      if (((PrePosition->GetStepStatus() == fGeomBoundary))) {
+
+        G4ThreeVector localPosition = PrePosition->GetTouchableHandle()->GetHistory()->GetTopTransform().TransformPoint(worldPosition);
+
+        if (fabs(localPosition.y() + m_topgp->getQthickness() / 2.0) > 10e-14) return(true);
+
+
+
+        /**
+         B2INFO ("SensQuartz: " << aTrack->GetDefinition()->GetParticleName()
          << " " << aTrack->GetTrackID()
          << " " << aTrack->GetParentID()
+         << " " << material
+         << " " << G4BestUnit(localPosition,"Length")
          << " " << G4BestUnit(worldPosition,"Length")
          << " " << G4BestUnit(aTrack->GetMomentum(), "Energy")
          << " " << G4BestUnit(aTrack->GetGlobalTime(), "Time")
          << " Edep is " << G4BestUnit(aStep->GetTotalEnergyDeposit(),"Energy"));
          */
 
+
+
         int trackID = aTrack->GetTrackID();
         int  PDGEncoding = particle->GetPDGEncoding();
 
-        G4ThreeVector localPosition = PrePosition->GetTouchableHandle()->GetHistory()->GetTopTransform().TransformPoint(worldPosition);
+
         TVector3 TPosition(worldPosition.x() * Unit::mm, worldPosition.y() * Unit::mm, worldPosition.z() * Unit::mm);
         TVector3 TMomentum(momentum.x() * Unit::MeV, momentum.y() * Unit::MeV , momentum.z() * Unit::MeV);
 
@@ -73,7 +88,7 @@ namespace Belle2 {
         StoreArray<TOPQuartzHit> topQuartzHits;
         int nentr = topQuartzHits->GetLast() + 1;
         new(topQuartzHits->AddrAt(nentr)) TOPQuartzHit(trackID, PDGEncoding, TPosition, TMomentum);
-        B2INFO("Quartz Hit.");
+        //! B2INFO("Quartz Hit.");
 
       }
       return true;

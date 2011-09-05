@@ -39,7 +39,7 @@ namespace Belle2 {
     {
       //Get particle ID
       G4Track& track  = *aStep->GetTrack();
-      // if (track.GetDefinition()->GetParticleName() != "opticalphoton") return false;
+      if (track.GetDefinition()->GetParticleName() != "opticalphoton") return false;
 
       //Get time (check for proper global time)
       const G4double globalTime = track.GetGlobalTime();
@@ -61,7 +61,8 @@ namespace Belle2 {
       const G4int moduleID = preStep.GetTouchableHandle()->GetReplicaNumber(1);
       const G4int barID = preStep.GetTouchableHandle()->GetReplicaNumber(3);
 
-      B2INFO("replica number: " << moduleID << " bar number: " << barID);
+      //! B2INFO("replica number: " << moduleID << " bar number: " << barID);
+
       //Get photon energy
       const G4double energy = track.GetKineticEnergy() / eV;
 
@@ -71,13 +72,13 @@ namespace Belle2 {
       //------------------------------------------------------------
       //                Create TOPSimHit and save it to datastore
       //------------------------------------------------------------
-      /*
-       TVector3 locpos(localPosition.x() / cm, localPosition.y() / cm, localPosition.z() / cm);
-       StoreArray<TOPSimHit> hitArray("TOPSimHitArray");
-       G4int nentr = hitArray->GetEntries();
-       new(hitArray->AddrAt(nentr)) TOPSimHit(moduleID, locpos, globalTime, energy, parentID);
 
-       // after detection photon track is killed */
+      TVector3 locpos(localPosition.x() / cm, localPosition.y() / cm, localPosition.z() / cm);
+      StoreArray<TOPSimHit> topSimHits;
+      G4int nentr = topSimHits->GetEntries();
+      new(topSimHits->AddrAt(nentr)) TOPSimHit(moduleID, barID, locpos, globalTime, energy, parentID);
+
+      // after detection photon track is killed */
       track.SetTrackStatus(fStopAndKill);
 
       return true;

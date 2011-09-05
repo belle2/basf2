@@ -89,6 +89,10 @@ namespace Belle2 {
 
       /*! Build detector segment */
 
+      m_topgp = TOPGeometryPar::Instance();
+      m_topgp->Initialize(content);
+
+
       G4LogicalVolume* air = buildSupport(content);
       G4AssemblyVolume* bar = buildBar(content);
 
@@ -98,7 +102,8 @@ namespace Belle2 {
       bar->MakeImprint(air, transa, rota, 100, false);
 
 
-      m_topgp = TOPGeometryPar::Instance(content);
+
+
       G4double Radius = m_topgp->getRadius() + m_topgp->getQthickness() / 2.0;
       G4int Nbars = m_topgp->getNbars();
 
@@ -124,7 +129,7 @@ namespace Belle2 {
 
       /*!  Define object for reading parameters  */
 
-      m_topgp = TOPGeometryPar::Instance(content);
+      //m_topgp = TOPGeometryPar::Instance(content);
 
       /*!  Read parameters  */
 
@@ -312,7 +317,7 @@ namespace Belle2 {
 
       /*!  Define object for reading parameters  */
 
-      m_topgp = TOPGeometryPar::Instance(content);
+      //m_topgp = TOPGeometryPar::Instance(content);
 
       /*!  Read parameters  */
 
@@ -372,7 +377,7 @@ namespace Belle2 {
       polygon.push_back(G4TwoVector(Bposition - lengthw - dz - dx, -Qthickness / 2.0 - Wextdown - dx));
       polygon.push_back(G4TwoVector(Bposition - lengthw - dz - dx, Qthickness / 2.0 + dx));
 
-      G4ExtrudedSolid* airshape = new  G4ExtrudedSolid("wedge", polygon, Qwidth / 2.0 + dx / 2.0, G4TwoVector(0.0, 0.0), 1.0, G4TwoVector(0.0, 0.0), 1.0);
+      G4ExtrudedSolid* airshape = new  G4ExtrudedSolid("Air", polygon, Qwidth / 2.0 + dx / 2.0, G4TwoVector(0.0, 0.0), 1.0, G4TwoVector(0.0, 0.0), 1.0);
 
 
       GearDir materialNames(content, "Detector/Module");
@@ -393,7 +398,7 @@ namespace Belle2 {
     G4LogicalVolume* GeoTOPCreator::buildPMTstack(const GearDir& content)
     {
 
-      m_topgp = TOPGeometryPar::Instance(content);
+      //m_topgp = TOPGeometryPar::Instance(content);
 
 
       /*! Get PMT dimensions */
@@ -463,7 +468,7 @@ namespace Belle2 {
     G4LogicalVolume* GeoTOPCreator::buildPMT(const GearDir& content)
     {
 
-      m_topgp = TOPGeometryPar::Instance(content);
+      //m_topgp = TOPGeometryPar::Instance(content);
 
 
       /*! Get PMT dimensions */

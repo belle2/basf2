@@ -39,6 +39,7 @@ namespace Belle2 {
     bool loadLibrary(std::string library, bool fullname = true);
   }
 
+  /** General utility functions */
   namespace Utils {
     /**
      * Return current value of the high performance clock.

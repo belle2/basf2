@@ -43,6 +43,8 @@ namespace Belle2 {
     EXPECT_FALSE(RelationArray(evtData, runData, "", DataStore::c_Event, false));
     RelationArray relation(evtData, runData);
     EXPECT_TRUE(RelationArray(evtData, runData, "", DataStore::c_Event, false));
+    string name = relation.getName();
+    EXPECT_TRUE(RelationArray(name));
   }
 
   //Test that adding to an invalid relation yields a FATAL

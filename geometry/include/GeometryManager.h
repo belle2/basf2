@@ -15,8 +15,6 @@
 #include <memory>
 
 class G4VPhysicalVolume;
-class VGMGeometry;
-class TGeoManager;
 
 namespace Belle2 {
 
@@ -68,15 +66,11 @@ namespace Belle2 {
       void clear();
 
       /**
-       * Create a VGM representation of the native geometry description
-       * FIXME: to be implemented
-       * @return Pointer to the VGM representation, ownership goes to the caller
-       */
-      VGMGeometry* createVGMRepresentation();
-
-      /**
-       * Create a TGeo representation of the native geometry description
-       * FIXME: to be implemented
+       * Create a TGeo representation of the native geometry description.
+       *
+       * This method will convert the existing Geometry to a ROOT TGeo
+       * representation which can be accessed using the global gGeoManager
+       * provided by ROOT.
        */
       void createTGeoRepresentation();
 

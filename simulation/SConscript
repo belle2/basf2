@@ -2,7 +2,6 @@ Import('env')
 
 env['LIBS'] = ['framework', 'geometry', 'generators',
                '$ROOT_LIBS', 'Geom', 'EG', 'g4root',
-               'BaseVGM', 'ClhepVGM', 'Geant4GM', 'RootGM',
                '$GEANT4_LIBS', 'G4GMocren', 'CLHEP']
 
 Return('env')

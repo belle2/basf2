@@ -17,21 +17,21 @@ from basf2 import *
 
 # EvtMetaGen - generate event meta data
 evtmetagen = register_module('EvtMetaGen')
-evtruninfo = {'ExpList': [0], 'RunList': [0], 'EvtNumList': [1]}
+evtruninfo = {'ExpList': [0], 'RunList': [1], 'EvtNumList': [1]}
 evtmetagen.param(evtruninfo)
 
 # Geometry parameter loader
-paramloader = register_module('ParamLoaderXML')
+gearbox = register_module('Gearbox')
 
 # Geometry builder
-geobuilder = register_module('GeoBuilder')
+geometry = register_module('Geometry')
 
 # Overlap Checker
-overlapchecker = register_module('OverlapChecker')
-overlapchecker.param('Tolerance', 0.01)
+# overlapchecker = register_module('OverlapChecker')
+# overlapchecker.param('Tolerance', 0.01)
 
 # Saves the geometry as a Root file
-geosaver = register_module('GeoSaver')
+geosaver = register_module('ExportGeometry')
 geosaver.param('Filename', 'Belle2Geo.root')
 
 # Create main path
@@ -39,9 +39,9 @@ main = create_path()
 
 # Add modules to main path
 main.add_module(evtmetagen)
-main.add_module(paramloader)
-main.add_module(geobuilder)
-main.add_module(overlapchecker)
+main.add_module(gearbox)
+main.add_module(geometry)
+# main.add_module(overlapchecker)
 main.add_module(geosaver)
 
 # Process one event

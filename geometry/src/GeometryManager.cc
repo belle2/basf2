@@ -30,6 +30,11 @@
 #include "G4LogicalBorderSurface.hh"
 #include "G4LogicalSkinSurface.hh"
 
+//VGM stuff
+#include "Geant4GM/volumes/Factory.h"
+#include "RootGM/volumes/Factory.h"
+#include "TGeoManager.h"
+
 #include <boost/foreach.hpp>
 #include <memory>
 #include <framework/core/utilities.h>
@@ -117,5 +122,24 @@ namespace Belle2 {
       }
     }
 
+    void GeometryManager::createTGeoRepresentation()
+    {
+      if (!m_topVolume) {
+        B2ERROR("No Geometry found, please create a geometry before converting it to ROOT::TGeo");
+        return;
+      }
+
+      Geant4GM::Factory g4Factory;
+      if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 100, PACKAGENAME())) {
+        g4Factory.SetDebug(1);
+      }
+      g4Factory.Import(m_topVolume);
+      RootGM::Factory rtFactory;
+      if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 100, PACKAGENAME())) {
+        rtFactory.SetDebug(1);
+      }
+      g4Factory.Export(&rtFactory);
+      gGeoManager->CloseGeometry();
+    }
   }
 } //Belle2 namespace

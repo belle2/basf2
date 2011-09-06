@@ -5,6 +5,7 @@
 #pragma link off all functions;
 #pragma link C++ nestedclasses;
 
+#pragma link C++ class Belle2::TOPHit;
 #pragma link C++ class Belle2::TOPSimHit;
 #pragma link C++ class Belle2::TOPQuartzHit;
 

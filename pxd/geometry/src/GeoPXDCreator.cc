@@ -328,6 +328,7 @@ namespace Belle2 {
         //Create appropriate sensitive detector instance
         SensorInfo* sensorInfo = new SensorInfo(s.info);
         sensorInfo->setID(sensorID);
+        if (s.flipV) sensorInfo->flipVSegmentation();
         SensitiveDetector *sensitive = new SensitiveDetector(sensorInfo);
         m_sensitive.push_back(sensitive);
 

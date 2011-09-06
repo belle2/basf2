@@ -21,6 +21,8 @@
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 
+#include <generators/dataobjects/MCParticle.h>
+
 #include <boost/lexical_cast.hpp>
 
 #include "CLHEP/Vector/ThreeVector.h"

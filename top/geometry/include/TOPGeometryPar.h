@@ -16,6 +16,7 @@
 #include <framework/gearbox/Unit.h>
 #include <cmath>
 #include <boost/format.hpp>
+#include <TVector2.h>
 
 using namespace std;
 using namespace boost;
@@ -134,6 +135,9 @@ namespace Belle2 {
     double getMirthickness() const;
     //! get radius of spherical mirror
     double getMirradius() const;
+
+    //! derived function that are part of geometry
+    int getChannelID(TVector2 position, int moduleID) const;
 
   private:
     //! Parameters for bars
@@ -402,9 +406,25 @@ namespace Belle2 {
     return _Mirradius / Unit::mm;
   }
 
+  //! Derived functions which are part of geometry
+  inline int TOPGeometryPar::getChannelID(TVector2 position, int moduleID) const
+  {
 
+    double padx = _Asizex / (double)_Npadx;
+    double pady = _Asizey / (double)_Npady;
+
+    int ix = int((position.X() + _Asizex / 2.0) / padx);
+    int iy = int((position.Y() + _Asizey / 2.0) / pady);
+
+    if (ix > _Npadx - 1 || iy > _Npady - 1) return -1;
+
+    int pmtID = ix + _Npadx * iy;
+
+    int chID = pmtID + moduleID * _Npadx * _Npady;
+
+    return chID;
+  }
 
 } // end of namespace Belle2
 
 #endif
-

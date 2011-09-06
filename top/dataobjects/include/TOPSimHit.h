@@ -54,6 +54,7 @@ namespace Belle2 {
       double energy,
       int parentID):
         m_moduleID(moduleID),
+        m_barID(barID),
         m_position(position),
         m_globalTime(globalTime),
         m_energy(energy),

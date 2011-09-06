@@ -27,7 +27,6 @@ namespace Belle2 {
 
     //! Default constructor
     TOPHit():
-        m_moduleID(0),
         m_barID(0),
         m_channelID(0),
         m_globalTime(0),
@@ -46,13 +45,12 @@ namespace Belle2 {
      */
 
     TOPHit(
-      int moduleID,
       int barID,
       int channelID,
       double globalTime,
       double energy,
       int parentID):
-        m_moduleID(moduleID),
+        m_barID(barID),
         m_channelID(channelID),
         m_globalTime(globalTime),
         m_energy(energy),
@@ -60,8 +58,6 @@ namespace Belle2 {
       /* Does nothing */
     }
 
-    //! Get ID number of module that registered hit
-    int getModuleID() const { return m_moduleID; }
 
     //! Get ID number of bar that registered hit
     int getBarID() const { return m_barID; }
@@ -79,7 +75,7 @@ namespace Belle2 {
     int getParentID() const { return m_parentID; }
 
     //! Set ID number of module that registered hit
-    void setModuleID(int moduleID) { m_moduleID = moduleID; }
+    void setBarID(int barID) { m_barID = barID; }
 
     //! Set global time of hit
     void setGlobalTime(double globalTime) { m_globalTime = globalTime; }
@@ -91,7 +87,6 @@ namespace Belle2 {
     void setParentID(int parentID) { m_parentID = parentID; }
 
   private:
-    int m_moduleID;           /**< ID number of module that registered hit*/
     int m_barID;           /**< ID number of bar that registered hit*/
     int m_channelID;      /**< Channel ID of the hit in the PMT */
     double m_globalTime;      /**< Global time of hit */

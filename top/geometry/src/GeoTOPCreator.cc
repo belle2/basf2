@@ -127,10 +127,6 @@ namespace Belle2 {
     G4AssemblyVolume* GeoTOPCreator::buildBar(const GearDir& content)
     {
 
-      /*!  Define object for reading parameters  */
-
-      //m_topgp = TOPGeometryPar::Instance(content);
-
       /*!  Read parameters  */
 
       //! get width of the quartz bar
@@ -315,10 +311,6 @@ namespace Belle2 {
     G4LogicalVolume* GeoTOPCreator::buildSupport(const GearDir& content)
     {
 
-      /*!  Define object for reading parameters  */
-
-      //m_topgp = TOPGeometryPar::Instance(content);
-
       /*!  Read parameters  */
 
       //! get width of the quartz bar
@@ -398,9 +390,6 @@ namespace Belle2 {
     G4LogicalVolume* GeoTOPCreator::buildPMTstack(const GearDir& content)
     {
 
-      //m_topgp = TOPGeometryPar::Instance(content);
-
-
       /*! Get PMT dimensions */
 
       //! get module side X
@@ -450,7 +439,7 @@ namespace Belle2 {
       for (G4int ix = 0; ix < Npmtx; ix++) {
         for (G4int iy = 0; iy < Npmty; iy++) {
 
-          G4Transform3D tpmt = G4Translate3D(x / 2.0 - dx / 2.0 - (dx + Xgap) * ix , -y / 2.0 + dy / 2.0 + (dy + Ygap) * iy, -dGlue / 2.0);
+          G4Transform3D tpmt = G4Translate3D(-x / 2.0 + dx / 2.0 + (dx + Xgap) * ix , -y / 2.0 + dy / 2.0 + (dy + Ygap) * iy, -dGlue / 2.0);
 
           new G4PVPlacement(tpmt, PMT, "TOP.window", stack, false, (ix + 1)*(iy + 1));
         }
@@ -467,9 +456,6 @@ namespace Belle2 {
 
     G4LogicalVolume* GeoTOPCreator::buildPMT(const GearDir& content)
     {
-
-      //m_topgp = TOPGeometryPar::Instance(content);
-
 
       /*! Get PMT dimensions */
 

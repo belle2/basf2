@@ -1,32 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<ParamSet type="MAT">
-	<Name>EKLMMaterials</Name>
+<Materials>
 	<Description>EKLM material definitions</Description>
 	<Version>0</Version>
-	<Creator>GeoMaterials</Creator>
-	<Content>
-                <Mixture name="Polystyrene">
-                        <Density>1.05</Density>
-                        <Elements>
-                                <Element name="H" weight="0.08333">
-                                        <AtomNumber>1.0</AtomNumber>
-                                        <MassNumber>1.00794</MassNumber>
-                                </Element>
-                                <Element name="C" weight="0.91666">
-                                        <AtomNumber>6.0</AtomNumber>
-                                        <MassNumber>12.0107</MassNumber>
-                                </Element>
-                        </Elements>
-                </Mixture>
-		<Mixture name="Iron">
-			<Density>7.87</Density>
-			<Elements>
-				<Element name="Fe" weight="7.87">
-					<AtomNumber>26</AtomNumber>
-					<MassNumber>55.845</MassNumber>
-				</Element>
-			</Elements>
-		</Mixture>
-	</Content>
-</ParamSet>
+        <Material name="Polystyrene">
+	       	<density unit="g/cm3">1.05</density>
+        	<Elements>
+                	<Element name="H" weight="0.08333">
+                        	<AtomNumber>1.0</AtomNumber>
+				<MassNumber>1.00794</MassNumber>
+                        </Element>
+                        <Element name="C" weight="0.91666">
+				<AtomNumber>6.0</AtomNumber>
+				<MassNumber>12.0107</MassNumber>
+			</Element>
+		</Elements>
+	</Material>
+	<Material name="Iron">
+		<density unit="g/cm3">7.87</density>
+		<Components>
+			<Material fraction="1.0">Fe</Material> 
+		</Components>
+	</Material>
+</Materials>

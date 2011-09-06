@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Galina Pakhlova, Timofey Uglov                           *
+ * Contributors: Galina Pakhlova, Timofey Uglov, Kirill Chilikin          *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -12,18 +12,21 @@
 #define GEOEKLMBELLEII_H_
 
 #include <geometry/CreatorBase.h>
-//#include <structure/geostructure/StructureEndcap.h>
 #include <framework/gearbox/GearDir.h>
+#include <eklm/simeklm/EKLMSensitiveDetector.h>
 
 #include <G4LogicalVolume.hh>
 #include <G4Material.hh>
+#include <G4PVPlacement.hh>
 
 #include <string>
 #include <vector>
 
 namespace Belle2 {
 
-  //!  Position information for the elements of detector
+  static std::map<G4PVPlacement*, G4Transform3D> EKLMVolumeTransforms;
+
+  //! Position information for the elements of detector
   struct EKLMElementPosition {
     double innerR;
     double outerR;
@@ -32,7 +35,6 @@ namespace Belle2 {
     double Y;
     double Z;
   };
-
 
   //!   The GeoEKLMBelleII class.
   //!   The creator for the outer EKLM geometry of the Belle II detector.
@@ -69,19 +71,23 @@ namespace Belle2 {
     void readXMLData(const GearDir& content);
 
     /* Create endcap */
-    void createEndcap(int iEndcap, G4LogicalVolume *mother);
+    void createEndcap(int iEndcap, G4LogicalVolume *mlv);
 
     /* Create layer */
-    void createLayer(int iLayer, G4LogicalVolume *mother);
+    void createLayer(int iLayer, G4LogicalVolume *mlv, G4Transform3D *mtr,
+                     int zOrient);
 
     /* Create sector */
-    void createSector(int iSector, G4LogicalVolume *mother);
+    void createSector(int iSector, G4LogicalVolume *mlv, G4Transform3D *mtr,
+                      int zOrient);
 
     /* Create plane */
-    void createPlane(int iPlane, G4LogicalVolume *mother);
+    void createPlane(int iPlane, int iSector, G4LogicalVolume *mlv,
+                     G4Transform3D *mtr, int zOrient);
 
     /* Create strip */
-    void createStrip(int iStrip, G4LogicalVolume *mother);
+    void createStrip(int iStrip, int iPlane, int iSector, G4LogicalVolume *mlv,
+                     G4Transform3D *mtr);
 
     //! Materials
     G4Material *Air, *Polystyrene, *Iron;
@@ -98,6 +104,9 @@ namespace Belle2 {
 
     //! Names
     std::string Endcap_Name, Layer_Name, Sector_Name, Plane_Name, Strip_Name;
+
+    //! sensitive detector
+    EKLMSensitiveDetector *m_sensitive;
 
   };
 

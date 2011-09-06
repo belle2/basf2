@@ -22,12 +22,13 @@ namespace Belle2 {
     EKLMSimHits are saved into hits collection.
   */
 
-  class EKLMSensitiveDetector  {
+  class EKLMSensitiveDetector : public Simulation::SensitiveDetectorBase  {
 
   public:
 
     //! Constructor
-    EKLMSensitiveDetector(G4String name, G4double thresholdEnergyDeposit, G4double thresholdKineticEnergy);
+    EKLMSensitiveDetector(G4String name, G4double thresholdEnergyDeposit,
+                          G4double thresholdKineticEnergy);
 
     //! Destructor
     ~EKLMSensitiveDetector() {};
@@ -36,7 +37,7 @@ namespace Belle2 {
     void Initialize(G4HCofThisEvent *eventHC);
 
     //! Process each step and calculate variables defined in EKLMHit
-    G4bool ProcessHits(G4Step *aStep, G4TouchableHistory *history);
+    bool step(G4Step *aStep, G4TouchableHistory *history);
 
     //! Do what you want to do at the end of each event
     void EndOfEvent(G4HCofThisEvent *eventHC);
@@ -45,10 +46,12 @@ namespace Belle2 {
     //void AddbgOne(bool doit);
 
   private:
-    //! all hits with energies less than m_ThresholdEnergyDeposit will be dropped
+    //! all hits with energies less than m_ThresholdEnergyDeposit
+    //! will be dropped
     G4double m_ThresholdEnergyDeposit;
 
-    //! all hits with kinetic energies less than m_ThresholdEnergyDeposit will be dropped
+    //! all hits with kinetic energies less than m_ThresholdEnergyDeposit
+    //! will be dropped
     G4double m_ThresholdKineticEnergy;
 
     //! sim hits collection
@@ -62,3 +65,4 @@ namespace Belle2 {
 } // end of namespace Belle2
 
 #endif
+

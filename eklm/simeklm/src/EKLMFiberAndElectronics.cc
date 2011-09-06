@@ -11,6 +11,7 @@
 #include <eklm/simeklm/EKLMFiberAndElectronics.h>
 #include <eklm/geoeklm/GeoEKLMBelleII.h>
 
+#include "G4Box.hh"
 #include "TRandom.h"
 #include "TH1D.h"
 
@@ -58,8 +59,7 @@ namespace Belle2 {
          iHit != vectorHits.end(); iHit++) {
 
       // calculate distance
-      lightPropagationDistance(forwardHitDist, backwardHitDist,
-                               (*iHit)->getPos());
+      lightPropagationDistance(forwardHitDist, backwardHitDist, *iHit);
 
       // calculate # of p.e.
       int nForwardPE = gRandom->Poisson((*iHit)->getEDep() * nPEperMeV);
@@ -92,18 +92,12 @@ namespace Belle2 {
 
   //***********************************************************
 
-  void EKLMFiberAndElectronics::lightPropagationDistance(double &firstHitDist, double &secondHitDist, Hep3Vector pos)
+  void EKLMFiberAndElectronics::lightPropagationDistance(double &firstHitDist,
+                                                         double &secondHitDist, EKLMSimHit *sh)
   {
-
-    double globalPos[] = {pos.x(), pos.y(), pos.z()};
-    double localPos[3];
-    // coordinates in the strip frame
-    //gGeoManager->MasterToLocal(globalPos, localPos);
-    double xmin = 0; // half of the strip length
-    double xmax = 0; // half of the strip length
-    // set strip length
-    // gGeoManager->GetCurrentVolume()->GetShape()->GetAxisRange(1, xmin, xmax);
-    firstHitDist = xmax - localPos[0];           //  direct light hit
+    G4Box *box = (G4Box*)(sh->getPV()->GetLogicalVolume()->GetSolid());
+    double xmax = 2.0 * box->GetXHalfLength();
+    firstHitDist = xmax - (sh->getLocalPos()).x();   //  direct light hit
     secondHitDist = 4 * xmax - firstHitDist;     //  reflected light hit
   }
 

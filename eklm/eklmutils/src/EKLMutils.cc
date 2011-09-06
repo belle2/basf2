@@ -93,8 +93,8 @@ namespace Belle2 {
                        (getVolumeNumber(stripName, "Strip"));
     // tempopary. Used for the procedure checks
     /*  if (!gGeoManager->CheckPath(path.c_str()))
-        B2ERROR("Something goes wrong! Strip path is not found!");
-      return path;*/
+        B2ERROR("Something goes wrong! Strip path is not found!");*/
+    return path;
   }
 
   G4VPhysicalVolume *GetPhysicalVolumeByPoint(const G4ThreeVector &point)

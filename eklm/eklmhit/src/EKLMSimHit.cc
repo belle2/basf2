@@ -24,7 +24,8 @@ void EKLMSimHit::Save(char* filename)
   std::ofstream save_hit(filename, std::fstream::app);
   save_hit << '\n';
   save_hit << "EKLM Hit: \n" ;
-  save_hit << "Position: " << m_pos << '\n'  ;
+  save_hit << "Global position: " << m_global_pos << '\n'  ;
+  save_hit << "Local position: " << m_local_pos << '\n'  ;
   save_hit << "Time: " << m_time << '\n' ;
   save_hit << "Energy Deposition: " <<  m_eDep << '\n' ;
   save_hit << "PDG code: " << m_PDGcode << '\n';

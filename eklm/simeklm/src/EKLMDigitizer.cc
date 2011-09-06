@@ -78,7 +78,7 @@ namespace Belle2 {
         new EKLMFiberAndElectronics(*it);
       fiberAndElectronicsSimulator->processEntry();
 
-      EKLMSimHit *simHit = NULL;
+      EKLMSimHit *simHit = it->second.front();
       EKLMStripHit *stripHit = new EKLMStripHit();
 
       stripHit->setName(it->first);

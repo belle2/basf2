@@ -29,7 +29,9 @@
 namespace Belle2 {
 
 
-  EKLMSensitiveDetector::EKLMSensitiveDetector(G4String name, G4double thresholdEnergyDeposit, G4double thresholdKineticEnergy)
+  EKLMSensitiveDetector::EKLMSensitiveDetector(G4String name,
+                                               G4double thresholdEnergyDeposit, G4double thresholdKineticEnergy)
+      : Simulation::SensitiveDetectorBase(name, KLM)
   {
   }
 
@@ -39,8 +41,8 @@ namespace Belle2 {
 
   //-----------------------------------------------------
   // Method invoked for every step in sensitive detector
-//-----------------------------------------------------
-  G4bool EKLMSensitiveDetector::ProcessHits(G4Step *aStep, G4TouchableHistory *)
+  //-----------------------------------------------------
+  bool EKLMSensitiveDetector::step(G4Step *aStep, G4TouchableHistory *)
   {
     // Get deposited energy
     const G4double eDep = aStep->GetTotalEnergyDeposit();
@@ -61,14 +63,20 @@ namespace Belle2 {
     // get time of hit
     const G4double hitTime = track.GetGlobalTime();
 
-    // drop hit if global time is nan or if it is  mothe than hitTimeThreshold (to avoid nuclei fission signals)
+    G4VPhysicalVolume *pv = aStep->GetPostStepPoint()->GetPhysicalVolume();
+
+    /*
+     * drop hit if global time is nan or if it is  mothe than
+     * hitTimeThreshold (to avoid nuclei fission signals)
+     */
     if (isnan(hitTime)) {
       B2ERROR("EKLMSensitiveDetector: global time is nan");
       return false;
 
       double hitTimeThreshold = 500; // should be parameter or accessev via xml
       if (hitTime > hitTimeThreshold) {
-        B2INFO("EKLMSensitiveDetector:  ALL HITS WITH TIME > hitTimeThreshold ARE DROPPED!!!!!!!");
+        B2INFO("EKLMSensitiveDetector:  "
+               "ALL HITS WITH TIME > hitTimeThreshold ARE DROPPED!!!!!!!");
         return false;
       }
 
@@ -78,15 +86,19 @@ namespace Belle2 {
     // Get particle information
     const G4int PDGcode = track.GetDefinition()->GetPDGEncoding();
 
-    const G4ThreeVector & position = 0.5 * (aStep->GetPostStepPoint()->GetPosition() +
-                                            aStep->GetPreStepPoint()->GetPosition())
-                                     * 0.1; // to convert to cm
+    const G4ThreeVector & gpos = 0.5 *
+                                 (aStep->GetPostStepPoint()->GetPosition() +
+                                  aStep->GetPreStepPoint()->GetPosition()) * 0.1; // to convert to cm
+
+    const G4ThreeVector & lpos = aStep->GetPostStepPoint()->
+                                 GetTouchableHandle()->GetHistory()->
+                                 GetTopTransform().TransformPoint(gpos);
 
     //creates hit
-    //    EKLMSimHit *hit = new  EKLMSimHit(position,  hitTime, PDGcode,  eDep);
+    EKLMSimHit *hit = new  EKLMSimHit(pv, gpos, lpos, hitTime, PDGcode,  eDep);
 
     // store hit
-    //    storeEKLMObject("SimHitsEKLMArray", hit);
+    storeEKLMObject("SimHitsEKLMArray", hit);
 
 
     return true;
@@ -97,3 +109,4 @@ namespace Belle2 {
   }
 
 } //namespace Belle II
+

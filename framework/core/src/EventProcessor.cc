@@ -17,6 +17,10 @@
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/logging/Logger.h>
 
+#ifdef HAS_CALLGRIND
+#include <valgrind/callgrind.h>
+#endif
+
 using namespace std;
 using namespace Belle2;
 
@@ -35,6 +39,9 @@ EventProcessor::~EventProcessor()
 
 void EventProcessor::process(PathPtr startPath, long maxEvent)
 {
+#ifdef HAS_CALLGRIND
+  CALLGRIND_START_INSTRUMENTATION;
+#endif
   //Get list of modules which could be executed during the data processing.
   ModulePtrList moduleList = m_pathManager.buildModulePathList(startPath);
 
@@ -52,6 +59,9 @@ void EventProcessor::process(PathPtr startPath, long maxEvent)
 
   //Terminate modules
   processTerminate(moduleList);
+#ifdef HAS_CALLGRIND
+  CALLGRIND_STOP_INSTRUMENTATION;
+#endif
 }
 
 
@@ -61,6 +71,9 @@ void EventProcessor::process(PathPtr startPath, long maxEvent)
 
 void EventProcessor::processInitialize(const ModulePtrList& modulePathList)
 {
+#ifdef HAS_CALLGRIND
+  CALLGRIND_ZERO_STATS;
+#endif
   LogSystem& logSystem = LogSystem::Instance();
   ModulePtrList::const_iterator listIter;
   ModuleStatistics &stats = ModuleStatistics::getInstance();
@@ -88,11 +101,17 @@ void EventProcessor::processInitialize(const ModulePtrList& modulePathList)
   }
   DataStore::Instance().setInitializeActive(false);
   stats.stopGlobal(ModuleStatistics::c_Init);
+#ifdef HAS_CALLGRIND
+  CALLGRIND_DUMP_STATS_AT("initialize");
+#endif
 }
 
 
 void EventProcessor::processCore(PathPtr startPath, const ModulePtrList& modulePathList, long maxEvent)
 {
+#ifdef HAS_CALLGRIND
+  CALLGRIND_ZERO_STATS;
+#endif
   long currEvent = 0;
   bool endProcess = false;
   PathPtr currPath;
@@ -142,7 +161,7 @@ void EventProcessor::processCore(PathPtr startPath, const ModulePtrList& moduleP
       //Check for end of data
       if ((*eventMetaDataPtr == endEventMetaData) ||
           ((module == master) && (*eventMetaDataPtr == noEventMetaData))) {
-        if (module != master) {
+        if (module == master) {
           B2WARNING("Event processing stopped by non-master module " << module->getName());
         }
         endProcess = true;
@@ -159,6 +178,9 @@ void EventProcessor::processCore(PathPtr startPath, const ModulePtrList& moduleP
           stats.stopGlobal(ModuleStatistics::c_Event, true);
           //End the previous run
           if (currEvent > 0) {
+#ifdef HAS_CALLGRIND
+            CALLGRIND_DUMP_STATS_AT("event");
+#endif
             EventMetaData newEventMetaData = *eventMetaDataPtr;
             *eventMetaDataPtr = previousEventMetaData;
             processEndRun(modulePathList);
@@ -168,6 +190,9 @@ void EventProcessor::processCore(PathPtr startPath, const ModulePtrList& moduleP
           //Start a new run
           processBeginRun(modulePathList);
 
+#ifdef HAS_CALLGRIND
+          CALLGRIND_ZERO_STATS;
+#endif
           stats.startGlobal(ModuleStatistics::c_Event);
         }
 
@@ -206,6 +231,9 @@ void EventProcessor::processCore(PathPtr startPath, const ModulePtrList& moduleP
 
     stats.stopGlobal(ModuleStatistics::c_Event);
   }
+#ifdef HAS_CALLGRIND
+  CALLGRIND_DUMP_STATS_AT("event");
+#endif
 
   //End last run
   if (master && (currEvent > 0)) {
@@ -218,6 +246,9 @@ void EventProcessor::processCore(PathPtr startPath, const ModulePtrList& moduleP
 
 void EventProcessor::processTerminate(const ModulePtrList& modulePathList)
 {
+#ifdef HAS_CALLGRIND
+  CALLGRIND_ZERO_STATS;
+#endif
   LogSystem& logSystem = LogSystem::Instance();
   ModulePtrList::const_reverse_iterator listIter;
   ModuleStatistics &stats = ModuleStatistics::getInstance();
@@ -241,11 +272,17 @@ void EventProcessor::processTerminate(const ModulePtrList& modulePathList)
   //Delete persistent data in DataStore
   DataStore::Instance().clearMaps(DataStore::c_Persistent);
   stats.stopGlobal(ModuleStatistics::c_Term);
+#ifdef HAS_CALLGRIND
+  CALLGRIND_DUMP_STATS_AT("terminate");
+#endif
 }
 
 
 void EventProcessor::processBeginRun(const ModulePtrList& modulePathList)
 {
+#ifdef HAS_CALLGRIND
+  CALLGRIND_ZERO_STATS;
+#endif
   LogSystem& logSystem = LogSystem::Instance();
   ModulePtrList::const_iterator listIter;
   ModuleStatistics &stats = ModuleStatistics::getInstance();
@@ -266,11 +303,18 @@ void EventProcessor::processBeginRun(const ModulePtrList& modulePathList)
     logSystem.setModuleLogConfig(NULL);
   }
   stats.stopGlobal(ModuleStatistics::c_BeginRun);
+#ifdef HAS_CALLGRIND
+  CALLGRIND_DUMP_STATS_AT("beginRun");
+#endif
+
 }
 
 
 void EventProcessor::processEndRun(const ModulePtrList& modulePathList)
 {
+#ifdef HAS_CALLGRIND
+  CALLGRIND_ZERO_STATS;
+#endif
   LogSystem& logSystem = LogSystem::Instance();
   ModulePtrList::const_iterator listIter;
   ModuleStatistics &stats = ModuleStatistics::getInstance();
@@ -294,4 +338,7 @@ void EventProcessor::processEndRun(const ModulePtrList& modulePathList)
   //Delete run related data in DataStore
   DataStore::Instance().clearMaps(DataStore::c_Run);
   stats.stopGlobal(ModuleStatistics::c_EndRun);
+#ifdef HAS_CALLGRIND
+  CALLGRIND_DUMP_STATS_AT("endRun");
+#endif
 }

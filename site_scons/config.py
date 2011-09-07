@@ -116,6 +116,12 @@ def configure_system(conf):
         sqlite_env.ParseConfig('pkg-config sqlite3 --libs')
         conf.env['SQLITE_LIBS'] = sqlite_env['LIBS']
 
+    # valgrind
+    conf.env['HAS_CALLGRIND'] = False
+    if conf.CheckHeader('valgrind/callgrind.h'):
+        conf.env['HAS_CALLGRIND'] = True
+        conf.env.Append(CPPDEFINES='-DHAS_CALLGRIND')
+
     return True
 
 

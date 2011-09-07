@@ -89,6 +89,7 @@ namespace Belle2 {
       int    m_nRun;                   /**< Run number.   */
       int    m_nEvent;                 /**< Event number. */
 
+      //!Parameter reading object
       TOPGeometryPar* m_topgp;
       //! Returns q.e. of detector at given photon energy
       /*!
@@ -103,7 +104,7 @@ namespace Belle2 {
       double QEMultiAlkali(double energy);
 
 
-      //! Apply q.e., returns 1 if photon is detected and 0 if not.
+      //! Apply q.e., returns trure if photon is detected and false if not.
       /*!
         \param energy energy of photon
        */

@@ -107,6 +107,8 @@ namespace Belle2 {
       int nHits = topSimHits->GetLast();
       B2INFO("nHits: " << nHits);
       // Loop over all hits
+
+      int dighit = 0;
       for (int iHit = 0; iHit < nHits; ++iHit) {
         // Get a simhit
         TOPSimHit* aSimHit = topSimHits[iHit];
@@ -130,15 +132,19 @@ namespace Belle2 {
 
         double globaltime = aSimHit->getGlobalTime();
 
-        B2INFO("ihit: " << iHit  << "channel ID: " << channelID << " bar ID " << BarID);
+        B2INFO("ihit: " << iHit  << " channel ID: " << channelID << " bar ID " << BarID);
         // Check if channel already registered hit in this event(no multiple hits)
 
         int nentr = topHits->GetEntries();
         new(topHits->AddrAt(nentr)) TOPHit(BarID, channelID, globaltime, energy, aSimHit->getParentID());
-
+        if (aSimHit->getParentID() == 1) {
+          dighit++;
+        }
       } // for iHit
 
       m_nEvent++;
+
+      B2INFO("nHits: " << nHits << "digitized hits: " << dighit);
     }
 
     void TOPDigiModule::endRun()

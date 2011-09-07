@@ -8,14 +8,14 @@
     <Surface>
         <Properties>
             <Property name="REFLECTIVITY" unit="eV">
-                <value energy="0.5">1.0</value> 
-                <value energy="1.0">1.0</value> 
-                <value energy="2.0">1.0</value> 
-                <value energy="3.0">1.0</value> 
-                <value energy="4.0">1.0</value> 
-                <value energy="5.0">1.0</value> 
-                <value energy="6.0">1.0</value> 
-                <value energy="7.0">1.0</value>                 
+                <value energy="0.5">0.95</value> 
+                <value energy="0.95">0.95</value> 
+                <value energy="2.0">0.95</value> 
+                <value energy="3.0">0.95</value> 
+                <value energy="4.0">0.95</value> 
+                <value energy="5.0">0.95</value> 
+                <value energy="6.0">0.95</value> 
+                <value energy="7.0">0.95</value>                 
             </Property>
         </Properties>
         <Type>dielectric_metal</Type>

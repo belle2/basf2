@@ -132,7 +132,9 @@ namespace Belle2 {
 
         double globaltime = aSimHit->getGlobalTime();
 
-        B2INFO("ihit: " << iHit  << " channel ID: " << channelID << " bar ID " << BarID);
+        if (globaltime / Unit::ns > 4096.0*25.0e-3) continue;
+
+        B2INFO("ihit: " << iHit  << " channel ID: " << channelID << " bar ID " << BarID << "arival time:" << globaltime);
         // Check if channel already registered hit in this event(no multiple hits)
 
         int nentr = topHits->GetEntries();
@@ -144,7 +146,7 @@ namespace Belle2 {
 
       m_nEvent++;
 
-      B2INFO("nHits: " << nHits << "digitized hits: " << dighit);
+      B2INFO("nHits: " << nHits << " digitized hits: " << dighit);
     }
 
     void TOPDigiModule::endRun()

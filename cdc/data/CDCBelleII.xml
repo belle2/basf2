@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ParamSet type="CDC">
-  <Name>CDC BelleII </Name>
-  <Description>CDC geometry parameters</Description>
-  <Version>0</Version>
-  <Creator>CDCBelleII</Creator>
+<DetectorComponent name="CDC" xmlns:xi="http://www.w3.org/2001/XInclude">
+  <Creator library="cdc">CDCCreator</Creator>
   <Content>
     <Rotation desc="Rotation of the whole cdc detector (should be the same as beampipe)" unit="mrad">0.0</Rotation>
     <OffsetZ desc="The offset of the whole cdc in z with respect to the IP (should be the same as beampipe)" unit="mm">0.0</OffsetZ>
@@ -3919,4 +3916,4 @@
       <Length desc="Length of feedthrough" unit="mm">15</Length>
     </FeedThrough>
   </Content>
-</ParamSet>
+</DetectorComponent>

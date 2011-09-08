@@ -36,7 +36,7 @@ namespace Belle2 {
     void Initialize(G4HCofThisEvent *);
 
     //! Process each step and calculate variables defined in CDCB4VHit
-    G4bool ProcessHits(G4Step *aStep, G4TouchableHistory *history);
+    bool step(G4Step *aStep, G4TouchableHistory *history);
 
     //! Do what you want to do at the end of each event
     void EndOfEvent(G4HCofThisEvent *);

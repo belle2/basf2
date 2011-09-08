@@ -16,6 +16,7 @@
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/dataobjects/Relation.h>
+#include <framework/datastore/RelationArray.h>
 #include <cdc/hitcdc/CDCSimHit.h>
 #include <cdc/hitcdc/CDCEBSimHit.h>
 
@@ -41,10 +42,14 @@ typedef HepGeom::Vector3D<double> HepVector3D;
 using namespace Belle2;
 
 CDCSensitiveDetector::CDCSensitiveDetector(G4String name, G4double thresholdEnergyDeposit, G4double thresholdKineticEnergy):
-    SensitiveDetectorBase(name), m_thresholdEnergyDeposit(thresholdEnergyDeposit),
+    SensitiveDetectorBase(name, CDC), m_thresholdEnergyDeposit(thresholdEnergyDeposit),
     m_thresholdKineticEnergy(thresholdKineticEnergy), m_hitNumber(0), m_EBhitNumber(0)
 {
-  addRelationCollection(DEFAULT_MCPART_TO_CDCSIMHITS);
+  StoreArray<MCParticle> mcParticles;
+  StoreArray<CDCSimHit> cdcSimHits;
+  StoreArray<CDCEBSimHit> cdcEBArray;
+  RelationArray cdcSimHitRel(mcParticles, cdcSimHits);
+  registerMCParticleRelation(cdcSimHitRel);
 }
 
 void CDCSensitiveDetector::Initialize(G4HCofThisEvent *)
@@ -56,7 +61,7 @@ void CDCSensitiveDetector::Initialize(G4HCofThisEvent *)
 //-----------------------------------------------------
 // Method invoked for every step in sensitive detector
 //-----------------------------------------------------
-G4bool CDCSensitiveDetector::ProcessHits(G4Step *aStep, G4TouchableHistory *)
+bool CDCSensitiveDetector::step(G4Step *aStep, G4TouchableHistory *)
 {
   // Get deposited energy
   const G4double edep = aStep->GetTotalEnergyDeposit();
@@ -275,17 +280,17 @@ G4bool CDCSensitiveDetector::ProcessHits(G4Step *aStep, G4TouchableHistory *)
             saveIndex = saveSimHit(layerId, wires[i], trackID, pid, distance, tof, edep_in_cell, (s2 - sint) * cm, p_In, posW, x_In, posOut, lr);
           }
         }
-        setSeenInDetectorFlag(aStep, MCParticle::c_SeenInCDC);
+        //setSeenInDetectorFlag(aStep, MCParticle::c_SeenInCDC);
 
-        //Add relation between the MCParticle and the hit.
-        //The index of the MCParticle has to be set to the TrackID and will be
-        //replaced later by the correct MCParticle index automatically.
-        StoreArray<Relation> mcPartToSimHits(getRelationCollectionName());
-        StoreArray<MCParticle> mcPartArray(DEFAULT_MCPARTICLES);
-        if (saveIndex < 0) {B2FATAL("SimHit wasn't saved despite charge != 0");}
-        StoreArray<CDCSimHit> cdcArray(DEFAULT_CDCSIMHITS);
+        ////Add relation between the MCParticle and the hit.
+        ////The index of the MCParticle has to be set to the TrackID and will be
+        ////replaced later by the correct MCParticle index automatically.
+        //StoreArray<Relation> mcPartToSimHits(getRelationCollectionName());
+        //StoreArray<MCParticle> mcPartArray(DEFAULT_MCPARTICLES);
+        //if (saveIndex < 0) {B2FATAL("SimHit wasn't saved despite charge != 0");}
+        //StoreArray<CDCSimHit> cdcArray(DEFAULT_CDCSIMHITS);
 
-        new(mcPartToSimHits->AddrAt(saveIndex)) Relation(mcPartArray, cdcArray, trackID, saveIndex);
+        //new(mcPartToSimHits->AddrAt(saveIndex)) Relation(mcPartArray, cdcArray, trackID, saveIndex);
 
       }
     }
@@ -314,8 +319,11 @@ CDCSensitiveDetector::saveSimHit(const G4int layerId,
                                  const G4ThreeVector & posOut,
                                  const G4int lr)
 {
+  StoreArray<MCParticle> mcParticles;
   //change Later
-  StoreArray<CDCSimHit> cdcArray(DEFAULT_CDCSIMHITS);
+  StoreArray<CDCSimHit> cdcArray;
+  RelationArray cdcSimHitRel(mcParticles, cdcArray);
+
   m_hitNumber = cdcArray->GetLast() + 1;
   new(cdcArray->AddrAt(m_hitNumber)) CDCSimHit();
   cdcArray[m_hitNumber]->setLayerId(layerId);
@@ -337,6 +345,7 @@ CDCSensitiveDetector::saveSimHit(const G4int layerId,
   cdcArray[m_hitNumber]->setPosFlag(lr);
 
   B2DEBUG(150, "HitNumber: " << m_hitNumber);
+  cdcSimHitRel.add(trackID, m_hitNumber);
   return (m_hitNumber);
 }
 

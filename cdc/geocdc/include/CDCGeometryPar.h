@@ -64,6 +64,24 @@ namespace Belle2 {
     */
     std::string version() const;
 
+    //! The method to get cdc mother volume inner R
+    /*!
+        \return The inner radius of the cdc mother volume.
+    */
+    double motherInnerR() const;
+
+    //! The method to get cdc mother volume outer R
+    /*!
+        \return The outer radius of the cdc mother volume.
+    */
+    double motherOuterR() const;
+
+    //! The method to get cdc mother volume length
+    /*!
+        \return The length of the cdc mother volume.
+    */
+    double motherLength() const;
+
     //! The method to get cell id based on given layer id and the position.
     /*!
         \param layerId The given layer id.
@@ -287,10 +305,29 @@ namespace Belle2 {
     double m_senseWireDiameter;                   /*!< The diameter of sense wires. */
     double m_fieldWireDiameter;                   /*!< The diameter of field wires. */
 
+    double m_motherInnerR;  /*!< The inner radius of cdc mother volume. */
+    double m_motherOuterR;  /*!< The outer radius of cdc mother volume. */
+    double m_motherLength;  /*!< The length of cdc mother volume. */
+
     static CDCGeometryPar* m_B4CDCGeometryParDB; /*!< Pointer that saves the instance of this class. */
   };
 
 //-----------------------------------------------------------------------------
+  inline double CDCGeometryPar::motherInnerR() const
+  {
+    return m_motherInnerR;
+  }
+
+  inline double CDCGeometryPar::motherOuterR() const
+  {
+    return m_motherOuterR;
+  }
+
+  inline double CDCGeometryPar::motherLength() const
+  {
+    return m_motherLength;
+  }
+
   inline std::string CDCGeometryPar::version() const
   {
     return m_version;

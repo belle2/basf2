@@ -134,7 +134,7 @@ namespace Belle2 {
 
         if (globaltime / Unit::ns > 4096.0*25.0e-3) continue;
 
-        B2INFO("ihit: " << iHit  << " channel ID: " << channelID << " bar ID " << BarID << "arival time:" << globaltime);
+        //B2INFO("ihit: " << iHit  << " channel ID: " << channelID << " bar ID " << BarID << "arival time:" << globaltime);
         // Check if channel already registered hit in this event(no multiple hits)
 
         int nentr = topHits->GetEntries();

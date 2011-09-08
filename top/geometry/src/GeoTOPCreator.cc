@@ -78,9 +78,9 @@ namespace Belle2 {
 
     GeoTOPCreator::~GeoTOPCreator()
     {
-      delete m_sensitive;
-      delete m_sensitiveQuartz;
-      delete m_topgp;
+      if (m_sensitive) delete m_sensitive;
+      if (m_sensitiveQuartz) delete m_sensitiveQuartz;
+      if (m_topgp) delete m_topgp;
     }
 
 

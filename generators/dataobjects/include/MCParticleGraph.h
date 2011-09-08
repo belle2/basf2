@@ -155,7 +155,7 @@ namespace Belle2 {
        * @param index The vertex id of the particle in the graph.
        */
       GraphParticle(MCParticleGraph* graph, unsigned int vertexId): MCParticle(),
-          m_graph(graph), m_vertexId(vertexId), m_ignore(false), m_primary(true) {}
+          m_graph(graph), m_vertexId(vertexId), m_ignore(false), m_primary(true), m_trackID(0) {}
 
       /**
        * Set the 1-based index of the particle.

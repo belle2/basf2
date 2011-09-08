@@ -15,7 +15,6 @@
 #include <framework/logging/Logger.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/dataobjects/Relation.h>
 #include <framework/datastore/RelationArray.h>
 #include <cdc/hitcdc/CDCSimHit.h>
 #include <cdc/hitcdc/CDCEBSimHit.h>

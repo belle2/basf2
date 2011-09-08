@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Materials>
+  <Material name="CFRP">
+    <density unit="g/cm3">1.555</density>
+    <Components>
+       <Element fraction="0.912">C</Element>
+       <Element fraction="0.002">H</Element>
+       <Element fraction="0.086">O</Element>
+    </Components>
+  </Material>
+
+  <Material name="NEMA_G10_Plate">
+    <density unit="g/cm3">1.70</density>
+    <Components>
+       <Element fraction="0.2802">Si</Element>
+       <Element fraction="0.3874">O</Element>
+       <Element fraction="0.304">C</Element>
+       <Element fraction="0.0284">H</Element>
+    </Components>
+  </Material>
+
+  <Material name="Helium">
+     <density unit="g/cm3">1.786e-4</density>
+     <Components>
+        <Element fraction="1.0">He</Element>
+     </Components>
+  </Material>
+
+  <Material name="Aluminum">
+     <density unit="g/cm3">2.70</density>
+     <Components>
+        <Element fraction="1.0">Al</Element>
+     </Components>
+   </Material>
+
+   <Material name="Tungsten">
+     <density unit="g/cm3">19.3</density>
+     <Components>
+        <Element fraction="1.0">W</Element>
+     </Components>
+   </Material>
+</Materials>

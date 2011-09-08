@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <cdc/geometry/GeoCDCCreator.h>
-#include <cdc/geometry/CDCGeometryPar.h>
+#include <cdc/geocdc/GeoCDCCreator.h>
+#include <cdc/geocdc/CDCGeometryPar.h>
 #include <cdc/simcdc/CDCSensitiveDetector.h>
 
 #include <geometry/CreatorFactory.h>
@@ -97,7 +97,7 @@ namespace Belle2 {
 
       for (int iOuterWall = 0; iOuterWall < nOuterWall; ++iOuterWall) {
         GearDir outerWallContent(content);
-        outerWallContent.append((format("OuterWalls/OuterWall[%1%]/") % (iOuterWall + 1)).str());
+        outerWallContent.append((format("/OuterWalls/OuterWall[%1%]/") % (iOuterWall + 1)).str());
 
         string sOuterWallID = outerWallContent.getString("@id");
         int outerWallID = atoi(sOuterWallID.c_str());
@@ -126,7 +126,7 @@ namespace Belle2 {
 
       for (int iInnerWall = 0; iInnerWall < nInnerWall; ++iInnerWall) {
         GearDir innerWallContent(content);
-        innerWallContent.append((format("InnerWalls/InnerWall[%1%]/") % (iInnerWall + 1)).str());
+        innerWallContent.append((format("/InnerWalls/InnerWall[%1%]/") % (iInnerWall + 1)).str());
 
         string sInnerWallID = innerWallContent.getString("@id");
         int innerWallID = atoi(sInnerWallID.c_str());
@@ -143,22 +143,24 @@ namespace Belle2 {
       // Get sense wire and field wire information, radius and total numbers.
       //-----------------------------------------------------------------------
       GearDir senseWire(content);
-      senseWire.append("SenseWire/");
+      senseWire.append("/SenseWire/");
       double diameter_senseWire = senseWire.getLength("Diameter");
       int num_senseWire = atoi((senseWire.getString("Number")).c_str());
 
       GearDir fieldWire(content);
-      fieldWire.append("FieldWire/");
+      fieldWire.append("/FieldWire/");
       double diameter_fieldWire = fieldWire.getLength("Diameter");
       int num_fieldWire = atoi((fieldWire.getString("Number")).c_str());
 
       //----------------
       // Get Material
       //----------------
-      G4Material* medHelium = geometry::Materials::get(Helium.c_str());
+      G4Material* medHelium = G4Material::GetMaterial(Helium.c_str());
       G4Material* medEthane = geometry::Materials::get(Ethane.c_str());
-      G4Material* medAluminum = geometry::Materials::get(Aluminum.c_str());
-      G4Material* medTungsten = geometry::Materials::get(Tungsten.c_str());
+      G4Material* medAluminum = G4Material::GetMaterial(Aluminum.c_str());
+      //G4Material* medAluminum = geometry::Materials::get(Aluminum.c_str());
+      //G4Material* medTungsten = geometry::Materials::get(Tungsten.c_str());
+      G4Material* medTungsten = G4Material::GetMaterial(Tungsten.c_str());
       G4Material* medCFRP = geometry::Materials::get(CFRP.c_str());
       G4Material* medNEMA_G10_Plate = geometry::Materials::get(NEMA_G10_Plate.c_str());
       G4Material* medAir = geometry::Materials::get("Air");
@@ -299,7 +301,7 @@ namespace Belle2 {
       for (int iSLayer = 0; iSLayer < nSLayer; ++iSLayer) {
         // Get parameters of sensitive layers
         GearDir layerContent(content);
-        layerContent.append((format("SLayers/SLayer[%1%]/") % (iSLayer + 1)).str());
+        layerContent.append((format("/SLayers/SLayer[%1%]/") % (iSLayer + 1)).str());
 
         string layerID = layerContent.getString("@id");
         int ilayerID = atoi(layerID.c_str());
@@ -309,7 +311,7 @@ namespace Belle2 {
 
         // Get parameters of endplates
         GearDir epContent(content);
-        epContent.append((format("Endplates/Endplate[%1%]/") % (iSLayer + 1)).str());
+        epContent.append((format("/Endplates/Endplate[%1%]/") % (iSLayer + 1)).str());
         string sepID = epContent.getString("@id");
         int epID = atoi(sepID.c_str());
         int nEPLayer = epContent.getNumberNodes("EndplateLayer");
@@ -324,7 +326,7 @@ namespace Belle2 {
 
         for (int iEPLayer = 0; iEPLayer < nEPLayer; ++iEPLayer) {
           GearDir epLayerContent(epContent);
-          epLayerContent.append((format("EndplateLayer[%1%]/") % (iEPLayer + 1)).str());
+          epLayerContent.append((format("/EndplateLayer[%1%]/") % (iEPLayer + 1)).str());
           string sepLayerID = epLayerContent.getString("@id");
           int epLayerID = atoi(sepLayerID.c_str());
           epName[epID][epLayerID] = epLayerContent.getString("Name");
@@ -340,7 +342,7 @@ namespace Belle2 {
       //--------------------------------
       for (int iFLayer = 0; iFLayer < nFLayer; ++iFLayer) {
         GearDir layerContent(content);
-        layerContent.append((format("FLayers/FLayer[%1%]/") % (iFLayer + 1)).str());
+        layerContent.append((format("/FLayers/FLayer[%1%]/") % (iFLayer + 1)).str());
 
         string layerID = layerContent.getString("@id");
         int ilayerID = atoi(layerID.c_str());
@@ -353,7 +355,7 @@ namespace Belle2 {
       // Get length of feedthrough
       //----------------------------
       GearDir feedthroughContent(content);
-      feedthroughContent.append("FeedThrough/");
+      feedthroughContent.append("/FeedThrough/");
 
       double length_feedthrough  = feedthroughContent.getLength("Length");
 
@@ -630,7 +632,7 @@ namespace Belle2 {
       for (int iEB = 0; iEB < nEB; ++iEB) {
         // Get parameters
         GearDir ebContent(content);
-        ebContent.append((format("ElectronicsBoards/ElectronicsBoard[%1%]/") % (iEB + 1)).str());
+        ebContent.append((format("/ElectronicsBoards/ElectronicsBoard[%1%]/") % (iEB + 1)).str());
         string sebID = ebContent.getString("@id");
         int ebID = atoi(sebID.c_str());
         double ebInnerR = ebContent.getLength("EBInnerR");
@@ -653,7 +655,7 @@ namespace Belle2 {
       for (int iCover = 0; iCover < nCover; ++iCover) {
         // Get parameters
         GearDir coverContent(content);
-        coverContent.append((format("Covers/Cover[%1%]/") % (iCover + 1)).str());
+        coverContent.append((format("/Covers/Cover[%1%]/") % (iCover + 1)).str());
         string scoverID = coverContent.getString("@id");
         int coverID = atoi(scoverID.c_str());
         string coverName = coverContent.getString("Name");

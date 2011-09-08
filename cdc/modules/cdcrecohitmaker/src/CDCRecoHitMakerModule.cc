@@ -16,7 +16,7 @@
 #include <cdc/dataobjects/CDCRecoHit.h>
 
 #include <framework/datastore/StoreArray.h>
-#include <framework/dataobjects/Relation.h>
+//#include <framework/dataobjects/Relation.h>
 
 
 using namespace std;
@@ -75,12 +75,12 @@ void CDCRecoHitMakerModule::event()
 
   //Arrays needed for relation creation
   StoreArray<MCParticle> mcParticles(m_mcParticlesCollectionName);
-  StoreArray<Relation> mcPartToCDCSimHit(m_mcPartToCDCSimHitsCollectionName);
-  StoreArray<Relation> cdcSimHitToCDCHit(m_simHitToCDCHitCollectionName);
+  //StoreArray<Relation> mcPartToCDCSimHit(m_mcPartToCDCSimHitsCollectionName);
+  //StoreArray<Relation> cdcSimHitToCDCHit(m_simHitToCDCHitCollectionName);
 
   //Output Arrays
   StoreArray<CDCRecoHit> cdcRecoHitArray(m_cdcRecoHitCollectionName);
-  StoreArray<Relation> mcPartToCDCRecoHit(m_mcParticleToCDCRecoHits);
+  //StoreArray<Relation> mcPartToCDCRecoHit(m_mcParticleToCDCRecoHits);
 
   for (int ii = 0; ii < cdcHitArray.getEntries(); ii++) {
     new(cdcRecoHitArray->AddrAt(ii)) CDCRecoHit(*(cdcHitArray[ii]));
@@ -91,25 +91,25 @@ void CDCRecoHitMakerModule::event()
     int mcindex;
 
     //find the corresponding SimHit for the RecoHit
-    for (int j = 0; j < cdcSimHitToCDCHit.getEntries(); j++) {
-      if (cdcSimHitToCDCHit[j]->getToIndex() == ii) {
-        simHitindex = cdcSimHitToCDCHit[j]->getFromIndex();
-      }
-    }
-    //find the corresponding MCParticle for this SimHit
-    for (int k = 0; k < mcPartToCDCSimHit.getEntries(); k++) {
-      if (mcPartToCDCSimHit[k]->getToIndex() == simHitindex) {
-        mcindex = mcPartToCDCSimHit[k]->getFromIndex();
-      }
-    }
+    //for (int j = 0; j < cdcSimHitToCDCHit.getEntries(); j++) {
+    //  if (cdcSimHitToCDCHit[j]->getToIndex() == ii) {
+    //    simHitindex = cdcSimHitToCDCHit[j]->getFromIndex();
+    //  }
+    //}
+    ////find the corresponding MCParticle for this SimHit
+    //for (int k = 0; k < mcPartToCDCSimHit.getEntries(); k++) {
+    //  if (mcPartToCDCSimHit[k]->getToIndex() == simHitindex) {
+    //    mcindex = mcPartToCDCSimHit[k]->getFromIndex();
+    //  }
+    //}
 
     //create Relation
-    new(mcPartToCDCRecoHit->AddrAt(ii)) Relation(mcParticles, cdcRecoHitArray, mcindex, ii);
+    //new(mcPartToCDCRecoHit->AddrAt(ii)) Relation(mcParticles, cdcRecoHitArray, mcindex, ii);
 
   } //end loop over cdcHitArray
 
   B2DEBUG(149, "CDCRecoHitMaker: Number of CDCRecoHits: " << cdcRecoHitArray.getEntries());
-  B2DEBUG(149, "CDCRecoHitMaker: Number of Relations MCParticle->CDCRecoHit: " << mcPartToCDCRecoHit.getEntries());
+  //B2DEBUG(149, "CDCRecoHitMaker: Number of Relations MCParticle->CDCRecoHit: " << mcPartToCDCRecoHit.getEntries());
 
 
 }

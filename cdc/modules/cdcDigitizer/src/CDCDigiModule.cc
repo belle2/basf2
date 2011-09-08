@@ -14,7 +14,6 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Unit.h>
-#include <framework/dataobjects/Relation.h>
 #include <framework/logging/Logger.h>
 
 //cdc package headers
@@ -198,7 +197,7 @@ void CDCDigiModule::event()
   int iDigits = 0;
   // Arrays for CDCHits and Relations between SimHit and CDCHit.
   StoreArray<CDCHit> cdcHitArray(m_cdcHitOutColName);
-  StoreArray<Relation> cdcSimRelation(m_relColNameSimHitToHit);
+  //StoreArray<Relation> cdcSimRelation(m_relColNameSimHitToHit);
 
   for (iterCDCMap = cdcSignalMap.begin(); iterCDCMap != cdcSignalMap.end(); iterCDCMap++) {
 
@@ -234,7 +233,7 @@ void CDCDigiModule::event()
 
     // Creation of Relation between SimHit, that has smalles drift length in each cell and the CDCHit.
     B2DEBUG(150, "First: " << (iterCDCMap->first) << "iDigits" << iDigits);
-    new(cdcSimRelation->AddrAt(iDigits)) Relation(cdcArray, cdcHitArray, iterCDCMap->second->getHitNumber(), iDigits);
+    //new(cdcSimRelation->AddrAt(iDigits)) Relation(cdcArray, cdcHitArray, iterCDCMap->second->getHitNumber(), iDigits);
     B2DEBUG(150, "START");
     B2DEBUG(150, "SimHitDriftLength: " << cdcArray[iterCDCMap->first]->getDriftLength());
     B2DEBUG(150, "CDCHitDriftLength: " << cdcHitArray[iDigits]->getDriftTime());

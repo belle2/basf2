@@ -6,6 +6,7 @@ import config
 # build options
 AddOption('--color', dest = 'color', nargs = 1, default = 'off', action = 'store', help = 'Enable color output. Possible values are: off, light, dark')
 AddOption('--verbose', dest = 'verbose', action = 'store_true', default = False, help='Enable verbose output')
+AddOption('--extra-libpath', dest = 'extralibpath', action = 'store', help = 'Additional library path')
 
 
 # get the sub directory name for architecture and build option dependent files
@@ -44,6 +45,10 @@ global_env = Environment(ENV = os.environ,
                          TOOLS_LIBPATH = {},
                          TEST_LIBS = [],
                          TEST_FILES = [])
+
+# include extra library paths
+if GetOption('extralibpath'):
+    global_env.Append(LIBPATH = GetOption('extralibpath').split(':'))
 
 # check for debug flag
 option = os.environ['BELLE2_OPTION']

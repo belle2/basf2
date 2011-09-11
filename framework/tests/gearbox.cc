@@ -39,6 +39,7 @@ namespace Belle2 {
     gb.close();
   }
 
+#ifdef HAS_SQLITE
   TEST(GearBox, SQLite)
   {
     StoreObjPtr<EventMetaData> eventMetaDataPtr;
@@ -58,6 +59,7 @@ namespace Belle2 {
     EXPECT_EQ(0.5, gb.getLength("/detector/bar"));
     gb.close();
   }
+#endif
 
 
 }  // namespace

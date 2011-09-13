@@ -62,7 +62,6 @@ namespace Belle2 {
         if (fabs(localPosition.y() + m_topgp->getQthickness() / 2.0) > 10e-14) return(true);
 
 
-
         /**
          B2INFO ("SensQuartz: " << aTrack->GetDefinition()->GetParticleName()
          << " " << aTrack->GetTrackID()
@@ -79,7 +78,7 @@ namespace Belle2 {
 
         int trackID = aTrack->GetTrackID();
         int  PDGEncoding = particle->GetPDGEncoding();
-
+        double tracklength = aTrack->GetTrackLength();
 
         TVector3 TPosition(worldPosition.x() * Unit::mm, worldPosition.y() * Unit::mm, worldPosition.z() * Unit::mm);
         TVector3 TMomentum(momentum.x() * Unit::MeV, momentum.y() * Unit::MeV , momentum.z() * Unit::MeV);
@@ -87,7 +86,7 @@ namespace Belle2 {
         // Tracks are saved in "topQuartzHits"
         StoreArray<TOPQuartzHit> topQuartzHits;
         int nentr = topQuartzHits->GetLast() + 1;
-        new(topQuartzHits->AddrAt(nentr)) TOPQuartzHit(trackID, PDGEncoding, TPosition, TMomentum);
+        new(topQuartzHits->AddrAt(nentr)) TOPQuartzHit(trackID, PDGEncoding, PDGCharge, TPosition, TMomentum, tracklength, 0, 0, 0, 0, 0, 0, 0);
         //! B2INFO("Quartz Hit.");
 
       }

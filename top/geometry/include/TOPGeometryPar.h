@@ -124,6 +124,11 @@ namespace Belle2 {
     int getNpady() const;
     //! get the thickness of the glue between the PMT stack and the wedge
     double getdGlue() const;
+    //! get number of TDC bits
+    int getTDCbits() const;
+    //! get width of TDC bit
+    double getTDCbitwidth() const;
+
 
     //! Mirror parameters
 
@@ -207,6 +212,10 @@ namespace Belle2 {
     int _Npady;
     //! PMT wedge glue thickness
     double _dGlue;
+    //! number of TDC bits
+    int _NTDC;
+    //! width of TDC bit
+    double _TDCwidth;
 
     //! Mirror parameters
 
@@ -381,7 +390,16 @@ namespace Belle2 {
   {
     return _dGlue / Unit::mm;
   }
-
+  //! Return number of TDC bits
+  inline int TOPGeometryPar::getTDCbits() const
+  {
+    return _NTDC;
+  }
+  //! Return width of TDC bit
+  inline double TOPGeometryPar::getTDCbitwidth() const
+  {
+    return _TDCwidth / Unit::ns;
+  }
 
   //! Mirror functions
 

@@ -15,7 +15,7 @@
 
 // Hit classes
 #include <top/dataobjects/TOPSimHit.h>
-#include <top/dataobjects/TOPHit.h>
+#include <top/dataobjects/TOPDigiHit.h>
 
 // framework - DataStore
 #include <framework/datastore/DataStore.h>
@@ -52,7 +52,7 @@ namespace Belle2 {
 
       // Add parameters
       addParam("InputColName", m_inColName, "Input collection name", string("TOPSimHitArray"));
-      addParam("OutputColName", m_outColName, "Output collection name", string("TOPHitArray"));
+      addParam("OutputColName", m_outColName, "Output collection name", string("TOPDigiHitArray"));
     }
 
     TOPDigiModule::~TOPDigiModule()
@@ -74,7 +74,7 @@ namespace Belle2 {
       m_timeCPU = clock() * Unit::us;
 
       StoreArray<TOPSimHit> topSimHits;
-      StoreArray<TOPHit> topHits;
+      StoreArray<TOPDigiHit> topDigiHits;
     }
 
     void TOPDigiModule::beginRun()
@@ -96,13 +96,13 @@ namespace Belle2 {
       // Get the collection of TOPHits from the Data store,
       // (or have one created)
       //-----------------------------------------------------
-      StoreArray<TOPHit> topHits;
+      StoreArray<TOPDigiHit> topDigiHits;
 
       //---------------------------------------------------------------------
       // Convert SimHits one by one to digitizer hits.
       //---------------------------------------------------------------------
 
-
+      /*
       // Get number of hits in this event
       int nHits = topSimHits->GetLast();
       B2INFO("nHits: " << nHits);
@@ -110,43 +110,44 @@ namespace Belle2 {
 
       int dighit = 0;
       for (int iHit = 0; iHit < nHits; ++iHit) {
-        // Get a simhit
-        TOPSimHit* aSimHit = topSimHits[iHit];
+          // Get a simhit
+          TOPSimHit* aSimHit = topSimHits[iHit];
 
-        double energy = aSimHit->getEnergy();
+          double energy = aSimHit->getEnergy();
 
-        // Apply q.e. of detector
-        if (!DetectorQE(energy)) continue;
+          // Apply q.e. of detector
+          if (!DetectorQE(energy)) continue;
 
-        TVector2 locpos(aSimHit->getLocalPosition().X(), aSimHit->getLocalPosition().Y());
+          TVector2 locpos(aSimHit->getLocalPosition().X(), aSimHit->getLocalPosition().Y());
 
-        // Get id number of hit channel
+          // Get id number of hit channel
 
-        int moduleID = aSimHit->getModuleID();
-        int BarID = aSimHit->getBarID();
+          int moduleID = aSimHit->getModuleID();
+          int BarID = aSimHit->getBarID();
 
-        int channelID = m_topgp->getChannelID(locpos, moduleID);
+          int channelID = m_topgp->getChannelID(locpos, moduleID);
 
 
-        if (channelID < 0) continue;
+          if (channelID < 0) continue;
 
-        double globaltime = aSimHit->getGlobalTime();
+          double globaltime = aSimHit->getGlobalTime();
 
-        if (globaltime / Unit::ns > 4096.0*25.0e-3) continue;
+          if (globaltime / Unit::ns > 4096.0*25.0e-3) continue;
 
-        //B2INFO("ihit: " << iHit  << " channel ID: " << channelID << " bar ID " << BarID << "arival time:" << globaltime);
-        // Check if channel already registered hit in this event(no multiple hits)
+          //B2INFO("ihit: " << iHit  << " channel ID: " << channelID << " bar ID " << BarID << "arival time:" << globaltime);
+          // Check if channel already registered hit in this event(no multiple hits)
 
-        int nentr = topHits->GetEntries();
-        new(topHits->AddrAt(nentr)) TOPHit(BarID, channelID, globaltime, energy, aSimHit->getParentID());
-        if (aSimHit->getParentID() == 1) {
-          dighit++;
-        }
+          int nentr = topHits->GetEntries();
+          new(topHits->AddrAt(nentr)) TOPHit(BarID, channelID, globaltime, energy, aSimHit->getParentID());
+          if (aSimHit->getParentID() == 1) {
+              dighit++;
+          }
       } // for iHit
 
       m_nEvent++;
 
       B2INFO("nHits: " << nHits << " digitized hits: " << dighit);
+       */
     }
 
     void TOPDigiModule::endRun()
@@ -191,6 +192,114 @@ namespace Belle2 {
     bool TOPDigiModule::DetectorQE(double energy)
     {
       return (m_random->Rndm(0) < QEMultiAlkali(energy));
+    }
+
+    double TOPDigiModule::Gaus(double mean, double sigma)
+    {
+      //
+      //  samples a random number from the standard Normal (Gaussian) Distribution
+      //  with the given mean and sigma.
+      //  Uses the Acceptance-complement ratio from W. Hoermann and G. Derflinger
+      //  This is one of the fastest existing method for generating normal random variables.
+      //  It is a factor 2/3 faster than the polar (Box-Muller) method used in the previous
+      //  version of TRandom::Gaus. The speed is comparable to the Ziggurat method (from Marsaglia)
+      //  implemented for example in GSL and available in the MathMore library.
+      //
+      //
+      //  REFERENCE:  - W. Hoermann and G. Derflinger (1990):
+      //               The ACR Method for generating normal random variables,
+      //               OR Spektrum 12 (1990), 181-185.
+      //
+      //  Implementation taken from
+      //   UNURAN (c) 2000  W. Hoermann & J. Leydold, Institut f. Statistik, WU Wien
+      ///////////////////////////////////////////////////////////////////////////////
+
+
+
+      const double kC1 = 1.448242853;
+      const double kC2 = 3.307147487;
+      const double kC3 = 1.46754004;
+      const double kD1 = 1.036467755;
+      const double kD2 = 5.295844968;
+      const double kD3 = 3.631288474;
+      const double kHm = 0.483941449;
+      const double kZm = 0.107981933;
+      const double kHp = 4.132731354;
+      const double kZp = 18.52161694;
+      const double kPhln = 0.4515827053;
+      const double kHm1 = 0.516058551;
+      const double kHp1 = 3.132731354;
+      const double kHzm = 0.375959516;
+      const double kHzmp = 0.591923442;
+      /*zhm 0.967882898*/
+
+      const double kAs = 0.8853395638;
+      const double kBs = 0.2452635696;
+      const double kCs = 0.2770276848;
+      const double kB  = 0.5029324303;
+      const double kX0 = 0.4571828819;
+      const double kYm = 0.187308492 ;
+      const double kS  = 0.7270572718 ;
+      const double kT  = 0.03895759111;
+
+      double result;
+      double rn, x, y, z;
+
+
+      do {
+        y = m_random->Rndm(0);
+
+        if (y > kHm1) {
+          result = kHp * y - kHp1; break;
+        }
+
+        else if (y < kZm) {
+          rn = kZp * y - 1;
+          result = (rn > 0) ? (1 + rn) : (-1 + rn);
+          break;
+        }
+
+        else if (y < kHm) {
+          rn = m_random->Rndm(0);
+          rn = rn - 1 + rn;
+          z = (rn > 0) ? 2 - rn : -2 - rn;
+          if ((kC1 - y)*(kC3 + TMath::Abs(z)) < kC2) {
+            result = z; break;
+          } else {
+            x = rn * rn;
+            if ((y + kD1)*(kD3 + x) < kD2) {
+              result = rn; break;
+            } else if (kHzmp - y < exp(-(z*z + kPhln) / 2)) {
+              result = z; break;
+            } else if (y + kHzm < exp(-(x + kPhln) / 2)) {
+              result = rn; break;
+            }
+          }
+        }
+
+        while (1) {
+          x = m_random->Rndm(0);
+          y = kYm * m_random->Rndm(0);
+          z = kX0 - kS * x - y;
+          if (z > 0)
+            rn = 2 + y / x;
+          else {
+            x = 1 - x;
+            y = kYm - y;
+            rn = -(2 + y / x);
+          }
+          if ((y - kAs + x)*(kCs + x) + kBs < 0) {
+            result = rn; break;
+          } else if (y < x + kT)
+            if (rn*rn < 4*(kB - log(x))) {
+              result = rn; break;
+            }
+        }
+      } while (0);
+
+
+      return mean + sigma * result;
+
     }
 
   } // end top namespace

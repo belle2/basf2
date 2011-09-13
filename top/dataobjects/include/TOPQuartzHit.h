@@ -18,7 +18,7 @@ namespace Belle2 {
 
   //! Datastore class that holds information on track parameters at the entrance in aerogel.
   /*!  For now this information comes from ("TOPSensitiveQuartz" sensitive detector). This should be replaced with the information from tracking.
-  */
+   */
 
 
   class TOPQuartzHit : public TObject {
@@ -29,32 +29,109 @@ namespace Belle2 {
     TOPQuartzHit():
         m_trackID(-1),
         m_particleID(-1),
+        m_charge(0),
         m_position(0, 0, 0),
-        m_momentum(0, 0, 0) {
+        m_momentum(0, 0, 0),
+        m_length(0.),
+        m_eL(0.),
+        m_muL(0.),
+        m_piL(0.),
+        m_KL(0.),
+        m_pL(0.),
+        m_recoflag(0),
+        m_detfot(0) {
       /*! does nothing */
     }
 
     //! Useful Constructor
     /*!
-      \param trackId geant4 track id
-      \param particleId particle PDG id number
-      \param position vector of track position on aerogel plane
-      \param momentum vector of track momentum on aerogel plane
-    */
+     \param trackID geant4 track id
+     \param particleID particle PDG id number
+     \param charge the charge of the track
+     \param position vector of track position on quartz bar plane
+     \param momentum vector of track momentum on quarz bar plane
+     \param eL electron likelihood
+     \param eL electron likelihood
+     \param eL electron likelihood
+     \param eL electron likelihood
+     \param eL electron likelihood
+     \param recoflag is the flag from reconstruction
+     \param detfot is the number of detected photons
+     */
     TOPQuartzHit(
-      int trackId,
-      int particleId,
+      int trackID,
+      int particleID,
+      int charge,
       TVector3 position,
-      TVector3 momentum
+      TVector3 momentum,
+      double length,
+      double eL,
+      double muL,
+      double piL,
+      double KL,
+      double pL,
+      int recoflag,
+      int detfot
     ) {
-      m_trackID = trackId;
-      m_particleID = particleId;
+      m_trackID = trackID;
+      m_particleID = particleID;
+      m_charge = charge;
       m_position = position;
       m_momentum = momentum;
+      m_length = length;
+      m_eL = eL;
+      m_muL = muL;
+      m_piL = piL;
+      m_KL = KL;
+      m_pL = pL;
+      m_recoflag = recoflag;
+      m_detfot = detfot;
     }
 
+    //! Get Geant4 track ID
+    int getTrackID() const { return m_trackID; }
+
+    //! Get particle PDG identity number
+    int getParticleID() const { return m_particleID; }
+
+    //! Get charge of track
+    int getCharge() const { return m_charge;}
+
+    //! Get track position (at entrance into bar)
+    const TVector3 &getPosition() const { return m_position; }
+
+    //! Get track momentum  (at entrance into bar)
+    const TVector3 &getMomentum() const { return m_momentum; }
+
+    //! Get track length
+    double getLength() const { return m_length; }
+
+    //! get electron likelihood
+    double getElectronLikelihood() const { return m_eL;}
+
+    //! get muon likelihood
+    double getMuonLikelihood() const { return m_muL;}
+
+    //! get pion likelihood
+    double getPionLikelihood() const { return m_piL;}
+
+    //! get kaon likelihood
+    double getKaonLikelihood() const { return m_KL;}
+
+    //! get proton likelihood
+    double getProtonLikelihood() const { return m_pL;}
+
+    //! get proton likelihood
+    double getRecoFlag() const { return m_recoflag;}
+
+    //! get number of detected photons
+    int getNPhotons() const { return m_detfot;}
+
     //! Set Geant4 track ID
-    void setTrackID(int trackId) { m_trackID = trackId; }
+    void setTrackID(int trackID) { m_trackID = trackID; }
+
+    //! set track charge
+    void setCharge(int charge) {m_charge = charge;}
 
     //! Set particle PDG identity number
     void setParticleID(int particleId) { m_particleID = particleId; }
@@ -65,24 +142,46 @@ namespace Belle2 {
     //! Set track momentum  (at entrance in 1. aerogel plane)
     void setMomentum(TVector3 momentum) { m_momentum = momentum; }
 
-    //! Get Geant4 track ID
-    int getTrackID() const { return m_trackID; }
+    //! Set track length
+    void setLength(double length) { m_length = length; }
 
-    //! Get particle PDG identity number
-    int getParticleID() const { return m_particleID; }
+    //! Set electron likelihood
+    void setElectronLikelihood(double eL)  {  m_eL = eL;}
 
-    //! Get track position (at entrance in 1. aerogel plane)
-    const TVector3 &getPosition() const { return m_position; }
+    //! Set muon likelihood
+    void setMuonLikelihood(double muL)  {  m_muL = muL;}
 
-    //! Get track momentum  (at entrance in 1. aerogel plane)
-    const TVector3 &getMomentum() const { return m_momentum; }
+    //! Set pion likelihood
+    void setPionLikelihood(double piL)  {  m_piL = piL;}
+
+    //! Set kaon likelihood
+    void setKaonLikelihood(double KL)  {  m_KL = KL;}
+
+    //! Set proton likelihood
+    void setProtonLikelihood(double pL)  {  m_pL = pL;}
+
+    //! Set reconstruction flag
+    void setRecoFlag(int recoflag) {m_recoflag = recoflag;}
+
+    //! set the number of detected photons
+    void setNPhotons(int detfot) {m_detfot = detfot;}
+
 
   private:
 
     int m_trackID;             /**< G4 id of track */
     int m_particleID;          /**< particle PDG id number */
+    int m_charge;               /**< charge of track */
     TVector3 m_position;       /**< track position (at entrance in 1. aerogel plane) */
     TVector3 m_momentum;       /**< track position (at entrance in 1. aerogel plane) */
+    double m_length;          /**< track length */
+    double m_eL;            /**< electron likelihood */
+    double m_muL;            /**< muon likelihood */
+    double m_piL;            /**< pion likelihood */
+    double m_KL;            /**< kaon likelihood */
+    double m_pL;            /**< proton likelihood */
+    int m_recoflag;          /**< flag of the TOPrec reconstruction */
+    int m_detfot;          /**< number of detected photons */
 
 
     ClassDef(TOPQuartzHit, 1); /**< the class title */

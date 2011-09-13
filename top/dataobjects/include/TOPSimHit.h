@@ -33,17 +33,19 @@ namespace Belle2 {
         m_position(0, 0, 0),
         m_globalTime(0),
         m_energy(0),
-        m_parentID(0) {
+        m_parentID(0),
+        m_trackID(0) {
       /*! Does nothing */
     }
 
     //! Full constructor.
     /*!
-     \param moduleID ID of hapd module containing hit
-     \param position vector of hit local position (in module coor. sys.)
+     \param moduleID ID of PMT module containing hit
+     \param barID is the ID of the bar in which the PMT was hit
      \param globalTime global time of photon hit
      \param energy energy of photon
      \param parentID geant4 id of photon parent particle
+     \param trackID geant4 id of photon track
      */
 
     TOPSimHit(
@@ -52,13 +54,15 @@ namespace Belle2 {
       TVector3 position,
       double globalTime,
       double energy,
-      int parentID):
+      int parentID,
+      int trackID):
         m_moduleID(moduleID),
         m_barID(barID),
         m_position(position),
         m_globalTime(globalTime),
         m_energy(energy),
-        m_parentID(parentID) {
+        m_parentID(parentID),
+        m_trackID(trackID) {
       /* Does nothing */
     }
 
@@ -69,10 +73,10 @@ namespace Belle2 {
     int getBarID() const { return m_barID; }
 
     //! Get local position of hit (in module coordinates)
-    const TVector3& getLocalPosition() const { return m_position; }
+    const TVector3& getPosition() const { return m_position; }
 
     //! Get global time of hit
-    double getGlobalTime() const { return m_globalTime; }
+    double getTime() const { return m_globalTime; }
 
     //! Get detected photon energy
     double getEnergy() const { return m_energy; }
@@ -80,20 +84,29 @@ namespace Belle2 {
     //! Get G4 ID number of photons parent particle
     int getParentID() const { return m_parentID; }
 
+    //! Get G4 ID number of photons track
+    int getTrackID() const { return m_trackID; }
+
     //! Set ID number of module that registered hit
     void setModuleID(int moduleID) { m_moduleID = moduleID; }
 
+    //! Set ID number of bar that registered hit
+    void setBarID(int barID) { m_barID = barID; }
+
     //! Set local position of hit (in module coordinates)
-    void setLocalPosition(double x, double y, double z) { m_position.SetXYZ(x, y, z); }
+    void setPosition(double x, double y, double z) { m_position.SetXYZ(x, y, z); }
 
     //! Set global time of hit
-    void setGlobalTime(double globalTime) { m_globalTime = globalTime; }
+    void setTime(double globalTime) { m_globalTime = globalTime; }
 
     //! Get detected photon energy
     void setEnergy(double energy) { m_energy = energy; }
 
     //! Get G4 ID number of photons parent particle
     void setParentID(int parentID) { m_parentID = parentID; }
+
+    //! Get G4 ID number of photons parent particle
+    void setTrackID(int trackID) { m_trackID = trackID; }
 
   private:
     int m_moduleID;           /**< ID number of module that registered hit*/
@@ -102,6 +115,7 @@ namespace Belle2 {
     double m_globalTime;      /**< Global time of hit */
     double m_energy;          /**< Energy of detected photon */
     int m_parentID;        /**< G4 ID number of photons parent particle */
+    int m_trackID;        /**< G4 ID number of photons track */
 
 
     ClassDef(TOPSimHit, 1); /**< the class title */

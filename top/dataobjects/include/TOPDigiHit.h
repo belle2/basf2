@@ -16,45 +16,49 @@
 namespace Belle2 {
 
 
-  //! Class TOPHit - Geant4 simulated hit for TOP.
+  //! Class TOPDigiHit - Stores hits after digitisation
   /*!
    This is a class to store TOP geant4 hit in datastore.
    It is also the input for digitization module (TOPDigi).
    */
 
-  class TOPHit : public TObject {
+  class TOPDigiHit : public TObject {
   public:
 
     //! Default constructor
-    TOPHit():
+    TOPDigiHit():
         m_barID(0),
         m_channelID(0),
-        m_globalTime(0),
-        m_energy(0),
-        m_parentID(0) {
+        m_TDC(0),
+        m_energy(0.),
+        m_parentID(0),
+        m_trackID(0) {
       /*! Does nothing */
     }
 
     //! Full constructor.
     /*!
-     \param moduleID ID of hapd module containing hit
-     \param position vector of hit local position (in module coor. sys.)
-     \param globalTime global time of photon hit
+     \param barID is the ID of the bar
+     \param channelID is the ID of the digitised channel
+     \param TDC it the TDC of global time
      \param energy energy of photon
      \param parentID geant4 id of photon parent particle
+     \param trackID geant4 id of photon track
      */
 
-    TOPHit(
+    TOPDigiHit(
       int barID,
       int channelID,
-      double globalTime,
+      int TDC,
       double energy,
-      int parentID):
+      int parentID,
+      int trackID):
         m_barID(barID),
         m_channelID(channelID),
-        m_globalTime(globalTime),
+        m_TDC(TDC),
         m_energy(energy),
-        m_parentID(parentID) {
+        m_parentID(parentID),
+        m_trackID(trackID) {
       /* Does nothing */
     }
 
@@ -65,8 +69,8 @@ namespace Belle2 {
     //! Get the channel ID of the hit in the PMT
     int getChannelID() const { return m_channelID; }
 
-    //! Get global time of hit
-    double getGlobalTime() const { return m_globalTime; }
+    //! Get TDC time of hit
+    int getTDC() const { return m_TDC; }
 
     //! Get detected photon energy
     double getEnergy() const { return m_energy; }
@@ -74,11 +78,17 @@ namespace Belle2 {
     //! Get G4 ID number of photons parent particle
     int getParentID() const { return m_parentID; }
 
+    //! Get G4 ID number of photons track
+    int getTrackID() const { return m_trackID; }
+
     //! Set ID number of module that registered hit
     void setBarID(int barID) { m_barID = barID; }
 
+    //! Set ID number of module that registered hit
+    void setChannelID(int channelID) { m_channelID = channelID; }
+
     //! Set global time of hit
-    void setGlobalTime(double globalTime) { m_globalTime = globalTime; }
+    void setTDC(int TDC) { m_TDC = TDC; }
 
     //! Get detected photon energy
     void setEnergy(double energy) { m_energy = energy; }
@@ -86,15 +96,18 @@ namespace Belle2 {
     //! Get G4 ID number of photons parent particle
     void setParentID(int parentID) { m_parentID = parentID; }
 
+    //! Get G4 ID number of photons track
+    void setTrackID(int trackID) { m_trackID = trackID; }
+
   private:
     int m_barID;           /**< ID number of bar that registered hit*/
     int m_channelID;      /**< Channel ID of the hit in the PMT */
-    double m_globalTime;      /**< Global time of hit */
+    int m_TDC;              /**< digitised time */
     double m_energy;          /**< Energy of detected photon */
     int m_parentID;        /**< G4 ID number of photons parent particle */
+    int m_trackID;        /**< G4 ID number of photons track */
 
-
-    ClassDef(TOPHit, 1); /**< the class title */
+    ClassDef(TOPDigiHit, 1); /**< the class title */
 
   };
 

@@ -110,6 +110,14 @@ namespace Belle2 {
        */
       bool DetectorQE(double energy);
 
+      //! Returns gausian distribuded random number
+      /*!
+       \param mean
+       \param sigma
+      */
+      double Gaus(double mean, double sigma);
+
+
     };
 
   } // top namespace

@@ -64,8 +64,10 @@ namespace Belle2 {
       //Get photon energy
       const G4double energy = track.GetKineticEnergy() / eV;
 
-      //Get ID of parent particle
+      //Get ID of parent particle and track
       const G4int parentID = track.GetParentID();
+      const G4int trackID = track.GetTrackID();
+
 
       //------------------------------------------------------------
       //                Create TOPSimHit and save it to datastore
@@ -74,7 +76,7 @@ namespace Belle2 {
       TVector3 locpos(localPosition.x() / cm, localPosition.y() / cm, localPosition.z() / cm);
       StoreArray<TOPSimHit> topSimHits;
       G4int nentr = topSimHits->GetEntries();
-      new(topSimHits->AddrAt(nentr)) TOPSimHit(moduleID, barID, locpos, globalTime, energy, parentID);
+      new(topSimHits->AddrAt(nentr)) TOPSimHit(moduleID, barID, locpos, globalTime, energy, parentID, trackID);
 
       // after detection photon track is killed */
       track.SetTrackStatus(fStopAndKill);

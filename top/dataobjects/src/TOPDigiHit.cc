@@ -8,12 +8,12 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <top/dataobjects/TOPHit.h>
+#include <top/dataobjects/TOPDigiHit.h>
 
 using namespace std;
 using namespace Belle2;
 
-ClassImp(TOPHit)
+ClassImp(TOPDigiHit)
 
 
 

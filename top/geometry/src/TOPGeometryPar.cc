@@ -86,6 +86,8 @@ TOPGeometryPar::clear(void)
   _Npadx = 0;
   _Npady = 0;
   _dGlue = 0;
+  _NTDC = 0;
+  _TDCwidth = 0;
 
   //! Mirror parameters
 
@@ -141,6 +143,8 @@ void TOPGeometryPar::read(const GearDir& content)
   _Npadx = detParams.getInt("Module/PadXNum");
   _Npady = detParams.getInt("Module/PadXNum");
   _dGlue = detParams.getLength("dGlue");
+  _NTDC = detParams.getInt("Module/TDCbits");
+  _TDCwidth = detParams.getInt("Module/TDCbitwidth");
 
   //! Mirror parameters
 

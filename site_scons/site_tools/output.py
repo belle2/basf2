@@ -53,6 +53,8 @@ def generate(env):
             SHCXXCOMSTR='${CXXCOMSTR}',
             CXXCOMSTR=color_map['compile'] + '*** compiling  : ${SOURCE}'
                 + color_map['end'],
+            FORTRANPPCOMSTR='${CXXCOMSTR}',
+            SHFORTRANPPCOMSTR='${CXXCOMSTR}',
             SHLINKCOMSTR='${LINKCOMSTR}',
             LINKCOMSTR=color_map['link'] + '*** linking    : ${TARGET}'
                 + color_map['end'],

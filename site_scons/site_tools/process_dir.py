@@ -61,7 +61,11 @@ def process_dir(
 
     # get list of source files
     src_nodes = get_files(os.path.join(dir_name, '*.cc'), release_dir) \
-        + get_files(os.path.join(dir_name, 'src', '*.cc'), release_dir)
+        + get_files(os.path.join(dir_name, 'src', '*.cc'), release_dir) \
+        + get_files(os.path.join(dir_name, '*.f'), release_dir) \
+        + get_files(os.path.join(dir_name, 'src', '*.f'), release_dir) \
+        + get_files(os.path.join(dir_name, '*.F'), release_dir) \
+        + get_files(os.path.join(dir_name, 'src', '*.F'), release_dir)
     src_files = [os.path.join(parent_env['BUILDDIR'], str(node)) for node in
                  src_nodes]
 

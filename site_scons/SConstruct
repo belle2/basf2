@@ -8,6 +8,8 @@ AddOption('--color', dest = 'color', nargs = 1, default = 'off', action = 'store
 AddOption('--verbose', dest = 'verbose', action = 'store_true', default = False, help='Enable verbose output')
 AddOption('--extra-libpath', dest = 'extralibpath', action = 'store', help = 'Additional library path')
 
+SetOption('warn', 'no-fortran-cxx-mix')
+
 
 # get the sub directory name for architecture and build option dependent files
 if not os.environ.has_key('BELLE2_SUBDIR'):

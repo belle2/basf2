@@ -21,8 +21,8 @@ namespace Belle2 {
   public:
 
     //! Constructor
-    ECLSensitiveDetector(G4String name);
-
+//    ECLSensitiveDetector(G4String name);
+    ECLSensitiveDetector(G4String name, G4double thresholdEnergyDeposit, G4double thresholdKineticEnergy);
     //! Destructor
     ~ECLSensitiveDetector();
 
@@ -30,7 +30,8 @@ namespace Belle2 {
     void Initialize(G4HCofThisEvent* HCTE);
 
     //! Process each step and calculate variables defined in ECLHit (not yet prepared)
-    G4bool ProcessHits(G4Step* aStep, G4TouchableHistory*);
+    bool step(G4Step *aStep, G4TouchableHistory *history);
+//    G4bool ProcessHits(G4Step* aStep, G4TouchableHistory*);
 
     //! Do what you want to do at the end of each event
     void EndOfEvent(G4HCofThisEvent *eventHC);
@@ -62,8 +63,10 @@ namespace Belle2 {
 
   private:
 
+    G4double m_thresholdEnergyDeposit;
+    G4double m_thresholdKineticEnergy;
     int m_hitNumber; /**< The current number of created hits in an event. Used to fill the DataStore ECL array.*/
-
+    int m_EBhitNumber; /**< The current number of created hits in an event. Used to fill the DataStore ECL EB array.*/
   };
 
 } // end of namespace Belle2

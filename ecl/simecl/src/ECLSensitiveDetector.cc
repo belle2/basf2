@@ -16,7 +16,7 @@
 #include <framework/logging/Logger.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/dataobjects/Relation.h>
+//#include <framework/dataobjects/Relation.h>
 //#include <ecl/hitecl/include/ECLSimHit.h>
 #include <ecl/hitecl/ECLSimHit.h>
 
@@ -43,11 +43,12 @@
 
 using namespace Belle2;
 
-ECLSensitiveDetector::ECLSensitiveDetector(G4String name) : SensitiveDetectorBase(name)
+ECLSensitiveDetector::ECLSensitiveDetector(G4String name, G4double thresholdEnergyDeposit, G4double thresholdKineticEnergy):
+    SensitiveDetectorBase(name, ECL), m_thresholdEnergyDeposit(thresholdEnergyDeposit),
+    m_thresholdKineticEnergy(thresholdKineticEnergy), m_hitNumber(0), m_EBhitNumber(0)
 {
-  addRelationCollection(DEFAULT_MCPART_TO_ECLSIMHITS);
-
 }
+
 
 ECLSensitiveDetector::~ECLSensitiveDetector()
 {
@@ -69,60 +70,9 @@ void ECLSensitiveDetector::Initialize(G4HCofThisEvent * HCTE)
 //-----------------------------------------------------
 // Method invoked for every step in sensitive detector
 //-----------------------------------------------------
-G4bool ECLSensitiveDetector::ProcessHits(G4Step *aStep, G4TouchableHistory *)
+//G4bool ECLSensitiveDetector::ProcessHits(G4Step *aStep, G4TouchableHistory *)
+bool ECLSensitiveDetector::step(G4Step *aStep, G4TouchableHistory *)
 {
-
-//http://geant4.web.cern.ch/geant4/UserDocumentation/UsersGuides/ForApplicationDeveloper/html/ch05.html
-
-  const G4double edep = aStep->GetTotalEnergyDeposit();
-  if (edep == 0.) return false;
-
-  // Get step length
-  const G4double stepLength = aStep->GetStepLength();
-  const G4double s_in_layer = stepLength / cm;
-//  if (stepLength == 0.) return false;
-
-  // Get step information
-  const G4Track & t = * aStep->GetTrack();
-
-  const G4double tof = t.GetGlobalTime();
-  if (isnan(tof)) {
-    B2ERROR("ECLSensitiveDetector: global time is nan");
-    return false;
-  }
-
-  const G4int pid = t.GetDefinition()->GetPDGEncoding();
-  const G4int trackID = t.GetTrackID();
-
-  const G4VPhysicalVolume & v = * t.GetVolume();
-  const G4StepPoint & in = * aStep->GetPreStepPoint();
-  const G4StepPoint & out = * aStep->GetPostStepPoint();
-  const G4ThreeVector & posIn = in.GetPosition();
-  const G4ThreeVector & posOut = out.GetPosition();
-  const G4ThreeVector momIn(in.GetMomentum().x(), in.GetMomentum().y(),
-                            in.GetMomentum().z());
-
-  const G4ThreeVector posCell = v.GetTranslation();
-  // Get layer ID
-
-  Mapping(v.GetName());
-
-  int saveIndex = -999;
-  saveIndex = saveSimHit(m_cellID, m_thetaID, m_phiID  , trackID, pid, tof, edep, s_in_layer * cm, momIn, posCell, posIn, posOut);
-
-  //Set the SeenInDetector flag
-  setSeenInDetectorFlag(aStep, MCParticle::c_LastSeenInECL);
-
-  //Add relation between the MCParticle and the hit.
-  //The index of the MCParticle has to be set to the TrackID and will be
-  //replaced later by the correct MCParticle index automatically.
-
-  StoreArray<Relation> mcPartToSimHits(getRelationCollectionName());
-  StoreArray<MCParticle> mcPartArray(DEFAULT_MCPARTICLES);
-  if (saveIndex < 0) {B2FATAL("SimHit wasn't saved despite charge != 0");}
-  StoreArray<ECLSimHit> eclArray(DEFAULT_ECLSIMHITS);
-
-  new(mcPartToSimHits->AddrAt(saveIndex)) Relation(mcPartArray, eclArray, trackID, saveIndex);
 
   return true;
 }
@@ -135,44 +85,6 @@ void ECLSensitiveDetector::EndOfEvent(G4HCofThisEvent *)
 }
 
 
-int ECLSensitiveDetector::saveSimHit(
-  const G4int cellId,
-  const G4int thetaId,
-  const G4int phiId,
-  const G4int trackID,
-  const G4int pid,
-  const G4double tof,
-  const G4double edep,
-  const G4double stepLength,
-  const G4ThreeVector & mom,
-  const G4ThreeVector & posCell,
-  const G4ThreeVector & posIn,
-  const G4ThreeVector & posOut)
-{
-  //change Later
-  StoreArray<ECLSimHit> eclArray(DEFAULT_ECLSIMHITS);
-  m_hitNumber = eclArray->GetLast() + 1;
-  new(eclArray->AddrAt(m_hitNumber)) ECLSimHit();
-  eclArray[m_hitNumber]->setThetaId(thetaId);
-  eclArray[m_hitNumber]->setPhiId(phiId);
-  eclArray[m_hitNumber]->setCellId(cellId);
-  eclArray[m_hitNumber]->setTrackId(trackID);
-  eclArray[m_hitNumber]->setPDGCode(pid);
-  eclArray[m_hitNumber]->setFlightTime(tof / ns);
-  eclArray[m_hitNumber]->setEnergyDep(edep / GeV);
-  eclArray[m_hitNumber]->setStepLength(stepLength / cm);
-  TVector3 momentum(mom.getX() / GeV, mom.getY() / GeV, mom.getZ() / GeV);
-  eclArray[m_hitNumber]->setMomentum(momentum);
-  TVector3 posCellv(posCell.getX() / cm, posCell.getY() / cm, posCell.getZ() / cm);
-  eclArray[m_hitNumber]->setPosCell(posCellv);
-  TVector3 positionIn(posIn.getX() / cm, posIn.getY() / cm, posIn.getZ() / cm);
-  eclArray[m_hitNumber]->setPosIn(positionIn);
-  TVector3 positionOut(posOut.getX() / cm, posOut.getY() / cm, posOut.getZ() / cm);
-  eclArray[m_hitNumber]->setPosOut(positionOut);
-//  B2INFO("SensitiveDetector ECL initialized");
-  B2INFO("HitNumber: " << m_hitNumber);
-  return (m_hitNumber);
-}
 
 
 int ECLSensitiveDetector::Mapping(const G4String VolumeName)

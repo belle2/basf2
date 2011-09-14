@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Materials>
+  <Material name="CsI">
+    <density unit="g/cm3">4.510</density>
+    <Components>
+       <Element fraction="0.4885">Cs</Element>
+       <Element fraction="0.5115">I</Element>
+    </Components>
+  </Material>
+</Materials>

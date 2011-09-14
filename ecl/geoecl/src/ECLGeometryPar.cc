@@ -3,26 +3,28 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Guofu Cao                                                *
+ * Contributors: Poyuan Chen                                                *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <framework/gearbox/Gearbox.h>
+//#include <framework/gearbox/Gearbox.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
+
 
 #include <ecl/geoecl/ECLGeometryPar.h>
 
 #include <cmath>
 #include <boost/format.hpp>
 #include <iostream>
+#include <iomanip>
 #include <fstream>
 
 using namespace std;
 using namespace boost;
 using namespace Belle2;
-#define PI 3.14159265358979323846
+
 
 
 ECLGeometryPar* ECLGeometryPar::m_B4ECLGeometryParDB = 0;
@@ -56,52 +58,48 @@ void ECLGeometryPar::clear()
 void ECLGeometryPar::read()
 {
 
-
-  char stemp[100];
+  GearDir content = GearDir("/Detector/DetectorComponent[@name=\"ECL\"]/Content/");
   for (int iBrCry = 1 ; iBrCry <= 46 ; ++iBrCry) {//46=29+17
 
-    GearDir layerContent = GearDir("/Detector/Subdetectors/ParamSet[@type=\"ECL\"]/");
-    layerContent = Gearbox::Instance().getContent("ECL");
-    sprintf(stemp, "BarrelCrystals/BarrelCrystal[%d]/", iBrCry);
-    layerContent.append(stemp);
+    GearDir layerContent(content);
+    layerContent.append((format("/BarrelCrystals/BarrelCrystal[%1%]/") % (iBrCry)).str());
 
-    m_BLThetaCrystal[iBrCry-1] = layerContent.getParamAngle("K_z_TILTED") ;
-    m_BLPhiCrystal[iBrCry-1] = layerContent.getParamAngle("K_phi_TILTED") ;
-    m_BLPreppos[iBrCry-1] = layerContent.getParamLength("K_perpC") ;
-    m_BLPhipos[iBrCry-1] = layerContent.getParamAngle("K_phiC") ;
-    m_BLZpos[iBrCry-1] = layerContent.getParamLength("K_zC") ;
+    m_BLThetaCrystal[iBrCry-1] = layerContent.getAngle("K_z_TILTED") ;
+    m_BLPhiCrystal[iBrCry-1] = layerContent.getAngle("K_phi_TILTED") ;
+    m_BLPreppos[iBrCry-1] = layerContent.getLength("K_perpC") ;
+    m_BLPhipos[iBrCry-1] = layerContent.getAngle("K_phiC") ;
+    m_BLZpos[iBrCry-1] = layerContent.getLength("K_zC") ;
   }
 
 
 
   for (int iCry = 1 ; iCry <= 132 ; ++iCry) {
-    GearDir counter = GearDir("/Detector/Subdetectors/ParamSet[@type=\"ECL\"]/");
-    counter = Gearbox::Instance().getContent("ECL");
-    char stemp_ecap[100];
-    sprintf(stemp_ecap, "EndCapCrystals/EndCapCrystal[%d]/", iCry);
-    counter.append(stemp_ecap);
 
-    m_ECThetaCrystal[iCry-1]  = counter.getParamAngle("K_Ptheta") ;
-    m_ECPhiCrystal[iCry-1] = counter.getParamAngle("K_Rphi2")  ;
-    m_ECRpos[iCry-1]  = counter.getParamLength("K_Pr");
-    m_ECThetapos[iCry-1]  = counter.getParamAngle("K_Ptheta") ;
-    m_ECPhipos[iCry-1]  = counter.getParamAngle("K_Pphi") ;
+    GearDir counter(content);
+    counter.append((format("/EndCapCrystals/EndCapCrystal[%1%]/") % (iCry)).str());
+
+    m_ECThetaCrystal[iCry-1]  = counter.getAngle("K_Ptheta") ;
+    m_ECPhiCrystal[iCry-1] = counter.getAngle("K_Rphi2")  ;
+    m_ECRpos[iCry-1]  = counter.getLength("K_Pr");
+    m_ECThetapos[iCry-1]  = counter.getAngle("K_Ptheta") ;
+    m_ECPhipos[iCry-1]  = counter.getAngle("K_Pphi") ;
   }
 
 
 }
 
 
-TVector3 ECLGeometryPar::GetCrystalPos()
+TVector3 ECLGeometryPar::GetCrystalPos(int cid)
 {
 
+  Mapping(cid);
   TVector3 Pos;
 
   if (mPar_cellID <7776 && mPar_cellID>1151) {
     int iSector = mPar_phiID / 2;
     double phi_ang = iSector * 360 / 72  + m_BLPhipos[mPar_thetaIndex] + (mPar_phiIndex % 2) * (5 - 2.494688) ;
-    TVector3 Pos_tmp(m_BLPreppos[mPar_thetaIndex] * cos(phi_ang *PI / 180) ,
-                     m_BLPreppos[mPar_thetaIndex] * sin(phi_ang*PI / 180) , m_BLZpos[mPar_thetaIndex]);
+    TVector3 Pos_tmp(m_BLPreppos[mPar_thetaIndex] * cos(phi_ang) ,
+                     m_BLPreppos[mPar_thetaIndex] * sin(phi_ang) , m_BLZpos[mPar_thetaIndex]);
     Pos = Pos_tmp;
 
   } else {
@@ -109,19 +107,19 @@ TVector3 ECLGeometryPar::GetCrystalPos()
     double phi_ang = m_ECPhipos[mPar_phiIndex] + 360. / 16 * mPar_thetaIndex;
     double theta_ang = m_ECThetapos[mPar_phiIndex];
     TVector3 Pos_tmp(
-      m_ECRpos[mPar_phiIndex] * sin(theta_ang *PI / 180) * cos(phi_ang *PI / 180),
-      m_ECRpos[mPar_phiIndex] * sin(theta_ang *PI / 180) * sin(phi_ang *PI / 180),
-      m_ECRpos[mPar_phiIndex] * cos(theta_ang *PI / 180));
+      m_ECRpos[mPar_phiIndex] * sin(theta_ang) * cos(phi_ang),
+      m_ECRpos[mPar_phiIndex] * sin(theta_ang) * sin(phi_ang),
+      m_ECRpos[mPar_phiIndex] * cos(theta_ang));
     Pos = Pos_tmp;
   }
 
   return Pos;
 }
 
-TVector3 ECLGeometryPar::GetCrystalVec()
+TVector3 ECLGeometryPar::GetCrystalVec(int cid)
 {
 
-
+  Mapping(cid);
   TVector3 Pos;
 
   if (mPar_cellID <7776 && mPar_cellID>1151) {
@@ -129,18 +127,18 @@ TVector3 ECLGeometryPar::GetCrystalVec()
     double phi_ang = double(iSector) * 360. / 72.  + m_BLPhipos[mPar_thetaIndex] + double(mPar_phiIndex % 2) * (5. - 2.494688) + m_BLPhiCrystal[mPar_thetaIndex];
     double theta_ang = m_BLThetaCrystal[mPar_thetaIndex];
     TVector3 Pos_tmp(
-      sin(theta_ang *PI / 180.) * cos(phi_ang *PI / 180.),
-      sin(theta_ang *PI / 180.) * sin(phi_ang *PI / 180.),
-      cos(theta_ang *PI / 180.));
+      sin(theta_ang) * cos(phi_ang),
+      sin(theta_ang) * sin(phi_ang),
+      cos(theta_ang));
     Pos = Pos_tmp;
 
   } else {
     double phi_ang =   360. / 16. * mPar_thetaIndex +  m_ECPhiCrystal[mPar_phiIndex];
     double theta_ang =  m_ECThetaCrystal[mPar_phiIndex];
     TVector3 Pos_tmp(
-      sin(theta_ang *PI / 180.) * cos(phi_ang *PI / 180.),
-      sin(theta_ang *PI / 180.) * sin(phi_ang *PI / 180.),
-      cos(theta_ang *PI / 180.));
+      sin(theta_ang) * cos(phi_ang),
+      sin(theta_ang) * sin(phi_ang),
+      cos(theta_ang));
     Pos = Pos_tmp;
   }
 
@@ -150,6 +148,26 @@ TVector3 ECLGeometryPar::GetCrystalVec()
 
 
 
+int ECLGeometryPar::GetCellID(int ThetaId, int PhiId)
+{
+  int forwRing[13] = {0, 3, 6, 10, 14, 18, 24, 30, 36, 42, 48, 54, 63 };
+  int backRing[10] = {0, 9, 18, 24, 30, 36, 42, 48, 52, 56} ;
+
+/// 0-12  forward
+/// 13-58 barrel
+/// 59-68 backward
+  if (ThetaId < 13) {
+    mPar_cellID = forwRing[ThetaId] * 16 + PhiId;
+  } else if (ThetaId > 58) {
+    mPar_cellID = 7776 + backRing[ThetaId-59] * 16 + PhiId;
+  } else if (ThetaId > 12 && ThetaId < 59) {
+    mPar_cellID = 1152 + 144 * (ThetaId - 13)  + PhiId;
+  } else     B2ERROR("ECL ECLGeometryPar::CellID int ThetaId " << ThetaId << " int PhiId " << PhiId << ". Out of range.");
+
+  mPar_thetaID = ThetaId;
+  mPar_phiID =  PhiId ;
+  return mPar_cellID;
+}
 
 void ECLGeometryPar::Mapping(int cid)
 {
@@ -283,4 +301,6 @@ void ECLGeometryPar::Mapping(int cid)
   }
 
 }
+
+
 

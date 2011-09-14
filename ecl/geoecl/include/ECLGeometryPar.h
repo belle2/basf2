@@ -11,14 +11,31 @@
  *                                                                        *
  *                                                                        *
  **************************************************************************/
-
-#ifndef ECLGEOMETRYMAPPING_H
-#define ECLGEOMETRYMAPPING_H
+#ifndef ECLGEOMETRYPAR_H
+#define ECLGEOMETRYPAR_H
 
 #include <vector>
 #include <string>
+#include <iostream>
+#include <iomanip>
+#include <fstream>
+#include <functional>
+#include <map>
+
 
 #include "TVector3.h"
+typedef int EclIdentifier ;
+typedef double     EclGeV        ;
+///
+typedef double   EclCM         ;
+///
+typedef double     EclCC         ;
+///
+typedef double     EclKG         ;
+///
+typedef double     EclRad        ;
+///
+typedef double     EclDeg        ;
 
 
 namespace Belle2 {
@@ -56,9 +73,15 @@ namespace Belle2 {
     void Mapping(int cid);
 
 
-    TVector3 GetCrystalPos();  /** The Postion of crystal*/
+    TVector3 GetCrystalPos(int cid);  /** The Postion of crystal*/
 
-    TVector3 GetCrystalVec();  /** The dection of crystal*/
+    TVector3 GetCrystalVec(int cid);  /** The dection of crystal*/
+
+    int GetCellID(int ThetaId, int PhiId);//! Get Cell Id
+
+    int GetCellID() {return mPar_cellID;};//! Get Cell Id
+    int GetThetaID() {return mPar_thetaID;};//! Get Theta Id
+    int GetPhiID() {return mPar_phiID;};//! Get Phi Id
 
   private:
 
@@ -82,8 +105,6 @@ namespace Belle2 {
 
     static ECLGeometryPar* m_B4ECLGeometryParDB; /*!< Pointer that saves the instance of this class. */
   };
-
-
 } // end of namespace Belle2
 
 #endif

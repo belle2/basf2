@@ -1,0 +1,41 @@
+c--   TOP_PIK.fi: table of peak positions, widths, etc.
+
+      integer MAX_PIK, NUM_CHA
+      PARAMETER (MAX_PIK=512)   ! max number of peaks in a single channel
+      PARAMETER (NUM_CHA=1024)   ! max number of channels
+      
+      INTEGER NCH(-1:1)                   ! number of exit window channels 
+      REAL PIK_XCH(0:NUM_CHA-1)           ! x pos. of channel (pad center) [cm]
+      REAL PIK_YCH(0:NUM_CHA-1)           ! y pos. of channel (pad center) [cm]
+      REAL PIK_DXCH(0:NUM_CHA-1)          ! x size of channel [cm]
+      REAL PIK_DYCH(0:NUM_CHA-1)          ! y size of channel [cm]
+      REAL PIK_BGR(0:NUM_CHA-1)           ! bkg. (normalised)
+
+      INTEGER NUM_PIK(0:NUM_CHA-1)        ! number of peaks in single channel
+      REAL PIK_POZ(MAX_PIK,0:NUM_CHA-1)   ! peak position [ns]
+      REAL PIK_WID(MAX_PIK,0:NUM_CHA-1)   ! peak width squared (rms^2) [ns^2]
+      REAL PIK_NPH(MAX_PIK,0:NUM_CHA-1)   ! normalized number of photons in peak
+      REAL PIK_FIC(MAX_PIK,0:NUM_CHA-1)   ! peak: Cerenkov phi
+      INTEGER PIK_NX(MAX_PIK,0:NUM_CHA-1) ! peak: number of reflections in x
+      INTEGER PIK_NY(MAX_PIK,0:NUM_CHA-1) ! peak: number of reflections in y
+      REAL PIK_XD(MAX_PIK,0:NUM_CHA-1)    ! unfolded x pos. of channel
+      REAL PIK_YD(MAX_PIK,0:NUM_CHA-1)    ! unfolded y pos. of channel
+
+      REAL STFS, STFB                   ! expected num. of signal, bkg. photons
+      INTEGER LR_FLAG(0:1)              ! L/R flag
+      REAL MASS_HYP, BETA, TOF          ! mass hypothesis, beta, time-of-flight
+      REAL FOT0, PTOT, T_MAX            ! photons/2pi, tot.refl.rq., max time
+      REAL C_THC(0:1), S_THC(0:1)       ! cos & sin theta_Cer
+      REAL TH0_SIP                      ! multiple scatt. contr. to theta_Cer
+      REAL D_THC                        ! d(theta_Cer)
+
+      COMMON /TOP_PIK/ NCH, 
+     &     PIK_XCH, PIK_YCH, PIK_DXCH, PIK_DYCH, PIK_BGR, NUM_PIK, 
+     &	   PIK_POZ, PIK_WID, PIK_NPH, PIK_FIC, PIK_NX, PIK_NY,
+     &     PIK_XD, PIK_YD,
+     &     STFS, STFB, LR_FLAG,
+     &     MASS_HYP, BETA, TOF, FOT0, PTOT, T_MAX, C_THC, S_THC,
+     &	   TH0_SIP, D_THC
+
+
+      

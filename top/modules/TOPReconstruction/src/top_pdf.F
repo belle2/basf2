@@ -1,0 +1,889 @@
+!-----------------------------------------------------------------------
+! TOP counter for Belle: Reconstruction - construct TOP PDF
+! M. Staric, nov-2008, jun-2009, feb-2010
+! units: GeV, GeV/c, cm, ns, cm/ns, T, nm
+!-----------------------------------------------------------------------
+
+      SUBROUTINE TOP_SET_PDF(MASS,T0)
+
+      IMPLICIT NONE
+      REAL MASS                 ! mass of particle hypothesis
+      REAL T0                   ! start time for beta=1
+#include "TOP_CONS.fi"
+#include "TOP_GEO.fi"
+#include "TOP_EXT.fi"
+#include "TOP_PMT.fi"
+#include "TOP_TDC.fi"
+#include "TOP_PAR.fi"
+#include "TOP_PIK.fi"
+#include "TOP_TOPF.fi"
+#include "TOP_TRACK.fi"
+      DATA NCH /3*0/
+      INTEGER NUMCH
+      INTEGER NN, ICH, LR, L, K, I
+      REAL ZW(0:1), ZD, ZB, ZM, DZEXT
+      REAL NORM, FOT, RIND(0:1), SIGE_SIP
+      INTEGER MAXPIK
+
+!     reset & set some parameters
+      LR_FLAG(0)=QBAR_LSIDE(MODUL)
+      LR_FLAG(1)=QBAR_RSIDE(MODUL)
+      ZW(0)=-QBAR_C(MODUL)/2.
+      ZW(1)=QBAR_C(MODUL)/2.
+      NCH(0)=PMT_NX*PMT_NY*N_PMT(0,MODUL)
+      NCH(1)=PMT_NX*PMT_NY*N_PMT(1,MODUL)
+      NUMCH=NCH(0)+NCH(1)
+      IF(NUMCH.GT.NUM_CHA) THEN
+         PRINT*,'top_set_pdf_: NUMCH>NUM_CHA, NUMCH=',NUMCH
+         RETURN
+      ENDIF
+      CALL SET_XYCH(MODUL)
+      T_MAX=TDC_RANGE*TDC_DT
+      CALL SET_BACKG(MODUL)
+      DO ICH=0,NUMCH-1
+         NUM_PIK(ICH)=0
+      ENDDO
+      STFS=0.
+      IF(MASS.LE.0) RETURN
+      MASS_HYP=MASS
+      BETA=PMOM/MASS/SQRT(1+(PMOM/MASS)**2)
+      TOF=(TOF_C0+T0)/BETA
+      RIND(0)=REF_IND
+      RIND(1)=REF_IND1
+      DO I=0,1
+         C_THC(I)=1./BETA/RIND(I)
+         IF(C_THC(I).GE.1) RETURN
+         S_THC(I)=SQRT(1.-C_THC(I)**2)
+      ENDDO
+      FOT0=N_ZERO*T_LEN/2./PI*S_THC(0)**2
+      PTOT=SQRT(1.-1./REF_IND**2)
+      IF(QBAR_RADL.GT.0) THEN
+         TH0_SIP=13.6E-3/BETA/PMOM*SQRT(T_LEN/2./QBAR_RADL)
+      ELSE
+         TH0_SIP=0.
+      ENDIF
+      D_THC=(S_THC(1)-S_THC(0))/C_THC(0)
+      SIGE_SIP=D_E/D_THC*TH0_SIP
+      CALL QE_SET_XQE(SIGE_SIP)
+
+!     calculate pattern
+      DO L=0,1
+         DZEXT=0.
+         IF(LR_FLAG(L).EQ.0) THEN
+            CYCLE
+         ELSE IF(LR_FLAG(L).EQ.1) THEN
+            LR=L
+            IF(QBAR_EXT(LR,MODUL).GT.0) DZEXT=EXT_DZ(QBAR_EXT(LR,MODUL))
+            ZM=0
+            ZB=ZW(L)
+            ZD=ZB+(2*L-1)*DZEXT
+            CALL TOP_PATT_WIN(LR,L,0,ZD,ZB,ZM)
+         ELSE IF(LR_FLAG(L).EQ.2) THEN
+            LR=1-L
+            IF(QBAR_EXT(LR,MODUL).GT.0) DZEXT=EXT_DZ(QBAR_EXT(LR,MODUL))
+            ZM=ZW(L)
+            ZB=ZM+(2*L-1)*QBAR_C(MODUL)
+            ZD=ZB+(2*L-1)*DZEXT
+            CALL TOP_PATT_WIN(LR,L,0,ZD,ZB,ZM)
+         ELSE IF(LR_FLAG(L).EQ.3) THEN
+            LR=1-L
+            IF(QBAR_EXT(LR,MODUL).GT.0) DZEXT=EXT_DZ(QBAR_EXT(LR,MODUL))
+            ZM=ZW(L)
+            ZB=ZM+(2*L-1)*QBAR_C(MODUL)
+            ZD=ZB+(2*L-1)*DZEXT
+            CALL TOP_PATT_WIN(LR,L,1,ZD,ZB,ZM)
+         ELSE IF(LR_FLAG(L).EQ.4) THEN
+            LR=1-L
+            IF(QBAR_EXT(LR,MODUL).GT.0) DZEXT=EXT_DZ(QBAR_EXT(LR,MODUL))
+            ZM=ZW(L)
+            ZB=ZM+(2*L-1)*QBAR_C(MODUL)
+            ZD=ZB+(2*L-1)*DZEXT
+            CALL TOP_PATT_WIN(LR,L,2,ZD,ZB,ZM)
+         ELSE
+            PRINT*,'top_reco: unknown exit window type ',LR_FLAG(L)
+            CYCLE
+         ENDIF
+      ENDDO
+
+      MAXPIK=0
+      NN=0
+      DO ICH=0,NUMCH-1
+         MAXPIK=MAX(MAXPIK,NUM_PIK(ICH))
+         IF(NUM_PIK(ICH).GT.MAX_PIK) THEN
+            NN=NN+1
+            NUM_PIK(ICH)=MAX_PIK
+         ENDIF
+      ENDDO      
+      IF(NN.GT.0) PRINT*,'num.pik>MAX_PIK---->',NN, MAXPIK
+
+!     normalize 
+      STFS=0.
+      NORM=0.
+      DO ICH=0,NUMCH-1
+         FOT=0.                 ! kaj pa ozadje?
+         DO K=1,NUM_PIK(ICH)
+            NORM=NORM+PIK_NPH(K,ICH)
+            FOT=FOT+PIK_NPH(K,ICH)
+         ENDDO
+         STFS=STFS+(1.-EXP(-FOT))
+      ENDDO
+      IF(NORM.EQ.0) RETURN
+
+      DO ICH=0,NUMCH-1
+         DO K=1,NUM_PIK(ICH)
+            PIK_NPH(K,ICH)=PIK_NPH(K,ICH)/NORM
+         ENDDO
+      ENDDO
+
+      END
+
+
+      SUBROUTINE TOP_PATT_WIN(LR,L,TYP,ZD,ZB,ZM)
+
+      IMPLICIT NONE
+      INTEGER LR, L             ! exit window: 0/1=left/right
+      INTEGER TYP               ! focusing type: 0=non, 1=cyl, 2=sph
+      REAL ZD                   ! z coordinate of detector plane
+      REAL ZB                   ! z coordinate of qbar-end
+      REAL ZM                   ! z coordinate of mirror for focusing type
+#include "TOP_CONS.fi"
+#include "TOP_GEO.fi"
+#include "TOP_PMT.fi"
+#include "TOP_PAR.fi"
+#include "TOP_PIK.fi"
+#include "TOP_TRACK.fi"
+#include "TOP_TOPF.fi"
+      REAL XMI, XMA, XCH, DXCH, X
+      INTEGER KMI, KMA, IPMTX, IX, ICH, K, ICHAN
+      LOGICAL NOT_WINDOW, OK
+
+      IF(NOT_WINDOW(ZD,C_THC(0),S_THC(0))) RETURN
+      XMI=T_R0(1)-(T_MAX-TOF)/GRU_IND*C0*PTOT
+      XMA=T_R0(1)+(T_MAX-TOF)/GRU_IND*C0*PTOT
+      CALL XMINMAX(XMI,XMA,ZD,C_THC(0),S_THC(0),OK)
+      IF(.NOT.OK) RETURN
+      KMI=NINT(XMI/QBAR_A(MODUL))
+      KMA=NINT(XMA/QBAR_A(MODUL))
+
+      DO IPMTX=0,N_PMTX(LR,MODUL)-1
+         DO IX=0,PMT_NX-1
+            ICH=ICHAN(IX,0,IPMTX,0,LR,MODUL)
+            XCH=PIK_XCH(ICH)
+            DXCH=PIK_DXCH(ICH)
+            IF(DXCH.EQ.0) CYCLE
+            DO K=KMI,KMA
+               IF(MOD(ABS(K),2).EQ.0) THEN
+                  X=K*QBAR_A(MODUL)+XCH
+               ELSE
+                  X=K*QBAR_A(MODUL)-XCH
+               ENDIF
+               IF(X.LT.XMI-DXCH.OR.X.GT.XMA+DXCH) CYCLE
+               IF(TYP.EQ.0) THEN
+                  CALL TOP_PATT_PMT(X,ZD,ZB,DXCH,LR,L,IPMTX,IX,K)
+               ELSE IF(TYP.EQ.1) THEN
+                  CALL TOP_PATT_CYL(X,ZD,ZB,ZM,XCH,DXCH,LR,IPMTX,IX,K)
+               ELSE IF(TYP.EQ.2) THEN
+                  ! pozor: samo ce kanali simetricno na x
+                  CALL TOP_PATT_SPH(X,ZD,ZB,ZM,XCH,DXCH,LR,IPMTX,IX,K)
+               ENDIF                  
+            ENDDO
+         ENDDO
+      ENDDO
+
+      END
+
+
+      SUBROUTINE TOP_PATT_PMT(X,ZD,ZB,DXCH,LR,L,IPMTX,IX,NX)
+
+      IMPLICIT NONE
+      REAL X, ZD, ZB, DXCH
+      INTEGER LR, L, IPMTX, IX, NX
+#include "TOP_CONS.fi"
+#include "TOP_GEO.fi"
+#include "TOP_EXT.fi"
+#include "TOP_PMT.fi"
+#include "TOP_PIK.fi"
+#include "TOP_TRACK.fi"
+#include "TOP_PAR.fi"
+#include "TOP_TOPF.fi"
+      INTEGER TOPF_PMT, TOPF_RAYTRACE
+      REAL TOPF_DTL, TOPF_DYY, TOPF_DYD, TOPF_DYB, TOPF_DFIC
+      integer NBUF
+      PARAMETER (NBUF=1000)
+      REAL SUM(NBUF), E0(NBUF), SIGE2(NBUF), ECPP(NBUF)
+      INTEGER ICHA(NBUF), N
+      INTEGER I, K, K0, K1, K2, K3, K4, NY
+      REAL H, TL0, YD0, YB0, YY0, FIC0, DIR(3)
+      REAL DTLDX, DTLDL, DTLDE, DTDTHC
+      REAL DYDDX, DYDDL, DYDDE, DYDDZ
+      REAL DYBDX, DYBDL, DYBDE
+      REAL DYYDE, DFICDX, DFICDE
+      REAL DFI, DTDE, DTDL, DTDX, WID0, DEL_E, YY, Y
+      REAL TIM, WID, FOT, FIC
+      REAL GROUP_INDEX
+
+c--   clear TOP_TOPF
+      NT=0
+c--   solve equations
+      H=0.
+      K0=TOPF_PMT(X,ZD,ZB,0,0,H)
+      IF(K0.EQ.0) RETURN
+c--   for channel width
+      H=0.1
+      K1=TOPF_PMT(X+H,ZD,ZB,0,0,H)
+      IF(K1.EQ.0) RETURN
+c--   for parallax
+      H=T_H
+      K2=TOPF_PMT(X,ZD,ZB,1,0,H)
+      IF(K2.EQ.0) RETURN
+c--   for cromatic
+      H=D_E
+      K3=TOPF_PMT(X,ZD,ZB,0,1,H)
+      IF(K3.EQ.0) RETURN
+
+c--   calculate PDF parameters
+      DO I=1,2
+         IF(.NOT.F_OK(I)) CYCLE
+         TIM=F_TL(I,K0)*GRU_IND/C0+TOF
+         IF(TIM.GT.T_MAX) CYCLE
+
+         DFICDX=TOPF_DFIC(I,K0,K1)
+         K4=TOPF_RAYTRACE(K0,I,DFICDX)
+         IF(K4.EQ.0) CYCLE
+
+         FIC0=ATAN2(F_SFIC(I,K4),F_CFIC(I,K4))
+         IF(FIC0.LT.0) FIC0=FIC0+2*PI
+
+         TL0=F_TL(I,K4)
+         DTLDX=TOPF_DTL(I,K0,K1)
+         DTLDL=TOPF_DTL(I,K0,K2)
+         DTLDE=TOPF_DTL(I,K0,K3)
+
+         YY0=F_YY(I,K4)
+         DYYDE=TOPF_DYY(I,K0,K3)
+         DFICDE=TOPF_DFIC(I,K0,K3)
+
+         DFI=ABS(DFICDX)*DXCH
+         DTDE=(DTLDE+TL0*REL_DNGDE)*GRU_IND/C0 ! dispersion (cromatic)
+         DTDL=(DTLDL*GRU_IND+1/BETA)/C0 ! parallax
+         DTDX=DTLDX*GRU_IND/C0  ! channel x-size
+         DTDTHC=DTLDE*D_E/D_THC*GRU_IND/C0 ! multiple scattering in Q-bar
+         WID0=(DTDX*DXCH)**2/12.+(DTDL*SIG_TLEN)**2+(DTDTHC*TH0_SIP)**2
+
+         YD0=F_YD(I,K4)
+         DYDDX=TOPF_DYD(I,K0,K1)
+         DYDDL=TOPF_DYD(I,K0,K2)
+         DYDDE=TOPF_DYD(I,K0,K3)
+         IF(ZB.EQ.ZD) THEN
+            CALL YSKEN(IX,IPMTX,LR,MODUL,YD0,DYDDE,DYDDL,DYDDX,
+     &           NBUF,SUM,E0,SIGE2,ICHA,ECPP,N)
+         ELSE
+            YB0=F_YB(I,K4)
+            DYBDX=TOPF_DYB(I,K0,K1)
+            DYBDL=TOPF_DYB(I,K0,K2)
+            DYBDE=TOPF_DYB(I,K0,K3)
+            IF(EXT_SHAPE(QBAR_EXT(LR,MODUL)).EQ.2) THEN
+               DYDDZ=F_KY(I,K4)/F_KZ(I,K4)
+               IF(LR.NE.L) DYDDZ=-DYDDZ
+               CALL YSKENX(IX,IPMTX,LR,MODUL,
+     &              YD0,DYDDE,DYDDL,DYDDX,DYDDZ,
+     &              YB0,DYBDE,DYBDL,DYBDX,
+     &              NBUF,SUM,E0,SIGE2,ICHA,ECPP,N)
+            ELSE
+               CALL YSKENE(IX,IPMTX,LR,MODUL,
+     &              YD0,DYDDE,DYDDL,DYDDX,
+     &              YB0,DYBDE,DYBDL,DYBDX,
+     &              NBUF,SUM,E0,SIGE2,ICHA,ECPP,N)
+            ENDIF
+         ENDIF
+
+         DO K=1,N
+            DEL_E=E0(K)-E_MEAN
+            TIM=(TL0+DTLDE*DEL_E)*GROUP_INDEX(E0(K))/C0+TOF
+            WID=WID0+SIGE2(K)*DTDE**2
+            FOT=FOT0*DFI*SUM(K)
+            FIC=FIC0+DFICDE*DEL_E
+            CALL TO_FIRST_PERIOD(FIC)
+            YY=YY0+DYYDE*DEL_E
+            NY=NINT(YY/QBAR_B(MODUL))
+            Y=YD0+DYDDE*DEL_E
+            CALL PATT_PUSH(ICHA(K),TIM,WID,FOT,FIC,NX,NY,X,Y)
+         ENDDO
+      ENDDO
+
+      END
+
+
+      SUBROUTINE TOP_PATT_CYL(X,ZD,ZB,ZM,XCH,DXCH,LR,IPMTX,IX,NX)
+
+      IMPLICIT NONE
+      REAL X, ZD, ZB, ZM, XCH, DXCH
+      INTEGER LR, IPMTX, IX, NX
+#include "TOP_CONS.fi"
+#include "TOP_GEO.fi"
+#include "TOP_EXT.fi"
+#include "TOP_PMT.fi"
+#include "TOP_PIK.fi"
+#include "TOP_TRACK.fi"
+#include "TOP_PAR.fi"
+#include "TOP_TOPF.fi"
+      INTEGER TOPF_CYL, TOPF_RAYTRACE
+      REAL TOPF_DTL, TOPF_DYY, TOPF_DYD, TOPF_DYB, TOPF_DFIC
+      integer NBUF
+      PARAMETER (NBUF=1000)
+      REAL SUM(NBUF), E0(NBUF), SIGE2(NBUF), ECPP(NBUF)
+      INTEGER ICHA(NBUF), N
+      INTEGER I, K, K0, K1, K2, K3, K4, NY
+      REAL H, TL0, YD0, YB0, YY0, FIC0, DIR(3)
+      REAL DTLDX, DTLDL, DTLDE, DTDTHC
+      REAL DYDDX, DYDDL, DYDDE, DYDDZ
+      REAL DYBDX, DYBDL, DYBDE
+      REAL DYYDE, DFICDX, DFICDE
+      REAL DFI, DTDE, DTDL, DTDX, WFOC, WID0, DEL_E, YY, Y
+      REAL TIM, WID, FOT, FIC
+      REAL GROUP_INDEX
+
+c--   clear TOP_TOPF
+      NT=0
+c--   solve equations
+      H=0.
+      K0=TOPF_CYL(X,ZD,ZB,ZM,0,0,H)
+      IF(K0.EQ.0) RETURN
+c--   for channel width
+      H=0.1
+      K1=TOPF_CYL(X+H,ZD,ZB,ZM,0,0,H)
+      IF(K1.EQ.0) RETURN
+c--   for parallax
+      H=T_H
+      K2=TOPF_CYL(X,ZD,ZB,ZM,1,0,H)
+      IF(K2.EQ.0) RETURN
+c--   for cromatic
+      H=D_E
+      K3=TOPF_CYL(X,ZD,ZB,ZM,0,1,H)
+      IF(K3.EQ.0) RETURN
+     
+c--   calculate PDF parameters
+      DO I=1,2
+         IF(.NOT.F_OK(I)) CYCLE
+         TIM=F_TL(I,K0)*GRU_IND/C0+TOF
+         IF(TIM.GT.T_MAX) CYCLE
+
+         DFICDX=TOPF_DFIC(I,K0,K1)
+         K4=TOPF_RAYTRACE(K0,I,DFICDX)
+         IF(K4.EQ.0) CYCLE
+
+         FIC0=ATAN2(F_SFIC(I,K4),F_CFIC(I,K4))
+         IF(FIC0.LT.0) FIC0=FIC0+2*PI
+
+         DIR(1)=F_KX(I,K4)
+         DIR(2)=F_KY(I,K4)
+         DIR(3)=F_KZ(I,K4)
+
+         TL0=F_TL(I,K4)
+         DTLDX=TOPF_DTL(I,K0,K1)
+         DTLDL=TOPF_DTL(I,K0,K2)
+         DTLDE=TOPF_DTL(I,K0,K3)
+
+         YY0=F_YY(I,K4)
+         DYYDE=TOPF_DYY(I,K0,K3)
+         DFICDE=TOPF_DFIC(I,K0,K3)
+
+         DFI=ABS(DFICDX)*DXCH
+         DTDE=(DTLDE+TL0*REL_DNGDE)*GRU_IND/C0 ! dispersion (cromatic)
+         DTDL=(DTLDL*GRU_IND+1/BETA)/C0 ! parallax
+         DTDX=DTLDX*GRU_IND/C0  ! channel x-size
+         WFOC=2*QBAR_B(MODUL)*DIR(2)*GRU_IND/C0 ! focusing
+         DTDTHC=DTLDE*D_E/D_THC*GRU_IND/C0 ! multiple scattering in Q-bar
+         WID0=(DTDX*DXCH)**2/12.+(DTDL*SIG_TLEN)**2+WFOC**2/12.
+     &        +(DTDTHC*TH0_SIP)**2
+
+         YD0=F_YD(I,K4)
+         DYDDX=TOPF_DYD(I,K0,K1)
+         DYDDL=TOPF_DYD(I,K0,K2)
+         DYDDE=TOPF_DYD(I,K0,K3)
+         IF(ZB.EQ.ZD) THEN
+            CALL YSKEN(IX,IPMTX,LR,MODUL,YD0,DYDDE,DYDDL,DYDDX,
+     &           NBUF,SUM,E0,SIGE2,ICHA,ECPP,N)
+         ELSE
+            YB0=F_YB(I,K4)
+            DYBDX=TOPF_DYB(I,K0,K1)
+            DYBDL=TOPF_DYB(I,K0,K2)
+            DYBDE=TOPF_DYB(I,K0,K3)
+            IF(EXT_SHAPE(QBAR_EXT(LR,MODUL)).EQ.2) THEN
+               DYDDZ=-F_KY(I,K4)/F_KZ(I,K4)
+               CALL YSKENX(IX,IPMTX,LR,MODUL,
+     &              YD0,DYDDE,DYDDL,DYDDX,DYDDZ,
+     &              YB0,DYBDE,DYBDL,DYBDX,
+     &              NBUF,SUM,E0,SIGE2,ICHA,ECPP,N)
+            ELSE
+               CALL YSKENE(IX,IPMTX,LR,MODUL,
+     &              YD0,DYDDE,DYDDL,DYDDX,
+     &              YB0,DYBDE,DYBDL,DYBDX,
+     &              NBUF,SUM,E0,SIGE2,ICHA,ECPP,N)
+            ENDIF
+         ENDIF
+
+         DO K=1,N
+            DEL_E=E0(K)-E_MEAN
+            TIM=(TL0+DTLDE*DEL_E)*GROUP_INDEX(E0(K))/C0+TOF
+            WID=WID0+SIGE2(K)*DTDE**2
+            FOT=FOT0*DFI*SUM(K)
+            FIC=FIC0+DFICDE*DEL_E
+            CALL TO_FIRST_PERIOD(FIC)
+            YY=YY0+DYYDE*DEL_E
+            NY=NINT(YY/QBAR_B(MODUL))
+            Y=YD0+DYDDE*DEL_E
+            CALL PATT_PUSH(ICHA(K),TIM,WID,FOT,FIC,NX,NY,X,Y)
+         ENDDO
+      ENDDO
+
+      END
+
+
+      SUBROUTINE TOP_PATT_SPH(X,ZD,ZB,ZM,XCH,DXCH,LR,IPMTX0,IX0,NX)
+
+      IMPLICIT NONE
+      REAL X, ZD, ZB, ZM, XCH, DXCH
+      INTEGER LR, IPMTX0, IX0, NX
+#include "TOP_CONS.fi"
+#include "TOP_GEO.fi"
+#include "TOP_EXT.fi"
+#include "TOP_PMT.fi"
+#include "TOP_PIK.fi"
+#include "TOP_TRACK.fi"
+#include "TOP_PAR.fi"
+#include "TOP_TOPF.fi"
+      INTEGER IX, IPMTX
+      INTEGER TOPF_SPH, TOPF_RAYTRACE
+      REAL TOPF_DTL, TOPF_DYY, TOPF_DYD, TOPF_DYB, TOPF_DFIC
+      integer NBUF
+      PARAMETER (NBUF=1000)
+      REAL SUM(NBUF), E0(NBUF), SIGE2(NBUF), ECPP(NBUF)
+      INTEGER ICHA(NBUF), N
+      INTEGER I, K, K0, K1, K2, K3, K4, NY, NX1
+      REAL H, TL0, YD0, YB0, YY0, FIC0, DIR(3)
+      REAL DTLDX, DTLDL, DTLDE, DTDTHC
+      REAL DYDDX, DYDDL, DYDDE, DYDDZ
+      REAL DYBDX, DYBDL, DYBDE
+      REAL DYYDE, DFICDX, DFICDE
+      REAL DFI, DTDE, DTDL, DTDX, WFOCX, WFOCY, WID0, DEL_E, YY, Y
+      REAL TIM, WID, FOT, FIC
+      REAL GROUP_INDEX
+
+c--   clear TOP_TOPF
+      NT=0
+c--   solve equations
+      H=0.
+      K0=TOPF_SPH(X,ZD,ZB,ZM,0,0,H)
+      IF(K0.EQ.0) RETURN
+c--   for channel width
+      H=0.1
+      K1=TOPF_SPH(X+H,ZD,ZB,ZM,0,0,H)
+      IF(K1.EQ.0) RETURN
+c--   for parallax
+      H=T_H
+      K2=TOPF_SPH(X,ZD,ZB,ZM,1,0,H)
+      IF(K2.EQ.0) RETURN
+c--   for cromatic
+      H=D_E
+      K3=TOPF_SPH(X,ZD,ZB,ZM,0,1,H)
+      IF(K3.EQ.0) RETURN
+
+c--   calculate PDF parameters
+      DO I=1,2
+         IF(.NOT.F_OK(I)) CYCLE
+         TIM=F_TL(I,K0)*GRU_IND/C0+TOF
+         IF(TIM.GT.T_MAX) CYCLE
+
+         DFICDX=TOPF_DFIC(I,K0,K1)
+         K4=TOPF_RAYTRACE(K0,I,DFICDX)
+         IF(K4.EQ.0) CYCLE
+
+         FIC0=ATAN2(F_SFIC(I,K4),F_CFIC(I,K4))
+         IF(FIC0.LT.0) FIC0=FIC0+2*PI
+
+         DIR(1)=F_KX(I,K4)
+         DIR(2)=F_KY(I,K4)
+         DIR(3)=F_KZ(I,K4)
+
+         TL0=F_TL(I,K4)
+         DTLDX=TOPF_DTL(I,K0,K1)
+         DTLDL=TOPF_DTL(I,K0,K2)
+         DTLDE=TOPF_DTL(I,K0,K3)
+
+         YY0=F_YY(I,K4)
+         DYYDE=TOPF_DYY(I,K0,K3)
+         DFICDE=TOPF_DFIC(I,K0,K3)
+
+         NX1=F_NXM(I,K4)
+         IF(MOD(ABS(NX1),2).EQ.0) THEN
+            IX=IX0
+            IPMTX=IPMTX0
+         ELSE
+            ! pozor, velja le za simetricno postavitev PMT glede na x
+            IX=PMT_NX-1-IX0
+            IPMTX=N_PMTX(LR,MODUL)-1-IPMTX0
+         ENDIF
+
+         DFI=ABS(DFICDX)*DXCH
+         DTDE=(DTLDE+TL0*REL_DNGDE)*GRU_IND/C0 ! dispersion (cromatic)
+         DTDL=(DTLDL*GRU_IND+1/BETA)/C0 ! parallax
+         DTDX=DTLDX*GRU_IND/C0  ! channel x-size
+         WFOCX=T_LEN*T_DIR(1)*DIR(1)*GRU_IND/C0 ! focusing in x
+         WFOCY=2*QBAR_B(MODUL)*DIR(2)*GRU_IND/C0 ! focusing in y
+         DTDTHC=DTLDE*D_E/D_THC*GRU_IND/C0 ! multiple scattering in Q-bar
+         WID0=(DTDX*DXCH)**2/12.+(DTDL*SIG_TLEN)**2+
+     &        (WFOCX**2+WFOCY**2)/12.+(DTDTHC*TH0_SIP)**2
+
+         YD0=F_YD(I,K4)
+         DYDDX=TOPF_DYD(I,K0,K1)
+         DYDDL=TOPF_DYD(I,K0,K2)
+         DYDDE=TOPF_DYD(I,K0,K3)
+         IF(ZB.EQ.ZD) THEN
+            CALL YSKEN(IX,IPMTX,LR,MODUL,YD0,DYDDE,DYDDL,DYDDX,
+     &           NBUF,SUM,E0,SIGE2,ICHA,ECPP,N)
+         ELSE
+            YB0=F_YB(I,K4)
+            DYBDX=TOPF_DYB(I,K0,K1)
+            DYBDL=TOPF_DYB(I,K0,K2)
+            DYBDE=TOPF_DYB(I,K0,K3)
+            IF(EXT_SHAPE(QBAR_EXT(LR,MODUL)).EQ.2) THEN
+               DYDDZ=-F_KY(I,K4)/F_KZ(I,K4)
+               CALL YSKENX(IX,IPMTX,LR,MODUL,
+     &              YD0,DYDDE,DYDDL,DYDDX,DYDDZ,
+     &              YB0,DYBDE,DYBDL,DYBDX,
+     &              NBUF,SUM,E0,SIGE2,ICHA,ECPP,N)
+            ELSE
+               CALL YSKENE(IX,IPMTX,LR,MODUL,
+     &              YD0,DYDDE,DYDDL,DYDDX,
+     &              YB0,DYBDE,DYBDL,DYBDX,
+     &              NBUF,SUM,E0,SIGE2,ICHA,ECPP,N)
+            ENDIF
+         ENDIF
+
+         DO K=1,N
+            DEL_E=E0(K)-E_MEAN
+            TIM=(TL0+DTLDE*DEL_E)*GROUP_INDEX(E0(K))/C0+TOF
+            WID=WID0+SIGE2(K)*DTDE**2
+            FOT=FOT0*DFI*SUM(K)
+            FIC=FIC0+DFICDE*DEL_E
+            CALL TO_FIRST_PERIOD(FIC)
+            YY=YY0+DYYDE*DEL_E
+            NY=NINT(YY/QBAR_B(MODUL))
+            Y=YD0+DYDDE*DEL_E
+            CALL PATT_PUSH(ICHA(K),TIM,WID,FOT,FIC,NX+NX1,NY,X,Y)
+         ENDDO
+      ENDDO
+
+      END
+
+
+      SUBROUTINE TOP_PATT_PMT_FAST(X,ZD,ZB,DXCH,LR,IPMTX,IX,NX)
+
+      IMPLICIT NONE
+      REAL X, ZD, ZB, DXCH
+      INTEGER LR, IPMTX, IX, NX
+#include "TOP_CONS.fi"
+#include "TOP_GEO.fi"
+#include "TOP_PMT.fi"
+#include "TOP_PIK.fi"
+#include "TOP_TRACK.fi"
+#include "TOP_PAR.fi"
+#include "TOP_TOPF.fi"
+
+      INTEGER TOPF_PMT
+      REAL TOPF_DTL, TOPF_DYY, TOPF_DYD, TOPF_DFIC
+      INTEGER K0, K1, K2, K3, I, IY, ICH, ICHAN, NY, IPMTY
+      REAL H, TL, Y, DFI, DTDX, DTDL, DTDE, DTDTHC, DFICDX
+      REAL TIM, WID, FOT, FIC
+
+      IF(ZD.NE.ZB) PRINT*,'TOP_PATT_PMT_FAST: do not use it for i-TOP!'
+
+c--   clear TOP_TOPF
+      NT=0
+c--   solve equations
+      H=0.
+      K0=TOPF_PMT(X,ZD,ZB,0,0,H)
+      IF(K0.EQ.0) RETURN
+c--   for channel width
+      H=0.1
+      K1=TOPF_PMT(X+H,ZD,ZB,0,0,H)
+      IF(K1.EQ.0) RETURN
+c--   for parallax
+      H=T_H
+      K2=TOPF_PMT(X,ZD,ZB,1,0,H)
+      IF(K2.EQ.0) RETURN
+c--   for cromatic
+      H=D_E
+      K3=TOPF_PMT(X,ZD,ZB,0,1,H)
+      IF(K3.EQ.0) RETURN
+c--   calculate PDF parameters
+      DO I=1,2
+         IF(.NOT.F_OK(I)) CYCLE
+         TL=F_TL(I,K0)
+         TIM=TL*GRU_IND/C0+TOF
+         IF(TIM.GT.T_MAX) CYCLE
+         DTDX=TOPF_DTL(I,K0,K1) ! chanel width
+         DTDL=TOPF_DTL(I,K0,K2) ! paralax
+         DTDE=TOPF_DTL(I,K0,K3) ! cromatic
+         DTDTHC=DTDE*D_E/D_THC  ! multiple scattering in Q-bar
+         DTDX=DTDX*GRU_IND/C0
+         DTDL=(DTDL*GRU_IND+1/BETA)/C0
+         DTDE=(DTDE+TL*REL_DNGDE)*GRU_IND/C0
+         DTDTHC=DTDTHC*GRU_IND/C0
+         WID=(DTDX*DXCH)**2/12.+(DTDL*SIG_TLEN)**2+(DTDE*SIG_E)**2
+     &        +(DTDTHC*TH0_SIP)**2
+         DFICDX=TOPF_DFIC(I,K0,K1)
+         DFI=ABS(DFICDX)*DXCH
+         FIC=ATAN2(F_SFIC(I,K0),F_CFIC(I,K0))
+         IF(FIC.LT.0) FIC=FIC+2*PI
+         Y=F_YY(I,K0)
+         NY=NINT(Y/QBAR_B(MODUL))
+         DO IPMTY=0,N_PMTY(LR,MODUL)-1
+            DO IY=0,PMT_NY-1
+               ICH=ICHAN(IX,IY,IPMTX,IPMTY,LR,MODUL)
+               FOT=FOT0*DFI*PIK_DYCH(ICH)/QBAR_B(MODUL)
+               CALL PATT_PUSH(ICH,TIM,WID,FOT,FIC,NX,NY,X,Y)
+            ENDDO
+         ENDDO
+      ENDDO
+
+      END
+
+
+
+      SUBROUTINE PATT_PUSH(ICH,TIM,WID,FOT,FIC,NX,NY,XD,YD)
+
+      IMPLICIT NONE
+      INTEGER ICH
+      REAL TIM, WID, FOT, FIC
+      INTEGER NX, NY
+      REAL XD, YD
+#include "TOP_PIK.fi"
+#include "TOP_TDC.fi"
+      INTEGER KK
+      
+      IF(TIM.LT.0.OR.TIM.GT.T_MAX) RETURN
+      IF(ICH.LT.0.OR.ICH.GE.NUM_CHA) RETURN
+      IF(WID.LE.0) RETURN
+      IF(FOT.LE.0) RETURN
+
+      KK=NUM_PIK(ICH)+1
+      IF(KK.GT.MAX_PIK) THEN
+         NUM_PIK(ICH)=KK
+         RETURN
+      ENDIF
+      NUM_PIK(ICH)=KK
+      PIK_POZ(KK,ICH)=TIM
+      PIK_WID(KK,ICH)=WID+TDC_DT**2/12.
+      PIK_NPH(KK,ICH)=FOT
+      PIK_FIC(KK,ICH)=FIC
+      PIK_NX(KK,ICH)=NX
+      PIK_NY(KK,ICH)=NY
+      PIK_XD(KK,ICH)=XD
+      PIK_YD(KK,ICH)=YD
+
+      END
+
+
+      SUBROUTINE SET_XYCH(M)
+
+      IMPLICIT NONE
+      INTEGER M                 ! module number
+#include "TOP_GEO.fi"
+#include "TOP_EXT.fi"
+#include "TOP_PMT.fi"
+#include "TOP_PIK.fi"
+      INTEGER LR, I, ICH, II
+      REAL X, Y, Z, AH, BH, XMI, XMA, YMI, YMA, DXH, DYH
+      REAL X1, X2, Y1, Y2, DX, DY
+      INTEGER M_OLD /-1/
+      SAVE M_OLD
+
+      IF(M.EQ.M_OLD) RETURN
+      M_OLD=M
+
+      AH=QBAR_A(M)/2
+      BH=QBAR_B(M)/2
+      DXH=PMT_DXCH/2
+      DYH=PMT_DYCH/2
+
+      XMI=-AH
+      XMA=AH
+      DO LR=0,1
+         II=QBAR_EXT(LR,M)
+         IF(II.GT.0) THEN
+            YMI=EXT_YDN(II)
+            YMA=EXT_YUP(II)
+         ELSE
+            YMI=-BH
+            YMA=BH
+         ENDIF
+         DO I=0,NCH(LR)-1
+            ICH=I+LR*NCH(LR-1)
+            CALL ICHXYZ(ICH,M,X,Y,Z)
+            DX=PMT_DXCH
+            DY=PMT_DYCH
+            X1=X-DXH
+            X2=X+DXH
+            IF(X1.LT.XMI.OR.X2.GT.XMA) THEN
+               X1=MAX(X-DXH,XMI)
+               X2=MIN(X+DXH,XMA)
+               DX=MAX(X2-X1,0.)
+               IF(DX.GT.0) X=(X1+X2)/2
+            ENDIF
+            Y1=Y-DYH
+            Y2=Y+DYH
+            IF(Y1.LT.YMI.OR.Y2.GT.YMA) THEN
+               Y1=MAX(Y-DYH,YMI)
+               Y2=MIN(Y+DYH,YMA)
+               DY=MAX(Y2-Y1,0.)
+               IF(DY.GT.0) Y=(Y1+Y2)/2
+            ENDIF
+            PIK_XCH(ICH)=X
+            PIK_YCH(ICH)=Y
+            PIK_DXCH(ICH)=DX
+            PIK_DYCH(ICH)=DY
+         ENDDO
+      ENDDO
+
+      END
+
+
+      SUBROUTINE SET_BACKG(M)
+
+      IMPLICIT NONE
+      INTEGER M                 ! module number
+#include "TOP_GEO.fi"
+#include "TOP_EXT.fi"
+#include "TOP_PIK.fi"
+#include "TOP_PAR.fi"
+      INTEGER LR, I, ICH, II
+      REAL S(0:1), B(0:1), F
+      INTEGER M_OLD /-1/
+      SAVE M_OLD
+
+      IF(M.EQ.M_OLD) RETURN
+      M_OLD=M
+
+      DO LR=0,1
+         S(LR)=0.
+         II=QBAR_EXT(LR,M)
+         IF(II.GT.0) THEN
+            B(LR)=EXT_YUP(II)-EXT_YDN(II)
+         ELSE
+            B(LR)=QBAR_B(M)
+         ENDIF
+         IF(LR_FLAG(LR).NE.1) CYCLE
+         DO I=0,NCH(LR)-1
+            ICH=I+LR*NCH(LR-1)
+            S(LR)=S(LR)+PIK_DXCH(ICH)*PIK_DYCH(ICH)
+         ENDDO
+      ENDDO
+      STFB=NUM_BGR*(S(0)/B(0)+S(1)/B(1))/QBAR_A(M)
+      IF(LR_FLAG(0).GT.1.OR.LR_FLAG(1).GT.1) STFB=STFB*2
+      F=1.
+      IF(LR_FLAG(0).EQ.1.AND.LR_FLAG(1).EQ.1) F=2.
+      DO LR=0,1
+         IF(LR_FLAG(LR).NE.1) CYCLE
+         IF(S(LR).EQ.0) S(LR)=1.
+         DO I=0,NCH(LR)-1
+            ICH=I+LR*NCH(LR-1)
+            PIK_BGR(ICH)=PIK_DXCH(ICH)*PIK_DYCH(ICH)/S(LR)/F/T_MAX
+         ENDDO
+      ENDDO
+
+      END
+
+
+      LOGICAL FUNCTION NOT_WINDOW(Z,CTHC,STHC)
+
+      IMPLICIT NONE
+      REAL Z                    ! window coordinate
+      REAL CTHC, STHC           ! cos(theta_cer), sin(theta_cer)
+#include "TOP_TRACK.fi"
+      
+      IF(Z-T_R0(3).GT.0) THEN
+         NOT_WINDOW=T_CTH(0)*CTHC.LT.-T_STH(0)*STHC
+      ELSE
+         NOT_WINDOW=T_CTH(0)*CTHC.GT.T_STH(0)*STHC
+      ENDIF
+
+      END
+
+
+      SUBROUTINE XMINMAX(XMI,XMA,Z,CTHC,STHC,OK)
+
+
+      IMPLICIT NONE
+      REAL XMI, XMA             ! min, max unfolded x-coordinate [in-out]
+      REAL Z                    ! window coordinate
+      REAL CTHC, STHC           ! cos(theta_cer), sin(theta_cer)
+      LOGICAL OK                ! flag
+#include "TOP_TRACK.fi"
+#include "TOP_CONS.fi"
+      real XINF
+      PARAMETER (XINF=1.E10)
+      REAL X(2), X1D, X2D, DZ, TH, THC, A, B, C, D, CFIC, KZ
+      INTEGER I
+
+      DZ=Z-T_R0(3)
+      OK=DZ.NE.0
+      IF(.NOT.OK) RETURN
+
+      TH=ACOS(T_CTH(0))
+      THC=ACOS(CTHC)
+      IF(DZ.LT.0) TH=PI-TH      ! rotation around x for pi (phi=-phi; z=-z)
+      DZ=ABS(DZ)
+      OK=TH-THC.LT.PI/2
+      IF(.NOT.OK) RETURN
+
+      IF(T_SFI(0).EQ.0) THEN
+         IF(TH-THC.LT.PI/2) THEN
+            X(1)=TAN(TH-THC)*T_CFI(0)
+         ELSE
+            X(1)=XINF*T_CFI(0)
+         ENDIF
+         IF(TH+THC.LT.PI/2) THEN
+            X(2)=TAN(TH+THC)*T_CFI(0)
+         ELSE
+            X(2)=XINF*T_CFI(0)
+         ENDIF
+      ELSE
+         A=-COS(TH+THC)*COS(TH-THC)
+         B=SIN(2*TH)*T_CFI(0)
+         C=(T_SFI(0)*STHC)**2-T_CFI(0)**2*SIN(TH+THC)*SIN(TH-THC)
+         IF(A.EQ.0) THEN
+            IF(B.EQ.0) RETURN
+            X(1)=-C/B
+            X(2)=SIGN(XINF,B)
+         ELSE
+            D=B**2-4*A*C
+            IF(D.LT.0) RETURN
+            D=SQRT(D)
+            X(1)=(-B+D)/2/A
+            X(2)=(-B-D)/2/A
+            DO I=1,2
+               A=(X(I)*COS(TH)-T_CFI(0)*SIN(TH))*CTHC
+               B=(X(I)*SIN(TH)+T_CFI(0)*COS(TH))*STHC
+               D=T_SFI(0)*STHC
+               CFIC=A*B/(B**2+D**2)
+               KZ=COS(TH)*CTHC-SIN(TH)*STHC*CFIC
+               IF(KZ.LT.0) X(I)=SIGN(XINF,X(3-I)-X(I))
+            ENDDO
+         ENDIF
+      ENDIF
+
+      X1D=T_R0(1)+DZ*X(1)
+      X2D=T_R0(1)+DZ*X(2)
+      IF(X1D.LT.X2D) THEN
+         XMI=MAX(X1D,XMI)
+         XMA=MIN(X2D,XMA)
+      ELSE
+         XMI=MAX(X2D,XMI)
+         XMA=MIN(X1D,XMA)
+      ENDIF
+      OK=XMI.LT.XMA
+
+      END
+

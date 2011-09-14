@@ -1,0 +1,8 @@
+c--  TOP_CONS.fi: some constants
+
+      REAL PI   ! pi
+      REAL C0   ! speed of light [cm/ns]
+
+      COMMON /RND_GEN/ PI, C0
+
+

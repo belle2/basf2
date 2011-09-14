@@ -1,0 +1,911 @@
+!-----------------------------------------------------------------------
+! TOP counter for Belle: Reconstruction - construct PDF in y-slices
+! M. Staric, nov-2008, jun-2009, feb-2010
+! units: GeV, GeV/c, cm, ns, cm/ns, T, nm
+!-----------------------------------------------------------------------
+
+c--   Qbar without expansion volume at side LR
+
+      SUBROUTINE YSKEN(IX,IPMTX,LR,M,Y0,DYDE,DYDL,DYDX,
+     &     NB,SUM,E0,SIG2,ICHA,ECPP,NT)
+      
+      IMPLICIT NONE
+      INTEGER IX, IPMTX, LR, M
+      REAL Y0, DYDE, DYDL, DYDX
+      INTEGER NB
+      REAL SUM(NB), E0(NB), SIG2(NB)
+      INTEGER ICHA(NB), NT
+      REAL ECPP(NB)
+#include "TOP_PAR.fi" 
+#include "TOP_GEO.fi"
+#include "TOP_PMT.fi"
+#include "TOP_PIK.fi"
+#include "TOP_TRACK.fi"
+#include "TOP_QEFF.fi" 
+      REAL DELY, Y, Y1, Y2, YCH, DX, DY, WTAG, DX_PREV, DY_PREV
+      REAL ECP, S, S_E, S_E2
+      INTEGER ICHAN, ICH
+      INTEGER I, IPT
+      INTEGER J, J1, J2, IY, IPMTY
+      integer NSIZ
+      PARAMETER (NSIZ=MAX_NT*2)
+      REAL MASK(0:NSIZ-1), WID
+      INTEGER MM
+      LOGICAL TAG
+
+      NT=0
+      IF(DYDE.EQ.0) RETURN
+
+      ICH=ICHAN(IX,0,IPMTX,0,LR,M)
+      DX=PIK_DXCH(ICH)
+      DELY=(ABS(DYDL)*T_LEN+ABS(DYDX)*DX)/2
+      IF(DYDE.GT.0) THEN
+         Y1=Y0-DELY+DYDE*(EMIN-E_MEAN)
+         Y2=Y0+DELY+DYDE*(EMAX-E_MEAN)
+      ELSE
+         Y1=Y0-DELY+DYDE*(EMAX-E_MEAN)
+         Y2=Y0+DELY+DYDE*(EMIN-E_MEAN)
+      ENDIF
+      J1=NINT(Y1/QBAR_B(M))
+      J2=NINT(Y2/QBAR_B(M))
+
+      DX_PREV=0.
+      DY_PREV=0.
+      DO IPMTY=0,N_PMTY(LR,M)-1
+         DO IY=0,PMT_NY-1
+            ICH=ICHAN(IX,IY,IPMTX,IPMTY,LR,M)
+            DX=PIK_DXCH(ICH)
+            IF(DX.LE.0) CYCLE
+            DY=PIK_DYCH(ICH)
+            IF(DY.LE.0) CYCLE
+            IF(XQE_FLAG) THEN
+               YCH=PIK_YCH(ICH)
+               IF(BTEST(ABS(J1),0)) YCH=-YCH
+               IF(DX.NE.DX_PREV.OR.DY.NE.DY_PREV) THEN
+                  DX_PREV=DX
+                  DY_PREV=DY
+                  WTAG=(QBAR_B(M)+2*ABS(YCH))/ABS(DYDE)
+                  TAG=XQE_MAXSEP*WTAG.GT.1
+                  IF(TAG) THEN
+                     WTAG=MIN(WTAG,EMAX-EMIN)
+                     CALL SET_EMASK(DYDE,DYDL,DYDX,DY,T_LEN,DX,WTAG,
+     &                    MASK,MM,NSIZ,TAG,WID)
+                  ENDIF
+               ENDIF
+            ELSE
+               TAG=.FALSE.
+            ENDIF
+            IF(TAG) THEN
+               IPT=NT
+               DO J=J1,J2
+                  Y=YCH+J*QBAR_B(M)
+                  ECP=(Y-Y0)/DYDE+E_MEAN
+                  CALL QE_INTEGRATE(MASK,MM,NSIZ,ECP,WID,S,S_E,S_E2)
+                  YCH=-YCH
+                  IF(S.EQ.0) CYCLE
+                  DO I=IPT+1,NT
+                     IF(ABS(ECP-ECPP(I)).LT.WID) EXIT
+                  ENDDO
+                  IF(I.GT.NT) THEN
+                     IF(I.GT.NB) GOTO 999
+                     NT=I
+                     ECPP(I)=ECP
+                     SUM(I)=S
+                     E0(I)=S_E
+                     SIG2(I)=S_E2
+                     ICHA(I)=ICH
+                  ELSE
+                     ECPP(I)=ECP
+                     SUM(I)=SUM(I)+S
+                     E0(I)=E0(I)+S_E
+                     SIG2(I)=SIG2(I)+S_E2
+                  ENDIF
+               ENDDO
+               DO I=IPT+1,NT
+                  E0(I)=E0(I)/SUM(I)
+                  SIG2(I)=SIG2(I)/SUM(I)-E0(I)**2
+               ENDDO
+            ELSE
+               IF(NT.GE.NB) GOTO 999
+               NT=NT+1
+               SUM(NT)=DY/QBAR_B(M)
+               E0(NT)=E_MEAN
+               SIG2(NT)=SIG_E**2
+               ICHA(NT)=ICH
+            ENDIF
+         ENDDO
+      ENDDO
+      RETURN
+
+ 999  CONTINUE
+      PRINT*,'YSKEN: NT>NB ',NT,NB
+
+      END
+
+
+c--   Qbar with expansion volume at side LR, type Box
+
+      SUBROUTINE YSKENE(IX,IPMTX,LR,M,Y0,DYDE,DYDL,DYDX,
+     &     YB0,DYBDE,DYBDL,DYBDX,
+     &     NB,SUM,E0,SIG2,ICHA,ECPP,NT)
+      
+      IMPLICIT NONE
+      INTEGER IX, IPMTX, LR, M
+      REAL Y0, DYDE, DYDL, DYDX
+      REAL YB0, DYBDE, DYBDL, DYBDX
+      INTEGER NB
+      REAL SUM(NB), E0(NB), SIG2(NB)
+      INTEGER ICHA(NB), NT
+      REAL ECPP(NB)
+#include "TOP_PAR.fi" 
+#include "TOP_GEO.fi"
+#include "TOP_EXT.fi"
+#include "TOP_PMT.fi"
+#include "TOP_PIK.fi"
+#include "TOP_TRACK.fi"
+#include "TOP_QEFF.fi" 
+      REAL DELY, Y, Y1, Y2, YCH, DX, DY, YB, DX_PREV, DY_PREV
+      REAL ECP, S, S_E, S_E2
+      INTEGER ICHAN, ICH
+      INTEGER I, IPT
+      INTEGER J, J1, J2, IY, IPMTY, K, K1, K2
+      integer NSIZ
+      PARAMETER (NSIZ=MAX_NT*4)
+      REAL MASK(0:NSIZ-1,10), WID, WIDI(10)
+      INTEGER MM(10)
+      LOGICAL TAG(10)
+      REAL DY1, DYBH, DYBDY, YBAR, BH, Y0EXT, Y0_EXT, DY_EXT, YCHE
+      REAL DELY1, DELY2, WYB
+      LOGICAL TYPE_BOX
+
+      NT=0
+      IF(DYDE.EQ.0.OR.DYBDE.EQ.0) RETURN
+
+      ICH=ICHAN(IX,0,IPMTX,0,LR,M)
+      DX=PIK_DXCH(ICH)
+      DELY=(ABS(DYBDL)*T_LEN+ABS(DYBDX)*DX)/2
+      IF(DYBDE.GT.0) THEN
+         Y1=YB0-DELY+DYBDE*(EMIN-E_MEAN)
+         Y2=YB0+DELY+DYBDE*(EMAX-E_MEAN)
+      ELSE
+         Y1=YB0-DELY+DYBDE*(EMAX-E_MEAN)
+         Y2=YB0+DELY+DYBDE*(EMIN-E_MEAN)
+      ENDIF
+      J1=NINT(Y1/QBAR_B(M))
+      J2=NINT(Y2/QBAR_B(M))
+      BH=QBAR_B(M)/2
+      DYBDY=DYBDE/DYDE
+
+      K=QBAR_EXT(LR,M)
+      TYPE_BOX=EXT_SHAPE(K).EQ.1
+      IF(TYPE_BOX) THEN
+         Y0_EXT=(EXT_YUP(K)+EXT_YDN(K))/2
+         DY_EXT=EXT_YUP(K)-EXT_YDN(K)
+         DELY=(ABS(DYDL)*T_LEN+ABS(DYDX)*DX)/2
+         IF(DYDE.GT.0) THEN
+            DELY1=DELY+DYDE*(E_MEAN-EMIN)
+            DELY2=DELY+DYDE*(EMAX-E_MEAN)
+         ELSE
+            DELY1=DELY-DYDE*(EMAX-E_MEAN)
+            DELY2=DELY-DYDE*(E_MEAN-EMIN)
+         ENDIF
+      ELSE
+         Y0_EXT=0.
+         DY_EXT=0.
+      ENDIF 
+
+      DX_PREV=0.
+      DY_PREV=0.
+      DO IPMTY=0,N_PMTY(LR,M)-1
+         DO IY=0,PMT_NY-1
+            ICH=ICHAN(IX,IY,IPMTX,IPMTY,LR,M)
+            DX=PIK_DXCH(ICH)
+            IF(DX.LE.0) CYCLE
+            DY=PIK_DYCH(ICH)
+            IF(DY.LE.0) CYCLE
+            YCH=PIK_YCH(ICH)
+            Y0EXT=Y0_EXT
+            IF(BTEST(ABS(J1),0)) THEN
+               YCH=-YCH
+               Y0EXT=-Y0EXT
+            ENDIF
+            IF(DX.NE.DX_PREV.OR.DY.NE.DY_PREV) THEN
+               DX_PREV=DX
+               DY_PREV=DY
+               DYBH=DYBDY*DY/2
+               WYB=BH+DYBH
+               DO I=1,10
+                  TAG(I)=.FALSE.
+               ENDDO
+               CALL SET_EMASK(DYDE,DYDL,DYDX,DY,T_LEN,DX,0.,
+     &              MASK(0,10),MM(10),NSIZ,TAG(10),WIDI(10))
+            ENDIF
+            IPT=NT
+            DO J=J1,J2
+               YBAR=J*QBAR_B(M)
+               IF(TYPE_BOX) THEN
+                  Y1=Y0-YBAR-DELY1
+                  Y2=Y0-YBAR+DELY2
+                  K1=NINT((Y1-Y0EXT)/DY_EXT)
+                  K2=NINT((Y2-Y0EXT)/DY_EXT)
+                  YCHE=YCH
+                  IF(BTEST(ABS(K1),0)) YCHE=2*Y0EXT-YCHE
+               ELSE
+                  K1=0
+                  K2=0
+                  YCHE=YCH
+               ENDIF
+               DO K=K1,K2
+                  Y=YCHE+YBAR+K*DY_EXT-Y0
+                  YB=YB0+Y*DYBDY-YBAR
+                  YCHE=2*Y0EXT-YCHE
+                  IF(ABS(YB).GT.WYB) CYCLE
+                  Y1=MAX(YB-DYBH,-BH)
+                  Y2=MIN(YB+DYBH, BH)
+                  DY1=(Y2-Y1)/DYBDY
+                  I=MIN(IFIX(DY1/DY*10.),10)
+                  IF(I.LE.0) CYCLE
+                  IF(.NOT.TAG(I)) THEN
+                     CALL SET_EMASK(DYDE,DYDL,DYDX,DY1,T_LEN,DX,0.,
+     &                    MASK(0,I),MM(I),NSIZ,TAG(I),WIDI(I))
+                  ENDIF
+                  ECP=((Y1+Y2)/2+YBAR-YB0)/DYBDE+E_MEAN
+                  CALL QE_INTEGRATE(MASK(0,I),MM(I),NSIZ,ECP,WIDI(I),
+     &                 S,S_E,S_E2)
+                  IF(S.LE.0) CYCLE
+                  ECP=S_E/S
+                  WID=(S_E2/S-ECP**2)*4
+                  DO I=IPT+1,NT
+                     IF((ECP-ECPP(I))**2.LT.WID) EXIT
+                  ENDDO
+                  IF(I.GT.NT) THEN
+                     IF(I.GT.NB) GOTO 999
+                     NT=NT+1
+                     ECPP(NT)=ECP
+                     SUM(NT)=S
+                     E0(NT)=S_E
+                     SIG2(NT)=S_E2
+                     ICHA(NT)=ICH
+                  ELSE
+                     ECPP(I)=ECP
+                     SUM(I)=SUM(I)+S
+                     E0(I)=E0(I)+S_E
+                     SIG2(I)=SIG2(I)+S_E2
+                  ENDIF
+               ENDDO
+               YCH=-YCH
+               Y0EXT=-Y0EXT
+            ENDDO
+         ENDDO
+      ENDDO
+      DO I=1,NT
+         E0(I)=E0(I)/SUM(I)
+         SIG2(I)=SIG2(I)/SUM(I)-E0(I)**2
+      ENDDO
+      RETURN
+
+ 999  CONTINUE
+      PRINT*,'YSKENE: NT>NB ',NT,NB
+
+      END
+
+
+
+c--   Qbar with expansion volume at side LR, type Prism
+
+      SUBROUTINE YSKENX(IX,IPMTX,LR,M,
+     &     YD0,DYDE,DYDL,DYDX,DYDZ,
+     &     YB0,DYBDE,DYBDL,DYBDX,
+     &     NB,SUM,E0,SIG2,ICHA,ECPP,NT)
+      
+      IMPLICIT NONE
+      INTEGER IX, IPMTX, LR, M
+      REAL YD0, DYDE, DYDL, DYDX, DYDZ
+      REAL YB0, DYBDE, DYBDL, DYBDX
+      INTEGER NB
+      REAL SUM(NB), E0(NB), SIG2(NB)
+      INTEGER ICHA(NB), NT
+      REAL ECPP(NB)
+#include "TOP_PAR.fi" 
+#include "TOP_GEO.fi"
+#include "TOP_EXT.fi"
+#include "TOP_PMT.fi"
+#include "TOP_PIK.fi"
+#include "TOP_TRACK.fi"
+#include "TOP_QEFF.fi" 
+      REAL DELY, Y, Y0, Y1, Y2, YCH, DX, DY, YB, DX_PREV, DY_PREV
+      REAL ECP, S, S_E, S_E2
+      INTEGER ICHAN, ICH
+      INTEGER I, IPT
+      INTEGER J, J1, J2, IY, IPMTY, K, K1, K2
+      integer NSIZ
+      PARAMETER (NSIZ=MAX_NT*4)
+      REAL MASK(0:NSIZ-1,10), WID, WIDI(10)
+      INTEGER MM(10)
+      LOGICAL TAG(10), OK
+      REAL DY1, DYBH, DYBDY, YBAR, BH, Y0_EXT, DY_EXT
+      REAL WYB
+
+      NT=0
+      IF(DYDE.EQ.0.OR.DYBDE.EQ.0) RETURN
+
+      ICH=ICHAN(IX,0,IPMTX,0,LR,M)
+      DX=PIK_DXCH(ICH)
+      DELY=(ABS(DYBDL)*T_LEN+ABS(DYBDX)*DX)/2
+      IF(DYBDE.GT.0) THEN
+         Y1=YB0-DELY+DYBDE*(EMIN-E_MEAN)
+         Y2=YB0+DELY+DYBDE*(EMAX-E_MEAN)
+      ELSE
+         Y1=YB0-DELY+DYBDE*(EMAX-E_MEAN)
+         Y2=YB0+DELY+DYBDE*(EMIN-E_MEAN)
+      ENDIF
+      J1=NINT(Y1/QBAR_B(M))
+      J2=NINT(Y2/QBAR_B(M))
+      BH=QBAR_B(M)/2
+      DYBDY=DYBDE/DYDE
+
+      K=QBAR_EXT(LR,M)
+      CALL UNFOLD_EXTVOL(M,LR,K1,K2)
+
+      Y0_EXT=(EXT_YUP(K)+EXT_YDN(K))/2
+      DY_EXT=EXT_YUP(K)-EXT_YDN(K)
+      J=NINT(YB0/QBAR_B(M))
+      YBAR=J*QBAR_B(M)
+      DELY=YD0-YBAR
+      IF(BTEST(ABS(J),0)) DELY=-DELY
+      DELY=DELY-Y0_EXT
+      K=NINT(DELY/DY_EXT)
+      DELY=DELY-K*DY_EXT
+      IF(BTEST(ABS(K),0)) DELY=-DELY
+      DELY=DELY+Y0_EXT
+
+      CALL TO_FLAT_SCREEN(DELY,K,DYDZ,Y,OK)
+      IF(BTEST(ABS(J),0)) Y=-Y
+      Y0=Y+YBAR
+
+      DX_PREV=0.
+      DY_PREV=0.
+      DO IPMTY=0,N_PMTY(LR,M)-1
+         DO IY=0,PMT_NY-1
+            ICH=ICHAN(IX,IY,IPMTX,IPMTY,LR,M)
+            DX=PIK_DXCH(ICH)
+            IF(DX.LE.0) CYCLE
+            DY=PIK_DYCH(ICH)
+            IF(DY.LE.0) CYCLE
+            IPT=NT
+            DO K=K1,K2
+               CALL TO_FLAT_SCREEN(PIK_YCH(ICH),K,DYDZ,YCH,OK)
+               IF(.NOT.OK) CYCLE
+               CALL DTO_FLAT_SCREEN(PIK_DYCH(ICH),K,DYDZ,DY)
+               IF(DY.LE.0) CYCLE
+               IF(DX.NE.DX_PREV.OR.DY.NE.DY_PREV) THEN
+                  DX_PREV=DX
+                  DY_PREV=DY
+                  DO I=1,10
+                     TAG(I)=.FALSE.
+                  ENDDO
+               ENDIF
+               DYBH=DYBDY*DY/2
+               WYB=BH+DYBH
+               DY=DY/10.
+               IF(BTEST(ABS(J1),0)) YCH=-YCH
+               DO J=J1,J2
+                  YBAR=J*QBAR_B(M)
+                  Y=YCH+YBAR-Y0
+                  YB=YB0+Y*DYBDY-YBAR
+                  YCH=-YCH
+                  IF(ABS(YB).GT.WYB) CYCLE
+                  Y1=MAX(YB-DYBH,-BH)
+                  Y2=MIN(YB+DYBH, BH)
+                  DY1=(Y2-Y1)/DYBDY
+                  I=MIN(NINT(DY1/DY),10)
+                  IF(I.LE.0) CYCLE
+                  IF(.NOT.TAG(I)) THEN
+                     DY1=DY*I
+                     CALL SET_EMASK(DYDE,DYDL,DYDX,DY1,T_LEN,DX,0.,
+     &                    MASK(0,I),MM(I),NSIZ,TAG(I),WIDI(I))
+                  ENDIF
+                  ECP=((Y1+Y2)/2+YBAR-YB0)/DYBDE+E_MEAN
+                  CALL QE_INTEGRATE(MASK(0,I),MM(I),NSIZ,ECP,WIDI(I),
+     &                 S,S_E,S_E2)
+                  IF(S.LE.0) CYCLE
+                  ECP=S_E/S
+                  WID=(S_E2/S-ECP**2)*4
+                  DO I=IPT+1,NT
+                     IF((ECP-ECPP(I))**2.LT.WID) EXIT
+                  ENDDO
+                  IF(I.GT.NT) THEN
+                     IF(I.GT.NB) GOTO 999
+                     NT=NT+1
+                     ECPP(NT)=ECP
+                     SUM(NT)=S
+                     E0(NT)=S_E
+                     SIG2(NT)=S_E2
+                     ICHA(NT)=ICH
+                  ELSE
+                     ECPP(I)=ECP
+                     SUM(I)=SUM(I)+S
+                     E0(I)=E0(I)+S_E
+                     SIG2(I)=SIG2(I)+S_E2
+                  ENDIF
+               ENDDO
+            ENDDO
+         ENDDO
+      ENDDO
+      DO I=1,NT
+         E0(I)=E0(I)/SUM(I)
+         SIG2(I)=SIG2(I)/SUM(I)-E0(I)**2
+      ENDDO
+
+      RETURN
+
+ 999  CONTINUE
+      PRINT*,'YSKENX: NT>NB ',NT,NB
+
+      END
+
+
+
+      SUBROUTINE SET_EMASK(DYDE,DYDL,DYDX,DY,DL,DX,WTAG,
+     &     P,NT,NSIZ,TAG,WID)
+
+      IMPLICIT NONE
+      REAL DYDE, DYDL, DYDX
+      REAL DY, DL, DX, WTAG
+      REAL P(*)                 ! mask
+      INTEGER NT, NSIZ          ! size of mask, size of array P
+      LOGICAL TAG
+      REAL WID
+#include "TOP_QEFF.fi" 
+      REAL W, A, B, C, WY, E
+      REAL CONV_SQUARES
+      INTEGER I
+
+      NT=0
+      IF(DY.LE.0) RETURN
+
+      CALL SET_MASK_PAR(DYDE,DYDL,DYDX,DY,DL,DX,A,B,C,WY,WID)
+
+      TAG=A.LT.WTAG.OR.WTAG.EQ.0
+      IF(.NOT.TAG) RETURN
+
+      CALL SET_MASK(A,B,C,WY,P,NT,NSIZ)
+
+      END
+
+
+      SUBROUTINE SET_MASK_PAR(DYDE,DYDL,DYDX,DY,DL,DX,A,B,C,WY,WID)
+
+      IMPLICIT NONE
+      REAL DYDE, DYDL, DYDX     ! input
+      REAL DY, DL, DX           ! input
+      REAL A, B, C, WY, WID     ! output
+#include "TOP_QEFF.fi" 
+      REAL W
+      REAL CONV_SQUARES
+
+      IF(DY.LE.0) THEN
+         A=0.
+         B=0.
+         C=0.
+         WY=0.
+         WID=E_STEP*4
+         RETURN
+      ENDIF
+
+      WY=DY/ABS(DYDE)
+      A=WY
+      W=ABS(DL*DYDL/DYDE)
+      IF(W.GT.A) THEN
+         B=A
+         A=W
+      ELSE
+         B=W
+      ENDIF
+      W=ABS(DX*DYDX/DYDE)
+      IF(W.GT.A) THEN
+         C=B
+         B=A
+         A=W
+      ELSE IF(W.GT.B) THEN
+         C=B
+         B=W
+      ELSE
+         C=W
+      ENDIF
+
+      W=(A+B+C)/2
+      WID=2*MAX(W,E_STEP*2)
+
+      END
+
+
+      SUBROUTINE SET_MASK(A,B,C,WY,P,NT,NSIZ)
+
+      IMPLICIT NONE
+      REAL A, B, C, WY          ! input, must be sorted: A>B>C
+      REAL P(*)                 ! mask
+      INTEGER NT, NSIZ          ! size of mask, size of array P
+#include "TOP_QEFF.fi" 
+      REAL W, E
+      REAL CONV_SQUARES
+      INTEGER I
+
+      W=(A+B+C)/2
+      NT=IFIX(W/E_STEP)+1
+      IF(NT.LE.NSIZ) THEN
+         E=0.
+         DO I=1,NT
+            P(I)=CONV_SQUARES(E,A,B,C)*WY
+            E=E+E_STEP
+         ENDDO
+      ELSE
+         P(1)=A
+         P(2)=B
+         P(3)=C
+         P(4)=WY
+      ENDIF
+
+      END
+
+
+      REAL FUNCTION CONV_SQUARES(X,A,B,C)
+
+c--   normalized convolution of three square functions of full width A, B and C
+c--   sorting required: A>B>C
+      
+      IMPLICIT NONE
+      REAL X, A, B, C
+      REAL CONV_2SQUARE, CONV_3SQUARE
+
+      IF(A.GT.0) THEN
+         IF(C/A.GT.0.001) THEN
+            CONV_SQUARES=CONV_3SQUARE(A,B,C,X)
+         ELSE
+            CONV_SQUARES=CONV_2SQUARE(A,B,X)
+         ENDIF
+      ELSE
+         CONV_SQUARES=0.
+      ENDIF
+      END
+
+
+      REAL FUNCTION CONV_2SQUARE(A,B,X)
+
+c--   normalized convolution of two square functions of full width A and B
+c--   sorting required: A>B
+
+      IMPLICIT NONE
+      REAL A, B, X
+      REAL X1, X2, ABSX
+
+      X1=(A-B)/2
+      X2=(A+B)/2
+      ABSX=ABS(X)
+
+      IF(ABSX.LT.X1) THEN
+         CONV_2SQUARE=1./A
+      ELSE IF(ABSX.LT.X2) THEN
+         CONV_2SQUARE=(X2-ABSX)/(X2-X1)/A
+      ELSE
+         CONV_2SQUARE=0.
+      ENDIF
+      END
+
+
+      REAL FUNCTION CONV_3SQUARE(A,B,C,X)
+
+c--   normalized convolution of three square functions of full width A, B and C
+c--   sorting required: A>B>C
+
+      IMPLICIT NONE
+      REAL A, B, C, X
+      REAL T1, T2, T3, T4, P, ABC
+
+      ABC=(A+B+C)/2
+      IF(ABS(X).LT.ABC) THEN
+         T1=ABC-X
+         T2=ABC+X
+         P=T1**2+T2**2
+         T3=T1-A
+         T4=T2-A
+         P=P-(SIGN(T3**2,T3)+SIGN(T4**2,T4))
+         T3=T1-B
+         T4=T2-B
+         P=P-(SIGN(T3**2,T3)+SIGN(T4**2,T4))
+         T3=T1-C
+         T4=T2-C
+         P=P-(SIGN(T3**2,T3)+SIGN(T4**2,T4))
+         CONV_3SQUARE=MAX(P/(4*A*B*C),0.)
+      ELSE
+         CONV_3SQUARE=0.
+      ENDIF
+
+      END
+      
+
+      SUBROUTINE QE_INTEGRATE(P,N,NSIZ,ECP,WID,S,SE,SEE)
+
+      IMPLICIT NONE
+      INTEGER NSIZ
+      REAL P(0:NSIZ-1)
+      INTEGER N
+      REAL ECP, WID
+      REAL S, SE, SEE
+#include "TOP_QEFF.fi" 
+      INTEGER I0, I, K, K1, K2, II
+      REAL PP, A, B, C, WY, W, E, WH
+      REAL CONV_SQUARES
+      
+      S=0.
+      SE=0.
+      SEE=0.
+      WH=WID/2
+      IF(ECP+WH.LT.EMIN) RETURN
+      IF(ECP-WH.GT.EMAX) RETURN
+
+      IF(N.LE.NSIZ) THEN
+         I0=NINT((ECP-EMIN)/E_STEP)+1
+         K1=MAX(-(N-1),1-I0)
+         K2=MIN(N-1,NT_XQE-I0)
+         DO K=K1,K2
+            I=K+I0
+            II=ABS(K)
+            S=S+XQE_S(I)*P(II)
+            SE=SE+XQE_SE(I)*P(II)
+            SEE=SEE+XQE_SEE(I)*P(II)
+         ENDDO
+      ELSE
+         A=P(0)
+         IF(A.EQ.0) RETURN
+         B=P(1)
+         C=P(2)
+         WY=P(3)
+         W=(A+B+C)/2
+         DO I=1,NT_XQE
+            E=XQE_E(I)-ECP
+            IF(ABS(E).LT.W) THEN
+               PP=CONV_SQUARES(E,A,B,C)*WY
+               S=S+XQE_S(I)*PP
+               SE=SE+XQE_SE(I)*PP
+               SEE=SEE+XQE_SEE(I)*PP
+            ENDIF
+         ENDDO         
+      ENDIF
+
+      END
+
+
+      SUBROUTINE QE_INT_MASK(A,B,C,WY,ECP,S,SE,SEE)
+
+      IMPLICIT NONE
+      REAL A, B, C, WY
+      REAL ECP
+      REAL S, SE, SEE
+#include "TOP_QEFF.fi" 
+      INTEGER I
+      REAL PP, E, W
+      REAL CONV_SQUARES
+
+      S=0.
+      SE=0.
+      SEE=0.
+      IF(A.EQ.0) RETURN
+
+      W=(A+B+C)/2
+      DO I=1,NT_XQE
+         E=XQE_E(I)-ECP
+         IF(ABS(E).LT.W) THEN
+            PP=CONV_SQUARES(E,A,B,C)*WY
+            S=S+XQE_S(I)*PP
+            SE=SE+XQE_SE(I)*PP
+            SEE=SEE+XQE_SEE(I)*PP
+         ENDIF
+      ENDDO         
+
+      END
+
+
+      SUBROUTINE UNFOLD_EXTVOL(MDN,LR,KMIN,KMAX)
+
+      IMPLICIT NONE
+      INTEGER MDN, LR
+      INTEGER KMIN, KMAX
+
+      INTEGER KK
+      REAL SMER_Y, SMER_Z
+      REAL ORIG_Y, ORIG_Z
+      REAL YCH, DYDZ, Y, DY
+      INTEGER LUN
+      LOGICAL OK
+#include "TOP_GEO.fi" 
+#include "TOP_EXT.fi" 
+      INTEGER ID, II, K, I
+      REAL PHI0, PHI1, YSIZ, AA, Z
+      REAL R_PL(3,0:1), NORM(3,0:1)
+      integer nsiz
+      PARAMETER (NSIZ=20)
+      INTEGER KMI, KMA
+      REAL R0(3,-NSIZ:NSIZ), SMER(3,-NSIZ:NSIZ), ORIG(3,-NSIZ:NSIZ)
+      REAL Z_MAX
+      INTEGER MDN_OLD /-1/, LR_OLD /0/
+      SAVE KMI, KMA, R0, SMER, ORIG, MDN_OLD, LR_OLD, Z_MAX
+
+      IF(MDN.EQ.MDN_OLD.AND.LR.EQ.LR_OLD) THEN
+         KMIN=KMI
+         KMAX=KMA
+         RETURN
+      ENDIF
+      MDN_OLD=MDN
+      LR_OLD=LR
+      
+      SMER(1,0)=0.
+      SMER(2,0)=1.
+      SMER(3,0)=0.
+      KMI=0
+      KMA=0
+
+      ID=QBAR_EXT(LR,MDN)
+      IF(ID.EQ.0) RETURN
+      IF(EXT_SHAPE(ID).EQ.2) THEN
+         PHI0=ATAN2(EXT_YDN(ID)+QBAR_B(MDN)/2,EXT_DZ(ID))
+         PHI1=ATAN2(EXT_YUP(ID)-QBAR_B(MDN)/2,EXT_DZ(ID))
+      ELSE
+         PHI0=0.
+         PHI1=0.
+      ENDIF
+      R_PL(1,0)=0.
+      R_PL(2,0)=EXT_YDN(ID)
+      R_PL(3,0)=EXT_DZ(ID)
+      R_PL(1,1)=0.
+      R_PL(2,1)=EXT_YUP(ID)
+      R_PL(3,1)=EXT_DZ(ID)
+      NORM(1,0)=0.
+      NORM(2,0)=COS(PHI0)
+      NORM(3,0)=-SIN(PHI0)
+      NORM(1,1)=0.
+      NORM(2,1)=-COS(PHI1)
+      NORM(3,1)=SIN(PHI1)
+      II=0
+      K=II
+      DO I=1,3
+         R0(I,K)=R_PL(I,II)
+      ENDDO
+      DO WHILE(K.GT.-NSIZ)
+         CALL REFLECT_PLANE(R_PL,NORM,II)
+         K=K-1
+         DO I=1,3
+            R0(I,K)=R_PL(I,II)
+         ENDDO
+         IF(R_PL(3,II).LT.0) EXIT
+      ENDDO
+      KMI=K
+
+      R_PL(1,0)=0.
+      R_PL(2,0)=EXT_YDN(ID)
+      R_PL(3,0)=EXT_DZ(ID)
+      R_PL(1,1)=0.
+      R_PL(2,1)=EXT_YUP(ID)
+      R_PL(3,1)=EXT_DZ(ID)
+      NORM(1,0)=0.
+      NORM(2,0)=COS(PHI0)
+      NORM(3,0)=-SIN(PHI0)
+      NORM(1,1)=0.
+      NORM(2,1)=-COS(PHI1)
+      NORM(3,1)=SIN(PHI1)
+      II=1
+      K=II
+      DO I=1,3
+         R0(I,K)=R_PL(I,II)
+      ENDDO
+      DO WHILE(K.LT.NSIZ)
+         CALL REFLECT_PLANE(R_PL,NORM,II)
+         K=K+1
+         DO I=1,3
+            R0(I,K)=R_PL(I,II)
+         ENDDO
+         IF(R_PL(3,II).LT.0) EXIT
+      ENDDO
+      KMA=K-1
+
+      DO K=KMI,KMA+1
+         R0(3,K)=R0(3,K)-EXT_DZ(ID)
+         IF(LR.EQ.0) R0(3,K)=-R0(3,K)
+      ENDDO
+
+      YSIZ=EXT_YUP(ID)-EXT_YDN(ID)
+      DO K=KMI,KMA
+         IF(MOD(ABS(K),2).EQ.0) THEN
+            AA=-EXT_YDN(ID)
+            DO I=1,3
+               SMER(I,K)=(R0(I,K+1)-R0(I,K))/YSIZ
+               ORIG(I,K)=R0(I,K)+AA*SMER(I,K)
+            ENDDO
+         ELSE
+            AA=-EXT_YUP(ID)
+            DO I=1,3
+               SMER(I,K)=-(R0(I,K+1)-R0(I,K))/YSIZ
+               ORIG(I,K)=R0(I,K)+AA*SMER(I,K)
+            ENDDO
+         ENDIF
+      ENDDO
+      Z_MAX=EXT_DZ(ID)
+      KMIN=KMI
+      KMAX=KMA
+
+      RETURN
+
+      ENTRY GET_UNFOLD_EXT(KK,SMER_Y,SMER_Z, ORIG_Y, ORIG_Z)
+
+      SMER_Y=SMER(2,KK)
+      SMER_Z=SMER(3,KK)
+      ORIG_Y=ORIG(2,KK)
+      ORIG_Z=ORIG(3,KK)
+      RETURN
+
+      ENTRY TO_FLAT_SCREEN(YCH,KK,DYDZ,Y,OK)
+
+      Y=YCH*SMER(2,KK)+ORIG(2,KK)
+      Z=YCH*SMER(3,KK)+ORIG(3,KK)
+      IF(KK.GE.0) THEN
+         Y=Y-DYDZ*Z
+      ELSE
+         Y=Y+DYDZ*Z
+      ENDIF
+      OK=ABS(Z).LT.Z_MAX
+      RETURN
+
+      ENTRY DTO_FLAT_SCREEN(DY,KK,DYDZ,Y)
+
+      Y=DY*SMER(2,KK)
+      Z=DY*SMER(3,KK)
+      IF(KK.GE.0) THEN
+         Y=abs(Y-DYDZ*Z)
+      ELSE
+         Y=abs(Y+DYDZ*Z)
+      ENDIF
+      RETURN
+      
+
+      ENTRY DUMP_UNFOLD(LUN)
+
+      DO K=KMI,KMA+1
+         WRITE(LUN,*) K,R0(3,K),R0(2,K),ORIG(3,K),ORIG(2,K),
+     &        SMER(3,K),SMER(2,K)
+      ENDDO
+      RETURN
+
+      END
+
+
+      SUBROUTINE REFLECT_PLANE(R_PL,NORM,K)
+
+      IMPLICIT NONE
+      REAL R_PL(3,0:1)          ! planes (point)
+      REAL NORM(3,0:1)          ! planes (normal)
+      INTEGER K                 ! mirror plane [in], reflected plane [out]
+
+      INTEGER K0, K1, I
+      REAL R(3), A, S_PROD
+
+      K0=MOD(K,2)               ! mirror plane
+      K1=MOD(K+1,2)             ! plane to be refected
+
+      DO I=1,3
+         R(I)=R_PL(I,K1)-R_PL(I,K0)
+      ENDDO
+      A=2.*S_PROD(R,NORM(1,K0))
+      DO I=1,3
+         R_PL(I,K1)=R_PL(I,K1)-A*NORM(I,K0)
+      ENDDO
+      A=2.*S_PROD(NORM(1,K1),NORM(1,K0))
+      DO I=1,3
+         NORM(I,K1)=NORM(I,K1)-A*NORM(I,K0)
+      ENDDO
+      K=K1
+
+      END
+
+
+
+

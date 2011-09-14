@@ -26,7 +26,7 @@ namespace Belle2 {
   void EKLMRecon::readStripHits()
   {
     StoreArray<EKLMStripHit> array("StripHitsEKLMArray");
-    for (int i = 0; i < array.GetEntries(); i++)
+    for (int i = 0; i < array.getEntries(); i++)
       m_StripHitVector.push_back(array[i]);
   }
 

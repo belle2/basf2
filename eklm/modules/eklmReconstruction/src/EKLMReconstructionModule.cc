@@ -21,7 +21,6 @@ REG_MODULE(EKLMReconstruction)
 EKLMReconstructionModule::EKLMReconstructionModule() : Module()
 {
   setDescription("EKLM reconstruction simple module for tests");
-
 }
 
 EKLMReconstructionModule::~EKLMReconstructionModule()

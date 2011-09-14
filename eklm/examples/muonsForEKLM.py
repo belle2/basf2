@@ -29,7 +29,8 @@ set_log_level(LogLevel.INFO)
 
 # EvtMetaGen - generate event meta data
 evtmetagen = register_module('EvtMetaGen')
-evtmetagen.param('EvtNumList', [1])
+evtmetagen.param('EvtNumList', [100])
+evtmetagen.param('RunList', [1])
 
 # Particle gun
 particlegun = register_module('PGunInput')
@@ -39,15 +40,19 @@ particlegun.param('pPar1', 0.05)
 particlegun.param('pPar2', 3)
 
 # Geometry parameter loader
-paramloader = register_module('ParamLoaderXML')
-paramloader.param('InputFileXML', os.path.join(basf2datadir,
-                  'simulation/Belle2.xml'))
+paramloader = register_module('Gearbox')
 
 # Geometry builder
-geobuilder = register_module('GeoBuilder')
+geobuilder = register_module('Geometry')
+geobuilder.log_level = LogLevel.INFO
 
 # Full Geant4 simulation
 g4sim = register_module('FullSim')
+# g4sim.param('EnableVisualization', True)
+# g4sim.param('UICommands', ['/vis/open VRML2FILE', '/vis/drawVolume',
+#            '/vis/scene/add/axes 0 0 0 100 mm',
+#            '/vis/scene/add/trajectories smooth',
+#            '/vis/modeling/trajectories/create/drawByCharge'])
 
 # Root file output
 simpleoutput = register_module('SimpleOutput')
@@ -77,3 +82,4 @@ main.add_module(simpleoutput)
 
 # Process 100 events
 process(main)
+

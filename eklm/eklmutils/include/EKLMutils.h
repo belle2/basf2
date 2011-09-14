@@ -76,9 +76,9 @@ namespace Belle2 {
   void storeEKLMObject(std::string arrayName, T* obj)
   {
     StoreArray<T> array(arrayName);
-    // since the array is indexed from 0 GetEntries() points
+    // since the array is indexed from 0 getEntries() points
     // exactly to the next to the last entry
-    new(array->AddrAt(array.GetEntries())) T(*obj);
+    new(array->AddrAt(array.getEntries())) T(*obj);
   }
 
   template < class T >
@@ -87,7 +87,16 @@ namespace Belle2 {
     return !(boost::lexical_cast<bool>(getVolumeNumber(stripName, "Plane")));
   };
 
+  /**
+   * Get physical volume by point
+   */
   G4VPhysicalVolume *GetPhysicalVolumeByPoint(const G4ThreeVector &point);
+
+  /**
+   * Check whether strip is oriented along X
+   * @strip: strip
+   */
+  bool CheckStripOrientationX(G4VPhysicalVolume *strip);
 }
 
 

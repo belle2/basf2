@@ -14,96 +14,259 @@
 #include <geometry/CreatorBase.h>
 #include <framework/gearbox/GearDir.h>
 #include <eklm/simeklm/EKLMSensitiveDetector.h>
+#include <eklm/geoeklm/G4PVPlacementGT.h>
 
 #include <G4LogicalVolume.hh>
 #include <G4Material.hh>
 #include <G4PVPlacement.hh>
+#include <G4Tubs.hh>
+#include <G4Box.hh>
 
 #include <string>
 #include <vector>
 
 namespace Belle2 {
 
-  static std::map<G4PVPlacement*, G4Transform3D> EKLMVolumeTransforms;
-
-  //! Position information for the elements of detector
+  /**
+   * struct EKLMElementPosition - position information for the elements
+   * of detector
+   */
   struct EKLMElementPosition {
-    double innerR;
-    double outerR;
-    double length;
-    double X;
-    double Y;
-    double Z;
+    double innerR;   /**< inner radius */
+    double outerR;   /**< outer radius */
+    double length;   /**< length */
+    double X;        /**< X coordinate */
+    double Y;        /**< Y coordinate */
+    double Z;        /**< Z coordinate */
   };
 
-  //!   The GeoEKLMBelleII class.
-  //!   The creator for the outer EKLM geometry of the Belle II detector.
-
+  /**
+   * Class GeoEKLMBelleII.
+   * The creator for the  EKLM geometry of the Belle II detector.
+   */
   class GeoEKLMBelleII : public geometry::CreatorBase {
 
   public:
 
-    //! Constructor of the GeoEKLMBelleII class.
+    /**
+     * Constructor of the GeoEKLMBelleII class.
+     */
     GeoEKLMBelleII();
 
-    //! The destructor of the GeoEKLMBelleII class.
+    /**
+     * Destructor of the GeoEKLMBelleII class.
+     */
     ~GeoEKLMBelleII();
 
-    //! Create geometry
+    /*
+     * create - creation of the detector geometry
+     * @content: XML data directory
+     * @topVolume: Geant world volume
+     * @type:
+     */
     virtual void create(const GearDir& content, G4LogicalVolume& topVolume,
                         geometry::GeometryTypes type);
 
-    //! returns top volume for EKLM
-//    inline TGeoVolume * getTopmostVolume()
-//    {return volGrpEKLM;}
   protected:
 
   private:
 
-    //! Create materials
+    /**
+     * Create materials
+     */
     void createMaterials();
 
-    //! Read position data
+    /**
+     * Read position data
+     */
     void readPositionData(struct EKLMElementPosition& epos,
                           GearDir& content);
 
-    //! Read XML data
+    /**
+     * Read XML data
+     */
     void readXMLData(const GearDir& content);
 
-    /* Create endcap */
+    /**
+     * ReflectCoordinates - get reflected coordinates
+     */
+    void ReflectCoordinates(double xin, double yin, double *xout, double *yout,
+                            int quarter);
+
+    /*
+     * createEndcap - create endcap
+     * @iEndcap: number of endcap
+     * @mlv: mother logical volume
+     */
     void createEndcap(int iEndcap, G4LogicalVolume *mlv);
 
-    /* Create layer */
-    void createLayer(int iLayer, G4LogicalVolume *mlv, G4Transform3D *mtr,
-                     int zOrient);
+    /*
+     * createLayer - create layer
+     * @iLayer: number of layer
+     * @mpvgt: mother physical volume with global transformation
+     */
+    void createLayer(int iLayer, G4PVPlacementGT *mpvgt);
 
-    /* Create sector */
-    void createSector(int iSector, G4LogicalVolume *mlv, G4Transform3D *mtr,
-                      int zOrient);
+    /*
+     * createSector - create sector
+     * @iSector: number of sector
+     * @mpvgt: mother physical volume with global transformation
+     */
+    void createSector(int iSector, G4PVPlacementGT *mpvgt);
 
-    /* Create plane */
-    void createPlane(int iPlane, int iSector, G4LogicalVolume *mlv,
-                     G4Transform3D *mtr, int zOrient);
+    /**
+     * createSectorSupport - create sector support structure
+     * @mlv: mother logical volume
+     */
+    void createSectorSupport(G4LogicalVolume *mlv);
 
-    /* Create strip */
-    void createStrip(int iStrip, int iPlane, int iSector, G4LogicalVolume *mlv,
-                     G4Transform3D *mtr);
+    /**
+     * createSectorSupportInnerTube - create inner tube of sector
+     * support structure
+     * @mlv: mother logical volume
+     */
+    G4Tubs *createSectorSupportInnerTube(G4LogicalVolume *mlv);
 
-    //! Materials
-    G4Material *Air, *Polystyrene, *Iron;
+    /**
+     * createSectorSupportOuterTube - create outer tube of sector
+     * support structure
+     * @mlv: mother logical volume
+     */
+    G4Tubs *createSectorSupportOuterTube(G4LogicalVolume *mlv);
 
-    //! Numbers of detector elements
-    int nEndcap, nLayer, nSector, nPlane, nStrip;
+    /**
+     * createSectorSuportBoxX - create X side of sector support structure
+     * @mlv: mother logical volume
+     * @t: transformation (output)
+     *
+     * Sets t to the transformation of the box.
+     */
+    G4Box *createSectorSupportBoxX(G4LogicalVolume *mlv, G4Transform3D &t);
 
-    //! Detector parameters
-    double EKLM_OffsetZ, Layer_shiftZ, Strip_width, Strip_thickness;
+    /**
+     * createSectorSuportBoxY - create Y side of sector support structure
+     * @mlv: mother logical volume
+     * @t: transformation (output)
+     *
+     * Sets t to the transformation of the box.
+     */
+    G4Box *createSectorSupportBoxY(G4LogicalVolume *mlv, G4Transform3D &t);
 
-    //! Positions of elements
-    struct EKLMElementPosition EndcapPosition, LayerPosition, SectorPosition,
-          PlanePosition, *StripPosition;
+    /**
+     * createSectorSuportBoxTop - create box in the cutted corner of sector
+     * support structure
+     * @mlv: mother logical volume
+     * @t: transformation (output)
+     *
+     * Sets t to the transformation of the box.
+     */
+    G4Box *createSectorSupportBoxTop(G4LogicalVolume *mlv, G4Transform3D &t);
 
-    //! Names
-    std::string Endcap_Name, Layer_Name, Sector_Name, Plane_Name, Strip_Name;
+    /**
+     * createPlane - create plane
+     * @iPlane: number of plane
+     * @mpvgt: mother physical volume with global transformation
+     */
+    void createPlane(int iPlane, G4PVPlacementGT *mpvgt);
+
+    /**
+     * createStrip - create strip
+     * @iStrip: number of strip
+     * @iPlane: number of plane
+     * @mpvgt: mother physical volume with global transformation
+     */
+    void createStrip(int iStrip, int iPlane, G4PVPlacementGT *mpvgt);
+
+    /**
+     * Air
+     */
+    G4Material *Air;
+
+    /**
+     * Polystyrene
+     */
+    G4Material *Polystyrene;
+
+    /**
+     * Iron
+     */
+    G4Material *Iron;
+
+    /**
+     * Number of layers.
+     */
+    int nLayer;
+
+    /**
+     * Number of planes in one sector.
+     */
+    int nPlane;
+
+    /**
+     * Number of strips in one plane.
+     */
+    int nStrip;
+
+    /**
+     * Position data for endcaps.
+     */
+    struct EKLMElementPosition EndcapPosition;
+
+    /**
+     * Position data for layers.
+     */
+    struct EKLMElementPosition LayerPosition;
+
+    /**
+     * Z distance between two layers.
+     */
+    double Layer_shiftZ;
+
+    /**
+     * Position data for sectors.
+     */
+    struct EKLMElementPosition SectorPosition;
+
+    /**
+     * Position data for sector support structure.
+     */
+    struct EKLMElementPosition SectorSupportPosition;
+
+    /**
+     * Sector support structure thickness.
+     */
+    double SectorSupportThickness;
+
+    /**
+     * Sector support structure: Outer radius - Y coordinate of upper edge
+     * of BoxY
+     */
+    double SectorSupport_DeltaLY;
+
+    /**
+     * Sector support structure: coordinate X of corner
+     */
+    double SectorSupport_CornerX;
+
+    /**
+     * Position data for planes.
+     */
+    struct EKLMElementPosition PlanePosition;
+
+    /**
+     * Position data for strips.
+     */
+    struct EKLMElementPosition *StripPosition;
+
+    /**
+     * Strip width.
+     */
+    double Strip_width;
+
+    /**
+     * Strip thickness.
+     */
+    double Strip_thickness;
 
     //! sensitive detector
     EKLMSensitiveDetector *m_sensitive;

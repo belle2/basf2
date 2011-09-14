@@ -30,7 +30,8 @@ namespace Belle2 {
 
 
   EKLMSensitiveDetector::EKLMSensitiveDetector(G4String name,
-                                               G4double thresholdEnergyDeposit, G4double thresholdKineticEnergy)
+                                               G4double thresholdEnergyDeposit,
+                                               G4double thresholdKineticEnergy)
       : Simulation::SensitiveDetectorBase(name, KLM)
   {
   }
@@ -63,7 +64,7 @@ namespace Belle2 {
     // get time of hit
     const G4double hitTime = track.GetGlobalTime();
 
-    G4VPhysicalVolume *pv = aStep->GetPostStepPoint()->GetPhysicalVolume();
+    G4VPhysicalVolume *pv = aStep->GetPreStepPoint()->GetPhysicalVolume();
 
     /*
      * drop hit if global time is nan or if it is  mothe than
@@ -88,9 +89,9 @@ namespace Belle2 {
 
     const G4ThreeVector & gpos = 0.5 *
                                  (aStep->GetPostStepPoint()->GetPosition() +
-                                  aStep->GetPreStepPoint()->GetPosition()) * 0.1; // to convert to cm
+                                  aStep->GetPreStepPoint()->GetPosition());
 
-    const G4ThreeVector & lpos = aStep->GetPostStepPoint()->
+    const G4ThreeVector & lpos = aStep->GetPreStepPoint()->
                                  GetTouchableHandle()->GetHistory()->
                                  GetTopTransform().TransformPoint(gpos);
 

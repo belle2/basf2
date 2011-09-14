@@ -104,7 +104,7 @@ namespace Belle2 {
     double m_LightPropagationLength;
 
     //! Physical volume (for simulation)
-    G4VPhysicalVolume *m_pv;
+    G4VPhysicalVolume *m_pv;   //! {ROOT streamer directive}
 
     /*     //! fit results */
     /*     TH1D * m_fitHistograms; */

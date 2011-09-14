@@ -38,7 +38,7 @@ namespace Belle2 {
   void EKLMDigitizer::readSimHits()
   {
     StoreArray<EKLMSimHit> array("SimHitsEKLMArray");
-    for (int i = 0; i < array.GetEntries(); i++)
+    for (int i = 0; i < array.getEntries(); i++)
       m_simHitsVector.push_back(array[i]);
   }
 

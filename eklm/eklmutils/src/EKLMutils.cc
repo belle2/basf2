@@ -11,7 +11,7 @@
 #include "G4TransportationManager.hh"
 #include "G4Navigator.hh"
 
-#include <eklm/geoeklm/GeoEKLMBelleII.h>
+#include <eklm/geoeklm/G4PVPlacementGT.h>
 
 #include <eklm/eklmutils/EKLMutils.h>
 #include <iostream>
@@ -101,6 +101,12 @@ namespace Belle2 {
   {
     return G4TransportationManager::GetTransportationManager()->
            GetNavigatorForTracking()->LocateGlobalPointAndSetup(point);
+  }
+
+  bool CheckStripOrientationX(G4VPhysicalVolume *strip)
+  {
+    G4Transform3D t = ((G4PVPlacementGT*)strip)->getTransform();
+    return (fabs(sin(t.getRotation().phiX())) < 0.01);
   }
 
 }

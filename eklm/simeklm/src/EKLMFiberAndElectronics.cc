@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Timofey Uglov                                            *
+ * Contributors: Timofey Uglov, Kirill Chilikin                           *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -21,7 +21,8 @@ using namespace CLHEP;
 namespace Belle2 {
 
   EKLMFiberAndElectronics::EKLMFiberAndElectronics(std::pair < std::string,
-                                                   std::vector<EKLMSimHit*> > entry)
+                                                   std::vector<EKLMSimHit*> >
+                                                   entry)
   {
     timeDigitizationStep = 1; // 1 ns
     nTimeDigitizationSteps = 200; // 1000 steps
@@ -35,15 +36,21 @@ namespace Belle2 {
 
     const char * stripName = entry.first.c_str();
     digitizedAmplitudeDirect = new TH1D("digitizedAmplitudeDirect", "",
-                                        nTimeDigitizationSteps, 0, nTimeDigitizationSteps*timeDigitizationStep);
+                                        nTimeDigitizationSteps, 0,
+                                        nTimeDigitizationSteps *
+                                        timeDigitizationStep);
     digitizedAmplitudeDirect->SetNameTitle("digitizedAmplitudeDirect",
                                            stripName);
     digitizedAmplitudeReflected = new TH1D("digitizedAmplitudeReflected", "",
-                                           nTimeDigitizationSteps, 0, nTimeDigitizationSteps*timeDigitizationStep);
+                                           nTimeDigitizationSteps, 0,
+                                           nTimeDigitizationSteps *
+                                           timeDigitizationStep);
     digitizedAmplitudeReflected->SetNameTitle("digitizedAmplitudeReflected",
                                               stripName);
     digitizedAmplitude = new TH1D("digitizedAmplitude", "",
-                                  nTimeDigitizationSteps, 0, nTimeDigitizationSteps*timeDigitizationStep);
+                                  nTimeDigitizationSteps, 0,
+                                  nTimeDigitizationSteps *
+                                  timeDigitizationStep);
     digitizedAmplitude->SetNameTitle("digitizedAmplitude", stripName);
 
 
@@ -93,12 +100,13 @@ namespace Belle2 {
   //***********************************************************
 
   void EKLMFiberAndElectronics::lightPropagationDistance(double &firstHitDist,
-                                                         double &secondHitDist, EKLMSimHit *sh)
+                                                         double &secondHitDist,
+                                                         EKLMSimHit *sh)
   {
     G4Box *box = (G4Box*)(sh->getPV()->GetLogicalVolume()->GetSolid());
-    double xmax = 2.0 * box->GetXHalfLength();
-    firstHitDist = xmax - (sh->getLocalPos()).x();   //  direct light hit
-    secondHitDist = 4 * xmax - firstHitDist;     //  reflected light hit
+    double half_len = box->GetXHalfLength();
+    firstHitDist = half_len - (sh->getLocalPos()).x();   //  direct light hit
+    secondHitDist = 4.0 * half_len - firstHitDist;     //  reflected light hit
   }
 
   double EKLMFiberAndElectronics::addRandomNoise(double ampl)
@@ -120,8 +128,6 @@ namespace Belle2 {
     //temporary  : att.Length=3 m
     return exp(-dist / 300);
   }
-
-
 
   void EKLMFiberAndElectronics::hitTimes(int nPE, bool isReflected)
   {
@@ -153,12 +159,15 @@ namespace Belle2 {
         hitTimesVectorForward.push_back(hitTime);
     }
   }
-  void EKLMFiberAndElectronics::timesToShape(std::vector <double> * times, TH1D * shape)
+
+  void EKLMFiberAndElectronics::timesToShape(std::vector <double> * times,
+                                             TH1D * shape)
   {
     for (unsigned  i = 0; i < times->size(); i++)
       for (int iTimeStep = 0; iTimeStep < nTimeDigitizationSteps; iTimeStep++)
         shape->AddBinContent(iTimeStep + 1,
-                             signalShape(iTimeStep*timeDigitizationStep - (*times)[i]));
+                             signalShape(iTimeStep*timeDigitizationStep -
+                                         (*times)[i]));
   }
 
   double EKLMFiberAndElectronics::lightPropagationTime(double L)

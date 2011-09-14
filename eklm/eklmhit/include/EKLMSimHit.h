@@ -77,7 +77,7 @@ namespace Belle2 {
 
   private:
     //! Physical volume
-    G4VPhysicalVolume *m_pv;
+    G4VPhysicalVolume *m_pv;  //! {ROOT streamer directive}
 
     //! hit position (in global reference frame)
     G4ThreeVector m_global_pos;
@@ -95,7 +95,7 @@ namespace Belle2 {
     G4int m_PDGcode;
 
     //! Needed to make root object storable
-    ClassDef(EKLMSimHit, 1);
+    ClassDef(Belle2::EKLMSimHit, 1);
 
   };
 

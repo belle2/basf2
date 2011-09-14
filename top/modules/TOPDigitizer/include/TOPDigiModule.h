@@ -117,6 +117,9 @@ namespace Belle2 {
       */
       double Gaus(double mean, double sigma);
 
+      //! Returns gausian distribuded random number
+      double PMT_TTS();
+
 
     };
 

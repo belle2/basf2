@@ -87,67 +87,77 @@ namespace Belle2 {
     void TOPDigiModule::event()
     {
 
-      // Get the collection of TOPSimHits from the Data store.
-      //------------------------------------------------------
+      //! Get the collection of TOPSimHits from the Data store.
+
       StoreArray<TOPSimHit> topSimHits;
       if (!topSimHits) B2ERROR("TOPDigitizerModule: Cannot find TOPSimHit array.");
-      //-----------------------------------------------------
 
-      // Get the collection of TOPHits from the Data store,
-      // (or have one created)
-      //-----------------------------------------------------
+      //! Get the collection of TOPDigiHits from the Data store,
+
       StoreArray<TOPDigiHit> topDigiHits;
+      if (!topDigiHits) B2ERROR("TOPDigitizerModule: Cannot find TOPDigiHits array.");
 
-      //---------------------------------------------------------------------
-      // Convert SimHits one by one to digitizer hits.
-      //---------------------------------------------------------------------
 
-      /*
-      // Get number of hits in this event
+
+      //! Get number of hits in this event
       int nHits = topSimHits->GetLast();
-      B2INFO("nHits: " << nHits);
-      // Loop over all hits
 
+      //! count the numebr of digitised photons
       int dighit = 0;
-      for (int iHit = 0; iHit < nHits; ++iHit) {
-          // Get a simhit
-          TOPSimHit* aSimHit = topSimHits[iHit];
 
-          double energy = aSimHit->getEnergy();
+      for (int i = 0; i < nHits; i++) {
+        //! Get a simhit
+        TOPSimHit* aSimHit = topSimHits[i];
 
-          // Apply q.e. of detector
-          if (!DetectorQE(energy)) continue;
+        double energy = aSimHit->getEnergy();
 
-          TVector2 locpos(aSimHit->getLocalPosition().X(), aSimHit->getLocalPosition().Y());
+        //! Apply quantum efficiency
+        if (!DetectorQE(energy)) continue;
 
-          // Get id number of hit channel
+        //! Get local position
+        TVector2 locpos(aSimHit->getPosition().X(), aSimHit->getPosition().Y());
 
-          int moduleID = aSimHit->getModuleID();
-          int BarID = aSimHit->getBarID();
+        //! Convert local position to channel number - spatial digitisation
+        int moduleID = aSimHit->getModuleID();
+        int channelID = m_topgp->getChannelID(locpos, moduleID);
 
-          int channelID = m_topgp->getChannelID(locpos, moduleID);
+        if (channelID < 0) continue;
 
+        //! get global time
+        double globaltime = aSimHit->getTime();
 
-          if (channelID < 0) continue;
+        //! simulate interaction time relative to RF clock
+        double sig_beam = 0.;
+        double t_beam = Gaus(0., sig_beam);
 
-          double globaltime = aSimHit->getGlobalTime();
+        //! simulate TTS
+        double t_tts = PMT_TTS();
 
-          if (globaltime / Unit::ns > 4096.0*25.0e-3) continue;
+        //! obtain actual time
+        double time = t_beam + globaltime + t_tts;
+        if (time < 0) continue;
 
-          //B2INFO("ihit: " << iHit  << " channel ID: " << channelID << " bar ID " << BarID << "arival time:" << globaltime);
-          // Check if channel already registered hit in this event(no multiple hits)
+        //convert time to TDC
+        int NTDC = m_topgp->getTDCbits();
+        double TDCwidth = m_topgp->getTDCbitwidth();
 
-          int nentr = topHits->GetEntries();
-          new(topHits->AddrAt(nentr)) TOPHit(BarID, channelID, globaltime, energy, aSimHit->getParentID());
-          if (aSimHit->getParentID() == 1) {
-              dighit++;
-          }
-      } // for iHit
+        int TDC = (int)(time / TDCwidth);
+        int maxTDC = (int)pow(2., (double)NTDC);
+
+        //! If TDC is in overflow correct to max
+        if (TDC > maxTDC) {
+          TDC = maxTDC;
+        }
+
+        int nentr = topDigiHits->GetEntries();
+        new(topDigiHits->AddrAt(nentr)) TOPDigiHit(aSimHit->getBarID(), channelID, TDC, energy, aSimHit->getParentID(), aSimHit->getTrackID());
+        dighit++;
+
+      }
 
       m_nEvent++;
-
       B2INFO("nHits: " << nHits << " digitized hits: " << dighit);
-       */
+
     }
 
     void TOPDigiModule::endRun()
@@ -194,28 +204,32 @@ namespace Belle2 {
       return (m_random->Rndm(0) < QEMultiAlkali(energy));
     }
 
+    double TOPDigiModule::PMT_TTS()
+    {
+
+      double prob = 0;
+      double s = 0;
+
+      int TTS_NG = 3;
+      double tts_frac[3] = {0.5815, 0.2870, 0.1315};
+      double tts_t0[3] = { -13.59e-3, 29.03e-3, 273.0e-3};
+      double tts_sig[3] = {31.97e-3, 53.39e-3, 340.2e-3};
+
+      prob = m_random->Rndm();
+
+      for (int i = 0; i < TTS_NG; i++) {
+        s = s + tts_frac[i];
+        if (prob < s) {
+          return Gaus(tts_t0[i], tts_sig[i]);
+
+        }
+      }
+
+      return -999999;
+    }
+
     double TOPDigiModule::Gaus(double mean, double sigma)
     {
-      //
-      //  samples a random number from the standard Normal (Gaussian) Distribution
-      //  with the given mean and sigma.
-      //  Uses the Acceptance-complement ratio from W. Hoermann and G. Derflinger
-      //  This is one of the fastest existing method for generating normal random variables.
-      //  It is a factor 2/3 faster than the polar (Box-Muller) method used in the previous
-      //  version of TRandom::Gaus. The speed is comparable to the Ziggurat method (from Marsaglia)
-      //  implemented for example in GSL and available in the MathMore library.
-      //
-      //
-      //  REFERENCE:  - W. Hoermann and G. Derflinger (1990):
-      //               The ACR Method for generating normal random variables,
-      //               OR Spektrum 12 (1990), 181-185.
-      //
-      //  Implementation taken from
-      //   UNURAN (c) 2000  W. Hoermann & J. Leydold, Institut f. Statistik, WU Wien
-      ///////////////////////////////////////////////////////////////////////////////
-
-
-
       const double kC1 = 1.448242853;
       const double kC2 = 3.307147487;
       const double kC3 = 1.46754004;
@@ -231,7 +245,6 @@ namespace Belle2 {
       const double kHp1 = 3.132731354;
       const double kHzm = 0.375959516;
       const double kHzmp = 0.591923442;
-      /*zhm 0.967882898*/
 
       const double kAs = 0.8853395638;
       const double kBs = 0.2452635696;

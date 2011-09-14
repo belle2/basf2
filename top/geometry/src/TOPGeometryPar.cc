@@ -144,7 +144,7 @@ void TOPGeometryPar::read(const GearDir& content)
   _Npady = detParams.getInt("Module/PadXNum");
   _dGlue = detParams.getLength("dGlue");
   _NTDC = detParams.getInt("Module/TDCbits");
-  _TDCwidth = detParams.getInt("Module/TDCbitwidth");
+  _TDCwidth = detParams.getLength("Module/TDCbitwidth");
 
   //! Mirror parameters
 

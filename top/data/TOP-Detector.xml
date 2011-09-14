@@ -29,8 +29,8 @@
         <PadXNum desc="Number of pads in x direction">4</PadXNum>
         <PadYNum desc="Number of pads in y direction">4</PadYNum>
 
-        <TDCbits desc"Number of TDC bits available">12</TDCbits>
-        <TDCbitwidth desc"Width of TDC bit" unit="ns">25e-3</TDCbitwidth>
+        <TDCbits desc="Number of TDC bits available">12</TDCbits>
+        <TDCbitwidth desc="Width of TDC bit" unit="ns">0.025</TDCbitwidth>
     </Module>
     
 </Detector>

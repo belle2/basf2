@@ -142,7 +142,15 @@ namespace Belle2 {
     double getMirradius() const;
 
     //! derived function that are part of geometry
+
+    //! conversion of locaton possition to channel ID
     int getChannelID(TVector2 position, int moduleID) const;
+
+    //!Backwads possition
+    double getZ1() const;
+
+    //!Forward possition
+    double getZ2() const;
 
   private:
     //! Parameters for bars
@@ -425,6 +433,8 @@ namespace Belle2 {
   }
 
   //! Derived functions which are part of geometry
+
+  //Convert possition on PMT into channel ID
   inline int TOPGeometryPar::getChannelID(TVector2 position, int moduleID) const
   {
 
@@ -441,6 +451,16 @@ namespace Belle2 {
     int chID = pmtID + moduleID * _Npadx * _Npady;
 
     return chID;
+  }
+  //! return backwards posstition
+  inline double TOPGeometryPar::getZ1() const
+  {
+    return _Bposition - _Gwidth1;
+  }
+  //return forwards posstiton
+  inline double TOPGeometryPar::getZ2() const
+  {
+    return _Bposition - _Length1 + _Gwidth2 + _Length2 + _Gwidth3 + _Length3;
   }
 
 } // end of namespace Belle2

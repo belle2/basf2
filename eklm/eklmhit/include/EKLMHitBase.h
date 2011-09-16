@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Timofey Uglov                                            *
+ * Contributors: Timofey Uglov, Kirill Chilikin                           *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -11,10 +11,10 @@
 #ifndef EKLMHITBASE_H
 #define EKLMHITBASE_H
 
-#include <TObject.h>
-//#include <simulation/simkernel/B4VHit.h>
+#include <sys/types.h>
 
-//#include <framework/datastore/StoreDefs.h>
+#include <TObject.h>
+
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 
@@ -32,11 +32,9 @@ namespace Belle2 {
     //! Constructor
     EKLMHitBase() {};
 
-    //! Constructor with name
-    EKLMHitBase(const char *);
-
-    //! Constructor with name
-    EKLMHitBase(std::string &);
+    //! Constructor
+    EKLMHitBase(char nEndcap, char nLayer, char nSector, char nPlane,
+                char nStrip);
 
     //! Destructor
     virtual ~EKLMHitBase() {};
@@ -44,21 +42,87 @@ namespace Belle2 {
     //! Print hit information
     virtual void Print();
 
-    //! sets name for the hit. Usually constructed from the strip name
-    inline void setName(std::string name)
-    {m_Name = name;}
+    /**
+     * Get endcap number.
+     */
+    inline char get_nEndcap() {return m_nEndcap;}
 
-    //! returns hit name
-    inline std::string getName() const
-    {return m_Name;}
+    /**
+     * Set endcap number.
+     */
+    inline void set_nEndcap(char nEndcap) {m_nEndcap = nEndcap;}
 
+    /**
+     * Get layer number.
+     */
+    inline char get_nLayer() {return m_nLayer;}
+
+    /**
+     * Set layer number.
+     */
+    inline void set_nLayer(char nLayer) {m_nLayer = nLayer;}
+
+    /**
+     * Get sector number.
+     */
+    inline char get_nSector() {return m_nSector;}
+
+    /**
+     * Set sector number.
+     */
+    inline void set_nSector(char nSector) {m_nSector = nSector;}
+
+    /**
+     * Get plane number.
+     */
+    inline char get_nPlane() {return m_nPlane;}
+
+    /**
+     * Set plane number.
+     */
+    inline void set_nPlane(char nPlane) {m_nPlane = nPlane;}
+
+    /**
+     * Get strip number.
+     */
+    inline char get_nStrip() {return m_nStrip;}
+
+    /**
+     * Set strip number.
+     */
+    inline void set_nStrip(char nStrip) {m_nStrip = nStrip;}
 
   private:
-    //! needed to make objects storable
+    /**
+     * Number of endcap.
+     */
+    char m_nEndcap;
+
+    /**
+     * Number of layer.
+     */
+    char m_nLayer;
+
+    /**
+     * Number of sector.
+     */
+    char m_nSector;
+
+    /**
+     * Number of plane.
+     */
+    char m_nPlane;
+
+    /**
+     * Number of strip.
+     */
+    char m_nStrip;
+
+    /**
+     * Needed to make objects storable.
+     */
     ClassDef(Belle2::EKLMHitBase, 1);
 
-    //! name of the hit
-    std::string m_Name;
   };
 
 

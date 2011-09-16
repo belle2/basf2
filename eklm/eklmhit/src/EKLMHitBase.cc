@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Timofey Uglov                                            *
+ * Contributors: Timofey Uglov, Kirill Chilikin                           *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -27,15 +27,15 @@ using namespace Belle2;
 
 ClassImp(EKLMHitBase);
 
-EKLMHitBase::EKLMHitBase(const char * name)
+EKLMHitBase::EKLMHitBase(char nEndcap, char nLayer, char nSector, char nPlane,
+                         char nStrip)
 {
-  m_Name = name;
+  m_nEndcap = nEndcap;
+  m_nLayer = nLayer;
+  m_nSector = nSector;
+  m_nPlane = nPlane;
+  m_nStrip = nStrip;
 }
-EKLMHitBase::EKLMHitBase(std::string &name)
-{
-  m_Name = name;
-}
-
 
 void EKLMHitBase::Print()
 {

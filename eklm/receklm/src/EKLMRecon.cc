@@ -33,6 +33,7 @@ namespace Belle2 {
 
   void EKLMRecon::createSectorHits()
   {
+    EKLMSectorHit *newSectorHit;
     for (std::vector<EKLMStripHit*>::iterator stripIter =
            m_StripHitVector.begin(); stripIter != m_StripHitVector.end();
          ++stripIter) {
@@ -47,8 +48,9 @@ namespace Belle2 {
         }
       }
       if (sectorNotFound) {
-        EKLMSectorHit  *newSectorHit = new EKLMSectorHit(EKLMNameManipulator::
-                                                         getVolumeName((*stripIter)->getName(), "Sector").c_str());
+        newSectorHit = new EKLMSectorHit((*stripIter)->get_nEndcap(),
+                                         (*stripIter)->get_nLayer(),
+                                         (*stripIter)->get_nSector(), 0, 0);
         newSectorHit->addStripHit(*stripIter);
         m_SectorHitVector.push_back(newSectorHit);
       }
@@ -58,7 +60,7 @@ namespace Belle2 {
            m_SectorHitVector.begin();
          sectorIter != m_SectorHitVector.end(); sectorIter++) {
       storeEKLMObject("SectorHitsEKLMArray", *sectorIter);
-      //  (*sectorIter)->Print();
+      // (*sectorIter)->Print();
     }
   }
 

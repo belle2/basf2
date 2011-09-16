@@ -33,7 +33,8 @@ namespace Belle2 {
                     const G4Transform3D &Transform3D,
                     G4LogicalVolume *pCurrentLogical,
                     const G4String &pName,
-                    G4LogicalVolume *pMotherLogical);
+                    G4LogicalVolume *pMotherLogical,
+                    int id = 0);
 
     /**
      * Constructor.
@@ -43,20 +44,41 @@ namespace Belle2 {
     G4PVPlacementGT(G4PVPlacementGT *motherPVPlacementGT,
                     const G4Transform3D &Transform3D,
                     G4LogicalVolume *pCurrentLogical,
-                    const G4String &pName);
+                    const G4String &pName,
+                    int id = 0);
 
     /**
-     * getTransform - get global transformation.
+     * getTransform - get transformation.
      */
-    inline G4Transform3D getTransform() const
-    {return m_transform;}
+    inline G4Transform3D getTransform() {return m_transform;}
+
+    /**
+     * getID - get identifier.
+     */
+    inline int getID() {return m_id;}
+
+    /**
+     * getMother - get mother G4PVPlacementGT;
+     */
+    inline G4PVPlacementGT *getMother() {return m_mother;}
 
   private:
 
     /**
-     * Transformation from global to local coordinates.
+     * Transformation from local to global coordinate.
+     * This is the transformation of point (not coordinate system).
      */
     G4Transform3D m_transform;
+
+    /**
+     * Identifier.
+     */
+    int m_id;
+
+    /**
+     * Mother G4PVPlacementGT.
+     */
+    G4PVPlacementGT *m_mother;
 
   };
 

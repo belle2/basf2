@@ -29,12 +29,6 @@ namespace Belle2 {
     //! Constructor
     EKLMHit2d();
 
-    //! Constructor with name
-    EKLMHit2d(const char *);
-
-    //! Constructor with name
-    EKLMHit2d(const std::string &);
-
     //! Constructor with two strips
     EKLMHit2d(Belle2::EKLMStripHit*, Belle2::EKLMStripHit*);
 
@@ -75,10 +69,10 @@ namespace Belle2 {
 
 
     //! reference to the X Strip hit
-    Belle2::EKLMStripHit * m_XStrip;
+    Belle2::EKLMStripHit * m_XStrip; //-> {ROOT streamer directive}
 
     //! reference to the Y Strip hit
-    Belle2::EKLMStripHit * m_YStrip;
+    Belle2::EKLMStripHit * m_YStrip; //-> {ROOT streamer directive}
 
     //! crossing point global coordinates
     CLHEP::Hep3Vector m_crossPoint;

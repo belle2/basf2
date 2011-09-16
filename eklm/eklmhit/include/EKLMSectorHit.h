@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Timofey Uglov                                            *
+ * Contributors: Timofey Uglov, Kirill Chilikin                           *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -21,7 +21,6 @@
 #include <string>
 namespace Belle2 {
 
-
   //! Class for handling hits in the whole sector. Needed to form 2d hits
   //! in a comfortable way
   class EKLMSectorHit : public EKLMHitBase  {
@@ -31,12 +30,9 @@ namespace Belle2 {
     //! Constructor
     EKLMSectorHit() {};
 
-    //! Constructor with name
-    EKLMSectorHit(const char *);
-
-    //! Constructor with name
-    EKLMSectorHit(std::string &);
-
+    //! Constructor
+    EKLMSectorHit(char nEndcap, char nLayer, char nSector, char nPlane,
+                  char nStrip);
 
     //! Destructor
     ~EKLMSectorHit() {};

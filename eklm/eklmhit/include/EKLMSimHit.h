@@ -77,7 +77,7 @@ namespace Belle2 {
 
   private:
     //! Physical volume
-    G4VPhysicalVolume *m_pv;  //! {ROOT streamer directive}
+    G4VPhysicalVolume *m_pv; //! {ROOT streamer directive}
 
     //! hit position (in global reference frame)
     G4ThreeVector m_global_pos;

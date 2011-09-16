@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Timofey Uglov                                            *
+ * Contributors: Timofey Uglov, Kirill Chilikin                           *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -31,12 +31,6 @@ namespace Belle2 {
     //! Constructor
     EKLMStripHit() {};
 
-    //! Constructor with name
-    EKLMStripHit(const char *);
-
-    //! Constructor with name
-    EKLMStripHit(std::string &);
-
     //! Destructor
     ~EKLMStripHit() {};
 
@@ -58,10 +52,6 @@ namespace Belle2 {
     //! set  PDG code of the leading ( (grand-)mother ) particle
     inline void setLeadingParticlePDGCode(const int  &pdg)
     {m_LeadingParticlePDGCode = pdg;};
-
-    //! returns name of the strip (the same as Volume name)
-    inline std::string getName()const
-    {return m_Name;};
 
     //! returns time of the hit
     inline double getTime()const

@@ -58,11 +58,11 @@ namespace Belle2 {
      */
     ~GeoEKLMBelleII();
 
-    /*
+    /**
      * create - creation of the detector geometry
      * @content: XML data directory
      * @topVolume: Geant world volume
-     * @type:
+     * @type: geometry type
      */
     virtual void create(const GearDir& content, G4LogicalVolume& topVolume,
                         geometry::GeometryTypes type);
@@ -93,21 +93,21 @@ namespace Belle2 {
     void ReflectCoordinates(double xin, double yin, double *xout, double *yout,
                             int quarter);
 
-    /*
+    /**
      * createEndcap - create endcap
      * @iEndcap: number of endcap
      * @mlv: mother logical volume
      */
     void createEndcap(int iEndcap, G4LogicalVolume *mlv);
 
-    /*
+    /**
      * createLayer - create layer
      * @iLayer: number of layer
      * @mpvgt: mother physical volume with global transformation
      */
     void createLayer(int iLayer, G4PVPlacementGT *mpvgt);
 
-    /*
+    /**
      * createSector - create sector
      * @iSector: number of sector
      * @mpvgt: mother physical volume with global transformation

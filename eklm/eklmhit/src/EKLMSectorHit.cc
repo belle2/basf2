@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Timofey Uglov                                            *
+ * Contributors: Timofey Uglov, Kirill Chilikin                           *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -18,32 +18,28 @@ using namespace std;
 
 ClassImp(EKLMSectorHit);
 
-EKLMSectorHit::EKLMSectorHit(const char * name)
+EKLMSectorHit::EKLMSectorHit(char nEndcap, char nLayer, char nSector,
+                             char nPlane, char nStrip) :
+    EKLMHitBase(nEndcap, nLayer, nSector, nPlane, nStrip)
 {
-  m_Name = name;
 }
-
-EKLMSectorHit::EKLMSectorHit(std::string & name)
-{
-  m_Name = name;
-}
-
 
 void EKLMSectorHit::Print()
 {
   std::cout << "------------  Sector Hit  -------------- " << std::endl;
-  std::cout << m_Name << std::endl;
+  std::cout << "Endcap: " << get_nEndcap()
+            << " Layer: " << get_nLayer()
+            << " Sector: " << get_nSector() << "\n";
   for (std::vector<EKLMStripHit*>::iterator it = m_stripHitVector.begin();
        it != m_stripHitVector.end(); ++it)
     (*it)->Print();
 }
 
-
 bool EKLMSectorHit::addStripHit(EKLMStripHit *stripHit)
 {
-  // important! getName is case sensetive!!
-  if (EKLMNameManipulator::getVolumeName(stripHit->getName(), "Sector") ==
-      m_Name) {
+  if (stripHit->get_nEndcap() == get_nEndcap() &&
+      stripHit->get_nLayer() == get_nLayer() &&
+      stripHit->get_nSector() == get_nSector()) {
     m_stripHitVector.push_back(stripHit);
     return true;
   }

@@ -81,7 +81,11 @@ namespace Belle2 {
       EKLMSimHit *simHit = it->second.front();
       EKLMStripHit *stripHit = new EKLMStripHit();
 
-      stripHit->setName(it->first);
+      stripHit->set_nEndcap(simHit->get_nEndcap());
+      stripHit->set_nLayer(simHit->get_nLayer());
+      stripHit->set_nSector(simHit->get_nSector());
+      stripHit->set_nPlane(simHit->get_nPlane());
+      stripHit->set_nStrip(simHit->get_nStrip());
       stripHit->setPV(simHit->getPV());
 
       //stripHit->setHistogramm(cloneHist);

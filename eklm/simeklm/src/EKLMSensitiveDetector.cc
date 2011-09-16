@@ -13,9 +13,8 @@
 
 #include <framework/logging/Logger.h>
 
-
 #include <eklm/eklmutils/EKLMutils.h>
-//#include <framework/datastore/Units.h>
+#include <eklm/geoeklm/G4PVPlacementGT.h>
 
 #include "G4Step.hh"
 #include "G4SteppingManager.hh"
@@ -96,11 +95,24 @@ namespace Belle2 {
                                  GetTopTransform().TransformPoint(gpos);
 
     //creates hit
-    EKLMSimHit *hit = new  EKLMSimHit(pv, gpos, lpos, hitTime, PDGcode,  eDep);
+    EKLMSimHit *hit = new EKLMSimHit(pv, gpos, lpos, hitTime, PDGcode,  eDep);
+    if (hit == NULL) {
+      B2ERROR("Memory allocation error.");
+      return false;
+    }
+    G4PVPlacementGT *pvgt = (G4PVPlacementGT*)pv;
+    hit->set_nStrip(pvgt->getID());
+    pvgt = pvgt->getMother();
+    hit->set_nPlane(pvgt->getID());
+    pvgt = pvgt->getMother();
+    hit->set_nSector(pvgt->getID());
+    pvgt = pvgt->getMother();
+    hit->set_nLayer(pvgt->getID());
+    pvgt = pvgt->getMother();
+    hit->set_nEndcap(pvgt->getID());
 
     // store hit
     storeEKLMObject("SimHitsEKLMArray", hit);
-
 
     return true;
   }

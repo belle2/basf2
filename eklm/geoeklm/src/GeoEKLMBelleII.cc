@@ -193,7 +193,8 @@ void GeoEKLMBelleII::createEndcap(int iEndcap, G4LogicalVolume *mlv)
     exit(ENOMEM);
   }
   geometry::setVisibility(*logicEndcap, false);
-  physiEndcap = new G4PVPlacementGT(t, t, logicEndcap, Endcap_Name, mlv);
+  physiEndcap = new G4PVPlacementGT(t, t, logicEndcap, Endcap_Name, mlv,
+                                    iEndcap);
   if (physiEndcap == NULL) {
     B2FATAL("Memory allocation error.");
     exit(ENOMEM);
@@ -232,7 +233,7 @@ void GeoEKLMBelleII::createLayer(int iLayer, G4PVPlacementGT *mpvgt)
   LayerPosition.Z = -EndcapPosition.length / 2.0 + iLayer * Layer_shiftZ +
                     0.5 * LayerPosition.length;
   t = G4Translate3D(0.0, 0.0, LayerPosition.Z);
-  physiLayer = new G4PVPlacementGT(mpvgt, t, logicLayer, Layer_Name);
+  physiLayer = new G4PVPlacementGT(mpvgt, t, logicLayer, Layer_Name, iLayer);
   if (physiLayer == NULL) {
     B2FATAL("Memory allocation error.");
     exit(ENOMEM);
@@ -282,7 +283,8 @@ void GeoEKLMBelleII::createSector(int iSector, G4PVPlacementGT *mpvgt)
       t = G4RotateZ3D(-90.0 * deg);
       break;
   }
-  physiSector = new G4PVPlacementGT(mpvgt, t, logicSector, Sector_Name);
+  physiSector = new G4PVPlacementGT(mpvgt, t, logicSector, Sector_Name,
+                                    iSector);
   if (physiSector == NULL) {
     B2FATAL("Memory allocation error.");
     exit(ENOMEM);
@@ -526,7 +528,7 @@ void GeoEKLMBelleII::createPlane(int iPlane, G4PVPlacementGT *mpvgt)
     t = G4Translate3D(PlanePosition.X, PlanePosition.Y, -PlanePosition.Z) *
         G4Rotate3D(180. * deg, G4ThreeVector(1., 1., 0.));
   }
-  physiPlane = new G4PVPlacementGT(mpvgt, t, logicPlane, Plane_Name);
+  physiPlane = new G4PVPlacementGT(mpvgt, t, logicPlane, Plane_Name, iPlane);
   if (physiPlane == NULL) {
     B2FATAL("Memory allocation error.");
     exit(ENOMEM);
@@ -567,7 +569,7 @@ void GeoEKLMBelleII::createStrip(int iStrip, int iPlane, G4PVPlacementGT *mpvgt)
   else
     geometry::setColor(*logicStrip, "#0000ffff");
   t = G4Translate3D(StripPosition[iStrip].X, StripPosition[iStrip].Y, 0.0);
-  physiStrip = new G4PVPlacementGT(mpvgt, t, logicStrip, Strip_Name);
+  physiStrip = new G4PVPlacementGT(mpvgt, t, logicStrip, Strip_Name, iStrip);
   if (physiStrip == NULL) {
     B2FATAL("Memory allocation error.");
     exit(ENOMEM);

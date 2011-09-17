@@ -1,6 +1,7 @@
 import os, re, platform
 from distutils import sysconfig
 import config
+import multiprocessing
 
 
 # build options
@@ -9,7 +10,7 @@ AddOption('--verbose', dest = 'verbose', action = 'store_true', default = False,
 AddOption('--extra-libpath', dest = 'extralibpath', action = 'store', help = 'Additional library path')
 
 SetOption('warn', 'no-fortran-cxx-mix')
-
+SetOption('num_jobs', multiprocessing.cpu_count())
 
 # get the sub directory name for architecture and build option dependent files
 if not os.environ.has_key('BELLE2_SUBDIR'):

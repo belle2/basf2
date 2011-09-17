@@ -10,12 +10,8 @@ evtmetainfo = register_module('EvtMetaInfo')
 output = register_module('SimpleOutput')
 
 # Set module parameters
-param_evtmetagen = {
-    'ExpList': [1, 1],
-    'RunList': [1, 2],
-    'EvtStartList': [1, 101],
-    'EvtEndList': [100, 200],
-    }
+param_evtmetagen = {'ExpList': [1, 1], 'RunList': [1, 2], 'EvtNumList': [100,
+                    100]}
 evtmetagen.param(param_evtmetagen)
 
 output.param('outputFileName', 'sample.root')

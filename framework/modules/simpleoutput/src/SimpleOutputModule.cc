@@ -39,6 +39,7 @@ SimpleOutputModule::SimpleOutputModule() : Module()
   //Initialization of some member variables
   for (int jj = 0; jj < DataStore::c_NDurabilityTypes; jj++) {
     m_size[jj] = 0;
+    m_objects[jj] = 0;
     m_treeNames[jj]   = "NONE";
   }
 

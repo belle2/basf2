@@ -116,21 +116,21 @@ namespace Belle2 {
       return false;
     }
 
-    const bool Module::isSameModule(int frontBack, int sector, int layer) const
+    bool Module::isSameModule(int frontBack, int sector, int layer) const
     {
       return (frontBack == m_FrontBack) &&
              (sector    == m_Sector) &&
              (layer     == m_Layer);
     }
 
-    const bool Module::isSameModule(const Module& m) const
+    bool Module::isSameModule(const Module& m) const
     {
       return (m.getFrontBack() == m_FrontBack) &&
              (m.getSector()    == m_Sector) &&
              (m.getLayer()     == m_Layer);
     }
 
-    const double Module::getLocalCoordinate(double stripAve, char direction) const
+    double Module::getLocalCoordinate(double stripAve, char direction) const
     {
       if (direction == 'P') {
         return (stripAve + 0.5 - m_PhiStripNumber * 0.5) * m_PhiStripWidth;
@@ -244,7 +244,7 @@ namespace Belle2 {
       return rect;
     }
 
-    const bool Module::isInActiveArea(const Hep3Vector& pos, int& phiStrip, int& zStrip) const
+    bool Module::isInActiveArea(const Hep3Vector& pos, int& phiStrip, int& zStrip) const
     {
       Hep3Vector posShifted = pos - m_Shift;
 
@@ -257,7 +257,7 @@ namespace Belle2 {
              (fabs(posShifted.x() - m_LocalX) <= m_ToleranceX);
     }
 
-    const void Module::getStripDivisions(const Hep3Vector& pos, double& phiStripDiv, double& zStripDiv) const
+    void Module::getStripDivisions(const Hep3Vector& pos, double& phiStripDiv, double& zStripDiv) const
     {
       Hep3Vector posShifted = pos - m_Shift;
 

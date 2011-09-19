@@ -90,17 +90,17 @@ namespace Belle2 {
       m_Modules.push_back(m);
     }
 
-    const bool Sector::isSameSector(int frontBack, int sector) const
+    bool Sector::isSameSector(int frontBack, int sector) const
     {
       return (frontBack == m_FrontBack) && (sector == m_Sector);
     }
 
-    const bool Sector::isSameSector(const Sector& s) const
+    bool Sector::isSameSector(const Sector& s) const
     {
       return (s.m_FrontBack == m_FrontBack) && (s.m_Sector == m_Sector);
     }
 
-    const bool Sector::isSameSector(const Module& m) const
+    bool Sector::isSameSector(const Module& m) const
     {
       return (m.getFrontBack() == m_FrontBack) && (m.getSector() == m_Sector);
     }

@@ -89,22 +89,22 @@ namespace Belle2 {
       void addModule(Module*);
 
       //! Determine if two sectors are identical
-      const bool isSameSector(int frontBack, int sector) const;
+      bool isSameSector(int frontBack, int sector) const;
 
       //! Determine if two sectors are identical
-      const bool isSameSector(const Sector& s) const;
+      bool isSameSector(const Sector& s) const;
 
       //! Determine if two sectors are identical
-      const bool isSameSector(const Module& m) const;
+      bool isSameSector(const Module& m) const;
 
       //! Get sector's end (forward or backward)
-      const int getFrontBack() const { return m_FrontBack; }
+      int getFrontBack() const { return m_FrontBack; }
 
       //! Get sector number
-      const int getSector() const { return m_Sector; }
+      int getSector() const { return m_Sector; }
 
       //! Get number of layers in this sector
-      const int getNLayer() const { return m_NLayer; }
+      int getNLayer() const { return m_NLayer; }
 
       //! Get sector's shift, nominally (0,0,0) (in global coordinates)
       const Hep3Vector& getShift() const { return m_Shift; }

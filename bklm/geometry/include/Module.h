@@ -66,54 +66,54 @@ namespace Belle2 {
       bool operator==(const Module& m) const { return isSameModule(m); }
 
       //! Get module's end (forward or backward)
-      const int getFrontBack() const { return m_FrontBack; }
+      int getFrontBack() const { return m_FrontBack; }
 
       //! Get module's sector number
-      const int getSector() const { return m_Sector; }
+      int getSector() const { return m_Sector; }
 
       //! Get module's layer number
-      const int getLayer() const { return m_Layer; }
+      int getLayer() const { return m_Layer; }
 
       //! Get module's phi-strip count
-      const int getPhiStripNumber() const { return m_PhiStripNumber; }
+      int getPhiStripNumber() const { return m_PhiStripNumber; }
 
       //! Get module's phi-strip minimum index
-      const int getPhiStripMin() const { return m_PhiStripMin; }
+      int getPhiStripMin() const { return m_PhiStripMin; }
 
       //! Get module's phi-strip maximum index
-      const int getPhiStripMax() const { return m_PhiStripMax; }
+      int getPhiStripMax() const { return m_PhiStripMax; }
 
       //! Get module's z-strip count
-      const int getZStripNumber() const { return m_ZStripNumber; }
+      int getZStripNumber() const { return m_ZStripNumber; }
 
       //! Get module's z-strip minimum index
-      const int getZStripMin() const { return m_ZStripMin; }
+      int getZStripMin() const { return m_ZStripMin; }
 
       //! Get module's z-strip maximum index
-      const int getZStripMax() const { return m_ZStripMax; }
+      int getZStripMax() const { return m_ZStripMax; }
 
       //! Get module's shift, nominally (0,0,0) (in local coordinates)
       const Hep3Vector getShift() const { return m_Shift; }
 
       //! Get module's altitude (in local coordinates)
-      const double getLocalX() const { return m_LocalX; }
+      double getLocalX() const { return m_LocalX; }
 
       //! Get pointer to the module's containing sector
       const Sector* getSectorPtr(void) const { return m_SectorPtr; }
 
       //! Determine if two modules are identical
-      const bool isSameModule(int frontBack, int sector, int layer) const;
+      bool isSameModule(int frontBack, int sector, int layer) const;
 
       //! Determine if two modules are identical
-      const bool isSameModule(const Module& m) const;
+      bool isSameModule(const Module& m) const;
 
       //! Get the number of strips in this module
-      const int getNStrips(char direction) const {
+      int getNStrips(char direction) const {
         return (direction == 'P' ? m_PhiStripNumber : m_ZStripNumber);
       }
 
       //! Convert 1D strip position (0..nStrips) to local coordinate
-      const double getLocalCoordinate(double stripAve, char direction) const;
+      double getLocalCoordinate(double stripAve, char direction) const;
 
       //! Convert 2D strip position (0..nStrips along each axis) to local coordinates
       const Hep3Vector getLocalPosition(double phiStripAve, double zStripAve) const;
@@ -128,13 +128,13 @@ namespace Belle2 {
       const Rect getModuleRectLocal(void) const;
 
       //! Determine if space-point (in local coordinates) is in active area of RPC module, and fills phiStrip and zStrip
-      const bool isInActiveArea(const Hep3Vector& p, int& phiStrip, int& zStrip) const;
+      bool isInActiveArea(const Hep3Vector& p, int& phiStrip, int& zStrip) const;
 
       //! Determine if space-point (in local coordinates) is in active area of scint module, and fills either phiStrip or zStrip
-      const bool isInActiveArea(const Hep3Vector& p, int& phiStrip, int& zStrip, int innerOuter) const;
+      bool isInActiveArea(const Hep3Vector& p, int& phiStrip, int& zStrip, int innerOuter) const;
 
       //! Fills phiStrip and zStrip with relative position (-0.5..+0.5) of space-point (in local coordinates) along each strip's width
-      const void getStripDivisions(const Hep3Vector& p, double& phiStrip, double& zStrip) const;
+      void getStripDivisions(const Hep3Vector& p, double& phiStrip, double& zStrip) const;
 
       //! Print module definition
       void printTree(void) const;

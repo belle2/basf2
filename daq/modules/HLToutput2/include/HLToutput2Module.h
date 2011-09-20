@@ -8,37 +8,33 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef HLTINPUTMODULE_H
-#define HLTINPUTMODULE_H
+#ifndef HLTOUTPUT2MODULE_H
+#define HLTOUTPUT2MODULE_H
 
 #include <vector>
+#include <string>
+
+#include <boost/shared_ptr.hpp>
 
 #include <framework/core/Module.h>
 
 #include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/StoreIter.h>
-#include <framework/datastore/EventMetaData.h>
 
-#include <framework/core/Module.h>
-#include <framework/pcore/MsgHandler.h>
 #include <framework/pcore/EvtMessage.h>
+#include <framework/pcore/MsgHandler.h>
 
-#include <daq/hlt/EvtReceiver.h>
-#include <daq/hlt/HLTDefs.h>
+#include <daq/hlt/EvtSender.h>
 #include <daq/hlt/HLTBuffer.h>
-
-#include <TTree.h>
 
 #define MAXPACKET 10000000 * 4
 
 namespace Belle2 {
 
-  class HLTInputModule : public Module {
+  class HLTOutput2Module : public Module {
 
   public:
-    HLTInputModule();
-    virtual ~HLTInputModule();
+    HLTOutput2Module();
+    virtual ~HLTOutput2Module();
 
     virtual void initialize();
     virtual void beginRun();
@@ -46,23 +42,25 @@ namespace Belle2 {
     virtual void endRun();
     virtual void terminate();
 
-    int readData(const DataStore::EDurability&);
+    void putData(const std::string);
+    void putData(const DataStore::EDurability&);
 
   protected:
 
 
   private:
-    HLTBuffer* m_inBuf;
-    std::string m_inBufferName;
+    HLTBuffer* m_outBuf;
+    HLTBuffer* m_testBuf;
+    std::string m_outBufferName;
 
-    std::vector<std::string> m_objectNames[DataStore::c_NDurabilityTypes];
     std::vector<std::string> m_branchNames[DataStore::c_NDurabilityTypes];
+    bool m_done[DataStore::c_NDurabilityTypes];
+    StoreIter* m_obj_iter[DataStore::c_NDurabilityTypes];
+    StoreIter* m_array_iter[DataStore::c_NDurabilityTypes];
 
     MsgHandler* m_msgHandler;
-
-    StoreObjPtr<EventMetaData> eventMetaDataPtr;
   };
 
 } // end namespace Belle2
 
-#endif // HLTINPUTMODULE_H
+#endif // HLTOUTPUTMODULE_H

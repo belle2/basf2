@@ -54,7 +54,6 @@ void HLTOutputModule::initialize()
     return;
   }
   */
-
   m_msgHandler = new MsgHandler(1);
 
   // Set data
@@ -85,6 +84,8 @@ void HLTOutputModule::endRun()
 
 void HLTOutputModule::terminate()
 {
+  B2INFO("HLTOutput Module terminates...");
+  putData("EOF");
 }
 
 void HLTOutputModule::putData(const std::string data)
@@ -176,8 +177,8 @@ void HLTOutputModule::putData(const DataStore::EDurability& durability)
   MsgHandler* msgHandlerTransfer = new MsgHandler(1);
   msgHandlerTransfer->clear();
   char* tmpMessage = new char[MAXPACKETSIZE];
-  strcpy(tmpMessage, "8!");
-  //m_testBuf->remq((int*)tmpMessage);
+  //strcpy(tmpMessage, "8!");
+  m_testBuf->remq((int*)tmpMessage);
   EvtMessage* testMsgTransfer = new EvtMessage(tmpMessage);
   msgHandlerTransfer->decode_msg(testMsgTransfer, testObjListTransfer, testNameListTransfer);
   testMsgTransfer->type();
@@ -198,6 +199,22 @@ void HLTOutputModule::putData(const DataStore::EDurability& durability)
     B2WARNING(" Two messages are different!");
     B2WARNING("    Direct: " << testMsgDirect->msg());
     B2WARNING("    Transfer: " << testMsgTransfer->msg());
+  }
+
+  int nobjs = testMsgDirect->header()->reserved[1];
+  int narrays = testMsgDirect->header()->reserved[2];
+
+  for (int i = 0; i < nobjs; i++) {
+    B2INFO("Storing objects...");
+    testObjListDirect[i]->Print();
+    DataStore::Instance().storeObject(testObjListDirect[i], testNameListDirect[i]);
+    //DataStore::Instance().storeObject(objlist.at(i), m_objectNames[durability].at(i));
+  }
+  for (int i = 0; i < narrays; i++) {
+    B2INFO("Storing arrays...");
+    testObjListDirect[nobjs + i]->Print();
+    DataStore::Instance().storeArray((TClonesArray*)testObjListDirect[nobjs + i], testNameListDirect[nobjs + i]);
+    ///DataStore::Instance().storeArray((TClonesArray*)objlist.at(i + nobjs), m_arrayNames[durability].at(i));
   }
 
   B2INFO("HLTOutput: putData () function done!");

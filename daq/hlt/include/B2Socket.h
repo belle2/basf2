@@ -26,7 +26,7 @@
 #include <daq/hlt/NodeInfo.h>
 #include <daq/hlt/HLTDefs.h>
 
-#define MAXPACKETSIZE 1024000
+#define MAXPACKETSIZE 10240000
 
 namespace Belle2 {
 

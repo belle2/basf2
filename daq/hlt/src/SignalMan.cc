@@ -104,6 +104,10 @@ EStatus SignalMan::init(int inBufKey, int outBufKey)
   m_inBuf->clear();
   m_outBuf->clear();
 
+  m_reconMessage = new char[MAXPACKETSIZE];
+  memset(m_reconMessage, 0, MAXPACKETSIZE);
+  m_reconOffset = 0;
+
   return c_Success;
 }
 
@@ -189,34 +193,80 @@ EStatus SignalMan::runEvtReceiver(void)
     EvtReceiver new_sock;
     m_receiver.accept(new_sock);
     char* data = new char [MAXPACKETSIZE];
+    memset(data, 0, MAXPACKETSIZE);
     //std::string data;
 
     B2INFO("listening incomings...");
 
-
     while (1) {
       int size = new_sock.recv(data);
+      //std::cout << "[SignalMan]: INTERMIDIATE CHECK = " << data[size - 12] << std::endl;
+
+      char filename[255];
+      sprintf(filename, "receiveLog%ld_%d", time(NULL), size);
+      FILE* fp = fopen(filename, "w");
+
+      for (int i = 0; i < size; i++) {
+        fprintf(fp, "%c", data[i]);
+      }
+
+      fclose(fp);
+
+      if (footerChecker(data, size)) {
+        if (m_reconOffset == 0) {
+          m_inBuf->insq((int*)data, (size - 1) / 4 + 1);
+        } else {
+          B2INFO("SignalMan: Merging " << size << " at offset " << m_reconOffset);
+          printf("%x\n", m_reconMessage + m_reconOffset);
+          //memcpy (*(&m_reconMessage + m_reconOffset), data, size);
+          memcpy(m_reconMessage + m_reconOffset, data, size);
+
+          m_inBuf->insq((int*)m_reconMessage, ((m_reconOffset + size) - 1) / 4 + 1);
+
+          char filename[255];
+          sprintf(filename, "concatenatedLog%ld", time(NULL));
+          FILE* fp = fopen(filename, "w");
+
+          for (int i = 0; i < m_reconOffset + size; i++) {
+            fprintf(fp, "%c", m_reconMessage[i]);
+          }
+
+          fclose(fp);
+
+          memset(m_reconMessage, 0, MAXPACKETSIZE);
+          m_reconOffset = 0;
+        }
+        B2INFO("SignalMan: INTERNAL BUFFER FLUSHING");
+      } else {
+        B2INFO("SignalMan: Storing partial data into internal container");
+        B2INFO("SignalMan: Merging " << size << " at offset " << m_reconOffset);
+        printf("%x\n", m_reconMessage + m_reconOffset);
+        memcpy(m_reconMessage + m_reconOffset, data, size);
+        m_reconOffset += size;
+      }
+
+      memset(data, 0, MAXPACKETSIZE);
+      //memset (data + (size - 11), 0, 11);
       //new_sock >> data;
       //if (data.size() > 0) {
+      /*
       if (size > 0) {
         //char* dataTaken = new char [MAXPACKETSIZE];
         //strcpy(dataTaken, data.c_str());
         //memcpy (dataTaken, data, size);
         //strcpy(dataTaken, data);
-        //B2INFO("Message taken: " << dataTaken << " (size = " << data.size() << ")");
-        B2INFO("Message taken: " << data << " (size = " << size << ")");
+        //B2INFO("Message taken: " << data << " (size = " << size << ")");
         //m_inBuf->insq((int*)dataTaken, (data.size() / 4 + 1));
         //m_inBuf->insq((int*)dataTaken, ((data.size () - 1) / 4 + 1));
         m_inBuf->insq((int*)data, (size - 1) / 4 + 1);
 
         //m_inBuf->insq((int*)(data.c_str()), data.size());
-        /*
         if (data == "EOF") {
           B2INFO("Destroying EvtReceiver..");
           return c_TermCalled;
         }
-        */
       }
+        */
 
       usleep(100);
     }
@@ -373,4 +423,18 @@ const void SignalMan::Print(void)
   B2INFO("   Incoming port# = " << m_inPort);
   B2INFO("   Outgoing port# = " << m_outPort);
   B2INFO("=================================================");
+}
+
+bool SignalMan::footerChecker(char* data, int size)
+{
+  bool flag = false;
+
+  for (int i = 0; i < size; i++) {
+    // broken EOS handing should be included here
+    if (data[i] == 'E' && data[i + 1] == 'O' && data[i + 2] == 'S') {
+      flag = true;
+    }
+  }
+
+  return flag;
 }

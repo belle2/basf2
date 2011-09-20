@@ -73,6 +73,20 @@ EStatus EvtSender::broadCasting()
       char* tmp = new char[MAXPACKETSIZE];
       int size = 4 * (m_buffer->remq((int*)tmp) - 1) + 1;
 
+      //strcat (tmp, " B2SOCKETEOS");
+      strcpy(tmp + size, " EOS");
+      size += strlen(" EOS");
+
+      char filename[255];
+      sprintf(filename, "sendLog%ld-%d", time(NULL), size);
+      FILE* fp = fopen(filename, "w");
+
+      for (int i = 0; i < size; i++) {
+        fprintf(fp, "%c", tmp[i]);
+      }
+
+      fclose(fp);
+
       /*
       EvtMessage* testMsg = new EvtMessage (tmp);
       MsgHanlder* msgHandler = new MsgHandler (1);

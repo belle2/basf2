@@ -80,6 +80,7 @@ namespace Belle2 {
     const void Print(void);
 
   protected:
+    bool footerChecker(char* data, int size);
 
   private:
     int m_inPort, m_outPort;      /*!< Ports number for data communication */
@@ -92,6 +93,9 @@ namespace Belle2 {
 
     EvtSender m_sender;           /*!< Event sender */
     EvtReceiver m_receiver;       /*!< Event receiver */
+
+    char* m_reconMessage;
+    int m_reconOffset;
   };
 }
 

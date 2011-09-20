@@ -44,11 +44,13 @@ EStatus HLTProcess::init()
       B2ERROR("HLTProcess: Destinations are not assigned");
       return c_InitFailed;
     } else {
-      B2INFO("HLTProcess: SignalMan initialized with destination " << m_nodeInfo->targetIP()[0]);
-      m_signalMan = new SignalMan(m_nodeInfo->portBaseDataIn(), m_nodeInfo->portBaseDataOut(), m_nodeInfo->targetIP()[0]);
-      //m_signalMan->init("B2DataIn", "B2DataOut");
-      m_signalMan->init(c_DataInPort, c_DataOutPort);
-      m_signalMan->doCommunication();
+      for (unsigned int i = 0; i < m_nodeInfo->targetIP().size(); i++) {
+        B2INFO("HLTProcess: SignalMan initialized with destination " << m_nodeInfo->targetIP()[i]);
+        m_signalMan = new SignalMan(m_nodeInfo->portBaseDataIn(), m_nodeInfo->portBaseDataOut(), m_nodeInfo->targetIP()[i]);
+        //m_signalMan->init("B2DataIn", "B2DataOut");
+        m_signalMan->init(c_DataInPort, c_DataOutPort);
+        m_signalMan->doCommunication();
+      }
 
       B2INFO("HLTProcess: Return c_Success");
       return c_Success;
@@ -63,14 +65,20 @@ EStatus HLTProcess::beginRun()
   m_pidBasf2 = fork();
 
   if (m_pidBasf2 == 0) {
+    init();
     B2INFO("HLTProcess: dest = " << m_nodeInfo->targetIP()[0]);
     if (m_nodeInfo->type() == "ES")
       system("basf2 $BELLE2_LOCAL_DIR/daq/data/eventSeparator.py");
-    if (m_nodeInfo->type() == "WN")
+    else if (m_nodeInfo->type() == "WN")
       system("basf2 $BELLE2_LOCAL_DIR/daq/data/workerNode.py");
-    if (m_nodeInfo->type() == "EM")
+    else if (m_nodeInfo->type() == "EM")
       system("basf2 $BELLE2_LOCAL_DIR/daq/data/eventMerger.py");
+    else {
+      B2ERROR("Wrong node type assigned!");
+      return c_TermCalled;
+    }
 
+    B2INFO("HLTProcess done! Terminating...");
     return c_TermCalled;
   }
 

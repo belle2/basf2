@@ -57,7 +57,7 @@ EStatus B2Socket::create()
   if (setsockopt(m_sock, SOL_SOCKET, SO_REUSEADDR, (const char*)&on, sizeof(on)) == -1)
     return c_InitFailed;
 
-  B2DEBUG(50, "B2Socket created (m_sock = " << m_sock << ")");
+  B2DEBUG(30, "B2Socket created (m_sock = " << m_sock << ")");
 
   return c_Success;
 }
@@ -84,7 +84,7 @@ EStatus B2Socket::bind(const int port)
     return c_InitFailed;
   }
 
-  B2DEBUG(50, "B2Socket bound (bind_return = " << bind_return << ")");
+  B2DEBUG(30, "B2Socket bound (bind_return = " << bind_return << ")");
 
   return c_Success;
 }
@@ -106,7 +106,7 @@ EStatus B2Socket::listen() const
     return c_InitFailed;
   }
 
-  B2DEBUG(50, "Starting to listen through m_sock = " << m_sock << " with max connection of " << m_maxcons << ")");
+  B2DEBUG(30, "Starting to listen through m_sock = " << m_sock << " with max connection of " << m_maxcons << ")");
 
   return c_Success;
 }
@@ -206,8 +206,8 @@ int B2Socket::recv(char* data) const
   //int status = ::recv(m_sock, buf, m_maxrecv, MSG_WAITALL);
   int status = ::recv(m_sock, buf, m_maxrecv, 0);
 
-  B2INFO("B2SOCKET got " << buf);
-  B2INFO("B2SOCKET has maxrecv " << m_maxrecv);
+  B2DEBUG(30, "B2SOCKET got " << buf);
+  B2DEBUG(30, "B2SOCKET has maxrecv " << m_maxrecv);
 
   if (status == -1) {
     return 0;

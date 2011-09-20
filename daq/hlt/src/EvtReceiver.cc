@@ -67,7 +67,7 @@ int EvtReceiver::recv(char* data)
 {
   int receivedSize = B2Socket::recv(data);
   B2INFO("[EvtReceiver] " << receivedSize << " bytes received");
-  B2INFO("[EvtReceiver] " << data << " received");
+  //B2INFO("[EvtReceiver] " << data << " received");
 
   return receivedSize;
 }

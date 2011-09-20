@@ -162,7 +162,14 @@ EStatus HLTFramework::xmlHLTInfo(std::string xmlHLTInfo)
 EStatus HLTFramework::beginRun()
 {
   m_HLTProcess = new HLTProcess(m_nodeManager->nodeInfo());
-  m_HLTProcess->init();
+  //m_HLTProcess->init();
+  EStatus status = m_HLTProcess->beginRun();
 
-  return m_HLTProcess->beginRun();
+  if (status == c_TermCalled) {
+    delete m_HLTProcess;
+    return status;
+  }
+
+  return c_Success;
+  //return m_HLTProcess->beginRun();
 }

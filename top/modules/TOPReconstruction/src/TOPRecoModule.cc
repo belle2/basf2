@@ -106,38 +106,41 @@ namespace Belle2 {
 
       TOPconfigure();
 
-      /*
-       double Masses[5] = {.511E-3, .10566, .13957, .49368, .93827};
-       int Nhyp = 5;
-       TOPreco reco(Nhyp, Masses);
 
-       // Get number of hits in this event
-       int nHits = topHits->GetLast();
-       B2INFO("nHits: " << nHits);
+      double Masses[5] = {.511E-3, .10566, .13957, .49368, .93827};
+      int Nhyp = 5;
+      TOPreco reco(Nhyp, Masses);
 
-       // Get number of hits in this event
-       int nQHits = topQuartzHits->GetLast();
-       B2INFO("n tracks: " << nHits);
+      // Get number of hits in this event
+      int nHits = topDigiHits->GetLast() + 1;
+      B2INFO("nHits: " << nHits);
 
-       for (int track = 0; track < nQHits; ++track) {
-       TOPQuartzHit* atrack = topQuartzHits[track];
+      // Get number of hits in this event
+      int nQHits = topQuartzHits->GetLast() + 1;
+      B2INFO("n tracks: " << nQHits);
 
-       TVector3 pos = atrack->getPosition();
-       TVector3 mom = atrack->getMomentum();
+      for (int track = 0; track < nQHits; ++track) {
+        TOPQuartzHit* atrack = topQuartzHits[track];
 
-       TOPtrack tr(pos.X(), pos.Y(), pos.Z(), mom.X(), mom.Y(), mom.Z(), atrack->getLength(), 1, atrack->getParticleID());
-       tr.toTop();
-       tr.Dump();
+        TVector3 pos = atrack->getPosition();
+        TVector3 mom = atrack->getMomentum();
 
-       reco.Clear();
-       for (int hit; hit < nHits; ++nHits) {
-       TOPHit* pmthit = topHits[hit];
+        TOPtrack tr(pos.X(), pos.Y(), pos.Z(), mom.X(), mom.Y(), mom.Z(), atrack->getLength(), atrack->getCharge(), atrack->getParticleID());
+        tr.toTop();
+        tr.Dump();
 
-       reco.AddData(pmthit->getBarID(), pmthit->getChannelID(), TDCdigi(pmthit->getGlobalTime()));
-       }
+        reco.Clear();
+        for (int hit = 0; hit < nHits; ++hit) {
+          TOPDigiHit* pmthit = topDigiHits[hit];
 
-       reco.Reconstruct(tr);
-       }*/
+          reco.AddData(pmthit->getBarID(), pmthit->getChannelID(), pmthit->getTDC());
+        }
+
+        reco.Reconstruct(tr);
+        reco.DumpHit(Local);
+        reco.DumpHit(Global);
+        reco.DumpLogL(Nhyp);
+      }
 
     }
 
@@ -165,25 +168,38 @@ namespace Belle2 {
 
       setTDC(m_topgp->getTDCbits(), m_topgp->getTDCbitwidth());
 
-
-      double Pi = 4.*atan(1.);
-
       int n = m_topgp->getNbars();           // number of bars in phi
-      double Dphi = 2 * Pi / n;
-      double Phi = 0;
+      double Dphi = 2 * M_PI / n;
+      double Phi = - 0.5 * M_PI;
 
       int id;
-      double R = m_topgp->getRadius();     // innner bar surface radius
-      double A = m_topgp->getQwidth();      // bar width
-      double B = m_topgp->getQthickness();       // bar thickness
-      double z1 = m_topgp->getZ1(); // backward, forward bar position
-      double z2 = m_topgp->getZ2();   // backward, forward bar position
-      double DzExp = m_topgp->getWLength();  // expansion volume length
-      double YsizExp = m_topgp->getWextdown() + m_topgp->getQthickness();  // expansion volume height
-      double YsizPMT = 2 * 2.8; // height to arrange 2 rows of PMT
+      double R = m_topgp->getRadius() / 10.0;     // innner bar surface radius
+      double MirR = m_topgp->getMirradius() / 10.0; //Mirror radious
+      double A = m_topgp->getQwidth() / 10.0;      // bar width
+      double B = m_topgp->getQthickness() / 10.0;       // bar thickness
+      double z1 = m_topgp->getZ1() / 10.0; // backward, forward bar position
+      double z2 = m_topgp->getZ2() / 10.0;   // backward, forward bar position
+      double DzExp = m_topgp->getWLength() / 10.0;  // expansion volume length
+      double YsizExp = (m_topgp->getWextdown() + m_topgp->getQthickness()) / 10.0;  // expansion volume height
+      double YsizPMT = (m_topgp->getNpmty() * m_topgp->getMsizey() + m_topgp->getYgap()) / 10.0; // height to arrange 2 rows of PMT
+      double XsizPMT = (m_topgp->getNpmtx() * m_topgp->getMsizex() + (m_topgp->getNpmtx() - 1) * m_topgp->getXgap()) / 10.0; // height to arrange 2 rows of PMT
+
 
       //! No edge roughness
       setEdgeRoughness(0);
+
+      for (int i = 0; i < n; i++) {
+        id = setQbar(A, B, z1, z2, R, 0, Phi, PMT, SphericM);
+        setMirrorRadius(id, MirR);
+        addExpansionVolume(id, Left, Prism, DzExp, B / 2, - YsizExp);
+        arrangePMT(id, Left, XsizPMT, YsizPMT);
+        Phi += Dphi;
+      }
+
+
+      TOPfinalize();
+
+
     }
 
 

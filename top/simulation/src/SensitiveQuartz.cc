@@ -47,7 +47,7 @@ namespace Belle2 {
       G4StepPoint* PrePosition =  aStep->GetPreStepPoint();
       G4ThreeVector worldPosition = PrePosition->GetPosition();
       G4ParticleDefinition* particle = aTrack->GetDefinition();
-      G4double  PDGCharge = particle->GetPDGCharge();
+      int  PDGCharge = (int)(particle->GetPDGCharge());
       G4ThreeVector momentum = PrePosition->GetMomentum();
 
       // Save only tracks of charged particles
@@ -59,7 +59,7 @@ namespace Belle2 {
 
         G4ThreeVector localPosition = PrePosition->GetTouchableHandle()->GetHistory()->GetTopTransform().TransformPoint(worldPosition);
 
-        if (fabs(localPosition.y() + m_topgp->getQthickness() / 2.0) > 10e-14) return(true);
+//        if (fabs(localPosition.y() + m_topgp->getQthickness() / 2.0) > 10e-5) return(true);
 
 
         /**
@@ -85,9 +85,8 @@ namespace Belle2 {
 
         // Tracks are saved in "topQuartzHits"
         StoreArray<TOPQuartzHit> topQuartzHits;
-        int nentr = topQuartzHits->GetLast() + 1;
+        G4int nentr = topQuartzHits->GetEntries();
         new(topQuartzHits->AddrAt(nentr)) TOPQuartzHit(trackID, PDGEncoding, PDGCharge, TPosition, TMomentum, tracklength, 0, 0, 0, 0, 0, 0, 0);
-        //! B2INFO("Quartz Hit.");
 
       }
       return true;

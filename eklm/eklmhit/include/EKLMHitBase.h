@@ -45,7 +45,7 @@ namespace Belle2 {
     /**
      * Get endcap number.
      */
-    inline char get_nEndcap() {return m_nEndcap;}
+    inline int get_nEndcap() {return m_nEndcap;}
 
     /**
      * Set endcap number.
@@ -55,7 +55,7 @@ namespace Belle2 {
     /**
      * Get layer number.
      */
-    inline char get_nLayer() {return m_nLayer;}
+    inline int get_nLayer() {return m_nLayer;}
 
     /**
      * Set layer number.
@@ -65,7 +65,7 @@ namespace Belle2 {
     /**
      * Get sector number.
      */
-    inline char get_nSector() {return m_nSector;}
+    inline int get_nSector() {return m_nSector;}
 
     /**
      * Set sector number.
@@ -75,7 +75,7 @@ namespace Belle2 {
     /**
      * Get plane number.
      */
-    inline char get_nPlane() {return m_nPlane;}
+    inline int get_nPlane() {return m_nPlane;}
 
     /**
      * Set plane number.
@@ -85,7 +85,7 @@ namespace Belle2 {
     /**
      * Get strip number.
      */
-    inline char get_nStrip() {return m_nStrip;}
+    inline int get_nStrip() {return m_nStrip;}
 
     /**
      * Set strip number.

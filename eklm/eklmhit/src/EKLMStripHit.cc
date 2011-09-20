@@ -26,6 +26,7 @@ void EKLMStripHit::Print()
   std::cout << "Endcap: " << get_nEndcap()
             << " Layer: " << get_nLayer()
             << " Sector: " << get_nSector()
+            << " Plane: " << get_nPlane()
             << " Strip: " << get_nStrip()
             << " # Time: " << m_Time << "\n";
 }

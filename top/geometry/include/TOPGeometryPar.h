@@ -455,12 +455,12 @@ namespace Belle2 {
   //! return backwards posstition
   inline double TOPGeometryPar::getZ1() const
   {
-    return _Bposition - _Gwidth1;
+    return _Bposition / Unit::mm - _Gwidth1 / Unit::mm;
   }
   //return forwards posstiton
   inline double TOPGeometryPar::getZ2() const
   {
-    return _Bposition - _Length1 + _Gwidth2 + _Length2 + _Gwidth3 + _Length3;
+    return _Bposition / Unit::mm + _Length1 / Unit::mm + _Gwidth2 / Unit::mm + _Length2 / Unit::mm + _Gwidth3 / Unit::mm + _Length3 / Unit::mm;
   }
 
 } // end of namespace Belle2

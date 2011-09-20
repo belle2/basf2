@@ -59,20 +59,19 @@ namespace Belle2 {
 
         G4ThreeVector localPosition = PrePosition->GetTouchableHandle()->GetHistory()->GetTopTransform().TransformPoint(worldPosition);
 
-//        if (fabs(localPosition.y() + m_topgp->getQthickness() / 2.0) > 10e-5) return(true);
+        if (fabs(localPosition.y() + m_topgp->getQthickness() / 2.0) > 10e-10) return(true);
 
 
-        /**
-         B2INFO ("SensQuartz: " << aTrack->GetDefinition()->GetParticleName()
-         << " " << aTrack->GetTrackID()
-         << " " << aTrack->GetParentID()
-         << " " << material
-         << " " << G4BestUnit(localPosition,"Length")
-         << " " << G4BestUnit(worldPosition,"Length")
-         << " " << G4BestUnit(aTrack->GetMomentum(), "Energy")
-         << " " << G4BestUnit(aTrack->GetGlobalTime(), "Time")
-         << " Edep is " << G4BestUnit(aStep->GetTotalEnergyDeposit(),"Energy"));
-         */
+
+        B2INFO("SensQuartz: " << aTrack->GetDefinition()->GetParticleName()
+               << " " << aTrack->GetTrackID()
+               << " " << aTrack->GetParentID()
+               << " " << G4BestUnit(localPosition, "Length")
+               << " " << G4BestUnit(worldPosition, "Length")
+               << " " << G4BestUnit(aTrack->GetMomentum(), "Energy")
+               << " " << G4BestUnit(aTrack->GetGlobalTime(), "Time")
+               << " Edep is " << G4BestUnit(aStep->GetTotalEnergyDeposit(), "Energy"));
+
 
 
 

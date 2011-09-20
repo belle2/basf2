@@ -112,11 +112,11 @@ namespace Belle2 {
       TOPreco reco(Nhyp, Masses);
 
       // Get number of hits in this event
-      int nHits = topDigiHits->GetLast() + 1;
+      int nHits = topDigiHits->GetEntries();
       B2INFO("nHits: " << nHits);
 
       // Get number of hits in this event
-      int nQHits = topQuartzHits->GetLast() + 1;
+      int nQHits = topQuartzHits->GetEntries();
       B2INFO("n tracks: " << nQHits);
 
       for (int track = 0; track < nQHits; ++track) {
@@ -151,7 +151,7 @@ namespace Belle2 {
 
       setBfield(1.5);
 
-      setPMT(m_topgp->getMsizex(), m_topgp->getMsizey(), m_topgp->getAsizex(), m_topgp->getAsizey(), m_topgp->getNpmtx(), m_topgp->getNpmty());
+      setPMT(m_topgp->getMsizex() / 10.0, m_topgp->getMsizey() / 10.0, m_topgp->getAsizex() / 10.0, m_topgp->getAsizey() / 10.0, m_topgp->getNpmtx(), m_topgp->getNpmty());
 
 
       double frac[3] = {0.5815, 0.2870, 0.1315};
@@ -183,6 +183,7 @@ namespace Belle2 {
       double YsizExp = (m_topgp->getWextdown() + m_topgp->getQthickness()) / 10.0;  // expansion volume height
       double YsizPMT = (m_topgp->getNpmty() * m_topgp->getMsizey() + m_topgp->getYgap()) / 10.0; // height to arrange 2 rows of PMT
       double XsizPMT = (m_topgp->getNpmtx() * m_topgp->getMsizex() + (m_topgp->getNpmtx() - 1) * m_topgp->getXgap()) / 10.0; // height to arrange 2 rows of PMT
+      B2INFO("z1 = " << z1 << "  z2 = " << z2);
 
 
       //! No edge roughness

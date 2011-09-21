@@ -32,7 +32,8 @@
         <R9 unit="cm">2.25</R9>
         <R10 unit="cm">2.5</R10>
         <R11 unit="cm">1.45</R11>
-        <Material desc="SUS">SUS316L</Material>
+        <!--Material desc="SUS">SUS316L</Material-->
+            <Material desc="">Air</Material>
     </Lv1SUS>
 
     <Lv2OutBe>
@@ -40,7 +41,8 @@
         <L2 unit="cm">5.10</L2>
         <R1 unit="cm">1.16</R1>
         <R2 unit="cm">1.20</R2>
-        <Material>Beryllium</Material>
+        <!--Material>Beryllium</Material-->
+            <Material desc="">Air</Material>
     </Lv2OutBe>
 
     <Lv2InBe>
@@ -48,7 +50,8 @@
         <L2 unit="cm">6.20</L2>
         <R1 unit="cm">1.00</R1>
         <R2 unit="cm">1.06</R2>
-        <Material>Beryllium</Material>
+        <!--Material>Beryllium</Material-->
+            <Material desc="">Air</Material>
     </Lv2InBe>
 
     <Lv2Paraf>
@@ -85,7 +88,8 @@
         <R11 unit="cm">1.31</R11>
         <R12 unit="cm">1.6</R12>
         <R13 unit="cm">2.25</R13>
-        <Material>Paraffin</Material>
+        <!--Material>Paraffin</Material-->
+            <Material desc="">Air</Material>
     </Lv2Paraf>
 
     <Lv2Vacuum>
@@ -98,7 +102,8 @@
         <R3 unit="cm">0.493</R3>
         <A1 unit="rad">0.0415</A1>
         <A2 unit="rad">0.069</A2>
-        <Material>Vacuum</Material>
+        <!--Material>Vacuum</Material-->
+            <Material desc="">Air</Material>
     </Lv2Vacuum>
 
     <Lv3AuCoat>
@@ -106,7 +111,8 @@
         <L2 unit="cm">6.20</L2>
         <R1 unit="cm">0.999</R1>
         <R2 unit="cm">1.000</R2>
-        <Material>Gold</Material>
+        <!--Material>Gold</Material-->
+            <Material desc="">Air</Material>
     </Lv3AuCoat>
 
     <!-- ########## Ta pipe Forward ########## -->
@@ -115,10 +121,9 @@
         <L1 unit="cm">26.15</L1>
         <L2 unit="cm">1.45</L2>
         <L3 unit="cm">3.301</L3>
-        <L4 unit="cm">0.1</L4>
         <T1 unit="cm">1.45</T1>
-        <R1 unit="cm">1.45</R1>
-        <Material>Tantalum</Material>
+        <!--Material>Tantalum</Material-->
+            <Material desc="">Air</Material>
     </Lv1TaFwd>
 
     <Lv2VacFwd>
@@ -134,7 +139,8 @@
         <R4 unit="cm">1.0</R4>
         <A1 unit="rad">0.0415</A1>
         <A2 unit="rad">0.069</A2>
-        <Material>Vacuum</Material>
+        <!--Material>Vacuum</Material-->
+            <Material desc="">Air</Material>
     </Lv2VacFwd>
 
     <!-- ########## Ta pipe Backward ########## -->
@@ -143,10 +149,9 @@
         <L1 unit="cm">31.0</L1>
         <L2 unit="cm">3.37</L2>
         <L3 unit="cm">1.2</L3>
-        <L4 unit="cm">3.5</L4>
         <T1 unit="cm">1.45</T1>
-        <R1 unit="cm">1.2</R1>
-        <Material>Tantalum</Material>
+        <!--Material>Tantalum</Material-->
+            <Material desc="">Air</Material>
     </Lv1TaBwd>
 
     <Lv2VacBwd>
@@ -162,12 +167,13 @@
         <R4 unit="cm">1.0</R4>
         <A1 unit="rad">0.0415</A1>
         <A2 unit="rad">0.069</A2>
-        <Material>Vacuum</Material>
+        <!--Material>Vacuum</Material-->
+            <Material desc="">Air</Material>
     </Lv2VacBwd>
 
     <!-- ########## Ta pipe Forward Forward ########## -->
     <AreaTubeFwd>
-        <R1 unit="cm">12</R1>
+        <R1 unit="cm">12.</R1>
         <D1 unit="cm">40.0</D1>
         <D2 unit="cm">63.35</D2>
     </AreaTubeFwd>
@@ -177,12 +183,14 @@
         <L1 unit="cm">40.0</L1>
         <L2 unit="cm">65.0</L2>
         <A1 unit="rad">0.0415</A1>
-        <Material>Tantalum</Material>
+        <!--Material>Tantalum</Material-->
+            <Material desc="">Air</Material>
     </Lv1TaLERUp>
 
     <Lv2VacLERUp>
         <R1 unit="cm">1.0</R1>
-        <Material>Vacuum</Material>
+        <!--Material>Vacuum</Material-->
+            <Material desc="">Air</Material>
     </Lv2VacLERUp>
 
     <Lv1TaHERDwn>
@@ -190,12 +198,14 @@
         <L1 unit="cm">40.0</L1>
         <L2 unit="cm">65.0</L2>
         <A1 unit="rad">-0.0415</A1>
-        <Material>Tantalum</Material>
+        <!--Material>Tantalum</Material-->
+            <Material desc="">Air</Material>
     </Lv1TaHERDwn>
 
     <Lv2VacHERDwn>
         <R1 unit="cm">1.0</R1>
-        <Material>Vacuum</Material>
+        <!--Material>Vacuum</Material-->
+            <Material desc="">Air</Material>
     </Lv2VacHERDwn>
 
     <!-- ########## Ta pipe Backward Backward ########## -->
@@ -210,12 +220,14 @@
         <L1 unit="cm">40.0</L1>
         <L2 unit="cm">65.0</L2>
         <A1 unit="rad">0.0415</A1>
-        <Material>Tantalum</Material>
+        <!--Material>Tantalum</Material-->
+            <Material desc="">Air</Material>
     </Lv1TaHERUp>
 
     <Lv2VacHERUp>
         <R1 unit="cm">1.0</R1>
-        <Material>Vacuum</Material>
+        <!--Material>Vacuum</Material-->
+            <Material desc="">Air</Material>
     </Lv2VacHERUp>
 
     <Lv1TaLERDwn>
@@ -223,12 +235,14 @@
         <L1 unit="cm">40.0</L1>
         <L2 unit="cm">65.0</L2>
         <A1 unit="rad">-0.0415</A1>
-        <Material>Tantalum</Material>
+        <!--Material>Tantalum</Material-->
+            <Material desc="">Air</Material>
     </Lv1TaLERDwn>
 
     <Lv2VacLERDwn>
         <R1 unit="cm">1.0</R1>
-        <Material>Vacuum</Material>
+        <!--Material>Vacuum</Material-->
+            <Material desc="">Air</Material>
     </Lv2VacLERDwn>
 
 

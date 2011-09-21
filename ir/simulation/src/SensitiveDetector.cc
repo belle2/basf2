@@ -9,7 +9,7 @@
  **************************************************************************/
 
 #include <ir/simulation/SensitiveDetector.h>
-//#include <ir/dataobjects/IRVolumeUserInfo.h>
+#include <ir/dataobjects/IRSimHit.h>
 
 #include <framework/logging/Logger.h>
 #include <framework/datastore/DataStore.h>
@@ -28,6 +28,7 @@
 #include <G4UserLimits.hh>
 
 #include <string>
+#include <cmath>
 
 using namespace std;
 

@@ -165,6 +165,12 @@
         </C6spc4>
 
         <C6tnl1>
+            <L1 unit="cm">116.3093</L1>
+            <L2 unit="cm">2.7807</L2>
+            <L3 unit="cm">44.0</L3>
+            <L4 unit="cm">6.5093</L4>
+            <L5 unit="cm">90.0</L5>
+            <R1 unit="cm">1.8</R1>
             <R1 unit="cm">2.1</R1>
             <R2 unit="cm">2.9</R2>
             <R3 unit="cm">5.0</R3>
@@ -188,6 +194,13 @@
         </C6spc5>
 
         <C6tnl2>
+            <L1 unit="cm">107.8093</L1>
+            <L2 unit="cm">7.5</L2>
+            <L3 unit="cm">3.7907</L3>
+            <L4 unit="cm">41.5</L4>
+            <L5 unit="cm">2.5</L5>
+            <L6 unit="cm">6.5093</L6>
+            <L7 unit="cm">200.0</L7>
             <R1 unit="cm">2.1</R1>
             <R2 unit="cm">2.45</R2>
             <R3 unit="cm">3.4</R3>
@@ -359,7 +372,7 @@
         </C7mag1>
 
         <C7mag2>
-            <!--<d1 unit="cm"></d1>-->
+            <!--<d1 unit="cm"> C6spc4L1 +C6spc4L2 </d1>-->
             <L1 unit="cm">44.0</L1>
             <O1 unit="cm">5.215</O1>
             <!--Material desc="Super conducting magnet">SC_COIL</Material-->
@@ -367,7 +380,7 @@
         </C7mag2>
 
         <C7mag3>
-            <!--<d1 unit="cm"></d1>-->
+            <!--<d1 unit="cm"> C6spc4L1 +C6spc4L2 +C6spc4L3 +C6spc4L4 </d1>-->
             <L1 unit="cm">52.0</L1>
             <O1 unit="cm">5.65</O1>
             <!--Material desc="Super conducting magnet">SC_COIL</Material-->
@@ -383,7 +396,7 @@
         </C7mag4>
 
         <C7mag5>
-            <!--<d1 unit="cm"></d1>-->
+            <!--<d1 unit="cm"> C6spc5L1 +C6spc5L2 +C6spc5L3 </d1>-->
             <L1 unit="cm">44.0</L1>
             <O1 unit="cm">4.1</O1>
             <!--Material desc="Super conducting magnet">SC_COIL</Material-->
@@ -391,7 +404,7 @@
         </C7mag5>
 
         <C7mag6>
-            <!--<d1 unit="cm"></d1>-->
+            <!--<d1 unit="cm"> C6spc5L1 +C6spc5L2 +C6spc5L3 +C6spc5L4 +C6spc5L5 +C6spc5L6 </d1>-->
             <L1 unit="cm">52.0</L1>
             <O1 unit="cm">7.0</O1>
             <!--Material desc="Super conducting magnet">SC_COIL</Material-->
@@ -706,6 +719,7 @@
         </F7mag1>
 
         <F7mag2>
+            <!--<d1 unit="cm"> F6spc5L1 + F6spc5L2 </d1>-->
             <L1 unit="cm">-44.0</L1>
             <O1 unit="cm">5.215</O1>
 			<!--Material desc="Super conducting magnet">SC_COIL</Material-->
@@ -721,6 +735,7 @@
         </F7mag3>
 
         <F7mag4>
+            <!--<d1 unit="cm"> F6spc6L1 + F6spc6L2 + F6spc6L3 </d1>-->
             <L1 unit="cm">-44.0</L1>
             <O1 unit="cm">4.1</O1>
 			<!--Material desc="Super conducting magnet">SC_COIL</Material-->

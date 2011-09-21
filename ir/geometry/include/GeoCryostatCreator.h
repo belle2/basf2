@@ -27,6 +27,7 @@ class G4Polycone;
 
 namespace Belle2 {
   namespace ir {
+    class SensitiveDetector;
 
     /** The creator for the Cryostat geometry of the Belle II detector.   */
     class GeoCryostatCreator : public geometry::CreatorBase {

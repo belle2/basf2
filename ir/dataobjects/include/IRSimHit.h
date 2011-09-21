@@ -15,9 +15,6 @@
 #include <TVector3.h>
 #include <string>
 
-#define DEFAULT_IRSIMHITS           "IRSimHits"
-#define DEFAULT_IRSIMHITSREL "MCParticlesToIRSimHits"
-
 
 namespace Belle2 {
 

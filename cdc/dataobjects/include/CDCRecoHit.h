@@ -12,7 +12,7 @@
 #define CDCRECOHIT_H
 
 #include <framework/gearbox/Unit.h>
-#include <cdc/geocdc/CDCGeometryPar.h>
+#include <cdc/geometry/CDCGeometryPar.h>
 
 #include <TVector3.h>
 #include <TMatrixD.h>

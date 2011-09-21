@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef CDCSensitiveDetector_H
-#define CDCSensitiveDetector_H
+#ifndef SensitiveDetector_H
+#define SensitiveDetector_H
 
 //#include <cdc/simcdc/CDCB4VHit.h>
 #include <simulation/kernel/SensitiveDetectorBase.h>
@@ -22,15 +22,15 @@ namespace Belle2 {
       And save CDCB4VHit into hits collection.
   */
 
-  class CDCSensitiveDetector: public Simulation::SensitiveDetectorBase {
+  class SensitiveDetector: public Simulation::SensitiveDetectorBase {
 
   public:
 
     //! Constructor
-    CDCSensitiveDetector(G4String name, G4double thresholdEnergyDeposit, G4double thresholdKineticEnergy);
+    SensitiveDetector(G4String name, G4double thresholdEnergyDeposit, G4double thresholdKineticEnergy);
 
     //! Destructor
-    ~CDCSensitiveDetector() {}
+    ~SensitiveDetector() {}
 
     //! Register CDC hits collection into G4HCofThisEvent
     void Initialize(G4HCofThisEvent *);

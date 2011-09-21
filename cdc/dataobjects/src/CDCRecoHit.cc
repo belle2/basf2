@@ -13,7 +13,7 @@
 // genfit
 #include <genfit/RKTrackRep.h>
 #include <genfit/GFDetPlane.h>
-#include <cdc/geocdc/CDCGeometryPar.h>
+#include <cdc/geometry/CDCGeometryPar.h>
 
 #include <cmath>
 #include <TMath.h>

@@ -19,7 +19,7 @@
 //cdc package headers
 #include <cdc/dataobjects/CDCHit.h>
 #include <cdc/hitcdc/HitCDC.h>
-#include <cdc/geocdc/CDCGeometryPar.h>
+#include <cdc/geometry/CDCGeometryPar.h>
 
 //root
 #include <TVector3.h>

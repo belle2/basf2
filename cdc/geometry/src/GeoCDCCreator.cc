@@ -8,9 +8,9 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <cdc/geocdc/GeoCDCCreator.h>
-#include <cdc/geocdc/CDCGeometryPar.h>
-#include <cdc/simcdc/CDCSensitiveDetector.h>
+#include <cdc/geometry/GeoCDCCreator.h>
+#include <cdc/geometry/CDCGeometryPar.h>
+#include <cdc/simulation/SensitiveDetector.h>
 
 #include <geometry/CreatorFactory.h>
 #include <geometry/Materials.h>
@@ -52,7 +52,7 @@ namespace Belle2 {
 
     GeoCDCCreator::GeoCDCCreator()
     {
-      m_sensitive = new CDCSensitiveDetector("CDCSensitiveDetector", (2*24)*eV, 10*MeV);
+      m_sensitive = new SensitiveDetector("SensitiveDetector", (2*24)*eV, 10*MeV);
       logical_cdc = 0;
       physical_cdc = 0;
     }
@@ -643,6 +643,7 @@ namespace Belle2 {
         // Construct electronics boards
         G4Tubs* ebTubeShape = new G4Tubs((format("solidSD_ElectronicsBoard_Layer%1%") % ebID).str().c_str(), ebInnerR, ebOuterR, (ebFZ - ebBZ) / 2.0, 0*deg, 360.*deg);
         G4LogicalVolume* ebTube = new G4LogicalVolume(ebTubeShape, medNEMA_G10_Plate, (format("logicalSD_ElectronicsBoard_Layer%1%") % ebID).str().c_str(), 0, 0, 0);
+        ebTube->SetSensitiveDetector(m_sensitive);
         ebTube->SetVisAttributes(G4VisAttributes(G4Colour(0., 1., 0.)));
         G4VPhysicalVolume* phyebTube;
         phyebTube = new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, (ebFZ + ebBZ) / 2.0), ebTube, (format("physicalSD_ElectronicsBoard_Layer%1%") % ebID).str().c_str(), logical_cdc, false, ebID);

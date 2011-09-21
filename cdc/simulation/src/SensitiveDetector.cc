@@ -8,10 +8,10 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <cdc/simcdc/CDCSensitiveDetector.h>
+#include <cdc/simulation/SensitiveDetector.h>
 
-#include <cdc/simcdc/Helix.h>
-#include <cdc/geocdc/CDCGeometryPar.h>
+#include <cdc/simulation/Helix.h>
+#include <cdc/geometry/CDCGeometryPar.h>
 #include <framework/logging/Logger.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
@@ -40,7 +40,7 @@ typedef HepGeom::Vector3D<double> HepVector3D;
 
 using namespace Belle2;
 
-CDCSensitiveDetector::CDCSensitiveDetector(G4String name, G4double thresholdEnergyDeposit, G4double thresholdKineticEnergy):
+SensitiveDetector::SensitiveDetector(G4String name, G4double thresholdEnergyDeposit, G4double thresholdKineticEnergy):
     SensitiveDetectorBase(name, CDC), m_thresholdEnergyDeposit(thresholdEnergyDeposit),
     m_thresholdKineticEnergy(thresholdKineticEnergy), m_hitNumber(0), m_EBhitNumber(0)
 {
@@ -51,7 +51,7 @@ CDCSensitiveDetector::CDCSensitiveDetector(G4String name, G4double thresholdEner
   registerMCParticleRelation(cdcSimHitRel);
 }
 
-void CDCSensitiveDetector::Initialize(G4HCofThisEvent *)
+void SensitiveDetector::Initialize(G4HCofThisEvent *)
 {
   // Initialize
   m_nonUniformField = 0;
@@ -60,11 +60,10 @@ void CDCSensitiveDetector::Initialize(G4HCofThisEvent *)
 //-----------------------------------------------------
 // Method invoked for every step in sensitive detector
 //-----------------------------------------------------
-bool CDCSensitiveDetector::step(G4Step *aStep, G4TouchableHistory *)
+bool SensitiveDetector::step(G4Step *aStep, G4TouchableHistory *)
 {
   // Get deposited energy
   const G4double edep = aStep->GetTotalEnergyDeposit();
-  if (edep == 0.) return false;
 
   // Get step length
   const G4double stepLength = aStep->GetStepLength();
@@ -74,11 +73,10 @@ bool CDCSensitiveDetector::step(G4Step *aStep, G4TouchableHistory *)
   const G4Track & t = * aStep->GetTrack();
 
   const G4double charge = t.GetDefinition()->GetPDGCharge();
-  if (charge == 0.) return false;
 
   const G4double tof = t.GetGlobalTime();
   if (isnan(tof)) {
-    B2ERROR("CDCSensitiveDetector: global time is nan");
+    B2ERROR("SensitiveDetector: global time is nan");
     return false;
   }
 
@@ -105,6 +103,9 @@ bool CDCSensitiveDetector::step(G4Step *aStep, G4TouchableHistory *)
     saveEBSimHit(layerId, phi, trackID, pid, edep, momIn);
     return true;
   }
+
+  if (edep == 0.) return false;
+  if (charge == 0.) return false;
 
   // Calculate cell ID
   CDCGeometryPar * cdcgp = CDCGeometryPar::Instance();
@@ -299,24 +300,24 @@ bool CDCSensitiveDetector::step(G4Step *aStep, G4TouchableHistory *)
 }
 
 
-void CDCSensitiveDetector::EndOfEvent(G4HCofThisEvent *)
+void SensitiveDetector::EndOfEvent(G4HCofThisEvent *)
 {
 }
 
 int
-CDCSensitiveDetector::saveSimHit(const G4int layerId,
-                                 const G4int wireId,
-                                 const G4int trackID,
-                                 const G4int pid,
-                                 const G4double distance,
-                                 const G4double tof,
-                                 const G4double edep,
-                                 const G4double stepLength,
-                                 const G4ThreeVector & mom,
-                                 const G4ThreeVector & posW,
-                                 const G4ThreeVector & posIn,
-                                 const G4ThreeVector & posOut,
-                                 const G4int lr)
+SensitiveDetector::saveSimHit(const G4int layerId,
+                              const G4int wireId,
+                              const G4int trackID,
+                              const G4int pid,
+                              const G4double distance,
+                              const G4double tof,
+                              const G4double edep,
+                              const G4double stepLength,
+                              const G4ThreeVector & mom,
+                              const G4ThreeVector & posW,
+                              const G4ThreeVector & posIn,
+                              const G4ThreeVector & posOut,
+                              const G4int lr)
 {
   StoreArray<MCParticle> mcParticles;
   //change Later
@@ -349,12 +350,12 @@ CDCSensitiveDetector::saveSimHit(const G4int layerId,
 }
 
 int
-CDCSensitiveDetector::saveEBSimHit(const G4int layerId,
-                                   const G4double phi,
-                                   const G4int trackID,
-                                   const G4int pid,
-                                   const G4double edep,
-                                   const G4ThreeVector & mom)
+SensitiveDetector::saveEBSimHit(const G4int layerId,
+                                const G4double phi,
+                                const G4int trackID,
+                                const G4int pid,
+                                const G4double edep,
+                                const G4ThreeVector & mom)
 {
   //change Later
   StoreArray<CDCEBSimHit> cdcEBArray(DEFAULT_CDCEBSIMHITS);
@@ -373,13 +374,13 @@ CDCSensitiveDetector::saveEBSimHit(const G4int layerId,
 }
 
 /*
-void CDCSensitiveDetector::AddbgOne(bool doit) {
+void SensitiveDetector::AddbgOne(bool doit) {
   Belle::Datcdc_olhit_Manager& olhitmgr=Belle::Datcdc_olhit_Manager::get_manager();
   if(doit) {
     for( int i=0;i<olhitmgr.count();i++ ){
       Belle::Datcdc_olhit&  h = olhitmgr[i];
     }
-    dout(Debugout::B2INFO,"CDCSensitiveDetector")
+    dout(Debugout::B2INFO,"SensitiveDetector")
       << "AddbgOne " << olhitmgr.size()
       << std::endl;
   }
@@ -388,14 +389,14 @@ void CDCSensitiveDetector::AddbgOne(bool doit) {
 */
 
 void
-CDCSensitiveDetector::CellBound(const G4int layerId,
-                                const G4int ic1,
-                                const G4int ic2,
-                                const G4double venter[6],
-                                const G4double vexit[6],
-                                const G4double s1, const G4double s2,
-                                const G4int ic, G4double xint[6],
-                                G4double& sint, G4int& iflag)
+SensitiveDetector::CellBound(const G4int layerId,
+                             const G4int ic1,
+                             const G4int ic2,
+                             const G4double venter[6],
+                             const G4double vexit[6],
+                             const G4double s1, const G4double s2,
+                             const G4int ic, G4double xint[6],
+                             G4double& sint, G4int& iflag)
 {
   //dead copy of gsim_cdc_cellbound.F in gsim-cdc for Belle (for tentaive use)
   //---------------------------------------------------------------------------
@@ -576,7 +577,7 @@ L100:
 
 }
 
-void CDCSensitiveDetector::RotVec(G4double& x, G4double& y, G4double& z, const G4double phi, const G4double theta, const G4int mode)
+void SensitiveDetector::RotVec(G4double& x, G4double& y, G4double& z, const G4double phi, const G4double theta, const G4int mode)
 {
   //dead copy of UtilCDC_RotVec in com-cdc for Belle (for tentative use)
   //----------------------------------------------------------------------
@@ -653,9 +654,9 @@ void CDCSensitiveDetector::RotVec(G4double& x, G4double& y, G4double& z, const G
 }
 
 void
-CDCSensitiveDetector::GIPLAN(const G4double yc, const G4double x1[6], const G4double x2[6],
-                             const G4double s1, const G4double s2, const G4int ic,
-                             G4double xint[6], G4double& sint, G4double pzint[4], G4int& iflag)
+SensitiveDetector::GIPLAN(const G4double yc, const G4double x1[6], const G4double x2[6],
+                          const G4double s1, const G4double s2, const G4int ic,
+                          G4double xint[6], G4double& sint, G4double pzint[4], G4int& iflag)
 {
 
   //dead copy of GIPLAN in Geant3 (for tentative use)
@@ -837,7 +838,7 @@ L90:
 }
 
 
-void CDCSensitiveDetector::GCUBS(const G4double x, const G4double y, const G4double d1, const G4double d2, G4double a[4])
+void SensitiveDetector::GCUBS(const G4double x, const G4double y, const G4double d1, const G4double d2, G4double a[4])
 {
   //dead copy of GCUBS in Geant3 (for tentative use)
   //    ******************************************************************
@@ -872,7 +873,7 @@ L10:
 }
 
 void
-CDCSensitiveDetector::for_Rotat(const G4double bfld[3])
+SensitiveDetector::for_Rotat(const G4double bfld[3])
 {
   //Calculates a rotation matrix in advance at a local position in lab.
   //The rotation is done about the coord. origin; lab.-frame to B-field
@@ -908,8 +909,8 @@ CDCSensitiveDetector::for_Rotat(const G4double bfld[3])
 }
 
 void
-CDCSensitiveDetector::Rotat(G4double& x, G4double& y, G4double& z,
-                            const int mode)
+SensitiveDetector::Rotat(G4double& x, G4double& y, G4double& z,
+                         const int mode)
 {
   //Translates (x,y,z) in lab. to (x,y,z) in B-field frame (mode=1), or reverse
   // translation (mode=-1).
@@ -929,14 +930,14 @@ CDCSensitiveDetector::Rotat(G4double& x, G4double& y, G4double& z,
     y = brot[1][0] * x0 + brot[1][1] * y0 + brot[1][2] * z0;
     z = brot[2][0] * x0 + brot[2][1] * y0 + brot[2][2] * z0;
   } else {
-    //B2ERROR("CDCSensitiveDetector " <<"invalid mode " << mode << "specifed");
+    //B2ERROR("SensitiveDetector " <<"invalid mode " << mode << "specifed");
   }
   return;
 
 }
 
 void
-CDCSensitiveDetector::Rotat(G4double x[3], const int mode)
+SensitiveDetector::Rotat(G4double x[3], const int mode)
 {
   //Translates (x,y,z) in lab. to (x,y,z) in B-field frame (mode=1), or reverse
   // translation (mode=-1).
@@ -956,26 +957,26 @@ CDCSensitiveDetector::Rotat(G4double x[3], const int mode)
     x[1] = brot[1][0] * x0 + brot[1][1] * y0 + brot[1][2] * z0;
     x[2] = brot[2][0] * x0 + brot[2][1] * y0 + brot[2][2] * z0;
   } else {
-    //B2ERROR("CDCSensitiveDetector " <<"invalid mode " << mode << "specifed");
+    //B2ERROR("SensitiveDetector " <<"invalid mode " << mode << "specifed");
   }
   return;
 
 }
 
 void
-CDCSensitiveDetector::HELWIR(const G4double xwb4, const G4double ywb4,
-                             const G4double zwb4,
-                             const G4double xwf4, const G4double ywf4,
-                             const G4double zwf4,
-                             const G4double xp, const G4double yp,
-                             const G4double zp,
-                             const G4double px, const G4double py,
-                             const G4double pz,
-                             const G4double B_kG[3],
-                             const G4double charge, const G4int ntryMax,
-                             G4double& distance,
-                             G4double q2[3], G4double q1[3],
-                             G4int& ntry)
+SensitiveDetector::HELWIR(const G4double xwb4, const G4double ywb4,
+                          const G4double zwb4,
+                          const G4double xwf4, const G4double ywf4,
+                          const G4double zwf4,
+                          const G4double xp, const G4double yp,
+                          const G4double zp,
+                          const G4double px, const G4double py,
+                          const G4double pz,
+                          const G4double B_kG[3],
+                          const G4double charge, const G4int ntryMax,
+                          G4double& distance,
+                          G4double q2[3], G4double q1[3],
+                          G4int& ntry)
 {
   //~dead copy of gsim_cdc_hit.F in gsim-cdc for Belle (for tentaive use)
   // ---------------------------------------------------------------------
@@ -1225,8 +1226,8 @@ line100:
 }
 
 void
-CDCSensitiveDetector::Mvopr(const G4int ndim, const G4double b[3], const G4double m[3][3],
-                            const G4double a[3], G4double c[3], const G4int mode)
+SensitiveDetector::Mvopr(const G4int ndim, const G4double b[3], const G4double m[3][3],
+                         const G4double a[3], G4double c[3], const G4int mode)
 {
   //~dead copy of UtilCDC_mvopr in com-cdc for Belle (for tentative use)
   //-----------------------------------------------------------------------
@@ -1274,7 +1275,7 @@ CDCSensitiveDetector::Mvopr(const G4int ndim, const G4double b[3], const G4doubl
 }
 
 std::vector<int>
-CDCSensitiveDetector::WireId_in_hit_order(int id0, int id1, int nWires)
+SensitiveDetector::WireId_in_hit_order(int id0, int id1, int nWires)
 {
   std::vector<int> list;
   int i0 = int(id0);
@@ -1305,7 +1306,7 @@ CDCSensitiveDetector::WireId_in_hit_order(int id0, int id1, int nWires)
   return list;
 }
 
-G4double CDCSensitiveDetector::ClosestApproach(G4int layerId, G4int cellId, G4ThreeVector posIn, G4ThreeVector posOut, G4ThreeVector& hitPosition)//,G4double& transferT)
+G4double SensitiveDetector::ClosestApproach(G4int layerId, G4int cellId, G4ThreeVector posIn, G4ThreeVector posOut, G4ThreeVector& hitPosition)//,G4double& transferT)
 {
   //----------------------------------------------------------
   /* For two lines r=r1+t1.v1 & r=r2+t2.v2

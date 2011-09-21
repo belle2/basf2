@@ -12,7 +12,7 @@
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
 
-#include <cdc/geocdc/CDCGeometryPar.h>
+#include <cdc/geometry/CDCGeometryPar.h>
 
 #include <cmath>
 #include <boost/format.hpp>
@@ -84,29 +84,30 @@ void CDCGeometryPar::read()
   //------------------------------
   // Get CDC geometry parameters
   //------------------------------
-  GearDir innerWallParams(content, "InnerWalls");
-  m_motherInnerR = innerWallParams.getLength("InnerWall[2]/InnerR");
+  GearDir innerWallParams(content, "InnerWalls/");
+  m_motherInnerR = innerWallParams.getLength("InnerWall[3]/InnerR");
 
-  GearDir outerWallParams(content, "OuterWalls");
-  m_motherOuterR = outerWallParams.getLength("OuterWall[5]/OuterR");
+  GearDir outerWallParams(content, "OuterWalls/");
+  m_motherOuterR = outerWallParams.getLength("OuterWall[6]/OuterR");
 
-  GearDir coverParams(content, "Covers");
-  double R1 = coverParams.getLength("Cover[1]/InnerR1");
-  double R2 = coverParams.getLength("Cover[1]/InnerR2");
-  double angle = coverParams.getLength("Cover[1]/Angle");
-  double thick = coverParams.getLength("Cover[1]/Thickness");
-  double zpos = coverParams.getLength("Cover[1]/PosZ");
+  GearDir coverParams(content, "Covers/");
+  double R1 = coverParams.getLength("Cover[2]/InnerR1");
+  double R2 = coverParams.getLength("Cover[2]/InnerR2");
+  double angle = coverParams.getLength("Cover[2]/Angle");
+  double thick = coverParams.getLength("Cover[2]/Thickness");
+  double zpos = coverParams.getLength("Cover[2]/PosZ");
   double length1;
   if (angle != 0) length1 = fabs(zpos - (R2 - R1) / tan(angle));
   else length1 = fabs(zpos);
-  R1 = coverParams.getLength("Cover[3]/InnerR1");
-  R2 = coverParams.getLength("Cover[3]/InnerR2");
-  angle = coverParams.getLength("Cover[3]/Angle");
-  zpos = coverParams.getLength("Cover[3]/PosZ");
+  R1 = coverParams.getLength("Cover[4]/InnerR1");
+  R2 = coverParams.getLength("Cover[4]/InnerR2");
+  angle = coverParams.getLength("Cover[4]/Angle");
+  zpos = coverParams.getLength("Cover[4]/PosZ");
   double length2;
   if (angle != 0) length2 = fabs(zpos + (R2 - R1) / tan(angle));
   else length2 = fabs(zpos);
-  m_motherLength = length1 + length2 + 2 * thick;
+  m_motherLength = (length2 + thick) * 2.;
+  //m_motherLength = length1 + length2 + 2 * thick;
 
   // Get inner wall parameters
   m_rWall[0]    = innerWallParams.getLength("InnerWall[3]/InnerR");

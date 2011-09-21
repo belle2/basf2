@@ -33,6 +33,7 @@
 #include <G4Box.hh>
 #include <G4Tubs.hh>
 #include <G4Polycone.hh>
+#include <G4UnionSolid.hh>
 #include <G4IntersectionSolid.hh>
 #include <G4SubtractionSolid.hh>
 #include <G4UserLimits.hh>
@@ -117,25 +118,25 @@ namespace Belle2 {
       for (int tmpn = 0; tmpn < 8; tmpn++) {
         Lv1SUS_Z[0] -= cLv1SUS.getLength((format("L%1%") % (tmpn + 1)).str().c_str()) / Unit::mm;
       }
-      Lv1SUS_Z[1] = Lv1SUS_Z[0] + cLv1SUS.getLength("L1") / Unit::mm;;
-      Lv1SUS_Z[2] = Lv1SUS_Z[1]; Lv1SUS_Z[3] = Lv1SUS_Z[2] + cLv1SUS.getLength("L2") / Unit::mm;;
-      Lv1SUS_Z[4] = Lv1SUS_Z[3] + cLv1SUS.getLength("L3") / Unit::mm;;
+      Lv1SUS_Z[1] = Lv1SUS_Z[0] + cLv1SUS.getLength("L1") / Unit::mm;
+      Lv1SUS_Z[2] = Lv1SUS_Z[1]; Lv1SUS_Z[3] = Lv1SUS_Z[2] + cLv1SUS.getLength("L2") / Unit::mm;
+      Lv1SUS_Z[4] = Lv1SUS_Z[3] + cLv1SUS.getLength("L3") / Unit::mm;
       Lv1SUS_Z[5] = Lv1SUS_Z[4];
-      Lv1SUS_Z[6] = Lv1SUS_Z[5] + cLv1SUS.getLength("L4") / Unit::mm;;
-      Lv1SUS_Z[7] = Lv1SUS_Z[6] + cLv1SUS.getLength("L5") / Unit::mm;;
-      Lv1SUS_Z[8] = Lv1SUS_Z[7] + cLv1SUS.getLength("L6") / Unit::mm;;
-      Lv1SUS_Z[9] = Lv1SUS_Z[8] + cLv1SUS.getLength("L7") / Unit::mm;;
-      Lv1SUS_Z[10] = Lv1SUS_Z[9] + cLv1SUS.getLength("L8") / Unit::mm;;
-      Lv1SUS_Z[11] = Lv1SUS_Z[10] + cLv1SUS.getLength("L9") / Unit::mm;;
-      Lv1SUS_Z[12] = Lv1SUS_Z[11] + cLv1SUS.getLength("L10") / Unit::mm;;
-      Lv1SUS_Z[13] = Lv1SUS_Z[12] + cLv1SUS.getLength("L11") / Unit::mm;;
-      Lv1SUS_Z[14] = Lv1SUS_Z[13] + cLv1SUS.getLength("L12") / Unit::mm;;
-      Lv1SUS_Z[15] = Lv1SUS_Z[14] + cLv1SUS.getLength("L13") / Unit::mm;;
+      Lv1SUS_Z[6] = Lv1SUS_Z[5] + cLv1SUS.getLength("L4") / Unit::mm;
+      Lv1SUS_Z[7] = Lv1SUS_Z[6] + cLv1SUS.getLength("L5") / Unit::mm;
+      Lv1SUS_Z[8] = Lv1SUS_Z[7] + cLv1SUS.getLength("L6") / Unit::mm;
+      Lv1SUS_Z[9] = Lv1SUS_Z[8] + cLv1SUS.getLength("L7") / Unit::mm;
+      Lv1SUS_Z[10] = Lv1SUS_Z[9] + cLv1SUS.getLength("L8") / Unit::mm;
+      Lv1SUS_Z[11] = Lv1SUS_Z[10] + cLv1SUS.getLength("L9") / Unit::mm;
+      Lv1SUS_Z[12] = Lv1SUS_Z[11] + cLv1SUS.getLength("L10") / Unit::mm;
+      Lv1SUS_Z[13] = Lv1SUS_Z[12] + cLv1SUS.getLength("L11") / Unit::mm;
+      Lv1SUS_Z[14] = Lv1SUS_Z[13] + cLv1SUS.getLength("L12") / Unit::mm;
+      Lv1SUS_Z[15] = Lv1SUS_Z[14] + cLv1SUS.getLength("L13") / Unit::mm;
       Lv1SUS_Z[16] = Lv1SUS_Z[15];
-      Lv1SUS_Z[17] = Lv1SUS_Z[16] + cLv1SUS.getLength("L14") / Unit::mm;;
-      Lv1SUS_Z[18] = Lv1SUS_Z[17] + cLv1SUS.getLength("L15") / Unit::mm;;
+      Lv1SUS_Z[17] = Lv1SUS_Z[16] + cLv1SUS.getLength("L14") / Unit::mm;
+      Lv1SUS_Z[18] = Lv1SUS_Z[17] + cLv1SUS.getLength("L15") / Unit::mm;
       Lv1SUS_Z[19] = Lv1SUS_Z[18];
-      Lv1SUS_Z[20] = Lv1SUS_Z[19] + cLv1SUS.getLength("L16") / Unit::mm;;
+      Lv1SUS_Z[20] = Lv1SUS_Z[19] + cLv1SUS.getLength("L16") / Unit::mm;
       //
       double Lv1SUS_rI[Lv1SUS_num];
       for (int tmpn = 0; tmpn < Lv1SUS_num; tmpn++)
@@ -187,8 +188,8 @@ namespace Belle2 {
       const int Lv2OutBe_num = 2;
       //
       double Lv2OutBe_Z[Lv2OutBe_num];
-      Lv2OutBe_Z[0] = -cLv2OutBe.getLength("L1") / Unit::mm;;
-      Lv2OutBe_Z[1] = cLv2OutBe.getLength("L2") / Unit::mm;;
+      Lv2OutBe_Z[0] = -cLv2OutBe.getLength("L1") / Unit::mm;
+      Lv2OutBe_Z[1] = cLv2OutBe.getLength("L2") / Unit::mm;
       //
       double Lv2OutBe_rI[Lv2OutBe_num];
       Lv2OutBe_rI[0] = cLv2OutBe.getLength("R1") / Unit::mm;
@@ -223,8 +224,8 @@ namespace Belle2 {
       const int Lv2InBe_num = 2;
       //
       double Lv2InBe_Z[Lv2InBe_num];
-      Lv2InBe_Z[0] = -cLv2InBe.getLength("L1") / Unit::mm;;
-      Lv2InBe_Z[1] = cLv2InBe.getLength("L2") / Unit::mm;;
+      Lv2InBe_Z[0] = -cLv2InBe.getLength("L1") / Unit::mm;
+      Lv2InBe_Z[1] = cLv2InBe.getLength("L2") / Unit::mm;
       //
       double Lv2InBe_rI[Lv2InBe_num];
       Lv2InBe_rI[0] = cLv2InBe.getLength("R1") / Unit::mm;
@@ -248,6 +249,79 @@ namespace Belle2 {
 
       //----------
       //- Lv2Vacuum
+
+      //get parameters from .xml file
+      GearDir cLv2Vacuum(content, "Lv2Vacuum/");
+      //
+      double Lv2Vacuum_L1 = cLv2Vacuum.getLength("L1") / Unit::mm;
+      double Lv2Vacuum_L2 = cLv2Vacuum.getLength("L2") / Unit::mm;
+      double Lv2Vacuum_L3 = cLv2Vacuum.getLength("L3") / Unit::mm;
+      double Lv2Vacuum_L4 = cLv2Vacuum.getLength("L4") / Unit::mm;
+      double Lv2Vacuum_R1 = cLv2Vacuum.getLength("R1") / Unit::mm;
+      double Lv2Vacuum_R2 = cLv2Vacuum.getLength("R2") / Unit::mm;
+      double Lv2Vacuum_R3 = cLv2Vacuum.getLength("R3") / Unit::mm;
+      double Lv2Vacuum_A1 = cLv2Vacuum.getAngle("A1");
+      double Lv2Vacuum_A2 = cLv2Vacuum.getAngle("A2");
+      //
+      string strMat_Lv2Vacuum = cLv2Vacuum.getString("Material");
+      G4Material* mat_Lv2Vacuum = Materials::get(strMat_Lv2Vacuum);
+      //
+      // Part 1
+      const int Lv2Vacuum1_num = 2;
+      //
+      double Lv2Vacuum1_Z[Lv2Vacuum1_num];
+      Lv2Vacuum1_Z[0] = -Lv2Vacuum_L1;
+      Lv2Vacuum1_Z[1] = Lv2Vacuum_L2;
+      double Lv2Vacuum1_rI[Lv2Vacuum1_num];
+      for (int tmpn = 0; tmpn < Lv2Vacuum1_num; tmpn++)
+        { Lv2Vacuum1_rI[tmpn] = 0.0; }
+      double Lv2Vacuum1_rO[Lv2Vacuum1_num];
+      Lv2Vacuum1_rO[0] = Lv2Vacuum_R1;
+      Lv2Vacuum1_rO[1] = Lv2Vacuum_R1;
+      // Part 2
+      double Lv2Vacuum2_Z1  = 2. * Lv2Vacuum_L3;
+      double Lv2Vacuum2_rI1 = 0.0;
+      double Lv2Vacuum2_rO1 = Lv2Vacuum_R2;
+      //
+      double Lv2Vacuum2_Z2  = Lv2Vacuum_L3 * cos(Lv2Vacuum_A2);
+      double Lv2Vacuum2_rI2 = 0.0;
+      double Lv2Vacuum2_rO2 = 2 * Lv2Vacuum_R2;
+      // Part 3
+      const int Lv2Vacuum3_num = 2;
+      //
+      double Lv2Vacuum3_Z[Lv2Vacuum3_num];
+      Lv2Vacuum3_Z[0] = 0.0;
+      Lv2Vacuum3_Z[1] = Lv2Vacuum_L4;
+      double Lv2Vacuum3_rI[Lv2Vacuum3_num];
+      for (int tmpn = 0; tmpn < Lv2Vacuum3_num; tmpn++)
+        { Lv2Vacuum3_rI[tmpn] = 0.0; }
+      double Lv2Vacuum3_rO[Lv2Vacuum3_num];
+      Lv2Vacuum3_rO[0] = Lv2Vacuum_R3;
+      Lv2Vacuum3_rO[1] = Lv2Vacuum_R3;
+
+      //define geometry
+      // Part 1
+      G4Polycone* geo_Lv2Vacuumpcon1 = new G4Polycone("geo_Lv2Vacuumpcon1_name", 0, 2*M_PI, Lv2Vacuum1_num, Lv2Vacuum1_Z, Lv2Vacuum1_rI, Lv2Vacuum1_rO);
+      // Part 2
+      G4Tubs* geo_Lv2Vacuumpcon2_1 = new G4Tubs("geo_Lv2Vacuumpcon2_1_name", Lv2Vacuum2_rI1, Lv2Vacuum2_rO1, Lv2Vacuum2_Z1, 0, 2*M_PI);
+      G4Tubs* geo_Lv2Vacuumpcon2_2 = new G4Tubs("geo_Lv2Vacuumpcon2_2_name", Lv2Vacuum2_rI2, Lv2Vacuum2_rO2, Lv2Vacuum2_Z2, 0, 2*M_PI);
+      G4Transform3D transform_Lv2Vacuumpcon2_2 = G4Translate3D(0., 0., 0.);
+      transform_Lv2Vacuumpcon2_2 = transform_Lv2Vacuumpcon2_2 * G4RotateY3D(-Lv2Vacuum_A2);
+      G4IntersectionSolid* geo_Lv2Vacuumpcon2 = new G4IntersectionSolid("", geo_Lv2Vacuumpcon2_1, geo_Lv2Vacuumpcon2_2, transform_Lv2Vacuumpcon2_2);
+      // Part 3
+      G4Polycone* geo_Lv2Vacuumpcon3 = new G4Polycone("geo_Lv2Vacuumpcon3_name", 0, 2*M_PI, Lv2Vacuum3_num, Lv2Vacuum3_Z, Lv2Vacuum3_rI, Lv2Vacuum3_rO);
+      // Part1+2+3
+      G4Transform3D transform_Lv2Vacuumpcon3 = G4Translate3D(0., 0., 0.);
+      transform_Lv2Vacuumpcon3 = transform_Lv2Vacuumpcon3 * G4RotateY3D(-Lv2Vacuum_A1);
+      G4UnionSolid* geo_Lv2Vacuum = new G4UnionSolid("", geo_Lv2Vacuumpcon1, geo_Lv2Vacuumpcon3, transform_Lv2Vacuumpcon3);
+      G4Transform3D transform_Lv2Vacuumpcon2 = G4Translate3D(Lv2Vacuum_L3 * sin(Lv2Vacuum_A2), 0., Lv2Vacuum_L2 + Lv2Vacuum_L3 * cos(Lv2Vacuum_A2));
+      transform_Lv2Vacuumpcon2 = transform_Lv2Vacuumpcon2 * G4RotateY3D(Lv2Vacuum_A2);
+      geo_Lv2Vacuum = new G4UnionSolid("", geo_Lv2Vacuum, geo_Lv2Vacuumpcon2, transform_Lv2Vacuumpcon2);
+      G4LogicalVolume *logi_Lv2Vacuum = new G4LogicalVolume(geo_Lv2Vacuum, mat_Lv2Vacuum, "logi_Lv2Vacuum_name");
+
+      //-   put volume
+      setColor(*logi_Lv2Vacuum, cLv2Vacuum.getString("Color", "#CCCCCC"));
+      new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_Lv2Vacuum, "phys_Lv2Vacuum_name", logi_Lv1SUS, false, 0);
 
       //-
       //----------
@@ -364,42 +438,39 @@ namespace Belle2 {
       //-
       //----------
 
-      /*
-        //----------
-        //- Lv3AuCoat
+      //----------
+      //- Lv3AuCoat
 
-            //get parameters from .xml file
-            GearDir cLv3AuCoat(content, "Lv3AuCoat/");
-            //
-            const int Lv3AuCoat_num = 21;
-            //
-            double Lv3AuCoat_Z[Lv3AuCoat_num];
-            Lv3AuCoat_Z[0] = -cLv3AuCoat.getLength("L1") / Unit::mm;;
-            Lv3AuCoat_Z[1] = cLv3AuCoat.getLength("L2") / Unit::mm;;
-            //
-            double Lv3AuCoat_rI[Lv3AuCoat_num];
-            Lv3AuCoat_rI[0] = cLv3AuCoat.getLength("R1") / Unit::mm;
-            Lv3AuCoat_rI[1] = Lv3AuCoat_rI[0];
-            //
-            double Lv3AuCoat_rO[Lv3AuCoat_num];
-            Lv3AuCoat_rO[0] = cLv3AuCoat.getLength("R2") / Unit::mm;
-            Lv3AuCoat_rO[1] = Lv3AuCoat_rO[0];
-            //
-            string strMat_Lv3AuCoat = cLv3AuCoat.getString("Material");
-            G4Material* mat_Lv3AuCoat = Materials::get(strMat_Lv3AuCoat);
+      //get parameters from .xml file
+      GearDir cLv3AuCoat(content, "Lv3AuCoat/");
+      //
+      const int Lv3AuCoat_num = 2;
+      //
+      double Lv3AuCoat_Z[Lv3AuCoat_num];
+      Lv3AuCoat_Z[0] = -cLv3AuCoat.getLength("L1") / Unit::mm;
+      Lv3AuCoat_Z[1] = cLv3AuCoat.getLength("L2") / Unit::mm;
+      //
+      double Lv3AuCoat_rI[Lv3AuCoat_num];
+      Lv3AuCoat_rI[0] = cLv3AuCoat.getLength("R1") / Unit::mm;
+      Lv3AuCoat_rI[1] = Lv3AuCoat_rI[0];
+      //
+      double Lv3AuCoat_rO[Lv3AuCoat_num];
+      Lv3AuCoat_rO[0] = cLv3AuCoat.getLength("R2") / Unit::mm;
+      Lv3AuCoat_rO[1] = Lv3AuCoat_rO[0];
+      //
+      string strMat_Lv3AuCoat = cLv3AuCoat.getString("Material");
+      G4Material* mat_Lv3AuCoat = Materials::get(strMat_Lv3AuCoat);
 
-            //define geometry
-            G4Polycone* geo_Lv3AuCoat = new G4Polycone("geo_Lv3AuCoat_name", 0, 2*M_PI, Lv3AuCoat_num, Lv3AuCoat_Z, Lv3AuCoat_rI, Lv3AuCoat_rO);
-            G4LogicalVolume *logi_Lv3AuCoat = new G4LogicalVolume(geo_Lv3AuCoat, mat_Lv3AuCoat, "logi_Lv3AuCoat_name");
+      //define geometry
+      G4Polycone* geo_Lv3AuCoat = new G4Polycone("geo_Lv3AuCoat_name", 0, 2*M_PI, Lv3AuCoat_num, Lv3AuCoat_Z, Lv3AuCoat_rI, Lv3AuCoat_rO);
+      G4LogicalVolume *logi_Lv3AuCoat = new G4LogicalVolume(geo_Lv3AuCoat, mat_Lv3AuCoat, "logi_Lv3AuCoat_name");
 
-            //-   put volume
-            setColor(*logi_Lv3AuCoat, cLv3AuCoat.getString("Color", "#666666"));
-            new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_Lv3AuCoat, "phys_Lv3AuCoat_name", logi_Lv2Vacuum, false, 0);
+      //-   put volume
+      setColor(*logi_Lv3AuCoat, cLv3AuCoat.getString("Color", "#666666"));
+      new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_Lv3AuCoat, "phys_Lv3AuCoat_name", logi_Lv2Vacuum, false, 0);
 
-        //-
-        //----------
-      */
-
+      //-
+      //----------
 
       //=
       //==========
@@ -408,16 +479,16 @@ namespace Belle2 {
       //= Ta pipe Forward
 
       //----------
-      //- Lv1. Ta pipe Forward
+      //- Lv1TaFwd
 
       //get parameters from .xml file
       GearDir cLv1TaFwd(content, "Lv1TaFwd/");
       //
-      double Lv1TaFwd_D1 = cLv1TaFwd.getLength("D1") / Unit::mm;;
-      double Lv1TaFwd_L1 = cLv1TaFwd.getLength("L1") / Unit::mm;;
-      double Lv1TaFwd_L2 = cLv1TaFwd.getLength("L2") / Unit::mm;;
-      double Lv1TaFwd_L3 = cLv1TaFwd.getLength("L3") / Unit::mm;;
-      double Lv1TaFwd_T1 = cLv1TaFwd.getLength("T1") / Unit::mm;;
+      double Lv1TaFwd_D1 = cLv1TaFwd.getLength("D1") / Unit::mm;
+      double Lv1TaFwd_L1 = cLv1TaFwd.getLength("L1") / Unit::mm;
+      double Lv1TaFwd_L2 = cLv1TaFwd.getLength("L2") / Unit::mm;
+      double Lv1TaFwd_L3 = cLv1TaFwd.getLength("L3") / Unit::mm;
+      double Lv1TaFwd_T1 = cLv1TaFwd.getLength("T1") / Unit::mm;
       //
       string strMat_Lv1TaFwd = cLv1TaFwd.getString("Material");
       G4Material* mat_Lv1TaFwd = Materials::get(strMat_Lv1TaFwd);
@@ -434,7 +505,95 @@ namespace Belle2 {
       //----------
 
       //----------
-      //- Lv2. Vacuum Forward
+      //- Lv2VacFwd
+
+      //get parameters from .xml file
+      GearDir cLv2VacFwd(content, "Lv2VacFwd/");
+      //
+      double Lv2VacFwd_D1 = cLv2VacFwd.getLength("D1") / Unit::mm;
+      double Lv2VacFwd_D2 = cLv2VacFwd.getLength("D2") / Unit::mm;
+      double Lv2VacFwd_D3 = cLv2VacFwd.getLength("D3") / Unit::mm;
+      double Lv2VacFwd_L1 = cLv2VacFwd.getLength("L1") / Unit::mm;
+      double Lv2VacFwd_L2 = cLv2VacFwd.getLength("L2") / Unit::mm;
+      double Lv2VacFwd_L3 = cLv2VacFwd.getLength("L3") / Unit::mm;
+      double Lv2VacFwd_R1 = cLv2VacFwd.getLength("R1") / Unit::mm;
+      double Lv2VacFwd_R2 = cLv2VacFwd.getLength("R2") / Unit::mm;
+      double Lv2VacFwd_R3 = cLv2VacFwd.getLength("R3") / Unit::mm;
+      double Lv2VacFwd_R4 = cLv2VacFwd.getLength("R4") / Unit::mm;
+      double Lv2VacFwd_A1 = cLv2VacFwd.getAngle("A1");
+      double Lv2VacFwd_A2 = cLv2VacFwd.getAngle("A2");
+      //
+      string strMat_Lv2VacFwd = cLv2VacFwd.getString("Material");
+      G4Material* mat_Lv2VacFwd = Materials::get(strMat_Lv2VacFwd);
+      //
+      // Part 1
+      double Lv2VacFwd1_Z1  = sqrt(Lv2VacFwd_D1 * Lv2VacFwd_D1 + Lv2VacFwd_D2 * Lv2VacFwd_D2 - 2.*Lv2VacFwd_D1 * Lv2VacFwd_D2 * cos(Lv2VacFwd_A1));
+      double Lv2VacFwd1_rI1 = 0.0;
+      double Lv2VacFwd1_rO1 = Lv2VacFwd_R1;
+      //
+      double Lv2VacFwd1_Z2  = Lv2VacFwd1_Z1 / 2. * cos(Lv2VacFwd_A2);
+      double Lv2VacFwd1_rI2 = 0.0;
+      double Lv2VacFwd1_rO2 = 2 * Lv2VacFwd_R1;
+      // Part 2
+      double Lv2VacFwd2_Z1  = Lv2VacFwd_L1;
+      double Lv2VacFwd2_rI1 = 0.0;
+      double Lv2VacFwd2_rO1 = Lv2VacFwd_R2;
+      //
+      double Lv2VacFwd2_Z2  = Lv2VacFwd_L1 / 2. * cos(Lv2VacFwd_A2);
+      double Lv2VacFwd2_rI2 = 0.0;
+      double Lv2VacFwd2_rO2 = 2 * Lv2VacFwd_R2;
+      // Part 3
+      const int Lv2VacFwd3_num = 4;
+      //
+      double Lv2VacFwd_Z[Lv2VacFwd3_num];
+      Lv2VacFwd_Z[0] = 0.0;
+      Lv2VacFwd_Z[1] = Lv2VacFwd_D3 - Lv2VacFwd_L2;
+      Lv2VacFwd_Z[2] = Lv2VacFwd_D3;
+      Lv2VacFwd_Z[3] = Lv2VacFwd_Z[2] + Lv2VacFwd_L3;
+      double Lv2VacFwd_rI[Lv2VacFwd3_num];
+      for (int tmpn = 0; tmpn < Lv2VacFwd3_num; tmpn++)
+        { Lv2VacFwd_rI[tmpn] = 0.0; }
+      double Lv2VacFwd_rO[Lv2VacFwd3_num];
+      Lv2VacFwd_rO[0] = Lv2VacFwd_R3;
+      Lv2VacFwd_rO[1] = Lv2VacFwd_R3;
+      Lv2VacFwd_rO[2] = Lv2VacFwd_R4;
+      Lv2VacFwd_rO[3] = Lv2VacFwd_R4;
+
+      //define geometry
+      // Part 1
+      G4Tubs* geo_Lv2VacFwdpcon1_1 = new G4Tubs("geo_Lv2VacFwdpcon1_1_name", Lv2VacFwd1_rI1, Lv2VacFwd1_rO1, Lv2VacFwd1_Z1, 0, 2*M_PI);
+      G4Tubs* geo_Lv2VacFwdpcon1_2 = new G4Tubs("geo_Lv2VacFwdpcon1_2_name", Lv2VacFwd1_rI2, Lv2VacFwd1_rO2, Lv2VacFwd1_Z2, 0, 2*M_PI);
+      G4Transform3D transform_Lv2VacFwdpcon1_2 = G4Translate3D(0., 0., 0.);
+      transform_Lv2VacFwdpcon1_2 = transform_Lv2VacFwdpcon1_2 * G4RotateY3D(-Lv2VacFwd_A2);
+      G4IntersectionSolid* geo_Lv2VacFwdpcon1 = new G4IntersectionSolid("", geo_Lv2VacFwdpcon1_1, geo_Lv2VacFwdpcon1_2, transform_Lv2VacFwdpcon1_2);
+      // Part 2
+      G4Tubs* geo_Lv2VacFwdpcon2_1 = new G4Tubs("geo_Lv2VacFwdpcon2_1_name", Lv2VacFwd2_rI1, Lv2VacFwd2_rO1, Lv2VacFwd2_Z1, 0, 2*M_PI);
+      G4Tubs* geo_Lv2VacFwdpcon2_2 = new G4Tubs("geo_Lv2VacFwdpcon2_2_name", Lv2VacFwd2_rI2, Lv2VacFwd2_rO2, Lv2VacFwd2_Z2, 0, 2*M_PI);
+      G4Transform3D transform_Lv2VacFwdpcon2_2 = G4Translate3D(0., 0., 0.);
+      transform_Lv2VacFwdpcon2_2 = transform_Lv2VacFwdpcon2_2 * G4RotateY3D(-Lv2VacFwd_A2);
+      G4IntersectionSolid* geo_Lv2VacFwdpcon2 = new G4IntersectionSolid("", geo_Lv2VacFwdpcon2_1, geo_Lv2VacFwdpcon2_2, transform_Lv2VacFwdpcon2_2);
+      // Part 3
+      G4Polycone* geo_Lv2VacFwdpcon3 = new G4Polycone("geo_Lv2VacFwdpcon3", 0, 2*M_PI, Lv2VacFwd3_num, Lv2VacFwd_Z, Lv2VacFwd_rI, Lv2VacFwd_rO);
+      // Part1+2+3
+      G4Transform3D transform_Lv2VacFwdpcon1
+      = G4Translate3D((Lv2VacFwd_D1 * sin(Lv2VacFwd_A1) + Lv2VacFwd_D2 * sin(2 * Lv2VacFwd_A1)) / 2.,
+                      0.,
+                      (Lv2VacFwd_D1 * cos(Lv2VacFwd_A1) + Lv2VacFwd_D2 * cos(2 * Lv2VacFwd_A1)) / 2.);
+      transform_Lv2VacFwdpcon1 = transform_Lv2VacFwdpcon1 * G4RotateY3D(Lv2VacFwd_A1 + Lv2VacFwd_A2);
+      G4UnionSolid* geo_Lv2VacFwd = new G4UnionSolid("", geo_Lv2VacFwdpcon3, geo_Lv2VacFwdpcon1, transform_Lv2VacFwdpcon1);
+      G4Transform3D transform_Lv2VacFwdpcon2
+      = G4Translate3D((Lv2VacFwd_D2 + Lv2VacFwd_L1 / 2.) * sin(2.*Lv2VacFwd_A1),
+                      0.,
+                      (Lv2VacFwd_D2 + Lv2VacFwd_L1 / 2.) * cos(2.*Lv2VacFwd_A1));
+      transform_Lv2VacFwdpcon2 = transform_Lv2VacFwdpcon2 * G4RotateY3D(2.*Lv2VacFwd_A1);
+      geo_Lv2VacFwd = new G4UnionSolid("", geo_Lv2VacFwd, geo_Lv2VacFwdpcon2, transform_Lv2VacFwdpcon2);
+      G4LogicalVolume *logi_Lv2VacFwd = new G4LogicalVolume(geo_Lv2VacFwd, mat_Lv2VacFwd, "logi_Lv2VacFwd_name");
+
+      //-   put volume
+      setColor(*logi_Lv2VacFwd, cLv2VacFwd.getString("Color", "#CCCCCC"));
+      G4Transform3D transform_Lv2VacFwd = G4Translate3D(0., 0., 0.);
+      transform_Lv2VacFwd = transform_Lv2VacFwd * G4RotateY3D(-Lv2VacFwd_A1);
+      new G4PVPlacement(transform_Lv2VacFwd, logi_Lv2VacFwd, "phys_Lv2VacFwd_name", logi_Lv1TaFwd, false, 0);
 
       //-
       //----------
@@ -446,16 +605,16 @@ namespace Belle2 {
       //= Ta pipe Backward
 
       //----------
-      //- Lv1. Ta pipe Backward
+      //- Lv1TaBwd
 
       //get parameters from .xml file
       GearDir cLv1TaBwd(content, "Lv1TaBwd/");
       //
-      double Lv1TaBwd_D1 = cLv1TaBwd.getLength("D1") / Unit::mm;;
-      double Lv1TaBwd_L1 = cLv1TaBwd.getLength("L1") / Unit::mm;;
-      double Lv1TaBwd_L2 = cLv1TaBwd.getLength("L2") / Unit::mm;;
-      double Lv1TaBwd_L3 = cLv1TaBwd.getLength("L3") / Unit::mm;;
-      double Lv1TaBwd_T1 = cLv1TaBwd.getLength("T1") / Unit::mm;;
+      double Lv1TaBwd_D1 = cLv1TaBwd.getLength("D1") / Unit::mm;
+      double Lv1TaBwd_L1 = cLv1TaBwd.getLength("L1") / Unit::mm;
+      double Lv1TaBwd_L2 = cLv1TaBwd.getLength("L2") / Unit::mm;
+      double Lv1TaBwd_L3 = cLv1TaBwd.getLength("L3") / Unit::mm;
+      double Lv1TaBwd_T1 = cLv1TaBwd.getLength("T1") / Unit::mm;
       //
       string strMat_Lv1TaBwd = cLv1TaBwd.getString("Material");
       G4Material* mat_Lv1TaBwd = Materials::get(strMat_Lv1TaBwd);
@@ -472,7 +631,7 @@ namespace Belle2 {
       //----------
 
       //----------
-      //- Lv2. Vacuum Backward
+      //- Lv2VacBwd
 
       //-
       //----------
@@ -788,6 +947,7 @@ namespace Belle2 {
       //-   put volume
       setColor(*logi_Lv2VacLERUp, cLv2VacLERUp.getString("Color", "#CCCCCC"));
       new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_Lv2VacLERUp, "phys_Lv2VacLERUp_name", logi_Lv1TaLERUp, false, 0);
+
       //-
       //----------
 

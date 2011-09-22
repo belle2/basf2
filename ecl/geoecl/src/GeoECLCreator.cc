@@ -47,7 +47,6 @@
 
 
 
-
 using namespace std;
 using namespace boost;
 
@@ -119,17 +118,18 @@ namespace Belle2 {
         layerContent.append((format("/BarrelCrystals/BarrelCrystal[%1%]/") % (iBrCry)).str());
 
 
-        k_BLL = layerContent.getLength("K_BLL") ;
-        k_Ba = layerContent.getLength("K_Ba")   ;
-        k_Bb = layerContent.getLength("K_Bb")   ;
-        k_Bh = layerContent.getLength("K_Bh")   ;
-        k_BA = layerContent.getLength("K_BA")   ;
-        k_BH = layerContent.getLength("K_BH")   ;
+        k_BLL = layerContent.getLength("K_BLL") * cm;
+        k_Ba = layerContent.getLength("K_Ba")   * cm;
+        k_Bb = layerContent.getLength("K_Bb")   * cm;
+        k_Bh = layerContent.getLength("K_Bh")   * cm;
+        k_BA = layerContent.getLength("K_BA")   * cm;
+        k_BH = layerContent.getLength("K_BH")   * cm;
         k_z_TILTED = layerContent.getAngle("K_z_TILTED") ;
         k_phi_TILTED = layerContent.getAngle("K_phi_TILTED") ;
-        k_perpC = layerContent.getLength("K_perpC")  ;
+        k_perpC = layerContent.getLength("K_perpC") * cm ;
         k_phiC = layerContent.getAngle("K_phiC") ;
-        k_zC = layerContent.getLength("K_zC")    ;
+        k_zC = layerContent.getLength("K_zC")    * cm;
+
         double cDx1 = k_Ba / 2;
         double cDx2 = k_Bb / 2;
         double cDy1 = k_Bh / 2;
@@ -167,18 +167,18 @@ namespace Belle2 {
         GearDir counter(content);
         counter.append((format("/EndCapCrystals/EndCapCrystal[%1%]/") % (iCry)).str());
 
-        h1 = counter.getLength("K_h1");
-        h2 = counter.getLength("K_h2");
-        bl1 = counter.getLength("K_bl1");
-        bl2 = counter.getLength("K_bl2");
-        tl1 = counter.getLength("K_tl1");
-        tl2 = counter.getLength("K_tl2");
+        h1 = counter.getLength("K_h1") * cm;
+        h2 = counter.getLength("K_h2") * cm;
+        bl1 = counter.getLength("K_bl1") * cm;
+        bl2 = counter.getLength("K_bl2") * cm;
+        tl1 = counter.getLength("K_tl1") * cm;
+        tl2 = counter.getLength("K_tl2") * cm;
         alpha1 = counter.getAngle("K_alpha1");
         alpha2 = counter.getAngle("K_alpha2");
         Rphi1 = counter.getAngle("K_Rphi1") ;
         Rtheta = counter.getAngle("K_Ptheta") ;
         Rphi2 = counter.getAngle("K_Rphi2")  ;
-        Pr = counter.getLength("K_Pr");
+        Pr = counter.getLength("K_Pr") * cm;
         Ptheta = counter.getAngle("K_Ptheta") ;
         Pphi = counter.getAngle("K_Pphi") ;
         halflength = 15.0;
@@ -204,18 +204,18 @@ namespace Belle2 {
         GearDir counter(content);
         counter.append((format("/EndCapCrystals/EndCapCrystal[%1%]/") % (iCry)).str());
 
-        h1 = counter.getLength("K_h1");
-        h2 = counter.getLength("K_h2");
-        bl1 = counter.getLength("K_bl1");
-        bl2 = counter.getLength("K_bl2");
-        tl1 = counter.getLength("K_tl1");
-        tl2 = counter.getLength("K_tl2");
+        h1 = counter.getLength("K_h1") * cm;
+        h2 = counter.getLength("K_h2") * cm;
+        bl1 = counter.getLength("K_bl1") * cm;
+        bl2 = counter.getLength("K_bl2") * cm;
+        tl1 = counter.getLength("K_tl1") * cm;
+        tl2 = counter.getLength("K_tl2") * cm;
         alpha1 = counter.getAngle("K_alpha1");
         alpha2 = counter.getAngle("K_alpha2");
         Rphi1 = counter.getAngle("K_Rphi1") ;
         Rtheta = counter.getAngle("K_Ptheta") ;
         Rphi2 = counter.getAngle("K_Rphi2")  ;
-        Pr = counter.getLength("K_Pr");
+        Pr = counter.getLength("K_Pr") * cm;
         Ptheta = counter.getAngle("K_Ptheta") ;
         Pphi = counter.getAngle("K_Pphi") ;
         halflength = 15.0;

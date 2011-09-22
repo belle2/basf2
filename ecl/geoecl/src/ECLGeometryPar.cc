@@ -8,13 +8,12 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-//#include <framework/gearbox/Gearbox.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
-
-
+#include <framework/gearbox/Unit.h>
+#include <cmath>
+#include <boost/format.hpp>
 #include <ecl/geoecl/ECLGeometryPar.h>
-
 #include <cmath>
 #include <boost/format.hpp>
 #include <iostream>
@@ -67,8 +66,8 @@ void ECLGeometryPar::read()
     m_BLThetaCrystal[iBrCry-1] = layerContent.getAngle("K_z_TILTED") ;
     m_BLPhiCrystal[iBrCry-1] = layerContent.getAngle("K_phi_TILTED") ;
     m_BLPreppos[iBrCry-1] = layerContent.getLength("K_perpC") ;
-    m_BLPhipos[iBrCry-1] = layerContent.getAngle("K_phiC") ;
-    m_BLZpos[iBrCry-1] = layerContent.getLength("K_zC") ;
+    m_BLPhipos[iBrCry-1] = layerContent.getAngle("K_phiC") * 10; //cm->mm
+    m_BLZpos[iBrCry-1] = layerContent.getLength("K_zC") * 10 ;//cm->mm
   }
 
 
@@ -80,7 +79,7 @@ void ECLGeometryPar::read()
 
     m_ECThetaCrystal[iCry-1]  = counter.getAngle("K_Ptheta") ;
     m_ECPhiCrystal[iCry-1] = counter.getAngle("K_Rphi2")  ;
-    m_ECRpos[iCry-1]  = counter.getLength("K_Pr");
+    m_ECRpos[iCry-1]  = counter.getLength("K_Pr") * 10;//cm->mm
     m_ECThetapos[iCry-1]  = counter.getAngle("K_Ptheta") ;
     m_ECPhipos[iCry-1]  = counter.getAngle("K_Pphi") ;
   }

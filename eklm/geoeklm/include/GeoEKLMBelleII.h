@@ -103,9 +103,10 @@ namespace Belle2 {
     /**
      * createLayer - create layer
      * @iLayer: number of layer
+     * @iEndcap: number of endcap
      * @mpvgt: mother physical volume with global transformation
      */
-    void createLayer(int iLayer, G4PVPlacementGT *mpvgt);
+    void createLayer(int iLayer, int iEndcap, G4PVPlacementGT *mpvgt);
 
     /**
      * createSector - create sector
@@ -116,51 +117,51 @@ namespace Belle2 {
 
     /**
      * createSectorSupport - create sector support structure
-     * @mlv: mother logical volume
+     * @mpvgt: mother physical volume with global transformation
      */
-    void createSectorSupport(G4LogicalVolume *mlv);
+    void createSectorSupport(G4PVPlacementGT *mpvgt);
 
     /**
      * createSectorSupportInnerTube - create inner tube of sector
      * support structure
-     * @mlv: mother logical volume
+     * @mpvgt: mother physical volume with global transformation
      */
-    G4Tubs *createSectorSupportInnerTube(G4LogicalVolume *mlv);
+    G4Tubs *createSectorSupportInnerTube(G4PVPlacementGT *mpvgt);
 
     /**
      * createSectorSupportOuterTube - create outer tube of sector
      * support structure
-     * @mlv: mother logical volume
+     * @mpvgt: mother physical volume with global transformation
      */
-    G4Tubs *createSectorSupportOuterTube(G4LogicalVolume *mlv);
+    G4Tubs *createSectorSupportOuterTube(G4PVPlacementGT *mpvgt);
 
     /**
      * createSectorSuportBoxX - create X side of sector support structure
-     * @mlv: mother logical volume
+     * @mpvgt: mother physical volume with global transformation
      * @t: transformation (output)
      *
      * Sets t to the transformation of the box.
      */
-    G4Box *createSectorSupportBoxX(G4LogicalVolume *mlv, G4Transform3D &t);
+    G4Box *createSectorSupportBoxX(G4PVPlacementGT *mpvgt, G4Transform3D &t);
 
     /**
      * createSectorSuportBoxY - create Y side of sector support structure
-     * @mlv: mother logical volume
+     * @mpvgt: mother physical volume with global transformation
      * @t: transformation (output)
      *
      * Sets t to the transformation of the box.
      */
-    G4Box *createSectorSupportBoxY(G4LogicalVolume *mlv, G4Transform3D &t);
+    G4Box *createSectorSupportBoxY(G4PVPlacementGT *mpvgt, G4Transform3D &t);
 
     /**
      * createSectorSuportBoxTop - create box in the cutted corner of sector
      * support structure
-     * @mlv: mother logical volume
+     * @mpvgt: mother physical volume with global transformation
      * @t: transformation (output)
      *
      * Sets t to the transformation of the box.
      */
-    G4Box *createSectorSupportBoxTop(G4LogicalVolume *mlv, G4Transform3D &t);
+    G4Box *createSectorSupportBoxTop(G4PVPlacementGT *mpvgt, G4Transform3D &t);
 
     /**
      * createPlane - create plane
@@ -170,27 +171,38 @@ namespace Belle2 {
     void createPlane(int iPlane, G4PVPlacementGT *mpvgt);
 
     /**
-     * createStrip - create strip
-     * @iStrip: number of strip
-     * @iPlane: number of plane
+     * createSectionSupport - create section support
+     * @iSectionSupport: number of section support
      * @mpvgt: mother physical volume with global transformation
      */
-    void createStrip(int iStrip, int iPlane, G4PVPlacementGT *mpvgt);
+    void createSectionSupport(int iSectionSupport, G4PVPlacementGT *mpvgt);
 
     /**
-     * Air
+     * createStrip - create strip
+     * @iStrip: number of strip
+     * @mpvgt: mother physical volume with global transformation
+     */
+    void createStrip(int iStrip, G4PVPlacementGT *mpvgt);
+
+    /**
+     * Air.
      */
     G4Material *Air;
 
     /**
-     * Polystyrene
+     * Polystyrene.
      */
     G4Material *Polystyrene;
 
     /**
-     * Iron
+     * Iron.
      */
     G4Material *Iron;
+
+    /**
+     * Aluminium.
+     */
+    G4Material *Aluminium;
 
     /**
      * Number of layers.
@@ -206,6 +218,11 @@ namespace Belle2 {
      * Number of strips in one plane.
      */
     int nStrip;
+
+    /**
+     * Number of sections is one plane
+     */
+    int nSection;
 
     /**
      * Position data for endcaps.
@@ -252,6 +269,31 @@ namespace Belle2 {
      * Position data for planes.
      */
     struct EKLMElementPosition PlanePosition;
+
+    /**
+     * Position data for section support structure.
+     */
+    struct EKLMElementPosition *SectionSupportPosition;
+
+    /**
+     * Section support structure top box width.
+     */
+    double SectionSupportTopWidth;
+
+    /**
+     * Section support structure top box thickness.
+     */
+    double SectionSupportTopThickness;
+
+    /**
+     * Section support structure middle box width.
+     */
+    double SectionSupportMiddleWidth;
+
+    /**
+     * Section support structure middle box thickness.
+     */
+    double SectionSupportMiddleThickness;
 
     /**
      * Position data for strips.

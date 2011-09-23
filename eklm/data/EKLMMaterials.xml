@@ -22,4 +22,10 @@
 			<Material fraction="1.0">Fe</Material> 
 		</Components>
 	</Material>
+	<Material name="Aluminium">
+		<density unit="g/cm3">2.70</density>
+		<Components>
+			<Material fraction="1.0">Al</Material> 
+		</Components>
+	</Material>
 </Materials>

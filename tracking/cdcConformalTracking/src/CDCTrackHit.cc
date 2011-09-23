@@ -11,7 +11,7 @@
 #include "../include/CDCTrackHit.h"
 
 #include <tracking/cdcConformalTracking/AxialTrackFinder.h>
-#include <cdc/geocdc/CDCGeometryPar.h>
+#include <cdc/geometry/CDCGeometryPar.h>
 
 #include <cmath>
 #include <TMath.h>
@@ -29,20 +29,23 @@ CDCTrackHit::CDCTrackHit()
 CDCTrackHit::CDCTrackHit(CDCHit *hit, int index)
 {
 
-  cdcHit = hit;
   m_storeIndex = index;
   m_driftTime = hit->getDriftTime();
   m_charge = hit->getCharge();
 
   m_wireId = hit->getIWire();
-  // Change the variables saved within CDCHit to be compatible with the following pattern recognition steps, will be changed later to be consistent
-  m_superlayerId = hit ->getISuperLayer() + 1;
+
+  m_superlayerId = hit ->getISuperLayer();
+
+  // for the patter recognition it is nice to have a unique layerId, maybe one can change it later to avoid confusion
   if (hit->getISuperLayer() == 0)   m_layerId = hit->getILayer();
   else m_layerId = hit->getILayer() + hit->getISuperLayer() * 6 + 2 ;
 
-  if (m_superlayerId % 2 == 0) m_isAxial = false;
-  else m_isAxial = true ;
+  //set if the hit is axial or stereo
+  if (m_superlayerId % 2 == 0) m_isAxial = true;
+  else m_isAxial = false;
 
+  //set hit coordinates in normal space and conformal plane
   setWirePosition();
   ConformalTransformation();
 
@@ -64,7 +67,6 @@ void CDCTrackHit::setWirePosition()
   m_wirePosition.SetY((cdcg.wireForwardPosition(m_layerId, m_wireId).y() + cdcg.wireBackwardPosition(m_layerId, m_wireId).y()) / 2);
   m_wirePosition.SetZ((cdcg.wireForwardPosition(m_layerId, m_wireId).z() + cdcg.wireBackwardPosition(m_layerId, m_wireId).z()) / 2);
 
-
 }
 
 
@@ -79,18 +81,19 @@ void CDCTrackHit::ConformalTransformation()
 }
 
 
-void CDCTrackHit::addTrackIndex(int index)
+void CDCTrackHit::addTrackIndex(const int index)
 {
-
   m_TrackIndices.push_back(index);
 }
 
 
 double CDCTrackHit::getPhi() const
 {
+  //the phi angle of the hit depends on the definition, so I try to use the wireId instead
+  //however maybe this function might also be still useful...
   double phi = atan(m_wirePosition.y() / m_wirePosition.x());
 
-//distribute the phi values from 0 to 2pi
+  //distribute the phi values from 0 to 2pi
   if (m_wirePosition.x() >= 0 && m_wirePosition.y() >= 0) {
     phi = atan(m_wirePosition.y() / m_wirePosition.x());
   }
@@ -109,7 +112,7 @@ double CDCTrackHit::getPhi() const
 }
 
 
-void CDCTrackHit::shiftAlongZ(TVector3 trackDirection, CDCTrackHit trackHit)
+void CDCTrackHit::shiftAlongZ(const TVector3 trackDirection, const CDCTrackHit trackHit)
 {
 
   //Get the necessary position of the hit wire from CDCGeometryParameters
@@ -184,7 +187,7 @@ void CDCTrackHit::shiftAlongZ(TVector3 trackDirection, CDCTrackHit trackHit)
 
   }
 
-//assign the new better wire point as hit position
+  //assign the new better wire point as hit position
   double x = forwardWirePoint.x() +  parameter[bestIndex] * wireVector.x();
   double y = forwardWirePoint.y() +  parameter[bestIndex] * wireVector.y();
   double z = forwardWirePoint.z() +  parameter[bestIndex] * wireVector.z();
@@ -201,7 +204,43 @@ void CDCTrackHit::shiftAlongZ(TVector3 trackDirection, CDCTrackHit trackHit)
 
 }
 
+void CDCTrackHit::setTempCellState(const int tempCellState)
+{
+  m_tempCellState = tempCellState;
+}
+
+void CDCTrackHit::updateCellState()
+{
+  m_cellState = m_tempCellState;
+}
 
 
+void CDCTrackHit::setSegmentId(const int segmentId)
+{
+  bool already = false ;
+  //check if there is already the same Id
+  //only add the new value if it is not already there
+  for (unsigned int i = 0; i < m_segmentIds.size(); i++) {
+    if (segmentId == m_segmentIds.at(i)) {
+      already = true;
+    }
+  }
+  if (already == false) {
+    m_segmentIds.push_back(segmentId);
+  }
+}
+
+void CDCTrackHit::setSegmentIds(const vector<int> segmentIds)
+{
+
+  for (unsigned int i = 0; i < segmentIds.size(); i++) {
+    setSegmentId(segmentIds.at(i));
+  }
+}
+
+void CDCTrackHit::clearSegmentIds()
+{
+  m_segmentIds.erase(m_segmentIds.begin(), m_segmentIds.end());
+}
 
 

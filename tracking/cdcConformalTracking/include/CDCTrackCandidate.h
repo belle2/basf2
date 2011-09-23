@@ -28,12 +28,12 @@ namespace Belle2 {
     /** Constructor.
      * Creates a new track with an Id.
      */
-    CDCTrackCandidate(int Id);
+    CDCTrackCandidate(const int Id);
 
     /** Copy Constructor.
      * Creates a new track from a copy of another track and a new Id.
      */
-    CDCTrackCandidate(CDCTrackCandidate &candidate, int Id);
+    CDCTrackCandidate(CDCTrackCandidate &candidate, const int Id);
 
     /** Destructor. */
     ~CDCTrackCandidate();
@@ -44,13 +44,13 @@ namespace Belle2 {
     void addSegment(CDCSegment & aSegment);
 
     /**Removes a segment with a given Id from the track. */
-    void removeSegment(int Id);
+    void removeSegment(const int Id);
 
     /** Sets a Chi2 value to describe the quality of the TrackCandidate. */
-    void setChiSquare(double chi2);
+    void setChiSquare(const double chi2);
 
-    /** Sets an absolute value of the momentum of the TrackCandidate. */
-    void setMomentumValue(double momentum);
+    /** Sets the transverse momentum of the TrackCandidate. */
+    void setPt(const double momentum);
 
     /** Sets and updates some member variables of the TrackCandidate.
      * This method is executed every time a new Segment is added to the TrackCandidate.
@@ -66,7 +66,7 @@ namespace Belle2 {
     void estimateMomentum();
 
     /** Sets the charge of the track. */
-    void setChargeSign(int sign);
+    void setChargeSign(const int sign);
 
     /** Returns the Id of the TrackCandidate. */
     int getId() const {return m_Id;};
@@ -100,46 +100,17 @@ namespace Belle2 {
     /** Returns the outermost axial segment (farthest to the origin) of the TrackCandidate. */
     CDCSegment getOuterMostSegment() const {return m_outerMostSegment;};
 
-    /** Returns a Chi2 value of the TrackCandidate. */
+    /** Returns a Chi2 value of the TrackCandidate calculated from a linear fit in the conformal plane. */
     double getChiSquare() const {return m_chi2;};
 
-    /** Returns the absolute value of the momentum of the TrackCandidate. */
-    double getMomentumValue() {return m_momentumValue;}
+    /** Returns the transverse momentum of the TrackCandidate. */
+    double getPt() const {return m_pt;}
 
     /** Returns the momentum vector of the TrackCandidate. */
-    TVector3 getMomentumVector() {return m_momentumVector;}
+    TVector3 getMomentum() const {return m_momentum;}
 
     /** Returns the estimated charge of the track . */
-    int getChargeSign() { return m_chargeSign; }
-
-    // The following methods are used to match the CDCTrackCandidate with MCParticles
-
-    /** Adds an MCParticle to the collection of MCParticles which produced the Hits of this TrackCandidate.
-     *  The Id of the MCParticle is added to the m_mcParticles vector.
-     *  If this MCParticle has already contributed to this TrackCandidate, the corresponding number of Hits is augmented by 1.
-     */
-    void addMCParticle(int id);
-
-    /** Matches the TrackCandidate with an MCParticle.
-     *  This method selects the largest contribution in m_mcParticle and assigns the Id of the matched MCParticle and the purity of the TrackCandidate.
-     */
-    void evaluateMC();
-
-    /** Returns a vector of pairs: MCParticleId & Number of Hits produced by this MCParticle. */
-    std::vector<std::pair<int, int> > getMCParticles() { return m_mcParticles; }
-
-    /** Returns the Id of the MCParticle matched to this TrackCandidate. */
-    int getMCId() { return m_mcId; }
-
-    /** Returns the purity of this TrackCandidate.
-     *  Purity means in this case: number of Hits contributed by the matched MCParticle/total number of Hits * 100 .
-     */
-    double getPurity() { return m_purity; }
-
-    /** Returns the contribution of the given MCParticle to this TrackCandidate.
-     *  Return value is: number of Hits contributed by the given MCParticle/total number of Hits * 100 .
-     */
-    double getRatioForMCP(int mcId);
+    int getChargeSign() const { return m_chargeSign; }
 
 
   private:
@@ -158,19 +129,12 @@ namespace Belle2 {
     CDCSegment m_innerMostSegment;          /**< Innermost (closest to the origin) segment of the TrackCandidate */
     CDCSegment m_outerMostSegment;          /**< Outermost (farthest to the origin) segment of the TrackCandidate */
 
-    double m_chi2;                          /**< Chi2 value to describe the quality of the TrackCandidate */
+    double m_chi2;                          /**< Chi2 value from linear fit in the conformal plane to describe the quality of the TrackCandidate */
 
-    double m_momentumValue;                 /**< Absolute momentum value of the TrackCandidate */
-    TVector3 m_momentumVector;              /**< 3D momentum vector of the TrackCandidate */
+    double m_pt;                            /**< Transvers momentum of the TrackCandidate */
+    TVector3 m_momentum;                    /**< 3D momentum vector of the TrackCandidate */
 
     int m_chargeSign;                       /**< Charge of the TrackCandidate. (+1 or -1)*/
-
-    //The following member variables are used to match the CDCTrackCandidate with MCParticles
-
-    std:: vector <std::pair<int, int> > m_mcParticles;  /**< vector to store pairs <MCParticleId, Number of Hits from this MCParticle> */
-    int m_mcId;                                         /**< Id of the MCParticle matched to this TrackCandidate */
-    double m_purity;                                    /**< Purity of this TrackCandidate: contribution from the matched MCParticle */
-
 
     /** ROOT ClassDef macro to make this class a ROOT class.*/
     ClassDef(CDCTrackCandidate, 1);

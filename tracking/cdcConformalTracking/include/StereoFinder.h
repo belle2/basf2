@@ -36,18 +36,23 @@ namespace Belle2 {
      */
     static double ShortestDistance(CDCTrackCandidate track, CDCSegment segment);
 
+    /** This method calculates the 'wire distance' between a track and a segment.
+     *  The difference between the WireIds of the outermost hit in the track and the outermost hit in the segment is calculated.
+     */
+    static int WireIdDifference(CDCTrackCandidate track, CDCSegment segment);
+
     /**Function to check if there are more than one segment from one superlayer in this track candidate.
      * With the given track candidate and the index of a segment, it is checked if there are other segments with the same superlayer in this track candidate.
      * Returns false is the given segment is the only one. Returns true if there is more than one.
      */
-    static bool SegmentFromOvercrowdedSL(CDCTrackCandidate track, int SegmentIndex) ;
+    static bool OvercrowdedSuperlayer(CDCTrackCandidate track, int SLId);
 
-    /**Fits a track candidate and removes bad segments (this method is still under developement...).
-     * Performs a simple straight line fit in the conformal plane and a straight line fit in the r z plane.
-     * In the case of bad Chi2, the distance between the segments and the fit line is checked.
-     * If this distance is above a given cut, the segment is removed and the candidate is refitted.
+    /** Method to check if there are more than one segment per superlayer.
+     *  Superlayer with more the one segment are considered and the competing segments are compared to each other.
+     *  The 'best matching' segment is chosen and the other segments are removed (!) from candidate.
      */
-    static void StereoFitCandidates(CDCTrackCandidate & candidate);
+
+    static void CheckOvercrowdedSL(CDCTrackCandidate & axialCandidate, CDCTrackCandidate & stereoCandidate);
 
     /**Searches for matching stereo segments for the given track candidate.
      * First parameter: track candidate
@@ -64,10 +69,9 @@ namespace Belle2 {
      * For each superlayer the possible track candidates are found (FindStereoSegments).
      * In the next step the segment coordinates are moved (shiftAlongZ) according to the direction information of the track candidate they may belong to.
      * After the 'best matching' coordinates are found, the segments have to pass another more strict cut to be assigned to the track candidate.
-     * At the end the (stereo) candidates are fittet and segments too far away from the fit line are removed.
+     * At the end the superlayers are checked to have only one segment, the best one is selected and the others are removed.
      */
     static void AppendStereoSegments(std::vector<CDCSegment> & cdcStereoSegments, std::string CDCTrackCandidates);
-
 
   private:
 

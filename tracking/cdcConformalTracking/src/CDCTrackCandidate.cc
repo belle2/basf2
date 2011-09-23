@@ -21,7 +21,7 @@ CDCTrackCandidate::CDCTrackCandidate()
 {
 }
 
-CDCTrackCandidate::CDCTrackCandidate(int Id)
+CDCTrackCandidate::CDCTrackCandidate(const int Id)
 {
   m_Id = Id;
 
@@ -32,12 +32,15 @@ CDCTrackCandidate::CDCTrackCandidate(int Id)
   m_direction.SetY(0);
   m_direction.SetZ(0);
   m_chi2 = 0;
-  m_momentumValue = 0;
+  m_pt = 0;
+  m_momentum.SetX(0);
+  m_momentum.SetY(0);
+  m_momentum.SetZ(0);
   m_chargeSign = 0;
 
 }
 
-CDCTrackCandidate::CDCTrackCandidate(CDCTrackCandidate &candidate, int Id)
+CDCTrackCandidate::CDCTrackCandidate(CDCTrackCandidate &candidate, const int Id)
 {
 
   m_Id = Id;
@@ -55,10 +58,9 @@ CDCTrackCandidate::CDCTrackCandidate(CDCTrackCandidate &candidate, int Id)
   m_outerMostSegment = candidate.getOuterMostSegment();
 
   m_chi2 = candidate.getChiSquare();
-  m_momentumValue = candidate.getMomentumValue();
+  m_pt = candidate.getPt();
+  m_momentum = candidate.getMomentum();
   m_chargeSign = candidate.getChargeSign();
-
-  m_mcParticles = candidate.getMCParticles();
 
 }
 
@@ -75,7 +77,7 @@ void CDCTrackCandidate::addSegment(CDCSegment & aSegment)
   update();
 }
 
-void CDCTrackCandidate::removeSegment(int Id)
+void CDCTrackCandidate::removeSegment(const int Id)
 {
 
   for (int i = 0; i < m_nSegments; i++) {
@@ -87,14 +89,14 @@ void CDCTrackCandidate::removeSegment(int Id)
   }
 }
 
-void CDCTrackCandidate::setChiSquare(double chi2)
+void CDCTrackCandidate::setChiSquare(const double chi2)
 {
   m_chi2 = chi2;
 }
 
-void CDCTrackCandidate::setMomentumValue(double momentum)
+void CDCTrackCandidate::setPt(const double momentum)
 {
-  m_momentumValue = momentum;
+  m_pt = momentum;
 }
 
 
@@ -103,7 +105,7 @@ void CDCTrackCandidate::update()
   m_nSegments = m_Segments.size();
   m_nHits = m_TrackHits.size();
 
-//Calculate the direction from the directions of axial segments
+  //Calculate the direction from the directions of axial segments
   for (int i = 0; i < m_nSegments; i++) {
     if (m_Segments.at(i).getIsAxial() == true) {
       m_direction = m_direction + m_Segments.at(i).getDirection();
@@ -114,7 +116,7 @@ void CDCTrackCandidate::update()
   //m_direction.SetY( m_direction.y()/norm);
   //m_direction.SetZ( m_direction.z()/norm);
 
-//Assign correct innermost and outermost hits
+  //Assign correct innermost and outermost hits
   int min = 10;
   int max = 0;
   int max_index = 0;
@@ -133,7 +135,7 @@ void CDCTrackCandidate::update()
   m_innerMostHit = m_TrackHits.at(min_index);
   m_outerMostHit = m_TrackHits.at(max_index);
 
-//Assign correct innermost and outermost segments
+  //Assign correct innermost and outermost segments
   int minSL = 10;
   int maxSL = 0;
   int max_indexSeg = 0;
@@ -156,95 +158,123 @@ void CDCTrackCandidate::update()
 
 void CDCTrackCandidate::estimateMomentum()
 {
+  //this method is still not quite finished as there are several possibilities to estimate the momentum
+  //the original goal was to have a simple estimation which it good enough for the fit
 
-  //Find the innermost *stereo* segment
-  int minSL = 10;
-  int min_index = 0;
+  //the innermost *stereo* segment
+  int minStereoSL = 10;
+  int minStereoIndex = 0;
+
+  //the second innermost *stereo* segment
+  int secondMinStereoSL = 10;
+  int secondMinStereoIndex = 0;
+
+  //the innermost *axial* segment
+  int minAxialSL = 10;
+  int minAxialIndex = 0;
 
   for (int i = 0; i < m_nSegments; i++) {
-    if (m_Segments.at(i).getSuperlayerId() < minSL && m_Segments.at(i).getIsAxial() == false) {
-      minSL = m_Segments.at(i).getSuperlayerId() ;
-      min_index = i;
+    if (m_Segments.at(i).getSuperlayerId() < minStereoSL && m_Segments.at(i).getIsAxial() == false) {  //innermost stereo segment
+      minStereoSL = m_Segments.at(i).getSuperlayerId() ;
+      minStereoIndex = i;
+    }
+    if (m_Segments.at(i).getSuperlayerId() < minAxialSL && m_Segments.at(i).getIsAxial() == true) { //innermost axial segment
+      minAxialSL = m_Segments.at(i).getSuperlayerId() ;
+      minAxialIndex = i;
     }
   }
-  //The coordinates of the innermost stereo hit build the momentum vector (0,0,0 supposed to be the starting point of the track)
-  double x = m_Segments.at(min_index).getInnerMostHit().getWirePosition().x();
-  double y = m_Segments.at(min_index).getInnerMostHit().getWirePosition().y();
-  double z = m_Segments.at(min_index).getInnerMostHit().getWirePosition().z();
-  double norm = sqrt(x * x + y * y + z * z);
+  for (int i = 0; i < m_nSegments; i++) {
+    if (m_Segments.at(i).getSuperlayerId() < secondMinStereoSL && m_Segments.at(i).getSuperlayerId() > minStereoSL && m_Segments.at(i).getIsAxial() == false) {  //second innermost stereo layer
+      secondMinStereoSL = m_Segments.at(i).getSuperlayerId() ;
+      secondMinStereoIndex = i;
+    }
+  }
 
-  m_momentumVector.SetX((x / norm)*m_momentumValue);
-  m_momentumVector.SetY((y / norm)*m_momentumValue);
-  m_momentumVector.SetZ((z / norm)*m_momentumValue);
+  //B2INFO("First stereo segment in SL "<<minStereoSL);
+  //B2INFO("Second stereo segment in SL "<<secondMinStereoSL);
+
+  //coordinates of the innermost stereo hit
+  double x_stIn = m_Segments.at(minStereoIndex).getInnerMostHit().getWirePosition().x();
+  double y_stIn = m_Segments.at(minStereoIndex).getInnerMostHit().getWirePosition().y();
+  double z_stIn = m_Segments.at(minStereoIndex).getInnerMostHit().getWirePosition().z();
+
+  //coordinates of the outermost hit in the innermost stereo segment
+  double x_stOut = m_Segments.at(minStereoIndex).getOuterMostHit().getWirePosition().x();
+  double y_stOut = m_Segments.at(minStereoIndex).getOuterMostHit().getWirePosition().y();
+  double z_stOut = m_Segments.at(minStereoIndex).getOuterMostHit().getWirePosition().z();
+
+  //B2INFO("Z direction of the innermost stereo hit "<<z_stIn/(sqrt(x_stIn*x_stIn+y_stIn*y_stIn+z_stIn*z_stIn)));
+  //B2INFO("Z direction of the outermost hit in the innermost stereo segment "<<z_stOut/(sqrt(x_stOut*x_stOut+y_stOut*y_stOut+z_stOut*z_stOut)));
+
+  //B2INFO("Coordinates of the innermost axial hit: "<<m_Segments.at(minAxialIndex).getInnerMostHit().getWirePosition().x()<<"  "<<m_Segments.at(minAxialIndex).getInnerMostHit().getWirePosition().y()<<"  "<<m_Segments.at(minAxialIndex).getInnerMostHit().getWirePosition().z());
+  //B2INFO("Coordinates of the outermost hit in the innermost axial segment: "<<m_Segments.at(minAxialIndex).getOuterMostHit().getWirePosition().x()<<"  "<<m_Segments.at(minAxialIndex).getOuterMostHit().getWirePosition().y()<<"  "<<m_Segments.at(minAxialIndex).getOuterMostHit().getWirePosition().z());
+
+
+  //coordinates of the innermost hit in the second innermost stereo segment
+  double x_st2In = m_Segments.at(secondMinStereoIndex).getInnerMostHit().getWirePosition().x();
+  double y_st2In = m_Segments.at(secondMinStereoIndex).getInnerMostHit().getWirePosition().y();
+  double z_st2In = m_Segments.at(secondMinStereoIndex).getInnerMostHit().getWirePosition().z();
+
+  //coordinates of the outermost hit in the second innermost stereo segment
+  double x_st2Out = m_Segments.at(minStereoIndex).getOuterMostHit().getWirePosition().x();
+  double y_st2Out = m_Segments.at(minStereoIndex).getOuterMostHit().getWirePosition().y();
+  double z_st2Out = m_Segments.at(minStereoIndex).getOuterMostHit().getWirePosition().z();
+
+  //B2INFO("Z direction of the innermost hit in the second innermost stereo segment "<<z_st2In/(sqrt(x_st2In*x_st2In+y_st2In*y_st2In+z_st2In*z_st2In)));
+  //B2INFO("Z direction of the outermost hit in the second innermost stereo segment "<<z_st2Out/(sqrt(x_st2Out*x_st2Out+y_st2Out*y_st2Out+z_st2Out*z_st2Out)));
+
+  //Px and Py are estimated from the innermost of the innermost axial segment
+  //the absolute values are weighted with the pt estimated from the whole track in the AxialTrackFinder
+  double ptNorm = sqrt((m_Segments.at(minAxialIndex).getInnerMostHit().getWirePosition().x()) * (m_Segments.at(minAxialIndex).getInnerMostHit().getWirePosition().x()) + (m_Segments.at(minAxialIndex).getInnerMostHit().getWirePosition().y()) * (m_Segments.at(minAxialIndex).getInnerMostHit().getWirePosition().y()));
+
+  double momentumX = (m_Segments.at(minAxialIndex).getInnerMostHit().getWirePosition().x()) / ptNorm * m_pt;
+  double momentumY = (m_Segments.at(minAxialIndex).getInnerMostHit().getWirePosition().y()) / ptNorm * m_pt;
+
+  double momentumZ;
+
+  //the estimation of the z momentum component needs a more elaborate approach...
+  //at the moment it seems that it make a difference using the innermost stereo segment or the second innermost
+  //so this part is still under developement...
+
+  double tempz;
+  double tempx;
+  double tempy;
+  double znorm;
+  double norm;
+
+  if (m_chargeSign >= 0) {
+    tempz = (z_st2In + z_st2Out) / 2;
+    tempx = (x_st2In + x_st2Out) / 2;
+    tempy = (y_st2In + y_st2Out) / 2;
+    znorm = sqrt(tempx * tempx + tempy * tempy);
+    norm = sqrt(tempx * tempx + tempy * tempy + tempz * tempz);
+    //B2INFO("Tempz/norm: "<<tempz/norm);
+    //momentumZ = tempz/znorm * m_pt;
+    momentumZ = tempz / norm;
+  } else {
+    tempz = (z_stIn + z_stOut) / 2;
+    tempx = (x_stIn + x_stOut) / 2;
+    tempy = (y_stIn + y_stOut) / 2;
+    znorm = sqrt(tempx * tempx + tempy * tempy);
+    norm = sqrt(tempx * tempx + tempy * tempy + tempz * tempz);
+    //B2INFO("Tempz/norm: "<<tempz/norm);
+    //momentumZ = tempz/znorm * m_pt;
+    momentumZ = tempz / norm;
+  }
+
+  m_momentum.SetX(momentumX);
+  m_momentum.SetY(momentumY);
+  m_momentum.SetZ(momentumZ);
+
+
+//B2INFO("Estimated momentum: "<<momentumX<<"  "<<momentumY<<"  "<<momentumZ);
+
+
 }
 
-void CDCTrackCandidate::setChargeSign(int sign)
+void CDCTrackCandidate::setChargeSign(const int sign)
 {
-
   m_chargeSign = sign;
-
 }
-
-void CDCTrackCandidate::addMCParticle(int Id)
-{
-
-  bool already = false;
-  for (unsigned int i = 0; i < m_mcParticles.size(); i++) { //loop over mcParticles which are already there
-
-    if (m_mcParticles.at(i).first == Id) { //if there is already an entry for this mcParticleId
-      m_mcParticles.at(i).second = m_mcParticles.at(i).second + 1;  //increase the number of hits from this mcParticle by 1
-      already = true;
-    }
-  }// end loop over mcParticles
-
-  if (already == false) {                 //if this is the first entry for thi mcParticleId, create new entry
-    pair <int, int> newEntry(Id, 1);
-    m_mcParticles.push_back(newEntry);
-  }
-}
-
-void CDCTrackCandidate::evaluateMC()
-{
-
-  double max = 0;     //variable to mark the highest number of hits
-  int indexMax = 0;   //variable to mart the index of the mcParticle which contributed the highest number of hits
-
-  //Search for maximum
-  for (unsigned int i = 0; i < m_mcParticles.size(); i++) {
-    if (m_mcParticles.at(i).second > max) {
-      max = m_mcParticles.at(i).second;
-      indexMax = i;
-    }
-  }
-
-  //Assign results
-  double fraction = double(max) / double(m_nHits) * 100;
-  m_purity = fraction;
-  m_mcId = m_mcParticles.at(indexMax).first;
-
-}
-
-double CDCTrackCandidate::getRatioForMCP(int mcId)
-{
-
-  double nHits = 0;
-
-  //Search for number of Hits contributed by this mcParticleId
-  for (unsigned int i = 0; i < m_mcParticles.size(); i++) {
-    if (m_mcParticles.at(i).first == mcId) {
-      nHits = m_mcParticles.at(i).second;
-    }
-  }
-
-  double fraction = double(nHits) / double(m_nHits) * 100;
-
-  return fraction;
-
-}
-
-
-
-
-
 
 

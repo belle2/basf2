@@ -12,6 +12,7 @@
 
 #include <tracking/cdcConformalTracking/AxialTrackFinder.h>
 
+#include <cdc/geometry/CDCGeometryPar.h>
 #include <cmath>
 #include <cstdlib>
 
@@ -35,26 +36,17 @@ CDCSegment::CDCSegment(int superlayerId, int Id)
   m_Id = Id;
 
   if (m_superlayerId % 2 == 0) {
-    m_isAxial = false;
-  } else {
     m_isAxial = true;
+  } else {
+    m_isAxial = false;
   }
 
 //Set some start values
   m_nHits = 0;
-  m_isUsed = false;
-  m_isGood = true;
 
   m_direction.SetX(0);
   m_direction.SetY(0);
   m_direction.SetZ(0);
-
-  //-------------------------------
-  //m_chi2 = 0;
-  //m_tempCellState = 1;
-  //m_cellState = 1;
-  //-------------------------------
-
 }
 
 void CDCSegment::addTrackHit(CDCTrackHit &aTrackHit)
@@ -63,19 +55,7 @@ void CDCSegment::addTrackHit(CDCTrackHit &aTrackHit)
   update();
 }
 
-void CDCSegment::setIsGood(bool isGood) {m_isGood = isGood;}
-
-void CDCSegment::setIsUsed(bool isUsed)
-{
-
-  m_isUsed = isUsed;
-
-// for (int i = 0; i < m_nHits; i++) {
-//   m_TrackHits[i].setIsUsed(isUsed);
-// }
-}
-
-void CDCSegment::setTrackCandId(int trackId)
+void CDCSegment::setTrackCandId(const int trackId)
 {
   bool already = false ;
   //check if there is already the same Id
@@ -90,7 +70,7 @@ void CDCSegment::setTrackCandId(int trackId)
   }
 }
 
-void CDCSegment::setTrackCandId(vector<int> trackId)
+void CDCSegment::setTrackCandId(const vector<int> trackId)
 {
 
   for (unsigned int i = 0; i < trackId.size(); i++) {
@@ -168,61 +148,42 @@ void CDCSegment::update()
   m_direction.SetY(innerY - outerY);
   m_direction.SetZ(0);  //conformal plane
 
-  //double norm = m_direction.Mag();
-
 }
 
-int CDCSegment::getWireIdDiff()
+int CDCSegment::getWireIdDiff() const
 {
+
+  CDCGeometryPar * cdcgp = CDCGeometryPar::Instance();
+  CDCGeometryPar & cdcg(*cdcgp);
 
   int minWireId = 1000;
   int maxWireId = 0;
-  //Number of wires per layer, hardcoded for now, has to come from the cdc database later
-  int NWires[10];
-  NWires[0] = 0;
-  NWires[1] = 160;
-  NWires[2] = 160;
-  NWires[3] = 192;
-  NWires[4] = 224;
-  NWires[5] = 256;
-  NWires[6] = 288;
-  NWires[7] = 320;
-  NWires[8] = 352;
-  NWires[9] = 384;
+  int layerId = 0;
 
   //Loop over all hits searching for minimal and maximal WireId
   for (int i = 0; i < m_nHits; i++) {
-    if (m_TrackHits.at(i).getWireId() < minWireId) minWireId = m_TrackHits.at(i).getWireId();
-    if (m_TrackHits.at(i).getWireId() > maxWireId) maxWireId = m_TrackHits.at(i).getWireId();
+    if (m_TrackHits.at(i).getWireId() < minWireId) {
+      minWireId = m_TrackHits.at(i).getWireId();
+      layerId = m_TrackHits.at(i).getLayerId();
+    }
+    if (m_TrackHits.at(i).getWireId() > maxWireId)
+      maxWireId = m_TrackHits.at(i).getWireId();
+  }
+  //calculate wireId difference
+  unsigned int wireIdDifference = abs(maxWireId - minWireId);
+
+  //for the case that the wireIdDifference is 'crossing 0' (e.g. first WireId 1 and second WireId 300, the difference is not 299), some modification is needed
+  if (wireIdDifference > cdcg.nWiresInLayer(layerId) / 2) {
+    wireIdDifference = cdcg.nWiresInLayer(layerId) - wireIdDifference;
   }
 
-  //if the segment is 'crossing' WireId = 0, some recalculation is needed to get the correct difference
-  if (minWireId < 10 && maxWireId > (NWires[m_superlayerId] - 10)) {
-    minWireId = 1000;
-    maxWireId = 0;
-
-    for (int i = 0; i < m_nHits; i++) { //loop again over all hits
-      //if there is a WireId below 10, shift the values by the total number of wires in this layer
-      if (m_TrackHits.at(i).getWireId() < 10) {
-
-        if ((m_TrackHits.at(i).getWireId() + NWires[m_superlayerId]) < minWireId) minWireId = m_TrackHits.at(i).getWireId() + NWires[m_superlayerId];
-        if ((m_TrackHits.at(i).getWireId() + NWires[m_superlayerId]) > maxWireId) maxWireId = m_TrackHits.at(i).getWireId() + NWires[m_superlayerId];
-      } else {
-
-        if (m_TrackHits.at(i).getWireId() < minWireId) minWireId = m_TrackHits.at(i).getWireId();
-        if (m_TrackHits.at(i).getWireId() > maxWireId) maxWireId = m_TrackHits.at(i).getWireId();
-      }
-    }//end loop over all hits
-
-  }// endif the segment is 'crossing' WireId = 0
-
-  return abs(maxWireId - minWireId);
+  return wireIdDifference;
 }
 
 
 
 
-float CDCSegment::getCenterPosR()
+float CDCSegment::getCenterPosR() const
 {
 
   float average = 0;
@@ -237,7 +198,7 @@ float CDCSegment::getCenterPosR()
 
 }
 
-float CDCSegment::getCenterPosZ()
+float CDCSegment::getCenterPosZ() const
 {
 
   float average = 0;
@@ -251,32 +212,6 @@ float CDCSegment::getCenterPosZ()
   return average;
 
 }
-
-//Methods for segment fitting
-//-----------------------------------------------------
-/*void CDCSegment::setChiSquare(double chi2)
-{
-  m_chi2 = chi2;
-}
-
-void CDCSegment::removeTrackHit(int index){
-  m_TrackHits.erase(m_TrackHits.begin()+index);
-  update();
-}*/
-//------------------------------------------------------
-
-//Methods for CellularAxialTrackFinder
-//------------------------------------------------------
-/*
-void CDCSegment::setTempCellState(int tempCellState){
-  m_tempCellState = tempCellState;
-}
-
-void CDCSegment::updateCellState(){
-  m_cellState = m_tempCellState;
-}
-*/
-//------------------------------------------------------
 
 
 

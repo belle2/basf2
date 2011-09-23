@@ -19,7 +19,7 @@
 
 namespace Belle2 {
 
-  /** Class for CDC tracklets ('connected' hits from one superlayer). */
+  /** Class for CDC tracklets (hits from one superlayer belonging to the same track). */
   class CDCSegment : public TObject {
   public:
 
@@ -32,20 +32,14 @@ namespace Belle2 {
     /** Destructor. */
     ~CDCSegment();
 
-    /** Adds a reference of a TrackHit object to the segment. */
+    /** Adds a reference(!) of a TrackHit object to the segment. */
     void addTrackHit(CDCTrackHit & aTrackHit);
 
-    /** Sets the boolean to classify the segment. */
-    void setIsGood(bool isGood);
-
-    /** Sets the boolean to classify the segment as used. */
-    void setIsUsed(bool isUsed);
-
     /** Adds an Id of a track candidate to which this segment may belong. */
-    void setTrackCandId(int trackId);
+    void setTrackCandId(const int trackId);
 
     /** Adds several Ids of track candidates to which this segment may belong. */
-    void setTrackCandId(std::vector<int> trackId);
+    void setTrackCandId(const std::vector<int> trackId);
 
     /** Clears/Erases all stored Ids of track candidates. */
     void clearTrackCandId();
@@ -65,17 +59,11 @@ namespace Belle2 {
     /** Returns number of TrackHit objects in the segment. */
     int getNHits() const {return m_nHits;};
 
-    /** Is true if the segment is classified as good. */
-    bool getIsGood() const {return m_isGood;};
-
-    /** Is true if the segment was already assigned to a track. */
-    bool getIsUsed() const {return m_isUsed;};
-
     /** Is true if the segment belongs to an axial superlayer. */
     bool getIsAxial() const {return m_isAxial;};
 
     /** Return a vector with Ids of track candidates to which this segment may belong.  */
-    std::vector<int>getTrackCandId() {return m_trackCandId;};
+    std::vector<int>getTrackCandId() const {return m_trackCandId;};
 
     /** Returns a vector with TrackHits objects in the Segment.
      * This vector contains all Hits which build this Segment.
@@ -97,37 +85,14 @@ namespace Belle2 {
      *  The difference between the lowest and the highest wire Id in the segment is calculated.
      *  Some addition recalculations are performed if the segment is 'crossing' WireId = 0 to get the correct range.
      */
-    int getWireIdDiff();
+    int getWireIdDiff() const;
 
     /** Returns the average r-phi position of the segment. */
-    float getCenterPosR();
+    float getCenterPosR() const;
 
     /** Returns the average z position of the segment. */
-    float getCenterPosZ();
+    float getCenterPosZ() const;
 
-    //These methods are for segment fitting
-    //---------------------------------------------
-    /** Returns chi2 from a linear segment fit in the conformal plane. */
-    //void setChiSquare(double chi2);
-
-    /** Sets chi2 for the segment fit. */
-    //double getChiSquare() const {return m_chi2;};
-
-    /** Removes a TrackHit from the Segment based on a position of the TrackHit in the TrackHits vector. */
-    //  void removeTrackHit(int index);
-    //---------------------------------------------
-
-    //These methods are for CellularAxialTrackFinder
-    //---------------------------------------------
-    /** Sets a temporary cell state. */
-    //void setTempCellState(int tempCellState);
-
-    /** Sets the 'permanent' cell state to the currect temporary cell state. */
-    //void updateCellState();
-
-    /** Returns the 'permanent' cell state.*/
-    //int getCellState() {return m_cellState;};
-    //---------------------------------------------
 
   private:
 
@@ -135,28 +100,17 @@ namespace Belle2 {
     int m_Id;                              /**< Unique Id of the segment*/
 
     bool m_isAxial;                        /**< Boolean to mark a segment as belonging to an axial superlayer */
-    bool m_isGood;                         /**< classifies segment as 'good' or 'bad', only 'good' Segments are used in the first step of track reconstruction*/
-    bool m_isUsed;                         /**<Boolean to mark a segment as already used for reconstruction of a track candidate*/
 
-    int m_nHits;                           /**<Number of hits in the segment */
-    std::vector<CDCTrackHit> m_TrackHits;  /**< vector to store TrackHits belonging to this segment*/
+    int m_nHits;                           /**< Number of hits in the segment */
+    std::vector<CDCTrackHit> m_TrackHits;  /**< Vector to store TrackHits belonging to this segment*/
 
-    TVector3 m_direction;                  /**<Direction of the Segment in conformal plane */
+    TVector3 m_direction;                  /**< Direction of the Segment in conformal plane */
 
-    CDCTrackHit m_innerMostHit;            /**<Innermost (closest to the origin) hit of the segment*/
-    CDCTrackHit m_outerMostHit;            /**<Outermost (farthest to the origin) hit of the segment*/
+    CDCTrackHit m_innerMostHit;            /**< Innermost (closest to the origin) hit of the segment*/
+    CDCTrackHit m_outerMostHit;            /**< Outermost (farthest to the origin) hit of the segment*/
 
     std::vector<int> m_trackCandId;        /**< Vector to hold the Ids of track candidates to which this segment may belong */
 
-    //Variable for segment fitting
-    //--------------------------------------
-    //double m_chi2;
-    //----------------------------------------
-    //Variables for CellularAxialTrackFinder
-    //------------------------------------------
-    //int m_tempCellState;
-    //int m_cellState;
-    //---------------------------------------------
 
     //! ROOT ClassDef macro to make this class a ROOT class.
     ClassDef(CDCSegment, 1);

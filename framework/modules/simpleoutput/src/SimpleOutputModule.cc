@@ -30,7 +30,8 @@ REG_MODULE(SimpleOutput)
 //                 Implementation
 //-----------------------------------------------------------------
 
-SimpleOutputModule::SimpleOutputModule() : Module()
+SimpleOutputModule::SimpleOutputModule() : Module(), m_experiment(0), m_runLow(0), m_eventLow(0),
+    m_runHigh(0), m_eventHigh(0)
 {
   //Set module properties
   setDescription("simple output");
@@ -125,6 +126,11 @@ void SimpleOutputModule::initialize()
 void SimpleOutputModule::beginRun()
 {
   B2DEBUG(1, "beginRun called.");
+
+  StoreObjPtr<EventMetaData> eventMetaDataPtr;
+  if (m_experiment && (m_experiment != eventMetaDataPtr->getExperiment())) {
+    B2ERROR("The output file " << m_outputFileName << " contains more than one experiment.");
+  }
 }
 
 
@@ -151,6 +157,20 @@ void SimpleOutputModule::event()
   if (id && (m_parents.empty() || (m_parents.back() != id))) {
     m_parents.push_back(id);
   }
+
+  // keep track of file level metadata
+  StoreObjPtr<EventMetaData> eventMetaDataPtr;
+  if (!m_experiment) {
+    m_experiment = eventMetaDataPtr->getExperiment();
+  }
+  if (!m_runLow || (eventMetaDataPtr->getRun() < m_runLow) || ((eventMetaDataPtr->getRun() == m_runLow) && (eventMetaDataPtr->getEvent() < m_eventLow))) {
+    m_runLow = eventMetaDataPtr->getRun();
+    m_eventLow = eventMetaDataPtr->getEvent();
+  }
+  if (!m_runHigh || (eventMetaDataPtr->getRun() > m_runHigh) || ((eventMetaDataPtr->getRun() == m_runHigh) && (eventMetaDataPtr->getEvent() > m_eventHigh))) {
+    m_runHigh = eventMetaDataPtr->getRun();
+    m_eventHigh = eventMetaDataPtr->getEvent();
+  }
 }
 
 
@@ -171,27 +191,19 @@ void SimpleOutputModule::endRun()
 void SimpleOutputModule::terminate()
 {
   //get pointer to event and file level metadata
-  StoreObjPtr<EventMetaData> eventMetaDataPtr;
   StoreObjPtr<FileMetaData> fileMetaDataPtr("", DataStore::c_Persistent);
 
   if (m_treeNames[DataStore::c_Event] != "NONE") {
 
     //create an index for the event tree
     TTree* tree = m_tree[DataStore::c_Event];
-    int nEntries = tree->BuildIndex("1000000*EventMetaData.m_experiment+EventMetaData.m_run",
-                                    "EventMetaData.m_event");
-    TTreeIndex* index = (TTreeIndex*) tree->GetTreeIndex();
+    tree->BuildIndex("1000000*EventMetaData.m_experiment+EventMetaData.m_run", "EventMetaData.m_event");
 
     //fill the file level metadata
     fileMetaDataPtr->setEvents(tree->GetEntries());
-    tree->GetEntry(index->GetIndex()[0]);
-    fileMetaDataPtr->setExperiment(eventMetaDataPtr->getExperiment());
-    fileMetaDataPtr->setLow(eventMetaDataPtr->getRun(), eventMetaDataPtr->getEvent());
-    tree->GetEntry(index->GetIndex()[nEntries-1]);
-    if (fileMetaDataPtr->getExperiment() != eventMetaDataPtr->getExperiment()) {
-      B2ERROR("The output file " << m_outputFileName << " contains more than one experiment.");
-    }
-    fileMetaDataPtr->setHigh(eventMetaDataPtr->getRun(), eventMetaDataPtr->getEvent());
+    fileMetaDataPtr->setExperiment(m_experiment);
+    fileMetaDataPtr->setLow(m_runLow, m_eventLow);
+    fileMetaDataPtr->setHigh(m_runHigh, m_eventHigh);
   }
 
   //fill more file level metadata

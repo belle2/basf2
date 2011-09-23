@@ -202,6 +202,26 @@ namespace Belle2 {
 
     /** Vector of parent file IDs. */
     std::vector<int> m_parents;
+
+    /** Experiment number.
+     */
+    unsigned long m_experiment;
+
+    /** Lowest run number.
+     */
+    unsigned long m_runLow;
+
+    /** Lowest event number in lowest run.
+     */
+    unsigned long m_eventLow;
+
+    /** Highest run number.
+     */
+    unsigned long m_runHigh;
+
+    /** Highest event number in highest run.
+     */
+    unsigned long m_eventHigh;
   };
 
 } // end namespace Belle2

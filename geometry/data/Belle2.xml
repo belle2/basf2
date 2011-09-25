@@ -25,7 +25,7 @@
 
   <!-- Subdedectors -->
   <xi:include href="../ir/BeamPipe.xml"/>
-  <xi:include href="../ir/Cyrostat.xml"/>
+  <xi:include href="../ir/Cryostat.xml"/>
   <xi:include href="../ir/HeavyMetalShield.xml"/>
   <xi:include href="../pxd/PXD.xml"/>
   <xi:include href="../svd/SVD.xml"/>

@@ -3,6 +3,9 @@
   <Creator library="ir">BeamPipeCreator</Creator>
   <Content>
 
+    <Safety>
+        <L1 unit="cm">0.001</L1>
+    </Safety>
     <!-- ########## IP pipe ########## -->
     <Lv1SUS>
         <L1 unit="cm">0.3</L1>

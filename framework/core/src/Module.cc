@@ -12,6 +12,7 @@
 #include <boost/shared_ptr.hpp>
 
 #include <framework/core/Module.h>
+#include <framework/core/PyModule.h>
 #include <framework/core/ModuleManager.h>
 
 using namespace std;
@@ -188,8 +189,9 @@ void Module::exposePythonAPI()
   void (Module::*setConditionBool)(boost::shared_ptr<Path>) = &Module::setCondition;
 
   //Python class definition
-  class_<Module>("Module")
+  class_<Module, PyModule>("Module")
   .def("name", &Module::getName, return_value_policy<copy_const_reference>())
+  .def("setName", &PyModule::setName)
   .def("description", &Module::getDescription, return_value_policy<copy_const_reference>())
   .def("condition", setConditionString)
   .def("condition", setConditionBool)
@@ -204,6 +206,12 @@ void Module::exposePythonAPI()
   .def("set_debug_level", &Module::setDebugLevel)
   .def("set_abort_level", &Module::setAbortLevel)
   .def("set_log_info", &Module::setLogInfo)
+  //tell python about the default implementations of virtual functions
+  .def("initialize", &PyModule::def_initialize)
+  .def("beginRun", &PyModule::def_beginRun)
+  .def("event", &PyModule::def_event)
+  .def("endRun", &PyModule::def_endRun)
+  .def("terminate", &PyModule::def_terminate)
   ;
 
   register_ptr_to_python<ModulePtr>();

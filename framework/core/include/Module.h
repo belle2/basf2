@@ -327,10 +327,10 @@ namespace Belle2 {
      */
     void setReturnValue(bool value);
 
+    std::string m_name;           /**< The name of the module, saved as a string. */
 
   private:
 
-    std::string m_name;           /**< The name of the module, saved as a string. */
     std::string m_description;    /**< The description of the module. */
     unsigned int m_propertyFlags; /**< The properties of the module (Master, multi processing etc.) saved as bitwise flags. */
 

@@ -284,8 +284,8 @@ template <class T> bool Belle2::DataStore::handleArray(const std::string& name,
   } else {                                                      // "else" because otherwise storing without knowing type doesn't work.
     array = result.first->second;                               // This shall never be a NULL pointer at this point
     B2DEBUG(250, "If someone deleted a TClonesArray under name " << name << " and durability " << durability << ", a crash is coming.");
-    if (T::Class() != result.first->second->GetClass()) {       // TClonesArray in map slot is for different type than requested one
-      B2FATAL("Existing array is for different type than requested one. Name was: " <<  name << " EDurability was " << durability);
+    if (!result.first->second->GetClass()->InheritsFrom(T::Class())) {      // TClonesArray in map slot is for different type than requested one
+      B2FATAL("Requested array type is not a base class of the existing array. Name was: " <<  name << " EDurability was " << durability);
     }
   }
 

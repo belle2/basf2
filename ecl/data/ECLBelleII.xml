@@ -3,6 +3,7 @@
    <Creator library="ecl">ECLCreator</Creator>
 	<Content>
          <CsI>CsI</CsI>
+         <Si>Si</Si>
 	 <k_fin_thickness unit="cm">0.05</k_fin_thickness>
          <k_wrap_thickness unit="cm">0.025</k_wrap_thickness>
          <k_barrel_Nblock>72</k_barrel_Nblock>
@@ -18,6 +19,10 @@
          <k_backwZfar unit="cm">131.42</k_backwZfar>
          <k_backRout_ang  unit="deg">31.62</k_backRout_ang>
          <k_backRin_ang   unit="deg">12.398</k_backRin_ang>
+         <k_diodewidth   unit="cm">2.0</k_diodewidth>
+         <k_diodelength   unit="cm">2.0</k_diodelength>
+         <k_diodeheight   unit="cm">0.1</k_diodeheight>
+
 
          <BarrelCrystals>
             <BarrelCrystal id="1">

@@ -7,4 +7,10 @@
        <Element fraction="0.5115">I</Element>
     </Components>
   </Material>
+  <Material name="Si">
+     <density unit="g/cm3">2.3290</density>
+     <Components>
+        <Element fraction="1.0">Si</Element>
+     </Components>
+   </Material>
 </Materials>

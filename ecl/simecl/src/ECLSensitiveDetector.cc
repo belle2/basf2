@@ -43,6 +43,7 @@
 
 using namespace Belle2;
 
+using namespace std;
 ECLSensitiveDetector::ECLSensitiveDetector(G4String name, G4double thresholdEnergyDeposit, G4double thresholdKineticEnergy):
     SensitiveDetectorBase(name, ECL), m_thresholdEnergyDeposit(thresholdEnergyDeposit),
     m_thresholdKineticEnergy(thresholdKineticEnergy), m_hitNumber(0), m_EBhitNumber(0)
@@ -73,7 +74,39 @@ void ECLSensitiveDetector::Initialize(G4HCofThisEvent * HCTE)
 //G4bool ECLSensitiveDetector::ProcessHits(G4Step *aStep, G4TouchableHistory *)
 bool ECLSensitiveDetector::step(G4Step *aStep, G4TouchableHistory *)
 {
+  // Get deposited energy
+  const G4double edep = aStep->GetTotalEnergyDeposit();
 
+  // Get step length
+  const G4double stepLength = aStep->GetStepLength();
+  if (stepLength == 0.) return false;
+
+  // Get step information
+  const G4Track & t = * aStep->GetTrack();
+
+  const G4double charge = t.GetDefinition()->GetPDGCharge();
+
+  const G4double tof = t.GetGlobalTime();
+  if (isnan(tof)) {
+    B2ERROR("SensitiveDetector: global time is nan");
+    return false;
+  }
+
+  const G4int pid = t.GetDefinition()->GetPDGEncoding();
+  const G4int trackID = t.GetTrackID();
+
+  const G4VPhysicalVolume & v = * t.GetVolume();
+  const G4StepPoint & in = * aStep->GetPreStepPoint();
+  const G4StepPoint & out = * aStep->GetPostStepPoint();
+  const G4ThreeVector & posIn = in.GetPosition();
+  const G4ThreeVector & posOut = out.GetPosition();
+  const G4ThreeVector momIn(in.GetMomentum().x(), in.GetMomentum().y(),
+                            in.GetMomentum().z());
+
+
+  cout << in.GetPosition() << " " << v.GetName() << endl;
+  // Get layer ID
+  const unsigned layerId = v.GetCopyNo();
   return true;
 }
 

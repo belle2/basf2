@@ -3,29 +3,21 @@
 
 #include <boost/python.hpp>
 #include <boost/python/call_method.hpp>
-#include <boost/ref.hpp>
-#include <boost/python/scope.hpp>
-#include <boost/python/list.hpp>
-#include <boost/python/dict.hpp>
 
 #include <framework/core/Module.h>
 
-#include <vector>
-#include <list>
 #include <string>
-#include <set>
-#include <map>
 
 using namespace boost::python;
 
-/** Python wrapper for Belle2::Module.
- *
- * Used internally when deriving a python class from Module to ensure that
- * reimplemented virtual functions (e.g. event()) actually get called.
- * The C++ part of the framework will only see a PyModule, which will call
- * the corresponding methods of the python module (m_self)
- */
 namespace Belle2 {
+  /** Python wrapper for Belle2::Module.
+   *
+   * Used internally when deriving a python class from Module to ensure that
+   * reimplemented virtual functions (e.g. event()) actually get called.
+   * The C++ part of the framework will only see a PyModule, which will call
+   * the corresponding methods of the python module (m_self)
+   */
   class PyModule : public Module {
   public:
     PyModule(PyObject *p):

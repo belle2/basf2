@@ -94,9 +94,7 @@ namespace Belle2 {
 
     //member variables for the PXD hit information:we allow for 10 hits per particle
     int m_PXDhcount;                /**< number of PXhits for the track */
-    int m_PXDlayerID[cMaxSizeHitArray];           /**< Layer number. */
-    int m_PXDladderID[cMaxSizeHitArray];          /**< Ladder number. */
-    int m_PXDsensorID[cMaxSizeHitArray];          /**< Sensor number. */
+    int m_PXDhitID[cMaxSizeHitArray];           /**< Layer number. */
 
     float m_PXDposInX[cMaxSizeHitArray];      /**< LRF position at entry  X. */
     float m_PXDposInY[cMaxSizeHitArray];      /**< LRF position at entry  Y. */
@@ -117,9 +115,7 @@ namespace Belle2 {
 
     //member variables for the SVD hit information:we allow for 40 hits per particle
     int m_SVDhcount;                /**< number of SVDhits for the track */
-    int m_SVDlayerID[cMaxSizeHitArray];           /**< Layer number. */
-    int m_SVDladderID[cMaxSizeHitArray];          /**< Ladder number. */
-    int m_SVDsensorID[cMaxSizeHitArray];          /**< Sensor number. */
+    int m_SVDhitID[cMaxSizeHitArray];           /**< Layer number. */
 
     float m_SVDposInX[cMaxSizeHitArray];      /**< LRF position at entry  X. */
     float m_SVDposInY[cMaxSizeHitArray];      /**< LRF position at entry  Y. */

@@ -11,18 +11,23 @@
 
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/EventMetaData.h>
+#include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/dataobjects/Relation.h>
+#include <framework/datastore/RelationArray.h>
+#include <framework/datastore/RelationIndex.h>
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Unit.h>
 
 #include <generators/dataobjects/MCParticle.h>
 #include <pxd/dataobjects/PXDSimHit.h>
 #include <svd/dataobjects/SVDSimHit.h>
+#include <pxd/vxd/VxdID.h>
+#include <boost/foreach.hpp>
+
 
 using namespace std;
 using namespace Belle2;
+
 
 //-----------------------------------------------------------------
 //                 Register the Module
@@ -86,9 +91,7 @@ void makeSimulationTreeModule::initialize()
 
 //tree branches for the PXD hits:
   m_tree->Branch("PXDhcount", &m_PXDhcount, "PXDhcount/I");
-  m_tree->Branch("PXDlayerID", &m_PXDlayerID, "PXDlayerID[PXDhcount]/I");
-  m_tree->Branch("PXDladderID", &m_PXDladderID, "PXDladderID[PXDhcount]/I");
-  m_tree->Branch("PXDsensorID", &m_PXDsensorID, "PXDsensorID[PXDhcount]/I");
+  m_tree->Branch("PXDhitID", &m_PXDhitID, "PXDhitID[PXDhcount]/I");
 
   m_tree->Branch("PXDposInX", &m_PXDposInX, "PXDposInX[PXDhcount]/F");
   m_tree->Branch("PXDposInY", &m_PXDposInY, "PXDposInY[PXDhcount]/F");
@@ -103,18 +106,12 @@ void makeSimulationTreeModule::initialize()
   m_tree->Branch("PXDmomInY", &m_PXDmomInY, "PXDmomInY[PXDhcount]/F");
   m_tree->Branch("PXDmomInZ", &m_PXDmomInZ, "PXDmomInZ[PXDhcount]/F");
 
-  m_tree->Branch("PXDtrackID", &m_PXDtrackID, "PXDtrackID[PXDhcount]/I");
-  m_tree->Branch("PXDPDGcode", &m_PXDPDGcode, "PXDPDGcode[PXDhcount]/I");
-
   m_tree->Branch("PXDenergyDep", &m_PXDenergyDep, "PXDenergyDep[PXDhcount]/F");
-  m_tree->Branch("PXDstepLength", &m_PXDstepLength, "PXDstepLength[PXDhcount]/F");
   m_tree->Branch("PXDglobalTime", &m_PXDglobalTime, "PXDglobalTime[PXDhcount]/F");
 
   //tree branches for the SVD hits:
   m_tree->Branch("SVDhcount", &m_SVDhcount, "SVDhcount/I");
-  m_tree->Branch("SVDlayerID", &m_SVDlayerID, "SVDlayerID[SVDhcount]/I");
-  m_tree->Branch("SVDladderID", &m_SVDladderID, "SVDladderID[SVDhcount]/I");
-  m_tree->Branch("SVDsensorID", &m_SVDsensorID, "SVDsensorID[SVDhcount]/I");
+  m_tree->Branch("SVDhitID", &m_SVDhitID, "SVDhitID[SVDhcount]/I");
 
   m_tree->Branch("SVDposInX", &m_SVDposInX, "SVDposInX[SVDhcount]/F");
   m_tree->Branch("SVDposInY", &m_SVDposInY, "SVDposInY[SVDhcount]/F");
@@ -129,11 +126,7 @@ void makeSimulationTreeModule::initialize()
   m_tree->Branch("SVDmomInY", &m_SVDmomInY, "SVDmomInY[SVDhcount]/F");
   m_tree->Branch("SVDmomInZ", &m_SVDmomInZ, "SVDmomInZ[SVDhcount]/F");
 
-  m_tree->Branch("SVDtrackID", &m_SVDtrackID, "SVDtrackID[SVDhcount]/I");
-  m_tree->Branch("SVDPDGcode", &m_SVDPDGcode, "SVDPDGcode[SVDhcount]/I");
-
   m_tree->Branch("SVDenergyDep", &m_SVDenergyDep, "SVDenergyDep[SVDhcount]/F");
-  m_tree->Branch("SVDstepLength", &m_SVDstepLength, "SVDstepLength[SVDhcount]/F");
   m_tree->Branch("SVDglobalTime", &m_SVDglobalTime, "SVDglobalTime[SVDhcount]/F");
 
 }
@@ -144,7 +137,6 @@ void makeSimulationTreeModule::event()
   //Printout statement to indicate we are in the event function
   //  B2INFO("makeSimulationTreeModule: in event");
 
-
   //get run, experiment and event number:
   StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
   m_expNum = eventMetaDataPtr->getExperiment();
@@ -152,19 +144,7 @@ void makeSimulationTreeModule::event()
   m_evtNum = eventMetaDataPtr->getEvent();
 
   //get collection of MCParticles from the data store:
-  StoreArray<MCParticle> MCParticles("MCParticles");
-
-  //get collection of relations between PXDSimHits and MCParticles
-  StoreArray <Relation> PXDrelationArray("MCParticlesToPXDSimHits");
-
-  //StoreArray <PXDSimHit> PXDSimHitArray (PXDrelationArray->getToAccessorInfo());
-  StoreArray <PXDSimHit> PXDSimHitArray("PXDSimHits");
-
-  //get collection of relations between SVDSimHits and MCParticles
-  StoreArray <Relation> SVDrelationArray("MCParticlesToSVDSimHits");
-
-  //StoreArray <SVDSimHit> SVDSimHitArray (SVDrelationArray->getToAccessorInfo());
-  StoreArray <SVDSimHit> SVDSimHitArray("SVDSimHits");
+  StoreArray<MCParticle> MCParticles;
 
   //Loop over the primary particles. The MCParticle collection was
   //sorted: primary particles come first and then the daughters
@@ -213,85 +193,56 @@ void makeSimulationTreeModule::event()
     m_MCPdecayVertexZ = vector.Z();
     m_MCPdecayTime = currParticle->getDecayTime();
 
+    typedef RelationIndex<PXDSimHit, MCParticle> indexPXDHitMC_t;
+    indexPXDHitMC_t indexPXDHitMC ;
+    BOOST_FOREACH(const indexPXDHitMC_t::Element &element, indexPXDHitMC.getTo(currParticle)) {
+      const PXDSimHit * relatedHit = element.from ;
+      m_PXDhitID[m_PXDhcount] = relatedHit->getSensorID().getID();
+      m_PXDtheta[m_PXDhcount] = relatedHit->getTheta();
+      m_PXDenergyDep[m_PXDhcount] = relatedHit->getEnergyDep();
+      m_PXDglobalTime[m_PXDhcount] = relatedHit->getGlobalTime();
 
-    //now lets get the PXD hits:
-    m_PXDhcount = 0;//counting the hits for each track
-    for (long int jj = 0; jj < PXDrelationArray->GetEntriesFast(); jj++) { // Looping PXD relations
-      if (PXDrelationArray[jj]->getFromIndex() == iPart) {//PXD if statement
-        if (m_PXDhcount > 99) {
-          B2INFO("not storing a PXD entry. Track has more than 100 PXD hits.");
-        } else {//storing the entry
-          if (!PXDSimHitArray[PXDrelationArray[jj]->getToIndex()]) { // Problem with to-index
-            continue;
-          }
+      TVector3 pxdvect = relatedHit->getPosIn();
+      m_PXDposInX[m_PXDhcount] = pxdvect.X();
+      m_PXDposInY[m_PXDhcount] = pxdvect.Y();
+      m_PXDposInZ[m_PXDhcount] = pxdvect.Z();
+      pxdvect = relatedHit->getPosOut();
+      m_PXDposOutX[m_PXDhcount] = pxdvect.X();
+      m_PXDposOutY[m_PXDhcount] = pxdvect.Y();
+      m_PXDposOutZ[m_PXDhcount] = pxdvect.Z();
+      pxdvect = relatedHit->getMomIn();
+      m_PXDmomInX[m_PXDhcount] = pxdvect.X();
+      m_PXDmomInY[m_PXDhcount] = pxdvect.Y();
+      m_PXDmomInZ[m_PXDhcount] = pxdvect.Z();
 
-          m_PXDlayerID[m_PXDhcount] = PXDSimHitArray[PXDrelationArray[jj]->getToIndex()]->getLayerID();
-          m_PXDladderID[m_PXDhcount] = PXDSimHitArray[PXDrelationArray[jj]->getToIndex()]->getLadderID();
-          m_PXDsensorID[m_PXDhcount] = PXDSimHitArray[PXDrelationArray[jj]->getToIndex()]->getSensorID();
-          m_PXDtheta[m_PXDhcount] = PXDSimHitArray[PXDrelationArray[jj]->getToIndex()]->getTheta();
-          m_PXDPDGcode[m_PXDhcount] = PXDSimHitArray[PXDrelationArray[jj]->getToIndex()]->getPDGcode();
-          m_PXDtrackID[m_PXDhcount] = PXDSimHitArray[PXDrelationArray[jj]->getToIndex()]->getTrackID();
-          m_PXDenergyDep[m_PXDhcount] = PXDSimHitArray[PXDrelationArray[jj]->getToIndex()]->getEnergyDep();
-          m_PXDstepLength[m_PXDhcount] = PXDSimHitArray[PXDrelationArray[jj]->getToIndex()]->getStepLength();
-          m_PXDglobalTime[m_PXDhcount] = PXDSimHitArray[PXDrelationArray[jj]->getToIndex()]->getGlobalTime();
+      m_PXDhcount++;
+    }//end of BOOST_FOREACH
 
 
-          TVector3 pxdvect = PXDSimHitArray[PXDrelationArray[jj]->getToIndex()]->getPosIn();
-          m_PXDposInX[m_PXDhcount] = pxdvect.X();
-          m_PXDposInY[m_PXDhcount] = pxdvect.Y();
-          m_PXDposInZ[m_PXDhcount] = pxdvect.Z();
-          pxdvect = PXDSimHitArray[PXDrelationArray[jj]->getToIndex()]->getPosOut();
-          m_PXDposOutX[m_PXDhcount] = pxdvect.X();
-          m_PXDposOutY[m_PXDhcount] = pxdvect.Y();
-          m_PXDposOutZ[m_PXDhcount] = pxdvect.Z();
-          pxdvect = PXDSimHitArray[PXDrelationArray[jj]->getToIndex()]->getMomIn();
-          m_PXDmomInX[m_PXDhcount] = pxdvect.X();
-          m_PXDmomInY[m_PXDhcount] = pxdvect.Y();
-          m_PXDmomInZ[m_PXDhcount] = pxdvect.Z();
+    typedef RelationIndex<SVDSimHit, MCParticle> indexSVDHitMC_t;
+    indexSVDHitMC_t indexSVDHitMC ;
+    BOOST_FOREACH(const indexSVDHitMC_t::Element &element, indexSVDHitMC.getTo(currParticle)) {
+      const SVDSimHit * relatedHit = element.from ;
+      m_SVDhitID[m_SVDhcount] = relatedHit->getSensorID().getID();
+      m_SVDtheta[m_SVDhcount] = relatedHit->getTheta();
+      m_SVDenergyDep[m_SVDhcount] = relatedHit->getEnergyDep();
+      m_SVDglobalTime[m_SVDhcount] = relatedHit->getGlobalTime();
 
-          m_PXDhcount++;
-        }//end of else statement
-      }//end PXD if statement
-    }//end PXD relation loop
+      TVector3 svdvect = relatedHit->getPosIn();
+      m_SVDposInX[m_SVDhcount] = svdvect.X();
+      m_SVDposInY[m_SVDhcount] = svdvect.Y();
+      m_SVDposInZ[m_SVDhcount] = svdvect.Z();
+      svdvect = relatedHit->getPosOut();
+      m_SVDposOutX[m_SVDhcount] = svdvect.X();
+      m_SVDposOutY[m_SVDhcount] = svdvect.Y();
+      m_SVDposOutZ[m_SVDhcount] = svdvect.Z();
+      svdvect = relatedHit->getMomIn();
+      m_SVDmomInX[m_SVDhcount] = svdvect.X();
+      m_SVDmomInY[m_SVDhcount] = svdvect.Y();
+      m_SVDmomInZ[m_SVDhcount] = svdvect.Z();
 
-    //now lets get the SVD hits:
-    m_SVDhcount = 0;//counting the hits for each track
-    for (int jj = 0; jj < SVDrelationArray->GetEntriesFast(); jj++) { // Looping SVD relations
-      if (SVDrelationArray[jj]->getFromIndex() == iPart) {//SVD if statment
-        if (m_SVDhcount > 99) {
-          B2INFO("not storing SVD entry. Track has more than 100 SVD hits!");
-        } else {//storing the entry
-          if (!SVDSimHitArray[SVDrelationArray[jj]->getToIndex()]) {// something is wrong with the hit index
-            continue;
-          }
-
-          m_SVDlayerID[m_SVDhcount] = SVDSimHitArray[SVDrelationArray[jj]->getToIndex()]->getLayerID();
-          m_SVDladderID[m_SVDhcount] = SVDSimHitArray[SVDrelationArray[jj]->getToIndex()]->getLadderID();
-          m_SVDsensorID[m_SVDhcount] = SVDSimHitArray[SVDrelationArray[jj]->getToIndex()]->getSensorID();
-          m_SVDtheta[m_SVDhcount] = SVDSimHitArray[SVDrelationArray[jj]->getToIndex()]->getTheta();
-          m_SVDPDGcode[m_SVDhcount] = SVDSimHitArray[SVDrelationArray[jj]->getToIndex()]->getPDGcode();
-          m_SVDtrackID[m_SVDhcount] = SVDSimHitArray[SVDrelationArray[jj]->getToIndex()]->getTrackID();
-          m_SVDenergyDep[m_SVDhcount] = SVDSimHitArray[SVDrelationArray[jj]->getToIndex()]->getEnergyDep();
-          m_SVDstepLength[m_SVDhcount] = SVDSimHitArray[SVDrelationArray[jj]->getToIndex()]->getStepLength();
-          m_SVDglobalTime[m_SVDhcount] = SVDSimHitArray[SVDrelationArray[jj]->getToIndex()]->getGlobalTime();
-
-          TVector3 pxdvect = SVDSimHitArray[SVDrelationArray[jj]->getToIndex()]->getPosIn();
-          m_SVDposInX[m_SVDhcount] = pxdvect.X();
-          m_SVDposInY[m_SVDhcount] = pxdvect.Y();
-          m_SVDposInZ[m_SVDhcount] = pxdvect.Z();
-          pxdvect = SVDSimHitArray[SVDrelationArray[jj]->getToIndex()]->getPosOut();
-          m_SVDposOutX[m_SVDhcount] = pxdvect.X();
-          m_SVDposOutY[m_SVDhcount] = pxdvect.Y();
-          m_SVDposOutZ[m_SVDhcount] = pxdvect.Z();
-          pxdvect = SVDSimHitArray[SVDrelationArray[jj]->getToIndex()]->getMomIn();
-          m_SVDmomInX[m_SVDhcount] = pxdvect.X();
-          m_SVDmomInY[m_SVDhcount] = pxdvect.Y();
-          m_SVDmomInZ[m_SVDhcount] = pxdvect.Z();
-
-          m_SVDhcount++;
-        }//end of else statement
-      }//end SVD if statement
-    }//end SVDhit relations
+      m_SVDhcount++;
+    }//end of BOOST_FOREACH
 
     //store  all infos for this particle in the root tree
     // if there is a PXD/SVD hit for the particle:

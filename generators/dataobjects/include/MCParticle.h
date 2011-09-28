@@ -32,7 +32,7 @@ namespace Belle2 {
     B2ERROR("DEFAULT_MCPARTICLES is deprecated, please use an empty string");
     return "";
   }
-#define DEFAULT_MCPARTICLES deprecated_DEFAULT_MCPARTICLES()
+  //#define DEFAULT_MCPARTICLES deprecated_DEFAULT_MCPARTICLES()
 
   /**
    * A Class to store the Monte Carlo particle information.

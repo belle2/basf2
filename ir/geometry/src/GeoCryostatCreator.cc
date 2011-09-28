@@ -939,7 +939,7 @@ namespace Belle2 {
       string strMat_C6spc3 = cC6spc3.getString("Material");
       G4Material* mat_C6spc3 = Materials::get(strMat_C6spc3);
 
-      for (int i = 0; i < C6spc3_num; i++) printf("%f %f %f\n", C6spc3_Z[i], C6spc3_rI[i], C6spc3_rO[i]);
+      //for (int i = 0; i < C6spc3_num; i++) printf("%f %f %f\n", C6spc3_Z[i], C6spc3_rI[i], C6spc3_rO[i]);
 
       //define geometry
       G4Polycone* geo_C6spc3xx = new G4Polycone("geo_C6spc3xx_name", 0, 2*M_PI, C6spc3_num, C6spc3_Z, C6spc3_rI, C6spc3_rO);
@@ -1318,7 +1318,7 @@ namespace Belle2 {
       string strMat_C7hld1 = cC7hld1.getString("Material");
       G4Material* mat_C7hld1 = Materials::get(strMat_C7hld1);
 
-      for (int i = 0; i < C7hld1_num; i++) printf("%f %f %f\n", C7hld1_Z[i], C7hld1_rI[i], C7hld1_rO[i]);
+      //for (int i = 0; i < C7hld1_num; i++) printf("%f %f %f\n", C7hld1_Z[i], C7hld1_rI[i], C7hld1_rO[i]);
 
       //define geometry
       G4Polycone* geo_C7hld1x7 = new G4Polycone("geo_C7hld1x7_name", 0, 2*M_PI, C7hld1_num, C7hld1_Z, C7hld1_rI, C7hld1_rO);
@@ -1366,7 +1366,7 @@ namespace Belle2 {
       string strMat_C7cil1 = cC7cil1.getString("Material");
       G4Material* mat_C7cil1 = Materials::get(strMat_C7cil1);
 
-      for (int i = 0; i < C7hld1_num; i++) printf("%f %f %f\n", C7hld1_Z[i], C7hld1_rI[i], C7cil1_rO[i]);
+      //for (int i = 0; i < C7hld1_num; i++) printf("%f %f %f\n", C7hld1_Z[i], C7hld1_rI[i], C7cil1_rO[i]);
 
       //define geometry
       G4Polycone* geo_C7cil1x7 = new G4Polycone("geo_C7cil1x7_name", 0, 2*M_PI, C7hld1_num, C7hld1_Z, C7hld1_rI, C7cil1_rO);
@@ -1740,7 +1740,7 @@ namespace Belle2 {
       //-
       //--------------
 
-      /*
+      return;
 
       //--------------
       //-   F4spc2
@@ -2206,8 +2206,6 @@ namespace Belle2 {
       string strMat_F6spc3 = cF6spc3.getString("Material");
       G4Material* mat_F6spc3 = Materials::get(strMat_F6spc3);
 
-      for (int i=0; i< F6spc3_num; i++) printf("%f %f %f\n", F6spc3_Z[i], F6spc3_rI[i], F6spc3_rO[i]);
-
       //define geometry
       G4Polycone* geo_F6spc3xx = new G4Polycone("geo_F6spc3xx_name", 0, 2*M_PI, F6spc3_num, F6spc3_Z, F6spc3_rI, F6spc3_rO);
       G4SubtractionSolid* geo_F6spc3x = new G4SubtractionSolid("geo_F6spc3x_name", geo_F6spc3xx, geo_F6tnl1, transform_D1wal1);
@@ -2585,8 +2583,6 @@ namespace Belle2 {
       string strMat_F7hld1 = cF7hld1.getString("Material");
       G4Material* mat_F7hld1 = Materials::get(strMat_F7hld1);
 
-      for (int i=0; i< F7hld1_num; i++) printf("%f %f %f\n", F7hld1_Z[i], F7hld1_rI[i], F7hld1_rO[i]);
-
       //define geometry
       G4Polycone* geo_F7hld1x7 = new G4Polycone("geo_F7hld1x7_name", 0, 2*M_PI, F7hld1_num, F7hld1_Z, F7hld1_rI, F7hld1_rO);
       //G4SubtractionSolid* geo_F7hld1x6 = new G4SubtractionSolid("geo_F7hld1x6_name", geo_F7hld1x7, geo_F7mag6, transform_E1wal1);
@@ -2633,8 +2629,6 @@ namespace Belle2 {
       string strMat_F7cil1 = cF7cil1.getString("Material");
       G4Material* mat_F7cil1 = Materials::get(strMat_F7cil1);
 
-      for (int i=0; i< F7hld1_num; i++) printf("%f %f %f\n", F7hld1_Z[i], F7hld1_rI[i], F7cil1_rO[i]);
-
       //define geometry
       G4Polycone* geo_F7cil1x7 = new G4Polycone("geo_F7cil1x7_name", 0, 2*M_PI, F7hld1_num, F7hld1_Z, F7hld1_rI, F7cil1_rO);
       //G4SubtractionSolid* geo_F7cil1x6 = new G4SubtractionSolid("geo_F7cil1x6_name", geo_F7cil1x7, geo_F7mag6, transform_E1wal1);
@@ -2658,7 +2652,6 @@ namespace Belle2 {
 
       //-
       //--------------
-      */
 
     }
   }

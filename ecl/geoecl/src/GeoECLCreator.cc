@@ -90,12 +90,13 @@ namespace Belle2 {
 
       double eclWorld_I[6] = {452, 452, 1250, 1250, 395, 395};//unit:mm
       double eclWorld_O[6] = {1640, 1640, 1640, 1640, 1640, 1640};//unit:mm
-      double eclWorld_Z[6] = { -145, -102, -102, 196, 196, 240};
+      double eclWorld_Z[6] = { -1450, -1020, -1020, 1960, 1960, 2400};//unit:mm
 
 
       //define geometry
       G4Polycone* eclWorld = new G4Polycone("eclWorld", 0, 2*M_PI, 6, eclWorld_Z, eclWorld_I, eclWorld_O);
       G4LogicalVolume *logical_ecl = new G4LogicalVolume(eclWorld, medAir, "logical_ecl");
+
       physical_ecl = new G4PVPlacement(0, G4ThreeVector(0., 0., 0.), logical_ecl, "physicalECL", &topVolume, false, 0);
 
       double DiodeWidth = content.getLength("k_diodewidth") * cm;
@@ -199,7 +200,7 @@ namespace Belle2 {
         Pr = counter.getLength("K_Pr") * cm;
         Ptheta = counter.getAngle("K_Ptheta") ;
         Pphi = counter.getAngle("K_Pphi") ;
-        halflength = 15.0;
+        halflength = 15.0 * cm;
         G4Transform3D m1 = G4RotateZ3D(Rphi1);
         G4Transform3D m2 = G4RotateY3D(Rtheta);
         G4Transform3D m3 = G4RotateZ3D(Rphi2);
@@ -243,7 +244,7 @@ namespace Belle2 {
         Pr = counter.getLength("K_Pr") * cm;
         Ptheta = counter.getAngle("K_Ptheta") ;
         Pphi = counter.getAngle("K_Pphi") ;
-        halflength = 15.0;
+        halflength = 15.0 * cm;
         G4Transform3D m1 = G4RotateZ3D(Rphi1);
         G4Transform3D m2 = G4RotateY3D(Rtheta);
         G4Transform3D m3 = G4RotateZ3D(Rphi2);

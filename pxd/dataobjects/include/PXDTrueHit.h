@@ -17,9 +17,6 @@
 #include <TObject.h>
 #include <TVector3.h>
 
-#define DEFAULT_PXDTRUEHITS "PXDTrueHits"
-#define DEFAULT_PXDTRUEHITSREL "MCParticlesToPXDTrueHits"
-
 namespace Belle2 {
 
   /**
@@ -33,13 +30,13 @@ namespace Belle2 {
 
   public:
     PXDTrueHit(
-      VxdID vxdID = 0,
+      VxdID sensorID = 0,
       float u = 0, float v = 0, const TVector3 momentum = TVector3(0, 0, 0), float globalTime = 0):
-        m_vxdID(vxdID),
+        m_sensorID(sensorID),
         m_u(u), m_v(v), m_momentum(momentum), m_globalTime(globalTime) {}
 
     /** Return the Sensor ID */
-    VxdID getSensorID() const { return m_vxdID; }
+    VxdID getSensorID() const { return m_sensorID; }
     /** Retun local u coordinate of hit */
     float getU() const { return m_u; }
     /** Retun local v coordinate of hit */
@@ -51,7 +48,7 @@ namespace Belle2 {
 
   private:
 
-    int m_vxdID;             /**< ID of the sensor */
+    int m_sensorID;          /**< ID of the sensor */
     float m_u;               /**< Local u coordinate */
     float m_v;               /**< Local v coordinate */
     TVector3 m_momentum;     /**< momentum in local coordinates */

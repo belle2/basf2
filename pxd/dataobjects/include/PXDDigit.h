@@ -11,6 +11,8 @@
 #ifndef PXDDIGIT_H
 #define PXDDIGIT_H
 
+#include <pxd/vxd/VxdID.h>
+
 #include <TObject.h>
 
 namespace Belle2 {
@@ -28,7 +30,7 @@ namespace Belle2 {
 
     /** Default constructor for the ROOT IO. */
     PXDDigit():
-        m_sensorUniID(-1),
+        m_sensorID(0),
         m_uCellID(-1), m_vCellID(-1),
         m_uCellPosition(0), m_vCellPosition(0),
         m_charge(0)
@@ -42,47 +44,17 @@ namespace Belle2 {
      * @param vCell Cell center v coordinate.
      * @param charge The charge collected in the cell.
      */
-    PXDDigit(int sensorID, short uCellID, short vCellID, float uCellPosition, float vCellPosition, float charge):
-        m_sensorUniID(sensorID),
+    PXDDigit(VxdID sensorID, short uCellID, short vCellID, float uCellPosition, float vCellPosition, float charge):
+        m_sensorID(sensorID),
         m_uCellID(uCellID), m_vCellID(vCellID),
         m_uCellPosition(uCellPosition), m_vCellPosition(vCellPosition),
         m_charge(charge)
     {;}
 
-    /** Set compressed layer/ladder/sensor id.
-     * @param sensorID Compressed ID of the sensor.
+    /** Get the sensor ID.
+     * @return ID of the sensor.
      */
-    void setSensorID(int sensorID) { m_sensorUniID = sensorID; }
-
-    /** Set u ID of a cell.
-     * @param uCellID Cell number in u.
-     */
-    void setUCellID(short uCellID) { m_uCellID = uCellID; }
-
-    /** Set v ID of a cell.
-     * @param vCellID Cell number in v.
-     */
-    void setVCellID(short vCellID) { m_vCellID = vCellID; }
-
-    /** Set u cell coordinate.
-     * @param uCellPosition Cell center u coordinate.
-     */
-    void setUCellPosition(float uCellPosition) { m_uCellPosition = uCellPosition; }
-
-    /** Set v cell coordinate.
-    * @param vCellPosition Cell center v coordinate.
-    */
-    void setVCellPosition(float vCellPosition) { m_vCellPosition = vCellPosition; }
-
-    /** Set cell charge.
-     * @param charge Cell charge.
-     */
-    void setCharge(float charge) { m_charge = charge; }
-
-    /** Get the sensor compact ID.
-     * @return compact ID of the sensor.
-     */
-    int getSensorUniID() const { return m_sensorUniID; }
+    VxdID getSensorID() const { return m_sensorID; }
 
     /** Get cell ID in u.
      * @return u ID of the cell.
@@ -111,12 +83,12 @@ namespace Belle2 {
 
   private:
 
-    int m_sensorUniID;                 /**< Compressed sensor identifier.*/
-    short m_uCellID;        /**< Cell z-coordinate in pitch units. */
-    short m_vCellID;        /**< Cell r-phi coordinate in pitch units. */
-    float m_uCellPosition;          /**< Absolute cell position in z. */
-    float m_vCellPosition;          /**< Absolute cell position in r-phi. */
-    float m_charge;         /**< Deposited charge (units depend on user selection). */
+    unsigned short m_sensorID; /**< Compressed sensor identifier.*/
+    short m_uCellID;           /**< Cell z-coordinate in pitch units. */
+    short m_vCellID;           /**< Cell r-phi coordinate in pitch units. */
+    float m_uCellPosition;     /**< Absolute cell position in z. */
+    float m_vCellPosition;     /**< Absolute cell position in r-phi. */
+    float m_charge;            /**< Deposited charge (units depend on user selection). */
 
     ClassDef(PXDDigit, 1)
 

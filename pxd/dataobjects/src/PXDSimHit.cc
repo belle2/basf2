@@ -8,7 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-// basf2
 #include <pxd/dataobjects/PXDSimHit.h>
 
 using namespace std;

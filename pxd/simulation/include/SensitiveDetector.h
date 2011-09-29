@@ -16,7 +16,8 @@
 #include <pxd/vxd/SensitiveDetectorBase.h>
 
 namespace Belle2 {
-  namespace pxd {
+  /** Namespace to encapsulate code needed for simulation and reconstrucion of the PXD */
+  namespace PXD {
     /**
      * The PXD Sensitive Detector class.
      *

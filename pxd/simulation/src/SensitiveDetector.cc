@@ -36,7 +36,8 @@
 using namespace std;
 
 namespace Belle2 {
-  namespace pxd {
+  /** Namespace to encapsulate code needed for simulation and reconstrucion of the PXD */
+  namespace PXD {
 
     SensitiveDetector::SensitiveDetector(VXD::SensorInfoBase* sensorInfo):
         VXD::SensitiveDetectorBase(sensorInfo)

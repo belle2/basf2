@@ -16,7 +16,8 @@
 using namespace std;
 
 namespace Belle2 {
-  namespace pxd {
+  /** Namespace to encapsulate code needed for simulation and reconstrucion of the PXD */
+  namespace PXD {
     GeoPXDPlacement::GeoPXDPlacement(const std::string &name, double u, double v, std::string w): name(name), u(u), v(v)
     {
       boost::to_lower(w);

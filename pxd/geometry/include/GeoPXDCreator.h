@@ -27,7 +27,9 @@ class G4AssemblyVolume;
 class G4Polycone;
 
 namespace Belle2 {
-  namespace pxd {
+  /** Namespace to encapsulate code needed for simulation and reconstrucion of the PXD */
+  namespace PXD {
+
     class SensitiveDetector;
 
     /** The creator for the PXD geometry of the Belle II detector.   */

@@ -28,8 +28,6 @@ namespace Belle2 {
 
   namespace PXD {
 
-    using namespace Belle2::pxd;
-
     /** The PXDClustering module.
      *
      * This module is responsible to cluster all hits found in the PXD and

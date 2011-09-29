@@ -20,7 +20,8 @@
 class G4LogicalVolume;
 
 namespace Belle2 {
-  namespace pxd {
+  /** Namespace to encapsulate code needed for simulation and reconstrucion of the PXD */
+  namespace PXD {
 
     struct GeoPXDPlacement {
       enum EPosW { c_below, c_bottom, c_center, c_top, c_above };

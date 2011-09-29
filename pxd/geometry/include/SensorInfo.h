@@ -15,7 +15,8 @@
 #include <algorithm>
 
 namespace Belle2 {
-  namespace pxd {
+  /** Namespace to encapsulate code needed for simulation and reconstrucion of the PXD */
+  namespace PXD {
     /** Specific implementation of SensorInfo for PXD Sensors which provides additional pixel specific information */
     class SensorInfo: public VXD::SensorInfoBase {
     public:

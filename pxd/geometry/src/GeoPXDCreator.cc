@@ -52,10 +52,9 @@ using namespace boost;
 
 namespace Belle2 {
 
-
   using namespace geometry;
-
-  namespace pxd {
+  /** Namespace to encapsulate code needed for simulation and reconstrucion of the PXD */
+  namespace PXD {
 
     //-----------------------------------------------------------------
     //                 Register the Creator

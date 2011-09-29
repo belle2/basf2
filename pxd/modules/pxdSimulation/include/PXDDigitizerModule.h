@@ -25,7 +25,8 @@
 #include <TH2D.h>
 
 namespace Belle2 {
-  namespace pxd {
+  /** Namespace to encapsulate code needed for simulation and reconstrucion of the PXD */
+  namespace PXD {
 
     class Digit {
     public:
@@ -124,7 +125,7 @@ namespace Belle2 {
       TH2D*  m_histDiffusion;
 
     };//end class declaration
-  } // end namespace pxd
+  } // end namespace PXD
 } // end namespace Belle2
 
 #endif // PXDDigitizerModule_H

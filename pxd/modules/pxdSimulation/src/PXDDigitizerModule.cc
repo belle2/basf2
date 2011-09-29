@@ -28,7 +28,7 @@
 
 using namespace std;
 using namespace Belle2;
-using namespace Belle2::pxd;
+using namespace Belle2::PXD;
 
 //-----------------------------------------------------------------
 //                 Register the Module
@@ -492,7 +492,7 @@ void PXDDigitizerModule::saveDigits()
 
   BOOST_FOREACH(Sensors::value_type &sensor, m_sensors) {
     int sensorID = sensor.first;
-    //const SensorInfo &info = dynamic_cast<const SensorInfo&>(VXD::GeoCache::get(sensorID));
+    const SensorInfo &info = dynamic_cast<const SensorInfo&>(VXD::GeoCache::get(sensorID));
     BOOST_FOREACH(Sensor::value_type &digit, sensor.second) {
       const Digit &d = digit.first;
       const DigitValue &v = digit.second;
@@ -511,7 +511,7 @@ void PXDDigitizerModule::saveDigits()
       int digIndex = storeDigits->GetLast() + 1;
       new(storeDigits->AddrAt(digIndex)) PXDDigit(
         sensorID, d.u(), d.v(),
-        /*info.getUCellPosition(d.u()), info.getVCellPosition(d.v()),*/ charge
+        info.getUCellPosition(d.u()), info.getVCellPosition(d.v()), charge
       );
 
       //If the digit has any relations to MCParticles, add the Relation

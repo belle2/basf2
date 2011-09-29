@@ -23,6 +23,9 @@
 #include "G4FieldManager.hh"
 #include "G4MagneticField.hh"
 
+#include <generators/dataobjects/MCParticle.h>
+#include <framework/datastore/RelationArray.h>
+
 
 
 namespace Belle2 {
@@ -37,6 +40,7 @@ namespace Belle2 {
 
   void EKLMSensitiveDetector::Initialize(G4HCofThisEvent * HCTE)
   {
+    m_HitNumber = 0;
   }
 
   //-----------------------------------------------------
@@ -95,7 +99,8 @@ namespace Belle2 {
                                  GetTopTransform().TransformPoint(gpos);
 
     //creates hit
-    EKLMSimHit *hit = new EKLMSimHit(pv, gpos, lpos, hitTime, PDGcode,  eDep);
+    StoreArray<EKLMSimHit> simHitsArray;
+    EKLMSimHit *hit = new(simHitsArray->AddrAt(simHitsArray.getEntries()))EKLMSimHit(pv, gpos, lpos, hitTime, PDGcode,  eDep);
     if (hit == NULL) {
       B2ERROR("Memory allocation error.");
       return false;
@@ -111,8 +116,11 @@ namespace Belle2 {
     pvgt = pvgt->getMother();
     hit->set_nEndcap(pvgt->getID());
 
-    // store hit
-    storeEKLMObject("SimHitsEKLMArray", hit);
+
+    StoreArray<MCParticle> MCParticlesArray;
+    RelationArray particleToSimHitsRelation(MCParticlesArray, simHitsArray);
+    registerMCParticleRelation(particleToSimHitsRelation);
+    particleToSimHitsRelation.add(track.GetTrackID(), simHitsArray.getEntries());
 
     return true;
   }

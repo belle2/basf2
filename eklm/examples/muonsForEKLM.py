@@ -25,11 +25,11 @@ import random
 from basf2 import *
 
 # Set the log level to show only error and fatal messages
-set_log_level(LogLevel.INFO)
+set_log_level(LogLevel.DEBUG)
 
 # EvtMetaGen - generate event meta data
 evtmetagen = register_module('EvtMetaGen')
-evtmetagen.param('EvtNumList', [100])
+evtmetagen.param('EvtNumList', [2])
 evtmetagen.param('RunList', [1])
 
 # Particle gun

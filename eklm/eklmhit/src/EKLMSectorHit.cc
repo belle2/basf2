@@ -29,7 +29,7 @@ void EKLMSectorHit::Print()
   std::cout << "------------  Sector Hit  -------------- " << std::endl;
   std::cout << "Endcap: " << get_nEndcap()
             << " Layer: " << get_nLayer()
-            << " Sector: " << get_nSector() << "\n";
+            << " Sector: " << get_nSector() << std::endl;
   for (std::vector<EKLMStripHit*>::iterator it = m_stripHitVector.begin();
        it != m_stripHitVector.end(); ++it)
     (*it)->Print();
@@ -49,7 +49,7 @@ bool EKLMSectorHit::addStripHit(EKLMStripHit *stripHit)
 
 void EKLMSectorHit::create2dHits()
 {
-
+  StoreArray<EKLMHit2d>hits2dArray;
   for (std::vector<EKLMStripHit*>::iterator itX = m_stripHitVector.begin();
        itX != m_stripHitVector.end(); ++itX) {
     // only X strips
@@ -64,7 +64,9 @@ void EKLMSectorHit::create2dHits()
       // drop entries with non-intersected strips
       if (!((*itX)->doesIntersect(*itY, crossPoint)))
         continue;
-      EKLMHit2d *hit2d = new EKLMHit2d(*itX, *itY);
+
+      EKLMHit2d *hit2d = new(hits2dArray->AddrAt(hits2dArray.getEntries())) EKLMHit2d(*itX, *itY);
+
       hit2d->setCrossPoint(crossPoint);
       hit2d->setChiSq();
       m_hit2dVector.push_back(hit2d);
@@ -74,11 +76,4 @@ void EKLMSectorHit::create2dHits()
   }
 }
 
-
-void EKLMSectorHit::store2dHits()
-{
-  for (std::vector<EKLMHit2d*>::iterator it = m_hit2dVector.begin();
-       it != m_hit2dVector.end(); ++it)
-    storeEKLMObject("Hits2dEKLMArray", *it);
-}
 

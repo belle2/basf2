@@ -45,8 +45,6 @@ namespace Belle2 {
     //! merges hits from the same strip. Creates EKLMStripHits
     void mergeSimHitsToStripHits();
 
-    //! Saves EKLMStripHits to the DataStore
-    void saveStripHits();
 
 
     //! Operator new

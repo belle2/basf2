@@ -17,10 +17,10 @@
 
 namespace Belle2 {
 
-  //! The Class for EKLM Sensitive Detector
-  /*! In this class, every variables defined in EKLMSimHit will be calculated.
-    EKLMSimHits are saved into hits collection.
-  */
+  /** The Class for EKLM Sensitive Detector
+   * In this class, every variables defined in EKLMSimHit will be calculated.
+   * EKLMSimHits are saved into hits collection.
+   */
 
   class EKLMSensitiveDetector : public Simulation::SensitiveDetectorBase  {
 
@@ -59,6 +59,9 @@ namespace Belle2 {
 
     //! hit colleation ID
     //    G4int m_HCID;
+
+    //! Hit number within one event
+    int m_HitNumber;
 
   };
 

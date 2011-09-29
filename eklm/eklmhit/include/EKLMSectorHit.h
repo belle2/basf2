@@ -56,8 +56,6 @@ namespace Belle2 {
     //! creates 2d hits from the SectorHits of the current sector
     void create2dHits();
 
-    //! stores hits from m_hit2dVector to the datastore
-    void store2dHits();
 
   private:
 

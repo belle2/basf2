@@ -37,9 +37,9 @@ namespace Belle2 {
 
   void EKLMDigitizer::readSimHits()
   {
-    StoreArray<EKLMSimHit> array("SimHitsEKLMArray");
-    for (int i = 0; i < array.getEntries(); i++)
-      m_simHitsVector.push_back(array[i]);
+    StoreArray<EKLMSimHit> simHitsArray;
+    for (int i = 0; i < simHitsArray.getEntries(); i++)
+      m_simHitsVector.push_back(simHitsArray[i]);
   }
 
   void EKLMDigitizer::sortSimHits()
@@ -79,7 +79,11 @@ namespace Belle2 {
       fiberAndElectronicsSimulator->processEntry();
 
       EKLMSimHit *simHit = it->second.front();
-      EKLMStripHit *stripHit = new EKLMStripHit();
+
+      StoreArray<EKLMStripHit> stripHitsArray;
+      EKLMStripHit *stripHit = new(stripHitsArray->AddrAt(stripHitsArray.getEntries()))EKLMStripHit();
+
+      //      EKLMStripHit *stripHit = new EKLMStripHit();
 
       stripHit->set_nEndcap(simHit->get_nEndcap());
       stripHit->set_nLayer(simHit->get_nLayer());
@@ -101,19 +105,10 @@ namespace Belle2 {
 
       stripHit->setLeadingParticlePDGCode(0);
 
-      m_HitVector.push_back(stripHit);
+      //      m_HitVector.push_back(stripHit);
       delete fiberAndElectronicsSimulator;
     }
     //    B2INFO( "STOP MERGING HITS");
-  }
-
-  void EKLMDigitizer::saveStripHits()
-  {
-
-    for (std::vector<EKLMStripHit*>::const_iterator iter = m_HitVector.begin();
-         iter != m_HitVector.end(); ++iter)
-      storeEKLMObject("StripHitsEKLMArray", *iter);
-
   }
 }
 

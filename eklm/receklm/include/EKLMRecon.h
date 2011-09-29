@@ -38,8 +38,6 @@ namespace Belle2 {
     //! Creates 2d hits in each SectorHit
     void create2dHits();
 
-    //! Stores 2d hits in the datastore
-    void store2dHits();
 
   private:
     //! vector of StripHits

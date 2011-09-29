@@ -104,9 +104,12 @@ namespace Belle2 {
      * createLayer - create layer
      * @iLayer: number of layer
      * @iEndcap: number of endcap
-     * @mpvgt: mother physical volume with global transformation
+     * @mlv: mother logical volume
+     * @mtr: transformation of mother volume reference frame from
+     *       global reference frame
      */
-    void createLayer(int iLayer, int iEndcap, G4PVPlacementGT *mpvgt);
+    void createLayer(int iLayer, int iEndcap, G4LogicalVolume *mlv,
+                     G4Transform3D *mtr);
 
     /**
      * createSector - create sector
@@ -173,9 +176,11 @@ namespace Belle2 {
     /**
      * createSectionSupport - create section support
      * @iSectionSupport: number of section support
+     * @iPlane: number of plane
      * @mpvgt: mother physical volume with global transformation
      */
-    void createSectionSupport(int iSectionSupport, G4PVPlacementGT *mpvgt);
+    void createSectionSupport(int iSectionSupport, int iPlane,
+                              G4PVPlacementGT *mpvgt);
 
     /**
      * createStrip - create strip
@@ -266,6 +271,21 @@ namespace Belle2 {
     double SectorSupport_CornerX;
 
     /**
+     * Sector support structure: top corner height
+     */
+    double SectorSupport_TopCornerHeight;
+
+    /**
+     * Sector support structure: cutted corner angle.
+     */
+    double SectorSupport_CornerAngle;
+
+    /**
+     * getSectorSupportCornerAngle - get cutted corner angle
+     */
+    double getSectorSupportCornerAngle();
+
+    /**
      * Position data for planes.
      */
     struct EKLMElementPosition PlanePosition;
@@ -273,7 +293,7 @@ namespace Belle2 {
     /**
      * Position data for section support structure.
      */
-    struct EKLMElementPosition *SectionSupportPosition;
+    struct EKLMElementPosition *SectionSupportPosition[2];
 
     /**
      * Section support structure top box width.

@@ -8,11 +8,11 @@
     </Components>
   </Material>
 
-  <!--g
+  <!--
     There are some trenches in the PXD sensors left and right to the sensitive
     area to reduce material. These are modelled by using a mixture of Air and
     silicon. The fractions were calculated using the CAD models of the Sensor,
-    2011-08-01g
+    2011-08-01
   -->
   <Material name="PXD-BorderThinning">
     <state>Solid</state>
@@ -30,12 +30,37 @@
     </Components>
   </Material>
 
+  <Material name="PXD-Zirconoxide">
+    <state>Solid</state>
+    <density unit="g/cm3">6.05</density>
+    <Components>
+      <Element fraction="0.74">Zr</Element>
+      <Element fraction="0.26">O</Element>
+    </Components>
+  </Material>
+
   <Material name="PXD-Support">
     <state>Solid</state>
+    <!--
+      Density of Steel is 7.9, but since the support in the simulation is
+      smaller than the actual endflange we increase the density:
+
+      Real volume: 10047 mm^3
+      Simulation volume: 8243 mm^3
+      Density scale of 1.22
+    -->
+    <density unit="g/cm3">9.63</density>
     <temperature>243.15</temperature>
     <Components>
-      <Material fraction="0.80">Fe</Material>
-      <Material fraction="0.20">ColdAir</Material>
+      <Element>Fe</Element>
+    </Components>
+  </Material>
+
+  <Material name="PXD-CarbonTubes">
+    <state>Solid</state>
+    <density unit="g/cm3">1.5</density>
+    <Components>
+      <Element>C</Element>
     </Components>
   </Material>
 

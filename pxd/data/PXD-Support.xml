@@ -62,7 +62,7 @@
     <deltaPhi unit="deg">45.000</deltaPhi>
   </Cutout>
   <CarbonTubes description="Carbon tubes for air cooling of Switchers">
-    <Material>C</Material>
+    <Material>PXD-CarbonTubes</Material>
     <count>4</count>
     <minZ unit="mm">-34.083</minZ>
     <maxZ unit="mm"> 64.822</maxZ>

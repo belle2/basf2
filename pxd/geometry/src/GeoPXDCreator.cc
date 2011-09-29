@@ -39,6 +39,13 @@
 #include <G4SubtractionSolid.hh>
 #include <G4UserLimits.hh>
 #include <G4RegionStore.hh>
+#include <G4Point3D.hh>
+
+#include <G4TessellatedSolid.hh>
+#include <G4QuadrangularFacet.hh>
+#include <G4TriangularFacet.hh>
+
+#define MATERIAL_SCAN
 
 using namespace std;
 using namespace boost;
@@ -156,6 +163,13 @@ namespace Belle2 {
                            );
         }
         c.volume = new G4LogicalVolume(solid, Materials::get(c.material), "PXD." + name);
+#ifdef MATERIAL_SCAN
+        if (name == "DHP" || name == "DCD" || name == "Switcher") {
+          G4Region* asicRegion = G4RegionStore::GetInstance()->FindOrCreateRegion("PXD-Asics");
+          c.volume->SetRegion(asicRegion);
+          asicRegion->AddRootLogicalVolume(c.volume);
+        }
+#endif
       }
       vector<GeoPXDPlacement> subComponents = getSubComponents(params);
       addSubComponents("PXD." + name, c, subComponents);
@@ -303,14 +317,16 @@ namespace Belle2 {
     {
       VxdID ladder(m_ladder.layerID, ladderID, 0);
 
-      G4RotationMatrix ladderRotation(0, 0, phi);
+      G4RotationMatrix ladderRotation(0, 0, -phi);
       G4Translate3D ladderPos(m_ladder.shift, m_ladder.radius, 0.0);
       G4Transform3D ladderPlacement = placement * G4Rotate3D(ladderRotation) * ladderPos * getAlignment(ladder);
 
+      vector<G4Point3D> lastSensorEdge;
       BOOST_FOREACH(GeoPXDSensor s, m_ladder.sensors) {
         VxdID sensorID(ladder);
         sensorID.setSensor(s.sensorID);
         string name = "PXD." + (string)sensorID;
+        B2DEBUG(10, "Creating Sensor " << name);
         G4Box* sensorShape = new G4Box(name, s.width / 2.0, s.length / 2.0, s.height / 2.0);
         s.volume = new G4LogicalVolume(sensorShape, Materials::get(s.material), name);
 
@@ -335,6 +351,11 @@ namespace Belle2 {
         G4LogicalVolume* active = new G4LogicalVolume(activeShape,  Materials::get(s.material),
                                                       name + ".Active", 0, sensitive);
         active->SetUserLimits(new G4UserLimits(s.active.stepSize));
+#ifdef MATERIAL_SCAN
+        G4Region* activeRegion = G4RegionStore::GetInstance()->FindOrCreateRegion("PXD-Active");
+        active->SetRegion(activeRegion);
+        activeRegion->AddRootLogicalVolume(active);
+#endif
         setColor(*active, "#ddd");
         //The coordinates of the active region are given relative to the corner of the sensor, not to the center
         //so we convert them. If the sensor is flipped, the sign of coordinates need to be inverted
@@ -361,11 +382,77 @@ namespace Belle2 {
         }*/
 
         //Now create all the other components and place the Sensor
-        double shiftX = s.height / 2.0 * (s.flipW ? -1 : 1) + addSubComponents(name, s, s.components, true, false);
+        double sHeight = s.height;
+        double shiftW = addSubComponents(name, s, s.components, true, false);
+        double w = sHeight / 2.0 * (s.flipW ? -1 : 1) + shiftW;
         G4RotationMatrix rotation(0, -M_PI / 2.0, -M_PI / 2.0);
         G4Transform3D sensorAlign = getAlignment(sensorID);
-        G4Transform3D placement = ladderPlacement * G4Translate3D(-shiftX, 0.0, s.z) * G4Rotate3D(rotation) * sensorAlign;
+        G4Transform3D placement = ladderPlacement * G4Translate3D(-w, 0.0, s.z) * G4Rotate3D(rotation) * sensorAlign;
         new G4PVPlacement(placement, s.volume, name, volume, false, 1);
+
+        //See if we want to glue the modules together
+        if (m_ladder.glueSize >= 0) {
+          double u = s.width / 2.0 + m_ladder.glueSize;
+          double v = s.length / 2.0;
+          double w = sHeight / 2.0 + m_ladder.glueSize;
+          std::vector<G4Point3D> curSensorEdge(4);
+          curSensorEdge[0] = placement * G4Point3D(u, v, shiftW + w);
+          curSensorEdge[1] = placement * G4Point3D(u, v, shiftW - w);
+          curSensorEdge[2] = placement * G4Point3D(-u, v, shiftW - w);
+          curSensorEdge[3] = placement * G4Point3D(-u, v, shiftW + w);
+          if (lastSensorEdge.size()) {
+            //Check that the modules don't overlap in z
+            bool glueOK = true;
+            for (int i = 0; i < 4; ++i) glueOK &= curSensorEdge[i].z() <= lastSensorEdge[i].z();
+            if (!glueOK) {
+              B2WARNING("Cannot place Glue at sensor " + (string)sensorID +
+                        " since it overlaps with the last module in z");
+            } else {
+              //Create Glue which spans from last sensor to this sensor
+              G4TessellatedSolid* solidTarget = new G4TessellatedSolid("PXD.Glue." + (string)sensorID);
+
+              //Face at end of last Sensor
+              solidTarget->AddFacet(new G4QuadrangularFacet(
+                                      curSensorEdge[3], curSensorEdge[2], curSensorEdge[1], curSensorEdge[0], ABSOLUTE));
+              //Face at begin of current Sensor
+              solidTarget->AddFacet(new G4QuadrangularFacet(
+                                      lastSensorEdge[0], lastSensorEdge[1], lastSensorEdge[2], lastSensorEdge[3], ABSOLUTE));
+
+              //Top faces
+              solidTarget->AddFacet(new G4TriangularFacet(
+                                      curSensorEdge[3], curSensorEdge[0], lastSensorEdge[0], ABSOLUTE));
+              solidTarget->AddFacet(new G4TriangularFacet(
+                                      lastSensorEdge[0], lastSensorEdge[3], curSensorEdge[3], ABSOLUTE));
+              //Bottom faces
+              solidTarget->AddFacet(new G4TriangularFacet(
+                                      curSensorEdge[1], curSensorEdge[2], lastSensorEdge[2], ABSOLUTE));
+              solidTarget->AddFacet(new G4TriangularFacet(
+                                      lastSensorEdge[2], lastSensorEdge[1], curSensorEdge[1], ABSOLUTE));
+              //Right faces
+              solidTarget->AddFacet(new G4TriangularFacet(
+                                      curSensorEdge[0], curSensorEdge[1], lastSensorEdge[1], ABSOLUTE));
+              solidTarget->AddFacet(new G4TriangularFacet(
+                                      lastSensorEdge[1], lastSensorEdge[0], curSensorEdge[0], ABSOLUTE));
+              //Left faces
+              solidTarget->AddFacet(new G4TriangularFacet(
+                                      curSensorEdge[2], curSensorEdge[3], lastSensorEdge[3], ABSOLUTE));
+              solidTarget->AddFacet(new G4TriangularFacet(
+                                      lastSensorEdge[3], lastSensorEdge[2], curSensorEdge[2], ABSOLUTE));
+
+              solidTarget->SetSolidClosed(true);
+
+              G4LogicalVolume* glue = new G4LogicalVolume(solidTarget,  Materials::get(m_ladder.glueMaterial),
+                                                          "PXD.Glue." + (string)sensorID);
+              setColor(*glue, "#097");
+              new G4PVPlacement(G4Transform3D(), glue, "PXD.Glue." + (string)sensorID, volume, false, 1);
+            }
+          }
+          lastSensorEdge.resize(4);
+          lastSensorEdge[0] = placement * G4Point3D(u, -v, shiftW + w);
+          lastSensorEdge[1] = placement * G4Point3D(u, -v, shiftW - w);
+          lastSensorEdge[2] = placement * G4Point3D(-u, -v, shiftW - w);
+          lastSensorEdge[3] = placement * G4Point3D(-u, -v, shiftW + w);
+        }
       }
     }
 
@@ -373,6 +460,10 @@ namespace Belle2 {
     {
       if (!support) return 0;
       G4AssemblyVolume *supportAssembly = new G4AssemblyVolume();
+
+#ifdef MATERIAL_SCAN
+      G4Region* supportRegion = G4RegionStore::GetInstance()->FindOrCreateRegion("PXD-Support");
+#endif
 
       BOOST_FOREACH(const GearDir &endflange, support.getNodes("Endflange")) {
         double minZ(0), maxZ(0);
@@ -411,6 +502,10 @@ namespace Belle2 {
 
         G4LogicalVolume *volume = new G4LogicalVolume(supportCone, material, name);
         setColor(*volume, endflange.getString("color", "#ccc4"));
+#ifdef MATERIAL_SCAN
+        volume->SetRegion(supportRegion);
+        supportRegion->AddRootLogicalVolume(volume);
+#endif
         G4Transform3D identity;
         supportAssembly->AddPlacedVolume(volume, identity);
       }
@@ -432,6 +527,10 @@ namespace Belle2 {
 
         G4Tubs* tube = new G4Tubs("CarbonTube", minR, maxR, sizeZ, 0, 2*M_PI);
         G4LogicalVolume* tubeVol = new G4LogicalVolume(tube, Materials::get(material), "CarbonTube");
+#ifdef MATERIAL_SCAN
+        tubeVol->SetRegion(supportRegion);
+        supportRegion->AddRootLogicalVolume(tubeVol);
+#endif
         setColor(*tubeVol, "#000");
         for (int i = 0; i < nTubes; ++i) {
           G4Transform3D placement = G4RotateZ3D(phi0 + i * dphi) * G4Translate3D(shiftX, shiftY, shiftZ);
@@ -561,7 +660,9 @@ namespace Belle2 {
       m_ladder = GeoPXDLadder(
                    layer,
                    paramsLadder.getLength("radius") / Unit::mm,
-                   paramsLadder.getLength("shift") / Unit::mm
+                   paramsLadder.getLength("shift") / Unit::mm,
+                   paramsLadder.getLength("Glue/oversize", -1) / Unit::mm,
+                   paramsLadder.getString("Glue/Material", "")
                  );
       GeoPXDSensor sensor(
         paramsSensor.getString("Material"),

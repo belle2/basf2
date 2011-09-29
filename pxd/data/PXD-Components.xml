@@ -3,14 +3,16 @@
   <Ladder layer="1">
     <shift  unit="mm"> 3.500</shift>
     <radius unit="mm">14.000</radius>
-    <Sensor id="1" unit="mm" flipW="true">-20.013</Sensor>
-    <Sensor id="2" unit="mm" flipW="true" flipV="true"> 48.013</Sensor>
+    <Glue><oversize unit="um">20</oversize><Material>PXD-Glue</Material></Glue>
+    <Sensor id="1" unit="mm" flipW="true" flipV="true"> 48.013</Sensor>
+    <Sensor id="2" unit="mm" flipW="true">-20.013</Sensor>
   </Ladder>
   <Ladder layer="2">
     <shift  unit="mm"> 3.500</shift>
     <radius unit="mm">22.000</radius>
-    <Sensor id="1" unit="mm">-23.513</Sensor>
-    <Sensor id="2" unit="mm" flipV="true"> 61.513</Sensor>
+    <Glue><oversize unit="um">20</oversize><Material>PXD-Glue</Material></Glue>
+    <Sensor id="1" unit="mm" flipV="true"> 61.513</Sensor>
+    <Sensor id="2" unit="mm">-23.513</Sensor>
   </Ladder>
 
   <Sensor layer="1">
@@ -43,14 +45,13 @@
       <IntegrationStart unit="us">-10.0</IntegrationStart>
       <IntegrationEnd   unit="us"> 10.0</IntegrationEnd>
     </Active>
-    <!--TODO: Glue-->
     <Component type="ThinningLayer1">
       <u unit="mm"> 7.000</u><v unit="mm">45.390</v>
     </Component>
     <Component type="Reinforcement">
-      <u unit="mm"> 0.500</u><v unit="mm">66.480</v><w>bottom</w>
-      <u unit="mm">13.500</u><v unit="mm">66.480</v><w>bottom</w>
-      <u unit="mm">14.500</u><v unit="mm">66.480</v><w>bottom</w>
+      <u unit="mm"> 0.500</u><v unit="mm">66.475</v><w>bottom</w>
+      <u unit="mm">13.500</u><v unit="mm">66.475</v><w>bottom</w>
+      <u unit="mm">14.500</u><v unit="mm">66.475</v><w>bottom</w>
     </Component>
     <Component type="BorderThinningLayer1">
       <u unit="mm"> 0.525</u><v unit="mm">44.085</v><w>bottom</w>
@@ -97,7 +98,6 @@
       <IntegrationEnd   unit="us"> 10.0</IntegrationEnd>
     </Active>
 
-    <!--TODO: Glue-->
     <Component type="ThinningLayer2">
       <u unit="mm"> 7.000</u><v unit="mm">53.888</v>
     </Component>
@@ -139,7 +139,7 @@
   </Component>
 
   <Component name="Reinforcement">
-    <Material>Al</Material>
+    <Material>PXD-Zirconoxide</Material>
     <Color>#CCCCCC</Color>
     <width  unit="mm">0.600</width>
     <length unit="mm">3.000</length>
@@ -221,7 +221,7 @@
   </Component>
 
   <Component name="DCD">
-    <Material>Si</Material>
+    <Material>PXD-DCD</Material>
     <Color>#666633</Color>
     <width  unit="mm">3.410</width>
     <length unit="mm">5.310</length>
@@ -229,7 +229,7 @@
   </Component>
 
   <Component name="DHP">
-    <Material>Si</Material>
+    <Material>PXD-DHP</Material>
     <Color>#666666</Color>
     <width  unit="mm">3.410</width>
     <length unit="mm">5.130</length>
@@ -237,7 +237,7 @@
   </Component>
 
   <Component name="Switcher">
-    <Material>Si</Material>
+    <Material>PXD-Switcher</Material>
     <Color>#660000</Color>
     <width  unit="mm">2.035</width>
     <length unit="mm">3.600</length>

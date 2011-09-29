@@ -65,10 +65,13 @@ namespace Belle2 {
     };
 
     struct GeoPXDLadder {
-      GeoPXDLadder(int layerID = 0, double shift = 0, double radius = 0): layerID(layerID), shift(shift), radius(radius) {}
+      GeoPXDLadder(int layerID = 0, double shift = 0, double radius = 0, double glueSize = -1, const std::string &glueMaterial = ""):
+          layerID(layerID), shift(shift), radius(radius), glueSize(glueSize), glueMaterial(glueMaterial) {}
       int layerID;
       double shift;
       double radius;
+      double glueSize;
+      std::string glueMaterial;
       std::vector<GeoPXDSensor> sensors;
     };
 

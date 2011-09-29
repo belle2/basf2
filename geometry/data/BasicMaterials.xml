@@ -32,19 +32,10 @@
 
   <Material name="Paraffin">
     <state>Liquid</state>
-    <density>0.93</density>
+    <density unit="g/cm3">0.93</density>
     <Components>
       <Element fraction="0.15">H</Element>
       <Element fraction="0.85">O</Element>
-    </Components>
-  </Material>
-
-  <Material name="MatMixture">
-    <state>Solid</state>
-    <density>1</density>
-    <Components>
-      <Material fraction="0.5">Paraffin</Material>
-      <Material fraction="0.5">Air</Material>
     </Components>
   </Material>
 </Materials>

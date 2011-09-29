@@ -29,6 +29,13 @@ namespace Belle2 {
   class PXDTrueHit : public TObject {
 
   public:
+    /** Constructor
+     * @param sensorID SensorID of the Sensor
+     * @param u u coordinate of the hit in local coordinates
+     * @param v v coordinate of the hit in local coordinates
+     * @param momentum momentum of the particle in local coordinates
+     * @param globalTime timestamp of the hit
+     */
     PXDTrueHit(
       VxdID sensorID = 0,
       float u = 0, float v = 0, const TVector3 momentum = TVector3(0, 0, 0), float globalTime = 0):

@@ -62,6 +62,8 @@ namespace Belle2 {
         if (width2 > 0) m_deltaWidth = width2 - width;
         if (splitLength > 0) m_splitLength = splitLength / length;
       }
+      /** Default constructor to make class polymorph */
+      virtual ~SensorInfoBase() {}
 
       /** Return the Type of the Sensor */
       SensorType getType() const { return m_type; }
@@ -147,7 +149,8 @@ namespace Belle2 {
        * @param v v coordinate of the pixel/strip, ignored for rectangular sensors
        * @return ID of the pixel/strip covering the given coordinate
        */
-      double getUCellID(double u, double v = 0) const {
+      int getUCellID(double u, double v = 0, bool clamp = false) const {
+        if (clamp) return std::min(getUCells() - 1, std::max(0, getUCellID(u, v, false)));
         return static_cast<int>((u / getWidth(v) + 0.5)*m_uCells);
       }
 
@@ -155,7 +158,8 @@ namespace Belle2 {
        * @param v v coordinate of the pixel/strip
        * @return ID of the pixel/strip covering the given coordinate
        */
-      double getVCellID(double v) const {
+      int getVCellID(double v, bool clamp = false) const {
+        if (clamp) return std::min(getVCells() - 1, std::max(0, getVCellID(v, false)));
         double nv = v / m_length + 0.5;
         if (m_splitLength <= 0) return static_cast<int>(nv*m_vCells);
         if (nv >= m_splitLength) return static_cast<int>((nv - m_splitLength) / (1 - m_splitLength)*m_vCells2) + m_vCells;

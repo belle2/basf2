@@ -25,8 +25,8 @@
   <Material name="PXD-SwitcherThinning">
     <state>Solid</state>
     <Components>
-      <Material fraction="0.428">Si</Material>
-      <Material fraction="0.572">ColdAir</Material>
+      <Material fraction="0.413">Si</Material>
+      <Material fraction="0.587">ColdAir</Material>
     </Components>
   </Material>
 

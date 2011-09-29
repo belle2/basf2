@@ -111,6 +111,9 @@ namespace Belle2 {
           B2ERROR("Could not find required element Name or Creator for " << component.getPath());
           continue;
         }
+        if (m_components.size() > 0 && m_components.count(name) == 0) continue;
+        if (m_excluded.size() > 0 && m_excluded.count(name) > 0) continue;
+
         string libraryName = component.getString("Creator/@library", "");
 
         CreatorBase* creator = CreatorManager::getCreator(creatorName, libraryName);

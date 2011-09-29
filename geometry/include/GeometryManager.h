@@ -12,6 +12,8 @@
 #define GEOMETRYMANAGER_H
 
 #include <vector>
+#include <set>
+#include <string>
 #include <memory>
 
 class G4VPhysicalVolume;
@@ -61,6 +63,29 @@ namespace Belle2 {
       void createGeometry(const GearDir &params, GeometryTypes type = FullGeometry);
 
       /**
+       * Set the names of the components to create.
+       * This member allows to set a list of component names. When creating the
+       * the geometry, only components matching names in the list will be
+       * created. All other components found in the parameters will be ignored
+       * @param components List of detector components to be created
+       */
+      void setDetectorComponents(const std::vector<std::string>& components) {
+        m_components.clear();
+        m_components.insert(components.begin(), components.end());
+      }
+
+      /**
+       * Set the names of the components to exclude from creation.
+       * This member allows to set a list of component names. When creating the
+       * the geometry, components matching names in the list will be ignored
+       * @param components List of detector components to be excluded
+       */
+      void setExcludedComponents(const std::vector<std::string>& components) {
+        m_excluded.clear();
+        m_excluded.insert(components.begin(), components.end());
+      }
+
+      /**
        * Delete the existing Geant4 Geometry.
        */
       void clear();
@@ -86,9 +111,12 @@ namespace Belle2 {
 
       /** Pointer to the top volume of the native geometry description */
       G4VPhysicalVolume* m_topVolume;
-
       /** List of all creators, to be freed when geometry is destucted */
       std::vector<CreatorBase*> m_creators;
+      /** List of names of components to be created, all other components will be ignored */
+      std::set<std::string> m_components;
+      /** List of names of components to be excluded from creation */
+      std::set<std::string> m_excluded;
 
       /** Allow destruction of instance */
       friend class std::auto_ptr<GeometryManager>;

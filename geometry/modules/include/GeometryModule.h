@@ -14,16 +14,24 @@
 #include <framework/core/Module.h>
 
 namespace Belle2 {
+  /** Module to faciliate Geometry creation. */
   class GeometryModule: public Module {
   public:
+    /** Constructor */
     GeometryModule();
+    /** Destructor */
     ~GeometryModule() {};
-
+    /** Create geometry */
     void initialize();
   protected:
+    /** Path for the geometry in the parameter space */
     std::string m_geometryPath;
-    std::string m_geometryTypeString;
+    /** Type of the geometry to be built */
     int m_geometryType;
+    /** Components to be created, if empty all components will be created */
+    std::vector<std::string> m_components;
+    /** Components to excluded from creation */
+    std::vector<std::string> m_excluded;
   };
 } //Belle2 namespace
 #endif

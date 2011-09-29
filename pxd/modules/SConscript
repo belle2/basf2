@@ -1,0 +1,6 @@
+Import('env')
+
+env['LIBS'] = ['pxd', 'framework', 'generators', 'geometry', 'libboost_iostreams',
+               '$ROOT_LIBS']
+
+Return('env')

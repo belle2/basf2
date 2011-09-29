@@ -103,12 +103,7 @@ namespace Belle2 {
       //              Add SimHit to the DataStore
       //-------------------------------------------------------
 
-      VxdID vxdID = preStep.GetTouchableHandle()->GetCopyNumber();
-      if (!vxdID) {
-        B2ERROR("Could not determine Sensor ID");
-        return false;
-      }
-
+      VxdID sensorID = m_info->getID();
       TVector3 posIn(preStepPosLocal.x() * Unit::mm, preStepPosLocal.y() * Unit::mm, preStepPosLocal.z() * Unit::mm);
       TVector3 posOut(posStepPosLocal.x() * Unit::mm, posStepPosLocal.y() * Unit::mm, posStepPosLocal.z() * Unit::mm);
       TVector3 momInVec(momInLocal.x() * Unit::MeV, momInLocal.y() * Unit::MeV, momInLocal.z() * Unit::MeV);
@@ -116,16 +111,16 @@ namespace Belle2 {
       StoreArray<MCParticle> mcParticles;
 
       //-------------------------------------------------------
-      // If Step crossed local x=0, add TrueHit
+      // If Step crossed local z=0, add TrueHit
       //-------------------------------------------------------
-      if (posIn.X()*posOut.X() < 0) {
+      if (posIn.Z()*posOut.Z() < 0) {
         TVector3 dir = posOut - posIn;
-        TVector3 posZero = posIn - posIn.X() / dir.X() * dir;
+        TVector3 posZero = posIn - posIn.Z() / dir.Z() * dir;
         StoreArray<PXDTrueHit> pxdTrueHits;
         RelationArray   pxdTrueHitRel(mcParticles, pxdTrueHits);
         int hitIndex = pxdTrueHits->GetLast() + 1;
         new(pxdTrueHits->AddrAt(hitIndex))
-        PXDTrueHit(vxdID, posZero.Y(), posZero.Z(), momInVec, globalTime);
+        PXDTrueHit(sensorID, posZero.X(), posZero.Y(), momInVec, globalTime);
         pxdTrueHitRel.add(trackID, hitIndex);
       }
 
@@ -138,7 +133,7 @@ namespace Belle2 {
       RelationArray pxdSimHitRel(mcParticles, pxdSimHits);
 
       int hitIndex = pxdSimHits->GetLast() + 1 ;
-      new(pxdSimHits->AddrAt(hitIndex)) PXDSimHit(vxdID, partPDGCode, theta, depEnergy, globalTime,
+      new(pxdSimHits->AddrAt(hitIndex)) PXDSimHit(sensorID, partPDGCode, theta, depEnergy, globalTime,
                                                   posIn, posOut, momInVec);
 
       //Add relation between the MCParticle and the hit.

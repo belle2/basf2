@@ -9,7 +9,7 @@
       <Ring id="1">
 	<nSegments desc="number of detector segments">6</nSegments>
 	<dFi desc="minimal distance between modules in fi direction" unit="mm">5</dFi>
-	<dR desc="minimal distance between modules in r direction" unit="mm">1.5</dR>
+	<dR desc="minimal distance between modules in r direction" unit="mm">20</dR>
       </Ring>
       <Ring id="2">
 	<nSegments desc="number of detector segments">6</nSegments>

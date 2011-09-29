@@ -40,7 +40,7 @@ namespace Belle2 {
     {
       //Get particle ID
       G4Track& track  = *aStep->GetTrack();
-      // if (track.GetDefinition()->GetParticleName() != "opticalphoton") return false;
+      if (track.GetDefinition()->GetParticleName() != "opticalphoton") return false;
 
       //Get time (check for proper global time)
       const G4double globalTime = track.GetGlobalTime();
@@ -51,16 +51,12 @@ namespace Belle2 {
 
       //Get step information
       const G4StepPoint& preStep  = *aStep->GetPreStepPoint();
-
       //Get world position
       const G4ThreeVector& worldPosition = preStep.GetPosition();
-
       //Transform to local position
       const G4ThreeVector localPosition = preStep.GetTouchableHandle()->GetHistory()->GetTopTransform().TransformPoint(worldPosition);
-
       //Get module ID number
       const G4int moduleID = preStep.GetTouchableHandle()->GetReplicaNumber(1);
-      B2INFO("replica number: " << moduleID);
       //Get photon energy
       const G4double energy = track.GetKineticEnergy() / eV;
 

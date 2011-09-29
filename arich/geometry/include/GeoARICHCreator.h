@@ -8,23 +8,18 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef GEOARICHCREATOR_H_
-#define GEOARICHCREATOR_H_
+#ifndef GEOARICHCREATOR_H
+#define GEOARICHCREATOR_H
 
 #include <arich/geometry/ARICHGeometryPar.h>
 #include <geometry/CreatorBase.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
-#include <string>
-#include <vector>
-#include <map>
-#include <sstream>
 
-#include <G4Transform3D.hh>
+
 class G4LogicalVolume;
-class G4AssemblyVolume;
-class G4Polycone;
 class G4Material;
+
 namespace Belle2 {
   namespace arich {
 
@@ -51,24 +46,14 @@ namespace Belle2 {
 
       virtual void create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes type);
 
-      /**
-       * Get Alignment for given component from the database
-       * @param  component Name of the component to align
-       * @return Transformation matrix for component, idendity if component
-       *         could not be found
-       */
-
       G4LogicalVolume* buildModule(GearDir Module);
       G4LogicalVolume* buildModulePCB(GearDir Module);
       G4LogicalVolume* buildModuleSupportPlate(GearDir Support);
       G4LogicalVolume* buildMirrors(GearDir Mirrors);
       double getAvgRINDEX(G4Material* material);
       void createSimple(const GearDir& content, G4LogicalVolume& topVolume);
+
     protected:
-      //      GearDir m_alignment;
-      // GearDir m_components;
-      // std::map<std::string, GeoPXDComponent> m_componentCache;
-      //GeoPXDLadder m_ladder;
       SensitiveDetector* m_sensitive;
       SensitiveAero* m_sensitiveAero;
       ARICHGeometryPar* m_arichgp;
@@ -77,4 +62,4 @@ namespace Belle2 {
   }
 }
 
-#endif /* GEOARICHCREATOR_H_ */
+#endif /* GEOARICHCREATOR_H */

@@ -46,7 +46,6 @@ namespace Belle2 {
       G4ParticleDefinition* particle = aTrack->GetDefinition();
       G4double  PDGCharge = particle->GetPDGCharge();
       G4ThreeVector momentum = PrePosition->GetMomentum();
-
       // Save only tracks of charged particles
       if (PDGCharge == 0) return(true);
 

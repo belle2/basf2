@@ -570,21 +570,36 @@ namespace Belle2 {
         paramsSensor.getLength("length") / Unit::mm,
         paramsSensor.getLength("height") / Unit::mm
       );
+      GearDir paramsActive(paramsSensor, "Active");
       sensor.active = GeoPXDActiveArea(
-                        paramsSensor.getLength("Active/u") / Unit::mm,
-                        paramsSensor.getLength("Active/v") / Unit::mm,
-                        paramsSensor.getLength("Active/stepSize") / Unit::mm
+                        paramsActive.getLength("u") / Unit::mm,
+                        paramsActive.getLength("v") / Unit::mm,
+                        paramsActive.getLength("stepSize") / Unit::mm
                       );
       sensor.info = SensorInfo(
                       VxdID(layer, 0, 0),
-                      paramsSensor.getLength("Active/width"),
-                      paramsSensor.getLength("Active/length"),
-                      paramsSensor.getLength("Active/height"),
-                      paramsSensor.getInt("Active/pixelsR"),
-                      paramsSensor.getInt("Active/pixelsZ[1]"),
-                      paramsSensor.getLength("Active/splitLength", 0),
-                      paramsSensor.getInt("Active/pixelsZ[2]", 0)
+                      paramsActive.getLength("width"),
+                      paramsActive.getLength("length"),
+                      paramsActive.getLength("height"),
+                      paramsActive.getInt("pixelsR"),
+                      paramsActive.getInt("pixelsZ[1]"),
+                      paramsActive.getLength("splitLength", 0),
+                      paramsActive.getInt("pixelsZ[2]", 0)
                     );
+      sensor.info.setDEPFETParams(
+        paramsActive.getDouble("BulkDoping") / (Unit::um * Unit::um * Unit::um),
+        paramsActive.getWithUnit("BackVoltage"),
+        paramsActive.getWithUnit("TopVoltage"),
+        paramsActive.getLength("SourceBorder"),
+        paramsActive.getLength("ClearBorder"),
+        paramsActive.getLength("DrainBorder"),
+        paramsActive.getLength("GateDepth"),
+        paramsActive.getBool("DoublePixel")
+      );
+      sensor.info.setIntegrationWindow(
+        paramsActive.getTime("IntegrationStart"),
+        paramsActive.getTime("IntegrationEnd")
+      );
 
       sensor.components = getSubComponents(paramsSensor);
 

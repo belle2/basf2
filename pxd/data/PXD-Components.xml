@@ -30,7 +30,18 @@
       <pixelsZ>512</pixelsZ>
       <pixelsZ>256</pixelsZ>
       <splitLength unit="mm">30.720</splitLength>
-      <!--TODO: Add sensor properties needed by digitizer/clustering -->
+
+      <BulkDoping unit="1/um^3">10.0</BulkDoping>
+      <BackVoltage unit="V">-60.0</BackVoltage>
+      <TopVoltage unit="V">0.0</TopVoltage>
+      <SourceBorder unit="um">3.0</SourceBorder>
+      <ClearBorder unit="um">8.0</ClearBorder>
+      <DrainBorder unit="um">8.0</DrainBorder>
+      <GateDepth unit="um">22</GateDepth>
+      <DoublePixel>true</DoublePixel>
+
+      <IntegrationStart unit="us">-10.0</IntegrationStart>
+      <IntegrationEnd   unit="us"> 10.0</IntegrationEnd>
     </Active>
     <!--TODO: Glue-->
     <Component type="ThinningLayer1">
@@ -72,7 +83,18 @@
       <pixelsZ>512</pixelsZ>
       <pixelsZ>256</pixelsZ>
       <splitLength unit="mm">43.520</splitLength>
-      <!--TODO: Add sensor properties needed by digitizer/clustering -->
+
+      <BulkDoping unit="1/um^3">10.0</BulkDoping>
+      <BackVoltage unit="V">-60.0</BackVoltage>
+      <TopVoltage unit="V">0.0</TopVoltage>
+      <SourceBorder unit="um">3.0</SourceBorder>
+      <ClearBorder unit="um">8.0</ClearBorder>
+      <DrainBorder unit="um">15.0</DrainBorder>
+      <GateDepth unit="um">22</GateDepth>
+      <DoublePixel>true</DoublePixel>
+
+      <IntegrationStart unit="us">-10.0</IntegrationStart>
+      <IntegrationEnd   unit="us"> 10.0</IntegrationEnd>
     </Active>
 
     <!--TODO: Glue-->

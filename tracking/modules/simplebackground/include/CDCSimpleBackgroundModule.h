@@ -17,8 +17,9 @@
 namespace Belle2 {
 
   /** Module to create some random background hits in the CDC.
-   *  The module should be used after the Digitizer but before RecoHit creation.
-   *  A random position in the CDC is chosen (superlayerId, layerId, wireId), other needed variables (driftTime, charge) are also assigned, but it has to be checked how realistic they are.
+   *  The module should be used after the CDCDigitizer but before tracking.
+   *  The module generates an 1/r background, e.g. the number of hits per layer is constant.
+   *  In a loop over all layers a random wireId is chosen, other needed variables (driftTime, charge) are also assigned, but it has to be checked how realistic they are.
    *  There is a possibility to generate single random hits, or clusters of hits.
    *  In this case cluster means that there are some additional hits generated around the random hit (neighboring layers/wires). In total a cluster will have 5-7 Hits.
    *  The steering parameters give the amount of wires hit by background in %.

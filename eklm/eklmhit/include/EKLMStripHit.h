@@ -24,7 +24,7 @@ namespace Belle2 {
 
   //! Main reconstruction hit class. Containes infromation about the
   //! hitted strips
-  class EKLMStripHit : public EKLMHitBase  {
+  class EKLMStripHit : public EKLMHitBase {
 
   public:
 
@@ -37,41 +37,29 @@ namespace Belle2 {
     //! Print stip name and some other useful info
     void Print();
 
-    /*     //! sets histograms */
-    /*     inline void setHistogramm( TH1D * his)  */
-    /*     {m_fitHistograms = his;}; */
-
     //! sets the number of photo electorns
-    inline void setNumberPhotoElectrons(const double &npe)
-    {m_NumberPhotoElectrons = npe;};
+    void setNumberPhotoElectrons(const double &npe);
 
     //! sets the time of the hit
-    inline void setTime(const double  &time)
-    {m_Time = time;};
+    void setTime(const double  &time);
 
     //! set  PDG code of the leading ( (grand-)mother ) particle
-    inline void setLeadingParticlePDGCode(const int  &pdg)
-    {m_LeadingParticlePDGCode = pdg;};
+    void setLeadingParticlePDGCode(const int &pdg);
 
     //! returns time of the hit
-    inline double getTime()const
-    {return m_Time;};
+    double getTime();
 
     //! returns number of photo electrons
-    inline double getNumberPhotoElectrons()const
-    {return m_NumberPhotoElectrons;};
+    double getNumberPhotoElectrons();
 
     //! return  PDG code of the leading ( (grand-)mother ) particle
-    inline int getLeadingParticlePDGCode()const
-    {return m_LeadingParticlePDGCode;};
+    int getLeadingParticlePDGCode();
 
     //! returns physical volume
-    inline G4VPhysicalVolume *getPV() const
-    {return this->m_pv;};
+    G4VPhysicalVolume *getPV();
 
     //! set physical volume
-    inline void setPV(G4VPhysicalVolume *pv)
-    {this->m_pv = pv;};
+    void setPV(G4VPhysicalVolume *pv);
 
     //! returns true if strips intersects (does not pay attention to the layer)
     bool doesIntersect(Belle2::EKLMStripHit *, CLHEP::Hep3Vector &);
@@ -99,15 +87,10 @@ namespace Belle2 {
     /*     //! fit results */
     /*     TH1D * m_fitHistograms; */
 
-
-
     //! Makes objects storable
     ClassDef(Belle2::EKLMStripHit, 1);
 
-
   };
-
-
 
 } // end of namespace Belle2
 

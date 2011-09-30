@@ -20,6 +20,16 @@ using namespace CLHEP;
 
 namespace Belle2 {
 
+  double EKLMFiberAndElectronics::getFitResults(int i)
+  {
+    return fitResultsPtr->Value(i);
+  }
+
+  int EKLMFiberAndElectronics::getFitStatus()
+  {
+    return (int)fitResultsPtr;
+  }
+
   EKLMFiberAndElectronics::EKLMFiberAndElectronics(std::pair < std::string,
                                                    std::vector<EKLMSimHit*> >
                                                    entry)

@@ -35,6 +35,18 @@ namespace Belle2 {
 
   G4Allocator<EKLMDigitizer> EKLMDigitizerAllocator;
 
+  void* EKLMDigitizer::operator new(size_t)
+  {
+    void *aEKLMDigitizer;
+    aEKLMDigitizer = (void *) EKLMDigitizerAllocator.MallocSingle();
+    return aEKLMDigitizer;
+  }
+
+  void EKLMDigitizer::operator delete(void *aEKLMDigitizer)
+  {
+    EKLMDigitizerAllocator.FreeSingle((EKLMDigitizer*) aEKLMDigitizer);
+  }
+
   void EKLMDigitizer::readSimHits()
   {
     StoreArray<EKLMSimHit> simHitsArray;

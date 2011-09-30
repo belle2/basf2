@@ -19,6 +19,48 @@ ClassImp(Belle2::EKLMSimHit)
 
 G4Allocator<EKLMSimHit> EKLMSimHitAllocator;
 
+EKLMSimHit::EKLMSimHit(G4VPhysicalVolume *pv, G4ThreeVector global_pos,
+                       G4ThreeVector local_pos, G4double time,
+                       G4int PDGcode, G4double eDep)
+{
+  m_pv = pv;
+  m_global_pos = global_pos;
+  m_local_pos = local_pos;
+  m_time = time;
+  m_PDGcode = PDGcode;
+  m_eDep = eDep;
+}
+
+G4VPhysicalVolume* EKLMSimHit::getPV()
+{
+  return m_pv;
+}
+
+G4ThreeVector EKLMSimHit::getGlobalPos()
+{
+  return m_global_pos;
+}
+
+G4ThreeVector EKLMSimHit::getLocalPos()
+{
+  return m_local_pos;
+}
+
+G4double EKLMSimHit::getTime()
+{
+  return m_time;
+}
+
+G4double EKLMSimHit::getEDep()
+{
+  return m_eDep;
+}
+
+G4int EKLMSimHit::getPDGCode()
+{
+  return m_PDGcode;
+}
+
 void EKLMSimHit::Save(char* filename)
 {
   std::ofstream save_hit(filename, std::fstream::app);

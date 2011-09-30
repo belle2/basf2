@@ -11,18 +11,6 @@
 #include <eklm/eklmhit/EKLMHitBase.h>
 #include <framework/logging/Logger.h>
 
-//#include <framework/datastore/StoreDefs.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/StoreArray.h>
-
-//Geant4 classes
-#include "G4VVisManager.hh"
-#include "G4Colour.hh"
-#include "G4VisAttributes.hh"
-#include "G4Polyline.hh"
-#include "G4Circle.hh"
-
-
 using namespace Belle2;
 
 ClassImp(EKLMHitBase);
@@ -37,10 +25,58 @@ EKLMHitBase::EKLMHitBase(char nEndcap, char nLayer, char nSector, char nPlane,
   m_nStrip = nStrip;
 }
 
+int EKLMHitBase::get_nEndcap()
+{
+  return m_nEndcap;
+}
+
+void EKLMHitBase::set_nEndcap(char nEndcap)
+{
+  m_nEndcap = nEndcap;
+}
+
+int EKLMHitBase::get_nLayer()
+{
+  return m_nLayer;
+}
+
+void EKLMHitBase::set_nLayer(char nLayer)
+{
+  m_nLayer = nLayer;
+}
+
+int EKLMHitBase::get_nSector()
+{
+  return m_nSector;
+}
+
+void EKLMHitBase::set_nSector(char nSector)
+{
+  m_nSector = nSector;
+}
+
+int EKLMHitBase::get_nPlane()
+{
+  return m_nPlane;
+}
+
+void EKLMHitBase::set_nPlane(char nPlane)
+{
+  m_nPlane = nPlane;
+}
+
+int EKLMHitBase::get_nStrip()
+{
+  return m_nStrip;
+}
+
+void EKLMHitBase::set_nStrip(char nStrip)
+{
+  m_nStrip = nStrip;
+}
+
 void EKLMHitBase::Print()
 {
   B2INFO("Not implemented yet");
 }
-
-
 

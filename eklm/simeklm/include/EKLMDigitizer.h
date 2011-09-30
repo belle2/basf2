@@ -28,10 +28,8 @@ namespace Belle2 {
 
   public:
 
-
     //! Constructor
     EKLMDigitizer() {};
-
 
     //! Destructor
     ~EKLMDigitizer() {};
@@ -45,14 +43,11 @@ namespace Belle2 {
     //! merges hits from the same strip. Creates EKLMStripHits
     void mergeSimHitsToStripHits();
 
-
-
     //! Operator new
-    inline void *operator new(size_t);
+    void *operator new(size_t);
 
     //! Operator delete
-    inline void operator delete(void *aEKLMDigitizer);
-
+    void operator delete(void *aEKLMDigitizer);
 
   private:
 
@@ -69,21 +64,7 @@ namespace Belle2 {
   };
 
   //! Extern allocator
-  extern G4Allocator<EKLMDigitizer>   EKLMDigitizerAllocator;
-
-  //! Operator new
-  inline void* EKLMDigitizer::operator new(size_t)
-  {
-    void *aEKLMDigitizer;
-    aEKLMDigitizer = (void *) EKLMDigitizerAllocator.MallocSingle();
-    return aEKLMDigitizer;
-  }
-
-  //! Operator delete
-  inline void EKLMDigitizer::operator delete(void *aEKLMDigitizer)
-  {
-    EKLMDigitizerAllocator.FreeSingle((EKLMDigitizer*) aEKLMDigitizer);
-  }
+  extern G4Allocator<EKLMDigitizer> EKLMDigitizerAllocator;
 
 } // end of namespace Belle2
 

@@ -42,31 +42,24 @@ namespace Belle2 {
     bool addStripHit(Belle2::EKLMStripHit *);
 
     //! returns pointer to the strip hit in X direction
-    inline Belle2::EKLMStripHit* getXStripHit() const
-    {return m_XStrip;}
+    Belle2::EKLMStripHit* getXStripHit();
 
     //! returns pointer to the strip hit in Y direction
-    inline Belle2::EKLMStripHit* getYStripHit() const
-    {return m_YStrip;}
+    Belle2::EKLMStripHit* getYStripHit();
 
     //! set coordinates of the crossing point
-    inline void  setCrossPoint(CLHEP::Hep3Vector & point)
-    {m_crossPoint = point;}
+    void setCrossPoint(CLHEP::Hep3Vector & point);
 
     //! returns coordinates of the crossing point
-    inline CLHEP::Hep3Vector  getCrossPoint() const
-    {return  m_crossPoint;}
+    CLHEP::Hep3Vector getCrossPoint();
 
     //! calculates ChiSquare of the crossing point
     void setChiSq();
 
     //! returns  ChiSquare of the crossing point
-    inline double getChiSq() const
-    {return m_ChiSq;}
-
+    double getChiSq();
 
   private:
-
 
     //! reference to the X Strip hit
     Belle2::EKLMStripHit * m_XStrip; //-> {ROOT streamer directive}
@@ -82,9 +75,8 @@ namespace Belle2 {
 
     //! Needed to make Belle2::EKLMHit2d storable
     ClassDef(Belle2::EKLMHit2d, 1);
+
   };
-
-
 
 } // end of namespace Belle2
 

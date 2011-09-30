@@ -50,22 +50,22 @@ namespace Belle2 {
     /**
      * getTransform - get transformation.
      */
-    inline G4Transform3D getTransform() {return m_transform;}
+    G4Transform3D getTransform();
 
     /**
      * getID - get identifier.
      */
-    inline int getID() {return m_id;}
+    int getID();
 
     /**
      * getID2 - get identifier 2.
      */
-    inline int getID2() {return m_id2;}
+    int getID2();
 
     /**
      * getMother - get mother G4PVPlacementGT;
      */
-    inline G4PVPlacementGT *getMother() {return m_mother;}
+    G4PVPlacementGT *getMother();
 
   private:
 

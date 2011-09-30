@@ -31,46 +31,33 @@ namespace Belle2 {
   public:
 
     //! constructor needed to make the class storable
-    inline EKLMSimHit() {};
+    EKLMSimHit() {};
 
     //! Constructor with initial values
-    inline EKLMSimHit(G4VPhysicalVolume *pv, G4ThreeVector global_pos,
-                      G4ThreeVector local_pos, G4double time, G4int PDGcode,
-                      G4double eDep) {
-      this->m_pv = pv;
-      this->m_global_pos = global_pos;
-      this->m_local_pos = local_pos;
-      this->m_time = time;
-      this->m_PDGcode = PDGcode;
-      this->m_eDep = eDep;
-    };
+    EKLMSimHit(G4VPhysicalVolume *pv, G4ThreeVector global_pos,
+               G4ThreeVector local_pos, G4double time, G4int PDGcode,
+               G4double eDep);
 
     //! Destructor
     ~EKLMSimHit() {};
 
     //! returns physical volume
-    inline G4VPhysicalVolume *getPV() const
-    {return m_pv;}
+    G4VPhysicalVolume *getPV();
 
     //! returns global position of the hit
-    inline G4ThreeVector getGlobalPos() const
-    {return m_global_pos;}
+    G4ThreeVector getGlobalPos();
 
     //! returns local position of the hit
-    inline G4ThreeVector getLocalPos() const
-    {return m_local_pos;}
+    G4ThreeVector getLocalPos();
 
     //! returns hit time
-    inline G4double getTime() const
-    {return m_time;}
+    G4double getTime();
 
     //! returns energy deposition
-    inline G4double getEDep() const
-    {return m_eDep;}
+    G4double getEDep();
 
     //! returns PDG code of the particle
-    inline G4int getPDGCode() const
-    {return m_PDGcode;}
+    G4int getPDGCode();
 
     //! dumps hit into ASCII file
     void Save(char * filename);

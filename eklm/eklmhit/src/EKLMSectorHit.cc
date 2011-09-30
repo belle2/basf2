@@ -24,6 +24,16 @@ EKLMSectorHit::EKLMSectorHit(char nEndcap, char nLayer, char nSector,
 {
 }
 
+std::vector <Belle2::EKLMStripHit*> EKLMSectorHit::getStripHitVector()
+{
+  return m_stripHitVector;
+}
+
+std::vector <Belle2::EKLMHit2d*> EKLMSectorHit::get2dHitVector()
+{
+  return m_hit2dVector;
+}
+
 void EKLMSectorHit::Print()
 {
   std::cout << "------------  Sector Hit  -------------- " << std::endl;

@@ -43,4 +43,25 @@ namespace Belle2 {
     m_mother = motherPVPlacementGT;
   }
 
+  G4Transform3D G4PVPlacementGT::getTransform()
+  {
+    return m_transform;
+  }
+
+  int G4PVPlacementGT::getID()
+  {
+    return m_id;
+  }
+
+  int G4PVPlacementGT::getID2()
+  {
+    return m_id2;
+  }
+
+  G4PVPlacementGT* G4PVPlacementGT::getMother()
+  {
+    return m_mother;
+  }
+
 }
+

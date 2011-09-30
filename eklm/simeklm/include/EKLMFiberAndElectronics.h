@@ -22,28 +22,26 @@
 #include "TF1.h"
 namespace Belle2 {
 
-
-
   //! Digitize EKLMSimHits  to get EKLM StripHits
   class EKLMFiberAndElectronics {
 
   public:
-    //! Constructor
+    /**
+     * Constructor
+     */
     EKLMFiberAndElectronics(std::pair<std::string, std::vector<EKLMSimHit*> >);
+
+    /**
+     * Destructor
+     */
     ~EKLMFiberAndElectronics();
 
     void processEntry();
     void setRootOutput(TTree * sel);
 
+    double getFitResults(int i);
 
-    inline double getFitResults(int i) {
-      return fitResultsPtr->Value(i);
-    }
-
-    inline int getFitStatus() {
-      return (int)fitResultsPtr;
-    }
-
+    int getFitStatus();
 
   private:
     std::vector <double> hitTimesVectorForward;
@@ -65,8 +63,6 @@ namespace Belle2 {
     void timesToShape(std::vector <double> * , TH1D *);
 
     void hitTimes(int , bool isReflected = false) ;
-
-
 
     //! root tree pointer for external output
     TTree * selection;
@@ -116,7 +112,6 @@ namespace Belle2 {
     //! distance amplitude attenuation
     //! f(l)=distanceAttenuation(l)*f(0)
     double distanceAttenuation(double);
-
 
   };
 

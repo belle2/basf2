@@ -24,6 +24,31 @@ EKLMHit2d::EKLMHit2d()
   m_YStrip = NULL;
 }
 
+Belle2::EKLMStripHit* EKLMHit2d::getXStripHit()
+{
+  return m_XStrip;
+}
+
+Belle2::EKLMStripHit* EKLMHit2d::getYStripHit()
+{
+  return m_YStrip;
+}
+
+void EKLMHit2d::setCrossPoint(CLHEP::Hep3Vector & point)
+{
+  m_crossPoint = point;
+}
+
+CLHEP::Hep3Vector EKLMHit2d::getCrossPoint()
+{
+  return m_crossPoint;
+}
+
+double EKLMHit2d::getChiSq()
+{
+  return m_ChiSq;
+}
+
 EKLMHit2d::EKLMHit2d(EKLMStripHit * xStrip, EKLMStripHit * yStrip)
 {
   m_XStrip = xStrip;

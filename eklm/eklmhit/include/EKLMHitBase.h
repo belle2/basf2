@@ -37,60 +37,60 @@ namespace Belle2 {
                 char nStrip);
 
     //! Destructor
-    virtual ~EKLMHitBase() {};
+    ~EKLMHitBase() {};
 
     //! Print hit information
-    virtual void Print();
+    void Print();
 
     /**
      * Get endcap number.
      */
-    inline int get_nEndcap() {return m_nEndcap;}
+    int get_nEndcap();
 
     /**
      * Set endcap number.
      */
-    inline void set_nEndcap(char nEndcap) {m_nEndcap = nEndcap;}
+    void set_nEndcap(char nEndcap);
 
     /**
      * Get layer number.
      */
-    inline int get_nLayer() {return m_nLayer;}
+    int get_nLayer();
 
     /**
      * Set layer number.
      */
-    inline void set_nLayer(char nLayer) {m_nLayer = nLayer;}
+    void set_nLayer(char nLayer);
 
     /**
      * Get sector number.
      */
-    inline int get_nSector() {return m_nSector;}
+    int get_nSector();
 
     /**
      * Set sector number.
      */
-    inline void set_nSector(char nSector) {m_nSector = nSector;}
+    void set_nSector(char nSector);
 
     /**
      * Get plane number.
      */
-    inline int get_nPlane() {return m_nPlane;}
+    int get_nPlane();
 
     /**
      * Set plane number.
      */
-    inline void set_nPlane(char nPlane) {m_nPlane = nPlane;}
+    void set_nPlane(char nPlane);
 
     /**
      * Get strip number.
      */
-    inline int get_nStrip() {return m_nStrip;}
+    int get_nStrip();
 
     /**
      * Set strip number.
      */
-    inline void set_nStrip(char nStrip) {m_nStrip = nStrip;}
+    void set_nStrip(char nStrip);
 
   private:
     /**

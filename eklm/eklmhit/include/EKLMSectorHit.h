@@ -45,13 +45,11 @@ namespace Belle2 {
 
     //! returns vector of pointers to the Belle2::EKLMStripHits included to
     //! the Belle2::EKLMSectorHit
-    inline std::vector <Belle2::EKLMStripHit*> getStripHitVector() const
-    {return m_stripHitVector;}
+    std::vector <Belle2::EKLMStripHit*> getStripHitVector();
 
     //! returns vector of pointers to 2d hits included to the
     //! Belle2::EKLMSectorHit
-    inline std::vector <Belle2::EKLMHit2d*> get2dHitVector() const
-    {return m_hit2dVector;}
+    std::vector <Belle2::EKLMHit2d*> get2dHitVector();
 
     //! creates 2d hits from the SectorHits of the current sector
     void create2dHits();

@@ -21,6 +21,46 @@ using namespace Belle2;
 
 ClassImp(Belle2::EKLMStripHit);
 
+void EKLMStripHit::setNumberPhotoElectrons(const double &npe)
+{
+  m_NumberPhotoElectrons = npe;
+}
+
+void EKLMStripHit::setTime(const double &time)
+{
+  m_Time = time;
+}
+
+void EKLMStripHit::setLeadingParticlePDGCode(const int &pdg)
+{
+  m_LeadingParticlePDGCode = pdg;
+}
+
+double EKLMStripHit::getTime()
+{
+  return m_Time;
+}
+
+double EKLMStripHit::getNumberPhotoElectrons()
+{
+  return m_NumberPhotoElectrons;
+}
+
+int EKLMStripHit::getLeadingParticlePDGCode()
+{
+  return m_LeadingParticlePDGCode;
+}
+
+G4VPhysicalVolume *EKLMStripHit::getPV()
+{
+  return m_pv;
+}
+
+void EKLMStripHit::setPV(G4VPhysicalVolume *pv)
+{
+  m_pv = pv;
+}
+
 void EKLMStripHit::Print()
 {
   std::cout << "Endcap: " << get_nEndcap()

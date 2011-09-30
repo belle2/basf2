@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Timofey Uglov                                            *
+ * Contributors: Timofey Uglov, Kirill Chilikin                           *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -100,7 +100,8 @@ namespace Belle2 {
 
     //creates hit
     StoreArray<EKLMSimHit> simHitsArray;
-    EKLMSimHit *hit = new(simHitsArray->AddrAt(simHitsArray.getEntries()))EKLMSimHit(pv, gpos, lpos, hitTime, PDGcode,  eDep);
+    EKLMSimHit *hit = new(simHitsArray->AddrAt(simHitsArray.getEntries()))
+    EKLMSimHit(pv, gpos, lpos, hitTime, PDGcode,  eDep);
     if (hit == NULL) {
       B2ERROR("Memory allocation error.");
       return false;
@@ -113,14 +114,14 @@ namespace Belle2 {
     hit->set_nSector(pvgt->getID());
     pvgt = pvgt->getMother();
     hit->set_nLayer(pvgt->getID());
-    pvgt = pvgt->getMother();
-    hit->set_nEndcap(pvgt->getID());
+    hit->set_nEndcap(pvgt->getID2());
 
 
     StoreArray<MCParticle> MCParticlesArray;
     RelationArray particleToSimHitsRelation(MCParticlesArray, simHitsArray);
     registerMCParticleRelation(particleToSimHitsRelation);
-    particleToSimHitsRelation.add(track.GetTrackID(), simHitsArray.getEntries());
+    particleToSimHitsRelation.add(track.GetTrackID(),
+                                  simHitsArray.getEntries());
 
     return true;
   }

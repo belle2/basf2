@@ -19,12 +19,13 @@ namespace Belle2 {
                                    G4LogicalVolume *pCurrentLogical,
                                    const G4String &pName,
                                    G4LogicalVolume *pMotherLogical,
-                                   int id) :
+                                   int id, int id2) :
       G4PVPlacement(Transform3D, pCurrentLogical, pName, pMotherLogical, false,
                     1, false)
   {
     m_transform = globalTransform;
     m_id = id;
+    m_id2 = id2;
     m_mother = NULL;
   }
 
@@ -32,12 +33,13 @@ namespace Belle2 {
                                    const G4Transform3D &Transform3D,
                                    G4LogicalVolume *pCurrentLogical,
                                    const G4String &pName,
-                                   int id) :
+                                   int id, int id2) :
       G4PVPlacement(Transform3D, pCurrentLogical, pName,
                     motherPVPlacementGT->GetLogicalVolume(), false, 1, false)
   {
     m_transform = motherPVPlacementGT->getTransform() * Transform3D;
     m_id = id;
+    m_id2 = id2;
     m_mother = motherPVPlacementGT;
   }
 

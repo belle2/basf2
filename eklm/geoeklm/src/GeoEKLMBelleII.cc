@@ -245,7 +245,8 @@ void GeoEKLMBelleII::createLayer(int iLayer, int iEndcap,
   if (iEndcap == 1)
     LayerPosition.Z = -LayerPosition.Z;
   t = G4Translate3D(0.0, 0.0, LayerPosition.Z) * (*mtr);
-  physiLayer = new G4PVPlacementGT(t, t, logicLayer, Layer_Name, mlv, iLayer);
+  physiLayer = new G4PVPlacementGT(t, t, logicLayer, Layer_Name, mlv, iLayer,
+                                   iEndcap);
   if (physiLayer == NULL) {
     B2FATAL("Memory allocation error.");
     exit(ENOMEM);

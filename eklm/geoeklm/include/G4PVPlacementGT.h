@@ -34,7 +34,7 @@ namespace Belle2 {
                     G4LogicalVolume *pCurrentLogical,
                     const G4String &pName,
                     G4LogicalVolume *pMotherLogical,
-                    int id = 0);
+                    int id = 0, int id2 = 0);
 
     /**
      * Constructor.
@@ -45,7 +45,7 @@ namespace Belle2 {
                     const G4Transform3D &Transform3D,
                     G4LogicalVolume *pCurrentLogical,
                     const G4String &pName,
-                    int id = 0);
+                    int id = 0, int id2 = 0);
 
     /**
      * getTransform - get transformation.
@@ -56,6 +56,11 @@ namespace Belle2 {
      * getID - get identifier.
      */
     inline int getID() {return m_id;}
+
+    /**
+     * getID2 - get identifier 2.
+     */
+    inline int getID2() {return m_id2;}
 
     /**
      * getMother - get mother G4PVPlacementGT;
@@ -74,6 +79,11 @@ namespace Belle2 {
      * Identifier.
      */
     int m_id;
+
+    /**
+     * Identifier.
+     */
+    int m_id2;
 
     /**
      * Mother G4PVPlacementGT.

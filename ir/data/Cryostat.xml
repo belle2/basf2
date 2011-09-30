@@ -261,7 +261,7 @@
             <Material desc="">Air</Material>
         </C6spc6>
 
-        <C7hld1>
+        <C7cil1>
             <T1 unit="cm">0.6</T1>
             <T2 unit="cm">0.6</T2>
             <T3 unit="cm">0.6</T3>
@@ -308,21 +308,21 @@
             <I13 unit="cm">14.8</I13>
             <I14 unit="cm">15.3</I14>
             <I15 unit="cm">15.8</I15>
-            <R1 unit="cm">6.6</R1>
-            <R2 unit="cm">7.822</R2>
-            <R3 unit="cm">8.75</R3>
-            <R4 unit="cm">9.535</R4>
-            <R5 unit="cm">10.035</R5>
-            <R6 unit="cm">11.535</R6>
-            <R7 unit="cm">12.035</R7>
-            <R8 unit="cm">12.535</R8>
-            <R9 unit="cm">13.535</R9>
-            <R10 unit="cm">14.035</R10>
-            <R11 unit="cm">14.535</R11>
-            <R12 unit="cm">15.035</R12>
-            <R13 unit="cm">15.535</R13>
-            <R14 unit="cm">16.035</R14>
-            <R15 unit="cm">16.535</R15>
+            <R1 unit="cm">9.6</R1>
+            <R2 unit="cm">10.222</R2>
+            <R3 unit="cm">10.55</R3>
+            <R4 unit="cm">10.735</R4>
+            <R5 unit="cm">10.935</R5>
+            <R6 unit="cm">12.135</R6>
+            <R7 unit="cm">12.635</R7>
+            <R8 unit="cm">13.135</R8>
+            <R9 unit="cm">14.135</R9>
+            <R10 unit="cm">14.635</R10>
+            <R11 unit="cm">15.135</R11>
+            <R12 unit="cm">15.635</R12>
+            <R13 unit="cm">16.135</R13>
+            <R14 unit="cm">16.635</R14>
+            <R15 unit="cm">17.135</R15>
             <O1 unit="cm">10.58</O1>
             <O2 unit="cm">10.58</O2>
             <O3 unit="cm">10.58</O3>
@@ -339,11 +339,10 @@
             <O14 unit="cm">17.05</O14>
             <O15 unit="cm">17.64</O15>
             <O16 unit="cm">17.93</O16>
-            <!--Material desc="Compensation solenoid holder">SUS316L</Material-->
             <Material desc="">Air</Material>
-        </C7hld1>
-
-        <C7cil1>
+            <!--Material desc="Compensation solenoid">SC_COIL</Material-->
+        </C7cil1>
+        <C8hld1>
             <L1 unit="cm">3</L1>
             <L2 unit="cm">2.4</L2>
             <L3 unit="cm">1.8</L3>
@@ -359,9 +358,9 @@
             <L13 unit="cm">0.6</L13>
             <L14 unit="cm">0.6</L14>
             <L15 unit="cm">0.6</L15>
-            <!--Material desc="Compensation solenoid">SC_COIL</Material-->
+            <!--Material desc="Compensation solenoid holder">SUS316L</Material-->
             <Material desc="">Air</Material>
-        </C7cil1>
+        </C8hld1>
 
         <C7mag1>
             <D1 unit="cm">69.3093</D1>

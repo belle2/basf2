@@ -20,7 +20,13 @@
 namespace Belle2 {
 
   /**
-    * ClassPXDTrueHit - Geant4 simulated hit for the PXD.
+    * Class PXDTrueHit - Position where are particle traversed the detector plane.
+    *
+    * This class is meant as helper for tracking optimization. It stores
+    * information about particle traversal in condensed form: The local
+    * coordinates where the particle traversed the detector plane as well as
+    * the momenta when the particle entered the silicon, traversed the detector
+    * plane and exited the silicon.
     *
     * This class holds particle hit data from geant4 simulation. As the simulated
     * hit classes are used to generate detector response, they contain _local_
@@ -29,6 +35,9 @@ namespace Belle2 {
   class PXDTrueHit : public TObject {
 
   public:
+    /** Default constructor for ROOT IO */
+    PXDTrueHit(): m_sensorID(0), m_u(0), m_v(0), m_globalTime(0) {}
+
     /** Constructor
      * @param sensorID SensorID of the Sensor
      * @param u u coordinate of the hit in local coordinates
@@ -37,10 +46,10 @@ namespace Belle2 {
      * @param globalTime timestamp of the hit
      */
     PXDTrueHit(
-      VxdID sensorID = 0,
-      float u = 0, float v = 0, const TVector3 momentum = TVector3(0, 0, 0), float globalTime = 0):
-        m_sensorID(sensorID),
-        m_u(u), m_v(v), m_momentum(momentum), m_globalTime(globalTime) {}
+      VxdID sensorID, float u, float v, float globalTime,
+      const TVector3& momentum, const TVector3& entryMomentum, const TVector3& exitMomentum):
+        m_sensorID(sensorID), m_u(u), m_v(v), m_globalTime(globalTime),
+        m_momentum(momentum), m_entryMomentum(entryMomentum), m_exitMomentum(exitMomentum) {}
 
     /** Return the Sensor ID */
     VxdID getSensorID() const { return m_sensorID; }
@@ -48,18 +57,24 @@ namespace Belle2 {
     float getU() const { return m_u; }
     /** Retun local v coordinate of hit */
     float getV() const { return m_v; }
-    /** The method to get momentum.*/
-    const TVector3& getMomentum() const { return m_momentum; }
-    /** The method to get GlobalTime.*/
+    /** Return Time of hit.*/
     float getGlobalTime() const { return m_globalTime; }
+    /** Return momentum when crossing detector plane.*/
+    const TVector3& getMomentum() const { return m_momentum; }
+    /** Return momentum when entering silicon.*/
+    const TVector3& getEntryMomentum() const { return m_entryMomentum; }
+    /** Return momentum when exiting silicon.*/
+    const TVector3& getExitMomentum() const { return m_exitMomentum; }
 
   private:
 
-    int m_sensorID;          /**< ID of the sensor */
-    float m_u;               /**< Local u coordinate */
-    float m_v;               /**< Local v coordinate */
-    TVector3 m_momentum;     /**< momentum in local coordinates */
-    float m_globalTime;      /**< Global time. */
+    int m_sensorID;           /**< ID of the sensor */
+    float m_u;                /**< Local u coordinate */
+    float m_v;                /**< Local v coordinate */
+    float m_globalTime;       /**< Global time. */
+    TVector3 m_momentum;      /**< momentum in local coordinates when crossing detector plane */
+    TVector3 m_entryMomentum; /**< momentum in local coordinates when entering silicon */
+    TVector3 m_exitMomentum;  /**< momentum in local coordinates when exiting silicon */
 
     ClassDef(PXDTrueHit, 1)
   };

@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef VXD_SENSITIVEDETECTOR_H
-#define VXD_SENSITIVEDETECTOR_H
+#ifndef VXD_SENSITIVEDETECTORBASE_H
+#define VXD_SENSITIVEDETECTORBASE_H
 
 #include <simulation/kernel/SensitiveDetectorBase.h>
 #include <pxd/vxd/SensorInfoBase.h>

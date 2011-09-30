@@ -13,6 +13,7 @@
 #define GEOPXDCREATOR_H_
 
 #include <pxd/geometry/GeoPXDComponents.h>
+#include <pxd/simulation/SensitiveDetector.h>
 #include <geometry/CreatorBase.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
@@ -29,8 +30,6 @@ class G4Polycone;
 namespace Belle2 {
   /** Namespace to encapsulate code needed for simulation and reconstrucion of the PXD */
   namespace PXD {
-
-    class SensitiveDetector;
 
     /** The creator for the PXD geometry of the Belle II detector.   */
     class GeoPXDCreator : public geometry::CreatorBase {

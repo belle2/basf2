@@ -20,7 +20,6 @@
 #include <framework/gearbox/GearDir.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
-#include <pxd/simulation/SensitiveDetector.h>
 
 #include <cmath>
 #include <boost/format.hpp>

@@ -123,6 +123,7 @@ namespace Belle2 {
       int nBarrelCrystal = content.getNumberNodes("BarrelCrystals/BarrelCrystal");
 
       for (int iBrCry = 1 ; iBrCry <= nBarrelCrystal ; ++iBrCry) {//46=29+17
+
         GearDir layerContent(content);
         layerContent.append((format("/BarrelCrystals/BarrelCrystal[%1%]/") % (iBrCry)).str());
 
@@ -154,18 +155,29 @@ namespace Belle2 {
         G4Transform3D pos_phi = G4RotateZ3D(k_phiC);
         G4Transform3D Tr = pos_phi * position * tilt_phi * tilt_z * r00;
 
+        /*
+                    double vtx[15];
+                    vtx[0] = cDx1; vtx[1] = cDy1;//HepPoint3D tmp0( cDx1, cDy1,-cDz);
+                    vtx[2] = cDx2; vtx[3] = -cDy1;//HepPoint3D tmp1( cDx2,-cDy1,-cDz);
+                    vtx[4] = -cDx2; vtx[5] = -cDy1;//HepPoint3D tmp2(-cDx2,-cDy1,-cDz);
+                    vtx[6] = -cDx1; vtx[7] = cDy1;//HepPoint3D tmp3(-cDx1, cDy1,-cDz);
+                    vtx[8] = cDx3; vtx[9] = cDy2;//HepPoint3D tmp4( cDx3, cDy2, cDz);
+                    vtx[10] = cDx4; vtx[11] = -cDy2;//HepPoint3D tmp5( cDx4,-cDy2, cDz);
+                    vtx[12] = -cDx4; vtx[13] = -cDy2;//HepPoint3D tmp6(-cDx4,-cDy2, cDz);
+                    vtx[14] = -cDx3; vtx[15] = cDy2;//HepPoint3D tmp7(-cDx3, cDy2, cDz);
+        */
         G4Trap* BrCrysralShape = new G4Trap((format("solidEclBrCrystal_%1%") % iBrCry).str().c_str(),
                                             cDz , 0 , 0, cDy1, cDx2, cDx1, 0, cDy2 , cDx4, cDx3, 0);
         G4LogicalVolume* BrCrysral = new G4LogicalVolume(BrCrysralShape, medCsI, (format("logicalEclBrCrystal_%1%") % iBrCry).str().c_str(), 0, 0, 0);
-
+        BrCrysral->SetSensitiveDetector(m_sensitive);
 
         G4LogicalVolume* Sensor = new G4LogicalVolume(SensorDiode, medSi, (format("logicalEclDiode_%1%") % iBrCry).str().c_str(), 0, 0, 0);
-
+        Sensor->SetSensitiveDetector(m_sensitive);
         assemblyBrCrystals->AddPlacedVolume(BrCrysral, Tr);
 
         G4Transform3D DiodePosition = G4Translate3D(0, 0, (k_BLL + DiodeHeight) / 2);  // Move over to the left...
         G4Transform3D TrD = pos_phi * position * tilt_phi * tilt_z * r00 * DiodePosition ;
-        assemblyBrCrystals->AddPlacedVolume(Sensor, TrD);
+//        assemblyBrCrystals->AddPlacedVolume(Sensor, TrD);
 
 
 
@@ -214,13 +226,14 @@ namespace Belle2 {
                                             halflength , 0 , 0, h1 ,   bl1, tl1 , alpha1 , h2   , bl2, tl2, alpha2);
         G4LogicalVolume* FwCrysral = new G4LogicalVolume(FwCrysralShape, medCsI, (format("logicalEclFwCrystal_%1%") % iCry).str().c_str(), 0, 0, 0);
         G4LogicalVolume* Sensor = new G4LogicalVolume(SensorDiode, medSi, (format("logicalEclDiode_%1%") % iCry).str().c_str(), 0, 0, 0);
-
+        FwCrysral->SetSensitiveDetector(m_sensitive);
+        Sensor->SetSensitiveDetector(m_sensitive);
 
         assemblyFwCrystals->AddPlacedVolume(FwCrysral, Tr);
 
         G4Transform3D DiodePosition = G4Translate3D(0, 0, halflength + (DiodeHeight) / 2); // Move over to the left...
         G4Transform3D TrD =  position * m3 * m2 * m1 * DiodePosition ;
-        assemblyFwCrystals->AddPlacedVolume(Sensor, TrD);
+//        assemblyFwCrystals->AddPlacedVolume(Sensor, TrD);
 
 
       }//forward endcap crystals
@@ -257,13 +270,14 @@ namespace Belle2 {
         G4Trap* BwCrysralShape = new G4Trap((format("solidEclBwCrystal_%1%") % iCry).str().c_str(),
                                             halflength , 0 , 0, h1 ,   bl1, tl1 , alpha1 , h2   , bl2, tl2, alpha2);
         G4LogicalVolume* BwCrysral = new G4LogicalVolume(BwCrysralShape, medCsI, (format("logicalEclBwCrystal_%1%") % iCry).str().c_str(), 0, 0, 0);
+        BwCrysral->SetSensitiveDetector(m_sensitive);
         G4LogicalVolume* Sensor = new G4LogicalVolume(SensorDiode, medSi, (format("logicalEclDiode_%1%") % iCry).str().c_str(), 0, 0, 0);
-
+        Sensor->SetSensitiveDetector(m_sensitive);
         assemblyBwCrystals->AddPlacedVolume(BwCrysral, Tr);
 
         G4Transform3D DiodePosition = G4Translate3D(0, 0, halflength + (DiodeHeight) / 2); // Move over to the left...
         G4Transform3D TrD =  position * m3 * m2 * m1 * DiodePosition ;
-        assemblyBwCrystals->AddPlacedVolume(Sensor, TrD);
+//        assemblyBwCrystals->AddPlacedVolume(Sensor, TrD);
 
       }//backward endcap crystals
 

@@ -7,7 +7,7 @@ logging.log_level = LogLevel.INFO
 
 # Uncomment the line below to set the environment variable to automatically start the VRML viewer
 # for example http://freewrl.sourceforge.net/
-# os.environ['G4VRMLFILE_VIEWER'] = 'freewrl'
+os.environ['G4VRMLFILE_VIEWER'] = 'freewrl'
 
 # -------------------------
 # here we register modules
@@ -38,6 +38,11 @@ arichRec = register_module('ARICHRec')
 evtmetagen.param('EvtNumList', [2])
 # set number of runs
 evtmetagen.param('RunList', [1])
+
+# select which sub-detectors you want to be built
+geobuilder.param('Components', ['ARICH', 'TOP'])
+# alternatively you can select which sub-detectors you want to exclude:
+# geobuilder.param("ExcludedComponents", ["BeamPipe", "SVD"])
 
 # This line is necessary if you want to simulate Cerenkov photons!
 # By default optical processes are not registered.

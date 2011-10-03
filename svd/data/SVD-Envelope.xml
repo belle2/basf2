@@ -3,17 +3,17 @@
   <Material>Air</Material>
   <Plane>
     <posZ unit="mm">360.000</posZ>
-    <outerRadius unit="mm">102.000</outerRadius>
+    <outerRadius unit="mm">200.000</outerRadius>
     <innerRadius unit="mm">36.000</innerRadius>
   </Plane>
   <Plane>
     <posZ unit="mm">240.000</posZ>
-    <outerRadius unit="mm">150.000</outerRadius>
+    <outerRadius unit="mm">220.000</outerRadius>
     <innerRadius unit="mm">36.000</innerRadius>
   </Plane>
   <Plane>
     <posZ unit="mm">-265.000</posZ>
-    <outerRadius unit="mm">150.000</outerRadius>
+    <outerRadius unit="mm">220.000</outerRadius>
     <innerRadius unit="mm">36.000</innerRadius>
   </Plane>
 </Envelope>

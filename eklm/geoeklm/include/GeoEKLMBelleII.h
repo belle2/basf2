@@ -119,6 +119,13 @@ namespace Belle2 {
     void createSector(int iSector, G4PVPlacementGT *mpvgt);
 
     /**
+     * createSectorCover - create sector cover
+     * @iCover: number of cover
+     * @@mpvgt: mother physical volume with global transformation
+     */
+    void createSectorCover(int iCover, G4PVPlacementGT *mpvgt);
+
+    /**
      * createSectorSupport - create sector support structure
      * @mpvgt: mother physical volume with global transformation
      */
@@ -181,6 +188,15 @@ namespace Belle2 {
      */
     void createSectionSupport(int iSectionSupport, int iPlane,
                               G4PVPlacementGT *mpvgt);
+
+    /**
+     * createPlasticListElement - create plastic list element
+     * @iListPlane: number of list plane
+     * @iList: number of list
+     * @mpvgt: mother physical volume with global transformation
+     */
+    void createPlasticListElement(int iListPlane, int iList,
+                                  G4PVPlacementGT *mpvgt);
 
     /**
      * createStrip - create strip
@@ -314,6 +330,16 @@ namespace Belle2 {
      * Section support structure middle box thickness.
      */
     double SectionSupportMiddleThickness;
+
+    /**
+     * Plastic list width
+     */
+    double PlasticListWidth;
+
+    /**
+     * Distance from edge of last strip to edge of plastic list
+     */
+    double PlasticListDeltaL;
 
     /**
      * Position data for strips.

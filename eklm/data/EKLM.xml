@@ -25,7 +25,7 @@
 	<Sector>
 	  <InnerR desc="Inner radius"   unit="mm">1305.0</InnerR>
 	  <OuterR desc="Outer radius"   unit="mm">3310.0</OuterR>
-	  <Length desc="Length"         unit="mm">44.0</Length>
+	  <Length desc="Length"         unit="mm">39.0</Length>
 	  <PositionX  desc="X position" unit="mm">0</PositionX>
 	  <PositionY  desc="Y position" unit="mm">0</PositionY>
 	  <PositionZ  desc="Z position" unit="mm">0</PositionZ>
@@ -33,7 +33,7 @@
           <SectorSupport>
             <InnerR desc="Inner radius" unit="mm">1305.0</InnerR>
             <OuterR desc="Outer radius" unit="mm">3310.0</OuterR>
-	    <Length desc="Length"       unit="mm">39.0</Length>
+	    <Length desc="Length"       unit="mm">35.0</Length>
 	    <PositionX  desc="X position" unit="mm">62.0</PositionX>
 	    <PositionY  desc="Y position" unit="mm">52.0</PositionY>
 	    <PositionZ  desc="Z position" unit="mm">0</PositionZ>
@@ -52,11 +52,13 @@
 	    <PositionY  desc="Y position" unit="mm">0</PositionY>
 	    <PositionZ  desc="Z position" unit="mm">11.0</PositionZ>
             <nSection desc="Number of sections in one plane">5</nSection>
+            <PlasticListWidth unit="mm">1.0</PlasticListWidth>
+            <PlasticListDeltaL unit="mm">10.0</PlasticListDeltaL>
             <Sections>
               <TopWidth unit="mm">21.0</TopWidth>
               <TopThickness unit="mm">1.5</TopThickness>
               <MiddleWidth unit="mm">3.0</MiddleWidth>
-              <MiddleThickness unit="mm">10.0</MiddleThickness>
+              <MiddleThickness unit="mm">9.0</MiddleThickness>
               <SectionSupportData id="1">
                 <SectionSupport id="1">
                   <Length     desc="Length"      unit="mm">1572.0</Length>

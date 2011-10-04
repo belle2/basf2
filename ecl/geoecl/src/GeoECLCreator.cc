@@ -42,10 +42,7 @@
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 
-
 #include <TVector3.h>
-
-#include <iomanip.h>
 
 using namespace std;
 using namespace boost;
@@ -176,21 +173,14 @@ namespace Belle2 {
         Sensor->SetSensitiveDetector(m_sensitive);
         assemblyBrCrystals->AddPlacedVolume(BrCrysral, Tr);
 
-        G4Transform3D DiodePosition = G4Translate3D(0, 0, (k_BLL + DiodeHeight) / 2);  // Move over to the left...
+        G4Transform3D DiodePosition = G4Translate3D(0, 0, (k_BLL + DiodeHeight) / 2 + 0.1);  // Move over to the left...
         G4Transform3D TrD = pos_phi * position * tilt_phi * tilt_z * r00 * DiodePosition ;
-//        assemblyBrCrystals->AddPlacedVolume(Sensor, TrD);
+        assemblyBrCrystals->AddPlacedVolume(Sensor, TrD);
 
 
 
 
       }//iBrCry
-      for (int iSector = 0; iSector < 72; ++iSector) {//total 72
-        G4Transform3D BrR = G4RotateZ3D(360.*iSector / 72 * deg);
-        G4Transform3D BrRR = G4RotateZ3D((360.*iSector / 72 - 2.494688) * deg);
-
-//        assemblyBrCrystals->MakeImprint(logical_ecl, BrRR);
-//        assemblyBrCrystals->MakeImprint(logical_ecl, BrR);
-      }//iSector
 
       double h1, h2, bl1, bl2, tl1, tl2, alpha1, alpha2, Rphi1, Rphi2, Rtheta, Pr, Ptheta, Pphi, halflength;
 
@@ -208,7 +198,7 @@ namespace Belle2 {
         alpha1 = counter.getAngle("K_alpha1");
         alpha2 = counter.getAngle("K_alpha2");
         Rphi1 = counter.getAngle("K_Rphi1") ;
-        Rtheta = counter.getAngle("K_Ptheta") ;
+        Rtheta = counter.getAngle("K_Rtheta") ;
         Rphi2 = counter.getAngle("K_Rphi2")  ;
         Pr = counter.getLength("K_Pr") * cm;
         Ptheta = counter.getAngle("K_Ptheta") ;
@@ -223,8 +213,6 @@ namespace Belle2 {
                         Pr * sin(Ptheta) * sin(Pphi),
                         Pr * cos(Ptheta));  // Move over to the left...
 
-//        cout<<fixed<<setprecision (6)<<"x " <<Pr * sin(Ptheta) * cos(Pphi)<<" y "<< Pr * sin(Ptheta) * sin(Pphi)<<" z "<<Pr * cos(Ptheta)<<endl;
-//        cout<<fixed<<setprecision (12)<<" alpha1 "<<alpha1<<" alpha2 "<<alpha2<<endl;
 
         G4Transform3D Tr = position * m3 * m2 * m1;
         G4Trap* FwCrysralShape = new G4Trap((format("solidEclFwCrystal_%1%") % iCry).str().c_str(),
@@ -237,7 +225,7 @@ namespace Belle2 {
 
         G4LogicalVolume* Sensor = new G4LogicalVolume(SensorDiode, medSi, (format("logicalEclDiode_%1%") % iCry).str().c_str(), 0, 0, 0);
         Sensor->SetSensitiveDetector(m_sensitive);
-        G4Transform3D DiodePosition = G4Translate3D(0, 0, halflength + (DiodeHeight) / 2); // Move over to the left...
+        G4Transform3D DiodePosition = G4Translate3D(0, 0, halflength + (DiodeHeight) / 2 + 0.1); // Move over to the left...
         G4Transform3D TrD =  position * m3 * m2 * m1 * DiodePosition ;
         assemblyFwCrystals->AddPlacedVolume(Sensor, TrD);
 
@@ -245,7 +233,7 @@ namespace Belle2 {
       }//forward endcap crystals
 
       G4AssemblyVolume* assemblyBwCrystals = new G4AssemblyVolume();
-      for (int iCry = 120 ; iCry <= 132 ; ++iCry) {
+      for (int iCry = 73 ; iCry <= 132 ; ++iCry) {
         GearDir counter(content);
         counter.append((format("/EndCapCrystals/EndCapCrystal[%1%]/") % (iCry)).str());
 
@@ -258,7 +246,7 @@ namespace Belle2 {
         alpha1 = counter.getAngle("K_alpha1");
         alpha2 = counter.getAngle("K_alpha2");
         Rphi1 = counter.getAngle("K_Rphi1") ;
-        Rtheta = counter.getAngle("K_Ptheta") ;
+        Rtheta = counter.getAngle("K_Rtheta") ;
         Rphi2 = counter.getAngle("K_Rphi2")  ;
         Pr = counter.getLength("K_Pr") * cm;
         Ptheta = counter.getAngle("K_Ptheta") ;
@@ -268,32 +256,40 @@ namespace Belle2 {
         G4Transform3D m2 = G4RotateY3D(Rtheta);
         G4Transform3D m3 = G4RotateZ3D(Rphi2);
 
+
         G4Transform3D position =
           G4Translate3D(Pr * sin(Ptheta) * cos(Pphi),
                         Pr * sin(Ptheta) * sin(Pphi),
                         Pr * cos(Ptheta));  // Move over to the left...
         G4Transform3D Tr = position * m3 * m2 * m1;
         G4Trap* BwCrysralShape = new G4Trap((format("solidEclBwCrystal_%1%") % iCry).str().c_str(),
-                                            halflength , 0 , 0, h1 ,   bl1, tl1 , alpha1 , h2   , bl2, tl2, alpha1);
+                                            halflength , 0 , 0, h1 ,   bl1, tl1 , alpha1 , h2   , bl2, tl2, alpha2);
         G4LogicalVolume* BwCrysral = new G4LogicalVolume(BwCrysralShape, medCsI, (format("logicalEclBwCrystal_%1%") % iCry).str().c_str(), 0, 0, 0);
         BwCrysral->SetSensitiveDetector(m_sensitive);
         assemblyBwCrystals->AddPlacedVolume(BwCrysral, Tr);
 
         G4LogicalVolume* Sensor = new G4LogicalVolume(SensorDiode, medSi, (format("logicalEclDiode_%1%") % iCry).str().c_str(), 0, 0, 0);
         Sensor->SetSensitiveDetector(m_sensitive);
-        G4Transform3D DiodePosition = G4Translate3D(0, 0, halflength + (DiodeHeight) / 2); // Move over to the left...
+        G4Transform3D DiodePosition = G4Translate3D(0, 0, halflength + (DiodeHeight) / 2 + 0.1); // Move over to the left...
         G4Transform3D TrD =  position * m3 * m2 * m1 * DiodePosition ;
-//        assemblyBwCrystals->AddPlacedVolume(Sensor, TrD);
+        assemblyBwCrystals->AddPlacedVolume(Sensor, TrD);
 
       }//backward endcap crystals
 
 
       for (int iSector = 0; iSector < 16; ++iSector) {//total 72
         G4Transform3D BrR = G4RotateZ3D(360.*iSector / 16 * deg);
-//        assemblyFwCrystals->MakeImprint(logical_ecl, BrR);
+        assemblyFwCrystals->MakeImprint(logical_ecl, BrR);
         assemblyBwCrystals->MakeImprint(logical_ecl, BrR);
       }//16 sectior
 
+      for (int iSector = 0; iSector < 72; ++iSector) {//total 72
+        G4Transform3D BrR = G4RotateZ3D(360.*iSector / 72 * deg);
+        G4Transform3D BrRR = G4RotateZ3D((360.*iSector / 72 - 2.494688) * deg);
+
+        assemblyBrCrystals->MakeImprint(logical_ecl, BrRR);
+        assemblyBrCrystals->MakeImprint(logical_ecl, BrR);
+      }//iSector
 
 
     }//create

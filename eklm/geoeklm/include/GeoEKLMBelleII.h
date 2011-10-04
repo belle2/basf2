@@ -104,12 +104,9 @@ namespace Belle2 {
      * createLayer - create layer
      * @iLayer: number of layer
      * @iEndcap: number of endcap
-     * @mlv: mother logical volume
-     * @mtr: transformation of mother volume reference frame from
-     *       global reference frame
+     * @mpvgt: mother physical volume with global transformation
      */
-    void createLayer(int iLayer, int iEndcap, G4LogicalVolume *mlv,
-                     G4Transform3D *mtr);
+    void createLayer(int iLayer, int iEndcap, G4PVPlacementGT *mpvgt);
 
     /**
      * createSector - create sector

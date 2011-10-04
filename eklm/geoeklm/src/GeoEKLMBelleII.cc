@@ -11,6 +11,8 @@
 #include <eklm/geoeklm/G4PVPlacementGT.h>
 #include <eklm/simeklm/EKLMSensitiveDetector.h>
 
+#include <eklm/geoeklm/StructureEndcap.h>
+
 #include <framework/gearbox/GearDir.h>
 #include <framework/gearbox/Unit.h>
 
@@ -23,6 +25,8 @@
 
 #include <G4Box.hh>
 #include <G4Tubs.hh>
+#include <G4Polyhedra.hh>
+#include <G4SubtractionSolid.hh>
 #include <G4PVPlacement.hh>
 #include <G4Transform3D.hh>
 #include <G4ReflectedSolid.hh>
@@ -201,34 +205,84 @@ void GeoEKLMBelleII::createEndcap(int iEndcap, G4LogicalVolume *mlv)
 {
   int i;
   double z;
+  double phi;
+  double dphi;
+  int nsides;
+  int nBoundary;
+  double zsub;
+  double rminsub;
+  double rmaxsub;
+  G4Polyhedra *boct;
+  G4Tubs *atube;
+  G4SubtractionSolid *solidEndcap;
+  G4LogicalVolume *logicEndcap;
+  G4PVPlacementGT *physiEndcap;
   G4Transform3D t;
+  StructureEndcap EndcapMgr;
+  EndcapMgr.read();
+  phi = EndcapMgr.phi();
+  dphi = EndcapMgr.dphi();
+  nsides = EndcapMgr.nsides();
+  nBoundary = EndcapMgr.nBoundary();
+  double struct_z[nBoundary];
+  double rmin[nBoundary];
+  double rmax[nBoundary];
+  for (int izBoundary  = 0; izBoundary < nBoundary; izBoundary++) {
+    struct_z[izBoundary] = EndcapMgr.z(izBoundary);
+    rmin[izBoundary] = EndcapMgr.rmin(izBoundary);
+    rmax[izBoundary] = EndcapMgr.rmax(izBoundary);
+  }
+  //m_matnamesub = EndcapMgr.matnamesub();
+  zsub = EndcapMgr.zsub();
+  rminsub = EndcapMgr.rminsub();
+  rmaxsub = EndcapMgr.rmaxsub();
+  std::string Endcap_Name = "Endcap_" + lexical_cast<string>(iEndcap);
+  boct = new G4Polyhedra("tempoct", phi, dphi, nsides, nBoundary, struct_z,
+                         rmin, rmax);
+  atube = new G4Tubs("tempatube", rminsub, rmaxsub, zsub, 0.0, 360.0 * deg);
+  solidEndcap = new G4SubtractionSolid(Endcap_Name, boct, atube);
+  if (solidEndcap == NULL) {
+    B2FATAL("Memory allocation error.");
+    exit(ENOMEM);
+  }
   if (iEndcap == 1)
     z = -EndcapPosition.Z + 94.0 * cm;
   else
     z = EndcapPosition.Z;
   t = G4Translate3D(EndcapPosition.X, EndcapPosition.Y, z);
+  logicEndcap = new G4LogicalVolume(solidEndcap, Iron, Endcap_Name);
+  if (logicEndcap == NULL) {
+    B2FATAL("Memory allocation error.");
+    exit(ENOMEM);
+  }
+  geometry::setVisibility(*logicEndcap, true);
+  geometry::setColor(*logicEndcap, "#ffffff22");
+  physiEndcap = new G4PVPlacementGT(t, t, logicEndcap, Endcap_Name, mlv,
+                                    iEndcap);
+  if (physiEndcap == NULL) {
+    B2FATAL("Memory allocation error.");
+    exit(ENOMEM);
+  }
   for (i = 1; i <= nLayer; i++)
-    createLayer(i, iEndcap, mlv, &t);
+    createLayer(i, iEndcap, physiEndcap);
 }
 
 /*
  * createLayer - create layer
  * @iLayer: number of layer
  * @iEndcap: number of endcap
- * @mlv: mother logical volume
- * @mtr: transformation of mother volume reference frame from
- *       global reference frame
+ * @mpvgt: mother physical volume with global transformation
  */
 void GeoEKLMBelleII::createLayer(int iLayer, int iEndcap,
-                                 G4LogicalVolume *mlv, G4Transform3D *mtr)
+                                 G4PVPlacementGT *mpvgt)
 {
   int i;
   G4Tubs *solidLayer;
   G4LogicalVolume *logicLayer;
   G4PVPlacementGT *physiLayer;
   G4Transform3D t;
-  std::string Layer_Name = "Layer_" + lexical_cast<string>(iLayer) + "_Endcap_"
-                           + lexical_cast<string>(iEndcap);
+  std::string Layer_Name = "Layer_" + lexical_cast<string>(iLayer) + "_" +
+                           mpvgt->GetName();
   solidLayer = new G4Tubs(Layer_Name, LayerPosition.innerR,
                           LayerPosition.outerR, LayerPosition.length / 2.0,
                           0. * deg, 360. * deg);
@@ -246,9 +300,8 @@ void GeoEKLMBelleII::createLayer(int iLayer, int iEndcap,
                     0.5 * LayerPosition.length;
   if (iEndcap == 1)
     LayerPosition.Z = -LayerPosition.Z;
-  t = G4Translate3D(0.0, 0.0, LayerPosition.Z) * (*mtr);
-  physiLayer = new G4PVPlacementGT(t, t, logicLayer, Layer_Name, mlv, iLayer,
-                                   iEndcap);
+  t = G4Translate3D(0.0, 0.0, LayerPosition.Z);
+  physiLayer = new G4PVPlacementGT(mpvgt, t, logicLayer, Layer_Name, iLayer);
   if (physiLayer == NULL) {
     B2FATAL("Memory allocation error.");
     exit(ENOMEM);

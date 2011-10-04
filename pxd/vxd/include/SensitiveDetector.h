@@ -282,7 +282,7 @@ namespace Belle2 {
       //Create a new TrueHit
       int hitIndex = trueHits->GetLast() + 1;
       new(trueHits->AddrAt(hitIndex))
-      TrueHitClass(sensorID, m_trueHitPos.X(), m_trueHitPos.Y(), m_trueHitTime,
+      TrueHitClass(sensorID, m_trueHitPos.X(), m_trueHitPos.Y(), m_trueHitWeight, m_trueHitTime,
                    m_trueHitMom, m_trueHitMomStart, m_trueHitMomEnd);
       //Add Relation to MCParticle
       relMCTrueHits.add(m_trueHitTrackID, hitIndex, m_trueHitWeight);

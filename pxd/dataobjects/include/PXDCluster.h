@@ -51,12 +51,12 @@ namespace Belle2 {
     /** Get u coordinate of cell center.
      * @return u coordinate of cluster position.
      */
-    float getUPosition() const { return m_uPosition; }
+    float getU() const { return m_uPosition; }
 
     /** Get v coordinate of cell center.
      * @return v coordinate of cluster position.
      */
-    float getVPosition() const { return m_vPosition; }
+    float getV() const { return m_vPosition; }
 
     /** Get collected charge.
      * @return charge collected in the cluster.

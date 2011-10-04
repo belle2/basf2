@@ -1,0 +1,4 @@
+#this module is taken out of the build process until it can be adapted to the current framework version 
+Import('env')
+env['CONTINUE'] = False
+Return('env')

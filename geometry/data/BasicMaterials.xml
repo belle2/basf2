@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Materials>
-  <Material name="Vaccum">
+  <Material name="Vacuum">
     <state>Gas</state>
     <density unit="g/cm3">1e-12</density>
     <temperature>273</temperature>

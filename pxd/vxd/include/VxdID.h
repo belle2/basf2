@@ -16,31 +16,42 @@
 
 namespace Belle2 {
   /**
-   * Union to uniquely identify a any structure of the PXD and SVD
+   * Class to uniquely identify a any structure of the PXD and SVD.
+   *
+   * - Ladder, Layer and Sensor all start at 1
+   * - Ladders are numbered with increasing phi
+   * - Sensors are numbered from front to back
+   * - Segment ID is not used at the moment but foreseen for tracking and or
+   *   alignment subdivisions of one sensor.
+   *
+   * Internal use of a union gets rid of all the bit shifting which would be
+   * neccessary to represent the id as one unsigned short and get all the
+   * components out of it. Disadvantage is that it is not guaranteed to be
+   * portable, but neither is bit shifting
    */
   class VxdID {
   public:
     enum {
-      //Number of bits available to represent a layer
+      /** Number of bits available to represent a layer */
       LayerBits   = 3,
-      //Number of bits available to represent a ladder
+      /** Number of bits available to represent a ladder */
       LadderBits  = 5,
-      //Number of bits available to represent a sensor
+      /** Number of bits available to represent a sensor */
       SensorBits  = 3,
-      //Number of bits available to represent segmentation of the sensor
+      /** Number of bits available to represent segmentation of the sensor */
       SegmentBits = 5,
-      //Total size of the VxdID
+      /** Total bit size of the VxdID */
       Bits = LayerBits + LadderBits + SensorBits + SegmentBits,
 
-      //Maximum valid Layer ID
+      /** Maximum valid Layer ID */
       MaxLayer   = (1 << LayerBits) - 1,
-      //Maximum valid Ladder ID
+      /** Maximum valid Ladder ID */
       MaxLadder  = (1 << LadderBits) - 1,
-      //Maximum valid Sensor ID
+      /** Maximum valid Sensor ID */
       MaxSensor  = (1 << SensorBits) - 1,
-      //Maximum valid Segment ID
+      /** Maximum valid Segment ID */
       MaxSegment = (1 << SegmentBits) - 1,
-      //Maximum value for ID
+      /** Maximum value for ID */
       MaxID = (1 << Bits) - 1
     };
 
@@ -97,18 +108,11 @@ namespace Belle2 {
 
   private:
 
-    /**
-     * Union to store the ID and all components in one go
-     *
-     * use of a union gets rid of all the bit shifting which would be
-     * neccessary to represent the id as one unsigned short and get all the
-     * components out of it. Disadvantage is that it is not guaranteed to be
-     * portable, but neither is bit shifting
-     */
     union {
       /** Unique id */
 unsigned id: Bits;
       struct {
+        /** Segment id */
 unsigned segment: SegmentBits;
         /** Sensor id */
 unsigned sensor: SensorBits;
@@ -116,8 +120,8 @@ unsigned sensor: SensorBits;
 unsigned ladder: LadderBits;
         /** Layer id */
 unsigned layer: LayerBits;
-      } parts;
-    } m_id;
+      } parts /**< Struct to contain all id components */;
+    } m_id; /**< Union to store the ID and all components in one go. */
   };
 
   /** Print id to stream by converting it to string */

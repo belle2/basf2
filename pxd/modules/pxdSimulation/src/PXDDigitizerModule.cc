@@ -39,7 +39,7 @@ REG_MODULE(PXDDigitizer)
 //                 Implementation
 //-----------------------------------------------------------------
 
-PXDDigitizerModule::PXDDigitizerModule() : Module(), m_random(0)
+PXDDigitizerModule::PXDDigitizerModule() : Module(), m_random(0), m_rootFile(0), m_histSteps(0), m_histDiffusion(0)
 {
   //Set module properties
   setDescription("Digitize PXDSimHits");

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DetectorComponent name="STR" xmlns:xi="http://www.w3.org/2001/XInclude">
+    <Creator library="structure">STRCreator</Creator>
+    <Content>
+	<Rotation desc="Rotation of the structure with respect to the Detector" unit="rad">0.0</Rotation>
+	<OffsetZ desc="The offset of the Structure in z with respect to the IP" unit="cm">47.0</OffsetZ>
+	<Material desc="Starting material of Structure Vessel">Air</Material>
+		
+	<Poletip>
+		<Material desc="material of the Pole tip of the Belle II detector">Iron</Material>
+		<Phi unit="deg">0</Phi>
+		<Dphi unit="deg">360.0</Dphi>
+		<ZBoundary id="1">
+			<Zposition unit="cm">194.75</Zposition>
+			<InnerRadius unit="cm">50.0</InnerRadius>
+			<OuterRadius unit="cm">115.0</OuterRadius>
+		</ZBoundary>
+		<ZBoundary id="2">
+			<Zposition unit="cm">204.75</Zposition>
+			<InnerRadius unit="cm">50.0</InnerRadius>
+			<OuterRadius unit="cm">125.0</OuterRadius>
+		</ZBoundary>
+		<ZBoundary id="3">
+			<Zposition unit="cm">230.0</Zposition>
+			<InnerRadius unit="cm">50.0</InnerRadius>
+			<OuterRadius unit="cm">125.0</OuterRadius>
+		</ZBoundary>
+		<ZBoundary id="4">
+			<Zposition unit="cm">230.0</Zposition>
+			<InnerRadius unit="cm">50.0</InnerRadius>
+			<OuterRadius unit="cm">128.0</OuterRadius>
+		</ZBoundary>
+		<ZBoundary id="5">
+			<Zposition unit="cm">262.0</Zposition>
+			<InnerRadius unit="cm">50.0</InnerRadius>
+			<OuterRadius unit="cm">128.0</OuterRadius>
+		</ZBoundary>
+	</Poletip>
+
+	<Poletip2>
+		<Material desc="material of the Pole tip of the Belle II detector">Iron</Material>
+		<Phi unit="deg">0</Phi>
+		<Dphi unit="deg">360.0</Dphi>
+		<ZBoundary id="1">
+			<Zposition unit="cm">262.0</Zposition>
+			<InnerRadius unit="cm">55.0</InnerRadius>
+			<OuterRadius unit="cm">128.0</OuterRadius>
+		</ZBoundary>
+		<ZBoundary id="2">
+			<Zposition unit="cm">278.0</Zposition>
+			<InnerRadius unit="cm">55.0</InnerRadius>
+			<OuterRadius unit="cm">128.0</OuterRadius>
+		</ZBoundary>
+		<ZBoundary id="3">
+			<Zposition unit="cm">278.0</Zposition>
+			<InnerRadius unit="cm">60.0</InnerRadius>
+			<OuterRadius unit="cm">128.0</OuterRadius>
+		</ZBoundary>
+		<ZBoundary id="4">
+			<Zposition unit="cm">323.0</Zposition>
+			<InnerRadius unit="cm">60.0</InnerRadius>
+			<OuterRadius unit="cm">128.0</OuterRadius>
+		</ZBoundary>
+	</Poletip2>
+
+	<Poletip3>
+		<Material desc="material of the Pole tip of the Belle II detector">Iron</Material>
+		<Phi unit="deg">0</Phi>
+		<Dphi unit="deg">360.0</Dphi>
+		<ZBoundary id="1">
+			<Zposition unit="cm">323.0</Zposition>
+			<InnerRadius unit="cm">85.0</InnerRadius>
+			<OuterRadius unit="cm">128.0</OuterRadius>
+		</ZBoundary>
+		<ZBoundary id="2">
+			<Zposition unit="cm">362.1</Zposition>
+			<InnerRadius unit="cm">85.0</InnerRadius>
+			<OuterRadius unit="cm">128.0</OuterRadius>
+		</ZBoundary>
+	</Poletip3>
+
+    </Content>
+</DetectorComponent>

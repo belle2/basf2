@@ -16,7 +16,11 @@
 #include <G4Colour.hh>
 #include <G4LogicalVolume.hh>
 #include <G4VisAttributes.hh>
+#include <G4Polycone.hh>
 
+#include <vector>
+#include <limits>
+#include <boost/foreach.hpp>
 
 using namespace std;
 
@@ -88,5 +92,36 @@ namespace Belle2 {
       attr->SetVisibility(visible);
       volume.SetVisAttributes(attr);
     }
+
+    G4Polycone* createPolyCone(const string& name, GearDir params, double &minZ, double &maxZ)
+    {
+      if (!params) return 0;
+
+      double minPhi = params.getAngle("minPhi", 0);
+      double dPhi   = params.getAngle("maxPhi", 2 * M_PI) - minPhi;
+      const std::vector<GearDir> planes = params.getNodes("Plane");
+      int nPlanes = planes.size();
+      if (nPlanes < 2) {
+        B2ERROR("Polycone needs at least two planes");
+        return 0;
+      }
+      double z[nPlanes];
+      double rMin[nPlanes];
+      double rMax[nPlanes];
+      int index(0);
+      minZ = numeric_limits<double>::infinity();
+      maxZ = -numeric_limits<double>::infinity();
+      BOOST_FOREACH(const GearDir &plane, planes) {
+        z[index]    = plane.getLength("posZ") / Unit::mm;
+        minZ = min(minZ, z[index]);
+        maxZ = max(maxZ, z[index]);
+        rMin[index] = plane.getLength("innerRadius") / Unit::mm;
+        rMax[index] = plane.getLength("outerRadius") / Unit::mm;
+        ++index;
+      }
+      G4Polycone* polycone = new G4Polycone(name, minPhi, dPhi, nPlanes, z, rMin, rMax);
+      return polycone;
+    }
+
   }
 } //Belle2 namespace

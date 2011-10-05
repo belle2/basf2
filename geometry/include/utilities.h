@@ -11,15 +11,71 @@
 #ifndef GEOMETRY_UTILITIES_H
 #define GEOMETRY_UTILITIES_H
 
+#include <framework/gearbox/GearDir.h>
+
 #include <string>
 //class G4Colour;
 class G4LogicalVolume;
+class G4Polycone;
 
 namespace Belle2 {
+  /** Common code concerning the geometry representation of the detector */
   namespace geometry {
-//    G4Colour parseColor(std::string colorString);
+
+    /** Set the color of a logical volume.
+     * This function will set the visualization color of a logical volume from a string representation of the color
+     * Recognized formats for the color are:
+     *  - #rgb where r,g,b are hexadecimal values from 0 to f representing the
+     *    color values for red, green and blue respectively
+     *  - #rgba where r,g,b,a are hexadecimal values from 0 to f and a
+     *    represents the alpha value
+     *  - #rrggbb where rr,gg,bb are hexadecimal values from 00 to ff
+     *    representing the color values for red, green and blue respectively
+     *  - #rrggbbaa where rr,gg,bb,aa are hexadecimal values from 00 to ff and
+     *    aa represents the alpha value
+     *  - rgb(r,g,b) where r,g,b are float values between 0.0 and 1.0
+     *    representing the color values for red, green and blue respectively
+     *  - rgb(r,g,b,a) where r,g,b,a are float values between 0.0 and 1.0
+     *    representing the color values for red, green, blue and alpha
+     *    respectively
+     *
+     * @param volume Volume for which to set the color
+     * @param color  String representation of the color
+     */
     void setColor(G4LogicalVolume &volume, const std::string &color);
+
+    /** Helper function to quickly set the visibility of a given volume.
+     * @param volume Volume for which to set the visibility
+     * @param visible true if the volume should be visible, false otherwise
+     */
     void setVisibility(G4LogicalVolume &volume, bool visible);
+
+    /** Create Polycone Shape from XML Parameters.
+     * This function will create a polycone shape directly from Gearbox Parameters of the form
+     *
+     * <minPhi unit="deg">  0</minPhi>
+     * <maxPhi unit="deg">360</maxPhi>
+     * <Plane>
+     *   <posZ unit="mm">-10.0</posZ>
+     *   <innerRadius unit="mm"> 20.000</innerRadius>
+     *   <outerRadius unit="mm"> 20.000</outerRadius>
+     * </Plane>
+     * ...
+     * <Plane>
+     *   <posZ unit="mm">10.0</posZ>
+     *   <innerRadius unit="mm"> 15.000</innerRadius>
+     *   <outerRadius unit="mm"> 30.000</outerRadius>
+     * </Plane>
+     *
+     * There must be at least two Plane definitions, minPhi and maxPhi can be
+     * omitted. minZ and maxZ will return the extents of the Polycone along z
+     *
+     * @param name   Name of the shape to create
+     * @param params GearDir pointing to the parameters
+     * @param[out] minZ will contain the minimal z coordinate of the polycone
+     * @param[out] maxZ will contain the maximal z coordinate of the polycone
+     */
+    G4Polycone* createPolyCone(const std::string& name, GearDir params, double &minZ, double &maxZ);
   }
 } //Belle2 namespace
 #endif

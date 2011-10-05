@@ -25,7 +25,6 @@
 #include <G4Transform3D.hh>
 class G4LogicalVolume;
 class G4AssemblyVolume;
-class G4Polycone;
 
 namespace Belle2 {
   /** Namespace to encapsulate code needed for simulation and reconstrucion of the PXD */
@@ -64,24 +63,32 @@ namespace Belle2 {
        * The name is assumed to be unique and Volumes are cached. If a component had allready
        * been created, the pointer to the existing volume will be returned
        * @param name Name of the component
-       * @return pair containing the TGeoVolume* of the component as well as the height of the component
+       * @return pair containing the TGeoVolume* of the component as well as
+       *         the height of the component
        */
       GeoPXDComponent getComponent(const std::string& component);
 
       /**
        * Place a list of subcomponents into an component.
        *
-       * If the volume of the given component is NULL, a new container will be created to fit all subcomponents. It will have air as medium.
-       * If createContainer is true, then the placements above and below are valid. If at least one subcomponent with this placement is found the whole
-       * component is wrapped in a container volume with Air medium which extends above and below to fit the subcomponents
-       * @param name Name for the potential new volume or as prefix for the container to extend the component
-       * @param component Component to fit the subcomponents into
-       * @param placements Placement information for all subcomponents
-       * @param createContainer if true, subcomponents are allowed to be placed on top or below the component and the whole component will be wrapped in
-       *            an Air volume fitting all components
+       * If the volume of the given component is NULL, a new container will be
+       * created to fit all subcomponents. It will have air as medium.  If
+       * createContainer is true, then the placements above and below are
+       * valid. If at least one subcomponent with this placement is found the
+       * whole component is wrapped in a container volume with Air medium which
+       * extends above and below to fit the subcomponents
+       *
+       * @param name Name for the potential new volume or as prefix for the
+       *        container to extend the component
+       * @param component Component to fit the subcomponents into @param
+       *        placements Placement information for all subcomponents
+       * @param createContainer if true, subcomponents are allowed to be placed
+       *        on top or below the component and the whole component will be
+       *        wrapped in an Air volume fitting all components
        * @return offset in w which was applied to the component when extending it
        */
-      double addSubComponents(const std::string& name, GeoPXDComponent &component, std::vector<GeoPXDPlacement> placements, bool createContainer = false, bool originCenter = true);
+      double addSubComponents(const std::string& name, GeoPXDComponent &component,
+                              std::vector<GeoPXDPlacement> placements, bool createContainer = false, bool originCenter = true);
 
       /**
        * Return vector of GeoPXDPlacements with all the components defined inside a given path
@@ -101,24 +108,20 @@ namespace Belle2 {
       G4AssemblyVolume* createSupport(GearDir support);
 
       /**
-       * Create a PolyCone from parameters
-       * @param name   Name of the volume
-       * @param params Reference to the parameters defining the PolyCone
-       */
-      G4Polycone* createPolyCone(const std::string& name, GearDir params, double &minZ, double &maxZ);
-
-      /**
        * Read parameters for given layer and store in m_ladder
        */
       void setLayer(int layer);
 
-
-
     protected:
+      /** GearDir pointing to the alignment parameters */
       GearDir m_alignment;
+      /** GearDir pointing to the toplevel of the components */
       GearDir m_components;
+      /** Cache of all previously created components */
       std::map<std::string, GeoPXDComponent> m_componentCache;
+      /** Parameters of the currently active ladder */
       GeoPXDLadder m_ladder;
+      /** List to all created sensitive detector instances */
       std::vector<SensitiveDetector*> m_sensitive;
     };
 

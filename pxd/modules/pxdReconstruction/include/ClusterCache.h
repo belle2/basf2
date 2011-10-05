@@ -48,6 +48,7 @@ namespace Belle2 {
      * this way we only have to look at each pixel once and otherwise just
      * update the list of clusters.
      *
+     * @verbatim
      *   u → → → → → → → → → →
      * v┌─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┐
      * ↓│ │ │O│O│O│ │ │ │ │ │ │
@@ -62,6 +63,7 @@ namespace Belle2 {
      *  ├─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┤
      * ↓│ │ │ │ │ │ │ │ │ │ │ │
      *  └─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┘
+     * @endverbatim
      *
      */
     class ClusterCache {

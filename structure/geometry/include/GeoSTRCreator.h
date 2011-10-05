@@ -8,48 +8,49 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <geometry/geodetector/CreatorBase.h>
+#ifndef GEOSTRCREATOR_H
+#define GEOSTRCREATOR_H
 
-#include <TGeoShape.h>
-#include <TGeoMedium.h>
-#include <TGeoMatrix.h>
+#include <geometry/CreatorBase.h>
+#include <framework/gearbox/GearDir.h>
+#include <framework/logging/Logger.h>
 
 #include <string>
 #include <vector>
 
-#ifndef GEOCOILBELLEII_H_
-#define GEOCOILBELLEII_H_
+class G4LogicalVolume;
+//class G4Polycone
 
 namespace Belle2 {
 
-  class GearDir;
+  namespace structure {
 
-  //!  The GeoCoilBelleII class.
-  /*!
-     The creator for the the Belle II coil.
-  */
-  class GeoCoilBelleII : public CreatorBase {
-
-  public:
-
-    //! Constructor of the GeoCoilBelleII class.
-    GeoCoilBelleII();
-
-    //! The destructor of the GeoCoilBelleII class.
-    virtual ~GeoCoilBelleII();
-
-    //! Creates the ROOT Objects for the coil geometry.
+    //!  The GeoSTRCreator class.
     /*!
-      \param content A reference to the content part of the parameter description, which should to be used to create the ROOT objects.
+       The creator for the Belle II Structure.
     */
-    virtual void create(GearDir& content);
+    class GeoSTRCreator : public geometry::CreatorBase {
 
-  protected:
+    public:
 
-  private:
+      //! Constructor of the GeoSTRCreator class.
+      GeoSTRCreator();
 
-  };
+      //! The destructor of the GeoSTRCreator class.
+      virtual ~GeoSTRCreator();
 
+      //! Creates the ROOT Objects for the structure geometry.
+      /*!
+      \param content A reference to the content part of the parameter description, which should to be used to create the ROOT objects.
+      */
+      virtual void create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes type);
+
+    protected:
+
+    private:
+
+    };
+  }
 }
 
-#endif /* GEOCOILBELLEII_H_ */
+#endif /* GEOSTRCREATOR_H */

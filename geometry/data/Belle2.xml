@@ -24,6 +24,8 @@
   <xi:include href="../simulation/MagneticField.xml"/>
 
   <!-- Subdedectors -->
+  <xi:include href="../structure/COIL.xml"/>
+  <xi:include href="../structure/STR.xml"/>
   <xi:include href="../ir/BeamPipe.xml"/>
   <xi:include href="../ir/Cryostat.xml"/>
   <xi:include href="../ir/HeavyMetalShield.xml"/>

@@ -44,7 +44,7 @@
 #include <G4QuadrangularFacet.hh>
 #include <G4TriangularFacet.hh>
 
-#define MATERIAL_SCAN
+//#define MATERIAL_SCAN
 
 using namespace std;
 using namespace boost;
@@ -331,7 +331,7 @@ namespace Belle2 {
         // Create sensitive Area: this Part is created separately since we want full control over the coordinate system:
         // local x (called u) should point in RPhi direction
         // local y (called v) should point in global z
-        // local z (called w) should away from the origin
+        // local z (called w) should point away from the origin
         G4Box* activeShape = new G4Box(
           name + ".Active",
           s.info.getWidth() / Unit::mm / 2.0,
@@ -466,7 +466,7 @@ namespace Belle2 {
       BOOST_FOREACH(const GearDir &endflange, support.getNodes("Endflange")) {
         double minZ(0), maxZ(0);
         string name = endflange.getString("@name");
-        G4VSolid *supportCone = createPolyCone(name, endflange, minZ, maxZ);
+        G4VSolid *supportCone = geometry::createPolyCone(name, endflange, minZ, maxZ);
 
         //Cutout boxes to make place for modules
 
@@ -539,36 +539,6 @@ namespace Belle2 {
       return supportAssembly;
     }
 
-    G4Polycone* GeoPXDCreator::createPolyCone(const string& name, GearDir params, double &minZ, double &maxZ)
-    {
-      if (!params) return 0;
-
-      double minPhi = params.getAngle("minPhi", 0);
-      double dPhi   = params.getAngle("maxPhi", 2 * M_PI) - minPhi;
-      const std::vector<GearDir> planes = params.getNodes("Plane");
-      int nPlanes = planes.size();
-      if (nPlanes < 2) {
-        B2ERROR("Polycone needs at least two planes");
-        return 0;
-      }
-      double z[nPlanes];
-      double rMin[nPlanes];
-      double rMax[nPlanes];
-      int index(0);
-      minZ = numeric_limits<double>::infinity();
-      maxZ = -numeric_limits<double>::infinity();
-      BOOST_FOREACH(const GearDir &plane, planes) {
-        z[index]    = plane.getLength("posZ") / Unit::mm;
-        minZ = min(minZ, z[index]);
-        maxZ = max(maxZ, z[index]);
-        rMin[index] = plane.getLength("innerRadius") / Unit::mm;
-        rMax[index] = plane.getLength("outerRadius") / Unit::mm;
-        ++index;
-      }
-      G4Polycone* polycone = new G4Polycone(name, minPhi, dPhi, nPlanes, z, rMin, rMax);
-      return polycone;
-    }
-
     void GeoPXDCreator::create(const GearDir& content, G4LogicalVolume& topVolume, GeometryTypes type)
     {
       m_alignment = GearDir(content, "Alignment/");
@@ -581,7 +551,7 @@ namespace Belle2 {
         B2FATAL("Could not find definition for PXD Envelope");
       }
       double minZ(0), maxZ(0);
-      G4Polycone *envelopeCone = createPolyCone("PXD", GearDir(content, "Envelope/"), minZ, maxZ);
+      G4Polycone *envelopeCone = geometry::createPolyCone("PXD", GearDir(content, "Envelope/"), minZ, maxZ);
       string materialName = content.getString("Envelope/Material", "Air");
       G4Material* material = Materials::get(materialName);
       if (!material) B2FATAL("Material '" << materialName << "', required by PXD Envelope could not be found");

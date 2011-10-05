@@ -268,36 +268,6 @@ namespace Belle2 {
       return componentW;
     }
 
-    G4Polycone* GeoSVDCreator::createPolyCone(const string& name, GearDir params, double &minZ, double &maxZ)
-    {
-      if (!params) return 0;
-
-      double minPhi = params.getAngle("minPhi", 0);
-      double dPhi   = params.getAngle("maxPhi", 2 * M_PI) - minPhi;
-      const std::vector<GearDir> planes = params.getNodes("Plane");
-      int nPlanes = planes.size();
-      if (nPlanes < 2) {
-        B2ERROR("Polycone needs at least two planes");
-        return 0;
-      }
-      double z[nPlanes];
-      double rMin[nPlanes];
-      double rMax[nPlanes];
-      int index(0);
-      minZ = numeric_limits<double>::infinity();
-      maxZ = -numeric_limits<double>::infinity();
-      BOOST_FOREACH(const GearDir &plane, planes) {
-        z[index]    = plane.getLength("posZ") / Unit::mm;
-        minZ = min(minZ, z[index]);
-        maxZ = max(maxZ, z[index]);
-        rMin[index] = plane.getLength("innerRadius") / Unit::mm;
-        rMax[index] = plane.getLength("outerRadius") / Unit::mm;
-        ++index;
-      }
-      G4Polycone* polycone = new G4Polycone(name, minPhi, dPhi, nPlanes, z, rMin, rMax);
-      return polycone;
-    }
-
     G4Transform3D GeoSVDCreator::getAlignment(const string& component)
     {
       string path = (boost::format("Align[@component='%1%']/") % component).str();
@@ -442,13 +412,13 @@ namespace Belle2 {
         B2FATAL("Could not find definition for SVD Envelope.");
       }
       double minZ(0), maxZ(0);
-      G4Polycone *envelopeCone = createPolyCone("Envelope", GearDir(content, "Envelope/"), minZ, maxZ);
+      G4Polycone *envelopeCone = geometry::createPolyCone("Envelope", GearDir(content, "Envelope/"), minZ, maxZ);
       string materialName = content.getString("Envelope/Material", "Air");
       G4Material* material = Materials::get(materialName);
       if (!material) B2FATAL("Material '" << materialName << "', required by SVD Envelope could not be found");
       envelope = new G4LogicalVolume(envelopeCone, material, "SVD");
       setColor(*envelope, "#f00");
-      setVisibility(*envelope, false);
+      setVisibility(*envelope, true);
       G4Region* svdRegion = G4RegionStore::GetInstance()->FindOrCreateRegion("SVD");
       envelope->SetRegion(svdRegion);
       svdRegion->AddRootLogicalVolume(envelope);

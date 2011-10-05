@@ -51,13 +51,6 @@ namespace Belle2 {
       virtual void create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes type);
 
       /**
-       * Create a PolyCone from parameters
-       * @param name   Name of the volume
-       * @param params Reference to the parameters defining the PolyCone
-       */
-      G4Polycone* createPolyCone(const std::string& name, GearDir params, double &minZ, double &maxZ);
-
-      /**
        * Get the volume and the height representing a single sub-component
        * The name is assumed to be unique and Volumes are cached. If a component had already
        * been created, the pointer to the existing volume will be returned

@@ -418,7 +418,7 @@ namespace Belle2 {
       if (!material) B2FATAL("Material '" << materialName << "', required by SVD Envelope could not be found");
       envelope = new G4LogicalVolume(envelopeCone, material, "SVD");
       setColor(*envelope, "#f00");
-      setVisibility(*envelope, true);
+      setVisibility(*envelope, false);
       G4Region* svdRegion = G4RegionStore::GetInstance()->FindOrCreateRegion("SVD");
       envelope->SetRegion(svdRegion);
       svdRegion->AddRootLogicalVolume(envelope);

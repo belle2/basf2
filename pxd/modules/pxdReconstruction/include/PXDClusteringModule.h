@@ -19,12 +19,7 @@
 #include <boost/format.hpp>
 #include <string>
 
-#ifdef DUMP_CLUSTERS
-#include <boost/iostreams/filtering_stream.hpp>
-#endif
-
 namespace Belle2 {
-
 
   namespace PXD {
 
@@ -62,12 +57,6 @@ namespace Belle2 {
       void writeClusters(VxdID sensorID);
 
     protected:
-#ifdef DUMP_CLUSTERS
-      /** text filename to write cluster-information into */
-      std::string m_dumpFileName;
-      /** stream for writing cluster information */
-      boost::iostreams::filtering_ostream m_dump;
-#endif
       /** Noise in number of electrons */
       double m_elNoise;
       /** Seed cut in sigma */
@@ -80,6 +69,8 @@ namespace Belle2 {
       std::string m_storeDigitsName;
       /** Name of the collection to use for the PXDClusters */
       std::string m_storeClustersName;
+      /** Name of the collection to use for the PXDTrueHits */
+      std::string m_storeTrueHitsName;
       /** Name of the collection to use for the MCParticles */
       std::string m_storeMCParticlesName;
       /** Name of the relation between PXDDigits and MCParticles */
@@ -88,6 +79,10 @@ namespace Belle2 {
       std::string m_relClusterMCParticleName;
       /** Name of the relation between PXDClusters and PXDDigits */
       std::string m_relClusterDigitName;
+      /** Name of the relation between PXDDigits and PXDTrueHits */
+      std::string m_relDigitTrueHitName;
+      /** Name of the relation between PXDClusters and PXDTrueHits */
+      std::string m_relClusterTrueHitName;
 
       /** Size of the cluster at which we switch from Center of Gravity to Analog Head Tail */
       int m_sizeHeadTail;

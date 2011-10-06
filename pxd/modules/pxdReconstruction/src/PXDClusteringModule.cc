@@ -23,17 +23,8 @@
 #include <generators/dataobjects/MCParticle.h>
 #include <pxd/dataobjects/PXDDigit.h>
 #include <pxd/dataobjects/PXDCluster.h>
-#include <boost/foreach.hpp>
-
-
-
-#ifdef DUMP_CLUSTERS
 #include <pxd/dataobjects/PXDTrueHit.h>
-#include <framework/dataobjects/EventMetaData.h>
-#include <boost/iostreams/device/file.hpp>
-#include <boost/iostreams/filter/gzip.hpp>
-using namespace boost::iostreams;
-#endif
+#include <boost/foreach.hpp>
 
 using namespace std;
 using namespace Belle2;
@@ -66,6 +57,8 @@ PXDClusteringModule::PXDClusteringModule() : Module(), m_elNoise(200.0),
            "Digits collection name", string(""));
   addParam("Clusters", m_storeClustersName,
            "Cluster collection name", string(""));
+  addParam("TrueHits", m_storeTrueHitsName,
+           "TrueHit collection name", string(""));
   addParam("MCParticles", m_storeMCParticlesName,
            "MCParticles collection name", string(""));
   addParam("DigitMCRel", m_relDigitMCParticleName,
@@ -74,11 +67,11 @@ PXDClusteringModule::PXDClusteringModule() : Module(), m_elNoise(200.0),
            "Relation between clusters and MCParticles", string(""));
   addParam("ClusterDigitRel", m_relClusterDigitName,
            "Relation between clusters and Digits", string(""));
+  addParam("DigitTrueRel", m_relDigitTrueHitName,
+           "Relation between Digits and TrueHits", string(""));
+  addParam("ClusterTrueRel", m_relDigitTrueHitName,
+           "Relation between Clusters and TrueHits", string(""));
 
-#ifdef DUMP_CLUSTERS
-  addParam("DumpClusters", m_dumpFileName,
-           "Dump digits and clusters into file", string(""));
-#endif
   addParam("TanLorentz", m_tanLorentzAngle,
            "Tangent of the Lorentz angle", double(0.25));
   addParam("AssumeSorted", m_assumeSorted,
@@ -92,14 +85,19 @@ void PXDClusteringModule::initialize()
   StoreArray<MCParticle> storeMCParticles(m_storeMCParticlesName);
   StoreArray<PXDDigit>   storeDigits(m_storeDigitsName);
   StoreArray<PXDCluster> storeClusters(m_storeClustersName);
+  StoreArray<PXDTrueHit> storeTrueHits(m_storeTrueHitsName);
   RelationArray relDigitMCParticle(storeDigits, storeMCParticles, m_relDigitMCParticleName);
   RelationArray relClusterMCParticle(storeClusters, storeMCParticles, m_relClusterMCParticleName);
   RelationArray relClusterDigit(storeClusters, storeDigits, m_relClusterDigitName);
+  RelationArray relDigitTrueHit(storeDigits, storeTrueHits, m_relDigitTrueHitName);
+  RelationArray relClusterTrueHit(storeClusters, storeTrueHits, m_relClusterTrueHitName);
 
   //Set names in case default was used
   m_relDigitMCParticleName   = relDigitMCParticle.getName();
   m_relClusterMCParticleName = relClusterMCParticle.getName();
   m_relClusterDigitName      = relClusterDigit.getName();
+  m_relDigitTrueHitName      = relDigitTrueHit.getName();
+  m_relClusterTrueHitName    = relClusterTrueHit.getName();
 
   B2INFO("PXDClustering Parameters (in default system units, *=cannot be set directly):");
   B2INFO(" -->  ElectronicNoise:    " << m_elNoise);
@@ -109,26 +107,16 @@ void PXDClusteringModule::initialize()
   B2INFO(" -->  MCParticles:        " << storeMCParticles.getName());
   B2INFO(" -->  Digits:             " << storeDigits.getName());
   B2INFO(" -->  Clusters:           " << storeClusters.getName());
-  //B2INFO(" -->  TrueHits:           " << storeTrueHits.getName());
+  B2INFO(" -->  TrueHits:           " << storeTrueHits.getName());
   B2INFO(" -->  DigitMCRel:         " << m_relDigitMCParticleName);
   B2INFO(" -->  ClusterMCRel:       " << m_relClusterMCParticleName);
   B2INFO(" -->  ClusterDigitRel:    " << m_relClusterDigitName);
-  //B2INFO(" -->  DigitTrueRel:       " << m_relDigitTrueHitName);
-  //B2INFO(" -->  ClusterTrueRel:     " << m_relClusterTrueHitName);
+  B2INFO(" -->  DigitTrueRel:       " << m_relDigitTrueHitName);
+  B2INFO(" -->  ClusterTrueRel:     " << m_relClusterTrueHitName);
   B2INFO(" -->  AssumeSorted:       " << (m_assumeSorted ? "true" : "false"));
   B2INFO(" -->  TanLorentz:         " << m_tanLorentzAngle);
-#ifdef DUMP_CLUSTERS
-  B2INFO(" -->  DumpClusters:       " << (m_dumpFileName == "" ? "false" : m_dumpFileName));
-#endif
-
 
   NoiseMap::getInstance().setCuts(m_elNoise*m_cutAdjacent, m_elNoise*m_cutSeed, m_elNoise*m_cutCluster);
-#ifdef DUMP_CLUSTERS
-  if (m_dumpFileName != "") {
-    m_dump.push(boost::iostreams::gzip_compressor());
-    m_dump.push(boost::iostreams::file_sink(m_dumpFileName));
-  }
-#endif
 }
 
 void PXDClusteringModule::event()
@@ -136,53 +124,32 @@ void PXDClusteringModule::event()
   StoreArray<MCParticle> storeMCParticles(m_storeMCParticlesName);
   StoreArray<PXDDigit>   storeDigits(m_storeDigitsName);
   StoreArray<PXDCluster> storeClusters(m_storeClustersName);
+  StoreArray<PXDTrueHit> storeTrueHits(m_storeTrueHitsName);
   RelationArray relDigitMCParticle(storeDigits, storeMCParticles, m_relDigitMCParticleName);
   RelationArray relClusterMCParticle(storeClusters, storeMCParticles, m_relClusterMCParticleName);
   RelationArray relClusterDigit(storeClusters, storeDigits, m_relClusterDigitName);
+  RelationArray relDigitTrueHit(storeDigits, storeTrueHits, m_relDigitTrueHitName);
+  RelationArray relClusterTrueHit(storeClusters, storeTrueHits, m_relClusterTrueHitName);
 
   storeClusters->Clear();
   relClusterMCParticle.clear();
   relClusterDigit.clear();
-
-
-#ifdef DUMP_CLUSTERS
-  StoreObjPtr<EventMetaData> eventMetaDataPtr;
-  m_dump << "Event " << eventMetaDataPtr->getEvent() << endl;
-  StoreArray<PXDTrueHit> storeTrueHits;
-  int nTrueHits = storeTrueHits.getEntries();
-  if (nTrueHits) {
-    m_dump << "TrueHits" << endl;
-    for (int i = 0; i < nTrueHits; ++i) {
-      PXDTrueHit &hit = *storeTrueHits[i];
-      const SensorInfo &info = dynamic_cast<const SensorInfo&> VXD::GeoCache::get(hit.getSensorID());
-      double posU = (0.5 * info.getUSize() + hit.getU()) / info.getUPitch();
-      double posV = (0.5 * info.getVSize() + hit.getV()) / info.getVPitch(hit.getV());
-      m_dump << (string)hit.getSensorID() << " " << posU << " " << posV << endl;
-    }
-  }
-  m_assumeSorted = false;
-#endif
+  relClusterTrueHit.clear();
 
   if (!m_assumeSorted) {
     std::map<VxdID, Sensor> sensors;
 
     int nPixels = storeDigits.getEntries();
     //Fill sensors
-#ifdef DUMP_CLUSTERS
-    m_dump << "Digits" << endl;
-#endif
     for (int i = 0; i < nPixels; i++) {
       Pixel px(storeDigits[i], i);
-#ifdef DUMP_CLUSTERS
-      m_dump << px.get()->getSensorID() << " " << px.getU() << " " << px.getV() << " " << px.getCharge() << endl;
-#endif
       if (!NoiseMap::getInstance().adjacent(px.getU(), px.getV(), px.getCharge())) continue;
       VxdID sensorID = px.get()->getSensorID();
       std::pair<Sensor::iterator, bool> it = sensors[sensorID].insert(px);
       if (!it.second) B2ERROR("Pixel (" << px.getU() << "," << px.getV() << ") in sensor "
                                 << (string)sensorID << " is already set, ignoring second occurence");
     }
-
+    //Loop over sensors and cluster each sensor in turn
     for (map<VxdID, Sensor>::iterator it = sensors.begin(); it != sensors.end(); it++) {
       findClusters(it->second);
       writeClusters(it->first);
@@ -233,9 +200,12 @@ void PXDClusteringModule::writeClusters(VxdID sensorID)
   StoreArray<MCParticle> storeMCParticles(m_storeMCParticlesName);
   StoreArray<PXDDigit>   storeDigits(m_storeDigitsName);
   StoreArray<PXDCluster> storeClusters(m_storeClustersName);
+  StoreArray<PXDTrueHit> storeTrueHits(m_storeTrueHitsName);
   RelationArray relClusterMCParticle(storeClusters, storeMCParticles, m_relClusterMCParticleName);
   RelationArray relClusterDigit(storeClusters, storeDigits, m_relClusterDigitName);
+  RelationArray relClusterTrueHit(storeClusters, storeTrueHits, m_relClusterTrueHitName);
   RelationIndex<PXDDigit, MCParticle> relDigitMCParticle(storeDigits, storeMCParticles, m_relDigitMCParticleName);
+  RelationIndex<PXDDigit, PXDTrueHit> relDigitTrueHit(storeDigits, storeTrueHits, m_relDigitTrueHitName);
 
   //Get Geometry information
   const SensorInfo &info = dynamic_cast<const SensorInfo&>(VXD::GeoCache::get(sensorID));
@@ -260,6 +230,7 @@ void PXDClusteringModule::writeClusters(VxdID sensorID)
   }
 
     map<int, float> mc_relations;
+    map<int, float> truehit_relations;
     vector<pair<int, float> > digit_weights;
     digit_weights.reserve(cls.size());
     BOOST_FOREACH(const PXD::Pixel &px, cls.pixels()) {
@@ -271,11 +242,16 @@ void PXDClusteringModule::writeClusters(VxdID sensorID)
       posU += px.getCharge() * info.getUCellPosition(px.getU());
       posV += px.getCharge() * info.getVCellPosition(px.getV());
 
-      typedef const RelationIndex<PXDDigit, MCParticle>::Element rel_type;
+      typedef const RelationIndex<PXDDigit, MCParticle>::Element relMC_type;
+      typedef const RelationIndex<PXDDigit, PXDTrueHit>::Element relTrueHit_type;
 
       //Fill map with MCParticle relations
-      BOOST_FOREACH(rel_type &mcRel, relDigitMCParticle.getFrom(px.get())) {
+      BOOST_FOREACH(relMC_type &mcRel, relDigitMCParticle.getFrom(px.get())) {
         mc_relations[mcRel.indexTo] += mcRel.weight;
+      };
+      //Fill map with PXDTrueHit relations
+      BOOST_FOREACH(relTrueHit_type &trueRel, relDigitTrueHit.getFrom(px.get())) {
+        truehit_relations[trueRel.indexTo] += trueRel.weight;
       };
       //Add digit to the Cluster->Digit relation list
       digit_weights.push_back(make_pair(px.getIndex(), px.getCharge()));
@@ -313,18 +289,8 @@ void PXDClusteringModule::writeClusters(VxdID sensorID)
 
     //Create Relations to this Digit
     relClusterMCParticle.add(clsIndex, mc_relations.begin(), mc_relations.end());
+    relClusterTrueHit.add(clsIndex, truehit_relations.begin(), truehit_relations.end());
     relClusterDigit.add(clsIndex, digit_weights.begin(), digit_weights.end());
-
-
-#ifdef DUMP_CLUSTERS
-    posU = (0.5 * info.getUSize() + posU) / info.getUPitch();
-    posV = (0.5 * info.getVSize() + posV) / info.getVPitch(posV);
-
-    m_dump << "Cluster " << uid << " "
-    << posU << " " << posV << " "
-    << sizeU << " " << sizeV << " "
-    << cls.charge() << " " << seed.charge() << " " << endl;
-#endif
   }
 
   m_clusters.clear();

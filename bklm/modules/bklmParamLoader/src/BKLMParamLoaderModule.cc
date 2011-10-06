@@ -69,7 +69,12 @@ void BKLMParamLoaderModule::initialize()
     B2ERROR("BKLMParamLoader: file " << m_Pathname << " does not exist.")
   }
   Gearbox& gearbox = Gearbox::getInstance();
-  gearbox.open(m_Pathname);
+  vector<string> backends;
+  string local_dir(getenv("BELLE2_LOCAL_DIR"));
+  backends.push_back("file:" + local_dir + "/data");
+  gearbox.setBackends(backends);
+  gearbox.open("bklm/BKLMSimulationPar.xml");
+  // m_Pathname is ignored for now    :/
   GearDir content = GearDir("/ParamSet[@type=\"BKLM\"]/Content");
   simPar->read(content, (unsigned int) m_RandomSeed, m_DoBackgroundStudy);
   gearbox.close();

@@ -50,13 +50,16 @@ namespace Belle2 {
       registerMCParticleRelation(particleToSimHits);
     }
 
-    void SensitiveDetector::Initialize(G4HCofThisEvent*)
+    //-----------------------------------------------------
+    // Method invoked for every step in sensitive detector
+    //-----------------------------------------------------
+    G4bool SensitiveDetector::step(G4Step* step, G4TouchableHistory*)
     {
-      m_HitNumber = 0;
+
       // One-time initializations (constructor is called too early)
       if (m_FirstCall) {
         m_FirstCall = false;
-        m_NeutronPID = G4Neutron::Definition()->GetPDGEncoding(); // 2112
+        m_NeutronPID = G4Neutron::Definition()->GetPDGEncoding(); // =2112
         SimulationPar* simPar = SimulationPar::instance();
         if (!simPar->isValid()) {
           B2FATAL("BKLM SensitiveDetector: simulation-control parameters are not available from module BKLMParamLoader")
@@ -65,13 +68,6 @@ namespace Belle2 {
         m_DoBackgroundStudy = simPar->getDoBackgroundStudy();
         m_Random = new TRandom3(simPar->getRandomSeed());
       }
-    }
-
-    //-----------------------------------------------------
-    // Method invoked for every step in sensitive detector
-    //-----------------------------------------------------
-    G4bool SensitiveDetector::step(G4Step* step, G4TouchableHistory*)
-    {
 
       // It is not necessary to detect motion from one volume to another (or track death
       // in the RPC gas volume).  Experimentation shows that most tracks pass through the
@@ -109,7 +105,8 @@ namespace Belle2 {
         int layer = boost::lexical_cast<int>(volumeName.substr(13, 2));
         int plane = boost::lexical_cast<int>(volumeName.substr(16, 1));
         StoreArray<BKLMSimHit> simHits;
-        BKLMSimHit* simHit = new(simHits->AddrAt(m_HitNumber))
+        int hitNumber = simHits->GetLast() + 1;
+        BKLMSimHit* simHit = new(simHits->AddrAt(hitNumber))
         BKLMSimHit(hitPos, hitTime, deltaE, KE, inRPC, decayed, frontBack, sector, layer, plane);
         if (inRPC) {
           convertHitToRPCStrips(simHit);
@@ -123,8 +120,7 @@ namespace Belle2 {
         }
         StoreArray<MCParticle> particles;
         RelationArray particleToSimHits(particles, simHits);
-        particleToSimHits.add(track->GetTrackID(), m_HitNumber);
-        m_HitNumber++;
+        particleToSimHits.add(track->GetTrackID(), hitNumber);
         return true;
       }
       return false;

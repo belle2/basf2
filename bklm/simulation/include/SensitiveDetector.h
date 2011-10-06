@@ -30,9 +30,6 @@ namespace Belle2 {
       //! Constructor
       SensitiveDetector();
 
-      //! Initialize at the start of each event
-      void Initialize(G4HCofThisEvent*);
-
       //! Process each step in the BKLM
       bool step(G4Step*, G4TouchableHistory*);
 
@@ -55,9 +52,6 @@ namespace Belle2 {
 
       //! Random number generator
       TRandom3* m_Random;
-
-      //! Hit number within one event
-      int m_HitNumber;
 
       //! Flag to enforce once-only initializations in Initialize()
       bool m_FirstCall;

@@ -59,19 +59,24 @@ namespace Belle2 {
        * @param charge charge in electrons to be added
        * @param particle Index of the particle contributing the charge, -1 for no particle/noise
        */
-      void add(double charge, int particle = -1) {
+      void add(double charge, int particle = -1, int truehit = -1) {
         if (particle >= 0) m_particles[particle] += charge;
+        if (truehit >= 0) m_truehits[truehit] += charge;
         m_charge += charge;
       }
       /** Return the charge collected in the pixel */
       double charge() const { return m_charge; }
       /** Return the map containing all particle contributions to the pixel charge */
-      const relations_map &relations() const { return m_particles; }
+      const relations_map &particles() const { return m_particles; }
+      /** Return the map containing all truehit contributions to the pixel charge */
+      const relations_map &truehits() const { return m_truehits; }
     protected:
       /** charge of the pixel */
       double m_charge;
       /** particle contributions to the charge */
       relations_map m_particles;
+      /** truehit contributions to the charge */
+      relations_map m_truehits;
     };
 
     typedef std::map<Digit, DigitValue> Sensor;
@@ -135,10 +140,17 @@ namespace Belle2 {
       std::string m_digitColName;
       /** Name of the collection for the PXDSimhits */
       std::string m_simhitColName;
+      /** Name of the collection for the PXDTrueHits */
+      std::string m_truehitColName;
       /** Name of the relation between MCParticles and PXDSimHits */
       std::string m_relSimName;
       /** Name of the relation between PXDDigits and MCParticles */
       std::string m_relDigitName;
+      /** Name of the relation between PXDTrueHits and PXDSimHits */
+      std::string m_relTrueSimName;
+      /** Name of the relation between PXDDigits and PXDTrueHits */
+      std::string m_relDigitTrueName;
+
 
       /** Wether or not to apply poission fluctuation of charge */
       bool   m_applyPoisson;
@@ -181,6 +193,8 @@ namespace Belle2 {
       const PXDSimHit*   m_currentHit;
       /** Index of the particle which caused the current hit */
       int                m_currentParticle;
+      /** Index of the TrueHit the current hit belongs to */
+      int                m_currentTrueHit;
       /** Pointer to the sensor in which the current hit occured */
       Sensor*            m_currentSensor;
       /** Pointer to the SensorInfo of the current sensor */

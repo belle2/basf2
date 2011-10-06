@@ -19,6 +19,7 @@
 #include <framework/datastore/RelationIndex.h>
 
 #include <generators/dataobjects/MCParticle.h>
+#include <pxd/dataobjects/PXDTrueHit.h>
 #include <pxd/dataobjects/PXDDigit.h>
 #include <boost/foreach.hpp>
 #include <cmath>
@@ -56,10 +57,16 @@ PXDDigitizerModule::PXDDigitizerModule() : Module(), m_random(0), m_rootFile(0),
            "Digits collection name", string(""));
   addParam("SimHits", m_simhitColName,
            "SimHit collection name", string(""));
+  addParam("TrueHits", m_truehitColName,
+           "TrueHit collection name", string(""));
   addParam("MCSimHitRel", m_relSimName,
            "Relation between MCParticles and SimHits", string(""));
   addParam("DigitMCRel", m_relDigitName,
-           "Relation between MCParticles and Digits", string(""));
+           "Relation between Digits and MCParticles", string(""));
+  addParam("TrueSimRel", m_relTrueSimName,
+           "Relation between TrueHits and SimHits", string(""));
+  addParam("DigitTrueRel", m_relDigitTrueName,
+           "Relation between Digits and TrueHits", string(""));
 
   addParam("PoissonSmearing", m_applyPoisson,
            "Apply Poisson smearing of electrons collected on pixels?", true);
@@ -100,15 +107,20 @@ void PXDDigitizerModule::initialize()
   //Check for existing collections
   StoreArray<MCParticle> storeMC(m_mcColName);
   StoreArray<PXDSimHit>  storeSimHits(m_simhitColName);
+  StoreArray<PXDTrueHit>  storeTrueHits(m_truehitColName);
   RelationArray relSimHits(storeMC, storeSimHits, m_relSimName);
-  //Set name in case default was used
-  m_relSimName = relSimHits.getName();
+  RelationArray relTrueSimHits(storeTrueHits, storeSimHits, m_relTrueSimName);
 
   //Register Output collections
   StoreArray<PXDDigit>   storeDigits(m_digitColName);
   RelationArray relDigits(storeDigits, storeMC, m_relDigitName);
-  //Set name in case default was used
+  RelationArray relDigitsTrue(storeDigits, storeTrueHits, m_relDigitTrueName);
+
+  //Set names in case default was used
+  m_relSimName = relSimHits.getName();
+  m_relTrueSimName = relTrueSimHits.getName();
   m_relDigitName = relDigits.getName();
+  m_relDigitTrueName = relDigitsTrue.getName();
 
   //Convert parameters to correct units
   m_elNoise *= Unit::e;
@@ -183,7 +195,9 @@ void PXDDigitizerModule::event()
 
   StoreArray<MCParticle> storeMC(m_mcColName);
   StoreArray<PXDSimHit> storeSimHits(m_simhitColName);
+  StoreArray<PXDTrueHit> storeTrueHits(m_truehitColName);
   RelationIndex<MCParticle, PXDSimHit> simRel(storeMC, storeSimHits, m_relSimName);
+  RelationIndex<PXDTrueHit, PXDSimHit> relTrueSimHit(storeTrueHits, storeSimHits, m_relTrueSimName);
   unsigned int nSimHits = storeSimHits->GetEntries();
   if (nSimHits == 0) return;
 
@@ -196,6 +210,12 @@ void PXDDigitizerModule::event()
     } else {
       B2ERROR("Could not find MCParticle which produced PXDSimhit " << i);
       m_currentParticle = -1;
+    }
+    const RelationIndex<PXDTrueHit, PXDSimHit>::Element* relTrue = relTrueSimHit.getFirstFrom(m_currentHit);
+    if (relTrue) {
+      m_currentTrueHit = relTrue->indexFrom;
+    } else {
+      m_currentTrueHit = -1;
     }
 
     VxdID sensorID = m_currentHit->getSensorID();
@@ -359,7 +379,7 @@ void PXDDigitizerModule::driftCharge(const TVector3 &position, double electrons)
               << ", uID=" << uID << ", vID=" << vID);
       if (m_histSteps) m_histSteps->Fill(m_elMaxSteps);
     }
-    sensor[Digit(uID, vID)].add(groupCharge, m_currentParticle);
+    sensor[Digit(uID, vID)].add(groupCharge, m_currentParticle, m_currentTrueHit);
   }
 }
 
@@ -416,7 +436,7 @@ void PXDDigitizerModule::driftChargeSimple(const TVector3 &position, double elec
       uLowerTail = uUpperTail;
 
       double charge = electrons * uIntegral * vIntegral;
-      sensor[Digit(uID, vID)].add(charge, m_currentParticle);
+      sensor[Digit(uID, vID)].add(charge, m_currentParticle, m_currentTrueHit);
       B2DEBUG(80, "Relative charge for pixel (" << uID << ", " << vID << "): " << uIntegral*vIntegral);
       fraction += uIntegral * vIntegral;
       if (m_histDiffusion && charge >= 1.0) m_histDiffusion->Fill((uPos - uCenter) / Unit::um, (vPos - vCenter) / Unit::um, charge);
@@ -481,11 +501,14 @@ void PXDDigitizerModule::saveDigits()
 {
   StoreArray<MCParticle> storeMC(m_mcColName);
   StoreArray<PXDDigit> storeDigits(m_digitColName);
+  StoreArray<PXDTrueHit> storeTrueHits(m_truehitColName);
   RelationArray storeRel(storeDigits, storeMC, m_relDigitName);
+  RelationArray storeTrue(storeDigits, storeTrueHits, m_relDigitTrueName);
 
   //Clear out old digits
   storeDigits->Clear();
   storeRel.clear();
+  storeTrue.clear();
 
   //Zero supression cut in electrons
   double charge_threshold = m_SNAdjacent * m_elNoise;
@@ -515,8 +538,12 @@ void PXDDigitizerModule::saveDigits()
       );
 
       //If the digit has any relations to MCParticles, add the Relation
-      if (v.relations().size() > 0) {
-        storeRel.add(digIndex, v.relations().begin(), v.relations().end());
+      if (v.particles().size() > 0) {
+        storeRel.add(digIndex, v.particles().begin(), v.particles().end());
+      }
+      //If the digit has any truehits to TrueHit, add the Relation
+      if (v.truehits().size() > 0) {
+        storeTrue.add(digIndex, v.truehits().begin(), v.truehits().end());
       }
     }
   }

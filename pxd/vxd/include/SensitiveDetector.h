@@ -269,7 +269,10 @@ namespace Belle2 {
       // - at least one created SimHit
       // - at least one crossing of the detector plane, local z=0
       //If any of this conditions is not met, return
-      if (m_trueHitSteps.empty() || m_trueHitCount < 1) return;
+      if (m_trueHitSteps.empty() || m_trueHitCount < 1) {
+        m_trueHitSteps.clear();
+        return;
+      }
 
       //Get SensorID and all collections
       VxdID sensorID = m_info->getID();

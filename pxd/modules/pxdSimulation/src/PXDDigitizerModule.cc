@@ -197,10 +197,11 @@ void PXDDigitizerModule::event()
   StoreArray<MCParticle> storeMCParticles(m_storeMCParticlesName);
   StoreArray<PXDSimHit>  storeSimHits(m_storeSimHitsName);
   StoreArray<PXDTrueHit> storeTrueHits(m_storeTrueHitsName);
-  RelationIndex<MCParticle, PXDSimHit> relMCParticleSimHit(storeMCParticles, storeSimHits, m_relMCParticleSimHitName);
-  RelationIndex<PXDTrueHit, PXDSimHit> relTrueHitSimHit(storeTrueHits, storeSimHits, m_relTrueHitSimHitName);
   unsigned int nSimHits = storeSimHits->GetEntries();
   if (nSimHits == 0) return;
+
+  RelationIndex<MCParticle, PXDSimHit> relMCParticleSimHit(storeMCParticles, storeSimHits, m_relMCParticleSimHitName);
+  RelationIndex<PXDTrueHit, PXDSimHit> relTrueHitSimHit(storeTrueHits, storeSimHits, m_relTrueHitSimHitName);
 
   //Check sensor info and set pointers to current sensor
   for (unsigned int i = 0; i < nSimHits; ++i) {

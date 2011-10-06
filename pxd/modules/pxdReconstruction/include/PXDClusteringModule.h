@@ -47,16 +47,17 @@ namespace Belle2 {
       /** do the clustering */
       virtual void event();
 
-      /** Find all clusters in a given sensor
-       * @param sensor ordered container of all hits in one sensor
+    protected:
+      /** Find the cluster a given pixel belongs to.
+       * For this to work correctly, the pixels have to be passed sorted by sensor,row,column
+       * @param px Pixel to find the cluster for
        */
-      void findClusters(const Sensor &sensor);
+      void findCluster(const Pixel &px);
       /** Write clusters to collection.
        * This method will check all cluster candidates and write valid ones to the datastore
        */
       void writeClusters(VxdID sensorID);
 
-    protected:
       /** Noise in number of electrons */
       double m_elNoise;
       /** Seed cut in sigma */

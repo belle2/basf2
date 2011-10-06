@@ -52,6 +52,8 @@ PXDClusteringModule::PXDClusteringModule() : Module(), m_elNoise(200.0),
            "SN for digits to be considered as seed", m_cutSeed);
   addParam("ClusterSN", m_cutCluster,
            "Minimum SN for clusters", m_cutCluster);
+  addParam("HeadTailSize", m_sizeHeadTail,
+           "Minimum cluster size to switch to Analog head tail algorithm for cluster center", m_sizeHeadTail);
 
   addParam("Digits", m_storeDigitsName,
            "Digits collection name", string(""));
@@ -80,7 +82,6 @@ PXDClusteringModule::PXDClusteringModule() : Module(), m_elNoise(200.0),
 
 void PXDClusteringModule::initialize()
 {
-
   //Register collections
   StoreArray<MCParticle> storeMCParticles(m_storeMCParticlesName);
   StoreArray<PXDDigit>   storeDigits(m_storeDigitsName);
@@ -135,11 +136,15 @@ void PXDClusteringModule::event()
   relClusterMCParticle.clear();
   relClusterDigit.clear();
   relClusterTrueHit.clear();
+  int nPixels = storeDigits.getEntries();
+  if (nPixels == 0) return;
+
+  m_clusters.clear();
+  m_cache.clear();
 
   if (!m_assumeSorted) {
+    //If the pixels are in random order, we have to sort them first before we can cluster them
     std::map<VxdID, Sensor> sensors;
-
-    int nPixels = storeDigits.getEntries();
     //Fill sensors
     for (int i = 0; i < nPixels; i++) {
       Pixel px(storeDigits[i], i);
@@ -149,15 +154,20 @@ void PXDClusteringModule::event()
       if (!it.second) B2ERROR("Pixel (" << px.getU() << "," << px.getV() << ") in sensor "
                                 << (string)sensorID << " is already set, ignoring second occurence");
     }
-    //Loop over sensors and cluster each sensor in turn
+
+    //Now we loop over sensors and cluster each sensor in turn
     for (map<VxdID, Sensor>::iterator it = sensors.begin(); it != sensors.end(); it++) {
-      findClusters(it->second);
+      BOOST_FOREACH(const PXD::Pixel &px, it->second) {
+        findCluster(px);
+      }
       writeClusters(it->first);
       it->second.clear();
     }
   } else {
+    //If we can assume that all pixels are already sorted we can skip the
+    //reordering and directly cluster them once the sensorID changes, we write
+    //out all existing clusters and continue
     VxdID sensorID;
-    int nPixels = storeDigits.getEntries();
     for (int i = 0; i < nPixels; i++) {
       Pixel px(storeDigits[i], i);
       //Ignore digits with not enough signal
@@ -165,37 +175,31 @@ void PXDClusteringModule::event()
 
       //New sensor, write clusters
       if (sensorID != px.get()->getSensorID()) {
-        if (sensorID) writeClusters(sensorID);
+        writeClusters(sensorID);
         sensorID = px.get()->getSensorID();
       }
       //Find correct cluster and add pixel to cluster
-      ClusterCandidate* prev = m_cache.findCluster(px.getU(), px.getV());
-      if (!prev) {
-        m_clusters.push_back(ClusterCandidate());
-        prev = &m_clusters.back();
-      }
-      prev->add(px);
-      m_cache.setLast(px.getU(), px.getV(), prev);
+      findCluster(px);
     }
     writeClusters(sensorID);
   }
 }
 
-void PXDClusteringModule::findClusters(const Sensor &sensor)
+inline void PXDClusteringModule::findCluster(const Pixel &px)
 {
-  BOOST_FOREACH(const PXD::Pixel &px, sensor) {
-    ClusterCandidate* prev = m_cache.findCluster(px.getU(), px.getV());
-    if (!prev) {
-      m_clusters.push_back(ClusterCandidate());
-      prev = &m_clusters.back();
-    }
-    prev->add(px);
-    m_cache.setLast(px.getU(), px.getV(), prev);
+  ClusterCandidate* prev = m_cache.findCluster(px.getU(), px.getV());
+  if (!prev) {
+    m_clusters.push_back(ClusterCandidate());
+    prev = &m_clusters.back();
   }
+  prev->add(px);
+  m_cache.setLast(px.getU(), px.getV(), prev);
 }
 
 void PXDClusteringModule::writeClusters(VxdID sensorID)
 {
+  if (m_clusters.empty()) return;
+
   //Get all datastore elements
   StoreArray<MCParticle> storeMCParticles(m_storeMCParticlesName);
   StoreArray<PXDDigit>   storeDigits(m_storeDigitsName);

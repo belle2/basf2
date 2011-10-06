@@ -12,11 +12,22 @@ os.environ['G4VRMLFILE_VIEWER'] = 'freewrl'
 
 evtmetagen = register_module('EvtMetaGen')
 # Load XML parameters
+
+# BKLM simulation parameter loader
+bklmparamloader = register_module('BKLMParamLoader')
+bklmparamloader.param('InputFileXML', os.path.join(basf2datadir,
+                      'bklm/BKLMSimulationPar.xml'))
+# bklmparamloader.param('RandomSeed',987654321)
+# bklmparamloader.param('DoBackgroundStudy',True)
+
 paramloader = register_module('Gearbox')
+
 # Create Geometry
 geobuilder = register_module('Geometry')
 geobuilder.log_level = LogLevel.INFO
+
 pguninput = register_module('PGunInput')
+
 g4sim = register_module('FullSim')
 
 evtmetagen.param('EvtNumList', [1])
@@ -60,6 +71,7 @@ pguninput.param('phiPar2', 5)
 main = create_path()
 
 main.add_module(evtmetagen)
+main.add_module(bklmparamloader)
 main.add_module(paramloader)
 main.add_module(geobuilder)
 # Without Particle Gun there are no tracks

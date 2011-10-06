@@ -112,12 +112,12 @@ namespace Belle2 {
       std::vector<std::pair<unsigned int, float> > m_trueHitSteps;
       /** TrackID of the current volume traversal */
       int      m_trueHitTrackID;
+      /** Number of crossings of the detector plane (z=0) for the current volume traversal */
+      int      m_trueHitCount;
       /** Accumulated energy of the current volume traversal */
       double   m_trueHitWeight;
       /** Timestamp for crossing the detector plane (z=0) of the current volume traversal */
       double   m_trueHitTime;
-      /** Number of crossings of the detector plane (z=0) for the current volume traversal */
-      int      m_trueHitCount;
       /** Position of the crossing of the detector plane (z=0) for the current volume traversal */
       TVector3 m_trueHitPos;
       /** Momentum of the crossing of the detector plane (z=0) for the current volume traversal */
@@ -129,7 +129,8 @@ namespace Belle2 {
     };
 
     template <class SimHitClass, class TrueHitClass>
-    SensitiveDetector<SimHitClass, TrueHitClass>::SensitiveDetector(VXD::SensorInfoBase* sensorInfo): VXD::SensitiveDetectorBase(sensorInfo)
+    SensitiveDetector<SimHitClass, TrueHitClass>::SensitiveDetector(VXD::SensorInfoBase* sensorInfo): VXD::SensitiveDetectorBase(sensorInfo),
+        m_trueHitTrackID(0), m_trueHitCount(0), m_trueHitWeight(0.0), m_trueHitTime(0.0)
     {
       //Make sure all collections are registered
       StoreArray<MCParticle>   mcParticles;
@@ -249,9 +250,9 @@ namespace Belle2 {
           m_trueHitTime = time;
         } else {
           //Otherwise take the avg of all crossings
-          m_trueHitPos = (m_trueHitCount * m_trueHitPos + posZero) * (1.0 / (m_trueHitCount + 1));
-          m_trueHitMom = (m_trueHitCount * m_trueHitMom + momZero) * (1.0 / (m_trueHitCount + 1));
-          m_trueHitMom = (m_trueHitCount * m_trueHitTime + time) * (1.0 / (m_trueHitCount + 1));
+          m_trueHitPos  = (m_trueHitCount * m_trueHitPos + posZero) * (1.0 / (m_trueHitCount + 1));
+          m_trueHitMom  = (m_trueHitCount * m_trueHitMom + momZero) * (1.0 / (m_trueHitCount + 1));
+          m_trueHitTime = (m_trueHitCount * m_trueHitTime + time)   * (1.0 / (m_trueHitCount + 1));
         }
         //Increase number of crossings
         m_trueHitCount++;
@@ -268,35 +269,33 @@ namespace Belle2 {
       //We save a TrueHit under the following circumstances:
       // - at least one created SimHit
       // - at least one crossing of the detector plane, local z=0
-      //If any of this conditions is not met, return
-      if (m_trueHitSteps.empty() || m_trueHitCount < 1) {
-        m_trueHitSteps.clear();
-        return;
+      //If any of this conditions is not met, just clear
+      if (!m_trueHitSteps.empty() && m_trueHitCount > 0) {
+        //Get SensorID and all collections
+        VxdID sensorID = m_info->getID();
+        StoreArray<MCParticle>   mcParticles;
+        StoreArray<SimHitClass>  simHits;
+        StoreArray<TrueHitClass> trueHits;
+        RelationArray relMCTrueHits(mcParticles, trueHits);
+        RelationArray relTrueSimHit(trueHits, simHits);
+
+        //Create a new TrueHit
+        int hitIndex = trueHits->GetLast() + 1;
+        new(trueHits->AddrAt(hitIndex))
+        TrueHitClass(sensorID, m_trueHitPos.X(), m_trueHitPos.Y(), m_trueHitWeight, m_trueHitTime,
+                     m_trueHitMom, m_trueHitMomStart, m_trueHitMomEnd);
+        //Add Relation to MCParticle
+        relMCTrueHits.add(m_trueHitTrackID, hitIndex, m_trueHitWeight);
+        //Add Relation to SimHits
+        relTrueSimHit.add(hitIndex, m_trueHitSteps.begin(), m_trueHitSteps.end());
       }
-
-      //Get SensorID and all collections
-      VxdID sensorID = m_info->getID();
-      StoreArray<MCParticle>   mcParticles;
-      StoreArray<SimHitClass>  simHits;
-      StoreArray<TrueHitClass> trueHits;
-      RelationArray relMCTrueHits(mcParticles, trueHits);
-      RelationArray relTrueSimHit(trueHits, simHits);
-
-      //Create a new TrueHit
-      int hitIndex = trueHits->GetLast() + 1;
-      new(trueHits->AddrAt(hitIndex))
-      TrueHitClass(sensorID, m_trueHitPos.X(), m_trueHitPos.Y(), m_trueHitWeight, m_trueHitTime,
-                   m_trueHitMom, m_trueHitMomStart, m_trueHitMomEnd);
-      //Add Relation to MCParticle
-      relMCTrueHits.add(m_trueHitTrackID, hitIndex, m_trueHitWeight);
-      //Add Relation to SimHits
-      relTrueSimHit.add(hitIndex, m_trueHitSteps.begin(), m_trueHitSteps.end());
 
       //Clear the collected steps and reset the TrackID
       m_trueHitSteps.clear();
       m_trueHitTrackID = 0;
-      m_trueHitWeight  = 0;
       m_trueHitCount   = 0;
+      m_trueHitWeight  = 0.0;
+      m_trueHitTime    = 0.0;
     }
 
   } //VXD Namespace

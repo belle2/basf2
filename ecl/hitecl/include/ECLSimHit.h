@@ -11,8 +11,6 @@
 #ifndef ECLSIMHIT_H
 #define ECLSIMHIT_H
 
-#include <framework/datastore/DataStore.h>
-
 #include <TObject.h>
 #include <TVector3.h>
 

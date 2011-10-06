@@ -10,6 +10,7 @@
 #ifndef MSGHANDLER_H
 #define MSGHANDLER_H
 
+#include <framework/logging/Logger.h>
 #include <framework/pcore/EvtMessage.h>
 
 #include <vector>

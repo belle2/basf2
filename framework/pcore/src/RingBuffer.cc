@@ -38,12 +38,12 @@ RingBuffer::RingBuffer(char* name, int size)
   // 1. Open shared memory
   m_shmid = shmget(IPC_PRIVATE, size * 4, IPC_CREAT | 0644);
   if (m_shmid < 0) {
-    perror("RingBuffer::shmget");
+    B2ERROR("RingBuffer::shmget");
     return;
   }
   m_shmadr = (int *) shmat(m_shmid, 0, 0);
   if (m_shmadr == (int*) - 1) {
-    perror("RingBuffer::shmat");
+    B2ERROR("RingBuffer::shmat");
     return;
   }
   //  cout << "Shared Memory created" << endl;
@@ -51,7 +51,7 @@ RingBuffer::RingBuffer(char* name, int size)
   // 2. Open Semaphore
   m_semid = semget(IPC_PRIVATE, 1, IPC_CREAT | 0644);
   if (m_semid < 0) {
-    perror("RingBuffer::semget");
+    B2ERROR("RingBuffer::semget");
     return;
   }
   //  cout << "Semaphore created" << endl;
@@ -76,8 +76,9 @@ RingBuffer::RingBuffer(char* name, int size)
   m_insq_counter = 0;
 
   sem_unlock(m_semid);
-  cout << "RingBuffer initialization done" << endl;
-  B2INFO(boost::format("buftop = %1%, end = %2%\n") % m_buftop % (m_buftop + m_bufinfo->size))
+  //  cout << "RingBuffer initialization done" << endl;
+  B2INFO("RingBuffer initialization done");
+  B2INFO(boost::format("buftop = %1%, end = %2%\n") % m_buftop % (m_buftop + m_bufinfo->size));
 }
 
 RingBuffer::RingBuffer(int shm_id)
@@ -259,6 +260,7 @@ int RingBuffer::remq(int* buf)
   //  printf ( "remq : nbuf = %d\n", m_bufinfo->nbuf );
   int* r_ptr = m_buftop + m_bufinfo->rptr;
   int nw = *r_ptr;
+  //  printf ( "RingBuffer : nw = %d\n", nw );
   if (nw <= 0) {
     printf("RingBuffer::remq : buffer size = %d, skipped\n", nw);
     sem_unlock(m_semid);

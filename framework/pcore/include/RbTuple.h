@@ -10,6 +10,7 @@
 //-
 
 #include <framework/core/HistoModule.h>
+#include <framework/logging/Logger.h>
 
 #include <vector>
 

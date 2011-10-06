@@ -62,7 +62,8 @@ int ProcHandler::init_EvtServer(void)
     exit(-99);
   } else {
     m_fEvtServer = 1; // I'm event server
-    m_fEvtProcID = -10;
+    //    m_fEvtProcID = -10;
+    m_fEvtProcID = 10000;
   }
   return 0;
 }
@@ -80,6 +81,7 @@ int ProcHandler::init_EvtProc(int nproc)
         m_fEvtProc = 0;
         m_nEvtProc++;
         printf("ProcHandler: event process %d forked. pid = %d\n", i, pid);
+        fflush(stdout);
       } else if (pid < 0) {
         perror("init_EvtProc");
         exit(-99);
@@ -108,7 +110,8 @@ int ProcHandler::init_OutServer(int id)
   } else {
     m_fOutputSrv = 1; // I'm output server
     m_fOutputSrvID = id;
-    m_fEvtProcID = -20;
+    //    m_fEvtProcID = -20;
+    m_fEvtProcID = 20000 + id;
   }
   return 0;
 }
@@ -303,13 +306,64 @@ int ProcHandler::remove_pid(pid_t pid)
   return -1;
 }
 
+int ProcHandler::wait_event_server(void)
+{
+  unsigned int id = 0;
+  while (id  < m_lEvtSrv.size()) {
+    while (1) {
+      int status;
+      int pid = waitpid(m_lEvtSrv[id], &status, 0);
+      if (pid == -1) {
+        if (errno == EINTR)
+          continue;
+        else {
+          perror("wait_processes : waitpid");
+          return -1;
+        }
+      } else {
+        break;
+      }
+    }
+    id++;
+  }
+  m_lEvtSrv.erase(m_lEvtSrv.begin(), m_lEvtSrv.end());
+  return 0;
+}
+
+int ProcHandler::wait_event_processes(void)
+{
+  unsigned int id = 0;
+  while (id  < m_lEvtProc.size()) {
+    while (1) {
+      int status;
+      int pid = waitpid(m_lEvtProc[id], &status, 0);
+      if (pid == -1) {
+        if (errno == EINTR)
+          continue;
+        else {
+          perror("wait_processes : waitpid");
+          return -1;
+        }
+      } else {
+        break;
+      }
+    }
+    id++;
+  }
+  m_lEvtProc.erase(m_lEvtProc.begin(), m_lEvtProc.end());
+  return 0;
+}
+
+
+
 
 int ProcHandler::wait_output_server(void)
 {
-  while (m_lOutputSrv.size() > 0) {
+  unsigned int id = 0;
+  while (id < m_lOutputSrv.size()) {
     while (1) {
       int status;
-      int pid = waitpid(-1, &status, 0);
+      int pid = waitpid(m_lOutputSrv[id], &status, 0);
       if (pid == -1) {
         if (errno == EINTR)
           continue;
@@ -319,13 +373,15 @@ int ProcHandler::wait_output_server(void)
         }
       } else {
         //  printf ( "wait_processes : completion of %d detected\n", pid );
-        remove_pid(pid);
+        //        remove_pid(pid);
         //  printf ( "sizes = EVS %d; EVP %d; OPS %d\n",
         //     m_lEvtSrv.size(), m_lEvtProc.size(), m_lOutputSrv.size() );
         break;
       }
     }
+    id++;
   }
+  m_lOutputSrv.erase(m_lOutputSrv.begin(), m_lOutputSrv.end());
   return 0;
 }
 

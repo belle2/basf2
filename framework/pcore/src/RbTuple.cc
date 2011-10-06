@@ -11,6 +11,8 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <string.h>
+#include <dirent.h>
+#include <errno.h>
 
 #include "TChain.h"
 #include "TFile.h"
@@ -48,12 +50,24 @@ void RbTupleManager::init(int nprocess, const char* filename)
   strcpy(m_filename, filename);
   m_nproc = nprocess;
 
-  // Delete temporary files
-  for (int i = 0; i < m_nproc; i++) {
-    char filename[1024];
-    sprintf(filename, "%s.%d", m_filename, i);
-    unlink(filename);
+  // Open current directory
+  std::string dir = ".";
+  DIR *dp;
+  struct dirent *dirp;
+  if ((dp = opendir(dir.c_str())) == NULL) {
+    B2ERROR("Error to open directory" << dir);
+    return;
   }
+
+  // Scan the directory and delete temporary files
+  std::string compfile = std::string(filename) + ".";
+  while ((dirp = readdir(dp)) != NULL) {
+    std::string curfile = std::string(dirp->d_name);
+    if (curfile.compare(0, compfile.size(), compfile) == 0) {
+      unlink(curfile.c_str());
+    }
+  }
+  closedir(dp);
 }
 
 // Function to register histogram definitions
@@ -69,11 +83,13 @@ int RbTupleManager::begin(int procid)
     char filename[1024];
     sprintf(filename, "%s.%d", m_filename, procid);
     m_root = new TFile(filename, "update");
-    printf("RbTupleManager: histo file opened for process %d (pid=%d)\n",
-           procid, getpid());
+    //    printf("RbTupleManager: histo file opened for process %d (pid=%d)\n",
+    //           procid, getpid());
+    B2INFO("RbTupleManager : histo file opened for process " << procid << "(" << getpid() << ")");
   } else {
     m_root = new TFile(m_filename, "recreate");
-    printf("RbTupleManager: initialized for single-process\n");
+    //    printf("RbTupleManager: initialized for single-process\n");
+    B2INFO("RbTupleManager :  initialized for single process");
   }
   if (m_root == NULL) return -1;
   //  printf ( "RbTupleManager::TFile opened\n" );
@@ -110,6 +126,9 @@ int RbTupleManager::hadd(void)
 
   // Make a list of ROOT file created by event processes
   TList* filelist = new TList();
+  std::vector<std::string> filenames;
+
+  /* OLD
   for (int i = 0; i < m_nproc; i++) {
     char filename[1024];
     sprintf(filename, "%s.%d", m_filename, i);
@@ -117,6 +136,29 @@ int RbTupleManager::hadd(void)
     TFile* tf = new TFile(filename, "READ");
     filelist->Add(tf) ;
   }
+  */
+
+  // Open current directory
+  std::string dir = ".";
+  DIR *dp;
+  struct dirent *dirp;
+  if ((dp = opendir(dir.c_str())) == NULL) {
+    B2ERROR("Error to open directory" << dir);
+    return errno;
+  }
+
+  // Scan the directory and register all histogram files
+  std::string compfile = std::string(m_filename) + ".";
+  while ((dirp = readdir(dp)) != NULL) {
+    std::string curfile = std::string(dirp->d_name);
+    if (curfile.compare(0, compfile.size(), compfile) == 0) {
+      //      printf ( "Opening file =%s\n", curfile.c_str() );
+      TFile* tf = new TFile(curfile.c_str(), "READ");
+      filelist->Add(tf) ;
+      filenames.push_back(curfile);
+    }
+  }
+  closedir(dp);
 
   // Open a root file to merge histograms
   TFile* target = new TFile(m_filename, "recreate");
@@ -126,12 +168,22 @@ int RbTupleManager::hadd(void)
   MergeRootfile((TDirectory*) target, filelist);
 
   // Delete temporary files
+  /* OLD
   for (int i = 0; i < m_nproc; i++) {
     char filename[1024];
     sprintf(filename, "%s.%d", m_filename, i);
     unlink(filename);
   }
-  printf("RbTupleManager: histogram files are added\n");
+  */
+
+  vector<string>::iterator it;
+  for (it = filenames.begin(); it != filenames.end(); ++it) {
+    string& hfile = *it;
+    unlink(hfile.c_str());
+  }
+
+  //  printf("RbTupleManager: histogram files are added\n");
+  //  B2INFO ( "RbTupleManager : histogram files are added" );
 
   return 0;
 }

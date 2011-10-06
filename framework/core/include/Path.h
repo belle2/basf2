@@ -58,6 +58,11 @@ namespace Belle2 {
      */
     const std::list<ModulePtr>& getModules() const {return m_modules; };
 
+    /**
+     * Replace module list
+     **/
+    void putModules(std::list<ModulePtr>& mlist) {  m_modules = mlist; };
+
 
     //--------------------------------------------------
     //                   Python API

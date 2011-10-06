@@ -32,7 +32,10 @@ namespace Belle2 {
     *
     * Use inside the python module's __init__ function
     */
-    void setName(const std::string &name) { m_name = name; }
+    void setName(const std::string &name) {
+      //m_name = name;
+      setModuleName(name);
+    }
 
 
     /* reimplement all virtual functions of base class and call the corresponding method in the python class

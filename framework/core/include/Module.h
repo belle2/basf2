@@ -48,7 +48,9 @@ namespace Belle2 {
       c_Input                       = 1,  /**< This module is an input module (reads data). */
       c_Output                      = 2,  /**< This module is an output module (writes data). */
       c_ParallelProcessingCertified = 4,  /**< This module can be run in parallel processing mode safely (has to comply with certain standards). */
-      c_RequiresGUISupport          = 8   /**< This module requires the framework to have GUI support built-in. */
+      c_RequiresGUISupport          = 8,   /**< This module requires the framework to have GUI support built-in. */
+      c_HistogramManager            = 16,  /**< This module is used to manage histograms accumulated by other modules */
+      c_InitializeInProcess         = 32,  /**< initialize() function is called in forked process */
     };
 
     /**
@@ -184,6 +186,30 @@ namespace Belle2 {
     void setCondition(const std::string& expression, boost::shared_ptr<Path> path);
 
     /**
+     * Sets the condition of the module.
+     *
+     * Please be careful: Avoid creating cyclic paths, e.g. by linking a condition
+     * to a path which is processed before the path where this module is
+     * located in.
+     *
+     * @param expression Parsed condition operator
+     * @param value      Parsed condition value
+     * @param path       Shared pointer to the Path, which will be executed if the condition is evaluated to true.
+     */
+    void setCondition(const Belle2::CondParser::EConditionOperators expression, int value, boost::shared_ptr<Path> path) {
+      m_conditionOperator = expression;
+      m_conditionValue = value;
+      m_conditionPath = path;
+    };
+
+    /**
+     * Sets the condition path of the module
+     *
+     * @param path
+     */
+    void setConditionPath(boost::shared_ptr<Path> path) { m_conditionPath = path; };
+
+    /**
      * A simplified version to set the condition of the module.
      *
      * Please be careful: Avoid creating cyclic paths, e.g. by linking a condition
@@ -220,6 +246,20 @@ namespace Belle2 {
      * @return The path of the condition.
      */
     boost::shared_ptr<Path> getConditionPath() const {return m_conditionPath; };
+
+    /**
+     * Returns the parsed condition operator
+     *
+     * @ return Parsed condition operator
+     */
+    Belle2::CondParser::EConditionOperators getConditionOperator() const { return m_conditionOperator; };
+
+    /**
+     * Returns the parsed condition value
+     *
+     * @ return Parsed condition value
+     */
+    int getConditionValue() const { return m_conditionValue; };
 
     /**
      * Returns true if all specified property flags are available in this module.
@@ -327,10 +367,18 @@ namespace Belle2 {
      */
     void setReturnValue(bool value);
 
-    std::string m_name;           /**< The name of the module, saved as a string. */
+    /**
+     * Set the name of the module just for internal use.
+     * Note : the name should be set through ModuleProxy in the normal usage.
+     *
+     * @param name The name of the module
+     */
+    void setModuleName(const std::string name) { m_name = name; };
+
 
   private:
 
+    std::string m_name;           /**< The name of the module, saved as a string. */
     std::string m_description;    /**< The description of the module. */
     unsigned int m_propertyFlags; /**< The properties of the module (Master, multi processing etc.) saved as bitwise flags. */
 

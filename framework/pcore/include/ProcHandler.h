@@ -52,8 +52,13 @@ namespace Belle2 {
 
     /*! Wait until all forked processes are completed */
     int wait_processes(void);
+    /*! Wait untill event server process is completed */
+    int wait_event_server(void);
+    /*! Wait until all event processes are completed */
+    int wait_event_processes(void);
     /*! Wait until output servers are completed */
     int wait_output_server(void);
+
     /*! remove the pid from the process list */
     int remove_pid(pid_t pid);
 

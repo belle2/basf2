@@ -23,15 +23,17 @@ using namespace Belle2;
 
 MsgHandler::MsgHandler(int complevel)
 {
-  printf("MsgHandler : constructor called.....\n");
+  //  printf("MsgHandler : constructor called.....\n");
+  B2INFO("MsgHandler : constructor called.....");
   m_cbuf = (char*) malloc(MAX_BUFFER_SIZE);
   m_complevel = complevel;
 }
 
 MsgHandler::~MsgHandler(void)
 {
-  printf("MsgHandler : destructor called.....\n");
-  //  free ( m_cbuf );
+  //  printf("MsgHandler : destructor called.....\n");
+  B2INFO("MsgHandler : destructor called.....");
+  free(m_cbuf);
 }
 
 void MsgHandler::clear(void)
@@ -49,6 +51,7 @@ void MsgHandler::add(TObject* obj, string name)
   msg->Compress();
   m_buf.push_back(msg);
   m_name.push_back(name);
+  //  printf ( "MsgHandler : %s added\n", name.c_str() );
 }
 
 EvtMessage* MsgHandler::encode_msg(RECORD_TYPE rectype)
@@ -57,6 +60,8 @@ EvtMessage* MsgHandler::encode_msg(RECORD_TYPE rectype)
     EvtMessage* eod = new EvtMessage(NULL, 0, rectype);
     return eod;
   }
+
+  //  printf ( "MsgHandler : encoding message .....\n" );
 
   int totlen = 0;
   char* msgbuf = new char[MAXEVTMSG];
@@ -79,11 +84,14 @@ EvtMessage* MsgHandler::encode_msg(RECORD_TYPE rectype)
       len = msg->CompLength();
       buf = msg->CompBuffer();
     }
-    //    printf ( "new obj size = %d, msgptr = %8.8x\n", len, msgptr );
+    //    printf ( "new obj name = %s : size = %d, msgptr = %8.8x\n",
+    //       name.c_str(), len, msgptr );
     memcpy(msgptr, &len, sizeof(int));
     memcpy(msgptr + sizeof(int), buf, len);
     msgptr += (sizeof(int) + len);
     totlen += (sizeof(int) + len);
+    nameptr++;
+    delete msg; // test
   }
   EvtMessage* evtmsg = new EvtMessage(msgbuf, totlen, rectype);
 
@@ -91,6 +99,7 @@ EvtMessage* MsgHandler::encode_msg(RECORD_TYPE rectype)
   //     *((int*)msgbuf), *((int*)(msgbuf+1)), *((int*)(msgbuf+2)), *((int*)(msgbuf+3)) );
 
   delete[] msgbuf;
+  m_buf.erase(m_buf.begin(), m_buf.end());
 
   return evtmsg;
 
@@ -115,6 +124,7 @@ int MsgHandler::decode_msg(EvtMessage* msg, vector<TObject*>& objlist,
     totlen += (sizeof(int) + lname);
     // Restore object
     int objlen;
+    //    printf ( "MsgHandler::decode obj=%s\n", name.c_str() );
     memcpy(&objlen, msgptr, sizeof(int));
     //    printf ( "decode_msg : objlen = %d\n", objlen );
     // Old impl.
@@ -125,7 +135,7 @@ int MsgHandler::decode_msg(EvtMessage* msg, vector<TObject*>& objlist,
     objlist.push_back(obj);
     msgptr += objlen + sizeof(int);
     totlen += objlen + sizeof(int);
-    //    delete tmsg; // tmpmsg should be deleted here also.
+    delete tmsg; // tmpmsg should be deleted here also.
   }
   return 0;
 }

@@ -37,8 +37,20 @@ def process(path, max_event=0, run_number=None):
 
     if run_number is not None:
         fw.process(path, max_event, run_number)
-    else:
+    elif max_event != 0:
         fw.process(path, max_event)
+    else:
+        fw.process(path)
+
+
+def nprocess(nproc):
+    """
+    Sets number of processes for parallel processing
+
+    nproc: number of processes
+    """
+
+    fw.set_nprocess(nproc)
 
 
 def print_params(module, print_values=True, shared_lib_path=None):

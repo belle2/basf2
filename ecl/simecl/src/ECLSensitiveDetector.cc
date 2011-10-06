@@ -111,7 +111,6 @@ namespace Belle2 {
     // Get layer ID
 
 
-    cout << posIn << endl;
     Mapping(v.GetName());
 
     if (v.GetName().find("Crystal") != string::npos) {
@@ -123,7 +122,6 @@ namespace Belle2 {
 
 
 
-    cout << m_cellID << " " << m_phiID << " " << m_thetaID << " " << in.GetPosition().theta() / degree << " " << in.GetPosition().phi() / degree << " " << v.GetName() << endl << endl << endl;;
     // Get layer ID
 //  const unsigned layerId = v.GetCopyNo();
     return true;
@@ -189,15 +187,6 @@ namespace Belle2 {
     char temp1[10], temp2[10], temp3[10], temp4[30], temp5[30], temp6[10], temp7[10];
 
     sscanf(VolumeName.c_str(), "%[^'_']_%[^'_']_%[^'_']_%[^'_']_%[^'_']_%[^'_']_%s", temp1, temp2, temp3, temp4, temp5, temp6, temp7);
-    cout << temp1 << " " << temp2 << " " << temp3 << " " << temp4 << " " << temp5 << " " << temp6 << " " << temp7 << endl;
-
-
-
-//av_3_impr_3_logicalEclBrCrystal_29_pv_56
-//  sscanf(VolumeName.c_str(), "%[^'_']_%[^'_']_%[^'_']_%s", tmp1, tmp2, EclSector, CrystalID);
-//  sscanf(VolumeName.c_str(), "%[^'_']_%[^'_']_%[^'_']_%[^'_']_%[^'_']_%[^'_']_%s", tmp1, tmp2,tmp3, tmp4,tmp5, tmp6,tmp7);
-//  cout<<VolumeName.c_str()<<endl;
-//  cout<<tmp1<<" "<<tmp2<<" "<<tmp3<<" "<<tmp4<<" "<<tmp5<<" "<<tmp6<<" "<<tmp7<<endl;
 
     int GSector = atoi(temp4) - 1;
     int iCry = atoi(temp6) - 1;
@@ -207,7 +196,6 @@ namespace Belle2 {
       return -1;
     } else if (string(VolumeName.c_str()).find("Fw") != string::npos) {
 
-      cout << "FW GSector: " << GSector << " iCry: " << iCry << " " << string(VolumeName.c_str()).find("Fw") << endl;
       if (iCry < 3) {
         m_thetaID = 0;
         m_phiID = GSector * 3 + iCry - 0;
@@ -263,7 +251,6 @@ namespace Belle2 {
 
       }
     } else if (string(VolumeName.c_str()).find("Br") != string::npos) {
-      cout << "BR GSector: " << GSector << " iCry: " << iCry << endl;
       m_phiID = GSector;
       m_thetaID = iCry + 13 ;
       if (m_phiID == -1) m_phiID = 143;
@@ -272,7 +259,6 @@ namespace Belle2 {
     } else {
 
       iCry = iCry - 72;
-      cout << "BW GSector: " << GSector << " iCry: " << iCry << endl;
       if (iCry < 9) {
         m_thetaID = 59;
         m_phiID = (GSector) * 9 + iCry - 0;

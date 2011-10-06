@@ -152,7 +152,8 @@ void EventProcessor::processCore(PathPtr startPath, const ModulePtrList& moduleP
 
       //Determine the master module
       StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
-      if (!master && (currEvent == 0)) {
+      //      if (!master && (currEvent == 0) ) {
+      if (!master && (currEvent == 0) && !module->hasProperties(Module::c_HistogramManager)) {
         if (*eventMetaDataPtr != previousEventMetaData) {
           master = module;
         }

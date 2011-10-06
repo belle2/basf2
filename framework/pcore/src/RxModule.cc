@@ -112,8 +112,8 @@ void RxModule::event()
   B2INFO("Rx: message decoded!");
 
   // Get Object info
-  RECORD_TYPE type = msg->type();
-  DataStore::EDurability durability = (DataStore::EDurability)(msg->header())->reserved[0];
+  //  RECORD_TYPE type = msg->type();
+  //  DataStore::EDurability durability = (DataStore::EDurability)(msg->header())->reserved[0];
   int nobjs = (msg->header())->reserved[1];
   int narrays = (msg->header())->reserved[2];
 

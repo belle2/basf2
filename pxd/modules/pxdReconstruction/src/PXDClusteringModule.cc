@@ -61,18 +61,18 @@ PXDClusteringModule::PXDClusteringModule() : Module(), m_elNoise(200.0),
            "SN for digits to be considered as seed", m_cutSeed);
   addParam("ClusterSN", m_cutCluster,
            "Minimum SN for clusters", m_cutCluster);
-  addParam("Digits", m_digitColName,
-           "Digits collection name", string(""));
-  addParam("Clusters", m_clusterColName,
-           "Cluster collection name", string(""));
-  addParam("MCParticles", m_mcColName,
-           "MCParticles collection name", string(""));
 
-  addParam("DigitMCRel", m_digitMCRelName,
+  addParam("Digits", m_storeDigitsName,
+           "Digits collection name", string(""));
+  addParam("Clusters", m_storeClustersName,
+           "Cluster collection name", string(""));
+  addParam("MCParticles", m_storeMCParticlesName,
+           "MCParticles collection name", string(""));
+  addParam("DigitMCRel", m_relDigitMCParticleName,
            "Relation between digits and MCParticles", string(""));
-  addParam("ClusterMCRel", m_clusterMCRelName,
+  addParam("ClusterMCRel", m_relClusterMCParticleName,
            "Relation between clusters and MCParticles", string(""));
-  addParam("ClusterDigitRel", m_clusterDigitRelName,
+  addParam("ClusterDigitRel", m_relClusterDigitName,
            "Relation between clusters and Digits", string(""));
 
 #ifdef DUMP_CLUSTERS
@@ -89,12 +89,38 @@ void PXDClusteringModule::initialize()
 {
 
   //Register collections
-  StoreArray<MCParticle> storeMC(m_mcColName);
-  StoreArray<PXDDigit>   storeDigits(m_digitColName);
-  StoreArray<PXDCluster> storeClusters(m_clusterColName);
-  RelationArray relDigitMC(storeDigits, storeMC, m_digitMCRelName);
-  RelationArray relClusterMC(storeClusters, storeMC, m_clusterMCRelName);
-  RelationArray relClusterDigit(storeClusters, storeDigits, m_clusterDigitRelName);
+  StoreArray<MCParticle> storeMCParticles(m_storeMCParticlesName);
+  StoreArray<PXDDigit>   storeDigits(m_storeDigitsName);
+  StoreArray<PXDCluster> storeClusters(m_storeClustersName);
+  RelationArray relDigitMCParticle(storeDigits, storeMCParticles, m_relDigitMCParticleName);
+  RelationArray relClusterMCParticle(storeClusters, storeMCParticles, m_relClusterMCParticleName);
+  RelationArray relClusterDigit(storeClusters, storeDigits, m_relClusterDigitName);
+
+  //Set names in case default was used
+  m_relDigitMCParticleName   = relDigitMCParticle.getName();
+  m_relClusterMCParticleName = relClusterMCParticle.getName();
+  m_relClusterDigitName      = relClusterDigit.getName();
+
+  B2INFO("PXDClustering Parameters (in default system units, *=cannot be set directly):");
+  B2INFO(" -->  ElectronicNoise:    " << m_elNoise);
+  B2INFO(" -->  NoiseSN:            " << m_cutAdjacent);
+  B2INFO(" -->  SeedSN:             " << m_cutSeed);
+  B2INFO(" -->  ClusterSN:          " << m_cutCluster);
+  B2INFO(" -->  MCParticles:        " << storeMCParticles.getName());
+  B2INFO(" -->  Digits:             " << storeDigits.getName());
+  B2INFO(" -->  Clusters:           " << storeClusters.getName());
+  //B2INFO(" -->  TrueHits:           " << storeTrueHits.getName());
+  B2INFO(" -->  DigitMCRel:         " << m_relDigitMCParticleName);
+  B2INFO(" -->  ClusterMCRel:       " << m_relClusterMCParticleName);
+  B2INFO(" -->  ClusterDigitRel:    " << m_relClusterDigitName);
+  //B2INFO(" -->  DigitTrueRel:       " << m_relDigitTrueHitName);
+  //B2INFO(" -->  ClusterTrueRel:     " << m_relClusterTrueHitName);
+  B2INFO(" -->  AssumeSorted:       " << (m_assumeSorted ? "true" : "false"));
+  B2INFO(" -->  TanLorentz:         " << m_tanLorentzAngle);
+#ifdef DUMP_CLUSTERS
+  B2INFO(" -->  DumpClusters:       " << (m_dumpFileName == "" ? "false" : m_dumpFileName));
+#endif
+
 
   NoiseMap::getInstance().setCuts(m_elNoise*m_cutAdjacent, m_elNoise*m_cutSeed, m_elNoise*m_cutCluster);
 #ifdef DUMP_CLUSTERS
@@ -107,15 +133,15 @@ void PXDClusteringModule::initialize()
 
 void PXDClusteringModule::event()
 {
-  StoreArray<MCParticle> storeMC(m_mcColName);
-  StoreArray<PXDDigit>   storeDigits(m_digitColName);
-  StoreArray<PXDCluster> storeClusters(m_clusterColName);
-  RelationArray relDigitMC(storeDigits, storeMC, m_digitMCRelName);
-  RelationArray relClusterMC(storeClusters, storeMC, m_clusterMCRelName);
-  RelationArray relClusterDigit(storeClusters, storeDigits, m_clusterDigitRelName);
+  StoreArray<MCParticle> storeMCParticles(m_storeMCParticlesName);
+  StoreArray<PXDDigit>   storeDigits(m_storeDigitsName);
+  StoreArray<PXDCluster> storeClusters(m_storeClustersName);
+  RelationArray relDigitMCParticle(storeDigits, storeMCParticles, m_relDigitMCParticleName);
+  RelationArray relClusterMCParticle(storeClusters, storeMCParticles, m_relClusterMCParticleName);
+  RelationArray relClusterDigit(storeClusters, storeDigits, m_relClusterDigitName);
 
   storeClusters->Clear();
-  relClusterMC.clear();
+  relClusterMCParticle.clear();
   relClusterDigit.clear();
 
 
@@ -204,12 +230,12 @@ void PXDClusteringModule::findClusters(const Sensor &sensor)
 void PXDClusteringModule::writeClusters(VxdID sensorID)
 {
   //Get all datastore elements
-  StoreArray<MCParticle> storeMC(m_mcColName);
-  StoreArray<PXDDigit>   storeDigits(m_digitColName);
-  StoreArray<PXDCluster> storeClusters(m_clusterColName);
-  RelationArray relClusterMC(storeClusters, storeMC, m_clusterMCRelName);
-  RelationArray relClusterDigit(storeClusters, storeDigits, m_clusterDigitRelName);
-  RelationIndex<PXDDigit, MCParticle> digitRel(storeDigits, storeMC, m_digitMCRelName);
+  StoreArray<MCParticle> storeMCParticles(m_storeMCParticlesName);
+  StoreArray<PXDDigit>   storeDigits(m_storeDigitsName);
+  StoreArray<PXDCluster> storeClusters(m_storeClustersName);
+  RelationArray relClusterMCParticle(storeClusters, storeMCParticles, m_relClusterMCParticleName);
+  RelationArray relClusterDigit(storeClusters, storeDigits, m_relClusterDigitName);
+  RelationIndex<PXDDigit, MCParticle> relDigitMCParticle(storeDigits, storeMCParticles, m_relDigitMCParticleName);
 
   //Get Geometry information
   const SensorInfo &info = dynamic_cast<const SensorInfo&>(VXD::GeoCache::get(sensorID));
@@ -248,7 +274,7 @@ void PXDClusteringModule::writeClusters(VxdID sensorID)
       typedef const RelationIndex<PXDDigit, MCParticle>::Element rel_type;
 
       //Fill map with MCParticle relations
-      BOOST_FOREACH(rel_type &mcRel, digitRel.getFrom(px.get())) {
+      BOOST_FOREACH(rel_type &mcRel, relDigitMCParticle.getFrom(px.get())) {
         mc_relations[mcRel.indexTo] += mcRel.weight;
       };
       //Add digit to the Cluster->Digit relation list
@@ -286,7 +312,7 @@ void PXDClusteringModule::writeClusters(VxdID sensorID)
     );
 
     //Create Relations to this Digit
-    relClusterMC.add(clsIndex, mc_relations.begin(), mc_relations.end());
+    relClusterMCParticle.add(clsIndex, mc_relations.begin(), mc_relations.end());
     relClusterDigit.add(clsIndex, digit_weights.begin(), digit_weights.end());
 
 

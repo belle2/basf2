@@ -77,17 +77,17 @@ namespace Belle2 {
       /** Cluster cut in sigma */
       double m_cutCluster;
       /** Name of the collection to use for the PXDDigits */
-      std::string m_digitColName;
+      std::string m_storeDigitsName;
       /** Name of the collection to use for the PXDClusters */
-      std::string m_clusterColName;
+      std::string m_storeClustersName;
       /** Name of the collection to use for the MCParticles */
-      std::string m_mcColName;
+      std::string m_storeMCParticlesName;
       /** Name of the relation between PXDDigits and MCParticles */
-      std::string m_digitMCRelName;
+      std::string m_relDigitMCParticleName;
       /** Name of the relation between PXDClusters and MCParticles */
-      std::string m_clusterMCRelName;
+      std::string m_relClusterMCParticleName;
       /** Name of the relation between PXDClusters and PXDDigits */
-      std::string m_clusterDigitRelName;
+      std::string m_relClusterDigitName;
 
       /** Size of the cluster at which we switch from Center of Gravity to Analog Head Tail */
       int m_sizeHeadTail;

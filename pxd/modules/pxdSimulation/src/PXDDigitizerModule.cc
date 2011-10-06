@@ -51,21 +51,21 @@ PXDDigitizerModule::PXDDigitizerModule() : Module(), m_random(0), m_rootFile(0),
   addParam("NoiseSN", m_SNAdjacent,
            "SN for digits to be considered for clustering", 4.0);
 
-  addParam("MCParticles", m_mcColName,
+  addParam("MCParticles", m_storeMCParticlesName,
            "MCParticle collection name", string(""));
-  addParam("Digits", m_digitColName,
+  addParam("Digits", m_storeDigitsName,
            "Digits collection name", string(""));
-  addParam("SimHits", m_simhitColName,
+  addParam("SimHits", m_storeSimHitsName,
            "SimHit collection name", string(""));
-  addParam("TrueHits", m_truehitColName,
+  addParam("TrueHits", m_storeTrueHitsName,
            "TrueHit collection name", string(""));
-  addParam("MCSimHitRel", m_relSimName,
+  addParam("MCSimHitRel", m_relMCParticleSimHitName,
            "Relation between MCParticles and SimHits", string(""));
-  addParam("DigitMCRel", m_relDigitName,
+  addParam("DigitMCRel", m_relDigitMCParticleName,
            "Relation between Digits and MCParticles", string(""));
-  addParam("TrueSimRel", m_relTrueSimName,
+  addParam("TrueSimRel", m_relTrueHitSimHitName,
            "Relation between TrueHits and SimHits", string(""));
-  addParam("DigitTrueRel", m_relDigitTrueName,
+  addParam("DigitTrueRel", m_relDigitTrueHitName,
            "Relation between Digits and TrueHits", string(""));
 
   addParam("PoissonSmearing", m_applyPoisson,
@@ -104,23 +104,21 @@ PXDDigitizerModule::PXDDigitizerModule() : Module(), m_random(0), m_rootFile(0),
 
 void PXDDigitizerModule::initialize()
 {
-  //Check for existing collections
-  StoreArray<MCParticle> storeMC(m_mcColName);
-  StoreArray<PXDSimHit>  storeSimHits(m_simhitColName);
-  StoreArray<PXDTrueHit>  storeTrueHits(m_truehitColName);
-  RelationArray relSimHits(storeMC, storeSimHits, m_relSimName);
-  RelationArray relTrueSimHits(storeTrueHits, storeSimHits, m_relTrueSimName);
-
-  //Register Output collections
-  StoreArray<PXDDigit>   storeDigits(m_digitColName);
-  RelationArray relDigits(storeDigits, storeMC, m_relDigitName);
-  RelationArray relDigitsTrue(storeDigits, storeTrueHits, m_relDigitTrueName);
+  //Register all required collections
+  StoreArray<MCParticle> storeMCParticles(m_storeMCParticlesName);
+  StoreArray<PXDSimHit>  storeSimHits(m_storeSimHitsName);
+  StoreArray<PXDTrueHit> storeTrueHits(m_storeTrueHitsName);
+  StoreArray<PXDDigit>   storeDigits(m_storeDigitsName);
+  RelationArray relMCParticleSimHit(storeMCParticles, storeSimHits, m_relMCParticleSimHitName);
+  RelationArray relTrueHitSimHit(storeTrueHits, storeSimHits, m_relTrueHitSimHitName);
+  RelationArray relDigitMCParticle(storeDigits, storeMCParticles, m_relDigitMCParticleName);
+  RelationArray relDigitTrueHit(storeDigits, storeTrueHits, m_relDigitTrueHitName);
 
   //Set names in case default was used
-  m_relSimName = relSimHits.getName();
-  m_relTrueSimName = relTrueSimHits.getName();
-  m_relDigitName = relDigits.getName();
-  m_relDigitTrueName = relDigitsTrue.getName();
+  m_relMCParticleSimHitName = relMCParticleSimHit.getName();
+  m_relTrueHitSimHitName    = relTrueHitSimHit.getName();
+  m_relDigitMCParticleName  = relDigitMCParticle.getName();
+  m_relDigitTrueHitName     = relDigitTrueHit.getName();
 
   //Convert parameters to correct units
   m_elNoise *= Unit::e;
@@ -136,11 +134,14 @@ void PXDDigitizerModule::initialize()
   B2INFO(" -->  ElectronicNoise:    " << m_elNoise);
   B2INFO(" -->  NoiseSN:            " << m_SNAdjacent);
   B2INFO(" --> *NoiseFraction:      " << m_noiseFraction);
-  B2INFO(" -->  MCParticles:        " << storeMC.getName());
+  B2INFO(" -->  MCParticles:        " << storeMCParticles.getName());
   B2INFO(" -->  Digits:             " << storeDigits.getName());
   B2INFO(" -->  SimHits:            " << storeSimHits.getName());
-  B2INFO(" -->  MCSimHitRel:        " << m_relSimName);
-  B2INFO(" -->  DigitMCRel:         " << m_relDigitName);
+  B2INFO(" -->  TrueHits:           " << storeTrueHits.getName());
+  B2INFO(" -->  MCSimHitRel:        " << m_relMCParticleSimHitName);
+  B2INFO(" -->  DigitMCRel:         " << m_relDigitMCParticleName);
+  B2INFO(" -->  TrueSimRel:         " << m_relTrueHitSimHitName);
+  B2INFO(" -->  DigitTrueRel:       " << m_relDigitTrueHitName);
   B2INFO(" -->  PoissonSmearing:    " << (m_applyPoisson ? "true" : "false"));
   B2INFO(" -->  IntegrationWindow:  " << (m_applyWindow ? "true" : "false"));
   B2INFO(" -->  SegmentLength:      " << m_segmentLength);
@@ -193,27 +194,27 @@ void PXDDigitizerModule::event()
   m_currentSensor = 0;
   m_currentSensorInfo = 0;
 
-  StoreArray<MCParticle> storeMC(m_mcColName);
-  StoreArray<PXDSimHit> storeSimHits(m_simhitColName);
-  StoreArray<PXDTrueHit> storeTrueHits(m_truehitColName);
-  RelationIndex<MCParticle, PXDSimHit> simRel(storeMC, storeSimHits, m_relSimName);
-  RelationIndex<PXDTrueHit, PXDSimHit> relTrueSimHit(storeTrueHits, storeSimHits, m_relTrueSimName);
+  StoreArray<MCParticle> storeMCParticles(m_storeMCParticlesName);
+  StoreArray<PXDSimHit>  storeSimHits(m_storeSimHitsName);
+  StoreArray<PXDTrueHit> storeTrueHits(m_storeTrueHitsName);
+  RelationIndex<MCParticle, PXDSimHit> relMCParticleSimHit(storeMCParticles, storeSimHits, m_relMCParticleSimHitName);
+  RelationIndex<PXDTrueHit, PXDSimHit> relTrueHitSimHit(storeTrueHits, storeSimHits, m_relTrueHitSimHitName);
   unsigned int nSimHits = storeSimHits->GetEntries();
   if (nSimHits == 0) return;
 
   //Check sensor info and set pointers to current sensor
   for (unsigned int i = 0; i < nSimHits; ++i) {
     m_currentHit = storeSimHits[i];
-    const RelationIndex<MCParticle, PXDSimHit>::Element* rel = simRel.getFirstFrom(m_currentHit);
-    if (rel) {
-      m_currentParticle = rel->indexFrom;
+    const RelationIndex<MCParticle, PXDSimHit>::Element* mcRel = relMCParticleSimHit.getFirstFrom(m_currentHit);
+    if (mcRel) {
+      m_currentParticle = mcRel->indexFrom;
     } else {
       B2ERROR("Could not find MCParticle which produced PXDSimhit " << i);
       m_currentParticle = -1;
     }
-    const RelationIndex<PXDTrueHit, PXDSimHit>::Element* relTrue = relTrueSimHit.getFirstFrom(m_currentHit);
-    if (relTrue) {
-      m_currentTrueHit = relTrue->indexFrom;
+    const RelationIndex<PXDTrueHit, PXDSimHit>::Element* trueRel = relTrueHitSimHit.getFirstFrom(m_currentHit);
+    if (trueRel) {
+      m_currentTrueHit = trueRel->indexFrom;
     } else {
       m_currentTrueHit = -1;
     }
@@ -499,16 +500,16 @@ void PXDDigitizerModule::addNoiseDigits()
 
 void PXDDigitizerModule::saveDigits()
 {
-  StoreArray<MCParticle> storeMC(m_mcColName);
-  StoreArray<PXDDigit> storeDigits(m_digitColName);
-  StoreArray<PXDTrueHit> storeTrueHits(m_truehitColName);
-  RelationArray storeRel(storeDigits, storeMC, m_relDigitName);
-  RelationArray storeTrue(storeDigits, storeTrueHits, m_relDigitTrueName);
+  StoreArray<MCParticle> storeMCParticles(m_storeMCParticlesName);
+  StoreArray<PXDDigit>   storeDigits(m_storeDigitsName);
+  StoreArray<PXDTrueHit> storeTrueHits(m_storeTrueHitsName);
+  RelationArray relDigitMCParticle(storeDigits, storeMCParticles, m_relDigitMCParticleName);
+  RelationArray relDigitTrueHit(storeDigits, storeTrueHits, m_relDigitTrueHitName);
 
   //Clear out old digits
   storeDigits->Clear();
-  storeRel.clear();
-  storeTrue.clear();
+  relDigitMCParticle.clear();
+  relDigitTrueHit.clear();
 
   //Zero supression cut in electrons
   double charge_threshold = m_SNAdjacent * m_elNoise;
@@ -539,11 +540,11 @@ void PXDDigitizerModule::saveDigits()
 
       //If the digit has any relations to MCParticles, add the Relation
       if (v.particles().size() > 0) {
-        storeRel.add(digIndex, v.particles().begin(), v.particles().end());
+        relDigitMCParticle.add(digIndex, v.particles().begin(), v.particles().end());
       }
       //If the digit has any truehits to TrueHit, add the Relation
       if (v.truehits().size() > 0) {
-        storeTrue.add(digIndex, v.truehits().begin(), v.truehits().end());
+        relDigitTrueHit.add(digIndex, v.truehits().begin(), v.truehits().end());
       }
     }
   }

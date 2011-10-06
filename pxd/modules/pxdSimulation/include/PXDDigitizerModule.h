@@ -135,21 +135,21 @@ namespace Belle2 {
       double m_noiseFraction;
 
       /** Name of the collection for the MCParticles */
-      std::string m_mcColName;
+      std::string m_storeMCParticlesName;
       /** Name of the collection for the PXDDigits */
-      std::string m_digitColName;
+      std::string m_storeDigitsName;
       /** Name of the collection for the PXDSimhits */
-      std::string m_simhitColName;
+      std::string m_storeSimHitsName;
       /** Name of the collection for the PXDTrueHits */
-      std::string m_truehitColName;
+      std::string m_storeTrueHitsName;
       /** Name of the relation between MCParticles and PXDSimHits */
-      std::string m_relSimName;
+      std::string m_relMCParticleSimHitName;
       /** Name of the relation between PXDDigits and MCParticles */
-      std::string m_relDigitName;
+      std::string m_relDigitMCParticleName;
       /** Name of the relation between PXDTrueHits and PXDSimHits */
-      std::string m_relTrueSimName;
+      std::string m_relTrueHitSimHitName;
       /** Name of the relation between PXDDigits and PXDTrueHits */
-      std::string m_relDigitTrueName;
+      std::string m_relDigitTrueHitName;
 
 
       /** Wether or not to apply poission fluctuation of charge */

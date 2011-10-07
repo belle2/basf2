@@ -114,8 +114,8 @@ namespace Belle2 {
     hit->set_nSector(pvgt->getID());
     pvgt = pvgt->getMother();
     hit->set_nLayer(pvgt->getID());
-    hit->set_nEndcap(pvgt->getID2());
-
+    pvgt = pvgt->getMother();
+    hit->set_nEndcap(pvgt->getID());
 
     StoreArray<MCParticle> MCParticlesArray;
     RelationArray particleToSimHitsRelation(MCParticlesArray, simHitsArray);

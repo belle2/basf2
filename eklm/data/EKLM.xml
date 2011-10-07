@@ -30,6 +30,8 @@
 	  <PositionY  desc="Y position" unit="mm">0</PositionY>
 	  <PositionZ  desc="Z position" unit="mm">0</PositionZ>
           <nPlane desc="Number of planes in one sector">2</nPlane>
+          <nBoard desc="Number of readout boards corresponding to one plane">
+          5</nBoard>
           <SectorSupport>
             <InnerR desc="Inner radius" unit="mm">1305.0</InnerR>
             <OuterR desc="Outer radius" unit="mm">3310.0</OuterR>
@@ -43,14 +45,131 @@
             <CornerX desc="X coordinate of cutted corner" unit="mm">300.0
             </CornerX>
             <TopCornerHeight unit="mm">30.0</TopCornerHeight>
+            <Corner2LX unit="mm">150.0</Corner2LX>
+            <Corner2LY unit="mm">100.0</Corner2LY>
+            <Corner2Thickness unit="mm">10.0</Corner2Thickness>
+            <Corner2Z unit="mm">0.0</Corner2Z>
+            <Corner3LX unit="mm">100.0</Corner3LX>
+            <Corner3LY unit="mm">100.0</Corner3LY>
+            <Corner3Thickness unit="mm">10.0</Corner3Thickness>
+            <Corner3Z unit="mm">0.0</Corner3Z>
+            <Corner4LX unit="mm">100.0</Corner4LX>
+            <Corner4LY unit="mm">100.0</Corner4LY>
+            <Corner4Thickness unit="mm">10.0</Corner4Thickness>
+            <Corner4Z unit="mm">0.0</Corner4Z>
           </SectorSupport>
+          <Boards>
+            <Length unit="mm">180.5</Length>
+            <Width unit="mm">18.0</Width>
+            <Height unit="mm">18.0</Height>
+            <BaseWidth desc="Width of base board" unit="mm">17.8</BaseWidth>
+            <BaseHeight desc="Height of base board" unit="mm">1.6</BaseHeight>
+            <nStripBoard desc="Number of strip readout boards">15</nStripBoard>
+            <StripLength desc="Length of strip readout board" unit="mm">1.7
+            </StripLength>
+            <StripWidth desc="Width of strip readout board" unit="mm">17.9
+            </StripWidth>
+            <StripHeight desc="Height of strip readout board" unit="mm">16.2
+            </StripHeight>
+            <BoardData id="1">
+              <Board id="1">
+                <Radius unit="mm">3288</Radius>
+                <Phi unit="rad">0.173128</Phi>
+              </Board>
+              <Board id="2">
+                <Radius unit="mm">3288</Radius>
+                <Phi unit="rad">0.252081</Phi>
+              </Board>
+              <Board id="3">
+                <Radius unit="mm">3288</Radius>
+                <Phi unit="rad">0.581599</Phi>
+              </Board>
+              <Board id="4">
+                <Radius unit="mm">3288</Radius>
+                <Phi unit="rad">0.727379</Phi>
+              </Board>
+              <Board id="5">
+                <Radius unit="mm">3288</Radius>
+                <Phi unit="rad">1.084724</Phi>
+              </Board>
+            </BoardData>
+            <BoardData id="2">
+              <Board id="1">
+                <Radius unit="mm">3288</Radius>
+                <Phi unit="rad">0.485253</Phi>
+              </Board>
+              <Board id="2">
+                <Radius unit="mm">3288</Radius>
+                <Phi unit="rad">0.828880</Phi>
+              </Board>
+              <Board id="3">
+                <Radius unit="mm">3288</Radius>
+                <Phi unit="rad">0.988461</Phi>
+              </Board>
+              <Board id="4">
+                <Radius unit="mm">3288</Radius>
+                <Phi unit="rad">1.228436</Phi>
+              </Board>
+              <Board id="5">
+                <Radius unit="mm">3288</Radius>
+                <Phi unit="rad">1.395686</Phi>
+              </Board>
+            </BoardData>
+            <StripBoardData>
+              <Board id="1">
+                <PositionX unit="mm">14.67</PositionX>
+              </Board>
+              <Board id="2">
+                <PositionX unit="mm">20.21</PositionX>
+              </Board>
+              <Board id="3">
+                <PositionX unit="mm">25.76</PositionX>
+              </Board>
+              <Board id="4">
+                <PositionX unit="mm">31.30</PositionX>
+              </Board>
+              <Board id="5">
+                <PositionX unit="mm">36.84</PositionX>
+              </Board>
+              <Board id="6">
+                <PositionX unit="mm">42.39</PositionX>
+              </Board>
+              <Board id="7">
+                <PositionX unit="mm">47.43</PositionX>
+              </Board>
+              <Board id="8">
+                <PositionX unit="mm">53.47</PositionX>
+              </Board>
+              <Board id="9">
+                <PositionX unit="mm">132.19</PositionX>
+              </Board>
+              <Board id="10">
+                <PositionX unit="mm">137.78</PositionX>
+              </Board>
+              <Board id="11">
+                <PositionX unit="mm">143.36</PositionX>
+              </Board>
+              <Board id="12">
+                <PositionX unit="mm">148.94</PositionX>
+              </Board>
+              <Board id="13">
+                <PositionX unit="mm">154.53</PositionX>
+              </Board>
+              <Board id="14">
+                <PositionX unit="mm">160.11</PositionX>
+              </Board>
+              <Board id="15">
+                <PositionX unit="mm">165.69</PositionX>
+              </Board>
+            </StripBoardData>
+          </Boards>
 	  <Plane>
 	    <InnerR desc="Inner radius"   unit="mm">1325</InnerR>
 	    <OuterR desc="Outer radius"   unit="mm">3290</OuterR>
-	    <Length desc="Length"         unit="mm">13.0</Length>
+	    <Length desc="Length"         unit="mm">12.0</Length>
 	    <PositionX  desc="X position" unit="mm">0</PositionX>
 	    <PositionY  desc="Y position" unit="mm">0</PositionY>
-	    <PositionZ  desc="Z position" unit="mm">11.0</PositionZ>
+	    <PositionZ  desc="Z position" unit="mm">6.0</PositionZ>
             <nSection desc="Number of sections in one plane">5</nSection>
             <PlasticListWidth unit="mm">1.0</PlasticListWidth>
             <PlasticListDeltaL unit="mm">10.0</PlasticListDeltaL>

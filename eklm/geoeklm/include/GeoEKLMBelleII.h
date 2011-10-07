@@ -21,11 +21,15 @@
 #include <G4PVPlacement.hh>
 #include <G4Tubs.hh>
 #include <G4Box.hh>
+#include <G4Transform3D.hh>
+#include <G4SubtractionSolid.hh>
 
 #include <string>
 #include <vector>
 
 namespace Belle2 {
+
+  class G4TriangularPrism;
 
   /**
    * struct EKLMElementPosition - position information for the elements
@@ -38,6 +42,58 @@ namespace Belle2 {
     double X;        /**< X coordinate */
     double Y;        /**< Y coordinate */
     double Z;        /**< Z coordinate */
+  };
+
+  /**
+   * struct EKLMSectorSupportSize - sector support size data
+   */
+  struct EKLMSectorSupportSize {
+    double Thickness;        /**< thickness */
+    double DeltaLY;          /**< outerR - Y of upper edge of BoxY */
+    double CornerX;          /**< coordinate X of corner 1 */
+    double TopCornerHeight;  /**< corner 1 height */
+    double Corner2LX;        /**< corner 2 X length */
+    double Corner2LY;        /**< corner 2 Y length */
+    double Corner2Thickness; /**< corner 2 thickness */
+    double Corner2Z;         /**< corner 2 Z coordinate */
+    double Corner3LX;        /**< corner 3 X length */
+    double Corner3LY;        /**< corner 3 Y length */
+    double Corner3Thickness; /**< corner 3 thickness */
+    double Corner3Z;         /**< corner 3 Z coordinate */
+    double Corner4LX;        /**< corner 4 X length */
+    double Corner4LY;        /**< corner 4 Y length */
+    double Corner4Thickness; /**< corner 4 thickness */
+    double Corner4Z;         /**< corner 4 Z coordinate */
+    double CornerAngle;      /**< corner 1 angle */
+  };
+
+  /**
+   * struct EKLMBoardData - readout board size data
+   */
+  struct EKLMBoardSize {
+    double length;       /**< length */
+    double width;        /**< width */
+    double height;       /**< height */
+    double base_width;   /**< width of base board */
+    double base_height;  /**< height of base board */
+    double strip_length; /**< length of strip readout board */
+    double strip_width;  /**< width of strip readout board */
+    double strip_height; /**< height of strip readout board */
+  };
+
+  /**
+   * struct EKLMStripBoardPosition - strip readout board position data
+   */
+  struct EKLMStripBoardPosition {
+    int x;         /**< x coordinate */
+  };
+
+  /**
+   * struct EKLMBoardPosition - readout board position data
+   */
+  struct EKLMBoardPosition {
+    double r;      /**< radius of far edge of the board */
+    double phi;    /**< angle */
   };
 
   /**
@@ -170,12 +226,73 @@ namespace Belle2 {
      */
     G4Box *createSectorSupportBoxTop(G4PVPlacementGT *mpvgt, G4Transform3D &t);
 
+    /*
+     * createSectorSupportCorner2 - create sector support corner 2
+     * @mpvgt: mother physical volume with global transformation
+     * @t: transformation (output)
+     *
+     * Sets t to the transformation of the prism.
+     */
+    G4TriangularPrism* createSectorSupportCorner2(G4PVPlacementGT *mpvgt,
+                                                  G4Transform3D &t);
+
+    /*
+     * createSectorSupportCorner3 - create sector support corner 3
+     * @mpvgt: mother physical volume with global transformation
+     * @t: transformation (output)
+     *
+     * Sets t to the transformation of the prism.
+     */
+    G4TriangularPrism* createSectorSupportCorner3(G4PVPlacementGT *mpvgt,
+                                                  G4Transform3D &t);
+
+    /*
+     * createSectorSupportCorner4 - create sector support corner 4
+     * @mpvgt: mother physical volume with global transformation
+     * @t: transformation (output)
+     *
+     * Sets t to the transformation of the prism.
+     */
+    G4TriangularPrism* createSectorSupportCorner4(G4PVPlacementGT *mpvgt,
+                                                  G4Transform3D &t);
+
+    /**
+     * subtractBoardSolids - subtract board solids from planes
+     * @plane: plane solid without boards subtracted
+     * @iPlane: plane number
+     * @Plane_name: plane name
+     */
+    G4SubtractionSolid *subtractBoardSolids(G4SubtractionSolid *plane,
+                                            int iPlane, std::string Plane_Name);
+
     /**
      * createPlane - create plane
      * @iPlane: number of plane
      * @mpvgt: mother physical volume with global transformation
      */
     void createPlane(int iPlane, G4PVPlacementGT *mpvgt);
+
+    /**
+     * createSectionReadoutBoard - create readout board
+     * @iPlane: number of plane
+     * @iBoard: number of board
+     * @mpvgt: mother physical volume with global transformation
+     */
+    void createSectionReadoutBoard(int iPlane, int iBoard,
+                                   G4PVPlacementGT *mpvgt);
+
+    /**
+     * createBaseBoard - create base board of section readout board
+     * @mpvgt: mother physical volume with global transformation
+     */
+    void createBaseBoard(G4PVPlacementGT *mpvgt);
+
+    /**
+     * createStripBoard - create strip readout board
+     * @iBoard: number of board
+     * @mpvgt: mother physical volume with global transformation
+     */
+    void createStripBoard(int iBoard, G4PVPlacementGT *mpvgt);
 
     /**
      * createSectionSupport - create section support
@@ -233,6 +350,16 @@ namespace Belle2 {
     int nPlane;
 
     /**
+     * Number of readout boards in one sector.
+     */
+    int nBoard;
+
+    /**
+     * Number of strip readout boards on one section readout board.
+     */
+    int nStripBoard;
+
+    /**
      * Number of strips in one plane.
      */
     int nStrip;
@@ -268,35 +395,39 @@ namespace Belle2 {
     struct EKLMElementPosition SectorSupportPosition;
 
     /**
-     * Sector support structure thickness.
+     * Sector support size data.
      */
-    double SectorSupportThickness;
-
-    /**
-     * Sector support structure: Outer radius - Y coordinate of upper edge
-     * of BoxY
-     */
-    double SectorSupport_DeltaLY;
-
-    /**
-     * Sector support structure: coordinate X of corner
-     */
-    double SectorSupport_CornerX;
-
-    /**
-     * Sector support structure: top corner height
-     */
-    double SectorSupport_TopCornerHeight;
-
-    /**
-     * Sector support structure: cutted corner angle.
-     */
-    double SectorSupport_CornerAngle;
+    struct EKLMSectorSupportSize SectorSupportSize;
 
     /**
      * getSectorSupportCornerAngle - get cutted corner angle
      */
     double getSectorSupportCornerAngle();
+
+    /**
+     * Readout board size data
+     */
+    struct EKLMBoardSize BoardSize;
+
+    /**
+     * Positions of readout boards
+     */
+    struct EKLMBoardPosition *BoardPosition[2];
+
+    /**
+     * Transformations of boards from sector reference frame
+     */
+    G4Transform3D *BoardTransform[2];
+
+    /**
+     * Calculate board transformations
+     */
+    void calcBoardTransform();
+
+    /**
+     * Positions of strip readout boards.
+     */
+    struct EKLMStripBoardPosition *StripBoardPosition;
 
     /**
      * Position data for planes.

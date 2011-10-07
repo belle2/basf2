@@ -71,12 +71,10 @@ namespace Belle2 {
     void GeoCryostatCreator::create(const GearDir& content, G4LogicalVolume& topVolume, GeometryTypes type)
     {
 
-      //##############
-      //#
-      // -Index-
+      //######  L side index  ######
+      //
       // +- A1wal1
       //      +- A2spc1
-      //         +- Achecker
       // +- B1wal1
       //    +- B2spc1
       // +- C1wal1
@@ -84,22 +82,25 @@ namespace Belle2 {
       //       +- C3wal2
       //          +- C4spc2
       //             +- C5wal3
-      //             +- C5wal5
       //                +- C6spc4
       //                +- C6spc5
-      //                +- C6spc7
-      //                +- C6spc8
       //                +- C6spc3
-      //                +- C6spc6
       //                   +- C7mag1
       //                   +- C7mag2
       //                   +- C7mag3
       //                   +- C7mag4
       //                   +- C7mag5
       //                   +- C7mag6
-      //                   +- C7mag7
       //                   +- C7cil1
       //                     +- C8hld1
+      //             +- C5wal5
+      //                +- C6spc7
+      //                +- C6spc8
+      //                +- C6spc6
+      //                   +- C7mag7
+      //
+      //######  R side index  ######
+      //
       // +- D1wal1
       //    +- D2spc1
       // +- E1wal1
@@ -107,25 +108,25 @@ namespace Belle2 {
       // +- F1wal1
       //    +- F2spc1
       //       +- F3wal2
-      //       +- F3wal3
       //          +- F4spc2
-      //          +- F4spc3
       //             +- F5wal4
-      //             +- F5wal5
       //                +- F6spc5
       //                +- F6spc6
       //                +- F6spc4
-      //                +- F6spc8
-      //                +- F6spc7
       //                   +- F7mag1
       //                   +- F7mag2
       //                   +- F7mag3
       //                   +- F7mag4
       //                   +- F7mag5
       //                   +- F7mag6
-      //                   +- F7mag7
-      //                   +- F7hld1
       //                   +- F7cil1
+      //                      +- F8hld1
+      //       +- F3wal3
+      //          +- F4spc3
+      //             +- F5wal5
+      //                +- F6spc8
+      //                +- F6spc7
+      //                   +- F7mag7
 
       double DistanceR = content.getLength("DistanceR") / Unit::mm;
       double DistanceL = content.getLength("DistanceL") / Unit::mm;
@@ -365,6 +366,7 @@ namespace Belle2 {
       G4Polycone* geo_C1wal1xx = new G4Polycone("geo_C1wal1xx_name", 0, 2*M_PI, C1wal1_num, C1wal1_Z, C1wal1_rI, C1wal1_rO);
       G4SubtractionSolid* geo_C1wal1x = new G4SubtractionSolid("geo_C1wal1x_name", geo_C1wal1xx, geo_A1wal1, transform_A1wal1);
       G4SubtractionSolid* geo_C1wal1 = new G4SubtractionSolid("geo_C1wal1_name", geo_C1wal1x, geo_B1wal1, transform_B1wal1);
+
       G4LogicalVolume *logi_C1wal1 = new G4LogicalVolume(geo_C1wal1, mat_C1wal1, "logi_C1wal1_name");
 
       //put volume
@@ -374,7 +376,6 @@ namespace Belle2 {
 
       //-
       //--------------
-
 
       //--------------
       //-   C2spc1
@@ -473,7 +474,6 @@ namespace Belle2 {
 
       //-
       //--------------
-
 
       //--------------
       //-   C4spc2
@@ -617,7 +617,6 @@ namespace Belle2 {
 
       //-
       //--------------
-
 
       //--------------
       //-   C6spc4
@@ -907,7 +906,6 @@ namespace Belle2 {
       //-
       //--------------
 
-
       //--------------
       //-   C6spc3
 
@@ -995,7 +993,6 @@ namespace Belle2 {
 
       //-
       //--------------
-
 
       //--------------
       //-   C7mag1
@@ -1263,7 +1260,6 @@ namespace Belle2 {
       //-
       //--------------
 
-
       //--------------
       //-   C7cil1
 
@@ -1381,7 +1377,6 @@ namespace Belle2 {
 
       //-
       //--------------
-
 
       //--------------
       //-   D1wal1
@@ -1616,6 +1611,7 @@ namespace Belle2 {
       G4Polycone* geo_F1wal1xx = new G4Polycone("geo_F1wal1xx_name", 0, 2*M_PI, F1wal1_num, F1wal1_Z, F1wal1_rI, F1wal1_rO);
       G4SubtractionSolid* geo_F1wal1x = new G4SubtractionSolid("geo_F1wal1x_name", geo_F1wal1xx, geo_D1wal1, transform_D1wal1);
       G4SubtractionSolid* geo_F1wal1 = new G4SubtractionSolid("geo_F1wal1_name", geo_F1wal1x, geo_E1wal1, transform_E1wal1);
+
       G4LogicalVolume *logi_F1wal1 = new G4LogicalVolume(geo_F1wal1, mat_F1wal1, "logi_F1wal1_name");
 
       //put volume
@@ -1693,9 +1689,9 @@ namespace Belle2 {
       F3wal2_Z[0] = F2spc1_Z[0] + cF3wal2.getLength("D1") / Unit::mm;
       F3wal2_Z[1] = F3wal2_Z[0] + cF3wal2.getLength("L1") / Unit::mm;
       F3wal2_Z[2] = F3wal2_Z[1] + cF3wal2.getLength("L2") / Unit::mm;
-      F3wal2_Z[3] = F3wal2_Z[2] + cF3wal2.getLength("L3") / Unit::mm;
-      F3wal2_Z[4] = F3wal2_Z[3] + cF3wal2.getLength("L4") / Unit::mm;
-      F3wal2_Z[5] = F3wal2_Z[4];
+      F3wal2_Z[3] = F3wal2_Z[2];
+      F3wal2_Z[4] = F3wal2_Z[3] + cF3wal2.getLength("L3") / Unit::mm;
+      F3wal2_Z[5] = F3wal2_Z[4] + cF3wal2.getLength("L4") / Unit::mm;
       F3wal2_Z[6] = F3wal2_Z[5] + cF3wal2.getLength("L5") / Unit::mm;
       //
       double F3wal2_rI[F3wal2_num];
@@ -1728,16 +1724,11 @@ namespace Belle2 {
       //-
       //--------------
 
-      return;
-
-      /*
       //--------------
       //-   F3wal3
 
       //get parameters from .xml file
       GearDir cF3wal3(content, "F3wal3/");
-      //
-      const int F3wal3_num = 7;
       //
       double F3wal3_D1 = cF3wal3.getLength("D1") / Unit::mm;
       double F3wal3_O1 = cF3wal3.getLength("O1") / Unit::mm;
@@ -1749,19 +1740,28 @@ namespace Belle2 {
       G4Material* mat_F3wal3 = Materials::get(strMat_F3wal3);
 
       //define geometry
-      G4Box* geo_F3wal3xx = new G4Box("geo_F3wal3xx_name", 0, 2*M_PI, F3wal3_num, F3wal3_Z, F3wal3_rI, F3wal3_rO);
-      G4IntersectionSolid* geo_F3wal3 = new G4IntersectionSolid("geo_F3wal3_name", geo_F3wal3xx, geo_F2spc1);
+      G4Box* geo_F3wal3_box = new G4Box("geo_F3wal3_box_name", F3wal3_R1, F3wal3_T1 / 2., F3wal3_L1 / 2.);
+      G4Tubs* geo_F3wal3_tube1 = new G4Tubs("geo_F3wal3_tube1_name", 0, F3wal3_R1, F3wal3_L1 / 2., 0, 2*M_PI);
+      G4Tubs* geo_F3wal3_tube2 = new G4Tubs("geo_F3wal3_tube2_name", 0, F3wal3_R1, F3wal3_L1 / 2., 0, 2*M_PI);
+
+      G4Transform3D transform_F3wal3_tube1 = G4Translate3D(0, -F3wal3_T1 / 2., 0);
+      G4Transform3D transform_F3wal3_tube2 = G4Translate3D(0, F3wal3_T1 / 2., 0);
+      G4Transform3D transform_F3wal3 = G4Translate3D(F3wal3_O1, F3wal3_T1 / 2. , F3wal3_D1 - F3wal3_L1 / 2.);
+
+      G4UnionSolid* geo_F3wal3xx = new G4UnionSolid("geo_F3wal3xx_name", geo_F3wal3_box, geo_F3wal3_tube1, transform_F3wal3_tube1);
+      G4UnionSolid* geo_F3wal3x = new G4UnionSolid("geo_F3wal3x_name", geo_F3wal3xx, geo_F3wal3_tube2, transform_F3wal3_tube2);
+      G4IntersectionSolid* geo_F3wal3 = new G4IntersectionSolid("geo_F3wal3_name", geo_F2spc1, geo_F3wal3x, transform_F3wal3);
 
       G4LogicalVolume *logi_F3wal3 = new G4LogicalVolume(geo_F3wal3, mat_F3wal3, "logi_F3wal3_name");
 
       //put volume
       setColor(*logi_F3wal3, cF3wal3.getString("Color", "#CC0000"));
-      //setVisibility(*logi_F3wal3, false);
+      //you must not make it visibile, otherwise terminated with SegV.
+      setVisibility(*logi_F3wal3, false);
       new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_F3wal3, "phys_F3wal3_name", logi_F2spc1, false, 0);
 
       //-
       //--------------
-
 
       //--------------
       //-   F4spc2
@@ -1775,9 +1775,9 @@ namespace Belle2 {
       F4spc2_Z[0] = F3wal2_Z[0] + cF4spc2.getLength("D1") / Unit::mm;
       F4spc2_Z[1] = F4spc2_Z[0] + cF4spc2.getLength("L1") / Unit::mm;
       F4spc2_Z[2] = F4spc2_Z[1] + cF4spc2.getLength("L2") / Unit::mm;
-      F4spc2_Z[3] = F4spc2_Z[2] + cF4spc2.getLength("L3") / Unit::mm;
-      F4spc2_Z[4] = F4spc2_Z[3] + cF4spc2.getLength("L4") / Unit::mm;
-      F4spc2_Z[5] = F4spc2_Z[4];
+      F4spc2_Z[3] = F4spc2_Z[2];
+      F4spc2_Z[4] = F4spc2_Z[3] + cF4spc2.getLength("L3") / Unit::mm;
+      F4spc2_Z[5] = F4spc2_Z[4] + cF4spc2.getLength("L4") / Unit::mm;
       F4spc2_Z[6] = F4spc2_Z[5] + cF4spc2.getLength("L5") / Unit::mm;
       //
       double F4spc2_rI[F4spc2_num];
@@ -1803,60 +1803,97 @@ namespace Belle2 {
       G4LogicalVolume *logi_F4spc2 = new G4LogicalVolume(geo_F4spc2, mat_F4spc2, "logi_F4spc2_name");
 
       //put volume
-      setColor(*logi_F4spc2, cF4spc2.getString("Color", "#CCCCCC"));
-      setVisibility(*logi_F4spc2, false);
+      setColor(*logi_F4spc2, cF4spc2.getString("Color", "#CC0000"));
+      //setVisibility(*logi_F4spc2, false);
       new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_F4spc2, "phys_F4spc2_name", logi_F3wal2, false, 0);
 
       //-
       //--------------
 
       //--------------
-      //-   F5wal3
+      //-   F4spc3
 
       //get parameters from .xml file
-      GearDir cF5wal3(content, "F5wal3/");
+      GearDir cF4spc3(content, "F4spc3/");
       //
-      const int F5wal3_num = 8;
-      //
-      double F5wal3_Z[F5wal3_num];
-      F5wal3_Z[0] = F4spc2_Z[0] + cF5wal3.getLength("D1") / Unit::mm;
-      F5wal3_Z[1] = F5wal3_Z[0] + cF5wal3.getLength("L1") / Unit::mm;
-      F5wal3_Z[2] = F5wal3_Z[1] + cF5wal3.getLength("L2") / Unit::mm;
-      F5wal3_Z[3] = F5wal3_Z[2];
-      F5wal3_Z[4] = F5wal3_Z[3] + cF5wal3.getLength("L3") / Unit::mm;
-      F5wal3_Z[5] = F5wal3_Z[4] + cF5wal3.getLength("L4") / Unit::mm;
-      F5wal3_Z[6] = F5wal3_Z[5] + cF5wal3.getLength("L5") / Unit::mm;
-      F5wal3_Z[7] = F5wal3_Z[6] + cF5wal3.getLength("L6") / Unit::mm;
-      //
-      double F5wal3_rI[F5wal3_num];
-      for (int i = 0; i < F5wal3_num; i++)
-        { F5wal3_rI[i] = 0.0; }
-      //
-      double F5wal3_rO[F5wal3_num];
-      F5wal3_rO[0] = cF5wal3.getLength("R1") / Unit::mm;
-      F5wal3_rO[1] = cF5wal3.getLength("R2") / Unit::mm;
-      F5wal3_rO[2] = F5wal3_rO[1];
-      F5wal3_rO[3] = cF5wal3.getLength("R3") / Unit::mm;
-      F5wal3_rO[4] = F5wal3_rO[3];
-      F5wal3_rO[5] = cF5wal3.getLength("R4") / Unit::mm;
-      F5wal3_rO[6] = F5wal3_rO[5];
-      F5wal3_rO[7] = cF5wal3.getLength("R5") / Unit::mm;
-      //
-      string strMat_F5wal3 = cF5wal3.getString("Material");
-      G4Material* mat_F5wal3 = Materials::get(strMat_F5wal3);
+      double F4spc3_D1 = F3wal3_D1 + cF4spc3.getLength("D1") / Unit::mm;
+      double F4spc3_O1 = F3wal3_O1;
+      double F4spc3_L1 = cF4spc3.getLength("L1") / Unit::mm;
+      double F4spc3_R1 = cF4spc3.getLength("R1") / Unit::mm;
+      double F4spc3_T1 = F3wal3_T1;
+
+      string strMat_F4spc3 = cF4spc3.getString("Material");
+      G4Material* mat_F4spc3 = Materials::get(strMat_F4spc3);
 
       //define geometry
-      G4Polycone* geo_F5wal3xx = new G4Polycone("geo_F5wal3xx_name", 0, 2*M_PI, F5wal3_num, F5wal3_Z, F5wal3_rI, F5wal3_rO);
-      //G4SubtractionSolid* geo_F5wal3x = new G4SubtractionSolid("geo_F5wal3x_name", geo_F5wal3xx, geo_D1wal1, transform_D1wal1);
-      //G4SubtractionSolid* geo_F5wal3 = new G4SubtractionSolid("geo_F5wal3_name", geo_F5wal3x, geo_E1wal1, transform_E1wal1);
-      G4IntersectionSolid* geo_F5wal3 = new G4IntersectionSolid("geo_F5wal3_name", geo_F5wal3xx, geo_F4spc2);
+      G4Box* geo_F4spc3_box = new G4Box("geo_F4spc3_box_name", F4spc3_R1, F4spc3_T1 / 2., F4spc3_L1 / 2.);
+      G4Tubs* geo_F4spc3_tube1 = new G4Tubs("geo_F4spc3_tube1_name", 0, F4spc3_R1, F4spc3_L1 / 2., 0, 2*M_PI);
+      G4Tubs* geo_F4spc3_tube2 = new G4Tubs("geo_F4spc3_tube2_name", 0, F4spc3_R1, F4spc3_L1 / 2., 0, 2*M_PI);
 
-      G4LogicalVolume *logi_F5wal3 = new G4LogicalVolume(geo_F5wal3, mat_F5wal3, "logi_F5wal3_name");
+      G4Transform3D transform_F4spc3_tube1 = G4Translate3D(0, -F4spc3_T1 / 2., 0);
+      G4Transform3D transform_F4spc3_tube2 = G4Translate3D(0, F4spc3_T1 / 2., 0);
+      G4Transform3D transform_F4spc3 = G4Translate3D(F4spc3_O1, F4spc3_T1 / 2. , F4spc3_D1 - F4spc3_L1 / 2.);
+
+      G4UnionSolid* geo_F4spc3xx = new G4UnionSolid("geo_F4spc3xx_name", geo_F4spc3_box, geo_F4spc3_tube1, transform_F4spc3_tube1);
+      G4UnionSolid* geo_F4spc3x = new G4UnionSolid("geo_F4spc3x_name", geo_F4spc3xx, geo_F4spc3_tube2, transform_F4spc3_tube2);
+      G4IntersectionSolid* geo_F4spc3 = new G4IntersectionSolid("geo_F4spc3_name", geo_F3wal3, geo_F4spc3x, transform_F4spc3);
+
+      G4LogicalVolume *logi_F4spc3 = new G4LogicalVolume(geo_F4spc3, mat_F4spc3, "logi_F4spc3_name");
 
       //put volume
-      setColor(*logi_F5wal3, cF5wal3.getString("Color", "#CC0000"));
-      //setVisibility(*logi_F5wal3, false);
-      new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_F5wal3, "phys_F5wal3_name", logi_F4spc2, false, 0);
+      setColor(*logi_F4spc3, cF4spc3.getString("Color", "#CC0000"));
+      //you must not make it visibile, otherwise terminated with SegV.
+      setVisibility(*logi_F4spc3, false);
+      new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_F4spc3, "phys_F4spc3_name", logi_F3wal3, false, 0);
+
+      //-
+      //--------------
+
+      //--------------
+      //-   F5wal4
+
+      //get parameters from .xml file
+      GearDir cF5wal4(content, "F5wal4/");
+      //
+      const int F5wal4_num = 8;
+      //
+      double F5wal4_Z[F5wal4_num];
+      F5wal4_Z[0] = F4spc2_Z[0] + cF5wal4.getLength("D1") / Unit::mm;
+      F5wal4_Z[1] = F5wal4_Z[0] + cF5wal4.getLength("L1") / Unit::mm;
+      F5wal4_Z[2] = F5wal4_Z[1] + cF5wal4.getLength("L2") / Unit::mm;
+      F5wal4_Z[3] = F5wal4_Z[2];
+      F5wal4_Z[4] = F5wal4_Z[3] + cF5wal4.getLength("L3") / Unit::mm;
+      F5wal4_Z[5] = F5wal4_Z[4] + cF5wal4.getLength("L4") / Unit::mm;
+      F5wal4_Z[6] = F5wal4_Z[5] + cF5wal4.getLength("L5") / Unit::mm;
+      F5wal4_Z[7] = F5wal4_Z[6] + cF5wal4.getLength("L6") / Unit::mm;
+      //
+      double F5wal4_rI[F5wal4_num];
+      for (int i = 0; i < F5wal4_num; i++)
+        { F5wal4_rI[i] = 0.0; }
+      //
+      double F5wal4_rO[F5wal4_num];
+      F5wal4_rO[0] = cF5wal4.getLength("R1") / Unit::mm;
+      F5wal4_rO[1] = cF5wal4.getLength("R2") / Unit::mm;
+      F5wal4_rO[2] = F5wal4_rO[1];
+      F5wal4_rO[3] = cF5wal4.getLength("R3") / Unit::mm;
+      F5wal4_rO[4] = F5wal4_rO[3];
+      F5wal4_rO[5] = cF5wal4.getLength("R4") / Unit::mm;
+      F5wal4_rO[6] = F5wal4_rO[5];
+      F5wal4_rO[7] = cF5wal4.getLength("R5") / Unit::mm;
+      //
+      string strMat_F5wal4 = cF5wal4.getString("Material");
+      G4Material* mat_F5wal4 = Materials::get(strMat_F5wal4);
+
+      //define geometry
+      G4Polycone* geo_F5wal4xx = new G4Polycone("geo_F5wal4xx_name", 0, 2*M_PI, F5wal4_num, F5wal4_Z, F5wal4_rI, F5wal4_rO);
+      G4IntersectionSolid* geo_F5wal4 = new G4IntersectionSolid("geo_F5wal4_name", geo_F5wal4xx, geo_F4spc2);
+
+      G4LogicalVolume *logi_F5wal4 = new G4LogicalVolume(geo_F5wal4, mat_F5wal4, "logi_F5wal4_name");
+
+      //put volume
+      setColor(*logi_F5wal4, cF5wal4.getString("Color", "#CCCCCC"));
+      //setVisibility(*logi_F5wal4, false);
+      new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_F5wal4, "phys_F5wal4_name", logi_F4spc2, false, 0);
 
       //-
       //--------------
@@ -1867,12 +1904,11 @@ namespace Belle2 {
       //get parameters from .xml file
       GearDir cF5wal5(content, "F5wal5/");
       //
-      const int F5wal5_num = 3;
+      const int F5wal5_num = 2;
       //
       double F5wal5_Z[F5wal5_num];
-      F5wal5_Z[0] = F4spc2_Z[0] + cF5wal5.getLength("D1") / Unit::mm;
+      F5wal5_Z[0] = cF5wal5.getLength("D1") / Unit::mm;
       F5wal5_Z[1] = F5wal5_Z[0] + cF5wal5.getLength("L1") / Unit::mm;
-      F5wal5_Z[2] = F5wal5_Z[1] + cF5wal5.getLength("L2") / Unit::mm;
       //
       double F5wal5_rI[F5wal5_num];
       for (int i = 0; i < F5wal5_num; i++)
@@ -1881,72 +1917,25 @@ namespace Belle2 {
       double F5wal5_rO[F5wal5_num];
       F5wal5_rO[0] = cF5wal5.getLength("R1") / Unit::mm;
       F5wal5_rO[1] = F5wal5_rO[0];
-      F5wal5_rO[2] = cF5wal5.getLength("R2") / Unit::mm;
       //
       string strMat_F5wal5 = cF5wal5.getString("Material");
       G4Material* mat_F5wal5 = Materials::get(strMat_F5wal5);
 
       //define geometry
       G4Polycone* geo_F5wal5xx = new G4Polycone("geo_F5wal5xx_name", 0, 2*M_PI, F5wal5_num, F5wal5_Z, F5wal5_rI, F5wal5_rO);
-      G4SubtractionSolid* geo_F5wal5x = new G4SubtractionSolid("geo_F5wal5x_name", geo_F5wal5xx, geo_D1wal1, transform_D1wal1);
-      G4SubtractionSolid* geo_F5wal5 = new G4SubtractionSolid("geo_F5wal5_name", geo_F5wal5x, geo_E1wal1, transform_E1wal1);
+      //G4SubtractionSolid* geo_F5wal5x = new G4SubtractionSolid("geo_F5wal5x_name", geo_F5wal5xx, geo_D1wal1);
+      G4IntersectionSolid* geo_F5wal5 = new G4IntersectionSolid("geo_F5wal5_name", geo_F4spc3, geo_F5wal5xx, transform_D1wal1);
+
       G4LogicalVolume *logi_F5wal5 = new G4LogicalVolume(geo_F5wal5, mat_F5wal5, "logi_F5wal5_name");
 
       //put volume
       setColor(*logi_F5wal5, cF5wal5.getString("Color", "#CC0000"));
-      //setVisibility(*logi_F5wal5, false);
-      new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_F5wal5, "phys_F5wal5_name", logi_F4spc2, false, 0);
+      //you must not make it visibile, otherwise terminated with SegV.
+      setVisibility(*logi_F5wal5, false);
+      new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_F5wal5, "phys_F5wal5_name", logi_F4spc3, false, 0);
 
       //-
       //--------------
-
-
-      //--------------
-      //-   F6spc4
-
-      //get parameters from .xml file
-      GearDir cF6spc4(content, "F6spc4/");
-      //
-      const int F6spc4_num = 6;
-      //
-      double F6spc4_Z[F6spc4_num];
-      F6spc4_Z[0] = 0.0;
-      F6spc4_Z[1] = F6spc4_Z[0] + cF6spc4.getLength("L1") / Unit::mm;
-      F6spc4_Z[2] = F6spc4_Z[1] + cF6spc4.getLength("L2") / Unit::mm;
-      F6spc4_Z[3] = F6spc4_Z[2] + cF6spc4.getLength("L3") / Unit::mm;
-      F6spc4_Z[4] = F6spc4_Z[3] + cF6spc4.getLength("L4") / Unit::mm;
-      F6spc4_Z[5] = F6spc4_Z[4] + cF6spc4.getLength("L5") / Unit::mm;
-      //
-      double F6spc4_rI[F6spc4_num];
-      for (int i = 0; i < F6spc4_num; i++)
-        { F6spc4_rI[i] = 0.0; }
-      //
-      double F6spc4_rO[F6spc4_num];
-      F6spc4_rO[0] = cF6spc4.getLength("R1") / Unit::mm;
-      F6spc4_rO[1] = F6spc4_rO[0];
-      F6spc4_rO[2] = cF6spc4.getLength("R2") / Unit::mm;
-      F6spc4_rO[3] = F6spc4_rO[2];
-      F6spc4_rO[4] = cF6spc4.getLength("R3") / Unit::mm;
-      F6spc4_rO[5] = F6spc4_rO[4];
-      //
-      string strMat_F6spc4 = cF6spc4.getString("Material");
-      G4Material* mat_F6spc4 = Materials::get(strMat_F6spc4);
-
-      //define geometry
-      G4Polycone* geo_F6spc4xx = new G4Polycone("geo_F6spc4xx_name", 0, 2*M_PI, F6spc4_num, F6spc4_Z, F6spc4_rI, F6spc4_rO);
-      G4SubtractionSolid* geo_F6spc4x = new G4SubtractionSolid("geo_F6spc4x_name", geo_F6spc4xx, geo_D1wal1, transform_D1wal1);
-      G4IntersectionSolid* geo_F6spc4 = new G4IntersectionSolid("geo_F6spc4_name", geo_F6spc4x, geo_F5wal3);
-
-      G4LogicalVolume *logi_F6spc4 = new G4LogicalVolume(geo_F6spc4, mat_F6spc4, "logi_F6spc4_name");
-
-      //put volume
-      setColor(*logi_F6spc4, cF6spc4.getString("Color", "#CCCCCC"));
-      //setVisibility(*logi_F6spc4, false);
-      new G4PVPlacement(transform_D1wal1, logi_F6spc4, "phys_F6spc4_name", logi_F5wal3, false, 0);
-
-      //-
-      //--------------
-
 
       //--------------
       //-   F6spc5
@@ -1954,7 +1943,7 @@ namespace Belle2 {
       //get parameters from .xml file
       GearDir cF6spc5(content, "F6spc5/");
       //
-      const int F6spc5_num = 8;
+      const int F6spc5_num = 6;
       //
       double F6spc5_Z[F6spc5_num];
       F6spc5_Z[0] = 0.0;
@@ -1963,8 +1952,6 @@ namespace Belle2 {
       F6spc5_Z[3] = F6spc5_Z[2] + cF6spc5.getLength("L3") / Unit::mm;
       F6spc5_Z[4] = F6spc5_Z[3] + cF6spc5.getLength("L4") / Unit::mm;
       F6spc5_Z[5] = F6spc5_Z[4] + cF6spc5.getLength("L5") / Unit::mm;
-      F6spc5_Z[6] = F6spc5_Z[5] + cF6spc5.getLength("L6") / Unit::mm;
-      F6spc5_Z[7] = F6spc5_Z[6] + cF6spc5.getLength("L7") / Unit::mm;
       //
       double F6spc5_rI[F6spc5_num];
       for (int i = 0; i < F6spc5_num; i++)
@@ -1974,67 +1961,121 @@ namespace Belle2 {
       F6spc5_rO[0] = cF6spc5.getLength("R1") / Unit::mm;
       F6spc5_rO[1] = F6spc5_rO[0];
       F6spc5_rO[2] = cF6spc5.getLength("R2") / Unit::mm;
-      F6spc5_rO[3] = cF6spc5.getLength("R3") / Unit::mm;
-      F6spc5_rO[4] = F6spc5_rO[2];
-      F6spc5_rO[5] = cF6spc5.getLength("R4") / Unit::mm;
-      F6spc5_rO[6] = cF6spc5.getLength("R5") / Unit::mm;
-      F6spc5_rO[7] = F6spc5_rO[4];
+      F6spc5_rO[3] = F6spc5_rO[2];
+      F6spc5_rO[4] = cF6spc5.getLength("R3") / Unit::mm;
+      F6spc5_rO[5] = F6spc5_rO[4];
       //
       string strMat_F6spc5 = cF6spc5.getString("Material");
       G4Material* mat_F6spc5 = Materials::get(strMat_F6spc5);
 
       //define geometry
       G4Polycone* geo_F6spc5xx = new G4Polycone("geo_F6spc5xx_name", 0, 2*M_PI, F6spc5_num, F6spc5_Z, F6spc5_rI, F6spc5_rO);
-      G4SubtractionSolid* geo_F6spc5x = new G4SubtractionSolid("geo_F6spc5x_name", geo_F6spc5xx, geo_E1wal1, transform_E1wal1);
-      G4IntersectionSolid* geo_F6spc5 = new G4IntersectionSolid("geo_F6spc5_name", geo_F6spc5x, geo_F5wal3);
+      G4IntersectionSolid* geo_F6spc5 = new G4IntersectionSolid("geo_F6spc5_name", geo_F5wal4, geo_F6spc5xx,  transform_D1wal1);
 
       G4LogicalVolume *logi_F6spc5 = new G4LogicalVolume(geo_F6spc5, mat_F6spc5, "logi_F6spc5_name");
 
       //put volume
       setColor(*logi_F6spc5, cF6spc5.getString("Color", "#CCCCCC"));
       //setVisibility(*logi_F6spc5, false);
-      new G4PVPlacement(transform_E1wal1, logi_F6spc5, "phys_F6spc5_name", logi_F5wal3, false, 0);
+      new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_F6spc5, "phys_F6spc5_name", logi_F5wal4, false, 0);
 
       //-
       //--------------
 
       //--------------
-      //-   F6spc7
+      //-   F6tnl1
 
       //get parameters from .xml file
-      GearDir cF6spc7(content, "F6spc7/");
+      GearDir cF6tnl1(content, "F6tnl1/");
       //
-      const int F6spc7_num = 2;
+      const int F6tnl1_num = 6;
       //
-      double F6spc7_Z[F6spc7_num];
-      F6spc7_Z[0] = cF6spc7.getLength("D1") / Unit::mm;
-      F6spc7_Z[1] = F6spc7_Z[0] + cF6spc7.getLength("L1") / Unit::mm;
-      //
-      double F6spc7_rI[F6spc7_num];
-      for (int i = 0; i < F6spc7_num; i++)
-        { F6spc7_rI[i] = 0.0; }
-      //
-      double F6spc7_rO[F6spc7_num];
-      F6spc7_rO[0] = cF6spc7.getLength("R1") / Unit::mm;
-      F6spc7_rO[1] = F6spc7_rO[0];
-      //
-      string strMat_F6spc7 = cF6spc7.getString("Material");
-      G4Material* mat_F6spc7 = Materials::get(strMat_F6spc7);
+      double F6tnl1_rO[F6tnl1_num];
+      F6tnl1_rO[0] = cF6tnl1.getLength("R1") / Unit::mm;
+      F6tnl1_rO[1] = F6tnl1_rO[0];
+      F6tnl1_rO[2] = cF6tnl1.getLength("R2") / Unit::mm;
+      F6tnl1_rO[3] = F6tnl1_rO[2];
+      F6tnl1_rO[4] = cF6tnl1.getLength("R3") / Unit::mm;
+      F6tnl1_rO[5] = F6tnl1_rO[4];
 
       //define geometry
-      G4Polycone* geo_F6spc7xx = new G4Polycone("geo_F6spc7xx_name", 0, 2*M_PI, F6spc7_num, F6spc7_Z, F6spc7_rI, F6spc7_rO);
-      G4SubtractionSolid* geo_F6spc7x = new G4SubtractionSolid("geo_F6spc7x_name", geo_F6spc7xx, geo_D1wal1, transform_D1wal1);
-      G4IntersectionSolid* geo_F6spc7 = new G4IntersectionSolid("geo_F6spc7_name", geo_F6spc7x, geo_F5wal5);
-      G4LogicalVolume *logi_F6spc7 = new G4LogicalVolume(geo_F6spc7, mat_F6spc7, "logi_F6spc7_name");
-
-      //put volume
-      setColor(*logi_F6spc7, cF6spc7.getString("Color", "#CCCCCC"));
-      //setVisibility(*logi_F6spc7, false);
-      new G4PVPlacement(transform_D1wal1, logi_F6spc7, "phys_F6spc7_name", logi_F5wal5, false, 0);
+      G4Polycone* geo_F6tnl1 = new G4Polycone("geo_F6tnl1_name", 0, 2*M_PI, F6tnl1_num, F6spc5_Z, F6spc5_rI, F6tnl1_rO);
 
       //-
       //--------------
 
+      //--------------
+      //-   F6spc6
+
+      //get parameters from .xml file
+      GearDir cF6spc6(content, "F6spc6/");
+      //
+      const int F6spc6_num = 8;
+      //
+      double F6spc6_Z[F6spc6_num];
+      F6spc6_Z[0] = 0.0;
+      F6spc6_Z[1] = F6spc6_Z[0] + cF6spc6.getLength("L1") / Unit::mm;
+      F6spc6_Z[2] = F6spc6_Z[1] + cF6spc6.getLength("L2") / Unit::mm;
+      F6spc6_Z[3] = F6spc6_Z[2] + cF6spc6.getLength("L3") / Unit::mm;
+      F6spc6_Z[4] = F6spc6_Z[3] + cF6spc6.getLength("L4") / Unit::mm;
+      F6spc6_Z[5] = F6spc6_Z[4] + cF6spc6.getLength("L5") / Unit::mm;
+      F6spc6_Z[6] = F6spc6_Z[5] + cF6spc6.getLength("L6") / Unit::mm;
+      F6spc6_Z[7] = F6spc6_Z[6] + cF6spc6.getLength("L7") / Unit::mm;
+      //
+      double F6spc6_rI[F6spc6_num];
+      for (int i = 0; i < F6spc6_num; i++)
+        { F6spc6_rI[i] = 0.0; }
+      //
+      double F6spc6_rO[F6spc6_num];
+      F6spc6_rO[0] = cF6spc6.getLength("R1") / Unit::mm;
+      F6spc6_rO[1] = F6spc6_rO[0];
+      F6spc6_rO[2] = cF6spc6.getLength("R2") / Unit::mm;
+      F6spc6_rO[3] = cF6spc6.getLength("R3") / Unit::mm;
+      F6spc6_rO[4] = F6spc6_rO[3];
+      F6spc6_rO[5] = cF6spc6.getLength("R4") / Unit::mm;
+      F6spc6_rO[6] = cF6spc6.getLength("R5") / Unit::mm;
+      F6spc6_rO[7] = F6spc6_rO[6];
+      //
+      string strMat_F6spc6 = cF6spc6.getString("Material");
+      G4Material* mat_F6spc6 = Materials::get(strMat_F6spc6);
+
+      //define geometry
+      G4Polycone* geo_F6spc6xx = new G4Polycone("geo_F6spc6xx_name", 0, 2*M_PI, F6spc6_num, F6spc6_Z, F6spc6_rI, F6spc6_rO);
+      G4IntersectionSolid* geo_F6spc6 = new G4IntersectionSolid("geo_F6spc6_name", geo_F5wal4, geo_F6spc6xx, transform_E1wal1);
+
+      G4LogicalVolume *logi_F6spc6 = new G4LogicalVolume(geo_F6spc6, mat_F6spc6, "logi_F6spc6_name");
+
+      //put volume
+      setColor(*logi_F6spc6, cF6spc6.getString("Color", "#CCCCCC"));
+      //setVisibility(*logi_F6spc6, false);
+      new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_F6spc6, "phys_F6spc6_name", logi_F5wal4, false, 0);
+
+      //-
+      //--------------
+
+      //--------------
+      //-   F6tnl2
+
+      //get parameters from .xml file
+      GearDir cF6tnl2(content, "F6tnl2/");
+      //
+      const int F6tnl2_num = 8;
+      //
+      double F6tnl2_rO[F6tnl2_num];
+      F6tnl2_rO[0] = cF6tnl2.getLength("R1") / Unit::mm;
+      F6tnl2_rO[1] = F6tnl2_rO[0];
+      F6tnl2_rO[2] = cF6tnl2.getLength("R2") / Unit::mm;
+      F6tnl2_rO[3] = cF6tnl2.getLength("R3") / Unit::mm;
+      F6tnl2_rO[4] = F6tnl2_rO[3];
+      F6tnl2_rO[5] = cF6tnl2.getLength("R4") / Unit::mm;
+      F6tnl2_rO[6] = cF6tnl2.getLength("R5") / Unit::mm;
+      F6tnl2_rO[7] = F6tnl2_rO[6];
+
+      //define geometry
+      G4Polycone* geo_F6tnl2 = new G4Polycone("geo_F6tnl2_name", 0, 2*M_PI, F6tnl2_num, F6spc6_Z, F6spc6_rI, F6tnl2_rO);
+
+      //-
+      //--------------
 
       //--------------
       //-   F6spc8
@@ -2061,229 +2102,127 @@ namespace Belle2 {
 
       //define geometry
       G4Polycone* geo_F6spc8xx = new G4Polycone("geo_F6spc8xx_name", 0, 2*M_PI, F6spc8_num, F6spc8_Z, F6spc8_rI, F6spc8_rO);
-      G4SubtractionSolid* geo_F6spc8x = new G4SubtractionSolid("geo_F6spc8x_name", geo_F6spc8xx, geo_E1wal1, transform_E1wal1);
-      G4IntersectionSolid* geo_F6spc8 = new G4IntersectionSolid("geo_F6spc8_name", geo_F6spc8x, geo_F5wal5);
+      G4IntersectionSolid* geo_F6spc8 = new G4IntersectionSolid("geo_F6spc8_name", geo_F5wal5, geo_F6spc8xx, transform_D1wal1);
 
       G4LogicalVolume *logi_F6spc8 = new G4LogicalVolume(geo_F6spc8, mat_F6spc8, "logi_F6spc8_name");
 
       //put volume
       setColor(*logi_F6spc8, cF6spc8.getString("Color", "#CCCCCC"));
-      //setVisibility(*logi_F6spc8, false);
-      new G4PVPlacement(transform_E1wal1, logi_F6spc8, "phys_F6spc8_name", logi_F5wal5, false, 0);
-
-      //-
-      //--------------
-
-
-      //--------------
-      //- F6tnl1
-
-      //get parameters from .xml file
-      GearDir cF6tnl1(content, "F6tnl1/");
-      //
-      const int F6tnl1_num = 6;
-      //
-      double F6tnl1_Z[F6tnl1_num];
-      F6tnl1_Z[0] = 0.0;
-      F6tnl1_Z[1] = F6tnl1_Z[0] + cF6tnl1.getLength("L1") / Unit::mm;
-      F6tnl1_Z[2] = F6tnl1_Z[1] + cF6tnl1.getLength("L2") / Unit::mm;
-      F6tnl1_Z[3] = F6tnl1_Z[2] + cF6tnl1.getLength("L3") / Unit::mm;
-      F6tnl1_Z[4] = F6tnl1_Z[3] + cF6tnl1.getLength("L4") / Unit::mm;
-      F6tnl1_Z[5] = F6tnl1_Z[4] + cF6tnl1.getLength("L5") / Unit::mm;
-      //
-      double F6tnl1_rI[F6tnl1_num];
-      for (int i = 0; i < F6tnl1_num; i++)
-        { F6tnl1_rI[i] = 0.0; }
-      //
-      double F6tnl1_rO[F6tnl1_num];
-      F6tnl1_rO[0] = cF6tnl1.getLength("R1") / Unit::mm;
-      F6tnl1_rO[1] = F6tnl1_rO[0];
-      F6tnl1_rO[2] = cF6tnl1.getLength("R2") / Unit::mm;
-      F6tnl1_rO[3] = F6tnl1_rO[2];
-      F6tnl1_rO[4] = cF6tnl1.getLength("R3") / Unit::mm;
-      F6tnl1_rO[5] = F6tnl1_rO[4];
-      //define geometry
-      G4Polycone* geo_F6tnl1 = new G4Polycone("geo_F6tnl1_name", 0, 2*M_PI, F6tnl1_num, F6tnl1_Z, F6tnl1_rI, F6tnl1_rO);
+      //you must not make it visibile, otherwise terminated with SegV.
+      setVisibility(*logi_F6spc8, false);
+      new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_F6spc8, "phys_F6spc8_name", logi_F5wal5, false, 0);
 
       //-
       //--------------
 
       //--------------
-      //- F6tnl2
-
-      //get parameters from .xml file
-      GearDir cF6tnl2(content, "F6tnl2/");
-      //
-      const int F6tnl2_num = 8;
-      //
-      double F6tnl2_Z[F6tnl2_num];
-      F6tnl2_Z[0] = 0.0;
-      F6tnl2_Z[1] = F6tnl2_Z[0] + cF6tnl2.getLength("L1") / Unit::mm;
-      F6tnl2_Z[2] = F6tnl2_Z[1] + cF6tnl2.getLength("L2") / Unit::mm;
-      F6tnl2_Z[3] = F6tnl2_Z[2] + cF6tnl2.getLength("L3") / Unit::mm;
-      F6tnl2_Z[4] = F6tnl2_Z[3] + cF6tnl2.getLength("L4") / Unit::mm;
-      F6tnl2_Z[5] = F6tnl2_Z[4] + cF6tnl2.getLength("L5") / Unit::mm;
-      F6tnl2_Z[6] = F6tnl2_Z[5] + cF6tnl2.getLength("L6") / Unit::mm;
-      F6tnl2_Z[7] = F6tnl2_Z[6] + cF6tnl2.getLength("L7") / Unit::mm;
-      //
-      double F6tnl2_rI[F6tnl2_num];
-      for (int i = 0; i < F6tnl2_num; i++)
-        { F6tnl2_rI[i] = 0.0; }
-      //
-      double F6tnl2_rO[F6tnl2_num];
-      F6tnl2_rO[0] = cF6tnl2.getLength("R1") / Unit::mm;
-      F6tnl2_rO[1] = F6tnl2_rO[0];
-      F6tnl2_rO[2] = cF6tnl2.getLength("R2") / Unit::mm;
-      F6tnl2_rO[3] = cF6tnl2.getLength("R3") / Unit::mm;
-      F6tnl2_rO[4] = F6tnl2_rO[3];
-      F6tnl2_rO[5] = cF6tnl2.getLength("R4") / Unit::mm;
-      F6tnl2_rO[6] = cF6tnl2.getLength("R5") / Unit::mm;
-      F6tnl2_rO[7] = F6tnl2_rO[6];
-      //define geometry
-      G4Polycone* geo_F6tnl2 = new G4Polycone("geo_F6tnl2_name", 0, 2*M_PI, F6tnl2_num, F6tnl2_Z, F6tnl2_rI, F6tnl2_rO);
-
-      //-
-      //--------------
-
-      //--------------
-      //- F6tnl3
+      //-   F6tnl3
 
       //get parameters from .xml file
       GearDir cF6tnl3(content, "F6tnl3/");
       //
       const int F6tnl3_num = 2;
       //
-      double F6tnl3_Z[F6tnl3_num];
-      F6tnl3_Z[0] = cF6tnl3.getLength("D1") / Unit::mm;
-      F6tnl3_Z[1] = F6tnl3_Z[0] + cF6tnl3.getLength("L1") / Unit::mm;
-      //
-      double F6tnl3_rI[F6tnl3_num];
-      for (int i = 0; i < F6tnl3_num; i++)
-        { F6tnl3_rI[i] = 0.0; }
-      //
       double F6tnl3_rO[F6tnl3_num];
       F6tnl3_rO[0] = cF6tnl3.getLength("R1") / Unit::mm;
       F6tnl3_rO[1] = F6tnl3_rO[0];
+
       //define geometry
-      G4Polycone* geo_F6tnl3 = new G4Polycone("geo_F6tnl3_name", 0, 2*M_PI, F6tnl3_num, F6tnl3_Z, F6tnl3_rI, F6tnl3_rO);
+      G4Polycone* geo_F6tnl3 = new G4Polycone("geo_F6tnl3_name", 0, 2*M_PI, F6tnl3_num, F6spc8_Z, F6spc8_rI, F6tnl3_rO);
 
       //-
       //--------------
 
       //--------------
-      //- F6tnl4
+      //-   F6spc4
 
       //get parameters from .xml file
-      GearDir cF6tnl4(content, "F6tnl4/");
+      GearDir cF6spc4(content, "F6spc4/");
       //
-      const int F6tnl4_num = 2;
+      const int F6spc4_num = 7;
       //
-      double F6tnl4_Z[F6tnl4_num];
-      F6tnl4_Z[0] = cF6tnl4.getLength("D1") / Unit::mm;
-      F6tnl4_Z[1] = F6tnl4_Z[0] + cF6tnl4.getLength("L1") / Unit::mm;
+      double F6spc4_Z[F6spc4_num];
+      F6spc4_Z[0] = F5wal4_Z[0] + cF6spc4.getLength("D1") / Unit::mm;
+      F6spc4_Z[1] = F6spc4_Z[0] + cF6spc4.getLength("L1") / Unit::mm;
+      F6spc4_Z[2] = F6spc4_Z[1];
+      F6spc4_Z[3] = F6spc4_Z[2] + cF6spc4.getLength("L2") / Unit::mm;
+      F6spc4_Z[4] = F6spc4_Z[3] + cF6spc4.getLength("L3") / Unit::mm;
+      F6spc4_Z[5] = F6spc4_Z[4] + cF6spc4.getLength("L4") / Unit::mm;
+      F6spc4_Z[6] = F6spc4_Z[5] + cF6spc4.getLength("L5") / Unit::mm;
       //
-      double F6tnl4_rI[F6tnl4_num];
-      for (int i = 0; i < F6tnl4_num; i++)
-        { F6tnl4_rI[i] = 0.0; }
+      double F6spc4_rI[F6spc4_num];
+      for (int i = 0; i < F6spc4_num; i++)
+        { F6spc4_rI[i] = 0.0; }
       //
-      double F6tnl4_rO[F6tnl4_num];
-      F6tnl4_rO[0] = cF6tnl4.getLength("R1") / Unit::mm;
-      F6tnl4_rO[1] = F6tnl4_rO[0];
-      //define geometry
-      G4Polycone* geo_F6tnl4 = new G4Polycone("geo_F6tnl4_name", 0, 2*M_PI, F6tnl4_num, F6tnl4_Z, F6tnl4_rI, F6tnl4_rO);
-
-      //-
-      //--------------
-
-
-      //--------------
-      //-   F6spc3
-
-      //get parameters from .xml file
-      GearDir cF6spc3(content, "F6spc3/");
+      double F6spc4_rO[F6spc4_num];
+      F6spc4_rO[0] = cF6spc4.getLength("R1") / Unit::mm;
+      F6spc4_rO[1] = F6spc4_rO[0];
+      F6spc4_rO[2] = cF6spc4.getLength("R2") / Unit::mm;
+      F6spc4_rO[3] = F6spc4_rO[2];
+      F6spc4_rO[4] = cF6spc4.getLength("R3") / Unit::mm;
+      F6spc4_rO[5] = F6spc4_rO[4];
+      F6spc4_rO[6] = cF6spc4.getLength("R4") / Unit::mm;
       //
-      const int F6spc3_num = 7;
-      //
-      double F6spc3_Z[F6spc3_num];
-      F6spc3_Z[0] = F5wal3_Z[0] + cF6spc3.getLength("D1") / Unit::mm;
-      F6spc3_Z[1] = F6spc3_Z[0] + cF6spc3.getLength("L1") / Unit::mm;
-      F6spc3_Z[2] = F6spc3_Z[1] + cF6spc3.getLength("L2") / Unit::mm;
-      F6spc3_Z[3] = F6spc3_Z[2];
-      F6spc3_Z[4] = F6spc3_Z[3] + cF6spc3.getLength("L3") / Unit::mm;
-      F6spc3_Z[5] = F6spc3_Z[4] + cF6spc3.getLength("L4") / Unit::mm;
-      F6spc3_Z[6] = F6spc3_Z[5] + cF6spc3.getLength("L5") / Unit::mm;
-      //
-      double F6spc3_rI[F6spc3_num];
-      for (int i = 0; i < F6spc3_num; i++)
-        { F6spc3_rI[i] = 0.0; }
-      //
-      double F6spc3_rO[F6spc3_num];
-      F6spc3_rO[0] = cF6spc3.getLength("R1") / Unit::mm;
-      F6spc3_rO[1] = cF6spc3.getLength("R2") / Unit::mm;
-      F6spc3_rO[2] = F6spc3_rO[1];
-      F6spc3_rO[3] = cF6spc3.getLength("R3") / Unit::mm;
-      F6spc3_rO[4] = F6spc3_rO[3];
-      F6spc3_rO[5] = cF6spc3.getLength("R4") / Unit::mm;
-      F6spc3_rO[6] = F6spc3_rO[5];
-      //
-      string strMat_F6spc3 = cF6spc3.getString("Material");
-      G4Material* mat_F6spc3 = Materials::get(strMat_F6spc3);
+      string strMat_F6spc4 = cF6spc4.getString("Material");
+      G4Material* mat_F6spc4 = Materials::get(strMat_F6spc4);
 
       //define geometry
-      G4Polycone* geo_F6spc3xx = new G4Polycone("geo_F6spc3xx_name", 0, 2*M_PI, F6spc3_num, F6spc3_Z, F6spc3_rI, F6spc3_rO);
-      G4SubtractionSolid* geo_F6spc3x = new G4SubtractionSolid("geo_F6spc3x_name", geo_F6spc3xx, geo_F6tnl1, transform_D1wal1);
-      G4SubtractionSolid* geo_F6spc3 = new G4SubtractionSolid("geo_F6spc3_name", geo_F6spc3x, geo_F6tnl2, transform_E1wal1);
+      G4Polycone* geo_F6spc4x2 = new G4Polycone("geo_F6spc4x2_name", 0, 2*M_PI, F6spc4_num, F6spc4_Z, F6spc4_rI, F6spc4_rO);
+      G4SubtractionSolid* geo_F6spc4xx = new G4SubtractionSolid("geo_F6spc4x2_name", geo_F6spc4x2, geo_F6tnl1, transform_D1wal1);
+      G4SubtractionSolid* geo_F6spc4 = new G4SubtractionSolid("geo_F6spc4_name", geo_F6spc4xx, geo_F6tnl2, transform_E1wal1);
+      //G4IntersectionSolid* geo_F6spc4 = new G4IntersectionSolid("geo_F6spc4_name", geo_F5wal4, geo_F6spc4x);
 
-      G4LogicalVolume *logi_F6spc3 = new G4LogicalVolume(geo_F6spc3, mat_F6spc3, "logi_F6spc3_name");
+      G4LogicalVolume *logi_F6spc4 = new G4LogicalVolume(geo_F6spc4, mat_F6spc4, "logi_F6spc4_name");
+
+      //for (int i=0; i<F6spc4_num; i++) printf("%f %f %f\n", F6spc4_Z[i], F6spc4_rI[i], F6spc4_rO[i]);
 
       //put volume
-      setColor(*logi_F6spc3, cF6spc3.getString("Color", "#CCCCCC"));
-      //setVisibility(*logi_F6spc3, false);
-      new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_F6spc3, "phys_F6spc3_name", logi_F5wal3, false, 0);
+      setColor(*logi_F6spc4, cF6spc4.getString("Color", "#CCCCCC"));
+      //you must not make it visibile, otherwise terminated with SegV.
+      setVisibility(*logi_F6spc4, false);
+      new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_F6spc4, "phys_F6spc4_name", logi_F5wal4, false, 0);
 
       //-
       //--------------
 
       //--------------
-      //-   F6spc6
+      //-   F6spc7
 
       //get parameters from .xml file
-      GearDir cF6spc6(content, "F6spc6/");
+      GearDir cF6spc7(content, "F6spc7/");
       //
-      const int F6spc6_num = 3;
+      const int F6spc7_num = 2;
       //
-      double F6spc6_Z[F6spc6_num];
-      F6spc6_Z[0] = F5wal5_Z[0] + cF6spc6.getLength("D1") / Unit::mm;
-      F6spc6_Z[1] = F6spc6_Z[0] + cF6spc6.getLength("L1") / Unit::mm;
-      F6spc6_Z[2] = F6spc6_Z[1] + cF6spc6.getLength("L2") / Unit::mm;
+      double F6spc7_Z[F6spc7_num];
+      F6spc7_Z[0] = F5wal5_Z[0] + cF6spc7.getLength("D1") / Unit::mm;
+      F6spc7_Z[1] = F6spc7_Z[0] + cF6spc7.getLength("L1") / Unit::mm;
       //
-      double F6spc6_rI[F6spc6_num];
-      for (int i = 0; i < F6spc6_num; i++)
-        { F6spc6_rI[i] = 0.0; }
+      double F6spc7_rI[F6spc7_num];
+      for (int i = 0; i < F6spc7_num; i++)
+        { F6spc7_rI[i] = 0.0; }
       //
-      double F6spc6_rO[F6spc6_num];
-      F6spc6_rO[0] = cF6spc6.getLength("R1") / Unit::mm;
-      F6spc6_rO[1] = F6spc6_rO[0];
-      F6spc6_rO[2] = cF6spc6.getLength("R2") / Unit::mm;
+      double F6spc7_rO[F6spc7_num];
+      F6spc7_rO[0] = cF6spc7.getLength("R1") / Unit::mm;
+      F6spc7_rO[1] = F6spc7_rO[0];
       //
-      string strMat_F6spc6 = cF6spc6.getString("Material");
-      G4Material* mat_F6spc6 = Materials::get(strMat_F6spc6);
+      string strMat_F6spc7 = cF6spc7.getString("Material");
+      G4Material* mat_F6spc7 = Materials::get(strMat_F6spc7);
 
       //define geometry
-      G4Polycone* geo_F6spc6xx = new G4Polycone("geo_F6spc6xx_name", 0, 2*M_PI, F6spc6_num, F6spc6_Z, F6spc6_rI, F6spc6_rO);
-      G4SubtractionSolid* geo_F6spc6x = new G4SubtractionSolid("geo_F6spc6x_name", geo_F6spc6xx, geo_F6tnl3, transform_D1wal1);
-      G4SubtractionSolid* geo_F6spc6 = new G4SubtractionSolid("geo_F6spc6_nam", geo_F6spc6x, geo_F6tnl4, transform_E1wal1);
+      G4Polycone* geo_F6spc7xx = new G4Polycone("geo_F6spc7xx_name", 0, 2*M_PI, F6spc7_num, F6spc7_Z, F6spc7_rI, F6spc7_rO);
+      G4IntersectionSolid* geo_F6spc7x = new G4IntersectionSolid("geo_F6spc7_name", geo_F5wal5, geo_F6spc7xx, transform_D1wal1);
+      G4SubtractionSolid* geo_F6spc7 = new G4SubtractionSolid("geo_F6spc7x_name", geo_F6spc7x, geo_F6tnl3, transform_D1wal1);
 
-      G4LogicalVolume *logi_F6spc6 = new G4LogicalVolume(geo_F6spc6, mat_F6spc6, "logi_F6spc6_name");
+      G4LogicalVolume *logi_F6spc7 = new G4LogicalVolume(geo_F6spc7, mat_F6spc7, "logi_F6spc7_name");
 
       //put volume
-      setColor(*logi_F6spc6, cF6spc6.getString("Color", "#CCCCCC"));
-      //setVisibility(*logi_F6spc6, false);
-      new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_F6spc6, "phys_F6spc6_name", logi_F5wal5, false, 0);
+      setColor(*logi_F6spc7, cF6spc7.getString("Color", "#CCCCCC"));
+      //you must not make it visibile, otherwise terminated with SegV.
+      setVisibility(*logi_F6spc7, false);
+      new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_F6spc7, "phys_F6spc7_name", logi_F5wal5, false, 0);
 
       //-
       //--------------
-
 
       //--------------
       //-   F7mag1
@@ -2310,14 +2249,14 @@ namespace Belle2 {
 
       //define geometry
       G4Polycone* geo_F7mag1x = new G4Polycone("geo_F7mag1x_name", 0, 2*M_PI, F7mag1_num, F7mag1_Z, F7mag1_rI, F7mag1_rO);
-      G4IntersectionSolid* geo_F7mag1 = new G4IntersectionSolid("geo_F7mag1_name", geo_F6spc3, geo_F7mag1x, transform_D1wal1);
+      G4IntersectionSolid* geo_F7mag1 = new G4IntersectionSolid("geo_F7mag1_name", geo_F6spc4, geo_F7mag1x, transform_D1wal1);
 
       G4LogicalVolume *logi_F7mag1 = new G4LogicalVolume(geo_F7mag1, mat_F7mag1, "logi_F7mag1_name");
 
       //put volume
       setColor(*logi_F7mag1, cF7mag1.getString("Color", "#CCCC00"));
       //setVisibility(*logi_F7mag1, false);
-      new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_F7mag1, "phys_F7mag1_name", logi_F6spc3, false, 0);
+      new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_F7mag1, "phys_F7mag1_name", logi_F6spc4, false, 0);
 
       //-
       //--------------
@@ -2331,7 +2270,7 @@ namespace Belle2 {
       const int F7mag2_num = 2;
       //
       double F7mag2_Z[F7mag2_num];
-      F7mag2_Z[0] = F6spc4_Z[2];
+      F7mag2_Z[0] = cF7mag2.getLength("D1") / Unit::mm;
       F7mag2_Z[1] = F7mag2_Z[0] + cF7mag2.getLength("L1") / Unit::mm;
       //
       double F7mag2_rI[F7mag2_num];
@@ -2347,14 +2286,14 @@ namespace Belle2 {
 
       //define geometry
       G4Polycone* geo_F7mag2x = new G4Polycone("geo_F7mag2x_name", 0, 2*M_PI, F7mag2_num, F7mag2_Z, F7mag2_rI, F7mag2_rO);
-      G4IntersectionSolid* geo_F7mag2 = new G4IntersectionSolid("geo_F7mag2_name", geo_F6spc3, geo_F7mag2x, transform_D1wal1);
+      G4IntersectionSolid* geo_F7mag2 = new G4IntersectionSolid("geo_F7mag2_name", geo_F6spc4, geo_F7mag2x, transform_D1wal1);
 
       G4LogicalVolume *logi_F7mag2 = new G4LogicalVolume(geo_F7mag2, mat_F7mag2, "logi_F7mag2_name");
 
       //put volume
       setColor(*logi_F7mag2, cF7mag2.getString("Color", "#CCCC00"));
       //setVisibility(*logi_F7mag2, false);
-      new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_F7mag2, "phys_F7mag2_name", logi_F6spc3, false, 0);
+      new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_F7mag2, "phys_F7mag2_name", logi_F6spc4, false, 0);
 
       //-
       //--------------
@@ -2368,7 +2307,7 @@ namespace Belle2 {
       const int F7mag3_num = 2;
       //
       double F7mag3_Z[F7mag3_num];
-      F7mag3_Z[0] = F6spc4_Z[4];
+      F7mag3_Z[0] = cF7mag3.getLength("D1") / Unit::mm;
       F7mag3_Z[1] = F7mag3_Z[0] + cF7mag3.getLength("L1") / Unit::mm;
       //
       double F7mag3_rI[F7mag3_num];
@@ -2383,15 +2322,16 @@ namespace Belle2 {
       G4Material* mat_F7mag3 = Materials::get(strMat_F7mag3);
 
       //define geometry
-      G4Polycone* geo_F7mag3x = new G4Polycone("geo_F7mag3_name", 0, 2*M_PI, F7mag3_num, F7mag3_Z, F7mag3_rI, F7mag3_rO);
-      G4IntersectionSolid* geo_F7mag3 = new G4IntersectionSolid("geo_F7mag3_name", geo_F6spc3, geo_F7mag3x, transform_D1wal1);
+      G4Polycone* geo_F7mag3xx = new G4Polycone("geo_F7mag3xx_name", 0, 2*M_PI, F7mag3_num, F7mag3_Z, F7mag3_rI, F7mag3_rO);
+      G4IntersectionSolid* geo_F7mag3x = new G4IntersectionSolid("geo_F7mag3x_name", geo_F6spc4, geo_F7mag3xx, transform_E1wal1);
+      G4SubtractionSolid* geo_F7mag3 = new G4SubtractionSolid("geo_F7mag3_name", geo_F7mag3x, geo_F7mag1x, transform_D1wal1);
 
       G4LogicalVolume *logi_F7mag3 = new G4LogicalVolume(geo_F7mag3, mat_F7mag3, "logi_F7mag3_name");
 
       //put volume
       setColor(*logi_F7mag3, cF7mag3.getString("Color", "#CCCC00"));
       //setVisibility(*logi_F7mag3, false);
-      new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_F7mag3, "phys_F7mag3_name", logi_F6spc3, false, 0);
+      new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_F7mag3, "phys_F7mag3_name", logi_F6spc4, false, 0);
 
       //-
       //--------------
@@ -2421,14 +2361,14 @@ namespace Belle2 {
 
       //define geometry
       G4Polycone* geo_F7mag4x = new G4Polycone("geo_F7mag4x_name", 0, 2*M_PI, F7mag4_num, F7mag4_Z, F7mag4_rI, F7mag4_rO);
-      G4IntersectionSolid* geo_F7mag4 = new G4IntersectionSolid("geo_F7mag4_name", geo_F6spc3, geo_F7mag4x, transform_E1wal1);
+      G4IntersectionSolid* geo_F7mag4 = new G4IntersectionSolid("geo_F7mag4_name", geo_F6spc4, geo_F7mag4x, transform_E1wal1);
 
       G4LogicalVolume *logi_F7mag4 = new G4LogicalVolume(geo_F7mag4, mat_F7mag4, "logi_F7mag4_name");
 
       //put volume
       setColor(*logi_F7mag4, cF7mag4.getString("Color", "#CCCC00"));
       //setVisibility(*logi_F7mag4, false);
-      new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_F7mag4, "phys_F7mag4_name", logi_F6spc3, false, 0);
+      new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_F7mag4, "phys_F7mag4_name", logi_F6spc4, false, 0);
 
       //-
       //--------------
@@ -2442,7 +2382,7 @@ namespace Belle2 {
       const int F7mag5_num = 2;
       //
       double F7mag5_Z[F7mag5_num];
-      F7mag5_Z[0] = F6spc5_Z[3];
+      F7mag5_Z[0] = cF7mag5.getLength("D1") / Unit::mm;
       F7mag5_Z[1] = F7mag5_Z[0] + cF7mag5.getLength("L1") / Unit::mm;
       //
       double F7mag5_rI[F7mag5_num];
@@ -2458,14 +2398,14 @@ namespace Belle2 {
 
       //define geometry
       G4Polycone* geo_F7mag5x = new G4Polycone("geo_F7mag5x_name", 0, 2*M_PI, F7mag5_num, F7mag5_Z, F7mag5_rI, F7mag5_rO);
-      G4IntersectionSolid* geo_F7mag5 = new G4IntersectionSolid("geo_F7mag5_name", geo_F6spc3, geo_F7mag5x, transform_E1wal1);
+      G4IntersectionSolid* geo_F7mag5 = new G4IntersectionSolid("geo_F7mag5_name", geo_F6spc4, geo_F7mag5x, transform_E1wal1);
 
       G4LogicalVolume *logi_F7mag5 = new G4LogicalVolume(geo_F7mag5, mat_F7mag5, "logi_F7mag5_name");
 
       //put volume
       setColor(*logi_F7mag5, cF7mag5.getString("Color", "#CCCC00"));
       //setVisibility(*logi_F7mag5, false);
-      new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_F7mag5, "phys_F7mag5_name", logi_F6spc3, false, 0);
+      new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_F7mag5, "phys_F7mag5_name", logi_F6spc4, false, 0);
 
       //-
       //--------------
@@ -2479,7 +2419,7 @@ namespace Belle2 {
       const int F7mag6_num = 2;
       //
       double F7mag6_Z[F7mag6_num];
-      F7mag6_Z[0] = F6spc5_Z[6];
+      F7mag6_Z[0] = cF7mag6.getLength("D1") / Unit::mm;
       F7mag6_Z[1] = F7mag6_Z[0] + cF7mag6.getLength("L1") / Unit::mm;
       //
       double F7mag6_rI[F7mag6_num];
@@ -2494,15 +2434,16 @@ namespace Belle2 {
       G4Material* mat_F7mag6 = Materials::get(strMat_F7mag6);
 
       //define geometry
-      G4Polycone* geo_F7mag6x = new G4Polycone("geo_F7mag6x_name", 0, 2*M_PI, F7mag6_num, F7mag6_Z, F7mag6_rI, F7mag6_rO);
-      G4IntersectionSolid* geo_F7mag6 = new G4IntersectionSolid("geo_F7mag6_name", geo_F6spc3, geo_F7mag6x, transform_E1wal1);
+      G4Polycone* geo_F7mag6xx = new G4Polycone("geo_F7mag6x_name", 0, 2*M_PI, F7mag6_num, F7mag6_Z, F7mag6_rI, F7mag6_rO);
+      G4IntersectionSolid* geo_F7mag6x = new G4IntersectionSolid("geo_F7mag6x_name", geo_F6spc4, geo_F7mag6xx);
+      G4SubtractionSolid* geo_F7mag6 = new G4SubtractionSolid("geo_F7mag6_name", geo_F7mag6x, geo_F7mag5x, transform_E1wal1);
 
       G4LogicalVolume *logi_F7mag6 = new G4LogicalVolume(geo_F7mag6, mat_F7mag6, "logi_F7mag6_name");
 
       //put volume
       setColor(*logi_F7mag6, cF7mag6.getString("Color", "#CCCC00"));
       //setVisibility(*logi_F7mag6, false);
-      new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_F7mag6, "phys_F7mag6_name", logi_F6spc3, false, 0);
+      new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_F7mag6, "phys_F7mag6_name", logi_F6spc4, false, 0);
 
       //-
       //--------------
@@ -2531,99 +2472,16 @@ namespace Belle2 {
       G4Material* mat_F7mag7 = Materials::get(strMat_F7mag7);
 
       //define geometry
-      G4Polycone* geo_F7mag7x = new G4Polycone("geo_F7mag7x_name", 0, 2*M_PI, F7mag7_num, F7mag7_Z, F7mag7_rI, F7mag7_rO);
-      G4IntersectionSolid* geo_F7mag7 = new G4IntersectionSolid("geo_F7mag7_name", geo_F6spc6, geo_F7mag7x, transform_D1wal1);
+      G4Polycone* geo_F7mag7xx = new G4Polycone("geo_F7mag7xx_name", 0, 2*M_PI, F7mag7_num, F7mag7_Z, F7mag7_rI, F7mag7_rO);
+      G4IntersectionSolid* geo_F7mag7 = new G4IntersectionSolid("geo_F7mag7_name", geo_F6spc7, geo_F7mag7xx, transform_D1wal1);
 
       G4LogicalVolume *logi_F7mag7 = new G4LogicalVolume(geo_F7mag7, mat_F7mag7, "logi_F7mag7_name");
 
       //put volume
       setColor(*logi_F7mag7, cF7mag7.getString("Color", "#CCCC00"));
-      //setVisibility(*logi_F7mag7, false);
-      new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_F7mag7, "phys_F7mag7_name", logi_F6spc6, false, 0);
-
-      //-
-      //--------------
-
-      //--------------
-      //-   F7hld1
-
-      //get parameters from .xml file
-      GearDir cF7hld1(content, "F7hld1/");
-      //
-      double F7hld1_T[16];
-      for (int tmpn = 0; tmpn < 16; tmpn++) {
-        F7hld1_T[tmpn] = cF7hld1.getLength((boost::format("T%1%") % (tmpn + 1)).str().c_str()) / Unit::mm;
-      }
-      double F7hld1_D[15];
-      for (int tmpn = 0; tmpn < 15; tmpn++) {
-        F7hld1_D[tmpn] = cF7hld1.getLength((boost::format("D%1%") % (tmpn + 1)).str().c_str()) / Unit::mm;
-      }
-      double F7hld1_I[15];
-      for (int tmpn = 0; tmpn < 15; tmpn++) {
-        F7hld1_I[tmpn] = cF7hld1.getLength((boost::format("I%1%") % (tmpn + 1)).str().c_str()) / Unit::mm;
-      }
-      double F7hld1_R[15];
-      for (int tmpn = 0; tmpn < 15; tmpn++) {
-        F7hld1_R[tmpn] = cF7hld1.getLength((boost::format("R%1%") % (tmpn + 1)).str().c_str()) / Unit::mm;
-      }
-      double F7hld1_O[16];
-      for (int tmpn = 0; tmpn < 16; tmpn++) {
-        F7hld1_O[tmpn] = cF7hld1.getLength((boost::format("O%1%") % (tmpn + 1)).str().c_str()) / Unit::mm;
-      }
-
-      const int F7hld1_num = 62;
-      //
-      double F7hld1_Z[F7hld1_num];
-      F7hld1_Z[0] = F6spc3_Z[0];
-      F7hld1_Z[1] = F7hld1_Z[0] + F7hld1_T[0];
-      for (int tmpn = 0; tmpn <= 14; tmpn++) {
-        F7hld1_Z[4*tmpn + 2] = F7hld1_Z[4*tmpn + 1];
-        F7hld1_Z[4*tmpn + 3] = F7hld1_Z[4*tmpn + 2] + F7hld1_D[tmpn];
-        F7hld1_Z[4*tmpn + 4] = F7hld1_Z[4*tmpn + 3];
-        F7hld1_Z[4*tmpn + 5] = F7hld1_Z[4*tmpn + 4] + F7hld1_T[tmpn+1];
-      }
-      //
-      double F7hld1_rI[F7hld1_num];
-      F7hld1_rI[0] = F7hld1_I[0];
-      F7hld1_rI[1] = F7hld1_I[0];
-      for (int tmpn = 0; tmpn <= 14; tmpn++) {
-        F7hld1_rI[4*tmpn + 2] = F7hld1_I[tmpn];
-        F7hld1_rI[4*tmpn + 3] = F7hld1_I[tmpn];
-        F7hld1_rI[4*tmpn + 4] = F7hld1_I[tmpn];
-        F7hld1_rI[4*tmpn + 5] = F7hld1_I[tmpn];
-      }
-      //
-      double F7hld1_rO[F7hld1_num];
-      F7hld1_rO[0] = F7hld1_O[0];
-      F7hld1_rO[1] = F7hld1_O[0];
-      for (int tmpn = 0; tmpn <= 14; tmpn++) {
-        F7hld1_rO[4*tmpn + 2] = F7hld1_R[tmpn];
-        F7hld1_rO[4*tmpn + 3] = F7hld1_R[tmpn];
-        F7hld1_rO[4*tmpn + 4] = F7hld1_O[tmpn + 1];
-        F7hld1_rO[4*tmpn + 5] = F7hld1_O[tmpn + 1];
-      }
-      //
-      string strMat_F7hld1 = cF7hld1.getString("Material");
-      G4Material* mat_F7hld1 = Materials::get(strMat_F7hld1);
-
-      //define geometry
-      G4Polycone* geo_F7hld1x7 = new G4Polycone("geo_F7hld1x7_name", 0, 2*M_PI, F7hld1_num, F7hld1_Z, F7hld1_rI, F7hld1_rO);
-      //G4SubtractionSolid* geo_F7hld1x6 = new G4SubtractionSolid("geo_F7hld1x6_name", geo_F7hld1x7, geo_F7mag6, transform_E1wal1);
-      //G4SubtractionSolid* geo_F7hld1x5 = new G4SubtractionSolid("geo_F7hld1x5_name", geo_F7hld1x6, geo_F7mag5, transform_E1wal1);
-      //G4SubtractionSolid* geo_F7hld1x4 = new G4SubtractionSolid("geo_F7hld1x4_name", geo_F7hld1x5, geo_F7mag4, transform_E1wal1);
-      //G4SubtractionSolid* geo_F7hld1x3 = new G4SubtractionSolid("geo_F7hld1x3_name", geo_F7hld1x4, geo_F7mag3, transform_D1wal1);
-      //G4SubtractionSolid* geo_F7hld1x2 = new G4SubtractionSolid("geo_F7hld1x2_name", geo_F7hld1x3, geo_F7mag2, transform_D1wal1);
-      //G4SubtractionSolid* geo_F7hld1x1 = new G4SubtractionSolid("geo_F7hld1x1_name", geo_F7hld1x2, geo_F7mag1, transform_D1wal1);
-      G4IntersectionSolid* geo_F7hld1 = new G4IntersectionSolid("geo_F7hld1_name", geo_F7hld1x7, geo_F6spc3);
-
-      G4LogicalVolume *logi_F7hld1 = new G4LogicalVolume(geo_F7hld1, mat_F7hld1, "logi_F7hld1_name");
-
-      //put volume
-      setColor(*logi_F7hld1, cF7hld1.getString("Color", "#CC0000"));
-      //setVisibility(*logi_F7hld1, false);
-
-      //Now F7hld1 goes under F7cil1. F7hld1 will be placed after F7cil1.
-      //new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_F7hld1, "phys_F7hld1_name", logi_F6spc3, false, 0);
+      //you must not make it visibile, otherwise terminated with SegV.
+      setVisibility(*logi_F7mag7, false);
+      new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_F7mag7, "phys_F7mag7_name", logi_F6spc7, false, 0);
 
       //-
       //--------------
@@ -2634,49 +2492,119 @@ namespace Belle2 {
       //get parameters from .xml file
       GearDir cF7cil1(content, "F7cil1/");
       //
-      double F7cil1_L[15];
-      for (int tmpn = 0; tmpn < 15; tmpn++) {
-        F7cil1_L[tmpn] = cF7cil1.getLength((boost::format("L%1%") % (tmpn + 1)).str().c_str()) / Unit::mm;
+      double F7cil1_T[7];
+      for (int tmpn = 0; tmpn < 7; tmpn++) {
+        F7cil1_T[tmpn] = cF7cil1.getLength((boost::format("T%1%") % (tmpn + 1)).str().c_str()) / Unit::mm;
+      }
+      double F7cil1_D[6];
+      for (int tmpn = 0; tmpn < 6; tmpn++) {
+        F7cil1_D[tmpn] = cF7cil1.getLength((boost::format("D%1%") % (tmpn + 1)).str().c_str()) / Unit::mm;
+      }
+      double F7cil1_I[6];
+      for (int tmpn = 0; tmpn < 6; tmpn++) {
+        F7cil1_I[tmpn] = cF7cil1.getLength((boost::format("I%1%") % (tmpn + 1)).str().c_str()) / Unit::mm;
+      }
+      double F7cil1_R[6];
+      for (int tmpn = 0; tmpn < 6; tmpn++) {
+        F7cil1_R[tmpn] = cF7cil1.getLength((boost::format("R%1%") % (tmpn + 1)).str().c_str()) / Unit::mm;
+      }
+      double F7cil1_O[7];
+      for (int tmpn = 0; tmpn < 7; tmpn++) {
+        F7cil1_O[tmpn] = cF7cil1.getLength((boost::format("O%1%") % (tmpn + 1)).str().c_str()) / Unit::mm;
       }
 
-      double F7cil1_rO[F7hld1_num];
-      F7cil1_rO[0] = F7hld1_O[0];
-      F7cil1_rO[1] = F7hld1_O[0];
-      for (int tmpn = 0; tmpn <= 14; tmpn++) {
-        F7cil1_rO[4*tmpn + 2] = F7hld1_R[tmpn] + F7cil1_L[tmpn];
-        F7cil1_rO[4*tmpn + 3] = F7hld1_R[tmpn] + F7cil1_L[tmpn];
-        F7cil1_rO[4*tmpn + 4] = F7hld1_O[tmpn + 1];
-        F7cil1_rO[4*tmpn + 5] = F7hld1_O[tmpn + 1];
+      const int F7cil1_num = 26;
+      //
+      double F7cil1_Z[F7cil1_num];
+      F7cil1_Z[0] = F6spc4_Z[0] - 0.1; //mm, to avoid touching surface with F6spc4;
+      F7cil1_Z[1] = F7cil1_Z[0] + F7cil1_T[0];
+      for (int tmpn = 0; tmpn <= 5; tmpn++) {
+        F7cil1_Z[4*tmpn + 2] = F7cil1_Z[4*tmpn + 1];
+        F7cil1_Z[4*tmpn + 3] = F7cil1_Z[4*tmpn + 2] + F7cil1_D[tmpn];
+        F7cil1_Z[4*tmpn + 4] = F7cil1_Z[4*tmpn + 3];
+        F7cil1_Z[4*tmpn + 5] = F7cil1_Z[4*tmpn + 4] + F7cil1_T[tmpn+1];
+      }
+      //
+      double F7cil1_rI[F7cil1_num];
+      F7cil1_rI[0] = F7cil1_I[0];
+      F7cil1_rI[1] = F7cil1_I[0];
+      for (int tmpn = 0; tmpn <= 5; tmpn++) {
+        F7cil1_rI[4*tmpn + 2] = F7cil1_I[tmpn];
+        F7cil1_rI[4*tmpn + 3] = F7cil1_I[tmpn];
+        F7cil1_rI[4*tmpn + 4] = F7cil1_I[tmpn];
+        F7cil1_rI[4*tmpn + 5] = F7cil1_I[tmpn];
+      }
+      //
+      double F7cil1_rO[F7cil1_num];
+      F7cil1_rO[0] = F7cil1_O[0];
+      F7cil1_rO[1] = F7cil1_O[0];
+      for (int tmpn = 0; tmpn <= 5; tmpn++) {
+        F7cil1_rO[4*tmpn + 2] = F7cil1_R[tmpn];
+        F7cil1_rO[4*tmpn + 3] = F7cil1_R[tmpn];
+        F7cil1_rO[4*tmpn + 4] = F7cil1_O[tmpn + 1];
+        F7cil1_rO[4*tmpn + 5] = F7cil1_O[tmpn + 1];
       }
       //
       string strMat_F7cil1 = cF7cil1.getString("Material");
       G4Material* mat_F7cil1 = Materials::get(strMat_F7cil1);
 
       //define geometry
-      G4Polycone* geo_F7cil1x7 = new G4Polycone("geo_F7cil1x7_name", 0, 2*M_PI, F7hld1_num, F7hld1_Z, F7hld1_rI, F7cil1_rO);
-      //G4SubtractionSolid* geo_F7cil1x6 = new G4SubtractionSolid("geo_F7cil1x6_name", geo_F7cil1x7, geo_F7mag6, transform_E1wal1);
-      //G4SubtractionSolid* geo_F7cil1x5 = new G4SubtractionSolid("geo_F7cil1x5_name", geo_F7cil1x6, geo_F7mag5, transform_E1wal1);
-      //G4SubtractionSolid* geo_F7cil1x4 = new G4SubtractionSolid("geo_F7cil1x4_name", geo_F7cil1x5, geo_F7mag4, transform_E1wal1);
-      //G4SubtractionSolid* geo_F7cil1x3 = new G4SubtractionSolid("geo_F7cil1x3_name", geo_F7cil1x4, geo_F7mag3, transform_D1wal1);
-      //G4SubtractionSolid* geo_F7cil1x2 = new G4SubtractionSolid("geo_F7cil1x2_name", geo_F7cil1x3, geo_F7mag2, transform_D1wal1);
-      //G4SubtractionSolid* geo_F7cil1x1 = new G4SubtractionSolid("geo_F7cil1x1_name", geo_F7cil1x2, geo_F7mag1, transform_D1wal1);
-      //G4SubtractionSolid* geo_F7cil1x = new G4SubtractionSolid("geo_F7cil1x_name", geo_F7cil1x7, geo_F7hld1);
-      G4IntersectionSolid* geo_F7cil1 = new G4IntersectionSolid("geo_F7cil1_name", geo_F7cil1x7, geo_F6spc3);
+      G4Polycone* geo_F7cil1x2 = new G4Polycone("geo_F7cil1x2_name", 0, 2*M_PI, F7cil1_num, F7cil1_Z, F7cil1_rI, F7cil1_rO);
+      //G4IntersectionSolid* geo_F7cil1xx = new G4IntersectionSolid("geo_F7cil1xx_name", geo_F6spc4, geo_F7cil1x2);
+      G4SubtractionSolid* geo_F7cil1x = new G4SubtractionSolid("geo_F7cil1x_name", geo_F7cil1x2, geo_F6tnl1, transform_D1wal1);
+      G4SubtractionSolid* geo_F7cil1 = new G4SubtractionSolid("geo_F7cil1_name", geo_F7cil1x, geo_F6tnl2, transform_E1wal1);
 
       G4LogicalVolume *logi_F7cil1 = new G4LogicalVolume(geo_F7cil1, mat_F7cil1, "logi_F7cil1_name");
 
       //put volume
-      setColor(*logi_F7cil1, cF7cil1.getString("Color", "#CCCC00"));
+      setColor(*logi_F7cil1, cF7cil1.getString("Color", "#CC0000"));
       //setVisibility(*logi_F7cil1, false);
-      //new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_F7cil1, "phys_F7cil1_name", &topVolume, false, 0);
-      new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_F7cil1, "phys_F7cil1_name", logi_F6spc3, false, 0);
-
-      new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_F7hld1, "phys_F7hld1_name", logi_F7cil1, false, 0);
+      new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_F7cil1, "phys_F7cil1_name", logi_F6spc4, false, 0);
 
       //-
       //--------------
 
-      */
+      //--------------
+      //-   F8hld1
+
+      //get parameters from .xml file
+      GearDir cF8hld1(content, "F8hld1/");
+      //
+      double F8hld1_L[6];
+      for (int tmpn = 0; tmpn < 6; tmpn++) {
+        F8hld1_L[tmpn] = cF8hld1.getLength((boost::format("L%1%") % (tmpn + 1)).str().c_str()) / Unit::mm;
+      }
+
+      double F8hld1_rO[F7cil1_num];
+      F8hld1_rO[0] = F7cil1_O[0];
+      F8hld1_rO[1] = F7cil1_O[0];
+      for (int tmpn = 0; tmpn <= 5; tmpn++) {
+        F8hld1_rO[4*tmpn + 2] = F7cil1_R[tmpn] - F8hld1_L[tmpn];
+        F8hld1_rO[4*tmpn + 3] = F7cil1_R[tmpn] - F8hld1_L[tmpn];
+        F8hld1_rO[4*tmpn + 4] = F7cil1_O[tmpn + 1];
+        F8hld1_rO[4*tmpn + 5] = F7cil1_O[tmpn + 1];
+      }
+      //
+      string strMat_F8hld1 = cF8hld1.getString("Material");
+      G4Material* mat_F8hld1 = Materials::get(strMat_F8hld1);
+
+      //define geometry
+      G4Polycone* geo_F8hld1x = new G4Polycone("geo_F8hld1x_name", 0, 2*M_PI, F7cil1_num, F7cil1_Z, F7cil1_rI, F8hld1_rO);
+      G4IntersectionSolid* geo_F8hld1 = new G4IntersectionSolid("geo_F8hld1_name", geo_F8hld1x, geo_F7cil1);
+
+      G4LogicalVolume *logi_F8hld1 = new G4LogicalVolume(geo_F8hld1, mat_F8hld1, "logi_F8hld1_name");
+
+      //for (int i=0; i<F7cil1_num; i++) printf("%f %f %f\n", F7cil1_Z[i], F7cil1_rI[i], F7cil1_rO[i]);
+      //for (int i=0; i<F7cil1_num; i++) printf("%f %f %f\n", F7cil1_Z[i], F7cil1_rI[i], F8hld1_rO[i]);
+
+      //put volume
+      setColor(*logi_F8hld1, cF8hld1.getString("Color", "#CCCC00"));
+      //setVisibility(*logi_F8hld1, false);
+      new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_F8hld1, "phys_F8hld1_name", logi_F7cil1, false, 0);
+
+      //-
+      //--------------
+
 
     }
   }

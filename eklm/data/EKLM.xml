@@ -4,6 +4,7 @@
   <Version>0</Version>
   <Creator library="eklm">EKLMBelleII</Creator>
   <Content>
+    <Mode desc="0 -- normal operation, 1 -- bg study">0</Mode>   
     <Rotation desc="Rotation of the EKLM with respect to the Detector"
       unit="mrad">0.0</Rotation>
     <EndCap>

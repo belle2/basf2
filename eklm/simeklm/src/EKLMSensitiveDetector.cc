@@ -36,11 +36,22 @@ namespace Belle2 {
                                                G4double thresholdKineticEnergy)
       : Simulation::SensitiveDetectorBase(name, KLM)
   {
+    m_mode = -1;
   }
 
   void EKLMSensitiveDetector::Initialize(G4HCofThisEvent * HCTE)
   {
     m_HitNumber = 0;
+  }
+
+  int EKLMSensitiveDetector::getMode(G4Step *aStep)
+  {
+    G4PVPlacementGT *pvgt;
+    if (m_mode >= 0)
+      return m_mode;
+    pvgt = (G4PVPlacementGT*)(aStep->GetPreStepPoint()->GetPhysicalVolume());
+    m_mode = pvgt->getMode();
+    return m_mode;
   }
 
   //-----------------------------------------------------

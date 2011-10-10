@@ -484,6 +484,11 @@ namespace Belle2 {
      */
     double Strip_thickness;
 
+    /**
+     * Detector mode. See description of possible values in G4PVPlacementGT.h
+     */
+    int m_mode;
+
     //! sensitive detector
     EKLMSensitiveDetector *m_sensitive;
 

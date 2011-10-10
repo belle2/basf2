@@ -34,7 +34,7 @@ namespace Belle2 {
                     G4LogicalVolume *pCurrentLogical,
                     const G4String &pName,
                     G4LogicalVolume *pMotherLogical,
-                    int id = 0, int id2 = 0);
+                    int id = 0, int mode = 0);
 
     /**
      * Constructor.
@@ -45,7 +45,7 @@ namespace Belle2 {
                     const G4Transform3D &Transform3D,
                     G4LogicalVolume *pCurrentLogical,
                     const G4String &pName,
-                    int id = 0, int id2 = 0);
+                    int id = 0, int mode = 0);
 
     /**
      * getTransform - get transformation.
@@ -58,9 +58,9 @@ namespace Belle2 {
     int getID();
 
     /**
-     * getID2 - get identifier 2.
+     * getMode - get detector mode
      */
-    int getID2();
+    int getMode();
 
     /**
      * getMother - get mother G4PVPlacementGT;
@@ -81,9 +81,11 @@ namespace Belle2 {
     int m_id;
 
     /**
-     * Identifier.
+     * Detector mode.
+     * 0 -- normal detector operation
+     * 1 -- background studies setup
      */
-    int m_id2;
+    int m_mode;
 
     /**
      * Mother G4PVPlacementGT.

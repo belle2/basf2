@@ -104,6 +104,7 @@ void GeoEKLMBelleII::readXMLData(const GearDir& content)
   int i;
   int j;
   GearDir gd(content);
+  m_mode = gd.getInt("Mode");
   GearDir EndCap(gd);
   EndCap.append("/EndCap");
   readPositionData(EndcapPosition, EndCap);

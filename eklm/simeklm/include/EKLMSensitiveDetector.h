@@ -63,6 +63,18 @@ namespace Belle2 {
     //! Hit number within one event
     int m_HitNumber;
 
+    /**
+     * Detector mode.
+     */
+    int m_mode;
+
+
+    /**
+     * getter for detector mode
+     */
+    int getMode(G4Step *aStep);
+
+
   };
 
 } // end of namespace Belle2

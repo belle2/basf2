@@ -16,6 +16,8 @@
 #include <framework/logging/Logger.h>
 
 #include <cmath>
+#include <cstdlib>
+
 
 using namespace std;
 using namespace Belle2;

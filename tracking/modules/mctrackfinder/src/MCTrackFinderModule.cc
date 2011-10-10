@@ -10,15 +10,20 @@
 
 #include <tracking/modules/mctrackfinder/MCTrackFinderModule.h>
 
+#include<framework/datastore/StoreArray.h>
+#include<framework/datastore/RelationArray.h>
+
 #include <generators/dataobjects/MCParticle.h>
 
 #include <cdc/dataobjects/CDCHit.h>
-#include <cdc/hitcdc/CDCSimHit.h>
-#include <svd/dataobjects/SVDHit.h>
-#include <pxd/dataobjects/PXDHit.h>
+#include <cdc/geometry/CDCGeometryPar.h>
+
+#include <pxd/dataobjects/PXDTrueHit.h>
+#include <pxd/vxd/VxdID.h>
+
+#include <svd/dataobjects/SVDTrueHit.h>
 
 #include "GFTrackCand.h"
-#include <cdc/geocdc/CDCGeometryPar.h>
 
 #include <boost/foreach.hpp>
 #include "TRandom3.h"
@@ -47,32 +52,29 @@ MCTrackFinderModule::MCTrackFinderModule() : Module()
   //Parameter definition
 
   // names of input containers
-  addParam("MCParticlesColName", m_mcParticlesColName, "Name of collection holding the MCParticles", string("MCParticles"));
+  addParam("MCParticlesColName", m_mcParticlesColName, "Name of collection holding the MCParticles", string(""));
   //pxd specific
-  addParam("PXDHitsColName", m_pxdHitColName, "Name of collection holding the PXDHits", string(DEFAULT_PXDHITS));
-  addParam("MCParticlesToPXDHitsColName", m_mcParticleToPXDHits, "Name of collection holding the Relations  MCParticles->PXDHits", string(DEFAULT_PXDHITSREL));
+  addParam("PXDHitsColName", m_pxdHitColName, "Name of collection holding the PXDHits", string(""));
+  addParam("MCParticlesToPXDHitsColName", m_mcParticleToPXDHits, "Name of collection holding the Relations  MCParticles->PXDHits", string(""));
   // svd specific
-  addParam("SVDHitsColName", m_svdHitColName, "Name of collection holding the SVDHits", string(DEFAULT_SVDHITS));
-  addParam("MCParticlesToSVDHitsColName", m_mcParticleToSVDHits, "Name of collection holding the Relations  MCParticles->SVDHits", string(DEFAULT_SVDHITSREL));
+  addParam("SVDHitsColName", m_svdHitColName, "Name of collection holding the SVDHits", string(""));
+  addParam("MCParticlesToSVDHitsColName", m_mcParticleToSVDHits, "Name of collection holding the Relations  MCParticles->SVDHits", string(""));
 
   // cdc specific
-  addParam("MCParticlesToCDCSimHitsColName", m_mcParticleToCDCSimHits, "Name of collection holding the Relations  MCParticles->CDCSimHits", string("MCPartToCDCSimHits"));
-  addParam("CDCSimHitsColName", m_cdcSimHitColName, "Name of collection holding the CDCSimHits", string("CDCSimHits"));
-  addParam("CDCSimHitsToCDCHitsColName", m_cdcSimHitsToCDCHits, "Name of collection holding the Relations  CDCSimHits->CDCHits", string("SimHitToCDCHits"));
-  addParam("CDCHitsColName", m_cdcHitColName, "Name of collection holding the CDCHits", string("CDCHits"));
+  addParam("CDCHitsColName", m_cdcHitColName, "Name of collection holding the CDCHits", string(""));
+  addParam("MCParticlesToCDCHitsColName", m_mcParticleToCDCHits, "Name of collection holding the Relations  MCParticles->CDCHits", string(""));
 
   //choose which hits to use, all hits assigned to the track candidate will be used in the fit
   addParam("UsePXDHits", m_usePXDHits, "Set true if PXDHits should be used", bool(true));
   addParam("UseSVDHits", m_useSVDHits, "Set true if SVDHits should be used", bool(true));
   addParam("UseCDCHits", m_useCDCHits, "Set true if CDCHits should be used by", bool(true));
-  addParam("UseOnlyAxial", m_onlyAxial, "Set it true if you want to use only axial CDCHits", bool(false));
 
   //smearing of MCMomentum (integer value)
-  addParam("Smearing", m_smearing, "Smearing of MCMomentum prior to storing it in GFTrackCandidate (in %)", 0);
+  addParam("Smearing", m_smearing, "Smearing of MCMomentum/MCVertex prior to storing it in GFTrackCandidate (in %)", 0);
 
   // names of output containers
-  addParam("GFTrackCandidatesColName", m_gfTrackCandsColName, "Name of collection holding the GFTrackCandidates (output)", string("GFTrackCandidates"));
-  addParam("GFTrackCandToMCParticleColName", m_gfTrackCandToMCParticleColName, "Name of collection holding the relations between GFTrackCandidates and MCParticles (output)", string("GFTrackCandidateToMCParticle"));
+  addParam("GFTrackCandidatesColName", m_gfTrackCandsColName, "Name of collection holding the GFTrackCandidates (output)", string(""));
+  addParam("GFTrackCandToMCParticleColName", m_gfTrackCandToMCParticleColName, "Name of collection holding the relations between GFTrackCandidates and MCParticles (output)", string(""));
 
 }
 
@@ -86,6 +88,10 @@ MCTrackFinderModule::~MCTrackFinderModule()
 void MCTrackFinderModule::initialize()
 {
 
+  StoreArray<GFTrackCand> trackCandidates(m_gfTrackCandsColName);
+  StoreArray<MCParticle> mcParticles(m_mcParticlesColName);
+  RelationArray gfTrackCandToMCPart(trackCandidates, mcParticles);
+
 }
 
 void MCTrackFinderModule::beginRun()
@@ -98,91 +104,48 @@ void MCTrackFinderModule::event()
   B2INFO("*******   MCTrackFinderModule  *******");
   StoreArray<MCParticle> mcParticles(m_mcParticlesColName);
   int nMcParticles = mcParticles.getEntries();
-  B2INFO("MCTrackFinder: total Number of MCParticles: " << nMcParticles);
+  B2DEBUG(149, "MCTrackFinder: total Number of MCParticles: " << nMcParticles);
   if (nMcParticles == 0) B2WARNING("MCTrackFinder: MCParticlesCollection is empty!");
 
-
   //PXD
-  StoreArray<PXDHit> pxdHits(m_pxdHitColName);
-  int nPXDHits = pxdHits.getEntries();
-  B2DEBUG(100, "MCTrackFinder: Number of PXDHits: " << nPXDHits);
+  StoreArray<PXDTrueHit> pxdTrueHits(m_pxdHitColName);
+  int nPXDHits = pxdTrueHits.getEntries();
+  B2DEBUG(149, "MCTrackFinder: Number of PXDHits: " << nPXDHits);
   if (nPXDHits == 0) B2WARNING("MCTrackFinder: PXDHitsCollection is empty!");
 
-  StoreArray<Relation>   mcParticleToPXDHits(m_mcParticleToPXDHits);
-  int nMcPartToPXDHits = mcParticleToPXDHits.getEntries();
-  B2DEBUG(100, "MCTrackFinder: Number of relations between MCParticles and PXDHits: " << nMcPartToPXDHits);
+  RelationArray mcPartToPXDTrueHits(mcParticles, pxdTrueHits);
+  int nMcPartToPXDHits = mcPartToPXDTrueHits.getEntries();
+  B2DEBUG(149, "MCTrackFinder: Number of relations between MCParticles and PXDHits: " << nMcPartToPXDHits);
   if (nMcPartToPXDHits == 0) B2WARNING("MCTrackFinder: MCParticlesToPXDHitsCollection is empty!");
 
+
   //SVD
-  StoreArray<SVDHit> svdHits(m_svdHitColName);
-  int nSVDHits = svdHits.getEntries();
-  B2DEBUG(100, "MCTrackFinder: Number of SVDHits: " << nSVDHits);
+  StoreArray<SVDTrueHit> svdTrueHits(m_svdHitColName);
+  int nSVDHits = svdTrueHits.getEntries();
+  B2DEBUG(149, "MCTrackFinder: Number of SVDDHits: " << nSVDHits);
   if (nSVDHits == 0) B2WARNING("MCTrackFinder: SVDHitsCollection is empty!");
 
-  StoreArray<Relation>   mcParticleToSVDHits(m_mcParticleToSVDHits);
-  int nMcPartToSVDHits = mcParticleToSVDHits.getEntries();
-  B2DEBUG(100, "MCTrackFinder: Number of relations between MCParticles and SVDHits: " << nMcPartToSVDHits);
+  RelationArray mcPartToSVDTrueHits(mcParticles, svdTrueHits);
+  int nMcPartToSVDHits = mcPartToSVDTrueHits.getEntries();
+  B2DEBUG(149, "MCTrackFinder: Number of relations between MCParticles and SVDHits: " << nMcPartToSVDHits);
   if (nMcPartToSVDHits == 0) B2WARNING("MCTrackFinder: MCParticlesToSVDHitsCollection is empty!");
 
-  //CDC
-  //cdcDigitizer currently do not provide the MCParticle->CDCHit relation like SVD or PXD, so other relations are needed
-  StoreArray<CDCSimHit> cdcSimHits(m_cdcSimHitColName);
-  int nCDCSimHits = cdcSimHits.getEntries();
-  B2DEBUG(100, "MCTrackFinder: Number of CDCSimHits: " << nCDCSimHits);
-  if (nCDCSimHits == 0) B2WARNING("MCTrackFinder: CDCSimHitsCollection is empty!");
 
+  //CDC
   StoreArray<CDCHit> cdcHits(m_cdcHitColName);
   int nCDCHits = cdcHits.getEntries();
-  B2DEBUG(100, "MCTrackFinder: Number of CDCHits: " << nCDCHits);
+  B2DEBUG(149, "MCTrackFinder: Number of CDCHits: " << nCDCHits);
   if (nCDCHits == 0) B2WARNING("MCTrackFinder: CDCHitsCollection is empty!");
 
-  StoreArray<Relation>   mcParticleToCDCSimHits(m_mcParticleToCDCSimHits);
-  int nMcPartToCDCSimHits = mcParticleToCDCSimHits.getEntries();
-  B2DEBUG(100, "MCTrackFinder: Number of relations between MCParticles and CDCSimHits: " << nMcPartToCDCSimHits);
-  if (nMcPartToCDCSimHits == 0) B2WARNING("MCTrackFinder: MCParticlesToCDCSimHitsCollection is empty!");
+  RelationArray mcPartToCDCHits(mcParticles, cdcHits);
+  int nMcPartToCDCHits = mcPartToCDCHits.getEntries();
+  B2DEBUG(149, "MCTrackFinder: Number of relations between MCParticles and CDCHits: " << nMcPartToCDCHits);
+  if (nMcPartToCDCHits == 0) B2WARNING("MCTrackFinder: MCParticlesToCDCHitsCollection is empty!");
 
-  StoreArray<Relation>   cdcSimHitsToCDCHits(m_cdcSimHitsToCDCHits);
-  int nCDCSimHitsToCDCHits = cdcSimHitsToCDCHits.getEntries();
-  B2DEBUG(100, "MCTrackFinder: Number of relations between CDCSimHits and CDCHits: " << nCDCSimHitsToCDCHits);
-  if (nMcPartToCDCSimHits == 0) B2WARNING("MCTrackFinder: CDCSimHitsToCDCHitsCollection is empty!");
-
-
-  //!!!!! should be moved to initialize in the newest framework version
   //register StoreArray which will be filled by this module
   StoreArray<GFTrackCand> trackCandidates(m_gfTrackCandsColName);
-  StoreArray<Relation> trackCandsToMCParticles(m_gfTrackCandToMCParticleColName);
-
-
-  //Temporary solution
-  //This relation should be provided by the CDCDigi module in the future, but as I need it now for the MCMatching I create it here...
-  //-------------------------------------------------------------------------------
-  StoreArray<Relation> mcParticleToCDCHits("MCParticleToCDCHits");
-
-  int testcounter = -1;
-  for (int iPart = 0; iPart < nMcParticles; ++iPart) {
-    list<int> cdcSimHitsIndices;;
-    list<int> cdcHitsIndices;
-
-    for (int i = 0; i < mcParticleToCDCSimHits->GetEntries(); i++) {
-      if (mcParticleToCDCSimHits[i]->getFromIndex() == iPart) {
-        cdcSimHitsIndices.push_back(mcParticleToCDCSimHits[i]->getToIndex());
-      }
-    }
-    BOOST_FOREACH(int hit, cdcSimHitsIndices) {
-      for (int j = 0; j < nCDCSimHitsToCDCHits; j++) {
-        if (cdcSimHitsToCDCHits[j]->getFromIndex() == hit) {
-          cdcHitsIndices.push_back(cdcSimHitsToCDCHits[j]->getToIndex());
-        }
-      }
-
-    }
-    if (cdcHitsIndices.size() > 0) {
-      testcounter++;
-      new(mcParticleToCDCHits->AddrAt(testcounter)) Relation(mcParticles, cdcHits, iPart, cdcHitsIndices);
-    }
-
-  }
-//-----------------------------------------------------------------------------------
+  //StoreArray<Relation> trackCandsToMCParticles(m_gfTrackCandToMCParticleColName);
+  RelationArray gfTrackCandToMCPart(trackCandidates, mcParticles);
 
 
   // loop over MCParticles.
@@ -195,44 +158,35 @@ void MCTrackFinderModule::event()
 
 
       // create a list containing the indices to the PXDHits that belong to one track
-      list<int> pxdHitsIndices;
+      vector<int> pxdHitsIndices;
       for (int i = 0; i < nMcPartToPXDHits; ++i) {
-        if (mcParticleToPXDHits[i]->getFromIndex() == iPart) {
-          int pxdHitIndex = mcParticleToPXDHits[i]->getToIndex();
-          pxdHitsIndices.push_back(pxdHitIndex);
+        if (mcPartToPXDTrueHits[i].getFromIndex() == unsigned(iPart)) {
+          for (unsigned int j = 0; j < mcPartToPXDTrueHits[i].getToIndices().size(); j++) {
+            pxdHitsIndices.push_back(mcPartToPXDTrueHits[i].getToIndex(j));
+          }
         }
       }
 
       // create a list containing the indices to the SVDHits that belong to one track
-      list<int> svdHitsIndices;
+      vector<int> svdHitsIndices;
       for (int i = 0; i < nMcPartToSVDHits; ++i) {
-        if (mcParticleToSVDHits[i]->getFromIndex() == iPart) {
-          int svdHitIndex = mcParticleToSVDHits[i]->getToIndex();
-          svdHitsIndices.push_back(svdHitIndex);
-        }
-      }
-
-
-
-      // create a list containing the indices to the CDCHits that belong to one track
-      // this is slightly complicated at the moment than PXD and SVD
-      list<int> cdcSimHitsIndices;;
-      list<int> cdcHitsIndices;
-
-      for (int i = 0; i < mcParticleToCDCSimHits->GetEntries(); i++) {
-        if (mcParticleToCDCSimHits[i]->getFromIndex() == iPart) {
-          cdcSimHitsIndices.push_back(mcParticleToCDCSimHits[i]->getToIndex());
-        }
-      }
-
-      BOOST_FOREACH(int hit, cdcSimHitsIndices) {
-        for (int j = 0; j < nCDCSimHitsToCDCHits; j++) {
-          if (cdcSimHitsToCDCHits[j]->getFromIndex() == hit) {
-            cdcHitsIndices.push_back(cdcSimHitsToCDCHits[j]->getToIndex());
+        if (mcPartToSVDTrueHits[i].getFromIndex() == unsigned(iPart)) {
+          for (unsigned int j = 0; j < mcPartToSVDTrueHits[i].getToIndices().size(); j++) {
+            svdHitsIndices.push_back(mcPartToSVDTrueHits[i].getToIndex(j));
           }
         }
-
       }
+
+      // create a list containing the indices to the SVDHits that belong to one track
+      vector<int> cdcHitsIndices;
+      for (int i = 0; i < nMcPartToCDCHits; ++i) {
+        if (mcPartToCDCHits[i].getFromIndex() == unsigned(iPart)) {
+          for (unsigned int j = 0; j < mcPartToCDCHits[i].getToIndices().size(); j++) {
+            cdcHitsIndices.push_back(mcPartToCDCHits[i].getToIndex(j));
+          }
+        }
+      }
+
 
       //Now create TrackCandidate
       int counter = trackCandidates->GetLast() + 1;
@@ -241,75 +195,107 @@ void MCTrackFinderModule::event()
       //create TrackCandidate
       new(trackCandidates->AddrAt(counter)) GFTrackCand();
 
+
+      //before assigning the Hits to the trackCandidate some additional geometry information is needed
+      CDCGeometryPar * cdcgp = CDCGeometryPar::Instance();
+      CDCGeometryPar & cdcg(*cdcgp);
+
       //set the values needed as start values for the fit in the GFTrackCandidate from the MCParticle information
       //variables stored in the GFTrackCandidates are: vertex position, momentum, pdg value, indices for the Hits
       //the Id of the MCParticle is also stored
 
+      //an alternative: use as vertex position not the true position, but the coordinates of the first CDCHit (can be also done for SVD or PXD)
+      /*
+      int minLayerId = 999;
+      int minIndex  =  999;
+      for (unsigned int i = 0; i<cdcHitsIndices.size(); i++){
+        if(cdcHits[i]->getILayer()<minLayerId){
+           minLayerId = cdcHits[i]->getILayer();
+           minIndex = i;
+        }
+      }
+
+      TVector3 position = (cdcg.wireForwardPosition(cdcHits[minIndex]->getILayer(), cdcHits[minIndex]->getIWire()) + cdcg.wireBackwardPosition(cdcHits[minIndex]->getILayer(), cdcHits[minIndex]->getIWire())) * 0.5;
+      */
+
+      //set track parameters from MCParticle information
       TVector3 position = mcParticles[iPart]->getProductionVertex();
       TVector3 momentum = mcParticles[iPart]->getMomentum();
       int pdg = mcParticles[iPart]->getPDG();
 
-      //it may have negative effects on the fit to start with exactly precise true values
+      //it may have positive effect on the fit not to start with exactly precise true values (or I may be just interesting to study this)
       //one can smear the starting momentum values with a gaussian
+      //this calculation is always performed, but with the default value of m_smearing = 0 it has no effect on momentum and position (true values are taken)
       TRandom3 *random = new TRandom3((UInt_t)12345);
       TVector3 smearedMomentum;
-      double smearing = double(m_smearing) / 100;
+      TVector3 smearedPosition;
+      double smearing = double(m_smearing) / 100;  //the module parameter m_smearing goes from 0 to 100, smearing should go from 0 to 1
 
       double smearedPX = random->Gaus(momentum.x(), smearing * momentum.x());
       double smearedPY = random->Gaus(momentum.y(), smearing * momentum.y());
       double smearedPZ = random->Gaus(momentum.z(), smearing * momentum.z());
       smearedMomentum.SetXYZ(smearedPX, smearedPY, smearedPZ);
 
+      double smearedX = random->Gaus(position.x(), smearing * position.x());
+      double smearedY = random->Gaus(position.y(), smearing * position.y());
+      double smearedZ = random->Gaus(position.z(), smearing * position.z());
+      smearedPosition.SetXYZ(smearedX, smearedY, smearedZ);
+
       //Errors for the position/momentum values can also be passed to GFTrackCandidate
-      //Default values in Genfit are (1.,1.,1.,)
+      //Default values in Genfit are (1.,1.,1.,), they seem to be not good!!
+      //The best way to set the 'correct' errors has to be investigated....
       TVector3 posError;
-      posError.SetXYZ(1.0, 1.0, 1.0);
+      posError.SetXYZ(2.0, 2.0, 2.0);
       TVector3 momError;
-      momError.SetXYZ(1.0, 1.0, 1.0);
+      momError.SetXYZ(0.1, 0.1, 0.5);
 
       //Finally set the complete track seed
-      trackCandidates[counter]->setComplTrackSeed(position, smearedMomentum, pdg, posError, momError);
+      trackCandidates[counter]->setComplTrackSeed(smearedPosition, smearedMomentum, pdg, posError, momError);
+
       //Save the MCParticleID in the TrackCandidate
       trackCandidates[counter]->setMcTrackId(iPart);
-      //create relation between the track candidates and the mcParticle (redundant to saving to MCId)
-      new(trackCandsToMCParticles->AddrAt(counter)) Relation(trackCandidates, mcParticles, counter, iPart);
-      B2INFO(" --- Create relation between MCParticle " << iPart << "   and Track Candidate " << counter);
 
-      //member variable Dip is currently used to store the purity of the tracks, for MCTrack it is always 100 %
+      //create relation between the track candidates and the mcParticle (redundant to saving the MCId)
+
+      gfTrackCandToMCPart.add(counter, iPart);
+
+      B2INFO(" --- Create relation between GFTrackCand " << counter << " and MCParticle " << iPart);
+
+      //member variable Dip is currently used to store the purity of the tracks, for MCTracks it is always 100 %
       trackCandidates[counter]->setDip(100);
 
-      //before assigning the Hits to the trackCandidate some additional geometry information is needed
-      //to use DAF each hit has to have a plane ID, in case of CDC the layerID can do the job, in case of SVD/PXD the ladderID (it was however not thouroughfully checked yet...)
-      //for correct hit order the parameter rho is important, it is calculaed as the distance from the origin for the CDCHits, for SVD/PXD it is at the moment the layerID....
-      CDCGeometryPar * cdcgp = CDCGeometryPar::Instance();
-      CDCGeometryPar & cdcg(*cdcgp);
 
       //assign indices of the Hits from all detectors, their are distinguishable by their DetID:
       // pxd 0
       //   svd 1
       //     cdc 2
       if (m_usePXDHits) {
-        BOOST_FOREACH(int hitID, pxdHitsIndices) {
-          int aSensorUniID = pxdHits[hitID]->getSensorUniID();
-          SensorUniIDManager aIdConverter(aSensorUniID);
-          int ladderId = aIdConverter.getLadderID();
-          int layerId = aIdConverter.getLayerID();
 
+        BOOST_FOREACH(int hitID, pxdHitsIndices) {
+
+          int sensorID = pxdTrueHits[hitID]->getSensorID();
+          VxdID aVXDId = VxdID(sensorID);
+          int ladderId = aVXDId.getLadder();
+          int layerId = aVXDId.getLayer();
+          //addHit(detectorID, hitID, rho (distance from the origin to sort hits), planeId (Id of the sensor, needed for DAF))
           trackCandidates[counter]->addHit(0, hitID, layerId, ladderId);
+
         }
-        B2INFO("Add " << pxdHitsIndices.size() << " PXDHits to Track Candidate " << counter);
+        B2INFO("     add " << pxdHitsIndices.size() << " PXDHits");
+
       }
       if (m_useSVDHits) {
 
         BOOST_FOREACH(int hitID, svdHitsIndices) {
-          int aSensorUniID = svdHits[hitID]->getSensorUniID();
-          SensorUniIDManager aIdConverter(aSensorUniID);
-          int ladderId = aIdConverter.getLadderID();
-          int layerId = aIdConverter.getLayerID();
-
+          int sensorID = svdTrueHits[hitID]->getSensorID();
+          VxdID aVXDId = VxdID(sensorID);
+          int ladderId = aVXDId.getLadder();
+          int layerId = aVXDId.getLayer();
+          //addHit(detectorID, hitID, rho (distance from the origin to sort hits), planeId (Id of the sensor, needed for DAF))
           trackCandidates[counter]->addHit(1, hitID, layerId, ladderId);
         }
-        B2INFO("Add " << svdHitsIndices.size() << " SVDHits to Track Candidate " << counter);
+        B2INFO("     add " << svdHitsIndices.size() << " SVDHits");
+
       }
 
       if (m_useCDCHits) {
@@ -317,29 +303,30 @@ void MCTrackFinderModule::event()
         float rho = -999.0;  //distance from the hit wire to the origin, needed to sort the hits
         BOOST_FOREACH(int hitID, cdcHitsIndices) {
 
+
           //calculate the layerId from information stored in the CDCHit
           if (cdcHits[hitID]->getISuperLayer() == 0) layerId = cdcHits[hitID]->getILayer();
           else layerId = 8 + (cdcHits[hitID]->getISuperLayer() - 1) * 6 + cdcHits[hitID]->getILayer();
 
+          //for the DAF algorithm within GenFit it is important to assign a planeId to each hit
+          //one can choose the layerId as the planeId, this would mean that hits from the same layer will 'compete' to be the 'best matching hit' in this layer
+          //one can also give to each hit a unique planeId, so that e.g. two correct hits in the same layer get similar weights (without 'competition')
+          //I am still not quite sure which way is the best one, this has to be tested...
+          int uniqueId = layerId * 10000 + cdcHits[hitID]->getIWire();
+
           //calculate the distance to origin
-          TVector3 distance = (cdcg.wireForwardPosition(layerId, cdcHits[hitID]->getIWire()) + cdcg.wireForwardPosition(layerId, cdcHits[hitID]->getIWire())) * 0.5;
+          TVector3 distance = (cdcg.wireForwardPosition(layerId, cdcHits[hitID]->getIWire()) + cdcg.wireBackwardPosition(layerId, cdcHits[hitID]->getIWire())) * 0.5;
           rho = distance.Mag();
 
-          if (m_onlyAxial) {
+          trackCandidates[counter]->addHit(2, hitID, rho, uniqueId);
 
-            if (cdcHits[hitID]->getISuperLayer() % 2 == 0) {
 
-              trackCandidates[counter]->addHit(2, hitID, rho, layerId);
-            }
-          } else {
-            trackCandidates[counter]->addHit(2, hitID, rho, layerId);
-
-          }
         }
-        if (m_onlyAxial) B2INFO(" ....(use only axial CDCHits).... ");
-        B2INFO("Add " << cdcHitsIndices.size() << " CDCHits to Track Candidate " << counter);
+
+        B2INFO("    add " << cdcHitsIndices.size() << " CDCHits");
       }
-      trackCandidates[counter]->sort();
+
+
     } //endif
 
 

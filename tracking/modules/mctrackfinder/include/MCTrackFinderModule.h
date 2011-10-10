@@ -12,9 +12,6 @@
 #define MCTRACKFIDNERMODULE_H_
 
 #include <framework/core/Module.h>
-#include <framework/datastore/StoreArray.h>
-#include <framework/dataobjects/Relation.h>
-#include <framework/datastore/RelationArray.h>
 
 
 namespace Belle2 {
@@ -22,11 +19,12 @@ namespace Belle2 {
   /** This module use MC true Relations to define which hits belong to which particles and writes track candidates filled with necessary information into the DataStore.
    *
    *  The Relations MCParticles -> Hits for PXD, SVD and CDC are used.
+   *  At the moment CDCHits, PXDTrueHits and SVDTrueHits are used, at some point we may replace the TrueHits with Clusters
    *  At the moment track candidates are created only for primary particles.
    *
-   *  The created TrackCandidates can be fitted with GenFitterModule.
+   *  The created GFTrackCandidates can be fitted with GenFitterModule.
    *
-   *  @todo: same procedure for CDC and VTX, check hit ordering and planeIds when adding hits to GFTrackCand, maybe create track candidates not only for primary particles
+   *  @todo: check hit ordering and planeIds when adding hits to GFTrackCand, maybe create track candidates not only for primary particles
    */
   class MCTrackFinderModule : public Module {
 
@@ -74,16 +72,13 @@ namespace Belle2 {
     std::string m_mcParticleToSVDHits;                          /**< MCParticles <-> SVDHits relation name */
 
     std::string m_cdcHitColName;                                /**< CDCHits collection name */
-    std::string m_cdcSimHitColName;                             /**< CDCSimHits collection name */
-    std::string m_mcParticleToCDCSimHits;                       /**< MCParticles <-> CDCSimHits relation name */
-    std::string m_cdcSimHitsToCDCHits;                          /**< CDCSimHits <-> CDCHits relation name */
+    std::string m_mcParticleToCDCHits;                          /**< MCParticles <-> CDCHits relation name */
 
     bool m_usePXDHits;                                          /**< Boolean to select if PXDHits should be used*/
     bool m_useSVDHits;                                          /**< Boolean to select if SVDHits should be used*/
     bool m_useCDCHits;                                          /**< Boolean to select if CDCHits should be used*/
-    bool m_onlyAxial;                                           /**< Boolean to select if only axial CDCHits should be used*/
 
-    int m_smearing;                                             /**< Smearing of MCMomentum in % */
+    int m_smearing;                                             /**< Smearing of MCMomentum and MCVertex in % */
 
     std::string m_gfTrackCandsColName;                          /**< TrackCandidates collection name */
     std::string m_gfTrackCandToMCParticleColName;               /**< TrackCandidates to MCParticles relation name */

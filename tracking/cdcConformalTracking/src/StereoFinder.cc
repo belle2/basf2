@@ -11,6 +11,7 @@
 #include "../include/StereoFinder.h"
 
 #include <cmath>
+#include <cstdlib>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/logging/Logger.h>

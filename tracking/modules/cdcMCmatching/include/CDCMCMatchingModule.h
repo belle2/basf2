@@ -12,14 +12,14 @@
 #define CDCMCMATCHINGMODULE_H
 
 #include <framework/core/Module.h>
-#include <fstream>
+//#include <fstream>
 
 namespace Belle2 {
 
   /** Module to match the GFTrackCandidates with MCParticles to be able to evaluate the performance of pattern recognition.
-   *  It is checked which MCParticles created the CDCRecoHits assigned to this TrackCandidates.
+   *  It is checked which MCParticles created the CDCHits assigned to this TrackCandidates.
    *  The MCParticle with the largest contribution is evaluated and its ID is assigned to the GFTrackCandidate.
-   *  @todo: at the moment this module is only usable for CDC pattern recognition, at some point VTX detectors also should be included
+   *  @todo: at the moment this module is only usable for CDC pattern recognition, at some point VTX detectors also could be included
    */
 
   class CDCMCMatchingModule : public Module {
@@ -67,20 +67,22 @@ namespace Belle2 {
 
     /** This method evaluates the MCParticle Id with the largest contribution from the vector mcParticleContributions.
      *  This vector stores pairs <MCParticleId, Number of Hits from this MCParticle>.
-     *  The method returns the Id of the MCParticle with the most hits.
+     *  The method returns the Id of the MCParticle with the most hits and the fraction contributed hits/total hits * 100 .
      */
-    virtual int getBestMCId(std:: vector <std::pair<int, int> >  mcParticleContributions);
+    virtual std::pair <int, float> getBestMCId(std:: vector <std::pair<int, int> >  mcParticleContributions, int nHit);
+
+
 
   protected:
 
 
   private:
 
-    std::string m_mcParticlesCollectionName;             /**< MC particle collection name */
+    std::string m_mcParticlesCollectionName;            /**< MC particle collection name */
 
-    std::string m_cdcRecoHitsCollectionName;             /**< CDCRecoHits collection name */
+    std::string m_cdcHitsCollectionName;                /**< CDCHits collection name */
 
-    std::string m_mcPartToCDCRecoHits;                  /**< MCParticles to CDCRecoHits relation name */
+    std::string m_mcPartToCDCHits;                      /**< MCParticles to CDCHits relation name */
 
     std::string m_gfTrackCandsCollectionName;           /**< GFTrackCandidates collection name */
 

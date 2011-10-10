@@ -10,22 +10,18 @@
 
 #include <tracking/modules/cdcMCmatching/CDCMCMatchingModule.h>
 
-#include <framework/dataobjects/Relation.h>
+#include <framework/datastore/RelationArray.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/gearbox/Unit.h>
 
 #include <framework/logging/Logger.h>
 
 #include <generators/dataobjects/MCParticle.h>
-#include <cdc/dataobjects/CDCRecoHit.h>
+#include <cdc/dataobjects/CDCHit.h>
 #include "GFTrackCand.h"
 
 #include <cstdlib>
-#include <iomanip>
 #include <string>
-#include <boost/foreach.hpp>
 
-#include <iostream>
 
 using namespace std;
 using namespace Belle2;
@@ -37,12 +33,14 @@ CDCMCMatchingModule::CDCMCMatchingModule() :
 {
   setDescription("Matches the GFTrackCandidates with MCTruth to evaluate the performance of pattern recognition. Assigns to each GFTrackCandidate an ID of the MCParticles which contributed the largest amount of hits to this track candidate.");
 
+  //the collection names as parameters may soon be obsolete if we will always use the default names created automatically
+
   //input
   addParam("MCParticlesColName", m_mcParticlesCollectionName, "Name of collection holding the MCParticles", string("MCParticles"));
-  addParam("CDCRecoHitsColName", m_cdcRecoHitsCollectionName, "CDCRecoHits collection (should be created by CDCRecoHitMaker module)", string("CDCRecoHits"));
-  addParam("MCParticlesToCDCRecoHitsColName", m_mcPartToCDCRecoHits, "Name of collection holding the relations between MCParticles and CDCRecoHits", string("MCParticleToCDCRecoHits"));
+  addParam("CDCHitsColName", m_cdcHitsCollectionName, "CDCHits collection ", string("CDCHits"));
+  addParam("MCParticlesToCDCHitsColName", m_mcPartToCDCHits, "Name of collection holding the relations between MCParticles and CDCHits", string("MCParticleToCDCHits"));
 
-  addParam("GFTrackCandidatesColName", m_gfTrackCandsCollectionName, "Name of collection holding the GFTrackCandidates (output of the pattern recognition)", string("GFTrackCandidates_PatternReco"));
+  addParam("GFTrackCandidatesColName", m_gfTrackCandsCollectionName, "Name of collection holding the GFTrackCandidates (output of the pattern recognition)", string("GFTrackCandidates_conformalFinder"));
 
   //output
   addParam("GFTrackCandsToMCParticlesColName", m_gfTrackCandsToMCParticles, "Name of collection holding the relations between the GFTrackCandidates and the matched MCParticles (output of this module)", string("GFTrackCandidateToMCParticle"));
@@ -56,6 +54,9 @@ CDCMCMatchingModule::~CDCMCMatchingModule()
 
 void CDCMCMatchingModule::initialize()
 {
+  StoreArray<MCParticle> mcParticles(m_mcParticlesCollectionName);
+  StoreArray<GFTrackCand> gfTrackCandidates(m_gfTrackCandsCollectionName);
+  RelationArray gfTrackCandToMCPart(gfTrackCandidates, mcParticles);
 
 }
 
@@ -69,57 +70,62 @@ void CDCMCMatchingModule::event()
 
   B2INFO("**********   CDCMCMatchingModule  ************");
   StoreArray<MCParticle> mcParticles(m_mcParticlesCollectionName);
-  B2INFO("CDCMCMatching: total Number of MCParticles: " << mcParticles.GetEntries());
-  if (mcParticles.GetEntries() == 0) B2WARNING("CDCMCMatching: MCParticlesCollection is empty!");
+  B2DEBUG(149, "CDCMCMatching: total Number of MCParticles: " << mcParticles.getEntries());
+  if (mcParticles.getEntries() == 0) B2WARNING("CDCMCMatching: MCParticlesCollection is empty!");
 
-  StoreArray<CDCRecoHit> cdcRecoHits(m_cdcRecoHitsCollectionName);
-  B2INFO("CDCMCMatching: Number of CDCRecoHits: " << cdcRecoHits.GetEntries());
-  if (cdcRecoHits.GetEntries() == 0) B2WARNING("CDCMCMatching: CDCRecoHitsCollection is empty!");
+  StoreArray<CDCHit> cdcHits(m_cdcHitsCollectionName);
+  B2DEBUG(149, "CDCMCMatching: Number of CDCHits: " << cdcHits.getEntries());
+  if (cdcHits.getEntries() == 0) B2WARNING("CDCMCMatching: CDCHitsCollection is empty!");
 
-  StoreArray<Relation> mcPartToCDCRecoHits(m_mcPartToCDCRecoHits);
-  B2INFO("CDCMCMatching: Number of relations between MCParticles and CDCRecoHits: " << mcPartToCDCRecoHits.GetEntries());
-  if (mcPartToCDCRecoHits.GetEntries() == 0) B2WARNING("CDCMCMatching: MCParticlesToCDCRecoHitsCollection is empty!");
+  RelationArray mcPartToCDCHits(mcParticles, cdcHits);
+  B2INFO("CDCMCMatching: Number of Relations between MCParticles and CDCHits: " << mcPartToCDCHits.getEntries());
+  if (mcPartToCDCHits.getEntries() == 0) B2WARNING("CDCMCMatching: MCParticlesToCDCHitsCollection is empty!");
+
 
   StoreArray<GFTrackCand> gfTrackCandidates(m_gfTrackCandsCollectionName);
-  B2INFO("CDCMCMatching: Number of GFTrackCandidates: " << gfTrackCandidates.GetEntries());
-  if (gfTrackCandidates.GetEntries() == 0) B2WARNING("CDCMCMatching: GFTrackCandidatesCollection is empty!");
+  B2INFO("CDCMCMatching: Number of GFTrackCandidates: " << gfTrackCandidates.getEntries());
+  if (gfTrackCandidates.getEntries() == 0) B2WARNING("CDCMCMatching: GFTrackCandidatesCollection is empty!");
 
 
   //Create a relation between the track candidate and their most probable 'mother' MC particle
-  StoreArray<Relation> gfTrackCandToMCPart(m_gfTrackCandsToMCParticles);
+  RelationArray gfTrackCandToMCPart(gfTrackCandidates, mcParticles);
 
-  if (gfTrackCandidates.GetEntries() != 0) {
-    for (int i = 0; i < gfTrackCandidates.GetEntries(); i++) { //loop over all TrackCandidates
+  if (gfTrackCandidates.getEntries() != 0) {
+    for (int i = 0; i < gfTrackCandidates.getEntries(); i++) { //loop over all TrackCandidates
 
-      vector<unsigned int> cdcHitsIndexList = gfTrackCandidates[i]->GetHitIDs(2);   //indices of CDCRecoHits for the candidate
+      vector<unsigned int> cdcHitsIndexList = gfTrackCandidates[i]->GetHitIDs(2);   //indices of CDCHits for the candidate
       vector <pair<int, int> > mcParticleContributions;  // vector to store pairs <MCParticleId, Number of Hits from this MCParticle>
-      int bestMCId = -999; //index of the matched MCParticle
+      pair <int, float> bestMCId(-999, 0.0); //index and the hit fraction of the matched MCParticle
 
-      B2INFO("Track Candidate " << i << " has " << cdcHitsIndexList.size() << " CDCRecoHits");
+      B2INFO("Track Candidate " << i << " has " << cdcHitsIndexList.size() << " CDCHits");
 
-      //this is a complex loop, will maybe became easier with new relations...
-      for (unsigned int j = 0; j < cdcHitsIndexList.size(); j++) { //loop over all RecoHits
-        for (int k = 0; k < mcPartToCDCRecoHits.GetEntries(); k++) {
+      //now we have to find out which MCParticle created these hits
+      for (unsigned int j = 0; j < cdcHitsIndexList.size(); j++) { //loop over all Hits
 
-          BOOST_FOREACH(unsigned int mchit, mcPartToCDCRecoHits[k]->getToIndices()) {
-            if (cdcHitsIndexList.at(j) == mchit) {
+        for (int k = 0; k < mcPartToCDCHits.getEntries(); k++) {   //loop over all MCParticle<->CDCHit relations
 
-              addMCParticle(mcParticleContributions, mcPartToCDCRecoHits[k]->getFromIndex()); //add the index of the MCParticle to the pair vector
+          for (unsigned int mchit = 0; mchit < mcPartToCDCHits[k].getToIndices().size(); mchit++) { //loop over all hits to which the MCParticle points
+
+            if (cdcHitsIndexList.at(j) == mcPartToCDCHits[k].getToIndex(mchit)) {         //if the hit to which this MCParticle points is in the list
+
+              addMCParticle(mcParticleContributions, mcPartToCDCHits[k].getFromIndex()); //add the index of the MCParticle to the pair vector
+
             }
           }
         }
-      } //end loop over all RecoHits
+      } //end loop over all Hits
 
+      bestMCId = getBestMCId(mcParticleContributions, cdcHitsIndexList.size()); //evaluate the MCParticle with the largest contribution
 
-      bestMCId = getBestMCId(mcParticleContributions); //evaluate the MCParticle with the largest contribution
-      gfTrackCandidates[i]->setMcTrackId(bestMCId);    //assign the ID of this MCParticle to the candidate
+      gfTrackCandidates[i]->setMcTrackId(bestMCId.first);    //assign the ID of this MCParticle to the candidate
+      gfTrackCandidates[i]->setDip(bestMCId.second);         //here I just 'misuse' one unused member variable from GFTrackCand called 'Dip' to store the 'purity' of the track
 
-      //create a relation between the track candidate and the MCParticle (redundat to the ID assignment)
-      new(gfTrackCandToMCPart->AddrAt(i)) Relation(gfTrackCandidates, mcParticles, i, bestMCId);
+      //create a relation between the track candidate and the MCParticle (redundant to the ID assignment, but may however be useful)
+      gfTrackCandToMCPart.add(i, bestMCId.first);
 
       cdcHitsIndexList.clear();
       mcParticleContributions.clear();
-    }
+    } //end loop over all track candidates
   }
 
 }
@@ -154,13 +160,15 @@ void CDCMCMatchingModule::addMCParticle(vector <pair<int, int> >  & mcParticleCo
   }
 }
 
-int CDCMCMatchingModule::getBestMCId(vector <pair<int, int> >  mcParticleContributions)
+pair<int, float> CDCMCMatchingModule::getBestMCId(vector <pair<int, int> >  mcParticleContributions, int nHits)
 {
   {
 
     double max = 0;     //variable to mark the highest number of hits
     int indexMax = 0;   //variable to mart the index of the mcParticle which contributed the highest number of hits
     int bestMCId = -999;
+    float fraction = 0;
+    pair <int, float> result(bestMCId, fraction);
 
     //Search for maximum
     for (unsigned int i = 0; i < mcParticleContributions.size(); i++) {
@@ -170,13 +178,26 @@ int CDCMCMatchingModule::getBestMCId(vector <pair<int, int> >  mcParticleContrib
       }
     }
 
-    //Assign results
-    bestMCId = mcParticleContributions.at(indexMax).first;
-    B2INFO("MCParticle with ID " << bestMCId << " contributed " << max << " hits to this track candidate");
+    if (mcParticleContributions.size() > 0) { //check if there are contributions at all
+      //Assign results
+      bestMCId = mcParticleContributions.at(indexMax).first;
 
-    return bestMCId;
+      fraction = 100.0 * float(max) / float(nHits);
+
+      B2INFO("--- MCParticle with ID " << bestMCId << " contributed " << max << " hits ( " << fraction << "% ) ");
+
+      result.first = bestMCId ;
+      result.second = fraction;
+    } else {
+      B2INFO("--- No MCParticle contributed to this track! (missing relations?)");
+    }
+
+    return result;
 
 
   }
 }
+
+
+
 

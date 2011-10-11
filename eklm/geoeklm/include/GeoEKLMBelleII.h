@@ -51,7 +51,11 @@ namespace Belle2 {
     double Thickness;        /**< thickness */
     double DeltaLY;          /**< outerR - Y of upper edge of BoxY */
     double CornerX;          /**< coordinate X of corner 1 */
-    double TopCornerHeight;  /**< corner 1 height */
+    double TopCornerHeight;  /**< corner 1 height (subtraction from plane) */
+    double Corner1LX;        /**< corner 1 X length */
+    double Corner1Width;     /**< corner 1 width */
+    double Corner1Thickness; /**< corner 1 thickness */
+    double Corner1Z;         /**< corner 1 Z coordinate */
     double Corner2LX;        /**< corner 2 X length */
     double Corner2LY;        /**< corner 2 Y length */
     double Corner2Thickness; /**< corner 2 thickness */
@@ -85,7 +89,7 @@ namespace Belle2 {
    * struct EKLMStripBoardPosition - strip readout board position data
    */
   struct EKLMStripBoardPosition {
-    int x;         /**< x coordinate */
+    double x;         /**< x coordinate */
   };
 
   /**
@@ -94,6 +98,18 @@ namespace Belle2 {
   struct EKLMBoardPosition {
     double r;      /**< radius of far edge of the board */
     double phi;    /**< angle */
+  };
+
+  /**
+   * struct EKLMSectionSupportPosition - section support position
+   */
+  struct EKLMSectionSupportPosition {
+    double deltal_right;  /**< right (X-plane) delta L */
+    double deltal_left;   /**< left (X-plane) delta L */
+    double length;        /**< length */
+    double x;             /**< X coordinate */
+    double y;             /**< Y coordinate */
+    double z;             /**< Z coordinate */
   };
 
   /**
@@ -226,35 +242,29 @@ namespace Belle2 {
      */
     G4Box *createSectorSupportBoxTop(G4PVPlacementGT *mpvgt, G4Transform3D &t);
 
+    /**
+     * createSectorSupportCorner1 - create sector support corner 1
+     * @mpvgt: mother physical volume with global transformation
+     */
+    void createSectorSupportCorner1(G4PVPlacementGT *mpvgt);
+
     /*
      * createSectorSupportCorner2 - create sector support corner 2
      * @mpvgt: mother physical volume with global transformation
-     * @t: transformation (output)
-     *
-     * Sets t to the transformation of the prism.
      */
-    G4TriangularPrism* createSectorSupportCorner2(G4PVPlacementGT *mpvgt,
-                                                  G4Transform3D &t);
+    void createSectorSupportCorner2(G4PVPlacementGT *mpvgt);
 
     /*
      * createSectorSupportCorner3 - create sector support corner 3
      * @mpvgt: mother physical volume with global transformation
-     * @t: transformation (output)
-     *
-     * Sets t to the transformation of the prism.
      */
-    G4TriangularPrism* createSectorSupportCorner3(G4PVPlacementGT *mpvgt,
-                                                  G4Transform3D &t);
+    void createSectorSupportCorner3(G4PVPlacementGT *mpvgt);
 
     /*
      * createSectorSupportCorner4 - create sector support corner 4
      * @mpvgt: mother physical volume with global transformation
-     * @t: transformation (output)
-     *
-     * Sets t to the transformation of the prism.
      */
-    G4TriangularPrism* createSectorSupportCorner4(G4PVPlacementGT *mpvgt,
-                                                  G4Transform3D &t);
+    void createSectorSupportCorner4(G4PVPlacementGT *mpvgt);
 
     /**
      * subtractBoardSolids - subtract board solids from planes
@@ -437,7 +447,7 @@ namespace Belle2 {
     /**
      * Position data for section support structure.
      */
-    struct EKLMElementPosition *SectionSupportPosition[2];
+    struct EKLMSectionSupportPosition *SectionSupportPosition[2];
 
     /**
      * Section support structure top box width.

@@ -9,7 +9,7 @@
       unit="mrad">0.0</Rotation>
     <EndCap>
       <InnerR desc="Inner radius"   unit="mm">1305.0</InnerR>
-      <OuterR desc="Outer radius"   unit="mm">3310.0</OuterR>
+      <OuterR desc="Outer radius"   unit="mm">3320.0</OuterR>
       <Length desc="Length"         unit="mm">1321.0</Length>
       <PositionX  desc="X position" unit="mm">0</PositionX>
       <PositionY  desc="Y position" unit="mm">0</PositionY>
@@ -17,7 +17,7 @@
       <nLayer desc="Number of layers in one endcap">14</nLayer>
       <Layer>	
 	<InnerR desc="Inner radius"   unit="mm">1305.0</InnerR>
-	<OuterR desc="Outer radius"   unit="mm">3310.0</OuterR>
+	<OuterR desc="Outer radius"   unit="mm">3320.0</OuterR>
 	<Length desc="Length"         unit="mm">44.0</Length>
 	<PositionX  desc="X position" unit="mm">62.0</PositionX>
 	<PositionY  desc="Y position" unit="mm">52.0</PositionY>
@@ -25,7 +25,7 @@
 	<ShiftZ     desc="Z Shift"    unit="mm">91.0</ShiftZ>
 	<Sector>
 	  <InnerR desc="Inner radius"   unit="mm">1305.0</InnerR>
-	  <OuterR desc="Outer radius"   unit="mm">3310.0</OuterR>
+	  <OuterR desc="Outer radius"   unit="mm">3320.0</OuterR>
 	  <Length desc="Length"         unit="mm">39.0</Length>
 	  <PositionX  desc="X position" unit="mm">0</PositionX>
 	  <PositionY  desc="Y position" unit="mm">0</PositionY>
@@ -46,6 +46,10 @@
             <CornerX desc="X coordinate of cutted corner" unit="mm">300.0
             </CornerX>
             <TopCornerHeight unit="mm">30.0</TopCornerHeight>
+            <Corner1LX unit="mm">70.0</Corner1LX>
+            <Corner1Width unit="mm">150.0</Corner1Width>
+            <Corner1Thickness unit="mm">5.0</Corner1Thickness>
+            <Corner1Z unit="mm">-15.0</Corner1Z>
             <Corner2LX unit="mm">150.0</Corner2LX>
             <Corner2LY unit="mm">100.0</Corner2LY>
             <Corner2Thickness unit="mm">10.0</Corner2Thickness>

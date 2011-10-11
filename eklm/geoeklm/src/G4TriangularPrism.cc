@@ -36,8 +36,8 @@ G4TriangularPrism::G4TriangularPrism(const G4String &name,
     rl = r1;
     rs = r2;
   } else {
-    rl = r1;
-    rs = r2;
+    rl = r2;
+    rs = r1;
   }
   delta_phi = phi2 - phi1;
   tg_alpha = (rl / rs - cos(delta_phi)) / sin(delta_phi);
@@ -46,7 +46,7 @@ G4TriangularPrism::G4TriangularPrism(const G4String &name,
   cos_alpha = 1.0 / sqrt(1.0 + tg_alpha * tg_alpha);
   m_box = new G4Box("Box_" + name, rl * sin_alpha, rl * cos_alpha, halfZlen);
   if (r1 >= r2)
-    t = G4RotateZ3D((phi1 + alpha) * rad + 90.0 * deg);
+    t = G4RotateZ3D((phi1 + alpha) * rad - 90.0 * deg);
   else
     t = G4RotateZ3D((phi2 - alpha) * rad + 90.0 * deg);
   if (m_box == NULL)

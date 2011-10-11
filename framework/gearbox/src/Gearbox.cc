@@ -189,8 +189,8 @@ namespace Belle2 {
     return value;
   }
 
-  GearDir Gearbox::getContent(const string& component)
+  GearDir Gearbox::getDetectorComponent(const string& component)
   {
-    return GearDir("/Detector/DetectorComponent[name='" + component + "']");
+    return GearDir("/Detector/DetectorComponent[name='" + component + "']/Content");
   }
 }

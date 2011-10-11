@@ -111,7 +111,7 @@ namespace Belle2 {
      *
      * @param component Name of the DetectorComponent (e.g. IR, PXD)
      */
-    GearDir getContent(const std::string& component);
+    GearDir getDetectorComponent(const std::string& component);
 
     /**
      * Register a new input handler

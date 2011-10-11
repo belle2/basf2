@@ -50,11 +50,7 @@ TouschekSADInputModule::TouschekSADInputModule() : Module()
   addParam("LifetimeLER",     m_lifetimeLER,   "The Touschek lifetime of the LER [ns].", 600 * Unit::s);
   addParam("PxResolutionLER", m_pxResLER,      "The resolution for the x momentum component of the Touschek real particle.", 0.01);
   addParam("PyResolutionLER", m_pyResLER,      "The resolution for the y momentum component of the Touschek real particle.", 0.01);
-}
-
-
-TouschekSADInputModule::~TouschekSADInputModule()
-{
+  addParam("RotateParticles", m_rotateParticles, "Rotate the SAD particles around the nominal beam axis [deg] (just for unphysical tests !!!).", 0.0);
 }
 
 
@@ -71,8 +67,9 @@ void TouschekSADInputModule::initialize()
   //Set the transformation from local Touschek plane space to global geant4 space
   //Get the parameters from the Gearbox
   m_lerPipePartMatrix = new TGeoHMatrix("TouschekSADTrafoLER");
-  GearDir irDir = Gearbox::getInstance().getContent("IR");
-  double angle = irDir.getAngle("Streams/Stream[@name='LERUpstream']/Section[@name='Crotch']/Pipe[1]/Angle");
+  m_lerPipePartMatrix->RotateZ(m_rotateParticles);
+  GearDir irDir = Gearbox::getInstance().getDetectorComponent("Cryostat");
+  double angle = irDir.getAngle("AngleLER");
   m_lerPipePartMatrix->RotateY(angle / Unit::deg);
 
   //-----------------------

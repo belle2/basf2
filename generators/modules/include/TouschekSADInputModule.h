@@ -38,7 +38,7 @@ namespace Belle2 {
     TouschekSADInputModule();
 
     /** Destructor. */
-    virtual ~TouschekSADInputModule();
+    virtual ~TouschekSADInputModule() {};
 
     /**
      * Checks the validity of the module parameters.
@@ -55,15 +55,16 @@ namespace Belle2 {
     TouschekReaderSAD m_readerLER;    /**< The Touschek reader object for the LER data. */
     TGeoHMatrix* m_lerPipePartMatrix; /**< LER transformation matrix from Touschek space into geant4 space. */
 
-    double m_readoutTime;   /**< The readout time of the detector [ns]. */
-    int m_readMode;         /**< The read mode: 0 = one real particle per event, 1 = all SAD particles per event. */
+    double m_readoutTime;      /**< The readout time of the detector [ns]. */
+    int m_readMode;            /**< The read mode: 0 = one real particle per event, 1 = all SAD particles per event. */
     std::string m_filenameLER; /**< The filename of the LER TURTLE Touschek file. */
-    double m_rangeLER;      /**< All particles within the range around the IP are loaded. */
-    double m_beamEnergyLER; /**< The beam energy of the LER [GeV]. */
-    double m_currentLER;    /**< The current of the LER [A]. */
-    double m_lifetimeLER;   /**< The Touschek lifetime of the LER [ns]. */
-    double m_pxResLER;      /**< The resolution for the x momentum component of the Touschek LER real particle. */
-    double m_pyResLER;      /**< The resolution for the y momentum component of the Touschek LER real particle. */
+    double m_rangeLER;         /**< All particles within the range around the IP are loaded. */
+    double m_beamEnergyLER;    /**< The beam energy of the LER [GeV]. */
+    double m_currentLER;       /**< The current of the LER [A]. */
+    double m_lifetimeLER;      /**< The Touschek lifetime of the LER [ns]. */
+    double m_pxResLER;         /**< The resolution for the x momentum component of the Touschek LER real particle. */
+    double m_pyResLER;         /**< The resolution for the y momentum component of the Touschek LER real particle. */
+    double m_rotateParticles;  /**< Rotate the SAD particles around the nominal beam axis (just for unphysical tests !!!). */
 
 
   private:

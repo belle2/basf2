@@ -84,12 +84,10 @@ void TouschekTURTLEInputModule::initialize()
 
   //Get the transformation from local Touschek plane space to global geant4 space
   //For the HER
-  GearDir irDir = Gearbox::getInstance().getContent("IR");
-  double angleher = irDir.getAngle("Streams/Stream[@name='HERUpstream']/Section[@name='Crotch']/Pipe[1]/Angle");
+  GearDir irDir = Gearbox::getInstance().getDetectorComponent("Cryostat");
+  double angleher = irDir.getAngle("AngleHER");
+  double angleler = irDir.getAngle("AngleLER");
   m_herPipePartMatrix->RotateY(angleher / Unit::deg);
-
-  //For the LER
-  double angleler = irDir.getAngle("Streams/Stream[@name='LERUpstream']/Section[@name='Crotch']/Pipe[1]/Angle");
   m_lerPipePartMatrix->RotateY(angleler / Unit::deg);
 }
 

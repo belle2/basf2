@@ -11,6 +11,7 @@
 
   <!-- Define materials -->
   <xi:include href="BasicMaterials.xml"/>
+  <xi:include href="../ir/IR-Materials.xml"/>
   <xi:include href="../pxd/PXD-Materials.xml"/>
   <xi:include href="../svd/SVD-Materials.xml"/>
   <xi:include href="../cdc/CDC-Materials.xml"/>

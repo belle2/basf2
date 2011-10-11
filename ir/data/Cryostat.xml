@@ -20,14 +20,12 @@
 		<R2 unit="cm">2.1</R2>
 		<R3 unit="cm">3.9</R3>
 		<R4 unit="cm">4.4</R4>
-		<!--Material desc="HER Beam pipe">Tantalum</Material-->
-		<Material desc="HER Beam pipe">Air</Material>
+		<Material desc="HER Beam pipe">Ta</Material>
 	</A1wal1>
 
         <A2spc1>
             <bpthick unit="cm">0.4</bpthick>
-            <!--Material desc="HER Beam pipe space">Vacuum</Material-->
-            <Material desc="HER Beam pipe">Air</Material>
+            <Material desc="HER Beam pipe space">Vacuum</Material>
         </A2spc1>
 
 	<B1wal1>
@@ -46,14 +44,12 @@
 		<R4 unit="cm">2.7</R4>
 		<R5 unit="cm">3.9</R5>
 		<R6 unit="cm">4.4</R6>
-		<!--Material desc="LER Beam pipe">Tantalum</Material-->
-		<Material desc="LER Beam pipe">Air</Material>
+		<Material desc="LER Beam pipe">Ta</Material>
 	</B1wal1>
 
         <B2spc1>
             <bpthick unit="cm">0.4</bpthick>
-            <!--Material desc="LER Beam pipe space">Vacuum</Material-->
-            <Material desc="HER Beam pipe">Air</Material>
+            <Material desc="LER Beam pipe space">Vacuum</Material>
         </B2spc1>
 
         <C1wal1>
@@ -70,8 +66,7 @@
             <R4 unit="cm">31.7</R4>
             <R5 unit="cm">35.0</R5>
             <R6 unit="cm">45.15</R6>
-            <!--Material desc="Vacuum vessel">SUS316L</Material-->
-            <Material desc="">Air</Material>
+            <Material desc="Vacuum vessel">SUS316L</Material>
         </C1wal1>
 
         <C2spc1>
@@ -90,8 +85,7 @@
             <R4 unit="cm">24.5</R4>
             <R5 unit="cm">29.5</R5>
             <R6 unit="cm">31</R6>
-            <!--Material desc="Vacuum space">Vacuum</Material-->
-            <Material desc="">Air</Material>
+            <Material desc="Vacuum space">Vacuum</Material>
         </C2spc1>
 
         <C3wal2>
@@ -105,8 +99,7 @@
             <R2 unit="cm">17.04</R2>
             <R3 unit="cm">21.1</R3>
             <R4 unit="cm">26.9</R4>
-            <!--Material desc="Cold shield">SUS316L</Material-->
-            <Material desc="">Air</Material>
+            <Material desc="Cold shield">SUS316L</Material>
         </C3wal2>
 
         <C4spc2>
@@ -120,8 +113,7 @@
             <R2 unit="cm">16.74</R2>
             <R3 unit="cm">20.8</R3>
             <R4 unit="cm">26.6</R4>
-            <!--Material desc="Vacuum space">Vacuum</Material-->
-            <Material desc="">Air</Material>
+            <Material desc="Vacuum space">Vacuum</Material>
         </C4spc2>
 
         <C5wal3>
@@ -137,8 +129,7 @@
             <R3 unit="cm">14.7</R3>
             <R4 unit="cm">19.4</R4>
             <R5 unit="cm">17.2</R5>
-            <!--Material desc="Helium vessel">SUS316L</Material-->
-            <Material desc="">Air</Material>
+            <Material desc="Helium vessel">SUS316L</Material>
         </C5wal3>
 
         <C5wal5>
@@ -147,8 +138,7 @@
             <L2 unit="cm">1.5</L2>
             <R1 unit="cm">25.1</R1>
             <R2 unit="cm">23.6</R2>
-            <!--Material desc="Helium vessel">SUS316L</Material-->
-            <Material desc="">Air</Material>
+            <Material desc="Helium vessel">SUS316L</Material>
         </C5wal5>
 
         <C6spc4>
@@ -160,8 +150,7 @@
             <R1 unit="cm">1.8</R1>
             <R2 unit="cm">2.5</R2>
             <R3 unit="cm">4.5</R3>
-            <!--Material desc="Internal space">Air</Material-->
-            <Material desc="">Air</Material>
+            <Material desc="Internal space">Air</Material>
         </C6spc4>
 
         <C6tnl1>
@@ -189,8 +178,7 @@
             <R3 unit="cm">3.0</R3>
             <R4 unit="cm">3.1</R4>
             <R5 unit="cm">4.5</R5>
-            <!--Material desc="Internal space">Air</Material-->
-            <Material desc="">Air</Material>
+            <Material desc="Internal space">Air</Material>
         </C6spc5>
 
         <C6tnl2>
@@ -219,16 +207,14 @@
             <R2 unit="cm">12.04</R2>
             <R3 unit="cm">13.5</R3>
             <R4 unit="cm">18.4</R4>
-            <!--Material desc="Liquid Helium">Liq_He</Material-->
-            <Material desc="">Air</Material>
+            <Material desc="Liquid Helium">Liq_He</Material>
         </C6spc3>
 
         <C6spc7>
             <D1 unit="cm">260.0</D1>
             <L1 unit="cm">100.0</L1>
             <R1 unit="cm">5.0</R1>
-            <!--Material desc="Internal space">Air</Material-->
-            <Material desc="">Air</Material>
+            <Material desc="Internal space">Air</Material>
         </C6spc7>
 
         <C6tnl3>
@@ -241,8 +227,7 @@
             <D1 unit="cm">260.0</D1>
             <L1 unit="cm">100.0</L1>
             <R1 unit="cm">4.5</R1>
-            <!--Material desc="Internal space">Air</Material-->
-            <Material desc="">Air</Material>
+            <Material desc="Internal space">Air</Material>
         </C6spc8>
 
         <C6tnl4>
@@ -257,8 +242,7 @@
             <L2 unit="cm">1.0</L2>
             <R1 unit="cm">23.6</R1>
             <R2 unit="cm">22.6</R2>
-            <!--Material desc="Liquid Helium">Liq_He</Material-->
-            <Material desc="">Air</Material>
+            <Material desc="Liquid Helium">Liq_He</Material>
         </C6spc6>
 
         <C7cil1>
@@ -339,8 +323,7 @@
             <O14 unit="cm">17.05</O14>
             <O15 unit="cm">17.64</O15>
             <O16 unit="cm">17.93</O16>
-            <Material desc="">Air</Material>
-            <!--Material desc="Compensation solenoid">SC_COIL</Material-->
+            <Material desc="Compensation solenoid">SC_COIL</Material>
         </C7cil1>
         <C8hld1>
             <L1 unit="cm">3</L1>
@@ -358,56 +341,49 @@
             <L13 unit="cm">0.6</L13>
             <L14 unit="cm">0.6</L14>
             <L15 unit="cm">0.6</L15>
-            <!--Material desc="Compensation solenoid holder">SUS316L</Material-->
-            <Material desc="">Air</Material>
+            <Material desc="Compensation solenoid holder">SUS316L</Material>
         </C8hld1>
 
         <C7mag1>
             <D1 unit="cm">69.3093</D1>
             <L1 unit="cm">47.0</L1>
             <O1 unit="cm">2.6</O1>
-            <!--Material desc="Super conducting magnet">SC_COIL</Material-->
-            <Material desc="">Air</Material>
+            <Material desc="Super conducting magnet">SC_COIL</Material>
         </C7mag1>
 
         <C7mag2>
             <!--<d1 unit="cm"> C6spc4L1 +C6spc4L2 </d1>-->
             <L1 unit="cm">44.0</L1>
             <O1 unit="cm">5.215</O1>
-            <!--Material desc="Super conducting magnet">SC_COIL</Material-->
-            <Material desc="">Air</Material>
+            <Material desc="Super conducting magnet">SC_COIL</Material>
         </C7mag2>
 
         <C7mag3>
             <!--<d1 unit="cm"> C6spc4L1 +C6spc4L2 +C6spc4L3 +C6spc4L4 </d1>-->
             <L1 unit="cm">52.0</L1>
             <O1 unit="cm">5.65</O1>
-            <!--Material desc="Super conducting magnet">SC_COIL</Material-->
-            <Material desc="">Air</Material>
+            <Material desc="Super conducting magnet">SC_COIL</Material>
         </C7mag3>
 
         <C7mag4>
             <D1 unit="cm">73.3093</D1>
             <L1 unit="cm">42.0</L1>
             <O1 unit="cm">3.55</O1>
-            <!--Material desc="Super conducting magnet">SC_COIL</Material-->
-            <Material desc="">Air</Material>
+            <Material desc="Super conducting magnet">SC_COIL</Material>
         </C7mag4>
 
         <C7mag5>
             <!--<d1 unit="cm"> C6spc5L1 +C6spc5L2 +C6spc5L3 </d1>-->
             <L1 unit="cm">44.0</L1>
             <O1 unit="cm">4.1</O1>
-            <!--Material desc="Super conducting magnet">SC_COIL</Material-->
-            <Material desc="">Air</Material>
+            <Material desc="Super conducting magnet">SC_COIL</Material>
         </C7mag5>
 
         <C7mag6>
             <!--<d1 unit="cm"> C6spc5L1 +C6spc5L2 +C6spc5L3 +C6spc5L4 +C6spc5L5 +C6spc5L6 </d1>-->
             <L1 unit="cm">52.0</L1>
             <O1 unit="cm">7.0</O1>
-            <!--Material desc="Super conducting magnet">SC_COIL</Material-->
-            <Material desc="">Air</Material>
+            <Material desc="Super conducting magnet">SC_COIL</Material>
         </C7mag6>
 
         <C7mag7>
@@ -415,8 +391,7 @@
             <L1 unit="cm">57</L1>
             <!--<i1 unit="cm"></i1>-->
             <O1 unit="cm">9.5</O1>
-            <!--Material desc="Super conducting magnet">SC_COIL</Material-->
-            <Material desc="">Air</Material>
+            <Material desc="Super conducting magnet">SC_COIL</Material>
         </C7mag7>
 
         <!--Cryo L-->
@@ -432,15 +407,13 @@
 			<R2 unit="cm">2.1</R2>
 			<R3 unit="cm">3.9</R3>
 			<R4 unit="cm">4.4</R4>
-			<!--Material desc="HER Beam pipe">Tantalum</Material-->
-            <Material desc="">Air</Material>
+			<Material desc="HER Beam pipe">Ta</Material>
 		</D1wal1>
 
-        <D2spc1>
-            <bpthick unit="cm">0.4</bpthick>
-			<!--Material desc="HER Beam pipe space">Vacuum</Material-->
-            <Material desc="">Air</Material>
-        </D2spc1>
+                <D2spc1>
+                        <bpthick unit="cm">0.4</bpthick>
+	                <Material desc="HER Beam pipe space">Vacuum</Material>
+                </D2spc1>
 
 		<E1wal1>
 			<L1 unit="cm">-109.2</L1>
@@ -458,14 +431,12 @@
 			<R4 unit="cm">2.7</R4>
 			<R5 unit="cm">3.9</R5>
 			<R6 unit="cm">4.4</R6>
-			<!--Material desc="LER Beam pipe">Tantalum</Material-->
-            <Material desc="">Air</Material>
+			<Material desc="LER Beam pipe">Ta</Material>
 		</E1wal1>
 
         <E2spc1>
             <bpthick unit="cm">0.4</bpthick>
-			<!--Material desc="LER Beam pipe space">Vacuum</Material-->
-            <Material desc="">Air</Material>
+	    <Material desc="LER Beam pipe space">Vacuum</Material>
         </E2spc1>
 
         <F1wal1>
@@ -484,8 +455,7 @@
             <R5 unit="cm">34.0</R5>
             <R6 unit="cm">40.0</R6>
             <R7 unit="cm">44.5</R7>
-			<!--Material desc="Vacuum vessel">SUS316L</Material-->
-            <Material desc="">Air</Material>
+	    <Material desc="Vacuum vessel">SUS316L</Material>
         </F1wal1>
 
         <F2spc1>
@@ -505,8 +475,7 @@
             <R5 unit="cm">25.0</R5>
             <R6 unit="cm">32.0</R6>
             <R7 unit="cm">36.0</R7>
-			<!--Material desc="Vacuum space">Vacuum</Material-->
-            <Material desc="">Air</Material>
+	    <Material desc="Vacuum space">Vacuum</Material>
         </F2spc1>
 
         <F3wal2>
@@ -520,8 +489,7 @@
             <R2 unit="cm">14.15</R2>
             <R3 unit="cm">15.55</R3>
             <R4 unit="cm">21.8</R4>
-			<!--Material desc="Cold shield">SUS316L</Material-->
-            <Material desc="">Air</Material>
+	    <Material desc="Cold shield">SUS316L</Material>
         </F3wal2>
 
         <F3wal3>
@@ -530,8 +498,7 @@
             <L1 unit="cm">79.8</L1>
             <R1 unit="cm">13.5</R1>
             <T1 unit="cm">7.0</T1>
-			<!--Material desc="Cold shield">SUS316L</Material-->
-            <Material desc="">Air</Material>
+            <Material desc="Cold shield">SUS316L</Material>
         </F3wal3>
 
         <F4spc2>
@@ -545,16 +512,14 @@
             <R2 unit="cm">13.85</R2>
             <R3 unit="cm">15.25</R3>
             <R4 unit="cm">21.5</R4>
-			<!--Material desc="Vacuum space">Vacuum</Material-->
-            <Material desc="">Air</Material>
+	    <Material desc="Vacuum space">Vacuum</Material>
         </F4spc2>
 
         <F4spc3>
             <D1 unit="cm">-0.5</D1>
             <L1 unit="cm">79.0</L1>
             <R1 unit="cm">13.2</R1>
-			<!--Material desc="Vacuum space">Vacuum</Material-->
-            <Material desc="">Air</Material>
+	    <Material desc="Vacuum space">Vacuum</Material>
         </F4spc3>
 
         <F5wal4>
@@ -570,16 +535,14 @@
             <R3 unit="cm">14.25</R3>
             <R4 unit="cm">20.5</R4>
             <R5 unit="cm">15.5</R5>
-			<!--Material desc="Helium vessel">SUS316L</Material-->
-            <Material desc="">Air</Material>
+	    <Material desc="Helium vessel">SUS316L</Material>
         </F5wal4>
 
         <F5wal5>
             <D1 unit="cm">-245.0</D1>
             <L1 unit="cm">-73.0</L1>
             <R1 unit="cm">10.5</R1>
-			<!--Material desc="Helium vessel">SUS316L</Material-->
-            <Material desc="">Air</Material>
+	    <Material desc="Helium vessel">SUS316L</Material>
         </F5wal5>
 
         <F6spc5>
@@ -591,8 +554,7 @@
             <R1 unit="cm">1.8</R1>
             <R2 unit="cm">2.5</R2>
             <R3 unit="cm">4.5</R3>
-			<!--Material desc="Internal space">Vacuum</Material-->
-            <Material desc="">Air</Material>
+	    <Material desc="Internal space">Vacuum</Material>
         </F6spc5>
 
         <F6tnl1>
@@ -614,8 +576,7 @@
             <R3 unit="cm">3.0</R3>
             <R4 unit="cm">3.1</R4>
             <R5 unit="cm">4.5</R5>
-			<!--Material desc="Internal space">Vacuum</Material-->
-            <Material desc="">Air</Material>
+	    <Material desc="Internal space">Vacuum</Material>
         </F6spc6>
 
         <F6tnl2>
@@ -637,16 +598,14 @@
             <R2 unit="cm">13.35</R2>
             <R3 unit="cm">19.4</R3>
             <R4 unit="cm">15.2</R4>
-			<!--Material desc="Liquid Helium">Liq_He</Material-->
-            <Material desc="">Air</Material>
+	    <Material desc="Liquid Helium">Liq_He</Material>
         </F6spc4>
 
         <F6spc8>
             <D1 unit="cm">-230.0</D1>
             <L1 unit="cm">-100.0</L1>
             <R1 unit="cm">5.0</R1>
-			<!--Material desc="Internal space">Air</Material-->
-            <Material desc="">Air</Material>
+	    <Material desc="Internal space">Air</Material>
         </F6spc8>
 
         <F6tnl3>
@@ -657,16 +616,14 @@
             <D1 unit="cm">-1.0</D1>
             <L1 unit="cm">-71.0</L1>
             <R1 unit="cm">9.7</R1>
-			<!--Material desc="Liquid Helium">Liq_He</Material-->
-            <Material desc="">Air</Material>
+	    <Material desc="Liquid Helium">Liq_He</Material>
         </F6spc7>
 
         <F7mag1>
             <D1 unit="cm">-69.1888</D1>
             <L1 unit="cm">-47.0</L1>
             <O1 unit="cm">2.6</O1>
-			<!--Material desc="Super conducting magnet">SC_COIL</Material-->
-            <Material desc="">Air</Material>
+	    <Material desc="Super conducting magnet">SC_COIL</Material>
         </F7mag1>
 
         <F7mag2>
@@ -674,16 +631,14 @@
             <D1 unit="cm">-119.0</D1>-->
             <L1 unit="cm">-44.0</L1>
             <O1 unit="cm">5.215</O1>
-			<!--Material desc="Super conducting magnet">SC_COIL</Material-->
-            <Material desc="">Air</Material>
+	    <Material desc="Super conducting magnet">SC_COIL</Material>
         </F7mag2>
 
         <F7mag3>
             <D1 unit="cm">-73.3088</D1>
             <L1 unit="cm">-42.0</L1>
             <O1 unit="cm">3.55</O1>
-			<!--Material desc="Super conducting magnet">SC_COIL</Material-->
-            <Material desc="">Air</Material>
+	    <Material desc="Super conducting magnet">SC_COIL</Material>
         </F7mag3>
 
         <F7mag4>
@@ -691,32 +646,28 @@
             <D1 unit="cm">-119.9</D1>
             <L1 unit="cm">-44.0</L1>
             <O1 unit="cm">4.1</O1>
-			<!--Material desc="Super conducting magnet">SC_COIL</Material-->
-            <Material desc="">Air</Material>
+	    <Material desc="Super conducting magnet">SC_COIL</Material>
         </F7mag4>
 
         <F7mag5>
             <D1 unit="cm">-171.8989</D1>
             <L1 unit="cm">-42.0</L1>
             <O1 unit="cm">7.0</O1>
-			<!--Material desc="Super conducting magnet">SC_COIL</Material-->
-            <Material desc="">Air</Material>
+	  <Material desc="Super conducting magnet">SC_COIL</Material>
         </F7mag5>
 
         <F7mag6>
             <D1 unit="cm">-169.0</D1>
             <L1 unit="cm">-45.1</L1>
             <O1 unit="cm">19.5</O1>
-			<!--Material desc="Super conducting magnet">SC_COIL</Material-->
-            <Material desc="">Air</Material>
+	    <Material desc="Super conducting magnet">SC_COIL</Material>
         </F7mag6>
 
         <F7mag7>
             <D1 unit="cm">-235.0</D1>
             <L1 unit="cm">-70.0</L1>
             <O1 unit="cm">9.5</O1>
-			<!--Material desc="Super conducting magnet">SC_COIL</Material-->
-            <Material desc="">Air</Material>
+	    <Material desc="Super conducting magnet">SC_COIL</Material>
         </F7mag7>
 
         <F7cil1>
@@ -752,8 +703,7 @@
             <O5 unit="cm">12.75</O5>
             <O6 unit="cm">12.75</O6>
             <O7 unit="cm">12.75</O7>
-			<!--Material desc="Compensation solenoid holder">SUS316L</Material-->
-            <Material desc="">Air</Material>
+	    <Material desc="Compensation solenoid holder">SC_COIL</Material>
         </F7cil1>
         <F8hld1>
             <L1 unit="cm">2.3</L1>
@@ -762,10 +712,7 @@
             <L4 unit="cm">1.64</L4>
             <L5 unit="cm">1.17</L5>
             <L6 unit="cm">0.56</L6>
-			<!--Material desc="Compensation solenoid">SC_COIL</Material-->
-            <Material desc="">Air</Material>
+	    <Material desc="Compensation solenoid">SUS316L</Material>
         </F8hld1>
-
-
   </Content>
 </DetectorComponent>

@@ -369,6 +369,9 @@ namespace Belle2 {
 
       G4LogicalVolume *logi_C1wal1 = new G4LogicalVolume(geo_C1wal1, mat_C1wal1, "logi_C1wal1_name");
 
+
+      //for (int i = 0; i < C1wal1_num; i++) printf("(%f, %f)\n", C1wal1_Z[i], C1wal1_rO[i]);
+
       //put volume
       setColor(*logi_C1wal1, cC1wal1.getString("Color", "#CC0000"));
       //setVisibility(*logi_C1wal1, false);
@@ -1613,6 +1616,8 @@ namespace Belle2 {
       G4SubtractionSolid* geo_F1wal1 = new G4SubtractionSolid("geo_F1wal1_name", geo_F1wal1x, geo_E1wal1, transform_E1wal1);
 
       G4LogicalVolume *logi_F1wal1 = new G4LogicalVolume(geo_F1wal1, mat_F1wal1, "logi_F1wal1_name");
+
+      //for (int i = 0; i < F1wal1_num; i++) printf("(%f, %f)\n", F1wal1_Z[i], F1wal1_rO[i]);
 
       //put volume
       setColor(*logi_F1wal1, cF1wal1.getString("Color", "#CC0000"));

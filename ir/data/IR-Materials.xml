@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Materials>
+
+  <Material name="SUS316L">
+    <state>Solid</state>
+    <density unit="g/cm3">8.03</density>
+    <Components>
+      <Material fraction="0.7347">Fe</Material>
+      <Material fraction="0.1200">Cr</Material>
+      <Material fraction="0.1200">Ni</Material>
+      <Material fraction="0.0250">Mo</Material>
+      <Material fraction="0.0003">C </Material>
+    </Components>
+  </Material>
+
+  <Material name="SC_COIL">
+    <state>Solid</state>
+    <density unit="g/cm3">8.0</density>
+    <Components>
+      <Material fraction="0.67">Cu</Material>
+      <Material fraction="0.1584">Nb</Material>
+      <Material fraction="0.1716">Ti</Material>
+    </Components>
+  </Material>
+
+  <Material name="Liq_He">
+    <state>Liquid</state>
+    <density unit="g/cm3">0.125</density>
+    <Components>
+      <Material fraction="0.67">Cu</Material>
+      <Material fraction="0.1584">Nb</Material>
+      <Material fraction="0.1716">Ti</Material>
+    </Components>
+  </Material>
+
+
+</Materials>

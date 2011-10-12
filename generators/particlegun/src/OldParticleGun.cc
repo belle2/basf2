@@ -9,7 +9,7 @@
  **************************************************************************/
 
 #include <framework/logging/Logger.h>
-#include <generators/pGun/ParticleGun.h>
+#include <generators/particlegun/OldParticleGun.h>
 
 #include <TMath.h>
 
@@ -21,7 +21,12 @@
 using namespace std;
 using namespace Belle2;
 
-bool ParticleGun::generateEvent(MCParticleGraph &graph)
+OldParticleGun::OldParticleGun()
+{
+  B2WARNING("This version of the ParticleGun is deprecated, please switch to the ParticleGun module.");
+}
+
+bool OldParticleGun::generateEvent(MCParticleGraph &graph)
 {
   int first = graph.size();
 

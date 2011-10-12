@@ -16,7 +16,7 @@
 #include <string>
 #include <generators/dataobjects/MCParticle.h>
 #include <generators/dataobjects/MCParticleGraph.h>
-#include <generators/pGun/ParticleGun.h>
+#include <generators/particlegun/OldParticleGun.h>
 #include <vector>
 
 namespace Belle2 {
@@ -46,7 +46,7 @@ namespace Belle2 {
 
   protected:
 
-    ParticleGun m_pgun;             /**< An instance of the particle gun itself. */
+    OldParticleGun m_pgun;             /**< An instance of the particle gun itself. */
     MCParticleGraph mpg;            /**< An instance of the MCParticle graph. */
     int m_nTracks;                  /**< The number of particles to be produced per event */
     double m_pPar1;                /**< The first parameter for momentum generation */

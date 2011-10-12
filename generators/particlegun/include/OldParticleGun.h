@@ -28,7 +28,7 @@ namespace Belle2 {//namespace Belle2
    * The class supports multiple tracks per event, different PIDcodes
    * and the range for track momenta, track angle and track origin is configurable.
    */
-  class ParticleGun {
+  class OldParticleGun {
 
   public:
 
@@ -48,16 +48,12 @@ namespace Belle2 {//namespace Belle2
     /**
      * Constructor.
      */
-    ParticleGun() {
-
-      // m_grand.SetSeed(m_randomseed); /** For the time being, always the same fixed seed is used. This will be changed when the random generator becomes a global object from the framework. */
-
-    };
+    OldParticleGun();
 
     /**
      * Destructor.
      */
-    ~ParticleGun() {}
+    ~OldParticleGun() {}
 
     /**
      * This function sets the random seed for the particle gun

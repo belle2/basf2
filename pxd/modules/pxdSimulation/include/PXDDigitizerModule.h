@@ -79,8 +79,10 @@ namespace Belle2 {
       relations_map m_truehits;
     };
 
+    /** Map of all hits in one Sensor */
     typedef std::map<Digit, DigitValue> Sensor;
-    typedef std::map<unsigned short, Sensor> Sensors;
+    /** Map of all hits in all Sensors */
+    typedef std::map<VxdID, Sensor> Sensors;
 
     /** The PXD Digitizer module. */
     class PXDDigitizerModule : public Module {
@@ -106,7 +108,7 @@ namespace Belle2 {
        * @param electrons number of electrons to drift
        */
       void driftChargeSimple(const TVector3 &position, double electrons);
-      /** Add pure noise digits toe the Sensors */
+      /** Add pure noise digits to the Sensors */
       void addNoiseDigits();
       /** Calculate the noise contribution to one pixel with given charge.
        * @return the new charge of the pixel.

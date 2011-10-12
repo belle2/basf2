@@ -55,10 +55,7 @@ namespace Belle2 {
   /** Namespace to encapsulate code needed for simulation and reconstrucion of the PXD */
   namespace PXD {
 
-    //-----------------------------------------------------------------
-    //                 Register the Creator
-    //-----------------------------------------------------------------
-
+    /** Register the creator */
     geometry::CreatorFactory<GeoPXDCreator> GeoPXDFactory("PXDCreator");
 
     //-----------------------------------------------------------------

@@ -46,9 +46,9 @@ namespace Belle2 {
       /** Constructor */
       GeoPXDActiveArea(double u = 0, double v = 0, double stepSize = 0):
           u(u), v(v), stepSize(stepSize) {}
-      double u;         /** < u coordinate where to start the active area */
-      double v;         /** < v coordinate where to start the active area */
-      double stepSize;  /** < maximum Geant4 steplength inside the active area */
+      double u;         /**< u coordinate where to start the active area */
+      double v;         /**< v coordinate where to start the active area */
+      double stepSize;  /**< maximum Geant4 steplength inside the active area */
     };
 
     /** Struct holding all parameters for an component */
@@ -59,15 +59,15 @@ namespace Belle2 {
           volume(0), material(material), color(color), width(width), length(length),
           height(height), flipU(false), flipV(false), flipW(false) {}
 
-      G4LogicalVolume* volume; /** < Pointer to the Logical volume if already created  */
-      std::string material;    /** < Name of the material of the component */
-      std::string color;       /** < Name of the color of the component */
-      double width;            /** < width of the component */
-      double length;           /** < length of the component */
-      double height;           /** < height of the component */
-      bool flipU;              /** < flip subcomponents along u? */
-      bool flipV;              /** < flip subcomponents along v? */
-      bool flipW;              /** < flip subcomponents along w? */
+      G4LogicalVolume* volume; /**< Pointer to the Logical volume if already created  */
+      std::string material;    /**< Name of the material of the component */
+      std::string color;       /**< Name of the color of the component */
+      double width;            /**< width of the component */
+      double length;           /**< length of the component */
+      double height;           /**< height of the component */
+      bool flipU;              /**< flip subcomponents along u? */
+      bool flipV;              /**< flip subcomponents along v? */
+      bool flipW;              /**< flip subcomponents along w? */
     };
 
     /** Struct holding all parameters for a completePXD Sensor */

@@ -54,28 +54,48 @@ namespace Belle2 {
         m_integrationEnd = end;
       }
 
+      /** Return the bulk doping of the Silicon sensor */
       double getBulkDoping() const { return m_bulkDoping; }
+      /** Return the voltage at the backside of the sensor */
       double getBackVoltage() const { return m_backVoltage; }
+      /** Return the voltate at the top of the sensor */
       double getTopVoltage() const { return m_topVoltage; }
+      /** Return the distance between the source side of the pixel and the start of the Gate */
       double getSourceBorder() const { return m_sourceBorder; }
+      /** Return the distance between the clear side of the pixel and the start of the Gate */
       double getClearBorder() const { return m_clearBorder; }
+      /** Return the distance between the drain side of the pixel and the start of the Gate */
       double getDrainBorder() const { return m_drainBorder; }
+      /** Return depth of the surface where the electrons will be collected */
       double getGateDepth() const { return m_gateDepth; }
+      /** Return true if the Sensor is a double pixel structure: every other pixel is mirrored along v */
       bool   getDoublePixel() const { return m_doublePixel; }
 
+      /** Return the start of the integration window, the timeframe the PXD is sensitive */
       double getIntegrationStart() const { return m_integrationStart; }
+      /** Return the end of the integration window, the timeframe the PXD is sensitive */
       double getIntegrationEnd() const { return m_integrationEnd; }
     protected:
+      /** The bulk doping of the Silicon sensor */
       double m_bulkDoping;
+      /** The voltage at the backside of the sensor */
       double m_backVoltage;
+      /** The voltate at the top of the sensor */
       double m_topVoltage;
+      /** The distance between the source side of the pixel and the start of the Gate */
       double m_sourceBorder;
+      /** The distance between the clear side of the pixel and the start of the Gate */
       double m_clearBorder;
+      /** The distance between the drain side of the pixel and the start of the Gate */
       double m_drainBorder;
+      /** Return depth of the surface where the electrons will be collected */
       double m_gateDepth;
+      /** True if the Sensor is a double pixel structure: every other pixel is mirrored along v */
       bool   m_doublePixel;
 
+      /** The start of the integration window, the timeframe the PXD is sensitive */
       double m_integrationStart;
+      /** The end of the integration window, the timeframe the PXD is sensitive */
       double m_integrationEnd;
     };
 

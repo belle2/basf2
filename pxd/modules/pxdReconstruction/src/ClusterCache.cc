@@ -80,7 +80,7 @@ namespace Belle2 {
 
       //reset variables
       m_curV = v;
-      m_curU = -1;
+      m_curU = MAX_PIXELS_U + 1;
       m_clsLeft = 0;
       m_idxCurrent  = !m_idxCurrent;
       m_idxNext = !m_idxNext;

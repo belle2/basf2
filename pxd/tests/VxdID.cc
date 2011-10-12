@@ -7,6 +7,7 @@ using namespace std;
 
 namespace Belle2 {
 
+  /** Check that both constructors yield the same result */
   TEST(VxdID, Constructor)
   {
     VxdID s("1.1.1");
@@ -15,6 +16,7 @@ namespace Belle2 {
     EXPECT_EQ((string)l, "1.1.1");
   }
 
+  /** Check the string conversion of the VxdID in both directions */
   TEST(VxdID, FromString)
   {
     //Check that all possible values can be converted back and forth

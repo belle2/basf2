@@ -280,7 +280,7 @@ void PXDDigitizerModule::processHit()
   } else {
     //Otherwise, split into segments of (default) max. 5µm and
     //drift the charges from the center of each segment
-    int numberOfSegments = (trackLength / m_segmentLength) + 1;
+    int numberOfSegments = (int)(trackLength / m_segmentLength) + 1;
     double segmentLength = trackLength / numberOfSegments;
     electrons /= numberOfSegments;
     direction.SetMag(1.0);
@@ -326,7 +326,7 @@ void PXDDigitizerModule::driftCharge(const TVector3 &position, double electrons)
   double sigmaDiffus = sqrt(2 * Unit::uTherm  * Unit::eMobilitySi * m_elStepTime);
   //Divide into groups of m_elGroupSize electrons and simulate lateral diffusion of each group by doing a
   //random walk with free electron mobility in uv-plane
-  int    nGroups     = (electrons / m_elGroupSize) + 1;
+  int    nGroups     = (int)(electrons / m_elGroupSize) + 1;
   double groupCharge = electrons / nGroups;
 
   B2DEBUG(30, "Sigma of drift diffusion is " << sigmaDrift);

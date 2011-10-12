@@ -53,11 +53,11 @@ namespace Belle2 {
 
     /** Constructor
      * @param rootFile Pointer to the ROOTFile where the histograms will be stored.
-     * @param histPrefix Prefix to preprend to all Histograms
+     * @param name Prefix to preprend to all Histograms
      * @param axisLabel Labels for the histogram axes, separated by semicolon
      * @param params Parameters for the scan
      */
-    MaterialScan(TFile* rootFile, const std::string &histPrefix, const std::string& axisLabel, ScanParams params);
+    MaterialScan(TFile* rootFile, const std::string &name, const std::string& axisLabel, ScanParams params);
 
     /** virtual destructor */
     virtual ~MaterialScan() {};
@@ -68,6 +68,11 @@ namespace Belle2 {
      * @return false if the scan is finished
      */
     bool createNext(G4ThreeVector &origin, G4ThreeVector &direction);
+
+    /** Return the name of the scan */
+    std::string getName() const { return m_name; }
+    /** Return the number of rays necessary to perform the scan */
+    int getNRays() const { return m_params.nU * m_params.nV; }
 
     /** Record the material budget for each step of the particles */
     void UserSteppingAction(const G4Step* step);
@@ -87,8 +92,8 @@ namespace Belle2 {
 
     /** Pointer to the root file for the histograms */
     TFile *m_rootFile;
-    /** Prefix to prepend for all histogram names */
-    std::string m_histPrefix;
+    /** Name of the scan, will be prefixed to all histogram names */
+    std::string m_name;
     /** Labels for the coordinate axes */
     std::string m_axisLabel;
     /** Parameters for the scan */
@@ -114,13 +119,17 @@ namespace Belle2 {
   public:
     /** Create a Spherical Scan object with the given parameters
      * @param rootFile pointer to the ROOT File containing the histograms
+     * @param origin Origin for the spherical scan
      * @param params Parameters of the scan
      */
-    MaterialScanSpherical(TFile* rootFile, ScanParams params):
-        MaterialScan(rootFile, "Spherical", "#theta [deg];#phi [deg]", params) {}
+    MaterialScanSpherical(TFile* rootFile, const G4ThreeVector& origin, ScanParams params):
+        MaterialScan(rootFile, "Spherical", "#theta [deg];#phi [deg]", params), m_origin(origin) {}
   protected:
     /** Create a ray with the current parameter values according to a spherical distribution */
     void getRay(G4ThreeVector &origin, G4ThreeVector &direction);
+
+    /** Origin for the spherical scan */
+    G4ThreeVector m_origin;
   };
 
   /** Specific implementaion of MaterialScan to scan parallel to a given plane.
@@ -140,7 +149,7 @@ namespace Belle2 {
      * @param params Parameters of the scan
      */
     MaterialScanPlanar(TFile* rootFile, const G4ThreeVector& origin, const G4ThreeVector& dirU, const G4ThreeVector& dirV, ScanParams params):
-        MaterialScan(rootFile, "Plane", "u [cm];v [cm]", params), m_origin(origin), m_dirU(dirU.unit()), m_dirV(dirV.unit()), m_dirW(m_dirU.cross(m_dirV)) {
+        MaterialScan(rootFile, "Planar", "u [cm];v [cm]", params), m_origin(origin), m_dirU(dirU.unit()), m_dirV(dirV.unit()), m_dirW(m_dirU.cross(m_dirV)) {
     }
   protected:
     /** Create a ray with the current parameter values according to a planar distribution */
@@ -204,6 +213,7 @@ namespace Belle2 {
     MaterialScan::ScanParams m_planar;
     /** Custom plane definition if m_planName is "custom" */
     std::vector<double> m_customPlane;
+    std::vector<double> m_sphericalOrigin;
   };
 }
 

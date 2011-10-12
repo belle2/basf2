@@ -10,7 +10,7 @@ gearbox = register_module('Gearbox')
 geometry = register_module('Geometry')
 geant4 = register_module('FullSim')
 matscan = register_module('MaterialScan')
-matscan.log_level = LogLevel.INFO
+matscan.set_log_level(LogLevel.INFO)
 
 # Restrict Geometry to certain components, in this case only BeamPipe and PXD
 geometry.param('Components', ['BeamPipe', 'PXD'])
@@ -23,6 +23,7 @@ geometry.param('Components', ['BeamPipe', 'PXD'])
 matscan.param({
     'Filename': 'MaterialScan.root',
     'spherical': True,
+    'spherical.origin': [0, 0, 0],
     'spherical.nTheta': 1000,
     'spherical.minTheta': 17,
     'spherical.maxTheta': 150,

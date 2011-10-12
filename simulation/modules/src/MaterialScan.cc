@@ -10,6 +10,7 @@
 
 #include <simulation/modules/MaterialScan.h>
 #include <framework/gearbox/Unit.h>
+#include <framework/core/utilities.h>
 #include <boost/format.hpp>
 
 #include <TFile.h>
@@ -25,6 +26,7 @@
 #include <G4Track.hh>
 
 #include <boost/foreach.hpp>
+#include <boost/format.hpp>
 #include <boost/algorithm/string.hpp>
 
 using namespace std;
@@ -39,8 +41,8 @@ REG_MODULE(MaterialScan);
 //                 Implementation
 //-----------------------------------------------------------------
 
-MaterialScan::MaterialScan(TFile* rootFile, const std::string &histPrefix, const std::string& axisLabel, ScanParams params):
-    G4UserSteppingAction(), m_rootFile(rootFile), m_histPrefix(histPrefix), m_axisLabel(axisLabel), m_params(params)
+MaterialScan::MaterialScan(TFile* rootFile, const std::string &name, const std::string& axisLabel, ScanParams params):
+    G4UserSteppingAction(), m_rootFile(rootFile), m_name(name), m_axisLabel(axisLabel), m_params(params)
 {
   //Sort the parameters accordingly
   if (m_params.minU > m_params.maxU) std::swap(m_params.minU, m_params.maxU);
@@ -81,7 +83,7 @@ void MaterialScan::fillValue(const std::string &name, double value)
   if (!hist) {
     //Create new histogram
     m_rootFile->cd();
-    hist = new TH2D((m_histPrefix + name).c_str(), (name + ";" + m_axisLabel).c_str(),
+    hist = new TH2D((m_name + name).c_str(), (name + ";" + m_axisLabel).c_str(),
                     m_params.nU, m_params.minU, m_params.maxU,
                     m_params.nV, m_params.minV, m_params.maxV);
   }
@@ -121,7 +123,7 @@ void MaterialScan::UserSteppingAction(const G4Step* step)
 void MaterialScanSpherical::getRay(G4ThreeVector &origin, G4ThreeVector &direction)
 {
   //We always shoot from the origin
-  origin.set(0, 0, 0);
+  origin = m_origin;
   double theta = m_curU * Unit::deg;
   double phi   = m_curV * Unit::deg;
   direction.set(sin(theta) * cos(phi),
@@ -136,7 +138,7 @@ void MaterialScanPlanar::getRay(G4ThreeVector &origin, G4ThreeVector &direction)
   direction = m_dirW;
 }
 
-MaterialScanModule::MaterialScanModule(): m_rootFile(0)
+MaterialScanModule::MaterialScanModule(): m_rootFile(0), m_sphericalOrigin(3, 0)
 {
   //Set module properties
   setDescription("This Module is intended to scan the material budget of the "
@@ -153,6 +155,8 @@ MaterialScanModule::MaterialScanModule(): m_rootFile(0)
   addParam("spherical",           m_doSpherical,
            "Do a spherical scan, that is shooting rays from the origin with "
            "varying angles", true);
+  addParam("spherical.origin",    m_sphericalOrigin,
+           "Origin for the spherical scan", m_sphericalOrigin);
   addParam("spherical.nTheta",    m_spherical.nU,
            "Number of rays in theta", 200);
   addParam("spherical.minTheta",  m_spherical.minU,
@@ -216,8 +220,14 @@ void MaterialScanModule::initialize()
     B2ERROR("planar.plane: " << m_planeName << " not valid, cannot use the same axis twice");
   }
 
+  //Check if we have enough values to define the origin
+  if (m_sphericalOrigin.size() < 3) {
+    B2ERROR("spherical.origin: Three values are needed to define a point, only " << m_sphericalOrigin.size() << " given.");
+  }
+
   //Convert plane definition to mm since Geant4 is of course using other units
   BOOST_FOREACH(double &value, m_customPlane) value /= Unit::mm;
+  BOOST_FOREACH(double &value, m_sphericalOrigin) value /= Unit::mm;
 }
 
 void MaterialScanModule::terminate()
@@ -248,7 +258,8 @@ void MaterialScanModule::beginRun()
   //- record the material budget for each ray
   vector<MaterialScan*> scans;
   if (m_doSpherical) {
-    scans.push_back(new MaterialScanSpherical(m_rootFile, m_spherical));
+    G4ThreeVector origin(m_sphericalOrigin[0], m_sphericalOrigin[1], m_sphericalOrigin[2]);
+    scans.push_back(new MaterialScanSpherical(m_rootFile, origin, m_spherical));
   }
   if (m_doPlanar) {
     G4ThreeVector origin(0, 0, 0);
@@ -271,14 +282,28 @@ void MaterialScanModule::beginRun()
     eventManager->SetUserAction(scan);
     //Now we can scan
     G4RayShooter rayShooter;
-    int evtNr(1);
     G4ThreeVector origin;
     G4ThreeVector direction;
+    int maxRays = scan->getNRays();
+    int curRay(0);
+    int lastPercent(-1);
+    double start = Utils::getClock();
     //Create one event per ray and process it
     while (scan->createNext(origin, direction)) {
-      G4Event* event = new G4Event(evtNr++);
+      G4Event* event = new G4Event(++curRay);
       rayShooter.Shoot(event, origin, direction);
       eventManager->ProcessOneEvent(event);
+
+      //Show progress
+      int donePercent = 100 * curRay / maxRays;
+      if (donePercent > lastPercent) {
+        double perRay = (Utils::getClock() - start) / curRay;
+        double eta = perRay * (maxRays - curRay);
+        B2INFO(boost::format("%s Scan: %3d%%, %.3f ms per ray, ETA: %.2f seconds")
+               % scan->getName() % donePercent
+               % (perRay / Unit::ms) % (eta / Unit::s));
+        lastPercent = donePercent;
+      }
     }
     //Free the scan object
     delete scan;

@@ -287,6 +287,10 @@
             <Strips>
               <Width      desc="Width"       unit="mm">40.0</Width>
               <Thickness  desc="Thickness"   unit="mm">7.0</Thickness>
+              <GrooveDepth unit="mm">4.5</GrooveDepth>
+              <GrooveWidth unit="mm">1.4</GrooveWidth>
+              <NoScintillationThickness unit="mm">0.1</NoScintillationThickness>
+              <RSSSize unit="mm">5.0</RSSSize>
               <Strip id="1">
                 <Length     desc="Length"      unit="mm">1572.0</Length>
                 <PositionX  desc="X position"  unit="mm">2221.0</PositionX>

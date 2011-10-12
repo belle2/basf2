@@ -118,6 +118,8 @@ namespace Belle2 {
       return false;
     }
     G4PVPlacementGT *pvgt = (G4PVPlacementGT*)pv;
+    pvgt = pvgt->getMother();
+    pvgt = pvgt->getMother();
     hit->set_nStrip(pvgt->getID());
     pvgt = pvgt->getMother();
     hit->set_nPlane(pvgt->getID());

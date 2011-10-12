@@ -192,8 +192,14 @@ void GeoEKLMBelleII::readXMLData(const GearDir& content)
   GearDir Strips(Plane);
   Strips.append("/Strips");
   nStrip = Strips.getNumberNodes("Strip");
-  Strip_width  = Strips.getLength("Width") * cm;
-  Strip_thickness = Strips.getLength("Thickness") * cm;
+  StripSize.width  = Strips.getLength("Width") * cm;
+  StripSize.thickness = Strips.getLength("Thickness") * cm;
+  StripSize.groove_depth = Strips.getLength("GrooveDepth") * cm;
+  StripSize.groove_width = Strips.getLength("GrooveWidth") * cm;
+  StripSize.no_scintillation_thickness = Strips.
+                                         getLength("NoScintillationThickness")
+                                         * cm;
+  StripSize.rss_size = Strips.getLength("RSSSize") * cm;
   StripPosition = new struct EKLMElementPosition[nStrip];
   if (StripPosition == NULL) {
     B2FATAL("Memory allocation error.");
@@ -1250,7 +1256,7 @@ void GeoEKLMBelleII::createPlane(int iPlane, G4PVPlacementGT *mpvgt)
     for (j = 1; j <= nStrip; j++)
       createPlasticListElement(i, j, physiPlane);
   for (i = 1; i <= nStrip; i++)
-    createStrip(i, physiPlane);
+    createStripVolume(i, physiPlane);
 }
 
 /**
@@ -1289,7 +1295,8 @@ void GeoEKLMBelleII::createSectionReadoutBoard(int iPlane, int iBoard,
                                                  BoardTransform[iPlane - 1]
                                                  [iBoard - 1],
                                                  logicSectionReadoutBoard,
-                                                 Board_Name, iBoard, iPlane);
+                                                 Board_Name,
+                                                 10 * iPlane + iBoard);
   if (physiSectionReadoutBoard == NULL) {
     B2FATAL("Memory allocation error.");
     exit(ENOMEM);
@@ -1365,7 +1372,8 @@ void GeoEKLMBelleII::createStripBoard(int iBoard, G4PVPlacementGT *mpvgt)
   t = G4Translate3D(-0.5 * BoardSize.length + StripBoardPosition[iBoard - 1].x,
                     -0.5 * BoardSize.height + BoardSize.base_height +
                     0.5 * BoardSize.strip_height, 0.);
-  physiStripBoard = new G4PVPlacementGT(mpvgt, t, logicStripBoard, Board_Name);
+  physiStripBoard = new G4PVPlacementGT(mpvgt, t, logicStripBoard, Board_Name,
+                                        iBoard, m_mode);
   if (physiStripBoard == NULL) {
     B2FATAL("Memory allocation error.");
     exit(ENOMEM);
@@ -1484,7 +1492,7 @@ void GeoEKLMBelleII::createPlasticListElement(int iListPlane, int iList,
   std::string List_Name = "List_" + lexical_cast<string>(iList) + "_ListPlane_"
                           + lexical_cast<string>(iListPlane) + "_" +
                           mpvgt->GetName();
-  ly = Strip_width;
+  ly = StripSize.width;
   if (iList % 15 <= 1)
     ly = ly - PlasticListDeltaL;
   solidList = new G4Box(List_Name, 0.5 * StripPosition[iList - 1].length,
@@ -1505,7 +1513,7 @@ void GeoEKLMBelleII::createPlasticListElement(int iListPlane, int iList,
     y = y + 0.5 * PlasticListDeltaL;
   else if (iList % 15 == 0)
     y = y - 0.5 * PlasticListDeltaL;
-  z = 0.5 * (Strip_thickness + PlasticListWidth);
+  z = 0.5 * (StripSize.thickness + PlasticListWidth);
   if (iListPlane == 2)
     z = -z;
   t = G4Translate3D(StripPosition[iList - 1].X, y, z);
@@ -1516,6 +1524,49 @@ void GeoEKLMBelleII::createPlasticListElement(int iListPlane, int iList,
     exit(ENOMEM);
   }
 }
+
+/**
+ * createStripVolume - create strip volume (strip + SiPM)
+ * @iStrip: number of strip
+ * @mpvgt: mother physical volume with global transformation
+ */
+void GeoEKLMBelleII::createStripVolume(int iStrip, G4PVPlacementGT *mpvgt)
+{
+  G4Box *solidStripVolume;
+  G4LogicalVolume *logicStripVolume;
+  G4PVPlacementGT *physiStripVolume;
+  G4Transform3D t;
+  std::string StripVolume_Name = "StripVolume_" + lexical_cast<string>(iStrip)
+                                 + "_" + mpvgt->GetName();
+  solidStripVolume = new G4Box(StripVolume_Name,
+                               0.5 *(StripPosition[iStrip - 1].length +
+                                     StripSize.rss_size),
+                               0.5 * StripSize.width,
+                               0.5 * StripSize.thickness);
+  if (solidStripVolume == NULL) {
+    B2FATAL("Memory allocation error.");
+    exit(ENOMEM);
+  }
+  logicStripVolume = new G4LogicalVolume(solidStripVolume, Air,
+                                         StripVolume_Name);
+  if (logicStripVolume == NULL) {
+    B2FATAL("Memory allocation error.");
+    exit(ENOMEM);
+  }
+  geometry::setVisibility(*logicStripVolume, false);
+  t = G4Translate3D(StripPosition[iStrip - 1].X + 0.5 * StripSize.rss_size,
+                    StripPosition[iStrip - 1].Y, 0.0);
+  physiStripVolume = new G4PVPlacementGT(mpvgt, t, logicStripVolume,
+                                         StripVolume_Name, iStrip);
+  if (physiStripVolume == NULL) {
+    B2FATAL("Memory allocation error.");
+    exit(ENOMEM);
+  }
+  createStrip(iStrip, physiStripVolume);
+  if (m_mode == 1)
+    createSiPM(iStrip, physiStripVolume);
+}
+
 
 /*
  * createStrip - create strip
@@ -1528,26 +1579,149 @@ void GeoEKLMBelleII::createStrip(int iStrip, G4PVPlacementGT *mpvgt)
   G4LogicalVolume *logicStrip;
   G4PVPlacementGT *physiStrip;
   G4Transform3D t;
-  std::string Strip_Name = "Strip_" + lexical_cast<string>(iStrip) + "_" +
-                           mpvgt->GetName();
+  std::string Strip_Name = "Strip_" + mpvgt->GetName();
   solidStrip = new G4Box(Strip_Name, 0.5 * StripPosition[iStrip - 1].length,
-                         0.5 * Strip_width, 0.5 * Strip_thickness);
+                         0.5 * StripSize.width, 0.5 * StripSize.thickness);
   if (solidStrip == NULL) {
     B2FATAL("Memory allocation error.");
     exit(ENOMEM);
   }
-  logicStrip = new G4LogicalVolume(solidStrip, Polystyrene, Strip_Name, 0,
-                                   m_sensitive, 0);
+  logicStrip = new G4LogicalVolume(solidStrip, Polystyrene, Strip_Name);
   if (logicStrip == NULL) {
     B2FATAL("Memory allocation error.");
     exit(ENOMEM);
   }
   geometry::setVisibility(*logicStrip, true);
   geometry::setColor(*logicStrip, "#ffffffff");
-  t = G4Translate3D(StripPosition[iStrip - 1].X, StripPosition[iStrip - 1].Y,
-                    0.0);
+  t = G4Translate3D(-0.5 * StripSize.rss_size, 0., 0.);
   physiStrip = new G4PVPlacementGT(mpvgt, t, logicStrip, Strip_Name, iStrip);
   if (physiStrip == NULL) {
+    B2FATAL("Memory allocation error.");
+    exit(ENOMEM);
+  }
+  createStripGroove(iStrip, physiStrip);
+  createStripSensitive(iStrip, physiStrip);
+}
+
+/**
+ * createStripGroove - create strip groove
+ * @iStrip: number of strip
+ * @mpvgt: mother physical volume with global transformation
+ */
+void GeoEKLMBelleII::createStripGroove(int iStrip, G4PVPlacementGT *mpvgt)
+{
+  G4Box *solidGroove;
+  G4LogicalVolume *logicGroove;
+  G4PVPlacementGT *physiGroove;
+  G4Transform3D t;
+  std::string Groove_Name = "Groove_" + mpvgt->GetName();
+  solidGroove = new G4Box(Groove_Name, 0.5 * StripPosition[iStrip - 1].length,
+                          0.5 * StripSize.groove_width,
+                          0.5 * StripSize.groove_depth);
+  if (solidGroove == NULL) {
+    B2FATAL("Memory allocation error.");
+    exit(ENOMEM);
+  }
+  logicGroove = new G4LogicalVolume(solidGroove, Polystyrene, Groove_Name);
+  if (logicGroove == NULL) {
+    B2FATAL("Memory allocation error.");
+    exit(ENOMEM);
+  }
+  geometry::setColor(*logicGroove, "#00ff00ff");
+  geometry::setVisibility(*logicGroove, true);
+  t = G4Translate3D(0., 0.,
+                    0.5 * (StripSize.thickness - StripSize.groove_depth));
+  physiGroove = new G4PVPlacementGT(mpvgt, t, logicGroove, Groove_Name, iStrip);
+  if (physiGroove == NULL) {
+    B2FATAL("Memory allocation error.");
+    exit(ENOMEM);
+  }
+}
+
+/**
+ * createStripSensitive - create strip sensitive volume
+ * @iStrip: number of strip
+ * @mpvgt: mother physical volume with global transformation
+ */
+void GeoEKLMBelleII::createStripSensitive(int iStrip, G4PVPlacementGT *mpvgt)
+{
+  G4Box *solidSensitiveBox;
+  G4Box *solidSensitiveGroove;
+  G4SubtractionSolid *solidSensitive;
+  G4LogicalVolume *logicSensitive;
+  G4PVPlacementGT *physiSensitive;
+  G4Transform3D t;
+  G4Transform3D t1;
+  std::string Sensitive_Name = "Sensitive_" + mpvgt->GetName();
+  solidSensitiveBox = new G4Box("Box_" + Sensitive_Name,
+                                0.5 * StripPosition[iStrip - 1].length -
+                                StripSize.no_scintillation_thickness,
+                                0.5 * StripSize.width -
+                                StripSize.no_scintillation_thickness,
+                                0.5 * StripSize.thickness -
+                                StripSize.no_scintillation_thickness);
+  solidSensitiveGroove = new G4Box("Groove_" + Sensitive_Name,
+                                   0.5 * StripPosition[iStrip - 1].length,
+                                   0.5 * StripSize.groove_width,
+                                   0.5 * StripSize.groove_depth);
+  if (solidSensitiveBox == NULL || solidSensitiveGroove == NULL) {
+    B2FATAL("Memory allocation error.");
+    exit(ENOMEM);
+  }
+  t1 = G4Translate3D(0., 0.,
+                     0.5 * (StripSize.thickness - StripSize.groove_depth));
+  solidSensitive = new G4SubtractionSolid(Sensitive_Name, solidSensitiveBox,
+                                          solidSensitiveGroove, t1);
+  if (solidSensitive == NULL) {
+    B2FATAL("Memory allocation error.");
+    exit(ENOMEM);
+  }
+  logicSensitive = new G4LogicalVolume(solidSensitive, Polystyrene,
+                                       Sensitive_Name, 0, m_sensitive, 0);
+  if (logicSensitive == NULL) {
+    B2FATAL("Memory allocation error.");
+    exit(ENOMEM);
+  }
+  geometry::setColor(*logicSensitive, "#ffffffff");
+  geometry::setVisibility(*logicSensitive, false);
+  t = G4Translate3D(0., 0., 0.);
+  physiSensitive = new G4PVPlacementGT(mpvgt, t, logicSensitive, Sensitive_Name,
+                                       iStrip, m_mode);
+  if (physiSensitive == NULL) {
+    B2FATAL("Memory allocation error.");
+    exit(ENOMEM);
+  }
+}
+
+/**
+ * createSiPM - create silicon cube in the place of SiPM for radiation study
+ * @iStrip: number of strip
+ * @mpvgt: mother physical volume with global transformation
+ */
+void GeoEKLMBelleII::createSiPM(int iStrip, G4PVPlacementGT *mpvgt)
+{
+  G4Box *solidSiPM;
+  G4LogicalVolume *logicSiPM;
+  G4PVPlacementGT *physiSiPM;
+  G4Transform3D t;
+  std::string SiPM_Name = "SiPM_" + mpvgt->GetName();
+  solidSiPM = new G4Box(SiPM_Name, 0.5 * StripSize.rss_size,
+                        0.5 * StripSize.rss_size, 0.5 * StripSize.rss_size);
+  if (solidSiPM == NULL) {
+    B2FATAL("Memory allocation error.");
+    exit(ENOMEM);
+  }
+  logicSiPM = new G4LogicalVolume(solidSiPM, Polystyrene, SiPM_Name);
+  if (logicSiPM == NULL) {
+    B2FATAL("Memory allocation error.");
+    exit(ENOMEM);
+  }
+  geometry::setVisibility(*logicSiPM, true);
+  geometry::setColor(*logicSiPM, "#0000ffff");
+  t = G4Translate3D(0.5 * StripPosition[iStrip - 1].length, 0., 0.);
+  physiSiPM = new G4PVPlacementGT(mpvgt, t, logicSiPM, SiPM_Name, iStrip,
+                                  m_mode);
+  if (physiSiPM == NULL) {
     B2FATAL("Memory allocation error.");
     exit(ENOMEM);
   }

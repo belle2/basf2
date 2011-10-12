@@ -72,7 +72,7 @@ namespace Belle2 {
   };
 
   /**
-   * struct EKLMBoardData - readout board size data
+   * struct EKLMBoardSize - readout board size data
    */
   struct EKLMBoardSize {
     double length;       /**< length */
@@ -110,6 +110,18 @@ namespace Belle2 {
     double x;             /**< X coordinate */
     double y;             /**< Y coordinate */
     double z;             /**< Z coordinate */
+  };
+
+  /**
+   * Struct EKLMStripSize - strip size data.
+   */
+  struct EKLMStripSize {
+    double width;                      /**< width */
+    double thickness;                  /**< thickness */
+    double groove_depth;               /**< groove depth */
+    double groove_width;               /**< groove width */
+    double no_scintillation_thickness; /**< non-scintillating layer */
+    double rss_size;                   /**< radiation study SiPM size */
   };
 
   /**
@@ -323,11 +335,39 @@ namespace Belle2 {
                                   G4PVPlacementGT *mpvgt);
 
     /**
+     * createStripVolume - create strip volume (strip + SiPM)
+     * @iStrip: number of strip
+     * @mpvgt: mother physical volume with global transformation
+     */
+    void createStripVolume(int iStrip, G4PVPlacementGT *mpvgt);
+
+    /**
      * createStrip - create strip
      * @iStrip: number of strip
      * @mpvgt: mother physical volume with global transformation
      */
     void createStrip(int iStrip, G4PVPlacementGT *mpvgt);
+
+    /**
+     * createStripGroove - create strip groove
+     * @iStrip: number of strip
+     * @mpvgt: mother physical volume with global transformation
+     */
+    void createStripGroove(int iStrip, G4PVPlacementGT *mpvgt);
+
+    /**
+     * createStripSensitive - create strip sensitive volume
+     * @iStrip: number of strip
+     * @mpvgt: mother physical volume with global transformation
+     */
+    void createStripSensitive(int iStrip, G4PVPlacementGT *mpvgt);
+
+    /**
+     * createSiPM - create silicon cube in the place of SiPM for radiation study
+     * @iStrip: number of strip
+     * @mpvgt: mother physical volume with global transformation
+     */
+    void createSiPM(int iStrip, G4PVPlacementGT *mpvgt);
 
     /**
      * Air.
@@ -485,14 +525,9 @@ namespace Belle2 {
     struct EKLMElementPosition *StripPosition;
 
     /**
-     * Strip width.
+     * Strip size data.
      */
-    double Strip_width;
-
-    /**
-     * Strip thickness.
-     */
-    double Strip_thickness;
+    struct EKLMStripSize StripSize;
 
     /**
      * Detector mode. See description of possible values in G4PVPlacementGT.h

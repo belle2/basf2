@@ -63,74 +63,74 @@ namespace Belle2 {
     //helix parameters
     /** Getter for impact parameter.
      */
-    const float getD0() { return m_d0; }
+    float getD0() const { return m_d0; }
 
     /** Getter for phi.
      */
-    const float getPhi() { return m_phi; }
+    float getPhi() const { return m_phi; }
 
     /** Getter for kappa.
       */
-    const float getKappa() {return m_kappa; }
+    float getKappa() const {return m_kappa; }
 
     /** Getter for z0.
      */
-    const float getZ0() {return m_z0; }
+    float getZ0() const {return m_z0; }
 
     /** Getter for tanLambda.
     */
-    const float getTanLambda() { return m_tanLambda;}
+    float getTanLambda() const { return m_tanLambda;}
 
     //non-helix parameters.
     /** Getter for Chi2 of the track fit.
      */
-    const float getChi2() {return m_chi2;}
+    float getChi2() const {return m_chi2;}
 
     /** Getter for the probability value of the track fit.
      */
-    const float getPValue() {return m_pValue;}
+    float getPValue() const {return m_pValue;}
     /** Getter for total number of tracker hits.
      */
-    const int getNHits() {return m_nHits;}
+    int getNHits() const {return m_nHits;}
 
     /** Getter of the MCParticle Id.
      */
-    const int getMCId() { return m_mcId; }
+    int getMCId() const { return m_mcId; }
 
     /** Getter for the pdg hypothesis under which this track was fitted.
      */
-    const int getPDG() {return m_pdgHypo;}
+    int getPDG() const {return m_pdgHypo;}
 
     /** Getter for the purity of the track.
      */
-    const float getPurity() { return m_purity;}
+    float getPurity() const { return m_purity;}
 
     /** Returns true if the fit of this track failed.
      */
-    const bool getFitFailed() {return m_fitFailed;}
+    bool getFitFailed() const {return m_fitFailed;}
 
     /** Return true if the extrapolation of this track failed.
      */
-    const bool getExtrapFailed() {return m_extrapFailed;}
+    bool getExtrapFailed() const {return m_extrapFailed;}
 
     /** Getter for momentum errors.
      */
-    const TVector3 getPErrors() {return m_pErrors;}
+    TVector3 getPErrors() const {return m_pErrors;}
     /** Getter for vertex errors.
      */
-    const TVector3 getVertexErrors() {return m_vertexErrors;}
+    TVector3 getVertexErrors() const {return m_vertexErrors;}
 
     /**Getter for energy loss in the tracking detectors.
      */
-    const float getdEdx() { return m_dEdx;}
+    float getdEdx() const { return m_dEdx;}
 
     /** Getter for uncertainty on energy loss in tracking detectors.
      */
-    const float getdEdxSigma() { return m_dEdxSigma;}
+    float getdEdxSigma() const { return m_dEdxSigma;}
 
     /** Getter for radius of innermost hit contributing to the track.
      */
-    const float getRadiusOfInnermostHit() { return m_radiusOfInnermostHit;}
+    float getRadiusOfInnermostHit() const { return m_radiusOfInnermostHit;}
 
 
     // Setters for all the parameters.

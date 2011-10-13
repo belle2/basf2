@@ -53,6 +53,15 @@ namespace Belle2 {
       const G4ThreeVector & posOut
     );
 
+    //! Save EBECLSimHit into datastore
+    int saveEBSimHit(
+      const G4int cellId,
+      const G4int trackID,
+      const G4int pid,
+      const G4double edep,
+      const G4ThreeVector & mom);
+
+
     //! Get cell, theta, phi Id from PhysicalVolume
     int Mapping(const G4String VolumeName);
     int m_phiID; /**< The current phi ID in an event. Used to fill the DataStore ECL array.*/

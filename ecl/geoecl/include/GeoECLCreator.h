@@ -50,8 +50,8 @@ namespace Belle2 {
 
     private:
 
-      G4LogicalVolume* logical_ecl;
-      G4VPhysicalVolume* physical_ecl;
+      G4LogicalVolume* logical_ecl;/**< the ecl Logical Volume */
+      G4VPhysicalVolume* physical_ecl;/**< the ecl Physical Volume*/
 
       //! Sensitive detector
       ECLSensitiveDetector* m_sensitive;

@@ -72,7 +72,7 @@ namespace Belle2 {
     //! Mapping theta, phi Id
     void Mapping(int cid);
 
-
+    //! Get Crystal Position
     TVector3 GetCrystalPos(int cid);  /** The Postion of crystal*/
 
     TVector3 GetCrystalVec(int cid);  /** The dection of crystal*/

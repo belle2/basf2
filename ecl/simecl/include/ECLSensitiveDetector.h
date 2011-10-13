@@ -63,8 +63,8 @@ namespace Belle2 {
 
   private:
 
-    G4double m_thresholdEnergyDeposit;
-    G4double m_thresholdKineticEnergy;
+    G4double m_thresholdEnergyDeposit;/*Energy Deposit  threshold  */
+    G4double m_thresholdKineticEnergy;/*Kinetic Energy  threshold  */
     int m_hitNumber; /**< The current number of created hits in an event. Used to fill the DataStore ECL array.*/
     int m_EBhitNumber; /**< The current number of created hits in an event. Used to fill the DataStore ECL EB array.*/
   };

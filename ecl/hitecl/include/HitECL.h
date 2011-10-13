@@ -79,7 +79,7 @@ namespace Belle2 {
       m_TimeAve = TimeAve;
     }
 
-    ClassDef(HitECL, 1);
+    ClassDef(HitECL, 1);/**< the class title */
 
   };
 

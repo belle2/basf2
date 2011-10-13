@@ -182,7 +182,7 @@ namespace Belle2 {
       m_posFlag = posFlag;
     }
 
-    ClassDef(ECLSimHit, 1);
+    ClassDef(ECLSimHit, 1);/**< the class title */
 
   };
 

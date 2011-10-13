@@ -56,8 +56,6 @@ namespace Belle2 {
 
   private:
 
-    bool m_mcTracks;                                 /**< Boolean to set if MCTracks (1) or patter reco tracks (0) are used */
-
     std::string m_cdcHitsColName;                    /**< CDCHits collection name */
     std::string m_svdHitsColName;                    /**< SVDHits collection name */
     std::string m_pxdHitsColName;                    /**< PXDHits collection name */
@@ -68,6 +66,17 @@ namespace Belle2 {
 
     int m_failedFitCounter;                          /**< Number of failed fits. */
     int m_successfulFitCounter;                      /**< Number of successfully fitted tracks. */
+
+    bool m_mcTracks;                                 /**< Boolean to mark if MCTrack or pattern reco tracks should be fitted. */
+
+    int m_filterId;                                  /**< Select the filter: 0 for Kalman, 1 (>0) for DAF. */
+    int m_nIter;                                     /**< Number of iterations for the Kalman filter. */
+    double m_probCut;                                /**< Probability cut for the DAF filter (0.001, 0.005, 0.01). */
+
+    bool m_storeFailed;                              /**< Boolean to mark if failed track fits should also be stored as Tracks. */
+    int m_pdg;                                       /**< PDG hypothesis for the track fit. If -999: MC/default values will be used. */
+
+    std::ofstream HelixParam;                        /**< Text output file name */
 
 
   };

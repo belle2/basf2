@@ -9,22 +9,22 @@
  **************************************************************************/
 #include <tracking/modules/genfitter/GenFitterModule.h>
 
-#include <framework/dataobjects/Relation.h>
+#include <framework/datastore/RelationArray.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Unit.h>
 
 #include <framework/logging/Logger.h>
 
+#include <geometry/GeometryManager.h>
 #include <geometry/bfieldmap/BFieldMap.h>
 
 #include <generators/dataobjects/MCParticle.h>
 
 #include <cdc/dataobjects/CDCHit.h>
-#include <svd/dataobjects/SVDHit.h>
-#include <pxd/dataobjects/PXDHit.h>
-
+#include <svd/dataobjects/SVDTrueHit.h>
+#include <pxd/dataobjects/PXDTrueHit.h>
 #include <cdc/dataobjects/CDCRecoHit.h>
-#include <svd/dataobjects/SVDRecoHit.h>
+//#include <svd/dataobjects/SVDRecoHit.h>
 #include <pxd/dataobjects/PXDRecoHit.h>
 
 #include <tracking/dataobjects/Track.h>
@@ -40,6 +40,7 @@
 #include "GFAbsTrackRep.h"
 #include "RKTrackRep.h"
 
+#include <tracking/gfbfield/GFGeant4Field.h>
 #include "GFConstField.h"
 #include "GFFieldManager.h"
 
@@ -67,19 +68,25 @@ GenFitterModule::GenFitterModule() :
   setDescription(
     "Uses GenFit to fit tracks. Needs GFTrackCands as input and provides GFTracks and Tracks as output.");
 
-
-  addParam("mcTracks", m_mcTracks, "Set true if the track candidates are from MCTrackFinder, set false if they are coming from the pattern recognition", bool(true));
-
   //input
   addParam("GFTrackCandidatesColName", m_gfTrackCandsColName,
-           "Name of collection holding the GFTrackCandidates (should be created by the pattern recognition or MCTrackFinderModule)", string("GFTrackCandidates"));
-  addParam("CDCHitsColName", m_cdcHitsColName, "CDCHits collection", string("CDCHits"));
-  addParam("SVDHitsColName", m_svdHitsColName, "SVDHits collection", string(DEFAULT_SVDHITS));
-  addParam("PXDHitsColName", m_pxdHitsColName, "PXDHits collection", string(DEFAULT_PXDHITS));
+           "Name of collection holding the GFTrackCandidates (should be created by the pattern recognition or MCTrackFinderModule)", string(""));
+  addParam("CDCHitsColName", m_cdcHitsColName, "CDCHits collection", string(""));
+  addParam("SVDHitsColName", m_svdHitsColName, "SVDHits collection", string(""));
+  addParam("PXDHitsColName", m_pxdHitsColName, "PXDHits collection", string(""));
+
+  //the tracks from MCTrackFinder are treated slightly different from tracks from pattern recognition (uknown pdg), so this parameter should be set true from mcTrack and false for pattern reco tracks
+  addParam("mcTracks", m_mcTracks, "Set true if the track candidates are from MCTrackFinder, set false if they are coming from the pattern recognition", bool(true));
+  //select the filter and set some parameters
+  addParam("FilterId", m_filterId, "Set 0 to use Kalman Filter, 1 to use DAF", int(0));
+  addParam("NIterations", m_nIter, "Number of iterations for the Kalman filter", int(1));
+  addParam("ProbCut", m_probCut, "Probability cut for the DAF (0.001, 0.005, 0.01)", double(0.001));
+  addParam("StoreFailedTracks", m_storeFailed, "Set true if the tracks where the fit failed should also be stored in the output", bool(false));
+  addParam("pdg", m_pdg, "Set the pdg hypothesis (positive charge) for the track (if set to -999, MC/default pdg will be used)", int(-999));
 
   //output
-  addParam("GFTracksColName", m_gfTracksColName, "Name of collection holding the final GFTracks (will be created by this module)", string("GFTracks"));
-  addParam("TracksColName", m_tracksColName, "Name of collection holding the final Tracks (will be created by this module)", string("Tracks"));
+  addParam("GFTracksColName", m_gfTracksColName, "Name of collection holding the final GFTracks (will be created by this module)", string(""));
+  addParam("TracksColName", m_tracksColName, "Name of collection holding the final Tracks (will be created by this module)", string(""));
 
 }
 
@@ -92,6 +99,12 @@ void GenFitterModule::initialize()
 
   m_failedFitCounter = 0;
   m_successfulFitCounter = 0;
+
+  StoreArray < Track > tracks(m_tracksColName);
+  StoreArray < GFTrack > gfTracks(m_gfTracksColName);
+
+  HelixParam.open("HelixParam.txt");
+
 }
 
 void GenFitterModule::beginRun()
@@ -103,31 +116,44 @@ void GenFitterModule::event()
 {
   B2INFO("**********   GenFitterModule  ************");
 
+  StoreArray < MCParticle > mcParticles("MCParticles");
+
   StoreArray < GFTrackCand > trackCandidates(m_gfTrackCandsColName);
-  B2INFO("GenFitter: Number of GFTrackCandidates: " << trackCandidates.GetEntries());
-  if (trackCandidates.GetEntries() == 0)
+  B2INFO("GenFitter: Number of GFTrackCandidates: " << trackCandidates.getEntries());
+  if (trackCandidates.getEntries() == 0)
     B2WARNING("GenFitter: GFTrackCandidatesCollection is empty!");
 
   StoreArray < CDCHit > cdcHits(m_cdcHitsColName);
-  B2DEBUG(100, "GenFitter: Number of CDCHits: " << cdcHits.GetEntries());
-  if (cdcHits.GetEntries() == 0)
+  B2DEBUG(149, "GenFitter: Number of CDCHits: " << cdcHits.getEntries());
+  if (cdcHits.getEntries() == 0)
     B2WARNING("GenFitter: CDCHitsCollection is empty!");
 
-  StoreArray < SVDHit > svdHits(m_svdHitsColName);
-  B2DEBUG(100, "GenFitter: Number of SVDHits: " << svdHits.GetEntries());
-  if (svdHits.GetEntries() == 0)
+  StoreArray < SVDTrueHit > svdHits(m_svdHitsColName);
+  B2DEBUG(149, "GenFitter: Number of SVDHits: " << svdHits.getEntries());
+  if (svdHits.getEntries() == 0)
     B2WARNING("GenFitter: SVDHitsCollection is empty!");
 
-  StoreArray < PXDHit > pxdHits(m_pxdHitsColName);
-  B2DEBUG(100, "GenFitter: Number of PXDHits: " << pxdHits.GetEntries());
-  if (pxdHits.GetEntries() == 0)
+  StoreArray < PXDTrueHit > pxdHits(m_pxdHitsColName);
+  B2DEBUG(149, "GenFitter: Number of PXDHits: " << pxdHits.getEntries());
+  if (pxdHits.getEntries() == 0)
     B2WARNING("GenFitter: PXDHitsCollection is empty!");
 
+  if (m_filterId == 0) {
+    B2INFO("Kalman filter with " << m_nIter << " iterations will be used ");
+  }
 
-  //Give Genfit the magnetic field, should come from the common database later... And we have to think if and how we want to incorporate the realistic magnetic field map
-  GFFieldManager::getInstance()->init(new GFConstField(0., 0., 15.));
+  else {
+    B2INFO("DAF will wit probability cut " << m_probCut << " will be used ");
+  }
 
-  //!!!!! will move to initialize
+  //convert geant4 geometry to TGeo geometry
+  //in the moment tesselated solids used for the glue within the PXD cannot be converted to TGeo, the general solution still has to be found, at the moment you can just comment out lines 6 and 13 in  pxd/data/PXD-Components.xml.
+  geometry::GeometryManager &geoManager = geometry::GeometryManager::getInstance();
+  geoManager.createTGeoRepresentation();
+
+  //get the magnetic field
+  GFFieldManager::getInstance()->init(new GFGeant4Field());
+
   //StoreArrays to store the fit results
   StoreArray < Track > tracks(m_tracksColName);
   StoreArray < GFTrack > gfTracks(m_gfTracksColName);
@@ -135,7 +161,7 @@ void GenFitterModule::event()
   //counter for fitted tracks, the number of fitted tracks may differ from the number of trackCandidates if the fit fails for some of them
   int trackCounter = -1;
 
-  for (int i = 0; i < trackCandidates.GetEntries(); ++i) { //loop over all track candidates
+  for (int i = 0; i < trackCandidates.getEntries(); ++i) { //loop over all track candidates
     B2INFO("#############  Fit track candidate Nr. : " << i << "  ################")
 
     GFAbsTrackRep* trackRep;  //initialize track representation
@@ -145,50 +171,52 @@ void GenFitterModule::event()
     if (m_mcTracks == true) {
 
       //for GFTrackCandidates from MCTrackFinder all information is already there
+      //check for user chosen pdg
+      if (m_pdg != -999) {
+        trackCandidates[i]->setPdgCode(int(TMath::Sign(1., trackCandidates[i]->getQoverPseed()) * m_pdg));
+      }
       trackRep = new RKTrackRep(trackCandidates[i]);
-      //trackRep = new RKTrackRep(trackCandidates[i]->getPosSeed(), trackCandidates[i]->getDirSeed(), trackCandidates[i]->getPdgCode());
       B2INFO("Fit MCTrack with start values: ");
     }
 
     else {
 
-      //the idea is to use different possible pdg values (with correct charge)
-      //will be implemented later on ...
+      //the idea is to use different possible pdg values (with correct charge) and fit them all and only afterwards select the best hypothesis
+      //however, as it will produce 5 times more tracks and take longer and no one seems to really need it now, it will be implemented later on ...
       int pdg;
-      int basicPDG = 211; //just choose some random common pdg, in this case pion
-      pdg = int(TMath::Sign(1., trackCandidates[i]->getQoverPseed()) * basicPDG);
+      if (m_pdg != -999) {
+        pdg = m_pdg;
+      } else pdg = -13;    //just choose some random common pdg, in this case muon
 
-      trackCandidates[i]->setPdgCode(pdg);
+      trackCandidates[i]->setPdgCode(int(TMath::Sign(1., trackCandidates[i]->getQoverPseed()) * pdg));
 
       trackRep = new RKTrackRep(trackCandidates[i]);
 
-      //trackRep = new RKTrackRep(trackCandidates[i]->getPosSeed(), trackCandidates[i]->getDirSeed(), trackCandidates[i]->getPdgCode());
-
       B2INFO("Fit pattern reco track with start values: ");
-
     }
 
-    B2INFO("            momentum: " << trackCandidates[i]->getDirSeed().x() / abs(trackCandidates[i]->getQoverPseed()) << "  " << trackCandidates[i]->getDirSeed().y() / abs(trackCandidates[i]->getQoverPseed()) << "  " << trackCandidates[i]->getDirSeed().z() / abs(trackCandidates[i]->getQoverPseed()));
+    B2INFO("            momentum: " << trackCandidates[i]->getDirSeed().x() << "  " << trackCandidates[i]->getDirSeed().y() << "  " << trackCandidates[i]->getDirSeed().z());
     B2INFO("            vertex:   " << trackCandidates[i]->getPosSeed().x() << "  " << trackCandidates[i]->getPosSeed().y() << "  " << trackCandidates[i]->getPosSeed().z());
-    B2INFO("             pdg:      " << trackCandidates[i]->getPdgCode());
+    B2INFO("            pdg:      " << trackCandidates[i]->getPdgCode());
 
-    GFTrack gfTrack(trackRep, false);  //create the track with the corresponding track representation
+    GFTrack gfTrack(trackRep, true);  //create the track with the corresponding track representation
+
 
     GFRecoHitFactory factory;
 
     //create RecoHitProducers for PXD, SVD and CDC
-    GFRecoHitProducer <PXDHit, PXDRecoHit> * PXDProducer;
-    PXDProducer =  new GFRecoHitProducer <PXDHit, PXDRecoHit> (&*pxdHits);
+    GFRecoHitProducer <PXDTrueHit, PXDRecoHit> * PXDProducer;
+    PXDProducer =  new GFRecoHitProducer <PXDTrueHit, PXDRecoHit> (&*pxdHits);
 
-    GFRecoHitProducer <SVDHit, SVDRecoHit> * SVDProducer;
-    SVDProducer =  new GFRecoHitProducer <SVDHit, SVDRecoHit> (&*svdHits);
+    //GFRecoHitProducer <SVDTrueHit, SVDRecoHit> * SVDProducer;
+    //SVDProducer =  new GFRecoHitProducer <SVDTrueHit, SVDRecoHit> (&*svdHits);
 
     GFRecoHitProducer <CDCHit, CDCRecoHit> * CDCProducer;
     CDCProducer =  new GFRecoHitProducer <CDCHit, CDCRecoHit> (&*cdcHits);
 
     //add producers to the factory with correct detector Id
     factory.addProducer(0, PXDProducer);
-    factory.addProducer(1, SVDProducer);
+    //factory.addProducer (1, SVDProducer);
     factory.addProducer(2, CDCProducer);
 
     vector <GFAbsRecoHit *> factoryHits;
@@ -206,37 +234,78 @@ void GenFitterModule::event()
     } else {
 
       //now fit the track
-      GFKalman k; //use Kalman algorithm
+      GFKalman k;
       GFDaf daf;
       try {
-        k.setNumIterations(5);
-        //k.setInitialDirection(-1);
-        k.processTrack(&gfTrack);
-        //daf.setProbCut(0.001);
-        //daf.processTrack(&gfTrack);
+        //set some parameters, there are more possible parameters to set in genfit, but their effect was not tested so far..
+        k.setNumIterations(m_nIter);
+        daf.setProbCut(m_probCut);
+        if (m_filterId == 0) {
+          k.processTrack(&gfTrack);
+        } else {
+          daf.processTrack(&gfTrack);
+        }
+
         //gfTrack.Print();
         int genfitStatusFlag = trackRep->getStatusFlag();
         //StatusFlag == 0 means fit was successful
         B2INFO("-----> Fit results:");
         B2INFO("       Status of fit: " << genfitStatusFlag);
         B2INFO("       Chi2 of the fit: " << gfTrack.getChiSqu());
+        //B2INFO("       Forward Chi2: "<<gfTrack.getForwardChiSqu());
         B2INFO("       NDF of the fit: " << gfTrack.getNDF());
         //Calculate probability
         double pValue = TMath::Prob(gfTrack.getChiSqu(), gfTrack.getNDF());
         B2INFO("       pValue of the fit: " << pValue);
-        B2INFO("       getRedChiSqu: " << gfTrack.getRedChiSqu());
-        B2INFO("       nFailedHits: " << gfTrack.getFailedHits());
+        B2INFO("       Covariance matrix: ");
+        gfTrack.getTrackRep(0)->getCov().Print();
 
-
-        if (genfitStatusFlag != 0) {
+        if (genfitStatusFlag != 0) {    //if fit failed
           B2WARNING("Genfit returned an error (with status flag " << genfitStatusFlag << ") during the fit!");
           ++m_failedFitCounter;
-        } else {
+          if (m_storeFailed == true) {
+            ++trackCounter;
+
+            //Create output tracks
+            new(gfTracks->AddrAt(trackCounter)) GFTrack(gfTrack);  //GFTrack can be assigned directly
+            new(tracks->AddrAt(trackCounter)) Track(); //Track is created empty, helix parameters are not available because the fit failed, but other variables may give some hint on the reason for the failure
+
+            //Set non-helix parameters
+            tracks[trackCounter]->setFitFailed(true);
+            tracks[trackCounter]->setChi2(gfTrack.getChiSqu());
+            tracks[trackCounter]->setNHits(gfTrack.getNumHits());
+            tracks[trackCounter]->setMCId(trackCandidates[i]->getMcTrackId());
+            tracks[trackCounter]->setPDG(trackCandidates[i]->getPdgCode());
+            tracks[trackCounter]->setPurity(trackCandidates[i]->getDip());
+            tracks[trackCounter]->setPValue(pValue);
+            //Set helix parameters
+            tracks[trackCounter]->setD0(-999);
+            tracks[trackCounter]->setPhi(-999);
+            tracks[trackCounter]->setKappa(gfTrack.getCharge());
+            tracks[trackCounter]->setZ0(-999);
+            tracks[trackCounter]->setTanLambda(-999);
+          }
+
+        } else {            //fit successful
           ++m_successfulFitCounter;
           ++trackCounter;
+
           //Create output tracks
           new(gfTracks->AddrAt(trackCounter)) GFTrack(gfTrack);  //GFTrack can be assigned directly
           new(tracks->AddrAt(trackCounter)) Track();  //Track is created empty, parameters are set later on
+
+
+          //Set non-helix parameters
+          tracks[trackCounter]->setFitFailed(false);
+          tracks[trackCounter]->setChi2(gfTrack.getChiSqu());
+          tracks[trackCounter]->setNHits(gfTrack.getNumHits());
+          tracks[trackCounter]->setMCId(trackCandidates[i]->getMcTrackId());
+          tracks[trackCounter]->setPDG(trackCandidates[i]->getPdgCode());
+          tracks[trackCounter]->setPurity(trackCandidates[i]->getDip());
+          tracks[trackCounter]->setPValue(pValue);
+          tracks[trackCounter]->setExtrapFailed(false);
+
+          //To calculate the correct starting helix parameters, one has to extrapolate the track to its 'start' (here: take point of closest approach to the origin)
 
           //Find the point of closest approach of the track to the origin
           TVector3 pos(0., 0., 0.); //origin
@@ -245,64 +314,88 @@ void GenFitterModule::event()
 
           try {
             //extrapolate the track to the origin, the results are stored directly in poca and dirInPoca
-            gfTrack.getCardinalRep()->extrapolateToPoint(pos, poca,
-                                                         dirInPoca);
-            B2DEBUG(100, "Point of closest approach: " << poca.x() << "  " << poca.y() << "  " << poca.z());
-            B2DEBUG(100, "Track direction in POCA: " << dirInPoca.x() << "  " << dirInPoca.y() << "  " << dirInPoca.z());
-            //Now choose a correct reference plane to get the momentum
+            gfTrack.getCardinalRep()->extrapolateToPoint(pos, poca, dirInPoca);
+            B2INFO("Point of closest approach: " << poca.x() << "  " << poca.y() << "  " << poca.z());
+            B2INFO("Track direction in POCA: " << dirInPoca.x() << "  " << dirInPoca.y() << "  " << dirInPoca.z());
+
+            //Now create a reference plane to get momentum and vertex position
             GFDetPlane plane(poca, dirInPoca);
-            //B2INFO("       Momentum: " << gfTrack.getMom(plane).x() << "  " << gfTrack.getMom(plane).y() << "  " << gfTrack.getMom(plane).z());
 
-            //Now calculate the parameters needed for helix parametrization to fill the Track objects
-            //determine track radius for the curvature
-            double pt = sqrt(gfTrack.getMom(plane).x()
-                             * gfTrack.getMom(plane).x()
-                             + gfTrack.getMom(plane).y()
-                             * gfTrack.getMom(plane).y());
-            double R = pt / (1.5 * 0.00299792458); //c and magnetic field, should come from some common database later...
+            //get momentum, position and covariance matrix
+            TVector3 resultPosition;
+            TVector3 resultMomentum;
+            TMatrixT<double> resultCovariance;
+            gfTrack.getPosMomCov(plane, resultPosition, resultMomentum, resultCovariance);
 
-            B2DEBUG(100, "Track radius: " << R);
+            //store position errors
+            double xErr = sqrt(resultCovariance[0][0]);
+            double yErr = sqrt(resultCovariance[1][1]);
+            double zErr = sqrt(resultCovariance[2][2]);
+            B2INFO("Position variances: " << xErr << "  " << yErr << "  " << zErr);
+            tracks[trackCounter]->setVertexErrors(xErr, yErr, zErr);
 
-            //determine the angle phi, distribute it from -pi to pi
-            double phi = atan2(dirInPoca.y() , dirInPoca.x());
+            //store momentum errors
+            double pxErr = sqrt(resultCovariance[3][3]);
+            double pyErr = sqrt(resultCovariance[4][4]);
+            double pzErr = sqrt(resultCovariance[5][5]);
+            B2INFO("Momentum variances: " << pxErr << "  " << pyErr << "  " << pzErr);
+            tracks[trackCounter]->setPErrors(pxErr, pyErr, pzErr);
 
-            //determine sign of d0
-            //calculate the sign of the projection of pt(dirInPoca) at d0(poca)
-            double d0Sign = TMath::Sign(1., poca.x() * dirInPoca.x()
-                                        + poca.y() * dirInPoca.y());
 
-            B2DEBUG(100, "D0 sign " << d0Sign);
+            //Now calculate the parameters for helix parametrisation to fill the Track objects
+
+            //calculate transverse momentum
+            double pt = sqrt(gfTrack.getMom(plane).x() * gfTrack.getMom(plane).x() + gfTrack.getMom(plane).y() * gfTrack.getMom(plane).y());
+
+            //determine the angle phi, distribute it from 0 to 2pi
+            //the calculation depends on the definition of the angle (it is necessary to know the definiton to recalculate the momentum etc)
+            //this calculation of phi is taken from basf, I do not really understand it, but it seems to work ...
+            double phi = fmod(atan2(- dirInPoca.x(), dirInPoca.y()) + 4 * TMath::Pi(), 2 * TMath::Pi());
+
+            //double phi = atan2(dirInPoca.y() , dirInPoca.x());
+
+
+            //determine sign of d0 (I have not really found a definition of belle d0 sign, so I just found one which fits the trajectory equations, but it has to be crosschecked!!)
+            double d0Sign = TMath::Sign(1., poca.x() * dirInPoca.y() - poca.y() * dirInPoca.x());
+            B2DEBUG(149, "D0 sign " << d0Sign);
+
+            //double alpha = 1/(1.5 * 0.00299792458);
 
             //Now set the helix parameters
-            tracks[trackCounter]->setD0(d0Sign * sqrt(poca.x() * poca.x()
-                                                      + poca.y() * poca.y()));
+            tracks[trackCounter]->setD0(d0Sign*sqrt(poca.x() * poca.x() + poca.y() * poca.y()));
             tracks[trackCounter]->setPhi(phi);
-            tracks[trackCounter]->setOmega((gfTrack.getCharge() / R));
+            tracks[trackCounter]->setKappa((gfTrack.getCharge() / pt));
             tracks[trackCounter]->setZ0(poca.z());
-            tracks[trackCounter]->setCotTheta(dirInPoca.z() / (sqrt(dirInPoca.x()
-                                                                    * dirInPoca.x() + dirInPoca.y() * dirInPoca.y())));
-            //Set non-helix parameters
-            tracks[trackCounter]->setChi2(gfTrack.getChiSqu());
-            tracks[trackCounter]->setPValue(pValue);
-            tracks[trackCounter]->setNHits(gfTrack.getNumHits());
-
-            tracks[trackCounter]->setMCId(trackCandidates[i]->getMcTrackId());
-
-            tracks[trackCounter]->setPDG(trackCandidates[i]->getPdgCode());
-            tracks[trackCounter]->setPurity(trackCandidates[i]->getDip());
-
+            tracks[trackCounter]->setTanLambda(dirInPoca.z() / (sqrt(dirInPoca.x() * dirInPoca.x() + dirInPoca.y() * dirInPoca.y())));
 
             //Print helix parameters
             B2INFO(">>>>>>> Helix Parameters <<<<<<<");
-            B2INFO("D0: " << std::setprecision(3) << tracks[trackCounter]->getD0() << "  Phi: " << std::setprecision(3) << tracks[trackCounter]->getPhi() << "  Omega: " << std::setprecision(3) << tracks[trackCounter]->getOmega() << "  Z0: " << std::setprecision(3) << tracks[trackCounter]->getZ0() << "  CotTheta: " << std::setprecision(3) << tracks[trackCounter]->getCotTheta());
+            B2INFO("D0: " << std::setprecision(3) << tracks[trackCounter]->getD0() << "  Phi: " << std::setprecision(3) << tracks[trackCounter]->getPhi() << "  Kappa: " << std::setprecision(3) << tracks[trackCounter]->getKappa() << "  Z0: " << std::setprecision(3) << tracks[trackCounter]->getZ0() << "  TanLambda: " << std::setprecision(3) << tracks[trackCounter]->getTanLambda());
             B2INFO("<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>");
             //Additional check
-            B2INFO("Check: recalculate momentum  px: " << abs(1.5*0.00299792458 / (tracks[trackCounter]->getOmega()))*cos(tracks[trackCounter]->getPhi()) << "  py: " << abs(1.5*0.00299792458 / (tracks[trackCounter]->getOmega()))*sin(tracks[trackCounter]->getPhi()) << "  pz: " << abs(1.5*0.00299792458 / (tracks[trackCounter]->getOmega()))*tracks[trackCounter]->getCotTheta());
+            B2INFO("Recalculate momentum  px: " << abs(1 / (tracks[trackCounter]->getKappa()))*(-sin(tracks[trackCounter]->getPhi())) << "  py: " << abs(1 / (tracks[trackCounter]->getKappa()))*cos(tracks[trackCounter]->getPhi()) << "  pz: " << abs(1 / (tracks[trackCounter]->getKappa()))*tracks[trackCounter]->getTanLambda());
+            B2INFO("<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>");
+            //Additional code
+            //print helix parameter to a file
+            //useful if one like to quickly plot track trajectories
+            //-------------------------------------
+            HelixParam << tracks[trackCounter]->getD0() << " \t"
+            << tracks[trackCounter]->getPhi() << " \t"
+            << tracks[trackCounter]->getKappa() << " \t"
+            << tracks[trackCounter]->getZ0() << " \t"
+            << tracks[trackCounter]->getTanLambda() << "\t" << poca.x()
+            << "\t" << poca.y() << "\t" << poca.z() << endl;
+            //----------------------------------------
+            //end additional code
+
           }
 
           catch (...) {
             B2WARNING("Something went wrong during the extrapolation of fit results!");
+            tracks[trackCounter]->setExtrapFailed(true);
           }
+
+          // }
         }// end else for successful fits
 
       } catch (...) {
@@ -313,7 +406,6 @@ void GenFitterModule::event()
 
 
     } //end loop over all track candidates
-
 
     factory.clear();
 
@@ -332,6 +424,6 @@ void GenFitterModule::endRun()
 
 void GenFitterModule::terminate()
 {
-
+  HelixParam.close();
 }
 

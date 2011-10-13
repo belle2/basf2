@@ -69,16 +69,16 @@ particlegun.param('varyNTracks', False)
 #              width of sigma
 
 # The default is a uniform momentum distribution between 0.05 and 3 GeV
-particlegun.param('momentumDist', 'uniform')
+particlegun.param('momentumGeneration', 'uniform')
 particlegun.param('momentumParams', [0.05, 3])
 
 # we could also generate a fixed momentum of 1 GeV
-# particlegun.param('momentumDist', "fixed")
+# particlegun.param('momentumGeneration', "fixed")
 # particlegun.param('momentumParams', [1.0])
 
 # or we could generate a normal distributed transverse momentum around 2 GeV
 # with a width of 0.5 GeV
-# particlegun.param('momentumDist', "normalPt")
+# particlegun.param('momentumGeneration', "normalPt")
 # particlegun.param('momentumParams', [2.0, 0.5])
 
 # ============================================================================
@@ -91,17 +91,17 @@ particlegun.param('momentumParams', [0.05, 3])
 # - normal:    normal distribution around mean with width of sigma
 #
 # The default is a uniform theta distribution between 17 and 150 degree
-particlegun.param('thetaDist', 'uniform')
+particlegun.param('thetaGeneration', 'uniform')
 particlegun.param('thetaParams', [17, 150])
 
 # or we could create a normal distributed theta angle around 90 degrees with a
 # width of 5 degrees
-# particlegun.param('thetaDist', "normal")
+# particlegun.param('thetaGeneration', "normal")
 # particlegun.param('thetaParams', [90,5])
 
 # or we could create a theta angle between 17 and 150 degree where the
 # cos(theta) distribution is flat
-# particlegun.param('thetaDist', "normal")
+# particlegun.param('thetaGeneration', "normal")
 # particlegun.param('thetaParams', [90,5])
 
 # ============================================================================
@@ -113,12 +113,12 @@ particlegun.param('thetaParams', [17, 150])
 # - normal:    normal distribution around mean with width of sigma
 #
 # The default is a uniform theta distribution between 0 and 360 degree
-particlegun.param('phiDist', 'uniform')
+particlegun.param('phiGeneration', 'uniform')
 particlegun.param('phiParams', [17, 150])
 
 # or we could create a normal distributed phi angle around 90 degrees with a
 # width of 5 degrees
-# particlegun.param('phiDist', "normal")
+# particlegun.param('phiGeneration', "normal")
 # particlegun.param('phiParams', [90,5])
 
 # ============================================================================
@@ -129,7 +129,7 @@ particlegun.param('phiParams', [17, 150])
 # - normal:    normal distribution around mean with width of sigma
 #
 # The default is a normal distribution of the vertex
-particlegun.param('vertexDist', 'normal')
+particlegun.param('vertexGeneration', 'normal')
 particlegun.param('xVertexParams', [0, 0.7])
 particlegun.param('yVertexParams', [0, 0.7])
 particlegun.param('zVertexParams', [0, 1.0])
@@ -151,6 +151,8 @@ print_params(particlegun)
 
 # Create Event information
 evtmetagen = register_module('EvtMetaGen')
+# Show progress of processing
+progress = register_module('Progress')
 # Load parameters
 gearbox = register_module('Gearbox')
 # Create geometry
@@ -172,6 +174,7 @@ output.param('outputFileName', 'ParticleGunOutput.root')
 
 main = create_path()
 main.add_module(evtmetagen)
+main.add_module(progress)
 main.add_module(gearbox)
 main.add_module(geometry)
 main.add_module(particlegun)
@@ -180,3 +183,6 @@ main.add_module(output)
 
 # Process events
 process(main)
+
+# Print call statistics
+print statistics

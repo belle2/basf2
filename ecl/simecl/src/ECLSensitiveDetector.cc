@@ -17,6 +17,7 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
 #include <ecl/hitecl/ECLSimHit.h>
+#include <ecl/hitecl/ECLEBSimHit.h>
 
 #include <string>
 #include <sstream>
@@ -114,11 +115,15 @@ namespace Belle2 {
     Mapping(v.GetName());
 
     if (v.GetName().find("Crystal") != string::npos) {
-      Mapping(v.GetName());
       int saveIndex = -999;
       saveIndex = saveSimHit(m_cellID, m_thetaID, m_phiID  , trackID, pid, tof, edep, 1, momIn, posCell, posIn, posOut);
     }
-    //Set the SeenInDetector flag
+
+    if (v.GetName().find("Diode") != string::npos) {
+
+      int saveEBIndex = -999;
+      saveEBIndex = saveEBSimHit(m_cellID , trackID, pid, edep, momIn);
+    }
 
 
 
@@ -133,6 +138,26 @@ namespace Belle2 {
 
     B2INFO("End Of Event");
   }
+  int ECLSensitiveDetector::saveEBSimHit(
+    const G4int cellId,
+    const G4int trackID,
+    const G4int pid,
+    const G4double edep,
+    const G4ThreeVector & mom)
+  {
+    StoreArray<ECLEBSimHit> eclEBArray;
+    m_EBhitNumber = eclEBArray->GetLast() + 1;
+    new(eclEBArray->AddrAt(m_EBhitNumber)) ECLEBSimHit();
+    eclEBArray[m_EBhitNumber]->setCellId(cellId);
+    eclEBArray[m_EBhitNumber]->setTrackId(trackID);
+    eclEBArray[m_EBhitNumber]->setPDGCode(pid);
+    eclEBArray[m_EBhitNumber]->setEnergyDep(edep / GeV);
+    TVector3 momentum(mom.getX() / GeV, mom.getY() / GeV, mom.getZ() / GeV);
+    eclEBArray[m_EBhitNumber]->setMomentum(momentum);
+    return (m_EBhitNumber);
+
+  }
+
 
   int ECLSensitiveDetector::saveSimHit(
     const G4int cellId,
@@ -172,7 +197,6 @@ namespace Belle2 {
     TVector3 positionOut(posOut.getX() / cm, posOut.getY() / cm, posOut.getZ() / cm);
     eclArray[m_hitNumber]->setPosOut(positionOut);
     B2DEBUG(150, "HitNumber: " << m_hitNumber);
-    eclSimHitRel.add(trackID, m_hitNumber);
     eclSimHitRel.add(trackID, m_hitNumber);
     return (m_hitNumber);
 

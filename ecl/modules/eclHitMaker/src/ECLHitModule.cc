@@ -137,7 +137,6 @@ void ECLHitModule::event()
         E_cell[iECLCell][TimeIndex] = E_cell[iECLCell][TimeIndex] + hitE;
         X_ave[iECLCell][TimeIndex] = X_ave[iECLCell][TimeIndex] + hitE * local_pos;
         Tof_ave[iECLCell][TimeIndex] = Tof_ave[iECLCell][TimeIndex] + hitE * hitTOF;
-        cout << " iECLCell " << iECLCell << " hitE  " << hitE << " local_pos " << local_pos << endl;
 
       }
     } // End loop crsyal 8736

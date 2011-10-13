@@ -76,7 +76,6 @@ void ECLHitModule::initialize()
   m_nRun    = 0 ;
   m_nEvent  = 0 ;
   m_hitNum = 0;
-  printModuleParams();
 }
 
 void ECLHitModule::beginRun()
@@ -129,7 +128,6 @@ void ECLHitModule::event()
     TVector3 PosCell =  eclp->GetCrystalPos(hitCellId);
     TVector3 VecCell =  eclp->GetCrystalVec(hitCellId);
     double local_pos = (15. - (0.5 * (HitInPos + HitOutPos) - PosCell) * VecCell);
-
     for (int iECLCell = 0; iECLCell < 8736; iECLCell++) {
 
       if (hitCellId == iECLCell && hitTOF < 8000) {

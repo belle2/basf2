@@ -58,11 +58,14 @@ namespace Belle2 {
      * gRandom. The Hit position will be smeared using a gaussian smearing with
      * sigmaU and sigmaV along u and v respectively
      *
+     * If one of the errors is set <0, a default resolution will be
+     * assumed for both values by dividing the pixel size by sqrt(12).
+     *
      * @param hit    PXDTrueHit to use as base
      * @param sigmaU Error of the Hit along u
      * @param sigmaV Error of the Hit along v
      */
-    PXDRecoHit(const PXDTrueHit* hit, float sigmaU, float sigmaV);
+    PXDRecoHit(const PXDTrueHit* hit, float sigmaU = -1, float sigmaV = -1);
 
     /** Construct PXDRecoHit from a PXD cluster
      * FIXME: Error handling not yet defined. For now the errors have to

@@ -39,6 +39,14 @@ PXDRecoHit::PXDRecoHit(const PXDTrueHit* hit, float sigmaU, float sigmaV):
 
   // Set the sensor UID
   m_sensorID = hit->getSensorID();
+
+  //If no error is given, estimate the error by dividing the pixel size by sqrt(12)
+  if (sigmaU < 0 || sigmaV < 0) {
+    const PXD::SensorInfo& geometry = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(m_sensorID));
+    sigmaU = geometry.getUPitch() / sqrt(12);
+    sigmaV = geometry.getVPitch(hit->getV()) / sqrt(12);
+  }
+
   // Set positions
   fHitCoord(0, 0) = hit->getU() + gRandom->Gaus(sigmaU);
   fHitCoord(1, 0) = hit->getV() + gRandom->Gaus(sigmaV);

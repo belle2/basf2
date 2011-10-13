@@ -52,7 +52,7 @@ namespace Belle2 {
   private:
 
     //! std::map for hits sorting according strip name
-    std::map<std::string, std::vector<EKLMSimHit*> > m_HitStripMap;
+    std::map<G4VPhysicalVolume *, std::vector<EKLMSimHit*> > m_HitStripMap;
 
     //! vector of EKLMStripHits
     std::vector<EKLMStripHit*> m_HitVector;

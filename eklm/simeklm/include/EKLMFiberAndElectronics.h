@@ -29,7 +29,7 @@ namespace Belle2 {
     /**
      * Constructor
      */
-    EKLMFiberAndElectronics(std::pair<std::string, std::vector<EKLMSimHit*> >);
+    EKLMFiberAndElectronics(std::pair<G4VPhysicalVolume *, std::vector<EKLMSimHit*> >);
 
     /**
      * Destructor

@@ -34,7 +34,7 @@ evtmetagen.param('RunList', [1])
 
 # Particle gun
 particlegun = register_module('PGunInput')
-particlegun.param('nTracks', 2)
+particlegun.param('nTracks', 1)
 particlegun.param('PIDcodes', [13, -13])
 particlegun.param('pPar1', 0.05)
 particlegun.param('pPar2', 3)
@@ -46,17 +46,23 @@ paramloader = register_module('Gearbox')
 geobuilder = register_module('Geometry')
 geobuilder.log_level = LogLevel.INFO
 
+geobuilder.param('Components', ['EKLM'])
+
 # Full Geant4 simulation
 g4sim = register_module('FullSim')
-# g4sim.param('EnableVisualization', True)
-# g4sim.param('UICommands', ['/vis/open VRML2FILE', '/vis/drawVolume',
-#            '/vis/scene/add/axes 0 0 0 100 mm',
-#            '/vis/scene/add/trajectories smooth',
-#            '/vis/modeling/trajectories/create/drawByCharge'])
+g4sim.param('EnableVisualization', True)
+g4sim.param('EnableVisualization', False)
+g4sim.param('UICommands', ['/vis/open VRML2FILE', '/vis/drawVolume',
+            '/vis/scene/add/axes 0 0 0 100 mm',
+            '/vis/scene/add/trajectories smooth',
+            '/vis/modeling/trajectories/create/drawByCharge'])
 
 # Root file output
 simpleoutput = register_module('SimpleOutput')
 simpleoutput.param('outputFileName', 'muForEKLM.root')
+
+# MC printuots
+mcprint = register_module('PrintMCParticles')
 
 # ------------  EKLM-related modules
 
@@ -79,6 +85,8 @@ main.add_module(eklmdigi)
 main.add_module(eklmreco)
 
 main.add_module(simpleoutput)
+
+main.add_module(mcprint)
 
 # Process 100 events
 process(main)

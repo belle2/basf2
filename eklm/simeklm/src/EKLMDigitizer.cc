@@ -58,17 +58,18 @@ namespace Belle2 {
   {
     for (std::vector<EKLMSimHit*>::iterator iHit = m_simHitsVector.begin();
          iHit != m_simHitsVector.end(); ++iHit) {
-      std::string StripName = (*iHit)->getPV()->GetName();
+
+
 
       // search for entries of the same strip
-      std::map<std::string, std::vector<EKLMSimHit*> >::iterator
-      it = m_HitStripMap.find(StripName);
+      std::map<G4VPhysicalVolume *, std::vector<EKLMSimHit*> >::iterator
+      it = m_HitStripMap.find((*iHit)->getPV());
 
       if (it == m_HitStripMap.end()) { //  new entry
         std::vector<EKLMSimHit*> *vectorHits =
           new std::vector<EKLMSimHit*> (1, (*iHit));
-        m_HitStripMap.insert(std::pair<std::string, std::vector<EKLMSimHit*> >
-                             (StripName, *vectorHits));
+        m_HitStripMap.insert(std::pair<G4VPhysicalVolume *, std::vector<EKLMSimHit*> >
+                             ((*iHit)->getPV(), *vectorHits));
       } else {
         it->second.push_back(*iHit);
       }
@@ -82,7 +83,7 @@ namespace Belle2 {
   void EKLMDigitizer::mergeSimHitsToStripHits()
   {
     //    B2INFO( "STRAT MERGING HITS");
-    for (std::map<std::string, std::vector<EKLMSimHit*> >::iterator it =
+    for (std::map<G4VPhysicalVolume *, std::vector<EKLMSimHit*> >::iterator it =
            m_HitStripMap.begin(); it != m_HitStripMap.end(); it++) {
 
       //      B2DEBUG(1, "MAP ENTRY");

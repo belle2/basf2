@@ -59,6 +59,21 @@ namespace Belle2 {
   //-----------------------------------------------------
   bool EKLMSensitiveDetector::step(G4Step *aStep, G4TouchableHistory *)
   {
+    // check if it is first step in volume
+    std::cout << "------------------------ " << (aStep->GetPreStepPoint()->GetStepStatus() == fGeomBoundary) << std::endl;
+
+    // post step point
+    G4StepPoint* post = aStep->GetPostStepPoint();
+
+    // changes
+    const G4TrackVector*  secondaries = aStep-> GetSecondary();
+
+    std::cout << "-------------------------- nSecond: " << secondaries->size() << std::endl;
+    std::cout << "-------------------------- CurrStep: " << aStep->GetTrack()->GetCurrentStepNumber() << std::endl;
+
+
+
+
     // Get deposited energy
     const G4double eDep = aStep->GetTotalEnergyDeposit();
 
@@ -73,7 +88,7 @@ namespace Belle2 {
     const G4double charge = track.GetDefinition()->GetPDGCharge();
 
     // ignore neutrals in EKLM
-    if (charge == 0.) return false;
+    //    if (charge == 0.) return false;
 
     // get time of hit
     const G4double hitTime = track.GetGlobalTime();

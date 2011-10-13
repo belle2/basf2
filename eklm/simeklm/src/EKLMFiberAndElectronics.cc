@@ -30,7 +30,7 @@ namespace Belle2 {
     return (int)fitResultsPtr;
   }
 
-  EKLMFiberAndElectronics::EKLMFiberAndElectronics(std::pair < std::string,
+  EKLMFiberAndElectronics::EKLMFiberAndElectronics(std::pair < G4VPhysicalVolume *,
                                                    std::vector<EKLMSimHit*> >
                                                    entry)
   {
@@ -44,7 +44,7 @@ namespace Belle2 {
     scintillatorDeExcitationTime = 3; //ns
     fiberDeExcitationTime = 10.; //ns
 
-    const char * stripName = entry.first.c_str();
+    const char * stripName = entry.first->GetName();
     digitizedAmplitudeDirect = new TH1D("digitizedAmplitudeDirect", "",
                                         nTimeDigitizationSteps, 0,
                                         nTimeDigitizationSteps *

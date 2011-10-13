@@ -181,10 +181,3 @@ void ECLHitModule::terminate()
 }
 
 
-void ECLHitModule::printModuleParams() const
-{
-  B2INFO("ECLHit parameters:")
-  B2INFO("  Input collection name:  " << m_inColName)
-  B2INFO("  Output collection name: " << m_eclHitOutColName)
-}
-

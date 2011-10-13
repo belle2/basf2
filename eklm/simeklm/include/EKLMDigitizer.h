@@ -34,11 +34,8 @@ namespace Belle2 {
     //! Destructor
     ~EKLMDigitizer() {};
 
-    //! Read hits from the store
-    void readSimHits();
-
-    //! Sort Sim Hits and fill m_HitStripMap
-    void sortSimHits();
+    //! Read hits from the store, sort sim hits and fill m_HitStripMap
+    void readAndSortSimHits();
 
     //! merges hits from the same strip. Creates EKLMStripHits
     void mergeSimHitsToStripHits();

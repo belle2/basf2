@@ -44,8 +44,7 @@ void EKLMDigitizationModule::event()
 
 
   EKLMDigitizer *digi = new EKLMDigitizer();
-  digi->readSimHits();
-  digi->sortSimHits();
+  digi->readAndSortSimHits();
   digi->mergeSimHitsToStripHits();
   delete digi;
   B2DEBUG(1, " DELETE DIGITIZER OBJECT");

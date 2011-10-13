@@ -60,18 +60,7 @@ namespace Belle2 {
   bool EKLMSensitiveDetector::step(G4Step *aStep, G4TouchableHistory *)
   {
     // check if it is first step in volume
-    std::cout << "------------------------ " << (aStep->GetPreStepPoint()->GetStepStatus() == fGeomBoundary) << std::endl;
-
-    // post step point
-    G4StepPoint* post = aStep->GetPostStepPoint();
-
-    // changes
-    const G4TrackVector*  secondaries = aStep-> GetSecondary();
-
-    std::cout << "-------------------------- nSecond: " << secondaries->size() << std::endl;
-    std::cout << "-------------------------- CurrStep: " << aStep->GetTrack()->GetCurrentStepNumber() << std::endl;
-
-
+    bool isFirstStep(aStep->GetPreStepPoint()->GetStepStatus() == fGeomBoundary);
 
 
     // Get deposited energy
@@ -144,6 +133,11 @@ namespace Belle2 {
     hit->set_nLayer(pvgt->getID());
     pvgt = pvgt->getMother();
     hit->set_nEndcap(pvgt->getID());
+
+    hit->setFirstHit(isFirstStep);
+    hit->setTrackID(track.GetTrackID());
+    hit->setParentTrackID(track.GetParentID());
+
 
     StoreArray<MCParticle> MCParticlesArray;
     RelationArray particleToSimHitsRelation(MCParticlesArray, simHitsArray);

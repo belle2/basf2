@@ -62,6 +62,22 @@ namespace Belle2 {
     //! dumps hit into ASCII file
     void Save(char * filename);
 
+
+    G4int getTrackID();
+
+
+    void  setTrackID(G4int id);
+
+    G4int getParentTrackID();
+
+    void setParentTrackID(G4int id);
+
+    bool  getFirstHit();
+
+    void  setFirstHit(bool fh);
+
+
+
   private:
     //! Physical volume
     G4VPhysicalVolume *m_pv; //! {ROOT streamer directive}
@@ -80,6 +96,15 @@ namespace Belle2 {
 
     //! PDG code of the track particle
     G4int m_PDGcode;
+
+    //! track ID
+    G4int m_trackID;
+
+    //! parent track ID
+    G4int m_parentTrackID;
+
+    //! is first step in volume
+    bool m_isFirstStep;
 
     //! Needed to make root object storable
     ClassDef(Belle2::EKLMSimHit, 1);

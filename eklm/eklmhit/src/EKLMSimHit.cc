@@ -61,6 +61,40 @@ G4int EKLMSimHit::getPDGCode()
   return m_PDGcode;
 }
 
+
+G4int EKLMSimHit::getTrackID()
+{
+  return m_trackID;
+}
+
+void  EKLMSimHit::setTrackID(G4int id)
+{
+  m_trackID = id;
+}
+
+
+G4int EKLMSimHit::getParentTrackID()
+{
+  return  m_parentTrackID;
+}
+
+void EKLMSimHit::setParentTrackID(G4int id)
+{
+  m_parentTrackID = id;
+}
+
+bool  EKLMSimHit::getFirstHit()
+{
+  return m_isFirstStep;
+}
+
+
+void  EKLMSimHit::setFirstHit(bool fh)
+{
+  m_isFirstStep = fh;
+}
+
+
 void EKLMSimHit::Save(char* filename)
 {
   std::ofstream save_hit(filename, std::fstream::app);

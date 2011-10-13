@@ -47,31 +47,22 @@ namespace Belle2 {
     EKLMDigitizerAllocator.FreeSingle((EKLMDigitizer*) aEKLMDigitizer);
   }
 
-  void EKLMDigitizer::readSimHits()
+  void EKLMDigitizer::readAndSortSimHits()
   {
     StoreArray<EKLMSimHit> simHitsArray;
-    for (int i = 0; i < simHitsArray.getEntries(); i++)
-      m_simHitsVector.push_back(simHitsArray[i]);
-  }
-
-  void EKLMDigitizer::sortSimHits()
-  {
-    for (std::vector<EKLMSimHit*>::iterator iHit = m_simHitsVector.begin();
-         iHit != m_simHitsVector.end(); ++iHit) {
-
-
+    for (int i = 0; i < simHitsArray.getEntries(); i++) {
 
       // search for entries of the same strip
       std::map<G4VPhysicalVolume *, std::vector<EKLMSimHit*> >::iterator
-      it = m_HitStripMap.find((*iHit)->getPV());
+      it = m_HitStripMap.find((simHitsArray[i])->getPV());
 
       if (it == m_HitStripMap.end()) { //  new entry
         std::vector<EKLMSimHit*> *vectorHits =
-          new std::vector<EKLMSimHit*> (1, (*iHit));
+          new std::vector<EKLMSimHit*> (1, (simHitsArray[i]));
         m_HitStripMap.insert(std::pair<G4VPhysicalVolume *, std::vector<EKLMSimHit*> >
-                             ((*iHit)->getPV(), *vectorHits));
+                             ((simHitsArray[i])->getPV(), *vectorHits));
       } else {
-        it->second.push_back(*iHit);
+        it->second.push_back(simHitsArray[i]);
       }
     }
 

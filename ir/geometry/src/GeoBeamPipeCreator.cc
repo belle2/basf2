@@ -175,6 +175,8 @@ namespace Belle2 {
       G4Polycone* geo_Lv1SUS = new G4Polycone("geo_Lv1SUS_name", 0, 2*M_PI, Lv1SUS_num, Lv1SUS_Z, Lv1SUS_rI, Lv1SUS_rO);
       G4LogicalVolume *logi_Lv1SUS = new G4LogicalVolume(geo_Lv1SUS, mat_Lv1SUS, "logi_Lv1SUS_name");
 
+      //for (int i=0;i<Lv1SUS_num;i++)printf("%f %f\n",Lv1SUS_Z[i],Lv1SUS_rO[i]);
+
       //-   put volume
       setColor(*logi_Lv1SUS, cLv1SUS.getString("Color", "#666666"));
       new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_Lv1SUS, "phys_Lv1SUS_name", &topVolume, false, 0);
@@ -812,7 +814,7 @@ namespace Belle2 {
       G4LogicalVolume *logi_Lv1TaLERUp = new G4LogicalVolume(geo_Lv1TaLERUp, mat_Lv1TaLERUp, "logi_Lv1TaLERUp_name");
 
       //-   put volume
-      setColor(*logi_Lv1TaLERUp, cLv1TaLERUp.getString("Color", "#00CC00"));
+      setColor(*logi_Lv1TaLERUp, cLv1TaLERUp.getString("Color", "#0000CC"));
       G4Transform3D transform_Lv1TaLERUp = G4Translate3D(0., 0., 0.);
       transform_Lv1TaLERUp = transform_Lv1TaLERUp * G4RotateY3D(Lv1TaLERUp_A1);
       new G4PVPlacement(transform_Lv1TaLERUp, logi_Lv1TaLERUp, "phys_Lv1TaLERUp_name", &topVolume, false, 0);
@@ -877,7 +879,7 @@ namespace Belle2 {
       G4LogicalVolume *logi_Lv1TaHERDwn = new G4LogicalVolume(geo_Lv1TaHERDwn, mat_Lv1TaHERDwn, "logi_Lv1TaHERDwn_name");
 
       //-   put volume
-      setColor(*logi_Lv1TaHERDwn, cLv1TaHERDwn.getString("Color", "#CC0000"));
+      setColor(*logi_Lv1TaHERDwn, cLv1TaHERDwn.getString("Color", "#00CC00"));
       G4Transform3D transform_Lv1TaHERDwn = G4Translate3D(0., 0., 0.);
       transform_Lv1TaHERDwn = transform_Lv1TaHERDwn * G4RotateY3D(Lv1TaHERDwn_A1);
       new G4PVPlacement(transform_Lv1TaHERDwn, logi_Lv1TaHERDwn, "phys_Lv1TaHERDwn_name", &topVolume, false, 0);
@@ -969,7 +971,7 @@ namespace Belle2 {
       G4LogicalVolume *logi_Lv1TaHERUp = new G4LogicalVolume(geo_Lv1TaHERUp, mat_Lv1TaHERUp, "logi_Lv1TaHERUp_name");
 
       //-   put volume
-      setColor(*logi_Lv1TaHERUp, cLv1TaHERUp.getString("Color", "#CC0000"));
+      setColor(*logi_Lv1TaHERUp, cLv1TaHERUp.getString("Color", "#00CC00"));
       G4Transform3D transform_Lv1TaHERUp = G4Translate3D(0., 0., 0.);
       transform_Lv1TaHERUp = transform_Lv1TaHERUp * G4RotateY3D(Lv1TaHERUp_A1);
       new G4PVPlacement(transform_Lv1TaHERUp, logi_Lv1TaHERUp, "phys_Lv1TaHERUp_name", &topVolume, false, 0);
@@ -1035,7 +1037,7 @@ namespace Belle2 {
       G4LogicalVolume *logi_Lv1TaLERDwn = new G4LogicalVolume(geo_Lv1TaLERDwn, mat_Lv1TaLERDwn, "logi_Lv1TaLERDwn_name");
 
       //-   put volume
-      setColor(*logi_Lv1TaLERDwn, cLv1TaLERDwn.getString("Color", "#00CC00"));
+      setColor(*logi_Lv1TaLERDwn, cLv1TaLERDwn.getString("Color", "#0000CC"));
       G4Transform3D transform_Lv1TaLERDwn = G4Translate3D(0., 0., 0.);
       transform_Lv1TaLERDwn = transform_Lv1TaLERDwn * G4RotateY3D(Lv1TaLERDwn_A1);
       new G4PVPlacement(transform_Lv1TaLERDwn, logi_Lv1TaLERDwn, "phys_Lv1TaLERDwn_name", &topVolume, false, 0);

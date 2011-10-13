@@ -113,6 +113,8 @@ namespace Belle2 {
       m_sensitive.push_back(sensitive);
       G4LogicalVolume *logi_Lv1RShield1 = new G4LogicalVolume(geo_Lv1RShield1pcon, mat_Lv1RShield1, "logi_Lv1RShield1_name", 0, sensitive);
 
+      //for (int i=0;i<Lv1RShield1_num;i++) printf("%f %f\n",Lv1RShield1_Z[i],Lv1RShield1_O[i]);
+
       //-   put volume
       setColor(*logi_Lv1RShield1, cLv1RShield1.getString("Color", "#CC0000"));
       new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_Lv1RShield1, "phys_Lv1RShield1_name", &topVolume, false, 0);
@@ -167,6 +169,8 @@ namespace Belle2 {
       //
       string strMat_Lv1RShield2 = cLv1RShield2.getString("Material");
       G4Material* mat_Lv1RShield2 = Materials::get(strMat_Lv1RShield2);
+
+      //for (int i=0;i<Lv1RShield2_num;i++) printf("%f %f\n",Lv1RShield2_Z[i],Lv1RShield2_O[i]);
 
       //define geometry
       G4Polycone* geo_Lv1RShield2pcon = new G4Polycone("geo_Lv1RShield2pcon_name", 0, 2*M_PI, Lv1RShield2_num, Lv1RShield2_Z, Lv1RShield2_I, Lv1RShield2_O);
@@ -247,6 +251,8 @@ namespace Belle2 {
       string strMat_Lv1LShield1 = cLv1LShield1.getString("Material");
       G4Material* mat_Lv1LShield1 = Materials::get(strMat_Lv1LShield1);
 
+      //for (int i = 0; i < Lv1LShield1_num; i++) printf("%f %f\n", Lv1LShield1_Z[i], Lv1LShield1_O[i]);
+
       //define geometry
       G4Polycone* geo_Lv1LShield1pcon = new G4Polycone("geo_Lv1LShield1pcon_name", 0, 2*M_PI, Lv1LShield1_num, Lv1LShield1_Z, Lv1LShield1_I, Lv1LShield1_O);
       G4LogicalVolume *logi_Lv1LShield1 = new G4LogicalVolume(geo_Lv1LShield1pcon, mat_Lv1LShield1, "logi_Lv1LShield1_name");
@@ -290,6 +296,8 @@ namespace Belle2 {
       //
       string strMat_Lv1LShield2 = cLv1LShield2.getString("Material");
       G4Material* mat_Lv1LShield2 = Materials::get(strMat_Lv1LShield2);
+
+      //for (int i=0;i<Lv1LShield2_num;i++) printf("%f %f\n",Lv1LShield2_Z[i],Lv1LShield2_O[i]);
 
       //define geometry
       G4Polycone* geo_Lv1LShield2pcon = new G4Polycone("geo_Lv1LShield2pcon_name", 0, 2*M_PI, Lv1LShield2_num, Lv1LShield2_Z, Lv1LShield2_I, Lv1LShield2_O);

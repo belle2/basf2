@@ -63,7 +63,7 @@ bool ParticleGun::generateEvent(MCParticleGraph &graph)
       p.setPDG(m_params.pdgCodes[i]);
     } else {
       //else choose randomly one of the available codes
-      int index = static_cast<int>(m_gRand.Uniform(m_params.pdgCodes.size() - 1));
+      int index = static_cast<int>(m_gRand.Uniform(m_params.pdgCodes.size()));
       p.setPDG(m_params.pdgCodes[index]);
     }
     p.setMassFromPDG();

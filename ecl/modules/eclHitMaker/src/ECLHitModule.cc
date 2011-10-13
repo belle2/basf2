@@ -22,8 +22,6 @@
 #include <ecl/hitecl/HitECL.h>
 #include <ecl/geoecl/ECLGeometryPar.h>
 
-#include <cdc/hitcdc/HitCDC.h>
-
 //root
 #include <TVector3.h>
 
@@ -130,8 +128,7 @@ void ECLHitModule::event()
 
     TVector3 PosCell =  eclp->GetCrystalPos(hitCellId);
     TVector3 VecCell =  eclp->GetCrystalVec(hitCellId);
-    double local_pos = 15. - (0.5 * (HitInPos + HitOutPos) - PosCell) * VecCell;
-
+    double local_pos = (15. - (0.5 * (HitInPos + HitOutPos) - PosCell) * VecCell);
 
     for (int iECLCell = 0; iECLCell < 8736; iECLCell++) {
 
@@ -140,6 +137,8 @@ void ECLHitModule::event()
         E_cell[iECLCell][TimeIndex] = E_cell[iECLCell][TimeIndex] + hitE;
         X_ave[iECLCell][TimeIndex] = X_ave[iECLCell][TimeIndex] + hitE * local_pos;
         Tof_ave[iECLCell][TimeIndex] = Tof_ave[iECLCell][TimeIndex] + hitE * hitTOF;
+        cout << " iECLCell " << iECLCell << " hitE  " << hitE << " local_pos " << local_pos << endl;
+
       }
     } // End loop crsyal 8736
 
@@ -158,13 +157,11 @@ void ECLHitModule::event()
         StoreArray<HitECL> eclHitArray(m_eclHitOutColName);
 
         m_hitNum = eclHitArray->GetLast() + 1;
-//        new(eclHitArray->AddrAt(m_hitNum)) HitECL();
-        /*
-                eclHitArray[m_hitNum]->setEventId(m_nEvent);
-                eclHitArray[m_hitNum]->setCellId(iECLCell);
-                eclHitArray[m_hitNum]->setEnergyDep(E_cell[iECLCell][TimeIndex]);
-                eclHitArray[m_hitNum]->setTimeAve(T_ave[iECLCell][TimeIndex] + Tof_ave[iECLCell][TimeIndex]);
-        */
+        new(eclHitArray->AddrAt(m_hitNum)) HitECL();
+        eclHitArray[m_hitNum]->setEventId(m_nEvent);
+        eclHitArray[m_hitNum]->setCellId(iECLCell);
+        eclHitArray[m_hitNum]->setEnergyDep(E_cell[iECLCell][TimeIndex]);
+        eclHitArray[m_hitNum]->setTimeAve(T_ave[iECLCell][TimeIndex] + Tof_ave[iECLCell][TimeIndex]);
       }//if Energy > 0
     }//16 Time interval 16x 500 ns
   } //store  each crystal hit

@@ -95,7 +95,7 @@ namespace Belle2 {
         zEnvBack = envelopeParams.getLength("zBack") / Unit::mm;
         double innerR = envelopeParams.getLength("innerRadius") / Unit::mm;
         double outerR = envelopeParams.getLength("outerRadius") / Unit::mm;
-        G4Tubs *envelopeTube = new G4Tubs("Envelope", innerR, outerR, zEnvBack - zEnvFront, 0, 2*M_PI);
+        G4Tubs *envelopeTube = new G4Tubs("Envelope", innerR, outerR, (zEnvBack - zEnvFront) / 2., 0, 2*M_PI);
         string materialName = envelopeParams.getString("material", "Air");
         G4Material* material = Materials::get(materialName);
         // check of material and its refractive index

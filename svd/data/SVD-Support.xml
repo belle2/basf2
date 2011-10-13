@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DetectorComponent name="SVDSupport" xmlns:xi="http://www.w3.org/2001/XInclude">
+  <Creator library="svd">SVDSupportCreator</Creator>
+  <Content>
+    <Polycone>
+      <Name>BackwardCone</Name>
+      <Color>#666</Color>
+      <Material>C</Material>
+      <Plane> <posZ unit="mm">-395.501</posZ><innerRadius unit="mm"> 98.064</innerRadius><outerRadius unit="mm">100.130</outerRadius> </Plane>
+      <Plane> <posZ unit="mm">-341.000</posZ><innerRadius unit="mm"> 83.952</innerRadius><outerRadius unit="mm"> 86.018</outerRadius> </Plane>
+      <Plane> <posZ unit="mm">-341.000</posZ><innerRadius unit="mm"> 74.047</innerRadius><outerRadius unit="mm"> 86.018</outerRadius> </Plane>
+      <Plane> <posZ unit="mm">-339.000</posZ><innerRadius unit="mm"> 73.397</innerRadius><outerRadius unit="mm"> 85.500</outerRadius> </Plane>
+      <Plane> <posZ unit="mm">-339.000</posZ><innerRadius unit="mm"> 73.397</innerRadius><outerRadius unit="mm"> 75.500</outerRadius> </Plane>
+      <Plane> <posZ unit="mm">-319.317</posZ><innerRadius unit="mm"> 67.000</innerRadius><outerRadius unit="mm"> 69.103</outerRadius> </Plane>
+      <Plane> <posZ unit="mm">-319.000</posZ><innerRadius unit="mm"> 67.000</innerRadius><outerRadius unit="mm"> 69.000</outerRadius> </Plane>
+      <Plane> <posZ unit="mm">-304.394</posZ><innerRadius unit="mm"> 67.000</innerRadius><outerRadius unit="mm"> 69.000</outerRadius> </Plane>
+      <Plane> <posZ unit="mm">-304.000</posZ><innerRadius unit="mm"> 66.838</innerRadius><outerRadius unit="mm"> 69.000</outerRadius> </Plane>
+      <Plane> <posZ unit="mm">-265.394</posZ><innerRadius unit="mm"> 51.000</innerRadius><outerRadius unit="mm"> 53.162</outerRadius> </Plane>
+      <Plane> <posZ unit="mm">-265.000</posZ><innerRadius unit="mm"> 51.000</innerRadius><outerRadius unit="mm"> 53.000</outerRadius> </Plane>
+      <Plane> <posZ unit="mm">-250.333</posZ><innerRadius unit="mm"> 51.000</innerRadius><outerRadius unit="mm"> 53.000</outerRadius> </Plane>
+      <Plane> <posZ unit="mm">-250.000</posZ><innerRadius unit="mm"> 50.871</innerRadius><outerRadius unit="mm"> 53.000</outerRadius> </Plane>   
+      <Plane> <posZ unit="mm">-202.353</posZ><innerRadius unit="mm"> 33.500</innerRadius><outerRadius unit="mm"> 35.629</outerRadius> </Plane>
+      <Plane> <posZ unit="mm">-202.000</posZ><innerRadius unit="mm"> 33.500</innerRadius><outerRadius unit="mm"> 35.500</outerRadius> </Plane>
+      <Plane> <posZ unit="mm">-187.000</posZ><innerRadius unit="mm"> 33.500</innerRadius><outerRadius unit="mm"> 35.500</outerRadius> </Plane>
+      <Plane> <posZ unit="mm">-132.000</posZ><innerRadius unit="mm"> 33.000</innerRadius><outerRadius unit="mm"> 35.000</outerRadius> </Plane>
+      <Plane> <posZ unit="mm">-117.000</posZ><innerRadius unit="mm"> 33.000</innerRadius><outerRadius unit="mm"> 35.000</outerRadius> </Plane>
+    </Polycone>
+    <Polycone>
+      <Name>ForwardCone</Name>
+      <Color>#666</Color>
+      <Material>C</Material>
+      <Plane> <posZ unit="mm"> 164.000</posZ><innerRadius unit="mm"> 33.000</innerRadius><outerRadius unit="mm"> 35.000</outerRadius> </Plane>
+      <Plane> <posZ unit="mm"> 179.000</posZ><innerRadius unit="mm"> 33.000</innerRadius><outerRadius unit="mm"> 35.000</outerRadius> </Plane>
+      <Plane> <posZ unit="mm"> 244.000</posZ><innerRadius unit="mm"> 33.500</innerRadius><outerRadius unit="mm"> 35.500</outerRadius> </Plane>
+      <Plane> <posZ unit="mm"> 259.000</posZ><innerRadius unit="mm"> 33.500</innerRadius><outerRadius unit="mm"> 35.500</outerRadius> </Plane>
+      <Plane> <posZ unit="mm"> 259.169</posZ><innerRadius unit="mm"> 33.500</innerRadius><outerRadius unit="mm"> 35.529</outerRadius> </Plane>
+      <Plane> <posZ unit="mm"> 314.000</posZ><innerRadius unit="mm"> 42.816</innerRadius><outerRadius unit="mm"> 44.835</outerRadius> </Plane>
+      <Plane> <posZ unit="mm"> 314.169</posZ><innerRadius unit="mm"> 42.845</innerRadius><outerRadius unit="mm"> 44.835</outerRadius> </Plane>
+      <Plane> <posZ unit="mm"> 329.000</posZ><innerRadius unit="mm"> 42.845</innerRadius><outerRadius unit="mm"> 44.835</outerRadius> </Plane>
+      <Plane> <posZ unit="mm"> 329.295</posZ><innerRadius unit="mm"> 42.845</innerRadius><outerRadius unit="mm"> 44.934</outerRadius> </Plane>
+      <Plane> <posZ unit="mm"> 383.000</posZ><innerRadius unit="mm"> 59.046</innerRadius><outerRadius unit="mm"> 61.135</outerRadius> </Plane>
+      <Plane> <posZ unit="mm"> 383.295</posZ><innerRadius unit="mm"> 59.135</innerRadius><outerRadius unit="mm"> 61.135</outerRadius> </Plane>
+      <Plane> <posZ unit="mm"> 398.000</posZ><innerRadius unit="mm"> 59.135</innerRadius><outerRadius unit="mm"> 61.135</outerRadius> </Plane>
+      <Plane> <posZ unit="mm"> 398.224</posZ><innerRadius unit="mm"> 59.135</innerRadius><outerRadius unit="mm"> 61.186</outerRadius> </Plane>
+      <Plane> <posZ unit="mm"> 444.000</posZ><innerRadius unit="mm"> 69.539</innerRadius><outerRadius unit="mm"> 71.590</outerRadius> </Plane>
+      <Plane> <posZ unit="mm"> 444.000</posZ><innerRadius unit="mm"> 69.539</innerRadius><outerRadius unit="mm"> 86.590</outerRadius> </Plane>
+      <Plane> <posZ unit="mm"> 446.000</posZ><innerRadius unit="mm"> 69.994</innerRadius><outerRadius unit="mm"> 86.590</outerRadius> </Plane>
+      <Plane> <posZ unit="mm"> 446.000</posZ><innerRadius unit="mm"> 84.590</innerRadius><outerRadius unit="mm"> 86.590</outerRadius> </Plane>
+      <Plane> <posZ unit="mm"> 510.000</posZ><innerRadius unit="mm"> 84.590</innerRadius><outerRadius unit="mm"> 86.590</outerRadius> </Plane>
+      <Plane> <posZ unit="mm"> 525.443</posZ><innerRadius unit="mm"> 88.050</innerRadius><outerRadius unit="mm"> 90.101</outerRadius> </Plane>
+    </Polycone>
+   </Content>
+</DetectorComponent>

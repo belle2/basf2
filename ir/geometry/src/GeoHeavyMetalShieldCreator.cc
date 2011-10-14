@@ -73,6 +73,49 @@ namespace Belle2 {
     void GeoHeavyMetalShieldCreator::create(const GearDir& content, G4LogicalVolume& topVolume, GeometryTypes type)
     {
 
+
+      //-- HeavyMetalShield L-side
+
+      GearDir cShieldL(content, "ShieldL");
+      if (! cShieldL) {
+        B2FATAL("Could not find definition for IR ShieldL");
+      }
+      double ShieldL_minZ(0), ShieldL_maxZ(0);
+      G4Polycone *geo_ShieldL = geometry::createPolyCone("geo_ShieldL_name", GearDir(content, "ShieldL/"), ShieldL_minZ, ShieldL_maxZ);
+
+      string strMat_ShieldL = content.getString("ShieldL/Material", "Air");
+      G4Material* mat_ShieldL = Materials::get(strMat_ShieldL);
+      if (!mat_ShieldL) B2FATAL("Material '" << strMat_ShieldL << "', required by IR ShieldL could not be found");
+
+      G4LogicalVolume* logi_ShieldL = new G4LogicalVolume(geo_ShieldL, mat_ShieldL, "logi_ShieldL_bane");
+      setColor(*logi_ShieldL, "#CC0000");
+      //setVisibility(*logi_ShieldL, false);
+      new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_ShieldL, "phys_ShieldL", &topVolume, false, 0);
+
+      // --
+      // Holes on L-side franges will be implemented later
+
+
+      //-- HeavyMetalShield L side
+      GearDir cShieldR(content, "ShieldR");
+      if (! cShieldR) {
+        B2FATAL("Could not find definition for IR ShieldR");
+      }
+      double ShieldR_minZ(0), ShieldR_maxZ(0);
+      G4Polycone *geo_ShieldR = geometry::createPolyCone("geo_ShieldR_name", GearDir(content, "ShieldR/"), ShieldR_minZ, ShieldR_maxZ);
+
+      string strMat_ShieldR = content.getString("ShieldR/Material", "Air");
+      G4Material* mat_ShieldR = Materials::get(strMat_ShieldR);
+      if (!mat_ShieldR) B2FATAL("Material '" << strMat_ShieldR << "', required by IR ShieldR could not be found");
+
+      G4LogicalVolume* logi_ShieldR = new G4LogicalVolume(geo_ShieldR, mat_ShieldR, "logi_ShieldR_bane");
+      setColor(*logi_ShieldR, "#CC0000");
+      //setVisibility(*logi_ShieldR, false);
+      new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_ShieldR, "phys_ShieldR", &topVolume, false, 0);
+
+
+
+      /*
       //##############
       //#   SVD Heavy metal shield
 
@@ -332,6 +375,7 @@ namespace Belle2 {
       new G4PVPlacement(0, G4ThreeVector(0, 0, -Lv1LFlange1_D1 - Lv1LFlange1_L1 / 2.), logi_Lv1LFlange1, "phys_Lv1LFlange1_name", &topVolume, false, 0);
       //-
       //--------------
+      */
 
     }
   }

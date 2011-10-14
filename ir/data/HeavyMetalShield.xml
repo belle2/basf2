@@ -3,77 +3,88 @@
   <Creator library="ir">HeavyMetalShieldCreator</Creator>
   <Content>
 
-        <!-- SVD end ring R side -->
-		<Lv1RShield1>
-			<D1 unit="mm"> 210.</D1>
-			<L1 unit="mm"> 93.6</L1>
-			<L2 unit="mm"> 61.0</L2>
-			<I1 unit="mm"> 31.</I1>
-			<I2 unit="mm"> 44.</I2>
-			<O1 unit="mm"> 34.45</O1>
-			<O2 unit="mm"> 50.</O2>
-			<Material desc="description">W</Material>
-		</Lv1RShield1>
+<ShieldL description="IR HeavyMetalShield L side">
+  <Material>W</Material>
+  <Plane>
+    <posZ unit="mm">-390</posZ>
+    <innerRadius unit="mm">46</innerRadius>
+    <outerRadius unit="mm">46</outerRadius>  
+  </Plane>
+  <Plane>
+    <posZ unit="mm">-390</posZ>
+    <innerRadius unit="mm">46</innerRadius>
+    <outerRadius unit="mm">115</outerRadius>  
+  </Plane>
+  <Plane>
+    <posZ unit="mm">-370</posZ>
+    <innerRadius unit="mm">46</innerRadius>
+    <outerRadius unit="mm">115</outerRadius>  
+  </Plane>
+  <Plane>
+    <posZ unit="mm">-370</posZ>
+    <innerRadius unit="mm">46</innerRadius>
+    <outerRadius unit="mm">56</outerRadius>  
+  </Plane>
+  <Plane>
+    <posZ unit="mm">-350</posZ>
+    <innerRadius unit="mm">46</innerRadius>
+    <outerRadius unit="mm">56</outerRadius>  
+  </Plane>
+  <Plane>
+    <posZ unit="mm">-335</posZ>
+    <innerRadius unit="mm">46</innerRadius>
+    <outerRadius unit="mm">53</outerRadius>  
+  </Plane>
+  <Plane>
+    <posZ unit="mm">-257</posZ>
+    <innerRadius unit="mm">33</innerRadius>
+    <outerRadius unit="mm">40</outerRadius>  
+  </Plane>
+  <Plane>
+    <posZ unit="mm">-230</posZ>
+    <innerRadius unit="mm">33</innerRadius>
+    <outerRadius unit="mm">35</outerRadius>  
+  </Plane>
+  <Plane>
+    <posZ unit="mm">-230</posZ>
+    <innerRadius unit="mm">33</innerRadius>
+    <outerRadius unit="mm">33</outerRadius>  
+  </Plane>
+</ShieldL>
 
-		<Lv1RShield2>
-			<D1 unit="mm"> 303.6</D1>
-			<L1 unit="mm"> 62.</L1>
-			<L2 unit="mm"> 34.</L2>
-			<L3 unit="mm"> 55.</L3>
-			<L4 unit="mm"> 50.</L4>
-			<L5 unit="mm"> 20.</L5>
-			<I1 unit="mm"> 60.</I1>
-			<I2 unit="mm"> 95.5</I2>
-			<O1 unit="mm"> 68.</O1>
-			<O2 unit="mm"> 70.</O2>
-			<O3 unit="mm"> 105.5</O3>
-			<O4 unit="mm"> 113.5</O4>
-			<Material desc="description">W</Material>
-		</Lv1RShield2>
-
-        <!-- SVD end ring L side -->
-		<Lv1LShield1>
-			<D1 unit="mm"> 144.</D1>
-			<L1 unit="mm"> 101.</L1>
-			<L2 unit="mm"> 90.</L2>
-			<L3 unit="mm"> 25.</L3>
-			<L4 unit="mm"> 05.</L4>
-			<I1 unit="mm"> 31.</I1>
-			<I2 unit="mm"> 47.</I2>
-			<I3 unit="mm"> 41.</I3>
-			<O1 unit="mm"> 34.45</O1>
-			<O2 unit="mm"> 57.</O2>
-			<O3 unit="mm"> 62.</O3>
-			<Material desc="description">W</Material>
-		</Lv1LShield1>
-
-		<Lv1LShield2>
-			<D1 unit="mm"> 245.</D1>
-			<L1 unit="mm"> 100.</L1>
-			<L2 unit="mm"> 20.</L2>
-			<I1 unit="mm"> 91.</I1>
-			<O1 unit="mm"> 101.45</O1>
-			<O2 unit="mm"> 121.</O2>
-			<Material desc="description">W</Material>
-		</Lv1LShield2>
-
-        <!-- End plate R side -->
-		<Lv1RFlange1>
-			<D1 unit="mm"> 524.6</D1>
-			<L1 unit="mm"> 20.</L1>
-			<I1 unit="mm"> 70.</I1>
-			<O1 unit="mm"> 113.5</O1>
-			<Material desc="description">W</Material>
-		</Lv1RFlange1>
-
-        <!-- End plate L side -->
-		<Lv1LFlange1>
-			<D1 unit="mm"> 365.</D1>
-			<L1 unit="mm"> 20.</L1>
-			<I1 unit="mm"> 41.</I1>
-			<O1 unit="mm"> 121.</O1>
-			<Material desc="description">W</Material>
-		</Lv1LFlange1>
+<ShieldR description="">
+  <Material>W</Material>
+  <Plane>
+    <posZ unit="mm">360</posZ>
+    <innerRadius unit="mm">40</innerRadius>
+    <outerRadius unit="mm">45</outerRadius>  
+  </Plane>
+  <Plane>
+    <posZ unit="mm">366</posZ>
+    <innerRadius unit="mm">40</innerRadius>
+    <outerRadius unit="mm">47.5</outerRadius>  
+  </Plane>
+  <Plane>
+    <posZ unit="mm">473</posZ>
+    <innerRadius unit="mm">63</innerRadius>
+    <outerRadius unit="mm">70</outerRadius>  
+  </Plane>
+  <Plane>
+    <posZ unit="mm">525</posZ>
+    <innerRadius unit="mm">63</innerRadius>
+    <outerRadius unit="mm">70</outerRadius>  
+  </Plane>
+  <Plane>
+    <posZ unit="mm">525</posZ>
+    <innerRadius unit="mm">63</innerRadius>
+    <outerRadius unit="mm">124</outerRadius>  
+  </Plane>
+  <Plane>
+    <posZ unit="mm">545</posZ>
+    <innerRadius unit="mm">63</innerRadius>
+    <outerRadius unit="mm">124</outerRadius>  
+  </Plane>
+</ShieldR>
 
   </Content>
 </DetectorComponent>

@@ -18,9 +18,9 @@
 
 #include <framework/core/Module.h>
 #include <pxd/dataobjects/PXDRecoHit.h>
-#include <svd/dataobjects/SVDRecoHit.h>
-#include <pxd/geopxd/CIDManager.h>
+//#include <svd/dataobjects/SVDRecoHit.h>
 #include <fstream>
+
 
 namespace Belle2 {
 
@@ -63,31 +63,13 @@ namespace Belle2 {
 
 
   private:
-
-    std::string m_mcParticlesCollectionName;                /**< MC particle collection name */
-    std::string m_cdcRecoHitsCollectionName;                /**< CDCRecoHits collection name */
-
-    std::string m_tracksCollectionName;                     /**< Tracks collection name */
-    std::string m_trackToCDCRecoHitCollectionName;          /**< Tracks to CDCRecoHits relation name */
-    std::string m_trackToMCParticleCollectionName;          /**< Tracks to MCParticles relation name  */
-
-    std::string m_cdcTrackCandsCollectionName;              /**< CDCTrackCandidates collection name */
-    std::string m_cdcTrackCandToRecoHitsCollectionName;     /**< CDCTrackCandidates to CDCRecoHits relation name */
-    std::string m_cdcTrackCandToMCParticleCollectionName;   /**< CDCTrackCandidates to MCParticles relation name */
-
-    std::string m_mcMatchParticlesCollectionName;           /**< MCMatchParticles collection name */
-    std::string m_pxdRecoHitsColName;                       /**< PXDRecoHits collection name */
-    std::string m_svdRecoHitsColName;
-    std::string m_trackToPxdRecoHitColName;
-    std::string m_trackToSvdRecoHitColName;
-    //std::vector<double> chi2values;
-    //std::vector<double> absMoms;
-    //std::vector<int> ndfs;
     ofstream dataOut;
     int m_failedFitCounter;
     int m_fitCounter;
-    // bool m_fitMCTracks;                                     /**< True if MC tracks should be fitted */
-    //bool m_fitRecoTracks;                                   /**< True if track candidates from pattern recognition should be fitted */
+    int m_notPerfectCounter;
+    double m_blowUpFactor;
+    bool m_noFilter;
+    bool m_useDaf;
 
 
   };

@@ -18,7 +18,7 @@
 #include <geometry/GeometryManager.h>
 #include <geometry/bfieldmap/BFieldMap.h>
 
-#include <generators/dataobjects/MCParticle.h>
+//#include <generators/dataobjects/MCParticle.h>
 
 #include <cdc/dataobjects/CDCHit.h>
 #include <svd/dataobjects/SVDTrueHit.h>
@@ -29,20 +29,20 @@
 
 #include <tracking/dataobjects/Track.h>
 
-#include "GFTrack.h"
-#include "GFTrackCand.h"
-#include "GFKalman.h"
-#include "GFDaf.h"
-#include "GFRecoHitProducer.h"
-#include "GFRecoHitFactory.h"
+#include <GFTrack.h>
+#include <GFTrackCand.h>
+#include <GFKalman.h>
+#include <GFDaf.h>
+#include <GFRecoHitProducer.h>
+#include <GFRecoHitFactory.h>
 
 
-#include "GFAbsTrackRep.h"
-#include "RKTrackRep.h"
+#include <GFAbsTrackRep.h>
+#include <RKTrackRep.h>
 
 #include <tracking/gfbfield/GFGeant4Field.h>
-#include "GFConstField.h"
-#include "GFFieldManager.h"
+#include <GFConstField.h>
+#include <GFFieldManager.h>
 
 #include <cstdlib>
 #include <iomanip>
@@ -52,9 +52,9 @@
 
 #include <boost/foreach.hpp>
 
-#include "TMath.h"
-#include "TRandom3.h"
-#include <math.h>
+#include <TMath.h>
+//#include <TRandom3.h>
+#include <cmath>
 
 using namespace std;
 using namespace Belle2;
@@ -116,7 +116,7 @@ void GenFitterModule::event()
 {
   B2INFO("**********   GenFitterModule  ************");
 
-  StoreArray < MCParticle > mcParticles("MCParticles");
+  //StoreArray < MCParticle > mcParticles("MCParticles");
 
   StoreArray < GFTrackCand > trackCandidates(m_gfTrackCandsColName);
   B2INFO("GenFitter: Number of GFTrackCandidates: " << trackCandidates.getEntries());

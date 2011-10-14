@@ -205,6 +205,7 @@ int main(int argc, char* argv[])
       B2ERROR(exc.what());
     } catch (error_already_set) {
       PyErr_Print();
+      return 1;
     }
 
   }

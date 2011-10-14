@@ -21,8 +21,8 @@
 #include <cdc/dataobjects/CDCHit.h>
 
 //genfit
-#include <GFRecoHitIfc.h>
-#include <GFWireHitPolicy.h>
+#include <genfit/GFRecoHitIfc.h>
+#include <genfit/GFWireHitPolicy.h>
 
 
 
@@ -46,26 +46,33 @@ namespace Belle2 {
     /** Default Constructor for ROOT IO.*/
     CDCRecoHit();
 
-    /** Constructor, that does the enrichment.
+
+    /** Constructor needed for GenFit RecoHitFactory.
      *
-     *  @param cdcHit original CDCHit from the enriched hit will be constructed.
      */
-    CDCRecoHit(const CDCHit& cdcHit, const float& resolution = 0.1);
+    CDCRecoHit(const CDCHit * cdcHit);
 
     /** Destructor. */
     ~CDCRecoHit() {}
 
     /** Creating a copy of this hit.
      *
-     * This function overwrites a funtion that GFRecoHitIfc inherits from GFRecoHit.
+     * This function overwrites a function that GFRecoHitIfc inherits from GFRecoHit.
      */
     GFAbsRecoHit* clone();
 
     /** Projection for the hit ...
      *
-     * This function overwrites a funtion that GFRecoHitIfc inherits from GFRecoHit.
+     * This function overwrites a function that GFRecoHitIfc inherits from GFRecoHit.
      */
     TMatrixD getHMatrix(const GFAbsTrackRep* stateVector);
+
+    /** Returns the distance of the wire center from the origin (radius of the hit).
+     *
+     */
+    double getRho() {return m_rho; } ;
+
+
 
 
   private:
@@ -99,6 +106,11 @@ namespace Belle2 {
     /** Accumulated charge within one cell.
     */
     double m_charge;
+
+    /** The distance of the wire center from the origin (radius of the hit).
+      *
+      */
+    double m_rho;
 
 
     //NOTE: The endcap positions of the wire is stored in a variable inherited from GFRecoHitIfc<GFWireHitPolicy>.

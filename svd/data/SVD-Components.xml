@@ -2,40 +2,40 @@
 <Components>
   <Version>1.0</Version>
   <Ladder layer="3">
-    <shift  unit="mm"> 4.100</shift>
-    <radius unit="mm">38.000</radius>
-    <Sensor sensorType="1" id="1" unit="mm" >-35.500</Sensor>
-    <Sensor sensorType="1" id="2" unit="mm" > 89.500</Sensor>
+    <shift  unit="mm"> 3.994</shift>
+    <radius unit="mm">38.160</radius>
+    <Sensor sensorType="1" id="1" unit="mm">  88.200</Sensor>
+    <Sensor sensorType="1" id="2" unit="mm"> -34.000</Sensor>
   </Ladder>
   <Ladder layer="4">
-    <shift  unit="mm">6.000</shift>
-    <radius unit="mm">80.000</radius>
+    <shift  unit="mm"> 8.408</shift>
+    <radius unit="mm">80.160</radius>
     <slantedAngle unit="deg">11.9</slantedAngle>
-    <slantedV unit="mm">25.000</slantedV>
-    <Sensor sensorType="4" id="1" unit="mm">-99.000</Sensor>
-    <Sensor sensorType="3" id="2" unit="mm"> 26.000</Sensor>
-    <!--Sensor sensorType="2" id="3" unit="mm"> 151.010</Sensor-->
+    <slantedV unit="mm">13.469</slantedV>
+    <Sensor sensorType="2" id="1" unit="mm"> 156.067</Sensor>
+    <Sensor sensorType="3" id="2" unit="mm">  32.520</Sensor>
+    <Sensor sensorType="4" id="3" unit="mm"> -92.560</Sensor>
   </Ladder>
   <Ladder layer="5">
-    <shift  unit="mm"> 6.500</shift>
-    <radius unit="mm">115.000</radius>
+    <shift  unit="mm"> 14.120</shift>
+    <radius unit="mm">115.160</radius>
     <slantedAngle unit="deg">17.2</slantedAngle>
-    <slantedV unit="mm">36.000</slantedV>
-    <Sensor sensorType="4" id="1" unit="mm">-146.000</Sensor>
-    <Sensor sensorType="3" id="2" unit="mm">-21.000</Sensor>
-    <Sensor sensorType="3" id="3" unit="mm"> 104.000</Sensor>
-    <!--Sensor sensorType="2" id="4" unit="mm"> 218.360</Sensor-->
+    <slantedV unit="mm">19.160</slantedV>
+    <Sensor sensorType="2" id="1" unit="mm"> 226.453</Sensor>
+    <Sensor sensorType="3" id="2" unit="mm"> 104.120</Sensor>
+    <Sensor sensorType="3" id="3" unit="mm"> -20.960</Sensor>
+    <Sensor sensorType="4" id="4" unit="mm">-146.040</Sensor>
   </Ladder>
   <Ladder layer="6">
-    <shift  unit="mm"> 7.500</shift>
-    <radius unit="mm">140.000</radius>
+    <shift  unit="mm"> 17.190</shift>
+    <radius unit="mm">140.160</radius>
     <slantedAngle unit="deg">21.1</slantedAngle>
-    <slantedV unit="mm">41.991</slantedV>
-    <Sensor sensorType="4" id="1" unit="mm">-197.000</Sensor>
-    <Sensor sensorType="3" id="2" unit="mm">-72.000</Sensor>
-    <Sensor sensorType="3" id="3" unit="mm"> 53.000</Sensor>
-    <Sensor sensorType="3" id="4" unit="mm"> 178.000</Sensor>
-    <!--Sensor sensorType="2" id="5" unit="mm"> 289.325</Sensor-->
+    <slantedV unit="mm">23.391</slantedV>
+    <Sensor sensorType="2" id="1" unit="mm"> 299.040</Sensor>
+    <Sensor sensorType="3" id="2" unit="mm"> 177.600</Sensor>
+    <Sensor sensorType="3" id="3" unit="mm">  52.600</Sensor>
+    <Sensor sensorType="3" id="4" unit="mm"> -72.480</Sensor>
+    <Sensor sensorType="4" id="5" unit="mm">-197.560</Sensor>
   </Ladder>
 
   <!--FOR SENSOR TYPE DESCRIPTION SEE PETER KODYS'S FILE FROM B2GM 2010-->
@@ -43,19 +43,19 @@
   <Sensor sensorType="1">
     <Color>#006699</Color>
     <Material>Si</Material>
-    <width  unit="mm">38.400</width>
-    <length unit="mm">124.880</length>
-    <height unit="mm"> 0.32000002</height>
+    <width  unit="mm"> 40.400</width>
+    <length unit="mm">122.000</length>
+    <height unit="um">320.000</height>
     <Active>
       <u unit="mm"> 0.940</u>
       <v unit="mm"> 0.990</v>
-      <width  unit="mm">36.520</width>
-      <length unit="mm">122.900</length>
-      <height unit="mm"> 0.320</height>
+      <width  unit="mm">38.520</width>
+      <length unit="mm">120.020</length>
+      <height unit="um">320.000</height>
       <stepSize unit="um">5</stepSize>
     </Active>
     <Component type="KaptonFrontSmallSensor">
-      <u unit="mm"> 19.200</u> <v unit="mm"> 62.440</v> <w unit="mm"> above</w>
+      <u unit="mm"> 20.200</u> <v unit="mm"> 61.000</v> <w unit="mm"> above</w>
     </Component>
   </Sensor>
   <Sensor sensorType="2">
@@ -64,14 +64,14 @@
     <width  unit="mm">60.630</width>
     <width2 unit="mm">41.020</width2>
     <length unit="mm">125.580</length>
-    <height unit="mm">0.3001</height>
+    <height unit="um">300</height>
     <Active>
       <u unit="mm"> 1.520</u>
       <v unit="mm"> 1.300</v>
       <width  unit="mm">57.590</width>
       <width2 unit="mm">38.420</width2>
       <length unit="mm">122.760</length>
-      <height unit="mm"> 0.300</height>
+      <height unit="um"> 300</height>
       <stepSize unit="um">5</stepSize>
     </Active>
     <Component type="KaptonFrontSlanted">
@@ -81,18 +81,19 @@
       <u unit="mm"> 30.315</u> <v unit="mm"> 62.790</v> <w unit="mm"> above</w>
     </Component-->
   </Sensor>
+
   <Sensor sensorType="3">
     <Color>#006699</Color>
     <Material>Si</Material>
     <width  unit="mm">59.600</width>
     <length unit="mm">124.880</length>
-    <height unit="mm"> 0.3201</height>
+    <height unit="um">320</height>
     <Active>
       <u unit="mm"> 0.940</u>
       <v unit="mm"> 0.990</v>
       <width  unit="mm">57.720</width>
       <length unit="mm">122.900</length>
-      <height unit="mm"> 0.320</height>
+      <height unit="um"> 320</height>
       <stepSize unit="um">5</stepSize>
     </Active>
     <Component type="KaptonFlex">
@@ -113,13 +114,13 @@
     <Material>Si</Material>
     <width  unit="mm">59.600</width>
     <length unit="mm">124.880</length>
-    <height unit="mm"> 0.3201</height>
+    <height unit="um">320</height>
     <Active>
       <u unit="mm"> 0.940</u>
       <v unit="mm"> 0.990</v>
       <width  unit="mm">57.720</width>
       <length unit="mm">122.900</length>
-      <height unit="mm"> 0.320</height>
+      <height unit="um">320</height>
       <stepSize unit="um">5</stepSize>
     </Active>
     <Component type="KaptonFrontBigSensor">
@@ -152,8 +153,8 @@
   <Component name="KaptonFrontSmallSensor">
     <Material>SVD_KaptonFront</Material>
     <Color>#660000</Color>
-    <width  unit="mm">38.400</width>
-    <length unit="mm">124.880</length>
+    <width  unit="mm">40.400</width>
+    <length unit="mm">122.000</length>
     <height unit="mm">0.100</height>
   </Component>
   <Component name="KaptonFrontBigSensor">

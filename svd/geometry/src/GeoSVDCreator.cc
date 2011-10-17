@@ -20,6 +20,7 @@
 
 #include <G4LogicalVolume.hh>
 #include <G4Trd.hh>
+#include <G4Trap.hh>
 #include <G4Box.hh>
 #include <G4Tubs.hh>
 #include <G4Polycone.hh>
@@ -30,6 +31,7 @@
 
 #include <boost/algorithm/string.hpp>
 #include <boost/foreach.hpp>
+#include <boost/format.hpp>
 
 using namespace std;
 
@@ -97,33 +99,16 @@ namespace Belle2 {
         params.getString("Material", "Air"),
         params.getString("Color", ""),
         params.getLength("width", 0) / Unit::mm,
+        params.getLength("width2", 0) / Unit::mm,
         params.getLength("length", 0) / Unit::mm,
         params.getLength("height", 0) / Unit::mm
       );
       double angle  = params.getAngle("angle", 0);
-      double width2 = params.getLength("width2", 0) / Unit::mm;
 
       if (c.width == 0 || c.length == 0 || c.height == 0) {
         B2DEBUG(100, "One dimension empty, using auto resize for component");
       } else {
-        G4VSolid* solid;
-        if (width2 != 0) {
-          solid = new G4Trd("SVD." + name, c.width / 2.0, width2 / 2.0, c.height / 2.0, c.height / 2.0, c.length / 2.0);
-        } else if (angle == 0) {
-          solid = new G4Box("SVD." + name, c.width / 2.0, c.length / 2.0, c.height / 2.0);
-        } else {
-          //If we have an angle!=0, the shape is a trapezoidal where all for edges are slanted by angle
-          //so we calculate the corresponding values
-          const double tana = tan(angle);
-          const double maxheight = min(tana * c.length / 2.0, min(tana * c.width / 2.0, c.height));
-          const double offset = maxheight / tana;
-          c.height = maxheight;
-          solid = new G4Trd(("SVD." + name),
-                            c.width / 2.0, c.width / 2.0 - offset,
-                            c.length / 2.0, c.length / 2.0 - offset,
-                            c.height / 2.0
-                           );
-        }
+        G4VSolid* solid = createTrapezoidal("SVD." + name, c.width, c.width2, c.length, c.height, angle);
         c.volume = new G4LogicalVolume(solid, Materials::get(c.material), "SVD." + name);
       }
       vector<GeoSVDPlacement> subComponents = getSubComponents(params);
@@ -176,6 +161,7 @@ namespace Belle2 {
                                           << "minWidth " << minWidth << " > " << component.width
                                          );
           component.width = minWidth * 2.0;
+          component.width2 = minWidth * 2.0;
         }
         if (minLength > component.length) {
           if (component.volume) B2FATAL("Subcomponent " << p.name << " does not fit into volume: "
@@ -193,7 +179,7 @@ namespace Belle2 {
 
       //No volume yet, create a new one automatically assuming air material
       if (!component.volume) {
-        G4Box *componentShape = new G4Box(name.c_str(), component.width / 2.0, component.length / 2.0, component.height / 2.0);
+        G4VSolid *componentShape = createTrapezoidal(name, component.width, component.width2, component.length, component.height);
         component.volume = new G4LogicalVolume(componentShape, Materials::get(component.material), name);
         if (component.material == "Air") {
           B2DEBUG(200, "Component " << name << " is an Air volume, setting invisible");
@@ -206,8 +192,7 @@ namespace Belle2 {
       double componentW(0);
       if (createContainer && (heightAbove > 0 || heightBelow > 0)) {
         double height = component.height + heightAbove + heightBelow;
-        G4Box *containerShape = new G4Box((name + ".Container"), component.width / 2.0, component.length / 2.0, height / 2.0);
-        container = new G4LogicalVolume(containerShape, Materials::get("Air"), name + ".Container");
+        G4VSolid *containerShape = createTrapezoidal(name, component.width, component.width2, component.length, height);        container = new G4LogicalVolume(containerShape, Materials::get("Air"), name + ".Container");
         componentW = -(heightAbove - heightBelow) / 2.0;
         new G4PVPlacement(0, G4ThreeVector(0, 0, componentW), component.volume, name + ".Container", container, false, 1);
       }
@@ -287,116 +272,97 @@ namespace Belle2 {
       return G4Transform3D(rotation, translation);
     }
 
+    G4VSolid* GeoSVDCreator::createTrapezoidal(const string& name, double width, double width2, double length, double &height, double angle)
+    {
+      double offset(0);
+      if (angle != 0) {
+        const double tana = tan(angle);
+        height = min(tana * length, min(tana * width, height));
+        offset = height / tana;
+      }
+      const double hwidth  = width / 2.0;
+      const double hwidth2 = width2 / 2.0;
+      const double hlength = length / 2.0;
+      const double hheight = height / 2.0;
+
+      if (width2 <= 0 || width == width2) {
+        if (angle == 0) {
+          return new G4Box(name, hwidth, hlength, hheight);
+        } else {
+          return new G4Trd(name, hwidth, hwidth - offset, hlength, hlength - offset, hheight);
+        }
+      }
+      //FIXME: offset not working, g4 complains about nonplanarity of face -X. But we do not need that shape at the moment
+      //so lets ignore it for now
+      return  new G4Trap(name, hheight, 0, 0, hlength, hwidth, hwidth2, 0, hlength - offset, hwidth - offset, hwidth2 - offset, 0);
+    }
+
+
+
     void GeoSVDCreator::addLadder(int ladderID, double phi, G4LogicalVolume* volume, const G4Transform3D& placement)
     {
       VxdID ladder(m_ladder.layerID, ladderID, 0);
 
-      G4RotationMatrix ladderRotation(0, 0, phi);
       G4Translate3D ladderPos(m_ladder.shift, m_ladder.radius, 0.0);
-      G4Transform3D ladderPlacement = placement * G4Rotate3D(ladderRotation) * ladderPos * getAlignment(ladder);
+      G4Transform3D ladderPlacement = placement * G4RotateZ3D(phi) * ladderPos * getAlignment(ladder);
 
-      int i(0);
       BOOST_FOREACH(GeoSVDSensor s, m_ladder.sensors) {
         VxdID sensorID(ladder);
         sensorID.setSensor(s.sensorID);
         string name = "SVD." + (string)sensorID;
-        if (m_ladder.sensors[i].sensorTypeID == 2) {
-          //string path = (boost::format("Ladder[@layer=%1%]/") % layer).str();
-          GearDir myParamsSensor(m_components, "Sensor[@sensorType=2]/");
-          if (!myParamsSensor) B2FATAL("Could not find parameters for slanted sensor.");
-          double sensorWidth2 = myParamsSensor.getLength("width2") / Unit::mm;
-          double activeSensorWidth2 = myParamsSensor.getLength("Active/width2") / Unit::mm;
-          G4Trd* sensorShape = new G4Trd(name, s.width / 2.0, sensorWidth2 / 2.0 , s.height / 2.0, s.height / 2.0, s.length / 2.0);
-          s.volume = new G4LogicalVolume(sensorShape, Materials::get(s.material), name);
+        G4VSolid* sensorShape = createTrapezoidal(name, s.width, s.width2, s.length, s.height);
 
-          // Create sensitive Area: this Part is created separately since we want full control over the coordinate system:
-          // local x (called u) should point in RPhi direction
-          // local y (called v) should point in global z
-          // local z (called w) should away from the origin
-          G4Trd* activeShape = new G4Trd(name + ".Active", s.info.getWidth() / Unit::mm / 2.0,
-                                         activeSensorWidth2 / 2.0, s.info.getThickness() / Unit::mm / 2.0,
-                                         s.info.getThickness() / Unit::mm / 2.0, s.info.getLength() / Unit::mm / 2.0);
-          //Create appropriate sensitive detector instance
-          SensorInfo* sensorInfo = new SensorInfo(s.info);
-          sensorInfo->setID(sensorID);
-          SensitiveDetector *sensitive = new SensitiveDetector(sensorInfo);
-          m_sensitive.push_back(sensitive);
+        s.volume = new G4LogicalVolume(sensorShape, Materials::get(s.material), name);
+        // Create sensitive Area: this Part is created separately since we want full control over the coordinate system:
+        // local x (called u) should point in RPhi direction
+        // local y (called v) should point in global z
+        // local z (called w) should away from the origin
+        G4VSolid* activeShape = createTrapezoidal(name + ".Active", s.active.width, s.active.width2,
+                                                  s.active.length, s.active.height);
+        //Create appropriate sensitive detector instance
+        SensorInfo* sensorInfo = new SensorInfo(s.info);
+        sensorInfo->setID(sensorID);
+        SensitiveDetector *sensitive = new SensitiveDetector(sensorInfo);
+        m_sensitive.push_back(sensitive);
 
-          G4LogicalVolume* active = new G4LogicalVolume(activeShape,  Materials::get(s.material), name + ".Active",
-                                                        0, sensitive);
-          active->SetUserLimits(new G4UserLimits(s.active.stepSize));
-          setColor(*active, "#ddd");
-          //The coordinates of the active region are given relative to the corner of the sensor, not to the center
-          //so we convert them. If the sensor is flipped, the sign of coordinates need to be inverted
-          double activeU = (s.active.u + (s.info.getWidth() / Unit::mm - s.width) / 2.0) * (s.flipU ? -1 : 1);
-          double activeV = (s.active.v + (s.info.getLength() / Unit::mm - s.length) / 2.0) * (s.flipV ? -1 : 1);
-          //active area is always at the top, so active.w would be active.height, otherwise the same as above
-          double activeW = (s.height - s.info.getThickness() / Unit::mm) / 2.0 * (s.flipW ? -1 : 1);
-          //Place the active area
-          new G4PVPlacement(G4Translate3D(activeU, activeV, activeW), active, name + ".Active",
-                            s.volume, false, (int)sensorID);
-          //Now create all the other components and place the Sensor
-          double shiftX = s.height / 2.0 * (s.flipW ? -1 : 1) + addSubComponents(name, s, s.components, true, false);
-          string path = (boost::format("Ladder[@layer=%1%]/") % m_ladder.layerID).str();
-          GearDir myParamsLadderSensors(m_components, path);
-          double angleOfSlantedSensor = myParamsLadderSensors.getLength("/slantedAngle") / Unit::deg;
-          double vPosition = myParamsLadderSensors.getLength("/slantedV") / Unit::mm;
-          G4RotationMatrix rotation(0, angleOfSlantedSensor* M_PI / 90.0, -M_PI / 2.0);
-          G4Transform3D sensorAlign = getAlignment(sensorID);
-          G4Transform3D placement = ladderPlacement * G4Translate3D(-shiftX - vPosition, 0.0, s.z) * G4Rotate3D(rotation) * sensorAlign;
-          new G4PVPlacement(placement, s.volume, name, volume, false, 1);
-        } else {
-          G4Box* sensorShape = new G4Box(name, s.width / 2.0, s.length / 2.0, s.height / 2.0);
-          s.volume = new G4LogicalVolume(sensorShape, Materials::get(s.material), name);
-          // Create sensitive Area: this Part is created separately since we want full control over the coordinate system:
-          // local x (called u) should point in RPhi direction
-          // local y (called v) should point in global z
-          // local z (called w) should away from the origin
-          G4Box* activeShape = new G4Box(name + ".Active", s.info.getWidth() / Unit::mm / 2.0,
-                                         s.info.getLength() / Unit::mm / 2.0,
-                                         s.info.getThickness() / Unit::mm / 2.0);
+        G4LogicalVolume* active = new G4LogicalVolume(activeShape,  Materials::get(s.material), name + ".Active",
+                                                      0, sensitive);
+        active->SetUserLimits(new G4UserLimits(s.active.stepSize));
+        setColor(*active, "#ddd");
+        //The coordinates of the active region are given relative to the corner of the sensor, not to the center
+        //so we convert them. If the sensor is flipped, the sign of coordinates need to be inverted
+        double activeU = (s.active.u + (s.active.width - s.width) / 2.0) * (s.flipU ? -1 : 1);
+        double activeV = (s.active.v + (s.active.length - s.length) / 2.0) * (s.flipV ? -1 : 1);
+        //active area is always at the top, so active.w would be active.height, otherwise the same as above
+        double activeW = (s.active.height - s.height) / 2.0 * (s.flipW ? -1 : 1);
+        //Place the active area
+        new G4PVPlacement(G4Translate3D(activeU, activeV, activeW), active, name + ".Active",
+                          s.volume, false, (int)sensorID);
+        //Draw local axes to check orientation
+        //Beware: do not enable for simulation, this is purely for visualization
+        /*{
+          G4LogicalVolume* uBox = new G4LogicalVolume(new G4Box("u",5*mm,0.1*mm,0.1*mm), Materials::get(s.material), "u");
+          G4LogicalVolume* vBox = new G4LogicalVolume(new G4Box("v",0.1*mm,5*mm,0.1*mm), Materials::get(s.material), "u");
+          G4LogicalVolume* wBox = new G4LogicalVolume(new G4Box("w",0.1*mm,0.1*mm,5*mm), Materials::get(s.material), "u");
+          setColor(*uBox,"#f00");
+          setColor(*vBox,"#0f0");
+          setColor(*wBox,"#00f");
+          new G4PVPlacement(G4Translate3D(5*mm,0,0),uBox,"u",active,false,1);
+          new G4PVPlacement(G4Translate3D(0,5*mm,0),vBox,"v",active,false,1);
+          new G4PVPlacement(G4Translate3D(0,0,5*mm),wBox,"w",active,false,1);
+        }*/
 
-          //Create appropriate sensitive detector instance
-          SensorInfo* sensorInfo = new SensorInfo(s.info);
-          sensorInfo->setID(sensorID);
-          SensitiveDetector *sensitive = new SensitiveDetector(sensorInfo);
-          m_sensitive.push_back(sensitive);
-
-          G4LogicalVolume* active = new G4LogicalVolume(activeShape,  Materials::get(s.material), name + ".Active",
-                                                        0, sensitive);
-          active->SetUserLimits(new G4UserLimits(s.active.stepSize));
-          setColor(*active, "#ddd");
-          //The coordinates of the active region are given relative to the corner of the sensor, not to the center
-          //so we convert them. If the sensor is flipped, the sign of coordinates need to be inverted
-          double activeU = (s.active.u + (s.info.getWidth() / Unit::mm - s.width) / 2.0) * (s.flipU ? -1 : 1);
-          double activeV = (s.active.v + (s.info.getLength() / Unit::mm - s.length) / 2.0) * (s.flipV ? -1 : 1);
-          //active area is always at the top, so active.w would be active.height, otherwise the same as above
-          double activeW = (s.height - s.info.getThickness() / Unit::mm) / 2.0 * (s.flipW ? -1 : 1);
-          //Place the active area
-          new G4PVPlacement(G4Translate3D(activeU, activeV, activeW), active, name + ".Active",
-                            s.volume, false, (int)sensorID);
-          //Draw local axes to check orientation
-          //Beware: do not enable for simulation, this is purely for visualization
-          /*{
-            G4LogicalVolume* uBox = new G4LogicalVolume(new G4Box("u",5*mm,0.1*mm,0.1*mm), Materials::get(s.material), "u");
-            G4LogicalVolume* vBox = new G4LogicalVolume(new G4Box("v",0.1*mm,5*mm,0.1*mm), Materials::get(s.material), "u");
-            G4LogicalVolume* wBox = new G4LogicalVolume(new G4Box("w",0.1*mm,0.1*mm,5*mm), Materials::get(s.material), "u");
-            setColor(*uBox,"#f00");
-            setColor(*vBox,"#0f0");
-            setColor(*wBox,"#00f");
-            new G4PVPlacement(G4Translate3D(5*mm,0,0),uBox,"u",active,false,1);
-            new G4PVPlacement(G4Translate3D(0,5*mm,0),vBox,"v",active,false,1);
-            new G4PVPlacement(G4Translate3D(0,0,5*mm),wBox,"w",active,false,1);
-          }*/
-
-          //Now create all the other components and place the Sensor
-          double shiftX = s.height / 2.0 * (s.flipW ? -1 : 1) + addSubComponents(name, s, s.components, true, false);
-          G4RotationMatrix rotation(0, -M_PI / 2.0, -M_PI / 2.0);
-          G4Transform3D sensorAlign = getAlignment(sensorID);
-          G4Transform3D placement = ladderPlacement * G4Translate3D(-shiftX, 0.0, s.z) * G4Rotate3D(rotation) * sensorAlign;
-          new G4PVPlacement(placement, s.volume, name, volume, false, 1);
+        //Now create all the other components and place the Sensor
+        double shiftX = addSubComponents(name, s, s.components, true, false);
+        G4RotationMatrix rotation(0, -M_PI / 2.0, -M_PI / 2.0);
+        //Trapezoidal sensors are slanted FIXME: this distinction is a bit arbitary, we should change that
+        if (s.sensorTypeID == 2) {
+          rotation *= G4RotationMatrix(0, m_ladder.slantedAngle, 0);
+          shiftX += m_ladder.slantedV;
         }
-        i++;
+        G4Transform3D sensorAlign = getAlignment(sensorID);
+        G4Transform3D placement = ladderPlacement * G4Translate3D(-shiftX, 0.0, s.z) * G4Rotate3D(rotation) * sensorAlign;
+        new G4PVPlacement(placement, s.volume, name, volume, false, 1);
       }
     }
 
@@ -424,41 +390,38 @@ namespace Belle2 {
       svdRegion->AddRootLogicalVolume(envelope);
       G4VPhysicalVolume* physEnvelope = new G4PVPlacement(getAlignment("SVD"), envelope, "SVD", &topVolume, false, 1);
 
-
-      BOOST_FOREACH(const GearDir &sensor, content.getNodes("Components/Sensor")) {
-        int sensorTypeID = sensor.getInt("@sensorType");
-        string path = (boost::format("Sensor[@sensorType=%1%]/") % sensorTypeID).str();
-        GearDir paramsSensor(m_components, path);
-        if (!paramsSensor) {
-          B2FATAL("Could not find Sensor definition for type " << sensorTypeID);
-        }
+      //Read the definition of all sensor types
+      BOOST_FOREACH(const GearDir &paramsSensor, m_components.getNodes("Sensor")) {
+        int sensorTypeID = paramsSensor.getInt("@sensorType");
         GeoSVDSensor sensor(
           paramsSensor.getString("Material"),
           paramsSensor.getString("Color", ""),
           paramsSensor.getLength("width") / Unit::mm,
+          paramsSensor.getLength("width2", 0) / Unit::mm,
           paramsSensor.getLength("length") / Unit::mm,
           paramsSensor.getLength("height") / Unit::mm
         );
         sensor.active = GeoSVDActiveArea(
                           paramsSensor.getLength("Active/u") / Unit::mm,
                           paramsSensor.getLength("Active/v") / Unit::mm,
+                          paramsSensor.getLength("Active/width") / Unit::mm,
+                          paramsSensor.getLength("Active/width2", 0) / Unit::mm,
+                          paramsSensor.getLength("Active/length") / Unit::mm,
+                          paramsSensor.getLength("Active/height") / Unit::mm,
                           paramsSensor.getLength("Active/stepSize") / Unit::mm
                         );
         sensor.info = SensorInfo(
-                        VxdID(0, 0, sensorTypeID), // FIXME -> sensorTypeID != sensorID
+                        VxdID(0, 0, 0),
                         paramsSensor.getLength("Active/width"),
                         paramsSensor.getLength("Active/length"),
                         paramsSensor.getLength("Active/height"),
-                        // TODO -> add these parameters to xml file
-                        paramsSensor.getInt("Active/pixelsR", 0),
-                        paramsSensor.getInt("Active/pixelsZ[1]", 0),
-                        paramsSensor.getLength("Active/splitLength", 0),
-                        paramsSensor.getInt("Active/pixelsZ[2]", 0)
+                        paramsSensor.getInt("Active/stripsU", 0),
+                        paramsSensor.getInt("Active/stripsV", 0),
+                        paramsSensor.getLength("Active/width2", 0)
                       );
 
         sensor.components = getSubComponents(paramsSensor);
-        m_sensorMap.insert(pair<int, GeoSVDSensor>(sensorTypeID, sensor));
-
+        m_sensorMap.insert(make_pair(sensorTypeID, sensor));
       }
 
       //Build all ladders including Sensors
@@ -474,27 +437,18 @@ namespace Belle2 {
           //Loop over defined ladders
           BOOST_FOREACH(const GearDir &ladder, layer.getNodes("Ladder")) {
             int ladderID = ladder.getInt("@id");
-            //int sensorID = sensor.getInt("@id");
             double phi = ladder.getAngle("phi", 0);
             addLadder(ladderID, phi, envelope, shellAlignment);
           }
         }
       }
+
       //Now build cache with all transformations
       VXD::GeoCache::getInstance().findVolumes(physEnvelope);
 
-      //Check hierachy of PXD + SVD
-      /*VXD::GeoCache &geo = VXD::GeoCache::getInstance();
-      BOOST_FOREACH(VxdID layer, geo.getLayers()){
-        cout << "Layer " << layer << endl;
-        BOOST_FOREACH(VxdID ladder, geo.getLadders(layer)){
-          cout << "  Ladder " << ladder << ": ";
-          BOOST_FOREACH(VxdID sensor, geo.getSensors(ladder)){
-            cout << sensor << " ";
-          }
-          cout << endl;
-        }
-      }*/
+      //Free some space
+      m_componentCache.clear();
+      m_sensorMap.clear();
     }
 
     void GeoSVDCreator::setLayer(int layer)
@@ -507,7 +461,9 @@ namespace Belle2 {
       m_ladder = GeoSVDLadder(
                    layer,
                    paramsLadder.getLength("radius") / Unit::mm,
-                   paramsLadder.getLength("shift") / Unit::mm
+                   paramsLadder.getLength("shift") / Unit::mm,
+                   paramsLadder.getAngle("slantedAngle", 0),
+                   paramsLadder.getLength("slantedV", 0) / Unit::mm
                  );
 
       BOOST_FOREACH(const GearDir &sensorInfo, paramsLadder.getNodes("Sensor")) {

@@ -32,21 +32,26 @@ namespace Belle2 {
     };
 
     struct GeoSVDActiveArea {
-      GeoSVDActiveArea(double u = 0, double v = 0, double stepSize = 0):
-          u(u), v(v), stepSize(stepSize) {}
+      GeoSVDActiveArea(double u = 0, double v = 0, double width = 0, double width2 = 0, double length = 0, double height = 0, double stepSize = 0):
+          u(u), v(v), width(width), width2(width2), length(length), height(height), stepSize(stepSize) {}
       double u;
       double v;
+      double width;
+      double width2;
+      double length;
+      double height;
       double stepSize;
     };
 
     struct GeoSVDComponent {
-      GeoSVDComponent(const std::string& material = "", const std::string& color = "", double width = 0, double length = 0, double height = 0):
-          volume(0), material(material), color(color), width(width), length(length), height(height), flipU(false), flipV(false), flipW(false) {}
+      GeoSVDComponent(const std::string& material = "", const std::string& color = "", double width = 0, double width2 = 0, double length = 0, double height = 0):
+          volume(0), material(material), color(color), width(width), width2(width2), length(length), height(height), flipU(false), flipV(false), flipW(false) {}
 
       G4LogicalVolume* volume;
       std::string material;
       std::string color;
       double width;
+      double width2;
       double length;
       double height;
       bool flipU;
@@ -55,8 +60,8 @@ namespace Belle2 {
     };
 
     struct GeoSVDSensor: public GeoSVDComponent {
-      GeoSVDSensor(const std::string& material = "", const std::string& color = "", double width = 0, double length = 0, double height = 0):
-          GeoSVDComponent(material, color, width, length, height) {}
+      GeoSVDSensor(const std::string& material = "", const std::string& color = "", double width = 0, double width2 = 0, double length = 0, double height = 0):
+          GeoSVDComponent(material, color, width, width2, length, height) {}
       SensorInfo info;
       int    sensorID;
       int    sensorTypeID;
@@ -66,10 +71,12 @@ namespace Belle2 {
     };
 
     struct GeoSVDLadder {
-      GeoSVDLadder(int layerID = 0, double shift = 0, double radius = 0): layerID(layerID), shift(shift), radius(radius) {}
+      GeoSVDLadder(int layerID = 0, double shift = 0, double radius = 0, double slantedAngle = 0, double slantedV = 0): layerID(layerID), shift(shift), radius(radius), slantedAngle(slantedAngle), slantedV(slantedV) {}
       int layerID;
       double shift;
       double radius;
+      double slantedAngle;
+      double slantedV;
       std::vector<GeoSVDSensor> sensors;
     };
 

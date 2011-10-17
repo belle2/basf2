@@ -50,6 +50,21 @@ namespace Belle2 {
        */
       virtual void create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes type);
 
+      /** Create a trapezoidal solid.
+       * @param width full forward width of the shape in mm
+       * @param width2 full backward width of the shape in mm
+       * @param length length of the shape in mm
+       * @param[inout] height of the shape in mm. If angle is not 0 this value
+       *        might be changed if the actual height will be smaller due to
+       *        the slanted edges
+       * @param angle angle of the sides along w with respect to to the uv
+       *        plane. 0 means normal box shaped, !=0 means the upper endcap of
+       *        the solid will be smaller since all edges will be slanted by
+       *        angle
+       * @return A G4VShape which could be a G4Box, a G4Trd or a G4Trap depending on the parameters
+       */
+      G4VSolid* createTrapezoidal(const std::string& name, double width, double width2, double length, double &height, double angle = 0);
+
       /**
        * Get the volume and the height representing a single sub-component
        * The name is assumed to be unique and Volumes are cached. If a component had already

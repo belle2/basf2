@@ -73,11 +73,11 @@ namespace Belle2 {
         case 1: return "PDX";
         case 2: return "SVD";
         case 3: return "CDC";
-        case 4: return "TOP";
-        case 5: return "ARICH";
+        case 4: return "ARICH";
+        case 5: return "TOP";
         case 6: return "ECL";
-        case 7: return "BKLM";
-        case 8: return "EKLM";
+        case 7: return "EKLM";
+        case 8: return "BKLM";
       }
       return "";
     }

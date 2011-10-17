@@ -39,11 +39,11 @@ namespace Belle2 {
     else if (subDet == "PXD")   m_subDet = 1;
     else if (subDet == "SVD")   m_subDet = 2;
     else if (subDet == "CDC")   m_subDet = 3;
-    else if (subDet == "TOP")   m_subDet = 4;
-    else if (subDet == "ARICH") m_subDet = 5;
+    else if (subDet == "ARICH")   m_subDet = 4;
+    else if (subDet == "TOP") m_subDet = 5;
     else if (subDet == "ECL")   m_subDet = 6;
-    else if (subDet == "BKLM")  m_subDet = 7;
-    else if (subDet == "EKLM")  m_subDet = 8;
+    else if (subDet == "EKLM")  m_subDet = 7;
+    else if (subDet == "BKLM")  m_subDet = 8;
     else                        m_subDet = 99;
 
     m_hitType = hitType;

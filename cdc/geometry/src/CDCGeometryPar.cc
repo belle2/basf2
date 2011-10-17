@@ -46,6 +46,12 @@ void CDCGeometryPar::clear()
   m_motherInnerR = 0.;
   m_motherOuterR = 0.;
   m_motherLength = 0.;
+  // T.Hara added to define the CDC mother volume (temporal)
+  for (unsigned i = 0; i < 5; i++) {
+    m_momZ[i] = 0.;
+    m_momRmin[i] = 0.;
+  }
+  //
   m_version = "unknown";
   m_nSLayer = 0;
   m_nFLayer = 0;
@@ -89,6 +95,13 @@ void CDCGeometryPar::read()
 
   GearDir outerWallParams(content, "OuterWalls/");
   m_motherOuterR = outerWallParams.getLength("OuterWall[6]/OuterR");
+
+  int nBound = content.getNumberNodes("MomVol/ZBound");
+  // Loop over to get the parameters of each boundary
+  for (int iBound = 0; iBound < nBound; iBound++) {
+    m_momZ[iBound] = content.getLength((format("MomVol/ZBound[%1%]/Z") % (iBound + 1)).str()) / Unit::mm;
+    m_momRmin[iBound] = content.getLength((format("MomVol/ZBound[%1%]/Rmin") % (iBound + 1)).str()) / Unit::mm;
+  }
 
   GearDir coverParams(content, "Covers/");
   double R1 = coverParams.getLength("Cover[2]/InnerR1");

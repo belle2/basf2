@@ -82,6 +82,26 @@ namespace Belle2 {
     */
     double motherLength() const;
 
+    //! to get the number of boundary position of the CDC mother volume
+    /*!
+        \return The number of boundary position of the CDC mother volume.
+    */
+    int momBound() const;
+
+    //! Returns boundary position in Z axis of the CDC mother volume
+    /*!
+        \param iBound : The boundary id.
+        \return The z component of the specified baoundary position in the CDC mother volume
+    */
+    double momZ(int iBound) const;
+
+    //! Returns inner radius of the CDC mother volume
+    /*!
+        \param iBound : The boundary id.
+        \return The inner radius of the specified baoundary position in the CDC mother volume
+    */
+    double momRmin(int iBound) const;
+
     //! The method to get cell id based on given layer id and the position.
     /*!
         \param layerId The given layer id.
@@ -309,6 +329,9 @@ namespace Belle2 {
     double m_motherOuterR;  /*!< The outer radius of cdc mother volume. */
     double m_motherLength;  /*!< The length of cdc mother volume. */
 
+    double m_momZ[5];
+    double m_momRmin[5];
+
     static CDCGeometryPar* m_B4CDCGeometryParDB; /*!< Pointer that saves the instance of this class. */
   };
 
@@ -326,6 +349,16 @@ namespace Belle2 {
   inline double CDCGeometryPar::motherLength() const
   {
     return m_motherLength;
+  }
+
+  inline double CDCGeometryPar::momZ(int iBound) const
+  {
+    return m_momZ[iBound];
+  }
+
+  inline double CDCGeometryPar::momRmin(int iBound) const
+  {
+    return m_momRmin[iBound];
   }
 
   inline std::string CDCGeometryPar::version() const

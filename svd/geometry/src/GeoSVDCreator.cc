@@ -9,7 +9,6 @@
  **************************************************************************/
 
 #include <svd/geometry/GeoSVDCreator.h>
-#include <svd/simulation/SensitiveDetector.h>
 #include <svd/geometry/SensorInfo.h>
 #include <pxd/vxd/GeoCache.h>
 

@@ -13,6 +13,7 @@
 
 #include <pxd/geometry/GeoPXDCreator.h>
 #include <svd/geometry/GeoSVDComponents.h>
+#include <svd/simulation/SensitiveDetector.h>
 #include <geometry/CreatorBase.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
@@ -29,8 +30,6 @@ class G4Polycone;
 namespace Belle2 {
 
   namespace svd {
-    class SensitiveDetector;
-
     /** The creator for the SVD geometry of the Belle II detector.   */
     class GeoSVDCreator : public geometry::CreatorBase {
 

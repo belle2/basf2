@@ -226,9 +226,8 @@ namespace Belle2 {
           outerPoints.pop_front();
         }
         if (popInner) innerPoints.pop_front();
-        cout << boost::format("(%1%,%2%), (%3%,%4%)") % innerZ % innerX % outerZ % outerX << endl;
         if (innerZ != outerZ) {
-          B2ERROR("Something else is wrong");
+          B2ERROR("createRotationSolid: Something is wrong, z values should be identical");
           return 0;
         }
         z.push_back(innerZ);

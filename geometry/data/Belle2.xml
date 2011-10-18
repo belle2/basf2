@@ -32,6 +32,7 @@
   <xi:include href="../ir/HeavyMetalShield.xml"/>
   <xi:include href="../pxd/PXD.xml"/>
   <xi:include href="../svd/SVD.xml"/>
+  <xi:include href="../svd/SVD-Support.xml"/>
   <xi:include href="../cdc/CDC.xml"/>
   <xi:include href="../top/TOP.xml"/>
   <xi:include href="../arich/ARICH.xml"/>

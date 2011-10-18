@@ -20,7 +20,9 @@
 
 #include <vector>
 #include <limits>
+#include <list>
 #include <boost/foreach.hpp>
+#include <boost/tuple/tuple.hpp>
 
 using namespace std;
 
@@ -123,5 +125,122 @@ namespace Belle2 {
       return polycone;
     }
 
+    //Use unnamed namespace to hide helper functions/definitions from outside
+    namespace {
+      /** Struct representing the Z and X coordinate of a point */
+      typedef pair<double, double> ZXPoint;
+      /** List of points in the ZX plane */
+      typedef list<ZXPoint> PointList;
+      /** Helper function for createRotationSolid.
+       * This function subdivides the polyline given by segments to contain a
+       * point at every z position in points.  Furthermore, the polyline will
+       * be extended to cover the same range of z as the points by appending
+       * the first or last point of points to the polyline if neccessary.
+       *
+       * This function also checks if the points have ascending z positions.
+       *
+       * @param points List of points which z positions should be included in
+       *        segments
+       * @param[inout] segments List of points which forms a polyline. Points
+       *        will be added to this list
+       */
+      void subdivideSegments(const PointList &points, PointList &segments)
+      {
+        double lastZ = -numeric_limits<double>::infinity();
+        BOOST_FOREACH(const ZXPoint p, points) {
+          if (p.first < lastZ) {
+            B2FATAL("createRotationSolid: Points have to be given with ascending z positions");
+          }
+          lastZ = p.first;
+          //Now go over all segments. If the segments cross the points z
+          //coordinate we know that we need a new segment. We calculate the x
+          //position of the segment and insert a new point at that position in
+          //the list of points
+          PointList::iterator segStart = segments.begin();
+          PointList::iterator segEnd = segStart;
+          segEnd++;
+          for (; segEnd != segments.end(); ++segEnd) {
+            if ((p.first > segStart->first && p.first < segEnd->first) ||
+                (p.first < segStart->first && p.first > segEnd->first)) {
+              double dZ = segEnd->first - segStart->first;
+              double dX = segEnd->second - segStart->second;
+              double newX = segStart->second + dX * (p.first - segStart->first) / dZ;
+              segments.insert(segEnd, ZXPoint(p.first, newX));
+            }
+            segStart = segEnd;
+          }
+        }
+
+        //Now make sure the polyline extend over the same z range by adding the
+        //first/last point of points when neccessary
+        if (points.front().first < segments.front().first) {
+          segments.insert(segments.begin(), points.front());
+        }
+        if (points.back().first > segments.back().first) {
+          segments.insert(segments.end(), points.back());
+        }
+      }
+    }
+
+    G4Polycone* createRotationSolid(const std::string &name, const GearDir& params, double &minZ, double &maxZ)
+    {
+
+      //Make a list of all the points (ZX coordinates)
+      PointList innerPoints;
+      PointList outerPoints;
+      BOOST_FOREACH(const GearDir point, params.getNodes("InnerPoints/point")) {
+        innerPoints.push_back(ZXPoint(point.getLength("z") / Unit::mm, point.getLength("x") / Unit::mm));
+      }
+      BOOST_FOREACH(const GearDir point, params.getNodes("OuterPoints/point")) {
+        outerPoints.push_back(ZXPoint(point.getLength("z") / Unit::mm, point.getLength("x") / Unit::mm));
+      }
+      //Subdivide the segments to have an x position for each z specified for
+      //either inner or outer boundary
+      subdivideSegments(innerPoints, outerPoints);
+      subdivideSegments(outerPoints, innerPoints);
+      minZ = innerPoints.front().first;
+      maxZ = outerPoints.front().first;
+
+      //Now we create the array of planes needed for the polycone
+      vector<double> z;
+      vector<double> rMin;
+      vector<double> rMax;
+
+      double innerZ;
+      double innerX;
+      double outerZ;
+      double outerX;
+      //We go through both lists until both are empty
+      while (!(innerPoints.empty() && outerPoints.empty())) {
+        double popInner = false;
+        //We could have more than one point at the same z position for segments
+        //going directly along x. because of that we check that the z
+        //coordinates for inner and outer line are always the same, reusing one
+        //point if neccessary
+        if (!innerPoints.empty() && innerPoints.front().first <= outerPoints.front().first) {
+          boost::tie(innerZ, innerX) = innerPoints.front();
+          popInner = true;
+        }
+        if (!outerPoints.empty() && outerPoints.front().first <= innerPoints.front().first) {
+          boost::tie(outerZ, outerX) = outerPoints.front();
+          outerPoints.pop_front();
+        }
+        if (popInner) innerPoints.pop_front();
+        cout << boost::format("(%1%,%2%), (%3%,%4%)") % innerZ % innerX % outerZ % outerX << endl;
+        if (innerZ != outerZ) {
+          B2ERROR("Something else is wrong");
+          return 0;
+        }
+        z.push_back(innerZ);
+        rMin.push_back(innerX);
+        rMax.push_back(outerX);
+      }
+
+      //Finally create the Polycone
+      int nPlanes = z.size();
+      double minPhi = params.getAngle("minPhi", 0);
+      double dPhi   = params.getAngle("maxPhi", 2 * M_PI) - minPhi;
+      return new G4Polycone(name, minPhi, dPhi, nPlanes, &z.front(), &rMin.front(), &rMax.front());
+    }
   }
 } //Belle2 namespace

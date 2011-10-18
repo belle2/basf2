@@ -76,6 +76,43 @@ namespace Belle2 {
      * @param[out] maxZ will contain the maximal z coordinate of the polycone
      */
     G4Polycone* createPolyCone(const std::string& name, GearDir params, double &minZ, double &maxZ);
+
+    /** Create a solid by roating two polylines around the Z-Axis.
+     * This function will create a polycone shape directly from Gearbox
+     * Parameters describing the inner and the outer envelope of the polycone.
+     * The XML Parameters should be of the form
+     *
+     * <minPhi unit="deg">  0</minPhi>
+     * <maxPhi unit="deg">360</maxPhi>
+     * <OuterPoints>
+     *   <point><z unit="mm">-393.000</z><x unit="mm">100.000</x></point>
+     *   <point><z unit="mm">-337.000</z><x unit="mm"> 85.500</x></point>
+     *   ...
+     *   <point><z unit="mm">-138.000</z><x unit="mm"> 35.000</x></point>
+     * </OuterPoints>
+     * <InnerPoints>
+     *   <point><z unit="mm">-393.000</z><x unit="mm"> 97.934</x></point>
+     *   <point><z unit="mm">-339.000</z><x unit="mm"> 83.952</x></point>
+     *   ...
+     *   <point><z unit="mm">-138.000</z><x unit="mm"> 33.000</x></point>
+     * </InnerPoints>
+     *
+     * Where OuterPoints and InnerPoints specify a polyline which is the outer
+     * respective inner envelope of the Polycone. The number of points doe s
+     * not have to be the same for Outer- and InnerPoints. Needed positions
+     * will be interpolated when creating the Polycone.
+     *
+     * The Positions for Outer- and InnerPoints have to be in ascending Z
+     * coordinates. The first and last point of OuterPoints will be connected to the
+     * first respective last point of InnerPoints. The resulting shape will be
+     * rotated around the z axis to create the polycone.
+     *
+     * @param name Name of the Solid
+     * @param params Parameters to use for the Solid
+     * @param[out] minZ will contain the minimal z coordinate of the polycone
+     * @param[out] maxZ will contain the maximal z coordinate of the polycone
+     */
+    G4Polycone* createRotationSolid(const std::string &name, const GearDir& params, double &minZ, double &maxZ);
   }
 } //Belle2 namespace
 #endif

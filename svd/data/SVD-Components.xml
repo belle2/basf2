@@ -2,26 +2,26 @@
 <Components>
   <Version>1.0</Version>
   <Ladder layer="3">
-    <shift  unit="mm"> 3.994</shift>
-    <radius unit="mm">38.160</radius>
+    <shift  unit="mm">  3.994</shift>
+    <radius unit="mm"> 38.160</radius>
     <Sensor sensorType="1" id="1" unit="mm">  88.200</Sensor>
     <Sensor sensorType="1" id="2" unit="mm"> -34.000</Sensor>
   </Ladder>
   <Ladder layer="4">
-    <shift  unit="mm"> 8.408</shift>
-    <radius unit="mm">80.160</radius>
-    <slantedAngle unit="deg">11.9</slantedAngle>
-    <slantedV unit="mm">13.469</slantedV>
-    <Sensor sensorType="2" id="1" unit="mm"> 156.067</Sensor>
+    <shift  unit="mm">  8.408</shift>
+    <radius unit="mm"> 80.160</radius>
+    <slantedAngle unit="deg"> 11.900</slantedAngle>
+    <slantedRadius unit="mm"> 66.678</slantedRadius>
+    <Sensor sensorType="2" id="1" unit="mm"> 156.098</Sensor>
     <Sensor sensorType="3" id="2" unit="mm">  32.520</Sensor>
     <Sensor sensorType="4" id="3" unit="mm"> -92.560</Sensor>
   </Ladder>
   <Ladder layer="5">
     <shift  unit="mm"> 14.120</shift>
     <radius unit="mm">115.160</radius>
-    <slantedAngle unit="deg">17.2</slantedAngle>
-    <slantedV unit="mm">19.160</slantedV>
-    <Sensor sensorType="2" id="1" unit="mm"> 226.453</Sensor>
+    <slantedAngle unit="deg"> 17.200</slantedAngle>
+    <slantedRadius unit="mm"> 95.983</slantedRadius>
+    <Sensor sensorType="2" id="1" unit="mm"> 226.498</Sensor>
     <Sensor sensorType="3" id="2" unit="mm"> 104.120</Sensor>
     <Sensor sensorType="3" id="3" unit="mm"> -20.960</Sensor>
     <Sensor sensorType="4" id="4" unit="mm">-146.040</Sensor>
@@ -29,9 +29,9 @@
   <Ladder layer="6">
     <shift  unit="mm"> 17.190</shift>
     <radius unit="mm">140.160</radius>
-    <slantedAngle unit="deg">21.1</slantedAngle>
-    <slantedV unit="mm">23.391</slantedV>
-    <Sensor sensorType="2" id="1" unit="mm"> 299.040</Sensor>
+    <slantedAngle unit="deg"> 21.100</slantedAngle>
+    <slantedRadius unit="mm">116.749</slantedRadius>
+    <Sensor sensorType="2" id="1" unit="mm"> 299.094</Sensor>
     <Sensor sensorType="3" id="2" unit="mm"> 177.600</Sensor>
     <Sensor sensorType="3" id="3" unit="mm">  52.600</Sensor>
     <Sensor sensorType="3" id="4" unit="mm"> -72.480</Sensor>
@@ -67,7 +67,7 @@
     <height unit="um">300</height>
     <Active>
       <u unit="mm"> 1.520</u>
-      <v unit="mm"> 1.300</v>
+      <v unit="mm"> 1.390</v>
       <width  unit="mm">57.590</width>
       <width2 unit="mm">38.420</width2>
       <length unit="mm">122.760</length>

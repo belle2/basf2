@@ -71,12 +71,12 @@ namespace Belle2 {
     };
 
     struct GeoSVDLadder {
-      GeoSVDLadder(int layerID = 0, double shift = 0, double radius = 0, double slantedAngle = 0, double slantedV = 0): layerID(layerID), shift(shift), radius(radius), slantedAngle(slantedAngle), slantedV(slantedV) {}
+      GeoSVDLadder(int layerID = 0, double shift = 0, double radius = 0, double slantedAngle = 0, double slantedRadius = 0): layerID(layerID), shift(shift), radius(radius), slantedAngle(slantedAngle), slantedRadius(slantedRadius) {}
       int layerID;
       double shift;
       double radius;
       double slantedAngle;
-      double slantedV;
+      double slantedRadius;
       std::vector<GeoSVDSensor> sensors;
     };
 

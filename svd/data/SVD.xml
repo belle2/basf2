@@ -6,6 +6,24 @@
     <xi:include href="SVD-Alignment.xml"/>
     <xi:include href="SVD-Envelope.xml"/>
     <xi:include href="SVD-Components.xml"/>
+
+    <!-- Only for testing: Each layer with only one ladder at phi=0 to check module positions
+    <HalfShell name="Pat">
+      <Layer id="3">
+        <Ladder id="1"> <phi unit="deg"> 0</phi></Ladder>
+      </Layer>
+      <Layer id="4">
+        <Ladder id="1"> <phi unit="deg"> 0</phi></Ladder>
+      </Layer>
+      <Layer id="5">
+        <Ladder id="1"> <phi unit="deg"> 0</phi></Ladder>
+      </Layer>
+      <Layer id="6">
+        <Ladder id="1"> <phi unit="deg"> 0</phi></Ladder>
+      </Layer>
+    </HalfShell>
+    -->
+
     <HalfShell name="Pat">
       <Layer id="3">
         <Ladder id="1"> <phi unit="deg"> -2.805</phi></Ladder>

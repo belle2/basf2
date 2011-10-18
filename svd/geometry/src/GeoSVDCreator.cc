@@ -303,7 +303,7 @@ namespace Belle2 {
     {
       VxdID ladder(m_ladder.layerID, ladderID, 0);
 
-      G4Translate3D ladderPos(m_ladder.shift, m_ladder.radius, 0.0);
+      G4Translate3D ladderPos(m_ladder.radius, m_ladder.shift, 0);
       G4Transform3D ladderPlacement = placement * G4RotateZ3D(phi) * ladderPos * getAlignment(ladder);
 
       BOOST_FOREACH(GeoSVDSensor s, m_ladder.sensors) {
@@ -333,7 +333,7 @@ namespace Belle2 {
         //so we convert them. If the sensor is flipped, the sign of coordinates need to be inverted
         double activeU = (s.active.u + (s.active.width - s.width) / 2.0) * (s.flipU ? -1 : 1);
         double activeV = (s.active.v + (s.active.length - s.length) / 2.0) * (s.flipV ? -1 : 1);
-        //active area is always at the top, so active.w would be active.height, otherwise the same as above
+        //active area is always in the middle, so active.w would be active.height, otherwise the same as above
         double activeW = (s.active.height - s.height) / 2.0 * (s.flipW ? -1 : 1);
         //Place the active area
         new G4PVPlacement(G4Translate3D(activeU, activeV, activeW), active, name + ".Active",
@@ -355,13 +355,14 @@ namespace Belle2 {
         //Now create all the other components and place the Sensor
         double shiftX = addSubComponents(name, s, s.components, true, false);
         G4RotationMatrix rotation(0, -M_PI / 2.0, -M_PI / 2.0);
-        //Trapezoidal sensors are slanted FIXME: this distinction is a bit arbitary, we should change that
-        if (s.sensorTypeID == 2) {
-          rotation *= G4RotationMatrix(0, m_ladder.slantedAngle, 0);
-          shiftX += m_ladder.slantedV;
-        }
         G4Transform3D sensorAlign = getAlignment(sensorID);
-        G4Transform3D placement = ladderPlacement * G4Translate3D(-shiftX, 0.0, s.z) * G4Rotate3D(rotation) * sensorAlign;
+        G4Transform3D placement = G4Rotate3D(rotation) * sensorAlign;
+        //SensorID=2 is slanted FIXME: this distinction is a bit arbitary, we should make that more clear
+        if (s.sensorTypeID == 2) {
+          placement = G4TranslateX3D(m_ladder.slantedRadius - m_ladder.radius) * G4RotateY3D(-m_ladder.slantedAngle) * placement;
+        }
+        placement = ladderPlacement * G4Translate3D(-shiftX, 0.0, s.z) * placement;
+
         new G4PVPlacement(placement, s.volume, name, volume, false, 1);
       }
     }
@@ -460,10 +461,10 @@ namespace Belle2 {
       }
       m_ladder = GeoSVDLadder(
                    layer,
-                   paramsLadder.getLength("radius") / Unit::mm,
                    paramsLadder.getLength("shift") / Unit::mm,
+                   paramsLadder.getLength("radius") / Unit::mm,
                    paramsLadder.getAngle("slantedAngle", 0),
-                   paramsLadder.getLength("slantedV", 0) / Unit::mm
+                   paramsLadder.getLength("slantedRadius", 0) / Unit::mm
                  );
 
       BOOST_FOREACH(const GearDir &sensorInfo, paramsLadder.getNodes("Sensor")) {

@@ -57,6 +57,7 @@ namespace Belle2 {
       SensitiveDetector* m_sensitive;
       SensitiveAero* m_sensitiveAero;
       ARICHGeometryPar* m_arichgp;
+      int isBeamBkgStudy;
     };
 
   }

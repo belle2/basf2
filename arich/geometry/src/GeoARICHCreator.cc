@@ -19,6 +19,7 @@
 #include <framework/logging/Logger.h>
 #include <arich/simulation/SensitiveDetector.h>
 #include <arich/simulation/SensitiveAero.h>
+#include <simulation/background/BkgSensitiveDetector.h>
 
 #include <cmath>
 #include <boost/format.hpp>
@@ -57,7 +58,7 @@ namespace Belle2 {
     //                 Implementation
     //-----------------------------------------------------------------
 
-    GeoARICHCreator::GeoARICHCreator()
+    GeoARICHCreator::GeoARICHCreator(): isBeamBkgStudy(0)
     {
       m_sensitive = new SensitiveDetector();
       m_sensitiveAero = new SensitiveAero();
@@ -108,6 +109,8 @@ namespace Belle2 {
         G4Transform3D transform = G4Translate3D(envOrigin);
         new G4PVPlacement(transform, envelope, "ARICH.Envelope", &topVolume, false, 1);
       }
+
+      isBeamBkgStudy = content.getInt("BeamBackgroundStudy");
 
       // Initializing geometry parametrisation; m_arichgp contains photon detectors positions, ...
       m_arichgp->Initialize(content);
@@ -239,7 +242,8 @@ namespace Belle2 {
         G4Material* asupportMaterial = Materials::get(asupMat);
 
         G4Tubs *asupportTube = new G4Tubs("asupportTube", rin, rout, asupportThick / 2., 0, 2*M_PI);
-        G4LogicalVolume* lasupportTube = new G4LogicalVolume(asupportTube, asupportMaterial, "AerogelSupportPlate", 0, m_sensitiveAero);
+        G4LogicalVolume* lasupportTube = new G4LogicalVolume(asupportTube, asupportMaterial, "AerogelSupportPlate");
+        if (!isBeamBkgStudy) lasupportTube->SetSensitiveDetector(m_sensitiveAero);
         G4ThreeVector asupPos = G4ThreeVector(0, 0, supportZ - asupportThick / 2.) - envOrigin;
         G4Transform3D transform5 = G4Translate3D(asupPos);
         new G4PVPlacement(transform5, lasupportTube, "ARICH.AerogelSupportPlate", envelope, false, 1);
@@ -326,7 +330,8 @@ namespace Belle2 {
 
       // build sensitive surface
       G4Box *sensBox = new G4Box("sensBox", sensXsize / 2., sensXsize / 2., 0.1*Unit::mm);
-      G4LogicalVolume *lmoduleSens = new G4LogicalVolume(sensBox, boxFill, "moduleSensitive", 0, m_sensitive);
+      G4LogicalVolume *lmoduleSens = new G4LogicalVolume(sensBox, boxFill, "moduleSensitive");
+      if (!isBeamBkgStudy) lmoduleSens->SetSensitiveDetector(m_sensitive);
       setColor(*lmoduleSens, "rgb(0.5,0.5,0.5,1.0)");
       G4Transform3D transform2 = G4Translate3D(0., 0., (-modZsize + 0.1) / 2. + winThick);
       new G4PVPlacement(transform2, lmoduleSens, "moduleSensitive", lmoduleBox, false, 1);
@@ -348,6 +353,7 @@ namespace Belle2 {
       // build board
       G4Box *pcbBox = new G4Box("pcbBox", pcbSize / 2., pcbSize / 2., pcbThick / 2.);
       G4LogicalVolume* lpcb = new G4LogicalVolume(pcbBox, pcbMaterial, "modulePcb");
+      if (isBeamBkgStudy) lpcb->SetSensitiveDetector(new BkgSensitiveDetector("ARICH"));
       setColor(*lpcb, "rgb(0.0,0.6,0.0,1.0)");
       // return pcb logical volume
       return lpcb;

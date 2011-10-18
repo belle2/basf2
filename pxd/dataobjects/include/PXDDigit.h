@@ -38,8 +38,8 @@ namespace Belle2 {
 
     /** Useful Constructor.
      * @param sensorID Sensor compact ID.
-     * @param uCellID Cell ID in "z".
-     * @param vCellID Cell ID in "r-phi".
+     * @param uCellID Cell ID in "r-phi".
+     * @param vCellID Cell ID in "z".
      * @param uCell Cell center u coordinate.
      * @param vCell Cell center v coordinate.
      * @param charge The charge collected in the cell.
@@ -84,10 +84,10 @@ namespace Belle2 {
   private:
 
     unsigned short m_sensorID; /**< Compressed sensor identifier.*/
-    short m_uCellID;           /**< Cell z-coordinate in pitch units. */
-    short m_vCellID;           /**< Cell r-phi coordinate in pitch units. */
-    float m_uCellPosition;     /**< Absolute cell position in z. */
-    float m_vCellPosition;     /**< Absolute cell position in r-phi. */
+    short m_uCellID;           /**< Cell r-phi coordinate in pitch units. */
+    short m_vCellID;           /**< Cell z coordinate in pitch units. */
+    float m_uCellPosition;     /**< Absolute cell position in r-phi. */
+    float m_vCellPosition;     /**< Absolute cell position in z. */
     float m_charge;            /**< Deposited charge (units depend on user selection). */
 
     ClassDef(PXDDigit, 1)

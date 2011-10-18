@@ -312,9 +312,8 @@ namespace Belle2 {
     {
       VxdID ladder(m_ladder.layerID, ladderID, 0);
 
-      G4RotationMatrix ladderRotation(0, 0, -phi);
       G4Translate3D ladderPos(m_ladder.shift, m_ladder.radius, 0.0);
-      G4Transform3D ladderPlacement = placement * G4Rotate3D(ladderRotation) * ladderPos * getAlignment(ladder);
+      G4Transform3D ladderPlacement = placement * G4RotateZ3D(phi) * ladderPos * getAlignment(ladder);
 
       vector<G4Point3D> lastSensorEdge;
       BOOST_FOREACH(GeoPXDSensor s, m_ladder.sensors) {

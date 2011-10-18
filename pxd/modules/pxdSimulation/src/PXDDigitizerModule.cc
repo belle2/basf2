@@ -175,7 +175,7 @@ void PXDDigitizerModule::beginRun()
   //the whole map
   m_sensors.clear();
   VXD::GeoCache &geo = VXD::GeoCache::getInstance();
-  BOOST_FOREACH(VxdID layer, geo.getLayers()) {
+  BOOST_FOREACH(VxdID layer, geo.getLayers(SensorInfo::PXD)) {
     BOOST_FOREACH(VxdID ladder, geo.getLadders(layer)) {
       BOOST_FOREACH(VxdID sensor, geo.getSensors(ladder)) {
         m_sensors[sensor] = Sensor();

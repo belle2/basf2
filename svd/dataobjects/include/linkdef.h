@@ -7,5 +7,7 @@
 
 #pragma link C++ class Belle2::SVDSimHit;
 #pragma link C++ class Belle2::SVDTrueHit;
+#pragma link C++ class Belle2::SVDRecoHit2D;
+#pragma link C++ class Belle2::VXDSensorPlane;
 
 #endif

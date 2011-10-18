@@ -8,7 +8,7 @@
  **************************************************************************/
 
 #include <pxd/modules/pxdSimulation/PXDDigitizerModule.h>
-#include <pxd/vxd/GeoCache.h>
+#include <vxd/geometry/GeoCache.h>
 
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Unit.h>

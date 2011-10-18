@@ -3,12 +3,12 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Peter Kvasnicka                                          *
+ * Contributors: Peter Kvasnicka, Martin Ritter                           *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <svd/dataobjects/VXDSensorPlane.h>
+#include <vxd/dataobjects/VXDSensorPlane.h>
 #include <framework/logging/Logger.h>
 
 using namespace std;

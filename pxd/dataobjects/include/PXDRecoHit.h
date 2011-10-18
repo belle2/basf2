@@ -11,7 +11,7 @@
 #ifndef PXDRECOHIT_H_
 #define PXDRECOHIT_H_
 
-#include <pxd/vxd/VxdID.h>
+#include <vxd/VxdID.h>
 #include <pxd/dataobjects/PXDTrueHit.h>
 
 // ROOT includes

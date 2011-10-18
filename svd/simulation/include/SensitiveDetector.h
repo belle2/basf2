@@ -14,7 +14,7 @@
 
 #include <svd/dataobjects/SVDSimHit.h>
 #include <svd/dataobjects/SVDTrueHit.h>
-#include <pxd/vxd/SensitiveDetector.h>
+#include <vxd/simulation/SensitiveDetector.h>
 
 namespace Belle2 {
   /** Namespace to encapsulate code needed for simulation and reconstrucion of the PXD */

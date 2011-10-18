@@ -13,8 +13,8 @@
 #include <pxd/dataobjects/PXDRecoHit.h>
 #include <pxd/dataobjects/PXDTrueHit.h>
 #include <pxd/dataobjects/PXDCluster.h>
-#include <pxd/vxd/GeoCache.h>
 #include <pxd/geometry/SensorInfo.h>
+#include <vxd/geometry/GeoCache.h>
 
 #include <GFDetPlane.h>
 #include <GFRectFinitePlane.h>

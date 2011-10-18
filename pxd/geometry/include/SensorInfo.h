@@ -11,7 +11,7 @@
 #ifndef PXD_SENSORINFO_H
 #define PXD_SENSORINFO_H
 
-#include <pxd/vxd/SensorInfoBase.h>
+#include <vxd/geometry/SensorInfoBase.h>
 #include <algorithm>
 
 namespace Belle2 {

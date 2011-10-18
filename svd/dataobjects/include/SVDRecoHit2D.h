@@ -11,7 +11,7 @@
 #ifndef SVDRECOHIT2D_H_
 #define SVDRECOHIT2D_H_
 
-#include <pxd/vxd/VxdID.h>
+#include <vxd/VxdID.h>
 #include <svd/dataobjects/SVDTrueHit.h>
 
 // ROOT includes

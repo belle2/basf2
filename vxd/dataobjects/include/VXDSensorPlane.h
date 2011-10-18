@@ -11,10 +11,10 @@
 #ifndef VXDSENSORPLANE_H_
 #define VXDSENSORPLANE_H_
 
-#include <pxd/vxd/VxdID.h>
-#include <pxd/vxd/SensorInfoBase.h>
+#include <vxd/VxdID.h>
+#include <vxd/geometry/SensorInfoBase.h>
 #ifndef __CINT__
-#include <pxd/vxd/GeoCache.h>
+#include <vxd/geometry/GeoCache.h>
 #endif
 
 #include <GFAbsFinitePlane.h>

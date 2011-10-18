@@ -11,7 +11,7 @@
 #ifndef PXDDIGIT_H
 #define PXDDIGIT_H
 
-#include <pxd/vxd/VxdID.h>
+#include <vxd/VxdID.h>
 
 #include <TObject.h>
 

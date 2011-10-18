@@ -9,8 +9,8 @@
  **************************************************************************/
 
 
-#include <pxd/vxd/GeoCache.h>
-#include <pxd/vxd/SensitiveDetectorBase.h>
+#include <vxd/geometry/GeoCache.h>
+#include <vxd/simulation/SensitiveDetectorBase.h>
 #include <framework/gearbox/Unit.h>
 
 #include <stack>

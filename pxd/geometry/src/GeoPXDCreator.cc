@@ -10,8 +10,8 @@
  **************************************************************************/
 
 #include <pxd/geometry/GeoPXDCreator.h>
-#include <pxd/vxd/VxdID.h>
-#include <pxd/vxd/GeoCache.h>
+#include <vxd/VxdID.h>
+#include <vxd/geometry/GeoCache.h>
 #include <pxd/geometry/SensorInfo.h>
 
 #include <geometry/Materials.h>

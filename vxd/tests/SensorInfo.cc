@@ -1,4 +1,4 @@
-#include <pxd/vxd/SensorInfoBase.h>
+#include <vxd/geometry/SensorInfoBase.h>
 #include <gtest/gtest.h>
 #include <iostream>
 #include <string>

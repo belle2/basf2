@@ -11,7 +11,7 @@
 #ifndef PXDTRUEHIT_H
 #define PXDTRUEHIT_H
 
-#include <pxd/vxd/VxdID.h>
+#include <vxd/VxdID.h>
 
 // ROOT
 #include <TObject.h>

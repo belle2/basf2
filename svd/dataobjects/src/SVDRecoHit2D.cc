@@ -11,8 +11,8 @@
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Unit.h>
 #include <svd/dataobjects/SVDRecoHit2D.h>
-#include <svd/dataobjects/VXDSensorPlane.h>
-#include <pxd/vxd/GeoCache.h>
+#include <vxd/dataobjects/VXDSensorPlane.h>
+#include <vxd/geometry/GeoCache.h>
 #include <svd/geometry/SensorInfo.h>
 
 #include <GFDetPlane.h>

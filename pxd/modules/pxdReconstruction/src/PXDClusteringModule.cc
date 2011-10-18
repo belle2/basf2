@@ -17,7 +17,7 @@
 #include <framework/datastore/RelationIndex.h>
 #include <framework/logging/Logger.h>
 
-#include <pxd/vxd/GeoCache.h>
+#include <vxd/geometry/GeoCache.h>
 #include <pxd/geometry/SensorInfo.h>
 
 #include <generators/dataobjects/MCParticle.h>

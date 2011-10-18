@@ -11,7 +11,7 @@
 #ifndef SVDSENSORINFO_H
 #define SVDSENSORINFO_H
 
-#include <pxd/vxd/SensorInfoBase.h>
+#include <vxd/geometry/SensorInfoBase.h>
 
 namespace Belle2 {
   namespace svd {

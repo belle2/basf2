@@ -10,7 +10,7 @@
 
 #include <svd/geometry/GeoSVDCreator.h>
 #include <svd/geometry/SensorInfo.h>
-#include <pxd/vxd/GeoCache.h>
+#include <vxd/geometry/GeoCache.h>
 
 #include <geometry/CreatorFactory.h>
 #include <geometry/Materials.h>

@@ -9,7 +9,7 @@
  **************************************************************************/
 
 #include <framework/logging/Logger.h>
-#include <pxd/vxd/VxdID.h>
+#include <vxd/VxdID.h>
 #include <sstream>
 #include <iostream>
 #include <stdexcept>
@@ -19,36 +19,38 @@ using namespace std;
 
 namespace Belle2 {
 
-  /**
-   * Small helper function to parse VxdID string representation
-   *
-   * This function takes an input stream and will return the next component of the VxdID
-   * */
-  static int getPart(istream &in)
-  {
-    if (!in.eof()) {
-      //Get next char, if it is a dot, ignore it and get the next one
-      char next = in.get();
-      if (next == '.') next = in.get();
-      //If it is a wildcard we return 0 as id, otherwise we put it back in the stream
-      if (next == '*') {
-        return 0;
-      } else {
-        in.unget();
-      }
-      //If it is the segment separator, we assume the remaining parts to be missing, so return 0
-      if (next == '#') return 0;
+  namespace {
+    /**
+     * Small helper function to parse VxdID string representation
+     *
+     * This function takes an input stream and will return the next component of the VxdID
+     * */
+    int getPart(istream &in)
+    {
+      if (!in.eof()) {
+        //Get next char, if it is a dot, ignore it and get the next one
+        char next = in.get();
+        if (next == '.') next = in.get();
+        //If it is a wildcard we return 0 as id, otherwise we put it back in the stream
+        if (next == '*') {
+          return 0;
+        } else {
+          in.unget();
+        }
+        //If it is the segment separator, we assume the remaining parts to be missing, so return 0
+        if (next == '#') return 0;
 
-      //Now get the actual value out of the stream. If this fails something is wrong and it is not
-      //a valid id
-      int value(0);
-      in >> value;
-      if (in.fail() && !in.eof()) {
-        throw runtime_error("Failed to parse Number");
+        //Now get the actual value out of the stream. If this fails something is wrong and it is not
+        //a valid id
+        int value(0);
+        in >> value;
+        if (in.fail() && !in.eof()) {
+          throw runtime_error("Failed to parse Number");
+        }
+        return value;
       }
-      return value;
+      return 0;
     }
-    return 0;
   }
 
   VxdID::VxdID(const std::string& sensor)

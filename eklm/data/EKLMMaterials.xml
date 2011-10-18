@@ -3,29 +3,46 @@
 <Materials>
 	<Description>EKLM material definitions</Description>
 	<Version>0</Version>
-        <Material name="Polystyrene">
+        <Material name="EKLMPolystyrene">
 	       	<density unit="g/cm3">1.05</density>
-        	<Elements>
-                	<Element name="H" weight="0.08333">
-                        	<AtomNumber>1.0</AtomNumber>
-				<MassNumber>1.00794</MassNumber>
-                        </Element>
-                        <Element name="C" weight="0.91666">
-				<AtomNumber>6.0</AtomNumber>
-				<MassNumber>12.0107</MassNumber>
-			</Element>
-		</Elements>
+        	<Components>
+                	<Element fraction="0.08333">H</Element>
+                        <Element fraction="0.91667">C</Element>
+		</Components>
 	</Material>
-	<Material name="Iron">
-		<density unit="g/cm3">7.87</density>
+        <Material name="EKLMPolystyrol">
+	       	<density unit="g/cm3">1.05</density>
+        	<Components>
+                	<Element fraction="0.08333">H</Element>
+                        <Element fraction="0.91667">C</Element>
+		</Components>
+	</Material>
+	<Material name="EKLMGel">
+                <density unit="g/cm3">1.05</density>
+                <Components>
+                	<Element fraction="0.08333">H</Element>
+                        <Element fraction="0.91667">C</Element>
+                </Components>
+	</Material>
+	<Material name="EKLMIron">
+		<density unit="g/cm3">7.874</density>
 		<Components>
 			<Material fraction="1.0">Fe</Material> 
 		</Components>
 	</Material>
-	<Material name="Aluminium">
+	<Material name="EKLMSilicon">
+		<density unit="g/cm3">2.329</density>
+		<Components>
+			<Material fraction="1.0">Fe</Material> 
+		</Components>
+	</Material>
+	<Material name="EKLMDuralumin">
 		<density unit="g/cm3">2.70</density>
 		<Components>
-			<Material fraction="1.0">Al</Material> 
+			<Material fraction="0.935">Al</Material> 
+			<Material fraction="0.044">Cu</Material> 
+			<Material fraction="0.015">Mg</Material> 
+			<Material fraction="0.006">Mn</Material> 
 		</Components>
 	</Material>
 </Materials>

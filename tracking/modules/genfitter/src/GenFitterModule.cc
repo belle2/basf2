@@ -18,31 +18,32 @@
 #include <geometry/GeometryManager.h>
 #include <geometry/bfieldmap/BFieldMap.h>
 
-//#include <generators/dataobjects/MCParticle.h>
+#include <generators/dataobjects/MCParticle.h>
 
 #include <cdc/dataobjects/CDCHit.h>
 #include <svd/dataobjects/SVDTrueHit.h>
 #include <pxd/dataobjects/PXDTrueHit.h>
+
 #include <cdc/dataobjects/CDCRecoHit.h>
-//#include <svd/dataobjects/SVDRecoHit.h>
+#include <svd/dataobjects/SVDRecoHit2D.h>
 #include <pxd/dataobjects/PXDRecoHit.h>
 
 #include <tracking/dataobjects/Track.h>
 
-#include <GFTrack.h>
-#include <GFTrackCand.h>
-#include <GFKalman.h>
-#include <GFDaf.h>
-#include <GFRecoHitProducer.h>
-#include <GFRecoHitFactory.h>
+#include "GFTrack.h"
+#include "GFTrackCand.h"
+#include "GFKalman.h"
+#include "GFDaf.h"
+#include "GFRecoHitProducer.h"
+#include "GFRecoHitFactory.h"
 
 
-#include <GFAbsTrackRep.h>
-#include <RKTrackRep.h>
+#include "GFAbsTrackRep.h"
+#include "RKTrackRep.h"
 
 #include <tracking/gfbfield/GFGeant4Field.h>
-#include <GFConstField.h>
-#include <GFFieldManager.h>
+#include "GFConstField.h"
+#include "GFFieldManager.h"
 
 #include <cstdlib>
 #include <iomanip>
@@ -52,9 +53,9 @@
 
 #include <boost/foreach.hpp>
 
-#include <TMath.h>
-//#include <TRandom3.h>
-#include <cmath>
+#include "TMath.h"
+#include "TRandom3.h"
+#include <math.h>
 
 using namespace std;
 using namespace Belle2;
@@ -116,7 +117,7 @@ void GenFitterModule::event()
 {
   B2INFO("**********   GenFitterModule  ************");
 
-  //StoreArray < MCParticle > mcParticles("MCParticles");
+  StoreArray < MCParticle > mcParticles("MCParticles");
 
   StoreArray < GFTrackCand > trackCandidates(m_gfTrackCandsColName);
   B2INFO("GenFitter: Number of GFTrackCandidates: " << trackCandidates.getEntries());
@@ -208,15 +209,15 @@ void GenFitterModule::event()
     GFRecoHitProducer <PXDTrueHit, PXDRecoHit> * PXDProducer;
     PXDProducer =  new GFRecoHitProducer <PXDTrueHit, PXDRecoHit> (&*pxdHits);
 
-    //GFRecoHitProducer <SVDTrueHit, SVDRecoHit> * SVDProducer;
-    //SVDProducer =  new GFRecoHitProducer <SVDTrueHit, SVDRecoHit> (&*svdHits);
+    GFRecoHitProducer <SVDTrueHit, SVDRecoHit2D> * SVDProducer;
+    SVDProducer =  new GFRecoHitProducer <SVDTrueHit, SVDRecoHit2D> (&*svdHits);
 
     GFRecoHitProducer <CDCHit, CDCRecoHit> * CDCProducer;
     CDCProducer =  new GFRecoHitProducer <CDCHit, CDCRecoHit> (&*cdcHits);
 
     //add producers to the factory with correct detector Id
     factory.addProducer(0, PXDProducer);
-    //factory.addProducer (1, SVDProducer);
+    factory.addProducer(1, SVDProducer);
     factory.addProducer(2, CDCProducer);
 
     vector <GFAbsRecoHit *> factoryHits;
@@ -257,8 +258,8 @@ void GenFitterModule::event()
         //Calculate probability
         double pValue = TMath::Prob(gfTrack.getChiSqu(), gfTrack.getNDF());
         B2INFO("       pValue of the fit: " << pValue);
-        B2INFO("       Covariance matrix: ");
-        gfTrack.getTrackRep(0)->getCov().Print();
+        //B2INFO("       Covariance matrix: ");
+        //gfTrack.getTrackRep(0)->getCov().Print();
 
         if (genfitStatusFlag != 0) {    //if fit failed
           B2WARNING("Genfit returned an error (with status flag " << genfitStatusFlag << ") during the fit!");
@@ -292,8 +293,8 @@ void GenFitterModule::event()
 
           //Create output tracks
           new(gfTracks->AddrAt(trackCounter)) GFTrack(gfTrack);  //GFTrack can be assigned directly
-          new(tracks->AddrAt(trackCounter)) Track();  //Track is created empty, parameters are set later on
 
+          new(tracks->AddrAt(trackCounter)) Track();  //Track is created empty, parameters are set later on
 
           //Set non-helix parameters
           tracks[trackCounter]->setFitFailed(false);
@@ -315,8 +316,8 @@ void GenFitterModule::event()
           try {
             //extrapolate the track to the origin, the results are stored directly in poca and dirInPoca
             gfTrack.getCardinalRep()->extrapolateToPoint(pos, poca, dirInPoca);
-            B2INFO("Point of closest approach: " << poca.x() << "  " << poca.y() << "  " << poca.z());
-            B2INFO("Track direction in POCA: " << dirInPoca.x() << "  " << dirInPoca.y() << "  " << dirInPoca.z());
+            B2DEBUG(149, "Point of closest approach: " << poca.x() << "  " << poca.y() << "  " << poca.z());
+            B2DEBUG(149, "Track direction in POCA: " << dirInPoca.x() << "  " << dirInPoca.y() << "  " << dirInPoca.z());
 
             //Now create a reference plane to get momentum and vertex position
             GFDetPlane plane(poca, dirInPoca);
@@ -402,7 +403,6 @@ void GenFitterModule::event()
         B2WARNING("Something went wrong during the fit!");
         ++m_failedFitCounter;
       }
-
 
 
     } //end loop over all track candidates

@@ -19,9 +19,8 @@
 #include <cdc/geometry/CDCGeometryPar.h>
 
 #include <pxd/dataobjects/PXDTrueHit.h>
-#include <pxd/vxd/VxdID.h>
-
 #include <svd/dataobjects/SVDTrueHit.h>
+#include <vxd/VxdID.h>
 
 #include "GFTrackCand.h"
 

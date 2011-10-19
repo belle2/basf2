@@ -81,6 +81,9 @@ namespace Belle2 {
 
       StoreArray<TOPDigiHit> topDigiHits;
       StoreArray<TOPQuartzHit> topQuartzHits;
+
+      TOPconfigure();
+
     }
 
     void TOPRecoModule::beginRun()
@@ -104,7 +107,7 @@ namespace Belle2 {
       if (!topQuartzHits) B2ERROR("TOPDigitizerModule: Cannot find TOPQuartzHit array.");
 
 
-      TOPconfigure();
+      //TOPconfigure();
 
 
       double Masses[5] = {.511E-3, .10566, .13957, .49368, .93827};
@@ -125,7 +128,7 @@ namespace Belle2 {
         TVector3 pos = atrack->getPosition();
         TVector3 mom = atrack->getMomentum();
 
-        TOPtrack tr(pos.X(), pos.Y(), pos.Z(), mom.X(), mom.Y(), mom.Z(), atrack->getLength(), atrack->getCharge(), atrack->getParticleID());
+        TOPtrack tr(pos.X() / 10., pos.Y() / 10., pos.Z() / 10., mom.X() / 1000., mom.Y() / 1000., mom.Z() / 1000., atrack->getLength() / 10., atrack->getCharge(), atrack->getParticleID());
         tr.toTop();
         tr.Dump();
 
@@ -133,7 +136,7 @@ namespace Belle2 {
         for (int hit = 0; hit < nHits; ++hit) {
           TOPDigiHit* pmthit = topDigiHits[hit];
 
-          reco.AddData(pmthit->getBarID(), pmthit->getChannelID(), pmthit->getTDC());
+          reco.AddData(pmthit->getBarID() - 1, pmthit->getChannelID(), pmthit->getTDC());
         }
 
         reco.Reconstruct(tr);
@@ -183,7 +186,7 @@ namespace Belle2 {
       double YsizExp = (m_topgp->getWextdown() + m_topgp->getQthickness()) / 10.0;  // expansion volume height
       double YsizPMT = (m_topgp->getNpmty() * m_topgp->getMsizey() + m_topgp->getYgap()) / 10.0; // height to arrange 2 rows of PMT
       double XsizPMT = (m_topgp->getNpmtx() * m_topgp->getMsizex() + (m_topgp->getNpmtx() - 1) * m_topgp->getXgap()) / 10.0; // height to arrange 2 rows of PMT
-      B2INFO("z1 = " << z1 << "  z2 = " << z2);
+      // B2INFO("z1 = "<<z1<<"  z2 = "<<z2);
 
 
       //! No edge roughness

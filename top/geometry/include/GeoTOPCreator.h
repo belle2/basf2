@@ -74,6 +74,7 @@ namespace Belle2 {
       SensitiveQuartz* m_sensitiveQuartz;
       //! used for reading parameters from the xml
       TOPGeometryPar* m_topgp;
+      int isBeamBkgStudy;
     };
 
   }

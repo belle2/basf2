@@ -30,6 +30,9 @@ namespace Belle2 {
     {
       StoreArray<MCParticle> mcParticles;
       StoreArray<TOPSimHit>  topSimHits;
+
+      RelationArray  topSimHitRel(mcParticles, topSimHits);
+      registerMCParticleRelation(topSimHitRel);
     }
 
 

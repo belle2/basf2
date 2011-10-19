@@ -19,6 +19,7 @@
 #include <framework/logging/Logger.h>
 #include <top/simulation/SensitiveDetector.h>
 #include <top/simulation/SensitiveQuartz.h>
+#include <simulation/background/BkgSensitiveDetector.h>
 
 #include <cmath>
 #include <boost/format.hpp>
@@ -69,7 +70,7 @@ namespace Belle2 {
     //                 Implementation
     //-----------------------------------------------------------------
 
-    GeoTOPCreator::GeoTOPCreator()
+    GeoTOPCreator::GeoTOPCreator(): isBeamBkgStudy(0)
     {
       m_sensitive = new SensitiveDetector();
       m_sensitiveQuartz = new SensitiveQuartz();
@@ -86,6 +87,8 @@ namespace Belle2 {
 
     void GeoTOPCreator::create(const GearDir& content, G4LogicalVolume& topVolume, GeometryTypes type)
     {
+
+      isBeamBkgStudy = content.getInt("BeamBackgroundStudy");
 
       /*! Build detector segment */
 
@@ -114,7 +117,7 @@ namespace Belle2 {
         G4RotationMatrix rot(M_PI / 2.0, M_PI / 2.0, -phi);
         G4ThreeVector trans(Radius*cos(phi), Radius*sin(phi), 0);
 
-        new G4PVPlacement(G4Transform3D(rot, trans), air, "TOP.gbox2", &topVolume, false, i + 1);
+        new G4PVPlacement(G4Transform3D(rot, trans), air, "PlacedBox", &topVolume, false, i + 1);
 
       }
 
@@ -187,8 +190,8 @@ namespace Belle2 {
 
       G4Box* bar = new G4Box("bar", length / 2.0, Qthickness / 2.0 , Qwidth / 2.0);
 
-      G4LogicalVolume* qbar = new G4LogicalVolume(bar, quartzMaterial, "cuttest", 0, m_sensitiveQuartz);
-
+      G4LogicalVolume* qbar = new G4LogicalVolume(bar, quartzMaterial, "cuttest");
+      if (!isBeamBkgStudy) qbar->SetSensitiveDetector(m_sensitiveQuartz);
 
       /*!  Build shapes of mirror  */
 
@@ -234,8 +237,10 @@ namespace Belle2 {
       G4Box* box2 = new G4Box("glue_2", Gwidth2 / 2.0, Qthickness / 2.0, Qwidth / 2.0);
       G4Box* box3 = new G4Box("glue_3", Gwidth3 / 2.0, Qthickness / 2.0, Qwidth / 2.0);
 
-      G4LogicalVolume* gbox2 = new G4LogicalVolume(box2, glueMaterial, "gbox2", 0, m_sensitiveQuartz);
-      G4LogicalVolume* gbox3 = new G4LogicalVolume(box3, glueMaterial, "gbox3", 0, m_sensitiveQuartz);
+      G4LogicalVolume* gbox2 = new G4LogicalVolume(box2, glueMaterial, "gbox2");
+      G4LogicalVolume* gbox3 = new G4LogicalVolume(box3, glueMaterial, "gbox3");
+      if (!isBeamBkgStudy) gbox2->SetSensitiveDetector(m_sensitiveQuartz);
+      if (!isBeamBkgStudy) gbox2->SetSensitiveDetector(m_sensitiveQuartz);
 
 
       /*!  Place glue joints */
@@ -270,7 +275,8 @@ namespace Belle2 {
 
 
       G4Box* box1 = new G4Box("glue_1", Gwidth3 / 2.0, Qthickness / 2.0, Wwidth / 2.0);
-      G4LogicalVolume* gbox1 = new G4LogicalVolume(box1, glueMaterial, "gbox1", 0, m_sensitiveQuartz);
+      G4LogicalVolume* gbox1 = new G4LogicalVolume(box1, glueMaterial, "gbox1");
+      if (!isBeamBkgStudy) gbox1->SetSensitiveDetector(m_sensitiveQuartz);
 
       G4Transform3D tglue1 = G4Translate3D(-length / 2.0 - Gwidth1 / 2.0 , 0, 0);
 
@@ -365,9 +371,10 @@ namespace Belle2 {
       polygon.push_back(G4TwoVector(Bposition + length + dx, -Qthickness / 2.0 - dx));
       polygon.push_back(G4TwoVector(Bposition, -Qthickness / 2.0 - dx));
       polygon.push_back(G4TwoVector(Bposition - Gwidth1, -Qthickness / 2.0 - dx));
-      polygon.push_back(G4TwoVector(Bposition - lengthw, -Qthickness / 2.0 - Wextdown - dx));
-      polygon.push_back(G4TwoVector(Bposition - lengthw - dz - dx, -Qthickness / 2.0 - Wextdown - dx));
-      polygon.push_back(G4TwoVector(Bposition - lengthw - dz - dx, Qthickness / 2.0 + dx));
+      polygon.push_back(G4TwoVector(Bposition - lengthw, -Qthickness / 2.0 - Wextdown - 3*dx));
+      polygon.push_back(G4TwoVector(Bposition - lengthw - dz - dx, -Qthickness / 2.0 - Wextdown - 3*dx));
+      polygon.push_back(G4TwoVector(Bposition - lengthw - dz - dx, Qthickness / 2.0 + 3*dx));
+      polygon.push_back(G4TwoVector(Bposition - lengthw, Qthickness / 2.0 + 3*dx));
 
       G4ExtrudedSolid* airshape = new  G4ExtrudedSolid("Air", polygon, Qwidth / 2.0 + dx / 2.0, G4TwoVector(0.0, 0.0), 1.0, G4TwoVector(0.0, 0.0), 1.0);
 
@@ -507,6 +514,8 @@ namespace Belle2 {
 
       G4Box *box1 = new G4Box("window", Msizex / 2., Msizey / 2., Winthickness / 2.);
       G4LogicalVolume* window = new G4LogicalVolume(box1, winMaterial, "window");
+      if (isBeamBkgStudy) window->SetSensitiveDetector(new BkgSensitiveDetector("TOP"));
+
 
       G4Box *box4 = new G4Box("bottom", Msizex / 2., Msizey / 2., Botthickness / 2.);
       G4LogicalVolume* bottom = new G4LogicalVolume(box4, botMaterial, "bottom");
@@ -517,7 +526,8 @@ namespace Belle2 {
       G4LogicalVolume* wall = new G4LogicalVolume(wallbox, caseMaterial, "wall");
 
       G4Box *sensBox = new G4Box("sensbox", Asizex / 2., Asizey / 2., Asizez  / 2.);
-      G4LogicalVolume *lmoduleSens = new G4LogicalVolume(sensBox, sensMaterial, "moduleSensitive", 0 , m_sensitive);
+      G4LogicalVolume *lmoduleSens = new G4LogicalVolume(sensBox, sensMaterial, "moduleSensitive");
+      if (!isBeamBkgStudy) lmoduleSens->SetSensitiveDetector(m_sensitive);
 
       /*! Place PMT segments */
 

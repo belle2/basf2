@@ -11,8 +11,8 @@
     <QBarMirror desc="Length of the quarz sedment to which the mirror is attached" unit="mm">50</QBarMirror>
     <QWedgeLength dest="Size of the extension volue of the quartz bar in the z direction" unit="mm">60</QWedgeLength>
     <QWedgeWidth desc="Width of the quartz bar extension" unit="mm">443</QWedgeWidth>
-    <QWedgetup dest="Size of the extension volue of the quartz bar in the y direction upwards" unit="cm">0.0</QWedgetup>
-    <QWedgetdown dest="Size of the extension volue of the quartz bar in the y direction downwards" unit="cm">3.1</QWedgetdown>
+    <QWedgetup dest="Size of the expansion volue of the quartz bar in the y direction upwards" unit="cm">0.0</QWedgetup>
+    <QWedgetdown dest="Size of the expansion volue of the quartz bar in the y direction downwards" unit="cm">3.1</QWedgetdown>
     
     <Glue>
         <GlueMaterial>TOPGlue</GlueMaterial>

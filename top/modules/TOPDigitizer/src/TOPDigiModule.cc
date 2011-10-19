@@ -186,7 +186,7 @@ namespace Belle2 {
 
       int ich = (int)((1239.85 / energy - 250) / 10.);
       if (ich < 0 || ich >= 62) return 0;
-      return 4.0*0.6*qe[ich];// collection efficiency 0.8 and 4 denoes the fraction of photons killed by staking action
+      return 4.0*qe[ich];// collection efficiency 0.8 and 4 denoes the fraction of photons killed by staking action
 
     }
 
@@ -196,7 +196,7 @@ namespace Belle2 {
 
       int ich = (int)((1239.85 / energy - 260) / 10.);
       if (ich < 0 || ich >= 45) return 0;
-      return 1 / 0.35*0.6*qe[ich];// collection efficiency 0.8 and 1/0.35 denoes the fraction of photons killed by staking action
+      return 1 / 0.35*qe[ich];// collection efficiency 0.8 and 1/0.35 denoes the fraction of photons killed by staking action
     }
 
     bool TOPDigiModule::DetectorQE(double energy)

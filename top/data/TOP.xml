@@ -10,5 +10,8 @@
         <xi:include href="TOP-Support.xml"/>
         <xi:include href="TOP-Mirror.xml"/>
         <xi:include href="TOP-SupportAlignement.xml"/>
+        
+        <BeamBackgroundStudy desc="select 1 if you want to record neutron and gamma hits">0</BeamBackgroundStudy>
+
     </Content>
 </DetectorComponent>

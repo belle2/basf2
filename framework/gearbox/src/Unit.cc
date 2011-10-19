@@ -40,7 +40,8 @@ namespace Belle2 {
   DEFINE_UNIT(mm  , Unit::m  * 1e-3);  /**< [millimeters] */
   DEFINE_UNIT(um  , Unit::m  * 1e-6);  /**< [micrometers] */
   DEFINE_UNIT(nm  , Unit::m  * 1e-9);  /**< [nanometers] */
-  DEFINE_UNIT(fm  , Unit::m  * 1e-12); /**< [femtometers] */
+  DEFINE_UNIT(pm  , Unit::m  * 1e-12); /**< [picometers] */
+  DEFINE_UNIT(fm  , Unit::m  * 1e-15); /**< [femtometers] */
 
 // area units
   DEFINE_UNIT(m2  , Unit::m * Unit::m);      /**< [square meters] */
@@ -53,7 +54,7 @@ namespace Belle2 {
   DEFINE_UNIT(nb  , Unit::b  * 1e-9);  /**< [nanobarn] */
   DEFINE_UNIT(pb  , Unit::b  * 1e-12); /**< [picobarn] */
   DEFINE_UNIT(fb  , Unit::b  * 1e-15); /**< [femtobarn] */
-  DEFINE_UNIT(ab  , Unit::b  * 1e-18); /**< [atobarn] */
+  DEFINE_UNIT(ab  , Unit::b  * 1e-18); /**< [attobarn] */
 
 // volume units
   DEFINE_UNIT(m3  , Unit::m * Unit::m * Unit::m);    /**< [cubic meters] */
@@ -75,7 +76,7 @@ namespace Belle2 {
   DEFINE_UNIT(eV  , Unit::GeV * 1e-9); /**< [electronvolt] */
   DEFINE_UNIT(keV , Unit::eV  * 1e3);  /**< [kiloelectronvolt] */
   DEFINE_UNIT(MeV , Unit::eV  * 1e6);  /**< [megaelectronvolt] */
-  DEFINE_UNIT(TeV , Unit::eV  * 1e9);  /**< [megaelectronvolt] */
+  DEFINE_UNIT(TeV , Unit::eV  * 1e12);  /**< [teraelectronvolt] */
   DEFINE_UNIT(J   , 1.0 / TMath::Qe() * Unit::eV); /**< [joule] */
   DEFINE_UNIT(V   , Unit::eV / Unit::e); /**< Standard of [voltage] */
 

@@ -24,7 +24,7 @@ namespace Belle2 {
    * to convert floating point numbers from a specified unit to the standard
    * unit of the framework.
    *
-   * This class can either be used a singleton or by using its static methods.
+   * This class cannot be instantiated, use the static members directly.
    */
   class Unit {
 
@@ -46,6 +46,7 @@ namespace Belle2 {
     static const double mm;           /**< [millimeters] */
     static const double um;           /**< [micrometers] */
     static const double nm;           /**< [nanometers] */
+    static const double pm;           /**< [picometers] */
     static const double fm;           /**< [femtometers] */
 
     // area units
@@ -59,7 +60,7 @@ namespace Belle2 {
     static const double nb;           /**< [nanobarn] */
     static const double pb;           /**< [picobarn] */
     static const double fb;           /**< [femtobarn] */
-    static const double ab;           /**< [atobarn] */
+    static const double ab;           /**< [attobarn] */
 
     // volume units
     static const double m3;           /**< [cubic meters] */
@@ -81,7 +82,7 @@ namespace Belle2 {
     static const double eV;           /**< [electronvolt] */
     static const double keV;          /**< [kiloelectronvolt] */
     static const double MeV;          /**< [megaelectronvolt] */
-    static const double TeV;          /**< [megaelectronvolt] */
+    static const double TeV;          /**< [teraelectronvolt] */
     static const double J;            /**< [joule] */
     static const double V;            /**< [voltage] */
 
@@ -104,7 +105,7 @@ namespace Belle2 {
     static const double fineStrConst; /**< The fine structure constant. */
     static const double permSi;       /**< Permittivity of Silicon */
     static const double uTherm;       /**< Thermal Voltage at room temperature */
-    static const double eMobilitySi;  /**< Electron mobility in intinsic Silicon at room temperature */
+    static const double eMobilitySi;  /**< Electron mobility in intrinsic Silicon at room temperature */
 
     //SuperKEKB and Belle II constants
     static const double ringCircumference; /**< The circumference of the SuperKEKB ring. */
@@ -114,7 +115,6 @@ namespace Belle2 {
      * Converts a floating point value to the standard framework unit.
      *
      * @param value The value which should be converted.
-     * @param unitType The unit type of the specified value.
      * @param unitString The string of the unit of the specified value.
      * @return The value converted to the specified unit.
      */

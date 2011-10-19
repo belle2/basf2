@@ -74,7 +74,7 @@ namespace Belle2 {
     const G4Track & track = * aStep->GetTrack();
 
     // Get tracks charge
-    const G4double charge = track.GetDefinition()->GetPDGCharge();
+    //    const G4double charge = track.GetDefinition()->GetPDGCharge();
 
     // ignore neutrals in EKLM
     //    if (charge == 0.) return false;

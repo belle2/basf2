@@ -590,7 +590,7 @@ namespace Belle2 {
       //G4Transform3D transform_Lv2VacFwdPart1 = G4Translate3D((Lv2VacFwd_D1 * sin(Lv2VacFwd_A1) + Lv2VacFwd_D2 * sin(2.*Lv2VacFwd_A1)) / 1.9 ,
       //                                                       0.,
       //                                                       (Lv2VacFwd_D1 * cos(Lv2VacFwd_A1) + Lv2VacFwd_D2 * cos(2.*Lv2VacFwd_A1)) / 1.9);
-      //transform_Lv2VacFwdPart1 = transform_Lv2VacFwdPart1 * G4RotateY3D(Lv2VacFwd_A1 + Lv2VacFwd_A2);
+      transform_Lv2VacFwdPart1 = transform_Lv2VacFwdPart1 * G4RotateY3D(Lv2VacFwd_A1 + Lv2VacFwd_A2);
       //
       G4Transform3D transform_Lv2VacFwdPart2 = G4Translate3D(Lv2VacFwd_D2 * sin(2.*Lv2VacFwd_A1) + Lv2VacFwd_L1 * sin(2.*Lv2VacFwd_A1) / 2.0,
                                                              0.,
@@ -730,7 +730,7 @@ namespace Belle2 {
       //G4Transform3D transform_Lv2VacBwdPart1 = G4Translate3D((Lv2VacBwd_D1 * sin(Lv2VacBwd_A1) + Lv2VacBwd_D2 * sin(2.*Lv2VacBwd_A1)) / 2.05,
       //                                                       0.,
       //                                                       -(Lv2VacBwd_D1 * cos(Lv2VacBwd_A1) + Lv2VacBwd_D2 * cos(2.*Lv2VacBwd_A1)) / 2.05);
-      //transform_Lv2VacBwdPart1 = transform_Lv2VacBwdPart1 * G4RotateY3D(-Lv2VacBwd_A1 - Lv2VacBwd_A2);
+      transform_Lv2VacBwdPart1 = transform_Lv2VacBwdPart1 * G4RotateY3D(-Lv2VacBwd_A1 - Lv2VacBwd_A2);
       //tmp end
       //
       G4Transform3D transform_Lv2VacBwdPart2 = G4Translate3D((Lv2VacBwd_D2 + Lv2VacBwd_L1 / 2.0) * sin(2.*Lv2VacBwd_A1) ,

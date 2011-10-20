@@ -4,7 +4,7 @@
   <Content>
 
     <Safety>
-        <L1 unit="cm">0.001</L1>
+        <L1 unit="cm">0.1</L1>
     </Safety>
     <!-- ########## IP pipe ########## -->
     <Lv1SUS>
@@ -57,22 +57,22 @@
     <Lv2Paraf>
         <L1 unit="cm">0.35</L1>
         <L2 unit="cm">0.1</L2>
-        <L3 unit="cm">0.675</L3>
+        <L3 unit="cm">0.625</L3>
         <L4 unit="cm">0.3</L4>
-        <L5 unit="cm">3.00</L5>
+        <L5 unit="cm">3.35</L5>
         <L6 unit="cm">0.075</L6>
-        <L7 unit="cm">0.425</L7>
+        <L7 unit="cm">0.125</L7>
         <L8 unit="cm">0.075</L8>
         <L9 unit="cm">3.00</L9>
-        <L10 unit="cm">5.225</L10>
-        <L11 unit="cm">0.075</L11>
-        <L12 unit="cm">0.425</L12>
+        <L10 unit="cm">5.20</L10>
+        <L11 unit="cm">0.025</L11>
+        <L12 unit="cm">0.175</L12>
         <L13 unit="cm">0.075</L13>
-        <L14 unit="cm">4.75</L14>
-        <L15 unit="cm">0.175</L15>
-        <L16 unit="cm">0.1</L16>
-        <L17 unit="cm">0.1</L17>
-        <L18 unit="cm">0.575</L18>
+        <L14 unit="cm">5.1</L14>
+        <L15 unit="cm">0.285</L15>
+        <L16 unit="cm">0.065</L16>
+        <L17 unit="cm">0.115</L17>
+        <L18 unit="cm">0.46</L18>
         <L19 unit="cm">0.1</L19>
         <L20 unit="cm">0.35</L20>
         <R1 unit="cm">1.12</R1>
@@ -83,7 +83,7 @@
         <R6 unit="cm">1.06</R6>
         <R7 unit="cm">1.16</R7>
         <R8 unit="cm">1.18</R8>
-        <R9 unit="cm">1.16</R9>
+        <R9 unit="cm">1.12</R9>
         <R10 unit="cm">1.5</R10>
         <R11 unit="cm">1.31</R11>
         <R12 unit="cm">1.6</R12>

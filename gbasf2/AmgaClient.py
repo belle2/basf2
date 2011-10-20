@@ -58,9 +58,9 @@ class AmgaClient(object):
             if os.environ.has_key('X509_USER_PROXY') and not gethostname() \
                 == 'kek2-uidev.cc.kek.jp':
                 print 'using X509 auth'
-                # self.client = mdclient.MDClient('150.183.246.196', 8822, '')
-                self.client = mdclient.MDClient('cgh10.collab.unimelb.edu.au',
-                        8822, '')
+                self.client = mdclient.MDClient('150.183.246.196', 8822, '')
+               # self.client = mdclient.MDClient('cgh10.collab.unimelb.edu.au',
+                #        8822, '')
                 self.client.requireSSL(os.environ['X509_USER_PROXY'],
                                        os.environ['X509_USER_PROXY'])
             else:
@@ -103,7 +103,9 @@ class AmgaClient(object):
         '''
 
         guids = []
-        self.client.selectAttr([experiment], query)
+        # self.client.selectAttr([experiment], query)
+        attribute = experiment + ':guid'  # hanyl  "not perfect, experiment should be list
+        self.client.selectAttr([attribute], query)  # hanyl
         while not self.client.eot():
             guids.append('guid:' + self.client.fetchRow())
             # -  we're interesteed in LFNS now
@@ -121,15 +123,25 @@ class AmgaClient(object):
         tmp = []
         results = []
 
-        self.client.find(experiment, query)
+       # self.client.find(experiment, query)
+       # while not self.client.eot():
+       #     tmp.append(experiment + '/' + self.client.fetchRow())
+
+       # for t in tmp:
+       #     print t
+       #     self.client.getattr(t, ['lfn', 'events'])
+       #     self.client.fetchRow()
+       #     results.append(self.client.fetchRow())
+
+       # return results
+
+        self.client.execute('SELECT ' + 'lfn,events' + ' FROM ' + experiment
+                            + ' WHERE ' + query.replace(' and ', ' AND '))
+        self.client.fetchRow()
+        self.client.fetchRow()
         while not self.client.eot():
-            tmp.append(experiment + '/' + self.client.fetchRow())
-
-        for t in tmp:
-            self.client.getattr(t, ['lfn', 'events'])
-            self.client.fetchRow()
             results.append(self.client.fetchRow())
-
+            self.client.fetchRow()
         return results
 
 ###############################################################################
@@ -193,8 +205,6 @@ class AmgaClient(object):
         #    for attribute in attributes:
         #        results[t][attribute] = self.client.fetchRow()
 
-        print results
-
         return results
 
 ###############################################################################
@@ -209,9 +219,11 @@ class AmgaClient(object):
             self.client.cd(path)
         except mdinterface.CommandException, ex:
         # it doesn't exist - create
+            print 'The directory %s does not exists, try to create it' % path  # hanyl
             try:
                 self.checkDirectory('/'.join(path.split('/')[0:-1]))
                 self.client.createDir(path)
+                print 'The directory %s create successfully!' % path  # hanyl
             except mdinterface.CommandException, ex2:
                 print 'Error:', ex2
                 return False
@@ -253,6 +265,55 @@ class AmgaClient(object):
 
 ###############################################################################
 
+###############################################################################
+## Wenjing Wu wuwj@ihep.ac.cn
+
+    def getAttributesValues(self, basepath, attrs):
+        '''
+      returns the values of given attributes in a given directory, or False on failure
+      attrs is a list of attributes, as ['id','lfn','guid']
+      '''
+
+        entries = {}
+        try:
+            self.client.getattr(basepath, attrs)
+            while not self.client.eot():
+                (file, values) = self.client.getEntry()
+                entries[file] = values
+            return entries
+        except mdinterface.CommandException, ex:
+    # ....print "->",file,values
+            print 'getAttributesValues Error:', ex
+            return False
+
+###############################################################################
+## Wenjing Wu wuwj@ihep.ac.cn
+
+    def rm(self, path):
+        '''remove a path'''
+
+        try:
+            self.client.rm(path)
+            return True
+        except mdinterface.CommandException, ex:
+            print 'rm Error:', ex
+            return False
+
+###############################################################################
+## Wenjing Wu wuwj@ihep.ac.cn
+
+    def removeDir(self, dir):
+        '''remove a dir'''
+
+        try:
+            self.client.removeDir(dir)
+            return True
+        except mdinterface.CommandException, ex:
+            print 'removeDir Error:', ex
+            return False
+
+###############################################################################
+
     def prepareUserDataset(self, basepath):
         '''
       Adds the set of stock attributes to the given basepath
@@ -269,4 +330,26 @@ class AmgaClient(object):
         else:
             return False
 
+    def execute(self, command):  # hanyl
+        self.client.execute(command)  # hanyl
+        while not self.client.eot():  # hanyl
+            print self.client.fetchRow()  # hanyl
+
+
+if __name__ == '__main__':
+    ac = AmgaClient()
+    print ac.getSubdirectories('/belle2/user/belle/hanyl/Ungrouped/',
+                               relative=True)
+    # print ac.getGUIDs("/belle2/data/E11/FC","id<5")
+    # print ac.directQuery("/belle2/data/E11/FC","id<5")    #problem
+    # print ac.directQueryWithAttributes("/belle2/user/belle/hanyl/Ungrouped/","id>0",["lfn"])
+    # print ac.checkDirectory("/belle2/data/E11/FC/TEST")
+    # print ac.getAttributes("/belle2/data/E11/FC")
+    # print ac.getAttributes("/belle2/user/belle/hanyl/Ungrouped/")
+    # print ac.getAttributesValues("/belle2/user/belle/hanyl/Ungrouped/",['lfn'])
+    print ac.rm('/belle2/user/belle/hanyl/Ungrouped/effs30.root')
+    print ac.rm('/belle2/user/belle/hanyl/Ungrouped/wutest1.root')
+    print ac.rm('/belle2/user/belle/hanyl/Ungrouped/wutest2.root')
+    print ac.removeDir('/belle2/user/belle/hanyl/Ungrouped')
+    print ac.removeDir('/belle2/user/belle/hanyl/Ungroupeda')
 

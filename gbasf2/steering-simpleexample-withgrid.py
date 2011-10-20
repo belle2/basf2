@@ -11,9 +11,10 @@ project = 'e1-testdata'
 # (optional) Job priority
 priority = '1'
 # Experiments (comma separated list)
-experiments = '1'
+experiments = '11'
 # Metadata query
-query = 'runL > 0'
+# query = 'runL < 2'
+query = 'id < 3'
 # Type of Data ('data' or 'MC')
 type = 'data'
 # estimated Average Events per Minute (eg official MC = 40)
@@ -23,7 +24,8 @@ swver = 'release-00-01-00'
 # (optional) Files to be send with the job
 inputsandboxfiles = 'file1.txt,file2.txt'
 # (optional) max events - the maximum number of events to use
-maxevents = '100000'
+# maxevents = '100000'
+maxevents = '10'
 
 ############################
 # Basf2 configuration     #
@@ -33,12 +35,7 @@ evtmetagen = fw.register_module('EvtMetaGen')
 evtmetainfo = fw.register_module('EvtMetaInfo')
 
 # set parameters in modules
-param_evtmetagen = {
-    'ExpList': [1],
-    'RunList': [1],
-    'EvtStartList': [0],
-    'EvtEndList': [100],
-    }
+param_evtmetagen = {'ExpList': [1], 'RunList': [1], 'EvtNumList': [4]}
 
 evtmetagen.param(param_evtmetagen)
 

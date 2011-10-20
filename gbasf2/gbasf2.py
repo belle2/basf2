@@ -17,6 +17,7 @@ import os
 import DIRAC
 from DIRAC.Core.Base import Script
 from DIRAC.Core.Security.Misc import *
+from DIRAC.Core.Security import CS  # hanyl
 from DIRAC.Core.Security import Properties
 from DIRAC.FrameworkSystem.Client.ProxyGeneration import generateProxy
 from DIRAC.FrameworkSystem.Client.ProxyManagerClient import ProxyManagerClient
@@ -64,8 +65,8 @@ def make_jdl(
     f.write('      "mdparser.py",\n')
     if tar is not None:
         f.write('      "' + tar + '",\n')
-    if lfn != 'None':
-        f.write('      "LFN:' + lfn + '"\n')
+    # if lfn != 'None':
+    #    f.write('      "LFN:' + lfn + '"\n')
     f.write('''    };
 \
       OutputSandbox =
@@ -138,7 +139,6 @@ def prepareProxy():
     else:
       # We need to enable the configuration service ourselves if we're not generating a proxy
         Script.enableCS()
-
     proxyProps = proxyinfo['Value']
     userName = proxyProps['username']
     if Properties.PROXY_MANAGEMENT not in proxyProps['groupProperties'] \
@@ -173,8 +173,10 @@ def prepareProxy():
     # Finally, try to add the VOMS attributes
     voms = VOMS()
     VOMSresult = voms.setVOMSAttributes(proxyProps['chain'],
-            CS.getVOMSAttributeForGroup(proxyparams.diracGroup))
+            CS.getVOMSAttributeForGroup(proxyparams.diracGroup),
+            proxyparams.diracGroup)
     if not VOMSresult['OK']:
+        print VOMSresult['Message']
         print 'Warning : Cannot add voms attribute to the proxy'
         print '          Accessing data in the grid storage from the user interface will not be possible.'
         print '          The grid jobs will not be affected.'
@@ -207,6 +209,7 @@ def main():
     Script.disableCS()
     Script.parseCommandLine(ignoreErrors=True)
     cliParams.registerSteeringOptions()
+    cliParams.validOption()  # hanyl
 
   # setup dirac - import here because it pwns everything
     from DIRAC.Interfaces.API import Dirac
@@ -225,6 +228,8 @@ def main():
     asearch.setExperiments([int(s) for s in
                            cliParams.getExperiments().split(',')])
     asearch.setQuery(cliParams.getQuery())
+    print cliParams.getExperiments().split(',')
+    print cliParams.getQuery()
     asearch.setAttributes(['lfn', 'events'])
     results = asearch.executeAmgaQueryWithAttributes()
   # deal with empty queries
@@ -254,12 +259,16 @@ def main():
 
   # keep track of the number of events submitted
     totalevents = 0
-
+  # number used to
+    numberOfLfns = 0
   # for each of the lfns, make a job and submit it
     for result in results:
+        numberOfLfns += 1
         jdl = make_jdl(  # Events/sec into CPUSecs
                          # XXX
-            cliParams.getSteeringFile(),
+                         # cliParams.getSteeringFile(),
+                         # hanyl make steering files for every lfn
+            cliParams.makeSteeringFile(result, numberOfLfns),
             cliParams.getProject(),
             int(float(results[result]['events']) / (cliParams.getEvtPerMin()
                 / 60.0)),
@@ -270,6 +279,7 @@ def main():
             tar,
             )
         subresult = dirac.submit(jdl)
+        lfns = []
         if subresult['OK']:
             print 'JobID = %s' % subresult['Value']
             # remove the JDL - we keep it on error

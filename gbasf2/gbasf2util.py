@@ -6,6 +6,8 @@
 import DIRAC
 from DIRAC.Core.Base import Script
 import os
+import mdclient
+import AmgaClient
 
 # initial implementation uses CLI and steering file
 # potentially we can also get some parameters from the user environment in the future
@@ -18,14 +20,21 @@ class CLIParams:
     EvtPerMin = 45
     steering_file = None
     project = 'Ungrouped'
+    # project = 'Ungroupeda'
     priority = 0
     query = None
     swver = 'release-00-01-00'
     sysconfig = 'Belle-v2r1'
     datatype = None
     experiments = None
-    inputsandboxfiles = None
+#    inputsandboxfiles = None
+    inputsandboxfiles = []
     maxevents = None
+    numberOfFiles = 1
+
+    def __init__(self):  # hanyl added
+        self.datatype = None
+        self.experiments = None
 
     def setSteeringFile(self, arg):
         self.steering_file = arg
@@ -91,6 +100,13 @@ class CLIParams:
         else:
             return DIRAC.S_ERROR
 
+    def setNumberOfFiles(self, arg):
+      # FIXME : check for integer
+        if arg > 0:
+            self.maxevents = arg.strip()
+        else:
+            return DIRAC.S_ERROR
+
     def getSteeringFile(self):
         return self.steering_file
 
@@ -124,10 +140,14 @@ class CLIParams:
     def getMaxEvents(self):
         return self.maxevents
 
+    def getNumberOfFiles(self):
+        return self.numberOfFiles
+
   # registers alll of the possible commandline options with the DIRAC Script handler
   # This is also used to generate the --help option
 
     def registerCLISwitches(self):
+        Script.localCfg.commandOptionList = []  # hanyl clear Script's options
         Script.registerSwitch('s:', 'steering=', 'basf2 steering file',
                               self.setSteeringFile)
         Script.registerSwitch('p:', 'project=', 'Name for project',
@@ -155,6 +175,9 @@ class CLIParams:
         Script.registerSwitch('x:', 'maxevents=',
                               '(optional) Maximum number of events to use',
                               self.setMaxEvents)
+        Script.registerSwitch('n:', 'numberOfFiles=',
+                              '(optional) Number of data files per job',
+                              self.setNumberOfFiles)
         Script.addDefaultOptionValue('LogLevel', 'debug')
 
   # loop through the steering file to determine any options set there
@@ -175,15 +198,79 @@ class CLIParams:
                 'swver': 'setSwVer',
                 'inputsandboxfiles': 'setInputFiles',
                 'maxevents': 'setMaxEvents',
+                'numberOfFiles': 'setNumberOfFiles',
                 }
       # read the options
+            print self.steering_file
             f = open(self.steering_file)
             for line in f:
                 for option in options.keys():
                     if option in line[0:len(option)]:
+                        print option
                         setFunction = getattr(self, options[option])
+                        print setFunction
                         # DEBUG print line
                         setFunction(line.split('=', 1)[1].strip().replace('"',
                                     '').replace("'", ''))
 
+    def validOption(self):  #  hanyl
+        """Make sure the datatype and experiments be given.
+           If not, the datatype will be set to data and the experiment to all
+        """
 
+        if self.getDataType() is None:  # check the datatype
+            print 'No datatype is given. We will set datatype to data. Continue?'
+            noinput = raw_input('Please type Y or N: ')
+            if noinput == 'N':
+                os.sys.exit(-1)
+            self.setDataType('data')
+        if self.getExperiments() is None:  # check the experiments
+            print 'No experiments is given. We will set experiments to all. Continue?'
+            noinput = raw_input('Please type Y or N: ')
+            if noinput == 'N':
+                os.sys.exit(-1)
+            tmp = []
+          # md = mdclient.MDClient('150.183.246.196', 8822,'belle_user', 'belle')
+          # md.execute('ls /belle2/data')
+          # while not md.eot():     #hanyl
+          #     tmp.append(md.fetchRow()[-2:])
+          # experiments=",".join(tmp)
+            ac = AmgaClient.AmgaClient()
+            for t in ac.getSubdirectories('/belle2/data', relative=True):
+                tmp.append(t[-2:])
+            self.setExperiments(','.join(tmp))
+        if self.getQuery() is None:  # check the query
+            print 'No query is given. We will set query to true. Continue?'
+            noinput = raw_input('Please type Y or N: ')
+            if noinput == 'N':
+                os.sys.exit(-1)
+            self.setQuery('2>1')
+
+    def makeSteeringFile(self, lfn, number):
+        """Make steering file for the given lfn"""
+
+        OldSteeringFile = self.getSteeringFile()
+        NewSteeringFile = OldSteeringFile[:-3] + '-' + str(number) + '.py'
+        fold = open(OldSteeringFile)
+        fnew = open(NewSteeringFile, 'w')
+        for eachline in fold:
+            if not eachline.strip().startswith('#') \
+                and eachline.find('outputFileName') > 0:
+                head = eachline.split(',')[0]
+                tail = eachline.split(',')[1]
+                tail = tail.split('.')[0] + '-' + str(number) + '.' \
+                    + tail.split('.')[1]
+                eachline = head + ',' + tail
+            fnew.write(eachline)
+        fnew.write('LFN="%s"' % lfn)
+        fold.close()
+        fnew.close()
+        return NewSteeringFile
+
+
+if __name__ == '__main__':
+    clipara = CLIParams()
+    clipara.setSteeringFile('Creation.py')
+    # clipara.setSteeringFile('steering-simulationexample-withgrid.py')
+    print clipara.getSteeringFile()
+    clipara.makeSteeringFile('hanyl', 2)

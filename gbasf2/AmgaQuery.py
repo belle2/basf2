@@ -120,3 +120,7 @@ def registerQuery(self, dataType, metadata):
                                    + experiment, metadata[experiment])
 
 
+if __name__ == '__main__':
+    aq = AmgaQuery()
+    # aq.searchQuery('data',[11],'id<5')
+    aq.searchQueryWithAttributes('data', [11], 'id<3', ['lfn', 'events'])

@@ -165,7 +165,11 @@ class AmgaSearch(object):
 if __name__ == '__main__':
     asearch = AmgaSearch()
     asearch.setDataType('data')  # or setDataType('MC')
-    asearch.setExperiments(['01', '02', '05'])
-    asearch.setQuery('(id > 1 and id < 5) or events = 666')
-    lfns = asearch.executeAmgaQuery()
-    print lfns
+    asearch.setExperiments(['07', '09', '35'])
+    # asearch.setQuery('(id > 1 and id < 5) or events = 666')
+    asearch.setQuery('True')
+#    asearch.setQuery('id = 1')
+    asearch.setAttributes(['lfn', 'events'])
+#    lfns = asearch.executeAmgaQuery()
+    results = asearch.executeAmgaQueryWithAttributes()
+    print results

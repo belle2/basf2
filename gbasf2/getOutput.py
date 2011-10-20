@@ -37,7 +37,7 @@ def usage():
 
 
 args = Script.getPositionalArgs()
-if not args:
+if args:
     usage()
 
 for switch in Script.getUnprocessedSwitches():

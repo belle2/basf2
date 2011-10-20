@@ -11,7 +11,6 @@
 #ifndef GEOSVDCREATOR_H
 #define GEOSVDCREATOR_H
 
-#include <pxd/geometry/GeoPXDCreator.h>
 #include <svd/geometry/GeoSVDComponents.h>
 #include <svd/simulation/SensitiveDetector.h>
 #include <geometry/CreatorBase.h>

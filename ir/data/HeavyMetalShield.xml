@@ -3,13 +3,53 @@
   <Creator library="ir">HeavyMetalShieldCreator</Creator>
   <Content>
 
-<ShieldL description="IR HeavyMetalShield L side">
+<TrdL>
+  <Z1 unit="mm">-400</Z1>
+  <Z2 unit="mm">-90</Z2>
+  <X1 unit="mm">42</X1>
+  <X2 unit="mm">20</X2>
+  <Y unit="mm">20</Y>
+</TrdL>
+
+<TrdR>
+  <Z1 unit="mm">140</Z1>
+  <Z2 unit="mm">550</Z2>
+  <X1 unit="mm">20</X1>
+  <X2 unit="mm">55</X2>
+  <Y unit="mm">20</Y>
+</TrdR>
+
+<ShieldL1 description="IR HeavyMetalShield L side part 1">
   <Material>W</Material>
   <Plane>
-    <posZ unit="mm">-390</posZ>
-    <innerRadius unit="mm">46</innerRadius>
-    <outerRadius unit="mm">46</outerRadius>  
+    <posZ unit="mm">-290</posZ>
+    <innerRadius unit="mm">20</innerRadius>
+    <outerRadius unit="mm">33</outerRadius>  
   </Plane>
+  <Plane>
+    <posZ unit="mm">-230</posZ>
+    <innerRadius unit="mm">20</innerRadius>
+    <outerRadius unit="mm">33</outerRadius>  
+  </Plane>
+  <Plane>
+    <posZ unit="mm">-160</posZ>
+    <innerRadius unit="mm">20</innerRadius>
+    <outerRadius unit="mm">26</outerRadius>  
+  </Plane>
+  <Plane>
+    <posZ unit="mm">-160</posZ>
+    <innerRadius unit="mm">20</innerRadius>
+    <outerRadius unit="mm">24</outerRadius>  
+  </Plane>
+  <Plane>
+    <posZ unit="mm">-140</posZ>
+    <innerRadius unit="mm">20</innerRadius>
+    <outerRadius unit="mm">24</outerRadius>  
+  </Plane>
+</ShieldL1>
+
+<ShieldL2 description="IR HeavyMetalShield L side part 2">
+  <Material>W</Material>
   <Plane>
     <posZ unit="mm">-390</posZ>
     <innerRadius unit="mm">46</innerRadius>
@@ -45,14 +85,38 @@
     <innerRadius unit="mm">33</innerRadius>
     <outerRadius unit="mm">35</outerRadius>  
   </Plane>
-  <Plane>
-    <posZ unit="mm">-230</posZ>
-    <innerRadius unit="mm">33</innerRadius>
-    <outerRadius unit="mm">33</outerRadius>  
-  </Plane>
-</ShieldL>
+</ShieldL2>
 
-<ShieldR description="">
+<ShieldR1 description="IR HeavyMetalShield R side part 1">
+  <Material>W</Material>
+  <Plane>
+    <posZ unit="mm">180</posZ>
+    <innerRadius unit="mm">20</innerRadius>
+    <outerRadius unit="mm">24</outerRadius>  
+  </Plane>
+  <Plane>
+    <posZ unit="mm">200</posZ>
+    <innerRadius unit="mm">20</innerRadius>
+    <outerRadius unit="mm">24</outerRadius>  
+  </Plane>
+  <Plane>
+    <posZ unit="mm">200</posZ>
+    <innerRadius unit="mm">20</innerRadius>
+    <outerRadius unit="mm">26</outerRadius>  
+  </Plane>
+  <Plane>
+    <posZ unit="mm">250</posZ>
+    <innerRadius unit="mm">20</innerRadius>
+    <outerRadius unit="mm">26</outerRadius>  
+  </Plane>
+  <Plane>
+    <posZ unit="mm">330</posZ>
+    <innerRadius unit="mm">20</innerRadius>
+    <outerRadius unit="mm">36</outerRadius>  
+  </Plane>
+</ShieldR1>
+
+<ShieldR2 description="IR HeavyMetalShield R side part 2">
   <Material>W</Material>
   <Plane>
     <posZ unit="mm">360</posZ>
@@ -62,29 +126,61 @@
   <Plane>
     <posZ unit="mm">366</posZ>
     <innerRadius unit="mm">40</innerRadius>
-    <outerRadius unit="mm">47.5</outerRadius>  
+    <outerRadius unit="mm">45.7</outerRadius>  
   </Plane>
   <Plane>
-    <posZ unit="mm">473</posZ>
-    <innerRadius unit="mm">63</innerRadius>
+    <posZ unit="mm">420</posZ>
+    <innerRadius unit="mm">50</innerRadius>
+    <outerRadius unit="mm">58</outerRadius>  
+  </Plane>
+  <Plane>
+    <posZ unit="mm">420</posZ>
+    <innerRadius unit="mm">40</innerRadius>
+    <outerRadius unit="mm">58</outerRadius>  
+  </Plane>
+  <Plane>
+    <posZ unit="mm">465</posZ>
+    <innerRadius unit="mm">40</innerRadius>
+    <outerRadius unit="mm">70</outerRadius>  
+  </Plane>
+  <Plane>
+    <posZ unit="mm">480</posZ>
+    <innerRadius unit="mm">40</innerRadius>
+    <outerRadius unit="mm">70</outerRadius>  
+  </Plane>
+  <Plane>
+    <posZ unit="mm">480</posZ>
+    <innerRadius unit="mm">53</innerRadius>
     <outerRadius unit="mm">70</outerRadius>  
   </Plane>
   <Plane>
     <posZ unit="mm">525</posZ>
-    <innerRadius unit="mm">63</innerRadius>
+    <innerRadius unit="mm">53</innerRadius>
     <outerRadius unit="mm">70</outerRadius>  
   </Plane>
   <Plane>
     <posZ unit="mm">525</posZ>
-    <innerRadius unit="mm">63</innerRadius>
+    <innerRadius unit="mm">53</innerRadius>
     <outerRadius unit="mm">124</outerRadius>  
   </Plane>
   <Plane>
     <posZ unit="mm">545</posZ>
-    <innerRadius unit="mm">63</innerRadius>
+    <innerRadius unit="mm">53</innerRadius>
     <outerRadius unit="mm">124</outerRadius>  
   </Plane>
-</ShieldR>
+  <Plane>
+    <posZ unit="mm">545</posZ>
+    <innerRadius unit="mm">53</innerRadius>
+    <outerRadius unit="mm">70</outerRadius>  
+  </Plane>
+  <Plane>
+    <posZ unit="mm">555</posZ>
+    <innerRadius unit="mm">53</innerRadius>
+    <outerRadius unit="mm">70</outerRadius>  
+  </Plane>
+</ShieldR2>
+
+
 
   </Content>
 </DetectorComponent>

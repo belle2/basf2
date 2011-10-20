@@ -73,46 +73,98 @@ namespace Belle2 {
     void GeoHeavyMetalShieldCreator::create(const GearDir& content, G4LogicalVolume& topVolume, GeometryTypes type)
     {
 
+      //----
+      // Trapezoid L-side
+      GearDir cTrdL(content, "TrdL");
+      double TrdL_Z1 = cTrdL.getLength("Z1") / Unit::mm;
+      double TrdL_Z2 = cTrdL.getLength("Z2") / Unit::mm;
+      double TrdL_X1 = cTrdL.getLength("X1") / Unit::mm;
+      double TrdL_X2 = cTrdL.getLength("X2") / Unit::mm;
+      double TrdL_Y = cTrdL.getLength("Y") / Unit::mm;
+      G4Trd* geo_TrdL = new G4Trd("geo_TrdL_name", TrdL_X1, TrdL_X2, TrdL_Y, TrdL_Y, TMath::Abs(TrdL_Z2 - TrdL_Z1) / 2.);
+      G4Transform3D transform_TrdL = G4Translate3D(0., 0., (TrdL_Z2 + TrdL_Z1) / 2.);
 
-      //-- HeavyMetalShield L-side
-
-      GearDir cShieldL(content, "ShieldL");
-      if (! cShieldL) {
-        B2FATAL("Could not find definition for IR ShieldL");
-      }
-      double ShieldL_minZ(0), ShieldL_maxZ(0);
-      G4Polycone *geo_ShieldL = geometry::createPolyCone("geo_ShieldL_name", GearDir(content, "ShieldL/"), ShieldL_minZ, ShieldL_maxZ);
-
-      string strMat_ShieldL = content.getString("ShieldL/Material", "Air");
-      G4Material* mat_ShieldL = Materials::get(strMat_ShieldL);
-      if (!mat_ShieldL) B2FATAL("Material '" << strMat_ShieldL << "', required by IR ShieldL could not be found");
-
-      G4LogicalVolume* logi_ShieldL = new G4LogicalVolume(geo_ShieldL, mat_ShieldL, "logi_ShieldL_bane");
-      setColor(*logi_ShieldL, "#CC0000");
-      //setVisibility(*logi_ShieldL, false);
-      new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_ShieldL, "phys_ShieldL", &topVolume, false, 0);
-
-      // --
-      // Holes on L-side franges will be implemented later
+      //----
+      // Trapezoid R-side
+      GearDir cTrdR(content, "TrdR");
+      double TrdR_Z1 = cTrdR.getLength("Z1") / Unit::mm;
+      double TrdR_Z2 = cTrdR.getLength("Z2") / Unit::mm;
+      double TrdR_X1 = cTrdR.getLength("X1") / Unit::mm;
+      double TrdR_X2 = cTrdR.getLength("X2") / Unit::mm;
+      double TrdR_Y = cTrdR.getLength("Y") / Unit::mm;
+      G4Trd* geo_TrdR = new G4Trd("geo_TrdR_name", TrdR_X1, TrdR_X2, TrdR_Y, TrdR_Y, TMath::Abs(TrdR_Z2 - TrdR_Z1) / 2.);
+      G4Transform3D transform_TrdR = G4Translate3D(0., 0., (TrdR_Z2 + TrdR_Z1) / 2.);
 
 
-      //-- HeavyMetalShield L side
-      GearDir cShieldR(content, "ShieldR");
-      if (! cShieldR) {
-        B2FATAL("Could not find definition for IR ShieldR");
-      }
-      double ShieldR_minZ(0), ShieldR_maxZ(0);
-      G4Polycone *geo_ShieldR = geometry::createPolyCone("geo_ShieldR_name", GearDir(content, "ShieldR/"), ShieldR_minZ, ShieldR_maxZ);
+      //----
+      // Shield L-side part 1
 
-      string strMat_ShieldR = content.getString("ShieldR/Material", "Air");
-      G4Material* mat_ShieldR = Materials::get(strMat_ShieldR);
-      if (!mat_ShieldR) B2FATAL("Material '" << strMat_ShieldR << "', required by IR ShieldR could not be found");
+      GearDir cShieldL1(content, "ShieldL1");
+      if (! cShieldL1) B2FATAL("Could not find definition for IR ShieldL1");
+      double ShieldL1_minZ(0), ShieldL1_maxZ(0);
+      G4Polycone *geo_ShieldL1x = geometry::createPolyCone("geo_ShieldL1x_name", cShieldL1, ShieldL1_minZ, ShieldL1_maxZ);
+      G4SubtractionSolid *geo_ShieldL1 = new G4SubtractionSolid("geo_ShieldL1_name", geo_ShieldL1x, geo_TrdL, transform_TrdL);
 
-      G4LogicalVolume* logi_ShieldR = new G4LogicalVolume(geo_ShieldR, mat_ShieldR, "logi_ShieldR_bane");
-      setColor(*logi_ShieldR, "#CC0000");
-      //setVisibility(*logi_ShieldR, false);
-      new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_ShieldR, "phys_ShieldR", &topVolume, false, 0);
+      string strMat_ShieldL1 = cShieldL1.getString("Material", "Air");
+      G4Material* mat_ShieldL1 = Materials::get(strMat_ShieldL1);
+      if (!mat_ShieldL1) B2FATAL("Material '" << strMat_ShieldL1 << "', required by IR ShieldL1 could not be found");
 
+      G4LogicalVolume* logi_ShieldL1 = new G4LogicalVolume(geo_ShieldL1, mat_ShieldL1, "logi_ShieldL1_name");
+      setColor(*logi_ShieldL1, "#CC0000");
+      //setVisibility(*logi_ShieldL1, false);
+      new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_ShieldL1, "phys_ShieldL1", &topVolume, false, 0);
+
+      //----
+      // Shield L-side part 2
+
+      GearDir cShieldL2(content, "ShieldL2");
+      if (! cShieldL2)  B2FATAL("Could not find definition for IR ShieldL2");
+      double ShieldL2_minZ(0), ShieldL2_maxZ(0);
+      G4Polycone *geo_ShieldL2x = geometry::createPolyCone("geo_ShieldL2x_name", cShieldL2, ShieldL2_minZ, ShieldL2_maxZ);
+      G4SubtractionSolid *geo_ShieldL2 = new G4SubtractionSolid("geo_ShieldL2_name", geo_ShieldL2x, geo_TrdL, transform_TrdL);
+
+      string strMat_ShieldL2 = cShieldL2.getString("Material", "Air");
+      G4Material* mat_ShieldL2 = Materials::get(strMat_ShieldL2);
+      if (!mat_ShieldL2) B2FATAL("Material '" << strMat_ShieldL2 << "', required by IR ShieldL2 could not be found");
+
+      G4LogicalVolume* logi_ShieldL2 = new G4LogicalVolume(geo_ShieldL2, mat_ShieldL2, "logi_ShieldL2_name");
+      setColor(*logi_ShieldL2, "#CC0000");
+      //setVisibility(*logi_ShieldL2, false);
+      new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_ShieldL2, "phys_ShieldL2", &topVolume, false, 0);
+
+
+      //-- Shield R side part 1
+      GearDir cShieldR1(content, "ShieldR1");
+      if (! cShieldR1) B2FATAL("Could not find definition for IR ShieldR1");
+      double ShieldR1_minZ(0), ShieldR1_maxZ(0);
+      G4Polycone *geo_ShieldR1x = geometry::createPolyCone("geo_ShieldR1x_name", cShieldR1, ShieldR1_minZ, ShieldR1_maxZ);
+      G4SubtractionSolid *geo_ShieldR1 = new G4SubtractionSolid("geo_ShieldR1_name", geo_ShieldR1x, geo_TrdR, transform_TrdR);
+
+      string strMat_ShieldR1 = cShieldR1.getString("Material", "Air");
+      G4Material* mat_ShieldR1 = Materials::get(strMat_ShieldR1);
+      if (!mat_ShieldR1) B2FATAL("Material '" << strMat_ShieldR1 << "', required by IR ShieldR1 could not be found");
+
+      G4LogicalVolume* logi_ShieldR1 = new G4LogicalVolume(geo_ShieldR1, mat_ShieldR1, "logi_ShieldR1_name");
+      setColor(*logi_ShieldR1, "#CC0000");
+      //setVisibility(*logi_ShieldR1, false);
+      new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_ShieldR1, "phys_ShieldR1", &topVolume, false, 0);
+
+
+      //-- Shield R side part 2
+      GearDir cShieldR2(content, "ShieldR2");
+      if (! cShieldR2) B2FATAL("Could not find definition for IR ShieldR2");
+      double ShieldR2_minZ(0), ShieldR2_maxZ(0);
+      G4Polycone *geo_ShieldR2x = geometry::createPolyCone("geo_ShieldR2x_name", cShieldR2, ShieldR2_minZ, ShieldR2_maxZ);
+      G4SubtractionSolid *geo_ShieldR2 = new G4SubtractionSolid("geo_ShieldR2_name", geo_ShieldR2x, geo_TrdR, transform_TrdR);
+
+      string strMat_ShieldR2 = cShieldR2.getString("Material", "Air");
+      G4Material* mat_ShieldR2 = Materials::get(strMat_ShieldR2);
+      if (!mat_ShieldR2) B2FATAL("Material '" << strMat_ShieldR2 << "', required by IR ShieldR2 could not be found");
+
+      G4LogicalVolume* logi_ShieldR2 = new G4LogicalVolume(geo_ShieldR2, mat_ShieldR2, "logi_ShieldR2_name");
+      setColor(*logi_ShieldR2, "#CC0000");
+      //setVisibility(*logi_ShieldR2, false);
+      new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_ShieldR2, "phys_ShieldR2", &topVolume, false, 0);
 
 
       /*

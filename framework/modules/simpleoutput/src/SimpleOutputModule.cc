@@ -266,7 +266,6 @@ void SimpleOutputModule::setupTFile()
   for (int ii = 0; ii < DataStore::c_NDurabilityTypes; ++ii) {
     if (m_treeNames[ii] != "NONE") {
       m_tree[ii] = new TTree(m_treeNames[ii].c_str(), m_treeNames[ii].c_str());
-      m_tree[ii]->SetAutoSave(1000000000);
     }
   }
 }

@@ -51,7 +51,7 @@ namespace Belle2 {
   {
     StoreArray<MCParticle> mcParticles;
     StoreArray<ECLSimHit> eclSimHits;
-//  StoreArray<ECLEBSimHit> eclEBArray;
+    StoreArray<ECLEBSimHit> eclEBSimHits;
     RelationArray eclSimHitRel(mcParticles, eclSimHits);
     registerMCParticleRelation(eclSimHitRel);
   }
@@ -111,7 +111,6 @@ namespace Belle2 {
     const G4ThreeVector posCell = v.GetTranslation();
     // Get layer ID
 
-
     Mapping(v.GetName());
 
     if (v.GetName().find("Crystal") != string::npos) {
@@ -122,8 +121,7 @@ namespace Belle2 {
     if (v.GetName().find("Diode") != string::npos) {
 
       int saveEBIndex = -999;
-
-      saveEBIndex = saveEBSimHit(m_cellID, m_thetaID, m_phiID  , trackID, pid, tof, edep, 1, momIn, posCell, posIn, posOut);
+      saveEBIndex = saveEBSimHit(m_cellID, m_thetaID, m_phiID  , trackID, pid, 1, edep, 1, momIn, posCell, posIn, posOut);
     }
 
 
@@ -158,12 +156,14 @@ namespace Belle2 {
     StoreArray<ECLEBSimHit> eclEBArray;
     m_EBhitNumber = eclEBArray->GetLast() + 1;
     new(eclEBArray->AddrAt(m_EBhitNumber)) ECLEBSimHit();
+
+
     eclEBArray[m_EBhitNumber]->setThetaId(thetaId);
     eclEBArray[m_EBhitNumber]->setPhiId(phiId);
     eclEBArray[m_EBhitNumber]->setCellId(cellId);
     eclEBArray[m_EBhitNumber]->setTrackId(trackID);
     eclEBArray[m_EBhitNumber]->setPDGCode(pid);
-    eclEBArray[m_EBhitNumber]->setFlightTime(tof / ns);
+//    eclEBArray[m_EBhitNumber]->setFlightTime(tof / ns);
     eclEBArray[m_EBhitNumber]->setEnergyDep(edep / GeV);
     eclEBArray[m_EBhitNumber]->setStepLength(stepLength / cm);
     TVector3 momentum(mom.getX() / GeV, mom.getY() / GeV, mom.getZ() / GeV);

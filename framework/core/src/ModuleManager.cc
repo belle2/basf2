@@ -158,7 +158,7 @@ void ModuleManager::fillModuleNameLibMap(boost::filesystem::directory_entry& map
   //Check if the associated shared library file exists
   string sharedLibPath = boost::filesystem::change_extension(mapPath, LIB_FILE_EXTENSION).string();
   if (!FileSystem::fileExists(sharedLibPath)) {
-    B2ERROR("The shared library file: " << sharedLibPath << " doesn't exist, but is required by " << mapPath.path().string())
+    B2WARNING("The shared library file: " << sharedLibPath << " doesn't exist, but is required by " << mapPath.path().string())
     return;
   }
 

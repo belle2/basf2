@@ -2,80 +2,108 @@
 # -*- coding: utf-8 -*-
 
 ########################################################
-# This steering file which shows all usage options for the
-# touschek SAD file reader module in the generators package.
-# The generated particles are taken from an input file and
-# fed through the Geant4 simulation and the output
-# is stored in a root file.
+# This steering file shows all options for the
+# simulation of the Touschek effect.
 #
-# The different options for the touschek SAD reader are
-# explained below.
-# Uncomment/comment different lines to get the wanted
-# settings
+# Please note:
+# The Touschek input file contains weighted particles, in
+# the following called 'SAD particles'.
+# Thus, one particle in the input file doesn't correspond
+# to one 'real' particle in an event. In order to simulate
+# the Touschek effect for your subdetector, you have
+# two possibilities:
+#
+# a) Create unweighted events by setting the 'ReadMode' to 1
+#    and 'ReadoutTime' to the correct readout time of your
+#    subdetector. Then run over ALL events in the input file.
+#    The result will be a ROOT file containing all particles
+#    which hit your subdetector during one readout frame/cycle
+#    of your subdetector.
+#
+# b) Create weighted events by setting the 'ReadMode' to 0.
+#    Run over ALL events in the input file. Each event will
+#    contain one MonteCarlo track, carrying the weight
+#    information. Using this information you can then scale
+#    the result to your subdetector readout time.
+#
+# Which one you choose depends on the background studies
+# you would like to perform. For example, if you are interested
+# in the details of your subdetector occupancy, it is recommended
+# to choose a). On the other hand, if you are interested in the
+# flux or rate of the background hitting your subdetector, you can
+# choose b).
 #
 # Example steering file - 2011 Belle II Collaboration
 ########################################################
 
 from basf2 import *
 
-# suppress messages and warnings during processing:
-set_log_level(LogLevel.FATAL)
+## Set the global log level
+set_log_level(LogLevel.ERROR)
 
-# to run the framework the used module needs to be registered
-touschekinput = register_module('TouschekSADInput')
-
-# setting the options for the TouschekSAD reader:
-touschekinput.param('FilenameLER',
-                    '/home/iwsatlas1/molland/Work/TouschekBackground/SAD/ler-data2/tree.root'
-                    )
-
-# number of particles to be read in 1 go
-# for the time being, it is recommended to
-# process the particles in the same event.
-# at some point this will be refined.
-touschekinput.param('MaxParticles', 200)
-# default is MaxParticles = 10.
-
-# This parameter indicates how far around the IR
-# the touschekparticles should maximally originate
-# Remember that this is in cm while a good distance is about 2-3m!
-touschekinput.param('RangeLER', 250)
-# default is RangeLER = 300
-
-# for a simple simulation job with output to a root file
-# these additional modules are needed
+## Register the event meta generator and set the number of events to a very
+## high number which exceeds the number of events in the input file.
 evtmetagen = register_module('EvtMetaGen')
-paramloader = register_module('ParamLoaderXML')
-geobuilder = register_module('GeoBuilder')
-g4sim = register_module('FullSim')
+evtmetagen.param({'EvtNumList': [10000000], 'RunList': [1]})
+
+## Register the TouschekSADInput module and specify the location of the Touschek
+## input file. The file can be downloaded from the TWiki.
+touschekinput = register_module('TouschekSADInput')
+touschekinput.param('FilenameLER', 'tree.root')
+
+# Set the ReadMode of the TouschekSAD input module
+# 0 = one SAD particle per event. This produces weighted events.
+# 1 = one real particle per event. This produces unweighted events.
+# 2 = all SAD particles in one event. Can be used for visualization.
+touschekinput.param('ReadMode', 1)
+
+# Set the readout time for your subdetector in [ns]. The value given
+# here corresponds to the readout time of the PXD.
+# This setting is only used if the 'ReadMode' is set to 1.
+touschekinput.param('ReadoutTime', 20000)
+
+# Set the range around the IP in which SAD particles are accepted
+# into the simulation. The value given below is highly recommended.
+touschekinput.param('RangeLER', 390)
+
+# If you would like to see some information about the created particles
+# set the logging output of the Touschek Input module to DEBUG.
+# touschekinput.set_log_level(LogLevel.DEBUG)
+
+## Register the standard chain of modules to the framework,
+## which are required for the simulation.
+gearbox = register_module('Gearbox')
+geometry = register_module('Geometry')
+bklmloader = register_module('BKLMParamLoader')
+fullsim = register_module('FullSim')
+
+## Add additional modules according to your own needs
+# pxddigi   = register_module('PXDDigitizer')
+# progress   = register_module('Progress')
+
+## Write the output to a file
 simpleoutput = register_module('SimpleOutput')
-
-# Setting the option for all non-touschek reader modules:
-evtruninfo = {'ExpList': [0], 'RunList': [0], 'EvtNumList': [1]}
-evtmetagen.param(evtruninfo)
-
-paramloader.param('InputFileXML', os.path.join(basf2datadir,
-                  'simulation/Belle2.xml'))
-
 simpleoutput.param('outputFileName', 'TouschekReaderOutput.root')
 
-# creating the path for the processing
+## Create the main path and add the required modules
 main = create_path()
 main.add_module(evtmetagen)
-main.add_module(paramloader)
-main.add_module(geobuilder)
-
-# Add Particle Gun module to path:
+main.add_module(gearbox)
 main.add_module(touschekinput)
-# and print parameters for hepevtreader
-# on startup of process
-print_params(touschekinput)
+main.add_module(geometry)
+main.add_module(bklmloader)
+main.add_module(fullsim)
 
-# Add all other modules for simple processing to path
-main.add_module(g4sim)
+## Add additional modules if you like
+# main.add_module(pxddigi)
+# ain.add_module(progress)
+
+## Add the output module
 main.add_module(simpleoutput)
 
-# Process 100 events
+## Start the event processing
 process(main)
-# if there are less events in the input file
-# the processing will be stopped at EOF.
+
+### Print some basic event statistics
+print 'Event Statistics:'
+print statistics

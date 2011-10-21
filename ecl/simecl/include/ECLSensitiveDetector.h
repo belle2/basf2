@@ -54,12 +54,20 @@ namespace Belle2 {
     );
 
     //! Save EBECLSimHit into datastore
-    int saveEBSimHit(
+    int saveSimHit(
       const G4int cellId,
+      const G4int thetaId,
+      const G4int phiId,
       const G4int trackID,
       const G4int pid,
+      const G4double tof,
       const G4double edep,
-      const G4ThreeVector & mom);
+      const G4double stepLength,
+      const G4ThreeVector & mom,
+      const G4ThreeVector & posW,
+      const G4ThreeVector & posIn,
+      const G4ThreeVector & posOut
+    );
 
 
     //! Get cell, theta, phi Id from PhysicalVolume
@@ -72,8 +80,8 @@ namespace Belle2 {
 
   private:
 
-    G4double m_thresholdEnergyDeposit;/*Energy Deposit  threshold  */
-    G4double m_thresholdKineticEnergy;/*Kinetic Energy  threshold  */
+    G4double m_thresholdEnergyDeposit;/**Energy Deposit  threshold  */
+    G4double m_thresholdKineticEnergy;/**Kinetic Energy  threshold  */
     int m_hitNumber; /**< The current number of created hits in an event. Used to fill the DataStore ECL array.*/
     int m_EBhitNumber; /**< The current number of created hits in an event. Used to fill the DataStore ECL EB array.*/
   };

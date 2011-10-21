@@ -122,7 +122,8 @@ namespace Belle2 {
     if (v.GetName().find("Diode") != string::npos) {
 
       int saveEBIndex = -999;
-      saveEBIndex = saveEBSimHit(m_cellID , trackID, pid, edep, momIn);
+
+      saveEBIndex = saveEBSimHit(m_cellID, m_thetaID, m_phiID  , trackID, pid, tof, edep, 1, momIn, posCell, posIn, posOut);
     }
 
 
@@ -138,24 +139,42 @@ namespace Belle2 {
 
     B2INFO("End Of Event");
   }
+
   int ECLSensitiveDetector::saveEBSimHit(
     const G4int cellId,
+    const G4int thetaId,
+    const G4int phiId,
     const G4int trackID,
     const G4int pid,
+    const G4double tof,
     const G4double edep,
-    const G4ThreeVector & mom)
+    const G4double stepLength,
+    const G4ThreeVector & mom,
+    const G4ThreeVector & posCell,
+    const G4ThreeVector & posIn,
+    const G4ThreeVector & posOut)
   {
+    //change Later
     StoreArray<ECLEBSimHit> eclEBArray;
     m_EBhitNumber = eclEBArray->GetLast() + 1;
     new(eclEBArray->AddrAt(m_EBhitNumber)) ECLEBSimHit();
+    eclEBArray[m_EBhitNumber]->setThetaId(thetaId);
+    eclEBArray[m_EBhitNumber]->setPhiId(phiId);
     eclEBArray[m_EBhitNumber]->setCellId(cellId);
     eclEBArray[m_EBhitNumber]->setTrackId(trackID);
     eclEBArray[m_EBhitNumber]->setPDGCode(pid);
+    eclEBArray[m_EBhitNumber]->setFlightTime(tof / ns);
     eclEBArray[m_EBhitNumber]->setEnergyDep(edep / GeV);
+    eclEBArray[m_EBhitNumber]->setStepLength(stepLength / cm);
     TVector3 momentum(mom.getX() / GeV, mom.getY() / GeV, mom.getZ() / GeV);
     eclEBArray[m_EBhitNumber]->setMomentum(momentum);
+    TVector3 posCellv(posCell.getX() / cm, posCell.getY() / cm, posCell.getZ() / cm);
+    eclEBArray[m_EBhitNumber]->setPosCell(posCellv);
+    TVector3 positionIn(posIn.getX() / cm, posIn.getY() / cm, posIn.getZ() / cm);
+    eclEBArray[m_EBhitNumber]->setPosIn(positionIn);
+    TVector3 positionOut(posOut.getX() / cm, posOut.getY() / cm, posOut.getZ() / cm);
+    eclEBArray[m_EBhitNumber]->setPosOut(positionOut);
     return (m_EBhitNumber);
-
   }
 
 

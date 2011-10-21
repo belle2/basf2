@@ -54,7 +54,7 @@ namespace Belle2 {
     );
 
     //! Save EBECLSimHit into datastore
-    int saveSimHit(
+    int saveEBSimHit(
       const G4int cellId,
       const G4int thetaId,
       const G4int phiId,

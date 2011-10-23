@@ -154,11 +154,12 @@
 	
   <Material name="HAPD_pcb">
     <state>Solid</state>
-    <density unit="g/cm3">8.96</density> 
+    <density unit="g/cm3">1.70</density>
     <Components>
-      <Element fraction="0.746268657">Cu</Element>
-      <Element fraction="0.194029851">Ni</Element>
-      <Element fraction="0.059701493">Ag</Element>
+       <Element fraction="0.2802">Si</Element>
+       <Element fraction="0.3874">O</Element>
+       <Element fraction="0.304">C</Element>
+       <Element fraction="0.0284">H</Element>
     </Components>
   </Material>
 

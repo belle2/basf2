@@ -27,6 +27,6 @@
   <Board desc="Parameters of HAPD pcb">	
    <material desc="Material of pcb">HAPD_pcb</material>
    <size desc="Size of pcb" unit="mm">75</size>
-   <thickness desc="Thickenss of pcb" unit="mm">3</thickness>
+   <thickness desc="Thickenss of pcb" unit="mm">2</thickness>
   </Board>
 </Module>

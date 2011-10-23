@@ -514,11 +514,12 @@ namespace Belle2 {
 
       G4Box *box1 = new G4Box("window", Msizex / 2., Msizey / 2., Winthickness / 2.);
       G4LogicalVolume* window = new G4LogicalVolume(box1, winMaterial, "window");
-      if (isBeamBkgStudy) window->SetSensitiveDetector(new BkgSensitiveDetector("TOP"));
+
 
 
       G4Box *box4 = new G4Box("bottom", Msizex / 2., Msizey / 2., Botthickness / 2.);
       G4LogicalVolume* bottom = new G4LogicalVolume(box4, botMaterial, "bottom");
+      if (isBeamBkgStudy) bottom->SetSensitiveDetector(new BkgSensitiveDetector("TOP"));
 
       G4Box *box2 = new G4Box("box2", Msizex / 2., Msizey / 2., MWsizez  / 2.);
       G4Box *box3 = new G4Box("box3", Asizex / 2., Asizey / 2., MWsizez  / 2. + 0.1);

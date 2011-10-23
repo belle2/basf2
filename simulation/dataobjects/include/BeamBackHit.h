@@ -35,7 +35,8 @@ namespace Belle2 {
         m_t(0),
         m_E(0),
         m_position(0., 0., 0.),
-        m_momentum(0., 0., 0.) {
+        m_momentum(0., 0., 0.),
+        m_energyDeposit(0) {
     }
 
     //! Full constructor.
@@ -54,7 +55,8 @@ namespace Belle2 {
       double t,
       double E,
       TVector3 position,
-      TVector3 momentum
+      TVector3 momentum,
+      double eDep
     )  {
       m_subDet = subDet;
       m_identifier = iden;
@@ -63,7 +65,7 @@ namespace Belle2 {
       m_E = E;
       m_position = position;
       m_momentum = momentum;
-
+      m_energyDeposit = eDep;
     }
 
     //! Get the subdetector name in which the hit occured
@@ -105,6 +107,9 @@ namespace Belle2 {
     //! Get momentum of the particle hit
     const TVector3 &getMomentum() const { return m_momentum; }
 
+    //! Get particle energy deposit in sensitive volume
+    double getEnergyDeposit() const { return m_energyDeposit; }
+
     //! Set the subdetector group in which the hit occured
     void setSubDet(int subDet) { m_subDet = subDet; }
 
@@ -121,11 +126,13 @@ namespace Belle2 {
     void setEnergy(double E)  {  m_E = E; }
 
     //! Set global position of the particle hit
-    void getPosition(TVector3 position)  {  m_position = position; }
+    void setPosition(TVector3 position)  {  m_position = position; }
 
     //! Set momentum of the particle hit
-    void getMomentum(TVector3 momentum)  {  m_momentum = momentum; }
+    void setMomentum(TVector3 momentum)  {  m_momentum = momentum; }
 
+    //! Set particle energy deposit in volume
+    void setEnergyDeposit(double eDep) { m_energyDeposit = eDep; }
 
   private:
     int m_subDet;               /**< The name of the subdetector */
@@ -135,6 +142,7 @@ namespace Belle2 {
     double m_E;                 /**< energy of particle */
     TVector3 m_position;        /**< global position of the hit */
     TVector3 m_momentum;        /**< momentum of the hit */
+    double m_energyDeposit;     /**< energy deposited in sensitive volume */
 
     ClassDef(BeamBackHit, 1);   /**< the class title */
 

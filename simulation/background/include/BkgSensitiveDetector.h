@@ -29,9 +29,9 @@ namespace Belle2 {
      * Constructor.
      * @param subDet name of the subdetector (i.e. "IR","PXD","SVD",...)
      * @param iden identifier of subdetector component (optional, 0 by default)
-     * @param hitType type of hits that are stored in DataStore (1 only neutrons, 2 only gammas, 0 both - default).
      */
-    BkgSensitiveDetector(const char* subDet, int iden = 0, int hitType = 0);
+
+    BkgSensitiveDetector(const char* subDet, int iden = 0);
 
     /**
      * Process each step and calculate variables defined in PXDSimHit.
@@ -44,7 +44,12 @@ namespace Belle2 {
   private:
     int m_subDet;           /* subdetector id number */
     int m_identifier;       /* identifier of subdetector component */
-    int m_hitType;        /* hit type of hits that are stored */
+    int m_trackID;          /* track id */
+    TVector3 m_startPos;    /* particle position at the entrance in volume */
+    TVector3 m_startMom;    /* particle momentum at the entrance in volume */
+    double m_startTime;     /* global time */
+    double m_startEnergy;   /* particle energy at the entrance in volume */
+    double m_energyDeposit; /* energy deposited in volume */
 
   }; // SensitiveDetector class
 } // end of namespace Belle2

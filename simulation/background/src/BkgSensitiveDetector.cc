@@ -15,6 +15,7 @@
 
 #include <G4Track.hh>
 #include <G4Step.hh>
+#include <G4TrackingManager.hh>
 
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
@@ -26,8 +27,8 @@ using namespace std;
 namespace Belle2 {
 
 
-  BkgSensitiveDetector::BkgSensitiveDetector(const char* subDett, int iden, int hitType):
-      Simulation::SensitiveDetectorBase("BKG", BkgSensitiveDetector::TOP)
+  BkgSensitiveDetector::BkgSensitiveDetector(const char* subDett, int iden):
+      Simulation::SensitiveDetectorBase("BKG", BkgSensitiveDetector::TOP), m_trackID(0), m_startPos(0., 0., 0.), m_startMom(0., 0., 0.), m_startTime(0), m_startEnergy(0), m_energyDeposit(0)
   {
     StoreArray<MCParticle> mcParticles;
     StoreArray<BeamBackHit> beamBackHits;
@@ -46,7 +47,6 @@ namespace Belle2 {
     else if (subDet == "BKLM")  m_subDet = 8;
     else                        m_subDet = 99;
 
-    m_hitType = hitType;
     m_identifier = iden;
 
   }
@@ -56,39 +56,43 @@ namespace Belle2 {
   {
 
     const G4StepPoint& preStep  = *aStep->GetPreStepPoint();
-
-    if (preStep.GetStepStatus() != fGeomBoundary) return false;
-
-    //Get particle ID
     G4Track& track  = *aStep->GetTrack();
-    const G4int pdgCode = track.GetDefinition()->GetPDGEncoding();
 
-    switch (m_hitType) {
-      case 0: if (pdgCode != 22 && abs(pdgCode) != 2112) return false; break;
-      case 1: if (abs(pdgCode) != 2112)                  return false; break;
-      case 2: if (pdgCode != 22)                         return false; break;
+
+    if (m_trackID != track.GetTrackID()) {
+      //TrackID changed, store track informations
+      m_trackID = track.GetTrackID();
+      //Get world position
+      const G4ThreeVector& worldPosition = preStep.GetPosition();
+      m_startPos.SetXYZ(worldPosition.x() / cm, worldPosition.y() / cm,
+                        worldPosition.z() / cm);
+      //Get momentum
+      const G4ThreeVector& momentum = preStep.GetMomentum() ;
+      m_startMom.SetXYZ(momentum.x() * Unit::MeV, momentum.y() * Unit::MeV ,
+                        momentum.z() * Unit::MeV);
+      //Get time
+      m_startTime = track.GetGlobalTime();
+      //Get energy
+      m_startEnergy =  track.GetKineticEnergy() * Unit::MeV;
+      //Reset energy deposit;
+      m_energyDeposit = 0;
     }
+    B2INFO("ene" << m_energyDeposit);
+    //Update energy deposit
+    m_energyDeposit += aStep->GetTotalEnergyDeposit() * Unit::MeV;
 
-    //Get time (check for proper global time)
-    const G4double globalTime = track.GetGlobalTime();
-    //Get step information
+    //Save Hit if track leaves volume or is killed
+    if (track.GetNextVolume() != track.GetVolume() || track.GetTrackStatus() >=
+        fStopAndKill) {
+      int pdgCode = track.GetDefinition()->GetPDGEncoding();
+      StoreArray<BeamBackHit> beamBackHits;
+      int nentr = beamBackHits->GetLast() + 1;
+      new(beamBackHits->AddrAt(nentr)) BeamBackHit(m_subDet, m_identifier, pdgCode,
+                                                   m_startTime, m_startEnergy, m_startPos, m_startMom, m_energyDeposit);
 
-    //Get world position
-    const G4ThreeVector& worldPosition = preStep.GetPosition();
-    //Get momentum
-    const G4ThreeVector& momentum = preStep.GetMomentum() ;
-    //Get energy
-    const G4double energy = track.GetKineticEnergy() * Unit::MeV;
-
-    //------------------------------------------------------------
-    //                Create BeamBackHit and save it to datastore
-    //------------------------------------------------------------
-
-    TVector3 pos(worldPosition.x() / cm, worldPosition.y() / cm, worldPosition.z() / cm);
-    TVector3 mom(momentum.x() * Unit::MeV, momentum.y() * Unit::MeV , momentum.z() * Unit::MeV);
-    StoreArray<BeamBackHit> beamBackHits;
-    int nentr = beamBackHits->GetLast() + 1;
-    new(beamBackHits->AddrAt(nentr)) BeamBackHit(m_subDet, m_identifier, pdgCode, globalTime, energy, pos, mom);
+      //Reset TrackID
+      m_trackID = 0;
+    }
 
     return true;
   }

@@ -13,6 +13,7 @@
 #define VXD_SENSITIVEDETECTOR_H
 
 #include <vxd/simulation/SensitiveDetectorBase.h>
+#include <simulation/dataobjects/BeamBackHit.h>
 
 #include <framework/logging/Logger.h>
 #include <framework/datastore/DataStore.h>
@@ -60,7 +61,7 @@ namespace Belle2 {
        * handle. Ownership of the SensorInfo goes to the sensitive detector
        * instance
        */
-      SensitiveDetector(VXD::SensorInfoBase* sensorInfo);
+      SensitiveDetector(VXD::SensorInfoBase* sensorInfo, bool seeNeutrons = false);
 
     protected:
       /** Process one step inside the sensitive volume.
@@ -108,6 +109,8 @@ namespace Belle2 {
        */
       void saveTrueHit();
 
+      /** See all particles (irrespective of charge, i.e., in particular, neutrons) */
+      bool m_seeNeutrons;
       /** List of all SimHit indices and their energy deposition belonging to the current volume traversal */
       std::vector<std::pair<unsigned int, float> > m_trueHitSteps;
       /** TrackID of the current volume traversal */
@@ -129,7 +132,8 @@ namespace Belle2 {
     };
 
     template <class SimHitClass, class TrueHitClass>
-    SensitiveDetector<SimHitClass, TrueHitClass>::SensitiveDetector(VXD::SensorInfoBase* sensorInfo): VXD::SensitiveDetectorBase(sensorInfo),
+    SensitiveDetector<SimHitClass, TrueHitClass>::SensitiveDetector(VXD::SensorInfoBase* sensorInfo, bool seeNeutrons):
+        VXD::SensitiveDetectorBase(sensorInfo), m_seeNeutrons(seeNeutrons),
         m_trueHitTrackID(0), m_trueHitCount(0), m_trueHitWeight(0.0), m_trueHitTime(0.0)
     {
       //Make sure all collections are registered
@@ -154,7 +158,8 @@ namespace Belle2 {
       //FIXME: Add option to do neutron study .. or provide alternative SensitiveDetector for neutron studies
       const double minCharge  = 0.01 * Unit::e;
       const double pdgCharge  = track.GetDefinition()->GetPDGCharge() * Unit::e;
-      if ((fabs(pdgCharge) < minCharge) && (pdgCode != 22)) return false;
+      bool isAllowedNeutral = (pdgCode == 22) || (m_seeNeutrons && (abs(pdgCode) == 2112));
+      if ((fabs(pdgCharge) < minCharge) && !isAllowedNeutral) return false;
       // Get track ID
       const int trackID       = track.GetTrackID();
       //Get deposited energy
@@ -270,7 +275,7 @@ namespace Belle2 {
       // - at least one created SimHit
       // - at least one crossing of the detector plane, local z=0
       //If any of this conditions is not met, just clear
-      if (!m_trueHitSteps.empty() && m_trueHitCount > 0) {
+      if ((!m_trueHitSteps.empty() || m_seeNeutrons) && m_trueHitCount > 0) {
         //Get SensorID and all collections
         VxdID sensorID = m_info->getID();
         StoreArray<MCParticle>   mcParticles;

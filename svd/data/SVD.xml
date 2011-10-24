@@ -3,6 +3,9 @@
   <Creator library="svd">SVDCreator</Creator>
   <Content>
     <!--TODO -> Add mechanical support and cooling -->
+    <!--Settings for background and exposure studies -->
+    <ActiveChips desc="Set to true to make chips on sensors sensitive">false</ActiveChips>
+    <SeeNeutrons desc="Set to true to make sensitive detectors see neutrons">false</SeeNeutrons>
     <xi:include href="SVD-Alignment.xml"/>
     <xi:include href="SVD-Envelope.xml"/>
     <xi:include href="SVD-Components.xml"/>

@@ -16,6 +16,7 @@
 #include <geometry/CreatorBase.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
+#include <simulation/background/BkgSensitiveDetector.h>
 
 #include <G4Transform3D.hh>
 
@@ -119,7 +120,12 @@ namespace Belle2 {
       std::map<int, GeoSVDSensor>::iterator m_sensorMapIterator;
       GeoSVDLadder m_ladder;
       std::vector<SensitiveDetector*> m_sensitive;
+      std::vector<BkgSensitiveDetector*> m_sensitiveBkg;
 
+      /** Make also chips sensitive. */
+      bool m_activeChips;
+      /** Make sensitive detectors also see neutrons. */
+      bool m_seeNeutrons;
 
     }; // class GeoSVDCreator
   }  // namespece svd

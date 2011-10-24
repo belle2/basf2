@@ -17,11 +17,11 @@
 #include <vxd/simulation/SensitiveDetector.h>
 
 namespace Belle2 {
-  /** Namespace to encapsulate code needed for simulation and reconstrucion of the PXD */
+  /** Namespace to encapsulate code needed for simulation and reconstrucion of the SVD */
   namespace svd {
-    /** The PXD Sensitive Detector class. */
+    /** The SVD Sensitive Detector class. */
     typedef VXD::SensitiveDetector<SVDSimHit, SVDTrueHit> SensitiveDetector;
-  } //end of namespace PXD
+  } //end of namespace svd
 } // end of namespace Belle2
 
 #endif /* SVDSENSITIVEDETECTOR_H */

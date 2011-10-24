@@ -11,6 +11,7 @@
 #include <svd/geometry/GeoSVDCreator.h>
 #include <svd/geometry/SensorInfo.h>
 #include <vxd/geometry/GeoCache.h>
+#include <svd/simulation/SensitiveDetector.h>
 
 #include <geometry/CreatorFactory.h>
 #include <geometry/Materials.h>
@@ -49,7 +50,7 @@ namespace Belle2 {
     //                 Implementation
     //-----------------------------------------------------------------
 
-    GeoSVDCreator::GeoSVDCreator()
+    GeoSVDCreator::GeoSVDCreator() : m_activeChips(0), m_seeNeutrons(0)
     {
     }
 
@@ -61,6 +62,10 @@ namespace Belle2 {
         delete sensitive;
       }
       m_sensitive.clear();
+      BOOST_FOREACH(BkgSensitiveDetector* sensitive, m_sensitiveBkg) {
+        delete sensitive;
+      }
+      m_sensitiveBkg.clear();
     }
 
     vector<GeoSVDPlacement> GeoSVDCreator::getSubComponents(GearDir path)
@@ -84,7 +89,7 @@ namespace Belle2 {
 
     GeoSVDComponent GeoSVDCreator::getComponent(const string &name)
     {
-      //Ceck if component already exists
+      //Check if component already exists
       map<string, GeoSVDComponent >::iterator cached = m_componentCache.find(name);
       if (cached != m_componentCache.end()) {
         return cached->second;
@@ -321,10 +326,9 @@ namespace Belle2 {
         //Create appropriate sensitive detector instance
         SensorInfo* sensorInfo = new SensorInfo(s.info);
         sensorInfo->setID(sensorID);
-        SensitiveDetector *sensitive = new SensitiveDetector(sensorInfo);
+        SensitiveDetector *sensitive = new SensitiveDetector(sensorInfo, m_seeNeutrons);
         m_sensitive.push_back(sensitive);
-
-        G4LogicalVolume* active = new G4LogicalVolume(activeShape,  Materials::get(s.material), name + ".Active",
+        G4LogicalVolume *active = new G4LogicalVolume(activeShape,  Materials::get(s.material), name + ".Active",
                                                       0, sensitive);
         active->SetUserLimits(new G4UserLimits(s.active.stepSize));
         setColor(*active, "#ddd");
@@ -368,6 +372,9 @@ namespace Belle2 {
 
     void GeoSVDCreator::create(const GearDir& content, G4LogicalVolume& topVolume, GeometryTypes type)
     {
+
+      m_activeChips = content.getBool("ActiveChips");
+      m_seeNeutrons = content.getBool("SeeNeutrons");
       m_alignment = GearDir(content, "Alignment/");
       m_components = GearDir(content, "Components/");
 

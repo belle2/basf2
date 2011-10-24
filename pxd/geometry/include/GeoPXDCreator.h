@@ -14,6 +14,7 @@
 
 #include <pxd/geometry/GeoPXDComponents.h>
 #include <pxd/simulation/SensitiveDetector.h>
+#include <simulation/background/BkgSensitiveDetector.h>
 #include <geometry/CreatorBase.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
@@ -123,6 +124,12 @@ namespace Belle2 {
       GeoPXDLadder m_ladder;
       /** List to all created sensitive detector instances */
       std::vector<SensitiveDetector*> m_sensitive;
+      std::vector<BkgSensitiveDetector*> m_sensitiveBkg;
+
+      /** Make also chips sensitive. */
+      bool m_activeChips;
+      /** Make sensitive detectors also see neutrons. */
+      bool m_seeNeutrons;
     };
 
   }

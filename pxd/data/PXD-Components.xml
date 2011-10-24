@@ -223,6 +223,7 @@
   <Component name="DCD">
     <Material>PXD-DCD</Material>
     <Color>#666633</Color>
+    <activeChipID>1</activeChipID>
     <width  unit="mm">3.410</width>
     <length unit="mm">5.310</length>
     <height unit="mm">0.400</height>
@@ -231,6 +232,7 @@
   <Component name="DHP">
     <Material>PXD-DHP</Material>
     <Color>#666666</Color>
+    <activeChipID>2</activeChipID>
     <width  unit="mm">3.410</width>
     <length unit="mm">5.130</length>
     <height unit="mm">0.400</height>
@@ -239,6 +241,7 @@
   <Component name="Switcher">
     <Material>PXD-Switcher</Material>
     <Color>#660000</Color>
+    <activeChipID>3</activeChipID>
     <width  unit="mm">2.035</width>
     <length unit="mm">3.600</length>
     <height unit="mm">0.400</height>

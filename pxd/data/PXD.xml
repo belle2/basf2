@@ -2,6 +2,9 @@
 <DetectorComponent name="PXD" xmlns:xi="http://www.w3.org/2001/XInclude">
   <Creator library="pxd">PXDCreator</Creator>
   <Content>
+    <!--Settings for background and exposure studies -->
+    <ActiveChips desc="Set to true to make chips on sensors sensitive">true</ActiveChips>
+    <SeeNeutrons desc="Set to true to make sensitive detectors see neutrons">true</SeeNeutrons>
     <xi:include href="PXD-Alignment.xml"/>
     <xi:include href="PXD-Envelope.xml"/>
     <xi:include href="PXD-Support.xml"/>

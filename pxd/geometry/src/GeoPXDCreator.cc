@@ -77,6 +77,10 @@ namespace Belle2 {
         delete sensitive;
       }
       m_sensitive.clear();
+      BOOST_FOREACH(BkgSensitiveDetector* sensitive, m_sensitiveBkg) {
+        delete sensitive;
+      }
+      m_sensitiveBkg.clear();
     }
 
     G4Transform3D GeoPXDCreator::getAlignment(const string& component)
@@ -157,7 +161,15 @@ namespace Belle2 {
                             c.height / 2.0
                            );
         }
-        c.volume = new G4LogicalVolume(solid, Materials::get(c.material), "PXD." + name);
+        BkgSensitiveDetector* sensitive(0);
+        if (m_activeChips && params.exists("activeChipID")) {
+          int chipID = params.getInt("activeChipID");
+          B2DEBUG(50, "Creating BkgSensitiveDetector for component " << name << " with chipID " <<  chipID);
+          sensitive = new BkgSensitiveDetector("PXD", chipID);
+          m_sensitiveBkg.push_back(sensitive);
+        }
+        c.volume = new G4LogicalVolume(solid, Materials::get(c.material), "PXD." + name, 0, sensitive);
+
 #ifdef MATERIAL_SCAN
         if (name == "DHP" || name == "DCD" || name == "Switcher") {
           G4Region* asicRegion = G4RegionStore::GetInstance()->FindOrCreateRegion("PXD-Asics");
@@ -339,7 +351,7 @@ namespace Belle2 {
         SensorInfo* sensorInfo = new SensorInfo(s.info);
         sensorInfo->setID(sensorID);
         if (s.flipV) sensorInfo->flipVSegmentation();
-        SensitiveDetector *sensitive = new SensitiveDetector(sensorInfo);
+        SensitiveDetector *sensitive = new SensitiveDetector(sensorInfo, m_seeNeutrons);
         m_sensitive.push_back(sensitive);
 
         G4LogicalVolume* active = new G4LogicalVolume(activeShape,  Materials::get(s.material),
@@ -537,6 +549,8 @@ namespace Belle2 {
 
     void GeoPXDCreator::create(const GearDir& content, G4LogicalVolume& topVolume, GeometryTypes type)
     {
+      m_activeChips = content.getBool("ActiveChips");
+      m_seeNeutrons = content.getBool("SeeNeutrons");
       m_alignment = GearDir(content, "Alignment/");
       m_components = GearDir(content, "Components/");
 

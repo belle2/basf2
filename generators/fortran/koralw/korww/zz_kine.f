@@ -2163,7 +2163,7 @@ c
      $      effbeam1(4),effbeam2(4),p1(4),p2(4),p3(4),p4(4)
       save   / momset /
 
-      INCLUDE 'zz_phsp.h'
+      INCLUDE 'zz_phsp.inc'
 
       real*4 rrx
       common /erery/ rrx(14)
@@ -2291,7 +2291,7 @@ c Last update:             by:
 c
       implicit DOUBLE PRECISION (a-h,o-z)
 
-      INCLUDE 'zz_phsp.h'
+      INCLUDE 'zz_phsp.inc'
 
       i6=nout
       write(i6,*) 'active entries from',mrchan,'to',nrchan,';'

@@ -8,7 +8,7 @@
 *     **************************************
       IMPLICIT DOUBLE PRECISION (a-h,o-z)
 
-      INCLUDE 'zz_phsp.h'
+      INCLUDE 'zz_phsp.inc'
 
       DIMENSION
      $      effbeam1(4),effbeam2(4),effp1(4),effp2(4),effp3(4),effp4(4)
@@ -33,7 +33,7 @@
 *     **************************************
       IMPLICIT DOUBLE PRECISION (a-h,o-z)
 
-      INCLUDE 'zz_phsp.h'
+      INCLUDE 'zz_phsp.inc'
 
       DIMENSION
      $      effbeam1(4),effbeam2(4),effp1(4),effp2(4),effp3(4),effp4(4)

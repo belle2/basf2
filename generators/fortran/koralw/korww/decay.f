@@ -10,8 +10,8 @@
       SAVE
 
 !!!!! M.Verzocchi bug fix !!!!!!!!!!!!!!!!!
-cccc Include KW.h to access m_Key4f......
-      INCLUDE   'KW.h'
+cccc Include KW.inc to access m_Key4f......
+      INCLUDE   'KW.inc'
 !!!!! M.Verzocchi bug fix end !!!!!!!!!!!!!!!!!
 
       DIMENSION ipdg(4)
@@ -53,7 +53,7 @@ c realised by swapping particles 2 and 4.
 ************************************************************
 c gets the decay channel probability factor
       IMPLICIT DOUBLE PRECISION (a-h,o-z)
-      INCLUDE 'decay.h'
+      INCLUDE 'decay.inc'
 
 ! we take value from nearest smaller energy. NO interpolation so far.
       estep=(emax-emin)/(max_e_bin-1)
@@ -70,7 +70,7 @@ c      write(6,*)'get_decay_prob=',gdp
 ************************************************************
 c gets the total (summed over channels) crude photonic distribution
       IMPLICIT DOUBLE PRECISION (a-h,o-z)
-      INCLUDE 'decay.h'
+      INCLUDE 'decay.inc'
 
 ! we take value from nearest smaller energy. NO interpolation so far.
       estep=(emax-emin)/(max_e_bin-1)
@@ -86,7 +86,7 @@ c gets the total (summed over channels) crude photonic distribution
 c chooses the decay channel
       IMPLICIT DOUBLE PRECISION (a-h,o-z)
 
-      INCLUDE 'decay.h'
+      INCLUDE 'decay.inc'
 !
 
 ! we take value from nearest smaller energy. NO interpolation so far.
@@ -270,7 +270,7 @@ c      endif
 ! from label=1  
 
       IMPLICIT DOUBLE PRECISION (a-h,o-z)
-      INCLUDE 'decay.h'
+      INCLUDE 'decay.inc'
       DIMENSION user_umask(*)
 
 
@@ -460,7 +460,7 @@ c      endif
 !    (keywgt =0 -pretabulated wtmax)
 
       IMPLICIT DOUBLE PRECISION (a-h,o-z)
-      INCLUDE 'decay.h'
+      INCLUDE 'decay.inc'
       DIMENSION user_umask(202)
 
 ! fill in smin and smax
@@ -526,7 +526,7 @@ c      write(6,*)'eloc,estep,emax,emin',eloc,estep,ema,emi,max_e_bin
       CHARACTER*250       path
       COMMON / datapath / path
 
-      INCLUDE 'decay.h'
+      INCLUDE 'decay.inc'
       PARAMETER (n_ene=100) ! number of actual energy bins in file
                             ! do not confuse with internal binning
       DIMENSION xsec_lcl(n_ene,max_label)
@@ -642,7 +642,7 @@ c     #                  xsec_lcl(iene,ilbl)+wtma_lcl(iene,ilbl) )
 ! label_dumm later on to be converted into real label (when relocated
 ! to karludw. for now label comes from get_label routine
       IMPLICIT DOUBLE PRECISION (a-h,o-z)
-      INCLUDE 'decay.h'
+      INCLUDE 'decay.inc'
 
       PARAMETER (label_max=202)
       DIMENSION num_phot(label_max)

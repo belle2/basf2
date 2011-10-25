@@ -78,7 +78,7 @@ namespace Belle2 {
   }
 
   template <typename T>
-  inline std::pair<T, T> vectorToPair(std::vector<T> &vec, const std::string &name)
+  inline std::pair<T, T> BHWideInputModule::vectorToPair(std::vector<T> &vec, const std::string &name)
   {
     std::pair<T, T> p;
     if (vec.size() != 2) {

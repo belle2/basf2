@@ -8,7 +8,7 @@
 *     **************************************
       IMPLICIT DOUBLE PRECISION (a-h,o-z)
 
-      INCLUDE 'mm_phsp.h'
+      INCLUDE 'mm_phsp.inc'
 
       DIMENSION
      $      effbeam1(4),effbeam2(4),effp1(4),effp2(4),effp3(4),effp4(4)
@@ -66,7 +66,7 @@ c masses not equal     @       (if_w.EQ.1 .AND. (iwm.EQ.7 .OR. iwp.EQ.7)) ) THEN
 *     **************************************
       IMPLICIT DOUBLE PRECISION (a-h,o-z)
 
-      INCLUDE 'mm_phsp.h'
+      INCLUDE 'mm_phsp.inc'
 
       DIMENSION
      $      effbeam1(4),effbeam2(4),effp1(4),effp2(4),effp3(4),effp4(4)
@@ -183,7 +183,7 @@ c masses not equal     @    (if_w.EQ.1 .AND. (iwm.EQ.7 .OR. iwp.EQ.7)) ) THEN
       IMPLICIT DOUBLE PRECISION (a-h,o-z)
       SAVE
 
-      INCLUDE 'mm_phsp.h'
+      INCLUDE 'mm_phsp.inc'
 
       DIMENSION densit(mm_nrchan),top(mm_nrchan),numb(mm_nrchan)
       DIMENSION densit_jac(mm_nrchan),top_jac(mm_nrchan)
@@ -292,7 +292,7 @@ c Last update:             by:
 c
       implicit DOUBLE PRECISION (a-h,o-z)
 
-      INCLUDE 'mm_phsp.h'
+      INCLUDE 'mm_phsp.inc'
 
       COMMON / momset / qeff1(4),qeff2(4),sphum(4),sphot(100,4),nphot
       COMMON / cms_eff_momdec /
@@ -440,7 +440,7 @@ c Last update:             by:
 c
       implicit DOUBLE PRECISION (a-h,o-z)
 
-      INCLUDE 'mm_phsp.h'
+      INCLUDE 'mm_phsp.inc'
 
       COMMON / momdec / q1(4),q2(4),p1(4),p2(4),p3(4),p4(4)
       COMMON / momset / qeff1(4),qeff2(4),sphum(4),sphot(100,4),nphot

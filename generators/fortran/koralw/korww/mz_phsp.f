@@ -9,8 +9,8 @@
       IMPLICIT DOUBLE PRECISION (a-h,o-z)
 
 ! two commons, no way ....
-      INCLUDE 'mm_phsp.h'
-      INCLUDE 'zz_phsp.h'
+      INCLUDE 'mm_phsp.inc'
+      INCLUDE 'zz_phsp.inc'
 
       DIMENSION drvec(100)
       DIMENSION
@@ -57,8 +57,8 @@
       IMPLICIT DOUBLE PRECISION (a-h,o-z)
 
 ! two commons, no way ....
-      INCLUDE 'mm_phsp.h'
-      INCLUDE 'zz_phsp.h'
+      INCLUDE 'mm_phsp.inc'
+      INCLUDE 'zz_phsp.inc'
 
       DIMENSION
      $      effbeam1(4),effbeam2(4),effp1(4),effp2(4),effp3(4),effp4(4)

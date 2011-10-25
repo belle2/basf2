@@ -6,7 +6,7 @@
 ! ###########################################
       implicit DOUBLE PRECISION (a-h,o-z)
 
-      INCLUDE 'zz_phsp.h'
+      INCLUDE 'zz_phsp.inc'
 
       COMMON / DECAYS / IFLAV(4), AMDEC(4) 
       COMMON / INOUT  / NINP,NOUT 

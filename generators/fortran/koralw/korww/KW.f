@@ -53,7 +53,7 @@
 *////////////////////////////////////////////////////////////////////////////////
       IMPLICIT DOUBLE PRECISION  (A-H,O-Z)
       SAVE
-      INCLUDE   'KW.h'
+      INCLUDE   'KW.inc'
       REAL*8  xpar_input( 10000) ! in main program
 *////////////////////////////////////////////////////////////////////////////////
 *//    Common blocks sorted in alphabetic order!!!!                            //
@@ -872,7 +872,7 @@ c?????????????????????????????????????????????
 *//////////////////////////////////////////////////////////////////
       IMPLICIT DOUBLE PRECISION (a-h,o-z)
       SAVE
-      INCLUDE   'KW.h'
+      INCLUDE   'KW.inc'
 *//////////////////////////////////////////////////////////////////
 *//    Common blocks sorted in alphabetic order!!!!              //
 *//////////////////////////////////////////////////////////////////
@@ -1142,7 +1142,7 @@ c      ENDIF
 *//////////////////////////////////////////////////////////////////
       IMPLICIT DOUBLE PRECISION (a-h,o-z)
       SAVE
-      INCLUDE   'KW.h'
+      INCLUDE   'KW.inc'
 
       COMMON / bxfmts / bxope,bxclo,bxtxt,bxl1i,bxl1f,bxl2f,bxl1g,bxl2g
       CHARACTER*80      bxope,bxclo,bxtxt,bxl1i,bxl1f,bxl2f,bxl1g,bxl2g
@@ -1885,7 +1885,7 @@ c      ENDIF
 *//   Main weights  WtMain                                       //
 *//////////////////////////////////////////////////////////////////
       IMPLICIT NONE
-      INCLUDE 'KW.h'
+      INCLUDE 'KW.inc'
       REAL*8      WtMain
 *
       COMMON / wgtall / m_WtCrud,m_WtMod,m_WtSet(100)
@@ -1901,7 +1901,7 @@ c      ENDIF
 *//   Weights ALL                                                 //
 *///////////////////////////////////////////////////////////////////
       IMPLICIT NONE
-      INCLUDE 'KW.h'
+      INCLUDE 'KW.inc'
 *
       COMMON / wgtall / m_WtCrud,m_WtMod,m_WtSet(100)
       REAL*8            m_WtCrud,m_WtMod,m_WtSet
@@ -1921,7 +1921,7 @@ c      ENDIF
 *//   Final parton momenta                                           //
 *//////////////////////////////////////////////////////////////////////
       IMPLICIT NONE
-      INCLUDE 'KW.h'
+      INCLUDE 'KW.inc'
       REAL*8          p1(4), p2(4), p3(4), p4(4)   
 *
       COMMON /momdec/ m_q1(4),m_q2(4),m_p1(4),m_p2(4),m_p3(4),m_p4(4)
@@ -1941,7 +1941,7 @@ c      ENDIF
 *//   Four-momenta of beams                                           //
 *///////////////////////////////////////////////////////////////////////
       IMPLICIT NONE
-      INCLUDE 'KW.h'
+      INCLUDE 'KW.inc'
       REAL*8  q1(4),q2(4)
 *
       COMMON /momdec/ m_q1(4),m_q2(4),m_p1(4),m_p2(4),m_p3(4),m_p4(4)
@@ -1961,7 +1961,7 @@ c      ENDIF
 *//                                                                   //
 *///////////////////////////////////////////////////////////////////////
       IMPLICIT NONE
-      INCLUDE 'KW.h'
+      INCLUDE 'KW.inc'
 *
       INTEGER  NphAll
       REAL*8   PhoAll(100,4)
@@ -1987,7 +1987,7 @@ c      ENDIF
 *//   CALL KW_Finalize before !!!                                       //
 */////////////////////////////////////////////////////////////////////////
       IMPLICIT NONE
-      INCLUDE 'KW.h'
+      INCLUDE 'KW.inc'
       INTEGER       NevMC
 *--------------------------------------------------------------
       NevMC = M_NevTru
@@ -2002,7 +2002,7 @@ c      ENDIF
 *//   For KeyWgt = 1    XSecNR =    XCruMC                             //
 *////////////////////////////////////////////////////////////////////////
       IMPLICIT NONE
-      INCLUDE 'KW.h'
+      INCLUDE 'KW.inc'
       REAL*8        XSecNR,XErrNR
 *--------------------------------------------------------------
       XSecNR = m_XSecNR
@@ -2016,7 +2016,7 @@ c      ENDIF
 *//   CALL KW_Finalize before !!!                                      //
 *////////////////////////////////////////////////////////////////////////
       IMPLICIT NONE
-      INCLUDE 'KW.h'
+      INCLUDE 'KW.inc'
       REAL*8        XSecMC,XErrMC
 *--------------------------------------------------------------
       XSecMC = m_XSecMC

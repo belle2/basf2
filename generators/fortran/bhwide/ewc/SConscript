@@ -1,0 +1,8 @@
+import os
+
+Import('env')
+
+#Don't create a sublib for this folder
+env['SUBLIB'] = False
+
+Return('env')

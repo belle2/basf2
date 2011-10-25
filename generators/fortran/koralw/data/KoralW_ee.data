@@ -1,0 +1,50 @@
+
+*///////////////////////////////////////////////////////////////////////////////
+*//        The input data for 2 photon QED studies at Belle II                //
+*//                                                                           //
+*//The complete set of input data can be found in the file KoralW_Default.data//
+*//The data below overwrites the default values                               //
+*///////////////////////////////////////////////////////////////////////////////
+BeginX
+*----|||||||||||||||----------------------------------------------------------
+    1        10.58d0 CmsEne  =CMS total energy [GeV]
+    4      91.1888d0 amaZ    =Z mass  [GeV] (PDG)
+    5       2.4974d0 gammZ   =Z width [GeV] (PDG)
+    6       80.230d0 amaW    =W mass  [GeV]
+   10         1.33d8 wtmax  =xpar(10) ! max weight for reject.
+   14      0.00001d0 arbitr =xpar(14) ! arbitr  min. vis p_t**2 (GeV**2)
+   15     0.000001d0 arbitr1=xpar(15) ! inv_mass**2 cut for e+e-xx (GeV**2)
+   16           1d-6 themin =xpar(16) ! themin  min theta (rad) with beam (0=no cut)
+   17           25d0 arbitr2=xpar(17) ! arbitr2 max p_t**2 of photons in e+e-xx (GeV**2)
+ 1011            0d0 KeyISR  =0,1  initial state radiation off/on (default=1)
+ 1013            1d0 KeyNLL  =0 sets next-to leading alpha/pi terms to zero
+*                            =1 alpha/pi in yfs formfactor is kept (default)
+ 1014            1d0 KeyCul  =0,1 Coulomb correction, off/on (default=1)
+ 1021            2d0 KeyBra  =0 Born branching ratios, no mixing
+*                            =1 branching ratios with mixing and naive QCD 
+*                            =2 IBA from the CKM matrix (PDG '96); see filexp.f (default)
+ 1031            0d0 KeyWgt  =0, wtmod=1 useful for apparatus Monte Carlo (default)
+*                            =1, wtmod varying, option faster and safer
+ 1032            1d0 KeyRnd =xpar(1032)
+*                    =1 for RANMAR random number generator (default)
+*                    =2 for ECURAN random number generator
+*                    =3 for CARRAN random number generator
+ 1033            2d0 KeySmp  =0 presampler set as in KORALW v. 1.02-1.2
+*                            =1 first presampler  for all 4fermion final states 
+*                            =2 second presampler for all 4fermion final states (default)
+ 1041            0d0 KeyMix, =0  EW renormalisation scheme 'LEP2 Workshop' (default)
+*                            =1 'G_mu' scheme
+ 1042            1d0 Key4f   =0, INTERNAL matrix element
+*                            =1, EXTERNAL matrix element (default)
+ 1044            1d0 KeyZon  =1/0, ZZ type final states ON/OFF (default=1)
+ 1045            1d0 KeyWon  =1/0, WW type final states ON/OFF (default=1)
+*    If you do NOT want to hadronize nor use Tauola/Photos then set the following:
+ 1071           -1d0 JAK1     Decay mode tau+ (default=0)
+ 1072           -1d0 JAK2     Decay mode tau- (default=0)
+* 1073            0d0 ITDKRC   Bremsstrahlung in Tauola (default=1)
+* 1074            0d0 IFPHOT   PHOTOS switch    (default=1)
+* 1075            0d0 IFHADM   Hadronisation W- (default=1)
+* 1076            0d0 IFHADP   Hadronisation W+ (default=1)
+* 1083            0d0 i_prnt =xpar(1083)   printout on wt over wtmax
+EndX
+******************************************************************************

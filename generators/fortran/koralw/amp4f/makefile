@@ -1,0 +1,54 @@
+#
+# Makefile for library 'amp4f' for  HP 9000
+# 
+#
+SHELL         = csh
+AR		= ar
+# for SUN.OS
+#RANLIB		= /usr/bin/ranlib
+# for HP
+RANLIB		= /bin/ar ts
+FC            = gfortran
+#FC            = /usr/lib/hf_FORT/f77
+FFLAGS        = -fno-automatic 
+#FFLAGS        = -W0,'LANGLVL(DARG(L))'
+#FFLAGS        = -W0,'LANGLVL(DARG(L)),testmode(a,s(2))'
+#
+LIBAMP4F      = ../grclib/libamp4f.a
+#
+SRCS	= am_1.f am_2.f am_3.f am_4.f am_5.f am_6.f am_7.f am_8.f \
+am_9.f am_10.f am_11.f am_12.f am_13.f am_14.f am_15.f am_16.f \
+am_17.f am_18.f am_19.f am_20.f am_21.f am_22.f am_23.f am_24.f \
+am_25.f am_26.f am_27.f am_28.f am_29.f am_30.f am_31.f am_32.f \
+am_33.f am_34.f am_35.f am_36.f am_37.f am_38.f am_39.f am_40.f \
+am_41.f am_42.f am_43.f am_44.f am_45.f am_46.f am_47.f am_48.f \
+am_49.f am_50.f am_51.f am_52.f am_53.f am_54.f am_55.f am_56.f \
+am_57.f am_58.f am_59.f am_60.f am_61.f am_62.f am_63.f am_64.f \
+am_65.f am_66.f am_67.f am_68.f am_69.f am_70.f am_71.f am_72.f \
+am_73.f am_74.f am_75.f am_76.f \
+fncall.f amptal.f procdb.f func.f ampord.f ampsum.f \
+kinmdb.f
+
+OBJS	= am_1.o am_2.o am_3.o am_4.o am_5.o am_6.o am_7.o am_8.o \
+am_9.o am_10.o am_11.o am_12.o am_13.o am_14.o am_15.o am_16.o \
+am_17.o am_18.o am_19.o am_20.o am_21.o am_22.o am_23.o am_24.o \
+am_25.o am_26.o am_27.o am_28.o am_29.o am_30.o am_31.o am_32.o \
+am_33.o am_34.o am_35.o am_36.o am_37.o am_38.o am_39.o am_40.o \
+am_41.o am_42.o am_43.o am_44.o am_45.o am_46.o am_47.o am_48.o \
+am_49.o am_50.o am_51.o am_52.o am_53.o am_54.o am_55.o am_56.o \
+am_57.o am_58.o am_59.o am_60.o am_61.o am_62.o am_63.o am_64.o \
+am_65.o am_66.o am_67.o am_68.o am_69.o am_70.o am_71.o am_72.o \
+am_73.o am_74.o am_75.o am_76.o \
+fncall.o amptal.o procdb.o func.o ampord.o ampsum.o \
+kinmdb.o
+
+all:	${LIBAMP4F}
+
+${LIBAMP4F}:	${OBJS}
+	${AR} rc ${LIBAMP4F} $?
+
+tags:${SRCS}
+	${FTAGS} ${SRCS}
+
+clean:
+		/bin/rm -f ${OBJS} core

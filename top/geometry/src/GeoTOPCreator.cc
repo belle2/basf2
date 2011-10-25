@@ -191,7 +191,7 @@ namespace Belle2 {
       G4Box* bar = new G4Box("bar", length / 2.0, Qthickness / 2.0 , Qwidth / 2.0);
 
       G4LogicalVolume* qbar = new G4LogicalVolume(bar, quartzMaterial, "cuttest");
-      if (!isBeamBkgStudy) qbar->SetSensitiveDetector(m_sensitiveQuartz);
+      qbar->SetSensitiveDetector(m_sensitiveQuartz);
 
       /*!  Build shapes of mirror  */
 
@@ -239,8 +239,8 @@ namespace Belle2 {
 
       G4LogicalVolume* gbox2 = new G4LogicalVolume(box2, glueMaterial, "gbox2");
       G4LogicalVolume* gbox3 = new G4LogicalVolume(box3, glueMaterial, "gbox3");
-      if (!isBeamBkgStudy) gbox2->SetSensitiveDetector(m_sensitiveQuartz);
-      if (!isBeamBkgStudy) gbox2->SetSensitiveDetector(m_sensitiveQuartz);
+      gbox2->SetSensitiveDetector(m_sensitiveQuartz);
+      gbox2->SetSensitiveDetector(m_sensitiveQuartz);
 
 
       /*!  Place glue joints */
@@ -276,7 +276,7 @@ namespace Belle2 {
 
       G4Box* box1 = new G4Box("glue_1", Gwidth3 / 2.0, Qthickness / 2.0, Wwidth / 2.0);
       G4LogicalVolume* gbox1 = new G4LogicalVolume(box1, glueMaterial, "gbox1");
-      if (!isBeamBkgStudy) gbox1->SetSensitiveDetector(m_sensitiveQuartz);
+      gbox1->SetSensitiveDetector(m_sensitiveQuartz);
 
       G4Transform3D tglue1 = G4Translate3D(-length / 2.0 - Gwidth1 / 2.0 , 0, 0);
 
@@ -528,7 +528,7 @@ namespace Belle2 {
 
       G4Box *sensBox = new G4Box("sensbox", Asizex / 2., Asizey / 2., Asizez  / 2.);
       G4LogicalVolume *lmoduleSens = new G4LogicalVolume(sensBox, sensMaterial, "moduleSensitive");
-      if (!isBeamBkgStudy) lmoduleSens->SetSensitiveDetector(m_sensitive);
+      lmoduleSens->SetSensitiveDetector(m_sensitive);
 
       /*! Place PMT segments */
 

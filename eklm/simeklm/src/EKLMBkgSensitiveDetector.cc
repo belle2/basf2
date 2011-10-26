@@ -68,11 +68,11 @@ namespace Belle2 {
     G4Track& track  = *aStep->GetTrack();
     const G4int pdgCode = track.GetDefinition()->GetPDGEncoding();
 
-    switch (m_hitType) {
-      case 0: if (pdgCode != 22 && abs(pdgCode) != 2112) return false; break;
-      case 1: if (abs(pdgCode) != 2112)                  return false; break;
-      case 2: if (pdgCode != 22)                         return false; break;
-    }
+//     switch (m_hitType) {
+//       case 0: if (pdgCode != 22 && abs(pdgCode) != 2112) return false; break;
+//       case 1: if (abs(pdgCode) != 2112)                  return false; break;
+//       case 2: if (pdgCode != 22)                         return false; break;
+//     }
 
     //Get time (check for proper global time)
     const G4double globalTime = track.GetGlobalTime();

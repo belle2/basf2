@@ -23,6 +23,7 @@
 #include <framework/dataobjects/EventMetaData.h>
 
 #include "TDatabasePDG.h"
+#include "TRandom.h"
 
 
 using namespace std;
@@ -33,6 +34,7 @@ using namespace boost::python;
 
 Framework::Framework()
 {
+  gRandom->SetSeed(0);
   m_pathManager = new PathManager();
   m_eventProcessor = new EventProcessor(*m_pathManager);
   m_peventProcessor = new pEventProcessor(*m_pathManager);

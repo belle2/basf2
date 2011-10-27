@@ -31,10 +31,16 @@ namespace Belle2 {
       static SimulationPar* instance();
 
       //! Get simulation parameters from Gearbox
-      void read(const GearDir&, unsigned int, bool);
+      void read();
 
       //! Get the flag for whether parameters have been loaded by BKLMParamLoader
-      bool isValid(void) const { return m_IsValid; }
+      bool isValid(void) { if (!m_IsValid) read(); return m_IsValid; }
+
+      //! Set the random number seed for the RPC strip-multiplicity algorithm
+      void setRandomSeed(unsigned int randomSeed) { isValid(); m_RandomSeed = randomSeed; }
+
+      //! Set the flag that controls whether to do the neutron-background study
+      void setDoBackgroundStudy(double doBackgroundStudy) { isValid(); m_DoBackgroundStudy = doBackgroundStudy; }
 
       //! Get the maximum global time for a recorded sim hit
       double getHitTimeMax(void) const { return m_HitTimeMax; }

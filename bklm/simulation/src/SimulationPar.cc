@@ -37,12 +37,14 @@ namespace Belle2 {
     {
     }
 
-    void SimulationPar::read(const GearDir& content, unsigned int randomSeed, bool doBackgroundStudy)
+    void SimulationPar::read()
     {
+      GearDir content(Gearbox::getInstance().getDetectorComponent("BKLM"), "SimulationParameters");
+      if (!content) return;
 
-      m_RandomSeed = randomSeed;
-      m_DoBackgroundStudy = doBackgroundStudy;
       m_HitTimeMax = content.getWithUnit("/HitTimeMax");
+      m_RandomSeed = content.getInt("RandomSeed");
+      m_DoBackgroundStudy = content.getBool("DoBackgroundStudy");
 
       char name[40];
       int div = 0;

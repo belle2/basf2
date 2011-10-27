@@ -10,10 +10,10 @@
 
 #include <bklm/modules/bklmParamLoader/BKLMParamLoaderModule.h>
 
-#include <framework/core/Environment.h>
-#include <framework/core/utilities.h>
-#include <framework/gearbox/Gearbox.h>
-#include <framework/gearbox/GearDir.h>
+//#include <framework/core/Environment.h>
+//#include <framework/core/utilities.h>
+//#include <framework/gearbox/Gearbox.h>
+//#include <framework/gearbox/GearDir.h>
 
 #include <bklm/simulation/SimulationPar.h>
 
@@ -39,11 +39,6 @@ BKLMParamLoaderModule::BKLMParamLoaderModule() : Module()
            "Turns on/off parameter validation",
            false);
 
-  addParam("InputFileXML",
-           m_Pathname,
-           "Pathname of the XML input file",
-           Environment::Instance().getDataSearchPath() + "/bklm/BKLMSimulationPar.xml");
-
   addParam("RandomSeed",
            m_RandomSeed,
            "Random number seed for RPC strip-multiplicity algorithm",
@@ -65,18 +60,6 @@ void BKLMParamLoaderModule::initialize()
 
   bklm::SimulationPar* simPar = bklm::SimulationPar::instance();
 
-  if (!FileSystem::fileExists(m_Pathname)) {
-    B2ERROR("BKLMParamLoader: file " << m_Pathname << " does not exist.")
-  }
-  Gearbox& gearbox = Gearbox::getInstance();
-  vector<string> backends;
-  string local_dir(getenv("BELLE2_LOCAL_DIR"));
-  backends.push_back("file:" + local_dir + "/data");
-  gearbox.setBackends(backends);
-  gearbox.open("bklm/BKLMSimulationPar.xml");
-  // m_Pathname is ignored for now    :/
-  GearDir content = GearDir("/ParamSet[@type=\"BKLM\"]/Content");
-  simPar->read(content, (unsigned int) m_RandomSeed, m_DoBackgroundStudy);
-  gearbox.close();
-
+  simPar->setRandomSeed((unsigned int) m_RandomSeed);
+  simPar->setDoBackgroundStudy(m_DoBackgroundStudy);
 }

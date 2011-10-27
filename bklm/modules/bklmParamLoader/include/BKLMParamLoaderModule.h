@@ -44,9 +44,6 @@ namespace Belle2 {
 
   private:
 
-    //! The pathname of the BKLM simulation-control XML file
-    std::string m_Pathname;
-
     //! Flag to check (or not) the validity of each XML parameter
     bool m_ParamCheck;
 

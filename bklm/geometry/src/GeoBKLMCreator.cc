@@ -11,6 +11,7 @@
 #include <bklm/geometry/GeoBKLMCreator.h>
 #include <bklm/geometry/GeometryPar.h>
 #include <bklm/simulation/SensitiveDetector.h>
+#include <simulation/background/BkgSensitiveDetector.h>
 
 #include <geometry/Materials.h>
 #include <geometry/CreatorFactory.h>
@@ -53,11 +54,13 @@ namespace Belle2 {
     GeoBKLMCreator::GeoBKLMCreator()
     {
       m_sensitive = new SensitiveDetector();
+      m_bkgsensitive = NULL;
     }
 
     GeoBKLMCreator::~GeoBKLMCreator()
     {
       delete m_sensitive;
+      if (m_bkgsensitive != NULL) delete m_bkgsensitive;
     }
 
     //-----------------------------------------------------------------
@@ -66,6 +69,8 @@ namespace Belle2 {
 
     void GeoBKLMCreator::create(const GearDir& content, G4LogicalVolume& motherLogical, GeometryTypes type)
     {
+
+      if (content.getInt("BeamBackgroundStudy") != 0) { m_bkgsensitive = new BkgSensitiveDetector("BKLM"); }
 
       m_GeoPar = GeometryPar::instance(content);
       m_SectorDphi = 2.0 * M_PI / m_GeoPar->getNSector();
@@ -695,14 +700,24 @@ namespace Belle2 {
                   gasHalfSize.x(), gasHalfSize.y(), gasHalfSize.z()
                  );
       sprintf(name, "BKLM.Layer%02dGasLogical", layer);
-      G4LogicalVolume* gasLogical =
-        new G4LogicalVolume(gasBox,
-                            Materials::get("RPCGas"),
-                            name,
-                            0, // use global field manager
-                            m_sensitive, // this is the only sensitive volume in BKLM
-                            0 // no user limits
-                           );
+      G4LogicalVolume* gasLogical;
+      if (m_bkgsensitive != NULL) {
+        gasLogical = new G4LogicalVolume(gasBox,
+                                         Materials::get("RPCGas"),
+                                         name,
+                                         0, // use global field manager
+                                         m_bkgsensitive, // this is the only sensitive volume in BKLM
+                                         0 // no user limits
+                                        );
+      } else {
+        gasLogical = new G4LogicalVolume(gasBox,
+                                         Materials::get("RPCGas"),
+                                         name,
+                                         0, // use global field manager
+                                         m_sensitive, // this is the only sensitive volume in BKLM
+                                         0 // no user limits
+                                        );
+      }
       gasLogical->SetVisAttributes(G4VisAttributes(true, G4Colour(1.0, 0.5, 0.0)));
       sprintf(name, "BKLM.Gas_%d_%d_%02d_0", fb, sector, layer);
       new G4PVPlacement(G4TranslateX3D(-dxGas),

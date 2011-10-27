@@ -53,16 +53,14 @@ hepevtreader.param('wrongSignPz', True)
 
 # for a simple simulation job with output to a root file
 # these additional modules are needed
-paramloader = register_module('ParamLoaderXML')
-geobuilder = register_module('GeoBuilder')
+paramloader = register_module('Gearbox')
+geobuilder = register_module('Geometry')
 g4sim = register_module('FullSim')
 simpleoutput = register_module('SimpleOutput')
+progress = register_module('Progress')
 
-# Setting the option for all non-hepevt reader modules:
-paramloader.param('InputFileXML', os.path.join(basf2datadir,
-                  'simulation/Belle2.xml'))
-
-simpleoutput.param('outputFileName', 'HepEvtReaderOutput.root')
+progress.set_log_level(LogLevel.INFO)
+simpleoutput.param('outputFileName', 'HepEvtReaderMOutput.root')
 
 # creating the path for the processing
 main = create_path()
@@ -74,13 +72,14 @@ main.add_module(hepevtreader)
 print_params(hepevtreader)
 
 # Add all other modules for simple processing to path
+main.add_module(progress)
 main.add_module(paramloader)
 main.add_module(geobuilder)
 main.add_module(g4sim)
 main.add_module(simpleoutput)
 
-# Process 100 events
-process(main, 100)
+# Process 10 events
+process(main, 10)
 # if there are less events in the input file
 # the processing will be stopped at EOF.
 # if all events in the file should be process

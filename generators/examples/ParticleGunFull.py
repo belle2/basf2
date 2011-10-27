@@ -164,7 +164,7 @@ output = register_module('SimpleOutput')
 
 # Setting the option for all non particle gun modules:
 # want to process 100 MC events
-evtmetagen.param({'EvtNumList': [100], 'RunList': [1]})
+evtmetagen.param({'EvtNumList': [10], 'RunList': [1]})
 
 # Set output filename
 output.param('outputFileName', 'ParticleGunOutput.root')

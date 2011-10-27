@@ -169,7 +169,7 @@ namespace Belle2 {
         G4LogicalVolume* BrCrysral = new G4LogicalVolume(BrCrysralShape, medCsI, (format("logicalEclBrCrystal_%1%") % iBrCry).str().c_str(), 0, 0, 0);
         BrCrysral->SetSensitiveDetector(m_sensitive);
 
-        G4LogicalVolume* Sensor = new G4LogicalVolume(SensorDiode, medSi, (format("logicalEclDiode_%1%") % iBrCry).str().c_str(), 0, 0, 0);
+        G4LogicalVolume* Sensor = new G4LogicalVolume(SensorDiode, medSi, (format("logicalEclBrDiode_%1%") % iBrCry).str().c_str(), 0, 0, 0);
         Sensor->SetSensitiveDetector(m_sensitive);
         assemblyBrCrystals->AddPlacedVolume(BrCrysral, Tr);
 
@@ -223,7 +223,7 @@ namespace Belle2 {
         assemblyFwCrystals->AddPlacedVolume(FwCrysral, Tr);
 
 
-        G4LogicalVolume* Sensor = new G4LogicalVolume(SensorDiode, medSi, (format("logicalEclDiode_%1%") % iCry).str().c_str(), 0, 0, 0);
+        G4LogicalVolume* Sensor = new G4LogicalVolume(SensorDiode, medSi, (format("logicalEclFwDiode_%1%") % iCry).str().c_str(), 0, 0, 0);
         Sensor->SetSensitiveDetector(m_sensitive);
         G4Transform3D DiodePosition = G4Translate3D(0, 0, halflength + (DiodeHeight) / 2 + 0.1); // Move over to the left...
         G4Transform3D TrD =  position * m3 * m2 * m1 * DiodePosition ;
@@ -268,7 +268,7 @@ namespace Belle2 {
         BwCrysral->SetSensitiveDetector(m_sensitive);
         assemblyBwCrystals->AddPlacedVolume(BwCrysral, Tr);
 
-        G4LogicalVolume* Sensor = new G4LogicalVolume(SensorDiode, medSi, (format("logicalEclDiode_%1%") % iCry).str().c_str(), 0, 0, 0);
+        G4LogicalVolume* Sensor = new G4LogicalVolume(SensorDiode, medSi, (format("logicalEclBwDiode_%1%") % iCry).str().c_str(), 0, 0, 0);
         Sensor->SetSensitiveDetector(m_sensitive);
         G4Transform3D DiodePosition = G4Translate3D(0, 0, halflength + (DiodeHeight) / 2 + 0.1); // Move over to the left...
         G4Transform3D TrD =  position * m3 * m2 * m1 * DiodePosition ;

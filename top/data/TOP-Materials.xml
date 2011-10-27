@@ -207,13 +207,20 @@
     
     <Material name="TOPPMTBottom">
         <state>Solid</state>
-        <density unit="g/cm3">1.7</density>
+        <density unit="g/cm3">4.2</density>
         <Components>   
-            <Element fraction="0.28">Si</Element>
-            <Element fraction="0.38">O</Element>
-            <Element fraction="0.30">C</Element>
-            <Element fraction="0.02">H</Element>   
-            <Element fraction="0.02">Br</Element>   
+            <Element fraction="0.14">Cu</Element>
+            <Element fraction="0.02">Fe</Element>
+            <Element fraction="0.02">Sn</Element>
+            <Element fraction="0.01">Ta</Element>
+            <Element fraction="0.01">Al</Element>
+            <Element fraction="0.3">O</Element>
+            <Element fraction="0.05">H</Element>
+            <Element fraction="0.05">N</Element>
+            <Element fraction="0.3">Si</Element>
+            <Element fraction="0.05">C</Element>
+            <Element fraction="0.04">Sb</Element>
+            <Element fraction="0.01">Zn</Element>            
         </Components>  
     </Material>
     

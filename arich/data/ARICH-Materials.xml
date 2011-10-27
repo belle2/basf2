@@ -153,15 +153,31 @@
   </Material> 
 	
   <Material name="HAPD_pcb">
+     <state>Solid</state>
+        <density unit="g/cm3">4.2</density>
+        <Components>   
+            <Element fraction="0.14">Cu</Element>
+            <Element fraction="0.02">Fe</Element>
+            <Element fraction="0.02">Sn</Element>
+            <Element fraction="0.01">Ta</Element>
+            <Element fraction="0.01">Al</Element>
+            <Element fraction="0.3">O</Element>
+            <Element fraction="0.05">H</Element>
+            <Element fraction="0.05">N</Element>
+            <Element fraction="0.3">Si</Element>
+            <Element fraction="0.05">C</Element>
+            <Element fraction="0.04">Sb</Element>
+            <Element fraction="0.01">Zn</Element>            
+        </Components>  
+    </Material>
+
+  <Material name="ARICH_Silicon">
     <state>Solid</state>
-    <density unit="g/cm3">1.70</density>
     <Components>
-       <Element fraction="0.2802">Si</Element>
-       <Element fraction="0.3674">O</Element>
-       <Element fraction="0.304">C</Element>
-       <Element fraction="0.0284">H</Element>
-       <Element fraction="0.02">Br</Element>
+      <Material fraction="1">Si</Material>
     </Components>
   </Material>
+
+
 
 </Materials>

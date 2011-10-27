@@ -317,6 +317,7 @@ namespace Belle2 {
       // build module bottom
       G4Box *botBox = new G4Box("botBox", modXsize / 2. - wallThick, modXsize / 2. - wallThick, botThick / 2.);
       G4LogicalVolume *lmoduleBot = new G4LogicalVolume(botBox, bottomMaterial, "moduleBottom");
+      if (isBeamBkgStudy) lmoduleBot->SetSensitiveDetector(new BkgSensitiveDetector("ARICH", 1));
       setColor(*lmoduleBot, "rgb(0.0,1.0,0.0,1.0)");
       G4Transform3D transform1 = G4Translate3D(0., 0., (modZsize - botThick) / 2.);
       // add surface optical properties if specified

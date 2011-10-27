@@ -10,8 +10,8 @@
   <chipGap desc="Gap between the APD chips" unit="mm">1.5</chipGap>
   <padXNum desc="Number of pads in one direction">12</padXNum>
   <Bottom desc="Parameters of HAPD bottom plane (to imitate APD chips)">
-    <thickness desc="Thickness of the HAPD reflective bottom" unit="mm">0.1</thickness>
-    <material desc="Material of HAPD reflective bottom">ARICH_Ceramics</material> 
+    <thickness desc="Thickness of the HAPD reflective bottom" unit="mm">0.5</thickness>
+    <material desc="Material of HAPD reflective bottom">ARICH_Silicon</material> 
     <Surface name="bottomSurface" desc="Surface of APDs is reflective">
       <Properties>
 	<Property name="REFLECTIVITY" unit="eV">

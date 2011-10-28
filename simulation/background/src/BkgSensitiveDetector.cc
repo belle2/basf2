@@ -77,7 +77,6 @@ namespace Belle2 {
       //Reset energy deposit;
       m_energyDeposit = 0;
     }
-    B2INFO("ene" << m_energyDeposit);
     //Update energy deposit
     m_energyDeposit += aStep->GetTotalEnergyDeposit() * Unit::MeV;
 

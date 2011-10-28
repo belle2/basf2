@@ -47,8 +47,8 @@ SVDRecoHit2D::SVDRecoHit2D(const SVDTrueHit* hit, float sigmaU, float sigmaV):
   }
 
   // Set positions
-  fHitCoord(0, 0) = hit->getU() + gRandom->Gaus(sigmaU);
-  fHitCoord(1, 0) = hit->getV() + gRandom->Gaus(sigmaV);
+  fHitCoord(0, 0) = gRandom->Gaus(hit->getU(), sigmaU);
+  fHitCoord(1, 0) = gRandom->Gaus(hit->getV(), sigmaV);
   // Set the error covariance matrix
   fHitCov(0, 0) = sigmaU * sigmaU;
   fHitCov(0, 1) = 0;

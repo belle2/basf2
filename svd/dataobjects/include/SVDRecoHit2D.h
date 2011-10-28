@@ -76,6 +76,9 @@ namespace Belle2 {
     /** Get the compact ID.*/
     VxdID getSensorID() const { return m_sensorID; }
 
+    /** Get pointer to the TrueHit used when creating this RecoHit, can be NULL if created from something else */
+    const SVDTrueHit* getTrueHit() const { return m_trueHit; }
+
     /** Get u coordinate.*/
     float getU() const { return fHitCoord(0, 0); }
     /** Get v coordinate.*/
@@ -99,6 +102,7 @@ namespace Belle2 {
     enum { HIT_DIMENSIONS = 2 /**< sensitive Dimensions of the Hit */ };
 
     unsigned short m_sensorID; /**< Unique sensor identifier.*/
+    const SVDTrueHit* m_trueHit; /**< Pointer to the Truehit used to generate this hit */
     float m_energyDep; /**< deposited energy.*/
     //float m_energyDepError; /**< error in dep. energy.*/
 

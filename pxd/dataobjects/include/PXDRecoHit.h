@@ -94,6 +94,11 @@ namespace Belle2 {
     /** Get the compact ID.*/
     VxdID getSensorID() const { return m_sensorID; }
 
+    /** Get pointer to the TrueHit used when creating this RecoHit, can be NULL if created from something else */
+    const PXDTrueHit* getTrueHit() const { return m_trueHit; }
+    /** Get pointer to the Cluster used when creating this RecoHit, can be NULL if created from something else */
+    const PXDCluster* getCluster() const { return m_cluster; }
+
     /** Get u coordinate.*/
     float getU() const { return fHitCoord(0, 0); }
     /** Get v coordinate.*/
@@ -117,6 +122,8 @@ namespace Belle2 {
     enum { HIT_DIMENSIONS = 2 /**< sensitive Dimensions of the Hit */ };
 
     unsigned short m_sensorID; /**< Unique sensor identifier.*/
+    const PXDTrueHit* m_trueHit; /**< Pointer to the TrueHit used when creating this object */
+    const PXDCluster* m_cluster; /**< Pointer to the Cluster used when creating this object */
     float m_energyDep; /**< deposited energy.*/
     //float m_energyDepError; /**< error in dep. energy.*/
 

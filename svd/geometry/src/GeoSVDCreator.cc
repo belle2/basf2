@@ -422,8 +422,8 @@ namespace Belle2 {
                         paramsSensor.getLength("Active/width"),
                         paramsSensor.getLength("Active/length"),
                         paramsSensor.getLength("Active/height"),
-                        paramsSensor.getInt("Active/stripsU", 0),
-                        paramsSensor.getInt("Active/stripsV", 0),
+                        paramsSensor.getInt("Active/stripsU"),
+                        paramsSensor.getInt("Active/stripsV"),
                         paramsSensor.getLength("Active/width2", 0)
                       );
 

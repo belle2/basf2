@@ -89,7 +89,7 @@ namespace Belle2 {
     const G4double energyDeposit = aStep->GetTotalEnergyDeposit() * Unit::MeV;
     const G4int    trackID = track.GetTrackID();
     const G4int    ParentTrackID = track.GetParentID();
-    const bool isFirstStep = (preStep.GetStepStatus() != fGeomBoundary);
+    const bool isFirstStep = (preStep.GetStepStatus() == fGeomBoundary);
 
     G4PVPlacementGT * pvgt = (G4PVPlacementGT*)(aStep->GetPreStepPoint()->GetPhysicalVolume());
     const std::string pvName = pvgt->GetName();

@@ -1,0 +1,6 @@
+Import('env')
+
+env['LIBS'] = ['eklm',  'framework',
+               '$ROOT_LIBS']
+
+Return('env')

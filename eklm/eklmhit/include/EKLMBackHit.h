@@ -103,7 +103,7 @@ namespace Belle2 {
       return m_identifier;
     }
 
-    //! Det the index of subdetector in which hit occured
+    //! Get the index of subdetector in which hit occured
     int getSubDet() const {return m_subDet; }
 
     //! Get the lund code of the particle that hit the sensitive area
@@ -160,6 +160,10 @@ namespace Belle2 {
     void getMomentum(TVector3 momentum)  {  m_momentum = momentum; }
 
 
+
+    //! Increase deposited energy
+    void increaseEDep(double newE) {m_energyDeposit += newE;}
+
   private:
     int m_subDet;               /**< The name of the subdetector */
     int m_identifier;           /**< The identifier of subdetector component */
@@ -175,8 +179,6 @@ namespace Belle2 {
     int m_parentTrackID;
     bool m_isFirstStep;
     std::string m_pvName;
-
-
 
     ClassDef(EKLMBackHit, 1);   /**< the class title */
 

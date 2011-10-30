@@ -22,10 +22,10 @@
 #include <svd/dataobjects/SVDTrueHit.h>
 #include <vxd/VxdID.h>
 
-#include "GFTrackCand.h"
+#include <GFTrackCand.h>
 
 #include <boost/foreach.hpp>
-#include "TRandom3.h"
+#include <TRandom3.h>
 
 #include <utility>
 #include <list>
@@ -196,27 +196,29 @@ void MCTrackFinderModule::event()
 
 
       //before assigning the Hits to the trackCandidate some additional geometry information is needed
-      CDCGeometryPar * cdcgp = CDCGeometryPar::Instance();
-      CDCGeometryPar & cdcg(*cdcgp);
+      CDCGeometryPar * cdcgPtr = NULL;
+      if (m_useCDCHits) {
+        cdcgPtr = CDCGeometryPar::Instance();
+        // //CDCGeometryPar & cdcg(*cdcgPtr);  //cannot be used anymore (says Moritz)
 
-      //set the values needed as start values for the fit in the GFTrackCandidate from the MCParticle information
-      //variables stored in the GFTrackCandidates are: vertex position, momentum, pdg value, indices for the Hits
-      //the Id of the MCParticle is also stored
+        //set the values needed as start values for the fit in the GFTrackCandidate from the MCParticle information
+        //variables stored in the GFTrackCandidates are: vertex position, momentum, pdg value, indices for the Hits
+        //the Id of the MCParticle is also stored
 
-      //an alternative: use as vertex position not the true position, but the coordinates of the first CDCHit (can be also done for SVD or PXD)
-      /*
-      int minLayerId = 999;
-      int minIndex  =  999;
-      for (unsigned int i = 0; i<cdcHitsIndices.size(); i++){
-        if(cdcHits[i]->getILayer()<minLayerId){
-           minLayerId = cdcHits[i]->getILayer();
-           minIndex = i;
+        //an alternative: use as vertex position not the true position, but the coordinates of the first CDCHit (can be also done for SVD or PXD)
+        /*
+        int minLayerId = 999;
+        int minIndex  =  999;
+        for (unsigned int i = 0; i<cdcHitsIndices.size(); i++){
+          if(cdcHits[i]->getILayer()<minLayerId){
+             minLayerId = cdcHits[i]->getILayer();
+             minIndex = i;
+          }
         }
+
+        TVector3 position = (cdcgPtr->wireForwardPosition(cdcHits[minIndex]->getILayer(), cdcHits[minIndex]->getIWire()) + cdcgPtr->wireBackwardPosition(cdcHits[minIndex]->getILayer(), cdcHits[minIndex]->getIWire())) * 0.5;
+        */
       }
-
-      TVector3 position = (cdcg.wireForwardPosition(cdcHits[minIndex]->getILayer(), cdcHits[minIndex]->getIWire()) + cdcg.wireBackwardPosition(cdcHits[minIndex]->getILayer(), cdcHits[minIndex]->getIWire())) * 0.5;
-      */
-
       //set track parameters from MCParticle information
       TVector3 position = mcParticles[iPart]->getProductionVertex();
       TVector3 momentum = mcParticles[iPart]->getMomentum();
@@ -314,7 +316,7 @@ void MCTrackFinderModule::event()
           int uniqueId = layerId * 10000 + cdcHits[hitID]->getIWire();
 
           //calculate the distance to origin
-          TVector3 distance = (cdcg.wireForwardPosition(layerId, cdcHits[hitID]->getIWire()) + cdcg.wireBackwardPosition(layerId, cdcHits[hitID]->getIWire())) * 0.5;
+          TVector3 distance = (cdcgPtr->wireForwardPosition(layerId, cdcHits[hitID]->getIWire()) + cdcgPtr->wireBackwardPosition(layerId, cdcHits[hitID]->getIWire())) * 0.5;
           rho = distance.Mag();
 
           trackCandidates[counter]->addHit(2, hitID, rho, uniqueId);

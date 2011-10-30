@@ -30,20 +30,18 @@
 
 #include <tracking/dataobjects/Track.h>
 
-#include "GFTrack.h"
-#include "GFTrackCand.h"
-#include "GFKalman.h"
-#include "GFDaf.h"
-#include "GFRecoHitProducer.h"
-#include "GFRecoHitFactory.h"
-
-
-#include "GFAbsTrackRep.h"
-#include "RKTrackRep.h"
+#include <GFTrack.h>
+#include <GFTrackCand.h>
+#include <GFKalman.h>
+#include <GFDaf.h>
+#include <GFRecoHitProducer.h>
+#include <GFRecoHitFactory.h>
+#include <GFAbsTrackRep.h>
+#include <RKTrackRep.h>
 
 #include <tracking/gfbfield/GFGeant4Field.h>
-#include "GFConstField.h"
-#include "GFFieldManager.h"
+#include <GFConstField.h>
+#include <GFFieldManager.h>
 
 #include <cstdlib>
 #include <iomanip>
@@ -53,9 +51,9 @@
 
 #include <boost/foreach.hpp>
 
-#include "TMath.h"
-#include "TRandom3.h"
-#include <math.h>
+#include <TMath.h>
+#include <TRandom3.h>
+#include <cmath>
 
 using namespace std;
 using namespace Belle2;
@@ -97,7 +95,6 @@ GenFitterModule::~GenFitterModule()
 
 void GenFitterModule::initialize()
 {
-
   m_failedFitCounter = 0;
   m_successfulFitCounter = 0;
 
@@ -106,6 +103,10 @@ void GenFitterModule::initialize()
 
   HelixParam.open("HelixParam.txt");
 
+  //convert geant4 geometry to TGeo geometry
+  //in the moment tesselated solids used for the glue within the PXD cannot be converted to TGeo, the general solution still has to be found, at the moment you can just comment out lines 6 and 13 in  pxd/data/PXD-Components.xml.
+  geometry::GeometryManager &geoManager = geometry::GeometryManager::getInstance();
+  geoManager.createTGeoRepresentation();
 }
 
 void GenFitterModule::beginRun()
@@ -146,11 +147,6 @@ void GenFitterModule::event()
   else {
     B2INFO("DAF will wit probability cut " << m_probCut << " will be used ");
   }
-
-  //convert geant4 geometry to TGeo geometry
-  //in the moment tesselated solids used for the glue within the PXD cannot be converted to TGeo, the general solution still has to be found, at the moment you can just comment out lines 6 and 13 in  pxd/data/PXD-Components.xml.
-  geometry::GeometryManager &geoManager = geometry::GeometryManager::getInstance();
-  geoManager.createTGeoRepresentation();
 
   //get the magnetic field
   GFFieldManager::getInstance()->init(new GFGeant4Field());

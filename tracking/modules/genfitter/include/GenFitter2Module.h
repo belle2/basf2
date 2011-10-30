@@ -17,8 +17,7 @@
 #define GENFITTER2MODULE_H
 
 #include <framework/core/Module.h>
-#include <pxd/dataobjects/PXDRecoHit.h>
-//#include <svd/dataobjects/SVDRecoHit.h>
+
 #include <fstream>
 
 
@@ -63,12 +62,12 @@ namespace Belle2 {
 
 
   private:
-    ofstream dataOut;
+    std::ofstream dataOut;
     int m_failedFitCounter;
     int m_fitCounter;
     int m_notPerfectCounter;
     double m_blowUpFactor;
-    bool m_noFilter;
+    bool m_filter;
     bool m_useDaf;
 
 

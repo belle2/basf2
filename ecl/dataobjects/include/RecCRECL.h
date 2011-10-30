@@ -61,25 +61,13 @@ namespace Belle2 {
     //! The method to set Width
     void setWidth(double Width) { m_Width = Width; }
 
-    double m_E9oE25;/**E9oE25 of this shower. */
-    double m_TotEnergy;/**TotEnergy of this shower. */
-    double m_E9oE25unf;/**E9oE25unf of this shower. */
-    double m_UncEnergy;/**UncEnergy of this shower. */
-    double m_NHits;/**NHits of this shower. */
-    double m_WNHits;/**WNHits of this shower. */
-    double m_NHitsUsed;/**NHitsUsed of this shower. */
-    int m_Status;/**Status of this shower. */
-    int m_Grade;/**Grade of this shower. */
-
-
-    //! The method to set E9oE25
     void setE9oE25(double E9oE25) { m_E9oE25 = E9oE25; }
 
     //! The method to set TotEnergy
     void setTotEnergy(double TotEnergy) { m_TotEnergy = TotEnergy; }
 
     //! The method to set E9oE25unf
-    void setE3x3unf(double E3x3unf) { m_E3x3unf = E3x3unf; }
+    void setE9oE25unf(double E9oE25unf) { m_E9oE25unf = E9oE25unf; }
 
     //! The method to set m_UncEnergy
     void setUncEnergy(double UncEnergy) { m_UncEnergy = UncEnergy; }

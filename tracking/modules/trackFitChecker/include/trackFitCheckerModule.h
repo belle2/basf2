@@ -9,11 +9,11 @@
  **************************************************************************/
 
 /* this is some kind of alpha version of a track fit tester. It is _planned_ that
- * this module will _at least_ be albe to calculate the p values of reconstructed
- * tracks (should be uniformly distributet) from the total chi2 values, the chi2
+ * this module will _at least_ be able to calculate the p values of reconstructed
+ * tracks (should be uniformly distributed) from the total chi2 values, the chi2
  * values of the smoother with respect to the measurements for
- * every sillicon layer (should be chi2(2) distributed for every layer), the
- * normalized residuals of the smoother for every layer (should ben standart
+ * every silicon layer (should be chi2(2) distributed for every layer), the
+ * normalized residuals of the smoother for every layer (should be standard
  * normal distributed) and the chi2 values of the smoothed track parameters with
  * respect to the true track parameters from geant4 (should be chi2(5)
  * distributed for every layer).
@@ -23,44 +23,56 @@
 #define trackFitCheckerModule_H_
 
 #include <framework/core/Module.h>
-#include <cdc/hitcdc/CDCSimHit.h>
-#include <cdc/dataobjects/CDCHit.h>
+
+
 #include <framework/datastore/StoreArray.h>
 #include <generators/dataobjects/MCParticle.h>
-#include <framework/dataobjects/Relation.h>
-#include <pxd/dataobjects/PXDSimHit.h>
-#include <pxd/dataobjects/PXDHit.h>
-#include <svd/dataobjects/SVDSimHit.h>
-#include <svd/dataobjects/SVDHit.h>
+
+#include <pxd/dataobjects/PXDTrueHit.h>
+#include <svd/dataobjects/SVDTrueHit.h>
+#include <pxd/dataobjects/PXDRecoHit.h>
+#include <svd/dataobjects/SVDRecoHit2D.h>
+
 #include <vector>
 #include <fstream>
 #include <string>
+#include <map>
 #include <iostream>
+#include <iomanip>
+#include <tracking/dataobjects/TrackFitCheckerTempHelperClass.h>
+#include <TMatrixDEigen.h>
 
-#include "GFTrack.h"
-#include "GFTools.h"
+#include <GFTrack.h>
+#include <GFTools.h>
+#include <RKTrackRep.h>
 
 // to get statistics functions of boost
 #include <boost/accumulators/accumulators.hpp>
 #include <boost/accumulators/statistics/stats.hpp>
 #include <boost/accumulators/statistics/mean.hpp>
 #include <boost/accumulators/statistics/variance.hpp>
+#include <boost/accumulators/statistics/count.hpp>
 
 namespace Belle2 {
-
+//namespace BA = boost::accumulators;
   //! Exercise 1 module.
   /*!
       Add here a description what your module does.
   */
+
   class trackFitCheckerModule : public Module {
 
+
+    typedef boost::accumulators::accumulator_set < double, boost::accumulators::stats < boost::accumulators::tag::mean, boost::accumulators::tag::variance(boost::accumulators::lazy) > > StatisticsAccuWithMeanAndVar;
+
+    typedef StatisticsAccuWithMeanAndVar StatisticsContainer;
   public:
 
     //! Constructor
     trackFitCheckerModule();
 
     //! Destructor
-    virtual ~trackFitCheckerModule();
+    ~trackFitCheckerModule();
 
     //! Initialize the Module
     /*! Function is called only once at the beginning of your job at the beginning of the corresponding module.
@@ -68,14 +80,14 @@ namespace Belle2 {
 
         This method has to be implemented by subclasses.
     */
-    virtual void initialize();
+    void initialize();
 
     //! Called when entering a new run
     /*! At the beginning of each run, the function gives you the chance to change run dependent constants like alignment parameters, etc.
 
         This method has to be implemented by subclasses.
     */
-    virtual void beginRun();
+    void beginRun();
 
     //! Running over all events
     /*! Function is called for each evRunning over all events
@@ -83,14 +95,15 @@ namespace Belle2 {
 
         This method has to be implemented by subclasses.
     */
-    virtual void event();
+
+    void event();
 
     //! Is called after processing the last event of a run
     /*! Good e.g. for storing stuff, that you want to aggregate over one run.
 
         This method has to be implemented by subclasses.
     */
-    virtual void endRun();
+    void endRun();
 
     //! Is called at the end of your Module
     /*! Function is called only once at the end of your job at the end of the corresponding module.
@@ -98,28 +111,67 @@ namespace Belle2 {
 
         This method has to be implemented by subclasses.
     */
-    virtual void terminate();
+    void terminate();
 
 
   protected:
 
-    std::string m_cdcSimHitColName;
-    std::string m_pxdSimHitColName;
-    std::string m_svdSimHitColName;
-    std::string m_mcParticleColName;
-    std::string m_fittedTracksName;
+    // littel helper functions for this module
+    double calcChi2(const TMatrixT<double>& res, const TMatrixT<double>& R);
+    std::vector<double> calcZs(const TMatrixT<double>& res, const TMatrixT<double>& R);
+    std::vector<double> calcTestsWithTruthInfo(const TMatrixT<double>& state, const TMatrixT<double>& cov, const TMatrixT<double>& trueState);
+    void isMatrixCov(const TMatrixT<double>& cov);
+    bool isSymmetric(const TMatrixT<double>& aMatrix);
+    void printLayerWiseStatistics(const std::string& nameOfDataSample,  const std::vector<std::string>& layerWiseVarNames);
+    void resizeLayerWiseData(const std::string& nameOfDataSample, const int nVarsToTest);
+    void printTrackWiseStatistics(const std::string& nameOfDataSample);
+    void printTrackWiseVecStatistics(const std::string& nameOfDataSample, const std::vector<std::string>& trackWiseVarNames);
+    void fillLayerWiseData(const std::string& nameOfDataSample, const int accuVecIndex, const std::vector<double>& newData);
+
   private:
+    int m_nSiLayers; // number of Si layers. That is 6 of course.
+    int m_nPxdLayers; // number of PXD layer (2) so number of SVD layers will be m_nSiLayers - m_nPxdLayers
+    int m_nSvdLayers;
     std::string m_dataOutFileName;
     std::string m_dataOutFileName2;
     std::ofstream m_dataOut;
     std::ofstream m_dataOut2;
-    std::vector<double> m_testVec;
-    boost::accumulators::accumulator_set < double, boost::accumulators::stats < boost::accumulators::tag::mean, boost::accumulators::tag::variance(boost::accumulators::lazy) > > m_pValues;
-    boost::accumulators::accumulator_set < double, boost::accumulators::stats < boost::accumulators::tag::mean, boost::accumulators::tag::variance(boost::accumulators::lazy) > > m_absMoms;
+    std::vector<std::string> m_layerWiseTruthTestsVarNames;
+    std::vector<std::string> m_vertexTestsVarNames;
 
-    boost::accumulators::accumulator_set<double, boost::accumulators::stats< boost::accumulators::tag::mean> > m_vertexX;
-    boost::accumulators::accumulator_set<double, boost::accumulators::stats< boost::accumulators::tag::mean> > m_vertexY;
-    boost::accumulators::accumulator_set<double, boost::accumulators::stats< boost::accumulators::tag::mean> > m_vertexZ;
+    //test first layer with the smearing I set:
+
+    /*    statisticsAccuWithMeanAndVar m_z_pf_qOverPsLayer1;
+        statisticsAccuWithMeanAndVar m_z_pf_dudwsLayer1;
+        statisticsAccuWithMeanAndVar m_z_pf_dvdwsLayer1;
+        statisticsAccuWithMeanAndVar m_z_pf_usLayer1;
+        statisticsAccuWithMeanAndVar m_z_pf_vsLayer1;
+        statisticsAccuWithMeanAndVar m_pf_chi2sLayer1;
+    */
+
+
+    std::map<std::string, StatisticsContainer > m_trackWiseDataSamples;
+    std::map<std::string, std::vector<StatisticsContainer> > m_trackWiseDataVecSamples;
+    //std::map<std::string, std::vector<StatisticsContainer> > m_layerWiseDataSamples;
+    std::map<std::string, std::vector<std::vector<StatisticsContainer> > > m_layerWiseDataSamples;
+
+    //bool m_testGeant3;
+    int m_failedSmootherCounter;
+    int m_processedTracks;
+    int m_eventCounter;
+    double m_totalChi2Cut;
+    int m_nCutawayTracks;
+    // counters holding the number of the covariance matrices (R) of the resuduals that have negative diagonal elements
+    int m_badR_fCounter;
+    int m_badR_bCounter;
+    int m_badR_smCounter;
+    bool m_testSi;
+    bool m_testCdc;
+    int m_unSymmetricCounter;
+    int m_notPosDefCounter;
+    int m_nDigits;
+    bool m_useTruthInfo;
+    bool m_testPrediction;
 
   };
 }

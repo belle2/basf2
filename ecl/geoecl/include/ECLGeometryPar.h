@@ -72,7 +72,7 @@ namespace Belle2 {
     //! Mapping theta, phi Id
     void Mapping(int cid);
 
-    //! Get Crystal Position
+
     TVector3 GetCrystalPos(int cid);  /** The Postion of crystal*/
 
     TVector3 GetCrystalVec(int cid);  /** The dection of crystal*/
@@ -105,6 +105,243 @@ namespace Belle2 {
 
     static ECLGeometryPar* m_B4ECLGeometryParDB; /*!< Pointer that saves the instance of this class. */
   };
+
+
+
+  class EclNbr {
+    // friend classses and functions
+
+  public:
+    // constants, enums and typedefs
+///
+
+    typedef EclIdentifier Identifier ;
+
+    /// Constructors and destructor
+    EclNbr();
+///
+    EclNbr(const EclNbr& aNbr);
+///
+    EclNbr(
+      const std::vector< Identifier >&           aNbrs     ,
+      const std::vector< Identifier >::size_type aNearSize
+    ) ;
+///
+    virtual ~EclNbr();
+
+    // member functions
+
+    // const member functions
+///
+    const std::vector< Identifier >&                nbrs()      const ;
+///
+    const std::vector< Identifier >::const_iterator nearBegin() const ;
+///
+    const std::vector< Identifier >::const_iterator nearEnd()   const ;
+///
+    const std::vector< Identifier >::const_iterator nextBegin() const ;
+///
+    const std::vector< Identifier >::const_iterator nextEnd()   const ;
+///
+    const std::vector< Identifier >::size_type      nearSize()  const ;
+///
+    const std::vector< Identifier >::size_type      nextSize()  const ;
+
+    /// assignment operator(s)
+    const EclNbr& operator=(const EclNbr& aNbr);
+    EclNbr getNbr(const Identifier  aCellId);
+    void printNbr();
+    //! Mapping theta, phi Id
+    void Mapping(int cid);
+    int GetCellID(int ThetaId, int PhiId);//! Get Cell Id
+
+    int GetCellID() {return mNbr_cellID;};//! Get Cell Id
+    int GetThetaID() {return mNbr_thetaID;};//! Get Theta Id
+    int GetPhiID() {return mNbr_phiID;};//! Get Phi Id
+
+  protected:
+    // protected member functions
+
+    // protected const member functions
+
+  private:
+    // Constructors and destructor
+
+    // private member functions
+
+    // private const member functions
+
+    // data members
+    int mNbr_cellID;           /** The Cell ID information*/
+    int mNbr_thetaID;          /** The Theta ID information*/
+    int mNbr_phiID;            /** The Phi ID information*/
+    std::vector< Identifier >&           m_nbrs     ;
+    std::vector< Identifier >::size_type m_nearSize ;
+
+    // static data members
+
+  };
+
+
+  class TEclEnergyHit {
+    // friend classes and functions
+
+  public:
+    // constants, enums and typedefs
+    ///
+    typedef EclIdentifier Identifier;
+//      has trouble with g++ stl, poor compiler
+//      typedef int Identifier;
+
+    /// Constructors and destructor
+    TEclEnergyHit() : fId(0), fEnergy(0), fCellId(0) {
+    }
+    ///
+    TEclEnergyHit(const TEclEnergyHit& ahit)
+        : fId(ahit.Id()), fEnergy(ahit.Energy()), fCellId(ahit.CellId()) {
+    }
+    ///
+    TEclEnergyHit(
+      const Identifier hid, const EclGeV energy, const Identifier cid)
+        : fId(hid), fEnergy(energy), fCellId(cid) {
+    }
+    ///
+    virtual ~TEclEnergyHit() { }
+
+    /// assignment operator(s)
+    const TEclEnergyHit& operator=(const TEclEnergyHit& hit) {
+      if (this != &hit) {
+        fId = hit.fId;
+        fEnergy = hit.fEnergy;
+        fCellId = hit.fCellId;
+      }
+      return *this;
+    }
+
+    // member functions
+    ///
+    const Identifier Id(void) const {
+      return fId;
+    }
+    ///
+    Identifier Id(Identifier id) {
+      return fId = id;
+    }
+    ///
+    const Identifier CellId(void) const {
+      return fCellId;
+    }
+    ///
+    Identifier CellId(int cId) {
+      return fCellId = cId;
+    }
+
+
+
+    ///
+    const EclGeV Energy(void) const {
+      return fEnergy;
+    }
+    ///
+    EclGeV Energy(EclGeV energy) {
+      return fEnergy = energy;
+    }
+
+    // const member functions
+
+    // static member functions
+
+    /// comparison operators
+    bool operator<(const TEclEnergyHit& rhs) const {
+      return
+        fId < rhs.Id();
+    }
+    ///
+    bool operator>(const TEclEnergyHit& rhs) const {
+      return
+        fId > rhs.Id();
+    }
+    ///
+    bool operator==(const TEclEnergyHit& rhs) const {
+      return
+        (fId == rhs.Id())
+        && (fEnergy == rhs.Energy())
+        && (fCellId == rhs.CellId())
+        ;
+    }
+    ///
+    bool operator!=(const TEclEnergyHit& rhs) const {
+      return
+        (fId != rhs.Id())
+        || (fEnergy != rhs.Energy())
+        || (fCellId != rhs.CellId())
+        ;
+    }
+
+    ///
+    struct less_Energy {
+      ///
+      bool operator()(const TEclEnergyHit& lhs, const TEclEnergyHit& rhs)
+      const {
+        return
+          lhs.Energy() < rhs.Energy();
+      }
+    };
+    ///
+    struct less_CellId {
+      ///
+      bool operator()(const TEclEnergyHit& lhs, const TEclEnergyHit& rhs)
+      const {
+        return
+          lhs.CellId() < rhs.CellId();
+      }
+    };
+    ///
+    struct greater_Energy {
+      ///
+      bool operator()(const TEclEnergyHit& lhs, const TEclEnergyHit& rhs)
+      const {
+        return
+          lhs.Energy() > rhs.Energy();
+      }
+    };
+    ///
+    struct greater_CellId {
+      ///
+      bool operator()(const TEclEnergyHit& lhs, const TEclEnergyHit& rhs)
+      const {
+        return
+          lhs.CellId() > rhs.CellId();
+      }
+    };
+
+
+  protected:
+    // protected member functions
+
+    // protected const member functions
+
+  private:
+    // Constructors and destructor
+
+
+    // private member functions
+
+    // private const member functions
+    // private const member functions
+
+    // data members
+    Identifier fId;
+    EclGeV fEnergy;
+    int fCellId;
+    // static data members
+
+  };
+
+///
+  typedef std::map < TEclEnergyHit::Identifier, TEclEnergyHit,
+  std::less<TEclEnergyHit::Identifier> > EclEnergyHitMap;
+
 } // end of namespace Belle2
 
 #endif

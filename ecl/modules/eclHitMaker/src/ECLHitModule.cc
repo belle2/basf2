@@ -128,6 +128,18 @@ void ECLHitModule::event()
     TVector3 PosCell =  eclp->GetCrystalPos(hitCellId);
     TVector3 VecCell =  eclp->GetCrystalVec(hitCellId);
     double local_pos = (15. - (0.5 * (HitInPos + HitOutPos) - PosCell) * VecCell);
+
+    cout << setiosflags(ios::fixed);
+
+    /*
+    if(local_pos>27){
+
+        cout<<hitCellId<<setprecision(6)<<" "<<local_pos<<" "<<hitTOF<<" "<<hitE <<endl;
+        cout<<HitInPos.x()<<" "<<PosCell.x()<<" "<<VecCell.x()<<endl;
+        cout<<HitInPos.y()<<" "<<PosCell.y()<<" "<<VecCell.y()<<endl;
+        cout<<HitInPos.z()<<" "<<PosCell.z()<<" "<<VecCell.z()<<endl<<endl;
+    }
+    */
     for (int iECLCell = 0; iECLCell < 8736; iECLCell++) {
 
       if (hitCellId == iECLCell && hitTOF < 8000) {
@@ -150,8 +162,9 @@ void ECLHitModule::event()
         X_ave[iECLCell][TimeIndex] = X_ave[iECLCell][TimeIndex] / E_cell[iECLCell][TimeIndex];
         T_ave[iECLCell][TimeIndex]  =  6.05 + 0.0749 * X_ave[iECLCell][TimeIndex] - 0.00112 * X_ave[iECLCell][TimeIndex] * X_ave[iECLCell][TimeIndex];
         Tof_ave[iECLCell][TimeIndex] =  Tof_ave[iECLCell][TimeIndex] / E_cell[iECLCell][TimeIndex];
-
         StoreArray<HitECL> eclHitArray(m_eclHitOutColName);
+
+//        cout<<iECLCell<<" "<<E_cell[iECLCell][TimeIndex]<<" "<<Tof_ave[iECLCell][TimeIndex] + T_ave[iECLCell][TimeIndex] <<endl;
 
         m_hitNum = eclHitArray->GetLast() + 1;
         new(eclHitArray->AddrAt(m_hitNum)) HitECL();
@@ -159,13 +172,15 @@ void ECLHitModule::event()
         eclHitArray[m_hitNum]->setCellId(iECLCell);
         eclHitArray[m_hitNum]->setEnergyDep(E_cell[iECLCell][TimeIndex]);
         eclHitArray[m_hitNum]->setTimeAve(T_ave[iECLCell][TimeIndex] + Tof_ave[iECLCell][TimeIndex]);
+//        eclHitArray[m_hitNum]->setEnergyDep(T_ave[iECLCell][TimeIndex] );
+//        eclHitArray[m_hitNum]->setTimeAve(T_ave[iECLCell][TimeIndex] );
       }//if Energy > 0
     }//16 Time interval 16x 500 ns
   } //store  each crystal hit
 
   m_nEvent++;
   m_timeCPU = clock() * Unit::us;
-  B2INFO("ECLHitModule finished. Time per event: " << m_timeCPU  / Unit::ms << " ms.");
+  B2INFO("ECLHitModule finished. End CPU Time " << m_timeCPU  / Unit::ms << " ms.");
 }
 
 

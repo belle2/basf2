@@ -89,8 +89,8 @@ namespace Belle2 {
     if (stepLength == 0.) return false;
 
 
+    G4int FirstStepFlag = 0;
     G4Track & t = * aStep->GetTrack();
-
     const G4double tof = t.GetGlobalTime();
     if (isnan(tof)) {
       B2ERROR("ECLSensitiveDetector: global time is nan");
@@ -110,18 +110,21 @@ namespace Belle2 {
 
     const G4ThreeVector posCell = v.GetTranslation();
     // Get layer ID
-
     Mapping(v.GetName());
+
+    if (in.GetStepStatus() == fGeomBoundary) {
+      FirstStepFlag = 1;
+    }
+
 
     if (v.GetName().find("Crystal") != string::npos) {
       int saveIndex = -999;
-      saveIndex = saveSimHit(m_cellID, m_thetaID, m_phiID  , trackID, pid, tof, edep, 1, momIn, posCell, posIn, posOut);
+      saveIndex = saveSimHit(m_cellID, m_thetaID, m_phiID  , trackID, pid, tof, edep, FirstStepFlag, momIn, posCell, posIn, posOut);
     }
-
     if (v.GetName().find("Diode") != string::npos) {
-
+//      cout<<FirstStepFlag<<" "<<trackID<<" "<<m_cellID<<" "<<m_thetaID<<" "<<edep<<" "<<pid<<endl;
       int saveEBIndex = -999;
-      saveEBIndex = saveEBSimHit(m_cellID, m_thetaID, m_phiID  , trackID, pid, 1, edep, 1, momIn, posCell, posIn, posOut);
+      saveEBIndex = saveEBSimHit(m_cellID, m_thetaID, m_phiID  , trackID, pid, 1, edep, FirstStepFlag, momIn, posCell, posIn, posOut);
     }
 
 
@@ -146,7 +149,7 @@ namespace Belle2 {
     const G4int pid,
     const G4double tof,
     const G4double edep,
-    const G4double stepLength,
+    const G4double FirstStep,
     const G4ThreeVector & mom,
     const G4ThreeVector & posCell,
     const G4ThreeVector & posIn,
@@ -165,7 +168,7 @@ namespace Belle2 {
     eclEBArray[m_EBhitNumber]->setPDGCode(pid);
 //    eclEBArray[m_EBhitNumber]->setFlightTime(tof / ns);
     eclEBArray[m_EBhitNumber]->setEnergyDep(edep / GeV);
-    eclEBArray[m_EBhitNumber]->setStepLength(stepLength / cm);
+    eclEBArray[m_EBhitNumber]->setStepLength(FirstStep);
     TVector3 momentum(mom.getX() / GeV, mom.getY() / GeV, mom.getZ() / GeV);
     eclEBArray[m_EBhitNumber]->setMomentum(momentum);
     TVector3 posCellv(posCell.getX() / cm, posCell.getY() / cm, posCell.getZ() / cm);
@@ -186,7 +189,7 @@ namespace Belle2 {
     const G4int pid,
     const G4double tof,
     const G4double edep,
-    const G4double stepLength,
+    const G4double FirstStep,
     const G4ThreeVector & mom,
     const G4ThreeVector & posCell,
     const G4ThreeVector & posIn,
@@ -206,7 +209,7 @@ namespace Belle2 {
     eclArray[m_hitNumber]->setPDGCode(pid);
     eclArray[m_hitNumber]->setFlightTime(tof / ns);
     eclArray[m_hitNumber]->setEnergyDep(edep / GeV);
-    eclArray[m_hitNumber]->setStepLength(stepLength / cm);
+    eclArray[m_hitNumber]->setStepLength(FirstStep);
     TVector3 momentum(mom.getX() / GeV, mom.getY() / GeV, mom.getZ() / GeV);
     eclArray[m_hitNumber]->setMomentum(momentum);
     TVector3 posCellv(posCell.getX() / cm, posCell.getY() / cm, posCell.getZ() / cm);

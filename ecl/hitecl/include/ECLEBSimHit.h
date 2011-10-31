@@ -49,7 +49,7 @@ namespace Belle2 {
     double m_edep;
 
     //! Step length of this hit.
-    double m_stepLength;
+    double m_FirstStep;
 
     //! The momentum of pre-step.
     TVector3 m_momentum;
@@ -89,7 +89,7 @@ namespace Belle2 {
     void setEnergyDep(double edep) { m_edep = edep; }
 
     //! The method to set step length
-    void setStepLength(double stepLength) { m_stepLength = stepLength; }
+    void setStepLength(double FirstStep) { m_FirstStep = FirstStep; }
 
     //! The method to set momentum
     void setMomentum(TVector3 momentum) { m_momentum = momentum; }
@@ -130,7 +130,7 @@ namespace Belle2 {
     double getEnergyDep() const { return m_edep; }
 
     //! The method to get step length
-    double getStepLength() const { return m_stepLength; }
+    double getStepLength() const { return m_FirstStep; }
 
     //! The method to get momentum
     TVector3 getMomentum() const { return m_momentum; }
@@ -161,7 +161,7 @@ namespace Belle2 {
       int pdg,
       double flightTime,
       double edep,
-      double stepLength,
+      double FirstStep,
       TVector3 momentum,
       TVector3 posCell,
       TVector3 posIn,
@@ -174,7 +174,7 @@ namespace Belle2 {
       m_pdg = pdg;
       m_flightTime = flightTime;
       m_edep = edep;
-      m_stepLength = stepLength;
+      m_FirstStep = FirstStep;
       m_momentum = momentum;
       m_posCell = posCell;
       m_posIn = posIn;
@@ -182,7 +182,7 @@ namespace Belle2 {
       m_posFlag = posFlag;
     }
 
-    ClassDef(ECLEBSimHit, 1);/**< the class title */
+    ClassDef(ECLEBSimHit, 2);/**< the class title */
 
   };
 

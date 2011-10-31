@@ -113,8 +113,6 @@ void StereoFinder::StereoFitCandidates(CDCTrackCandidate & candidate)
 
         for (int sl = 8; sl > 0; sl --) { //loop over all superlayers
 
-          int counter = 0;
-          double minDistance = 100;
           double maxDistance = 0;
           int index = 0;
           if (OvercrowdedSuperlayer(candidate, sl) == true) { //compare the segments from overcrowded superlayers

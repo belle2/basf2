@@ -30,18 +30,20 @@
 
 #include <tracking/dataobjects/Track.h>
 
-#include <GFTrack.h>
-#include <GFTrackCand.h>
-#include <GFKalman.h>
-#include <GFDaf.h>
-#include <GFRecoHitProducer.h>
-#include <GFRecoHitFactory.h>
-#include <GFAbsTrackRep.h>
-#include <RKTrackRep.h>
+#include "GFTrack.h"
+#include "GFTrackCand.h"
+#include "GFKalman.h"
+#include "GFDaf.h"
+#include "GFRecoHitProducer.h"
+#include "GFRecoHitFactory.h"
+
+
+#include "GFAbsTrackRep.h"
+#include "RKTrackRep.h"
 
 #include <tracking/gfbfield/GFGeant4Field.h>
-#include <GFConstField.h>
-#include <GFFieldManager.h>
+#include "GFConstField.h"
+#include "GFFieldManager.h"
 
 #include <cstdlib>
 #include <iomanip>
@@ -51,9 +53,9 @@
 
 #include <boost/foreach.hpp>
 
-#include <TMath.h>
-#include <TRandom3.h>
-#include <cmath>
+#include "TMath.h"
+#include "TRandom3.h"
+#include <math.h>
 
 using namespace std;
 using namespace Belle2;
@@ -95,6 +97,7 @@ GenFitterModule::~GenFitterModule()
 
 void GenFitterModule::initialize()
 {
+
   m_failedFitCounter = 0;
   m_successfulFitCounter = 0;
 
@@ -107,6 +110,7 @@ void GenFitterModule::initialize()
   //in the moment tesselated solids used for the glue within the PXD cannot be converted to TGeo, the general solution still has to be found, at the moment you can just comment out lines 6 and 13 in  pxd/data/PXD-Components.xml.
   geometry::GeometryManager &geoManager = geometry::GeometryManager::getInstance();
   geoManager.createTGeoRepresentation();
+
 }
 
 void GenFitterModule::beginRun()
@@ -147,6 +151,7 @@ void GenFitterModule::event()
   else {
     B2INFO("DAF will wit probability cut " << m_probCut << " will be used ");
   }
+
 
   //get the magnetic field
   GFFieldManager::getInstance()->init(new GFGeant4Field());
@@ -278,9 +283,14 @@ void GenFitterModule::event()
             //Set helix parameters
             tracks[trackCounter]->setD0(-999);
             tracks[trackCounter]->setPhi(-999);
-            tracks[trackCounter]->setKappa(gfTrack.getCharge());
+            tracks[trackCounter]->setOmega(gfTrack.getCharge());
             tracks[trackCounter]->setZ0(-999);
-            tracks[trackCounter]->setTanLambda(-999);
+            tracks[trackCounter]->setCotTheta(-999);
+            tracks[trackCounter]->setBelleD0(-999);
+            tracks[trackCounter]->setBellePhi(-999);
+            tracks[trackCounter]->setBelleKappa(gfTrack.getCharge());
+            tracks[trackCounter]->setBelleZ0(-999);
+            tracks[trackCounter]->setBelleTanLambda(-999);
           }
 
         } else {            //fit successful
@@ -344,33 +354,44 @@ void GenFitterModule::event()
             //calculate transverse momentum
             double pt = sqrt(gfTrack.getMom(plane).x() * gfTrack.getMom(plane).x() + gfTrack.getMom(plane).y() * gfTrack.getMom(plane).y());
 
-            //determine the angle phi, distribute it from 0 to 2pi
-            //the calculation depends on the definition of the angle (it is necessary to know the definiton to recalculate the momentum etc)
+            //determine angle phi for perigee parametrisation, distributed from -pi to pi
+            double phi = atan2(dirInPoca.y() , dirInPoca.x());
+
+            //determine d0 sign for perigee parametrization
+            double d0Sign = TMath::Sign(1., poca.x() * dirInPoca.x() + poca.y() * dirInPoca.y());
+
+            //determine the Belle angle phi, distribute it from 0 to 2pi
             //this calculation of phi is taken from basf, I do not really understand it, but it seems to work ...
-            double phi = fmod(atan2(- dirInPoca.x(), dirInPoca.y()) + 4 * TMath::Pi(), 2 * TMath::Pi());
-
-            //double phi = atan2(dirInPoca.y() , dirInPoca.x());
-
+            double Belle_phi = fmod(atan2(- dirInPoca.x(), dirInPoca.y()) + 4 * TMath::Pi(), 2 * TMath::Pi());
 
             //determine sign of d0 (I have not really found a definition of belle d0 sign, so I just found one which fits the trajectory equations, but it has to be crosschecked!!)
-            double d0Sign = TMath::Sign(1., poca.x() * dirInPoca.y() - poca.y() * dirInPoca.x());
-            B2DEBUG(149, "D0 sign " << d0Sign);
+            double Belle_d0Sign = TMath::Sign(1., poca.x() * dirInPoca.y() - poca.y() * dirInPoca.x());
 
-            //double alpha = 1/(1.5 * 0.00299792458);
+            //coefficient to illiminate the B field and get the 'pure' curvature
 
-            //Now set the helix parameters
+            double alpha = 1 / (1.5 * 0.00299792458);
+
+            //Now set the helix parameters for perigee parametrization
             tracks[trackCounter]->setD0(d0Sign*sqrt(poca.x() * poca.x() + poca.y() * poca.y()));
             tracks[trackCounter]->setPhi(phi);
-            tracks[trackCounter]->setKappa((gfTrack.getCharge() / pt));
+            tracks[trackCounter]->setOmega((gfTrack.getCharge() / (pt*alpha)));
             tracks[trackCounter]->setZ0(poca.z());
-            tracks[trackCounter]->setTanLambda(dirInPoca.z() / (sqrt(dirInPoca.x() * dirInPoca.x() + dirInPoca.y() * dirInPoca.y())));
+            tracks[trackCounter]->setCotTheta(dirInPoca.z() / (sqrt(dirInPoca.x() * dirInPoca.x() + dirInPoca.y() * dirInPoca.y())));
+
+            //And for Belle parametrization
+            tracks[trackCounter]->setBelleD0(Belle_d0Sign*sqrt(poca.x() * poca.x() + poca.y() * poca.y()));
+            tracks[trackCounter]->setBellePhi(Belle_phi);
+            tracks[trackCounter]->setBelleKappa((gfTrack.getCharge() / pt));
+            tracks[trackCounter]->setBelleZ0(poca.z());
+            tracks[trackCounter]->setBelleTanLambda(dirInPoca.z() / (sqrt(dirInPoca.x() * dirInPoca.x() + dirInPoca.y() * dirInPoca.y())));
 
             //Print helix parameters
             B2INFO(">>>>>>> Helix Parameters <<<<<<<");
-            B2INFO("D0: " << std::setprecision(3) << tracks[trackCounter]->getD0() << "  Phi: " << std::setprecision(3) << tracks[trackCounter]->getPhi() << "  Kappa: " << std::setprecision(3) << tracks[trackCounter]->getKappa() << "  Z0: " << std::setprecision(3) << tracks[trackCounter]->getZ0() << "  TanLambda: " << std::setprecision(3) << tracks[trackCounter]->getTanLambda());
+            B2INFO("D0: " << std::setprecision(3) << tracks[trackCounter]->getD0() << "  Phi: " << std::setprecision(3) << tracks[trackCounter]->getPhi() << "  Omega: " << std::setprecision(3) << tracks[trackCounter]->getOmega() << "  Z0: " << std::setprecision(3) << tracks[trackCounter]->getZ0() << "  CotTheta: " << std::setprecision(3) << tracks[trackCounter]->getCotTheta());
             B2INFO("<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>");
             //Additional check
-            B2INFO("Recalculate momentum  px: " << abs(1 / (tracks[trackCounter]->getKappa()))*(-sin(tracks[trackCounter]->getPhi())) << "  py: " << abs(1 / (tracks[trackCounter]->getKappa()))*cos(tracks[trackCounter]->getPhi()) << "  pz: " << abs(1 / (tracks[trackCounter]->getKappa()))*tracks[trackCounter]->getTanLambda());
+            B2INFO("Recalculate momentum from perigee: px: " << abs(1 / (tracks[trackCounter]->getOmega()*alpha))*(cos(tracks[trackCounter]->getPhi())) << "  py: " << abs(1 / (tracks[trackCounter]->getOmega()*alpha))*sin(tracks[trackCounter]->getPhi()) << "  pz: " << abs(1 / (tracks[trackCounter]->getOmega()*alpha))*tracks[trackCounter]->getCotTheta());
+            B2DEBUG(149, "Recalculate momentum from Belle: px: " << abs(1 / (tracks[trackCounter]->getBelleKappa()))*(-sin(tracks[trackCounter]->getBellePhi())) << "  py: " << abs(1 / (tracks[trackCounter]->getBelleKappa()))*cos(tracks[trackCounter]->getBellePhi()) << "  pz: " << abs(1 / (tracks[trackCounter]->getBelleKappa()))*tracks[trackCounter]->getBelleTanLambda());
             B2INFO("<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>");
             //Additional code
             //print helix parameter to a file
@@ -378,9 +399,9 @@ void GenFitterModule::event()
             //-------------------------------------
             HelixParam << tracks[trackCounter]->getD0() << " \t"
             << tracks[trackCounter]->getPhi() << " \t"
-            << tracks[trackCounter]->getKappa() << " \t"
+            << tracks[trackCounter]->getOmega() << " \t"
             << tracks[trackCounter]->getZ0() << " \t"
-            << tracks[trackCounter]->getTanLambda() << "\t" << poca.x()
+            << tracks[trackCounter]->getCotTheta() << "\t" << poca.x()
             << "\t" << poca.y() << "\t" << poca.z() << endl;
             //----------------------------------------
             //end additional code

@@ -7,6 +7,5 @@
 
 
 #pragma link C++ class Belle2::Track;
-
-
+#pragma link C++ class Belle2::TrackFitCheckerTempHelperClass;
 #endif

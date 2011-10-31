@@ -51,6 +51,7 @@ namespace Belle2 {
     /** This method checks for hit neighbours in the same layer.
      *  Per default only 'single hit chain' is constructed. There are however often two hits in one layer.
      *  So for a given hit (first parameter) it is checked, if there is a close neighbour in the same layer.
+     *  If such a neighbour hit is found, it is checked if the drift times of the two hits are 'compatible' (their sum should be approximately the distance between the wires).
      *  If such a neighbour hit is found, this hit get the same segment ids assigned as the given hit.
      */
     static void  CheckLayerNeighbours(CDCTrackHit aHit, std::vector<CDCTrackHit> & cdcHits);

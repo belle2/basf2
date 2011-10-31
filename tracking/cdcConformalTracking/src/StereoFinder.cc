@@ -13,6 +13,11 @@
 #include <cmath>
 #include <cstdlib>
 
+#include "TGraph.h"
+#include "TAxis.h"
+#include "TF1.h"
+
+
 #include <framework/datastore/StoreArray.h>
 #include <framework/logging/Logger.h>
 
@@ -67,6 +72,86 @@ void StereoFinder::FindStereoSegments(CDCTrackCandidate startTrack, vector<CDCSe
   }//end loop over all segments
 }
 
+void StereoFinder::StereoFitCandidates(CDCTrackCandidate & candidate)
+{
+  B2DEBUG(100, "Perform a stereo fit: candidate with " << candidate.getNSegments() << " segments");
+  if (candidate.getNSegments() > 0) {
+    //create a graph to fit r vs z
+    TGraph * zGraph;
+    double r[100];
+    double z[100];
+    int nHits = candidate.getNHits(); //Nr of hits in a track
+    bool refit = true;
+
+    while (refit == true) { //while loop to refit the candidate if one segment is removed, should be performed as long as there are 'overcrowded' superlayers
+      refit = false;
+      //loop over all hits and get their r and z coordinates
+      for (int j = 0; j < nHits; j++) {
+        r[j] = sqrt(candidate.getTrackHits().at(j).getWirePosition().X() * candidate.getTrackHits().at(j).getWirePosition().X() + candidate.getTrackHits().at(j).getWirePosition().Y() * candidate.getTrackHits().at(j).getWirePosition().Y());
+        z[j] = candidate.getTrackHits().at(j).getWirePosition().z();
+      }
+      //create graph and do a linear fit
+      zGraph = new TGraph(nHits, r, z);
+      double zMin = zGraph->GetXaxis()->GetXmin();
+      double zMax = zGraph->GetXaxis()->GetXmax();
+      zGraph->Fit("pol1", "Q", "", zMin, zMax);
+      TF1 *zFit = zGraph->GetFunction("pol1");
+
+      double zChi2 = zFit->GetChisquare();
+
+      //in case of bad chi2 some segments should be removed
+      if (zChi2 > 0.001) {
+        TVector3 zfitPoint;   //some point on the fit line (rz plane)
+        zfitPoint.SetX(r[0]);
+        zfitPoint.SetY(zFit->GetParameter(1) * r[0]);
+        zfitPoint.SetZ(0);
+
+        TVector3 zfitDirection;
+        zfitDirection.SetX(r[10] - r[0]);
+        zfitDirection.SetY(zFit->GetParameter(1) * r[10] - zFit->GetParameter(1) * r[0]);
+        zfitDirection.SetZ(0);
+
+        for (int sl = 8; sl > 0; sl --) { //loop over all superlayers
+
+          int counter = 0;
+          double minDistance = 100;
+          double maxDistance = 0;
+          int index = 0;
+          if (OvercrowdedSuperlayer(candidate, sl) == true) { //compare the segments from overcrowded superlayers
+            double zDeviation = 100;
+            for (int i = 0; i < candidate.getNSegments(); i++) {
+              if (candidate.getSegments().at(i).getSuperlayerId() == sl) {
+                double zSegX = sqrt(candidate.getSegments().at(i).getOuterMostHit().getWirePosition().X() * candidate.getSegments().at(i).getOuterMostHit().getWirePosition().X() + candidate.getSegments().at(i).getOuterMostHit().getWirePosition().Y() * candidate.getSegments().at(i).getOuterMostHit().getWirePosition().Y());
+                double zSegY = candidate.getSegments().at(i).getOuterMostHit().getWirePosition().Z();
+                TVector3 zSegmentPoint;
+                zSegmentPoint.SetX(zSegX);
+                zSegmentPoint.SetY(zSegY);
+                zSegmentPoint.SetZ(0);
+                zDeviation = fabs((zSegmentPoint.y() - (zFit->GetParameter(1) * zSegmentPoint.x() + zFit->GetParameter(0))) / (zFit->GetParameter(1) * zSegmentPoint.x() + zFit->GetParameter(0)));
+                //B2INFO("ZDeviation: "<<zDeviation);
+                //select the segment with the largest residual/deviation from the fit line
+                if (zDeviation > maxDistance) {
+                  maxDistance = zDeviation;
+                  index = i;
+                }
+
+              }
+            }
+            //remove the worst segment and refit
+            candidate.removeSegment(candidate.getSegments().at(index).getId());
+            //B2INFO("Remove bad segment with Id "<<index);
+            refit = true;
+          }
+        }//end loop over superlayers
+
+      }
+
+    } //end while loop
+  } //end if
+  B2DEBUG(100, "End stereo fit, number of segments reduced to " << candidate.getNSegments());
+}
+
+
 bool StereoFinder::OvercrowdedSuperlayer(CDCTrackCandidate track, int SLId)
 {
 
@@ -96,7 +181,7 @@ void StereoFinder::CheckOvercrowdedSL(CDCTrackCandidate & axialCandidate, CDCTra
     minDistance = 10;
 
     if (OvercrowdedSuperlayer(stereoCandidate, sl) == true) { //check if the superlayer is 'overcrowded' = has more than one segment
-      //B2INFO("Overcrowded SL! This Candidate has several segments in Superlayer "<<sl);
+      B2INFO("Overcrowded SL! This Candidate has several segments in Superlayer " << sl);
 
       for (int i = 0; i < stereoCandidate.getNSegments(); i++) {
         if (stereoCandidate.getSegments().at(i).getSuperlayerId() == sl) {  //loop over all segments from the overcrowded superlayer
@@ -107,9 +192,10 @@ void StereoFinder::CheckOvercrowdedSL(CDCTrackCandidate & axialCandidate, CDCTra
             stereoCandidate.getSegments().at(i).update();
           }
           //check if now the segment can pass more strict cuts
-          //double angle = axialCandidate.getOuterMostSegment().getDirection().Angle(stereoCandidate.getSegments().at(i).getDirection());
+          double angle = axialCandidate.getOuterMostSegment().getDirection().Angle(stereoCandidate.getSegments().at(i).getDirection());
           double shortestDistance = ShortestDistance(axialCandidate, stereoCandidate.getSegments().at(i));
-          //B2INFO("id: "<<stereoCandidate.getSegments().at(i).getId()<< "  shortest Distance: "<<shortestDistance<< "  angle: " <<abs(angle));
+          B2INFO("id: " << stereoCandidate.getSegments().at(i).getId() << "  shortest Distance: " << shortestDistance << "  angle: " << abs(angle));
+          B2INFO("z coordinate: " << stereoCandidate.getOuterMostHit().getWirePosition().z());
           if (shortestDistance < minDistance) { //select the best segment
             minDistance = shortestDistance;
             bestId = stereoCandidate.getSegments().at(i).getId();
@@ -117,12 +203,12 @@ void StereoFinder::CheckOvercrowdedSL(CDCTrackCandidate & axialCandidate, CDCTra
         }
 
       }
-      //B2INFO("Best segment "<<bestId<<" with "<<minDistance);
+      B2INFO("Best segment " << bestId << " with " << minDistance);
       while (OvercrowdedSuperlayer(stereoCandidate, sl) ==  true) {
         //remove all segments which 'lost' against the best segment in the overcrowded superlayers
         for (int i = 0; i < stereoCandidate.getNSegments(); i++) {
           if (stereoCandidate.getSegments().at(i).getSuperlayerId() == sl && stereoCandidate.getSegments().at(i).getId() != bestId) {
-            //B2INFO("!!! Remove Segment with ID "<<stereoCandidate.getSegments().at(i).getId());
+            B2INFO("!!! Remove Segment with ID " << stereoCandidate.getSegments().at(i).getId());
             stereoCandidate.removeSegment(stereoCandidate.getSegments().at(i).getId());
 
           }
@@ -203,11 +289,17 @@ void StereoFinder::AppendStereoSegments(vector<CDCSegment> & cdcStereoSegments, 
 
   } //end loop over all segments
 
+  for (int i = 0; i < nTracks; i++) {
+
+  }
+
+
 
   //it may happen, that several segments from the same superlayer are assigned to the same track (because of the shift and the uknown z-coordinate)
-  //so, for each track it is checked if there es only one stereo segment in each superlayer, if not, the best segment is chosen and the others are removed
+  //so, for each track it is checked if there is only one stereo segment in each superlayer, if not, the best segment is chosen and the others are removed
   for (int i = 0; i < nTracks; i++) {
-    CheckOvercrowdedSL(*cdcTrackCandidates[i], StereoCandidates[i]);
+    //CheckOvercrowdedSL(*cdcTrackCandidates[i],StereoCandidates[i]);
+    StereoFitCandidates(StereoCandidates[i]);
   }
 
   //Add the final stereo segments to the corresponding track candidates

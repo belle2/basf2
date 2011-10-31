@@ -445,8 +445,8 @@ void AxialTrackFinder::CollectTrackCandidates(vector<CDCSegment> & cdcAxialSegme
 
     //Discard bad chi2
     for (int i = 0; i < NTracks; i++) {
-      // B2INFO("Track Nr "<<i<< "(start with wireId "<<TrackCandidates.at(i).getOuterMostHit().getWireId()<<")  Chi2: "<<TrackCandidates.at(i).getChiSquare()<<"  (momentum:  "<< TrackCandidates.at(i).getMomentumValue()<<" ) ");
-      if (TrackCandidates.at(i).getChiSquare() < 0.0038) { // more or less aribtrary value used here..
+      //B2INFO("Track Nr "<<i<< "(start with wireId "<<TrackCandidates.at(i).getOuterMostHit().getWireId()<<")  Chi2: "<<TrackCandidates.at(i).getChiSquare());
+      if (float(TrackCandidates.at(i).getChiSquare() / TrackCandidates.at(i).getNHits()) < 0.00005) { // more or less aribtrary value used here..
         FinalTrackCandidates.push_back(TrackCandidates.at(i));
 
       }
@@ -485,7 +485,7 @@ void AxialTrackFinder::CollectTrackCandidates(vector<CDCSegment> & cdcAxialSegme
         //B2INFO("StartWireId: "<<startWireId);
         //check for 'similar' candidates
         for (int check = 0; check < NFinalTracks; check++) {
-          if (FinalTrackCandidates.at(check).getNSegments() == NumberOfSegments && FinalTrackCandidates.at(check).getOuterMostHit().getWireId() == startWireId && check != i && UsedSegmentsFraction(FinalTrackCandidates.at(check), UsedSegmentId) < 0.61 && UsedHitsFraction(FinalTrackCandidates.at(check), UsedTrackHitId) < 0.8) {
+          if (FinalTrackCandidates.at(check).getNSegments() == NumberOfSegments && FinalTrackCandidates.at(check).getOuterMostHit().getWireId() <= startWireId + 1 && FinalTrackCandidates.at(check).getOuterMostHit().getWireId() >= startWireId - 1 && check != i && UsedSegmentsFraction(FinalTrackCandidates.at(check), UsedSegmentId) < 0.61 && UsedHitsFraction(FinalTrackCandidates.at(check), UsedTrackHitId) < 0.8) {
             //B2INFO("Competitor found!");
             Competitors.push_back(FinalTrackCandidates.at(check));
           }

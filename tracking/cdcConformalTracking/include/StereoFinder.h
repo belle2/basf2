@@ -41,18 +41,29 @@ namespace Belle2 {
      */
     static int WireIdDifference(CDCTrackCandidate track, CDCSegment segment);
 
+
     /**Function to check if there are more than one segment from one superlayer in this track candidate.
      * With the given track candidate and the index of a segment, it is checked if there are other segments with the same superlayer in this track candidate.
      * Returns false is the given segment is the only one. Returns true if there is more than one.
      */
     static bool OvercrowdedSuperlayer(CDCTrackCandidate track, int SLId);
 
-    /** Method to check if there are more than one segment per superlayer.
+    /** Method to check if there are more than one segment per superlayer and remove the wrong ones.
      *  Superlayer with more the one segment are considered and the competing segments are compared to each other.
+     *  The comparison in performed in the conformal plane (2D).
      *  The 'best matching' segment is chosen and the other segments are removed (!) from candidate.
      */
 
     static void CheckOvercrowdedSL(CDCTrackCandidate & axialCandidate, CDCTrackCandidate & stereoCandidate);
+
+    /** Method to check if there are more than one segment per superlayer and remove the wrong ones.
+     *  Superlayer with more the one segment are considered and the competing segments are compared to each other.
+     *  The comparison in performed in the rz plane, where the hits are supposed to form a straight line.
+     *  A linear fit in performed and the segment with a worst deviation is removed.
+     *  The track candidate is refitted, as long as there are still overcrowded superlayers.
+     *  At the ende the track candidate should have one best matching segment left in each stereo superlayer.
+     */
+    static void StereoFitCandidates(CDCTrackCandidate & candidate);
 
     /**Searches for matching stereo segments for the given track candidate.
      * First parameter: track candidate

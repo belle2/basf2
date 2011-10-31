@@ -15,6 +15,8 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/logging/Logger.h>
 
+
+#include "TMath.h"
 #include <cmath>
 #include <cstdlib>
 
@@ -116,13 +118,22 @@ void CellularSegmentFinder::EvaluateStates(vector<CDCTrackHit> & cdcHits, int st
 
 void CellularSegmentFinder::CheckLayerNeighbours(CDCTrackHit aHit, vector<CDCTrackHit> & cdcHits)
 {
+  CDCGeometryPar * cdcgp = CDCGeometryPar::Instance();
+  CDCGeometryPar & cdcg(*cdcgp);
+
   int nHits = cdcHits.size();
   for (int j = 0; j < nHits; j++) {
     //check for hits from the same layer and a neighbouring wireId
     if (cdcHits[j].getLayerId() == aHit.getLayerId() && WireIdDifference(aHit, cdcHits[j]) == 1) {
-      cdcHits[j].setSegmentIds(aHit.getSegmentIds());  //copy the segment Ids from the original hit to the "new same layer neighour"
-      //B2INFO("A neighbour in the same layer was found in "<<cdcHits[j].getLayerId()<<"  "<<cdcHits[j].getWireId()<<" (for "<<aHit.getLayerId()<<"  "<<aHit.getWireId()<<")" );
-
+      //B2INFO("A possible neighbour in the same layer was found in "<<cdcHits[j].getLayerId()<<"  "<<cdcHits[j].getWireId()<<" (for "<<aHit.getLayerId()<<"  "<<aHit.getWireId()<<")" );
+      //check the distance between the wires and compare it to the sum of the drifttimes (drift length actually...)
+      //for hits which really are coming from the same tracks these two number should be similar (tracks passed between two wires)
+      double wireInterval = 2 * TMath::Pi() * cdcg.innerRadiusWireLayer()[aHit.getLayerId()] / cdcg.nWiresInLayer(aHit.getLayerId());
+      //B2INFO("Drifttime of the first  "<<aHit.getDriftTime()<<"   and of the second "<<cdcHits[j].getDriftTime()<<"  distance between wires "<<wireInterval);
+      if (abs(aHit.getDriftTime() + cdcHits[j].getDriftTime() - wireInterval) < 0.05*wireInterval) {
+        //B2INFO("-----> Real neighbour found!");
+        cdcHits[j].setSegmentIds(aHit.getSegmentIds());  //copy the segment Ids from the original hit to the "new same layer neighour"
+      }
     }
   }
 
@@ -253,7 +264,7 @@ void CellularSegmentFinder::FindSegments(string CDCTrackHits, string CDCSegments
 
     //use oldcounter to not overwrite already created segments
     for (int i = oldcounter; i <= segmentcounter; i++) {
-      B2DEBUG(100, "Create Segment Nr " << i << "  in Superlayer " << sl);
+      B2DEBUG(149, "Create Segment Nr " << i << "  in Superlayer " << sl);
       new(cdcSegments->AddrAt(i)) CDCSegment(sl, i);    //create Segment and put it in the StoreArray
 
       //assign hits to this segment
@@ -261,7 +272,7 @@ void CellularSegmentFinder::FindSegments(string CDCTrackHits, string CDCSegments
         for (unsigned int k = 0; k < cdcHits[j].getSegmentIds().size(); k++) {
           if (cdcHits[j].getSegmentIds().at(k) == i) {
             cdcSegments[i]->addTrackHit(cdcHits[j]);
-            B2DEBUG(100, "Add Hit " << cdcHits[j].getLayerId() << "  " << cdcHits[j].getWireId());
+            B2DEBUG(149, "Add Hit " << cdcHits[j].getLayerId() << "  " << cdcHits[j].getWireId());
           }
         }
 

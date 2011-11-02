@@ -124,7 +124,6 @@ void SimpleInputModule::initialize()
             iobject++;
             branch->GetEntry(0);
           }
-          B2DEBUG(150, m_objectNames[ii][jj]);
         }
       }
     }

@@ -197,7 +197,8 @@ void SimpleOutputModule::terminate()
 
     //create an index for the event tree
     TTree* tree = m_tree[DataStore::c_Event];
-    tree->BuildIndex("1000000*EventMetaData.m_experiment+EventMetaData.m_run", "EventMetaData.m_event");
+    if (tree->GetBranch("EventMetaData"))
+      tree->BuildIndex("1000000*EventMetaData.m_experiment+EventMetaData.m_run", "EventMetaData.m_event");
 
     //fill the file level metadata
     fileMetaDataPtr->setEvents(tree->GetEntries());

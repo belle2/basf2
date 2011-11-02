@@ -30,11 +30,11 @@ trackFitCheckerModule::trackFitCheckerModule() : Module()
 
   //Parameter definition
   addParam("outputFileName", m_dataOutFileName, "Output file name", string("forwardData.txt"));
-  addParam("outputFileName2", m_dataOutFileName2, "Output file name2", string("tfcpvalues.txt"));
-  addParam("totalChi2Cut", m_totalChi2Cut, "only tracks with a total χ2 lower than this value will be considered", 1E300);
-  addParam("testSi", m_testSi, "execute additionlly the Si only tests", true);
-  addParam("testCdc", m_testCdc, "execute additionlly the CDC only tests", false);
-  addParam("useTruthInfo", m_useTruthInfo, "use the truth info from the geant4 simulation", true);
+  //addParam("outputFileName2", m_dataOutFileName2, "Output file name2", string("tfcpvalues.txt"));
+  addParam("totalChi2Cut", m_totalChi2Cut, "only tracks with a total χ² lower than this value will be considered", 1E300);
+  addParam("testSi", m_testSi, "execute additionlly the Si only tests", false);
+  //addParam("testCdc", m_testCdc, "execute additionlly the CDC only tests", false);
+  addParam("useTruthInfo", m_useTruthInfo, "use the truth info from the geant4 simulation", false);
   addParam("testPrediction", m_testPrediction, "additionlly test the predicted state vecs from the Kalman filter. ONLY WOKRKS IF THEY ARE SAVED DURING FITTING WHICH IS NOT THE DEFAULT", false);
 }
 
@@ -52,15 +52,14 @@ void trackFitCheckerModule::initialize()
   //m_nCdcLayers = 0;
   m_nSvdLayers = 4;
   m_dataOut.open(m_dataOutFileName.c_str());
-  m_dataOut2.open(m_dataOutFileName2.c_str());
-  //m_absMomOut.open("absMomOut.txt");
+  //m_dataOut2.open(m_dataOutFileName2.c_str());
   m_dataOut.precision(14);
-  m_dataOut2.precision(14);
-  m_dataOut2 << "event#\tproc#\tndf\tchi2tot\tfChi2tot\tpValue\tfpValue\tsmChi2l1\tsmChi2l2\tsmChi2l3\tsmChi2l4\tsmChi2l5\tsmChi2l6\tz_qOverPl1\tresPropV4\tabs(p)\n";
+  //m_dataOut2.precision(14);
+  //m_dataOut2 << "event#\tproc#\tndf\tchi2tot\tfChi2tot\tpValue\tfpValue\tsmChi2l1\tsmChi2l2\tsmChi2l3\tsmChi2l4\tsmChi2l5\tsmChi2l6\tz_qOverPl1\tresPropV4\tabs(p)\n";
   //m_dataOut << "event#\tproc#\tfchi2tot\tbchi2tot\tabsMom\tu_t 1\tv_t\tu_m\tv_m\tu\tv\tvar_u\tvar_v\tcov_uv\tcov_vu\tpchi2\tu_t 2\tv_t\tu_m\tv_m\tu\tv\tvar_u\tvar_v\tcov_uv\tcov_vu\tpchi2\tu_t 3\tv_t\tu_m\tv_m\tu\tv\tvar_u\tvar_v\tcov_uv\tcov_vu\tpchi2\tu_t 4\tv_t\tu_m\tv_m\tu\tv\tvar_u\tvar_v\tcov_uv\tcov_vu\tpchi2\tu_t 5\tv_t\tu_m\tv_m\tu\tv\tvar_u\tvar_v\tcov_uv\tcov_vu\tpchi2\tu_t 6\tv_t\tu_m\tv_m\tu\tv\tvar_u\tvar_v\tcov_uv\tcov_vu\tpchi2\n";
-  m_dataOut << "event#\tproc#\tfchi2tot\tbchi2tot\tabsMom\tu_t 1\tv_t\tu_m\tv_m\tu\tv\tvar_u\tvar_v\tcov_uv\tcov_vu\tpchi\tfchi2\tu_t 2\tv_t\tu_m\tv_m\tu\tv\tvar_u\tvar_v\tcov_uv\tcov_vu\tpchi\tfchi2\tu_t 3\tv_t\tu_m\tv_m\tu\tv\tvar_u\tvar_v\tcov_uv\tcov_vu\tpchi\tfchi2\tu_t 4\tv_t\tu_m\tv_m\tu\tv\tvar_u\tvar_v\tcov_uv\tcov_vu\tpchi\tfchi2\tu_t 5\tv_t\tu_m\tv_m\tu\tv\tvar_u\tvar_v\tcov_uv\tcov_vu\tpchi\tfchi2\tu_t 6\tv_t\tu_m\tv_m\tu\tv\tvar_u\tvar_v\tcov_uv\tcov_vu\tpchi\tfchi2\tpfChi2tot\n";
+  //m_dataOut << "event#\tproc#\tfchi2tot\tbchi2tot\tabsMom\tu_t 1\tv_t\tu_m\tv_m\tu\tv\tvar_u\tvar_v\tcov_uv\tcov_vu\tpchi\tfchi2\tu_t 2\tv_t\tu_m\tv_m\tu\tv\tvar_u\tvar_v\tcov_uv\tcov_vu\tpchi\tfchi2\tu_t 3\tv_t\tu_m\tv_m\tu\tv\tvar_u\tvar_v\tcov_uv\tcov_vu\tpchi\tfchi2\tu_t 4\tv_t\tu_m\tv_m\tu\tv\tvar_u\tvar_v\tcov_uv\tcov_vu\tpchi\tfchi2\tu_t 5\tv_t\tu_m\tv_m\tu\tv\tvar_u\tvar_v\tcov_uv\tcov_vu\tpchi\tfchi2\tu_t 6\tv_t\tu_m\tv_m\tu\tv\tvar_u\tvar_v\tcov_uv\tcov_vu\tpchi\tfchi2\tpfChi2tot\n";
+  m_dataOut << "event#\tproc#\tfchi2tot\tabsMom\tq/p_t 1\tdu/dw_t\tdv/dw_t\tu_t\tv_t\tm_u\tm_v\tq/p\tdu/dw\tdv/dw\tu\tv\tsigma_u\tsigma_v\tcov(uv)\tfpChi2inc\tq/p_t 2\tdu/dw_t\tdv/dw_t\tu_t\tv_t\tm_u\tm_v\tq/p\tdu/dw\tdv/dw\tu\tv\tsigma_u\tsigma_v\tcov(uv)\tfpChi2inc\tq/p_t 3\tdu/dw_t\tdv/dw_t\tu_t\tv_t\tm_u\tm_v\tq/p\tdu/dw\tdv/dw\tu\tv\tsigma_u\tsigma_v\tcov(uv)\tfpChi2inc\tq/p_t 4\tdu/dw_t\tdv/dw_t\tu_t\tv_t\tm_u\tm_v\tq/p\tdu/dw\tdv/dw\tu\tv\tsigma_u\tsigma_v\tcov(uv)\tfpChi2inc\tq/p_t 5\tdu/dw_t\tdv/dw_t\tu_t\tv_t\tm_u\tm_v\tq/p\tdu/dw\tdv/dw\tu\tv\tsigma_u\tsigma_v\tcov(uv)\tfpChi2inc\tq/p_t 6\tdu/dw_t\tdv/dw_t\tu_t\tv_t\tm_u\tm_v\tq/p\tdu/dw\tdv/dw\tu\tv\tsigma_u\tsigma_v\tsigma_uv\tfpChi2inc\tfpChi2tot\n";
 
-  //m_absMomOut.precision(14);
   m_failedSmootherCounter = 0;
 
 
@@ -71,7 +70,7 @@ void trackFitCheckerModule::initialize()
 
   int vecSizeTruthTest = 6 + 1; //the +1 is for the uv subcov
   int vecSizeMeasTest = 3;
-  int measDim = 2;
+  //int measDim = 2;
 
   //set the default names of varialbes stored in the statistics container if they are mulitdimensional (like the 5 track parameters)
   m_layerWiseTruthTestsVarNames.push_back("q/p");
@@ -134,50 +133,44 @@ void trackFitCheckerModule::event()
 
   //simulated particles and hits
   StoreArray<MCParticle> aMcParticleArray("");
-  //m_dataOut << "mcParticles " << aMcParticleArray->GetEntries() << "\n";
+
   StoreArray<PXDTrueHit> aPxdTrueHitArray("");
-  int nPxdSimHits = aPxdTrueHitArray.getEntries();
-  //m_dataOut << "pxdSimHits " << aPxdTrueHitArray->GetEntries() << "\n";
+  //const int nPxdSimHits = aPxdTrueHitArray.getEntries();
+
   StoreArray<SVDTrueHit> aSvdTrueHitArray("");
-  int nSvdSimHits = aSvdTrueHitArray.getEntries();
-  int nSiSimHits = nPxdSimHits + nSvdSimHits;
-  //m_dataOut << "svdSimHits " << aSvdTrueHitArray->GetEntries() << "\n";
+  //const int nSvdSimHits = aSvdTrueHitArray.getEntries();
+  //const int nSiSimHits = nPxdSimHits + nSvdSimHits;
+
   //StoreArray<CDCTrueSimHit> aCdcTrueHitArray("");
-
-
-  //all relations
 
   //genfit stuff
   StoreArray<GFTrackCand> trackCandidates(""); // to create a new track rep for extrapolation only
   StoreArray<GFTrack> fittedTracks(""); // the results of the track fit
-  int nFittedTracks = fittedTracks.getEntries();
+  const int nFittedTracks = fittedTracks.getEntries();
   // testoutput
   StoreArray<TrackFitCheckerTempHelperClass> qualityIndicators("QualityIndicators");
 
-  //cerr << "===== event2\n";
-
-  //m_dataOut << "chi2totWerte: ";
-  //cerr << "===== event3\n";
   //cout << m_eventCounter << " " << flush;
   for (int i = 0; i not_eq nFittedTracks; ++i) {
 
     GFTrack* aTrackPtr = fittedTracks[i];
-    int mcParticleIndex = aTrackPtr->getCand().getMcTrackId();
+    const int mcParticleIndex = aTrackPtr->getCand().getMcTrackId();
 
     double charge = aMcParticleArray[mcParticleIndex]->getCharge();
     TVector3 trueVertexMom = aMcParticleArray[mcParticleIndex]->getMomentum();
     TVector3 trueVertexPos = aMcParticleArray[mcParticleIndex]->getVertex();
-    GFAbsTrackRep* propOnlyTrRepPtr = new RKTrackRep(trackCandidates[i]);
+    //GFAbsTrackRep* propOnlyTrRepPtr = new RKTrackRep(trackCandidates[i]);
 
 
-    double chi2tot_bu = aTrackPtr->getChiSqu(); //at the moment genfit returns the total chi2 from the backward filter
+    double chi2tot_bu = aTrackPtr->getChiSqu(); // returns the total chi2 from the backward filter
     if (chi2tot_bu > m_totalChi2Cut) {
       //consider this track to be an outlier and discard it
       ++m_nCutawayTracks;
     } else { // not and outlier contine with tests
       // first part: get variable disribing the hole track
-      double chi2tot_fu = aTrackPtr->getForwardChiSqu();
-      int ndf = aTrackPtr->getNDF();
+      const double chi2tot_fu = aTrackPtr->getForwardChiSqu();
+      m_dataOut << m_eventCounter << "\t" << m_processedTracks << "\t" << chi2tot_fu;
+      const int ndf = aTrackPtr->getNDF();
       double pValue_bu = TMath::Prob(chi2tot_bu, ndf); // actually the p value would be 1-TMath::Prob(chi2tot, ndf) but particle physicists want to have it this way.
       double pValue_fu = TMath::Prob(chi2tot_fu, ndf);
       m_trackWiseDataSamples["pValue_bu"](pValue_bu);
@@ -186,23 +179,28 @@ void trackFitCheckerModule::event()
       TVector3 vertexPos;
       TVector3 vertexMom;
       TMatrixT<double> vertexCov(6, 6);
+      vector<double> zVertexPosMom(6);
       TVector3 poca; //point of closest approach will be overwritten
       TVector3 dirInPoca; //direction of the track at the point of closest approach will be overwritten
       aTrackPtr->getCardinalRep()->extrapolateToPoint(trueVertexPos, poca, dirInPoca); //goto vertex position
       GFDetPlane plane(poca, dirInPoca); //get plane through fitted vertex position
       double vertexAbsMom = aTrackPtr->getMom(plane).Mag(); //get fitted momentum at fitted vertex
       m_trackWiseDataSamples["absMomVertex"](vertexAbsMom);
+      m_dataOut << "\t" << vertexAbsMom;
       aTrackPtr->getPosMomCov(plane, vertexPos, vertexMom, vertexCov);
-      TVector3 resVertexMom = vertexMom - trueVertexMom;
-      TVector3 resVertexPos = vertexPos - trueVertexPos;
-      m_trackWiseDataVecSamples["zs_vertexPosMom"][0](resVertexPos[0] / sqrt(vertexCov[0][0]));
-      m_trackWiseDataVecSamples["zs_vertexPosMom"][1](resVertexPos[1] / sqrt(vertexCov[1][1]));
-      m_trackWiseDataVecSamples["zs_vertexPosMom"][2](resVertexPos[2] / sqrt(vertexCov[2][2]));
-      m_trackWiseDataVecSamples["zs_vertexPosMom"][3](resVertexPos[0] / sqrt(vertexCov[3][3]));
-      m_trackWiseDataVecSamples["zs_vertexPosMom"][4](resVertexPos[1] / sqrt(vertexCov[4][4]));
-      m_trackWiseDataVecSamples["zs_vertexPosMom"][5](resVertexPos[2] / sqrt(vertexCov[5][5]));
+      zVertexPosMom[0] = (vertexPos[0] - trueVertexPos[0]) / sqrt(vertexCov[0][0]);
+      zVertexPosMom[1] = (vertexPos[1] - trueVertexPos[1]) / sqrt(vertexCov[1][1]);
+      zVertexPosMom[2] = (vertexPos[2] - trueVertexPos[2]) / sqrt(vertexCov[2][2]);
+      zVertexPosMom[3] = (vertexMom[0] - trueVertexMom[0]) / sqrt(vertexCov[3][3]);
+      zVertexPosMom[4] = (vertexMom[1] - trueVertexMom[1]) / sqrt(vertexCov[4][4]);
+      zVertexPosMom[5] = (vertexMom[2] - trueVertexMom[2]) / sqrt(vertexCov[5][5]);
 
-
+      m_trackWiseDataVecSamples["zs_vertexPosMom"][0](zVertexPosMom[0]);
+      m_trackWiseDataVecSamples["zs_vertexPosMom"][1](zVertexPosMom[1]);
+      m_trackWiseDataVecSamples["zs_vertexPosMom"][2](zVertexPosMom[2]);
+      m_trackWiseDataVecSamples["zs_vertexPosMom"][3](zVertexPosMom[3]);
+      m_trackWiseDataVecSamples["zs_vertexPosMom"][4](zVertexPosMom[4]);
+      m_trackWiseDataVecSamples["zs_vertexPosMom"][5](zVertexPosMom[5]);
 
       //write stuff in helper class... to be able to make plots with the TBrowser... something better should be used in the future
       new(qualityIndicators->AddrAt(i)) TrackFitCheckerTempHelperClass();
@@ -210,103 +208,113 @@ void trackFitCheckerModule::event()
       qualityIndicators[i]->pValue_fu = pValue_fu;
       qualityIndicators[i]->chi2tot_bu = chi2tot_bu;
       qualityIndicators[i]->pValue_bu = pValue_bu;
-      //now the layer wise tests
-      TVector3 pLocalTrue;
-      TMatrixT<double> state;
-      TMatrixT<double> cov;
-      TMatrixT<double> propMat(5, 5);
-      TMatrixT<double> trueState(5, 1);
-      TMatrixT<double> onlyPropState(5, 1);
-      TMatrixT<double> res(2, 1);
-      TMatrixT<double> R(2, 2);
-      TVector3 posInTrue;
-      TVector3 posOutTrue;
-      TVector3 pTrue;
-      //vector<double> zs;
-      vector<double> truthTests;
-      int hitLayerId = -1;
-      double uTrue = 0.0;
-      double vTrue = 0.0;
-      vector<double> testResutlsWithoutTruth;
-      double fpChi2tot = 0.0;
-      int nHits = aTrackPtr->getNumHits();
-      for (int iGFHit = 0; iGFHit not_eq nHits; ++iGFHit) {
-        //first get truth info or every GF recoHit
-        PXDRecoHit const*const aPxdRecoHitPtr = dynamic_cast<PXDRecoHit*>(aTrackPtr->getHit(iGFHit));
-        if (aPxdRecoHitPtr not_eq NULL) {
-          PXDTrueHit const*const aTrueHitPtr = aPxdRecoHitPtr->getTrueHit();
-          hitLayerId = aTrueHitPtr->getSensorID().getLayer();
-          pTrue = aTrueHitPtr->getMomentum();
-          uTrue = aTrueHitPtr->getU();
-          vTrue = aTrueHitPtr->getV();
-        } else {
-          SVDRecoHit2D const*const aSvdRecoHitPtr = static_cast<SVDRecoHit2D*>(aTrackPtr->getHit(iGFHit));
-          SVDTrueHit const*const aTrueHitPtr = aSvdRecoHitPtr->getTrueHit();
-          hitLayerId = aTrueHitPtr->getSensorID().getLayer();
-          pTrue = aTrueHitPtr->getMomentum();
-          uTrue = aTrueHitPtr->getU();
-          vTrue = aTrueHitPtr->getV();
-        }
+      qualityIndicators[i]->zVertexPosX = zVertexPosMom[0];
+      qualityIndicators[i]->zVertexPosY = zVertexPosMom[1];
+      qualityIndicators[i]->zVertexPosZ = zVertexPosMom[2];
+      qualityIndicators[i]->zVertexMomX = zVertexPosMom[3];
+      qualityIndicators[i]->zVertexMomY = zVertexPosMom[4];
+      qualityIndicators[i]->zVertexMomZ = zVertexPosMom[5];
 
-        int accuVecIndex = hitLayerId - 1;
-        //second get the data from the hit
-        TMatrixT<double> H = aTrackPtr->getHit(iGFHit)->getHMatrix(aTrackPtr->getTrackRep(0)); // this should not work because in the module genfitter releaseHits() is called and getHit performs a boundary check. Why it works only Yoda knows
-        TMatrixT<double> HT(TMatrixT<double>::kTransposed, H); // the transposed is needed later
-        TMatrixT<double> m = aTrackPtr->getHit(iGFHit)->getRawHitCoord(); //measurement of hit
-        TMatrixT<double> V = aTrackPtr->getHit(iGFHit)->getRawHitCov(); //covariance matrix of hit
-        //cout << "m"; m.Print();cout << "V"; V.Print();
-        // build the true state vector x_t all in local coordinates
-        trueState[0][0] = charge / pTrue.Mag(); // q/p
-        trueState[1][0] = pTrue[0] / pTrue[2]; //dudw
-        trueState[2][0] = pTrue[1] / pTrue[2];//dvdw
-        trueState[3][0] = uTrue; // u
-        trueState[4][0] = vTrue; // v
-        m_dataOut << "\t" << trueState[3][0] << "\t" << trueState[4][0] << "\t" << m[0][0] << "\t" << m[1][0];
-        //cout << "true state\n";trueState.Print();
-        // now test if measurements am their theoretical variances that were feeded to genfit are consistent with the acutal distribution of measurments
-        res = m - H * trueState;
-        truthTests = calcZs(res, V);
-        truthTests.push_back(calcChi2(res, V));
-        fillLayerWiseData("zs_and_chi2_meas_t", accuVecIndex, truthTests);
+      //now the layer wise tests
+      if (m_testSi == true) {
+        TVector3 pLocalTrue;
+        TMatrixT<double> state;
+        TMatrixT<double> cov;
+        TMatrixT<double> propMat(5, 5);
+        TMatrixT<double> trueState(5, 1);
+        TMatrixT<double> onlyPropState(5, 1);
+        TMatrixT<double> res(2, 1);
+        TMatrixT<double> R(2, 2);
+        TVector3 posInTrue;
+        TVector3 posOutTrue;
+        TVector3 pTrue;
+        //vector<double> zs;
+        vector<double> truthTests;
+        int hitLayerId = -1;
+        double uTrue = 0.0;
+        double vTrue = 0.0;
+        vector<double> testResutlsWithoutTruth;
+        double fpChi2tot = 0.0;
+        int nHits = aTrackPtr->getNumHits();
+        for (int iGFHit = 0; iGFHit not_eq nHits; ++iGFHit) {
+          //first get the data from the hit
+          TMatrixT<double> H = aTrackPtr->getHit(iGFHit)->getHMatrix(aTrackPtr->getTrackRep(0)); // this should not work because in the module genfitter releaseHits() is called and getHit performs a boundary check. Why it works only Yoda knows
+          TMatrixT<double> HT(TMatrixT<double>::kTransposed, H); // the transposed is needed later
+          TMatrixT<double> m = aTrackPtr->getHit(iGFHit)->getRawHitCoord(); //measurement of hit
+          TMatrixT<double> V = aTrackPtr->getHit(iGFHit)->getRawHitCov(); //covariance matrix of hit
+
+          //second get truth info or every GF recoHit
+          PXDRecoHit const*const aPxdRecoHitPtr = dynamic_cast<PXDRecoHit*>(aTrackPtr->getHit(iGFHit));
+          if (aPxdRecoHitPtr not_eq NULL) {
+            PXDTrueHit const*const aTrueHitPtr = aPxdRecoHitPtr->getTrueHit();
+            hitLayerId = aTrueHitPtr->getSensorID().getLayer();
+            pTrue = aTrueHitPtr->getMomentum();
+            uTrue = aTrueHitPtr->getU();
+            vTrue = aTrueHitPtr->getV();
+          } else {
+            SVDRecoHit2D const*const aSvdRecoHitPtr = static_cast<SVDRecoHit2D*>(aTrackPtr->getHit(iGFHit));
+            SVDTrueHit const*const aTrueHitPtr = aSvdRecoHitPtr->getTrueHit();
+            hitLayerId = aTrueHitPtr->getSensorID().getLayer();
+            pTrue = aTrueHitPtr->getMomentum();
+            uTrue = aTrueHitPtr->getU();
+            vTrue = aTrueHitPtr->getV();
+          }
+
+          const int accuVecIndex = hitLayerId - 1;
+
+          //cout << "m"; m.Print();cout << "V"; V.Print();
+          // build the true state vector x_t all in local coordinates
+          trueState[0][0] = charge / pTrue.Mag(); // q/p
+          trueState[1][0] = pTrue[0] / pTrue[2]; //dudw
+          trueState[2][0] = pTrue[1] / pTrue[2];//dvdw
+          trueState[3][0] = uTrue; // u
+          trueState[4][0] = vTrue; // v
+          m_dataOut << "\t" << trueState[0][0] << "\t" << trueState[1][0] << "\t" << trueState[2][0] << "\t" << trueState[3][0] << "\t" << trueState[4][0] << "\t" << m[0][0] << "\t" << m[1][0];
+          //cout << "true state\n";trueState.Print();
+          // now test if measurements am their theoretical variances that were feeded to genfit are consistent with the acutal distribution of measurments
+          res = m - H * trueState;
+          truthTests = calcZs(res, V);
+          truthTests.push_back(calcChi2(res, V));
+          fillLayerWiseData("zs_and_chi2_meas_t", accuVecIndex, truthTests);
 //
-        GFTools::getBiasedSmoothedData(aTrackPtr, 0, iGFHit, state, cov);
+          GFTools::getBiasedSmoothedData(aTrackPtr, 0, iGFHit, state, cov);
 //            cout << "smoother";
 //            state.Print();
 //            cov.Print();
-        res = m - H * state;
-        R = V - H * cov * HT;
-        if (R[0][0] <= 0.0 or R[1][1] <= 0.0) {
-          ++m_badR_smCounter;
-        } else {
-          testResutlsWithoutTruth = calcZs(res, R);
-          testResutlsWithoutTruth.push_back(calcChi2(res, R));
-          fillLayerWiseData("zs_and_chi2_sm", accuVecIndex, testResutlsWithoutTruth);
-        }
-        // now calculate test qunatites with smoothed state vec and cov and the true state vec
-        fillLayerWiseData("zs_and_chi2_sm_t", accuVecIndex, calcTestsWithTruthInfo(state, cov, trueState));
+          res = m - H * state;
+          R = V - H * cov * HT;
+          if (R[0][0] <= 0.0 or R[1][1] <= 0.0) {
+            ++m_badR_smCounter;
+          } else {
+            testResutlsWithoutTruth = calcZs(res, R);
+            testResutlsWithoutTruth.push_back(calcChi2(res, R));
+            fillLayerWiseData("zs_and_chi2_sm", accuVecIndex, testResutlsWithoutTruth);
+          }
+          // now calculate test qunatites with smoothed state vec and cov and the true state vec
+          fillLayerWiseData("zs_and_chi2_sm_t", accuVecIndex, calcTestsWithTruthInfo(state, cov, trueState));
 
 //
 //            // standard scores (pulls) calculated from residuals using the measurements and the predicted forward state
-        if (m_testPrediction == true) {
-          aTrackPtr->getBK(0)->getMatrix("fPreSt", iGFHit, state);
-          aTrackPtr->getBK(0)->getMatrix("fPreCov", iGFHit, cov);//
+          if (m_testPrediction == true) {
+            aTrackPtr->getBK(0)->getMatrix("fPreSt", iGFHit, state);
+            aTrackPtr->getBK(0)->getMatrix("fPreCov", iGFHit, cov);//
 //            isMatrixCov(cov);// test mathematical properties of cov matrix
-          res = m - H * state;
-          R = V + H * cov * HT;
-          testResutlsWithoutTruth = calcZs(res, R);
-          double fpChi2increment = calcChi2(res, R);
-          testResutlsWithoutTruth.push_back(fpChi2increment);
-          fillLayerWiseData("zs_and_chi2_fp", accuVecIndex, testResutlsWithoutTruth);
-          fpChi2tot += fpChi2increment;
-          //cout << "chi2inrement = " << calcChi2(res,R) << "\n";
-          m_dataOut << "\t" << state[3][0] << "\t" << state[4][0] << "\t" << cov[3][3] << "\t" << cov[4][4] << "\t" << cov[3][4] << "\t" <<  cov[4][3] << "\t" << fpChi2increment;
+            res = m - H * state;
+            R = V + H * cov * HT;
+            testResutlsWithoutTruth = calcZs(res, R);
+            double fpChi2increment = calcChi2(res, R);
+            testResutlsWithoutTruth.push_back(fpChi2increment);
+            fillLayerWiseData("zs_and_chi2_fp", accuVecIndex, testResutlsWithoutTruth);
+            fpChi2tot += fpChi2increment;
 
-          //get the propagation matrix
-          //aTrackPtr->getBK(0)->getMatrix("fProp",iGFHit,propMat);
-          //propMat.Print();
+            m_dataOut << "\t" << state[0][0] << "\t" << state[1][0] << "\t" << state[2][0] << "\t" << state[3][0] << "\t" << state[4][0] << "\t" << sqrt(cov[3][3]) << "\t" << sqrt(cov[4][4]) << "\t" << cov[3][4] << "\t" << fpChi2increment;
 
-          // test using predicted forward state and truth information
-          fillLayerWiseData("zs_and_chi2_fp_t", accuVecIndex, calcTestsWithTruthInfo(state, cov, trueState));
+            //get the propagation matrix
+            //aTrackPtr->getBK(0)->getMatrix("fProp",iGFHit,propMat);
+            //propMat.Print();
+
+            // test using predicted forward state and truth information
+            fillLayerWiseData("zs_and_chi2_fp_t", accuVecIndex, calcTestsWithTruthInfo(state, cov, trueState));
 
 //            //test the predicted state that I set myself
 //            /*TMatrixT<double> altTrueState(5,1);
@@ -335,73 +343,70 @@ void trackFitCheckerModule::event()
 //            /*cout <<setprecision(nDigits)<< fUpState[0][0] << " "<< fUpState[1][0] << " "<< fUpState[2][0] << " "<< fUpState[3][0] << " "<< fUpState[4][0] << "\n"; //updated
 //             */
 //
-        }
-        // standard scores (pulls) calculated from residuals using the measurements and the updated forward state
-        //TMatrixT<double> fUpState(5,1);
-        aTrackPtr->getBK(0)->getMatrix("fUpSt", iGFHit, state);
-        aTrackPtr->getBK(0)->getMatrix("fUpCov", iGFHit, cov);
-        isMatrixCov(cov);
-        res = m - H * state;
-        R = V - H * cov * HT;
-        double fChi2Inrement = 0;
-        if (R[0][0] <= 0.0 or R[1][1] <= 0.0) {
-          ++m_badR_fCounter;
-        } else {
-          fChi2Inrement = calcChi2(res, R);
-          testResutlsWithoutTruth = calcZs(res, R);
-          testResutlsWithoutTruth.push_back(fChi2Inrement);
-          fillLayerWiseData("zs_and_chi2_fu", accuVecIndex, testResutlsWithoutTruth);
-        }
-
-        m_dataOut << "\t" << fChi2Inrement;
-        // test using updated forward state and truth information
-        fillLayerWiseData("zs_and_chi2_fu_t", accuVecIndex, calcTestsWithTruthInfo(state, cov, trueState));
-
-        // standard scores (pulls) calculated from residuals using the measurements and the predicted backward state
-        if (m_testPrediction == true) {
-          aTrackPtr->getBK(0)->getMatrix("bPreSt", iGFHit, state);
-          aTrackPtr->getBK(0)->getMatrix("bPreCov", iGFHit, cov);
+          }
+          // standard scores (pulls) calculated from residuals using the measurements and the updated forward state
+          //TMatrixT<double> fUpState(5,1);
+          aTrackPtr->getBK(0)->getMatrix("fUpSt", iGFHit, state);
+          aTrackPtr->getBK(0)->getMatrix("fUpCov", iGFHit, cov);
           isMatrixCov(cov);
           res = m - H * state;
-          R = V + H * cov * HT;
-          testResutlsWithoutTruth = calcZs(res, R);
-          testResutlsWithoutTruth.push_back(calcChi2(res, R));
-          fillLayerWiseData("zs_and_chi2_bp", accuVecIndex, testResutlsWithoutTruth);
+          R = V - H * cov * HT;
+          double fuChi2Inrement = 0;
+          if (R[0][0] <= 0.0 or R[1][1] <= 0.0) {
+            ++m_badR_fCounter;
+          } else {
+            fuChi2Inrement = calcChi2(res, R);
+            testResutlsWithoutTruth = calcZs(res, R);
+            testResutlsWithoutTruth.push_back(fuChi2Inrement);
+            fillLayerWiseData("zs_and_chi2_fu", accuVecIndex, testResutlsWithoutTruth);
+          }
+
+          //m_dataOut << "\t" << fuChi2Inrement;
+          // test using updated forward state and truth information
+          fillLayerWiseData("zs_and_chi2_fu_t", accuVecIndex, calcTestsWithTruthInfo(state, cov, trueState));
+
+          // standard scores (pulls) calculated from residuals using the measurements and the predicted backward state
+          if (m_testPrediction == true) {
+            aTrackPtr->getBK(0)->getMatrix("bPreSt", iGFHit, state);
+            aTrackPtr->getBK(0)->getMatrix("bPreCov", iGFHit, cov);
+            isMatrixCov(cov);
+            res = m - H * state;
+            R = V + H * cov * HT;
+            testResutlsWithoutTruth = calcZs(res, R);
+            testResutlsWithoutTruth.push_back(calcChi2(res, R));
+            fillLayerWiseData("zs_and_chi2_bp", accuVecIndex, testResutlsWithoutTruth);
+            // test using updated backward state and truth information
+            fillLayerWiseData("zs_and_chi2_bp_t", accuVecIndex, calcTestsWithTruthInfo(state, cov, trueState));
+          }
+
+          // standard scores (pulls) calculated from residuals using the measurements and the updated backward state
+          aTrackPtr->getBK(0)->getMatrix("bUpSt", iGFHit, state);
+          aTrackPtr->getBK(0)->getMatrix("bUpCov", iGFHit, cov);
+          isMatrixCov(cov);
+          res = m - H * state;
+          R = V - H * cov * HT;
+          if (R[0][0] <= 0.0 or R[1][1] <= 0.0) {
+            ++m_badR_bCounter;
+          } else {
+            testResutlsWithoutTruth = calcZs(res, R);
+            testResutlsWithoutTruth.push_back(calcChi2(res, R));
+            fillLayerWiseData("zs_and_chi2_bu", accuVecIndex, testResutlsWithoutTruth);
+          }
+
           // test using updated backward state and truth information
-          fillLayerWiseData("zs_and_chi2_bp_t", accuVecIndex, calcTestsWithTruthInfo(state, cov, trueState));
+          fillLayerWiseData("zs_and_chi2_bu_t", accuVecIndex, calcTestsWithTruthInfo(state, cov, trueState));
+
+
+
+
+
         }
-
-        // standard scores (pulls) calculated from residuals using the measurements and the updated backward state
-        aTrackPtr->getBK(0)->getMatrix("bUpSt", iGFHit, state);
-        aTrackPtr->getBK(0)->getMatrix("bUpCov", iGFHit, cov);
-        isMatrixCov(cov);
-        res = m - H * state;
-        R = V - H * cov * HT;
-        if (R[0][0] <= 0.0 or R[1][1] <= 0.0) {
-          ++m_badR_bCounter;
-        } else {
-          testResutlsWithoutTruth = calcZs(res, R);
-          testResutlsWithoutTruth.push_back(calcChi2(res, R));
-          fillLayerWiseData("zs_and_chi2_bu", accuVecIndex, testResutlsWithoutTruth);
-        }
-
-        // test using updated backward state and truth information
-        fillLayerWiseData("zs_and_chi2_bu_t", accuVecIndex, calcTestsWithTruthInfo(state, cov, trueState));
-
-
-
-//        }
-//        m_dataOut << "\t" << pfChi2tot;
-//        /*if (layerIdSum not_eq 21){
-//          B2ERROR("layerIdSum is not 21 " << m_eventCounter << "\t" << m_processedTracks << "\t" << layerIdSum);
-//          m_dataOut << m_eventCounter << "\t" << m_processedTracks << "\t" << layerIdSum << "\n";
-//        }*/
-//        //m_dataOut2 << "\t" <<z_qOverPDataOut<< "\t" <<z_vDataOut <<"\t"<< vertexAbsMom;
-//      }
+        m_dataOut << "\t" << fpChi2tot;
 //      m_dataOut2 << "\n";
-//      m_dataOut << "\n";
-        ++m_processedTracks;
+        m_dataOut << "\n";
       }
+      ++m_processedTracks;
+
 
     }
   }
@@ -438,23 +443,24 @@ void trackFitCheckerModule::endRun()
     measVarNames.push_back("u");
     measVarNames.push_back("v");
     measVarNames.push_back("χ²");
-    printLayerWiseStatistics("zs_and_chi2_meas_t", measVarNames);
+
     printTrackWiseVecStatistics("zs_vertexPosMom", m_vertexTestsVarNames);
+    if (m_testSi == true) {
+      printLayerWiseStatistics("zs_and_chi2_meas_t", measVarNames);
+      printLayerWiseStatistics("zs_and_chi2_fp_t", m_layerWiseTruthTestsVarNames);
+      printLayerWiseStatistics("zs_and_chi2_fp", measVarNames);
+      printLayerWiseStatistics("zs_and_chi2_fu_t", m_layerWiseTruthTestsVarNames);
+      printLayerWiseStatistics("zs_and_chi2_fu", measVarNames);
 
-    printLayerWiseStatistics("zs_and_chi2_fp_t", m_layerWiseTruthTestsVarNames);
-    printLayerWiseStatistics("zs_and_chi2_fp", measVarNames);
-    printLayerWiseStatistics("zs_and_chi2_fu_t", m_layerWiseTruthTestsVarNames);
-    printLayerWiseStatistics("zs_and_chi2_fu", measVarNames);
+      printLayerWiseStatistics("zs_and_chi2_bp_t", m_layerWiseTruthTestsVarNames);
+      printLayerWiseStatistics("zs_and_chi2_bp", measVarNames);
+      printLayerWiseStatistics("zs_and_chi2_bu_t", m_layerWiseTruthTestsVarNames);
+      printLayerWiseStatistics("zs_and_chi2_bu", measVarNames);
 
-    printLayerWiseStatistics("zs_and_chi2_bp_t", m_layerWiseTruthTestsVarNames);
-    printLayerWiseStatistics("zs_and_chi2_bp", measVarNames);
-    printLayerWiseStatistics("zs_and_chi2_bu_t", m_layerWiseTruthTestsVarNames);
-    printLayerWiseStatistics("zs_and_chi2_bu", measVarNames);
-
-    printLayerWiseStatistics("zs_and_chi2_sm_t", m_layerWiseTruthTestsVarNames);
-    printLayerWiseStatistics("zs_and_chi2_sm", measVarNames);
-
-//    if (m_testSi == true){
+      printLayerWiseStatistics("zs_and_chi2_sm_t", m_layerWiseTruthTestsVarNames);
+      printLayerWiseStatistics("zs_and_chi2_sm", measVarNames);
+    }
+//
 //
 //
 //      B2INFO("Now testing the predicted forward track parameters with the state I set")
@@ -486,9 +492,8 @@ void trackFitCheckerModule::endRun()
 void trackFitCheckerModule::terminate()
 {
   //m_dataOut << "trackFitCheckerModule::terminate()\n";
-  m_dataOut2.close();
+  //m_dataOut2.close();
   m_dataOut.close();
-  //m_absMomOut.close();
 }
 
 // calculate a chi2 value from a residuum and it's covariance matrix R

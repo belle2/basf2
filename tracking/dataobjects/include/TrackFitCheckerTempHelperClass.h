@@ -50,6 +50,14 @@ namespace Belle2 {
     double pValue_fp;
     double pValue_bu;
     double pValue_bp;
+
+    double zVertexPosX;
+    double zVertexPosY;
+    double zVertexPosZ;
+    double zVertexMomX;
+    double zVertexMomY;
+    double zVertexMomZ;
+
     /** Needed for ROOT purposes. This Macro makes a ROOT object from TrackFitCheckerTempHelperClass. */
     ClassDef(TrackFitCheckerTempHelperClass, 1);
   }; //class

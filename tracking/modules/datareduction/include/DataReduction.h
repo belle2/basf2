@@ -28,17 +28,17 @@ namespace Belle2 {
     int _nRun;
     int _nEvt;
 
-    std::string _colNameDigiSVDHits; //Name of the digitized SVD hit input collection
-    std::string _colNameDigiPXDHits; //Name of the digitized PXD hit input collection
-    std::string _colNameSimPXDHits;  //Name of the simulated PXD hit input collection
+    std::string _colNameDigiSVDTrueHits; //Name of the digitized SVD hit input collection
+    std::string _colNameDigiPXDTrueHits; //Name of the digitized PXD hit input collection
+    std::string _colNameSimPXDTrueHits;  //Name of the simulated PXD hit input collection
 
     SectorList* _sectorList;
     PXDLadderList* _pxdLadderList;
 
-    int _numberPXDHitsTotal;
-    int _numberPXDHitsFound;
-    int _numberSimPXDHitsTotal;
-    int _numberSimPXDHitsFound;
+    int _numberPXDTrueHitsTotal;
+    int _numberPXDTrueHitsFound;
+    int _numberSimPXDTrueHitsTotal;
+    int _numberSimPXDTrueHitsFound;
 
     enum LayerType { pixel = 0, strip = 1, slanted = 2 };
 

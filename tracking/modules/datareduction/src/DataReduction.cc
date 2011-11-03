@@ -6,8 +6,8 @@
 //DataStore Objects
 
 #include <framework/datastore/StoreArray.h>
-#include <svd/dataobjects/SVDHit.h>
-#include <pxd/dataobjects/PXDHit.h>
+#include <svd/dataobjects/SVDTrueHit.h>
+#include <pxd/dataobjects/PXDTrueHit.h>
 #include <pxd/dataobjects/PXDSimHit.h>
 #include <tracking/modules/datareduction/TrackerHit.h>
 
@@ -46,23 +46,23 @@ DataReductionModule::DataReductionModule() : Module()
 
   //Input Collections
   /*
-  registerInputCollection(LCIO::TRACKERHIT, "InputDigiSVDCollection", "Name of tracker hits collection with digitized SVDHits",
-                          _colNameDigiSVDHits, std::string("SVDTrackerHits"));
+  registerInputCollection(LCIO::TRACKERHIT, "InputDigiSVDCollection", "Name of tracker hits collection with digitized SVDTrueHits",
+                          _colNameDigiSVDTrueHits, std::string("SVDTrackerHits"));
 
-  registerInputCollection(LCIO::TRACKERHIT, "InputDigiPXDCollection", "Name of tracker hits collection with digitized PXDHits",
-                          _colNameDigiPXDHits, std::string("PXDTrackerHits"));
+  registerInputCollection(LCIO::TRACKERHIT, "InputDigiPXDCollection", "Name of tracker hits collection with digitized PXDTrueHits",
+                          _colNameDigiPXDTrueHits, std::string("PXDTrackerHits"));
 
-  registerInputCollection(LCIO::SIMTRACKERHIT, "InputSimPXDCollection", "Name of tracker hits collection with digitized PXDHits",
-                          _colNameSimPXDHits, std::string("PXDCollection"));
+  registerInputCollection(LCIO::SIMTRACKERHIT, "InputSimPXDCollection", "Name of tracker hits collection with digitized PXDTrueHits",
+                          _colNameSimPXDTrueHits, std::string("PXDCollection"));
   */
 
-  addParam("InputDigiSVDCollection", _colNameDigiSVDHits,
-           "Name of the SVDHitCollection", string("SVDHits"));
+  addParam("InputDigiSVDCollection", _colNameDigiSVDTrueHits,
+           "Name of the SVDTrueHitCollection", string("SVDTrueHits"));
 
-  addParam("InputDigiPXDCollection", _colNameDigiPXDHits,
-           "Name of the PXDHitCollection", string("PXDHits"));
+  addParam("InputDigiPXDCollection", _colNameDigiPXDTrueHits,
+           "Name of the PXDTrueHitCollection", string("PXDTrueHits"));
 
-  addParam("InputSimPXDCollection", _colNameSimPXDHits,
+  addParam("InputSimPXDCollection", _colNameSimPXDTrueHits,
            "Name of the PXDSimHitCollection", string("PXDSimHits"));
 
   _sectorList = new SectorList();
@@ -82,8 +82,8 @@ void DataReductionModule::initialize()
 {
   _nRun = 0;
   _nEvt = 0;
-  _numberPXDHitsTotal = 0;
-  _numberPXDHitsFound = 0;
+  _numberPXDTrueHitsTotal = 0;
+  _numberPXDTrueHitsFound = 0;
 
 
   //------- Add sectors -------
@@ -267,42 +267,42 @@ void DataReductionModule::event()
   _pxdLadderList->clearAllRegions(); //Clear all regions
   /*
     //1) Prepare collections
-    LCCollection* digiSVDHitsCol = 0;
-    LCCollection* digiPXDHitsCol = 0;
-    LCCollection* simPXDHitsCol = 0;
+    LCCollection* digiSVDTrueHitsCol = 0;
+    LCCollection* digiPXDTrueHitsCol = 0;
+    LCCollection* simPXDTrueHitsCol = 0;
   */
-  StoreArray<PXDSimHit> pxdSimHitArray(_colNameSimPXDHits);
-  StoreArray<PXDHit>    pxdHitArray(_colNameDigiPXDHits);
-  StoreArray<SVDHit>    svdHitArray(_colNameDigiSVDHits);
-  B2INFO("Number of simulated SVDHits:  " << svdHitArray.GetEntries());
+  StoreArray<PXDSimHit> pxdSimHitArray(_colNameSimPXDTrueHits);
+  StoreArray<PXDTrueHit>    pxdHitArray(_colNameDigiPXDTrueHits);
+  StoreArray<SVDTrueHit>    svdHitArray(_colNameDigiSVDTrueHits);
+  B2INFO("Number of simulated SVDTrueHits:  " << svdHitArray.GetEntries());
   B2INFO("Number of simulated PXDSimHits:  " << pxdSimHitArray.GetEntries());
-  B2INFO("Number of simulated PXDHits:  " << pxdHitArray.GetEntries());
+  B2INFO("Number of simulated PXDTrueHits:  " << pxdHitArray.GetEntries());
 
   /*
     //2) Assign digitized SVD Hits hits to Sectors
     try {
-      digiSVDHitsCol = evt->getCollection(_colNameDigiSVDHits.c_str());
-      int ndigiSVDHits = digiSVDHitsCol->getNumberOfElements();
+      digiSVDTrueHitsCol = evt->getCollection(_colNameDigiSVDTrueHits.c_str());
+      int ndigiSVDTrueHits = digiSVDTrueHitsCol->getNumberOfElements();
 
-      digiPXDHitsCol = evt->getCollection(_colNameDigiPXDHits.c_str());
-      simPXDHitsCol = evt->getCollection(_colNameSimPXDHits.c_str());
+      digiPXDTrueHitsCol = evt->getCollection(_colNameDigiPXDTrueHits.c_str());
+      simPXDTrueHitsCol = evt->getCollection(_colNameSimPXDTrueHits.c_str());
 
-      for (int iHit = 0; iHit < ndigiSVDHits; ++iHit) {
-        TrackerHit* currentHit = dynamic_cast<TrackerHit*>(digiSVDHitsCol->getElementAt(iHit));
+      for (int iHit = 0; iHit < ndigiSVDTrueHits; ++iHit) {
+        TrackerHit* currentHit = dynamic_cast<TrackerHit*>(digiSVDTrueHitsCol->getElementAt(iHit));
         _sectorList->addHit(currentHit);
       }
 
       printSectorInfo();
 
     } catch (DataNotAvailableException &e) {
-      streamlog_out(MESSAGE4) << "Collection not found: " << _colNameDigiSVDHits << endl;
+      streamlog_out(MESSAGE4) << "Collection not found: " << _colNameDigiSVDTrueHits << endl;
       streamlog_out(MESSAGE4) << "Skip event: " << _nEvt << endl;
       return;
     }
   */
-  int ndigiSVDHits = svdHitArray.GetEntries();
+  int ndigiSVDTrueHits = svdHitArray.GetEntries();
 
-  for (int iHit = 0; iHit < ndigiSVDHits; ++iHit) {
+  for (int iHit = 0; iHit < ndigiSVDTrueHits; ++iHit) {
     TrackerHit* currentHit = new TrackerHit();
     double hitPos[3] = {svdHitArray[iHit]->getU(), svdHitArray[iHit]->getV(), 0.0};
     B2DEBUG(99, svdHitArray[iHit]->getU() << "  " << svdHitArray[iHit]->getV());
@@ -401,9 +401,9 @@ void DataReductionModule::event()
 #endif
 
     //Draw PXD Hits
-    int ndigiPXDHits = pxdHitArray.GetEntries();
+    int ndigiPXDTrueHits = pxdHitArray.GetEntries();
 
-    for (int iHit = 0; iHit < ndigiPXDHits; ++iHit) {
+    for (int iHit = 0; iHit < ndigiPXDTrueHits; ++iHit) {
       TrackerHit* currentHit = new TrackerHit();
       double hitPos[3] = {pxdHitArray[iHit]->getU(), pxdHitArray[iHit]->getV(), 0.0};
       currentHit->setPosition(hitPos);
@@ -412,7 +412,7 @@ void DataReductionModule::event()
 
       //Shift center to local ladder frame
       if (!l.isInLadder(currentHit->getPosition())) continue;
-      _numberPXDHitsTotal++;
+      _numberPXDTrueHitsTotal++;
 
       TVector2 hitPosNorm = l.convertToRelative(currentHit->getPosition());
 
@@ -422,7 +422,7 @@ void DataReductionModule::event()
 
         if ((hitPosNorm.X() >= currRegion->widthStart) && (hitPosNorm.X() <= currRegion->widthEnd) &&
             (hitPosNorm.Y() >= currRegion->lengthStart) && (hitPosNorm.Y() <= currRegion->lengthEnd)) {
-          _numberPXDHitsFound++;
+          _numberPXDTrueHitsFound++;
           break;
         }
       }
@@ -435,9 +435,9 @@ void DataReductionModule::event()
 #endif
     }
     //Draw PXD SimHits
-    int nsimPXDHits = pxdSimHitArray.GetEntries();
+    int nsimPXDTrueHits = pxdSimHitArray.GetEntries();
 
-    for (int iHit = 0; iHit < nsimPXDHits; ++iHit) {
+    for (int iHit = 0; iHit < nsimPXDTrueHits; ++iHit) {
       TrackerHit* currentHit = new TrackerHit();
       TVector3 posV =  pxdSimHitArray[iHit]->getPosIn();
       double hitPos[3] = {posV(0), posV(1), 0.0};
@@ -453,7 +453,7 @@ void DataReductionModule::event()
 
       //Shift center to local ladder frame
       if (!l.isInLadder(currentHit->getPosition())) continue;
-      _numberSimPXDHitsTotal++;
+      _numberSimPXDTrueHitsTotal++;
 
       TVector2 hitPosNorm = l.convertToRelative(currentHit->getPosition());
 
@@ -463,7 +463,7 @@ void DataReductionModule::event()
 
         if ((hitPosNorm.X() >= currRegion->widthStart) && (hitPosNorm.X() <= currRegion->widthEnd) &&
             (hitPosNorm.Y() >= currRegion->lengthStart) && (hitPosNorm.Y() <= currRegion->lengthEnd)) {
-          _numberSimPXDHitsFound++;
+          _numberSimPXDTrueHitsFound++;
           break;
         }
       }
@@ -494,12 +494,12 @@ void DataReductionModule::endRun()
   _sectorList->deleteAllSectors();
   _pxdLadderList->deleteAllLadders();
 
-  B2INFO("Number PXD Hits total: " << _numberPXDHitsTotal << endl);
-  B2INFO("Number PXD Hits found: " << _numberPXDHitsFound << endl);
-  B2INFO("Efficiency:            " << setprecision(5) << double(_numberPXDHitsFound) / double(_numberPXDHitsTotal) << endl);
-  B2INFO("Number SimPXD Hits total: " << _numberSimPXDHitsTotal << endl);
-  B2INFO("Number SimPXD Hits found: " << _numberSimPXDHitsFound << endl);
-  B2INFO("Efficiency:               " << setprecision(5) << double(_numberSimPXDHitsFound) / double(_numberSimPXDHitsTotal) << endl);
+  B2INFO("Number PXD Hits total: " << _numberPXDTrueHitsTotal << endl);
+  B2INFO("Number PXD Hits found: " << _numberPXDTrueHitsFound << endl);
+  B2INFO("Efficiency:            " << setprecision(5) << double(_numberPXDTrueHitsFound) / double(_numberPXDTrueHitsTotal) << endl);
+  B2INFO("Number SimPXD Hits total: " << _numberSimPXDTrueHitsTotal << endl);
+  B2INFO("Number SimPXD Hits found: " << _numberSimPXDTrueHitsFound << endl);
+  B2INFO("Efficiency:               " << setprecision(5) << double(_numberSimPXDTrueHitsFound) / double(_numberSimPXDTrueHitsTotal) << endl);
 #ifdef CAIRO_OUTPUT
   cairo_destroy(cairo);
   cairo_surface_finish(cairo_surface);

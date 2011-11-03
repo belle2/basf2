@@ -85,7 +85,8 @@ void CDCSimpleBackgroundModule::event()
     nWires += cdcg.nWiresInLayer(i);
   }
 
-  //Information about the possible values of charge/drift time. This is the first guess!!! I have no real idea in what range these values should be (and what their units are). It has to be investigated which values are realistic here...
+  //Information about the possible values of charge/drift time. This is the first guess!!! I have no real idea in what range these values should be (and what their units are).
+  //It also not clear if background hits will have similar drift time and charge as real hits, so it is really a very rough approach...
   double maxDriftTime = 10000;
   double maxCharge = 100;
 
@@ -105,12 +106,11 @@ void CDCSimpleBackgroundModule::event()
   //Generate single hits background
   if (m_hits > 0 && m_hits <= 100) {
     B2INFO("Generate single hits background ...");
-    //the generated background should go with 1/r
+    //the generated background should go approximately with 1/r
     //it is realized by making the number of background hits per layer constant
-    int nHitsPerLayer = 0;
+    int nHitsPerLayer = int(m_hits * nWires * 0.01 / nLayers + 0.5);   //(round up)
 
     for (int layerId = 0; layerId < nLayers; layerId++) { //loop over all layers (56)
-      nHitsPerLayer = int(m_hits * cdcg.nWiresInLayer(layerId) * 0.01 + 0.5); //calculate the number of background hits for this layer (round up)
       for (int i = 0; i < nHitsPerLayer; i++) { //loop to create hits
         wireId = rand() % cdcg.nWiresInLayer(layerId);  //choose a random wire
 
@@ -134,9 +134,8 @@ void CDCSimpleBackgroundModule::event()
   //Generate cluster background
   if (m_clusters > 0 && m_clusters <= 100) {
     B2INFO("Generate cluster background ...");
-    int nClustersPerLayer = 0;
+    int nClustersPerLayer = int(m_clusters * nWires * 0.0019 / nLayers + 0.5);   //assume that each cluster will have ~ 5 hits (average) (round up)
     for (int layerId = 0; layerId < nLayers; layerId++) {
-      nClustersPerLayer = int(m_clusters * cdcg.nWiresInLayer(layerId) * 0.0019 + 0.5); //assume that each cluster will have ~ 5 hits (average)  (round up)
       for (int i = 0; i < nClustersPerLayer; i++) {
         wireId = rand() % cdcg.nWiresInLayer(layerId);  //choose a random wire
 

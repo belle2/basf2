@@ -30,7 +30,7 @@ namespace Belle2 {
   public:
 
     //! Constructor
-    EKLMHitBase() {};
+    EKLMHitBase();
 
     //! Constructor
     EKLMHitBase(char nEndcap, char nLayer, char nSector, char nPlane,

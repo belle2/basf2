@@ -105,18 +105,24 @@ namespace Belle2 {
     // Get particle information
     const G4int PDGcode = track.GetDefinition()->GetPDGEncoding();
 
+
+    // no conversion btw. G4ThreeVector and TVector3. Sad but true
     const G4ThreeVector & gpos = 0.5 *
                                  (aStep->GetPostStepPoint()->GetPosition() +
                                   aStep->GetPreStepPoint()->GetPosition());
+
+    const TVector3 & gposRoot = TVector3(gpos.z(), gpos.y(), gpos.z());
 
     const G4ThreeVector & lpos = aStep->GetPreStepPoint()->
                                  GetTouchableHandle()->GetHistory()->
                                  GetTopTransform().TransformPoint(gpos);
 
+    const TVector3 & lposRoot = TVector3(lpos.z(), lpos.y(), lpos.z());
+
     //creates hit
     StoreArray<EKLMSimHit> simHitsArray;
     EKLMSimHit *hit = new(simHitsArray->AddrAt(simHitsArray.getEntries()))
-    EKLMSimHit(pv, gpos, lpos, hitTime, PDGcode,  eDep);
+    EKLMSimHit(pv, gposRoot, lposRoot, hitTime, PDGcode,  eDep);
     if (hit == NULL) {
       B2ERROR("Memory allocation error.");
       return false;

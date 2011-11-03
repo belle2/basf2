@@ -20,6 +20,7 @@
 #include "G4ThreeVector.hh"
 
 #include "eklm/eklmhit/EKLMHitBase.h"
+#include <TVector3.h>
 
 #include "G4VHit.hh"
 namespace Belle2 {
@@ -30,12 +31,12 @@ namespace Belle2 {
 
   public:
 
-    //! constructor needed to make the class storable
-    EKLMSimHit() {};
+    //! default constructor needed to make the class storable
+    EKLMSimHit();
 
     //! Constructor with initial values
-    EKLMSimHit(G4VPhysicalVolume *pv, G4ThreeVector global_pos,
-               G4ThreeVector local_pos, G4double time, G4int PDGcode,
+    EKLMSimHit(G4VPhysicalVolume *pv, TVector3 global_pos,
+               TVector3 local_pos, G4double time, G4int PDGcode,
                G4double eDep);
 
     //! Destructor
@@ -43,37 +44,49 @@ namespace Belle2 {
 
     //! returns physical volume
     G4VPhysicalVolume *getPV();
+    void setPV(G4VPhysicalVolume *);
 
     //! returns global position of the hit
-    G4ThreeVector getGlobalPos();
+    TVector3 getGlobalPos();
 
     //! returns local position of the hit
-    G4ThreeVector getLocalPos();
+    TVector3 getLocalPos();
+
+    //! set global position of the hit
+    void setGlobalPos(const TVector3 &);
+
+    //! set local position of the hit
+    void setLocalPos(const TVector3 &);
+
+
+
 
     //! returns hit time
     G4double getTime();
+    void setTime(double);
 
     //! returns energy deposition
     G4double getEDep();
+    void setEDep(double);
 
     //! returns PDG code of the particle
     G4int getPDGCode();
+    void setPDGCode(G4int);
+
 
     //! dumps hit into ASCII file
     void Save(char * filename);
 
-
+    //! returm track ID
     G4int getTrackID();
-
-
     void  setTrackID(G4int id);
 
+    //! returs parent track ID
     G4int getParentTrackID();
-
     void setParentTrackID(G4int id);
 
+    //! returns  first hit status
     bool  getFirstHit();
-
     void  setFirstHit(bool fh);
 
 
@@ -83,10 +96,10 @@ namespace Belle2 {
     G4VPhysicalVolume *m_pv; //! {ROOT streamer directive}
 
     //! hit position (in global reference frame)
-    G4ThreeVector m_global_pos;
+    TVector3 m_global_pos;
 
     //! hit position (in local reference frame)
-    G4ThreeVector m_local_pos;
+    TVector3 m_local_pos;
 
     //!hit time
     G4double m_time;

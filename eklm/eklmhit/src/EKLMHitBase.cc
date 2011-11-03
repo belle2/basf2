@@ -15,6 +15,15 @@ using namespace Belle2;
 
 ClassImp(EKLMHitBase);
 
+EKLMHitBase::EKLMHitBase()
+{
+  m_nEndcap = 0;
+  m_nLayer = 0;
+  m_nSector = 0;
+  m_nPlane = 0;
+  m_nStrip = 0;
+}
+
 EKLMHitBase::EKLMHitBase(char nEndcap, char nLayer, char nSector, char nPlane,
                          char nStrip)
 {

@@ -19,8 +19,18 @@ ClassImp(Belle2::EKLMSimHit)
 
 G4Allocator<EKLMSimHit> EKLMSimHitAllocator;
 
-EKLMSimHit::EKLMSimHit(G4VPhysicalVolume *pv, G4ThreeVector global_pos,
-                       G4ThreeVector local_pos, G4double time,
+EKLMSimHit::EKLMSimHit()
+{
+  m_pv = NULL;
+  m_global_pos = TVector3(0, 0, 0);
+  m_local_pos = TVector3(0, 0, 0);
+  m_time = 0;
+  m_PDGcode = 0;
+  m_eDep = 0;
+}
+
+EKLMSimHit::EKLMSimHit(G4VPhysicalVolume *pv, TVector3 global_pos,
+                       TVector3 local_pos, G4double time,
                        G4int PDGcode, G4double eDep)
 {
   m_pv = pv;
@@ -36,19 +46,38 @@ G4VPhysicalVolume* EKLMSimHit::getPV()
   return m_pv;
 }
 
-G4ThreeVector EKLMSimHit::getGlobalPos()
+void EKLMSimHit::setPV(G4VPhysicalVolume* pv)
+{
+  m_pv = pv;
+}
+
+TVector3 EKLMSimHit::getGlobalPos()
 {
   return m_global_pos;
 }
 
-G4ThreeVector EKLMSimHit::getLocalPos()
+void EKLMSimHit::setGlobalPos(const TVector3 & gp)
+{
+  m_global_pos = gp;
+}
+
+TVector3 EKLMSimHit::getLocalPos()
 {
   return m_local_pos;
+}
+
+void setLocalPos(TVector3 lp)
+{
+  //  m_local_pos=lp;
 }
 
 G4double EKLMSimHit::getTime()
 {
   return m_time;
+}
+void EKLMSimHit::setTime(double t)
+{
+  m_time = t;
 }
 
 G4double EKLMSimHit::getEDep()
@@ -56,9 +85,19 @@ G4double EKLMSimHit::getEDep()
   return m_eDep;
 }
 
+void EKLMSimHit::setEDep(double e)
+{
+  m_eDep = e;
+}
+
 G4int EKLMSimHit::getPDGCode()
 {
   return m_PDGcode;
+}
+
+void EKLMSimHit::setPDGCode(int pdg)
+{
+  m_PDGcode = pdg;
 }
 
 
@@ -100,8 +139,8 @@ void EKLMSimHit::Save(char* filename)
   std::ofstream save_hit(filename, std::fstream::app);
   save_hit << '\n';
   save_hit << "EKLM Hit: \n" ;
-  save_hit << "Global position: " << m_global_pos << '\n'  ;
-  save_hit << "Local position: " << m_local_pos << '\n'  ;
+  save_hit << "Global position: (" << m_global_pos.x() << "," << m_global_pos.y() << "," << m_global_pos.z() << ")\n"  ;
+  save_hit << "Local position: (" << m_local_pos.x() << "," << m_local_pos.y() << "," << m_local_pos.z() << ")\n"  ;
   save_hit << "Time: " << m_time << '\n' ;
   save_hit << "Energy Deposition: " <<  m_eDep << '\n' ;
   save_hit << "PDG code: " << m_PDGcode << '\n';

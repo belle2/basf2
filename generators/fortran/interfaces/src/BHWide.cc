@@ -37,6 +37,11 @@ extern"C" {
 
 BHWide::BHWide()
 {
+  for (int i = 0; i < 100; ++i) {
+    m_npar[i] = 0;
+    m_xpar[i] = 0.0;
+  }
+
   setDefaultSettings();
 }
 
@@ -66,7 +71,7 @@ void BHWide::setDefaultSettings()
   m_minEnergyFinalStatePos = 0.2 * Unit::GeV;
   m_minEnergyFinalStateElc = 0.2 * Unit::GeV;
   m_maxAcollinearity = 10.0;
-  m_infCutCMSEnergy = 10e-5;
+  m_infCutCMSEnergy = 1e-5;
   m_maxRejectionWeight = 3.0;
   m_massZ = 91.1882 * Unit::GeV;
   m_widthZ = 2.4952;

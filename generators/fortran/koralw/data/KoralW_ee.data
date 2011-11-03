@@ -16,7 +16,7 @@ BeginX
    15     0.000001d0 arbitr1=xpar(15) ! inv_mass**2 cut for e+e-xx (GeV**2)
    16           1d-6 themin =xpar(16) ! themin  min theta (rad) with beam (0=no cut)
    17           25d0 arbitr2=xpar(17) ! arbitr2 max p_t**2 of photons in e+e-xx (GeV**2)
- 1011            0d0 KeyISR  =0,1  initial state radiation off/on (default=1)
+ 1011            1d0 KeyISR  =0,1  initial state radiation off/on (default=1)
  1013            1d0 KeyNLL  =0 sets next-to leading alpha/pi terms to zero
 *                            =1 alpha/pi in yfs formfactor is kept (default)
  1014            1d0 KeyCul  =0,1 Coulomb correction, off/on (default=1)

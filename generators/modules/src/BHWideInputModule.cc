@@ -53,8 +53,6 @@ BHWideInputModule::~BHWideInputModule()
 void BHWideInputModule::initialize()
 {
   StoreObjPtr<RunMetaData> runMetaDataPtr("RunMetaData", DataStore::c_Run);
-  m_generator.init();
-
 
   //Depending on the settings, use the Belle II or Belle boost
   if (m_boostMode == 1) {
@@ -78,6 +76,7 @@ void BHWideInputModule::initialize()
   m_generator.enableBoost(m_boostMode > 0);
   m_generator.setScatAnglePositron(vectorToPair(m_ScatteringAngleRangePositron, "ScatteringAngleRangePositron"));
   m_generator.setScatAngleElectron(vectorToPair(m_ScatteringAngleRangeElectron, "ScatteringAngleRangeElectron"));
+  m_generator.init();
 }
 
 

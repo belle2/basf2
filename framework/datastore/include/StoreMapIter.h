@@ -82,7 +82,7 @@ namespace Belle2 {
      *  @par name of the object to be pointed to.
      */
     typename T::iterator find(const std::string& name) {
-      m_iter = m_map.find(name);
+      m_iter = m_map->find(name);
       return m_iter;
     }
 

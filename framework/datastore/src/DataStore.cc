@@ -34,6 +34,7 @@ void DataStore::clearMaps(const EDurability& durability)
   B2DEBUG(100, "Start deletion process of durability " << durability);
   for (StoreObjIter iter = m_objectMap[durability].begin(); iter != m_objectMap[durability].end(); iter++) {
     if (iter->second) {
+      B2DEBUG(250, iter->second->ClassName() << " is going to be deleted.");
       delete iter->second; // delete object
       iter->second = 0;    // make sure pointer isn't dangling
       //    delete iter->second.get<1>();

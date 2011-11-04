@@ -55,7 +55,10 @@ SimpleInputModule::SimpleInputModule() : Module()
   addParam(m_steerTreeNames[1], m_treeNames[1], "TTree name for run data. NONE for no input.", string("NONE"));
   addParam(m_steerTreeNames[2], m_treeNames[2], "TTree name for persistent data. NONE for no input.", string("NONE"));
 
-  addParam("eventNumber", m_eventNumber, "Skip this number of events before starting.", 0);
+  addParam("eventNumber", m_counterNumber[0], "Skip this number of events before starting.", 0);
+  m_counterNumber[1] = 0;
+  m_counterNumber[2] = 0;
+
 
   vector<string> branchNames;
   addParam(m_steerBranchNames[0], m_branchNames[0], "Names of branches to be read into event map. Empty means all branches.", branchNames);
@@ -81,51 +84,6 @@ void SimpleInputModule::initialize()
       m_tree[ii] = dynamic_cast<TTree*>(m_file->Get(m_treeNames[ii].c_str()));
       if (!m_tree[ii]) {B2FATAL("TTree " + m_treeNames[ii] + " doesn't exist");}
       B2INFO("Opened tree " + m_treeNames[ii]);
-
-      //Connect the branches to the TObject pointers
-      TObjArray* branches = m_tree[ii]->GetListOfBranches();
-      TBranch* branch = 0;
-
-      //How many objects, How many arrays
-      for (int jj = 0; jj < branches->GetEntriesFast(); jj++) {
-        branch = validBranch(jj, branches);
-        if (branch) {
-          //Count none TClonesArrays extra
-          if (static_cast<string>(branch->GetClassName()) != "TClonesArray") {
-            m_sizeObj[ii]++;
-          }
-          m_size[ii]++;
-        }
-      }
-      B2DEBUG(150, "m_sizeObj[" << ii << "] : " << m_sizeObj[ii]);
-      B2DEBUG(150, "m_size["    << ii << "] : " << m_size[ii]);
-
-      //Create the TObject pointers
-      m_objects[ii] = new TObject* [m_size[ii]];
-      for (int jj = 0; jj < m_size[ii]; jj++) {
-        m_objects[ii][jj] = 0;
-      }
-
-      //Go again over the branchlist and connect the branches with TObject pointers
-      int iobject = 0;
-      int iarray = 0;
-      m_objectNames[ii].resize(m_size[ii], "");
-      for (int jj = 0; jj < branches->GetEntriesFast(); jj++) {
-        branch = validBranch(jj, branches);
-        if (branch) {
-          if (static_cast<string>(branch->GetClassName()) == "TClonesArray") {
-            branch->SetAddress(&(m_objects[ii][iarray + m_sizeObj[ii]]));
-            m_objectNames[ii][iarray + m_sizeObj[ii]] = static_cast<string>(branch->GetName());
-            iarray++;
-            branch->GetEntry(0);
-          } else {
-            branch->SetAddress(&(m_objects[ii][iobject]));
-            m_objectNames[ii][iobject] = static_cast<string>(branch->GetName());
-            iobject++;
-            branch->GetEntry(0);
-          }
-        }
-      }
     }
   }
 
@@ -138,7 +96,10 @@ void SimpleInputModule::initialize()
 
 void SimpleInputModule::beginRun()
 {
-  cout << "beginRun called" << endl;
+  B2DEBUG(200, "beginRun called.");
+  if (m_tree[DataStore::c_Run]) {
+    readTree(DataStore::c_Run);
+  }
 }
 
 
@@ -146,8 +107,10 @@ void SimpleInputModule::event()
 {
   m_file->cd();
 
-  readTree(DataStore::c_Event);
-  m_eventNumber++;
+  if (m_tree[DataStore::c_Event]) {
+    readTree(DataStore::c_Event);
+  }
+  m_counterNumber[DataStore::c_Event]++;
 }
 
 
@@ -170,10 +133,57 @@ void SimpleInputModule::setupTFile()
 
 void SimpleInputModule::readTree(const DataStore::EDurability& durability)
 {
-  // Fill m_objects
+  // Check if there are still new entries available.
   B2DEBUG(200, "Durability" << durability)
-  if (m_eventNumber >= m_tree[durability]->GetEntriesFast()) return;
-  m_tree[durability]->GetEntry(m_eventNumber);
+  if (m_counterNumber[durability] >= m_tree[durability]->GetEntriesFast()) return;
+
+  //Connect the branches to the TObject pointers
+  TObjArray* branches = m_tree[durability]->GetListOfBranches();
+  TBranch* branch = 0;
+  int ii = durability;
+  //How many objects, How many arrays
+  for (int jj = 0; jj < branches->GetEntriesFast(); jj++) {
+    branch = validBranch(jj, branches);
+    if (branch) {
+      //Count none TClonesArrays extra
+      if (static_cast<string>(branch->GetClassName()) != "TClonesArray") {
+        m_sizeObj[ii]++;
+      }
+      m_size[ii]++;
+    }
+  }
+  B2DEBUG(150, "m_sizeObj[" << ii << "] : " << m_sizeObj[ii]);
+  B2DEBUG(150, "m_size["    << ii << "] : " << m_size[ii]);
+
+  //Create the TObject pointers
+  m_objects[ii] = new TObject* [m_size[ii]];
+  for (int jj = 0; jj < m_size[ii]; jj++) {
+    m_objects[ii][jj] = 0;
+  }
+
+  //Go again over the branchlist and connect the branches with TObject pointers
+  int iobject = 0;
+  int iarray = 0;
+  m_objectNames[ii].resize(m_size[ii], "");
+  for (int jj = 0; jj < branches->GetEntriesFast(); jj++) {
+    branch = validBranch(jj, branches);
+    if (branch) {
+      if (static_cast<string>(branch->GetClassName()) == "TClonesArray") {
+        branch->SetAddress(&(m_objects[ii][iarray + m_sizeObj[ii]]));
+        m_objectNames[ii][iarray + m_sizeObj[ii]] = static_cast<string>(branch->GetName());
+        iarray++;
+        branch->GetEntry(0);
+      } else {
+        branch->SetAddress(&(m_objects[ii][iobject]));
+        m_objectNames[ii][iobject] = static_cast<string>(branch->GetName());
+        iobject++;
+        branch->GetEntry(0);
+      }
+    }
+  }
+
+
+  m_tree[durability]->GetEntry(m_counterNumber[durability]);
 
 
   // Store objects in the DataStore

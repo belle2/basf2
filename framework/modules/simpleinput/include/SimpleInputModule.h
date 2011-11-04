@@ -104,7 +104,7 @@ namespace Belle2 {
     /*! Event Number. */
     /*! Steerable number of events to be skipped before start.
     */
-    int m_eventNumber;
+    int m_counterNumber[DataStore::c_NDurabilityTypes];
 
 
     //then those for purely internal use:

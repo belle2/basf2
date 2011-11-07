@@ -84,12 +84,64 @@ void SimpleInputModule::initialize()
       m_tree[ii] = dynamic_cast<TTree*>(m_file->Get(m_treeNames[ii].c_str()));
       if (!m_tree[ii]) {B2FATAL("TTree " + m_treeNames[ii] + " doesn't exist");}
       B2INFO("Opened tree " + m_treeNames[ii]);
+
+
+
+      //Connect the branches to the TObject pointers
+      TObjArray* branches = m_tree[ii]->GetListOfBranches();
+      TBranch* branch = 0;
+
+      //How many objects, How many arrays
+      for (int jj = 0; jj < branches->GetEntriesFast(); jj++) {
+        branch = validBranch(jj, branches);
+        if (branch) {
+          //Count none TClonesArrays extra
+          if (static_cast<string>(branch->GetClassName()) != "TClonesArray") {
+            m_sizeObj[ii]++;
+          }
+          m_size[ii]++;
+        }
+      }
+      B2DEBUG(150, "m_sizeObj[" << ii << "] : " << m_sizeObj[ii]);
+      B2DEBUG(150, "m_size[" << ii << "] : " << m_size[ii]);
+
+      //Create the TObject pointers
+      m_objects[ii] = new TObject* [m_size[ii]];
+      for (int jj = 0; jj < m_size[ii]; jj++) {
+        m_objects[ii][jj] = 0;
+      }
+
+      //Go again over the branchlist and connect the branches with TObject pointers
+      int iobject = 0;
+      int iarray = 0;
+      m_objectNames[ii].resize(m_size[ii], "");
+      for (int jj = 0; jj < branches->GetEntriesFast(); jj++) {
+        branch = validBranch(jj, branches);
+        if (branch) {
+          if (static_cast<string>(branch->GetClassName()) == "TClonesArray") {
+            branch->SetAddress(&(m_objects[ii][iarray + m_sizeObj[ii]]));
+            m_objectNames[ii][iarray + m_sizeObj[ii]] = static_cast<string>(branch->GetName());
+            iarray++;
+            branch->GetEntry(0);
+          } else {
+            branch->SetAddress(&(m_objects[ii][iobject]));
+            m_objectNames[ii][iobject] = static_cast<string>(branch->GetName());
+            iobject++;
+            branch->GetEntry(0);
+          }
+        }
+      }
+    }
+    // Store arrays in the DataStore
+    for (int jj = 0; jj < m_size[ii] - m_sizeObj[ii]; jj++) {
+      DataStore::Instance().storeArray(static_cast<TClonesArray*>(m_objects[ii][jj+m_sizeObj[ii]]), m_objectNames[ii][jj+m_sizeObj[ii]]);
+      if (m_tree[DataStore::c_Persistent]) {
+        readTree(DataStore::c_Persistent);
+      }
+
     }
   }
 
-  if (m_tree[DataStore::c_Persistent]) {
-    readTree(DataStore::c_Persistent);
-  }
 
 }
 
@@ -142,6 +194,8 @@ void SimpleInputModule::readTree(const DataStore::EDurability& durability)
   TBranch* branch = 0;
   int ii = durability;
   //How many objects, How many arrays
+  m_sizeObj[ii] = 0;
+  m_size[ii] = 0;
   for (int jj = 0; jj < branches->GetEntriesFast(); jj++) {
     branch = validBranch(jj, branches);
     if (branch) {
@@ -168,16 +222,14 @@ void SimpleInputModule::readTree(const DataStore::EDurability& durability)
   for (int jj = 0; jj < branches->GetEntriesFast(); jj++) {
     branch = validBranch(jj, branches);
     if (branch) {
-      if (static_cast<string>(branch->GetClassName()) == "TClonesArray") {
+      if (static_cast<string>(branch->GetClassName()) == "TClonesArray") {/*
         branch->SetAddress(&(m_objects[ii][iarray + m_sizeObj[ii]]));
         m_objectNames[ii][iarray + m_sizeObj[ii]] = static_cast<string>(branch->GetName());
-        iarray++;
-        branch->GetEntry(0);
+        iarray++;*/
       } else {
         branch->SetAddress(&(m_objects[ii][iobject]));
         m_objectNames[ii][iobject] = static_cast<string>(branch->GetName());
         iobject++;
-        branch->GetEntry(0);
       }
     }
   }
@@ -191,9 +243,9 @@ void SimpleInputModule::readTree(const DataStore::EDurability& durability)
     DataStore::Instance().storeObject(m_objects[durability][jj], m_objectNames[durability][jj]);
   }
   // Store arrays in the DataStore
-  for (int jj = 0; jj < m_size[durability] - m_sizeObj[durability]; jj++) {
-    DataStore::Instance().storeArray(static_cast<TClonesArray*>(m_objects[durability][jj+m_sizeObj[durability]]), m_objectNames[durability][jj+m_sizeObj[durability]]);
-  }
+  /*  for (int jj = 0; jj < m_size[durability] - m_sizeObj[durability]; jj++) {
+      DataStore::Instance().storeArray(static_cast<TClonesArray*>(m_objects[durability][jj+m_sizeObj[durability]]), m_objectNames[durability][jj+m_sizeObj[durability]]);
+    }*/
 
 }
 

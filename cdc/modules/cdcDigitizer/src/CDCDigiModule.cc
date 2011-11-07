@@ -13,8 +13,11 @@
 //framework headers
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
+#include <framework/datastore/RelationArray.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
+
+#include <generators/dataobjects/MCParticle.h>
 
 //cdc package headers
 #include <cdc/dataobjects/CDCHit.h>
@@ -100,6 +103,14 @@ void CDCDigiModule::initialize()
 
   // CPU time start
   m_timeCPU = clock() * Unit::us;
+
+  StoreArray<CDCHit> cdcHitArray(m_cdcHitOutColName);
+  StoreArray<CDCSimHit> cdcArray(m_inColName);
+  StoreArray<MCParticle> mcParticles;
+
+  RelationArray cdcSimHitToHitRel(cdcArray, cdcHitArray);
+  RelationArray mcPartToCDCHitRel(mcParticles, cdcHitArray);
+
 }
 
 void CDCDigiModule::beginRun()
@@ -115,6 +126,8 @@ void CDCDigiModule::event()
   if (!cdcArray) {
     B2ERROR("Can not find " << m_inColName << ".");
   }
+  StoreArray<MCParticle> mcParticles;                         //needed to use the relations with MCParticles
+  RelationArray cdcSimHitRel(mcParticles, cdcArray);  //RelationsArray created by CDC SensitiveDetector
 
   //---------------------------------------------------------------------
   // Merge the hits in the same cell and save them into CDC signal map.
@@ -199,6 +212,9 @@ void CDCDigiModule::event()
   StoreArray<CDCHit> cdcHitArray(m_cdcHitOutColName);
   //StoreArray<Relation> cdcSimRelation(m_relColNameSimHitToHit);
 
+  RelationArray cdcSimHitToHitRel(cdcArray, cdcHitArray); //SimHit<->CDCHit
+  RelationArray mcPartToCDCHitRel(mcParticles, cdcHitArray); //MCParticle<->CDCHit
+
   for (iterCDCMap = cdcSignalMap.begin(); iterCDCMap != cdcSignalMap.end(); iterCDCMap++) {
 
     // Smear drift length using double  Gaussion, based on spatial resolution.
@@ -230,6 +246,17 @@ void CDCDigiModule::event()
 
     new(cdcHitArray->AddrAt(iDigits)) CDCHit(iterCDCMap->second->getDriftLength(), iterCDCMap->second->getCharge(),
                                              iSuperLayer, iLayer, iterCDCMap->second->getWireId());
+
+    cdcSimHitToHitRel.add(iterCDCMap->second->getHitNumber(), iDigits);     //add entry
+
+    for (int index = 0; index < cdcSimHitRel.getEntries(); index++) {
+      for (int hit = 0; hit < cdcSimHitRel[index].getToIndices().size(); hit++) {
+        if (cdcSimHitRel[index].getToIndex(hit) == iterCDCMap->second->getHitNumber()) {
+          mcPartToCDCHitRel.add(cdcSimHitRel[index].getFromIndex(), iDigits);      //add entry
+        }
+      }
+    }
+
 
     // Creation of Relation between SimHit, that has smalles drift length in each cell and the CDCHit.
     B2DEBUG(150, "First: " << (iterCDCMap->first) << "iDigits" << iDigits);
@@ -447,3 +474,4 @@ void CDCDigiModule::printCDCSignalInfo(std::string info, const CDCSignalMap & cd
            << std::setprecision(0));
   } // end loop
 }
+

@@ -92,6 +92,10 @@ def process_dir(
     env['DATA_FILES'] = data_files
 
     # include SConscript file if it exists
+    if env.Dictionary().has_key('SUBLIB'):
+        del env.Dictionary()['SUBLIB']
+    if env.Dictionary().has_key('PYTHON_MODULE'):
+        del env.Dictionary()['PYTHON_MODULE']
     sconscript_name = real_path(os.path.join(dir_name, 'SConscript'),
                                 release_dir)
     if os.path.isfile(sconscript_name):

@@ -75,8 +75,7 @@ fw.set_data_search_path(basf2datadir)
 # -----------------------------------------------
 #         Load evtgen particle tables
 # -----------------------------------------------
-if not fw.read_evtgen_table(os.path.join(envarExtDir,
-                            'evtgen/DecFiles/scripts/evt.pdl')):
+if not fw.read_evtgen_table(os.path.join(envarExtDir, 'share/evtgen/evt.pdl')):
     print """ERROR: Could not load the evtgen table file !"""
 
 # -----------------------------------------------

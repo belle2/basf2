@@ -47,11 +47,11 @@ void PrintMCParticlesModule::event()
 {
   StoreArray<MCParticle> MCParticles(m_particleList);
   m_seen.clear();
-  m_seen.resize(MCParticles.GetEntries() + 1, false);
+  m_seen.resize(MCParticles.getEntries() + 1, false);
   B2INFO("Content from MCParticle Collection '" + m_particleList + "':");
 
   //Loop over the primary particles (no mother particle exists)
-  for (int i = 0; i < MCParticles.GetEntries(); i++) {
+  for (int i = 0; i < MCParticles.getEntries(); i++) {
     MCParticle& mc = *MCParticles[i];
     if (mc.getMother() != NULL) continue;
     printTree(mc, 0);

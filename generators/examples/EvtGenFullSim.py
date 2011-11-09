@@ -1,0 +1,51 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+from basf2 import *
+
+# suppress messages and warnings during processing:
+set_log_level(LogLevel.ERROR)
+
+# to run the framework the used modules need to be registered
+evtgeninput = register_module('EvtGenInput')
+evtgeninput.param('DECFile', os.path.join(basf2datadir, 'generators/DECAY.DEC'
+                  ))
+evtgeninput.param('pdlFile', os.path.join(basf2datadir, 'generators/evt.pdl'))
+evtgeninput.param('boost2LAB', True)
+
+evtmetagen = register_module('EvtMetaGen')
+paramloader = register_module('Gearbox')
+geobuilder = register_module('Geometry')
+g4sim = register_module('FullSim')
+simpleoutput = register_module('SimpleOutput')
+mcparticleprinter = register_module('PrintMCParticles')
+
+# Setting the option for all non-hepevt reader modules:
+evtmetagen.param('EvtNumList', [3])  # we want to process 100 events
+evtmetagen.param('RunList', [1])  # from run number 1
+evtmetagen.param('ExpList', [1])  # and experiment number 1
+
+simpleoutput.param('outputFileName', 'EvtGenOutput.root')
+mcparticleprinter.set_log_level(0)
+
+# creating the path for the processing
+main = create_path()
+main.add_module(evtmetagen)
+main.add_module(paramloader)
+main.add_module(geobuilder)
+
+# Add hepevtreader module to path:
+main.add_module(evtgeninput)
+# and print parameters for hepevtreader
+# on startup of process
+print_params(evtgeninput)
+
+# Add all other modules for simple processing to path
+main.add_module(mcparticleprinter)
+main.add_module(g4sim)
+main.add_module(simpleoutput)
+
+# Process the events
+process(main)
+# if there are less events in the input file
+# the processing will be stopped at EOF.

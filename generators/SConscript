@@ -1,6 +1,8 @@
 Import('env')
 
-env['LIBS'] = ['framework', 'geometry', 'generators_fortran_bhwide', 'generators_fortran_koralw',
-               '$ROOT_LIBS']
+env['LIBS'] = ['framework', 'geometry','generators_fortran_koralw','generators_fortran_bhwide',
+               '$ROOT_LIBS','EvtGen','pythia8','PhotosCxxInterface.a', 'gfortran', 'HepMC', 
+		'TauolaCxxInterface', 'TauolaFortran', 'lhapdfdummy', 'hepmcinterface']
+
 
 Return('env')

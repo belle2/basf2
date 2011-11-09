@@ -549,6 +549,7 @@ void GeoEKLMBelleII::createSectorCover(int iCover, G4PVPlacementGT *mpvgt)
     B2FATAL("Memory allocation error.");
     exit(ENOMEM);
   }
+  printVolumeMass(logicCover);
 }
 
 /**
@@ -777,6 +778,7 @@ void GeoEKLMBelleII::createSectorSupportCorner1(G4PVPlacementGT *mpvgt)
     B2FATAL("Memory allocation error.");
     exit(ENOMEM);
   }
+  printVolumeMass(logicCorner1);
 }
 
 /*
@@ -836,6 +838,7 @@ void GeoEKLMBelleII::createSectorSupportCorner2(G4PVPlacementGT *mpvgt)
     B2FATAL("Memory allocation error.");
     exit(ENOMEM);
   }
+  printVolumeMass(logicCorner2);
 }
 
 /*
@@ -896,6 +899,7 @@ void GeoEKLMBelleII::createSectorSupportCorner3(G4PVPlacementGT *mpvgt)
     B2FATAL("Memory allocation error.");
     exit(ENOMEM);
   }
+  printVolumeMass(logicCorner3);
 }
 
 /*
@@ -956,6 +960,7 @@ void GeoEKLMBelleII::createSectorSupportCorner4(G4PVPlacementGT *mpvgt)
     B2FATAL("Memory allocation error.");
     exit(ENOMEM);
   }
+  printVolumeMass(logicCorner4);
 }
 
 /*
@@ -1046,6 +1051,7 @@ void GeoEKLMBelleII::createSectorSupport(G4PVPlacementGT *mpvgt)
   createSectorSupportCorner2(mpvgt);
   createSectorSupportCorner3(mpvgt);
   createSectorSupportCorner4(mpvgt);
+  printVolumeMass(logicSectorSupport);
 }
 
 /**
@@ -1350,6 +1356,7 @@ void GeoEKLMBelleII::createBaseBoard(G4PVPlacementGT *mpvgt)
     B2FATAL("Memory allocation error.");
     exit(ENOMEM);
   }
+  printVolumeMass(logicBaseBoard);
 }
 
 /**
@@ -1393,6 +1400,7 @@ void GeoEKLMBelleII::createStripBoard(int iBoard, G4PVPlacementGT *mpvgt)
     B2FATAL("Memory allocation error.");
     exit(ENOMEM);
   }
+  printVolumeMass(logicStripBoard);
 }
 
 /**
@@ -1486,6 +1494,7 @@ void GeoEKLMBelleII::createSectionSupport(int iSectionSupport, int iPlane,
     B2FATAL("Memory allocation error.");
     exit(ENOMEM);
   }
+  printVolumeMass(logicSectionSupport);
 }
 
 /**
@@ -1538,6 +1547,7 @@ void GeoEKLMBelleII::createPlasticListElement(int iListPlane, int iList,
     B2FATAL("Memory allocation error.");
     exit(ENOMEM);
   }
+  printVolumeMass(logicList);
 }
 
 /**
@@ -1578,7 +1588,7 @@ void GeoEKLMBelleII::createStripVolume(int iStrip, G4PVPlacementGT *mpvgt)
     exit(ENOMEM);
   }
   createStrip(iStrip, physiStripVolume);
-  if (m_mode == 1)
+  if (m_mode == 1 || m_mode == 2)
     createSiPM(iStrip, physiStripVolume);
 }
 
@@ -1616,6 +1626,7 @@ void GeoEKLMBelleII::createStrip(int iStrip, G4PVPlacementGT *mpvgt)
   }
   createStripGroove(iStrip, physiStrip);
   createStripSensitive(iStrip, physiStrip);
+  printVolumeMass(logicStrip);
 }
 
 /**
@@ -1651,6 +1662,7 @@ void GeoEKLMBelleII::createStripGroove(int iStrip, G4PVPlacementGT *mpvgt)
     B2FATAL("Memory allocation error.");
     exit(ENOMEM);
   }
+  printVolumeMass(logicGroove);
 }
 
 /**
@@ -1711,6 +1723,7 @@ void GeoEKLMBelleII::createStripSensitive(int iStrip, G4PVPlacementGT *mpvgt)
     B2FATAL("Memory allocation error.");
     exit(ENOMEM);
   }
+  printVolumeMass(logicSensitive);
 }
 
 /**
@@ -1749,6 +1762,15 @@ void GeoEKLMBelleII::createSiPM(int iStrip, G4PVPlacementGT *mpvgt)
     B2FATAL("Memory allocation error.");
     exit(ENOMEM);
   }
+  printVolumeMass(logicSiPM);
+}
+
+/* Print volume mass */
+void GeoEKLMBelleII::printVolumeMass(G4LogicalVolume *lv)
+{
+  if (m_mode == 2)
+    printf("Volume %s: mass = %g g\n", lv->GetName().c_str(),
+           lv->GetMass() / g);
 }
 
 /*
@@ -1781,5 +1803,9 @@ void GeoEKLMBelleII::create(const GearDir& content, G4LogicalVolume& topVolume,
   createMaterials();
   for (i = 1; i <= 2; i++)
     createEndcap(i, &topVolume);
+  if (m_mode == 2) {
+    printf("EKLM started in mode 2. Exiting now.\n");
+    exit(0);
+  }
 }
 

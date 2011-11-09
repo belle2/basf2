@@ -371,6 +371,12 @@ namespace Belle2 {
     void createSiPM(int iStrip, G4PVPlacementGT *mpvgt);
 
     /**
+     * printVolumeMass - print mass of volume if m_mode == 2
+     * @lv: logical volume
+     */
+    void printVolumeMass(G4LogicalVolume *lv);
+
+    /**
      * Air.
      */
     G4Material *Air;

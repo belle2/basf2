@@ -84,6 +84,7 @@ namespace Belle2 {
      * Detector mode.
      * 0 -- normal detector operation
      * 1 -- background studies setup
+     * 2 -- when constructing geometry, print masses of all volumes and exit.
      */
     int m_mode;
 

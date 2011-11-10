@@ -21,6 +21,7 @@
 #include "trg/cdc/TRGCDC.h"
 #include "trg/cdc/Wire.h"
 #include "trg/cdc/WireHit.h"
+#include "trg/cdc/Link.h"
 #include "trg/cdc/TrackSegment.h"
 #include "trg/cdc/Circle.h"
 #include "trg/cdc/Track.h"
@@ -351,9 +352,9 @@ TRGCDCDisplayDrawingAreaRphi::drawTrack(const TCTrack & t,
 
     //...Draw segments first...
     for (unsigned i = 0; i < cdc.nSuperLayers(); i++) {
-        const vector<const TCTSegment *> & segments = t.trackSegments(i);
-        for (unsigned j = 0; j < segments.size(); j++) {
-            drawTrackSegment(* segments[j], lineWidth, c, s);
+        const vector<TCLink *> & links = t.links(i);
+        for (unsigned j = 0; j < links.size(); j++) {
+            drawTrackSegment(* (TCTSegment *) links[j]->wire(), lineWidth, c, s);
         }
     }
 

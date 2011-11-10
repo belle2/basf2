@@ -20,14 +20,16 @@
 #include "trg/cdc/WireHitMC.h"
 #include "trg/cdc/TrackMC.h"
 
+using namespace std;
+
 namespace Belle2 {
 
 TRGCDCWireHit::TRGCDCWireHit(const TRGCDCWire & w,
-                                     float driftLeft,
-                                     float driftLeftError,
-                                     float driftRight,
-                                     float driftRightError,
-                                     float fudgeFactor)
+			     float driftLeft,
+			     float driftLeftError,
+			     float driftRight,
+			     float driftRightError,
+			     float fudgeFactor)
     :  _state(0),
        _wire(w),
        _xyPosition(w.xyPosition()),
@@ -39,7 +41,7 @@ TRGCDCWireHit::TRGCDCWireHit(const TRGCDCWire & w,
     _driftError[0] = driftLeftError * fudgeFactor;
     _driftError[1] = driftRightError * fudgeFactor;
     if (w.axial()) _state |= WireHitAxial;
-    else            _state |= WireHitStereo;
+    else           _state |= WireHitStereo;
 }
 
 // TRGCDCWireHit::TRGCDCWireHit(TRGCDCWire * w, reccdc_wirhit * r, float fudgeFactor)
@@ -63,7 +65,7 @@ TRGCDCWireHit::~TRGCDCWireHit() {
 
 void
 TRGCDCWireHit::dump(const std::string & msg,
-                        const std::string & pre) const {
+		    const std::string & pre) const {
     std::cout << pre;
     std::cout << _wire.name();
     if (msg.find("state") != std::string::npos ||
@@ -71,6 +73,10 @@ TRGCDCWireHit::dump(const std::string & msg,
         std::cout << ",state";
         TRGUtil::bitDisplay(_state);
         if (track()) std::cout << ",trk ";
+    }
+    if (msg.find("position") != std::string::npos ||
+        msg.find("detail") != std::string::npos) {
+	cout << ",xy=" << _xyPosition;
     }
     if (msg.find("drift") != std::string::npos ||
         msg.find("detail") != std::string::npos) {

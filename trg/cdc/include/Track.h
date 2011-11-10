@@ -14,11 +14,9 @@
 #ifndef TRGCDCTrack_FLAG_
 #define TRGCDCTrack_FLAG_
 
-// #include <vector>
-// #include "CLHEP/Vector/LorentzVector.h"
-// #include "trg/trg/Utilities.h"
-// #include "trg/cdc/TRGCDC.h"
 #include "trg/cdc/TrackBase.h"
+#include "trg/cdc/WireHit.h"
+#include "trg/cdc/Helix.h"
 
 #ifdef TRGCDC_SHORT_NAMES
 #define TCTrack TRGCDCTrack
@@ -32,6 +30,8 @@
 
 namespace Belle2 {
 
+class TRGCDCCircle;
+
 /// A class to represent a reconstructed charged track in TRGCDC.
 class TRGCDCTrack : public TRGCDCTrackBase {
 
@@ -43,11 +43,27 @@ class TRGCDCTrack : public TRGCDCTrackBase {
     /// Constructor
     TRGCDCTrack();
 
+    /// Constructor from a Circle.
+    TRGCDCTrack(const TRGCDCCircle &);
+
     /// Destructor
     virtual ~TRGCDCTrack();
 
+    /// returns helix parameter.
+    const TRGCDCHelix & helix(void) const;
+
+    /// calculates the closest approach to a wire in real space. Results are stored in TLink. Return value is negative if error happened.
+    int approach(TRGCDCLink &, bool sagCorrection = false) const;
+    
   private:// static members
+
+    /// a vector to keep all TRGCDCTrack objects.
     static std::vector<const TRGCDCTrack *> _list;
+
+  private:
+
+    /// Helix parameter.
+    TRGCDCHelix _helix;
 };
 
 //-----------------------------------------------------------------------------
@@ -62,6 +78,12 @@ class TRGCDCTrack : public TRGCDCTrackBase {
 //     }
 //     return 999;
 // }
+
+inline
+const TRGCDCHelix &
+TRGCDCTrack::helix(void) const {
+    return _helix;
+}
 
 } // namespace Belle2
 

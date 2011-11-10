@@ -26,7 +26,7 @@ using namespace Belle2;
 
 #define DEBUG_LEVEL   0
 #define NAME          "TRGCDCConfig"
-#define VERSION       "version 0.00"
+#define VERSION       "version 0.01"
 #define ENV_PATH      "BELLE2_LOCAL_DIR"
 #define N_FRONT       500
 #define NOT_CONNECTED 99999
@@ -94,7 +94,7 @@ main(int argc, char * argv[]) {
             string car = TRGUtil::carstring(l);
             l = TRGUtil::cdrstring(l);
 
-            if (car == "#") {
+            if (car[0] == '#') {
                 skip = true;
                 break;
             }

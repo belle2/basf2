@@ -21,6 +21,7 @@
 #include "trg/cdc/Wire.h"
 #include "trg/cdc/WireHit.h"
 #include "trg/cdc/WireHitMC.h"
+#include "trg/cdc/TrackSegment.h"
 
 #define P3D HepGeom::Point3D<double>
 
@@ -30,23 +31,38 @@ namespace Belle2 {
 
 TRGCDCWire::TRGCDCWire(unsigned id,
                        unsigned localId,
-                       TRGCDCLayer * l,
+                       TCLayer * l,
                        const P3D & fp,
                        const P3D & bp)
-    : _state(0),
-      _hit(0),
-      _mcHits(),
-      _id(id),
+    : _id(id),
       _localId(localId),
       _layer(l),
+      _segment(0),
+      _xyPosition(0.5 * (fp + bp)),
       _forwardPosition(fp),
       _backwardPosition(bp),
-      _direction(fp - bp),
+      _direction((fp - bp).unit()),
+      _state(0),
+      _hit(0),
+      _mcHits(),
       _triggerOutput() {
-    _xyPosition = 0.5 * (_forwardPosition + _backwardPosition);
-    _xyPosition.setZ(0.);
-    _direction = _direction.unit();
     _triggerOutput.name(name() + string("to"));
+}
+
+TRGCDCWire::TRGCDCWire(const TCTSegment * s,
+		       const TRGCDCWire * const w)
+    : _id(w->_id),
+      _localId(w->_localId),
+      _layer(w->_layer),
+      _segment(s),
+      _xyPosition(w->_xyPosition),
+      _forwardPosition(w->_forwardPosition),
+      _backwardPosition(w->_backwardPosition),
+      _direction(w->_direction),
+      _state(w->_state),
+      _hit(w->_hit),
+      _mcHits(w->_mcHits),
+      _triggerOutput(w->_triggerOutput) {
 }
 
 TRGCDCWire::~TRGCDCWire() {
@@ -135,7 +151,7 @@ TRGCDCWire::neighbor(unsigned i) const {
 //   //
 //   // new version by NK
 //   //
-//   const TRGCDCLayer &l = *layer();
+//   const TCLayer &l = *layer();
 //   const int nw = l.nWires();
 //   if(_localId+1==nw) return -1;
 //   else return _localId;
@@ -230,7 +246,7 @@ TRGCDCWire::neighbor(unsigned i) const {
 //   //
 //   // new version ny NK
 //   //
-//   const TRGCDCLayer &l = *layer();
+//   const TCLayer &l = *layer();
 //   const int nw = l.nWires();
 //   if(0==_localId) return nw;
 //   else return _localId;

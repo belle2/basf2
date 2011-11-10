@@ -28,15 +28,17 @@ namespace Belle2 {
 TRGCDCTrackSegment::TRGCDCTrackSegment(unsigned id,
                                        const TCWire & w,
                                        const TRGCDCLayer * layer,
-                             const std::vector<const TRGCDCWire *> & cells)
+				       const std::vector<const TRGCDCWire *> &
+				       cells)
 
-    : TCWire::TCWire(w),
+    : TCWire::TCWire(this, & w),
       _state(0),
       _id(id),
       _localId(w.localId()),
       _layer(layer),
       _wires(cells),
-      _signal(std::string("TS_") + TRGUtil::itostring(id)) {
+      _signal(std::string("TS_") + TRGUtil::itostring(id)),
+      _hit(0) {
 }
 
 TRGCDCTrackSegment::~TRGCDCTrackSegment() {
@@ -54,6 +56,30 @@ TRGCDCTrackSegment::dump(const string & msg,
         cout << ",super layer " << superLayerId();
         cout << ",local layer " << localLayerId();
         cout << endl;
+    }
+    if ((msg.find("hit") != string::npos) ||
+        (msg.find("detail") != string::npos)) {
+        cout << pre;
+	if (hit()) {
+	    cout << "WHit dump" << endl;
+	    hit()->dump("", pre + "    ");
+	}
+	else {
+	    cout << "no TSHit" << endl;
+	}
+	if (_hits.size() == 0) {
+	    cout << pre << "no wire hit" << endl;
+	}
+	else {
+	    cout << pre;
+	    for (unsigned i = 0; i < _hits.size(); i++) {
+		cout << _hits[i]->wire().name();
+		if (i < _hits.size() - 1)
+		    cout << ",";
+		else
+		    cout << endl;
+	    }
+	}
     }
 //     if (msg.find("neighbor") != string::npos ||
 //         msg.find("detail") != string::npos) {

@@ -23,6 +23,7 @@
 #include "trg/cdc/TrackSegment.h"
 #include "trg/cdc/Circle.h"
 #include "trg/cdc/Track.h"
+#include "trg/cdc/Link.h"
 
 #ifdef TRGCDC_DISPLAY
 #include "trg/cdc/DisplayRphi.h"
@@ -217,6 +218,9 @@ TRGCDCHoughFinder::doit(vector<TCTrack *> & trackList) {
     D->run();
 #endif
 
+    //...Make circles tracks...
+    
+
     //...2D fitting...
 
     //...Select stereo TSs...
@@ -230,14 +234,12 @@ TRGCDCHoughFinder::doitPerfectly(vector<TRGCDCTrack *> & trackList) {
 
     TRGDebug::enterStage("Perfect Finder");
 
-    //...Make a track...
-    TCTrack * track = new TCTrack();
-    trackList.push_back(track);
-
     //...TS hit loop...
     //   Presently assuming single track event.
     //   Select the best TS(the fastest hit) in eash super layer.
     //
+
+    vector<TCLink *> links;
     for (unsigned i = 0; i < _cdc.nTrackSegmentLayers(); i++) {
         const Belle2::TRGCDCLayer * l = _cdc.trackSegmentLayer(i);
         const unsigned nWires = l->nWires();
@@ -261,12 +263,39 @@ TRGCDCHoughFinder::doitPerfectly(vector<TRGCDCTrack *> & trackList) {
             }
         }
 
-        if (best)
-            track->append(best);
+        if (best) {
+	    TCLink * link = new TCLink(0,
+				       best->hit(),
+				       best->hit()->wire().xyPosition());
+	    links.push_back(link);
+	}
     }
 
+    //...Let's fit it...
+    TCCircle c = TCCircle(links);
+    c.fit();
+
+    //...Make a track...
+    TCTrack * track = new TCTrack(c);
+    trackList.push_back(track);
+
     if (TRGDebug::level())
-        track->dump();
+ 	track->dump();
+
+#ifdef TRGCDC_DISPLAY
+    vector<const TCCircle *> cc;
+    cc.push_back(& c);
+    string stg = "2D : Perfect Finder circle fit";
+    string inf = "   ";
+    D->clear();
+    D->stage(stg);
+    D->information(inf);
+    D->area().append(cc, Gdk::Color("#FF0066009900"));
+    D->area().append(_cdc.hits());
+    D->area().append(_cdc.tsHits());
+    D->show();
+    D->run();
+#endif
 
     TRGDebug::leaveStage("Perfect Finder");
     return 0;

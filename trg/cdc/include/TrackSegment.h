@@ -16,6 +16,7 @@
 
 #include <vector>
 #include "trg/cdc/Wire.h"
+#include "trg/cdc/TrackSegmentHit.h"
 
 #ifdef TRGCDC_SHORT_NAMES
 #define TCTSegment TRGCDCTrackSegment
@@ -59,6 +60,12 @@ class TRGCDCTrackSegment : public TRGCDCWire {
     /// returns a vector containing pointers to a wire.
     const std::vector<const TRGCDCWire *> & wires(void) const;
 
+    /// returns true if this is in axial layer.
+    bool axial(void) const;
+
+    /// returns true if this is in stereo layer.
+    bool stereo(void) const;
+
     /// returns state.
     unsigned state(void) const;
 
@@ -71,9 +78,22 @@ class TRGCDCTrackSegment : public TRGCDCWire {
     /// returns trigger output. Null will returned if no signal.
     const TRGSignal & triggerOutput(void) const;
 
+    /// returns a pointer to a TRGCDCTrackSegmentHit.
+    const TRGCDCTrackSegmentHit * hit(void) const;
+
     /// dumps debug information.
     void dump(const std::string & message = std::string(""),
               const std::string & prefix = std::string("")) const;
+
+  public:// Utility functions
+
+    /// returns axial segments.
+    static const std::vector<const TRGCDCTrackSegment *>
+	axial(const std::vector<const TRGCDCTrackSegment *> & list);
+
+    /// returns \# of stereo segments.
+    static unsigned
+	nStereo(const std::vector<const TRGCDCTrackSegment *> & list);
 
   public:// Modifiers
 
@@ -85,6 +105,9 @@ class TRGCDCTrackSegment : public TRGCDCWire {
 
     /// simulates TF hit using wire information.
     void simulate(void);
+
+    /// sets a pointer to a TRGCDCTrackSegmentHit.
+    const TRGCDCTrackSegmentHit * hit(const TRGCDCTrackSegmentHit * const);
 
   private:
 
@@ -103,8 +126,17 @@ class TRGCDCTrackSegment : public TRGCDCWire {
     /// Wires.
     std::vector<const TRGCDCWire *> _wires;
 
+    /// Wire hits.
+    std::vector<const TRGCDCWireHit *> _hits;
+
     /// Trigger signal.
     TRGSignal _signal;
+
+    /// Track segment hit.
+    const TRGCDCTrackSegmentHit * _hit;
+
+  // Friends
+    friend class TRGCDC;
 };
 
 //-----------------------------------------------------------------------------
@@ -160,13 +192,39 @@ TRGCDCTrackSegment::wires(void) const {
 inline
 const TRGCDCWire *
 TRGCDCTrackSegment::operator[](unsigned id) const {
-    return _wires[id];
+    if (id < _wires.size())
+	return _wires[id];
+    return 0;
 }
 
 inline
 const TRGSignal &
 TRGCDCTrackSegment::triggerOutput(void) const {
     return _signal;
+}
+
+inline
+bool
+TRGCDCTrackSegment::axial(void) const {
+    return _wires[0]->axial();
+}
+
+inline
+bool
+TRGCDCTrackSegment::stereo(void) const {
+    return _wires[0]->stereo();
+}
+
+inline
+const TRGCDCTrackSegmentHit *
+TRGCDCTrackSegment::hit(const TRGCDCTrackSegmentHit * const h) {
+    return _hit = h;
+}
+
+inline
+const TRGCDCTrackSegmentHit *
+TRGCDCTrackSegment::hit(void) const {
+    return _hit;
 }
 
 } // namespace Belle2

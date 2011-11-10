@@ -28,7 +28,7 @@ class TRGDebug {
     static int level(void);
 
     /// sets and returns the debug level.
-    static int level(int newLevel);
+    static int level(int newLevel, bool thisStageOnly = false);
 
     /// Declare that you enter new stage.
     static void enterStage(const std::string & stageName);

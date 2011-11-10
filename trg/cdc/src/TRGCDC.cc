@@ -18,7 +18,7 @@
 #include "framework/datastore/StoreArray.h"
 #include "cdc/hitcdc/HitCDC.h"
 #include "cdc/hitcdc/CDCSimHit.h"
-#include "cdc/geocdc/CDCGeometryPar.h"
+#include "cdc/geometry/CDCGeometryPar.h"
 #include "trg/trg/Debug.h"
 #include "trg/trg/Time.h"
 #include "trg/trg/Signal.h"
@@ -60,7 +60,7 @@ TRGCDC::name(void) const {
 
 std::string
 TRGCDC::version(void) const {
-    return string("TRGCDC 5.04");
+    return string("TRGCDC 5.05");
 }
 
 TRGCDC *
@@ -236,7 +236,7 @@ TRGCDC::initialize(bool houghFinderPerfect,
             const P3D bp = P3D(cdc2.wireBackwardPosition(i, j).x(),
                                cdc2.wireBackwardPosition(i, j).y(),
                                cdc2.wireBackwardPosition(i, j).z());
-            TRGCDCWire * tw = new TRGCDCWire(nWires++,
+            TCWire * tw = new TCWire(nWires++,
                                          j,
                                          layer,
                                          fp,
@@ -271,24 +271,24 @@ TRGCDC::initialize(bool houghFinderPerfect,
         }
 
         //...TS layer... w is a central wire
-        const TRGCDCWire & ww = * (* _superLayers[i])[2]->front();
+        const TCWire & ww = * (* _superLayers[i])[2]->front();
         TRGCDCLayer * layer = new TRGCDCLayer(id++, ww);
         _tsLayers.push_back(layer);
 
         //...Loop over all wires in a central wire layer...
         const unsigned nWiresInLayer = ww.layer().nWires();
         for (unsigned j = 0; j < nWiresInLayer; j++) {
-            const TRGCDCWire & w = * (* (* _superLayers[i])[2])[j];
+            const TCWire & w = * (* (* _superLayers[i])[2])[j];
 
             const unsigned localId = w.localId();
             const unsigned layerId = w.layerId();
-            std::vector<const TRGCDCWire *> cells;
+            std::vector<const TCWire *> cells;
 
             for (unsigned i = 0; i < nWiresInTS; i++) {
                 const unsigned laid = layerId + shape[i * 2];
                 const unsigned loid = localId + shape[i * 2 + 1];
         
-                const TRGCDCWire * c = wire(laid, loid);
+                const TCWire * c = wire(laid, loid);
                 if (! c)
                     cout << "TRGCDC !!! no such a wire for TS : "
                          << "layer id=" << laid << ", local id=" << loid
@@ -296,12 +296,17 @@ TRGCDC::initialize(bool houghFinderPerfect,
 
                 cells.push_back(c);
             }
-        
-            //...Center of a track segment...
+
+            //...Create a track segment...
             TRGCDCTrackSegment * ts = new TRGCDCTrackSegment(idTS++,
-                                                                     w,
-                                                                     layer,
-                                                                     cells);
+							     w,
+							     layer,
+							     cells);
+	    for (unsigned i = 0; i < nWiresInTS; i++) {
+		TCWire * c = (TCWire *) cells[i];
+		c->_segment = ts;
+	    }
+
 
             //...Store it...
             _tss.push_back(ts);
@@ -327,7 +332,7 @@ TRGCDC::initialize(bool houghFinderPerfect,
         }
 
         if (TRGDebug::level() > 9) {
-            const TRGCDCWire & wi = * slayer[0]->front();
+            const TCWire & wi = * slayer[0]->front();
             const unsigned layerId = wi.layerId();
             cout << layerId << "," << cdc2.senseWireR(layerId) << ","
                  << cdc2.fieldWireR(layerId) << std::endl;
@@ -454,28 +459,28 @@ TRGCDC::dump(const std::string & msg) const {
     }
 }
 
-const TRGCDCWire * const
+const TCWire * const
 TRGCDC::wire(unsigned id) const {
     if (id < nWires())
         return _wires[id];
     return 0;
 }
 
-const TRGCDCWire * const
+const TCWire * const
 TRGCDC::wire(unsigned layerId, int localId) const {
     if (layerId < nLayers())
         return _layers[layerId]->wire(localId);
     return 0;
 }
 
-// const TRGCDCWire * const
+// const TCWire * const
 // TRGCDC::wire(const HepGeom::Point3D<double> & p) const {
 //     float r = p.mag();
 //     float phi = p.phi();
 //     return wire(r, phi);
 // }
 
-const TRGCDCWire * const
+const TCWire * const
 TRGCDC::wire(float r, float p) const {
 
     //...Not implemented yet...
@@ -505,7 +510,7 @@ TRGCDC::wire(float r, float p) const {
 void
 TRGCDC::clear(void) {
     unsigned i = 0;
-    while (TRGCDCWire * w = _wires[i++])
+    while (TCWire * w = _wires[i++])
         w->clear();
     for (unsigned i = 0; i < _tsHits.size(); i++)
         _tsHits[i]->clear();
@@ -529,13 +534,13 @@ void
 TRGCDC::fastClear(void) {
     if (_hitWires.size()) {
         unsigned i = 0;
-        while (TRGCDCWire * w = _hitWires[i++])
+        while (TCWire * w = _hitWires[i++])
             w->clear();
     }
     if (_badHits.size()) {
         unsigned i = 0;
-        while (TRGCDCWireHit * h = _badHits[i++])
-            ((TRGCDCWire &) h->wire()).clear();
+        while (TCWHit * h = _badHits[i++])
+            ((TCWire &) h->wire()).clear();
     }
 
     _hitWires.clear();
@@ -589,30 +594,49 @@ TRGCDC::update(bool mcAnalysis) {
         //...Wire...
         const unsigned layerId = h.getLayerId();
         const unsigned wireId = h.getWireId();
-        const TRGCDCWire & w = * wire(layerId, wireId);
+        const TCWire & w = * wire(layerId, wireId);
 
 //        cout << "lid,wid=" << layerId << "," << wireId << std::endl;
 
-        //...TRGCDCWireHit...
-        TRGCDCWireHit * hit = new TRGCDCWireHit(w,
-                                                h.getLeftDriftLength(),
-                                                0.15,
-                                                h.getRightDriftLength(),
-                                                0.15,
-                                                1);
-        hit->state(WireHitFindingValid | WireHitFittingValid );
+        //...TCWireHit...
+        TCWHit * hit = new TCWHit(w,
+				  h.getLeftDriftLength(),
+				  0.15,
+				  h.getRightDriftLength(),
+				  0.15,
+				  1);
+//      hit->state(WireHitFindingValid | WireHitFittingValid );
 
         //...Store a hit...
         (* _layers[layerId])[wireId]->hit(hit);
-//        _layers[layerId]->wire(wireId)->hit(hit);
-//        _wires[wireId]->hit(hit);
         _hits.push_back(hit);
         if (w.axial()) _axialHits.push_back(hit);
         else           _stereoHits.push_back(hit);
     }
 
+    //...Track segment...
+    const unsigned nTS = _tss.size();
+    for (unsigned i = 0; i < nTS; i++) {
+	TCTSegment & s = * _tss[i];
+	unsigned j = 0;
+	const TCWire * w = s[j];
+	const TCTSHit * th = 0;
+	while (w) {
+	    const TCWHit * h = w->hit();
+	    if (h) {
+		if (! th) {
+		    th = new TCTSHit((TCWire &) s);
+		    s.TCWire::hit(th);
+		    s.hit(th);
+		}
+		s._hits.push_back(h);
+	    }
+	    w = s[++j];
+	}
+    }
+
     //...Hit classification...
-//  _hits.sort(TRGCDCWireHit::sortByWireId);
+//  _hits.sort(TCWHit::sortByWireId);
     classification();
 
     //...MC information...
@@ -646,8 +670,8 @@ TRGCDC::updateMC(void) {
 //             (reccdc_wirhit *) BsGetEnt(RECCDC_WIRHIT, h->m_dat, BBS_No_Index);
 
 //         //...Get Trasan objects...
-//         TRGCDCWireHit * wh = 0;
-//         TRGCDCWire * w = 0;
+//         TCWHit * wh = 0;
+//         TCWire * w = 0;
 //         if (whp) {
 //             if (whp->m_stat & WireHitFindingValid) {
 //                 unsigned n = _hits.size();
@@ -668,8 +692,8 @@ TRGCDC::updateMC(void) {
 // //             w = _wires[g->m_ID - 1];
 // //         }
 
-//         //...Create TRGCDCWireHitMC...
-//         TRGCDCWireHitMC * hit = new TRGCDCWireHitMC(w, wh, h);
+//         //...Create TCWHitMC...
+//         TCWHitMC * hit = new TCWHitMC(w, wh, h);
 //         _hitsMC.push_back(hit);
 //         w->hit(hit);
 //         if (wh) wh->mc(hit);
@@ -700,12 +724,12 @@ TRGCDC::classification(void) {
     unsigned n = _hits.size();
 
     for (unsigned i = 0; i < n; i++) {
-        TRGCDCWireHit * h = _hits[i];
-        const TRGCDCWire & w = h->wire();
+        TCWHit * h = _hits[i];
+        const TCWire & w = h->wire();
         unsigned state = h->state();
 
         //...Cache pointers to a neighbor...
-        const TRGCDCWire * neighbor[7];
+        const TCWire * neighbor[7];
         for (unsigned j = 0; j < 7; j++) neighbor[j] = w.neighbor(j);
 
         //...Decide hit pattern...
@@ -718,14 +742,14 @@ TRGCDC::classification(void) {
         state |= (pattern << WireHitNeighborHit);
 
         //...Check isolation...
-        const TRGCDCWireHit * hr1 = neighbor[2]->hit();
-        const TRGCDCWireHit * hl1 = neighbor[3]->hit();
+        const TCWHit * hr1 = neighbor[2]->hit();
+        const TCWHit * hl1 = neighbor[3]->hit();
         if ((hr1 == 0) && (hl1 == 0)) {
             state |= WireHitIsolated;
         }
         else {
-            const TRGCDCWireHit * hr2 = neighbor[2]->neighbor(2)->hit();
-            const TRGCDCWireHit * hl2 = neighbor[3]->neighbor(3)->hit();
+            const TCWHit * hr2 = neighbor[2]->neighbor(2)->hit();
+            const TCWHit * hl2 = neighbor[3]->neighbor(3)->hit();
             if ((hr2 == 0) && (hr1 != 0) && (hl1 == 0) ||
                 (hl2 == 0) && (hl1 != 0) && (hr1 == 0))
                 state |= WireHitIsolated;
@@ -766,9 +790,9 @@ TRGCDC::classification(void) {
     }
 }
 
-std::vector<const TRGCDCWireHit *>
+std::vector<const TCWHit *>
 TRGCDC::axialHits(void) const {
-    std::vector<const TRGCDCWireHit *> t;
+    std::vector<const TCWHit *> t;
     t.assign(_axialHits.begin(), _axialHits.end());
     return t;
 
@@ -778,9 +802,9 @@ TRGCDC::axialHits(void) const {
 //  return _axialHits;
 }
 
-std::vector<const TRGCDCWireHit *>
+std::vector<const TCWHit *>
 TRGCDC::stereoHits(void) const {
-    std::vector<const TRGCDCWireHit *> t;
+    std::vector<const TCWHit *> t;
     t.assign(_stereoHits.begin(), _stereoHits.end());
     return t;
 
@@ -790,9 +814,9 @@ TRGCDC::stereoHits(void) const {
 //     return _stereoHits;
 }
 
-std::vector<const TRGCDCWireHit *>
+std::vector<const TCWHit *>
 TRGCDC::hits(void) const {
-    std::vector<const TRGCDCWireHit *> t;
+    std::vector<const TCWHit *> t;
     t.assign(_hits.begin(), _hits.end());
     return t;
 
@@ -802,9 +826,9 @@ TRGCDC::hits(void) const {
 //     return _hits;
 }
 
-std::vector<const TRGCDCWireHit *>
+std::vector<const TCWHit *>
 TRGCDC::badHits(void) const {
-    std::vector<const TRGCDCWireHit *> t;
+    std::vector<const TCWHit *> t;
     t.assign(_badHits.begin(), _badHits.end());
     return t;
 
@@ -826,18 +850,18 @@ TRGCDC::badHits(void) const {
 //             (geocdc_wire *) BsGetEnt(GEOCDC_WIRE, h->m_geo, BBS_No_Index);
 
 //         //...Get a pointer to a TRGCDCWire...
-//         TRGCDCWire * w = _wires[g->m_ID - 1];
+//         TCWire * w = _wires[g->m_ID - 1];
 
-//         //...Create TRGCDCWireHit...
-//         _badHits.append(new TRGCDCWireHit(w, h, _fudgeFactor));
+//         //...Create TCWHit...
+//         _badHits.append(new TCWHit(w, h, _fudgeFactor));
 //     }
 
 //     return _badHits;
 }
 
-std::vector<const TRGCDCWireHitMC *>
+std::vector<const TCWHitMC *>
 TRGCDC::hitsMC(void) const {
-    std::vector<const TRGCDCWireHitMC *> t;
+    std::vector<const TCWHitMC *> t;
     t.assign(_hitsMC.begin(), _hitsMC.end());
     return t;
 }
@@ -845,7 +869,7 @@ TRGCDC::hitsMC(void) const {
 std::string
 TRGCDC::wireName(unsigned wireId) const {
     std::string as = "-";
-    const TRGCDCWire * const w = wire(wireId);
+    const TCWire * const w = wire(wireId);
     if (w) {
         if (w->stereo())
             as = "=";
@@ -1000,7 +1024,7 @@ TRGCDC::axialStereoSuperLayerId(unsigned axialStereo,
 //     if (! (flag && 2)) t0Offset = 0.;
 
 //     //...Propagation corrections...
-//     const TRGCDCWireHit & h = * l.hit();
+//     const TCWHit & h = * l.hit();
 //     int wire = h.wire()->id();
 //     HepGeom::Vector3D<double> tp = t.helix().momentum(l.dPhi());
 //     float p[3] = {tp.x(), tp.y(), tp.z()};
@@ -1079,7 +1103,7 @@ TRGCDC::~TRGCDC() {
 }
 
 bool
-TRGCDC::neighbor(const TRGCDCWire & w0, const TRGCDCWire & w1) const {
+TRGCDC::neighbor(const TCWire & w0, const TCWire & w1) const {
     const int lyr0 = w0.layerId();
     const int lyr1 = w1.layerId();
     const int lyr = lyr0 - lyr1;
@@ -1129,6 +1153,9 @@ TRGCDC::simulate(void) {
     //...2D tracker : Hough finder...
     vector<TCTrack *> trackList;
     _hFinder->doit(trackList);
+
+    //...2D tracker : helix fitter...
+
 
     //...3D tracker...
     vector<TCTrack *> trackList3D;

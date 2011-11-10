@@ -24,11 +24,15 @@
 namespace Belle2 {
 
 class TRGCDCHoughPlane;
+class TRGCDCCircleFitter;
 
 /// A class to represent a circle.
 class TRGCDCCircle : public TRGCDCTrackBase {
 
   public:
+
+    /// Constructor with links.
+    TRGCDCCircle(const std::vector<TRGCDCLink *> links);
 
     /// Constructor with a circle center, assuming the origin is on a circle.
     TRGCDCCircle(float r,
@@ -41,6 +45,9 @@ class TRGCDCCircle : public TRGCDCTrackBase {
 
   public:
 
+    /// returns type.
+    virtual unsigned objectType(void) const;
+
     /// returns the circle center.
     const TRGPoint2D & center(void) const;
 
@@ -51,8 +58,14 @@ class TRGCDCCircle : public TRGCDCTrackBase {
     float radius(void) const;
 
     /// dumps debug information.
-    void dump(const std::string & message = std::string(""),
-              const std::string & prefix = std::string("")) const;
+    virtual void dump(const std::string & message = std::string(""),
+		      const std::string & prefix = std::string("")) const;
+
+    /// sets circle properties.
+    void property(double charge,
+		  double radius,
+		  HepGeom::Point3D<double> center);
+//  void property(double charge, double radius, TPoint2D & center);
 
   private:
 
@@ -64,6 +77,10 @@ class TRGCDCCircle : public TRGCDCTrackBase {
 
     /// Hough plane.
     const TRGCDCHoughPlane * _plane;
+
+    /// Default fitter.
+    static const TRGCDCCircleFitter _fitter;
+
 };
 
 //-----------------------------------------------------------------------------
@@ -85,6 +102,20 @@ inline
 float
 TRGCDCCircle::radius(void) const {
     return _radius;
+}
+
+inline
+unsigned
+TRGCDCCircle::objectType(void) const {
+    return TRGCDCCircleType;
+}
+
+inline
+void
+TRGCDCCircle::property(double c, double r, HepGeom::Point3D<double> e) {
+    charge(c);
+    _radius = r;
+    _center = e;
 }
 
 } // namespace Belle2

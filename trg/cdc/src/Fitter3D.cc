@@ -19,12 +19,13 @@
 #include "trg/cdc/Fitter3D.h"
 #include "trg/cdc/TrackSegment.h"
 #include "trg/cdc/Track.h"
+#include "trg/cdc/Link.h"
 #include <cstdlib>
 
 #include "framework/datastore/StoreArray.h"
 #include "cdc/hitcdc/HitCDC.h"
 #include "cdc/hitcdc/CDCSimHit.h"
-#include "cdc/geocdc/CDCGeometryPar.h"
+#include "cdc/geometry/CDCGeometryPar.h"
 #include "trg/trg/Time.h"
 #include "trg/trg/Signal.h"
 #include "trg/trg/Link.h"
@@ -264,16 +265,19 @@ TRGCDCFitter3D::doit(vector<TCTrack *> & trackListIn,
         //...Access to a track...
         const TCTrack & t = * trackListIn[i];
 
+	t.dump("detail");
+
         //...Super layer loop...
         for (unsigned i = 0; i < _cdc.nSuperLayers(); i++) {
 
             //...Access to track segment list in this super layer...
-            const vector<const TCTSegment *> & segments = t.trackSegments(i);
-            const unsigned nSegments = segments.size();
+//          const vector<const TCTSegment *> & segments = t.trackSegments(i);
+            const vector<TCLink *> & links = t.links(i);
+            const unsigned nSegments = links.size();
 
             //...Presently nSegments should be 1...
             if (nSegments != 1) {
-		if(nSegments==0){
+		if (nSegments==0){
 		ckt=0;
 		break;
                 cout << name() << " !!! NO TS assigned" << endl;
@@ -284,8 +288,8 @@ TRGCDCFitter3D::doit(vector<TCTrack *> & trackListIn,
 	    ckt=ckt*chk[i];
 
             //...Access to a track segment...
-            const TCTSegment & s = * segments[0];
-            s.name();
+	    links[0]->dump("detail");
+            const TCTSegment & s = * (TCTSegment *) links[0]->hit();
 	    phi[i]=(double) s.localId()/ni[i]*4*M_PI;
         }
 

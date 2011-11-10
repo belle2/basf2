@@ -66,8 +66,11 @@ TRGDebug::level(void) {
 }
 
 int
-TRGDebug::level(int a) {
-    return _level = a;
+TRGDebug::level(int a, bool b) {
+    if (! b)
+	return _level = a;
+    else
+	return _level = a;
 }
 
 } // namespace Belle2

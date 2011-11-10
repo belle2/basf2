@@ -36,8 +36,10 @@ typedef HepGeom::Vector3D<double>  Vector3D;
 #define WireOuterRight 5
 #define MaxNeighbors 6
 
+class TRGCDC;
 class TRGCDCWireHit;
 class TRGCDCWireHitMC;
+class TRGCDCTrackSegment;
 
 /// A class to represent a wire in CDC.
 class TRGCDCWire {
@@ -45,10 +47,14 @@ class TRGCDCWire {
   public:
     /// Constructor.
     TRGCDCWire(unsigned id,
-                   unsigned localId,
-                   TRGCDCLayer *,
-                   const HepGeom::Point3D<double> & forwardPosition,
-                   const HepGeom::Point3D<double> & backwardPosition);
+	       unsigned localId,
+	       TRGCDCLayer *,
+	       const HepGeom::Point3D<double> & forwardPosition,
+	       const HepGeom::Point3D<double> & backwardPosition);
+
+    /// Constructor with a track segment.
+    TRGCDCWire(const TRGCDCTrackSegment * segment,
+	       const TRGCDCWire * wire);
 
     /// Destructor
     virtual ~TRGCDCWire();
@@ -80,6 +86,9 @@ class TRGCDCWire {
 
     /// returns a pointer to a TRGCDCWireHit.
     const TRGCDCWireHit * hit(void) const;
+
+    /// returns a pointer to a TRGCDCTrackSegment.
+    const TRGCDCTrackSegment * const segment(void) const;
 
     /// returns state.
     unsigned state(void) const;
@@ -138,7 +147,7 @@ class TRGCDCWire {
     int localIdDifference(const TRGCDCWire &) const;
 
     /// returns name.
-    std::string name(void) const;
+    virtual std::string name(void) const;
 
     /// dumps debug information.
     void dump(const std::string & message = std::string(""),
@@ -164,19 +173,45 @@ class TRGCDCWire {
     void clear(void);
 
   private:
-    unsigned _state;
-    const TRGCDCWireHit * _hit;
-    std::vector<TRGCDCWireHitMC *> _mcHits;
 
+    /// ID
     unsigned _id;
-    unsigned _localId;
-    const TRGCDCLayer * _layer;
-    HepGeom::Point3D<double> _xyPosition;
-    HepGeom::Point3D<double> _forwardPosition;
-    HepGeom::Point3D<double> _backwardPosition;
-    Vector3D _direction;
 
+    /// Local ID
+    unsigned _localId;
+
+    /// Layer.
+    const TRGCDCLayer * const _layer;
+
+    /// Track segment.
+    const TRGCDCTrackSegment * _segment;
+
+    /// Wire center(?) position.
+    const HepGeom::Point3D<double> _xyPosition;
+
+    /// Wire forward position.
+    const HepGeom::Point3D<double> _forwardPosition;
+
+    /// Wire backward position.
+    const HepGeom::Point3D<double> _backwardPosition;
+
+    /// Direction vector.
+    const Vector3D _direction;
+
+    /// Status in this event.
+    unsigned _state;
+
+    /// Wire hit.
+    const TRGCDCWireHit * _hit;
+
+    /// MC wire hit.
+//  std::vector<const TRGCDCWireHitMC * const> _mcHits;
+    std::vector<const TRGCDCWireHitMC *> _mcHits;
+
+    /// Trigger output.
     mutable TRGSignal _triggerOutput;
+
+    friend class TRGCDC;
 };
 
 //-----------------------------------------------------------------------------

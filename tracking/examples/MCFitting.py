@@ -24,36 +24,41 @@
 import os
 from basf2 import *
 
-# Register necessary modules
+# register necessary modules
 evtmetagen = register_module('EvtMetaGen')
 
-# one event
+# generate one event
 evtmetagen.param('ExpList', [0])
 evtmetagen.param('RunList', [1])
 evtmetagen.param('EvtNumList', [1])
 
 evtmetainfo = register_module('EvtMetaInfo')
 
-# Create geometry
+# create geometry
 gearbox = register_module('Gearbox')
 geometry = register_module('Geometry')
 
-# if you want you can simulate only tracking detectors, if you want to simulate the whole detector, comment the next line out
+# simulate only tracking detectors
+# to simulate the whole detector included in BelleII.xml, comment the next line out
 geometry.param('Components', ['MagneticField', 'BeamPipe', 'PXD', 'SVD', 'CDC'
                ])
 
-# Simulation
+# particle gun to shoot particles in the detector
 pGun = register_module('ParticleGun')
+
+# generate a random seed for the simulation
+import random
+intseed = random.randint(1, 10000000)
 
 # choose the particles you want to simulate
 param_pGun = {
     'pdgCodes': [13, -13],
-    'randomSeed': 1028307,
-    'nTracks': 1,
+    'randomSeed': intseed,
+    'nTracks': 4,
     'momentumGeneration': 'uniform',
-    'momentumParams': [0.8, 1.2],
+    'momentumParams': [0.4, 1.6],
     'thetaGeneration': 'fixed',
-    'thetaParams': [100., 100.],
+    'thetaParams': [60., 120.],
     'phiGeneration': 'uniform',
     'phiParams': [0, 360],
     'vertexGeneration': 'uniform',
@@ -64,31 +69,27 @@ param_pGun = {
 
 pGun.param(param_pGun)
 
+# simulation
 g4sim = register_module('FullSim')
 
-# Digitizer
+# digitizer
 cdcDigitizer = register_module('CDCDigi')
 
-# use one gaussian with resolution of 0.01 in the digitizer
+# use one gaussian with resolution of 0.01 in the digitizer (to simplify the fitting)
 param_cdcdigi = {'Fraction': 1, 'Resolution1': 0.01, 'Resolution2': 0.0}
 cdcDigitizer.param(param_cdcdigi)
 
-# Find MCTracks
+# find MCTracks
 mctrackfinder = register_module('MCTrackFinder')
 
-# select which detectors you would like to use and if the values storen in the track candidates should be smeared
-param_mctrackfinder = {
-    'UseCDCHits': 1,
-    'UseSVDHits': 1,
-    'UsePXDHits': 1,
-    'Smearing': 0,
-    }
+# select which detectors you would like to use
+param_mctrackfinder = {'UseCDCHits': 1, 'UseSVDHits': 1, 'UsePXDHits': 1}
 mctrackfinder.param(param_mctrackfinder)
 
-# Fitting
+# fitting
 cdcfitting = register_module('GenFitter')
 
-# fit the tracks with Kalman filter
+# fit the tracks with one iteration of Kalman filter
 param_cdcfitting = {
     'StoreFailedTracks': 0,
     'mcTracks': 1,
@@ -98,14 +99,14 @@ param_cdcfitting = {
     }
 cdcfitting.param(param_cdcfitting)
 
-# Output
+# output
 output = register_module('SimpleOutput')
 output.param('outputFileName', 'MCFittingOutput.root')
 
-# Create paths
+# create paths
 main = create_path()
 
-# Add modules to paths
+# add modules to paths
 main.add_module(evtmetagen)
 main.add_module(evtmetainfo)
 

@@ -13,9 +13,8 @@
 
 # CDCDigi creates the detecotor response in the CDC for the simulated Hits.
 
-# CDCTracking performs pattern recognition in the CDC based on conformal algorithm. GFTrackCandidates with corresponding hit incides and start values are created.
+# CDCTracking performs pattern recognition in the CDC based on conformal algorithm. GFTrackCandidates with corresponding hit indices and start values are created.
 # GenFitter fits the found GFTrackCandidates and created two track collections: GFTracks (Genfit class) and Tracks (class with helix parametrization)
-# Caution: it is still under testing how well GenFitter can handle 'unperfect' pattern reco track candidates, so the fitting may fail here...
 #
 # For details about module parameters just type > basf2 -m .
 #
@@ -24,36 +23,41 @@
 import os
 from basf2 import *
 
-# Register necessary modules
+# register necessary modules
 evtmetagen = register_module('EvtMetaGen')
 
-# one event
+# generate one event
 evtmetagen.param('ExpList', [0])
 evtmetagen.param('RunList', [1])
 evtmetagen.param('EvtNumList', [1])
 
 evtmetainfo = register_module('EvtMetaInfo')
 
-# Create geometry
+# create geometry
 gearbox = register_module('Gearbox')
 geometry = register_module('Geometry')
 
-# if you want you can simulate only tracking detectors, if you want to simulate the whole detector, comment the next line out
+# simulate only tracking detectors
+# to simulate the whole detector included in BelleII.xml, comment the next line out
 geometry.param('Components', ['MagneticField', 'BeamPipe', 'PXD', 'SVD', 'CDC'
                ])
 
-# Simulation
+# shoot particles in the detector
 pGun = register_module('ParticleGun')
+
+# generate a random seed for the simulation
+import random
+intseed = random.randint(1, 10000000)
 
 # choose the particles you want to simulate
 param_pGun = {
     'pdgCodes': [13, -13],
-    'randomSeed': 1028307,
-    'nTracks': 1,
+    'randomSeed': intseed,
+    'nTracks': 4,
     'momentumGeneration': 'uniform',
-    'momentumParams': [0.8, 1.2],
+    'momentumParams': [0.4, 1.6],
     'thetaGeneration': 'fixed',
-    'thetaParams': [100., 100.],
+    'thetaParams': [60., 120.],
     'phiGeneration': 'uniform',
     'phiParams': [0, 360],
     'vertexGeneration': 'uniform',
@@ -64,50 +68,48 @@ param_pGun = {
 
 pGun.param(param_pGun)
 
+# simulation
 g4sim = register_module('FullSim')
 
-# Digitizer
+# digitizer
 cdcDigitizer = register_module('CDCDigi')
 
-# use one gaussian with resolution of 0.01 in the digitizer
+# use one gaussian with resolution of 0.01 in the digitizer (to simplify the fitting)
 param_cdcdigi = {'Fraction': 1, 'Resolution1': 0.01, 'Resolution2': 0.0}
 cdcDigitizer.param(param_cdcdigi)
 
-# Pattern Recognition
+# pattern recognition
 cdctracking = register_module('CDCTracking')
 
-param_cdctracking = {
-    'CDCSimHitsColName': 'CDCSimHits',
-    'CDCHitsColName': 'CDCHits',
-    'CDCTrackCandidatesColName': 'CDCTrackCandidates',
-    'GFTrackCandidatesColName': 'GFTrackCands_PatternReco',
-    'TextFileOutput': 0,
-    }
+# give the collection a custom name to mark that it is coming from pattern recognition
+param_cdctracking = {'GFTrackCandidatesColName': 'GFTrackCands_PatternReco'}
 cdctracking.param(param_cdctracking)
 
-# Matches the found track candidate with an MCParticle
+# match the found track candidates with MCParticles
 mcmatching = register_module('CDCMCMatching')
 
+# select the correct collection for the matching
 param_mcmatching = {'GFTrackCandidatesColName': 'GFTrackCands_PatternReco'}
 mcmatching.param(param_mcmatching)
 
-# Fitting
+# fitting
 cdcfitting = register_module('GenFitter')
 
+# set correct collection name as input an custom collection names as output
+# select DAF instead of Kalman as Filter
 param_cdcfitting = {
     'GFTrackCandidatesColName': 'GFTrackCands_PatternReco',
     'TracksColName': 'Tracks_PatternReco',
     'GFTracksColName': 'GFTracks_PatternReco',
-    'StoreFailedTracks': 1,
     'mcTracks': 0,
-    'FilterId': 0,
+    'FilterId': 1,
     'NIterations': 1,
     'ProbCut': 0.001,
     }
 
 cdcfitting.param(param_cdcfitting)
 
-# Output
+# output
 output = register_module('SimpleOutput')
 output.param('outputFileName', 'CDCPatternRecoOutput.root')
 

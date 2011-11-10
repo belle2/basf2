@@ -89,6 +89,7 @@ GenFitterModule::GenFitterModule() :
   addParam("GFTracksColName", m_gfTracksColName, "Name of collection holding the final GFTracks (will be created by this module)", string(""));
   addParam("TracksColName", m_tracksColName, "Name of collection holding the final Tracks (will be created by this module)", string(""));
 
+  addParam("HelixOutput", m_createTextFile, "Set true if you want to have a text file with perigee helix parameters of all tracks", bool(false));
 }
 
 GenFitterModule::~GenFitterModule()
@@ -104,7 +105,9 @@ void GenFitterModule::initialize()
   StoreArray < Track > tracks(m_tracksColName);
   StoreArray < GFTrack > gfTracks(m_gfTracksColName);
 
-  HelixParam.open("HelixParam.txt");
+  if (m_createTextFile) {
+    HelixParam.open("HelixParam.txt");
+  }
 
   //convert geant4 geometry to TGeo geometry
   //in the moment tesselated solids used for the glue within the PXD cannot be converted to TGeo, the general solution still has to be found, at the moment you can just comment out lines 6 and 13 in  pxd/data/PXD-Components.xml.
@@ -203,6 +206,8 @@ void GenFitterModule::event()
 
     GFTrack gfTrack(trackRep, true);  //create the track with the corresponding track representation
 
+    //B2INFO("       Initial Covariance matrix: ");
+    //gfTrack.getTrackRep(0)->getCov().Print();
 
     GFRecoHitFactory factory;
 
@@ -393,19 +398,21 @@ void GenFitterModule::event()
             B2INFO("Recalculate momentum from perigee: px: " << abs(1 / (tracks[trackCounter]->getOmega()*alpha))*(cos(tracks[trackCounter]->getPhi())) << "  py: " << abs(1 / (tracks[trackCounter]->getOmega()*alpha))*sin(tracks[trackCounter]->getPhi()) << "  pz: " << abs(1 / (tracks[trackCounter]->getOmega()*alpha))*tracks[trackCounter]->getCotTheta());
             B2DEBUG(149, "Recalculate momentum from Belle: px: " << abs(1 / (tracks[trackCounter]->getBelleKappa()))*(-sin(tracks[trackCounter]->getBellePhi())) << "  py: " << abs(1 / (tracks[trackCounter]->getBelleKappa()))*cos(tracks[trackCounter]->getBellePhi()) << "  pz: " << abs(1 / (tracks[trackCounter]->getBelleKappa()))*tracks[trackCounter]->getBelleTanLambda());
             B2INFO("<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>");
-            //Additional code
-            //print helix parameter to a file
-            //useful if one like to quickly plot track trajectories
-            //-------------------------------------
-            HelixParam << tracks[trackCounter]->getD0() << " \t"
-            << tracks[trackCounter]->getPhi() << " \t"
-            << tracks[trackCounter]->getOmega() << " \t"
-            << tracks[trackCounter]->getZ0() << " \t"
-            << tracks[trackCounter]->getCotTheta() << "\t" << poca.x()
-            << "\t" << poca.y() << "\t" << poca.z() << endl;
-            //----------------------------------------
-            //end additional code
 
+            if (m_createTextFile) {
+              //Additional code
+              //print helix parameter to a file
+              //useful if one like to quickly plot track trajectories
+              //-------------------------------------
+              HelixParam << tracks[trackCounter]->getD0() << " \t"
+              << tracks[trackCounter]->getPhi() << " \t"
+              << tracks[trackCounter]->getOmega() << " \t"
+              << tracks[trackCounter]->getZ0() << " \t"
+              << tracks[trackCounter]->getCotTheta() << "\t" << poca.x()
+              << "\t" << poca.y() << "\t" << poca.z() << endl;
+              //----------------------------------------
+              //end additional code
+            }
           }
 
           catch (...) {
@@ -441,6 +448,8 @@ void GenFitterModule::endRun()
 
 void GenFitterModule::terminate()
 {
-  HelixParam.close();
+  if (m_createTextFile) {
+    HelixParam.close();
+  }
 }
 

@@ -77,6 +77,7 @@ namespace Belle2 {
     int m_pdg;                                       /**< PDG hypothesis for the track fit. If -999: MC/default values will be used. */
 
     std::ofstream HelixParam;                        /**< Text output file name */
+    bool m_createTextFile;                           /**< Boolean to select if an output file with helix parameters should be created. */
 
 
   };

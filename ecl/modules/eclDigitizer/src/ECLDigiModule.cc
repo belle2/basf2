@@ -125,7 +125,7 @@ void ECLDigiModule::event()
 
 
     E_tmp[hitCellId] = hitE + E_tmp[hitCellId];//for summation deposit energy; do fit if this summation > 0.1 MeV
-    cout << "HitEnergy ADC  :" << hitCellId << " " << hitE << " " << hitTimeAve << endl;
+//    cout << "HitEnergy ADC  :" << hitCellId << " " << hitE << " " << hitTimeAve << endl;
 
     //Noise generation
     for (int iCal = 0; iCal < 31; iCal++) {
@@ -182,7 +182,6 @@ void ECLDigiModule::event()
       tFit[iECLCell] = m_ttrig;    //fit output : T_ave
       qualityFit[iECLCell] = m_lq;    //fit output : T_ave
 
-      cout << "Fit result Cell ID: " << iECLCell << " energy: " << energyFit[iECLCell] << " t: " << tFit[iECLCell] << " quality: " << qualityFit[iECLCell] << " DeltaT " << DeltaT << endl;
 
       StoreArray<DigiECL> eclDigiArray(m_eclDigiCollectionName);
       m_hitNum = eclDigiArray->GetLast() + 1;
@@ -204,10 +203,9 @@ void ECLDigiModule::event()
   } //store  each crystal hit
 
 
-  cout << "m_nEvent++ : " << m_nEvent++    << endl;
   m_nEvent++;
   m_timeCPU = clock() * Unit::us;
-  B2INFO("ECLDigiModule finished. Time per event: " << m_timeCPU  / Unit::ms << " ms.");
+  B2INFO("ECLDigiModule event finished.  Time: " << m_timeCPU  / Unit::ms << " ms.");
 
 }
 

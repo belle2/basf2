@@ -1,6 +1,7 @@
 Import('env')
 
 env['LIBS'] = ['framework',
+               'arich', 'bklm', 'cdc', 'ecl', 'eklm', 'ir', 'pxd', 'svd', 'top', 'vxd',
                '$ROOT_LIBS', 'EG',
                'boost_filesystem']
 

@@ -25,7 +25,7 @@ import random
 from basf2 import *
 
 # Set the log level to show only error and fatal messages
-set_log_level(LogLevel.DEBUG)
+set_log_level(LogLevel.ERROR)
 
 # EvtMetaGen - generate event meta data
 evtmetagen = register_module('EvtMetaGen')

@@ -26,6 +26,8 @@ namespace Belle2 {
   class EKLMFiberAndElectronics {
 
   public:
+
+
     /**
      * Constructor
      */
@@ -44,6 +46,10 @@ namespace Belle2 {
     int getFitStatus();
 
   private:
+
+
+
+
     std::vector <double> hitTimesVectorForward;
     std::vector <double> hitTimesVectorBackward;
 
@@ -60,12 +66,12 @@ namespace Belle2 {
     double forwardHitDist;
     double backwardHitDist;
 
+    const std::string * stripName ;
+
     void timesToShape(std::vector <double> * , TH1D *);
 
     void hitTimes(int , bool isReflected = false) ;
 
-    //! root tree pointer for external output
-    TTree * selection;
 
     //! returns delay depending on the distance to the hit
     double lightPropagationTime(double);
@@ -74,9 +80,18 @@ namespace Belle2 {
     void lightPropagationDistance(double &firstHitDist,
                                   double &secondHitDist, EKLMSimHit *sh);
 
+
+    //! Filename  prefix for files saved
+    //! Each file containes digitizedAmplitudeDirect  digitizedAmplitudeReflected and digitizedAmplitude histograms as well as fitFunction with fit results
+    //! Empty string means no file should be saved
+    std::string outputFilename;
+
     //! number of ADC digitization steps
     //! should be accessible via XML
     int nTimeDigitizationSteps;
+
+    //! lightspeed in fiber
+    double lightSpeed;
 
     //! ADC digitization step
     //! should be accessible via XML

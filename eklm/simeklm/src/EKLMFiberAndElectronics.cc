@@ -14,54 +14,60 @@
 #include "G4Box.hh"
 #include "TRandom.h"
 #include "TH1D.h"
+#include "TFile.h"
+
+
+#include <framework/gearbox/GearDir.h>
+#include <framework/gearbox/Unit.h>
+
 
 using namespace CLHEP;
 
 
 namespace Belle2 {
 
-  double EKLMFiberAndElectronics::getFitResults(int i)
-  {
-    return fitResultsPtr->Value(i);
-  }
 
-  int EKLMFiberAndElectronics::getFitStatus()
-  {
-    return (int)fitResultsPtr;
-  }
+
 
   EKLMFiberAndElectronics::EKLMFiberAndElectronics(std::pair < G4VPhysicalVolume *,
                                                    std::vector<EKLMSimHit*> >
                                                    entry)
   {
-    timeDigitizationStep = 1; // 1 ns
-    nTimeDigitizationSteps = 200; // 1000 steps
-    nPEperMeV = 20;
-    // alpha=arccos(1-Sangle/2/pi)
-    // Sangle=5.5%*2pi
-    minCosTheta = 0.9912; // Suspicious! to be checked!!!
-    mirrorReflectiveIndex = 0.95;  // to be refined
-    scintillatorDeExcitationTime = 3; //ns
-    fiberDeExcitationTime = 10.; //ns
 
-    const char * stripName = entry.first->GetName();
+    // get information from Gearbox
+
+    GearDir Digitizer = GearDir("/Detector/DetectorComponent[@name=\"EKLM\"]/Content/Digitizer");
+    timeDigitizationStep = Digitizer.getInt("TimeDigitizationStep");
+    nTimeDigitizationSteps = Digitizer.getInt("NTimeDigitizationSteps");
+    nPEperMeV = Digitizer.getDouble("NPEperMeV");
+    minCosTheta = cos(Digitizer.getAngle("MaxTheta"));
+    mirrorReflectiveIndex = Digitizer.getDouble("MirrorReflectiveIndex");
+    scintillatorDeExcitationTime = Digitizer.getDouble("ScintillatorDeExcitationTime");
+    scintillatorDeExcitationTime = Digitizer.getDouble("ScintillatorDeExcitationTime");
+    fiberDeExcitationTime = Digitizer.getDouble("FiberDeExcitationTime");
+    outputFilename = Digitizer.getString("OutputFile");
+    lightSpeed = Digitizer.getDouble("LightSpeedInFiber");
+
+
+    stripName = &entry.first->GetName();
+
     digitizedAmplitudeDirect = new TH1D("digitizedAmplitudeDirect", "",
                                         nTimeDigitizationSteps, 0,
                                         nTimeDigitizationSteps *
                                         timeDigitizationStep);
     digitizedAmplitudeDirect->SetNameTitle("digitizedAmplitudeDirect",
-                                           stripName);
+                                           stripName->c_str());
     digitizedAmplitudeReflected = new TH1D("digitizedAmplitudeReflected", "",
                                            nTimeDigitizationSteps, 0,
                                            nTimeDigitizationSteps *
                                            timeDigitizationStep);
     digitizedAmplitudeReflected->SetNameTitle("digitizedAmplitudeReflected",
-                                              stripName);
+                                              stripName->c_str());
     digitizedAmplitude = new TH1D("digitizedAmplitude", "",
                                   nTimeDigitizationSteps, 0,
                                   nTimeDigitizationSteps *
                                   timeDigitizationStep);
-    digitizedAmplitude->SetNameTitle("digitizedAmplitude", stripName);
+    digitizedAmplitude->SetNameTitle("digitizedAmplitude", stripName->c_str());
 
 
     fitFunction = new TF1("fitFunction", EKLMSignalShapeFitFunction, 0, 300, 4);
@@ -94,9 +100,21 @@ namespace Belle2 {
 
       fitFunction->SetParameters(10, 2., 0.04, 30);
       fitResultsPtr = digitizedAmplitude->Fit(fitFunction, "LLSQ");
-
     }
 
+    if (outputFilename.size() != 0) {
+      const char * info = (std::string("Histograms will be saved with ") + outputFilename + std::string(" prefix. To switch it off change OutputFile parameter in EKLM.xml to void")).c_str();
+      B2INFO(info);
+      std::string filename = outputFilename + *stripName + boost::lexical_cast<std::string>(gRandom->Integer(10000000)) + ".root";
+      TFile *hfile = new TFile(filename.c_str(), "NEW");
+      hfile->Append(digitizedAmplitudeDirect);
+      hfile->Append(digitizedAmplitudeReflected);
+      hfile->Append(digitizedAmplitude);
+      hfile->Append(fitFunction);
+      hfile->Write();
+    } else {
+      B2INFO("OutputFile parameter in EKLM.xml is void. No histogram will be saved");
+    }
   }
 
   EKLMFiberAndElectronics::~EKLMFiberAndElectronics()
@@ -182,10 +200,23 @@ namespace Belle2 {
 
   double EKLMFiberAndElectronics::lightPropagationTime(double L)
   {
-    // nearly arbitrary function. to be updated
-    double speed = 17;// (cm/ns)   // should be accessible via xml!
-    return L / speed;
+    return L / lightSpeed;
   }
+
+
+  double EKLMFiberAndElectronics::getFitResults(int i)
+  {
+    return fitResultsPtr->Value(i);
+  }
+
+  int EKLMFiberAndElectronics::getFitStatus()
+  {
+    return (int)fitResultsPtr;
+  }
+
+
+
+
   //----------------------------------------------------------
 
 

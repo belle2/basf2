@@ -18,7 +18,7 @@
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreIter.h>
-#include <framework/datastore/EventMetaData.h>
+#include <framework/dataobjects/EventMetaData.h>
 
 #include <framework/core/Module.h>
 #include <framework/pcore/MsgHandler.h>

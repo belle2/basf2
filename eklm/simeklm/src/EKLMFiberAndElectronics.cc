@@ -47,6 +47,9 @@ namespace Belle2 {
     fiberDeExcitationTime = Digitizer.getDouble("FiberDeExcitationTime");
     outputFilename = Digitizer.getString("OutputFile");
     lightSpeed = Digitizer.getDouble("LightSpeedInFiber");
+    attenuationLength = Digitizer.getLength("AttenuationLength");
+    expCoefficient = Digitizer.getDouble("SignalShapeExpCoefficient");
+    meanSiPMNoise = Digitizer.getDouble("BackgroundPoissonMean");
 
 
     stripName = &entry.first->GetName();
@@ -94,13 +97,17 @@ namespace Belle2 {
       timesToShape(&hitTimesVectorBackward, digitizedAmplitudeReflected);
       timesToShape(&hitTimesVectorForward, digitizedAmplitudeDirect);
 
-      digitizedAmplitude->Add(digitizedAmplitudeReflected, 1);
-      digitizedAmplitude->Add(digitizedAmplitudeDirect, 1);
-
-
-      fitFunction->SetParameters(10, 2., 0.04, 30);
-      fitResultsPtr = digitizedAmplitude->Fit(fitFunction, "LLSQ");
     }
+
+
+    digitizedAmplitude->Add(digitizedAmplitudeReflected, 1);
+    digitizedAmplitude->Add(digitizedAmplitudeDirect, 1);
+
+
+    fitFunction->SetParameters(10, 2., 0.04, 50);
+    fitResultsPtr = digitizedAmplitude->Fit(fitFunction, "LLSQ");
+
+    addRandomSiPMNoise();
 
     if (outputFilename.size() != 0) {
       const char * info = (std::string("Histograms will be saved with ") + outputFilename + std::string(" prefix. To switch it off change OutputFile parameter in EKLM.xml to void")).c_str();
@@ -137,15 +144,15 @@ namespace Belle2 {
     secondHitDist = 4.0 * half_len - firstHitDist;     //  reflected light hit
   }
 
-  double EKLMFiberAndElectronics::addRandomNoise(double ampl)
+  void EKLMFiberAndElectronics::addRandomSiPMNoise()
   {
-    // Gauss for now
-    return gRandom->Gaus(ampl, sqrt(ampl));
+    double meanSiPMNoise = 10.;
+    for (int iTimeStep = 0; iTimeStep < nTimeDigitizationSteps; iTimeStep++)
+      digitizedAmplitude->AddBinContent(iTimeStep + 1,  gRandom->Poisson(meanSiPMNoise));
   }
 
   double EKLMFiberAndElectronics::signalShape(double t)
   {
-    double expCoefficient = 0.04;
     if (t > 0)
       return exp(-expCoefficient*t);
     return 0;
@@ -153,8 +160,7 @@ namespace Belle2 {
 
   double  EKLMFiberAndElectronics::distanceAttenuation(double dist)
   {
-    //temporary  : att.Length=3 m
-    return exp(-dist / 300);
+    return exp(-dist / attenuationLength);
   }
 
   void EKLMFiberAndElectronics::hitTimes(int nPE, bool isReflected)

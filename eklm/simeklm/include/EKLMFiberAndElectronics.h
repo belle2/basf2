@@ -93,6 +93,12 @@ namespace Belle2 {
     //! lightspeed in fiber
     double lightSpeed;
 
+    //! attenuation length in fiber
+    double attenuationLength;
+
+    //! expCoefficint
+    double expCoefficient;
+
     //! ADC digitization step
     //! should be accessible via XML
     int timeDigitizationStep;
@@ -100,6 +106,9 @@ namespace Belle2 {
     //! mirror reflective index
     //! should be accessible via XML
     double mirrorReflectiveIndex;
+
+    //! meanSiPMNoise
+    double meanSiPMNoise;
 
 
     //! minimal values of cos(Theta), (corresponds to maximal Theta)
@@ -122,7 +131,7 @@ namespace Belle2 {
     double signalShape(double);
 
     //! Adds random noise to the signal (amplitude-dependend)
-    double addRandomNoise(double);
+    void addRandomSiPMNoise();
 
     //! distance amplitude attenuation
     //! f(l)=distanceAttenuation(l)*f(0)

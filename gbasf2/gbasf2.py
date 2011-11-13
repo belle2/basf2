@@ -9,194 +9,27 @@
 # Tom Fifield (fifieldt@unimelb.edu.au) - 2010-11
 #
 
-# we require Amga tools from Polish devs for metadata
-from AmgaSearch import AmgaSearch
-# handy file/path features
 import os
-# we're part of DIRAC, yay
+import tarfile
 import DIRAC
 from DIRAC.Core.Base import Script
 from DIRAC.Core.Security.Misc import *
-from DIRAC.Core.Security import CS  # hanyl
-from DIRAC.Core.Security import Properties
-from DIRAC.FrameworkSystem.Client.ProxyGeneration import generateProxy
-from DIRAC.FrameworkSystem.Client.ProxyManagerClient import ProxyManagerClient
 # used for commandline and steeringfile option parsing
 from gbasf2util import CLIParams
-# used to make tar for input sandbox
-import tarfile
-
-# make_jdl takes the options defined by the user and and lfn and makes a basic
-# JDL file. This is then written into a temporary file in the same directory.
-# Returns the path of the JDL
-
-
-def make_jdl(
-    steering_file,
-    project,
-    CPUTime,
-    priority,
-    lfn,
-    sysconfig,
-    swver,
-    tar,
-    ):
-
-    f = open(project + '-' + os.path.basename(lfn) + '.jdl', 'w')
-    f.write('[\n')
-    f.write('    Executable = "basf2helper.sh";\n')
-    f.write('    Arguments = "' + steering_file + ' ' + swver + '";\n')
-    f.write('    JobGroup = ' + project + ';\n')
-    f.write('    JobName = ' + os.path.basename(lfn) + ';\n')
-    f.write('    PilotType = "private";\n')
-    f.write('    SystemConfig = ' + sysconfig + ';\n')
-    f.write('    Requirements = Member("VO-belle-' + swver
-            + '",other.GlueHostApplicationSoftwareRunTimeEnvironment);\n')
-    f.write('    InputSandbox = \n')
-    f.write('    {\n')
-    f.write('      "' + steering_file + '",\n')
-    f.write('      "basf2helper.sh",\n')
-    f.write('      "gbasf2util.py",\n')
-    f.write('      "gbasf2output.py",\n')
-    f.write('      "AmgaClient.py",\n')
-    f.write('      "mdinterface.py",\n')
-    f.write('      "mdstandalone.py",\n')
-    f.write('      "mdclient.py",\n')
-    f.write('      "mdparser.py",\n')
-    if tar is not None:
-        f.write('      "' + tar + '",\n')
-    # if lfn != 'None':
-    #    f.write('      "LFN:' + lfn + '"\n')
-    f.write('''    };
-\
-      OutputSandbox =
-\
-        {
-\
-            "basf2.err",
-\
-            "std.err",
-\
-            "std.out"
-\
-        };
-\
-      StdError = "std.err";
-\
-      StdOutput = "std.out";
-\
-      OutputData = "std.out";
-\
-      MaxCPUTime = '''
-            + str(CPUTime) + ';\n\
-      Priority = ' + str(priority) + ' ;\n]'
-            )
-    f.close()
-    return project + '-' + os.path.basename(lfn) + '.jdl'
-
-
-# basic function to make a tar of input files, written to pwd
-# FIXME - upload to SandboxSE, return an URL and reuse URL to speed up submission
-
-
-def make_tar(project, files):
-    if files is not None:
-        tar = tarfile.open(project + '-inputsandbox.tar.bz2', 'w:bz2')
-        for file in files:
-            try:
-                tar.add(file)
-            except OSError:
-                print 'No such input file: ' + file
-                DIRAC.exit(1)
-        return project + '-inputsandbox.tar.bz2'
-    else:
-        return None
-
-
-# check for proxy prescence and if not present, make it, upload it, VOMS it
-
-
-def prepareProxy():
-  # FIXME - upload proxy for lifetime of certificate
-  # FIXME - warn on certificate validity
-    proxyinfo = getProxyInfo()
-    if not proxyinfo['OK'] or 'username' not in proxyinfo['Value'].keys():
-        print 'No proxy found - trying to generate one'
-        proxyparams = DIRAC.FrameworkSystem.Client.ProxyGeneration.CLIParams()
-        proxyparams.diracGroup = 'belle'
-        proxyparams.proxyLifeTime = 604800
-        proxyparams.checkClock = True
-        proxyparams.debug = True
-        retVal = generateProxy(proxyparams)
-        if not retVal['OK']:
-            print retVal['Message']
-            DIRAC.exit(1)
-        else:
-            proxyinfo = getProxyInfo()
-            if not proxyinfo['OK']:
-                print 'Error: %s' % proxyinfo['Message']
-                DIRAC.exit(1)
-    else:
-      # We need to enable the configuration service ourselves if we're not generating a proxy
-        Script.enableCS()
-    proxyProps = proxyinfo['Value']
-    userName = proxyProps['username']
-    if Properties.PROXY_MANAGEMENT not in proxyProps['groupProperties'] \
-        and userName != CS.getUsernameForDN(proxyProps['issuer'])['Value']:
-        print "You're trying to manage a proxy that is not yours, without permission!"
-        DIRAC.exit(1)
-
-    DNresult = CS.getDNForUsername(userName)
-    if not DNresult['OK']:
-        print 'Oops %s' % DNresult['Message']
-        DIRAC.exit(1)
-
-    dnList = DNresult['Value']
-    if not dnList:
-        print 'User %s has no DN defined!' % userName
-        DIRAC.exit(1)
-
-    # Next, check there's a proxy that's been uploaded
-    pmc = ProxyManagerClient()
-    PMCresult = pmc.userHasProxy(dnList[0], 'belle')
-    if not PMCresult['OK']:
-        print 'Could not retrieve the proxy list: %s' % PMCresult['Value']
-        DIRAC.exit(1)
-    else:
-        lifetime = pmc.getUploadedProxyLifeTime(dnList[0], 'belle')
-        if not lifetime['OK'] or lifetime['Value'] < 604799:
-            uploadResult = pmc.uploadProxy()
-            if not uploadResult['OK']:
-                print "Couldn't find a valid uploaded proxy, and couldn't upload one %s " \
-                    % uploadResult['Value']
-
-    # Finally, try to add the VOMS attributes
-    voms = VOMS()
-    VOMSresult = voms.setVOMSAttributes(proxyProps['chain'],
-            CS.getVOMSAttributeForGroup(proxyparams.diracGroup),
-            proxyparams.diracGroup)
-    if not VOMSresult['OK']:
-        print VOMSresult['Message']
-        print 'Warning : Cannot add voms attribute to the proxy'
-        print '          Accessing data in the grid storage from the user interface will not be possible.'
-        print '          The grid jobs will not be affected.'
-    else:
-        # dump VOMS proxy to file
-        print VOMSresult['Value'].dumpAllToFile(proxyProps['path'])
-
-    # set path of proxy so  AMGA client picks it up
-    os.environ['X509_USER_PROXY'] = proxyProps['path']
-
-
-# gBasf2 takes a number of options - either from the commandline or in a steering file (see
-# gbasf2utils.py) and uses them to (currently)
-# 1. conduct a metadata query to match appropriate data to work with - a set of LFNs
-# 2. performs all necessary tasks to get the user a proxy
-# 3. construct a project based on the name provided and appropriate JDLs - presently just 1 per job
-# 4. submits the created jdls to the DIRAC Workload Management System
+from AmgaSearch import AmgaSearch
+from DIRAC import gLogger
+from util import CheckAndRemoveProjectIfForce, make_jdl, prepareProxy, make_tar
 
 
 def main():
+    ''' gBasf2 takes a number of options - either from the commandline or in a steering file (see
+        gbasf2utils.py) and uses them to (currently)
+        1. conduct a metadata query to match appropriate data to work with - a set of LFNs
+        2. performs all necessary tasks to get the user a proxy
+        3. construct a project based on the name provided and appropriate JDLs - presently just 1 per job
+        4. submits the created jdls to the DIRAC Workload Management System
+    '''
+
     exitCode = 0
     errorList = []
     lfns = []
@@ -209,18 +42,19 @@ def main():
     Script.disableCS()
     Script.parseCommandLine(ignoreErrors=True)
     cliParams.registerSteeringOptions()
-    cliParams.validOption()  # hanyl
+    cliParams.validOption()
+
+    gLogger.setLevel(cliParams.getLogLevel())
 
   # setup dirac - import here because it pwns everything
     from DIRAC.Interfaces.API import Dirac
     dirac = Dirac.Dirac()
 
   # FIXME - think about enableCS here.
-
   # completes all necessary steps to setup the proxy we need, or exits out
-    prepareProxy()
-
-  # FIXME - check for existing project name, and prevent additions unless forced
+    proxyinfo = prepareProxy()
+    CheckAndRemoveProjectIfForce(proxyinfo['Value']['username'],
+                                 cliParams.getProject())
 
   # perform the metadata query
     asearch = AmgaSearch()
@@ -228,10 +62,11 @@ def main():
     asearch.setExperiments([int(s) for s in
                            cliParams.getExperiments().split(',')])
     asearch.setQuery(cliParams.getQuery())
-    print cliParams.getExperiments().split(',')
-    print cliParams.getQuery()
     asearch.setAttributes(['lfn', 'events'])
+    asearch.setUserData(cliParams.getUserData())
+    asearch.setUsername(proxyinfo['Value']['username'])
     results = asearch.executeAmgaQueryWithAttributes()
+
   # deal with empty queries
     if results == {}:
         print 'Query returned no results - do you want to run with no input?'
@@ -259,27 +94,34 @@ def main():
 
   # keep track of the number of events submitted
     totalevents = 0
-  # number used to
-    numberOfLfns = 0
+    numberOfJobs = 0
+    numberofLfns = 1
+    tmp = 0
   # for each of the lfns, make a job and submit it
     for result in results:
-        numberOfLfns += 1
+        tmp += 1
+        lfns.append(results[result]['lfn'])
+        if results[result]['events'] == '':
+            results[result]['events'] = 0
+        if tmp < numberofLfns:
+            continue
+        gLogger.info('The lfn used is %s.' % str(lfns))
+        numberOfJobs += 1
         jdl = make_jdl(  # Events/sec into CPUSecs
                          # XXX
-                         # cliParams.getSteeringFile(),
-                         # hanyl make steering files for every lfn
-            cliParams.makeSteeringFile(result, numberOfLfns),
+                         # results[result]['lfn'].replace('belle2', 'belle'),
+            cliParams.makeSteeringFile(lfns, numberOfJobs),
             cliParams.getProject(),
             int(float(results[result]['events']) / (cliParams.getEvtPerMin()
                 / 60.0)),
             cliParams.getJobPriority(),
-            results[result]['lfn'].replace('belle2', 'belle'),
+            lfns,
             cliParams.getSysConfig(),
             cliParams.getSwVer(),
             tar,
+            numberOfJobs,
             )
         subresult = dirac.submit(jdl)
-        lfns = []
         if subresult['OK']:
             print 'JobID = %s' % subresult['Value']
             # remove the JDL - we keep it on error
@@ -293,6 +135,8 @@ def main():
             errorList.append('[' + results[result]['lfn'] + '] '
                              + subresult['Message'])
             exitCode = 2
+        lfns = []
+        tmp = 0
 
   # print any errors encountered during submission
     for error in errorList:
@@ -306,7 +150,7 @@ def main():
 
     print str(totalevents) + ' events to process!'
   # FIXME - retrieve this URL automatically from DIRAC
-    print 'Now visit https://kek2-uidev.cc.kek.jp:15043/DIRAC/systems/projects/overview and select Project ' \
+    print 'Now visit https://kek2-dirac.cc.kek.jp:15043/DIRAC/systems/projects/overview and select Project ' \
         + cliParams.getProject()
     DIRAC.exit(exitCode)
 

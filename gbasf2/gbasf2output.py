@@ -9,24 +9,27 @@
 # Tom Fifield (fifieldt@unimelb.edu.au) - 2011-01
 #
 
-# we require Amga tools from Polish devs for metadata
-from AmgaClient import AmgaClient
-# handy file/path features
 import os
 import glob
-# we're part of DIRAC, yay
-import DIRAC
 from DIRAC.Core.Base import Script
-from DIRAC.Core.Security.Misc import *
-from DIRAC.Core.Security import Properties
-# from DIRAC.ResourceStatusSystem.Utilities.CS import *
-from DIRAC.ConfigurationSystem.Client.Config import gConfig
-from DIRAC.FrameworkSystem.Client.ProxyGeneration import generateProxy
-from DIRAC.FrameworkSystem.Client.ProxyManagerClient import ProxyManagerClient
-from DIRAC.DataManagementSystem.Client.ReplicaManager import ReplicaManager
-
-# used for commandline and steeringfile option parsing
 from gbasf2util import CLIParams
+
+# parse options
+cliParams = CLIParams()
+if os.environ.has_key('BELLE2_RELEASE'):
+    cliParams.setSwVer(os.environ['BELLE2_RELEASE'])
+cliParams.registerCLISwitches()
+Script.parseCommandLine(ignoreErrors=True)
+cliParams.registerSteeringOptions()
+
+import DIRAC
+from DIRAC import gLogger
+from DIRAC.Core.Security.Misc import *
+from DIRAC.ConfigurationSystem.Client.Config import gConfig
+from DIRAC.DataManagementSystem.Client.ReplicaManager import ReplicaManager
+from AmgaClient import AmgaClient
+
+gLogger.setLevel(cliParams.getLogLevel())
 
 
 def main():
@@ -34,50 +37,39 @@ def main():
     errorList = []
     lfns = []
 
-  # setup options
-    cliParams = CLIParams()
-    if os.environ.has_key('BELLE2_RELEASE'):
-        cliParams.setSwVer(os.environ['BELLE2_RELEASE'])
-    cliParams.registerCLISwitches()
-    Script.disableCS()
-    Script.parseCommandLine(ignoreErrors=True)
-    cliParams.registerSteeringOptions()
-
-  # setup dirac - import here because it pwns everything
-    from DIRAC.Interfaces.API import Dirac
-    dirac = Dirac.Dirac()
-    Script.enableCS()
-
-  # AMGAClient for metadata
-    aclient = AmgaClient()
-
+    # get the proxy info and check whether it's OK.
     proxyinfo = getProxyInfo()
     if not proxyinfo['OK']:
-        print 'Problem with proxy'
+        gLogger.error('Problem with proxy')
         DIRAC.exit(1)
     else:
         outputpath = '/belle2/user/belle/' + proxyinfo['Value']['username'] \
             + '/' + cliParams.getProject()
-
+        gLogger.debug('The output path is %s' % outputpath)
+    # AMGAClient for metadata
     entries = {}
+    aclient = AmgaClient()
     if aclient.checkDirectory(outputpath):
         repman = ReplicaManager()
-      # loop through the output files, uploading and registering
-      #  ses = getStorageElements()['Value']
+        # loop through the output files, uploading and registering
         ses = gConfig.getSections('/Resources/StorageElements')['Value']
-        ses.remove('SandboxSE')
-        ses.remove('CentralSE')
-        print ses
+        # ses.remove('SandboxSE')  #hanyl
+        # ses.remove('CentralSE')  #hanyl
+        ses.remove('ProductionSandboxSE')
         selist = repman._getSEProximity(ses)
-        print selist
         se = selist['Value'][0]
         print 'trying to use SE: ' + se
         inputfiles = []
         for jdlline in open(glob.glob('../*.jdl')[0].rstrip()):
             if 'LFN' in jdlline:
                 inputfiles.append(os.path.basename(jdlline)[0:-3])
+        gLogger.debug('The inputfiles with lfn are %s' % str(inputfiles))
+        gLogger.debug('The inputfiles written in the jdl is %s'
+                      % str(cliParams.getInputFiles()))
+
         # XXX need a better way to determine output files
         for outputfile in glob.glob('*.root'):
+            gLogger.debug('the outputfile is %s' % outputfile)
             if outputfile in cliParams.getInputFiles() or outputfile \
                 in inputfiles:
                 continue
@@ -87,7 +79,7 @@ def main():
             cr_result = repman.putAndRegister(lfn.replace('belle2', 'belle'),
                     outputfile, se)
             if not cr_result['OK']:
-                print cr_result
+                gLogger.error(cr_result)
                 DIRAC.exit(1)
             else:
                 cr_result = cr_result['Value']['Successful'
@@ -107,24 +99,23 @@ def main():
                             entries[outputfile][1].append(line_parts[1].rstrip())
                 except IOError:
                     print 'no metadata file, using defaults'
-        print entries
         # if this isn't an existing dataset, we need to set the attributes
         if len(aclient.getAttributes(outputpath)[0]) == 0:
             aclient.prepareUserDataset(outputpath)
         if not aclient.bulkInsert(outputpath, entries):
-            print 'Error inserting metadata'
+            gLogger.error('Error inserting metadata')
             DIRAC.exit(1)
     else:
-        print 'Error with metadata path'
+        gLogger.error('Error with metadata path')
         DIRAC.exit(1)
 
   # print any errors encountered during submission
     for error in errorList:
-        print 'ERROR %s' % error
+        gLogger.error('ERROR %s' % error)
 
   # clean temporary files
     if exitCode != 0:
-        print 'Something went wrong'
+        gLogger.error('Something went wrong')
 
     DIRAC.exit(exitCode)
 

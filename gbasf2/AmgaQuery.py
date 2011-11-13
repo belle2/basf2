@@ -72,10 +72,12 @@ class AmgaQuery(object):
 
     def searchQueryWithAttributes(
         self,
-        dataType,
-        experiments,
-        query,
-        attributes,
+        dataType='data',
+        experiments=None,
+        query=None,
+        attributes=None,
+        project=None,
+        username=None,
         ):
         '''
         Executes search query. Called by AmgaSearch module.
@@ -89,20 +91,24 @@ class AmgaQuery(object):
         exp = []
         results = {}
 
-        if experiments is not None:
-            for e in experiments:
-                exp.append('/' + self.vo + '/' + dataType + '/E' + str(e)
-                           + '/FC')
+        if dataType == 'user':  # hanyl, hander the dataType 'user'
+            exp.append('/' + self.vo + '/' + dataType + '/belle' + '/'
+                       + username + '/' + project)
         else:
-            exp = self.amgaclient.getSubdirectories('/' + self.vo + '/'
-                    + dataType)
-            for i in xrange(len(exp)):
-                exp[i] += '/FC'
+            # exp.append('/' + self.vo + '/' + dataType + '/belle'+'/'+ 'hanyl' + '/' + project)
+            if experiments is not None:
+                for e in experiments:
+                    exp.append('/' + self.vo + '/' + dataType + '/E' + str(e)
+                               + '/FC')
+            else:
+                exp = self.amgaclient.getSubdirectories('/' + self.vo + '/'
+                        + dataType)
+                for i in xrange(len(exp)):
+                    exp[i] += '/FC'
 
         for e in exp:
             results.update(self.amgaclient.directQueryWithAttributes(e, query,
                            attributes))
-        print results
         return results
 
 
@@ -122,5 +128,14 @@ def registerQuery(self, dataType, metadata):
 
 if __name__ == '__main__':
     aq = AmgaQuery()
-    # aq.searchQuery('data',[11],'id<5')
-    aq.searchQueryWithAttributes('data', [11], 'id<3', ['lfn', 'events'])
+    # result = aq.searchQuery('data',[11],'id<5')
+    result = aq.searchQueryWithAttributes(
+        'data',
+        [11],
+        'id<3',
+        ['lfn', 'events'],
+        project='creation9129',
+        username='hanyl',
+        )
+    # result = aq.searchQueryWithAttributes('user',[11],'2<3',['lfn','events'])
+    print result

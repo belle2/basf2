@@ -27,6 +27,8 @@ class AmgaSearch(object):
     experiments = None
     attributes = None
     queryString = None
+    project = None
+    username = None
 
 ###############################################################################
 
@@ -106,6 +108,20 @@ class AmgaSearch(object):
 
 ###############################################################################
 
+    def setUserData(self, project):
+        '''Set project name for the search'''
+
+        self.project = project
+
+###############################################################################
+
+    def setUsername(self, username):
+        '''Set username for the search'''
+
+        self.username = username
+
+###############################################################################
+
     def getDataType(self):
         return self.dataType
 
@@ -149,8 +165,14 @@ class AmgaSearch(object):
             raise Exception('No query. Aborting.')
 
         aq = AmgaQuery()
-        results = aq.searchQueryWithAttributes(self.dataType,
-                self.experiments, self.queryString, self.attributes)
+        results = aq.searchQueryWithAttributes(
+            dataType=self.dataType,
+            experiments=self.experiments,
+            query=self.queryString,
+            attributes=self.attributes,
+            project=self.project,
+            username=self.username,
+            )
         return results
 
 ###############################################################################
@@ -164,12 +186,15 @@ class AmgaSearch(object):
 # if used not as a module: make tests, show workflow
 if __name__ == '__main__':
     asearch = AmgaSearch()
-    asearch.setDataType('data')  # or setDataType('MC')
+    # asearch.setDataType('data')  # or setDataType('MC')
+    asearch.setDataType('user')  # or setDataType('MC')
     asearch.setExperiments(['07', '09', '35'])
     # asearch.setQuery('(id > 1 and id < 5) or events = 666')
-    asearch.setQuery('True')
-#    asearch.setQuery('id = 1')
+    # asearch.setQuery('True')
+    asearch.setQuery('2>1')
     asearch.setAttributes(['lfn', 'events'])
-#    lfns = asearch.executeAmgaQuery()
+    asearch.setUsername('hanyl')
+    asearch.setUserData('creation8129')
+    # lfns = asearch.executeAmgaQuery()
     results = asearch.executeAmgaQueryWithAttributes()
     print results

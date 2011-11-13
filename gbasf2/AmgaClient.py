@@ -165,9 +165,6 @@ class AmgaClient(object):
         lfnpos = 0
         results = {}
 
-        print 'SELECT ' + ', '.join(attributes) + ' FROM ' + experiment \
-            + ' WHERE ' + query.replace(' and ', ' AND ')
-
         self.client.execute('SELECT ' + ', '.join(attributes) + ' FROM '
                             + experiment + ' WHERE ' + query.replace(' and ',
                             ' AND '))
@@ -227,6 +224,17 @@ class AmgaClient(object):
             except mdinterface.CommandException, ex2:
                 print 'Error:', ex2
                 return False
+        return True
+
+###############################################################################
+
+    def checkDirectoryOnly(self, path):
+        """Only checks the directory exitsts"""
+
+        try:
+            self.client.cd(path)
+        except mdinterface.CommandException, ex:
+            return False
         return True
 
 ###############################################################################
@@ -330,10 +338,10 @@ class AmgaClient(object):
         else:
             return False
 
-    def execute(self, command):  # hanyl
-        self.client.execute(command)  # hanyl
-        while not self.client.eot():  # hanyl
-            print self.client.fetchRow()  # hanyl
+    def execute(self, command):
+        self.client.execute(command)
+        while not self.client.eot():
+            print self.client.fetchRow()
 
 
 if __name__ == '__main__':

@@ -17,20 +17,22 @@ import AmgaClient
 
 class CLIParams:
 
+    '''used to parse options from files or commandline'''
+
     EvtPerMin = 45
     steering_file = None
     project = 'Ungrouped'
-    # project = 'Ungroupeda'
     priority = 0
     query = None
     swver = 'release-00-01-00'
     sysconfig = 'Belle-v2r1'
     datatype = None
     experiments = None
-#    inputsandboxfiles = None
     inputsandboxfiles = []
     maxevents = None
     numberOfFiles = 1
+    userdata = None
+    LogLevel = 'WARN'
 
     def __init__(self):  # hanyl added
         self.datatype = None
@@ -63,7 +65,7 @@ class CLIParams:
         return DIRAC.S_OK()
 
     def setDataType(self, arg):
-        if arg == 'data' or arg == 'MC':
+        if arg == 'data' or arg == 'MC' or arg == 'user':
             self.datatype = arg
             return DIRAC.S_OK()
         else:
@@ -71,7 +73,6 @@ class CLIParams:
 
     def setExperiments(self, arg):
     # FIXME check experiment meets range and list of valid experiments
-        print 'Experiments=' + arg
         self.experiments = arg
         return DIRAC.S_OK()
 
@@ -106,6 +107,18 @@ class CLIParams:
             self.maxevents = arg.strip()
         else:
             return DIRAC.S_ERROR
+
+    def setUserData(self, arg):
+        '''set the project name for user data'''
+
+        self.userdata = arg.strip()
+        return DIRAC.S_ERROR
+
+    def setLogLevel(self, arg):
+        '''set the LogLevel'''
+
+        self.LogLevel = arg.strip()
+        return DIRAC.S_ERROR
 
     def getSteeringFile(self):
         return self.steering_file
@@ -143,6 +156,12 @@ class CLIParams:
     def getNumberOfFiles(self):
         return self.numberOfFiles
 
+    def getUserData(self):
+        return self.userdata
+
+    def getLogLevel(self):
+        return self.LogLevel
+
   # registers alll of the possible commandline options with the DIRAC Script handler
   # This is also used to generate the --help option
 
@@ -178,7 +197,12 @@ class CLIParams:
         Script.registerSwitch('n:', 'numberOfFiles=',
                               '(optional) Number of data files per job',
                               self.setNumberOfFiles)
-        Script.addDefaultOptionValue('LogLevel', 'debug')
+        Script.registerSwitch('u:', 'userdata=',
+                              '(optional) The project naem of user data',
+                              self.setUserData)
+        Script.registerSwitch('', 'LogLevel=', 'Log Level', self.setLogLevel)
+
+        # Script.addDefaultOptionValue('LogLevel', 'debug')
 
   # loop through the steering file to determine any options set there
 
@@ -199,21 +223,20 @@ class CLIParams:
                 'inputsandboxfiles': 'setInputFiles',
                 'maxevents': 'setMaxEvents',
                 'numberOfFiles': 'setNumberOfFiles',
+                'userdata': 'setUserData',
+                'LogLevel': 'setLogLevel',
                 }
       # read the options
-            print self.steering_file
             f = open(self.steering_file)
             for line in f:
                 for option in options.keys():
                     if option in line[0:len(option)]:
-                        print option
                         setFunction = getattr(self, options[option])
-                        print setFunction
                         # DEBUG print line
                         setFunction(line.split('=', 1)[1].strip().replace('"',
                                     '').replace("'", ''))
 
-    def validOption(self):  #  hanyl
+    def validOption(self):
         """Make sure the datatype and experiments be given.
            If not, the datatype will be set to data and the experiment to all
         """
@@ -246,23 +269,57 @@ class CLIParams:
                 os.sys.exit(-1)
             self.setQuery('2>1')
 
-    def makeSteeringFile(self, lfn, number):
-        """Make steering file for the given lfn"""
+    def makeSteeringFile(self, lfns, number):
+        """Make steering file for the given lfn by adding the number as a suffix of lfn
+           return the new steering file.
+        """
+
+        files = []
+        for lfn in lfns:
+            files.append(os.path.basename(lfn))
 
         OldSteeringFile = self.getSteeringFile()
-        NewSteeringFile = OldSteeringFile[:-3] + '-' + str(number) + '.py'
+        if OldSteeringFile.endswith('.py'):
+            NewSteeringFile = OldSteeringFile[:-3] + '-' + str(number) + '.py'
+        else:
+            NewSteeringFile = OldSteeringFile + '-' + str(number) + '.py'
         fold = open(OldSteeringFile)
         fnew = open(NewSteeringFile, 'w')
+
         for eachline in fold:
-            if not eachline.strip().startswith('#') \
-                and eachline.find('outputFileName') > 0:
-                head = eachline.split(',')[0]
-                tail = eachline.split(',')[1]
-                tail = tail.split('.')[0] + '-' + str(number) + '.' \
-                    + tail.split('.')[1]
-                eachline = head + ',' + tail
+            if not eachline.strip().startswith('#'):
+                if eachline.find('outputFileName') > 0:  # the output file
+                    head = eachline.split(',')[0]
+                    tail = eachline.split(',')[1]
+                    tail = tail.split('.')[0] + '-' + str(number) + '.' \
+                        + tail.split('.')[1]
+                    eachline = head + ',' + tail
+                if eachline.find('SimpleInput') > -1:  # close the original input
+                    eachline = '#' + eachline
+                if eachline.find('from basf2 import *') > -1:  # the input file
+                    if eachline.endswith('\r\n'):
+                        eachline += '\r\n'
+                        eachline += \
+                            "sinput = fw.register_module('SimpleInput')\r\n"
+                        if len(files) > 1:
+                            eachline += "sinput.param('inputFileName'," \
+                                + str(files) + ')\r\n'
+                        else:
+                            eachline += "sinput.param('inputFileName','" \
+                                + files[0] + "')\r\n"
+                    else:
+                        eachline += '\n'
+                        eachline += \
+                            "sinput = fw.register_module('SimpleInput')\n"
+                        if len(files) > 1:
+                            eachline += "sinput.param('inputFileName'," \
+                                + str(files) + ')\n'
+                        else:
+                            eachline += "sinput.param('inputFileName','" \
+                                + files[0] + "')\n"
             fnew.write(eachline)
-        fnew.write('LFN="%s"' % lfn)
+        for lfn in lfns:
+            fnew.write('LFN="%s"\r\n' % lfn)
         fold.close()
         fnew.close()
         return NewSteeringFile
@@ -270,7 +327,7 @@ class CLIParams:
 
 if __name__ == '__main__':
     clipara = CLIParams()
-    clipara.setSteeringFile('Creation.py')
+    clipara.setSteeringFile('READER.py')
     # clipara.setSteeringFile('steering-simulationexample-withgrid.py')
-    print clipara.getSteeringFile()
+    # print clipara.getSteeringFile()
     clipara.makeSteeringFile('hanyl', 2)

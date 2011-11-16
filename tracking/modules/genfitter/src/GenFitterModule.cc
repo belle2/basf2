@@ -291,13 +291,7 @@ void GenFitterModule::event()
             tracks[trackCounter]->setOmega(gfTrack.getCharge());
             tracks[trackCounter]->setZ0(-999);
             tracks[trackCounter]->setCotTheta(-999);
-            tracks[trackCounter]->setBelleD0(-999);
-            tracks[trackCounter]->setBellePhi(-999);
-            tracks[trackCounter]->setBelleKappa(gfTrack.getCharge());
-            tracks[trackCounter]->setBelleZ0(-999);
-            tracks[trackCounter]->setBelleTanLambda(-999);
           }
-
         } else {            //fit successful
           ++m_successfulFitCounter;
           ++trackCounter;
@@ -365,13 +359,6 @@ void GenFitterModule::event()
             //determine d0 sign for perigee parametrization
             double d0Sign = TMath::Sign(1., poca.x() * dirInPoca.x() + poca.y() * dirInPoca.y());
 
-            //determine the Belle angle phi, distribute it from 0 to 2pi
-            //this calculation of phi is taken from basf, I do not really understand it, but it seems to work ...
-            double Belle_phi = fmod(atan2(- dirInPoca.x(), dirInPoca.y()) + 4 * TMath::Pi(), 2 * TMath::Pi());
-
-            //determine sign of d0 (I have not really found a definition of belle d0 sign, so I just found one which fits the trajectory equations, but it has to be crosschecked!!)
-            double Belle_d0Sign = TMath::Sign(1., poca.x() * dirInPoca.y() - poca.y() * dirInPoca.x());
-
             //coefficient to illiminate the B field and get the 'pure' curvature
 
             double alpha = 1 / (1.5 * 0.00299792458);
@@ -383,20 +370,12 @@ void GenFitterModule::event()
             tracks[trackCounter]->setZ0(poca.z());
             tracks[trackCounter]->setCotTheta(dirInPoca.z() / (sqrt(dirInPoca.x() * dirInPoca.x() + dirInPoca.y() * dirInPoca.y())));
 
-            //And for Belle parametrization
-            tracks[trackCounter]->setBelleD0(Belle_d0Sign*sqrt(poca.x() * poca.x() + poca.y() * poca.y()));
-            tracks[trackCounter]->setBellePhi(Belle_phi);
-            tracks[trackCounter]->setBelleKappa((gfTrack.getCharge() / pt));
-            tracks[trackCounter]->setBelleZ0(poca.z());
-            tracks[trackCounter]->setBelleTanLambda(dirInPoca.z() / (sqrt(dirInPoca.x() * dirInPoca.x() + dirInPoca.y() * dirInPoca.y())));
-
             //Print helix parameters
             B2INFO(">>>>>>> Helix Parameters <<<<<<<");
             B2INFO("D0: " << std::setprecision(3) << tracks[trackCounter]->getD0() << "  Phi: " << std::setprecision(3) << tracks[trackCounter]->getPhi() << "  Omega: " << std::setprecision(3) << tracks[trackCounter]->getOmega() << "  Z0: " << std::setprecision(3) << tracks[trackCounter]->getZ0() << "  CotTheta: " << std::setprecision(3) << tracks[trackCounter]->getCotTheta());
             B2INFO("<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>");
             //Additional check
             B2INFO("Recalculate momentum from perigee: px: " << abs(1 / (tracks[trackCounter]->getOmega()*alpha))*(cos(tracks[trackCounter]->getPhi())) << "  py: " << abs(1 / (tracks[trackCounter]->getOmega()*alpha))*sin(tracks[trackCounter]->getPhi()) << "  pz: " << abs(1 / (tracks[trackCounter]->getOmega()*alpha))*tracks[trackCounter]->getCotTheta());
-            B2DEBUG(149, "Recalculate momentum from Belle: px: " << abs(1 / (tracks[trackCounter]->getBelleKappa()))*(-sin(tracks[trackCounter]->getBellePhi())) << "  py: " << abs(1 / (tracks[trackCounter]->getBelleKappa()))*cos(tracks[trackCounter]->getBellePhi()) << "  pz: " << abs(1 / (tracks[trackCounter]->getBelleKappa()))*tracks[trackCounter]->getBelleTanLambda());
             B2INFO("<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>");
 
             if (m_createTextFile) {
@@ -420,7 +399,6 @@ void GenFitterModule::event()
             tracks[trackCounter]->setExtrapFailed(true);
           }
 
-          // }
         }// end else for successful fits
 
       } catch (...) {

@@ -16,8 +16,8 @@
 namespace Belle2 {
 
   /** Track parameters. */
-  /** This Track class is based on the perigee track parametrisation. The helix parameters according to track parametrisation used at Belle are also provided.
-   *  It is not a permanent solution to have two simulateous track parametrisations, it seems to be conveneit for the moment, as it is still under discussion which parametrisation will be the one we want to use at the ende.
+  /** This Track class is based on the perigee track parametrisation.
+   *  It is still under discussion if we want to change some of the parametrisation conventions.
    *  It is also generally not fixed which variables this class should contain, so it is more or less a preliminary solution...
    */
   class Track : public TObject {
@@ -34,12 +34,6 @@ namespace Belle2 {
       m_omega = -999;
       m_z0 = -999;
       m_cotTheta = -999;
-
-      m_Belle_d0 = -999;
-      m_Belle_phi = -999;
-      m_Belle_kappa = -999;
-      m_Belle_z0 = -999;
-      m_Belle_tanLambda = -999;
 
       m_nHits = -999;
       m_chi2 = -999;
@@ -88,27 +82,6 @@ namespace Belle2 {
     /** Getter for cotTheta.
     */
     float getCotTheta() const { return m_cotTheta;}
-
-    //helix parameters: Belle
-    /** Getter for impact parameter.
-      */
-    float getBelleD0() const { return m_Belle_d0; }
-
-    /** Getter for phi.
-     */
-    float getBellePhi() const { return m_Belle_phi; }
-
-    /** Getter for kappa.
-     */
-    float getBelleKappa() const {return m_Belle_kappa; }
-
-    /** Getter for z0.
-     */
-    float getBelleZ0() const {return m_Belle_z0; }
-
-    /** Getter for tanLambda.
-      */
-    float getBelleTanLambda() const { return m_Belle_tanLambda;}
 
     //non-helix parameters.
     /** Getter for Chi2 of the track fit.
@@ -183,27 +156,6 @@ namespace Belle2 {
     /** Setter for cotTheta.
      */
     void setCotTheta(const float& cotTheta) {m_cotTheta = cotTheta;}
-
-    //helix parameters: Belle
-    /** Setter for impact parameter.
-     */
-    void setBelleD0(const float& d0) { m_Belle_d0 = d0;}
-
-    /** Setter for phi
-     */
-    void setBellePhi(const float& phi) {m_Belle_phi = phi;}
-
-    /** Setter for kappa.
-     */
-    void setBelleKappa(const float& kappa) {m_Belle_kappa = kappa;}
-
-    /** Setter for z0.
-     */
-    void setBelleZ0(const float& z0) {m_Belle_z0 = z0;}
-
-    /** Setter for tanLambda.
-     */
-    void setBelleTanLambda(const float& tanLambda) {m_Belle_tanLambda = tanLambda;}
 
     //non-helix parameters.
     /** Setter for Chi2 of the track fit.
@@ -284,70 +236,31 @@ namespace Belle2 {
     /** Impact Parameter.
      * The Impact Parameter is the two-dimensional point of closest approach of a track to the origin.
      * A sign is assigned such, that if the projection of the momentum on this distance points to the origin, d0 is negative.
-     * (absolute value equals m_Belle_d0 but different sign convention)
      */
     float m_d0;
 
     /** Phi at the perigee [-pi, pi].
      * This is the angle of the track momentum at the perigee in the plane perpendicular to the detector axis.
-     * (different angle definition as m_Belle_phi)
      */
     float m_phi;
 
     /** Signed curvature of the track.
      *  The curvature is 1/(R) where R is the radius of the track measured in cm.
      *  It is negative if we have a negatively charged track leaving the origin.
-     *  (can be transformed to m_Belle_kappa by taking into account c and B)
      */
     float m_omega;
 
     /** z Position of the perigee.
      *  z is parallel to the detector axis.
-     *  (same as m_Belle_z0)
      */
     float m_z0;
 
     /** Cotangens of polar angle theta.
      *  This equals dz/ds with s the path length in R-Phi at the perigee.
-     *  (same as m_Belle_tanLambda)
      */
     float m_cotTheta;
     //---------------------------------------------------------------------------------------------------
 
-    //Belle parametrisation
-    //-------------------------------------------------------------------------------------------------------
-
-    /** Impact Parameter.
-     *  The Impact Parameter is the two-dimensional point of closest approach of a track to the origin.
-     *  The sign convention is not quite clear to me, but seems to be consistent with the Belle track parametrisation...
-     *  (absolute value equals m_d0 but different sign convention)
-     */
-    float m_Belle_d0;
-
-    /** Azimuthal angle to specify the pivot with respect to the helix center [0, 2pi].
-     * * (different angle definition as m_phi)
-     */
-    float m_Belle_phi;
-
-    /** Signed reciprocal transvers momentum of the track (1/Pt).
-     *  Pt is measured in GeV.
-     *  It is negative if we have a negatively charged track leaving the origin.
-     *  (can be transformed to m_omega by taking into account c and B)
-     */
-    float m_Belle_kappa;
-
-    /** z Position of the perigee.
-     *  z is parallel to the detector axis.
-     *  (same as m_z0)
-     */
-    float m_Belle_z0;
-
-    /** Tangens of the dip angle lambda.
-     *  This equals dz/ds with s the path length in R-Phi at the perigee.
-     *  (same as m_cotTheta)
-     */
-    float m_Belle_tanLambda;
-    //--------------------------------------------------------------------------------------------
 
     //non-helix parameters
 

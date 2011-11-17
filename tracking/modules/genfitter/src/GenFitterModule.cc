@@ -337,14 +337,14 @@ void GenFitterModule::event()
             double xErr = sqrt(resultCovariance[0][0]);
             double yErr = sqrt(resultCovariance[1][1]);
             double zErr = sqrt(resultCovariance[2][2]);
-            B2INFO("Position variances: " << xErr << "  " << yErr << "  " << zErr);
+            B2INFO("Position standard deviation: " << xErr << "  " << yErr << "  " << zErr);
             tracks[trackCounter]->setVertexErrors(xErr, yErr, zErr);
 
             //store momentum errors
             double pxErr = sqrt(resultCovariance[3][3]);
             double pyErr = sqrt(resultCovariance[4][4]);
             double pzErr = sqrt(resultCovariance[5][5]);
-            B2INFO("Momentum variances: " << pxErr << "  " << pyErr << "  " << pzErr);
+            B2INFO("Momentum standard deviation: " << pxErr << "  " << pyErr << "  " << pzErr);
             tracks[trackCounter]->setPErrors(pxErr, pyErr, pzErr);
 
 

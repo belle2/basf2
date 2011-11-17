@@ -20,10 +20,12 @@ namespace Belle2 {
    */
   class PyModule : public Module {
   public:
+    /** constructor */
     PyModule(PyObject *p):
         Module(),
         m_self(p) { }
 
+    /** copy constructor */
     PyModule(PyObject *p, const Module &m):
         Module(m),
         m_self(p) { }
@@ -32,10 +34,7 @@ namespace Belle2 {
     *
     * Use inside the python module's __init__ function
     */
-    void setName(const std::string &name) {
-      //m_name = name;
-      setModuleName(name);
-    }
+    void setName(const std::string &name) { setModuleName(name); }
 
 
     /* reimplement all virtual functions of base class and call the corresponding method in the python class
@@ -48,12 +47,14 @@ namespace Belle2 {
     void endRun() { call_method<void>(m_self, "endRun"); };
     void terminate() { call_method<void>(m_self, "terminate"); };
 
-    /* supply default implementations */
+    //@{
+    /** default implementation used when Python module doesn't supply its own */
     static void def_initialize(Module &m) { m.Module::initialize(); }
     static void def_beginRun(Module &m) { m.Module::beginRun(); }
     static void def_event(Module &m) { m.Module::event(); }
     static void def_endRun(Module &m) { m.Module::endRun(); }
     static void def_terminate(Module &m) { m.Module::terminate(); }
+    //@}
 
   private:
     PyObject *m_self; /**< the actual python module */

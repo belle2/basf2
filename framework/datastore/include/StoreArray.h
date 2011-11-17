@@ -25,7 +25,7 @@ namespace Belle2 {
    *  This is an accessor class for the TClonesArrays saved in the DataStore.
    *  To add new objects, please use the TClonesArray function
    *  <a href="http://root.cern.ch/root/htmldoc/TClonesArray.html#TClonesArray:New">new</a>.
-   *  The TClonesArrays are never deleted, but their content is deleted according to the EDurability type,
+   *  The TClonesArrays are never deleted, but their content is deleted according to the EDurability type
    *  that is given to them.
    *  @author <a href="mailto:belle2_software@bpost.kek.jp?subject=StoreArray">The basf2 developers</a>
    */
@@ -37,7 +37,6 @@ namespace Belle2 {
      *  This constructor calls the assignArray function.
      *  @param name        Name under which the TClonesArray is stored.
      *  @param durability  Specifies lifetime of array in question.
-     *  @param generate    Shall array be created, if none with name exists so far?
      */
     StoreArray(const std::string& name = "", const DataStore::EDurability& durability = DataStore::c_Event) {
       assignArray(name, durability);
@@ -67,7 +66,6 @@ namespace Belle2 {
      *
      *  @param name       Key with which the TClonesArray is saved. An empty string is treated as equal to class name.
      *  @param durability Specifies lifetime of array in question.
-     *  @param generate   Shall array be created, if none with name exists so far.
      */
     bool assignArray(const std::string& name, const DataStore::EDurability& durability = DataStore::c_Event);
 
@@ -86,7 +84,7 @@ namespace Belle2 {
     /** Access to the stored objects.
      *
      *  By default the TClonesArray would return TObjects, so a cast is necessary.
-     *  The static cast is save here, because at a previous stage, it is already checked,
+     *  The static cast is safe here, because at a previous stage, it is already checked
      *  that the TClonesArray contains type T.
      */
     T* operator [](int i) const {return static_cast<T*>(m_storeArray->At(i));}

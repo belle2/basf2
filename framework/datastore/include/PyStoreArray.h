@@ -8,10 +8,12 @@
 namespace Belle2 {
   /** a (simplified) python wrapper for StoreArray.
   *
-  *  to convert the returned TObjects into useful types, use something like
-  *   myobject = Belle2.MyObject(tobject)
+  * Compared to StoreArray, PyStoreArray returns only TObject pointers (since
+  * it doesn't use templates). Thanks to Python, you can still access all
+  * public functions and data members of the actual type.
   *
-  *  to check runtime type information, use type(tobject)
+  * You can check the runtime type information of the returned objects by
+  * using Python's built-in type() function.
   */
   class PyStoreArray : public TObject {
   public:

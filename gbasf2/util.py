@@ -105,7 +105,8 @@ def make_jdl(
         f.write('      "' + tar + '",\n')
     # if lfn != 'None':
     for lf in lfns:
-        f.write('      "LFN:' + lf.replace('belle2', 'belle') + '"\n')
+        if lf != 'None':
+            f.write('      "LFN:' + lf.replace('belle2', 'belle') + '"\n')
     f.write('''    };
 \
       OutputSandbox =

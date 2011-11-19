@@ -3,11 +3,12 @@
 
 # Class to deal with all required parameters for gbasf.
 
-import DIRAC
-from DIRAC.Core.Base import Script
 import os
 import mdclient
 import AmgaClient
+import DIRAC
+from DIRAC import gLogger
+from DIRAC.Core.Base import Script
 
 # initial implementation uses CLI and steering file
 # potentially we can also get some parameters from the user environment in the future
@@ -65,7 +66,7 @@ class CLIParams:
         return DIRAC.S_OK()
 
     def setDataType(self, arg):
-        if arg == 'data' or arg == 'MC' or arg == 'user':
+        if arg == 'data' or arg == 'MC' or arg == 'user' or arg == 'gen-mc':
             self.datatype = arg
             return DIRAC.S_OK()
         else:
@@ -162,11 +163,34 @@ class CLIParams:
     def getLogLevel(self):
         return self.LogLevel
 
+    def showHelp(self, dummy=False):
+        """
+      Printout help message including a Usage message if defined via setUsageMessage method
+      """
+
+        cmdlist = Script.localCfg.commandOptionList
+        for iPos in range(len(cmdlist)):
+            optionTuple = cmdlist[iPos]
+            gLogger.notice('  -%s --%s : %s' % (optionTuple[0].ljust(3),
+                           optionTuple[1].ljust(15), optionTuple[2]))
+            iLastOpt = iPos
+            if optionTuple[0] == 'h':
+          # Last general opt is always help
+                break
+        if iLastOpt + 1 < len(cmdlist):
+            gLogger.notice(' \nOptions:')
+            for iPos in range(iLastOpt + 1, len(cmdlist)):
+                optionTuple = cmdlist[iPos]
+                gLogger.notice('  -%s --%s : %s' % (optionTuple[0].ljust(3),
+                               optionTuple[1].ljust(15), optionTuple[2]))
+        DIRAC.exit(0)
+
   # registers alll of the possible commandline options with the DIRAC Script handler
   # This is also used to generate the --help option
 
     def registerCLISwitches(self):
         Script.localCfg.commandOptionList = []  # hanyl clear Script's options
+        Script.registerSwitch('h', 'help', 'show the usage', self.showHelp)
         Script.registerSwitch('s:', 'steering=', 'basf2 steering file',
                               self.setSteeringFile)
         Script.registerSwitch('p:', 'project=', 'Name for project',
@@ -244,28 +268,33 @@ class CLIParams:
         if self.getDataType() is None:  # check the datatype
             print 'No datatype is given. We will set datatype to data. Continue?'
             noinput = raw_input('Please type Y or N: ')
-            if noinput == 'N':
+            if noinput.upper() == 'N':
+                os.sys.exit(-1)
+            elif noinput.upper() != 'Y':
+                print 'You should give Y or N'
                 os.sys.exit(-1)
             self.setDataType('data')
-        if self.getExperiments() is None:  # check the experiments
-            print 'No experiments is given. We will set experiments to all. Continue?'
-            noinput = raw_input('Please type Y or N: ')
-            if noinput == 'N':
-                os.sys.exit(-1)
-            tmp = []
-          # md = mdclient.MDClient('150.183.246.196', 8822,'belle_user', 'belle')
-          # md.execute('ls /belle2/data')
-          # while not md.eot():     #hanyl
-          #     tmp.append(md.fetchRow()[-2:])
-          # experiments=",".join(tmp)
-            ac = AmgaClient.AmgaClient()
-            for t in ac.getSubdirectories('/belle2/data', relative=True):
-                tmp.append(t[-2:])
-            self.setExperiments(','.join(tmp))
+        elif self.getDataType() == 'data' or self.getDataType() == 'MC':
+            if self.getExperiments() is None:  # check the experiments
+                print 'No experiments is given. We will set experiments to all. Continue?'
+                noinput = raw_input('Please type Y or N: ')
+                if noinput.upper() == 'N':
+                    os.sys.exit(-1)
+                elif noinput.upper() != 'Y':
+                    print 'You should give Y or N'
+                    os.sys.exit(-1)
+                tmp = []
+                ac = AmgaClient.AmgaClient()
+                for t in ac.getSubdirectories('/belle2/data', relative=True):
+                    tmp.append(t[-2:])
+                self.setExperiments(','.join(tmp))
         if self.getQuery() is None:  # check the query
             print 'No query is given. We will set query to true. Continue?'
             noinput = raw_input('Please type Y or N: ')
-            if noinput == 'N':
+            if noinput.upper() == 'N':
+                os.sys.exit(-1)
+            elif noinput.upper() != 'Y':
+                print 'You should give Y or N'
                 os.sys.exit(-1)
             self.setQuery('2>1')
 
@@ -294,29 +323,30 @@ class CLIParams:
                     tail = tail.split('.')[0] + '-' + str(number) + '.' \
                         + tail.split('.')[1]
                     eachline = head + ',' + tail
-                if eachline.find('SimpleInput') > -1:  # close the original input
-                    eachline = '#' + eachline
-                if eachline.find('from basf2 import *') > -1:  # the input file
-                    if eachline.endswith('\r\n'):
-                        eachline += '\r\n'
-                        eachline += \
-                            "sinput = fw.register_module('SimpleInput')\r\n"
-                        if len(files) > 1:
-                            eachline += "sinput.param('inputFileName'," \
-                                + str(files) + ')\r\n'
+                if self.getDataType == 'gen-user':
+                    if eachline.find('SimpleInput') > -1:  # close the original input
+                        eachline = '#' + eachline
+                    if eachline.find('from basf2 import *') > -1:  # the input file
+                        if eachline.endswith('\r\n'):
+                            eachline += '\r\n'
+                            eachline += \
+                                "sinput = fw.register_module('SimpleInput')\r\n"
+                            if len(files) > 1:
+                                eachline += "sinput.param('inputFileName'," \
+                                    + str(files) + ')\r\n'
+                            else:
+                                eachline += "sinput.param('inputFileName','" \
+                                    + files[0] + "')\r\n"
                         else:
-                            eachline += "sinput.param('inputFileName','" \
-                                + files[0] + "')\r\n"
-                    else:
-                        eachline += '\n'
-                        eachline += \
-                            "sinput = fw.register_module('SimpleInput')\n"
-                        if len(files) > 1:
-                            eachline += "sinput.param('inputFileName'," \
-                                + str(files) + ')\n'
-                        else:
-                            eachline += "sinput.param('inputFileName','" \
-                                + files[0] + "')\n"
+                            eachline += '\n'
+                            eachline += \
+                                "sinput = fw.register_module('SimpleInput')\n"
+                            if len(files) > 1:
+                                eachline += "sinput.param('inputFileName'," \
+                                    + str(files) + ')\n'
+                            else:
+                                eachline += "sinput.param('inputFileName','" \
+                                    + files[0] + "')\n"
             fnew.write(eachline)
         for lfn in lfns:
             fnew.write('LFN="%s"\r\n' % lfn)

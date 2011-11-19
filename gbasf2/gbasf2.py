@@ -42,7 +42,6 @@ def main():
     Script.disableCS()
     Script.parseCommandLine(ignoreErrors=True)
     cliParams.registerSteeringOptions()
-    cliParams.validOption()
 
     gLogger.setLevel(cliParams.getLogLevel())
 
@@ -53,19 +52,26 @@ def main():
   # FIXME - think about enableCS here.
   # completes all necessary steps to setup the proxy we need, or exits out
     proxyinfo = prepareProxy()
+
+    cliParams.validOption()
+
     CheckAndRemoveProjectIfForce(proxyinfo['Value']['username'],
                                  cliParams.getProject())
 
+    if cliParams.getDataType == 'gen-mc':
+        results = {}
+    else:
   # perform the metadata query
-    asearch = AmgaSearch()
-    asearch.setDataType(cliParams.getDataType())
-    asearch.setExperiments([int(s) for s in
-                           cliParams.getExperiments().split(',')])
-    asearch.setQuery(cliParams.getQuery())
-    asearch.setAttributes(['lfn', 'events'])
-    asearch.setUserData(cliParams.getUserData())
-    asearch.setUsername(proxyinfo['Value']['username'])
-    results = asearch.executeAmgaQueryWithAttributes()
+        asearch = AmgaSearch()
+        asearch.setDataType(cliParams.getDataType())
+        if cliParams.getExperiments():
+            asearch.setExperiments([int(s) for s in
+                                   cliParams.getExperiments().split(',')])
+        asearch.setQuery(cliParams.getQuery())
+        asearch.setAttributes(['lfn', 'events'])
+        asearch.setUserData(cliParams.getUserData())
+        asearch.setUsername(proxyinfo['Value']['username'])
+        results = asearch.executeAmgaQueryWithAttributes()
 
   # deal with empty queries
     if results == {}:

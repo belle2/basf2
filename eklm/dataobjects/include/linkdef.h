@@ -5,7 +5,9 @@
 #pragma link off all functions;
 #pragma link C++ nestedclasses;
 
+
 #pragma link C++ class Belle2::EKLMBackHit;
+#pragma link C++ class Belle2::EKLMStepHit;
 
 #pragma link C++ class Belle2::EKLMSimHit;
 #pragma link C++ class Belle2::EKLMHitBase;

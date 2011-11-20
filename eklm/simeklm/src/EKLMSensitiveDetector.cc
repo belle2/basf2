@@ -10,48 +10,30 @@
 
 
 #include <eklm/simeklm/EKLMSensitiveDetector.h>
+#include <eklm/dataobjects/EKLMStepHit.h>
 
 #include <framework/logging/Logger.h>
-
-#include <eklm/eklmutils/EKLMutils.h>
 #include <eklm/geoeklm/G4PVPlacementGT.h>
 
 #include "G4Step.hh"
 #include "G4SteppingManager.hh"
-#include "G4SDManager.hh"
-#include "G4TransportationManager.hh"
-#include "G4FieldManager.hh"
-#include "G4MagneticField.hh"
+//#include "G4SDManager.hh"
+//#include "G4TransportationManager.hh"
 
-#include <generators/dataobjects/MCParticle.h>
-#include <framework/datastore/RelationArray.h>
 
+#include <framework/gearbox/GearDir.h>
+#include <framework/gearbox/Unit.h>
 
 
 namespace Belle2 {
 
 
-  EKLMSensitiveDetector::EKLMSensitiveDetector(G4String name,
-                                               G4double thresholdEnergyDeposit,
-                                               G4double thresholdKineticEnergy)
+  EKLMSensitiveDetector::EKLMSensitiveDetector(G4String name)
       : Simulation::SensitiveDetectorBase(name, KLM)
   {
-    m_mode = -1;
-  }
-
-  void EKLMSensitiveDetector::Initialize(G4HCofThisEvent * HCTE)
-  {
-    m_HitNumber = 0;
-  }
-
-  int EKLMSensitiveDetector::getMode(G4Step *aStep)
-  {
-    G4PVPlacementGT *pvgt;
-    if (m_mode >= 0)
-      return m_mode;
-    pvgt = (G4PVPlacementGT*)(aStep->GetPreStepPoint()->GetPhysicalVolume());
-    m_mode = pvgt->getMode();
-    return m_mode;
+    GearDir SensitiveDetector = GearDir("/Detector/DetectorComponent[@name=\"EKLM\"]/Content/SensitiveDetector");
+    m_ThresholdEnergyDeposit = SensitiveDetector.getDouble("EnergyDepositionThreshold") / MeV;
+    m_ThresholdHitTime = SensitiveDetector.getDouble("HitTimeThreshold") / ns;
   }
 
   //-----------------------------------------------------
@@ -60,70 +42,111 @@ namespace Belle2 {
   bool EKLMSensitiveDetector::step(G4Step *aStep, G4TouchableHistory *)
   {
 
-    // Get deposited energy
+    /**
+     * Get deposited energy
+     */
     const G4double eDep = aStep->GetTotalEnergyDeposit();
 
-    // ignore tracks with small energy deposition
-    double eDepositionThreshold = 0.001 / MeV;  // should be accessible via xml
-    if (eDep <= eDepositionThreshold) return false;
+    /**
+     * ignore tracks with small energy deposition
+     * use "<=" instead of "<" to drop hits from neutrinos etc unless eDepositionThreshold is non-negative
+     */
+    if (eDep <= m_ThresholdEnergyDeposit)
+      return false;
 
-
+    /**
+     * get reference to the track
+     */
     const G4Track & track = * aStep->GetTrack();
 
-    // Get tracks charge
-    //    const G4double charge = track.GetDefinition()->GetPDGCharge();
-
-    // ignore neutrals in EKLM
-    //    if (charge == 0.) return false;
-
-    // get time of hit
+    /**
+     * get time of hit
+     */
     const G4double hitTime = track.GetGlobalTime();
 
-    G4VPhysicalVolume *pv = aStep->GetPreStepPoint()->GetPhysicalVolume();
 
-    /*
-     * drop hit if global time is nan or if it is  mothe than
-     * hitTimeThreshold (to avoid nuclei fission signals)
-     */
+    /**
+    * drop hit if global time is nan or if it is  mothe than
+    * hitTimeThreshold (to avoid nuclei fission signals)
+    */
     if (isnan(hitTime)) {
       B2ERROR("EKLMSensitiveDetector: global time is nan");
       return false;
-
-      double hitTimeThreshold = 500; // should be parameter or accessev via xml
-      if (hitTime > hitTimeThreshold) {
-        B2INFO("EKLMSensitiveDetector:  "
-               "ALL HITS WITH TIME > hitTimeThreshold ARE DROPPED!!!!!!!");
-        return false;
-      }
-
+    }
+    if (hitTime > m_ThresholdHitTime) {
+      B2INFO("EKLMSensitiveDetector: ALL HITS WITH TIME > hitTimeThreshold ARE DROPPED!!");
+      return false;
     }
 
+    /**
+     * get reference to a physical volume
+     */
+    const G4VPhysicalVolume *pv = aStep->GetPreStepPoint()->GetPhysicalVolume();
 
-    // Get particle information
+
+    /**
+     * Get particle information
+     */
     const G4int PDGcode = track.GetDefinition()->GetPDGEncoding();
 
 
-    // no conversion btw. G4ThreeVector and TVector3. Sad but true
+    /**
+     * Get Hit position
+     */
     const G4ThreeVector & gpos = 0.5 *
                                  (aStep->GetPostStepPoint()->GetPosition() +
                                   aStep->GetPreStepPoint()->GetPosition());
 
-    const TVector3 & gposRoot = TVector3(gpos.z(), gpos.y(), gpos.z());
+    /**
+     * no conversion btw. G4ThreeVector and TVector3 Sad but true
+     */
+    const TVector3 & gposRoot = TVector3(gpos.x(), gpos.y(), gpos.z());
 
-    const G4ThreeVector & lpos = aStep->GetPreStepPoint()->
-                                 GetTouchableHandle()->GetHistory()->
-                                 GetTopTransform().TransformPoint(gpos);
+    /**
+     * Get Momentum of the particle
+     */
+    const G4ThreeVector & momentum = track.GetMomentum();
+    /**
+     * no conversion btw. G4ThreeVector and TVector3 Sad but true
+     */
+    const TVector3 & momentumRoot = TVector3(momentum.x(), momentum.y(), momentum.z());
 
-    const TVector3 & lposRoot = TVector3(lpos.z(), lpos.y(), lpos.z());
+    /**
+     * Get Kinetic energy of the particle
+     */
+    const double Ekin = track.GetKineticEnergy();
 
-    //creates hit
-    StoreArray<EKLMSimHit> simHitsArray;
-    EKLMSimHit *hit = new(simHitsArray->AddrAt(simHitsArray.getEntries()))
-    EKLMSimHit(pv, gposRoot, lposRoot, hitTime, PDGcode,  eDep);
+    /**
+     * get  track ID
+     */
+    const int trackID = track.GetTrackID();
+
+    /**
+     * get parent track ID
+     */
+    const int paretntTrackID = track.GetParentID();
+
+
+    /**
+     * get name of the volume
+     */
+    const std::string volumeName = pv->GetName();
+
+
+    /**
+     * creates step hit and store in to DataStore
+     */
+    StoreArray<EKLMStepHit> stepHitsArray;
+    EKLMStepHit *hit = new(stepHitsArray->AddrAt(stepHitsArray.getEntries()))
+    EKLMStepHit(PDGcode, hitTime, Ekin, gposRoot, momentumRoot, eDep, trackID, paretntTrackID, volumeName);
     if (hit == NULL) {
-      B2ERROR("Memory allocation error.");
+      B2ERROR("EKLMSensitiveDetector.cc:: Memory allocation error. Cannot allocate hit in stepHitsArray");
       return false;
     }
+
+    /**
+     * Get information on mother volumes and store them to the hit
+     */
     G4PVPlacementGT *pvgt = (G4PVPlacementGT*)pv;
     pvgt = pvgt->getMother();
     pvgt = pvgt->getMother();
@@ -138,21 +161,15 @@ namespace Belle2 {
     hit->set_nEndcap(pvgt->getID());
 
 
-    hit->setTrackID(track.GetTrackID());
-    hit->setParentTrackID(track.GetParentID());
 
 
-    StoreArray<MCParticle> MCParticlesArray;
-    RelationArray particleToSimHitsRelation(MCParticlesArray, simHitsArray);
-    registerMCParticleRelation(particleToSimHitsRelation);
-    particleToSimHitsRelation.add(track.GetTrackID(),
-                                  simHitsArray.getEntries());
+    //     StoreArray<MCParticle> MCParticlesArray;
+    //     RelationArray particleToSimHitsRelation(MCParticlesArray, simHitsArray);
+    //     registerMCParticleRelation(particleToSimHitsRelation);
+    //     particleToSimHitsRelation.add(track.GetTrackID(),
+    //                                   simHitsArray.getEntries());
 
     return true;
-  }
-
-  void EKLMSensitiveDetector::EndOfEvent(G4HCofThisEvent *)
-  {
   }
 
 } //namespace Belle II

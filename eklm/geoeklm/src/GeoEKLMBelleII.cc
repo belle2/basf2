@@ -1785,8 +1785,7 @@ void GeoEKLMBelleII::create(const GearDir& content, G4LogicalVolume& topVolume,
   int i;
   readXMLData(content);
   if (m_mode == 0) {
-    m_sensitive = new EKLMSensitiveDetector("EKLMSensitiveDetector", (2*24)*eV,
-                                            10*MeV);
+    m_sensitive = new EKLMSensitiveDetector("EKLMSensitiveDetector");
     if (m_sensitive == NULL) {
       B2FATAL("Memory allocation error.");
       exit(ENOMEM);

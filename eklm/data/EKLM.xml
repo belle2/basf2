@@ -5,7 +5,11 @@
   <Creator library="eklm">EKLMBelleII</Creator>
   <Content>
     <Mode desc="0 -- normal operation, 1 -- bg study">0</Mode>   
-    <Digitizer>
+    <SensitiveDetector>
+     <EnergyDepositionThreshold desc="All hits with smaller energy will be dropped at SensitiveDetector level" unit="MeV">0.0</EnergyDepositionThreshold>  
+     <HitTimeThreshold desc="All hits with larger time will be dropped at SensitiveDetector level" unit="ns">1000000000</HitTimeThreshold>  
+    </SensitiveDetector>
+     <Digitizer>
      <TimeDigitizationStep desc="Time setp of FPGA TDC">1</TimeDigitizationStep>
      <NTimeDigitizationSteps desc="Number of steps to to in digitization">200</NTimeDigitizationSteps>
      <NPEperMeV desc="Number of Photoelectons per 1 MeV energy deposition">20</NPEperMeV>

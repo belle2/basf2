@@ -46,6 +46,39 @@ namespace Belle2 {
   {
     EKLMDigitizerAllocator.FreeSingle((EKLMDigitizer*) aEKLMDigitizer);
   }
+  /*
+  void EKLMDigitizer::readAndSortBkgHits()
+  {
+    B2DEBUG(1,"EKLMDigitizer::readAndSortBkgHits()");
+
+    StoreArray<EKLMBackHit> bkgHitsArray;
+    for (int i = 0; i < bkgHitsArray.getEntries(); i++) {
+
+      // search for entries of the same strip
+      map<string, vector<EKLMBackHit*> >::iterator
+  it = m_HitVolumeMap.find((bkgHitsArray[i])->getName());
+
+      if (it == m_HitVolumeMap.end()) { //  new entry
+      vector<EKLMBackHit*> *vectorHits =
+        new vector<EKLMBackHit*> (1, (bkgHitsArray[i]));
+      m_HitVolumeMap.insert(pair<string, vector<EKLMBackHit*> >
+                            ((bkgHitsArray[i])->getName(), *vectorHits));
+      } else {
+  it->second.push_back(bkgHitsArray[i]);
+      }
+    }
+
+    B2DEBUG(1,"EKLMDigitizer::readAndSortBkgHits()  completed");
+  }
+  */
+
+
+
+
+
+
+
+
 
   void EKLMDigitizer::readAndSortSimHits()
   {

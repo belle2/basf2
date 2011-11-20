@@ -122,15 +122,36 @@ void EKLMSimHit::setParentTrackID(G4int id)
   m_parentTrackID = id;
 }
 
-bool  EKLMSimHit::getFirstHit()
+bool  EKLMSimHit::getVolType()
 {
-  return m_isFirstStep;
+  return m_volType;
 }
 
 
-void  EKLMSimHit::setFirstHit(bool fh)
+void  EKLMSimHit::setVolType(int vt)
 {
-  m_isFirstStep = fh;
+  m_volType = vt;
+}
+
+
+TVector3  EKLMSimHit::getMomentum()
+{
+  return m_momentum;
+}
+
+void  EKLMSimHit::setMomentum(const TVector3 &p)
+{
+  m_momentum = p;
+}
+
+double  EKLMSimHit::getEnergy()
+{
+  return m_energy;
+}
+
+void  EKLMSimHit::setEnergy(double e)
+{
+  m_energy = e;
 }
 
 

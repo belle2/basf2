@@ -15,8 +15,6 @@
 
 #include <TObject.h>
 
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/StoreArray.h>
 
 #include  <string>
 

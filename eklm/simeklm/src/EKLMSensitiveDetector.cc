@@ -59,9 +59,6 @@ namespace Belle2 {
   //-----------------------------------------------------
   bool EKLMSensitiveDetector::step(G4Step *aStep, G4TouchableHistory *)
   {
-    // check if it is first step in volume
-    bool isFirstStep(aStep->GetPreStepPoint()->GetStepStatus() == fGeomBoundary);
-
 
     // Get deposited energy
     const G4double eDep = aStep->GetTotalEnergyDeposit();
@@ -140,7 +137,7 @@ namespace Belle2 {
     pvgt = pvgt->getMother();
     hit->set_nEndcap(pvgt->getID());
 
-    hit->setFirstHit(isFirstStep);
+
     hit->setTrackID(track.GetTrackID());
     hit->setParentTrackID(track.GetParentID());
 

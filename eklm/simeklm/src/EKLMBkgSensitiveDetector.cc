@@ -62,34 +62,24 @@ namespace Belle2 {
     const G4StepPoint& preStep  = *aStep->GetPreStepPoint();
 
 
-    //if (preStep.GetStepStatus() != fGeomBoundary) return false;
-
     //Get particle ID
     G4Track& track  = *aStep->GetTrack();
     const G4int pdgCode = track.GetDefinition()->GetPDGEncoding();
 
-//     switch (m_hitType) {
-//       case 0: if (pdgCode != 22 && abs(pdgCode) != 2112) return false; break;
-//       case 1: if (abs(pdgCode) != 2112)                  return false; break;
-//       case 2: if (pdgCode != 22)                         return false; break;
-//     }
-
-    //Get time (check for proper global time)
+    //Get time
     const G4double globalTime = track.GetGlobalTime();
-    //Get step information
 
     //Get world position
     const G4ThreeVector& worldPosition = preStep.GetPosition();
     //Get momentum
     const G4ThreeVector& momentum = preStep.GetMomentum() ;
     //Get energy
-    const G4double energy = track.GetKineticEnergy() * Unit::MeV;
+    const G4double energy = track.GetKineticEnergy();
 
     // -----------  EKLM-specific information
-    const G4double energyDeposit = aStep->GetTotalEnergyDeposit() * Unit::MeV;
+    const G4double energyDeposit = aStep->GetTotalEnergyDeposit();
     const G4int    trackID = track.GetTrackID();
     const G4int    ParentTrackID = track.GetParentID();
-    const bool isFirstStep = (preStep.GetStepStatus() == fGeomBoundary);
 
     G4PVPlacementGT * pvgt = (G4PVPlacementGT*)(aStep->GetPreStepPoint()->GetPhysicalVolume());
     const std::string pvName = pvgt->GetName();
@@ -100,12 +90,28 @@ namespace Belle2 {
     //------------------------------------------------------------
 
     TVector3 pos(worldPosition.x() / cm, worldPosition.y() / cm, worldPosition.z() / cm);
-    TVector3 mom(momentum.x() * Unit::MeV, momentum.y() * Unit::MeV , momentum.z() * Unit::MeV);
+    TVector3 mom(momentum.x(), momentum.y() , momentum.z());
     StoreArray<EKLMBackHit> backHits;
-    int nentr = backHits->GetLast() + 1;
-    new(backHits->AddrAt(nentr)) EKLMBackHit(m_subDet, m_identifier, pdgCode, globalTime, energy, pos, mom, energyDeposit, trackID, ParentTrackID, isFirstStep, pvName);
 
+    EKLMBackHit * hit = new(backHits->AddrAt(backHits.getEntries())) EKLMBackHit(m_subDet, m_identifier, pdgCode, globalTime, energy, pos, mom, energyDeposit, trackID, ParentTrackID, pvName);
+
+
+    // if hit is in Strip save all information of it's position
+    if (pvName.find("Sensitive_Strip_StripVolume") != string::npos) {
+      pvgt = pvgt->getMother();
+      pvgt = pvgt->getMother();
+      hit->set_nStrip(pvgt->getID());
+      pvgt = pvgt->getMother();
+      hit->set_nPlane(pvgt->getID());
+      pvgt = pvgt->getMother();
+      hit->set_nSector(pvgt->getID());
+      pvgt = pvgt->getMother();
+      hit->set_nLayer(pvgt->getID());
+      pvgt = pvgt->getMother();
+      hit->set_nEndcap(pvgt->getID());
+    }
     return true;
+
   }
 
 

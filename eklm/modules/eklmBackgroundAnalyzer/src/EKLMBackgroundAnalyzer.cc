@@ -46,9 +46,11 @@ void EKLMBackgroundAnalyzerModule::beginRun()
 void EKLMBackgroundAnalyzerModule::event()
 {
   B2INFO("EKLMBackgroundAnalyzerModule:: event()");
+
   m_HitVolumeMap.clear();
   readAndSortBkgHits();
   makeGraphs();
+
 }
 
 
@@ -78,12 +80,27 @@ void EKLMBackgroundAnalyzerModule::readAndSortBkgHits()
 
 void EKLMBackgroundAnalyzerModule::makeGraphs()
 {
+  StoreArray<EKLMSimHit> simHitsArray;
+
   using namespace boost;
   B2INFO("EKLMBackgroundAnalyzerModule::makeGraphs()");
 
   //loop over volumes
   for (map<string, vector<EKLMBackHit*> >::iterator volumeIterator = m_HitVolumeMap.begin();
        volumeIterator != m_HitVolumeMap.end(); volumeIterator++) {
+
+
+
+    int volType = 0;
+    if (volumeIterator->first.find("SiPM") != string::npos)
+      volType = 1;
+    if (volumeIterator->first.find("Board") != string::npos)
+      volType = 2;
+
+
+
+
+
     // we have only tree graphs here, so edge is completely defined by it's track ID
     // map to store (edge  <--> hit) == (vertex <--> hit) correspondence
     map < int , EKLMBackHit*> hitMap;
@@ -152,7 +169,7 @@ void EKLMBackgroundAnalyzerModule::makeGraphs()
     // map for component <-> simhit correspondence
     map <int, EKLMSimHit*> graphComponentToSimHit;
 
-    StoreArray<EKLMSimHit> simHitsArray;
+
 
     // loop over the vertices
     for (map < int , EKLMBackHit*>::iterator hitIterator = hitMap.begin(); hitIterator != hitMap.end(); hitIterator++) {
@@ -173,6 +190,18 @@ void EKLMBackgroundAnalyzerModule::makeGraphs()
         simHit->setTime(backhit->getTime());
         simHit->setEDep(backhit->getEDep());
         simHit->setPDGCode(backhit->getPDG());
+        simHit->setVolType(volType);
+        simHit->setMomentum(backhit->getMomentum());
+        simHit->setEnergy(backhit->getEnergy());
+
+
+        if (volType == 0) { // strip
+          simHit->set_nEndcap(backhit->get_nEndcap());
+          simHit->set_nSector(backhit->get_nSector());
+          simHit->set_nLayer(backhit->get_nLayer());
+          simHit->set_nPlane(backhit->get_nPlane());
+          simHit->set_nStrip(backhit->get_nStrip());
+        }
       } else { // entry already exist
         // compare hittime. The leading one has smallest time
         if (current->second->getTime() < backhit->getTime()) { // new hit is successor, add edep of the successsor to the ancestor
@@ -183,38 +212,67 @@ void EKLMBackgroundAnalyzerModule::makeGraphs()
           current->second->setGlobalPos(backhit->getPosition());
           current->second->setTime(backhit->getTime());
           current->second->setPDGCode(backhit->getPDG());
+          current->second->setMomentum(backhit->getMomentum());
+          current->second->setEnergy(backhit->getEnergy());
         }
       }
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
   }
+
+  // searching for the nearest hit
+  //temporal
+
+  // nearest hit
+  int min_layer = 100;
+  int min_i = -1;
+
+  for (int i = 0; i < simHitsArray.getEntries(); i++) {
+    if ((simHitsArray[i])->getEDep() > 10) {
+      (simHitsArray[i])->setVolType(100);
+
+
+      if ((simHitsArray[i])->get_nLayer() < min_layer) {
+        min_layer = (simHitsArray[i])->get_nLayer();
+        min_i = i;
+        std::cout << "aa " << min_layer << " " << min_i << std::endl;
+      }
+
+    }
+    if ((simHitsArray[i])->getEDep() > 0.7)
+      for (int j = 0 ;  j < simHitsArray.getEntries(); j++) {
+        if (
+          (simHitsArray[i])->get_nLayer() == (simHitsArray[j])->get_nLayer()
+          &&
+          (simHitsArray[i])->get_nSector() == (simHitsArray[j])->get_nSector()
+          &&
+          (simHitsArray[i])->get_nPlane() != (simHitsArray[j])->get_nPlane()
+          &&
+          (simHitsArray[j])->getEDep() > 0.7
+        ) {
+          (simHitsArray[i])->setVolType(101);
+          //    std::cout<<(simHitsArray[i])->getEDep()<<" "<<(simHitsArray[j])->getEDep()<<" "<<simHitsArray[i]->getName()<<" "<<simHitsArray[j]->getName()<<std::endl;
+
+          if ((simHitsArray[i])->get_nLayer() < min_layer) {
+            min_layer = (simHitsArray[i])->get_nLayer();
+            min_i = i;
+            std::cout << "aa " << min_layer << " " << min_i << std::endl;
+          }
+
+
+        }
+      }
+  }
+
+  if (min_i != -1)
+    (simHitsArray[min_i])->setVolType(200);
+
+
+
+
+
   B2INFO("EKLMBackgroundAnalyzerModule::makeGraphs() completed");
 }
-
 
 
 

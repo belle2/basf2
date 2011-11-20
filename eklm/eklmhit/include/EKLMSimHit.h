@@ -86,14 +86,29 @@ namespace Belle2 {
     void setParentTrackID(G4int id);
 
     //! returns  first hit status
-    bool  getFirstHit();
-    void  setFirstHit(bool fh);
+    bool  getVolType();
+    void  setVolType(int vt);
+
+    //! returns  particle momentum
+    TVector3  getMomentum();
+    void  setMomentum(const TVector3 &p);
+
+
+    //! returns  particle energy
+    double  getEnergy();
+    void  setEnergy(const double e);
 
 
 
   private:
     //! Physical volume
     G4VPhysicalVolume *m_pv; //! {ROOT streamer directive}
+
+    //! particle momentum
+    TVector3 m_momentum;
+
+    //! particle energy
+    double m_energy;
 
     //! hit position (in global reference frame)
     TVector3 m_global_pos;
@@ -117,7 +132,7 @@ namespace Belle2 {
     G4int m_parentTrackID;
 
     //! is first step in volume
-    bool m_isFirstStep;
+    int m_volType;
 
     //! Needed to make root object storable
     ClassDef(Belle2::EKLMSimHit, 1);

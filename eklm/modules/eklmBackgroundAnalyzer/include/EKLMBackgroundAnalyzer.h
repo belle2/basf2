@@ -10,6 +10,7 @@
 
 #include <eklm/geoeklm/G4PVPlacementGT.h>
 #include <eklm/eklmhit/EKLMBackHit.h>
+#include <eklm/eklmhit/EKLMSimHit.h>
 
 
 
@@ -83,6 +84,7 @@ namespace Belle2 {
 
     void makeGraphs();
 
+    //    StoreArray<EKLMSimHit> simHitsArray;
 
   };
 } // end namespace Belle2

@@ -13,7 +13,7 @@
 #ifndef EKLMBACKHIT_H
 #define EKLMBACKHIT_H
 
-#include <TObject.h>
+#include <eklm/eklmhit/EKLMHitBase.h>
 #include <TVector3.h>
 #include <TString.h>
 
@@ -26,7 +26,7 @@ namespace Belle2 {
    It is a general class for all subdetectors
    */
 
-  class EKLMBackHit : public TObject {
+  class EKLMBackHit : public EKLMHitBase {
   public:
 
     //! Default constructor
@@ -41,7 +41,6 @@ namespace Belle2 {
         m_energyDeposit(0.),
         m_trackID(-1),
         m_parentTrackID(-1),
-        m_isFirstStep(false),
         m_pvName("not initialized") {
     }
 
@@ -65,7 +64,6 @@ namespace Belle2 {
       double edep ,
       int    trID,
       int  ptrID,
-      bool firstStep,
       std::string name
     )  {
       m_subDet = subDet;
@@ -78,7 +76,6 @@ namespace Belle2 {
       m_energyDeposit = edep;
       m_trackID = trID;
       m_parentTrackID = ptrID;
-      m_isFirstStep = firstStep;
       m_pvName = name;
     }
 
@@ -131,8 +128,6 @@ namespace Belle2 {
     //! Get  ID of parent track
     const int &getParentTrackID() const { return m_parentTrackID;}
 
-    //! check if the step is the first
-    const bool &getFirstStep() const { return m_isFirstStep;}
 
     //! get volume name
     const std::string getName()  const { return m_pvName;}
@@ -177,7 +172,6 @@ namespace Belle2 {
     double m_energyDeposit;
     int m_trackID;
     int m_parentTrackID;
-    bool m_isFirstStep;
     std::string m_pvName;
 
     ClassDef(EKLMBackHit, 1);   /**< the class title */

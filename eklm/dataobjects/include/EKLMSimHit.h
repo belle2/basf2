@@ -19,54 +19,85 @@
 #include "G4Allocator.hh"
 #include "G4ThreeVector.hh"
 
-#include "eklm/eklmhit/EKLMHitBase.h"
+#include <eklm/dataobjects/EKLMHitBase.h>
 #include <TVector3.h>
 
 #include "G4VHit.hh"
 namespace Belle2 {
 
-  //! Class to handle simulation hits
-  //  class EKLMSimHit  : public G4VHit  {
+  /**
+   * Class to handle simulation hits
+   */
+
   class EKLMSimHit : public EKLMHitBase  {
 
   public:
 
-    //! default constructor needed to make the class storable
+    /**
+     * default constructor needed to make the class storable
+     */
     EKLMSimHit();
 
-    //! Constructor with initial values
+    /**
+     *  Constructor with initial values
+     */
     EKLMSimHit(G4VPhysicalVolume *pv, TVector3 global_pos,
                TVector3 local_pos, G4double time, G4int PDGcode,
                G4double eDep);
 
-    //! Destructor
+    /**
+     * Destructor
+     */
     ~EKLMSimHit() {};
 
-    //! returns physical volume
+    /**
+     *returns physical volume
+     */
     G4VPhysicalVolume *getPV();
+
+    /**
+     * set physical volume
+     */
     void setPV(G4VPhysicalVolume *);
 
-    //! returns global position of the hit
+    /**
+     * returns global position of the hit
+     */
     TVector3 getGlobalPos();
 
-    //! returns local position of the hit
+    /**
+     * returns local position of the hit
+     */
     TVector3 getLocalPos();
 
-    //! set global position of the hit
+    /**
+     * set global position of the hit
+     */
     void setGlobalPos(const TVector3 &);
 
-    //! set local position of the hit
+    /**
+     * set local position of the hit
+     */
     void setLocalPos(const TVector3 &);
 
 
-
-
-    //! returns hit time
+    /**
+     * returns hit time
+     */
     G4double getTime();
+    /**
+     * set hit time
+     */
     void setTime(double);
 
-    //! returns energy deposition
+    /**
+     * returns energy deposition
+     */
     G4double getEDep();
+
+    /**
+     * set  energy deposition
+     */
     void setEDep(double);
 
     //! returns PDG code of the particle

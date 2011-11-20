@@ -12,33 +12,36 @@
 #define EKLMHITBASE_H
 
 #include <sys/types.h>
-
 #include <TObject.h>
-
-
 #include  <string>
 
 
 namespace Belle2 {
 
-  //! Base Hit reconstruction class. inherit HitBase class from TObject
-  //! to make all hits storable
+  /**
+   * Base Hit reconstruction class. inherit HitBase class from TObject
+   *  to make all hits storable
+   */
   class EKLMHitBase: public TObject  {
 
   public:
 
-    //! Constructor
+    /**
+     *  Constructor
+     */
     EKLMHitBase();
 
-    //! Constructor
+    /**
+     *  Constructor
+     */
+
     EKLMHitBase(char nEndcap, char nLayer, char nSector, char nPlane,
                 char nStrip);
 
-    //! Destructor
+    /**
+     * Destructor
+     */
     ~EKLMHitBase() {};
-
-    //! Print hit information
-    void Print();
 
     /**
      * Get endcap number.
@@ -91,6 +94,7 @@ namespace Belle2 {
     void set_nStrip(char nStrip);
 
   private:
+
     /**
      * Number of endcap.
      */

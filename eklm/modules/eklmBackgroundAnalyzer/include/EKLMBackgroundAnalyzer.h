@@ -9,8 +9,8 @@
 #include <string>
 
 #include <eklm/geoeklm/G4PVPlacementGT.h>
-#include <eklm/eklmhit/EKLMBackHit.h>
-#include <eklm/eklmhit/EKLMSimHit.h>
+#include <eklm/dataobjects/EKLMBackHit.h>
+#include <eklm/dataobjects/EKLMSimHit.h>
 
 
 

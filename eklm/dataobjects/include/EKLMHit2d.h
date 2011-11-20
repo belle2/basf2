@@ -14,7 +14,7 @@
 #include <framework/datastore/DataStore.h>
 #include <TObject.h>
 
-#include  <eklm/eklmhit/EKLMStripHit.h>
+#include  <eklm/dataobjects/EKLMStripHit.h>
 #include  "globals.hh"
 #include  "CLHEP/Vector/ThreeVector.h"
 

@@ -12,8 +12,8 @@
 #define EKLMDIGITIZER_H
 
 #include <eklm/eklmutils/EKLMutils.h>
-#include <eklm/eklmhit/EKLMSimHit.h>
-#include <eklm/eklmhit/EKLMStripHit.h>
+#include <eklm/dataobjects/EKLMSimHit.h>
+#include <eklm/dataobjects/EKLMStripHit.h>
 #include <map>
 #include <vector>
 #include  "CLHEP/Vector/ThreeVector.h"

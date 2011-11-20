@@ -14,8 +14,8 @@
 #include <framework/datastore/DataStore.h>
 #include <TObject.h>
 
-#include  <eklm/eklmhit/EKLMStripHit.h>
-#include  <eklm/eklmhit/EKLMHit2d.h>
+#include  <eklm/dataobjects/EKLMStripHit.h>
+#include  <eklm/dataobjects/EKLMHit2d.h>
 #include  "globals.hh"
 
 #include <string>

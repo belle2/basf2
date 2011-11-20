@@ -9,7 +9,7 @@
 #include <boost/graph/graph_traits.hpp>
 #include <boost/graph/properties.hpp>
 #include <boost/range/irange.hpp>
-#include <eklm/eklmhit/EKLMSimHit.h>
+#include <eklm/dataobjects/EKLMSimHit.h>
 
 
 using namespace std;

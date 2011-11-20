@@ -14,7 +14,7 @@
 #define EKLMBACKSENSITIVEDETECTOR_H
 
 #include <simulation/kernel/SensitiveDetectorBase.h>
-#include <eklm/eklmhit/EKLMBackHit.h>
+#include <eklm/dataobjects/EKLMBackHit.h>
 #include <TString.h>
 
 namespace Belle2 {

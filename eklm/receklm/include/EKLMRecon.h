@@ -12,8 +12,8 @@
 #define EKLMRECON_H
 
 #include<vector>
-#include<eklm/eklmhit/EKLMStripHit.h>
-#include<eklm/eklmhit/EKLMSectorHit.h>
+#include<eklm/dataobjects/EKLMStripHit.h>
+#include<eklm/dataobjects/EKLMSectorHit.h>
 
 
 

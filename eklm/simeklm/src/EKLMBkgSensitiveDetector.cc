@@ -9,7 +9,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <eklm/eklmhit/EKLMBackHit.h>
+#include <eklm/dataobjects/EKLMBackHit.h>
 #include <eklm/simeklm/EKLMBkgSensitiveDetector.h>
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Unit.h>

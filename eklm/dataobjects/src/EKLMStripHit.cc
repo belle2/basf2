@@ -10,7 +10,7 @@
 
 #include <G4Box.hh>
 
-#include <eklm/eklmhit/EKLMStripHit.h>
+#include <eklm/dataobjects/EKLMStripHit.h>
 #include <eklm/eklmutils/EKLMutils.h>
 #include <eklm/geoeklm/G4PVPlacementGT.h>
 #include <framework/logging/Logger.h>

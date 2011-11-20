@@ -9,7 +9,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <eklm/eklmhit/EKLMBackHit.h>
+#include <eklm/dataobjects/EKLMBackHit.h>
 
 using namespace std;
 using namespace Belle2;

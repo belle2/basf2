@@ -13,7 +13,7 @@
 #ifndef EKLMBACKHIT_H
 #define EKLMBACKHIT_H
 
-#include <eklm/eklmhit/EKLMHitBase.h>
+#include <eklm/dataobjects/EKLMHitBase.h>
 #include <TVector3.h>
 #include <TString.h>
 

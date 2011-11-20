@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <eklm/eklmhit/EKLMHitBase.h>
+#include <eklm/dataobjects/EKLMHitBase.h>
 #include <framework/logging/Logger.h>
 
 using namespace Belle2;
@@ -84,8 +84,4 @@ void EKLMHitBase::set_nStrip(char nStrip)
   m_nStrip = nStrip;
 }
 
-void EKLMHitBase::Print()
-{
-  B2INFO("Not implemented yet");
-}
 

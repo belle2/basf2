@@ -13,7 +13,7 @@
 
 #include <framework/datastore/DataStore.h>
 
-#include  <eklm/eklmhit/EKLMHitBase.h>
+#include  <eklm/dataobjects/EKLMHitBase.h>
 #include  "globals.hh"
 #include  "CLHEP/Vector/ThreeVector.h"
 

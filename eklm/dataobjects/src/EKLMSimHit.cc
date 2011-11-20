@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <eklm/eklmhit/EKLMSimHit.h>
+#include <eklm/dataobjects/EKLMSimHit.h>
 #include <framework/logging/Logger.h>
 #include<iostream>
 #include<fstream>

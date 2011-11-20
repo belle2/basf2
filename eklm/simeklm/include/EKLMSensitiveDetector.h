@@ -11,7 +11,7 @@
 #ifndef EKLMSENSETIVEDETECTOR_H
 #define EKLMSENSETIVEDETECTOR_H
 
-#include <eklm/eklmhit/EKLMSimHit.h>
+#include <eklm/dataobjects/EKLMSimHit.h>
 #include <simulation/kernel/SensitiveDetectorBase.h>
 
 

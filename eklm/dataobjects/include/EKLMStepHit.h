@@ -172,7 +172,7 @@ namespace Belle2 {
     /**
      * Set ID of parent track
      */
-    void getParentTrackID(int track)  { m_parentTackID = track;}
+    void getParentTrackID(int track)  { m_parentTrackID = track;}
 
 
 

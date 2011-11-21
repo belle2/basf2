@@ -196,11 +196,11 @@ void EKLMBackgroundAnalyzerModule::makeGraphs()
 
 
         if (volType == 0) { // strip
-          simHit->set_nEndcap(backhit->get_nEndcap());
-          simHit->set_nSector(backhit->get_nSector());
-          simHit->set_nLayer(backhit->get_nLayer());
-          simHit->set_nPlane(backhit->get_nPlane());
-          simHit->set_nStrip(backhit->get_nStrip());
+          simHit->setEndcap(backhit->getEndcap());
+          simHit->setSector(backhit->getSector());
+          simHit->setLayer(backhit->getLayer());
+          simHit->setPlane(backhit->getPlane());
+          simHit->setStrip(backhit->getStrip());
         }
       } else { // entry already exist
         // compare hittime. The leading one has smallest time
@@ -232,8 +232,8 @@ void EKLMBackgroundAnalyzerModule::makeGraphs()
       (simHitsArray[i])->setVolType(100);
 
 
-      if ((simHitsArray[i])->get_nLayer() < min_layer) {
-        min_layer = (simHitsArray[i])->get_nLayer();
+      if ((simHitsArray[i])->getLayer() < min_layer) {
+        min_layer = (simHitsArray[i])->getLayer();
         min_i = i;
         std::cout << "aa " << min_layer << " " << min_i << std::endl;
       }
@@ -242,19 +242,19 @@ void EKLMBackgroundAnalyzerModule::makeGraphs()
     if ((simHitsArray[i])->getEDep() > 0.7)
       for (int j = 0 ;  j < simHitsArray.getEntries(); j++) {
         if (
-          (simHitsArray[i])->get_nLayer() == (simHitsArray[j])->get_nLayer()
+          (simHitsArray[i])->getLayer() == (simHitsArray[j])->getLayer()
           &&
-          (simHitsArray[i])->get_nSector() == (simHitsArray[j])->get_nSector()
+          (simHitsArray[i])->getSector() == (simHitsArray[j])->getSector()
           &&
-          (simHitsArray[i])->get_nPlane() != (simHitsArray[j])->get_nPlane()
+          (simHitsArray[i])->getPlane() != (simHitsArray[j])->getPlane()
           &&
           (simHitsArray[j])->getEDep() > 0.7
         ) {
           (simHitsArray[i])->setVolType(101);
           //    std::cout<<(simHitsArray[i])->getEDep()<<" "<<(simHitsArray[j])->getEDep()<<" "<<simHitsArray[i]->getName()<<" "<<simHitsArray[j]->getName()<<std::endl;
 
-          if ((simHitsArray[i])->get_nLayer() < min_layer) {
-            min_layer = (simHitsArray[i])->get_nLayer();
+          if ((simHitsArray[i])->getLayer() < min_layer) {
+            min_layer = (simHitsArray[i])->getLayer();
             min_i = i;
             std::cout << "aa " << min_layer << " " << min_i << std::endl;
           }

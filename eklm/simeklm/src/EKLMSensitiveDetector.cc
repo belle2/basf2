@@ -142,15 +142,15 @@ namespace Belle2 {
     G4PVPlacementGT *pvgt = (G4PVPlacementGT*)pv;
     pvgt = pvgt->getMother();
     pvgt = pvgt->getMother();
-    hit->set_nStrip(pvgt->getID());
+    hit->setStrip(pvgt->getID());
     pvgt = pvgt->getMother();
-    hit->set_nPlane(pvgt->getID());
+    hit->setPlane(pvgt->getID());
     pvgt = pvgt->getMother();
-    hit->set_nSector(pvgt->getID());
+    hit->setSector(pvgt->getID());
     pvgt = pvgt->getMother();
-    hit->set_nLayer(pvgt->getID());
+    hit->setLayer(pvgt->getID());
     pvgt = pvgt->getMother();
-    hit->set_nEndcap(pvgt->getID());
+    hit->setEndcap(pvgt->getID());
 
 
 

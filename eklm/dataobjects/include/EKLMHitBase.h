@@ -35,8 +35,8 @@ namespace Belle2 {
      *  Constructor
      */
 
-    EKLMHitBase(char nEndcap, char nLayer, char nSector, char nPlane,
-                char nStrip);
+    EKLMHitBase(int Endcap, int Layer, int Sector, int Plane,
+                int Strip);
 
     /**
      * Destructor
@@ -46,79 +46,79 @@ namespace Belle2 {
     /**
      * Get endcap number.
      */
-    int get_nEndcap();
+    const int getEndcap();
 
     /**
      * Set endcap number.
      */
-    void set_nEndcap(char nEndcap);
+    void setEndcap(const int Endcap);
 
     /**
      * Get layer number.
      */
-    int get_nLayer();
+    const int getLayer();
 
     /**
      * Set layer number.
      */
-    void set_nLayer(char nLayer);
+    void setLayer(const int nLayer);
 
     /**
      * Get sector number.
      */
-    int get_nSector();
+    const int getSector();
 
     /**
      * Set sector number.
      */
-    void set_nSector(char nSector);
+    void setSector(const int nSector);
 
     /**
      * Get plane number.
      */
-    int get_nPlane();
+    const int getPlane();
 
     /**
      * Set plane number.
      */
-    void set_nPlane(char nPlane);
+    void setPlane(const int Plane);
 
     /**
      * Get strip number.
      */
-    int get_nStrip();
+    const int getStrip();
 
     /**
      * Set strip number.
      */
-    void set_nStrip(char nStrip);
+    void setStrip(const int Strip);
 
   private:
 
     /**
      * Number of endcap.
      */
-    char m_nEndcap;
+    int m_Endcap;
 
     /**
      * Number of layer.
      */
-    char m_nLayer;
+    int m_Layer;
 
     /**
      * Number of sector.
      */
-    char m_nSector;
+    int m_Sector;
 
     /**
      * Number of plane.
      */
-    char m_nPlane;
+    int m_Plane;
 
     /**
      * Number of strip.
      */
-    char m_nStrip;
+    int m_Strip;
 
     /**
      * Needed to make objects storable.

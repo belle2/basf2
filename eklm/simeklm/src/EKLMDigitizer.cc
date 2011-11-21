@@ -267,11 +267,11 @@ namespace Belle2 {
 
       //      EKLMStripHit *stripHit = new EKLMStripHit();
 
-      stripHit->set_nEndcap(simHit->get_nEndcap());
-      stripHit->set_nLayer(simHit->get_nLayer());
-      stripHit->set_nSector(simHit->get_nSector());
-      stripHit->set_nPlane(simHit->get_nPlane());
-      stripHit->set_nStrip(simHit->get_nStrip());
+      stripHit->setEndcap(simHit->getEndcap());
+      stripHit->setLayer(simHit->getLayer());
+      stripHit->setSector(simHit->getSector());
+      stripHit->setPlane(simHit->getPlane());
+      stripHit->setStrip(simHit->getStrip());
       stripHit->setPV(simHit->getPV());
 
       //stripHit->setHistogramm(cloneHist);

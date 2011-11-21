@@ -17,71 +17,71 @@ ClassImp(EKLMHitBase);
 
 EKLMHitBase::EKLMHitBase()
 {
-  m_nEndcap = 0;
-  m_nLayer = 0;
-  m_nSector = 0;
-  m_nPlane = 0;
-  m_nStrip = 0;
+  m_Endcap = 0;
+  m_Layer = 0;
+  m_Sector = 0;
+  m_Plane = 0;
+  m_Strip = 0;
 }
 
-EKLMHitBase::EKLMHitBase(char nEndcap, char nLayer, char nSector, char nPlane,
-                         char nStrip)
+EKLMHitBase::EKLMHitBase(const int Endcap, const int Layer, const int Sector, const int Plane,
+                         const int Strip)
 {
-  m_nEndcap = nEndcap;
-  m_nLayer = nLayer;
-  m_nSector = nSector;
-  m_nPlane = nPlane;
-  m_nStrip = nStrip;
+  m_Endcap = Endcap;
+  m_Layer = Layer;
+  m_Sector = Sector;
+  m_Plane = Plane;
+  m_Strip = Strip;
 }
 
-int EKLMHitBase::get_nEndcap()
+const int EKLMHitBase::getEndcap()
 {
-  return m_nEndcap;
+  return m_Endcap;
 }
 
-void EKLMHitBase::set_nEndcap(char nEndcap)
+void EKLMHitBase::setEndcap(const int Endcap)
 {
-  m_nEndcap = nEndcap;
+  m_Endcap = Endcap;
 }
 
-int EKLMHitBase::get_nLayer()
+const int EKLMHitBase::getLayer()
 {
-  return m_nLayer;
+  return m_Layer;
 }
 
-void EKLMHitBase::set_nLayer(char nLayer)
+void EKLMHitBase::setLayer(const int Layer)
 {
-  m_nLayer = nLayer;
+  m_Layer = Layer;
 }
 
-int EKLMHitBase::get_nSector()
+const int EKLMHitBase::getSector()
 {
-  return m_nSector;
+  return m_Sector;
 }
 
-void EKLMHitBase::set_nSector(char nSector)
+void EKLMHitBase::setSector(const int Sector)
 {
-  m_nSector = nSector;
+  m_Sector = Sector;
 }
 
-int EKLMHitBase::get_nPlane()
+const int EKLMHitBase::getPlane()
 {
-  return m_nPlane;
+  return m_Plane;
 }
 
-void EKLMHitBase::set_nPlane(char nPlane)
+void EKLMHitBase::setPlane(const int Plane)
 {
-  m_nPlane = nPlane;
+  m_Plane = Plane;
 }
 
-int EKLMHitBase::get_nStrip()
+const int EKLMHitBase::getStrip()
 {
-  return m_nStrip;
+  return m_Strip;
 }
 
-void EKLMHitBase::set_nStrip(char nStrip)
+void EKLMHitBase::setStrip(const int Strip)
 {
-  m_nStrip = nStrip;
+  m_Strip = Strip;
 }
 
 

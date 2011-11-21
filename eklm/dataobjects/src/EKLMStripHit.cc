@@ -63,11 +63,11 @@ void EKLMStripHit::setPV(G4VPhysicalVolume *pv)
 
 void EKLMStripHit::Print()
 {
-  std::cout << "Endcap: " << get_nEndcap()
-            << " Layer: " << get_nLayer()
-            << " Sector: " << get_nSector()
-            << " Plane: " << get_nPlane()
-            << " Strip: " << get_nStrip()
+  std::cout << "Endcap: " << getEndcap()
+            << " Layer: " << getLayer()
+            << " Sector: " << getSector()
+            << " Plane: " << getPlane()
+            << " Strip: " << getStrip()
             << " # Time: " << m_Time << "\n";
 }
 

@@ -53,19 +53,19 @@ EKLMHit2d::EKLMHit2d(EKLMStripHit * xStrip, EKLMStripHit * yStrip)
 {
   m_XStrip = xStrip;
   m_YStrip = yStrip;
-  set_nEndcap(xStrip->get_nEndcap());
-  set_nLayer(xStrip->get_nLayer());
-  set_nSector(xStrip->get_nSector());
-  set_nPlane(0);
-  set_nStrip(0);
+  setEndcap(xStrip->getEndcap());
+  setLayer(xStrip->getLayer());
+  setSector(xStrip->getSector());
+  setPlane(0);
+  setStrip(0);
 }
 
 void EKLMHit2d::Print()
 {
   std::cout << "------------  Hit 2d  -------------- " << std::endl;
-  std::cout << "Endcap: " << get_nEndcap()
-            << " Layer: " << get_nLayer()
-            << " Sector: " << get_nSector() << "\n";
+  std::cout << "Endcap: " << getEndcap()
+            << " Layer: " << getLayer()
+            << " Sector: " << getSector() << "\n";
   std::cout << "X: ";
   m_XStrip->Print();
   std::cout << "Y: ";

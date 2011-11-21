@@ -49,9 +49,9 @@ namespace Belle2 {
       }
       if (sectorNotFound) {
         EKLMSectorHit *newSectorHit = new(sectorHitsArray->AddrAt(sectorHitsArray.getEntries()))
-        EKLMSectorHit((*stripIter)->get_nEndcap(),
-                      (*stripIter)->get_nLayer(),
-                      (*stripIter)->get_nSector(), 0, 0);
+        EKLMSectorHit((*stripIter)->getEndcap(),
+                      (*stripIter)->getLayer(),
+                      (*stripIter)->getSector(), 0, 0);
 
         newSectorHit->addStripHit(*stripIter);
         m_SectorHitVector.push_back(newSectorHit);

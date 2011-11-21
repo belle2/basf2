@@ -37,9 +37,9 @@ std::vector <Belle2::EKLMHit2d*> EKLMSectorHit::get2dHitVector()
 void EKLMSectorHit::Print()
 {
   std::cout << "------------  Sector Hit  -------------- " << std::endl;
-  std::cout << "Endcap: " << get_nEndcap()
-            << " Layer: " << get_nLayer()
-            << " Sector: " << get_nSector() << std::endl;
+  std::cout << "Endcap: " << getEndcap()
+            << " Layer: " << getLayer()
+            << " Sector: " << getSector() << std::endl;
   for (std::vector<EKLMStripHit*>::iterator it = m_stripHitVector.begin();
        it != m_stripHitVector.end(); ++it)
     (*it)->Print();
@@ -47,9 +47,9 @@ void EKLMSectorHit::Print()
 
 bool EKLMSectorHit::addStripHit(EKLMStripHit *stripHit)
 {
-  if (stripHit->get_nEndcap() == get_nEndcap() &&
-      stripHit->get_nLayer() == get_nLayer() &&
-      stripHit->get_nSector() == get_nSector()) {
+  if (stripHit->getEndcap() == getEndcap() &&
+      stripHit->getLayer() == getLayer() &&
+      stripHit->getSector() == getSector()) {
     m_stripHitVector.push_back(stripHit);
     return true;
   }

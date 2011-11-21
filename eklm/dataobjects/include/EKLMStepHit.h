@@ -214,6 +214,7 @@ namespace Belle2 {
     double m_energyDeposit;
     int m_trackID;
     int m_parentTrackID;
+    //** we do not want to  allow anyone to change the PV !! */
     const G4VPhysicalVolume * m_pv;     //! {ROOT streamer directive}
     std::string m_pvName;
 

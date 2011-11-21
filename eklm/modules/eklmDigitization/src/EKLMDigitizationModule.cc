@@ -40,9 +40,11 @@ void EKLMDigitizationModule::event()
 {
   B2DEBUG(1, "EKLMDigitizationModule : event");
   B2DEBUG(1, " START DIGITIZATION");
-  EKLMDigitizer *digi = new EKLMDigitizer();
-  digi->readAndSortSimHits();
-  digi->mergeSimHitsToStripHits();
+  EKLMDigitizer * digi = new EKLMDigitizer();
+  digi->readAndSortStepHits();
+  digi->makeSimHits();
+  //   digi->readAndSortSimHits();
+  //   digi->mergeSimHitsToStripHits();
   delete digi;
   B2DEBUG(1, " DELETE DIGITIZER OBJECT");
 }

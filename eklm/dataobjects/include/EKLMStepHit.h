@@ -13,8 +13,9 @@
 #define EKLMSTEPHIT_H
 
 #include <eklm/dataobjects/EKLMHitBase.h>
+#include "G4VPhysicalVolume.hh"
 #include <TVector3.h>
-#include <TString.h>
+//#include <TString.h>
 
 namespace Belle2 {
 
@@ -37,28 +38,27 @@ namespace Belle2 {
         m_energyDeposit(0.),
         m_trackID(-1),
         m_parentTrackID(-1),
-        m_pvName("not initialized") {
-    }
+        m_pv(0) {}
 
     //! Full constructor.
     /*!
-      \param m_PDG the PDG code of the particle
-      \param m_t the global time the at which the hit occured
-      \param m_E energy of the particle
-      \param m_position the global position at which the track occured
-      \param m_momentum the of the particle that produced the hit
+    \param m_PDG the PDG code of the particle
+    \param m_t the global time the at which the hit occured
+    \param m_E energy of the particle
+    \param m_position the global position at which the track occured
+    \param m_momentum the of the particle that produced the hit
     */
 
     EKLMStepHit(
-      int PDG,
-      double t,
-      double E,
-      TVector3 position,
-      TVector3 momentum,
-      double edep ,
-      int    trID,
-      int  ptrID,
-      std::string name
+      const int PDG,
+      const double t,
+      const double E,
+      const TVector3 position,
+      const TVector3 momentum,
+      const double edep ,
+      const int    trID,
+      const int  ptrID,
+      const G4VPhysicalVolume * pv
     )  {
       m_PDG = PDG;
       m_t = t;
@@ -68,7 +68,8 @@ namespace Belle2 {
       m_energyDeposit = edep;
       m_trackID = trID;
       m_parentTrackID = ptrID;
-      m_pvName = name;
+      m_pv = pv;
+      m_pvName = pv->GetName();
     }
 
     /**
@@ -187,6 +188,14 @@ namespace Belle2 {
 
 
 
+
+    /**
+     * Get volume
+     */
+    const G4VPhysicalVolume* getVolume()  const { return m_pv;}
+
+
+
     /**
      * Increase deposited energy
      */
@@ -195,21 +204,21 @@ namespace Belle2 {
 
 
   private:
-    int m_subDet;               /**< The name of the subdetector */
-    int m_identifier;           /**< The identifier of subdetector component */
-    int m_PDG;                  /**< The PDG code of the particle that hit the sensitive area */
-    double m_t;                 /**< time at which the hit occured */
-    double m_E;                 /**< energy of particle */
-    TVector3 m_position;        /**< global position of the hit */
-    TVector3 m_momentum;        /**< momentum of the hit */
-
-
+    int m_subDet;               /** The name of the subdetector */
+    int m_identifier;           /** The identifier of subdetector component */
+    int m_PDG;                  /** The PDG code of the particle that hit the sensitive area */
+    double m_t;                 /** time at which the hit occured */
+    double m_E;                 /** energy of particle */
+    TVector3 m_position;        /** global position of the hit */
+    TVector3 m_momentum;        /** momentum of the hit */
     double m_energyDeposit;
     int m_trackID;
     int m_parentTrackID;
+    const G4VPhysicalVolume * m_pv;     //! {ROOT streamer directive}
     std::string m_pvName;
 
-    ClassDef(EKLMStepHit, 1);   /**< the class title */
+
+    ClassDef(EKLMStepHit, 1);   /** the class title */
 
   };
 

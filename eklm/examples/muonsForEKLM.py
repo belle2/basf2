@@ -36,7 +36,7 @@ evtmetagen.param('RunList', [1])
 particlegun = register_module('PGunInput')
 particlegun.param('nTracks', 1)
 particlegun.param('PIDcodes', [13, -13])
-particlegun.param('pPar1', 0.05)
+particlegun.param('pPar1', 2)
 particlegun.param('pPar2', 3)
 
 # Geometry parameter loader
@@ -69,7 +69,7 @@ mcprint = register_module('PrintMCParticles')
 # EKLM digi
 eklmdigi = register_module('EKLMDigitization')
 # EKLM reco
-eklmreco = register_module('EKLMReconstruction')
+# eklmreco = register_module('EKLMReconstruction')
 
 # Create main path
 main = create_path()
@@ -82,7 +82,7 @@ main.add_module(geobuilder)
 main.add_module(g4sim)
 
 main.add_module(eklmdigi)
-main.add_module(eklmreco)
+# main.add_module(eklmreco)
 
 main.add_module(simpleoutput)
 

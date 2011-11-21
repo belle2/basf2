@@ -16,9 +16,7 @@
 #include <eklm/geoeklm/G4PVPlacementGT.h>
 
 #include "G4Step.hh"
-#include "G4SteppingManager.hh"
-//#include "G4SDManager.hh"
-//#include "G4TransportationManager.hh"
+//#include "G4SteppingManager.hh"
 
 
 #include <framework/gearbox/GearDir.h>
@@ -128,17 +126,11 @@ namespace Belle2 {
 
 
     /**
-     * get name of the volume
-     */
-    const std::string volumeName = pv->GetName();
-
-
-    /**
      * creates step hit and store in to DataStore
      */
     StoreArray<EKLMStepHit> stepHitsArray;
     EKLMStepHit *hit = new(stepHitsArray->AddrAt(stepHitsArray.getEntries()))
-    EKLMStepHit(PDGcode, hitTime, Ekin, gposRoot, momentumRoot, eDep, trackID, paretntTrackID, volumeName);
+    EKLMStepHit(PDGcode, hitTime, Ekin, gposRoot, momentumRoot, eDep, trackID, paretntTrackID, pv);
     if (hit == NULL) {
       B2ERROR("EKLMSensitiveDetector.cc:: Memory allocation error. Cannot allocate hit in stepHitsArray");
       return false;

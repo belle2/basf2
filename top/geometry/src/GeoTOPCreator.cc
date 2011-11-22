@@ -270,6 +270,7 @@ namespace Belle2 {
       G4ExtrudedSolid* wedge = new  G4ExtrudedSolid("wedge", polygon, Wwidth / 2.0, G4TwoVector(0.0, 0.0), 1.0, G4TwoVector(0.0, 0.0), 1.0);
 
       G4LogicalVolume* qwedge = new G4LogicalVolume(wedge, quartzMaterial, "qwedge");
+      qwedge->SetSensitiveDetector(m_sensitive);
 
       /*! Add glue to wedge */
 
@@ -423,22 +424,27 @@ namespace Belle2 {
 
       G4double dz = Winthickness + MWsizez + Botthickness;
 
+      G4double Qthickness = m_topgp->getQthickness();
+      G4double Wwidth = m_topgp->getWwidth();
+      G4double Wextdown = m_topgp->getWextdown();
 
-
-      GearDir materialNames(content, "Detector/Module");
-      string fillName = materialNames.getString("fillMaterial", "TOPAir");
-      G4Material* fillMaterial = Materials::get(fillName);
-      if (!fillMaterial) { B2FATAL("Material '" << fillName << "' missing!");}
+      GearDir materialNames(content, "Bars");
+      string quartzName = materialNames.getString("BarMaterial", "TOPSiO2");
+      /*
+            GearDir materialNames(content, "Detector/Module");
+            string fillName = materialNames.getString("fillMaterial", "TOPAir");*/
+      G4Material* fillMaterial = Materials::get(quartzName);
+      if (!fillMaterial) { B2FATAL("Material '" << quartzName << "' missing!");}
 
 
       /*! Build stack */
 
-      G4double x = Npmtx * dx + (Npmtx - 1) * Xgap;
-      G4double y = Npmty * dy + (Npmty - 1) * Ygap;
+      G4double x = Wwidth;
+      G4double y = Qthickness + Wextdown;
 
       G4Box *box = new G4Box("box", x / 2.0, y / 2.0, (dz + dGlue) / 2.0);
       G4LogicalVolume* stack = new G4LogicalVolume(box, fillMaterial, "stack");
-
+      //stack->SetSensitiveDetector(m_sensitive);
 
 
       G4LogicalVolume* PMT = buildPMT(content);
@@ -448,7 +454,7 @@ namespace Belle2 {
 
           G4Transform3D tpmt = G4Translate3D(-x / 2.0 + dx / 2.0 + (dx + Xgap) * ix , -y / 2.0 + dy / 2.0 + (dy + Ygap) * iy, -dGlue / 2.0);
 
-          new G4PVPlacement(tpmt, PMT, "TOP.window", stack, false, (ix + 1)*(iy + 1));
+          // new G4PVPlacement(tpmt, PMT, "TOP.window", stack, false, (ix + 1)*(iy + 1));
         }
       }
 

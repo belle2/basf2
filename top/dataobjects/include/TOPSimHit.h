@@ -31,7 +31,13 @@ namespace Belle2 {
         m_moduleID(0),
         m_barID(0),
         m_position(0, 0, 0),
+        m_gposition(0, 0, 0),
+        m_direction(0, 0, 0),
+        m_vposition(0, 0, 0),
+        m_vdirection(0, 0, 0),
         m_globalTime(0),
+        m_localTime(0),
+        m_length(0),
         m_energy(0),
         m_parentID(0),
         m_trackID(0) {
@@ -52,14 +58,26 @@ namespace Belle2 {
       int moduleID,
       int barID,
       TVector3 position,
+      TVector3 gposition,
+      TVector3 direction,
+      TVector3 vposition,
+      TVector3 vdirection,
       double globalTime,
+      double localTime,
+      double length,
       double energy,
       int parentID,
       int trackID):
         m_moduleID(moduleID),
         m_barID(barID),
         m_position(position),
+        m_gposition(gposition),
+        m_direction(direction),
+        m_vposition(vposition),
+        m_vdirection(vdirection),
         m_globalTime(globalTime),
+        m_localTime(localTime),
+        m_length(length),
         m_energy(energy),
         m_parentID(parentID),
         m_trackID(trackID) {
@@ -75,8 +93,26 @@ namespace Belle2 {
     //! Get local position of hit (in module coordinates)
     const TVector3& getPosition() const { return m_position; }
 
+    //! Get global position of hit (in module coordinates)
+    const TVector3& getGPosition() const { return m_gposition; }
+
+    //! Get global position of hit (in module coordinates)
+    const TVector3& getDirection() const { return m_direction; }
+
+    //! Get local position of hit (in module coordinates)
+    const TVector3& getVposition() const { return m_vposition; }
+
+    //! Get global position of hit (in module coordinates)
+    const TVector3& getVdirection() const { return m_vdirection; }
+
     //! Get global time of hit
     double getTime() const { return m_globalTime; }
+
+    //! Get global time of hit
+    double getEmissionTime() const { return m_localTime; }
+
+    //! Get track length
+    double getLength() const { return m_length; }
 
     //! Get detected photon energy
     double getEnergy() const { return m_energy; }
@@ -96,6 +132,9 @@ namespace Belle2 {
     //! Set local position of hit (in module coordinates)
     void setPosition(double x, double y, double z) { m_position.SetXYZ(x, y, z); }
 
+    //! Set global position of hit (in module coordinates)
+    void setGPosition(double x, double y, double z) { m_gposition.SetXYZ(x, y, z); }
+
     //! Set global time of hit
     void setTime(double globalTime) { m_globalTime = globalTime; }
 
@@ -111,8 +150,14 @@ namespace Belle2 {
   private:
     int m_moduleID;           /**< ID number of module that registered hit*/
     int m_barID;           /**< ID number of bar that registered hit*/
-    TVector3 m_position;      /**< Local position of hit (in module coordinates) */
+    TVector3 m_position;
+    TVector3 m_gposition;
+    TVector3 m_direction;
+    TVector3 m_vposition;
+    TVector3 m_vdirection;
     double m_globalTime;      /**< Global time of hit */
+    double m_localTime;
+    double m_length;
     double m_energy;          /**< Energy of detected photon */
     int m_parentID;        /**< G4 ID number of photons parent particle */
     int m_trackID;        /**< G4 ID number of photons track */

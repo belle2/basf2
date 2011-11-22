@@ -31,8 +31,12 @@ namespace Belle2 {
         m_particleID(-1),
         m_charge(0),
         m_position(0, 0, 0),
+        m_sposition(0, 0, 0),
         m_momentum(0, 0, 0),
+        m_smomentum(0, 0, 0),
         m_length(0.),
+        m_globaltime(0.),
+        m_localtime(0.),
         m_eL(0.),
         m_muL(0.),
         m_piL(0.),
@@ -49,7 +53,9 @@ namespace Belle2 {
      \param particleID particle PDG id number
      \param charge the charge of the track
      \param position vector of track position on quartz bar plane
+     \param production vertex
      \param momentum vector of track momentum on quarz bar plane
+     \param production momentum
      \param eL electron likelihood
      \param eL electron likelihood
      \param eL electron likelihood
@@ -63,8 +69,13 @@ namespace Belle2 {
       int particleID,
       int charge,
       TVector3 position,
+      TVector3 sposition,
       TVector3 momentum,
+      TVector3 smomentum,
+      int barID,
       double length,
+      double globaltime,
+      double localtime,
       double eL,
       double muL,
       double piL,
@@ -77,8 +88,13 @@ namespace Belle2 {
       m_particleID = particleID;
       m_charge = charge;
       m_position = position;
+      m_sposition = sposition;
       m_momentum = momentum;
+      m_smomentum = smomentum;
+      m_barID = barID;
       m_length = length;
+      m_globaltime = globaltime;
+      m_localtime = localtime;
       m_eL = eL;
       m_muL = muL;
       m_piL = piL;
@@ -100,11 +116,26 @@ namespace Belle2 {
     //! Get track position (at entrance into bar)
     const TVector3 &getPosition() const { return m_position; }
 
+    //! Get vertex position (at entrance into bar)
+    const TVector3 &getVPosition() const { return m_sposition; }
+
     //! Get track momentum  (at entrance into bar)
     const TVector3 &getMomentum() const { return m_momentum; }
 
+    //! Get track momentum  (at entrance into bar)
+    const TVector3 &getVMomentum() const { return m_smomentum; }
+
+    //! Get barID
+    int getBarID() const { return m_barID;}
+
     //! Get track length
     double getLength() const { return m_length; }
+
+    //! Get track length
+    double getGlobalTime() const { return m_globaltime; }
+
+    //! Get track length
+    double getLocalTime() const { return m_localtime; }
 
     //! get electron likelihood
     double getElectronLikelihood() const { return m_eL;}
@@ -139,8 +170,17 @@ namespace Belle2 {
     //! Set track position (at entrance in 1. aerogel plane)
     void setPosition(TVector3 position) { m_position = position; }
 
+    //! Set vertex position
+    void setVPosition(TVector3 sposition) { m_sposition = sposition; }
+
     //! Set track momentum  (at entrance in 1. aerogel plane)
     void setMomentum(TVector3 momentum) { m_momentum = momentum; }
+
+    //! Set track momentum  (at entrance in 1. aerogel plane)
+    void setVMomentum(TVector3 smomentum) { m_smomentum = smomentum; }
+
+    //! set track charge
+    void setBarID(int barID) {m_barID = barID;}
 
     //! Set track length
     void setLength(double length) { m_length = length; }
@@ -173,8 +213,13 @@ namespace Belle2 {
     int m_particleID;          /**< particle PDG id number */
     int m_charge;               /**< charge of track */
     TVector3 m_position;       /**< track position (at entrance in 1. aerogel plane) */
+    TVector3 m_sposition;       /**< track position (at entrance in 1. aerogel plane) */
     TVector3 m_momentum;       /**< track position (at entrance in 1. aerogel plane) */
+    TVector3 m_smomentum;       /**< track position (at entrance in 1. aerogel plane) */
+    int m_barID;                /**< barid of the hit */
     double m_length;          /**< track length */
+    double m_globaltime;
+    double m_localtime;
     double m_eL;            /**< electron likelihood */
     double m_muL;            /**< muon likelihood */
     double m_piL;            /**< pion likelihood */

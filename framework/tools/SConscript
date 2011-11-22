@@ -2,6 +2,6 @@ Import('env')
 
 env['TOOLS_LIBS']['basf2'] = ['$XML_LIBS', 'framework_pybasf2', 'framework',
                               'boost_filesystem', 'boost_program_options', 'boost_python', 'boost_system',
-                              '$PYTHON_LIBS']
+                              '$PYTHON_LIBS', '$ROOT_LIBS']
 
 Return('env')

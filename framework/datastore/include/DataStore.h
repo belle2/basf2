@@ -237,28 +237,32 @@ template <class T> bool Belle2::DataStore::handleObject(const std::string& name,
                                                         const Belle2::DataStore::EDurability& durability,
                                                         bool generate, T*& AObject)
 {
-  std::pair<Belle2::DataStore::StoreObjIter, bool> result = m_objectMap[durability].insert(make_pair(name, AObject));
+  const bool object_found = (m_objectMap[durability].find(name) != m_objectMap[durability].end());
 
-  if (result.second && (!initializeActive)) {    // new slot in map was created, should only happen in the initialize phase
-    B2ERROR("initializeActive is false while you try to create an object " << name << " under EDurability " << durability << " for first time.");
-  }
-
-  if (result.first->second) {                                         // map slot is occupied
-    generate = result.second;                                         // True, if occupier is AObject, false otherwise
-    B2DEBUG(250, "Crash is coming if there is no valid object with name " << name << " and durability " << durability << ".");
-    if (!dynamic_cast<T*>(result.first->second)) {                    // object is of different type than requested
-      B2FATAL("Existing object is of different type than requested one. Name was: " <<  name << " EDurability was " << durability);
+  if (!object_found || m_objectMap[durability][name] == 0) {
+    // new slot in map needs to be created
+    if (!object_found && generate && !initializeActive) {
+      // should only happen in the initialize phase
+      //shall soon be replaced with a B2ERROR message
+      B2WARNING("initializeActive is false while you try to create an object " << name << " under EDurability " << durability);
     }
-    AObject  = static_cast<T*>(result.first->second);                 // assignment in case there was already an object before function call
-
-  } else if (AObject) {                                               // map slot is not occupied by an actual object, so ...
-    generate = true;
-    result.first->second = AObject;                                   // ... make use of existing map slot with NULL pointer for storage
-
-  } else if (generate) {                                              // ... or generate one if requested
-    AObject =  new T;
-    result.first->second = AObject;
-    B2DEBUG(100, "Object with name " << name << " and durability " << durability << " was created.");
+    if (AObject == 0 && generate) {
+      AObject = new T;
+      B2DEBUG(100, "Object with name " << name << " and durability " << durability << " was created.");
+    }
+    if (AObject != 0)
+      m_objectMap[durability][name] = AObject;
+  } else {
+    //object found
+    if (AObject != 0) { //and new one given...
+      B2INFO("Found existing object '" << name << "', overwriting.");
+      delete m_objectMap[durability][name];
+      m_objectMap[durability][name] = AObject;
+    }
+    AObject = dynamic_cast<T*>(m_objectMap[durability][name]);
+    if (AObject == 0) {
+      B2ERROR("Existing object '" << name << "' of type " << m_objectMap[durability][name]->ClassName() << " doesn't match requested type " << T::Class()->GetName());
+    }
   }
 
   return generate;
@@ -269,27 +273,37 @@ template <class T> bool Belle2::DataStore::handleArray(const std::string& name,
                                                        const Belle2::DataStore::EDurability& durability,
                                                        TClonesArray*& array)
 {
-  std::pair<Belle2::DataStore::StoreArrayIter, bool> result = m_arrayMap[durability].insert(make_pair(name, array));
+  const bool register_new_array = (m_arrayMap[durability].find(name) == m_arrayMap[durability].end());
 
-  if (result.second) {                                         // new slot in map was created
-    if (!initializeActive) {                                   // should only happen in the initialize phase
+  if (register_new_array) { // new slot in map needs to be created
+    if (!initializeActive) { // should only happen in the initialize phase
       //shall soon be replaced with an B2ERROR message
       B2WARNING("initializeActive is false while you try to create an array " << name << " under EDurability " << durability);
     }
-    if (!(result.first->second)) {                                     // if given with array = 0, ...
-      array =  new TClonesArray(T::Class());                           // use default constructor
-      result.first->second = array;
+    if (array == 0) {
+      array = new TClonesArray(T::Class()); // use default constructor
       B2DEBUG(100, "Array with name " << name << " and durability " << durability << " was created.");
     }
-  } else {                                                      // "else" because otherwise storing without knowing type doesn't work.
-    array = result.first->second;                               // This shall never be a NULL pointer at this point
-    B2DEBUG(250, "If someone deleted a TClonesArray under name " << name << " and durability " << durability << ", a crash is coming.");
-    if (!result.first->second->GetClass()->InheritsFrom(T::Class())) {      // TClonesArray in map slot is for different type than requested one
-      B2FATAL("Requested array type is not a base class of the existing array. Name was: " <<  name << " EDurability was " << durability);
+
+    //actually insert new array
+    m_arrayMap[durability][name] = array;
+  } else { //map already contains an array
+    if (array != 0) { //we have both a new array and an existing one, merge them.
+      B2INFO("Found existing array '" << name << "', merging.");
+      array->AbsorbObjects(m_arrayMap[durability][name]);
+      delete m_arrayMap[durability][name];
+      m_arrayMap[durability][name] = array;
+    }
+    array = m_arrayMap[durability][name];
+    B2DEBUG(250, "Attaching to existing TClonesArray with name " << name << " and durability " << durability << ".");
+
+    //assuming array != 0 (valid unless someone stored a null pointer in the DataStore)
+    if (!array->GetClass()->InheritsFrom(T::Class())) { // TClonesArray in map slot is for different type than requested one
+      B2FATAL("Requested array type (" << T::Class()->GetName() << ") is not a base class of the existing array (" << array->GetClass()->GetName() << "). Name was: " <<  name << " EDurability was " << durability);
     }
   }
 
-  return result.second;
+  return register_new_array;
 }
 
 #endif // DATASTORE_H

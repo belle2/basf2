@@ -261,7 +261,7 @@ template <class T> bool Belle2::DataStore::handleObject(const std::string& name,
     }
     AObject = dynamic_cast<T*>(m_objectMap[durability][name]);
     if (AObject == 0) {
-      B2ERROR("Existing object '" << name << "' of type " << m_objectMap[durability][name]->ClassName() << " doesn't match requested type " << T::Class()->GetName());
+      B2FATAL("Existing object '" << name << "' of type " << m_objectMap[durability][name]->ClassName() << " doesn't match requested type " << T::Class()->GetName());
     }
   }
 

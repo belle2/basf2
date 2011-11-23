@@ -72,7 +72,25 @@ namespace Belle2 {
      */
     double getRho() {return m_rho; } ;
 
+    /** Returns the layer number.
+     *
+     */
+    unsigned short int getLayerId() {return m_layerId; } ;
 
+    /** Returns the wire id.
+     *
+     */
+    unsigned short int getWireId() {return m_wireId; } ;
+
+    /** Returns the super layer id.
+     *
+     */
+    unsigned short int getSuperLayerId() {return m_superLayerId; } ;
+
+    /** Returns the sub layer id in the super layer.
+     *
+     */
+    unsigned short int getSubLayerId() {return m_subLayerId; } ;
 
 
   private:

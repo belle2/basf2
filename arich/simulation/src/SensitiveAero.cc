@@ -34,6 +34,10 @@ namespace Belle2 {
     {
       StoreArray<MCParticle> mcParticles;
       StoreArray<ARICHAeroHit>  arichAeroHits;
+      // popravi!
+      RelationArray arichAeroHitRel(arichAeroHits, mcParticles);
+      registerMCParticleRelation(arichAeroHitRel);
+
     }
 
     bool SensitiveAero::step(G4Step* aStep, G4TouchableHistory*)
@@ -72,6 +76,12 @@ namespace Belle2 {
         StoreArray<ARICHAeroHit> arichAeroHits;
         int nentr = arichAeroHits->GetLast() + 1;
         new(arichAeroHits->AddrAt(nentr)) ARICHAeroHit(trackID, PDGEncoding, TPosition, TMomentum);
+
+        // Create relation to MCParticle
+        StoreArray<MCParticle> mcParticles;
+        RelationArray  arichAeroHitRel(arichAeroHits, mcParticles);
+        arichAeroHitRel.add(nentr, trackID);
+
       }
       return true;
     }

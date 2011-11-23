@@ -20,6 +20,7 @@
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
+#include <framework/datastore/RelationIndex.h>
 #include <TVector3.h>
 
 using namespace std;
@@ -32,7 +33,7 @@ namespace Belle2 {
   {
     StoreArray<MCParticle> mcParticles;
     StoreArray<BeamBackHit> beamBackHits;
-    RelationArray  beamBackHitRel(mcParticles, beamBackHits);
+    RelationArray  beamBackHitRel(beamBackHits, mcParticles);
     registerMCParticleRelation(beamBackHitRel);
 
     std::string subDet = subDett;
@@ -88,6 +89,12 @@ namespace Belle2 {
       int nentr = beamBackHits->GetLast() + 1;
       new(beamBackHits->AddrAt(nentr)) BeamBackHit(m_subDet, m_identifier, pdgCode,
                                                    m_startTime, m_startEnergy, m_startPos, m_startMom, m_energyDeposit);
+
+
+      // create relation to MCParticle
+      StoreArray<MCParticle> mcParticles;
+      RelationArray beamBackHitRel(beamBackHits, mcParticles);
+      beamBackHitRel.add(nentr, m_trackID);
 
       //Reset TrackID
       m_trackID = 0;

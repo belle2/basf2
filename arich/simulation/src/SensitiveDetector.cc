@@ -18,6 +18,7 @@
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
+#include <framework/datastore/RelationIndex.h>
 #include <TVector3.h>
 
 using namespace std;
@@ -31,7 +32,7 @@ namespace Belle2 {
       StoreArray<MCParticle> mcParticles;
       StoreArray<ARICHSimHit>  arichSimHits;
 
-      RelationArray  arichSimHitRel(mcParticles, arichSimHits);
+      RelationArray  arichSimHitRel(arichSimHits, mcParticles);
       registerMCParticleRelation(arichSimHitRel);
     }
 
@@ -62,6 +63,8 @@ namespace Belle2 {
 
       //Get ID of parent particle
       const G4int parentID = track.GetParentID();
+      //Get id of particle
+      const G4int trackID = track.GetTrackID();
 
       //------------------------------------------------------------
       //                Create ARICHSimHit and save it to datastore
@@ -71,6 +74,11 @@ namespace Belle2 {
       StoreArray<ARICHSimHit> arichSimHits;
       int nentr = arichSimHits->GetLast() + 1;
       new(arichSimHits->AddrAt(nentr)) ARICHSimHit(moduleID, locpos, globalTime, energy, parentID);
+
+      // add relation to MCParticle
+      StoreArray<MCParticle> mcParticles;
+      RelationArray  arichSimHitRel(arichSimHits, mcParticles);
+      arichSimHitRel.add(nentr, trackID);
 
       // after detection photon track is killed
       track.SetTrackStatus(fStopAndKill);

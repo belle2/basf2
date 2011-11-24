@@ -33,6 +33,7 @@ class CLIParams:
     maxevents = None
     numberOfFiles = 1
     userdata = None
+    site = None
     LogLevel = 'WARN'
 
     def __init__(self):  # hanyl added
@@ -113,7 +114,13 @@ class CLIParams:
         '''set the project name for user data'''
 
         self.userdata = arg.strip()
-        return DIRAC.S_ERROR
+        return DIRAC.S_OK
+
+    def setSite(self, arg):
+        '''set the site name to which you want to submit'''
+
+        self.site = arg.strip()
+        return DIRAC.S_OK
 
     def setLogLevel(self, arg):
         '''set the LogLevel'''
@@ -162,6 +169,9 @@ class CLIParams:
 
     def getLogLevel(self):
         return self.LogLevel
+
+    def getSite(self):
+        return self.site
 
     def showHelp(self, dummy=False):
         """
@@ -224,6 +234,9 @@ class CLIParams:
         Script.registerSwitch('u:', 'userdata=',
                               '(optional) The project naem of user data',
                               self.setUserData)
+        Script.registerSwitch('', 'site=',
+                              '(optional) The site name to which you want to submit'
+                              , self.setSite)
         Script.registerSwitch('', 'LogLevel=', 'Log Level', self.setLogLevel)
 
         # Script.addDefaultOptionValue('LogLevel', 'debug')
@@ -249,6 +262,7 @@ class CLIParams:
                 'numberOfFiles': 'setNumberOfFiles',
                 'userdata': 'setUserData',
                 'LogLevel': 'setLogLevel',
+                'site': 'setSite',
                 }
       # read the options
             f = open(self.steering_file)

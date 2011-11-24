@@ -129,6 +129,7 @@ def main():
             cliParams.getSwVer(),
             tar,
             numberOfJobs,
+            cliParams.getSite(),
             )
         subresult = dirac.submit(jdl)
         if subresult['OK']:

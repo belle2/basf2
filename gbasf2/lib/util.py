@@ -69,6 +69,7 @@ def make_jdl(
     swver,
     tar,
     num=0,
+    site='',
     ):
     '''make_jdl takes the options defined by the user and and lfn and makes a basic
        JDL file. This is then written into a temporary file in the same directory.
@@ -91,6 +92,8 @@ def make_jdl(
     f.write('    JobName = ' + os.path.basename(lfn) + ';\n')
     f.write('    PilotType = "private";\n')
     f.write('    SystemConfig = ' + sysconfig + ';\n')
+    if site != '':
+        f.write('    Site = ' + site + ';\n')
     f.write('    Requirements = Member("VO-belle-' + swver
             + '",other.GlueHostApplicationSoftwareRunTimeEnvironment);\n')
     f.write('    InputSandbox = \n')

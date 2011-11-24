@@ -25,8 +25,8 @@ class CLIParams:
     project = 'Ungrouped'
     priority = 0
     query = None
-    swver = 'release-00-01-00'
-    sysconfig = 'Belle-v2r1'
+    swver = 'build-2011-07-01'
+    sysconfig = 'Belle-v2r2'
     datatype = None
     experiments = None
     inputsandboxfiles = []

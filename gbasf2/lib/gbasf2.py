@@ -75,25 +75,28 @@ def main():
 
   # deal with empty queries
     if results == {}:
-        print 'Query returned no results - do you want to run with no input?'
-        noinput = raw_input('Y/N')
-        if noinput == 'Y':
-            results[0] = {}
-            events = raw_input('How many events are you generating?')
-            try:
-                int(events)
-            except ValueError:
-                print 'Number of events needs to be an integer'
-                DIRAC.exit(1)
+        results[0] = {}
+        results[0]['lfn'] = 'None'
+        results[0]['events'] = ''
+        # print 'Query returned no results - do you want to run with no input?'
+        # noinput = raw_input('Y/N')
+        # if noinput == 'Y':
+        #    results[0] = {}
+        #    events = raw_input('How many events are you generating?')
+        #    try:
+        #        int(events)
+        #    except ValueError:
+        #        print 'Number of events needs to be an integer'
+        #        DIRAC.exit(1)
 
-            results[0]['lfn'] = 'None'
-            results[0]['events'] = events
-        elif noinput == 'N':
+        #    results[0]['lfn'] = 'None'
+        #    results[0]['events'] = events
+        # elif noinput == 'N':
 
-            DIRAC.exit(1)
-        else:
-            print 'Unhandled value. Exiting'
-            DIRAC.exit(1)
+        #    DIRAC.exit(1)
+        # else:
+        #    print 'Unhandled value. Exiting'
+        #    DIRAC.exit(1)
 
   # create the input sandbox
     tar = make_tar(cliParams.getProject(), cliParams.getInputFiles())
@@ -156,7 +159,7 @@ def main():
 
     print str(totalevents) + ' events to process!'
   # FIXME - retrieve this URL automatically from DIRAC
-    print 'Now visit https://kek2-dirac.cc.kek.jp:15043/DIRAC/systems/projects/overview and select Project ' \
+    print 'Now visit https://besdirac01.ihep.ac.cn/DIRAC/BELLE_Production/belle/systems/projects/overview  and select Project ' \
         + cliParams.getProject()
     DIRAC.exit(exitCode)
 

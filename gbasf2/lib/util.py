@@ -145,7 +145,24 @@ def prepareProxy():
        return proxy infomation if proxy is generated correctly
     '''
 
+    from DIRAC.Core.Base import Script
+    Script.enableCS()
+    Script.parseCommandLine(ignoreErrors=True)
     proxyinfo = getProxyInfo()
+    timeleft = int(proxyinfo['Value']['secondsLeft'])
+    timeleft /= 3600
+    print "The proxy will be despired after %s hours. Do you want to continue \
+or to generate a new proxy?" \
+        % timeleft
+
+    user_choice = raw_input('Please input C or G: ')
+    if user_choice.upper() == 'C':
+        return proxyinfo
+    elif user_choice.upper() != 'G':
+        print 'You should give C or G'
+        import sys
+        sys.exit(-1)
+
     if not proxyinfo['OK'] or 'username' not in proxyinfo['Value'].keys():
         print 'No proxy found - trying to generate one'
         proxyparams = DIRAC.FrameworkSystem.Client.ProxyGeneration.CLIParams()

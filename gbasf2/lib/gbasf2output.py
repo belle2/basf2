@@ -60,12 +60,16 @@ def main():
         se = selist['Value'][0]
         print 'trying to use SE: ' + se
         inputfiles = []
-        for jdlline in open(glob.glob('../*.jdl')[0].rstrip()):
-            if 'LFN' in jdlline:
-                inputfiles.append(os.path.basename(jdlline)[0:-3])
-        gLogger.debug('The inputfiles with lfn are %s' % str(inputfiles))
-        gLogger.debug('The inputfiles written in the jdl is %s'
-                      % str(cliParams.getInputFiles()))
+        try:
+            for jdlline in open(glob.glob('../*.jdl')[0].rstrip()):
+                if 'LFN' in jdlline:
+                    inputfiles.append(os.path.basename(jdlline)[0:-3])
+            gLogger.debug('The inputfiles with lfn are %s' % str(inputfiles))
+            gLogger.debug('The inputfiles written in the jdl is %s'
+                          % str(cliParams.getInputFiles()))
+        except:
+            gLogger.info('There is no jdl file in the parent directory')
+            pass
 
         # XXX need a better way to determine output files
         for outputfile in glob.glob('*.root'):

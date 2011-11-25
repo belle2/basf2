@@ -238,6 +238,7 @@ template <class T> bool Belle2::DataStore::handleObject(const std::string& name,
                                                         bool generate, T*& AObject)
 {
   const bool object_found = (m_objectMap[durability].find(name) != m_objectMap[durability].end());
+  bool store_successful = false; //true when new object created or given AObject was inserted
 
   if (!object_found || m_objectMap[durability][name] == 0) {
     // new slot in map needs to be created
@@ -249,6 +250,7 @@ template <class T> bool Belle2::DataStore::handleObject(const std::string& name,
     if (AObject == 0 && generate) {
       AObject = new T;
       B2DEBUG(100, "Object with name " << name << " and durability " << durability << " was created.");
+      store_successful = true;
     }
     if (AObject != 0)
       m_objectMap[durability][name] = AObject;
@@ -258,6 +260,7 @@ template <class T> bool Belle2::DataStore::handleObject(const std::string& name,
       B2INFO("Found existing object '" << name << "', overwriting.");
       delete m_objectMap[durability][name];
       m_objectMap[durability][name] = AObject;
+      store_successful = true;
     }
     AObject = dynamic_cast<T*>(m_objectMap[durability][name]);
     if (AObject == 0) {
@@ -265,7 +268,7 @@ template <class T> bool Belle2::DataStore::handleObject(const std::string& name,
     }
   }
 
-  return generate;
+  return store_successful;
 }
 
 

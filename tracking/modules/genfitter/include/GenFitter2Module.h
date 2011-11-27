@@ -69,6 +69,7 @@ namespace Belle2 {
     double m_blowUpFactor;
     bool m_filter;
     bool m_useDaf;
+    int m_nGFIter;
 
 
   };

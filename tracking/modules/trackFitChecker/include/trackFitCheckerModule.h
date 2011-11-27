@@ -32,9 +32,10 @@
 #include <svd/dataobjects/SVDTrueHit.h>
 #include <pxd/dataobjects/PXDRecoHit.h>
 #include <svd/dataobjects/SVDRecoHit2D.h>
-
+#include <cdc/dataobjects/CDCRecoHit.h>
 #include <vector>
 #include <fstream>
+#include <sstream>
 #include <string>
 #include <map>
 #include <iostream>
@@ -127,7 +128,8 @@ namespace Belle2 {
     void printTrackWiseStatistics(const std::string& nameOfDataSample);
     void printTrackWiseVecStatistics(const std::string& nameOfDataSample, const std::vector<std::string>& trackWiseVarNames);
     void fillLayerWiseData(const std::string& nameOfDataSample, const int accuVecIndex, const std::vector<double>& newData);
-
+    void fillTrackWiseVecData(const std::string& nameOfDataSample, const std::vector<double>& newData);
+    void fillTrackWiseData(const std::string& nameOfDataSample, const double newData);
   private:
     int m_nSiLayers; // number of Si layers. That is 6 of course.
     int m_nPxdLayers; // number of PXD layer (2) so number of SVD layers will be m_nSiLayers - m_nPxdLayers
@@ -172,7 +174,14 @@ namespace Belle2 {
     int m_nDigits;
     bool m_useTruthInfo;
     bool m_testPrediction;
+    //output
+    bool m_writeToB2info;
+    std::string m_testOutputFileName;
+    std::stringstream m_textOutput;
 
+    bool m_writeToFile;
+    int m_nCdcLayers;
+    int m_nLayers;
   };
 }
 

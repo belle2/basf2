@@ -28,7 +28,7 @@
 #include <tracking/gfbfield/GFGeant4Field.h>
 
 #include <GFTrack.h>
-//#include <GFKalman2.h>
+#include <GFKalman2.h>
 #include <GFKalman.h>
 #include <GFDaf.h>
 #include <GFRecoHitProducer.h>
@@ -53,6 +53,8 @@
 #include <GFDetPlane.h>
 #include <GFTools.h>
 
+#include <TRandom.h>
+
 using namespace std;
 using namespace Belle2;
 
@@ -62,10 +64,13 @@ GenFitter2Module::GenFitter2Module() :
     Module()
 {
 
-  setDescription("Uses GenFit to fit tracks within the CDC. Can fit the MCTracks or Tracks provided by the CDCTrackingModule.");
+  setDescription("Simplified trackfit module with for testing and debugging");
   addParam("useDaf", m_useDaf, "use the DAF instead of the std. Kalman filter", false);
   addParam("blowUpFactor", m_blowUpFactor, "factor multiplied with the cov of the Kalman filter when backward filter starts", 500.0);
   addParam("filter", m_filter, "throw away tracks with do not have exactly 1 hit in every Si layer", false);
+  addParam("filterIterations", m_nGFIter, "number of Genfit iterations", 1);
+
+
 }
 
 GenFitter2Module::~GenFitter2Module()
@@ -76,6 +81,7 @@ void GenFitter2Module::initialize()
 {
   geometry::GeometryManager &geoManager = geometry::GeometryManager::getInstance();
   geoManager.createTGeoRepresentation();
+  //gRandom->SetSeed(1);
 }
 
 void GenFitter2Module::beginRun()
@@ -217,8 +223,8 @@ void GenFitter2Module::event()
     //Initialize fitting algorithm and process track
 //  if((nHitsL1 == 1 and nHitsL2 == 1 and nHitsL3 == 1 and nHitsL4 == 1 and nHitsL5 == 1 and nHitsL6 == 1) or m_noFilter == true){
     if (m_useDaf == false) {
-      GFKalman kalmanFilter;
-      kalmanFilter.setNumIterations(1);
+      GFKalman2 kalmanFilter;
+      kalmanFilter.setNumIterations(m_nGFIter);
       kalmanFilter.setBlowUpFactor(m_blowUpFactor);
       kalmanFilter.processTrack(&track);
     } else {
@@ -247,12 +253,13 @@ void GenFitter2Module::event()
 
 void GenFitter2Module::endRun()
 {
-  if (m_failedFitCounter != 0) {
-    B2WARNING(m_failedFitCounter << " of " << m_fitCounter + m_failedFitCounter + m_notPerfectCounter << " tracks could not be fitted in this run");
-  }
   if (m_notPerfectCounter != 0) {
     B2WARNING(m_notPerfectCounter << " of " << m_fitCounter + m_failedFitCounter + m_notPerfectCounter << " tracks had not exaclty on hit in every layer and were not fitted");
   }
+  if (m_failedFitCounter != 0) {
+    B2WARNING(m_failedFitCounter << " of " << m_fitCounter + m_failedFitCounter << " tracks could not be fitted in this run");
+  }
+
 }
 
 void GenFitter2Module::terminate()

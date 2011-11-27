@@ -32,10 +32,12 @@ trackFitCheckerModule::trackFitCheckerModule() : Module()
   addParam("outputFileName", m_dataOutFileName, "Output file name", string("forwardData.txt"));
   //addParam("outputFileName2", m_dataOutFileName2, "Output file name2", string("tfcpvalues.txt"));
   addParam("totalChi2Cut", m_totalChi2Cut, "only tracks with a total χ² lower than this value will be considered", 1E300);
-  addParam("testSi", m_testSi, "execute additionlly the Si only tests", false);
-  //addParam("testCdc", m_testCdc, "execute additionlly the CDC only tests", false);
+  addParam("testSi", m_testSi, "execute additionally the Si only tests", false);
+  //addParam("testCdc", m_testCdc, "execute additionally the CDC only tests", false);
   addParam("useTruthInfo", m_useTruthInfo, "use the truth info from the geant4 simulation", false);
-  addParam("testPrediction", m_testPrediction, "additionlly test the predicted state vecs from the Kalman filter. ONLY WOKRKS IF THEY ARE SAVED DURING FITTING WHICH IS NOT THE DEFAULT", false);
+  addParam("testPrediction", m_testPrediction, "Additionally test the predicted state vecs from the Kalman filter. ONLY WOKRKS IF THEY ARE SAVED DURING FITTING WHICH IS NOT THE DEFAULT", false);
+  addParam("writeToB2info", m_writeToB2info, "Set to True if you want the results of the statistical tests written out with the B2INFO command", true);
+  //Module::getParam(string("writeToB2info"));
 }
 
 
@@ -46,11 +48,16 @@ trackFitCheckerModule::~trackFitCheckerModule()
 
 void trackFitCheckerModule::initialize()
 {
+
+  //configure the output
+  //Module::getParam(string("writeToB2info"));
+  m_testOutputFileName = "statisticaltests.txt";
+  m_writeToFile = true;
   m_nDigits = 4;
-  m_nSiLayers = 6;
   m_nPxdLayers = 2;
-  //m_nCdcLayers = 0;
+  m_nCdcLayers = 0;
   m_nSvdLayers = 4;
+  m_nLayers = m_nPxdLayers + m_nSvdLayers + m_nCdcLayers;
   m_dataOut.open(m_dataOutFileName.c_str());
   //m_dataOut2.open(m_dataOutFileName2.c_str());
   m_dataOut.precision(14);
@@ -64,10 +71,6 @@ void trackFitCheckerModule::initialize()
 
 
   //make all vector of vectors have the size of the number of current layers in use
-
-  //map<string, vector<vector<double> > >::const_iterator iter = m_layerWiseDataSamples.begin();
-  //map<string, vector<vector<double> > >::const_iterator iterMax = m_layerWiseDataSamples.end();
-
   int vecSizeTruthTest = 6 + 1; //the +1 is for the uv subcov
   int vecSizeMeasTest = 3;
   //int measDim = 2;
@@ -91,7 +94,8 @@ void trackFitCheckerModule::initialize()
 
   // pulls (z) of cartesian coordinates of innermost hit and vertex
   m_trackWiseDataVecSamples["zs_vertexPosMom"].resize(6);
-
+  // residuals of Cartesian coordinates of innermost hit and vertex
+  m_trackWiseDataVecSamples["res_vertexPosMom"].resize(6);
   // pulls (z) and chi2s for the 5 track parameters in every layer using truth info
   resizeLayerWiseData("zs_and_chi2_fp_t", vecSizeTruthTest);
   resizeLayerWiseData("zs_and_chi2_fu_t", vecSizeTruthTest);
@@ -153,16 +157,16 @@ void trackFitCheckerModule::event()
   //cout << m_eventCounter << " " << flush;
   for (int i = 0; i not_eq nFittedTracks; ++i) {
 
-    GFTrack* aTrackPtr = fittedTracks[i];
+    GFTrack* const aTrackPtr = fittedTracks[i];
     const int mcParticleIndex = aTrackPtr->getCand().getMcTrackId();
 
-    double charge = aMcParticleArray[mcParticleIndex]->getCharge();
-    TVector3 trueVertexMom = aMcParticleArray[mcParticleIndex]->getMomentum();
-    TVector3 trueVertexPos = aMcParticleArray[mcParticleIndex]->getVertex();
+    const double charge = aMcParticleArray[mcParticleIndex]->getCharge();
+    const TVector3 trueVertexMom = aMcParticleArray[mcParticleIndex]->getMomentum();
+    const TVector3 trueVertexPos = aMcParticleArray[mcParticleIndex]->getVertex();
     //GFAbsTrackRep* propOnlyTrRepPtr = new RKTrackRep(trackCandidates[i]);
 
 
-    double chi2tot_bu = aTrackPtr->getChiSqu(); // returns the total chi2 from the backward filter
+    const double chi2tot_bu = aTrackPtr->getChiSqu(); // returns the total chi2 from the backward filter
     if (chi2tot_bu > m_totalChi2Cut) {
       //consider this track to be an outlier and discard it
       ++m_nCutawayTracks;
@@ -171,36 +175,38 @@ void trackFitCheckerModule::event()
       const double chi2tot_fu = aTrackPtr->getForwardChiSqu();
       m_dataOut << m_eventCounter << "\t" << m_processedTracks << "\t" << chi2tot_fu;
       const int ndf = aTrackPtr->getNDF();
-      double pValue_bu = TMath::Prob(chi2tot_bu, ndf); // actually the p value would be 1-TMath::Prob(chi2tot, ndf) but particle physicists want to have it this way.
-      double pValue_fu = TMath::Prob(chi2tot_fu, ndf);
-      m_trackWiseDataSamples["pValue_bu"](pValue_bu);
-      m_trackWiseDataSamples["pValue_fu"](pValue_fu);
-
+      const double pValue_bu = TMath::Prob(chi2tot_bu, ndf); // actually the p value would be 1-TMath::Prob(chi2tot, ndf) but particle physicists want to have it this way.
+      const double pValue_fu = TMath::Prob(chi2tot_fu, ndf);
+      fillTrackWiseData("pValue_bu", pValue_bu);
+      fillTrackWiseData("pValue_fu", pValue_fu);
       TVector3 vertexPos;
       TVector3 vertexMom;
       TMatrixT<double> vertexCov(6, 6);
       vector<double> zVertexPosMom(6);
+      vector<double> resVertexPosMom(6);
       TVector3 poca; //point of closest approach will be overwritten
       TVector3 dirInPoca; //direction of the track at the point of closest approach will be overwritten
       aTrackPtr->getCardinalRep()->extrapolateToPoint(trueVertexPos, poca, dirInPoca); //goto vertex position
       GFDetPlane plane(poca, dirInPoca); //get plane through fitted vertex position
       double vertexAbsMom = aTrackPtr->getMom(plane).Mag(); //get fitted momentum at fitted vertex
-      m_trackWiseDataSamples["absMomVertex"](vertexAbsMom);
+      fillTrackWiseData("absMomVertex", vertexAbsMom);
       m_dataOut << "\t" << vertexAbsMom;
       aTrackPtr->getPosMomCov(plane, vertexPos, vertexMom, vertexCov);
-      zVertexPosMom[0] = (vertexPos[0] - trueVertexPos[0]) / sqrt(vertexCov[0][0]);
-      zVertexPosMom[1] = (vertexPos[1] - trueVertexPos[1]) / sqrt(vertexCov[1][1]);
-      zVertexPosMom[2] = (vertexPos[2] - trueVertexPos[2]) / sqrt(vertexCov[2][2]);
-      zVertexPosMom[3] = (vertexMom[0] - trueVertexMom[0]) / sqrt(vertexCov[3][3]);
-      zVertexPosMom[4] = (vertexMom[1] - trueVertexMom[1]) / sqrt(vertexCov[4][4]);
-      zVertexPosMom[5] = (vertexMom[2] - trueVertexMom[2]) / sqrt(vertexCov[5][5]);
-
+      resVertexPosMom[0] = (vertexPos[0] - trueVertexPos[0]);
+      resVertexPosMom[1] = (vertexPos[1] - trueVertexPos[1]);
+      resVertexPosMom[2] = (vertexPos[2] - trueVertexPos[2]);
+      resVertexPosMom[3] = (vertexMom[0] - trueVertexMom[0]);
+      resVertexPosMom[4] = (vertexMom[1] - trueVertexMom[1]);
+      resVertexPosMom[5] = (vertexMom[2] - trueVertexMom[2]);
+      fillTrackWiseVecData("res_vertexPosMom", resVertexPosMom);
+      zVertexPosMom[0] = resVertexPosMom[0] / sqrt(vertexCov[0][0]);
+      zVertexPosMom[1] = resVertexPosMom[1] / sqrt(vertexCov[1][1]);
+      zVertexPosMom[2] = resVertexPosMom[2] / sqrt(vertexCov[2][2]);
+      zVertexPosMom[3] = resVertexPosMom[3] / sqrt(vertexCov[3][3]);
+      zVertexPosMom[4] = resVertexPosMom[4] / sqrt(vertexCov[4][4]);
+      zVertexPosMom[5] = resVertexPosMom[5] / sqrt(vertexCov[5][5]);
       m_trackWiseDataVecSamples["zs_vertexPosMom"][0](zVertexPosMom[0]);
-      m_trackWiseDataVecSamples["zs_vertexPosMom"][1](zVertexPosMom[1]);
-      m_trackWiseDataVecSamples["zs_vertexPosMom"][2](zVertexPosMom[2]);
-      m_trackWiseDataVecSamples["zs_vertexPosMom"][3](zVertexPosMom[3]);
-      m_trackWiseDataVecSamples["zs_vertexPosMom"][4](zVertexPosMom[4]);
-      m_trackWiseDataVecSamples["zs_vertexPosMom"][5](zVertexPosMom[5]);
+      fillTrackWiseVecData("zs_vertexPosMom", zVertexPosMom);
 
       //write stuff in helper class... to be able to make plots with the TBrowser... something better should be used in the future
       new(qualityIndicators->AddrAt(i)) TrackFitCheckerTempHelperClass();
@@ -214,6 +220,13 @@ void trackFitCheckerModule::event()
       qualityIndicators[i]->zVertexMomX = zVertexPosMom[3];
       qualityIndicators[i]->zVertexMomY = zVertexPosMom[4];
       qualityIndicators[i]->zVertexMomZ = zVertexPosMom[5];
+
+      qualityIndicators[i]->vertexPosX = vertexPos[0] - trueVertexPos[0];
+      qualityIndicators[i]->vertexPosY = vertexPos[1] - trueVertexPos[1];
+      qualityIndicators[i]->vertexPosZ = vertexPos[2] - trueVertexPos[2];
+      qualityIndicators[i]->vertexMomX = vertexMom[0] - trueVertexMom[0];
+      qualityIndicators[i]->vertexMomY = vertexMom[1] - trueVertexMom[1];
+      qualityIndicators[i]->vertexMomZ = vertexMom[2] - trueVertexMom[2];
 
       //now the layer wise tests
       if (m_testSi == true) {
@@ -238,29 +251,39 @@ void trackFitCheckerModule::event()
         int nHits = aTrackPtr->getNumHits();
         for (int iGFHit = 0; iGFHit not_eq nHits; ++iGFHit) {
           //first get the data from the hit
-          TMatrixT<double> H = aTrackPtr->getHit(iGFHit)->getHMatrix(aTrackPtr->getTrackRep(0)); // this should not work because in the module genfitter releaseHits() is called and getHit performs a boundary check. Why it works only Yoda knows
+          TMatrixT<double> H = aTrackPtr->getHit(iGFHit)->getHMatrix(aTrackPtr->getTrackRep(0));
           TMatrixT<double> HT(TMatrixT<double>::kTransposed, H); // the transposed is needed later
           TMatrixT<double> m = aTrackPtr->getHit(iGFHit)->getRawHitCoord(); //measurement of hit
           TMatrixT<double> V = aTrackPtr->getHit(iGFHit)->getRawHitCov(); //covariance matrix of hit
 
           //second get truth info or every GF recoHit
-          PXDRecoHit const*const aPxdRecoHitPtr = dynamic_cast<PXDRecoHit*>(aTrackPtr->getHit(iGFHit));
+          GFAbsRecoHit *const aGFAbsRecoHitPtr = aTrackPtr->getHit(iGFHit);
+          PXDRecoHit const*const aPxdRecoHitPtr = dynamic_cast<PXDRecoHit const * const>(aGFAbsRecoHitPtr);
+          SVDRecoHit2D const*const aSvdRecoHitPtr =  dynamic_cast<SVDRecoHit2D const * const>(aGFAbsRecoHitPtr);
+          CDCRecoHit *const aCdcRecoHitPtr = dynamic_cast<CDCRecoHit * const>(aGFAbsRecoHitPtr); // cannot use the additional const here because the getter fuctions inside the CDCRecoHit class are not decleared as const (although they could be const)
+          int accuVecIndex; //this is an index to sort the info from one layer in the corresponding statistics container
           if (aPxdRecoHitPtr not_eq NULL) {
             PXDTrueHit const*const aTrueHitPtr = aPxdRecoHitPtr->getTrueHit();
             hitLayerId = aTrueHitPtr->getSensorID().getLayer();
             pTrue = aTrueHitPtr->getMomentum();
             uTrue = aTrueHitPtr->getU();
             vTrue = aTrueHitPtr->getV();
-          } else {
-            SVDRecoHit2D const*const aSvdRecoHitPtr = static_cast<SVDRecoHit2D*>(aTrackPtr->getHit(iGFHit));
+            accuVecIndex = hitLayerId - 1;
+          } else if (aSvdRecoHitPtr not_eq NULL) {
             SVDTrueHit const*const aTrueHitPtr = aSvdRecoHitPtr->getTrueHit();
             hitLayerId = aTrueHitPtr->getSensorID().getLayer();
             pTrue = aTrueHitPtr->getMomentum();
             uTrue = aTrueHitPtr->getU();
             vTrue = aTrueHitPtr->getV();
+            accuVecIndex = hitLayerId - 1;
+          } else if (aCdcRecoHitPtr not_eq NULL) {
+            hitLayerId = aCdcRecoHitPtr->getLayerId();// at the moment the CDCRecoHit class does not have any getters its content
+            accuVecIndex = hitLayerId + m_nPxdLayers + m_nSvdLayers;
+          } else {
+            //error non supported type of recoHit
           }
 
-          const int accuVecIndex = hitLayerId - 1;
+
 
           //cout << "m"; m.Print();cout << "V"; V.Print();
           // build the true state vector x_t all in local coordinates
@@ -276,11 +299,9 @@ void trackFitCheckerModule::event()
           truthTests = calcZs(res, V);
           truthTests.push_back(calcChi2(res, V));
           fillLayerWiseData("zs_and_chi2_meas_t", accuVecIndex, truthTests);
-//
+
           GFTools::getBiasedSmoothedData(aTrackPtr, 0, iGFHit, state, cov);
-//            cout << "smoother";
-//            state.Print();
-//            cov.Print();
+
           res = m - H * state;
           R = V - H * cov * HT;
           if (R[0][0] <= 0.0 or R[1][1] <= 0.0) {
@@ -293,7 +314,6 @@ void trackFitCheckerModule::event()
           // now calculate test qunatites with smoothed state vec and cov and the true state vec
           fillLayerWiseData("zs_and_chi2_sm_t", accuVecIndex, calcTestsWithTruthInfo(state, cov, trueState));
 
-//
 //            // standard scores (pulls) calculated from residuals using the measurements and the predicted forward state
           if (m_testPrediction == true) {
             aTrackPtr->getBK(0)->getMatrix("fPreSt", iGFHit, state);
@@ -397,9 +417,6 @@ void trackFitCheckerModule::event()
           fillLayerWiseData("zs_and_chi2_bu_t", accuVecIndex, calcTestsWithTruthInfo(state, cov, trueState));
 
 
-
-
-
         }
         m_dataOut << "\t" << fpChi2tot;
 //      m_dataOut2 << "\n";
@@ -422,7 +439,7 @@ void trackFitCheckerModule::endRun()
 //    B2WARNING("Smoothed states could not be extracted " << m_failedSmootherCounter << " times";)
 //  }
   if (m_nCutawayTracks not_eq 0) {
-    B2WARNING(m_nCutawayTracks << " tracks where cut out because of too large total χ²";)
+    B2WARNING(m_nCutawayTracks << " tracks where cut out because of too large total χ²");
   }
   if (m_badR_fCounter not_eq 0 or m_badR_bCounter not_eq 0 or m_badR_smCounter not_eq 0) {
     B2WARNING("There were tracks hits with negative diagonal elements in the covariance matrix of the residuals. Occurrence forward: " << m_badR_fCounter << " backward: " << m_badR_bCounter << " smoother: " << m_badR_smCounter);
@@ -443,7 +460,7 @@ void trackFitCheckerModule::endRun()
     measVarNames.push_back("u");
     measVarNames.push_back("v");
     measVarNames.push_back("χ²");
-
+    printTrackWiseVecStatistics("res_vertexPosMom", m_vertexTestsVarNames);
     printTrackWiseVecStatistics("zs_vertexPosMom", m_vertexTestsVarNames);
     if (m_testSi == true) {
       printLayerWiseStatistics("zs_and_chi2_meas_t", measVarNames);
@@ -459,6 +476,14 @@ void trackFitCheckerModule::endRun()
 
       printLayerWiseStatistics("zs_and_chi2_sm_t", m_layerWiseTruthTestsVarNames);
       printLayerWiseStatistics("zs_and_chi2_sm", measVarNames);
+    }
+    if (m_writeToB2info == true) {
+      B2INFO("\n" << m_textOutput.rdbuf());
+    }
+    if (m_writeToFile == true) {
+      ofstream testOutputToFile(m_testOutputFileName.c_str());
+      testOutputToFile << m_textOutput.rdbuf();
+      testOutputToFile.close();
     }
 //
 //
@@ -576,19 +601,19 @@ void trackFitCheckerModule::printLayerWiseStatistics(const string& nameOfDataSam
 
   vector<vector<StatisticsContainer> >&  dataSample = m_layerWiseDataSamples[nameOfDataSample];
 
-  cout.precision(m_nDigits);
+  m_textOutput.precision(m_nDigits);
 
   int nOfLayers = dataSample.size();
   int nOfVars = dataSample[0].size();
-  cout << "Information on " << nameOfDataSample << " for all layers\npara\\l\t1\t\t2\t\t3\t\t4\t\t5\t\t6\n\tmean\tstd\tmean\tstd\tmean\tstd\tmean\tstd\tmean\tstd\tmean\tstd\n";
+  m_textOutput << "Information on " << nameOfDataSample << " for all layers\npara\\l\t1\t\t2\t\t3\t\t4\t\t5\t\t6\n\tmean\tstd\tmean\tstd\tmean\tstd\tmean\tstd\tmean\tstd\tmean\tstd\n";
   for (int i = 0; i not_eq nOfVars; ++i) {
-    cout << layerWiseVarNames[i];
+    m_textOutput << layerWiseVarNames[i];
     for (int l = 0; l not_eq nOfLayers; ++l) {
       double tempMean = mean(dataSample[l][i]);
       double tempStd = sqrt(variance(dataSample[l][i]));
-      cout << fixed << "\t" << tempMean << "\t" << tempStd;
+      m_textOutput << fixed << "\t" << tempMean << "\t" << tempStd;
     }
-    cout << "\n";
+    m_textOutput << "\n";
   }
 }
 
@@ -597,30 +622,29 @@ void trackFitCheckerModule::printTrackWiseStatistics(const string& nameOfDataSam
 
   StatisticsContainer&  dataSample = m_trackWiseDataSamples[nameOfDataSample];
 
-  cout.precision(m_nDigits);
-
-  cout << "Information on " << nameOfDataSample << "\nmean\tstd\n";
-  cout << fixed << mean(dataSample) << "\t" << sqrt(variance(dataSample)) << "\n";
+  m_textOutput.precision(m_nDigits);
+  m_textOutput << "Information on " << nameOfDataSample << "\nmean\tstd\n";
+  m_textOutput << fixed << mean(dataSample) << "\t" << sqrt(variance(dataSample)) << "\n";
 }
 
 void trackFitCheckerModule::printTrackWiseVecStatistics(const string& nameOfDataSample, const vector<string>& trackWiseVarNames)
 {
 
-  vector<StatisticsContainer>&  dataSample = m_trackWiseDataVecSamples[nameOfDataSample];
+  vector<StatisticsContainer>& dataSample = m_trackWiseDataVecSamples[nameOfDataSample];
 
-  cout.precision(m_nDigits);
+  m_textOutput.precision(m_nDigits);
   const int nOfVars = dataSample.size();
-  cout << "Information on " << nameOfDataSample << "\n\tmean\tstd\n";
+  m_textOutput << "Information on " << nameOfDataSample << "\n\tmean\tstd\n";
   for (int i = 0; i not_eq nOfVars; ++i) {
-    cout << fixed << trackWiseVarNames[i] << "\t" << mean(dataSample[i]) << "\t" << sqrt(variance(dataSample[i])) << "\n";
+    m_textOutput << fixed << trackWiseVarNames[i] << "\t" << mean(dataSample[i]) << "\t" << sqrt(variance(dataSample[i])) << "\n";
   }
 
 }
 
 void trackFitCheckerModule::resizeLayerWiseData(const string& nameOfDataSample, const int nVarsToTest)
 {
-  m_layerWiseDataSamples[nameOfDataSample].resize(m_nSiLayers);
-  for (int l = 0; l not_eq m_nSiLayers; ++l) {
+  m_layerWiseDataSamples[nameOfDataSample].resize(m_nLayers);
+  for (int l = 0; l not_eq m_nLayers; ++l) {
     m_layerWiseDataSamples[nameOfDataSample][l].resize(nVarsToTest);
   }
 }
@@ -631,4 +655,17 @@ void trackFitCheckerModule::fillLayerWiseData(const string& nameOfDataSample, co
   for (int i = 0; i not_eq nNewData; ++i) {
     m_layerWiseDataSamples[nameOfDataSample][accuVecIndex][i](newData[i]);
   }
+}
+
+void trackFitCheckerModule::fillTrackWiseVecData(const string& nameOfDataSample, const vector<double>& newData)
+{
+  const int nNewData = newData.size();
+  for (int i = 0; i not_eq nNewData; ++i) {
+    m_trackWiseDataVecSamples[nameOfDataSample][i](newData[i]);
+  }
+}
+
+void trackFitCheckerModule::fillTrackWiseData(const string& nameOfDataSample, const double newData)
+{
+  m_trackWiseDataSamples[nameOfDataSample](newData);
 }

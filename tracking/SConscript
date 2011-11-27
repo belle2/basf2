@@ -1,7 +1,7 @@
 Import('env')
 
 env['LIBS'] = ['framework',
-               'cdc', 'pxd', 'svd',
+               'cdc', 'vxd',
                '$ROOT_LIBS', 'EG']
 Return('env')
 

@@ -277,7 +277,7 @@ void trackFitCheckerModule::event()
             vTrue = aTrueHitPtr->getV();
             accuVecIndex = hitLayerId - 1;
           } else if (aCdcRecoHitPtr not_eq NULL) {
-            hitLayerId = aCdcRecoHitPtr->getLayerId();// at the moment the CDCRecoHit class does not have any getters its content
+            hitLayerId = aCdcRecoHitPtr->getLayerId();
             accuVecIndex = hitLayerId + m_nPxdLayers + m_nSvdLayers;
           } else {
             //error non supported type of recoHit
@@ -478,11 +478,11 @@ void trackFitCheckerModule::endRun()
       printLayerWiseStatistics("zs_and_chi2_sm", measVarNames);
     }
     if (m_writeToB2info == true) {
-      B2INFO("\n" << m_textOutput.rdbuf());
+      B2INFO("\n" << m_textOutput.str());
     }
     if (m_writeToFile == true) {
       ofstream testOutputToFile(m_testOutputFileName.c_str());
-      testOutputToFile << m_textOutput.rdbuf();
+      testOutputToFile << m_textOutput.str();
       testOutputToFile.close();
     }
 //

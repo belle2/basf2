@@ -18,9 +18,7 @@
 #include <TClonesArray.h>
 #include <TClass.h>
 
-#include <iostream>
 #include <string>
-#include <utility>
 
 //#include <boost/tuple/tuple.hpp>
 
@@ -33,9 +31,9 @@ namespace Belle2 {
    *  StoreObjPtr or the StoreArray. <br>
    *  Currently the store supports either the storage of single objects, that inherit from TObject,
    *  and TClonesArrays, which are faster, if you have to store a large number of objects from the same type.
-   *  Besides that, you have to chose the durability of the things, you want to store. <br>
+   *  Besides that, you have to chose the durability of the things you want to store. <br>
    *  Currently you can chose between lifetimes of event, run, and persistent.
-   *  basf2 deletes the objects from the store according to the durability map, in which the objects are stored.
+   *  basf2 deletes the objects from the store according to the durability map in which the objects are stored.
    *
    *  @sa EDurability StoreObjPtr StoreArray
    *  @author <a href="mailto:belle2_software@bpost.kek.jp?subject=DataStore">The basf2 developers</a>
@@ -102,10 +100,10 @@ namespace Belle2 {
     //------------------------------ Accessing objects and arrays ----------------------------------------------
     /** Function to create, get or store objects in the DataStore.
      *
-     *  If in the map of requested durability is already an object under the key name with a DIFFERENT type
+     *  If the map of requested durability already contains an object under the key name with a DIFFERENT type
      *  than the template type one, the program ends. <br>
      *  If this function is called for the first time with a given name and durability, a new map slot is created.
-     *  However, for I/O related reasons, this should be usually not done outside of the initialize functions of modules.
+     *  However, for I/O related reasons, this should usually not be done outside of the initialize functions of modules.
      *  Therefore the latter condition is checked, and an error returned, if you try to create a new map slot at other
      *  times.
      *  @return           In case AObject has been NULL, true is returned, if a new object was created.
@@ -123,7 +121,7 @@ namespace Belle2 {
      *                    reassigned to a new object created with the default constructor and returned.
      */
     template <class T> bool handleObject(const std::string& name, const EDurability& durability,
-                                         bool generate, T*& AObject = static_cast<T*>(0));
+                                         bool generate, T*& AObject);
 
     /** Store existing Object.
      *
@@ -140,13 +138,13 @@ namespace Belle2 {
 
     /** Function to create, get or store TClonesArrays in the DataStore.
      *
-     *  If in the map of requested durability is already an array under the key name with a DIFFERENT type
-     *  of clone space than the template type one, the program ends. <br>
+     *  If the map of requested durability already contains an array under the key name with a type of TClonesArray
+     *  DIFFERENT from the supplied one, the program ends. <br>
      *  If this function is called for the first time with a given name and durability, a new map slot is created.
-     *  However, for I/O related reasons, this should be usually not done outside of the initialize functions of modules.
-     *  Therefore the latter condition is checked, and an error returned, if you try to create a new map slot at other
+     *  However, for I/O related reasons, this should usually not be done outside of the initialize functions of modules.
+     *  Therefore the latter condition is checked, and an error returned if you try to create a new map slot at other
      *  times. <br>
-     *  The TClonesArray has a mechanism to delete the objects without giving the memory free,
+     *  The TClonesArray has a mechanism to delete the objects without freeing the memory
      *  and thereby allows faster recreation of objects with a mechanism described at
      *  <a href=http://root.cern.ch/root/html/TClonesArray.html> TClonesArray's root page</a>.
      *  @return           True, if a new map slot was created, false otherwise. As the map slots are never freed,
@@ -158,7 +156,7 @@ namespace Belle2 {
      */
     template <class T> bool handleArray(const std::string& name,
                                         const EDurability& durability,
-                                        TClonesArray*& array = static_cast<TClonesArray*>(0));
+                                        TClonesArray*& array);
 
     /** Store existing TClonesArray.
      *
@@ -169,7 +167,6 @@ namespace Belle2 {
      */
     inline bool storeArray(TClonesArray* array, const std::string& name, const EDurability& durability = c_Event) {
       // use of TObject for template class is usually fine, because it is only checked, if there is already a corresponding slot.
-      B2DEBUG(250, "Storing will abort, if there is already an object with name " << name << ", durability " << durability);
       return handleArray<TObject>(name, durability, array);
     }
 
@@ -192,9 +189,6 @@ namespace Belle2 {
     void setInitializeActive(const bool active) {
       initializeActive = active;
     }
-
-    /** Creating new map slots is only allowed, if this boolean is true. */
-    bool initializeActive;
 
     /** Clearing Maps of a specified durability.
      *
@@ -229,6 +223,9 @@ namespace Belle2 {
      *  Otherwise same as map for the TObjects.
      */
     StoreArrayMap m_arrayMap[c_NDurabilityTypes];
+
+    /** Creating new map slots is only allowed, if this boolean is true. */
+    bool initializeActive;
   };
 } // namespace Belle2
 

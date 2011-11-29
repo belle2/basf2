@@ -22,6 +22,7 @@
 
 
 using namespace CLHEP;
+using namespace std;
 
 
 namespace Belle2 {
@@ -29,195 +30,204 @@ namespace Belle2 {
 
 
 
-  EKLMFiberAndElectronics::EKLMFiberAndElectronics(std::pair < G4VPhysicalVolume *,
-                                                   std::vector<EKLMSimHit*> >
+  EKLMFiberAndElectronics::EKLMFiberAndElectronics(pair < const G4VPhysicalVolume *,
+                                                   vector<EKLMSimHit*> >
                                                    entry)
   {
 
     // get information from Gearbox
-
     GearDir Digitizer = GearDir("/Detector/DetectorComponent[@name=\"EKLM\"]/Content/Digitizer");
-    timeDigitizationStep = Digitizer.getInt("TimeDigitizationStep");
-    nTimeDigitizationSteps = Digitizer.getInt("NTimeDigitizationSteps");
-    nPEperMeV = Digitizer.getDouble("NPEperMeV");
-    minCosTheta = cos(Digitizer.getAngle("MaxTheta"));
-    mirrorReflectiveIndex = Digitizer.getDouble("MirrorReflectiveIndex");
-    scintillatorDeExcitationTime = Digitizer.getDouble("ScintillatorDeExcitationTime");
-    scintillatorDeExcitationTime = Digitizer.getDouble("ScintillatorDeExcitationTime");
-    fiberDeExcitationTime = Digitizer.getDouble("FiberDeExcitationTime");
-    outputFilename = Digitizer.getString("OutputFile");
-    lightSpeed = Digitizer.getDouble("LightSpeedInFiber");
-    attenuationLength = Digitizer.getLength("AttenuationLength");
-    expCoefficient = Digitizer.getDouble("SignalShapeExpCoefficient");
-    meanSiPMNoise = Digitizer.getDouble("BackgroundPoissonMean");
+    m_timeDigitizationStep = Digitizer.getInt("TimeDigitizationStep");
+    m_nTimeDigitizationSteps = Digitizer.getInt("NTimeDigitizationSteps");
+    m_nPEperMeV = Digitizer.getDouble("NPEperMeV");
+    m_minCosTheta = cos(Digitizer.getAngle("MaxTheta"));
+    m_mirrorReflectiveIndex = Digitizer.getDouble("MirrorReflectiveIndex");
+    m_scintillatorDeExcitationTime = Digitizer.getDouble("ScintillatorDeExcitationTime");
+    m_scintillatorDeExcitationTime = Digitizer.getDouble("ScintillatorDeExcitationTime");
+    m_fiberDeExcitationTime = Digitizer.getDouble("FiberDeExcitationTime");
+    m_outputFilename = Digitizer.getString("OutputFile");
+    m_lightSpeed = Digitizer.getDouble("LightSpeedInFiber");
+    m_attenuationLength = Digitizer.getLength("AttenuationLength");
+    m_expCoefficient = Digitizer.getDouble("SignalShapeExpCoefficient");
+    m_meanSiPMNoise = Digitizer.getDouble("BackgroundPoissonMean");
+
+    m_stripName = &entry.first->GetName();
 
 
-    stripName = &entry.first->GetName();
+    // create histos
+    m_digitizedAmplitudeDirect = new TH1D("digitizedAmplitudeDirect", "",
+                                          m_nTimeDigitizationSteps, 0,
+                                          m_nTimeDigitizationSteps *
+                                          m_timeDigitizationStep);
 
-    digitizedAmplitudeDirect = new TH1D("digitizedAmplitudeDirect", "",
-                                        nTimeDigitizationSteps, 0,
-                                        nTimeDigitizationSteps *
-                                        timeDigitizationStep);
-    digitizedAmplitudeDirect->SetNameTitle("digitizedAmplitudeDirect",
-                                           stripName->c_str());
-    digitizedAmplitudeReflected = new TH1D("digitizedAmplitudeReflected", "",
-                                           nTimeDigitizationSteps, 0,
-                                           nTimeDigitizationSteps *
-                                           timeDigitizationStep);
-    digitizedAmplitudeReflected->SetNameTitle("digitizedAmplitudeReflected",
-                                              stripName->c_str());
-    digitizedAmplitude = new TH1D("digitizedAmplitude", "",
-                                  nTimeDigitizationSteps, 0,
-                                  nTimeDigitizationSteps *
-                                  timeDigitizationStep);
-    digitizedAmplitude->SetNameTitle("digitizedAmplitude", stripName->c_str());
+    m_digitizedAmplitudeDirect->SetNameTitle("digitizedAmplitudeDirect",
+                                             m_stripName->c_str());
 
+    m_digitizedAmplitudeReflected = new TH1D("digitizedAmplitudeReflected", "",
+                                             m_nTimeDigitizationSteps, 0,
+                                             m_nTimeDigitizationSteps *
+                                             m_timeDigitizationStep);
 
-    fitFunction = new TF1("fitFunction", EKLMSignalShapeFitFunction, 0, 300, 4);
-    vectorHits = entry.second;
+    m_digitizedAmplitudeReflected->SetNameTitle("digitizedAmplitudeReflected",
+                                                m_stripName->c_str());
+
+    m_digitizedAmplitude = new TH1D("digitizedAmplitude", "",
+                                    m_nTimeDigitizationSteps, 0,
+                                    m_nTimeDigitizationSteps *
+                                    m_timeDigitizationStep);
+
+    m_digitizedAmplitude->SetNameTitle("digitizedAmplitude", m_stripName->c_str());
+
+    // define fit function
+    m_fitFunction = new TF1("fitFunction", EKLMSignalShapeFitFunction, 0, 300, 4);
+
+    // define vector of hits
+    m_vectorHits = entry.second;
   }
 
+
+  EKLMFiberAndElectronics::~EKLMFiberAndElectronics()
+  {
+    delete     m_digitizedAmplitudeDirect;
+    delete     m_digitizedAmplitudeReflected;
+    delete     m_digitizedAmplitude;
+    delete     m_fitFunction;
+  }
 
   void EKLMFiberAndElectronics::processEntry()
   {
 
-    for (std::vector<EKLMSimHit*> ::iterator iHit = vectorHits.begin();
-         iHit != vectorHits.end(); iHit++) {
+    for (vector<EKLMSimHit*> ::iterator iHit = m_vectorHits.begin();
+         iHit != m_vectorHits.end(); iHit++) {
 
       // calculate distance
-      lightPropagationDistance(forwardHitDist, backwardHitDist, *iHit);
+      lightPropagationDistance(*iHit);
 
-      // calculate # of p.e.
-      int nForwardPE = gRandom->Poisson((*iHit)->getEDep() * nPEperMeV);
-      int nBackwardPE = gRandom->Poisson((*iHit)->getEDep() * nPEperMeV);
+      // Poisson mean for # of p.e.
+      double nPEmean = (*iHit)->getEDep() * m_nPEperMeV;
 
-      hitTimes(nForwardPE, false);
-      hitTimes(nBackwardPE, true);
 
-      timesToShape(&hitTimesVectorBackward, digitizedAmplitudeReflected);
-      timesToShape(&hitTimesVectorForward, digitizedAmplitudeDirect);
+      // fill histograms
+      timesToShape(hitTimes(gRandom->Poisson(nPEmean), true), m_digitizedAmplitudeDirect);
+      timesToShape(hitTimes(gRandom->Poisson(nPEmean), false), m_digitizedAmplitudeReflected);
 
     }
 
+    // sum up histograms
+    m_digitizedAmplitude->Add(m_digitizedAmplitudeReflected, 1);
+    m_digitizedAmplitude->Add(m_digitizedAmplitudeDirect, 1);
 
-    digitizedAmplitude->Add(digitizedAmplitudeReflected, 1);
-    digitizedAmplitude->Add(digitizedAmplitudeDirect, 1);
+    // set up fit parameters
+    m_fitFunction->SetParameters(10, 2., 0.04, 50);
 
+    // do fit
+    m_fitResultsPtr = m_digitizedAmplitude->Fit(m_fitFunction, "LLSQ");
 
-    fitFunction->SetParameters(10, 2., 0.04, 50);
-    fitResultsPtr = digitizedAmplitude->Fit(fitFunction, "LLSQ");
-
+    // add random SiPM noise
     addRandomSiPMNoise();
 
-    if (outputFilename.size() != 0) {
-      const char * info = (std::string("Histograms will be saved with ") + outputFilename + std::string(" prefix. To switch it off change OutputFile parameter in EKLM.xml to void")).c_str();
+
+    // if save histograms if outputFilename is non-empty
+    if (m_outputFilename.size() != 0) {
+      const char * info = (string("Histograms will be saved with ") + m_outputFilename + string(" prefix. To switch it off change OutputFile parameter in EKLM.xml to void")).c_str();
       B2INFO(info);
-      std::string filename = outputFilename + *stripName + boost::lexical_cast<std::string>(gRandom->Integer(10000000)) + ".root";
+      string filename = m_outputFilename + *m_stripName + boost::lexical_cast<string>(gRandom->Integer(10000000)) + ".root";
       TFile *hfile = new TFile(filename.c_str(), "NEW");
-      hfile->Append(digitizedAmplitudeDirect);
-      hfile->Append(digitizedAmplitudeReflected);
-      hfile->Append(digitizedAmplitude);
-      hfile->Append(fitFunction);
+      hfile->Append(m_digitizedAmplitudeDirect);
+      hfile->Append(m_digitizedAmplitudeReflected);
+      hfile->Append(m_digitizedAmplitude);
+      hfile->Append(m_fitFunction);
       hfile->Write();
     } else {
       B2INFO("OutputFile parameter in EKLM.xml is void. No histogram will be saved");
     }
   }
 
-  EKLMFiberAndElectronics::~EKLMFiberAndElectronics()
-  {
-    delete     digitizedAmplitudeDirect;
-    delete     digitizedAmplitudeReflected;
-    delete     digitizedAmplitude;
-    delete     fitFunction;
-  }
 
   //***********************************************************
 
-  void EKLMFiberAndElectronics::lightPropagationDistance(double &firstHitDist,
-                                                         double &secondHitDist,
-                                                         EKLMSimHit *sh)
+  void EKLMFiberAndElectronics::lightPropagationDistance(EKLMSimHit *sh)
   {
-    G4Box *box = (G4Box*)(sh->getPV()->GetLogicalVolume()->GetSolid());
+    G4Box *box = (G4Box*)(sh->getVolume()->GetLogicalVolume()->GetSolid());
     double half_len = box->GetXHalfLength();
-    firstHitDist = half_len - (sh->getLocalPos()).x();   //  direct light hit
-    secondHitDist = 4.0 * half_len - firstHitDist;     //  reflected light hit
+    double local_pos = sh->getLocalPos()->x();
+    m_hitDist = make_pair(half_len - local_pos, 3.0 * half_len + local_pos);
   }
 
   void EKLMFiberAndElectronics::addRandomSiPMNoise()
   {
-    double meanSiPMNoise = 10.;
-    for (int iTimeStep = 0; iTimeStep < nTimeDigitizationSteps; iTimeStep++)
-      digitizedAmplitude->AddBinContent(iTimeStep + 1,  gRandom->Poisson(meanSiPMNoise));
+    for (int iTimeStep = 0; iTimeStep < m_nTimeDigitizationSteps; iTimeStep++)
+      m_digitizedAmplitude->AddBinContent(iTimeStep + 1,  gRandom->Poisson(m_meanSiPMNoise));
   }
 
   double EKLMFiberAndElectronics::signalShape(double t)
   {
     if (t > 0)
-      return exp(-expCoefficient*t);
+      return exp(-m_expCoefficient*t);
     return 0;
   }
 
   double  EKLMFiberAndElectronics::distanceAttenuation(double dist)
   {
-    return exp(-dist / attenuationLength);
+    return exp(-dist / m_attenuationLength);
   }
 
-  void EKLMFiberAndElectronics::hitTimes(int nPE, bool isReflected)
+  vector<double>  EKLMFiberAndElectronics::hitTimes(int nPE, bool isReflected)
   {
+    vector <double> hitTimesVector;
     // start selection procedure
     for (int i = 0; i < nPE; i++) {
-      double cosTheta = gRandom->Uniform(minCosTheta, 1);
+      double cosTheta = gRandom->Uniform(m_minCosTheta, 1);
       double hitDist;
       if (isReflected)
-        hitDist = backwardHitDist / cosTheta;
+        hitDist = m_hitDist.first / cosTheta;
       else
-        hitDist = forwardHitDist / cosTheta;
+        hitDist = m_hitDist.second / cosTheta;
+
       // drop lightflashes which was captured by fiber
       if (gRandom->Uniform() > distanceAttenuation(hitDist))
         continue;
 
       // account for mirror reflective index
       if (isReflected)
-        if (gRandom->Uniform() > mirrorReflectiveIndex)
+        if (gRandom->Uniform() > m_mirrorReflectiveIndex)
           continue;
 
 
       // Scintillator de-excitation time  && Fiber  de-excitation time
-      double deExcitationTime = gRandom->Exp(scintillatorDeExcitationTime)
-                                + gRandom->Exp(fiberDeExcitationTime);
+      double deExcitationTime = gRandom->Exp(m_scintillatorDeExcitationTime)
+                                + gRandom->Exp(m_fiberDeExcitationTime);
       double hitTime = lightPropagationTime(hitDist) + deExcitationTime;
-      if (isReflected)
-        hitTimesVectorBackward.push_back(hitTime);
-      else
-        hitTimesVectorForward.push_back(hitTime);
+
+      hitTimesVector.push_back(hitTime);
     }
+    return hitTimesVector;
   }
 
-  void EKLMFiberAndElectronics::timesToShape(std::vector <double> * times,
+  void EKLMFiberAndElectronics::timesToShape(const vector <double> & times,
                                              TH1D * shape)
   {
-    for (unsigned  i = 0; i < times->size(); i++)
-      for (int iTimeStep = 0; iTimeStep < nTimeDigitizationSteps; iTimeStep++)
+    for (unsigned  i = 0; i < times.size(); i++)
+      for (int iTimeStep = 0; iTimeStep < m_nTimeDigitizationSteps; iTimeStep++)
         shape->AddBinContent(iTimeStep + 1,
-                             signalShape(iTimeStep*timeDigitizationStep -
-                                         (*times)[i]));
+                             signalShape(iTimeStep*m_timeDigitizationStep -
+                                         times[i]));
   }
 
   double EKLMFiberAndElectronics::lightPropagationTime(double L)
   {
-    return L / lightSpeed;
+    return L / m_lightSpeed;
   }
 
 
-  double EKLMFiberAndElectronics::getFitResults(int i)
+  double EKLMFiberAndElectronics::getFitResults(int i) const
   {
-    return fitResultsPtr->Value(i);
+    return m_fitResultsPtr->Value(i);
   }
 
-  int EKLMFiberAndElectronics::getFitStatus()
+  int EKLMFiberAndElectronics::getFitStatus() const
   {
-    return (int)fitResultsPtr;
+    return (int)m_fitResultsPtr;
   }
 
 

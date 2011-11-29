@@ -53,22 +53,17 @@ namespace Belle2 {
     /**
      *returns physical volume
      */
-    G4VPhysicalVolume *getPV();
+    const G4VPhysicalVolume *getVolume()  const;
 
     /**
      * set physical volume
      */
-    void setPV(G4VPhysicalVolume *);
+    void setVolume(const G4VPhysicalVolume *);
 
     /**
      * returns global position of the hit
      */
-    TVector3 getGlobalPos();
-
-    /**
-     * returns local position of the hit
-     */
-    TVector3 getLocalPos();
+    const TVector3 * getGlobalPos() const;
 
     /**
      * set global position of the hit
@@ -76,15 +71,30 @@ namespace Belle2 {
     void setGlobalPos(const TVector3 &);
 
     /**
+     * set global position of the hit
+     */
+    void setGlobalPos(const TVector3 *);
+
+    /**
+     * returns local position of the hit
+     */
+    const TVector3 * getLocalPos() const;
+
+    /**
      * set local position of the hit
      */
     void setLocalPos(const TVector3 &);
 
+    /**
+     * set local position of the hit
+     */
+    void setLocalPos(const TVector3 *);
 
     /**
      * returns hit time
      */
-    G4double getTime();
+    G4double getTime()  const;
+
     /**
      * set hit time
      */
@@ -93,85 +103,149 @@ namespace Belle2 {
     /**
      * returns energy deposition
      */
-    G4double getEDep();
+    G4double getEDep() const;
 
     /**
      * set  energy deposition
      */
     void setEDep(double);
 
-    //! returns PDG code of the particle
-    G4int getPDGCode();
+    /**
+     *returns PDG code of the particle
+     */
+    G4int getPDGCode() const;
+
+    /**
+     *sets PDG code of the particle
+     */
     void setPDGCode(G4int);
+
+    /**
+     * returns track ID
+     */
+    G4int getTrackID() const;
+
+    /**
+     * sets track ID
+     */
+    void  setTrackID(G4int);
+
+    /**
+     * returs parent track ID
+     */
+    int getParentTrackID() const;
+
+    /**
+     * sets parent track ID
+     */
+    void setParentTrackID(G4int);
+
+    /**
+     * returns volume type (needed for background study mode)
+     */
+    bool  getVolType() const;
+
+    /**
+     * sets volume type (needed for background study mode)
+     */
+    void  setVolType(int);
+
+    /**
+     * returns  particle momentum
+     */
+    const TVector3 *  getMomentum() const;
+
+    /**
+     * sets  particle momentum
+     */
+    void  setMomentum(const TVector3 &p);
+
+    /**
+     * sets  particle momentum
+     */
+    void  setMomentum(const TVector3 *p);
+
+
+    /**
+     * returns  particle energy
+     */
+    double  getEnergy() const;
+
+    /**
+     * sets  particle energy
+     */
+    void  setEnergy(double);
+
 
 
     //! dumps hit into ASCII file
     void Save(char * filename);
 
-    //! returm track ID
-    G4int getTrackID();
-    void  setTrackID(G4int id);
-
-    //! returs parent track ID
-    G4int getParentTrackID();
-    void setParentTrackID(G4int id);
-
-    //! returns  first hit status
-    bool  getVolType();
-    void  setVolType(int vt);
-
-    //! returns  particle momentum
-    TVector3  getMomentum();
-    void  setMomentum(const TVector3 &p);
-
-
-    //! returns  particle energy
-    double  getEnergy();
-    void  setEnergy(const double e);
-
 
 
   private:
-    //! Physical volume
-    G4VPhysicalVolume *m_pv; //! {ROOT streamer directive}
+    /**
+     *Physical volume
+     */
+    const  G4VPhysicalVolume *m_pv; //! {ROOT streamer directive}
 
-    //! particle momentum
+    /**
+     * particle momentum
+     */
     TVector3 m_momentum;
 
-    //! particle energy
+    /**
+     *particle energy
+     */
     double m_energy;
 
-    //! hit position (in global reference frame)
+    /**
+     * hit position (in global reference frame)
+     */
     TVector3 m_global_pos;
 
-    //! hit position (in local reference frame)
+    /**
+     * hit position (in local reference frame)
+     */
     TVector3 m_local_pos;
 
-    //!hit time
+    /**
+     * hit time
+     */
     G4double m_time;
 
-    //! energy depostion
+    /**
+     * energy depostion
+     */
     G4double m_eDep;
 
-    //! PDG code of the track particle
+    /**
+     * PDG code of the track particle
+     */
     G4int m_PDGcode;
 
-    //! track ID
+    /**
+     * track ID
+     */
     G4int m_trackID;
 
-    //! parent track ID
+    /**
+     * parent track ID
+     */
     G4int m_parentTrackID;
 
-    //! is first step in volume
-    int m_volType;
 
-    //! Needed to make root object storable
+    /**
+     * Volume type (for Background studies)
+     */
+    G4int m_volType;
+
+
+    // Needed to make root object storable
     ClassDef(Belle2::EKLMSimHit, 1);
 
   };
 
-  //! define collections of Sim Hits
-  //  typedef G4THitsCollection<EKLMSimHit> EKLMSimHitsCollection;
 
 } // end of namespace Belle2
 

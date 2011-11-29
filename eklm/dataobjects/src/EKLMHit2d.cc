@@ -81,11 +81,11 @@ bool EKLMHit2d::addStripHit(EKLMStripHit *stripHit)
     B2FATAL("Attempt to add more than 2 strips in 2d hit!");
     exit(0);
   }
-  if (m_XStrip == NULL && CheckStripOrientationX(stripHit->getPV())) {
+  if (m_XStrip == NULL && CheckStripOrientationX(stripHit->getVolume())) {
     m_XStrip = stripHit;
     return true;
   }
-  if (m_YStrip == NULL && !CheckStripOrientationX(stripHit->getPV())) {
+  if (m_YStrip == NULL && !CheckStripOrientationX(stripHit->getVolume())) {
     m_YStrip = stripHit;
     return true;
   }

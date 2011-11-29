@@ -15,7 +15,6 @@
 #include <TObject.h>
 #include  <string>
 
-
 namespace Belle2 {
 
   /**
@@ -46,52 +45,52 @@ namespace Belle2 {
     /**
      * Get endcap number.
      */
-    const int getEndcap();
+    int getEndcap() const;
 
     /**
      * Set endcap number.
      */
-    void setEndcap(const int Endcap);
+    void setEndcap(int Endcap);
 
     /**
      * Get layer number.
      */
-    const int getLayer();
+    int getLayer() const;
 
     /**
      * Set layer number.
      */
-    void setLayer(const int nLayer);
+    void setLayer(int nLayer);
 
     /**
      * Get sector number.
      */
-    const int getSector();
+    int getSector() const;
 
     /**
      * Set sector number.
      */
-    void setSector(const int nSector);
+    void setSector(int nSector);
 
     /**
      * Get plane number.
      */
-    const int getPlane();
+    int getPlane() const;
 
     /**
      * Set plane number.
      */
-    void setPlane(const int Plane);
+    void setPlane(int Plane);
 
     /**
      * Get strip number.
      */
-    const int getStrip();
+    int getStrip() const;
 
     /**
      * Set strip number.
      */
-    void setStrip(const int Strip);
+    void setStrip(int Strip);
 
   private:
 

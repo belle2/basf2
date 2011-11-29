@@ -63,12 +63,12 @@ void EKLMSectorHit::create2dHits()
   for (std::vector<EKLMStripHit*>::iterator itX = m_stripHitVector.begin();
        itX != m_stripHitVector.end(); ++itX) {
     // only X strips
-    if (!CheckStripOrientationX((*itX)->getPV()))
+    if (!CheckStripOrientationX((*itX)->getVolume()))
       continue;
     for (std::vector<EKLMStripHit*>::iterator itY = m_stripHitVector.begin();
          itY != m_stripHitVector.end(); ++itY) {
       // only Y strips
-      if (CheckStripOrientationX((*itY)->getPV()))
+      if (CheckStripOrientationX((*itY)->getVolume()))
         continue;
       CLHEP::Hep3Vector crossPoint(0, 0, 0);
       // drop entries with non-intersected strips

@@ -39,13 +39,13 @@ namespace Belle2 {
   /**
    * Get physical volume by point
    */
-  G4VPhysicalVolume *GetPhysicalVolumeByPoint(const G4ThreeVector &point);
+  const G4VPhysicalVolume *GetPhysicalVolumeByPoint(const G4ThreeVector &point);
 
   /**
    * Check whether strip is oriented along X
    * @strip: strip
    */
-  bool CheckStripOrientationX(G4VPhysicalVolume *strip);
+  bool CheckStripOrientationX(const G4VPhysicalVolume *strip);
 }
 
 

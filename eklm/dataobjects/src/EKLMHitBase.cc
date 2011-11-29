@@ -34,52 +34,52 @@ EKLMHitBase::EKLMHitBase(const int Endcap, const int Layer, const int Sector, co
   m_Strip = Strip;
 }
 
-const int EKLMHitBase::getEndcap()
+int EKLMHitBase::getEndcap() const
 {
   return m_Endcap;
 }
 
-void EKLMHitBase::setEndcap(const int Endcap)
+void EKLMHitBase::setEndcap(int Endcap)
 {
   m_Endcap = Endcap;
 }
 
-const int EKLMHitBase::getLayer()
+int EKLMHitBase::getLayer() const
 {
   return m_Layer;
 }
 
-void EKLMHitBase::setLayer(const int Layer)
+void EKLMHitBase::setLayer(int Layer)
 {
   m_Layer = Layer;
 }
 
-const int EKLMHitBase::getSector()
+int EKLMHitBase::getSector() const
 {
   return m_Sector;
 }
 
-void EKLMHitBase::setSector(const int Sector)
+void EKLMHitBase::setSector(int Sector)
 {
   m_Sector = Sector;
 }
 
-const int EKLMHitBase::getPlane()
+int EKLMHitBase::getPlane() const
 {
   return m_Plane;
 }
 
-void EKLMHitBase::setPlane(const int Plane)
+void EKLMHitBase::setPlane(int Plane)
 {
   m_Plane = Plane;
 }
 
-const int EKLMHitBase::getStrip()
+int EKLMHitBase::getStrip() const
 {
   return m_Strip;
 }
 
-void EKLMHitBase::setStrip(const int Strip)
+void EKLMHitBase::setStrip(int Strip)
 {
   m_Strip = Strip;
 }

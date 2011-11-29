@@ -75,92 +75,79 @@ namespace Belle2 {
     /**
     * Get the lund code of the particle that hit the sensitive area
     */
-    const int getPDG() const { return m_PDG; }
+    int getPDG() const ;
+
 
     /**
      *  Set the lund code of the particle that hit the sensitive area
      */
-    void setPDG(int PDG)  { m_PDG = PDG; }
-
-
-
-
+    void setPDG(int);
 
     /**
      * Get the time at which the hit occured
      */
-    const double getTime() const { return m_t; }
+    double getTime() const;
 
     /**
      * Set the time at which the hit occured
      */
-    void setTime(double t)  {  m_t = t; }
-
-
-
+    void setTime(double);
 
 
     /**
      * Get energy of the particle
      */
-    const double getEnergy() const { return m_E; }
+    double getEnergy() const;
 
     /**
      * Set energy of the particle
      */
-    void setEnergy(double E)  {  m_E = E; }
-
-
+    void setEnergy(double E);
 
 
     /**
      * Get global position of the particle hit
      */
-    const TVector3 getPosition() const { return m_position; }
+    const TVector3 * getPosition() const;
+
 
     /**
      * Set global position of the particle hit
      */
-    void setPosition(TVector3 position)  {  m_position = position; }
-
-
-
+    void setPosition(TVector3 & position);
 
 
     /**
      * Get momentum of the particle hit
      */
-    const TVector3 getMomentum() const { return m_momentum; }
+    const TVector3 * getMomentum() const;
 
     /**
      * Set momentum of the particle hit
      */
-    void setMomentum(TVector3 momentum)  {  m_momentum = momentum; }
-
+    void setMomentum(TVector3 & momentum) ;
 
 
     /**
      * Get energy deposition
      */
-    const double getEDep() const { return m_energyDeposit; }
+    double getEDep() const ;
 
     /**
      * Set energy deposition
      */
-    void setEDep(double edep)  { m_energyDeposit = edep; }
-
-
+    void setEDep(double edep) ;
 
 
     /**
      * Get track ID
      */
-    const int getTrackID() const { return m_trackID;}
+    int getTrackID() const;
 
     /**
      * Set track ID
      */
-    void getTrackID(int track)  { m_trackID = track;}
+    void setTrackID(int track);
 
 
 
@@ -168,23 +155,22 @@ namespace Belle2 {
     /**
      * Get  ID of parent track
      */
-    const int getParentTrackID() const { return m_parentTrackID;}
+    int getParentTrackID() const;
 
     /**
      * Set ID of parent track
      */
-    void getParentTrackID(int track)  { m_parentTrackID = track;}
-
+    void setParentTrackID(int track);
 
 
     /**
      * Get volume name
      */
-    const std::string getName()  const { return m_pvName;}
+    std::string getName()  const;
     /**
      * Set volume name
      */
-    void setName(std::string name)   { m_pvName = name;}
+    void setName(std::string & name);
 
 
 
@@ -192,14 +178,18 @@ namespace Belle2 {
     /**
      * Get volume
      */
-    const G4VPhysicalVolume* getVolume()  const { return m_pv;}
+    const G4VPhysicalVolume* getVolume()  const ;
+    /**
+     * Set volume
+     */
+    void setVolume(const G4VPhysicalVolume *);
 
 
 
     /**
-     * Increase deposited energy
+     *  Increase energy deposition
      */
-    void increaseEDep(double newE) {m_energyDeposit += newE;}
+    void increaseEDep(double);
 
 
 
@@ -211,12 +201,12 @@ namespace Belle2 {
     double m_E;                 /** energy of particle */
     TVector3 m_position;        /** global position of the hit */
     TVector3 m_momentum;        /** momentum of the hit */
-    double m_energyDeposit;
-    int m_trackID;
-    int m_parentTrackID;
+    double m_energyDeposit;     /** energy deposition */
+    int m_trackID;              /** track ID */
+    int m_parentTrackID;        /** parent track ID */
     //** we do not want to  allow anyone to change the PV !! */
     const G4VPhysicalVolume * m_pv;     //! {ROOT streamer directive}
-    std::string m_pvName;
+    std::string m_pvName; /** volume name */
 
 
     ClassDef(EKLMStepHit, 1);   /** the class title */

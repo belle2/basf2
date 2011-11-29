@@ -17,13 +17,13 @@
 
 namespace Belle2 {
 
-  G4VPhysicalVolume *GetPhysicalVolumeByPoint(const G4ThreeVector &point)
+  const  G4VPhysicalVolume *GetPhysicalVolumeByPoint(const G4ThreeVector &point)
   {
     return G4TransportationManager::GetTransportationManager()->
            GetNavigatorForTracking()->LocateGlobalPointAndSetup(point);
   }
 
-  bool CheckStripOrientationX(G4VPhysicalVolume *strip)
+  bool CheckStripOrientationX(const G4VPhysicalVolume *strip)
   {
     G4Transform3D t = ((G4PVPlacementGT*)strip)->getTransform().inverse();
     return (fabs(sin(t.getRotation().phiX())) < 0.01);

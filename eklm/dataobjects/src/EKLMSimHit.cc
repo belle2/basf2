@@ -41,19 +41,19 @@ EKLMSimHit::EKLMSimHit(G4VPhysicalVolume *pv, TVector3 global_pos,
   m_eDep = eDep;
 }
 
-G4VPhysicalVolume* EKLMSimHit::getPV()
+const G4VPhysicalVolume* EKLMSimHit::getVolume() const
 {
   return m_pv;
 }
 
-void EKLMSimHit::setPV(G4VPhysicalVolume* pv)
+void EKLMSimHit::setVolume(const G4VPhysicalVolume* pv)
 {
   m_pv = pv;
 }
 
-TVector3 EKLMSimHit::getGlobalPos()
+const TVector3 * EKLMSimHit::getGlobalPos() const
 {
-  return m_global_pos;
+  return &m_global_pos;
 }
 
 void EKLMSimHit::setGlobalPos(const TVector3 & gp)
@@ -61,17 +61,22 @@ void EKLMSimHit::setGlobalPos(const TVector3 & gp)
   m_global_pos = gp;
 }
 
-TVector3 EKLMSimHit::getLocalPos()
+void EKLMSimHit::setGlobalPos(const TVector3 * gp)
 {
-  return m_local_pos;
+  m_global_pos = *gp;
 }
 
-void setLocalPos(TVector3 lp)
+const TVector3 *  EKLMSimHit::getLocalPos() const
 {
-  //  m_local_pos=lp;
+  return &m_local_pos;
 }
 
-G4double EKLMSimHit::getTime()
+void EKLMSimHit::setLocalPos(const TVector3 & lp)
+{
+  m_local_pos = lp;
+}
+
+G4double EKLMSimHit::getTime() const
 {
   return m_time;
 }
@@ -80,7 +85,7 @@ void EKLMSimHit::setTime(double t)
   m_time = t;
 }
 
-G4double EKLMSimHit::getEDep()
+G4double EKLMSimHit::getEDep() const
 {
   return m_eDep;
 }
@@ -90,7 +95,7 @@ void EKLMSimHit::setEDep(double e)
   m_eDep = e;
 }
 
-G4int EKLMSimHit::getPDGCode()
+G4int EKLMSimHit::getPDGCode() const
 {
   return m_PDGcode;
 }
@@ -101,7 +106,7 @@ void EKLMSimHit::setPDGCode(int pdg)
 }
 
 
-G4int EKLMSimHit::getTrackID()
+G4int EKLMSimHit::getTrackID() const
 {
   return m_trackID;
 }
@@ -112,7 +117,7 @@ void  EKLMSimHit::setTrackID(G4int id)
 }
 
 
-G4int EKLMSimHit::getParentTrackID()
+G4int EKLMSimHit::getParentTrackID() const
 {
   return  m_parentTrackID;
 }
@@ -122,7 +127,7 @@ void EKLMSimHit::setParentTrackID(G4int id)
   m_parentTrackID = id;
 }
 
-bool  EKLMSimHit::getVolType()
+bool  EKLMSimHit::getVolType() const
 {
   return m_volType;
 }
@@ -134,9 +139,9 @@ void  EKLMSimHit::setVolType(int vt)
 }
 
 
-TVector3  EKLMSimHit::getMomentum()
+const TVector3 *  EKLMSimHit::getMomentum() const
 {
-  return m_momentum;
+  return & m_momentum;
 }
 
 void  EKLMSimHit::setMomentum(const TVector3 &p)
@@ -144,7 +149,12 @@ void  EKLMSimHit::setMomentum(const TVector3 &p)
   m_momentum = p;
 }
 
-double  EKLMSimHit::getEnergy()
+void  EKLMSimHit::setMomentum(const TVector3 *p)
+{
+  m_momentum = *p;
+}
+
+double  EKLMSimHit::getEnergy() const
 {
   return m_energy;
 }

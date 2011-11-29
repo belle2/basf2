@@ -37,35 +37,47 @@ namespace Belle2 {
     //! Print stip name and some other useful info
     void Print();
 
-    //! sets the number of photo electorns
-    void setNumberPhotoElectrons(const double &npe);
 
-    //! sets the time of the hit
-    void setTime(const double  &time);
-
-    //! set  PDG code of the leading ( (grand-)mother ) particle
-    void setLeadingParticlePDGCode(const int &pdg);
-
-    //! returns time of the hit
-    double getTime();
 
     //! returns number of photo electrons
-    double getNumberPhotoElectrons();
+    double getNumberPhotoElectrons() const;
+
+    //! sets the number of photo electorns
+    void setNumberPhotoElectrons(double);
+
+
+    //! returns time of the hit
+    double getTime() const;
+
+    //! sets the time of the hit
+    void setTime(double);
+
+
 
     //! return  PDG code of the leading ( (grand-)mother ) particle
-    int getLeadingParticlePDGCode();
+    int getLeadingParticlePDGCode() const;
+
+    //! set  PDG code of the leading ( (grand-)mother ) particle
+    void setLeadingParticlePDGCode(int);
+
+
 
     //! returns physical volume
-    G4VPhysicalVolume *getPV();
+    const G4VPhysicalVolume *getVolume() const;
 
     //! set physical volume
-    void setPV(G4VPhysicalVolume *pv);
+    void setVolume(const G4VPhysicalVolume *pv);
+
+
+
 
     //! returns true if strips intersects (does not pay attention to the layer)
     bool doesIntersect(Belle2::EKLMStripHit *, CLHEP::Hep3Vector &);
 
     //! returns distance btw. the hit and SiPM
     double getLightPropagationLength(CLHEP::Hep3Vector &);
+
+
 
   private:
 
@@ -82,10 +94,8 @@ namespace Belle2 {
     double m_LightPropagationLength;
 
     //! Physical volume (for simulation)
-    G4VPhysicalVolume *m_pv;   //! {ROOT streamer directive}
+    const G4VPhysicalVolume *m_pv;   //! {ROOT streamer directive}
 
-    /*     //! fit results */
-    /*     TH1D * m_fitHistograms; */
 
     //! Makes objects storable
     ClassDef(Belle2::EKLMStripHit, 1);

@@ -18,77 +18,67 @@
 
 using namespace std;
 using namespace Belle2;
+using namespace CLHEP;
 
 ClassImp(Belle2::EKLMStripHit);
 
-void EKLMStripHit::setNumberPhotoElectrons(const double &npe)
-{
-  m_NumberPhotoElectrons = npe;
-}
 
-void EKLMStripHit::setTime(const double &time)
-{
-  m_Time = time;
-}
-
-void EKLMStripHit::setLeadingParticlePDGCode(const int &pdg)
-{
-  m_LeadingParticlePDGCode = pdg;
-}
-
-double EKLMStripHit::getTime()
-{
-  return m_Time;
-}
-
-double EKLMStripHit::getNumberPhotoElectrons()
+double EKLMStripHit::getNumberPhotoElectrons() const
 {
   return m_NumberPhotoElectrons;
 }
 
-int EKLMStripHit::getLeadingParticlePDGCode()
+void EKLMStripHit::setNumberPhotoElectrons(double npe)
+{
+  m_NumberPhotoElectrons = npe;
+}
+
+
+
+double EKLMStripHit::getTime() const
+{
+  return m_Time;
+}
+
+void EKLMStripHit::setTime(double time)
+{
+  m_Time = time;
+}
+
+
+
+int EKLMStripHit::getLeadingParticlePDGCode() const
 {
   return m_LeadingParticlePDGCode;
 }
 
-G4VPhysicalVolume *EKLMStripHit::getPV()
+void EKLMStripHit::setLeadingParticlePDGCode(int pdg)
+{
+  m_LeadingParticlePDGCode = pdg;
+}
+
+
+
+
+const G4VPhysicalVolume* EKLMStripHit::getVolume() const
 {
   return m_pv;
 }
 
-void EKLMStripHit::setPV(G4VPhysicalVolume *pv)
+void EKLMStripHit::setVolume(const G4VPhysicalVolume *pv)
 {
   m_pv = pv;
 }
 
-void EKLMStripHit::Print()
-{
-  std::cout << "Endcap: " << getEndcap()
-            << " Layer: " << getLayer()
-            << " Sector: " << getSector()
-            << " Plane: " << getPlane()
-            << " Strip: " << getStrip()
-            << " # Time: " << m_Time << "\n";
-}
 
-double EKLMStripHit::getLightPropagationLength(CLHEP::Hep3Vector &pos)
-{
-  G4Box *box = (G4Box*)(m_pv->GetLogicalVolume()->GetSolid());
-  double half_len = box->GetXHalfLength();
-  HepGeom::Point3D<double> p(pos);
-  HepGeom::Point3D<double> pt = ((G4PVPlacementGT*)m_pv)->getTransform()
-                                .inverse() * p;
-  m_LightPropagationLength = half_len - pt.x();
-  return m_LightPropagationLength;
-}
 
 bool EKLMStripHit::doesIntersect(EKLMStripHit * hit,
-                                 CLHEP::Hep3Vector & crossPoint)
+                                 Hep3Vector & crossPoint)
 {
-  G4Box *box1 = (G4Box*)(hit->getPV()->GetLogicalVolume()->GetSolid());
+  G4Box *box1 = (G4Box*)(hit->getVolume()->GetLogicalVolume()->GetSolid());
   double max1 = 2.0 * box1->GetXHalfLength();
   HepGeom::Point3D<double> p1(0.5 * max1, 0., 0.);
-  HepGeom::Point3D<double> pt1 = ((G4PVPlacementGT*)(hit->getPV()))->
+  HepGeom::Point3D<double> pt1 = ((G4PVPlacementGT*)(hit->getVolume()))->
                                  getTransform() * p1;
 
   G4Box *box2 = (G4Box*)(m_pv->GetLogicalVolume()->GetSolid());
@@ -99,7 +89,7 @@ bool EKLMStripHit::doesIntersect(EKLMStripHit * hit,
 
   crossPoint.setZ((pt1.z() + pt2.z()) / 2);
 
-  if (CheckStripOrientationX(hit->getPV())) {
+  if (CheckStripOrientationX(hit->getVolume())) {
     if (fabs(pt1.x() - pt2.x()) <= max1 && fabs(pt1.y() - pt2.y()) <= max2 &&
         fabs(pt2.x()) <= fabs(pt1.x()) && fabs(pt1.y()) <= fabs(pt2.y())) {
       crossPoint.setX(pt2.x());
@@ -115,6 +105,31 @@ bool EKLMStripHit::doesIntersect(EKLMStripHit * hit,
     }
   }
   return false;
+}
 
+
+double EKLMStripHit::getLightPropagationLength(Hep3Vector &pos)
+{
+  G4Box *box = (G4Box*)(m_pv->GetLogicalVolume()->GetSolid());
+  double half_len = box->GetXHalfLength();
+  HepGeom::Point3D<double> p(pos);
+  HepGeom::Point3D<double> pt = ((G4PVPlacementGT*)m_pv)->getTransform()
+                                .inverse() * p;
+  m_LightPropagationLength = half_len - pt.x();
+  return m_LightPropagationLength;
+}
+
+
+
+
+
+void EKLMStripHit::Print()
+{
+  std::cout << "Endcap: " << getEndcap()
+            << " Layer: " << getLayer()
+            << " Sector: " << getSector()
+            << " Plane: " << getPlane()
+            << " Strip: " << getStrip()
+            << " # Time: " << m_Time << "\n";
 }
 

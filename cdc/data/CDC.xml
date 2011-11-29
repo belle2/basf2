@@ -3912,7 +3912,7 @@ v        <Radius desc="Radius of wires in this layer" unit="mm">656.4</Radius>
       <Number desc="The total number of sense wires">14336</Number>
     </SenseWire>
     <FieldWire name="FieldWire">
-      <Diameter desc="Diameter of field wire" unit="mm">0.030</Diameter>
+      <Diameter desc="Diameter of field wire" unit="mm">0.126</Diameter>
       <Number desc="The total number of field wires">42240</Number>
     </FieldWire>
     <FeedThrough name="FeedThrough">

@@ -37,11 +37,6 @@ namespace Belle2 {
     ~EKLMSensitiveDetector() {};
 
     /**
-     * Register EKLM hits collection into G4HCofThisEvent
-     */
-    //    void Initialize(G4HCofThisEvent *eventHC);
-
-    /**
      * Process each step and calculate variables for EKLMStepHit
      * store EKLMStepHit
      */
@@ -59,6 +54,14 @@ namespace Belle2 {
      * will be dropped
      */
     G4double m_ThresholdHitTime;
+
+    /**
+     * sensitive detector operation mode
+     * 0 - normal operation
+     * 1 - bkg studies
+     */
+    int m_mode;
+
 
   };
 

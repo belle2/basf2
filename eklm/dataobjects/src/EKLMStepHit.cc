@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include <eklm/dataobjects/EKLMStepHit.h>
+#include <framework/logging/Logger.h>
 
 
 using namespace Belle2;
@@ -126,6 +127,20 @@ void EKLMStepHit::setVolume(const G4VPhysicalVolume * vol)
 {
   m_pv = vol;
 }
+
+int  EKLMStepHit::getVolumeType()  const
+{
+  return m_volType;
+}
+
+void EKLMStepHit::setVolumeType(int type)
+{
+  if (type != 0 && type != 1 && type != 2)
+    B2ERROR("Wrong Volume Type!");
+  m_volType = type;
+}
+
+
 
 
 void EKLMStepHit::increaseEDep(double e)

@@ -1384,7 +1384,7 @@ void GeoEKLMBelleII::createStripBoard(int iBoard, G4PVPlacementGT *mpvgt)
                                           Board_Name);
   else
     logicStripBoard = new G4LogicalVolume(solidStripBoard, Silicon,
-                                          Board_Name, 0, m_bkgsensitive[2], 0);
+                                          Board_Name, 0, m_sensitive, 0);
   if (logicStripBoard == NULL) {
     B2FATAL("Memory allocation error.");
     exit(ENOMEM);
@@ -1400,6 +1400,9 @@ void GeoEKLMBelleII::createStripBoard(int iBoard, G4PVPlacementGT *mpvgt)
     B2FATAL("Memory allocation error.");
     exit(ENOMEM);
   }
+  // mark this object as StripBoard
+  physiStripBoard->setVolumeType(2);
+
   printVolumeMass(logicStripBoard);
 }
 
@@ -1708,7 +1711,7 @@ void GeoEKLMBelleII::createStripSensitive(int iStrip, G4PVPlacementGT *mpvgt)
                                          Sensitive_Name, 0, m_sensitive, 0);
   else
     logicSensitive = new G4LogicalVolume(solidSensitive, Polystyrene,
-                                         Sensitive_Name, 0, m_bkgsensitive[0],
+                                         Sensitive_Name, 0, m_sensitive,
                                          0);
   if (logicSensitive == NULL) {
     B2FATAL("Memory allocation error.");
@@ -1723,6 +1726,9 @@ void GeoEKLMBelleII::createStripSensitive(int iStrip, G4PVPlacementGT *mpvgt)
     B2FATAL("Memory allocation error.");
     exit(ENOMEM);
   }
+  // mark this object as SensitiveStrip
+  physiSensitive->setVolumeType(0);
+
   printVolumeMass(logicSensitive);
 }
 
@@ -1748,7 +1754,7 @@ void GeoEKLMBelleII::createSiPM(int iStrip, G4PVPlacementGT *mpvgt)
     logicSiPM = new G4LogicalVolume(solidSiPM, Silicon, SiPM_Name);
   else
     logicSiPM = new G4LogicalVolume(solidSiPM, Silicon, SiPM_Name, 0,
-                                    m_bkgsensitive[1], 0);
+                                    m_sensitive, 0);
   if (logicSiPM == NULL) {
     B2FATAL("Memory allocation error.");
     exit(ENOMEM);
@@ -1762,6 +1768,9 @@ void GeoEKLMBelleII::createSiPM(int iStrip, G4PVPlacementGT *mpvgt)
     B2FATAL("Memory allocation error.");
     exit(ENOMEM);
   }
+  //mark volume as SiPM
+  physiSiPM->setVolumeType(1);
+
   printVolumeMass(logicSiPM);
 }
 
@@ -1784,21 +1793,12 @@ void GeoEKLMBelleII::create(const GearDir& content, G4LogicalVolume& topVolume,
 {
   int i;
   readXMLData(content);
-  if (m_mode == 0) {
-    m_sensitive = new EKLMSensitiveDetector("EKLMSensitiveDetector");
-    if (m_sensitive == NULL) {
-      B2FATAL("Memory allocation error.");
-      exit(ENOMEM);
-    }
-  } else {
-    for (i = 0; i < 3; i++) {
-      m_bkgsensitive[i] = new EKLMBkgSensitiveDetector("EKLM", i, 0);
-      if (m_bkgsensitive[i] == NULL) {
-        B2FATAL("Memory allocation error.");
-        exit(ENOMEM);
-      }
-    }
+  m_sensitive = new EKLMSensitiveDetector("EKLMSensitiveDetector");
+  if (m_sensitive == NULL) {
+    B2FATAL("Memory allocation error.");
+    exit(ENOMEM);
   }
+
   createMaterials();
   for (i = 1; i <= 2; i++)
     createEndcap(i, &topVolume);

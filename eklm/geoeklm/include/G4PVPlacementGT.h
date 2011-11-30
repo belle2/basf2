@@ -55,17 +55,32 @@ namespace Belle2 {
     /**
      * getID - get identifier.
      */
-    int getID();
+    int getID() const;
 
     /**
      * getMode - get detector mode
      */
-    int getMode();
+    int getMode() const;
+
+    /**
+     * getVolumeType - get VolumeType
+     */
+    int  getVolumeType() const;
+
+    /**
+     * setVolumeType - set VolumeType
+     */
+    void setVolumeType(int) ;
 
     /**
      * getMother - get mother G4PVPlacementGT;
      */
-    G4PVPlacementGT *getMother();
+    const G4PVPlacementGT *getMother() const;
+
+    /**
+     * getName - get volume Name
+     */
+    const std::string getName() const;
 
   private:
 
@@ -88,10 +103,27 @@ namespace Belle2 {
      */
     int m_mode;
 
+
+    /**
+     * Volume Type
+     * -1 -- default value
+     *  0 -- sensitive strips
+     *  1 -- sensitive SiPM (background studies only)
+     *  2 -- sensitive Electronic Boards (background studies only)
+     */
+    int m_type;
+
+
+
+    /**
+     * Name
+     */
+    const std::string m_name;
+
     /**
      * Mother G4PVPlacementGT.
      */
-    G4PVPlacementGT *m_mother;
+    const G4PVPlacementGT *m_mother;
 
   };
 

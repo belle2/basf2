@@ -187,6 +187,18 @@ namespace Belle2 {
 
 
     /**
+     * Get volume type
+     */
+    int  getVolumeType()  const ;
+
+    /**
+     * Set volume type
+     */
+    void setVolumeType(int);
+
+
+
+    /**
      *  Increase energy deposition
      */
     void increaseEDep(double);
@@ -204,6 +216,8 @@ namespace Belle2 {
     double m_energyDeposit;     /** energy deposition */
     int m_trackID;              /** track ID */
     int m_parentTrackID;        /** parent track ID */
+    int m_volType;              /** Volume type: 0 --> stip, 1 --> SiPM , 2 --> ElectronicBoard */
+
     //** we do not want to  allow anyone to change the PV !! */
     const G4VPhysicalVolume * m_pv;     //! {ROOT streamer directive}
     std::string m_pvName; /** volume name */

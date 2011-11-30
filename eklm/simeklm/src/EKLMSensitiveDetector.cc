@@ -16,7 +16,6 @@
 #include <eklm/geoeklm/G4PVPlacementGT.h>
 
 #include "G4Step.hh"
-//#include "G4SteppingManager.hh"
 
 
 #include <framework/gearbox/GearDir.h>
@@ -29,9 +28,11 @@ namespace Belle2 {
   EKLMSensitiveDetector::EKLMSensitiveDetector(G4String name)
       : Simulation::SensitiveDetectorBase(name, KLM)
   {
-    GearDir SensitiveDetector = GearDir("/Detector/DetectorComponent[@name=\"EKLM\"]/Content/SensitiveDetector");
-    m_ThresholdEnergyDeposit = SensitiveDetector.getDouble("EnergyDepositionThreshold") / MeV;
-    m_ThresholdHitTime = SensitiveDetector.getDouble("HitTimeThreshold") / ns;
+    GearDir gd = GearDir("/Detector/DetectorComponent[@name=\"EKLM\"]/Content");
+    m_mode = gd.getInt("Mode");
+    gd.append("/SensitiveDetector");
+    m_ThresholdEnergyDeposit = gd.getDouble("EnergyDepositionThreshold") / MeV;
+    m_ThresholdHitTime = gd.getDouble("HitTimeThreshold") / ns;
   }
 
   //-----------------------------------------------------
@@ -46,10 +47,12 @@ namespace Belle2 {
     const G4double eDep = aStep->GetTotalEnergyDeposit();
 
     /**
+     * in normal opearation mode (m_mode=0)
      * ignore tracks with small energy deposition
      * use "<=" instead of "<" to drop hits from neutrinos etc unless eDepositionThreshold is non-negative
+     * Background studies m_mode=1 accepts all tracks
      */
-    if (eDep <= m_ThresholdEnergyDeposit)
+    if (eDep <= m_ThresholdEnergyDeposit && m_mode == 0)
       return false;
 
     /**
@@ -64,14 +67,15 @@ namespace Belle2 {
 
 
     /**
-    * drop hit if global time is nan or if it is  mothe than
+    * drop hit if global time is nan or if it is  more than
     * hitTimeThreshold (to avoid nuclei fission signals)
     */
     if (isnan(hitTime)) {
       B2ERROR("EKLMSensitiveDetector: global time is nan");
       return false;
     }
-    if (hitTime > m_ThresholdHitTime) {
+    // No time cut for background studeis
+    if (hitTime > m_ThresholdHitTime && m_mode == 0) {
       B2INFO("EKLMSensitiveDetector: ALL HITS WITH TIME > hitTimeThreshold ARE DROPPED!!");
       return false;
     }
@@ -139,18 +143,31 @@ namespace Belle2 {
     /**
      * Get information on mother volumes and store them to the hit
      */
-    G4PVPlacementGT *pvgt = (G4PVPlacementGT*)pv;
-    pvgt = pvgt->getMother();
-    pvgt = pvgt->getMother();
-    hit->setStrip(pvgt->getID());
-    pvgt = pvgt->getMother();
-    hit->setPlane(pvgt->getID());
-    pvgt = pvgt->getMother();
-    hit->setSector(pvgt->getID());
-    pvgt = pvgt->getMother();
-    hit->setLayer(pvgt->getID());
-    pvgt = pvgt->getMother();
-    hit->setEndcap(pvgt->getID());
+    const G4PVPlacementGT *pvgt = (G4PVPlacementGT*)pv;
+    hit->setVolumeType(pvgt->getVolumeType());
+    if (pvgt->getVolumeType() >= 0) {
+      pvgt = pvgt->getMother();
+
+      if (hit->getVolumeType() == 0) { // Sensitive strip
+        pvgt = pvgt->getMother();
+      }
+      hit->setStrip(pvgt->getID()); // StripVolume ID for Strip and SiPM and BaseBoard ID for StripBoard
+
+      if (hit->getVolumeType() == 0 || hit->getVolumeType() == 1) { // Sensitive strip
+        pvgt = pvgt->getMother();
+      }
+      hit->setPlane(pvgt->getID());  // Plane ID for Stripand and SiPM and SectionBoard ID for StripBoard
+
+      pvgt = pvgt->getMother();
+      hit->setSector(pvgt->getID()); // Sector ID
+
+      pvgt = pvgt->getMother();
+      hit->setLayer(pvgt->getID());  // Layer ID
+
+      pvgt = pvgt->getMother();
+      hit->setEndcap(pvgt->getID()); // Endcap ID
+    } else
+      B2ERROR("EKLMSensitiveDetector.cc:: Try to get hit information from insensitive volumes");
 
 
 

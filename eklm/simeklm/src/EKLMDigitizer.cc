@@ -9,43 +9,16 @@
  **************************************************************************/
 
 #include <eklm/simeklm/EKLMDigitizer.h>
+#include <eklm/simeklm/EKLMFiberAndElectronics.h>
+#include <eklm/dataobjects/EKLMSimHit.h>
 
 #include <framework/datastore/StoreArray.h>
+#include <framework/logging/Logger.h>
 
 #include "G4VPhysicalVolume.hh"
 
-
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/connected_components.hpp>
-// #include <boost/graph/graph_traits.hpp>
-// #include <boost/graph/properties.hpp>
-// #include <boost/range/irange.hpp>
-
-#include <eklm/dataobjects/EKLMSimHit.h>
-
-
-
-//-----------------------
-
-#include <eklm/simeklm/EKLMFiberAndElectronics.h>
-
-#include <eklm/eklmutils/EKLMutils.h>
-#include <framework/logging/Logger.h>
-#include<iostream>
-#include<fstream>
-
-#include <framework/datastore/StoreObjPtr.h>
-
-
-#include <framework/gearbox/Gearbox.h>
-#include <framework/gearbox/GearDir.h>
-
-#include <TRandom.h>
-
-#include <geometry/CreatorManager.h>
-#include <geometry/CreatorBase.h>
-
-#include <eklm/geoeklm/GeoEKLMBelleII.h>
 
 
 using namespace CLHEP;

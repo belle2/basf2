@@ -14,7 +14,6 @@
 #include <geometry/CreatorBase.h>
 #include <framework/gearbox/GearDir.h>
 #include <eklm/simeklm/EKLMSensitiveDetector.h>
-#include <eklm/simeklm/EKLMBkgSensitiveDetector.h>
 #include <eklm/geoeklm/G4PVPlacementGT.h>
 
 #include <G4LogicalVolume.hh>
@@ -560,14 +559,6 @@ namespace Belle2 {
      * Sensitive detector
      */
     EKLMSensitiveDetector *m_sensitive;
-
-    /**
-     * Background study sensitive detectors.
-     * 0 - strips,
-     * 1 - SiPMs,
-     * 2 - readout boards.
-     */
-    EKLMBkgSensitiveDetector *m_bkgsensitive[3];
 
   };
 

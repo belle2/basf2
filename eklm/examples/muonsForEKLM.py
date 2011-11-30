@@ -50,12 +50,6 @@ geobuilder.param('Components', ['EKLM'])
 
 # Full Geant4 simulation
 g4sim = register_module('FullSim')
-g4sim.param('EnableVisualization', True)
-g4sim.param('EnableVisualization', False)
-g4sim.param('UICommands', ['/vis/open VRML2FILE', '/vis/drawVolume',
-            '/vis/scene/add/axes 0 0 0 100 mm',
-            '/vis/scene/add/trajectories smooth',
-            '/vis/modeling/trajectories/create/drawByCharge'])
 
 # Root file output
 simpleoutput = register_module('SimpleOutput')

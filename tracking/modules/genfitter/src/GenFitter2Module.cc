@@ -16,8 +16,9 @@
 
 #include <geometry/GeometryManager.h>
 #include <geometry/bfieldmap/BFieldMap.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/dataobjects/EventMetaData.h>
 
-//#include <framework/datastore/StoreObjPtr.h>
 #include <svd/dataobjects/SVDTrueHit.h>
 #include <pxd/dataobjects/PXDTrueHit.h>
 #include <framework/logging/Logger.h>
@@ -28,7 +29,7 @@
 #include <tracking/gfbfield/GFGeant4Field.h>
 
 #include <GFTrack.h>
-//#include <GFKalman2.h>
+#include <GFKalman2.h>
 #include <GFKalman.h>
 #include <GFDaf.h>
 #include <GFRecoHitProducer.h>
@@ -69,7 +70,7 @@ GenFitter2Module::GenFitter2Module() :
   addParam("blowUpFactor", m_blowUpFactor, "factor multiplied with the cov of the Kalman filter when backward filter starts", 500.0);
   addParam("filter", m_filter, "throw away tracks with do not have exactly 1 hit in every Si layer", false);
   addParam("filterIterations", m_nGFIter, "number of Genfit iterations", 1);
-
+  addParam("seedForRecoHits", m_seedForRecoHits, "hack because there is no framwork wide random number seed at the moment", -1);
 
 }
 
@@ -81,7 +82,9 @@ void GenFitter2Module::initialize()
 {
   geometry::GeometryManager &geoManager = geometry::GeometryManager::getInstance();
   geoManager.createTGeoRepresentation();
-  //gRandom->SetSeed(1);
+  if (m_seedForRecoHits >= 0) {
+    gRandom->SetSeed(m_seedForRecoHits); //this will set the seed for the global gRandom where the recoHits get there randomness for measurements from
+  }
 }
 
 void GenFitter2Module::beginRun()
@@ -94,8 +97,9 @@ void GenFitter2Module::beginRun()
 void GenFitter2Module::event()
 {
 
-  //StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
-  B2INFO("**********   GenFitter2Module  ************");
+  StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
+  int eventCounter = eventMetaDataPtr->getEvent();
+  B2INFO("**********   GenFitter2Module  processing event number: " << eventCounter << " ************");
   StoreArray<GFTrackCand> trackCandidates("");
   int nTrackCandidates = trackCandidates.getEntries();
   if (nTrackCandidates == 0) {
@@ -223,7 +227,7 @@ void GenFitter2Module::event()
     //Initialize fitting algorithm and process track
 //  if((nHitsL1 == 1 and nHitsL2 == 1 and nHitsL3 == 1 and nHitsL4 == 1 and nHitsL5 == 1 and nHitsL6 == 1) or m_noFilter == true){
     if (m_useDaf == false) {
-      GFKalman kalmanFilter;
+      GFKalman2 kalmanFilter;
       kalmanFilter.setNumIterations(m_nGFIter);
       kalmanFilter.setBlowUpFactor(m_blowUpFactor);
       kalmanFilter.processTrack(&track);
@@ -243,7 +247,7 @@ void GenFitter2Module::event()
       new(fittedTracks->AddrAt(0)) GFTrack(track);
       ++m_fitCounter;
     } else {
-      B2WARNING("Genfit returned an error (with status flag " << genfitStatusFlag << ") during the fit of one track");
+      B2WARNING("Genfit returned an error (with status flag " << genfitStatusFlag << ") during the fit of one track in event " << eventCounter);
       ++m_failedFitCounter;
     }
 

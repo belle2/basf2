@@ -117,7 +117,7 @@ namespace Belle2 {
 
   protected:
 
-    // littel helper functions for this module
+    // little helper functions for this module
     double calcChi2(const TMatrixT<double>& res, const TMatrixT<double>& R);
     std::vector<double> calcZs(const TMatrixT<double>& res, const TMatrixT<double>& R);
     std::vector<double> calcTestsWithTruthInfo(const TMatrixT<double>& state, const TMatrixT<double>& cov, const TMatrixT<double>& trueState);

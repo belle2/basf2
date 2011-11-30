@@ -10,7 +10,6 @@
 
 #include <tracking/modules/trackFitChecker/trackFitCheckerModule.h>
 
-
 using namespace std;
 using namespace Belle2;
 using namespace boost::accumulators;
@@ -48,7 +47,6 @@ trackFitCheckerModule::~trackFitCheckerModule()
 
 void trackFitCheckerModule::initialize()
 {
-
   //configure the output
   //Module::getParam(string("writeToB2info"));
   m_testOutputFileName = "statisticaltests.txt";
@@ -117,7 +115,6 @@ void trackFitCheckerModule::initialize()
   m_badR_bCounter = 0;
   m_badR_smCounter = 0;
   m_processedTracks = 0;
-  m_eventCounter = 0;
   m_nCutawayTracks = 0;
   m_notPosDefCounter = 0;
   m_unSymmetricCounter = 0;
@@ -134,6 +131,8 @@ void trackFitCheckerModule::beginRun()
 
 void trackFitCheckerModule::event()
 {
+  StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
+  int eventCounter = eventMetaDataPtr->getEvent();
 
   //simulated particles and hits
   StoreArray<MCParticle> aMcParticleArray("");
@@ -154,7 +153,7 @@ void trackFitCheckerModule::event()
   // testoutput
   StoreArray<TrackFitCheckerTempHelperClass> qualityIndicators("QualityIndicators");
 
-  //cout << m_eventCounter << " " << flush;
+  //cout << eventCounter << " " << flush;
   for (int i = 0; i not_eq nFittedTracks; ++i) {
 
     GFTrack* const aTrackPtr = fittedTracks[i];
@@ -173,7 +172,7 @@ void trackFitCheckerModule::event()
     } else { // not and outlier contine with tests
       // first part: get variable disribing the hole track
       const double chi2tot_fu = aTrackPtr->getForwardChiSqu();
-      m_dataOut << m_eventCounter << "\t" << m_processedTracks << "\t" << chi2tot_fu;
+      m_dataOut << eventCounter << "\t" << m_processedTracks << "\t" << chi2tot_fu;
       const int ndf = aTrackPtr->getNDF();
       const double pValue_bu = TMath::Prob(chi2tot_bu, ndf); // actually the p value would be 1-TMath::Prob(chi2tot, ndf) but particle physicists want to have it this way.
       const double pValue_fu = TMath::Prob(chi2tot_fu, ndf);
@@ -205,7 +204,6 @@ void trackFitCheckerModule::event()
       zVertexPosMom[3] = resVertexPosMom[3] / sqrt(vertexCov[3][3]);
       zVertexPosMom[4] = resVertexPosMom[4] / sqrt(vertexCov[4][4]);
       zVertexPosMom[5] = resVertexPosMom[5] / sqrt(vertexCov[5][5]);
-      m_trackWiseDataVecSamples["zs_vertexPosMom"][0](zVertexPosMom[0]);
       fillTrackWiseVecData("zs_vertexPosMom", zVertexPosMom);
 
       //write stuff in helper class... to be able to make plots with the TBrowser... something better should be used in the future
@@ -221,12 +219,12 @@ void trackFitCheckerModule::event()
       qualityIndicators[i]->zVertexMomY = zVertexPosMom[4];
       qualityIndicators[i]->zVertexMomZ = zVertexPosMom[5];
 
-      qualityIndicators[i]->vertexPosX = vertexPos[0] - trueVertexPos[0];
-      qualityIndicators[i]->vertexPosY = vertexPos[1] - trueVertexPos[1];
-      qualityIndicators[i]->vertexPosZ = vertexPos[2] - trueVertexPos[2];
-      qualityIndicators[i]->vertexMomX = vertexMom[0] - trueVertexMom[0];
-      qualityIndicators[i]->vertexMomY = vertexMom[1] - trueVertexMom[1];
-      qualityIndicators[i]->vertexMomZ = vertexMom[2] - trueVertexMom[2];
+      qualityIndicators[i]->vertexPosX = resVertexPosMom[0];
+      qualityIndicators[i]->vertexPosY = resVertexPosMom[1];
+      qualityIndicators[i]->vertexPosZ = resVertexPosMom[2];
+      qualityIndicators[i]->vertexMomX = resVertexPosMom[3];
+      qualityIndicators[i]->vertexMomY = resVertexPosMom[4];
+      qualityIndicators[i]->vertexMomZ = resVertexPosMom[5];
 
       //now the layer wise tests
       if (m_testSi == true) {
@@ -428,7 +426,7 @@ void trackFitCheckerModule::event()
     }
   }
   //m_dataOut << "\n";
-  ++m_eventCounter;
+  ++eventCounter;
 }
 
 void trackFitCheckerModule::endRun()

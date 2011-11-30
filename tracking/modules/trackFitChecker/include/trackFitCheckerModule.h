@@ -23,7 +23,8 @@
 #define trackFitCheckerModule_H_
 
 #include <framework/core/Module.h>
-
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/dataobjects/EventMetaData.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <generators/dataobjects/MCParticle.h>
@@ -160,7 +161,6 @@ namespace Belle2 {
     //bool m_testGeant3;
     int m_failedSmootherCounter;
     int m_processedTracks;
-    int m_eventCounter;
     double m_totalChi2Cut;
     int m_nCutawayTracks;
     // counters holding the number of the covariance matrices (R) of the resuduals that have negative diagonal elements

@@ -29,7 +29,7 @@
 #include <tracking/gfbfield/GFGeant4Field.h>
 
 #include <GFTrack.h>
-#include <GFKalman2.h>
+//#include <GFKalman2.h>
 #include <GFKalman.h>
 #include <GFDaf.h>
 #include <GFRecoHitProducer.h>
@@ -227,7 +227,7 @@ void GenFitter2Module::event()
     //Initialize fitting algorithm and process track
 //  if((nHitsL1 == 1 and nHitsL2 == 1 and nHitsL3 == 1 and nHitsL4 == 1 and nHitsL5 == 1 and nHitsL6 == 1) or m_noFilter == true){
     if (m_useDaf == false) {
-      GFKalman2 kalmanFilter;
+      GFKalman kalmanFilter;
       kalmanFilter.setNumIterations(m_nGFIter);
       kalmanFilter.setBlowUpFactor(m_blowUpFactor);
       kalmanFilter.processTrack(&track);

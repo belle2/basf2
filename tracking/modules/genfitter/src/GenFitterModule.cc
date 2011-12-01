@@ -201,7 +201,8 @@ void GenFitterModule::event()
 
 
     while (pdgCounter > 0) {  //while loop over all pdg hypothesises
-      trackCandidates[i]->setPdgCode(int(TMath::Sign(1., trackCandidates[i]->getQoverPseed()) * pdg.at(pdgCounter - 1)));
+      if (m_mcTracks == true && m_pdg == -999)trackCandidates[i]->setPdgCode(pdg.at(pdgCounter - 1));
+      else trackCandidates[i]->setPdgCode(int(TMath::Sign(1., trackCandidates[i]->getQoverPseed()) * pdg.at(pdgCounter - 1)));
 
       trackRep = new RKTrackRep(trackCandidates[i]);
 

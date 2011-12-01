@@ -99,8 +99,6 @@ param_cdcfitting = {
     }
 cdcfitting.param(param_cdcfitting)
 
-myanalysis = register_module('MyTrackingAnalysis')
-
 # output
 output = register_module('SimpleOutput')
 output.param('outputFileName', 'MCFittingOutput.root')
@@ -121,7 +119,6 @@ main.add_module(cdcDigitizer)
 
 main.add_module(mctrackfinder)
 main.add_module(cdcfitting)
-main.add_module(myanalysis)
 main.add_module(output)
 
 # Process events

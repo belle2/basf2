@@ -49,7 +49,7 @@
 //
 //
 //
-//   Class THelix 
+//   Class THelix
 //
 //   Author      Date         comments
 //   Y.Ohnishi   03/01/1997   original version
@@ -78,22 +78,22 @@
 namespace Belle {
 
 /// THelix parameter class
-class THelix {
+  class THelix {
 
   public:
     /// Constructor with pivot, helix parameter a, and its error matrix.
     THelix(const HepGeom::Point3D<double>  & pivot,
-	  const CLHEP::HepVector & a,
-	  const CLHEP::HepSymMatrix & Ea);
+           const CLHEP::HepVector & a,
+           const CLHEP::HepSymMatrix & Ea);
 
     /// Constructor without error matrix.
     THelix(const HepGeom::Point3D<double>  & pivot,
-	  const CLHEP::HepVector & a);
+           const CLHEP::HepVector & a);
 
     /// Constructor with position, momentum, and charge.
     THelix(const HepGeom::Point3D<double>  & position,
-	  const CLHEP::Hep3Vector & momentum,
-	  double charge);
+           const CLHEP::Hep3Vector & momentum,
+           double charge);
 
     /// Destructor
     virtual ~THelix();
@@ -131,7 +131,7 @@ class THelix {
     CLHEP::HepLorentzVector momentum(double dPhi, double mass, CLHEP::HepSymMatrix & Em) const;
 
     /// returns 4momentum vector after rotating angle dPhi in phi direction.
-    CLHEP::HepLorentzVector momentum(double dPhi, double mass, HepGeom::Point3D<double>  & x, CLHEP::HepSymMatrix & Emx) const;  
+    CLHEP::HepLorentzVector momentum(double dPhi, double mass, HepGeom::Point3D<double>  & x, CLHEP::HepSymMatrix & Emx) const;
 
   public:// Parametrization dependent functions. Prepared for tracking codes. Users should not use them.
     /// returns an element of parameters.
@@ -152,7 +152,7 @@ class THelix {
 
   public:// Modifiers
     /// sets helix parameters.
-    const CLHEP::HepVector & a(const CLHEP::HepVector & newA); 
+    const CLHEP::HepVector & a(const CLHEP::HepVector & newA);
 
     /// sets helix paramters and error matrix.
     const CLHEP::HepSymMatrix & Ea(const CLHEP::HepSymMatrix & newdA);
@@ -162,8 +162,8 @@ class THelix {
 
     /// sets helix pivot position, parameters, and error matrix.
     void set(const HepGeom::Point3D<double>  & pivot,
-	     const CLHEP::HepVector & a,
-	     const CLHEP::HepSymMatrix & Ea);
+             const CLHEP::HepVector & a,
+             const CLHEP::HepSymMatrix & Ea);
 
     /// unsets error matrix. Error calculations will be ignored after this function call until an error matrix be set again. 0 matrix will be return as a return value for error matrix when you call functions which returns an error matrix.
     void ignoreErrorMatrix(void);
@@ -172,15 +172,15 @@ class THelix {
     double bFieldZ(double);
     double bFieldZ(void) const;
 
-  static void set_limits(const CLHEP::HepVector &a_min, const CLHEP::HepVector &a_max);
-  static bool set_exception(bool);
-  static bool set_print(bool);
-private:
-  static CLHEP::HepVector ms_amin, ms_amax;
-  static bool ms_check_range;
-  static bool ms_print_debug;
-  static bool ms_throw_exception;
-  
+    static void set_limits(const CLHEP::HepVector &a_min, const CLHEP::HepVector &a_max);
+    static bool set_exception(bool);
+    static bool set_print(bool);
+  private:
+    static CLHEP::HepVector ms_amin, ms_amax;
+    static bool ms_check_range;
+    static bool ms_print_debug;
+    static bool ms_throw_exception;
+
 
   public:// Operators
     /// Copy operator
@@ -219,9 +219,9 @@ private:
     double m_r;
     double m_ac[5];
 
-  static const std::string invalidhelix;
+    static const std::string invalidhelix;
 
-};
+  };
 
 #if defined(BELLE_DEBUG)
 #define DEBUG_HELIX debugTHelix()
@@ -242,152 +242,170 @@ private:
 
 #ifdef THelix_INLINE_DEFINE_HERE
 
-inline
-const HepGeom::Point3D<double>  &
-THelix::center(void) const {
+  inline
+  const HepGeom::Point3D<double>  &
+  THelix::center(void) const
+  {
 #if defined(BELLE_DEBUG)
-  if(!m_helixValid) {
-    DEBUG_PRINT;
-    if(ms_throw_exception) throw invalidhelix;
-  }
-#endif
-    return m_center;
-}
-
-inline
-const HepGeom::Point3D<double>  &
-THelix::pivot(void) const {
-  DEBUG_HELIX;
-    return m_pivot;
-}
-
-inline
-double
-THelix::radius(void) const {
-  DEBUG_HELIX;
-    return m_r;
-}
-
-inline
-CLHEP::Hep3Vector
-THelix::direction(double phi) const {
-  DEBUG_HELIX;
-    return momentum(phi).unit();
-}
-
-inline
-double
-THelix::dr(void) const {
-  DEBUG_HELIX;
-    return m_ac[0];
-}
-
-inline
-double
-THelix::phi0(void) const {
-  DEBUG_HELIX;
-    return m_ac[1];
-}
-
-inline
-double
-THelix::kappa(void) const {
-  DEBUG_HELIX;
-    return m_ac[2];
-}
-
-inline
-double
-THelix::dz(void) const {
-  DEBUG_HELIX;
-    return m_ac[3];
-}
-
-inline
-double
-THelix::tanl(void) const {
-  DEBUG_HELIX;
-    return m_ac[4];
-}
-
-inline
-double
-THelix::curv(void) const {
-  DEBUG_HELIX;
-    return m_r;
-}
-
-inline
-const CLHEP::HepVector &
-THelix::a(void) const {
-  DEBUG_HELIX;
-    return m_a;
-}
-
-inline
-const CLHEP::HepSymMatrix &
-THelix::Ea(void) const {
-  DEBUG_HELIX;
-    return m_Ea;
-}
-
-inline
-const CLHEP::HepVector &
-THelix::a(const CLHEP::HepVector & i) {
-  if(i.num_row()==5) {
-    m_a = i;
-    m_helixValid = false;
-    updateCache();
-#if defined(BELLE_DEBUG)
-    DEBUG_HELIX;
-  } else {
-    {
-      std::cout << "THelix::input vector's num_row is not 5" << std::endl;
+    if (!m_helixValid) {
       DEBUG_PRINT;
-      if(ms_throw_exception) throw invalidhelix;
+      if (ms_throw_exception) throw invalidhelix;
     }
 #endif
+    return m_center;
   }
-  return m_a;
-}
 
-inline
-const CLHEP::HepSymMatrix &
-THelix::Ea(const CLHEP::HepSymMatrix & i) {
-  DEBUG_HELIX;
+  inline
+  const HepGeom::Point3D<double>  &
+  THelix::pivot(void) const
+  {
+    DEBUG_HELIX;
+    return m_pivot;
+  }
+
+  inline
+  double
+  THelix::radius(void) const
+  {
+    DEBUG_HELIX;
+    return m_r;
+  }
+
+  inline
+  CLHEP::Hep3Vector
+  THelix::direction(double phi) const
+  {
+    DEBUG_HELIX;
+    return momentum(phi).unit();
+  }
+
+  inline
+  double
+  THelix::dr(void) const
+  {
+    DEBUG_HELIX;
+    return m_ac[0];
+  }
+
+  inline
+  double
+  THelix::phi0(void) const
+  {
+    DEBUG_HELIX;
+    return m_ac[1];
+  }
+
+  inline
+  double
+  THelix::kappa(void) const
+  {
+    DEBUG_HELIX;
+    return m_ac[2];
+  }
+
+  inline
+  double
+  THelix::dz(void) const
+  {
+    DEBUG_HELIX;
+    return m_ac[3];
+  }
+
+  inline
+  double
+  THelix::tanl(void) const
+  {
+    DEBUG_HELIX;
+    return m_ac[4];
+  }
+
+  inline
+  double
+  THelix::curv(void) const
+  {
+    DEBUG_HELIX;
+    return m_r;
+  }
+
+  inline
+  const CLHEP::HepVector &
+  THelix::a(void) const
+  {
+    DEBUG_HELIX;
+    return m_a;
+  }
+
+  inline
+  const CLHEP::HepSymMatrix &
+  THelix::Ea(void) const
+  {
+    DEBUG_HELIX;
+    return m_Ea;
+  }
+
+  inline
+  const CLHEP::HepVector &
+  THelix::a(const CLHEP::HepVector & i)
+  {
+    if (i.num_row() == 5) {
+      m_a = i;
+      m_helixValid = false;
+      updateCache();
+#if defined(BELLE_DEBUG)
+      DEBUG_HELIX;
+    } else {
+      {
+        std::cout << "THelix::input vector's num_row is not 5" << std::endl;
+        DEBUG_PRINT;
+        if (ms_throw_exception) throw invalidhelix;
+      }
+#endif
+    }
+    return m_a;
+  }
+
+  inline
+  const CLHEP::HepSymMatrix &
+  THelix::Ea(const CLHEP::HepSymMatrix & i)
+  {
+    DEBUG_HELIX;
     return m_Ea = i;
-}
+  }
 
-inline
-double
-THelix::bFieldZ(double a) {
-  DEBUG_HELIX;
+  inline
+  double
+  THelix::bFieldZ(double a)
+  {
+    DEBUG_HELIX;
     m_bField = a;
     m_alpha = 10000. / 2.99792458 / m_bField;
     updateCache();
     return m_bField;
-}
+  }
 
-inline
-double
-THelix::bFieldZ(void) const {
-  DEBUG_HELIX;
+  inline
+  double
+  THelix::bFieldZ(void) const
+  {
+    DEBUG_HELIX;
     return m_bField;
-}
+  }
 
-inline
-double
-THelix::sinPhi0(void) const {
-  DEBUG_HELIX;
+  inline
+  double
+  THelix::sinPhi0(void) const
+  {
+    DEBUG_HELIX;
     return m_sp;
-}
+  }
 
-inline
-double
-THelix::cosPhi0(void) const {
-  DEBUG_HELIX;
+  inline
+  double
+  THelix::cosPhi0(void) const
+  {
+    DEBUG_HELIX;
     return m_cp;
-}
+  }
 
 #endif
 

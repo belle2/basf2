@@ -338,19 +338,19 @@ struct mdst_trk_fit;
 namespace Belle {
 
 
-class Trasan;
-class TTrackManager;
-class TCircle;
-class TCosmicFitter;
-class Refit;
-class THelixFitter;
-class TBuilder;
-class TPMCurlFinder;
-class TCurlFinder;
+  class Trasan;
+  class TTrackManager;
+  class TCircle;
+  class TCosmicFitter;
+  class Refit;
+  class THelixFitter;
+  class TBuilder;
+  class TPMCurlFinder;
+  class TCurlFinder;
 
 
 /// A class to represent a track in tracking.
-class TTrack : public TTrackBase {
+  class TTrack : public TTrackBase {
 
   public:
     /// Default constructor
@@ -405,7 +405,7 @@ class TTrack : public TTrackBase {
 
     /// dumps debug information.
     void dump(const std::string & message = std::string(""),
-	      const std::string & prefix = std::string("")) const;
+              const std::string & prefix = std::string("")) const;
 
   public:// Kinematics
     /// returns charge.
@@ -460,7 +460,7 @@ class TTrack : public TTrackBase {
 
     /// calculates arc length and z for a segment. Results are stored in TLink.
     int szPosition(const TSegment & segment, TLink & link) const;
-    
+
     /// calculates arc length for a point.
     int szPosition(const HepGeom::Point3D<double>  & p, HepGeom::Point3D<double>  & szPosition) const;
 
@@ -471,10 +471,10 @@ class TTrack : public TTrackBase {
     int stereoHitForCurl(TLink & link, TLink & link1) const;
     int stereoHitForCurl(TLink & link, TLink & link1, TLink & link2) const;
     void deleteListForCurl(AList<HepGeom::Point3D<double> > &l1,
-			   AList<HepGeom::Point3D<double> > &l2) const;
+                           AList<HepGeom::Point3D<double> > &l2) const;
     void deleteListForCurl(AList<HepGeom::Point3D<double> > &l1,
-			   AList<HepGeom::Point3D<double> > &l2,
-			   AList<HepGeom::Point3D<double> > &l3) const;
+                           AList<HepGeom::Point3D<double> > &l2,
+                           AList<HepGeom::Point3D<double> > &l3) const;
 #endif
     /// calculates arc length and z for a stereo hit. uses these functions for curl tracks(included svd version).
     int stereoHitForCurl(AList<TLink>&) const;
@@ -491,7 +491,7 @@ class TTrack : public TTrackBase {
     int fit2D(unsigned = 0, double = 0.1, double = 0.015);
 
     /// fits itself with cathode hits.
-    int fitWithCathode( float windowSize = 0.6 , int SysCorr = 0 ); // mod by matsu ( 1999/07/05 )
+    int fitWithCathode(float windowSize = 0.6 , int SysCorr = 0);   // mod by matsu ( 1999/07/05 )
 
     /// remove bad points by chi2. Bad points are returned in a 'list'. fit() should be called before calling this function. (using stereo wire as axial wire(z=0))
     void refine2D(AList<TLink> & list, float maxSigma);
@@ -500,7 +500,7 @@ class TTrack : public TTrackBase {
     void movePivot(void);
 
   public:// Static utility functions
-    
+
 
   public:// temporary added
     /// returns a cathode hit list.
@@ -508,12 +508,12 @@ class TTrack : public TTrackBase {
 
     /// calculates an intersection of this track and a cylinder.
     int HelCyl(double rhole,
-	       double rcyl,
-	       double zb,
-	       double zf,
-	       double epsl,
-	       double & phi,
-	       HepGeom::Point3D<double>  & xp) const;
+               double rcyl,
+               double zb,
+               double zf,
+               double epsl,
+               double & phi,
+               HepGeom::Point3D<double>  & xp) const;
 
     /// finds cathode hits associated to this track.
     void findCatHit(unsigned trackid);
@@ -522,7 +522,7 @@ class TTrack : public TTrackBase {
     void relationClusterWithWire();
 
     /// relation between cluster and layer
-    void relationClusterWithLayer(int SysCorr ); // by matsu ( 1999/07/05 )
+    void relationClusterWithLayer(int SysCorr);  // by matsu ( 1999/07/05 )
 
     /// appends Svd Hits(TSvdHit)
     void svdHits(AList<TSvdHit> &);
@@ -554,10 +554,10 @@ class TTrack : public TTrackBase {
     /// to dump a track.
     static std::string trackDump(const TTrack &);
     static void dump(const AList<TTrack> &,
-// 		     const std::string & message,
-// 		     const std::string & prefix);
- 		     const std::string & message = std::string(""),
- 		     const std::string & prefix = std::string(""));
+//         const std::string & message,
+//         const std::string & prefix);
+                     const std::string & message = std::string(""),
+                     const std::string & prefix = std::string(""));
 
     /// returns string of track type.
     static std::string trackType(const TTrack &);
@@ -568,11 +568,11 @@ class TTrack : public TTrackBase {
     static std::string trackStatus(const reccdc_trk &);
     static std::string trackStatus(const reccdc_trk_add &);
     static std::string trackStatus(unsigned md,
-				   unsigned mk,
-				   unsigned mq,
-				   unsigned ms,
-				   unsigned mm,
-				   unsigned ma);
+                                   unsigned mk,
+                                   unsigned mq,
+                                   unsigned ms,
+                                   unsigned mm,
+                                   unsigned ma);
 
     /// returns track information
     static std::string trackKinematics(const TTrack &);
@@ -580,9 +580,9 @@ class TTrack : public TTrackBase {
     static std::string trackInformation(const TTrack &);
     static std::string trackInformation(const reccdc_trk &);
     static std::string trackInformation(unsigned nA,
-					unsigned nS,
-					unsigned n,
-					float chisq);
+                                        unsigned nS,
+                                        unsigned n,
+                                        float chisq);
     static std::string trackLayerUsage(const TTrack &);
 
     /// returns helix.
@@ -603,20 +603,20 @@ class TTrack : public TTrackBase {
 
     static double chisq2confLevel(int, double);
     static int intersection(const HepGeom::Point3D<double>  & c1,
-			    double r1,
-			    const HepGeom::Point3D<double>  & c2,
-			    double r2,
-			    double eps,
-			    HepGeom::Point3D<double>  & x1,
-			    HepGeom::Point3D<double>  & x2);
+                            double r1,
+                            const HepGeom::Point3D<double>  & c2,
+                            double r2,
+                            double eps,
+                            HepGeom::Point3D<double>  & x1,
+                            HepGeom::Point3D<double>  & x2);
 
   private:
     /// calculates dXda. 'link' and 'dPhi' are inputs. Others are outputs.
     int dxda(const TLink & link,
-	     double dPhi,
-	     CLHEP::HepVector & dxda,
-	     CLHEP::HepVector & dyda,
-	     CLHEP::HepVector & dzda) const;
+             double dPhi,
+             CLHEP::HepVector & dxda,
+             CLHEP::HepVector & dyda,
+             CLHEP::HepVector & dzda) const;
 
     int dxda2D(const TLink & link,
                double dPhi,
@@ -679,7 +679,7 @@ class TTrack : public TTrackBase {
     static unsigned _nTTracks;
     static unsigned _nTTracksMax;
 #endif
-};
+  };
 
 //-----------------------------------------------------------------------------
 
@@ -692,44 +692,49 @@ class TTrack : public TTrackBase {
 
 #ifdef TTrack_INLINE_DEFINE_HERE
 
-inline
-const THelix &
-TTrack::helix(void) const {
+  inline
+  const THelix &
+  TTrack::helix(void) const
+  {
 #ifdef TRASAN_DEBUG
     // if (! _fitted) std::cout << "TTrack::helix !!! helix not updated" << std::endl;
 #endif
     return * _helix;
-}
+  }
 
-inline
-unsigned
-TTrack::ndf(void) const {
+  inline
+  unsigned
+  TTrack::ndf(void) const
+  {
 #ifdef TRASAN_DEBUG
     if (! _fitted) std::cout << "TTrack::ndf !!! ndf not updated" << std::endl;
 #endif
     return _ndf;
-}
+  }
 
-inline
-double
-TTrack::chi2(void) const {
+  inline
+  double
+  TTrack::chi2(void) const
+  {
 #ifdef TRASAN_DEBUG
     if (! _fitted) std::cout << "TTrack::chi2 !!! chi2 not updated" << std::endl;
 #endif
     return _chi2;
-}
+  }
 
-inline
-double
-TTrack::charge(void) const {
+  inline
+  double
+  TTrack::charge(void) const
+  {
     return _charge;
-}
+  }
 
-inline
-double
-TTrack::charge(double a) {
+  inline
+  double
+  TTrack::charge(double a)
+  {
     return _charge = a;
-}
+  }
 
 //cnv inline
 // const AList<TRGCDCCatHit> &
@@ -737,235 +742,270 @@ TTrack::charge(double a) {
 //     return _catHits;
 // }
 
-inline
-const std::string &
-TTrack::name(void) const {
+  inline
+  const std::string &
+  TTrack::name(void) const
+  {
     return _name;
-}
+  }
 
-inline
-const std::string &
-TTrack::name(const std::string & a) {
+  inline
+  const std::string &
+  TTrack::name(const std::string & a)
+  {
 //  return _name = a + "[" + _name + "]";
     return _name = a;
-}
+  }
 
-inline
-double
-TTrack::pt(void) const {
+  inline
+  double
+  TTrack::pt(void) const
+  {
     return 1. / fabs(_helix->a()[2]);
-}
+  }
 
-inline
-double
-TTrack::pz(void) const {
+  inline
+  double
+  TTrack::pz(void) const
+  {
     return (1. / fabs(_helix->a()[2])) * _helix->a()[4];
-}
+  }
 
-inline
-double
-TTrack::ptot(void) const {
-    return (1. / fabs(_helix->a()[2])) * 
-	sqrt(1. + _helix->a()[4] * _helix->a()[4]);
-}
+  inline
+  double
+  TTrack::ptot(void) const
+  {
+    return (1. / fabs(_helix->a()[2])) *
+           sqrt(1. + _helix->a()[4] * _helix->a()[4]);
+  }
 
-inline
-double
-TTrack::confidenceLevel(void) const {
+  inline
+  double
+  TTrack::confidenceLevel(void) const
+  {
     return chisq2confLevel((int) _ndf, _chi2);
-}
+  }
 
-inline
-CLHEP::Hep3Vector
-TTrack::p(void) const {
+  inline
+  CLHEP::Hep3Vector
+  TTrack::p(void) const
+  {
     return _helix->momentum(0.);
-}
+  }
 
-inline
-unsigned
-TTrack::objectType(void) const {
+  inline
+  unsigned
+  TTrack::objectType(void) const
+  {
     return Track;
-}
+  }
 
-inline
-unsigned
-TTrack::type(void) const {
+  inline
+  unsigned
+  TTrack::type(void) const
+  {
     return defineType();
-}
+  }
 
-inline
-double
-TTrack::impact(void) const {
+  inline
+  double
+  TTrack::impact(void) const
+  {
     return fabs(_helix->radius()) - _helix->center().mag();
-}
+  }
 
-inline
-double
-TTrack::radius(void) const {
+  inline
+  double
+  TTrack::radius(void) const
+  {
     return _helix->radius();
-}
+  }
 
-inline
-AList<TSegment> &
-TTrack::segments(void) {
+  inline
+  AList<TSegment> &
+  TTrack::segments(void)
+  {
     return _segments;
-}
+  }
 
-inline
-const AList<TSegment> &
-TTrack::segments(void) const {
+  inline
+  const AList<TSegment> &
+  TTrack::segments(void) const
+  {
     return _segments;
-}
+  }
 
-inline
-TPoint2D
-TTrack::center(void) const {
+  inline
+  TPoint2D
+  TTrack::center(void) const
+  {
     return TPoint2D(_helix->center());
-}
+  }
 
-inline
-unsigned
-TTrack::finder(void) const {
+  inline
+  unsigned
+  TTrack::finder(void) const
+  {
     return _state & TrackFinderMask;
-}
+  }
 
-inline
-unsigned
-TTrack::finder(unsigned a) {
+  inline
+  unsigned
+  TTrack::finder(unsigned a)
+  {
     _state |= (a & TrackFinderMask);
     return finder();
-}
+  }
 
-inline
-unsigned
-TTrack::quality(void) const {
+  inline
+  unsigned
+  TTrack::quality(void) const
+  {
     return (_state >> TrackQualityShift) & TrackQualityMask;
-}
+  }
 
-inline
-unsigned
-TTrack::quality(unsigned a) {
+  inline
+  unsigned
+  TTrack::quality(unsigned a)
+  {
 //      _state = ((a << TrackQualityShift) & TrackQualityMask) |
-//  	(_state & (~ (TrackQualityMask << TrackQualityShift)));
+//    (_state & (~ (TrackQualityMask << TrackQualityShift)));
     _state = ((a & TrackQualityMask) << TrackQualityShift) |
-	(_state & (~ (TrackQualityMask << TrackQualityShift)));
+             (_state & (~(TrackQualityMask << TrackQualityShift)));
     return quality();
-}
+  }
 
-inline
-unsigned
-TTrack::fitting(void) const {
+  inline
+  unsigned
+  TTrack::fitting(void) const
+  {
     return (_state >> TrackFitShift) & TrackFitMask;
-}
+  }
 
-inline
-unsigned
-TTrack::fitting(unsigned a) {
+  inline
+  unsigned
+  TTrack::fitting(unsigned a)
+  {
     _state |= ((a << TrackFitShift) & TrackFitMask);
     return fitting();
-}
+  }
 
-inline
-TTrack *
-TTrack::mother(void) const {
+  inline
+  TTrack *
+  TTrack::mother(void) const
+  {
     return _mother;
-}
+  }
 
-inline
-TTrack *
-TTrack::mother(TTrack * a) {
+  inline
+  TTrack *
+  TTrack::mother(TTrack * a)
+  {
     if (a) _state |= (TrackHasMother << TrackRelationShift);
     else   _state &= (~(TrackHasMother << TrackRelationShift));
     return _mother = a;
-}
+  }
 
-inline
-TTrack *
-TTrack::daughter(void) const {
+  inline
+  TTrack *
+  TTrack::daughter(void) const
+  {
     return _daughter;
-}
+  }
 
-inline
-TTrack *
-TTrack::daughter(TTrack * a) {
+  inline
+  TTrack *
+  TTrack::daughter(TTrack * a)
+  {
     if (a) _state |= (TrackHasDaughter << TrackRelationShift);
     else   _state &= (~(TrackHasDaughter << TrackRelationShift));
     return _daughter = a;
-}
+  }
 
-inline
-unsigned
-TTrack::state(void) const {
+  inline
+  unsigned
+  TTrack::state(void) const
+  {
     return _state;
-}
+  }
 
-inline
-void 
-TTrack::svdHits(AList<TSvdHit> &list)
-{
-  _svdHits.append(list);
-}
+  inline
+  void
+  TTrack::svdHits(AList<TSvdHit> &list)
+  {
+    _svdHits.append(list);
+  }
 
-inline
-AList<TSvdHit> & 
-TTrack::svdHits(void) {
-  return _svdHits;
-}
+  inline
+  AList<TSvdHit> &
+  TTrack::svdHits(void)
+  {
+    return _svdHits;
+  }
 
-inline
-const AList<TSvdHit> & 
-TTrack::svdHits(void) const {
-  return _svdHits;
-}
+  inline
+  const AList<TSvdHit> &
+  TTrack::svdHits(void) const
+  {
+    return _svdHits;
+  }
 
-inline
-std::string
-TTrack::trackType(const TTrack & t) {
+  inline
+  std::string
+  TTrack::trackType(const TTrack & t)
+  {
     return trackType(t.type());
-}
+  }
 
-inline
-std::string
-TTrack::trackKinematics(const TTrack & t) {
+  inline
+  std::string
+  TTrack::trackKinematics(const TTrack & t)
+  {
     return trackKinematics(t.helix());
-}
+  }
 
-inline
-std::string
-TTrack::trackDump(const TTrack & t) {
+  inline
+  std::string
+  TTrack::trackDump(const TTrack & t)
+  {
     return t.name() + " " + trackStatus(t) + " " + trackKinematics(t) + " " +
-	trackInformation(t);
-}
+           trackInformation(t);
+  }
 
-inline
-const AList<TLink> &
-TTrack::finalHits(const AList<TLink> & list) {
+  inline
+  const AList<TLink> &
+  TTrack::finalHits(const AList<TLink> & list)
+  {
     _finalHits = list;
     return _finalHits;
-}
+  }
 
-inline
-const AList<TLink> &
-TTrack::finalHits(void) const {
+  inline
+  const AList<TLink> &
+  TTrack::finalHits(void) const
+  {
     return _finalHits;
-}
+  }
 
-inline
-const AList<TLink> &
-TTrack::associateHits(const AList<TLink> & list) {
+  inline
+  const AList<TLink> &
+  TTrack::associateHits(const AList<TLink> & list)
+  {
     _associateHits = list;
     return _associateHits;
-}
+  }
 
-inline
-const AList<TLink> &
-TTrack::associateHits(void) const {
+  inline
+  const AList<TLink> &
+  TTrack::associateHits(void) const
+  {
     return _associateHits;
-}
+  }
 
-inline
-std::string
-TTrack::finderName(unsigned i) {
+  inline
+  std::string
+  TTrack::finderName(unsigned i)
+  {
     if (i & TrackHoughFinder) return "Hough Finder";
     else if (i & TrackSVDAssociator) return "SVD Associator";
     else if (i & TrackPMCurlFinder) return "Pattern Matching Curl Finder";
@@ -974,15 +1014,16 @@ TTrack::finderName(unsigned i) {
     else if (i & TrackSlowFinder) return "Conformal Slow Finder";
     else if (i & TrackFastFinder) return "Conformal Fast Finder";
     return "All Finders(old definition is Unknown Finder)";
-}
+  }
 
-inline
-void
-TTrack::dump(const AList<TTrack> & list,
-	     const std::string & message,
-	     const std::string & prefix) {
+  inline
+  void
+  TTrack::dump(const AList<TTrack> & list,
+               const std::string & message,
+               const std::string & prefix)
+  {
     TTrackBase::dump((const AList<TTrackBase> &) list, message, prefix);
-}
+  }
 
 #endif
 

@@ -48,8 +48,8 @@
 
 namespace Belle {
 
-class TTrackBase;
-class TTrack;
+  class TTrackBase;
+  class TTrack;
 
 #define TFitAlreadyFitted 1;
 #define TFitErrorFewHits -1;
@@ -57,7 +57,7 @@ class TTrack;
 #define TFitUnavailable  -3;
 
 /// A class to fit a TTrackBase object.
-class TFitter {
+  class TFitter {
 
   public:
     /// Constructor.
@@ -70,7 +70,7 @@ class TFitter {
     /// returns name.
     const std::string & name(void) const;
     void dump(const std::string & message = std::string(""),
-	      const std::string & prefix = std::string("")) const;
+              const std::string & prefix = std::string("")) const;
 
   public:// Fit functions.
     virtual int fit(TTrackBase &) const = 0;
@@ -81,7 +81,7 @@ class TFitter {
 
   private:
     std::string _name;
-};
+  };
 
 //-----------------------------------------------------------------------------
 
@@ -94,11 +94,12 @@ class TFitter {
 
 #ifdef TFITTER_INLINE_DEFINE_HERE
 
-inline
-const std::string &
-TFitter::name(void) const {
+  inline
+  const std::string &
+  TFitter::name(void) const
+  {
     return _name;
-}
+  }
 
 #endif
 

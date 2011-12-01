@@ -25,42 +25,48 @@
 
 namespace Belle {
 
-THoughTransformationLine::THoughTransformationLine(
+  THoughTransformationLine::THoughTransformationLine(
     const std::string & name)
-    : THoughTransformation(name) {
-}
+      : THoughTransformation(name)
+  {
+  }
 
-THoughTransformationLine::~THoughTransformationLine() {
-}
+  THoughTransformationLine::~THoughTransformationLine()
+  {
+  }
 
-float
-THoughTransformationLine::y(float xReal, float yReal, float x) const {
+  float
+  THoughTransformationLine::y(float xReal, float yReal, float x) const
+  {
     return (xReal * cos(x) + yReal * sin(x));
-}
+  }
 
-bool
-THoughTransformationLine::diverge(float xReal,
-				  float yReal,
-				  float x0,
-				  float x1) const {
+  bool
+  THoughTransformationLine::diverge(float xReal,
+                                    float yReal,
+                                    float x0,
+                                    float x1) const
+  {
     return false;
-}
+  }
 
-bool
-THoughTransformationLine::positiveDiverge(float xReal,
-					  float yReal,
-					  float x0,
-					  float x1) const {
+  bool
+  THoughTransformationLine::positiveDiverge(float xReal,
+                                            float yReal,
+                                            float x0,
+                                            float x1) const
+  {
     return false;
-}
+  }
 
-bool
-THoughTransformationLine::negativeDiverge(float xReal,
-					  float yReal,
-					  float x0,
-					  float x1) const {
+  bool
+  THoughTransformationLine::negativeDiverge(float xReal,
+                                            float yReal,
+                                            float x0,
+                                            float x1) const
+  {
     return false;
-}
+  }
 
 } // namespace Belle
 

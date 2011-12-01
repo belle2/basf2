@@ -366,35 +366,35 @@ struct reccdc_timing {
 
 namespace Belle {
 
-extern const HepGeom::Point3D<double>  ORIGIN;
+  extern const HepGeom::Point3D<double>  ORIGIN;
 
 // speed up option by j.tanaka (2001/04/14)
 #define OPTJT
 
-extern "C" 
-void
-calcdc_driftdist_(int *,
-		  int *,
-		  int *,
-		  float[3],
-		  float[3],
-		  float *,
-		  float *,
-		  float *);
-extern "C"
-void 
-calcdc_driftdist3_(int *,
-		   int *,		      
-		   float[3],
-		   float[3],
-		   float *,
-		   float[2],
-		   float[2], 
-		   float[2]);
+  extern "C"
+  void
+  calcdc_driftdist_(int *,
+                    int *,
+                    int *,
+                    float[3],
+                    float[3],
+                    float *,
+                    float *,
+                    float *);
+  extern "C"
+  void
+  calcdc_driftdist3_(int *,
+                     int *,
+                     float[3],
+                     float[3],
+                     float *,
+                     float[2],
+                     float[2],
+                     float[2]);
 
-extern "C"
-void
-calcdc_tof2_(int *, float *, float *, float *);
+  extern "C"
+  void
+  calcdc_tof2_(int *, float *, float *, float *);
 
 #ifdef TRASAN_DEBUG
 // BelleHistogram * _nCall[8];
@@ -402,120 +402,123 @@ calcdc_tof2_(int *, float *, float *, float *);
 // BelleHistogram * _pull[2][2][8];
 // BelleHistogram * _nTrialNegative;
 // BelleHistogram * _nTrialPositive;
-bool first = true;
+  bool first = true;
 #endif
 
   //#define NTrailMax 100
 #define Convergence 1.0e-5
 
-extern float
-TrasanTHelixFitterChisqMax;
-extern int
-TrasanTHelixFitterNtrialMax;
+  extern float
+  TrasanTHelixFitterChisqMax;
+  extern int
+  TrasanTHelixFitterNtrialMax;
 
-THelixFitter::THelixFitter(const std::string & name)
-: TFitter(name),
-  _fit2D(false),
-  _freeT0(false),
-  _sag(false),
-  _propagation(false),
-  _tof(false),
-  _tanl(false),
-  _pre_chi2(0.),
-  _fitted_chi2(0.) {
-}
+  THelixFitter::THelixFitter(const std::string & name)
+      : TFitter(name),
+      _fit2D(false),
+      _freeT0(false),
+      _sag(false),
+      _propagation(false),
+      _tof(false),
+      _tanl(false),
+      _pre_chi2(0.),
+      _fitted_chi2(0.)
+  {
+  }
 
-THelixFitter::~THelixFitter() {
-}
+  THelixFitter::~THelixFitter()
+  {
+  }
 
 #ifdef OPTJT
 // speed up
-int
-THelixFitter::main(TTrackBase & b, float t0Offset,
-		   double *pre_chi2, double *fitted_chi2) const {
+  int
+  THelixFitter::main(TTrackBase & b, float t0Offset,
+                     double *pre_chi2, double *fitted_chi2) const
+  {
 #ifdef TRASAN_DEBUG
     const std::string stage = "THlxFttr::main";
     EnterStage(stage);
 
 //cnv     if (first) {
-// 	first = false;
-// 	extern BelleTupleManager * BASF_Histogram;
-// 	BelleTupleManager * m = BASF_Histogram;
-// 	_nCall[0] = m->histogram("HF nCall all", 1, 0., 1.);
-// 	_nCall[1] = m->histogram("HF nCall conf f2d l0", 1, 0., 1.);
-// 	_nCall[2] = m->histogram("HF nCall conf f3d l0", 1, 0., 1.);
-// 	_nCall[3] = m->histogram("HF nCall conf f2d l1", 1, 0., 1.);
-// 	_nCall[4] = m->histogram("HF nCall conf f3d l1", 1, 0., 1.);
-// 	_nCall[5] = m->histogram("HF nCall conf s2d", 1, 0., 1.);
-// 	_nCall[6] = m->histogram("HF nCall conf s3d", 1, 0., 1.);
-// 	_nCall[7] = m->histogram("HF nCall other", 1, 0., 1.);
-// 	_nTrial[0] = m->histogram("HF nTrial all", 100, 0., 100.);
-// 	_nTrial[1] = m->histogram("HF nTrial conf f2d l0", 100, 0., 100.);
-// 	_nTrial[2] = m->histogram("HF nTrial conf f3d l0", 100, 0., 100.);
-// 	_nTrial[3] = m->histogram("HF nTrial conf f2d l1", 100, 0., 100.);
-// 	_nTrial[4] = m->histogram("HF nTrial conf f3d l1", 100, 0., 100.);
-// 	_nTrial[5] = m->histogram("HF nTrial conf s2d", 100, 0., 100.);
-// 	_nTrial[6] = m->histogram("HF nTrial conf s3d", 100, 0., 100.);
-// 	_nTrial[7] = m->histogram("HF nTrial other", 100, 0., 100.);
-// 	_pull[0][0][0] = m->histogram("HF pull ax true all",
-// 				      100, 0., 5000.);
-// 	_pull[0][0][2] = m->histogram("HF pull ax true conf f3d l0",
-// 				      100, 0., 5000.);
-// 	_pull[0][0][4] = m->histogram("HF pull ax true conf f3d l1",
-// 				      100, 0., 5000.);
-// 	_pull[0][0][6] = m->histogram("HF pull ax true conf s3d",
-// 				      100, 0., 5000.);
-// 	_pull[0][0][7] = m->histogram("HF pull ax true other",
-// 				      100, 0., 5000.);
-// 	_pull[1][0][0] = m->histogram("HF pull st true all",
-// 				      100, 0., 5000.);
-// 	_pull[1][0][2] = m->histogram("HF pull st true conf f3d l0", 
-// 				      100, 0., 5000.);
-// 	_pull[1][0][4] = m->histogram("HF pull st true conf f3d l1",
-// 				      100, 0., 5000.);
-// 	_pull[1][0][6] = m->histogram("HF pull st true conf s3d",
-// 				      100, 0., 5000.);
-// 	_pull[1][0][7] = m->histogram("HF pull st true other",
-// 				      100, 0., 5000.);
-// 	_pull[0][1][0] = m->histogram("HF pull ax wrong all",
-// 				      100, 0., 5000.);
-// 	_pull[0][1][2] = m->histogram("HF pull ax wrong conf f3d l0",
-// 				      100, 0., 5000.);
-// 	_pull[0][1][4] = m->histogram("HF pull ax wrong conf f3d l1",
-// 				      100, 0., 5000.);
-// 	_pull[0][1][6] = m->histogram("HF pull ax wrong conf s3d",
-// 				      100, 0., 5000.);
-// 	_pull[0][1][7] = m->histogram("HF pull ax wrong other",
-// 				      100, 0., 5000.);
-// 	_pull[1][1][0] = m->histogram("HF pull st wrong all",
-// 				      100, 0., 5000.);
-// 	_pull[1][1][2] = m->histogram("HF pull st wrong conf f3d l0",
-// 				      100, 0., 5000.);
-// 	_pull[1][1][4] = m->histogram("HF pull st wrong conf f3d l1",
-// 				      100, 0., 5000.);
-// 	_pull[1][1][6] = m->histogram("HF pull st wrong conf s3d",
-// 				      100, 0., 5000.);
-// 	_pull[1][1][7] = m->histogram("HF pull st wrong other",
-// 				      100, 0., 5000.);
-// 	_nTrialPositive = m->histogram("HF nTrial +", 100, 0., 100.);
-// 	_nTrialNegative = m->histogram("HF nTrial -", 100, 0., 100.);
+//  first = false;
+//  extern BelleTupleManager * BASF_Histogram;
+//  BelleTupleManager * m = BASF_Histogram;
+//  _nCall[0] = m->histogram("HF nCall all", 1, 0., 1.);
+//  _nCall[1] = m->histogram("HF nCall conf f2d l0", 1, 0., 1.);
+//  _nCall[2] = m->histogram("HF nCall conf f3d l0", 1, 0., 1.);
+//  _nCall[3] = m->histogram("HF nCall conf f2d l1", 1, 0., 1.);
+//  _nCall[4] = m->histogram("HF nCall conf f3d l1", 1, 0., 1.);
+//  _nCall[5] = m->histogram("HF nCall conf s2d", 1, 0., 1.);
+//  _nCall[6] = m->histogram("HF nCall conf s3d", 1, 0., 1.);
+//  _nCall[7] = m->histogram("HF nCall other", 1, 0., 1.);
+//  _nTrial[0] = m->histogram("HF nTrial all", 100, 0., 100.);
+//  _nTrial[1] = m->histogram("HF nTrial conf f2d l0", 100, 0., 100.);
+//  _nTrial[2] = m->histogram("HF nTrial conf f3d l0", 100, 0., 100.);
+//  _nTrial[3] = m->histogram("HF nTrial conf f2d l1", 100, 0., 100.);
+//  _nTrial[4] = m->histogram("HF nTrial conf f3d l1", 100, 0., 100.);
+//  _nTrial[5] = m->histogram("HF nTrial conf s2d", 100, 0., 100.);
+//  _nTrial[6] = m->histogram("HF nTrial conf s3d", 100, 0., 100.);
+//  _nTrial[7] = m->histogram("HF nTrial other", 100, 0., 100.);
+//  _pull[0][0][0] = m->histogram("HF pull ax true all",
+//              100, 0., 5000.);
+//  _pull[0][0][2] = m->histogram("HF pull ax true conf f3d l0",
+//              100, 0., 5000.);
+//  _pull[0][0][4] = m->histogram("HF pull ax true conf f3d l1",
+//              100, 0., 5000.);
+//  _pull[0][0][6] = m->histogram("HF pull ax true conf s3d",
+//              100, 0., 5000.);
+//  _pull[0][0][7] = m->histogram("HF pull ax true other",
+//              100, 0., 5000.);
+//  _pull[1][0][0] = m->histogram("HF pull st true all",
+//              100, 0., 5000.);
+//  _pull[1][0][2] = m->histogram("HF pull st true conf f3d l0",
+//              100, 0., 5000.);
+//  _pull[1][0][4] = m->histogram("HF pull st true conf f3d l1",
+//              100, 0., 5000.);
+//  _pull[1][0][6] = m->histogram("HF pull st true conf s3d",
+//              100, 0., 5000.);
+//  _pull[1][0][7] = m->histogram("HF pull st true other",
+//              100, 0., 5000.);
+//  _pull[0][1][0] = m->histogram("HF pull ax wrong all",
+//              100, 0., 5000.);
+//  _pull[0][1][2] = m->histogram("HF pull ax wrong conf f3d l0",
+//              100, 0., 5000.);
+//  _pull[0][1][4] = m->histogram("HF pull ax wrong conf f3d l1",
+//              100, 0., 5000.);
+//  _pull[0][1][6] = m->histogram("HF pull ax wrong conf s3d",
+//              100, 0., 5000.);
+//  _pull[0][1][7] = m->histogram("HF pull ax wrong other",
+//              100, 0., 5000.);
+//  _pull[1][1][0] = m->histogram("HF pull st wrong all",
+//              100, 0., 5000.);
+//  _pull[1][1][2] = m->histogram("HF pull st wrong conf f3d l0",
+//              100, 0., 5000.);
+//  _pull[1][1][4] = m->histogram("HF pull st wrong conf f3d l1",
+//              100, 0., 5000.);
+//  _pull[1][1][6] = m->histogram("HF pull st wrong conf s3d",
+//              100, 0., 5000.);
+//  _pull[1][1][7] = m->histogram("HF pull st wrong other",
+//              100, 0., 5000.);
+//  _nTrialPositive = m->histogram("HF nTrial +", 100, 0., 100.);
+//  _nTrialNegative = m->histogram("HF nTrial -", 100, 0., 100.);
 //     }
 // #ifdef TRASAN_DEBUG_DETAIL
 // //     _nCall[0]->accumulate(.5);
 // //     if (TConformalFinder::_stage == ConformalOutside)
-// // 	_nCall[7]->accumulate(.5);
+// //   _nCall[7]->accumulate(.5);
 // //     else if (TConformalFinder::_stage == ConformalFast2DLevel0)
-// // 	_nCall[1]->accumulate(.5);
+// //   _nCall[1]->accumulate(.5);
 // //     else if (TConformalFinder::_stage == ConformalFast3DLevel0)
-// // 	_nCall[2]->accumulate(.5);
+// //   _nCall[2]->accumulate(.5);
 // //     else if (TConformalFinder::_stage == ConformalFast2DLevel1)
-// // 	_nCall[3]->accumulate(.5);
+// //   _nCall[3]->accumulate(.5);
 // //     else if (TConformalFinder::_stage == ConformalFast3DLevel1)
-// // 	_nCall[4]->accumulate(.5);
+// //   _nCall[4]->accumulate(.5);
 // //     else if (TConformalFinder::_stage == ConformalSlow2D)
-// // 	_nCall[5]->accumulate(.5);
+// //   _nCall[5]->accumulate(.5);
 // //     else if (TConformalFinder::_stage == ConformalSlow3D)
-// // 	_nCall[6]->accumulate(.5);
+// //   _nCall[6]->accumulate(.5);
 // //     bool posi = true;
 // #endif
 // //  const TTrackHEP & hep = Links2HEP(b.links());
@@ -523,29 +526,29 @@ THelixFitter::main(TTrackBase & b, float t0Offset,
 
     //...Initialize
     _pre_chi2 = _fitted_chi2 = 0.;
-    if(pre_chi2)*pre_chi2 = _pre_chi2;
-    if(fitted_chi2)*fitted_chi2 = _fitted_chi2;
+    if (pre_chi2)*pre_chi2 = _pre_chi2;
+    if (fitted_chi2)*fitted_chi2 = _fitted_chi2;
 
     //...Type check...
     if (b.objectType() != Track) {
 #ifdef TRASAN_DEBUG
-	LeaveStage(stage);
+      LeaveStage(stage);
 #endif
-	return TFitUnavailable;
+      return TFitUnavailable;
     }
     TTrack & t = (TTrack &) b;
 
     //...Already fitted ?...
     if (t.fitted()) {
 #ifdef TRASAN_DEBUG
-	LeaveStage(stage);
+      LeaveStage(stage);
 #endif
-	return TFitAlreadyFitted;
+      return TFitAlreadyFitted;
     }
 
     //...Count # of hits...
     AList<TLink> cores = t.cores();
-    if (_fit2D)	cores = TLink::axialHits(cores);
+    if (_fit2D) cores = TLink::axialHits(cores);
     unsigned nCores = cores.length();
     unsigned nStereoCores = TLink::nStereoHits(cores);
 
@@ -555,34 +558,32 @@ THelixFitter::main(TTrackBase & b, float t0Offset,
 
     //...Check # of hits...
     if (! fitBy2D) {
-	if ((nStereoCores < 2) || (nCores - nStereoCores < 3)) {
+      if ((nStereoCores < 2) || (nCores - nStereoCores < 3)) {
 #ifdef TRASAN_DEBUG
-	    LeaveStage(stage);
+        LeaveStage(stage);
 #endif
-	    return TFitErrorFewHits;
-	}
-    }
-    else {
-	if (nCores < 3) {
+        return TFitErrorFewHits;
+      }
+    } else {
+      if (nCores < 3) {
 #ifdef TRASAN_DEBUG
-	    LeaveStage(stage);
+        LeaveStage(stage);
 #endif
-	    return TFitErrorFewHits;
-	}
+        return TFitErrorFewHits;
+      }
     }
     //...Setup...
     CLHEP::HepVector a(5), da(5);
 #if defined(BELLE_DEBUG)
-	try {
+    try {
 #endif
-    a = t.helix().a();
+      a = t.helix().a();
 #if defined(BELLE_DEBUG)
-	}
-	catch(std::string&e) {
-	  std::cout << "THelixFitter::helix is invalid" << std::endl;
-	  return TFitFailed;
-}
-#endif	  
+    } catch (std::string&e) {
+      std::cout << "THelixFitter::helix is invalid" << std::endl;
+      return TFitFailed;
+    }
+#endif
     CLHEP::HepVector dxda(5);
     CLHEP::HepVector dyda(5);
     CLHEP::HepVector dzda(5);
@@ -594,7 +595,7 @@ THelixFitter::main(TTrackBase & b, float t0Offset,
     double chi2Old = DBL_MAX;
     const double convergence = Convergence;
 //  bool allAxial = true;
-   CLHEP::HepMatrix e(3, 3);
+    CLHEP::HepMatrix e(3, 3);
     CLHEP::HepVector f(3);
     int err = 0;
     double factor = 1.0;//jtanaka0715
@@ -602,8 +603,8 @@ THelixFitter::main(TTrackBase & b, float t0Offset,
     //...For bad hit rejection...(by JT, 2001/04/12)...
     int flagBad = 0;
     if (TrasanTHelixFitterChisqMax != 0.)
-	flagBad = 1;
-    AList<TLink> initBadWires; 
+      flagBad = 1;
+    AList<TLink> initBadWires;
     unsigned nInitBadWires = 0;
     CLHEP::HepVector initBadDchi2da(5);
     CLHEP::HepSymMatrix initBadD2chi2d2a(5, 0);
@@ -611,10 +612,10 @@ THelixFitter::main(TTrackBase & b, float t0Offset,
     double initBadChi2 = 0.;
 
     //...Initializing position for sag correction
-    if (_sag){
+    if (_sag) {
       unsigned i = 0;
       while (TLink * l = cores[i++]) {
-       t.approach(*l);
+        t.approach(*l);
       }
     }
 
@@ -623,302 +624,294 @@ THelixFitter::main(TTrackBase & b, float t0Offset,
     //    while (nTrial < NTrailMax) {
     while (nTrial < (unsigned) TrasanTHelixFitterNtrialMax) {
 
-	//...Set up...
-	chi2 = 0.;
-	for (unsigned j = 0; j < 5; j++) dchi2da[j] = 0.;
-	d2chi2d2a = zero5;
+      //...Set up...
+      chi2 = 0.;
+      for (unsigned j = 0; j < 5; j++) dchi2da[j] = 0.;
+      d2chi2d2a = zero5;
 
-	//...Loop with hits...
-	unsigned i = 0;
-	while (TLink * l = cores[i++]) {
-	    const Belle2::TRGCDCWireHit & h = * l->hit();
+      //...Loop with hits...
+      unsigned i = 0;
+      while (TLink * l = cores[i++]) {
+        const Belle2::TRGCDCWireHit & h = * l->hit();
 
-	    //...Cal. closest points...
-	    t.approach(* l, _sag);
-	    double dPhi = l->dPhi();
-	    const HepGeom::Point3D<double> & onTrack = l->positionOnTrack();
-	    const HepGeom::Point3D<double> & onWire = l->positionOnWire();
-	    unsigned leftRight = (onWire.cross(onTrack).z() < 0.)
-		? WireHitLeft : WireHitRight;
+        //...Cal. closest points...
+        t.approach(* l, _sag);
+        double dPhi = l->dPhi();
+        const HepGeom::Point3D<double> & onTrack = l->positionOnTrack();
+        const HepGeom::Point3D<double> & onWire = l->positionOnWire();
+        unsigned leftRight = (onWire.cross(onTrack).z() < 0.)
+                             ? WireHitLeft : WireHitRight;
 
-	    //...Obtain drift distance and its error...
-	    double distance;
-	    double eDistance;
-	    drift(t, * l, t0Offset, distance, eDistance);
-	    double inv_eDistance2 = 1. / (eDistance * eDistance);
+        //...Obtain drift distance and its error...
+        double distance;
+        double eDistance;
+        drift(t, * l, t0Offset, distance, eDistance);
+        double inv_eDistance2 = 1. / (eDistance * eDistance);
 
-	    //...Residual...
-	    Vector3D v = onTrack - onWire;
-	    double vmag = v.mag();
-	    double dDistance = vmag - distance;
+        //...Residual...
+        Vector3D v = onTrack - onWire;
+        double vmag = v.mag();
+        double dDistance = vmag - distance;
 
-	    //...dxda...
-	    this->dxda(* l, t.helix(), dPhi, dxda, dyda, dzda);
+        //...dxda...
+        this->dxda(* l, t.helix(), dPhi, dxda, dyda, dzda);
 
-	    //...Chi2 related...
-	    // dDda = (v.x() * dxda + v.y() * dyda + v.z() * dzda) / vmag;
-	    // HepGeom::Vector3D<double> vw = h.wire().direction();
-	    double vw[3] = { h.wire().direction().x(),
-                             h.wire().direction().y(),
-                             h.wire().direction().z() };
-            double vwxy = vw[0]*vw[1];
-            double vwyz = vw[1]*vw[2];
-            double vwzx = vw[2]*vw[0];
-	    static CLHEP::HepVector nv(5,0);
-	    dDda = (vmag > 0.)
-                ? ((v.x() * (1. - vw[0] * vw[0]) -
-                    v.y() * vwxy - v.z() * vwzx)
-                   * dxda + 
-                   (v.y() * (1. - vw[1] * vw[1]) -
-                    v.z() * vwyz - v.x() * vwxy)
-                   * dyda + 
-                   (v.z() * (1. - vw[2] * vw[2]) -
-                    v.x() * vwzx - v.y() * vwyz)
-                   * dzda) / vmag
-                : nv;
-#ifdef TRASAN_DEBUG_DETAIL	    
-	    if (vmag <= 0.0) {
-		std::cout  << Stage() << " !!! in fit " << onTrack << ", "
-			  << onWire;
-		h.dump();
-	    }
+        //...Chi2 related...
+        // dDda = (v.x() * dxda + v.y() * dyda + v.z() * dzda) / vmag;
+        // HepGeom::Vector3D<double> vw = h.wire().direction();
+        double vw[3] = { h.wire().direction().x(),
+                         h.wire().direction().y(),
+                         h.wire().direction().z()
+                       };
+        double vwxy = vw[0] * vw[1];
+        double vwyz = vw[1] * vw[2];
+        double vwzx = vw[2] * vw[0];
+        static CLHEP::HepVector nv(5, 0);
+        dDda = (vmag > 0.)
+               ? ((v.x() * (1. - vw[0] * vw[0]) -
+                   v.y() * vwxy - v.z() * vwzx)
+                  * dxda +
+                  (v.y() * (1. - vw[1] * vw[1]) -
+                   v.z() * vwyz - v.x() * vwxy)
+                  * dyda +
+                  (v.z() * (1. - vw[2] * vw[2]) -
+                   v.x() * vwzx - v.y() * vwyz)
+                  * dzda) / vmag
+               : nv;
+#ifdef TRASAN_DEBUG_DETAIL
+        if (vmag <= 0.0) {
+          std::cout  << Stage() << " !!! in fit " << onTrack << ", "
+                     << onWire;
+          h.dump();
+        }
 #endif
-	    double pChi2 = dDistance * dDistance * inv_eDistance2;
+        double pChi2 = dDistance * dDistance * inv_eDistance2;
 
-	    //...Bad hit rejection...
-	    if (flagBad && nTrial == 0) {
-		if (pChi2 > TrasanTHelixFitterChisqMax) {
-		    initBadWires.append(l);
-		    initBadDchi2da += (dDistance * inv_eDistance2) * dDda;
-		    initBadD2chi2d2a += vT_times_v(dDda) * inv_eDistance2;
-		    initBadChi2 += pChi2;
-		}
-	    }
-	    else {
-		dchi2da += (dDistance * inv_eDistance2) * dDda;
-		d2chi2d2a += vT_times_v(dDda) * inv_eDistance2;
-		chi2 += pChi2;	    
+        //...Bad hit rejection...
+        if (flagBad && nTrial == 0) {
+          if (pChi2 > TrasanTHelixFitterChisqMax) {
+            initBadWires.append(l);
+            initBadDchi2da += (dDistance * inv_eDistance2) * dDda;
+            initBadD2chi2d2a += vT_times_v(dDda) * inv_eDistance2;
+            initBadChi2 += pChi2;
+          }
+        } else {
+          dchi2da += (dDistance * inv_eDistance2) * dDda;
+          d2chi2d2a += vT_times_v(dDda) * inv_eDistance2;
+          chi2 += pChi2;
 
-		//...Store results...
-		l->update(onTrack, onWire, leftRight, pChi2);
-	    }
+          //...Store results...
+          l->update(onTrack, onWire, leftRight, pChi2);
+        }
 
 #ifdef TRASAN_DEBUG
-//  	    if ((! fitBy2D) && (nTrial == 0)) {
-//  		unsigned as = 0;
-//  		if (l->hit()->wire().stereo()) as = 1;
-//  		unsigned mt = 0;
-//  		if (& hep != l->hit()->mc()->hep()) mt = 1;
+//        if ((! fitBy2D) && (nTrial == 0)) {
+//      unsigned as = 0;
+//      if (l->hit()->wire().stereo()) as = 1;
+//      unsigned mt = 0;
+//      if (& hep != l->hit()->mc()->hep()) mt = 1;
 
-//  		_pull[as][mt][0]->accumulate(pChi2);
-//  		if (TConformalFinder::_stage == ConformalOutside)
-//  		    _pull[as][mt][7]->accumulate(pChi2);
-//  		else if (TConformalFinder::_stage == ConformalFast3DLevel0)
-//  		    _pull[as][mt][2]->accumulate(pChi2);
-//  		else if (TConformalFinder::_stage == ConformalFast3DLevel1)
-//  		    _pull[as][mt][4]->accumulate(pChi2);
-//  		else if (TConformalFinder::_stage == ConformalSlow3D)
-//  		    _pull[as][mt][6]->accumulate(pChi2);
-//  	    }
+//      _pull[as][mt][0]->accumulate(pChi2);
+//      if (TConformalFinder::_stage == ConformalOutside)
+//          _pull[as][mt][7]->accumulate(pChi2);
+//      else if (TConformalFinder::_stage == ConformalFast3DLevel0)
+//          _pull[as][mt][2]->accumulate(pChi2);
+//      else if (TConformalFinder::_stage == ConformalFast3DLevel1)
+//          _pull[as][mt][4]->accumulate(pChi2);
+//      else if (TConformalFinder::_stage == ConformalSlow3D)
+//          _pull[as][mt][6]->accumulate(pChi2);
+//        }
 #endif
-	}
+      }
 
-	//...Bad hit rejection...
-	if (flagBad && nTrial == 0) {
-	    if ((initBadWires.length() == 1 || initBadWires.length() == 2) &&
-		nCores >= 20 &&
-		chi2 / (double)(nCores - initBadWires.length()) < 10.) {
-		cores.remove(initBadWires);
-		nInitBadWires = initBadWires.length();
-	    }
-	    else if (initBadWires.length() != 0) {
-		dchi2da += initBadDchi2da;
-		d2chi2d2a += initBadD2chi2d2a;
-		chi2 += initBadChi2;
-	    }
-	}
+      //...Bad hit rejection...
+      if (flagBad && nTrial == 0) {
+        if ((initBadWires.length() == 1 || initBadWires.length() == 2) &&
+            nCores >= 20 &&
+            chi2 / (double)(nCores - initBadWires.length()) < 10.) {
+          cores.remove(initBadWires);
+          nInitBadWires = initBadWires.length();
+        } else if (initBadWires.length() != 0) {
+          dchi2da += initBadDchi2da;
+          d2chi2d2a += initBadD2chi2d2a;
+          chi2 += initBadChi2;
+        }
+      }
 
-	//...Save chi2 information...
-	if (nTrial == 0) {
-	    _pre_chi2 = chi2;
-	    _fitted_chi2 = chi2;
-	}
-	else {
-	    _fitted_chi2 = chi2;
-	}
+      //...Save chi2 information...
+      if (nTrial == 0) {
+        _pre_chi2 = chi2;
+        _fitted_chi2 = chi2;
+      } else {
+        _fitted_chi2 = chi2;
+      }
 
-	//...Check condition...
-	double change = chi2Old - chi2;
-	if (fabs(change) < convergence) break;
-	if (change < 0.) {
-//    	    a += factor * da;
-//    	    t._helix->a(a);
-//    	    break;
-	    factor = 0.5;
-	}
-	chi2Old = chi2;
+      //...Check condition...
+      double change = chi2Old - chi2;
+      if (fabs(change) < convergence) break;
+      if (change < 0.) {
+//          a += factor * da;
+//          t._helix->a(a);
+//          break;
+        factor = 0.5;
+      }
+      chi2Old = chi2;
 
-	//...Cal. helix parameters for next loop...
-	if (fitBy2D) {
-	    f = dchi2da.sub(1, 3);
-	    e = d2chi2d2a.sub(1, 3);
-	    f = solve(e, f);
-	    da[0] = f[0];
-	    da[1] = f[1];
-	    da[2] = f[2];
-	    da[3] = 0.;
-	    da[4] = 0.;
-	}
-	else {
-	    da = solve(d2chi2d2a, dchi2da);
-	}
-	static const double kp_max = 1.e10;
-	static const double kp_min = 1.e-30;
-	const double kp_test = std::abs(a[2] - factor * da[2]);
-	if (kp_test < kp_min || kp_test > kp_max) {
-	    err = 1;
-	    break;
-	}
+      //...Cal. helix parameters for next loop...
+      if (fitBy2D) {
+        f = dchi2da.sub(1, 3);
+        e = d2chi2d2a.sub(1, 3);
+        f = solve(e, f);
+        da[0] = f[0];
+        da[1] = f[1];
+        da[2] = f[2];
+        da[3] = 0.;
+        da[4] = 0.;
+      } else {
+        da = solve(d2chi2d2a, dchi2da);
+      }
+      static const double kp_max = 1.e10;
+      static const double kp_min = 1.e-30;
+      const double kp_test = std::abs(a[2] - factor * da[2]);
+      if (kp_test < kp_min || kp_test > kp_max) {
+        err = 1;
+        break;
+      }
 
-	a -= factor * da;
+      a -= factor * da;
 #if defined(BELLE_DEBUG)
-	try {
+      try {
 #endif
-	  t._helix->a(a);
+        t._helix->a(a);
 #if defined(BELLE_DEBUG)
-	}
-	catch(std::string&e) {
-	  std::cout << "THelixFitter::helix is invalid" << std::endl;
-	  err = 1;
-	  break;
-	}
-#endif	  
-	++nTrial;
+      } catch (std::string&e) {
+        std::cout << "THelixFitter::helix is invalid" << std::endl;
+        err = 1;
+        break;
+      }
+#endif
+      ++nTrial;
 
-	// jtanaka 001008
-	//if( fabs(a[3]) > 200. ){
-	// yiwasaki 001010
-	if( fabs(a[3]) > 1000. ){
-	  // stop "fit" and return error.
-	  // std::cout << "Stop Fit... " << a << std::endl;
-	  err = 1;
-	  break;
-	}
+      // jtanaka 001008
+      //if( fabs(a[3]) > 200. ){
+      // yiwasaki 001010
+      if (fabs(a[3]) > 1000.) {
+        // stop "fit" and return error.
+        // std::cout << "Stop Fit... " << a << std::endl;
+        err = 1;
+        break;
+      }
 #ifdef TRASAN_DEBUG_DETAIL
-	std::string name = "?";
-	if (b.type() == Track) name = ((TTrack &) b).name();
-	std::cout << Tab() << name << " fit" << nTrial-1 << ":chi2=" << chi2
-		  << ":change=" << change << std::endl;
+      std::string name = "?";
+      if (b.type() == Track) name = ((TTrack &) b).name();
+      std::cout << Tab() << name << " fit" << nTrial - 1 << ":chi2=" << chi2
+                << ":change=" << change << std::endl;
 #endif
     }
 
 #ifdef TRASAN_DEBUG_DETAIL
 //     _nTrial[0]->accumulate(float(nTrial) + .5);
 //     if (TConformalFinder::_stage == ConformalOutside)
-// 	_nTrial[7]->accumulate(float(nTrial) + .5);
+//  _nTrial[7]->accumulate(float(nTrial) + .5);
 //     else if (TConformalFinder::_stage == ConformalFast2DLevel0)
-// 	_nTrial[1]->accumulate(float(nTrial) + .5);
+//  _nTrial[1]->accumulate(float(nTrial) + .5);
 //     else if (TConformalFinder::_stage == ConformalFast3DLevel0)
-// 	_nTrial[2]->accumulate(float(nTrial) + .5);
+//  _nTrial[2]->accumulate(float(nTrial) + .5);
 //     else if (TConformalFinder::_stage == ConformalFast2DLevel1)
-// 	_nTrial[3]->accumulate(float(nTrial) + .5);
+//  _nTrial[3]->accumulate(float(nTrial) + .5);
 //     else if (TConformalFinder::_stage == ConformalFast3DLevel1)
-// 	_nTrial[4]->accumulate(float(nTrial) + .5);
+//  _nTrial[4]->accumulate(float(nTrial) + .5);
 //     else if (TConformalFinder::_stage == ConformalSlow2D)
-// 	_nTrial[5]->accumulate(float(nTrial) + .5);
+//  _nTrial[5]->accumulate(float(nTrial) + .5);
 //     else if (TConformalFinder::_stage == ConformalSlow3D)
-// 	_nTrial[6]->accumulate(float(nTrial) + .5);
+//  _nTrial[6]->accumulate(float(nTrial) + .5);
 
 //     if (posi) _nTrialPositive->accumulate((float) nTrial + .5);
 //     else _nTrialNegative->accumulate((float) nTrial + .5);
 #endif
     // if (!err) by nk
     if (!err) {
-      
-    //...Cal. error matrix...
-    CLHEP::HepSymMatrix Ea(5, 0);
-    unsigned dim;
-    if (fitBy2D) {
-	dim = 3;
-	CLHEP::HepSymMatrix Eb(3, 0), Ec(3, 0);
-#if defined(BELLE_DEBUG)
-	try {
-#endif
-	Eb = d2chi2d2a.sub(1, 3);
-	Ec = Eb.inverse(err);
-	Ea[0][0] = Ec[0][0];
-	Ea[0][1] = Ec[0][1];
-	Ea[0][2] = Ec[0][2];
-	Ea[1][1] = Ec[1][1];
-	Ea[1][2] = Ec[1][2];
-	Ea[2][2] = Ec[2][2];
-#if defined(BELLE_DEBUG)
-	}
-	catch (...) {
-	  err=1;
-	  std::cout << "Matrix inversion gave a floating exception" << std::endl;
-	}
-#endif
-    }
-    else {
-	dim = 5;
-#if defined(BELLE_DEBUG)
-	try {
-#endif
-	  Ea = d2chi2d2a.inverse(err);
-#if defined(BELLE_DEBUG)
-	}
-	catch (...) {
-	  err=1;
-	  std::cout << "Matrix inversion gave a floating exception" << std::endl;
-	}
-#endif
-    }
 
-    
-    
-    //...Store information...
-    if (! err) {
+      //...Cal. error matrix...
+      CLHEP::HepSymMatrix Ea(5, 0);
+      unsigned dim;
+      if (fitBy2D) {
+        dim = 3;
+        CLHEP::HepSymMatrix Eb(3, 0), Ec(3, 0);
+#if defined(BELLE_DEBUG)
+        try {
+#endif
+          Eb = d2chi2d2a.sub(1, 3);
+          Ec = Eb.inverse(err);
+          Ea[0][0] = Ec[0][0];
+          Ea[0][1] = Ec[0][1];
+          Ea[0][2] = Ec[0][2];
+          Ea[1][1] = Ec[1][1];
+          Ea[1][2] = Ec[1][2];
+          Ea[2][2] = Ec[2][2];
+#if defined(BELLE_DEBUG)
+        } catch (...) {
+          err = 1;
+          std::cout << "Matrix inversion gave a floating exception" << std::endl;
+        }
+#endif
+      } else {
+        dim = 5;
+#if defined(BELLE_DEBUG)
+        try {
+#endif
+          Ea = d2chi2d2a.inverse(err);
+#if defined(BELLE_DEBUG)
+        } catch (...) {
+          err = 1;
+          std::cout << "Matrix inversion gave a floating exception" << std::endl;
+        }
+#endif
+      }
 
-	t._helix->a(a);
-	t._helix->Ea(Ea);
-	t._fitted = true;
-    }
-    else {
-	err = TFitFailed;
-    }
 
-    t._charge = copysign(1., a[2]);    
-    t._ndf = nCores - dim -nInitBadWires;
-    t._chi2 = chi2;
+
+      //...Store information...
+      if (! err) {
+
+        t._helix->a(a);
+        t._helix->Ea(Ea);
+        t._fitted = true;
+      } else {
+        err = TFitFailed;
+      }
+
+      t._charge = copysign(1., a[2]);
+      t._ndf = nCores - dim - nInitBadWires;
+      t._chi2 = chi2;
 
     } // if (!err) by nk
     else {
-	err = TFitFailed;
+      err = TFitFailed;
     }
-    
+
     //...Treatment for bad wires...
     if (nInitBadWires) {
-	for  (unsigned i = 0; i < nInitBadWires; i++) {
-	    TLink * l = initBadWires[i];
-	    t.approach(* l, _sag);
-//	    double dPhi = l->dPhi();
-	    const HepGeom::Point3D<double> & onTrack = l->positionOnTrack();
-	    const HepGeom::Point3D<double> & onWire = l->positionOnWire();
-	    Vector3D v = onTrack - onWire;
-	    double vmag = v.mag();
-	    unsigned leftRight = (onWire.cross(onTrack).z() < 0.)
-		? WireHitLeft : WireHitRight;
-	    double distance;
-	    double eDistance;
-	    drift(t, * l, t0Offset, distance, eDistance);
-	    double inv_eDistance2 = 1. / (eDistance * eDistance);
-	    double dDistance = vmag - distance;
-	    double pChi2 = dDistance * dDistance * inv_eDistance2;
-	    l->update(onTrack, onWire, leftRight, pChi2);
-	}
+      for (unsigned i = 0; i < nInitBadWires; i++) {
+        TLink * l = initBadWires[i];
+        t.approach(* l, _sag);
+//      double dPhi = l->dPhi();
+        const HepGeom::Point3D<double> & onTrack = l->positionOnTrack();
+        const HepGeom::Point3D<double> & onWire = l->positionOnWire();
+        Vector3D v = onTrack - onWire;
+        double vmag = v.mag();
+        unsigned leftRight = (onWire.cross(onTrack).z() < 0.)
+                             ? WireHitLeft : WireHitRight;
+        double distance;
+        double eDistance;
+        drift(t, * l, t0Offset, distance, eDistance);
+        double inv_eDistance2 = 1. / (eDistance * eDistance);
+        double dDistance = vmag - distance;
+        double pChi2 = dDistance * dDistance * inv_eDistance2;
+        l->update(onTrack, onWire, leftRight, pChi2);
+      }
 #ifdef TRASAN_DEBUG_DETAIL
-	std::cout << Tab() << "#rejected hits=" << nInitBadWires << std::endl;
+      std::cout << Tab() << "#rejected hits=" << nInitBadWires << std::endl;
 #endif
     }
 
@@ -929,29 +922,30 @@ THelixFitter::main(TTrackBase & b, float t0Offset,
     LeaveStage(stage);
 #endif
     return err;
-}
+  }
 #else
-int
-THelixFitter::main(TTrackBase & b, float t0Offset,
-		   double *pre_chi2, double *fitted_chi2) const {
+  int
+  THelixFitter::main(TTrackBase & b, float t0Offset,
+                     double *pre_chi2, double *fitted_chi2) const
+  {
 #ifdef TRASAN_DEBUG_DETAIL
     if (first) {
-	first = false;
-//cnv 	extern BelleTupleManager * BASF_Histogram;
-// 	BelleTupleManager * m = BASF_Histogram;
-// 	_nCall = m->histogram("HF nCall", 1, 0., 1.);
-// 	_nTrial = m->histogram("HF nTrial", 100, 0., 100.);
-// 	_nTrialPositive = m->histogram("HF nTrial +", 100, 0., 100.);
-// 	_nTrialNegative = m->histogram("HF nTrial -", 100, 0., 100.);
+      first = false;
+//cnv   extern BelleTupleManager * BASF_Histogram;
+//  BelleTupleManager * m = BASF_Histogram;
+//  _nCall = m->histogram("HF nCall", 1, 0., 1.);
+//  _nTrial = m->histogram("HF nTrial", 100, 0., 100.);
+//  _nTrialPositive = m->histogram("HF nTrial +", 100, 0., 100.);
+//  _nTrialNegative = m->histogram("HF nTrial -", 100, 0., 100.);
     }
 //     _nCall->accumulate(1.);
     bool posi = true;
-     << "        THelixFitter::fit ..." << std::endl;
+    << "        THelixFitter::fit ..." << std::endl;
 #endif
     //...Initialize
     _pre_chi2 = _fitted_chi2 = 0.;
-    if(pre_chi2)*pre_chi2 = _pre_chi2;
-    if(fitted_chi2)*fitted_chi2 = _fitted_chi2;
+    if (pre_chi2)*pre_chi2 = _pre_chi2;
+    if (fitted_chi2)*fitted_chi2 = _fitted_chi2;
 
     //...Type check...
     if (b.objectType() != Track) return TFitUnavailable;
@@ -962,7 +956,7 @@ THelixFitter::main(TTrackBase & b, float t0Offset,
 
     //...Count # of hits...
     AList<TLink> cores = t.cores();
-    if (_fit2D)	cores = AxialHits(cores);
+    if (_fit2D) cores = AxialHits(cores);
     unsigned nCores = cores.length();
     unsigned nStereoCores = NStereoHits(cores);
 
@@ -972,11 +966,10 @@ THelixFitter::main(TTrackBase & b, float t0Offset,
 
     //...Check # of hits...
     if (! fitBy2D) {
-	if ((nStereoCores < 2) || (nCores - nStereoCores < 3))
-	    return TFitErrorFewHits;
-    }
-    else {
-	if (nCores < 3) return TFitErrorFewHits;
+      if ((nStereoCores < 2) || (nCores - nStereoCores < 3))
+        return TFitErrorFewHits;
+    } else {
+      if (nCores < 3) return TFitErrorFewHits;
     }
 
     //...Setup...
@@ -993,13 +986,13 @@ THelixFitter::main(TTrackBase & b, float t0Offset,
     double chi2Old = DBL_MAX;
     const double convergence = Convergence;
     bool allAxial = true;
-   CLHEP::HepMatrix e(3, 3);
+    CLHEP::HepMatrix e(3, 3);
     CLHEP::HepVector f(3);
     int err = 0;
     double factor = 1.0;//jtanaka0715
 
     int flagBad = 0; // 2001/04/12
-    AList<TLink> initBadWires; 
+    AList<TLink> initBadWires;
     unsigned nInitBadWires = 0;
     CLHEP::HepVector initBadDchi2da(5);
     CLHEP::HepSymMatrix initBadD2chi2d2a(5, 0);
@@ -1011,151 +1004,150 @@ THelixFitter::main(TTrackBase & b, float t0Offset,
     //    while (nTrial < NTrailMax) {
     while (nTrial < TrasanTHelixFitterNtrialMax) {
 
-	//...Set up...
-	chi2 = 0.;
-	for (unsigned j = 0; j < 5; j++) dchi2da[j] = 0.;
-	d2chi2d2a = zero5;
+      //...Set up...
+      chi2 = 0.;
+      for (unsigned j = 0; j < 5; j++) dchi2da[j] = 0.;
+      d2chi2d2a = zero5;
 
-	//...Loop with hits...
-	unsigned i = 0;
-	while (TLink * l = cores[i++]) {
-	    const Belle2::TRGCDCWireHit & h = * l->hit();
+      //...Loop with hits...
+      unsigned i = 0;
+      while (TLink * l = cores[i++]) {
+        const Belle2::TRGCDCWireHit & h = * l->hit();
 
-	    //...Cal. closest points...
-	    t.approach(* l, _sag);
-	    double dPhi = l->dPhi();
-	    const HepGeom::Point3D<double> & onTrack = l->positionOnTrack();
-	    const HepGeom::Point3D<double> & onWire = l->positionOnWire();
-	    unsigned leftRight = WireHitRight;
-	    if (onWire.cross(onTrack).z() < 0.)	leftRight = WireHitLeft;
+        //...Cal. closest points...
+        t.approach(* l, _sag);
+        double dPhi = l->dPhi();
+        const HepGeom::Point3D<double> & onTrack = l->positionOnTrack();
+        const HepGeom::Point3D<double> & onWire = l->positionOnWire();
+        unsigned leftRight = WireHitRight;
+        if (onWire.cross(onTrack).z() < 0.) leftRight = WireHitLeft;
 
-	    //...Obtain drift distance and its error...
-	    double distance;
-	    double eDistance;
-	    drift(t, * l, t0Offset, distance, eDistance);
-	    double eDistance2 = eDistance * eDistance;
+        //...Obtain drift distance and its error...
+        double distance;
+        double eDistance;
+        drift(t, * l, t0Offset, distance, eDistance);
+        double eDistance2 = eDistance * eDistance;
 
-	    //...Residual...
-	    Vector3D v = onTrack - onWire;
-	    double vmag = v.mag();
-	    double dDistance = vmag - distance;
+        //...Residual...
+        Vector3D v = onTrack - onWire;
+        double vmag = v.mag();
+        double dDistance = vmag - distance;
 
-	    //...dxda...
-	    this->dxda(* l, t.helix(), dPhi, dxda, dyda, dzda);
+        //...dxda...
+        this->dxda(* l, t.helix(), dPhi, dxda, dyda, dzda);
 
-	    //...Chi2 related...
-	    // dDda = (v.x() * dxda + v.y() * dyda + v.z() * dzda) / vmag;
-	    HepGeom::Vector3D<double> vw = h.wire().direction();
-	    static CLHEP::HepVector nv(5,0);
-            dDda = (vmag > 0.)
-		? ((v.x() * (1. - vw.x() * vw.x()) -
-		    v.y() * vw.x() * vw.y() - v.z() * vw.x() * vw.z())
-		   * dxda + 
-		   (v.y() * (1. - vw.y() * vw.y()) -
-		    v.z() * vw.y() * vw.z() - v.x() * vw.y() * vw.x())
-		   * dyda + 
-		   (v.z() * (1. - vw.z() * vw.z()) -
-		    v.x() * vw.z() * vw.x() - v.y() * vw.z() * vw.y())
-		   * dzda) / vmag
-		: nv;
-	    if (vmag <= 0.0) {
-		std::cout << "    in fit " << onTrack << ", " << onWire;
-	      h.dump();
-	    }
-	
-	    double pChi2 = dDistance * dDistance / eDistance2;
-	    if(flagBad){ // 2001/04/12
-	      if(nTrial == 0 && pChi2 > 1500.){
-		initBadWires.append(l);
-		initBadDchi2da += (dDistance / eDistance2) * dDda;
-		initBadD2chi2d2a += vT_times_v(dDda) / eDistance2;
-		initBadChi2 += pChi2;
-	      }else{
-		dchi2da += (dDistance / eDistance2) * dDda;
-		d2chi2d2a += vT_times_v(dDda) / eDistance2;
-		chi2 += pChi2;	    
-		//...Store results...
-		l->update(onTrack, onWire, leftRight, pChi2);
-	      }
-	    }else{
-	      dchi2da += (dDistance / eDistance2) * dDda;
-	      d2chi2d2a += vT_times_v(dDda) / eDistance2;
-	      chi2 += pChi2;	    
-	      //...Store results...
-	      l->update(onTrack, onWire, leftRight, pChi2);
-	    }
-	}
+        //...Chi2 related...
+        // dDda = (v.x() * dxda + v.y() * dyda + v.z() * dzda) / vmag;
+        HepGeom::Vector3D<double> vw = h.wire().direction();
+        static CLHEP::HepVector nv(5, 0);
+        dDda = (vmag > 0.)
+               ? ((v.x() * (1. - vw.x() * vw.x()) -
+                   v.y() * vw.x() * vw.y() - v.z() * vw.x() * vw.z())
+                  * dxda +
+                  (v.y() * (1. - vw.y() * vw.y()) -
+                   v.z() * vw.y() * vw.z() - v.x() * vw.y() * vw.x())
+                  * dyda +
+                  (v.z() * (1. - vw.z() * vw.z()) -
+                   v.x() * vw.z() * vw.x() - v.y() * vw.z() * vw.y())
+                  * dzda) / vmag
+               : nv;
+        if (vmag <= 0.0) {
+          std::cout << "    in fit " << onTrack << ", " << onWire;
+          h.dump();
+        }
 
-	if(flagBad){ // 2001/04/12
-	  if(nTrial == 0 &&
-	     (initBadWires.length() == 1 ||
-	      initBadWires.length() == 2) &&
-	     nCores >= 20 &&
-	     chi2/(double)(nCores-initBadWires.length()) < 10.){
-	    cores.remove(initBadWires);
-	    nInitBadWires = initBadWires.length();
-	  }else if(nTrial == 0 && initBadWires.length() != 0){
-	    dchi2da += initBadDchi2da;
-	    d2chi2d2a += initBadD2chi2d2a;
-	    chi2 += initBadChi2;
-	  }
-	}
+        double pChi2 = dDistance * dDistance / eDistance2;
+        if (flagBad) { // 2001/04/12
+          if (nTrial == 0 && pChi2 > 1500.) {
+            initBadWires.append(l);
+            initBadDchi2da += (dDistance / eDistance2) * dDda;
+            initBadD2chi2d2a += vT_times_v(dDda) / eDistance2;
+            initBadChi2 += pChi2;
+          } else {
+            dchi2da += (dDistance / eDistance2) * dDda;
+            d2chi2d2a += vT_times_v(dDda) / eDistance2;
+            chi2 += pChi2;
+            //...Store results...
+            l->update(onTrack, onWire, leftRight, pChi2);
+          }
+        } else {
+          dchi2da += (dDistance / eDistance2) * dDda;
+          d2chi2d2a += vT_times_v(dDda) / eDistance2;
+          chi2 += pChi2;
+          //...Store results...
+          l->update(onTrack, onWire, leftRight, pChi2);
+        }
+      }
 
-	//...Save chi2 information...
-	if(nTrial == 0){
-	  _pre_chi2 = chi2;
-	  _fitted_chi2 = chi2;
-	}else _fitted_chi2 = chi2;
+      if (flagBad) { // 2001/04/12
+        if (nTrial == 0 &&
+            (initBadWires.length() == 1 ||
+             initBadWires.length() == 2) &&
+            nCores >= 20 &&
+            chi2 / (double)(nCores - initBadWires.length()) < 10.) {
+          cores.remove(initBadWires);
+          nInitBadWires = initBadWires.length();
+        } else if (nTrial == 0 && initBadWires.length() != 0) {
+          dchi2da += initBadDchi2da;
+          d2chi2d2a += initBadD2chi2d2a;
+          chi2 += initBadChi2;
+        }
+      }
 
-	//...Check condition...
-	double change = chi2Old - chi2;
-	if (fabs(change) < convergence) break;
-	if (change < 0.) {
-//    	    a += factor * da;
-//    	    t._helix->a(a);
-//    	    break;
-	    factor = 0.5;
-	}
-	chi2Old = chi2;
+      //...Save chi2 information...
+      if (nTrial == 0) {
+        _pre_chi2 = chi2;
+        _fitted_chi2 = chi2;
+      } else _fitted_chi2 = chi2;
 
-	//...Cal. helix parameters for next loop...
-	if (fitBy2D) {
-	    f = dchi2da.sub(1, 3);
-	    e = d2chi2d2a.sub(1, 3);
-	    f = solve(e, f);
-	    da[0] = f[0];
-	    da[1] = f[1];
-	    da[2] = f[2];
-	    da[3] = 0.;
-	    da[4] = 0.;
-	}
-	else {
-	    da = solve(d2chi2d2a, dchi2da);
-	}
-	static const double kp_max = 1.e10;
-	static const double kp_min = 1.e-30;
-	const double kp_test = std::abs(a[2] - factor * da[2]);
-	if (kp_test < kp_min || kp_test > kp_max) {
-	    err = 1;
-	    break;
-	}
+      //...Check condition...
+      double change = chi2Old - chi2;
+      if (fabs(change) < convergence) break;
+      if (change < 0.) {
+//          a += factor * da;
+//          t._helix->a(a);
+//          break;
+        factor = 0.5;
+      }
+      chi2Old = chi2;
 
-	a -= factor * da;
-	t._helix->a(a);
-	++nTrial;
+      //...Cal. helix parameters for next loop...
+      if (fitBy2D) {
+        f = dchi2da.sub(1, 3);
+        e = d2chi2d2a.sub(1, 3);
+        f = solve(e, f);
+        da[0] = f[0];
+        da[1] = f[1];
+        da[2] = f[2];
+        da[3] = 0.;
+        da[4] = 0.;
+      } else {
+        da = solve(d2chi2d2a, dchi2da);
+      }
+      static const double kp_max = 1.e10;
+      static const double kp_min = 1.e-30;
+      const double kp_test = std::abs(a[2] - factor * da[2]);
+      if (kp_test < kp_min || kp_test > kp_max) {
+        err = 1;
+        break;
+      }
 
-	// jtanaka 001008
-	//if( fabs(a[3]) > 200. ){
-	// yiwasaki 001010
-	if( fabs(a[3]) > 1000. ){
-	  // stop "fit" and return error.
-	  // std::cout << "Stop Fit... " << a << std::endl;
-	  err = 1;
-	  break;
-	}
+      a -= factor * da;
+      t._helix->a(a);
+      ++nTrial;
+
+      // jtanaka 001008
+      //if( fabs(a[3]) > 200. ){
+      // yiwasaki 001010
+      if (fabs(a[3]) > 1000.) {
+        // stop "fit" and return error.
+        // std::cout << "Stop Fit... " << a << std::endl;
+        err = 1;
+        break;
+      }
 #ifdef TRASAN_DEBUG_DETAIL
-	 << "            fit " << nTrial-1<< " : " << chi2 << " : "
-		  << change << std::endl;
+      << "            fit " << nTrial - 1 << " : " << chi2 << " : "
+      << change << std::endl;
 #endif
     }
 
@@ -1169,52 +1161,51 @@ THelixFitter::main(TTrackBase & b, float t0Offset,
     CLHEP::HepSymMatrix Ea(5, 0);
     unsigned dim;
     if (fitBy2D) {
-	dim = 3;
-	CLHEP::HepSymMatrix Eb(3, 0), Ec(3, 0);
-	Eb = d2chi2d2a.sub(1, 3);
-	Ec = Eb.inverse(err);
-	Ea[0][0] = Ec[0][0];
-	Ea[0][1] = Ec[0][1];
-	Ea[0][2] = Ec[0][2];
-	Ea[1][1] = Ec[1][1];
-	Ea[1][2] = Ec[1][2];
-	Ea[2][2] = Ec[2][2];
-    }
-    else {
-	dim = 5;
-	Ea = d2chi2d2a.inverse(err);
+      dim = 3;
+      CLHEP::HepSymMatrix Eb(3, 0), Ec(3, 0);
+      Eb = d2chi2d2a.sub(1, 3);
+      Ec = Eb.inverse(err);
+      Ea[0][0] = Ec[0][0];
+      Ea[0][1] = Ec[0][1];
+      Ea[0][2] = Ec[0][2];
+      Ea[1][1] = Ec[1][1];
+      Ea[1][2] = Ec[1][2];
+      Ea[2][2] = Ec[2][2];
+    } else {
+      dim = 5;
+      Ea = d2chi2d2a.inverse(err);
     }
 
     //...Store information...
     if (! err) {
-	t._helix->a(a);
-	t._helix->Ea(Ea);
-	t._fitted = true;
-    }
-    else {
-	err = TFitFailed;
+      t._helix->a(a);
+      t._helix->Ea(Ea);
+      t._fitted = true;
+    } else {
+      err = TFitFailed;
     }
 
-    t._charge = copysign(1., a[2]);    
-    t._ndf = nCores - dim -nInitBadWires;
+    t._charge = copysign(1., a[2]);
+    t._ndf = nCores - dim - nInitBadWires;
     t._chi2 = chi2;
 
-    if(pre_chi2)*pre_chi2 = _pre_chi2;
-    if(fitted_chi2)*fitted_chi2 = _fitted_chi2;
-  
+    if (pre_chi2)*pre_chi2 = _pre_chi2;
+    if (fitted_chi2)*fitted_chi2 = _fitted_chi2;
+
     return err;
-}
+  }
 #endif
 
 #ifdef OPTJT
 // speed up
-int
-THelixFitter::dxda(const TLink & link,
-                   const THelix & h,
-                   double dPhi,
-                   CLHEP::HepVector & dxda,
-                   CLHEP::HepVector & dyda,
-                   CLHEP::HepVector & dzda) const {
+  int
+  THelixFitter::dxda(const TLink & link,
+                     const THelix & h,
+                     double dPhi,
+                     CLHEP::HepVector & dxda,
+                     CLHEP::HepVector & dyda,
+                     CLHEP::HepVector & dzda) const
+  {
 
     //...Setup...
     const Belle2::TRGCDCWire & w = * link.wire();
@@ -1229,8 +1220,8 @@ THelixFitter::dxda(const TLink & link,
     const double cosPhi0 = cos(phi0);
     // double sinPhi0 = h.sinphi0();
     // double cosPhi0 = h.cosphi0();
-    const double sinPhi0dPhi = sin(phi0+dPhi);
-    const double cosPhi0dPhi = cos(phi0+dPhi);
+    const double sinPhi0dPhi = sin(phi0 + dPhi);
+    const double cosPhi0dPhi = cos(phi0 + dPhi);
     //Vector dphida(5);
     double dphida[5];
 
@@ -1239,8 +1230,8 @@ THelixFitter::dxda(const TLink & link,
     HepGeom::Point3D<double> wireBackwardPosition = w.backwardPosition();
     Vector3D v = w.direction();
     if (_sag) {
-	std::cout << "THelixFitter::dxda !!! sag correction is not implemented"
-	       << std::endl;
+      std::cout << "THelixFitter::dxda !!! sag correction is not implemented"
+                << std::endl;
 //         w.wirePosition(link.positionOnTrack().z(),
 //                        xw,
 //                        wireBackwardPosition,
@@ -1249,130 +1240,132 @@ THelixFitter::dxda(const TLink & link,
 
     //...Axial case...
     if (w.axial()) {
-      const double d[3] = { h.center().x()-xw.x(),
-                            h.center().y()-xw.y(),
-                            h.center().z()-xw.z() };
-      const double inv_dmag2 = 1./(d[0]*d[0]+d[1]*d[1]+d[2]*d[2]);
+      const double d[3] = { h.center().x() - xw.x(),
+                            h.center().y() - xw.y(),
+                            h.center().z() - xw.z()
+                          };
+      const double inv_dmag2 = 1. / (d[0] * d[0] + d[1] * d[1] + d[2] * d[2]);
 
-      const double rho_per_kappa  = rho/kappa;
-      const double dRho_plus_rho  = dRho+rho;
-      const double rhoSinPhi0dPhi = rho*sinPhi0dPhi;
-      const double rhoCosPhi0dPhi = rho*cosPhi0dPhi;
-      const double rhoTanLambda   = rho*tanLambda;
-      
-      dphida[0] = (sinPhi0*d[0]-cosPhi0*d[1])*inv_dmag2;
-      dphida[1] = dRho_plus_rho*(cosPhi0*d[0]+sinPhi0*d[1])*inv_dmag2-1.;
-      dphida[2] = -rho_per_kappa*dphida[0];
+      const double rho_per_kappa  = rho / kappa;
+      const double dRho_plus_rho  = dRho + rho;
+      const double rhoSinPhi0dPhi = rho * sinPhi0dPhi;
+      const double rhoCosPhi0dPhi = rho * cosPhi0dPhi;
+      const double rhoTanLambda   = rho * tanLambda;
+
+      dphida[0] = (sinPhi0 * d[0] - cosPhi0 * d[1]) * inv_dmag2;
+      dphida[1] = dRho_plus_rho * (cosPhi0 * d[0] + sinPhi0 * d[1]) * inv_dmag2 - 1.;
+      dphida[2] = -rho_per_kappa * dphida[0];
       dphida[3] = 0.;
       dphida[4] = 0.;
-      
-      dxda[0] = cosPhi0+rhoSinPhi0dPhi*dphida[0];
-      dxda[1] = -dRho_plus_rho*sinPhi0+rhoSinPhi0dPhi*(1.+dphida[1]);
-      dxda[2] = -rho_per_kappa*(cosPhi0-cosPhi0dPhi)+rhoSinPhi0dPhi*dphida[2];
+
+      dxda[0] = cosPhi0 + rhoSinPhi0dPhi * dphida[0];
+      dxda[1] = -dRho_plus_rho * sinPhi0 + rhoSinPhi0dPhi * (1. + dphida[1]);
+      dxda[2] = -rho_per_kappa * (cosPhi0 - cosPhi0dPhi) + rhoSinPhi0dPhi * dphida[2];
       dxda[3] = 0.;
       dxda[4] = 0.;
-      
-      dyda[0] = sinPhi0-rhoCosPhi0dPhi*dphida[0];
-      dyda[1] = dRho_plus_rho*cosPhi0-rhoCosPhi0dPhi*(1.+dphida[1]);
-      dyda[2] = -rho_per_kappa*(sinPhi0-sinPhi0dPhi)-rhoCosPhi0dPhi*dphida[2];
+
+      dyda[0] = sinPhi0 - rhoCosPhi0dPhi * dphida[0];
+      dyda[1] = dRho_plus_rho * cosPhi0 - rhoCosPhi0dPhi * (1. + dphida[1]);
+      dyda[2] = -rho_per_kappa * (sinPhi0 - sinPhi0dPhi) - rhoCosPhi0dPhi * dphida[2];
       dyda[3] = 0.;
       dyda[4] = 0.;
-      
-      dzda[0] = -rhoTanLambda*dphida[0];
-      dzda[1] = -rhoTanLambda*dphida[1];
-      dzda[2] = rho_per_kappa*tanLambda*dPhi-rhoTanLambda*dphida[2];
+
+      dzda[0] = -rhoTanLambda * dphida[0];
+      dzda[1] = -rhoTanLambda * dphida[1];
+      dzda[2] = rho_per_kappa * tanLambda * dPhi - rhoTanLambda * dphida[2];
       dzda[3] = 1.;
-      dzda[4] = -rho*dPhi;
+      dzda[4] = -rho * dPhi;
     }
 
     //...Stereo case...
     else {
-      const double v_dot_wireBackwardPosition = v.x()*wireBackwardPosition.x()
-        +                                       v.y()*wireBackwardPosition.y()
-        +                                       v.z()*wireBackwardPosition.z();
-      const double c[3] = { w.backwardPosition().x()-v_dot_wireBackwardPosition*v.x(),
-                            w.backwardPosition().y()-v_dot_wireBackwardPosition*v.y(),
-                            w.backwardPosition().z()-v_dot_wireBackwardPosition*v.z() };
+      const double v_dot_wireBackwardPosition = v.x() * wireBackwardPosition.x()
+                                                +                                       v.y() * wireBackwardPosition.y()
+                                                +                                       v.z() * wireBackwardPosition.z();
+      const double c[3] = { w.backwardPosition().x() - v_dot_wireBackwardPosition*v.x(),
+                            w.backwardPosition().y() - v_dot_wireBackwardPosition*v.y(),
+                            w.backwardPosition().z() - v_dot_wireBackwardPosition*v.z()
+                          };
 
       const double x[3] = { link.positionOnTrack().x(), link.positionOnTrack().y(), link.positionOnTrack().z() };
-      const double x_minus_c[3] = { x[0]-c[0], x[1]-c[1], x[2]-c[2] };
-      
+      const double x_minus_c[3] = { x[0] - c[0], x[1] - c[1], x[2] - c[2] };
+
       //Vector dxdphi(3);
       const double dxdphi[3] = { rho*sinPhi0dPhi, -rho*cosPhi0dPhi, -rho*tanLambda };
-      
+
       //Vector d2xdphi2(3);
       const double d2xdphi2[3] = { -dxdphi[1], dxdphi[0], 0. };
-      
+
       double dxdphi_dot_v = (dxdphi[0] * v.x() +
                              dxdphi[1] * v.y() +
                              dxdphi[2] * v.z());
       double x_dot_v = x[0] * v.x() + x[1] * v.y() + x[2] * v.z();
-      double inv_dfdphi = -1./(( dxdphi[0] - dxdphi_dot_v*v.x()) * dxdphi[0] 
-                               +(dxdphi[1] - dxdphi_dot_v*v.y()) * dxdphi[1]
-                               +(dxdphi[2] - dxdphi_dot_v*v.z()) * dxdphi[2]
-                               +(x_minus_c[0] - x_dot_v*v.x()) * d2xdphi2[0]
-                               +(x_minus_c[1] - x_dot_v*v.y()) * d2xdphi2[1]);
+      double inv_dfdphi = -1. / ((dxdphi[0] - dxdphi_dot_v * v.x()) * dxdphi[0]
+                                 + (dxdphi[1] - dxdphi_dot_v * v.y()) * dxdphi[1]
+                                 + (dxdphi[2] - dxdphi_dot_v * v.z()) * dxdphi[2]
+                                 + (x_minus_c[0] - x_dot_v * v.x()) * d2xdphi2[0]
+                                 + (x_minus_c[1] - x_dot_v * v.y()) * d2xdphi2[1]);
       /* +(x_minus_c[2] - x_dot_v*v.z()) * d2xdphi2[2];  = 0. */
-      
 
-      const double rho_per_kappa  =  rho/kappa;
-      const double dRho_plus_rho  =  dRho+rho;
+
+      const double rho_per_kappa  =  rho / kappa;
+      const double dRho_plus_rho  =  dRho + rho;
       const double &rhoSinPhi0dPhi =  dxdphi[0];
       const double rhoCosPhi0dPhi = -dxdphi[1];
       const double rhoTanLambda   = -dxdphi[2];
-      
+
       //dxda_phi, dyda_phi, dzda_phi : phi is fixed
       //Vector dxda_phi(5);
       double dxda_phi[5];
       dxda_phi[0] = cosPhi0;
-      dxda_phi[1] = -dRho_plus_rho*sinPhi0+rhoSinPhi0dPhi; 
-      dxda_phi[2] = -rho_per_kappa*(cosPhi0-cosPhi0dPhi);
+      dxda_phi[1] = -dRho_plus_rho * sinPhi0 + rhoSinPhi0dPhi;
+      dxda_phi[2] = -rho_per_kappa * (cosPhi0 - cosPhi0dPhi);
       dxda_phi[3] = 0.;
       dxda_phi[4] = 0.;
-      
+
       //Vector dyda_phi(5);
       double dyda_phi[5];
       dyda_phi[0] = sinPhi0;
-      dyda_phi[1] = dRho_plus_rho*cosPhi0-rhoCosPhi0dPhi;
-      dyda_phi[2] = -rho_per_kappa*(sinPhi0-sinPhi0dPhi);
+      dyda_phi[1] = dRho_plus_rho * cosPhi0 - rhoCosPhi0dPhi;
+      dyda_phi[2] = -rho_per_kappa * (sinPhi0 - sinPhi0dPhi);
       dyda_phi[3] = 0.;
       dyda_phi[4] = 0.;
-      
+
       //Vector dzda_phi(5);
       double dzda_phi[5];
       dzda_phi[0] = 0.;
       dzda_phi[1] = 0.;
-      dzda_phi[2] = rho_per_kappa*tanLambda*dPhi;
+      dzda_phi[2] = rho_per_kappa * tanLambda * dPhi;
       dzda_phi[3] = 1.;
-      dzda_phi[4] = -rho*dPhi;
-      
+      dzda_phi[4] = -rho * dPhi;
+
       //Vector d2xdphida(5);
       double d2xdphida[5];
       d2xdphida[0] = 0.;
-      d2xdphida[1] = rhoCosPhi0dPhi; 
-      d2xdphida[2] = -rho_per_kappa*sinPhi0dPhi; 
+      d2xdphida[1] = rhoCosPhi0dPhi;
+      d2xdphida[2] = -rho_per_kappa * sinPhi0dPhi;
       d2xdphida[3] = 0.;
       d2xdphida[4] = 0.;
-      
+
       //Vector d2ydphida(5);
       double d2ydphida[5];
       d2ydphida[0] = 0.;
       d2ydphida[1] = rhoSinPhi0dPhi;
-      d2ydphida[2] = rho_per_kappa*cosPhi0dPhi; 
+      d2ydphida[2] = rho_per_kappa * cosPhi0dPhi;
       d2ydphida[3] = 0.;
       d2ydphida[4] = 0.;
-      
+
       //Vector d2zdphida(5);
       double d2zdphida[5];
       d2zdphida[0] = 0.;
       d2zdphida[1] = 0.;
-      d2zdphida[2] = rho_per_kappa*tanLambda;
+      d2zdphida[2] = rho_per_kappa * tanLambda;
       d2zdphida[3] = 0.;
       d2zdphida[4] = -rho;
-      
+
       //Vector dfda(5);
       double dfda[5];
-      for(int i = 0; i < 5; ++i) {
+      for (int i = 0; i < 5; ++i) {
         double d_dot_v = (v.x() * dxda_phi[i] +
                           v.y() * dyda_phi[i] +
                           v.z() * dzda_phi[i]);
@@ -1382,42 +1375,43 @@ THelixFitter::dxda(const TLink & link,
                    - (x_minus_c[0] - x_dot_v * v.x()) * d2xdphida[i]
                    - (x_minus_c[1] - x_dot_v * v.y()) * d2ydphida[i]
                    - (x_minus_c[2] - x_dot_v * v.z()) * d2zdphida[i]);
-        dphida[i] = -dfda[i]*inv_dfdphi;
+        dphida[i] = -dfda[i] * inv_dfdphi;
       }
-      
-      dxda[0] = cosPhi0+rhoSinPhi0dPhi*dphida[0];
-      dxda[1] = -dRho_plus_rho*sinPhi0+rhoSinPhi0dPhi*(1.+dphida[1]);
-      dxda[2] = -rho_per_kappa*(cosPhi0-cosPhi0dPhi)+rhoSinPhi0dPhi*dphida[2];
-      dxda[3] = rhoSinPhi0dPhi*dphida[3];
-      dxda[4] = rhoSinPhi0dPhi*dphida[4];
-      
-      dyda[0] = sinPhi0-rhoCosPhi0dPhi*dphida[0];
-      dyda[1] = dRho_plus_rho*cosPhi0-rhoCosPhi0dPhi*(1.+dphida[1]);
-      dyda[2] = -rho_per_kappa*(sinPhi0-sinPhi0dPhi)-rhoCosPhi0dPhi*dphida[2];
-      dyda[3] = -rhoCosPhi0dPhi*dphida[3];
-      dyda[4] = -rhoCosPhi0dPhi*dphida[4];
-      
-      dzda[0] = -rhoTanLambda*dphida[0];
-      dzda[1] = -rhoTanLambda*dphida[1];
-      dzda[2] = rho_per_kappa*tanLambda*dPhi-rhoTanLambda*dphida[2];
-      dzda[3] = 1.-rhoTanLambda*dphida[3];
-      dzda[4] = -rho*dPhi-rhoTanLambda*dphida[4];
+
+      dxda[0] = cosPhi0 + rhoSinPhi0dPhi * dphida[0];
+      dxda[1] = -dRho_plus_rho * sinPhi0 + rhoSinPhi0dPhi * (1. + dphida[1]);
+      dxda[2] = -rho_per_kappa * (cosPhi0 - cosPhi0dPhi) + rhoSinPhi0dPhi * dphida[2];
+      dxda[3] = rhoSinPhi0dPhi * dphida[3];
+      dxda[4] = rhoSinPhi0dPhi * dphida[4];
+
+      dyda[0] = sinPhi0 - rhoCosPhi0dPhi * dphida[0];
+      dyda[1] = dRho_plus_rho * cosPhi0 - rhoCosPhi0dPhi * (1. + dphida[1]);
+      dyda[2] = -rho_per_kappa * (sinPhi0 - sinPhi0dPhi) - rhoCosPhi0dPhi * dphida[2];
+      dyda[3] = -rhoCosPhi0dPhi * dphida[3];
+      dyda[4] = -rhoCosPhi0dPhi * dphida[4];
+
+      dzda[0] = -rhoTanLambda * dphida[0];
+      dzda[1] = -rhoTanLambda * dphida[1];
+      dzda[2] = rho_per_kappa * tanLambda * dPhi - rhoTanLambda * dphida[2];
+      dzda[3] = 1. - rhoTanLambda * dphida[3];
+      dzda[4] = -rho * dPhi - rhoTanLambda * dphida[4];
     }
 
     // std::cout << dxda << std::endl;
     // std::cout << dyda << std::endl;
     // std::cout << dzda << std::endl;
-    
+
     return 0;
-}
+  }
 #else
-int
-THelixFitter::dxda(const TLink & link,
-		   const THelix & h,
-		   double dPhi,
-		   CLHEP::HepVector & dxda,
-		   CLHEP::HepVector & dyda,
-		   CLHEP::HepVector & dzda) const {
+  int
+  THelixFitter::dxda(const TLink & link,
+                     const THelix & h,
+                     double dPhi,
+                     CLHEP::HepVector & dxda,
+                     CLHEP::HepVector & dyda,
+                     CLHEP::HepVector & dzda) const
+  {
 
     //...Setup...
     const Belle2::TRGCDCWire & w = * link.wire();
@@ -1441,124 +1435,124 @@ THelixFitter::dxda(const TLink & link,
     HepGeom::Point3D<double> wireBackwardPosition = w.backwardPosition();
     Vector3D v = w.direction();
     if (_sag)
-	w.wirePosition(link.positionOnTrack().z(),
-		       xw,
-		       wireBackwardPosition,
-		       v);
+      w.wirePosition(link.positionOnTrack().z(),
+                     xw,
+                     wireBackwardPosition,
+                     v);
 
     //...Axial case...
     if (w.axial()) {
-	Point3D d = h.center() - xw;
-	double dmag2 = d.mag2();
+      Point3D d = h.center() - xw;
+      double dmag2 = d.mag2();
 
-	dphida[0] = (sinPhi0 * d.x() - cosPhi0 * d.y()) / dmag2;
-	dphida[1] = (dRho + rho)    * (cosPhi0 * d.x() + sinPhi0 * d.y())
-	    / dmag2 - 1.;
-	dphida[2] = (- rho / kappa) * (sinPhi0 * d.x() - cosPhi0 * d.y())
-	    / dmag2;
-	dphida[3] = 0.;
-	dphida[4] = 0.;
+      dphida[0] = (sinPhi0 * d.x() - cosPhi0 * d.y()) / dmag2;
+      dphida[1] = (dRho + rho)    * (cosPhi0 * d.x() + sinPhi0 * d.y())
+                  / dmag2 - 1.;
+      dphida[2] = (- rho / kappa) * (sinPhi0 * d.x() - cosPhi0 * d.y())
+                  / dmag2;
+      dphida[3] = 0.;
+      dphida[4] = 0.;
     }
 
     //...Stereo case...
     else {
-      //temp	Point3D onTrack = h.x(dPhi);
-	//temp
-        HepGeom::Point3D<double> onTrack = link.positionOnTrack();
-	//	   << "ontrack =" << onTrack  << std::endl;
-	//	   << "ontrackp=" << onTrackp << std::endl;
-	//temp
+      //temp  Point3D onTrack = h.x(dPhi);
+      //temp
+      HepGeom::Point3D<double> onTrack = link.positionOnTrack();
+      //     << "ontrack =" << onTrack  << std::endl;
+      //     << "ontrackp=" << onTrackp << std::endl;
+      //temp
 
-	CLHEP::HepVector c(3);
-	c = Point3D(w.backwardPosition() - (v * wireBackwardPosition) * v);
+      CLHEP::HepVector c(3);
+      c = Point3D(w.backwardPosition() - (v * wireBackwardPosition) * v);
 
-	CLHEP::HepVector x(3);
-	x = onTrack;
+      CLHEP::HepVector x(3);
+      x = onTrack;
 
-	CLHEP::HepVector dxdphi(3);
-	dxdphi[0] =   rho * sinPhi0dPhi;
-	dxdphi[1] = - rho * cosPhi0dPhi;
-	dxdphi[2] = - rho * tanLambda;
+      CLHEP::HepVector dxdphi(3);
+      dxdphi[0] =   rho * sinPhi0dPhi;
+      dxdphi[1] = - rho * cosPhi0dPhi;
+      dxdphi[2] = - rho * tanLambda;
 
-	CLHEP::HepVector d2xdphi2(3);
-	d2xdphi2[0] = rho * cosPhi0dPhi;
-	d2xdphi2[1] = rho * sinPhi0dPhi;
-	d2xdphi2[2] = 0.;
+      CLHEP::HepVector d2xdphi2(3);
+      d2xdphi2[0] = rho * cosPhi0dPhi;
+      d2xdphi2[1] = rho * sinPhi0dPhi;
+      d2xdphi2[2] = 0.;
 
-	double dxdphi_dot_v = (dxdphi[0] * v.x() +
-			       dxdphi[1] * v.y() +
-			       dxdphi[2] * v.z());
-	double x_dot_v = x[0] * v.x() + x[1] * v.y() + x[2] * v.z();
-	double dfdphi = - (dxdphi[0] - dxdphi_dot_v*v.x()) * dxdphi[0] 
-	                - (dxdphi[1] - dxdphi_dot_v*v.y()) * dxdphi[1]
-                        - (dxdphi[2] - dxdphi_dot_v*v.z()) * dxdphi[2]
-                        - (x[0] - c[0] - x_dot_v*v.x()) * d2xdphi2[0]
-                        - (x[1] - c[1] - x_dot_v*v.y()) * d2xdphi2[1];
-	            /*  - (x[2] - c[2] - x_dot_v*v.z()) * d2xdphi2[2];  = 0. */
+      double dxdphi_dot_v = (dxdphi[0] * v.x() +
+                             dxdphi[1] * v.y() +
+                             dxdphi[2] * v.z());
+      double x_dot_v = x[0] * v.x() + x[1] * v.y() + x[2] * v.z();
+      double dfdphi = - (dxdphi[0] - dxdphi_dot_v * v.x()) * dxdphi[0]
+                      - (dxdphi[1] - dxdphi_dot_v * v.y()) * dxdphi[1]
+                      - (dxdphi[2] - dxdphi_dot_v * v.z()) * dxdphi[2]
+                      - (x[0] - c[0] - x_dot_v * v.x()) * d2xdphi2[0]
+                      - (x[1] - c[1] - x_dot_v * v.y()) * d2xdphi2[1];
+      /*  - (x[2] - c[2] - x_dot_v*v.z()) * d2xdphi2[2];  = 0. */
 
 
-	//dxda_phi, dyda_phi, dzda_phi : phi is fixed
-	CLHEP::HepVector dxda_phi(5);
-	dxda_phi[0] = cosPhi0;
-	dxda_phi[1] = - (dRho + rho) * sinPhi0 + rho * sinPhi0dPhi; 
-	dxda_phi[2] = - (rho / kappa) * (cosPhi0 - cosPhi0dPhi);
-	dxda_phi[3] = 0.;
-	dxda_phi[4] = 0.;
+      //dxda_phi, dyda_phi, dzda_phi : phi is fixed
+      CLHEP::HepVector dxda_phi(5);
+      dxda_phi[0] = cosPhi0;
+      dxda_phi[1] = - (dRho + rho) * sinPhi0 + rho * sinPhi0dPhi;
+      dxda_phi[2] = - (rho / kappa) * (cosPhi0 - cosPhi0dPhi);
+      dxda_phi[3] = 0.;
+      dxda_phi[4] = 0.;
 
-	CLHEP::HepVector dyda_phi(5);
-	dyda_phi[0] = sinPhi0;
-	dyda_phi[1] = (dRho + rho) * cosPhi0 - rho * cosPhi0dPhi;
-	dyda_phi[2] = - (rho / kappa) * (sinPhi0 - sinPhi0dPhi);
-	dyda_phi[3] = 0.;
-	dyda_phi[4] = 0.;
-	
-	CLHEP::HepVector dzda_phi(5);
-	dzda_phi[0] = 0.;
-	dzda_phi[1] = 0.;
-	dzda_phi[2] = (rho / kappa) * tanLambda * dPhi;
-	dzda_phi[3] = 1.;
-	dzda_phi[4] = - rho * dPhi;
+      CLHEP::HepVector dyda_phi(5);
+      dyda_phi[0] = sinPhi0;
+      dyda_phi[1] = (dRho + rho) * cosPhi0 - rho * cosPhi0dPhi;
+      dyda_phi[2] = - (rho / kappa) * (sinPhi0 - sinPhi0dPhi);
+      dyda_phi[3] = 0.;
+      dyda_phi[4] = 0.;
 
-	CLHEP::HepVector d2xdphida(5);
-	d2xdphida[0] = 0.;
-	d2xdphida[1] = rho * cosPhi0dPhi; 
-	d2xdphida[2] = - (rho / kappa) * sinPhi0dPhi; 
-	d2xdphida[3] = 0.;
-	d2xdphida[4] = 0.;
+      CLHEP::HepVector dzda_phi(5);
+      dzda_phi[0] = 0.;
+      dzda_phi[1] = 0.;
+      dzda_phi[2] = (rho / kappa) * tanLambda * dPhi;
+      dzda_phi[3] = 1.;
+      dzda_phi[4] = - rho * dPhi;
 
-	CLHEP::HepVector d2ydphida(5);
-	d2ydphida[0] = 0.;
-	d2ydphida[1] = rho * sinPhi0dPhi;
-	d2ydphida[2] = (rho / kappa) * cosPhi0dPhi; 
-	d2ydphida[3] = 0.;
-	d2ydphida[4] = 0.;
+      CLHEP::HepVector d2xdphida(5);
+      d2xdphida[0] = 0.;
+      d2xdphida[1] = rho * cosPhi0dPhi;
+      d2xdphida[2] = - (rho / kappa) * sinPhi0dPhi;
+      d2xdphida[3] = 0.;
+      d2xdphida[4] = 0.;
 
-	CLHEP::HepVector d2zdphida(5);
-	d2zdphida[0] = 0.;
-	d2zdphida[1] = 0.;
-	d2zdphida[2] = (rho / kappa) * tanLambda;
-	d2zdphida[3] = 0.;
-	d2zdphida[4] = - rho;
- 
-	CLHEP::HepVector dfda(5);
-	for(int i = 0; i < 5; i++) {
-	    double d_dot_v = (v.x() * dxda_phi[i] +
-			      v.y() * dyda_phi[i] +
-			      v.z() * dzda_phi[i]);
-	    dfda[i] = (- (dxda_phi[i] - d_dot_v * v.x()) * dxdphi[0]
-		       - (dyda_phi[i] - d_dot_v * v.y()) * dxdphi[1]
-		       - (dzda_phi[i] - d_dot_v * v.z()) * dxdphi[2]
-		       - (x[0] - c[0] - x_dot_v * v.x()) * d2xdphida[i]
-		       - (x[1] - c[1] - x_dot_v * v.y()) * d2ydphida[i]
-		       - (x[2] - c[2] - x_dot_v * v.z()) * d2zdphida[i]);
-	    dphida[i] = - dfda[i] / dfdphi;
-	}
+      CLHEP::HepVector d2ydphida(5);
+      d2ydphida[0] = 0.;
+      d2ydphida[1] = rho * sinPhi0dPhi;
+      d2ydphida[2] = (rho / kappa) * cosPhi0dPhi;
+      d2ydphida[3] = 0.;
+      d2ydphida[4] = 0.;
+
+      CLHEP::HepVector d2zdphida(5);
+      d2zdphida[0] = 0.;
+      d2zdphida[1] = 0.;
+      d2zdphida[2] = (rho / kappa) * tanLambda;
+      d2zdphida[3] = 0.;
+      d2zdphida[4] = - rho;
+
+      CLHEP::HepVector dfda(5);
+      for (int i = 0; i < 5; i++) {
+        double d_dot_v = (v.x() * dxda_phi[i] +
+                          v.y() * dyda_phi[i] +
+                          v.z() * dzda_phi[i]);
+        dfda[i] = (- (dxda_phi[i] - d_dot_v * v.x()) * dxdphi[0]
+                   - (dyda_phi[i] - d_dot_v * v.y()) * dxdphi[1]
+                   - (dzda_phi[i] - d_dot_v * v.z()) * dxdphi[2]
+                   - (x[0] - c[0] - x_dot_v * v.x()) * d2xdphida[i]
+                   - (x[1] - c[1] - x_dot_v * v.y()) * d2ydphida[i]
+                   - (x[2] - c[2] - x_dot_v * v.z()) * d2zdphida[i]);
+        dphida[i] = - dfda[i] / dfdphi;
+      }
     }
 
     dxda[0] = cosPhi0 + rho * sinPhi0dPhi * dphida[0];
     dxda[1] = - (dRho + rho) * sinPhi0 + rho * sinPhi0dPhi * (1. + dphida[1]);
     dxda[2] = - rho / kappa * (cosPhi0 - cosPhi0dPhi)
-       	      + rho * sinPhi0dPhi * dphida[2];
+              + rho * sinPhi0dPhi * dphida[2];
     dxda[3] = rho * sinPhi0dPhi * dphida[3];
     dxda[4] = rho * sinPhi0dPhi * dphida[4];
 
@@ -1578,43 +1572,44 @@ THelixFitter::dxda(const TLink & link,
     // std::cout << dxda << std::endl;
     // std::cout << dyda << std::endl;
     // std::cout << dzda << std::endl;
-    
+
     return 0;
-}
+  }
 #endif
 
-void
-THelixFitter::drift(const TTrack & t,
-		    const TLink & l,
-		    float t0Offset,
-		    double & distance,
-		    double & err) const {
+  void
+  THelixFitter::drift(const TTrack & t,
+                      const TLink & l,
+                      float t0Offset,
+                      double & distance,
+                      double & err) const
+  {
 
     const Belle2::TRGCDCWireHit & h = * l.hit();
     const HepGeom::Point3D<double> & onTrack = l.positionOnTrack();
     const HepGeom::Point3D<double> & onWire = l.positionOnWire();
     unsigned leftRight = WireHitRight;
-    if (onWire.cross(onTrack).z() < 0.)	leftRight = WireHitLeft;
+    if (onWire.cross(onTrack).z() < 0.) leftRight = WireHitLeft;
 
     //...No correction...
     if ((t0Offset == 0.) && (! _propagation) && (! _tof)) {
-	distance = h.drift(leftRight);
-	err = h.dDrift(leftRight);
-	return;
+      distance = h.drift(leftRight);
+      err = h.dDrift(leftRight);
+      return;
     }
 
     //...TOF correction...
     float tof = 0.;
     double dPhi = l.dPhi();
-    while(dPhi >  M_PI) dPhi -= M_PI;
-    while(dPhi < -M_PI) dPhi += M_PI;
+    while (dPhi >  M_PI) dPhi -= M_PI;
+    while (dPhi < -M_PI) dPhi += M_PI;
     if (_tof) {
-	int imass = 3;
-	float tl = t.helix().a()[4];
-	float f = sqrt(1. + tl * tl);
-	float s = fabs(t.helix().curv() * dPhi) * f;
-	float p = f / fabs(t.helix().a()[2]);
-	calcdc_tof2_(& imass, & p, & s, & tof);
+      int imass = 3;
+      float tl = t.helix().a()[4];
+      float f = sqrt(1. + tl * tl);
+      float s = fabs(t.helix().curv() * dPhi) * f;
+      float p = f / fabs(t.helix().a()[2]);
+      calcdc_tof2_(& imass, & p, & s, & tof);
     }
 
     //...T0 and propagation corrections...
@@ -1630,31 +1625,32 @@ THelixFitter::drift(const TTrack & t,
     float edist;
     int prop = _propagation;
     calcdc_driftdist_(& prop,
-		      & wire,
-		      & side,
-		      p,
-		      x,
-		      & time,
-		      & dist,
-		      & edist);
+                      & wire,
+                      & side,
+                      p,
+                      x,
+                      & time,
+                      & dist,
+                      & edist);
     distance = (double) dist;
     err = (double) edist;
     // std::cout << "at drift of THelixFitter" << std::endl;
     // std::cout << "(" << p[0] << ", " << p[1] << ", " << p[2] << ")" << std::endl;
     // std::cout << distance << "/" << err << std::endl;
     return;
-}
+  }
 
 #ifdef OPTJT
 //=====================================================================
-int
-THelixFitter::main(TTrackBase & b, float & tev, float & tev_err,
-		   double *pre_chi2, double *fitted_chi2) const {
+  int
+  THelixFitter::main(TTrackBase & b, float & tev, float & tev_err,
+                     double *pre_chi2, double *fitted_chi2) const
+  {
 //=====================================================================
     //...Initialize
     _pre_chi2 = _fitted_chi2 = 0.;
-    if(pre_chi2)*pre_chi2 = _pre_chi2;
-    if(fitted_chi2)*fitted_chi2 = _fitted_chi2;
+    if (pre_chi2)*pre_chi2 = _pre_chi2;
+    if (fitted_chi2)*fitted_chi2 = _fitted_chi2;
 
     //...Type check...
     if (b.objectType() != Track) return TFitUnavailable;
@@ -1665,7 +1661,7 @@ THelixFitter::main(TTrackBase & b, float & tev, float & tev_err,
 
     //...Count # of hits...
     AList<TLink> cores = t.cores();
-    if (_fit2D)	cores = TLink::axialHits(cores);
+    if (_fit2D) cores = TLink::axialHits(cores);
     unsigned nCores = cores.length();
     unsigned nStereoCores = TLink::nStereoHits(cores);
 
@@ -1675,11 +1671,10 @@ THelixFitter::main(TTrackBase & b, float & tev, float & tev_err,
 
     //...Check # of hits...
     if (! fitBy2D) {
-	if ((nStereoCores < 2) || (nCores - nStereoCores < 3))
-	    return TFitErrorFewHits;
-    }
-    else {
-	if (nCores < 3) return TFitErrorFewHits;
+      if ((nStereoCores < 2) || (nCores - nStereoCores < 3))
+        return TFitErrorFewHits;
+    } else {
+      if (nCores < 3) return TFitErrorFewHits;
     }
 
     //...Setup...
@@ -1700,7 +1695,7 @@ THelixFitter::main(TTrackBase & b, float & tev, float & tev_err,
     //temp    const double convergence = Convergence;
     const double convergence = 1.0e-4;
 //  bool allAxial = true;
-   CLHEP::HepMatrix e(3, 3);
+    CLHEP::HepMatrix e(3, 3);
     CLHEP::HepVector f(3);
     int err = 0;
     double factor = 1.0;//jtanaka0715
@@ -1710,138 +1705,138 @@ THelixFitter::main(TTrackBase & b, float & tev, float & tev_err,
     //    while (nTrial < NTrailMax) {
     while (nTrial < (unsigned) TrasanTHelixFitterNtrialMax) {
 
-	//...Set up...
-	chi2 = 0.;
-	for (unsigned j = 0; j < 6; j++) dchi2da[j] = 0.;
-	d2chi2d2a = zero6;
+      //...Set up...
+      chi2 = 0.;
+      for (unsigned j = 0; j < 6; j++) dchi2da[j] = 0.;
+      d2chi2d2a = zero6;
 
-	//...Loop with hits...
-	unsigned i = 0;
-	while (TLink * l = cores[i++]) {
-	    const Belle2::TRGCDCWireHit & h = * l->hit();
+      //...Loop with hits...
+      unsigned i = 0;
+      while (TLink * l = cores[i++]) {
+        const Belle2::TRGCDCWireHit & h = * l->hit();
 
-	    //...Cal. closest points...
-	    t.approach(* l, _sag);
-	    double dPhi = l->dPhi();
-	    const HepGeom::Point3D<double> & onTrack = l->positionOnTrack();
-	    const HepGeom::Point3D<double> & onWire = l->positionOnWire();
-	    unsigned leftRight = (onWire.cross(onTrack).z() < 0.) ? WireHitLeft : WireHitRight;
+        //...Cal. closest points...
+        t.approach(* l, _sag);
+        double dPhi = l->dPhi();
+        const HepGeom::Point3D<double> & onTrack = l->positionOnTrack();
+        const HepGeom::Point3D<double> & onWire = l->positionOnWire();
+        unsigned leftRight = (onWire.cross(onTrack).z() < 0.) ? WireHitLeft : WireHitRight;
 
-	    //...Obtain drift distance and its error...
-	    double distance;
-	    double eDistance;
-            double dddt;
-	    drift(t, * l, tev, distance, eDistance, dddt);
-	    double inv_eDistance2 = 1./(eDistance * eDistance);
+        //...Obtain drift distance and its error...
+        double distance;
+        double eDistance;
+        double dddt;
+        drift(t, * l, tev, distance, eDistance, dddt);
+        double inv_eDistance2 = 1. / (eDistance * eDistance);
 
-	    //...Residual...
-	    Vector3D v = onTrack - onWire;
-	    double vmag = v.mag();
-	    double dDistance = vmag - distance;
+        //...Residual...
+        Vector3D v = onTrack - onWire;
+        double vmag = v.mag();
+        double dDistance = vmag - distance;
 
-	    //...dxda...
-	    this->dxda(* l, t.helix(), dPhi, dxda, dyda, dzda);
+        //...dxda...
+        this->dxda(* l, t.helix(), dPhi, dxda, dyda, dzda);
 
-	    //...Chi2 related...
-	    // dDda = (v.x() * dxda + v.y() * dyda + v.z() * dzda) / vmag;
-	    double vw[3] = { h.wire().direction().x(),
-                             h.wire().direction().y(),
-                             h.wire().direction().z() };
-            double vwxy = vw[0]*vw[1];
-            double vwyz = vw[1]*vw[2];
-            double vwzx = vw[2]*vw[0];
-	    dDda_5dim = (vmag > 0.)
-                ? ((v.x() * (1. - vw[0] * vw[0]) -
-                    v.y() * vwxy - v.z() * vwzx)
-                   * dxda + 
-                   (v.y() * (1. - vw[1] * vw[1]) -
-                    v.z() * vwyz - v.x() * vwxy)
-                   * dyda + 
-                   (v.z() * (1. - vw[2] * vw[2]) -
-                    v.x() * vwzx - v.y() * vwyz)
-                   * dzda) / vmag
-                :CLHEP::HepVector(5, 0);
-	    if (vmag <= 0.0) {
-		std::cout  << "    in fit " << onTrack << ", " << onWire;
-		h.dump();
-	    }
-	    //	    for (unsigned j = 0; j < 5; j++) dDda[j] = dDda_5dim[j];
-	    dDda[0] = dDda_5dim[0];
-	    dDda[1] = dDda_5dim[1];
-	    dDda[2] = dDda_5dim[2];
-	    dDda[3] = dDda_5dim[3];
-	    dDda[4] = dDda_5dim[4];
-            dDda[5] = -dddt;
+        //...Chi2 related...
+        // dDda = (v.x() * dxda + v.y() * dyda + v.z() * dzda) / vmag;
+        double vw[3] = { h.wire().direction().x(),
+                         h.wire().direction().y(),
+                         h.wire().direction().z()
+                       };
+        double vwxy = vw[0] * vw[1];
+        double vwyz = vw[1] * vw[2];
+        double vwzx = vw[2] * vw[0];
+        dDda_5dim = (vmag > 0.)
+                    ? ((v.x() * (1. - vw[0] * vw[0]) -
+                        v.y() * vwxy - v.z() * vwzx)
+                       * dxda +
+                       (v.y() * (1. - vw[1] * vw[1]) -
+                        v.z() * vwyz - v.x() * vwxy)
+                       * dyda +
+                       (v.z() * (1. - vw[2] * vw[2]) -
+                        v.x() * vwzx - v.y() * vwyz)
+                       * dzda) / vmag
+                    : CLHEP::HepVector(5, 0);
+        if (vmag <= 0.0) {
+          std::cout  << "    in fit " << onTrack << ", " << onWire;
+          h.dump();
+        }
+        //      for (unsigned j = 0; j < 5; j++) dDda[j] = dDda_5dim[j];
+        dDda[0] = dDda_5dim[0];
+        dDda[1] = dDda_5dim[1];
+        dDda[2] = dDda_5dim[2];
+        dDda[3] = dDda_5dim[3];
+        dDda[4] = dDda_5dim[4];
+        dDda[5] = -dddt;
 
-	    dchi2da += (dDistance * inv_eDistance2) * dDda;
-	    d2chi2d2a += vT_times_v(dDda) * inv_eDistance2;
-	    double pChi2 = dDistance * dDistance * inv_eDistance2;
-	    chi2 += pChi2;
+        dchi2da += (dDistance * inv_eDistance2) * dDda;
+        d2chi2d2a += vT_times_v(dDda) * inv_eDistance2;
+        double pChi2 = dDistance * dDistance * inv_eDistance2;
+        chi2 += pChi2;
 
-	    //...Store results...
-	    l->update(onTrack, onWire, leftRight, pChi2);
-	}
+        //...Store results...
+        l->update(onTrack, onWire, leftRight, pChi2);
+      }
 
-	//...Save chi2 information...
-	if(nTrial == 0){
-	  _pre_chi2 = chi2;
-	  _fitted_chi2 = chi2;
-	}else _fitted_chi2 = chi2;
+      //...Save chi2 information...
+      if (nTrial == 0) {
+        _pre_chi2 = chi2;
+        _fitted_chi2 = chi2;
+      } else _fitted_chi2 = chi2;
 
-	//...Check condition...
-	double change = chi2Old - chi2;
-	if (fabs(change) < convergence) break;
-	//temp
-		factor = 1.0;
-	//temp
-	if (change < 0.) {
-//    	    a += factor * da;
-//    	    t._helix->a(a);
-//    	    break;
-	    factor = 0.5;
-	}
-	chi2Old = chi2;
+      //...Check condition...
+      double change = chi2Old - chi2;
+      if (fabs(change) < convergence) break;
+      //temp
+      factor = 1.0;
+      //temp
+      if (change < 0.) {
+//          a += factor * da;
+//          t._helix->a(a);
+//          break;
+        factor = 0.5;
+      }
+      chi2Old = chi2;
 
-	//...Cal. helix parameters for next loop...
-	if (fitBy2D) {
-	    f = dchi2da.sub(1, 4);
-	    e = d2chi2d2a.sub(1, 4);
-	    f = solve(e, f);
-	    da[0] = f[0];
-	    da[1] = f[1];
-	    da[2] = f[2];
-	    da[3] = f[3];
-	    da[4] = 0.;
-	    da[5] = 0.;
-	}
-	else {
-	    da = solve(d2chi2d2a, dchi2da);
-	}
-	static const double kp_max = 1.e10;
-	static const double kp_min = 1.e-30;
-	const double kp_test = std::abs(a[2] - factor * da[2]);
-	if (kp_test < kp_min || kp_test > kp_max) {
-	    err = 1;
-	    break;
-	}
+      //...Cal. helix parameters for next loop...
+      if (fitBy2D) {
+        f = dchi2da.sub(1, 4);
+        e = d2chi2d2a.sub(1, 4);
+        f = solve(e, f);
+        da[0] = f[0];
+        da[1] = f[1];
+        da[2] = f[2];
+        da[3] = f[3];
+        da[4] = 0.;
+        da[5] = 0.;
+      } else {
+        da = solve(d2chi2d2a, dchi2da);
+      }
+      static const double kp_max = 1.e10;
+      static const double kp_min = 1.e-30;
+      const double kp_test = std::abs(a[2] - factor * da[2]);
+      if (kp_test < kp_min || kp_test > kp_max) {
+        err = 1;
+        break;
+      }
 
-	a -= factor * da;
+      a -= factor * da;
 
-	//	for (unsigned j = 0; j < 5; j++) a_5dim[j] = a[j];
-	a_5dim[0] = a[0];
-	a_5dim[1] = a[1];
-	a_5dim[2] = a[2];
-	a_5dim[3] = a[3];
-	a_5dim[4] = a[4];
-	t._helix->a(a_5dim);
-        tev = a[5];
-	//temp
-	//	if(nTrial == 0)  << "initial chi2=" <<chi2 << std::endl;
-	//temp
-	++nTrial;
+      //  for (unsigned j = 0; j < 5; j++) a_5dim[j] = a[j];
+      a_5dim[0] = a[0];
+      a_5dim[1] = a[1];
+      a_5dim[2] = a[2];
+      a_5dim[3] = a[3];
+      a_5dim[4] = a[4];
+      t._helix->a(a_5dim);
+      tev = a[5];
+      //temp
+      //  if(nTrial == 0)  << "initial chi2=" <<chi2 << std::endl;
+      //temp
+      ++nTrial;
 
 #ifdef TRASAN_DEBUG_DETAIL
-	std::cout << "fit " << nTrial-1<< " : " << chi2 << " : " << change << std::endl;
+      std::cout << "fit " << nTrial - 1 << " : " << chi2 << " : " << change << std::endl;
 #endif
     }
 
@@ -1849,73 +1844,72 @@ THelixFitter::main(TTrackBase & b, float & tev, float & tev_err,
     CLHEP::HepSymMatrix Ea(6, 0);
     unsigned dim;
     if (fitBy2D) {
-	dim = 4;
-	CLHEP::HepSymMatrix Eb(4, 0), Ec(4, 0);
-	Eb = d2chi2d2a.sub(1, 4);
-	Ec = Eb.inverse(err);
-	Ea[0][0] = Ec[0][0];
-	Ea[0][1] = Ec[0][1];
-	Ea[0][2] = Ec[0][2];
-	Ea[0][3] = Ec[0][3];
-	Ea[1][1] = Ec[1][1];
-	Ea[1][2] = Ec[1][2];
-	Ea[1][3] = Ec[1][3];
-	Ea[2][2] = Ec[2][2];
-	Ea[2][3] = Ec[2][3];
-	Ea[3][3] = Ec[3][3];
-    }
-    else {
-	dim = 6;
-	Ea = d2chi2d2a.inverse(err);
-	// std::cout << "err flg=" << err << std::endl;
+      dim = 4;
+      CLHEP::HepSymMatrix Eb(4, 0), Ec(4, 0);
+      Eb = d2chi2d2a.sub(1, 4);
+      Ec = Eb.inverse(err);
+      Ea[0][0] = Ec[0][0];
+      Ea[0][1] = Ec[0][1];
+      Ea[0][2] = Ec[0][2];
+      Ea[0][3] = Ec[0][3];
+      Ea[1][1] = Ec[1][1];
+      Ea[1][2] = Ec[1][2];
+      Ea[1][3] = Ec[1][3];
+      Ea[2][2] = Ec[2][2];
+      Ea[2][3] = Ec[2][3];
+      Ea[3][3] = Ec[3][3];
+    } else {
+      dim = 6;
+      Ea = d2chi2d2a.inverse(err);
+      // std::cout << "err flg=" << err << std::endl;
     }
     //
     // nk temp fix
     //
-    if(!err && Ea[5][5]<0) {
+    if (!err && Ea[5][5] < 0) {
       std::cout << "Ea[5][5] is bad... " << Ea[5][5] << std::endl;
       return TFitFailed;
     }
 
     //...Store information...
     if (! err) {
-	for (unsigned j = 0; j < 5; j++) a_5dim[j] = a[j];
-	CLHEP::HepSymMatrix Ea_5dim(5, 0);
-	Ea_5dim = Ea.sub(1, 5);
-	t._helix->a(a_5dim);
-	t._helix->Ea(Ea_5dim);
-        tev = a[5];
-        tev_err = sqrt(Ea[5][5]);
-	//temp
-	//	 << "nTrial=" << nTrial << std::endl;
-	//	 << "chi2="   << chi2   << std::endl;
-	//	 << "tev,tev_err="<<tev<<" "<<tev_err<<std::endl;
-	//temp
+      for (unsigned j = 0; j < 5; j++) a_5dim[j] = a[j];
+      CLHEP::HepSymMatrix Ea_5dim(5, 0);
+      Ea_5dim = Ea.sub(1, 5);
+      t._helix->a(a_5dim);
+      t._helix->Ea(Ea_5dim);
+      tev = a[5];
+      tev_err = sqrt(Ea[5][5]);
+      //temp
+      //   << "nTrial=" << nTrial << std::endl;
+      //   << "chi2="   << chi2   << std::endl;
+      //   << "tev,tev_err="<<tev<<" "<<tev_err<<std::endl;
+      //temp
 
-	t._fitted = true;
-    }
-    else {
-	err = TFitFailed;
+      t._fitted = true;
+    } else {
+      err = TFitFailed;
     }
 
     t._ndf = nCores - dim;
     t._chi2 = chi2;
 
-    if(pre_chi2)*pre_chi2 = _pre_chi2;
-    if(fitted_chi2)*fitted_chi2 = _fitted_chi2;
+    if (pre_chi2)*pre_chi2 = _pre_chi2;
+    if (fitted_chi2)*fitted_chi2 = _fitted_chi2;
 
     return err;
-}
+  }
 #else
 //=====================================================================
-int
-THelixFitter::main(TTrackBase & b, float & tev, float & tev_err,
-		   double *pre_chi2, double *fitted_chi2) const {
+  int
+  THelixFitter::main(TTrackBase & b, float & tev, float & tev_err,
+                     double *pre_chi2, double *fitted_chi2) const
+  {
 //=====================================================================
     //...Initialize
     _pre_chi2 = _fitted_chi2 = 0.;
-    if(pre_chi2)*pre_chi2 = _pre_chi2;
-    if(fitted_chi2)*fitted_chi2 = _fitted_chi2;
+    if (pre_chi2)*pre_chi2 = _pre_chi2;
+    if (fitted_chi2)*fitted_chi2 = _fitted_chi2;
 
     //...Type check...
     if (b.objectType() != Track) return TFitUnavailable;
@@ -1926,7 +1920,7 @@ THelixFitter::main(TTrackBase & b, float & tev, float & tev_err,
 
     //...Count # of hits...
     AList<TLink> cores = t.cores();
-    if (_fit2D)	cores = AxialHits(cores);
+    if (_fit2D) cores = AxialHits(cores);
     unsigned nCores = cores.length();
     unsigned nStereoCores = NStereoHits(cores);
 
@@ -1936,11 +1930,10 @@ THelixFitter::main(TTrackBase & b, float & tev, float & tev_err,
 
     //...Check # of hits...
     if (! fitBy2D) {
-	if ((nStereoCores < 2) || (nCores - nStereoCores < 3))
-	    return TFitErrorFewHits;
-    }
-    else {
-	if (nCores < 3) return TFitErrorFewHits;
+      if ((nStereoCores < 2) || (nCores - nStereoCores < 3))
+        return TFitErrorFewHits;
+    } else {
+      if (nCores < 3) return TFitErrorFewHits;
     }
 
     //...Setup...
@@ -1961,7 +1954,7 @@ THelixFitter::main(TTrackBase & b, float & tev, float & tev_err,
     //temp    const double convergence = Convergence;
     const double convergence = 1.0e-4;
     bool allAxial = true;
-   CLHEP::HepMatrix e(3, 3);
+    CLHEP::HepMatrix e(3, 3);
     CLHEP::HepVector f(3);
     int err = 0;
     double factor = 1.0;//jtanaka0715
@@ -1971,134 +1964,133 @@ THelixFitter::main(TTrackBase & b, float & tev, float & tev_err,
     //    while (nTrial < NTrailMax) {
     while (nTrial < TrasanTHelixFitterNtrialMax) {
 
-	//...Set up...
-	chi2 = 0.;
-	for (unsigned j = 0; j < 6; j++) dchi2da[j] = 0.;
-	d2chi2d2a = zero6;
+      //...Set up...
+      chi2 = 0.;
+      for (unsigned j = 0; j < 6; j++) dchi2da[j] = 0.;
+      d2chi2d2a = zero6;
 
-	//...Loop with hits...
-	unsigned i = 0;
-	while (TLink * l = cores[i++]) {
-	    const Belle2::TRGCDCWireHit & h = * l->hit();
+      //...Loop with hits...
+      unsigned i = 0;
+      while (TLink * l = cores[i++]) {
+        const Belle2::TRGCDCWireHit & h = * l->hit();
 
-	    //...Cal. closest points...
-	    t.approach(* l, _sag);
-	    double dPhi = l->dPhi();
-	    const HepGeom::Point3D<double> & onTrack = l->positionOnTrack();
-	    const HepGeom::Point3D<double> & onWire = l->positionOnWire();
-	    unsigned leftRight = WireHitRight;
-	    if (onWire.cross(onTrack).z() < 0.)	leftRight = WireHitLeft;
+        //...Cal. closest points...
+        t.approach(* l, _sag);
+        double dPhi = l->dPhi();
+        const HepGeom::Point3D<double> & onTrack = l->positionOnTrack();
+        const HepGeom::Point3D<double> & onWire = l->positionOnWire();
+        unsigned leftRight = WireHitRight;
+        if (onWire.cross(onTrack).z() < 0.) leftRight = WireHitLeft;
 
-	    //...Obtain drift distance and its error...
-	    double distance;
-	    double eDistance;
-            double dddt;
-	    drift(t, * l, tev, distance, eDistance, dddt);
-	    double eDistance2 = eDistance * eDistance;
+        //...Obtain drift distance and its error...
+        double distance;
+        double eDistance;
+        double dddt;
+        drift(t, * l, tev, distance, eDistance, dddt);
+        double eDistance2 = eDistance * eDistance;
 
-	    //...Residual...
-	    Vector3D v = onTrack - onWire;
-	    double vmag = v.mag();
-	    double dDistance = vmag - distance;
+        //...Residual...
+        Vector3D v = onTrack - onWire;
+        double vmag = v.mag();
+        double dDistance = vmag - distance;
 
-	    //...dxda...
-	    this->dxda(* l, t.helix(), dPhi, dxda, dyda, dzda);
+        //...dxda...
+        this->dxda(* l, t.helix(), dPhi, dxda, dyda, dzda);
 
-	    //...Chi2 related...
-	    // dDda = (v.x() * dxda + v.y() * dyda + v.z() * dzda) / vmag;
-	    HepGeom::Vector3D<double> vw = h.wire().direction();
-            dDda_5dim = (vmag > 0.)
-		? ((v.x() * (1. - vw.x() * vw.x()) -
-		    v.y() * vw.x() * vw.y() - v.z() * vw.x() * vw.z())
-		   * dxda + 
-		   (v.y() * (1. - vw.y() * vw.y()) -
-		    v.z() * vw.y() * vw.z() - v.x() * vw.y() * vw.x())
-		   * dyda + 
-		   (v.z() * (1. - vw.z() * vw.z()) -
-		    v.x() * vw.z() * vw.x() - v.y() * vw.z() * vw.y())
-		   * dzda) / vmag
-		:CLHEP::HepVector(5, 0);
-	    if (vmag <= 0.0) {
-		std::cout << "    in fit " << onTrack << ", " << onWire;
-		h.dump();
-	    }
-	    //	    for (unsigned j = 0; j < 5; j++) dDda[j] = dDda_5dim[j];
-	    dDda[0] = dDda_5dim[0];
-	    dDda[1] = dDda_5dim[1];
-	    dDda[2] = dDda_5dim[2];
-	    dDda[3] = dDda_5dim[3];
-	    dDda[4] = dDda_5dim[4];
-            dDda[5] = -dddt;
+        //...Chi2 related...
+        // dDda = (v.x() * dxda + v.y() * dyda + v.z() * dzda) / vmag;
+        HepGeom::Vector3D<double> vw = h.wire().direction();
+        dDda_5dim = (vmag > 0.)
+                    ? ((v.x() * (1. - vw.x() * vw.x()) -
+                        v.y() * vw.x() * vw.y() - v.z() * vw.x() * vw.z())
+                       * dxda +
+                       (v.y() * (1. - vw.y() * vw.y()) -
+                        v.z() * vw.y() * vw.z() - v.x() * vw.y() * vw.x())
+                       * dyda +
+                       (v.z() * (1. - vw.z() * vw.z()) -
+                        v.x() * vw.z() * vw.x() - v.y() * vw.z() * vw.y())
+                       * dzda) / vmag
+                    : CLHEP::HepVector(5, 0);
+        if (vmag <= 0.0) {
+          std::cout << "    in fit " << onTrack << ", " << onWire;
+          h.dump();
+        }
+        //      for (unsigned j = 0; j < 5; j++) dDda[j] = dDda_5dim[j];
+        dDda[0] = dDda_5dim[0];
+        dDda[1] = dDda_5dim[1];
+        dDda[2] = dDda_5dim[2];
+        dDda[3] = dDda_5dim[3];
+        dDda[4] = dDda_5dim[4];
+        dDda[5] = -dddt;
 
-	    dchi2da += (dDistance / eDistance2) * dDda;
-	    d2chi2d2a += vT_times_v(dDda) / eDistance2;
-	    double pChi2 = dDistance * dDistance / eDistance2;
-	    chi2 += pChi2;
+        dchi2da += (dDistance / eDistance2) * dDda;
+        d2chi2d2a += vT_times_v(dDda) / eDistance2;
+        double pChi2 = dDistance * dDistance / eDistance2;
+        chi2 += pChi2;
 
-	    //...Store results...
-	    l->update(onTrack, onWire, leftRight, pChi2);
-	}
+        //...Store results...
+        l->update(onTrack, onWire, leftRight, pChi2);
+      }
 
-	//...Save chi2 information...
-	if(nTrial == 0){
-	  _pre_chi2 = chi2;
-	  _fitted_chi2 = chi2;
-	}else _fitted_chi2 = chi2;
+      //...Save chi2 information...
+      if (nTrial == 0) {
+        _pre_chi2 = chi2;
+        _fitted_chi2 = chi2;
+      } else _fitted_chi2 = chi2;
 
-	//...Check condition...
-	double change = chi2Old - chi2;
-	if (fabs(change) < convergence) break;
-	//temp
-		factor = 1.0;
-	//temp
-	if (change < 0.) {
-//    	    a += factor * da;
-//    	    t._helix->a(a);
-//    	    break;
-	    factor = 0.5;
-	}
-	chi2Old = chi2;
+      //...Check condition...
+      double change = chi2Old - chi2;
+      if (fabs(change) < convergence) break;
+      //temp
+      factor = 1.0;
+      //temp
+      if (change < 0.) {
+//          a += factor * da;
+//          t._helix->a(a);
+//          break;
+        factor = 0.5;
+      }
+      chi2Old = chi2;
 
-	//...Cal. helix parameters for next loop...
-	if (fitBy2D) {
-	    f = dchi2da.sub(1, 4);
-	    e = d2chi2d2a.sub(1, 4);
-	    f = solve(e, f);
-	    da[0] = f[0];
-	    da[1] = f[1];
-	    da[2] = f[2];
-	    da[3] = f[3];
-	    da[4] = 0.;
-	    da[5] = 0.;
-	}
-	else {
-	    da = solve(d2chi2d2a, dchi2da);
-	}
-	static const double kp_max = 1.e10;
-	static const double kp_min = 1.e-30;
-	const double kp_test = std::abs(a[2] - factor * da[2]);
-	if (kp_test < kp_min || kp_test > kp_max) {
-	    err = 1;
-	    break;
-	}
+      //...Cal. helix parameters for next loop...
+      if (fitBy2D) {
+        f = dchi2da.sub(1, 4);
+        e = d2chi2d2a.sub(1, 4);
+        f = solve(e, f);
+        da[0] = f[0];
+        da[1] = f[1];
+        da[2] = f[2];
+        da[3] = f[3];
+        da[4] = 0.;
+        da[5] = 0.;
+      } else {
+        da = solve(d2chi2d2a, dchi2da);
+      }
+      static const double kp_max = 1.e10;
+      static const double kp_min = 1.e-30;
+      const double kp_test = std::abs(a[2] - factor * da[2]);
+      if (kp_test < kp_min || kp_test > kp_max) {
+        err = 1;
+        break;
+      }
 
-	a -= factor * da;
+      a -= factor * da;
 
-	//	for (unsigned j = 0; j < 5; j++) a_5dim[j] = a[j];
-	a_5dim[0] = a[0];
-	a_5dim[1] = a[1];
-	a_5dim[2] = a[2];
-	a_5dim[3] = a[3];
-	a_5dim[4] = a[4];
-	t._helix->a(a_5dim);
-        tev = a[5];
-	//temp
-	//	if(nTrial == 0)  << "initial chi2=" <<chi2 << std::endl;
-	//temp
-	++nTrial;
+      //  for (unsigned j = 0; j < 5; j++) a_5dim[j] = a[j];
+      a_5dim[0] = a[0];
+      a_5dim[1] = a[1];
+      a_5dim[2] = a[2];
+      a_5dim[3] = a[3];
+      a_5dim[4] = a[4];
+      t._helix->a(a_5dim);
+      tev = a[5];
+      //temp
+      //  if(nTrial == 0)  << "initial chi2=" <<chi2 << std::endl;
+      //temp
+      ++nTrial;
 
 #ifdef TRASAN_DEBUG_DETAIL
-	 << "fit " << nTrial-1<< " : " << chi2 << " : " << change << std::endl;
+      << "fit " << nTrial - 1 << " : " << chi2 << " : " << change << std::endl;
 #endif
     }
 
@@ -2106,88 +2098,87 @@ THelixFitter::main(TTrackBase & b, float & tev, float & tev_err,
     CLHEP::HepSymMatrix Ea(6, 0);
     unsigned dim;
     if (fitBy2D) {
-	dim = 4;
-	CLHEP::HepSymMatrix Eb(4, 0), Ec(4, 0);
-	Eb = d2chi2d2a.sub(1, 4);
-	Ec = Eb.inverse(err);
-	Ea[0][0] = Ec[0][0];
-	Ea[0][1] = Ec[0][1];
-	Ea[0][2] = Ec[0][2];
-	Ea[0][3] = Ec[0][3];
-	Ea[1][1] = Ec[1][1];
-	Ea[1][2] = Ec[1][2];
-	Ea[1][3] = Ec[1][3];
-	Ea[2][2] = Ec[2][2];
-	Ea[2][3] = Ec[2][3];
-	Ea[3][3] = Ec[3][3];
-    }
-    else {
-	dim = 6;
-	Ea = d2chi2d2a.inverse(err);
-	// std::cout << "err flg=" << err << std::endl;
+      dim = 4;
+      CLHEP::HepSymMatrix Eb(4, 0), Ec(4, 0);
+      Eb = d2chi2d2a.sub(1, 4);
+      Ec = Eb.inverse(err);
+      Ea[0][0] = Ec[0][0];
+      Ea[0][1] = Ec[0][1];
+      Ea[0][2] = Ec[0][2];
+      Ea[0][3] = Ec[0][3];
+      Ea[1][1] = Ec[1][1];
+      Ea[1][2] = Ec[1][2];
+      Ea[1][3] = Ec[1][3];
+      Ea[2][2] = Ec[2][2];
+      Ea[2][3] = Ec[2][3];
+      Ea[3][3] = Ec[3][3];
+    } else {
+      dim = 6;
+      Ea = d2chi2d2a.inverse(err);
+      // std::cout << "err flg=" << err << std::endl;
     }
 
 
     //...Store information...
     if (! err) {
-	for (unsigned j = 0; j < 5; j++) a_5dim[j] = a[j];
-	CLHEP::HepSymMatrix Ea_5dim(5, 0);
-	Ea_5dim = Ea.sub(1, 5);
-	t._helix->a(a_5dim);
-	t._helix->Ea(Ea_5dim);
-        tev = a[5];
-        tev_err = sqrt(Ea[5][5]);
-	//temp
-	//	 << "nTrial=" << nTrial << std::endl;
-	//	 << "chi2="   << chi2   << std::endl;
-	//	 << "tev,tev_err="<<tev<<" "<<tev_err<<std::endl;
-	//temp
+      for (unsigned j = 0; j < 5; j++) a_5dim[j] = a[j];
+      CLHEP::HepSymMatrix Ea_5dim(5, 0);
+      Ea_5dim = Ea.sub(1, 5);
+      t._helix->a(a_5dim);
+      t._helix->Ea(Ea_5dim);
+      tev = a[5];
+      tev_err = sqrt(Ea[5][5]);
+      //temp
+      //   << "nTrial=" << nTrial << std::endl;
+      //   << "chi2="   << chi2   << std::endl;
+      //   << "tev,tev_err="<<tev<<" "<<tev_err<<std::endl;
+      //temp
 
-	t._fitted = true;
-    }
-    else {
-	err = TFitFailed;
+      t._fitted = true;
+    } else {
+      err = TFitFailed;
     }
 
     t._ndf = nCores - dim;
     t._chi2 = chi2;
 
-    if(pre_chi2)*pre_chi2 = _pre_chi2;
-    if(fitted_chi2)*fitted_chi2 = _fitted_chi2;
+    if (pre_chi2)*pre_chi2 = _pre_chi2;
+    if (fitted_chi2)*fitted_chi2 = _fitted_chi2;
 
     return err;
-}
+  }
 #endif
 
 //=========================================
-void
-THelixFitter::drift(const TTrack & t,
-		    const TLink & l,
-		    float tev,
-		    double & distance,
-		    double & err,
-		    double & dddt) const {
+  void
+  THelixFitter::drift(const TTrack & t,
+                      const TLink & l,
+                      float tev,
+                      double & distance,
+                      double & err,
+                      double & dddt) const
+  {
 //=========================================
 
     const Belle2::TRGCDCWireHit & h = * l.hit();
     const HepGeom::Point3D<double> & onTrack = l.positionOnTrack();
     const HepGeom::Point3D<double> & onWire = l.positionOnWire();
     unsigned leftRight = WireHitRight;
-    if (onWire.cross(onTrack).z() < 0.)	leftRight = WireHitLeft;
+    if (onWire.cross(onTrack).z() < 0.) leftRight = WireHitLeft;
 
     //...No correction...
     if ((tev == 0.) && (! _propagation) && (! _tof)) {
-	distance = h.drift(leftRight);
-	err = h.dDrift(leftRight);
-	//do not return here; need to cal. dddt 
-	//	return;
+      distance = h.drift(leftRight);
+      err = h.dDrift(leftRight);
+      //do not return here; need to cal. dddt
+      //  return;
     }
 
     //...TOF correction...
     float tof = 0.;
     double dPhi = l.dPhi();
-    while(dPhi >  M_PI) dPhi -= M_PI;
-    while(dPhi < -M_PI) dPhi += M_PI;
+    while (dPhi >  M_PI) dPhi -= M_PI;
+    while (dPhi < -M_PI) dPhi += M_PI;
     if (_tof) {
       int imass = 3;
       THelix th = t.helix();
@@ -2199,28 +2190,28 @@ THelixFitter::drift(const TTrack & t,
 
       //      std::cout << "pivot= " << th.pivot() << std::endl;
       if (th.pivot().x() != 0. || th.pivot().y() != 0.) {
-	HepGeom::Point3D<double>  vt = th.x(0.) - th.center();
-	float vtx( vt.x() ), vty( vt.y() );
-	HepGeom::Point3D<double>  vtp = th.x(0.);
-	th.pivot( ORIGIN );
-	HepGeom::Point3D<double>  v0 = th.x(0.) - th.center();
-	float v0x( v0.x() ), v0y( v0.y() );
-	float dfi = atan2(v0x*vty - v0y*vtx, v0x*vtx + v0y*vty);
-	s += f * std::abs(th.curv()*dfi);
-	//	std::cout << "s    = " << std::abs(th.curv()*dfi) << std::endl;
-	//	float xt( vtp.x() ), yt( vtp.y() );	
-	//	std::cout << "s_lin= " << sqrt( xt*xt + yt*yt)    << std::endl;
+        HepGeom::Point3D<double>  vt = th.x(0.) - th.center();
+        float vtx(vt.x()), vty(vt.y());
+        HepGeom::Point3D<double>  vtp = th.x(0.);
+        th.pivot(ORIGIN);
+        HepGeom::Point3D<double>  v0 = th.x(0.) - th.center();
+        float v0x(v0.x()), v0y(v0.y());
+        float dfi = atan2(v0x * vty - v0y * vtx, v0x * vtx + v0y * vty);
+        s += f * std::abs(th.curv() * dfi);
+        //  std::cout << "s    = " << std::abs(th.curv()*dfi) << std::endl;
+        //  float xt( vtp.x() ), yt( vtp.y() );
+        //  std::cout << "s_lin= " << sqrt( xt*xt + yt*yt)    << std::endl;
       }
 
       calcdc_tof2_(& imass, & p, & s, & tof);
     }
-    
+
     //...T0 and propagation corrections...
     int wire = h.wire().id();
     int side = leftRight;
-    if (side==0) side = -1;
+    if (side == 0) side = -1;
     HepGeom::Vector3D<double> tp = t.helix().momentum(dPhi);
-    float p[3] = {tp.x(),tp.y(),tp.z()};
+    float p[3] = {tp.x(), tp.y(), tp.z()};
     float x[3] = {onWire.x(), onWire.y(), onWire.z()};
 //cnv    float time = h.reccdc()->m_tdc + tev - tof;
     float time = 0;
@@ -2230,27 +2221,27 @@ THelixFitter::drift(const TTrack & t,
     float edist;
     int prop = _propagation;
 
-    //    //calculate derivative w.r.t. time in blute force way; need update 
+    //    //calculate derivative w.r.t. time in blute force way; need update
     //    //in future to speed up
     //    float time_p = time + 0.1;
     //    calcdc_driftdist_(& prop,
-    //    		      & wire,
-    //    		      & side,
-    //    		      p,
-    //    		      x,
-    //    		      & time_p,
-    //    		      & dist_p,
-    //    		      & edist);
+    //              & wire,
+    //              & side,
+    //              p,
+    //              x,
+    //              & time_p,
+    //              & dist_p,
+    //              & edist);
     //
     //        float time_m = time - 0.1;
     //        calcdc_driftdist_(& prop,
-    //    		      & wire,		      
+    //              & wire,
     //                      & side,
-    //    		      p,
-    //    		      x,
-    //    		      & time_m,
-    //    		      & dist_m,
-    //    		      & edist);
+    //              p,
+    //              x,
+    //              & time_m,
+    //              & dist_m,
+    //              & edist);
     ////dddt = (dist_p - dist_m)/0.2;
     //    dddt = (dist_p - dist_m)*5.;
     // std::cout << "side=" << side << std::endl;
@@ -2261,46 +2252,46 @@ THelixFitter::drift(const TTrack & t,
     float deriv2[2];
     float time_tmp = time;
     calcdc_driftdist3_(& prop,
-		       & wire,		      
-		       p,
-		       x,
-		       & time_tmp,
-		       dist2,
-		       sigma_d2, 
-		       deriv2);
-    //n.b. input and output time are slightly different because of prop. 
+                       & wire,
+                       p,
+                       x,
+                       & time_tmp,
+                       dist2,
+                       sigma_d2,
+                       deriv2);
+    //n.b. input and output time are slightly different because of prop.
     //delay corr. in driftdist3.
     //    calcdc_driftdist_(& prop,
-    //    		      & wire,
-    //    		      & side,
-    //    		      p,
-    //    		      x,
-    //    		      & time,
-    //    		      & dist,
-    //    		      & edist);
+    //              & wire,
+    //              & side,
+    //              p,
+    //              x,
+    //              & time,
+    //              & dist,
+    //              & edist);
 
-    if (side==-1) {
+    if (side == -1) {
       // std::cout << " " << std::endl;
       // std::cout << dist << " " << dist2[0] << " " <<dist2[1] << std::endl;
       // std::cout << edist << " " << sigma_d2[0] << " " << sigma_d2[1] << std::endl;
       // std::cout << dddt  << " " << 0.001*deriv2[0] << std::endl;
       dist  = dist2[0];
       edist = sigma_d2[0];
-      dddt = 0.001*deriv2[0];
-    } else if(side== 1) {
+      dddt = 0.001 * deriv2[0];
+    } else if (side == 1) {
       // std::cout << " " << std::endl;
       // std::cout << dist << " " << dist2[1] << " " <<dist2[0] << std::endl;
       // std::cout << edist << " " << sigma_d2[1] << " " << sigma_d2[0] << std::endl;
       // std::cout << dddt  << " " << 0.001*deriv2[1] << std::endl;
       dist  = dist2[1];
       edist = sigma_d2[1];
-      dddt = 0.001*deriv2[1];
-    }  
+      dddt = 0.001 * deriv2[1];
+    }
 
     distance = (double) dist;
     // std::cout << "time,distance="<<time<<" "<<distance<<std::endl;
     err = (double) edist;
     return;
-}
+  }
 
 } // namespace Belle

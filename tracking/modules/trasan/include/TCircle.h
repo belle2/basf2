@@ -110,7 +110,7 @@
 namespace Belle {
 
 /// A class to represent a circle in tracking.
-class TCircle : public TTrackBase {
+  class TCircle : public TTrackBase {
 
   public:
     /// Constructor.
@@ -129,7 +129,7 @@ class TCircle : public TTrackBase {
 
     /// dumps debug information.
     void dump(const std::string & message = std::string(""),
-	      const std::string & prefix = std::string("")) const;
+              const std::string & prefix = std::string("")) const;
 
     /// returns position of center.
     const HepGeom::Point3D<double>  & center(void) const;
@@ -168,7 +168,7 @@ class TCircle : public TTrackBase {
     double _radius;
     HepGeom::Point3D<double>  _center;
     static const TCircleFitter _fitter;
-};
+  };
 
 //-----------------------------------------------------------------------------
 
@@ -181,85 +181,94 @@ class TCircle : public TTrackBase {
 
 #ifdef TCircle_INLINE_DEFINE_HERE
 
-inline
-const HepGeom::Point3D<double>  &
-TCircle::center(void) const {
+  inline
+  const HepGeom::Point3D<double>  &
+  TCircle::center(void) const
+  {
 #ifdef TRASAN_DEBUG
 //     if (! _fitted) std::cout << "TCircle::center !!! fit not performed : "
-// 			     << "center=" << _center << std::endl;
+//           << "center=" << _center << std::endl;
 #endif
     return _center;
-}
+  }
 
-inline
-double
-TCircle::radius(void) const {
+  inline
+  double
+  TCircle::radius(void) const
+  {
 #ifdef TRASAN_DEBUG
 //     if (! _fitted) std::cout << "TCircle::radius !!! fit not performed : "
-// 			     << "radius=" << _radius << std::endl;
+//           << "radius=" << _radius << std::endl;
 #endif
     return _radius;
-}
+  }
 
-inline
-double
-TCircle::pt(void) const {
+  inline
+  double
+  TCircle::pt(void) const
+  {
 #ifdef TRASAN_DEBUG
 //     if (! _fitted) std::cout << "TCircle::pt !!! fit not performed"
-// 			     << std::endl;
+//           << std::endl;
 #endif
     return fabs(_radius) / THelix::ConstantAlpha;
-}
+  }
 
-inline
-double
-TCircle::impact(void) const {
+  inline
+  double
+  TCircle::impact(void) const
+  {
 #ifdef TRASAN_DEBUG
 //     if (! _fitted) std::cout << "TCircle::impact !!! fit not performed"
-// 			     << std::endl;
+//           << std::endl;
 #endif
     return fabs(sqrt(_center.x() * _center.x() +
-		     _center.y() * _center.y())
-		- fabs(_radius));
-}
+                     _center.y() * _center.y())
+                - fabs(_radius));
+  }
 
-inline
-double
-TCircle::charge(void) const {
+  inline
+  double
+  TCircle::charge(void) const
+  {
 #ifdef TRASAN_DEBUG
 //     if (! _fitted) std::cout << "TCircle::charge !!! fit not performed"
-// 			     << std::endl;
+//           << std::endl;
 #endif
     return _charge;
-}
+  }
 
-inline
-void
-TCircle::property(double c, double r, HepGeom::Point3D<double>  e) {
+  inline
+  void
+  TCircle::property(double c, double r, HepGeom::Point3D<double>  e)
+  {
     _charge = c;
     _radius = r;
     _center = e;
-}
+  }
 
-inline
-unsigned
-TCircle::objectType(void) const {
+  inline
+  unsigned
+  TCircle::objectType(void) const
+  {
     return Circle;
-}
+  }
 
-inline
-double
-TCircle::charge(double a) {
+  inline
+  double
+  TCircle::charge(double a)
+  {
     return _charge = a;
-}
+  }
 
-inline
-void
-TCircle::property(double c, double r, TPoint2D & e) {
+  inline
+  void
+  TCircle::property(double c, double r, TPoint2D & e)
+  {
     _charge = c;
     _radius = r;
     _center = HepGeom::Point3D<double> (e.x(), e.y(), 0);
-}
+  }
 
 #endif
 

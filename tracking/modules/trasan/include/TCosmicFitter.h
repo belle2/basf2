@@ -58,10 +58,10 @@
 
 namespace Belle {
 
-class TLink;
+  class TLink;
 
 /// A class to fit a TTrackBase object to a helix.
-class TCosmicFitter : public TFitter {
+  class TCosmicFitter : public TFitter {
 
   public:
     /// Constructor.
@@ -73,27 +73,27 @@ class TCosmicFitter : public TFitter {
   public:// Selectors
     /// dumps debug information.
     void dump(const std::string & message = std::string(""),
-	      const std::string & prefix = std::string("")) const;
+              const std::string & prefix = std::string("")) const;
 
   public:// Modifiers
     int fit(TTrackBase &) const;
     int fit(TTrackBase &, float t0Offset) const;
 
     int fitWithCathode(TTrackBase &, float t0Offset = 0.,
-                        float windowSize= 0.6, int SysCorr = 0 ) ; // added by matsu ( 1999/07/05 )
+                       float windowSize = 0.6, int SysCorr = 0) ; // added by matsu ( 1999/07/05 )
 
   private:
     /// calculates dXda. 'link' and 'dPhi' are inputs. Others are outputs.
     int dxda(const TLink & link,
-	     const THelix & helix,
-	     double dPhi,
-	     CLHEP::HepVector & dxda,
-	     CLHEP::HepVector & dyda,
-	     CLHEP::HepVector & dzda,
+             const THelix & helix,
+             double dPhi,
+             CLHEP::HepVector & dxda,
+             CLHEP::HepVector & dyda,
+             CLHEP::HepVector & dzda,
              int doSagCorrection) const;
 
   private:
-};
+  };
 
 //-----------------------------------------------------------------------------
 

@@ -8,4 +8,6 @@
 
 #pragma link C++ class Belle2::Track;
 #pragma link C++ class Belle2::TrackFitCheckerTempHelperClass;
+#pragma link C++ class Belle2::TrackingOutput;
+
 #endif

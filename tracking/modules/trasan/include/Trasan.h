@@ -243,7 +243,7 @@
 #include <string>
 #define HEP_SHORT_NAMES
 #include "tracking/modules/trasan/AList.h"
- 
+
 #include "framework/core/Module.h"
 
 #include "tracking/modules/trasan/TUpdater.h"
@@ -256,34 +256,34 @@
 #endif
 
 namespace Belle2 {
-    class TRGCDC;
-    class TRGCDCWireHit;
+  class TRGCDC;
+  class TRGCDCWireHit;
 }
 
 namespace Belle {
 
-class TRGCDCCat;
-class TRGCDCClustFinder;
-class TFinderBase;
-class TConformalFinder0;
-class TCurlFinder;
-class TTrack;
-class TTrackMC;
-class TPMCurlFinder;
+  class TRGCDCCat;
+  class TRGCDCClustFinder;
+  class TFinderBase;
+  class TConformalFinder0;
+  class TCurlFinder;
+  class TTrack;
+  class TTrackMC;
+  class TPMCurlFinder;
 
-extern float TrasanTHelixFitterChisqMax;
-extern int   TrasanTHelixFitterNtrialMax;
-extern const HepGeom::Point3D<double> ORIGIN;
+  extern float TrasanTHelixFitterChisqMax;
+  extern int   TrasanTHelixFitterNtrialMax;
+  extern const HepGeom::Point3D<double> ORIGIN;
 
 /// A tracking module.
-class Trasan : public Belle2::Module, TUpdater {
+  class Trasan : public Belle2::Module, TUpdater {
 
   public:
     /// returns Trasan.
     static Trasan * getTrasan(void);
 
     virtual Belle2::ModulePtr newModule() {
-	Belle2::ModulePtr nm(new Trasan()); return nm;
+      Belle2::ModulePtr nm(new Trasan()); return nm;
     };
 
 //cnv  private:
@@ -304,7 +304,7 @@ class Trasan : public Belle2::Module, TUpdater {
     /// processes an event.
     void event();
 
-    /// temporarily required 
+    /// temporarily required
     void beginRun();
     void endRun();
     void disp_stat(const char *);
@@ -318,7 +318,7 @@ class Trasan : public Belle2::Module, TUpdater {
 
     /// dumps debug information.
     void dump(const std::string & message = std::string(""),
-	      const std::string & prefix = std::string("")) const;
+              const std::string & prefix = std::string("")) const;
 
     /// returns a pointer to the rphi finder.
     const TFinderBase * confFinder(void) const;
@@ -337,7 +337,7 @@ class Trasan : public Belle2::Module, TUpdater {
 
   public: // to access information
     /// clears all TRGCDC information.
-    void clear(bool termination=false);
+    void clear(bool termination = false);
 
     /// clears TRGCDC information.
     void fastClear(void);
@@ -354,24 +354,24 @@ class Trasan : public Belle2::Module, TUpdater {
 
     /// returns unused hits.
     void selectUnusedHits(const CAList<Belle2::TRGCDCWireHit> & hits,
-			  CAList<Belle2::TRGCDCWireHit> & unusedHits) const;
+                          CAList<Belle2::TRGCDCWireHit> & unusedHits) const;
 
     /// Cathode
     void cathode(float);
 
     /// standard main loop.
     void main0(const CAList<Belle2::TRGCDCWireHit> & axialHits,
-	       const CAList<Belle2::TRGCDCWireHit> & stereoHits,
-	       const CAList<Belle2::TRGCDCWireHit> & allHits,
-	       AList<TTrack> & tracks,
-	       AList<TTrack> & tracks2D);
+               const CAList<Belle2::TRGCDCWireHit> & stereoHits,
+               const CAList<Belle2::TRGCDCWireHit> & allHits,
+               AList<TTrack> & tracks,
+               AList<TTrack> & tracks2D);
 
     /// Hough + Conf + Curl (Conf doesn't use used hits)
     void main1(const CAList<Belle2::TRGCDCWireHit> & axialHits,
-	       const CAList<Belle2::TRGCDCWireHit> & stereoHits,
-	       const CAList<Belle2::TRGCDCWireHit> & allHits,
-	       AList<TTrack> & tracks,
-	       AList<TTrack> & tracks2D);
+               const CAList<Belle2::TRGCDCWireHit> & stereoHits,
+               const CAList<Belle2::TRGCDCWireHit> & allHits,
+               AList<TTrack> & tracks,
+               AList<TTrack> & tracks2D);
 
   public:// public members for basf interface
 
@@ -567,7 +567,7 @@ class Trasan : public Belle2::Module, TUpdater {
     TWindowGTKSZ * _sz;
 #endif
 
-};
+  };
 
 //-----------------------------------------------------------------------------
 
@@ -580,85 +580,96 @@ class Trasan : public Belle2::Module, TUpdater {
 
 #ifdef Trasan_INLINE_DEFINE_HERE
 
-inline
-const TFinderBase *
-Trasan::confFinder(void) const {
+  inline
+  const TFinderBase *
+  Trasan::confFinder(void) const
+  {
     return (TFinderBase *) _confFinder;
-}
+  }
 
-inline
-const TFinderBase *
-Trasan::curlFinder(void) const {
+  inline
+  const TFinderBase *
+  Trasan::curlFinder(void) const
+  {
     return (TFinderBase *) _curlFinder;
-}
+  }
 
-inline
-const AList<TTrack> &
-Trasan::tracks(void) const {
+  inline
+  const AList<TTrack> &
+  Trasan::tracks(void) const
+  {
     return _trackManager.tracksFinal();
-}
+  }
 
-/* inline */
-/* const TRGCDCClustFinder * */
-/* Trasan::clustFinder(void) const { */
-/*     return _clustFinder; */
-/* } */
+  /* inline */
+  /* const TRGCDCClustFinder * */
+  /* Trasan::clustFinder(void) const { */
+  /*     return _clustFinder; */
+  /* } */
 
-inline
-std::string
-Trasan::name(void) const {
+  inline
+  std::string
+  Trasan::name(void) const
+  {
     return std::string("Trasan");
-}
+  }
 
-inline
-const TTrackManager &
-Trasan::trackManager(void) const {
+  inline
+  const TTrackManager &
+  Trasan::trackManager(void) const
+  {
     return _trackManager;
-}
+  }
 
-/* inline */
-/* const TFinderBase * */
-/* Trasan::pmCurlFinder(void) const { */
-/*     return (TFinderBase *) _pmCurlFinder; */
-/* } */
+  /* inline */
+  /* const TFinderBase * */
+  /* Trasan::pmCurlFinder(void) const { */
+  /*     return (TFinderBase *) _pmCurlFinder; */
+  /* } */
 
 #ifdef TRASAN_WINDOW_GTK
 
-inline
-TWindowGTKConformal &
-Trasan::w(void) {
+  inline
+  TWindowGTKConformal &
+  Trasan::w(void)
+  {
     return * _w;
-}
+  }
 
-inline
-TWindowGTKHough &
-Trasan::hp(void) {
+  inline
+  TWindowGTKHough &
+  Trasan::hp(void)
+  {
     return * _hp;
-}
+  }
 
-inline
-TWindowGTKHough &
-Trasan::hm(void) {
+  inline
+  TWindowGTKHough &
+  Trasan::hm(void)
+  {
     return * _hm;
-}
+  }
 
-inline
-TWindowGTKHough &
-Trasan::hc(void) {
+  inline
+  TWindowGTKHough &
+  Trasan::hc(void)
+  {
     return * _hc;
-}
+  }
 
-inline
-TWindowGTKHough &
-Trasan::hl(void) {
+  inline
+  TWindowGTKHough &
+  Trasan::hl(void)
+  {
     return * _hl;
-}
+  }
 
-inline
-TWindowGTKSZ &
-Trasan::sz(void) {
+  inline
+  TWindowGTKSZ &
+  Trasan::sz(void)
+  {
     return * _sz;
-}
+  }
 
 #endif
 

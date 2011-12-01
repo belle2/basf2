@@ -33,17 +33,17 @@
 namespace Belle {
 
 /// A class to build a track.
-class TBuilderConformal : public TBuilder {
+  class TBuilderConformal : public TBuilder {
 
   public:
     /// Constructor with salvage level.
     TBuilderConformal(const std::string & name,
-		      float maxSigma,
-		      float maxSigmaStereo,
-		      float salvageLevel,
-		      float szSegmentDistance,
-		      float szLinkDistance,
-		      unsigned fittingFlag);
+                      float maxSigma,
+                      float maxSigmaStereo,
+                      float salvageLevel,
+                      float szSegmentDistance,
+                      float szLinkDistance,
+                      unsigned fittingFlag);
 
     /// Destructor
     virtual ~TBuilderConformal();
@@ -55,23 +55,23 @@ class TBuilderConformal : public TBuilder {
 
     /// builds a 3D track from segments.
     TTrack * buildStereoNew(const TTrack & t,
-			    AList<TSegment> & goodSegments,
-			    AList<TSegment> & badSegments) const;
+                            AList<TSegment> & goodSegments,
+                            AList<TSegment> & badSegments) const;
 
     /// salvages hits.
     void salvage(TTrack & t, AList<TSegment> & segments) const;
 
-public: // Obsolete functions
+  public: // Obsolete functions
     TTrack * buildStereo(const TTrack & t, AList<TSegment> &) const;
     TTrack * buildStereo(TTrack & t,
-			 TLine & l,
-			 const AList<TLink> & links) const;
+                         TLine & l,
+                         const AList<TLink> & links) const;
 
-private:
+  private:
     /// initializes internal variables for stereo reconstruction. This should be called with new stereo codes.
     bool initializeForStereo(const TTrack &,
-			     const AList<TSegment> &,
-			     const AList<TSegment> &) const;
+                             const AList<TSegment> &,
+                             const AList<TSegment> &) const;
     AList<TLine> searchInitialLines(unsigned nSuperLayers) const;
     AList<TLine> searchLines5(void) const;
     AList<TLine> searchLines4(void) const;
@@ -84,16 +84,16 @@ private:
     unsigned stereoQuality(const AList<TLink> & links) const;
 
     AList<TSegment> selectStereoSegment(const TLine & line,
-					const AList<TSegment> & list,
-					const AList<TLink> & szList) const;
+                                        const AList<TSegment> & list,
+                                        const AList<TLink> & szList) const;
     void removeFarSegment(const TLine &,
-			  AList<TSegment> &,
-			  AList<TLink> &) const;
+                          AList<TSegment> &,
+                          AList<TLink> &) const;
     TLine * initialLine(const TTrack &, AList<TSegment> &) const;
     TLine * initialLineOld(const TTrack &, AList<TSegment> &) const;
     TLine * initialLine1(const TTrack &,
-			 const AList<TSegment> &,
-			 const AList<TLink> &) const;
+                         const AList<TSegment> &,
+                         const AList<TLink> &) const;
 
   private:
     const float _szSegmentDistance;
@@ -102,7 +102,7 @@ private:
     mutable AList<TLink> _links[5];
     mutable AList<TLink> _forLine;
     mutable unsigned _nHits[6];
-};
+  };
 
 //-----------------------------------------------------------------------------
 

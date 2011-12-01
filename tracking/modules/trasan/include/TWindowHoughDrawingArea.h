@@ -24,8 +24,8 @@
 
 namespace Belle {
 
-class TPoint2D;
-class THoughPlane;
+  class TPoint2D;
+  class THoughPlane;
 // class TRGCDCWireHit;
 // class TLink;
 // class TTrackBase;
@@ -33,12 +33,12 @@ class THoughPlane;
 // class TTrack;
 
 /// Actual class to display tracking objects
-class TWindowHoughDrawingArea : public Gtk::DrawingArea {
+  class TWindowHoughDrawingArea : public Gtk::DrawingArea {
 
   public:
     /// Default constructor
     TWindowHoughDrawingArea(int size);
-    
+
     /// Destructor
     virtual ~TWindowHoughDrawingArea();
 
@@ -62,9 +62,9 @@ class TWindowHoughDrawingArea : public Gtk::DrawingArea {
     virtual void on_realize();
     void draw(void);
 //     void draw(const THoughPlane &,
-// 	      const AList<TPoint2D> & list,
-// 	      float radius,
-// 	      Gdk::Color c);
+//        const AList<TPoint2D> & list,
+//        float radius,
+//        Gdk::Color c);
 
     /// Coordinate transformations.
     int toY(int y) const;
@@ -83,7 +83,7 @@ class TWindowHoughDrawingArea : public Gtk::DrawingArea {
     Glib::RefPtr<Gdk::GC> _gc;
     Gdk::Color _blue, _red, _green, _black, _white, _gray, _yellow;
     Gdk::Color _gray0, _gray1, _gray2, _gray3;
-};
+  };
 
 //-----------------------------------------------------------------------------
 
@@ -95,72 +95,83 @@ class TWindowHoughDrawingArea : public Gtk::DrawingArea {
 #endif
 #ifdef TWINDOWGTK_INLINE_DEFINE_HERE
 
-inline
-double
-TWindowHoughDrawingArea::scale(double a) {
+  inline
+  double
+  TWindowHoughDrawingArea::scale(double a)
+  {
     return _scale = a;
-}
+  }
 
-inline
-double
-TWindowHoughDrawingArea::scale(void) const {
+  inline
+  double
+  TWindowHoughDrawingArea::scale(void) const
+  {
     return _scale;
-}
+  }
 
-inline
-bool
-TWindowHoughDrawingArea::axial(void) const {
+  inline
+  bool
+  TWindowHoughDrawingArea::axial(void) const
+  {
     return _axial;
-}
+  }
 
-inline
-bool
-TWindowHoughDrawingArea::axial(bool a) {
+  inline
+  bool
+  TWindowHoughDrawingArea::axial(bool a)
+  {
     return _axial = a;
-}
+  }
 
-inline
-bool
-TWindowHoughDrawingArea::stereo(void) const {
+  inline
+  bool
+  TWindowHoughDrawingArea::stereo(void) const
+  {
     return _stereo;
-}
+  }
 
-inline
-bool
-TWindowHoughDrawingArea::stereo(bool a) {
+  inline
+  bool
+  TWindowHoughDrawingArea::stereo(bool a)
+  {
     return _stereo = a;
-}
+  }
 
-inline
-bool
-TWindowHoughDrawingArea::wireName(void) const {
+  inline
+  bool
+  TWindowHoughDrawingArea::wireName(void) const
+  {
     return _wireName;
-}
+  }
 
-inline
-bool
-TWindowHoughDrawingArea::wireName(bool a) {
+  inline
+  bool
+  TWindowHoughDrawingArea::wireName(bool a)
+  {
     return _wireName = a;
-}
+  }
 
-inline
-int
-TWindowHoughDrawingArea::toY(int a) const {
+  inline
+  int
+  TWindowHoughDrawingArea::toY(int a) const
+  {
     return - a + _winh;
-}
+  }
 
-inline
-void
-TWindowHoughDrawingArea::clear(void) {
+  inline
+  void
+  TWindowHoughDrawingArea::clear(void)
+  {
     _hp = 0;
-}
+  }
 
-inline
-void
-TWindowHoughDrawingArea::append(const THoughPlane * const hp) {
+  inline
+  void
+  TWindowHoughDrawingArea::append(const THoughPlane * const hp)
+  {
     _hp = hp;
     on_expose_event((GdkEventExpose *) NULL);
-}
+  }
 
 
 #endif

@@ -343,32 +343,35 @@ struct reccdc_timing {
 namespace Belle {
 
 #if defined(__alpha)
-#define DBL_MIN 2.2250738585072014E-308 
+#define DBL_MIN 2.2250738585072014E-308
 #define FLT_MIN 1.175494351E-38F
 #endif
 
-TTrackMC::TTrackMC(const TTrack & t)
-: _state(0),
-  _quality(0),
-  _t(t),
-  _hep(0),
-  _hepID(-1),
-  _wireFraction(-999.),
-  _wireFractionHEP(-999.),
-  _charge(false),
-  _ptFraction(-999.),
-  _pzFraction(-999.),
-  _ptResidual(-999.),
-  _pzResidual(-999.),
-  _ptPull(-999.),
-  _pzPull(-999.) {
-}
+  TTrackMC::TTrackMC(const TTrack & t)
+      : _state(0),
+      _quality(0),
+      _t(t),
+      _hep(0),
+      _hepID(-1),
+      _wireFraction(-999.),
+      _wireFractionHEP(-999.),
+      _charge(false),
+      _ptFraction(-999.),
+      _pzFraction(-999.),
+      _ptResidual(-999.),
+      _pzResidual(-999.),
+      _ptPull(-999.),
+      _pzPull(-999.)
+  {
+  }
 
-TTrackMC::~TTrackMC() {
-}
+  TTrackMC::~TTrackMC()
+  {
+  }
 
-void
-TTrackMC::update(void) {
+  void
+  TTrackMC::update(void)
+  {
     _state = 0;
     _quality = 0;
 
@@ -380,50 +383,50 @@ TTrackMC::update(void) {
     float * F1 = (float *) malloc(nHep * sizeof(float));
 //cnv    unsigned N2 = 0;
     for (unsigned i = 0; i < nHep; i++) {
-	N1[i] = 0;
-	F1[i] = 0.;
+      N1[i] = 0;
+      F1[i] = 0.;
     }
-    
+
     //...Prepare for fraction F1...
 //  const AList<TLink> & cores = _t.cores();
     const AList<TLink> & cores = _t.finalHits();
     unsigned nCores = cores.length();
     for (unsigned i = 0; i < nCores; i++) {
-//cnv	TLink * t = cores[i];
-//cnv 	if(t && t->hit() && t->hit()->mc() && t->hit()->mc()->hep() ) {
-// 	  int hepID = t->hit()->mc()->hep()->id();
-// 	  ++N1[hepID];
-// 	}
+//cnv TLink * t = cores[i];
+//cnv   if(t && t->hit() && t->hit()->mc() && t->hit()->mc()->hep() ) {
+//    int hepID = t->hit()->mc()->hep()->id();
+//    ++N1[hepID];
+//  }
     }
 
     //...Calculate fraction F1 and find the best HEP...
     int bestHep = -1;
     float bestF1 = 0.;
     for (unsigned i = 0; i < nHep; i++) {
-	if (nCores) F1[i] = (float) N1[i] / (float) nCores;
-	if (F1[i] > bestF1) {
-	    bestHep = i;
-	    bestF1 = F1[i];
-	}
+      if (nCores) F1[i] = (float) N1[i] / (float) nCores;
+      if (F1[i] > bestF1) {
+        bestHep = i;
+        bestF1 = F1[i];
+      }
     }
 
     //...Check HEP...
     float F2 = 0.;
     Belle2::TRGCDCTrackMC * hep = 0;
     if (bestHep != -1) {
-//cnv 	hep = Belle2::TRGCDCTrackMC::list()[bestHep];
-// 	unsigned nAll = 0;
-// 	for (unsigned i = 0; i < (unsigned) hep->hits().length(); i++) {
-// 	    const TRGCDCWireHit * hit = hep->hits()[i]->hit();
-// 	    if (! hit) continue;
-// 	    if (hit->state() & WireHitInvalidForFit) continue;
-	    
-// 	    ++nAll;
-// 	    if (hit->track() == & _t) ++N2;
-// 	}
+//cnv   hep = Belle2::TRGCDCTrackMC::list()[bestHep];
+//  unsigned nAll = 0;
+//  for (unsigned i = 0; i < (unsigned) hep->hits().length(); i++) {
+//      const TRGCDCWireHit * hit = hep->hits()[i]->hit();
+//      if (! hit) continue;
+//      if (hit->state() & WireHitInvalidForFit) continue;
 
-// 	//...Calculate fraction F2...
-// 	if (nAll) F2 = (float) N2 / (float) nAll;
+//      ++nAll;
+//      if (hit->track() == & _t) ++N2;
+//  }
+
+//  //...Calculate fraction F2...
+//  if (nAll) F2 = (float) N2 / (float) nAll;
     }
 
     //...Store results...
@@ -441,10 +444,11 @@ TTrackMC::update(void) {
     //...Termination...
     free(N1);
     free(F1);
-}
+  }
 
-void
-TTrackMC::dump(const std::string & msg, const std::string & pre) const {
+  void
+  TTrackMC::dump(const std::string & msg, const std::string & pre) const
+  {
     std::cout << pre << msg;
     std::cout << _t.name() << ":";
     std::cout << "state=" << _state << ":";
@@ -459,10 +463,11 @@ TTrackMC::dump(const std::string & msg, const std::string & pre) const {
     std::cout << _wireFraction << "," << _wireFractionHEP << ":";
     std::cout << _ptFraction << "," << _pzFraction;
     std::cout << std::endl;
-}
+  }
 
-void
-TTrackMC::compare(void) {
+  void
+  TTrackMC::compare(void)
+  {
     if (! _hep) return;
 
     //...Get charge of HEP particle(This part should be done by LUCHARGE)...
@@ -482,14 +487,14 @@ TTrackMC::compare(void) {
     HepGeom::Vector3D<double> pHep;
     HepGeom::Vector3D<double> vHep;
     for (unsigned i = 0; i < n; i++) {
-	TLink * inner = TLink::innerMost(list);
-	if (inner->hit()->mc()->hep() == _hep) {
-	    pHep = inner->hit()->mc()->momentum();
-	    vHep = inner->hit()->mc()->entrance();
-	    found = true;
-	    break;
-	}
-	list.remove(inner);
+      TLink * inner = TLink::innerMost(list);
+      if (inner->hit()->mc()->hep() == _hep) {
+        pHep = inner->hit()->mc()->momentum();
+        vHep = inner->hit()->mc()->entrance();
+        found = true;
+        break;
+      }
+      list.remove(inner);
     }
     THelix hHep = THelix(vHep, pHep, copysign(1., id));
 #if defined(BELLE_DEBUG)
@@ -498,34 +503,33 @@ TTrackMC::compare(void) {
       hHep.pivot(_t.helix().pivot());
       pHep = hHep.momentum();
 #if defined(BELLE_DEBUG)
-    }
-    catch(std::string&e) {
+    } catch (std::string&e) {
       std::cout << "TTrackMC::compare:exception has been thrown:" << e << std::endl;
       found = false;
     }
 #endif
     //...For debug...
     if (! found) {
-	std::cout << "TTrackMC::compare !!! something wrong with mc hits"
-		  << std::endl;
+      std::cout << "TTrackMC::compare !!! something wrong with mc hits"
+                << std::endl;
 
-	//...For debug...
-//  	list = _t.cores();
-//  	for (unsigned i = 0; i < list.length(); i++) {
-//  	    TLink * inner = innerMost(list);
-//  	    std::cout << i << " " << inner << ":" << inner->hit()->mc()->hep();
-//  	    std::cout << " " << _hep << std::endl;
-//  	    if (inner->hit()->mc()->hep() == _hep) {
-//  		pHep = inner->hit()->mc()->momentum();
-//  		break;
-//  	    }
-//  	    list.remove(inner);
-//  	}
-//  	TLink * t = 0;
-//  	t->hit();
-	//...For debug end...
+      //...For debug...
+//    list = _t.cores();
+//    for (unsigned i = 0; i < list.length(); i++) {
+//        TLink * inner = innerMost(list);
+//        std::cout << i << " " << inner << ":" << inner->hit()->mc()->hep();
+//        std::cout << " " << _hep << std::endl;
+//        if (inner->hit()->mc()->hep() == _hep) {
+//      pHep = inner->hit()->mc()->momentum();
+//      break;
+//        }
+//        list.remove(inner);
+//    }
+//    TLink * t = 0;
+//    t->hit();
+      //...For debug end...
 
-	return;
+      return;
     }
 
     //...Fill caches...
@@ -541,12 +545,12 @@ TTrackMC::compare(void) {
     CLHEP::HepVector dPt(5, 0);
     dPt[2] = - 1. / (h.kappa() * h.kappa());
     double ptError2 = h.Ea().similarity(dPt);
-    if(ptError2<0.0) {
+    if (ptError2 < 0.0) {
       std::cout << h.kappa() << " " << h.Ea() << " dPt=" << dPt << std::endl;
     }
     double ptError = (ptError2 > 0.) ? sqrt(ptError2) : (DBL_MIN);
     _ptPull = (ptError2 > 0.) ? (_ptResidual) / ptError : (FLT_MAX);
-    _ptFraction = (fabs(ptHep)>(FLT_MIN)) ? _ptResidual / ptHep : 0.0;
+    _ptFraction = (fabs(ptHep) > (FLT_MIN)) ? _ptResidual / ptHep : 0.0;
 
     //...Compare pz...
     double pz = _t.pz();
@@ -556,16 +560,17 @@ TTrackMC::compare(void) {
     dPz[2] = - h.tanl() / (h.kappa() * h.kappa());
     dPz[4] = 1. / h.kappa();
     double pzError2 = h.Ea().similarity(dPz);
-    if(pzError2<0.0) {
+    if (pzError2 < 0.0) {
       std::cout << h.kappa() << " " << h.Ea() << " dPz=" << dPz << std::endl;
     }
     double pzError = (pzError2 > 0.) ? sqrt(pzError2) : (DBL_MIN);
     _pzPull = (pzError2 > 0.) ? (_pzResidual) / pzError : (FLT_MAX);
-    _pzFraction = (abs(pzHep)>FLT_MIN) ? (_pzResidual / pzHep) : (FLT_MAX);
-}
+    _pzFraction = (abs(pzHep) > FLT_MIN) ? (_pzResidual / pzHep) : (FLT_MAX);
+  }
 
-void
-TTrackMC::classify(void) {
+  void
+  TTrackMC::classify(void)
+  {
     _state |= TTrackClassified;
     _quality = TTrackGarbage;
 
@@ -576,20 +581,20 @@ TTrackMC::classify(void) {
     if (fabs(_pzFraction) < .1) _quality |= TTrackPz;
 
     if ((fabs(_ptFraction) < 0.1) &&
-	(fabs(_pzFraction) < 0.1) &&
-	(_cosOpen > 0.99))
- 	_quality |= TTrackMatchingLoose;
+        (fabs(_pzFraction) < 0.1) &&
+        (_cosOpen > 0.99))
+      _quality |= TTrackMatchingLoose;
     if ((fabs(_ptFraction) < 0.02) &&
-	(fabs(_pzFraction) < 0.02) &&
-	(_cosOpen > 0.998))
- 	_quality |= TTrackMatchingTight;
+        (fabs(_pzFraction) < 0.02) &&
+        (_cosOpen > 0.998))
+      _quality |= TTrackMatchingTight;
 
 //     float momResidual = sqrt(_ptResidual * _ptResidual +
-// 			      _pzResidual * _pzResidual);
-//     if ((momResidual < 0.100) && (_cosOpen > 0.99)) 
-// 	_quality |= TTrackMatchingLoose;
+//            _pzResidual * _pzResidual);
+//     if ((momResidual < 0.100) && (_cosOpen > 0.99))
+//  _quality |= TTrackMatchingLoose;
 //     if ((momResidual < 0.020) && (_cosOpen > 0.998))
-// 	_quality |= TTrackMatchingTight;
+//  _quality |= TTrackMatchingTight;
 
     //...Wire fraction...
     if (_wireFraction < 0.8) return;
@@ -602,48 +607,53 @@ TTrackMC::classify(void) {
 
     //...Momentum matching...
     if (_quality & TTrackMatchingLoose)
-	_quality |= TTrackGhost;
+      _quality |= TTrackGhost;
 
     //...TTrackGood is set by Trasan after checking uniqueness...
-}
+  }
 
-std::string
-TTrackMC::qualityString(void) const {
+  std::string
+  TTrackMC::qualityString(void) const
+  {
     return TrackMCQualityString(_quality);
-}
+  }
 
-std::string
-TrackMCStatus(unsigned quality) {
+  std::string
+  TrackMCStatus(unsigned quality)
+  {
     //...This is a local function to hide from user...
 
     std::string matching;
     if (quality & TTrackHep) {
-	if (quality & TTrackMatchingTight) matching += "tight";
-	else if (quality & TTrackMatchingLoose) matching += "loose";
-	else matching = "bad";
+      if (quality & TTrackMatchingTight) matching += "tight";
+      else if (quality & TTrackMatchingLoose) matching += "loose";
+      else matching = "bad";
     }
     return TrackMCQualityString(quality) + " " + matching;
-}
+  }
 
-std::string
-TrackMCStatus(const TTrackMC & m) {
+  std::string
+  TrackMCStatus(const TTrackMC & m)
+  {
     return TrackMCStatus(m.quality());
-}
+  }
 
-std::string
-TrackMCStatus(const reccdc_mctrk & m) {
+  std::string
+  TrackMCStatus(const reccdc_mctrk & m)
+  {
     return TrackMCStatus(m.m_quality);
-}
+  }
 
-std::string
-TrackMCQualityString(unsigned quality) {
+  std::string
+  TrackMCQualityString(unsigned quality)
+  {
     if (quality & TTrackGood) return std::string("Good");
     else if (quality & TTrackGhost) return std::string("Ghost");
     else if (quality & TTrackBad) return std::string("Bad");
     else if (quality & TTrackCharge) return std::string("Charge");
     else if (quality & TTrackGarbage) return std::string("Garbage");
     return std::string("Unknown");
-}
+  }
 
 } // namespace Belle
 

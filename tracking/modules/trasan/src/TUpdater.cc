@@ -41,14 +41,17 @@
 
 namespace Belle {
 
-TUpdater::TUpdater() : _expN(0), _runN(0), _evtN(0), _init(false) {
-}
+  TUpdater::TUpdater() : _expN(0), _runN(0), _evtN(0), _init(false)
+  {
+  }
 
-TUpdater::~TUpdater() {
-}
+  TUpdater::~TUpdater()
+  {
+  }
 
-void
-TUpdater::dump(const std::string &, const std::string & pre) const {
+  void
+  TUpdater::dump(const std::string &, const std::string & pre) const
+  {
     std::cout << pre;
 
     std::cout << "updated:" << updated();
@@ -56,14 +59,15 @@ TUpdater::dump(const std::string &, const std::string & pre) const {
     std::cout << ",run=" << _runN;
     std::cout << ",evt=" << _evtN;
     std::cout << std::endl;
-}
+  }
 
-void
-TUpdater::update(void) {
+  void
+  TUpdater::update(void)
+  {
 //cnv     if (updated()) return;
 
-//     struct belle_event * ev = 
-// 	(struct belle_event *) BsGetEnt(BELLE_EVENT, 1, BBS_No_Index);
+//     struct belle_event * ev =
+//  (struct belle_event *) BsGetEnt(BELLE_EVENT, 1, BBS_No_Index);
 
 //     //...No BELLE_EVENT ???...
 //     if (! ev) return;
@@ -71,24 +75,25 @@ TUpdater::update(void) {
 //     _expN = ev->m_ExpNo;
 //     _runN = ev->m_RunNo;
 //     _evtN = ev->m_EvtNo;
-}
+  }
 
-bool
-TUpdater::updated(void) const {
+  bool
+  TUpdater::updated(void) const
+  {
 //cnv
-//     struct belle_event * ev = 
-// 	(struct belle_event *) BsGetEnt(BELLE_EVENT, 1, BBS_No_Index);
+//     struct belle_event * ev =
+//  (struct belle_event *) BsGetEnt(BELLE_EVENT, 1, BBS_No_Index);
 
 //     //...No BELLE_EVENT ???...
 //     if (! ev) return false;
 
 //     //...Same event?...
 //     if (_expN == ev->m_ExpNo &&
-// 	_runN == ev->m_RunNo &&
-// 	_evtN == ev->m_EvtNo) return true;
+//  _runN == ev->m_RunNo &&
+//  _evtN == ev->m_EvtNo) return true;
 
     return false;
-}
+  }
 
 } // namespace Belle
 

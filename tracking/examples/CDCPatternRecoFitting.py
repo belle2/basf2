@@ -109,6 +109,10 @@ param_cdcfitting = {
 
 cdcfitting.param(param_cdcfitting)
 
+myanalysis = register_module('MyTrackingAnalysis')
+param_myanalysis = {'GFTracksColName': 'GFTracks_PatternReco',
+                    'TracksColName': 'Tracks_PatternReco'}
+myanalysis.param(param_myanalysis)
 # output
 output = register_module('SimpleOutput')
 output.param('outputFileName', 'CDCPatternRecoOutput.root')
@@ -130,6 +134,7 @@ main.add_module(cdcDigitizer)
 main.add_module(cdctracking)
 main.add_module(mcmatching)
 main.add_module(cdcfitting)
+main.add_module(myanalysis)
 main.add_module(output)
 
 # Process events

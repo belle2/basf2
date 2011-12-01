@@ -109,7 +109,7 @@ namespace Belle {
 
 
 /// A class to build a Curl track.
-class TBuilderCurl : public TBuilder0 {
+  class TBuilderCurl : public TBuilder0 {
 
   public:
     /// Constructor.
@@ -129,48 +129,48 @@ class TBuilderCurl : public TBuilder0 {
     TTrack * buildStereo(TTrack & track, const AList<TLink> &, const AList<TLink> &) const;
     bool buildStereo(TTrack & track, double &dZ, double &tanL) const;
 
-  void setSvdClusters(void){
-/* cnv     m_svdAssociator->clearClusters(); */
-/*     m_svdAssociator->fillClusters(); */
-  }
+    void setSvdClusters(void) {
+      /* cnv     m_svdAssociator->clearClusters(); */
+      /*     m_svdAssociator->fillClusters(); */
+    }
   private:
-  static void set_smallcell(bool s) {
-    ms_smallcell = s;
-  }
-  static void set_superb(bool s) {
-    ms_superb = s;
-  }
-  static int offsetBorder(TLink *);
-  static void makeList(AList<TLink> &layer, AList<TLink> &list, double q, int border, int checkB, TLink *layer0);
-  static unsigned findMaxLocalId(unsigned superLayerId);
-  static unsigned isIsolation(unsigned localId, unsigned maxLocalId, unsigned layerId, int lr, const AList<TLink> &allStereoList);
-  static void findTwoHits(AList<TLink> &twoOnLayer, const AList<TLink> &hitsOnLayer, const AList<TLink> &allStereoList);
-  static void setLR(AList<TLink> &hitsOnLayer, unsigned LR = 0);
-  static bool moveLR(AList<TLink> &hitsOnLayer);
-  static void selectGoodWires(const AList<TLink> &allWires, AList<TLink> &goodWires);
-  static void calVirtualCircle(const TLink &hit, const TTrack &track, const int LR, HepGeom::Point3D<double>  &center, double &radius);
-  static void moveLR(AList<TLink> &hits, const AList<TLink> &hitsOnLayerOrg, const TTrack &track);
+    static void set_smallcell(bool s) {
+      ms_smallcell = s;
+    }
+    static void set_superb(bool s) {
+      ms_superb = s;
+    }
+    static int offsetBorder(TLink *);
+    static void makeList(AList<TLink> &layer, AList<TLink> &list, double q, int border, int checkB, TLink *layer0);
+    static unsigned findMaxLocalId(unsigned superLayerId);
+    static unsigned isIsolation(unsigned localId, unsigned maxLocalId, unsigned layerId, int lr, const AList<TLink> &allStereoList);
+    static void findTwoHits(AList<TLink> &twoOnLayer, const AList<TLink> &hitsOnLayer, const AList<TLink> &allStereoList);
+    static void setLR(AList<TLink> &hitsOnLayer, unsigned LR = 0);
+    static bool moveLR(AList<TLink> &hitsOnLayer);
+    static void selectGoodWires(const AList<TLink> &allWires, AList<TLink> &goodWires);
+    static void calVirtualCircle(const TLink &hit, const TTrack &track, const int LR, HepGeom::Point3D<double>  &center, double &radius);
+    static void moveLR(AList<TLink> &hits, const AList<TLink> &hitsOnLayerOrg, const TTrack &track);
 
-  friend class TRGCDC;
+    friend class TRGCDC;
 
 
   private:
     //
     void setArcZ(TTrack&, AList<TLink>&) const;
     void setArcZ(TTrack&, AList<TLink>&, AList<TLink>&, AList<TLink>&,
-		 unsigned) const;
+                 unsigned) const;
     void setArcZ(TTrack&, AList<TLink>&, AList<TLink>&, AList<TLink>&,
-		 AList<TLink>&,
-		 unsigned) const;
+                 AList<TLink>&,
+                 unsigned) const;
     void setArcZ(TTrack&, AList<TLink>&, AList<TLink>&, AList<TLink>&,
-		 AList<TLink>&, AList<TLink>&,
-		 unsigned) const;
+                 AList<TLink>&, AList<TLink>&,
+                 unsigned) const;
     void setArcZ(TTrack&, AList<TLink>&, AList<TLink>&, AList<TLink>&,
-		 AList<TLink>&, AList<TLink>&, AList<TLink>&,
-		 unsigned) const;
+                 AList<TLink>&, AList<TLink>&, AList<TLink>&,
+                 unsigned) const;
     void setArcZ(TTrack&, AList<TLink>&, AList<TLink>&, AList<TLink>&,
-		 AList<TLink>&, AList<TLink>&, AList<TLink>&, AList<TLink>&,
-		 unsigned) const;
+                 AList<TLink>&, AList<TLink>&, AList<TLink>&, AList<TLink>&,
+                 unsigned) const;
 
     //
     unsigned appendPoints(AList<TLink>&, AList<TLink>&, double, double, TTrack&, double) const;
@@ -192,15 +192,15 @@ class TBuilderCurl : public TBuilder0 {
                   AList<TLink> & list) const;
 
     void makeLine(TTrack&, AList<TLink>&, const AList<TLink>&,
-		  AList<TLink>&, double&, double&, double&, AList<HepGeom::Point3D<double> >&) const;
+                  AList<TLink>&, double&, double&, double&, AList<HepGeom::Point3D<double> >&) const;
     int sortByLocalId(AList<TLink> &list) const;
 
     //
 #if DEBUG_CURL_GNUPLOT
     void plotArcZ(AList<TLink> &,
-		  double = 0.,
-		  double = 0.,
-		  const int = 1) const;
+                  double = 0.,
+                  double = 0.,
+                  const int = 1) const;
 #endif
 
   private:
@@ -208,12 +208,12 @@ class TBuilderCurl : public TBuilder0 {
     TCurlFinderParameter m_param;
 //cnv    TSvdFinder * m_svdFinder;
 //cnv    TSvdAssociator * m_svdAssociator;
-  //
-  // for quick dicision
-  //
-  static bool ms_smallcell;
-  static bool ms_superb;
-};
+    //
+    // for quick dicision
+    //
+    static bool ms_smallcell;
+    static bool ms_superb;
+  };
 
 //-----------------------------------------------------------------------------
 

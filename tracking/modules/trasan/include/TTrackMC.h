@@ -86,16 +86,16 @@
 struct reccdc_mctrk;
 
 namespace Belle {
-    class TRGCDCTrackMC;
+  class TRGCDCTrackMC;
 }
 
 namespace Belle {
 
-class Trasan;
-class TTrack;
+  class Trasan;
+  class TTrack;
 
 /// A class to have MC information of TTrack.
-class TTrackMC {
+  class TTrackMC {
 
   private:
     /// Constructor
@@ -108,7 +108,7 @@ class TTrackMC {
   public:
     /// dumps debug information.
     void dump(const std::string & message = std::string(""),
-	      const std::string & prefix = std::string("")) const;
+              const std::string & prefix = std::string("")) const;
 
     /// returns HEP ID.
     int hepId(void) const;
@@ -185,17 +185,17 @@ class TTrackMC {
     double _ptPull;
     double _pzPull;
 
-  friend class Trasan;
-};
+    friend class Trasan;
+  };
 
-std::string
-TrackMCStatus(const TTrackMC &);
+  std::string
+  TrackMCStatus(const TTrackMC &);
 
-std::string
-TrackMCStatus(const reccdc_mctrk &);
+  std::string
+  TrackMCStatus(const reccdc_mctrk &);
 
-std::string
-TrackMCQualityString(unsigned quality);
+  std::string
+  TrackMCQualityString(unsigned quality);
 
 //-----------------------------------------------------------------------------
 
@@ -208,89 +208,103 @@ TrackMCQualityString(unsigned quality);
 
 #ifdef TTrackMC_INLINE_DEFINE_HERE
 
-inline
-int
-TTrackMC::hepId(void) const {
+  inline
+  int
+  TTrackMC::hepId(void) const
+  {
     return _hepID;
-}
+  }
 
-inline
-const Belle2::TRGCDCTrackMC * const
-TTrackMC::hep(void) const {
+  inline
+  const Belle2::TRGCDCTrackMC * const
+  TTrackMC::hep(void) const
+  {
     return _hep;
-}
+  }
 
-inline
-bool
-TTrackMC::charge(void) const {
+  inline
+  bool
+  TTrackMC::charge(void) const
+  {
     return _charge;
-}
+  }
 
-inline
-double
-TTrackMC::ptFraction(void) const {
+  inline
+  double
+  TTrackMC::ptFraction(void) const
+  {
     return _ptFraction;
-}
+  }
 
-inline
-double
-TTrackMC::pzFraction(void) const {
+  inline
+  double
+  TTrackMC::pzFraction(void) const
+  {
     return _pzFraction;
-}
+  }
 
-inline
-double
-TTrackMC::wireFraction(void) const {
+  inline
+  double
+  TTrackMC::wireFraction(void) const
+  {
     return _wireFraction;
-}
+  }
 
-inline
-double
-TTrackMC::wireFractionHEP(void) const {
+  inline
+  double
+  TTrackMC::wireFractionHEP(void) const
+  {
     return _wireFractionHEP;
-}
+  }
 
-inline
-unsigned
-TTrackMC::state(void) const {
+  inline
+  unsigned
+  TTrackMC::state(void) const
+  {
     return _state;
-}
+  }
 
-inline 
-unsigned 
-TTrackMC::quality(void) const { 
+  inline
+  unsigned
+  TTrackMC::quality(void) const
+  {
     return _quality;
-} 
+  }
 
-inline
-const CLHEP::Hep3Vector &
-TTrackMC::residual(void) const {
+  inline
+  const CLHEP::Hep3Vector &
+  TTrackMC::residual(void) const
+  {
     return _residual;
-}
+  }
 
-inline
-double
-TTrackMC::ptResidual(void) const {
+  inline
+  double
+  TTrackMC::ptResidual(void) const
+  {
     return _ptResidual;
-}
+  }
 
-inline
-double
-TTrackMC::pzResidual(void) const {
+  inline
+  double
+  TTrackMC::pzResidual(void) const
+  {
     return _pzResidual;
-}
+  }
 
-inline
-double
-TTrackMC::ptPull(void) const {
+  inline
+  double
+  TTrackMC::ptPull(void) const
+  {
     return _ptPull;
-}
+  }
 
-inline
-double
-TTrackMC::pzPull(void) const {
+  inline
+  double
+  TTrackMC::pzPull(void) const
+  {
     return _pzPull;
-}
+  }
 
 #endif
 

@@ -27,13 +27,13 @@
 
 namespace Belle {
 
-Gtk::Main * GtkMain = 0;
-bool TWindowGTK::_skipEvent = false;
-bool TWindowGTK::_endOfEvent = false;
-bool TWindowGTK::_endOfEventFlag = false;
+  Gtk::Main * GtkMain = 0;
+  bool TWindowGTK::_skipEvent = false;
+  bool TWindowGTK::_endOfEvent = false;
+  bool TWindowGTK::_endOfEventFlag = false;
 
-TWindowGTK::TWindowGTK(const std::string & name, double outerR, int size)
-    : _axial(true),
+  TWindowGTK::TWindowGTK(const std::string & name, double outerR, int size)
+      : _axial(true),
       _stereo(false),
       _wireName(false),
       _box0(false, 2),
@@ -42,32 +42,33 @@ TWindowGTK::TWindowGTK(const std::string & name, double outerR, int size)
       _buttonEndOfEvent("End of Event"),
       _buttonNextEvent("Next Eevnt"),
       _label("Stage : Tracking not started yet \nInformation : ",
-	     Gtk::ALIGN_LEFT,
-	     Gtk::ALIGN_TOP),
+             Gtk::ALIGN_LEFT,
+             Gtk::ALIGN_TOP),
       _adjustment(double(size) / outerR / 2,
-		  double(size) / outerR / 2,
-		  10.0,
-		  0.1),
+                  double(size) / outerR / 2,
+                  10.0,
+                  0.1),
       _scaler(_adjustment),
       _buttonPositionReset("Reset position"),
       _buttonAxial("Axial"),
       _buttonStereo("Stereo"),
       _buttonWireName("Wire Name"),
-      _w(0) {
+      _w(0)
+  {
 
     set_title(name);
 
     _buttonNext
-	.signal_clicked()
-	.connect(sigc::mem_fun(* this, & TWindowGTK::on_next));
+    .signal_clicked()
+    .connect(sigc::mem_fun(* this, & TWindowGTK::on_next));
     _menuButtons.pack_start(_buttonNext, Gtk::PACK_EXPAND_WIDGET, 2);
     _buttonEndOfEvent
-	.signal_clicked()
-	.connect(sigc::mem_fun(* this, & TWindowGTK::on_endOfEvent));
+    .signal_clicked()
+    .connect(sigc::mem_fun(* this, & TWindowGTK::on_endOfEvent));
     _menuButtons.pack_start(_buttonEndOfEvent, Gtk::PACK_EXPAND_WIDGET, 2);
     _buttonNextEvent
-	.signal_clicked()
-	.connect(sigc::mem_fun(* this, & TWindowGTK::on_nextEvent));
+    .signal_clicked()
+    .connect(sigc::mem_fun(* this, & TWindowGTK::on_nextEvent));
     _menuButtons.pack_start(_buttonNextEvent, Gtk::PACK_EXPAND_WIDGET, 2);
 
     _scaler.set_update_policy(Gtk::UPDATE_CONTINUOUS);
@@ -76,20 +77,20 @@ TWindowGTK::TWindowGTK(const std::string & name, double outerR, int size)
     _scaler.set_draw_value();
     _scaler.set_size_request(200, 30);
     _scaler
-	.signal_value_changed()
-	.connect(sigc::mem_fun(* this, & TWindowGTK::on_scale_value_changed));
+    .signal_value_changed()
+    .connect(sigc::mem_fun(* this, & TWindowGTK::on_scale_value_changed));
     _buttonPositionReset
-	.signal_clicked()
-	.connect(sigc::mem_fun(* this, & TWindowGTK::on_positionReset));
+    .signal_clicked()
+    .connect(sigc::mem_fun(* this, & TWindowGTK::on_positionReset));
     _buttonAxial
-	.signal_clicked()
-	.connect(sigc::mem_fun(* this, & TWindowGTK::on_axial));
+    .signal_clicked()
+    .connect(sigc::mem_fun(* this, & TWindowGTK::on_axial));
     _buttonStereo
-	.signal_clicked()
-	.connect(sigc::mem_fun(* this, & TWindowGTK::on_stereo));
+    .signal_clicked()
+    .connect(sigc::mem_fun(* this, & TWindowGTK::on_stereo));
     _buttonWireName
-	.signal_clicked()
-	.connect(sigc::mem_fun(* this, & TWindowGTK::on_wireName));
+    .signal_clicked()
+    .connect(sigc::mem_fun(* this, & TWindowGTK::on_wireName));
     _scale.pack_start(_scaler, Gtk::PACK_SHRINK, 5);
     _scale.pack_start(_buttonPositionReset, Gtk::PACK_EXPAND_WIDGET, 2);
     _scale.pack_start(_buttonAxial, Gtk::PACK_SHRINK, 2);
@@ -102,60 +103,68 @@ TWindowGTK::TWindowGTK(const std::string & name, double outerR, int size)
     _stereo = _buttonStereo.get_active();
     _buttonWireName.set_active(false);
     _wireName = _buttonWireName.get_active();
-}
+  }
 
-TWindowGTK::~TWindowGTK() {
-}
+  TWindowGTK::~TWindowGTK()
+  {
+  }
 
-void
-TWindowGTK::on_scale_value_changed(void) {
-}
+  void
+  TWindowGTK::on_scale_value_changed(void)
+  {
+  }
 
-void
-TWindowGTK::on_positionReset(void) {
-}
+  void
+  TWindowGTK::on_positionReset(void)
+  {
+  }
 
-void
-TWindowGTK::on_next(void) {
+  void
+  TWindowGTK::on_next(void)
+  {
     Gtk::Main::quit();
-}
+  }
 
-void
-TWindowGTK::on_endOfEvent(void) {
+  void
+  TWindowGTK::on_endOfEvent(void)
+  {
     _endOfEventFlag = true;
     _skipEvent = true;
     Gtk::Main::quit();
-}
+  }
 
-void
-TWindowGTK::on_nextEvent(void) {
+  void
+  TWindowGTK::on_nextEvent(void)
+  {
     _skipEvent = true;
     Gtk::Main::quit();
-}
+  }
 
 // void
 // TWindowGTK::initializeGTK(void) {
 //     std::cout << "TWindowGTK ... initializing GTK"
-// 				      << std::endl;
+//              << std::endl;
 //     int argc = 0;
 //     char ** argv = 0;
 //     Gtk::Main main_instance(argc, argv);
 //     GtkMain = main_instance.instance();
 // }
 
-void
-TWindowGTK::run(void) {
+  void
+  TWindowGTK::run(void)
+  {
     int argc = 0;
     char ** argv = 0;
     Gtk::Main main_instance(argc, argv);
     show();
     if (((! _skip) && (! _skipEvent)) ||
-	(_endOfEventFlag && _endOfEvent))
-	Gtk::Main::run();
-}
+        (_endOfEventFlag && _endOfEvent))
+      Gtk::Main::run();
+  }
 
-void
-TWindowGTK::pack(Gtk::DrawingArea & w) {
+  void
+  TWindowGTK::pack(Gtk::DrawingArea & w)
+  {
     _w = & w;
 
     _box0.pack_start(_menuButtons, Gtk::PACK_SHRINK, 5);
@@ -166,7 +175,7 @@ TWindowGTK::pack(Gtk::DrawingArea & w) {
     set_border_width(5);
     add(_box0);
     show_all();
-}
+  }
 
 } // namespace Belle
 

@@ -55,55 +55,55 @@
 
 namespace Belle {
 
-class TLink;
-class T3DLine;
+  class TLink;
+  class T3DLine;
 
 /// A class to fit a TTrackBase object to a 3D line.
-class T3DLineFitter : public TFitter {
+  class T3DLineFitter : public TFitter {
 
-public:
-  /// Constructor.
-  T3DLineFitter(const std::string & name);
-  T3DLineFitter(const std::string & name,bool m_sag,int m_prop,bool m_tof);
- 
-  /// Destructor
-  virtual ~T3DLineFitter();
-  
-public:// Selectors
-  /// dumps debug information.
-  void dump(const std::string & message = std::string(""),
-	    const std::string & prefix = std::string("")) const;
-  
-public:// Modifiers
-  virtual int fit(TTrackBase &) const;
-  virtual int fit(TTrackBase &, float t0Offset) const;
+  public:
+    /// Constructor.
+    T3DLineFitter(const std::string & name);
+    T3DLineFitter(const std::string & name, bool m_sag, int m_prop, bool m_tof);
 
-  void sag(bool);
-  void propagation(int);
-  void tof(bool);
-  
-private:
-  /// calculates dXda. 'TLink' and 'T3DLine' are inputs. Others are outputs.
-  int dxda(const TLink&,
-	   const T3DLine&,
-	   CLHEP::HepVector & dxda,
-	   CLHEP::HepVector & dyda,
-	   CLHEP::HepVector & dzda,
-	   HepGeom::Vector3D<double> & wireDirection) const;
-  
-  /// calculates drift distance and its error.
-  void drift(const T3DLine &,
-	     const TLink &,
-	     float t0Offset,
-	     double & distance,
-	     double & err) const;
-  
-private:
-  bool _sag;
-  int _propagation;
-  bool _tof;
-  
-};
+    /// Destructor
+    virtual ~T3DLineFitter();
+
+  public:// Selectors
+    /// dumps debug information.
+    void dump(const std::string & message = std::string(""),
+              const std::string & prefix = std::string("")) const;
+
+  public:// Modifiers
+    virtual int fit(TTrackBase &) const;
+    virtual int fit(TTrackBase &, float t0Offset) const;
+
+    void sag(bool);
+    void propagation(int);
+    void tof(bool);
+
+  private:
+    /// calculates dXda. 'TLink' and 'T3DLine' are inputs. Others are outputs.
+    int dxda(const TLink&,
+             const T3DLine&,
+             CLHEP::HepVector & dxda,
+             CLHEP::HepVector & dyda,
+             CLHEP::HepVector & dzda,
+             HepGeom::Vector3D<double> & wireDirection) const;
+
+    /// calculates drift distance and its error.
+    void drift(const T3DLine &,
+               const TLink &,
+               float t0Offset,
+               double & distance,
+               double & err) const;
+
+  private:
+    bool _sag;
+    int _propagation;
+    bool _tof;
+
+  };
 
 //-----------------------------------------------------------------------------
 

@@ -449,8 +449,7 @@ void AxialTrackFinder::CollectTrackCandidates(vector<CDCSegment> & cdcAxialSegme
       if (float(TrackCandidates.at(i).getChiSquare() / TrackCandidates.at(i).getNHits()) < 0.00005) { // more or less aribtrary value used here..
         FinalTrackCandidates.push_back(TrackCandidates.at(i));
 
-      }
-      //else B2INFO("Throw away the track "<<i);
+      } else B2INFO("Throw away the track " << i);
 
     }
     //B2INFO("Number of TrackCandidates after Chi2 test: "<<FinalTrackCandidates.size());

@@ -102,18 +102,20 @@
 
 namespace Belle {
 
-const TCircleFitter
-TCircle::_fitter = TCircleFitter("TCircle Default Circle Fitter");
+  const TCircleFitter
+  TCircle::_fitter = TCircleFitter("TCircle Default Circle Fitter");
 
-TCircle::TCircle(const TCircle & a)
-: TTrackBase((TTrackBase &) a),
+  TCircle::TCircle(const TCircle & a)
+      : TTrackBase((TTrackBase &) a),
 //  _circle(a._circle),
-  _radius(a._radius),
-  _center(a._center) {
-}
+      _radius(a._radius),
+      _center(a._center)
+  {
+  }
 
-TCircle::TCircle(const AList<TLink> & a)
-: TTrackBase(a), _charge(0.), _radius(0.) {
+  TCircle::TCircle(const AList<TLink> & a)
+      : TTrackBase(a), _charge(0.), _radius(0.)
+  {
 #ifdef TRASAN_DEBUG
     const std::string stage = "TCircle";
     EnterStage(stage);
@@ -128,73 +130,77 @@ TCircle::TCircle(const AList<TLink> & a)
 #ifdef TRASAN_DEBUG
     LeaveStage(stage);
 #endif
-}
+  }
 
-TCircle::TCircle(const TTrack & t)
+  TCircle::TCircle(const TTrack & t)
 //    : TTrackBase((TTrackBase &) t),
-    : TTrackBase(t.links()),
+      : TTrackBase(t.links()),
       _charge(t.charge()),
       _radius(fabs(t.radius())),
-      _center(t.center().x(), t.center().y(), 0) {
+      _center(t.center().x(), t.center().y(), 0)
+  {
 
     //...Set a defualt fitter...
     fitter(& TCircle::_fitter);
-}
+  }
 
-TCircle::TCircle(float r, float phi, float charge)
-    : TTrackBase(),
+  TCircle::TCircle(float r, float phi, float charge)
+      : TTrackBase(),
       _charge(charge),
       _radius(r),
-      _center(r * cos(phi), r * sin(phi), 0) {
+      _center(r * cos(phi), r * sin(phi), 0)
+  {
 
     //...Set a defualt fitter...
     fitter(& TCircle::_fitter);
 
     //...Because no link...
     _fitted = true;
-}
+  }
 
-TCircle::TCircle(const TPoint2D & c, float r, float charge)
-    : TTrackBase(),
+  TCircle::TCircle(const TPoint2D & c, float r, float charge)
+      : TTrackBase(),
       _charge(charge),
       _radius(r),
-      _center(c.y() * cos(c.x()), c.y() * sin(c.x()), 0) {
+      _center(c.y() * cos(c.x()), c.y() * sin(c.x()), 0)
+  {
 
     //...Set a defualt fitter...
     fitter(& TCircle::_fitter);
 
     //...Because no link...
     _fitted = true;
-}
+  }
 
-TCircle::~TCircle() {
-}
+  TCircle::~TCircle()
+  {
+  }
 
-void
-TCircle::dump(const std::string & msg, const std::string & pre) const {
+  void
+  TCircle::dump(const std::string & msg, const std::string & pre) const
+  {
     bool def = false;
     if (msg == "") def = true;
 
     if (def ||
-	msg.find("circle") != std::string::npos ||
-	msg.find("detail") != std::string::npos) {
-	std::cout << pre;
-	std::cout << "#links=" << _links.length();
-	if (_fitted) {
-	    std::cout << ",charge=" << _charge;
-	    std::cout << ",center=" << _center;
-	    std::cout << ",radius=" << _radius;
-	    std::cout << std::endl << pre;
-	    std::cout << "pt=" << pt();
-	    std::cout << ",impact=" << impact();
-	    std::cout << std::endl;
-	}
-	else {
-	    std::cout << ",not fitted yet" << std::endl;
-	}
+        msg.find("circle") != std::string::npos ||
+        msg.find("detail") != std::string::npos) {
+      std::cout << pre;
+      std::cout << "#links=" << _links.length();
+      if (_fitted) {
+        std::cout << ",charge=" << _charge;
+        std::cout << ",center=" << _center;
+        std::cout << ",radius=" << _radius;
+        std::cout << std::endl << pre;
+        std::cout << "pt=" << pt();
+        std::cout << ",impact=" << impact();
+        std::cout << std::endl;
+      } else {
+        std::cout << ",not fitted yet" << std::endl;
+      }
     }
     if (! def) TTrackBase::dump(msg, pre);
-}
+  }
 
 //  int
 //  TCircle::fitx(void) {
@@ -206,21 +212,21 @@ TCircle::dump(const std::string & msg, const std::string & pre) const {
 //      if (n < 3) return -1;
 
 //      for (unsigned i = 0; i < n; i++) {
-//  	TLink * l = _links[i];
-//  	const TRGCDCWireHit * h = l->hit();
+//    TLink * l = _links[i];
+//    const TRGCDCWireHit * h = l->hit();
 
-//  	//...Check next hit...
-//  	Point3D point;
-//  	if (h->state() & WireHitPatternLeft)
-//  	    point = h->position(WireHitLeft);
-//  	else if (h->state() & WireHitPatternRight)
-//  	    point = h->position(WireHitRight);
-//  	else
-//  	    point = h->xyPosition();
-//  	// float weight = 1. / (h->distance() * h->distance());
-//  	// float weight = 1. / h->distance();
+//    //...Check next hit...
+//    Point3D point;
+//    if (h->state() & WireHitPatternLeft)
+//        point = h->position(WireHitLeft);
+//    else if (h->state() & WireHitPatternRight)
+//        point = h->position(WireHitRight);
+//    else
+//        point = h->xyPosition();
+//    // float weight = 1. / (h->distance() * h->distance());
+//    // float weight = 1. / h->distance();
 
-//  	_circle.add_point(point.x(), point.y()); //, weight);
+//    _circle.add_point(point.x(), point.y()); //, weight);
 //      }
 
 //      if(_circle.fit()<0.0 || _circle.kappa()==0.0) return -1;
@@ -232,15 +238,15 @@ TCircle::dump(const std::string & msg, const std::string & pre) const {
 //      //...Determine charge...Better way???
 //      int qSum = 0;
 //      for (unsigned i = 0; i < n; i++) {
-//  	TLink * l = _links[i];
-//  	if (l == 0) continue;
+//    TLink * l = _links[i];
+//    if (l == 0) continue;
 
-//  	const TRGCDCWireHit * h = l->hit();
-//  	if (h == 0) continue;
+//    const TRGCDCWireHit * h = l->hit();
+//    if (h == 0) continue;
 
-//  	float q = (_center.cross(h->xyPosition())).z();
-//  	if (q > 0.) qSum += 1;
-//  	else        qSum -= 1;
+//    float q = (_center.cross(h->xyPosition())).z();
+//    if (q > 0.) qSum += 1;
+//    else        qSum -= 1;
 //      }
 //      if (qSum >= 0) _charge = +1.;
 //      else           _charge = -1.;
@@ -250,71 +256,73 @@ TCircle::dump(const std::string & msg, const std::string & pre) const {
 //      return 0;
 //  }
 
-double
-TCircle::weight(const TLink & l) const {
+  double
+  TCircle::weight(const TLink & l) const
+  {
 
-  //...Axial Wires
-  int maxLink = 0;
-  int localID[7];
-  int layerID[7];
-  int LayerID = l.hit()->wire().layerId();
-  for(int i=0;i<7;i++){
-    if(l.neighbor(i)){
-      maxLink = i;
-      localID[i] = l.neighbor(i)->hit()->wire().localId();
-      layerID[i] = l.neighbor(i)->hit()->wire().layerId();
-    }else{
-      break;
+    //...Axial Wires
+    int maxLink = 0;
+    int localID[7];
+    int layerID[7];
+    int LayerID = l.hit()->wire().layerId();
+    for (int i = 0; i < 7; i++) {
+      if (l.neighbor(i)) {
+        maxLink = i;
+        localID[i] = l.neighbor(i)->hit()->wire().localId();
+        layerID[i] = l.neighbor(i)->hit()->wire().layerId();
+      } else {
+        break;
+      }
     }
+    if (maxLink != 1)return 1.0;
+    if (layerID[0] == LayerID &&
+        layerID[1] == LayerID)return 0.5;
+    if (layerID[0] + layerID[1] != LayerID*2)return 1.0;
+    if (localID[0] != localID[1])return 1.5;//1.0 or 2.0 ??
+    return 1.0;
   }
-  if(maxLink != 1)return 1.0;
-  if(layerID[0] == LayerID &&
-     layerID[1] == LayerID)return 0.5;
-  if(layerID[0]+layerID[1] != LayerID*2)return 1.0;
-  if(localID[0] != localID[1])return 1.5;//1.0 or 2.0 ??
-  return 1.0;
-}
 
-int
-TCircle::fitForCurl(int ipConst) {
+  int
+  TCircle::fitForCurl(int ipConst)
+  {
     unsigned n = _links.length();
     if (n < 3) return -1;
 
     //IP check
     unsigned flagIP = 1;
     unsigned layerID = _links[0]->hit()->wire().layerId();
-    for(unsigned i = 0; i < n; i++){
-      if(layerID != _links[i]->hit()->wire().layerId()){
+    for (unsigned i = 0; i < n; i++) {
+      if (layerID != _links[i]->hit()->wire().layerId()) {
         flagIP = 0;
         break;
       }
     }
-    if(ipConst != 0)flagIP = 1;
-    if(flagIP == 1){
+    if (ipConst != 0)flagIP = 1;
+    if (flagIP == 1) {
       _circle.add_point(0., 0., 0.5);
       //++_nPointsForFit;
     }
     for (unsigned i = 0; i < n; i++) {
-        TLink * l = _links[i];
-        if (l == 0) continue;
+      TLink * l = _links[i];
+      if (l == 0) continue;
 
-        const Belle2::TRGCDCWireHit * h = l->hit();
-        if (h == 0) continue;
+      const Belle2::TRGCDCWireHit * h = l->hit();
+      if (h == 0) continue;
 
-        //...Check next hit...
-        HepGeom::Point3D<double> point;
-        point = h->xyPosition();
-        
-        double weight = 1.0;
-        weight = this->weight(* l);
+      //...Check next hit...
+      HepGeom::Point3D<double> point;
+      point = h->xyPosition();
 
-        _circle.add_point(point.x(), point.y(), weight);
-        //++_nPointsForFit;
+      double weight = 1.0;
+      weight = this->weight(* l);
+
+      _circle.add_point(point.x(), point.y(), weight);
+      //++_nPointsForFit;
     }
 
     //if (_nPointsForFit < 3) return -1;
 
-    if(_circle.fit()<0.0 || _circle.kappa()==0.0) return -1;
+    if (_circle.fit() < 0.0 || _circle.kappa() == 0.0) return -1;
     CLHEP::HepVector v(_circle.center());
     _center.setX(v(1));
     _center.setY(v(2));
@@ -323,15 +331,15 @@ TCircle::fitForCurl(int ipConst) {
     //...Determine charge...Better way???
     int qSum = 0;
     for (unsigned i = 0; i < n; i++) {
-        TLink * l = _links[i];
-        if (l == 0) continue;
+      TLink * l = _links[i];
+      if (l == 0) continue;
 
-        const Belle2::TRGCDCWireHit * h = l->hit();
-        if (h == 0) continue;
+      const Belle2::TRGCDCWireHit * h = l->hit();
+      if (h == 0) continue;
 
-        float q = (_center.cross(h->xyPosition())).z();
-        if (q > 0.) qSum += 1;
-        else        qSum -= 1;
+      float q = (_center.cross(h->xyPosition())).z();
+      if (q > 0.) qSum += 1;
+      else        qSum -= 1;
     }
     if (qSum >= 0) _charge = +1.;
     else           _charge = -1.;
@@ -339,7 +347,7 @@ TCircle::fitForCurl(int ipConst) {
 
     _fitted = true;
     return 0;
-}
+  }
 
 } // namespace Belle
 

@@ -24,37 +24,37 @@
 #include "tracking/modules/trasan/TWindowSZDrawingArea.h"
 
 namespace Belle2 {
-    class TRGCDCWireHit;
+  class TRGCDCWireHit;
 }
 
 namespace Belle {
 
-class TRGCDCWireHit;
-class TLink;
-class TTrackBase;
-class TSegment;
-class TTrack;
-class TLine;
+  class TRGCDCWireHit;
+  class TLink;
+  class TTrackBase;
+  class TSegment;
+  class TTrack;
+  class TLine;
 
 /// A class to display tracking objects.
-class TWindowGTKSZ : public TWindowGTK {
-    
+  class TWindowGTKSZ : public TWindowGTK {
+
   public:
     /// Default constructor
     TWindowGTKSZ(const std::string & name = "TWindowGTKSZ",
-		 int size = 600);
-    
+                 int size = 600);
+
     /// Destructor
     virtual ~TWindowGTKSZ();
 
   public: // Tracking stuff
     void clear(void);
     void append(const AList<TLink> &,
-		Gdk::Color color = Gdk::Color("grey"));
+                Gdk::Color color = Gdk::Color("grey"));
     void append(const AList<TLine> &,
-		Gdk::Color color = Gdk::Color("grey"));
+                Gdk::Color color = Gdk::Color("grey"));
     void append(const TLine & t,
-		Gdk::Color color = Gdk::Color("grey"));
+                Gdk::Color color = Gdk::Color("grey"));
 
   public: // Actions
     void on_scale_value_changed(void);
@@ -65,7 +65,7 @@ class TWindowGTKSZ : public TWindowGTK {
 
   private: // GTK stuff
     TWindowSZDrawingArea _w;
-};
+  };
 
 //-----------------------------------------------------------------------------
 
@@ -77,36 +77,40 @@ class TWindowGTKSZ : public TWindowGTK {
 #endif
 #ifdef TWINDOWGTK_INLINE_DEFINE_HERE
 
-inline
-void
-TWindowGTKSZ::clear(void) {
+  inline
+  void
+  TWindowGTKSZ::clear(void)
+  {
     _w.clear();
     TWindowGTK::clear();
-}
+  }
 
-inline
-void
-TWindowGTKSZ::on_axial(void) {
+  inline
+  void
+  TWindowGTKSZ::on_axial(void)
+  {
     TWindowGTK::on_axial();
     _w.axial(axial());
     _w.on_expose_event((GdkEventExpose *) NULL);
-}
+  }
 
-inline
-void
-TWindowGTKSZ::on_stereo(void) {
+  inline
+  void
+  TWindowGTKSZ::on_stereo(void)
+  {
     TWindowGTK::on_stereo();
     _w.stereo(stereo());
     _w.on_expose_event((GdkEventExpose *) NULL);
-}
+  }
 
-inline
-void
-TWindowGTKSZ::on_wireName(void) {
+  inline
+  void
+  TWindowGTKSZ::on_wireName(void)
+  {
     TWindowGTK::on_wireName();
     _w.wireName(wireName());
     _w.on_expose_event((GdkEventExpose *) NULL);
-}
+  }
 
 #endif
 #undef inline

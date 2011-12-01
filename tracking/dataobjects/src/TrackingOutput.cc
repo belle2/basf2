@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <tracking/karlsruhe/TrackingOutput.h>
+#include <tracking/dataobjects/TrackingOutput.h>
 
 using namespace std;
 using namespace Belle2;

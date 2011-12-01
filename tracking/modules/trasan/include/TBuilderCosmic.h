@@ -59,7 +59,7 @@
 namespace Belle {
 
 /// A class to build a cosmic track.
-class TBuilderCosmic : public TBuilder0 {
+  class TBuilderCosmic : public TBuilder0 {
 
   public:
     /// Constructor.
@@ -75,7 +75,7 @@ class TBuilderCosmic : public TBuilder0 {
   private:
     // THelixFitter _fitter;
     TCosmicFitter _fitter;
-};
+  };
 
 //-----------------------------------------------------------------------------
 

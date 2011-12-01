@@ -51,32 +51,36 @@
 
 namespace Belle {
 
-TSegmentLinker::TSegmentLinker(unsigned nLayer,
-			       TSegment0 * baseSegment,
-			       AList<TSegment0> * segmentLists)
-: _nLayer(nLayer),
-  _base(baseSegment) {
+  TSegmentLinker::TSegmentLinker(unsigned nLayer,
+                                 TSegment0 * baseSegment,
+                                 AList<TSegment0> * segmentLists)
+      : _nLayer(nLayer),
+      _base(baseSegment)
+  {
     for (unsigned i = 0; i < _nLayer; i++)
-	_list[i] = new AList<TSegment0>(segmentLists[i]);
+      _list[i] = new AList<TSegment0>(segmentLists[i]);
 
     roughSelection();
-}
+  }
 
-TSegmentLinker::~TSegmentLinker() {
-}
+  TSegmentLinker::~TSegmentLinker()
+  {
+  }
 
-void
-TSegmentLinker::dump(const std::string &, const std::string &) const {
+  void
+  TSegmentLinker::dump(const std::string &, const std::string &) const
+  {
     std::cout << "TSegmentLinker::dump ... " << std::endl;
-}
+  }
 
-AList<TSegment0>
-TSegmentLinker::bestLink(void) {
+  AList<TSegment0>
+  TSegmentLinker::bestLink(void)
+  {
 
 // #ifdef TRASAN_DEBUG_DETAIL
 // std::cout << name() << " ... finding cluster linkage" << std::endl;
 //     if (base.links().length() == 0)
-// 	std::cout << name() << " !!! base doesn't have any TLink." << std::endl;
+//  std::cout << name() << " !!! base doesn't have any TLink." << std::endl;
 // std::cout << "... base cluster" << std::endl;
 //     base.dump("cluster hits mc", "  ->");
 // #endif
@@ -92,33 +96,34 @@ TSegmentLinker::bestLink(void) {
 //     int next = outerMost;
 //     TSegment0 * last = & base;
 //     while (next) {
-// 	--next;
-// 	const AList<TSegment0> & candidates = list[next];
-// 	if (candidates.length() == 0) continue;
-	
+//  --next;
+//  const AList<TSegment0> & candidates = list[next];
+//  if (candidates.length() == 0) continue;
+
 // #ifdef TRASAN_DEBUG_DETAIL
-// 	std::cout << "... clusters in super layer " << next << std::endl;
+//  std::cout << "... clusters in super layer " << next << std::endl;
 // #endif
 
-// 	//...Find best match...
-// 	TSegment0 * best = findBestLink(* last, candidates);
-// 	if (best != NULL) {
-// 	    seeds.append(best);
-// 	    last = best;
+//  //...Find best match...
+//  TSegment0 * best = findBestLink(* last, candidates);
+//  if (best != NULL) {
+//      seeds.append(best);
+//      last = best;
 // #ifdef TRASAN_DEBUG_DETAIL
-// 	    std::cout << "  ->Best is ";
-// 	    std::cout << best->position() << " ";
-// 	    best->dump("hits mc");
+//      std::cout << "  ->Best is ";
+//      std::cout << best->position() << " ";
+//      best->dump("hits mc");
 // #endif
-// 	}
+//  }
 //     }
 
     return seeds;
-}
+  }
 
-void
-TSegmentLinker::roughSelection(void) {
-}
+  void
+  TSegmentLinker::roughSelection(void)
+  {
+  }
 
 } // namespace Belle
 

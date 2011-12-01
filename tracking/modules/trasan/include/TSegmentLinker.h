@@ -50,17 +50,17 @@
 
 namespace Belle {
 
-class Range;
-class TSegment0;
+  class Range;
+  class TSegment0;
 
 /// A class to link TSegment0s.
-class TSegmentLinker {
+  class TSegmentLinker {
 
   public:
     /// Constructor.
     TSegmentLinker(unsigned nLayer,
-		   TSegment0 * baseSegmnet,
-		   AList<TSegment0> * segmentLists);
+                   TSegment0 * baseSegmnet,
+                   AList<TSegment0> * segmentLists);
 
     /// Destructor
     virtual ~TSegmentLinker();
@@ -68,7 +68,7 @@ class TSegmentLinker {
   public:// Selectors
     /// dumps debug information.
     void dump(const std::string & message = std::string(""),
-    	      const std::string & prefix = std::string("")) const;
+              const std::string & prefix = std::string("")) const;
 
     /// returns a list of best segment link.
     AList<TSegment0> bestLink(void);
@@ -81,7 +81,7 @@ class TSegmentLinker {
     unsigned _nLayer;
     TSegment0 * _base;
     AList<TSegment0> * _list[11];
-};
+  };
 
 //-----------------------------------------------------------------------------
 

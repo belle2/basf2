@@ -24,7 +24,7 @@
 namespace Belle {
 
 /// A class to represent an 2D area.
-class TArea {
+  class TArea {
 
   public:
     /// Contructor.
@@ -39,20 +39,21 @@ class TArea {
 
     /// returns cross-points.
     void cross(const TPoint2D & x0, const TPoint2D & x1,
-	       unsigned & nFound, TPoint2D crossPoint[2]) const;
+               unsigned & nFound, TPoint2D crossPoint[2]) const;
 
   private:
     TPoint2D _c[2];
-};
+  };
 
-inline
-bool
-TArea::inArea(const TPoint2D & x) const {
+  inline
+  bool
+  TArea::inArea(const TPoint2D & x) const
+  {
     if ((x.x() >= _c[0].x()) && (x.x() <= _c[1].x()))
-	if ((x.y() >= _c[0].y()) && (x.y() <= _c[1].y()))
-	    return true;
+      if ((x.y() >= _c[0].y()) && (x.y() <= _c[1].y()))
+        return true;
     return false;
-}
+  }
 
 } // namespace Belle
 

@@ -16,7 +16,7 @@
 #include "GFTrack.h"
 #include "GFTrackCand.h"
 
-#include <tracking/karlsruhe/TrackingOutput.h>
+#include <tracking/dataobjects/TrackingOutput.h>
 
 #include <framework/datastore/StoreArray.h>
 

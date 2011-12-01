@@ -36,7 +36,7 @@
 namespace Belle {
 
 /// A class to represent circle Hough transformation.
-class THoughTransformationCircle : public THoughTransformation {
+  class THoughTransformationCircle : public THoughTransformation {
 
   public:
     /// Contructor.
@@ -54,18 +54,18 @@ class THoughTransformationCircle : public THoughTransformation {
 
     /// returns true if Y diverges in given region.
     virtual bool positiveDiverge(float xReal, float yReal, float x0, float x1)
-	const;
+    const;
 
     /// returns true if Y diverges in given region.
     virtual bool negativeDiverge(float xReal, float yReal, float x0, float x1)
-	const;
+    const;
 
     /// returns Point2D(phi, r) of a circle in real plane.
     virtual TPoint2D circleCenter(const TPoint2D &) const;
 
     /// converts Point2D(phi, r) in real plane into Point2D(phi, r) in Hough plane.
     virtual TPoint2D convert(const TPoint2D &) const;
-};
+  };
 
 } // namespace Belle
 

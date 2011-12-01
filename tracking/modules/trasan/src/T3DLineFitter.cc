@@ -256,348 +256,361 @@ struct reccdc_timing {
 
 namespace Belle {
 
-extern const HepGeom::Point3D<double>  ORIGIN;
+  extern const HepGeom::Point3D<double>  ORIGIN;
 
 #define T3DLine2DFit 2
 
-extern "C" 
-void
-calcdc_driftdist_(int *,
-                  int *,
-                  int *,
-                  float[3],
-                  float[3],
-                  float *,
-                  float *,
-                  float *);
+  extern "C"
+  void
+  calcdc_driftdist_(int *,
+                    int *,
+                    int *,
+                    float[3],
+                    float[3],
+                    float *,
+                    float *,
+                    float *);
 
-extern "C"
-void
-calcdc_tof2_(int *, float *, float *, float *);
+  extern "C"
+  void
+  calcdc_tof2_(int *, float *, float *, float *);
 
-T3DLineFitter::T3DLineFitter(const std::string& name)
-  : TFitter(name),
-    _sag(true),_propagation(1),_tof(false){
-}
-T3DLineFitter::T3DLineFitter(const std::string& name,
-                             bool m_sag,int m_prop,bool m_tof)
-  : TFitter(name),
-    _sag(m_sag),_propagation(m_prop),_tof(m_tof){
-}
+  T3DLineFitter::T3DLineFitter(const std::string& name)
+      : TFitter(name),
+      _sag(true), _propagation(1), _tof(false)
+  {
+  }
+  T3DLineFitter::T3DLineFitter(const std::string& name,
+                               bool m_sag, int m_prop, bool m_tof)
+      : TFitter(name),
+      _sag(m_sag), _propagation(m_prop), _tof(m_tof)
+  {
+  }
 
-T3DLineFitter::~T3DLineFitter() {
-}
+  T3DLineFitter::~T3DLineFitter()
+  {
+  }
 
-void T3DLineFitter::sag(bool _in){
-  _sag = _in;
-}
-void T3DLineFitter::propagation(int _in){
-  _propagation = _in;
-}
-void T3DLineFitter::tof(bool _in){
-  _tof = _in;
-}
+  void T3DLineFitter::sag(bool _in)
+  {
+    _sag = _in;
+  }
+  void T3DLineFitter::propagation(int _in)
+  {
+    _propagation = _in;
+  }
+  void T3DLineFitter::tof(bool _in)
+  {
+    _tof = _in;
+  }
 
-void T3DLineFitter::drift(const T3DLine& t,const TLink& l,
-			  float t0Offset,
-			  double& distance,double& err) const{
+  void T3DLineFitter::drift(const T3DLine& t, const TLink& l,
+                            float t0Offset,
+                            double& distance, double& err) const
+  {
 
-  const Belle2::TRGCDCWireHit& h = *l.hit();
-  const Point3D& onTrack = l.positionOnTrack();
-  const Point3D& onWire = l.positionOnWire();
-  unsigned leftRight = WireHitRight;
-  //  if (onWire.cross(onTrack).z() < 0) leftRight = WireHitLeft;
-  if((onWire.x()*onTrack.y()-onWire.y()*onTrack.x())<0) leftRight = WireHitLeft;
+    const Belle2::TRGCDCWireHit& h = *l.hit();
+    const Point3D& onTrack = l.positionOnTrack();
+    const Point3D& onWire = l.positionOnWire();
+    unsigned leftRight = WireHitRight;
+    //  if (onWire.cross(onTrack).z() < 0) leftRight = WireHitLeft;
+    if ((onWire.x()*onTrack.y() - onWire.y()*onTrack.x()) < 0) leftRight = WireHitLeft;
 
-  //...No correction...
-  if ((t0Offset == 0.) && (_propagation==0) && (! _tof)) {
-    distance = l.drift(leftRight);
-    err = h.dDrift(leftRight);
+    //...No correction...
+    if ((t0Offset == 0.) && (_propagation == 0) && (! _tof)) {
+      distance = l.drift(leftRight);
+      err = h.dDrift(leftRight);
+      return;
+    }
+
+    //...TOF correction...
+    //  momentum ???? or velocity -> assumued light velocity
+    float tof = 0.;
+    if (_tof) {
+      //    double length = ((onTrack - t.x0())*t.k())/t.k().mag();
+      double tl = t.tanl();
+      double length = ((onTrack - t.x0()) * t.k()) / sqrt(1 + tl * tl);
+      static const double Ic = 1 / 29.9792; //1/[cm/ns]
+      tof = length * Ic;
+    }
+
+    //...T0 and propagation corrections...
+//int wire = h.wire()->id();
+    int wire = h.wire().id();
+    int side = leftRight;
+    if (side == 0) side = -1;
+    float p[3] = { -t.sinPhi0(), t.cosPhi0(), t.tanl()};
+    float x[3] = {onWire.x(), onWire.y(), onWire.z()};
+//cnv  float time = h.reccdc()->m_tdc + t0Offset - tof;
+    float time = 0;
+    float dist;
+    float edist;
+    int prop = _propagation;
+    calcdc_driftdist_(& prop,
+                      & wire,
+                      & side,
+                      p,
+                      x,
+                      & time,
+                      & dist,
+                      & edist);
+    distance = (double) dist;
+    err = (double) edist;
     return;
   }
-  
-  //...TOF correction...
-  //	momentum ???? or velocity -> assumued light velocity
-  float tof = 0.;
-  if (_tof) {
-    //    double length = ((onTrack - t.x0())*t.k())/t.k().mag();
-    double tl = t.tanl();
-    double length = ((onTrack - t.x0())*t.k())/sqrt(1+tl*tl);
-    static const double Ic = 1/29.9792;	//1/[cm/ns] 
-    tof = length * Ic;
+
+  int T3DLineFitter::fit(TTrackBase& tb) const
+  {
+    return fit(tb, 0);
   }
-  
-  //...T0 and propagation corrections...
-//int wire = h.wire()->id();
-  int wire = h.wire().id();
-  int side = leftRight;
-  if (side==0) side = -1;
-  float p[3] = {-t.sinPhi0(),t.cosPhi0(),t.tanl()};
-  float x[3] = {onWire.x(), onWire.y(), onWire.z()};
-//cnv  float time = h.reccdc()->m_tdc + t0Offset - tof;
-  float time = 0;
-  float dist;
-  float edist;
-  int prop = _propagation;
-  calcdc_driftdist_(& prop,
-		    & wire,
-		    & side,
-		    p,
-		    x,
-		    & time,
-		    & dist,
-		    & edist);
-  distance = (double) dist;
-  err = (double) edist;
-  return;
-}
 
-int T3DLineFitter::fit(TTrackBase& tb) const{
-  return fit(tb,0);
-}
+  int T3DLineFitter::fit(TTrackBase& tb, float t0Offset) const
+  {
 
-int T3DLineFitter::fit(TTrackBase& tb, float t0Offset) const{
+    // std::cout<<"T3DLineFitter::fit  start"<<std::endl;
 
-  // std::cout<<"T3DLineFitter::fit  start"<<std::endl;
+    //...Type check...
+    if (tb.objectType() != Line3D) return TFitUnavailable;
+    T3DLine& t = (T3DLine&) tb;
 
-  //...Type check...
-  if(tb.objectType() != Line3D) return TFitUnavailable;
-  T3DLine& t = (T3DLine&) tb;
+    //...Already fitted ?...
+    if (t.fitted()) return TFitAlreadyFitted;
 
-  //...Already fitted ?...
-  if(t.fitted()) return TFitAlreadyFitted;
+    //...Count # of hits...
+    AList<TLink> cores = t.cores();
+    unsigned nCores = cores.length();
+    unsigned nStereoCores = TLink::nStereoHits(cores);
 
-  //...Count # of hits...
-  AList<TLink> cores = t.cores();
-  unsigned nCores = cores.length();
-  unsigned nStereoCores = TLink::nStereoHits(cores);
-  
-  //...Check # of hits...
-  bool flag2D = false;
-  if ((nStereoCores == 0) && (nCores > 3)) flag2D = true;
-  else if ((nStereoCores < 2) || (nCores - nStereoCores < 3))
-    return TFitErrorFewHits;
+    //...Check # of hits...
+    bool flag2D = false;
+    if ((nStereoCores == 0) && (nCores > 3)) flag2D = true;
+    else if ((nStereoCores < 2) || (nCores - nStereoCores < 3))
+      return TFitErrorFewHits;
 
-  //...Move pivot to ORIGIN...
-  const HepGeom::Point3D<double> pivot_bak = t.pivot();
-  t.pivot(ORIGIN);
+    //...Move pivot to ORIGIN...
+    const HepGeom::Point3D<double> pivot_bak = t.pivot();
+    t.pivot(ORIGIN);
 
-  //...Setup...
-  CLHEP::HepVector a(4),da(4);
-  a = t.a();
-  CLHEP::HepVector dxda(4);
-  CLHEP::HepVector dyda(4);
-  CLHEP::HepVector dzda(4);
-  CLHEP::HepVector dDda(4);
-  CLHEP::HepVector dchi2da(4);
-  CLHEP::HepSymMatrix d2chi2d2a(4,0);
-  static const CLHEP::HepSymMatrix zero4(4,0);
-  double chi2;
-  double chi2Old = DBL_MAX;
-  double factor = 1.0;
-  int err = 0;
-  CLHEP::HepSymMatrix e(2,0);
-  CLHEP::HepVector f(2);
+    //...Setup...
+    CLHEP::HepVector a(4), da(4);
+    a = t.a();
+    CLHEP::HepVector dxda(4);
+    CLHEP::HepVector dyda(4);
+    CLHEP::HepVector dzda(4);
+    CLHEP::HepVector dDda(4);
+    CLHEP::HepVector dchi2da(4);
+    CLHEP::HepSymMatrix d2chi2d2a(4, 0);
+    static const CLHEP::HepSymMatrix zero4(4, 0);
+    double chi2;
+    double chi2Old = DBL_MAX;
+    double factor = 1.0;
+    int err = 0;
+    CLHEP::HepSymMatrix e(2, 0);
+    CLHEP::HepVector f(2);
 
-  //...Fitting loop...
-  unsigned nTrial = 0;
-  while(nTrial < 100){
-    
-    //...Set up...
-    chi2 = 0;
-    for (unsigned j=0;j<4;j++) dchi2da[j]=0;
-    d2chi2d2a=zero4;
+    //...Fitting loop...
+    unsigned nTrial = 0;
+    while (nTrial < 100) {
 
-    //...Loop with hits...
-    unsigned i=0;
-    while(TLink* l = cores[i++]){
-      const Belle2::TRGCDCWireHit& h = *l->hit();
+      //...Set up...
+      chi2 = 0;
+      for (unsigned j = 0; j < 4; j++) dchi2da[j] = 0;
+      d2chi2d2a = zero4;
 
-      //...Cal. closest points...
-      t.approach(*l,_sag);
-      const Point3D& onTrack=l->positionOnTrack();
-      const Point3D& onWire=l->positionOnWire();
-      unsigned leftRight = WireHitRight;
-      if (onWire.cross(onTrack).z() < 0.) leftRight = WireHitLeft;
+      //...Loop with hits...
+      unsigned i = 0;
+      while (TLink* l = cores[i++]) {
+        const Belle2::TRGCDCWireHit& h = *l->hit();
 
-      //...Obtain drift distance and its error...
-      double distance;
-      double eDistance;
-      drift(t, * l, t0Offset, distance, eDistance);
-      double eDistance2 = eDistance * eDistance;
+        //...Cal. closest points...
+        t.approach(*l, _sag);
+        const Point3D& onTrack = l->positionOnTrack();
+        const Point3D& onWire = l->positionOnWire();
+        unsigned leftRight = WireHitRight;
+        if (onWire.cross(onTrack).z() < 0.) leftRight = WireHitLeft;
 
-      //...Residual...
-      HepGeom::Vector3D<double> v = onTrack - onWire;
-      double vmag = v.mag();
-      double dDistance = vmag - distance;
+        //...Obtain drift distance and its error...
+        double distance;
+        double eDistance;
+        drift(t, * l, t0Offset, distance, eDistance);
+        double eDistance2 = eDistance * eDistance;
 
-      HepGeom::Vector3D<double> vw;
-      //...dxda...
-      this->dxda(*l, t, dxda, dyda, dzda, vw);
+        //...Residual...
+        HepGeom::Vector3D<double> v = onTrack - onWire;
+        double vmag = v.mag();
+        double dDistance = vmag - distance;
 
-      //...Chi2 related...
-      dDda = (vmag > 0.)
-	? ((v.x() * (1. - vw.x() * vw.x()) -
-	    v.y() * vw.x() * vw.y() - v.z() * vw.x() * vw.z())
-	   * dxda + 
-	   (v.y() * (1. - vw.y() * vw.y()) -
-	    v.z() * vw.y() * vw.z() - v.x() * vw.y() * vw.x())
-	   * dyda + 
-	   (v.z() * (1. - vw.z() * vw.z()) -
-	    v.x() * vw.z() * vw.x() - v.y() * vw.z() * vw.y())
-	   * dzda) / vmag :CLHEP::HepVector(4, 0);
-      if (vmag <= 0.0) {
-	std::cout << "    in fit " << onTrack << ", " << onWire;
-	h.dump();
+        HepGeom::Vector3D<double> vw;
+        //...dxda...
+        this->dxda(*l, t, dxda, dyda, dzda, vw);
+
+        //...Chi2 related...
+        dDda = (vmag > 0.)
+               ? ((v.x() * (1. - vw.x() * vw.x()) -
+                   v.y() * vw.x() * vw.y() - v.z() * vw.x() * vw.z())
+                  * dxda +
+                  (v.y() * (1. - vw.y() * vw.y()) -
+                   v.z() * vw.y() * vw.z() - v.x() * vw.y() * vw.x())
+                  * dyda +
+                  (v.z() * (1. - vw.z() * vw.z()) -
+                   v.x() * vw.z() * vw.x() - v.y() * vw.z() * vw.y())
+                  * dzda) / vmag : CLHEP::HepVector(4, 0);
+        if (vmag <= 0.0) {
+          std::cout << "    in fit " << onTrack << ", " << onWire;
+          h.dump();
+        }
+        dchi2da += (dDistance / eDistance2) * dDda;
+        d2chi2d2a += vT_times_v(dDda) / eDistance2;
+        double pChi2 = dDistance * dDistance / eDistance2;
+        chi2 += pChi2;
+
+        //...Store results...
+        l->update(onTrack, onWire, leftRight, pChi2);
       }
-      dchi2da += (dDistance / eDistance2) * dDda;
-      d2chi2d2a += vT_times_v(dDda) / eDistance2;
-      double pChi2 = dDistance * dDistance / eDistance2;
-      chi2 += pChi2;
-      
-      //...Store results...
-      l->update(onTrack, onWire, leftRight, pChi2);
+
+      //...Check condition...
+      double change = chi2Old - chi2;
+
+      if (fabs(change) < 1.0e-5) break;
+      if (change < 0.) {
+        a += factor * da; //recover
+        factor *= 0.1;
+      } else {
+        chi2Old = chi2;
+        if (flag2D) {
+          f = dchi2da.sub(1, 2);
+          e = d2chi2d2a.sub(1, 2);
+          f = solve(e, f);
+          da[0] = f[0];
+          da[1] = f[1];
+          da[2] = 0;
+          da[3] = 0;
+        } else {
+          //...Cal. helix parameters for next loop...
+          da = solve(d2chi2d2a, dchi2da);
+        }
+      }
+      a -= factor * da;
+      t.a(a);
+      ++nTrial;
     }
 
-    //...Check condition...
-    double change = chi2Old - chi2;
-
-    if (fabs(change) < 1.0e-5) break;
-    if (change < 0.) {
-      a += factor * da;	//recover
-      factor *= 0.1;
-    }else{
-      chi2Old = chi2;
-      if(flag2D){
-	f = dchi2da.sub(1,2);
-	e = d2chi2d2a.sub(1,2);
-	f = solve(e,f);
-	da[0]=f[0];
-	da[1]=f[1];
-	da[2]= 0;
-	da[3]= 0;
-      }else{
-	//...Cal. helix parameters for next loop...
-	da = solve(d2chi2d2a, dchi2da);
-      }
+    //...Cal. error matrix...
+    CLHEP::HepSymMatrix Ea(4, 0);
+    unsigned dim;
+    if (flag2D) {
+      dim = 2;
+      CLHEP::HepSymMatrix Eb(3, 0), Ec(3, 0);
+      Eb = d2chi2d2a.sub(1, 3);
+      Ec = Eb.inverse(err);
+      Ea[0][0] = Ec[0][0];
+      Ea[0][1] = Ec[0][1];
+      Ea[0][2] = Ec[0][2];
+      Ea[1][1] = Ec[1][1];
+      Ea[1][2] = Ec[1][2];
+      Ea[2][2] = Ec[2][2];
+    } else {
+      dim = 4;
+      Ea = d2chi2d2a.inverse(err);
     }
-    a -= factor * da;
-    t.a(a);
-    ++nTrial;
+
+    //...Store information...
+    if (! err) {
+      t.a(a);
+      t.Ea(Ea);
+      t._fitted = true;
+      if (flag2D) err = T3DLine2DFit;
+    } else {
+      err = TFitFailed;
+    }
+
+    t._ndf = nCores - dim;
+    t._chi2 = chi2;
+
+    //...Recover pivot...
+    t.pivot(pivot_bak);
+
+    return err;
   }
 
-  //...Cal. error matrix...
-  CLHEP::HepSymMatrix Ea(4,0);
-  unsigned dim;
-  if(flag2D){
-    dim=2;
-    CLHEP::HepSymMatrix Eb(3,0),Ec(3,0);
-    Eb = d2chi2d2a.sub(1,3);
-    Ec = Eb.inverse(err);
-    Ea[0][0] = Ec[0][0];
-    Ea[0][1] = Ec[0][1];
-    Ea[0][2] = Ec[0][2];
-    Ea[1][1] = Ec[1][1];
-    Ea[1][2] = Ec[1][2];
-    Ea[2][2] = Ec[2][2];
-  }else{
-    dim=4;
-    Ea = d2chi2d2a.inverse(err);
-  }
+  int T3DLineFitter::dxda(const TLink& l, const T3DLine& t,
+                          CLHEP::HepVector & dxda, CLHEP::HepVector & dyda, CLHEP::HepVector & dzda,
+                          HepGeom::Vector3D<double> & wireDirection) const
+  {
+    //   onTrack = x0 + t * k
+    //   onWire  = w0 + s * wireDirection
+    //...Setup...
+    const Belle2::TRGCDCWire& w = *l.wire();
+    const HepGeom::Vector3D<double> k = t.k();
+    const double cosPhi0 = t.cosPhi0();
+    const double sinPhi0 = t.sinPhi0();
+    const double dr = t.dr();
+    const Point3D& onWire = l.positionOnWire();
+    // const Point3D& onTrack = l.positionOnTrack();
+    // const HepGeom::Vector3D<double> u = onTrack - onWire;
+    const double t_t = (onWire - t.x0()).dot(k) / k.mag2();
 
-  //...Store information...
-  if(! err){
-    t.a(a);
-    t.Ea(Ea);
-    t._fitted = true;
-    if (flag2D) err = T3DLine2DFit;
-  }else{
-    err = TFitFailed;
-  }
-
-  t._ndf = nCores - dim;
-  t._chi2 = chi2;
-
-  //...Recover pivot...
-  t.pivot(pivot_bak);
-
-  return err;
-}
-
-int T3DLineFitter::dxda(const TLink& l,const T3DLine& t,
-			CLHEP::HepVector & dxda, CLHEP::HepVector & dyda, CLHEP::HepVector & dzda,
-			HepGeom::Vector3D<double> & wireDirection) const{
-  //   onTrack = x0 + t * k
-  //   onWire  = w0 + s * wireDirection
-  //...Setup...
-  const Belle2::TRGCDCWire& w = *l.wire();
-  const HepGeom::Vector3D<double> k = t.k();
-  const double cosPhi0 = t.cosPhi0();
-  const double sinPhi0 = t.sinPhi0();
-  const double dr = t.dr();
-  const Point3D& onWire = l.positionOnWire();
-  // const Point3D& onTrack = l.positionOnTrack();
-  // const HepGeom::Vector3D<double> u = onTrack - onWire;
-  const double t_t = (onWire - t.x0()).dot(k)/k.mag2();
-
-  //...Sag correction...
-  HepGeom::Point3D<double> xw = w.xyPosition();
-  HepGeom::Point3D<double> wireBackwardPosition = w.backwardPosition();
-  wireDirection = w.direction();
-  std::cout << "T3DLineFitter::dxda !!! sag correction is not implemented"
-	 << std::endl;
+    //...Sag correction...
+    HepGeom::Point3D<double> xw = w.xyPosition();
+    HepGeom::Point3D<double> wireBackwardPosition = w.backwardPosition();
+    wireDirection = w.direction();
+    std::cout << "T3DLineFitter::dxda !!! sag correction is not implemented"
+              << std::endl;
 //   if (_sag) w.wirePosition(onWire.z(),
-// 			   xw,
-// 			   wireBackwardPosition,
-// 			   (HepGeom::Vector3D<double> &) wireDirection);
-  const HepGeom::Vector3D<double> & v = wireDirection;
+//         xw,
+//         wireBackwardPosition,
+//         (HepGeom::Vector3D<double> &) wireDirection);
+    const HepGeom::Vector3D<double> & v = wireDirection;
 
-  // onTrack = x0 + t * k
-  // onWire  = w0 + s * v
+    // onTrack = x0 + t * k
+    // onWire  = w0 + s * v
 
-  const double v_k = v.dot(k);
-  const double tvk = v_k*v_k-k.mag2();
-  if(tvk==0) return(-1);
+    const double v_k = v.dot(k);
+    const double tvk = v_k * v_k - k.mag2();
+    if (tvk == 0) return(-1);
 
-  const HepGeom::Vector3D<double> & dxdt_a = k;
+    const HepGeom::Vector3D<double> & dxdt_a = k;
 
-  const HepGeom::Vector3D<double> dxda_t[4]
-    ={HepGeom::Vector3D<double>(cosPhi0,sinPhi0,0),
-      HepGeom::Vector3D<double>(-dr*sinPhi0-t_t*cosPhi0,dr*cosPhi0-t_t*sinPhi0,0),
-      HepGeom::Vector3D<double>(0,0,1),
-      HepGeom::Vector3D<double>(0,0,t_t)};
+    const HepGeom::Vector3D<double> dxda_t[4]
+    = {HepGeom::Vector3D<double>(cosPhi0, sinPhi0, 0),
+       HepGeom::Vector3D<double>(-dr*sinPhi0 - t_t*cosPhi0, dr*cosPhi0 - t_t*sinPhi0, 0),
+       HepGeom::Vector3D<double>(0, 0, 1),
+       HepGeom::Vector3D<double>(0, 0, t_t)
+      };
 
-  const HepGeom::Vector3D<double> dx0da[4]
-    ={HepGeom::Vector3D<double>(cosPhi0,sinPhi0,0),
-      HepGeom::Vector3D<double>(-dr*sinPhi0,dr*cosPhi0,0),
-      HepGeom::Vector3D<double>(0,0,1),
-      HepGeom::Vector3D<double>(0,0,0)};
+    const HepGeom::Vector3D<double> dx0da[4]
+    = {HepGeom::Vector3D<double>(cosPhi0, sinPhi0, 0),
+       HepGeom::Vector3D<double>(-dr*sinPhi0, dr*cosPhi0, 0),
+       HepGeom::Vector3D<double>(0, 0, 1),
+       HepGeom::Vector3D<double>(0, 0, 0)
+      };
 
-  const HepGeom::Vector3D<double> dkda[4]
-    ={HepGeom::Vector3D<double>(0,0,0),
-      HepGeom::Vector3D<double>(-cosPhi0,-sinPhi0,0),
-      HepGeom::Vector3D<double>(0,0,0),
-      HepGeom::Vector3D<double>(0,0,1)};
+    const HepGeom::Vector3D<double> dkda[4]
+    = {HepGeom::Vector3D<double>(0, 0, 0),
+       HepGeom::Vector3D<double>(-cosPhi0, -sinPhi0, 0),
+       HepGeom::Vector3D<double>(0, 0, 0),
+       HepGeom::Vector3D<double>(0, 0, 1)
+      };
 
-  const HepGeom::Vector3D<double> d = t.x0() - wireBackwardPosition;
-  const HepGeom::Vector3D<double> kvkv = k - v_k*v;
+    const HepGeom::Vector3D<double> d = t.x0() - wireBackwardPosition;
+    const HepGeom::Vector3D<double> kvkv = k - v_k * v;
 
-  for(int i=0;i<4;i++){
-    const double v_dkda = v.dot(dkda[i]);
+    for (int i = 0; i < 4; i++) {
+      const double v_dkda = v.dot(dkda[i]);
 
-    const double dtda = dx0da[i].dot(kvkv)/tvk
-                      + d.dot(dkda[i]-v_dkda*v)/tvk
-                      - d.dot(kvkv)*2*(v_k*v_dkda-k.dot(dkda[i]))/(tvk*tvk);
+      const double dtda = dx0da[i].dot(kvkv) / tvk
+                          + d.dot(dkda[i] - v_dkda * v) / tvk
+                          - d.dot(kvkv) * 2 * (v_k * v_dkda - k.dot(dkda[i])) / (tvk * tvk);
 
-    const HepGeom::Vector3D<double> dxda3D = dxda_t[i] + dtda*dxdt_a;
+      const HepGeom::Vector3D<double> dxda3D = dxda_t[i] + dtda * dxdt_a;
 
-    dxda[i] = dxda3D.x();
-    dyda[i] = dxda3D.y();
-    dzda[i] = dxda3D.z();
+      dxda[i] = dxda3D.x();
+      dyda[i] = dxda3D.y();
+      dzda[i] = dxda3D.z();
+    }
+
+    return 0;
   }
-    
-  return 0;
-}
 
 } // namespace Belle
 

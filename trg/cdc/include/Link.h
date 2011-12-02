@@ -14,6 +14,7 @@
 #ifndef TRGCDCLink_FLAG_
 #define TRGCDCLink_FLAG_
 
+#include <cstring>
 #include "CLHEP/Geometry/Point3D.h"
 #include "trg/cdc/Wire.h"
 #include "trg/cdc/WireHit.h"

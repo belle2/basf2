@@ -15,6 +15,7 @@
 #define TRGCDC_SHORT_NAMES
 
 #include <string>
+#include <cstring>
 #include "trg/trg/Constants.h"
 #include "trg/trg/Utilities.h"
 #include "trg/cdc/WireHit.h"

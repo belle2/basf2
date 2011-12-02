@@ -10,7 +10,6 @@
 
 
 #include <eklm/simeklm/EKLMSensitiveDetector.h>
-#include <eklm/dataobjects/EKLMStepHit.h>
 
 #include <framework/logging/Logger.h>
 #include <eklm/geoeklm/G4PVPlacementGT.h>
@@ -40,7 +39,7 @@ namespace Belle2 {
   //-----------------------------------------------------
   bool EKLMSensitiveDetector::step(G4Step *aStep, G4TouchableHistory *)
   {
-
+    std::cout << "EKLM SD called" << std::endl;
     /**
      * Get deposited energy
      */
@@ -129,11 +128,12 @@ namespace Belle2 {
     const int paretntTrackID = track.GetParentID();
 
 
+    std::cout << "EKLM SD creates a hit in " << ((G4PVPlacementGT*)pv)->getName() << " volume" << std::endl;
+
     /**
      * creates step hit and store in to DataStore
      */
-    StoreArray<EKLMStepHit> stepHitsArray;
-    EKLMStepHit *hit = new(stepHitsArray->AddrAt(stepHitsArray.getEntries()))
+    EKLMStepHit *hit = new(m_stepHitsArray->AddrAt(m_stepHitsArray.getEntries()))
     EKLMStepHit(PDGcode, hitTime, Ekin, gposRoot, momentumRoot, eDep, trackID, paretntTrackID, pv);
     if (hit == NULL) {
       B2ERROR("EKLMSensitiveDetector.cc:: Memory allocation error. Cannot allocate hit in stepHitsArray");

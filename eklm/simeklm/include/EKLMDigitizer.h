@@ -23,6 +23,9 @@
 
 
 
+#include <framework/datastore/StoreArray.h>
+
+
 namespace Belle2 {
 
 
@@ -99,6 +102,16 @@ namespace Belle2 {
      * sim hits vector
      */
     std::vector<EKLMSimHit*> m_simHitsVector;
+
+    /**
+     * SimHit storage initialization
+     */
+    StoreArray<EKLMSimHit> m_simHitsArray;
+
+    /**
+     * StripHit storage initialization
+     */
+    StoreArray<EKLMStripHit> m_stripHitsArray;
 
 
   };

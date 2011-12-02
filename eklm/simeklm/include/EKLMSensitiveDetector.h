@@ -12,6 +12,7 @@
 #define EKLMSENSETIVEDETECTOR_H
 
 #include <simulation/kernel/SensitiveDetectorBase.h>
+#include <eklm/dataobjects/EKLMStepHit.h>
 
 
 namespace Belle2 {
@@ -61,6 +62,12 @@ namespace Belle2 {
      * 1 - bkg studies
      */
     int m_mode;
+
+    /**
+     * initialize array for hit stogare
+     */
+    StoreArray<EKLMStepHit> m_stepHitsArray;
+
 
 
   };

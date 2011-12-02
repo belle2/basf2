@@ -10,9 +10,7 @@
 
 #include <eklm/simeklm/EKLMDigitizer.h>
 #include <eklm/simeklm/EKLMFiberAndElectronics.h>
-#include <eklm/dataobjects/EKLMSimHit.h>
 
-#include <framework/datastore/StoreArray.h>
 #include <framework/logging/Logger.h>
 
 #include "G4VPhysicalVolume.hh"
@@ -56,7 +54,7 @@ namespace Belle2 {
     using namespace boost;
     B2DEBUG(1, "EKLMDigitizer::makeSimHits()");
 
-    StoreArray<EKLMSimHit> simHitsArray;
+
 
 
     //loop over volumes
@@ -147,7 +145,7 @@ namespace Belle2 {
         if (current == graphComponentToSimHit.end()) {    // no  entry for this component
 
           // create new EKLMSimHit and store all information into it
-          EKLMSimHit *simHit = new(simHitsArray->AddrAt(simHitsArray.getEntries()))  EKLMSimHit();
+          EKLMSimHit *simHit = new(m_simHitsArray->AddrAt(m_simHitsArray.getEntries()))  EKLMSimHit();
           // insert hit to the map
           graphComponentToSimHit.insert(pair<int, EKLMSimHit*>(component[distance(hitMap.begin(), hitIterator)], simHit));
           simHit->setGlobalPos(stepHit->getPosition());
@@ -193,27 +191,22 @@ namespace Belle2 {
 
 
 
-
-
-
-
-
   void EKLMDigitizer::readAndSortSimHits()
   {
-    StoreArray<EKLMSimHit> simHitsArray;
-    for (int i = 0; i < simHitsArray.getEntries(); i++) {
+
+    for (int i = 0; i < m_simHitsArray.getEntries(); i++) {
 
       // search for entries of the same strip
       map<const G4VPhysicalVolume *, vector<EKLMSimHit*> >::iterator
-      it = m_HitStripMap.find((simHitsArray[i])->getVolume());
+      it = m_HitStripMap.find((m_simHitsArray[i])->getVolume());
 
       if (it == m_HitStripMap.end()) { //  new entry
         vector<EKLMSimHit*> *vectorHits =
-          new vector<EKLMSimHit*> (1, (simHitsArray[i]));
+          new vector<EKLMSimHit*> (1, (m_simHitsArray[i]));
         m_HitStripMap.insert(pair<const G4VPhysicalVolume *, vector<EKLMSimHit*> >
-                             ((simHitsArray[i])->getVolume(), *vectorHits));
+                             ((m_simHitsArray[i])->getVolume(), *vectorHits));
       } else {
-        it->second.push_back(simHitsArray[i]);
+        it->second.push_back(m_simHitsArray[i]);
       }
     }
 
@@ -235,8 +228,7 @@ namespace Belle2 {
 
       EKLMSimHit *simHit = it->second.front();
 
-      StoreArray<EKLMStripHit> stripHitsArray;
-      EKLMStripHit *stripHit = new(stripHitsArray->AddrAt(stripHitsArray.getEntries()))EKLMStripHit();
+      EKLMStripHit *stripHit = new(m_stripHitsArray->AddrAt(m_stripHitsArray.getEntries()))EKLMStripHit();
 
       //      EKLMStripHit *stripHit = new EKLMStripHit();
 

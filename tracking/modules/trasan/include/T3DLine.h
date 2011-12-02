@@ -40,7 +40,7 @@
 #define T3DLine_FLAG_
 #include "CLHEP/Geometry/Vector3D.h"
 
-#define Line3D  32
+#define Line3D	32
 // This must be writen in TTrackBase.h
 
 
@@ -56,115 +56,114 @@
 
 namespace Belle {
 
-  typedef HepGeom::Point3D<double>  Point3D;
-  class T3DLineFitter;
-  class TTrack;
-  class TLink;
+typedef HepGeom::Point3D<double>  Point3D;
+class T3DLineFitter;
+class TTrack;
+class TLink;
 
 /// A class to represent a track in tracking.
-  class T3DLine : public TTrackBase {
+class T3DLine : public TTrackBase {
 
-  public:
-    /// Constructors
-    T3DLine();
-    T3DLine(const TTrack&);
-    T3DLine(const T3DLine&);
+public:
+  /// Constructors
+  T3DLine();
+  T3DLine(const TTrack&);
+  T3DLine(const T3DLine&);
 
-    /// Destructor
-    virtual ~T3DLine();
+  /// Destructor
+  virtual ~T3DLine();
 
-  public:// Extractors
-    /// Track parameters
-    double dr(void) const;
-    double phi0(void) const;
-    double dz(void) const;
-    double tanl(void) const;
+public:// Extractors
+  /// Track parameters
+  double dr(void) const;
+  double phi0(void) const;
+  double dz(void) const;
+  double tanl(void) const;
 
-    double cosPhi0(void) const;
-    double sinPhi0(void) const;
+  double cosPhi0(void) const;
+  double sinPhi0(void) const;
 
-    CLHEP::HepVector a(void) const;   //dr,phi0,dz,tanl
+  CLHEP::HepVector a(void) const;		//dr,phi0,dz,tanl
 
-    /// returns error matrix
-    const CLHEP::HepSymMatrix& Ea(void) const;
+  /// returns error matrix
+  const CLHEP::HepSymMatrix& Ea(void) const;
 
-    /// pivot position
-    const HepGeom::Point3D<double>  & pivot(void) const;
+  /// pivot position
+  const HepGeom::Point3D<double>  & pivot(void) const;
 
-    /// approximated helix class
-    THelix helix(void) const;
+  /// approximated helix class
+  THelix helix(void) const;
 
-    /// returns NDF
-    unsigned ndf(void) const;
+  /// returns NDF
+  unsigned ndf(void) const;
 
-    /// returns chi2.
-    double chi2(void) const;
+  /// returns chi2.
+  double chi2(void) const;
 
-    /// returns reduced-chi2
-    double reducedchi2(void) const;
+  /// returns reduced-chi2
+  double reducedchi2(void) const;
 
-    /// returns object type
-    unsigned objectType(void) const;
+  /// returns object type
+  unsigned objectType(void) const;
 
-  public:// Executors
+public:// Executors
 
-  public:// Utilities
-    /// returns position on 3D line
-    HepGeom::Point3D<double>  x(double) const;
+public:// Utilities
+  /// returns position on 3D line
+  HepGeom::Point3D<double>  x(double) const;
 
-    /// returns 3D line component    x(t)=x0 + t * k
-    HepGeom::Point3D<double>  x0(void) const;
-    HepGeom::Vector3D<double> k(void) const;
+  /// returns 3D line component    x(t)=x0 + t * k
+  HepGeom::Point3D<double>  x0(void) const;
+  HepGeom::Vector3D<double> k(void) const;
 
-    /// calculates the closest approach to a wire in real space. Results are stored in TLink. Return value is negative if error happened.
-    int approach(TLink &, bool sagCorrection = true) const;
+  /// calculates the closest approach to a wire in real space. Results are stored in TLink. Return value is negative if error happened.
+  int approach(TLink &, bool sagCorrection = true) const;
 
-    /// caluculate closest points between a line and this track
-    int approach_line(const HepGeom::Point3D<double> &, const HepGeom::Vector3D<double> &,
-                      HepGeom::Point3D<double> & onLine, HepGeom::Point3D<double> & onTrack) const;
+  /// caluculate closest points between a line and this track
+  int approach_line(const HepGeom::Point3D<double> &,const HepGeom::Vector3D<double> &,
+		    HepGeom::Point3D<double> & onLine,HepGeom::Point3D<double> & onTrack) const;
 
-    /// caluculate closest point between a point and this track
-    int approach_point(const HepGeom::Point3D<double> &, HepGeom::Point3D<double> & onTrack) const;
+  /// caluculate closest point between a point and this track
+  int approach_point(const HepGeom::Point3D<double> &,HepGeom::Point3D<double> & onTrack) const;
 
-  public:// Modifiers
-    /// set new pivot
-    const HepGeom::Point3D<double>  & pivot(const HepGeom::Point3D<double> &);
+public:// Modifiers
+  /// set new pivot
+  const HepGeom::Point3D<double>  & pivot(const HepGeom::Point3D<double> &);
 
-    /// set track parameters,pivot
-    void set(const HepGeom::Point3D<double> &, double t_dr, double t_phi0, double t_dz, double t_tanl);
+  /// set track parameters,pivot
+  void set(const HepGeom::Point3D<double> &,double t_dr,double t_phi0,double t_dz,double t_tanl);
 
-    /// set track parameters
-    CLHEP::HepVector a(const CLHEP::HepVector &);
+  /// set track parameters
+  CLHEP::HepVector a(const CLHEP::HepVector &);
 
-    /// set error matrix
-    const CLHEP::HepSymMatrix& Ea(const CLHEP::HepSymMatrix&);
+  /// set error matrix
+  const CLHEP::HepSymMatrix& Ea(const CLHEP::HepSymMatrix&);
 
-  private:
-    HepGeom::Point3D<double>  _pivot;
-    // Updated when fitted
-    double _dr;
-    double _phi0;
-    double _dz;
-    double _tanl;
+private:
+  HepGeom::Point3D<double>  _pivot;
+  // Updated when fitted
+  double _dr;
+  double _phi0;
+  double _dz;
+  double _tanl;
 
-    CLHEP::HepSymMatrix _Ea;
+  CLHEP::HepSymMatrix _Ea;
 
-    double _chi2;
-    unsigned _ndf;
+  double _chi2;
+  unsigned _ndf;
 
-    //Cashe
-    double _cos_phi0;
-    double _sin_phi0;
+  //Cashe
+  double _cos_phi0;
+  double _sin_phi0;
 
-    static const T3DLineFitter _fitter;
+  static const T3DLineFitter _fitter;
 
-    friend class T3DLineFitter;
-  };
+  friend class T3DLineFitter;
+};
 
-  inline unsigned T3DLine::objectType(void) const
-  {
-    return Line3D;
-  }
+inline unsigned T3DLine::objectType(void) const{
+  return Line3D;
+}
 
 } // namespace Belle
 

@@ -58,11 +58,11 @@
 
 namespace Belle {
 
-  class TTrackBase;
-  class TCircle;
+class TTrackBase;
+class TCircle;
 
 /// A class to select a TTrackBase object.
-  class TSelector {
+class TSelector {
 
   public:
     /// Constructor.
@@ -110,7 +110,7 @@ namespace Belle {
 
     /// dumps debug information.
     void dump(const std::string & message = std::string(""),
-              const std::string & prefix = std::string("")) const;
+	      const std::string & prefix = std::string("")) const;
 
   private:
     bool _nLinksDefined;
@@ -122,7 +122,7 @@ namespace Belle {
     unsigned _nLinksStereo;
     unsigned _nSuperLayers;
     float _minPt;
-  };
+};
 
 //-----------------------------------------------------------------------------
 
@@ -135,81 +135,73 @@ namespace Belle {
 
 #ifdef TSelector_INLINE_DEFINE_HERE
 
-  inline
-  unsigned
-  TSelector::nLinks(void) const
-  {
+inline
+unsigned
+TSelector::nLinks(void) const {
 #ifdef TRASAN_DEBUG
     if (! _nLinksDefined)
-      std::cout << "TSelector !!! min. nLinks is not defined" << std::endl;
+	std::cout << "TSelector !!! min. nLinks is not defined" << std::endl;
 #endif
     return _nLinks;
-  }
+}
 
-  inline
-  unsigned
-  TSelector::nLinks(unsigned a)
-  {
+inline
+unsigned
+TSelector::nLinks(unsigned a) {
     _nLinksDefined = true;
     return _nLinks = a;
-  }
+}
 
-  inline
-  unsigned
-  TSelector::nSuperLayers(void) const
-  {
+inline
+unsigned
+TSelector::nSuperLayers(void) const {
 #ifdef TRASAN_DEBUG
     if (! _nSuperLayers)
-      std::cout << "TSelector !!! min. nSuperLayers is not defined" << std::endl;
+	std::cout << "TSelector !!! min. nSuperLayers is not defined" << std::endl;
 #endif
     return _nSuperLayers;
-  }
+}
 
-  inline
-  unsigned
-  TSelector::nSuperLayers(unsigned a)
-  {
+inline
+unsigned
+TSelector::nSuperLayers(unsigned a) {
     _nSuperLayersDefined = true;
     return _nSuperLayers = a;
-  }
+}
 
-  inline
-  double
-  TSelector::minPt(void) const
-  {
+inline
+double
+TSelector::minPt(void) const {
 #ifdef TRASAN_DEBUG
     if (! _minPtDefined)
-      std::cout << "TSelector !!! min. pt is not defined" << std::endl;
+	std::cout << "TSelector !!! min. pt is not defined" << std::endl;
 #endif
     return _minPt;
-  }
+}
 
-  inline
-  double
-  TSelector::minPt(double a)
-  {
+inline
+double
+TSelector::minPt(double a) {
     _minPtDefined = true;
     return _minPt = a;
-  }
+}
 
-  inline
-  unsigned
-  TSelector::nLinksStereo(void) const
-  {
+inline
+unsigned
+TSelector::nLinksStereo(void) const {
 #ifdef TRASAN_DEBUG
     if (! _nLinksStereoDefined)
-      std::cout << "TSelector !!! min. nLinksStereo is not defined" << std::endl;
+	std::cout << "TSelector !!! min. nLinksStereo is not defined" << std::endl;
 #endif
     return _nLinksStereo;
-  }
+}
 
-  inline
-  unsigned
-  TSelector::nLinksStereo(unsigned a)
-  {
+inline
+unsigned
+TSelector::nLinksStereo(unsigned a) {
     _nLinksStereoDefined = true;
     return _nLinksStereo = a;
-  }
+}
 
 #endif
 

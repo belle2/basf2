@@ -34,37 +34,37 @@
 namespace Belle {
 #endif
 
-  class THoughPlane;
+class THoughPlane;
 
 /// A class to display tracking object in Hough Finder.
-  class TWindowHough : public TWindow {
-
+class TWindowHough : public TWindow {
+    
   public:
     /// Default constructor
     TWindowHough(const std::string & name, int xSize = 600, int ySize = 600);
-
+    
     /// Destructor
     virtual ~TWindowHough();
-
+    
   public:
     /// draws Hough plane.
     void draw(const THoughPlane &);
 
     /// draws peaks.
     void draw(const THoughPlane &,
-              const AList<TPoint2D> & list,
-              float radius,
-              leda_color = leda_green);
+	      const AList<TPoint2D> & list,
+	      float radius,
+	      leda_color = leda_green);
 
     /// appends a circle.
     void drawOver(const THoughPlane &,
-                  const AList<TPoint2D> & list,
-                  float radius,
-                  leda_color = leda_green);
+		  const AList<TPoint2D> & list,
+		  float radius,
+		  leda_color = leda_green);
 
     /// waits.
     void wait(void);
-  };
+};
 
 //-----------------------------------------------------------------------------
 

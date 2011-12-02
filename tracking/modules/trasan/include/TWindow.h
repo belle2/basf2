@@ -95,32 +95,32 @@
 namespace Belle {
 #endif
 
-  typedef HepGeom::Vector3D<double>  Vector3D;
-  class TRGCDCWireHit;
-  class TTrackBase;
-  class TTrack;
-  class TLine;
-  class TWindow;
-  class TSegment;
-  class TSegmentCurl;
-  class TCircle;
-  class TLink;
+typedef HepGeom::Vector3D<double>  Vector3D;
+class TRGCDCWireHit;
+class TTrackBase;
+class TTrack;
+class TLine;
+class TWindow;
+class TSegment;
+class TSegmentCurl;
+class TCircle;
+class TLink;
 
-  extern const TPoint2D AxesOrigin;
+extern const TPoint2D AxesOrigin;
 
 /// A class to display tracking object.
-  class TWindow {
-
+class TWindow {
+    
   public:
     /// Default constructor
     TWindow(const TWindow &);
-
+    
     /// Constructor
     TWindow(const std::string & name, int xSize = 600, int ySize = 600);
-
+    
     /// Destructor
     virtual ~TWindow();
-
+    
   public:
     /// opens window.
     void open(void);
@@ -131,23 +131,23 @@ namespace Belle {
     /// appends/remove objects.
     void append(const AList<TRGCDCWireHit> &, leda_color = leda_black);
     void append(const TTrackBase &,
-                leda_color = leda_black,
-                bool toBeSelfObject = false);
+		leda_color = leda_black,
+		bool toBeSelfObject = false);
     void append(const AList<TSegment> &,
-                leda_color = leda_black,
-                bool toBeSelfObject = false);
+		leda_color = leda_black,
+		bool toBeSelfObject = false);
     void append(const AList<TSegmentCurl> &, leda_color = leda_black);
     void append(const AList<TTrack> &,
-                leda_color = leda_black,
-                bool toBeSelfObject = false);
+		leda_color = leda_black,
+		bool toBeSelfObject = false);
     void append(const TPoint2D &);
     void remove(const TTrackBase &);
     void remove(const AList<TSegment> &);
     void remove(const AList<TTrack> &);
-    void appendSz(const TTrack &, const AList<TLink> &, leda_color = leda_black);
+    void appendSz(const TTrack &, const AList<TLink> &, leda_color=leda_black);
     void appendSz(const TTrack &,
-                  const AList<TSegment> &,
-                  leda_color = leda_black);
+		  const AList<TSegment> &,
+		  leda_color=leda_black);
 
     /// appends TLink's. You can't remove TLink's but you can clear.
     void append(const AList<TLink> &, leda_color = leda_black);
@@ -244,7 +244,7 @@ namespace Belle {
     unsigned _targetRun;
     unsigned _targetEvent;
     unsigned _nEvents;
-  };
+};
 
 //-----------------------------------------------------------------------------
 
@@ -257,138 +257,124 @@ namespace Belle {
 
 #ifdef TWINDOW_INLINE_DEFINE_HERE
 
-  inline
-  void
-  TWindow::append(const TTrackBase & a, leda_color b, bool self)
-  {
+inline
+void
+TWindow::append(const TTrackBase & a, leda_color b, bool self) {
     _objects.append(a);
     _colors.append(new leda_color(b));
     if (self)
-      _selfObjects.append((TTrackBase &) a);
-  }
+	_selfObjects.append((TTrackBase &) a);
+}
 
-  inline
-  void
-  TWindow::append(const AList<TSegment> & a, leda_color b, bool self)
-  {
+inline
+void
+TWindow::append(const AList<TSegment> & a, leda_color b, bool self) {
     for (unsigned i = 0; i < (unsigned) a.length(); i++) {
-      append(*(TTrackBase *) a[i], b);
-      if (self)
-        _selfObjects.append(*(TTrackBase *) a[i]);
+	append(* (TTrackBase *) a[i], b);
+	if (self)
+	    _selfObjects.append(* (TTrackBase *) a[i]);
     }
-  }
+}
 
-  inline
-  void
-  TWindow::append(const AList<TTrack> & a, leda_color b, bool self)
-  {
+inline
+void
+TWindow::append(const AList<TTrack> & a, leda_color b, bool self) {
     for (unsigned i = 0; i < (unsigned) a.length(); i++) {
-      append(*(TTrackBase *) a[i], b);
-      if (self)
-        _selfObjects.append(*(TTrackBase *) a[i]);
+	append(* (TTrackBase *) a[i], b);
+	if (self)
+	    _selfObjects.append(* (TTrackBase *) a[i]);
     }
-  }
+}
 
-  inline
-  void
-  TWindow::remove(const TTrackBase & a)
-  {
+inline
+void
+TWindow::remove(const TTrackBase & a) {
     int i;
     while ((i = _objects.fIndex(a)) != -1) {
-      _objects.remove(i);
-      leda_color * b = _colors[i];
-      _colors.remove(i);
-      delete b;
+	_objects.remove(i);
+	leda_color * b = _colors[i];
+	_colors.remove(i);
+	delete b;
     }
-  }
+}
 
-  inline
-  void
-  TWindow::remove(const AList<TSegment> & a)
-  {
+inline
+void
+TWindow::remove(const AList<TSegment> & a) {
     for (unsigned i = 0; i < (unsigned) a.length(); i++) {
-      remove(*(TTrackBase *) a[i]);
+	remove(* (TTrackBase *) a[i]);
     }
-  }
+}
 
-  inline
-  void
-  TWindow::remove(const AList<TTrack> & a)
-  {
+inline
+void
+TWindow::remove(const AList<TTrack> & a) {
     for (unsigned i = 0; i < (unsigned) a.length(); i++) {
-      remove(*(TTrackBase *) a[i]);
+	remove(* (TTrackBase *) a[i]);
     }
-  }
+}
 
-  inline
-  void
-  TWindow::open(void)
-  {
+inline
+void
+TWindow::open(void) {
     if (! target()) return;
     if (! _display) {
-      if (_mode == 1) {
-        _xmin = -1;
-        _xmax = 7;
-        _ymin = -1;
-        _window.init(_xmin, _xmax, _ymin);
-      }
-      _window.display();
+	if (_mode == 1) {
+	    _xmin = -1;
+	    _xmax = 7;
+	    _ymin = -1;
+	    _window.init(_xmin, _xmax, _ymin);
+	}
+	_window.display();
     }
     _display = true;
-  }
+}
 
-  inline
-  unsigned
-  TWindow::mode(unsigned a)
-  {
+inline
+unsigned
+TWindow::mode(unsigned a) {
     if (a == 2) {
-      _stereo = true;
-      _axial = false;
+	_stereo = true;
+	_axial = false;
     }
     return _mode = a;
-  }
+}
 
-  inline
-  bool
-  TWindow::skip(bool a)
-  {
+inline
+bool
+TWindow::skip(bool a) {
     return _skip = a;
-  }
+}
 
-  inline
-  bool
-  TWindow::skipAllWindow(bool a)
-  {
+inline
+bool
+TWindow::skipAllWindow(bool a) {
     return _skipAllWindow = a;
-  }
+}
 
-  inline
-  void
-  TWindow::text(const std::string & text)
-  {
+inline
+void
+TWindow::text(const std::string & text) {
     _text = text;
-  }
+}
 
-  inline
-  std::string
-  TWindow::text(void) const
-  {
+inline
+std::string
+TWindow::text(void) const {
     return _text;
-  }
+}
 
-  inline
-  bool
-  TWindow::stereo(bool a)
-  {
+inline
+bool
+TWindow::stereo(bool a) {
     return _stereo = a;
-  }
+}
 
-  inline
-  void
-  TWindow::append(const TPoint2D & a)
-  {
+inline
+void
+TWindow::append(const TPoint2D & a) {
     _selfAxes.append(new TPoint2D(a));
-  }
+}
 
 #endif
 

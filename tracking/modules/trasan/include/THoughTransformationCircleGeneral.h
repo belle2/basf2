@@ -27,7 +27,7 @@
 namespace Belle {
 
 /// A class to represent circle Hough transformation.
-  class THoughTransformationCircleGeneral : public THoughTransformation {
+class THoughTransformationCircleGeneral : public THoughTransformation {
 
   public:
     /// Contructor.
@@ -54,11 +54,11 @@ namespace Belle {
 
     /// returns true if Y diverges in given region.
     virtual bool positiveDiverge(float xReal, float yReal, float x0, float x1)
-    const;
+	const;
 
     /// returns true if Y diverges in given region.
     virtual bool negativeDiverge(float xReal, float yReal, float x0, float x1)
-    const;
+	const;
 
   public:// Modifiers
     /// sets R.
@@ -66,7 +66,7 @@ namespace Belle {
 
   private:
     float _r;
-  };
+};
 
 #ifdef THoughTransformationCircleGeneral_NO_INLINE
 #define inline
@@ -77,39 +77,35 @@ namespace Belle {
 
 #ifdef THoughTransformationCircleGeneral_INLINE_DEFINE_HERE
 
-  inline
-  float
-  THoughTransformationCircleGeneral::r(float a)
-  {
+inline
+float
+THoughTransformationCircleGeneral::r(float a) {
     return _r = a;
-  }
+}
 
-  inline
-  bool
-  THoughTransformationCircleGeneral::diverge(float, float, float, float) const
-  {
+inline
+bool
+THoughTransformationCircleGeneral::diverge(float, float, float, float) const {
     return false;
-  }
+}
 
-  inline
-  bool
-  THoughTransformationCircleGeneral::positiveDiverge(float,
-                                                     float,
-                                                     float,
-                                                     float) const
-  {
+inline
+bool
+THoughTransformationCircleGeneral::positiveDiverge(float,
+						   float,
+						   float,
+						   float) const {
     return false;
-  }
+}
 
-  inline
-  bool
-  THoughTransformationCircleGeneral::negativeDiverge(float,
-                                                     float,
-                                                     float,
-                                                     float) const
-  {
+inline
+bool
+THoughTransformationCircleGeneral::negativeDiverge(float,
+						   float,
+						   float,
+						   float) const {
     return false;
-  }
+}
 
 #endif
 

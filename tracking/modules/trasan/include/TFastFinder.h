@@ -52,10 +52,10 @@
 
 namespace Belle {
 
-  class TLink;
+class TLink;
 
 /// A class to find tracks with the conformal method.
-  class TFastFinder : public TFinderBase {
+class TFastFinder : public TFinderBase {
 
   public:
     /// Constructor.
@@ -73,7 +73,7 @@ namespace Belle {
 
     /// dumps debug information.
     void dump(const std::string & message = std::string(""),
-              const std::string & prefix = std::string("")) const;
+	      const std::string & prefix = std::string("")) const;
 
   public:// Modifiers
     /// clear internal information.
@@ -81,25 +81,25 @@ namespace Belle {
 
     /// finds tracks.
     int doit(const AList<Belle2::TRGCDCWireHit> & axialHits,
-             const AList<Belle2::TRGCDCWireHit> & stereoHits,
-             AList<TTrack> & tracks);
+	     const AList<Belle2::TRGCDCWireHit> & stereoHits,
+	     AList<TTrack> & tracks);
 
   private:
     /// selects isolated hits.(conf.finder type)
     void selectHits(const AList<Belle2::TRGCDCWireHit> & axialHits,
-                    const AList<Belle2::TRGCDCWireHit> & stereoHits);
+		    const AList<Belle2::TRGCDCWireHit> & stereoHits);
 
     /// selects isolated hits.(calling selectSimpleSegments)
     void selectHits2(const AList<Belle2::TRGCDCWireHit> & axialHits,
-                     const AList<Belle2::TRGCDCWireHit> & stereoHits);
+		     const AList<Belle2::TRGCDCWireHit> & stereoHits);
 
     /// selects simple segments.
     void selectSimpleSegments(const AList<Belle2::TRGCDCWireHit> & hits,
-                              AList<Belle2::TRGCDCWireHit> & output) const;
+			      AList<Belle2::TRGCDCWireHit> & output) const;
 
     /// finds close hits.
     AList<TLink> findCloseHits(const AList<TLink> & links,
-                               const TTrack & track) const;
+			       const TTrack & track) const;
 
   private:
     AList<Belle2::TRGCDCWireHit> _axialHits;
@@ -109,7 +109,7 @@ namespace Belle {
 
     TBuilder0 _builder;
     TSelector0 _selector;
-  };
+};
 
 //-----------------------------------------------------------------------------
 
@@ -122,12 +122,11 @@ namespace Belle {
 
 #ifdef TFastFinder_INLINE_DEFINE_HERE
 
-  inline
-  std::string
-  TFastFinder::name(void) const
-  {
+inline
+std::string
+TFastFinder::name(void) const {
     return "Fast Finder";
-  }
+}
 
 #endif
 

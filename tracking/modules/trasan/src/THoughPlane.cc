@@ -23,28 +23,26 @@
 
 namespace Belle {
 
-  THoughPlane::THoughPlane(const std::string & name,
-                           unsigned nX,
-                           float xMin,
-                           float xMax,
-                           unsigned nY,
-                           float yMin,
-                           float yMax)
-      : THoughPlaneBase(name, nX, xMin, xMax, nY, yMin, yMax),
+THoughPlane::THoughPlane(const std::string & name,
+			 unsigned nX,
+			 float xMin,
+			 float xMax,
+			 unsigned nY,
+			 float yMin,
+			 float yMax)
+    : THoughPlaneBase(name, nX, xMin, xMax, nY, yMin, yMax),
 //    _cell(new unsigned[nX * nY * sizeof(unsigned)]),
       _cell(new int[nX * nY]),
       _patterns(0),
-      _nPatterns(0)
-  {
+      _nPatterns(0) {
     clear();
-  }
+}
 
-  THoughPlane::~THoughPlane()
-  {
+THoughPlane::~THoughPlane() {
     delete [] _cell;
     if (_patterns)
-      delete [] _patterns;
-  }
+	delete [] _patterns;
+}
 
 // void
 // THoughPlane::vote(float x, float y) {
@@ -68,9 +66,9 @@ namespace Belle {
 //     locationInPlane(x0, y0, x1, y1, nFound, iX0, iY0, iX1, iY1);
 // #ifdef TRASAN_DEBUG_DETAIL
 //     std::cout << "(x0,y0)=(" << x0 << "," << y0 << "),(iX0,iY0)=(" << iX0
-//        << "," << iY0 << ")" << std::endl;
+// 	      << "," << iY0 << ")" << std::endl;
 //     std::cout << "(x1,y1)=(" << x1 << "," << y1
-//        << "),(iX1,iY1)=(" << iX1 << "," << iY1 << ")" << std::endl;
+// 	      << "),(iX1,iY1)=(" << iX1 << "," << iY1 << ")" << std::endl;
 // #endif
 
 //     //...No cell...
@@ -78,34 +76,34 @@ namespace Belle {
 
 //     //...Same cell...
 //     if ((iX0 == iX1) && (iY0 == iY1)) {
-//  ++_cell[iX0 * nY() + iY0];
-//  return;
+// 	++_cell[iX0 * nY() + iY0];
+// 	return;
 //     }
 
 //     //...X...
 //     else if (iX0 == iX1) {
-//  int iMin = iY0;
-//  int iMax = iY1;
-//  if (iY0 > iY1) {
-//      iMin = iY1;
-//      iMax = iY0;
-//  }
-//  for (int i = iMin; i < (iMax + 1); i++)
-//      ++_cell[iX0 * nY() + i];
-//  return;
+// 	int iMin = iY0;
+// 	int iMax = iY1;
+// 	if (iY0 > iY1) {
+// 	    iMin = iY1;
+// 	    iMax = iY0;
+// 	}
+// 	for (int i = iMin; i < (iMax + 1); i++)
+// 	    ++_cell[iX0 * nY() + i];
+// 	return;
 //     }
 
 //     //...Y...
 //     else if (iY0 == iY1) {
-//  int iMin = iX0;
-//  int iMax = iX1;
-//  if (iX0 > iX1) {
-//      iMin = iX1;
-//      iMax = iX0;
-//  }
-//  for (int i = iMin; i < (iMax + 1); i++)
-//      ++_cell[i * nY() + iY0];
-//  return;
+// 	int iMin = iX0;
+// 	int iMax = iX1;
+// 	if (iX0 > iX1) {
+// 	    iMin = iX1;
+// 	    iMax = iX0;
+// 	}
+// 	for (int i = iMin; i < (iMax + 1); i++)
+// 	    ++_cell[i * nY() + iY0];
+// 	return;
 //     }
 
 //     //...Line...
@@ -124,16 +122,16 @@ namespace Belle {
 //     int iXGrid = 1;
 //     int iYGrid = 1;
 //     if (direction == 1) {
-//  iXGrid = 0;
-//  iYGrid = 1;
+// 	iXGrid = 0;
+// 	iYGrid = 1;
 //     }
 //     else if (direction == 2) {
-//  iXGrid = 0;
-//  iYGrid = 0;
+// 	iXGrid = 0;
+// 	iYGrid = 0;
 //     }
 //     else if (direction == 3) {
-//  iXGrid = 1;
-//  iYGrid = 0;
+// 	iXGrid = 1;
+// 	iYGrid = 0;
 //     }
 
 //     std::cout << "direction=" << direction << std::endl;
@@ -149,69 +147,68 @@ namespace Belle {
 //     unsigned steps = 0;
 //     while (1) {
 
-//  //...Vote this cell...
-//  ++_cell[iX * nY() + iY];
-//  if ((iX == iX1) && (iY == iY1))
-//      break;
+// 	//...Vote this cell...
+// 	++_cell[iX * nY() + iY];
+// 	if ((iX == iX1) && (iY == iY1))
+// 	    break;
 
-//  //...Center of the cell...
-//  TPoint2D center((float(iX) + 0.5) * xSize() + xMin(),
-//      (float(iY) + 0.5) * ySize() + yMin());
+// 	//...Center of the cell...
+// 	TPoint2D center((float(iX) + 0.5) * xSize() + xMin(),
+// 			(float(iY) + 0.5) * ySize() + yMin());
 
-//  //...Set grids...
-//  const float xGrid = (iX + iXGrid) * xSize() + xMin();
-//  const float yGrid = (iY + iYGrid) * ySize() + yMin();
+// 	//...Set grids...
+// 	const float xGrid = (iX + iXGrid) * xSize() + xMin();
+// 	const float yGrid = (iY + iYGrid) * ySize() + yMin();
 
-//  //...Cal. position of cross-points with grids...
-//  TPoint2D crs[2];
-//  crs[0] = TPoint2D((yGrid - offset) / slope, yGrid);
-//  crs[1] = TPoint2D(xGrid, slope * xGrid + offset);
+// 	//...Cal. position of cross-points with grids...
+// 	TPoint2D crs[2];
+// 	crs[0] = TPoint2D((yGrid - offset) / slope, yGrid);
+// 	crs[1] = TPoint2D(xGrid, slope * xGrid + offset);
 
-//  //...Select points on a cell...
-//  unsigned best = 0;
-//  if ((crs[1] - center).mag2() < (crs[0] - center).mag2()) best = 1;
+// 	//...Select points on a cell...
+// 	unsigned best = 0;
+// 	if ((crs[1] - center).mag2() < (crs[0] - center).mag2()) best = 1;
 
 // #ifdef TRASAN_DEBUG_DETAIL
-//  std::cout << "    step " << steps << ":(iX,iY)=" << iX << "," << iY
-//      << "):center=(" << center.x() << "," << center.y()
-//      << "):best=" << best << std::endl;
-//  std::cout << "        crs0=(" << crs[0].x() << "," << crs[0].y()
-//      << "),crs1=(" << crs[1].x() << "," << crs[1].y() << "),"
-//      << std::endl;
-// #endif
+// 	std::cout << "    step " << steps << ":(iX,iY)=" << iX << "," << iY
+// 		  << "):center=(" << center.x() << "," << center.y()
+// 		  << "):best=" << best << std::endl;
+// 	std::cout << "        crs0=(" << crs[0].x() << "," << crs[0].y()
+// 		  << "),crs1=(" << crs[1].x() << "," << crs[1].y() << "),"
+// 		  << std::endl;
+// #endif	
 
-//  //...Move...
-//  if (best == 0) {
-//      if (iYGrid == 1)
-//    ++iY;
-//      else
-//    --iY;
-//  }
-//  else {
-//      if (iXGrid == 1)
-//    ++iX;
-//      else
-//    --iX;
-//  }
+// 	//...Move...
+// 	if (best == 0) {
+// 	    if (iYGrid == 1)
+// 		++iY;
+// 	    else
+// 		--iY;
+// 	}
+// 	else {
+// 	    if (iXGrid == 1)
+// 		++iX;
+// 	    else
+// 		--iX;
+// 	}
 
-//  //...End ?...
-//  ++steps;
-//  if (steps > maxStep) break;
+// 	//...End ?...
+// 	++steps;
+// 	if (steps > maxStep) break;
 //     }
 // }
 
-  void
-  THoughPlane::registerPattern(unsigned)
-  {
+void
+THoughPlane::registerPattern(unsigned) {
     if (_patterns) {
-      delete [] _patterns;
-      _nPatterns = 0;
+	delete [] _patterns;
+	_nPatterns = 0;
     }
     const unsigned n = nX() * nY();
 
     //...Check # of active cells...
     for (unsigned i = 0; i < n; i++)
-      if (_cell[i]) ++_nPatterns;
+	if (_cell[i]) ++_nPatterns;
 
     //...Create array...
     _patterns = new unsigned[_nPatterns];
@@ -219,18 +216,17 @@ namespace Belle {
     //...Store them...
     unsigned j = 0;
     for (unsigned i = 0; i < n; i++)
-      if (_cell[i]) _patterns[j++] = i;
-  }
+	if (_cell[i]) _patterns[j++] = i;
+}
 
-  void
-  THoughPlane::voteByPattern(float xOffset, int weight)
-  {
+void
+THoughPlane::voteByPattern(float xOffset, int weight) {
 #ifdef TRASAN_DEBUG
     if (_patterns == 0)
-      std::cout << "THoughPlane::vote !!! pattern is note defined" << std::endl;
+	std::cout << "THoughPlane::vote !!! pattern is note defined" << std::endl;
     if ((xOffset < 0) || (xOffset > 1))
-      std::cout << "THoughPlane::vote !!! xOffset should be (0 - 1). xOffset="
-                << xOffset << std::endl;
+	std::cout << "THoughPlane::vote !!! xOffset should be (0 - 1). xOffset="
+	       << xOffset << std::endl;
 #endif
 
     const unsigned x = unsigned(nX() * xOffset);
@@ -238,9 +234,9 @@ namespace Belle {
     const unsigned n = nX() * nY();
 
     for (unsigned i = 0; i < _nPatterns; i++) {
-      unsigned id = _patterns[i] + p;
-      if (id > n) id -= n;
-      _cell[id] += weight;
+	unsigned id = _patterns[i] + p;
+	if (id > n) id -= n;
+	_cell[id] += weight;
     }
 
 //     const unsigned x = unsigned(nX() * xOffset);
@@ -248,12 +244,12 @@ namespace Belle {
 //     const unsigned n = nX() * nY();
 //     unsigned j = 0;
 //     for (unsigned i = p; i < n; i++)
-//  _cell[i] += _pattern[j++] * weight;
+// 	_cell[i] += _pattern[j++] * weight;
 //     for (unsigned i = 0; i < p; i++)
-//  _cell[i] += _pattern[j++] * weight;
+// 	_cell[i] += _pattern[j++] * weight;
 
 //    std::cout << "--------------------------------" << std::endl;
-  }
+}
 
 } // namespace Belle
 

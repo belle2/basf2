@@ -21,7 +21,7 @@
 namespace Belle2 {
 
 /// A track finding module using Belle track finder Trasan.
-  class TrasanModule : public Module {
+class TrasanModule : public Module {
 
   public:
 
@@ -50,7 +50,7 @@ namespace Belle2 {
     int _debugLevel;
     int _testParamInt;
     Belle::Trasan _tra;
-  };
+};
 
 } // namespace Belle2
 

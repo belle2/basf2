@@ -142,32 +142,32 @@
 #include "tracking/modules/trasan/TBuilder0.h"
 
 namespace Belle2 {
-  class TRGCDCWireHit;
+    class TRGCDCWireHit;
 }
 
 namespace Belle {
 
 
-  class TLink;
-  class THistogram;
-  class TCircle;
-  class TSegment0;
+class TLink;
+class THistogram;
+class TCircle;
+class TSegment0;
 
 /// A class to find tracks with the conformal method.
-  class TConformalFinder0 : public TFinderBase {
+class TConformalFinder0 : public TFinderBase {
 
   public:
     /// Constructor.
     TConformalFinder0(float maxSigma,
-                      float fraction,
-                      float stereoZ3,
-                      float stereoZ4,
-                      float stereoChisq3,
-                      float stereoChisq4,
-                      float stereoMaxSigma,
-                      unsigned fittingCorrections,
-                      float salvageLevel,
-                      bool cosmic);
+		      float fraction,
+		      float stereoZ3,
+		      float stereoZ4,
+		      float stereoChisq3,
+		      float stereoChisq4,
+		      float stereoMaxSigma,
+		      unsigned fittingCorrections,
+		      float salvageLevel,
+		      bool cosmic);
 
     /// Destructor
     virtual ~TConformalFinder0();
@@ -181,7 +181,7 @@ namespace Belle {
 
     /// dumps debug information.
     void dump(const std::string & message = std::string(""),
-              const std::string & prefix = std::string("")) const;
+	      const std::string & prefix = std::string("")) const;
 
     /// returns a list of conformal links.
     const AList<TLink> & axialConformalLinks(void) const;
@@ -198,20 +198,20 @@ namespace Belle {
 
     /// finds tracks.
     int doit(const CAList<Belle2::TRGCDCWireHit> & axialHits,
-             const CAList<Belle2::TRGCDCWireHit> & stereoHits,
-             AList<TTrack> & tracks,
-             AList<TTrack> & tracks3D);
+	     const CAList<Belle2::TRGCDCWireHit> & stereoHits,
+	     AList<TTrack> & tracks,
+	     AList<TTrack> & tracks3D);
 
-    /// transforms hits into a conformal plane. 'center' is a center of the transformation. Z position of 'center' must be zero. Transformed positions are newly created, and are stored in 'links'.
+    /// transforms hits into a conformal plane. 'center' is a center of the transformation. Z position of 'center' must be zero. Transformed positions are newly created, and are stored in 'links'. 
     static void conformalTransformation(const HepGeom::Point3D<double>  & center,
-                                        const CAList<Belle2::TRGCDCWireHit> & hits,
-                                        AList<TLink> & links);
+					const CAList<Belle2::TRGCDCWireHit> & hits,
+					AList<TLink> & links);
 
-    /// transforms hits into a conformal plane. 'center' is a center of the transformation. Z position of 'center' must be zero. Transformed positions are newly created, and are stored in 'links'.
+    /// transforms hits into a conformal plane. 'center' is a center of the transformation. Z position of 'center' must be zero. Transformed positions are newly created, and are stored in 'links'. 
     static void conformalTransformationRphi(const HepGeom::Point3D<double>  & center,
-                                            const CAList<Belle2::TRGCDCWireHit> & hits,
-                                            AList<TLink> & links);
-
+					    const CAList<Belle2::TRGCDCWireHit> & hits,
+					    AList<TLink> & links);
+    
     /// finds segments.
     AList< AList<TSegment0> > findSegments(const AList<TLink> & in) const;
     AList< AList<TSegment0> > findSegments2(const AList<TLink> & in) const;
@@ -230,18 +230,18 @@ namespace Belle {
   private:
     /// returns a list of links close to a track.
     AList<TLink> findCloseHits(const AList<TLink> & in,
-                               const TTrack & track) const;
+			       const TTrack & track) const;
 
     /// returns a pointer to the best cluster to be linked.
     TSegment0 * findBestLink(const TSegment0 &,
-                             const AList<TSegment0> & in) const;
+			    const AList<TSegment0> & in) const;
 
     /// appends the best cluster in 'list' to 'track'.
     TSegment0 * appendCluster(TTrack & track, AList<TSegment0> & in) const;
 
     /// returns a list of clusters to be a track.
     AList<TSegment0> findClusterLink(TSegment0 &,
-                                     const AList<TSegment0> * const) const;
+				    const AList<TSegment0> * const) const;
 
     /// makes a track.
     TTrack * makeTrack(const AList<TSegment0> &) const;
@@ -251,18 +251,18 @@ namespace Belle {
 
     /// returns a list of clusters close to a cluster.
     AList<TSegment0> findCloseClusters(const TTrack &,
-                                       const AList<TSegment0> &,
-                                       double maxDistance) const;
+				      const AList<TSegment0> &,
+				      double maxDistance) const;
 
     /// main loop with salvaging.
     void standardFinding(AList<TLink> & seeds,
-                         AList<TLink> & unusedLinks,
-                         double fraction);
+			 AList<TLink> & unusedLinks,
+			 double fraction);
 
     /// main loop with salvaging for second trial.
     void specialFinding(AList<TLink> & seeds,
-                        AList<TLink> & unusedLinks,
-                        double fraction);
+			AList<TLink> & unusedLinks,
+			double fraction);
 
   private:
     /// Track builder.
@@ -287,7 +287,7 @@ namespace Belle {
     /// Switches
     bool _doStereo;
     bool _doSalvage;
-  };
+};
 
 //-----------------------------------------------------------------------------
 
@@ -300,47 +300,41 @@ namespace Belle {
 
 #ifdef TConformalFinder0_INLINE_DEFINE_HERE
 
-  inline
-  const AList<TLink> &
-  TConformalFinder0::axialConformalLinks(void) const
-  {
+inline
+const AList<TLink> &
+TConformalFinder0::axialConformalLinks(void) const {
     return _axialConfLinks;
-  }
+}
 
-  inline
-  const AList<TLink> &
-  TConformalFinder0::stereoConformalLinks(void) const
-  {
+inline
+const AList<TLink> &
+TConformalFinder0::stereoConformalLinks(void) const {
     return _stereoConfLinks;
-  }
+}
 
-  inline
-  bool
-  TConformalFinder0::doStereo(bool a)
-  {
+inline
+bool
+TConformalFinder0::doStereo(bool a) {
     return _doStereo = a;
-  }
+}
 
-  inline
-  bool
-  TConformalFinder0::doSalvage(bool a)
-  {
+inline
+bool
+TConformalFinder0::doSalvage(bool a) {
     return _doSalvage = a;
-  }
+}
 
-  inline
-  std::string
-  TConformalFinder0::name(void) const
-  {
+inline
+std::string
+TConformalFinder0::name(void) const {
     return "Conformal Finder 0";
-  }
+}
 
-  inline
-  void
-  TConformalFinder0::init(void)
-  {
+inline
+void
+TConformalFinder0::init(void) {
     return;
-  }
+}
 
 #endif
 

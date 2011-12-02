@@ -68,7 +68,7 @@
 
 namespace Belle {
 
-  class TLink;
+class TLink;
 
 //...Drift time correction method...
 #define TrackFitNoCorrection          0
@@ -76,7 +76,7 @@ namespace Belle {
 #define TrackFitCorrectEveryIteration 2
 
 /// A class to fit a TTrackBase object to a helix.
-  class THelixFitter : public TFitter {
+class THelixFitter : public TFitter {
 
   public:
     /// Constructor.
@@ -88,7 +88,7 @@ namespace Belle {
   public:// Informations
     /// dumps debug information.
     void dump(const std::string & message = std::string(""),
-              const std::string & prefix = std::string("")) const;
+	      const std::string & prefix = std::string("")) const;
 
   public:// Options
     /// sets/returns 2D flag.
@@ -129,39 +129,39 @@ namespace Belle {
   public:// Fitting
     int fit(TTrackBase &) const;
     int fit(TTrackBase &, double *pre_chi2, double *fitted_chi2) const;
-    int fit(TTrackBase &, float t0Offset, double *pre_chi2 = NULL, double *fitted_chi2 = NULL) const;
-    int fit(TTrackBase &, float & tev, float & tev_err, double *pre_chi2 = NULL, double *fitted_chi2 = NULL) const;
+    int fit(TTrackBase &, float t0Offset, double *pre_chi2=NULL, double *fitted_chi2=NULL) const;
+    int fit(TTrackBase &, float & tev, float & tev_err, double *pre_chi2=NULL, double *fitted_chi2=NULL) const;
 
   private:
     /// main routine for fixed T0.
-    int main(TTrackBase &, float t0Offset, double *pre_chi2 = NULL, double *fitted_chi2 = NULL) const;
+    int main(TTrackBase &, float t0Offset, double *pre_chi2=NULL, double *fitted_chi2=NULL) const;
 
     /// main routine for free T0.
-    int main(TTrackBase &, float & tev, float & tev_err, double *pre_chi2 = NULL, double *fitted_chi2 = NULL) const;
+    int main(TTrackBase &, float & tev, float & tev_err, double *pre_chi2=NULL, double *fitted_chi2=NULL) const;
 
     /// calculates drift distance and its error.
     void drift(const TTrack &,
-               const TLink &,
-               float t0Offset,
-               double & distance,
-               double & itsError) const;
+	       const TLink &,
+	       float t0Offset,
+	       double & distance,
+	       double & itsError) const;
 
     /// calculates drift distance and its error for free T0 case.
     void drift(const TTrack &,
-               const TLink &,
-               float t0Offset,
-               double & distance,
-               double & itsError,
-               double & ddda) const;
+	       const TLink &,
+	       float t0Offset,
+	       double & distance,
+	       double & itsError,
+	       double & ddda) const;
 
     /// calculates dXda. 'link' and 'dPhi' are inputs. Others are outputs.
     // virtual
     int dxda(const TLink & link,
-             const THelix & helix,
-             double dPhi,
-             CLHEP::HepVector & dxda,
-             CLHEP::HepVector & dyda,
-             CLHEP::HepVector & dzda) const;
+	     const THelix & helix,
+	     double dPhi,
+	     CLHEP::HepVector & dxda,
+	     CLHEP::HepVector & dyda,
+	     CLHEP::HepVector & dzda) const;
 
   private:
     bool _fit2D;
@@ -175,7 +175,7 @@ namespace Belle {
 
     mutable double _pre_chi2;
     mutable double _fitted_chi2;
-  };
+};
 
 //-----------------------------------------------------------------------------
 
@@ -188,167 +188,147 @@ namespace Belle {
 
 #ifdef THELIXFITTER_INLINE_DEFINE_HERE
 
-  inline
-  bool
-  THelixFitter::fit2D(void) const
-  {
+inline
+bool
+THelixFitter::fit2D(void) const {
     return _fit2D;
-  }
+}
 
-  inline
-  bool
-  THelixFitter::fit2D(bool a)
-  {
+inline
+bool
+THelixFitter::fit2D(bool a) {
     return _fit2D = a;
-  }
+}
 
-  inline
-  bool
-  THelixFitter::sag(void) const
-  {
+inline
+bool
+THelixFitter::sag(void) const {
     return _sag;
-  }
+}
 
-  inline
-  bool
-  THelixFitter::sag(bool a)
-  {
+inline
+bool
+THelixFitter::sag(bool a) {
     return _sag = a;
-  }
+}
 
-  inline
-  bool
-  THelixFitter::propagation(void) const
-  {
+inline
+bool
+THelixFitter::propagation(void) const {
     return (bool) _propagation;
-  }
+}
 
-  inline
-  bool
-  THelixFitter::propagation(bool a)
-  {
+inline
+bool
+THelixFitter::propagation(bool a) {
     if (a) _propagation = 1;
     else   _propagation = 0;
     return propagation();
-  }
+}
 
-  inline
-  bool
-  THelixFitter::tof(void) const
-  {
+inline
+bool
+THelixFitter::tof(void) const {
     return _tof;
-  }
+}
 
-  inline
-  bool
-  THelixFitter::tof(bool a)
-  {
+inline
+bool
+THelixFitter::tof(bool a) {
     return _tof = a;
-  }
+}
 
-  inline
-  bool
-  THelixFitter::tanl(void) const
-  {
+inline
+bool
+THelixFitter::tanl(void) const {
     return _tanl;
-  }
+}
 
-  inline
-  bool
-  THelixFitter::tanl(bool a)
-  {
+inline
+bool
+THelixFitter::tanl(bool a) {
     return _tanl = a;
-  }
+}
 
-  inline
-  int
-  THelixFitter::fit(TTrackBase & a) const
-  {
+inline
+int
+THelixFitter::fit(TTrackBase & a) const {
     if (! _freeT0) return main(a, 0.);
     else {
-      float tev = 0.;
-      float tevError;
-      return main(a, tev, tevError);
+	float tev = 0.;
+	float tevError;
+	return main(a, tev, tevError);
     }
-  }
+}
 
-  inline
-  int
-  THelixFitter::fit(TTrackBase & a,
-                    double *pre_chi2, double *fitted_chi2) const
-  {
+inline
+int
+THelixFitter::fit(TTrackBase & a,
+		  double *pre_chi2, double *fitted_chi2) const {
     if (! _freeT0) return main(a, 0., pre_chi2, fitted_chi2);
     else {
-      float tev = 0.;
-      float tevError;
-      return main(a, tev, tevError, pre_chi2, fitted_chi2);
+	float tev = 0.;
+	float tevError;
+	return main(a, tev, tevError, pre_chi2, fitted_chi2);
     }
-  }
+}
 
-  inline
-  int
-  THelixFitter::fit(TTrackBase & a, float t0Offset,
-                    double *pre_chi2, double *fitted_chi2) const
-  {
+inline
+int
+THelixFitter::fit(TTrackBase & a, float t0Offset,
+		  double *pre_chi2, double *fitted_chi2) const {
     a._fitted = false;
     if (! _freeT0) return main(a, t0Offset, pre_chi2, fitted_chi2);
     else {
-      float tev = t0Offset;
-      float tevError;
-      return main(a, tev, tevError, pre_chi2, fitted_chi2);
+	float tev = t0Offset;
+	float tevError;
+	return main(a, tev, tevError, pre_chi2, fitted_chi2);
     }
-  }
+}
 
-  inline
-  int
-  THelixFitter::fit(TTrackBase & a, float & tev, float & tev_err,
-                    double *pre_chi2, double *fitted_chi2) const
-  {
+inline
+int
+THelixFitter::fit(TTrackBase & a, float & tev, float & tev_err,
+		  double *pre_chi2, double *fitted_chi2) const {
     a._fitted = false;
     return main(a, tev, tev_err, pre_chi2, fitted_chi2);
-  }
+}
 
-  inline
-  bool
-  THelixFitter::freeT0(void) const
-  {
+inline
+bool
+THelixFitter::freeT0(void) const {
     return _freeT0;
-  }
+}
 
-  inline
-  bool
-  THelixFitter::freeT0(bool a)
-  {
+inline
+bool
+THelixFitter::freeT0(bool a) {
     return _freeT0 = a;
-  }
+}
 
-  inline
-  unsigned
-  THelixFitter::corrections(void) const
-  {
+inline
+unsigned
+THelixFitter::corrections(void) const {
     return _corrections;
-  }
+}
 
-  inline
-  unsigned
-  THelixFitter::corrections(unsigned a)
-  {
+inline
+unsigned
+THelixFitter::corrections(unsigned a) {
     return _corrections = a;
-  }
+}
 
-  inline
-  double
-  THelixFitter::preChi2(void) const
-  {
+inline
+double
+THelixFitter::preChi2(void) const {
     return _pre_chi2;
-  }
+}
 
-  inline
-  double
-  THelixFitter::chi2(void) const
-  {
+inline
+double
+THelixFitter::chi2(void) const {
     return _fitted_chi2;
-  }
+}
 
 #endif
 

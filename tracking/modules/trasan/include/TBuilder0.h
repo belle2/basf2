@@ -118,12 +118,12 @@
 
 namespace Belle {
 
-  class TTrack;
-  class TLink;
-  class TSegment;
+class TTrack;
+class TLink;
+class TSegment;
 
 /// A class to build a track.
-  class TBuilder0 {
+class TBuilder0 {
 
   public:
     /// Constructor.
@@ -131,17 +131,17 @@ namespace Belle {
 
     /// Constructor with salvage level.
     TBuilder0(const std::string & name,
-              float salvageLevel);
+	     float salvageLevel);
 
     /// Constructor with parameters.
     TBuilder0(const std::string & name,
-              float stereoZ3,
-              float stereoZ4,
-              float stereoChisq3,
-              float stereoChisq4,
-              float stereoMaxSigma,
-              unsigned fittingCorrections,
-              float salvageLevel);
+	     float stereoZ3,
+	     float stereoZ4,
+	     float stereoChisq3,
+	     float stereoChisq4,
+	     float stereoMaxSigma,
+	     unsigned fittingCorrections,
+	     float salvageLevel);
 
     /// Destructor
     virtual ~TBuilder0();
@@ -152,7 +152,7 @@ namespace Belle {
 
     /// dumps debug information.
     void dump(const std::string & message = std::string(""),
-              const std::string & prefix = std::string("")) const;
+	      const std::string & prefix = std::string("")) const;
 
     /// returns a track selector.
     const TSelector0 & trackSelector(void) const;
@@ -203,7 +203,7 @@ namespace Belle {
     float _stereoChisq3;
     float _stereoChisq4;
     float _stereoMaxSigma;
-  };
+};
 
 //-----------------------------------------------------------------------------
 
@@ -216,26 +216,23 @@ namespace Belle {
 
 #ifdef TBuilder0_INLINE_DEFINE_HERE
 
-  inline
-  const TSelector0 &
-  TBuilder0::trackSelector(void) const
-  {
+inline
+const TSelector0 &
+TBuilder0::trackSelector(void) const {
     return _trackSelector;
-  }
+}
 
-  inline
-  const std::string &
-  TBuilder0::name(void) const
-  {
+inline
+const std::string &
+TBuilder0::name(void) const {
     return _name;
-  }
+}
 
-  inline
-  int
-  TBuilder0::fit(TTrackBase & a) const
-  {
+inline
+int
+TBuilder0::fit(TTrackBase & a) const {
     return _fitter.fit(a);
-  }
+}
 
 #endif
 

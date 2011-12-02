@@ -45,7 +45,7 @@
 namespace Belle {
 
 /// A class to fit a TTrackBase object to a line.
-  class TRobustLineFitter : public TLineFitter {
+class TRobustLineFitter : public TLineFitter {
 
   public:
     /// Constructor.
@@ -57,7 +57,7 @@ namespace Belle {
   public:// Selectors
     /// dumps debug information.
     void dump(const std::string & message = std::string(""),
-              const std::string & prefix = std::string("")) const;
+	      const std::string & prefix = std::string("")) const;
     double a(void) const;
     double b(void) const;
     double det(void) const;
@@ -74,7 +74,7 @@ namespace Belle {
     mutable double _b;
     mutable double _det;
     mutable unsigned _n;
-  };
+};
 
 //-----------------------------------------------------------------------------
 
@@ -87,26 +87,23 @@ namespace Belle {
 
 #ifdef TROBUSTLINEFITTER_INLINE_DEFINE_HERE
 
-  inline
-  double
-  TRobustLineFitter::a(void) const
-  {
+inline
+double
+TRobustLineFitter::a(void) const {
     return _a;
-  }
+}
 
-  inline
-  double
-  TRobustLineFitter::b(void) const
-  {
+inline
+double
+TRobustLineFitter::b(void) const {
     return _b;
-  }
+}
 
-  inline
-  double
-  TRobustLineFitter::det(void) const
-  {
+inline
+double
+TRobustLineFitter::det(void) const {
     return _det;
-  }
+}
 
 #endif
 

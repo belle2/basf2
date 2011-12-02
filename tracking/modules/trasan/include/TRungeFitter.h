@@ -48,39 +48,39 @@
 
 namespace Belle {
 
-  class TLink;
-  class TRunge;
+class TLink;
+class TRunge;
 
 /// A class to fit a TTrackBase object to a 3D line.
-  class TRungeFitter : public TFitter {
+class TRungeFitter : public TFitter {
 
-  public:
-    /// Constructor.
-    TRungeFitter(const std::string & name);
-    TRungeFitter(const std::string & name, bool m_sag, int m_prop, bool m_tof);
+public:
+  /// Constructor.
+  TRungeFitter(const std::string & name);
+  TRungeFitter(const std::string & name,bool m_sag,int m_prop,bool m_tof);
+ 
+  /// Destructor
+  virtual ~TRungeFitter();
+  
+public:// Selectors
+  /// dumps debug information.
+  void dump(const std::string & message = std::string(""),
+	    const std::string & prefix = std::string("")) const;
+  
+public:// Modifiers
+  virtual int fit(TTrackBase &) const;
+  virtual int fit(TTrackBase &, float t0Offset) const;
 
-    /// Destructor
-    virtual ~TRungeFitter();
-
-  public:// Selectors
-    /// dumps debug information.
-    void dump(const std::string & message = std::string(""),
-              const std::string & prefix = std::string("")) const;
-
-  public:// Modifiers
-    virtual int fit(TTrackBase &) const;
-    virtual int fit(TTrackBase &, float t0Offset) const;
-
-    void sag(bool);
-    void propagation(int);
-    void tof(bool);
-
-  private:
-    bool _sag;
-    int _propagation;
-    bool _tof;
-
-  };
+  void sag(bool);
+  void propagation(int);
+  void tof(bool);
+  
+private:
+  bool _sag;
+  int _propagation;
+  bool _tof;
+  
+};
 
 //-----------------------------------------------------------------------------
 

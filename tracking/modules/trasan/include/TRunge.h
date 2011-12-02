@@ -38,7 +38,7 @@
 #include "CLHEP/Geometry/Point3D.h"
 #include "CLHEP/Geometry/Vector3D.h"
 
-#define Runge 64
+#define Runge	64
 // This must be writen in TTrackBase.h
 
 #define HEP_SHORT_NAMES
@@ -53,197 +53,196 @@
 
 namespace Belle {
 
-  typedef HepGeom::Point3D<double>  Point3D;
-  class TRungeFitter;
-  class TTrack;
-  class TLink;
+typedef HepGeom::Point3D<double>  Point3D;
+class TRungeFitter;
+class TTrack;
+class TLink;
 
 #define TRunge_MAXstep 10000
 
 /// A class to represent a track in tracking.
-  class TRunge : public TTrackBase {
+class TRunge : public TTrackBase {
 
-  public:
-    /// Constructors
-    TRunge();
-    TRunge(const TTrack&);
-    TRunge(const THelix&);
-    TRunge(const TRunge&);
+public:
+  /// Constructors
+  TRunge();
+  TRunge(const TTrack&);
+  TRunge(const THelix&);
+  TRunge(const TRunge&);
 
-    /// Destructor
-    ~TRunge();
+  /// Destructor
+  ~TRunge();
 
-  public:// General information
-    /// returns object type
-    unsigned objectType(void) const;
+public:// General information
+  /// returns object type
+  unsigned objectType(void) const;
 
-  public:// Extractors
-    /// Track parameters (at pivot)
-    double dr(void) const;
-    double phi0(void) const;
-    double kappa(void) const;
-    double dz(void) const;
-    double tanl(void) const;
+public:// Extractors
+  /// Track parameters (at pivot)
+  double dr(void) const;
+  double phi0(void) const;
+  double kappa(void) const;
+  double dz(void) const;
+  double tanl(void) const;
 
-    /// pivot position
-    const HepGeom::Point3D<double> & pivot(void) const;
+  /// pivot position
+  const HepGeom::Point3D<double> & pivot(void) const;
 
-    /// returns helix parameter
-    const CLHEP::HepVector & a(void) const;
+  /// returns helix parameter
+  const CLHEP::HepVector & a(void) const;
 
-    /// returns error matrix
-    const CLHEP::HepSymMatrix& Ea(void) const;
+  /// returns error matrix
+  const CLHEP::HepSymMatrix& Ea(void) const;
 
-    /// returns helix class
-    THelix helix(void) const;
+  /// returns helix class
+  THelix helix(void) const;
 
 
-    /// returns NDF
-    unsigned ndf(void) const;
+  /// returns NDF
+  unsigned ndf(void) const;
 
-    /// returns chi2.
-    double chi2(void) const;
+  /// returns chi2.
+  double chi2(void) const;
 
-    /// returns reduced-chi2
-    double reducedchi2(void) const;
+  /// returns reduced-chi2
+  double reducedchi2(void) const;
 
-    /// returns B field ID
-    int BfieldID(void) const;
+  /// returns B field ID
+  int BfieldID(void) const;
 
-    /// returns step size
-    double StepSize(void) const;
+  /// returns step size
+  double StepSize(void) const;
 
-    /// return error parameters for fitting with step size control
-    const double* Yscal(void) const;
-    double Eps(void) const;
-    double StepSizeMax(void) const;
-    double StepSizeMin(void) const;
+  /// return error parameters for fitting with step size control
+  const double* Yscal(void) const;
+  double Eps(void) const;
+  double StepSizeMax(void) const;
+  double StepSizeMin(void) const;
 
-    /// return mass
-    float Mass(void) const;
+  /// return mass
+  float Mass(void) const;
 
-    /// return max flight length
-    double MaxFlightLength(void) const;
+  /// return max flight length
+  double MaxFlightLength(void) const;
 
-  public:// Executors
+public:// Executors
 
-  public:// Utilities
-    /// calculates the closest approach to a wire in real space.
-    ///  Results are stored in TLink. Return value is negative if error happened.
-    int approach(TLink &, bool sagCorrection = true) const;
-    int approach(TLink &, float& tof, HepGeom::Vector3D<double> & p,
-                 bool sagCorrection = true) const;
+public:// Utilities
+  /// calculates the closest approach to a wire in real space. 
+  ///  Results are stored in TLink. Return value is negative if error happened.
+  int approach(TLink &, bool sagCorrection = true) const;
+  int approach(TLink &, float& tof, HepGeom::Vector3D<double> & p,
+	       bool sagCorrection = true) const;
 
-    /// caluculate closest points between a line and this track
-    int approach_line(const HepGeom::Point3D<double> &, const HepGeom::Vector3D<double> &,
-                      HepGeom::Point3D<double> & onLine, HepGeom::Point3D<double> & onTrack) const;
-    int approach_line(const HepGeom::Point3D<double> &, const HepGeom::Vector3D<double> &,
-                      HepGeom::Point3D<double> & onLine, HepGeom::Point3D<double> & onTrack,
-                      float& tof, HepGeom::Vector3D<double> & p) const;
-    int approach_line(const HepGeom::Point3D<double> &, const HepGeom::Vector3D<double> &,
-                      HepGeom::Point3D<double> & onLine, HepGeom::Point3D<double> & onTrack,
-                      float& tof, HepGeom::Vector3D<double> & p, unsigned& stepNum) const;
+  /// caluculate closest points between a line and this track
+  int approach_line(const HepGeom::Point3D<double> &,const HepGeom::Vector3D<double> &,
+		    HepGeom::Point3D<double> & onLine,HepGeom::Point3D<double> & onTrack) const;
+  int approach_line(const HepGeom::Point3D<double> &,const HepGeom::Vector3D<double> &,
+		    HepGeom::Point3D<double> & onLine,HepGeom::Point3D<double> & onTrack,
+		    float& tof, HepGeom::Vector3D<double> & p) const;
+  int approach_line(const HepGeom::Point3D<double> &,const HepGeom::Vector3D<double> &,
+		    HepGeom::Point3D<double> & onLine,HepGeom::Point3D<double> & onTrack,
+		    float& tof, HepGeom::Vector3D<double> & p, unsigned& stepNum) const;
 
-    /// caluculate closest point between a point and this track
-    int approach_point(const HepGeom::Point3D<double> &, HepGeom::Point3D<double> & onTrack) const;
+  /// caluculate closest point between a point and this track
+  int approach_point(const HepGeom::Point3D<double> &,HepGeom::Point3D<double> & onTrack) const;
 
-  public:// Modifiers
-    /// set new pivot
-    const HepGeom::Point3D<double> & pivot(const HepGeom::Point3D<double> &);
+public:// Modifiers
+  /// set new pivot
+  const HepGeom::Point3D<double> & pivot(const HepGeom::Point3D<double> &);
 
-    /// set helix parameter
-    const CLHEP::HepVector & a(const CLHEP::HepVector &);
+  /// set helix parameter
+  const CLHEP::HepVector & a(const CLHEP::HepVector &);
 
-    /// set helix error matrix
-    const CLHEP::HepSymMatrix& Ea(const CLHEP::HepSymMatrix&);
+  /// set helix error matrix
+  const CLHEP::HepSymMatrix& Ea(const CLHEP::HepSymMatrix&);
 
-    /// set B field map ID
-    int BfieldID(int);
+  /// set B field map ID
+  int BfieldID(int);
 
-    /// set step size to calc. trajectory
-    double StepSize(double);
+  /// set step size to calc. trajectory
+  double StepSize(double);
 
-    /// set error parameters for fitting with step size control
-    const double* Yscal(const double*);
-    double Eps(double);
-    double StepSizeMax(double);
-    double StepSizeMin(double);
+  /// set error parameters for fitting with step size control
+  const double* Yscal(const double*);
+  double Eps(double);
+  double StepSizeMax(double);
+  double StepSizeMin(double);
 
-    /// set mass  for tof calc.
-    float Mass(float);
+  /// set mass  for tof calc.
+  float Mass(float);
 
-    // set max flight length
-    double MaxFlightLength(double);
+  // set max flight length
+  double MaxFlightLength(double);
 
-  public:// utilities for local use
-    /// make the trajectory in cache,   return the number of step
-    unsigned Fly(void) const;
-    unsigned Fly_SC(void) const; //fly with stepsize control
+public:// utilities for local use
+  /// make the trajectory in cache,   return the number of step
+  unsigned Fly(void) const;
+  unsigned Fly_SC(void) const; //fly with stepsize control
 
-    /// propagate the track using 4th-order Runge-Kutta method
-    void Propagate(double y[6], const double& step) const;
-    void Function(const double y[6], double f[6]) const;
-    // for propagate with quality check
-    void Propagate1(const double y[6], const double dydx[6],
-                    const double& step, double yout[6]) const;
-    void Propagate_QC(double y[6], double dydx[6], const double& steptry,
-                      const double& eps, const double yscal[6],
-                      double& stepdid, double& stepnext) const;
+  /// propagate the track using 4th-order Runge-Kutta method
+  void Propagate(double y[6],const double& step) const;
+  void Function(const double y[6],double f[6]) const;
+  // for propagate with quality check
+  void Propagate1(const double y[6], const double dydx[6],
+		  const double& step, double yout[6]) const;
+  void Propagate_QC(double y[6],double dydx[6],const double& steptry,
+		    const double& eps, const double yscal[6],
+		    double& stepdid, double& stepnext) const;
+  
+  /// set first point (position, momentum)  s=0, phi=0
+  void SetFirst(double y[6]) const;
 
-    /// set first point (position, momentum)  s=0, phi=0
-    void SetFirst(double y[6]) const;
+  /// access to trajectory cache
+  unsigned Nstep(void) const;
+  int GetXP(unsigned stepNum,double y[6]) const;
+  // y[6] = (x,y,z,px,py,pz)  output: error=-1
+  int GetStep(unsigned stepNum,double& step) const;
 
-    /// access to trajectory cache
-    unsigned Nstep(void) const;
-    int GetXP(unsigned stepNum, double y[6]) const;
-    // y[6] = (x,y,z,px,py,pz)  output: error=-1
-    int GetStep(unsigned stepNum, double& step) const;
+  /// set flight length using wire hits
+  double SetFlightLength(void);
 
-    /// set flight length using wire hits
-    double SetFlightLength(void);
+private:
+  // track parameters   updated when fitted
+  HepGeom::Point3D<double>  _pivot;
+  CLHEP::HepVector _a;		//dr,phi0,kappa,dz,tanl
+  CLHEP::HepSymMatrix _Ea;
 
-  private:
-    // track parameters   updated when fitted
-    HepGeom::Point3D<double>  _pivot;
-    CLHEP::HepVector _a;    //dr,phi0,kappa,dz,tanl
-    CLHEP::HepSymMatrix _Ea;
+  double _chi2;
+  unsigned _ndf;
 
-    double _chi2;
-    unsigned _ndf;
+  static const TRungeFitter _fitter;
 
-    static const TRungeFitter _fitter;
+  friend class TRungeFitter;
 
-    friend class TRungeFitter;
+  Bfield* _bfield;
+  int _bfieldID;
 
-    Bfield* _bfield;
-    int _bfieldID;
+  double _maxflightlength;
+  
+  double _stepSize;	// default step size  
+                        //if 0, step size will be made automatically
+  double _yscal[6];
+  double _eps;		//used for step size control
+  double _stepSizeMax;
+  double _stepSizeMin;
 
-    double _maxflightlength;
+  float _mass;
 
-    double _stepSize; // default step size
-    //if 0, step size will be made automatically
-    double _yscal[6];
-    double _eps;    //used for step size control
-    double _stepSizeMax;
-    double _stepSizeMin;
+private:
+  // caches
+  float _mass2;	//=_mass*_mass;
+  int _charge;
 
-    float _mass;
+  mutable double _y[TRunge_MAXstep][6];	//(x,y,z,px,py,pz)
+  mutable double _h[TRunge_MAXstep];	//step size in each step
+  mutable unsigned _Nstep;		//0:not cached the trajectory
 
-  private:
-    // caches
-    float _mass2; //=_mass*_mass;
-    int _charge;
+};
 
-    mutable double _y[TRunge_MAXstep][6]; //(x,y,z,px,py,pz)
-    mutable double _h[TRunge_MAXstep];  //step size in each step
-    mutable unsigned _Nstep;    //0:not cached the trajectory
-
-  };
-
-  inline unsigned TRunge::objectType(void) const
-  {
-    return Runge;
-  }
+inline unsigned TRunge::objectType(void) const{
+  return Runge;
+}
 
 } // namespace Belle
 

@@ -72,22 +72,22 @@
 #include "tracking/modules/trasan/ConstAList.h"
 
 namespace Belle2 {
-  class TRGCDCWireHit;
+    class TRGCDCWireHit;
 }
 
 namespace Belle {
 
-  class TCircle;
-  class TTrack;
-  class TPoint2D;
-  class TLink;
+class TCircle;
+class TTrack;
+class TPoint2D;
+class TLink;
 
 // extern const float WIDTHXXX[11];
 // extern const float RXXX[12];
 // extern const float R2XXX[12];
 
 /// A virtual class for a track finder in tracking.
-  class TFinderBase {
+class TFinderBase {
 
   public:
     /// Constructor
@@ -105,7 +105,7 @@ namespace Belle {
 
     /// dumps debug information.
     virtual void dump(const std::string & message = std::string(""),
-                      const std::string & prefix = std::string("")) const;
+		      const std::string & prefix = std::string("")) const;
 
     /// returns debug level.
     virtual int debugLevel(void) const;
@@ -128,10 +128,10 @@ namespace Belle {
 
     /// finds tracks. 'hits' are used to reconstruct. 'tracks' can be used for both inputs and outputs. Return value = (0, +, -) means (success, warning, fatal error).
     virtual int doit(const CAList<Belle2::TRGCDCWireHit> & axialHits,
-                     const CAList<Belle2::TRGCDCWireHit> & stereoHits,
-                     AList<TTrack> & tracks3D,
-                     AList<TTrack> & tracks2D) = 0;
-
+		     const CAList<Belle2::TRGCDCWireHit> & stereoHits,
+		     AList<TTrack> & tracks3D,
+		     AList<TTrack> & tracks2D) = 0;
+    
   public:// Finder utilities
 //  int crossPoints(const TCircle &, TPoint2D points[12]) const;
 //  int crossPointsDetail(const TCircle &, TPoint2D points[50]) const;
@@ -139,32 +139,32 @@ namespace Belle {
     static int crossPointsByLayer(const TCircle &, TPoint2D * points);
 
     static AList<TLink> pickUpLinks(const TCircle &,
-                                    const AList<TLink> & links,
-                                    float loadWidth,
-                                    unsigned axialStereo);
+				    const AList<TLink> & links,
+				    float loadWidth,
+				    unsigned axialStereo);
     static AList<TLink> pickUpLinksDetail(const TCircle &,
-                                          const AList<TLink> & links,
-                                          float loadWidth,
-                                          unsigned axialStereo);
+					  const AList<TLink> & links,
+					  float loadWidth,
+					  unsigned axialStereo);
     static AList<TLink> pickUpNeighborLinks(const AList<TLink> & seeds,
-                                            const AList<TLink> & links);
+					    const AList<TLink> & links);
 
     //...For Hough finder...
     static AList<TLink> pickUpLinks2(const TCircle &,
-                                     const AList<TLink> & links,
-                                     float loadWidth,
-                                     unsigned axialStereo);
+				     const AList<TLink> & links,
+				     float loadWidth,
+				     unsigned axialStereo);
 //     AList<TLink> pickUpLinks2(const TTrack &,
-//            const AList<TLink> & links,
-//            float loadWidth,
-//            unsigned axialStereo) const;
-
+// 			      const AList<TLink> & links,
+// 			      float loadWidth,
+// 			      unsigned axialStereo) const;
+    
   private:
     int _debugLevel;
     static TPoint2D _points0[100];
     static TPoint2D _points1[100];
     static TPoint2D _points2[100];
-  };
+};
 
 //-----------------------------------------------------------------------------
 
@@ -177,33 +177,29 @@ namespace Belle {
 
 #ifdef TFinderBase_INLINE_DEFINE_HERE
 
-  inline
-  int
-  TFinderBase::debugLevel(void) const
-  {
+inline
+int
+TFinderBase::debugLevel(void) const {
     return _debugLevel;
-  }
+}
 
-  inline
-  int
-  TFinderBase::debugLevel(int a)
-  {
+inline
+int
+TFinderBase::debugLevel(int a) {
     return _debugLevel = a;
-  }
+}
 
-  inline
-  bool
-  TFinderBase::doStereo(bool a)
-  {
+inline
+bool
+TFinderBase::doStereo(bool a) {
     return a;
-  }
+}
 
-  inline
-  bool
-  TFinderBase::doSalvage(bool a)
-  {
+inline
+bool
+TFinderBase::doSalvage(bool a) {
     return a;
-  }
+}
 
 #endif
 

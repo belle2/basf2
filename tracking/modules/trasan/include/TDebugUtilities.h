@@ -30,21 +30,21 @@
 namespace Belle {
 
 //...Trasan stage information...
-  std::string Stage(void);
-  std::string Tab(int shift = 0);
-  unsigned EnterStage(const std::string &);
-  unsigned LeaveStage(const std::string &);
-  unsigned NestLevel(void);
-  void DumpStageInformation(void);
+std::string Stage(void);
+std::string Tab(int shift = 0);
+unsigned EnterStage(const std::string &);
+unsigned LeaveStage(const std::string &);
+unsigned NestLevel(void);
+void DumpStageInformation(void);
 
 //...Structure for stage analyses...
-  struct stageInfo {
+struct stageInfo {
     unsigned counter;
     double usedUTime;
     double lastUTime;
     double usedSTime;
     double lastSTime;
-  };
+};
 
 } // namespace Belle
 

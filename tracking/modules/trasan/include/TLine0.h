@@ -83,7 +83,7 @@
 namespace Belle {
 
 /// A class to represent a track in tracking.
-  class TLine0 : public TTrackBase {
+class TLine0 : public TTrackBase {
 
   public:
     /// Constructor.
@@ -101,7 +101,7 @@ namespace Belle {
 
     /// dumps debug information.
     void dump(const std::string & message = std::string(""),
-              const std::string & prefix = std::string("")) const;
+	      const std::string & prefix = std::string("")) const;
 
     /// returns coefficient a.
     double a(void) const;
@@ -141,13 +141,13 @@ namespace Belle {
     /// remove bad points by chi2. Bad points are returned in a 'list'. fit() should be called before calling this function.
     void refine(AList<TLink> & list, float maxSigma);
 
-    ///
+    /// 
     void removeSLY(AList<TLink> & list);
 
-    ///
+    /// 
     void appendSLY(AList<TLink> & list);
 
-    ///
+    /// 
     void appendByszdistance(AList<TLink> & list, unsigned isl, float maxSigma);
 
     /// sets circle properties.
@@ -165,7 +165,7 @@ namespace Belle {
   private:// Updated when fitted and accessed
     mutable double _chi2;
     mutable double _reducedChi2;
-  };
+};
 
 //-----------------------------------------------------------------------------
 
@@ -178,53 +178,48 @@ namespace Belle {
 
 #ifdef TLine0_INLINE_DEFINE_HERE
 
-  inline
-  double
-  TLine0::a(void) const
-  {
+inline
+double
+TLine0::a(void) const {
 #ifdef TRASAN_DEBUG
     if (! _fitted) std::cout << "TLine0::a !!! fit not performed" << std::endl;
 #endif
     return _a;
-  }
+}
 
-  inline
-  double
-  TLine0::b(void) const
-  {
+inline
+double
+TLine0::b(void) const {
 #ifdef TRASAN_DEBUG
     if (! _fitted) std::cout << "TLine0::b !!! fit not performed" << std::endl;
 #endif
     return _b;
-  }
+}
 
-  inline
-  double
-  TLine0::distance(const TLink & l) const
-  {
+inline
+double
+TLine0::distance(const TLink & l) const {
 #ifdef TRASAN_DEBUG
     if (! _fitted) std::cout << "TLine0::distance !!! fit not performed" << std::endl;
 #endif
     double dy = fabs(_a * l.position().x() + _b - l.position().y());
     double invCos = sqrt(1. + _a * _a);
     return dy / invCos;
-  }
+}
 
-  inline
-  void
-  TLine0::property(double a, double b, double det)
-  {
+inline
+void
+TLine0::property(double a, double b, double det) {
     _a = a;
     _b = b;
     _det = det;
-  }
+}
 
-  inline
-  unsigned
-  TLine0::objectType(void) const
-  {
+inline
+unsigned
+TLine0::objectType(void) const {
     return Line;
-  }
+}
 
 #endif
 

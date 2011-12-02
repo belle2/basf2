@@ -171,17 +171,17 @@
 #include "tracking/modules/trasan/AList.h"
 
 namespace Belle2 {
-  class TRGCDCTrackMC;
+    class TRGCDCTrackMC;
 }
 
 namespace Belle {
 
-  class TLink;
-  class TTrackMC;
-  class TFitter;
+class TLink;
+class TTrackMC;
+class TFitter;
 
 /// A virtual class for a track class in tracking.
-  class TTrackBase {
+class TTrackBase {
 
   public:
     /// Constructor.
@@ -202,7 +202,7 @@ namespace Belle {
 
     /// dumps debug information.
     virtual void dump(const std::string & message = std::string(""),
-                      const std::string & prefix = std::string("")) const;
+		      const std::string & prefix = std::string("")) const;
 
   public:// Hit information
     /// returns a list of masked TLinks assigned to this track. 'mask' will be applied if mask is not 0.
@@ -299,8 +299,8 @@ namespace Belle {
   public:// Static utility functions
     /// dumps TLinks.
     static void dump(const AList<TTrackBase> & list,
-                     const std::string & message = std::string(""),
-                     const std::string & prefix = std::string(""));
+		     const std::string & message = std::string(""),
+		     const std::string & prefix = std::string(""));
 
   private:
     /// refine core part.
@@ -319,7 +319,7 @@ namespace Belle {
   private:// Updated when accessed
     mutable AList<TLink> _cores;
 
-  private:// Always updated when accessed
+  private:// Always updated when accessed 
     mutable const Belle2::TRGCDCTrackMC * _hep;
     mutable unsigned _nHeps;
 
@@ -335,7 +335,7 @@ namespace Belle {
   public:
     bool fitted(bool) const;
 #endif
-  };
+};
 
 //-----------------------------------------------------------------------------
 
@@ -348,100 +348,88 @@ namespace Belle {
 
 #ifdef TTrackBase_INLINE_DEFINE_HERE
 
-  inline
-  void
-  TTrackBase::remove(TLink & a)
-  {
+inline
+void
+TTrackBase::remove(TLink & a) {
     _links.remove(a);
     _updated = false;
     _fitted = false;
     _fittedWithCathode = false; // mod. by matsu ( 1999/05/24 )
-  }
+}
 
-  inline
-  void
-  TTrackBase::remove(const AList<TLink> & a)
-  {
+inline
+void
+TTrackBase::remove(const AList<TLink> & a) {
     _links.remove(a);
     _updated = false;
     _fitted = false;
     _fittedWithCathode = false; // mod. by matsu ( 1999/05/24 )
-  }
+}
 
-  inline
-  bool
-  TTrackBase::fitted(void) const
-  {
+inline
+bool
+TTrackBase::fitted(void) const {
     return _fitted;
-  }
+}
 
 // added by matsu ( 1999/05/24 )
-  inline
-  void
-  TTrackBase::falseFit()
-  {
+inline
+void
+TTrackBase::falseFit(){
     _fitted = false;
     _fittedWithCathode = false;
-  }
+}
 // end of addition
 
-  inline
-  TLink *
-  TTrackBase::operator[](unsigned i) const
-  {
+inline
+TLink *
+TTrackBase::operator[](unsigned i) const {
     return _links[i];
-  }
+}
 
-  inline
-  bool
-  TTrackBase::fittedWithCathode(void) const
-  {
+inline
+bool
+TTrackBase::fittedWithCathode(void) const {
     return _fittedWithCathode;
-  }
+}
 
-  inline
-  const TTrackMC * const
-  TTrackBase::mc(void) const
-  {
+inline
+const TTrackMC * const
+TTrackBase::mc(void) const {
     return _mc;
-  }
+}
 
-  inline
-  const TFitter * const
-  TTrackBase::fitter(void) const
-  {
+inline
+const TFitter * const
+TTrackBase::fitter(void) const {
     return _fitter;
-  }
+}
 
-  inline
-  const TFitter * const
-  TTrackBase::fitter(const TFitter * a)
-  {
+inline
+const TFitter * const
+TTrackBase::fitter(const TFitter * a) {
     _fitted = false;
     return _fitter = a;
-  }
+}
 
-  inline
-  unsigned
-  TTrackBase::objectType(void) const
-  {
+inline
+unsigned
+TTrackBase::objectType(void) const {
     return TrackBase;
-  }
+}
 
-  inline
-  unsigned
-  TTrackBase::type(void) const
-  {
+inline
+unsigned
+TTrackBase::type(void) const {
     return 0;
-  }
+}
 
 #ifdef TRASAN_DEBUG
-  inline
-  bool
-  TTrackBase::fitted(bool a) const
-  {
+inline
+bool
+TTrackBase::fitted(bool a) const {
     return _fitted = a;
-  }
+}
 #endif
 
 #endif

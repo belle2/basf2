@@ -49,11 +49,11 @@
 
 namespace Belle {
 
-  class TLink;
-  class TCircle;
+class TLink;
+class TCircle;
 
 /// A class to fit a TTrackBase object to a circle.
-  class TCircleFitter : public TFitter {
+class TCircleFitter : public TFitter {
 
   public:
     /// Constructor.
@@ -65,7 +65,7 @@ namespace Belle {
   public:// Selectors
     /// dumps debug information.
     void dump(const std::string & message = std::string(""),
-              const std::string & prefix = std::string("")) const;
+	      const std::string & prefix = std::string("")) const;
 
   public:// Modifiers
     virtual int fit(TTrackBase &) const;
@@ -74,7 +74,7 @@ namespace Belle {
     mutable double _charge;
     mutable double _radius;
     mutable HepGeom::Point3D<double>  _center;
-  };
+};
 
 //-----------------------------------------------------------------------------
 

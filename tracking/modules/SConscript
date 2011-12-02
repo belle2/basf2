@@ -1,5 +1,0 @@
-Import('env')
-
-env['LIBS'] = ['tracking', 'framework', 'generators', 'geometry', 'pxd', 'svd', 'cdc', 'genfit', 'RKTrackRep']
-Return('env')
-

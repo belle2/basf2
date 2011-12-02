@@ -31,8 +31,7 @@ namespace Belle2 {
     EKLMSectorHit() {};
 
     //! Constructor
-    EKLMSectorHit(char nEndcap, char nLayer, char nSector, char nPlane,
-                  char nStrip);
+    EKLMSectorHit(int nEndcap, int nLayer, int nSector);
 
     //! Destructor
     ~EKLMSectorHit() {};

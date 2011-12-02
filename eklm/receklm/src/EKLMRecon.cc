@@ -30,7 +30,7 @@ namespace Belle2 {
 
   void EKLMRecon::createSectorHits()
   {
-
+    /*
     //    EKLMSectorHit *newSectorHit;
     StoreArray<EKLMSectorHit> sectorHitsArray;
 
@@ -57,6 +57,7 @@ namespace Belle2 {
         m_SectorHitVector.push_back(newSectorHit);
       }
     }
+    */
   }
 
   void EKLMRecon::create2dHits()

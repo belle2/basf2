@@ -14,6 +14,7 @@
 #include <framework/datastore/DataStore.h>
 
 #include  <eklm/dataobjects/EKLMHitBase.h>
+#include  <eklm/dataobjects/EKLMSimHit.h>
 #include  "globals.hh"
 #include  "CLHEP/Vector/ThreeVector.h"
 
@@ -31,6 +32,9 @@ namespace Belle2 {
     //! Constructor
     EKLMStripHit() {};
 
+    //! Constructor from the EKLMHitBase
+    EKLMStripHit(const EKLMSimHit * Hit);
+
     //! Destructor
     ~EKLMStripHit() {};
 
@@ -44,21 +48,6 @@ namespace Belle2 {
 
     //! sets the number of photo electorns
     void setNumberPhotoElectrons(double);
-
-
-    //! returns time of the hit
-    double getTime() const;
-
-    //! sets the time of the hit
-    void setTime(double);
-
-
-
-    //! return  PDG code of the leading ( (grand-)mother ) particle
-    int getLeadingParticlePDGCode() const;
-
-    //! set  PDG code of the leading ( (grand-)mother ) particle
-    void setLeadingParticlePDGCode(int);
 
 
 
@@ -77,18 +66,46 @@ namespace Belle2 {
     //! returns distance btw. the hit and SiPM
     double getLightPropagationLength(CLHEP::Hep3Vector &);
 
+    /**
+     * Get plane number.
+     */
+    int getPlane() const;
+
+    /**
+     * Set plane number.
+     */
+    void setPlane(int Plane);
+
+    /**
+     * Get strip number.
+     */
+    int getStrip() const;
+
+    /**
+     * Set strip number.
+     */
+    void setStrip(int Strip);
+
 
 
   private:
 
+
+    /**
+     * Number of plane.
+     */
+    int m_Plane;
+
+    /**
+     * Number of strip.
+     */
+    int m_Strip;
+
+
+
     //! number of photo electrons
     double m_NumberPhotoElectrons;
 
-    //!  PDG code of the leading ( (grand-)mother ) particle
-    int m_LeadingParticlePDGCode;
-
-    //! hit time (the time of the first photo electorn)
-    double m_Time;
 
     //! distance btw. the hit and SiPM
     double m_LightPropagationLength;

@@ -14,8 +14,8 @@
 
 #include <eklm/dataobjects/EKLMHitBase.h>
 #include "G4VPhysicalVolume.hh"
-#include <TVector3.h>
-//#include <TString.h>
+
+
 
 namespace Belle2 {
 
@@ -30,15 +30,33 @@ namespace Belle2 {
 
     //! Default constructor
     EKLMStepHit():
-        m_PDG(0),
-        m_t(0),
-        m_E(0),
-        m_position(0., 0., 0.),
+        EKLMHitBase(),
         m_momentum(0., 0., 0.),
-        m_energyDeposit(0.),
         m_trackID(-1),
         m_parentTrackID(-1),
-        m_pv(0) {}
+        m_pv(0),
+        m_Plane(0),
+        m_Strip(0) {}
+
+    //!Partial info
+    EKLMStepHit(
+      const TVector3 momentum,
+      const double E ,
+      const int  trID,
+      const int  ptrID,
+      const G4VPhysicalVolume * pv
+    )
+        :
+        EKLMHitBase() {
+      m_energy = E;
+      m_momentum = momentum;
+      m_trackID = trID;
+      m_parentTrackID = ptrID;
+      m_pv = pv;
+      m_pvName = pv->GetName();
+    }
+
+
 
     //! Full constructor.
     /*!
@@ -50,48 +68,31 @@ namespace Belle2 {
     */
 
     EKLMStepHit(
+      const int Endcap,
+      const int Layer,
+      const int Sector,
+      const int Plane,
+      const int Strip,
       const int PDG,
-      const double t,
-      const double E,
-      const TVector3 position,
+      const double Time,
+      const double EDep,
+      const TVector3 GlobalPosition,
+      const TVector3 LocalPosition,
       const TVector3 momentum,
-      const double edep ,
-      const int    trID,
+      const double E ,
+      const int  trID,
       const int  ptrID,
       const G4VPhysicalVolume * pv
-    )  {
-      m_PDG = PDG;
-      m_t = t;
-      m_E = E;
-      m_position = position;
+    ) :
+        EKLMHitBase(Endcap, Layer, Sector, PDG, Time,  EDep, GlobalPosition, LocalPosition) {
+      m_energy = E;
       m_momentum = momentum;
-      m_energyDeposit = edep;
       m_trackID = trID;
       m_parentTrackID = ptrID;
       m_pv = pv;
       m_pvName = pv->GetName();
     }
 
-    /**
-    * Get the lund code of the particle that hit the sensitive area
-    */
-    int getPDG() const ;
-
-
-    /**
-     *  Set the lund code of the particle that hit the sensitive area
-     */
-    void setPDG(int);
-
-    /**
-     * Get the time at which the hit occured
-     */
-    double getTime() const;
-
-    /**
-     * Set the time at which the hit occured
-     */
-    void setTime(double);
 
 
     /**
@@ -106,18 +107,6 @@ namespace Belle2 {
 
 
     /**
-     * Get global position of the particle hit
-     */
-    const TVector3 * getPosition() const;
-
-
-    /**
-     * Set global position of the particle hit
-     */
-    void setPosition(TVector3 & position);
-
-
-    /**
      * Get momentum of the particle hit
      */
     const TVector3 * getMomentum() const;
@@ -129,17 +118,6 @@ namespace Belle2 {
 
 
     /**
-     * Get energy deposition
-     */
-    double getEDep() const ;
-
-    /**
-     * Set energy deposition
-     */
-    void setEDep(double edep) ;
-
-
-    /**
      * Get track ID
      */
     int getTrackID() const;
@@ -148,8 +126,6 @@ namespace Belle2 {
      * Set track ID
      */
     void setTrackID(int track);
-
-
 
 
     /**
@@ -185,7 +161,6 @@ namespace Belle2 {
     void setVolume(const G4VPhysicalVolume *);
 
 
-
     /**
      * Get volume type
      */
@@ -196,30 +171,72 @@ namespace Belle2 {
      */
     void setVolumeType(int);
 
-
+    /**
+     * Get plane number.
+     */
+    int getPlane() const;
 
     /**
-     *  Increase energy deposition
+     * Set plane number.
      */
-    void increaseEDep(double);
+    void setPlane(int Plane);
+
+    /**
+     * Get strip number.
+     */
+    int getStrip() const;
+
+    /**
+     * Set strip number.
+     */
+    void setStrip(int Strip);
+
 
 
 
   private:
-    int m_subDet;               /** The name of the subdetector */
-    int m_identifier;           /** The identifier of subdetector component */
-    int m_PDG;                  /** The PDG code of the particle that hit the sensitive area */
-    double m_t;                 /** time at which the hit occured */
-    double m_E;                 /** energy of particle */
-    TVector3 m_position;        /** global position of the hit */
-    TVector3 m_momentum;        /** momentum of the hit */
-    double m_energyDeposit;     /** energy deposition */
-    int m_trackID;              /** track ID */
-    int m_parentTrackID;        /** parent track ID */
-    int m_volType;              /** Volume type: 0 --> stip, 1 --> SiPM , 2 --> ElectronicBoard */
+
+    /**
+    * energy of particle
+    */
+    double m_energy;
+
+    /**
+     *  momentum of the hit
+    */
+    TVector3 m_momentum;
+
+
+    /**
+     * track ID
+     */
+    int m_trackID;
+    /**
+     * parent track ID
+     */
+    int m_parentTrackID;
 
     //** we do not want to  allow anyone to change the PV !! */
     const G4VPhysicalVolume * m_pv;     //! {ROOT streamer directive}
+
+
+    /**
+     * Number of plane.
+     */
+    int m_Plane;
+
+    /**
+     * Number of strip.
+     */
+    int m_Strip;
+
+
+    /**
+     * Volume type: 0 --> stip, 1 --> SiPM , 2 --> ElectronicBoard
+     */
+    int m_volType;
+
+
     std::string m_pvName; /** volume name */
 
 

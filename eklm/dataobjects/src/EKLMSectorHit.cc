@@ -18,9 +18,8 @@ using namespace std;
 
 ClassImp(EKLMSectorHit);
 
-EKLMSectorHit::EKLMSectorHit(char nEndcap, char nLayer, char nSector,
-                             char nPlane, char nStrip) :
-    EKLMHitBase(nEndcap, nLayer, nSector, nPlane, nStrip)
+EKLMSectorHit::EKLMSectorHit(int nEndcap, int nLayer, int  nSector) :
+    EKLMHitBase()
 {
 }
 

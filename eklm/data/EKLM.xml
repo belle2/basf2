@@ -4,7 +4,7 @@
   <Version>0</Version>
   <Creator library="eklm">EKLMBelleII</Creator>
   <Content>
-    <Mode desc="0 -- normal operation, 1 -- bg study">1</Mode>   
+    <Mode desc="0 -- normal operation, 1 -- bg study">0</Mode>   
     <SensitiveDetector>
      <EnergyDepositionThreshold desc="All hits with smaller energy will be dropped at SensitiveDetector level" unit="MeV">0.0</EnergyDepositionThreshold>  
      <HitTimeThreshold desc="All hits with larger time will be dropped at SensitiveDetector level" unit="ns">1000000000</HitTimeThreshold>  
@@ -21,7 +21,7 @@
      <SignalShapeExpCoefficient desc="exponent coefficient for a single-photoelectron shape">0.04</SignalShapeExpCoefficient>
      <AttenuationLength desc="attenuation length in the fiber" unit="cm">300</AttenuationLength>
      <BackgroundPoissonMean desc="Mean for SiPM backgrouns. If zero or negative no backgopunds are added">1</BackgroundPoissonMean>
-     <OutputFile desc="Prefix for name of file with histograms (can include directory name). If void no histos would be saved">/tmp/file_</OutputFile>
+     <OutputFile desc="Prefix for name of file with histograms (can include directory name). If void no histos would be saved"></OutputFile>
     </Digitizer>
     <Rotation desc="Rotation of the EKLM with respect to the Detector"
       unit="mrad">0.0</Rotation>

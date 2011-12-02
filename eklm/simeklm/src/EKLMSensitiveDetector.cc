@@ -30,8 +30,8 @@ namespace Belle2 {
     GearDir gd = GearDir("/Detector/DetectorComponent[@name=\"EKLM\"]/Content");
     m_mode = gd.getInt("Mode");
     gd.append("/SensitiveDetector");
-    m_ThresholdEnergyDeposit = gd.getDouble("EnergyDepositionThreshold") / MeV;
-    m_ThresholdHitTime = gd.getDouble("HitTimeThreshold") / ns;
+    m_ThresholdEnergyDeposit = Unit::convertValue(gd.getDouble("EnergyDepositionThreshold"), "MeV");
+    m_ThresholdHitTime = Unit::convertValue(gd.getDouble("HitTimeThreshold") , "ns");
   }
 
   //-----------------------------------------------------
@@ -99,18 +99,40 @@ namespace Belle2 {
                                   aStep->GetPreStepPoint()->GetPosition());
 
     /**
-     * no conversion btw. G4ThreeVector and TVector3 Sad but true
+     * Global -> Local position
      */
-    const TVector3 & gposRoot = TVector3(gpos.x(), gpos.y(), gpos.z());
+    const G4ThreeVector & lpos = aStep->GetPreStepPoint()->
+                                 GetTouchableHandle()->GetHistory()->
+                                 GetTopTransform().TransformPoint(gpos);
+
+    /**
+     * no conversion btw. G4ThreeVector and TVector3 Sad but true
+     * GEANT returns in mm!
+     * convert to standard units (cm)
+     */
+    const TVector3  gposRoot = TVector3(Unit::convertValue(gpos.x(), "mm"), Unit::convertValue(gpos.y(), "mm"), Unit::convertValue(gpos.z(), "mm"));
+
+    /**
+     * no conversion btw. G4ThreeVector and TVector3 Sad but true
+     * GEANT returns in mm!
+     * convert to standard units(cm)
+     */
+    const TVector3  lposRoot = TVector3(Unit::convertValue(lpos.x(), "mm"), Unit::convertValue(lpos.y(), "mm"), Unit::convertValue(lpos.z(), "mm"));
 
     /**
      * Get Momentum of the particle
      */
     const G4ThreeVector & momentum = track.GetMomentum();
+
+    /**
+     * Get Kinetic energy of the particle
+     */
+    const double E = track.GetKineticEnergy();
+
     /**
      * no conversion btw. G4ThreeVector and TVector3 Sad but true
      */
-    const TVector3 & momentumRoot = TVector3(momentum.x(), momentum.y(), momentum.z());
+    const TVector3  momentumRoot = TVector3(momentum.x(), momentum.y(), momentum.z());
 
     /**
      * Get Kinetic energy of the particle
@@ -134,11 +156,18 @@ namespace Belle2 {
      * creates step hit and store in to DataStore
      */
     EKLMStepHit *hit = new(m_stepHitsArray->AddrAt(m_stepHitsArray.getEntries()))
-    EKLMStepHit(PDGcode, hitTime, Ekin, gposRoot, momentumRoot, eDep, trackID, paretntTrackID, pv);
+    EKLMStepHit(momentumRoot, E, trackID, paretntTrackID, pv);
     if (hit == NULL) {
       B2ERROR("EKLMSensitiveDetector.cc:: Memory allocation error. Cannot allocate hit in stepHitsArray");
       return false;
     }
+    hit->setLocalPosition(&lposRoot);
+    hit->setPosition(&gposRoot);
+    hit->setEDep(eDep);
+    hit->setPDG(PDGcode);
+    hit->setTime(hitTime);
+    hit->setEnergy(Ekin);
+
 
     /**
      * Get information on mother volumes and store them to the hit

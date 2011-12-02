@@ -13,6 +13,7 @@
 
 #include <sys/types.h>
 #include <TObject.h>
+#include <TVector3.h>
 #include  <string>
 
 namespace Belle2 {
@@ -34,8 +35,7 @@ namespace Belle2 {
      *  Constructor
      */
 
-    EKLMHitBase(int Endcap, int Layer, int Sector, int Plane,
-                int Strip);
+    EKLMHitBase(int Endcap, int Layer, int Sector, int PDG, double Time, double EDep,  TVector3 GlobalPosition, TVector3 LocalPosition);
 
     /**
      * Destructor
@@ -73,26 +73,105 @@ namespace Belle2 {
     void setSector(int nSector);
 
     /**
-     * Get plane number.
+     * Get EDep
      */
-    int getPlane() const;
+    double getEDep() const;
 
     /**
-     * Set plane number.
+     * set EDep.
      */
-    void setPlane(int Plane);
+    void setEDep(double eDep);
 
     /**
-     * Get strip number.
+     * increase EDep.
      */
-    int getStrip() const;
+    void increaseEDep(double deltaEDep);
 
     /**
-     * Set strip number.
+     * Get hit time
      */
-    void setStrip(int Strip);
+    double getTime() const;
+
+    /**
+     * Set hit time.
+     */
+    void setTime(double time);
+
+    /**
+     * Get the lund code of the (leading) particle
+     */
+    int getPDG() const ;
+
+
+    /**
+     *  Set the lund code of the (leading) particle
+     */
+    void setPDG(int);
+
+
+    /**
+     * Get global position of the particle hit
+     */
+    const TVector3 * getPosition() const;
+
+    /**
+     * Set global position of the particle hit
+     */
+    void setPosition(TVector3 & position);
+
+    /**
+     * Set global position of the particle hit
+     */
+    void setPosition(const TVector3 * position);
+
+
+    /**
+     * Get global position of the particle hit
+     */
+    const TVector3 * getLocalPosition() const;
+
+    /**
+     * Set global position of the particle hit
+     */
+    void setLocalPosition(TVector3 & position);
+
+    /**
+     * Set global position of the particle hit
+     */
+    void setLocalPosition(const TVector3 * position);
+
+
+  protected:
+
+    /**
+     * PDG code of the (leading) particle
+     */
+    int m_PDG;
+
+    /**
+     * time of the hit
+     */
+    double m_Time;
+
+    /**
+     * Energy deposition
+     */
+    double m_EDep;
+
+    /**
+     * global position of the hit
+     */
+    TVector3 m_GlobalPosition;
+
+    /**
+     * local position of the hit
+     */
+    TVector3 m_LocalPosition;
+
+
 
   private:
+
 
     /**
      * Number of endcap.
@@ -104,25 +183,18 @@ namespace Belle2 {
      */
     int m_Layer;
 
+
     /**
      * Number of sector.
      */
     int m_Sector;
 
     /**
-     * Number of plane.
-     */
-    int m_Plane;
-
-    /**
-     * Number of strip.
-     */
-    int m_Strip;
-
-    /**
      * Needed to make objects storable.
      */
     ClassDef(Belle2::EKLMHitBase, 1);
+
+
 
   };
 

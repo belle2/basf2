@@ -23,6 +23,17 @@ using namespace CLHEP;
 ClassImp(Belle2::EKLMStripHit);
 
 
+EKLMStripHit::EKLMStripHit(const EKLMSimHit * hit)
+    : EKLMHitBase((EKLMHitBase)(*hit)),
+    m_Plane(hit->getPlane()),
+    m_Strip(hit->getStrip()),
+    m_NumberPhotoElectrons(-1),
+    m_LightPropagationLength(0),
+    m_pv(hit->getVolume())
+{}
+
+
+
 double EKLMStripHit::getNumberPhotoElectrons() const
 {
   return m_NumberPhotoElectrons;
@@ -34,27 +45,21 @@ void EKLMStripHit::setNumberPhotoElectrons(double npe)
 }
 
 
-
-double EKLMStripHit::getTime() const
+int EKLMStripHit::getPlane() const
 {
-  return m_Time;
+  return m_Plane;
 }
-
-void EKLMStripHit::setTime(double time)
+void EKLMStripHit::setPlane(int plane)
 {
-  m_Time = time;
+  m_Plane = plane;
 }
-
-
-
-int EKLMStripHit::getLeadingParticlePDGCode() const
+int EKLMStripHit::getStrip() const
 {
-  return m_LeadingParticlePDGCode;
+  return m_Strip;
 }
-
-void EKLMStripHit::setLeadingParticlePDGCode(int pdg)
+void EKLMStripHit::setStrip(int strip)
 {
-  m_LeadingParticlePDGCode = pdg;
+  m_Strip = strip;
 }
 
 

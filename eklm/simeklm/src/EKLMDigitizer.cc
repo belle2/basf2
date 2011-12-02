@@ -126,9 +126,6 @@ namespace Belle2 {
         }
       }
 
-//       graph_traits < adjacency_list <> >::vertex_iterator it, end;
-//       property_map < adjacency_list <>, vertex_index_t >::type  index_map = get(vertex_index, G);
-
       // search for connected subgraphs
       vector<int> component(num_vertices(G));
 
@@ -145,24 +142,15 @@ namespace Belle2 {
         if (current == graphComponentToSimHit.end()) {    // no  entry for this component
 
           // create new EKLMSimHit and store all information into it
-          EKLMSimHit *simHit = new(m_simHitsArray->AddrAt(m_simHitsArray.getEntries()))  EKLMSimHit();
+          EKLMSimHit *simHit = new(m_simHitsArray->AddrAt(m_simHitsArray.getEntries()))  EKLMSimHit(stepHit);
           // insert hit to the map
           graphComponentToSimHit.insert(pair<int, EKLMSimHit*>(component[distance(hitMap.begin(), hitIterator)], simHit));
-          simHit->setGlobalPos(stepHit->getPosition());
-          simHit->setTime(stepHit->getTime());
-          simHit->setEDep(stepHit->getEDep());
-          simHit->setPDGCode(stepHit->getPDG());
-          //simHit->setVolType(volType);
+
+          simHit->setPlane(stepHit->getPlane());
+          simHit->setStrip(stepHit->getStrip());
           simHit->setMomentum(stepHit->getMomentum());
           simHit->setEnergy(stepHit->getEnergy());
 
-//    if (volType == 0) { // strip
-//      simHit->set_nEndcap(stepHit->get_nEndcap());
-//      simHit->set_nSector(stepHit->get_nSector());
-//      simHit->set_nLayer(stepHit->get_nLayer());
-//      simHit->set_nPlane(stepHit->get_nPlane());
-//      simHit->set_nStrip(stepHit->get_nStrip());
-//    }
         } else { // entry already exist
           // compare hittime. The leading one has smallest time
           if (current->second->getTime() < stepHit->getTime()) {
@@ -171,9 +159,9 @@ namespace Belle2 {
           } else {
             // new hit is ancestor,  modify everything
             current->second->setEDep(current->second->getEDep() + stepHit->getEDep());
-            current->second->setGlobalPos(stepHit->getPosition());
+            current->second->setPosition(stepHit->getPosition());
             current->second->setTime(stepHit->getTime());
-            current->second->setPDGCode(stepHit->getPDG());
+            current->second->setPDG(stepHit->getPDG());
             current->second->setMomentum(stepHit->getMomentum());
             current->second->setEnergy(stepHit->getEnergy());
           }
@@ -183,11 +171,8 @@ namespace Belle2 {
     }
 
 
-    B2INFO("EKLMDigitizer::makeSimHits() completed");
+    B2DEBUG(1, "EKLMDigitizer::makeSimHits() completed");
   }
-
-
-
 
 
 
@@ -217,42 +202,28 @@ namespace Belle2 {
   //!  are simulated in EKLMFiberAndElectronics class
   void EKLMDigitizer::mergeSimHitsToStripHits()
   {
-    //    B2INFO( "STRAT MERGING HITS");
     for (map<const G4VPhysicalVolume *, vector<EKLMSimHit*> >::iterator it =
            m_HitStripMap.begin(); it != m_HitStripMap.end(); it++) {
 
-      //      B2DEBUG(1, "MAP ENTRY");
+
+      // create fiberAndElectronicsSimulator entry
       EKLMFiberAndElectronics * fiberAndElectronicsSimulator =
         new EKLMFiberAndElectronics(*it);
+
+      // do all work
       fiberAndElectronicsSimulator->processEntry();
 
       EKLMSimHit *simHit = it->second.front();
 
-      EKLMStripHit *stripHit = new(m_stripHitsArray->AddrAt(m_stripHitsArray.getEntries()))EKLMStripHit();
-
-      //      EKLMStripHit *stripHit = new EKLMStripHit();
-
-      stripHit->setEndcap(simHit->getEndcap());
-      stripHit->setLayer(simHit->getLayer());
-      stripHit->setSector(simHit->getSector());
-      stripHit->setPlane(simHit->getPlane());
-      stripHit->setStrip(simHit->getStrip());
-      stripHit->setVolume(simHit->getVolume());
-
-      //stripHit->setHistogramm(cloneHist);
+      // create new stripHit
+      EKLMStripHit *stripHit = new(m_stripHitsArray->AddrAt(m_stripHitsArray.getEntries()))EKLMStripHit(simHit);
 
       if (!fiberAndElectronicsSimulator->getFitStatus()) {
         stripHit->setTime(fiberAndElectronicsSimulator->getFitResults(0));
         stripHit->setNumberPhotoElectrons(fiberAndElectronicsSimulator->
                                           getFitResults(3));
-      } else {
-        stripHit->setNumberPhotoElectrons(-1);
-        stripHit->setTime(-1);
       }
 
-      stripHit->setLeadingParticlePDGCode(0);
-
-      //      m_HitVector.push_back(stripHit);
       delete fiberAndElectronicsSimulator;
     }
     //    B2INFO( "STOP MERGING HITS");

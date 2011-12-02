@@ -14,15 +14,13 @@
 
 #include <TObject.h>
 
+
 #include "G4VPhysicalVolume.hh"
-#include "G4THitsCollection.hh"
-#include "G4Allocator.hh"
-#include "G4ThreeVector.hh"
-
 #include <eklm/dataobjects/EKLMHitBase.h>
-#include <TVector3.h>
+#include <eklm/dataobjects/EKLMStepHit.h>
 
-#include "G4VHit.hh"
+
+#include <string>
 namespace Belle2 {
 
   /**
@@ -39,11 +37,9 @@ namespace Belle2 {
     EKLMSimHit();
 
     /**
-     *  Constructor with initial values
+     *  Constructor with StepHit
      */
-    EKLMSimHit(G4VPhysicalVolume *pv, TVector3 global_pos,
-               TVector3 local_pos, G4double time, G4int PDGcode,
-               G4double eDep);
+    EKLMSimHit(const EKLMStepHit * stepHit);
 
     /**
      * Destructor
@@ -59,86 +55,6 @@ namespace Belle2 {
      * set physical volume
      */
     void setVolume(const G4VPhysicalVolume *);
-
-    /**
-     * returns global position of the hit
-     */
-    const TVector3 * getGlobalPos() const;
-
-    /**
-     * set global position of the hit
-     */
-    void setGlobalPos(const TVector3 &);
-
-    /**
-     * set global position of the hit
-     */
-    void setGlobalPos(const TVector3 *);
-
-    /**
-     * returns local position of the hit
-     */
-    const TVector3 * getLocalPos() const;
-
-    /**
-     * set local position of the hit
-     */
-    void setLocalPos(const TVector3 &);
-
-    /**
-     * set local position of the hit
-     */
-    void setLocalPos(const TVector3 *);
-
-    /**
-     * returns hit time
-     */
-    G4double getTime()  const;
-
-    /**
-     * set hit time
-     */
-    void setTime(double);
-
-    /**
-     * returns energy deposition
-     */
-    G4double getEDep() const;
-
-    /**
-     * set  energy deposition
-     */
-    void setEDep(double);
-
-    /**
-     *returns PDG code of the particle
-     */
-    G4int getPDGCode() const;
-
-    /**
-     *sets PDG code of the particle
-     */
-    void setPDGCode(G4int);
-
-    /**
-     * returns track ID
-     */
-    G4int getTrackID() const;
-
-    /**
-     * sets track ID
-     */
-    void  setTrackID(G4int);
-
-    /**
-     * returs parent track ID
-     */
-    int getParentTrackID() const;
-
-    /**
-     * sets parent track ID
-     */
-    void setParentTrackID(G4int);
 
     /**
      * returns volume type (needed for background study mode)
@@ -182,17 +98,27 @@ namespace Belle2 {
     void Save(char * filename);
 
 
+    /**
+     * Get plane number.
+     */
+    int getPlane() const;
+
+    /**
+     * Set plane number.
+     */
+    void setPlane(int Plane);
+
+    /**
+     * Get strip number.
+     */
+    int getStrip() const;
+
+    /**
+     * Set strip number.
+     */
+    void setStrip(int Strip);
 
   private:
-    /**
-     *Physical volume
-     */
-    const  G4VPhysicalVolume *m_pv; //! {ROOT streamer directive}
-
-    /**
-     * particle momentum
-     */
-    TVector3 m_momentum;
 
     /**
      *particle energy
@@ -200,39 +126,32 @@ namespace Belle2 {
     double m_energy;
 
     /**
-     * hit position (in global reference frame)
+     * particle momentum
      */
-    TVector3 m_global_pos;
+    TVector3 m_momentum;
+
 
     /**
-     * hit position (in local reference frame)
+     *Physical volume
      */
-    TVector3 m_local_pos;
+    const  G4VPhysicalVolume *m_pv; //! {ROOT streamer directive}
+
 
     /**
-     * hit time
+     * Number of plane.
      */
-    G4double m_time;
+    int m_Plane;
 
     /**
-     * energy depostion
+     * Number of strip.
      */
-    G4double m_eDep;
+    int m_Strip;
+
 
     /**
-     * PDG code of the track particle
+     * Name of the volume
      */
-    G4int m_PDGcode;
-
-    /**
-     * track ID
-     */
-    G4int m_trackID;
-
-    /**
-     * parent track ID
-     */
-    G4int m_parentTrackID;
+    std::string m_pvName;
 
 
     /**

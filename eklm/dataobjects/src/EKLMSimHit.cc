@@ -17,29 +17,23 @@ using namespace Belle2;
 
 ClassImp(Belle2::EKLMSimHit)
 
-G4Allocator<EKLMSimHit> EKLMSimHitAllocator;
+EKLMSimHit::EKLMSimHit():
+    EKLMHitBase(),
+    m_energy(0.),
+    m_momentum(TVector3(0., 0., 0.)),
+    m_pv(NULL),
+    m_pvName("not initialized"),
+    m_volType(0)
+{}
 
-EKLMSimHit::EKLMSimHit()
-{
-  m_pv = NULL;
-  m_global_pos = TVector3(0, 0, 0);
-  m_local_pos = TVector3(0, 0, 0);
-  m_time = 0;
-  m_PDGcode = 0;
-  m_eDep = 0;
-}
-
-EKLMSimHit::EKLMSimHit(G4VPhysicalVolume *pv, TVector3 global_pos,
-                       TVector3 local_pos, G4double time,
-                       G4int PDGcode, G4double eDep)
-{
-  m_pv = pv;
-  m_global_pos = global_pos;
-  m_local_pos = local_pos;
-  m_time = time;
-  m_PDGcode = PDGcode;
-  m_eDep = eDep;
-}
+EKLMSimHit::EKLMSimHit(const EKLMStepHit * stepHit)
+    : EKLMHitBase((EKLMHitBase)*stepHit),
+    m_energy(stepHit->getEnergy()),
+    m_momentum(*(stepHit->getMomentum())),
+    m_pv(stepHit->getVolume()),
+    m_pvName(m_pv->GetName()),
+    m_volType(stepHit->getVolumeType())
+{}
 
 const G4VPhysicalVolume* EKLMSimHit::getVolume() const
 {
@@ -49,82 +43,6 @@ const G4VPhysicalVolume* EKLMSimHit::getVolume() const
 void EKLMSimHit::setVolume(const G4VPhysicalVolume* pv)
 {
   m_pv = pv;
-}
-
-const TVector3 * EKLMSimHit::getGlobalPos() const
-{
-  return &m_global_pos;
-}
-
-void EKLMSimHit::setGlobalPos(const TVector3 & gp)
-{
-  m_global_pos = gp;
-}
-
-void EKLMSimHit::setGlobalPos(const TVector3 * gp)
-{
-  m_global_pos = *gp;
-}
-
-const TVector3 *  EKLMSimHit::getLocalPos() const
-{
-  return &m_local_pos;
-}
-
-void EKLMSimHit::setLocalPos(const TVector3 & lp)
-{
-  m_local_pos = lp;
-}
-
-G4double EKLMSimHit::getTime() const
-{
-  return m_time;
-}
-void EKLMSimHit::setTime(double t)
-{
-  m_time = t;
-}
-
-G4double EKLMSimHit::getEDep() const
-{
-  return m_eDep;
-}
-
-void EKLMSimHit::setEDep(double e)
-{
-  m_eDep = e;
-}
-
-G4int EKLMSimHit::getPDGCode() const
-{
-  return m_PDGcode;
-}
-
-void EKLMSimHit::setPDGCode(int pdg)
-{
-  m_PDGcode = pdg;
-}
-
-
-G4int EKLMSimHit::getTrackID() const
-{
-  return m_trackID;
-}
-
-void  EKLMSimHit::setTrackID(G4int id)
-{
-  m_trackID = id;
-}
-
-
-G4int EKLMSimHit::getParentTrackID() const
-{
-  return  m_parentTrackID;
-}
-
-void EKLMSimHit::setParentTrackID(G4int id)
-{
-  m_parentTrackID = id;
 }
 
 bool  EKLMSimHit::getVolType() const
@@ -164,17 +82,33 @@ void  EKLMSimHit::setEnergy(double e)
   m_energy = e;
 }
 
+int EKLMSimHit::getPlane() const
+{
+  return m_Plane;
+}
+void EKLMSimHit::setPlane(int plane)
+{
+  m_Plane = plane;
+}
+int EKLMSimHit::getStrip() const
+{
+  return m_Strip;
+}
+void EKLMSimHit::setStrip(int strip)
+{
+  m_Strip = strip;
+}
+
 
 void EKLMSimHit::Save(char* filename)
 {
   std::ofstream save_hit(filename, std::fstream::app);
   save_hit << '\n';
   save_hit << "EKLM Hit: \n" ;
-  save_hit << "Global position: (" << m_global_pos.x() << "," << m_global_pos.y() << "," << m_global_pos.z() << ")\n"  ;
-  save_hit << "Local position: (" << m_local_pos.x() << "," << m_local_pos.y() << "," << m_local_pos.z() << ")\n"  ;
-  save_hit << "Time: " << m_time << '\n' ;
-  save_hit << "Energy Deposition: " <<  m_eDep << '\n' ;
-  save_hit << "PDG code: " << m_PDGcode << '\n';
+  save_hit << "Global position: (" << m_GlobalPosition.x() << "," << m_GlobalPosition.y() << "," << m_GlobalPosition.z() << ")\n"  ;
+  save_hit << "Time: " << m_Time << '\n' ;
+  save_hit << "Energy Deposition: " <<  m_EDep << '\n' ;
+  save_hit << "PDG code: " << m_PDG << '\n';
   save_hit.close();
 }
 

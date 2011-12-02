@@ -59,6 +59,26 @@ namespace Belle2 {
     //! returns  ChiSquare of the crossing point
     double getChiSq();
 
+    /**
+     * Get plane number.
+     */
+    int getPlane() const;
+
+    /**
+     * Set plane number.
+     */
+    void setPlane(int Plane);
+
+    /**
+     * Get strip number.
+     */
+    int getStrip() const;
+
+    /**
+     * Set strip number.
+     */
+    void setStrip(int Strip);
+
   private:
 
     //! reference to the X Strip hit
@@ -75,6 +95,17 @@ namespace Belle2 {
 
     //! Needed to make Belle2::EKLMHit2d storable
     ClassDef(Belle2::EKLMHit2d, 1);
+    /**
+     * Number of plane.
+     */
+    int m_Plane;
+
+    /**
+     * Number of strip.
+     */
+    int m_Strip;
+
+
 
   };
 

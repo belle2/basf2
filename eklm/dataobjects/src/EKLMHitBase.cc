@@ -20,18 +20,23 @@ EKLMHitBase::EKLMHitBase()
   m_Endcap = 0;
   m_Layer = 0;
   m_Sector = 0;
-  m_Plane = 0;
-  m_Strip = 0;
+  m_PDG = 0;
+  m_Time = 0;
+  m_EDep = 0;
+  m_GlobalPosition = TVector3(0., 0., 0.);
+  m_LocalPosition = TVector3(0., 0., 0.);
 }
 
-EKLMHitBase::EKLMHitBase(const int Endcap, const int Layer, const int Sector, const int Plane,
-                         const int Strip)
+EKLMHitBase::EKLMHitBase(int Endcap, int Layer, int Sector, int PDG, double Time, double EDep, TVector3  GlobalPosition, TVector3  LocalPosition)
 {
   m_Endcap = Endcap;
   m_Layer = Layer;
   m_Sector = Sector;
-  m_Plane = Plane;
-  m_Strip = Strip;
+  m_PDG = PDG;
+  m_Time = Time;
+  m_EDep = EDep;
+  m_GlobalPosition = GlobalPosition;
+  m_LocalPosition = LocalPosition;
 }
 
 int EKLMHitBase::getEndcap() const
@@ -64,24 +69,75 @@ void EKLMHitBase::setSector(int Sector)
   m_Sector = Sector;
 }
 
-int EKLMHitBase::getPlane() const
+
+
+
+int EKLMHitBase::getPDG() const
 {
-  return m_Plane;
+  return m_PDG;
 }
 
-void EKLMHitBase::setPlane(int Plane)
+void EKLMHitBase::setPDG(int PDG)
 {
-  m_Plane = Plane;
+  m_PDG = PDG;
 }
 
-int EKLMHitBase::getStrip() const
+
+
+double EKLMHitBase::getTime() const
 {
-  return m_Strip;
+  return m_Time;
 }
 
-void EKLMHitBase::setStrip(int Strip)
+void EKLMHitBase::setTime(double Time)
 {
-  m_Strip = Strip;
+  m_Time = Time;
 }
 
+
+
+double EKLMHitBase::getEDep() const
+{
+  return m_EDep;
+}
+
+void EKLMHitBase::setEDep(double EDep)
+{
+  m_EDep = EDep;
+}
+void EKLMHitBase::increaseEDep(double deltaEDep)
+{
+  m_EDep += deltaEDep;
+}
+
+const TVector3 * EKLMHitBase::getPosition() const
+{
+  return &m_GlobalPosition;
+}
+
+void EKLMHitBase::setPosition(TVector3 & position)
+{
+  m_GlobalPosition = position;
+}
+
+void EKLMHitBase::setPosition(const TVector3 * position)
+{
+  m_GlobalPosition = *position;
+}
+
+
+const TVector3 * EKLMHitBase::getLocalPosition() const
+{
+  return &m_LocalPosition;
+}
+
+void EKLMHitBase::setLocalPosition(TVector3 & position)
+{
+  m_LocalPosition = position;
+}
+
+void EKLMHitBase::setLocalPosition(const TVector3 * position)
+{
+  m_LocalPosition = *position;
+}
 

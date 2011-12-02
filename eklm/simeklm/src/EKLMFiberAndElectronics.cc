@@ -150,7 +150,7 @@ namespace Belle2 {
   {
     G4Box *box = (G4Box*)(sh->getVolume()->GetLogicalVolume()->GetSolid());
     double half_len = box->GetXHalfLength();
-    double local_pos = sh->getLocalPos()->x();
+    double local_pos = sh->getLocalPosition()->x();
     m_hitDist = make_pair(half_len - local_pos, 3.0 * half_len + local_pos);
   }
 

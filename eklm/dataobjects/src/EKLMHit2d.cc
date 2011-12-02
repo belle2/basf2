@@ -106,4 +106,21 @@ void EKLMHit2d::setChiSq()
 }
 
 
+int EKLMHit2d::getStrip() const
+{
+  return m_Strip;
+}
+void EKLMHit2d::setStrip(int strip)
+{
+  m_Strip = strip;
+}
 
+
+int EKLMHit2d::getPlane() const
+{
+  return m_Plane;
+}
+void EKLMHit2d::setPlane(int plane)
+{
+  m_Plane = plane;
+}

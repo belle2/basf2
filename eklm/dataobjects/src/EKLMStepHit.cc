@@ -17,49 +17,17 @@ using namespace std;
 
 ClassImp(EKLMStepHit);
 
-int EKLMStepHit::getPDG() const
-{
-  return m_PDG;
-}
-
-
-void  EKLMStepHit::setPDG(int PDG)
-{
-  m_PDG = PDG;
-}
-
-
-double EKLMStepHit::getTime() const
-{
-  return m_t;
-}
-
-
-void EKLMStepHit::setTime(double t)
-{
-  m_t = t;
-}
 
 
 double EKLMStepHit::getEnergy() const
 {
-  return m_E;
+  return m_energy;
 }
 
 
 void EKLMStepHit::setEnergy(double E)
 {
-  m_E = E;
-}
-
-const TVector3 * EKLMStepHit::getPosition() const
-{
-  return &m_position;
-}
-
-void EKLMStepHit::setPosition(TVector3 & position)
-{
-  m_position = position;
+  m_energy = E;
 }
 
 const TVector3 * EKLMStepHit::getMomentum() const
@@ -71,16 +39,6 @@ const TVector3 * EKLMStepHit::getMomentum() const
 void EKLMStepHit::setMomentum(TVector3  &  momentum)
 {
   m_momentum = momentum;
-}
-
-double EKLMStepHit::getEDep() const
-{
-  return m_energyDeposit;
-}
-
-void EKLMStepHit::setEDep(double edep)
-{
-  m_energyDeposit = edep;
 }
 
 int EKLMStepHit::getTrackID() const
@@ -141,11 +99,19 @@ void EKLMStepHit::setVolumeType(int type)
 }
 
 
-
-
-void EKLMStepHit::increaseEDep(double e)
+int EKLMStepHit::getPlane() const
 {
-  m_energyDeposit += e;
+  return m_Plane;
 }
-
-
+void EKLMStepHit::setPlane(int plane)
+{
+  m_Plane = plane;
+}
+int EKLMStepHit::getStrip() const
+{
+  return m_Strip;
+}
+void EKLMStepHit::setStrip(int strip)
+{
+  m_Strip = strip;
+}

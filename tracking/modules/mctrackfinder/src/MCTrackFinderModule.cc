@@ -66,7 +66,10 @@ MCTrackFinderModule::MCTrackFinderModule() : Module()
   //choose which hits to use, all hits assigned to the track candidate will be used in the fit
   addParam("UsePXDHits", m_usePXDHits, "Set true if PXDHits should be used", bool(true));
   addParam("UseSVDHits", m_useSVDHits, "Set true if SVDHits should be used", bool(true));
-  addParam("UseCDCHits", m_useCDCHits, "Set true if CDCHits should be used by", bool(true));
+  addParam("UseCDCHits", m_useCDCHits, "Set true if CDCHits should be used", bool(true));
+
+  //choose for which particles a track candidate should be created
+  addParam("WhichParticles", m_whichParticles, "Select for which particles a track candidate should be created: 0 for all primaries, 1 for those primaries who reach PXD, 2 for those primaries who reach SVD, 3 for those primaries who reach CDC", int(0));
 
   //smearing of MCMomentum (integer value)
   addParam("Smearing", m_smearing, "Smearing of MCMomentum/MCVertex prior to storing it in GFTrackCandidate (in %)", 0);
@@ -146,15 +149,22 @@ void MCTrackFinderModule::event()
   //StoreArray<Relation> trackCandsToMCParticles(m_gfTrackCandToMCParticleColName);
   RelationArray gfTrackCandToMCPart(trackCandidates, mcParticles);
 
-
+  //set the proper status
+  int status = 0;
+  if (m_whichParticles == 0) status = 1;   //primaries
+  if (m_whichParticles == 1) status = 16;  //seen in PXD
+  if (m_whichParticles == 2) status = 32;  //seen in SVD
+  if (m_whichParticles == 3) status = 64;  //seen in CDC
+  if (m_whichParticles > 3 || m_whichParticles < 0) {
+    B2WARNING("Invalid parameter! Track Candidates for all primary particles will be created.")
+    status = 1;
+  }
   // loop over MCParticles.
   // it would be nice to optimize this, because there are actually ~1000 secondary MCParticles for each primary MCParticle
   for (int iPart = 0; iPart < nMcParticles; ++iPart) {
-
-    //make links only for interesting MCParticles, for the moment take only primary particles
-    if (mcParticles[iPart]->hasStatus(1) == true) {
+    //make links only for interesting MCParticles, for the moment: primaries seen in a subdetector
+    if (mcParticles[iPart]->hasStatus(status) == true && mcParticles[iPart]->hasStatus(1) == true) {
       B2INFO("Search a  track for the MCParticle with index: " << iPart << " (PDG: " << mcParticles[iPart]->getPDG() << ")");
-
 
       // create a list containing the indices to the PXDHits that belong to one track
       vector<int> pxdHitsIndices;
@@ -224,7 +234,7 @@ void MCTrackFinderModule::event()
       TVector3 momentum = mcParticles[iPart]->getMomentum();
       int pdg = mcParticles[iPart]->getPDG();
 
-      //it may have positive effect on the fit not to start with exactly precise true values (or I may be just interesting to study this)
+      //it may have positive effect on the fit not to start with exactly precise true values (or it may be just interesting to study this)
       //one can smear the starting momentum values with a gaussian
       //this calculation is always performed, but with the default value of m_smearing = 0 it has no effect on momentum and position (true values are taken)
       TRandom3 *random = new TRandom3((UInt_t)12345);
@@ -246,9 +256,9 @@ void MCTrackFinderModule::event()
       //Default values in Genfit are (1.,1.,1.,), they seem to be not good!!
       //The best way to set the 'correct' errors has to be investigated....
       TVector3 posError;
-      posError.SetXYZ(2.0, 2.0, 2.0);
+      posError.SetXYZ(1.0, 1.0, 2.0);
       TVector3 momError;
-      momError.SetXYZ(0.1, 0.1, 0.5);
+      momError.SetXYZ(0.1, 0.1, 0.2);
 
       //Finally set the complete track seed
       trackCandidates[counter]->setComplTrackSeed(smearedPosition, smearedMomentum, pdg, posError, momError);

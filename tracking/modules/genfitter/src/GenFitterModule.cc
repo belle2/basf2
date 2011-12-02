@@ -103,6 +103,9 @@ void GenFitterModule::initialize()
   m_failedFitCounter = 0;
   m_successfulFitCounter = 0;
 
+  m_failedGFTrackCandFitCounter = 0;
+  m_successfulGFTrackCandFitCounter = 0;
+
   StoreArray < Track > tracks(m_tracksColName);
   StoreArray < GFTrack > gfTracks(m_gfTracksColName);
 
@@ -199,6 +202,7 @@ void GenFitterModule::event()
 
     int pdgCounter = pdg.size();   //number of pdg hypothesises
 
+    bool candFitted = false;   //boolean to mark if the track candidates was fitted successfully with at least one PDG hypothesis
 
     while (pdgCounter > 0) {  //while loop over all pdg hypothesises
       if (m_mcTracks == true && m_pdg == -999)trackCandidates[i]->setPdgCode(pdg.at(pdgCounter - 1));
@@ -308,6 +312,7 @@ void GenFitterModule::event()
             ++m_successfulFitCounter;
             ++trackCounter;
 
+            candFitted = true;
             //Create output tracks
             new(gfTracks->AddrAt(trackCounter)) GFTrack(gfTrack);  //GFTrack can be assigned directly
 
@@ -425,15 +430,21 @@ void GenFitterModule::event()
       pdgCounter--;
     } //end while
 
+    if (candFitted == true) m_successfulGFTrackCandFitCounter++;
+    else m_failedGFTrackCandFitCounter++;
+
   }// end else (track has hits)
-  B2INFO("GenFitter event summary: " << trackCounter + 1 << " tracks were fitted");
+  B2INFO("GenFitter event summary: " << trackCounter + 1 << " tracks were processed");
 
 }
 
 void GenFitterModule::endRun()
 {
-  B2INFO("GenFitter run summary: " << m_successfulFitCounter << "  tracks were fitted");
+  B2INFO("----- GenFitter run summary")
+  B2INFO("      " << m_successfulGFTrackCandFitCounter << " track candidates were fitted successfully");
+  B2INFO("      in total " << m_successfulFitCounter << " tracks were fitted");
   if (m_failedFitCounter > 0) {
+    B2WARNING("GenFitter: " << m_failedGFTrackCandFitCounter << " of " << m_successfulGFTrackCandFitCounter + m_failedGFTrackCandFitCounter << " track candidates could not be fitted in this run");
     B2WARNING("GenFitter: " << m_failedFitCounter << " of " << m_successfulFitCounter + m_failedFitCounter << " tracks could not be fitted in this run");
   }
 }

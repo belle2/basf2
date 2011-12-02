@@ -64,8 +64,12 @@ namespace Belle2 {
     std::string m_tracksColName;                     /**< Tracks collection name */
     std::string m_gfTracksColName;                   /**< GFTracks collection name */
 
+    //These are two different counters, the counter for GFTrackCands refers to the number of input GFTrackCands. The number of total successfull/failed fits may be different, if GFTrackCand is fitted several times under different PDG hypothesises.
     int m_failedFitCounter;                          /**< Number of failed fits. */
     int m_successfulFitCounter;                      /**< Number of successfully fitted tracks. */
+
+    int m_failedGFTrackCandFitCounter;               /**< Number of GFTrackCands with failed fits. */
+    int m_successfulGFTrackCandFitCounter;           /**< Number of GFTracksCands with successfully fitted tracks. */
 
     bool m_mcTracks;                                 /**< Boolean to mark if MCTrack or pattern reco tracks should be fitted. */
 

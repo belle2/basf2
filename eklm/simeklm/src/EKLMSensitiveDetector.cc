@@ -39,7 +39,7 @@ namespace Belle2 {
   //-----------------------------------------------------
   bool EKLMSensitiveDetector::step(G4Step *aStep, G4TouchableHistory *)
   {
-    std::cout << "EKLM SD called" << std::endl;
+
     /**
      * Get deposited energy
      */
@@ -128,7 +128,7 @@ namespace Belle2 {
     const int paretntTrackID = track.GetParentID();
 
 
-    std::cout << "EKLM SD creates a hit in " << ((G4PVPlacementGT*)pv)->getName() << " volume" << std::endl;
+
 
     /**
      * creates step hit and store in to DataStore

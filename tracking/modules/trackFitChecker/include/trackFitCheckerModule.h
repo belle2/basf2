@@ -155,7 +155,6 @@ namespace Belle2 {
 
     std::map<std::string, StatisticsContainer > m_trackWiseDataSamples;
     std::map<std::string, std::vector<StatisticsContainer> > m_trackWiseDataVecSamples;
-    //std::map<std::string, std::vector<StatisticsContainer> > m_layerWiseDataSamples;
     std::map<std::string, std::vector<std::vector<StatisticsContainer> > > m_layerWiseDataSamples;
 
     //bool m_testGeant3;
@@ -180,6 +179,7 @@ namespace Belle2 {
     std::stringstream m_textOutput;
 
     bool m_writeToFile;
+    bool m_writeToRootFile;
     int m_nCdcLayers;
     int m_nLayers;
   };

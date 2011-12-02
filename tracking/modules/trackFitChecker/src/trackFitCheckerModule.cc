@@ -36,6 +36,8 @@ trackFitCheckerModule::trackFitCheckerModule() : Module()
   addParam("useTruthInfo", m_useTruthInfo, "use the truth info from the geant4 simulation", false);
   addParam("testPrediction", m_testPrediction, "Additionally test the predicted state vecs from the Kalman filter. ONLY WOKRKS IF THEY ARE SAVED DURING FITTING WHICH IS NOT THE DEFAULT", false);
   addParam("writeToB2info", m_writeToB2info, "Set to True if you want the results of the statistical tests written out with the B2INFO command", true);
+  addParam("writeToRootFile", m_writeToRootFile, "Set to True if you want the data from the statistical tests written into a root file", false);
+
   //Module::getParam(string("writeToB2info"));
 }
 
@@ -47,11 +49,14 @@ trackFitCheckerModule::~trackFitCheckerModule()
 
 void trackFitCheckerModule::initialize()
 {
+  //set all user parameters
+
   //configure the output
   //Module::getParam(string("writeToB2info"));
   m_testOutputFileName = "statisticaltests.txt";
   m_writeToFile = true;
-  m_nDigits = 4;
+  m_textOutput.precision(4);
+
   m_nPxdLayers = 2;
   m_nCdcLayers = 0;
   m_nSvdLayers = 4;
@@ -421,12 +426,8 @@ void trackFitCheckerModule::event()
         m_dataOut << "\n";
       }
       ++m_processedTracks;
-
-
     }
   }
-  //m_dataOut << "\n";
-  ++eventCounter;
 }
 
 void trackFitCheckerModule::endRun()
@@ -591,15 +592,11 @@ bool trackFitCheckerModule::isSymmetric(const TMatrixT<double>& aMatrix)
     }
   }
   return true;
-
 }
 
 void trackFitCheckerModule::printLayerWiseStatistics(const string& nameOfDataSample, const vector<string>& layerWiseVarNames)
 {
-
   vector<vector<StatisticsContainer> >&  dataSample = m_layerWiseDataSamples[nameOfDataSample];
-
-  m_textOutput.precision(m_nDigits);
 
   int nOfLayers = dataSample.size();
   int nOfVars = dataSample[0].size();
@@ -617,20 +614,16 @@ void trackFitCheckerModule::printLayerWiseStatistics(const string& nameOfDataSam
 
 void trackFitCheckerModule::printTrackWiseStatistics(const string& nameOfDataSample)
 {
-
   StatisticsContainer&  dataSample = m_trackWiseDataSamples[nameOfDataSample];
 
-  m_textOutput.precision(m_nDigits);
   m_textOutput << "Information on " << nameOfDataSample << "\nmean\tstd\n";
   m_textOutput << fixed << mean(dataSample) << "\t" << sqrt(variance(dataSample)) << "\n";
 }
 
 void trackFitCheckerModule::printTrackWiseVecStatistics(const string& nameOfDataSample, const vector<string>& trackWiseVarNames)
 {
-
   vector<StatisticsContainer>& dataSample = m_trackWiseDataVecSamples[nameOfDataSample];
 
-  m_textOutput.precision(m_nDigits);
   const int nOfVars = dataSample.size();
   m_textOutput << "Information on " << nameOfDataSample << "\n\tmean\tstd\n";
   for (int i = 0; i not_eq nOfVars; ++i) {

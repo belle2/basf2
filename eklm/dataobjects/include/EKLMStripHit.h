@@ -11,12 +11,12 @@
 #ifndef EKLMSTRIPHIT_H
 #define EKLMSTRIPHIT_H
 
-#include <framework/datastore/DataStore.h>
-
 #include  <eklm/dataobjects/EKLMHitBase.h>
 #include  <eklm/dataobjects/EKLMSimHit.h>
 #include  "globals.hh"
 #include  "CLHEP/Vector/ThreeVector.h"
+#include  "TFitResultPtr.h"
+#include  "TFitResult.h"
 
 #include "G4VPhysicalVolume.hh"
 
@@ -32,14 +32,14 @@ namespace Belle2 {
     //! Constructor
     EKLMStripHit() {};
 
-    //! Constructor from the EKLMHitBase
+    //! Constructor from the EKLMSimHit
     EKLMStripHit(const EKLMSimHit * Hit);
 
     //! Destructor
     ~EKLMStripHit() {};
 
     //! Print stip name and some other useful info
-    void Print();
+    void Print() const;
 
 
 
@@ -58,13 +58,6 @@ namespace Belle2 {
     void setVolume(const G4VPhysicalVolume *pv);
 
 
-
-
-    //! returns true if strips intersects (does not pay attention to the layer)
-    bool doesIntersect(Belle2::EKLMStripHit *, CLHEP::Hep3Vector &);
-
-    //! returns distance btw. the hit and SiPM
-    double getLightPropagationLength(CLHEP::Hep3Vector &);
 
     /**
      * Get plane number.
@@ -85,6 +78,23 @@ namespace Belle2 {
      * Set strip number.
      */
     void setStrip(int Strip);
+
+    /**
+     * Get fit results
+     */
+    const TFitResult * getFitResults() const;
+
+    /**
+     * Set fit results
+     */
+    void setFitResults(TFitResult &res);
+
+
+    /**
+     * Set fit results
+     */
+    void setFitResults(TFitResultPtr resPtr);
+
 
 
 
@@ -107,11 +117,11 @@ namespace Belle2 {
     double m_NumberPhotoElectrons;
 
 
-    //! distance btw. the hit and SiPM
-    double m_LightPropagationLength;
-
     //! Physical volume (for simulation)
     const G4VPhysicalVolume *m_pv;   //! {ROOT streamer directive}
+
+    //! Fit results object
+    TFitResult m_fitResults;
 
 
     //! Makes objects storable

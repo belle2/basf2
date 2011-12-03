@@ -43,6 +43,11 @@ namespace Belle2 {
      */
     void processEntry();
 
+    /**
+     * returns pointer to  TFitResult object
+     */
+    TFitResultPtr getFitResultsPtr() const;
+
 
     /**
      * returns i'th parameter of the fit
@@ -172,6 +177,11 @@ namespace Belle2 {
      */
     double m_fiberDeExcitationTime;
 
+    /**
+     * speed of the first photoelectoron
+     * used to calculate distance from SiPm to the Hit using time delay
+     */
+    double  m_firstPhotonlightSpeed;
 
     // -------------------------- methods
 

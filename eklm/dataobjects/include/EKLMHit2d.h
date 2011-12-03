@@ -16,7 +16,7 @@
 
 #include  <eklm/dataobjects/EKLMStripHit.h>
 #include  "globals.hh"
-#include  "CLHEP/Vector/ThreeVector.h"
+#include  "TVector3.h"
 
 #include <string>
 namespace Belle2 {
@@ -30,7 +30,7 @@ namespace Belle2 {
     EKLMHit2d();
 
     //! Constructor with two strips
-    EKLMHit2d(Belle2::EKLMStripHit*, Belle2::EKLMStripHit*);
+    EKLMHit2d(EKLMStripHit*, EKLMStripHit*);
 
     //! Destructor
     ~EKLMHit2d() {};
@@ -39,56 +39,37 @@ namespace Belle2 {
     void Print();
 
     //! add StripHit to 2dhit. returns false if impossible
-    bool addStripHit(Belle2::EKLMStripHit *);
+    bool addStripHit(const EKLMStripHit *);
 
     //! returns pointer to the strip hit in X direction
-    Belle2::EKLMStripHit* getXStripHit();
+    const EKLMStripHit* getXStripHit() const;
 
     //! returns pointer to the strip hit in Y direction
-    Belle2::EKLMStripHit* getYStripHit();
+    const EKLMStripHit* getYStripHit() const;
 
     //! set coordinates of the crossing point
-    void setCrossPoint(CLHEP::Hep3Vector & point);
+    void setCrossPoint(TVector3 & point);
 
     //! returns coordinates of the crossing point
-    CLHEP::Hep3Vector getCrossPoint();
+    TVector3 getCrossPoint()  const;
 
     //! calculates ChiSquare of the crossing point
     void setChiSq();
 
     //! returns  ChiSquare of the crossing point
-    double getChiSq();
+    double getChiSq() const;
 
-    /**
-     * Get plane number.
-     */
-    int getPlane() const;
-
-    /**
-     * Set plane number.
-     */
-    void setPlane(int Plane);
-
-    /**
-     * Get strip number.
-     */
-    int getStrip() const;
-
-    /**
-     * Set strip number.
-     */
-    void setStrip(int Strip);
 
   private:
 
     //! reference to the X Strip hit
-    Belle2::EKLMStripHit * m_XStrip; //-> {ROOT streamer directive}
+    EKLMStripHit const * m_XStrip; //-> {ROOT streamer directive}
 
     //! reference to the Y Strip hit
-    Belle2::EKLMStripHit * m_YStrip; //-> {ROOT streamer directive}
+    EKLMStripHit const * m_YStrip; //-> {ROOT streamer directive}
 
     //! crossing point global coordinates
-    CLHEP::Hep3Vector m_crossPoint;
+    TVector3  m_crossPoint;
 
     //! ChiSq of the hit
     double m_ChiSq;
@@ -99,12 +80,6 @@ namespace Belle2 {
      * Number of plane.
      */
     int m_Plane;
-
-    /**
-     * Number of strip.
-     */
-    int m_Strip;
-
 
 
   };

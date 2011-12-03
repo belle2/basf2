@@ -222,6 +222,9 @@ namespace Belle2 {
         stripHit->setTime(fiberAndElectronicsSimulator->getFitResults(0));
         stripHit->setNumberPhotoElectrons(fiberAndElectronicsSimulator->
                                           getFitResults(3));
+      } else {
+        stripHit->setTime(0);
+        stripHit->setNumberPhotoElectrons(0);
       }
 
       delete fiberAndElectronicsSimulator;

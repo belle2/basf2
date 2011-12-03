@@ -11,14 +11,16 @@
 #ifndef EKLMSECTORHIT_H
 #define EKLMSECTORHIT_H
 
-#include <framework/datastore/DataStore.h>
-#include <TObject.h>
-
+#include  <eklm/dataobjects/EKLMHitBase.h>
 #include  <eklm/dataobjects/EKLMStripHit.h>
 #include  <eklm/dataobjects/EKLMHit2d.h>
 #include  "globals.hh"
 
 #include <string>
+#include <vector>
+
+
+
 namespace Belle2 {
 
   //! Class for handling hits in the whole sector. Needed to form 2d hits
@@ -39,16 +41,17 @@ namespace Belle2 {
     //! Print information about the sector hit
     void Print();
 
-    //! Adds Belle2::EKLMStripHit to the Belle2::EKLMSectorHit
-    bool addStripHit(Belle2::EKLMStripHit *);
+    //! Adds EKLMStripHit to the EKLMSectorHit
+    bool addStripHit(EKLMStripHit *);
 
-    //! returns vector of pointers to the Belle2::EKLMStripHits included to
-    //! the Belle2::EKLMSectorHit
-    std::vector <Belle2::EKLMStripHit*> getStripHitVector();
+    //! returns pointer to the vector of pointers to the EKLMStripHits included to
+    //! the EKLMSectorHit
+    std::vector <EKLMStripHit*> * getStripHitVector() ;
 
-    //! returns vector of pointers to 2d hits included to the
+    //! returns pointer to the vector of pointers to 2d hits included to the
+
     //! Belle2::EKLMSectorHit
-    std::vector <Belle2::EKLMHit2d*> get2dHitVector();
+    std::vector <EKLMHit2d*>* get2dHitVector() ;
 
     //! creates 2d hits from the SectorHits of the current sector
     void create2dHits();
@@ -58,10 +61,10 @@ namespace Belle2 {
 
     //! vector of pointers to the Belle2::EKLMStripHits included to the
     //! Belle2::EKLMSectorHit
-    std::vector<Belle2::EKLMStripHit*> m_stripHitVector;
+    std::vector<EKLMStripHit*> m_stripHitVector;
 
     //! vector of pointers to 2d hits included to the Belle2::EKLMSectorHit
-    std::vector<Belle2::EKLMHit2d*> m_hit2dVector;
+    std::vector<EKLMHit2d*> m_hit2dVector;
 
     //! Needed to make objects storable
     ClassDef(Belle2::EKLMSectorHit, 1);

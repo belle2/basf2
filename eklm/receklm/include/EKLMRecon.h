@@ -14,6 +14,7 @@
 #include<vector>
 #include<eklm/dataobjects/EKLMStripHit.h>
 #include<eklm/dataobjects/EKLMSectorHit.h>
+#include <framework/datastore/StoreArray.h>
 
 
 
@@ -40,6 +41,13 @@ namespace Belle2 {
 
 
   private:
+
+    /**
+     * Storage
+     */
+    StoreArray<EKLMHit2d>m_hit2dArray;
+
+
     //! vector of StripHits
     std::vector <EKLMStripHit*> m_StripHitVector;
 
@@ -47,7 +55,7 @@ namespace Belle2 {
     std::vector <EKLMSectorHit*> m_SectorHitVector;
 
     //! vector of  2d hits
-    std::vector <EKLMHit2d*> m_2dHitVector;
+    std::vector <EKLMHit2d*> m_hit2dVector;
 
   };
 

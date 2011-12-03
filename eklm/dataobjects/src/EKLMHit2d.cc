@@ -24,27 +24,27 @@ EKLMHit2d::EKLMHit2d()
   m_YStrip = NULL;
 }
 
-Belle2::EKLMStripHit* EKLMHit2d::getXStripHit()
+const Belle2::EKLMStripHit* EKLMHit2d::getXStripHit() const
 {
   return m_XStrip;
 }
 
-Belle2::EKLMStripHit* EKLMHit2d::getYStripHit()
+const Belle2::EKLMStripHit* EKLMHit2d::getYStripHit() const
 {
   return m_YStrip;
 }
 
-void EKLMHit2d::setCrossPoint(CLHEP::Hep3Vector & point)
+void EKLMHit2d::setCrossPoint(TVector3 & point)
 {
   m_crossPoint = point;
 }
 
-CLHEP::Hep3Vector EKLMHit2d::getCrossPoint()
+TVector3 EKLMHit2d::getCrossPoint() const
 {
   return m_crossPoint;
 }
 
-double EKLMHit2d::getChiSq()
+double EKLMHit2d::getChiSq() const
 {
   return m_ChiSq;
 }
@@ -56,8 +56,6 @@ EKLMHit2d::EKLMHit2d(EKLMStripHit * xStrip, EKLMStripHit * yStrip)
   setEndcap(xStrip->getEndcap());
   setLayer(xStrip->getLayer());
   setSector(xStrip->getSector());
-  setPlane(0);
-  setStrip(0);
 }
 
 void EKLMHit2d::Print()
@@ -70,12 +68,14 @@ void EKLMHit2d::Print()
   m_XStrip->Print();
   std::cout << "Y: ";
   m_YStrip->Print();
-  std::cout << "intersection: " << m_crossPoint << std::endl;
+  std::cout << "intersection:";
+  m_crossPoint.Print();
+
   std::cout << "ChiSq: " << m_ChiSq << std::endl;
 }
 
 
-bool EKLMHit2d::addStripHit(EKLMStripHit *stripHit)
+bool EKLMHit2d::addStripHit(const EKLMStripHit *stripHit)
 {
   if (m_XStrip != NULL && m_YStrip != NULL) {
     B2FATAL("Attempt to add more than 2 strips in 2d hit!");
@@ -97,30 +97,11 @@ void EKLMHit2d::setChiSq()
 
   double v = 17.0;  // 17cm/ns=speed of light; should be accessible via xml!
   double tX = m_XStrip->getTime() -
-              m_XStrip->getLightPropagationLength(m_crossPoint) / v;
+              getLightPropagationLength(m_XStrip->getVolume(), m_crossPoint) / v;
   double tY = m_YStrip->getTime() -
-              m_YStrip->getLightPropagationLength(m_crossPoint) / v;
+              getLightPropagationLength(m_YStrip->getVolume(), m_crossPoint) / v;
 
   double sigmaT = 1.;  // ns, smearing in time ; should be accessible via xml!
   m_ChiSq = (tX - tY) * (tX - tY) / sigmaT / sigmaT;
 }
 
-
-int EKLMHit2d::getStrip() const
-{
-  return m_Strip;
-}
-void EKLMHit2d::setStrip(int strip)
-{
-  m_Strip = strip;
-}
-
-
-int EKLMHit2d::getPlane() const
-{
-  return m_Plane;
-}
-void EKLMHit2d::setPlane(int plane)
-{
-  m_Plane = plane;
-}

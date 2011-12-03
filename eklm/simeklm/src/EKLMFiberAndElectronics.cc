@@ -47,6 +47,7 @@ namespace Belle2 {
     m_fiberDeExcitationTime = Digitizer.getDouble("FiberDeExcitationTime");
     m_outputFilename = Digitizer.getString("OutputFile");
     m_lightSpeed = Digitizer.getDouble("LightSpeedInFiber");
+    m_firstPhotonlightSpeed = Digitizer.getDouble("FirstPhotonSpeed");
     m_attenuationLength = Digitizer.getLength("AttenuationLength");
     m_expCoefficient = Digitizer.getDouble("SignalShapeExpCoefficient");
     m_meanSiPMNoise = Digitizer.getDouble("BackgroundPoissonMean");
@@ -117,14 +118,15 @@ namespace Belle2 {
     m_digitizedAmplitude->Add(m_digitizedAmplitudeReflected, 1);
     m_digitizedAmplitude->Add(m_digitizedAmplitudeDirect, 1);
 
+
+    // add random SiPM noise to the histogram
+    addRandomSiPMNoise();
+
     // set up fit parameters
     m_fitFunction->SetParameters(10, 2., 0.04, 50);
 
     // do fit
     m_fitResultsPtr = m_digitizedAmplitude->Fit(m_fitFunction, "LLSQ");
-
-    // add random SiPM noise
-    addRandomSiPMNoise();
 
 
     // if save histograms if outputFilename is non-empty
@@ -216,9 +218,14 @@ namespace Belle2 {
 
   double EKLMFiberAndElectronics::lightPropagationTime(double L)
   {
-    return L / m_lightSpeed;
+    return L / m_firstPhotonlightSpeed;
   }
 
+
+  TFitResultPtr EKLMFiberAndElectronics::getFitResultsPtr() const
+  {
+    return m_fitResultsPtr;
+  }
 
   double EKLMFiberAndElectronics::getFitResults(int i) const
   {

@@ -15,26 +15,16 @@
 
 //! Tools collections common for EKLM
 
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/StoreArray.h>
-
 #include <TGeoVolume.h>
+#include <TVector3.h>
 #include "boost/lexical_cast.hpp"
 
+#include "CLHEP/Vector/ThreeVector.h"
+
+#include <eklm/dataobjects/EKLMStripHit.h>
 
 
 namespace Belle2 {
-
-  //! template function to simple store any storable object in the datastore.
-  //! (too slow?)
-  template < class T >
-  void storeEKLMObject(std::string arrayName, T* obj)
-  {
-    StoreArray<T> array(arrayName);
-    // since the array is indexed from 0 getEntries() points
-    // exactly to the next to the last entry
-    new(array->AddrAt(array.getEntries())) T(*obj);
-  }
 
   /**
    * Get physical volume by point
@@ -46,10 +36,28 @@ namespace Belle2 {
    * @strip: strip
    */
   bool CheckStripOrientationX(const G4VPhysicalVolume *strip);
+
+
+  /**
+   * check if two Hitted sterips do intersect and fill Hep3Vector with coordinates of intersection
+   * if interseation is not found crossPoint is set to (0,0,0)
+   */
+  bool doesIntersect(const EKLMStripHit * hit1, const EKLMStripHit * hit2,
+                     TVector3 & crossPoint);
+
+
+
+  /**
+   *  Return distance from the point and SiPM of the Strip
+   */
+  double getLightPropagationLength(const G4VPhysicalVolume * vol, const TVector3  &pos);
+
+  /**
+   *  Return distance from the point and SiPM of the Strip
+   */
+  double getLightPropagationLength(const G4VPhysicalVolume * vol, const CLHEP::Hep3Vector  &pos);
+
 }
-
-
-
 
 #endif //EKLMUTILS_H
 

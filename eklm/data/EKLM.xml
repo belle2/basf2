@@ -17,7 +17,8 @@
      <MirrorReflectiveIndex desc="Reflective index of the mirror at the end of the fiber">0.95</MirrorReflectiveIndex>
      <ScintillatorDeExcitationTime desc="Scintillator deexcitation time" unit="ns">3</ScintillatorDeExcitationTime>
      <FiberDeExcitationTime desc="Fiber deexcitation time" unit="ns">10</FiberDeExcitationTime>
-     <LightSpeedInFiber desc="self-explaining, cm/ns">17.0</LightSpeedInFiber>
+     <LightSpeedInFiber desc="Light speed in fiber, does not depend on angle, cm/ns">17.0</LightSpeedInFiber>
+     <FirstPhotonSpeed desc="Speed for a fastest photon. Should be measured, cm/ns">17.0</FirstPhotonSpeed>
      <SignalShapeExpCoefficient desc="exponent coefficient for a single-photoelectron shape">0.04</SignalShapeExpCoefficient>
      <AttenuationLength desc="attenuation length in the fiber" unit="cm">300</AttenuationLength>
      <BackgroundPoissonMean desc="Mean for SiPM backgrouns. If zero or negative no backgopunds are added">1</BackgroundPoissonMean>

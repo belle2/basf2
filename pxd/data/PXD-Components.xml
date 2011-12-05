@@ -3,14 +3,16 @@
   <Ladder layer="1">
     <shift  unit="mm"> 3.500</shift>
     <radius unit="mm">14.000</radius>
-    <Glue><oversize unit="um">20</oversize><Material>PXD-Glue</Material></Glue>
+    <!-- Disabled as it causes problems with TGeo conversion -->
+    <!--<Glue><oversize unit="um">20</oversize><Material>PXD-Glue</Material></Glue>-->
     <Sensor id="1" unit="mm" flipW="true" flipV="true"> 48.013</Sensor>
     <Sensor id="2" unit="mm" flipW="true">-20.013</Sensor>
   </Ladder>
   <Ladder layer="2">
     <shift  unit="mm"> 3.500</shift>
     <radius unit="mm">22.000</radius>
-    <Glue><oversize unit="um">20</oversize><Material>PXD-Glue</Material></Glue>
+    <!-- Disabled as it causes problems with TGeo conversion -->
+    <!--<Glue><oversize unit="um">20</oversize><Material>PXD-Glue</Material></Glue>-->
     <Sensor id="1" unit="mm" flipV="true"> 61.513</Sensor>
     <Sensor id="2" unit="mm">-23.513</Sensor>
   </Ladder>

@@ -32,7 +32,7 @@ namespace Belle2 {
      * Constructs the plane for a given VXD Sensor
      * @param sensorID SensorID of the Sensor for which this plane should be build
      */
-    VXDSensorPlane(VxdID sensorID = 0): m_sensorID(sensorID), m_sensorInfo(0) {}
+    VXDSensorPlane(VxdID sensorID = 0, double uTolerance = 0, double vTolerance = 0): m_sensorID(sensorID), m_uTolerance(uTolerance), m_vTolerance(vTolerance), m_sensorInfo(0) {}
 
     /** Destructor. */
     virtual ~VXDSensorPlane() {}
@@ -48,7 +48,7 @@ namespace Belle2 {
         m_sensorInfo = &VXD::GeoCache::get(m_sensorID);
       }
 #endif
-      return m_sensorInfo->inside(u, v);
+      return m_sensorInfo->inside(u, v, m_uTolerance, m_vTolerance);
     }
 
     /** Prints object data. */
@@ -63,7 +63,13 @@ namespace Belle2 {
     }
 
   private:
+    /** Sensor ID of the the sensor plane */
     unsigned short m_sensorID;
+    /** Tolerance to add to the sensor dimensions in u direction */
+    double m_uTolerance;
+    /** Tolerance to add to the sensor dimensions in v direction */
+    double m_vTolerance;
+    /** Pointer to the SensorInfo which contains the geometry information for the given sensor plane */
     mutable const VXD::SensorInfoBase* m_sensorInfo; //! transient member
 
     ClassDef(VXDSensorPlane, 1)

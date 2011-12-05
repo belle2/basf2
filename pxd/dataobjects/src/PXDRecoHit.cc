@@ -14,10 +14,10 @@
 #include <pxd/dataobjects/PXDTrueHit.h>
 #include <pxd/dataobjects/PXDCluster.h>
 #include <pxd/geometry/SensorInfo.h>
+#include <vxd/dataobjects/VXDSensorPlane.h>
 #include <vxd/geometry/GeoCache.h>
 
 #include <GFDetPlane.h>
-#include <GFRectFinitePlane.h>
 #include <TVector3.h>
 #include <TRandom.h>
 
@@ -43,7 +43,7 @@ PXDRecoHit::PXDRecoHit(const PXDTrueHit* hit, float sigmaU, float sigmaV):
   //If no error is given, estimate the error by dividing the pixel size by sqrt(12)
   if (sigmaU < 0 || sigmaV < 0) {
     const PXD::SensorInfo& geometry = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(m_sensorID));
-    sigmaU = geometry.getUPitch() / sqrt(12);
+    sigmaU = geometry.getUPitch(hit->getV()) / sqrt(12);
     sigmaV = geometry.getVPitch(hit->getV()) / sqrt(12);
   }
 
@@ -93,10 +93,8 @@ void PXDRecoHit::setDetectorPlane()
   TVector3 uGlobal = geometry.vectorToGlobal(TVector3(1, 0, 0));
   TVector3 vGlobal = geometry.vectorToGlobal(TVector3(0, 1, 0));
 
-  // Construct finite plane - we can do with RectFinitPlanes for PXD
-  const double uSize = 0.5 * geometry.getUSize();
-  const double vSize = 0.5 * geometry.getVSize();
-  GFDetPlane detPlane(origin, uGlobal, vGlobal, new GFRectFinitePlane(-uSize, uSize, -vSize, vSize));
+  //Construct the detector plane
+  GFDetPlane detPlane(origin, uGlobal, vGlobal, new VXDSensorPlane(m_sensorID));
   // Set in policy
   fPolicy.setDetPlane(detPlane);
 }

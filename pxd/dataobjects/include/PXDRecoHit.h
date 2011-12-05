@@ -12,7 +12,6 @@
 #define PXDRECOHIT_H_
 
 #include <vxd/VxdID.h>
-#include <pxd/dataobjects/PXDTrueHit.h>
 
 // ROOT includes
 #include <TMatrixD.h>

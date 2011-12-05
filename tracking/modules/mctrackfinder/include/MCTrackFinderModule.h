@@ -78,7 +78,10 @@ namespace Belle2 {
     bool m_useSVDHits;                                          /**< Boolean to select if SVDHits should be used*/
     bool m_useCDCHits;                                          /**< Boolean to select if CDCHits should be used*/
 
-    int m_whichParticles;                                       /**< Boolean to mark for which particles a track candidate should be created: 0 for all primaries, 1 for those who reach PXD, 2 for those who reach SVD, 3 for those who reach CDC . */
+    int m_whichParticles;                                       /**< Boolean to mark for which particles a track candidate should be created: 0 for all primaries, 1 for all tracks which reach PXD, 2 for all tracks which reach SVD, 3 for all tracks which reach CDC . */
+    double m_energyCut;                                         /**< Create track candidates only for MCParticles with energy above this cut*/
+    bool m_neutrals;                                            /**< Boolean to mark if track candidates should also be created for neutral particles.*/
+
 
     int m_smearing;                                             /**< Smearing of MCMomentum and MCVertex in % */
 

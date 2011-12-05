@@ -18,7 +18,7 @@ namespace Belle2 {
   /** This is an auxiliary output module for tracking.
    *  It uses the MC information, the Tracks from MCFitting and the Tracks from fitting with pattern recognition.
    *  Many different variables describing the fit results are written out to analyze the performance.
-   *  The idea is to have for each primary MCParticle an TrackingOutput, where all the information concerning this particle can be stored (MCtruth together with fit results).
+   *  The idea is to have for each primary MCParticle (or MCParticles which reach certain subdetectors) an TrackingOutput, where all the information concerning this particle can be stored (MCtruth together with fit results).
    *  The produced TrackingOutput collection can be written out with SimpleOutputModule.
    */
   class TrackingOutputModule : public Module {
@@ -74,8 +74,11 @@ namespace Belle2 {
 
     std::string m_outputCollectionName;          /**< Name of the output collection (TrackingOutput) */
 
+    int m_whichParticles;                        /**< Boolean to mark for which particles an output should be created: 0 for all primaries, 1 for tracks which reach PXD, 2 for tracks which reach SVD, 3 for tracks which reach CDC . */
+    double m_energyCut;                          /**< Create track candidates only for MCParticles with energy above this cut*/
+    bool m_neutrals;                             /**< Boolean to mark if track candidates should also be created for neutral particles.*/
 
-    int m_nMCPrimary;                            /**< Number of primary MCParticles */
+    int m_nMCPart;                               /**< Number of interesting MCParticles */
 
     int m_mcSuccessCounter;                      /**< Counter for successfully fitted MCTracks */
     int m_prSuccessCounter;                      /**< Counter for successfully fitted PRTracks */

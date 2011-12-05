@@ -51,6 +51,12 @@ TrackingOutputModule::TrackingOutputModule() : Module()
 
   addParam("PRGFTracksColName", m_gfTracksPRColName, "Name of collection holding the GFTracks from MCTracking", string("GFTracks_PatternReco"));
 
+  //choose for which particles the output should be created (you should use the same particles as in MCTrackFinder to get a fair comparison)
+  addParam("WhichParticles", m_whichParticles, "Select for which particles output should be created: 0 for all primaries, 1 for tracks which reach PXD, 2 for tracks which reach SVD, 3 for tracks which reach CDC", int(0));
+  addParam("EnergyCut", m_energyCut, "Track Candidates are only created for MCParticles with energy larger than this cut ", double(0.1));
+  addParam("Neutrals", m_neutrals, "Set true if track candidates should be created also for neutral particles", bool(true));
+
+  //name of output container
   addParam("OutputCollectionName" , m_outputCollectionName, "Name of the created TrackingOutput collection", string(""));
 
 }
@@ -115,20 +121,35 @@ void TrackingOutputModule::event()
   //output storeArray
   StoreArray<TrackingOutput> output(m_outputCollectionName);
 
-  m_nMCPrimary = 0 ;
+  //set the proper status
+  int status = 0;
+  if (m_whichParticles == 0) status = 1;   //primaries
+  if (m_whichParticles == 1) status = 16;  //seen in PXD
+  if (m_whichParticles == 2) status = 32;  //seen in SVD
+  if (m_whichParticles == 3) status = 64;  //seen in CDC
+  if (m_whichParticles > 3 || m_whichParticles < 0) {
+    B2WARNING("Invalid parameter! Track Candidates for primary particles will be created.")
+    status = 1;
+  }
+
+  //an auxiliary variable to discard neutrals if necessary (assume that no particles with charge -999 exist)
+  float forbiddenCharge = -999;
+  if (m_neutrals == false) forbiddenCharge = 0;
+
+  m_nMCPart = 0 ;
   for (int i = 0; i < nMcParticles; i++) {
-    if (mcParticles[i]->hasStatus(1) == true) {
-      ++m_nMCPrimary;
+    if (mcParticles[i]->getEnergy() > m_energyCut && mcParticles[i]->hasStatus(status) == true && mcParticles[i]->getPDG() < 100000000 && mcParticles[i]->getCharge() != forbiddenCharge) {
+      ++m_nMCPart;
     }
   }
 
-  B2INFO("Tracking output: number of  primary MCParticles: " << m_nMCPrimary);
+  B2INFO("Tracking output: number of interesting MCParticles: " << m_nMCPart);
   double alpha = 1 / (1.5 * 0.00299792458); //assume constant 1.5 T magnetic field to recalculate the momentum
 
   int counter = -1;
 
   for (int i = 0; i < nMcParticles; i++) {
-    if (mcParticles[i]->hasStatus(1) == true) {
+    if (mcParticles[i]->getEnergy() > m_energyCut && mcParticles[i]->hasStatus(status) == true && mcParticles[i]->getPDG() < 100000000 && mcParticles[i]->getCharge() != forbiddenCharge) {
       counter++;
 
       m_mcSuccessCounter = 0;
@@ -150,7 +171,9 @@ void TrackingOutputModule::event()
 
       output[counter]->setMCPDG(mcParticles[i]->getPDG());
 
+
       m_mcFitTracks = getTrackIdsForMCId(m_tracksMCColName, i);
+
       m_prFitTracks = getTrackIdsForMCId(m_tracksPRColName, i);
 
       output[counter]->setMCFitTracks(m_mcFitTracks);
@@ -161,7 +184,7 @@ void TrackingOutputModule::event()
 
       //there should only be one mc track for an mc particle, but maybe one wants to fit with different pdg hypothesises
 
-      B2INFO("Collect Info for MCTrack ( " << m_nMCFitTracks << " tracks found )");
+      //B2INFO("Collect Info for MCTrack ( "<<m_nMCFitTracks<<" tracks found )");
       for (int j = 0; j < m_nMCFitTracks; j ++) {
         int trackId = m_mcFitTracks.at(j);
         GFTrackCand candidateMC = gfTracksMC[trackId]->getCand();
@@ -206,7 +229,7 @@ void TrackingOutputModule::event()
       }
 
 
-      B2INFO("Collect Info for PRTrack( " << m_nPRFitTracks << " tracks found )");
+      //B2INFO("Collect Info for PRTrack( "<<m_nPRFitTracks<<" tracks found )");
       if (m_nPRFitTracks > 0) {
         int trackId = -999;
         for (int j = 0; j < m_nPRFitTracks; j ++) {
@@ -251,7 +274,7 @@ void TrackingOutputModule::event()
           } else output[counter]->setPRSuccessExtrap(0);
         }
       } else {
-        B2INFO("TrackingOutput: no PatternRecoTrack found for this particle...");
+        //B2INFO("TrackingOutput: no PatternRecoTrack found for this particle...");
       }
 
     }
@@ -277,11 +300,10 @@ vector<int> TrackingOutputModule::getTrackIdsForMCId(string Tracks, int MCId)
 
   StoreArray<Track> tracks(Tracks.c_str());
   vector <int> trackIds;
-
   for (int i = 0; i < tracks.getEntries(); i++) {
-
     if (tracks[i]->getMCId() == MCId) {
       trackIds.push_back(i);
+
     }
 
   }

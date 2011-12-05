@@ -69,7 +69,9 @@ MCTrackFinderModule::MCTrackFinderModule() : Module()
   addParam("UseCDCHits", m_useCDCHits, "Set true if CDCHits should be used", bool(true));
 
   //choose for which particles a track candidate should be created
-  addParam("WhichParticles", m_whichParticles, "Select for which particles a track candidate should be created: 0 for all primaries, 1 for those primaries who reach PXD, 2 for those primaries who reach SVD, 3 for those primaries who reach CDC", int(0));
+  addParam("WhichParticles", m_whichParticles, "Select for which particles a track candidate should be created: 0 for primaries, 1 for all tracks which reach PXD, 2 for all tracks which reach SVD, 3 for all tracks which reach CDC", int(0));
+  addParam("EnergyCut", m_energyCut, "Track candidates are only created for MCParticles with energy larger than this cut ", double(0.1));
+  addParam("Neutrals", m_neutrals, "Set true if track candidates should be created also for neutral particles", bool(true));
 
   //smearing of MCMomentum (integer value)
   addParam("Smearing", m_smearing, "Smearing of MCMomentum/MCVertex prior to storing it in GFTrackCandidate (in %)", 0);
@@ -156,14 +158,18 @@ void MCTrackFinderModule::event()
   if (m_whichParticles == 2) status = 32;  //seen in SVD
   if (m_whichParticles == 3) status = 64;  //seen in CDC
   if (m_whichParticles > 3 || m_whichParticles < 0) {
-    B2WARNING("Invalid parameter! Track Candidates for all primary particles will be created.")
+    B2WARNING("Invalid parameter! Track Candidates for primary particles will be created.")
     status = 1;
   }
+  //an auxiliary variable to discard neutrals if necessary (assume that no particles with charge -999 exist)
+  float forbiddenCharge = -999;
+  if (m_neutrals == false) forbiddenCharge = 0;
+
   // loop over MCParticles.
   // it would be nice to optimize this, because there are actually ~1000 secondary MCParticles for each primary MCParticle
   for (int iPart = 0; iPart < nMcParticles; ++iPart) {
-    //make links only for interesting MCParticles, for the moment: primaries seen in a subdetector
-    if (mcParticles[iPart]->hasStatus(status) == true && mcParticles[iPart]->hasStatus(1) == true) {
+    //make links only for interesting MCParticles: energy cut, which subdetector was reached and a 'dirty hack' to avoid atoms which are unknown to GenFit and check for neutrals
+    if (mcParticles[iPart]->getEnergy() > m_energyCut && mcParticles[iPart]->hasStatus(status) == true && abs(mcParticles[iPart]->getPDG()) < 100000000 && mcParticles[iPart]->getCharge() != forbiddenCharge) {
       B2INFO("Search a  track for the MCParticle with index: " << iPart << " (PDG: " << mcParticles[iPart]->getPDG() << ")");
 
       // create a list containing the indices to the PXDHits that belong to one track

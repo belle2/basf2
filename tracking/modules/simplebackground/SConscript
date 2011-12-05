@@ -1,5 +1,5 @@
 Import('env')
 
-env['LIBS'] = ['framework', 'svd', 'genfit', 'RKTrackRep']
+env['LIBS'] = ['framework', 'cdc', 'genfit', 'RKTrackRep']
 Return('env')
 

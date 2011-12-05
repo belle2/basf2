@@ -1,6 +1,6 @@
 Import('env')
 
-env['LIBS'] = ['framework', 'geometry', 'simulation', 'genfit',
+env['LIBS'] = ['framework', 'generators', 'simulation', 'genfit',
                '$ROOT_LIBS']
 
 Return('env')

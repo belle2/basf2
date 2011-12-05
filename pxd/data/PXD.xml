@@ -3,8 +3,8 @@
   <Creator library="pxd">PXDCreator</Creator>
   <Content>
     <!--Settings for background and exposure studies -->
-    <ActiveChips desc="Set to true to make chips on sensors sensitive">true</ActiveChips>
-    <SeeNeutrons desc="Set to true to make sensitive detectors see neutrons">true</SeeNeutrons>
+    <ActiveChips desc="Set to true to make chips on sensors sensitive">false</ActiveChips>
+    <SeeNeutrons desc="Set to true to make sensitive detectors see neutrons">false</SeeNeutrons>
     <xi:include href="PXD-Alignment.xml"/>
     <xi:include href="PXD-Envelope.xml"/>
     <xi:include href="PXD-Support.xml"/>

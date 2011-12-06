@@ -152,8 +152,7 @@ void EventProcessor::processCore(PathPtr startPath, const ModulePtrList& moduleP
 
       //Determine the master module
       StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
-      //      if (!master && (currEvent == 0) ) {
-      if (!master && (currEvent == 0) && !module->hasProperties(Module::c_HistogramManager)) {
+      if (!master && (currEvent == 0) && eventMetaDataPtr) {
         if (*eventMetaDataPtr != previousEventMetaData) {
           master = module;
         }
@@ -162,7 +161,7 @@ void EventProcessor::processCore(PathPtr startPath, const ModulePtrList& moduleP
       //Check for end of data
       if ((*eventMetaDataPtr == endEventMetaData) ||
           ((module == master) && (*eventMetaDataPtr == noEventMetaData))) {
-        if (module == master) {
+        if (module != master) {
           B2WARNING("Event processing stopped by non-master module " << module->getName());
         }
         endProcess = true;

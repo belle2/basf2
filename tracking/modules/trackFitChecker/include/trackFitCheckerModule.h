@@ -8,32 +8,12 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-/* this is some kind of alpha version of a track fit tester. It is _planned_ that
- * this module will _at least_ be able to calculate the p values of reconstructed
- * tracks (should be uniformly distributed) from the total chi2 values, the chi2
- * values of the smoother with respect to the measurements for
- * every silicon layer (should be chi2(2) distributed for every layer), the
- * normalized residuals of the smoother for every layer (should be standard
- * normal distributed) and the chi2 values of the smoothed track parameters with
- * respect to the true track parameters from geant4 (should be chi2(5)
- * distributed for every layer).
- */
 
 #ifndef trackFitCheckerModule_H_
 #define trackFitCheckerModule_H_
 
 #include <framework/core/Module.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/dataobjects/EventMetaData.h>
 
-#include <framework/datastore/StoreArray.h>
-#include <generators/dataobjects/MCParticle.h>
-
-#include <pxd/dataobjects/PXDTrueHit.h>
-#include <svd/dataobjects/SVDTrueHit.h>
-#include <pxd/dataobjects/PXDRecoHit.h>
-#include <svd/dataobjects/SVDRecoHit2D.h>
-#include <cdc/dataobjects/CDCRecoHit.h>
 #include <vector>
 #include <fstream>
 #include <sstream>
@@ -41,12 +21,8 @@
 #include <map>
 #include <iostream>
 #include <iomanip>
-#include <tracking/dataobjects/TrackFitCheckerTempHelperClass.h>
-#include <TMatrixDEigen.h>
 
-#include <GFTrack.h>
-#include <GFTools.h>
-#include <RKTrackRep.h>
+#include <TMatrixT.h>
 
 // to get statistics functions of boost
 #include <boost/accumulators/accumulators.hpp>
@@ -56,10 +32,9 @@
 #include <boost/accumulators/statistics/count.hpp>
 
 namespace Belle2 {
-//namespace BA = boost::accumulators;
-  //! Exercise 1 module.
+
   /*!
-      Add here a description what your module does.
+      This module calculates the resudals, pulls and chi^2 for a sample of tracks both track wise and layer wise tests are used. If availiable truth info from simulation in form of "TrueHits" is used.
   */
 
   class trackFitCheckerModule : public Module {
@@ -124,6 +99,7 @@ namespace Belle2 {
     std::vector<double> calcTestsWithTruthInfo(const TMatrixT<double>& state, const TMatrixT<double>& cov, const TMatrixT<double>& trueState);
     void isMatrixCov(const TMatrixT<double>& cov);
     bool isSymmetric(const TMatrixT<double>& aMatrix);
+    bool hasMatrixNegDiagElement(const TMatrixT<double>& aMatrix);
     void printLayerWiseStatistics(const std::string& nameOfDataSample,  const std::vector<std::string>& layerWiseVarNames);
     void resizeLayerWiseData(const std::string& nameOfDataSample, const int nVarsToTest);
     void printTrackWiseStatistics(const std::string& nameOfDataSample);
@@ -135,6 +111,8 @@ namespace Belle2 {
     int m_nSiLayers; // number of Si layers. That is 6 of course.
     int m_nPxdLayers; // number of PXD layer (2) so number of SVD layers will be m_nSiLayers - m_nPxdLayers
     int m_nSvdLayers;
+    int m_nCdcLayers;
+    int m_nLayers;
     std::string m_dataOutFileName;
     std::string m_dataOutFileName2;
     std::ofstream m_dataOut;
@@ -174,14 +152,13 @@ namespace Belle2 {
     bool m_useTruthInfo;
     bool m_testPrediction;
     //output
-    bool m_writeToB2info;
+    //bool m_writeToB2info;
     std::string m_testOutputFileName;
     std::stringstream m_textOutput;
 
     bool m_writeToFile;
     bool m_writeToRootFile;
-    int m_nCdcLayers;
-    int m_nLayers;
+
   };
 }
 

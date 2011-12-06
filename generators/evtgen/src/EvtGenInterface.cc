@@ -150,6 +150,7 @@ void EvtGenInterface::updateGraphParticle(EvtParticle * eParticle, MCParticleGra
   gParticle->setStatus(MCParticle::c_PrimaryParticle);
   gParticle->setMass(eParticle->mass());
   gParticle->setPDG(EvtPDL::getStdHep(eParticle->getId()));
+  gParticle->setChargeFromPDG();
 
   EvtVector4R EvtP4 = eParticle->getP4Lab();
   TLorentzVector p4(EvtP4.get(1), EvtP4.get(2), EvtP4.get(3), EvtP4.get(0));

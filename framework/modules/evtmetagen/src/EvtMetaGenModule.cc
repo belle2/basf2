@@ -53,6 +53,9 @@ EvtMetaGenModule::~EvtMetaGenModule()
 
 void EvtMetaGenModule::initialize()
 {
+  //Register the EventMetaData in the data store
+  StoreObjPtr<EventMetaData> eventMetaDataPtr;
+
   //Make sure all lists have the same size
   unsigned int defListSize = m_expList.size();
   if ((m_runList.size() != defListSize) || (m_evtNumList.size() != defListSize)) {
@@ -84,7 +87,7 @@ void EvtMetaGenModule::event()
     }
   }
 
-  StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
+  StoreObjPtr<EventMetaData> eventMetaDataPtr;
   eventMetaDataPtr->setExperiment(m_expList[m_colIndex]);
   eventMetaDataPtr->setRun(m_runList[m_colIndex]);
   eventMetaDataPtr->setEvent(m_evtNumber);

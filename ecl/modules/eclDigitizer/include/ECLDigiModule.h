@@ -84,6 +84,12 @@ namespace Belle2 {
       */
     std::string m_eclDspCollectionName;
 
+
+    /** Name of the  Random Time of Trig record
+      */
+    std::string m_eclTrigCollectionName;
+
+
 //    unsigned int m_randSeed;    /**< User-supplied random seed, default is 0. for ctime  */
     TRandom3* m_random;     /**< Random number generator.*/
 
@@ -91,6 +97,9 @@ namespace Belle2 {
     int    m_nRun;                   /*!< Run number   */
     int    m_nEvent;                 /*!< Event number */
     int    m_hitNum;
+    int    m_hitNum1;
+    int    m_hitNum2;
+
 
     int m_ttrig ;        /*! input trigger time 0-23 (*m_ttrig=delta/T*24;    */
     int m_n16 ;          /*! number of points before signal *m_n16=16       */

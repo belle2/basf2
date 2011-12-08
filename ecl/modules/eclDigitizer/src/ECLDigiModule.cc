@@ -12,6 +12,7 @@
 #include <ecl/hitecl/HitECL.h>
 #include <ecl/dataobjects/DigiECL.h>
 #include <ecl/dataobjects/DspECL.h>
+#include <ecl/dataobjects/TrigECL.h>
 #include <ecl/geoecl/ECLGeometryPar.h>
 
 #include <framework/datastore/StoreArray.h>
@@ -51,6 +52,9 @@ ECLDigiModule::ECLDigiModule() : Module()
 
   addParam("ECLDspCollection", m_eclDspCollectionName,
            "Output of this module//the detected A[0:16] to be fitted ", string("ECLShaperArray"));
+
+  addParam("ECLTrigCollection", m_eclTrigCollectionName,
+           "Record the Random Time of Trig", string("ECLRandomTrig"));
 
 //  addParam("RandomSeed", m_randSeed, "User-supplied random seed; Default 0 for ctime", (unsigned int)(0));
 
@@ -122,7 +126,6 @@ void ECLDigiModule::event()
     double hitTimeAve       =  aECLHit->getTimeAve()   / Unit::us;
     double sampleTime ;
 
-
     E_tmp[hitCellId] = hitE + E_tmp[hitCellId];//for summation deposit energy; do fit if this summation > 0.1 MeV
 
     //Noise generation
@@ -151,20 +154,21 @@ void ECLDigiModule::event()
   for (int iECLCell = 0; iECLCell < 8736; iECLCell++) {
     if (E_tmp[iECLCell] > 0.0001) {
 
-
       for (int  T_clock = 0; T_clock < 31; T_clock++) {
         FitA[T_clock] = (int)(HitEnergy[iECLCell][T_clock] * 20000 + 3000 + AdcNoise[iECLCell][T_clock] * 20) ;
       }//for T_clock 31 clock
 
       m_n16 = 16;
       m_ttrig = int(DeltaT) / 2 + 13;
+      if (m_ttrig > 23)m_ttrig = 23;
 
       shapeFitter(&(m_id[0][0]), &(m_f[0][0]), &(m_f1[0][0]), &(m_fg41[0][0]), &(m_fg43[0][0]), &(m_fg31[0][0]), &(m_fg32[0][0]), &(m_fg33[0][0]), &(FitA[0]), &m_ttrig,  &m_n16, &m_ch, &m_lar, &m_ltr, &m_lq);
 
       energyFit[iECLCell] = m_lar; //fit output : Amplitude
       tFit[iECLCell] = m_ltr;    //fit output : T_ave
       qualityFit[iECLCell] = m_lq;    //fit output : T_ave
-      if (m_lar / 20000. > 0.5)cout << iECLCell << " Fit E " << m_lar / 20000. << " Fit time " << m_ltr << " " << (1520 - m_ltr)*24.*12 / 508 / (3072 / 2)  << " us " << m_lq << endl;
+
+
 
 
       StoreArray<DspECL> eclDspArray(m_eclDspCollectionName);
@@ -175,17 +179,24 @@ void ECLDigiModule::event()
       eclDspArray[m_hitNum]->setDspA(FitA);
 
       StoreArray<DigiECL> eclDigiArray(m_eclDigiCollectionName);
-      m_hitNum = eclDigiArray->GetLast() + 1;
-      new(eclDigiArray->AddrAt(m_hitNum)) DigiECL();
-      eclDigiArray[m_hitNum]->setEventId(m_nEvent);
-      eclDigiArray[m_hitNum]->setCellId(iECLCell);
-      eclDigiArray[m_hitNum]->setAmp(energyFit[iECLCell]);//E (GeV) = energyFit/20000;
-      eclDigiArray[m_hitNum]->setTimeFit(tFit[iECLCell]);//t0 (us)= (1520 - m_ltr)*24.*12/508/(3072/2) ;
-      eclDigiArray[m_hitNum]->setQuality(qualityFit[iECLCell]);
+      m_hitNum1 = eclDigiArray->GetLast() + 1;
+      new(eclDigiArray->AddrAt(m_hitNum1)) DigiECL();
+      eclDigiArray[m_hitNum1]->setEventId(m_nEvent);
+      eclDigiArray[m_hitNum1]->setCellId(iECLCell);
+      eclDigiArray[m_hitNum1]->setAmp(energyFit[iECLCell]);//E (GeV) = energyFit/20000;
+      eclDigiArray[m_hitNum1]->setTimeFit(tFit[iECLCell]);//t0 (us)= (1520 - m_ltr)*24.*12/508/(3072/2) ;
+      eclDigiArray[m_hitNum1]->setQuality(qualityFit[iECLCell]);
 
 
     }//if Energy > 0.1 MeV
   } //store  each crystal hit
+
+  StoreArray<TrigECL> eclTrigArray(m_eclTrigCollectionName);
+  m_hitNum2 = eclTrigArray->GetLast() + 1;
+  new(eclTrigArray->AddrAt(m_hitNum2)) TrigECL();
+  eclTrigArray[m_hitNum2]->setEventId(m_nEvent);
+  eclTrigArray[m_hitNum2]->setTimeTrig(DeltaT* 12. / 508.);//t0 (us)= (1520 - m_ltr)*24.*12/508/(3072/2) ;
+
 
 
   m_nEvent++;
@@ -445,6 +456,9 @@ void ECLDigiModule::shapeFitter(short int *id, int *f, int *f1, int *fg41, int *
 //  it_l = 0;
 //  it = it0;
 
+  if (*ttrig > 23) {cout << "*Ttrig  Warning" << *ttrig << endl; *ttrig = 23;}
+  if (*ttrig < 0) {cout << "*Ttrig  Warning" << *ttrig << endl; *ttrig = 0;}
+
 
   it0 = 96 + ((12 - *ttrig) << 3);
 
@@ -459,7 +473,6 @@ void ECLDigiModule::shapeFitter(short int *id, int *f, int *f1, int *fg41, int *
   //  int it00=23-it0;
 
   A2 = (*(fg41 + *ttrig * 16));
-
 
   A2 = (A2 * z0);
 
@@ -486,6 +499,7 @@ void ECLDigiModule::shapeFitter(short int *id, int *f, int *f1, int *fg41, int *
 
 
   low_ampl = 0;
+
   if (A2 >= A0) {
 
     for (iter = 0, it = it0; iter < 3;) {
@@ -536,7 +550,7 @@ void ECLDigiModule::shapeFitter(short int *id, int *f, int *f1, int *fg41, int *
         it = it > it_h ? it_h : it;
         it = it < it_l ? it_l : it;
 
-
+//        cout<<" A1:Amp "<<A1<<" B3:time "<< B3<<" it "<<it<<" it0 "<<it0<<endl;
       } else {
         B2 = B1 >> (k_b - 13);
         B5 = B1 >> (k_b - 9);
@@ -564,6 +578,7 @@ void ECLDigiModule::shapeFitter(short int *id, int *f, int *f1, int *fg41, int *
         C1 += (1 << (k_c - 1));
         C1 >>= k_c;
 
+//        cout<<" A1:Amp "<<A1<<" B3:time "<< T<<" it "<<it<<" it0 "<<it0<<" C1:pred "<<C1 <<endl;
       }
 
     }
@@ -602,10 +617,12 @@ lam:
   B2 >>= (k2_chi - 2);
   B2 += chi_thres;
   if (ch1 > B2)validity_code = 3;
+//        cout<<" A1:Amp "<<A1<<" A2 "<<A2<<" A0 "<<A0 <<endl;
 ou:
 
   *lar = A1;
   *ltr = T;
+//        cout<<" A1:Amp "<<*lar <<" B3:time "<< *ltr<<" it "<<it<<" it0 "<<it0<<endl;
 
   if (A1 < Askip)validity_code = validity_code + 8;
 

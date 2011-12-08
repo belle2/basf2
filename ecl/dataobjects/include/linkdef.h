@@ -8,5 +8,6 @@
 #pragma link C++ class Belle2::DigiECL;
 #pragma link C++ class Belle2::DspECL;
 #pragma link C++ class Belle2::RecCRECL;
+#pragma link C++ class Belle2::TrigECL;
 
 #endif

@@ -153,7 +153,7 @@ def process_dir(
     # process modules directory last so that it is known whether the main library exists
     if os.path.isdir(real_path(os.path.join(dir_name, 'modules'),
                      release_dir)):
-        process_dir(env, os.path.join(dir_name, entry), True, release_dir)
+        process_dir(env, os.path.join(dir_name, 'modules'), True, release_dir)
 
     # determine whether we are in a special directory
     is_package_dir = dir_name == env['PACKAGE']

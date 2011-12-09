@@ -143,6 +143,13 @@ namespace Belle2 {
     */
     bool readEvtGenTableFromFile(const std::string& filename);
 
+    /**
+     * Sets the seed for the random number generator.
+     *
+     * @param seed The random number generator seed.
+    */
+    void setRandomSeed(unsigned int seed);
+
 
     //--------------------------------------------------
     //                   Python API
@@ -185,6 +192,7 @@ namespace Belle2 {
   private:
 
     static int m_nproc;
+    unsigned int m_randomSeed;          /**< The random number generator seed. */
 
   };
 

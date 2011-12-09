@@ -32,9 +32,9 @@ using namespace Belle2;
 using namespace boost::python;
 
 
-Framework::Framework()
+Framework::Framework() :
+    m_randomSeed(0)
 {
-  gRandom->SetSeed(0);
   m_pathManager = new PathManager();
   m_eventProcessor = new EventProcessor(*m_pathManager);
   m_peventProcessor = new pEventProcessor(*m_pathManager);
@@ -81,6 +81,8 @@ PathPtr Framework::createPath() throw(PathManager::PathNotCreatedError)
 
 void Framework::process(PathPtr startPath)
 {
+  gRandom->SetSeed(m_randomSeed);
+
   if (Environment::Instance().getNumberProcesses() == 0)
     m_eventProcessor->process(startPath);
   else
@@ -91,6 +93,8 @@ void Framework::process(PathPtr startPath)
 
 void Framework::process(PathPtr startPath, long maxEvent)
 {
+  gRandom->SetSeed(m_randomSeed);
+
   m_eventProcessor->process(startPath, maxEvent);
 }
 
@@ -116,6 +120,12 @@ bool Framework::readEvtGenTableFromFile(const std::string& filename)
     return false;
   }
   return true;
+}
+
+
+void Framework::setRandomSeed(unsigned int seed)
+{
+
 }
 
 
@@ -182,5 +192,6 @@ void Framework::exposePythonAPI()
   .def("process", process2)
   .def("set_nprocess", &Framework::setNumberProcesses)
   .def("read_evtgen_table", &Framework::readEvtGenTableFromFile)
+  .def("set_random_seed", &Framework::setRandomSeed)
   ;
 }

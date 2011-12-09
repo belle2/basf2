@@ -47,6 +47,7 @@ global_env = Environment(ENV = os.environ,
                          CPPDEFINES = {'_PACKAGE_': '\\"$PACKAGE\\"'},
                          CPPPATH = ['include', '$EXTINCDIR', sysconfig.get_python_inc()],
                          LIBPATH = ['$LIBDIR', '$EXTLIBDIR', os.path.join('$EXTDIR', 'root', 'lib')],
+                         DATAOBJECT_LIBS = [],
                          TOOLS_LIBS = {},
                          TOOLS_LIBPATH = {},
                          TEST_LIBS = [],
@@ -124,6 +125,13 @@ if repository:
 
         global_env.ProcessDirectory(entry, False, repository)
 
+
+# build global dataobjects library
+if len(global_env['DATAOBJECT_LIBS']) > 0:
+    global_env['LIBS'] = global_env['DATAOBJECT_LIBS']
+    empty_file = Command(os.path.join(global_env['BUILDDIR'], 'empty.cc'), '', Touch('$TARGET'))
+    lib = global_env.SharedLibrary(os.path.join(global_env['LIBDIR'], 'dataobjects'), empty_file)
+    global_env.Alias('lib', lib)
 
 # build global test executable
 if len(global_env['TEST_FILES']) > 0:

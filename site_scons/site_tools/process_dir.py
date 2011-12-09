@@ -91,11 +91,15 @@ def process_dir(
     env['SCRIPT_FILES'] = script_files
     env['DATA_FILES'] = data_files
 
-    # include SConscript file if it exists
+    # clean up some environment variables that should not be inherited from the parent environment
     if env.Dictionary().has_key('SUBLIB'):
         del env.Dictionary()['SUBLIB']
     if env.Dictionary().has_key('PYTHON_MODULE'):
         del env.Dictionary()['PYTHON_MODULE']
+    if env.Dictionary().has_key('LIBS'):
+        del env.Dictionary()['LIBS']
+
+    # include SConscript file if it exists
     sconscript_name = real_path(os.path.join(dir_name, 'SConscript'),
                                 release_dir)
     if os.path.isfile(sconscript_name):
@@ -106,8 +110,7 @@ def process_dir(
             env = result
 
             # don't continue with the default build process if the SConscript file requests this
-            if env.Dictionary().has_key('CONTINUE') and env['CONTINUE'] \
-                == False:
+            if env.Dictionary().get('CONTINUE', True) == False:
                 return
 
     # install header files in the include directory
@@ -143,18 +146,25 @@ def process_dir(
             'data',
             'doc',
             'examples',
+            'modules',
             ]:
-            process_dir(env, os.path.join(dir_name, entry), entry == 'modules'
-                        or is_module_dir, release_dir)
+            process_dir(env, os.path.join(dir_name, entry), is_module_dir,
+                        release_dir)
+    # process modules directory last so that it is known whether the main library exists
+    if os.path.isdir(real_path(os.path.join(dir_name, 'modules'),
+                     release_dir)):
+        process_dir(env, os.path.join(dir_name, entry), True, release_dir)
+
+    # determine whether we are in a special directory
+    is_package_dir = dir_name == env['PACKAGE']
+    is_sublib_dir = env.Dictionary().get('SUBLIB', False) == True
+    is_python_module_dir = env.Dictionary().get('PYTHON_MODULE', False) == True
+    is_dataobjects_dir = dir_name == os.path.join(env['PACKAGE'], 'dataobjects'
+            )
 
     # check whether we have to create a new library
-    if env.Dictionary().has_key('MODULE') and env['MODULE'] == True:
-        is_module_dir = True
-    if dir_name == env['PACKAGE'] or env.Dictionary().has_key('SUBLIB') \
-        and env['SUBLIB'] == True or env.Dictionary().has_key('PYTHON_MODULE') \
-        and env['PYTHON_MODULE'] == True or is_module_dir \
-        and not (env.Dictionary().has_key('SUBLIB') and env['SUBLIB']
-                 == False):
+    if is_package_dir or is_sublib_dir or is_python_module_dir \
+        or is_module_dir or is_dataobjects_dir:
 
         # generate dictionaries
         dict_files = []
@@ -169,25 +179,44 @@ def process_dir(
 
         # build a shared library with all source and dictionary files
         if len(env['SRC_FILES']) > 0:
+
+            # determine path of library and adjust path and name for modules
             lib_dir_name = env['LIBDIR']
             if is_module_dir:
                 lib_dir_name = env['MODDIR']
                 if os.path.basename(dir_name) != 'modules':
                     lib_name = os.path.basename(dir_name)
 
+            # link a dataobject library to the main package library
+            if is_dataobjects_dir:
+                parent_env.Append(LIBS=[lib_name])
+                parent_env['DATAOBJECT_LIB'] = lib_name
+
+            # link the main package library to all (python) modules
+            if (is_module_dir or is_python_module_dir) \
+                and len(parent_env.get('SRC_FILES', [])) > 0:
+                env.Append(LIBS=[env['PACKAGE']])
+
+            # create library and map for modules
             lib = env.SharedLibrary(os.path.join(lib_dir_name, lib_name),
                                     [env['SRC_FILES'], dict_files])
-            reg_map = env.RegMap(os.path.join(lib_dir_name,
-                                 env.subst('$SHLIBPREFIX') + lib_name + '.map'
-                                 ), env['SRC_FILES'])
-            Local([lib, reg_map])
-            env.Alias(lib_name, [lib, reg_map])
+            lib_files = [lib]
             if is_module_dir:
-                define_aliases(env, [lib, reg_map], dir_name, 'modules')
+                reg_map = env.RegMap(os.path.join(lib_dir_name,
+                                     env.subst('$SHLIBPREFIX') + lib_name
+                                     + '.map'), env['SRC_FILES'])
+                lib_files.append(reg_map)
+            Local(lib_files)
+
+            # define build target aliases
+            env.Alias(lib_name, lib_files)
+            if is_module_dir:
+                define_aliases(env, lib_files, dir_name, 'modules')
             else:
-                define_aliases(env, [lib, reg_map], dir_name, 'lib')
-            if env.Dictionary().has_key('PYTHON_MODULE') \
-                and env['PYTHON_MODULE'] == True:
+                define_aliases(env, lib_files, dir_name, 'lib')
+
+            # install python module libraries with a file name that is recognized by python
+            if is_python_module_dir:
                 pymod = env.InstallAs(os.path.join(env['LIBDIR'],
                                       os.path.basename(dir_name) + 'module'
                                       + env.subst('$SHLIBSUFFIX')), lib)
@@ -198,6 +227,10 @@ def process_dir(
         # add linkdef, and source files to parent environment if we are in a normal sub-directory
         parent_env['LINKDEF_FILES'] += env['LINKDEF_FILES']
         parent_env['SRC_FILES'] += env['SRC_FILES']
+
+    # add dataobject libs to parent environment
+    if env.Dictionary().has_key('DATAOBJECT_LIB'):
+        parent_env.Append(DATAOBJECT_LIBS=env['DATAOBJECT_LIB'])
 
     # setup environment for building executables, include SConscript if it exists
     save_env = env.Clone()
@@ -253,7 +286,7 @@ def process_dir(
 
     # add test files and libs to parent environment
     parent_env.AppendUnique(TEST_LIBS=env['TEST_LIBS'])
-    parent_env['TEST_FILES'] += env['TEST_FILES']
+    parent_env.Append(TEST_FILES=env['TEST_FILES'])
 
 
 def generate(env):

@@ -36,14 +36,14 @@ CDCMCMatchingModule::CDCMCMatchingModule() :
   //the collection names as parameters may soon be obsolete if we will always use the default names created automatically
 
   //input
-  addParam("MCParticlesColName", m_mcParticlesCollectionName, "Name of collection holding the MCParticles", string("MCParticles"));
-  addParam("CDCHitsColName", m_cdcHitsCollectionName, "CDCHits collection ", string("CDCHits"));
-  addParam("MCParticlesToCDCHitsColName", m_mcPartToCDCHits, "Name of collection holding the relations between MCParticles and CDCHits", string("MCParticleToCDCHits"));
+  addParam("MCParticlesColName", m_mcParticlesCollectionName, "Name of collection holding the MCParticles", string(""));
+  addParam("CDCHitsColName", m_cdcHitsCollectionName, "CDCHits collection ", string(""));
+  addParam("MCParticlesToCDCHitsColName", m_mcPartToCDCHits, "Name of collection holding the relations between MCParticles and CDCHits", string(""));
 
-  addParam("GFTrackCandidatesColName", m_gfTrackCandsCollectionName, "Name of collection holding the GFTrackCandidates (output of the pattern recognition)", string("GFTrackCandidates_conformalFinder"));
+  addParam("GFTrackCandidatesColName", m_gfTrackCandsCollectionName, "Name of collection holding the GFTrackCandidates (output of the pattern recognition)", string("GFTrackCands_PatternReco"));
 
   //output
-  addParam("GFTrackCandsToMCParticlesColName", m_gfTrackCandsToMCParticles, "Name of collection holding the relations between the GFTrackCandidates and the matched MCParticles (output of this module)", string("GFTrackCandidateToMCParticle"));
+  addParam("GFTrackCandsToMCParticlesColName", m_gfTrackCandsToMCParticles, "Name of collection holding the relations between the GFTrackCandidates and the matched MCParticles (output of this module)", string("GFTrackCands_patternRecoToMCParticle"));
 
 
 }
@@ -56,7 +56,7 @@ void CDCMCMatchingModule::initialize()
 {
   StoreArray<MCParticle> mcParticles(m_mcParticlesCollectionName);
   StoreArray<GFTrackCand> gfTrackCandidates(m_gfTrackCandsCollectionName);
-  RelationArray gfTrackCandToMCPart(gfTrackCandidates, mcParticles);
+  RelationArray gfTrackCandToMCPart(gfTrackCandidates, mcParticles, m_gfTrackCandsToMCParticles);
 
 }
 
@@ -88,7 +88,7 @@ void CDCMCMatchingModule::event()
 
 
   //Create a relation between the track candidate and their most probable 'mother' MC particle
-  RelationArray gfTrackCandToMCPart(gfTrackCandidates, mcParticles);
+  RelationArray gfTrackCandToMCPart(gfTrackCandidates, mcParticles, m_gfTrackCandsToMCParticles);
 
   if (gfTrackCandidates.getEntries() != 0) {
     for (int i = 0; i < gfTrackCandidates.getEntries(); i++) { //loop over all TrackCandidates
@@ -118,6 +118,7 @@ void CDCMCMatchingModule::event()
       bestMCId = getBestMCId(mcParticleContributions, cdcHitsIndexList.size()); //evaluate the MCParticle with the largest contribution
 
       gfTrackCandidates[i]->setMcTrackId(bestMCId.first);    //assign the ID of this MCParticle to the candidate
+      B2INFO("Assign MCId " << bestMCId.first << " (pdg: " << mcParticles[bestMCId.first]->getPDG() << ") to track candidate " << i);
       gfTrackCandidates[i]->setDip(bestMCId.second);         //here I just 'misuse' one unused member variable from GFTrackCand called 'Dip' to store the 'purity' of the track
 
       //create a relation between the track candidate and the MCParticle (redundant to the ID assignment, but may however be useful)

@@ -52,7 +52,7 @@ TrackingOutputModule::TrackingOutputModule() : Module()
   addParam("PRGFTracksColName", m_gfTracksPRColName, "Name of collection holding the GFTracks from MCTracking", string("GFTracks_PatternReco"));
 
   //choose for which particles the output should be created (you should use the same particles as in MCTrackFinder to get a fair comparison)
-  addParam("WhichParticles", m_whichParticles, "Select for which particles output should be created: 0 for all primaries, 1 for tracks which reach PXD, 2 for tracks which reach SVD, 3 for tracks which reach CDC", int(0));
+  addParam("WhichParticles", m_whichParticles, "Select for which particles output should be created: 0 for all primaries, 1 for tracks which created hits in the PXD, 2 for tracks which created hits in the SVD, 3 for tracks which created hits in the CDC", int(0));
   addParam("EnergyCut", m_energyCut, "Track Candidates are only created for MCParticles with energy larger than this cut ", double(0.1));
   addParam("Neutrals", m_neutrals, "Set true if track candidates should be created also for neutral particles", bool(true));
 
@@ -123,10 +123,10 @@ void TrackingOutputModule::event()
 
   //set the proper status
   int status = 0;
-  if (m_whichParticles == 0) status = 1;   //primaries
-  if (m_whichParticles == 1) status = 16;  //seen in PXD
-  if (m_whichParticles == 2) status = 32;  //seen in SVD
-  if (m_whichParticles == 3) status = 64;  //seen in CDC
+  if (m_whichParticles == 0) status = MCParticle::c_PrimaryParticle;   //primaries
+  if (m_whichParticles == 1) status = MCParticle::c_SeenInPXD;  //seen in PXD
+  if (m_whichParticles == 2) status = MCParticle::c_SeenInSVD;  //seen in SVD
+  if (m_whichParticles == 3) status = MCParticle::c_SeenInCDC;  //seen in CDC
   if (m_whichParticles > 3 || m_whichParticles < 0) {
     B2WARNING("Invalid parameter! Track Candidates for primary particles will be created.")
     status = 1;

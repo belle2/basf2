@@ -69,7 +69,8 @@ MCTrackFinderModule::MCTrackFinderModule() : Module()
   addParam("UseCDCHits", m_useCDCHits, "Set true if CDCHits should be used", bool(true));
 
   //choose for which particles a track candidate should be created
-  addParam("WhichParticles", m_whichParticles, "Select for which particles a track candidate should be created: 0 for primaries, 1 for all tracks which reach PXD, 2 for all tracks which reach SVD, 3 for all tracks which reach CDC", int(0));
+  //this is just an attempt to find out what is the most suitable way to select particles, if you have other/better ideas, communicate it to the tracking group...
+  addParam("WhichParticles", m_whichParticles, "Select for which particles a track candidate should be created: 0 for primaries, 1 for all tracks which created hits in the PXD, 2 for all tracks which created hits in the SVD, 3 for all tracks which created hits in the CDC", int(0));
   addParam("EnergyCut", m_energyCut, "Track candidates are only created for MCParticles with energy larger than this cut ", double(0.1));
   addParam("Neutrals", m_neutrals, "Set true if track candidates should be created also for neutral particles", bool(true));
 
@@ -153,10 +154,10 @@ void MCTrackFinderModule::event()
 
   //set the proper status
   int status = 0;
-  if (m_whichParticles == 0) status = 1;   //primaries
-  if (m_whichParticles == 1) status = 16;  //seen in PXD
-  if (m_whichParticles == 2) status = 32;  //seen in SVD
-  if (m_whichParticles == 3) status = 64;  //seen in CDC
+  if (m_whichParticles == 0) status = MCParticle::c_PrimaryParticle;   //primaries
+  if (m_whichParticles == 1) status = MCParticle::c_SeenInPXD;  //seen in PXD
+  if (m_whichParticles == 2) status = MCParticle::c_SeenInSVD;  //seen in SVD
+  if (m_whichParticles == 3) status = MCParticle::c_SeenInCDC;  //seen in CDC
   if (m_whichParticles > 3 || m_whichParticles < 0) {
     B2WARNING("Invalid parameter! Track Candidates for primary particles will be created.")
     status = 1;

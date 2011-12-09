@@ -150,10 +150,6 @@ def process_dir(
             ]:
             process_dir(env, os.path.join(dir_name, entry), is_module_dir,
                         release_dir)
-    # process modules directory last so that it is known whether the main library exists
-    if os.path.isdir(real_path(os.path.join(dir_name, 'modules'),
-                     release_dir)):
-        process_dir(env, os.path.join(dir_name, 'modules'), True, release_dir)
 
     # determine whether we are in a special directory
     is_package_dir = dir_name == env['PACKAGE']
@@ -193,9 +189,11 @@ def process_dir(
                 parent_env['DATAOBJECT_LIB'] = lib_name
 
             # link the main package library to all (python) modules
-            if (is_module_dir or is_python_module_dir) \
-                and len(parent_env.get('SRC_FILES', [])) > 0:
-                env.Append(LIBS=[env['PACKAGE']])
+            if is_package_dir:
+                env['PACKAGE_LIB'] = env['PACKAGE']
+            package_lib = parent_env.Dictionary().get('PACKAGE_LIB', None)
+            if (is_module_dir or is_python_module_dir) and package_lib != None:
+                env.Append(LIBS=parent_env['PACKAGE_LIB'])
 
             # create library and map for modules
             lib = env.SharedLibrary(os.path.join(lib_dir_name, lib_name),
@@ -231,6 +229,11 @@ def process_dir(
     # add dataobject libs to parent environment
     if env.Dictionary().has_key('DATAOBJECT_LIB'):
         parent_env.Append(DATAOBJECT_LIBS=env['DATAOBJECT_LIB'])
+
+    # process modules directory last so that it is known whether the main library exists
+    if os.path.isdir(real_path(os.path.join(dir_name, 'modules'),
+                     release_dir)):
+        process_dir(env, os.path.join(dir_name, 'modules'), True, release_dir)
 
     # setup environment for building executables, include SConscript if it exists
     save_env = env.Clone()

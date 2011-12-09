@@ -77,11 +77,9 @@ int main(int argc, char* argv[])
   string pythonFile;
 
   //Check for the Belle2 environment variable
-  char* belle2Dir = getenv("BELLE2_LOCAL_DIR");
-  if (!belle2Dir) {
-    belle2Dir = getenv("BELLE2_RELEASE_DIR");
-  }
-  if (!belle2Dir) {
+  char* belle2LocalDir = getenv("BELLE2_LOCAL_DIR");
+  char* belle2ReleaseDir = getenv("BELLE2_RELEASE_DIR");
+  if (!belle2LocalDir && !belle2ReleaseDir) {
     B2ERROR("The basf2 environment is not set up. Please execute the 'setuprel' script first.")
     return 1;
   }
@@ -93,7 +91,18 @@ int main(int argc, char* argv[])
   }
 
   //Get the lib path
-  boost::filesystem::path libPath(belle2Dir);
+  boost::filesystem::path libPath = "";
+  boost::filesystem::path libPath2 = "";
+  if (belle2LocalDir) {
+    libPath = belle2LocalDir;
+    if (belle2ReleaseDir) {
+      libPath2 = belle2ReleaseDir;
+      libPath2 /= "lib";
+      libPath2 /=  belle2SubDir;
+    }
+  } else {
+    libPath = belle2ReleaseDir;
+  }
   libPath /= "lib";
   libPath /=  belle2SubDir;
 
@@ -146,25 +155,21 @@ int main(int argc, char* argv[])
     if (varMap.count("steering")) {
       pythonFile = varMap["steering"].as<string>();
       cout << "Steering file: " << pythonFile << endl;
-      runInteractiveMode = false;
     }
 
     //Check for version option
     if (varMap.count("version")) {
-      pythonFile = (libPath / "version.py").string();
-      runInteractiveMode = false;
+      pythonFile = "version.py";
     }
 
     //Check for modules option
     if (varMap.count("modules")) {
-      pythonFile = (libPath / "modules.py").string();
-      runInteractiveMode = false;
+      pythonFile = "modules.py";
     }
 
     //Check for info option
     if (varMap.count("info")) {
-      pythonFile = (libPath / "info.py").string();
-      runInteractiveMode = false;
+      pythonFile = "info.py";
     }
 
   } catch (exception& e) {
@@ -180,6 +185,15 @@ int main(int argc, char* argv[])
   //---------------------------------------------------
   if (!pythonFile.empty()) {
     runInteractiveMode = false;
+
+    //Get the lib path
+    if (!boost::filesystem::exists(pythonFile)) {
+      if (boost::filesystem::exists(libPath / pythonFile)) {
+        pythonFile = (libPath / pythonFile).string();
+      } else {
+        pythonFile = (libPath2 / pythonFile).string();
+      }
+    }
 
     try {
       //Init Python interpreter
@@ -215,7 +229,11 @@ int main(int argc, char* argv[])
   //  Python interpreter in interactive mode.
   //---------------------------------------------------
   if (runInteractiveMode) {
-    string extCommand("python -i " + (libPath / "basf2.py").string());
+    pythonFile = (libPath / "basf2.py").string();
+    if (!boost::filesystem::exists(pythonFile)) {
+      pythonFile = (libPath2 / "basf2.py").string();
+    }
+    string extCommand("python -i " + pythonFile);
     system(extCommand.c_str());
   }
 

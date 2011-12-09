@@ -120,7 +120,6 @@ def process_dir(
 
     # install script files in the library directory
     scripts = env.Install(env['LIBDIR'], env['SCRIPT_FILES'])
-    Local(scripts)
     define_aliases(env, scripts, dir_name, 'scripts')
 
     # install data files in the data directory
@@ -204,7 +203,6 @@ def process_dir(
                                      env.subst('$SHLIBPREFIX') + lib_name
                                      + '.map'), env['SRC_FILES'])
                 lib_files.append(reg_map)
-            Local(lib_files)
 
             # define build target aliases
             env.Alias(lib_name, lib_files)
@@ -218,7 +216,6 @@ def process_dir(
                 pymod = env.InstallAs(os.path.join(env['LIBDIR'],
                                       os.path.basename(dir_name) + 'module'
                                       + env.subst('$SHLIBSUFFIX')), lib)
-                Local(pymod)
                 define_aliases(env, pymod, dir_name, 'lib')
     else:
 

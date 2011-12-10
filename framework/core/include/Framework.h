@@ -3,7 +3,7 @@
  * Copyright(C) 2010-2011  Belle II Collaboration                         *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Andreas Moll                                             *
+ * Contributors: Andreas Moll, Thomas Kuhr                                *
  *               R.Itoh, addition of parallel processing function         *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
@@ -23,6 +23,8 @@
 #include <framework/core/EventProcessor.h>
 
 #include <framework/pcore/pEventProcessor.h>
+
+#include <TRandom3.h>
 
 #include <string>
 #include <map>
@@ -150,6 +152,34 @@ namespace Belle2 {
     */
     void setRandomSeed(unsigned int seed);
 
+    /**
+     * Obtain a seed for the initialization of an external random number generator.
+     *
+     * @return The random number generator seed.
+    */
+    static unsigned int getRandomSeed();
+
+    /**
+     * Get the initial random number generator seed.
+     *
+     * @return The initial random number generator seed.
+    */
+    static unsigned int getInitialRandomSeed() {return s_randomSeed;};
+
+    /**
+     * Get the initial random number generator object.
+     *
+     * @return The initial random number generator object.
+    */
+    static const TRandom3 getInitialRandom() {return s_initialRandom;};
+
+    /**
+     * Reset the random seed and the initial random number generator object to the current gRandom object.
+     *
+     * @param seed The random number generator seed.
+    */
+    static void resetInitialRandom(unsigned int seed);
+
 
     //--------------------------------------------------
     //                   Python API
@@ -192,7 +222,8 @@ namespace Belle2 {
   private:
 
     static int m_nproc;
-    unsigned int m_randomSeed;          /**< The random number generator seed. */
+    static unsigned int s_randomSeed;   /**< The random number generator seed set by the user. */
+    static TRandom3 s_initialRandom;    /**< The initial random number generator. */
 
   };
 

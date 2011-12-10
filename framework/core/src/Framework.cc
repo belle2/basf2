@@ -3,7 +3,7 @@
  * Copyright(C) 2010-2011  Belle II Collaboration                         *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Andreas Moll                                             *
+ * Contributors: Andreas Moll, Thomas Kuhr                                *
  *               R.Itoh, addition of parallel processing function         *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
@@ -32,12 +32,18 @@ using namespace Belle2;
 using namespace boost::python;
 
 
-Framework::Framework() :
-    m_randomSeed(0)
+unsigned int Framework::s_randomSeed = 0;
+TRandom3  Framework::s_initialRandom;
+
+
+Framework::Framework()
 {
   m_pathManager = new PathManager();
   m_eventProcessor = new EventProcessor(*m_pathManager);
   m_peventProcessor = new pEventProcessor(*m_pathManager);
+
+  gRandom->SetSeed(0);
+  s_initialRandom = *static_cast<TRandom3*>(gRandom);
 }
 
 
@@ -81,8 +87,6 @@ PathPtr Framework::createPath() throw(PathManager::PathNotCreatedError)
 
 void Framework::process(PathPtr startPath)
 {
-  gRandom->SetSeed(m_randomSeed);
-
   if (Environment::Instance().getNumberProcesses() == 0)
     m_eventProcessor->process(startPath);
   else
@@ -93,8 +97,6 @@ void Framework::process(PathPtr startPath)
 
 void Framework::process(PathPtr startPath, long maxEvent)
 {
-  gRandom->SetSeed(m_randomSeed);
-
   m_eventProcessor->process(startPath, maxEvent);
 }
 
@@ -125,7 +127,27 @@ bool Framework::readEvtGenTableFromFile(const std::string& filename)
 
 void Framework::setRandomSeed(unsigned int seed)
 {
+  s_randomSeed = seed;
+  gRandom->SetSeed(s_randomSeed);
+  s_initialRandom = *static_cast<TRandom3*>(gRandom);
+  B2INFO("The random number seed is set to " << s_randomSeed);
+}
 
+
+unsigned int Framework::getRandomSeed()
+{
+  if (s_randomSeed > 0) {
+    return s_randomSeed;
+  } else {
+    return gRandom->Integer(static_cast<unsigned int>(-1)) + 1;
+  }
+}
+
+
+void Framework::resetInitialRandom(unsigned int seed)
+{
+  s_randomSeed = seed;
+  s_initialRandom = *static_cast<TRandom3*>(gRandom);
 }
 
 

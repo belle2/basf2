@@ -20,7 +20,8 @@ ClassImp(FileMetaData)
 
 FileMetaData::FileMetaData() :
     m_id(0), m_guid(""), m_lfn(""), m_events(0), m_experiment(0), m_runLow(0), m_eventLow(0),
-    m_runHigh(0), m_eventHigh(0), m_release(""), m_timeStamp(0), m_site(""), m_user(""), m_logFile(0)
+    m_runHigh(0), m_eventHigh(0), m_release(""), m_timeStamp(0), m_site(""), m_user(""), m_logFile(0),
+    m_randomSeed(0), m_random(0), m_steering("")
 {
 }
 
@@ -43,5 +44,8 @@ void FileMetaData::exposePythonAPI()
   .def("get_site", &FileMetaData::getSite)
   .def("get_user", &FileMetaData::getUser)
   .def("get_logfile", &FileMetaData::getLogFile)
+  .def("get_random_seed", &FileMetaData::getRandomSeed)
+  .def("get_random", &FileMetaData::getRandom)
+  .def("get_steering", &FileMetaData::getSteering)
   .def("set_ids", &FileMetaData::setIds);
 }

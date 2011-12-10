@@ -11,6 +11,7 @@
 #define FILEMETADATA_H
 
 #include <TObject.h>
+#include <TRandom3.h>
 #include <time.h>
 
 
@@ -101,6 +102,18 @@ namespace Belle2 {
      */
     int getLogFile() {return m_logFile;}
 
+    /** Random seed getter.
+     */
+    unsigned int getRandomSeed() {return m_randomSeed;}
+
+    /** Initital random number generator object getter.
+     */
+    const TRandom3 getRandom() {return m_random;}
+
+    /** Steering file content getter.
+     */
+    std::string getSteering() {return m_steering;}
+
     /** Number of events setter.
      *
      *  @param events The number of events.
@@ -133,9 +146,12 @@ namespace Belle2 {
      */
     void setParents(const std::vector<int>& parents) {m_parents = parents;}
 
-    /** Parents setter.
+    /** Creation data setter.
      *
-     *  @param parents The vector of parent IDs.
+     *  @param release The software release.
+     *  @param timeStamp The creation date and time.
+     *  @param site The site where the file was created.
+     *  @param user The user who created the file.
      */
     void setCreationData(const std::string& release, time_t timeStamp, const std::string& site, const std::string& user)
     {m_release = release; m_timeStamp = timeStamp; m_site = site; m_user = user;}
@@ -149,6 +165,19 @@ namespace Belle2 {
       */
     void setIds(int id, const std::string& guid, const std::string& lfn, int logFile = 0)
     {m_id = id; m_guid = guid; m_lfn = lfn; m_logFile = logFile;}
+
+    /** Random seed and number generator setter.
+     *
+     *  @param seed The random seed.
+     *  @param random The random number generator object.
+     */
+    void setRandom(unsigned int seed, const TRandom3& random) {m_randomSeed = seed; m_random = random;}
+
+    /** Steering file content setter.
+     *
+     *  @param steering The content of the steering file.
+     */
+    void setSteering(const std::string& steering) {m_steering = steering;}
 
     /**
      * Exposes methods of the FileMateData class to Python.
@@ -218,9 +247,21 @@ namespace Belle2 {
      */
     int m_logFile;
 
+    /** The random seed.
+     */
+    unsigned int m_randomSeed;
+
+    /** The initial random number generator object.
+     */
+    TRandom3 m_random;
+
+    /** The steering file content.
+     */
+    std::string m_steering;
+
     /** ROOT Macro for FileMetaData dictionary.
      */
-    ClassDef(FileMetaData, 1);
+    ClassDef(FileMetaData, 2);
 
   }; //class
 } // namespace Belle2

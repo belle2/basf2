@@ -3,7 +3,7 @@
  * Copyright(C) 2010-2011  Belle II Collaboration                         *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Andreas Moll                                             *
+ * Contributors: Andreas Moll, Thomas Kuhr                                *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -72,11 +72,25 @@ namespace Belle2 {
      */
     int getNumberProcesses() { return m_numberProcesses; }
 
+    /**
+     * Sets the steering file content.
+     *
+     * @param steering The steering file content.
+     */
+    void setSteering(const std::string& steering) { m_steering = steering; };
+
+    /**
+     * Returns the steering file content.
+     *
+     * @return The steering file content.
+     */
+    const std::string& getSteering() { return m_steering; };
 
   private:
 
     std::string m_dataSearchPath; /**< The path in which the data files, such as geometry files, are stored. */
     int m_numberProcesses;        /**< The number of processes that should be used for the parallel processing. */
+    std::string m_steering;       /**< The content of the steering file. */
 
     /**
      * The constructor is hidden to avoid that someone creates an instance of this class.

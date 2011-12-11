@@ -13,6 +13,7 @@
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/dataobjects/FileMetaData.h>
 #include <framework/core/RandomNumbers.h>
+#include <framework/core/Environment.h>
 
 #include <TTreeIndex.h>
 #include <stdlib.h>
@@ -224,6 +225,7 @@ void SimpleOutputModule::terminate()
   if (!user) user = "unknown";
   fileMetaDataPtr->setCreationData(release, time(0), site, user);
   fileMetaDataPtr->setRandom(RandomNumbers::getInitialSeed(), RandomNumbers::getInitialRandom());
+  fileMetaDataPtr->setSteering(Environment::Instance().getSteering());
 
   //fill Persistent data
   if (m_treeNames[DataStore::c_Persistent] != "NONE") {

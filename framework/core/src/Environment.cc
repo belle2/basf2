@@ -3,7 +3,7 @@
  * Copyright(C) 2010-2011  Belle II Collaboration                         *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Andreas Moll                                             *
+ * Contributors: Andreas Moll, Thomas Kuhr                                             *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -34,7 +34,7 @@ const list<string>& Environment::getModuleSearchPaths() const
 //                              Private methods
 //============================================================================
 
-Environment::Environment() : m_dataSearchPath(""), m_numberProcesses(0)
+Environment::Environment() : m_dataSearchPath(""), m_numberProcesses(0), m_steering("")
 {
 
 }

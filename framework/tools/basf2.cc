@@ -32,6 +32,7 @@
 
 #include <framework/pybasf2/PyBasf2.h>
 #include <framework/core/Framework.h>
+#include <framework/core/Environment.h>
 #include <framework/logging/Logger.h>
 
 #include <boost/program_options.hpp>
@@ -46,6 +47,8 @@
 #include <algorithm>
 #include <string>
 #include <vector>
+#include <fstream>
+#include <streambuf>
 
 using namespace std;
 using namespace Belle2;
@@ -60,6 +63,11 @@ void executePythonFile(const string& pythonFile)
 
   fullPath = boost::filesystem::system_complete(boost::filesystem::path(pythonFile));
   if ((!(boost::filesystem::is_directory(fullPath))) && (boost::filesystem::exists(fullPath))) {
+
+    std::ifstream file(fullPath.string().c_str());
+    std::stringstream buffer;
+    buffer << file.rdbuf();
+    Environment::Instance().setSteering(buffer.str());
 
     object main_module = import("__main__");
     object main_namespace = main_module.attr("__dict__");
@@ -154,7 +162,7 @@ int main(int argc, char* argv[])
     //Check for steering option
     if (varMap.count("steering")) {
       pythonFile = varMap["steering"].as<string>();
-      cout << "Steering file: " << pythonFile << endl;
+      B2INFO("Steering file: " << pythonFile);
     }
 
     //Check for version option

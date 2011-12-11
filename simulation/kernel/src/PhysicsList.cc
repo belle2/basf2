@@ -30,12 +30,12 @@ PhysicsList::PhysicsList(const string& physicsListName) : G4VModularPhysicsList(
   G4VModularPhysicsList* physList = NULL;
 
   if (physListFactory.IsReferencePhysList(physicsListName)) physList = physListFactory.GetReferencePhysList(physicsListName);
-  if (physList == NULL) B2FATAL("Could not load the physics list " << physicsListName)
+  if (physList == NULL) B2FATAL("Could not load the physics list " << physicsListName);
 
-    int iPhysList = 1;
+  int iPhysList = 1;
   G4VPhysicsConstructor* regPhys = const_cast<G4VPhysicsConstructor*>(physList->GetPhysics(0));
   while (regPhys != NULL) {
-    B2DEBUG(10, "RegisterPhysics: " << regPhys->GetPhysicsName())
+    B2DEBUG(10, "RegisterPhysics: " << regPhys->GetPhysicsName());
     RegisterPhysics(regPhys);
     regPhys = const_cast<G4VPhysicsConstructor*>(physList->GetPhysics(iPhysList++));
   }
@@ -50,7 +50,7 @@ PhysicsList::~PhysicsList()
 
 void PhysicsList::SetCuts()
 {
-  B2INFO("B4PhysicsList::SetCuts, CutLength: " << G4BestUnit(defaultCutValue, "Length"))
+  B2INFO("B4PhysicsList::SetCuts, CutLength: " << G4BestUnit(defaultCutValue, "Length"));
 
   // Set cuts to the defaultCutValue.
   SetCutsWithDefault();

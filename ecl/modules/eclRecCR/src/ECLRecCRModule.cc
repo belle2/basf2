@@ -112,7 +112,7 @@ void ECLRecCRModule::event()
     DigiECL* aECLHit = eclDigiArray[ii];
     int    get_ID       =  aECLHit->getEventId();
     float FitEnergy    = (aECLHit->getAmp()) / 20000;//ADC count to GeV
-    double FitTime    = (1520 - aECLHit->getTimeFit()) * 24.*12 / 508 / (3072 / 2) ;//ADC count to us
+//    double FitTime    = (1520 - aECLHit->getTimeFit()) * 24.*12 / 508 / (3072 / 2) ;//ADC count to us
     int cId          =  aECLHit->getCellId();
     cf.Accumulate(get_ID , FitEnergy, cId);
   }

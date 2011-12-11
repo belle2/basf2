@@ -109,6 +109,38 @@ def print_params(module, print_values=True, shared_lib_path=None):
     print ''
 
 
+def print_path(path, defaults=False, description=False):
+    """
+    This function prints the modules in the given path and the module parameters.
+    Parameters that are not set by the user are suppressed by default.
+
+    defaults: Set it to True to print also the parameters with default values
+    description: Set it to True to print the descriptions of modules and parameters
+    """
+
+    B2INFO('Modules and parameter settings in the path:')
+    index = 1
+    for module in path.modules():
+        out = '%2d. %s' % (index, module.name())
+        if description:
+            out += '  #%s' % module.description()
+        print out
+        index += 1
+        for param in module.available_params():
+            if not defaults and param.values == param.default:
+                continue
+            values = param.values
+            if not param.type.startswith('List'):
+                if len(values) > 0:
+                    values = values[0]
+                else:
+                    values = ''
+            out = '      %s=%s' % (param.name, values)
+            if description:
+                out += '  #%s' % param.description
+            print out
+
+
 def set_log_level(level):
     """
     Sets the global log level which specifies up to which level the logging messages will be shown

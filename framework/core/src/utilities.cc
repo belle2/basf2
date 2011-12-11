@@ -51,7 +51,7 @@ namespace Belle2 {
     {
       if (!fullname) library = "lib" + library + ".so";
 
-      B2INFO("Loading shared library " << library);
+      B2DEBUG(1, "Loading shared library " << library);
       void* libPointer = dlopen(library.c_str() , RTLD_LAZY | RTLD_GLOBAL);
 
       if (libPointer == NULL) {

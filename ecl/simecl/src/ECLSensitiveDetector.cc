@@ -127,7 +127,7 @@ namespace Belle2 {
     }
     if (v.GetName().find("Diode") != string::npos) {
 //      cout<<FirstStepFlag<<" "<<trackID<<" "<<m_cellID<<" "<<m_thetaID<<" "<<edep<<" "<<pid<<endl;
-      if (trackID != oldtrack && m_cellID != oldcellId) {
+      if (trackID != oldtrack && m_cellID != oldcellId && pid == 2112) {
         oldtrack = trackID; oldcellId = m_cellID;
         FirstStepFlag = 1;
       }

@@ -83,7 +83,6 @@ namespace Belle2 {
       std::map<int, DetectorBackgroundBase*> m_detectorBackgrounds;     /**< Map of the created detector backgrounds.*/
       std::map<int, DetectorBackgroundBase*>::iterator m_FirstNextIter; /**< Internal iterator which is used for the getFirst* and getNext* methods. */
     };
-
   }
 }
 

@@ -207,3 +207,56 @@ namespace Belle2 {
       int simHitIndexOffset = colIndex; //The index offset in the global SimHit DataStoreArray
       int nSimHits = m_readoutFrame->GetEntries();
       std::vector<int> oldNewIndexList;
+      for (int iSimHit = 0; iSimHit < nSimHits; ++iSimHit) {
+        new(simHitArray->AddrAt(colIndex)) SIMHITS(*(dynamic_cast<SIMHITS*>(m_readoutFrame->At(iSimHit))));
+        colIndex++;
+      }
+
+      //Add the information which background is mixed in to a new collection 'BkgInfo'.
+      //Loop over the MCParticle content of the ROF and add it to the MCParticle DataStore collection.
+      //Add the relation between a MCParticle and a SimHit into the appropriate collection.
+      //Add the relation between a MCParticle and the background information into the 'BkgInfoRels' collection.
+
+      //Access the standard DataStore collections
+      StoreArray<MCParticle> mcPartCollection;
+      RelationArray simHitToMCPartCollection(mcPartCollection, simHitArray, m_simHitRelation);
+
+      //Create the background specific DataStore collections
+      StoreArray<BackgroundInfo> bkgInfoCollection("BkgInfo");
+      RelationArray bkgInfoRelCollection(mcPartCollection, bkgInfoCollection, "BkgInfoRels");
+
+      //1) Add the background info to the new collection 'BkgInfo'.
+      new(bkgInfoCollection->AddrAt(bkgInfoCollection->GetLast() + 1)) BackgroundInfo(m_component, m_generator);
+
+      //2) Add the MCParticles and a relation to the background info
+      colIndex = mcPartCollection->GetLast() + 1;
+      int mcPartIndexOffset = colIndex; //The index offset in the global MCParticle DataStoreArray
+      int nPart = m_mcParticles->GetEntries();
+      for (int iPart = 0; iPart < nPart; ++iPart) {
+        new(mcPartCollection->AddrAt(colIndex)) MCParticle(*(dynamic_cast<MCParticle*>(m_mcParticles->At(iPart))));
+        bkgInfoRelCollection.add(colIndex, bkgInfoCollection->GetLast());
+        colIndex++;
+      }
+
+      //3) Add the SimHit to MCParticle relations
+      int nRel = m_mcPartRels->GetEntries();
+      for (int iRel = 0; iRel < nRel; ++iRel) {
+        RelationElement *relation = dynamic_cast<RelationElement*>(m_mcPartRels->At(iRel));
+        simHitToMCPartCollection.add(relation->getFromIndex() + mcPartIndexOffset, relation->getToIndex() + simHitIndexOffset);
+      }
+
+      m_index++;
+    }
+
+
+    template<class SIMHITS>
+    inline void Generator<SIMHITS>::updateNumberROF()
+    {
+      if (m_numberROFs < 0) {
+        m_numberROFs = m_files->GetEntries();
+      }
+    }
+  }
+}
+
+#endif /* GENERATOR_H */

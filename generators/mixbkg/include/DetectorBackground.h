@@ -192,3 +192,60 @@ namespace Belle2 {
       //Check if the component with the name already exists. If not create the component.
       MapIterator mapIter = m_components.find(component);
       if (mapIter == m_components.end()) {
+        B2INFO(">> Created new background component '" << component << "' for '" << SIMHITS::Class_Name() << "'.");
+        addComponent(component).addFile(component, generator, filename, simHitCollection, simHitRelation);
+      } else mapIter->second->addFile(component, generator, filename, simHitCollection, simHitRelation);
+    }
+
+
+    template<class SIMHITS>
+    inline Component<SIMHITS>& DetectorBackground<SIMHITS>::addComponent(const std::string& name)
+    {
+      Component<SIMHITS> *newComponent = new Component<SIMHITS>();
+      m_components.insert(make_pair(name, newComponent));
+      return *newComponent;
+    }
+
+
+    template<class SIMHITS>
+    inline unsigned int DetectorBackground<SIMHITS>::getMaxNumberReadoutFrames()
+    {
+      unsigned int maxNum = 0;
+      for (MapIterator mapIter = m_components.begin(); mapIter != m_components.end(); ++mapIter) {
+        if (mapIter->second->getMaxNumberReadoutFrames() > maxNum) {
+          maxNum = mapIter->second->getMaxNumberReadoutFrames();
+        }
+      }
+      return maxNum;
+    }
+
+
+    template<class SIMHITS>
+    inline unsigned int DetectorBackground<SIMHITS>::getMinNumberReadoutFrames()
+    {
+      unsigned int minNum = 0;
+      for (MapIterator mapIter = m_components.begin(); mapIter != m_components.end(); ++mapIter) {
+        if ((minNum == 0) && (mapIter->second->getMinNumberReadoutFrames() > 0)) {
+          minNum = mapIter->second->getMinNumberReadoutFrames();
+        } else {
+          if (mapIter->second->getMinNumberReadoutFrames() < minNum) {
+            minNum = mapIter->second->getMinNumberReadoutFrames();
+          }
+        }
+      }
+      return minNum;
+    }
+
+
+    template<class SIMHITS>
+    void DetectorBackground<SIMHITS>::fillDataStore()
+    {
+      for (MapIterator mapIter = m_components.begin(); mapIter != m_components.end(); ++mapIter) {
+        mapIter->second->fillDataStore();
+      }
+    }
+  }
+}
+
+
+#endif /* DETECTORBACKGROUND_H */

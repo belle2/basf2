@@ -195,3 +195,46 @@ MCParticleGraph::GraphParticle& ROFBuilderModule::createGraphParticle(MCParticle
   graphParticle.setCharge(mcParticle.getCharge());
   graphParticle.setEnergy(mcParticle.getEnergy());
   graphParticle.setValidVertex(mcParticle.hasValidVertex());
+  graphParticle.setProductionTime(mcParticle.getProductionTime());
+  graphParticle.setDecayTime(mcParticle.getDecayTime());
+  graphParticle.setProductionVertex(mcParticle.getProductionVertex());
+  graphParticle.setMomentum(mcParticle.getMomentum());
+  graphParticle.setDecayVertex(mcParticle.getDecayVertex());
+  graphParticle.setFirstDaughter(mcParticle.getFirstDaughter());
+  graphParticle.setLastDaughter(mcParticle.getLastDaughter());
+  if (motherIndex > 0) graphParticle.comesFrom(graph[motherIndex-1]); //Add decay
+
+  return graphParticle;
+}
+
+
+void ROFBuilderModule::addParticleToEventGraph(MCParticleGraph &graph, MCParticle &mcParticle, int motherIndex, const std::vector<bool> &keepList)
+{
+  MCParticleGraph::GraphParticle& graphParticle = createGraphParticle(graph, mcParticle, motherIndex);
+
+  //Keep/Ignore particles based on the keep list
+  graphParticle.setTrackID(mcParticle.getArrayIndex());
+  graphParticle.setIgnore(!keepList[mcParticle.getArrayIndex()]);
+
+  //Add all children
+  int currMotherIndex = graph.size();
+  BOOST_FOREACH(MCParticle* daughter, mcParticle.getDaughters()) {
+    addParticleToEventGraph(graph, *daughter, currMotherIndex, keepList);
+  }
+}
+
+
+void ROFBuilderModule::addParticleToROFGraph(MCParticle &mcParticle, int motherIndex, std::vector<int> &uniqueIDList)
+{
+  MCParticleGraph::GraphParticle& graphParticle = createGraphParticle(m_rofMCParticleGraph, mcParticle, motherIndex);
+
+  //Use the TrackID to store an unique identifier for each MCParticleGraph node
+  graphParticle.setTrackID(++m_rofGraphUniqueID);
+  uniqueIDList[mcParticle.getArrayIndex()] = m_rofGraphUniqueID;
+
+  //Add all children
+  int currMotherIndex = m_rofMCParticleGraph.size();
+  BOOST_FOREACH(MCParticle* daughter, mcParticle.getDaughters()) {
+    addParticleToROFGraph(*daughter, currMotherIndex, uniqueIDList);
+  }
+}

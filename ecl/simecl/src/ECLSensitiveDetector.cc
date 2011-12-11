@@ -18,6 +18,7 @@
 #include <framework/datastore/RelationArray.h>
 #include <ecl/hitecl/ECLSimHit.h>
 #include <ecl/hitecl/ECLEBSimHit.h>
+#include <ecl/geoecl/ECLGeometryPar.h>
 
 #include <string>
 #include <sstream>
@@ -34,8 +35,8 @@
 #include <G4MagneticField.hh>
 
 
-#include "CLHEP/Geometry/Vector3D.h"
-#include "CLHEP/Geometry/Point3D.h"
+//#include "CLHEP/Geometry/Vector3D.h"
+//#include "CLHEP/Geometry/Point3D.h"
 
 #include "TVector3.h"
 #define PI 3.14159265358979323846
@@ -80,7 +81,6 @@ namespace Belle2 {
 //G4bool ECLSensitiveDetector::ProcessHits(G4Step *aStep, G4TouchableHistory *)
   bool ECLSensitiveDetector::step(G4Step *aStep, G4TouchableHistory *)
   {
-
     // Get deposited energy
     const G4double edep = aStep->GetTotalEnergyDeposit();
 
@@ -112,9 +112,26 @@ namespace Belle2 {
     // Get layer ID
     Mapping(v.GetName());
 
-    if (in.GetStepStatus() == fGeomBoundary) {
+
+    ECLGeometryPar * eclp = ECLGeometryPar::Instance();
+    TVector3 VecCell =  eclp->GetCrystalVec(m_cellID);
+    TVector3 Pin(momIn.getX(), momIn.getY(), momIn.getZ());
+
+
+    double cos_ins = abs(cos(Pin.Angle(VecCell)));
+    if (1 / abs(cos_ins) > sqrt(1 + 1 + 0.1*0.1))
+      {cos_ins = 1 / sqrt(1 + 1 + 0.1 * 0.1);}
+
+
+
+    if (trackID != oldtrack && m_cellID != oldcellId) {
+      oldtrack = trackID; oldcellId = m_cellID;
       FirstStepFlag = 1;
     }
+
+
+
+
 
 
     if (v.GetName().find("Crystal") != string::npos) {
@@ -124,7 +141,7 @@ namespace Belle2 {
     if (v.GetName().find("Diode") != string::npos) {
 //      cout<<FirstStepFlag<<" "<<trackID<<" "<<m_cellID<<" "<<m_thetaID<<" "<<edep<<" "<<pid<<endl;
       int saveEBIndex = -999;
-      saveEBIndex = saveEBSimHit(m_cellID, m_thetaID, m_phiID  , trackID, pid, 1, edep, FirstStepFlag, momIn, posCell, posIn, posOut);
+      saveEBIndex = saveEBSimHit(m_cellID, m_thetaID, m_phiID  , trackID, pid, 1 / cos_ins, edep, FirstStepFlag, momIn, posCell, posIn, posOut);
     }
 
 
@@ -147,7 +164,7 @@ namespace Belle2 {
     const G4int phiId,
     const G4int trackID,
     const G4int pid,
-    const G4double tof,
+    const G4double lof,
     const G4double edep,
     const G4double FirstStep,
     const G4ThreeVector & mom,
@@ -166,7 +183,7 @@ namespace Belle2 {
     eclEBArray[m_EBhitNumber]->setCellId(cellId);
     eclEBArray[m_EBhitNumber]->setTrackId(trackID);
     eclEBArray[m_EBhitNumber]->setPDGCode(pid);
-//    eclEBArray[m_EBhitNumber]->setFlightTime(tof / ns);
+    eclEBArray[m_EBhitNumber]->setFlightLength(lof);
     eclEBArray[m_EBhitNumber]->setEnergyDep(edep / GeV);
     eclEBArray[m_EBhitNumber]->setStepLength(FirstStep);
     TVector3 momentum(mom.getX() / GeV, mom.getY() / GeV, mom.getZ() / GeV);
@@ -358,7 +375,5 @@ namespace Belle2 {
     return m_cellID;
 
   }
-
-
 
 } //namespace Belle II

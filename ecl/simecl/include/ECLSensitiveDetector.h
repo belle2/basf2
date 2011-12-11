@@ -75,7 +75,6 @@ namespace Belle2 {
     int m_phiID; /**< The current phi ID in an event. Used to fill the DataStore ECL array.*/
     int m_thetaID; /**< The current theta ID in an event. Used to fill the DataStore ECL array.*/
     int m_cellID; /**< The current cellID in an event. Used to fill the DataStore ECL array.*/
-
   protected:
 
   private:
@@ -84,6 +83,9 @@ namespace Belle2 {
     G4double m_thresholdKineticEnergy;/**Kinetic Energy  threshold  */
     int m_hitNumber; /**< The current number of created hits in an event. Used to fill the DataStore ECL array.*/
     int m_EBhitNumber; /**< The current number of created hits in an event. Used to fill the DataStore ECL EB array.*/
+    int oldtrack;
+    int oldcellId;
+
   };
 
 } // end of namespace Belle2

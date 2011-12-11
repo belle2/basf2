@@ -43,7 +43,7 @@ namespace Belle2 {
     double m_driftLength;
 
     //!  Flight time from IP.
-    double m_flightTime;
+    double m_flightLength;
 
     //! Deposited energy of this hit.
     double m_edep;
@@ -83,7 +83,7 @@ namespace Belle2 {
 
 
     //! The method to set flight time
-    void setFlightTime(double flightTime) { m_flightTime = flightTime; }
+    void setFlightLength(double flightLength) { m_flightLength = flightLength; }
 
     //! The method to set deposited energy
     void setEnergyDep(double edep) { m_edep = edep; }
@@ -124,7 +124,7 @@ namespace Belle2 {
 
 
     //! The method to get flight time
-    double getFlightTime() const { return m_flightTime; }
+    double getFlightLength() const { return m_flightLength; }
 
     //! The method to get deposited energy
     double getEnergyDep() const { return m_edep; }
@@ -159,7 +159,7 @@ namespace Belle2 {
       int phiId,
       int trackId,
       int pdg,
-      double flightTime,
+      double flightLength,
       double edep,
       double FirstStep,
       TVector3 momentum,
@@ -172,7 +172,7 @@ namespace Belle2 {
       m_cellId = cellId;
       m_trackId = trackId;
       m_pdg = pdg;
-      m_flightTime = flightTime;
+      m_flightLength = flightLength;
       m_edep = edep;
       m_FirstStep = FirstStep;
       m_momentum = momentum;

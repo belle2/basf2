@@ -24,8 +24,6 @@
 
 #include <framework/pcore/pEventProcessor.h>
 
-#include <TRandom3.h>
-
 #include <string>
 #include <map>
 #include <list>
@@ -145,41 +143,6 @@ namespace Belle2 {
     */
     bool readEvtGenTableFromFile(const std::string& filename);
 
-    /**
-     * Sets the seed for the random number generator.
-     *
-     * @param seed The random number generator seed.
-    */
-    void setRandomSeed(unsigned int seed);
-
-    /**
-     * Obtain a seed for the initialization of an external random number generator.
-     *
-     * @return The random number generator seed.
-    */
-    static unsigned int getRandomSeed();
-
-    /**
-     * Get the initial random number generator seed.
-     *
-     * @return The initial random number generator seed.
-    */
-    static unsigned int getInitialRandomSeed() {return s_randomSeed;};
-
-    /**
-     * Get the initial random number generator object.
-     *
-     * @return The initial random number generator object.
-    */
-    static const TRandom3 getInitialRandom() {return s_initialRandom;};
-
-    /**
-     * Reset the random seed and the initial random number generator object to the current gRandom object.
-     *
-     * @param seed The random number generator seed.
-    */
-    static void resetInitialRandom(unsigned int seed);
-
 
     //--------------------------------------------------
     //                   Python API
@@ -222,8 +185,6 @@ namespace Belle2 {
   private:
 
     static int m_nproc;
-    static unsigned int s_randomSeed;   /**< The random number generator seed set by the user. */
-    static TRandom3 s_initialRandom;    /**< The initial random number generator. */
 
   };
 

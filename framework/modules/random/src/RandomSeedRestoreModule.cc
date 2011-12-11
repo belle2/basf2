@@ -10,7 +10,7 @@
 
 #include <framework/modules/random/RandomSeedRestoreModule.h>
 #include <framework/dataobjects/FileMetaData.h>
-#include <framework/core/Framework.h>
+#include <framework/core/RandomNumbers.h>
 
 #include <TFile.h>
 #include <TTree.h>
@@ -66,8 +66,7 @@ void RandomSeedRestoreModule::initialize()
   }
 
   // Restore the random number generator
-  *static_cast<TRandom3*>(gRandom) = fileMetaData->getRandom();
-  Framework::resetInitialRandom(fileMetaData->getRandomSeed());
+  RandomNumbers::initialize(fileMetaData->getRandomSeed(), fileMetaData->getRandom());
   B2INFO("The random number seed was restored from the file " << m_fileName << ".");
 
   // Clean up

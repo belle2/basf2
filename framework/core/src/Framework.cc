@@ -11,6 +11,7 @@
 
 #include <framework/core/Framework.h>
 #include <framework/core/Environment.h>
+#include <framework/core/RandomNumbers.h>
 #include <framework/core/utilities.h>
 
 #include <framework/logging/Logger.h>
@@ -23,7 +24,6 @@
 #include <framework/dataobjects/EventMetaData.h>
 
 #include "TDatabasePDG.h"
-#include "TRandom.h"
 
 
 using namespace std;
@@ -32,18 +32,13 @@ using namespace Belle2;
 using namespace boost::python;
 
 
-unsigned int Framework::s_randomSeed = 0;
-TRandom3  Framework::s_initialRandom;
-
-
 Framework::Framework()
 {
   m_pathManager = new PathManager();
   m_eventProcessor = new EventProcessor(*m_pathManager);
   m_peventProcessor = new pEventProcessor(*m_pathManager);
 
-  gRandom->SetSeed(0);
-  s_initialRandom = *static_cast<TRandom3*>(gRandom);
+  RandomNumbers::initialize();
 }
 
 
@@ -125,32 +120,6 @@ bool Framework::readEvtGenTableFromFile(const std::string& filename)
 }
 
 
-void Framework::setRandomSeed(unsigned int seed)
-{
-  s_randomSeed = seed;
-  gRandom->SetSeed(s_randomSeed);
-  s_initialRandom = *static_cast<TRandom3*>(gRandom);
-  B2INFO("The random number seed is set to " << s_randomSeed);
-}
-
-
-unsigned int Framework::getRandomSeed()
-{
-  if (s_randomSeed > 0) {
-    return s_randomSeed;
-  } else {
-    return gRandom->Integer(static_cast<unsigned int>(-1)) + 1;
-  }
-}
-
-
-void Framework::resetInitialRandom(unsigned int seed)
-{
-  s_randomSeed = seed;
-  s_initialRandom = *static_cast<TRandom3*>(gRandom);
-}
-
-
 //=====================================================================
 //                          Python API
 //=====================================================================
@@ -214,6 +183,5 @@ void Framework::exposePythonAPI()
   .def("process", process2)
   .def("set_nprocess", &Framework::setNumberProcesses)
   .def("read_evtgen_table", &Framework::readEvtGenTableFromFile)
-  .def("set_random_seed", &Framework::setRandomSeed)
   ;
 }

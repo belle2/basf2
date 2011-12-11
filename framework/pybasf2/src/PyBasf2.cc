@@ -17,6 +17,7 @@
 #include <framework/core/Framework.h>
 #include <framework/core/ModuleParam.h>
 #include <framework/core/ModuleStatistics.h>
+#include <framework/core/RandomNumbers.h>
 #include <framework/logging/LogPythonInterface.h>
 #include <framework/dataobjects/FileMetaData.h>
 
@@ -77,6 +78,7 @@ BOOST_PYTHON_MODULE(pybasf2)
   ModuleParamInfoPython::exposePythonAPI();
   ModuleStatistics::exposePythonAPI();
   LogPythonInterface::exposePythonAPI();
+  RandomNumbers::exposePythonAPI();
   FileMetaData::exposePythonAPI();
   def("update_file_metadata", &updateFileMetaData);
 }

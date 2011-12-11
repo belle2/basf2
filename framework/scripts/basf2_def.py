@@ -167,11 +167,3 @@ def set_data_search_path(datapath):
     fw.set_data_search_path(datapath)
 
 
-def set_random_seed(seed):
-    """
-    Sets the seed of the random number generator
-    """
-
-    fw.set_random_seed(seed)
-
-

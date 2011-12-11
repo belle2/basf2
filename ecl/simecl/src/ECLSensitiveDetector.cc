@@ -118,19 +118,6 @@ namespace Belle2 {
     TVector3 Pin(momIn.getX(), momIn.getY(), momIn.getZ());
 
 
-    double cos_ins = abs(cos(Pin.Angle(VecCell)));
-    if (1 / abs(cos_ins) > sqrt(1 + 1 + 0.1*0.1))
-      {cos_ins = 1 / sqrt(1 + 1 + 0.1 * 0.1);}
-
-
-
-    if (trackID != oldtrack && m_cellID != oldcellId) {
-      oldtrack = trackID; oldcellId = m_cellID;
-      FirstStepFlag = 1;
-    }
-
-
-
 
 
 
@@ -140,6 +127,14 @@ namespace Belle2 {
     }
     if (v.GetName().find("Diode") != string::npos) {
 //      cout<<FirstStepFlag<<" "<<trackID<<" "<<m_cellID<<" "<<m_thetaID<<" "<<edep<<" "<<pid<<endl;
+      if (trackID != oldtrack && m_cellID != oldcellId) {
+        oldtrack = trackID; oldcellId = m_cellID;
+        FirstStepFlag = 1;
+      }
+
+      double cos_ins = abs(cos(Pin.Angle(VecCell)));
+      if (1 / abs(cos_ins) > sqrt(1 + 1 + 0.1*0.1))
+        {cos_ins = 1 / sqrt(1 + 1 + 0.1 * 0.1);}
       int saveEBIndex = -999;
       saveEBIndex = saveEBSimHit(m_cellID, m_thetaID, m_phiID  , trackID, pid, 1 / cos_ins, edep, FirstStepFlag, momIn, posCell, posIn, posOut);
     }

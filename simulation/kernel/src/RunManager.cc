@@ -15,6 +15,8 @@
 #include <framework/datastore/StoreArray.h>
 
 #include <boost/foreach.hpp>
+#include "Random/Random.h"
+#include "TRandom.h"
 
 using namespace std;
 using namespace Belle2;
@@ -35,6 +37,7 @@ void RunManager::Initialize()
   //Set geometry to be Initialized because there won't be any before the beginRun
   //FIXME: reverted to run independent
   //geometryInitialized = true;
+  CLHEP::HepRandom::setTheSeed(gRandom->GetSeed());
   G4RunManager::Initialize();
 }
 

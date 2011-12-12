@@ -94,7 +94,7 @@ void PXDRecoHit::setDetectorPlane()
   TVector3 vGlobal = geometry.vectorToGlobal(TVector3(0, 1, 0));
 
   //Construct the detector plane
-  GFDetPlane detPlane(origin, uGlobal, vGlobal, new VXDSensorPlane(m_sensorID));
+  GFDetPlane detPlane(origin, uGlobal, vGlobal, new VXDSensorPlane(m_sensorID, 1.0, 1.0));
   // Set in policy
   fPolicy.setDetPlane(detPlane);
 }

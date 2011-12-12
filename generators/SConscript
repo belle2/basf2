@@ -2,8 +2,8 @@ Import('env')
 
 env['LIBS'] = ['framework', 'geometry','generators_fortran_koralw','generators_fortran_bhwide',
                '$ROOT_LIBS','EvtGen','pythia8','PhotosCxxInterface.a', 'gfortran', 'HepMC',
-               'TauolaCxxInterface', 'TauolaFortran', 'lhapdfdummy', 'hepmcinterface',
-               'pxd_dataobjects', 'svd_dataobjects','generators_dataobjects','framework_dataobjects']
+               'TauolaCxxInterface', 'TauolaFortran', 'lhapdfdummy', 'hepmcinterface', 'genfit',
+               'vxd_dataobjects', 'pxd_dataobjects', 'svd_dataobjects','generators_dataobjects','framework_dataobjects']
 
 
 Return('env')

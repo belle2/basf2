@@ -79,9 +79,10 @@ namespace Belle2 {
     std::string m_componentName;         /**< The name of the background component (e.g. Touschek, QED etc.). */
     std::string m_generatorName;         /**< The name of the generator which was used to create the background (e.g. SAD_LER). */
     int m_mcParticleWriteMode;           /**< The MCParticle write mode:
-                                                                           0 = only the MCParticle which caused a SimHit in the subdetector (default),
-                                                                           1 = like 0 but in addition all mother particles are stored,
-                                                                           2 = all MCParticles*/
+                                                                           0 = no MCParticle are saved,
+                                                                           1 = only the MCParticle which caused a SimHit in the subdetector (default),
+                                                                           2 = like 0 but in addition all mother particles are stored,
+                                                                           3 = all MCParticles*/
     std::string m_simHitMCPartRelationName; /**< The name of the SimHit to MCParticle relation. */
 
     //Variables
@@ -106,8 +107,8 @@ namespace Belle2 {
     template <class SIMHIT>
     void addSimHitsToROF();
 
-    /** Fill the collected MCParticles into the ROOT readout frame tree. */
-    void fillMCParticleROFTree();
+    /** Fill the ROOT readout frame tree and add the MCParticles and the relations if the MCParticle write mode is set. */
+    void fillROFTree();
 
     MCParticleGraph::GraphParticle& createGraphParticle(MCParticleGraph &graph, MCParticle &mcParticle, int motherIndex);
 
@@ -148,7 +149,8 @@ namespace Belle2 {
     //------------------------------------------------
     int nSimHits = collection->GetEntries();
     std::vector<int> mcpToSimHitMapEvent;
-    m_mcpToSimHitMap.resize(m_mcpToSimHitMap.size() + nSimHits);
+    if (m_mcParticleWriteMode > 0) m_mcpToSimHitMap.resize(m_mcpToSimHitMap.size() + nSimHits);
+
     int colIndex = m_readoutFrame->GetLast() + 1;
     int simHitEvtOffset = colIndex;
     for (int iSimHit = 0; iSimHit < nSimHits; ++iSimHit) {
@@ -156,92 +158,96 @@ namespace Belle2 {
       new((*m_readoutFrame)[colIndex]) SIMHIT(*origSimHit);
 
       //Store the MCParticle index for the given SimHit index (list index) in the vector
-      if (mcPartSimHitIndex.getFirstFrom(origSimHit) != NULL) {
-        const MCParticle *mcPart = mcPartSimHitIndex.getFirstFrom(origSimHit)->from;
-        if (mcPart != NULL) m_mcpToSimHitMap[colIndex] = mcPart->getArrayIndex();
-        else m_mcpToSimHitMap[colIndex] = -1;
+      if (m_mcParticleWriteMode > 0) {
+        if (mcPartSimHitIndex.getFirstFrom(origSimHit) != NULL) {
+          const MCParticle *mcPart = mcPartSimHitIndex.getFirstFrom(origSimHit)->from;
+          if (mcPart != NULL) m_mcpToSimHitMap[colIndex] = mcPart->getArrayIndex();
+          else m_mcpToSimHitMap[colIndex] = -1;
+        }
       }
       colIndex++;
     }
     m_numberSimHits += nSimHits;
 
 
-    //------------------------------------------------
-    // MCParticles
-    //------------------------------------------------
-    int nMCPart = mcPartCollection.getEntries();
+    //-------------------------------------------------------
+    // MCParticles (only of the MCParticle write mode is set)
+    //-------------------------------------------------------
+    if (m_mcParticleWriteMode > 0) {
+      int nMCPart = mcPartCollection.getEntries();
 
-    //Create a list of the indices of the MCParticles which should be kept.
-    std::vector<bool> keepParticle;
-    keepParticle.resize(nMCPart, false);
-    switch (m_mcParticleWriteMode) {
-      case 0: //seen in the subdetector
-        for (int iSimHit = 0; iSimHit < nSimHits; ++iSimHit) {
-          SIMHIT *simHit = collection[iSimHit];
-          if (mcPartSimHitIndex.getFirstFrom(simHit) == NULL) continue;
-          const MCParticle *mcPart = mcPartSimHitIndex.getFirstFrom(simHit)->from;
-          if (mcPart != NULL) keepParticle[mcPart->getArrayIndex()] = true;
-        }
-        break;
-      case 1: //seen in the subdetector + mothers
-        for (int iSimHit = 0; iSimHit < nSimHits; ++iSimHit) {
-          SIMHIT *simHit = collection[iSimHit];
-          if (mcPartSimHitIndex.getFirstFrom(simHit) == NULL) continue;
-          const MCParticle *mcPart = mcPartSimHitIndex.getFirstFrom(simHit)->from;
-          if (mcPart != NULL) keepParticle[mcPart->getArrayIndex()] = true;
-          MCParticle *mother = mcPart->getMother();
-          while (mother != NULL) {
-            keepParticle[mother->getArrayIndex()] = true;
-            mother = mother->getMother();
+      //Create a list of the indices of the MCParticles which should be kept.
+      std::vector<bool> keepParticle;
+      keepParticle.resize(nMCPart, false);
+      switch (m_mcParticleWriteMode) {
+        case 1: //seen in the subdetector
+          for (int iSimHit = 0; iSimHit < nSimHits; ++iSimHit) {
+            SIMHIT *simHit = collection[iSimHit];
+            if (mcPartSimHitIndex.getFirstFrom(simHit) == NULL) continue;
+            const MCParticle *mcPart = mcPartSimHitIndex.getFirstFrom(simHit)->from;
+            if (mcPart != NULL) keepParticle[mcPart->getArrayIndex()] = true;
           }
-        }
-        break;
-      case 2: //all
-        for (int iPart = 0; iPart < nMCPart; ++iPart) keepParticle[iPart] = true;
-        break;
-    }
+          break;
+        case 2: //seen in the subdetector + mothers
+          for (int iSimHit = 0; iSimHit < nSimHits; ++iSimHit) {
+            SIMHIT *simHit = collection[iSimHit];
+            if (mcPartSimHitIndex.getFirstFrom(simHit) == NULL) continue;
+            const MCParticle *mcPart = mcPartSimHitIndex.getFirstFrom(simHit)->from;
+            if (mcPart != NULL) keepParticle[mcPart->getArrayIndex()] = true;
+            MCParticle *mother = mcPart->getMother();
+            while (mother != NULL) {
+              keepParticle[mother->getArrayIndex()] = true;
+              mother = mother->getMother();
+            }
+          }
+          break;
+        case 3: //all
+          for (int iPart = 0; iPart < nMCPart; ++iPart) keepParticle[iPart] = true;
+          break;
+      }
 
-    //Create a new, compressed MCParticle list for the event.
-    //The MCParticle collection has to be sorted breadth first.
-    MCParticleGraph eventGraph;
-    for (int iPart = 0; iPart < nMCPart; ++iPart) {
-      MCParticle *currParticle = mcPartCollection[iPart];
-      if (currParticle->getMother() != NULL) break;
-      addParticleToEventGraph(eventGraph, *currParticle, 0, keepParticle);
-    }
-    eventGraph.generateList("ROFBuilderMCParticleEvent");
-    StoreArray<MCParticle> mcParticleEventCol("ROFBuilderMCParticleEvent");
-    int nMCPartEvent = mcParticleEventCol.getEntries();
+      //Create a new, compressed MCParticle list for the event.
+      //The MCParticle collection has to be sorted breadth first.
+      MCParticleGraph eventGraph;
+      for (int iPart = 0; iPart < nMCPart; ++iPart) {
+        MCParticle *currParticle = mcPartCollection[iPart];
+        if (currParticle->getMother() != NULL) break;
+        addParticleToEventGraph(eventGraph, *currParticle, 0, keepParticle);
+      }
+      eventGraph.generateList("ROFBuilderMCParticleEvent");
+      StoreArray<MCParticle> mcParticleEventCol("ROFBuilderMCParticleEvent");
+      int nMCPartEvent = mcParticleEventCol.getEntries();
 
-    //Create a list that relates the old MCParticle index (list index) with the new (after compressing) MCParticle index.
-    std::vector<int> mapOldToNewIndexEvent;
-    mapOldToNewIndexEvent.resize(nMCPart, -1);
-    for (unsigned int iPart = 0; iPart < eventGraph.size(); ++iPart) {
-      MCParticleGraph::GraphParticle &currParticle = eventGraph[iPart];
-      mapOldToNewIndexEvent[currParticle.getTrackID()] = currParticle.getArrayIndex();
-    }
+      //Create a list that relates the old MCParticle index (list index) with the new (after compressing) MCParticle index.
+      std::vector<int> mapOldToNewIndexEvent;
+      mapOldToNewIndexEvent.resize(nMCPart, -1);
+      for (unsigned int iPart = 0; iPart < eventGraph.size(); ++iPart) {
+        MCParticleGraph::GraphParticle &currParticle = eventGraph[iPart];
+        mapOldToNewIndexEvent[currParticle.getTrackID()] = currParticle.getArrayIndex();
+      }
 
-    //Add the compressed MCParticle list to the readout-frame MCParticleGraph.
-    //Give each node in the graph an unique identifier (since vertexID is not accessible we 'misuse' the trackID)
-    //and create a list which relates the event MCParticle indices with the unique identifiers.
-    std::vector<int> mcpToUniqueIDMap;
-    mcpToUniqueIDMap.resize(nMCPartEvent);
-    for (int iPart = 0; iPart < nMCPartEvent; ++iPart) {
-      MCParticle *currParticle = mcParticleEventCol[iPart];
-      if (currParticle->getMother() != NULL) break;
-      addParticleToROFGraph(*currParticle, 0, mcpToUniqueIDMap);
-    }
+      //Add the compressed MCParticle list to the readout-frame MCParticleGraph.
+      //Give each node in the graph an unique identifier (since vertexID is not accessible we 'misuse' the trackID)
+      //and create a list which relates the event MCParticle indices with the unique identifiers.
+      std::vector<int> mcpToUniqueIDMap;
+      mcpToUniqueIDMap.resize(nMCPartEvent);
+      for (int iPart = 0; iPart < nMCPartEvent; ++iPart) {
+        MCParticle *currParticle = mcParticleEventCol[iPart];
+        if (currParticle->getMother() != NULL) break;
+        addParticleToROFGraph(*currParticle, 0, mcpToUniqueIDMap);
+      }
 
-    //Replace the values of the ROF SimHit list (m_mcpToSimHitMap) with the unique identifiers
-    for (unsigned int iSimHit = simHitEvtOffset; iSimHit < m_mcpToSimHitMap.size(); ++iSimHit) {
-      if (m_mcpToSimHitMap[iSimHit] > -1) {
-
-        //Replace the original MCParticle index with the one after the compression
-        m_mcpToSimHitMap[iSimHit] = mapOldToNewIndexEvent[m_mcpToSimHitMap[iSimHit]];
-
-        //Replace the updated MCParticle index with the unique ID of the ROF MCParticle graph
+      //Replace the values of the ROF SimHit list (m_mcpToSimHitMap) with the unique identifiers
+      for (unsigned int iSimHit = simHitEvtOffset; iSimHit < m_mcpToSimHitMap.size(); ++iSimHit) {
         if (m_mcpToSimHitMap[iSimHit] > -1) {
-          m_mcpToSimHitMap[iSimHit] = mcpToUniqueIDMap[m_mcpToSimHitMap[iSimHit]];
+
+          //Replace the original MCParticle index with the one after the compression
+          m_mcpToSimHitMap[iSimHit] = mapOldToNewIndexEvent[m_mcpToSimHitMap[iSimHit]];
+
+          //Replace the updated MCParticle index with the unique ID of the ROF MCParticle graph
+          if (m_mcpToSimHitMap[iSimHit] > -1) {
+            m_mcpToSimHitMap[iSimHit] = mcpToUniqueIDMap[m_mcpToSimHitMap[iSimHit]];
+          }
         }
       }
     }

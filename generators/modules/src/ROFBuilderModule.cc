@@ -103,7 +103,7 @@ void ROFBuilderModule::event()
 {
   //Check if a new readout frame has to be created
   if (m_event >= ((m_currReadoutFrameIdx + 1) * m_eventsPerReadoutFrame)) {
-    fillMCParticleROFTree();
+    fillROFTree();
     B2INFO(">> Save readout frame: #" << m_currReadoutFrameIdx << " (" << m_numberSimHits << " SimHits" << ")")
 
     //Clear the TClones Arrays
@@ -130,7 +130,7 @@ void ROFBuilderModule::terminate()
 {
   //Check if a new readout frame has to be created
   if (m_event >= ((m_currReadoutFrameIdx + 1) * m_eventsPerReadoutFrame)) {
-    fillMCParticleROFTree();
+    fillROFTree();
     B2INFO(">> Save readout frame: #" << m_currReadoutFrameIdx << " (" << m_numberSimHits << " SimHits" << ")")
   }
   B2INFO("=======================================================")
@@ -145,34 +145,37 @@ void ROFBuilderModule::terminate()
 }
 
 
-void ROFBuilderModule::fillMCParticleROFTree()
+void ROFBuilderModule::fillROFTree()
 {
-  //Fill the MCParticles
-  m_rofMCParticleGraph.generateList("ROFBuilderMCParticleROF");
-  StoreArray<MCParticle> mcParticleEventROF("ROFBuilderMCParticleROF");
+  //Fill the MCParticles if the MCParticle write mode is set
+  if (m_mcParticleWriteMode > 0) {
 
-  int nParticles = mcParticleEventROF.getEntries();
-  for (int iParticle = 0; iParticle < nParticles; ++iParticle) {
-    new((*m_mcParticles)[iParticle]) MCParticle(*mcParticleEventROF[iParticle]);
-  }
+    m_rofMCParticleGraph.generateList("ROFBuilderMCParticleROF");
+    StoreArray<MCParticle> mcParticleEventROF("ROFBuilderMCParticleROF");
 
-  //Create a list that relates the unique identifier of a MCParticleGraph node (list index)
-  //with the index of the MCParticle in the final list
-  vector<int> uniqueIDMCPartFinal;
-  uniqueIDMCPartFinal.resize(m_rofMCParticleGraph.size());
-  for (unsigned int iPart = 0; iPart < m_rofMCParticleGraph.size(); ++iPart) {
-    MCParticleGraph::GraphParticle &currParticle = m_rofMCParticleGraph[iPart];
-    if (currParticle.getIndex() > 0) {
-      uniqueIDMCPartFinal[currParticle.getTrackID()] = currParticle.getArrayIndex();
+    int nParticles = mcParticleEventROF.getEntries();
+    for (int iParticle = 0; iParticle < nParticles; ++iParticle) {
+      new((*m_mcParticles)[iParticle]) MCParticle(*mcParticleEventROF[iParticle]);
     }
-  }
 
-  //Fill the MCParticles to SimHit Relation
-  for (unsigned int iRel = 0; iRel < m_mcpToSimHitMap.size(); ++iRel) {
-    if (m_mcpToSimHitMap[iRel] < 0) continue;
-    int mcpIndex = uniqueIDMCPartFinal[m_mcpToSimHitMap[iRel]];
-    if (mcpIndex < 0) continue;
-    new((*m_mcPartRels)[m_mcPartRels->GetLast() + 1]) RelationElement(mcpIndex, iRel);
+    //Create a list that relates the unique identifier of a MCParticleGraph node (list index)
+    //with the index of the MCParticle in the final list
+    vector<int> uniqueIDMCPartFinal;
+    uniqueIDMCPartFinal.resize(m_rofMCParticleGraph.size());
+    for (unsigned int iPart = 0; iPart < m_rofMCParticleGraph.size(); ++iPart) {
+      MCParticleGraph::GraphParticle &currParticle = m_rofMCParticleGraph[iPart];
+      if (currParticle.getIndex() > 0) {
+        uniqueIDMCPartFinal[currParticle.getTrackID()] = currParticle.getArrayIndex();
+      }
+    }
+
+    //Fill the MCParticles to SimHit Relation
+    for (unsigned int iRel = 0; iRel < m_mcpToSimHitMap.size(); ++iRel) {
+      if (m_mcpToSimHitMap[iRel] < 0) continue;
+      int mcpIndex = uniqueIDMCPartFinal[m_mcpToSimHitMap[iRel]];
+      if (mcpIndex < 0) continue;
+      new((*m_mcPartRels)[m_mcPartRels->GetLast() + 1]) RelationElement(mcpIndex, iRel);
+    }
   }
 
   //Fill the ROOT tree

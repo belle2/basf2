@@ -36,13 +36,13 @@ namespace Belle2 {
     /** Destructor. */
     virtual ~MixBkgModule() {}
 
-    /**  */
+    /** Initializes the module. */
     virtual void initialize();
 
     /** Method is called for each event. */
     virtual void event();
 
-    /**  */
+    /** Terminates the module. */
     virtual void terminate();
 
 
@@ -52,7 +52,7 @@ namespace Belle2 {
     std::vector<std::string> m_fileNames; /**< List of the ROF Root background files.*/
 
     //Variables
-    generators::MixBackground m_mixBackground; /**< The background mixing class.*/
+    generators::MixBackground m_mixBackground; /**< The background mixing library.*/
 
   };
 

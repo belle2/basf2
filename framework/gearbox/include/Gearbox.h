@@ -66,6 +66,12 @@ namespace Belle2 {
     void close();
 
     /**
+     * Return the state of the Gearbox.
+     * @return True if the Gearbox has an initialized backend and opened a document for reading.
+     */
+    bool isOpen() { return m_xmlDocument != 0; }
+
+    /**
      * Return the number of nodes a given path will expand to
      * @return number of nodes, 0 if path does not exist
      */

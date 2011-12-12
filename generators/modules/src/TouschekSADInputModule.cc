@@ -22,6 +22,8 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 
+#include <TGeoMatrix.h>
+
 using namespace std;
 using namespace Belle2;
 
@@ -56,6 +58,10 @@ TouschekSADInputModule::TouschekSADInputModule() : Module()
 
 void TouschekSADInputModule::initialize()
 {
+  if (!Gearbox::getInstance().isOpen()) {
+    B2FATAL("The Touschek SAD input module requires a valid Gearbox. Please make sure you have the Gearbox module added to your path.")
+  }
+
   //Register collections
   StoreArray<MCParticle> MCParticles;
 

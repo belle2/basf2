@@ -14,8 +14,9 @@
 #include <framework/core/Module.h>
 #include <generators/touschek/TouschekReaderSAD.h>
 
-#include <TGeoMatrix.h>
 #include <string>
+
+class TGeoMatrix;
 
 namespace Belle2 {
 
@@ -26,6 +27,7 @@ namespace Belle2 {
    *
    * Reads in the Touschek data from a SAD file and stores it into
    * the MCParticle collection.
+   * This module requires that the interaction region XML file has already been loaded by the Gearbox module.
   */
   class TouschekSADInputModule : public Module {
 

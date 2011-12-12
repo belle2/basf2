@@ -12,19 +12,22 @@
 #define TOUSCHEKTURTLEINPUTMODULE_H_
 
 #include <framework/core/Module.h>
-#include <generators/touschek/TouschekReaderTURTLE.h>
 #include <generators/dataobjects/MCParticleGraph.h>
 
 #include <TGeoMatrix.h>
 #include <string>
 
+
 namespace Belle2 {
+
+  class TouschekReaderTURTLE;
 
   /**
    * The TouschekTURTLE Input module.
    *
    * Reads in the Touschek data from a TURTLE file and stores it into
    * the MCParticle collection.
+   * This module requires that the interaction region XML file has already been loaded by the Gearbox module.
   */
   class TouschekTURTLEInputModule : public Module {
 

@@ -18,8 +18,9 @@
 #include <framework/gearbox/Gearbox.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/core/utilities.h>
-
 #include <framework/gearbox/Unit.h>
+
+#include <generators/touschek/TouschekReaderTURTLE.h>
 
 #include <TGeoManager.h>
 #include <TGeoVolume.h>
@@ -70,6 +71,11 @@ TouschekTURTLEInputModule::~TouschekTURTLEInputModule()
 
 void TouschekTURTLEInputModule::initialize()
 {
+  //Check if the Gearbox is ready for reading
+  if (!Gearbox::getInstance().isOpen()) {
+    B2FATAL("The Touschek Turtle input module requires a valid Gearbox. Please make sure you have the Gearbox module added to your path.")
+  }
+
   //Initialize MCParticle collection
   StoreArray<MCParticle> MCParticles;
 

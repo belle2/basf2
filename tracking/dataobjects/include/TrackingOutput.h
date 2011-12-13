@@ -218,6 +218,14 @@ namespace Belle2 {
      */
     void setMCFitTracks(std::vector<int> mcFitTracks) {m_mcFitTracks = mcFitTracks;}
 
+    /** Setter for the number of MCTracks.
+     */
+    void setNMCFitTracks(int nMCFitTracks) {m_nMCFitTracks.push_back(nMCFitTracks);}
+
+    /** Getter for the number of <CTracks.
+     */
+    std::vector<int> getNMCFitTracks() {return m_nMCFitTracks; }
+
     /** Getter for the MCTrack Ids for the given MCParticle.
      */
     std::vector<int> getMCFitTracks() { return m_mcFitTracks; }
@@ -371,6 +379,10 @@ namespace Belle2 {
       */
     void setPRSuccessExtrap(int prSuccessExtrap) {m_prSuccessExtrap.push_back(prSuccessExtrap) ;}
 
+    /** Setter for purity of the PRTracks.
+     */
+    void setPRPurity(double prPurity) {m_prPurity.push_back(prPurity); }
+
     /** Setter for the fit result of the PRTrack fit: momentum error (x-component).
         */
     void setPRFitMomentumXErr(float prFitMomentumXErr) {m_prFitMomentumXErr.push_back(prFitMomentumXErr) ;}
@@ -398,6 +410,14 @@ namespace Belle2 {
     /** Setter for the PRTrack Ids for the given PRParticle.
      */
     void setPRFitTracks(std::vector<int> prFitTracks) {m_prFitTracks = prFitTracks;}
+
+    /** Setter for the number of PRTracks.
+      */
+    void setNPRFitTracks(int nPRFitTracks) {m_nPRFitTracks.push_back(nPRFitTracks);}
+
+    /**Getter for the number of PRTracks.
+     */
+    std::vector<int> getNPRFitTracks() {return m_nPRFitTracks; }
 
     /** Getter for the PRTrack Ids for the given PRParticle.
      */
@@ -470,7 +490,7 @@ namespace Belle2 {
     float m_mcPositionZ;                         /**< Vertex of the MCParticle (z-component) */
 
     //-------------------------------------------------------------------------
-    int m_nMCFitTracks;                          /** Number of fitted MCTracks */
+    std::vector<int>   m_nMCFitTracks;           /** Number of fitted MCTracks */
     std::vector<float> m_mcStartMomentumX;       /** Start values for the MCTrack fit: momentum (x-component) */
     std::vector<float> m_mcStartMomentumY;       /** Start values for the MCTrack fit: momentum (y-component) */
     std::vector<float> m_mcStartMomentumZ;       /** Start values for the MCTrack fit: momentum (z-component) */
@@ -508,7 +528,7 @@ namespace Belle2 {
     std::vector <int> m_mcFitTracks;             /** MCTracks Ids for the given MCParticle */
 
     //---------------------------------------------------------------------------
-    int m_nPRFitTracks;                          /** Number of fitted PRTracks */
+    std::vector<int>   m_nPRFitTracks;           /** Number of fitted PRTracks */
     std::vector<float> m_prStartMomentumX;       /** Start values for the PRTrack fit: momentum (x-component) */
     std::vector<float> m_prStartMomentumY;       /** Start values for the PRTrack fit: momentum (y-component) */
     std::vector<float> m_prStartMomentumZ;       /** Start values for the PRTrack fit: momentum (z-component) */

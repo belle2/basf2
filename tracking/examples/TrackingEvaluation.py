@@ -2,20 +2,25 @@
 # -*- coding: utf-8 -*-
 
 ###########################################################################################################################
+# This steering file is an example how to execute MC based track finding and fitting and 'realistic' track finding and fitting in one file. The results are stored in the TrackingOutput branch and allows a comparison between the two ways, and thus allows an evaluation of the pattern recognition.
+# This is just an example of how the evaluation can be performed, it is surely can and should be improved in the future, so it is just meant to be an orientation help for people who are starting to work on tracking in basf2 and not as ultimate solution.
+#
 #
 # This steering file creates the Belle II detector geometry,
-# and perfoms the simulation and MC based track finding and fitting.
+# perfoms the simulation, mc based and realistic pattern recognition in der CDC. Afterwards the resulting tracks are fitted and stored in a suitable way.
 #
 # EvtMetaGen and EvtMetaInfo generates and shows event meta data (see example in the framework package).
 # Gearbox and Geometry are used to create the Belle2 detector geometry.
 # The generator used in this example is geant4 particle gun (see example in the simulation or generator package).
 # FullSim performs the full simulation.
 
-# CDCDigi creates the detector response in the CDC for the simulated Hits.
-# For the PXD and SVD currently the TrueHits are used (created directly by the sensitive detector), will be replaced by realistic clusters later on.
+# CDCDigi creates the detecotor response in the CDC for the simulated Hits.
 
 # MCTrackFinder creates relations between MCParticles and CDCHits/PXDTrueHits/SVDTrueHits produced by it.
-# GenFitter fits the found MCTracks and created two track collections: GFTracks (Genfit class) and Tracks (class with helix parametrization)
+# CDCTracking performs pattern recognition in the CDC based on conformal algorithm. GFTrackCandidates with corresponding hit indices and start values are created.
+# GenFitter fits the found GFTrackCandidates and created two track collections: GFTracks (Genfit class) and Tracks (class with helix parametrization)
+#
+# TrackingOutput creates the TrackingOutput objects to store the results.
 #
 # For details about module parameters just type > basf2 -m .
 #
@@ -43,7 +48,7 @@ geometry = register_module('Geometry')
 geometry.param('Components', ['MagneticField', 'BeamPipe', 'PXD', 'SVD', 'CDC'
                ])
 
-# particle gun to shoot particles in the detector
+# shoot particles in the detector
 pGun = register_module('ParticleGun')
 
 # generate a random seed for the simulation
@@ -52,7 +57,7 @@ intseed = random.randint(1, 10000000)
 
 # choose the particles you want to simulate
 param_pGun = {
-    'pdgCodes': [13, -13],
+    'pdgCodes': [211, -211],
     'randomSeed': intseed,
     'nTracks': 4,
     'momentumGeneration': 'uniform',
@@ -71,7 +76,7 @@ pGun.param(param_pGun)
 
 # simulation
 g4sim = register_module('FullSim')
-# make the simulation less noisy
+# make simulation less noisy
 g4sim.logging.log_level = LogLevel.ERROR
 
 # digitizer
@@ -85,32 +90,71 @@ cdcDigitizer.param(param_cdcdigi)
 mctrackfinder = register_module('MCTrackFinder')
 
 # select which detectors you would like to use
-param_mctrackfinder = {'UseCDCHits': 1, 'UseSVDHits': 1, 'UsePXDHits': 1}
+param_mctrackfinder = {'UseCDCHits': 1, 'UseSVDHits': 0, 'UsePXDHits': 0}
 # select which particles to use: primary particles
 param_mctrackfinder = {'WhichParticles': 0}
 mctrackfinder.param(param_mctrackfinder)
 
-# fitting
-cdcfitting = register_module('GenFitter')
+# fitting of MCTracks
+mcfitting = register_module('GenFitter')
 
 # fit the tracks with one iteration of Kalman filter
-param_cdcfitting = {
+param_mcfitting = {
     'StoreFailedTracks': 0,
     'mcTracks': 1,
     'FilterId': 0,
     'NIterations': 1,
     'ProbCut': 0.001,
     }
+mcfitting.param(param_mcfitting)
+
+# pattern recognition
+cdctracking = register_module('CDCTracking')
+
+# give the collection a custom name to mark that it is coming from pattern recognition
+param_cdctracking = {'GFTrackCandidatesColName': 'GFTrackCands_PatternReco'}
+cdctracking.param(param_cdctracking)
+
+# match the found track candidates with MCParticles
+mcmatching = register_module('CDCMCMatching')
+
+# select the correct collection for the matching
+param_mcmatching = {'GFTrackCandidatesColName': 'GFTrackCands_PatternReco'}
+mcmatching.param(param_mcmatching)
+
+# fitting
+cdcfitting = register_module('GenFitter')
+
+# set correct collection name as input and custom collection names as output
+# select DAF instead of Kalman as Filter
+# set the pdg hypothesis to the simulated one, if you want to fit with different pdg hypothesises, set 'allPDG' to true
+param_cdcfitting = {
+    'GFTrackCandidatesColName': 'GFTrackCands_PatternReco',
+    'TracksColName': 'Tracks_PatternReco',
+    'GFTracksColName': 'GFTracks_PatternReco',
+    'mcTracks': 0,
+    'pdg': 211,
+    'allPDG': 0,
+    'FilterId': 1,
+    'NIterations': 1,
+    'ProbCut': 0.001,
+    }
+
 cdcfitting.param(param_cdcfitting)
+
+# create TrackingOutputObjects
+trackingoutput = register_module('TrackingOutput')
 
 # output
 output = register_module('SimpleOutput')
-output.param('outputFileName', 'MCFittingOutput.root')
+# write out only the interesting branch
+output.param('branchNames', ['TrackingOutputs'])
+output.param('outputFileName', 'TrackingEvaluationOutput.root')
 
-# create paths
+# Create paths
 main = create_path()
 
-# add modules to paths
+# Add modules to paths
 main.add_module(evtmetagen)
 main.add_module(evtmetainfo)
 
@@ -122,10 +166,15 @@ main.add_module(g4sim)
 main.add_module(cdcDigitizer)
 
 main.add_module(mctrackfinder)
+main.add_module(mcfitting)
+
+main.add_module(cdctracking)
+main.add_module(mcmatching)
 main.add_module(cdcfitting)
+
+main.add_module(trackingoutput)
 main.add_module(output)
 
 # Process events
 process(main)
-
 print statistics

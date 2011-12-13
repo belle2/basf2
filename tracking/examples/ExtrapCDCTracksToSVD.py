@@ -4,7 +4,8 @@
 ###########################################################################################################################
 #
 # This steering file creates the Belle II detector geometry,
-# perfoms the simulation and pattern recognition in der CDC. Afterwards the resulting tracks are fitted.
+# perfoms the simulation and pattern recognition in der CDC. The found tracks are fitted and extrapolated to the SVD. Matching SVD hits are added and afterwards the resulting tracks are refitted.
+# You can also use MCTracks with CDCHits and then extrapolate them, just replace CDCTracking with MCTracking and adjust the steering parameters (see other examples).
 #
 # EvtMetaGen and EvtMetaInfo generates and shows event meta data (see example in the framework package).
 # Gearbox and Geometry are used to create the Belle2 detector geometry.
@@ -15,6 +16,9 @@
 
 # CDCTracking performs pattern recognition in the CDC based on conformal algorithm. GFTrackCandidates with corresponding hit indices and start values are created.
 # GenFitter fits the found GFTrackCandidates and created two track collections: GFTracks (Genfit class) and Tracks (class with helix parametrization)
+# ExtrapolateToSVD extrapolates the tracks to each SVDHit position. The best matching hit in each layer is added to the track.
+#
+# (This steering file seems always to crash at the end of the event processing, I am not sure if it is a general framework issue or an issue with the ExtrapolateToSVDModule. But the crash does not affect the result or the output file, so it can be used...)
 #
 # For details about module parameters just type > basf2 -m .
 #
@@ -94,7 +98,7 @@ mcmatching = register_module('CDCMCMatching')
 param_mcmatching = {'GFTrackCandidatesColName': 'GFTrackCands_PatternReco'}
 mcmatching.param(param_mcmatching)
 
-# fitting
+# cdc fitting
 cdcfitting = register_module('GenFitter')
 
 # set correct collection name as input and custom collection names as output
@@ -104,19 +108,43 @@ param_cdcfitting = {
     'GFTrackCandidatesColName': 'GFTrackCands_PatternReco',
     'TracksColName': 'Tracks_PatternReco',
     'GFTracksColName': 'GFTracks_PatternReco',
+    'StoreFailedTracks': 1,
     'mcTracks': 0,
     'pdg': 211,
     'allPDG': 0,
     'FilterId': 1,
-    'NIterations': 1,
     'ProbCut': 0.001,
     }
 
 cdcfitting.param(param_cdcfitting)
 
+# extrapolate to SVD
+extrapolate = register_module('ExtrapolateToSVD')
+# set the correct input (GFTracks from cdcfitting) and output (new GFTrackCands with SVDHits) collection names
+extrapolate.param('GFTracksColName', 'GFTracks_PatternReco')
+extrapolate.param('GFTrackCandsColName', 'GFTrackCands_withSVD')
+
+# refitting
+svdfitting = register_module('GenFitter')
+
+# set proper new collection names (important to avoid mix up with previous collections)
+param_svdfitting = {
+    'GFTrackCandidatesColName': 'GFTrackCands_withSVD',
+    'TracksColName': 'Tracks_withSVD',
+    'GFTracksColName': 'GFTracks_withSVD',
+    'StoreFailedTracks': 1,
+    'mcTracks': 0,
+    'pdg': 211,
+    'allPDG': 0,
+    'FilterId': 1,
+    'ProbCut': 0.001,
+    }
+
+svdfitting.param(param_svdfitting)
+
 # output
 output = register_module('SimpleOutput')
-output.param('outputFileName', 'CDCPatternRecoOutput.root')
+output.param('outputFileName', 'ExtrapCDCTracksToSVDOutput.root')
 
 # Create paths
 main = create_path()
@@ -135,6 +163,10 @@ main.add_module(cdcDigitizer)
 main.add_module(cdctracking)
 main.add_module(mcmatching)
 main.add_module(cdcfitting)
+
+main.add_module(extrapolate)
+main.add_module(svdfitting)
+
 main.add_module(output)
 
 # Process events

@@ -4,7 +4,7 @@
 ###########################################################################################################################
 #
 # This steering file creates the Belle II detector geometry,
-# and perfoms the simulation and MC based track finding and fitting.
+# and perfoms the simulation with EVTGen as generator and MC based track finding and fitting.
 #
 # EvtMetaGen and EvtMetaInfo generates and shows event meta data (see example in the framework package).
 # Gearbox and Geometry are used to create the Belle2 detector geometry.
@@ -42,32 +42,14 @@ geometry = register_module('Geometry')
 # to simulate the whole detector included in BelleII.xml, comment the next line out
 geometry.param('Components', ['MagneticField', 'BeamPipe', 'PXD', 'SVD', 'CDC'
                ])
+# EvtGen to provide generic BB events
+evtgeninput = register_module('EvtGenInput')
 
-# particle gun to shoot particles in the detector
-pGun = register_module('ParticleGun')
-
-# generate a random seed for the simulation
-import random
-intseed = random.randint(1, 10000000)
-
-# choose the particles you want to simulate
-param_pGun = {
-    'pdgCodes': [13, -13],
-    'randomSeed': intseed,
-    'nTracks': 4,
-    'momentumGeneration': 'uniform',
-    'momentumParams': [0.4, 1.6],
-    'thetaGeneration': 'fixed',
-    'thetaParams': [60., 120.],
-    'phiGeneration': 'uniform',
-    'phiParams': [0, 360],
-    'vertexGeneration': 'uniform',
-    'xVertexParams': [0.0, 0.0],
-    'yVertexParams': [0.0, 0.0],
-    'zVertexParams': [0.0, 0.0],
-    }
-
-pGun.param(param_pGun)
+# if the files are not in your data/generators folder, copy them there from externals/v...../evtgen
+evtgeninput.param('DECFile', os.path.join(basf2datadir, 'generators/DECAY.DEC'
+                  ))
+evtgeninput.param('pdlFile', os.path.join(basf2datadir, 'generators/evt.pdl'))
+evtgeninput.param('boost2LAB', True)
 
 # simulation
 g4sim = register_module('FullSim')
@@ -86,8 +68,9 @@ mctrackfinder = register_module('MCTrackFinder')
 
 # select which detectors you would like to use
 param_mctrackfinder = {'UseCDCHits': 1, 'UseSVDHits': 1, 'UsePXDHits': 1}
-# select which particles to use: primary particles
-param_mctrackfinder = {'WhichParticles': 0}
+
+# select which particles to use, here as example: use only particles which had created hits in the CDC, have an energy > 0.1 and are charged
+param_mctrackfinder = {'WhichParticles': 3, 'EnergyCut': 0.1, 'Neutrals': 0}
 mctrackfinder.param(param_mctrackfinder)
 
 # fitting
@@ -105,7 +88,7 @@ cdcfitting.param(param_cdcfitting)
 
 # output
 output = register_module('SimpleOutput')
-output.param('outputFileName', 'MCFittingOutput.root')
+output.param('outputFileName', 'MCFittingEvtGenOutput.root')
 
 # create paths
 main = create_path()
@@ -116,7 +99,7 @@ main.add_module(evtmetainfo)
 
 main.add_module(gearbox)
 main.add_module(geometry)
-main.add_module(pGun)
+main.add_module(evtgeninput)
 main.add_module(g4sim)
 
 main.add_module(cdcDigitizer)

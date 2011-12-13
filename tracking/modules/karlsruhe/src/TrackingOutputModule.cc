@@ -182,6 +182,9 @@ void TrackingOutputModule::event()
       m_nMCFitTracks = m_mcFitTracks.size();
       m_nPRFitTracks = m_prFitTracks.size();
 
+      output[counter]->setNMCFitTracks(m_mcFitTracks.size());
+      output[counter]->setNPRFitTracks(m_prFitTracks.size());
+
       //there should only be one mc track for an mc particle, but maybe one wants to fit with different pdg hypothesises
 
       //B2INFO("Collect Info for MCTrack ( "<<m_nMCFitTracks<<" tracks found )");
@@ -256,6 +259,8 @@ void TrackingOutputModule::event()
           output[counter]->setPRFitPDG(tracksPR[trackId]->getPDG());
           output[counter]->setPRFitChi2(tracksPR[trackId]->getChi2());
           output[counter]->setPRFitPValue(tracksPR[trackId]->getPValue());
+
+          output[counter]->setPRPurity(tracksPR[trackId]->getPurity());
 
           output[counter]->setPRFitMomentumXErr(tracksPR[trackId]->getPErrors().x());
           output[counter]->setPRFitMomentumYErr(tracksPR[trackId]->getPErrors().y());

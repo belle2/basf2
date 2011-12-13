@@ -10,13 +10,13 @@
 
 #include <simulation/kernel/RunManager.h>
 #include <framework/logging/Logger.h>
+#include <framework/core/RandomNumbers.h>
 
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 
 #include <boost/foreach.hpp>
 #include "Random/Random.h"
-#include "TRandom.h"
 
 using namespace std;
 using namespace Belle2;
@@ -37,7 +37,7 @@ void RunManager::Initialize()
   //Set geometry to be Initialized because there won't be any before the beginRun
   //FIXME: reverted to run independent
   //geometryInitialized = true;
-  CLHEP::HepRandom::setTheSeed(gRandom->GetSeed());
+  CLHEP::HepRandom::setTheSeed(RandomNumbers::getSeed());
   G4RunManager::Initialize();
 }
 

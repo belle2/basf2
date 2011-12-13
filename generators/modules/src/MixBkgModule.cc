@@ -32,6 +32,7 @@ MixBkgModule::MixBkgModule() : Module()
 
   //Parameters
   addParam("BackgroundFiles", m_fileNames, "The ROF Root files containing the background SimHits. Wildcards can be used !");
+  addParam("AnalysisMode", m_analysisMode, "Activates the analysis mode which stores all background MCParticles and background information into separate collections.", false);
 }
 
 
@@ -40,6 +41,13 @@ void MixBkgModule::initialize()
   B2INFO("============================================================")
   B2INFO("                         MixBkg                             ")
   B2INFO("------------------------------------------------------------")
+
+  m_mixBackground.setAnalysisMode(m_analysisMode);
+  if (m_analysisMode) {
+    B2INFO(">> Analysis mode: ON")
+  } else {
+    B2INFO(">> Analysis mode: OFF")
+  }
 
   //Add the background ROF Root files to the background mixing library
   for (vector<string>::iterator listIter = m_fileNames.begin(); listIter != m_fileNames.end(); ++listIter) {

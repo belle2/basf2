@@ -92,8 +92,10 @@ namespace Belle2 {
        * background components is increased by one. If the internal counter
        * of a background component is greater than the available number of frames,
        * the counter starts from 0.
+       *
+       * @param analysisMode If set to true all background MCParticles and background information are stored into separate collections.
        */
-      void fillDataStore();
+      void fillDataStore(bool analysisMode = false);
 
 
     private:
@@ -171,12 +173,12 @@ namespace Belle2 {
 
 
     template<class SIMHITS>
-    void Component<SIMHITS>::fillDataStore()
+    void Component<SIMHITS>::fillDataStore(bool analysisMode)
     {
       if (!m_enabled) return;
 
       for (MapIterator mapIter = m_generators.begin(); mapIter != m_generators.end(); ++mapIter) {
-        mapIter->second->fillDataStore();
+        mapIter->second->fillDataStore(analysisMode);
       }
     }
 

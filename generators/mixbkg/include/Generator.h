@@ -93,8 +93,10 @@ namespace Belle2 {
        * background components is increased by one. If the internal counter
        * of a background component is greater than the available number of frames,
        * the counter starts from 0.
+       *
+       * @param analysisMode If set to true all background MCParticles and background information are stored into separate collections.
        */
-      void fillDataStore();
+      void fillDataStore(bool analysisMode = false);
 
 
     protected :
@@ -190,7 +192,7 @@ namespace Belle2 {
 
 
     template<class SIMHITS>
-    inline void Generator<SIMHITS>::fillDataStore()
+    inline void Generator<SIMHITS>::fillDataStore(bool analysisMode)
     {
       if (!m_enabled) return;
 
@@ -200,52 +202,81 @@ namespace Belle2 {
 
       //Get ROF from chain
       m_files->GetEntry(m_index);
+      m_index++;
 
-      //Loop over SimHit content of ROF and add it to the DataStore SimHit collection.
+      //Get the collections and relations
       StoreArray<SIMHITS> simHitArray(m_simHitCollection);
-      int colIndex = simHitArray->GetLast() + 1;
-      int simHitIndexOffset = colIndex; //The index offset in the global SimHit DataStoreArray
-      int nSimHits = m_readoutFrame->GetEntries();
-      std::vector<int> oldNewIndexList;
-      for (int iSimHit = 0; iSimHit < nSimHits; ++iSimHit) {
-        new(simHitArray->AddrAt(colIndex)) SIMHITS(*(dynamic_cast<SIMHITS*>(m_readoutFrame->At(iSimHit))));
-        colIndex++;
-      }
-
-      //Add the information which background is mixed in to a new collection 'BkgInfo'.
-      //Loop over the MCParticle content of the ROF and add it to the MCParticle DataStore collection.
-      //Add the relation between a MCParticle and a SimHit into the appropriate collection.
-      //Add the relation between a MCParticle and the background information into the 'BkgInfoRels' collection.
-
-      //Access the standard DataStore collections
       StoreArray<MCParticle> mcPartCollection;
       RelationArray simHitToMCPartCollection(mcPartCollection, simHitArray, m_simHitRelation);
 
-      //Create the background specific DataStore collections
-      StoreArray<BackgroundInfo> bkgInfoCollection("BkgInfo");
-      RelationArray bkgInfoRelCollection(mcPartCollection, bkgInfoCollection, "BkgInfoRels");
-
-      //1) Add the background info to the new collection 'BkgInfo'.
-      new(bkgInfoCollection->AddrAt(bkgInfoCollection->GetLast() + 1)) BackgroundInfo(m_component, m_generator);
-
-      //2) Add the MCParticles and a relation to the background info
-      colIndex = mcPartCollection->GetLast() + 1;
-      int mcPartIndexOffset = colIndex; //The index offset in the global MCParticle DataStoreArray
-      int nPart = m_mcParticles->GetEntries();
-      for (int iPart = 0; iPart < nPart; ++iPart) {
-        new(mcPartCollection->AddrAt(colIndex)) MCParticle(*(dynamic_cast<MCParticle*>(m_mcParticles->At(iPart))));
-        bkgInfoRelCollection.add(colIndex, bkgInfoCollection->GetLast());
-        colIndex++;
+      //Loop over the SimHit content of the ROF and add the SimHits to the DataStore SimHit collection.
+      int simHitIndexOffset = simHitArray->GetLast() + 1; //The index offset in the global SimHit DataStoreArray
+      int nSimHits = m_readoutFrame->GetEntries();
+      for (int iSimHit = 0; iSimHit < nSimHits; ++iSimHit) {
+        new(simHitArray->AddrAt(simHitIndexOffset + iSimHit)) SIMHITS(*(dynamic_cast<SIMHITS*>(m_readoutFrame->At(iSimHit))));
       }
 
-      //3) Add the SimHit to MCParticle relations
+      //Loop over the SimHit to MCParticle relation and add the MCParticles and Relations
+      int mcPartIndexOffset = mcPartCollection->GetLast() + 1; //The index offset in the global MCParticle DataStoreArray
+      int mcIndex = mcPartIndexOffset;
       int nRel = m_mcPartRels->GetEntries();
+      std::vector<int> addedToCol;
+      addedToCol.resize(m_mcParticles->GetEntries(), -1);
       for (int iRel = 0; iRel < nRel; ++iRel) {
         RelationElement *relation = dynamic_cast<RelationElement*>(m_mcPartRels->At(iRel));
-        simHitToMCPartCollection.add(relation->getFromIndex() + mcPartIndexOffset, relation->getToIndex() + simHitIndexOffset);
+        MCParticle &currParticle = *(dynamic_cast<MCParticle*>(m_mcParticles->At(relation->getFromIndex())));
+
+        //Check if the MCParticle has already been added to the collection
+        if (addedToCol[relation->getFromIndex()] < 0) {
+          addedToCol[relation->getFromIndex()] = mcIndex;
+
+          //Create a new MCParticle to make sure the mother and daughter information is set to the value 0.
+          MCParticle newParticle;
+          newParticle.setStatus(currParticle.getStatus());
+          newParticle.setPDG(currParticle.getPDG());
+          newParticle.setMass(currParticle.getMass());
+          newParticle.setCharge(currParticle.getCharge());
+          newParticle.setEnergy(currParticle.getEnergy());
+          newParticle.setMomentum(currParticle.getMomentum());
+          newParticle.setValidVertex(currParticle.hasValidVertex());
+          newParticle.setProductionTime(currParticle.getProductionTime());
+          newParticle.setProductionVertex(currParticle.getProductionVertex());
+          newParticle.setDecayTime(currParticle.getDecayTime());
+          newParticle.setDecayVertex(currParticle.getDecayVertex());
+
+          //Store the MCParticle and its relation into the appropriate collections
+          new(mcPartCollection->AddrAt(mcIndex)) MCParticle(newParticle);
+          mcIndex++;
+        }
+
+        simHitToMCPartCollection.add(addedToCol[relation->getFromIndex()], relation->getToIndex() + simHitIndexOffset);
       }
 
-      m_index++;
+      //Only continue if the analysis mode is set
+      if (!analysisMode) return;
+
+      //Create the analysis mode specific background DataStore collections
+      StoreArray<BackgroundInfo> bkgInfoCollection;
+      StoreArray<MCParticle> mcPartBkgCollection("BackgroundMCParticles");
+      RelationArray bkgInfoRelCollection(mcPartCollection, bkgInfoCollection, "BackgroundInfoRelation");
+      RelationArray bkgSimHitRelCollection(mcPartCollection, bkgInfoCollection, "BackgroundMCSimHitRelation");
+
+      //Add the background info to the new collection 'BkgInfo'.
+      new(bkgInfoCollection->AddrAt(bkgInfoCollection->GetLast() + 1)) BackgroundInfo(m_component, m_generator);
+
+      //Add the MCParticles and a relation to the background info
+      int nPart = m_mcParticles->GetEntries();
+      for (int iPart = 0; iPart < nPart; ++iPart) {
+        new(mcPartBkgCollection->AddrAt(mcPartBkgCollection->GetLast() + 1)) MCParticle(*(dynamic_cast<MCParticle*>(m_mcParticles->At(iPart))));
+        bkgInfoRelCollection.add(mcPartBkgCollection->GetLast(), bkgInfoCollection->GetLast());
+      }
+
+      //Add the SimHit to MCParticle relations
+      nRel = m_mcPartRels->GetEntries();
+      for (int iRel = 0; iRel < nRel; ++iRel) {
+        RelationElement *relation = dynamic_cast<RelationElement*>(m_mcPartRels->At(iRel));
+        bkgSimHitRelCollection.add(relation->getFromIndex(), relation->getToIndex() + simHitIndexOffset);
+      }
     }
 
 

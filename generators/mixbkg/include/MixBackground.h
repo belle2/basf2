@@ -41,6 +41,12 @@ namespace Belle2 {
       ~MixBackground();
 
       /**
+       * Sets the analysis mode of the mixing library.
+       * @param If set to true all background MCParticles and background information are stored into separate collections.
+       */
+      void setAnalysisMode(bool analysisMode = true) { m_analysisMode = analysisMode; }
+
+      /**
        * Adds a new ROF Root file to the background mixing library.
        * The file content is read and the file is automatically loaded into the correct Component/Generator section.
        * @param filename The filename of the ROF Root file. Follows the same rules as explained in the TChain.Add() method.
@@ -80,6 +86,7 @@ namespace Belle2 {
     protected:
 
       int m_mcParticleWriteMode; /**< The MonteCarlo write mode. Makes sure only files having the same mode are loaded into the library. */
+      bool m_analysisMode; /**< Activates the analysis mode which stores all background MCParticles and background information into separate collections. */
       std::map<int, DetectorBackgroundBase*> m_detectorBackgrounds;     /**< Map of the created detector backgrounds.*/
       std::map<int, DetectorBackgroundBase*>::iterator m_FirstNextIter; /**< Internal iterator which is used for the getFirst* and getNext* methods. */
     };

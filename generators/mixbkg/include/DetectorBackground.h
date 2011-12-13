@@ -80,8 +80,10 @@ namespace Belle2 {
        * background components is increased by one. If the internal counter
        * of a background component is greater than the available number of frames,
        * the counter starts from 0.
+       *
+       * @param debugMode If set to true all background MCParticles and background information are stored into separate collections.
        */
-      virtual void fillDataStore() = 0;
+      virtual void fillDataStore(bool debugMode = false) = 0;
     };
 
     //=========================================================================
@@ -146,7 +148,7 @@ namespace Belle2 {
        * The value is given by the lowest number of the readout frames among all background
        * components and their generators of the subdetector.
        * If you would like to add no background readout frame twice for this subdetector,
-       * call the method fillDataStore() only as often as the number that this method returns.
+       * call the method fillDataStore() only as often as the number which this method returns.
        */
       unsigned int getMinNumberReadoutFrames();
 
@@ -156,8 +158,10 @@ namespace Belle2 {
        * background components is increased by one. If the internal counter
        * of a background component is greater than the available number of frames,
        * the counter starts from 0.
+       *
+       * @param analysisMode If set to true all background MCParticles and background information are stored into separate collections.
        */
-      void fillDataStore();
+      void fillDataStore(bool analysisMode = false);
 
 
     protected :
@@ -238,10 +242,10 @@ namespace Belle2 {
 
 
     template<class SIMHITS>
-    void DetectorBackground<SIMHITS>::fillDataStore()
+    void DetectorBackground<SIMHITS>::fillDataStore(bool analysisMode)
     {
       for (MapIterator mapIter = m_components.begin(); mapIter != m_components.end(); ++mapIter) {
-        mapIter->second->fillDataStore();
+        mapIter->second->fillDataStore(analysisMode);
       }
     }
   }

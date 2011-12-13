@@ -72,7 +72,7 @@ void MixBackground::addFile(const std::string &filename)
       }
     }
 
-    //Check if the subdetector background was already created. If not create it.
+    //Check if the subdetector background has already been created. If not create it.
     map<int, DetectorBackgroundBase*>::iterator mapIter = m_detectorBackgrounds.find(subdetector);
     if (mapIter == m_detectorBackgrounds.end()) {
       switch (subdetector) {
@@ -118,10 +118,10 @@ void MixBackground::fillDataStore()
 {
   for (map<int, DetectorBackgroundBase*>::iterator mapIter = m_detectorBackgrounds.begin();
        mapIter != m_detectorBackgrounds.end(); ++mapIter) {
-    mapIter->second->fillDataStore();
+    mapIter->second->fillDataStore(m_analysisMode);
   }
 
-  //Reset the indices for the whole MCParticle collection
+  //Reset the indices for the standard MCParticle collection
   StoreArray<MCParticle> mcPartCollection;
-  if (mcPartCollection.GetEntries() > 0) dynamic_cast<MCParticle*>(mcPartCollection[0])->fixParticleList();
+  if (mcPartCollection.getEntries() > 0) dynamic_cast<MCParticle*>(mcPartCollection[0])->fixParticleList();
 }

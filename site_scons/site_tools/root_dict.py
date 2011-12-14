@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 import os
@@ -7,9 +7,8 @@ from SCons.Builder import Builder
 from SCons.Scanner.C import CScanner
 
 # regular expression to find class names in linkdef files
-linkdef_class_re = \
-    re.compile(r'^#pragma\s+link\s+C\+\+\s+class\s+Belle2::([\w<>,\*]+)[+-]?\!?;\s*$'
-               , re.M)
+linkdef_class_re = re.compile(r'^#pragma\s+link\s+C\+\+\s+class\s+Belle2::'
+                              '([\w]*::)?([\w<>,\*]+)[+-]?\!?;\s*$', re.M)
 
 
 def linkdef_emitter(target, source, env):
@@ -26,7 +25,7 @@ def linkdef_emitter(target, source, env):
     sources = []
     contents = source[0].get_text_contents()
     for entry in linkdef_class_re.findall(contents):
-        include_base = entry.split('<')[0] + '.h'
+        include_base = entry[1].split('<')[0] + '.h'
         include_file = os.path.join(include_dir, include_base)
         if not include_file in sources:
             sources.append(include_file)
@@ -36,9 +35,9 @@ def linkdef_emitter(target, source, env):
 
 
 # define builder for root dictionaries
-rootcint = \
-    Builder(action='rootcint -f $TARGET -c -p $_CPPDEFFLAGS $_CPPINCFLAGS $SOURCES'
-            , emitter=linkdef_emitter, source_scanner=CScanner())
+rootcint = Builder(
+    action='rootcint -f $TARGET -c -p $_CPPDEFFLAGS $_CPPINCFLAGS $SOURCES',
+    emitter=linkdef_emitter, source_scanner=CScanner())
 rootcint.action.cmdstr = '${ROOTCINTCOMSTR}'
 
 
@@ -48,5 +47,3 @@ def generate(env):
 
 def exists(env):
     return True
-
-

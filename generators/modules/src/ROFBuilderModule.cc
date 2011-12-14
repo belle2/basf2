@@ -82,9 +82,10 @@ void ROFBuilderModule::initialize()
   m_rofGraphUniqueID = -1;
 
   map<int, string> writeModeLabels;
-  writeModeLabels.insert(make_pair(0, "seen in the subdetector"));
-  writeModeLabels.insert(make_pair(1, "seen in the subdetector + mothers"));
-  writeModeLabels.insert(make_pair(2, "all"));
+  writeModeLabels.insert(make_pair(0, "none"));
+  writeModeLabels.insert(make_pair(1, "seen in the subdetector"));
+  writeModeLabels.insert(make_pair(2, "seen in the subdetector + mothers"));
+  writeModeLabels.insert(make_pair(3, "all"));
 
   B2INFO("=======================================================")
   B2INFO("                    ROFBuilder                         ")
@@ -163,7 +164,7 @@ void ROFBuilderModule::fillROFTree()
     vector<int> uniqueIDMCPartFinal;
     uniqueIDMCPartFinal.resize(m_rofMCParticleGraph.size());
     for (unsigned int iPart = 0; iPart < m_rofMCParticleGraph.size(); ++iPart) {
-      MCParticleGraph::GraphParticle &currParticle = m_rofMCParticleGraph[iPart];
+      MCParticleGraph::GraphParticle& currParticle = m_rofMCParticleGraph[iPart];
       if (currParticle.getIndex() > 0) {
         uniqueIDMCPartFinal[currParticle.getTrackID()] = currParticle.getArrayIndex();
       }
@@ -189,7 +190,7 @@ void ROFBuilderModule::fillROFTree()
 }
 
 
-MCParticleGraph::GraphParticle& ROFBuilderModule::createGraphParticle(MCParticleGraph &graph, MCParticle &mcParticle, int motherIndex)
+MCParticleGraph::GraphParticle& ROFBuilderModule::createGraphParticle(MCParticleGraph& graph, MCParticle& mcParticle, int motherIndex)
 {
   MCParticleGraph::GraphParticle& graphParticle = graph.addParticle();
   graphParticle.setPDG(mcParticle.getPDG());
@@ -205,13 +206,13 @@ MCParticleGraph::GraphParticle& ROFBuilderModule::createGraphParticle(MCParticle
   graphParticle.setDecayVertex(mcParticle.getDecayVertex());
   graphParticle.setFirstDaughter(mcParticle.getFirstDaughter());
   graphParticle.setLastDaughter(mcParticle.getLastDaughter());
-  if (motherIndex > 0) graphParticle.comesFrom(graph[motherIndex-1]); //Add decay
+  if (motherIndex > 0) graphParticle.comesFrom(graph[motherIndex - 1]); //Add decay
 
   return graphParticle;
 }
 
 
-void ROFBuilderModule::addParticleToEventGraph(MCParticleGraph &graph, MCParticle &mcParticle, int motherIndex, const std::vector<bool> &keepList)
+void ROFBuilderModule::addParticleToEventGraph(MCParticleGraph& graph, MCParticle& mcParticle, int motherIndex, const std::vector<bool> &keepList)
 {
   MCParticleGraph::GraphParticle& graphParticle = createGraphParticle(graph, mcParticle, motherIndex);
 
@@ -221,13 +222,13 @@ void ROFBuilderModule::addParticleToEventGraph(MCParticleGraph &graph, MCParticl
 
   //Add all children
   int currMotherIndex = graph.size();
-  BOOST_FOREACH(MCParticle* daughter, mcParticle.getDaughters()) {
+  BOOST_FOREACH(MCParticle * daughter, mcParticle.getDaughters()) {
     addParticleToEventGraph(graph, *daughter, currMotherIndex, keepList);
   }
 }
 
 
-void ROFBuilderModule::addParticleToROFGraph(MCParticle &mcParticle, int motherIndex, std::vector<int> &uniqueIDList)
+void ROFBuilderModule::addParticleToROFGraph(MCParticle& mcParticle, int motherIndex, std::vector<int> &uniqueIDList)
 {
   MCParticleGraph::GraphParticle& graphParticle = createGraphParticle(m_rofMCParticleGraph, mcParticle, motherIndex);
 
@@ -237,7 +238,7 @@ void ROFBuilderModule::addParticleToROFGraph(MCParticle &mcParticle, int motherI
 
   //Add all children
   int currMotherIndex = m_rofMCParticleGraph.size();
-  BOOST_FOREACH(MCParticle* daughter, mcParticle.getDaughters()) {
+  BOOST_FOREACH(MCParticle * daughter, mcParticle.getDaughters()) {
     addParticleToROFGraph(*daughter, currMotherIndex, uniqueIDList);
   }
 }

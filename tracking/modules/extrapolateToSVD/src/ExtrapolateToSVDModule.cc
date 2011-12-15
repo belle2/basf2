@@ -41,7 +41,7 @@ using namespace Belle2;
 REG_MODULE(ExtrapolateToSVD)
 
 ExtrapolateToSVDModule::ExtrapolateToSVDModule() :
-    Module()
+  Module()
 {
 
   setDescription(
@@ -102,6 +102,10 @@ void ExtrapolateToSVDModule::event()
   //initialize the new output collection
   StoreArray<GFTrackCand> newGFTrackCands(m_gfTrackCandsColName);
 
+  //get the CDCGeometryPar to get the hit coordinates
+  CDCGeometryPar* cdcgp = CDCGeometryPar::Instance();
+  CDCGeometryPar& cdcg(*cdcgp);
+
   B2INFO("Copy GFTrackCands from input GFTracks, replace the momentum seed with the current fit result and create a new collection with " << nTracks << " GFTrackCands");
 
   //fill the array of new GFTrackCands by copying the existing GFTrackCand from GFTracks, SVDHits will be added afterwards to these new GFTrackCands
@@ -141,7 +145,7 @@ void ExtrapolateToSVDModule::event()
 
   //cut on the distance between the point of closest approach and the hit, hits outside if this range are not added to the track candidate
   //how large this value should or may be has to be figured out in more elaborate studies, this is just a first guess...
-  double distanceCut = 5.0;
+  double distanceCut = 8.0;
 
   for (int iTrack = 0; iTrack < nTrackCands; iTrack ++) {
     B2INFO("************************************************************************************");
@@ -166,6 +170,7 @@ void ExtrapolateToSVDModule::event()
         if (layerId == iLayer) {
 
           B2DEBUG(150, "Check hit " << iHit);
+          double gap = 0.0;   //distance between the innermost CDCHit and the SVDHit
           //get local hit position
           float u = svdHits[iHit]->getU();
           float v = svdHits[iHit]->getV();
@@ -185,10 +190,30 @@ void ExtrapolateToSVDModule::event()
 
             double distance = (position - poca).Mag();
             B2DEBUG(150, "           Distance : " << distance);
-            if (distance < minDistance) {
-              minDistance = distance;
-              bestHitID = iHit;
-            }
+            //now also check additionally for the distance between the innermost CDCHit and this SVDHit to avoid assignment from 'other side' of the SVD
+            //get the innermost CDCHit
+            unsigned int detId = 0;
+            unsigned int hitId = 0;
+            newGFTrackCands[iTrack]->getHit(0, detId, hitId); //get the hit, assume that all hits are from CDC and sorted, so the hit 0 should be the innermost CDCHit
+            if (detId == 2) {
+              TVector3 wire(0.0, 0.0, 0.0);
+              int wireId = cdcHits[hitId]->getIWire();
+              int superlayerId = cdcHits[hitId]->getISuperLayer();
+              int layerId = -999;
+              if (superlayerId == 0)   layerId = cdcHits[hitId]->getILayer();
+              else layerId = cdcHits[hitId]->getILayer() + superlayerId * 6 + 2 ;
+
+              //get the center of the hit wire and use it as hit position
+              wire.SetX((cdcg.wireForwardPosition(layerId, wireId).x() + cdcg.wireBackwardPosition(layerId, wireId).x()) / 2);
+              wire.SetY((cdcg.wireForwardPosition(layerId, wireId).y() + cdcg.wireBackwardPosition(layerId, wireId).y()) / 2);
+              wire.SetZ((cdcg.wireForwardPosition(layerId, wireId).z() + cdcg.wireBackwardPosition(layerId, wireId).z()) / 2);
+              gap = (position - wire).Mag();
+              B2DEBUG(150, "Distance between the innermost CDCHit and SVDHit is : " << gap);
+            } else B2WARNING("The innermost hit is not from CDC!")
+              if (distance < minDistance && gap < 20.0) {
+                minDistance = distance;
+                bestHitID = iHit;
+              }
 
           } catch (...) {
             B2WARNING("Something went wrong during the extrapolation!");
@@ -220,9 +245,6 @@ void ExtrapolateToSVDModule::event()
   //It is one possible solution to visualize the events and to check by eye if the found SVDHits are correct
   //But it is not relevant for so code above
   if (m_textFileOutput) {
-    //get the CDCGeometryPar to get the hit coordinates
-    CDCGeometryPar * cdcgp = CDCGeometryPar::Instance();
-    CDCGeometryPar & cdcg(*cdcgp);
 
     //Print all tracks to a file
     for (int i = 0; i < nTrackCands; i++) { //loop over all tracks

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Detector>
+<PMTs>
     
     <Xgap desc="Gap between PMTs in x direction" unit="mm">0.5</Xgap>
     <Ygap desc="Gap between PMTs in y direction" unit="mm">0.5</Ygap>
@@ -33,5 +33,5 @@
         <TDCbitwidth desc="Width of TDC bit" unit="ns">0.025</TDCbitwidth>
     </Module>
     
-</Detector>
+</PMTs>
 

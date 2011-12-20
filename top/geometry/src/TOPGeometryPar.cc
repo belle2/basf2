@@ -122,6 +122,7 @@ namespace Belle2 {
       _Length3 = barParams.getLength("QBarMirror");
       _WLength = barParams.getLength("QWedgeLength");
       _Wwidth = barParams.getLength("QWedgeWidth");
+      _Wextdown = barParams.getLength("QWedgeDown");
       _Gwidth1 = barParams.getLength("Glue/Thicknes1");
       _Gwidth2 = barParams.getLength("Glue/Thicknes2");
       _Gwidth3 = barParams.getLength("Glue/Thicknes3");
@@ -129,7 +130,7 @@ namespace Belle2 {
 
       //! Parameters for PMT
 
-      GearDir detParams(content, "PMT");
+      GearDir detParams(content, "PMTs");
 
       _Xgap = detParams.getLength("Xgap");
       _Ygap = detParams.getLength("Ygap");

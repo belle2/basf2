@@ -15,24 +15,15 @@
 #include <geometry/CreatorBase.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
-#include <string>
-#include <vector>
-#include <map>
-#include <sstream>
-
-
-
-class G4LogicalVolume;
-class G4AssemblyVolume;
-class G4Polycone;
-class G4Material;
+#include <G4AssemblyVolume.hh>
+#include <G4LogicalVolume.hh>
 
 namespace Belle2 {
   /** Namespace to encapsulate code needed for simulation and reconstrucion of the TOP */
   namespace TOP {
 
-    class SensitiveDetector;
-    class SensitiveQuartz;
+    class SensitivePMT;
+    class SensitiveTrack;
 
     /** The creator for the TOP geometry of the Belle II detector.   */
     class GeoTOPCreator : public geometry::CreatorBase {
@@ -53,24 +44,47 @@ namespace Belle2 {
        */
       virtual void create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes type);
 
-      //! This function quartz bar
+      /**
+       * Creates a quartz bar
+       * @param content A reference to the content part of the parameter description, which should to be used to create the GEANT objects.
+       * @return G4AssemblyVolume of a whole bar
+       */
       G4AssemblyVolume* buildBar(const GearDir& content);
-      //! This function constructs the case for the quertz bar
+
+      /**
+       * Creates a segment of electronics which holds 8 PMTs
+       * @param content A reference to the content part of the parameter description, which should to be used to create the GEANT objects.
+       * @return G4AssemblyVolume of one segment of electronics
+       */
+      G4AssemblyVolume* buildElectronics(const GearDir& content);
+
+      /**
+       * Creates the support for the quartz bar, PMTs and electronics
+       * @param content A reference to the content part of the parameter description, which should to be used to create the GEANT objects.
+       * @return G4AssemblyVolume of a whole Support
+       */
       G4LogicalVolume* buildSupport(const GearDir& content);
-      //! This function constructs a stack of 2x16 PMTS
+
+      /**
+       * Creates the support for the quartz bar, PMTs and electronics
+       * @param content A reference to the content part of the parameter description, which should to be used to create the GEANT objects.
+       * @return G4LogicalVolume of the desired stack of PMTs
+       */
       G4LogicalVolume* buildPMTstack(const GearDir& content);
-      //! This function constructs one pmt
+
+      /**
+       * Creates the support for the quartz bar, PMTs and electronics
+       * @param content A reference to the content part of the parameter description, which should to be used to create the GEANT objects.
+       * @return G4LogicalVolume of one PMT
+       */
       G4LogicalVolume* buildPMT(const GearDir& content);
 
     protected:
-      //! This sensitive volume is used to store hits in the PMT
-      SensitiveDetector* m_sensitive;
-      //! This sensitive volume is used to store hits in the qurtz and is used as loong the trackign is not finished
-      SensitiveQuartz* m_sensitiveQuartz;
-      //! used for reading parameters from the xml
-      TOPGeometryPar* m_topgp;
-      //! Used to store the flag is the beambackgound modules are ON or OFF
-      int isBeamBkgStudy;
+
+      SensitivePMT* m_sensitivePMT;                  /**< Sensitive volume is used to store hits in the PMT (SimHits) */
+      SensitiveTrack* m_sensitiveTrack;               /**< Sensitive volume is used to store hits of charges tracks at a small distance before the bar */
+      TOPGeometryPar* m_topgp;                         /**< Used for reading parameters from the xml */
+      int isBeamBkgStudy;                              /**< Used to store the flag is the beambackgound modules are ON or OFF */
     };
 
   }

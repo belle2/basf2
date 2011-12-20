@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <top/simulation/SensitiveQuartz.h>
+#include <top/simulation/SensitiveTrack.h>
 #include <top/dataobjects/TOPQuartzHit.h>
 #include <top/geometry/TOPGeometryPar.h>
 
@@ -32,8 +32,8 @@ using namespace std;
 namespace Belle2 {
   namespace TOP {
 
-    SensitiveQuartz::SensitiveQuartz():
-      Simulation::SensitiveDetectorBase("TOP", SensitiveQuartz::TOP), m_topgp(TOPGeometryPar::Instance())
+    SensitiveTrack::SensitiveTrack():
+      Simulation::SensitiveDetectorBase("TOP", SensitiveTrack::TOP), m_topgp(TOPGeometryPar::Instance())
     {
       StoreArray<MCParticle> mcParticles;
       StoreArray<TOPQuartzHit>  topQuartzHits;
@@ -44,7 +44,7 @@ namespace Belle2 {
     }
 
 
-    bool SensitiveQuartz::step(G4Step* aStep, G4TouchableHistory*)
+    bool SensitiveTrack::step(G4Step* aStep, G4TouchableHistory*)
     {
       // Get track parameters
       StoreArray<MCParticle> mcParticles;

@@ -8,41 +8,41 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef TOPSENSITIVEQUARTZ_H
-#define TOPSENSITIVEQUARTZ_H
+#ifndef TOPSENSITIVEDETECTOR_H
+#define TOPSENSITIVEDETECTOR_H
 
 #include <simulation/kernel/SensitiveDetectorBase.h>
-#include <top/geometry/TOPGeometryPar.h>
-
+#include <top/dataobjects/TOPSimHit.h>
 
 namespace Belle2 {
   namespace TOP {
-    //! This is optional (temporary) class that provides information on track parameters on aerogel plane, until tracking is not prepared.
-
-    class SensitiveQuartz : public Simulation::SensitiveDetectorBase {
+    //! The Class for TOP Sensitive Detector
+    /*! In this class, every variable defined in TOPSimHit will be calculated,
+      and stored in datastore.
+    */
+    class SensitivePMT : public Simulation::SensitiveDetectorBase {
 
     public:
-
 
       /**
        * Constructor.
        * @param name Name of the sensitive detector. Do we still need that?
        */
-      SensitiveQuartz();
+      SensitivePMT();
 
       /**
-       * Process each step and calculate variables defined in TOPSimHit.
+       * Process each step and calculate variables defined in PXDSimHit.
        * @param aStep Current Geant4 step in the sensitive medium.
        * @result true if a hit was stored, o.w. false.
        */
       bool step(G4Step* aStep, G4TouchableHistory*);
 
-    protected:
-      //! used for reading parameters from the xml
-      TOPGeometryPar* m_topgp;
-    };
 
+    private:
+
+
+    }; // SensitivePMT class
   } // end of namespace top
 } // end of namespace Belle2
 
-#endif /* TOPSENSITIVEQUARTZ_H */
+#endif /* TOPSENSITIVEDETECTOR_H */

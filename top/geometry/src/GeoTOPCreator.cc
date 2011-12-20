@@ -17,8 +17,8 @@
 #include <framework/gearbox/GearDir.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
-#include <top/simulation/SensitiveDetector.h>
-#include <top/simulation/SensitiveQuartz.h>
+#include <top/simulation/SensitivePMT.h>
+#include <top/simulation/SensitiveTrack.h>
 #include <simulation/background/BkgSensitiveDetector.h>
 
 #include <cmath>
@@ -72,15 +72,15 @@ namespace Belle2 {
 
     GeoTOPCreator::GeoTOPCreator(): isBeamBkgStudy(0)
     {
-      m_sensitive = new SensitiveDetector();
-      m_sensitiveQuartz = new SensitiveQuartz();
+      m_sensitivePMT = new SensitivePMT();
+      m_sensitiveTrack = new SensitiveTrack();
       m_topgp = new TOPGeometryPar();
     }
 
     GeoTOPCreator::~GeoTOPCreator()
     {
-      if (m_sensitive) delete m_sensitive;
-      if (m_sensitiveQuartz) delete m_sensitiveQuartz;
+      if (m_sensitivePMT) delete m_sensitivePMT;
+      if (m_sensitiveTrack) delete m_sensitiveTrack;
       if (m_topgp) delete m_topgp;
     }
 
@@ -189,7 +189,7 @@ namespace Belle2 {
       G4Box* bar = new G4Box("bar", length / 2.0, Qthickness / 2.0 , Qwidth / 2.0);
 
       G4LogicalVolume* qbar = new G4LogicalVolume(bar, quartzMaterial, "cuttest");
-      qbar->SetSensitiveDetector(m_sensitiveQuartz);
+      qbar->SetSensitiveDetector(m_sensitiveTrack);
 
       /*!  Build shapes of mirror  */
 
@@ -237,8 +237,8 @@ namespace Belle2 {
 
       G4LogicalVolume* gbox2 = new G4LogicalVolume(box2, glueMaterial, "gbox2");
       G4LogicalVolume* gbox3 = new G4LogicalVolume(box3, glueMaterial, "gbox3");
-      gbox2->SetSensitiveDetector(m_sensitiveQuartz);
-      gbox2->SetSensitiveDetector(m_sensitiveQuartz);
+      gbox2->SetSensitiveDetector(m_sensitiveTrack);
+      gbox2->SetSensitiveDetector(m_sensitiveTrack);
 
 
       /*!  Place glue joints */
@@ -274,7 +274,7 @@ namespace Belle2 {
 
       G4Box* box1 = new G4Box("glue_1", Gwidth3 / 2.0, Qthickness / 2.0, Wwidth / 2.0);
       G4LogicalVolume* gbox1 = new G4LogicalVolume(box1, glueMaterial, "gbox1");
-      gbox1->SetSensitiveDetector(m_sensitiveQuartz);
+      gbox1->SetSensitiveDetector(m_sensitiveTrack);
 
       G4Transform3D tglue1 = G4Translate3D(-length / 2.0 - Gwidth1 / 2.0 , 0, 0);
 
@@ -371,7 +371,7 @@ namespace Belle2 {
       polygon.push_back(G4TwoVector(Bposition - Gwidth1, -Qthickness / 2.0 - dx));
       polygon.push_back(G4TwoVector(Bposition - lengthw, -Qthickness / 2.0 - Wextdown - 3 * dx));
       polygon.push_back(G4TwoVector(Bposition - lengthw - dz - dx, -Qthickness / 2.0 - Wextdown - 3 * dx));
-      polygon.push_back(G4TwoVector(Bposition - lengthw - dz - dx, Qthickness / 2.0 + 3 * dx));
+      polygon.push_back(G4TwoVector(Bposition - lengthw - dz - dx, Qthickness / 2.0 + 5 * dx));
       polygon.push_back(G4TwoVector(Bposition - lengthw, Qthickness / 2.0 + 3 * dx));
 
       G4ExtrudedSolid* airshape = new  G4ExtrudedSolid("Air", polygon, Qwidth / 2.0 + dx / 2.0, G4TwoVector(0.0, 0.0), 1.0, G4TwoVector(0.0, 0.0), 1.0);
@@ -528,7 +528,7 @@ namespace Belle2 {
 
       G4Box* sensBox = new G4Box("sensbox", Asizex / 2., Asizey / 2., Asizez  / 2.);
       G4LogicalVolume* lmoduleSens = new G4LogicalVolume(sensBox, sensMaterial, "moduleSensitive");
-      lmoduleSens->SetSensitiveDetector(m_sensitive);
+      lmoduleSens->SetSensitiveDetector(m_sensitivePMT);
 
       /*! Place PMT segments */
 

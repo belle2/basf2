@@ -3,7 +3,7 @@
     <Material desc="material of the mirror">TOPSiO2</Material>
     <Xpos desc="origin of the spherical mirror x coordinate" unit="mm">0.0</Xpos>
     <Ypos desc="origin of the spherical mirror y coordinate" unit="mm">10</Ypos>
-    <Radius desc="Radius of the spherical mirror" unit="cm">500</Radius>
+    <Radius desc="Radius of the spherical mirror" unit="cm">700</Radius>
     <mirrorThickness desc="Thickness of mirror coating" unit="mm">0.1</mirrorThickness>
     <Surface>
         <Properties>

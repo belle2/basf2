@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <top/simulation/SensitiveDetector.h>
+#include <top/simulation/SensitivePMT.h>
 
 #include <top/dataobjects/TOPSimHit.h>
 
@@ -28,8 +28,8 @@ using namespace std;
 namespace Belle2 {
   namespace TOP {
 
-    SensitiveDetector::SensitiveDetector():
-      Simulation::SensitiveDetectorBase("TOP", SensitiveDetector::TOP)
+    SensitivePMT::SensitivePMT():
+      Simulation::SensitiveDetectorBase("TOP", SensitivePMT::TOP)
     {
       StoreArray<MCParticle> mcParticles;
       StoreArray<TOPSimHit>  topSimHits;
@@ -39,7 +39,7 @@ namespace Belle2 {
     }
 
 
-    G4bool SensitiveDetector::step(G4Step* aStep, G4TouchableHistory*)
+    G4bool SensitivePMT::step(G4Step* aStep, G4TouchableHistory*)
     {
       StoreArray<MCParticle> mcParticles;
 

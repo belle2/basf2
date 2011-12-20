@@ -30,10 +30,10 @@
 using namespace std;
 
 namespace Belle2 {
-  namespace top {
+  namespace TOP {
 
     SensitiveQuartz::SensitiveQuartz():
-        Simulation::SensitiveDetectorBase("TOP", SensitiveQuartz::TOP), m_topgp(TOPGeometryPar::Instance())
+      Simulation::SensitiveDetectorBase("TOP", SensitiveQuartz::TOP), m_topgp(TOPGeometryPar::Instance())
     {
       StoreArray<MCParticle> mcParticles;
       StoreArray<TOPQuartzHit>  topQuartzHits;

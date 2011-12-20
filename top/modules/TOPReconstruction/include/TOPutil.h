@@ -37,14 +37,14 @@ inline int chID(int IX, int IY, int PMTidX, int PMTidY, int LR, int QbarID)
 
 // converts channel ID of QbarID to PMTchannel, PMTid, window number
 inline void chIDtoIII(int chID, int QbarID,
-                      int & IX, int & IY, int & PMTidX, int & PMTidY, int & LR)
+                      int& IX, int& IY, int& PMTidX, int& PMTidY, int& LR)
 {
   ichiii_(&chID, &QbarID, &IX, &IY, &PMTidX, &PMTidY, &LR);
 }
 
 // converts channel ID to position in local frame of QbarID
 inline void chIDtoXYZ(int chID, int QbarID,
-                      double & X, double & Y, double & Z)
+                      double& X, double& Y, double& Z)
 {
   float x, y, z;
   ichxyz_(&chID, &QbarID, &x, &y, &z);
@@ -66,7 +66,7 @@ inline double TIME(int TDC)
 
 // transformation of 3D point from Belle to Qbar frame
 inline void PointToLocal(int QbarID, double X, double Y, double Z,
-                         double & x, double & y, double & z)
+                         double& x, double& y, double& z)
 {
   float r[3] = {X, Y, Z};
   float dir[3] = {0, 0, 0};
@@ -76,7 +76,7 @@ inline void PointToLocal(int QbarID, double X, double Y, double Z,
 
 // transformation of 3D point from Qbar to Belle frame
 inline void PointToGlobal(int QbarID, double X, double Y, double Z,
-                          double & x, double & y, double & z)
+                          double& x, double& y, double& z)
 {
   float r[3] = {X, Y, Z};
   float dir[3] = {0, 0, 0};
@@ -86,7 +86,7 @@ inline void PointToGlobal(int QbarID, double X, double Y, double Z,
 
 // transformation of momentum vector from Belle to Qbar frame
 inline void MomentumToLocal(int QbarID, double Px, double Py, double Pz,
-                            double & px, double & py, double & pz)
+                            double& px, double& py, double& pz)
 {
   float r[3] = {0, 0, 0};
   float dir[3] = {Px, Py, Pz};
@@ -96,7 +96,7 @@ inline void MomentumToLocal(int QbarID, double Px, double Py, double Pz,
 
 // transformation of momentum vector from Qbar to Belle frame
 inline void MomentumToGlobal(int QbarID, double Px, double Py, double Pz,
-                             double & px, double & py, double & pz)
+                             double& px, double& py, double& pz)
 {
   float r[3] = {0, 0, 0};
   float dir[3] = {Px, Py, Pz};
@@ -170,7 +170,7 @@ inline double QEffi(double E)
 }
 
 // returns energy range of nonzero quantum efficiency
-inline void QErange(double & Emin, double & Emax)
+inline void QErange(double& Emin, double& Emax)
 {
   float emin, emax;
   qe_range_(&emin, &emax);
@@ -198,8 +198,8 @@ inline double CerAngle(double P, double Mass, double RefrIndex)
 
 // returns Qbar data: dimensions (A,B,C [cm]), exit window types (Lside,Rside),
 //                    expansion volume ID's (LexpvID,RexpvID)
-inline void getQbar(int QbarID, double & A, double & B, double & C,
-                    int & Lside, int & Rside, int & LexpvID, int & RexpvID)
+inline void getQbar(int QbarID, double& A, double& B, double& C,
+                    int& Lside, int& Rside, int& LexpvID, int& RexpvID)
 {
   float a, b, c;
   get_qbar_(&QbarID, &a, &b, &c, &Lside, &Rside, &LexpvID, &RexpvID);
@@ -207,8 +207,8 @@ inline void getQbar(int QbarID, double & A, double & B, double & C,
 }
 
 // returns expansion volume data
-inline void getExpansionVolume(int expvID, double & Dz, double & Yup, double & Ydown,
-                               int & Shape, int & LR)
+inline void getExpansionVolume(int expvID, double& Dz, double& Yup, double& Ydown,
+                               int& Shape, int& LR)
 {
   float dz, yup, ydn;
   get_expvol_(&expvID, &dz, &yup, &ydn, &Shape, &LR);
@@ -218,8 +218,8 @@ inline void getExpansionVolume(int expvID, double & Dz, double & Yup, double & Y
 // returns mirror data: radius of curvature (R [cm]),
 //                      center of curvature (Xc,Yc,Zc [cm]) given in Qbar frame
 //                      focal length used within linear optics (F)
-inline void getMirror(int QbarID, double & R, double & Xc, double & Yc, double & Zc,
-                      double & F)
+inline void getMirror(int QbarID, double& R, double& Xc, double& Yc, double& Zc,
+                      double& F)
 {
   float r, xc, yc, zc, f;
   get_mirror_(&QbarID, &r, &xc, &yc, &zc, &f);

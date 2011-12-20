@@ -28,19 +28,19 @@ namespace Belle2 {
 
     //! Default constructor
     TOPSimHit():
-        m_moduleID(0),
-        m_barID(0),
-        m_position(0, 0, 0),
-        m_gposition(0, 0, 0),
-        m_direction(0, 0, 0),
-        m_vposition(0, 0, 0),
-        m_vdirection(0, 0, 0),
-        m_globalTime(0),
-        m_localTime(0),
-        m_length(0),
-        m_energy(0),
-        m_parentID(0),
-        m_trackID(0) {
+      m_moduleID(0),
+      m_barID(0),
+      m_position(0, 0, 0),
+      m_gposition(0, 0, 0),
+      m_direction(0, 0, 0),
+      m_vposition(0, 0, 0),
+      m_vdirection(0, 0, 0),
+      m_globalTime(0),
+      m_localTime(0),
+      m_length(0),
+      m_energy(0),
+      m_parentID(0),
+      m_trackID(0) {
       /*! Does nothing */
     }
 
@@ -68,19 +68,19 @@ namespace Belle2 {
       double energy,
       int parentID,
       int trackID):
-        m_moduleID(moduleID),
-        m_barID(barID),
-        m_position(position),
-        m_gposition(gposition),
-        m_direction(direction),
-        m_vposition(vposition),
-        m_vdirection(vdirection),
-        m_globalTime(globalTime),
-        m_localTime(localTime),
-        m_length(length),
-        m_energy(energy),
-        m_parentID(parentID),
-        m_trackID(trackID) {
+      m_moduleID(moduleID),
+      m_barID(barID),
+      m_position(position),
+      m_gposition(gposition),
+      m_direction(direction),
+      m_vposition(vposition),
+      m_vdirection(vdirection),
+      m_globalTime(globalTime),
+      m_localTime(localTime),
+      m_length(length),
+      m_energy(energy),
+      m_parentID(parentID),
+      m_trackID(trackID) {
       /* Does nothing */
     }
 

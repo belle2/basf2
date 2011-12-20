@@ -26,10 +26,10 @@
 using namespace std;
 
 namespace Belle2 {
-  namespace top {
+  namespace TOP {
 
     SensitiveDetector::SensitiveDetector():
-        Simulation::SensitiveDetectorBase("TOP", SensitiveDetector::TOP)
+      Simulation::SensitiveDetectorBase("TOP", SensitiveDetector::TOP)
     {
       StoreArray<MCParticle> mcParticles;
       StoreArray<TOPSimHit>  topSimHits;

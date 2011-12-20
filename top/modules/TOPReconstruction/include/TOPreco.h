@@ -31,21 +31,21 @@ public:
   // run reconstruction
   void Reconstruct(double X, double Y, double Z, double Tlen,
                    double Px, double Py, double Pz, int Q, int HYP = 0);
-  void Reconstruct(TOPtrack & trk);
+  void Reconstruct(TOPtrack& trk);
   // get status (1=OK, 0=out of acceptance, -1=inside gap)
   int Flag();
   // get log likelihoods, expected photons, measured photons
-  void GetLogL(int Size, double LogL[], double ExpNphot[], int & Nphot);
+  void GetLogL(int Size, double LogL[], double ExpNphot[], int& Nphot);
   // get track hit at Q-bar in Local or Global frame
-  void GetHit(int LocGlob, double R[3], double Dir[3], double & Len,
-              double & Tlen, double & Mom, int & QbarID);
+  void GetHit(int LocGlob, double R[3], double Dir[3], double& Len,
+              double& Tlen, double& Mom, int& QbarID);
   // print results to std output
   void DumpLogL(int NumHyp);
   void DumpHit(int LocGlob);
   // get pulls
   int PullSize();
-  void GetPull(int K, double & T, double & T0, double & Wid, double & PhiCer,
-               double & Wt);
+  void GetPull(int K, double& T, double& T0, double& Wid, double& PhiCer,
+               double& Wt);
   // get PDF for channel chID at time t for mass hypothesis mass
   double PDF(int chID, double t, double mass);
 

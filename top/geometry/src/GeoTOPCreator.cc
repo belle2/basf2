@@ -53,12 +53,12 @@
 using namespace std;
 using namespace boost;
 
-namespace Belle2 {
 
+namespace Belle2 {
 
   using namespace geometry;
 
-  namespace top {
+  namespace TOP {
 
     //-----------------------------------------------------------------
     //                 Register the Creator
@@ -115,7 +115,7 @@ namespace Belle2 {
         G4double phi = i * 2 * M_PI / ((double)Nbars);
 
         G4RotationMatrix rot(M_PI / 2.0, M_PI / 2.0, -phi);
-        G4ThreeVector trans(Radius*cos(phi), Radius*sin(phi), 0);
+        G4ThreeVector trans(Radius * cos(phi), Radius * sin(phi), 0);
 
         new G4PVPlacement(G4Transform3D(rot, trans), air, "PlacedBox", &topVolume, false, i + 1);
 
@@ -148,8 +148,6 @@ namespace Belle2 {
       G4double WLength = m_topgp->getWLength();
       //! get width wedge segment
       G4double Wwidth = m_topgp->getWwidth();
-      //! get wedge extension up
-      G4double Wextup = m_topgp->getWextup();
       //! get wedge extension down
       G4double Wextdown = m_topgp->getWextdown();
       //! get width of glue between wedge and segment 1
@@ -263,7 +261,7 @@ namespace Belle2 {
       polygon.push_back(G4TwoVector(-length / 2.0, -Qthickness / 2.0));
       polygon.push_back(G4TwoVector(-length / 2.0 - Gwidth1, -Qthickness / 2.0));
       polygon.push_back(G4TwoVector(-length / 2.0 - Gwidth1 - WLength, -Qthickness / 2.0 - Wextdown));
-      polygon.push_back(G4TwoVector(-length / 2.0 - Gwidth1 - WLength, Qthickness / 2.0 + Wextup));
+      polygon.push_back(G4TwoVector(-length / 2.0 - Gwidth1 - WLength, Qthickness / 2.0));
       polygon.push_back(G4TwoVector(-length / 2.0 - Gwidth1, Qthickness / 2.0));
 
 
@@ -296,7 +294,7 @@ namespace Belle2 {
       G4LogicalVolume* stack = buildPMTstack(content);
 
       G4double dz = Bposition - WLength - Gwidth1 - (m_topgp->getdGlue() + m_topgp->getWinthickness() + m_topgp->getMWsizez() + m_topgp->getBotthickness()) / 2.0;
-      G4double dx = (Wextup - Wextdown) / 2.0;
+      G4double dx = (-Wextdown) / 2.0;
 
       //            G4RotationMatrix* rotsta = new G4RotationMatrix(0,0,-M_PI/2.0);
       G4RotationMatrix* rotsta = new G4RotationMatrix(M_PI / 2.0, -M_PI / 2.0, -M_PI / 2.0);
@@ -371,10 +369,10 @@ namespace Belle2 {
       polygon.push_back(G4TwoVector(Bposition + length + dx, -Qthickness / 2.0 - dx));
       polygon.push_back(G4TwoVector(Bposition, -Qthickness / 2.0 - dx));
       polygon.push_back(G4TwoVector(Bposition - Gwidth1, -Qthickness / 2.0 - dx));
-      polygon.push_back(G4TwoVector(Bposition - lengthw, -Qthickness / 2.0 - Wextdown - 3*dx));
-      polygon.push_back(G4TwoVector(Bposition - lengthw - dz - dx, -Qthickness / 2.0 - Wextdown - 3*dx));
-      polygon.push_back(G4TwoVector(Bposition - lengthw - dz - dx, Qthickness / 2.0 + 3*dx));
-      polygon.push_back(G4TwoVector(Bposition - lengthw, Qthickness / 2.0 + 3*dx));
+      polygon.push_back(G4TwoVector(Bposition - lengthw, -Qthickness / 2.0 - Wextdown - 3 * dx));
+      polygon.push_back(G4TwoVector(Bposition - lengthw - dz - dx, -Qthickness / 2.0 - Wextdown - 3 * dx));
+      polygon.push_back(G4TwoVector(Bposition - lengthw - dz - dx, Qthickness / 2.0 + 3 * dx));
+      polygon.push_back(G4TwoVector(Bposition - lengthw, Qthickness / 2.0 + 3 * dx));
 
       G4ExtrudedSolid* airshape = new  G4ExtrudedSolid("Air", polygon, Qwidth / 2.0 + dx / 2.0, G4TwoVector(0.0, 0.0), 1.0, G4TwoVector(0.0, 0.0), 1.0);
 
@@ -439,7 +437,7 @@ namespace Belle2 {
       G4double x = Wwidth;
       G4double y = Qthickness + Wextdown;
 
-      G4Box *box = new G4Box("box", x / 2.0, y / 2.0, (dz + dGlue) / 2.0);
+      G4Box* box = new G4Box("box", x / 2.0, y / 2.0, (dz + dGlue) / 2.0);
       G4LogicalVolume* stack = new G4LogicalVolume(box, fillMaterial, "stack");
 
 
@@ -511,25 +509,25 @@ namespace Belle2 {
 
 
       /*! Build PMT segments */
-      G4Box *box = new G4Box("box", Msizex / 2., Msizey / 2., (MWsizez + Winthickness + Botthickness) / 2.);
+      G4Box* box = new G4Box("box", Msizex / 2., Msizey / 2., (MWsizez + Winthickness + Botthickness) / 2.);
       G4LogicalVolume* PMT = new G4LogicalVolume(box, fillMaterial, "PMT");
 
-      G4Box *box1 = new G4Box("window", Msizex / 2., Msizey / 2., Winthickness / 2.);
+      G4Box* box1 = new G4Box("window", Msizex / 2., Msizey / 2., Winthickness / 2.);
       G4LogicalVolume* window = new G4LogicalVolume(box1, winMaterial, "window");
 
 
 
-      G4Box *box4 = new G4Box("bottom", Msizex / 2., Msizey / 2., Botthickness / 2.);
+      G4Box* box4 = new G4Box("bottom", Msizex / 2., Msizey / 2., Botthickness / 2.);
       G4LogicalVolume* bottom = new G4LogicalVolume(box4, botMaterial, "bottom");
       if (isBeamBkgStudy) bottom->SetSensitiveDetector(new BkgSensitiveDetector("TOP"));
 
-      G4Box *box2 = new G4Box("box2", Msizex / 2., Msizey / 2., MWsizez  / 2.);
-      G4Box *box3 = new G4Box("box3", Asizex / 2., Asizey / 2., MWsizez  / 2. + 0.1);
+      G4Box* box2 = new G4Box("box2", Msizex / 2., Msizey / 2., MWsizez  / 2.);
+      G4Box* box3 = new G4Box("box3", Asizex / 2., Asizey / 2., MWsizez  / 2. + 0.1);
       G4SubtractionSolid* wallbox = new G4SubtractionSolid("box2-box3", box2, box3, G4Transform3D());
       G4LogicalVolume* wall = new G4LogicalVolume(wallbox, caseMaterial, "wall");
 
-      G4Box *sensBox = new G4Box("sensbox", Asizex / 2., Asizey / 2., Asizez  / 2.);
-      G4LogicalVolume *lmoduleSens = new G4LogicalVolume(sensBox, sensMaterial, "moduleSensitive");
+      G4Box* sensBox = new G4Box("sensbox", Asizex / 2., Asizey / 2., Asizez  / 2.);
+      G4LogicalVolume* lmoduleSens = new G4LogicalVolume(sensBox, sensMaterial, "moduleSensitive");
       lmoduleSens->SetSensitiveDetector(m_sensitive);
 
       /*! Place PMT segments */

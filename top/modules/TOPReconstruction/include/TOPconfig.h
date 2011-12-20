@@ -79,7 +79,7 @@ inline void setTTS(int ng, double Frac[], double Mean[], double Sigma[])
 // read quantum efficency from file
 // CE: electron collection efficiency
 
-inline void setQE(const char *file, double CE)
+inline void setQE(const char* file, double CE)
 {
   int len = strlen(file); float ce = CE;
   read_qeffi_(file, &ce, len);

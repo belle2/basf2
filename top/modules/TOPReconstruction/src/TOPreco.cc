@@ -62,7 +62,7 @@ void TOPreco::Reconstruct(double X, double Y, double Z, double Tlen,
   top_reco_();
 }
 
-void TOPreco::Reconstruct(TOPtrack & trk)
+void TOPreco::Reconstruct(TOPtrack& trk)
 {
   m_HYP = trk.Hyp();
   float x = trk.X(); float y = trk.Y(); float z = trk.Z();  float t = trk.Tlen() / C0;
@@ -81,7 +81,7 @@ int TOPreco::Flag()
   return rtra_getflag_(&K);
 }
 
-void TOPreco::GetLogL(int Size, double LogL[], double ExpNphot[], int & Nphot)
+void TOPreco::GetLogL(int Size, double LogL[], double ExpNphot[], int& Nphot)
 {
   int K = 1;
   float logl[Size], sfot[Size];
@@ -93,8 +93,8 @@ void TOPreco::GetLogL(int Size, double LogL[], double ExpNphot[], int & Nphot)
   }
 }
 
-void TOPreco::GetHit(int LocGlob, double R[3], double Dir[3], double & Len,
-                     double & Tlen, double & Mom, int & QbarID)
+void TOPreco::GetHit(int LocGlob, double R[3], double Dir[3], double& Len,
+                     double& Tlen, double& Mom, int& QbarID)
 {
   int K = 1;
   float r[3], dir[3], len, tof, p;
@@ -160,8 +160,8 @@ int TOPreco::PullSize()
   return n;
 }
 
-void TOPreco::GetPull(int K, double & T, double & T0, double & Wid, double & PhiCer,
-                      double & Wt)
+void TOPreco::GetPull(int K, double& T, double& T0, double& Wid, double& PhiCer,
+                      double& Wt)
 {
   float t, t0, wid, fic, wt;
   int dum;

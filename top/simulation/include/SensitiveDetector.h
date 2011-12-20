@@ -15,7 +15,7 @@
 #include <top/dataobjects/TOPSimHit.h>
 
 namespace Belle2 {
-  namespace top {
+  namespace TOP {
     //! The Class for TOP Sensitive Detector
     /*! In this class, every variable defined in TOPSimHit will be calculated,
       and stored in datastore.

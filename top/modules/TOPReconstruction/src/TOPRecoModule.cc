@@ -38,7 +38,7 @@ using namespace std;
 using namespace boost;
 
 namespace Belle2 {
-  namespace top {
+  namespace TOP {
     //-----------------------------------------------------------------
     //                 Register the Module
     //-----------------------------------------------------------------
@@ -51,7 +51,7 @@ namespace Belle2 {
     //-----------------------------------------------------------------
 
     TOPRecoModule::TOPRecoModule() : Module(),
-        m_random(new TRandom1(0)), m_topgp(TOPGeometryPar::Instance())
+      m_random(new TRandom1(0)), m_topgp(TOPGeometryPar::Instance())
     {
       // Set description()
       setDescription("TOPRecotizer");

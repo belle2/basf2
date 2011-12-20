@@ -27,23 +27,23 @@ namespace Belle2 {
     //! Empty constructor
     /*! Recommended for ROOT IO */
     TOPQuartzHit():
-        m_trackID(-1),
-        m_particleID(-1),
-        m_charge(0),
-        m_position(0, 0, 0),
-        m_sposition(0, 0, 0),
-        m_momentum(0, 0, 0),
-        m_smomentum(0, 0, 0),
-        m_length(0.),
-        m_globaltime(0.),
-        m_localtime(0.),
-        m_eL(0.),
-        m_muL(0.),
-        m_piL(0.),
-        m_KL(0.),
-        m_pL(0.),
-        m_recoflag(0),
-        m_detfot(0) {
+      m_trackID(-1),
+      m_particleID(-1),
+      m_charge(0),
+      m_position(0, 0, 0),
+      m_sposition(0, 0, 0),
+      m_momentum(0, 0, 0),
+      m_smomentum(0, 0, 0),
+      m_length(0.),
+      m_globaltime(0.),
+      m_localtime(0.),
+      m_eL(0.),
+      m_muL(0.),
+      m_piL(0.),
+      m_KL(0.),
+      m_pL(0.),
+      m_recoflag(0),
+      m_detfot(0) {
       /*! does nothing */
     }
 
@@ -114,16 +114,16 @@ namespace Belle2 {
     int getCharge() const { return m_charge;}
 
     //! Get track position (at entrance into bar)
-    const TVector3 &getPosition() const { return m_position; }
+    const TVector3& getPosition() const { return m_position; }
 
     //! Get vertex position (at entrance into bar)
-    const TVector3 &getVPosition() const { return m_sposition; }
+    const TVector3& getVPosition() const { return m_sposition; }
 
     //! Get track momentum  (at entrance into bar)
-    const TVector3 &getMomentum() const { return m_momentum; }
+    const TVector3& getMomentum() const { return m_momentum; }
 
     //! Get track momentum  (at entrance into bar)
-    const TVector3 &getVMomentum() const { return m_smomentum; }
+    const TVector3& getVMomentum() const { return m_smomentum; }
 
     //! Get barID
     int getBarID() const { return m_barID;}

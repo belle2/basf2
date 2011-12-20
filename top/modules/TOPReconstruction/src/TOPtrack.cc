@@ -56,7 +56,7 @@ TOPtrack::TOPtrack(double x, double y, double z,
   m_QbarID = -1;
 }
 
-double TOPtrack::p() {return sqrt(m_Px*m_Px + m_Py*m_Py + m_Pz*m_Pz);}
+double TOPtrack::p() {return sqrt(m_Px * m_Px + m_Py * m_Py + m_Pz * m_Pz);}
 
 double TOPtrack::theta() {return acos(m_Pz / p());}
 
@@ -100,7 +100,7 @@ void TOPtrack::smear(double sig_x, double sig_z,
 
   m_Z += GaussRnd(sig_z);
   double dx = GaussRnd(sig_x);
-  if (m_X*m_X + m_Y*m_Y != 0) phi = atan2(m_Y, m_X);
+  if (m_X* m_X + m_Y* m_Y != 0) phi = atan2(m_Y, m_X);
   m_X += dx * sin(phi);
   m_Y -= dx * cos(phi);
 }
@@ -112,8 +112,8 @@ void TOPtrack::Dump()
   cout << "TOPtrack::Dump(): Ref=" << m_REF << " Lund=" << m_LUND;
   cout << " charge=" << m_Q << endl;
   cout << "  p=" << setprecision(3) << p() << " GeV/c";
-  cout << "  theta=" << setprecision(3) << theta() / pi*180;
-  cout << "  phi=" << setprecision(3) << phi() / pi*180 << endl;
+  cout << "  theta=" << setprecision(3) << theta() / pi * 180;
+  cout << "  phi=" << setprecision(3) << phi() / pi * 180 << endl;
   cout << "  x=" << m_X << " cm";
   cout << "  y=" << m_Y << " cm";
   cout << "  z=" << m_Z << " cm\n";

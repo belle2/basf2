@@ -32,7 +32,7 @@ using namespace std;
 using namespace boost;
 
 namespace Belle2 {
-  namespace top {
+  namespace TOP {
     //-----------------------------------------------------------------
     //                 Register the Module
     //-----------------------------------------------------------------
@@ -45,7 +45,7 @@ namespace Belle2 {
     //-----------------------------------------------------------------
 
     TOPDigiModule::TOPDigiModule() : Module(),
-        m_random(new TRandom1(0)), m_topgp(TOPGeometryPar::Instance())
+      m_random(new TRandom1(0)), m_topgp(TOPGeometryPar::Instance())
     {
       // Set description()
       setDescription("TOPDigitizer");
@@ -186,7 +186,7 @@ namespace Belle2 {
 
       int ich = (int)((1239.85 / energy - 250) / 10.);
       if (ich < 0 || ich >= 62) return 0;
-      return 4.0*qe[ich];// collection efficiency 0.8 and 4 denoes the fraction of photons killed by staking action
+      return 4.0 * qe[ich]; // collection efficiency 0.8 and 4 denoes the fraction of photons killed by staking action
 
     }
 
@@ -196,7 +196,7 @@ namespace Belle2 {
 
       int ich = (int)((1239.85 / energy - 260) / 10.);
       if (ich < 0 || ich >= 45) return 0;
-      return 1 / 0.35*qe[ich];// collection efficiency 0.8 and 1/0.35 denoes the fraction of photons killed by staking action
+      return 1 / 0.35 * qe[ich]; // collection efficiency 0.8 and 1/0.35 denoes the fraction of photons killed by staking action
     }
 
     bool TOPDigiModule::DetectorQE(double energy)
@@ -276,13 +276,13 @@ namespace Belle2 {
           rn = m_random->Rndm(0);
           rn = rn - 1 + rn;
           z = (rn > 0) ? 2 - rn : -2 - rn;
-          if ((kC1 - y)*(kC3 + TMath::Abs(z)) < kC2) {
+          if ((kC1 - y) * (kC3 + TMath::Abs(z)) < kC2) {
             result = z; break;
           } else {
             x = rn * rn;
-            if ((y + kD1)*(kD3 + x) < kD2) {
+            if ((y + kD1) * (kD3 + x) < kD2) {
               result = rn; break;
-            } else if (kHzmp - y < exp(-(z*z + kPhln) / 2)) {
+            } else if (kHzmp - y < exp(-(z * z + kPhln) / 2)) {
               result = z; break;
             } else if (y + kHzm < exp(-(x + kPhln) / 2)) {
               result = rn; break;
@@ -301,10 +301,10 @@ namespace Belle2 {
             y = kYm - y;
             rn = -(2 + y / x);
           }
-          if ((y - kAs + x)*(kCs + x) + kBs < 0) {
+          if ((y - kAs + x) * (kCs + x) + kBs < 0) {
             result = rn; break;
           } else if (y < x + kT)
-            if (rn*rn < 4*(kB - log(x))) {
+            if (rn * rn < 4 * (kB - log(x))) {
               result = rn; break;
             }
         }

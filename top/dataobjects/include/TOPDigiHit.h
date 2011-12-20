@@ -27,12 +27,12 @@ namespace Belle2 {
 
     //! Default constructor
     TOPDigiHit():
-        m_barID(0),
-        m_channelID(0),
-        m_TDC(0),
-        m_energy(0.),
-        m_parentID(0),
-        m_trackID(0) {
+      m_barID(0),
+      m_channelID(0),
+      m_TDC(0),
+      m_energy(0.),
+      m_parentID(0),
+      m_trackID(0) {
       /*! Does nothing */
     }
 
@@ -53,12 +53,12 @@ namespace Belle2 {
       double energy,
       int parentID,
       int trackID):
-        m_barID(barID),
-        m_channelID(channelID),
-        m_TDC(TDC),
-        m_energy(energy),
-        m_parentID(parentID),
-        m_trackID(trackID) {
+      m_barID(barID),
+      m_channelID(channelID),
+      m_TDC(TDC),
+      m_energy(energy),
+      m_parentID(parentID),
+      m_trackID(trackID) {
       /* Does nothing */
     }
 

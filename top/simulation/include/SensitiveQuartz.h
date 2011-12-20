@@ -16,7 +16,7 @@
 
 
 namespace Belle2 {
-  namespace top {
+  namespace TOP {
     //! This is optional (temporary) class that provides information on track parameters on aerogel plane, until tracking is not prepared.
 
     class SensitiveQuartz : public Simulation::SensitiveDetectorBase {

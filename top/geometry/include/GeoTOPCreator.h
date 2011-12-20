@@ -20,13 +20,16 @@
 #include <map>
 #include <sstream>
 
-#include <G4Transform3D.hh>
+
+
 class G4LogicalVolume;
 class G4AssemblyVolume;
 class G4Polycone;
 class G4Material;
+
 namespace Belle2 {
-  namespace top {
+  /** Namespace to encapsulate code needed for simulation and reconstrucion of the TOP */
+  namespace TOP {
 
     class SensitiveDetector;
     class SensitiveQuartz;
@@ -36,27 +39,19 @@ namespace Belle2 {
 
     public:
 
-      /** Constructor of the GeoPXDCreator class. */
+      /** Constructor of the GeoTOPCreator class. */
       GeoTOPCreator();
 
-      /** The destructor of the GeoPXDCreator class. */
+      /** The destructor of the GeoTOPCreator class. */
       virtual ~GeoTOPCreator();
 
       /**
-       * Creates the ROOT Objects for the TOP geometry.
+       * Creates the GEANT Objects for the TOP geometry.
        * @param content A reference to the content part of the parameter
-       *                description, which should to be used to create the ROOT
+       *                description, which should to be used to create the GEANT
        *                objects.
        */
-
       virtual void create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes type);
-
-      /**
-       * Get Alignment for given component from the database
-       * @param  component Name of the component to align
-       * @return Transformation matrix for component, idendity if component
-       *         could not be found
-       */
 
       //! This function quartz bar
       G4AssemblyVolume* buildBar(const GearDir& content);
@@ -74,6 +69,7 @@ namespace Belle2 {
       SensitiveQuartz* m_sensitiveQuartz;
       //! used for reading parameters from the xml
       TOPGeometryPar* m_topgp;
+      //! Used to store the flag is the beambackgound modules are ON or OFF
       int isBeamBkgStudy;
     };
 

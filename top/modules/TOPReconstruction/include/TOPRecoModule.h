@@ -21,7 +21,7 @@
 
 
 namespace Belle2 {
-  namespace top {
+  namespace TOP {
     //! TOP reconstruction module.
     /*!
       This module takes the hits form G4 simulation (TOPSimHit), applies q.e. of PMTs, calculates and saves hit channel numbers (TOPHit).

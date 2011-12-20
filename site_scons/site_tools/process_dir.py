@@ -155,7 +155,7 @@ def process_dir(
     is_sublib_dir = env.Dictionary().get('SUBLIB', False) == True
     is_python_module_dir = env.Dictionary().get('PYTHON_MODULE', False) == True
     is_dataobjects_dir = dir_name == os.path.join(env['PACKAGE'], 'dataobjects'
-            )
+            ) and env['PACKAGE'] != 'framework'
 
     # check whether we have to create a new library
     if is_package_dir or is_sublib_dir or is_python_module_dir \

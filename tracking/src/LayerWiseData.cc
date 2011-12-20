@@ -8,9 +8,9 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <tracking/dataobjects/TrackFitCheckerTempHelperClass.h>
+#include <tracking/LayerWiseData.h>
 
 using namespace std;
 using namespace Belle2;
 
-ClassImp(TrackFitCheckerTempHelperClass)
+ClassImp(LayerWiseData)

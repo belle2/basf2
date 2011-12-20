@@ -31,6 +31,14 @@
 #include <boost/accumulators/statistics/variance.hpp>
 #include <boost/accumulators/statistics/count.hpp>
 
+//stuff for root output
+#include <TTree.h>
+#include <TFile.h>
+#include <tracking/TrackWiseDataStruct.h>
+#include <tracking/TrackWiseVecDataStruct.h>
+#include <tracking/LayerWiseData.h>
+
+
 namespace Belle2 {
 
   /*!
@@ -41,7 +49,6 @@ namespace Belle2 {
 
 
     typedef boost::accumulators::accumulator_set < double, boost::accumulators::stats < boost::accumulators::tag::mean, boost::accumulators::tag::variance(boost::accumulators::lazy) > > StatisticsAccuWithMeanAndVar;
-
     typedef StatisticsAccuWithMeanAndVar StatisticsContainer;
   public:
 
@@ -107,7 +114,7 @@ namespace Belle2 {
     void fillLayerWiseData(const std::string& nameOfDataSample, const int accuVecIndex, const std::vector<double>& newData);
     void fillTrackWiseVecData(const std::string& nameOfDataSample, const std::vector<double>& newData);
     void fillTrackWiseData(const std::string& nameOfDataSample, const double newData);
-  private:
+
     int m_nSiLayers; // number of Si layers. That is 6 of course.
     int m_nPxdLayers; // number of PXD layer (2) so number of SVD layers will be m_nSiLayers - m_nPxdLayers
     int m_nSvdLayers;
@@ -132,9 +139,13 @@ namespace Belle2 {
 
 
     std::map<std::string, StatisticsContainer > m_trackWiseDataSamples;
-    std::map<std::string, std::vector<StatisticsContainer> > m_trackWiseDataVecSamples;
+    std::map<std::string, std::vector<StatisticsContainer> > m_trackWiseVecDataSamples;
     std::map<std::string, std::vector<std::vector<StatisticsContainer> > > m_layerWiseDataSamples;
 
+    std::map<std::string, float* > m_trackWiseDataForRoot;
+//    std::map<std::string, TrackWiseVecDataStruct* > m_trackWiseVecDataForRoot;
+    std::map<std::string, std::vector<float>* > m_trackWiseVecDataForRoot;
+    std::map<std::string, LayerWiseData* > m_layerWiseDataForRoot;
     //bool m_testGeant3;
     int m_failedSmootherCounter;
     int m_processedTracks;
@@ -158,6 +169,10 @@ namespace Belle2 {
 
     bool m_writeToFile;
     bool m_writeToRootFile;
+
+    //stuff for root output
+    TTree* m_statDataTreePtr;
+    TFile* m_rootFilePtr;
 
   };
 }

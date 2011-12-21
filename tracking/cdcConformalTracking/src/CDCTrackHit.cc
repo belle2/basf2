@@ -26,7 +26,7 @@ CDCTrackHit::CDCTrackHit()
 }
 
 
-CDCTrackHit::CDCTrackHit(CDCHit *hit, int index)
+CDCTrackHit::CDCTrackHit(CDCHit* hit, int index)
 {
 
   m_storeIndex = index;
@@ -37,7 +37,7 @@ CDCTrackHit::CDCTrackHit(CDCHit *hit, int index)
 
   m_superlayerId = hit ->getISuperLayer();
 
-  // for the patter recognition it is nice to have a unique layerId, maybe one can change it later to avoid confusion
+  // for the pattern recognition it is nice to have a unique layerId, maybe one can change it later to avoid confusion
   if (hit->getISuperLayer() == 0)   m_layerId = hit->getILayer();
   else m_layerId = hit->getILayer() + hit->getISuperLayer() * 6 + 2 ;
 
@@ -49,6 +49,9 @@ CDCTrackHit::CDCTrackHit(CDCHit *hit, int index)
   setWirePosition();
   ConformalTransformation();
 
+  m_tempCellState = 0;
+  m_cellState = 0;
+
 }
 
 CDCTrackHit::~CDCTrackHit()
@@ -59,8 +62,8 @@ CDCTrackHit::~CDCTrackHit()
 void CDCTrackHit::setWirePosition()
 {
   //Get the position of the hit wire from CDCGeometryParameters
-  CDCGeometryPar * cdcgp = CDCGeometryPar::Instance();
-  CDCGeometryPar & cdcg(*cdcgp);
+  CDCGeometryPar* cdcgp = CDCGeometryPar::Instance();
+  CDCGeometryPar& cdcg(*cdcgp);
 
   //center of the wire
   m_wirePosition.SetX((cdcg.wireForwardPosition(m_layerId, m_wireId).x() + cdcg.wireBackwardPosition(m_layerId, m_wireId).x()) / 2);
@@ -116,8 +119,8 @@ void CDCTrackHit::shiftAlongZ(const TVector3 trackDirection, const CDCTrackHit t
 {
 
   //Get the necessary position of the hit wire from CDCGeometryParameters
-  CDCGeometryPar * cdcgp = CDCGeometryPar::Instance();
-  CDCGeometryPar & cdcg(*cdcgp);
+  CDCGeometryPar* cdcgp = CDCGeometryPar::Instance();
+  CDCGeometryPar& cdcg(*cdcgp);
 
   TVector3 forwardWirePoint; //forward end of the wire
   TVector3 backwardWirePoint; //backward end of the wire

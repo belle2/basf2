@@ -108,6 +108,9 @@ namespace Belle2 {
     int m_nSvdLayers;
     std::string m_dataOutFileName;
 
+    bool m_filter;
+
+    int m_notPerfectCounter;
 
 
   };

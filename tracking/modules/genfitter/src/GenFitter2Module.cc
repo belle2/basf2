@@ -29,7 +29,7 @@
 #include <tracking/gfbfield/GFGeant4Field.h>
 
 #include <GFTrack.h>
-//#include <GFKalman2.h>
+#include <GFKalman2.h>
 #include <GFKalman.h>
 #include <GFDaf.h>
 #include <GFRecoHitProducer.h>
@@ -62,7 +62,7 @@ using namespace Belle2;
 REG_MODULE(GenFitter2)
 
 GenFitter2Module::GenFitter2Module() :
-    Module()
+  Module()
 {
 
   setDescription("Simplified trackfit module with for testing and debugging");
@@ -80,7 +80,7 @@ GenFitter2Module::~GenFitter2Module()
 
 void GenFitter2Module::initialize()
 {
-  geometry::GeometryManager &geoManager = geometry::GeometryManager::getInstance();
+  geometry::GeometryManager& geoManager = geometry::GeometryManager::getInstance();
   geoManager.createTGeoRepresentation();
   if (m_seedForRecoHits >= 0) {
     gRandom->SetSeed(m_seedForRecoHits); //this will set the seed for the global gRandom where the recoHits get there randomness for measurements from
@@ -143,7 +143,7 @@ void GenFitter2Module::event()
     }
     if (nHitsL1 not_eq 1 or nHitsL2 not_eq 1 or nHitsL3 not_eq 1 or nHitsL4 not_eq 1 or nHitsL5 not_eq 1 or nHitsL6 not_eq 1) {
       filterEvent = true;
-      B2INFO("Not exacly one hit in very Si layer. Track "  << m_fitCounter + m_failedFitCounter + m_notPerfectCounter << " will not be reconstructed");
+      B2INFO("Not exacly one hit in very Si layer. Track "  << eventCounter << " will not be reconstructed");
       ++m_notPerfectCounter;
     }
   }
@@ -157,14 +157,18 @@ void GenFitter2Module::event()
     GFTrackCand* aTrackCandPointer = trackCandidates[0];
     //get fit starting values from the MCParticle
     TVector3 vertex = aTrackCandPointer->getPosSeed();
+    TVector3 vertexSigma = aTrackCandPointer->getPosError();
     TVector3 momentum = aTrackCandPointer->getDirSeed() * abs(1.0 / aTrackCandPointer->getQoverPseed());
+    TVector3 dirSigma = aTrackCandPointer->getDirError();
     //int pdg = aMcParticleArray[0]->getPDG();
 
 
 
     //B2INFO("MCIndex: "<<mcindex);
     B2INFO("Start values: momentum: " << momentum.x() << "  " << momentum.y() << "  " << momentum.z() << " " << momentum.Mag());
+    B2INFO("Start values: direction std: " << dirSigma.x() << "  " << dirSigma.y() << "  " << dirSigma.z());
     B2INFO("Start values: vertex:   " << vertex.x() << "  " << vertex.y() << "  " << vertex.z());
+    B2INFO("Start values: vertex std:   " << vertexSigma.x() << "  " << vertexSigma.y() << "  " << vertexSigma.z());
     B2INFO("Start values: pdg:      " << aTrackCandPointer->getPdgCode());
     GFAbsTrackRep* trackRep;
     //Now create a GenFit track with this representation
@@ -189,7 +193,7 @@ void GenFitter2Module::event()
     factory.addProducer(0, PXDProducer);
     factory.addProducer(1, SVDProducer);
 
-    vector <GFAbsRecoHit *> factoryHits;
+    vector <GFAbsRecoHit*> factoryHits;
     //use the factory to create RecoHits for all Hits stored in the track candidate
     factoryHits = factory.createMany(*trackCandidates[0]);
     /*cout << "sizeOffactoryHits " << factoryHits.size() << "\n";
@@ -225,9 +229,8 @@ void GenFitter2Module::event()
     B2INFO("Total Nr of Hits assigned to the Track: " << track.getNumHits());
 
     //Initialize fitting algorithm and process track
-//  if((nHitsL1 == 1 and nHitsL2 == 1 and nHitsL3 == 1 and nHitsL4 == 1 and nHitsL5 == 1 and nHitsL6 == 1) or m_noFilter == true){
     if (m_useDaf == false) {
-      GFKalman kalmanFilter;
+      GFKalman2 kalmanFilter;
       kalmanFilter.setNumIterations(m_nGFIter);
       kalmanFilter.setBlowUpFactor(m_blowUpFactor);
       kalmanFilter.processTrack(&track);
@@ -243,6 +246,11 @@ void GenFitter2Module::event()
     B2INFO("-----> Fit Result: current position: " << track.getPos().x() << "  " << track.getPos().y() << "  " << track.getPos().z());
     B2INFO("----> Chi2 of the fit: " << track.getChiSqu());
     B2INFO("----> NDF of the fit: " << track.getNDF());
+    /*    track.Print();
+        for ( int iHit = 0; iHit not_eq track.getNumHits(); ++iHit){
+          track.getHit(iHit)->Print();
+        }
+        */
     if (genfitStatusFlag == 0) {
       new(fittedTracks->AddrAt(0)) GFTrack(track);
       ++m_fitCounter;
@@ -258,7 +266,7 @@ void GenFitter2Module::event()
 void GenFitter2Module::endRun()
 {
   if (m_notPerfectCounter != 0) {
-    B2WARNING(m_notPerfectCounter << " of " << m_fitCounter + m_failedFitCounter + m_notPerfectCounter << " tracks had not exaclty on hit in every layer and were not fitted");
+    B2WARNING(m_notPerfectCounter << " of " << m_fitCounter + m_failedFitCounter + m_notPerfectCounter << " tracks had not exactly on hit in every layer and were not fitted");
   }
   if (m_failedFitCounter != 0) {
     B2WARNING(m_failedFitCounter << " of " << m_fitCounter + m_failedFitCounter << " tracks could not be fitted in this run");

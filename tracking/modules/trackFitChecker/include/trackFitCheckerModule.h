@@ -142,7 +142,7 @@ namespace Belle2 {
     std::map<std::string, std::vector<StatisticsContainer> > m_trackWiseVecDataSamples;
     std::map<std::string, std::vector<std::vector<StatisticsContainer> > > m_layerWiseDataSamples;
 
-    std::map<std::string, float* > m_trackWiseDataForRoot;
+    std::map<std::string, TrackWiseDataStruct* > m_trackWiseDataForRoot;
 //    std::map<std::string, TrackWiseVecDataStruct* > m_trackWiseVecDataForRoot;
     std::map<std::string, std::vector<float>* > m_trackWiseVecDataForRoot;
     std::map<std::string, LayerWiseData* > m_layerWiseDataForRoot;

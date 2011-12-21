@@ -98,12 +98,18 @@ void trackFitCheckerModule::initialize()
     m_rootFilePtr = new TFile("statisticaltestsData.root", "RECREATE");
     m_statDataTreePtr = new TTree("m_statDataTreePtr", "aTree");
     //init objects to store track wise data
-    m_trackWiseDataForRoot["pValue_bu"] = new float(0);
-    m_trackWiseDataForRoot["pValue_fu"] = new float(0);
-    m_trackWiseDataForRoot["absMomVertex"] = new float(0);
-    m_statDataTreePtr->Bronch("pValue_bu", "float", &(m_trackWiseDataForRoot["pValue_bu"]));
-    m_statDataTreePtr->Bronch("pValue_fu", "float", &(m_trackWiseDataForRoot["pValue_fu"]));
-    m_statDataTreePtr->Bronch("absMomVertex", "float", &(m_trackWiseDataForRoot["absMomVertex"]));
+//    m_trackWiseDataForRoot["pValue_bu"] = new float(0);
+//    m_trackWiseDataForRoot["pValue_fu"] = new float(0);
+//    m_trackWiseDataForRoot["absMomVertex"] = new float(0);
+//    m_statDataTreePtr->Bronch("pValue_bu", "float", &(m_trackWiseDataForRoot["pValue_bu"]));
+//    m_statDataTreePtr->Bronch("pValue_fu", "float", &(m_trackWiseDataForRoot["pValue_fu"]));
+//    m_statDataTreePtr->Bronch("absMomVertex", "float", &(m_trackWiseDataForRoot["absMomVertex"]));
+    m_trackWiseDataForRoot["pValue_bu"] = new Belle2::TrackWiseDataStruct();
+    m_trackWiseDataForRoot["pValue_fu"] = new Belle2::TrackWiseDataStruct();
+    m_trackWiseDataForRoot["absMomVertex"] = new Belle2::TrackWiseDataStruct();
+    m_statDataTreePtr->Bronch("pValue_bu", "Belle2::TrackWiseDataStruct()", &(m_trackWiseDataForRoot["pValue_bu"]));
+    m_statDataTreePtr->Bronch("pValue_fu", "Belle2::TrackWiseDataStruct()", &(m_trackWiseDataForRoot["pValue_fu"]));
+    m_statDataTreePtr->Bronch("absMomVertex", "Belle2::TrackWiseDataStruct()", &(m_trackWiseDataForRoot["absMomVertex"]));
     //and objects for track wise vec data
 //    m_trackWiseVecDataForRoot["zs_vertexPosMom"] = new Belle2::TrackWiseVecDataStruct(vecDataSize);
 //    m_trackWiseVecDataForRoot["res_vertexPosMom"] = new Belle2::TrackWiseVecDataStruct(vecDataSize);
@@ -140,7 +146,7 @@ void trackFitCheckerModule::initialize()
   //make all vector of vectors have the size of the number of current layers in use
   int vecSizeMeasTest = 3;
   if (m_testCdc == true and m_testSi == false) {
-    vecSizeMeasTest = 2; //it is easier to just caluclate the chi^2 to although it does not have more info that the standart score in this calse
+    vecSizeMeasTest = 2; //it is easier to just caluclate the chi^2 to although it does not have more info than the standard score in this case
   }
   //int measDim = 2;
 
@@ -510,7 +516,7 @@ void trackFitCheckerModule::endRun()
     }
     printTrackWiseVecStatistics("res_vertexPosMom", m_vertexTestsVarNames);
     printTrackWiseVecStatistics("zs_vertexPosMom", m_vertexTestsVarNames);
-    //looks a bit clumy with all the if (m_testSi == true) but the hope is there will easy accessable truth info for CDCHits so a better solution is not needed because the if (m_testSi == true) are temporary anyway
+    //looks a bit clumsy with all the if (m_testSi == true) but the hope is there will easy accessible truth info for CDCHits so a better solution is not needed because the if (m_testSi == true) are temporary anyway
     if (m_nLayers > 0) {
       if (m_testSi == true) {
         printLayerWiseStatistics("zs_and_chi2_meas_t", measVarNames);
@@ -784,6 +790,6 @@ void trackFitCheckerModule::fillTrackWiseData(const string& nameOfDataSample, co
 {
   m_trackWiseDataSamples[nameOfDataSample](newData);
   if (m_writeToRootFile == true) {
-    *(m_trackWiseDataForRoot[nameOfDataSample]) = float(newData);
+    m_trackWiseDataForRoot[nameOfDataSample]->data = float(newData);
   }
 }

@@ -134,7 +134,7 @@ void SimpleInputModule::initialize()
     }
     // Store arrays in the DataStore
     for (int jj = 0; jj < m_size[ii] - m_sizeObj[ii]; jj++) {
-      DataStore::Instance().storeArray(static_cast<TClonesArray*>(m_objects[ii][jj+m_sizeObj[ii]]), m_objectNames[ii][jj+m_sizeObj[ii]]);
+      DataStore::Instance().storeArray(static_cast<TClonesArray*>(m_objects[ii][jj + m_sizeObj[ii]]), m_objectNames[ii][jj + m_sizeObj[ii]]);
       if (m_tree[DataStore::c_Persistent]) {
         readTree(DataStore::c_Persistent);
       }
@@ -217,15 +217,16 @@ void SimpleInputModule::readTree(const DataStore::EDurability& durability)
 
   //Go again over the branchlist and connect the branches with TObject pointers
   int iobject = 0;
-  int iarray = 0;
+  //int iarray = 0;
   m_objectNames[ii].resize(m_size[ii], "");
   for (int jj = 0; jj < branches->GetEntriesFast(); jj++) {
     branch = validBranch(jj, branches);
     if (branch) {
-      if (static_cast<string>(branch->GetClassName()) == "TClonesArray") {/*
-        branch->SetAddress(&(m_objects[ii][iarray + m_sizeObj[ii]]));
-        m_objectNames[ii][iarray + m_sizeObj[ii]] = static_cast<string>(branch->GetName());
-        iarray++;*/
+      if (static_cast<string>(branch->GetClassName()) == "TClonesArray") {
+        /*
+          branch->SetAddress(&(m_objects[ii][iarray + m_sizeObj[ii]]));
+          m_objectNames[ii][iarray + m_sizeObj[ii]] = static_cast<string>(branch->GetName());
+          iarray++;*/
       } else {
         branch->SetAddress(&(m_objects[ii][iobject]));
         m_objectNames[ii][iobject] = static_cast<string>(branch->GetName());

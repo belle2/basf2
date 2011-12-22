@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Envelope description="Envelope Volume for PXD">
+<Envelope description="Envelope Volume for SVD">
   <Material>Air</Material>
   <Plane>
     <posZ unit="mm">360.000</posZ>

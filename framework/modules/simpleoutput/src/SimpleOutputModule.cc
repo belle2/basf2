@@ -33,7 +33,7 @@ REG_MODULE(SimpleOutput)
 //-----------------------------------------------------------------
 
 SimpleOutputModule::SimpleOutputModule() : Module(), m_experiment(0), m_runLow(0), m_eventLow(0),
-    m_runHigh(0), m_eventHigh(0)
+  m_runHigh(0), m_eventHigh(0)
 {
   //Set module properties
   setDescription("simple output");
@@ -106,8 +106,8 @@ void SimpleOutputModule::initialize()
 
   // get iterators
   for (int ii = 0; ii < DataStore::c_NDurabilityTypes; ii++) {
-    m_iter[2*ii]   = DataStore::Instance().getObjectIterator(static_cast<DataStore::EDurability>(ii));
-    m_iter[2*ii+1] = DataStore::Instance().getArrayIterator(static_cast<DataStore::EDurability>(ii));
+    m_iter[2 * ii]   = DataStore::Instance().getObjectIterator(static_cast<DataStore::EDurability>(ii));
+    m_iter[2 * ii + 1] = DataStore::Instance().getArrayIterator(static_cast<DataStore::EDurability>(ii));
     m_done[ii]     = false;
   }
 
@@ -199,8 +199,10 @@ void SimpleOutputModule::terminate()
 
     //create an index for the event tree
     TTree* tree = m_tree[DataStore::c_Event];
-    if (tree->GetBranch("EventMetaData"))
+    if (tree->GetBranch("EventMetaData")) {
+      tree->SetBranchAddress("EventMetaData", 0);
       tree->BuildIndex("1000000*EventMetaData.m_experiment+EventMetaData.m_run", "EventMetaData.m_event");
+    }
 
     //fill the file level metadata
     fileMetaDataPtr->setEvents(tree->GetEntries());
@@ -249,11 +251,11 @@ size_t SimpleOutputModule::getSize(const int& mapID)
   int sizeCounter = 0;
   m_iter[mapID]->first();
   while (!m_iter[mapID]->isDone()) {
-    if (!(m_branchNames[mapID/2].size())) {
+    if (!(m_branchNames[mapID / 2].size())) {
       sizeCounter++;
     } else {
-      for (size_t ii = 0; ii < m_branchNames[mapID/2].size(); ++ii) {
-        if (m_branchNames[mapID/2][ii] == m_iter[mapID]->key()) {
+      for (size_t ii = 0; ii < m_branchNames[mapID / 2].size(); ++ii) {
+        if (m_branchNames[mapID / 2][ii] == m_iter[mapID]->key()) {
           sizeCounter++;
         }
       }
@@ -303,7 +305,7 @@ void SimpleOutputModule::fillTree(const DataStore::EDurability& durability)
       m_objects[durability] = new TObject* [m_size[durability]];
     }
 
-    for (int ii = 2 * durability; ii < 2*durability + 2; ii++) {
+    for (int ii = 2 * durability; ii < 2 * durability + 2; ii++) {
       m_iter[ii]->first();
       while (!m_iter[ii]->isDone()) {
         if (!(m_branchNames[durability].size())) {
@@ -328,20 +330,20 @@ void SimpleOutputModule::fillTree(const DataStore::EDurability& durability)
     }
   } else {
     // no need to reconnect the arrays, as the TClonesArrays aren't deleted
-    m_iter[2*durability]->first();
-    while (!m_iter[2*durability]->isDone()) {
+    m_iter[2 * durability]->first();
+    while (!m_iter[2 * durability]->isDone()) {
       if (!(m_branchNames[durability].size())) {
-        m_objects[durability][sizeCounter] = m_iter[2*durability]->value();
+        m_objects[durability][sizeCounter] = m_iter[2 * durability]->value();
         sizeCounter++;
       } else {
         for (size_t jj = 0; jj < m_branchNames[durability].size(); ++jj) {
-          if (m_branchNames[durability][jj] == m_iter[2*durability]->key()) {
-            m_objects[durability][sizeCounter] = m_iter[2*durability]->value();
+          if (m_branchNames[durability][jj] == m_iter[2 * durability]->key()) {
+            m_objects[durability][sizeCounter] = m_iter[2 * durability]->value();
             sizeCounter++;
           }
         }
       }
-      m_iter[2*durability]->next();
+      m_iter[2 * durability]->next();
       if (sizeCounter > m_sizeObj[durability]) {B2FATAL("More elements than in first event.");}
     }
   }
@@ -352,7 +354,7 @@ void SimpleOutputModule::fillTree(const DataStore::EDurability& durability)
 void SimpleOutputModule::switchBranchNameMeaning(const DataStore::EDurability& durability)
 {
   vector<string> branchNameDummy;
-  for (int ii = 2 * durability; ii < 2*durability + 2; ii++) {
+  for (int ii = 2 * durability; ii < 2 * durability + 2; ii++) {
     m_iter[ii]->first();
     while (!m_iter[ii]->isDone()) {
       bool take = true;

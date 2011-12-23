@@ -13,6 +13,7 @@
 
 #include <framework/core/Module.h>
 
+#include <string>
 
 namespace Belle2 {
 
@@ -83,7 +84,7 @@ namespace Belle2 {
     bool m_neutrals;                                            /**< Boolean to mark if track candidates should also be created for neutral particles.*/
 
 
-    int m_smearing;                                             /**< Smearing of MCMomentum and MCVertex in % */
+    double m_smearing;                                             /**< Smearing of MCMomentum and MCVertex in % */
 
     std::string m_gfTrackCandsColName;                          /**< TrackCandidates collection name */
     std::string m_gfTrackCandToMCParticleColName;               /**< TrackCandidates to MCParticles relation name */

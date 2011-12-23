@@ -25,7 +25,7 @@
 #include <GFTrackCand.h>
 
 #include <boost/foreach.hpp>
-#include <TRandom3.h>
+#include <TRandom.h>
 
 #include <utility>
 #include <list>
@@ -75,7 +75,7 @@ MCTrackFinderModule::MCTrackFinderModule() : Module()
   addParam("Neutrals", m_neutrals, "Set true if track candidates should be created also for neutral particles", bool(true));
 
   //smearing of MCMomentum (integer value)
-  addParam("Smearing", m_smearing, "Smearing of MCMomentum/MCVertex prior to storing it in GFTrackCandidate (in %)", 0);
+  addParam("Smearing", m_smearing, "Smearing of MCMomentum/MCVertex prior to storing it in GFTrackCandidate (in %). A negative value will switch off smearing. This is also the default.", -1.0);
 
   // names of output containers
   addParam("GFTrackCandidatesColName", m_gfTrackCandsColName, "Name of collection holding the GFTrackCandidates (output)", string(""));
@@ -92,7 +92,6 @@ MCTrackFinderModule::~MCTrackFinderModule()
 
 void MCTrackFinderModule::initialize()
 {
-
   StoreArray<GFTrackCand> trackCandidates(m_gfTrackCandsColName);
   StoreArray<MCParticle> mcParticles(m_mcParticlesColName);
   RelationArray gfTrackCandToMCPart(trackCandidates, mcParticles);
@@ -213,7 +212,7 @@ void MCTrackFinderModule::event()
 
 
       //before assigning the Hits to the trackCandidate some additional geometry information is needed
-      CDCGeometryPar * cdcgPtr = NULL;
+      CDCGeometryPar* cdcgPtr = NULL;
       if (m_useCDCHits) {
         cdcgPtr = CDCGeometryPar::Instance();
         // //CDCGeometryPar & cdcg(*cdcgPtr);  //cannot be used anymore (says Moritz)
@@ -237,28 +236,32 @@ void MCTrackFinderModule::event()
         */
       }
       //set track parameters from MCParticle information
-      TVector3 position = mcParticles[iPart]->getProductionVertex();
-      TVector3 momentum = mcParticles[iPart]->getMomentum();
+      TVector3 positionTrue = mcParticles[iPart]->getProductionVertex();
+      TVector3 momentumTrue = mcParticles[iPart]->getMomentum();
       int pdg = mcParticles[iPart]->getPDG();
 
       //it may have positive effect on the fit not to start with exactly precise true values (or it may be just interesting to study this)
       //one can smear the starting momentum values with a gaussian
       //this calculation is always performed, but with the default value of m_smearing = 0 it has no effect on momentum and position (true values are taken)
-      TRandom3 *random = new TRandom3((UInt_t)12345);
-      TVector3 smearedMomentum;
-      TVector3 smearedPosition;
-      double smearing = double(m_smearing) / 100;  //the module parameter m_smearing goes from 0 to 100, smearing should go from 0 to 1
 
-      double smearedPX = random->Gaus(momentum.x(), smearing * momentum.x());
-      double smearedPY = random->Gaus(momentum.y(), smearing * momentum.y());
-      double smearedPZ = random->Gaus(momentum.z(), smearing * momentum.z());
-      smearedMomentum.SetXYZ(smearedPX, smearedPY, smearedPZ);
+      TVector3 momentum;
+      TVector3 position;
+      if (m_smearing > 0.0) {
+        double smearing = m_smearing / 100.0;  //the module parameter m_smearing goes from 0 to 100, smearing should go from 0 to 1
 
-      double smearedX = random->Gaus(position.x(), smearing * position.x());
-      double smearedY = random->Gaus(position.y(), smearing * position.y());
-      double smearedZ = random->Gaus(position.z(), smearing * position.z());
-      smearedPosition.SetXYZ(smearedX, smearedY, smearedZ);
+        double smearedPX = gRandom->Gaus(momentumTrue.x(), smearing * momentumTrue.x());
+        double smearedPY = gRandom->Gaus(momentumTrue.y(), smearing * momentumTrue.y());
+        double smearedPZ = gRandom->Gaus(momentumTrue.z(), smearing * momentumTrue.z());
+        momentum.SetXYZ(smearedPX, smearedPY, smearedPZ);
 
+        double smearedX = gRandom->Gaus(positionTrue.x(), smearing * positionTrue.x());
+        double smearedY = gRandom->Gaus(positionTrue.y(), smearing * positionTrue.y());
+        double smearedZ = gRandom->Gaus(positionTrue.z(), smearing * positionTrue.z());
+        position.SetXYZ(smearedX, smearedY, smearedZ);
+      } else {
+        position = positionTrue;
+        momentum = momentumTrue;
+      }
       //Errors for the position/momentum values can also be passed to GFTrackCandidate
       //Default values in Genfit are (1.,1.,1.,), they seem to be not good!!
       //The best way to set the 'correct' errors has to be investigated....
@@ -268,7 +271,7 @@ void MCTrackFinderModule::event()
       momError.SetXYZ(0.1, 0.1, 0.2);
 
       //Finally set the complete track seed
-      trackCandidates[counter]->setComplTrackSeed(smearedPosition, smearedMomentum, pdg, posError, momError);
+      trackCandidates[counter]->setComplTrackSeed(position, momentum, pdg, posError, momError);
 
       //Save the MCParticleID in the TrackCandidate
       trackCandidates[counter]->setMcTrackId(iPart);

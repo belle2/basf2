@@ -30,32 +30,31 @@
 
 #include <tracking/dataobjects/Track.h>
 
-#include "GFTrack.h"
-#include "GFTrackCand.h"
-#include "GFKalman.h"
-#include "GFDaf.h"
-#include "GFRecoHitProducer.h"
-#include "GFRecoHitFactory.h"
+#include <GFTrack.h>
+#include <GFTrackCand.h>
+#include <GFKalman.h>
+#include <GFDaf.h>
+#include <GFRecoHitProducer.h>
+#include <GFRecoHitFactory.h>
 
 
-#include "GFAbsTrackRep.h"
-#include "RKTrackRep.h"
+#include <GFAbsTrackRep.h>
+#include <RKTrackRep.h>
 
 #include <tracking/gfbfield/GFGeant4Field.h>
-#include "GFConstField.h"
-#include "GFFieldManager.h"
+#include <GFConstField.h>
+#include <GFFieldManager.h>
 
 #include <cstdlib>
 #include <iomanip>
 #include <string>
-
+#include <cmath>
 #include <iostream>
 
 #include <boost/foreach.hpp>
 
-#include "TMath.h"
-#include "TRandom3.h"
-#include <math.h>
+#include <TMath.h>
+
 
 using namespace std;
 using namespace Belle2;
@@ -63,7 +62,7 @@ using namespace Belle2;
 REG_MODULE(GenFitter)
 
 GenFitterModule::GenFitterModule() :
-    Module()
+  Module()
 {
 
   setDescription(
@@ -115,7 +114,7 @@ void GenFitterModule::initialize()
 
   //convert geant4 geometry to TGeo geometry
   //in the moment tesselated solids used for the glue within the PXD cannot be converted to TGeo, the general solution still has to be found, at the moment you can just comment out lines 6 and 13 in  pxd/data/PXD-Components.xml.
-  geometry::GeometryManager &geoManager = geometry::GeometryManager::getInstance();
+  geometry::GeometryManager& geoManager = geometry::GeometryManager::getInstance();
   geoManager.createTGeoRepresentation();
 
 }
@@ -242,7 +241,7 @@ void GenFitterModule::event()
       factory.addProducer(1, SVDProducer);
       factory.addProducer(2, CDCProducer);
 
-      vector <GFAbsRecoHit *> factoryHits;
+      vector <GFAbsRecoHit*> factoryHits;
       //use the factory to create RecoHits for all Hits stored in the track candidate
       factoryHits = factory.createMany(*trackCandidates[i]);
       //add created hits to the track
@@ -381,9 +380,9 @@ void GenFitterModule::event()
               double alpha = 1 / (1.5 * 0.00299792458);
 
               //Now set the helix parameters for perigee parametrization
-              tracks[trackCounter]->setD0(d0Sign*sqrt(poca.x() * poca.x() + poca.y() * poca.y()));
+              tracks[trackCounter]->setD0(d0Sign * sqrt(poca.x() * poca.x() + poca.y() * poca.y()));
               tracks[trackCounter]->setPhi(phi);
-              tracks[trackCounter]->setOmega((gfTrack.getCharge() / (pt*alpha)));
+              tracks[trackCounter]->setOmega((gfTrack.getCharge() / (pt * alpha)));
               tracks[trackCounter]->setZ0(poca.z());
               tracks[trackCounter]->setCotTheta(dirInPoca.z() / (sqrt(dirInPoca.x() * dirInPoca.x() + dirInPoca.y() * dirInPoca.y())));
 
@@ -392,7 +391,7 @@ void GenFitterModule::event()
               B2INFO("D0: " << std::setprecision(3) << tracks[trackCounter]->getD0() << "  Phi: " << std::setprecision(3) << tracks[trackCounter]->getPhi() << "  Omega: " << std::setprecision(3) << tracks[trackCounter]->getOmega() << "  Z0: " << std::setprecision(3) << tracks[trackCounter]->getZ0() << "  CotTheta: " << std::setprecision(3) << tracks[trackCounter]->getCotTheta());
               B2INFO("<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>");
               //Additional check
-              B2INFO("Recalculate momentum from perigee: px: " << abs(1 / (tracks[trackCounter]->getOmega()*alpha))*(cos(tracks[trackCounter]->getPhi())) << "  py: " << abs(1 / (tracks[trackCounter]->getOmega()*alpha))*sin(tracks[trackCounter]->getPhi()) << "  pz: " << abs(1 / (tracks[trackCounter]->getOmega()*alpha))*tracks[trackCounter]->getCotTheta());
+              B2INFO("Recalculate momentum from perigee: px: " << abs(1 / (tracks[trackCounter]->getOmega()*alpha)) * (cos(tracks[trackCounter]->getPhi())) << "  py: " << abs(1 / (tracks[trackCounter]->getOmega()*alpha))*sin(tracks[trackCounter]->getPhi()) << "  pz: " << abs(1 / (tracks[trackCounter]->getOmega()*alpha))*tracks[trackCounter]->getCotTheta());
               B2INFO("<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>");
 
               if (m_createTextFile) {
@@ -401,11 +400,11 @@ void GenFitterModule::event()
                 //useful if one like to quickly plot track trajectories
                 //-------------------------------------
                 HelixParam << tracks[trackCounter]->getD0() << " \t"
-                << tracks[trackCounter]->getPhi() << " \t"
-                << tracks[trackCounter]->getOmega() << " \t"
-                << tracks[trackCounter]->getZ0() << " \t"
-                << tracks[trackCounter]->getCotTheta() << "\t" << poca.x()
-                << "\t" << poca.y() << "\t" << poca.z() << endl;
+                           << tracks[trackCounter]->getPhi() << " \t"
+                           << tracks[trackCounter]->getOmega() << " \t"
+                           << tracks[trackCounter]->getZ0() << " \t"
+                           << tracks[trackCounter]->getCotTheta() << "\t" << poca.x()
+                           << "\t" << poca.y() << "\t" << poca.z() << endl;
                 //----------------------------------------
                 //end additional code
               }

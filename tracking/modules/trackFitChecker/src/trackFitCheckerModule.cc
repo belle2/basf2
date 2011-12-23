@@ -471,7 +471,9 @@ void trackFitCheckerModule::event()
       // m_dataOut << "\t" << fpChi2tot;
       // m_dataOut << "\n";
     }
-    m_statDataTreePtr->Fill();
+    if (m_writeToRootFile == true) {
+      m_statDataTreePtr->Fill();
+    }
     ++m_processedTracks;
 
 
@@ -480,6 +482,11 @@ void trackFitCheckerModule::event()
 
 void trackFitCheckerModule::endRun()
 {
+
+//    StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
+//    int eventCounter = eventMetaDataPtr->getEvent();
+//    cout << "eventCounter " << eventCounter << "\n";
+
   B2INFO("Now following the endRun Output from the trackFitChecker module");
 
   //  if (m_failedSmootherCounter not_eq 0){
@@ -584,25 +591,30 @@ void trackFitCheckerModule::endRun()
 
 void trackFitCheckerModule::terminate()
 {
-  // m_dataOut.close();
+
   if (m_statDataTreePtr not_eq NULL) {
     m_statDataTreePtr->Write();
-    //m_statDataTreePtr->Scan();
-//    m_statDataTreePtr->GetBranch("zs_vertexPosMom")->Dump();
-//    //m_statDataTreePtr->Draw("zs_vertexPosMom[0]");
-//    m_statDataTreePtr->Draw("pValue_bu.data");
-//      std::cout << "Press ENTER to continue...";
-//      std::cin.ignore( std::numeric_limits <std::streamsize> ::max(), '\n' );
     m_rootFilePtr->Close();
-    //let there be delete for every new (ashes to ashes, dust to dust)
-    delete m_statDataTreePtr;
-    std::map<std::string, LayerWiseData* >::iterator iter = m_layerWiseDataForRoot.begin();
-    std::map<std::string, LayerWiseData* >::const_iterator iterMax = m_layerWiseDataForRoot.end();
-    while (iter not_eq iterMax) {
-      delete(iter->second);
-      ++iter;
-    }
 
+    // delete all the objects associated with branches
+    std::map<std::string, TrackWiseDataStruct* >::iterator iter1 = m_trackWiseDataForRoot.begin();
+    std::map<std::string, TrackWiseDataStruct* >::const_iterator iterMax1 = m_trackWiseDataForRoot.end();
+    while (iter1 not_eq iterMax1) {
+      delete(iter1->second);
+      ++iter1;
+    }
+    std::map<std::string, std::vector<float>* >::iterator iter2 = m_trackWiseVecDataForRoot.begin();
+    std::map<std::string, std::vector<float>* >::const_iterator iterMax2 = m_trackWiseVecDataForRoot.end();
+    while (iter2 not_eq iterMax2) {
+      delete(iter2->second);
+      ++iter2;
+    }
+    std::map<std::string, LayerWiseData* >::iterator iter3 = m_layerWiseDataForRoot.begin();
+    std::map<std::string, LayerWiseData* >::const_iterator iterMax3 = m_layerWiseDataForRoot.end();
+    while (iter3 not_eq iterMax3) {
+      delete(iter3->second);
+      ++iter3;
+    }
   }
 
 }
@@ -793,3 +805,5 @@ void trackFitCheckerModule::fillTrackWiseData(const string& nameOfDataSample, co
     m_trackWiseDataForRoot[nameOfDataSample]->data = float(newData);
   }
 }
+
+

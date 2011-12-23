@@ -70,7 +70,7 @@ namespace Belle2 {
     bool m_filter;
     bool m_useDaf;
     int m_nGFIter;
-    int m_seedForRecoHits;
+    //int m_seedForRecoHits;
 
 
   };

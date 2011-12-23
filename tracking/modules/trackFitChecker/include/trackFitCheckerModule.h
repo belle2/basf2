@@ -166,13 +166,15 @@ namespace Belle2 {
     //bool m_writeToB2info;
     std::string m_testOutputFileName;
     std::stringstream m_textOutput;
-
+    //stuff for root output
     bool m_writeToFile;
     bool m_writeToRootFile;
 
-    //stuff for root output
     TTree* m_statDataTreePtr;
     TFile* m_rootFilePtr;
+
+    // std::vector<int> m_layerFlags; //holds the number of hits in every layer, so the Fill() function
+
 
   };
 }

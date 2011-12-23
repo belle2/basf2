@@ -235,11 +235,8 @@ void trueHitTesterModule::endRun()
 void trueHitTesterModule::terminate()
 {
   m_trueHitDataTreePtr->Write();
-
   m_rootFilePtr->Close();
-  // make a delete for every new in this module
-  delete m_trueHitDataTreePtr;
-  delete m_rootFilePtr;
+  // delete all the objects associated with branches
   std::map<std::string, LayerWiseData* >::iterator iter = m_layerWiseDataForRoot.begin();
   std::map<std::string, LayerWiseData* >::const_iterator iterMax = m_layerWiseDataForRoot.end();
   while (iter not_eq iterMax) {

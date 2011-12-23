@@ -29,7 +29,7 @@
 #include <tracking/gfbfield/GFGeant4Field.h>
 
 #include <GFTrack.h>
-//#include <GFKalman2.h>
+#include <GFKalman2.h>
 #include <GFKalman.h>
 #include <GFDaf.h>
 #include <GFRecoHitProducer.h>
@@ -70,7 +70,7 @@ GenFitter2Module::GenFitter2Module() :
   addParam("blowUpFactor", m_blowUpFactor, "factor multiplied with the cov of the Kalman filter when backward filter starts", 500.0);
   addParam("filter", m_filter, "throw away tracks with do not have exactly 1 hit in every Si layer", false);
   addParam("filterIterations", m_nGFIter, "number of Genfit iterations", 1);
-  addParam("seedForRecoHits", m_seedForRecoHits, "hack because there is no framwork wide random number seed at the moment", -1);
+//  addParam("seedForRecoHits", m_seedForRecoHits, "hack because there is no framwork wide random number seed at the moment", -1);
 
 }
 
@@ -82,9 +82,9 @@ void GenFitter2Module::initialize()
 {
   geometry::GeometryManager& geoManager = geometry::GeometryManager::getInstance();
   geoManager.createTGeoRepresentation();
-  if (m_seedForRecoHits >= 0) {
-    gRandom->SetSeed(m_seedForRecoHits); //this will set the seed for the global gRandom where the recoHits get there randomness for measurements from
-  }
+//  if (m_seedForRecoHits >= 0) {
+//    gRandom->SetSeed(m_seedForRecoHits); //this will set the seed for the global gRandom where the recoHits get there randomness for measurements from
+//  }
 }
 
 void GenFitter2Module::beginRun()
@@ -230,8 +230,8 @@ void GenFitter2Module::event()
 
     //Initialize fitting algorithm and process track
     if (m_useDaf == false) {
-      //GFKalman2 kalmanFilter;
-      GFKalman kalmanFilter;
+      GFKalman2 kalmanFilter;
+      //GFKalman kalmanFilter;
       kalmanFilter.setNumIterations(m_nGFIter);
       kalmanFilter.setBlowUpFactor(m_blowUpFactor);
       kalmanFilter.processTrack(&track);

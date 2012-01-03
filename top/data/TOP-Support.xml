@@ -2,13 +2,12 @@
 <Support>
     <PannelMaterial desc="Material QBB support structure">TOPQBB</PannelMaterial>
     <PannelThickness desc="Thickness of the QBB plate" unit="mm">10</PannelThickness>
-    <SidePannelThickness desc="Thickness of the QBB plate" unit="mm">1</SidePannelThickness>
-    <FrontPannelThickness desc="Thickness of the QBB plate" unit="mm">1</FrontPannelThickness>
+    <PlateThickness desc="Thickness of the QBB plate" unit="mm">1</PlateThickness>
     <lowerGap desc="Air gap between lower plate and quartz" unit="mm">2</lowerGap>
     <upperGap desc="Air gap between lower plate and quartz" unit="mm">2</upperGap>
     <sideGap desc="Air gap between lower plate and quartz" unit="mm">1</sideGap>
-    <ZForward desc="Forward edge of the QBB box" unit="cm">193.0</ZForward>
-    <ZBackward desc="Backward edge of the QBB box" unit="cm">-94.0</ZBackward>
+    <ZForward desc="Forward edge of the QBB box" unit="mm">1930</ZForward>
+    <ZBackward desc="Backward edge of the QBB box" unit="mm">-940</ZBackward>
 </Support>
 
 

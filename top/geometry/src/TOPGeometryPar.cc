@@ -82,7 +82,8 @@ namespace Belle2 {
       _Npmty = 0;
       _Msizex = 0;
       _Msizey = 0;
-      _MWsizez = 0;
+      _Msizez = 0;
+      _MWallThickness = 0;
       _Asizex = 0;
       _Asizey = 0;
       _Asizez = 0;
@@ -93,6 +94,16 @@ namespace Belle2 {
       _dGlue = 0;
       _NTDC = 0;
       _TDCwidth = 0;
+
+      //! Support parameters
+
+      _PannelThickness = 0;
+      _PlateThickness = 0;
+      _LowerGap = 0;
+      _UpperGap = 0;
+      _SideGap = 0;
+      _ZForward = 0;
+      _ZBackward = 0;
 
       //! Mirror parameters
 
@@ -138,7 +149,8 @@ namespace Belle2 {
       _Npmty = detParams.getInt("nPMTy");
       _Msizex = detParams.getLength("Module/ModuleXSize");
       _Msizey = detParams.getLength("Module/ModuleYSize");
-      _MWsizez = detParams.getLength("Module/ModuleZSize");
+      _Msizez = detParams.getLength("Module/ModuleZSize");
+      _MWallThickness = detParams.getLength("Module/ModuleWall");
       _Asizex = detParams.getLength("Module/SensXSize");
       _Asizey = detParams.getLength("Module/SensYSize");
       _Asizez = detParams.getLength("Module/SensThickness");
@@ -159,6 +171,19 @@ namespace Belle2 {
       _Mirthickness = mirParams.getLength("mirrorThickness");
       _Mirradius = mirParams.getLength("Radius");
 
+
+      //! Support parameters
+
+      GearDir supParams(content, "Support");
+
+      _PannelThickness = supParams.getLength("PannelThickness");
+      _PlateThickness = supParams.getLength("PlateThickness");
+      _LowerGap = supParams.getLength("lowerGap");
+      _UpperGap = supParams.getLength("upperGap");
+      _SideGap = supParams.getLength("sideGap");
+      _ZForward = supParams.getLength("ZForward");
+      _ZBackward = supParams.getLength("ZBackward");
+
       //! Set alignment
 
       m_alignment = GearDir(content, "Alignment/");
@@ -168,6 +193,7 @@ namespace Belle2 {
 
     void TOPGeometryPar::Print(void) const
     {
+      //! Here to be added the printout of the parameters
     }
 
   } //! End namespace TOP

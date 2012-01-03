@@ -182,7 +182,12 @@ namespace Belle2 {
       /** Get module wall size in in z direction
        * @return module wall size in z direction in mm
        */
-      double getMWsizez() const;
+      double getMsizez() const;
+
+      /** Get module wall thickness
+       * @return module wall thickness in mm
+       */
+      double getMWallThickness() const;
 
       /** Get active area size in x direction
        * @return active area size in x direction in mm
@@ -259,6 +264,43 @@ namespace Belle2 {
        */
       double getMirradius() const;
 
+      //! Support parameters
+
+      /** Get thickness of the QBB pannel
+       * @return thicness of QBB pannel in mm
+       */
+      double getPannelThickness() const;
+
+      /** Get thickness of the sinde plate
+       * @return thickness of side pladte in mm
+       */
+      double getPlateThickness() const;
+
+      /** Get size of air gap between quartz and support at inner radious
+       * @return air gar in mm
+       */
+      double getLowerGap() const;
+
+      /** Get size of air gap between quartz and support at outer radious
+       * @return air gar in mm
+       */
+      double getUpperGap() const;
+
+      /** Get size of air gap between quartz and support (side plate)
+       * @return air gar in mm
+       */
+      double getSideGap() const;
+
+      /** Get forward possition of support
+       * @return forward possition of support in mm
+       */
+      double getZForward() const;
+
+      /** Get backward possition of support
+       * @return backward possition of support in mm
+       */
+      double getZBackward() const;
+
       /**< derived function that are part of geometry */
 
       /** Calculate the channel ID from local possition on the PMT
@@ -317,7 +359,8 @@ namespace Belle2 {
       int _Npmty;                /**< number og PMTs in one column */
       double _Msizex;            /**< module side X */
       double _Msizey;            /**< module side Y */
-      double _MWsizez;           /**< module wall size in Z */
+      double _Msizez;            /**< module wall size in Z */
+      double _MWallThickness;    /**< module wall thickness */
       double _Asizex;            /**< active area size in X */
       double _Asizey;            /**< active area size in y */
       double _Asizez;            /**< active area size in z */
@@ -339,8 +382,17 @@ namespace Belle2 {
 
       //! Support parameters
 
-      //! Here to be added parameters for support
 
+      double _PannelThickness;   /**< thicness of QBB pannel */
+      double _PlateThickness;    /**< thickness of side pladte */
+      double _LowerGap;          /**< lower air gap */
+      double _UpperGap;          /**< upper air gap */
+      double _SideGap;           /**< side air gap */
+      double _ZForward;          /**< forward possition of support */
+      double _ZBackward;         /**< backward possition of support */
+
+
+      //! Technical parameters
 
       static TOPGeometryPar* p_B4TOPGeometryParDB; /*!< Pointer that saves the instance of this class. */
 
@@ -454,9 +506,14 @@ namespace Belle2 {
       return _Msizey / Unit::mm;
     }
 
-    inline double TOPGeometryPar::getMWsizez() const
+    inline double TOPGeometryPar::getMsizez() const
     {
-      return _MWsizez / Unit::mm;
+      return _Msizez / Unit::mm;
+    }
+
+    inline double TOPGeometryPar::getMWallThickness() const
+    {
+      return _MWallThickness / Unit::mm;
     }
 
     inline double TOPGeometryPar::getAsizex() const
@@ -531,6 +588,45 @@ namespace Belle2 {
     {
       return _Mirradius / Unit::mm;
     }
+
+    //! Support parameters
+
+
+    inline double TOPGeometryPar::getPannelThickness() const
+    {
+      return _PannelThickness / Unit::mm;
+    }
+
+    inline double TOPGeometryPar::getPlateThickness() const
+    {
+      return _PlateThickness / Unit::mm;
+    }
+
+    inline double TOPGeometryPar::getLowerGap() const
+    {
+      return _LowerGap / Unit::mm;
+    }
+
+    inline double TOPGeometryPar::getUpperGap() const
+    {
+      return _UpperGap / Unit::mm;
+    }
+
+    inline double TOPGeometryPar::getSideGap() const
+    {
+      return _SideGap / Unit::mm;
+    }
+
+    inline double TOPGeometryPar::getZForward() const
+    {
+      return _ZForward / Unit::mm;
+    }
+
+    inline double TOPGeometryPar::getZBackward() const
+    {
+      return _ZBackward / Unit::mm;
+    }
+
 
     //! Derived functions which are part of geometry
 

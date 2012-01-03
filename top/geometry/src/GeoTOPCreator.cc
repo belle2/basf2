@@ -293,7 +293,7 @@ namespace Belle2 {
 
       G4LogicalVolume* stack = buildPMTstack(content);
 
-      G4double dz = Bposition - WLength - Gwidth1 - (m_topgp->getdGlue() + m_topgp->getWinthickness() + m_topgp->getMWsizez() + m_topgp->getBotthickness()) / 2.0;
+      G4double dz = Bposition - WLength - Gwidth1 - (m_topgp->getdGlue() + m_topgp->getWinthickness() + m_topgp->getMsizez() + m_topgp->getBotthickness()) / 2.0;
       G4double dx = (-Wextdown) / 2.0;
 
       //            G4RotationMatrix* rotsta = new G4RotationMatrix(0,0,-M_PI/2.0);
@@ -347,7 +347,7 @@ namespace Belle2 {
       G4double lengthw = WLength + Gwidth1;
 
       //! get module wall size in Z
-      G4double MWsizez = m_topgp->getMWsizez();
+      G4double MWsizez = m_topgp->getMsizez();
       //! get window thickness
       G4double Winthickness = m_topgp->getWinthickness();
       //! get window thickness
@@ -402,7 +402,7 @@ namespace Belle2 {
       //! get module side Y
       G4double dy = m_topgp->getMsizey();
       //! get module wall size in Z
-      G4double MWsizez = m_topgp->getMWsizez();
+      G4double MWsizez = m_topgp->getMsizez();
       //! get window thickness
       G4double Winthickness = m_topgp->getWinthickness();
       //! get window thickness
@@ -471,7 +471,7 @@ namespace Belle2 {
       //! get module side Y
       G4double Msizey = m_topgp->getMsizey();
       //! get module wall size in Z
-      G4double MWsizez = m_topgp->getMWsizez();
+      G4double MWsizez = m_topgp->getMsizez();
       //! get active area size in X
       G4double Asizex = m_topgp->getAsizex();
       //! get active area size in y

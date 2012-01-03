@@ -14,6 +14,7 @@
         <ModuleXSize desc="module size in X" unit="mm">27.5</ModuleXSize>
         <ModuleYSize desc="module size in Y" unit="mm">27.5</ModuleYSize>
         <ModuleZSize  desc="module wall size in Z" unit="mm">9.6</ModuleZSize>
+        <ModuleWall desc="thickness of the module wall" unit="mm">0.5</ModuleWall>
         
         <SensXSize desc="Active surface x dimension" unit="mm">22.5</SensXSize>
         <SensYSize desc="Active surface y dimension" unit="mm">22.5</SensYSize>

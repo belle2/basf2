@@ -394,6 +394,20 @@
             <Material desc="Super conducting magnet">SC_COIL</Material>
         </C7mag7>
 
+<C7Shield description="Shield in QCSL">
+  <Material>W</Material>
+  <Plane>
+    <posZ unit="mm">1160</posZ>
+    <innerRadius unit="mm">34</innerRadius>
+    <outerRadius unit="mm">50</outerRadius>  
+  </Plane>
+  <Plane>
+    <posZ unit="mm">1190</posZ>
+    <innerRadius unit="mm">34</innerRadius>
+    <outerRadius unit="mm">50</outerRadius>  
+  </Plane>
+</C7Shield>
+
         <!--Cryo L-->
 		<D1wal1>
 			<L1 unit="cm">-116.0</L1>

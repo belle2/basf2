@@ -64,7 +64,7 @@ namespace Belle2 {
     GeoHeavyMetalShieldCreator::~GeoHeavyMetalShieldCreator()
     {
       //Delete all sensitive detectors
-      BOOST_FOREACH(SensitiveDetector* sensitive, m_sensitive) {
+      BOOST_FOREACH(SensitiveDetector * sensitive, m_sensitive) {
         delete sensitive;
       }
       m_sensitive.clear();
@@ -102,8 +102,8 @@ namespace Belle2 {
       GearDir cShieldL1(content, "ShieldL1");
       if (! cShieldL1) B2FATAL("Could not find definition for IR ShieldL1");
       double ShieldL1_minZ(0), ShieldL1_maxZ(0);
-      G4Polycone *geo_ShieldL1x = geometry::createPolyCone("geo_ShieldL1x_name", cShieldL1, ShieldL1_minZ, ShieldL1_maxZ);
-      G4SubtractionSolid *geo_ShieldL1 = new G4SubtractionSolid("geo_ShieldL1_name", geo_ShieldL1x, geo_TrdL, transform_TrdL);
+      G4Polycone* geo_ShieldL1x = geometry::createPolyCone("geo_ShieldL1x_name", cShieldL1, ShieldL1_minZ, ShieldL1_maxZ);
+      G4SubtractionSolid* geo_ShieldL1 = new G4SubtractionSolid("geo_ShieldL1_name", geo_ShieldL1x, geo_TrdL, transform_TrdL);
 
       string strMat_ShieldL1 = cShieldL1.getString("Material", "Air");
       G4Material* mat_ShieldL1 = Materials::get(strMat_ShieldL1);
@@ -120,8 +120,8 @@ namespace Belle2 {
       GearDir cShieldL2(content, "ShieldL2");
       if (! cShieldL2)  B2FATAL("Could not find definition for IR ShieldL2");
       double ShieldL2_minZ(0), ShieldL2_maxZ(0);
-      G4Polycone *geo_ShieldL2x = geometry::createPolyCone("geo_ShieldL2x_name", cShieldL2, ShieldL2_minZ, ShieldL2_maxZ);
-      G4SubtractionSolid *geo_ShieldL2 = new G4SubtractionSolid("geo_ShieldL2_name", geo_ShieldL2x, geo_TrdL, transform_TrdL);
+      G4Polycone* geo_ShieldL2x = geometry::createPolyCone("geo_ShieldL2x_name", cShieldL2, ShieldL2_minZ, ShieldL2_maxZ);
+      G4SubtractionSolid* geo_ShieldL2 = new G4SubtractionSolid("geo_ShieldL2_name", geo_ShieldL2x, geo_TrdL, transform_TrdL);
 
       string strMat_ShieldL2 = cShieldL2.getString("Material", "Air");
       G4Material* mat_ShieldL2 = Materials::get(strMat_ShieldL2);
@@ -137,8 +137,8 @@ namespace Belle2 {
       GearDir cShieldR1(content, "ShieldR1");
       if (! cShieldR1) B2FATAL("Could not find definition for IR ShieldR1");
       double ShieldR1_minZ(0), ShieldR1_maxZ(0);
-      G4Polycone *geo_ShieldR1x = geometry::createPolyCone("geo_ShieldR1x_name", cShieldR1, ShieldR1_minZ, ShieldR1_maxZ);
-      G4SubtractionSolid *geo_ShieldR1 = new G4SubtractionSolid("geo_ShieldR1_name", geo_ShieldR1x, geo_TrdR, transform_TrdR);
+      G4Polycone* geo_ShieldR1x = geometry::createPolyCone("geo_ShieldR1x_name", cShieldR1, ShieldR1_minZ, ShieldR1_maxZ);
+      G4SubtractionSolid* geo_ShieldR1 = new G4SubtractionSolid("geo_ShieldR1_name", geo_ShieldR1x, geo_TrdR, transform_TrdR);
 
       string strMat_ShieldR1 = cShieldR1.getString("Material", "Air");
       G4Material* mat_ShieldR1 = Materials::get(strMat_ShieldR1);
@@ -154,8 +154,8 @@ namespace Belle2 {
       GearDir cShieldR2(content, "ShieldR2");
       if (! cShieldR2) B2FATAL("Could not find definition for IR ShieldR2");
       double ShieldR2_minZ(0), ShieldR2_maxZ(0);
-      G4Polycone *geo_ShieldR2x = geometry::createPolyCone("geo_ShieldR2x_name", cShieldR2, ShieldR2_minZ, ShieldR2_maxZ);
-      G4SubtractionSolid *geo_ShieldR2 = new G4SubtractionSolid("geo_ShieldR2_name", geo_ShieldR2x, geo_TrdR, transform_TrdR);
+      G4Polycone* geo_ShieldR2x = geometry::createPolyCone("geo_ShieldR2x_name", cShieldR2, ShieldR2_minZ, ShieldR2_maxZ);
+      G4SubtractionSolid* geo_ShieldR2 = new G4SubtractionSolid("geo_ShieldR2_name", geo_ShieldR2x, geo_TrdR, transform_TrdR);
 
       string strMat_ShieldR2 = cShieldR2.getString("Material", "Air");
       G4Material* mat_ShieldR2 = Materials::get(strMat_ShieldR2);

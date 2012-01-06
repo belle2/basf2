@@ -65,7 +65,7 @@ namespace Belle2 {
     GeoBeamPipeCreator::~GeoBeamPipeCreator()
     {
       //Delete all sensitive detectors
-      BOOST_FOREACH(SensitiveDetector* sensitive, m_sensitive) {
+      BOOST_FOREACH(SensitiveDetector * sensitive, m_sensitive) {
         delete sensitive;
       }
       m_sensitive.clear();
@@ -143,7 +143,7 @@ namespace Belle2 {
       //
       double Lv1SUS_rI[Lv1SUS_num];
       for (int tmpn = 0; tmpn < Lv1SUS_num; tmpn++)
-        { Lv1SUS_rI[tmpn] = 0.0; }
+      { Lv1SUS_rI[tmpn] = 0.0; }
       //
       double Lv1SUS_rO[Lv1SUS_num];
       Lv1SUS_rO[0] = cLv1SUS.getLength("R1") / Unit::mm;
@@ -172,8 +172,8 @@ namespace Belle2 {
       G4Material* mat_Lv1SUS = Materials::get(strMat_Lv1SUS);
 
       //define geometry
-      G4Polycone* geo_Lv1SUS = new G4Polycone("geo_Lv1SUS_name", 0, 2*M_PI, Lv1SUS_num, Lv1SUS_Z, Lv1SUS_rI, Lv1SUS_rO);
-      G4LogicalVolume *logi_Lv1SUS = new G4LogicalVolume(geo_Lv1SUS, mat_Lv1SUS, "logi_Lv1SUS_name");
+      G4Polycone* geo_Lv1SUS = new G4Polycone("geo_Lv1SUS_name", 0, 2 * M_PI, Lv1SUS_num, Lv1SUS_Z, Lv1SUS_rI, Lv1SUS_rO);
+      G4LogicalVolume* logi_Lv1SUS = new G4LogicalVolume(geo_Lv1SUS, mat_Lv1SUS, "logi_Lv1SUS_name");
 
       //for (int i=0;i<Lv1SUS_num;i++)printf("%f %f\n",Lv1SUS_Z[i],Lv1SUS_rO[i]);
 
@@ -208,8 +208,8 @@ namespace Belle2 {
       G4Material* mat_Lv2OutBe = Materials::get(strMat_Lv2OutBe);
 
       //define geometry
-      G4Polycone* geo_Lv2OutBe = new G4Polycone("geo_Lv2OutBe_name", 0, 2*M_PI, Lv2OutBe_num, Lv2OutBe_Z, Lv2OutBe_rI, Lv2OutBe_rO);
-      G4LogicalVolume *logi_Lv2OutBe = new G4LogicalVolume(geo_Lv2OutBe, mat_Lv2OutBe, "logi_Lv2OutBe_name");
+      G4Polycone* geo_Lv2OutBe = new G4Polycone("geo_Lv2OutBe_name", 0, 2 * M_PI, Lv2OutBe_num, Lv2OutBe_Z, Lv2OutBe_rI, Lv2OutBe_rO);
+      G4LogicalVolume* logi_Lv2OutBe = new G4LogicalVolume(geo_Lv2OutBe, mat_Lv2OutBe, "logi_Lv2OutBe_name");
 
       //-   put volume
       setColor(*logi_Lv2OutBe, cLv2OutBe.getString("Color", "#333300"));
@@ -244,8 +244,8 @@ namespace Belle2 {
       G4Material* mat_Lv2InBe = Materials::get(strMat_Lv2InBe);
 
       //define geometry
-      G4Polycone* geo_Lv2InBe = new G4Polycone("geo_Lv2InBe_name", 0, 2*M_PI, Lv2InBe_num, Lv2InBe_Z, Lv2InBe_rI, Lv2InBe_rO);
-      G4LogicalVolume *logi_Lv2InBe = new G4LogicalVolume(geo_Lv2InBe, mat_Lv2InBe, "logi_Lv2InBe_name");
+      G4Polycone* geo_Lv2InBe = new G4Polycone("geo_Lv2InBe_name", 0, 2 * M_PI, Lv2InBe_num, Lv2InBe_Z, Lv2InBe_rI, Lv2InBe_rO);
+      G4LogicalVolume* logi_Lv2InBe = new G4LogicalVolume(geo_Lv2InBe, mat_Lv2InBe, "logi_Lv2InBe_name");
 
       //-   put volume
       setColor(*logi_Lv2InBe, cLv2InBe.getString("Color", "#333300"));
@@ -279,7 +279,7 @@ namespace Belle2 {
       Lv2Vacuum1_Z[1] = Lv2Vacuum_L2;
       double Lv2Vacuum1_rI[Lv2Vacuum1_num];
       for (int tmpn = 0; tmpn < Lv2Vacuum1_num; tmpn++)
-        { Lv2Vacuum1_rI[tmpn] = 0.0; }
+      { Lv2Vacuum1_rI[tmpn] = 0.0; }
       double Lv2Vacuum1_rO[Lv2Vacuum1_num];
       Lv2Vacuum1_rO[0] = Lv2Vacuum_R1;
       Lv2Vacuum1_rO[1] = Lv2Vacuum_R1;
@@ -299,22 +299,22 @@ namespace Belle2 {
       Lv2Vacuum3_Z[1] = Lv2Vacuum_L4;
       double Lv2Vacuum3_rI[Lv2Vacuum3_num];
       for (int tmpn = 0; tmpn < Lv2Vacuum3_num; tmpn++)
-        { Lv2Vacuum3_rI[tmpn] = 0.0; }
+      { Lv2Vacuum3_rI[tmpn] = 0.0; }
       double Lv2Vacuum3_rO[Lv2Vacuum3_num];
       Lv2Vacuum3_rO[0] = Lv2Vacuum_R3;
       Lv2Vacuum3_rO[1] = Lv2Vacuum_R3;
 
       //define geometry
       // Part 1
-      G4Polycone* geo_Lv2VacuumPart1 = new G4Polycone("geo_Lv2VacuumPart1_name", 0, 2*M_PI, Lv2Vacuum1_num, Lv2Vacuum1_Z, Lv2Vacuum1_rI, Lv2Vacuum1_rO);
+      G4Polycone* geo_Lv2VacuumPart1 = new G4Polycone("geo_Lv2VacuumPart1_name", 0, 2 * M_PI, Lv2Vacuum1_num, Lv2Vacuum1_Z, Lv2Vacuum1_rI, Lv2Vacuum1_rO);
       // Part 2
-      G4Tubs* geo_Lv2VacuumPart2_1 = new G4Tubs("geo_Lv2VacuumPart2_1_name", Lv2Vacuum2_rI1, Lv2Vacuum2_rO1, Lv2Vacuum2_Z1, 0, 2*M_PI);
-      G4Tubs* geo_Lv2VacuumPart2_2 = new G4Tubs("geo_Lv2VacuumPart2_2_name", Lv2Vacuum2_rI2, Lv2Vacuum2_rO2, Lv2Vacuum2_Z2, 0, 2*M_PI);
+      G4Tubs* geo_Lv2VacuumPart2_1 = new G4Tubs("geo_Lv2VacuumPart2_1_name", Lv2Vacuum2_rI1, Lv2Vacuum2_rO1, Lv2Vacuum2_Z1, 0, 2 * M_PI);
+      G4Tubs* geo_Lv2VacuumPart2_2 = new G4Tubs("geo_Lv2VacuumPart2_2_name", Lv2Vacuum2_rI2, Lv2Vacuum2_rO2, Lv2Vacuum2_Z2, 0, 2 * M_PI);
       G4Transform3D transform_Lv2VacuumPart2_2 = G4Translate3D(0., 0., 0.);
       transform_Lv2VacuumPart2_2 = transform_Lv2VacuumPart2_2 * G4RotateY3D(-Lv2Vacuum_A2);
       G4IntersectionSolid* geo_Lv2VacuumPart2 = new G4IntersectionSolid("geo_Lv2VacuumPart2_name", geo_Lv2VacuumPart2_1, geo_Lv2VacuumPart2_2, transform_Lv2VacuumPart2_2);
       // Part 3
-      G4Polycone* geo_Lv2VacuumPart3 = new G4Polycone("geo_Lv2VacuumPart3_name", 0, 2*M_PI, Lv2Vacuum3_num, Lv2Vacuum3_Z, Lv2Vacuum3_rI, Lv2Vacuum3_rO);
+      G4Polycone* geo_Lv2VacuumPart3 = new G4Polycone("geo_Lv2VacuumPart3_name", 0, 2 * M_PI, Lv2Vacuum3_num, Lv2Vacuum3_Z, Lv2Vacuum3_rI, Lv2Vacuum3_rO);
       // Part1+2+3
       G4Transform3D transform_Lv2VacuumPart3 = G4Translate3D(0., 0., 0.);
       transform_Lv2VacuumPart3 = transform_Lv2VacuumPart3 * G4RotateY3D(-Lv2Vacuum_A1);
@@ -422,7 +422,7 @@ namespace Belle2 {
       //
       double Lv2Paraf2_rI[Lv2Paraf2_num];
       for (int tmpn = 0; tmpn < Lv2Paraf2_num; tmpn++)
-        { Lv2Paraf2_rI[tmpn] = 0.0; }
+      { Lv2Paraf2_rI[tmpn] = 0.0; }
       //
       double Lv2Paraf2_rO[Lv2Paraf2_num];
       Lv2Paraf2_rO[0] = cLv2Paraf.getLength("R9") / Unit::mm;
@@ -433,10 +433,10 @@ namespace Belle2 {
       G4Material* mat_Lv2Paraf = Materials::get(strMat_Lv2Paraf);
 
       //define geometry
-      G4Polycone* geo_Lv2Parafpcon1 = new G4Polycone("geo_Lv2Parafpcon1_name", 0, 2*M_PI, Lv2Paraf1_num, Lv2Paraf1_Z, Lv2Paraf1_rI, Lv2Paraf1_rO);
-      G4Polycone* geo_Lv2Parafpcon2 = new G4Polycone("geo_Lv2Parafpcon2_name", 0, 2*M_PI, Lv2Paraf2_num, Lv2Paraf2_Z, Lv2Paraf2_rI, Lv2Paraf2_rO);
+      G4Polycone* geo_Lv2Parafpcon1 = new G4Polycone("geo_Lv2Parafpcon1_name", 0, 2 * M_PI, Lv2Paraf1_num, Lv2Paraf1_Z, Lv2Paraf1_rI, Lv2Paraf1_rO);
+      G4Polycone* geo_Lv2Parafpcon2 = new G4Polycone("geo_Lv2Parafpcon2_name", 0, 2 * M_PI, Lv2Paraf2_num, Lv2Paraf2_Z, Lv2Paraf2_rI, Lv2Paraf2_rO);
       G4SubtractionSolid* geo_Lv2Paraf = new G4SubtractionSolid("geo_Lv2Paraf_name", geo_Lv2Parafpcon1, geo_Lv2Parafpcon2);
-      G4LogicalVolume *logi_Lv2Paraf = new G4LogicalVolume(geo_Lv2Paraf, mat_Lv2Paraf, "logi_Lv2Paraf_name");
+      G4LogicalVolume* logi_Lv2Paraf = new G4LogicalVolume(geo_Lv2Paraf, mat_Lv2Paraf, "logi_Lv2Paraf_name");
 
       //-   put volume
       setColor(*logi_Lv2Paraf, cLv2Paraf.getString("Color", "#00CCCC"));
@@ -469,8 +469,8 @@ namespace Belle2 {
       G4Material* mat_Lv3AuCoat = Materials::get(strMat_Lv3AuCoat);
 
       //define geometry
-      G4Polycone* geo_Lv3AuCoat = new G4Polycone("geo_Lv3AuCoat_name", 0, 2*M_PI, Lv3AuCoat_num, Lv3AuCoat_Z, Lv3AuCoat_rI, Lv3AuCoat_rO);
-      G4LogicalVolume *logi_Lv3AuCoat = new G4LogicalVolume(geo_Lv3AuCoat, mat_Lv3AuCoat, "logi_Lv3AuCoat_name");
+      G4Polycone* geo_Lv3AuCoat = new G4Polycone("geo_Lv3AuCoat_name", 0, 2 * M_PI, Lv3AuCoat_num, Lv3AuCoat_Z, Lv3AuCoat_rI, Lv3AuCoat_rO);
+      G4LogicalVolume* logi_Lv3AuCoat = new G4LogicalVolume(geo_Lv3AuCoat, mat_Lv3AuCoat, "logi_Lv3AuCoat_name");
 
       //-   put volume
       setColor(*logi_Lv3AuCoat, cLv3AuCoat.getString("Color", "#CCCC00"));
@@ -502,7 +502,7 @@ namespace Belle2 {
 
       //define geometry
       G4Trd* geo_Lv1TaFwd = new G4Trd("geo_Lv1TaFwd_name", Lv1TaFwd_L2, Lv1TaFwd_L3, Lv1TaFwd_T1, Lv1TaFwd_T1, Lv1TaFwd_L1 / 2.0);
-      G4LogicalVolume *logi_Lv1TaFwd = new G4LogicalVolume(geo_Lv1TaFwd, mat_Lv1TaFwd, "logi_Lv1TaFwd_name");
+      G4LogicalVolume* logi_Lv1TaFwd = new G4LogicalVolume(geo_Lv1TaFwd, mat_Lv1TaFwd, "logi_Lv1TaFwd_name");
 
       //-   put volume
       setColor(*logi_Lv1TaFwd, cLv1TaFwd.getString("Color", "#333333"));
@@ -559,7 +559,7 @@ namespace Belle2 {
       Lv2VacFwd_Z[3] = Lv2VacFwd_D3 + Lv2VacFwd_L3;
       double Lv2VacFwd_rI[Lv2VacFwd3_num];
       for (int tmpn = 0; tmpn < Lv2VacFwd3_num; tmpn++)
-        { Lv2VacFwd_rI[tmpn] = 0.0; }
+      { Lv2VacFwd_rI[tmpn] = 0.0; }
       double Lv2VacFwd_rO[Lv2VacFwd3_num];
       Lv2VacFwd_rO[0] = Lv2VacFwd_R3;
       Lv2VacFwd_rO[1] = Lv2VacFwd_R3;
@@ -568,19 +568,19 @@ namespace Belle2 {
 
       //define geometry
       // Part 1
-      G4Tubs* geo_Lv2VacFwdPart1_1 = new G4Tubs("geo_Lv2VacFwdPart1_1_name", Lv2VacFwd1_rI1, Lv2VacFwd1_rO1, Lv2VacFwd1_Z1, 0, 2*M_PI);
-      G4Tubs* geo_Lv2VacFwdPart1_2 = new G4Tubs("geo_Lv2VacFwdPart1_2_name", Lv2VacFwd1_rI2, Lv2VacFwd1_rO2, Lv2VacFwd1_Z2, 0, 2*M_PI);
+      G4Tubs* geo_Lv2VacFwdPart1_1 = new G4Tubs("geo_Lv2VacFwdPart1_1_name", Lv2VacFwd1_rI1, Lv2VacFwd1_rO1, Lv2VacFwd1_Z1, 0, 2 * M_PI);
+      G4Tubs* geo_Lv2VacFwdPart1_2 = new G4Tubs("geo_Lv2VacFwdPart1_2_name", Lv2VacFwd1_rI2, Lv2VacFwd1_rO2, Lv2VacFwd1_Z2, 0, 2 * M_PI);
       G4Transform3D transform_Lv2VacFwdPart1_2 = G4Translate3D(0., 0., 0.);
       transform_Lv2VacFwdPart1_2 = transform_Lv2VacFwdPart1_2 * G4RotateY3D(-Lv2VacFwd_A2 / 2.);
       G4IntersectionSolid* geo_Lv2VacFwdPart1 = new G4IntersectionSolid("geo_Lv2VacFwdPart1_name", geo_Lv2VacFwdPart1_1, geo_Lv2VacFwdPart1_2, transform_Lv2VacFwdPart1_2);
       // Part 2
-      G4Tubs* geo_Lv2VacFwdPart2_1 = new G4Tubs("geo_Lv2VacFwdPart2_1_name", Lv2VacFwd2_rI1, Lv2VacFwd2_rO1, Lv2VacFwd2_Z1, 0, 2*M_PI);
-      G4Tubs* geo_Lv2VacFwdPart2_2 = new G4Tubs("geo_Lv2VacFwdPart2_2_name", Lv2VacFwd2_rI2, Lv2VacFwd2_rO2, Lv2VacFwd2_Z2, 0, 2*M_PI);
+      G4Tubs* geo_Lv2VacFwdPart2_1 = new G4Tubs("geo_Lv2VacFwdPart2_1_name", Lv2VacFwd2_rI1, Lv2VacFwd2_rO1, Lv2VacFwd2_Z1, 0, 2 * M_PI);
+      G4Tubs* geo_Lv2VacFwdPart2_2 = new G4Tubs("geo_Lv2VacFwdPart2_2_name", Lv2VacFwd2_rI2, Lv2VacFwd2_rO2, Lv2VacFwd2_Z2, 0, 2 * M_PI);
       G4Transform3D transform_Lv2VacFwdPart2_2 = G4Translate3D(0., 0., 0.);
       transform_Lv2VacFwdPart2_2 = transform_Lv2VacFwdPart2_2 * G4RotateY3D(Lv2VacFwd_A2 / 2.);
       G4IntersectionSolid* geo_Lv2VacFwdPart2 = new G4IntersectionSolid("geo_Lv2VacFwdPart2_name", geo_Lv2VacFwdPart2_1, geo_Lv2VacFwdPart2_2, transform_Lv2VacFwdPart2_2);
       // Part 3
-      G4Polycone* geo_Lv2VacFwdPart3 = new G4Polycone("geo_Lv2VacFwdPart3", 0, 2*M_PI, Lv2VacFwd3_num, Lv2VacFwd_Z, Lv2VacFwd_rI, Lv2VacFwd_rO);
+      G4Polycone* geo_Lv2VacFwdPart3 = new G4Polycone("geo_Lv2VacFwdPart3", 0, 2 * M_PI, Lv2VacFwd3_num, Lv2VacFwd_Z, Lv2VacFwd_rI, Lv2VacFwd_rO);
 
       // Part1+2+3
       //tmp begin
@@ -642,7 +642,7 @@ namespace Belle2 {
 
       //define geometry
       G4Trd* geo_Lv1TaBwd = new G4Trd("geo_Lv1TaBwd_name", Lv1TaBwd_L2, Lv1TaBwd_L3, Lv1TaBwd_T1, Lv1TaBwd_T1, Lv1TaBwd_L1 / 2.0);
-      G4LogicalVolume *logi_Lv1TaBwd = new G4LogicalVolume(geo_Lv1TaBwd, mat_Lv1TaBwd, "logi_Lv1TaBwd_name");
+      G4LogicalVolume* logi_Lv1TaBwd = new G4LogicalVolume(geo_Lv1TaBwd, mat_Lv1TaBwd, "logi_Lv1TaBwd_name");
 
       //-   put volume
       setColor(*logi_Lv1TaBwd, cLv1TaBwd.getString("Color", "#333333"));
@@ -699,7 +699,7 @@ namespace Belle2 {
       Lv2VacBwd_Z[3] = -Lv2VacBwd_D3 - Lv2VacBwd_L3;
       double Lv2VacBwd_rI[Lv2VacBwd3_num];
       for (int tmpn = 0; tmpn < Lv2VacBwd3_num; tmpn++)
-        { Lv2VacBwd_rI[tmpn] = 0.0; }
+      { Lv2VacBwd_rI[tmpn] = 0.0; }
       double Lv2VacBwd_rO[Lv2VacBwd3_num];
       Lv2VacBwd_rO[0] = Lv2VacBwd_R3;
       Lv2VacBwd_rO[1] = Lv2VacBwd_R3;
@@ -708,19 +708,19 @@ namespace Belle2 {
 
       //define geometry
       // Part 1
-      G4Tubs* geo_Lv2VacBwdPart1_1 = new G4Tubs("geo_Lv2VacBwdPart1_1_name", Lv2VacBwd1_rI1, Lv2VacBwd1_rO1, Lv2VacBwd1_Z1, 0, 2*M_PI);
-      G4Tubs* geo_Lv2VacBwdPart1_2 = new G4Tubs("geo_Lv2VacBwdPart1_2_name", Lv2VacBwd1_rI2, Lv2VacBwd1_rO2, Lv2VacBwd1_Z2, 0, 2*M_PI);
+      G4Tubs* geo_Lv2VacBwdPart1_1 = new G4Tubs("geo_Lv2VacBwdPart1_1_name", Lv2VacBwd1_rI1, Lv2VacBwd1_rO1, Lv2VacBwd1_Z1, 0, 2 * M_PI);
+      G4Tubs* geo_Lv2VacBwdPart1_2 = new G4Tubs("geo_Lv2VacBwdPart1_2_name", Lv2VacBwd1_rI2, Lv2VacBwd1_rO2, Lv2VacBwd1_Z2, 0, 2 * M_PI);
       G4Transform3D transform_Lv2VacBwdPart1_2 = G4Translate3D(0., 0., 0.);
       transform_Lv2VacBwdPart1_2 = transform_Lv2VacBwdPart1_2 * G4RotateY3D(Lv2VacBwd_A2 / 2.);
       G4IntersectionSolid* geo_Lv2VacBwdPart1 = new G4IntersectionSolid("geo_Lv2VacBwdPart1_name", geo_Lv2VacBwdPart1_1, geo_Lv2VacBwdPart1_2, transform_Lv2VacBwdPart1_2);
       // Part 2
-      G4Tubs* geo_Lv2VacBwdPart2_1 = new G4Tubs("geo_Lv2VacBwdPart2_1_name", Lv2VacBwd2_rI1, Lv2VacBwd2_rO1, Lv2VacBwd2_Z1, 0, 2*M_PI);
-      G4Tubs* geo_Lv2VacBwdPart2_2 = new G4Tubs("geo_Lv2VacBwdPart2_2_name", Lv2VacBwd2_rI2, Lv2VacBwd2_rO2, Lv2VacBwd2_Z2, 0, 2*M_PI);
+      G4Tubs* geo_Lv2VacBwdPart2_1 = new G4Tubs("geo_Lv2VacBwdPart2_1_name", Lv2VacBwd2_rI1, Lv2VacBwd2_rO1, Lv2VacBwd2_Z1, 0, 2 * M_PI);
+      G4Tubs* geo_Lv2VacBwdPart2_2 = new G4Tubs("geo_Lv2VacBwdPart2_2_name", Lv2VacBwd2_rI2, Lv2VacBwd2_rO2, Lv2VacBwd2_Z2, 0, 2 * M_PI);
       G4Transform3D transform_Lv2VacBwdPart2_2 = G4Translate3D(0., 0., 0.);
       transform_Lv2VacBwdPart2_2 = transform_Lv2VacBwdPart2_2 * G4RotateY3D(-Lv2VacBwd_A2 / 2.);
       G4IntersectionSolid* geo_Lv2VacBwdPart2 = new G4IntersectionSolid("geo_Lv2VacBwdPart2_name", geo_Lv2VacBwdPart2_1, geo_Lv2VacBwdPart2_2, transform_Lv2VacBwdPart2_2);
       // Part 3
-      G4Polycone* geo_Lv2VacBwdPart3 = new G4Polycone("geo_Lv2VacBwdPart3", 0, 2*M_PI, Lv2VacBwd3_num, Lv2VacBwd_Z, Lv2VacBwd_rI, Lv2VacBwd_rO);
+      G4Polycone* geo_Lv2VacBwdPart3 = new G4Polycone("geo_Lv2VacBwdPart3", 0, 2 * M_PI, Lv2VacBwd3_num, Lv2VacBwd_Z, Lv2VacBwd_rI, Lv2VacBwd_rO);
 
       // Part1+2+3
       //tmp begin
@@ -773,14 +773,14 @@ namespace Belle2 {
       //
       double AreaTubeFwd_rI[AreaTubeFwd_num];
       for (int i = 0; i < AreaTubeFwd_num; i++)
-        { AreaTubeFwd_rI[i] = 0.0; }
+      { AreaTubeFwd_rI[i] = 0.0; }
       //
       double AreaTubeFwd_rO[AreaTubeFwd_num];
       AreaTubeFwd_rO[0] = cAreaTubeFwd.getLength("R1") / Unit::mm;
       AreaTubeFwd_rO[1] = AreaTubeFwd_rO[0];
 
       //define geometry
-      G4Polycone* geo_AreaTubeFwdpcon = new G4Polycone("geo_AreaTubeFwdpcon_name", 0, 2*M_PI, AreaTubeFwd_num, AreaTubeFwd_Z, AreaTubeFwd_rI, AreaTubeFwd_rO);
+      G4Polycone* geo_AreaTubeFwdpcon = new G4Polycone("geo_AreaTubeFwdpcon_name", 0, 2 * M_PI, AreaTubeFwd_num, AreaTubeFwd_Z, AreaTubeFwd_rI, AreaTubeFwd_rO);
 
       //----------
       //- Lv1TaLERUp
@@ -798,7 +798,7 @@ namespace Belle2 {
       //
       double Lv1TaLERUp_rI[Lv1TaLERUp_num];
       for (int i = 0; i < Lv1TaLERUp_num; i++)
-        { Lv1TaLERUp_rI[i] = 0.0; }
+      { Lv1TaLERUp_rI[i] = 0.0; }
       //
       double Lv1TaLERUp_rO[Lv1TaLERUp_num];
       Lv1TaLERUp_rO[0] = cLv1TaLERUp.getLength("R1") / Unit::mm;
@@ -808,11 +808,11 @@ namespace Belle2 {
       G4Material* mat_Lv1TaLERUp = Materials::get(strMat_Lv1TaLERUp);
 
       //define geometry
-      G4Polycone* geo_Lv1TaLERUppcon = new G4Polycone("geo_Lv1TaLERUppcon_name", 0, 2*M_PI, Lv1TaLERUp_num, Lv1TaLERUp_Z, Lv1TaLERUp_rI, Lv1TaLERUp_rO);
+      G4Polycone* geo_Lv1TaLERUppcon = new G4Polycone("geo_Lv1TaLERUppcon_name", 0, 2 * M_PI, Lv1TaLERUp_num, Lv1TaLERUp_Z, Lv1TaLERUp_rI, Lv1TaLERUp_rO);
       G4Transform3D transform_AreaTubeFwdForLER = G4Translate3D(0., 0., 0.);
       transform_AreaTubeFwdForLER = transform_AreaTubeFwdForLER * G4RotateY3D(-Lv1TaLERUp_A1);
       G4IntersectionSolid* geo_Lv1TaLERUp = new G4IntersectionSolid("geo_Lv1TaLERUp_name", geo_Lv1TaLERUppcon, geo_AreaTubeFwdpcon, transform_AreaTubeFwdForLER);
-      G4LogicalVolume *logi_Lv1TaLERUp = new G4LogicalVolume(geo_Lv1TaLERUp, mat_Lv1TaLERUp, "logi_Lv1TaLERUp_name");
+      G4LogicalVolume* logi_Lv1TaLERUp = new G4LogicalVolume(geo_Lv1TaLERUp, mat_Lv1TaLERUp, "logi_Lv1TaLERUp_name");
 
       //-   put volume
       setColor(*logi_Lv1TaLERUp, cLv1TaLERUp.getString("Color", "#0000CC"));
@@ -837,9 +837,9 @@ namespace Belle2 {
       G4Material* mat_Lv2VacLERUp = Materials::get(strMat_Lv2VacLERUp);
 
       //define geometry
-      G4Polycone* geo_Lv2VacLERUppcon = new G4Polycone("geo_Lv2VacLERUppcon_name", 0, 2*M_PI, Lv1TaLERUp_num, Lv1TaLERUp_Z, Lv1TaLERUp_rI, Lv2VacLERUp_rO);
+      G4Polycone* geo_Lv2VacLERUppcon = new G4Polycone("geo_Lv2VacLERUppcon_name", 0, 2 * M_PI, Lv1TaLERUp_num, Lv1TaLERUp_Z, Lv1TaLERUp_rI, Lv2VacLERUp_rO);
       G4IntersectionSolid* geo_Lv2VacLERUp = new G4IntersectionSolid("geo_Lv2VacLERUp_name", geo_Lv2VacLERUppcon, geo_AreaTubeFwdpcon, transform_AreaTubeFwdForLER);
-      G4LogicalVolume *logi_Lv2VacLERUp = new G4LogicalVolume(geo_Lv2VacLERUp, mat_Lv2VacLERUp, "logi_Lv2VacLERUp_name");
+      G4LogicalVolume* logi_Lv2VacLERUp = new G4LogicalVolume(geo_Lv2VacLERUp, mat_Lv2VacLERUp, "logi_Lv2VacLERUp_name");
 
       //-   put volume
       setColor(*logi_Lv2VacLERUp, cLv2VacLERUp.getString("Color", "#CCCCCC"));
@@ -863,7 +863,7 @@ namespace Belle2 {
       //
       double Lv1TaHERDwn_rI[Lv1TaHERDwn_num];
       for (int i = 0; i < Lv1TaHERDwn_num; i++)
-        { Lv1TaHERDwn_rI[i] = 0.0; }
+      { Lv1TaHERDwn_rI[i] = 0.0; }
       //
       double Lv1TaHERDwn_rO[Lv1TaHERDwn_num];
       Lv1TaHERDwn_rO[0] = cLv1TaHERDwn.getLength("R1") / Unit::mm;
@@ -873,11 +873,11 @@ namespace Belle2 {
       G4Material* mat_Lv1TaHERDwn = Materials::get(strMat_Lv1TaHERDwn);
 
       //define geometry
-      G4Polycone* geo_Lv1TaHERDwnpcon = new G4Polycone("geo_Lv1TaHERDwnpcon_name", 0, 2*M_PI, Lv1TaHERDwn_num, Lv1TaHERDwn_Z, Lv1TaHERDwn_rI, Lv1TaHERDwn_rO);
+      G4Polycone* geo_Lv1TaHERDwnpcon = new G4Polycone("geo_Lv1TaHERDwnpcon_name", 0, 2 * M_PI, Lv1TaHERDwn_num, Lv1TaHERDwn_Z, Lv1TaHERDwn_rI, Lv1TaHERDwn_rO);
       G4Transform3D transform_AreaTubeFwdForHER = G4Translate3D(0., 0., 0.);
       transform_AreaTubeFwdForHER = transform_AreaTubeFwdForHER * G4RotateY3D(-Lv1TaHERDwn_A1);
       G4IntersectionSolid* geo_Lv1TaHERDwn = new G4IntersectionSolid("", geo_Lv1TaHERDwnpcon, geo_AreaTubeFwdpcon, transform_AreaTubeFwdForHER);
-      G4LogicalVolume *logi_Lv1TaHERDwn = new G4LogicalVolume(geo_Lv1TaHERDwn, mat_Lv1TaHERDwn, "logi_Lv1TaHERDwn_name");
+      G4LogicalVolume* logi_Lv1TaHERDwn = new G4LogicalVolume(geo_Lv1TaHERDwn, mat_Lv1TaHERDwn, "logi_Lv1TaHERDwn_name");
 
       //-   put volume
       setColor(*logi_Lv1TaHERDwn, cLv1TaHERDwn.getString("Color", "#00CC00"));
@@ -902,9 +902,9 @@ namespace Belle2 {
       G4Material* mat_Lv2VacHERDwn = Materials::get(strMat_Lv2VacHERDwn);
 
       //define geometry
-      G4Polycone* geo_Lv2VacHERDwnpcon = new G4Polycone("geo_Lv2VacHERDwnpcon_name", 0, 2*M_PI, Lv1TaHERDwn_num, Lv1TaHERDwn_Z, Lv1TaHERDwn_rI, Lv2VacHERDwn_rO);
+      G4Polycone* geo_Lv2VacHERDwnpcon = new G4Polycone("geo_Lv2VacHERDwnpcon_name", 0, 2 * M_PI, Lv1TaHERDwn_num, Lv1TaHERDwn_Z, Lv1TaHERDwn_rI, Lv2VacHERDwn_rO);
       G4IntersectionSolid* geo_Lv2VacHERDwn = new G4IntersectionSolid("", geo_Lv2VacHERDwnpcon, geo_AreaTubeFwdpcon, transform_AreaTubeFwdForHER);
-      G4LogicalVolume *logi_Lv2VacHERDwn = new G4LogicalVolume(geo_Lv2VacHERDwn, mat_Lv2VacHERDwn, "logi_Lv2VacHERDwn_name");
+      G4LogicalVolume* logi_Lv2VacHERDwn = new G4LogicalVolume(geo_Lv2VacHERDwn, mat_Lv2VacHERDwn, "logi_Lv2VacHERDwn_name");
 
       //-   put volume
       setColor(*logi_Lv2VacHERDwn, cLv2VacHERDwn.getString("Color", "#CCCCCC"));
@@ -930,14 +930,14 @@ namespace Belle2 {
       //
       double AreaTubeBwd_rI[AreaTubeBwd_num];
       for (int i = 0; i < AreaTubeBwd_num; i++)
-        { AreaTubeBwd_rI[i] = 0.0; }
+      { AreaTubeBwd_rI[i] = 0.0; }
       //
       double AreaTubeBwd_rO[AreaTubeBwd_num];
       AreaTubeBwd_rO[0] = cAreaTubeBwd.getLength("R1") / Unit::mm;
       AreaTubeBwd_rO[1] = AreaTubeBwd_rO[0];
 
       //define geometry
-      G4Polycone* geo_AreaTubeBwdpcon = new G4Polycone("geo_AreaTubeBwdpcon_name", 0, 2*M_PI, AreaTubeBwd_num, AreaTubeBwd_Z, AreaTubeBwd_rI, AreaTubeBwd_rO);
+      G4Polycone* geo_AreaTubeBwdpcon = new G4Polycone("geo_AreaTubeBwdpcon_name", 0, 2 * M_PI, AreaTubeBwd_num, AreaTubeBwd_Z, AreaTubeBwd_rI, AreaTubeBwd_rO);
 
       //----------
       //- Lv1TaHERUp
@@ -955,7 +955,7 @@ namespace Belle2 {
       //
       double Lv1TaHERUp_rI[Lv1TaHERUp_num];
       for (int i = 0; i < Lv1TaHERUp_num; i++)
-        { Lv1TaHERUp_rI[i] = 0.0; }
+      { Lv1TaHERUp_rI[i] = 0.0; }
       //
       double Lv1TaHERUp_rO[Lv1TaHERUp_num];
       Lv1TaHERUp_rO[0] = cLv1TaHERUp.getLength("R1") / Unit::mm;
@@ -965,11 +965,11 @@ namespace Belle2 {
       G4Material* mat_Lv1TaHERUp = Materials::get(strMat_Lv1TaHERUp);
 
       //define geometry
-      G4Polycone* geo_Lv1TaHERUppcon = new G4Polycone("geo_Lv1TaHERUppcon_name", 0, 2*M_PI, Lv1TaHERUp_num, Lv1TaHERUp_Z, Lv1TaHERUp_rI, Lv1TaHERUp_rO);
+      G4Polycone* geo_Lv1TaHERUppcon = new G4Polycone("geo_Lv1TaHERUppcon_name", 0, 2 * M_PI, Lv1TaHERUp_num, Lv1TaHERUp_Z, Lv1TaHERUp_rI, Lv1TaHERUp_rO);
       G4Transform3D transform_AreaTubeBwdForHER = G4Translate3D(0., 0., 0.);
       transform_AreaTubeBwdForHER = transform_AreaTubeBwdForHER * G4RotateY3D(-Lv1TaHERUp_A1);
       G4IntersectionSolid* geo_Lv1TaHERUp = new G4IntersectionSolid("", geo_Lv1TaHERUppcon, geo_AreaTubeBwdpcon, transform_AreaTubeBwdForHER);
-      G4LogicalVolume *logi_Lv1TaHERUp = new G4LogicalVolume(geo_Lv1TaHERUp, mat_Lv1TaHERUp, "logi_Lv1TaHERUp_name");
+      G4LogicalVolume* logi_Lv1TaHERUp = new G4LogicalVolume(geo_Lv1TaHERUp, mat_Lv1TaHERUp, "logi_Lv1TaHERUp_name");
 
       //-   put volume
       setColor(*logi_Lv1TaHERUp, cLv1TaHERUp.getString("Color", "#00CC00"));
@@ -994,9 +994,9 @@ namespace Belle2 {
       G4Material* mat_Lv2VacHERUp = Materials::get(strMat_Lv2VacHERUp);
 
       //define geometry
-      G4Polycone* geo_Lv2VacHERUppcon = new G4Polycone("geo_Lv2VacHERUppcon_name", 0, 2*M_PI, Lv1TaHERUp_num, Lv1TaHERUp_Z, Lv1TaHERUp_rI, Lv2VacHERUp_rO);
+      G4Polycone* geo_Lv2VacHERUppcon = new G4Polycone("geo_Lv2VacHERUppcon_name", 0, 2 * M_PI, Lv1TaHERUp_num, Lv1TaHERUp_Z, Lv1TaHERUp_rI, Lv2VacHERUp_rO);
       G4IntersectionSolid* geo_Lv2VacHERUp = new G4IntersectionSolid("", geo_Lv2VacHERUppcon, geo_AreaTubeBwdpcon, transform_AreaTubeFwdForHER);
-      G4LogicalVolume *logi_Lv2VacHERUp = new G4LogicalVolume(geo_Lv2VacHERUp, mat_Lv2VacHERUp, "logi_Lv2VacHERUp_name");
+      G4LogicalVolume* logi_Lv2VacHERUp = new G4LogicalVolume(geo_Lv2VacHERUp, mat_Lv2VacHERUp, "logi_Lv2VacHERUp_name");
 
       //-   put volume
       setColor(*logi_Lv2VacHERUp, cLv2VacHERUp.getString("Color", "#CCCCCC"));
@@ -1021,7 +1021,7 @@ namespace Belle2 {
       //
       double Lv1TaLERDwn_rI[Lv1TaLERDwn_num];
       for (int i = 0; i < Lv1TaLERDwn_num; i++)
-        { Lv1TaLERDwn_rI[i] = 0.0; }
+      { Lv1TaLERDwn_rI[i] = 0.0; }
       //
       double Lv1TaLERDwn_rO[Lv1TaLERDwn_num];
       Lv1TaLERDwn_rO[0] = cLv1TaLERDwn.getLength("R1") / Unit::mm;
@@ -1031,11 +1031,11 @@ namespace Belle2 {
       G4Material* mat_Lv1TaLERDwn = Materials::get(strMat_Lv1TaLERDwn);
 
       //define geometry
-      G4Polycone* geo_Lv1TaLERDwnpcon = new G4Polycone("geo_Lv1TaLERDwnpcon_name", 0, 2*M_PI, Lv1TaLERDwn_num, Lv1TaLERDwn_Z, Lv1TaLERDwn_rI, Lv1TaLERDwn_rO);
+      G4Polycone* geo_Lv1TaLERDwnpcon = new G4Polycone("geo_Lv1TaLERDwnpcon_name", 0, 2 * M_PI, Lv1TaLERDwn_num, Lv1TaLERDwn_Z, Lv1TaLERDwn_rI, Lv1TaLERDwn_rO);
       G4Transform3D transform_AreaTubeBwdForLER = G4Translate3D(0., 0., 0.);
       transform_AreaTubeBwdForLER = transform_AreaTubeBwdForLER * G4RotateY3D(-Lv1TaLERDwn_A1);
       G4IntersectionSolid* geo_Lv1TaLERDwn = new G4IntersectionSolid("", geo_Lv1TaLERDwnpcon, geo_AreaTubeBwdpcon, transform_AreaTubeBwdForLER);
-      G4LogicalVolume *logi_Lv1TaLERDwn = new G4LogicalVolume(geo_Lv1TaLERDwn, mat_Lv1TaLERDwn, "logi_Lv1TaLERDwn_name");
+      G4LogicalVolume* logi_Lv1TaLERDwn = new G4LogicalVolume(geo_Lv1TaLERDwn, mat_Lv1TaLERDwn, "logi_Lv1TaLERDwn_name");
 
       //-   put volume
       setColor(*logi_Lv1TaLERDwn, cLv1TaLERDwn.getString("Color", "#0000CC"));
@@ -1060,9 +1060,9 @@ namespace Belle2 {
       G4Material* mat_Lv2VacLERDwn = Materials::get(strMat_Lv2VacLERDwn);
 
       //define geometry
-      G4Polycone* geo_Lv2VacLERDwnpcon = new G4Polycone("geo_Lv2VacLERDwnpcon_name", 0, 2*M_PI, Lv1TaLERDwn_num, Lv1TaLERDwn_Z, Lv1TaLERDwn_rI, Lv2VacLERDwn_rO);
+      G4Polycone* geo_Lv2VacLERDwnpcon = new G4Polycone("geo_Lv2VacLERDwnpcon_name", 0, 2 * M_PI, Lv1TaLERDwn_num, Lv1TaLERDwn_Z, Lv1TaLERDwn_rI, Lv2VacLERDwn_rO);
       G4IntersectionSolid* geo_Lv2VacLERDwn = new G4IntersectionSolid("", geo_Lv2VacLERDwnpcon, geo_AreaTubeBwdpcon, transform_AreaTubeBwdForLER);
-      G4LogicalVolume *logi_Lv2VacLERDwn = new G4LogicalVolume(geo_Lv2VacLERDwn, mat_Lv2VacLERDwn, "logi_Lv2VacLERDwn_name");
+      G4LogicalVolume* logi_Lv2VacLERDwn = new G4LogicalVolume(geo_Lv2VacLERDwn, mat_Lv2VacLERDwn, "logi_Lv2VacLERDwn_name");
 
       //-   put volume
       setColor(*logi_Lv2VacLERDwn, cLv2VacLERDwn.getString("Color", "#CCCCCC"));

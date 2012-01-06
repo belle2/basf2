@@ -24,13 +24,13 @@ namespace Belle2 {
 
     /** Empty constructor for ROOT IO. */
     IRSimHit():
-        m_posIn(0, 0, 0),
-        m_momIn(0, 0, 0),
-        m_posOut(0, 0, 0),
-        m_momOut(0, 0, 0),
-        m_PDGcode(0),
-        m_depEnergy(0),
-        m_Volname("noname") {}
+      m_posIn(0, 0, 0),
+      m_momIn(0, 0, 0),
+      m_posOut(0, 0, 0),
+      m_momOut(0, 0, 0),
+      m_PDGcode(0),
+      m_depEnergy(0),
+      m_Volname("noname") {}
 
     /** Full Constructor. */
     IRSimHit(

@@ -27,11 +27,8 @@
     <state>Liquid</state>
     <density unit="g/cm3">0.125</density>
     <Components>
-      <Material fraction="0.67">Cu</Material>
-      <Material fraction="0.1584">Nb</Material>
-      <Material fraction="0.1716">Ti</Material>
+      <Material fraction="1.0">He</Material>
     </Components>
   </Material>
-
 
 </Materials>

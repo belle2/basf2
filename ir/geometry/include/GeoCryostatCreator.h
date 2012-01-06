@@ -49,6 +49,13 @@ namespace Belle2 {
 
       virtual void create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes type);
 
+    protected:
+
+    private:
+
+      SensitiveDetector* m_sensitive;
+
+
     };
 
   }

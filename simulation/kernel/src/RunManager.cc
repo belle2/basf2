@@ -37,7 +37,7 @@ void RunManager::Initialize()
   //Set geometry to be Initialized because there won't be any before the beginRun
   //FIXME: reverted to run independent
   //geometryInitialized = true;
-  CLHEP::HepRandom::setTheSeed(RandomNumbers::getSeed());
+  CLHEP::HepRandom::setTheSeed(abs(static_cast<long>(RandomNumbers::getSeed())));
   G4RunManager::Initialize();
 }
 

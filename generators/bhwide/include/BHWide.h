@@ -192,7 +192,7 @@ namespace Belle2 {
     /** Generates one single event.
      * @param mcGraph Reference to the MonteCarlo graph into which the generated particles will be stored.
      */
-    void generateEvent(MCParticleGraph &mcGraph);
+    void generateEvent(MCParticleGraph& mcGraph);
 
     /**
      * Terminates the generator.
@@ -253,7 +253,7 @@ namespace Belle2 {
      * @param pdg The PDG code of the particle.
      * @param isVirtual If the particle is a virtual particle, such as the incoming particles, set this to true.
      */
-    void storeParticle(MCParticleGraph &mcGraph, const double *mom, int pdg, bool isVirtual = false);
+    void storeParticle(MCParticleGraph& mcGraph, const double* mom, int pdg, bool isVirtual = false);
 
   private:
 

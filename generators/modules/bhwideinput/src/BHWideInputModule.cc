@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <generators/modules/BHWideInputModule.h>
+#include <generators/modules/bhwideinput/BHWideInputModule.h>
 #include <generators/utilities/cm2LabBoost.h>
 
 #include <framework/datastore/DataStore.h>
@@ -68,7 +68,7 @@ void BHWideInputModule::initialize()
 
       double pzP = sqrt(positronBeamEnergy * positronBeamEnergy - 0.000510998918 * 0.000510998918);
       double pE  = sqrt(electronBeamEnergy * electronBeamEnergy - 0.000510998918 * 0.000510998918);
-      TLorentzVector boostVector(pE*sin(crossingAngle * 0.001), 0., pE * cos(crossingAngle * 0.001) - pzP, electronBeamEnergy + positronBeamEnergy);
+      TLorentzVector boostVector(pE * sin(crossingAngle * 0.001), 0., pE * cos(crossingAngle * 0.001) - pzP, electronBeamEnergy + positronBeamEnergy);
       m_generator.setBoost(boostVector.BoostVector());
     }
   }

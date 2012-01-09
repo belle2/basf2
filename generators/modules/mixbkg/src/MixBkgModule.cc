@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <generators/modules/MixBkgModule.h>
+#include <generators/modules/mixbkg/MixBkgModule.h>
 
 #include <boost/format.hpp>
 

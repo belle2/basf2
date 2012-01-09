@@ -3,7 +3,7 @@ import os
 Import('env')
 
 env['SUBLIB'] = True
-env['LIBS'] = []
+env['LIBS'] = ['$ROOT_LIBS', 'generators_dataobjects', 'framework']
 
 env.Append(FORTRANFLAGS = '-O3 -fno-automatic -ffixed-line-length-none')
 

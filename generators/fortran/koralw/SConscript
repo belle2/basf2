@@ -1,8 +1,0 @@
-import os
-
-Import('env')
-
-env['SUBLIB'] = True
-env['LIBS'] = []
-
-Return('env')

@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <generators/modules/ROFMergerModule.h>
+#include <generators/modules/mixbkg/ROFMergerModule.h>
 
 using namespace std;
 using namespace Belle2;

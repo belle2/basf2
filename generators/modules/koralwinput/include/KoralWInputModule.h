@@ -12,7 +12,7 @@
 #define KORALWINPUTMODULE_H
 
 #include <framework/core/Module.h>
-#include <generators/fortran/interfaces/KoralW.h>
+#include <generators/koralw/KoralW.h>
 
 #include <generators/dataobjects/MCParticle.h>
 #include <generators/dataobjects/MCParticleGraph.h>

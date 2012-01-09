@@ -89,12 +89,12 @@ namespace Belle2 {
     MCParticleGraph m_rofMCParticleGraph;        /**< The MCParticle graph for one full readout frame. */
     std::vector<int> m_mcpToSimHitMap;           /**< List for one full readout frame that maps a SimHit index (the list index) to a MCParticle index. */
     int m_rofGraphUniqueID;                      /**< Unique identifier for the nodes of the ROF graph. */
-    TFile *m_outputRootFile;                     /**< The output root file. */
-    TTree *m_rofTree;                            /**< The readout frame root tree. */
-    TTree *m_contentTree;                        /**< The header root tree which contains information about the file. */
-    TClonesArray *m_readoutFrame;                /**< The current readout frame (a TClonesArray of SimHits). */
-    TClonesArray *m_mcParticles;                 /**< The current MCParticle list (a TClonesArray of MCParticles). */
-    TClonesArray *m_mcPartRels;                  /**< The current relation between a MCParticle and a SimHit (a TClonesArray of relations). */
+    TFile* m_outputRootFile;                     /**< The output root file. */
+    TTree* m_rofTree;                            /**< The readout frame root tree. */
+    TTree* m_contentTree;                        /**< The header root tree which contains information about the file. */
+    TClonesArray* m_readoutFrame;                /**< The current readout frame (a TClonesArray of SimHits). */
+    TClonesArray* m_mcParticles;                 /**< The current MCParticle list (a TClonesArray of MCParticles). */
+    TClonesArray* m_mcPartRels;                  /**< The current relation between a MCParticle and a SimHit (a TClonesArray of relations). */
     int m_event;                                 /**< The current event number. */
     int m_currReadoutFrameIdx;                   /**< The index of the current readout frame. */
     std::vector<std::string> m_SimHitClassNames; /**< Stores the SimHit class name for each subdetector type. */
@@ -110,7 +110,7 @@ namespace Belle2 {
     /** Fill the ROOT readout frame tree and add the MCParticles and the relations if the MCParticle write mode is set. */
     void fillROFTree();
 
-    MCParticleGraph::GraphParticle& createGraphParticle(MCParticleGraph &graph, MCParticle &mcParticle, int motherIndex);
+    MCParticleGraph::GraphParticle& createGraphParticle(MCParticleGraph& graph, MCParticle& mcParticle, int motherIndex);
 
     /**
      * Adds a new particle (+ daughters) to the graph.
@@ -120,12 +120,12 @@ namespace Belle2 {
      * @param useUniqueID Set it to true to store a unique number for each node into the trackID.
      * @param keepList List which specifies the indices of the MCParticle which should be kept. Set it to NULL to skip the list.
      */
-    void addParticleToEventGraph(MCParticleGraph &graph, MCParticle &mcParticle, int motherIndex, const std::vector<bool> &keepList);
+    void addParticleToEventGraph(MCParticleGraph& graph, MCParticle& mcParticle, int motherIndex, const std::vector<bool> &keepList);
 
     /**
      * uniqueIDList relates MCParticle index (list index) to unique ID
      */
-    void addParticleToROFGraph(MCParticle &mcParticle, int motherIndex, std::vector<int> &uniqueIDList);
+    void addParticleToROFGraph(MCParticle& mcParticle, int motherIndex, std::vector<int> &uniqueIDList);
 
   };
 
@@ -154,13 +154,13 @@ namespace Belle2 {
     int colIndex = m_readoutFrame->GetLast() + 1;
     int simHitEvtOffset = colIndex;
     for (int iSimHit = 0; iSimHit < nSimHits; ++iSimHit) {
-      SIMHIT *origSimHit = collection[iSimHit];
+      SIMHIT* origSimHit = collection[iSimHit];
       new((*m_readoutFrame)[colIndex]) SIMHIT(*origSimHit);
 
       //Store the MCParticle index for the given SimHit index (list index) in the vector
       if (m_mcParticleWriteMode > 0) {
         if (mcPartSimHitIndex.getFirstFrom(origSimHit) != NULL) {
-          const MCParticle *mcPart = mcPartSimHitIndex.getFirstFrom(origSimHit)->from;
+          const MCParticle* mcPart = mcPartSimHitIndex.getFirstFrom(origSimHit)->from;
           if (mcPart != NULL) m_mcpToSimHitMap[colIndex] = mcPart->getArrayIndex();
           else m_mcpToSimHitMap[colIndex] = -1;
         }
@@ -182,19 +182,19 @@ namespace Belle2 {
       switch (m_mcParticleWriteMode) {
         case 1: //seen in the subdetector
           for (int iSimHit = 0; iSimHit < nSimHits; ++iSimHit) {
-            SIMHIT *simHit = collection[iSimHit];
+            SIMHIT* simHit = collection[iSimHit];
             if (mcPartSimHitIndex.getFirstFrom(simHit) == NULL) continue;
-            const MCParticle *mcPart = mcPartSimHitIndex.getFirstFrom(simHit)->from;
+            const MCParticle* mcPart = mcPartSimHitIndex.getFirstFrom(simHit)->from;
             if (mcPart != NULL) keepParticle[mcPart->getArrayIndex()] = true;
           }
           break;
         case 2: //seen in the subdetector + mothers
           for (int iSimHit = 0; iSimHit < nSimHits; ++iSimHit) {
-            SIMHIT *simHit = collection[iSimHit];
+            SIMHIT* simHit = collection[iSimHit];
             if (mcPartSimHitIndex.getFirstFrom(simHit) == NULL) continue;
-            const MCParticle *mcPart = mcPartSimHitIndex.getFirstFrom(simHit)->from;
+            const MCParticle* mcPart = mcPartSimHitIndex.getFirstFrom(simHit)->from;
             if (mcPart != NULL) keepParticle[mcPart->getArrayIndex()] = true;
-            MCParticle *mother = mcPart->getMother();
+            MCParticle* mother = mcPart->getMother();
             while (mother != NULL) {
               keepParticle[mother->getArrayIndex()] = true;
               mother = mother->getMother();
@@ -210,7 +210,7 @@ namespace Belle2 {
       //The MCParticle collection has to be sorted breadth first.
       MCParticleGraph eventGraph;
       for (int iPart = 0; iPart < nMCPart; ++iPart) {
-        MCParticle *currParticle = mcPartCollection[iPart];
+        MCParticle* currParticle = mcPartCollection[iPart];
         if (currParticle->getMother() != NULL) break;
         addParticleToEventGraph(eventGraph, *currParticle, 0, keepParticle);
       }
@@ -222,7 +222,7 @@ namespace Belle2 {
       std::vector<int> mapOldToNewIndexEvent;
       mapOldToNewIndexEvent.resize(nMCPart, -1);
       for (unsigned int iPart = 0; iPart < eventGraph.size(); ++iPart) {
-        MCParticleGraph::GraphParticle &currParticle = eventGraph[iPart];
+        MCParticleGraph::GraphParticle& currParticle = eventGraph[iPart];
         mapOldToNewIndexEvent[currParticle.getTrackID()] = currParticle.getArrayIndex();
       }
 
@@ -232,7 +232,7 @@ namespace Belle2 {
       std::vector<int> mcpToUniqueIDMap;
       mcpToUniqueIDMap.resize(nMCPartEvent);
       for (int iPart = 0; iPart < nMCPartEvent; ++iPart) {
-        MCParticle *currParticle = mcParticleEventCol[iPart];
+        MCParticle* currParticle = mcParticleEventCol[iPart];
         if (currParticle->getMother() != NULL) break;
         addParticleToROFGraph(*currParticle, 0, mcpToUniqueIDMap);
       }

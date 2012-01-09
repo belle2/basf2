@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <generators/fortran/interfaces/KoralW.h>
+#include <generators/koralw/KoralW.h>
 
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Unit.h>
@@ -48,19 +48,19 @@ extern"C" {
   } hepevt_;
 
 
-  void kw_setdatapath_(const char *filename, size_t *length);
-  void kw_readatax_(const char *filename, size_t *length, int *reset, int *max, double *xpar);
-  void kw_initialize_(double *xpar);
-  void marini_(int *mar1, int *mar2, int *mar3);
-  void rmarin_(int *mar1, int *mar2, int *mar3);
+  void kw_setdatapath_(const char* filename, size_t* length);
+  void kw_readatax_(const char* filename, size_t* length, int* reset, int* max, double* xpar);
+  void kw_initialize_(double* xpar);
+  void marini_(int* mar1, int* mar2, int* mar3);
+  void rmarin_(int* mar1, int* mar2, int* mar3);
   void kw_make_();
   void kw_finalize_();
-  void kw_getmomdec_(double *p1, double *p2, double *p3, double *p4);
-  void kw_getxsecmc_(double *xSecMC, double *xErrMC);
+  void kw_getmomdec_(double* p1, double* p2, double* p3, double* p4);
+  void kw_getxsecmc_(double* xSecMC, double* xErrMC);
 }
 
 
-void KoralW::init(const std::string &dataPath, const std::string &userDataFile, int randomSeed)
+void KoralW::init(const std::string& dataPath, const std::string& userDataFile, int randomSeed)
 {
   if (dataPath.empty()) B2FATAL("KoralW: The specified data path is empty !")
     if (userDataFile.empty()) B2FATAL("KoralW: The specified user data file is empty !")
@@ -68,7 +68,7 @@ void KoralW::init(const std::string &dataPath, const std::string &userDataFile, 
 
         //Make sure the dataPath ends with an "/"
         string dataPathNew = dataPath;
-  if (dataPath[dataPath.length()-1] != '/') dataPathNew += "/";
+  if (dataPath[dataPath.length() - 1] != '/') dataPathNew += "/";
 
   //Set the path to the data files
   size_t pathLength = dataPathNew.size();
@@ -98,7 +98,7 @@ void KoralW::init(const std::string &dataPath, const std::string &userDataFile, 
 }
 
 
-void KoralW::generateEvent(MCParticleGraph &mcGraph)
+void KoralW::generateEvent(MCParticleGraph& mcGraph)
 {
   kw_make_();
 
@@ -127,10 +127,10 @@ void KoralW::term()
 //                       Protected methods
 //=========================================================================
 
-void KoralW::storeParticle(MCParticleGraph &mcGraph, const float *mom, const float *vtx, int pdg, bool isVirtual)
+void KoralW::storeParticle(MCParticleGraph& mcGraph, const float* mom, const float* vtx, int pdg, bool isVirtual)
 {
   //Create particle
-  MCParticleGraph::GraphParticle &part = mcGraph.addParticle();
+  MCParticleGraph::GraphParticle& part = mcGraph.addParticle();
   if (!isVirtual) {
     part.setStatus(MCParticle::c_PrimaryParticle);
   } else {

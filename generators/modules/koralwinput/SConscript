@@ -1,0 +1,5 @@
+Import('env')
+
+env['LIBS'] = ['generators_koralw', 'generators_dataobjects', 'framework']
+
+Return('env')

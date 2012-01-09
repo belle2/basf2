@@ -48,12 +48,12 @@ namespace Belle2 {
      * @param userDataFile The path and filename of the user input data file, which defines the user settings for the generator.
      * @param randomSeed The random seed for the generator.
      */
-    void init(const std::string &dataPath, const std::string &userDataFile, int randomSeed);
+    void init(const std::string& dataPath, const std::string& userDataFile, int randomSeed);
 
     /** Generates one single event.
      * @param mcGraph Reference to the MonteCarlo graph into which the generated particles will be stored.
      */
-    void generateEvent(MCParticleGraph &mcGraph);
+    void generateEvent(MCParticleGraph& mcGraph);
 
     /**
      * Terminates the generator.
@@ -87,7 +87,7 @@ namespace Belle2 {
      * @param pdg The PDG code of the particle.
      * @param isVirtual If the particle is a virtual particle, such as the incoming particles, set this to true.
      */
-    void storeParticle(MCParticleGraph &mcGraph, const float *mom, const float *vtx, int pdg, bool isVirtual = false);
+    void storeParticle(MCParticleGraph& mcGraph, const float* mom, const float* vtx, int pdg, bool isVirtual = false);
 
 
   private:

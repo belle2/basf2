@@ -14,7 +14,7 @@
 #include <framework/core/Module.h>
 #include <framework/logging/Logger.h>
 
-#include <generators/fortran/interfaces/BHWide.h>
+#include <generators/bhwide/BHWide.h>
 
 #include <generators/dataobjects/MCParticle.h>
 #include <generators/dataobjects/MCParticleGraph.h>
@@ -61,15 +61,15 @@ namespace Belle2 {
     MCParticleGraph m_mcGraph; /**< The MCParticle graph object. */
 
     template <typename T>
-    std::vector<T> make_vector(T const &t1, T const &t2);
+    std::vector<T> make_vector(T const& t1, T const& t2);
 
     template <typename T>
-    std::pair<T, T> vectorToPair(std::vector<T> &vec, const std::string &name = "");
+    std::pair<T, T> vectorToPair(std::vector<T> &vec, const std::string& name = "");
   };
 
 
   template <typename T>
-  inline std::vector<T> BHWideInputModule::make_vector(T const &t1, T const &t2)
+  inline std::vector<T> BHWideInputModule::make_vector(T const& t1, T const& t2)
   {
     std::vector<T> v;
     v.push_back(t1);
@@ -78,7 +78,7 @@ namespace Belle2 {
   }
 
   template <typename T>
-  inline std::pair<T, T> BHWideInputModule::vectorToPair(std::vector<T> &vec, const std::string &name)
+  inline std::pair<T, T> BHWideInputModule::vectorToPair(std::vector<T> &vec, const std::string& name)
   {
     std::pair<T, T> p;
     if (vec.size() != 2) {

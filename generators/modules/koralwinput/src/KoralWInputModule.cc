@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <generators/modules/KoralWInputModule.h>
+#include <generators/modules/koralwinput/KoralWInputModule.h>
 #include <generators/utilities/cm2LabBoost.h>
 
 #include <framework/core/Environment.h>
@@ -75,7 +75,7 @@ void KoralWInputModule::initialize()
 
       double pzP = sqrt(positronBeamEnergy * positronBeamEnergy - 0.000510998918 * 0.000510998918);
       double pE  = sqrt(electronBeamEnergy * electronBeamEnergy - 0.000510998918 * 0.000510998918);
-      TLorentzVector boostVector(pE*sin(crossingAngle * 0.001), 0., pE * cos(crossingAngle * 0.001) - pzP, electronBeamEnergy + positronBeamEnergy);
+      TLorentzVector boostVector(pE * sin(crossingAngle * 0.001), 0., pE * cos(crossingAngle * 0.001) - pzP, electronBeamEnergy + positronBeamEnergy);
       m_generator.setBoost(boostVector.BoostVector());
     }
   }

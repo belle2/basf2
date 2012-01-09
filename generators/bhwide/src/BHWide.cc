@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <generators/fortran/interfaces/BHWide.h>
+#include <generators/bhwide/BHWide.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 
@@ -30,8 +30,8 @@ extern"C" {
     int nphot;           /**< Number of photons. */
   } momset_;
 
-  void bhwide_(int *mode, double *xpar, int *npar);
-  void glimit_(int *number);
+  void bhwide_(int* mode, double* xpar, int* npar);
+  void glimit_(int* number);
 }
 
 
@@ -89,7 +89,7 @@ void BHWide::init()
 }
 
 
-void BHWide::generateEvent(MCParticleGraph &mcGraph)
+void BHWide::generateEvent(MCParticleGraph& mcGraph)
 {
   //Generate event
   int mode = 0;
@@ -159,10 +159,10 @@ void BHWide::applySettings()
 }
 
 
-void BHWide::storeParticle(MCParticleGraph &mcGraph, const double *mom, int pdg, bool isVirtual)
+void BHWide::storeParticle(MCParticleGraph& mcGraph, const double* mom, int pdg, bool isVirtual)
 {
   //Create particle
-  MCParticleGraph::GraphParticle &part = mcGraph.addParticle();
+  MCParticleGraph::GraphParticle& part = mcGraph.addParticle();
   if (!isVirtual) {
     part.setStatus(MCParticle::c_PrimaryParticle);
   } else {
@@ -177,7 +177,7 @@ void BHWide::storeParticle(MCParticleGraph &mcGraph, const double *mom, int pdg,
 
   //Mirror Pz and if boosting is enable boost the particles to the lab frame
   TLorentzVector p4 = part.get4Vector();
-  p4.SetPz(-1.0*p4.Pz());
+  p4.SetPz(-1.0 * p4.Pz());
   if (m_applyBoost) p4 = m_boostVector * p4;
   part.set4Vector(p4);
 }

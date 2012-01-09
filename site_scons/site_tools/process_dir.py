@@ -268,6 +268,7 @@ def process_dir(
     if len(local_test_files) > 0:
         test_filename = 'test_' + lib_name
         test_env = env.Clone()
+        test_env['LIBS'] = []
         sconscript_name = real_path(os.path.join(dir_name, 'tests',
                                     'SConscript'), release_dir)
         if os.path.isfile(sconscript_name):

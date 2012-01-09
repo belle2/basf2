@@ -2,4 +2,5 @@ Import('env')
 
 
 env['LIBS'] = ['tracking', 'framework', 'generators', 'geometry', 'pxd', 'svd', 'cdc', 'genfit','tracking_dataobjects','generators_dataobjects' ,'RaveBase', 'RKTrackRep','$ROOT_LIBS']
+env.Append(CPPDEFINES = {'RaveDllExport':''})
 Return('env')

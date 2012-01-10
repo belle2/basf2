@@ -273,6 +273,7 @@ namespace Belle2 {
       G4ExtrudedSolid* wedge = new  G4ExtrudedSolid("wedge", polygon, Wwidth / 2.0, G4TwoVector(0.0, 0.0), 1.0, G4TwoVector(0.0, 0.0), 1.0);
 
       G4LogicalVolume* qwedge = new G4LogicalVolume(wedge, quartzMaterial, "qwedge");
+      qwedge->SetSensitiveDetector(m_sensitiveTrack);
 
       //!color the glue
 
@@ -311,7 +312,6 @@ namespace Belle2 {
 
       /*! Putt all segment into the Assembly volume */
 
-      //            G4RotationMatrix* rotasem = new G4RotationMatrix(M_PI/2.0, M_PI/2.0,0);
       G4RotationMatrix* rotasem = new G4RotationMatrix(0, 0, 0);
       G4ThreeVector trnsasem(length / 2.0 + Bposition, 0, 0);
 
@@ -325,7 +325,6 @@ namespace Belle2 {
       G4double dz = Bposition - WLength - Gwidth1 - m_topgp->getdGlue() - (m_topgp->getWinthickness() + m_topgp->getMsizez() + m_topgp->getBotthickness()) / 2.0;
       G4double dx = (-Wextdown) / 2.0;
 
-      //            G4RotationMatrix* rotsta = new G4RotationMatrix(0,0,-M_PI/2.0);
       G4RotationMatrix* rotsta = new G4RotationMatrix(M_PI / 2.0, -M_PI / 2.0, -M_PI / 2.0);
       G4ThreeVector trnssta(dz, dx, 0);
 

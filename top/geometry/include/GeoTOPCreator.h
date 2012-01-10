@@ -45,11 +45,12 @@ namespace Belle2 {
       virtual void create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes type);
 
       /**
-       * Creates a quartz bar
+       * Creates a quartz bar with aligned PMTs acording to the moduleID
        * @param content A reference to the content part of the parameter description, which should to be used to create the GEANT objects.
+       * @param moduleID the number used to read the proper alignement parameters.
        * @return G4AssemblyVolume of a whole bar
        */
-      G4AssemblyVolume* buildBar(const GearDir& content);
+      G4AssemblyVolume* buildBar(const GearDir& content, const int moduleID);
 
       /**
        * Creates a segment of electronics which holds 8 PMTs
@@ -59,15 +60,16 @@ namespace Belle2 {
       G4AssemblyVolume* buildElectronics(const GearDir& content);
 
       /**
-       * Creates the support for the quartz bar, PMTs and electronics
+       * Creates one module of the TOP detector quarz+support+PMT und aligns it with the specified aligmenet paraters for each moduleID
        * @param content A reference to the content part of the parameter description, which should to be used to create the GEANT objects.
-       * @return G4AssemblyVolume of a whole Support
+       * @return G4LogicalVolume of a whole TOP module
        */
-      G4LogicalVolume* buildSupport(const GearDir& content);
+      G4LogicalVolume* buildTOPModule(const GearDir& content, const int moduleID);
 
       /**
        * Creates the support for the quartz bar, PMTs and electronics
        * @param content A reference to the content part of the parameter description, which should to be used to create the GEANT objects.
+       * @param moduleID the number used to read the proper alignement parameters.
        * @return G4AssemblyVolume of the desired stack of PMTs
        */
       G4LogicalVolume* buildPMTstack(const GearDir& content);

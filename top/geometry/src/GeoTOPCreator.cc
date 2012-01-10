@@ -92,31 +92,19 @@ namespace Belle2 {
 
       /*! Build detector segment */
 
+      //! Initialize parameters
       m_topgp = TOPGeometryPar::Instance();
       m_topgp->Initialize(content);
-      /*
-      G4LogicalVolume* air = buildSupport(content);
-
-      G4Transform3D aa = G4Translate3D(0 , 0, 0);
-
-      // new G4PVPlacement(aa, PMT, "TOP", &topVolume, false, 1);
-      /* */
 
 
-      G4LogicalVolume* air = buildSupport(content);
-      /*           G4AssemblyVolume* bar = buildBar(content);
+      G4int moduleID = 0;
+      //build one segment
+      G4LogicalVolume* module = buildTOPModule(content, moduleID);
 
-                 G4RotationMatrix* rota = new G4RotationMatrix(0, 0, 0);
-                 G4ThreeVector transa(0, 0, 0);
-
-                 bar->MakeImprint(air, transa, rota, 100, false);
-      //              bar->MakeImprint(&topVolume, transa, rota, 100, false);
-
-
-                 */
       G4double Radius = m_topgp->getRadius() + m_topgp->getQthickness() / 2.0;
       G4int Nbars = m_topgp->getNbars();
 
+      //! position the segment
       for (G4int i = 0; i < Nbars; i++) {
 
         G4double phi = i * 2 * M_PI / ((double)Nbars);
@@ -124,17 +112,15 @@ namespace Belle2 {
         G4RotationMatrix rot(M_PI / 2.0, M_PI / 2.0, -phi);
         G4ThreeVector trans(Radius * cos(phi), Radius * sin(phi), 0);
 
-        new G4PVPlacement(G4Transform3D(rot, trans), air, "PlacedBox", &topVolume, false, i + 1);
+        new G4PVPlacement(G4Transform3D(rot, trans), module, "PlacedTOPModule", &topVolume, false, i + 1);
 
       }
-      /**/
-
 
     }
 
 
 
-    G4AssemblyVolume* GeoTOPCreator::buildBar(const GearDir& content)
+    G4AssemblyVolume* GeoTOPCreator::buildBar(const GearDir& content, const int moduleID)
     {
 
       /*!  Read parameters  */
@@ -204,7 +190,10 @@ namespace Belle2 {
       G4Box* bar = new G4Box("bar", length / 2.0, Qthickness / 2.0 , Qwidth / 2.0);
 
       G4LogicalVolume* qbar = new G4LogicalVolume(bar, quartzMaterial, "cuttest");
+
+      //!make quartz bar sensitive for tracking.
       qbar->SetSensitiveDetector(m_sensitiveTrack);
+
       //! set the color of the bar
       setColor(*qbar, "rgb(0.0,0.75,1.0,1.0)");
       /*!  Build shapes of mirror  */
@@ -329,10 +318,11 @@ namespace Belle2 {
       G4AssemblyVolume* assemblyDetector = new G4AssemblyVolume();
       assemblyDetector->AddPlacedVolume(qbar, trnsasem, rotasem);
       assemblyDetector->AddPlacedVolume(qwedge, trnsasem, rotasem);
-      /*
+
+      //! get the PMT stack and position it
       G4LogicalVolume* stack = buildPMTstack(content);
 
-      G4double dz = Bposition - WLength - Gwidth1 - (m_topgp->getdGlue() + m_topgp->getWinthickness() + m_topgp->getMsizez() + m_topgp->getBotthickness()) / 2.0;
+      G4double dz = Bposition - WLength - Gwidth1 - m_topgp->getdGlue() - (m_topgp->getWinthickness() + m_topgp->getMsizez() + m_topgp->getBotthickness()) / 2.0;
       G4double dx = (-Wextdown) / 2.0;
 
       //            G4RotationMatrix* rotsta = new G4RotationMatrix(0,0,-M_PI/2.0);
@@ -342,7 +332,6 @@ namespace Belle2 {
 
       assemblyDetector->AddPlacedVolume(stack, trnssta, rotsta);
 
-      */
       return assemblyDetector;
 
 
@@ -351,7 +340,7 @@ namespace Belle2 {
 
 
 
-    G4LogicalVolume* GeoTOPCreator::buildSupport(const GearDir& content)
+    G4LogicalVolume* GeoTOPCreator::buildTOPModule(const GearDir& content, const int moduleID)
     {
 
       /*!  Read parameters  */
@@ -409,8 +398,6 @@ namespace Belle2 {
         downside = -Wextdown - Qthickness / 2.0;
       }
 
-      cout << upside << "\t" << downside << endl;
-
       //! Check which is wider bar or PMTs
       G4double side = 0;
 
@@ -465,7 +452,7 @@ namespace Belle2 {
 
       /*! Build quartz bar and insert it into the air */
 
-      G4AssemblyVolume* bar = buildBar(content);
+      G4AssemblyVolume* bar = buildBar(content, moduleID);
       G4RotationMatrix* rota = new G4RotationMatrix(0, 0, 0);
       G4ThreeVector transa(0, 0, 0);
 

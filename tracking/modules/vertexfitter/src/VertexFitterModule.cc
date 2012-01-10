@@ -1,7 +1,5 @@
 #include <tracking/modules/vertexfitter/VertexFitterModule.h>
-
 #include <tracking/dataobjects/VertexFitterVertexContainer.h>
-
 #include <framework/datastore/StoreArray.h>
 #include <geometry/bfieldmap/BFieldMap.h>
 #include <rave/Vertex.h>
@@ -15,7 +13,6 @@
 using namespace Belle2;
 
 REG_MODULE(VertexFitter)
-
 
 class RaveDebug {
 public:
@@ -34,7 +31,6 @@ public:
 VertexFitterModule::VertexFitterModule() : Module()
 {
   setDescription("Integration of VertexFitter Rave (Reconstruction in an Abstract Vertices Environment).");
-
   addParam("GFTracksColName", m_GFTracksColName, "Name of collection holding the GFTrack instances.", std::string(""));
   addParam("RAVEVerticesColName", m_RAVEVerticesColName, "Name of collection holding the rave::Vertex instances.", std::string(""));
 }
@@ -64,7 +60,6 @@ void VertexFitterModule::event()
 
   std::vector<rave::Track> raveTracks;
   raveTracks.reserve(GFTracks.getEntries());
-
   const TVector3 origin(0, 0, 0);
 
   for (int i = 0; i < GFTracks.getEntries(); ++i) {
@@ -116,7 +111,7 @@ void VertexFitterModule::event()
     return;
   }
 
-  const Belle2MagneticField magneticField;
+  Belle2MagneticField magneticField;
   const rave::VertexFactory vertexFactory(magneticField);
   const std::vector<rave::Vertex> vertices = vertexFactory.create(raveTracks);
 

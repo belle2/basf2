@@ -1,5 +1,5 @@
 Import('env')
 
-env['LIBS'] = ['generators_mixbkg', 'generators_dataobjects', 'framework', 'pxd_dataobjects', 'svd_dataobjects']
+env['LIBS'] = ['generators_mixbkg', 'generators_dataobjects', 'framework', 'pxd_dataobjects', 'svd_dataobjects', 'vxd']
 
 Return('env')

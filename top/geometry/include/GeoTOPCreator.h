@@ -68,7 +68,7 @@ namespace Belle2 {
       /**
        * Creates the support for the quartz bar, PMTs and electronics
        * @param content A reference to the content part of the parameter description, which should to be used to create the GEANT objects.
-       * @return G4LogicalVolume of the desired stack of PMTs
+       * @return G4AssemblyVolume of the desired stack of PMTs
        */
       G4LogicalVolume* buildPMTstack(const GearDir& content);
 

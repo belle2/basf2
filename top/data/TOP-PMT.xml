@@ -7,10 +7,11 @@
     <nPMTy desc="Number of PMT modules rows">2</nPMTy>
     <dGlue desc="Thickness of the glue with which the PMTs are glued to the wedge" unit="mm">0.1</dGlue>
     <glueMaterial>PMTGlue</glueMaterial>
+    <stackMaterial>TOPAir</stackMaterial>
     
     <Module> 
         <wallMaterial>TOPPMTCase</wallMaterial>
-        <fillMaterial>TOPAir</fillMaterial>
+        <fillMaterial>TOPVacuum</fillMaterial>
         <ModuleXSize desc="module size in X" unit="mm">27.5</ModuleXSize>
         <ModuleYSize desc="module size in Y" unit="mm">27.5</ModuleYSize>
         <ModuleZSize  desc="module wall size in Z" unit="mm">9.6</ModuleZSize>

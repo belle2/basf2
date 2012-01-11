@@ -1,0 +1,124 @@
+[INFO] Steering file: simple_input.py
+>>> basf2 Python environment set
+>>> Framework object created: fw
+[INFO] Opened file simple_input.root
+[INFO] Opened tree tree
+[WARNING] initializeActive is false while you try to create an object EventMetaData under EDurability 0
+[WARNING] initializeActive is false while you try to create an object PXDClustersToPXDDigits under EDurability 0
+[WARNING] initializeActive is false while you try to create an object PXDClustersToPXDTrueHits under EDurability 0
+[INFO] ========================================================================
+[INFO] >>> Start new run: 1
+[INFO] ------------------------------------------------------------------------
+[INFO] EXP NUMBER: 0
+[INFO] RUN NUMBER: 1
+[INFO] EVT NUMBER: 0
+[INFO] ============================================================================
+[INFO] DataStore collections in event 0
+[INFO] ============================================================================
+[INFO] 
+[INFO] (Type)    Name                      Number entries                   <Event>
+[INFO] ----------------------------------------------------------------------------
+[INFO] (Object)  EventMetaData
+[INFO] (Object)  PXDClustersToPXDDigits
+[INFO] (Object)  PXDClustersToPXDTrueHits
+[INFO] (Array)   PXDDigits                 177
+[INFO] (Array)   PXDTrueHits               40
+[INFO] 
+[INFO] (Type)    Name                      Number entries                     <Run>
+[INFO] ----------------------------------------------------------------------------
+[INFO] 
+[INFO] (Type)    Name                      Number entries              <Persistent>
+[INFO] ----------------------------------------------------------------------------
+[INFO] 
+[INFO] ============================================================================
+[INFO] EXP NUMBER: 0
+[INFO] RUN NUMBER: 1
+[INFO] EVT NUMBER: 1
+[INFO] ============================================================================
+[INFO] DataStore collections in event 1
+[INFO] ============================================================================
+[INFO] 
+[INFO] (Type)    Name                      Number entries                   <Event>
+[INFO] ----------------------------------------------------------------------------
+[INFO] (Object)  EventMetaData
+[INFO] (Object)  PXDClustersToPXDDigits
+[INFO] (Object)  PXDClustersToPXDTrueHits
+[INFO] (Array)   PXDDigits                 165
+[INFO] (Array)   PXDTrueHits               37
+[INFO] 
+[INFO] (Type)    Name                      Number entries                     <Run>
+[INFO] ----------------------------------------------------------------------------
+[INFO] 
+[INFO] (Type)    Name                      Number entries              <Persistent>
+[INFO] ----------------------------------------------------------------------------
+[INFO] 
+[INFO] ============================================================================
+[INFO] EXP NUMBER: 0
+[INFO] RUN NUMBER: 1
+[INFO] EVT NUMBER: 2
+[INFO] ============================================================================
+[INFO] DataStore collections in event 2
+[INFO] ============================================================================
+[INFO] 
+[INFO] (Type)    Name                      Number entries                   <Event>
+[INFO] ----------------------------------------------------------------------------
+[INFO] (Object)  EventMetaData
+[INFO] (Object)  PXDClustersToPXDDigits
+[INFO] (Object)  PXDClustersToPXDTrueHits
+[INFO] (Array)   PXDDigits                 150
+[INFO] (Array)   PXDTrueHits               59
+[INFO] 
+[INFO] (Type)    Name                      Number entries                     <Run>
+[INFO] ----------------------------------------------------------------------------
+[INFO] 
+[INFO] (Type)    Name                      Number entries              <Persistent>
+[INFO] ----------------------------------------------------------------------------
+[INFO] 
+[INFO] ============================================================================
+[INFO] EXP NUMBER: 0
+[INFO] RUN NUMBER: 1
+[INFO] EVT NUMBER: 3
+[INFO] ============================================================================
+[INFO] DataStore collections in event 3
+[INFO] ============================================================================
+[INFO] 
+[INFO] (Type)    Name                      Number entries                   <Event>
+[INFO] ----------------------------------------------------------------------------
+[INFO] (Object)  EventMetaData
+[INFO] (Object)  PXDClustersToPXDDigits
+[INFO] (Object)  PXDClustersToPXDTrueHits
+[INFO] (Array)   PXDDigits                 103
+[INFO] (Array)   PXDTrueHits               18
+[INFO] 
+[INFO] (Type)    Name                      Number entries                     <Run>
+[INFO] ----------------------------------------------------------------------------
+[INFO] 
+[INFO] (Type)    Name                      Number entries              <Persistent>
+[INFO] ----------------------------------------------------------------------------
+[INFO] 
+[INFO] ============================================================================
+[INFO] EXP NUMBER: 0
+[INFO] RUN NUMBER: 1
+[INFO] EVT NUMBER: 4
+[INFO] ============================================================================
+[INFO] DataStore collections in event 4
+[INFO] ============================================================================
+[INFO] 
+[INFO] (Type)    Name                      Number entries                   <Event>
+[INFO] ----------------------------------------------------------------------------
+[INFO] (Object)  EventMetaData
+[INFO] (Object)  PXDClustersToPXDDigits
+[INFO] (Object)  PXDClustersToPXDTrueHits
+[INFO] (Array)   PXDDigits                 165
+[INFO] (Array)   PXDTrueHits               48
+[INFO] 
+[INFO] (Type)    Name                      Number entries                     <Run>
+[INFO] ----------------------------------------------------------------------------
+[INFO] 
+[INFO] (Type)    Name                      Number entries              <Persistent>
+[INFO] ----------------------------------------------------------------------------
+[INFO] 
+[INFO] ============================================================================
+[INFO] ------------------------------------------------------------------------
+[INFO] <<< End run: 1
+[INFO] ========================================================================

@@ -187,13 +187,6 @@ def process_dir(
                 parent_env.Append(LIBS=[lib_name])
                 parent_env['DATAOBJECT_LIB'] = lib_name
 
-            # link the main package library to all (python) modules
-            if is_package_dir:
-                env['PACKAGE_LIB'] = env['PACKAGE']
-            package_lib = parent_env.Dictionary().get('PACKAGE_LIB', None)
-            if (is_module_dir or is_python_module_dir) and package_lib != None:
-                env.Append(LIBS=parent_env['PACKAGE_LIB'])
-
             # create library and map for modules
             lib = env.SharedLibrary(os.path.join(lib_dir_name, lib_name),
                                     [env['SRC_FILES'], dict_files])

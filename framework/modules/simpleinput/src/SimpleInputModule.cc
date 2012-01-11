@@ -33,6 +33,7 @@ SimpleInputModule::SimpleInputModule() : Module()
   for (int jj = 0; jj < DataStore::c_NDurabilityTypes; jj++) {
     m_size[jj]    = 0;
     m_sizeObj[jj] = 0;
+    m_objects[jj] = 0;
     m_treeNames[jj]   = "NONE";
     m_tree[jj] = 0;
   }
@@ -68,7 +69,11 @@ SimpleInputModule::SimpleInputModule() : Module()
 
 
 SimpleInputModule::~SimpleInputModule()
-{}
+{
+  for (size_t jj = 0; jj < DataStore::c_NDurabilityTypes; jj++) {
+    delete[] m_objects[jj];
+  }
+}
 
 void SimpleInputModule::initialize()
 {
@@ -86,16 +91,14 @@ void SimpleInputModule::initialize()
       B2INFO("Opened tree " + m_treeNames[ii]);
 
 
-
       //Connect the branches to the TObject pointers
       TObjArray* branches = m_tree[ii]->GetListOfBranches();
-      TBranch* branch = 0;
 
       //How many objects, How many arrays
       for (int jj = 0; jj < branches->GetEntriesFast(); jj++) {
-        branch = validBranch(jj, branches);
+        TBranch* branch = validBranch(jj, branches);
         if (branch) {
-          //Count none TClonesArrays extra
+          //Count non-TClonesArrays extra
           if (static_cast<string>(branch->GetClassName()) != "TClonesArray") {
             m_sizeObj[ii]++;
           }
@@ -116,19 +119,18 @@ void SimpleInputModule::initialize()
       int iarray = 0;
       m_objectNames[ii].resize(m_size[ii], "");
       for (int jj = 0; jj < branches->GetEntriesFast(); jj++) {
-        branch = validBranch(jj, branches);
+        TBranch* branch = validBranch(jj, branches);
         if (branch) {
           if (static_cast<string>(branch->GetClassName()) == "TClonesArray") {
             branch->SetAddress(&(m_objects[ii][iarray + m_sizeObj[ii]]));
             m_objectNames[ii][iarray + m_sizeObj[ii]] = static_cast<string>(branch->GetName());
             iarray++;
-            branch->GetEntry(0);
           } else {
             branch->SetAddress(&(m_objects[ii][iobject]));
             m_objectNames[ii][iobject] = static_cast<string>(branch->GetName());
             iobject++;
-            branch->GetEntry(0);
           }
+          branch->GetEntry(0);
         }
       }
     }
@@ -141,8 +143,6 @@ void SimpleInputModule::initialize()
 
     }
   }
-
-
 }
 
 
@@ -168,18 +168,13 @@ void SimpleInputModule::event()
 
 void SimpleInputModule::endRun()
 {
-  cout << "endRun called" << endl;
+  B2DEBUG(200, "endRun called");
 }
 
 
 void SimpleInputModule::terminate()
 {
-  cout << "Term called" << endl;
-}
-
-
-void SimpleInputModule::setupTFile()
-{
+  B2DEBUG(200, "Term called");
 }
 
 
@@ -189,38 +184,16 @@ void SimpleInputModule::readTree(const DataStore::EDurability& durability)
   B2DEBUG(200, "Durability" << durability)
   if (m_counterNumber[durability] >= m_tree[durability]->GetEntriesFast()) return;
 
-  //Connect the branches to the TObject pointers
-  TObjArray* branches = m_tree[durability]->GetListOfBranches();
-  TBranch* branch = 0;
   int ii = durability;
-  //How many objects, How many arrays
-  m_sizeObj[ii] = 0;
-  m_size[ii] = 0;
-  for (int jj = 0; jj < branches->GetEntriesFast(); jj++) {
-    branch = validBranch(jj, branches);
-    if (branch) {
-      //Count none TClonesArrays extra
-      if (static_cast<string>(branch->GetClassName()) != "TClonesArray") {
-        m_sizeObj[ii]++;
-      }
-      m_size[ii]++;
-    }
-  }
-  B2DEBUG(150, "m_sizeObj[" << ii << "] : " << m_sizeObj[ii]);
-  B2DEBUG(150, "m_size["    << ii << "] : " << m_size[ii]);
-
-  //Create the TObject pointers
-  m_objects[ii] = new TObject* [m_size[ii]];
   for (int jj = 0; jj < m_size[ii]; jj++) {
     m_objects[ii][jj] = 0;
   }
 
   //Go again over the branchlist and connect the branches with TObject pointers
   int iobject = 0;
-  //int iarray = 0;
-  m_objectNames[ii].resize(m_size[ii], "");
+  TObjArray* branches = m_tree[durability]->GetListOfBranches();
   for (int jj = 0; jj < branches->GetEntriesFast(); jj++) {
-    branch = validBranch(jj, branches);
+    TBranch* branch = validBranch(jj, branches);
     if (branch) {
       if (static_cast<string>(branch->GetClassName()) == "TClonesArray") {
         /*

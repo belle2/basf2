@@ -76,9 +76,6 @@ namespace Belle2 {
     /*! gives back Null, if the branch isn't good for read out. */
     TBranch* validBranch(int& ibranch, TObjArray* branches);
 
-    /*! Some TFile setup. */
-    void setupTFile();
-
     /*! Function that actually performs the reading from the tree into m_objects. */
     void readTree(const DataStore::EDurability& durability);
 

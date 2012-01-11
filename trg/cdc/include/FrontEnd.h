@@ -54,6 +54,8 @@ class TRGCDCFrontEnd
     /// returns type.
     boardType type(void) const;
 
+  public:// VHDL utilities
+
     /// make a VHDL component file. Non-zero value will be returned if errors occured.
     static int implementation(const boardType & type, std::ofstream &);
 

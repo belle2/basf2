@@ -57,13 +57,13 @@ class TRGCDCTrackBase {
     float charge(void) const;
 
     /// returns momentum vector.
-    const CLHEP::HepLorentzVector & p(void) const;
+    virtual const CLHEP::Hep3Vector & p(void) const;
 
     /// returns Pt.
     virtual float pt(void) const;
 
     /// returns position vector.
-    const CLHEP::Hep3Vector & v(void) const;
+    virtual const CLHEP::Hep3Vector & x(void) const;
 
     /// dumps debug information.
     virtual void dump(const std::string & message = std::string(""),
@@ -120,14 +120,17 @@ class TRGCDCTrackBase {
     float _charge;
 
     /// Momentum.
-    CLHEP::HepLorentzVector _p;
+    CLHEP::Hep3Vector _p;
 
     /// Position.
-    CLHEP::Hep3Vector _v;
+    CLHEP::Hep3Vector _x;
 
-    /// Links.
+    /// Links for each super layer
 //  std::vector<const TRGCDCLink *> * _ts;
     std::vector<TRGCDCLink *> * _ts;
+
+    /// Links for all super layers
+    std::vector<TRGCDCLink *> _tsAll;
 
     /// Size of _ts.
     const unsigned _nTs;
@@ -165,15 +168,15 @@ TRGCDCTrackBase::status(void) const {
 }
 
 inline
-const CLHEP::HepLorentzVector &
+const CLHEP::Hep3Vector &
 TRGCDCTrackBase::p(void) const {
     return _p;
 }
 
 inline
 const CLHEP::Hep3Vector &
-TRGCDCTrackBase::v(void) const {
-    return _v;
+TRGCDCTrackBase::x(void) const {
+    return _x;
 }
 
 inline

@@ -106,6 +106,9 @@ TRGCDCDisplayDrawingAreaHough::on_button_press_event(GdkEventButton * e) {
     //...Clear window as a default...
     on_expose_event((GdkEventExpose *) NULL);
 
+    //...HP there?...
+    if (! _hp) return true;
+
     //...Get cell ID...
     const int cx0 = int(float(e->x) / _scaleX / _hp->xSize());
     const int cy0 = _hp->nY() - int(float(e->y) / _scaleY / _hp->ySize());

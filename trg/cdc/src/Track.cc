@@ -38,7 +38,7 @@ TRGCDCTrack::TRGCDCTrack(const TCCircle & c)
 
     //...Basic stuff...
 //    const string newName = "CopyOF" + c.name();
-    name("CopyOF" + c.name());
+    name("CopyOf" + c.name());
     charge(c.charge());
 
     //...Set a defualt fitter...
@@ -57,9 +57,9 @@ TRGCDCTrack::TRGCDCTrack(const TCCircle & c)
     _helix.a(a);
 
     //...Update links...
-    unsigned n = _ts[_nTs].size();
+    unsigned n = _tsAll.size();
     for (unsigned i = 0; i < n; i++)
-	_ts[_nTs][i]->track(this);
+	_tsAll[i]->track(this);
 
     _fitted = false;
 }

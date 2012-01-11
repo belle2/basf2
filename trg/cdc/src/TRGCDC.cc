@@ -1159,24 +1159,24 @@ TRGCDC::simulate(void) {
 
     //...3D tracker...
     vector<TCTrack *> trackList3D;
-    _fitter3D->doit(trackList, trackList3D);
+//    _fitter3D->doit(trackList, trackList3D);
 
     //...End of simulation...
 
 
 #ifdef TRGCDC_DISPLAY
 //  cdc.dump("hits");
-    vector<const TCTrack *> tt;
-    tt.assign(trackList.begin(), trackList.end());
+//     vector<const TCTrack *> tt;
+//     tt.assign(trackList.begin(), trackList.end());
     D->endOfEvent();
     string stg = "2D : Perfect Finding";
     string inf = "   ";
-    D->clear();
-    D->stage(stg);
-    D->information(inf);
-    D->area().append(hits());
-    D->area().append(tsHits());
-    D->area().append(tt);
+//     D->clear();
+//     D->stage(stg);
+//     D->information(inf);
+//     D->area().append(hits());
+//     D->area().append(tsHits());
+//    D->area().append(tt);
     D->show();
     D->run();
 //     unsigned iFront = 0;

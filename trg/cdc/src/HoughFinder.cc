@@ -280,17 +280,20 @@ TRGCDCHoughFinder::doitPerfectly(vector<TRGCDCTrack *> & trackList) {
     trackList.push_back(track);
 
     if (TRGDebug::level())
- 	track->dump();
+ 	track->dump("detail");
 
 #ifdef TRGCDC_DISPLAY
     vector<const TCCircle *> cc;
     cc.push_back(& c);
+    vector<const TCTrack *> tt;
+    tt.push_back(track);
     string stg = "2D : Perfect Finder circle fit";
     string inf = "   ";
     D->clear();
     D->stage(stg);
     D->information(inf);
     D->area().append(cc, Gdk::Color("#FF0066009900"));
+//  D->area().append(tt, Gdk::Color("#990066009900"));
     D->area().append(_cdc.hits());
     D->area().append(_cdc.tsHits());
     D->show();

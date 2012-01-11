@@ -55,6 +55,15 @@ class TRGCDCTrack : public TRGCDCTrackBase {
     /// calculates the closest approach to a wire in real space. Results are stored in TLink. Return value is negative if error happened.
     int approach(TRGCDCLink &, bool sagCorrection = false) const;
     
+    /// returns momentum vector.
+    virtual const CLHEP::Hep3Vector & p(void) const;
+
+    /// returns Pt.
+    virtual float pt(void) const;
+
+    /// returns position vector.
+    virtual const CLHEP::Hep3Vector & x(void) const;
+
   private:// static members
 
     /// a vector to keep all TRGCDCTrack objects.
@@ -64,6 +73,12 @@ class TRGCDCTrack : public TRGCDCTrackBase {
 
     /// Helix parameter.
     TRGCDCHelix _helix;
+
+    /// Momentum.
+    mutable CLHEP::Hep3Vector _p;
+
+    /// Position.
+    mutable CLHEP::Hep3Vector _x;
 };
 
 //-----------------------------------------------------------------------------
@@ -83,6 +98,27 @@ inline
 const TRGCDCHelix &
 TRGCDCTrack::helix(void) const {
     return _helix;
+}
+
+inline
+const CLHEP::Hep3Vector &
+TRGCDCTrack::p(void) const {
+    _p = _helix.momentum();
+    return _p;
+}
+
+inline
+float
+TRGCDCTrack::pt(void) const {
+    _p = _helix.momentum();
+    return _p.perp();
+}
+
+inline
+const CLHEP::Hep3Vector &
+TRGCDCTrack::x(void) const {
+    _x = _helix.x();
+    return _x;
 }
 
 } // namespace Belle2

@@ -31,28 +31,26 @@ TRGCDCTrackBase::TRGCDCTrackBase(const string & name, float charge)
       _nTs(TRGCDC::getTRGCDC()->nSuperLayers()),
       _fitter(0),
       _fitted(false) {
-//  _ts = new vector<const TCLink *>[_nTs + 1];
-    _ts = new vector<TCLink *>[_nTs + 1];
+    _ts = new vector<TCLink *>[_nTs];
 
-//     TCLink * t = 0;
-//     for (unsigned i = 0; i < n + 1; i++)
-// 	_ts[i].push_back(t);
-
+//    cout << ">>> " << _ts[0].size() << "," << _ts[1].size() << "," << _ts[2].size() << endl;
 }
 
 TRGCDCTrackBase::~TRGCDCTrackBase() {
     delete[] _ts;
+    _tsAll.clear();
 }
 
 void
 TRGCDCTrackBase::dump(const string & cmd, const string & pre) const {
-    const string tab = TRGDebug::tab() + pre;
+    string tab = TRGDebug::tab() + pre;
+    cout << tab << "Dump of " << name() << endl;
+    tab += "    ";
 
-    if (cmd.find("detail") != string::npos)
-        cout << tab << name() << ":status=" << status() << ":p="
-	     << _p << ":v=" << _v << endl;
+    cout << tab << "status=" << status() << ":p=" << p() << ":x=" << x()
+	 << endl;
     cout << tab;
-    for (unsigned i = 0; i < _nTs - 1; i++) {
+    for (unsigned i = 0; i < _nTs; i++) {
 	cout << i << "=" << _ts[i].size();
         for (unsigned j = 0; j < _ts[i].size(); j++) {
             if (j == 0)
@@ -72,7 +70,7 @@ void
 TRGCDCTrackBase::append(TRGCDCLink * a) {
 //    (* _ts)[a->wire()->superLayerId()]->push_back(a);
     _ts[a->wire()->superLayerId()].push_back(a);
-    _ts[_nTs - 1].push_back(a);
+    _tsAll.push_back(a);
 }
 
 void
@@ -84,7 +82,7 @@ TRGCDCTrackBase::append(const vector<TCLink *> links) {
 
 const std::vector<TRGCDCLink *> &
 TRGCDCTrackBase::links(void) const {
-    return _ts[_nTs - 1];
+    return _tsAll;
 }
 
 const std::vector<TRGCDCLink *> &

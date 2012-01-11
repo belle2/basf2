@@ -351,10 +351,14 @@ TRGCDCDisplayDrawingAreaRphi::drawTrack(const TCTrack & t,
     const TRGCDC & cdc = * TRGCDC::getTRGCDC();
 
     //...Draw segments first...
+    t.dump("detail");
     for (unsigned i = 0; i < cdc.nSuperLayers(); i++) {
         const vector<TCLink *> & links = t.links(i);
         for (unsigned j = 0; j < links.size(); j++) {
-            drawTrackSegment(* (TCTSegment *) links[j]->wire(), lineWidth, c, s);
+            drawTrackSegment(* (TCTSegment *) links[j]->wire(),
+			     lineWidth,
+			     c,
+			     s);
         }
     }
 

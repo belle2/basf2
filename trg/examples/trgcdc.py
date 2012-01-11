@@ -1,48 +1,48 @@
 import os
 from basf2 import *
 
-#...Register modules
+#...Modules...
 evtmetagen  = register_module("EvtMetaGen")
 evtmetainfo = register_module("EvtMetaInfo")
-paramloader = register_module("ParamLoaderXML")
-geobuilder  = register_module("GeoBuilder")
-pGun = register_module("PGunInput")
+paramloader = register_module("Gearbox")
+geobuilder = register_module("Geometry")
+geobuilder.log_level = LogLevel.INFO
 g4sim       = register_module("FullSim")
-mcparticle = register_module('PrintMCParticles')
 cdcdigitizer = register_module("CDCDigi")
-#out         = register_module("SimpleOutput")
-#trasan      = register_module("Trasan")
+out         = register_module("SimpleOutput")
+#trasan      = fw.register_module("Trasan")
 cdctrg      = register_module("TRGCDC")
+pGun        = register_module("PGunInput")
+mcparticle  = register_module('PrintMCParticles')
 
-#...Set parameters
-evtmetagen.param('EvtNumList', [100])
-paramloader.param('InputFileXML', os.path.join(basf2datadir,"simulation/Belle2.xml"))
+#...Events to generate...
+evtmetagen.param({'EvtNumList':[100], 'RunList': [1]})
 
-# 3 particles with uniform momentum distribution between 0.9 an 1.1 GeV
-param_pGun = {'ntracks': 1, 'p_par1': 0.9, 'p_par2': 1.1, 'th_par1':90, 'th_par2':90}
-pGun.param(param_pGun)
+#...Particle gun...
+pGun.param('nTracks',1)
+pGun.param('pPar1',3.0)
+pGun.param('pPar2',3.0)
+pGun.param('thetaPar1',90)
+pGun.param('thetaPar2',90)
 
 #...CDC Trigger...
-cdctrg.param('DebugLevel', 2)
 cdctrg.param('ConfigFile', os.path.join(basf2datadir,"trg/TRGCDCConfig_0_20101111_1051.dat"))
-cdctrg.param('CurlBackStop', 1)
-cdctrg.param('HoughFinderPerfect', 1)
+cdctrg.param('DebugLevel',2)
+cdctrg.param('CurlBackStop',1)
+cdctrg.param('HoughFinderPerfect',1)
 
-##Create paths
-main = create_path()
-
-##Add modules to paths
+#...Path...
+main = fw.create_path()
 main.add_module(evtmetagen)
 main.add_module(evtmetainfo)
 main.add_module(paramloader)
 main.add_module(geobuilder)
 main.add_module(pGun)
 main.add_module(g4sim)
-main.add_module(mcparticle)
 main.add_module(cdcdigitizer)
 #main.add_module(trasan)
 main.add_module(cdctrg)
-#main.add_module(out)
+main.add_module(out)
 
-##Process events
-process(main)
+#...Process events...
+fw.process(main)

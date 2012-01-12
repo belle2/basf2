@@ -22,7 +22,7 @@
   <xi:include href="../eklm/EKLMMaterials.xml"/>
 
   <!-- Magnetic field -->
-  <xi:include href="../simulation/MagneticField.xml"/>
+  <xi:include href="../geometry/MagneticFieldConstant.xml"/>
 
   <!-- Subdedectors -->
   <xi:include href="../structure/COIL.xml"/>

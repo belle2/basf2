@@ -138,8 +138,8 @@ namespace Belle2 {
     int m_apertSizeHER, m_apertSizeLER;            /**< The size of the aperture*/
     double m_beamEnergyHER, m_beamEnergyLER;       /**< The beamEnergy*/
 
-    ParamPoint *m_mapBufferHER, *m_mapBufferLER;    /**< The memory buffer for the field parameters. */
-    ApertPoint *m_apertBufferHER, *m_apertBufferLER; /**< The memory buffer for the aperture parameters. */
+    ParamPoint* m_mapBufferHER, *m_mapBufferLER;    /**< The memory buffer for the field parameters. */
+    ApertPoint* m_apertBufferHER, *m_apertBufferLER; /**< The memory buffer for the aperture parameters. */
 
   };
 

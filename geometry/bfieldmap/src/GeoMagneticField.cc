@@ -14,6 +14,7 @@
 #include <geometry/bfieldmap/BFieldComponentConstant.h>
 #include <geometry/bfieldmap/BFieldComponentRadial.h>
 #include <geometry/bfieldmap/BFieldComponentQuad.h>
+#include <geometry/bfieldmap/BFieldComponentBeamline.h>
 #include <geometry/CreatorFactory.h>
 
 
@@ -44,6 +45,7 @@ GeoMagneticField::GeoMagneticField() : CreatorBase()
   m_componentTypeMap.insert(make_pair("Constant", boost::bind(&GeoMagneticField::readConstantBField, this, _1)));
   m_componentTypeMap.insert(make_pair("Radial",   boost::bind(&GeoMagneticField::readRadialBField,   this, _1)));
   m_componentTypeMap.insert(make_pair("Quad",     boost::bind(&GeoMagneticField::readQuadBField,     this, _1)));
+  m_componentTypeMap.insert(make_pair("Beamline", boost::bind(&GeoMagneticField::readBeamlineBField, this, _1)));
 }
 
 
@@ -53,14 +55,14 @@ GeoMagneticField::~GeoMagneticField()
 }
 
 
-void GeoMagneticField::create(const GearDir& content, G4LogicalVolume &topVolume, geometry::GeometryTypes type)
+void GeoMagneticField::create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes type)
 {
   //Read the magnetic field components
   GearDir components(content, "Components/Component");
 
   //Loop over all components of the magnetic field
   CompTypeMap::iterator findIter;
-  BOOST_FOREACH(const GearDir &component, content.getNodes("Components/Component")) {
+  BOOST_FOREACH(const GearDir & component, content.getNodes("Components/Component")) {
     //Get the type of the magnetic field and call the appropriate function
     string compType = component.getString("attribute::type");
     B2DEBUG(10, "GeoMagneticField creator: Loading the parameters for the component type'" << compType << "'")
@@ -136,4 +138,27 @@ void GeoMagneticField::readQuadBField(const GearDir& component)
   bComp.setMapSize(mapSizeHER, mapSizeLER);
   bComp.setApertSize(apertSizeHER, apertSizeLER);
   bComp.setBeamEnergy(beamEnergyHER, beamEnergyLER);
+}
+
+void GeoMagneticField::readBeamlineBField(const GearDir& component)
+{
+  string mapFilenameHER = component.getString("MapFilenameHER");
+  string mapFilenameLER = component.getString("MapFilenameLER");
+  string interFilenameHER = component.getString("InterFilenameHER");
+  string interFilenameLER = component.getString("InterFilenameLER");
+
+  double mapRegionMinZ = component.getLength("ZMin");
+  double mapRegionMaxZ = component.getLength("ZMax");
+
+  double mapRegionMinR = component.getLength("RadiusMin");
+  double mapRegionMaxR = component.getLength("RadiusMax");
+
+  double beamAngle = component.getLength("BeamAngle");
+
+  BFieldComponentBeamline& bComp = BFieldMap::Instance().addBFieldComponent<BFieldComponentBeamline>();
+  bComp.setMapFilename(mapFilenameHER, mapFilenameLER);
+  bComp.setInterpolateFilename(interFilenameHER, interFilenameLER);
+  bComp.setMapRegionZ(mapRegionMinZ, mapRegionMaxZ);
+  bComp.setMapRegionR(mapRegionMinR, mapRegionMaxR);
+  bComp.setBeamAngle(beamAngle);
 }

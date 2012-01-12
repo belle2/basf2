@@ -106,7 +106,7 @@ namespace Belle2 {
   private:
 
     std::string m_mapFilename; /**< The filename of the magnetic field map. */
-    BFieldPoint **m_mapBuffer; /**< The memory buffer for the magnetic field map. */
+    BFieldPoint** m_mapBuffer; /**< The memory buffer for the magnetic field map. */
     int m_mapSize[2];          /**< The size of the map in r and z. */
     double m_mapRegionZ[2];    /**< The min and max boundaries of the map region in z. */
     double m_mapOffset;        /**< Offset required because the accelerator group defines the Belle center as zero. */

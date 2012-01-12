@@ -49,7 +49,7 @@ namespace Belle2 {
      *
      * @param content A reference to the content part of the parameter description, which should to be used to create the ROOT objects.
      */
-    virtual void create(const GearDir& content, G4LogicalVolume &topVolume, geometry::GeometryTypes type);
+    virtual void create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes type);
 
 
   protected:
@@ -74,6 +74,11 @@ namespace Belle2 {
      * @param component The GearDir pointing to the component parameter block from which the parameters should be read.
      */
     void readQuadBField(const GearDir& component);
+
+    /**
+     * Reads the 3D Bfield map and parameters near beam pipes and adds the component to the global magnetic field.
+     */
+    void readBeamlineBField(const GearDir& component);
 
 
   private:

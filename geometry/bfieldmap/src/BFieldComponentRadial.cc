@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include <geometry/bfieldmap/BFieldComponentRadial.h>
+#include <geometry/bfieldmap/BFieldComponentBeamline.h>
 
 #include <framework/core/Environment.h>
 #include <framework/core/utilities.h>
@@ -24,7 +25,6 @@
 using namespace std;
 using namespace Belle2;
 namespace io = boost::iostreams;
-
 
 BFieldComponentRadial::BFieldComponentRadial() : m_mapFilename("")
 {
@@ -84,6 +84,11 @@ void BFieldComponentRadial::initialize()
 
 TVector3 BFieldComponentRadial::calculate(const TVector3& point) const
 {
+  // When BFieldComponentBeamline return finit field, it return zero field;
+  if (BFieldComponentBeamline::isInRange(point)) {
+    return TVector3(0.0, 0.0, 0.0);
+  }
+
   //Get the r and z component
   double r = point.Perp();
   double z = point.Z();
@@ -110,15 +115,15 @@ TVector3 BFieldComponentRadial::calculate(const TVector3& point) const
 
   //Calculate the linear approx. of the magnetic field vector
   double Br1 = m_mapBuffer[ir][iz].r;
-  double Br2 = m_mapBuffer[ir][iz+1].r;
-  double Br3 = m_mapBuffer[ir+1][iz].r;
-  double Br4 = m_mapBuffer[ir+1][iz+1].r;
+  double Br2 = m_mapBuffer[ir][iz + 1].r;
+  double Br3 = m_mapBuffer[ir + 1][iz].r;
+  double Br4 = m_mapBuffer[ir + 1][iz + 1].r;
   double Br = ((Br1 * (m_gridPitchZ - dz) + Br2 * dz) * (m_gridPitchR - dr) + (Br3 * (m_gridPitchZ - dz) + Br4 * dz) * dr) / m_gridPitchZ / m_gridPitchR;
 
   double Bz1 = m_mapBuffer[ir][iz].z;
-  double Bz2 = m_mapBuffer[ir][iz+1].z;
-  double Bz3 = m_mapBuffer[ir+1][iz].z;
-  double Bz4 = m_mapBuffer[ir+1][iz+1].z;
+  double Bz2 = m_mapBuffer[ir][iz + 1].z;
+  double Bz3 = m_mapBuffer[ir + 1][iz].z;
+  double Bz4 = m_mapBuffer[ir + 1][iz + 1].z;
   double Bz = ((Bz1 * (m_gridPitchZ - dz) + Bz2 * dz) * (m_gridPitchR - dr) + (Bz3 * (m_gridPitchZ - dz) + Bz4 * dz) * dr) / m_gridPitchZ / m_gridPitchR;;
 
   double Bx = (r > 0.0) ? Br * point.X() / r : 0.0;
@@ -127,8 +132,8 @@ TVector3 BFieldComponentRadial::calculate(const TVector3& point) const
   //Near-axis approximation
   if (false) {
     //if (true) {
-    Br = - (m_mapBuffer[0][iz+1].z - m_mapBuffer[0][iz].z) / m_gridPitchZ * r / 2;
-    Bz = (m_mapBuffer[0][iz].z * (m_gridPitchZ - dz) + m_mapBuffer[0][iz+1].z * dz) / m_gridPitchZ;
+    Br = - (m_mapBuffer[0][iz + 1].z - m_mapBuffer[0][iz].z) / m_gridPitchZ * r / 2;
+    Bz = (m_mapBuffer[0][iz].z * (m_gridPitchZ - dz) + m_mapBuffer[0][iz + 1].z * dz) / m_gridPitchZ;
     Bx = (r > 0.0) ? Br * point.X() / r : 0.0;
     By = (r > 0.0) ? Br * point.Y() / r : 0.0;
   }
@@ -146,13 +151,13 @@ TVector3 BFieldComponentRadial::calculate(const TVector3& point) const
       TVector3 pLER(point.X(), point.Y(), point.Z()); pLER.RotateY(angle_LER); pLER.RotateX(M_PI);
       double rLER = pLER.Perp();
 
-      Bz = (m_mapBuffer[0][iz].z * (m_gridPitchZ - dz) + m_mapBuffer[0][iz+1].z * dz) / m_gridPitchZ;
+      Bz = (m_mapBuffer[0][iz].z * (m_gridPitchZ - dz) + m_mapBuffer[0][iz + 1].z * dz) / m_gridPitchZ;
       if (point.X()*point.Z() > 0) {
-        Br = - (m_mapBuffer[0][iz+1].z - m_mapBuffer[0][iz].z) / m_gridPitchZ * rHER / 2;
+        Br = - (m_mapBuffer[0][iz + 1].z - m_mapBuffer[0][iz].z) / m_gridPitchZ * rHER / 2;
         Bx = (rHER > 0.0) ? Br * pHER.X() / rHER : 0.0;
         By = (rHER > 0.0) ? Br * pHER.Y() / rHER : 0.0;
       } else {
-        Br = - (m_mapBuffer[0][iz+1].z - m_mapBuffer[0][iz].z) / m_gridPitchZ * rLER / 2;
+        Br = - (m_mapBuffer[0][iz + 1].z - m_mapBuffer[0][iz].z) / m_gridPitchZ * rLER / 2;
         Bx = (rLER > 0.0) ? Br * pLER.X() / rLER : 0.0;
         By = (rLER > 0.0) ? Br * pLER.Y() / rLER : 0.0;
       }

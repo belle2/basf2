@@ -163,14 +163,14 @@ void BFieldComponentQuad::initialize()
 double BFieldComponentQuad::getApertureHER(double s) const
 {
   if (s < m_apertBufferHER[0].s) return m_apertBufferHER[0].r;
-  if (s > m_apertBufferHER[m_apertSizeHER-1].s) return m_apertBufferHER[m_apertSizeHER-1].r;
+  if (s > m_apertBufferHER[m_apertSizeHER - 1].s) return m_apertBufferHER[m_apertSizeHER - 1].r;
   //H.Nakayama: this loop could be modified to binary-search
   for (int i = 0; i < m_apertSizeHER - 1; i++) {
-    if ((m_apertBufferHER[i].s <= s) && (s < m_apertBufferHER[i+1].s)) {
+    if ((m_apertBufferHER[i].s <= s) && (s < m_apertBufferHER[i + 1].s)) {
       double s1 = m_apertBufferHER[i].s;
-      double s2 = m_apertBufferHER[i+1].s;
+      double s2 = m_apertBufferHER[i + 1].s;
       double r1 = m_apertBufferHER[i].r;
-      double r2 = m_apertBufferHER[i+1].r;
+      double r2 = m_apertBufferHER[i + 1].r;
       double r = r1 + (r2 - r1) * (s - s1) / (s2 - s1);
       return r;
     }
@@ -181,14 +181,14 @@ double BFieldComponentQuad::getApertureHER(double s) const
 double BFieldComponentQuad::getApertureLER(double s) const
 {
   if (s < m_apertBufferLER[0].s) return m_apertBufferLER[0].r;
-  if (s > m_apertBufferLER[m_apertSizeLER-1].s) return m_apertBufferLER[m_apertSizeLER-1].r;
+  if (s > m_apertBufferLER[m_apertSizeLER - 1].s) return m_apertBufferLER[m_apertSizeLER - 1].r;
   //H.Nakayama: this loop could be modified to binary-search
   for (int i = 0; i < m_apertSizeLER - 1; i++) {
-    if ((m_apertBufferLER[i].s <= s) && (s < m_apertBufferLER[i+1].s)) {
+    if ((m_apertBufferLER[i].s <= s) && (s < m_apertBufferLER[i + 1].s)) {
       double s1 = m_apertBufferLER[i].s;
-      double s2 = m_apertBufferLER[i+1].s;
+      double s2 = m_apertBufferLER[i + 1].s;
       double r1 = m_apertBufferLER[i].r;
-      double r2 = m_apertBufferLER[i+1].r;
+      double r2 = m_apertBufferLER[i + 1].r;
       double r = r1 + (r2 - r1) * (s - s1) / (s2 - s1);
       return r;
     }

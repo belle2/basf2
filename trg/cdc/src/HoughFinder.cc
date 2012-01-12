@@ -274,6 +274,7 @@ TRGCDCHoughFinder::doitPerfectly(vector<TRGCDCTrack *> & trackList) {
     //...Let's fit it...
     TCCircle c = TCCircle(links);
     c.fit();
+    c.name("CircleFitted");
 
     //...Make a track...
     TCTrack * track = new TCTrack(c);

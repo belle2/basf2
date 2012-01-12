@@ -39,6 +39,9 @@ class TRGCDCTrackBase {
 
   public:
 
+    /// Copy constructor
+    TRGCDCTrackBase(const TRGCDCTrackBase &);
+
     /// Constructor
     TRGCDCTrackBase(const std::string & name, float charge);
 

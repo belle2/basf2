@@ -38,7 +38,7 @@ TRGCDCTrack::TRGCDCTrack(const TCCircle & c)
 
     //...Basic stuff...
 //    const string newName = "CopyOF" + c.name();
-    name("CopyOf" + c.name());
+    name("ConvFrom" + c.name());
     charge(c.charge());
 
     //...Set a defualt fitter...

@@ -23,6 +23,20 @@ using namespace std;
 
 namespace Belle2 {
 
+TRGCDCTrackBase::TRGCDCTrackBase(const TRGCDCTrackBase & t)
+    : _name("CopyOf" + t._name),
+      _status(t._status),
+      _charge(t._charge),
+      _ts(0),
+      _tsAll(t._tsAll),
+      _nTs(t._nTs),
+      _fitter(t._fitter),
+      _fitted(t._fitted) {
+    _ts = new vector<TCLink *>[_nTs];
+    for (unsigned i = 0; i < _nTs; i++)
+	_ts[i].assign(t._ts[i].begin(), t._ts[i].end());
+}
+
 TRGCDCTrackBase::TRGCDCTrackBase(const string & name, float charge)
     : _name(name),
       _status(0),
@@ -32,8 +46,6 @@ TRGCDCTrackBase::TRGCDCTrackBase(const string & name, float charge)
       _fitter(0),
       _fitted(false) {
     _ts = new vector<TCLink *>[_nTs];
-
-//    cout << ">>> " << _ts[0].size() << "," << _ts[1].size() << "," << _ts[2].size() << endl;
 }
 
 TRGCDCTrackBase::~TRGCDCTrackBase() {

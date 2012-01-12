@@ -24,11 +24,11 @@ using namespace std;
 
 namespace Belle2 {
 
-const TRGCDCCircleFitter TRGCDCCircle::_fitter =
-    TRGCDCCircleFitter("TRGCDCCircle Default Fitter");
+const TRGCDCCircleFitter
+TRGCDCCircle::_fitter = TRGCDCCircleFitter("TRGCDCCircle Default Fitter");
 
 TRGCDCCircle::TRGCDCCircle(const std::vector<TCLink *> links)
-    : TCTBase("unknown", 0),
+    : TCTBase("UnknownCircle", 0),
       _center(ORIGIN),
       _radius(0),
       _plane(0) {

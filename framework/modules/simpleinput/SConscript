@@ -1,5 +1,5 @@
 Import('env')
 
-env['LIBS'] = ['dataobjects']
+env['LIBS'] = ['framework', 'dataobjects']
 
 Return('env')

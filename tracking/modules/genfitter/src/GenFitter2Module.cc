@@ -92,7 +92,7 @@ void GenFitter2Module::initialize()
   geoManager.createTGeoRepresentation();
   // activate / deactivate material effects in genfit
   if (m_noEffects == true) {
-    GFMaterialEffects::getInstance()->setNoEffects(true);
+    //GFMaterialEffects::getInstance()->setNoEffects(true);
   } else {
     GFMaterialEffects::getInstance()->setEnergyLossBetheBloch(m_energyLossBetheBloch);
     GFMaterialEffects::getInstance()->setNoiseBetheBloch(m_noiseBetheBloch);

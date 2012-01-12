@@ -60,8 +60,6 @@ namespace Belle2 {
 
   protected:
 
-
-  private:
     std::ofstream dataOut;
     int m_failedFitCounter;
     int m_fitCounter;
@@ -71,7 +69,13 @@ namespace Belle2 {
     bool m_useDaf;
     int m_nGFIter;
     //int m_seedForRecoHits;
-
+    // switches to controll the material effects in genfit
+    bool m_energyLossBetheBloch;
+    bool m_noiseBetheBloch;
+    bool m_noiseCoulomb;
+    bool m_energyLossBrems;
+    bool m_noiseBrems;
+    bool m_noEffects;
 
   };
 } // end namespace Belle2

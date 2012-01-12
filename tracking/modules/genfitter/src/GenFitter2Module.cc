@@ -40,7 +40,7 @@
 #include <GFFieldManager.h>
 #include <GFRecoHitProducer.h>
 #include <GFRecoHitFactory.h>
-
+#include <GFMaterialEffects.h>
 
 
 #include <cstdlib>
@@ -70,6 +70,13 @@ GenFitter2Module::GenFitter2Module() :
   addParam("blowUpFactor", m_blowUpFactor, "factor multiplied with the cov of the Kalman filter when backward filter starts", 500.0);
   addParam("filter", m_filter, "throw away tracks with do not have exactly 1 hit in every Si layer", false);
   addParam("filterIterations", m_nGFIter, "number of Genfit iterations", 1);
+  addParam("energyLossBetheBloch", m_energyLossBetheBloch, "activte the material effect: EnergyLossBetheBloch", true);
+  addParam("noiseBetheBloch", m_noiseBetheBloch, "activte the material effect: NoiseBetheBloch", true);
+  addParam("noiseCoulomb", m_noiseCoulomb, "activte the material effect: NoiseCoulomb", true);
+  addParam("energyLossBrems", m_energyLossBrems, "activte the material effect: EnergyLossBrems", true);
+  addParam("noiseBrems", m_noiseBrems, "activte the material effect: NoiseBrems", true);
+  addParam("noEffects", m_noEffects, "switch off all material effects in genfit. This overwrites all individual material effects switches", false);
+
 //  addParam("seedForRecoHits", m_seedForRecoHits, "hack because there is no framwork wide random number seed at the moment", -1);
 
 }
@@ -80,11 +87,19 @@ GenFitter2Module::~GenFitter2Module()
 
 void GenFitter2Module::initialize()
 {
+  // convert the geant4 geometry to a TGeo geometry
   geometry::GeometryManager& geoManager = geometry::GeometryManager::getInstance();
   geoManager.createTGeoRepresentation();
-//  if (m_seedForRecoHits >= 0) {
-//    gRandom->SetSeed(m_seedForRecoHits); //this will set the seed for the global gRandom where the recoHits get there randomness for measurements from
-//  }
+  // activate / deactivate material effects in genfit
+  if (m_noEffects == true) {
+    GFMaterialEffects::getInstance()->setNoEffects(true);
+  } else {
+    GFMaterialEffects::getInstance()->setEnergyLossBetheBloch(m_energyLossBetheBloch);
+    GFMaterialEffects::getInstance()->setNoiseBetheBloch(m_noiseBetheBloch);
+    GFMaterialEffects::getInstance()->setNoiseCoulomb(m_noiseCoulomb);
+    GFMaterialEffects::getInstance()->setEnergyLossBrems(m_energyLossBrems);
+    GFMaterialEffects::getInstance()->setNoiseBrems(m_noiseBrems);
+  }
 }
 
 void GenFitter2Module::beginRun()

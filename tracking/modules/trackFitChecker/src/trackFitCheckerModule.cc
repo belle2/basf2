@@ -106,9 +106,13 @@ void trackFitCheckerModule::initialize()
 //    m_statDataTreePtr->Bronch("absMomVertex", "float", &(m_trackWiseDataForRoot["absMomVertex"]));
     m_trackWiseDataForRoot["pValue_bu"] = new Belle2::TrackWiseDataStruct();
     m_trackWiseDataForRoot["pValue_fu"] = new Belle2::TrackWiseDataStruct();
+    m_trackWiseDataForRoot["chi2tot_bu"] = new Belle2::TrackWiseDataStruct();
+    m_trackWiseDataForRoot["chi2tot_fu"] = new Belle2::TrackWiseDataStruct();
     m_trackWiseDataForRoot["absMomVertex"] = new Belle2::TrackWiseDataStruct();
     m_statDataTreePtr->Bronch("pValue_bu", "Belle2::TrackWiseDataStruct()", &(m_trackWiseDataForRoot["pValue_bu"]));
     m_statDataTreePtr->Bronch("pValue_fu", "Belle2::TrackWiseDataStruct()", &(m_trackWiseDataForRoot["pValue_fu"]));
+    m_statDataTreePtr->Bronch("chi2tot_bu", "Belle2::TrackWiseDataStruct()", &(m_trackWiseDataForRoot["chi2tot_bu"]));
+    m_statDataTreePtr->Bronch("chi2tot_fu", "Belle2::TrackWiseDataStruct()", &(m_trackWiseDataForRoot["chi2tot_fu"]));
     m_statDataTreePtr->Bronch("absMomVertex", "Belle2::TrackWiseDataStruct()", &(m_trackWiseDataForRoot["absMomVertex"]));
     //and objects for track wise vec data
 //    m_trackWiseVecDataForRoot["zs_vertexPosMom"] = new Belle2::TrackWiseVecDataStruct(vecDataSize);
@@ -153,9 +157,9 @@ void trackFitCheckerModule::initialize()
 
 
   // pulls (z) of cartesian coordinates of innermost hit and vertex
-  m_trackWiseVecDataSamples["zs_vertexPosMom"].resize(6);
+  m_trackWiseVecDataSamples["zs_vertexPosMom"].resize(vecDataSize);
   // residuals of Cartesian coordinates of innermost hit and vertex
-  m_trackWiseVecDataSamples["res_vertexPosMom"].resize(6);
+  m_trackWiseVecDataSamples["res_vertexPosMom"].resize(vecDataSize);
   // pulls (z) and chi2s for the 5 track parameters in every layer using truth info
   if (m_testPrediction) resizeLayerWiseData("zs_and_chi2_fp_t", vecSizeTruthTest);
   resizeLayerWiseData("zs_and_chi2_fu_t", vecSizeTruthTest);
@@ -228,6 +232,8 @@ void trackFitCheckerModule::event()
     const double pValue_fu = TMath::Prob(chi2tot_fu, ndf);
     fillTrackWiseData("pValue_bu", pValue_bu);
     fillTrackWiseData("pValue_fu", pValue_fu);
+    fillTrackWiseData("chi2tot_bu", chi2tot_bu);
+    fillTrackWiseData("chi2tot_fu", chi2tot_fu);
     TVector3 vertexPos;
     TVector3 vertexMom;
     TMatrixT<double> vertexCov(6, 6);
@@ -384,20 +390,7 @@ void trackFitCheckerModule::event()
           if (truthAvailable == true) {
             fillLayerWiseData("zs_and_chi2_fp_t", accuVecIndex, calcTestsWithTruthInfo(state, cov, trueState));
           }
-          //            //test the predicted state that I set myself
-          //            /*TMatrixT<double> altTrueState(5,1);
-          //            // get the true state
-          //            aTrackPtr->getBK(0)->getMatrix("fPreStTrue",iGFHit,altTrueState);
-          //            if (iGFHit == 0){
-          //              truthTests = calcTestsWithTruthInfo(state,cov,altTrueState);
-          //              m_z_pf_qOverPsLayer1(truthTests[0]);
-          //              m_z_pf_dudwsLayer1(truthTests[1]);
-          //              m_z_pf_dvdwsLayer1(truthTests[2]);
-          //              m_z_pf_usLayer1(truthTests[3]);
-          //              m_z_pf_vsLayer1(truthTests[4]);
-          //              m_pf_chi2sLayer1(truthTests[5]);
-          //            }*/
-          //
+
           //            // test the difference of the geant4 and genfit propagation
           //            propOnlyTrRepPtr->extrapolate(aTrackPtr->getHit(iGFHit)->getDetPlane(aTrackPtr->getTrackRep(0)), onlyPropState);
           //            //aTrackPtr->getTrackRep(0)->extrapolate(aTrackPtr->getHit(iGFHit)->getDetPlane(aTrackPtr->getTrackRep(0)), onlyPropState);
@@ -509,6 +502,8 @@ void trackFitCheckerModule::endRun()
   } else {
     printTrackWiseStatistics("pValue_fu");
     printTrackWiseStatistics("pValue_bu");
+    printTrackWiseStatistics("chi2tot_fu");
+    printTrackWiseStatistics("chi2tot_bu");
     printTrackWiseStatistics("absMomVertex");
     vector<string> measVarNames;
     measVarNames.push_back("u");
@@ -560,28 +555,7 @@ void trackFitCheckerModule::endRun()
       testOutputToFile << m_textOutput.str();
       testOutputToFile.close();
     }
-    //
-    //
-    //
-    //      B2INFO("Now testing the predicted forward track parameters with the state I set")
-    //      B2INFO("\t\tq/p,\tdudw,\tdvdw,\tu,\tv,\tχ²");
-    //      {
-    //        double mean_z_qOverP = mean(m_z_pf_qOverPsLayer1);
-    //        double std_z_qOverP = sqrt(variance(m_z_pf_qOverPsLayer1));
-    //        double mean_z_dudw = mean(m_z_pf_dudwsLayer1);
-    //        double std_z_dudw = sqrt(variance(m_z_pf_dudwsLayer1));
-    //        double mean_z_dvdw = mean(m_z_pf_dvdwsLayer1);
-    //        double std_z_dvdw = sqrt(variance(m_z_pf_dvdwsLayer1));
-    //        double mean_z_u = mean(m_z_pf_usLayer1);
-    //        double std_z_u = sqrt(variance(m_z_pf_usLayer1));
-    //        double mean_z_v = mean(m_z_pf_vsLayer1);
-    //        double std_z_v = sqrt(variance(m_z_pf_vsLayer1));
-    //        double mean_chi2 = mean(m_pf_chi2sLayer1);
-    //        double std_chi2 = sqrt(variance(m_pf_chi2sLayer1));
-    //        B2INFO("mean\t" << fixed<<setprecision(nDigits) << mean_z_qOverP << "\t" << mean_z_dudw << "\t"<< mean_z_dvdw << "\t"<< mean_z_u<<"\t" << mean_z_v<<"\t" <<  mean_chi2);
-    //        B2INFO("std\t"<< fixed<<setprecision(nDigits) << std_z_qOverP<< "\t" << std_z_dudw << "\t"<< std_z_dvdw <<"\t" << std_z_u<<"\t" << std_z_v <<"\t" << std_chi2);
-    //      }
-    //    }
+
   }
 
 }
@@ -675,7 +649,6 @@ bool trackFitCheckerModule::hasMatrixNegDiagElement(const TMatrixT<double>& aMat
 
 void trackFitCheckerModule::isMatrixCov(const TMatrixT<double>& cov)
 {
-
   if (isSymmetric(cov) == false) {
     ++m_unSymmetricCounter;
   }
@@ -805,5 +778,3 @@ void trackFitCheckerModule::fillTrackWiseData(const string& nameOfDataSample, co
     m_trackWiseDataForRoot[nameOfDataSample]->data = float(newData);
   }
 }
-
-

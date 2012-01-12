@@ -12,8 +12,7 @@
 #define trueHitTesterModule_H_
 
 #include <framework/core/Module.h>
-//#include <cdc/hitcdc/CDCSimHit.h>
-//#include <cdc/dataobjects/CDCHit.h>
+
 #include <tracking/LayerWiseData.h>
 //root
 #include <TMatrixT.h>
@@ -26,7 +25,6 @@
 #include <iostream>
 #include <iomanip>
 
-// #include <tracking/dataobjects/MscAndEnLossData.h>
 
 
 //// to get statistics functions of boost

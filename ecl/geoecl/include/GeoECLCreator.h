@@ -45,14 +45,15 @@ namespace Belle2 {
       */
       virtual void create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes type);
 
-
+      void makeEndcap(const bool aForward);
+      void makeInnerBarrel();
     protected:
 
     private:
 
       G4LogicalVolume* logical_ecl;/**< the ecl Logical Volume */
       G4VPhysicalVolume* physical_ecl;/**< the ecl Physical Volume*/
-
+      G4VPhysicalVolume* physical_ECLBarrelCylinder;
       //! Sensitive detector
       ECLSensitiveDetector* m_sensitive;
 

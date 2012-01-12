@@ -1,5 +1,5 @@
 Import('env')
 
-env['LIBS'] = ['vxd', 'pxd', 'framework', 'generators']
+env['LIBS'] = [ 'pxd' ]
 
 Return('env')

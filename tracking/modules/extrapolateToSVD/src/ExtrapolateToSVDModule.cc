@@ -163,7 +163,7 @@ void ExtrapolateToSVDModule::event()
 
         int sensorID = svdHits[iHit]->getSensorID();   //get unique sensor ID
         VxdID aVXDId = VxdID(sensorID);
-        const svd::SensorInfo& geometry = dynamic_cast<const svd::SensorInfo&>(VXD::GeoCache::get(sensorID)); //get the SensorInfo to get the hit coordinates
+        const SVD::SensorInfo& geometry = dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::get(sensorID)); //get the SensorInfo to get the hit coordinates
 
         int layerId = aVXDId.getLayer();
 
@@ -273,7 +273,7 @@ void ExtrapolateToSVDModule::event()
         }
         if (detId == 1) {    //SVD
           int sensorID = svdHits[hitId]->getSensorID();
-          const svd::SensorInfo& geometry = dynamic_cast<const svd::SensorInfo&>(VXD::GeoCache::get(sensorID));
+          const SVD::SensorInfo& geometry = dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::get(sensorID));
           float u = svdHits[hitId]->getU();
           float v = svdHits[hitId]->getV();
           TVector3 local(u, v, 0.0);
@@ -305,7 +305,7 @@ void ExtrapolateToSVDModule::event()
 
     for (int i = 0; i < nSvdHits; i++) {     //SVD
       int sensorID = svdHits[i]->getSensorID();
-      const svd::SensorInfo& geometry = dynamic_cast<const svd::SensorInfo&>(VXD::GeoCache::get(sensorID));
+      const SVD::SensorInfo& geometry = dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::get(sensorID));
       float u = svdHits[i]->getU();
       float v = svdHits[i]->getV();
       TVector3 local(u, v, 0.0);

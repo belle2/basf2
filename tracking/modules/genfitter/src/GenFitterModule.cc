@@ -117,6 +117,9 @@ void GenFitterModule::initialize()
   geometry::GeometryManager& geoManager = geometry::GeometryManager::getInstance();
   geoManager.createTGeoRepresentation();
 
+  //get the magnetic field
+  GFFieldManager::getInstance()->init(new GFGeant4Field());
+
 }
 
 void GenFitterModule::beginRun()
@@ -158,9 +161,6 @@ void GenFitterModule::event()
     B2INFO("DAF will wit probability cut " << m_probCut << " will be used ");
   }
 
-
-  //get the magnetic field
-  GFFieldManager::getInstance()->init(new GFGeant4Field());
 
   //StoreArrays to store the fit results
   StoreArray < Track > tracks(m_tracksColName);

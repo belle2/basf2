@@ -203,7 +203,7 @@ void TrackingOutputModule::event()
         output[counter]->setMCFitMomentumY(tracksMC[trackId]->getMomentum().y());
         output[counter]->setMCFitMomentumZ(tracksMC[trackId]->getMomentum().z());
         output[counter]->setMCFitMomentum(tracksMC[trackId]->getMomentum().Mag());
-        output[counter]->setMCFitCurv(tracksMC[trackId]->getOmega()*alpha);
+        output[counter]->setMCFitCurv(abs(tracksMC[trackId]->getOmega()*alpha));
         output[counter]->setMCFitCotTheta(output[counter]->getMCFitMomentumZ().at(j) * output[counter]->getMCFitCurv().at(j));
 
         output[counter]->setNMCHits(tracksMC[trackId]->getNHits());
@@ -252,7 +252,7 @@ void TrackingOutputModule::event()
           output[counter]->setPRFitMomentumY(tracksPR[trackId]->getMomentum().y());
           output[counter]->setPRFitMomentumZ(tracksPR[trackId]->getMomentum().z());
           output[counter]->setPRFitMomentum(tracksPR[trackId]->getMomentum().Mag());
-          output[counter]->setPRFitCurv(tracksPR[trackId]->getOmega()*alpha);
+          output[counter]->setPRFitCurv(abs(tracksPR[trackId]->getOmega()*alpha));
           output[counter]->setPRFitCotTheta(output[counter]->getPRFitMomentumZ().at(j) * output[counter]->getPRFitCurv().at(j));
 
           output[counter]->setNPRHits(tracksPR[trackId]->getNHits());

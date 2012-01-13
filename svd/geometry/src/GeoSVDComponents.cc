@@ -14,8 +14,8 @@
 #include <boost/algorithm/string.hpp>
 
 namespace Belle2 {
-  namespace svd {
-    GeoSVDPlacement::GeoSVDPlacement(const std::string &name, double u, double v, std::string w): name(name), u(u), v(v)
+  namespace SVD {
+    GeoSVDPlacement::GeoSVDPlacement(const std::string& name, double u, double v, std::string w): name(name), u(u), v(v)
     {
       boost::to_lower(w);
       if (w == "below")        this->w = c_below;

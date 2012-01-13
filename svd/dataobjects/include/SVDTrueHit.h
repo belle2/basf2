@@ -48,8 +48,8 @@ namespace Belle2 {
     SVDTrueHit(
       VxdID sensorID, float u, float v, float energyDep, float globalTime,
       const TVector3& momentum, const TVector3& entryMomentum, const TVector3& exitMomentum):
-        m_sensorID(sensorID), m_u(u), m_v(v), m_energyDep(energyDep), m_globalTime(globalTime),
-        m_momentum(momentum), m_entryMomentum(entryMomentum), m_exitMomentum(exitMomentum) {}
+      m_sensorID(sensorID), m_u(u), m_v(v), m_energyDep(energyDep), m_globalTime(globalTime),
+      m_momentum(momentum), m_entryMomentum(entryMomentum), m_exitMomentum(exitMomentum) {}
 
     /** Return the Sensor ID */
     VxdID getSensorID() const { return m_sensorID; }

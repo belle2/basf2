@@ -55,7 +55,7 @@ namespace Belle2 {
     void SupportCreator::create(const GearDir& content, G4LogicalVolume& topVolume, GeometryTypes type)
     {
       double minZ(0), maxZ(0);
-      BOOST_FOREACH(const GearDir &component, content.getNodes("Polycone")) {
+      BOOST_FOREACH(const GearDir & component, content.getNodes("Polycone")) {
         string name = component.getString("Name");
         string material = component.getString("Material");
 
@@ -64,7 +64,7 @@ namespace Belle2 {
         setColor(*volume, component.getString("Color"));
         new G4PVPlacement(G4Transform3D(), volume, name, &topVolume, false, 1);
       }
-      BOOST_FOREACH(const GearDir &component, content.getNodes("RotationSolid")) {
+      BOOST_FOREACH(const GearDir & component, content.getNodes("RotationSolid")) {
         string name = component.getString("Name");
         string material = component.getString("Material");
 

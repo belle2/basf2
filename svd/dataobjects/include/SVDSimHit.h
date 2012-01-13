@@ -29,7 +29,7 @@ namespace Belle2 {
   public:
     /** default constructor for ROOT */
     SVDSimHit(): m_sensorID(0), m_pdg(0), m_theta(0), m_energyDep(0), m_globalTime(0),
-        m_posIn(0, 0, 0), m_posOut(0, 0, 0), m_momIn(0, 0, 0) {}
+      m_posIn(0, 0, 0), m_posOut(0, 0, 0), m_momIn(0, 0, 0) {}
 
     /** Standard constructor
      * @param sensorID ID of the sensor
@@ -43,8 +43,8 @@ namespace Belle2 {
      */
     SVDSimHit(VxdID sensorID, int pdg, float theta, float energyDep, float globalTime,
               const TVector3& posIn, const TVector3& posOut, const TVector3& momIn):
-        m_sensorID(sensorID), m_pdg(pdg), m_theta(theta), m_energyDep(energyDep), m_globalTime(globalTime),
-        m_posIn(posIn), m_posOut(posOut), m_momIn(momIn) {}
+      m_sensorID(sensorID), m_pdg(pdg), m_theta(theta), m_energyDep(energyDep), m_globalTime(globalTime),
+      m_posIn(posIn), m_posOut(posOut), m_momIn(momIn) {}
 
     /** Return the sensorID of the sensor the energy was deposited in */
     VxdID getSensorID()         const { return m_sensorID; }

@@ -38,7 +38,7 @@ using namespace std;
 namespace Belle2 {
 
   using namespace geometry;
-  namespace svd {
+  namespace SVD {
 
     //-----------------------------------------------------------------
     //                 Register the Creator
@@ -58,11 +58,11 @@ namespace Belle2 {
     {
       VXD::GeoCache::getInstance().clear();
       //Delete all sensitive detectors
-      BOOST_FOREACH(SensitiveDetector* sensitive, m_sensitive) {
+      BOOST_FOREACH(SensitiveDetector * sensitive, m_sensitive) {
         delete sensitive;
       }
       m_sensitive.clear();
-      BOOST_FOREACH(BkgSensitiveDetector* sensitive, m_sensitiveBkg) {
+      BOOST_FOREACH(BkgSensitiveDetector * sensitive, m_sensitiveBkg) {
         delete sensitive;
       }
       m_sensitiveBkg.clear();
@@ -71,7 +71,7 @@ namespace Belle2 {
     vector<GeoSVDPlacement> GeoSVDCreator::getSubComponents(GearDir path)
     {
       vector<GeoSVDPlacement> result;
-      BOOST_FOREACH(const GearDir& component, path.getNodes("Component")) {
+      BOOST_FOREACH(const GearDir & component, path.getNodes("Component")) {
         string type = component.getString("@type");
         int nPos = max(component.getNumberNodes("u"), component.getNumberNodes("v"));
         for (int iPos = 1; iPos <= nPos; ++iPos) {
@@ -87,7 +87,7 @@ namespace Belle2 {
       return result;
     }
 
-    GeoSVDComponent GeoSVDCreator::getComponent(const string &name)
+    GeoSVDComponent GeoSVDCreator::getComponent(const string& name)
     {
       //Check if component already exists
       map<string, GeoSVDComponent >::iterator cached = m_componentCache.find(name);
@@ -121,7 +121,7 @@ namespace Belle2 {
       return c;
     }
 
-    double GeoSVDCreator::addSubComponents(const string& name, GeoSVDComponent &component, vector<GeoSVDPlacement> placements, bool createContainer, bool originCenter)
+    double GeoSVDCreator::addSubComponents(const string& name, GeoSVDComponent& component, vector<GeoSVDPlacement> placements, bool createContainer, bool originCenter)
     {
       B2DEBUG(100, "Creating component " << name);
       vector<GeoSVDComponent> subComponents;
@@ -130,7 +130,7 @@ namespace Belle2 {
       double heightBelow = 0;
       //Go over all subcomponents and check if they will fit inside.
       //If component.volume is zero we will create one so sum up needed space
-      BOOST_FOREACH(GeoSVDPlacement &p, placements) {
+      BOOST_FOREACH(GeoSVDPlacement & p, placements) {
         //Flip placement if component if flipped dimensions
         if (component.flipU) p.u = -p.u;
         if (component.flipV) p.v = -p.v;
@@ -183,7 +183,7 @@ namespace Belle2 {
 
       //No volume yet, create a new one automatically assuming air material
       if (!component.volume) {
-        G4VSolid *componentShape = createTrapezoidal(name, component.width, component.width2, component.length, component.height);
+        G4VSolid* componentShape = createTrapezoidal(name, component.width, component.width2, component.length, component.height);
         component.volume = new G4LogicalVolume(componentShape, Materials::get(component.material), name);
         if (component.material == "Air") {
           B2DEBUG(200, "Component " << name << " is an Air volume, setting invisible");
@@ -192,11 +192,11 @@ namespace Belle2 {
       }
 
       //See if we are allowed to create an container for the component and if it is neccessary
-      G4LogicalVolume *container(0);
+      G4LogicalVolume* container(0);
       double componentW(0);
       if (createContainer && (heightAbove > 0 || heightBelow > 0)) {
         double height = component.height + heightAbove + heightBelow;
-        G4VSolid *containerShape = createTrapezoidal(name, component.width, component.width2, component.length, height);        container = new G4LogicalVolume(containerShape, Materials::get("Air"), name + ".Container");
+        G4VSolid* containerShape = createTrapezoidal(name, component.width, component.width2, component.length, height);        container = new G4LogicalVolume(containerShape, Materials::get("Air"), name + ".Container");
         componentW = -(heightAbove - heightBelow) / 2.0;
         new G4PVPlacement(0, G4ThreeVector(0, 0, componentW), component.volume, name + ".Container", container, false, 1);
       }
@@ -204,8 +204,8 @@ namespace Belle2 {
 
       //Ok, all volumes set up, now add them together
       for (size_t i = 0; i < placements.size(); ++i) {
-        GeoSVDPlacement &p = placements[i];
-        GeoSVDComponent &s = subComponents[i];
+        GeoSVDPlacement& p = placements[i];
+        GeoSVDComponent& s = subComponents[i];
         G4LogicalVolume* mother(0);
         double w = 0;
         switch (p.w) {
@@ -276,7 +276,7 @@ namespace Belle2 {
       return G4Transform3D(rotation, translation);
     }
 
-    G4VSolid* GeoSVDCreator::createTrapezoidal(const string& name, double width, double width2, double length, double &height, double angle)
+    G4VSolid* GeoSVDCreator::createTrapezoidal(const string& name, double width, double width2, double length, double& height, double angle)
     {
       double offset(0);
       if (angle != 0) {
@@ -326,9 +326,9 @@ namespace Belle2 {
         //Create appropriate sensitive detector instance
         SensorInfo* sensorInfo = new SensorInfo(s.info);
         sensorInfo->setID(sensorID);
-        SensitiveDetector *sensitive = new SensitiveDetector(sensorInfo, m_seeNeutrons);
+        SensitiveDetector* sensitive = new SensitiveDetector(sensorInfo, m_seeNeutrons);
         m_sensitive.push_back(sensitive);
-        G4LogicalVolume *active = new G4LogicalVolume(activeShape,  Materials::get(s.material), name + ".Active",
+        G4LogicalVolume* active = new G4LogicalVolume(activeShape,  Materials::get(s.material), name + ".Active",
                                                       0, sensitive);
         active->SetUserLimits(new G4UserLimits(s.active.stepSize));
         setColor(*active, "#ddd");
@@ -385,7 +385,7 @@ namespace Belle2 {
         B2FATAL("Could not find definition for SVD Envelope.");
       }
       double minZ(0), maxZ(0);
-      G4Polycone *envelopeCone = geometry::createPolyCone("Envelope", GearDir(content, "Envelope/"), minZ, maxZ);
+      G4Polycone* envelopeCone = geometry::createPolyCone("Envelope", GearDir(content, "Envelope/"), minZ, maxZ);
       string materialName = content.getString("Envelope/Material", "Air");
       G4Material* material = Materials::get(materialName);
       if (!material) B2FATAL("Material '" << materialName << "', required by SVD Envelope could not be found");
@@ -398,7 +398,7 @@ namespace Belle2 {
       G4VPhysicalVolume* physEnvelope = new G4PVPlacement(getAlignment("SVD"), envelope, "SVD", &topVolume, false, 1);
 
       //Read the definition of all sensor types
-      BOOST_FOREACH(const GearDir &paramsSensor, m_components.getNodes("Sensor")) {
+      BOOST_FOREACH(const GearDir & paramsSensor, m_components.getNodes("Sensor")) {
         int sensorTypeID = paramsSensor.getInt("@sensorType");
         GeoSVDSensor sensor(
           paramsSensor.getString("Material"),
@@ -432,17 +432,17 @@ namespace Belle2 {
       }
 
       //Build all ladders including Sensors
-      BOOST_FOREACH(const GearDir &shell, content.getNodes("HalfShell")) {
+      BOOST_FOREACH(const GearDir & shell, content.getNodes("HalfShell")) {
         string shellName =  shell.getString("@name");
         B2INFO("Building SVD half-shell " << shellName);
         G4Transform3D shellAlignment = getAlignment("SVD." + shellName);
 
-        BOOST_FOREACH(const GearDir &layer, shell.getNodes("Layer")) {
+        BOOST_FOREACH(const GearDir & layer, shell.getNodes("Layer")) {
           int layerID = layer.getInt("@id");
           setLayer(layerID);
 
           //Loop over defined ladders
-          BOOST_FOREACH(const GearDir &ladder, layer.getNodes("Ladder")) {
+          BOOST_FOREACH(const GearDir & ladder, layer.getNodes("Ladder")) {
             int ladderID = ladder.getInt("@id");
             double phi = ladder.getAngle("phi", 0);
             addLadder(ladderID, phi, envelope, shellAlignment);
@@ -473,7 +473,7 @@ namespace Belle2 {
                    paramsLadder.getLength("slantedRadius", 0) / Unit::mm
                  );
 
-      BOOST_FOREACH(const GearDir &sensorInfo, paramsLadder.getNodes("Sensor")) {
+      BOOST_FOREACH(const GearDir & sensorInfo, paramsLadder.getNodes("Sensor")) {
         int sensorTypeID = sensorInfo.getInt("@sensorType");
         m_sensorMapIterator = m_sensorMap.find(sensorTypeID);
         m_sensorMapIterator->second.sensorID = sensorInfo.getInt("@id");

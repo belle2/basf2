@@ -18,7 +18,7 @@
 
 namespace Belle2 {
   /** Namespace to encapsulate code needed for simulation and reconstrucion of the SVD */
-  namespace svd {
+  namespace SVD {
     /** The SVD Sensitive Detector class. */
     typedef VXD::SensitiveDetector<SVDSimHit, SVDTrueHit> SensitiveDetector;
   } //end of namespace svd

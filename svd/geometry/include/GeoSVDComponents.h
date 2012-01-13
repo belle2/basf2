@@ -20,11 +20,11 @@
 class G4LogicalVolume;
 
 namespace Belle2 {
-  namespace svd {
+  namespace SVD {
 
     struct GeoSVDPlacement {
       enum EPosW { c_below, c_bottom, c_center, c_top, c_above };
-      GeoSVDPlacement(const std::string &name, double u, double v, std::string w);
+      GeoSVDPlacement(const std::string& name, double u, double v, std::string w);
       std::string name;
       double u;
       double v;
@@ -33,7 +33,7 @@ namespace Belle2 {
 
     struct GeoSVDActiveArea {
       GeoSVDActiveArea(double u = 0, double v = 0, double width = 0, double width2 = 0, double length = 0, double height = 0, double stepSize = 0):
-          u(u), v(v), width(width), width2(width2), length(length), height(height), stepSize(stepSize) {}
+        u(u), v(v), width(width), width2(width2), length(length), height(height), stepSize(stepSize) {}
       double u;
       double v;
       double width;
@@ -45,7 +45,7 @@ namespace Belle2 {
 
     struct GeoSVDComponent {
       GeoSVDComponent(const std::string& material = "", const std::string& color = "", double width = 0, double width2 = 0, double length = 0, double height = 0):
-          volume(0), material(material), color(color), width(width), width2(width2), length(length), height(height), flipU(false), flipV(false), flipW(false) {}
+        volume(0), material(material), color(color), width(width), width2(width2), length(length), height(height), flipU(false), flipV(false), flipW(false) {}
 
       G4LogicalVolume* volume;
       std::string material;
@@ -61,7 +61,7 @@ namespace Belle2 {
 
     struct GeoSVDSensor: public GeoSVDComponent {
       GeoSVDSensor(const std::string& material = "", const std::string& color = "", double width = 0, double width2 = 0, double length = 0, double height = 0):
-          GeoSVDComponent(material, color, width, width2, length, height) {}
+        GeoSVDComponent(material, color, width, width2, length, height) {}
       SensorInfo info;
       int    sensorID;
       int    sensorTypeID;

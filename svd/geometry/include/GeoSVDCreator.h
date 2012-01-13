@@ -29,7 +29,7 @@ class G4Polycone;
 
 namespace Belle2 {
 
-  namespace svd {
+  namespace SVD {
     /** The creator for the SVD geometry of the Belle II detector.   */
     class GeoSVDCreator : public geometry::CreatorBase {
 
@@ -62,7 +62,7 @@ namespace Belle2 {
        *        angle
        * @return A G4VShape which could be a G4Box, a G4Trd or a G4Trap depending on the parameters
        */
-      G4VSolid* createTrapezoidal(const std::string& name, double width, double width2, double length, double &height, double angle = 0);
+      G4VSolid* createTrapezoidal(const std::string& name, double width, double width2, double length, double& height, double angle = 0);
 
       /**
        * Get the volume and the height representing a single sub-component
@@ -86,7 +86,7 @@ namespace Belle2 {
        *            an Air volume fitting all components
        * @return offset in w which was applied to the component when extending it
        */
-      double addSubComponents(const std::string& name, GeoSVDComponent &component, std::vector<GeoSVDPlacement> placements, bool createContainer = false, bool originCenter = true);
+      double addSubComponents(const std::string& name, GeoSVDComponent& component, std::vector<GeoSVDPlacement> placements, bool createContainer = false, bool originCenter = true);
 
       /**
        * Return vector of GeoPXDPlacements with all the components defined inside a given path

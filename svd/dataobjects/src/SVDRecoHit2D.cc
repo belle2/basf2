@@ -26,13 +26,13 @@ using namespace Belle2;
 ClassImp(SVDRecoHit2D);
 
 SVDRecoHit2D::SVDRecoHit2D():
-    GFRecoHitIfc<GFPlanarHitPolicy> (HIT_DIMENSIONS), m_sensorID(0), m_trueHit(0),
-    m_energyDep(0)//, m_energyDepError(0)
+  GFRecoHitIfc<GFPlanarHitPolicy> (HIT_DIMENSIONS), m_sensorID(0), m_trueHit(0),
+  m_energyDep(0)//, m_energyDepError(0)
 {}
 
 SVDRecoHit2D::SVDRecoHit2D(const SVDTrueHit* hit, float sigmaU, float sigmaV):
-    GFRecoHitIfc<GFPlanarHitPolicy> (HIT_DIMENSIONS), m_sensorID(0), m_trueHit(hit),
-    m_energyDep(0)//, m_energyDepError(0)
+  GFRecoHitIfc<GFPlanarHitPolicy> (HIT_DIMENSIONS), m_sensorID(0), m_trueHit(hit),
+  m_energyDep(0)//, m_energyDepError(0)
 {
   if (!gRandom) B2FATAL("gRandom not initialized, please set up gRandom first");
 
@@ -41,7 +41,7 @@ SVDRecoHit2D::SVDRecoHit2D(const SVDTrueHit* hit, float sigmaU, float sigmaV):
 
   //If no error is given, estimate the error by dividing the pixel size by sqrt(12)
   if (sigmaU < 0 || sigmaV < 0) {
-    const svd::SensorInfo& geometry = dynamic_cast<const svd::SensorInfo&>(VXD::GeoCache::get(m_sensorID));
+    const SVD::SensorInfo& geometry = dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::get(m_sensorID));
     sigmaU = geometry.getUPitch(hit->getV()) / sqrt(12);
     sigmaV = geometry.getVPitch(hit->getV()) / sqrt(12);
   }
@@ -63,7 +63,7 @@ SVDRecoHit2D::SVDRecoHit2D(const SVDTrueHit* hit, float sigmaU, float sigmaV):
 void SVDRecoHit2D::setDetectorPlane()
 {
   // Construct a finite detector plane and set in the policy class.
-  const svd::SensorInfo& geometry = dynamic_cast<const svd::SensorInfo&>(VXD::GeoCache::get(m_sensorID));
+  const SVD::SensorInfo& geometry = dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::get(m_sensorID));
 
   // Construct vectors o, u, v
   TVector3 origin  = geometry.pointToGlobal(TVector3(0, 0, 0));

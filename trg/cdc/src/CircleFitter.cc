@@ -56,7 +56,7 @@ TCCFitter::fit(TCTBase & t) const {
 
     //...Hit loop...
     TCLpav circle;
-    unsigned n = t.links().size();
+    const unsigned n = t.links().size();
     for (unsigned i = 0; i < n; i++) {
 	const TCLink * l = t.links()[i];
 	const Belle2::TRGCDCWireHit * h = l->hit();
@@ -113,6 +113,14 @@ TCCFitter::fit(TCTBase & t) const {
     if (t.objectType() == TRGCDCCircleType)
 	((TRGCDCCircle &) t).property(_charge, _radius, _center);
     fitDone(t);
+
+    //...Update link information...
+    for (unsigned i = 0; i < n; i++) {
+	TCLink * l = t.links()[i];
+	if (l == 0) continue;
+
+	t.approach2D(* l);
+    }    
 
     if (TRGDebug::level() > 1) {
 	cout << TRGDebug::tab() << "fitted successfully" << endl;

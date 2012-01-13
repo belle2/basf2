@@ -59,7 +59,7 @@ class TRGCDCTrack : public TRGCDCTrackBase {
     virtual const CLHEP::Hep3Vector & p(void) const;
 
     /// returns Pt.
-    virtual float pt(void) const;
+    virtual double pt(void) const;
 
     /// returns position vector.
     virtual const CLHEP::Hep3Vector & x(void) const;
@@ -108,7 +108,7 @@ TRGCDCTrack::p(void) const {
 }
 
 inline
-float
+double
 TRGCDCTrack::pt(void) const {
     _p = _helix.momentum();
     return _p.perp();

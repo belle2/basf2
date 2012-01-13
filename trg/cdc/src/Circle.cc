@@ -36,9 +36,9 @@ TRGCDCCircle::TRGCDCCircle(const std::vector<TCLink *> links)
     append(links);
 }
 
-TRGCDCCircle::TRGCDCCircle(float r,
-                           float phi,
-                           float charge,
+TRGCDCCircle::TRGCDCCircle(double r,
+                           double phi,
+                           double charge,
                            const TCHPlane & plane)
     : TCTBase("unknown", charge),
       _center(r * cos(phi), r * sin(phi)),
@@ -59,6 +59,20 @@ TRGCDCCircle::dump(const string & cmd, const string & pre) const {
     cout << endl;
     if (cmd.find("detail") != string::npos)
         TRGCDCTrackBase::dump(cmd, pre);
+}
+
+int
+TRGCDCCircle::approach2D(TCLink & l) const {
+    HepGeom::Point3D<double> xw = l.wire()->xyPosition();
+    HepGeom::Point3D<double> xc(_center.x(), _center.y(), 0.);
+
+    xw.setZ(0.);
+    const HepGeom::Point3D<double> xv
+	= _charge * _radius * (xw - xc).unit() + xc;
+    l.positionOnTrack(xv);
+    l.positionOnWire(xw);
+    l.dPhi(0.);
+    return 0;
 }
 
 } // namespace Belle2

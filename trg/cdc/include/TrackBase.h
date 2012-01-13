@@ -43,7 +43,7 @@ class TRGCDCTrackBase {
     TRGCDCTrackBase(const TRGCDCTrackBase &);
 
     /// Constructor
-    TRGCDCTrackBase(const std::string & name, float charge);
+    TRGCDCTrackBase(const std::string & name, double charge);
 
     /// Destructor
     virtual ~TRGCDCTrackBase();
@@ -57,13 +57,13 @@ class TRGCDCTrackBase {
     int status(void) const;
 
     /// returns charge.
-    float charge(void) const;
+    double charge(void) const;
 
     /// returns momentum vector.
     virtual const CLHEP::Hep3Vector & p(void) const;
 
     /// returns Pt.
-    virtual float pt(void) const;
+    virtual double pt(void) const;
 
     /// returns position vector.
     virtual const CLHEP::Hep3Vector & x(void) const;
@@ -103,13 +103,18 @@ class TRGCDCTrackBase {
     void append(const std::vector<TRGCDCLink *> links);
 
     /// sets and returns charge.
-    float charge(float c);
+    double charge(double c);
 
     /// fits itself by a default fitter. Error was happened if return value is not zero.
     virtual int fit(void);
 
     /// sets a default fitter.
     const TRGCDCFitter * const fitter(const TRGCDCFitter *);
+
+  public: // Utility functions
+
+    /// calculate closest approach. Error was happened if return value is not zero.
+    virtual int approach2D(TRGCDCLink &) const;
 
   private:
 
@@ -120,7 +125,7 @@ class TRGCDCTrackBase {
     int _status;
 
     /// Charge.
-    float _charge;
+    double _charge;
 
     /// Momentum.
     CLHEP::Hep3Vector _p;
@@ -145,6 +150,7 @@ class TRGCDCTrackBase {
     mutable bool _fitted;
 
     friend class TRGCDCFitter;
+    friend class TRGCDCCircleFitter;
     friend class TRGCDCHelixFitter;
     friend class TRGCDCCircle;
     friend class TRGCDCTrack;
@@ -183,7 +189,7 @@ TRGCDCTrackBase::x(void) const {
 }
 
 inline
-float
+double
 TRGCDCTrackBase::pt(void) const {
     return _p.perp();
 }
@@ -201,14 +207,14 @@ TRGCDCTrackBase::objectType(void) const {
 }
 
 inline
-float
+double
 TRGCDCTrackBase::charge(void) const {
     return _charge;
 }
 
 inline
-float
-TRGCDCTrackBase::charge(float a) {
+double
+TRGCDCTrackBase::charge(double a) {
     return _charge = a;
 }
 

@@ -35,9 +35,9 @@ class TRGCDCCircle : public TRGCDCTrackBase {
     TRGCDCCircle(const std::vector<TRGCDCLink *> links);
 
     /// Constructor with a circle center, assuming the origin is on a circle.
-    TRGCDCCircle(float r,
-                 float phi,
-                 float charge,
+    TRGCDCCircle(double r,
+                 double phi,
+                 double charge,
                  const TRGCDCHoughPlane & plane);
 
     /// Destructor
@@ -52,10 +52,10 @@ class TRGCDCCircle : public TRGCDCTrackBase {
     const TRGPoint2D & center(void) const;
 
     /// returns Pt.
-    float pt(void) const;
+    double pt(void) const;
 
     /// returns radius.
-    float radius(void) const;
+    double radius(void) const;
 
     /// dumps debug information.
     virtual void dump(const std::string & message = std::string(""),
@@ -67,13 +67,18 @@ class TRGCDCCircle : public TRGCDCTrackBase {
 		  HepGeom::Point3D<double> center);
 //  void property(double charge, double radius, TPoint2D & center);
 
+  public: // Utility functions
+
+    /// calculate closest approach. Error was happened if return value is not zero.
+    int approach2D(TRGCDCLink &) const;
+
   private:
 
     /// Position of the circle center.
     TRGPoint2D _center;
 
-    /// Radius.
-    float _radius;
+    /// Radius multiplied by charge.
+    double _radius;
 
     /// Hough plane.
     const TRGCDCHoughPlane * _plane;
@@ -86,7 +91,7 @@ class TRGCDCCircle : public TRGCDCTrackBase {
 //-----------------------------------------------------------------------------
 
 inline
-float
+double
 TRGCDCCircle::pt(void) const {
     const double ConstantAlpha = 222.376063; // for 1.5T
     return _radius / ConstantAlpha;
@@ -99,7 +104,7 @@ TRGCDCCircle::center(void) const {
 }
 
 inline
-float
+double
 TRGCDCCircle::radius(void) const {
     return _radius;
 }

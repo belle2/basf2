@@ -37,7 +37,7 @@ TRGCDCTrackBase::TRGCDCTrackBase(const TRGCDCTrackBase & t)
 	_ts[i].assign(t._ts[i].begin(), t._ts[i].end());
 }
 
-TRGCDCTrackBase::TRGCDCTrackBase(const string & name, float charge)
+TRGCDCTrackBase::TRGCDCTrackBase(const string & name, double charge)
     : _name(name),
       _status(0),
       _charge(charge),
@@ -55,6 +55,8 @@ TRGCDCTrackBase::~TRGCDCTrackBase() {
 
 void
 TRGCDCTrackBase::dump(const string & cmd, const string & pre) const {
+    bool detail = (cmd.find("detail") != string::npos);
+
     string tab = TRGDebug::tab() + pre;
     cout << tab << "Dump of " << name() << endl;
     tab += "    ";
@@ -63,7 +65,7 @@ TRGCDCTrackBase::dump(const string & cmd, const string & pre) const {
 	 << endl;
     cout << tab;
     for (unsigned i = 0; i < _nTs; i++) {
-	cout << i << "=" << _ts[i].size();
+	cout << i << ":" << _ts[i].size();
         for (unsigned j = 0; j < _ts[i].size(); j++) {
             if (j == 0)
 		cout << "(";
@@ -75,11 +77,26 @@ TRGCDCTrackBase::dump(const string & cmd, const string & pre) const {
         if (_ts[i].size())
             cout << ")";
     }
+//     if (detail) {
+
+//     }
     cout << endl;
 }
 
+
+int
+TRGCDCTrackBase::fit(void) {
+    if (_fitter) {
+	return _fitter->fit(* this);
+    }
+    else {
+	cout << "TRGCDCTrackBase !!! no fitter available" << endl;
+	return -1;
+    }
+}
+
 void
-TRGCDCTrackBase::append(TRGCDCLink * a) {
+TRGCDCTrackBase::append(TCLink * a) {
 //    (* _ts)[a->wire()->superLayerId()]->push_back(a);
     _ts[a->wire()->superLayerId()].push_back(a);
     _tsAll.push_back(a);
@@ -92,25 +109,21 @@ TRGCDCTrackBase::append(const vector<TCLink *> links) {
     }
 }
 
-const std::vector<TRGCDCLink *> &
+const std::vector<TCLink *> &
 TRGCDCTrackBase::links(void) const {
     return _tsAll;
 }
 
-const std::vector<TRGCDCLink *> &
+const std::vector<TCLink *> &
 TRGCDCTrackBase::links(unsigned layerId) const {
     return _ts[layerId];
 }
 
 int
-TRGCDCTrackBase::fit(void) {
-    if (_fitter) {
-	return _fitter->fit(* this);
-    }
-    else {
-	cout << "TRGCDCTrackBase !!! no fitter available" << endl;
-	return -1;
-    }
+TRGCDCTrackBase::approach2D(TCLink &) const {
+    cout << "TRGCDCTrackBase::approach2D !!! not implemented" << endl;
+    return -1;
 }
+
 
 } // namespace Belle2

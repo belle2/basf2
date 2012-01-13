@@ -18,6 +18,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <pangomm/init.h>
+#include "trg/trg/Constants.h"
 #include "trg/cdc/TRGCDC.h"
 #include "trg/cdc/Wire.h"
 #include "trg/cdc/WireHit.h"
@@ -354,16 +355,50 @@ TRGCDCDisplayDrawingAreaRphi::drawTrack(const TCTrack & t,
     for (unsigned i = 0; i < cdc.nSuperLayers(); i++) {
         const vector<TCLink *> & links = t.links(i);
         for (unsigned j = 0; j < links.size(); j++) {
-            drawTrackSegment(* (TCTSegment *) links[j]->wire(),
+	    const TCLink & l = * links[j];
+            drawTrackSegment(* (TCTSegment *) l.wire(),
 			     lineWidth,
 			     c,
 			     s);
+	    _window->draw_line(_gc,
+			       x(l.positionOnTrack().x() * 10),
+			       y(l.positionOnTrack().y() * 10),
+			       x(l.positionOnWire().x() * 10),
+			       y(l.positionOnWire().y() * 10));
         }
     }
 
-    //...Draw a circle...
-//     const TRGPoint2D & h = t.center();
-//     double radius = fabs(t.radius());
+    //...Draw a track...
+    TCHelix hIp = t.helix();
+    hIp.pivot(ORIGIN);
+    const HepGeom::Point3D<double> & h = hIp.center();
+    const double radius = fabs(hIp.radius());
+    const HepGeom::Point3D<double> pIn = t.links(0)[0]->positionOnTrack();
+    const HepGeom::Point3D<double> pOut = t.links(8)[0]->positionOnTrack();
+//     const HepGeom::Point3D<double> pIn = TLink::innerMost(t.cores())->positionOnTrack() - h;
+//     const HepGeom::Point3D<double> pOut = TLink::outerMost(t.cores())->positionOnTrack() - h;
+    double a0 = atan2(pIn.y(), pIn.x()) / M_PI * 180;
+    double a1 = atan2(pOut.y(), pOut.x()) / M_PI * 180;
+     std::cout << "h=" << h << ",r=" << radius
+ 				      << ",a0=" << a0 << ",a1=" << a1
+ 				      << std::endl;
+    double d = a1 - a0;
+    if (d > 180) d -= 360;
+    else if (d < -180) d += 360;
+    _window->draw_arc(_gc,
+		      0,
+		      x((h.x() - radius) * 10),
+		      y((h.y() + radius) * 10),
+		      int(2 * radius * 10 * _scale),
+		      int(2 * radius * 10 * _scale),
+//		      int(a0 * 64),
+		      0,
+		      360 * 64);
+//		      int(d * 64));
+
+//     //...Draw a circle...
+//     const TRGPoint2D & h = t.helix().center();
+//     double radius = fabs(t.helix().radius());
 //     _window->draw_arc(_gc,
 //                       0,
 //                       x((h.x() - radius) * 10),
@@ -372,6 +407,7 @@ TRGCDCDisplayDrawingAreaRphi::drawTrack(const TCTrack & t,
 //                       int(2 * radius * 10 * _scale),
 //                       0,
 //                       360 * 64);
+
     colormap->free_color(c);
 }
 

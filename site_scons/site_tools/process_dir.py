@@ -182,9 +182,8 @@ def process_dir(
                 if os.path.basename(dir_name) != 'modules':
                     lib_name = os.path.basename(dir_name)
 
-            # link a dataobject library to the main package library
+            # update list of dataobject libraries
             if is_dataobjects_dir:
-                parent_env.Append(LIBS=[lib_name])
                 parent_env['DATAOBJECT_LIB'] = lib_name
 
             # create library and map for modules
@@ -240,6 +239,7 @@ def process_dir(
     for bin_file in env['TOOLS_FILES']:
         bin_filename = os.path.splitext(os.path.basename(str(bin_file)))[0]
         bin_env = env.Clone()
+        bin_env['LIBS'] = []
         if bin_env['TOOLS_LIBS'].has_key(bin_filename):
             bin_env['LIBS'] = Flatten([env.subst(str(lib)).split() for lib in
                                       Flatten(bin_env['TOOLS_LIBS'

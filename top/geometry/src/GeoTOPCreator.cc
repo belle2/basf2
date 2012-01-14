@@ -273,7 +273,6 @@ namespace Belle2 {
       G4ExtrudedSolid* wedge = new  G4ExtrudedSolid("wedge", polygon, Wwidth / 2.0, G4TwoVector(0.0, 0.0), 1.0, G4TwoVector(0.0, 0.0), 1.0);
 
       G4LogicalVolume* qwedge = new G4LogicalVolume(wedge, quartzMaterial, "qwedge");
-      qwedge->SetSensitiveDetector(m_sensitiveTrack);
 
       //!color the glue
 

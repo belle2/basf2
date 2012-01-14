@@ -155,6 +155,7 @@ namespace Belle2 {
       track.SetTrackStatus(fStopAndKill);
 
       //! Since we have detected the particle we return true
+
       return true;
     }
 

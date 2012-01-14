@@ -16,16 +16,15 @@
 namespace Belle2 {
 
 
-  //! Class TOPDigiHit - Stores hits after digitisation
-  /*!
-   This is a class to store TOP geant4 hit in datastore.
-   It is also the input for digitization module (TOPDigi).
+  /*! This is a class to store TOP digitized hits in datastore.
+   *  It is also the output for digitization module (TOPDigi).
    */
 
   class TOPDigiHit : public TObject {
   public:
 
-    //! Default constructor
+    /*! Default constructor
+     */
     TOPDigiHit():
       m_barID(0),
       m_channelID(0),
@@ -33,17 +32,15 @@ namespace Belle2 {
       m_energy(0.),
       m_parentID(0),
       m_trackID(0) {
-      /*! Does nothing */
     }
 
-    //! Full constructor.
-    /*!
-     \param barID is the ID of the bar
-     \param channelID is the ID of the digitised channel
-     \param TDC it the TDC of global time
-     \param energy energy of photon
-     \param parentID geant4 id of photon parent particle
-     \param trackID geant4 id of photon track
+    /*!  Full constructor.
+     * @param barID is the ID of the bar
+     * @param channelID is the ID of the digitised channel
+     * @param TDC it the TDC of global time
+     * @param energy energy of photon
+     * @param parentID geant4 id of photon parent particle
+     * @param trackID geant4 id of photon track
      */
 
     TOPDigiHit(
@@ -59,53 +56,73 @@ namespace Belle2 {
       m_energy(energy),
       m_parentID(parentID),
       m_trackID(trackID) {
-      /* Does nothing */
     }
 
+    /*! -- Function for getting parameters out of TOPDigiHit -- */
 
-    //! Get ID number of bar that registered hit
+    /*! Get ID number of bar that registered hit
+     * @return ID of the bar in which the hit took place
+     */
     int getBarID() const { return m_barID; }
 
-    //! Get the channel ID of the hit in the PMT
+    /*! Get channel ID in which the hit was registered
+     * @return channel ID of hit
+     */
     int getChannelID() const { return m_channelID; }
 
-    //! Get TDC time of hit
+    /*! Get TDC of global time
+     * @return TDC of hot
+     */
     int getTDC() const { return m_TDC; }
 
-    //! Get detected photon energy
+    /*! get energy of the detected photon
+     * @return energy of detected photon
+     */
     double getEnergy() const { return m_energy; }
 
-    //! Get G4 ID number of photons parent particle
+    /*! get the geant ID of the parent
+     * @return GeantID of parent particle
+     */
     int getParentID() const { return m_parentID; }
 
-    //! Get G4 ID number of photons track
+    /*! get track id of the particle
+     * @return track ID of the hit
+     */
     int getTrackID() const { return m_trackID; }
 
-    //! Set ID number of module that registered hit
+    /*! -- Function for parameters parameters in TOPDigiHit -- */
+
+    /*! Set ID number of bar in which the hit was registered
+     */
     void setBarID(int barID) { m_barID = barID; }
 
-    //! Set ID number of module that registered hit
+    /*! Set channel ID in which the hit was registered
+     */
     void setChannelID(int channelID) { m_channelID = channelID; }
 
-    //! Set global time of hit
+    /*! Set TDC of hit
+     */
     void setTDC(int TDC) { m_TDC = TDC; }
 
-    //! Get detected photon energy
+    /*! Set photon energy of detected photon
+     */
     void setEnergy(double energy) { m_energy = energy; }
 
-    //! Get G4 ID number of photons parent particle
+    /*! Set geant ID of parent particle
+     */
     void setParentID(int parentID) { m_parentID = parentID; }
 
-    //! Get G4 ID number of photons track
+    /*! Set track ID of detected photon
+     */
     void setTrackID(int trackID) { m_trackID = trackID; }
 
   private:
-    int m_barID;           /**< ID number of bar that registered hit*/
-    int m_channelID;      /**< Channel ID of the hit in the PMT */
-    int m_TDC;              /**< digitised time */
-    double m_energy;          /**< Energy of detected photon */
-    int m_parentID;        /**< G4 ID number of photons parent particle */
-    int m_trackID;        /**< G4 ID number of photons track */
+    int m_barID;             /**< ID number of bar that registered hit*/
+    int m_channelID;         /**< Channel ID of the hit */
+    int m_TDC;               /**< digitised time */
+    double m_energy;         /**< Energy of detected photon */
+    int m_parentID;          /**< G4 ID number of photons parent particle */
+    int m_trackID;           /**< G4 ID number of photons track */
 
     ClassDef(TOPDigiHit, 1); /**< the class title */
 

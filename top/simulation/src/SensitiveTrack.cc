@@ -9,7 +9,7 @@
  **************************************************************************/
 
 #include <top/simulation/SensitiveTrack.h>
-#include <top/dataobjects/TOPQuartzHit.h>
+#include <top/dataobjects/TOPTrack.h>
 #include <top/geometry/TOPGeometryPar.h>
 
 #include <G4Step.hh>
@@ -35,81 +35,121 @@ namespace Belle2 {
     SensitiveTrack::SensitiveTrack():
       Simulation::SensitiveDetectorBase("TOP", SensitiveTrack::TOP), m_topgp(TOPGeometryPar::Instance())
     {
+      //! MCPacrticle store array needed for creation of relations
       StoreArray<MCParticle> mcParticles;
-      StoreArray<TOPQuartzHit>  topQuartzHits;
+      //! TOPTracks into which the tracks will be stored
+      StoreArray<TOPTrack>  topTracks;
 
-      RelationArray relTOPQuartzHitToMCParticle(topQuartzHits, mcParticles);
-      registerMCParticleRelation(relTOPQuartzHitToMCParticle);
+      //! The relation array between MCParticle and TOPTrack
+      RelationArray  relTOPTrackToMCParticle(topTracks, mcParticles);
+      //! Registraction of the relation array
+      registerMCParticleRelation(relTOPTrackToMCParticle);
 
     }
 
 
     bool SensitiveTrack::step(G4Step* aStep, G4TouchableHistory*)
     {
-      // Get track parameters
-      StoreArray<MCParticle> mcParticles;
 
-
+      //! get particle track
       G4Track* aTrack = aStep->GetTrack();
-      G4StepPoint* PrePosition =  aStep->GetPreStepPoint();
-      G4ThreeVector worldPosition = PrePosition->GetPosition();
+
+      //! check which particle did hit the bar
       G4ParticleDefinition* particle = aTrack->GetDefinition();
-      int  PDGCharge = (int)(particle->GetPDGCharge());
+
+      //! query for it's PDG number
+      int  PDG = (int)(particle->GetPDGEncoding());
+
+      // Save all tracks excluding opticalphotons
+      if (PDG == 0) return false;
+
+      //! get the preposition, a step before current position
+      G4StepPoint* PrePosition =  aStep->GetPreStepPoint();
+
+      //! get lab frame position of the prestep point
+      G4ThreeVector worldPosition = PrePosition->GetPosition();
+
+      //! Check that the hit come from the boundary
+      if (PrePosition->GetStepStatus() != fGeomBoundary) return false;
+
+      //! Transform lab frame to bar frame
+      G4ThreeVector localPosition = PrePosition->GetTouchableHandle()->GetHistory()->GetTopTransform().TransformPoint(worldPosition);
+
+      //! Check that it is on the outside boundary not on the glue boundary
+      if (fabs(fabs(localPosition.y()) - (m_topgp->getQthickness() / 2.0)) > 10e-6) return false ;
+
+      //! This few lines are for debugging
+      /*
+       B2INFO("SensitiveTrack: " << aTrack->GetDefinition()->GetParticleName()
+       << " " << aTrack->GetTrackID()
+       << " " << aTrack->GetParentID()
+       << " " << G4BestUnit(localPosition, "Length")
+       << " " << G4BestUnit(worldPosition, "Length")
+       << " " << G4BestUnit(aTrack->GetMomentum(), "Energy")
+       << " " << G4BestUnit(aTrack->GetGlobalTime(), "Time")
+       << " Edep is " << G4BestUnit(aStep->GetTotalEnergyDeposit(), "Energy"));*/
+
+      //! Get track ID
+      int trackID = aTrack->GetTrackID();
+
+      //! get track length and subtract step length to get the length to the boundary
+      double tracklength = aTrack->GetTrackLength() - aStep->GetStepLength();
+
+      //! get the global time
+      const G4double globalTime = PrePosition->GetGlobalTime();
+
+      //! get the local time
+      const G4double localTime = PrePosition->GetLocalTime();
+
+      //! the momentum on the boundary
       G4ThreeVector momentum = PrePosition->GetMomentum();
 
-      // Save only tracks of charged particles
-      if (PDGCharge == 0) return(true);
+      //! calculate momentum at vertex position
+      double vmomentum = sqrt(aTrack->GetVertexKineticEnergy() * aTrack->GetVertexKineticEnergy() + 2 * aTrack->GetVertexKineticEnergy() * particle->GetPDGMass());
 
-      // Track parameters are saved at the entrance in quarz bar
+      //! Fill three vectors that hold momentum and position
+      TVector3 TPosition(worldPosition.x() , worldPosition.y() , worldPosition.z());
+      TVector3 TMomentum(momentum.x() , momentum.y()  , momentum.z());
 
-      if (((PrePosition->GetStepStatus() == fGeomBoundary))) {
+      TVector3 TVPosition(aTrack->GetVertexPosition().x() , aTrack->GetVertexPosition().y() , aTrack->GetVertexPosition().z());
+      TVector3 TVMomentum(vmomentum * aTrack->GetVertexMomentumDirection().x(), vmomentum * aTrack->GetVertexMomentumDirection().y() , vmomentum * aTrack->GetVertexMomentumDirection().z());
 
-        G4ThreeVector localPosition = PrePosition->GetTouchableHandle()->GetHistory()->GetTopTransform().TransformPoint(worldPosition);
+      //! Get the ID of the bar that was hit
+      int barID = PrePosition->GetTouchableHandle()->GetReplicaNumber(2);
 
-        if (fabs(localPosition.y() + m_topgp->getQthickness() / 2.0) > 10e-10) return(true);
-
-
-        /*
-         B2INFO("SensQuartz: " << aTrack->GetDefinition()->GetParticleName()
-         << " " << aTrack->GetTrackID()
-         << " " << aTrack->GetParentID()
-         << " " << G4BestUnit(localPosition, "Length")
-         << " " << G4BestUnit(worldPosition, "Length")
-         << " " << G4BestUnit(aTrack->GetMomentum(), "Energy")
-         << " " << G4BestUnit(aTrack->GetGlobalTime(), "Time")
-         << " Edep is " << G4BestUnit(aStep->GetTotalEnergyDeposit(), "Energy"));*/
+      //!Get the charge of the particle
+      int PDGCharge = (int)particle->GetPDGCharge();
 
 
+      /*!------------------------------------------------------------
+       *                Create TOPTrack and save it to datastore
+       * ------------------------------------------------------------
+       */
+
+      //! Define TOPTrack array to which the hit will be stored
+      StoreArray<TOPTrack> topTracks;
+
+      //! get the number of already stored topTracks
+      G4int nentr = topTracks->GetEntries();
+
+      //! Store hit
+      new(topTracks->AddrAt(nentr)) TOPTrack(trackID, PDG, PDGCharge, TPosition, TVPosition, TMomentum, TVMomentum, barID, tracklength, globalTime, localTime);
 
 
-        int trackID = aTrack->GetTrackID();
-        int  PDGEncoding = particle->GetPDGEncoding();
-        double tracklength = aTrack->GetTrackLength() - aStep->GetStepLength();
-        const G4double globalTime = PrePosition->GetGlobalTime();
-        const G4double localTime = PrePosition->GetLocalTime();
-        double vmomentum = sqrt(aTrack->GetVertexKineticEnergy() * aTrack->GetVertexKineticEnergy() + 2 * aTrack->GetVertexKineticEnergy() * particle->GetPDGMass());
+      /*!--------------------------------------------------------------------------
+       *                Make relation between TOPTracks and MCParticle
+       * --------------------------------------------------------------------------
+       */
 
-        // B2INFO(vmomentum)
+      //! Define the MCParticle class to be used for relation definition
+      StoreArray<MCParticle> mcParticles;
 
-        TVector3 TPosition(worldPosition.x() , worldPosition.y() , worldPosition.z());
-        TVector3 TMomentum(momentum.x() , momentum.y()  , momentum.z());
+      //! Define the relation array
+      RelationArray relTOPTrackToMCParticle(topTracks, mcParticles);
+      //! add the relation
+      relTOPTrackToMCParticle.add(nentr, trackID);
 
-        TVector3 TVPosition(aTrack->GetVertexPosition().x() , aTrack->GetVertexPosition().y() , aTrack->GetVertexPosition().z());
-        TVector3 TVMomentum(vmomentum * aTrack->GetVertexMomentumDirection().x(), vmomentum * aTrack->GetVertexMomentumDirection().y() , vmomentum * aTrack->GetVertexMomentumDirection().z());
-        //B2INFO(aTrack->GetVertexMomentumDirection().x())
-
-        const G4StepPoint& preStep  = *aStep->GetPreStepPoint();
-        const int barID = preStep.GetTouchableHandle()->GetReplicaNumber(1);
-
-        // Tracks are saved in "topQuartzHits"
-        StoreArray<TOPQuartzHit> topQuartzHits;
-        G4int nentr = topQuartzHits->GetEntries();
-        new(topQuartzHits->AddrAt(nentr)) TOPQuartzHit(trackID, PDGEncoding, PDGCharge, TPosition, TVPosition, TMomentum, TVMomentum, barID, tracklength, globalTime, localTime, 0, 0, 0, 0, 0, 0, 0);
-
-        RelationArray relTOPQuartzHitToMCParticle(topQuartzHits, mcParticles);
-        relTOPQuartzHitToMCParticle.add(nentr, trackID);
-
-      }
+      //! everything done successfully
       return true;
     }
 

@@ -19,7 +19,7 @@
 #include <time.h>
 
 // Hit classes
-#include <top/dataobjects/TOPQuartzHit.h>
+#include <top/dataobjects/TOPTrack.h>
 #include <top/dataobjects/TOPDigiHit.h>
 
 // framework - DataStore
@@ -80,7 +80,7 @@ namespace Belle2 {
       m_timeCPU = clock() * Unit::us;
 
       StoreArray<TOPDigiHit> topDigiHits;
-      StoreArray<TOPQuartzHit> topQuartzHits;
+      StoreArray<TOPTrack> topTracks;
 
       TOPconfigure();
 
@@ -103,8 +103,8 @@ namespace Belle2 {
 
       //! Get the collection of TOPDigiHits from the Data store,
 
-      StoreArray<TOPQuartzHit> topQuartzHits;
-      if (!topQuartzHits) B2ERROR("TOPDigitizerModule: Cannot find TOPQuartzHit array.");
+      StoreArray<TOPTrack> topTracks;
+      if (!topTracks) B2ERROR("TOPDigitizerModule: Cannot find TOPQuartzHit array.");
 
 
       //TOPconfigure();
@@ -119,11 +119,11 @@ namespace Belle2 {
       B2INFO("nHits: " << nHits);
 
       // Get number of hits in this event
-      int nQHits = topQuartzHits->GetEntries();
+      int nQHits = topTracks->GetEntries();
       B2INFO("n tracks: " << nQHits);
 
       for (int track = 0; track < nQHits; ++track) {
-        TOPQuartzHit* atrack = topQuartzHits[track];
+        TOPTrack* atrack = topTracks[track];
 
         TVector3 pos = atrack->getPosition();
         TVector3 mom = atrack->getMomentum();

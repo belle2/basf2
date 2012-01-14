@@ -8,9 +8,9 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <top/dataobjects/TOPQuartzHit.h>
+#include <top/dataobjects/TOPTrack.h>
 
 using namespace std;
 using namespace Belle2;
 
-ClassImp(TOPQuartzHit)
+ClassImp(TOPTrack)

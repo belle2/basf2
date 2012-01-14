@@ -7,7 +7,7 @@
 
 #pragma link C++ class Belle2::TOPSimHit;
 #pragma link C++ class Belle2::TOPDigiHit;
-#pragma link C++ class Belle2::TOPQuartzHit;
+#pragma link C++ class Belle2::TOPTrack;
 
 
 #endif

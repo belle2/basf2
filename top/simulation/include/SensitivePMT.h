@@ -16,22 +16,23 @@
 
 namespace Belle2 {
   namespace TOP {
-    //! The Class for TOP Sensitive PMT
-    /*! In this class, variables will be calculated that will be later stored in TOPSimHit
-    */
+    /*! The Class for TOP Sensitive PMT
+     * In this class, variables will be calculated that will be later stored in TOPSimHit
+     */
     class SensitivePMT : public Simulation::SensitiveDetectorBase {
 
     public:
 
       /**
        * Constructor.
+       * @param name Name of the sensitive detector. Do we still need that?
        */
       SensitivePMT();
 
       /**
        * Process each step and calculate variables defined in TOPSimHit.
        * @param aStep Current Geant4 step in the sensitive medium.
-       * @return true if a hit was stored, o.w. false.
+       * @result true if a hit was stored, o.w. false.
        */
       bool step(G4Step* aStep, G4TouchableHistory*);
 

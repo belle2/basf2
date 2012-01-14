@@ -51,11 +51,6 @@ namespace Belle2 {
       /*! Check if the particle that hit the sensitive are is actualy a optical photon */
       if (track.GetDefinition()->GetParticleName() != "opticalphoton") return false;
 
-      //! Get step information
-      const G4StepPoint& preStep  = *aStep->GetPreStepPoint();
-
-
-
       /*! Get time (check for proper global time) of track */
 
       //! get global time from bunch crossing

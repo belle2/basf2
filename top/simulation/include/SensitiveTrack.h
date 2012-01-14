@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef TOPSENSITIVEQUARTZ_H
-#define TOPSENSITIVEQUARTZ_H
+#ifndef TOPSENSITIVETRACK_H
+#define TOPSENSITIVETRACK_H
 
 #include <simulation/kernel/SensitiveDetectorBase.h>
 #include <top/geometry/TOPGeometryPar.h>
@@ -31,7 +31,7 @@ namespace Belle2 {
       SensitiveTrack();
 
       /**
-       * Process each step and calculate variables defined in TOPSimHit.
+       * Process each step and calculate variables defined in TOPTrack.
        * @param aStep Current Geant4 step in the sensitive medium.
        * @result true if a hit was stored, o.w. false.
        */

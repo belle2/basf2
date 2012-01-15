@@ -1,6 +1,6 @@
 Import('env')
 
-env['LIBS'] = ['framework', 'geometry', 'generators_dataobjects',
+env['LIBS'] = ['framework', 'geometry', 'generators_dataobjects', 'simulation_dataobjects',
                '$ROOT_LIBS', 'Geom', 'EG', 'g4root',
                '$GEANT4_LIBS', 'G4GMocren', 'CLHEP']
 

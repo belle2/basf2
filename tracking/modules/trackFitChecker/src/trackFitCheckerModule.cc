@@ -567,6 +567,7 @@ void trackFitCheckerModule::terminate()
 {
 
   if (m_statDataTreePtr not_eq NULL) {
+    m_rootFilePtr->cd();
     m_statDataTreePtr->Write();
     m_rootFilePtr->Close();
 

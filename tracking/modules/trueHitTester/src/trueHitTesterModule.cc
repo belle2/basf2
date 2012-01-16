@@ -234,6 +234,7 @@ void trueHitTesterModule::endRun()
 
 void trueHitTesterModule::terminate()
 {
+  m_rootFilePtr->cd();
   m_trueHitDataTreePtr->Write();
   m_rootFilePtr->Close();
   // delete all the objects associated with branches

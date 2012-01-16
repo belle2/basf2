@@ -44,7 +44,7 @@ namespace Belle2 {
     //-----------------------------------------------------------------
 
     ARICHDigiModule::ARICHDigiModule() : Module(),
-        m_random(new TRandom3(0)), m_arichgp(ARICHGeometryPar::Instance())
+      m_random(new TRandom3(0)), m_arichgp(ARICHGeometryPar::Instance())
     {
       // Set description()
       setDescription("ARICHDigitizer");
@@ -135,7 +135,7 @@ namespace Belle2 {
 
         // Add new ARIHCHit to datastore
         new(arichHits->AddrAt(nSig + 1)) ARICHHit();
-        ARICHHit* newHit = arichHits[nSig+1];
+        ARICHHit* newHit = arichHits[nSig + 1];
         newHit->setModuleID(moduleID);
         newHit->setChannelID(channelID);
         newHit->setGlobalTime(globaltime);
@@ -176,7 +176,7 @@ namespace Belle2 {
 
       int ich = (int)((1239.85 / energy - 270) / 10.);
       if (ich < 0 || ich >= 44) return 0;
-      return 2.857*0.8*qe[ich];// collection efficiency 0.8
+      return 2.857 * 0.8 * qe[ich]; // collection efficiency 0.8
 
       /*    const float qe[19] = {11.6399277036,
       19.1442321092,

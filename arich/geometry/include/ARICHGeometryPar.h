@@ -198,7 +198,7 @@ namespace Belle2 {
 
     inline double ARICHGeometryPar::getSensitiveSurfaceSize() const
     {
-      return _nPadX*_padSize + _chipGap;
+      return _nPadX * _padSize + _chipGap;
     }
 
     inline int ARICHGeometryPar::getNMCopies() const

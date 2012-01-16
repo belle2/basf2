@@ -28,11 +28,11 @@ namespace Belle2 {
 
     //! Default constructor
     ARICHSimHit():
-        m_moduleID(0),
-        m_position(0, 0, 0),
-        m_globalTime(0),
-        m_energy(0),
-        m_parentID(0) {
+      m_moduleID(0),
+      m_position(0, 0, 0),
+      m_globalTime(0),
+      m_energy(0),
+      m_parentID(0) {
       /*! Does nothing */
     }
 
@@ -51,11 +51,11 @@ namespace Belle2 {
       double globalTime,
       double energy,
       int parentID):
-        m_moduleID(moduleID),
-        m_position(position),
-        m_globalTime(globalTime),
-        m_energy(energy),
-        m_parentID(parentID) {
+      m_moduleID(moduleID),
+      m_position(position),
+      m_globalTime(globalTime),
+      m_energy(energy),
+      m_parentID(parentID) {
       /* Does nothing */
     }
 

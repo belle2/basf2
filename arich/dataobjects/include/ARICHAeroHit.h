@@ -27,10 +27,10 @@ namespace Belle2 {
     //! Empty constructor
     /*! Recommended for ROOT IO */
     ARICHAeroHit():
-        m_trackID(-1),
-        m_particleID(-1),
-        m_position(0, 0, 0),
-        m_momentum(0, 0, 0) {
+      m_trackID(-1),
+      m_particleID(-1),
+      m_position(0, 0, 0),
+      m_momentum(0, 0, 0) {
       /*! does nothing */
     }
 
@@ -72,10 +72,10 @@ namespace Belle2 {
     int getParticleID() const { return m_particleID; }
 
     //! Get track position (at entrance in 1. aerogel plane)
-    const TVector3 &getPosition() const { return m_position; }
+    const TVector3& getPosition() const { return m_position; }
 
     //! Get track momentum  (at entrance in 1. aerogel plane)
-    const TVector3 &getMomentum() const { return m_momentum; }
+    const TVector3& getMomentum() const { return m_momentum; }
 
   private:
 

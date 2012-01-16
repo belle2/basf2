@@ -13,7 +13,6 @@
 #define ARICHTRACK_H
 
 #include <arich/dataobjects/ARICHAeroHit.h>
-
 #include <TObject.h>
 
 #define MAXLKH 5
@@ -29,16 +28,16 @@ namespace Belle2 {
 
     //! Default constructor for ROOT IO. */
     ARICHTrack():
-        m_originalPosition(0, 0, 0),
-        m_originalDirection(0, 0, 0),
-        m_originalMomentum(0),
-        m_reconstructedPosition(0, 0, 0),
-        m_reconstructedDirection(0, 0, 0),
-        m_reconstructedMomentum(0),
-        m_PDGCharge(0),
-        m_PDGEncoding(-1),
-        m_G4TrackID(-1),
-        m_identity(-1) {
+      m_originalPosition(0, 0, 0),
+      m_originalDirection(0, 0, 0),
+      m_originalMomentum(0),
+      m_reconstructedPosition(0, 0, 0),
+      m_reconstructedDirection(0, 0, 0),
+      m_reconstructedMomentum(0),
+      m_PDGCharge(0),
+      m_PDGEncoding(-1),
+      m_G4TrackID(-1),
+      m_identity(-1) {
       /*! does nothing */
     }
 
@@ -46,7 +45,7 @@ namespace Belle2 {
     /*!
       \param aeroHit track hit on aerogel plane (ARICHAeroHit)
     */
-    ARICHTrack(const ARICHAeroHit &aeroHit);
+    ARICHTrack(const ARICHAeroHit& aeroHit);
 
     //! Useful constructor */
     /*!
@@ -72,19 +71,19 @@ namespace Belle2 {
     }
 
     //! returns original track position (from geant4 simulation)
-    const TVector3 &getOriginalPosition() const { return  m_originalPosition;};
+    const TVector3& getOriginalPosition() const { return  m_originalPosition;};
 
     //! returns original track direction (from geant4 simulation)
-    const TVector3 &getOriginalDirection() const { return m_originalDirection;} ;
+    const TVector3& getOriginalDirection() const { return m_originalDirection;} ;
 
     //! returns original track momentum (from geant4 simulation)
     double getOriginalMomentum() const { return m_originalMomentum;};
 
     //! returns reconstructed track position
-    const TVector3 &getReconstructedPosition() const { return  m_reconstructedPosition;};
+    const TVector3& getReconstructedPosition() const { return  m_reconstructedPosition;};
 
     //! returns original track direction
-    const TVector3 &getReconstructedDirection() const { return m_reconstructedDirection;} ;
+    const TVector3& getReconstructedDirection() const { return m_reconstructedDirection;} ;
 
     //! returns original track momentum
     double getReconstructedMomentum() const { return m_reconstructedMomentum;};
@@ -114,7 +113,7 @@ namespace Belle2 {
     void setLikelihood(int i, double val) {m_lkh[i] = val; };
 
     //!  sets value of likelihood function for all particle hypotheses. "imax" is number of particle hypotheses, "val" is array of hypotheses values (val[0] electron, 1 muon, 2 pion, 3 kaon, 4 proton)
-    void setLikelihood(int imax, double *val) {for (int i = 0; i < imax; i++) m_lkh[i] = val[i];};
+    void setLikelihood(int imax, double* val) {for (int i = 0; i < imax; i++) m_lkh[i] = val[i];};
 
     //! sets expected number of detected photons for "i" particle hypothesis (here i is particle index: 0 electron, 1 muon, 2 pion, 3 kaon, 4 proton)
     void setExpectedNOfPhotons(int i, double val) {m_sfot[i] = val; };
@@ -134,13 +133,13 @@ namespace Belle2 {
     double   getMeanEmissionLength(int i) const;
 
     //! Returns original mean emission direction of Cherenkov photons (same as track direction from geant4 simulation)
-    const TVector3 & getOriginalMeanEmissionDirection() const {return m_originalDirection;};
+    const TVector3& getOriginalMeanEmissionDirection() const {return m_originalDirection;};
 
     //! Returns mean emission direction of Cherenkov photons (same as reconstructed track direction)
-    const TVector3 & getMeanEmissionDirection() const {return m_reconstructedDirection;};
+    const TVector3& getMeanEmissionDirection() const {return m_reconstructedDirection;};
 
     //! Returns mean emission direction of Cherenkov photons from i-th aerogel (same as reconstructed track direction)
-    const TVector3 & getMeanEmissionDirection(int i) const {return m_reconstructedDirection;};
+    const TVector3& getMeanEmissionDirection(int i) const {return m_reconstructedDirection;};
 
     //! Returns track position at the aergel exit (exit from last layer).
     const TVector3 getAerogelExit(void) const {
@@ -154,7 +153,7 @@ namespace Belle2 {
     const TVector3 getAerogelInput(int i) const ;
 
     //! Returns track direction at point with z coordinate "zout" (assumes straight track).
-    const TVector3 & getDirectionAtZ(double zout) const {
+    const TVector3& getDirectionAtZ(double zout) const {
       return m_originalDirection;
     }
 

@@ -14,9 +14,8 @@
 
 using namespace std;
 using namespace Belle2;
-using namespace arich;
 
-ARICHTrack::ARICHTrack(const ARICHAeroHit &aeroHit)
+ARICHTrack::ARICHTrack(const ARICHAeroHit& aeroHit)
 {
 
   m_originalPosition = aeroHit.getPosition();
@@ -52,14 +51,14 @@ int ARICHTrack::Lund2Type(int ipart)
 double ARICHTrack::getMeanEmissionLength(int i) const
 {
   // Emission length measured from aerogel exit
-  static ARICHGeometryPar *arichgp = ARICHGeometryPar::Instance();
+  static arich::ARICHGeometryPar* arichgp = arich::ARICHGeometryPar::Instance();
 
   TVector3 dir = getMeanEmissionDirection(i);
   if (dir.Z() == 0) return 0;
   double atl = arichgp->getAerogelTransmissionLength(i);
   double d   = arichgp->getAerogelThickness(i) / dir.Z() / atl;
   double dmean = 1 - d / (exp(d) - 1);
-  return (dmean*atl);
+  return (dmean * atl);
 }
 
 TVector3 ARICHTrack::getMeanEmissionPosition(int i) const
@@ -67,14 +66,14 @@ TVector3 ARICHTrack::getMeanEmissionPosition(int i) const
 
   TVector3 dir = getMeanEmissionDirection(i);
   if (dir.Z() == 0) return TVector3();
-  return (getAerogelExit(i) - getMeanEmissionLength(i)*dir);
+  return (getAerogelExit(i) - getMeanEmissionLength(i) * dir);
 }
 
 
 const TVector3 ARICHTrack::getAerogelExit(int i) const
 {
 
-  static ARICHGeometryPar *arichgp = ARICHGeometryPar::Instance();
+  static arich::ARICHGeometryPar* arichgp = arich::ARICHGeometryPar::Instance();
   double z = arichgp->getAerogelZPosition(i) + arichgp->getAerogelThickness(i);
   return  getPositionAtZ(z);
 }
@@ -82,7 +81,7 @@ const TVector3 ARICHTrack::getAerogelExit(int i) const
 const TVector3 ARICHTrack::getAerogelInput(int i) const
 {
 
-  static ARICHGeometryPar *arichgp = ARICHGeometryPar::Instance();
+  static arich::ARICHGeometryPar* arichgp = arich::ARICHGeometryPar::Instance();
   double z = arichgp->getAerogelZPosition(i);
   return  getPositionAtZ(z);
 }
@@ -92,7 +91,7 @@ const TVector3 ARICHTrack::getPositionAtZ(double zout) const
 
   if (m_reconstructedDirection.Z() == 0) return m_reconstructedPosition;
   double path = (zout - m_reconstructedPosition.Z()) / m_reconstructedDirection.Z();
-  return m_reconstructedPosition + m_reconstructedDirection*path;
+  return m_reconstructedPosition + m_reconstructedDirection * path;
 }
 
 

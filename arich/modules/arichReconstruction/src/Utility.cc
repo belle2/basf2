@@ -70,9 +70,9 @@ namespace Belle2 {
       double x = s.x() / n;
       double y = s.y() / n;
 
-      if (x*x + y*y > 1) return TVector3();
-      if (s.z() < 0) return  TVector3(x, y, -sqrt(1 - x*x - y*y));
-      else   return  TVector3(x, y, sqrt(1 - x*x - y*y));
+      if (x * x + y * y > 1) return TVector3();
+      if (s.z() < 0) return  TVector3(x, y, -sqrt(1 - x * x - y * y));
+      else   return  TVector3(x, y, sqrt(1 - x * x - y * y));
     }
     //---------------------------------------------------------------
 

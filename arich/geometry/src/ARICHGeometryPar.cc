@@ -146,11 +146,11 @@ namespace Belle2 {
 
       double r = _detInnerRadius;
 
-      BOOST_FOREACH(const GearDir &ring, detParams.getNodes("Ring")) {
+      BOOST_FOREACH(const GearDir & ring, detParams.getNodes("Ring")) {
         double dR = ring.getLength("dR");
         r += dR;
         double rcenter = r + _modXSize / 2.;
-        if (rcenter + _modXSize*sqrt(2) / 2. > _detOuterRadius) {
+        if (rcenter + _modXSize * sqrt(2) / 2. > _detOuterRadius) {
           B2WARNING(_ncol.size() + 1  << "th ring of ARICH photon detectors will not be placed (out of detector tube).");
           break;
         }
@@ -177,7 +177,7 @@ namespace Belle2 {
 
     void ARICHGeometryPar::modulesPositionSimple(const GearDir& content)
     {
-      BOOST_FOREACH(const GearDir &module, content.getNodes("Detector/Plane/Modules/Module")) {
+      BOOST_FOREACH(const GearDir & module, content.getNodes("Detector/Plane/Modules/Module")) {
         TVector2 position(module.getLength("xPos"), module.getLength("yPos"));
         double angle = module.getAngle("angle") / Unit::rad;
         _fFi.push_back(position.Phi());
@@ -207,7 +207,7 @@ namespace Belle2 {
     TVector3 ARICHGeometryPar::getOrigin(int copyNo)
     {
       TVector2 origin;
-      origin.SetMagPhi(_fR[copyNo-1], _fFi[copyNo-1]);
+      origin.SetMagPhi(_fR[copyNo - 1], _fFi[copyNo - 1]);
       return TVector3(origin.X(), origin.Y(), _detZpos + _modZSize / 2.);
     }
 
@@ -219,16 +219,16 @@ namespace Belle2 {
 
     double ARICHGeometryPar::getModAngle(int copyno)
     {
-      return _fFiMod[copyno-1];
+      return _fFiMod[copyno - 1];
     }
 
     void ARICHGeometryPar::chipLocPosition()
     {
       double xycenter =  _padSize * _nPadX / 4. + _chipGap / 2.;
-      _chipLocPos.push_back(TVector2(xycenter - _padSize*_nPadX / 4., xycenter - _padSize*_nPadX / 4.));
-      _chipLocPos.push_back(TVector2(xycenter - _padSize*_nPadX / 4., -xycenter - _padSize*_nPadX / 4.));
-      _chipLocPos.push_back(TVector2(-xycenter - _padSize*_nPadX / 4., xycenter - _padSize*_nPadX / 4.));
-      _chipLocPos.push_back(TVector2(-xycenter - _padSize*_nPadX / 4., -xycenter - _padSize*_nPadX / 4.));
+      _chipLocPos.push_back(TVector2(xycenter - _padSize * _nPadX / 4., xycenter - _padSize * _nPadX / 4.));
+      _chipLocPos.push_back(TVector2(xycenter - _padSize * _nPadX / 4., -xycenter - _padSize * _nPadX / 4.));
+      _chipLocPos.push_back(TVector2(-xycenter - _padSize * _nPadX / 4., xycenter - _padSize * _nPadX / 4.));
+      _chipLocPos.push_back(TVector2(-xycenter - _padSize * _nPadX / 4., -xycenter - _padSize * _nPadX / 4.));
     }
 
 
@@ -265,7 +265,7 @@ namespace Belle2 {
         for (int ix = 0; ix < Npad; ix++) {
           for (int iy = 0; iy < Npad; iy++) {
             int chanID = chipID * Npad * Npad + ix * Npad + iy;
-            TVector2 center(_padSize / 2. + ix*_padSize, _padSize / 2. + iy*_padSize);
+            TVector2 center(_padSize / 2. + ix * _padSize, _padSize / 2. + iy * _padSize);
             center = center + chipPos;
             _padLocPositions[chanID] = center;
           }
@@ -289,16 +289,16 @@ namespace Belle2 {
     {
       double rmir = _mirrorOuterRad * cos(M_PI / _nMirrors) - _mirrorThickness;
       for (int i = 0; i < _nMirrors; i++) {
-        TVector3 norm(cos(2.*M_PI / double(_nMirrors)*(i + 0.5) + _mirrorStartAng), sin(2.*M_PI / double(_nMirrors)*(i + 0.5) + _mirrorStartAng), 0);
+        TVector3 norm(cos(2.*M_PI / double(_nMirrors) * (i + 0.5) + _mirrorStartAng), sin(2.*M_PI / double(_nMirrors) * (i + 0.5) + _mirrorStartAng), 0);
         _mirrornorm.push_back(norm);
-        _mirrorpoint.push_back(rmir*norm);
+        _mirrorpoint.push_back(rmir * norm);
       }
     }
 
     void ARICHGeometryPar::mirrorPositionSimple(const GearDir& content)
     {
       double thick = content.getLength("Mirrors/thickness");
-      BOOST_FOREACH(const GearDir &mirror, content.getNodes("Mirrors/Mirror")) {
+      BOOST_FOREACH(const GearDir & mirror, content.getNodes("Mirrors/Mirror")) {
         double angle = mirror.getAngle("angle");
         TVector3 point(mirror.getLength("xPos") - cos(angle)*thick / 2., mirror.getLength("yPos") - sin(angle)*thick / 2., 0);
         TVector3 norm(cos(angle), sin(angle), 0);

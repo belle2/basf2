@@ -80,7 +80,7 @@ namespace Belle2 {
         \param refind array of layers refractive indices
         \param z array of z coordinates of borders between layers
        */
-      TVector3 FastTracking(TVector3 dirf, TVector3 r,  double *refind, double *z, int n);
+      TVector3 FastTracking(TVector3 dirf, TVector3 r,  double* refind, double* z, int n);
 
 //! Calculates the intersection of the Cherenkov photon emitted from point "r" in "dirf" direction with the detector plane. (For the case of simple (beamtest) geometry.)
       /*!
@@ -90,7 +90,7 @@ namespace Belle2 {
         \param refind array of layers refractive indices
         \param z array of z coordinates of borders between layers
        */
-      TVector3 FastTrackingSimple(TVector3 dirf, TVector3 r,  double *refind, double *z, int n);
+      TVector3 FastTrackingSimple(TVector3 dirf, TVector3 r,  double* refind, double* z, int n);
 
       //! Calculates the direction of photon emission.
       /*! Giving the Cherenkov photon emission point "r" and its position on detector plane "rh" (hit position) this methods calculates the direction "dirf" in which photon was emitted, under the assumption that it was reflected from "nmir"-th mirror plate (nmir=-1 for no reflection).
@@ -105,8 +105,8 @@ namespace Belle2 {
         \param nmir id of mirror from which the foton was reflected (assuming).
       */
       int  CherenkovPhoton(TVector3 r, TVector3 rh,
-                           TVector3 &rf, TVector3 &dirf,
-                           double *refind, double *z, int n, int nmir);
+                           TVector3& rf, TVector3& dirf,
+                           double* refind, double* z, int n, int nmir);
     };
 
 

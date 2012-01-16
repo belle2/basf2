@@ -27,9 +27,9 @@ namespace Belle2 {
 
     //! Default constructor for ROOT IO.
     ARICHHit():
-        m_moduleID(-1),
-        m_channelID(-1),
-        m_globalTime(0) {
+      m_moduleID(-1),
+      m_channelID(-1),
+      m_globalTime(0) {
       /*! does nothing */
     }
 
@@ -40,9 +40,9 @@ namespace Belle2 {
       \param globalTime global time of hit
      */
     ARICHHit(int moduleID, int channelID, double globalTime):
-        m_moduleID(moduleID),
-        m_channelID(channelID),
-        m_globalTime(globalTime) {
+      m_moduleID(moduleID),
+      m_channelID(channelID),
+      m_globalTime(globalTime) {
       /*! Does nothing */
     }
 

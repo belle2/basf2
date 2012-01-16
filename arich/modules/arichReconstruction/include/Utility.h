@@ -38,7 +38,7 @@ namespace Belle2 {
       \param n quotient of media refractive indices (n_2/n_1)
       \param a photon direction after refraction
     */
-    int Refraction(TVector3 s, TVector3 norm, double n, TVector3 &a);
+    int Refraction(TVector3 s, TVector3 norm, double n, TVector3& a);
 
     //! Returns unit vector with polar angle theta and azimuth fi.
     /*!

@@ -96,7 +96,7 @@ namespace Belle2 {
         zEnvBack = envelopeParams.getLength("zBack") / Unit::mm;
         double innerR = envelopeParams.getLength("innerRadius") / Unit::mm;
         double outerR = envelopeParams.getLength("outerRadius") / Unit::mm;
-        G4Tubs *envelopeTube = new G4Tubs("Envelope", innerR, outerR, (zEnvBack - zEnvFront) / 2., 0, 2*M_PI);
+        G4Tubs* envelopeTube = new G4Tubs("Envelope", innerR, outerR, (zEnvBack - zEnvFront) / 2., 0, 2 * M_PI);
         string materialName = envelopeParams.getString("material", "Air");
         G4Material* material = Materials::get(materialName);
         // check of material and its refractive index
@@ -136,9 +136,9 @@ namespace Belle2 {
       G4LogicalVolume* lsupport = buildModuleSupportPlate(supportParam);
 
       // place photon detector modules and their pcbs
-      G4Tubs *detectorsTube = new G4Tubs("detectorsTube", detectorRin, detectorRout, (moduleThick + boardThick) / 2., 0, 2*M_PI);
+      G4Tubs* detectorsTube = new G4Tubs("detectorsTube", detectorRin, detectorRout, (moduleThick + boardThick) / 2., 0, 2 * M_PI);
       G4Material* dTubeMaterial = Materials::get("ARICH_Air");
-      G4LogicalVolume *ldetectorsTube = new G4LogicalVolume(detectorsTube, dTubeMaterial, "detectorsTube");
+      G4LogicalVolume* ldetectorsTube = new G4LogicalVolume(detectorsTube, dTubeMaterial, "detectorsTube");
       setVisibility(*ldetectorsTube, false);
       G4Transform3D dtubeTrans = G4Translate3D(0, 0, detectorZ + (moduleThick + boardThick) / 2. - envOrigin.z());
       int nModules = m_arichgp->getNMCopies();
@@ -178,7 +178,7 @@ namespace Belle2 {
       G4Material* gapsMaterial = Materials::get(gapsMat);
       int ilayer = 0;
       // build and place aerogel layers
-      BOOST_FOREACH(const GearDir &layer, aeroParam.getNodes("Layers/Layer")) {
+      BOOST_FOREACH(const GearDir & layer, aeroParam.getNodes("Layers/Layer")) {
 
         double thick = layer.getLength("thickness");
         m_arichgp->setAerogelThickness(ilayer, thick);
@@ -189,7 +189,7 @@ namespace Belle2 {
         // here we check that aerogel has specified optical properties, and set their values in m_arichgp to be available for reconstruction later on
         G4MaterialPropertiesTable* mTable = aeroMaterial->GetMaterialPropertiesTable();
         if (!mTable) { B2WARNING("Material '" << aeroMat << "', for ARICH aerogel layer has no specified optical properties");} else {
-          G4MaterialPropertyVector *mVector =  mTable->GetProperty("RAYLEIGH");
+          G4MaterialPropertyVector* mVector =  mTable->GetProperty("RAYLEIGH");
           if (!mVector) { B2WARNING("Material '" << aeroMat << "', for ARICH aerogel layer has no specified Rayleigh attenuation length.");} else {
             double lambda0 = 400;
             double e0 = 1240. / lambda0 * Unit::eV / Unit::MeV;
@@ -202,7 +202,7 @@ namespace Belle2 {
 
         if (supportZ == 0) supportZ = zPos / Unit::mm;
 
-        G4Tubs *aerogelTube = new G4Tubs("aerogelTube", rin, rout, thick / 2. / Unit::mm, 0, 2*M_PI);
+        G4Tubs* aerogelTube = new G4Tubs("aerogelTube", rin, rout, thick / 2. / Unit::mm, 0, 2 * M_PI);
         G4LogicalVolume* laerogelTube = new G4LogicalVolume(aerogelTube, gapsMaterial, "AerogelTube");
 
         // build and place aerogel tiles in tube
@@ -241,7 +241,7 @@ namespace Belle2 {
         string asupMat = aeroParam.getString("SupportPlate/material");
         G4Material* asupportMaterial = Materials::get(asupMat);
 
-        G4Tubs *asupportTube = new G4Tubs("asupportTube", rin, rout, asupportThick / 2., 0, 2*M_PI);
+        G4Tubs* asupportTube = new G4Tubs("asupportTube", rin, rout, asupportThick / 2., 0, 2 * M_PI);
         G4LogicalVolume* lasupportTube = new G4LogicalVolume(asupportTube, asupportMaterial, "AerogelSupportPlate");
         lasupportTube->SetSensitiveDetector(m_sensitiveAero);
         G4ThreeVector asupPos = G4ThreeVector(0, 0, supportZ - asupportThick / 2.) - envOrigin;
@@ -293,30 +293,30 @@ namespace Belle2 {
       double botThick =  Module.getLength("Bottom/thickness") / Unit::mm;
 
       // some trivial checks of overlaps
-      if (sensXsize > modXsize - 2*wallThick) B2FATAL("ARICH photon detector module: Sensitive surface is too big. Doesn't fit into module box.");
+      if (sensXsize > modXsize - 2 * wallThick) B2FATAL("ARICH photon detector module: Sensitive surface is too big. Doesn't fit into module box.");
       if (winThick + botThick > modZsize) B2FATAL("ARICH photon detector module: window + bottom thickness larger than module thickness.");
 
       // module master volume
-      G4Box *moduleBox = new G4Box("Box", modXsize / 2., modXsize / 2., modZsize / 2.);
+      G4Box* moduleBox = new G4Box("Box", modXsize / 2., modXsize / 2., modZsize / 2.);
       G4LogicalVolume* lmoduleBox = new G4LogicalVolume(moduleBox, boxFill, "moduleBox");
 
       // build and place module wall
-      G4Box *tempBox = new G4Box("tempBox", modXsize / 2. - wallThick, modXsize / 2. - wallThick, modZsize / 2. + 0.1); // Dont't care about "+0.1", needs to be there.
-      G4SubtractionSolid *moduleWall = new G4SubtractionSolid("Box-tempBox", moduleBox, tempBox);
-      G4LogicalVolume *lmoduleWall = new G4LogicalVolume(moduleWall, wallMaterial, "moduleWall");
+      G4Box* tempBox = new G4Box("tempBox", modXsize / 2. - wallThick, modXsize / 2. - wallThick, modZsize / 2. + 0.1); // Dont't care about "+0.1", needs to be there.
+      G4SubtractionSolid* moduleWall = new G4SubtractionSolid("Box-tempBox", moduleBox, tempBox);
+      G4LogicalVolume* lmoduleWall = new G4LogicalVolume(moduleWall, wallMaterial, "moduleWall");
       setColor(*lmoduleWall, "rgb(1.0,0.0,0.0,1.0)");
       new G4PVPlacement(G4Transform3D(), lmoduleWall, "moduleWall", lmoduleBox, false, 1);
 
       // build module window
-      G4Box *winBox = new G4Box("winBox", modXsize / 2. - wallThick, modXsize / 2. - wallThick, winThick / 2.);
-      G4LogicalVolume *lmoduleWin = new G4LogicalVolume(winBox, windowMaterial, "moduleWindow");
+      G4Box* winBox = new G4Box("winBox", modXsize / 2. - wallThick, modXsize / 2. - wallThick, winThick / 2.);
+      G4LogicalVolume* lmoduleWin = new G4LogicalVolume(winBox, windowMaterial, "moduleWindow");
       setColor(*lmoduleWin, "rgb(0.7,0.7,0.7,1.0)");
       G4Transform3D transform = G4Translate3D(0., 0., (-modZsize + winThick) / 2.);
       new G4PVPlacement(transform, lmoduleWin, "moduleWindow", lmoduleBox, false, 1);
 
       // build module bottom
-      G4Box *botBox = new G4Box("botBox", modXsize / 2. - wallThick, modXsize / 2. - wallThick, botThick / 2.);
-      G4LogicalVolume *lmoduleBot = new G4LogicalVolume(botBox, bottomMaterial, "moduleBottom");
+      G4Box* botBox = new G4Box("botBox", modXsize / 2. - wallThick, modXsize / 2. - wallThick, botThick / 2.);
+      G4LogicalVolume* lmoduleBot = new G4LogicalVolume(botBox, bottomMaterial, "moduleBottom");
       if (isBeamBkgStudy) lmoduleBot->SetSensitiveDetector(new BkgSensitiveDetector("ARICH", 1));
       setColor(*lmoduleBot, "rgb(0.0,1.0,0.0,1.0)");
       G4Transform3D transform1 = G4Translate3D(0., 0., (modZsize - botThick) / 2.);
@@ -330,8 +330,8 @@ namespace Belle2 {
       new G4PVPlacement(transform1, lmoduleBot, "moduleBottom", lmoduleBox, false, 1);
 
       // build sensitive surface
-      G4Box *sensBox = new G4Box("sensBox", sensXsize / 2., sensXsize / 2., 0.1*Unit::mm);
-      G4LogicalVolume *lmoduleSens = new G4LogicalVolume(sensBox, boxFill, "moduleSensitive");
+      G4Box* sensBox = new G4Box("sensBox", sensXsize / 2., sensXsize / 2., 0.1 * Unit::mm);
+      G4LogicalVolume* lmoduleSens = new G4LogicalVolume(sensBox, boxFill, "moduleSensitive");
       lmoduleSens->SetSensitiveDetector(m_sensitive);
       setColor(*lmoduleSens, "rgb(0.5,0.5,0.5,1.0)");
       G4Transform3D transform2 = G4Translate3D(0., 0., (-modZsize + 0.1) / 2. + winThick);
@@ -352,7 +352,7 @@ namespace Belle2 {
       double pcbThick = Module.getLength("Board/thickness") / Unit::mm;
 
       // build board
-      G4Box *pcbBox = new G4Box("pcbBox", pcbSize / 2., pcbSize / 2., pcbThick / 2.);
+      G4Box* pcbBox = new G4Box("pcbBox", pcbSize / 2., pcbSize / 2., pcbThick / 2.);
       G4LogicalVolume* lpcb = new G4LogicalVolume(pcbBox, pcbMaterial, "modulePcb");
       if (isBeamBkgStudy) lpcb->SetSensitiveDetector(new BkgSensitiveDetector("ARICH"));
       setColor(*lpcb, "rgb(0.0,0.6,0.0,1.0)");
@@ -375,10 +375,10 @@ namespace Belle2 {
       double holeX = Support.getLength("holeXSize") / Unit::mm;
 
       // build plate
-      G4Tubs *supportTube = new G4Tubs("supportTube", supportInRad, supportOutRad, supportThick / 2., 0, 2*M_PI);
+      G4Tubs* supportTube = new G4Tubs("supportTube", supportInRad, supportOutRad, supportThick / 2., 0, 2 * M_PI);
       G4LogicalVolume* lsupportTube = new G4LogicalVolume(supportTube, supportMaterial, "supportPlate");
       // build hole
-      G4Box *hole = new G4Box("hole", holeX / 2., holeY / 2., supportThick / 2.);
+      G4Box* hole = new G4Box("hole", holeX / 2., holeY / 2., supportThick / 2.);
       G4LogicalVolume* lhole = new G4LogicalVolume(hole, holeMaterial, "supportHole");
       setColor(*lsupportTube, "rgb(0.5,0.5,0.5,1.0)");
       setVisibility(*lhole, false);
@@ -415,8 +415,8 @@ namespace Belle2 {
       double innerr[2] = {outr - mThick, outr - mThick};
       double outerr[2] = {outr, outr};
 
-      G4Polyhedra *mirrShape = new G4Polyhedra("mirrShape", startAngle, 2*M_PI, nMirrors, 2, zPlane, innerr, outerr);
-      G4LogicalVolume *lmirrors = new G4LogicalVolume(mirrShape, mirrorMaterial, "ARICH.Mirrors");
+      G4Polyhedra* mirrShape = new G4Polyhedra("mirrShape", startAngle, 2 * M_PI, nMirrors, 2, zPlane, innerr, outerr);
+      G4LogicalVolume* lmirrors = new G4LogicalVolume(mirrShape, mirrorMaterial, "ARICH.Mirrors");
 
       GearDir surface(Mirrors, "Surface");
       if (surface) {
@@ -432,9 +432,9 @@ namespace Belle2 {
     {
       G4MaterialPropertiesTable* mTable = material->GetMaterialPropertiesTable();
       if (!mTable) return 0;
-      G4MaterialPropertyVector *mVector =  mTable->GetProperty("RINDEX");
+      G4MaterialPropertyVector* mVector =  mTable->GetProperty("RINDEX");
       if (!mVector) return 0;
-      return mVector->GetProperty(2*Unit::eV / Unit::MeV);
+      return mVector->GetProperty(2 * Unit::eV / Unit::MeV);
     }
 
     void GeoARICHCreator::createSimple(const GearDir& content, G4LogicalVolume& topVolume)
@@ -454,7 +454,7 @@ namespace Belle2 {
       setVisibility(*lenvBox, false);
       m_arichgp->Initialize(content);
       GearDir moduleParam(content, "Detector/Module");
-      G4LogicalVolume *detModule = buildModule(moduleParam);
+      G4LogicalVolume* detModule = buildModule(moduleParam);
 
       double detZpos = content.getLength("Detector/Plane/zPosition") / Unit::mm;
       double detThick = content.getLength("Detector/Module/moduleZSize") / Unit::mm;
@@ -475,7 +475,7 @@ namespace Belle2 {
       double posX = aerogelParam.getLength("tileXPos") / Unit::mm;
       double posY = aerogelParam.getLength("tileYPos") / Unit::mm;
       int ilayer = 0;
-      BOOST_FOREACH(const GearDir &layer, aerogelParam.getNodes("Layers/Layer")) {
+      BOOST_FOREACH(const GearDir & layer, aerogelParam.getNodes("Layers/Layer")) {
         double posZ = layer.getLength("zPosition");
         double sizeZ = layer.getLength("thickness");
         string tileMat = layer.getString("material");
@@ -486,7 +486,7 @@ namespace Belle2 {
         m_arichgp->setAerogelThickness(ilayer, sizeZ);
 
         G4MaterialPropertiesTable* mTable = tileMaterial->GetMaterialPropertiesTable();
-        G4MaterialPropertyVector *mVector =  mTable->GetProperty("RAYLEIGH");
+        G4MaterialPropertyVector* mVector =  mTable->GetProperty("RAYLEIGH");
         double lambda0 = 400;
         double e0 = 1240. / lambda0 * Unit::eV / Unit::MeV;
         m_arichgp->setAeroTransLength(ilayer, mVector->GetProperty(e0)*Unit::mm);
@@ -513,7 +513,7 @@ namespace Belle2 {
       G4OpticalSurface* optSurf = materials.createOpticalSurface(surface);
       new G4LogicalSkinSurface("mirrorsSurface", lmirror, optSurf);
       int iMirror = 0;
-      BOOST_FOREACH(const GearDir &mirror, mirrorsParam.getNodes("Mirror")) {
+      BOOST_FOREACH(const GearDir & mirror, mirrorsParam.getNodes("Mirror")) {
         double xpos = mirror.getLength("xPos") / Unit::mm;
         double ypos = mirror.getLength("yPos") / Unit::mm;
         double zpos = mirror.getLength("zPos") / Unit::mm;

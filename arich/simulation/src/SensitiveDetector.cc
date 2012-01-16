@@ -27,7 +27,7 @@ namespace Belle2 {
   namespace arich {
 
     SensitiveDetector::SensitiveDetector():
-        Simulation::SensitiveDetectorBase("ARICH", SensitiveDetector::TOP)
+      Simulation::SensitiveDetectorBase("ARICH", SensitiveDetector::TOP)
     {
       StoreArray<MCParticle> mcParticles;
       StoreArray<ARICHSimHit>  arichSimHits;

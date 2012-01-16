@@ -39,8 +39,8 @@ namespace Belle2 {
 
 
     ARICHReconstruction::ARICHReconstruction():
-        m_random(new TRandom3()), _arichgp(ARICHGeometryPar::Instance()), m_bkgLevel(0), m_trackPosRes(0),
-        m_trackAngRes(0), m_singleRes(0), m_aeroMerit(0)
+      m_random(new TRandom3()), _arichgp(ARICHGeometryPar::Instance()), m_bkgLevel(0), m_trackPosRes(0),
+      m_trackAngRes(0), m_singleRes(0), m_aeroMerit(0)
     {
 
     }
@@ -90,7 +90,7 @@ namespace Belle2 {
     }
 
 
-    TVector3 ARICHReconstruction::FastTracking(TVector3 dirf, TVector3 r,  double *refind, double *z, int n)
+    TVector3 ARICHReconstruction::FastTracking(TVector3 dirf, TVector3 r,  double* refind, double* z, int n)
     {
       //
       // Description:
@@ -121,7 +121,7 @@ namespace Belle2 {
       r   += dirf * path;
 
       for (int a = 1; a <= n + 1 ; a++) {
-        rind = refind[a] / refind[a-1];
+        rind = refind[a] / refind[a - 1];
         dirf = Refraction(dirf, rind);
         if (dirf.Mag() == 0) return TVector3();
         path = (z[a] - r.z()) / dirf.z();
@@ -134,7 +134,7 @@ namespace Belle2 {
         if (angle < 0) angle += 2 * M_PI;
         double dangle = 2 * M_PI / nmir;
         section[0] = int(angle / dangle);
-        if (r.Mag() > (r - 2*_arichgp->getMirrorPoint(section[0])).Mag()) {
+        if (r.Mag() > (r - 2 * _arichgp->getMirrorPoint(section[0])).Mag()) {
           refl = true;
           for (int k = 0; k < 2; k++) {
             TVector3 mirpoint = _arichgp->getMirrorPoint(section[k]);
@@ -162,13 +162,13 @@ namespace Belle2 {
       if (mirrorID == -1) return hitpos;
       TVector3 mirpoint = _arichgp->getMirrorPoint(mirrorID);
       TVector3 mirnorm = _arichgp->getMirrorNormal(mirrorID);
-      return hitpos - 2*((hitpos - mirpoint)*mirnorm)*mirnorm;
+      return hitpos - 2 * ((hitpos - mirpoint) * mirnorm) * mirnorm;
     }
 
 
     int ARICHReconstruction::CherenkovPhoton(TVector3 r, TVector3 rh,
-                                             TVector3 &rf, TVector3 &dirf,
-                                             double *refind, double *z, int n, int nmir)
+                                             TVector3& rf, TVector3& dirf,
+                                             double* refind, double* z, int n, int nmir)
     {
       //
       // Description:
@@ -229,16 +229,16 @@ namespace Belle2 {
         // *************************************
         // n-layers of aerogel // refind relative refractive index
         for (int a = n - 1; a >= 0 ; a--) {
-          rind = refind[a] / refind[a+1];
-          dirf0[a] = Refraction(dirf0[a+1], rind);
+          rind = refind[a] / refind[a + 1];
+          dirf0[a] = Refraction(dirf0[a + 1], rind);
         }
 
         path = (z[0] - r.z()) / dirf0[0].z();
         double x1 = rf0[1].x();
         double y1 = rf0[1].y();
         for (int a = 0; a < n ; a++) {
-          rf0[a+1] = rf0[a] + dirf0[a] * path;
-          path = (z[a+1] - rf0[a+1].z()) / dirf0[a+1].z();
+          rf0[a + 1] = rf0[a] + dirf0[a] * path;
+          path = (z[a + 1] - rf0[a + 1].z()) / dirf0[a + 1].z();
         }
 
         Refraction(dirf0[n], norm, refind0, dirw);
@@ -311,9 +311,9 @@ namespace Belle2 {
           thickness[asize]   += thickness[i];
         }
         refind[asize  ]   = 1.0;
-        refind[asize+1]   = _arichgp->getDetectorWindowRefIndex();
+        refind[asize + 1]   = _arichgp->getDetectorWindowRefIndex();
         zaero[asize  ] = _arichgp->getDetectorZPosition();
-        zaero[asize+1] = zaero[asize] + _arichgp->getDetectorWindowThickness();
+        zaero[asize + 1] = zaero[asize] + _arichgp->getDetectorWindowThickness();
         first = 0;
       }
 
@@ -372,7 +372,7 @@ namespace Belle2 {
 
             nsig[hyp][a] = n0[a] * trlen[a] * sin(thc[hyp][a]) * sin(thc[hyp][a]) * (1 - exp(-lrad[a] / trlen[a])) * acceptance[hyp][a];
 
-            if (a > 0)  nsig[hyp][a-1] *= exp(-lrad[a] / trlen[a]);
+            if (a > 0)  nsig[hyp][a - 1] *= exp(-lrad[a] / trlen[a]);
 
           } // for (unsigned int a=0;a<asize;a++)
           //*********************************************************
@@ -388,7 +388,7 @@ namespace Belle2 {
         //#####################################################
 
         double ebgri = m_bkgLevel * padArea;
-        TVector3 track_at_detector = track->getPositionAtZ(zaero[asize+1]);
+        TVector3 track_at_detector = track->getPositionAtZ(zaero[asize + 1]);
 
         // the id numbers of mirrors from which the photons could possibly reflect are calculated
         int mirrors[3];
@@ -548,7 +548,7 @@ namespace Belle2 {
       m_aeroMerit = merit;
     }
 
-    TVector3 ARICHReconstruction::FastTrackingSimple(TVector3 dirf, TVector3 r,  double *refind, double *z, int n)
+    TVector3 ARICHReconstruction::FastTrackingSimple(TVector3 dirf, TVector3 r,  double* refind, double* z, int n)
     {
       //
       // Description:
@@ -567,7 +567,7 @@ namespace Belle2 {
       path = (z[0] - r.z()) / dirf.z();
       r   += dirf * path;
       for (int a = 1; a <= n + 1 ; a++) {
-        rind = refind[a] / refind[a-1];
+        rind = refind[a] / refind[a - 1];
         dirf = Refraction(dirf, rind);
         if (dirf.Mag() == 0) return TVector3();
         path = (z[a] - r.z()) / dirf.z();

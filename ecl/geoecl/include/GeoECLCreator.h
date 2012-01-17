@@ -48,6 +48,7 @@ namespace Belle2 {
       void makeEndcap(const bool aForward);
       void makeInnerBarrel();
     protected:
+      int isBeamBkgStudy;
 
     private:
 

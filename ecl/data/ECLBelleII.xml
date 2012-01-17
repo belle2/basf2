@@ -2,6 +2,7 @@
 <DetectorComponent name="ECL" xmlns:xi="http://www.w3.org/2001/XInclude">
    <Creator library="ecl">ECLCreator</Creator>
 	<Content>
+         <BeamBackgroundStudy desc="select 1 if you want to record neutron and gamma hits">1</BeamBackgroundStudy>
          <CsI>CsI</CsI>
          <Si>Si</Si>
 	 <k_fin_thickness unit="cm">0.05</k_fin_thickness>

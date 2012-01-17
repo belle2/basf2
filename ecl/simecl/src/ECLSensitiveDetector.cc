@@ -81,66 +81,54 @@ namespace Belle2 {
 //G4bool ECLSensitiveDetector::ProcessHits(G4Step *aStep, G4TouchableHistory *)
   bool ECLSensitiveDetector::step(G4Step* aStep, G4TouchableHistory*)
   {
-    // Get deposited energy
-    const G4double edep = aStep->GetTotalEnergyDeposit();
 
-    // Get step length
-    const G4double stepLength = aStep->GetStepLength();
-    if (stepLength == 0.) return false;
+    /*
+        // Get deposited energy
+        const G4double edep = aStep->GetTotalEnergyDeposit();
 
-
-    G4int FirstStepFlag = 0;
-    G4Track& t = * aStep->GetTrack();
-    const G4double tof = t.GetGlobalTime();
-    if (isnan(tof)) {
-      B2ERROR("ECLSensitiveDetector: global time is nan");
-      return false;
-    }
-
-    const G4int pid = t.GetDefinition()->GetPDGEncoding();
-    const G4int trackID = t.GetTrackID();
-
-    const G4VPhysicalVolume& v = * t.GetVolume();
-    const G4StepPoint& in = * aStep->GetPreStepPoint();
-    const G4StepPoint& out = * aStep->GetPostStepPoint();
-    const G4ThreeVector& posIn = in.GetPosition();
-    const G4ThreeVector& posOut = out.GetPosition();
-    const G4ThreeVector momIn(in.GetMomentum().x(), in.GetMomentum().y(),
-                              in.GetMomentum().z());
-
-    const G4ThreeVector posCell = v.GetTranslation();
-    // Get layer ID
-    Mapping(v.GetName());
+        // Get step length
+        const G4double stepLength = aStep->GetStepLength();
+        if (stepLength == 0.) return false;
 
 
-    ECLGeometryPar* eclp = ECLGeometryPar::Instance();
-    TVector3 VecCell =  eclp->GetCrystalVec(m_cellID);
-    TVector3 Pin(momIn.getX(), momIn.getY(), momIn.getZ());
+        G4int FirstStepFlag = 0;
+        G4Track& t = * aStep->GetTrack();
+        const G4double tof = t.GetGlobalTime();
+        if (isnan(tof)) {
+          B2ERROR("ECLSensitiveDetector: global time is nan");
+          return false;
+        }
+
+        const G4int pid = t.GetDefinition()->GetPDGEncoding();
+        const G4int trackID = t.GetTrackID();
+
+        const G4VPhysicalVolume& v = * t.GetVolume();
+        const G4StepPoint& in = * aStep->GetPreStepPoint();
+        const G4StepPoint& out = * aStep->GetPostStepPoint();
+        const G4ThreeVector& posIn = in.GetPosition();
+        const G4ThreeVector& posOut = out.GetPosition();
+        const G4ThreeVector momIn(in.GetMomentum().x(), in.GetMomentum().y(),
+                                  in.GetMomentum().z());
+
+        const G4ThreeVector posCell = v.GetTranslation();
+        // Get layer ID
+        Mapping(v.GetName());
 
 
-
-
-
-    if (v.GetName().find("Crystal") != string::npos) {
-      int saveIndex = -999;
-      saveIndex = saveSimHit(m_cellID, m_thetaID, m_phiID  , trackID, pid, tof, edep, FirstStepFlag, momIn, posCell, posIn, posOut);
-    }
-    if (v.GetName().find("Diode") != string::npos) {
-//      cout<<FirstStepFlag<<" "<<trackID<<" "<<m_cellID<<" "<<m_thetaID<<" "<<edep<<" "<<pid<<endl;
-      if (trackID != oldtrack && m_cellID != oldcellId) {
-        oldtrack = trackID; oldcellId = m_cellID;
-        FirstStepFlag = 1;
-      }
-
-      double cos_ins = abs(cos(Pin.Angle(VecCell)));
-      if (1 / abs(cos_ins) > sqrt(1 + 1 + 0.1 * 0.1))
-      {cos_ins = 1 / sqrt(1 + 1 + 0.1 * 0.1);}
-      int saveEBIndex = -999;
-      saveEBIndex = saveEBSimHit(m_cellID, m_thetaID, m_phiID  , trackID, pid, 1 / cos_ins, edep, FirstStepFlag, momIn, posCell, posIn, posOut);
-    }
+        ECLGeometryPar* eclp = ECLGeometryPar::Instance();
+        TVector3 VecCell =  eclp->GetCrystalVec(m_cellID);
+        TVector3 Pin(momIn.getX(), momIn.getY(), momIn.getZ());
 
 
 
+
+
+        if (v.GetName().find("Crystal") != string::npos) {
+          int saveIndex = -999;
+          saveIndex = saveSimHit(m_cellID, m_thetaID, m_phiID  , trackID, pid, tof, edep, FirstStepFlag, momIn, posCell, posIn, posOut);
+        }
+
+    */
     // Get layer ID
 //  const unsigned layerId = v.GetCopyNo();
     return true;

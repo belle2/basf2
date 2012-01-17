@@ -13,6 +13,9 @@
 #include <ecl/geoecl/GeoECLCreator.h>
 #include <ecl/geoecl/ECLGeometryPar.h>
 #include <ecl/simecl/ECLSensitiveDetector.h>
+#include <simulation/background/BkgSensitiveDetector.h>
+
+
 #include <CLHEP/Geometry/Transform3D.h>
 #include <G4Point3D.hh>
 #include <G4Vector3D.hh>
@@ -210,7 +213,7 @@ namespace Belle2 {
     const double k_l2ang(9.0 * cm / ((k_l2r1 + k_l2r3) / 2.0));
 
 
-    GeoECLCreator::GeoECLCreator()
+    GeoECLCreator::GeoECLCreator(): isBeamBkgStudy(0)
     {
       m_sensitive = new ECLSensitiveDetector("ECLSensitiveDetector", (2 * 24)*eV, 10 * MeV);
       logical_ecl = 0;
@@ -226,6 +229,7 @@ namespace Belle2 {
 
     void GeoECLCreator::create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes type)
     {
+      isBeamBkgStudy = content.getInt("BeamBackgroundStudy");
       string CsI  = content.getString("CsI");
       G4Material* medCsI = geometry::Materials::get(CsI.c_str());
       G4Material* medAir = geometry::Materials::get("Air");
@@ -298,6 +302,8 @@ namespace Belle2 {
 
       G4Box* SensorDiode = new G4Box("diode", DiodeWidth / 2, DiodeLength / 2, DiodeHeight / 2);
 
+
+
       double k_BLL;
       double k_Ba;
       double k_Bb;
@@ -313,6 +319,7 @@ namespace Belle2 {
 
 
       G4AssemblyVolume* assemblyBrCrystals = new G4AssemblyVolume();
+      G4AssemblyVolume* assemblyBrDiodes = new G4AssemblyVolume();
       int nBarrelCrystal = content.getNumberNodes("BarrelCrystals/BarrelCrystal");
 
       for (int iBrCry = 1 ; iBrCry <= nBarrelCrystal ; ++iBrCry) {//46=29+17
@@ -363,23 +370,50 @@ namespace Belle2 {
                                             cDz , 0 , 0, cDy1, cDx2, cDx1, 0, cDy2 , cDx4, cDx3, 0);
         G4LogicalVolume* BrCrysral = new G4LogicalVolume(BrCrysralShape, medCsI, (format("logicalEclBrCrystal_%1%") % iBrCry).str().c_str(), 0, 0, 0);
         BrCrysral->SetSensitiveDetector(m_sensitive);
-
-        G4LogicalVolume* Sensor = new G4LogicalVolume(SensorDiode, medSi, (format("logicalEclBrDiode_%1%") % iBrCry).str().c_str(), 0, 0, 0);
-        Sensor->SetSensitiveDetector(m_sensitive);
         assemblyBrCrystals->AddPlacedVolume(BrCrysral, Tr);
 
+//        G4LogicalVolume* Sensor = new G4LogicalVolume(SensorDiode, medSi, (format("logicalEclBrDiode_%1%") % iBrCry).str().c_str(), 0, 0, 0);
+//        Sensor->SetSensitiveDetector(m_sensitive);
         G4Transform3D DiodePosition = G4Translate3D(0, 0, (k_BLL + DiodeHeight) / 2 + 0.1);  // Move over to the left...
         G4Transform3D TrD = pos_phi * position * tilt_phi * tilt_z * r00 * DiodePosition ;
-        assemblyBrCrystals->AddPlacedVolume(Sensor, TrD);
+//        assemblyBrCrystals->AddPlacedVolume(Sensor, TrD);
+
+        if (isBeamBkgStudy) {
+          for (int iSector = 0; iSector < 72; ++iSector) {//total 72 for Bareel Diode
+            G4Transform3D SectorRot = G4RotateZ3D(360.*iSector / 72 * deg);
+            G4Transform3D SectorRRot = G4RotateZ3D((360.*iSector / 72 - 2.494688) * deg);
+            G4Transform3D BrR = SectorRot * TrD;
+            G4Transform3D BrRR = SectorRRot * TrD;
+            int DiodeId = (iBrCry - 1) * 144 + iSector * 2 + 1152;
+            G4LogicalVolume* Sensor = new G4LogicalVolume(SensorDiode, medSi, (format("logicalEclBrDiode_%1%") % DiodeId).str().c_str(), 0, 0, 0);
+            Sensor->SetSensitiveDetector(new BkgSensitiveDetector("ECL", DiodeId));
+            assemblyBrDiodes->AddPlacedVolume(Sensor, BrR);
 
 
+            int DiodeId1 = (iBrCry - 1) * 144 + iSector * 2 - 1 + 1152;
+            if (iSector == 0)DiodeId1 = (iBrCry) * 144 + iSector * 2 - 1 + 1152;
+            G4LogicalVolume* Sensor1 = new G4LogicalVolume(SensorDiode, medSi, (format("logicalEclBrDiode_%1%") % DiodeId1).str().c_str(), 0, 0, 0);
+            Sensor1->SetSensitiveDetector(new BkgSensitiveDetector("ECL", DiodeId1));
+            assemblyBrDiodes->AddPlacedVolume(Sensor, BrRR);
+//         cout<<(format("logicalEclBrDiode_%1%") % DiodeId1).str().c_str()<<endl;
+//         cout<<(format("logicalEclBrDiode_%1%") % DiodeId).str().c_str()<<endl;
+          }//iSector
+        }
 
 
       }//iBrCry
 
+
       double h1, h2, bl1, bl2, tl1, tl2, alpha1, alpha2, Rphi1, Rphi2, Rtheta, Pr, Ptheta, Pphi, halflength;
+      int k_forwMPerRing[] = { 3, 3, 4, 4, 4, 6, 6, 6, 6, 6, 6, 9, 9 };
+      int k_backMPerRing[] = { 9, 9, 6, 6, 6, 6, 6, 4, 4, 4 } ;
+
+      int iRing = 0;
+      int nRing = 0;
+      int iPhi = 0;
 
       G4AssemblyVolume* assemblyFwCrystals = new G4AssemblyVolume();
+      G4AssemblyVolume* assemblyFwDiodes = new G4AssemblyVolume();
       for (int iCry = 1 ; iCry <= 72 ; ++iCry) {
         GearDir counter(content);
         counter.append((format("/EndCapCrystals/EndCapCrystal[%1%]/") % (iCry)).str());
@@ -418,16 +452,33 @@ namespace Belle2 {
         assemblyFwCrystals->AddPlacedVolume(FwCrysral, Tr);
 
 
-        G4LogicalVolume* Sensor = new G4LogicalVolume(SensorDiode, medSi, (format("logicalEclFwDiode_%1%") % iCry).str().c_str(), 0, 0, 0);
-        Sensor->SetSensitiveDetector(m_sensitive);
+//        G4LogicalVolume* Sensor = new G4LogicalVolume(SensorDiode, medSi, (format("logicalEclFwDiode_%1%") % iCry).str().c_str(), 0, 0, 0);
+//        Sensor->SetSensitiveDetector(m_sensitive);
         G4Transform3D DiodePosition = G4Translate3D(0, 0, halflength + (DiodeHeight) / 2 + 0.1); // Move over to the left...
         G4Transform3D TrD =  position * m3 * m2 * m1 * DiodePosition ;
-        assemblyFwCrystals->AddPlacedVolume(Sensor, TrD);
+//        assemblyFwCrystals->AddPlacedVolume(Sensor, TrD);
 
+
+        if (isBeamBkgStudy) {
+          for (int iSector = 0; iSector < 16; ++iSector) {//total 16 for EndcapDiode
+            G4Transform3D SectorRot = G4RotateZ3D(360.*iSector / 16 * deg);
+            G4Transform3D FwR = SectorRot * TrD;
+            iPhi = iCry - nRing - 1;
+            int DiodeId = nRing * 16 + iSector * k_forwMPerRing[iRing] + iPhi ;
+            G4LogicalVolume* Sensor = new G4LogicalVolume(SensorDiode, medSi, (format("logicalEclFwDiode_%1%") % DiodeId).str().c_str(), 0, 0, 0);
+            Sensor->SetSensitiveDetector(new BkgSensitiveDetector("ECL", DiodeId));
+            assemblyFwDiodes->AddPlacedVolume(Sensor, FwR);
+          }
+        }
+        if (iPhi == (k_forwMPerRing[iRing] - 1)) {nRing = nRing + k_forwMPerRing[iRing]; iRing++;}
 
       }//forward endcap crystals
 
+      iRing = 0;
+      nRing = 0;
+      iPhi = 0;
       G4AssemblyVolume* assemblyBwCrystals = new G4AssemblyVolume();
+      G4AssemblyVolume* assemblyBwDiodes = new G4AssemblyVolume();
       for (int iCry = 73 ; iCry <= 132 ; ++iCry) {
         GearDir counter(content);
         counter.append((format("/EndCapCrystals/EndCapCrystal[%1%]/") % (iCry)).str());
@@ -465,19 +516,33 @@ namespace Belle2 {
         BwCrysral->SetSensitiveDetector(m_sensitive);
         assemblyBwCrystals->AddPlacedVolume(BwCrysral, Tr);
 
-        G4LogicalVolume* Sensor = new G4LogicalVolume(SensorDiode, medSi, (format("logicalEclBwDiode_%1%") % iCry).str().c_str(), 0, 0, 0);
-        Sensor->SetSensitiveDetector(m_sensitive);
+//        G4LogicalVolume* Sensor = new G4LogicalVolume(SensorDiode, medSi, (format("logicalEclBwDiode_%1%") % iCry).str().c_str(), 0, 0, 0);
+//        Sensor->SetSensitiveDetector(m_sensitive);
         G4Transform3D DiodePosition = G4Translate3D(0, 0, halflength + (DiodeHeight) / 2 + 0.1); // Move over to the left...
         G4Transform3D TrD =  position * m3 * m2 * m1 * DiodePosition ;
-        assemblyBwCrystals->AddPlacedVolume(Sensor, TrD);
+//        assemblyBwCrystals->AddPlacedVolume(Sensor, TrD);
 
+        if (isBeamBkgStudy) {
+          for (int iSector = 0; iSector < 16; ++iSector) {//total 16 for EndcapDiode
+            G4Transform3D SectorRot = G4RotateZ3D(360.*iSector / 16 * deg);
+            G4Transform3D BwR = SectorRot * TrD;
+            iPhi = (iCry - 72) - nRing - 1;
+            int DiodeId = nRing * 16 + iSector * k_backMPerRing[iRing] + iPhi + 7776 ;
+            G4LogicalVolume* Sensor = new G4LogicalVolume(SensorDiode, medSi, (format("logicalEclBwDiode_%1%") % DiodeId).str().c_str(), 0, 0, 0);
+            Sensor->SetSensitiveDetector(new BkgSensitiveDetector("ECL", DiodeId));
+            assemblyBwDiodes->AddPlacedVolume(Sensor, BwR);
+//         cout<<(format("logicalEclBwDiode_%1%") % DiodeId).str().c_str()<<endl;
+          }
+          if (iPhi == (k_backMPerRing[iRing] - 1)) {nRing = nRing + k_backMPerRing[iRing]; iRing++;}
+        }
       }//backward endcap crystals
+
+
 
 
       for (int iSector = 0; iSector < 16; ++iSector) {//total 16
         G4Transform3D BrR = G4RotateZ3D(360.*iSector / 16 * deg);
         assemblyFwCrystals->MakeImprint(logical_ecl, BrR);
-        assemblyBwCrystals->MakeImprint(logical_ecl, BrR);
       }//16 sectior
 
       for (int iSector = 0; iSector < 72; ++iSector) {//total 72
@@ -487,6 +552,16 @@ namespace Belle2 {
         assemblyBrCrystals->MakeImprint(logical_ecl, BrRR);
         assemblyBrCrystals->MakeImprint(logical_ecl, BrR);
       }//iSector
+
+      for (int iSector = 0; iSector < 16; ++iSector) {//total 16
+        G4Transform3D BrR = G4RotateZ3D(360.*iSector / 16 * deg);
+        assemblyBwCrystals->MakeImprint(logical_ecl, BrR);
+      }//16 sectior
+      if (isBeamBkgStudy) {
+        assemblyFwDiodes->MakeImprint(logical_ecl, Global_offset);
+        assemblyBrDiodes->MakeImprint(logical_ecl, Global_offset);
+        assemblyBwDiodes->MakeImprint(logical_ecl, Global_offset);
+      }
       makeEndcap(0);
       makeEndcap(1);
 
@@ -502,14 +577,16 @@ namespace Belle2 {
 //       TripletF( k_c1z2, k_c1r1, k_c1r2)
 //       TripletF( k_c1z2, k_c1r1, k_c1r3)
 //       TripletF( k_c1z3, k_c1r1, k_c1r3)
-      double BarrelCylinderWZ[6]    = {k_c2z1, k_c2z2, k_c2z2, k_c2z2, k_c2z2, k_c1z3};
+
+
+      double BarrelCylinderWZ[6]    = {k_c2z1, k_c2z2, k_c2z2, k_c1z2, k_c1z2, k_c1z3};
       double BarrelCylinderWRin[6]  = {k_c2r1, k_c2r1, k_c2r1, k_c1r1, k_c1r1, k_c1r1};
       double BarrelCylinderWRout[6] = {k_c2r3, k_c2r3, k_c2r2, k_c1r2, k_c1r3, k_c1r3};
 
 
       G4Polycone* BarrelCylinderWorld = new G4Polycone("BarrelCylinderWorld", 0, 2 * PI, 6, BarrelCylinderWZ, BarrelCylinderWRin, BarrelCylinderWRout);
       G4LogicalVolume* logical_BarrelCylinder = new G4LogicalVolume(BarrelCylinderWorld, medAir, "logical_BarrelCylinderWorld");
-//      physical_ECLBarrelCylinder = new G4PVPlacement(0, G4ThreeVector(0., 0., 0.), logical_BarrelCylinder, "physicalBarrelCylinder", &topVolume, false, 0);
+      physical_ECLBarrelCylinder = new G4PVPlacement(0, G4ThreeVector(0., 0., 0.), logical_BarrelCylinder, "physicalBarrelCylinder", &topVolume, false, 0);
 
 
 
@@ -524,6 +601,7 @@ namespace Belle2 {
       G4Polycone* barCy1 =
         new G4Polycone("ECL Barrel Support Cylinder", 0 * deg, 360.*deg, 4, BarrelCylinder1Z, BarrelCylinder1Rin, BarrelCylinder1Rout);
 
+
       double BarrelCylinder2Z[4] = {k_c2z1, k_c2z2, k_c2z2, k_c2z3};
       double BarrelCylinder2Rin[4] = {k_c2r1, k_c2r1, k_c2r1, k_c2r1};
       double BarrelCylinder2Rout[4] = {k_c2r3, k_c2r3, k_c2r2, k_c1r2};
@@ -537,7 +615,7 @@ namespace Belle2 {
 
       assemblyBarrelCylinderSupport->AddPlacedVolume(barCy1_logi, Global_offset);
       assemblyBarrelCylinderSupport->AddPlacedVolume(barCy2_logi, Global_offset);
-//      assemblyBarrelCylinderSupport->MakeImprint(logical_BarrelCylinder, Global_offset);
+      assemblyBarrelCylinderSupport->MakeImprint(logical_BarrelCylinder, Global_offset);
 
       G4AssemblyVolume* assemblyInnerBarrelSupport = new G4AssemblyVolume();
       const EclRad InnerBarreloffset = (2.796 - 2.5) * deg;
@@ -1265,7 +1343,6 @@ namespace Belle2 {
 
 
     }//makeEndcap
-
 
 
 

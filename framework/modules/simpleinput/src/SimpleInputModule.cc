@@ -91,12 +91,9 @@ void SimpleInputModule::initialize()
       B2INFO("Opened tree " + m_treeNames[ii]);
 
 
-      //Connect the branches to the TObject pointers
-      TObjArray* branches = m_tree[ii]->GetListOfBranches();
-
       //How many objects, How many arrays
-      for (int jj = 0; jj < branches->GetEntriesFast(); jj++) {
-        TBranch* branch = validBranch(jj, branches);
+      for (int jj = 0; jj < m_tree[ii]->GetNbranches(); jj++) {
+        TBranch* branch = validBranch(jj, (DataStore::EDurability)ii);
         if (branch) {
           //Count non-TClonesArrays extra
           if (static_cast<string>(branch->GetClassName()) != "TClonesArray") {
@@ -118,8 +115,8 @@ void SimpleInputModule::initialize()
       int iobject = 0;
       int iarray = 0;
       m_objectNames[ii].resize(m_size[ii], "");
-      for (int jj = 0; jj < branches->GetEntriesFast(); jj++) {
-        TBranch* branch = validBranch(jj, branches);
+      for (int jj = 0; jj < m_tree[ii]->GetNbranches(); jj++) {
+        TBranch* branch = validBranch(jj, (DataStore::EDurability)ii);
         if (branch) {
           if (static_cast<string>(branch->GetClassName()) == "TClonesArray") {
             branch->SetAddress(&(m_objects[ii][iarray + m_sizeObj[ii]]));
@@ -136,12 +133,12 @@ void SimpleInputModule::initialize()
     }
     // Store arrays in the DataStore
     for (int jj = 0; jj < m_size[ii] - m_sizeObj[ii]; jj++) {
-      DataStore::Instance().storeArray(static_cast<TClonesArray*>(m_objects[ii][jj + m_sizeObj[ii]]), m_objectNames[ii][jj + m_sizeObj[ii]]);
-      if (m_tree[DataStore::c_Persistent]) {
-        readTree(DataStore::c_Persistent);
-      }
-
+      DataStore::Instance().storeArray(static_cast<TClonesArray*>(m_objects[ii][jj + m_sizeObj[ii]]), m_objectNames[ii][jj + m_sizeObj[ii]], (DataStore::EDurability)ii);
     }
+  }
+
+  if (m_tree[DataStore::c_Persistent]) {
+    readTree(DataStore::c_Persistent);
   }
 }
 
@@ -191,9 +188,8 @@ void SimpleInputModule::readTree(const DataStore::EDurability& durability)
 
   //Go again over the branchlist and connect the branches with TObject pointers
   int iobject = 0;
-  TObjArray* branches = m_tree[durability]->GetListOfBranches();
-  for (int jj = 0; jj < branches->GetEntriesFast(); jj++) {
-    TBranch* branch = validBranch(jj, branches);
+  for (int jj = 0; jj < m_tree[durability]->GetNbranches(); jj++) {
+    TBranch* branch = validBranch(jj, durability);
     if (branch) {
       if (static_cast<string>(branch->GetClassName()) == "TClonesArray") {
         /*
@@ -214,7 +210,7 @@ void SimpleInputModule::readTree(const DataStore::EDurability& durability)
 
   // Store objects in the DataStore
   for (int jj = 0; jj < m_sizeObj[durability]; jj++) {
-    DataStore::Instance().storeObject(m_objects[durability][jj], m_objectNames[durability][jj]);
+    DataStore::Instance().storeObject(m_objects[durability][jj], m_objectNames[durability][jj], durability);
   }
   // Store arrays in the DataStore
   /*  for (int jj = 0; jj < m_size[durability] - m_sizeObj[durability]; jj++) {
@@ -223,24 +219,22 @@ void SimpleInputModule::readTree(const DataStore::EDurability& durability)
 
 }
 
-TBranch* SimpleInputModule::validBranch(int& ibranch, TObjArray* branches)
+TBranch* SimpleInputModule::validBranch(int ibranch, DataStore::EDurability durability) const
 {
+  const TObjArray* branches = m_tree[durability]->GetListOfBranches();
   TBranch* branch = static_cast<TBranch*>(branches->At(ibranch));
   if (!branch) {
     return 0;
   }
 
-  // check if the branch is in the corresponding branch list
   // an empty list will cause all branches to be accepted
-  string name = branch->GetName();
-  DataStore::EDurability durability = DataStore::c_Event; // TODO
+  if (m_branchNames[durability].size() == 0)
+    return branch;
 
-  vector<string>::iterator found_itr = find(m_branchNames[durability].begin(), m_branchNames[durability].end(), name);
-  const bool found = (found_itr != m_branchNames[durability].end());
-
-  if (m_branchNames[durability].size() != 0 && !found)
-    return 0;
-
+  // check if the branch is in the corresponding branch list
+  vector<string>::const_iterator found_itr = find(m_branchNames[durability].begin(), m_branchNames[durability].end(), branch->GetName());
+  if (found_itr == m_branchNames[durability].end())
+    return 0; //not found
 
   return branch;
 }

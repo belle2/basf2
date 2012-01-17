@@ -21,6 +21,9 @@ input.param('inputFileName', 'simple_input.root')
 input.param('branchNames', ['EventMetaData', 'PXDClustersToPXDDigits',
 'PXDClustersToPXDTrueHits', 'PXDDigits', 'PXDTrueHits'])
 
+#also load persistent tree (contains FileMetaData object)
+input.param('treeNamePersistent', 'persistent')
+
 # Create paths
 main = create_path()
 

@@ -1,8 +1,9 @@
-[INFO] Steering file: simple_input.py
+[INFO] Steering file: framework/tests/simple_input.py
 >>> basf2 Python environment set
 >>> Framework object created: fw
 [INFO] Opened file simple_input.root
 [INFO] Opened tree tree
+[INFO] Opened tree persistent
 [WARNING] initializeActive is false while you try to create an object EventMetaData under EDurability 0
 [WARNING] initializeActive is false while you try to create an object PXDClustersToPXDDigits under EDurability 0
 [WARNING] initializeActive is false while you try to create an object PXDClustersToPXDTrueHits under EDurability 0
@@ -29,6 +30,7 @@
 [INFO] 
 [INFO] (Type)    Name                      Number entries              <Persistent>
 [INFO] ----------------------------------------------------------------------------
+[INFO] (Object)  FileMetaData
 [INFO] 
 [INFO] ============================================================================
 [INFO] EXP NUMBER: 0
@@ -51,6 +53,7 @@
 [INFO] 
 [INFO] (Type)    Name                      Number entries              <Persistent>
 [INFO] ----------------------------------------------------------------------------
+[INFO] (Object)  FileMetaData
 [INFO] 
 [INFO] ============================================================================
 [INFO] EXP NUMBER: 0
@@ -73,6 +76,7 @@
 [INFO] 
 [INFO] (Type)    Name                      Number entries              <Persistent>
 [INFO] ----------------------------------------------------------------------------
+[INFO] (Object)  FileMetaData
 [INFO] 
 [INFO] ============================================================================
 [INFO] EXP NUMBER: 0
@@ -95,6 +99,7 @@
 [INFO] 
 [INFO] (Type)    Name                      Number entries              <Persistent>
 [INFO] ----------------------------------------------------------------------------
+[INFO] (Object)  FileMetaData
 [INFO] 
 [INFO] ============================================================================
 [INFO] EXP NUMBER: 0
@@ -117,6 +122,7 @@
 [INFO] 
 [INFO] (Type)    Name                      Number entries              <Persistent>
 [INFO] ----------------------------------------------------------------------------
+[INFO] (Object)  FileMetaData
 [INFO] 
 [INFO] ============================================================================
 [INFO] ------------------------------------------------------------------------

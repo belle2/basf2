@@ -73,8 +73,8 @@ namespace Belle2 {
 
 
   private:
-    /*! gives back Null, if the branch isn't good for read out. */
-    TBranch* validBranch(int& ibranch, TObjArray* branches);
+    /*! Returns a pointer to the i'th branch of specified durability if valid and not disabled via branchNames, NULL otherwise */
+    TBranch* validBranch(int ibranch, DataStore::EDurability durability) const;
 
     /*! Function that actually performs the reading from the tree into m_objects. */
     void readTree(const DataStore::EDurability& durability);

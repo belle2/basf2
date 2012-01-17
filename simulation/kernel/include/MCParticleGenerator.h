@@ -62,7 +62,7 @@ namespace Belle2 {
        * @param motherIndex Graph MCParticle
        * @return Returns a pointer to the created primary particle. NULL if the primary particle could not be created.
        */
-      void addParticle(MCParticle &mcParticle, G4Event* event, G4PrimaryParticle* lastG4Mother, int motherIndex, bool useTime);
+      void addParticle(MCParticle& mcParticle, G4Event* event, G4PrimaryParticle* lastG4Mother, int motherIndex, bool useTime);
 
     };
 

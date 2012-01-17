@@ -41,8 +41,8 @@ REG_MODULE(MaterialScan);
 //                 Implementation
 //-----------------------------------------------------------------
 
-MaterialScan::MaterialScan(TFile* rootFile, const std::string &name, const std::string& axisLabel, ScanParams params):
-    G4UserSteppingAction(), m_rootFile(rootFile), m_name(name), m_axisLabel(axisLabel), m_params(params)
+MaterialScan::MaterialScan(TFile* rootFile, const std::string& name, const std::string& axisLabel, ScanParams params):
+  G4UserSteppingAction(), m_rootFile(rootFile), m_name(name), m_axisLabel(axisLabel), m_params(params)
 {
   //Sort the parameters accordingly
   if (m_params.minU > m_params.maxU) std::swap(m_params.minU, m_params.maxU);
@@ -59,7 +59,7 @@ MaterialScan::MaterialScan(TFile* rootFile, const std::string &name, const std::
 }
 
 
-bool MaterialScan::createNext(G4ThreeVector &origin, G4ThreeVector &direction)
+bool MaterialScan::createNext(G4ThreeVector& origin, G4ThreeVector& direction)
 {
   //Increase the internal coordinates
   m_curU += m_stepU;
@@ -77,7 +77,7 @@ bool MaterialScan::createNext(G4ThreeVector &origin, G4ThreeVector &direction)
   return (m_curV <= m_params.maxV);
 }
 
-void MaterialScan::fillValue(const std::string &name, double value)
+void MaterialScan::fillValue(const std::string& name, double value)
 {
   TH2D* &hist = m_regions[name];
   if (!hist) {
@@ -120,7 +120,7 @@ void MaterialScan::UserSteppingAction(const G4Step* step)
   fillValue(lambda_name, lambda);
 }
 
-void MaterialScanSpherical::getRay(G4ThreeVector &origin, G4ThreeVector &direction)
+void MaterialScanSpherical::getRay(G4ThreeVector& origin, G4ThreeVector& direction)
 {
   //We always shoot from the origin
   origin = m_origin;
@@ -131,7 +131,7 @@ void MaterialScanSpherical::getRay(G4ThreeVector &origin, G4ThreeVector &directi
                 cos(theta));
 }
 
-void MaterialScanPlanar::getRay(G4ThreeVector &origin, G4ThreeVector &direction)
+void MaterialScanPlanar::getRay(G4ThreeVector& origin, G4ThreeVector& direction)
 {
   //We shoot perpendicular to the plane, so direction is always the same but the position varies.
   origin = m_origin + m_curU / Unit::mm * m_dirU + m_curV / Unit::mm * m_dirV;
@@ -226,8 +226,8 @@ void MaterialScanModule::initialize()
   }
 
   //Convert plane definition to mm since Geant4 is of course using other units
-  BOOST_FOREACH(double &value, m_customPlane) value /= Unit::mm;
-  BOOST_FOREACH(double &value, m_sphericalOrigin) value /= Unit::mm;
+  BOOST_FOREACH(double & value, m_customPlane) value /= Unit::mm;
+  BOOST_FOREACH(double & value, m_sphericalOrigin) value /= Unit::mm;
 }
 
 void MaterialScanModule::terminate()
@@ -240,13 +240,13 @@ void MaterialScanModule::terminate()
 
 void MaterialScanModule::beginRun()
 {
-  G4EventManager *eventManager = G4EventManager::GetEventManager();
+  G4EventManager* eventManager = G4EventManager::GetEventManager();
 
   //First we save all user actions
-  G4UserEventAction    *vanillaEventAction    = eventManager->GetUserEventAction();
-  G4UserStackingAction *vanillaStackingAction = eventManager->GetUserStackingAction();
-  G4UserTrackingAction *vanillaTrackingAction = eventManager->GetUserTrackingAction();
-  G4UserSteppingAction *vanillaSteppingAction = eventManager->GetUserSteppingAction();
+  G4UserEventAction*    vanillaEventAction    = eventManager->GetUserEventAction();
+  G4UserStackingAction* vanillaStackingAction = eventManager->GetUserStackingAction();
+  G4UserTrackingAction* vanillaTrackingAction = eventManager->GetUserTrackingAction();
+  G4UserSteppingAction* vanillaSteppingAction = eventManager->GetUserSteppingAction();
 
   //Then we clear the user actions
   eventManager->SetUserAction((G4UserEventAction*)0);
@@ -277,7 +277,7 @@ void MaterialScanModule::beginRun()
   }
 
   //Do each configured scan
-  BOOST_FOREACH(MaterialScan* scan, scans) {
+  BOOST_FOREACH(MaterialScan * scan, scans) {
     //Set the Scan as steppingaction to see material
     eventManager->SetUserAction(scan);
     //Now we can scan

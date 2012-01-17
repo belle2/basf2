@@ -44,8 +44,8 @@ namespace Belle2 {
        * @param name name of the sensitive detector
        * @param subdetector subdetector the sensitive detector class belongs to
        */
-      SensitiveDetectorBase(const std::string &name, DetectorComponent subdetector):
-          G4VSensitiveDetector(name), m_subdetector(subdetector) {}
+      SensitiveDetectorBase(const std::string& name, DetectorComponent subdetector):
+        G4VSensitiveDetector(name), m_subdetector(subdetector) {}
 
       /** virtual destructor for inheritance */
       virtual ~SensitiveDetectorBase() {}

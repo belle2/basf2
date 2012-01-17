@@ -32,7 +32,7 @@ StackingAction::~StackingAction()
 }
 
 
-G4ClassificationOfNewTrack StackingAction::ClassifyNewTrack(const G4Track * aTrack)
+G4ClassificationOfNewTrack StackingAction::ClassifyNewTrack(const G4Track* aTrack)
 {
   // If optical photon is produced in "Cerenkov" it has "m_photonFraction" probability
   // for being propagated.

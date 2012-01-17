@@ -27,7 +27,7 @@ using namespace Belle2::Simulation;
 
 
 MCParticleGenerator::MCParticleGenerator(const string& mcCollectionName, MCParticleGraph& mcParticleGraph) :
-    G4VPrimaryGenerator(), m_mcCollectionName(mcCollectionName), m_mcParticleGraph(mcParticleGraph)
+  G4VPrimaryGenerator(), m_mcCollectionName(mcCollectionName), m_mcParticleGraph(mcParticleGraph)
 {
 
 }
@@ -51,7 +51,7 @@ void MCParticleGenerator::GeneratePrimaryVertex(G4Event* event)
   //sorted breadth first: primary particles come first and then the daughters
   int nPart = mcParticles.getEntries();
   for (int iPart = 0; iPart < nPart; iPart++) {
-    MCParticle *currParticle = mcParticles[iPart];
+    MCParticle* currParticle = mcParticles[iPart];
     if (currParticle->getMother() != NULL) break;
 
     //Add primary particle (+ daughters) and the vertex
@@ -60,7 +60,7 @@ void MCParticleGenerator::GeneratePrimaryVertex(G4Event* event)
 }
 
 
-void MCParticleGenerator::addParticle(MCParticle &mcParticle, G4Event* event, G4PrimaryParticle* lastG4Mother, int motherIndex, bool useTime)
+void MCParticleGenerator::addParticle(MCParticle& mcParticle, G4Event* event, G4PrimaryParticle* lastG4Mother, int motherIndex, bool useTime)
 {
   G4PrimaryParticle* g4Mother = lastG4Mother;
 
@@ -91,7 +91,7 @@ void MCParticleGenerator::addParticle(MCParticle &mcParticle, G4Event* event, G4
   graphParticle.setDecayVertex(mcParticle.getDecayVertex());
   graphParticle.setFirstDaughter(mcParticle.getFirstDaughter());
   graphParticle.setLastDaughter(mcParticle.getLastDaughter());
-  if (motherIndex > 0) graphParticle.comesFrom(m_mcParticleGraph[motherIndex-1]); //Add decay
+  if (motherIndex > 0) graphParticle.comesFrom(m_mcParticleGraph[motherIndex - 1]); //Add decay
 
   //Create a new Geant4 Primary particle and store the link to the GraphMCParticle object as user info.
   G4PrimaryParticle* newPart = NULL;
@@ -132,7 +132,7 @@ void MCParticleGenerator::addParticle(MCParticle &mcParticle, G4Event* event, G4
 
   //Add all children
   int currMotherIndex = m_mcParticleGraph.size();
-  BOOST_FOREACH(MCParticle* daughter, mcParticle.getDaughters()) {
+  BOOST_FOREACH(MCParticle * daughter, mcParticle.getDaughters()) {
     addParticle(*daughter, event, g4Mother, currMotherIndex, useTime);
   }
 }

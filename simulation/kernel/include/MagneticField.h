@@ -43,7 +43,7 @@ namespace Belle2 {
        * @param Point An array specifying the space point (x,y,z) in [mm].
        * @param Bfield Returns the magnetic field vector in tesla.
        */
-      void GetFieldValue(const G4double Point[3], G4double *Bfield) const;
+      void GetFieldValue(const G4double Point[3], G4double* Bfield) const;
 
 
     private:

@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include <simulation/background/BkgSensitiveDetector.h>
+#include <simulation/background/NeutronWeight.h>
 #include <simulation/dataobjects/BeamBackHit.h>
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Unit.h>
@@ -29,12 +30,13 @@ namespace Belle2 {
 
 
   BkgSensitiveDetector::BkgSensitiveDetector(const char* subDett, int iden):
-      Simulation::SensitiveDetectorBase("BKG", BkgSensitiveDetector::TOP), m_trackID(0), m_startPos(0., 0., 0.), m_startMom(0., 0., 0.), m_startTime(0), m_startEnergy(0), m_energyDeposit(0)
+    Simulation::SensitiveDetectorBase("BKG", BkgSensitiveDetector::TOP), m_trackID(0), m_startPos(0., 0., 0.), m_startMom(0., 0., 0.), m_startTime(0), m_startEnergy(0), m_energyDeposit(0), m_trackLength(0.)
   {
     StoreArray<MCParticle> mcParticles;
     StoreArray<BeamBackHit> beamBackHits;
-    RelationArray  beamBackHitRel(beamBackHits, mcParticles);
-    registerMCParticleRelation(beamBackHitRel);
+
+    RelationArray  relBeamBackHitToMCParticle(beamBackHits, mcParticles);
+    registerMCParticleRelation(relBeamBackHitToMCParticle);
 
     std::string subDet = subDett;
     if (subDet == "IR")    m_subDet = 0;
@@ -59,42 +61,43 @@ namespace Belle2 {
     const G4StepPoint& preStep  = *aStep->GetPreStepPoint();
     G4Track& track  = *aStep->GetTrack();
 
-
     if (m_trackID != track.GetTrackID()) {
       //TrackID changed, store track informations
       m_trackID = track.GetTrackID();
       //Get world position
       const G4ThreeVector& worldPosition = preStep.GetPosition();
-      m_startPos.SetXYZ(worldPosition.x() / cm, worldPosition.y() / cm,
-                        worldPosition.z() / cm);
+      m_startPos.SetXYZ(worldPosition.x() * Unit::mm / Unit::cm , worldPosition.y() * Unit::mm / Unit::cm,
+                        worldPosition.z() * Unit::mm / Unit::cm);
       //Get momentum
       const G4ThreeVector& momentum = preStep.GetMomentum() ;
       m_startMom.SetXYZ(momentum.x() * Unit::MeV, momentum.y() * Unit::MeV ,
                         momentum.z() * Unit::MeV);
       //Get time
-      m_startTime = track.GetGlobalTime();
+      m_startTime = preStep.GetGlobalTime();
       //Get energy
-      m_startEnergy =  track.GetKineticEnergy() * Unit::MeV;
+      m_startEnergy =  preStep.GetKineticEnergy() * Unit::MeV;
       //Reset energy deposit;
       m_energyDeposit = 0;
     }
     //Update energy deposit
     m_energyDeposit += aStep->GetTotalEnergyDeposit() * Unit::MeV;
+    m_trackLength += aStep->GetStepLength() * Unit::mm;
 
     //Save Hit if track leaves volume or is killed
-    if (track.GetNextVolume() != track.GetVolume() || track.GetTrackStatus() >=
-        fStopAndKill) {
+    if (track.GetNextVolume() != track.GetVolume() || track.GetTrackStatus() >= fStopAndKill) {
       int pdgCode = track.GetDefinition()->GetPDGEncoding();
+      double endEnergy = track.GetKineticEnergy() * Unit::MeV;
+      double neutWeight = 0;
+      if (pdgCode == 2112) neutWeight = getNeutronWeight(m_startEnergy / Unit::MeV);
       StoreArray<BeamBackHit> beamBackHits;
       int nentr = beamBackHits->GetLast() + 1;
-      new(beamBackHits->AddrAt(nentr)) BeamBackHit(m_subDet, m_identifier, pdgCode,
-                                                   m_startTime, m_startEnergy, m_startPos, m_startMom, m_energyDeposit);
+      new(beamBackHits->AddrAt(nentr)) BeamBackHit(m_subDet, m_identifier, pdgCode, m_trackID, m_startPos, m_startMom, m_startTime, endEnergy, m_startEnergy, m_energyDeposit, m_trackLength, neutWeight);
 
 
       // create relation to MCParticle
       StoreArray<MCParticle> mcParticles;
-      RelationArray beamBackHitRel(beamBackHits, mcParticles);
-      beamBackHitRel.add(nentr, m_trackID);
+      RelationArray relBeamBackHitToMCParticle(beamBackHits, mcParticles);
+      relBeamBackHitToMCParticle.add(nentr, m_trackID);
 
       //Reset TrackID
       m_trackID = 0;

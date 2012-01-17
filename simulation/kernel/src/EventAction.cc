@@ -23,8 +23,8 @@ using namespace Belle2;
 using namespace Belle2::Simulation;
 
 
-EventAction::EventAction(const std::string& mcCollectionName, MCParticleGraph &mcParticleGraph):
-    G4UserEventAction(), m_mcCollectionName(mcCollectionName),  m_mcParticleGraph(mcParticleGraph)
+EventAction::EventAction(const std::string& mcCollectionName, MCParticleGraph& mcParticleGraph):
+  G4UserEventAction(), m_mcCollectionName(mcCollectionName),  m_mcParticleGraph(mcParticleGraph)
 {
 
 }
@@ -60,7 +60,7 @@ void EventAction::EndOfEventAction(const G4Event* event)
   RelationArray::ReplaceVec<> indexReplacement(indices);
 
   //Update all registered MCParticle Relations and replace the TrackID by the final MCParticle id
-  BOOST_FOREACH(const string &relName, SensitiveDetectorBase::getMCParticleRelations()) {
+  BOOST_FOREACH(const string & relName, SensitiveDetectorBase::getMCParticleRelations()) {
     if (!relName.empty()) {
       RelationArray mcPartRelation(relName);
       if (mcPartRelation) mcPartRelation.consolidate(indexReplacement, RelationArray::Identity());

@@ -457,6 +457,32 @@ namespace Belle2 {
       bar->MakeImprint(air, transa, rota, 100, false);
 
 
+      //! Add electronics, this part is not finished, just for backgound studies.
+      G4Material* PCBMaterial = Materials::get("TOPPCB");
+      G4Box* el1 = new G4Box("el1box", m_topgp->getBotthickness() / 2.0, y / 2.0, x / 2.0);
+      G4Box* el2 = new G4Box("el1box", y / 2.0, m_topgp->getBotthickness() / 2.0, x / 2.0);
+      G4LogicalVolume* pcb1 = new G4LogicalVolume(el1, PCBMaterial, "Board.1");
+      G4LogicalVolume* pcb2 = new G4LogicalVolume(el2, PCBMaterial, "Board.2");
+
+      if (isBeamBkgStudy) {
+        pcb1->SetSensitiveDetector(new BkgSensitiveDetector("TOP", 1));
+        pcb2->SetSensitiveDetector(new BkgSensitiveDetector("TOP", 2));
+      }
+
+
+      setColor(*pcb1, "rgb(0.0,1.0,0.0,1.0)");
+      setColor(*pcb2, "rgb(0.0,1.0,0.0,1.0)");
+
+
+      G4RotationMatrix* rotPBC = new G4RotationMatrix(0, 0, 0);
+      G4ThreeVector transPCB(Z1 - WLength - 2 * m_topgp->getdGlue() - (m_topgp->getWinthickness() + m_topgp->getMsizez() + m_topgp->getBotthickness()) - m_topgp->getBotthickness() / 2.0, -Wextdown / 2.0, 0.);
+      G4ThreeVector transPCB2(Z1 - WLength - 3 * m_topgp->getdGlue() - (m_topgp->getWinthickness() + m_topgp->getMsizez() + m_topgp->getBotthickness()) - m_topgp->getBotthickness() - y / 2.0, -Wextdown / 2.0, 0.);
+
+      new G4PVPlacement(rotPBC, transPCB, pcb1, "TOP.electronics", air, false, 0);
+      new G4PVPlacement(rotPBC, transPCB2, pcb2, "TOP.electronics", air, false, 0);
+
+
+
       //! Needed dumy variable to place air inside support shape
       G4Transform3D temp = G4Translate3D(0.0, 0.0, 0.0);
 

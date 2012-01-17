@@ -372,13 +372,14 @@ namespace Belle2 {
         BrCrysral->SetSensitiveDetector(m_sensitive);
         assemblyBrCrystals->AddPlacedVolume(BrCrysral, Tr);
 
-//        G4LogicalVolume* Sensor = new G4LogicalVolume(SensorDiode, medSi, (format("logicalEclBrDiode_%1%") % iBrCry).str().c_str(), 0, 0, 0);
-//        Sensor->SetSensitiveDetector(m_sensitive);
         G4Transform3D DiodePosition = G4Translate3D(0, 0, (k_BLL + DiodeHeight) / 2 + 0.1);  // Move over to the left...
         G4Transform3D TrD = pos_phi * position * tilt_phi * tilt_z * r00 * DiodePosition ;
-//        assemblyBrCrystals->AddPlacedVolume(Sensor, TrD);
 
-        if (isBeamBkgStudy) {
+        if (!isBeamBkgStudy) {
+          G4LogicalVolume* Sensor = new G4LogicalVolume(SensorDiode, medSi, (format("logicalEclBrDiode_%1%") % iBrCry).str().c_str(), 0, 0, 0);
+          Sensor->SetSensitiveDetector(m_sensitive);
+          assemblyBrCrystals->AddPlacedVolume(Sensor, TrD);
+        } else {
           for (int iSector = 0; iSector < 72; ++iSector) {//total 72 for Bareel Diode
             G4Transform3D SectorRot = G4RotateZ3D(360.*iSector / 72 * deg);
             G4Transform3D SectorRRot = G4RotateZ3D((360.*iSector / 72 - 2.494688) * deg);
@@ -394,7 +395,7 @@ namespace Belle2 {
             if (iSector == 0)DiodeId1 = (iBrCry) * 144 + iSector * 2 - 1 + 1152;
             G4LogicalVolume* Sensor1 = new G4LogicalVolume(SensorDiode, medSi, (format("logicalEclBrDiode_%1%") % DiodeId1).str().c_str(), 0, 0, 0);
             Sensor1->SetSensitiveDetector(new BkgSensitiveDetector("ECL", DiodeId1));
-            assemblyBrDiodes->AddPlacedVolume(Sensor, BrRR);
+            assemblyBrDiodes->AddPlacedVolume(Sensor1, BrRR);
 //         cout<<(format("logicalEclBrDiode_%1%") % DiodeId1).str().c_str()<<endl;
 //         cout<<(format("logicalEclBrDiode_%1%") % DiodeId).str().c_str()<<endl;
           }//iSector
@@ -452,14 +453,15 @@ namespace Belle2 {
         assemblyFwCrystals->AddPlacedVolume(FwCrysral, Tr);
 
 
-//        G4LogicalVolume* Sensor = new G4LogicalVolume(SensorDiode, medSi, (format("logicalEclFwDiode_%1%") % iCry).str().c_str(), 0, 0, 0);
-//        Sensor->SetSensitiveDetector(m_sensitive);
         G4Transform3D DiodePosition = G4Translate3D(0, 0, halflength + (DiodeHeight) / 2 + 0.1); // Move over to the left...
         G4Transform3D TrD =  position * m3 * m2 * m1 * DiodePosition ;
-//        assemblyFwCrystals->AddPlacedVolume(Sensor, TrD);
 
 
-        if (isBeamBkgStudy) {
+        if (!isBeamBkgStudy) {
+          G4LogicalVolume* Sensor = new G4LogicalVolume(SensorDiode, medSi, (format("logicalEclFwDiode_%1%") % iCry).str().c_str(), 0, 0, 0);
+          Sensor->SetSensitiveDetector(m_sensitive);
+          assemblyFwCrystals->AddPlacedVolume(Sensor, TrD);
+        } else {
           for (int iSector = 0; iSector < 16; ++iSector) {//total 16 for EndcapDiode
             G4Transform3D SectorRot = G4RotateZ3D(360.*iSector / 16 * deg);
             G4Transform3D FwR = SectorRot * TrD;
@@ -516,13 +518,14 @@ namespace Belle2 {
         BwCrysral->SetSensitiveDetector(m_sensitive);
         assemblyBwCrystals->AddPlacedVolume(BwCrysral, Tr);
 
-//        G4LogicalVolume* Sensor = new G4LogicalVolume(SensorDiode, medSi, (format("logicalEclBwDiode_%1%") % iCry).str().c_str(), 0, 0, 0);
-//        Sensor->SetSensitiveDetector(m_sensitive);
         G4Transform3D DiodePosition = G4Translate3D(0, 0, halflength + (DiodeHeight) / 2 + 0.1); // Move over to the left...
         G4Transform3D TrD =  position * m3 * m2 * m1 * DiodePosition ;
-//        assemblyBwCrystals->AddPlacedVolume(Sensor, TrD);
 
-        if (isBeamBkgStudy) {
+        if (!isBeamBkgStudy) {
+          G4LogicalVolume* Sensor = new G4LogicalVolume(SensorDiode, medSi, (format("logicalEclBwDiode_%1%") % iCry).str().c_str(), 0, 0, 0);
+          Sensor->SetSensitiveDetector(m_sensitive);
+          assemblyBwCrystals->AddPlacedVolume(Sensor, TrD);
+        } else  {
           for (int iSector = 0; iSector < 16; ++iSector) {//total 16 for EndcapDiode
             G4Transform3D SectorRot = G4RotateZ3D(360.*iSector / 16 * deg);
             G4Transform3D BwR = SectorRot * TrD;

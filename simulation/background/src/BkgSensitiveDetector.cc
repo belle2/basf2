@@ -9,7 +9,7 @@
  **************************************************************************/
 
 #include <simulation/background/BkgSensitiveDetector.h>
-#include <simulation/background/NeutronWeight.h>
+#include <simulation/background/BkgNeutronWeight.h>
 #include <simulation/dataobjects/BeamBackHit.h>
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Unit.h>
@@ -88,7 +88,10 @@ namespace Belle2 {
       int pdgCode = track.GetDefinition()->GetPDGEncoding();
       double endEnergy = track.GetKineticEnergy() * Unit::MeV;
       double neutWeight = 0;
-      if (pdgCode == 2112) neutWeight = getNeutronWeight(m_startEnergy / Unit::MeV);
+      if (pdgCode == 2112) {
+        BkgNeutronWeight& wt = BkgNeutronWeight::getInstance();
+        neutWeight = wt.getWeight(m_startEnergy / Unit::MeV);
+      }
       StoreArray<BeamBackHit> beamBackHits;
       int nentr = beamBackHits->GetLast() + 1;
       new(beamBackHits->AddrAt(nentr)) BeamBackHit(m_subDet, m_identifier, pdgCode, m_trackID, m_startPos, m_startMom, m_startTime, endEnergy, m_startEnergy, m_energyDeposit, m_trackLength, neutWeight);

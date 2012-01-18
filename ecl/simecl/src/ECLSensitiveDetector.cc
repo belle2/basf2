@@ -116,7 +116,6 @@ namespace Belle2 {
     TVector3 VecCell =  eclp->GetCrystalVec(m_cellID);
     TVector3 Pin(momIn.getX(), momIn.getY(), momIn.getZ());
 
-    //cout << v.GetName() << " CellID " << m_cellID << " " << v.GetCopyNo() << endl;
 
 
     if (v.GetName().find("Crystal") != string::npos) {
@@ -126,12 +125,14 @@ namespace Belle2 {
 
     if (v.GetName().find("Diode") != string::npos) {
       int saveEBIndex = -999;
-      if (trackID != oldtrack && m_cellID != oldcellId) {
+      if (trackID != oldtrack || m_cellID != oldcellId) {
         oldtrack = trackID; oldcellId = m_cellID;
         FirstStepFlag = 1;
       }
       saveEBIndex = saveEBSimHit(m_cellID, m_thetaID, m_phiID, trackID, pid, tof, edep, FirstStepFlag, momIn, posCell, posIn, posOut);
     }
+
+//    cout << v.GetName() << " CellID " << m_cellID << " " << pid <<" FirstStepFlag"<<FirstStepFlag<< endl;
 
     // Ge layer ID
 //  const unsigned layerId = v.GetCopyNo();

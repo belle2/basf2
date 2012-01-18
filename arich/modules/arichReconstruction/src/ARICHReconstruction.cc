@@ -12,7 +12,7 @@
 #include "arich/modules/arichReconstruction/Utility.h"
 #include "arich/geometry/ARICHGeometryPar.h"
 #include "arich/dataobjects/ARICHHit.h"
-#include "arich/dataobjects/ARICHTrack.h"
+#include "arich/modules/arichReconstruction/ARICHTrack.h"
 
 // DataStore
 #include <framework/datastore/DataStore.h>

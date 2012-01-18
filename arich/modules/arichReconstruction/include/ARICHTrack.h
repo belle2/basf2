@@ -12,6 +12,7 @@
 #ifndef ARICHTRACK_H
 #define ARICHTRACK_H
 
+
 #include <arich/dataobjects/ARICHAeroHit.h>
 #include <TObject.h>
 
@@ -22,7 +23,7 @@ namespace Belle2 {
   //!  This is class for aRICH track.
   /*!  This track class holds track parameters and track related routines needed by reconstruction. After reconstruction, values of likelihood function for different particle hypotheses associated with track are written. This should be changed with more general track class eventually.
    */
-
+  class ARICHGeometryPar;
   class ARICHTrack : public TObject {
   public:
 

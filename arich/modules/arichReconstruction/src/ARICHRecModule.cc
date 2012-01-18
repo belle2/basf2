@@ -13,7 +13,7 @@
 #include <time.h>
 
 #include <arich/dataobjects/ARICHAeroHit.h>
-#include <arich/dataobjects/ARICHTrack.h>
+#include <arich/modules/arichReconstruction/ARICHTrack.h>
 
 #include <framework/core/ModuleManager.h>
 

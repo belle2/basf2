@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <arich/dataobjects/ARICHTrack.h>
+#include <arich/modules/arichReconstruction/ARICHTrack.h>
 #include <arich/geometry/ARICHGeometryPar.h>
 #include <cmath>
 

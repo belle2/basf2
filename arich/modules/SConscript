@@ -1,6 +1,0 @@
-Import('env')
-
-env['LIBS'] = ['framework', 'arich',
-               '$ROOT_LIBS']
-
-Return('env')

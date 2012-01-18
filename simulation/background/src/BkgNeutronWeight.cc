@@ -13,17 +13,17 @@
 
 namespace Belle2 {
 
-  BkgNeutronWeight* BkgNeutronWeight::m_Instance = NULL;
+  BkgNeutronWeight* BkgNeutronWeight::m_Instance = 0;
 
   BkgNeutronWeight& BkgNeutronWeight::getInstance()
   {
-    if (m_Instance == NULL) m_Instance = new BkgNeutronWeight();
+    if (m_Instance == 0) m_Instance = new BkgNeutronWeight();
     return *m_Instance;
   }
 
   double BkgNeutronWeight::getWeight(double ke)
   {
-    if (m_Instance == NULL) m_Instance = new BkgNeutronWeight();
+    if (m_Instance == 0) m_Instance = new BkgNeutronWeight();
     if (ke <= 0) return 0;
 
     double x = log(ke);

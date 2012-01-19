@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010-2011  Belle II Collaboration                         *
+ * Copyright(C) 2010-2012  Belle II Collaboration                         *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Andreas Moll, Thomas Kuhr                                *
@@ -51,11 +51,25 @@ namespace Belle2 {
     void setDataSearchPath(const std::string& dataPath) { m_dataSearchPath = dataPath; };
 
     /**
+     * Sets the path which points to the externals directory of the framework.
+     *
+     * @param externalsPath Path in which the externals of the framework are located.
+     */
+    void setExternalsPath(const std::string& externalsPath) { m_externalsPath = externalsPath; };
+
+    /**
      * Returns the path which points to the data directory of the framework.
      *
      * @return The path in which the data files for the framework are located.
      */
     const std::string getDataSearchPath() { return m_dataSearchPath; };
+
+    /**
+     * Returns the path which points to the externals directory of the framework.
+     *
+     * @return The path in which the externals of the framework are located.
+     */
+    const std::string getExternalsPath() { return m_externalsPath; };
 
     /**
      * Sets the number of processes which should be used for the parallel processing.
@@ -89,6 +103,7 @@ namespace Belle2 {
   private:
 
     std::string m_dataSearchPath; /**< The path in which the data files, such as geometry files, are stored. */
+    std::string m_externalsPath;  /**< The path in which the externals are located. */
     int m_numberProcesses;        /**< The number of processes that should be used for the parallel processing. */
     std::string m_steering;       /**< The content of the steering file. */
 

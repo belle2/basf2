@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010-2011  Belle II Collaboration                         *
+ * Copyright(C) 2010-2012  Belle II Collaboration                         *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Andreas Moll, Thomas Kuhr                                *
@@ -64,6 +64,13 @@ namespace Belle2 {
      * @param path The path in which the data for the framework is located.
     */
     void setDataSearchPath(const std::string& path);
+
+    /**
+     * Sets the path in which the externals of the framework are located.
+     *
+     * @param path The path in which the externals of the framework are located.
+    */
+    void setExternalsPath(const std::string& path);
 
     /**
      * Registers a new module to the framework and returns a shared pointer.

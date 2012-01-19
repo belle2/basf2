@@ -62,6 +62,12 @@ void Framework::setDataSearchPath(const std::string& path)
 }
 
 
+void Framework::setExternalsPath(const std::string& path)
+{
+  Environment::Instance().setExternalsPath(path);
+}
+
+
 ModulePtr Framework::registerModule(const string moduleName) throw(ModuleManager::ModuleNotCreatedError)
 {
   return ModuleManager::Instance().registerModule(moduleName);
@@ -173,6 +179,7 @@ void Framework::exposePythonAPI()
   class_<Framework>("Framework")
   .def("add_module_search_path", &Framework::addModuleSearchPath)
   .def("set_data_search_path", &Framework::setDataSearchPath)
+  .def("set_externals_path", &Framework::setExternalsPath)
   .def("list_module_search_paths", &Framework::getModuleSearchPathsPython)
   .def("list_available_modules", &Framework::getAvailableModulesPython)
   .def("register_module", registerModule1)

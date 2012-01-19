@@ -42,9 +42,9 @@ KoralWInputModule::KoralWInputModule() : Module()
   //Parameter definition
   addParam("BoostMode", m_boostMode, "The mode of the boost (0 = no boost, 1 = Belle II, 2 = Belle)", 0);
   addParam("DataPath",  m_dataPath, "The path to the KoralW input data files.",
-           Environment::Instance().getDataSearchPath() + "/generators/fortran/koralw");
+           Environment::Instance().getDataSearchPath() + "/generators/koralw");
   addParam("UserDataFile",  m_userDataFile, "The filename of the user KoralW input data file.",
-           Environment::Instance().getDataSearchPath() + "/generators/fortran/koralw/KoralW_ee.data");
+           Environment::Instance().getDataSearchPath() + "/generators/koralw/KoralW_ee.data");
   addParam("RandomSeed", m_seed, "The random seed of the generator.", 1227);
 }
 

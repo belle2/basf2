@@ -12,6 +12,7 @@
 #include <generators/evtgen/EvtGenInterface.h>
 #include <generators/dataobjects/MCParticleGraph.h>
 #include <generators/utilities/cm2LabBoost.h>
+#include <framework/core/Environment.h>
 
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
@@ -42,8 +43,10 @@ EvtGenInputModule::EvtGenInputModule() : Module()
 
   //Parameter definition
   addParam("userDECFile", m_userDECFileName, "user DECfile name", string(""));
-  addParam("DECFile", m_DECFileName, "standard DECfile name should be provided: default file is in release/data/generators/DECAY.DEC");
-  addParam("pdlFile", m_pdlFileName, "standard pdlfile name should be provided: default file is in release/data/generators/evt.pdl");
+  addParam("DECFile", m_DECFileName, "standard DECfile name should be provided: default file is in externals/share/evtgen/DECAY.DEC",
+           Environment::Instance().getExternalsPath() + "/share/evtgen/DECAY.DEC");
+  addParam("pdlFile", m_pdlFileName, "standard pdlfile name should be provided: default file is in externals/share/evtgen/evt.pdl",
+           Environment::Instance().getExternalsPath() + "/share/evtgen/evt.pdl");
   addParam("boost2LAB", m_boost2LAB, "Boolean to indicate whether the particles should be boosted to LAB frame", true);
 }
 

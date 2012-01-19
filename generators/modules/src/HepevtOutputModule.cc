@@ -60,7 +60,7 @@ void HepevtOutputModule::event()
   int nVirtualPart = 0;
   if (!m_storeVirtualParticles) {
     for (int iPart = 0; iPart < nPart; ++iPart) {
-      MCParticle &mcPart = *mcPartCollection[iPart];
+      MCParticle& mcPart = *mcPartCollection[iPart];
       if (mcPart.isVirtual()) nVirtualPart++;
     }
   }
@@ -68,11 +68,11 @@ void HepevtOutputModule::event()
   m_fileStream << format("%10d%10d\n") % eventMetaDataPtr->getEvent() % (nPart - nVirtualPart);
 
   for (int iPart = 0; iPart < nPart; ++iPart) {
-    MCParticle &mcPart = *mcPartCollection[iPart];
+    MCParticle& mcPart = *mcPartCollection[iPart];
     if (!m_storeVirtualParticles && mcPart.isVirtual()) continue;
 
     TVector3 mom = mcPart.getMomentum();
-    if (m_mirrorPz) mom.SetZ(-1.0*mom.Z());
+    if (m_mirrorPz) mom.SetZ(-1.0 * mom.Z());
     m_fileStream << format("%10.6f%10.6f%10.6f%10.6f%10.6f%6i\n") % mom.X() % mom.Y() % mom.Z() % mcPart.getEnergy() % mcPart.getMass() % mcPart.getPDG();
   }
 }

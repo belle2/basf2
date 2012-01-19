@@ -116,7 +116,7 @@ void TouschekTURTLEInputModule::event()
       B2INFO("Read " << readHERParticles << " e- particles (HER).")
       B2INFO("Read " << readLERParticles << " e+ particles (LER).")
     }
-  } catch (runtime_error &exc) {
+  } catch (runtime_error& exc) {
     B2ERROR(exc.what());
   }
 }

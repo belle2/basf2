@@ -90,19 +90,19 @@ void PGunInputModule::initialize()
     m_pgun.m_PIDcodes.push_back(-11);
   }
 
-  if (m_genMom<3 && m_genMom> -1)
+  if (m_genMom < 3 && m_genMom > -1)
     m_pgun.m_genMom = static_cast<OldParticleGun::EgenerationOption>(m_genMom);
   else {
     m_genMom = 0;
     B2ERROR("Invalide option for random generation of momenta in particle gun!");
   }
-  if (m_genVert<3 && m_genVert> -1)
+  if (m_genVert < 3 && m_genVert > -1)
     m_pgun.m_genVert = static_cast <OldParticleGun::EgenerationOption>(m_genVert);
   else {
     m_genVert = 2;
     B2ERROR("Invalid option for random generation of vertices in particle gun!");
   }
-  if (m_genAngle<3 && m_genAngle> -1)
+  if (m_genAngle < 3 && m_genAngle > -1)
     m_pgun.m_genAngle = static_cast <OldParticleGun::EgenerationOption>(m_genAngle);
   else {
     m_genMom = 0;
@@ -120,7 +120,7 @@ void PGunInputModule::event()
     mpg.clear();
     m_pgun.generateEvent(mpg);
     mpg.generateList("", MCParticleGraph::c_setDecayInfo | MCParticleGraph::c_checkCyclic);
-  } catch (runtime_error &e) {
+  } catch (runtime_error& e) {
     B2ERROR(e.what());
   }
 }

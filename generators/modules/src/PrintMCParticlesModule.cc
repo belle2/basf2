@@ -67,7 +67,7 @@ void PrintMCParticlesModule::printTree(const MCParticle& mc, int level)
   if (m_maxLevel >= 0 && level > m_maxLevel) return;
   ++level;
   string indent = "";
-  for (int i = 0; i < 2*level; i++) indent += " ";
+  for (int i = 0; i < 2 * level; i++) indent += " ";
   TDatabasePDG* pdb = TDatabasePDG::Instance();
   TParticlePDG* pdef = pdb->GetParticle(mc.getPDG());
   string name = pdef ? (string(" (") + pdef->GetTitle() + ")") : "";
@@ -88,7 +88,7 @@ void PrintMCParticlesModule::printTree(const MCParticle& mc, int level)
         );
 
   const vector<MCParticle*> daughters = mc.getDaughters();
-  BOOST_FOREACH(MCParticle* daughter, daughters) {
+  BOOST_FOREACH(MCParticle * daughter, daughters) {
     printTree(*daughter, level);
   }
   m_seen[mc.getIndex()] = true;

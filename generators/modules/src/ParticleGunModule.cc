@@ -121,8 +121,8 @@ void ParticleGunModule::initialize()
   m_parameters.vertexDist   = convertDistribution(m_vertexDist);
 
   //Convert degree to radian
-  BOOST_FOREACH(double& angle, m_parameters.thetaParams) angle *= Unit::deg;
-  BOOST_FOREACH(double& angle, m_parameters.phiParams)   angle *= Unit::deg;
+  BOOST_FOREACH(double & angle, m_parameters.thetaParams) angle *= Unit::deg;
+  BOOST_FOREACH(double & angle, m_parameters.phiParams)   angle *= Unit::deg;
 
   //Assign parameters
   m_particleGun.setParameters(m_parameters);
@@ -136,7 +136,7 @@ void ParticleGunModule::event()
     m_particleGraph.clear();
     m_particleGun.generateEvent(m_particleGraph);
     m_particleGraph.generateList();
-  } catch (runtime_error &e) {
+  } catch (runtime_error& e) {
     B2ERROR(e.what());
   }
 }

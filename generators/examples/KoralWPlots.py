@@ -22,6 +22,7 @@ logging.log_level = LogLevel.WARNING
 ## Load the required libraries
 import ROOT
 ROOT.gSystem.Load('libframework')
+ROOT.gSystem.Load('libgenerators_koralw')
 ROOT.gSystem.Load('libgenerators')
 from ROOT import Belle2
 
@@ -92,7 +93,8 @@ koralw.param('BoostMode', 1)
 # Set a random seed for the event generation
 koralw.param('RandomSeed', 2710)
 
-# Set the logging level for the KoralW module to INFO in order to see the total cross section
+# Set the logging level for the KoralW module to INFO in order to
+# see the total cross section
 koralw.set_log_level(LogLevel.INFO)
 
 ## Register the Progress module and the Python histogram module

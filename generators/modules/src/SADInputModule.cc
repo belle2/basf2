@@ -89,8 +89,6 @@ void SADInputModule::event()
     MCParticleGraph mpg;
     StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
 
-    cout << "event" << endl;
-
     try {
       //----------------------------------
       //       Read the SAD data

@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010-2011  Belle II Collaboration                         *
+ * Copyright(C) 2010-2012  Belle II Collaboration                         *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Andreas Moll, Martin Heck, Martin Ritter                 *
@@ -44,9 +44,9 @@ namespace Belle2 {
   DEFINE_UNIT(fm  , Unit::m  * 1e-15); /**< [femtometers] */
 
 // area units
-  DEFINE_UNIT(m2  , Unit::m * Unit::m);      /**< [square meters] */
-  DEFINE_UNIT(cm2 , Unit::cm * Unit::cm);    /**< [square centimeters] */
-  DEFINE_UNIT(mm2 , Unit::mm * Unit::mm);    /**< [square millimeters] */
+  DEFINE_UNIT(m2  , Unit::m* Unit::m);       /**< [square meters] */
+  DEFINE_UNIT(cm2 , Unit::cm* Unit::cm);     /**< [square centimeters] */
+  DEFINE_UNIT(mm2 , Unit::mm* Unit::mm);     /**< [square millimeters] */
 
   DEFINE_UNIT(b   , Unit::m2 * 1e-28); /**< [barn] */
   DEFINE_UNIT(mb  , Unit::b  * 1e-3);  /**< [millibarn] */
@@ -57,9 +57,9 @@ namespace Belle2 {
   DEFINE_UNIT(ab  , Unit::b  * 1e-18); /**< [attobarn] */
 
 // volume units
-  DEFINE_UNIT(m3  , Unit::m * Unit::m * Unit::m);    /**< [cubic meters] */
-  DEFINE_UNIT(cm3 , Unit::cm * Unit::cm * Unit::cm); /**< [cubic centimeters] */
-  DEFINE_UNIT(mm3 , Unit::mm * Unit::mm * Unit::mm); /**< [cubic millimeters] */
+  DEFINE_UNIT(m3  , Unit::m* Unit::m* Unit::m);      /**< [cubic meters] */
+  DEFINE_UNIT(cm3 , Unit::cm* Unit::cm* Unit::cm);   /**< [cubic centimeters] */
+  DEFINE_UNIT(mm3 , Unit::mm* Unit::mm* Unit::mm);   /**< [cubic millimeters] */
 
 // time units
   DEFINE_UNIT(s   , Unit::ns * 1e9);   /**< [second] */
@@ -102,7 +102,8 @@ namespace Belle2 {
   const double Unit::eMobilitySi    = 1415 * Unit::cm2 / Unit::V / Unit::s;
 
 //SuperKEKB and Belle II constants
-  const double Unit::ringCircumference = 3016.360049 * Unit::m;
+  const double Unit::crossingAngleLER = -0.0415 * Unit::rad;
+  const double Unit::crossingAngleHER = 0.0415 * Unit::rad;
 
 
   double Unit::convertValue(double value, const std::string& unitString)

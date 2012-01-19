@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010-2011  Belle II Collaboration                         *
+ * Copyright(C) 2010-2012  Belle II Collaboration                         *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Andreas Moll, Martin Heck, Martin Ritter                 *
@@ -108,7 +108,8 @@ namespace Belle2 {
     static const double eMobilitySi;  /**< Electron mobility in intrinsic Silicon at room temperature */
 
     //SuperKEKB and Belle II constants
-    static const double ringCircumference; /**< The circumference of the SuperKEKB ring. */
+    static const double crossingAngleLER; /**< The crossing angle of the LER. */
+    static const double crossingAngleHER; /**< The crossing angle of the LER. */
 
 
     /**

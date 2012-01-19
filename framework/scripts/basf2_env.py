@@ -27,24 +27,28 @@ basf2authors = [
 #               Prepare basf2
 # -----------------------------------------------
 
-# Reset the signal handler to allow the framework execution to be stopped with Ctrl-c
+# Reset the signal handler to allow the framework execution
+# to be stopped with Ctrl-c
 signal.signal(signal.SIGINT, signal.SIG_DFL)
 
 # Check for environment variables set by the belle 2 release script
 envarReleaseDir = os.environ.get('BELLE2_RELEASE_DIR', None)
 envarLocalDir = os.environ.get('BELLE2_LOCAL_DIR', None)
 if not envarReleaseDir and not envarLocalDir:
-    print """The basf2 environment is not set up. Please execute the 'setuprel' script first."""
+    print """The basf2 environment is not set up.
+             Please execute the 'setuprel' script first."""
     Exit(1)
 
 envarSubDir = os.environ.get('BELLE2_SUBDIR', None)
 if envarSubDir is None:
-    print """The environment variable BELLE2_SUBDIR is not set. Please execute the 'setuprel' script first."""
+    print """The environment variable BELLE2_SUBDIR is not set.
+             Please execute the 'setuprel' script first."""
     Exit(1)
 
 envarExtDir = os.environ.get('BELLE2_EXTERNALS_DIR', None)
 if envarExtDir is None:
-    print """The environment variable BELLE2_EXTERNALS_DIR is not set. Please execute the 'setuprel' script first."""
+    print """The environment variable BELLE2_EXTERNALS_DIR is not set.
+             Please execute the 'setuprel' script first."""
     Exit(1)
 
 # -----------------------------------------------
@@ -72,6 +76,10 @@ else:
 
 fw.set_data_search_path(basf2datadir)
 
+# Sets the path in which the externals of the framework are located
+fw.set_externals_path(envarExtDir)
+
+
 # -----------------------------------------------
 #         Load evtgen particle tables
 # -----------------------------------------------
@@ -83,4 +91,3 @@ if not fw.read_evtgen_table(os.path.join(envarExtDir, 'share/evtgen/evt.pdl')):
 # -----------------------------------------------
 print '>>> basf2 Python environment set'
 print '>>> Framework object created: fw'
-

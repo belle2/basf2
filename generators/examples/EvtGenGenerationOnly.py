@@ -6,10 +6,8 @@ set_log_level(LogLevel.INFO)
 
 # to run the framework the used modules need to be registered
 evtgeninput = register_module('EvtGenInput')
-evtgeninput.param('DECFile', os.path.join(basf2datadir, 'generators/DECAY.DEC'
-                  ))
-evtgeninput.param('pdlFile', os.path.join(basf2datadir, 'generators/evt.pdl'))
-# evtgeninput.param('userDECFile', os.path.join(basf2datadir,'generators/belle/MIX.DEC'))
+# evtgeninput.param('userDECFile',
+#                    os.path.join(basf2datadir,'generators/belle/MIX.DEC'))
 
 evtmetagen = register_module('EvtMetaGen')
 evtmetagen.param('EvtNumList', [100])  # we want to process 100 events

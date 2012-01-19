@@ -8,9 +8,6 @@ set_log_level(LogLevel.ERROR)
 
 # to run the framework the used modules need to be registered
 evtgeninput = register_module('EvtGenInput')
-evtgeninput.param('DECFile', os.path.join(basf2datadir, 'generators/DECAY.DEC'
-                  ))
-evtgeninput.param('pdlFile', os.path.join(basf2datadir, 'generators/evt.pdl'))
 evtgeninput.param('boost2LAB', True)
 
 evtmetagen = register_module('EvtMetaGen')

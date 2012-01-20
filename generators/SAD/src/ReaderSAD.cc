@@ -64,7 +64,7 @@ void ReaderSAD::open(const string& filename) throw(SADCouldNotOpenFileError)
   m_tree->SetBranchAddress("rate", &m_lostRate);
   m_tree->SetBranchAddress("E", &m_lostE);
 
-  m_readEntry = 0;
+  m_readEntry = -1;
 }
 
 
@@ -100,7 +100,7 @@ bool ReaderSAD::getRealParticle(MCParticleGraph& graph)
   }
 
   //Check for end of file
-  if (m_readEntry >= m_tree->GetEntries()) throw SADEndOfFile();
+  if ((m_readEntry >= m_tree->GetEntries()) || (m_tree->GetEntries() == 0)) throw SADEndOfFile();
 
   //Check if the number of the real particles is reached
   if (m_realPartEntry >= m_realPartNum) {
@@ -112,12 +112,14 @@ bool ReaderSAD::getRealParticle(MCParticleGraph& graph)
   if (m_realPartNum == 0) {
     //Read only SAD particles which are inside the chosen sRange
     do {
+      m_readEntry++;
+      if (m_readEntry >= m_tree->GetEntries()) throw SADEndOfFile();
+
       m_tree->GetEntry(m_readEntry);
       convertParamsToSADUnits();
 
       B2DEBUG(10, "> Read particle " << m_readEntry + 1 << "/" << m_tree->GetEntries() << " with s = " << m_lostS << " cm" << " and rate = " << m_lostRate << " Hz")
-      m_readEntry++;
-    } while ((fabs(m_lostS) > m_sRange) && (m_readEntry <= m_tree->GetEntries()));
+    } while ((fabs(m_lostS) > m_sRange) && (m_readEntry < m_tree->GetEntries()));
 
     m_realPartNum = calculateRealParticleNumber(m_lostRate);
   }
@@ -125,7 +127,7 @@ bool ReaderSAD::getRealParticle(MCParticleGraph& graph)
   //Create a new real particle from the SAD particle
   if ((fabs(m_lostS) <= m_sRange) && (m_realPartNum > 0)) {
     addParticleToMCParticles(graph);
-    B2DEBUG(10, "* Created real particle " << m_realPartEntry + 1 << "/" << m_realPartNum << " for SAD particle " << m_readEntry << "/" << m_tree->GetEntries())
+    B2DEBUG(10, "* Created real particle " << m_realPartEntry + 1 << "/" << m_realPartNum << " for SAD particle " << m_readEntry + 1 << "/" << m_tree->GetEntries())
   }
 
   m_realPartEntry++;

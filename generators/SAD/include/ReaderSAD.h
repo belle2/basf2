@@ -119,7 +119,7 @@ namespace Belle2 {
 
     unsigned int m_realPartNum;    /**< The current number of the created real particles. */
     unsigned int m_realPartEntry;  /**< The current number of the created real particles. */
-    unsigned int m_readEntry;      /**< The number of the next entry that will be read. */
+    int m_readEntry;               /**< The current number of the SAD entry that is read. */
 
     double m_lostX;             /**< x at lost position [m]. */
     double m_lostY;             /**< y at lost position [m]. */

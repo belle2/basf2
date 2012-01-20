@@ -90,9 +90,11 @@ void GenFitter2Module::initialize()
   // convert the geant4 geometry to a TGeo geometry
   geometry::GeometryManager& geoManager = geometry::GeometryManager::getInstance();
   geoManager.createTGeoRepresentation();
+  //pass the magnetic field to genfit
+  GFFieldManager::getInstance()->init(new GFGeant4Field());
   // activate / deactivate material effects in genfit
   if (m_noEffects == true) {
-    //GFMaterialEffects::getInstance()->setNoEffects(true);
+    //GFMaterialEffects::getInstance()->setNoEffects(true); //not yet possible in current basd2 genfit verion (but already possible upstream)
   } else {
     GFMaterialEffects::getInstance()->setEnergyLossBetheBloch(m_energyLossBetheBloch);
     GFMaterialEffects::getInstance()->setNoiseBetheBloch(m_noiseBetheBloch);
@@ -100,6 +102,7 @@ void GenFitter2Module::initialize()
     GFMaterialEffects::getInstance()->setEnergyLossBrems(m_energyLossBrems);
     GFMaterialEffects::getInstance()->setNoiseBrems(m_noiseBrems);
   }
+  StoreArray<GFTrack> fittedTracks(""); //initialization of the the output container of this module
 }
 
 void GenFitter2Module::beginRun()
@@ -131,7 +134,7 @@ void GenFitter2Module::event()
     B2DEBUG(100, "GenFitter: GFTrackCandidatesCollection is empty!");
   }
 
-  //fitler
+  //filter
   bool filterEvent = false;
   if (m_filter == true) {
     // for the filter function to get only tracks that hits specific layers
@@ -166,8 +169,6 @@ void GenFitter2Module::event()
   if (filterEvent == false) { // fit the track
 
     StoreArray<GFTrack> fittedTracks(""); //holds the output of this module in the form of Genfit track objects
-
-    GFFieldManager::getInstance()->init(new GFGeant4Field());
 
     GFTrackCand* aTrackCandPointer = trackCandidates[0];
     //get fit starting values from the MCParticle
@@ -211,31 +212,6 @@ void GenFitter2Module::event()
     vector <GFAbsRecoHit*> factoryHits;
     //use the factory to create RecoHits for all Hits stored in the track candidate
     factoryHits = factory.createMany(*trackCandidates[0]);
-    /*cout << "sizeOffactoryHits " << factoryHits.size() << "\n";
-    for ( int i = 0; i not_eq nPxdTrueHits; ++i){
-    cout << "i= " << i << endl;
-    factoryHits[i]->Print();
-    cout <<pxdTrueHits[i]->getU() << " " << pxdTrueHits[i]->getV() << "\n";
-    cout << (static_cast<PXDRecoHit*> (factoryHits[i]))->getUVariance() << " ";
-    cout << (static_cast<PXDRecoHit*> (factoryHits[i]))->getVVariance() << " ";
-    cout << (static_cast<PXDRecoHit*> (factoryHits[i]))->getUVCov() << "\n";
-    factoryHits[i]->getHMatrix(trackRep).Print();
-    }
-      for ( int i = 0; i not_eq nSvdTrueHits; ++i){
-      //pxdTrueHits[i]->
-      cout << "i= " << i << endl;
-    factoryHits[i+nPxdTrueHits]->Print();
-    cout << svdTrueHits[i]->getU() << " " << svdTrueHits[i]->getV() << "\n";
-    cout << (static_cast<SVDRecoHit2D*> (factoryHits[i+nPxdTrueHits]))->getUVariance() << " ";
-    cout << (static_cast<SVDRecoHit2D*> (factoryHits[i+nPxdTrueHits]))->getVVariance() << " ";
-    cout << (static_cast<SVDRecoHit2D*> (factoryHits[i+nPxdTrueHits]))->getUVCov() << "\n";
-    factoryHits[i+nPxdTrueHits]->getHMatrix(trackRep).Print();
-    }
-    for ( int i = 0; i not_eq factoryHits.size(); ++i){
-    cout << "i= " << i << endl;
-    factoryHits[i]->Print();
-    factoryHits[i]->getHMatrix(trackRep).Print();
-    }  */
 
     //add created hits to the track
     track.addHitVector(factoryHits);

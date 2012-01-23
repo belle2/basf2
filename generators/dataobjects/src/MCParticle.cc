@@ -48,7 +48,7 @@ const vector<MCParticle*> MCParticle::getDaughters() const
   if (m_firstDaughter > 0) {
     fixParticleList();
     if (m_lastDaughter > m_plist->GetEntriesFast()) throw LastChildIndexOutOfRangError();
-    TClonesArray &plist = *m_plist;
+    TClonesArray& plist = *m_plist;
     result.reserve(m_lastDaughter - m_firstDaughter + 1);
     for (int i = m_firstDaughter - 1; i < m_lastDaughter; i++) {
       result.push_back(static_cast<MCParticle*>(plist[i]));
@@ -73,7 +73,7 @@ void MCParticle::fixParticleList() const
     //Search all StoreArrays which happen to store MCParticles
     StoreMapIter<DataStore::StoreArrayMap>* iter = DataStore::Instance().getArrayIterator(DataStore::c_Event);
     for (iter->first(); iter->isDone(); iter++) {
-      TClonesArray &value = *(static_cast<TClonesArray*>(iter->value()));
+      TClonesArray& value = *(static_cast<TClonesArray*>(iter->value()));
       if (value.GetClass() == Class() && value.IndexOf(this) >= 0) {
         plist = &value;
         break;
@@ -87,8 +87,8 @@ void MCParticle::fixParticleList() const
   }
 
   //Set plist pointer and index for whole array
-  for (int i = 0; i < plist->GetEntries(); i++) {
-    MCParticle &mc = *(static_cast<MCParticle*>(plist->At(i)));
+  for (int i = 0; i < plist->GetEntriesFast(); i++) {
+    MCParticle& mc = *(static_cast<MCParticle*>(plist->At(i)));
     mc.m_plist = plist;
     mc.m_index = i + 1;
   }

@@ -1,40 +1,49 @@
-/**************************************************************************
- * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
- *                                                                        *
- * Author: The Belle II Collaboration                                     *
- * Contributors: Soohyung Lee                                             *
- *                                                                        *
- * This software is provided "as is" without any warranty.                *
- **************************************************************************/
-
 #ifndef HLTPROCESS_H
 #define HLTPROCESS_H
 
-#include <string>
-#include <vector>
+#include <sstream>
+#include <wait.h>
+
+#include <boost/archive/text_iarchive.hpp>
+#include <boost/archive/binary_iarchive.hpp>
 
 #include <framework/logging/Logger.h>
-
-#include <daq/hlt/NodeInfo.h>
 #include <daq/hlt/HLTDefs.h>
-#include <daq/hlt/SignalMan.h>
+
+#include <daq/hlt/HLTSender.h>
+#include <daq/hlt/HLTReceiver.h>
+#include <daq/hlt/NodeInfo.h>
+#include <framework/pcore/RingBuffer.h>
 
 namespace Belle2 {
   class HLTProcess {
   public:
-    HLTProcess(NodeInfo* nodeInfo);
-    ~HLTProcess(void);
+    HLTProcess();
+    ~HLTProcess();
 
-    EStatus init(void);
+    EHLTStatus initControl();
+    EHLTStatus initSenders();
+    EHLTStatus initReceivers();
 
-    EStatus beginRun(void);
-    EStatus steeringGenerator(void);
+    EHLTStatus process();
+    EHLTStatus checkChildren();
+
+    bool isChild();
+    void displayMode(const std::string mode);
 
   private:
-    NodeInfo* m_nodeInfo;
-    SignalMan* m_signalMan;
-    pid_t m_pidBasf2;
+    std::vector<pid_t> m_HLTSenders;
+    std::vector<pid_t> m_HLTReceivers;
+    pid_t m_Process, m_Control, m_Monitor;
+
+    bool m_isChild;
+
+    RingBuffer* m_controlInBuffer;
+    RingBuffer* m_controlOutBuffer;
+    RingBuffer* m_dataInBuffer;
+    RingBuffer* m_dataOutBuffer;
+
+    NodeInfo m_nodeInfo;
   };
 }
 

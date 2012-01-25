@@ -1,81 +1,79 @@
-/**************************************************************************
- * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
- *                                                                        *
- * Author: The Belle II Collaboration                                     *
- * Contributors: Soohyung Lee                                             *
- *                                                                        *
- * This software is provided "as is" without any warranty.                *
- **************************************************************************/
-
 #ifndef NODEINFO_H
 #define NODEINFO_H
 
-#include <iostream>
-#include <fstream>
-#include <cstring>
 #include <string>
 #include <vector>
 
+#include <boost/serialization/serialization.hpp>
+#include <boost/serialization/vector.hpp>
+#include <boost/serialization/string.hpp>
+
 #include <framework/logging/Logger.h>
+#include <daq/hlt/HLTDefs.h>
 
 namespace Belle2 {
-
   class NodeInfo {
   public:
-    NodeInfo(void);
-    NodeInfo(const std::string type, const int unitNo, const int nodeNo);
-    ~NodeInfo(void);
+    NodeInfo();
+    NodeInfo(const NodeInfo& nodeinfo);
+    ~NodeInfo();
 
-    void init(void);
+    NodeInfo& operator=(const NodeInfo& nodeinfo);
 
-    int unitNo(void);
-    int nodeNo(void);
-    std::string type(void);
+    void clear();
 
-    void setPortData(int inPort, int outPort);
-    void setPortControl(int port);
-    int portBaseDataIn(void);
-    int portBaseDataOut(void);
-    int portBaseControl(void);
+    void unitNo(int unitNo);
+    const int unitNo();
+    void nodeNo(int nodeNo);
+    const int nodeNo();
+    const int generateKey();
 
-    void setThisIP(const std::string ip);
-    void setManagerIP(const std::string ip);
-    void setSourceIP(std::string ip);
-    void setSourceIP(std::vector<std::string> ip);
-    void setTargetIP(std::string ip);
-    void setTargetIP(std::vector<std::string> ip);
+    void expNo(int expNo);
+    const int expNo();
+    void runStart(int runStart);
+    const int runStart();
+    void runEnd(int runEnd);
+    const int runEnd();
 
-    std::string thisIP(void);
-    std::string managerIP(void);
-    std::vector<std::string> sourceIP(void);
-    std::vector<std::string> targetIP(void);
+    void type(std::string type);
+    const std::string type();
 
-    void setSteeringName(char* steering);
-    std::string getSteeringName(void);
+    void managerIP(std::string managerIP);
+    const std::string managerIP();
+    void selfIP(std::string selfIP);
+    const std::string selfIP();
+    void sourceIP(std::string sourceIP);
+    const std::vector<std::string> sourceIP();
+    void targetIP(std::string targetIP);
+    const std::vector<std::string> targetIP();
 
-    void setSteering(char* steering);
-    void getSteering(void);
-
-    std::string serializedNodeInfo(void);
-    void deserializedNodeInfo(const std::string nodeinfo);
-
-    void Print(void);
+    void display();
 
   private:
+    friend class boost::serialization::access;
+    template<class Archive>
+    void serialize(Archive& ar, unsigned int ver) {
+      ar& m_unitNo;
+      ar& m_nodeNo;
+      ar& m_expNo;
+      ar& m_runStart;
+      ar& m_runEnd;
+      ar& m_type;
+      ar& m_managerIP;
+      ar& m_selfIP;
+      ar& m_sourceIP;
+      ar& m_targetIP;
+    }
+
     int m_unitNo, m_nodeNo;
+    int m_expNo, m_runStart, m_runEnd;
 
     std::string m_type;
-    int m_portBaseDataIn, m_portBaseDataOut;
-    int m_portBaseControl;
 
-    std::string m_thisIP;
     std::string m_managerIP;
+    std::string m_selfIP;
     std::vector<std::string> m_sourceIP;
     std::vector<std::string> m_targetIP;
-
-    std::string m_steeringName;
-    char* m_steeringContents;
   };
 }
 

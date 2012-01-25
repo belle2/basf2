@@ -1,227 +1,195 @@
-/**************************************************************************
- * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
- *                                                                        *
- * Author: The Belle II Collaboration                                     *
- * Contributors: Soohyung Lee                                             *
- *                                                                        *
- * This software is provided "as is" without any warranty.                *
- **************************************************************************/
-
 #include <daq/hlt/XMLParser.h>
 
 using namespace Belle2;
 
-/* @brief XMLParser constructor
-*/
-XMLParser::XMLParser(void)
-{
-  m_filename = NULL;
-  m_expNo = -1;
-  m_runStart = -1;
-  m_runEnd = -1;
-  m_units.clear();
-}
-
-/* @brief XMLParser constructor
- * Initializes variables and does XML parsing from input file
- * @param filename File name to parse
-*/
-XMLParser::XMLParser(char* filename)
+XMLParser::XMLParser(std::string filename)
 {
   m_filename = filename;
+
   m_expNo = -1;
   m_runStart = -1;
   m_runEnd = -1;
-  m_units.clear();
 
-  init();
+  m_dataSources.clear();
+  m_dataTargets.clear();
+
+  m_eventSeparators.clear();
+  m_workerNodes.clear();
+  m_eventMergers.clear();
+
+  m_curNode = NULL;
 }
 
-/* @brief XMLParser destructor
-*/
-XMLParser::~XMLParser(void)
+XMLParser::~XMLParser()
 {
-  xmlCleanupParser();
 }
 
-/* @brief Initialize the parsing
- * @return c_Success Initialization sucess
- * @return c_InitFailed Initialization failed (wrong format of xml)
-*/
-EStatus XMLParser::init(void)
+EHLTStatus XMLParser::init()
 {
-  m_docPtr = xmlParseFile(m_filename);
+  m_docPtr = xmlParseFile(m_filename.c_str());
   m_curNode = xmlDocGetRootElement(m_docPtr);
 
   if (xmlStrcmp(m_curNode->name, (const xmlChar*)"HLT")) {
-    B2ERROR("Wrong format input");
+    B2ERROR("Wrong xml format!");
     return c_InitFailed;
   }
 
   return c_Success;
 }
 
-/* @brief Do parsing (Unnecessary function?)
- * @return c_Success Parsing success
- * @return c_FuncError Parsing failed
- * @sa parsing
-*/
-EStatus XMLParser::parsing(void)
+EHLTStatus XMLParser::parsing()
 {
-  return parsing(m_curNode);
-}
-
-/* @brief Actual parsing part
- * @param cur Pointer to a node in XML tree
- * @return c_Success Parsing success
- * @return c_FuncError Parsing failed
-*/
-EStatus XMLParser::parsing(xmlNodePtr cur)
-{
+  xmlNodePtr cur = m_curNode->xmlChildrenNode;
   xmlChar* key;
-  cur = cur->xmlChildrenNode;
 
   while (cur != NULL) {
     key = xmlNodeListGetString(m_docPtr, cur->xmlChildrenNode, 1);
 
     if (!xmlStrcmp(cur->name, (const xmlChar*)"ExpNo")) {
-      if (m_expNo < 0)
-        m_expNo = atoi((char*)key);
-      else {
-        B2ERROR("Parsing Error: Redundant exp no.");
-        return c_FuncError;
-      }
+      m_expNo = atoi((char*)key);
     } else if (!xmlStrcmp(cur->name, (const xmlChar*)"RunStart")) {
-      if (m_runStart < 0)
-        m_runStart = atoi((char*)key);
+      m_runStart = atoi((char*)key);
     } else if (!xmlStrcmp(cur->name, (const xmlChar*)"RunEnd")) {
-      if (m_runEnd < 0 && m_runStart <= atoi((char*)key))
-        m_runEnd = atoi((char*)key);
-      else if (m_runStart > atoi((char*)key)) {
-        B2ERROR("Parsing Error: Wrong run no. range");
-        return c_FuncError;
-      }
-    } else if (!xmlStrcmp(cur->name, (const xmlChar*)"Name")) {
-      m_inputName = (char*)key;
-    } else if (!xmlStrcmp(cur->name, (const xmlChar*)"Description")) {
-      m_inputDescription = (char*)key;
+      m_runEnd = atoi((char*)key);
     } else if (!xmlStrcmp(cur->name, (const xmlChar*)"Manager")) {
-      m_manager = (char*)key;
-    } else if (!xmlStrcmp(cur->name, (const xmlChar*)"Steering")) {
-      m_steeringName = (char*)key;
+      m_managerIP = (char*)key;
+    } else if (!xmlStrcmp(cur->name, (const xmlChar*)"DataSource")) {
+      m_dataSources.push_back((char*)key);
+    } else if (!xmlStrcmp(cur->name, (const xmlChar*)"DataTarget")) {
+      m_dataTargets.push_back((char*)key);
     } else if (!xmlStrcmp(cur->name, (const xmlChar*)"Unit")) {
-      UnitInfo unit(atoi((char*)xmlGetProp(cur, (const xmlChar*)"no")));
+      int unitNo = atoi((char*)xmlGetProp(cur, (const xmlChar*)"no"));
+      xmlNodePtr curUnit = cur->xmlChildrenNode;
 
-      xmlNodePtr cur2 = cur->xmlChildrenNode;
-      unitParsing(cur2, unit);
+      while (curUnit != NULL) {
+        xmlChar* keyUnit = xmlNodeListGetString(m_docPtr, curUnit->xmlChildrenNode, 1);
 
-      m_units.push_back(unit);
+        if (!xmlStrcmp(curUnit->name, (const xmlChar*)"ES")) {
+          int keyES = unitNo * 100;
+          if (m_eventSeparators.insert(std::pair<int, std::string>(keyES, (char*)keyUnit)).second == false) {
+            B2ERROR("Failed to parse IP of event separator!");
+            return c_FuncError;
+          }
+        } else if (!xmlStrcmp(curUnit->name, (const xmlChar*)"WN")) {
+          int nodeNo = atoi((char*)xmlGetProp(curUnit, (const xmlChar*)"no"));
+          int keyWN = unitNo * 100 + nodeNo;
+          if (m_workerNodes.insert(std::pair <int, std::string>(keyWN, (char*)keyUnit)).second == false) {
+            B2ERROR("Failed to parse IP of worker node!");
+            return c_FuncError;
+          }
+        } else if (!xmlStrcmp(curUnit->name, (const xmlChar*)"EM")) {
+          int keyEM = unitNo * 100 + 99;
+          if (m_eventMergers.insert(std::pair<int, std::string>(keyEM, (char*)keyUnit)).second == false) {
+            B2ERROR("Failed to parse IP of event merger!");
+            return c_FuncError;
+          }
+        }
+
+        curUnit = curUnit->next;
+      }
     }
+
     cur = cur->next;
   }
 
   return c_Success;
 }
 
-/* @brief Parsing a single unit
- * @param cur Pointer to a node
- * @param unit Container to take unit information
-*/
-void XMLParser::unitParsing(xmlNodePtr cur, UnitInfo& unit)
+unsigned int XMLParser::getAllKeys(std::vector<int>& container)
 {
-  xmlChar* key;
+  container.clear();
+  unsigned int nKeys = 0;
 
-  while (cur != NULL) {
-    key = xmlNodeListGetString(m_docPtr, cur->xmlChildrenNode, 1);
+  for (std::map<int, std::string>::const_iterator i = m_eventSeparators.begin();
+       i != m_eventSeparators.end(); ++i) {
+    container.push_back((*i).first);
+    nKeys++;
+  }
+  for (std::map<int, std::string>::const_iterator i = m_workerNodes.begin();
+       i != m_workerNodes.end(); ++i) {
+    container.push_back((*i).first);
+    nKeys++;
+  }
+  for (std::map<int, std::string>::const_iterator i = m_eventMergers.begin();
+       i != m_eventMergers.end(); ++i) {
+    container.push_back((*i).first);
+    nKeys++;
+  }
 
-    if (!xmlStrcmp(cur->name, (const xmlChar*)"ES"))
-      unit.eventSeparator((char*)key);
-    else if (!xmlStrcmp(cur->name, (const xmlChar*)"EM"))
-      unit.eventMerger((char*)key);
-    else if (!xmlStrcmp(cur->name, (const xmlChar*)"WN"))
-      unit.workerNodes((char*)key);
+  return nKeys;
+}
 
-    unit.manager(m_manager);
-    unit.steering(m_steeringName);
+void XMLParser::fill(int key, NodeInfo& nodeinfo)
+{
+  nodeinfo.expNo(m_expNo);
+  nodeinfo.runStart(m_runStart);
+  nodeinfo.runEnd(m_runEnd);
+  nodeinfo.managerIP(m_managerIP);
 
-    cur = cur->next;
+  nodeinfo.unitNo(key / 100);
+  nodeinfo.nodeNo(key % 100);
+
+  if ((key % 100) == 0) {
+    nodeinfo.type("ES");
+    nodeinfo.selfIP(m_eventSeparators[key]);
+    for (std::vector<std::string>::const_iterator i = m_dataSources.begin();
+         i != m_dataSources.end(); ++i)
+      nodeinfo.sourceIP(*i);
+    for (std::map<int, std::string>::const_iterator i = m_workerNodes.begin();
+         i != m_workerNodes.end(); ++i) {
+      if (((*i).first / 100) == (key / 100))
+        nodeinfo.targetIP((*i).second);
+    }
+  } else if ((key % 100) == 99) {
+    nodeinfo.type("EM");
+    nodeinfo.selfIP(m_eventMergers[key]);
+    for (std::map<int, std::string>::const_iterator i = m_workerNodes.begin();
+         i != m_workerNodes.end(); ++i) {
+      if (((*i).first / 100) == (key / 100))
+        nodeinfo.sourceIP((*i).second);
+    }
+    for (std::vector<std::string>::const_iterator i = m_dataTargets.begin();
+         i != m_dataTargets.end(); ++i)
+      nodeinfo.targetIP(*i);
+  } else {
+    nodeinfo.type("WN");
+    nodeinfo.selfIP(m_workerNodes[key]);
+    for (std::map<int, std::string>::const_iterator i = m_eventSeparators.begin();
+         i != m_eventSeparators.end(); ++i) {
+      if (((*i).first / 100) == (key / 100))
+        nodeinfo.sourceIP((*i).second);
+    }
+    for (std::map<int, std::string>::const_iterator i = m_eventMergers.begin();
+         i != m_eventMergers.end(); ++i) {
+      if (((*i).first / 100) == (key / 100))
+        nodeinfo.targetIP((*i).second);
+    }
   }
 }
 
-/* @brief Return input name
- * @return Input name which is specified in XML input file
-*/
-char* XMLParser::inputName(void)
+void XMLParser::display()
 {
-  return m_inputName;
-}
-
-/* @brief Return input description
- * @return Input description which is specified in XML input file
-*/
-char* XMLParser::inputDescription(void)
-{
-  return m_inputDescription;
-}
-
-/* @brief Return experiment number
- * @return Experiment number which is specified in XML input file
-*/
-int XMLParser::expNo(void)
-{
-  return m_expNo;
-}
-
-/* @brief Return start run number
- * @return Run start number which is specified in XML input file
-*/
-int XMLParser::runStart(void)
-{
-  return m_runStart;
-}
-
-/* @brief Return end run number
- * @return Run end number which is specified in XML input file
-*/
-int XMLParser::runEnd(void)
-{
-  return m_runEnd;
-}
-
-/* @brief Return the number of units
- * @return The number of units assigned
-*/
-int XMLParser::NUnit(void)
-{
-  return m_units.size();
-}
-
-char* XMLParser::steeringName(void)
-{
-  return m_steeringName;
-}
-
-/* @brief Return information of units
- * @return Iterator (starting point) of the container which has unit information
-*/
-std::vector<UnitInfo>::iterator XMLParser::unitInfo(void)
-{
-  return m_units.begin();
-}
-
-/* @brief Print the entire information (only for debugging)
-*/
-void XMLParser::Print(void)
-{
-  B2INFO("=================================================");
-  B2INFO(" XMLParser Summary");
-  B2INFO("   Name        = " << m_inputName);
-  B2INFO("   Description = " << m_inputDescription);
-  B2INFO("   ExpNo       = " << m_expNo);
-  B2INFO("   RunNo       = " << m_runStart << " - " << m_runEnd);
-  B2INFO("   # of Units  = " << m_units.size());
-  for (std::vector<UnitInfo>::iterator i = m_units.begin(); i != m_units.end(); i++)
-    (*i).Print();
-  B2INFO("=================================================");
+  B2INFO("filename: " << m_filename);
+  B2INFO("   exp#=" << m_expNo << "    run#=" << m_runStart << "-" << m_runEnd);
+  B2INFO("   manager=" << m_managerIP);
+  B2INFO("   data sources:");
+  for (std::vector<std::string>::const_iterator i = m_dataSources.begin();
+       i != m_dataSources.end(); ++i)
+    B2INFO("       " << (*i));
+  B2INFO("   data targets:");
+  for (std::vector<std::string>::const_iterator i = m_dataTargets.begin();
+       i != m_dataTargets.end(); ++i)
+    B2INFO("       " << (*i));
+  B2INFO("   event separators:");
+  for (std::map<int, std::string>::const_iterator i = m_eventSeparators.begin();
+       i != m_eventSeparators.end(); ++i)
+    B2INFO("       " << (*i).second << " (" << (*i).first << ")");
+  B2INFO("   worker nodes:");
+  for (std::map<int, std::string>::const_iterator i = m_workerNodes.begin();
+       i != m_workerNodes.end(); ++i)
+    B2INFO("       " << (*i).second << " (" << (*i).first << ")");
+  B2INFO("   event mergers:");
+  for (std::map<int, std::string>::const_iterator i = m_eventMergers.begin();
+       i != m_eventMergers.end(); ++i)
+    B2INFO("       " << (*i).second << " (" << (*i).first << ")");
 }

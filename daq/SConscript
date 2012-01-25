@@ -2,6 +2,7 @@ Import('env')
 
 env['LIBS'] = ['$ROOT_LIBS', 'Geom',
                'g4root', '$GEANT4_LIBS', 'CLHEP',
+               'boost_serialization',
                'boost_python', 'boost_filesystem',
                '$PYTHON_LIBS', '$XML_LIBS']
 

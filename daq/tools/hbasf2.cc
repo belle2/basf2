@@ -1,59 +1,66 @@
-#include <cstring>
+#include <framework/logging/Logger.h>
+#include <daq/hlt/HLTDefs.h>
 #include <daq/hlt/HLTFramework.h>
 
 using namespace Belle2;
 
+int validationCommands(int argc, char** argv);
 void showUsage(void);
 
-int main(int argc, char* argv[])
+int main(int argc, char** argv)
 {
-  if (argc < 2) {
-    showUsage();
-    return 1;
+  int validation = validationCommands(argc, argv);
+
+  // arguments exceptions
+  if (validation < 0)
+    return validation;
+  else if (validation > 2) {
+    B2WARNING("No explicit error but unexpected usage of the software!");
+    return validation;
   }
-
-  // For Manager node
-  if (!strcmp(argv[1], "manager")) {
-    if (!argv[2]) {
-      B2WARNING("No HLT info xml assigned");
-      showUsage();
-      return 1;
-    } else {
-      HLTFramework* hltFramework = new HLTFramework(c_ManagerNode, argv[2]);
-      hltFramework->init();
-      B2INFO("Manager node initialized");
-
-      delete hltFramework;
-      return 0;
-    }
-  }
-  // For Process node
-  else if (!strcmp(argv[1], "node")) {
-    HLTFramework* hltFramework = new HLTFramework(c_ProcessNode);
-    B2INFO("Process node initializing");
-
-    if (hltFramework->init() == c_TermCalled)
-      return 0;
-
-    if (hltFramework->beginRun() == c_TermCalled)
-      return 0;
+  // no exceptions, then start working
+  else {
+    HLTFramework* hltFramework = new HLTFramework(validation);
+    hltFramework->init(argv[2]);
 
     delete hltFramework;
-    return 0;
-  }
-  // For wrong node assignment
-  else {
-    B2WARNING("Invalid node type");
-    showUsage();
-    return 1;
   }
 
+  return 0;
 }
 
-void showUsage(void)
+int validationCommands(int argc, char** argv)
 {
-  B2INFO("Usage: $ hbasf2 [mode] {input}");
-  B2INFO("         mode:  manager / node");
-  B2INFO("         input: XML node info (only for manager mode)");
+  // If there's no arguments
+  if (argc < 2) {
+    showUsage();
+    return -1;
+  }
+
+  // mode == manager
+  if (!strcmp(argv[1], "manager")) {
+    if (!argv[2]) {
+      B2ERROR("No HLT information XML file is assigned!");
+      showUsage();
+      return -1;
+    } else {
+      return 1;
+    }
+  }
+  // mode == node
+  else if (!strcmp(argv[1], "node")) {
+    return 2;
+  } else {
+    B2ERROR("Invalid node type is assigned: Only manager or node are relavant!");
+    showUsage();
+
+    return -1;
+  }
 }
 
+void showUsage()
+{
+  B2ERROR("Usage: $ hbasf2 [mode] {input}");
+  B2ERROR("                mode:  {manager, node}");
+  B2ERROR("                input: Node information XML file");
+}

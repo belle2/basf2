@@ -37,7 +37,7 @@ RawHeader::~RawHeader()
 void RawHeader::copy(int nwords, unsigned int* bufin)
 {
   m_buffer = new unsigned int[nwords];
-  memcpy((char*)m_buffer, (char*)bufin, nwords*sizeof(unsigned int));
+  memcpy((char*)m_buffer, (char*)bufin, nwords * sizeof(unsigned int));
   m_allocated = true;
 }
 

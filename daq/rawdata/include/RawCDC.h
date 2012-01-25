@@ -37,7 +37,7 @@ namespace Belle2 {
     void set_buffer(int, unsigned int*);
 
   private:
-    unsigned int * m_buffer;
+    unsigned int* m_buffer;
     int m_nwords;
     bool m_allocated;
 

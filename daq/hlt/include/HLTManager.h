@@ -1,61 +1,43 @@
-/**************************************************************************
- * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
- *                                                                        *
- * Author: The Belle II Collaboration                                     *
- * Contributors: Soohyung Lee                                             *
- *                                                                        *
- * This software is provided "as is" without any warranty.                *
- **************************************************************************/
-
 #ifndef HLTMANAGER_H
 #define HLTMANAGER_H
 
-#include <iostream>
-#include <vector>
+#include <map>
+#include <wait.h>
+
+#include <framework/logging/Logger.h>
+#include <daq/hlt/HLTDefs.h>
+
+#include <boost/serialization/serialization.hpp>
+#include <boost/serialization/map.hpp>
 
 #include <daq/hlt/XMLParser.h>
-#include <daq/hlt/UnitManager.h>
+#include <daq/hlt/NodeInfo.h>
+#include <daq/hlt/HLTSender.h>
+#include <framework/pcore/RingBuffer.h>
 
 namespace Belle2 {
-
-  //! HLTManager class
-  /*! This class is a manager for the entire HLT farm
-  */
   class HLTManager {
   public:
-    //! Constructor
-    HLTManager(void);
-    HLTManager(std::string& input);
-    HLTManager(char* input);
-    //! Destructor
-    ~HLTManager(void);
+    HLTManager();
+    ~HLTManager();
 
-    //! Initializing the HLT manager
-    EStatus init(void);
+    EHLTStatus initSenders();
 
-    EStatus broadCasting(void);
-    EStatus broadCasting(int unitNo);
+    EHLTStatus storeNodeInfo(XMLParser* xml);
+    std::string encodeNodeInfo(unsigned int key);
+    void decodeNodeInfo(std::string nodeinfo);
 
-    //! Print information of the HLT farm (only for internal testing)
-    void Print(void);
+    bool isChild();
+    EHLTStatus checkChildren();
 
-  protected:
-    //! Initializing the HLT manager (protected)
-    void initHLT(void);
-    //! Initializing the units inside the HLT
-    EStatus initUnit(void);
+    void printNodeInfo();
 
   private:
-    std::vector<UnitManager> m_units;       /*!< vector container to pointers to units inside HLT */
-    XMLParser* m_XMLParser;                 /*!< Pointer to XML parser */
-    char* m_inputXML;                       /*!< Input XML file of the entire information */
+    std::map<int, NodeInfo> m_nodeInfoMap;
+    std::vector<pid_t> m_senders;
+    bool m_isChild;
 
-    int m_expNo;                            /*!< Experiment number that is assigned from XML file */
-    int m_runStart;                         /*!< Start run number that is assigned from XML file */
-    int m_runEnd;                           /*!< End run number that is assigned from XML file */
-    char* m_inputName;                      /*!< Input name (human readable) from XML file */
-    char* m_inputDescription;               /*!< Description (human readable) of this assignment from XML file */
+    std::vector<int> m_controlBuffers;
   };
 }
 

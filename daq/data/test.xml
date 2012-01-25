@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<HLT>
+  <Name>Test</Name>
+  <Description>Test xml file</Description>
+  <ExpNo>1</ExpNo>
+  <RunStart>1</RunStart>
+  <RunEnd>100</RunEnd>
+  <Manager>192.168.100.0</Manager>
+  <DataSource no="1">192.168.200.1</DataSource>
+  <DataSource no="2">192.168.200.2</DataSource>
+  <DataSource no="3">192.168.200.3</DataSource>
+  <DataTarget no="1">192.168.200.11</DataTarget>
+  <DataTarget no="2">192.168.200.12</DataTarget>
+  <Unit no="1">
+    <ES>192.168.100.1</ES>
+    <WN no="1">192.168.100.2</WN>
+    <WN no="2">192.168.100.3</WN>
+    <EM>192.168.100.4</EM>
+  </Unit>
+  <Unit no="2">
+    <ES>192.168.100.5</ES>
+    <WN no="1">192.168.100.6</WN>
+    <WN no="2">192.168.100.7</WN>
+    <WN no="3">192.168.100.8</WN>
+    <WN no="4">192.168.100.9</WN>
+    <EM>192.168.100.10</EM>
+  </Unit>
+</HLT>

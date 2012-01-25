@@ -18,8 +18,6 @@ namespace Belle2 {
   enum EHLTPort {
     c_DataInPort = 20000,     /**< Port for incoming data */
     c_DataOutPort = 25000,    /**< Port for outgoing data */
-    c_InfoInPort = 30000,     /**< Port for incoming information */
-    c_InfoOutPort = 35000,    /**< Port for outgoing information */
     c_ControlPort = 30000,    /**< Port for control */
     c_MonitorPort = 35000     /**< Port for monitoring information */
   };
@@ -27,29 +25,27 @@ namespace Belle2 {
   /** Types of nodes in HLT
    *  At this moment (r1076), only c_ManagerNode and c_ProcessNode are used
    */
-  enum ENodeType {
+  enum EHLTNodeType {
     c_ManagerNode,      /**< Manager node */
     c_ProcessNode,      /**< Process nodes including event separator, worker node, and event merger */
     c_EventSeparator,   /**< Event separator node */
     c_WorkerNode,       /**< Worker node */
     c_EventMerger,      /**< Event merger node */
-    c_NotDefined        /**< Not specified node */
+    c_Undefined         /**< Not specified node */
   };
 
   /** Types of message passed in HLT
    *  Not used right now
    */
-  enum EMessage {
-    c_Initialization,   /**< To initialize */
-    c_StartRun,         /**< To start runs */
-    c_EndRun,           /**< To end runs */
+  enum EHLTMessage {
+    c_Data,
     c_Termination       /**< To terminate all */
   };
 
   /** Status of functions in hbasf2
    *  ProcFailed is not used at this moment
    */
-  enum EStatus {
+  enum EHLTStatus {
     c_FuncError,        /**< Function error somehow (for normal functions) */
     c_InitFailed,       /**< Initialization failure (for initialization functions) */
     c_ProcFailed,       /**< Process failure */
@@ -64,6 +60,11 @@ namespace Belle2 {
   };
 
   const int gBufferSize = 10000000 * 4;
+  const int gMaxHosts = 100;
+  const int gMaxConnections = 100;
+  const int gMaxReceives = 1000000;
+
+  const std::string gEOSTag = "EOS";
 }
 
 #endif

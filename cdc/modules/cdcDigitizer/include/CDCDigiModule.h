@@ -53,8 +53,8 @@ namespace Belle2 {
   public:
 
     typedef std::vector<CDCSimHit*>      CDCSimHitVec;   /**< For input from Geant4 simulation.*/
-    typedef std::map< int, CDCSignal *>  CDCSignalMap;   /**< Map of Cell ID -> signal.*/
-    typedef std::pair< int, CDCSignal *> vpair;          /**< Pair of CDCSignalMap. */
+    typedef std::map< int, CDCSignal*>  CDCSignalMap;    /**< Map of Cell ID -> signal.*/
+    typedef std::pair< int, CDCSignal*> vpair;           /**< Pair of CDCSignalMap. */
 
     /** Constructor.*/
     CDCDigiModule();
@@ -103,7 +103,7 @@ namespace Belle2 {
      *
      *  @param cdcSignalMap A map is used to store CDC signals and will be returned after adding noise.
      */
-    void genNoise(CDCSignalMap & cdcSignalMap);
+    void genNoise(CDCSignalMap& cdcSignalMap);
 
     /** The method to get drift time based on drift length
      *
@@ -127,14 +127,14 @@ namespace Belle2 {
      *        of the SimHit and other hits.
      */
 
-    void printCDCSimHitInfo(const CDCSimHit & hit) const;
+    void printCDCSimHitInfo(const CDCSimHit& hit) const;
 
     /** Method to print SimHit information of many hits.
      *
      *  @param info Extra information.
      *  @param hitVec Vector to store SimHits.
      */
-    void printCDCSimHitsInfo(std::string info, const CDCSimHitVec & hitVec) const;
+    void printCDCSimHitsInfo(std::string info, const CDCSimHitVec& hitVec) const;
 
     /** Method to print module parameters.
      *
@@ -150,7 +150,7 @@ namespace Belle2 {
      *
      *  @todo Again the question if not more of this work should be done in the CDCSignal.
      */
-    void printCDCSignalInfo(std::string info, const CDCSignalMap & cdcSignalMap) const;
+    void printCDCSignalInfo(std::string info, const CDCSignalMap& cdcSignalMap) const;
 
 
     std::string m_inColName;                /**< Input array name. */
@@ -175,7 +175,7 @@ namespace Belle2 {
 
     int   m_randomSeed;   /*!< Random number seed */
 
-    TRandom3 * m_random;   /*!< Random number generator - Gaussian distribution */
+    TRandom3* m_random;    /*!< Random number generator - Gaussian distribution */
 
   private:
 

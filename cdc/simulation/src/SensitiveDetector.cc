@@ -41,8 +41,8 @@ typedef HepGeom::Vector3D<double> HepVector3D;
 using namespace Belle2;
 
 SensitiveDetector::SensitiveDetector(G4String name, G4double thresholdEnergyDeposit, G4double thresholdKineticEnergy):
-    SensitiveDetectorBase(name, CDC), m_thresholdEnergyDeposit(thresholdEnergyDeposit),
-    m_thresholdKineticEnergy(thresholdKineticEnergy), m_hitNumber(0), m_EBhitNumber(0)
+  SensitiveDetectorBase(name, CDC), m_thresholdEnergyDeposit(thresholdEnergyDeposit),
+  m_thresholdKineticEnergy(thresholdKineticEnergy), m_hitNumber(0), m_EBhitNumber(0)
 {
   StoreArray<MCParticle> mcParticles;
   StoreArray<CDCSimHit> cdcSimHits;
@@ -51,7 +51,7 @@ SensitiveDetector::SensitiveDetector(G4String name, G4double thresholdEnergyDepo
   registerMCParticleRelation(cdcSimHitRel);
 }
 
-void SensitiveDetector::Initialize(G4HCofThisEvent *)
+void SensitiveDetector::Initialize(G4HCofThisEvent*)
 {
   // Initialize
   m_nonUniformField = 0;
@@ -60,7 +60,7 @@ void SensitiveDetector::Initialize(G4HCofThisEvent *)
 //-----------------------------------------------------
 // Method invoked for every step in sensitive detector
 //-----------------------------------------------------
-bool SensitiveDetector::step(G4Step *aStep, G4TouchableHistory *)
+bool SensitiveDetector::step(G4Step* aStep, G4TouchableHistory*)
 {
   // Get deposited energy
   const G4double edep = aStep->GetTotalEnergyDeposit();
@@ -70,7 +70,7 @@ bool SensitiveDetector::step(G4Step *aStep, G4TouchableHistory *)
   if (stepLength == 0.) return false;
 
   // Get step information
-  const G4Track & t = * aStep->GetTrack();
+  const G4Track& t = * aStep->GetTrack();
 
   const G4double charge = t.GetDefinition()->GetPDGCharge();
 
@@ -83,11 +83,11 @@ bool SensitiveDetector::step(G4Step *aStep, G4TouchableHistory *)
   const G4int pid = t.GetDefinition()->GetPDGEncoding();
   const G4int trackID = t.GetTrackID();
 
-  const G4VPhysicalVolume & v = * t.GetVolume();
-  const G4StepPoint & in = * aStep->GetPreStepPoint();
-  const G4StepPoint & out = * aStep->GetPostStepPoint();
-  const G4ThreeVector & posIn = in.GetPosition();
-  const G4ThreeVector & posOut = out.GetPosition();
+  const G4VPhysicalVolume& v = * t.GetVolume();
+  const G4StepPoint& in = * aStep->GetPreStepPoint();
+  const G4StepPoint& out = * aStep->GetPostStepPoint();
+  const G4ThreeVector& posIn = in.GetPosition();
+  const G4ThreeVector& posOut = out.GetPosition();
   const G4ThreeVector momIn(in.GetMomentum().x(), in.GetMomentum().y(),
                             in.GetMomentum().z());
 
@@ -108,8 +108,8 @@ bool SensitiveDetector::step(G4Step *aStep, G4TouchableHistory *)
   if (charge == 0.) return false;
 
   // Calculate cell ID
-  CDCGeometryPar * cdcgp = CDCGeometryPar::Instance();
-  CDCGeometryPar & cdcg(*cdcgp);
+  CDCGeometryPar* cdcgp = CDCGeometryPar::Instance();
+  CDCGeometryPar& cdcg(*cdcgp);
 
   TVector3 tposIn(posIn.x() / cm, posIn.y() / cm, posIn.z() / cm);
   TVector3 tposOut(posOut.x() / cm, posOut.y() / cm, posOut.z() / cm);
@@ -223,7 +223,7 @@ bool SensitiveDetector::step(G4Step *aStep, G4TouchableHistory *)
           // Cubic approximation of the track
           const G4int ic(3);
           G4int cel1 = wires[i]    + 1;
-          G4int cel2 = wires[wires.size()-1] + 1;
+          G4int cel2 = wires[wires.size() - 1] + 1;
           G4double s1 = t.GetTrackLength() / cm;
           G4double s2 = (s1 + s_in_layer);
           G4ThreeVector xin(posIn.x(), posIn.y(), posIn.z());
@@ -266,7 +266,7 @@ bool SensitiveDetector::step(G4Step *aStep, G4TouchableHistory *)
             const G4ThreeVector x_In(vent[0]*cm, vent[1]*cm, vent[2]*cm);
             const G4ThreeVector x_Out(xint[0]*cm, xint[1]*cm, xint[2]*cm);
             G4double pmag = momIn.mag();
-            const G4ThreeVector p_In(pmag*vent[3], pmag*vent[4], pmag*vent[5]);
+            const G4ThreeVector p_In(pmag * vent[3], pmag * vent[4], pmag * vent[5]);
 
             saveIndex = saveSimHit(layerId, wires[i], trackID, pid, distance, tof, edep_in_cell, (sint - s1) * cm, p_In, posW, x_In, x_Out, lr);
           } else {  //the particle exits
@@ -275,7 +275,7 @@ bool SensitiveDetector::step(G4Step *aStep, G4TouchableHistory *)
 
             const G4ThreeVector x_In(vent[0]*cm, vent[1]*cm, vent[2]*cm);
             G4double pmag = momIn.mag();
-            const G4ThreeVector p_In(pmag*vent[3], pmag*vent[4], pmag*vent[5]);
+            const G4ThreeVector p_In(pmag * vent[3], pmag * vent[4], pmag * vent[5]);
 
             saveIndex = saveSimHit(layerId, wires[i], trackID, pid, distance, tof, edep_in_cell, (s2 - sint) * cm, p_In, posW, x_In, posOut, lr);
           }
@@ -300,7 +300,7 @@ bool SensitiveDetector::step(G4Step *aStep, G4TouchableHistory *)
 }
 
 
-void SensitiveDetector::EndOfEvent(G4HCofThisEvent *)
+void SensitiveDetector::EndOfEvent(G4HCofThisEvent*)
 {
 }
 
@@ -313,10 +313,10 @@ SensitiveDetector::saveSimHit(const G4int layerId,
                               const G4double tof,
                               const G4double edep,
                               const G4double stepLength,
-                              const G4ThreeVector & mom,
-                              const G4ThreeVector & posW,
-                              const G4ThreeVector & posIn,
-                              const G4ThreeVector & posOut,
+                              const G4ThreeVector& mom,
+                              const G4ThreeVector& posW,
+                              const G4ThreeVector& posIn,
+                              const G4ThreeVector& posOut,
                               const G4int lr)
 {
   StoreArray<MCParticle> mcParticles;
@@ -355,7 +355,7 @@ SensitiveDetector::saveEBSimHit(const G4int layerId,
                                 const G4int trackID,
                                 const G4int pid,
                                 const G4double edep,
-                                const G4ThreeVector & mom)
+                                const G4ThreeVector& mom)
 {
   //change Later
   StoreArray<CDCEBSimHit> cdcEBArray(DEFAULT_CDCEBSIMHITS);
@@ -427,7 +427,7 @@ SensitiveDetector::CellBound(const G4int layerId,
   //main
   G4int irTry = 0;
   //Belle::Geocdc_wire_Manager &w = Belle::Geocdc_wire_Manager::get_manager();
-  CDCGeometryPar * p_cdc = CDCGeometryPar::Instance();
+  CDCGeometryPar* p_cdc = CDCGeometryPar::Instance();
   // Calculate forward/backward position of current wire
   TVector3 tfw0 = p_cdc->wireForwardPosition(layerId, 0);
   G4ThreeVector fw0(tfw0.x(), tfw0.y(), tfw0.z());
@@ -438,7 +438,7 @@ SensitiveDetector::CellBound(const G4int layerId,
   bw0 *= (1. / cm);
 
   G4double slant;
-  if (0.0 == 0.5 *(p_cdc->nShifts(layerId))) {
+  if (0.0 == 0.5 * (p_cdc->nShifts(layerId))) {
     slant = 0.0;
   } else {
     double delfi = 0.5 * (p_cdc->nShifts(layerId)) * 2.0 * CLHEP::pi / p_cdc->nWiresInLayer(layerId);

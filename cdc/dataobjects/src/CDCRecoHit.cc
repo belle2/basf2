@@ -24,18 +24,18 @@ using namespace Belle2;
 ClassImp(CDCRecoHit);
 
 CDCRecoHit::CDCRecoHit()
-    : GFRecoHitIfc<GFWireHitPolicy> (m_nParHitRep)
+  : GFRecoHitIfc<GFWireHitPolicy> (m_nParHitRep)
 {
 }
 
 CDCRecoHit::CDCRecoHit(const CDCHit* cdcHit)
-    : GFRecoHitIfc<GFWireHitPolicy> (m_nParHitRep)
+  : GFRecoHitIfc<GFWireHitPolicy> (m_nParHitRep)
 {
 
   // Get the position of the hit wire from CDCGeometryParameters
   // Maybe we should ask, if Instance could give back a reference directly instead of a pointer?
-  CDCGeometryPar * cdcgp = CDCGeometryPar::Instance();
-  CDCGeometryPar & cdcg(*cdcgp);
+  CDCGeometryPar* cdcgp = CDCGeometryPar::Instance();
+  CDCGeometryPar& cdcg(*cdcgp);
 
   double resolution = 0.0001;  //temporary solution (hardcoded resolution), should later on depend on hit position, drifttime etc and come from a database
 

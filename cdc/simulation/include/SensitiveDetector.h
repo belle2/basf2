@@ -33,13 +33,13 @@ namespace Belle2 {
     ~SensitiveDetector() {}
 
     //! Register CDC hits collection into G4HCofThisEvent
-    void Initialize(G4HCofThisEvent *);
+    void Initialize(G4HCofThisEvent*);
 
     //! Process each step and calculate variables defined in CDCB4VHit
-    bool step(G4Step *aStep, G4TouchableHistory *history);
+    bool step(G4Step* aStep, G4TouchableHistory* history);
 
     //! Do what you want to do at the end of each event
-    void EndOfEvent(G4HCofThisEvent *);
+    void EndOfEvent(G4HCofThisEvent*);
 
     //! Save CDCSimHit into datastore
     int saveSimHit(const G4int layerId,
@@ -50,10 +50,10 @@ namespace Belle2 {
                    const G4double tof,
                    const G4double edep,
                    const G4double stepLength,
-                   const G4ThreeVector & mom,
-                   const G4ThreeVector & posW,
-                   const G4ThreeVector & posIn,
-                   const G4ThreeVector & posOut,
+                   const G4ThreeVector& mom,
+                   const G4ThreeVector& posW,
+                   const G4ThreeVector& posIn,
+                   const G4ThreeVector& posOut,
                    const G4int lr);
 
     //! Save CDCEBSimHit into datastore
@@ -62,7 +62,7 @@ namespace Belle2 {
                      const G4int trackID,
                      const G4int pid,
                      const G4double edep,
-                     const G4ThreeVector & mom);
+                     const G4ThreeVector& mom);
 
     //void AddbgOne(bool doit);
 

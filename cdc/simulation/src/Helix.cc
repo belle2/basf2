@@ -122,7 +122,7 @@ bool Helix::set_print(bool t)
 }
 
 
-void Helix::set_limits(const HepVector &a_min, const HepVector &a_max)
+void Helix::set_limits(const HepVector& a_min, const HepVector& a_max)
 {
   if (a_min.num_row() != 5 || a_max.num_row() != 5) return;
   ms_amin = a_min;
@@ -131,10 +131,10 @@ void Helix::set_limits(const HepVector &a_min, const HepVector &a_max)
 }
 
 
-Helix::Helix(const HepPoint3D & pivot,
-             const HepVector & a,
-             const HepSymMatrix & Ea)
-    : m_matrixValid(true),
+Helix::Helix(const HepPoint3D& pivot,
+             const HepVector& a,
+             const HepSymMatrix& Ea)
+  : m_matrixValid(true),
     m_helixValid(false),
     m_bField(15.0),
     m_alpha(222.376063),
@@ -149,9 +149,9 @@ Helix::Helix(const HepPoint3D & pivot,
   }
 }
 
-Helix::Helix(const HepPoint3D & pivot,
-             const HepVector & a)
-    : m_matrixValid(false),
+Helix::Helix(const HepPoint3D& pivot,
+             const HepVector& a)
+  : m_matrixValid(false),
     m_helixValid(false),
     m_bField(15.0),
     m_alpha(222.376063),
@@ -165,10 +165,10 @@ Helix::Helix(const HepPoint3D & pivot,
   }
 }
 
-Helix::Helix(const HepPoint3D & position,
-             const Hep3Vector & momentum,
+Helix::Helix(const HepPoint3D& position,
+             const Hep3Vector& momentum,
              double charge)
-    : m_matrixValid(false),
+  : m_matrixValid(false),
     m_helixValid(false),
     m_bField(15.0),
     m_alpha(222.376063),
@@ -214,7 +214,7 @@ Helix::x(double phi) const
   return HepPoint3D(x, y, z);
 }
 
-double *
+double*
 Helix::x(double phi, double p[3]) const
 {
   DEBUG_HELIX;
@@ -234,7 +234,7 @@ Helix::x(double phi, double p[3]) const
 }
 
 HepPoint3D
-Helix::x(double phi, HepSymMatrix & Ex) const
+Helix::x(double phi, HepSymMatrix& Ex) const
 {
   DEBUG_HELIX;
 
@@ -280,7 +280,7 @@ Helix::momentum(double phi) const
 }
 
 Hep3Vector
-Helix::momentum(double phi, HepSymMatrix & Em) const
+Helix::momentum(double phi, HepSymMatrix& Em) const
 {
   DEBUG_HELIX;
   //
@@ -330,7 +330,7 @@ Helix::momentum(double phi, double mass) const
 
 
 HepLorentzVector
-Helix::momentum(double phi, double mass, HepSymMatrix & Em) const
+Helix::momentum(double phi, double mass, HepSymMatrix& Em) const
 {
   DEBUG_HELIX;
   //
@@ -359,8 +359,8 @@ Helix::momentum(double phi, double mass, HepSymMatrix & Em) const
 HepLorentzVector
 Helix::momentum(double phi,
                 double mass,
-                HepPoint3D & x,
-                HepSymMatrix & Emx) const
+                HepPoint3D& x,
+                HepSymMatrix& Emx) const
 {
   DEBUG_HELIX;
   //
@@ -380,8 +380,8 @@ Helix::momentum(double phi,
   double pz =   pt * m_ac[4];
   double E  = sqrt(pt * pt * (1. + m_ac[4] * m_ac[4]) + mass * mass);
 
-  x.setX(m_pivot.x() + m_ac[0] * m_cp + m_r *(m_cp - cos(m_ac[1] + phi)));
-  x.setY(m_pivot.y() + m_ac[0] * m_sp + m_r *(m_sp - sin(m_ac[1] + phi)));
+  x.setX(m_pivot.x() + m_ac[0] * m_cp + m_r * (m_cp - cos(m_ac[1] + phi)));
+  x.setY(m_pivot.y() + m_ac[0] * m_sp + m_r * (m_sp - sin(m_ac[1] + phi)));
   x.setZ(m_pivot.z() + m_ac[3] - m_r * m_ac[4] * phi);
 
   if (m_matrixValid) Emx = m_Ea.similarity(del4MXDelA(phi, mass));
@@ -391,18 +391,18 @@ Helix::momentum(double phi,
 }
 
 
-const HepPoint3D &
-Helix::pivot(const HepPoint3D & newPivot)
+const HepPoint3D&
+Helix::pivot(const HepPoint3D& newPivot)
 {
   DEBUG_HELIX;
 #if defined(BELLE_DEBUG)
   try {
 #endif
-    const double & dr    = m_ac[0];
-    const double & phi0  = m_ac[1];
-    const double & kappa = m_ac[2];
-    const double & dz    = m_ac[3];
-    const double & tanl  = m_ac[4];
+    const double& dr    = m_ac[0];
+    const double& phi0  = m_ac[1];
+    const double& kappa = m_ac[2];
+    const double& dz    = m_ac[3];
+    const double& tanl  = m_ac[4];
 
     double rdr = dr + m_r;
     double phi = fmod(phi0 + M_PI4, M_PI2);
@@ -466,9 +466,9 @@ Helix::pivot(const HepPoint3D & newPivot)
 }
 
 void
-Helix::set(const HepPoint3D & pivot,
-           const HepVector & a,
-           const HepSymMatrix & Ea)
+Helix::set(const HepPoint3D& pivot,
+           const HepVector& a,
+           const HepSymMatrix& Ea)
 {
   m_pivot = pivot;
   m_a = a;
@@ -479,8 +479,8 @@ Helix::set(const HepPoint3D & pivot,
   DEBUG_HELIX;
 }
 
-Helix &
-Helix::operator = (const Helix & i)
+Helix&
+Helix::operator = (const Helix& i)
 {
   if (this == & i) return * this;
   DEBUG_HELIX;
@@ -580,7 +580,7 @@ Helix::updateCache(void)
 }
 
 HepMatrix
-Helix::delApDelA(const HepVector & ap) const
+Helix::delApDelA(const HepVector& ap) const
 {
   DEBUG_HELIX;
   //
@@ -590,11 +590,11 @@ Helix::delApDelA(const HepVector & ap) const
 
   HepMatrix dApDA(5, 5, 0);
 
-  const double & dr    = m_ac[0];
-  const double & phi0  = m_ac[1];
-  const double & cpa   = m_ac[2];
+  const double& dr    = m_ac[0];
+  const double& phi0  = m_ac[1];
+  const double& cpa   = m_ac[2];
   //const double & dz    = m_ac[3];
-  const double & tnl   = m_ac[4];
+  const double& tnl   = m_ac[4];
 
   double drp   = ap[0];
   double phi0p = ap[1];
@@ -661,11 +661,11 @@ Helix::delXDelA(double phi) const
 
   HepMatrix dXDA(3, 5, 0);
 
-  const double & dr      = m_ac[0];
-  const double & phi0    = m_ac[1];
-  const double & cpa     = m_ac[2];
+  const double& dr      = m_ac[0];
+  const double& phi0    = m_ac[1];
+  const double& cpa     = m_ac[2];
   //const double & dz      = m_ac[3];
-  const double & tnl     = m_ac[4];
+  const double& tnl     = m_ac[4];
 
   double cosf0phi = cos(phi0 + phi);
   double sinf0phi = sin(phi0 + phi);
@@ -717,9 +717,9 @@ Helix::delMDelA(double phi) const
 
   HepMatrix dMDA(3, 5, 0);
 
-  const double & phi0 = m_ac[1];
-  const double & cpa  = m_ac[2];
-  const double & tnl  = m_ac[4];
+  const double& phi0 = m_ac[1];
+  const double& cpa  = m_ac[2];
+  const double& tnl  = m_ac[4];
 
   double cosf0phi = cos(phi0 + phi);
   double sinf0phi = sin(phi0 + phi);
@@ -806,11 +806,11 @@ Helix::del4MXDelA(double phi, double mass) const
 
   HepMatrix d4MXDA(7, 5, 0);
 
-  const double & dr      = m_ac[0];
-  const double & phi0    = m_ac[1];
-  const double & cpa     = m_ac[2];
+  const double& dr      = m_ac[0];
+  const double& phi0    = m_ac[1];
+  const double& cpa     = m_ac[2];
   //const double & dz      = m_ac[3];
-  const double & tnl     = m_ac[4];
+  const double& tnl     = m_ac[4];
 
   double cosf0phi = cos(phi0 + phi);
   double sinf0phi = sin(phi0 + phi);

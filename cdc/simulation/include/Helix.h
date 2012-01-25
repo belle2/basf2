@@ -47,17 +47,17 @@ namespace Belle2 {
 
   public:
     /// Constructor with pivot, helix parameter a, and its error matrix.
-    Helix(const HepPoint3D & pivot,
-          const HepVector & a,
-          const HepSymMatrix & Ea);
+    Helix(const HepPoint3D& pivot,
+          const HepVector& a,
+          const HepSymMatrix& Ea);
 
     /// Constructor without error matrix.
-    Helix(const HepPoint3D & pivot,
-          const HepVector & a);
+    Helix(const HepPoint3D& pivot,
+          const HepVector& a);
 
     /// Constructor with position, momentum, and charge.
-    Helix(const HepPoint3D & position,
-          const Hep3Vector & momentum,
+    Helix(const HepPoint3D& position,
+          const Hep3Vector& momentum,
           double charge);
 
     /// Destructor
@@ -65,20 +65,20 @@ namespace Belle2 {
 
   public:// Selectors
     /// returns position of helix center(z = 0.);
-    const HepPoint3D & center(void) const;
+    const HepPoint3D& center(void) const;
 
     /// returns pivot position.
-    const HepPoint3D & pivot(void) const;
+    const HepPoint3D& pivot(void) const;
 
     /// returns radious of helix.
     double radius(void) const;
 
     /// returns position after rotating angle dPhi in phi direction.
     HepPoint3D x(double dPhi = 0.) const;
-    double * x(double dPhi, double p[3]) const;
+    double* x(double dPhi, double p[3]) const;
 
     /// returns position and convariance matrix(Ex) after rotation.
-    HepPoint3D x(double dPhi, HepSymMatrix & Ex) const;
+    HepPoint3D x(double dPhi, HepSymMatrix& Ex) const;
 
     /// returns direction vector after rotating angle dPhi in phi direction.
     Hep3Vector direction(double dPhi = 0.) const;
@@ -87,16 +87,16 @@ namespace Belle2 {
     Hep3Vector momentum(double dPhi = 0.) const;
 
     /// returns momentum vector after rotating angle dPhi in phi direction.
-    Hep3Vector momentum(double dPhi, HepSymMatrix & Em) const;
+    Hep3Vector momentum(double dPhi, HepSymMatrix& Em) const;
 
     /// returns 4momentum vector after rotating angle dPhi in phi direction.
     HepLorentzVector momentum(double dPhi, double mass) const;
 
     /// returns 4momentum vector after rotating angle dPhi in phi direction.
-    HepLorentzVector momentum(double dPhi, double mass, HepSymMatrix & Em) const;
+    HepLorentzVector momentum(double dPhi, double mass, HepSymMatrix& Em) const;
 
     /// returns 4momentum vector after rotating angle dPhi in phi direction.
-    HepLorentzVector momentum(double dPhi, double mass, HepPoint3D & x, HepSymMatrix & Emx) const;
+    HepLorentzVector momentum(double dPhi, double mass, HepPoint3D& x, HepSymMatrix& Emx) const;
 
   public:// Parametrization dependent functions. Prepared for tracking codes. Users should not use them.
     /// returns an element of parameters.
@@ -110,25 +110,25 @@ namespace Belle2 {
     double cosPhi0(void) const;
 
     /// returns helix parameters.
-    const HepVector & a(void) const;
+    const HepVector& a(void) const;
 
     /// returns error matrix.
-    const HepSymMatrix & Ea(void) const;
+    const HepSymMatrix& Ea(void) const;
 
   public:// Modifiers
     /// sets helix parameters.
-    const HepVector & a(const HepVector & newA);
+    const HepVector& a(const HepVector& newA);
 
     /// sets helix paramters and error matrix.
-    const HepSymMatrix & Ea(const HepSymMatrix & newdA);
+    const HepSymMatrix& Ea(const HepSymMatrix& newdA);
 
     /// sets pivot position.
-    const HepPoint3D & pivot(const HepPoint3D & newPivot);
+    const HepPoint3D& pivot(const HepPoint3D& newPivot);
 
     /// sets helix pivot position, parameters, and error matrix.
-    void set(const HepPoint3D & pivot,
-             const HepVector & a,
-             const HepSymMatrix & Ea);
+    void set(const HepPoint3D& pivot,
+             const HepVector& a,
+             const HepSymMatrix& Ea);
 
     /// unsets error matrix. Error calculations will be ignored after this function call until an error matrix be set again. 0 matrix will be return as a return value for error matrix when you call functions which returns an error matrix.
     void ignoreErrorMatrix(void);
@@ -137,7 +137,7 @@ namespace Belle2 {
     double bFieldZ(double);
     double bFieldZ(void) const;
 
-    static void set_limits(const HepVector &a_min, const HepVector &a_max);
+    static void set_limits(const HepVector& a_min, const HepVector& a_max);
     static bool set_exception(bool);
     static bool set_print(bool);
   private:
@@ -149,10 +149,10 @@ namespace Belle2 {
 
   public:// Operators
     /// Copy operator
-    Helix & operator = (const Helix &);
+    Helix& operator = (const Helix&);
 
   public:// Mathmatical functions
-    HepMatrix delApDelA(const HepVector & ap) const;
+    HepMatrix delApDelA(const HepVector& ap) const;
     HepMatrix delXDelA(double phi) const;
     HepMatrix delMDelA(double phi) const;
     HepMatrix del4MDelA(double phi, double mass) const;
@@ -208,7 +208,7 @@ namespace Belle2 {
 #ifdef Helix_INLINE_DEFINE_HERE
 
   inline
-  const HepPoint3D &
+  const HepPoint3D&
   Helix::center(void) const
   {
 #if defined(BELLE_DEBUG)
@@ -221,7 +221,7 @@ namespace Belle2 {
   }
 
   inline
-  const HepPoint3D &
+  const HepPoint3D&
   Helix::pivot(void) const
   {
     DEBUG_HELIX;
@@ -293,7 +293,7 @@ namespace Belle2 {
   }
 
   inline
-  const HepVector &
+  const HepVector&
   Helix::a(void) const
   {
     DEBUG_HELIX;
@@ -301,7 +301,7 @@ namespace Belle2 {
   }
 
   inline
-  const HepSymMatrix &
+  const HepSymMatrix&
   Helix::Ea(void) const
   {
     DEBUG_HELIX;
@@ -309,8 +309,8 @@ namespace Belle2 {
   }
 
   inline
-  const HepVector &
-  Helix::a(const HepVector & i)
+  const HepVector&
+  Helix::a(const HepVector& i)
   {
     if (i.num_row() == 5) {
       m_a = i;
@@ -330,8 +330,8 @@ namespace Belle2 {
   }
 
   inline
-  const HepSymMatrix &
-  Helix::Ea(const HepSymMatrix & i)
+  const HepSymMatrix&
+  Helix::Ea(const HepSymMatrix& i)
   {
     DEBUG_HELIX;
     return m_Ea = i;

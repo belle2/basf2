@@ -155,6 +155,7 @@ void CDCGeometryPar::read()
     m_nShifts[layerId] = atoi((gbxParams.getString((format("SLayers/SLayer[%1%]/NShift") % (iSLayer + 1)).str())).c_str());
     m_offSet[layerId] = atof((gbxParams.getString((format("SLayers/SLayer[%1%]/Offset") % (iSLayer + 1)).str())).c_str());
     m_cellSize[layerId] = 2 * M_PI * m_rSLayer[layerId] / (double) m_nWires[layerId];
+    m_offSet[layerId] = m_offSet[layerId] * 2 * M_PI / (double) m_nWires[layerId];
   }
 
   // Get field layers parameters
@@ -312,7 +313,7 @@ unsigned CDCGeometryPar::cellId(unsigned layerId, const TVector3& position) cons
   return j;
 }
 
-void CDCGeometryPar::generateXML(const string & of)
+void CDCGeometryPar::generateXML(const string& of)
 {
   //...Open xml file...
   std::ofstream ofs(of.c_str(), std::ios::out);
@@ -321,16 +322,16 @@ void CDCGeometryPar::generateXML(const string & of)
             << of);
   }
   ofs << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"                                                                                                << endl
-  << "<Subdetector type=\"CDC\">"                                                                                                                << endl
-  << "  <Name>CDC BelleII </Name>"                                                                                                               << endl
-  << "  <Description>CDC geometry parameters</Description>"                                                                                      << endl
-  << "  <Version>0</Version>"                                                                                                                    << endl
-  << "  <GeoCreator>CDCBelleII</GeoCreator>"                                                                                                     << endl
-  << "  <Content>"                                                                                                                               << endl
-  << "    <Rotation desc=\"Rotation of the whole cdc detector (should be the same as beampipe)\" unit=\"mrad\">0.0</Rotation>"                   << endl
-  << "    <OffsetZ desc=\"The offset of the whole cdc in z with respect to the IP (should be the same as beampipe)\" unit=\"mm\">0.0</OffsetZ>"  << endl
-  << "    <Material>CDCGas</Material>"                                                                                                           << endl
-  << endl;
+      << "<Subdetector type=\"CDC\">"                                                                                                                << endl
+      << "  <Name>CDC BelleII </Name>"                                                                                                               << endl
+      << "  <Description>CDC geometry parameters</Description>"                                                                                      << endl
+      << "  <Version>0</Version>"                                                                                                                    << endl
+      << "  <GeoCreator>CDCBelleII</GeoCreator>"                                                                                                     << endl
+      << "  <Content>"                                                                                                                               << endl
+      << "    <Rotation desc=\"Rotation of the whole cdc detector (should be the same as beampipe)\" unit=\"mrad\">0.0</Rotation>"                   << endl
+      << "    <OffsetZ desc=\"The offset of the whole cdc in z with respect to the IP (should be the same as beampipe)\" unit=\"mm\">0.0</OffsetZ>"  << endl
+      << "    <Material>CDCGas</Material>"                                                                                                           << endl
+      << endl;
 
   ofs << "    <SLayers>" << endl;
 
@@ -341,7 +342,7 @@ void CDCGeometryPar::generateXML(const string & of)
     ofs << "        <ForwardZ desc=\"z position of this wire layer at forward endplate\" unit=\"mm\">" << senseWireFZ(i) << "</ForwardZ>" << endl;
 //    ofs << "        <BackwardPhi desc=\"azimuth angle of the first wire in this layer at backward endplate\" unit=\"rad\">" << wireBackwardPosition(i).phi() << "</BackwardPhi>" << endl;
 //    ofs << "        <ForwardPhi desc=\"azimuth angle of the first wire in this layer at forward endplate\" unit=\"rad\">" << wireForwardPosition(i).phi() << "</ForwardPhi>" << endl;
-    ofs << "        <NHoles desc=\"the number of holes in this layer, 2*(cell number)\">" << nWiresInLayer(i)*2 << "</NHoles>" << endl;
+    ofs << "        <NHoles desc=\"the number of holes in this layer, 2*(cell number)\">" << nWiresInLayer(i) * 2 << "</NHoles>" << endl;
     ofs << "        <NShift desc=\"the shifted hole number of each wire in this layer\">" << nShifts(i) << "</NShift>" << endl;
     ofs << "        <Offset desc=\"wire offset in phi direction at endplate\">" << m_offSet[i] << "</Offset>" << endl;
     ofs << "      </SLayer>" << endl;
@@ -375,5 +376,5 @@ void CDCGeometryPar::generateXML(const string & of)
   ofs << "    </OuterWall>" << endl;
 
   ofs << "  </Content>"                                         << endl
-  << "</Subdetector>"                                       << endl;
+      << "</Subdetector>"                                       << endl;
 }

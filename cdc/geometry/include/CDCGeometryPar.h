@@ -56,7 +56,7 @@ namespace Belle2 {
     /*!
         \param of The file name.
     */
-    void generateXML(const std::string & of);
+    void generateXML(const std::string& of);
 
     //! Returns the version of cdc geometry parameters
     /*!
@@ -108,7 +108,7 @@ namespace Belle2 {
         \param position The given position to calculate cell id.
         \return Cell id.
     */
-    unsigned cellId(unsigned layerId, const TVector3 & position) const;
+    unsigned cellId(unsigned layerId, const TVector3& position) const;
 
     //! Returns the inner radius of the outer wall.
     /*!
@@ -187,25 +187,25 @@ namespace Belle2 {
     /*!
         \return An array of inner radius of wire layers.
     */
-    const double * innerRadiusWireLayer() const;
+    const double* innerRadiusWireLayer() const;
 
     //! Returns an array of outer radius of wire layers.
     /*!
         \return A array of outer radius of wire layers.
     */
-    const double * outerRadiusWireLayer() const;
+    const double* outerRadiusWireLayer() const;
 
     //! Returns an array of forward z of wire layers.
     /*!
         \return An array of forward z.
     */
-    const double * zForwardWireLayer() const;
+    const double* zForwardWireLayer() const;
 
     //! Returns an array of backward z of wire layers.
     /*!
         \return An array of backward z.
     */
-    const double * zBackwardWireLayer() const;
+    const double* zBackwardWireLayer() const;
 
     //! Returns the offset of z of the wire layer i.
     /*!

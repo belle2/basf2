@@ -142,7 +142,7 @@ void CDCDigiModule::event()
   CDCSignalMap::const_iterator iterCDCMap;
 
   // Get instance of cdc geometry parameters
-  CDCGeometryPar * cdcp = CDCGeometryPar::Instance();
+  CDCGeometryPar* cdcp = CDCGeometryPar::Instance();
 
   // Loop over all hits
   for (int iHits = 0; iHits < nHits; iHits++) {
@@ -288,7 +288,7 @@ double CDCDigiModule::smearDriftLength(double driftLength, double fraction, doub
   // Smear drift length
   double newDL = m_random->Gaus(driftLength / Unit::cm + mean / Unit::cm, resolution / Unit::cm);
   while (newDL <= 0.) newDL = m_random->Gaus(driftLength / Unit::cm + mean / Unit::cm, resolution / Unit::cm);
-  return newDL*Unit::cm;
+  return newDL * Unit::cm;
 }
 
 void CDCDigiModule::endRun()
@@ -317,7 +317,7 @@ void CDCDigiModule::terminate()
   //     << ENDCOLOR);
 }
 
-void CDCDigiModule::genNoise(CDCSignalMap &) //cdcSignalMap)
+void CDCDigiModule::genNoise(CDCSignalMap&)  //cdcSignalMap)
 {
   //-------------------------------------------------------------------------------
   // Method generating random noise using Gaussian distribution (input parameter:
@@ -372,10 +372,10 @@ double CDCDigiModule::getDriftTime(double driftLength, double tof, double propLe
   if (!m_addTimeOfFlight)      tofFactor = 0;
 
   //drift speed: 4.0cm/us, propagation speed: 27.25cm/ns, provided by iwasaki-san and hard-coded here.
-  return (1000*driftTimeFactor*(driftLength / Unit::cm) / 4.0 + tofFactor*tof / Unit::ns + propagationDelayFactor*(propLength / Unit::cm) / 27.25 + m_eventTime);
+  return (1000 * driftTimeFactor * (driftLength / Unit::cm) / 4.0 + tofFactor * tof / Unit::ns + propagationDelayFactor * (propLength / Unit::cm) / 27.25 + m_eventTime);
 }
 
-void CDCDigiModule::printCDCSimHitInfo(const CDCSimHit & aHit) const
+void CDCDigiModule::printCDCSimHitInfo(const CDCSimHit& aHit) const
 {
   //----------------------
   // Printing a hit info.
@@ -397,7 +397,7 @@ void CDCDigiModule::printCDCSimHitInfo(const CDCSimHit & aHit) const
          << std::setprecision(0));
 }
 
-void CDCDigiModule::printCDCSimHitsInfo(std::string info, const CDCSimHitVec & hitVec) const
+void CDCDigiModule::printCDCSimHitsInfo(std::string info, const CDCSimHitVec& hitVec) const
 {
   //---------------------
   // Printing hits info.
@@ -445,7 +445,7 @@ void CDCDigiModule::printModuleParams() const
          << "\n");
 }
 
-void CDCDigiModule::printCDCSignalInfo(std::string info, const CDCSignalMap & cdcSignalMap) const
+void CDCDigiModule::printCDCSignalInfo(std::string info, const CDCSignalMap& cdcSignalMap) const
 {
   //---------------------------------------------
   // Printing info about signals in each cell.

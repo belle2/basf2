@@ -50,7 +50,7 @@ namespace Belle2 {
     /** Constructor needed for GenFit RecoHitFactory.
      *
      */
-    CDCRecoHit(const CDCHit * cdcHit);
+    CDCRecoHit(const CDCHit* cdcHit);
 
     /** Destructor. */
     ~CDCRecoHit() {}

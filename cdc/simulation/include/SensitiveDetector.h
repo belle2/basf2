@@ -54,6 +54,7 @@ namespace Belle2 {
                    const G4ThreeVector& posW,
                    const G4ThreeVector& posIn,
                    const G4ThreeVector& posOut,
+                   const G4ThreeVector& posTrack,
                    const G4int lr);
 
     //! Save CDCEBSimHit into datastore

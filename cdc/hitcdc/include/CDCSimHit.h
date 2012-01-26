@@ -59,6 +59,9 @@ namespace Belle2 {
     //! Position of post-step.
     TVector3 m_posOut;
 
+    //! Position on the track.
+    TVector3 m_posTrack;
+
     //! The flag to denote this hit is in the left or right side.
     int m_posFlag;
 
@@ -97,6 +100,9 @@ namespace Belle2 {
 
     //! The method to set position of post-step
     void setPosOut(TVector3 posOut) { m_posOut = posOut; }
+
+    //! The method to set position on the track
+    void setPosTrack(TVector3 posTrack) { m_posTrack = posTrack; }
 
     //! The method to set position flag
     void setPosFlag(int posFlag) { m_posFlag = posFlag; }
@@ -137,6 +143,9 @@ namespace Belle2 {
     //! The method to get position of post-step
     TVector3 getPosOut() const { return m_posOut; }
 
+    //! The method to get position on the track
+    TVector3 getPosTrack() const { return m_posTrack; }
+
     //! The method to get position flag
     int getPosFlag() const { return m_posFlag; }
 
@@ -158,6 +167,7 @@ namespace Belle2 {
               TVector3 posWire,
               TVector3 posIn,
               TVector3 posOut,
+              TVector3 posTrack,
               int posFlag) {
       m_layerId = layerId;
       m_wireId = wireId;
@@ -170,7 +180,7 @@ namespace Belle2 {
       m_momentum = momentum;
       m_posWire = posWire;
       m_posIn = posIn;
-      m_posOut = posOut;
+      m_posTrack = posTrack;
       m_posFlag = posFlag;
     }
 

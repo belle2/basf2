@@ -207,18 +207,21 @@ bool SensitiveDetector::step(G4Step* aStep, G4TouchableHistory*)
           onTrack.setX(q1[0]);
           onTrack.setY(q1[1]);
           onTrack.setZ(q1[2]);
+          onTrack *= cm;
           posW.setX(q2[0]);
           posW.setY(q2[1]);
           posW.setZ(q2[2]);
           posW *= cm;
         }
 
+        G4ThreeVector posTrack(onTrack.x(), onTrack.y(), onTrack.z());
+
         lr = 1;
         if ((tryp.cross(onTrack)).z() < 0.) lr = 0;
 
         int saveIndex = -999;
         if (wires.size() == 1) {
-          saveIndex = saveSimHit(layerId, wires[i], trackID, pid, distance, tof, edep, s_in_layer * cm, momIn, posW, posIn, posOut, lr);
+          saveIndex = saveSimHit(layerId, wires[i], trackID, pid, distance, tof, edep, s_in_layer * cm, momIn, posW, posIn, posOut, posTrack, lr);
         } else {
           // Cubic approximation of the track
           const G4int ic(3);
@@ -268,7 +271,7 @@ bool SensitiveDetector::step(G4Step* aStep, G4TouchableHistory*)
             G4double pmag = momIn.mag();
             const G4ThreeVector p_In(pmag * vent[3], pmag * vent[4], pmag * vent[5]);
 
-            saveIndex = saveSimHit(layerId, wires[i], trackID, pid, distance, tof, edep_in_cell, (sint - s1) * cm, p_In, posW, x_In, x_Out, lr);
+            saveIndex = saveSimHit(layerId, wires[i], trackID, pid, distance, tof, edep_in_cell, (sint - s1) * cm, p_In, posW, x_In, x_Out, posTrack, lr);
           } else {  //the particle exits
 
             edep_in_cell = edep * (s2 - sint) / s_in_layer;
@@ -277,7 +280,7 @@ bool SensitiveDetector::step(G4Step* aStep, G4TouchableHistory*)
             G4double pmag = momIn.mag();
             const G4ThreeVector p_In(pmag * vent[3], pmag * vent[4], pmag * vent[5]);
 
-            saveIndex = saveSimHit(layerId, wires[i], trackID, pid, distance, tof, edep_in_cell, (s2 - sint) * cm, p_In, posW, x_In, posOut, lr);
+            saveIndex = saveSimHit(layerId, wires[i], trackID, pid, distance, tof, edep_in_cell, (s2 - sint) * cm, p_In, posW, x_In, posOut, posTrack, lr);
           }
         }
         //setSeenInDetectorFlag(aStep, MCParticle::c_SeenInCDC);
@@ -317,6 +320,7 @@ SensitiveDetector::saveSimHit(const G4int layerId,
                               const G4ThreeVector& posW,
                               const G4ThreeVector& posIn,
                               const G4ThreeVector& posOut,
+                              const G4ThreeVector& posTrack,
                               const G4int lr)
 {
   StoreArray<MCParticle> mcParticles;
@@ -342,6 +346,8 @@ SensitiveDetector::saveSimHit(const G4int layerId,
   cdcArray[m_hitNumber]->setPosIn(positionIn);
   TVector3 positionOut(posOut.getX() / cm, posOut.getY() / cm, posOut.getZ() / cm);
   cdcArray[m_hitNumber]->setPosOut(positionOut);
+  TVector3 positionTrack(posTrack.getX() / cm, posTrack.getY() / cm, posTrack.getZ() / cm);
+  cdcArray[m_hitNumber]->setPosTrack(positionTrack);
   cdcArray[m_hitNumber]->setPosFlag(lr);
 
   B2DEBUG(150, "HitNumber: " << m_hitNumber);

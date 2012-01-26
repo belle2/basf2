@@ -155,7 +155,6 @@ void CDCGeometryPar::read()
     m_nShifts[layerId] = atoi((gbxParams.getString((format("SLayers/SLayer[%1%]/NShift") % (iSLayer + 1)).str())).c_str());
     m_offSet[layerId] = atof((gbxParams.getString((format("SLayers/SLayer[%1%]/Offset") % (iSLayer + 1)).str())).c_str());
     m_cellSize[layerId] = 2 * M_PI * m_rSLayer[layerId] / (double) m_nWires[layerId];
-    m_offSet[layerId] = m_offSet[layerId] * 2 * M_PI / (double) m_nWires[layerId];
   }
 
   // Get field layers parameters
@@ -202,7 +201,7 @@ const TVector3 CDCGeometryPar::wireForwardPosition(int layerID, int cellID) cons
     const double beta = (0 - b.z()) / u.z();
     const TVector3 p = b + beta * u;
     double phi0 = - atan2(p.y(), p.x());
-    offset += phi0;
+    offset += phi0 / (2 * M_PI / double(nWires));
   }
 
   const double phiF = phiSize * (double(cellID) + offset)
@@ -233,7 +232,7 @@ const TVector3 CDCGeometryPar::wireBackwardPosition(int layerID, int cellID) con
     const double beta = (0 - b.z()) / u.z();
     const TVector3 p = b + beta * u;
     double phi0 = - atan2(p.y(), p.x());
-    offset += phi0;
+    offset += phi0 / (2 * M_PI / double(nWires));
   }
 
   const double phiF = phiSize * (double(cellID) + offset)
@@ -288,7 +287,7 @@ unsigned CDCGeometryPar::cellId(unsigned layerId, const TVector3& position) cons
     const double beta = (0 - b.z()) / u.z();
     const TVector3 p = b + beta * u;
     double phi0 = - atan2(p.y(), p.x());
-    offset += phi0;
+    offset += phi0 / (2 * M_PI / double(nWires));
   }
 
   unsigned j = 0;

@@ -1,3 +1,13 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2010 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Soohyung Lee                                             *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
 #ifndef XMLPARSER_H
 #define XMLPARSER_H
 
@@ -13,34 +23,47 @@
 #include <daq/hlt/NodeInfo.h>
 
 namespace Belle2 {
+
+  //! XMLParser class
+  /*! This class is for parsing of XML input file that is supposed to contain node information
+  */
   class XMLParser {
   public:
+    //! Constructor
     XMLParser(std::string filename);
+    //! Destructor
     ~XMLParser();
 
+    //! Initialize the XMLParser
     EHLTStatus init();
+    //! Parsing the XML input file
     EHLTStatus parsing();
 
+    //! Initialize a container for node information with parsed keys
     unsigned int getAllKeys(std::vector<int>& container);
+    //! Fill node information parsed into a container by referring specific key
     void fill(int key, NodeInfo& nodeinfo);
 
+    //! Display (Development purpose)
     void display();
 
   private:
-    std::string m_filename;
+    std::string m_filename;                         /**< XML input file name */
 
-    int m_expNo, m_runStart, m_runEnd;
+    int m_expNo;                                    /**< Experiment number */
+    int m_runStart;                                 /**< Run start number */
+    int m_runEnd;                                   /**< Run end number */
 
-    std::string m_managerIP;
+    std::string m_managerIP;                        /**< IP address of manager node */
 
-    std::vector<std::string> m_dataSources;
-    std::vector<std::string> m_dataTargets;
-    std::map<int, std::string> m_eventSeparators;
-    std::map<int, std::string> m_workerNodes;
-    std::map<int, std::string> m_eventMergers;
+    std::vector<std::string> m_dataSources;         /**< Container for IP addresses of event builder 1 */
+    std::vector<std::string> m_dataTargets;         /**< Container for IP addresses of event builder 2 */
+    std::map<int, std::string> m_eventSeparators;   /**< Container for IP addresses of event separator nodes */
+    std::map<int, std::string> m_workerNodes;       /**< Container for IP addresses of worker nodes */
+    std::map<int, std::string> m_eventMergers;      /**< Container for IP addresses of event merger nodes */
 
-    xmlDocPtr m_docPtr;
-    xmlNode* m_curNode;
+    xmlDocPtr m_docPtr;                             /**< XML file document pointer */
+    xmlNode* m_curNode;                             /**< Pointer to the current XML tag being parsed */
   };
 }
 

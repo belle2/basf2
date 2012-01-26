@@ -25,8 +25,7 @@ HLTProcess::~HLTProcess()
 EHLTStatus HLTProcess::initControl()
 {
   B2INFO("[HLTProcess] \x1b[32mRing buffers initializing for control/monitor line\x1b[0m");
-  m_controlInBuffer = new RingBuffer(c_ControlPort, gBufferSize);
-  //m_controlOutBuffer = new RingBuffer (c_MonitorPort, gBufferSize);
+  m_controlInBuffer = new RingBuffer(boost::lexical_cast<std::string>(static_cast<int>(c_ControlPort)).c_str(), gBufferSize);
 
   pid_t pid = fork();
   if (pid == 0) {
@@ -73,7 +72,7 @@ EHLTStatus HLTProcess::initControl()
 
 EHLTStatus HLTProcess::initSenders()
 {
-  m_dataOutBuffer = new RingBuffer(c_DataOutPort, gBufferSize);
+  m_dataOutBuffer = new RingBuffer(boost::lexical_cast<std::string>(static_cast<int>(c_DataOutPort)).c_str(), gBufferSize);
 
   for (unsigned int i = 0; i < m_nodeInfo.targetIP().size(); ++i) {
     pid_t pidHLTSender = fork();
@@ -99,7 +98,6 @@ EHLTStatus HLTProcess::initSenders()
     } else {
       m_HLTSenders.push_back(pidHLTSender);
       B2INFO("\x1b[33m[HLTProcess] HLTSender " << pidHLTSender << " forked\x1b[0m");
-      return c_Success;
     }
   }
 
@@ -108,7 +106,7 @@ EHLTStatus HLTProcess::initSenders()
 
 EHLTStatus HLTProcess::initReceivers()
 {
-  m_dataInBuffer = new RingBuffer(c_DataInPort, gBufferSize);
+  m_dataInBuffer = new RingBuffer(boost::lexical_cast<std::string>(static_cast<int>(c_DataInPort)).c_str(), gBufferSize);
 
   for (unsigned int i = 0; i < m_nodeInfo.sourceIP().size(); ++i) {
     pid_t pidHLTReceiver = fork();
@@ -129,7 +127,6 @@ EHLTStatus HLTProcess::initReceivers()
     } else {
       m_HLTReceivers.push_back(pidHLTReceiver);
       B2INFO("\x1b[33m[HLTProcess] HLTReceiver " << pidHLTReceiver << " forked\x1b[0m");
-      return c_Success;
     }
   }
 

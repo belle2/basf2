@@ -52,22 +52,34 @@ EHLTStatus HLTReceiver::listening()
   while (status == c_Success) {
     std::vector<std::string> givenMessages;
     std::string data;
-    data.clear();
     int size = 0;
-    status = c_FuncError;
 
     while ((status = receive(newSocket, data, size)) != c_FuncError) {
-      if (decodeSingleton(data, givenMessages) == c_Success) {
-        for (std::vector<std::string>::const_iterator i = givenMessages.begin();
-             i != givenMessages.end(); ++i) {
+      decodeSingleton(data, givenMessages);
+
+      for (std::vector<std::string>::const_iterator i = givenMessages.begin();
+           i != givenMessages.end(); ++i) {
+        if ((*i).size() > 0) {
           if ((*i) == "Terminate") {
             B2INFO("\x1b[31m[HLTReceiver] Terminate tag met\x1b[0m");
-            m_buffer->insq((int*)(*i).c_str(), (*i).size() / 4 + 1);
+            int bufferStatus = m_buffer->insq((int*)(*i).c_str(), (*i).size() / 4 + 1);
+
+            while (bufferStatus < 0) {
+              B2INFO("\x1b[31m[HLTReceiver] Ring buffer overflow. Retrying...\x1b[0m");
+              bufferStatus = m_buffer->insq((int*)(*i).c_str(), (*i).size() / 4 + 1);
+              sleep(1);
+            }
             return c_TermCalled;
-          } else
-            m_buffer->insq((int*)(*i).c_str(), (*i).size() / 4 + 1);
+          } else {
+            int bufferStatus = m_buffer->insq((int*)(*i).c_str(), (*i).size() / 4 + 1);
+            while (bufferStatus < 0) {
+              B2INFO("\x1b[31m[HLTReceiver] Ring buffer overflow. Retrying...\x1b[0m");
+              bufferStatus = m_buffer->insq((int*)(*i).c_str(), (*i).size() / 4 + 1);
+              m_buffer->dump_db();
+              sleep(1);
+            }
+          }
         }
-        break;
       }
     }
   }
@@ -78,7 +90,7 @@ EHLTStatus HLTReceiver::listening()
 EHLTStatus HLTReceiver::setBuffer()
 {
   B2INFO("[HLTReceiver] \x1b[32mRing buffer initializing...\x1b[0m");
-  m_buffer = new RingBuffer(m_port);
+  m_buffer = new RingBuffer(boost::lexical_cast<std::string>(static_cast<int>(m_port)).c_str(), gBufferSize);
 
   return c_Success;
 }
@@ -86,7 +98,7 @@ EHLTStatus HLTReceiver::setBuffer()
 EHLTStatus HLTReceiver::setBuffer(unsigned int key)
 {
   B2INFO("[HLTReceiver] \x1b[32mRing buffer initializing...\x1b[0m");
-  m_buffer = new RingBuffer(key);
+  m_buffer = new RingBuffer(boost::lexical_cast<std::string>(static_cast<int>(key)).c_str(), gBufferSize);
 
   return c_Success;
 }
@@ -98,26 +110,26 @@ EHLTStatus HLTReceiver::decodeSingleton(std::string data, std::vector<std::strin
   size_t eos = data.find(gEOSTag);
 
   if (eos == std::string::npos) {
-    m_internalBuffer.push_back(data);
+    m_internalBuffer += data;
     return c_FuncError;
   } else {
-    while ((eos = data.find(gEOSTag)) != std::string::npos) {
-      if (m_internalBuffer.size() > 0) {
-        std::string reconstructed;
-        for (std::vector<std::string>::const_iterator i = m_internalBuffer.begin();
-             i != m_internalBuffer.end(); ++i)
-          reconstructed += (*i);
-        reconstructed += data.substr(0, eos);
-        container.push_back(reconstructed);
+    if (m_internalBuffer.size() > 0) {
+      std::string reconstructed;
+      reconstructed = m_internalBuffer + data.substr(0, eos);
+      container.push_back(reconstructed);
+      m_internalBuffer.clear();
+    } else
+      container.push_back(data.substr(0, eos));
 
-        m_internalBuffer.clear();
-      } else
-        container.push_back(data.substr(0, eos));
+    data = data.substr(eos + gEOSTag.size(), std::string::npos);
+
+    while ((eos = data.find(gEOSTag)) != std::string::npos) {
+      container.push_back(data.substr(0, eos));
       data = data.substr(eos + gEOSTag.size(), std::string::npos);
     }
 
     if (data.size() != 0) {
-      m_internalBuffer.push_back(data);
+      m_internalBuffer = data;
       return c_FuncError;
     }
   }

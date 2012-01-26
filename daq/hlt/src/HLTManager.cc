@@ -23,7 +23,7 @@ HLTManager::~HLTManager()
   if (!isChild()) {
     for (std::vector<int>::const_iterator i = m_controlBuffers.begin();
          i != m_controlBuffers.end(); ++i) {
-      RingBuffer* buffer = new RingBuffer((*i));
+      RingBuffer* buffer = new RingBuffer(boost::lexical_cast<std::string>(static_cast<int>(*i)).c_str(), gBufferSize);
       delete buffer;
     }
   }
@@ -34,7 +34,7 @@ EHLTStatus HLTManager::initSenders()
   for (std::map<int, NodeInfo>::const_iterator i = m_nodeInfoMap.begin();
        i != m_nodeInfoMap.end(); ++i) {
     pid_t pid = fork();
-    RingBuffer* buffer = new RingBuffer(c_ControlPort + (*i).first, gBufferSize);
+    RingBuffer* buffer = new RingBuffer(boost::lexical_cast<std::string>(static_cast<int>(c_ControlPort + (*i).first)).c_str(), gBufferSize);
 
     if (pid == 0) {
       m_isChild = true;
@@ -47,7 +47,12 @@ EHLTStatus HLTManager::initSenders()
       sender.setBuffer(c_ControlPort + (*i).first);
 
       std::string temp = encodeNodeInfo((*i).first);
-      buffer->insq((int*)temp.c_str(), temp.size() / 4 + 1);
+      int bufferStatus = buffer->insq((int*)temp.c_str(), temp.size() / 4 + 1);
+      while (bufferStatus < 0) {
+        B2INFO("\x1b[31m[HLTReceiver] Ring buffer overflow. Retrying...");
+        bufferStatus = buffer->insq((int*)temp.c_str(), temp.size() / 4 + 1);
+        sleep(1);
+      }
 
       sender.broadcasting();
       sender.broadcasting("Terminate");

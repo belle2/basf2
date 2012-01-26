@@ -128,7 +128,8 @@ EHLTStatus B2Socket::send(const std::string data, int& size)
   int status = ::send(m_socket, data.c_str(), data.size(), 0);
 
   if (status == -1) {
-    B2ERROR("\x1b[31m[B2Socket] Sending data " << data << " failed\x1b[0m");
+    B2ERROR("\x1b[31m[B2Socket] Sending data " << data
+            << " failed (errno=" << errno << ")\x1b[0m");
     return c_FuncError;
   } else {
     size = status;
@@ -150,9 +151,6 @@ EHLTStatus B2Socket::receive(int newSocket, std::string& data, int& size)
     return c_FuncError;
   } else {
     std::string tempData(buffer);
-
-    if (tempData == "Terminate")
-      return c_TermCalled;
 
     data = tempData;
     size = status;

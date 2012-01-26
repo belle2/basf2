@@ -51,29 +51,26 @@ EHLTStatus HLTSender::broadcasting()
   }
 
   char temp[gMaxReceives];
-  m_buffer->remq((int*)temp);
+  int bufferStatus = m_buffer->remq((int*)temp);
+  if (bufferStatus < 0)
+    return c_FuncError;
 
   std::string rawMessage(temp);
   std::string sendingMessage = makeSingleton(rawMessage);
 
   int size = 0;
 
-  if (send(sendingMessage, size) == c_FuncError) {
+  while (send(sendingMessage, size) == c_FuncError) {
     B2INFO("[HLTSender] \x1b[31mAn error occurred in sending so the data is put back to the ring buffer\x1b[0m");
-    m_buffer->insq((int*)sendingMessage.c_str(), sendingMessage.size() / 4 + 1);
     sleep(1);
-    return c_FuncError;
-  } else {
-    //B2INFO ("[HLTSender] \x1b[34mData " << sendingMessage << " (size=" << sendingMessage.size ()
-    //    << ") has been sent to " << m_destination << "\x1b[0m");
-
-    if (rawMessage == "Terminate") {
-      m_buffer->insq((int*)rawMessage.c_str(), rawMessage.size() / 4 + 1);
-      return c_TermCalled;
-    }
-
-    return c_Success;
   }
+
+  if (rawMessage == "Terminate") {
+    m_buffer->insq((int*)rawMessage.c_str(), rawMessage.size() / 4 + 1);
+    return c_TermCalled;
+  }
+
+  return c_Success;
 }
 
 EHLTStatus HLTSender::broadcasting(std::string data)
@@ -94,7 +91,7 @@ EHLTStatus HLTSender::broadcasting(std::string data)
 EHLTStatus HLTSender::setBuffer()
 {
   B2INFO("[HLTSender] \x1b[32mRing buffer initializing...\x1b[0m");
-  m_buffer = new RingBuffer(m_port);
+  m_buffer = new RingBuffer(boost::lexical_cast<std::string>(static_cast<int>(m_port)).c_str(), gBufferSize);
 
   return c_Success;
 }
@@ -102,20 +99,9 @@ EHLTStatus HLTSender::setBuffer()
 EHLTStatus HLTSender::setBuffer(unsigned int key)
 {
   B2INFO("[HLTSender] \x1b[32mRing buffer initializing...\x1b[0m");
-  m_buffer = new RingBuffer(key);
+  m_buffer = new RingBuffer(boost::lexical_cast<std::string>(static_cast<int>(key)).c_str(), gBufferSize);
 
   return c_Success;
-}
-
-EHLTStatus HLTSender::process(EHLTMessage dataType, std::string data)
-{
-  if (dataType == c_Termination) {
-    B2INFO("[HLTSender] Terminating...");
-    return c_TermCalled;
-  } else {
-    B2INFO("[HLTSender] Got: " << data);
-    return c_Success;
-  }
 }
 
 std::string HLTSender::makeSingleton(std::string data)

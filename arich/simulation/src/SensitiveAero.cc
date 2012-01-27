@@ -34,8 +34,7 @@ namespace Belle2 {
     {
       StoreArray<MCParticle> mcParticles;
       StoreArray<ARICHAeroHit>  arichAeroHits;
-      // popravi!
-      RelationArray arichAeroHitRel(arichAeroHits, mcParticles);
+      RelationArray arichAeroHitRel(mcParticles, arichAeroHits);
       registerMCParticleRelation(arichAeroHitRel);
 
     }
@@ -79,8 +78,8 @@ namespace Belle2 {
 
         // Create relation to MCParticle
         StoreArray<MCParticle> mcParticles;
-        RelationArray  arichAeroHitRel(arichAeroHits, mcParticles);
-        arichAeroHitRel.add(nentr, trackID);
+        RelationArray  arichAeroHitRel(mcParticles, arichAeroHits);
+        arichAeroHitRel.add(trackID, nentr);
 
       }
       return true;

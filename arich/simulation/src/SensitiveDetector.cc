@@ -32,7 +32,7 @@ namespace Belle2 {
       StoreArray<MCParticle> mcParticles;
       StoreArray<ARICHSimHit>  arichSimHits;
 
-      RelationArray  arichSimHitRel(arichSimHits, mcParticles);
+      RelationArray  arichSimHitRel(mcParticles, arichSimHits);
       registerMCParticleRelation(arichSimHitRel);
     }
 
@@ -77,8 +77,8 @@ namespace Belle2 {
 
       // add relation to MCParticle
       StoreArray<MCParticle> mcParticles;
-      RelationArray  arichSimHitRel(arichSimHits, mcParticles);
-      arichSimHitRel.add(nentr, trackID);
+      RelationArray  arichSimHitRel(mcParticles, arichSimHits);
+      arichSimHitRel.add(trackID, nentr);
 
       // after detection photon track is killed
       track.SetTrackStatus(fStopAndKill);

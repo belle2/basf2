@@ -11,7 +11,6 @@
 #ifndef GEOARICHCREATOR_H
 #define GEOARICHCREATOR_H
 
-#include <arich/geometry/ARICHGeometryPar.h>
 #include <geometry/CreatorBase.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
@@ -56,7 +55,6 @@ namespace Belle2 {
     protected:
       SensitiveDetector* m_sensitive;
       SensitiveAero* m_sensitiveAero;
-      ARICHGeometryPar* m_arichgp;
       int isBeamBkgStudy;
     };
 

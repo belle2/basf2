@@ -62,14 +62,12 @@ namespace Belle2 {
     {
       m_sensitive = new SensitiveDetector();
       m_sensitiveAero = new SensitiveAero();
-      m_arichgp = ARICHGeometryPar::Instance();
     }
 
     GeoARICHCreator::~GeoARICHCreator()
     {
       delete m_sensitive;
       delete m_sensitiveAero;
-      delete m_arichgp;
     }
 
 
@@ -111,6 +109,8 @@ namespace Belle2 {
       }
 
       isBeamBkgStudy = content.getInt("BeamBackgroundStudy");
+
+      ARICHGeometryPar* m_arichgp = ARICHGeometryPar::Instance();
 
       // Initializing geometry parametrisation; m_arichgp contains photon detectors positions, ...
       m_arichgp->Initialize(content);
@@ -283,6 +283,7 @@ namespace Belle2 {
       // check that module window material has specified refractive index
       double wref = getAvgRINDEX(windowMaterial);
       if (!wref) B2WARNING("Material '" << winMat << "', required for ARICH photon detector window as no specified refractive index. Continuing, but no photons in ARICH will be detected.");
+      ARICHGeometryPar* m_arichgp = ARICHGeometryPar::Instance();
       m_arichgp->setWindowRefIndex(wref);
       // get module dimensions
       double modXsize = Module.getLength("moduleXSize") / Unit::mm;
@@ -374,6 +375,8 @@ namespace Belle2 {
       double holeY = Support.getLength("holeYSize") / Unit::mm;
       double holeX = Support.getLength("holeXSize") / Unit::mm;
 
+      ARICHGeometryPar* m_arichgp = ARICHGeometryPar::Instance();
+
       // build plate
       G4Tubs* supportTube = new G4Tubs("supportTube", supportInRad, supportOutRad, supportThick / 2., 0, 2 * M_PI);
       G4LogicalVolume* lsupportTube = new G4LogicalVolume(supportTube, supportMaterial, "supportPlate");
@@ -452,6 +455,7 @@ namespace Belle2 {
       G4LogicalVolume* lenvBox = new G4LogicalVolume(envBox, envMaterial, "ARICH.envelope");
       new G4PVPlacement(G4Transform3D(), lenvBox, "ARICH.envelope", &topVolume, false, 1);
       setVisibility(*lenvBox, false);
+      ARICHGeometryPar* m_arichgp = ARICHGeometryPar::Instance();
       m_arichgp->Initialize(content);
       GearDir moduleParam(content, "Detector/Module");
       G4LogicalVolume* detModule = buildModule(moduleParam);

@@ -35,7 +35,7 @@ namespace Belle2 {
     StoreArray<MCParticle> mcParticles;
     StoreArray<BeamBackHit> beamBackHits;
 
-    RelationArray  relBeamBackHitToMCParticle(beamBackHits, mcParticles);
+    RelationArray  relBeamBackHitToMCParticle(mcParticles, beamBackHits);
     registerMCParticleRelation(relBeamBackHitToMCParticle);
 
     std::string subDet = subDett;
@@ -99,8 +99,8 @@ namespace Belle2 {
 
       // create relation to MCParticle
       StoreArray<MCParticle> mcParticles;
-      RelationArray relBeamBackHitToMCParticle(beamBackHits, mcParticles);
-      relBeamBackHitToMCParticle.add(nentr, m_trackID);
+      RelationArray relBeamBackHitToMCParticle(mcParticles, beamBackHits);
+      relBeamBackHitToMCParticle.add(m_trackID, nentr);
 
       //Reset TrackID
       m_trackID = 0;

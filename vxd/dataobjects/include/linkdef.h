@@ -6,5 +6,6 @@
 #pragma link C++ nestedclasses;
 
 #pragma link C++ class Belle2::VXDSensorPlane;
+#pragma link C++ class Belle2::VXDTrueHit;
 
 #endif

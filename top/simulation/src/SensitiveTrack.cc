@@ -41,9 +41,9 @@ namespace Belle2 {
       StoreArray<TOPTrack>  topTracks;
 
       //! The relation array between MCParticle and TOPTrack
-      RelationArray  relTOPTrackToMCParticle(topTracks, mcParticles);
+      RelationArray  relMCParticleToTOPTrack(mcParticles, topTracks);
       //! Registraction of the relation array
-      registerMCParticleRelation(relTOPTrackToMCParticle);
+      registerMCParticleRelation(relMCParticleToTOPTrack);
 
     }
 
@@ -145,9 +145,9 @@ namespace Belle2 {
       StoreArray<MCParticle> mcParticles;
 
       //! Define the relation array
-      RelationArray relTOPTrackToMCParticle(topTracks, mcParticles);
+      RelationArray relMCParticleToTOPTrack(mcParticles, topTracks);
       //! add the relation
-      relTOPTrackToMCParticle.add(nentr, trackID);
+      relMCParticleToTOPTrack.add(trackID, nentr);
 
       //! everything done successfully
       return true;

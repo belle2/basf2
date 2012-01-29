@@ -37,9 +37,9 @@ namespace Belle2 {
       StoreArray<TOPSimHit>  topSimHits;
 
       //! The relation array between MCParticle and TOPSimHit
-      RelationArray  relTOPSimHitToMCParticle(topSimHits, mcParticles);
+      RelationArray  relMCParticleToTOPSimHit(mcParticles, topSimHits);
       //! Registraction of the relation array
-      registerMCParticleRelation(relTOPSimHitToMCParticle);
+      registerMCParticleRelation(relMCParticleToTOPSimHit);
     }
 
 
@@ -140,9 +140,9 @@ namespace Belle2 {
       StoreArray<MCParticle> mcParticles;
 
       //! Define the relation array
-      RelationArray relTOPSimHitToMCParticle(topSimHits, mcParticles);
+      RelationArray relMCParticleToTOPSimHit(mcParticles, topSimHits);
       //! add the relation
-      relTOPSimHitToMCParticle.add(nentr, trackID);
+      relMCParticleToTOPSimHit.add(trackID, nentr);
 
 
       /*! After detection photon track is killed */

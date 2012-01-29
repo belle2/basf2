@@ -12,10 +12,7 @@
 #define PXDTRUEHIT_H
 
 #include <vxd/VxdID.h>
-
-// ROOT
-#include <TObject.h>
-#include <TVector3.h>
+#include <vxd/dataobjects/VXDTrueHit.h>
 
 namespace Belle2 {
 
@@ -32,11 +29,10 @@ namespace Belle2 {
     * hit classes are used to generate detector response, they contain _local_
     * information.
     */
-  class PXDTrueHit : public TObject {
-
+  class PXDTrueHit : public VXDTrueHit {
   public:
     /** Default constructor for ROOT IO */
-    PXDTrueHit(): m_sensorID(0), m_u(0), m_v(0), m_energyDep(0), m_globalTime(0) {}
+    PXDTrueHit(): VXDTrueHit() {}
 
     /** Constructor
      * @param sensorID SensorID of the Sensor
@@ -45,39 +41,10 @@ namespace Belle2 {
      * @param momentum momentum of the particle in local coordinates
      * @param globalTime timestamp of the hit
      */
-    PXDTrueHit(
-      VxdID sensorID, float u, float v, float energyDep, float globalTime,
-      const TVector3& momentum, const TVector3& entryMomentum, const TVector3& exitMomentum):
-        m_sensorID(sensorID), m_u(u), m_v(v), m_energyDep(energyDep), m_globalTime(globalTime),
-        m_momentum(momentum), m_entryMomentum(entryMomentum), m_exitMomentum(exitMomentum) {}
-
-    /** Return the Sensor ID */
-    VxdID getSensorID() const { return m_sensorID; }
-    /** Retun local u coordinate of hit */
-    float getU() const { return m_u; }
-    /** Retun local v coordinate of hit */
-    float getV() const { return m_v; }
-    /** Return energy deposited during traversal of sensor */
-    float getEnergyDep() const { return m_energyDep; }
-    /** Return Time of hit.*/
-    float getGlobalTime() const { return m_globalTime; }
-    /** Return momentum when crossing detector plane.*/
-    const TVector3& getMomentum() const { return m_momentum; }
-    /** Return momentum when entering silicon.*/
-    const TVector3& getEntryMomentum() const { return m_entryMomentum; }
-    /** Return momentum when exiting silicon.*/
-    const TVector3& getExitMomentum() const { return m_exitMomentum; }
-
-  private:
-
-    int m_sensorID;           /**< ID of the sensor */
-    float m_u;                /**< Local u coordinate */
-    float m_v;                /**< Local v coordinate */
-    float m_energyDep;        /**< Deposited energy while traversing sensor */
-    float m_globalTime;       /**< Global time. */
-    TVector3 m_momentum;      /**< momentum in local coordinates when crossing detector plane */
-    TVector3 m_entryMomentum; /**< momentum in local coordinates when entering silicon */
-    TVector3 m_exitMomentum;  /**< momentum in local coordinates when exiting silicon */
+    PXDTrueHit(VxdID sensorID, float u, float v, float energyDep, float globalTime,
+               const TVector3& momentum, const TVector3& entryMomentum, const TVector3& exitMomentum):
+      VXDTrueHit(sensorID, u, v, energyDep, globalTime, momentum, entryMomentum, exitMomentum)
+    {}
 
     ClassDef(PXDTrueHit, 1)
   };

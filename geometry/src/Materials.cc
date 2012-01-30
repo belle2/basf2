@@ -34,7 +34,7 @@ namespace Belle2 {
       return *instance;
     }
 
-    G4Material* Materials::getMaterial(const string &name, bool showErrors) const
+    G4Material* Materials::getMaterial(const string& name, bool showErrors) const
     {
       G4Material* mat;
       if (m_materialCache.retrieve(name, mat)) {
@@ -61,7 +61,7 @@ namespace Belle2 {
       return mat;
     }
 
-    G4Element* Materials::getElement(const string &name) const
+    G4Element* Materials::getElement(const string& name) const
     {
       G4Element* elm = G4NistManager::Instance()->FindOrBuildElement(name);
       if (!elm) B2ERROR("Element '" << name << "' could not be found");
@@ -82,7 +82,7 @@ namespace Belle2 {
       string stateStr = parameters.getString("state", "undefined");
       double density = parameters.getDensity("density", 0) * g / cm3;
       double temperature = parameters.getDouble("temperature", STP_Temperature);
-      double pressure = parameters.getDouble("pressure", STP_Pressure);
+      double pressure = parameters.getDouble("pressure", STP_Pressure / pascal);
       //If density is negative or smaller than epsilon we should calculate the
       //density from the used materials
       bool deductDensity = density < 1e-25;
@@ -101,8 +101,8 @@ namespace Belle2 {
       //Prepare vector with all component materials
       vector<G4Material*> componentMaterials;
       vector<double> fractionMaterials;
-      BOOST_FOREACH(const GearDir &material, parameters.getNodes("Components/Material")) {
-        G4Material *mat = getMaterial(material.getString());
+      BOOST_FOREACH(const GearDir & material, parameters.getNodes("Components/Material")) {
+        G4Material* mat = getMaterial(material.getString());
         double fraction = material.getDouble("@fraction", 1.0);
         if (!mat) {
           B2ERROR("createMaterial " << name << ": Material '" << material.getString() << "' not found");
@@ -119,7 +119,7 @@ namespace Belle2 {
       //Prepare vector with all component elements
       vector<G4Element*> componentElements;
       vector<double> fractionElements;
-      BOOST_FOREACH(const GearDir &element, parameters.getNodes("Components/Element")) {
+      BOOST_FOREACH(const GearDir & element, parameters.getNodes("Components/Element")) {
         G4Element* elm = getElement(element.getString());
         double fraction = element.getDouble("@fraction", 1.0);
         if (!elm) {
@@ -151,7 +151,7 @@ namespace Belle2 {
 
       //Finally, create Material and add all components
       G4Material* mat = new G4Material(name, density, componentElements.size() + componentMaterials.size(),
-                                       state, temperature, pressure);
+                                       state, temperature, pressure * pascal);
 
       for (size_t i = 0; i < componentMaterials.size(); ++i) {
         mat->AddMaterial(componentMaterials[i], fractionMaterials[i] / sumFractions);
@@ -169,12 +169,12 @@ namespace Belle2 {
       return mat;
     }
 
-    G4MaterialPropertiesTable* Materials::createProperties(const gearbox::Interface &parameters)
+    G4MaterialPropertiesTable* Materials::createProperties(const gearbox::Interface& parameters)
     {
       if (parameters.getNumberNodes("Property") > 0) {
         //Apparantly we have properties, so lets add them to the Material
         G4MaterialPropertiesTable* g4PropTable = new G4MaterialPropertiesTable();
-        BOOST_FOREACH(const GearDir& property, parameters.getNodes("Property")) {
+        BOOST_FOREACH(const GearDir & property, parameters.getNodes("Property")) {
           string name;
           try {
             name = property.getString("@name");
@@ -200,7 +200,7 @@ namespace Belle2 {
       return 0;
     }
 
-    G4OpticalSurface* Materials::createOpticalSurface(const gearbox::Interface &parameters)
+    G4OpticalSurface* Materials::createOpticalSurface(const gearbox::Interface& parameters)
     {
       string name         = parameters.getString("@name", "OpticalSurface");
       string modelString  = parameters.getString("Model", "glisur");

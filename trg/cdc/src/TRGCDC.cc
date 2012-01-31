@@ -16,8 +16,8 @@
 
 #include <cstdlib>
 #include "framework/datastore/StoreArray.h"
-#include "cdc/hitcdc/HitCDC.h"
 #include "cdc/hitcdc/CDCSimHit.h"
+#include "cdc/dataobjects/CDCHit.h"
 #include "cdc/geometry/CDCGeometryPar.h"
 #include "trg/trg/Debug.h"
 #include "trg/trg/Time.h"
@@ -569,42 +569,46 @@ TRGCDC::update(bool mcAnalysis) {
 //  fastClear();
     clear();
 
-    StoreArray<CDCSimHit> cdcArray("CDCSimHit");
+    StoreArray<CDCSimHit> cdcArray("CDCSimHits");
     if (! cdcArray) {
         cout << "TRGCDC !!! can not access to CDC sim hits" << std::endl;
     }
     const int n = cdcArray->GetEntriesFast();
+    
 
-    //...Loop over HitCDC...
-    StoreArray<HitCDC> cdcHits("HitCDCArray");
-    if (! cdcHits) {
-        cout << "TRGCDC !!! can not access to CDC hits" << std::endl;
+    //...Loop over CDCHit...
+    StoreArray<CDCHit> CDCHits("CDCHits");
+    if (! CDCHits) {
+        cout << "TRGCDC !!! can not access to CDCHits" << std::endl;
         TRGDebug::leaveStage("TRGCDC update");
         return;
     }
 
-    const unsigned nHits = cdcHits->GetEntries();
+
+    const unsigned nHits = CDCHits->GetEntries();
+
     for (unsigned i = 0; i < nHits; i++) {
 //        const HitCDC & h = * cdcHits[i];
-        HitCDC & h = * cdcHits[i];
+        CDCHit & h = * CDCHits[i];
 
 //         //...Check validity...
 //         if (! (h->m_stat & WireHitFindingValid)) continue;
 
         //...Wire...
-        const unsigned layerId = h.getLayerId();
-        const unsigned wireId = h.getWireId();
+        int t_layerId;
+        if(h.getISuperLayer()==0) t_layerId = h.getILayer();
+        else t_layerId = h.getILayer()+6*h.getISuperLayer()+2;
+        const unsigned layerId = t_layerId;
+        const unsigned wireId = h.getIWire();
+
         const TCWire & w = * wire(layerId, wireId);
+
 
 //        cout << "lid,wid=" << layerId << "," << wireId << std::endl;
 
         //...TCWireHit...
-        TCWHit * hit = new TCWHit(w,
-				  h.getLeftDriftLength(),
-				  0.15,
-				  h.getRightDriftLength(),
-				  0.15,
-				  1);
+        TCWHit * hit = new TCWHit(w,h.getDriftTime(),0.15,h.getDriftTime(),0.15,1);
+
 //      hit->state(WireHitFindingValid | WireHitFittingValid );
 
         //...Store a hit...

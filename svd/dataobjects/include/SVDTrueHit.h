@@ -47,7 +47,7 @@ namespace Belle2 {
       VXDTrueHit(sensorID, u, v, energyDep, globalTime, momentum, entryMomentum, exitMomentum)
     {}
 
-    ClassDef(SVDTrueHit, 1)
+    ClassDef(SVDTrueHit, 2)
   };
 
 } // end namespace Belle2

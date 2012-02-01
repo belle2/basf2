@@ -239,7 +239,7 @@ void SimpleOutputModule::terminate()
   for (int ii = 0; ii < DataStore::c_NDurabilityTypes; ++ii) {
     if (m_treeNames[ii] != "NONE") {
       B2INFO("Write TTree " << m_treeNames[ii]);
-      m_tree[ii]->Write();
+      m_tree[ii]->Write(m_treeNames[ii].c_str(), TObject::kWriteDelete);
     }
   }
 

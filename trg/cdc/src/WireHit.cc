@@ -25,6 +25,7 @@ using namespace std;
 namespace Belle2 {
 
 TRGCDCWireHit::TRGCDCWireHit(const TRGCDCWire & w,
+			     unsigned indexCDCHit,
 			     float driftLeft,
 			     float driftLeftError,
 			     float driftRight,
@@ -34,7 +35,8 @@ TRGCDCWireHit::TRGCDCWireHit(const TRGCDCWire & w,
        _wire(w),
        _xyPosition(w.xyPosition()),
        _track(0),
-       _mc(0) {
+       _mc(0),
+       _iCDCHit(indexCDCHit) {
 //  w.hit(this); // set by TRGCDC
     _drift[0] = driftLeft;
     _drift[1] = driftRight;

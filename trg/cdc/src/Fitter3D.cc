@@ -268,6 +268,45 @@ namespace Belle2 {
 
       TRGDebug::enterStage("Fitter 3D");
 
+      //...TS study (loop over all TS's)...
+      const TRGCDC & cdc = * TRGCDC::getTRGCDC();
+      for (unsigned i = 0; i < cdc.nTrackSegmentLayers(); i++) {
+	  const Belle2::TRGCDCLayer * l = cdc.trackSegmentLayer(i);
+	  const unsigned nWires = l->nWires();
+	  if (! nWires) continue;
+	  unsigned ptn = 0;
+	  for (unsigned j = 0; j < nWires; j++) {
+	      const TCTSegment & s = (TCTSegment &) * (* l)[j];
+
+	      //...Get hit pattern...
+	      unsigned ptn = s.hitPattern();
+
+	      if (ptn != 0)
+		  cout << s.name() << " ... ptn=" << ptn << endl;
+
+	      //...Or cal. hit pattern by my self...
+	      const std::vector<const TCWire *> & wires = s.wires();
+	      unsigned ptn2 = 0;
+	      for (unsigned j = 0; j < wires.size(); j++) {
+		  const TRGSignal & s = wires[j]->triggerOutput();
+		  if (s.active()) {
+		      ptn2 |= (1 << j);
+
+		      //...Get index for CDCHit...
+		      unsigned ind = wires[j]->hit()->CDCHit();
+		      // Use 'ind' to access CDCSimHit.
+		  }
+	      }
+
+	      if (ptn != 0)
+		  cout << s.name() << " ... ptn2=" << ptn2 << endl;
+	  }
+      }
+    
+
+
+
+
       double cotnum=0,sxx=0,z0num=0;
       int z0nump1[4],z0nump2[4],z0den,iz0den;
 

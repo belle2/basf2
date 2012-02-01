@@ -607,7 +607,13 @@ TRGCDC::update(bool mcAnalysis) {
 //        cout << "lid,wid=" << layerId << "," << wireId << std::endl;
 
         //...TCWireHit...
-        TCWHit * hit = new TCWHit(w,h.getDriftTime(),0.15,h.getDriftTime(),0.15,1);
+        TCWHit * hit = new TCWHit(w,
+				  i,
+				  h.getDriftTime(),
+				  0.15,
+				  h.getDriftTime(),
+				  0.15,
+				  1);
 
 //      hit->state(WireHitFindingValid | WireHitFittingValid );
 
@@ -1133,7 +1139,7 @@ TRGCDC::simulate(void) {
 
     TRGDebug::enterStage("TRGCDC simulation");
 
-    //...TS hits...
+    //...Store TS hits...
     const unsigned n = _tss.size();
     for (unsigned i = 0; i < n; i++) {
         TCTSegment & s = * _tss[i];
@@ -1163,7 +1169,7 @@ TRGCDC::simulate(void) {
 
     //...3D tracker...
     vector<TCTrack *> trackList3D;
-//    _fitter3D->doit(trackList, trackList3D);
+    _fitter3D->doit(trackList, trackList3D);
 
     //...End of simulation...
 

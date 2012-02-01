@@ -81,6 +81,9 @@ class TRGCDCTrackSegment : public TRGCDCWire {
     /// returns a pointer to a TRGCDCTrackSegmentHit.
     const TRGCDCTrackSegmentHit * hit(void) const;
 
+    /// returns hit pattern.
+    unsigned hitPattern(void) const;
+
     /// dumps debug information.
     void dump(const std::string & message = std::string(""),
               const std::string & prefix = std::string("")) const;
@@ -225,6 +228,18 @@ inline
 const TRGCDCTrackSegmentHit *
 TRGCDCTrackSegment::hit(void) const {
     return _hit;
+}
+
+inline
+unsigned
+TRGCDCTrackSegment::hitPattern(void) const {
+    unsigned ptn = 0;
+    for (unsigned i = 0; i < _wires.size(); i++) {
+        const TRGSignal & s = _wires[i]->triggerOutput();
+        if (s.active())
+	    ptn |= (1 << i);
+    }
+    return ptn;
 }
 
 } // namespace Belle2

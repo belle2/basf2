@@ -47,7 +47,7 @@ TRGCDCTrackSegment::~TRGCDCTrackSegment() {
 void
 TRGCDCTrackSegment::dump(const string & msg,
                          const string & pre) const {
-    cout << pre << name() << endl;
+    cout << pre << name() << " (ptn=" << hitPattern() << ")" << endl;
     if ((msg.find("geometry") != string::npos) ||
         (msg.find("detail") != string::npos)) {
         cout << pre << "w " << _id;

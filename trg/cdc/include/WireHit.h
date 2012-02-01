@@ -71,6 +71,7 @@ class TRGCDCWireHit {
   public:
     /// Constructor.
     TRGCDCWireHit(const TRGCDCWire &,
+		  unsigned indexCDCHit = 0,
 		  float driftLeft = 0,
 		  float driftLeftError = 0,
 		  float driftRight = 0,
@@ -120,6 +121,9 @@ class TRGCDCWireHit {
     /// returns a pointer to TRGCDCWireHitMC.
     const TRGCDCWireHitMC * const mc(void) const;
 
+    /// returns an index to CDCHit.
+    unsigned CDCHit(void) const;
+
   public:// Modifiers
     /// sets state. Meaning of bits are written below.
     unsigned state(unsigned newState);
@@ -152,6 +156,9 @@ class TRGCDCWireHit {
     mutable const void * _track;
     const TRGCDCWireHitMC * _mc;
     mutable unsigned _sequentialLength;
+
+    /// Index to CDCHit array
+    unsigned _iCDCHit;
 
    // _state bit definition
 
@@ -290,6 +297,12 @@ inline
 unsigned
 TRGCDCWireHit::sequence(unsigned a) const {
     return _sequentialLength = a;
+}
+
+inline
+unsigned
+TRGCDCWireHit::CDCHit(void) const {
+    return _iCDCHit;
 }
 
 } // namespace Belle2

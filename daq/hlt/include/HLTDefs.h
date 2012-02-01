@@ -63,8 +63,12 @@ namespace Belle2 {
   const int gMaxHosts = 100;              /**< Maximum number of hosts to connect */
   const int gMaxConnections = 100;        /**< Maximum number of connection allowed */
   const int gMaxReceives = 1000000;       /**< Maximum size of incoming data allowed */
+  const int gBufferArray = 10;
 
-  const std::string gEOSTag = "EOS";      /**< End-of-stream tag for data capsulation */
+  const std::string gEOSTag = "EOSS";      /**< End-of-stream tag for data capsulation */
+  const std::string gTerminate = "Terminat";
+  const std::string gTerminationTag = gTerminate + gEOSTag;
+  //const std::string gTerminationTag = "Terminat" + gEOSTag;
 }
 
 #endif

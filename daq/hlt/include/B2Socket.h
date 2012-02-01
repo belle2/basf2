@@ -50,8 +50,10 @@ namespace Belle2 {
     EHLTStatus accept(int& newSocket);
     //! Send data through socket
     EHLTStatus send(const std::string data, int& size);
+    EHLTStatus send(char* data, int size);
     //! Receive data from socket
     EHLTStatus receive(int newSocket, std::string& buffer, int& size);
+    EHLTStatus receive(int newSocket, char* buffer, int& size);
 
   protected:
     //! Check if the socket is valid or not

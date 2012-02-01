@@ -47,6 +47,9 @@ namespace Belle2 {
 
     //! Encode data to be sent to ensure the singleton of data
     std::string makeSingleton(std::string data);
+    EHLTStatus makeSingleton(char* data, int size);
+
+    void writeFile(char* file, char* data, int size);
 
   protected:
     //! Initialize the HLTSender

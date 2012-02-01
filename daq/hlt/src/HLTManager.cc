@@ -47,15 +47,16 @@ EHLTStatus HLTManager::initSenders()
       sender.setBuffer(c_ControlPort + (*i).first);
 
       std::string temp = encodeNodeInfo((*i).first);
-      int bufferStatus = buffer->insq((int*)temp.c_str(), temp.size() / 4 + 1);
-      while (bufferStatus < 0) {
+      B2INFO("[HLTFramework] nodeinfo = " << temp.c_str());
+      while (buffer->insq((int*)temp.c_str(), (temp.size()) / 4 + 1) <= 0) {
         B2INFO("\x1b[31m[HLTReceiver] Ring buffer overflow. Retrying...");
-        bufferStatus = buffer->insq((int*)temp.c_str(), temp.size() / 4 + 1);
-        sleep(1);
+        usleep(100);
       }
 
-      sender.broadcasting();
-      sender.broadcasting("Terminate");
+      //sender.broadcasting();
+      sender.broadcasting(temp);
+      //sender.broadcasting("Terminate");
+      sender.broadcasting(gTerminate);
 
       return c_ChildSuccess;
     } else {

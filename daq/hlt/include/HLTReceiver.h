@@ -43,16 +43,25 @@ namespace Belle2 {
 
     //! Decode received data to ensure a singleton of data
     EHLTStatus decodeSingleton(std::string data, std::vector<std::string>& container);
+    EHLTStatus decodeSingleton(char* data, int size, char** container, int* sizes);
+
+    int findEOS(char* data, int size);
+    void writeFile(char* file, char* data, int size);
 
   protected:
     //! Initialize the HLTReceiver
     EHLTStatus init();
+    EHLTStatus flushInternalBuffer();
 
   private:
     unsigned int m_port;            /**< Port number for the connection */
 
     RingBuffer* m_buffer;           /**< Pointer to ring buffer for incoming data */
-    std::string m_internalBuffer;   /**< Internal buffer to store temporary part of data */
+    char m_internalBuffer[gBufferArray][gMaxReceives];
+    int m_internalBufferSizes[gBufferArray];
+    int m_internalBufferWriteIndex;
+    int m_internalBufferEntries;
+    //std::string m_internalBuffer;   /**< Internal buffer to store temporary part of data */
   };
 }
 

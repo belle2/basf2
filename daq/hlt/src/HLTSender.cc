@@ -50,23 +50,29 @@ EHLTStatus HLTSender::broadcasting()
     return c_Success;
   }
 
-  char temp[gMaxReceives];
+  char temp[gMaxReceives + gEOSTag.size()];
+  memset(temp, 0, gMaxReceives + gEOSTag.size());
+
   int bufferStatus = m_buffer->remq((int*)temp);
   if (bufferStatus < 0)
     return c_FuncError;
 
-  std::string rawMessage(temp);
-  std::string sendingMessage = makeSingleton(rawMessage);
+  //int size = (bufferStatus - 1) * 4;
+  int size = bufferStatus * 4;
 
-  int size = 0;
+  writeFile("sender", temp, size);
+  makeSingleton(temp, size);
+  size += gEOSTag.size() + 1;
 
-  while (send(sendingMessage, size) == c_FuncError) {
+  writeFile("senderAfterEncode", temp, size);
+
+  while (send(temp, size) == c_FuncError) {
     B2INFO("[HLTSender] \x1b[31mAn error occurred in sending so the data is put back to the ring buffer\x1b[0m");
     sleep(1);
   }
 
-  if (rawMessage == "Terminate") {
-    m_buffer->insq((int*)rawMessage.c_str(), rawMessage.size() / 4 + 1);
+  if (!strcmp(temp, gTerminationTag.c_str())) {
+    m_buffer->insq((int*)temp, size / 4 + 1);
     return c_TermCalled;
   }
 
@@ -79,6 +85,7 @@ EHLTStatus HLTSender::broadcasting(std::string data)
 
   std::string sendingMessage = makeSingleton(data);
 
+  writeFile("sender.manager", (char*)sendingMessage.c_str(), sendingMessage.size());
   if (send(sendingMessage, size) == c_FuncError)
     return c_FuncError;
   else {
@@ -107,7 +114,24 @@ EHLTStatus HLTSender::setBuffer(unsigned int key)
 std::string HLTSender::makeSingleton(std::string data)
 {
   std::string tempMessage(data);
-  tempMessage += "EOS";
+  tempMessage += gEOSTag;
 
   return tempMessage;
+}
+
+EHLTStatus HLTSender::makeSingleton(char* data, int size)
+{
+  char* eosTag = (char*)gEOSTag.c_str();
+  memcpy(data + sizeof(char) * size, eosTag, gEOSTag.size());
+
+  return c_Success;
+}
+
+void HLTSender::writeFile(char* file, char* data, int size)
+{
+  FILE* fp;
+  fp = fopen(file, "a");
+  for (int i = 0; i < size; i++)
+    fprintf(fp, "%c", data[i]);
+  fclose(fp);
 }

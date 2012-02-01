@@ -20,6 +20,8 @@ EHLTStatus HLTReceiver::init()
   if (bind(m_port) != c_Success)
     return c_InitFailed;
 
+  flushInternalBuffer();
+
   return c_Success;
 }
 
@@ -50,35 +52,44 @@ EHLTStatus HLTReceiver::listening()
     return c_InitFailed;
 
   while (status == c_Success) {
-    std::vector<std::string> givenMessages;
-    std::string data;
+    int givenMessageSizes[gBufferArray];
+    char** givenMessages;
+    givenMessages = (char**)malloc(sizeof(char*) * gBufferArray);
+    for (int i = 0; i < gBufferArray; i++) {
+      givenMessageSizes[i] = 0;
+      givenMessages[i] = (char*)malloc(sizeof(char) * gMaxReceives);
+    }
+
     int size = 0;
 
+    char data[gMaxReceives];
     while ((status = receive(newSocket, data, size)) != c_FuncError) {
-      decodeSingleton(data, givenMessages);
+      if (size > 0) {
+        writeFile("receiver", data, size);
+        decodeSingleton(data, (int)size, givenMessages, givenMessageSizes);
 
-      for (std::vector<std::string>::const_iterator i = givenMessages.begin();
-           i != givenMessages.end(); ++i) {
-        if ((*i).size() > 0) {
-          if ((*i) == "Terminate") {
+        int givenMessageIndex = 0;
+        while (givenMessageSizes[givenMessageIndex] > 0) {
+          B2INFO("[HLTReceiver] Processing " << givenMessages[givenMessageIndex]);
+          if (!strcmp(givenMessages[givenMessageIndex], gTerminate.c_str())) {
             B2INFO("\x1b[31m[HLTReceiver] Terminate tag met\x1b[0m");
-            int bufferStatus = m_buffer->insq((int*)(*i).c_str(), (*i).size() / 4 + 1);
-
-            while (bufferStatus < 0) {
-              B2INFO("\x1b[31m[HLTReceiver] Ring buffer overflow. Retrying...\x1b[0m");
-              bufferStatus = m_buffer->insq((int*)(*i).c_str(), (*i).size() / 4 + 1);
-              sleep(1);
+            writeFile("receiverAfterDecode", givenMessages[givenMessageIndex], givenMessageSizes[givenMessageIndex]);
+            while (m_buffer->insq((int*)givenMessages[givenMessageIndex],
+                                  givenMessageSizes[givenMessageIndex] / 4 + 1) <= 0) {
+              usleep(100);
             }
             return c_TermCalled;
           } else {
-            int bufferStatus = m_buffer->insq((int*)(*i).c_str(), (*i).size() / 4 + 1);
-            while (bufferStatus < 0) {
-              B2INFO("\x1b[31m[HLTReceiver] Ring buffer overflow. Retrying...\x1b[0m");
-              bufferStatus = m_buffer->insq((int*)(*i).c_str(), (*i).size() / 4 + 1);
-              m_buffer->dump_db();
-              sleep(1);
+            writeFile("receiverAfterDecode", givenMessages[givenMessageIndex], givenMessageSizes[givenMessageIndex]);
+            while (m_buffer->insq((int*)givenMessages[givenMessageIndex],
+                                  givenMessageSizes[givenMessageIndex] / 4 + 1) <= 0) {
+              usleep(100);
             }
           }
+          givenMessageIndex++;
+
+          if (givenMessageIndex > gBufferArray)
+            return c_Success;
         }
       }
     }
@@ -103,36 +114,122 @@ EHLTStatus HLTReceiver::setBuffer(unsigned int key)
   return c_Success;
 }
 
-EHLTStatus HLTReceiver::decodeSingleton(std::string data, std::vector<std::string>& container)
+EHLTStatus HLTReceiver::decodeSingleton(char* data, int size, char** container, int* sizes)
 {
-  container.clear();
-  std::string returnData;
-  size_t eos = data.find(gEOSTag);
+  for (int i = 0; i < gBufferArray; i++) {
+    memset(container[i], 0, sizeof(char) * gMaxReceives);
+    sizes[i] = 0;
+  }
 
-  if (eos == std::string::npos) {
-    m_internalBuffer += data;
-    return c_FuncError;
-  } else {
-    if (m_internalBuffer.size() > 0) {
-      std::string reconstructed;
-      reconstructed = m_internalBuffer + data.substr(0, eos);
-      container.push_back(reconstructed);
-      m_internalBuffer.clear();
-    } else
-      container.push_back(data.substr(0, eos));
+  int eos = findEOS(data, size);
 
-    data = data.substr(eos + gEOSTag.size(), std::string::npos);
+  if (eos < 0) {
+    if (m_internalBufferEntries < gBufferArray) {
+      memcpy(m_internalBuffer[m_internalBufferWriteIndex], data, size);
+      m_internalBufferSizes[m_internalBufferWriteIndex] = size;
 
-    while ((eos = data.find(gEOSTag)) != std::string::npos) {
-      container.push_back(data.substr(0, eos));
-      data = data.substr(eos + gEOSTag.size(), std::string::npos);
-    }
+      if (m_internalBufferWriteIndex == gBufferArray - 1)
+        m_internalBufferWriteIndex = 0;
+      else
+        m_internalBufferWriteIndex++;
 
-    if (data.size() != 0) {
-      m_internalBuffer = data;
+      m_internalBufferEntries++;
+
       return c_FuncError;
+    } else {
+      B2ERROR("[HLTReceiver] Internal buffer is full!");
+      return c_FuncError;
+    }
+  } else {
+    int containerPointer = 0;
+
+    if (m_internalBufferEntries > 0) {
+      B2INFO("[HLTReceiver] Internal buffer exists!");
+      int tempPosition = 0;
+      for (int i = 0; i < m_internalBufferEntries; i++) {
+        memcpy(container[containerPointer] + sizeof(char) * tempPosition,
+               m_internalBuffer[i], m_internalBufferSizes[i]);
+        tempPosition += m_internalBufferSizes[i];
+      }
+      flushInternalBuffer();
+
+      memcpy(container[containerPointer] + sizeof(char) * tempPosition,
+             data, eos);
+      sizes[containerPointer] = tempPosition + eos;
+      containerPointer++;
+      data = data + sizeof(char) * (eos + gEOSTag.size());
+      size = size - sizes[containerPointer] - gEOSTag.size();
+    } else {
+      memcpy(container[containerPointer], data, eos);
+      sizes[containerPointer] = eos;
+      containerPointer++;
+      data = data + sizeof(char) * (eos + gEOSTag.size());
+      size = size - sizes[containerPointer] - gEOSTag.size();
+
+      if (size <= 0)
+        return c_Success;
+
+      while ((eos = findEOS(data, size)) > 0) {
+        memcpy(container[containerPointer], data, eos);
+        sizes[containerPointer] = eos;
+        containerPointer++;
+        data = data + sizeof(char) * (eos + gEOSTag.size());
+        size = size - sizes[containerPointer] - gEOSTag.size();
+
+        if (size == 0)
+          return c_Success;
+      }
+
+      if (size > 0) {
+        memcpy(m_internalBuffer[m_internalBufferWriteIndex], data, size);
+        m_internalBufferSizes[m_internalBufferWriteIndex] = size;
+
+        if (m_internalBufferWriteIndex == gBufferArray - 1)
+          m_internalBufferWriteIndex = 0;
+        else
+          m_internalBufferWriteIndex++;
+
+        m_internalBufferEntries++;
+
+        return c_FuncError;
+      }
     }
   }
 
   return c_Success;
+}
+
+int HLTReceiver::findEOS(char* data, int size)
+{
+  int eos = 0;
+  char* eosTag = (char*)gEOSTag.c_str();
+
+  for (int i = 0; i < size - gEOSTag.size() + 1; i++) {
+    if (!memcmp(data + sizeof(char) * i, gEOSTag.c_str(), gEOSTag.size())) {
+      return i;
+    }
+  }
+  return -1;
+}
+
+EHLTStatus HLTReceiver::flushInternalBuffer()
+{
+  for (int i = 0; i < gBufferArray; i++) {
+    memset(m_internalBuffer[i], 0, gMaxReceives);
+    m_internalBufferSizes[i] = 0;
+  }
+
+  m_internalBufferWriteIndex = 0;
+  m_internalBufferEntries = 0;
+
+  return c_Success;
+}
+
+void HLTReceiver::writeFile(char* file, char* data, int size)
+{
+  FILE* fp;
+  fp = fopen(file, "a");
+  for (int i = 0; i < size; i++)
+    fprintf(fp, "%c", data[i]);
+  fclose(fp);
 }

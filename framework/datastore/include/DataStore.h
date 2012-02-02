@@ -185,9 +185,9 @@ namespace Belle2 {
     StoreMapIter<StoreArrayMap>* getArrayIterator(const EDurability& durability);
 
     //------------------------------ Start and end procedures --------------------------------------------------
-    /** Setter for initializeActive. */
-    void setInitializeActive(const bool active) {
-      initializeActive = active;
+    /** Setter for m_initializeActive. */
+    void setInitializeActive(bool active) {
+      m_initializeActive = active;
     }
 
     /** Clearing Maps of a specified durability.
@@ -225,7 +225,7 @@ namespace Belle2 {
     StoreArrayMap m_arrayMap[c_NDurabilityTypes];
 
     /** Creating new map slots is only allowed, if this boolean is true. */
-    bool initializeActive;
+    bool m_initializeActive;
   };
 } // namespace Belle2
 
@@ -234,20 +234,20 @@ template <class T> bool Belle2::DataStore::handleObject(const std::string& name,
                                                         const Belle2::DataStore::EDurability& durability,
                                                         bool generate, T*& AObject)
 {
-  const bool object_found = (m_objectMap[durability].find(name) != m_objectMap[durability].end());
-  bool store_successful = false; //true when new object created or given AObject was inserted
+  const bool objectFound = (m_objectMap[durability].find(name) != m_objectMap[durability].end());
+  bool storeSuccessful = false; //true when new object created or given AObject was inserted
 
-  if (!object_found || m_objectMap[durability][name] == 0) {
+  if (!objectFound || m_objectMap[durability][name] == 0) {
     // new slot in map needs to be created
-    if (!object_found && generate && !initializeActive) {
+    if (!objectFound && generate && !m_initializeActive) {
       // should only happen in the initialize phase
       //shall soon be replaced with a B2ERROR message
-      B2WARNING("initializeActive is false while you try to create an object " << name << " under EDurability " << durability);
+      B2WARNING("m_initializeActive is false while you try to create an object " << name << " under EDurability " << durability);
     }
     if (AObject == 0 && generate) {
       AObject = new T;
       B2DEBUG(100, "Object with name " << name << " and durability " << durability << " was created.");
-      store_successful = true;
+      storeSuccessful = true;
     }
     if (AObject != 0)
       m_objectMap[durability][name] = AObject;
@@ -257,7 +257,7 @@ template <class T> bool Belle2::DataStore::handleObject(const std::string& name,
       B2INFO("Found existing object '" << name << "', overwriting.");
       delete m_objectMap[durability][name];
       m_objectMap[durability][name] = AObject;
-      store_successful = true;
+      storeSuccessful = true;
     }
     AObject = dynamic_cast<T*>(m_objectMap[durability][name]);
     if (AObject == 0) {
@@ -265,7 +265,7 @@ template <class T> bool Belle2::DataStore::handleObject(const std::string& name,
     }
   }
 
-  return store_successful;
+  return storeSuccessful;
 }
 
 
@@ -273,12 +273,12 @@ template <class T> bool Belle2::DataStore::handleArray(const std::string& name,
                                                        const Belle2::DataStore::EDurability& durability,
                                                        TClonesArray*& array)
 {
-  const bool register_new_array = (m_arrayMap[durability].find(name) == m_arrayMap[durability].end());
+  const bool registerNewArray = (m_arrayMap[durability].find(name) == m_arrayMap[durability].end());
 
-  if (register_new_array) { // new slot in map needs to be created
-    if (!initializeActive) { // should only happen in the initialize phase
+  if (registerNewArray) { // new slot in map needs to be created
+    if (!m_initializeActive) { // should only happen in the initialize phase
       //shall soon be replaced with an B2ERROR message
-      B2WARNING("initializeActive is false while you try to create an array " << name << " under EDurability " << durability);
+      B2WARNING("m_initializeActive is false while you try to create an array " << name << " under EDurability " << durability);
     }
     if (array == 0) {
       array = new TClonesArray(T::Class()); // use default constructor
@@ -303,7 +303,7 @@ template <class T> bool Belle2::DataStore::handleArray(const std::string& name,
     }
   }
 
-  return register_new_array;
+  return registerNewArray;
 }
 
 #endif // DATASTORE_H

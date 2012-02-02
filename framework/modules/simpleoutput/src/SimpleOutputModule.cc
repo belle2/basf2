@@ -36,14 +36,14 @@ SimpleOutputModule::SimpleOutputModule() : Module(), m_experiment(0), m_runLow(0
   m_runHigh(0), m_eventHigh(0)
 {
   //Set module properties
-  setDescription("simple output");
+  setDescription("Writes datastore objects into a .root file");
   setPropertyFlags(c_Output);
 
   //Initialization of some member variables
   for (int jj = 0; jj < DataStore::c_NDurabilityTypes; jj++) {
     m_size[jj] = 0;
     m_objects[jj] = 0;
-    m_treeNames[jj]   = "NONE";
+    m_treeNames[jj] = "NONE";
   }
 
   m_file = 0;

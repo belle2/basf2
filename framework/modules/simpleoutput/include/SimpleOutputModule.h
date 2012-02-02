@@ -44,8 +44,6 @@ namespace Belle2 {
   public:
 
     /** Constructor.
-     *
-     *  The following module properties are set: <br>
      */
     SimpleOutputModule();
 
@@ -100,8 +98,6 @@ namespace Belle2 {
     size_t getSize(const int& mapID);
 
     /** Configuring the TFile.
-     *
-     *  Checks for duplicates in branchName vectors.
      */
     void setupTFile();
 
@@ -118,7 +114,7 @@ namespace Belle2 {
      *
      *  This function reads the elements from the respective durability map, eliminates the members
      *  that are in the inital branchNames vector and returns the remaining ones.
-     *  This way you can give a list of names, that should NOT be written out, instead
+     *  This way you can give a list of names that should NOT be written out, instead
      *  of a list of names to be written out.
      *
      *  @param durability Specifies branchNames to be taken.
@@ -148,7 +144,7 @@ namespace Belle2 {
      */
     std::vector<std::string> m_branchNames[DataStore::c_NDurabilityTypes];
 
-    /** Switch branchNames from exclusion to inclusion list.
+    /** Switch branchNames from inclusion to exclusion lists.
      *
      * Switching happens, if the variable is true.
      */
@@ -189,7 +185,7 @@ namespace Belle2 {
     TObject** m_objects[DataStore::c_NDurabilityTypes];
 
     /** Iterators over the maps.*/
-    StoreIter* m_iter[2*DataStore::c_NDurabilityTypes];
+    StoreIter* m_iter[2 * DataStore::c_NDurabilityTypes];
 
     /** ROOT Object ID Restore Counter.*/
     int m_nObjID;

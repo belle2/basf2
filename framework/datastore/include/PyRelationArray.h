@@ -33,7 +33,7 @@ namespace Belle2 {
     * @param name Name of the relation array
     * @param durability 0: event, 1: run, 2: persistent
     */
-    PyRelationArray(const std::string &name, int durability = 0);
+    PyRelationArray(const std::string& name, int durability = 0);
 
     /** returns number of relations */
     int getEntries() const {
@@ -64,7 +64,7 @@ namespace Belle2 {
     RelationArray m_relations;
 
     /** maps from-index to to-indices */
-    std::map<unsigned int, std::vector<unsigned int> > m_toindices_map;
+    std::map<unsigned int, std::vector<unsigned int> > m_toindicesMap;
 
     ClassDef(PyRelationArray, 0);
   };

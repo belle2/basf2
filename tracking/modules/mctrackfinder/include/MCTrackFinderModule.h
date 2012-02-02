@@ -89,6 +89,8 @@ namespace Belle2 {
     std::string m_gfTrackCandsColName;                          /**< TrackCandidates collection name */
     std::string m_gfTrackCandToMCParticleColName;               /**< TrackCandidates to MCParticles relation name */
 
+    int m_notEnoughtHitsCounter;
+
 
   };
 }

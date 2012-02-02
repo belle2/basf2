@@ -18,9 +18,9 @@
 #include <framework/logging/Logger.h>
 
 //ecl package headers
-#include <ecl/hitecl/ECLSimHit.h>
-#include <ecl/hitecl/HitECL.h>
-#include <ecl/geoecl/ECLGeometryPar.h>
+#include <ecl/dataobjects/ECLSimHit.h>
+#include <ecl/dataobjects/HitECL.h>
+#include <ecl/geometry/ECLGeometryPar.h>
 
 //root
 #include <TVector3.h>
@@ -54,7 +54,7 @@ ECLHitModule::ECLHitModule() : Module()
   // Set description
 //  setDescription("ECLHitMakerModule");
 
-  setDescription("ECLDigiModuletizer");
+  setDescription("ECLHitMakerModule");
   // Add parameters
   // I/O
   addParam("ECLHitInputColName", m_inColName, "Input Array // Output from g4sim module", string("ECLSimHits"));

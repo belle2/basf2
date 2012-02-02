@@ -20,7 +20,7 @@
 //     [] if corr then E/Angle corr
 //     5. CR/Shower Attrs
 
-#include <ecl/geoecl/ECLGeometryPar.h>
+#include <ecl/geometry/ECLGeometryPar.h>
 #include <ecl/rec_lib/TEclCFCR.h>
 #include <ecl/rec_lib/TRecEclCF.h>
 

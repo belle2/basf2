@@ -13,7 +13,7 @@
 #include <framework/gearbox/Unit.h>
 #include <cmath>
 #include <boost/format.hpp>
-#include <ecl/geoecl/ECLGeometryPar.h>
+#include <ecl/geometry/ECLGeometryPar.h>
 #include <cmath>
 #include <boost/format.hpp>
 #include <iostream>

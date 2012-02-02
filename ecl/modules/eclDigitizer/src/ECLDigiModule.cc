@@ -9,11 +9,11 @@
  **************************************************************************/
 
 #include <ecl/modules/eclDigitizer/ECLDigiModule.h>
-#include <ecl/hitecl/HitECL.h>
+#include <ecl/dataobjects/HitECL.h>
 #include <ecl/dataobjects/DigiECL.h>
 #include <ecl/dataobjects/DspECL.h>
 #include <ecl/dataobjects/TrigECL.h>
-#include <ecl/geoecl/ECLGeometryPar.h>
+#include <ecl/geometry/ECLGeometryPar.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Unit.h>

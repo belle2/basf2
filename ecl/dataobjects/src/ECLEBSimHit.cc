@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "ecl/hitecl/ECLEBSimHit.h"
+#include "ecl/dataobjects/ECLEBSimHit.h"
 
 using namespace std;
 using namespace Belle2;

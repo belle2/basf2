@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <ecl/geoecl/ECLGeometryPar.h>
+#include <ecl/geometry/ECLGeometryPar.h>
 #include <ecl/rec_lib/TEclCFCR.h>
 
 

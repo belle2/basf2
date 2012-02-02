@@ -19,7 +19,7 @@
 #include <iostream>
 #include <iomanip>
 #include <fstream>
-#include <ecl/geoecl/ECLGeometryPar.h>
+#include <ecl/geometry/ECLGeometryPar.h>
 #include <ecl/rec_lib/TEclCFShower.h>
 #include <ecl/rec_lib/TRecEclCFParameters.h>
 #include "TVector3.h"

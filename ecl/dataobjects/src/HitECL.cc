@@ -8,9 +8,9 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "ecl/dataobjects/ECLSimHit.h"
+#include "ecl/dataobjects/HitECL.h"
 
 using namespace std;
 using namespace Belle2;
 
-ClassImp(ECLSimHit)
+ClassImp(HitECL)

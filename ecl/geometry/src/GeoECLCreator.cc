@@ -10,9 +10,9 @@
 
 #include <framework/gearbox/Unit.h>
 
-#include <ecl/geoecl/GeoECLCreator.h>
-#include <ecl/geoecl/ECLGeometryPar.h>
-#include <ecl/simecl/ECLSensitiveDetector.h>
+#include <ecl/geometry/GeoECLCreator.h>
+#include <ecl/geometry/ECLGeometryPar.h>
+#include <ecl/simulation/SensitiveDetector.h>
 #include <simulation/background/BkgSensitiveDetector.h>
 
 
@@ -215,7 +215,7 @@ namespace Belle2 {
 
     GeoECLCreator::GeoECLCreator(): isBeamBkgStudy(0)
     {
-      m_sensitive = new ECLSensitiveDetector("ECLSensitiveDetector", (2 * 24)*eV, 10 * MeV);
+      m_sensitive = new SensitiveDetector("SensitiveDetector", (2 * 24)*eV, 10 * MeV);
       logical_ecl = 0;
       physical_ecl = 0;
     }

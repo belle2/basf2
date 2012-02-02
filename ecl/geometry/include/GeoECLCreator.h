@@ -16,7 +16,7 @@
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
 
-#include <ecl/simecl/ECLSensitiveDetector.h>
+#include <ecl/simulation/ECLSensitiveDetector.h>
 
 class G4LogicalVolume;
 class G4VPhysicalVolume;

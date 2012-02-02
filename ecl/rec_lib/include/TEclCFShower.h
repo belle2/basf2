@@ -18,7 +18,7 @@
 #include <vector>
 #include <fstream>
 #include <functional>
-#include <ecl/geoecl/ECLGeometryPar.h>
+#include <ecl/geometry/ECLGeometryPar.h>
 
 #include "TVector3.h"
 #include "TMatrix.h"

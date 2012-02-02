@@ -12,7 +12,7 @@
 #include <ecl/dataobjects/DigiECL.h>
 #include <ecl/dataobjects/RecCRECL.h>
 
-#include <ecl/geoecl/ECLGeometryPar.h>
+#include <ecl/geometry/ECLGeometryPar.h>
 #include <ecl/rec_lib/TEclCFCR.h>
 #include <ecl/rec_lib/TRecEclCF.h>
 #include <ecl/rec_lib/TRecEclCFParameters.h>

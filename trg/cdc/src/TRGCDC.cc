@@ -266,7 +266,7 @@ TRGCDC::initialize(bool houghFinderPerfect,
         if (nLayers < 5) {
             cout << "TRGCDC !!! can not create TS because "
                       << "#layers is less than 5 in super layer " << i
-                      << std::endl;
+                      << endl;
             continue;
         }
 
@@ -335,9 +335,9 @@ TRGCDC::initialize(bool houghFinderPerfect,
             const TCWire & wi = * slayer[0]->front();
             const unsigned layerId = wi.layerId();
             cout << layerId << "," << cdc2.senseWireR(layerId) << ","
-                 << cdc2.fieldWireR(layerId) << std::endl;
+                 << cdc2.fieldWireR(layerId) << endl;
             cout << "    super layer " << i << " radius=" << _r[i] << "(r^2="
-                 << _r2[i] << ")" << std::endl;
+                 << _r2[i] << ")" << endl;
         }
     }
 
@@ -375,7 +375,7 @@ TRGCDC::dump(const std::string & msg) const {
         msg.find("state") != std::string::npos) {
         cout << "Debug Level=" << _debugLevel;
     }
-    cout << std::endl;
+    cout << endl;
 
     std::string tab("        ");
 
@@ -383,41 +383,41 @@ TRGCDC::dump(const std::string & msg) const {
 
         //...Get information..."
         unsigned nLayer = _layers.size();
-        cout << "    version    : " << version() << std::endl;
-        cout << "    cdc version: " << versionCDC() << std::endl;
-        cout << "    # of wires : " << _wires.size() << std::endl;
-        cout << "    # of layers: " << nLayer << std::endl;
-        cout << "    super layer information" << std::endl;
+        cout << "    version    : " << version() << endl;
+        cout << "    cdc version: " << versionCDC() << endl;
+        cout << "    # of wires : " << _wires.size() << endl;
+        cout << "    # of layers: " << nLayer << endl;
+        cout << "    super layer information" << endl;
         cout << "        # of super layers() = "
-               << nSuperLayers() << std::endl;
+               << nSuperLayers() << endl;
         cout << "        # of Axial super layers = "
-               << nAxialSuperLayers() << std::endl;
+               << nAxialSuperLayers() << endl;
         cout << "        # of Stereo super layers = "
-               << nStereoSuperLayers() << std::endl;
+               << nStereoSuperLayers() << endl;
 
         if (msg.find("superLayers") != std::string::npos) {
-            cout << "        super layer detail" << std::endl;
-            cout << "            id #layers (stereo type)" << std::endl;
+            cout << "        super layer detail" << endl;
+            cout << "            id #layers (stereo type)" << endl;
             for (unsigned i = 0; i < nSuperLayers(); ++i) {
                 const unsigned n = _superLayers[i]->size();
                 cout << "            " << i << "  " << n << " (";
                 for (unsigned j = 0; j < n; j++) {
                     cout << (* _superLayers[i])[0]->stereoType();
                 }
-                cout << ")" << std::endl;
+                cout << ")" << endl;
             }
         }
 
-        cout << "    layer information" << std::endl;
+        cout << "    layer information" << endl;
         cout << "        # of Axial layers = "
-                                    << nAxialLayers() << std::endl;
+                                    << nAxialLayers() << endl;
         cout << "        # of Stereo layers = "
-                                    << nStereoLayers() << std::endl;
+                                    << nStereoLayers() << endl;
 
         if (msg.find("layers") != std::string::npos) {
-            cout << "        layer detail" << std::endl;
+            cout << "        layer detail" << endl;
             cout << "            id type sId #wires lId asId assId"
-                   << std::endl;
+                   << endl;
             for (unsigned int i = 0; i < nLayers(); ++i) {
                 const TRGCDCLayer & l = * _layers[i];
                 cout << "            " << i
@@ -427,12 +427,12 @@ TRGCDC::dump(const std::string & msg) const {
                        << " " << l.localLayerId()
                        << " " << l.axialStereoLayerId()
                        << " " << l.axialStereoSuperLayerId()
-                       << std::endl;
+                       << endl;
             }
         }
         
         if (msg.find("wires") != std::string::npos) {
-            cout << "    wire information" << std::endl;
+            cout << "    wire information" << endl;
             for (unsigned i = 0; i < nWires(); i++)
                 (_wires[i])->dump("neighbor", tab);
         }
@@ -440,22 +440,46 @@ TRGCDC::dump(const std::string & msg) const {
         return;
     }
     if (msg.find("hits") != std::string::npos) {
-        cout << "    hits : " << _hits.size()
-                                    << std::endl;
+        cout << "    hits : " << _hits.size() << endl;
         for (unsigned i = 0; i < (unsigned) _hits.size(); i++)
             _hits[i]->dump("mc drift", tab);
     }
     if (msg.find("axialHits") != std::string::npos) {
-        cout << "    hits : "
-                                    << _axialHits.size() << std::endl;
+        cout << "    hits : " << _axialHits.size() << endl;
         for (unsigned i = 0; i < (unsigned) _axialHits.size(); i++)
             _axialHits[i]->dump("mc drift", tab);
     }
     if (msg.find("stereoHits") != std::string::npos) {
-        cout << "    hits : "
-                                    << _stereoHits.size() << std::endl;
+        cout << "    hits : " << _stereoHits.size() << endl;
         for (unsigned i = 0; i < (unsigned) _stereoHits.size(); i++)
             _stereoHits[i]->dump("mc drift", tab);
+    }
+    if (msg.find("trgWireHits") != std::string::npos) {
+        const string dumpOption = "trigger detail";
+        cout << "    wire hits" << endl;
+        for (unsigned i = 0; i < nWires(); i++) {
+            const TCWire & w = * wire(i);
+            if (w.triggerOutput().active())
+                w.dump(dumpOption, TRGDebug::tab(4));
+        }
+    }
+    if (msg.find("trgWireCentralHits") != std::string::npos) {
+        const string dumpOption = "trigger detail";
+        cout << "    wire hits" << endl;
+        for (unsigned i = 0; i < nTrackSegments(); i++) {
+            const TCTSegment & s = * trackSegment(i);
+            if (s.wires()[5]->triggerOutput().active())
+                s.wires()[5]->dump(dumpOption, TRGDebug::tab(4));
+        }
+    }
+    if (msg.find("trgTSHits") != std::string::npos) {
+        const string dumpOption = "trigger detail";
+        cout << "    TS hits" << endl;
+        for (unsigned i = 0; i < nTrackSegments(); i++) {
+            const TCTSegment & s = * trackSegment(i);
+            if (s.triggerOutput().active())
+                s.dump(dumpOption, TRGDebug::tab(4));
+        }
     }
 }
 
@@ -486,7 +510,7 @@ TRGCDC::wire(float r, float p) const {
     //...Not implemented yet...
     return _wires[0];
 
-// //     cout << "r,phi = " << r << "," << p << std::endl;
+// //     cout << "r,phi = " << r << "," << p << endl;
 
 // //     unsigned id = 25;
 // //     bool ok = false;
@@ -571,25 +595,23 @@ TRGCDC::update(bool mcAnalysis) {
 
     StoreArray<CDCSimHit> cdcArray("CDCSimHits");
     if (! cdcArray) {
-        cout << "TRGCDC !!! can not access to CDC sim hits" << std::endl;
+        cout << "TRGCDC !!! can not access to CDC sim hits" << endl;
     }
     const int n = cdcArray->GetEntriesFast();
     
-
     //...Loop over CDCHit...
     StoreArray<CDCHit> CDCHits("CDCHits");
     if (! CDCHits) {
-        cout << "TRGCDC !!! can not access to CDCHits" << std::endl;
+        cout << "TRGCDC !!! can not access to CDCHits" << endl;
         TRGDebug::leaveStage("TRGCDC update");
         return;
     }
 
-
     const unsigned nHits = CDCHits->GetEntries();
 
     for (unsigned i = 0; i < nHits; i++) {
-//        const HitCDC & h = * cdcHits[i];
-        CDCHit & h = * CDCHits[i];
+//      const HitCDC & h = * cdcHits[i];
+        const CDCHit & h = * CDCHits[i];
 
 //         //...Check validity...
 //         if (! (h->m_stat & WireHitFindingValid)) continue;
@@ -603,8 +625,7 @@ TRGCDC::update(bool mcAnalysis) {
 
         const TCWire & w = * wire(layerId, wireId);
 
-
-//        cout << "lid,wid=" << layerId << "," << wireId << std::endl;
+//        cout << "lid,wid=" << layerId << "," << wireId << endl;
 
         //...TCWireHit...
         TCWHit * hit = new TCWHit(w,
@@ -716,13 +737,13 @@ TRGCDC::updateMC(void) {
 //         }
 // //         if (h->m_hep>0 && hep) hep->_hits.push_back(hit);
 // //         else {
-// //           cout << "TRGCDC::updateMC !!! mission impossible" << std::endl;
+// //           cout << "TRGCDC::updateMC !!! mission impossible" << endl;
 // //           cout << "                   This error will cause trasan crush";
-// //           cout << std::endl;
+// //           cout << endl;
 // //           cout << "    h->m_hep, h->m_hep -1 = " << h->m_hep;
-// //           cout << ", " << h->m_hep - 1 << std::endl;
+// //           cout << ", " << h->m_hep - 1 << endl;
 // //           cout << "    TRGCDCTrackMC list length = ";
-// // //cnv          cout << TRGCDCTrackMC::list().size() << std::endl;
+// // //cnv          cout << TRGCDCTrackMC::list().size() << endl;
 // // //cnv          BsShwDat(GEN_HEPEVT);
 // // //cnv          BsShwDat(DATRGCDC_MCWIRHIT);
 // //        }
@@ -808,7 +829,7 @@ TRGCDC::axialHits(void) const {
 
 //     if (! mask) return _axialHits;
 //     else if (mask == WireHitFindingValid) return _axialHits;
-//     cout << "TRGCDC::axialHits !!! unsupported mask given" << std::endl;
+//     cout << "TRGCDC::axialHits !!! unsupported mask given" << endl;
 //  return _axialHits;
 }
 
@@ -820,7 +841,7 @@ TRGCDC::stereoHits(void) const {
 
 //     if (! mask) return _stereoHits;
 //     else if (mask == WireHitFindingValid) return _stereoHits;
-//     cout << "TRGCDC::stereoHits !!! unsupported mask given" << std::endl;
+//     cout << "TRGCDC::stereoHits !!! unsupported mask given" << endl;
 //     return _stereoHits;
 }
 
@@ -832,7 +853,7 @@ TRGCDC::hits(void) const {
 
 //     if (! mask) return _hits;
 //     else if (mask == WireHitFindingValid) return _hits;
-//     cout << "TRGCDC::hits !!! unsupported mask given" << std::endl;
+//     cout << "TRGCDC::hits !!! unsupported mask given" << endl;
 //     return _hits;
 }
 
@@ -893,7 +914,7 @@ TRGCDC::wireName(unsigned wireId) const {
 unsigned
 TRGCDC::localId(unsigned id) const {
     cout << "TRGCDC::localId !!! this function is not tested yet"
-              << std::endl;
+              << endl;
     unsigned iLayer = 0;
     unsigned nW = 0;
     unsigned nWLast = 0;
@@ -906,14 +927,14 @@ TRGCDC::localId(unsigned id) const {
         if (nW >= nWires())
             nextLayer = false;
     }
-    cout << "TRGCDC::localId !!! no such a wire (id=" << id << std::endl;
+    cout << "TRGCDC::localId !!! no such a wire (id=" << id << endl;
     return TRGCDC_UNDEFINED;
 }
 
 unsigned
 TRGCDC::layerId(unsigned id) const {
     cout << "TRGCDC::layerId !!! this function is not tested yet"
-              << std::endl;
+              << endl;
     unsigned iLayer = 0;
     unsigned nW = 0;
     bool nextLayer = true;
@@ -924,14 +945,14 @@ TRGCDC::layerId(unsigned id) const {
         if (nW >= nWires())
             nextLayer = false;
     }
-    cout << "TRGCDC::layerId !!! no such a wire (id=" << id << std::endl;
+    cout << "TRGCDC::layerId !!! no such a wire (id=" << id << endl;
     return TRGCDC_UNDEFINED;
 }
 
 unsigned
 TRGCDC::layerId(unsigned as, unsigned id) const {
     cout << "TRGCDC::layerId !!! this function is not implemented yet"
-              << std::endl;
+              << endl;
     return TRGCDC_UNDEFINED;    
 }
 
@@ -952,7 +973,7 @@ TRGCDC::superLayerId(unsigned id) const {
             nextLayer = false;
     }
     cout << "TRGCDC::superLayerId !!! no such a wire (id=" << id
-              << std::endl;
+              << endl;
     return TRGCDC_UNDEFINED;
 }
 
@@ -974,7 +995,7 @@ TRGCDC::localLayerId(unsigned id) const {
             nextLayer = false;
     }
     cout << "TRGCDC::localLayerId !!! no such a wire (id=" << id
-              << std::endl;
+              << endl;
     return TRGCDC_UNDEFINED;
 }
 
@@ -983,7 +1004,7 @@ TRGCDC::axialStereoSuperLayerId(unsigned axialStereo,
                               unsigned axialStereoLayerId) const {
     cout << "TRGCDC::axialStereoSuperLayerId !!! "
               << "this function is not implemented yet"
-              << std::endl;
+              << endl;
     return TRGCDC_UNDEFINED;
 }
 
@@ -1150,7 +1171,7 @@ TRGCDC::simulate(void) {
 
     if (TRGDebug::level() > 1) {
         cout << TRGDebug::tab() << "TS hit list" << endl;
-        string dumpOption = "trigger";
+	string dumpOption = "trigger";
         if (TRGDebug::level() > 2)
             dumpOption = "detail";
         for (unsigned i = 0; i < nTrackSegments(); i++) {

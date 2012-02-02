@@ -52,6 +52,15 @@ class TRGUtilities {
     static void bitDisplay(unsigned val,
                            unsigned firstDigit,
                            unsigned lastDigit);
+
+    /// Dumps bit stream in string.
+    static std::string streamDisplay(unsigned);
+
+    /// Dumps bit stream in string.
+    static std::string streamDisplay(unsigned,
+				     unsigned firstDigit,
+				     unsigned lastDigit);
+
 };
 
 //-----------------------------------------------------------------------------

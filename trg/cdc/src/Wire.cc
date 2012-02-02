@@ -77,11 +77,14 @@ TRGCDCWire::dump(const string & msg, const string & pre) const {
     cout << ",super layer " << superLayerId();
     cout << ",local layer " << localLayerId();
     cout << endl;
-    if (msg.find("neighbor") != string::npos ||
-        msg.find("detail") != string::npos) {
+    if (msg.find("neighbor") != string::npos) {
         for (unsigned i = 0; i < 7; i++)
             if (neighbor(i))
                 neighbor(i)->dump("", pre + TRGUtil::itostring(i) + "   ");
+    }    
+    if (msg.find("trigger") != string::npos ||
+        msg.find("detail") != string::npos) {
+	triggerOutput().dump(msg, pre + "    ");
     }    
 }
   
@@ -444,45 +447,18 @@ TRGCDCWire::triggerOutput(void) const {
         //   coefficient used here must be re-calculated.
         float driftTime = _hit->drift() * 10 * 1000 / 40;
         
-//        cout << name() << " drift=" << _hit->drift() << endl;
+//      cout << name() << " drift=" << _hit->drift() << endl;
 
-         TRGTime rise = TRGTime(driftTime, true, clock, name() + string("trg"));
+        TRGTime rise = TRGTime(driftTime, true, clock, name() + string("trg"));
         TRGTime fall = rise;
         fall.shift(1).reverse();
         _triggerOutput = TRGSignal(rise & fall);
-//        _triggerOutput->name(name() + string("to"));
-//        _triggerOutput->dump();
+//      _triggerOutput->name(name() + string("to"));
+//      _triggerOutput->dump();
         
         return _triggerOutput;
 
     }
-
-//     if (! _hit)
-//         return 0;
-
-//     if (_triggerOutput) {
-//         return _triggerOutput;
-//     }
-//     else {
-
-//         //...Clock...
-//         const TRGClock & clock = TRGCDC::getTRGCDC()->systemClock();
-
-//         //...Drift legnth(micron) to drift time(ns)...
-//         //   coefficient used here must be re-calculated.
-//         float driftTime = _hit->drift() * 10 * 1000 / 40;
-        
-// //        cout << name() << " drift=" << _hit->drift() << endl;
-
-//         TRGTime rise = TRGTime(driftTime, true, clock, name() + string("trg"));
-//         TRGTime fall = rise;
-//         fall.shift(1).reverse();
-//         _triggerOutput = new TRGSignal(rise & fall);
-//         _triggerOutput->name(name() + string("to"));
-// //        _triggerOutput->dump();
-        
-//         return _triggerOutput;
-//     }
 }
 
 

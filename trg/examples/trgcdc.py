@@ -36,6 +36,7 @@ g4sim       = register_module('FullSim')
 cdcdigitizer = register_module('CDCDigi')
 out         = register_module('SimpleOutput')
 cdctrg      = fw.register_module("TRGCDC")
+tsstream    = fw.register_module("TRGCDCTSStream")
 #mcparticle  = fw.register_module('PrintMCParticles')
 
 
@@ -74,6 +75,7 @@ main.add_module(mcparticleprinter)
 main.add_module(g4sim)
 main.add_module(cdcdigitizer)
 main.add_module(cdctrg)
+main.add_module(tsstream)
 #main.add_module(out)
 
 #Process events

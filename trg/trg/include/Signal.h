@@ -54,6 +54,9 @@ class TRGSignal {
     /// returns true if there is a signal.
     bool active(void) const;
 
+    /// returns true if signal is active in given clock position.
+    bool active(int clockPosition) const;
+
     /// dumps contents. "message" is to select information to dump. "pre" will be printed in head of each line.
     void dump(const std::string & message = "",
               const std::string & pre = "") const;
@@ -165,6 +168,22 @@ bool
 TRGSignal::active(void) const {
     if (_history.size())
         return true;
+    return false;
+}
+
+inline
+bool
+TRGSignal::active(int a) const {
+    if (_history.size()) {
+	bool last = false;
+	for (unsigned i = 0; i < _history.size(); i++) {
+	    if (_history[i].time() <= a)
+		last = _history[i].edge();
+	    else if (_history[i].time() > a)
+		break;
+	}
+	return last;
+    }
     return false;
 }
 

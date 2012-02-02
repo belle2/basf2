@@ -112,5 +112,20 @@ TRGUtil::bitDisplay(unsigned val, unsigned f, unsigned l) {
     }
 }
 
+string
+TRGUtil::streamDisplay(unsigned val, unsigned f, unsigned l) {
+    string s;
+    for (unsigned i = f; i < l + 1; i++) {
+        if ((i % 8) == 0) s += " ";
+        s += itostring((val >> (f - i)) % 2);
+    }
+    return s;
+}
+
+string
+TRGUtil::streamDisplay(unsigned val) {
+    return streamDisplay(val, 0, 63);
+}
+
 } // namespace Belle2
 

@@ -8,8 +8,6 @@
 
 #include <string>
 
-using namespace boost::python;
-
 namespace Belle2 {
   /** Python wrapper for Belle2::Module.
    *
@@ -21,43 +19,43 @@ namespace Belle2 {
   class PyModule : public Module {
   public:
     /** constructor */
-    PyModule(PyObject *p):
-        Module(),
-        m_self(p) { }
+    PyModule(PyObject* p):
+      Module(),
+      m_self(p) { }
 
     /** copy constructor */
-    PyModule(PyObject *p, const Module &m):
-        Module(m),
-        m_self(p) { }
+    PyModule(PyObject* p, const Module& m):
+      Module(m),
+      m_self(p) { }
 
     /** set the module's name.
     *
     * Use inside the python module's __init__ function
     */
-    void setName(const std::string &name) { setModuleName(name); }
+    void setName(const std::string& name) { setModuleName(name); }
 
 
     /* reimplement all virtual functions of base class and call the corresponding method in the python class
     * note that all methods must be registered in Module::exposePythonAPI()
     */
 
-    void initialize() { call_method<void>(m_self, "initialize"); };
-    void beginRun() { call_method<void>(m_self, "beginRun"); };
-    void event() { call_method<void>(m_self, "event"); };
-    void endRun() { call_method<void>(m_self, "endRun"); };
-    void terminate() { call_method<void>(m_self, "terminate"); };
+    void initialize() { boost::python::call_method<void>(m_self, "initialize"); };
+    void beginRun() { boost::python::call_method<void>(m_self, "beginRun"); };
+    void event() { boost::python::call_method<void>(m_self, "event"); };
+    void endRun() { boost::python::call_method<void>(m_self, "endRun"); };
+    void terminate() { boost::python::call_method<void>(m_self, "terminate"); };
 
     //@{
     /** default implementation used when Python module doesn't supply its own */
-    static void def_initialize(Module &m) { m.Module::initialize(); }
-    static void def_beginRun(Module &m) { m.Module::beginRun(); }
-    static void def_event(Module &m) { m.Module::event(); }
-    static void def_endRun(Module &m) { m.Module::endRun(); }
-    static void def_terminate(Module &m) { m.Module::terminate(); }
+    static void def_initialize(Module& m) { m.Module::initialize(); }
+    static void def_beginRun(Module& m) { m.Module::beginRun(); }
+    static void def_event(Module& m) { m.Module::event(); }
+    static void def_endRun(Module& m) { m.Module::endRun(); }
+    static void def_terminate(Module& m) { m.Module::terminate(); }
     //@}
 
   private:
-    PyObject *m_self; /**< the actual python module */
+    PyObject* m_self; /**< the actual python module */
   };
 }
 #endif

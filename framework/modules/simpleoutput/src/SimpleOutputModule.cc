@@ -10,14 +10,18 @@
 
 #include <framework/modules/simpleoutput/SimpleOutputModule.h>
 
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/datastore/StoreMapIter.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/dataobjects/FileMetaData.h>
 #include <framework/core/RandomNumbers.h>
 #include <framework/core/Environment.h>
 
 #include <TTreeIndex.h>
-#include <stdlib.h>
+#include <TProcessID.h>
+
 #include <time.h>
+#include <algorithm>
 
 
 using namespace std;

@@ -13,22 +13,18 @@
 
 #include <framework/core/Module.h>
 
-
-#include <string>
-#include <vector>
-#include <iostream>
-#include <algorithm>
-
-#include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreMapIter.h>
 
 #include <TFile.h>
 #include <TTree.h>
-#include <TProcessID.h>
+
+#include <string>
+#include <vector>
+
 
 
 namespace Belle2 {
+  class StoreIter;
 
   /** Write objects from DataStore into a ROOT file.
    *

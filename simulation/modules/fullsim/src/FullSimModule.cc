@@ -180,12 +180,12 @@ void FullSimModule::initialize()
   }
 
   //Apply the Geant4 UI commands
-  /*if (m_uiCommands.size() > 0) {
+  if (m_uiCommands.size() > 0) {
     G4UImanager* uiManager = G4UImanager::GetUIpointer();
     for (vector<string>::iterator iter = m_uiCommands.begin(); iter != m_uiCommands.end(); iter++) {
       uiManager->ApplyCommand(*iter);
     }
-  }*/
+  }
 }
 
 
@@ -196,12 +196,6 @@ void FullSimModule::beginRun()
 
   //Begin the Geant4 run
   RunManager::Instance().beginRun(eventMetaDataPtr->getRun());
-  if (m_uiCommands.size() > 0) {
-    G4UImanager* uiManager = G4UImanager::GetUIpointer();
-    for (vector<string>::iterator iter = m_uiCommands.begin(); iter != m_uiCommands.end(); iter++) {
-      uiManager->ApplyCommand(*iter);
-    }
-  }
 }
 
 

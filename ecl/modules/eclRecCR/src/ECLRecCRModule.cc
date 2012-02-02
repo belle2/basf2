@@ -129,7 +129,7 @@ void ECLRecCRModule::event()
       ///
       /// Shower Attributes
       ///
-      cout << "shower Energy: " << (*iShower).second.Energy() << " Theta " << (*iShower).second.Theta() / PI*180 << " Phi " << (*iShower).second.Phi() / PI*180 << endl;
+      cout << "shower Energy: " << (*iShower).second.Energy() << " Theta " << (*iShower).second.Theta() / PI * 180 << " Phi " << (*iShower).second.Phi() / PI * 180 << endl;
 
 //   for(Datecl_ehits_Manager::iterator ii = ehits_mgr.begin();
 //      ii != ehits_mgr.end(); ++ii) {

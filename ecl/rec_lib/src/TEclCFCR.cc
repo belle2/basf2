@@ -42,12 +42,12 @@ using namespace Belle2;
 // constructors and destructor
 //
 TEclCFCR::TEclCFCR(int id)
-    : fId(id)
+  : fId(id)
 {
 }
 
 TEclCFCR::TEclCFCR(const TEclCFCR& rhs)
-    : fId(rhs.fId),
+  : fId(rhs.fId),
     fMass(rhs.fMass), fEnergy(rhs.fEnergy), fWidth(rhs.fWidth),
     fShowers(rhs.fShowers),
     fEnergyHits(rhs.fEnergyHits),
@@ -64,7 +64,7 @@ TEclCFCR::~TEclCFCR()
 // assignment operators
 //
 const TEclCFCR&
-TEclCFCR::operator=(const TEclCFCR & rhs)
+TEclCFCR::operator=(const TEclCFCR& rhs)
 {
   if (this != &rhs) {
     fId = rhs.fId;

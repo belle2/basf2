@@ -27,11 +27,11 @@
 namespace Belle2 {
 
   struct TRecEclCFParameters {
-public:
+  public:
     TRecEclCFParameters();
     virtual ~TRecEclCFParameters();
 
-public:
+  public:
     /** Initial Parameters,
      *need different thresholds for endcap & barrel eventually
      */
@@ -61,7 +61,7 @@ public:
     ///(not used yet)
     double fEthCRSearch;
 //@}
-public:
+  public:
 //Control switches
     /// corr, cone, garbage collection ...
     int fEnergyAngleCorrection;

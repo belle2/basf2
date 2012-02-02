@@ -41,7 +41,7 @@ namespace Belle2 {
     virtual ~MEclCFShowerHA() {}
     ///
     MEclCFShowerHA(const MEclCFShowerHA& a)
-        : fId(a.fId), fFraction(a.fFraction) {}
+      : fId(a.fId), fFraction(a.fFraction) {}
     ///
     const MEclCFShowerHA& operator=(const MEclCFShowerHA& rhs) {
       if (this != &rhs) {
@@ -113,27 +113,27 @@ namespace Belle2 {
 
     ///
     TEclCFShower(const TEclCFShower& aShower)
-        : fId(aShower.fId)
-        , fEnergy(aShower.fEnergy)
-        , fTheta(aShower.fTheta)
-        , fPhi(aShower.fPhi)
-        , fDistance(aShower.fDistance)
+      : fId(aShower.fId)
+      , fEnergy(aShower.fEnergy)
+      , fTheta(aShower.fTheta)
+      , fPhi(aShower.fPhi)
+      , fDistance(aShower.fDistance)
 //   , fError(aShower.fError)
-        , fMass(aShower.fMass)
-        , fWidth(aShower.fWidth)
+      , fMass(aShower.fMass)
+      , fWidth(aShower.fWidth)
 
 //   , fE9oE25(aShower.fE9oE25)
 //   , fE9oE25unf(aShower.fE9oE25unf)
-        , fE3x3(aShower.fE3x3)
-        , fE5x5(aShower.fE5x5)
-        , fE3x3unf(aShower.fE3x3unf)
-        , fE5x5unf(aShower.fE5x5unf)
+      , fE3x3(aShower.fE3x3)
+      , fE5x5(aShower.fE5x5)
+      , fE3x3unf(aShower.fE3x3unf)
+      , fE5x5unf(aShower.fE5x5unf)
 //       , fNHits(aShower.fNHits)
-        , fNHitsUsed(aShower.fNHitsUsed)
+      , fNHitsUsed(aShower.fNHitsUsed)
 
-        , fStatus(aShower.fStatus)
-        , fGrade(aShower.fGrade)
-        , fHA(aShower.fHA) {
+      , fStatus(aShower.fStatus)
+      , fGrade(aShower.fGrade)
+      , fHA(aShower.fHA) {
     }
 
     /// assignment operator(s)

@@ -195,7 +195,7 @@ void ECLDigiModule::event()
   m_hitNum2 = eclTrigArray->GetLast() + 1;
   new(eclTrigArray->AddrAt(m_hitNum2)) TrigECL();
   eclTrigArray[m_hitNum2]->setEventId(m_nEvent);
-  eclTrigArray[m_hitNum2]->setTimeTrig(DeltaT* 12. / 508.);//t0 (us)= (1520 - m_ltr)*24.*12/508/(3072/2) ;
+  eclTrigArray[m_hitNum2]->setTimeTrig(DeltaT * 12. / 508.); //t0 (us)= (1520 - m_ltr)*24.*12/508/(3072/2) ;
 
 
 
@@ -259,9 +259,9 @@ double  ECLDigiModule::Sv123(double t, double t01, double tb1, double t02, doubl
 
   double sv123 = 0.;
   double  dks0, dks1, dksm,
-  dw0, dw1, dwp, dwm, das1, dac1, das0, dac0, dzna, dksm2, ds, dd,
-  dcs0, dsn0, dzn0, td, ts, dr,
-  dcs0s, dsn0s, dcs0d, dsn0d, dcs1s, dsn1s, dcs1d, dsn1d;
+          dw0, dw1, dwp, dwm, das1, dac1, das0, dac0, dzna, dksm2, ds, dd,
+          dcs0, dsn0, dzn0, td, ts, dr,
+          dcs0s, dsn0s, dcs0d, dsn0d, dcs1s, dsn1s, dcs1d, dsn1d;
 
 
   if (t < 0.) return 0.;
@@ -366,7 +366,7 @@ double  ECLDigiModule::Sv123(double t, double t01, double tb1, double t02, doubl
 }
 
 
-void ECLDigiModule::shapeFitter(short int *id, int *f, int *f1, int *fg41, int *fg43, int *fg31, int *fg32, int *fg33, int *y, int *ttrig, int *n16, int *ch, int *lar, int *ltr, int *lq)
+void ECLDigiModule::shapeFitter(short int* id, int* f, int* f1, int* fg41, int* fg43, int* fg31, int* fg32, int* fg33, int* y, int* ttrig, int* n16, int* ch, int* lar, int* ltr, int* lq)
 {
 
 
@@ -479,7 +479,7 @@ void ECLDigiModule::shapeFitter(short int *id, int *f, int *f1, int *fg41, int *
 
   for (i = 1; i < 16; i++) {
     s1 = (*(fg41 + *ttrig * 16 + i));
-    B3 = y[15+i];
+    B3 = y[15 + i];
     B3 = s1 * B3;
     A2 += B3;
 
@@ -514,11 +514,11 @@ void ECLDigiModule::shapeFitter(short int *id, int *f, int *f1, int *fg41, int *
       for (i = 1; i < 16; i++) {
         s1 = (*(fg31 + i + it * 16));
         s2 = (*(fg32 + i + it * 16));
-        B5 = y[15+i];
+        B5 = y[15 + i];
         B5 = s1 * B5;
         A1 += B5;
 
-        B3 = y[15+i];
+        B3 = y[15 + i];
         B3 = s2 * B3;
         B1 += B3;
       }
@@ -574,7 +574,7 @@ void ECLDigiModule::shapeFitter(short int *id, int *f, int *f1, int *fg41, int *
 
         C1 = (*(fg33 + it * 16) * z0);
         for (i = 1; i < 16; i++)
-          C1 += *(fg33 + i + it * 16) * y[15+i];
+          C1 += *(fg33 + i + it * 16) * y[15 + i];
         C1 += (1 << (k_c - 1));
         C1 >>= k_c;
 
@@ -593,7 +593,7 @@ lam:
     B1 = 0;
     C1 = (*(fg43 + *ttrig * 16) * z0);
     for (i = 1; i < 16; i++) {
-      B5 = y[15+i];
+      B5 = y[15 + i];
       C1 += *(fg43 + i + *ttrig * 16) * B5;
     }
     C1 += (1 << (k_c - 1));
@@ -603,12 +603,12 @@ lam:
   ch2 += C1;
   ch2 = z0 - *n16 * ch2;
   ch1 = ((ch2) * (ch2));
-  ch1 = ch1 * k_np[*n16-1];
+  ch1 = ch1 * k_np[*n16 - 1];
   ch1 = ch1 >> 16;
   for (i = 1; i < 16; i++) {
     ch2 = A1 * (*(f + i + it * 16)) + B1 * (*(f1 + i + it * 16));
     ch2 >>= k1_chi;
-    ch2 = (y[i+15] - ch2 - C1);
+    ch2 = (y[i + 15] - ch2 - C1);
 
     ch1 = ch1 + ch2 * ch2;
 

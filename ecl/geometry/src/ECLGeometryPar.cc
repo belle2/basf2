@@ -63,11 +63,11 @@ void ECLGeometryPar::read()
     GearDir layerContent(content);
     layerContent.append((format("/BarrelCrystals/BarrelCrystal[%1%]/") % (iBrCry)).str());
 
-    m_BLThetaCrystal[iBrCry-1] = layerContent.getAngle("K_z_TILTED") * 180 / PI;
-    m_BLPhiCrystal[iBrCry-1] = layerContent.getAngle("K_phi_TILTED") * 180 / PI;
-    m_BLPreppos[iBrCry-1] = layerContent.getLength("K_perpC") ;
-    m_BLPhipos[iBrCry-1] = layerContent.getAngle("K_phiC")  * 180 / PI;
-    m_BLZpos[iBrCry-1] = layerContent.getLength("K_zC") ;
+    m_BLThetaCrystal[iBrCry - 1] = layerContent.getAngle("K_z_TILTED") * 180 / PI;
+    m_BLPhiCrystal[iBrCry - 1] = layerContent.getAngle("K_phi_TILTED") * 180 / PI;
+    m_BLPreppos[iBrCry - 1] = layerContent.getLength("K_perpC") ;
+    m_BLPhipos[iBrCry - 1] = layerContent.getAngle("K_phiC")  * 180 / PI;
+    m_BLZpos[iBrCry - 1] = layerContent.getLength("K_zC") ;
   }
 
 
@@ -77,11 +77,11 @@ void ECLGeometryPar::read()
     GearDir counter(content);
     counter.append((format("/EndCapCrystals/EndCapCrystal[%1%]/") % (iCry)).str());
 
-    m_ECThetaCrystal[iCry-1]  = counter.getAngle("K_Ptheta") * 180 / PI;
-    m_ECPhiCrystal[iCry-1] = counter.getAngle("K_Rphi2")  * 180 / PI;
-    m_ECRpos[iCry-1]  = counter.getLength("K_Pr") ;
-    m_ECThetapos[iCry-1]  = counter.getAngle("K_Ptheta") * 180 / PI;
-    m_ECPhipos[iCry-1]  = counter.getAngle("K_Pphi") * 180 / PI;
+    m_ECThetaCrystal[iCry - 1]  = counter.getAngle("K_Ptheta") * 180 / PI;
+    m_ECPhiCrystal[iCry - 1] = counter.getAngle("K_Rphi2")  * 180 / PI;
+    m_ECRpos[iCry - 1]  = counter.getLength("K_Pr") ;
+    m_ECThetapos[iCry - 1]  = counter.getAngle("K_Ptheta") * 180 / PI;
+    m_ECPhipos[iCry - 1]  = counter.getAngle("K_Pphi") * 180 / PI;
   }
 
 
@@ -94,20 +94,20 @@ TVector3 ECLGeometryPar::GetCrystalPos(int cid)
   Mapping(cid);
   TVector3 Pos;
 
-  if (mPar_cellID <7776 && mPar_cellID>1151) {
+  if (mPar_cellID < 7776 && mPar_cellID > 1151) {
     int iSector = mPar_phiID / 2;
     double phi_ang = iSector * 360 / 72  + m_BLPhipos[mPar_thetaIndex] + (mPar_phiIndex % 2) * (5 - 2.494688) ;
-    TVector3 Pos_tmp(m_BLPreppos[mPar_thetaIndex] * cos(phi_ang *PI / 180) ,
-                     m_BLPreppos[mPar_thetaIndex] * sin(phi_ang *PI / 180) , m_BLZpos[mPar_thetaIndex]);
+    TVector3 Pos_tmp(m_BLPreppos[mPar_thetaIndex] * cos(phi_ang * PI / 180) ,
+                     m_BLPreppos[mPar_thetaIndex] * sin(phi_ang * PI / 180) , m_BLZpos[mPar_thetaIndex]);
     Pos = Pos_tmp;
   } else {
 
     double phi_ang = m_ECPhipos[mPar_phiIndex] + 360. / 16 * mPar_thetaIndex;
     double theta_ang = m_ECThetapos[mPar_phiIndex];
     TVector3 Pos_tmp(
-      m_ECRpos[mPar_phiIndex] * sin(theta_ang*PI / 180) * cos(phi_ang*PI / 180),
-      m_ECRpos[mPar_phiIndex] * sin(theta_ang*PI / 180) * sin(phi_ang*PI / 180),
-      m_ECRpos[mPar_phiIndex] * cos(theta_ang*PI / 180));
+      m_ECRpos[mPar_phiIndex] * sin(theta_ang * PI / 180) * cos(phi_ang * PI / 180),
+      m_ECRpos[mPar_phiIndex] * sin(theta_ang * PI / 180) * sin(phi_ang * PI / 180),
+      m_ECRpos[mPar_phiIndex] * cos(theta_ang * PI / 180));
 
     mPar_thetaID = 4;
     mPar_phiID = cid - 14 * 16 ;
@@ -125,23 +125,23 @@ TVector3 ECLGeometryPar::GetCrystalVec(int cid)
   Mapping(cid);
   TVector3 Pos;
 
-  if (mPar_cellID <7776 && mPar_cellID>1151) {
+  if (mPar_cellID < 7776 && mPar_cellID > 1151) {
     int iSector = mPar_phiID / 2;
     double phi_ang = double(iSector) * 360. / 72.  + m_BLPhipos[mPar_thetaIndex] + double(mPar_phiIndex % 2) * (5. - 2.494688) + m_BLPhiCrystal[mPar_thetaIndex];
     double theta_ang = m_BLThetaCrystal[mPar_thetaIndex];
     TVector3 Pos_tmp(
-      sin(theta_ang*PI / 180) * cos(phi_ang*PI / 180),
-      sin(theta_ang*PI / 180) * sin(phi_ang*PI / 180),
-      cos(theta_ang*PI / 180));
+      sin(theta_ang * PI / 180) * cos(phi_ang * PI / 180),
+      sin(theta_ang * PI / 180) * sin(phi_ang * PI / 180),
+      cos(theta_ang * PI / 180));
     Pos = Pos_tmp;
 
   } else {
     double phi_ang =   360. / 16. * mPar_thetaIndex +  m_ECPhiCrystal[mPar_phiIndex];
     double theta_ang =  m_ECThetaCrystal[mPar_phiIndex];
     TVector3 Pos_tmp(
-      sin(theta_ang*PI / 180) * cos(phi_ang*PI / 180),
-      sin(theta_ang*PI / 180) * sin(phi_ang*PI / 180),
-      cos(theta_ang*PI / 180));
+      sin(theta_ang * PI / 180) * cos(phi_ang * PI / 180),
+      sin(theta_ang * PI / 180) * sin(phi_ang * PI / 180),
+      cos(theta_ang * PI / 180));
     Pos = Pos_tmp;
   }
 
@@ -162,7 +162,7 @@ int ECLGeometryPar::GetCellID(int ThetaId, int PhiId)
   if (ThetaId < 13) {
     mPar_cellID = forwRing[ThetaId] * 16 + PhiId;
   } else if (ThetaId > 58) {
-    mPar_cellID = 7776 + backRing[ThetaId-59] * 16 + PhiId;
+    mPar_cellID = 7776 + backRing[ThetaId - 59] * 16 + PhiId;
   } else if (ThetaId > 12 && ThetaId < 59) {
     mPar_cellID = 1152 + 144 * (ThetaId - 13)  + PhiId;
   } else     B2ERROR("ECL ECLGeometryPar::CellID int ThetaId " << ThetaId << " int PhiId " << PhiId << ". Out of range.");
@@ -179,67 +179,67 @@ void ECLGeometryPar::Mapping(int cid)
   mPar_cellID = cid;
   if (cid < 0) {
     B2ERROR("ECL ECLGeometryPar Mapping  " << cid << ". Out of range.");
-  } else if (cid < 3*16) {//Forkward start
+  } else if (cid < 3 * 16) { //Forkward start
     mPar_thetaID = 0;
     mPar_phiID = cid;
     mPar_phiIndex = mPar_phiID % 3;
     mPar_thetaIndex = mPar_phiID / 3;
-  } else if (cid < 6*16) {
+  } else if (cid < 6 * 16) {
     mPar_thetaID = 1;
     mPar_phiID = cid - 3 * 16;
     mPar_phiIndex = mPar_phiID % 3 + 3;
     mPar_thetaIndex = mPar_phiID / 3;
-  } else if (cid < 10*16) {
+  } else if (cid < 10 * 16) {
     mPar_thetaID = 2;
     mPar_phiID = cid - 6 * 16 ;
     mPar_phiIndex = mPar_phiID % 4 + 6;
     mPar_thetaIndex = mPar_phiID / 4;
-  } else if (cid < 14*16) {
+  } else if (cid < 14 * 16) {
     mPar_thetaID = 3;
     mPar_phiID = cid - 10 * 16 ;
     mPar_phiIndex = mPar_phiID % 4 + 10;
     mPar_thetaIndex = mPar_phiID / 4;
-  } else if (cid < 18*16) {
+  } else if (cid < 18 * 16) {
     mPar_thetaID = 4;
     mPar_phiID = cid - 14 * 16 ;
     mPar_phiIndex = mPar_phiID % 4 + 14;
     mPar_thetaIndex = mPar_phiID / 4;
-  } else if (cid < 24*16) {
+  } else if (cid < 24 * 16) {
     mPar_thetaID = 5;
     mPar_phiID = cid - 18 * 16 ;
     mPar_phiIndex = mPar_phiID % 6 + 18;
     mPar_thetaIndex = mPar_phiID / 6;
-  } else if (cid < 30*16) {
+  } else if (cid < 30 * 16) {
     mPar_thetaID = 6;
     mPar_phiID = cid - 24 * 16 ;
     mPar_phiIndex = mPar_phiID % 6 + 24;
     mPar_thetaIndex = mPar_phiID / 6;
-  } else if (cid < 36*16) {
+  } else if (cid < 36 * 16) {
     mPar_thetaID = 7;
     mPar_phiID = cid - 30 * 16 ;
     mPar_phiIndex = mPar_phiID % 6 + 30;
     mPar_thetaIndex = mPar_phiID / 6;
-  } else if (cid < 42*16) {
+  } else if (cid < 42 * 16) {
     mPar_thetaID = 8;
     mPar_phiID = cid - 36 * 16 ;
     mPar_phiIndex = mPar_phiID % 6 + 36;
     mPar_thetaIndex = mPar_phiID / 6;
-  } else if (cid < 48*16) {
+  } else if (cid < 48 * 16) {
     mPar_thetaID = 9;
     mPar_phiID = cid - 42 * 16 ;
     mPar_phiIndex = mPar_phiID % 6 + 42;
     mPar_thetaIndex = mPar_phiID / 6;
-  } else if (cid < 54*16) {
+  } else if (cid < 54 * 16) {
     mPar_thetaID = 10;
     mPar_phiID = cid - 48 * 16 ;
     mPar_phiIndex = mPar_phiID % 6 + 48;
     mPar_thetaIndex = mPar_phiID / 6;
-  } else if (cid < 63*16) {
+  } else if (cid < 63 * 16) {
     mPar_thetaID = 11;
     mPar_phiID = cid - 54 * 16 ;
     mPar_phiIndex = mPar_phiID % 9 + 54;
     mPar_thetaIndex = mPar_phiID / 9;
-  } else if (cid < 72*16) {
+  } else if (cid < 72 * 16) {
     mPar_thetaID = 12;
     mPar_phiID = cid - 63 * 16 ;
     mPar_phiIndex = mPar_phiID % 9 + 63;
@@ -249,52 +249,52 @@ void ECLGeometryPar::Mapping(int cid)
     mPar_thetaID = (cid - 1152) / 144 + 13;
     mPar_thetaIndex = (cid - 1152) / 144;
     mPar_phiIndex = mPar_phiID;
-  } else if (cid < 7776 + 9*16) {//Backward start
+  } else if (cid < 7776 + 9 * 16) { //Backward start
     mPar_thetaID = 59;
     mPar_phiID =  cid - 7776 ;
     mPar_phiIndex = mPar_phiID % 9 + 72;
     mPar_thetaIndex = mPar_phiID / 9;
-  } else if (cid < 7776 + 18*16) {
+  } else if (cid < 7776 + 18 * 16) {
     mPar_thetaID = 60;
     mPar_phiID =   cid - 7776 - 9 * 16 ;
     mPar_phiIndex = mPar_phiID % 9 + 81;
     mPar_thetaIndex = mPar_phiID / 9;
-  } else if (cid < 7776 + 24*16) {
+  } else if (cid < 7776 + 24 * 16) {
     mPar_thetaID = 61;
     mPar_phiID =   cid - 7776 - 18 * 16 ;
     mPar_phiIndex = mPar_phiID % 6 + 90;
     mPar_thetaIndex = mPar_phiID / 6;
-  } else if (cid < 7776 + 30*16) {
+  } else if (cid < 7776 + 30 * 16) {
     mPar_thetaID = 62;
     mPar_phiID =   cid - 7776 - 24 * 16 ;
     mPar_phiIndex = mPar_phiID % 6 + 96;
     mPar_thetaIndex = mPar_phiID / 6;
-  } else if (cid < 7776 + 36*16) {
+  } else if (cid < 7776 + 36 * 16) {
     mPar_thetaID = 63;
     mPar_phiID =   cid - 7776 - 30 * 16 ;
     mPar_phiIndex = mPar_phiID % 6 + 102;
     mPar_thetaIndex = mPar_phiID / 6;
-  } else if (cid < 7776 + 42*16) {
+  } else if (cid < 7776 + 42 * 16) {
     mPar_thetaID = 64;
     mPar_phiID =   cid - 7776 - 36 * 16 ;
     mPar_phiIndex = mPar_phiID % 6 + 108;
     mPar_thetaIndex = mPar_phiID / 6;
-  } else if (cid < 7776 + 48*16) {
+  } else if (cid < 7776 + 48 * 16) {
     mPar_thetaID = 65;
     mPar_phiID =   cid - 7776 - 42 * 16 ;
     mPar_phiIndex = mPar_phiID % 6 + 114;
     mPar_thetaIndex = mPar_phiID / 6;
-  } else if (cid < 7776 + 52*16) {
+  } else if (cid < 7776 + 52 * 16) {
     mPar_thetaID = 66;
     mPar_phiID =   cid - 7776 - 48 * 16 ;
     mPar_phiIndex = mPar_phiID % 4 + 120;
     mPar_thetaIndex = mPar_phiID / 4;
-  } else if (cid < 7776 + 56*16) {
+  } else if (cid < 7776 + 56 * 16) {
     mPar_thetaID = 67;
     mPar_phiID =   cid - 7776 - 52 * 16 ;
     mPar_phiIndex = mPar_phiID % 4 + 124;
     mPar_thetaIndex = mPar_phiID / 4;
-  } else if (cid < 7776 + 60*16) {
+  } else if (cid < 7776 + 60 * 16) {
     mPar_thetaID = 68;
     mPar_phiID =   cid - 7776 - 56 * 16 ;
     mPar_phiIndex = mPar_phiID % 4 + 128;
@@ -319,13 +319,13 @@ void ECLGeometryPar::Mapping(int cid)
 // constructors and destructor
 //
 EclNbr::EclNbr() :
-    m_nbrs(*new std::vector< Identifier >)
+  m_nbrs(*new std::vector< Identifier >)
 {
 }
 
 EclNbr::EclNbr(const EclNbr& aNbr) :
-    m_nbrs(*new std::vector< Identifier > (aNbr.m_nbrs)) ,
-    m_nearSize(aNbr.m_nearSize)
+  m_nbrs(*new std::vector< Identifier > (aNbr.m_nbrs)) ,
+  m_nearSize(aNbr.m_nearSize)
 {
 }
 
@@ -333,9 +333,10 @@ EclNbr::EclNbr(
   const std::vector< Identifier >&           aNbrs     ,
   const std::vector< Identifier >::size_type aNearSize
 ) :
-    m_nbrs(*new std::vector< Identifier > (aNbrs)) ,
-    m_nearSize(aNearSize)
-{ // sort vector separately for near, nxt-near nbrs
+  m_nbrs(*new std::vector< Identifier > (aNbrs)) ,
+  m_nearSize(aNearSize)
+{
+  // sort vector separately for near, nxt-near nbrs
   std::sort(m_nbrs.begin() , m_nbrs.begin() + aNearSize , std::less< Identifier >()) ;
   std::sort(m_nbrs.begin() + aNearSize ,   m_nbrs.end() , std::less< Identifier >()) ;
 }
@@ -379,7 +380,7 @@ void EclNbr::printNbr()
 // assignment operators
 
 
-const EclNbr& EclNbr::operator=(const EclNbr & aNbr)
+const EclNbr& EclNbr::operator=(const EclNbr& aNbr)
 {
   if (this != &aNbr) {
     m_nbrs     = aNbr.m_nbrs     ;
@@ -452,7 +453,7 @@ int EclNbr::GetCellID(int ThetaId, int PhiId)
   if (ThetaId < 13) {
     mNbr_cellID = forwRing[ThetaId] * 16 + PhiId;
   } else if (ThetaId > 58) {
-    mNbr_cellID = 7776 + backRing[ThetaId-59] * 16 + PhiId;
+    mNbr_cellID = 7776 + backRing[ThetaId - 59] * 16 + PhiId;
   } else if (ThetaId > 12 && ThetaId < 59) {
     mNbr_cellID = 1152 + 144 * (ThetaId - 13)  + PhiId;
   } else     B2ERROR("ECL ECLGeometryNbr::CellID int ThetaId " << ThetaId << " int PhiId " << PhiId << ". Out of range.");
@@ -469,76 +470,76 @@ void EclNbr::Mapping(int cid)
   mNbr_cellID = cid;
   if (cid < 0) {
     B2ERROR("ECL ECLGeometryNbr Mapping  " << cid << ". Out of range.");
-  } else if (cid < 3*16) {//Forkward start
+  } else if (cid < 3 * 16) { //Forkward start
     mNbr_thetaID = 0;
     mNbr_phiID = cid;
-  } else if (cid < 6*16) {
+  } else if (cid < 6 * 16) {
     mNbr_thetaID = 1;
     mNbr_phiID = cid - 3 * 16;
-  } else if (cid < 10*16) {
+  } else if (cid < 10 * 16) {
     mNbr_thetaID = 2;
     mNbr_phiID = cid - 6 * 16 ;
-  } else if (cid < 14*16) {
+  } else if (cid < 14 * 16) {
     mNbr_thetaID = 3;
     mNbr_phiID = cid - 10 * 16 ;
-  } else if (cid < 18*16) {
+  } else if (cid < 18 * 16) {
     mNbr_thetaID = 4;
     mNbr_phiID = cid - 14 * 16 ;
-  } else if (cid < 24*16) {
+  } else if (cid < 24 * 16) {
     mNbr_thetaID = 5;
     mNbr_phiID = cid - 18 * 16 ;
-  } else if (cid < 30*16) {
+  } else if (cid < 30 * 16) {
     mNbr_thetaID = 6;
     mNbr_phiID = cid - 24 * 16 ;
-  } else if (cid < 36*16) {
+  } else if (cid < 36 * 16) {
     mNbr_thetaID = 7;
     mNbr_phiID = cid - 30 * 16 ;
-  } else if (cid < 42*16) {
+  } else if (cid < 42 * 16) {
     mNbr_thetaID = 8;
     mNbr_phiID = cid - 36 * 16 ;
-  } else if (cid < 48*16) {
+  } else if (cid < 48 * 16) {
     mNbr_thetaID = 9;
     mNbr_phiID = cid - 42 * 16 ;
-  } else if (cid < 54*16) {
+  } else if (cid < 54 * 16) {
     mNbr_thetaID = 10;
     mNbr_phiID = cid - 48 * 16 ;
-  } else if (cid < 63*16) {
+  } else if (cid < 63 * 16) {
     mNbr_thetaID = 11;
     mNbr_phiID = cid - 54 * 16 ;
-  } else if (cid < 72*16) {
+  } else if (cid < 72 * 16) {
     mNbr_thetaID = 12;
     mNbr_phiID = cid - 63 * 16 ;
   } else if (cid < 7776) {//Barrel start
     mNbr_phiID = (cid - 1152) % 144;
     mNbr_thetaID = (cid - 1152) / 144 + 13;
-  } else if (cid < 7776 + 9*16) {//Backward start
+  } else if (cid < 7776 + 9 * 16) { //Backward start
     mNbr_thetaID = 59;
     mNbr_phiID =  cid - 7776 ;
-  } else if (cid < 7776 + 18*16) {
+  } else if (cid < 7776 + 18 * 16) {
     mNbr_thetaID = 60;
     mNbr_phiID =   cid - 7776 - 9 * 16 ;
-  } else if (cid < 7776 + 24*16) {
+  } else if (cid < 7776 + 24 * 16) {
     mNbr_thetaID = 61;
     mNbr_phiID =   cid - 7776 - 18 * 16 ;
-  } else if (cid < 7776 + 30*16) {
+  } else if (cid < 7776 + 30 * 16) {
     mNbr_thetaID = 62;
     mNbr_phiID =   cid - 7776 - 24 * 16 ;
-  } else if (cid < 7776 + 36*16) {
+  } else if (cid < 7776 + 36 * 16) {
     mNbr_thetaID = 63;
     mNbr_phiID =   cid - 7776 - 30 * 16 ;
-  } else if (cid < 7776 + 42*16) {
+  } else if (cid < 7776 + 42 * 16) {
     mNbr_thetaID = 64;
     mNbr_phiID =   cid - 7776 - 36 * 16 ;
-  } else if (cid < 7776 + 48*16) {
+  } else if (cid < 7776 + 48 * 16) {
     mNbr_thetaID = 65;
     mNbr_phiID =   cid - 7776 - 42 * 16 ;
-  } else if (cid < 7776 + 52*16) {
+  } else if (cid < 7776 + 52 * 16) {
     mNbr_thetaID = 66;
     mNbr_phiID =   cid - 7776 - 48 * 16 ;
-  } else if (cid < 7776 + 56*16) {
+  } else if (cid < 7776 + 56 * 16) {
     mNbr_thetaID = 67;
     mNbr_phiID =   cid - 7776 - 52 * 16 ;
-  } else if (cid < 7776 + 60*16) {
+  } else if (cid < 7776 + 60 * 16) {
     mNbr_thetaID = 68;
     mNbr_phiID =   cid - 7776 - 56 * 16 ;
   } else {
@@ -547,7 +548,8 @@ void EclNbr::Mapping(int cid)
 }
 EclNbr
 EclNbr::getNbr(const Identifier aCellId)
-{ // generate nbr lists. always easier here to work with theta-phi
+{
+  // generate nbr lists. always easier here to work with theta-phi
 
   //const EclThetaPhiId thetaPhiId ( ids()[ aCellId -1 ].thetaPhiId() );
   //const EclThetaPhiId::Identifier thetaId ( thetaPhiId.thetaId() );
@@ -647,15 +649,15 @@ EclNbr::getNbr(const Identifier aCellId)
     int nm2 = 1000;
     if (aCellId < 1153) { // forward
       const EclIdentifier mPerRingForward[]
-      = { 48, 48, 64, 64, 64, 96, 96, 96, 96, 96, 96, 144, 144, 144, 144 };
-      if (thetaId > 1) nm2 = mPerRingForward[ thetaId-2 ];
-      if (thetaId > 0) nm1 = mPerRingForward[ thetaId-1 ];
+        = { 48, 48, 64, 64, 64, 96, 96, 96, 96, 96, 96, 144, 144, 144, 144 };
+      if (thetaId > 1) nm2 = mPerRingForward[ thetaId - 2 ];
+      if (thetaId > 0) nm1 = mPerRingForward[ thetaId - 1 ];
       n00 = mPerRingForward[ thetaId     ];
       np1 = mPerRingForward[ thetaId + 1 ];
       np2 = mPerRingForward[ thetaId + 2 ];
     } else { // backward
       const EclIdentifier mPerRingBackward[]
-      = { 64, 64, 64, 96, 96, 96, 96, 96, 144, 144, 144, 144 };
+        = { 64, 64, 64, 96, 96, 96, 96, 96, 144, 144, 144, 144 };
       if (thetaId < 67) np2 = mPerRingBackward[ 66 - thetaId ];
       if (thetaId < 68) np1 = mPerRingBackward[ 67 - thetaId ];
       n00 = mPerRingBackward[ 68 - thetaId ];

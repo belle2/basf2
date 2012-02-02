@@ -56,7 +56,7 @@ const float TRecEclCFParameters::fgEthX3[69] = {
 // constructors and destructor
 //
 TRecEclCFParameters::TRecEclCFParameters() :
-    fEthX3(1)
+  fEthX3(1)
 {
   fEthHit  = 0.0005;   // 500 KeV zero suppression
 

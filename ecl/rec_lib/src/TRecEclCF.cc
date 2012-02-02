@@ -115,7 +115,7 @@ TRecEclCF::Accumulate(const TEclEnergyHit& ahit)
   } else {                        // new theta dependent threshold
     int cid = ahit.CellId();
 //        ECLGeometryPar geom;
-    ECLGeometryPar * geom = ECLGeometryPar::Instance();
+    ECLGeometryPar* geom = ECLGeometryPar::Instance();
     geom->Mapping(cid);
     int ith = geom->GetThetaID();
     if (ahit.Energy() > fParameters.fgEthX3[ith] / 1000.)

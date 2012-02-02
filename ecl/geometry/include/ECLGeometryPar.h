@@ -198,12 +198,12 @@ namespace Belle2 {
     }
     ///
     TEclEnergyHit(const TEclEnergyHit& ahit)
-        : fId(ahit.Id()), fEnergy(ahit.Energy()), fCellId(ahit.CellId()) {
+      : fId(ahit.Id()), fEnergy(ahit.Energy()), fCellId(ahit.CellId()) {
     }
     ///
     TEclEnergyHit(
       const Identifier hid, const EclGeV energy, const Identifier cid)
-        : fId(hid), fEnergy(energy), fCellId(cid) {
+      : fId(hid), fEnergy(energy), fCellId(cid) {
     }
     ///
     virtual ~TEclEnergyHit() { }
@@ -340,7 +340,7 @@ namespace Belle2 {
 
 ///
   typedef std::map < TEclEnergyHit::Identifier, TEclEnergyHit,
-  std::less<TEclEnergyHit::Identifier> > EclEnergyHitMap;
+          std::less<TEclEnergyHit::Identifier> > EclEnergyHitMap;
 
 } // end of namespace Belle2
 

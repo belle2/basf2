@@ -111,7 +111,7 @@ void ECLHitModule::event()
     }
   }
   // Get instance of ecl geometry parameters
-  ECLGeometryPar * eclp = ECLGeometryPar::Instance();
+  ECLGeometryPar* eclp = ECLGeometryPar::Instance();
   // Loop over all hits of steps
   for (int iHits = 0; iHits < nHits; iHits++) {
     // Get a hit

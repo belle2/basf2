@@ -30,11 +30,11 @@ namespace Belle2 {
     void Initialize(G4HCofThisEvent* HCTE);
 
     //! Process each step and calculate variables defined in ECLHit (not yet prepared)
-    bool step(G4Step *aStep, G4TouchableHistory *history);
+    bool step(G4Step* aStep, G4TouchableHistory* history);
 //    G4bool ProcessHits(G4Step* aStep, G4TouchableHistory*);
 
     //! Do what you want to do at the end of each event
-    void EndOfEvent(G4HCofThisEvent *eventHC);
+    void EndOfEvent(G4HCofThisEvent* eventHC);
 
 
     //! Save ECLSimHit into datastore
@@ -47,10 +47,10 @@ namespace Belle2 {
       const G4double tof,
       const G4double edep,
       const G4double stepLength,
-      const G4ThreeVector & mom,
-      const G4ThreeVector & posW,
-      const G4ThreeVector & posIn,
-      const G4ThreeVector & posOut
+      const G4ThreeVector& mom,
+      const G4ThreeVector& posW,
+      const G4ThreeVector& posIn,
+      const G4ThreeVector& posOut
     );
 
     //! Save EBECLSimHit into datastore
@@ -63,10 +63,10 @@ namespace Belle2 {
       const G4double tof,
       const G4double edep,
       const G4double stepLength,
-      const G4ThreeVector & mom,
-      const G4ThreeVector & posW,
-      const G4ThreeVector & posIn,
-      const G4ThreeVector & posOut
+      const G4ThreeVector& mom,
+      const G4ThreeVector& posW,
+      const G4ThreeVector& posIn,
+      const G4ThreeVector& posOut
     );
 
 

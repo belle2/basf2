@@ -60,8 +60,8 @@ namespace Belle2 {
     //** Shaper-DSP Output  basic
     double  Sv123(double t, double t01, double tb1, double t02, double tb2, double td1, double ts1);
 
-    void shapeFitter(short int *id, int *f, int *f1, int *fg41, int *fg43, int *fg31,
-                     int *fg32, int *fg33, int *y, int *ttrig, int *n16, int *ch, int *lar, int *ltr, int *lq);
+    void shapeFitter(short int* id, int* f, int* f1, int* fg41, int* fg43, int* fg31,
+                     int* fg32, int* fg33, int* y, int* ttrig, int* n16, int* ch, int* lar, int* ltr, int* lq);
 
 
 

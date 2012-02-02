@@ -15,7 +15,7 @@
 //basf2 framework headers
 #include <framework/core/Module.h>
 
-#include <ecl/hitecl/ECLSimHit.h>
+#include <ecl/dataobjects/ECLSimHit.h>
 
 //C++/C standard lib elements.
 #include <string>

@@ -16,7 +16,7 @@
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
 
-#include <ecl/simulation/ECLSensitiveDetector.h>
+#include <ecl/simulation/SensitiveDetector.h>
 
 class G4LogicalVolume;
 class G4VPhysicalVolume;
@@ -56,7 +56,7 @@ namespace Belle2 {
       G4VPhysicalVolume* physical_ecl;/**< the ecl Physical Volume*/
       G4VPhysicalVolume* physical_ECLBarrelCylinder;
       //! Sensitive detector
-      ECLSensitiveDetector* m_sensitive;
+      SensitiveDetector* m_sensitive;
 
     };
 

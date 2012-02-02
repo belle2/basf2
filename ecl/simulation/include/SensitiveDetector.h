@@ -16,15 +16,15 @@
 namespace Belle2 {
 
   //! The Class for ECL Sensitive Detector
-  class ECLSensitiveDetector: public Simulation::SensitiveDetectorBase {
+  class SensitiveDetector: public Simulation::SensitiveDetectorBase {
 
   public:
 
     //! Constructor
-//    ECLSensitiveDetector(G4String name);
-    ECLSensitiveDetector(G4String name, G4double thresholdEnergyDeposit, G4double thresholdKineticEnergy);
+//    SensitiveDetector(G4String name);
+    SensitiveDetector(G4String name, G4double thresholdEnergyDeposit, G4double thresholdKineticEnergy);
     //! Destructor
-    ~ECLSensitiveDetector();
+    ~SensitiveDetector();
 
     //! Register ECL hits collection into G4HCofThisEvent
     void Initialize(G4HCofThisEvent* HCTE);

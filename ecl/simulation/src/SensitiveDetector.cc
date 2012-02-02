@@ -10,15 +10,15 @@
 
 
 
-#include <ecl/simecl/ECLSensitiveDetector.h>
+#include <ecl/simulation/SensitiveDetector.h>
 
 #include <framework/logging/Logger.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
-#include <ecl/hitecl/ECLSimHit.h>
-#include <ecl/hitecl/ECLEBSimHit.h>
-#include <ecl/geoecl/ECLGeometryPar.h>
+#include <ecl/dataobjects/ECLSimHit.h>
+#include <ecl/dataobjects/ECLEBSimHit.h>
+#include <ecl/geometry/ECLGeometryPar.h>
 
 #include <string>
 #include <sstream>
@@ -46,7 +46,7 @@ using namespace std;
 namespace Belle2 {
 
 
-  ECLSensitiveDetector::ECLSensitiveDetector(G4String name, G4double thresholdEnergyDeposit, G4double thresholdKineticEnergy):
+  SensitiveDetector::SensitiveDetector(G4String name, G4double thresholdEnergyDeposit, G4double thresholdKineticEnergy):
     Simulation::SensitiveDetectorBase(name, ECL), m_thresholdEnergyDeposit(thresholdEnergyDeposit),
     m_thresholdKineticEnergy(thresholdKineticEnergy), m_hitNumber(0), m_EBhitNumber(0)
   {
@@ -58,11 +58,11 @@ namespace Belle2 {
   }
 
 
-  ECLSensitiveDetector::~ECLSensitiveDetector()
+  SensitiveDetector::~SensitiveDetector()
   {
 
   }
-  void ECLSensitiveDetector::Initialize(G4HCofThisEvent* HCTE)
+  void SensitiveDetector::Initialize(G4HCofThisEvent* HCTE)
   {
     // Create a new hit collection
 
@@ -78,8 +78,8 @@ namespace Belle2 {
 //-----------------------------------------------------
 // Method invoked for every step in sensitive detector
 //-----------------------------------------------------
-//G4bool ECLSensitiveDetector::ProcessHits(G4Step *aStep, G4TouchableHistory *)
-  bool ECLSensitiveDetector::step(G4Step* aStep, G4TouchableHistory*)
+//G4bool SensitiveDetector::ProcessHits(G4Step *aStep, G4TouchableHistory *)
+  bool SensitiveDetector::step(G4Step* aStep, G4TouchableHistory*)
   {
 
     // Get deposited energy
@@ -94,7 +94,7 @@ namespace Belle2 {
     G4Track& t = * aStep->GetTrack();
     const G4double tof = t.GetGlobalTime();
     if (isnan(tof)) {
-      B2ERROR("ECLSensitiveDetector: global time is nan");
+      B2ERROR("SensitiveDetector: global time is nan");
       return false;
     }
 
@@ -140,13 +140,13 @@ namespace Belle2 {
   }
 
 
-  void ECLSensitiveDetector::EndOfEvent(G4HCofThisEvent*)
+  void SensitiveDetector::EndOfEvent(G4HCofThisEvent*)
   {
 
     B2INFO("End Of Event");
   }
 
-  int ECLSensitiveDetector::saveEBSimHit(
+  int SensitiveDetector::saveEBSimHit(
     const G4int cellId,
     const G4int thetaId,
     const G4int phiId,
@@ -186,7 +186,7 @@ namespace Belle2 {
   }
 
 
-  int ECLSensitiveDetector::saveSimHit(
+  int SensitiveDetector::saveSimHit(
     const G4int cellId,
     const G4int thetaId,
     const G4int phiId,
@@ -231,7 +231,7 @@ namespace Belle2 {
 
 
 
-  int ECLSensitiveDetector::Mapping(const G4String VolumeName)
+  int SensitiveDetector::Mapping(const G4String VolumeName)
   {
 
 
@@ -354,11 +354,11 @@ namespace Belle2 {
     }
 
     if (m_cellID > 1151 && string(VolumeName.c_str()).find("FW") != string::npos) {
-      B2ERROR("ECLSensitiveDetector: Cellid ERR FW GSector: " << GSector << " iCry: " << iCry << " " << string(VolumeName.c_str()));
+      B2ERROR("SensitiveDetector: Cellid ERR FW GSector: " << GSector << " iCry: " << iCry << " " << string(VolumeName.c_str()));
     } else if (m_cellID < 7776 && string(VolumeName.c_str()).find("Bw") != string::npos) {
-      B2ERROR("ECLSensitiveDetector: Cellid ERR BW GSector: " << GSector << " iCry: " << iCry << " " << string(VolumeName.c_str()));
+      B2ERROR("SensitiveDetector: Cellid ERR BW GSector: " << GSector << " iCry: " << iCry << " " << string(VolumeName.c_str()));
     } else if ((m_cellID > 7775 || m_cellID < 1152) && string(VolumeName.c_str()).find("Br") != string::npos) {
-      B2ERROR("ECLSensitiveDetector: Cellid ERR Br GSector: " << GSector << " iCry: " << iCry << " " << string(VolumeName.c_str()));
+      B2ERROR("SensitiveDetector: Cellid ERR Br GSector: " << GSector << " iCry: " << iCry << " " << string(VolumeName.c_str()));
     }
     return m_cellID;
 

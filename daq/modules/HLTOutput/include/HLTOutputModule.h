@@ -2,9 +2,11 @@
 #define HLTOUTPUTMODULE_H
 
 #include <string>
+#include <fstream>
 #include <vector>
 
 #include <boost/shared_ptr.hpp>
+#include <boost/lexical_cast.hpp>
 
 #include <framework/core/Module.h>
 #include <framework/datastore/DataStore.h>
@@ -27,13 +29,21 @@ namespace Belle2 {
     virtual void endRun();
     virtual void terminate();
 
-    void test(unsigned int times);
+    void putData(const DataStore::EDurability& durability);
+    EHLTStatus testData(char* buffer);
     void sendTerminate();
+
+    bool checkData(std::string data1, char* data2);
+    void writeFile(char* data, int size);
 
   private:
     RingBuffer* m_buffer;
+    MsgHandler* m_msgHandler;
 
-    int m_times;
+    std::vector<std::string> m_branchNames[DataStore::c_NDurabilityTypes];
+    bool m_done[DataStore::c_NDurabilityTypes];
+    StoreIter* m_objectIterator[DataStore::c_NDurabilityTypes];
+    StoreIter* m_arrayIterator[DataStore::c_NDurabilityTypes];
   };
 }
 

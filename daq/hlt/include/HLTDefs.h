@@ -68,6 +68,7 @@ namespace Belle2 {
   const std::string gEOSTag = "EOSS";      /**< End-of-stream tag for data capsulation */
   const std::string gTerminate = "Terminat";
   const std::string gTerminationTag = gTerminate + gEOSTag;
+  const std::string gEndOfEvent = "EndOfEvent";
   //const std::string gTerminationTag = "Terminat" + gEOSTag;
 }
 

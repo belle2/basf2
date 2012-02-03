@@ -179,6 +179,16 @@ EHLTStatus HLTProcess::checkChildren()
     B2INFO("[HLTProcess] \x1b[33mHLTReceiver " << pid << " finished! (exit code="
            << status << ")\x1b[0m");
   }
+
+  B2INFO("[HLTProcess] \x1b[33mTerminating basf2....(Put termination code into ring buffer "
+         << m_dataInBuffer->shmid() << " and " << m_dataOutBuffer->shmid() << ")\x1b[0m");
+  while (m_dataInBuffer->insq((int*)gTerminate.c_str(), gTerminate.size() / 4 + 1) <= 0) {
+    usleep(100);
+  }
+  while (m_dataOutBuffer->insq((int*)gTerminate.c_str(), gTerminate.size() / 4 + 1) <= 0) {
+    usleep(100);
+  }
+
   pid = waitpid(m_Process, &status, 0);
   B2INFO("[HLTProcess] \x1b[33mbasf2 " << pid << " finished! (exit code="
          << status << ")\x1b[0m");

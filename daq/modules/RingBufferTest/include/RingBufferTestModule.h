@@ -1,5 +1,5 @@
-#ifndef HLTINPUTMODULE_H
-#define HLTINPUTMODULE_H
+#ifndef RINGBUFFERTESTMODULE_H
+#define RINGBUFFERTESTMODULE_H
 
 #include <string>
 #include <fstream>
@@ -18,10 +18,10 @@
 #include <framework/pcore/RingBuffer.h>
 
 namespace Belle2 {
-  class HLTInputModule : public Module {
+  class RingBufferTestModule : public Module {
   public:
-    HLTInputModule();
-    virtual ~HLTInputModule();
+    RingBufferTestModule();
+    virtual ~RingBufferTestModule();
 
     virtual void initialize();
     virtual void beginRun();
@@ -29,12 +29,12 @@ namespace Belle2 {
     virtual void endRun();
     virtual void terminate();
 
-    EHLTStatus getData();
-    void writeFile(char* data, int size);
-
   private:
     RingBuffer* m_buffer;
-    MsgHandler* m_msgHandler;
+    RingBuffer* m_buffer2;
+    RingBuffer* m_buffer3;
+    std::fstream m_output;
+    bool m_flag;
   };
 }
 

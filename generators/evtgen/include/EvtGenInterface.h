@@ -26,6 +26,8 @@
 #include <evtgen/EvtGenBase/EvtStdlibRandomEngine.hh>
 #include <evtgen/EvtGenBase/EvtVector4R.hh>
 
+#include <generators/evtgen/EvtGenFwRandEngine.h>
+
 #include <string>
 #include <fstream>
 
@@ -50,20 +52,20 @@ namespace Belle2 {
     ~EvtGenInterface() {}
 
     int setup(const std::string& decayFileName, const std::string& pdlFileName, const std::string& userFileName = std::string(""));
-    int simulateEvent(MCParticleGraph &graph);
+    int simulateEvent(MCParticleGraph& graph);
 
     TLorentzRotation m_labboost;     /**< Boost&rotation vector for boost from CM to LAB. */
 
   private:
-    int addParticles2Graph(EvtParticle * particle, MCParticleGraph & graph);
-    void updateGraphParticle(EvtParticle * eParticle, MCParticleGraph::GraphParticle * gParticle);
+    int addParticles2Graph(EvtParticle* particle, MCParticleGraph& graph);
+    void updateGraphParticle(EvtParticle* eParticle, MCParticleGraph::GraphParticle* gParticle);
 
 
   protected:
-    EvtParticle * m_parent;
+    EvtParticle* m_parent;
     EvtStdHep   m_evtstdhep;
-    EvtStdlibRandomEngine m_eng;
-    EvtGen * m_Generator;
+    EvtGenFwRandEngine m_eng;
+    EvtGen* m_Generator;
     EvtVector4R m_pinit;
     EvtId c_UPS4;
   };

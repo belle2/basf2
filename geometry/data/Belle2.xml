@@ -36,7 +36,7 @@
   <xi:include href="../cdc/CDC.xml"/>
   <xi:include href="../top/TOP.xml"/>
   <xi:include href="../arich/ARICH.xml"/>
-  <xi:include href="../ecl/ECLBelleII.xml"/>
+  <xi:include href="../ecl/ECL.xml"/>
   <xi:include href="../bklm/BKLM.xml"/>
   <xi:include href="../eklm/ESTR.xml"/>
   <xi:include href="../eklm/EKLM.xml"/>

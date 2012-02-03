@@ -129,7 +129,7 @@ int main(int argc, char* argv[])
     ("help,h", "print all available options")
     ("version,v", "print version string")
     ("info,i", "print information about basf2")
-    ("modules,m", "print a list of all available modules")
+    ("modules,m", prog::value<string>()->implicit_value(""), "print a list of all available modules or optionally the module specified as an argument")
     ;
 
     // Declare a group of options that will be
@@ -172,6 +172,8 @@ int main(int argc, char* argv[])
 
     //Check for modules option
     if (varMap.count("modules")) {
+      string modArgs = varMap["modules"].as<string>();
+      if (!modArgs.empty()) arguments.push_back(modArgs);
       pythonFile = "modules.py";
     }
 
@@ -208,10 +210,10 @@ int main(int argc, char* argv[])
       Py_InitializeEx(0);
 
       //Pass python filename and additional arguments to python
-      const char *pyargs[arguments.size()+1];
+      const char* pyargs[arguments.size() + 1];
       pyargs[0] = pythonFile.c_str();
       for (size_t i = 0; i < arguments.size(); i++) {
-        pyargs[i+1] = arguments[i].c_str();
+        pyargs[i + 1] = arguments[i].c_str();
       }
       PySys_SetArgv(arguments.size() + 1, const_cast<char**>(pyargs));
 

@@ -17,6 +17,28 @@
 #include <vector>
 #include <string>
 
+//...Data structure of TRGBitStreamFile...
+//   4 byte                  : record type
+//   4 byte                  : size in bit
+//   variable(size / 8) byte : data
+
+//...TRGBitStream record definition...
+#define TRGBSRecord_Comment    0xffff0000
+#define TRGBSRecord_BeginRun   0xffff00A0
+#define TRGBSRecord_EndRun     0xffff00A1
+#define TRGBSRecord_BeginEvent 0xffff00B0
+#define TRGBSRecord_EndEvent   0xffff00B1
+#define TRGBSRecord_Clock      0xffff00C0
+#define TRGBSRecord_TrackSegmentSL0 0xffff00F0
+#define TRGBSRecord_TrackSegmentSL1 0xffff00F1
+#define TRGBSRecord_TrackSegmentSL2 0xffff00F2
+#define TRGBSRecord_TrackSegmentSL3 0xffff00F3
+#define TRGBSRecord_TrackSegmentSL4 0xffff00F4
+#define TRGBSRecord_TrackSegmentSL5 0xffff00F5
+#define TRGBSRecord_TrackSegmentSL6 0xffff00F6
+#define TRGBSRecord_TrackSegmentSL7 0xffff00F7
+#define TRGBSRecord_TrackSegmentSL8 0xffff00F8
+
 namespace Belle2 {
 
 /// A class to represent a bit stream
@@ -48,8 +70,14 @@ class TRGBitStream {
     void dump(const std::string & message = "",
               const std::string & pre = "") const;
 
-    /// returns size of stream.
+    /// returns size of stream in unit of bit.
     unsigned size(void) const;
+
+    /// returns size in char's.
+    unsigned sizeInChar(void) const;
+
+    /// returns a pointer to char's.
+    char c(unsigned positionInChar) const;
 
   public:// Modifiers
 
@@ -104,6 +132,42 @@ inline
 unsigned
 TRGBitStream::size(void) const {
     return _size;
+}
+
+inline
+void
+TRGBitStream::append(int a) {
+    if (a)
+	append(true);
+    else
+	append(false);
+}
+
+inline
+void
+TRGBitStream::append(unsigned a) {
+    if (a)
+	append(true);
+    else
+	append(false);
+}
+
+inline
+unsigned
+TRGBitStream::sizeInChar(void) const {
+    unsigned s = _size / 8;
+    if (_size % 8)
+	++s;
+    return s;
+}
+
+inline
+char
+TRGBitStream::c(unsigned a) const {
+    unsigned p = a / sizeof(unsigned);
+    unsigned q = a % sizeof(unsigned);
+    unsigned v = * _stream[p];
+    return (v >> (q * 8)) & 0xff;
 }
 
 } // namespace Belle2

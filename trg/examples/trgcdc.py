@@ -7,7 +7,8 @@ from basf2 import *
 #Register modules
 particlegun = register_module('ParticleGun')
 #particlegun.param('randomSeed', 3452346)
-particlegun.param('randomSeed', 345)
+#particlegun.param('randomSeed', 345)
+particlegun.param('randomSeed', 346)
 # The particle we are shooting
 particlegun.param('pdgCodes', [11])
 particlegun.param('nTracks', 1)
@@ -48,6 +49,11 @@ cdctrg.param('ConfigFile', os.path.join(basf2datadir,"trg/TRGCDCConfig_0_2010111
 cdctrg.param('DebugLevel',2)
 cdctrg.param('CurlBackStop',1)
 cdctrg.param('HoughFinderPerfect',1)
+
+#...CDC Trigger TS Stream...
+tsstream.param('DebugLevel', 2)
+tsstream.param('Mode', 0)
+tsstream.param('OutputStreamFile', "TRGCDCTSStream.dat")
 
 
 #set mcprinter

@@ -71,6 +71,9 @@ class TRGCDCTSStreamModule : public Module {
 
     /// Storage for TS central wires.
     std::vector<const TRGCDCWire *> _wires[9];
+
+    /// A pointer to an output file.
+    std::ofstream * _out;
 };
 
 } // namespace Belle2

@@ -53,13 +53,14 @@ TRGBitStream::dump(const string & msg,
 
     const string tab = "    ";
 
-    cout << pre << _name << endl;
+    cout << pre << _name << ":size=" << _size <<  endl;
     for (unsigned i = 0; i < _stream.size(); i++) {
 	cout << pre << tab;
 	if (i == _stream.size() - 1) {
-	    const unsigned last = _size % sizeof(unsigned);
+	    const unsigned last = _size % (sizeof(unsigned) * 8);
+
 	    if (last)
-		cout << TRGUtilities::streamDisplay(* _stream[i], 0, last);
+		cout << TRGUtilities::streamDisplay(* _stream[i], 0, last - 1);
 	}
 	else {
 	    cout << TRGUtilities::streamDisplay(* _stream[i], 0, 31);
@@ -83,11 +84,9 @@ TRGBitStream::append(bool a) {
 
     if (_size <= storageSize) {
 	if (a) {
-	    const unsigned position = _size % sizeof(unsigned);
+	    const unsigned position = _size % (sizeof(unsigned) * 8) - 1;
 	    unsigned & last = * _stream.back();
 	    last |= (1 << position);
-
-	    cout << "    posi,last=" << position << "," << last << endl;
 	}
     }
     else {
@@ -97,6 +96,5 @@ TRGBitStream::append(bool a) {
 	    _stream.push_back(new unsigned(0));
     }
 }
-
 
 } // namespace Belle2

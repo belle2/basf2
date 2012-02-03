@@ -117,7 +117,7 @@ TRGUtil::streamDisplay(unsigned val, unsigned f, unsigned l) {
     string s;
     for (unsigned i = f; i < l + 1; i++) {
         if ((i % 8) == 0) s += " ";
-        s += itostring((val >> (f - i)) % 2);
+        s += itostring((val >> i) % 2);
     }
     return s;
 }

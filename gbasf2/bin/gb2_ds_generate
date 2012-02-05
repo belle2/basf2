@@ -11,7 +11,7 @@ def main():
 	User=dsparam.getUser()
 	dstse=dsparam.getDstSE()
 	dspath="/belle2/user/belle/"+User+"/"+Project
-	//print "ds_path is ",dspath, "dstse is ",dstse
+	#print "ds_path is ",dspath, "dstse is ",dstse
 	from DataSetOp import ds_generate
 
         ds_generate(dspath,dstse)

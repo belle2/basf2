@@ -95,6 +95,21 @@ class AmgaClient(object):
                               )[-1])
         return result
 
+#################################################################################
+# added by wuwj@ihep.ac.cn
+
+    def checkEntry(self, entry):
+        '''
+....check if an entry exists
+....'''
+
+        dirname = os.path.dirname(entry)
+        files = self.getSubdirectories(dirname)
+        if entry in files:
+            return True
+        else:
+            return False
+
 ###############################################################################
 
     def getGUIDs(self, experiment, query):
@@ -346,8 +361,7 @@ class AmgaClient(object):
 
 if __name__ == '__main__':
     ac = AmgaClient()
-    print ac.getSubdirectories('/belle2/user/belle/hanyl/Ungrouped/',
-                               relative=True)
+    print ac.getSubdirectories('/belle2/user/belle/wuwj/p8/', relative=True)
     # print ac.getGUIDs("/belle2/data/E11/FC","id<5")
     # print ac.directQuery("/belle2/data/E11/FC","id<5")    #problem
     # print ac.directQueryWithAttributes("/belle2/user/belle/hanyl/Ungrouped/","id>0",["lfn"])
@@ -355,9 +369,11 @@ if __name__ == '__main__':
     # print ac.getAttributes("/belle2/data/E11/FC")
     # print ac.getAttributes("/belle2/user/belle/hanyl/Ungrouped/")
     # print ac.getAttributesValues("/belle2/user/belle/hanyl/Ungrouped/",['lfn'])
-    print ac.rm('/belle2/user/belle/hanyl/Ungrouped/effs30.root')
-    print ac.rm('/belle2/user/belle/hanyl/Ungrouped/wutest1.root')
-    print ac.rm('/belle2/user/belle/hanyl/Ungrouped/wutest2.root')
-    print ac.removeDir('/belle2/user/belle/hanyl/Ungrouped')
-    print ac.removeDir('/belle2/user/belle/hanyl/Ungroupeda')
-
+   # print ac.rm('/belle2/user/belle/hanyl/Ungrouped/effs30.root')
+   # print ac.rm('/belle2/user/belle/hanyl/Ungrouped/wutest1.root')
+   # print ac.rm('/belle2/user/belle/hanyl/Ungrouped/wutest2.root')
+   # print ac.removeDir('/belle2/user/belle/hanyl/Ungrouped')
+    print ac.checkEntry('/belle2/user/belle/wuwj/p9/file3.root')
+    print ac.checkEntry('/belle2/user/belle/wuwj/p9/file2.root')
+    print ac.checkEntry('/belle2/user/belle/wuwj/p9/file1.root')
+    # print ac.getSubdirectories('/belle2/user/belle/wuwj')

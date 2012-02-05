@@ -55,7 +55,7 @@ class DSParam:
 \t-i list site
 ''' \
                 % self.prog
-        elif 'rep' in self.prog:
+        elif 'rep' in self.prog or 'generate' in self.prog:
             usage = \
                 '''%s
 \t-h print help information

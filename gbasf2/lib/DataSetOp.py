@@ -251,6 +251,67 @@ def ds_sync(entries):
     return 0
 
 
+def ds_get_se_list():
+
+    from DIRAC.Interfaces.API import Dirac
+    dirac = Dirac.Dirac()
+    Script.enableCS()
+    repman = ReplicaManager()
+    dst_se = get_dst_ses(repman, [])
+    return dst_se
+
+
+def ds_generate(ds_path, dst_se):
+
+    from DIRAC.Interfaces.API import Dirac
+    dirac = Dirac.Dirac()
+    Script.enableCS()
+    repman = ReplicaManager()
+    aclient = AmgaClient()
+    entries = {}
+    if aclient.checkDirectory(ds_path):
+        if dst_se == '':
+            dst_se = get_dst_ses(repman, [])[0]
+            print 'no destination SE specified, choose a random SE ', dst_se
+        print 'uploading dataset to ', dst_se
+        for outfile in glob.glob('*.root'):
+            lfn = ds_path + '/' + outfile
+            if aclient.checkEntry(lfn):
+                print lfn, 'is already registered in this dataset, skip it ...'
+                continue
+            else:
+                GET_META_CMD = 'dirac-dms-lfn-metadata ' + lfn
+                (s, o) = commands.getstatusoutput(GET_META_CMD)
+                cr_result = eval(o)
+                if cr_result['Successful'].has_key(lfn.replace('belle2',
+                        'belle')):
+                    print lfn, \
+                        ' already exists in LFC, skip uploading, but register to AMGA...'
+                    entries[outfile] = (['lfn'], [lfn])
+                else:
+                    print 'trying to upload the register ', lfn
+                    cr_result = repman.putAndRegister(lfn.replace('belle2',
+                            'belle'), outfile, dst_se)
+                    if not cr_result['OK']:
+                        print 'Failed to upload the register file ', lfn
+                        DIRAC.exit(1)
+                    else:
+                        cr_result = cr_result['Value']['Successful'
+                                ][lfn.replace('belle2', 'belle')]
+                        entries[outfile] = (['lfn'], [lfn])
+
+        if len(aclient.getAttributes(ds_path)[0]) == 0:
+            aclient.prepareUserDataset(ds_path)
+        if not aclient.bulkInsert(ds_path, entries):
+            print 'Failed to Insert metadata for ', outfile
+            DIRAC.exit(1)
+    else:
+        print 'Error with metadata path', ds_path
+        DIRAC.exit(1)
+    print 'Successfully Register dataset ', ds_path
+    return 0
+
+
 def ds_list_replica(entries, ListReplica, ListSite):
 
     from DIRAC.Interfaces.API import Dirac

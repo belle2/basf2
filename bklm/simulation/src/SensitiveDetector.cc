@@ -66,7 +66,7 @@ namespace Belle2 {
         }
         m_HitTimeMax = simPar->getHitTimeMax();
         m_DoBackgroundStudy = simPar->getDoBackgroundStudy();
-        m_Random = new TRandom3(simPar->getRandomSeed());
+        if (!gRandom) B2FATAL("BKLM SensitiveDetector: gRandom is not initialized; please set up gRandom first");
       }
 
       // It is not necessary to detect motion from one volume to another (or track death
@@ -148,7 +148,7 @@ namespace Belle2 {
         double zStripDiv = 0.0;   // between -0.5 and +0.5 within central zStrip
         pM->getStripDivisions(localPos, phiStripDiv, zStripDiv);
         int n = 0;
-        double rand = m_Random->Uniform();
+        double rand = gRandom->Uniform();
         for (n = 1; n < simPar->getMaxMultiplicity(); ++n) {
           if (simPar->getPhiMultiplicityCDF(phiStripDiv, n) > rand) break;
         }
@@ -160,7 +160,7 @@ namespace Belle2 {
           }
           nextStrip = (nextStrip > 0 ? -(1 + nextStrip) : 1 - nextStrip);
         }
-        rand = m_Random->Uniform();
+        rand = gRandom->Uniform();
         for (n = 1; n < simPar->getMaxMultiplicity(); ++n) {
           if (simPar->getZMultiplicityCDF(zStripDiv, n) > rand) break;
         }

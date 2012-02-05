@@ -31,12 +31,12 @@ namespace Belle2 {
                    Hep3Vector  shift,
                    Hep3Vector  translation,
                    HepRotation rotation) :
-        m_FrontBack(frontBack),
-        m_Sector(sector),
-        m_NLayer(nLayer),
-        m_Shift(shift),
-        m_Translation(translation),
-        m_Rotation(rotation)
+      m_FrontBack(frontBack),
+      m_Sector(sector),
+      m_NLayer(nLayer),
+      m_Shift(shift),
+      m_Translation(translation),
+      m_Rotation(rotation)
     {
       m_RotationInverse = m_Rotation.inverse();
       m_RotationMatrix = m_Rotation;
@@ -45,15 +45,15 @@ namespace Belle2 {
     }
 
     Sector::Sector(const Sector& s) :
-        m_FrontBack(s.m_FrontBack),
-        m_Sector(s.m_Sector),
-        m_NLayer(s.m_NLayer),
-        m_Shift(s.m_Shift),
-        m_Translation(s.m_Translation),
-        m_Rotation(s.m_Rotation),
-        m_RotationInverse(s.m_RotationInverse),
-        m_Normal(s.m_Normal),
-        m_Modules(s.m_Modules)
+      m_FrontBack(s.m_FrontBack),
+      m_Sector(s.m_Sector),
+      m_NLayer(s.m_NLayer),
+      m_Shift(s.m_Shift),
+      m_Translation(s.m_Translation),
+      m_Rotation(s.m_Rotation),
+      m_RotationInverse(s.m_RotationInverse),
+      m_Normal(s.m_Normal),
+      m_Modules(s.m_Modules)
     {
     }
 

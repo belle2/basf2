@@ -207,14 +207,14 @@ namespace Belle2 {
                            );
       capLogical->SetVisAttributes(G4VisAttributes(false));
       G4Box* cablesShape =
-        new G4Box("BKLM.CablesShape", 0.5 *(ro - ri), dy, dz);
+        new G4Box("BKLM.CablesShape", 0.5 * (ro - ri), dy, dz);
       G4LogicalVolume* cablesLogical =
         new G4LogicalVolume(cablesShape,
                             Materials::get("G4_Al"),
                             "BKLM.LeftCablesLogical"
                            );
       cablesLogical->SetVisAttributes(G4VisAttributes(false));
-      new G4PVPlacement(G4Translate3D(0.5 *(ri + ro), -(0.5 * dyBrace + dy), 0.0),
+      new G4PVPlacement(G4Translate3D(0.5 * (ri + ro), -(0.5 * dyBrace + dy), 0.0),
                         cablesLogical,
                         "BKLM.LeftCablesPhysical",
                         capLogical,
@@ -222,7 +222,7 @@ namespace Belle2 {
                         0,
                         m_GeoPar->doOverlapCheck()
                        );
-      new G4PVPlacement(G4Translate3D(0.5 *(ri + ro), +(0.5 * dyBrace + dy), 0.0),
+      new G4PVPlacement(G4Translate3D(0.5 * (ri + ro), +(0.5 * dyBrace + dy), 0.0),
                         cablesLogical,
                         "BKLM.RightCablesPhysical",
                         capLogical,
@@ -351,9 +351,9 @@ namespace Belle2 {
       const double rInner[2] = {0.0, 0.0};
       const double rOuter[2] = {r, r};
       const double r1 = m_GeoPar->getBracketInnerRadius() * cm - m_RibShift;
-      const double z1[2] = { -(dz + 0.5*cm), dz + 0.5*cm};
+      const double z1[2] = { -(dz + 0.5 * cm), dz + 0.5 * cm};
       const double rOuter1[2] = {r1, r1};
-      const double z2[2] = { -(dz + 1.0*cm), dz + 1.0*cm};
+      const double z2[2] = { -(dz + 1.0 * cm), dz + 1.0 * cm};
       const double dzBracket = m_GeoPar->getBracketThickness() * cm;
       const double drBracket = dzBracket + bracketShift;
       const double rOuter2[2] = {r - drBracket, r - drBracket};
@@ -389,9 +389,9 @@ namespace Belle2 {
                        );
       G4Box* bracketCutout4 =
         new G4Box("BKLM.BracketCutout4",
-                  rOuter[1] + 1.0*cm,
+                  rOuter[1] + 1.0 * cm,
                   rOuter[1] * tan(0.5 * m_SectorDphi) - m_GeoPar->getBracketWidth() * cm,
-                  z[1] + 1.5*cm
+                  z[1] + 1.5 * cm
                  );
       G4VSolid* temp1 =
         new G4SubtractionSolid("BKLM.BracketsTemp1",
@@ -481,7 +481,7 @@ namespace Belle2 {
       Hep3Vector gapHalfSize = m_GeoPar->getGapHalfSize(layer, true) * cm;
       Hep3Vector chimneyHalfSize = m_GeoPar->getChimneyHalfSize(layer) * cm;
       Hep3Vector chimneyPosition = m_GeoPar->getChimneyPosition(layer) * cm;
-      gapHalfSize.setY(0.5 *(gapHalfSize.y() - chimneyHalfSize.y()));
+      gapHalfSize.setY(0.5 * (gapHalfSize.y() - chimneyHalfSize.y()));
       gapHalfSize.setZ(chimneyHalfSize.z() + 0.5 * m_GeoPar->getChimneyCoverThickness() * cm);
       double dx = m_GeoPar->getGapMiddleRadius(layer) * cm;
       double dy = gapHalfSize.y() + chimneyHalfSize.y();

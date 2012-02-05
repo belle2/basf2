@@ -13,8 +13,6 @@
 
 #include <simulation/kernel/SensitiveDetectorBase.h>
 
-class TRandom3;
-
 namespace Belle2 {
 
   class BKLMSimHit;
@@ -49,9 +47,6 @@ namespace Belle2 {
 
       //! maximum permissible hit time (based on overflow of LeCroy 1877 TDC)
       double m_HitTimeMax;
-
-      //! Random number generator
-      TRandom3* m_Random;
 
       //! Flag to enforce once-only initializations in Initialize()
       bool m_FirstCall;

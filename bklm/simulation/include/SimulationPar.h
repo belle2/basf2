@@ -13,8 +13,6 @@
 
 namespace Belle2 {
 
-  class GearDir;
-
   namespace bklm {
 
     //! Provides BKLM simulation parameters (from Gearbox)
@@ -36,17 +34,8 @@ namespace Belle2 {
       //! Get the flag for whether parameters have been loaded by BKLMParamLoader
       bool isValid(void) { if (!m_IsValid) read(); return m_IsValid; }
 
-      //! Set the random number seed for the RPC strip-multiplicity algorithm
-      void setRandomSeed(unsigned int randomSeed) { isValid(); m_RandomSeed = randomSeed; }
-
-      //! Set the flag that controls whether to do the neutron-background study
-      void setDoBackgroundStudy(double doBackgroundStudy) { isValid(); m_DoBackgroundStudy = doBackgroundStudy; }
-
       //! Get the maximum global time for a recorded sim hit
       double getHitTimeMax(void) const { return m_HitTimeMax; }
-
-      //! Get the random number seed for the RPC strip-multiplicity algorithm
-      unsigned int getRandomSeed(void) const { return m_RandomSeed; }
 
       //! Get the flag that controls whether to do the neutron-background study
       double getDoBackgroundStudy(void) const { return m_DoBackgroundStudy; }
@@ -77,17 +66,14 @@ namespace Belle2 {
       //! variable for the maximum global time for a recorded sim hit
       double m_HitTimeMax;
 
-      //! variable for the random number seed used in RPC strip multiplicity algorithm
-      unsigned int m_RandomSeed;
-
       //! flag for whether the neutron background study is done
       double m_DoBackgroundStudy;
 
       //! RPC phiStrip multiplicity cumulative probability distribution table
-      double m_PhiMultiplicityCDF[c_NDIV+1][c_MAX_NHIT];
+      double m_PhiMultiplicityCDF[c_NDIV + 1][c_MAX_NHIT];
 
       //! RPC zStrip multiplicity cumulative probability distribution table
-      double m_ZMultiplicityCDF[c_NDIV+1][c_MAX_NHIT];
+      double m_ZMultiplicityCDF[c_NDIV + 1][c_MAX_NHIT];
 
       //! static pointer to the singleton instance of this class
       static SimulationPar* m_Instance;

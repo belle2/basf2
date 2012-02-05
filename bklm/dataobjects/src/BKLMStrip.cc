@@ -25,27 +25,27 @@ BKLMStrip::BKLMStrip()
 BKLMStrip::BKLMStrip(bool inRPC, int frontBack, int sector,
                      int layer, char direction, int strip,
                      double tdc, double adc) :
-    m_InRPC(inRPC),
-    m_FrontBack(frontBack),
-    m_Sector(sector),
-    m_Layer(layer),
-    m_Direction(direction),
-    m_Strip(strip),
-    m_TDC(tdc),
-    m_ADC(adc)
+  m_InRPC(inRPC),
+  m_FrontBack(frontBack),
+  m_Sector(sector),
+  m_Layer(layer),
+  m_Direction(direction),
+  m_Strip(strip),
+  m_TDC(tdc),
+  m_ADC(adc)
 {
 }
 
 //! Copy constructor
 BKLMStrip::BKLMStrip(const BKLMStrip& h) :
-    m_InRPC(h.m_InRPC),
-    m_FrontBack(h.m_FrontBack),
-    m_Sector(h.m_Sector),
-    m_Layer(h.m_Layer),
-    m_Direction(h.m_Direction),
-    m_Strip(h.m_Strip),
-    m_TDC(h.m_TDC),
-    m_ADC(h.m_ADC)
+  m_InRPC(h.m_InRPC),
+  m_FrontBack(h.m_FrontBack),
+  m_Sector(h.m_Sector),
+  m_Layer(h.m_Layer),
+  m_Direction(h.m_Direction),
+  m_Strip(h.m_Strip),
+  m_TDC(h.m_TDC),
+  m_ADC(h.m_ADC)
 {
 }
 

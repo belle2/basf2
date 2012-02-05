@@ -228,7 +228,7 @@ namespace Belle2 {
     {
       Hep3Vector size = getGapHalfSize(layer, flag);
       size.setX(0.5 * m_ModuleHeight);
-      size.setZ(0.5 *(flag ? m_ModuleLengthChimney : m_ModuleLength));
+      size.setZ(0.5 * (flag ? m_ModuleLengthChimney : m_ModuleLength));
       return size;
     }
 
@@ -275,16 +275,16 @@ namespace Belle2 {
 
     const Hep3Vector GeometryPar::getChimneyHalfSize(int layer) const
     {
-      return Hep3Vector(0.5 *(getLayerOuterRadius(layer) - getLayerInnerRadius(layer)),
+      return Hep3Vector(0.5 * (getLayerOuterRadius(layer) - getLayerInnerRadius(layer)),
                         0.5 * m_ChimneyWidth,
-                        0.5 *(m_ChimneyLength - m_ChimneyCoverThickness));
+                        0.5 * (m_ChimneyLength - m_ChimneyCoverThickness));
     }
 
     const Hep3Vector GeometryPar::getChimneyPosition(int layer) const
     {
-      return Hep3Vector(0.5 *(getLayerOuterRadius(layer) + getLayerInnerRadius(layer)),
+      return Hep3Vector(0.5 * (getLayerOuterRadius(layer) + getLayerInnerRadius(layer)),
                         0.0,
-                        0.5 *(m_GapLength - m_ChimneyLength - m_ChimneyCoverThickness));
+                        0.5 * (m_GapLength - m_ChimneyLength - m_ChimneyCoverThickness));
     }
 
     const Hep3Vector GeometryPar::getSupportPlateHalfSize(bool flag) const

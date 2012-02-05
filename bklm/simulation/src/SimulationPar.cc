@@ -43,7 +43,6 @@ namespace Belle2 {
       if (!content) return;
 
       m_HitTimeMax = content.getWithUnit("/HitTimeMax");
-      m_RandomSeed = content.getInt("RandomSeed");
       m_DoBackgroundStudy = content.getBool("DoBackgroundStudy");
 
       char name[40];
@@ -68,7 +67,7 @@ namespace Belle2 {
         weight[0] = 0.0;
         for (j = 1; j <= nWeight; ++j) {
           sprintf(name, "/Weight[@multiplicity=\"%d\"]", j);
-          weight[j] = divContent.getDouble(name) + weight[j-1];
+          weight[j] = divContent.getDouble(name) + weight[j - 1];
           weight[0] = weight[j];
         }
         for (j = 1; j < c_MAX_NHIT; ++j) {
@@ -86,7 +85,7 @@ namespace Belle2 {
         weight[0] = 0.0;
         for (j = 1; j <= nWeight; ++j) {
           sprintf(name, "/Weight[@multiplicity=\"%d\"]", j);
-          weight[j] = divContent.getDouble(name) + weight[j-1];
+          weight[j] = divContent.getDouble(name) + weight[j - 1];
           weight[0] = weight[j];
         }
         for (j = 1; j < c_MAX_NHIT; ++j) {

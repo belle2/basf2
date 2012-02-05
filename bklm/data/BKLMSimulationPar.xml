@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <SimulationParameters>
-  <RandomSeed>0</RandomSeed>
   <DoBackgroundStudy>false</DoBackgroundStudy>
   <HitTimeMax desc="Maximum global time for a recorded hit" unit="ns">32000</HitTimeMax>
   <RPCStripMultiplicity>

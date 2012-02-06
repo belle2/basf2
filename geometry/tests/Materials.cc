@@ -14,7 +14,7 @@
 using namespace std;
 
 /** stream operator for G4MPVEntry, needed for testing of PropertyTable */
-ostream& operator<<(ostream &out, G4MPVEntry entry)
+ostream& operator<<(ostream& out, G4MPVEntry entry)
 {
   out << "G4MPVEntry(" << entry.GetPhotonEnergy() << "," << entry.GetProperty() << ")";
   return out;
@@ -27,7 +27,7 @@ namespace Belle2 {
     {
       //Check that we can find hydrogen and that the basic Parameters
       //are correct.
-      Materials &m = Materials::getInstance();
+      Materials& m = Materials::getInstance();
       G4Element* e1 = m.getElement("H");
       ASSERT_TRUE(e1);
       EXPECT_EQ("H", e1->GetName());
@@ -52,7 +52,7 @@ namespace Belle2 {
       //Check creation of a simple mixture with fractions of other materials
       //The density of the new material should be equal to the weighted sum
       //of the original densities
-      Gearbox &gb = Gearbox::getInstance();
+      Gearbox& gb = Gearbox::getInstance();
       vector<string> backends;
       backends.push_back("string:<Material name='Test'><state>Gas</state><Components>"
                          "<Material fraction='1.5'>Si</Material>"
@@ -60,7 +60,7 @@ namespace Belle2 {
                          "</Components></Material>");
       gb.setBackends(backends);
       gb.open();
-      Materials &m = Materials::getInstance();
+      Materials& m = Materials::getInstance();
       ASSERT_EQ(0, gb.getNumberNodes("/Material/density"));
       ASSERT_EQ(1, gb.getNumberNodes("/Material/@name"));
 
@@ -69,7 +69,7 @@ namespace Belle2 {
       G4Material* mat = m.createMaterial(GearDir("/Material"));
       ASSERT_TRUE(mat);
       EXPECT_EQ("Test", mat->GetName());
-      EXPECT_DOUBLE_EQ((2.5612*au->GetDensity() + 1.5*si->GetDensity()) / 4.0612, mat->GetDensity());
+      EXPECT_DOUBLE_EQ((2.5612 * au->GetDensity() + 1.5 * si->GetDensity()) / 4.0612, mat->GetDensity());
       gb.close();
     }
 
@@ -77,7 +77,7 @@ namespace Belle2 {
     {
       //When adding elements one has to specify a density since elements do not
       //have a density
-      Gearbox &gb = Gearbox::getInstance();
+      Gearbox& gb = Gearbox::getInstance();
       vector<string> backends;
       backends.push_back("string:<Material name='Test1'><state>Solid</state><Components>"
                          "<Material fraction='0.5'>Si</Material>"
@@ -86,7 +86,7 @@ namespace Belle2 {
       gb.setBackends(backends);
       gb.open();
 
-      Materials &m = Materials::getInstance();
+      Materials& m = Materials::getInstance();
       G4Material* mat = m.createMaterial(GearDir("/Material"));
       ASSERT_FALSE(mat);
       gb.close();
@@ -95,7 +95,7 @@ namespace Belle2 {
     TEST(Materials, CreateDensity)
     {
       //Same as above, but with density so it should work
-      Gearbox &gb = Gearbox::getInstance();
+      Gearbox& gb = Gearbox::getInstance();
       vector<string> backends;
       backends.push_back("string:<Material name='Test2'><state>Liquid</state><density>1</density><Components>"
                          "<Material>Si</Material>"
@@ -104,7 +104,7 @@ namespace Belle2 {
       gb.setBackends(backends);
       gb.open();
 
-      Materials &m = Materials::getInstance();
+      Materials& m = Materials::getInstance();
       G4Material* mat = m.createMaterial(GearDir("/Material"));
       ASSERT_TRUE(mat);
       gb.close();
@@ -113,7 +113,7 @@ namespace Belle2 {
     TEST(Materials, CreateMaterialError)
     {
       //When adding unknown materials we should get NULL
-      Gearbox &gb = Gearbox::getInstance();
+      Gearbox& gb = Gearbox::getInstance();
       vector<string> backends;
       backends.push_back("string:<Material name='Test3'><Components>"
                          "<Material>Foo</Material>"
@@ -121,7 +121,7 @@ namespace Belle2 {
       gb.setBackends(backends);
       gb.open();
 
-      Materials &m = Materials::getInstance();
+      Materials& m = Materials::getInstance();
       G4Material* mat = m.createMaterial(GearDir("/Material"));
       ASSERT_FALSE(mat);
       gb.close();
@@ -130,7 +130,7 @@ namespace Belle2 {
     TEST(Materials, CreateElementError)
     {
       //When adding unknown elements we should get NULL
-      Gearbox &gb = Gearbox::getInstance();
+      Gearbox& gb = Gearbox::getInstance();
       vector<string> backends;
       backends.push_back("string:<Material name='Test4'><density>1</density><Components>"
                          "<Element>Foo</Element>"
@@ -138,7 +138,7 @@ namespace Belle2 {
       gb.setBackends(backends);
       gb.open();
 
-      Materials &m = Materials::getInstance();
+      Materials& m = Materials::getInstance();
       G4Material* mat = m.createMaterial(GearDir("/Material"));
       ASSERT_FALSE(mat);
       gb.close();
@@ -146,7 +146,7 @@ namespace Belle2 {
 
     TEST(Materials, OpticalSurface)
     {
-      Gearbox &gb = Gearbox::getInstance();
+      Gearbox& gb = Gearbox::getInstance();
       vector<string> backends;
       backends.push_back("string:<test><Surface/>"
                          "<Surface name='test'><Model>unified</Model><Finish>Ground</Finish>"
@@ -158,7 +158,7 @@ namespace Belle2 {
       gb.setBackends(backends);
       gb.open();
 
-      Materials &m = Materials::getInstance();
+      Materials& m = Materials::getInstance();
 
       G4OpticalSurface* surf1 = m.createOpticalSurface(GearDir("/test/Surface[1]"));
       ASSERT_TRUE(surf1);
@@ -186,7 +186,7 @@ namespace Belle2 {
 
     TEST(Materials, Properties)
     {
-      Gearbox &gb = Gearbox::getInstance();
+      Gearbox& gb = Gearbox::getInstance();
       vector<string> backends;
       backends.push_back("string:<Material name='TestProperties'>"
                          "<Components><Material>Si</Material></Components>"
@@ -199,23 +199,23 @@ namespace Belle2 {
                          "</Material>");
       gb.setBackends(backends);
       gb.open();
-      Materials &m = Materials::getInstance();
+      Materials& m = Materials::getInstance();
 
       G4Material* mat = m.createMaterial(GearDir("/Material"));
       ASSERT_TRUE(mat);
-      G4MaterialPropertiesTable *properties = mat->GetMaterialPropertiesTable();
+      G4MaterialPropertiesTable* properties = mat->GetMaterialPropertiesTable();
       ASSERT_TRUE(properties);
-      G4MaterialPropertyVector *property = properties->GetProperty("RINDEX");
+      G4MaterialPropertyVector* property = properties->GetProperty("RINDEX");
       ASSERT_TRUE(property);
       EXPECT_EQ(property->Entries(), 4);
       EXPECT_DOUBLE_EQ(property->GetMinProperty(), 1.40);
       EXPECT_DOUBLE_EQ(property->GetMaxProperty(), 1.43);
-      EXPECT_DOUBLE_EQ(property->GetMinPhotonEnergy(), 1*eV);
-      EXPECT_DOUBLE_EQ(property->GetMaxPhotonEnergy(), 3.5*eV);
-      EXPECT_EQ(property->GetEntry(0), G4MPVEntry(1.0*eV, 1.40));
-      EXPECT_EQ(property->GetEntry(1), G4MPVEntry(1.5*eV, 1.41));
-      EXPECT_EQ(property->GetEntry(2), G4MPVEntry(2.0*eV, 1.42));
-      EXPECT_EQ(property->GetEntry(3), G4MPVEntry(3.5*eV, 1.43));
+      EXPECT_DOUBLE_EQ(property->GetMinPhotonEnergy(), 1 * eV);
+      EXPECT_DOUBLE_EQ(property->GetMaxPhotonEnergy(), 3.5 * eV);
+      EXPECT_EQ(property->GetEntry(0), G4MPVEntry(1.0 * eV, 1.40));
+      EXPECT_EQ(property->GetEntry(1), G4MPVEntry(1.5 * eV, 1.41));
+      EXPECT_EQ(property->GetEntry(2), G4MPVEntry(2.0 * eV, 1.42));
+      EXPECT_EQ(property->GetEntry(3), G4MPVEntry(3.5 * eV, 1.43));
       gb.close();
     }
   } // namespace geometry

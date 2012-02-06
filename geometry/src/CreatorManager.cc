@@ -36,7 +36,7 @@ namespace Belle2 {
         FileSystem::loadLibrary(library, false);
       }
 
-      CreatorManager &instance = getInstance();
+      CreatorManager& instance = getInstance();
       map<string, CreatorFactory*>::const_iterator it = instance.m_creatorFactories.find(name);
       if (it == instance.m_creatorFactories.end()) {
         B2ERROR("Could not find a geometry creator named " << name);

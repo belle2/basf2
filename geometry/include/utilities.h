@@ -42,13 +42,13 @@ namespace Belle2 {
      * @param volume Volume for which to set the color
      * @param color  String representation of the color
      */
-    void setColor(G4LogicalVolume &volume, const std::string &color);
+    void setColor(G4LogicalVolume& volume, const std::string& color);
 
     /** Helper function to quickly set the visibility of a given volume.
      * @param volume Volume for which to set the visibility
      * @param visible true if the volume should be visible, false otherwise
      */
-    void setVisibility(G4LogicalVolume &volume, bool visible);
+    void setVisibility(G4LogicalVolume& volume, bool visible);
 
     /** Create Polycone Shape from XML Parameters.
      * This function will create a polycone shape directly from Gearbox Parameters of the form
@@ -75,7 +75,7 @@ namespace Belle2 {
      * @param[out] minZ will contain the minimal z coordinate of the polycone
      * @param[out] maxZ will contain the maximal z coordinate of the polycone
      */
-    G4Polycone* createPolyCone(const std::string& name, GearDir params, double &minZ, double &maxZ);
+    G4Polycone* createPolyCone(const std::string& name, GearDir params, double& minZ, double& maxZ);
 
     /** Create a solid by roating two polylines around the Z-Axis.
      * This function will create a polycone shape directly from Gearbox
@@ -112,7 +112,7 @@ namespace Belle2 {
      * @param[out] minZ will contain the minimal z coordinate of the polycone
      * @param[out] maxZ will contain the maximal z coordinate of the polycone
      */
-    G4Polycone* createRotationSolid(const std::string &name, const GearDir& params, double &minZ, double &maxZ);
+    G4Polycone* createRotationSolid(const std::string& name, const GearDir& params, double& minZ, double& maxZ);
   }
 } //Belle2 namespace
 #endif

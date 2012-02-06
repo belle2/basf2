@@ -34,7 +34,7 @@ namespace Belle2 {
 
   void GeometryModule::initialize()
   {
-    geometry::GeometryManager &geoManager = geometry::GeometryManager::getInstance();
+    geometry::GeometryManager& geoManager = geometry::GeometryManager::getInstance();
     geoManager.setDetectorComponents(m_components);
     geoManager.setExcludedComponents(m_excluded);
     geoManager.createGeometry(GearDir(m_geometryPath), geometry::FullGeometry);

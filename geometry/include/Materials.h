@@ -49,7 +49,7 @@ namespace Belle2 {
        * @see Materials::getMaterial
        * @param name of the material to find
        */
-      static G4Material* get(const std::string &name) { return Materials::getInstance().getMaterial(name); }
+      static G4Material* get(const std::string& name) { return Materials::getInstance().getMaterial(name); }
 
       /**
        * Get a pointer to the G4Material with the given name
@@ -65,13 +65,13 @@ namespace Belle2 {
        *
        * @param name Name of the material to be found
        */
-      G4Material* getMaterial(const std::string &name, bool showErrors = true) const;
+      G4Material* getMaterial(const std::string& name, bool showErrors = true) const;
 
       /**
        * Find given chemical element
        * @param name Name of the Element, e.g. Si, Al, He
        */
-      G4Element* getElement(const std::string &name) const;
+      G4Element* getElement(const std::string& name) const;
 
       /**
        * Create a material from the parameters specified by parameters
@@ -79,7 +79,7 @@ namespace Belle2 {
        * @return pointer to the newly created material, 0 if there was an
        *         error creating it
        */
-      G4Material* createMaterial(const gearbox::Interface &parameters);
+      G4Material* createMaterial(const gearbox::Interface& parameters);
 
       /**
        * Create a list of Material properties from a set of parameters
@@ -87,14 +87,14 @@ namespace Belle2 {
        * @return pointer to the newly created properties table, 0 if no
        *         properties were found
        */
-      G4MaterialPropertiesTable* createProperties(const gearbox::Interface &parameter);
+      G4MaterialPropertiesTable* createProperties(const gearbox::Interface& parameter);
 
       /**
        * Create an optical surface from parameters
        * @param parameters Optical surface definition
        * @return new optical surface, 0 on error
        */
-      G4OpticalSurface* createOpticalSurface(const gearbox::Interface &parameters);
+      G4OpticalSurface* createOpticalSurface(const gearbox::Interface& parameters);
 
     protected:
       /** Singleton: hide constructor */

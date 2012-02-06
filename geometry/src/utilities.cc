@@ -80,14 +80,14 @@ namespace Belle2 {
       return G4Colour(red, green, blue, alpha);
     }
 
-    void setColor(G4LogicalVolume &volume, const string &color)
+    void setColor(G4LogicalVolume& volume, const string& color)
     {
       G4VisAttributes* attr = const_cast<G4VisAttributes*>(volume.GetVisAttributes());
       if (!attr) attr = new G4VisAttributes();
       attr->SetColor(parseColor(color));
       volume.SetVisAttributes(attr);
     }
-    void setVisibility(G4LogicalVolume &volume, bool visible)
+    void setVisibility(G4LogicalVolume& volume, bool visible)
     {
       G4VisAttributes* attr = const_cast<G4VisAttributes*>(volume.GetVisAttributes());
       if (!attr) attr = new G4VisAttributes();
@@ -95,7 +95,7 @@ namespace Belle2 {
       volume.SetVisAttributes(attr);
     }
 
-    G4Polycone* createPolyCone(const string& name, GearDir params, double &minZ, double &maxZ)
+    G4Polycone* createPolyCone(const string& name, GearDir params, double& minZ, double& maxZ)
     {
       if (!params) return 0;
 
@@ -113,7 +113,7 @@ namespace Belle2 {
       int index(0);
       minZ = numeric_limits<double>::infinity();
       maxZ = -numeric_limits<double>::infinity();
-      BOOST_FOREACH(const GearDir &plane, planes) {
+      BOOST_FOREACH(const GearDir & plane, planes) {
         z[index]    = plane.getLength("posZ") / Unit::mm;
         minZ = min(minZ, z[index]);
         maxZ = max(maxZ, z[index]);
@@ -144,7 +144,7 @@ namespace Belle2 {
        * @param[inout] segments List of points which forms a polyline. Points
        *        will be added to this list
        */
-      void subdivideSegments(const PointList &points, PointList &segments)
+      void subdivideSegments(const PointList& points, PointList& segments)
       {
         double lastZ = -numeric_limits<double>::infinity();
         BOOST_FOREACH(const ZXPoint p, points) {
@@ -182,7 +182,7 @@ namespace Belle2 {
       }
     }
 
-    G4Polycone* createRotationSolid(const std::string &name, const GearDir& params, double &minZ, double &maxZ)
+    G4Polycone* createRotationSolid(const std::string& name, const GearDir& params, double& minZ, double& maxZ)
     {
 
       //Make a list of all the points (ZX coordinates)

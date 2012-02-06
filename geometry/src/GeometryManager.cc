@@ -65,7 +65,7 @@ namespace Belle2 {
       G4LogicalSkinSurface::CleanSurfaceTable();
       //FIXME: The MaterialPropertyTables associated with the surfaces won't get deleted.
       G4SurfaceProperty::CleanSurfacePropertyTable();
-      BOOST_FOREACH(CreatorBase* creator, m_creators) delete creator;
+      BOOST_FOREACH(CreatorBase * creator, m_creators) delete creator;
       m_creators.clear();
       m_topVolume = 0;
     }
@@ -81,10 +81,10 @@ namespace Belle2 {
         B2FATAL("Could not read detector name, make sure gearbox is connected and " << detectorDir.getPath() << " points to the geometry description");
       }
 
-      Materials &materials = Materials::getInstance();
+      Materials& materials = Materials::getInstance();
       //Set up Materials first since we possibly need them for the top volume
-      BOOST_FOREACH(const GearDir& matlist, detectorDir.getNodes("Materials")) {
-        BOOST_FOREACH(const GearDir& mat, matlist.getNodes("Material")) {
+      BOOST_FOREACH(const GearDir & matlist, detectorDir.getNodes("Materials")) {
+        BOOST_FOREACH(const GearDir & mat, matlist.getNodes("Material")) {
           materials.createMaterial(mat);
         }
       }
@@ -101,7 +101,7 @@ namespace Belle2 {
       m_topVolume = new G4PVPlacement(0, G4ThreeVector(), top_log, "Top", 0, false, 0);
 
       //Now create all subcomponents
-      BOOST_FOREACH(const GearDir &component, detectorDir.getNodes("DetectorComponent")) {
+      BOOST_FOREACH(const GearDir & component, detectorDir.getNodes("DetectorComponent")) {
         string name;
         string creatorName;
         try {

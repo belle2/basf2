@@ -60,7 +60,7 @@ namespace Belle2 {
        * @param params GearDir pointing to the top element of the geometry parameters
        * @param type Type of the geometry to be built
        */
-      void createGeometry(const GearDir &params, GeometryTypes type = FullGeometry);
+      void createGeometry(const GearDir& params, GeometryTypes type = FullGeometry);
 
       /**
        * Set the names of the components to create.

@@ -72,7 +72,10 @@ EHLTStatus HLTProcess::initControl()
 
 EHLTStatus HLTProcess::initSenders()
 {
-  m_dataOutBuffer = new RingBuffer(boost::lexical_cast<std::string>(static_cast<int>(c_DataOutPort)).c_str(), gBufferSize);
+  if (m_nodeInfo.type() == "WN")
+    m_dataOutBuffer = new RingBuffer(boost::lexical_cast<std::string>(static_cast<int>(c_DataInPort)).c_str(), gBufferSize);
+  else
+    m_dataOutBuffer = new RingBuffer(boost::lexical_cast<std::string>(static_cast<int>(c_DataOutPort)).c_str(), gBufferSize);
 
   for (unsigned int i = 0; i < m_nodeInfo.targetIP().size(); ++i) {
     pid_t pidHLTSender = fork();
@@ -106,7 +109,10 @@ EHLTStatus HLTProcess::initSenders()
 
 EHLTStatus HLTProcess::initReceivers()
 {
-  m_dataInBuffer = new RingBuffer(boost::lexical_cast<std::string>(static_cast<int>(c_DataInPort)).c_str(), gBufferSize);
+  if (m_nodeInfo.type() == "WN")
+    m_dataInBuffer = new RingBuffer(boost::lexical_cast<std::string>(static_cast<int>(c_DataOutPort)).c_str(), gBufferSize);
+  else
+    m_dataInBuffer = new RingBuffer(boost::lexical_cast<std::string>(static_cast<int>(c_DataInPort)).c_str(), gBufferSize);
 
   for (unsigned int i = 0; i < m_nodeInfo.sourceIP().size(); ++i) {
     pid_t pidHLTReceiver = fork();
@@ -147,7 +153,7 @@ EHLTStatus HLTProcess::process()
       system("basf2 $BELLE2_LOCAL_DIR/daq/data/workerNode.py");
     } else if (m_nodeInfo.type() == "EM") {
       displayMode("Event merger");
-      B2INFO("[HLTProcess] Hi, I'm event merger!");
+      system("basf2 $BELLE2_LOCAL_DIR/daq/data/eventMerger.py");
     }
   } else {
     B2INFO("\x1b[33m[HLTProcess] basf2 " << pidProcess << " forked\x1b[0m");

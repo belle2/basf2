@@ -43,7 +43,8 @@ namespace Belle2 {
 
     //! Decode received data to ensure a singleton of data
     EHLTStatus decodeSingleton(std::string data, std::vector<std::string>& container);
-    int decodeSingleton(char* data, int size, char** container, int* sizes);
+    //int decodeSingleton(char* data, int size, char** container, int* sizes);
+    int decodeSingleton(char* data, int size, char* container, std::vector<int>& sizes);
 
     int findEOS(char* data, int size);
     void writeFile(char* file, char* data, int size);

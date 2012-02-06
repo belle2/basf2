@@ -43,19 +43,19 @@
 			    which needs accurate propagation of beam particles.
 			    Field strength are calculated from the magnet parameters (K0,K1,SK0,SK1) 
 			    used in accelerator simulation.
-			    These parameters are provided for each 4cm slice in the beam direction.
+			    These parameters are provided for each 1cm slice in the beam direction.
 			-->
 			<Component type="Quad">
-				<MapFilenameHER>geometry/QuadFieldMapHER.dat</MapFilenameHER>
-				<MapFilenameLER>geometry/QuadFieldMapLER.dat</MapFilenameLER>
-				<MapSizeHER>116</MapSizeHER>
-				<MapSizeLER> 74</MapSizeLER>
+				<MapFilenameHER>geometry/QuadFieldMapHER3d.dat</MapFilenameHER>
+				<MapFilenameLER>geometry/QuadFieldMapLER3d.dat</MapFilenameLER>
+				<MapSizeHER>518</MapSizeHER>
+				<MapSizeLER>401</MapSizeLER>
 				<ApertFilenameHER>geometry/ApertHER.dat</ApertFilenameHER>
 				<ApertFilenameLER>geometry/ApertLER.dat</ApertFilenameLER>
 				<ApertSizeHER>22</ApertSizeHER>
 				<ApertSizeLER>26</ApertSizeLER>
-				<CircumferenceHER unit="m">3016.36984</CircumferenceHER>
-				<CircumferenceLER unit="m">3016.36087</CircumferenceLER>
+				<CircumferenceHER unit="m">3016.314538</CircumferenceHER>
+				<CircumferenceLER unit="m">3016.305574</CircumferenceLER>
 				<BeamEnergyHER unit="GeV">7.0</BeamEnergyHER>
 				<BeamEnergyLER unit="GeV">4.0</BeamEnergyLER>
 			</Component>

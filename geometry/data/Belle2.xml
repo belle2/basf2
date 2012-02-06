@@ -23,6 +23,8 @@
 
   <!-- Magnetic field -->
   <xi:include href="../geometry/MagneticFieldConstant.xml"/>
+  <!--xi:include href="../geometry/MagneticField2d.xml"/-->
+  <!--xi:include href="../geometry/MagneticField3d.xml"/-->
 
   <!-- Subdedectors -->
   <xi:include href="../structure/COIL.xml"/>

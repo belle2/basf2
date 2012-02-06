@@ -52,7 +52,7 @@
 				<ApertFilenameLER>geometry/ApertLER.dat</ApertFilenameLER>
 				<ApertSizeHER>22</ApertSizeHER>
 				<ApertSizeLER>26</ApertSizeLER>
-				<CircumferenceHER unit="m">3016.36984</CircumferenceHER>
+ 				<CircumferenceHER unit="m">3016.369812</CircumferenceHER>
 				<CircumferenceLER unit="m">3016.36087</CircumferenceLER>
 				<BeamEnergyHER unit="GeV">7.0</BeamEnergyHER>
 				<BeamEnergyLER unit="GeV">4.0</BeamEnergyLER>

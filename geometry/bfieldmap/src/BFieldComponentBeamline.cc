@@ -180,6 +180,9 @@ TVector3 BFieldComponentBeamline::calculate_beamline(const TVector3& point0, int
   int offsetRPhi;
   double mapSizeRPhi;
 
+  //added by nakayama to avoid segV
+  if (TMath::Abs(point0.z()) > 390.) return TVector3(0., 0., 0.);
+
   if (isher == 1) {
     mapBuffer = m_mapBuffer_her;
     interBuffer = m_interBuffer_her;

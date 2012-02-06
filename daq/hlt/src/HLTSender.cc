@@ -50,8 +50,8 @@ EHLTStatus HLTSender::broadcasting()
     return c_Success;
   }
 
-  char temp[gMaxReceives + gEOSTag.size()];
-  memset(temp, 0, gMaxReceives + gEOSTag.size());
+  char* temp = new char [gMaxReceives + gEOSTag.size()];
+  memset(temp, 0, sizeof(char) * (gMaxReceives + gEOSTag.size()));
 
   int bufferStatus = 0;
   while ((bufferStatus = m_buffer->remq((int*)temp)) <= 0) {
@@ -62,17 +62,21 @@ EHLTStatus HLTSender::broadcasting()
 
   std::string termChecker(temp);
   if (termChecker == gTerminate) {
-    m_buffer->insq((int*)temp, bufferStatus / 4 + 1);
+    B2INFO("\x1b[032m[HLTSender] Termination code taken!\x1b[0m");
+    if (m_buffer->insq((int*)gTerminate.c_str(), gTerminate.size() / 4 + 1) <= 0) {
+      usleep(100);
+    }
+    //m_buffer->insq((int*)temp, bufferStatus / 4 + 1);
     termCode = true;
   }
 
   int size = bufferStatus * 4;
 
-  writeFile("sender", temp, size);
+  //writeFile("sender", temp, size);
   makeSingleton(temp, size);
   size += gEOSTag.size();
 
-  writeFile("senderAfterEncode", temp, size);
+  //writeFile("senderAfterEncode", temp, size);
 
   if (!termCode) {
     while (send(temp, size) == c_FuncError) {
@@ -100,8 +104,8 @@ EHLTStatus HLTSender::broadcasting(std::string data)
   if (send(sendingMessage, size) == c_FuncError)
     return c_FuncError;
   else {
-    //B2INFO ("[HLTSender] \x1b[34mData " << sendingMessage << " (size=" << sendingMessage.size ()
-    //    << ") has been sent to " << m_destination << "\x1b[0m");
+    B2INFO("[HLTSender] \x1b[34mData " << sendingMessage << " (size=" << sendingMessage.size()
+           << ") has been sent to " << m_destination << "\x1b[0m");
     return c_Success;
   }
 }
@@ -132,9 +136,9 @@ std::string HLTSender::makeSingleton(std::string data)
 
 EHLTStatus HLTSender::makeSingleton(char* data, int size)
 {
-  char* eosTag = (char*)gEOSTag.c_str();
+  //char* eosTag = (char*)gEOSTag.c_str();
   //memcpy(data + sizeof(char) * size, eosTag, gEOSTag.size());
-  memcpy(data + sizeof(char) * size, gEOSTag.c_str(), gEOSTag.size());
+  memcpy(data + sizeof(char) * size, gEOSTag.c_str(), sizeof(char) * gEOSTag.size());
 
   return c_Success;
 }

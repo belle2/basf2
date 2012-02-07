@@ -17,10 +17,15 @@
 #include <framework/logging/Logger.h>
 #include <daq/hlt/HLTDefs.h>
 
+#include <boost/archive/text_oarchive.hpp>
+#include <boost/archive/text_iarchive.hpp>
+#include <boost/archive/binary_oarchive.hpp>
+#include <boost/archive/binary_iarchive.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/serialization/serialization.hpp>
 #include <boost/serialization/map.hpp>
 
+#include <daq/hlt/B2Socket.h>
 #include <daq/hlt/XMLParser.h>
 #include <daq/hlt/NodeInfo.h>
 #include <daq/hlt/HLTSender.h>

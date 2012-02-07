@@ -42,6 +42,27 @@ TRGBitStream::TRGBitStream(const TRGBitStream & a) :
 	_stream.push_back(new unsigned(* a._stream[i]));
 }
 
+TRGBitStream::TRGBitStream(const char * const c, unsigned s) :
+    _name("unknown"),
+    _sizeMax(0),
+    _size(s),
+    _stream(0) {
+    unsigned sz = s / 8;
+    if (s % 8) ++sz;
+    unsigned sz4 = sz / 4;
+    for (unsigned i = 0; i < sz4; i++) {
+//	unsigned j = * (unsigned *) c[i * 4];
+	unsigned j = * (unsigned *) (& (c[i * 4]));
+	_stream.push_back(new unsigned(j));
+    }
+    if (sz % 4) {
+	unsigned j = 0;
+	for (unsigned i = 0; i < sz % 4; i++)
+	    j |= (c[sz4 + i] << i * 8);
+	_stream.push_back(new unsigned(j));
+    }
+}
+
 TRGBitStream::~TRGBitStream() {
     for (unsigned i = 0; i < _stream.size(); i++)
 	delete _stream[i];
@@ -53,7 +74,7 @@ TRGBitStream::dump(const string & msg,
 
     const string tab = "    ";
 
-    cout << pre << _name << ":size=" << _size <<  endl;
+    cout << pre << _name << ":size=" << dec << _size <<  endl;
     for (unsigned i = 0; i < _stream.size(); i++) {
 	cout << pre << tab;
 	if (i == _stream.size() - 1) {

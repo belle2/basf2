@@ -55,6 +55,9 @@ class TRGBitStream {
     /// Copy constructor.
     TRGBitStream(const TRGBitStream &);
 
+    /// Constructor with char stream.
+    TRGBitStream(const char * const, unsigned sizeInBit);
+
     /// Destructor
     virtual ~TRGBitStream();
 

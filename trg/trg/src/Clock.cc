@@ -77,7 +77,7 @@ TRGClock::time(double t) const {
              << ") !!! out of time window : min=" << minTiming()
              << ",max=" << maxTiming() << ",given value=" << t << endl;
 
-    cout << "t,offset,unit=" << t << "," << _offset << "," << int((t - _offset) / _cycle) << endl;
+//    cout << "t,offset,unit=" << t << "," << _offset << "," << int((t - _offset) / _cycle) << endl;
 
     return int((t - _offset) / _cycle);
 }

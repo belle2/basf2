@@ -45,10 +45,12 @@ namespace Belle2 {
     //! Set ring buffer with specific key
     EHLTStatus setBuffer(unsigned int key);
 
-    //! Encode data to be sent to ensure the singleton of data
+    //! Encode data to be sent to ensure the singleton of data for a string
     std::string makeSingleton(std::string data);
+    //! Encode data to be sent to ensure the singleton of data for general data
     EHLTStatus makeSingleton(char* data, int size);
 
+    //! Writing a data into a file (development purpose only)
     void writeFile(char* file, char* data, int size);
 
   protected:

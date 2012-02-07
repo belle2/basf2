@@ -41,12 +41,15 @@ namespace Belle2 {
     //! Set buffer with specific key
     EHLTStatus setBuffer(unsigned int key);
 
-    //! Decode received data to ensure a singleton of data
+    //! Decode received data to ensure a singleton of data for a simple string
     EHLTStatus decodeSingleton(std::string data, std::vector<std::string>& container);
-    //int decodeSingleton(char* data, int size, char** container, int* sizes);
+    //! Decode received data to ensure a singleton of data for general data
     int decodeSingleton(char* data, int size, char* container, std::vector<int>& sizes);
 
+    //! Find EOS tag from the data
     int findEOS(char* data, int size);
+
+    //! Writing a data into a file (development purpose only)
     void writeFile(char* file, char* data, int size);
 
   protected:

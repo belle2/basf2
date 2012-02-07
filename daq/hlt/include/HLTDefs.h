@@ -69,7 +69,6 @@ namespace Belle2 {
   const std::string gTerminate = "Terminat";
   const std::string gTerminationTag = gTerminate + gEOSTag;
   const std::string gEndOfEvent = "EndOfEvent";
-  //const std::string gTerminationTag = "Terminat" + gEOSTag;
 }
 
 #endif

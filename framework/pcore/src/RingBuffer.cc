@@ -14,18 +14,6 @@
 #include <framework/pcore/RingBuffer.h>
 #include <framework/logging/Logger.h>
 
-#include <iostream>
-#include <errno.h>
-#include <sys/types.h>
-#include <sys/ipc.h>
-#include <sys/shm.h>
-#include <sys/sem.h>
-#include <stdio.h>
-#include <unistd.h>
-#include <string.h>
-
-#include <boost/format.hpp>
-
 #define REDZONE_FACTOR 0.8
 
 using namespace std;
@@ -33,15 +21,22 @@ using namespace Belle2;
 
 // Constructor / Destructor
 
-RingBuffer::RingBuffer(char* name, int size)
+// Constructor of Private Ringbuffer
+RingBuffer::RingBuffer(int size)
 {
+  m_file = false;
+  m_new = true;
+  m_pathname = "";
+  m_shmkey = IPC_PRIVATE;
+
+
   // 1. Open shared memory
   m_shmid = shmget(IPC_PRIVATE, size * 4, IPC_CREAT | 0644);
   if (m_shmid < 0) {
     B2ERROR("RingBuffer::shmget");
     return;
   }
-  m_shmadr = (int *) shmat(m_shmid, 0, 0);
+  m_shmadr = (int*) shmat(m_shmid, 0, 0);
   if (m_shmadr == (int*) - 1) {
     B2ERROR("RingBuffer::shmat");
     return;
@@ -81,6 +76,94 @@ RingBuffer::RingBuffer(char* name, int size)
   B2INFO(boost::format("buftop = %1%, end = %2%\n") % m_buftop % (m_buftop + m_bufinfo->size));
 }
 
+// Constructor of Global Ringbuffer with name
+RingBuffer::RingBuffer(const char* name, unsigned int size)
+{
+  // 0. Determine shared memory type
+  if (strcmp(name, "private") != 0) {      // Global
+    m_file = true;
+    m_pathname = string("/tmp/") + string(getenv("USER"))
+                 + string("_") + string(name);
+    //m_pathfd = creat ( m_pathname.c_str(), 0644 );
+    m_pathfd = open(m_pathname.c_str(), O_CREAT | O_EXCL, 0644);
+    //m_pathfd = open ( m_pathname.c_str(), O_EXCL, 0644 );
+    if (m_pathfd > 0) {   // a new shared memory file created
+      B2INFO("[RingBuffer] Creating a ring buffer with key " << name);
+      m_shmkey = ftok(m_pathname.c_str(), 1);
+      m_semkey = ftok(m_pathname.c_str(), 2);
+      m_new = true;
+    } else if (m_pathfd == -1 && errno == EEXIST) { // shm already there
+      B2INFO("[RingBuffer] Attaching the ring buffer with key " << name);
+      m_shmkey = ftok(m_pathname.c_str(), 1);
+      m_semkey = ftok(m_pathname.c_str(), 2);
+      m_new = false;
+    } else {
+      B2ERROR("RingBuffer: error to open shm file");
+      return;
+    }
+  } else { // Private
+    m_file = false;
+    m_new = true;
+    m_shmkey = IPC_PRIVATE;
+    m_semkey = IPC_PRIVATE;
+  }
+
+  // 1. Open shared memory
+  m_shmid = shmget(m_shmkey, size * 4, IPC_CREAT | 0644);
+  if (m_shmid < 0) {
+    B2ERROR("RingBuffer::shmget");
+    return;
+  }
+  m_shmadr = (int*) shmat(m_shmid, 0, 0);
+  if (m_shmadr == (int*) - 1) {
+    B2ERROR("RingBuffer::shmat");
+    return;
+  }
+
+  // 2. Open Semaphore
+  m_semid = semget(m_semkey, 1, IPC_CREAT | 0644);
+  if (m_semid < 0) {
+    B2ERROR("RingBuffer::semget");
+    return;
+  }
+  //  cout << "Semaphore created" << endl;
+
+  // 3. Initialize control parameters
+  m_shmsize = size;
+  if (m_new) {
+    m_bufinfo = (struct RingBufInfo*) m_shmadr;
+    m_buftop = m_shmadr + sizeof(struct RingBufInfo);
+    m_bufinfo->size = m_shmsize - sizeof(struct RingBufInfo);
+    m_bufinfo->remain = m_bufinfo->size;
+    m_bufinfo->wptr = 0;
+    m_bufinfo->prevwptr = 0;
+    m_bufinfo->rptr = 0;
+    m_bufinfo->nbuf = 0;
+    m_bufinfo->semid = m_semid;
+    m_bufinfo->nattached = 1;
+    m_bufinfo->mode = 0;
+    m_bufinfo->ninsq = 0;
+    m_bufinfo->nremq = 0;
+  } else {
+    m_bufinfo = (struct RingBufInfo*) m_shmadr;
+    m_buftop = m_shmadr + sizeof(struct RingBufInfo);
+    m_bufinfo->nattached++;
+
+    B2INFO("[RingBuffer] check entries = " << m_bufinfo->nbuf);
+    B2INFO("[RingBuffer] check size = " << m_bufinfo->size);
+  }
+
+  m_remq_counter = 0;
+  m_insq_counter = 0;
+
+  sem_unlock(m_semid);
+
+  //  cout << "RingBuffer initialization done" << endl;
+  B2INFO("RingBuffer initialization done with shm=" << m_shmid);
+  B2INFO(boost::format("buftop = %1%, end = %2%\n") % m_buftop % (m_buftop + m_bufinfo->size));
+}
+
+/* OLD implementation
 RingBuffer::RingBuffer(int shm_id)
 {
   m_shmid = shm_id;
@@ -98,6 +181,7 @@ RingBuffer::RingBuffer(int shm_id)
   m_insq_counter = 0;
 
 }
+*/
 
 RingBuffer::~RingBuffer(void)
 {
@@ -108,9 +192,16 @@ void RingBuffer::cleanup(void)
 {
   shmdt((char*)m_shmadr);
   printf("RingBuffer: Cleaning up IPC\n");
-  shmctl(m_shmid, IPC_RMID, (struct shmid_ds*) 0);
-  struct sembuf arg;
-  semctl(m_semid, 1, IPC_RMID, arg);
+  if (m_new) {
+    shmctl(m_shmid, IPC_RMID, (struct shmid_ds*) 0);
+    struct sembuf arg;
+    semctl(m_semid, 1, IPC_RMID, arg);
+    if (m_file) {
+      close(m_pathfd);
+      unlink(m_pathname.c_str());
+    }
+  }
+
 }
 
 void RingBuffer::dump_db(void)
@@ -134,14 +225,16 @@ int RingBuffer::insq(int* buf, int size)
     m_bufinfo->wptr = 0;
     m_bufinfo->rptr = 0;
     if (size > m_bufinfo->size + 2) {
-      printf("insq: buffer too large!! %d\n", size);
+      B2INFO("[RingBuffer::insq ()] Inserted item is too large! ("
+             << m_bufinfo->size + 2 << " < " << size << ")");
+      sem_unlock(m_semid);
       return -1;
     }
     m_bufinfo->mode = 0;
     int* wptr = m_buftop + m_bufinfo->wptr;
     *wptr = size;
     *(wptr + 1) = m_bufinfo->wptr + (size + 2);
-    memcpy(wptr + 2, buf, size*4);
+    memcpy(wptr + 2, buf, size * 4);
     m_bufinfo->prevwptr = m_bufinfo->wptr;
     m_bufinfo->wptr += (size + 2);
     m_bufinfo->nbuf++;
@@ -160,6 +253,8 @@ int RingBuffer::insq(int* buf, int size)
     }
     if (m_bufinfo->mode == 3) {
       //      printf ( "---> mode is 3, still remaining buffers\n" );
+      B2INFO("[RingBuffer] mode 3");
+      sem_unlock(m_semid);
       return -1;
     } else if (m_bufinfo->mode == 4) {
       //      printf ( "---> mode returned to 0, wptr=%d, rptr=%d\n",
@@ -170,7 +265,7 @@ int RingBuffer::insq(int* buf, int size)
       int* wptr = m_buftop + m_bufinfo->wptr;
       *wptr = size;
       *(wptr + 1) = m_bufinfo->wptr + (size + 2);
-      memcpy(wptr + 2, buf, size*4);
+      memcpy(wptr + 2, buf, size * 4);
       m_bufinfo->prevwptr = m_bufinfo->wptr;
       m_bufinfo->wptr += (size + 2);
       m_bufinfo->nbuf++;
@@ -189,7 +284,7 @@ int RingBuffer::insq(int* buf, int size)
         }
         m_bufinfo->mode = 1;
         int* wptr = m_buftop;
-        memcpy(wptr + 2, buf, size*4);
+        memcpy(wptr + 2, buf, size * 4);
         *wptr = size;
         *(wptr + 1) = size + 2;
         m_bufinfo->wptr = *(wptr + 1);
@@ -228,7 +323,7 @@ int RingBuffer::insq(int* buf, int size)
       int* wptr = m_buftop + m_bufinfo->wptr;
       *wptr = size;
       *(wptr + 1) = m_bufinfo->wptr + (size + 2);
-      memcpy(wptr + 2, buf, size*4);
+      memcpy(wptr + 2, buf, size * 4);
       m_bufinfo->prevwptr = m_bufinfo->wptr;
       m_bufinfo->wptr += (size + 2);
       m_bufinfo->nbuf++;
@@ -263,11 +358,12 @@ int RingBuffer::remq(int* buf)
   //  printf ( "RingBuffer : nw = %d\n", nw );
   if (nw <= 0) {
     printf("RingBuffer::remq : buffer size = %d, skipped\n", nw);
+    printf("RingBuffer::remq : entries = %d\n", m_bufinfo->nbuf);
     sem_unlock(m_semid);
     return 0;
   }
   //  printf ( "remq : taking buf from %d(%d)\n", m_bufinfo->rptr, nw );
-  memcpy(buf, r_ptr + 2, nw*4);
+  memcpy(buf, r_ptr + 2, nw * 4);
   m_bufinfo->rptr = *(r_ptr + 1);
   //  if ( *(r_ptr+1) < m_bufinfo->rptr )
   if (m_bufinfo->rptr == 0)

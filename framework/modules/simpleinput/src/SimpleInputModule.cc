@@ -26,7 +26,7 @@ REG_MODULE(SimpleInput)
 SimpleInputModule::SimpleInputModule() : Module()
 {
   //Set module properties
-  setDescription("simple input");
+  setDescription("This module reads objects/arrays from a root file and writes them into the DataStore.");
   setPropertyFlags(c_Input);
 
   //Initialization of some member variables
@@ -79,15 +79,21 @@ void SimpleInputModule::initialize()
 {
   //Open TFile
   m_file = new TFile(m_inputFileName.c_str(), "READ");
-  m_file->cd();
-  if (!m_file) {B2FATAL("Input file " + m_inputFileName + " doesn't exist");}
+  if (!m_file) {
+    B2FATAL("Couldn't open input file " + m_inputFileName);
+    return;
+  }
   B2INFO("Opened file " + m_inputFileName);
+  m_file->cd();
 
   for (int ii = 0; ii < DataStore::c_NDurabilityTypes; ++ii) {
     //Get TTree
     if (m_treeNames[ii] != "NONE") {
       m_tree[ii] = dynamic_cast<TTree*>(m_file->Get(m_treeNames[ii].c_str()));
-      if (!m_tree[ii]) {B2FATAL("TTree " + m_treeNames[ii] + " doesn't exist");}
+      if (!m_tree[ii]) {
+        B2FATAL("TTree " + m_treeNames[ii] + " doesn't exist");
+        return;
+      }
       B2INFO("Opened tree " + m_treeNames[ii]);
 
 
@@ -137,18 +143,14 @@ void SimpleInputModule::initialize()
     }
   }
 
-  if (m_tree[DataStore::c_Persistent]) {
-    readTree(DataStore::c_Persistent);
-  }
+  readTree(DataStore::c_Persistent);
 }
 
 
 void SimpleInputModule::beginRun()
 {
   B2DEBUG(200, "beginRun called.");
-  if (m_tree[DataStore::c_Run]) {
-    readTree(DataStore::c_Run);
-  }
+  readTree(DataStore::c_Run);
 }
 
 
@@ -156,9 +158,7 @@ void SimpleInputModule::event()
 {
   m_file->cd();
 
-  if (m_tree[DataStore::c_Event]) {
-    readTree(DataStore::c_Event);
-  }
+  readTree(DataStore::c_Event);
   m_counterNumber[DataStore::c_Event]++;
 }
 
@@ -177,13 +177,15 @@ void SimpleInputModule::terminate()
 
 void SimpleInputModule::readTree(const DataStore::EDurability& durability)
 {
+  if (!m_tree[durability])
+    return;
+
   // Check if there are still new entries available.
   B2DEBUG(200, "Durability" << durability)
   if (m_counterNumber[durability] >= m_tree[durability]->GetEntriesFast()) return;
 
-  int ii = durability;
-  for (int jj = 0; jj < m_size[ii]; jj++) {
-    m_objects[ii][jj] = 0;
+  for (int jj = 0; jj < m_size[durability]; jj++) {
+    m_objects[durability][jj] = 0;
   }
 
   //Go again over the branchlist and connect the branches with TObject pointers
@@ -191,20 +193,15 @@ void SimpleInputModule::readTree(const DataStore::EDurability& durability)
   for (int jj = 0; jj < m_tree[durability]->GetNbranches(); jj++) {
     TBranch* branch = validBranch(jj, durability);
     if (branch) {
-      if (static_cast<string>(branch->GetClassName()) == "TClonesArray") {
-        /*
-          branch->SetAddress(&(m_objects[ii][iarray + m_sizeObj[ii]]));
-          m_objectNames[ii][iarray + m_sizeObj[ii]] = static_cast<string>(branch->GetName());
-          iarray++;*/
-      } else {
-        branch->SetAddress(&(m_objects[ii][iobject]));
-        m_objectNames[ii][iobject] = static_cast<string>(branch->GetName());
+      if (static_cast<string>(branch->GetClassName()) != "TClonesArray") {
+        branch->SetAddress(&(m_objects[durability][iobject]));
         iobject++;
       }
     }
   }
 
 
+  //this will also (re)fill the TClonesArrays in the DataStore, we don't need to reassign any pointers
   m_tree[durability]->GetEntry(m_counterNumber[durability]);
 
 
@@ -212,11 +209,6 @@ void SimpleInputModule::readTree(const DataStore::EDurability& durability)
   for (int jj = 0; jj < m_sizeObj[durability]; jj++) {
     DataStore::Instance().storeObject(m_objects[durability][jj], m_objectNames[durability][jj], durability);
   }
-  // Store arrays in the DataStore
-  /*  for (int jj = 0; jj < m_size[durability] - m_sizeObj[durability]; jj++) {
-      DataStore::Instance().storeArray(static_cast<TClonesArray*>(m_objects[durability][jj+m_sizeObj[durability]]), m_objectNames[durability][jj+m_sizeObj[durability]]);
-    }*/
-
 }
 
 TBranch* SimpleInputModule::validBranch(int ibranch, DataStore::EDurability durability) const
@@ -232,8 +224,8 @@ TBranch* SimpleInputModule::validBranch(int ibranch, DataStore::EDurability dura
     return branch;
 
   // check if the branch is in the corresponding branch list
-  vector<string>::const_iterator found_itr = find(m_branchNames[durability].begin(), m_branchNames[durability].end(), branch->GetName());
-  if (found_itr == m_branchNames[durability].end())
+  vector<string>::const_iterator foundItr = find(m_branchNames[durability].begin(), m_branchNames[durability].end(), branch->GetName());
+  if (foundItr == m_branchNames[durability].end())
     return 0; //not found
 
   return branch;

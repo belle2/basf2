@@ -197,13 +197,11 @@ void SimpleInputModule::readTree(const DataStore::EDurability& durability)
         branch->SetAddress(&(m_objects[durability][iobject]));
         iobject++;
       }
+
+      //this will also (re)fill the TClonesArrays in the DataStore, we don't need to reassign any pointers
+      branch->GetEntry(m_counterNumber[durability]);
     }
   }
-
-
-  //this will also (re)fill the TClonesArrays in the DataStore, we don't need to reassign any pointers
-  m_tree[durability]->GetEntry(m_counterNumber[durability]);
-
 
   // Store objects in the DataStore
   for (int jj = 0; jj < m_sizeObj[durability]; jj++) {

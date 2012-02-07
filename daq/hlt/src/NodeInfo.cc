@@ -12,6 +12,7 @@
 
 using namespace Belle2;
 
+/// @brief NodeInfo constructor
 NodeInfo::NodeInfo()
 {
   m_unitNo = -1;
@@ -28,6 +29,7 @@ NodeInfo::NodeInfo()
   m_targetIP.clear();
 }
 
+/// @brief NodeInfo copy constructor
 NodeInfo::NodeInfo(const NodeInfo& nodeinfo)
 {
   m_unitNo = nodeinfo.m_unitNo;
@@ -46,10 +48,12 @@ NodeInfo::NodeInfo(const NodeInfo& nodeinfo)
   m_targetIP = nodeinfo.m_targetIP;
 }
 
+/// @brief NodeInfo destructor
 NodeInfo::~NodeInfo()
 {
 }
 
+/// @brief NodeInfo = operator overloading
 NodeInfo& NodeInfo::operator=(const NodeInfo& nodeinfo)
 {
   if (this != &nodeinfo) {
@@ -72,6 +76,7 @@ NodeInfo& NodeInfo::operator=(const NodeInfo& nodeinfo)
   }
 }
 
+/// @brief Clear the node information
 void NodeInfo::clear()
 {
   m_unitNo = -1;
@@ -88,111 +93,154 @@ void NodeInfo::clear()
   m_targetIP.clear();
 }
 
+/// @brief Set unit number of the node
+/// @param unitNo Unit number of the node
 void NodeInfo::unitNo(int unitNo)
 {
   m_unitNo = unitNo;
 }
 
+/// @brief Get unit number of the node
+/// @return Unit number of the node
 const int NodeInfo::unitNo()
 {
   return m_unitNo;
 }
 
+/// @brief Set node number of the node
+/// @param nodeNo Node number of the node
 void NodeInfo::nodeNo(int nodeNo)
 {
   m_nodeNo = nodeNo;
 }
 
+/// @brief Get node number of the node
+/// @return Node number of the node
 const int NodeInfo::nodeNo()
 {
   return m_nodeNo;
 }
 
+/// @brief Generate a unique key based on unit and node number of the node
+/// @return Generated key (unit# * 100 + node#)
 const int NodeInfo::generateKey()
 {
   return m_unitNo * 100 + m_nodeNo;
 }
 
+/// @brief Set experiment number
+/// @param expNo Experiment number to be set
 void NodeInfo::expNo(int expNo)
 {
   m_expNo = expNo;
 }
 
+/// @brief Get experiment number
+/// @return Experiment number of the current configuration
 const int NodeInfo::expNo()
 {
   return m_expNo;
 }
 
+/// @brief Set run start number
+/// @param runStart Run start number to be set
 void NodeInfo::runStart(int runStart)
 {
   m_runStart = runStart;
 }
 
+/// @brief Get run start number
+/// @return Run start number of the current configuration
 const int NodeInfo::runStart()
 {
   return m_runStart;
 }
 
+/// @brief Set run end number
+/// @param runEnd Run end number to be set
 void NodeInfo::runEnd(int runEnd)
 {
   m_runEnd = runEnd;
 }
 
+/// @brief Get run end number
+/// @return Run end number of the current configuration
 const int NodeInfo::runEnd()
 {
   return m_runEnd;
 }
 
+/// @brief Set type of the node
+/// @param type Type of the node
 void NodeInfo::type(std::string type)
 {
   m_type = type;
 }
 
+/// @brief Get type of the node
+/// @return Type of the node
 const std::string NodeInfo::type()
 {
   return m_type;
 }
 
+/// @brief Set IP address of the manager node
+/// @param managerIP IP address of the manager node
 void NodeInfo::managerIP(std::string managerIP)
 {
   m_managerIP = managerIP;
 }
 
+/// @brief Get IP address of the manager node
+/// @return IP address of the manager node
 const std::string NodeInfo::managerIP()
 {
   return m_managerIP;
 }
 
+/// @brief Set IP address of the node
+/// @param selfIP IP address of the node
 void NodeInfo::selfIP(std::string selfIP)
 {
   m_selfIP = selfIP;
 }
 
+/// @brief Get IP address of the node
+/// @return IP address of the node
 const std::string NodeInfo::selfIP()
 {
   return m_selfIP;
 }
 
+/// @brief Add an IP address of a data source
+/// @param sourceIP IP address of a data source
 void NodeInfo::sourceIP(std::string sourceIP)
 {
   m_sourceIP.push_back(sourceIP);
 }
 
+/// @brief Get the container that contains IP addresses of data sources
+/// @return Standart vector container for data sources
 const std::vector<std::string> NodeInfo::sourceIP()
 {
   return m_sourceIP;
 }
 
+/// @brief Add an IP address of a target node
+/// @param targetIP IP address of a target node
 void NodeInfo::targetIP(std::string targetIP)
 {
   m_targetIP.push_back(targetIP);
 }
 
+/// @brief Get the container that contains IP addresses of target node
+/// @return Standart vector container for target node
 const std::vector<std::string> NodeInfo::targetIP()
 {
   return m_targetIP;
 }
 
+/// @brief Display the node information (development purpose only)
 void NodeInfo::display()
 {
   B2INFO("unit#=" << m_unitNo << "    nodeNo =" << m_nodeNo);

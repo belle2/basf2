@@ -1,18 +1,34 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2010 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Soohyung Lee                                             *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
 #include <daq/hlt/HLTReceiver.h>
 
 using namespace Belle2;
 
+/// @brief HLTReceiver constructor
+/// @param port Port number for data communication
 HLTReceiver::HLTReceiver(unsigned int port)
 {
   m_port = port;
   m_buffer = NULL;
 }
 
+/// @brief HLTReceiver destructor
 HLTReceiver::~HLTReceiver()
 {
-  delete m_internalBuffer;
+  //delete m_internalBuffer;
 }
 
+/// @brief Initialize the HLTReceiver
+/// @return c_Success Initialization done
+/// @return c_InitFailed Initialization failed
 EHLTStatus HLTReceiver::init()
 {
   if (create() != c_Success)
@@ -27,6 +43,9 @@ EHLTStatus HLTReceiver::init()
   return c_Success;
 }
 
+/// @brief Create a static connection through the assigned port
+/// @return c_Success Connection established
+/// @return c_InitFailed Initialization of socket or starting to listen falied
 EHLTStatus HLTReceiver::createConnection()
 {
   if (init() != c_Success)
@@ -41,6 +60,11 @@ EHLTStatus HLTReceiver::createConnection()
   return c_Success;
 }
 
+/// @brief Accepting data from assigned port
+/// @return c_Success Receiving data done
+/// @return c_InitFailed Accepting socket failed
+/// @return c_FuncError Buffer wasn't set
+/// @return c_TermCalled Termination requested
 EHLTStatus HLTReceiver::listening()
 {
   if (m_buffer == NULL) {
@@ -64,17 +88,13 @@ EHLTStatus HLTReceiver::listening()
       memset(givenMessages, 0, sizeof(char) * gBufferSize);
 
       if (size > 0) {
-        //writeFile("receiver", data, size);
-
         std::string termChecker(data);
         if (termChecker == gTerminate) {
           B2INFO("\x1b[31m[HLTReceiver] Terminate tag met\x1b[0m");
           return c_TermCalled;
         }
 
-        //B2INFO("[HLTReceiver] " << size << " bytes come in");
         int readContents = decodeSingleton(data, (int)size, givenMessages, givenMessageSizes);
-        //B2INFO("\x1b[32m[HLTReceiver] " << readContents << " data taken!\x1b[0m");
 
         int givenMessageIndex = 0;
         for (int i = 0; i < readContents; i++) {
@@ -86,12 +106,10 @@ EHLTStatus HLTReceiver::listening()
             memcpy(givenMessage, givenMessages + sizeof(char) * givenMessageIndex, givenMessageSizes[i]);
 
           givenMessageIndex += givenMessageSizes[i];
-          //B2INFO("[HLTReceiver] taken " << i << ": (" << givenMessage << ") " << givenMessageSizes[i] << " bytes");
           if (!strcmp(givenMessage, gTerminate.c_str())) {
             B2INFO("\x1b[31m[HLTReceiver] Terminate tag met\x1b[0m");
             return c_TermCalled;
           } else {
-            //writeFile("receiverAfterDecode", givenMessage, givenMessageSizes[i]);
             while (m_buffer->insq((int*)givenMessage,
                                   givenMessageSizes[i] / 4 + 1) <= 0) {
               usleep(100);
@@ -111,6 +129,8 @@ EHLTStatus HLTReceiver::listening()
   return c_Success;
 }
 
+/// @brief Set buffer for data communication with predefined buffer key
+/// @return c_Success Set buffer succeeded
 EHLTStatus HLTReceiver::setBuffer()
 {
   B2INFO("[HLTReceiver] \x1b[32mRing buffer initializing...\x1b[0m");
@@ -119,6 +139,9 @@ EHLTStatus HLTReceiver::setBuffer()
   return c_Success;
 }
 
+/// @brief Set buffer for data communication with a specific buffer key
+/// @param key Key value for the buffer
+/// @return c_Success Set buffer succeeded
 EHLTStatus HLTReceiver::setBuffer(unsigned int key)
 {
   B2INFO("[HLTReceiver] \x1b[32mRing buffer initializing...\x1b[0m");
@@ -127,18 +150,22 @@ EHLTStatus HLTReceiver::setBuffer(unsigned int key)
   return c_Success;
 }
 
+/// @brief Decode received data
+/// @param data Taken data
+/// @param size Size of the taken data
+/// @param container Container for decoded data (the data can be multiple)
+/// @param sizes Container for size of decoded data
+/// @return The number of decoded data (this might be redundant)
 int HLTReceiver::decodeSingleton(char* data, int size, char* container, std::vector<int>& sizes)
 {
   int containerIndex = 0;
   int eos = findEOS(data, size);
 
   if (eos < 0) {
-    //B2INFO("\x1b[033m[HLTReceiver] EOS not found. Saving to internal buffer...\x1b[0m");
     if (size < gBufferSize - m_internalBufferWriteIndex) {
       memcpy(m_internalBuffer + sizeof(char) * m_internalBufferWriteIndex, data, sizeof(char) * size);
       m_internalBufferWriteIndex += size;
       m_internalBufferEntries++;
-      //B2INFO("\x1b[033m[HLTReceiver] " << m_internalBufferWriteIndex << " bytes saved in the internal buffer...\x1b[0m");
 
       return 0;
     } else {
@@ -146,59 +173,41 @@ int HLTReceiver::decodeSingleton(char* data, int size, char* container, std::vec
       return -1;
     }
   } else {
-    //B2INFO("\x1b[033m[HLTReceiver] EOS found. Checking internal buffer...\x1b[0m");
     if (m_internalBufferEntries > 0) {
-      //B2INFO("[HLTReceiver] " << m_internalBufferEntries << " chunks ("
-      //       << m_internalBufferWriteIndex << " bytes) are ready to be mergied which is " << m_internalBuffer);
-
       memcpy(container, m_internalBuffer, sizeof(char) * m_internalBufferWriteIndex);
-      //B2INFO("\x1b[033m[HLTReceiver] " << m_internalBufferWriteIndex << " bytes written from internal buffer...\x1b[0m");
       memcpy(container + sizeof(char) * m_internalBufferWriteIndex, data, sizeof(char) * eos);
       sizes.push_back(m_internalBufferWriteIndex + eos);
       containerIndex += m_internalBufferWriteIndex + eos;
-      //B2INFO("\x1b[033m[HLTReceiver] " << eos << " bytes written from received...\x1b[0m");
 
       flushInternalBuffer();
 
       data = data + sizeof(char) * (eos + gEOSTag.size());
       size = size - (eos + gEOSTag.size());
-      //B2INFO("\x1b[033m[HLTReceiver] " << size << " bytes still left...\x1b[0m");
     } else {
-      //B2INFO("\x1b[033m[HLTReceiver] No contents in the internal buffer\x1b[0m");
       memcpy(container, data, sizeof(char) * eos);
       sizes.push_back(eos);
       containerIndex += eos;
 
       data = data + sizeof(char) * (eos + gEOSTag.size());
       size = size - (eos + gEOSTag.size());
-
-      //B2INFO("\x1b[033m[HLTReceiver] " << eos << " bytes written from received...\x1b[0m");
-      //B2INFO("\x1b[033m[HLTReceiver] " << size << " bytes still left...\x1b[0m");
     }
 
     if (size <= 0)
       return sizes.size();
 
     while ((eos = findEOS(data, size)) > 0) {
-      //B2INFO("\x1b[033m[HLTReceiver] More EOS found. Storing it...\x1b[0m");
-      //B2INFO("\x1b[033m[HLTReceiver] Writing @" << containerIndex << "\x1b[0m");
       memcpy(container + sizeof(char) * containerIndex, data, sizeof(char) * eos);
       sizes.push_back(eos);
       containerIndex += eos;
 
       data = data + sizeof(char) * (eos + gEOSTag.size());
       size = size - (eos + gEOSTag.size());
-
-      //B2INFO("\x1b[033m[HLTReceiver] " << eos << " bytes written from received...\x1b[0m");
-      //B2INFO("\x1b[033m[HLTReceiver] " << size << " bytes still left...\x1b[0m");
     }
 
     if (size > 0) {
-      //B2INFO("\x1b[033m[HLTReceiver] Data still remains without EOS. Saving it into the internal buffer...\x1b[0m");
       memcpy(m_internalBuffer, data, sizeof(char) * size);
       m_internalBufferWriteIndex += size;
       m_internalBufferEntries++;
-      //B2INFO("\x1b[033m[HLTReceiver] " << m_internalBufferWriteIndex << " bytes saved in the internal buffer...\x1b[0m");
     }
 
     return sizes.size();
@@ -207,6 +216,11 @@ int HLTReceiver::decodeSingleton(char* data, int size, char* container, std::vec
   return 0;
 }
 
+/// @brief Find EOS tag that indicates the end of an individual data
+/// @param data Taken data chunk
+/// @param size Size of taken data
+/// @return -1 No EOS found
+/// @return otherwise Position of EOS tag
 int HLTReceiver::findEOS(char* data, int size)
 {
   if (size > 0) {
@@ -220,6 +234,8 @@ int HLTReceiver::findEOS(char* data, int size)
   return -1;
 }
 
+/// @brief Flush internal buffer that is supposed to contain part of data
+/// @return c_Success The internal buffer is flushed
 EHLTStatus HLTReceiver::flushInternalBuffer()
 {
   memset(m_internalBuffer, 0, gBufferSize);
@@ -229,6 +245,10 @@ EHLTStatus HLTReceiver::flushInternalBuffer()
   return c_Success;
 }
 
+/// @brief Write a data into a file (development purpose only)
+/// @param file File name
+/// @param data Data to be written
+/// @param size Size of the data
 void HLTReceiver::writeFile(char* file, char* data, int size)
 {
   FILE* fp;

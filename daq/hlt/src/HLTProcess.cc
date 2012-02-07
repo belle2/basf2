@@ -1,7 +1,18 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2010 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Soohyung Lee                                             *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
 #include <daq/hlt/HLTProcess.h>
 
 using namespace Belle2;
 
+/// @brief HLTProcess constructor
 HLTProcess::HLTProcess()
 {
   m_isChild = false;
@@ -12,6 +23,7 @@ HLTProcess::HLTProcess()
   m_dataOutBuffer = NULL;
 }
 
+/// @brief HLTProcess destructor
 HLTProcess::~HLTProcess()
 {
   if (!m_isChild) {
@@ -22,6 +34,9 @@ HLTProcess::~HLTProcess()
   }
 }
 
+/// @brief Initialize the control line to manager node
+/// @return c_Success Initialization done
+/// @return c_ChildSuccess The process is child process
 EHLTStatus HLTProcess::initControl()
 {
   B2INFO("[HLTProcess] \x1b[32mRing buffers initializing for control/monitor line\x1b[0m");
@@ -70,6 +85,9 @@ EHLTStatus HLTProcess::initControl()
   }
 }
 
+/// @brief Initialize HLTSenders for outgoing data flow
+/// @return c_Success Initialization done
+/// @return c_ChildSuccess The process is child process
 EHLTStatus HLTProcess::initSenders()
 {
   if (m_nodeInfo.type() == "WN")
@@ -107,6 +125,9 @@ EHLTStatus HLTProcess::initSenders()
   return c_Success;
 }
 
+/// @brief Initialize HLTReceivers for incoming data flow
+/// @return c_Success Initialization done
+/// @return c_ChildSuccess The process is child process
 EHLTStatus HLTProcess::initReceivers()
 {
   if (m_nodeInfo.type() == "WN")
@@ -139,6 +160,8 @@ EHLTStatus HLTProcess::initReceivers()
   return c_Success;
 }
 
+/// @brief Run basf2 with predefined module chain for assigned node type properly
+/// @return c_Success Processing completed
 EHLTStatus HLTProcess::process()
 {
   pid_t pidProcess = fork();
@@ -163,11 +186,16 @@ EHLTStatus HLTProcess::process()
   return c_Success;
 }
 
+/// @brief Check if the process is mother or child process
+/// @return true The process is child process
+/// @return false The process is mother process
 bool HLTProcess::isChild()
 {
   return m_isChild;
 }
 
+/// @brief Wait for child processes forked (For mother process only)
+/// @return c_Success All the child processes are terminated
 EHLTStatus HLTProcess::checkChildren()
 {
   int status;
@@ -206,6 +234,8 @@ EHLTStatus HLTProcess::checkChildren()
   return c_Success;
 }
 
+/// @brief Display what type of the node is (Just for fun)
+/// @param mode Type of the node
 void HLTProcess::displayMode(const std::string mode)
 {
   B2INFO("\x1b[33m++++++++++++++++++++++++++++++++++++++++++++++++\x1b[0m");

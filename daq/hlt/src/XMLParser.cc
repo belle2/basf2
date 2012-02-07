@@ -1,7 +1,19 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2010 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Soohyung Lee                                             *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
 #include <daq/hlt/XMLParser.h>
 
 using namespace Belle2;
 
+/// @brief XMLParser constructor
+/// @param filename Name of the XML input file
 XMLParser::XMLParser(std::string filename)
 {
   m_filename = filename;
@@ -20,10 +32,14 @@ XMLParser::XMLParser(std::string filename)
   m_curNode = NULL;
 }
 
+/// @brief XMLParser destructor
 XMLParser::~XMLParser()
 {
 }
 
+/// @brief Initialize the XMLParser
+/// @return c_Success Initialization done
+/// @return c_InitFailed Wrong format of XML file is assigned
 EHLTStatus XMLParser::init()
 {
   m_docPtr = xmlParseFile(m_filename.c_str());
@@ -37,6 +53,9 @@ EHLTStatus XMLParser::init()
   return c_Success;
 }
 
+/// @brief Parsing the input file
+/// @return c_Success Parsing done
+/// @return c_FuncError Parsing failed
 EHLTStatus XMLParser::parsing()
 {
   xmlNodePtr cur = m_curNode->xmlChildrenNode;
@@ -95,6 +114,9 @@ EHLTStatus XMLParser::parsing()
   return c_Success;
 }
 
+/// @brief Get unique key values of all nodes
+/// @param container Container to store the keys
+/// @return The number of keys stored (redundant, maybe)
 unsigned int XMLParser::getAllKeys(std::vector<int>& container)
 {
   container.clear();
@@ -119,6 +141,9 @@ unsigned int XMLParser::getAllKeys(std::vector<int>& container)
   return nKeys;
 }
 
+/// @brief Fill a specific node information parsed
+/// @param key Key value of a node
+/// @param nodeinfo Individual node information
 void XMLParser::fill(int key, NodeInfo& nodeinfo)
 {
   nodeinfo.expNo(m_expNo);
@@ -167,6 +192,7 @@ void XMLParser::fill(int key, NodeInfo& nodeinfo)
   }
 }
 
+/// @brief Display the information parsed from input (development purpose only)
 void XMLParser::display()
 {
   B2INFO("filename: " << m_filename);

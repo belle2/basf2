@@ -177,6 +177,11 @@ EHLTStatus B2Socket::send(const std::string data, int& size)
   }
 }
 
+/// @brief Send data to assigned host
+/// @param data Data to be sent
+/// @param size Container to record the size sent
+/// @return c_Success Data send success
+/// @return c_FuncError Data send failed
 EHLTStatus B2Socket::send(char* data, int size)
 {
   int status = ::send(m_socket, data, size, 0);
@@ -221,6 +226,12 @@ EHLTStatus B2Socket::receive(int newSocket, std::string& data, int& size)
   return c_Success;
 }
 
+/// @brief Receive data from the socket
+/// @param newSocket Projected socket identifier
+/// @param data Container to store received data
+/// @param size Container to record size of received data
+/// @return c_Success Receiving data success
+/// @return c_FuncError Receiving data failed
 EHLTStatus B2Socket::receive(int newSocket, char* data, int& size)
 {
   memset(data, 0, m_maxReceives);

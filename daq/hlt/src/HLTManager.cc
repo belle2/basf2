@@ -1,14 +1,18 @@
-#include <daq/hlt/HLTManager.h>
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2010 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Soohyung Lee                                             *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
 
-// temporary headers
-#include <boost/archive/text_oarchive.hpp>
-#include <boost/archive/text_iarchive.hpp>
-#include <boost/archive/binary_oarchive.hpp>
-#include <boost/archive/binary_iarchive.hpp>
-#include <daq/hlt/B2Socket.h>
+#include <daq/hlt/HLTManager.h>
 
 using namespace Belle2;
 
+/// @brief HLTManager constructor
 HLTManager::HLTManager()
 {
   m_nodeInfoMap.clear();
@@ -18,6 +22,9 @@ HLTManager::HLTManager()
   m_isChild = false;
 }
 
+/* @brief HLTManager destructor
+   If the process is mother process, it delete all the buffers assigned.
+*/
 HLTManager::~HLTManager()
 {
   if (!isChild()) {
@@ -29,6 +36,9 @@ HLTManager::~HLTManager()
   }
 }
 
+/// @brief Initialize HLTSenders
+/// @return c_Success HLTSenders initialization succeeded
+/// @return c_ChildSuccess The process is child process
 EHLTStatus HLTManager::initSenders()
 {
   for (std::map<int, NodeInfo>::const_iterator i = m_nodeInfoMap.begin();
@@ -53,9 +63,7 @@ EHLTStatus HLTManager::initSenders()
         usleep(100);
       }
 
-      //sender.broadcasting();
       sender.broadcasting(temp);
-      //sender.broadcasting("Terminate");
       sender.broadcasting(gTerminate);
 
       return c_ChildSuccess;
@@ -69,12 +77,15 @@ EHLTStatus HLTManager::initSenders()
   return c_Success;
 }
 
+/// @brief Store node information that parsed from XMLParser into NodeInfo map
+/// @param xml Pointer to XMLParser
+/// @return c_Success Storing succeeded
+/// @return c_FuncFailed Storing failed
 EHLTStatus HLTManager::storeNodeInfo(XMLParser* xml)
 {
   std::vector<int> mapKeys;
   xml->getAllKeys(mapKeys);
 
-  // nodeinfo allocator
   for (std::vector<int>::const_iterator i = mapKeys.begin();
        i != mapKeys.end(); ++i) {
     if (m_nodeInfoMap.insert(std::pair<int, NodeInfo>(*i, NodeInfo())).second == false) {
@@ -96,6 +107,9 @@ EHLTStatus HLTManager::storeNodeInfo(XMLParser* xml)
   return c_Success;
 }
 
+/// @brief Encode an individual node information specified by key
+/// @param key Key value of the node information to be encoded
+/// @return Encoded node informaton
 std::string HLTManager::encodeNodeInfo(unsigned int key)
 {
   std::stringstream ss;
@@ -106,6 +120,8 @@ std::string HLTManager::encodeNodeInfo(unsigned int key)
   return ss.str();
 }
 
+/// @brief Decode an encoded node information
+/// @param nodeinfo Encoded node information
 void HLTManager::decodeNodeInfo(std::string nodeinfo)
 {
   NodeInfo tempNodeinfo;
@@ -118,11 +134,16 @@ void HLTManager::decodeNodeInfo(std::string nodeinfo)
   tempNodeinfo.display();
 }
 
+/// @brief Check if the process is mother or child process
+/// @return true The process is child process
+/// @return false The process is mother process
 bool HLTManager::isChild()
 {
   return m_isChild;
 }
 
+/// @brief Wait for child processes forked (For mother process)
+/// @return c_Success All child processes are terminated
 EHLTStatus HLTManager::checkChildren()
 {
   int status;
@@ -138,6 +159,7 @@ EHLTStatus HLTManager::checkChildren()
   return c_Success;
 }
 
+/// @brief Print node information that the HLTManager contains (development purpose only)
 void HLTManager::printNodeInfo()
 {
   for (std::map<int, NodeInfo>::const_iterator i = m_nodeInfoMap.begin();

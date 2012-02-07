@@ -1,7 +1,19 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2010 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Soohyung Lee                                             *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
 #include <daq/hlt/HLTFramework.h>
 
 using namespace Belle2;
 
+/// @brief HLTFramework constructor
+/// @param type Type of the node
 HLTFramework::HLTFramework(int type)
 {
   B2INFO("\x1b[33m####################################################\x1b[0m");
@@ -17,6 +29,7 @@ HLTFramework::HLTFramework(int type)
   }
 }
 
+/// @brief HLTFramework destructor
 HLTFramework::~HLTFramework()
 {
   if (m_hltManager != NULL)
@@ -25,6 +38,10 @@ HLTFramework::~HLTFramework()
     delete m_hltProcess;
 }
 
+/// @brief Initialize the HLTFramework
+/// @param xmlFileName XML file name that contains information of entire HLT farm
+/// @return c_Success Initialization succeeded
+/// @return c_InitFailed Initialization failed
 EHLTStatus HLTFramework::init(char* xmlFileName)
 {
   if (m_type == c_ManagerNode) {

@@ -105,13 +105,15 @@ TRGClock::name(void) const {
 inline
 double
 TRGClock::minTiming(void) const {
-    return _min * _cycle + _offset;
+//    return _min * _cycle + _offset;
+    return _min * _cycle;
 }
 
 inline
 double
 TRGClock::maxTiming(void) const {
-    return _max * _cycle + _offset;
+//    return _max * _cycle + _offset;
+    return _max * _cycle;
 }
 
 inline

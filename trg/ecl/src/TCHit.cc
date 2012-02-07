@@ -15,8 +15,8 @@
 #include <framework/gearbox/Unit.h>
 #include "framework/core/ModuleManager.h"
 
-#include <ecl/geoecl/ECLGeometryPar.h>
-#include <ecl/hitecl/ECLSimHit.h>
+#include <ecl/geometry/ECLGeometryPar.h>
+#include <ecl/dataobjects/ECLSimHit.h>
 
 #include "trg/ecl/TCHit.h"
 #include "trg/ecl/TRGECLHit.h"

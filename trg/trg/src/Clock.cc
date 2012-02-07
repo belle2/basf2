@@ -42,9 +42,11 @@ TRGClock::TRGClock(double offset,
 
     if (this != & Belle2_GDL::GDLSystemClock) {
         if (Belle2_GDL::GDLSystemClock.minTiming() > minTiming())
-            _min = int(Belle2_GDL::GDLSystemClock.minTiming() / _cycle);
+            _min = int((Belle2_GDL::GDLSystemClock.minTiming() - _offset)
+		       / _cycle);
         if (Belle2_GDL::GDLSystemClock.maxTiming() < maxTiming())
-            _max = int(Belle2_GDL::GDLSystemClock.maxTiming() / _cycle);
+            _max = int((Belle2_GDL::GDLSystemClock.maxTiming() - _offset)
+		       / _cycle);
     }
 }
 
@@ -75,7 +77,7 @@ TRGClock::time(double t) const {
              << ") !!! out of time window : min=" << minTiming()
              << ",max=" << maxTiming() << ",given value=" << t << endl;
 
-//     cout << "t,offset,unit=" << t << "," << _offset << "," << int((t - _offset) / _cycle) << endl;
+    cout << "t,offset,unit=" << t << "," << _offset << "," << int((t - _offset) / _cycle) << endl;
 
     return int((t - _offset) / _cycle);
 }

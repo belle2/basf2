@@ -57,8 +57,8 @@ namespace Belle2 {
        */
       SensorInfoBase(SensorType type, VxdID id, double width, double length, double thickness,
                      int uCells, int vCells, double width2 = -1, double splitLength = -1, int vCells2 = 0):
-          m_type(type), m_id(id), m_width(width), m_length(length), m_thickness(thickness),
-          m_deltaWidth(0), m_splitLength(0), m_uCells(uCells), m_vCells(vCells), m_vCells2(vCells2) {
+        m_type(type), m_id(id), m_width(width), m_length(length), m_thickness(thickness),
+        m_deltaWidth(0), m_splitLength(0), m_uCells(uCells), m_vCells(vCells), m_vCells2(vCells2) {
         if (width2 > 0) m_deltaWidth = width2 - width;
         if (splitLength > 0) m_splitLength = splitLength / length;
       }
@@ -76,7 +76,7 @@ namespace Belle2 {
        */
       double getWidth(double v = 0) const {
         if (m_deltaWidth == 0) return m_width;
-        return m_width + (v / m_length + 0.5)*m_deltaWidth;
+        return m_width + (v / m_length + 0.5) * m_deltaWidth;
       }
 
       /** Return the length of the sensor
@@ -118,8 +118,8 @@ namespace Belle2 {
        */
       double getVPitch(double v = 0) const {
         if (m_splitLength <= 0) return m_length / m_vCells;
-        if (v / m_length + 0.5 >= m_splitLength) return m_length*(1 - m_splitLength) / m_vCells2;
-        return m_length*m_splitLength / m_vCells;
+        if (v / m_length + 0.5 >= m_splitLength) return m_length * (1 - m_splitLength) / m_vCells2;
+        return m_length * m_splitLength / m_vCells;
       }
 
       /** Return the position of a specific strip/pixel in u direction
@@ -128,10 +128,10 @@ namespace Belle2 {
        * @return Pixel/Strip position in u direction
        */
       double getUCellPosition(int uID, int vID = -1) const {
-        if (m_deltaWidth == 0) return ((uID + 0.5) / m_uCells - 0.5)*m_width;
+        if (m_deltaWidth == 0) return ((uID + 0.5) / m_uCells - 0.5) * m_width;
         double v = 0;
         if (vID >= 0) v = getVCellPosition(vID);
-        return ((uID + 0.5) / m_uCells - 0.5)*getWidth(v);
+        return ((uID + 0.5) / m_uCells - 0.5) * getWidth(v);
       }
 
       /** Return the position of a specific strip/pixel in v direction
@@ -140,8 +140,8 @@ namespace Belle2 {
        */
       double getVCellPosition(int vID) const {
         if (m_splitLength <= 0) return ((vID + 0.5) / m_vCells - 0.5) * m_length;
-        if (vID >= m_vCells) return ((vID - m_vCells + 0.5) / m_vCells2*(1 - m_splitLength) - 0.5 + m_splitLength) * m_length;
-        return ((vID + 0.5) / m_vCells*m_splitLength - 0.5)* m_length;
+        if (vID >= m_vCells) return ((vID - m_vCells + 0.5) / m_vCells2 * (1 - m_splitLength) - 0.5 + m_splitLength) * m_length;
+        return ((vID + 0.5) / m_vCells * m_splitLength - 0.5) * m_length;
       }
 
       /** Return the corresponding pixel/strip ID of a given u coordinate
@@ -151,7 +151,7 @@ namespace Belle2 {
        */
       int getUCellID(double u, double v = 0, bool clamp = false) const {
         if (clamp) return std::min(getUCells() - 1, std::max(0, getUCellID(u, v, false)));
-        return static_cast<int>((u / getWidth(v) + 0.5)*m_uCells);
+        return static_cast<int>((u / getWidth(v) + 0.5) * m_uCells);
       }
 
       /** Return the corresponding pixel/strip ID of a given v coordinate
@@ -161,9 +161,9 @@ namespace Belle2 {
       int getVCellID(double v, bool clamp = false) const {
         if (clamp) return std::min(getVCells() - 1, std::max(0, getVCellID(v, false)));
         double nv = v / m_length + 0.5;
-        if (m_splitLength <= 0) return static_cast<int>(nv*m_vCells);
-        if (nv >= m_splitLength) return static_cast<int>((nv - m_splitLength) / (1 - m_splitLength)*m_vCells2) + m_vCells;
-        return static_cast<int>(nv / m_splitLength*m_vCells);
+        if (m_splitLength <= 0) return static_cast<int>(nv * m_vCells);
+        if (nv >= m_splitLength) return static_cast<int>((nv - m_splitLength) / (1 - m_splitLength) * m_vCells2) + m_vCells;
+        return static_cast<int>(nv / m_splitLength * m_vCells);
       }
 
       /** Return number of pixel/strips in u direction */
@@ -199,7 +199,7 @@ namespace Belle2 {
        * @param u u coordinate to be forced inside
        * @param v v coordinate to be forced inside
        */
-      void forceInside(double &u, double &v) const {
+      void forceInside(double& u, double& v) const {
         double length = getLength() / 2.0;
         v = std::min(length, std::max(-length, v));
         double width = getWidth(v) / 2.0;
@@ -216,25 +216,25 @@ namespace Belle2 {
        * @param local point in local coordinates
        * @return point in global coordinates
        */
-      TVector3 pointToGlobal(const TVector3 &local) const;
+      TVector3 pointToGlobal(const TVector3& local) const;
 
       /** Convert a vector from local to global coordinates
        * @param local vector in local coordinates
        * @return vector in global coordinates
        */
-      TVector3 vectorToGlobal(const TVector3 &local) const;
+      TVector3 vectorToGlobal(const TVector3& local) const;
 
       /** Convert a point from global to local coordinates
        * @param global point in global coordinates
        * @return point in local coordinates
        */
-      TVector3 pointToLocal(const TVector3 &global) const;
+      TVector3 pointToLocal(const TVector3& global) const;
 
       /** Convert a vector from global to local coordinates
        * @param global vector in global coordinates
        * @return vector in local coordinates
        */
-      TVector3 vectorToLocal(const TVector3 &global) const;
+      TVector3 vectorToLocal(const TVector3& global) const;
 
       /** Set the transformation matrix of the Sensor
        * @param transform Transformation matrix of the Sensor
@@ -279,7 +279,7 @@ namespace Belle2 {
       local.SetZ(std::min(thickness, std::max(-thickness, local.z())));
     }
 
-    inline TVector3 SensorInfoBase::pointToGlobal(const TVector3 &local) const
+    inline TVector3 SensorInfoBase::pointToGlobal(const TVector3& local) const
     {
       double clocal[3];
       double cmaster[3];
@@ -288,7 +288,7 @@ namespace Belle2 {
       return TVector3(cmaster);
     }
 
-    inline TVector3 SensorInfoBase::vectorToGlobal(const TVector3 &local) const
+    inline TVector3 SensorInfoBase::vectorToGlobal(const TVector3& local) const
     {
       double clocal[3];
       double cmaster[3];
@@ -297,7 +297,7 @@ namespace Belle2 {
       return TVector3(cmaster);
     }
 
-    inline TVector3 SensorInfoBase::pointToLocal(const TVector3 &global) const
+    inline TVector3 SensorInfoBase::pointToLocal(const TVector3& global) const
     {
       double clocal[3];
       double cmaster[3];
@@ -306,7 +306,7 @@ namespace Belle2 {
       return TVector3(clocal);
     }
 
-    inline TVector3 SensorInfoBase::vectorToLocal(const TVector3 &global) const
+    inline TVector3 SensorInfoBase::vectorToLocal(const TVector3& global) const
     {
       double clocal[3];
       double cmaster[3];

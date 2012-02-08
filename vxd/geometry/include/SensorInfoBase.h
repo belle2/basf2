@@ -79,6 +79,20 @@ namespace Belle2 {
         return m_width + (v / m_length + 0.5) * m_deltaWidth;
       }
 
+      /** Convinience Wrapper to return width at backward side.
+       * @return width of the sensor at the backward side
+       */
+      double getBackwardWidth() const {
+        return getWidth(-0.5 * m_length);
+      }
+
+      /** Convinience Wrapper to return width at forward side.
+       * @return width of the sensor at the forward side
+       */
+      double getForwardWidth() const {
+        return getWidth(0.5 * m_length);
+      }
+
       /** Return the length of the sensor
        * @return length of the sensor
        */
@@ -241,6 +255,10 @@ namespace Belle2 {
        */
       void setTransformation(const TGeoHMatrix& transform) {
         m_transform = transform;
+      }
+
+      const TGeoHMatrix& getTransformation() const {
+        return m_transform;
       }
 
     protected:

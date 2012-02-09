@@ -97,9 +97,9 @@ TRGCDC::getTRGCDC(void) {
 }
 
 TRGCDC::TRGCDC(const std::string & configFile,
-                  bool houghFinderPerfect,
-                  unsigned houghFinderMeshX,
-                  unsigned houghFinderMeshY) 
+	       bool houghFinderPerfect,
+	       unsigned houghFinderMeshX,
+	       unsigned houghFinderMeshY) 
     : _debugLevel(0),
       _configFilename(configFile),
       _fudgeFactor(1.),

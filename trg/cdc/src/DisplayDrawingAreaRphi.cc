@@ -176,6 +176,7 @@ TRGCDCDisplayDrawingAreaRphi::drawCDC(void) {
 
 void
 TRGCDCDisplayDrawingAreaRphi::draw(void) {
+    drawWires();
     drawHits();
     for (unsigned i = 0; i < _segments.size(); i++)
         drawTrackSegment(* _segments[i],
@@ -200,6 +201,12 @@ TRGCDCDisplayDrawingAreaRphi::draw(void) {
 }
 
 void
+TRGCDCDisplayDrawingAreaRphi::drawWires(void) {
+    for (unsigned i = 0; i < _wires.size(); i++)
+	drawWire(* _wires[i], 1, _wiresColor[i], Gdk::LINE_SOLID);
+}
+
+void
 TRGCDCDisplayDrawingAreaRphi::drawHits(void) {
     Glib::RefPtr<Gdk::Colormap> colormap = get_default_colormap();
     const unsigned n = _hits.size();
@@ -213,7 +220,7 @@ TRGCDCDisplayDrawingAreaRphi::drawHits(void) {
 
         //...Points...
         const TCWire & w = _hits[i]->wire();
-        const HepGeom::Point3D<double> & p = w.forwardPosition();
+        const HepGeom::Point3D<double> & p = w.backwardPosition();
         double radius = _hits[i]->drift();
 
         colormap->alloc_color(_hitsColor[i]);
@@ -266,7 +273,7 @@ TRGCDCDisplayDrawingAreaRphi::drawWire(const TCWire & w,
     const unsigned nDivisions = 5;
     const float ri = w.layer().innerRadius();
     const float ro = w.layer().outerRadius();
-    const float cPhi = w.forwardPosition().phi();
+    const float cPhi = w.backwardPosition().phi();
     const float dPhi = M_PI / w.layer().nWires();
     for (unsigned j = 0; j < nDivisions + 1; j++) {  // inner
         const float phi = cPhi - dPhi
@@ -445,6 +452,17 @@ TRGCDCDisplayDrawingAreaRphi::resetPosition(void) {
 }
 
 void
+TRGCDCDisplayDrawingAreaRphi::append(const std::vector<const TCWire *> & l,
+                                     Gdk::Color c) {
+    const unsigned n = l.size();
+    for (unsigned i = 0; i < n; i++) {
+        _wires.push_back(l[i]);
+        _wiresColor.push_back(c);
+    }
+    on_expose_event((GdkEventExpose *) NULL);
+}
+
+void
 TRGCDCDisplayDrawingAreaRphi::append(const std::vector<const TCWHit *> & l,
                                      Gdk::Color c) {
     const unsigned n = l.size();
@@ -530,6 +548,8 @@ TRGCDCDisplayDrawingAreaRphi::append(const TCMerger & s,
 
 void
 TRGCDCDisplayDrawingAreaRphi::clear(void) {
+    _wires.clear();
+    _wiresColor.clear();
     _hits.clear();
     _hitsColor.clear();
     _segments.clear();

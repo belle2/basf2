@@ -16,6 +16,7 @@
 
 #include <vector>
 #include <string>
+#include "trg/trg/Signal.h"
 
 //...Data structure of TRGBitStreamFile...
 //   4 byte                  : record type
@@ -82,6 +83,9 @@ class TRGBitStream {
     /// returns a pointer to char's.
     char c(unsigned positionInChar) const;
 
+    /// returns true if given position is active.
+    bool bit(unsigned positionInBit) const;
+
   public:// Modifiers
 
     /// clears contents.
@@ -95,6 +99,14 @@ class TRGBitStream {
 
     /// appends a bit to a stream.
     void append(unsigned);
+
+  public:// Utility functions
+
+    /// Make trigger signals from bit stream.
+    static std::vector<TRGSignal> TRGBitStream2TRGSignal(
+	const TRGClock & clock,
+	int initialClockPosition,
+	std::vector<TRGBitStream *> stream);
 
   private:
 
@@ -171,6 +183,15 @@ TRGBitStream::c(unsigned a) const {
     unsigned q = a % sizeof(unsigned);
     unsigned v = * _stream[p];
     return (v >> (q * 8)) & 0xff;
+}
+
+inline
+bool
+TRGBitStream::bit(unsigned a) const {
+    unsigned p = a / (sizeof(unsigned) * 8);
+    unsigned q = a % (sizeof(unsigned) * 8);
+    unsigned v = * _stream[p];
+    return (v & (1 << q));
 }
 
 } // namespace Belle2

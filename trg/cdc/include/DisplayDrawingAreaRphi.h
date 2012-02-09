@@ -62,6 +62,8 @@ class TRGCDCDisplayDrawingAreaRphi : public TRGCDCDisplayDrawingArea {
     void clear(void);
 
     /// appends wire hits to display.
+    void append(const std::vector<const TRGCDCWire *> &,
+                Gdk::Color color = Gdk::Color("grey"));
     void append(const std::vector<const TRGCDCWireHit *> &,
                 Gdk::Color color = Gdk::Color("grey"));
     void append(const TRGCDCTrackSegment &,
@@ -92,6 +94,7 @@ class TRGCDCDisplayDrawingAreaRphi : public TRGCDCDisplayDrawingArea {
     virtual void on_realize();
     void drawCDC(void);
     void draw(void);
+    void drawWires(void);
     void drawHits(void);
 
     void drawWire(const TRGCDCWire & w,
@@ -134,6 +137,9 @@ class TRGCDCDisplayDrawingAreaRphi : public TRGCDCDisplayDrawingArea {
     double _x, _y;
     double _innerR;
     double _outerR;
+
+    std::vector<const TRGCDCWire *> _wires;
+    std::vector<Gdk::Color> _wiresColor;
 
     std::vector<const TRGCDCWireHit *> _hits;
     std::vector<Gdk::Color> _hitsColor;

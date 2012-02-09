@@ -37,6 +37,16 @@ TRGTime::TRGTime(double timing,
     _name(name) {
 }
 
+TRGTime::TRGTime(int timing,
+                 bool edge,
+                 const TRGClock & clock,
+                 const std::string & name) :
+    _time(timing),
+    _edge(edge),
+    _clock(& clock),
+    _name(name) {
+}
+
 TRGTime::~TRGTime() {
 }
 

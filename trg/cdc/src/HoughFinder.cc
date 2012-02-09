@@ -25,7 +25,7 @@
 #include "trg/cdc/Track.h"
 #include "trg/cdc/Link.h"
 
-#ifdef TRGCDC_DISPLAY
+#ifdef TRGCDC_DISPLAY_HOUGH
 #include "trg/cdc/DisplayRphi.h"
 #include "trg/cdc/DisplayHough.h"
 namespace Belle2_TRGCDC {
@@ -35,7 +35,7 @@ namespace Belle2_TRGCDC {
 #endif
 
 using namespace std;
-#ifdef TRGCDC_DISPLAY
+#ifdef TRGCDC_DISPLAY_HOUGH
 using namespace Belle2_TRGCDC;
 #endif
 
@@ -80,7 +80,7 @@ TRGCDCHoughFinder::TRGCDCHoughFinder(const string & name,
     _plane[0]->charge(1);
     _plane[1]->charge(-1);
 
-#ifdef TRGCDC_DISPLAY
+#ifdef TRGCDC_DISPLAY_HOUGH
     if (! H0)
         H0 = new TCDisplayHough("Plus");
     H0->link(* D);
@@ -117,7 +117,7 @@ TRGCDCHoughFinder::TRGCDCHoughFinder(const string & name,
             _plane[1]->vote(x, y, -1, axialSuperLayerId, 1);
             _plane[1]->registerPattern(axialSuperLayerId, j);
 
-#ifdef TRGCDC_DISPLAY
+#ifdef TRGCDC_DISPLAY_HOUGH
 //             string stg = "Hough Pattern Regstration";
 //             string inf = "   ";
 //             _plane[0]->merge();
@@ -140,7 +140,7 @@ TRGCDCHoughFinder::TRGCDCHoughFinder(const string & name,
 }
 
 TRGCDCHoughFinder::~TRGCDCHoughFinder() {
-#ifdef TRGCDC_DISPLAY
+#ifdef TRGCDC_DISPLAY_HOUGH
     if (H0)
         delete H0;
     if (H1)
@@ -183,7 +183,7 @@ TRGCDCHoughFinder::doit(vector<TCTrack *> & trackList) {
     _plane[0]->merge();
     _plane[1]->merge();
 
-#ifdef TRGCDC_DISPLAY
+#ifdef TRGCDC_DISPLAY_HOUGH
     string stg = "2D : Hough : Results of Peak Finding";
     string inf = "   ";
     H0->stage(stg);
@@ -203,7 +203,7 @@ TRGCDCHoughFinder::doit(vector<TCTrack *> & trackList) {
     _peakFinder.doit(circles, * _plane[0], 5, false);
     _peakFinder.doit(circles, * _plane[1], 5, false);
 
-#ifdef TRGCDC_DISPLAY
+#ifdef TRGCDC_DISPLAY_HOUGH
     vector<const TCCircle *> cc;
     cc.assign(circles.begin(), circles.end());
     stg = "2D : Peak Finding";
@@ -283,7 +283,7 @@ TRGCDCHoughFinder::doitPerfectly(vector<TRGCDCTrack *> & trackList) {
     if (TRGDebug::level())
  	track->dump("detail");
 
-#ifdef TRGCDC_DISPLAY
+#ifdef TRGCDC_DISPLAY_HOUGH
     vector<const TCCircle *> cc;
     cc.push_back(& c);
     vector<const TCTrack *> tt;

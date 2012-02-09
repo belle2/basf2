@@ -118,4 +118,48 @@ TRGBitStream::append(bool a) {
     }
 }
 
+vector<TRGSignal>
+TRGBitStream::TRGBitStream2TRGSignal(const TRGClock & clock,
+				     int initialClockPosition,
+				     vector<TRGBitStream *> stream) {
+
+    vector<TRGSignal> t;
+
+    //...Check the size of stream...
+    if (stream.size() == 0) {
+	cout << " !!! TRGBitStream::TRGBitStream2TRGSignal: given stream "
+	     << "has no data" << endl;
+	return t;
+    }
+
+    //...Get bit size...
+    const unsigned bs = stream[0]->size();
+    const unsigned cs = stream.size();
+
+    //...Preparation...
+    vector<TRGSignal *> s;
+    for (unsigned i = 0; i < bs; i++)
+	s.push_back(new TRGSignal());
+
+    //...Bit stream loop...
+    for (unsigned i = 0; i < cs; i++) {
+
+	//...Bit position loop...
+	for (unsigned j = 0; j < bs; j++) {
+	    if (stream[i]->bit(j)) {
+		TRGTime r(int(initialClockPosition + i), true, clock);
+		TRGTime f = r;
+		f.shift(1).reverse();
+		(* s[j]) |= (r & f);
+	    }
+	}
+    }
+
+    //...Return value...
+    for (unsigned i = 0; i < s.size(); i++)
+	t.push_back(* s[i]);
+    return t;
+}
+
+
 } // namespace Belle2

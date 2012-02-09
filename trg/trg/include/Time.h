@@ -35,6 +35,12 @@ class TRGTime {
             const TRGClock & clock,
             const std::string & name = "signal");
 
+    /// Constructor with clock. For rising edge, edge must be true. Given timing is syncronized to clock.
+    TRGTime(int clockPosition,
+            bool edge,
+            const TRGClock & clock,
+            const std::string & name = "signal");
+
     /// Destructor
     virtual ~TRGTime();
 

@@ -37,24 +37,16 @@ g4sim       = register_module('FullSim')
 cdcdigitizer = register_module('CDCDigi')
 out         = register_module('SimpleOutput')
 cdctrg      = fw.register_module("TRGCDC")
-tsstream    = fw.register_module("TRGCDCTSStream")
 #mcparticle  = fw.register_module('PrintMCParticles')
 
+#...EvtMetaGen...
+evtmetagen.param({'EvtNumList': [10], 'RunList': [1]})
 
-evtmetagen.param({'EvtNumList': [2], 'RunList': [1]})
-
-
-#.... CDC Trigger....
+#...CDC Trigger...
 cdctrg.param('ConfigFile', os.path.join(basf2datadir,"trg/TRGCDCConfig_0_20101111_1051.dat"))
 cdctrg.param('DebugLevel',2)
 cdctrg.param('CurlBackStop',1)
 cdctrg.param('HoughFinderPerfect',1)
-
-#...CDC Trigger TS Stream...
-tsstream.param('DebugLevel', 2)
-tsstream.param('Mode', 0)
-tsstream.param('OutputStreamFile', "TRGCDCTSStream.dat")
-
 
 #set mcprinter
 mcparticleprinter = register_module('PrintMCParticles')

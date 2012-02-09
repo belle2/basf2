@@ -12,24 +12,39 @@
 //-----------------------------------------------------------------------------
 
 #define TRG_SHORT_NAMES
+#define TRGCDC_SHORT_NAMES
 
 #include <iostream>
 #include <fstream>
 #include <string>
 #include "trg/trg/BitStream.h"
+#include "trg/cdc/TRGCDC.h"
+#include "trg/cdc/Wire.h"
+#ifdef TRGCDC_DISPLAY
+#include "framework/gearbox/Gearbox.h"
+#include "trg/cdc/DisplayRphi.h"
+#include "trg/cdc/DisplayHough.h"
+namespace Belle2_TRGCDC {
+    Belle2::TRGCDCDisplayRphi * D = 0;
+}
+#endif
 
 using namespace std;
 using namespace Belle2;
+#ifdef TRGCDC_DISPLAY
+using namespace Belle2_TRGCDC;
+#endif
 
-#define DEBUG_LEVEL   1
-#define NAME          "TRGCDCTSStreamReader"
-#define VERSION       "version 0.01"
-#define ENV_PATH      "BELLE2_LOCAL_DIR"
+#define DEBUG_LEVEL     1
+#define NAME            "TRGCDCTSStreamReader"
+#define PROGRAM_VERSION "version 0.02"
+#define ENV_PATH        "BELLE2_LOCAL_DIR"
+#define CONFIG          "TRGCDCWireConfig_0_20101110_0836.dat"
 
 int
 main(int argc, char * argv[]) {
 
-    cout << NAME << " ... " << VERSION << endl;
+    cout << NAME << " ... " << PROGRAM_VERSION << endl;
     const string tab = "    ";
 
     //...Check arguments...
@@ -51,6 +66,39 @@ main(int argc, char * argv[]) {
         return -2;
     }
 
+#ifdef TRGCDC_DISPLAY
+    int arg2c = 0;
+    char ** arg2v = 0;
+    Gtk::Main main_instance(arg2c, arg2v);
+    if (! D)
+        D = new TCDisplayRphi();
+    D->clear();
+    D->show();
+    cout << "TRGCDC ... GTK initialized" << endl;
+
+    //...Gearbox...
+    const string path = getenv(ENV_PATH);
+    std::vector<std::string> m_backends;
+    std::string m_filename = path + "/data/geometry/Belle2.xml";
+    m_backends.push_back("file:");
+    Gearbox &gearbox = Gearbox::getInstance();
+    gearbox.setBackends(m_backends);
+    gearbox.open(m_filename);
+
+    //...TRGCDC...
+    const string cname = path + "/data/trg/" + CONFIG;
+    TRGCDC * cdc = TRGCDC::getTRGCDC(cname, false, 100, 100);
+    const TRGClock & clock = cdc->systemClock();
+
+    //...Wire layer ID for the central wires...
+    unsigned LID[9] = {2, 10, 16, 22, 28, 34, 40, 46, 52};
+#endif
+
+    //...Prepare buffers...
+    vector<int *> clks;
+    vector<TRGBitStream *> bits[9];
+    vector<const TCWire *> wires;
+
     //...Read stream...
     while (! infile.eof()) {
 
@@ -64,6 +112,7 @@ main(int argc, char * argv[]) {
 
 	//...Record manipulation...
 	switch (rec) {
+
 	case TRGBSRecord_Comment: {
 	    unsigned csiz = siz / 8;
 	    if (siz % 8) ++csiz;
@@ -89,11 +138,40 @@ main(int argc, char * argv[]) {
 	    break;
 
 	case TRGBSRecord_BeginEvent:
+#ifdef TRGCDC_DISPLAY
+	    D->clear();
+	    D->beginningOfEvent();
+#endif
+	    for (unsigned i = 0; i < 9; i++) {
+		for (unsigned j = 0; j < bits[i].size(); j++)
+		    delete bits[i][j];
+		bits[i].clear();
+	    }
+	    for (unsigned i = 0; i < clks.size(); i++)
+		delete clks[i];
+	    clks.clear();
+	    wires.clear();
 	    if (DEBUG_LEVEL)
 		cout << "BeginEvent : " << siz << endl;
 	    break;
 
 	case TRGBSRecord_EndEvent:
+#ifdef TRGCDC_DISPLAY
+	    for (unsigned i = 0; i < 9; i++) {
+		vector<TRGSignal> t = TRGBitStream::TRGBitStream2TRGSignal(
+		    clock,
+		    0,
+		    bits[i]);
+		for (unsigned j = 0; j < t.size(); j++) {
+ 		    if (t[j].active())
+ 			wires.push_back(cdc->wire(LID[i], j));
+		}
+	    }
+	    D->area().append(wires);
+	    D->endOfEvent();
+	    D->run();
+	    
+#endif
 	    if (DEBUG_LEVEL)
 		cout << "EndEvent : " << siz << endl;
 	    break;
@@ -101,6 +179,7 @@ main(int argc, char * argv[]) {
 	case TRGBSRecord_Clock: {
 	    unsigned clk = 0;
 	    infile.read((char *) & clk, 4);
+	    clks.push_back(new int(clk));
 	    if (DEBUG_LEVEL)
 		cout << "Clock : " << clk << endl;
 	    break;
@@ -115,16 +194,21 @@ main(int argc, char * argv[]) {
 	case TRGBSRecord_TrackSegmentSL6:
 	case TRGBSRecord_TrackSegmentSL7:
 	case TRGBSRecord_TrackSegmentSL8: {
+	    unsigned superLayer = rec - TRGBSRecord_TrackSegmentSL0;
 	    unsigned csiz = siz / 8;
 	    if (siz % 8) ++csiz;
 	    char * buf = new char[csiz];
 	    infile.read(buf, csiz);
-
-	    TRGBitStream bs = TRGBitStream(buf, siz);
-	    bs.dump();
+	    TRGBitStream * bs = new TRGBitStream(buf, siz);
+	    bits[superLayer].push_back(bs);
+	    if (DEBUG_LEVEL)
+		bs->dump();
 	    break;
 	}
+
 	default:
+	    cout << NAME << " !!! unknown record found : "
+		 << "record type = " << hex << rec << endl;
 	    break;
 	}
     }

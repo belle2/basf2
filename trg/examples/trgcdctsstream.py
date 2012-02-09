@@ -40,12 +40,13 @@ cdctrg      = fw.register_module("TRGCDC")
 tsstream    = fw.register_module("TRGCDCTSStream")
 #mcparticle  = fw.register_module('PrintMCParticles')
 
+#...EvtMetaGen...
+evtmetagen.param({'EvtNumList': [10], 'RunList': [1]})
 
-evtmetagen.param({'EvtNumList': [2], 'RunList': [1]})
-
-
-#.... CDC Trigger....
-cdctrg.param('ConfigFile', os.path.join(basf2datadir,"trg/TRGCDCConfig_0_20101111_1051.dat"))
+#...CDC Trigger...
+cdctrg.param('ConfigFile',
+             os.path.join(basf2datadir,
+                          "trg/TRGCDCConfig_0_20101111_1051.dat"))
 cdctrg.param('DebugLevel',0)
 cdctrg.param('CurlBackStop',1)
 cdctrg.param('HoughFinderPerfect',1)

@@ -163,7 +163,9 @@ void TrackingOutputModule::event()
       output[counter]->setMCMomentumZ(mcParticles[i]->getMomentum().z());
       output[counter]->setMCMomentum(mcParticles[i]->getMomentum().Mag());
       output[counter]->setMCCurv(1 / sqrt(mcParticles[i]->getMomentum().x()*mcParticles[i]->getMomentum().x() + mcParticles[i]->getMomentum().y()*mcParticles[i]->getMomentum().y()));
+      output[counter]->setMCPhi(atan2(output[counter]->getMCMomentumY(), output[counter]->getMCMomentumX()));
       output[counter]->setMCCotTheta(output[counter]->getMCMomentumZ() * output[counter]->getMCCurv());
+      output[counter]->setMCTheta(atan2(1 / (output[counter]->getMCCurv()), output[counter]->getMCMomentumZ()));
 
       output[counter]->setMCPositionX(mcParticles[i]->getVertex().x());
       output[counter]->setMCPositionY(mcParticles[i]->getVertex().y());
@@ -197,14 +199,23 @@ void TrackingOutputModule::event()
         output[counter]->setMCStartMomentumZ(candidateMC.getDirSeed().z());
         output[counter]->setMCStartMomentum(candidateMC.getDirSeed().Mag());
         output[counter]->setMCStartCurv(1 / sqrt(candidateMC.getDirSeed().x()*candidateMC.getDirSeed().x() + candidateMC.getDirSeed().y()*candidateMC.getDirSeed().y()));
+        output[counter]->setMCStartPhi(atan2(output[counter]->getMCStartMomentumY().at(j), output[counter]->getMCStartMomentumX().at(j)));
         output[counter]->setMCStartCotTheta(output[counter]->getMCStartMomentumZ().at(j) * output[counter]->getMCStartCurv().at(j));
+        output[counter]->setMCStartTheta(atan2((1 / (output[counter]->getMCStartCurv().at(j))), output[counter]->getMCStartMomentumZ().at(j)));
 
         output[counter]->setMCFitMomentumX(tracksMC[trackId]->getMomentum().x());
         output[counter]->setMCFitMomentumY(tracksMC[trackId]->getMomentum().y());
         output[counter]->setMCFitMomentumZ(tracksMC[trackId]->getMomentum().z());
         output[counter]->setMCFitMomentum(tracksMC[trackId]->getMomentum().Mag());
+
+        output[counter]->setMCFitPositionX(tracksMC[trackId]->getD0()*sin(tracksMC[trackId]->getPhi()));
+        output[counter]->setMCFitPositionY(-tracksMC[trackId]->getD0()*cos(tracksMC[trackId]->getPhi()));
+        output[counter]->setMCFitPositionZ(tracksMC[trackId]->getZ0());
+
         output[counter]->setMCFitCurv(abs(tracksMC[trackId]->getOmega()*alpha));
+        output[counter]->setMCFitPhi(atan2(output[counter]->getMCFitMomentumY().at(j), output[counter]->getMCFitMomentumX().at(j)));
         output[counter]->setMCFitCotTheta(output[counter]->getMCFitMomentumZ().at(j) * output[counter]->getMCFitCurv().at(j));
+        output[counter]->setMCFitTheta(atan2(1 / (output[counter]->getMCFitCurv().at(j)), output[counter]->getMCFitMomentumZ().at(j)));
 
         output[counter]->setNMCHits(tracksMC[trackId]->getNHits());
         output[counter]->setMCFitPDG(tracksMC[trackId]->getPDG());
@@ -246,14 +257,23 @@ void TrackingOutputModule::event()
           output[counter]->setPRStartMomentumZ(candidatePR.getDirSeed().z());
           output[counter]->setPRStartMomentum(candidatePR.getDirSeed().Mag());
           output[counter]->setPRStartCurv(1 / sqrt(candidatePR.getDirSeed().x()*candidatePR.getDirSeed().x() + candidatePR.getDirSeed().y()*candidatePR.getDirSeed().y()));
+          output[counter]->setPRStartPhi(atan2(output[counter]->getPRStartMomentumY().at(j), output[counter]->getPRStartMomentumX().at(j)));
           output[counter]->setPRStartCotTheta(output[counter]->getPRStartMomentumZ().at(j) * output[counter]->getPRStartCurv().at(j));
+          output[counter]->setPRStartTheta(atan2(1 / (output[counter]->getPRStartCurv().at(j)), output[counter]->getPRStartMomentumZ().at(j)));
+
 
           output[counter]->setPRFitMomentumX(tracksPR[trackId]->getMomentum().x());
           output[counter]->setPRFitMomentumY(tracksPR[trackId]->getMomentum().y());
           output[counter]->setPRFitMomentumZ(tracksPR[trackId]->getMomentum().z());
           output[counter]->setPRFitMomentum(tracksPR[trackId]->getMomentum().Mag());
           output[counter]->setPRFitCurv(abs(tracksPR[trackId]->getOmega()*alpha));
+          output[counter]->setPRFitPhi(atan2(output[counter]->getPRFitMomentumY().at(j), output[counter]->getPRFitMomentumX().at(j)));
           output[counter]->setPRFitCotTheta(output[counter]->getPRFitMomentumZ().at(j) * output[counter]->getPRFitCurv().at(j));
+          output[counter]->setPRFitTheta(atan2(1 / output[counter]->getPRFitCurv().at(j), output[counter]->getPRFitMomentumZ().at(j)));
+
+          output[counter]->setPRFitPositionX(tracksPR[trackId]->getD0()*sin(tracksPR[trackId]->getPhi()));
+          output[counter]->setPRFitPositionY(-tracksPR[trackId]->getD0()*cos(tracksPR[trackId]->getPhi()));
+          output[counter]->setPRFitPositionZ(tracksPR[trackId]->getZ0());
 
           output[counter]->setNPRHits(tracksPR[trackId]->getNHits());
           output[counter]->setPRFitPDG(tracksPR[trackId]->getPDG());

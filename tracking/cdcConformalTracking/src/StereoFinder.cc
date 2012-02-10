@@ -58,26 +58,31 @@ void StereoFinder::FindStereoSegments(CDCTrackCandidate startTrack, vector<CDCSe
 {
   int nSegments = cdcStereoSegments.size();
 
-  for (int i = 0; i < nSegments; i++) { //loop over all segments
-    //first necessary neighbouring condition and check the correct superlayer
-    if (cdcStereoSegments[i].getSuperlayerId() == SLId) {
-      //the decisive neighbouring condition
-      if (SimpleDistance(startTrack, cdcStereoSegments[i]) < SimpleDistanceCut && ShortestDistance(startTrack, cdcStereoSegments[i]) < ShortDistanceCut) {
-        //add the Id of the track candidate to the segment
-        cdcStereoSegments[i].setTrackCandId(startTrack.getId());
-        // B2INFO("Possible stereo Candidate for track "<<startTrack.getId()<<"  in SL "<<SLId);
-      }
-    }
+  bool skip = false;    //we want the outermost segments of the track to be a axial segment, so all stereo segments 'higher' than the outermost axial segment will be skipped
+  if (startTrack.getOuterMostSegment().getSuperlayerId() < SLId) skip = true;
 
-  }//end loop over all segments
+  if (skip == false) {
+    for (int i = 0; i < nSegments; i++) { //loop over all segments
+      //first necessary neighbouring condition and check the correct superlayer
+      if (cdcStereoSegments[i].getSuperlayerId() == SLId) {
+        //the decisive neighbouring condition
+        if (SimpleDistance(startTrack, cdcStereoSegments[i]) < SimpleDistanceCut && ShortestDistance(startTrack, cdcStereoSegments[i]) < ShortDistanceCut) {
+          //add the Id of the track candidate to the segment
+          cdcStereoSegments[i].setTrackCandId(startTrack.getId());
+          // B2INFO("Possible stereo Candidate for track "<<startTrack.getId()<<"  in SL "<<SLId);
+        }
+      }
+
+    }//end loop over all segments
+  } //end if skip false
 }
 
-void StereoFinder::StereoFitCandidates(CDCTrackCandidate & candidate)
+void StereoFinder::StereoFitCandidates(CDCTrackCandidate& candidate)
 {
   B2DEBUG(100, "Perform a stereo fit: candidate with " << candidate.getNSegments() << " segments");
   if (candidate.getNSegments() > 0) {
     //create a graph to fit r vs z
-    TGraph * zGraph;
+    TGraph* zGraph;
     double r[100];
     double z[100];
     int nHits = candidate.getNHits(); //Nr of hits in a track
@@ -95,7 +100,7 @@ void StereoFinder::StereoFitCandidates(CDCTrackCandidate & candidate)
       double zMin = zGraph->GetXaxis()->GetXmin();
       double zMax = zGraph->GetXaxis()->GetXmax();
       zGraph->Fit("pol1", "Q", "", zMin, zMax);
-      TF1 *zFit = zGraph->GetFunction("pol1");
+      TF1* zFit = zGraph->GetFunction("pol1");
 
       double zChi2 = zFit->GetChisquare();
 
@@ -126,6 +131,7 @@ void StereoFinder::StereoFitCandidates(CDCTrackCandidate & candidate)
                 zSegmentPoint.SetY(zSegY);
                 zSegmentPoint.SetZ(0);
                 zDeviation = fabs((zSegmentPoint.y() - (zFit->GetParameter(1) * zSegmentPoint.x() + zFit->GetParameter(0))) / (zFit->GetParameter(1) * zSegmentPoint.x() + zFit->GetParameter(0)));
+
                 //B2INFO("ZDeviation: "<<zDeviation);
                 //select the segment with the largest residual/deviation from the fit line
                 if (zDeviation > maxDistance) {
@@ -169,7 +175,7 @@ bool StereoFinder::OvercrowdedSuperlayer(CDCTrackCandidate track, int SLId)
   return overcrowded;
 }
 
-void StereoFinder::CheckOvercrowdedSL(CDCTrackCandidate & axialCandidate, CDCTrackCandidate & stereoCandidate)
+void StereoFinder::CheckOvercrowdedSL(CDCTrackCandidate& axialCandidate, CDCTrackCandidate& stereoCandidate)
 {
   //B2INFO("...... start check overcrowded SLs for ");
   double minDistance;
@@ -234,9 +240,9 @@ void StereoFinder::AppendStereoSegments(vector<CDCSegment> & cdcStereoSegments, 
   }
 
   int SL = 7; //start superlayer
-  double simpleCut = 30; //cut on the simple distance
+  double simpleCut = 20; //cut on the simple distance
   double shortDistanceCut = 0.05 ; //cut on the 'short' distance for the first search loop
-  double strictCut = 0.025 ; //cut on the 'short' distance for the final decision (after shifting the stereo segments)
+  double strictCut = 0.007 ; //cut on the 'short' distance for the final decision (after shifting the stereo segments)
   double angleCut = 0.4 ; //cut on the angle between the track candidate and the segment
 
   while (SL > 0) { //loop over all stereo superlayers
@@ -245,7 +251,7 @@ void StereoFinder::AppendStereoSegments(vector<CDCSegment> & cdcStereoSegments, 
 
       //recalculate the cut depending on the superlayer difference (e.g. the cut should be different for consecutive superlayers as for superlayers with a gap in between)
       int SLDiff = abs(cdcTrackCandidates[i]->getOuterMostSegment().getSuperlayerId() - SL);
-      simpleCut = 30 + (SLDiff * 10 - 10);
+      simpleCut = 15 + (SLDiff * 10 - 10);
 
       //search for matching stereo segments in the given superlayer
       //the matching stereo segments get the trackId assigned to them
@@ -290,8 +296,6 @@ void StereoFinder::AppendStereoSegments(vector<CDCSegment> & cdcStereoSegments, 
   for (int i = 0; i < nTracks; i++) {
 
   }
-
-
 
   //it may happen, that several segments from the same superlayer are assigned to the same track (because of the shift and the uknown z-coordinate)
   //so, for each track it is checked if there is only one stereo segment in each superlayer, if not, the best segment is chosen and the others are removed

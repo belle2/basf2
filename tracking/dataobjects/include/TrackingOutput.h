@@ -47,9 +47,17 @@ namespace Belle2 {
       */
     void setMCCurv(float mcCurv) {m_mcCurv = mcCurv ;}
 
-    /** Setter for Cotangens theta of the MCParticle (pz/pt)
+    /** Setter for the phi angle of MCParticle (track angle in xy plane).
+      */
+    void setMCPhi(float mcPhi) {m_mcPhi = mcPhi;}
+
+    /** Setter for Cotangens theta of the MCParticle (pz/pt).
      */
     void setMCCotTheta(float mcCotTheta) {m_mcCotTheta = mcCotTheta ;}
+
+    /** Setter for theta of the MCParticle .
+     */
+    void setMCTheta(float mcTheta) {m_mcTheta = mcTheta ;}
 
     /** Setter for the pdg value of the MCParticle.
      */
@@ -88,9 +96,18 @@ namespace Belle2 {
      */
     float getMCCurv() {return m_mcCurv; }
 
+    /** Getter for phi of MCParticle.
+     */
+    float getMCPhi() {return m_mcPhi; }
+
     /** Getter for cotangens theta of MCParticle (pz/pt).
      */
     float getMCCotTheta() {return m_mcCotTheta; }
+
+    /** Getter for theta of MCParticle.
+     */
+    float getMCTheta() {return m_mcTheta; }
+
 
     //------------------------------------------------------------------------------------------------
 
@@ -114,9 +131,17 @@ namespace Belle2 {
      */
     void setMCStartCurv(float mcStartCurv) {m_mcStartCurv.push_back(mcStartCurv) ;}
 
+    /** Setter for the start value for the MCTrack fit: phi angle (track angle in xy plane).
+      */
+    void setMCStartPhi(float mcStartPhi) {m_mcStartPhi.push_back(mcStartPhi);}
+
     /** Setter for start value for the MCTrack fit: cotangens theta (pz/pt).
      */
     void setMCStartCotTheta(float mcStartCotTheta) {m_mcStartCotTheta.push_back(mcStartCotTheta) ;}
+
+    /** Setter for start value for the MCTrack fit: theta .
+     */
+    void setMCStartTheta(float mcStartTheta) {m_mcStartTheta.push_back(mcStartTheta) ;}
 
     /** Setter for start value for the MCTrack fit: vertex position (x-component).
      */
@@ -150,9 +175,17 @@ namespace Belle2 {
      */
     void setMCFitCurv(float mcFitCurv) {m_mcFitCurv.push_back(mcFitCurv) ;}
 
+    /** Setter for the fit result the MCTrack fit: phi angle (track angle in xy plane).
+      */
+    void setMCFitPhi(float mcFitPhi) {m_mcFitPhi.push_back(mcFitPhi);}
+
     /** Setter for the fit result of the MCTrack fit: cotangens theta (pz/pt).
      */
     void setMCFitCotTheta(float mcFitCotTheta) {m_mcFitCotTheta.push_back(mcFitCotTheta) ;}
+
+    /** Setter for the fit result of the MCTrack fit: theta .
+     */
+    void setMCFitTheta(float mcFitTheta) {m_mcFitTheta.push_back(mcFitTheta) ;}
 
     /** Setter for the fit result of the MCTrack fit: vertex position (x-component).
      */
@@ -251,11 +284,17 @@ namespace Belle2 {
      */
     std::vector<float> getMCStartCurv() {return m_mcStartCurv; }
 
+    /** Getter for the start value of MCTrack fit: phi .
+     */
+    std::vector<float> getMCStartPhi() {return m_mcStartPhi; }
+
     /** Getter for the start value of MCTrack fit: cotangens theta (pz/pt).
      */
     std::vector<float> getMCStartCotTheta() {return m_mcStartCotTheta; }
 
-
+    /** Getter for the start value of MCTrack fit: theta .
+     */
+    std::vector<float> getMCStartTheta() {return m_mcStartTheta; }
 
     /** Getter for the fit result of MCTrack fit: momentum (x-component).
      */
@@ -277,9 +316,18 @@ namespace Belle2 {
      */
     std::vector<float> getMCFitCurv() {return m_mcFitCurv; }
 
+    /** Getter for the fit result of MCTrack fit: phi.
+     */
+    std::vector<float> getMCFitPhi() {return m_mcFitPhi; }
+
     /** Getter for the fit result of MCTrack fit: cotangens theta (pz/pt).
      */
     std::vector<float> getMCFitCotTheta() {return m_mcFitCotTheta; }
+
+    /** Getter for the fit result of MCTrack fit: theta.
+     */
+    std::vector<float> getMCFitTheta() {return m_mcFitTheta; }
+
 
     //------------------------------------------------------------------------------------------------------------
 
@@ -303,9 +351,17 @@ namespace Belle2 {
      */
     void setPRStartCurv(float prStartCurv) {m_prStartCurv.push_back(prStartCurv) ;}
 
+    /** Setter for the start value for the PRTrack fit: phi angle (track angle in xy plane).
+      */
+    void setPRStartPhi(float prStartPhi) {m_prStartPhi.push_back(prStartPhi);}
+
     /** Setter for start value for the PRTrack fit: cotangens theta (pz/pt).
      */
     void setPRStartCotTheta(float prStartCotTheta) {m_prStartCotTheta.push_back(prStartCotTheta) ;}
+
+    /** Setter for start value for the PRTrack fit: theta .
+     */
+    void setPRStartTheta(float prStartTheta) {m_prStartTheta.push_back(prStartTheta) ;}
 
     /** Setter for start value for the PRTrack fit: vertex position (x-component).
      */
@@ -339,9 +395,17 @@ namespace Belle2 {
      */
     void setPRFitCurv(float prFitCurv) {m_prFitCurv.push_back(prFitCurv) ;}
 
+    /** Setter for the fit result the PRTrack fit: phi angle (track angle in xy plane).
+      */
+    void setPRFitPhi(float prFitPhi) {m_prFitPhi.push_back(prFitPhi);}
+
     /** Setter for the fit result of the PRTrack fit: cotangens theta (pz/pt).
      */
     void setPRFitCotTheta(float prFitCotTheta) {m_prFitCotTheta.push_back(prFitCotTheta) ;}
+
+    /** Setter for the fit result of the PRTrack fit: theta .
+     */
+    void setPRFitTheta(float prFitTheta) {m_prFitTheta.push_back(prFitTheta) ;}
 
     /** Setter for the fit result of the PRTrack fit: vertex position (x-component).
      */
@@ -444,10 +508,17 @@ namespace Belle2 {
      */
     std::vector<float> getPRStartCurv() {return m_prStartCurv; }
 
+    /** Getter for the start value of PRTrack fit: phi .
+     */
+    std::vector<float> getPRStartPhi() {return m_prStartPhi; }
+
     /** Getter for the start value of PRTrack fit: cotangens theta (pz/pt).
      */
     std::vector<float> getPRStartCotTheta() {return m_prStartCotTheta; }
 
+    /** Getter for the start value of PRTrack fit: theta .
+     */
+    std::vector<float> getPRStartTheta() {return m_prStartTheta; }
 
 
     /** Getter for the fit result of PRTrack fit: momentum (x-component).
@@ -470,9 +541,17 @@ namespace Belle2 {
      */
     std::vector<float> getPRFitCurv() {return m_prFitCurv; }
 
+    /** Getter for the fit result of PRTrack fit: phi.
+     */
+    std::vector<float> getPRFitPhi() {return m_prFitPhi; }
+
     /** Getter for the fit result of PRTrack fit: cotangens theta (pz/pt).
      */
     std::vector<float> getPRFitCotTheta() {return m_prFitCotTheta; }
+
+    /** Getter for the fit result of PRTrack fit: theta.
+     */
+    std::vector<float> getPRFitTheta() {return m_prFitTheta; }
 
 
   private:
@@ -483,7 +562,9 @@ namespace Belle2 {
     float m_mcMomentumZ;                         /**< Momentum of the MCParticle (z-component) */
     float m_mcMomentum;                          /**< Momentum of the MCParticle (absolute value) */
     float m_mcCurv;                              /**< Curvature of the MCParticle (inverse transverse momentum) */
+    float m_mcPhi;         /**< Phi of the MCParticle */
     float m_mcCotTheta;                          /**< Cotangens theta of the MCParticle (pz/pt) */
+    float m_mcTheta;         /**< Theta of the MCParticle */
     int m_mcPDG;                                 /**< PDG of the MCParticle */
     float m_mcPositionX;                         /**< Vertex of the MCParticle (x-component) */
     float m_mcPositionY;                         /**< Vertex of the MCParticle (y-component) */
@@ -496,7 +577,10 @@ namespace Belle2 {
     std::vector<float> m_mcStartMomentumZ;       /** Start values for the MCTrack fit: momentum (z-component) */
     std::vector<float> m_mcStartMomentum;        /** Start values for the MCTrack fit: momentum (absolute value) */
     std::vector<float> m_mcStartCurv;            /** Start values for the MCTrack fit: curvature (inverse transverse momentum) */
+    std::vector<float> m_mcStartPhi;             /** Start values for the MCTrack fit: phi */
     std::vector<float> m_mcStartCotTheta;        /** Start values for the MCTrack fit: cotangens theta (pz/pt) */
+    std::vector<float> m_mcStartTheta;           /** Start values for the MCTrack fit: theta */
+
     std::vector<float> m_mcStartPositionX;       /** Start values for the MCTrack fit: vertex (x-component) */
     std::vector<float> m_mcStartPositionY;       /** Start values for the MCTrack fit: vertex (y-component) */
     std::vector<float> m_mcStartPositionZ;       /** Start values for the MCTrack fit: vertex (z-component) */
@@ -506,7 +590,9 @@ namespace Belle2 {
     std::vector<float> m_mcFitMomentumZ;         /** Fit result for the MCTrack fit: momentum (z-component) */
     std::vector<float> m_mcFitMomentum;          /** Fit result for the MCTrack fit: momentum (absolute value) */
     std::vector<float> m_mcFitCurv;              /** Fit result for the MCTrack fit: curvature (inverse transverse momentum) */
+    std::vector<float> m_mcFitPhi  ;             /** Fit result for the MCTrack fit: phi */
     std::vector<float> m_mcFitCotTheta;          /** Fit result for the MCTrack fit: cotangens theta(pz/pt) */
+    std::vector<float> m_mcFitTheta;             /** Fit result for the MCTrack fit: theta */
     std::vector<float> m_mcFitPositionX;         /** Fit result for the MCTrack fit: vertex (x-component) */
     std::vector<float> m_mcFitPositionY;         /** Fit result for the MCTrack fit: vertex (y-component) */
     std::vector<float> m_mcFitPositionZ;         /** Fit result for the MCTrack fit: vertex (z-component) */
@@ -534,7 +620,10 @@ namespace Belle2 {
     std::vector<float> m_prStartMomentumZ;       /** Start values for the PRTrack fit: momentum (z-component) */
     std::vector<float> m_prStartMomentum;        /** Start values for the PRTrack fit: momentum (absolute value) */
     std::vector<float> m_prStartCurv;            /** Start values for the PRTrack fit: curvature (inverse transverse momentum) */
+    std::vector<float> m_prStartPhi  ;           /** Start values for the PRTrack fit: phi */
     std::vector<float> m_prStartCotTheta;        /** Start values for the PRTrack fit: cotangens theta (pz/pt) */
+    std::vector<float> m_prStartTheta;           /** Start values for the PRTrack fit: theta */
+
     std::vector<float> m_prStartPositionX;       /** Start values for the PRTrack fit: vertex (x-component) */
     std::vector<float> m_prStartPositionY;       /** Start values for the PRTrack fit: vertex (y-component) */
     std::vector<float> m_prStartPositionZ;       /** Start values for the PRTrack fit: vertex (z-component) */
@@ -544,7 +633,10 @@ namespace Belle2 {
     std::vector<float> m_prFitMomentumZ;         /** Fit result for the PRTrack fit: momentum (z-component) */
     std::vector<float> m_prFitMomentum;          /** Fit result for the PRTrack fit: momentum (absolute value) */
     std::vector<float> m_prFitCurv;              /** Fit result for the PRTrack fit: curvature (inverse transverse momentum) */
+    std::vector<float> m_prFitPhi  ;             /** Fit result for the PRTrack fit: phi */
     std::vector<float> m_prFitCotTheta;          /** Fit result for the PRTrack fit: cotangens theta(pz/pt) */
+    std::vector<float> m_prFitTheta;             /** Fit result for the PRTrack fit: theta */
+
     std::vector<float> m_prFitPositionX;         /** Fit result for the PRTrack fit: vertex (x-component) */
     std::vector<float> m_prFitPositionY;         /** Fit result for the PRTrack fit: vertex (y-component) */
     std::vector<float> m_prFitPositionZ;         /** Fit result for the PRTrack fit: vertex (z-component) */

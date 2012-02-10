@@ -29,7 +29,7 @@ using namespace Belle2;
 REG_MODULE(CDCMCMatching)
 
 CDCMCMatchingModule::CDCMCMatchingModule() :
-    Module()
+  Module()
 {
   setDescription("Matches the GFTrackCandidates with MCTruth to evaluate the performance of pattern recognition. Assigns to each GFTrackCandidate an ID of the MCParticles which contributed the largest amount of hits to this track candidate.");
 
@@ -118,11 +118,14 @@ void CDCMCMatchingModule::event()
       bestMCId = getBestMCId(mcParticleContributions, cdcHitsIndexList.size()); //evaluate the MCParticle with the largest contribution
 
       gfTrackCandidates[i]->setMcTrackId(bestMCId.first);    //assign the ID of this MCParticle to the candidate
-      B2INFO("Assign MCId " << bestMCId.first << " (pdg: " << mcParticles[bestMCId.first]->getPDG() << ") to track candidate " << i);
       gfTrackCandidates[i]->setDip(bestMCId.second);         //here I just 'misuse' one unused member variable from GFTrackCand called 'Dip' to store the 'purity' of the track
 
-      //create a relation between the track candidate and the MCParticle (redundant to the ID assignment, but may however be useful)
-      gfTrackCandToMCPart.add(i, bestMCId.first);
+      //check if there is an MCParticle contributing to the track (-999 as ID means its random composition of background hits)
+      if (bestMCId.first != -999) {
+        B2INFO("Assign MCId " << bestMCId.first << " (pdg: " << mcParticles[bestMCId.first]->getPDG() << ") to track candidate " << i);
+        //create a relation between the track candidate and the MCParticle (redundant to the ID assignment, but may however be useful)
+        gfTrackCandToMCPart.add(i, bestMCId.first);
+      } else B2WARNING("No MCParticle contributed to this track!");
 
       cdcHitsIndexList.clear();
       mcParticleContributions.clear();
@@ -191,6 +194,8 @@ pair<int, float> CDCMCMatchingModule::getBestMCId(vector <pair<int, int> >  mcPa
       result.second = fraction;
     } else {
       B2INFO("--- No MCParticle contributed to this track! (missing relations?)");
+      result.first = -999;
+      result.second = 0.0;
     }
 
     return result;

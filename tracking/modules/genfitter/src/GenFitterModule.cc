@@ -170,7 +170,7 @@ void GenFitterModule::event()
   int trackCounter = -1;
 
   for (int i = 0; i < trackCandidates.getEntries(); ++i) { //loop over all track candidates
-    B2INFO("#############  Fit track candidate Nr. : " << i << "  ################")
+    B2INFO("#############  Fit track candidate Nr. : " << i << "  ################");
 
     GFAbsTrackRep* trackRep;  //initialize track representation
 

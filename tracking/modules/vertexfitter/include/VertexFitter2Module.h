@@ -1,17 +1,16 @@
-#ifndef VERTEXFITTERSTATISTICSMODULE_H
-#define VERTEXFITTERSTATISTICSMODULE_H
+#ifndef VERTEXFITTER2MODULE_H
+#define VERTEXFITTER2MODULE_H
 
 #include <framework/core/Module.h>
-
 #include <TH1D.h>
 
 namespace Belle2 {
 
-  class VertexFitterStatisticsModule : public Module {
+  class VertexFitter2Module : public Module {
 
   public:
-    VertexFitterStatisticsModule();
-    virtual ~VertexFitterStatisticsModule();
+    VertexFitter2Module();
+    virtual ~VertexFitter2Module() {}
 
     virtual void initialize();
     virtual void beginRun();
@@ -20,10 +19,10 @@ namespace Belle2 {
     virtual void terminate();
 
   private:
+    std::string m_GFTracksColName;             ///< GFTrack instance collection name.
     std::string m_RAVEVerticesColName;         ///< rave::Vertex instance collection name.
     std::string m_MCParticlesColName;          ///< MCParticle instances collection name.
     std::string m_GFTrackCandsColName;         ///< GFTrackCand instances collection name.
-    std::string m_GFTracksColName;             ///< GFTrack instance collection name.
     std::string m_GFTrackToGFTrackCandColName; ///< Collection of relations of GFTrack instances to GFTrackCand instances.
     std::string m_resultFilePath;              ///< The path and file name of the files that are going to be saved, without any file extension.
     std::string m_steeringFile;                ///< The path to the steering file used.

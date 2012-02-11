@@ -42,12 +42,12 @@ cdcfitting = register_module('GenFitter')
 # cdcfitting.logging.log_level = LogLevel.DEBUG
 
 # Register VertexFitter
-vertexfitter = register_module('VertexFitter')
+vertexfitter2 = register_module('VertexFitter2')
 # rave.logging.log_level = LogLevel.INFO
 
 # Register VertexFitterStat
-vertexfitterstat = register_module('VertexFitterStatistics')
-vertexfitterstat.logging.log_level = LogLevel.INFO
+#vertexfitterstat = register_module('VertexFitterStatistics')
+#vertexfitterstat.logging.log_level = LogLevel.INFO
 
 # print
 printcol = register_module('PrintCollections')
@@ -62,7 +62,7 @@ intseed = random.randint(1, 10000000)
 # one event
 evtmetagen.param('ExpList', [0])
 evtmetagen.param('RunList', [1])
-evtmetagen.param('EvtNumList', [400])
+evtmetagen.param('EvtNumList', [20])
 
 param_pGun = {  # 'randomSeed': 1028307,
                 # 'randomSeed': 1111300,
@@ -98,9 +98,9 @@ param_cdcfitting = {'mcTracks': 1, 'FilterId': 0}
 
 cdcfitting.param(param_cdcfitting)
 
-# VertexFitterStatistics Parameter
-vertexfitterstat.param('resultFilePath', '/home/polyun/Belle2/results/test')
-vertexfitterstat.param('steeringFile', os.path.abspath(sys.argv[0]))
+# VertexFitter2 Parameter
+vertexfitter2.param('resultFilePath', '/home/polyun/Belle2/results/test')
+vertexfitter2.param('steeringFile', os.path.abspath(sys.argv[0]))
 
 # Name of the output root file
 output.param('outputFileName', 'TEST.root')
@@ -123,8 +123,8 @@ main.add_module(cdcDigitizer)
 
 main.add_module(mctrackfinder)
 main.add_module(cdcfitting)
-main.add_module(vertexfitter)
-main.add_module(vertexfitterstat)
+main.add_module(vertexfitter2)
+#main.add_module(vertexfitterstat)
 main.add_module(output)
 
 # Process events

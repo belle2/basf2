@@ -16,7 +16,7 @@
 #include <framework/dataobjects/EventMetaData.h>
 #include <generators/dataobjects/MCParticle.h>
 #include <cdc/dataobjects/CDCHit.h>
-#include <cdc/hitcdc/CDCSimHit.h>
+#include <cdc/dataobjects/CDCSimHit.h>
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <pxd/dataobjects/PXDTrueHit.h>
 #include <svd/dataobjects/SVDTrueHit.h>

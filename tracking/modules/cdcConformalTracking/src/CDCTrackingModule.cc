@@ -16,7 +16,7 @@
 
 #include <framework/logging/Logger.h>
 
-#include <cdc/hitcdc/CDCSimHit.h>
+#include <cdc/dataobjects/CDCSimHit.h>
 #include <cdc/dataobjects/CDCHit.h>
 
 #include <tracking/cdcConformalTracking/CDCTrackHit.h>
@@ -260,27 +260,27 @@ void CDCTrackingModule::event()
 
 //Dump the position information of simulated Hits to a text file
     for (int i = 0; i < cdcSimHits.getEntries(); i++) { //loop over all SimHits
-      CDCSimHit *aSimHit = cdcSimHits[i];
+      CDCSimHit* aSimHit = cdcSimHits[i];
       //prints the position of simulated axial Hits to a file
       SimHitsfile << std::setprecision(5) << (aSimHit->getPosIn()[0] + aSimHit->getPosOut()[0]) / 2. << " \t"
-      << (aSimHit->getPosIn()[1] + aSimHit->getPosOut()[1]) / 2.  << " \t"
-      << (aSimHit->getPosIn()[2] + aSimHit->getPosOut()[2]) / 2. << " \t"
-      << aSimHit->getDriftLength()  << endl;
+                  << (aSimHit->getPosIn()[1] + aSimHit->getPosOut()[1]) / 2.  << " \t"
+                  << (aSimHit->getPosIn()[2] + aSimHit->getPosOut()[2]) / 2. << " \t"
+                  << aSimHit->getDriftLength()  << endl;
     }
 
 
 //Dump the position information of digitized Hits to a text file
     for (int i = 0; i < cdcTrackHits.getEntries(); i++) {     //loop over all Hits
-      CDCTrackHit *aTrackHit = cdcTrackHits[i];
+      CDCTrackHit* aTrackHit = cdcTrackHits[i];
 
       //Prints the Hit position to output files
       Hitsfile << std::setprecision(5) << aTrackHit->getWirePosition().x() << " \t"
-      <<  aTrackHit->getWirePosition().y() << " \t"
-      <<  aTrackHit->getWirePosition().z() << " \t"
-      << aTrackHit->getDriftTime()  << endl;
+               <<  aTrackHit->getWirePosition().y() << " \t"
+               <<  aTrackHit->getWirePosition().z() << " \t"
+               << aTrackHit->getDriftTime()  << endl;
 
       ConfHitsfile << std::setprecision(5) << aTrackHit->getConformalX() << " \t"
-      <<  aTrackHit->getConformalY() << endl;
+                   <<  aTrackHit->getConformalY() << endl;
     }
 
 //Dump the position information of digitized Hits *trackwise* to a text file. First number which indicates the number of Hits in this track is followed by coordinates of Hits assigned to this track.
@@ -291,12 +291,12 @@ void CDCTrackingModule::event()
       for (int hit = 0; hit < cdcTrackCandidates[j]->getNHits(); hit++) {//loop over all Hits
 
         Tracksfile << "\t" << std::setprecision(5) << cdcTrackCandidates[j]->getTrackHits()[hit].getWirePosition().x()  << " \t"
-        <<  cdcTrackCandidates[j]->getTrackHits()[hit].getWirePosition().y() << " \t"
-        <<  cdcTrackCandidates[j]->getTrackHits()[hit].getWirePosition().z() << endl;
+                   <<  cdcTrackCandidates[j]->getTrackHits()[hit].getWirePosition().y() << " \t"
+                   <<  cdcTrackCandidates[j]->getTrackHits()[hit].getWirePosition().z() << endl;
 
         ConfTracksfile << "\t" << std::setprecision(5) << cdcTrackCandidates[j]->getTrackHits()[hit].getConformalX()  << " \t"
-        <<  cdcTrackCandidates[j]->getTrackHits()[hit].getConformalY() << " \t"
-        << "0" << endl;
+                       <<  cdcTrackCandidates[j]->getTrackHits()[hit].getConformalY() << " \t"
+                       << "0" << endl;
       }
 
     }//end loop over all Tracks

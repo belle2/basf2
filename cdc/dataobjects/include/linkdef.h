@@ -7,5 +7,8 @@
 
 #pragma link C++ class Belle2::CDCHit;
 #pragma link C++ class Belle2::CDCRecoHit;
+#pragma link C++ class Belle2::CDCSimHit;
+#pragma link C++ class Belle2::CDCEBSimHit;
+#pragma link C++ class Belle2::HitCDC;
 
 #endif

@@ -189,7 +189,7 @@ const TVector3 CDCGeometryPar::wireForwardPosition(int layerID, int cellID) cons
   double offset = m_offSet[layerID];
   //...Offset modification to be aligned to axial at z=0...
   const double phiSize = 2 * M_PI / double(nWires);
-  {
+  /*{
     const double phiF = phiSize * offset
                         + phiSize * 0.5 * double(m_nShifts[layerID]);
     const double phiB = phiSize * offset;
@@ -202,7 +202,7 @@ const TVector3 CDCGeometryPar::wireForwardPosition(int layerID, int cellID) cons
     const TVector3 p = b + beta * u;
     double phi0 = - atan2(p.y(), p.x());
     offset += phi0 / (2 * M_PI / double(nWires));
-  }
+  }*/
 
   const double phiF = phiSize * (double(cellID) + offset)
                       + phiSize * 0.5 * double(m_nShifts[layerID]);
@@ -220,7 +220,7 @@ const TVector3 CDCGeometryPar::wireBackwardPosition(int layerID, int cellID) con
   double offset = m_offSet[layerID];
   //...Offset modification to be aligned to axial at z=0...
   const double phiSize = 2 * M_PI / double(nWires);
-  {
+  /*{
     const double phiF = phiSize * offset
                         + phiSize * 0.5 * double(m_nShifts[layerID]);
     const double phiB = phiSize * offset;
@@ -233,7 +233,7 @@ const TVector3 CDCGeometryPar::wireBackwardPosition(int layerID, int cellID) con
     const TVector3 p = b + beta * u;
     double phi0 = - atan2(p.y(), p.x());
     offset += phi0 / (2 * M_PI / double(nWires));
-  }
+  }*/
 
   const double phiF = phiSize * (double(cellID) + offset)
                       + phiSize * 0.5 * double(m_nShifts[layerID]);
@@ -275,7 +275,7 @@ unsigned CDCGeometryPar::cellId(unsigned layerId, const TVector3& position) cons
   double offset = m_offSet[layerId];
   //...Offset modification to be aligned to axial at z=0...
   const double phiSize = 2 * M_PI / double(nWires);
-  {
+  /*{
     const double phiF = phiSize * offset
                         + phiSize * 0.5 * double(m_nShifts[layerId]);
     const double phiB = phiSize * offset;
@@ -288,7 +288,7 @@ unsigned CDCGeometryPar::cellId(unsigned layerId, const TVector3& position) cons
     const TVector3 p = b + beta * u;
     double phi0 = - atan2(p.y(), p.x());
     offset += phi0 / (2 * M_PI / double(nWires));
-  }
+  }*/
 
   unsigned j = 0;
   for (unsigned i = 0; i < 1; i++) {

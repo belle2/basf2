@@ -21,7 +21,7 @@
 
 //cdc package headers
 #include <cdc/dataobjects/CDCHit.h>
-#include <cdc/hitcdc/HitCDC.h>
+#include <cdc/dataobjects/HitCDC.h>
 #include <cdc/geometry/CDCGeometryPar.h>
 
 //root

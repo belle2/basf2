@@ -16,8 +16,8 @@
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
-#include <cdc/hitcdc/CDCSimHit.h>
-#include <cdc/hitcdc/CDCEBSimHit.h>
+#include <cdc/dataobjects/CDCSimHit.h>
+#include <cdc/dataobjects/CDCEBSimHit.h>
 
 #include "G4Step.hh"
 #include "G4SteppingManager.hh"

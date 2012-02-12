@@ -15,7 +15,7 @@
 #include <framework/core/Module.h>
 
 //cdc package headers
-#include <cdc/hitcdc/CDCSimHit.h>
+#include <cdc/dataobjects/CDCSimHit.h>
 #include <cdc/modules/cdcDigitizer/CDCSignal.h>
 
 //C++/C standard lib elements.

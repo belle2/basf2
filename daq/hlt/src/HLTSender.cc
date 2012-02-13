@@ -71,6 +71,7 @@ EHLTStatus HLTSender::broadcasting()
   if (m_buffer->numq() <= 0) {
     return c_Success;
   }
+  //B2INFO ("[HLTSender] Start to send data to " << m_destination);
 
   char* temp = new char [gMaxReceives + gEOSTag.size()];
   memset(temp, 0, sizeof(char) * (gMaxReceives + gEOSTag.size()));
@@ -82,6 +83,7 @@ EHLTStatus HLTSender::broadcasting()
 
   bool termCode = false;
 
+  writeFile("test.txt", temp, bufferStatus * 4);
   std::string termChecker(temp);
   if (termChecker == gTerminate) {
     B2INFO("\x1b[032m[HLTSender] Termination code taken!\x1b[0m");
@@ -89,6 +91,14 @@ EHLTStatus HLTSender::broadcasting()
       usleep(100);
     }
     termCode = true;
+
+    while (broadcasting(gTerminate) == c_FuncError) {
+      B2INFO("[HLTSender] \x1b[31mAn error occurred in sending termination. Retrying...\x1b[0m");
+      //usleep(100);
+      sleep(1);
+    }
+    B2INFO("[HLTSender] Sending terminate to " << m_destination << " \x1b[034msuccess!\x1b[0m");
+    return c_TermCalled;
   }
 
   int size = bufferStatus * 4;
@@ -97,19 +107,26 @@ EHLTStatus HLTSender::broadcasting()
   size += gEOSTag.size();
 
   if (!termCode) {
+    B2INFO("[HLTSender] Sending events to " << m_destination << "...");
     while (send(temp, size) == c_FuncError) {
-      B2INFO("[HLTSender] \x1b[31mAn error occurred in sending so the data. Retrying...\x1b[0m");
-      usleep(100);
+      B2INFO("[HLTSender] \x1b[31mAn error occurred in sending data. Retrying...\x1b[0m");
+      //usleep(100);
+      sleep(1);
     }
-  } else {
+  }
+  /*
+  else {
+    B2INFO ("[HLTSender] Sending termination to " << m_destination << "...");
     while (broadcasting(gTerminate) == c_FuncError) {
-      B2INFO("[HLTSender] \x1b[31mAn error occurred in sending so the data. Retrying...\x1b[0m");
-      usleep(100);
+      B2INFO("[HLTSender] \x1b[31mAn error occurred in sending termination. Retrying...\x1b[0m");
+      //usleep(100);
+      sleep (1);
     }
     return c_TermCalled;
   }
+  */
 
-  B2INFO("[HLTSender] An event send to a destination" << m_destination);
+  B2INFO("[HLTSender] Sending events to " << m_destination << " \x1b[034msuccess!\x1b[0m");
   return c_Success;
 }
 
@@ -148,6 +165,14 @@ EHLTStatus HLTSender::setBuffer(unsigned int key)
 {
   B2INFO("[HLTSender] \x1b[32mRing buffer initializing...\x1b[0m");
   m_buffer = new RingBuffer(boost::lexical_cast<std::string>(static_cast<int>(key)).c_str(), gBufferSize);
+
+  return c_Success;
+}
+
+EHLTStatus HLTSender::setBuffer(std::string key)
+{
+  B2INFO("[HLTReceiver] \x1b[32mRing buffer initializing...\x1b[0m");
+  m_buffer = new RingBuffer(key.c_str(), gBufferSize);
 
   return c_Success;
 }

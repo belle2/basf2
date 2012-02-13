@@ -71,9 +71,9 @@ EHLTStatus B2Socket::bind(const unsigned int port)
 
   m_socketAddress.sin_family = AF_INET;
   m_socketAddress.sin_addr.s_addr = INADDR_ANY;
-  m_socketAddress.sin_port = ::htons(port);
+  m_socketAddress.sin_port = htons(port);
 
-  int bindReturn = ::bind(m_socket, (struct sockaddr*)&m_socketAddress, sizeof(m_socketAddress));
+  int bindReturn = ::bind(m_socket, (struct sockaddr*) & m_socketAddress, sizeof(m_socketAddress));
 
   if (bindReturn == -1) {
     B2ERROR("\x1b[31m[B2Socket] Socket " << m_socket << " binding failed with code=" << errno << "\x1b[0m");
@@ -101,11 +101,11 @@ EHLTStatus B2Socket::connect(const std::string destination, const int port)
   setNonBlocking(true);
 
   m_socketAddress.sin_family = AF_INET;
-  m_socketAddress.sin_port = ::htons(port);
+  m_socketAddress.sin_port = htons(port);
 
   int connectReturn = ::inet_pton(AF_INET, destination.c_str(), &m_socketAddress.sin_addr);
 
-  connectReturn = ::connect(m_socket, (sockaddr*)&m_socketAddress, sizeof(m_socketAddress));
+  connectReturn = ::connect(m_socket, (sockaddr*) & m_socketAddress, sizeof(m_socketAddress));
 
   setNonBlocking(false);
 
@@ -113,7 +113,8 @@ EHLTStatus B2Socket::connect(const std::string destination, const int port)
     return c_Success;
   } else {
     B2ERROR("\x1b[31m[B2Socket] Connection failed to "
-            << destination << " (errno=" << errno << ")\x1b[0m");
+            << destination << " through " << port
+            << " (errno=" << errno << ")\x1b[0m");
     return c_InitFailed;
   }
 }
@@ -145,7 +146,7 @@ EHLTStatus B2Socket::accept(int& newSocket)
 {
   B2INFO("\x1b[34m[B2Socket] Accepting a new socket...\x1b[0m");
   int addressLength = sizeof(m_socketAddress);
-  int status = ::accept(m_socket, (struct sockaddr*)&m_socketAddress, (socklen_t*)&addressLength);
+  int status = ::accept(m_socket, (struct sockaddr*) & m_socketAddress, (socklen_t*) & addressLength);
 
   if (status == -1) {
     B2ERROR("\x1b[31m[B2Socket] Can't find proper socket!\x1b[0m");

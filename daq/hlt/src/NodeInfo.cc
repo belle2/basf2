@@ -102,7 +102,7 @@ void NodeInfo::unitNo(int unitNo)
 
 /// @brief Get unit number of the node
 /// @return Unit number of the node
-const int NodeInfo::unitNo()
+int NodeInfo::unitNo()
 {
   return m_unitNo;
 }
@@ -116,14 +116,14 @@ void NodeInfo::nodeNo(int nodeNo)
 
 /// @brief Get node number of the node
 /// @return Node number of the node
-const int NodeInfo::nodeNo()
+int NodeInfo::nodeNo()
 {
   return m_nodeNo;
 }
 
 /// @brief Generate a unique key based on unit and node number of the node
 /// @return Generated key (unit# * 100 + node#)
-const int NodeInfo::generateKey()
+int NodeInfo::generateKey()
 {
   return m_unitNo * 100 + m_nodeNo;
 }
@@ -137,7 +137,7 @@ void NodeInfo::expNo(int expNo)
 
 /// @brief Get experiment number
 /// @return Experiment number of the current configuration
-const int NodeInfo::expNo()
+int NodeInfo::expNo()
 {
   return m_expNo;
 }
@@ -151,7 +151,7 @@ void NodeInfo::runStart(int runStart)
 
 /// @brief Get run start number
 /// @return Run start number of the current configuration
-const int NodeInfo::runStart()
+int NodeInfo::runStart()
 {
   return m_runStart;
 }
@@ -165,7 +165,7 @@ void NodeInfo::runEnd(int runEnd)
 
 /// @brief Get run end number
 /// @return Run end number of the current configuration
-const int NodeInfo::runEnd()
+int NodeInfo::runEnd()
 {
   return m_runEnd;
 }

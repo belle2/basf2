@@ -44,6 +44,7 @@ namespace Belle2 {
     EHLTStatus setBuffer();
     //! Set ring buffer with specific key
     EHLTStatus setBuffer(unsigned int key);
+    EHLTStatus setBuffer(std::string key);
 
     //! Encode data to be sent to ensure the singleton of data for a string
     std::string makeSingleton(std::string data);

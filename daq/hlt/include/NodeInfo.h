@@ -44,26 +44,26 @@ namespace Belle2 {
     //! Modifier to unit number
     void unitNo(int unitNo);
     //! Accessor to unit number
-    const int unitNo();
+    int unitNo();
     //! Modifier to node number
     void nodeNo(int nodeNo);
     //! Accessor to node number
-    const int nodeNo();
+    int nodeNo();
     //! Generate the unique key based on unit and node number
-    const int generateKey();
+    int generateKey();
 
     //! Modifier to experiment number
     void expNo(int expNo);
     //! Accessor to experiment number
-    const int expNo();
+    int expNo();
     //! Modifier to run start number
     void runStart(int runStart);
     //! Accessor to run start number
-    const int runStart();
+    int runStart();
     //! Modifier to run end number
     void runEnd(int runEnd);
     //! Accessor to run end number
-    const int runEnd();
+    int runEnd();
 
     //! Modifier to type of node
     void type(std::string type);

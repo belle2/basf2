@@ -14,9 +14,10 @@ using namespace Belle2;
 
 /// @brief HLTReceiver constructor
 /// @param port Port number for data communication
-HLTReceiver::HLTReceiver(unsigned int port)
+HLTReceiver::HLTReceiver(unsigned int port, unsigned int nSources)
 {
   m_port = port;
+  m_nSources = nSources;
   m_buffer = NULL;
 }
 
@@ -91,6 +92,9 @@ EHLTStatus HLTReceiver::listening()
         std::string termChecker(data);
         if (termChecker == gTerminate) {
           B2INFO("\x1b[31m[HLTReceiver] Terminate tag met\x1b[0m");
+          if (m_buffer->insq((int*)gTerminate.c_str(), gTerminate.size() / 4 + 1) <= 0) {
+            usleep(100);
+          }
           return c_TermCalled;
         }
 
@@ -108,7 +112,21 @@ EHLTStatus HLTReceiver::listening()
           givenMessageIndex += givenMessageSizes[i];
           if (!strcmp(givenMessage, gTerminate.c_str())) {
             B2INFO("\x1b[31m[HLTReceiver] Terminate tag met\x1b[0m");
+            if (m_buffer->insq((int*)gTerminate.c_str(), gTerminate.size() / 4 + 1) <= 0) {
+              usleep(100);
+            }
             return c_TermCalled;
+            /*
+            m_nSources--;
+            if (m_nSources == 0) {
+              B2INFO ("[HLTReceiver] All sources down. Terminating...");
+              return c_TermCalled;
+            }
+            else {
+              B2INFO ("[HLTReceiver] A source down. " << m_nSources << " more sources left.");
+              return c_Success;
+            }
+            */
           } else {
             while (m_buffer->insq((int*)givenMessage,
                                   givenMessageSizes[i] / 4 + 1) <= 0) {
@@ -146,6 +164,14 @@ EHLTStatus HLTReceiver::setBuffer(unsigned int key)
 {
   B2INFO("[HLTReceiver] \x1b[32mRing buffer initializing...\x1b[0m");
   m_buffer = new RingBuffer(boost::lexical_cast<std::string>(static_cast<int>(key)).c_str(), gBufferSize);
+
+  return c_Success;
+}
+
+EHLTStatus HLTReceiver::setBuffer(std::string key)
+{
+  B2INFO("[HLTReceiver] \x1b[32mRing buffer initializing...\x1b[0m");
+  m_buffer = new RingBuffer(key.c_str(), gBufferSize);
 
   return c_Success;
 }

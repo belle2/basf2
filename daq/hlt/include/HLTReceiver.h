@@ -27,7 +27,7 @@ namespace Belle2 {
   class HLTReceiver : public B2Socket {
   public:
     //! Constructor
-    HLTReceiver(unsigned int port);
+    HLTReceiver(unsigned int port, unsigned int nSources);
     //! Destructor
     ~HLTReceiver();
 
@@ -40,6 +40,7 @@ namespace Belle2 {
     EHLTStatus setBuffer();
     //! Set buffer with specific key
     EHLTStatus setBuffer(unsigned int key);
+    EHLTStatus setBuffer(std::string key);
 
     //! Decode received data to ensure a singleton of data for a simple string
     EHLTStatus decodeSingleton(std::string data, std::vector<std::string>& container);
@@ -59,6 +60,7 @@ namespace Belle2 {
 
   private:
     unsigned int m_port;            /**< Port number for the connection */
+    unsigned int m_nSources;         /**< Number of data sources */
 
     RingBuffer* m_buffer;           /**< Pointer to ring buffer for incoming data */
 

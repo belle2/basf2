@@ -83,7 +83,7 @@ EHLTStatus HLTSender::broadcasting()
 
   bool termCode = false;
 
-  writeFile("test.txt", temp, bufferStatus * 4);
+  //writeFile("test.txt", temp, bufferStatus * 4);
   std::string termChecker(temp);
   if (termChecker == gTerminate) {
     B2INFO("\x1b[032m[HLTSender] Termination code taken!\x1b[0m");

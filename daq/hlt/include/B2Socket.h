@@ -12,6 +12,7 @@
 #define B2SOCKET_H
 
 #include <cstdio>
+#include <cstring>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>

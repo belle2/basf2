@@ -11,6 +11,7 @@
 #ifndef B2SOCKET_H
 #define B2SOCKET_H
 
+#include <cstdio>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>

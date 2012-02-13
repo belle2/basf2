@@ -64,7 +64,7 @@ CDCDigiModule::CDCDigiModule() : Module()
   addParam("Fraction",                    m_fraction, "The fraction of the first Gaussian used to smear drift length, set in cm", 0.571);
   addParam("Mean1",                       m_mean1, "The mean value of the first Gaussian used to smear drift length, set in cm", 0.0);
   addParam("Resolution1",                 m_resolution1, "Resolution of the first Gaussian used to smear drift length, set in cm", 0.0089);
-  addParam("Mean2",                       m_mean1, "The mean value of the second Gaussian used to smear drift length, set in cm", 0.0);
+  addParam("Mean2",                       m_mean2, "The mean value of the second Gaussian used to smear drift length, set in cm", 0.0);
   addParam("Resolution2",                 m_resolution2, "Resolution of the second Gaussian used to smear drift length, set in cm", 0.0188);
   addParam("ElectronicEffects",           m_electronicEffects, "Apply electronic effects?", 0);
   addParam("ElectronicsNoise",            m_elNoise, "Noise added by the electronics, set in ENC", 1000.0);
@@ -268,6 +268,9 @@ void CDCDigiModule::event()
 
     // Count number of digits
     iDigits++;
+
+    //delete pointer
+    delete iterCDCMap->second;
   }
 
   m_nEvent++;

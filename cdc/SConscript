@@ -1,8 +1,8 @@
 Import('env')
 
 env['LIBS'] = ['framework', 'geometry', 'simulation', 'genfit',
-               '$ROOT_LIBS', 'Geom', 'EG', 'g4root',
-               '$GEANT4_LIBS', 'CLHEP', 'generators','generators_dataobjects',
+               '$ROOT_LIBS', 'Geom', 'EG', 'g4root','cdc_dataobjects',
+               '$GEANT4_LIBS', 'CLHEP','generators_dataobjects',
 	       'simulation_dataobjects']
 
 Return('env')

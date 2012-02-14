@@ -55,7 +55,7 @@ TRGCDCTrackBase::~TRGCDCTrackBase() {
 
 void
 TRGCDCTrackBase::dump(const string & cmd, const string & pre) const {
-    bool detail = (cmd.find("detail") != string::npos);
+//  bool detail = (cmd.find("detail") != string::npos);
 
     string tab = TRGDebug::tab() + pre;
     cout << tab << "Dump of " << name() << endl;

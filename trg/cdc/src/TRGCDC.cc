@@ -60,7 +60,7 @@ TRGCDC::name(void) const {
 
 std::string
 TRGCDC::version(void) const {
-    return string("TRGCDC 5.05");
+    return string("TRGCDC 5.06");
 }
 
 TRGCDC *
@@ -123,12 +123,12 @@ TRGCDC::TRGCDC(const std::string & configFile,
 #endif
 
     if (TRGDebug::level())
-        cout << "TRGCDC ... TRGCDC initializing for " << _configFilename
+        cout << "TRGCDC ... TRGCDC initializing with " << _configFilename
              << endl;
     initialize(houghFinderPerfect, houghFinderMeshX, houghFinderMeshY);
 
     if (TRGDebug::level()) {
-        cout << "TRGCDC ... TRGCDC created for " << _configFilename << endl;
+        cout << "TRGCDC ... TRGCDC created with " << _configFilename << endl;
         Belle2_GDL::GDLSystemClock.dump();
         _clock.dump();
     }
@@ -246,19 +246,39 @@ TRGCDC::initialize(bool houghFinderPerfect,
         }
     }
 
-    //...For TSF...
-    const unsigned nWiresInTS = 11;
-    const int shape[22] = {-2, -1,  // relative layer id, relative wire id
-                           -2, 0,   // assuming layer offset 0.0, not 0.5
-                           -2, 1,
-                           -1, -1,
-                           -1, 0,
-                           0, 0,
-                           1, -1,
-                           1, 0,
-                           2, -1,
-                           2, 0,
-                           2, 1};
+    //...Make TSF's...
+    const unsigned nWiresInTS[2] = {15, 11};
+    const int shape[2][30] =
+	{{-2,  0,  // relative layer id, relative wire id
+	  -1, -1, // assuming layer offset 0.0, not 0.5
+	  -1,  0,
+	  0,  -1,
+	  0,   0,
+	  0,   1,
+	  1,  -2,
+	  1,  -1,
+	  1,   0,
+	  1,   1,
+	  2,  -2,
+	  2,  -1,
+	  2,   0,
+	  2,   1,
+	  2,   2},
+	 {-2, -1,
+	  -2,  0, 
+	  -2,  1,
+	  -1, -1,
+	  -1,  0,
+	  0,   0,
+	  1,  -1,
+	  1,   0,
+	  2,  -1,
+	  2,   0,
+	  2,   1,
+	  0,   0,
+	  0,   0,
+	  0,   0,
+	  0,   0}};
     unsigned id = 0;
     unsigned idTS = 0;
     for (unsigned i = 0; i < nSuperLayers(); i++) {
@@ -284,9 +304,13 @@ TRGCDC::initialize(bool houghFinderPerfect,
             const unsigned layerId = w.layerId();
             std::vector<const TCWire *> cells;
 
-            for (unsigned i = 0; i < nWiresInTS; i++) {
-                const unsigned laid = layerId + shape[i * 2];
-                const unsigned loid = localId + shape[i * 2 + 1];
+	    unsigned tsType = 0;
+	    if (i)
+		tsType = 1;
+
+            for (unsigned i = 0; i < nWiresInTS[tsType]; i++) {
+                const unsigned laid = layerId + shape[tsType][i * 2];
+                const unsigned loid = localId + shape[tsType][i * 2 + 1];
         
                 const TCWire * c = wire(laid, loid);
                 if (! c)
@@ -302,7 +326,7 @@ TRGCDC::initialize(bool houghFinderPerfect,
 							     w,
 							     layer,
 							     cells);
-	    for (unsigned i = 0; i < nWiresInTS; i++) {
+	    for (unsigned i = 0; i < nWiresInTS[tsType]; i++) {
 		TCWire * c = (TCWire *) cells[i];
 		c->_segment = ts;
 	    }

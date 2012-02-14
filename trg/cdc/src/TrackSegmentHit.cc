@@ -33,6 +33,7 @@ TRGCDCTrackSegmentHit::TRGCDCTrackSegmentHit(const TRGCDCWire & w,
 					     float driftRightError,
 					     float fudgeFactor)
     : TCWHit(w,
+	     0,
 	     driftLeft,
 	     driftLeftError,
 	     driftRight,

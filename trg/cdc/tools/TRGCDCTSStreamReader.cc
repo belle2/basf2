@@ -36,20 +36,20 @@ using namespace Belle2_TRGCDC;
 #endif
 
 #define DEBUG_LEVEL     1
-#define NAME            "TRGCDCTSStreamReader"
-#define PROGRAM_VERSION "version 0.02"
+#define PROGRAM_NAME    "TRGCDCTSStreamReader"
+#define PROGRAM_VERSION "version 0.03"
 #define ENV_PATH        "BELLE2_LOCAL_DIR"
 #define CONFIG          "TRGCDCWireConfig_0_20101110_0836.dat"
 
 int
 main(int argc, char * argv[]) {
 
-    cout << NAME << " ... " << PROGRAM_VERSION << endl;
+    cout << PROGRAM_NAME << " ... " << PROGRAM_VERSION << endl;
     const string tab = "    ";
 
     //...Check arguments...
     if (argc < 2) {
-        cout << NAME << " !!! one argument necessary" << endl
+        cout << PROGRAM_NAME << " !!! one argument necessary" << endl
              << tab << " 1 : Track Segment Stream data file" << endl;
         return -1;
     }
@@ -61,21 +61,12 @@ main(int argc, char * argv[]) {
     //...Open configuration data...
     ifstream infile(inname.c_str(), ios::in | ios::binary);
     if (infile.fail()) {
-        cout << NAME << " !!! can not open file" << endl
+        cout << PROGRAM_NAME << " !!! can not open file" << endl
              << "    " << inname << endl;
         return -2;
     }
 
 #ifdef TRGCDC_DISPLAY
-    int arg2c = 0;
-    char ** arg2v = 0;
-    Gtk::Main main_instance(arg2c, arg2v);
-    if (! D)
-        D = new TCDisplayRphi();
-    D->clear();
-    D->show();
-    cout << "TRGCDC ... GTK initialized" << endl;
-
     //...Gearbox...
     const string path = getenv(ENV_PATH);
     std::vector<std::string> m_backends;
@@ -92,6 +83,10 @@ main(int argc, char * argv[]) {
 
     //...Wire layer ID for the central wires...
     unsigned LID[9] = {2, 10, 16, 22, 28, 34, 40, 46, 52};
+
+    //...Display...
+    D->clear();
+    D->show();
 #endif
 
     //...Prepare buffers...
@@ -207,7 +202,7 @@ main(int argc, char * argv[]) {
 	}
 
 	default:
-	    cout << NAME << " !!! unknown record found : "
+	    cout << PROGRAM_NAME << " !!! unknown record found : "
 		 << "record type = " << hex << rec << endl;
 	    break;
 	}
@@ -215,5 +210,5 @@ main(int argc, char * argv[]) {
     infile.close();
 
     //...Termination...
-    cout << NAME << " ... terminated" << endl;
+    cout << PROGRAM_NAME << " ... terminated" << endl;
 }

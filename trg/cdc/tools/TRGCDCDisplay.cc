@@ -1,0 +1,107 @@
+//-----------------------------------------------------------------------------
+// $Id$
+//-----------------------------------------------------------------------------
+// Filename : TRGCDCDisplay.cc
+// Section  : TRG CDC
+// Owner    : Yoshihito Iwasaki
+// Email    : yoshihito.iwasaki@kek.jp
+//-----------------------------------------------------------------------------
+// Description : A program to display TRGCDC components
+//-----------------------------------------------------------------------------
+// $Log$
+//-----------------------------------------------------------------------------
+
+#define TRG_SHORT_NAMES
+#define TRGCDC_SHORT_NAMES
+
+#include <iostream>
+#include "trg/cdc/TRGCDC.h"
+#include "trg/cdc/TrackSegment.h"
+#ifdef TRGCDC_DISPLAY
+#include "framework/gearbox/Gearbox.h"
+#include "trg/cdc/DisplayRphi.h"
+#include "trg/cdc/DisplayHough.h"
+namespace Belle2_TRGCDC {
+    Belle2::TRGCDCDisplayRphi * D = 0;
+}
+#endif
+
+using namespace std;
+using namespace Belle2;
+#ifdef TRGCDC_DISPLAY
+using namespace Belle2_TRGCDC;
+#endif
+
+#define DEBUG_LEVEL     1
+#define PROGRAM_NAME    "TRGCDCDisplay"
+#define PROGRAM_VERSION "version 0.00"
+#define ENV_PATH        "BELLE2_LOCAL_DIR"
+#define CONFIG          "TRGCDCWireConfig_0_20101110_0836.dat"
+
+int
+main(int argc, char * argv[]) {
+
+    cout << PROGRAM_NAME << " ... " << PROGRAM_VERSION << endl;
+    const string tab = "    ";
+
+#ifdef TRGCDC_DISPLAY
+    //...Gearbox...
+    const string path = getenv(ENV_PATH);
+    vector<std::string> m_backends;
+    string m_filename = path + "/data/geometry/Belle2.xml";
+    m_backends.push_back("file:");
+    Gearbox &gearbox = Gearbox::getInstance();
+    gearbox.setBackends(m_backends);
+    gearbox.open(m_filename);
+
+    //...TRGCDC...
+    const string cname = path + "/data/trg/" + CONFIG;
+    TRGCDC * cdc = TRGCDC::getTRGCDC(cname, false, 100, 100);
+
+    //...Display...
+    D->clear();
+    D->show();
+
+    //...Draw objects...
+    string inf = "";
+    string stg = "";
+    string target = "none";
+    while (target != "quit") {
+
+	cout << "Enter a target to display" << endl;
+	getline(cin, target);
+	if (target == "clear") {
+	    D->clear();
+	    inf = "";
+	    cout << "targets cleared" << endl;
+	}
+	else if (target.find("TS") != string::npos) {
+	    bool found = false;
+	    for (unsigned i = 0; i < cdc->nTrackSegments(); i++) {
+		if (target == cdc->trackSegment(i)->name()) {
+		    D->area().append(* cdc->trackSegment(i));
+		    if (inf.size()) inf += ",";
+		    inf += target;
+		    D->stage(stg);
+		    D->information(inf);
+		    D->show();
+//		    D->run();
+		    found = true;
+		    break;
+		}		    
+	    }
+	    if (! found)
+		cout << "!!! " << target << " not found" << endl;
+	}
+	else if (target == "draw") {
+	    D->run();
+	}
+	else {
+	    cout << "!!! unknown target" << endl;
+	}
+    }
+#endif
+
+    //...Termination...
+    cout << PROGRAM_NAME << " ... terminated" << endl;
+}

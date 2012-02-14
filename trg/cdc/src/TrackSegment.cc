@@ -141,18 +141,33 @@ TCTSegment::simulate(void) {
         signals[i].widen(width);
     }
 
-    //...Simple simulation assuming 3:2:1:2:3 shape...
-    TRGSignal l0 = signals[0] | signals[1] | signals[2];
-    TRGSignal l1 = signals[3] | signals[4];
-    TRGSignal l2 = signals[5];
-    TRGSignal l3 = signals[6] | signals[7];
-    TRGSignal l4 = signals[8] | signals[9] | signals[10];
+    //...Signal simulation...
+    TRGSignal l0, l1, l2, l3, l4;
+    if (n == 11) {
 
+	//...Simple simulation assuming 3:2:1:2:3 shape...
+	l0 = signals[0] | signals[1] | signals[2];
+	l1 = signals[3] | signals[4];
+	l2 = signals[5];
+	l3 = signals[6] | signals[7];
+	l4 = signals[8] | signals[9] | signals[10];
+
+    }
+    else if (n == 15) {
+
+	//...Simple simulation assuming 1:2:3:4:5 shape...
+	l0 = signals[0];
+	l1 = signals[1] | signals[2];
+	l2 = signals[3] | signals[4] | signals[5];
+	l3 = signals[6] | signals[7] | signals[8] | signals[9];
+	l4 = signals[10] |signals[11] | signals[12] | signals[13] |signals[14];
+    }
+    
     //...Coincidence of all layers...
     TRGSignal all = l0 & l1 & l2 & l3 & l4;
 
     if (all.nEdges())
-        _signal = all;
+	_signal = all;
 
 //     l0.dump("", "       -> ");
 //     l1.dump("", "       -> ");

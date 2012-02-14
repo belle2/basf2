@@ -123,11 +123,11 @@ void ECLHitModule::event()
     double hitE        = aECLSimHit->getEnergyDep() * Unit::GeV;
     double hitTOF         = aECLSimHit->getFlightTime() * Unit::ns;
     TVector3 HitInPos  =   aECLSimHit->getPosIn();
-    TVector3 HitOutPos  =   aECLSimHit->getPosOut();
+//    TVector3 HitOutPos  =   aECLSimHit->getPosOut();
 
     TVector3 PosCell =  eclp->GetCrystalPos(hitCellId);
     TVector3 VecCell =  eclp->GetCrystalVec(hitCellId);
-    double local_pos = (15. - (0.5 * (HitInPos + HitOutPos) - PosCell) * VecCell);
+    double local_pos = (15. - (HitInPos  - PosCell) * VecCell);
 
     cout << setiosflags(ios::fixed);
 

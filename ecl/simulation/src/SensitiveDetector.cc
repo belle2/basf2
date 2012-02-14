@@ -207,8 +207,8 @@ namespace Belle2 {
 
     m_hitNumber = eclArray->GetLast() + 1;
     new(eclArray->AddrAt(m_hitNumber)) ECLSimHit();
-    eclArray[m_hitNumber]->setThetaId(thetaId);
-    eclArray[m_hitNumber]->setPhiId(phiId);
+//    eclArray[m_hitNumber]->setThetaId(thetaId);
+//    eclArray[m_hitNumber]->setPhiId(phiId);
     eclArray[m_hitNumber]->setCellId(cellId);
     eclArray[m_hitNumber]->setTrackId(trackID);
     eclArray[m_hitNumber]->setPDGCode(pid);
@@ -217,12 +217,12 @@ namespace Belle2 {
     eclArray[m_hitNumber]->setStepLength(FirstStep);
     TVector3 momentum(mom.getX() / GeV, mom.getY() / GeV, mom.getZ() / GeV);
     eclArray[m_hitNumber]->setMomentum(momentum);
-    TVector3 posCellv(posCell.getX() / cm, posCell.getY() / cm, posCell.getZ() / cm);
-    eclArray[m_hitNumber]->setPosCell(posCellv);
-    TVector3 positionIn(posIn.getX() / cm, posIn.getY() / cm, posIn.getZ() / cm);
+//    TVector3 posCellv(posCell.getX() / cm, posCell.getY() / cm, posCell.getZ() / cm);
+//    eclArray[m_hitNumber]->setPosCell(posCellv);
+    TVector3 positionIn((posIn.getX() + posOut.getX()) / 2 / cm, (posIn.getY() + posOut.getY()) / 2 / cm, (posIn.getZ() + posOut.getZ()) / 2 / cm);
     eclArray[m_hitNumber]->setPosIn(positionIn);
-    TVector3 positionOut(posOut.getX() / cm, posOut.getY() / cm, posOut.getZ() / cm);
-    eclArray[m_hitNumber]->setPosOut(positionOut);
+//    TVector3 positionOut(posOut.getX() / cm, posOut.getY() / cm, posOut.getZ() / cm);
+//    eclArray[m_hitNumber]->setPosOut(positionOut);
     B2DEBUG(150, "HitNumber: " << m_hitNumber);
     eclSimHitRel.add(trackID, m_hitNumber);
     return (m_hitNumber);

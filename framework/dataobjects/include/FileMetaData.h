@@ -17,16 +17,7 @@
 
 namespace Belle2 {
 
-  /** Store information, that is constant during a run, and is needed during the event loop.
-   *
-   *  This object is supposed to be updated during the beginRun function.
-   *  Currently stored information: <br>
-   *  LER beam energy, HER beam energy, crossing angle of the beams, and angle between LER beam and solenoid axis. <br>
-   *  The latter two are probably constants during the lifetime of the experiment, but maybe changed for design studies. <br>
-   *  The Center of Mass energy and the \f$\gamma\f$ factor of the initial resonance in the lab frame can be calculated from the
-   *  these variables.
-   *
-   *  @author <a href="mailto:martin.heck@kit.edu?subject=RunMetaData">Martin Heck</a>
+  /** Metadata information about a file
    */
   class FileMetaData : public TObject {
   public:

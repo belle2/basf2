@@ -63,7 +63,6 @@ REG_MODULE(GenFitter2)
 GenFitter2Module::GenFitter2Module() :
   Module()
 {
-
   setDescription("Simplified trackfit module for testing and debugging");
   addParam("useDaf", m_useDaf, "use the DAF instead of the std. Kalman filter", false);
   addParam("blowUpFactor", m_blowUpFactor, "factor multiplied with the cov of the Kalman filter when backward filter starts", 500.0);
@@ -76,9 +75,6 @@ GenFitter2Module::GenFitter2Module() :
   addParam("energyLossBrems", m_energyLossBrems, "activate the material effect: EnergyLossBrems", true);
   addParam("noiseBrems", m_noiseBrems, "activate the material effect: NoiseBrems", true);
   addParam("noEffects", m_noEffects, "switch off all material effects in genfit. This overwrites all individual material effects switches", false);
-
-//  addParam("seedForRecoHits", m_seedForRecoHits, "hack because there is no framwork wide random number seed at the moment", -1);
-
 }
 
 GenFitter2Module::~GenFitter2Module()
@@ -126,21 +122,27 @@ void GenFitter2Module::event()
   B2INFO("**********   GenFitter2Module  processing event number: " << eventCounter << " ************");
   StoreArray<GFTrackCand> trackCandidates("");
   int nTrackCandidates = trackCandidates.getEntries();
-  if (nTrackCandidates > 0) {  // only try to access a track candidate if there is one
+  if (nTrackCandidates not_eq 0) {  // only try to access a track candidate if there is one
 
     if (nTrackCandidates == 0) {
-      B2DEBUG(100, "GenFitter: GFTrackCandidatesCollection is empty!");
+      B2DEBUG(100, "GenFitter2: StoreArray<GFTrackCand> is empty!");
     }
     StoreArray<SVDTrueHit> svdTrueHits("");
     int nSvdTrueHits = svdTrueHits.getEntries();
     if (nSvdTrueHits == 0) {
-      B2DEBUG(100, "GenFitter: GFTrackCandidatesCollection is empty!");
+      B2DEBUG(100, "GenFitter2: StoreArray<SVDTrueHit> is empty!");
     }
     StoreArray<PXDTrueHit> pxdTrueHits("");
     int nPxdTrueHits = pxdTrueHits.getEntries();
     if (nPxdTrueHits == 0) {
-      B2DEBUG(100, "GenFitter: GFTrackCandidatesCollection is empty!");
+      B2DEBUG(100, "GenFitter2: GFTrackCandidatesCollection is empty!");
     }
+    StoreArray<CDCHit> cdcHits("");
+    int nCdcHits = cdcHits.getEntries();
+    if (nCdcHits == 0) {
+      B2DEBUG(100, "GenFitter2: StoreArray<CDCHit> is empty!");
+    }
+
 
     //filter
     bool filterEvent = false;
@@ -206,16 +208,15 @@ void GenFitter2Module::event()
       //create RecoHitProducers for PXD, SVD and CDC
       GFRecoHitProducer <PXDTrueHit, PXDRecoHit> * PXDProducer;
       PXDProducer =  new GFRecoHitProducer <PXDTrueHit, PXDRecoHit> (&*pxdTrueHits);
-
       GFRecoHitProducer <SVDTrueHit, SVDRecoHit2D> * SVDProducer;
       SVDProducer =  new GFRecoHitProducer <SVDTrueHit, SVDRecoHit2D> (&*svdTrueHits);
-
-      //GFRecoHitProducer <CDCHit, CDCRecoHit> * CDCProducer;
-//   CDCProducer =  new GFRecoHitProducer <CDCHit, CDCRecoHit> (&*cdcHits);
+      GFRecoHitProducer <CDCHit, CDCRecoHit> * CDCProducer;
+      CDCProducer =  new GFRecoHitProducer <CDCHit, CDCRecoHit> (&*cdcHits);
 
       //add producers to the factory with correct detector Id
       factory.addProducer(0, PXDProducer);
       factory.addProducer(1, SVDProducer);
+      factory.addProducer(2, CDCProducer);
 
       vector <GFAbsRecoHit*> factoryHits;
       //use the factory to create RecoHits for all Hits stored in the track candidate

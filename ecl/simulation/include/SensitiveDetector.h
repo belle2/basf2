@@ -47,10 +47,10 @@ namespace Belle2 {
       const G4double tof,
       const G4double edep,
       const G4double stepLength,
-      const G4ThreeVector& mom,
-      const G4ThreeVector& posW,
-      const G4ThreeVector& posIn,
-      const G4ThreeVector& posOut
+      G4ThreeVector mom,
+      G4ThreeVector posW,
+      G4ThreeVector posIn,
+      G4ThreeVector posOut
     );
 
     //! Save EBECLSimHit into datastore
@@ -63,10 +63,10 @@ namespace Belle2 {
       const G4double tof,
       const G4double edep,
       const G4double stepLength,
-      const G4ThreeVector& mom,
-      const G4ThreeVector& posW,
-      const G4ThreeVector& posIn,
-      const G4ThreeVector& posOut
+      G4ThreeVector mom,
+      G4ThreeVector posW,
+      G4ThreeVector posIn,
+      G4ThreeVector posOut
     );
 
 
@@ -83,8 +83,17 @@ namespace Belle2 {
     G4double m_thresholdKineticEnergy;/**Kinetic Energy  threshold  */
     int m_hitNumber; /**< The current number of created hits in an event. Used to fill the DataStore ECL array.*/
     int m_EBhitNumber; /**< The current number of created hits in an event. Used to fill the DataStore ECL EB array.*/
-    int oldtrack;
-    int oldcellId;
+
+
+
+    int m_trackID;          /* track id */
+    G4ThreeVector m_startPos;
+    G4ThreeVector m_momentum;
+    double m_startTime;     /* global time */
+    double m_endTime;     /* global time */
+    double m_startEnergy;   /* particle energy at the entrance in volume */
+    double m_energyDeposit; /* energy deposited in volume */
+    double m_trackLength;   /* length of the track in the volume */
 
   };
 

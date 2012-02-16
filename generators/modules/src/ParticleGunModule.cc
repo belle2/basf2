@@ -48,7 +48,7 @@ ParticleGunModule::ParticleGunModule() : Module()
            "The number of tracks to be generated per event. If <=0, one particle will "
            "be created for each entry in pdgCodes. Otherwise N particles will be "
            "created and the Particle ID for each particle will be picked randomly "
-           "from pdgCodes", 1);
+           "from pdgCodes", 1.0);
   addParam("pdgCodes", m_parameters.pdgCodes,
            "PDG codes for generated particles", m_parameters.pdgCodes);
   addParam("varyNTracks", m_parameters.varyNumberOfTracks,
@@ -89,9 +89,6 @@ ParticleGunModule::ParticleGunModule() : Module()
   addParam("zVertexParams", m_parameters.zVertexParams,
            "Parameters for the z vertex generation. Meaning of the parameters "
            "depends on the chosen distribution", m_parameters.zVertexParams);
-
-  addParam("randomSeed", m_randomSeed,
-           "Randomseed for particle gun. (temporary solution)", 42);
 }
 
 
@@ -127,7 +124,6 @@ void ParticleGunModule::initialize()
 
   //Assign parameters
   m_particleGun.setParameters(m_parameters);
-  m_particleGun.setRandomSeed(m_randomSeed);
 }
 
 

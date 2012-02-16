@@ -55,7 +55,7 @@ namespace Belle2 {
       /** Distribution to use for vertex generation */
       Distribution vertexDist;
       /** Number of tracks to generate per event */
-      int nTracks;
+      double nTracks;
       /** List of PDG particle codes to pick from when generating particles */
       std::vector<int> pdgCodes;
       /** Parameters for the momentum generation, meaning depends on chosen distribution */
@@ -85,17 +85,6 @@ namespace Belle2 {
     ~ParticleGun() {}
 
     /**
-     * This function sets the random seed for the particle gun
-     * random generator. The seed is taken from the steering file.
-     * This function will become obsolete, when a global random generator
-     * for all generation and simulation processes is implemented.
-     */
-    void setRandomSeed(int seed) {
-      m_gRand.SetSeed(seed);
-    }
-
-
-    /**
      * Generate the next event and store the result in the given MCParticle graph.
      * @return true if the event was generated.
      */
@@ -110,9 +99,6 @@ namespace Belle2 {
 
     /** All relevant parameters */
     Parameters m_params;
-
-    /** Instance of the random generator TODO: This will be moved to the framework eventually. */
-    TRandom3 m_gRand;
   };
 
 } //end namespace Belle2

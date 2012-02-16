@@ -25,15 +25,15 @@ double ParticleGun::generateValue(Distribution dist, const vector<double> params
       return params[0];
     case uniformDistribution:
     case uniformPtDistribution:
-      return m_gRand.Uniform(params[0], params[1]);
+      return gRandom->Uniform(params[0], params[1]);
     case uniformCosinusDistribution:
-      return acos(m_gRand.Uniform(cos(params[0]), cos(params[1])));
+      return acos(gRandom->Uniform(cos(params[0]), cos(params[1])));
     case normalDistribution:
     case normalPtDistribution:
-      return m_gRand.Gaus(params[0], params[1]);
+      return gRandom->Gaus(params[0], params[1]);
     case discreteSpectrum:
       for (size_t i = 0; i < params.size() / 2; ++i) rand += params[2 * i];
-      rand = m_gRand.Uniform(0, rand);
+      rand = gRandom->Uniform(0, rand);
       for (size_t i = 0; i < params.size() / 2; ++i) {
         rand -= params[2 * i];
         if (rand <= 0) return params[2 * i + 1];
@@ -54,10 +54,10 @@ bool ParticleGun::generateEvent(MCParticleGraph& graph)
 
   //Determine number of tracks
   int nTracks = m_params.nTracks;
-  if (nTracks <= 0) {
+  if (m_params.nTracks <= 0) {
     nTracks = m_params.pdgCodes.size();
   } else if (m_params.varyNumberOfTracks) {
-    nTracks = m_gRand.Poisson(nTracks);
+    nTracks = gRandom->Poisson(m_params.nTracks);
   }
 
   //Make list of particles
@@ -67,12 +67,12 @@ bool ParticleGun::generateEvent(MCParticleGraph& graph)
     if (m_params.pdgCodes.size() == 1) {
       //only one PDGcode available, always take this one
       p.setPDG(m_params.pdgCodes[0]);
-    } else if (m_params.nTracks <= 0) {
+    } else if (nTracks <= 0) {
       //0 or negative nTracks, take the ids sequentially
       p.setPDG(m_params.pdgCodes[i]);
     } else {
       //else choose randomly one of the available codes
-      int index = static_cast<int>(m_gRand.Uniform(m_params.pdgCodes.size()));
+      int index = static_cast<int>(gRandom->Uniform(m_params.pdgCodes.size()));
       p.setPDG(m_params.pdgCodes[index]);
     }
     p.setMassFromPDG();

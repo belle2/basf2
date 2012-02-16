@@ -60,8 +60,6 @@ namespace Belle2 {
     std::string m_vertexDist;
     /** Particle graph to generate MCParticle list */
     MCParticleGraph m_particleGraph;
-    /** Random seed for generation FIXME: Should go to the framework */
-    int m_randomSeed;
   };
 
 } // end namespace Belle2

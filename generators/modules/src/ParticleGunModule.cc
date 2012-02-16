@@ -105,6 +105,7 @@ ParticleGun::Distribution ParticleGunModule::convertDistribution(std::string nam
   if (name == "uniformcosinus") return ParticleGun::uniformCosinusDistribution;
   if (name == "normal")         return ParticleGun::normalDistribution;
   if (name == "normalpt")       return ParticleGun::normalPtDistribution;
+  if (name == "discretespectrum") return ParticleGun::discreteSpectrum;
   B2ERROR("Unknown distribution '" << name << "', using fixed");
   return ParticleGun::fixedValue;
 }

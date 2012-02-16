@@ -19,6 +19,7 @@ using namespace Belle2;
 
 double ParticleGun::generateValue(Distribution dist, const vector<double> params)
 {
+  double rand(0);
   switch (dist) {
     case fixedValue:
       return params[0];
@@ -30,13 +31,21 @@ double ParticleGun::generateValue(Distribution dist, const vector<double> params
     case normalDistribution:
     case normalPtDistribution:
       return m_gRand.Gaus(params[0], params[1]);
+    case discreteSpectrum:
+      for (size_t i = 0; i < params.size() / 2; ++i) rand += params[2 * i];
+      rand = m_gRand.Uniform(0, rand);
+      for (size_t i = 0; i < params.size() / 2; ++i) {
+        rand -= params[2 * i];
+        if (rand <= 0) return params[2 * i + 1];
+      }
+      B2FATAL("Something wrong with picking fixed spectra values");
     default:
       B2FATAL("Unknown distribution");
   }
   return 0;
 }
 
-bool ParticleGun::generateEvent(MCParticleGraph &graph)
+bool ParticleGun::generateEvent(MCParticleGraph& graph)
 {
   //generate the event vertex (possible the same for all particles in event)
   double vx = generateValue(m_params.vertexDist, m_params.xVertexParams);
@@ -53,7 +62,7 @@ bool ParticleGun::generateEvent(MCParticleGraph &graph)
 
   //Make list of particles
   for (int i = 0; i < nTracks; ++i) {
-    MCParticleGraph::GraphParticle &p = graph.addParticle();
+    MCParticleGraph::GraphParticle& p = graph.addParticle();
     p.setStatus(MCParticle::c_PrimaryParticle);
     if (m_params.pdgCodes.size() == 1) {
       //only one PDGcode available, always take this one
@@ -128,9 +137,14 @@ bool ParticleGun::generateEvent(MCParticleGraph &graph)
   CHECK_DIST_NPARAMS(var,uniformPtDistribution,params,2) \
   CHECK_DIST_NPARAMS(var,uniformCosinusDistribution,params,2) \
   CHECK_DIST_NPARAMS(var,normalDistribution,params,2) \
-  CHECK_DIST_NPARAMS(var,normalPtDistribution,params,2)
+  CHECK_DIST_NPARAMS(var,normalPtDistribution,params,2)\
+  CHECK_DIST_NPARAMS(var,discreteSpectrum,params,2)\
+  if(p.var##Dist == discreteSpectrum && p.params##Params.size() % 2 != 0){\
+    B2ERROR(#var << " generation: discreteSpectrum requires an even number of parameters");\
+    ok = false; \
+  }
 
-bool ParticleGun::setParameters(const Parameters &p)
+bool ParticleGun::setParameters(const Parameters& p)
 {
   //Sanity checks
   bool ok(true);

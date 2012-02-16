@@ -39,7 +39,9 @@ namespace Belle2 {
       /** Normal distribution, parameters are mean and sigma */
       normalDistribution,
       /** Normal distribution of Pt, parameters are mean and sigma */
-      normalPtDistribution
+      normalPtDistribution,
+      /** Fixed Spectra, parameters are pairs of numbers giving weight and value for each spectrum value */
+      discreteSpectrum,
     };
 
     /** Struct to keep all necessary parameters for the particle gun */
@@ -97,7 +99,7 @@ namespace Belle2 {
      * Generate the next event and store the result in the given MCParticle graph.
      * @return true if the event was generated.
      */
-    bool generateEvent(MCParticleGraph &graph);
+    bool generateEvent(MCParticleGraph& graph);
 
     /** Set the parameters for generating the Particles */
     bool setParameters(const Parameters& parameters);

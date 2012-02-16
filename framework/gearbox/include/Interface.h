@@ -188,6 +188,49 @@ namespace Belle2 {
       double getWithUnit(const std::string& path, double defaultValue) const throw(ConversionError);
 
       /**
+       * Get the parameter path as a list of double values converted to the standard unit.
+       *
+       * The content of the parameter will be split at whitespace, comma and
+       * semi-colon and returned as a vector of numbers
+       *
+       * Gearbox will try to determine the unit with which the parameter was
+       * saved and convert it to the default system. If no unit can be
+       * determinded, it will be assumed that the parameter does not need to be
+       * converted.
+       *
+       * @exception gearbox::PathEmptyError if path is empty or does not exist
+       * @exception gearbox::ConversionError if the value could not converted to a numerical type
+       * @param path Path of the parameter to get
+       * @param unittype type of the unit, eg. length, angle or energy
+       * @return value of the parameter
+       */
+
+      std::vector<double> getArray(const std::string& path) const throw(PathEmptyError, ConversionError);
+
+      /**
+       * Get the parameter path as a list of double values converted to the standard unit.
+       *
+       * The content of the parameter will be split at whitespace, comma and
+       * semi-colon and returned as a vector of numbers
+       *
+       * Gearbox will try to determine the unit with which the parameter was
+       * saved and convert it to the default system. If no unit can be
+       * determinded, it will be assumed that the parameter does not need to be
+       * converted.
+       *
+       * If the parameter is empty or does not exist, the defaultValue will be
+       * returned.
+       *
+       * @exception gearbox::ConversionError if the value could not converted to a numerical type
+       * @param path Path of the parameter to get
+       * @param unittype type of the unit, eg. length, angle or energy
+       * @param defaultValue Value to return if the Path es empty or does not exist
+       * @return value of the parameter
+       */
+      std::vector<double> getArray(const std::string& path, const std::vector<double> &defaultValue) const throw(ConversionError);
+
+
+      /**
        * Get the parameter path as a double converted to the standard length unit.
        *
        * Gearbox will try to determine the unit with which the parameter was

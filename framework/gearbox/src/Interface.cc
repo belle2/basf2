@@ -13,8 +13,10 @@
 #include <framework/logging/Logger.h>
 
 #include <boost/lexical_cast.hpp>
+#include <boost/tokenizer.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/format.hpp>
+#include <boost/foreach.hpp>
 
 using namespace std;
 
@@ -83,7 +85,7 @@ namespace Belle2 {
     {
       string value = getString(path);
       boost::to_lower(value);
-      if (value.empty() || value == "false" || value == "0") return false;
+      if (value.empty() || value == "false" || value == "off" || value == "0") return false;
       return true;
     }
 
@@ -121,6 +123,39 @@ namespace Belle2 {
         return defaultValue;
       }
     }
+
+    vector<double> Interface::getArray(const string& path) const throw(PathEmptyError, ConversionError)
+    {
+      typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
+      boost::char_separator<char> sep(",; \t\n\r");
+
+      pair<string, string> value = getStringWithUnit(path);
+      tokenizer tokens(value.first, sep);
+      vector<double> result;
+      double numValue(0);
+      BOOST_FOREACH(const string & tok, tokens) {
+        try {
+          numValue = boost::lexical_cast<double>(tok);
+        } catch (boost::bad_lexical_cast& e) {
+          throw(ConversionError() << path << value.first);
+        }
+        if (!value.second.empty()) {
+          numValue = Unit::convertValue(numValue, value.second);
+        }
+        result.push_back(numValue);
+      }
+      return result;
+    }
+
+    vector<double> Interface::getArray(const string& path, const vector<double> &defaultValue) const throw(ConversionError)
+    {
+      try {
+        return getArray(path);
+      } catch (PathEmptyError) {
+        return defaultValue;
+      }
+    }
+
 
     string Interface::ensureNode(const string& path) const
     {

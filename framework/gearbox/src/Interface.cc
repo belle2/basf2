@@ -21,7 +21,7 @@ using namespace std;
 namespace Belle2 {
   namespace gearbox {
 
-    vector<GearDir> Interface::getNodes(const string &path) const
+    vector<GearDir> Interface::getNodes(const string& path) const
     {
       int size = getNumberNodes(path);
       vector<GearDir> result;
@@ -32,7 +32,7 @@ namespace Belle2 {
       return result;
     }
 
-    string Interface::getString(const string &path, const string &defaultValue) const
+    string Interface::getString(const string& path, const string& defaultValue) const
     {
       try {
         return getString(path);
@@ -41,7 +41,7 @@ namespace Belle2 {
       }
     }
 
-    double Interface::getDouble(const string &path) const throw(PathEmptyError, ConversionError)
+    double Interface::getDouble(const string& path) const throw(PathEmptyError, ConversionError)
     {
       string value = getString(path);
       try {
@@ -51,7 +51,7 @@ namespace Belle2 {
       }
     }
 
-    double Interface::getDouble(const string &path, double defaultValue) const throw(ConversionError)
+    double Interface::getDouble(const string& path, double defaultValue) const throw(ConversionError)
     {
       try {
         return getDouble(path);
@@ -60,7 +60,7 @@ namespace Belle2 {
       }
     }
 
-    int Interface::getInt(const string &path) const throw(PathEmptyError, ConversionError)
+    int Interface::getInt(const string& path) const throw(PathEmptyError, ConversionError)
     {
       string value = getString(path);
       try {
@@ -70,7 +70,7 @@ namespace Belle2 {
       }
     }
 
-    int Interface::getInt(const string &path, int defaultValue) const throw(ConversionError)
+    int Interface::getInt(const string& path, int defaultValue) const throw(ConversionError)
     {
       try {
         return getInt(path);
@@ -79,7 +79,7 @@ namespace Belle2 {
       }
     }
 
-    bool Interface::getBool(const string &path) const throw(PathEmptyError)
+    bool Interface::getBool(const string& path) const throw(PathEmptyError)
     {
       string value = getString(path);
       boost::to_lower(value);
@@ -87,7 +87,7 @@ namespace Belle2 {
       return true;
     }
 
-    bool Interface::getBool(const string &path, bool defaultValue) const
+    bool Interface::getBool(const string& path, bool defaultValue) const
     {
       try {
         return getBool(path);
@@ -96,7 +96,7 @@ namespace Belle2 {
       }
     }
 
-    double Interface::getWithUnit(const string &path) const throw(PathEmptyError, ConversionError)
+    double Interface::getWithUnit(const string& path) const throw(PathEmptyError, ConversionError)
     {
       pair<string, string> value = getStringWithUnit(path);
       double numValue(0);
@@ -113,7 +113,7 @@ namespace Belle2 {
       return numValue;
     }
 
-    double Interface::getWithUnit(const string &path, double defaultValue) const throw(ConversionError)
+    double Interface::getWithUnit(const string& path, double defaultValue) const throw(ConversionError)
     {
       try {
         return getWithUnit(path);
@@ -122,23 +122,23 @@ namespace Belle2 {
       }
     }
 
-    string Interface::ensureNode(const string &path) const
+    string Interface::ensureNode(const string& path) const
     {
       return boost::trim_right_copy_if(path, boost::is_any_of("/"));
     }
 
-    string Interface::ensurePath(const string &path) const
+    string Interface::ensurePath(const string& path) const
     {
       return ensureNode(path) + '/';
     }
 
-    string Interface::addIndex(const string &path, int index) const
+    string Interface::addIndex(const string& path, int index) const
     {
       static boost::format index_fmt("%1%[%2%]");
       return (index_fmt % ensureNode(path) % index).str();
     }
 
-    string Interface::joinPath(const string &path, const string &subpath) const
+    string Interface::joinPath(const string& path, const string& subpath) const
     {
       return ensurePath(path) + boost::trim_left_copy_if(subpath, boost::is_any_of("/"));
     }

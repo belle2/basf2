@@ -38,13 +38,13 @@ namespace Belle2 {
        * Return the number of nodes a given path will expand to
        * @return number of nodes, 0 if path does not exist
        */
-      virtual int getNumberNodes(const std::string &path = "") const = 0;
+      virtual int getNumberNodes(const std::string& path = "") const = 0;
 
       /**
        * Check if a given parameter path exists
        * @return true if path exists, false otherwise
        */
-      bool exists(const std::string &path = "") const { return getNumberNodes(path) > 0; }
+      bool exists(const std::string& path = "") const { return getNumberNodes(path) > 0; }
 
       /**
        * Convert to bool to simplify checking of existence
@@ -57,7 +57,7 @@ namespace Belle2 {
        * Get vector of GearDirs which point to all the nodes the given path evaluates to
        * @param path Path of the parameters to get
        */
-      std::vector<GearDir> getNodes(const std::string &path = "") const;
+      std::vector<GearDir> getNodes(const std::string& path = "") const;
 
       /** Return path of the current interface */
       std::string getPath() const { return m_path; }
@@ -68,7 +68,7 @@ namespace Belle2 {
        * @param path Path of the parameter to get
        * @return value of the parameter
        */
-      virtual std::string getString(const std::string &path = "") const throw(PathEmptyError) = 0;
+      virtual std::string getString(const std::string& path = "") const throw(PathEmptyError) = 0;
 
       /**
        * Get the parameter path as string and also return the unit it was defined with.
@@ -81,7 +81,7 @@ namespace Belle2 {
        * @param path Path of the parameter to get
        * @return value of the parameter
        */
-      virtual std::pair<std::string, std::string> getStringWithUnit(const std::string &path) const
+      virtual std::pair<std::string, std::string> getStringWithUnit(const std::string& path) const
       throw(PathEmptyError) = 0;
 
       /**
@@ -92,7 +92,7 @@ namespace Belle2 {
        * @param defaultvalue value to return if the path es empty or does not exist
        * @return value of the parameter
        */
-      std::string getString(const std::string &path, const std::string &defaultValue) const;
+      std::string getString(const std::string& path, const std::string& defaultValue) const;
 
       /**
        * Get the parameter path as a double.
@@ -101,7 +101,7 @@ namespace Belle2 {
        * @param path Path of the parameter to get
        * @return value of the parameter
        */
-      double getDouble(const std::string &path = "") const throw(PathEmptyError, ConversionError);
+      double getDouble(const std::string& path = "") const throw(PathEmptyError, ConversionError);
 
       /**
        * Get the parameter path as a double.
@@ -112,7 +112,7 @@ namespace Belle2 {
        * @param defaultValue Value to return if the Path es empty or does not exist
        * @return value of the parameter
        */
-      double getDouble(const std::string &path, double defaultValue) const throw(ConversionError);
+      double getDouble(const std::string& path, double defaultValue) const throw(ConversionError);
 
       /**
        * Get the parameter path as a int.
@@ -121,7 +121,7 @@ namespace Belle2 {
        * @param path Path of the parameter to get
        * @return value of the parameter
        */
-      int getInt(const std::string &path = "") const throw(PathEmptyError, ConversionError);
+      int getInt(const std::string& path = "") const throw(PathEmptyError, ConversionError);
 
       /**
        * Get the parameter path as a int.
@@ -132,7 +132,7 @@ namespace Belle2 {
        * @param defaultValue Value to return if the Path es empty or does not exist
        * @return value of the parameter
        */
-      int getInt(const std::string &path, int defaultValue) const throw(ConversionError);
+      int getInt(const std::string& path, int defaultValue) const throw(ConversionError);
 
       /**
        * Get the parameter path as a bool.
@@ -140,7 +140,7 @@ namespace Belle2 {
        * @param path Path of the parameter to get
        * @return value of the parameter
        */
-      bool getBool(const std::string &path = "") const throw(PathEmptyError);
+      bool getBool(const std::string& path = "") const throw(PathEmptyError);
 
       /**
        * Get the parameter path as a bool.
@@ -150,7 +150,7 @@ namespace Belle2 {
        * @param defaultValue Value to return if the Path es empty or does not exist
        * @return value of the parameter
        */
-      bool getBool(const std::string &path, bool defaultValue) const;
+      bool getBool(const std::string& path, bool defaultValue) const;
 
       /**
        * Get the parameter path as a double converted to the standard unit.
@@ -166,7 +166,7 @@ namespace Belle2 {
        * @param unittype type of the unit, eg. length, angle or energy
        * @return value of the parameter
        */
-      double getWithUnit(const std::string &path) const throw(PathEmptyError, ConversionError);
+      double getWithUnit(const std::string& path) const throw(PathEmptyError, ConversionError);
 
       /**
        * Get the parameter path as a double converted to the standard unit.
@@ -185,7 +185,7 @@ namespace Belle2 {
        * @param defaultValue Value to return if the Path es empty or does not exist
        * @return value of the parameter
        */
-      double getWithUnit(const std::string &path, double defaultValue) const throw(ConversionError);
+      double getWithUnit(const std::string& path, double defaultValue) const throw(ConversionError);
 
       /**
        * Get the parameter path as a double converted to the standard length unit.
@@ -200,7 +200,7 @@ namespace Belle2 {
        * @param path Path of the parameter to get
        * @return value of the parameter
        */
-      double getLength(const std::string &path = "") const throw(PathEmptyError, ConversionError) {
+      double getLength(const std::string& path = "") const throw(PathEmptyError, ConversionError) {
         return getWithUnit(path);
       }
 
@@ -221,7 +221,7 @@ namespace Belle2 {
        * @param defaultValue Value to return if the Path es empty or does not exist
        * @return value of the parameter
        */
-      double getLength(const std::string &path, double defaultValue) const throw(ConversionError) {
+      double getLength(const std::string& path, double defaultValue) const throw(ConversionError) {
         return getWithUnit(path, defaultValue);
       }
 
@@ -238,7 +238,7 @@ namespace Belle2 {
        * @param path Path of the parameter to get
        * @return value of the parameter
        */
-      double getAngle(const std::string &path = "") const throw(PathEmptyError, ConversionError) {
+      double getAngle(const std::string& path = "") const throw(PathEmptyError, ConversionError) {
         return getWithUnit(path);
       }
 
@@ -259,7 +259,7 @@ namespace Belle2 {
        * @param defaultValue Value to return if the Path es empty or does not exist
        * @return value of the parameter
        */
-      double getAngle(const std::string &path, double defaultValue) const throw(ConversionError) {
+      double getAngle(const std::string& path, double defaultValue) const throw(ConversionError) {
         return getWithUnit(path, defaultValue);
       }
 
@@ -276,7 +276,7 @@ namespace Belle2 {
        * @param path Path of the parameter to get
        * @return value of the parameter
        */
-      double getEnergy(const std::string &path = "") const throw(PathEmptyError, ConversionError) {
+      double getEnergy(const std::string& path = "") const throw(PathEmptyError, ConversionError) {
         return getWithUnit(path);
       }
 
@@ -297,7 +297,7 @@ namespace Belle2 {
        * @param defaultValue Value to return if the Path es empty or does not exist
        * @return value of the parameter
        */
-      double getEnergy(const std::string &path, double defaultValue) const throw(ConversionError) {
+      double getEnergy(const std::string& path, double defaultValue) const throw(ConversionError) {
         return getWithUnit(path, defaultValue);
       }
 
@@ -314,7 +314,7 @@ namespace Belle2 {
        * @param path Path of the parameter to get
        * @return value of the parameter
        */
-      double getDensity(const std::string &path = "") const throw(PathEmptyError, ConversionError) {
+      double getDensity(const std::string& path = "") const throw(PathEmptyError, ConversionError) {
         return getWithUnit(path);
       }
 
@@ -335,7 +335,7 @@ namespace Belle2 {
        * @param defaultValue Value to return if the Path es empty or does not exist
        * @return value of the parameter
        */
-      double getDensity(const std::string &path, double defaultValue) const throw(ConversionError) {
+      double getDensity(const std::string& path, double defaultValue) const throw(ConversionError) {
         return getWithUnit(path, defaultValue);
       }
 
@@ -352,7 +352,7 @@ namespace Belle2 {
        * @param path Path of the parameter to get
        * @return value of the parameter
        */
-      double getTime(const std::string &path = "") const throw(PathEmptyError, ConversionError) {
+      double getTime(const std::string& path = "") const throw(PathEmptyError, ConversionError) {
         return getWithUnit(path);
       }
 
@@ -373,20 +373,20 @@ namespace Belle2 {
        * @param defaultValue Value to return if the Path es empty or does not exist
        * @return value of the parameter
        */
-      double getTime(const std::string &path, double defaultValue) const throw(ConversionError) {
+      double getTime(const std::string& path, double defaultValue) const throw(ConversionError) {
         return getWithUnit(path, defaultValue);
       }
 
     protected:
 
       /** make sure the path really corresponds to an XPath node expression by removing trailing slashes */
-      std::string ensureNode(const std::string &path) const ;
+      std::string ensureNode(const std::string& path) const ;
       /** make sure the path really corresponds to a path by appending a trailing slash if neccessary */
-      std::string ensurePath(const std::string &path) const;
+      std::string ensurePath(const std::string& path) const;
       /** add [index] to the path (after stripping trailing slashes) */
-      std::string addIndex(const std::string &path, int index) const;
+      std::string addIndex(const std::string& path, int index) const;
       /** joind to paths, inserting a slash if neccessary */
-      std::string joinPath(const std::string &path, const std::string& subpath) const;
+      std::string joinPath(const std::string& path, const std::string& subpath) const;
 
       /** path of the current interface */
       std::string m_path;

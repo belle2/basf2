@@ -21,7 +21,6 @@ geometry.param('Components', ['MagneticField', 'PXD', 'SVD', 'CDC'])  # only the
 pGun = register_module('ParticleGun')
 param_pGun = {
     'pdgCodes': [-13, 13],
-    'randomSeed': 90,
     'nTracks': 10,
     'momentumGeneration': 'uniform',
     'momentumParams': [1.0, 1.0],
@@ -55,7 +54,7 @@ trackfitter = register_module('GenFitter')
 trackfitter.logging.log_level = LogLevel.WARNING
 trackfitter.param('NIterations', 3)
 
-trackfitchecker = register_module('trackFitChecker')
+trackfitchecker = register_module('TrackFitChecker')
 trackfitchecker.logging.log_level = LogLevel.INFO  # the reults of the statistical tests will only show up at info or debug level
 trackfitchecker.param('testSi', True)
 trackfitchecker.param('testCdc', True)

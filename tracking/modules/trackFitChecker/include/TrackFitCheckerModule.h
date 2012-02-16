@@ -9,8 +9,8 @@
  **************************************************************************/
 
 
-#ifndef trackFitCheckerModule_H_
-#define trackFitCheckerModule_H_
+#ifndef TrackFitCheckerModule_H_
+#define TrackFitCheckerModule_H_
 
 #include <framework/core/Module.h>
 
@@ -45,7 +45,7 @@ namespace Belle2 {
       This module calculates the resudals, pulls and chi^2 for a sample of tracks both track wise and layer wise tests are used. If availiable truth info from simulation in form of "TrueHits" is used.
   */
 
-  class trackFitCheckerModule : public Module {
+  class TrackFitCheckerModule : public Module {
 
 
     typedef boost::accumulators::accumulator_set < double, boost::accumulators::stats < boost::accumulators::tag::mean, boost::accumulators::tag::variance(boost::accumulators::lazy) > > StatisticsAccuWithMeanAndVar;
@@ -53,10 +53,10 @@ namespace Belle2 {
   public:
 
     //! Constructor
-    trackFitCheckerModule();
+    TrackFitCheckerModule();
 
     //! Destructor
-    ~trackFitCheckerModule();
+    ~TrackFitCheckerModule();
 
     //! Initialize the Module
     /*! Function is called only once at the beginning of your job at the beginning of the corresponding module.
@@ -123,7 +123,7 @@ namespace Belle2 {
     std::string m_dataOutFileName;
     std::string m_dataOutFileName2;
     std::ofstream m_dataOut;
-    std::ofstream m_dataOut2;
+    std::ofstream m_testSeedOutput;
     std::vector<std::string> m_layerWiseTruthTestsVarNames;
     std::vector<std::string> m_vertexTestsVarNames;
 
@@ -179,4 +179,4 @@ namespace Belle2 {
   };
 }
 
-#endif /* trackFitCheckerModule_H_ */
+#endif /* TrackFitCheckerModule_H_ */

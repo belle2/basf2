@@ -17,7 +17,6 @@
 #include <generators/dataobjects/MCParticle.h>
 #include <cdc/dataobjects/CDCHit.h>
 #include <cdc/dataobjects/CDCSimHit.h>
-#include <cdc/geometry/CDCGeometryPar.h>
 #include <pxd/dataobjects/PXDTrueHit.h>
 #include <svd/dataobjects/SVDTrueHit.h>
 #include <vxd/VxdID.h>
@@ -140,19 +139,19 @@ void MCTrackFinderModule::event()
   StoreArray<CDCHit> cdcHits(m_cdcHitColName);
   int nCDCHits = cdcHits.getEntries();
   B2DEBUG(149, "MCTrackFinder: Number of CDCHits: " << nCDCHits);
-  if (nCDCHits == 0) {B2INFO("MCTrackFinder: CDCHitsCollection is empty!")};
+  if (nCDCHits == 0) {B2INFO("MCTrackFinder: CDCHitsCollection is empty!");}
   RelationArray mcPartToCDCHits(mcParticles, cdcHits);
   int nMcPartToCDCHits = mcPartToCDCHits.getEntries();
   B2DEBUG(149, "MCTrackFinder: Number of relations between MCParticles and CDCHits: " << nMcPartToCDCHits);
-  if (nMcPartToCDCHits == 0) {B2INFO("MCTrackFinder: MCParticlesToCDCHitsCollection is empty!")};
+  if (nMcPartToCDCHits == 0) {B2INFO("MCTrackFinder: MCParticlesToCDCHitsCollection is empty!");}
   StoreArray<CDCSimHit> cdcSimHits("");
   int nCDCSimHits = cdcSimHits.getEntries();
   B2DEBUG(149, "MCTrackFinder: Number of CDCHits: " << nCDCSimHits);
-  if (nCDCSimHits == 0) {B2INFO("MCTrackFinder: CDCSimHitsCollection is empty!")};
+  if (nCDCSimHits == 0) {B2INFO("MCTrackFinder: CDCSimHitsCollection is empty!");}
   RelationArray cdcSimHitToHitRel(cdcSimHits, cdcHits);
   int nCdcSimHitToHitRel = cdcSimHitToHitRel.getEntries();
   B2DEBUG(149, "MCTrackFinder: Number of relations between CDCSimHit and CDCHits: " << nCdcSimHitToHitRel);
-  if (nCdcSimHitToHitRel == 0) {B2INFO("MCTrackFinder: MCParticlesToCDCHitsCollection is empty!")};
+  if (nCdcSimHitToHitRel == 0) {B2INFO("MCTrackFinder: MCParticlesToCDCHitsCollection is empty!");}
 
   //register StoreArray which will be filled by this module
   StoreArray<GFTrackCand> trackCandidates(m_gfTrackCandsColName);
@@ -165,7 +164,7 @@ void MCTrackFinderModule::event()
   if (m_whichParticles == 2) {status = MCParticle::c_SeenInSVD;} //seen in SVD
   if (m_whichParticles == 3) {status = MCParticle::c_SeenInCDC;}//seen in CDC
   if (m_whichParticles > 3 || m_whichParticles < 0) {
-    B2WARNING("Invalid parameter! Track Candidates for primary particles will be created.")
+    B2WARNING("Invalid parameter! Track Candidates for primary particles will be created.");
     status = 1;
   }
   //an auxiliary variable to discard neutrals if necessary (assume that no particles with charge -999 exist)
@@ -322,7 +321,7 @@ void MCTrackFinderModule::event()
 void MCTrackFinderModule::endRun()
 {
   if (m_notEnoughtHitsCounter != 0) {
-    B2WARNING(m_notEnoughtHitsCounter << " tracks had 2 or less hits. No Track Candidates were created from the so they will not be passed to the track fitter");
+    B2WARNING(m_notEnoughtHitsCounter << " tracks had 2 or less hits. No Track Candidates were created from them so they will not be passed to the track fitter");
   }
 }
 

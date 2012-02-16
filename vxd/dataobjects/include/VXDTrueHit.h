@@ -36,27 +36,56 @@ namespace Belle2 {
 
   public:
     /** Default constructor for ROOT IO */
-    VXDTrueHit(): m_sensorID(0), m_u(0), m_v(0), m_energyDep(0), m_globalTime(0) {}
+    VXDTrueHit(): m_sensorID(0), m_u(0), m_v(0), m_entryU(0), m_entryV(0), m_exitU(0), m_exitV(0), m_energyDep(0), m_globalTime(0) {}
 
     /** Constructor
      * @param sensorID SensorID of the Sensor
      * @param u u coordinate of the hit in local coordinates
      * @param v v coordinate of the hit in local coordinates
      * @param momentum momentum of the particle in local coordinates
+     * @param entryMomentum momentum of the particle in local coordinates when entering silicon
+     * @param exitMomentum momentum of the particle in local coordinates when exiting silicon
      * @param globalTime timestamp of the hit
      */
-    VXDTrueHit(VxdID sensorID, float u, float v, float energyDep, float globalTime,
-               const TVector3& momentum, const TVector3& entryMomentum, const TVector3& exitMomentum):
+    VXDTrueHit(
+      VxdID sensorID, float u, float v, float energyDep, float globalTime,
+      const TVector3& momentum, const TVector3& entryMomentum, const TVector3& exitMomentum):
       m_sensorID(sensorID), m_u(u), m_v(v), m_energyDep(energyDep), m_globalTime(globalTime),
-      m_momentum(momentum), m_entryMomentum(entryMomentum), m_exitMomentum(exitMomentum)
-    {}
+      m_momentum(momentum), m_entryMomentum(entryMomentum), m_exitMomentum(exitMomentum) {}
+
+    /** Constructor
+     * @param sensorID SensorID of the Sensor
+     * @param u u coordinate of the hit in local coordinates
+     * @param v v coordinate of the hit in local coordinates
+     * @param entryU u coordinate of the hit in local coordinates when entering silicon
+     * @param entryV v coordinate of the hit in local coordinates when entering silicon
+     * @param exitU u coordinate of the hit in local coordinates when exiting silicon
+     * @param exitV v coordinate of the hit in local coordinates when exiting silicon
+     * @param momentum momentum of the particle in local coordinates
+     * @param entryMomentum momentum of the particle in local coordinates when entering silicon
+     * @param exitMomentum momentum of the particle in local coordinates when exiting silicon
+     * @param globalTime timestamp of the hit
+     */
+    VXDTrueHit(
+      VxdID sensorID, float u, float v, float entryU, float entryV, float exitU, float exitV, float energyDep, float globalTime,
+      const TVector3& momentum, const TVector3& entryMomentum, const TVector3& exitMomentum):
+      m_sensorID(sensorID), m_u(u), m_v(v), m_entryU(entryU), m_entryV(entryV), m_exitU(exitU), m_exitV(exitV), m_energyDep(energyDep), m_globalTime(globalTime),
+      m_momentum(momentum), m_entryMomentum(entryMomentum), m_exitMomentum(exitMomentum) {}
 
     /** Return the Sensor ID */
     VxdID getSensorID() const { return m_sensorID; }
-    /** Retun local u coordinate of hit */
+    /** Return local u coordinate of hit */
     float getU() const { return m_u; }
-    /** Retun local v coordinate of hit */
+    /** Return local v coordinate of hit */
     float getV() const { return m_v; }
+    /** Return local u coordinate of hit when entering silicon*/
+    float getEntryU() const { return m_entryU; }
+    /** Return local v coordinate of hit when entering silicon*/
+    float getEntryV() const { return m_entryV; }
+    /** Return local u coordinate of hit  when exiting silicon*/
+    float getExitU() const { return m_exitU; }
+    /** Return local v coordinate of hit  when exiting silicon*/
+    float getExitV() const { return m_exitV; }
     /** Return energy deposited during traversal of sensor */
     float getEnergyDep() const { return m_energyDep; }
     /** Return Time of hit.*/
@@ -71,15 +100,19 @@ namespace Belle2 {
   protected:
 
     int m_sensorID;           /**< ID of the sensor */
-    float m_u;                /**< Local u coordinate */
-    float m_v;                /**< Local v coordinate */
+    float m_u;                /**< Local u coordinate when crossing detector plane*/
+    float m_v;                /**< Local v coordinate when crossing detector plane*/
+    float m_entryU;           /**< Local u coordinate when entering silicon */
+    float m_entryV;           /**< Local v coordinate when entering silicon */
+    float m_exitU;            /**< Local u coordinate when exiting silicon*/
+    float m_exitV;            /**< Local v coordinate when exiting silicon*/
     float m_energyDep;        /**< Deposited energy while traversing sensor */
     float m_globalTime;       /**< Global time. */
     TVector3 m_momentum;      /**< momentum in local coordinates when crossing detector plane */
     TVector3 m_entryMomentum; /**< momentum in local coordinates when entering silicon */
     TVector3 m_exitMomentum;  /**< momentum in local coordinates when exiting silicon */
 
-    ClassDef(VXDTrueHit, 1)
+    ClassDef(VXDTrueHit, 2)
   };
 
 } // end namespace Belle2

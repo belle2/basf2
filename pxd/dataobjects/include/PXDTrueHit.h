@@ -45,8 +45,25 @@ namespace Belle2 {
                const TVector3& momentum, const TVector3& entryMomentum, const TVector3& exitMomentum):
       VXDTrueHit(sensorID, u, v, energyDep, globalTime, momentum, entryMomentum, exitMomentum)
     {}
-
-    ClassDef(PXDTrueHit, 2)
+    /** Constructor
+     * @param sensorID SensorID of the Sensor
+     * @param u u coordinate of the hit in local coordinates
+     * @param v v coordinate of the hit in local coordinates
+     * @param entryU u coordinate of the hit in local coordinates when entering silicon
+     * @param entryV v coordinate of the hit in local coordinates when entering silicon
+     * @param exitU u coordinate of the hit in local coordinates when exiting silicon
+     * @param exitV v coordinate of the hit in local coordinates when exiting silicon
+     * @param momentum momentum of the particle in local coordinates
+     * @param entryMomentum momentum of the particle in local coordinates when entering silicon
+     * @param exitMomentum momentum of the particle in local coordinates when exiting silicon
+     * @param globalTime timestamp of the hit
+     */
+    PXDTrueHit(
+      VxdID sensorID, float u, float v, float entryU, float entryV, float exitU, float exitV, float energyDep, float globalTime,
+      const TVector3& momentum, const TVector3& entryMomentum, const TVector3& exitMomentum):
+      VXDTrueHit(sensorID, u, v, entryU, entryV, exitU, exitV, energyDep, globalTime, momentum, entryMomentum, exitMomentum)
+    {}
+    ClassDef(PXDTrueHit, 3)
   };
 
 } // end namespace Belle2

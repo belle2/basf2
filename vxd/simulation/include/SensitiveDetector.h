@@ -123,6 +123,10 @@ namespace Belle2 {
       double   m_trueHitTime;
       /** Position of the crossing of the detector plane (z=0) for the current volume traversal */
       TVector3 m_trueHitPos;
+      /** Position at the begin of the current volume traversal */
+      TVector3 m_trueHitPosStart;
+      /** Position at the end of the current volume traversal */
+      TVector3 m_trueHitPosEnd;
       /** Momentum of the crossing of the detector plane (z=0) for the current volume traversal */
       TVector3 m_trueHitMom;
       /** Momentum at the begin of the current volume traversal */
@@ -133,8 +137,8 @@ namespace Belle2 {
 
     template <class SimHitClass, class TrueHitClass>
     SensitiveDetector<SimHitClass, TrueHitClass>::SensitiveDetector(VXD::SensorInfoBase* sensorInfo, bool seeNeutrons):
-        VXD::SensitiveDetectorBase(sensorInfo), m_seeNeutrons(seeNeutrons),
-        m_trueHitTrackID(0), m_trueHitCount(0), m_trueHitWeight(0.0), m_trueHitTime(0.0)
+      VXD::SensitiveDetectorBase(sensorInfo), m_seeNeutrons(seeNeutrons),
+      m_trueHitTrackID(0), m_trueHitCount(0), m_trueHitWeight(0.0), m_trueHitTime(0.0)
     {
       //Make sure all collections are registered
       StoreArray<MCParticle>   mcParticles;
@@ -169,7 +173,7 @@ namespace Belle2 {
       // Get step information
       const G4StepPoint& preStep      = *step->GetPreStepPoint();
       const G4StepPoint& posStep      = *step->GetPostStepPoint();
-      const G4AffineTransform &topTransform = preStep.GetTouchableHandle()->GetHistory()->GetTopTransform();
+      const G4AffineTransform& topTransform = preStep.GetTouchableHandle()->GetHistory()->GetTopTransform();
 
       const G4ThreeVector& preStepPos = topTransform.TransformPoint(preStep.GetPosition()) * Unit::mm;
       const G4ThreeVector& posStepPos = topTransform.TransformPoint(posStep.GetPosition()) * Unit::mm;
@@ -231,6 +235,7 @@ namespace Belle2 {
         saveTrueHit();
         m_trueHitTrackID = trackID;
         m_trueHitMomStart = momIn;
+        m_trueHitPosStart = posIn;
       }
 
       //Remember the index and energy deposit of the SimHit
@@ -239,7 +244,7 @@ namespace Belle2 {
       m_trueHitWeight += energy;
       //Update the momentum at the end of traversing the volume
       m_trueHitMomEnd = momOut;
-
+      m_trueHitPosEnd = posOut;
       //Check if step crossed local z=0
       if (posIn.Z()*posOut.Z() < 0) {
         //Linear propagate to z=0
@@ -287,7 +292,7 @@ namespace Belle2 {
         //Create a new TrueHit
         int hitIndex = trueHits->GetLast() + 1;
         new(trueHits->AddrAt(hitIndex))
-        TrueHitClass(sensorID, m_trueHitPos.X(), m_trueHitPos.Y(), m_trueHitWeight, m_trueHitTime,
+        TrueHitClass(sensorID, m_trueHitPos.X(), m_trueHitPos.Y(), m_trueHitPosStart.X(), m_trueHitPosStart.Y(), m_trueHitPosEnd.X(), m_trueHitPosEnd.Y(), m_trueHitWeight, m_trueHitTime,
                      m_trueHitMom, m_trueHitMomStart, m_trueHitMomEnd);
         //Add Relation to MCParticle
         relMCTrueHits.add(m_trueHitTrackID, hitIndex, m_trueHitWeight);

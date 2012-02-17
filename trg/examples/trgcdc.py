@@ -4,12 +4,12 @@ from basf2 import *
 
 # suppress messages and warnings during processing:
 #set_log_level(LogLevel.ERROR)
-#Register modules
+
+#...Particle Gun...
 particlegun = register_module('ParticleGun')
 #particlegun.param('randomSeed', 3452346)
 #particlegun.param('randomSeed', 345)
 particlegun.param('randomSeed', 346)
-# The particle we are shooting
 particlegun.param('pdgCodes', [13])
 particlegun.param('nTracks', 1)
 particlegun.param('momentumGeneration', 'uniformPt')
@@ -21,7 +21,7 @@ particlegun.param('thetaParams', [45, 45])
 particlegun.param('phiGeneration', 'uniform')
 particlegun.param('phiParams', [0,360])
 particlegun.param('vertexGeneration', 'fixed')
-particlegun.param('vertexGeneration', 'normal')
+#particlegun.param('vertexGeneration', 'normal')
 particlegun.param('xVertexParams', [0, 0.0])
 particlegun.param('yVertexParams', [0, 0.0])
 particlegun.param('zVertexParams', [0, 0.0])

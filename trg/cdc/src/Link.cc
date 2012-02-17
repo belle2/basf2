@@ -145,19 +145,19 @@ TRGCDCLink::dump(const string & msg, const string & pre) const {
     //...Output...
     std::cout << pre;
     std::cout << wire()->name();
-    if (mc) {
-	if (_hit) {
-	    if (_hit->mc()) {
-		if (_hit->mc()->hep())
-		    std::cout << "(mc" << _hit->mc()->hep()->id() << ")";
-		else
-		    std::cout << "(mc?)";
-	    }
-	    else {
-		std::cout << "(mc?)";
-	    }
-	}
-    }
+//     if (mc) {
+// 	if (_hit) {
+// 	    if (_hit->mc()) {
+// 		if (_hit->mc()->hep())
+// 		    std::cout << "(mc" << _hit->mc()->hep()->id() << ")";
+// 		else
+// 		    std::cout << "(mc?)";
+// 	    }
+// 	    else {
+// 		std::cout << "(mc?)";
+// 	    }
+// 	}
+//     }
     if (pull)
 	std::cout << "[pul=" << this->pull() << "]";
     if (flag) {
@@ -274,24 +274,24 @@ TRGCDCLink::dump(const vector<const TRGCDCLink *> & links,
     for (unsigned i = 0; i < n; i++) {
 	const TRGCDCLink & l = * tmp[i];
 
-	if (mc) {
-	    unsigned mcId = 999;
-	    if (l.hit()) {
-		if (l.hit()->mc())
-		    if (l.hit()->mc()->hep())
-			mcId = l.hit()->mc()->hep()->id();
-		if (mcId < MCC_MAX) {
-		    ++MCC0[mcId];
-		    if (l.hit()->state() & WireHitFittingValid) {
-			if (! (l.hit()->state() & WireHitInvalidForFit))
-			    ++MCC1[mcId];
-		    }
-		}
-		else {
-		    MCCOverFlow = true;
-		}
-	    }
-	}
+// 	if (mc) {
+// 	    unsigned mcId = 999;
+// 	    if (l.hit()) {
+// 		if (l.hit()->mc())
+// 		    if (l.hit()->mc()->hep())
+// 			mcId = l.hit()->mc()->hep()->id();
+// 		if (mcId < MCC_MAX) {
+// 		    ++MCC0[mcId];
+// 		    if (l.hit()->state() & WireHitFittingValid) {
+// 			if (! (l.hit()->state() & WireHitInvalidForFit))
+// 			    ++MCC1[mcId];
+// 		    }
+// 		}
+// 		else {
+// 		    MCCOverFlow = true;
+// 		}
+// 	    }
+// 	}
 	if (flag) {
 	    if (l.hit()) {
 		if (l.hit()->state() & WireHitFittingValid) {
@@ -806,13 +806,13 @@ TRGCDCLink::links2HEP(const vector<TRGCDCLink *> & links) {
     }  
     for (unsigned i = 0; i < nHep; i++) N[i] = 0;
 
-    for (unsigned i = 0; i < (unsigned) links.size(); i++) {
-	const TRGCDCLink & l = * links[i];
-	const Belle2::TRGCDCTrackMC & hep = * l.hit()->mc()->hep();
-	for (unsigned j = 0; j < nHep; j++)
-	    if (list[j] == & hep)
-		++N[j];
-    }
+//     for (unsigned i = 0; i < (unsigned) links.size(); i++) {
+// 	const TRGCDCLink & l = * links[i];
+// 	const Belle2::TRGCDCTrackMC & hep = * l.hit()->mc()->hep();
+// 	for (unsigned j = 0; j < nHep; j++)
+// 	    if (list[j] == & hep)
+// 		++N[j];
+//     }
 
     unsigned nMax = 0;
     for (unsigned i = 0; i < nHep; i++) {

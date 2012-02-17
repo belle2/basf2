@@ -16,6 +16,8 @@
 
 #include <string>
 #include "CLHEP/Geometry/Point3D.h"
+//#include "cdc/dataobjects/CDCHit.h"
+//#include "cdc/hitcdc/CDCSimHit.h"
 
 #ifdef TRGCDC_SHORT_NAMES
 #define TCWHit TRGCDCWireHit
@@ -62,8 +64,9 @@
 
 namespace Belle2 {
 
+class CDCHit;
+class CDCSimHit;
 class TRGCDCWire;
-class TRGCDCWireHitMC;
 
 /// A class to represent a wire hit in CDC.
 class TRGCDCWireHit {
@@ -72,6 +75,7 @@ class TRGCDCWireHit {
     /// Constructor.
     TRGCDCWireHit(const TRGCDCWire &,
 		  unsigned indexCDCHit = 0,
+		  unsigned indexCDCSimHit = 0,
 		  float driftLeft = 0,
 		  float driftLeftError = 0,
 		  float driftRight = 0,
@@ -118,11 +122,14 @@ class TRGCDCWireHit {
     /// returns sequential Length in one segment : this parameter is used in TCurlFinder now.
     unsigned sequence(void) const;
 
-    /// returns a pointer to TRGCDCWireHitMC.
-    const TRGCDCWireHitMC * const mc(void) const;
-
     /// returns an index to CDCHit.
-    unsigned CDCHit(void) const;
+    unsigned iCDCHit(void) const;
+
+    /// Access to CDCHit.
+    const CDCHit * const hit(void) const;
+
+    /// Access to CDCSimHit.
+    const CDCSimHit * const simHit(void) const;
 
   public:// Modifiers
     /// sets state. Meaning of bits are written below.
@@ -137,14 +144,14 @@ class TRGCDCWireHit {
     /// assigns a pointer to a TTrack. (tmp)
     const void * const track(const void *) const;
 
-    /// sets a pointer to TRGCDCWireHitMC.
-    const TRGCDCWireHitMC * const mc(TRGCDCWireHitMC *);
-
     /// sets sequential length in one segment : this parameter is used in TCurlFinder now.
     unsigned sequence(unsigned) const;
 
   public:// Static utility functions
-    static int sortByWireId(const TRGCDCWireHit ** a, const TRGCDCWireHit ** b);
+
+    /// Sort function.
+    static int sortByWireId(const TRGCDCWireHit ** a,
+			    const TRGCDCWireHit ** b);
 
   private:
     mutable unsigned _state;
@@ -154,11 +161,13 @@ class TRGCDCWireHit {
     const TRGCDCWire & _wire;
     const HepGeom::Point3D<double>  & _xyPosition;
     mutable const void * _track;
-    const TRGCDCWireHitMC * _mc;
     mutable unsigned _sequentialLength;
 
     /// Index to CDCHit array
     unsigned _iCDCHit;
+
+    /// Index to CDCSimHit array
+    unsigned _iCDCSimHit;
 
    // _state bit definition
 
@@ -276,18 +285,6 @@ TRGCDCWireHit::track(const void * a) const {
 }
 
 inline
-const TRGCDCWireHitMC * const
-TRGCDCWireHit::mc(void) const {
-    return _mc;
-}
-
-inline
-const TRGCDCWireHitMC * const
-TRGCDCWireHit::mc(TRGCDCWireHitMC * a) {
-    return _mc = a;
-}
-
-inline
 unsigned
 TRGCDCWireHit::sequence(void) const {
     return _sequentialLength;
@@ -301,7 +298,7 @@ TRGCDCWireHit::sequence(unsigned a) const {
 
 inline
 unsigned
-TRGCDCWireHit::CDCHit(void) const {
+TRGCDCWireHit::iCDCHit(void) const {
     return _iCDCHit;
 }
 

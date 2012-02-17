@@ -43,6 +43,7 @@ class TRGCDCFrontEnd;
 class TRGCDCMerger;
 class TRGCDCHoughFinder;
 class TRGCDCFitter3D;
+class TRGCDCLUT;
 
 /** A class to represent CDC.
 
@@ -355,6 +356,9 @@ class TRGCDC {
 
     /// 3D fitter.
     TRGCDCFitter3D * _fitter3D;
+
+    /// LUT holder.
+    std::vector<TRGCDCLUT *> _luts;
 };
 
 //-----------------------------------------------------------------------------

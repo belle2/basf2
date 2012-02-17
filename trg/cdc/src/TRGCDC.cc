@@ -16,8 +16,9 @@
 
 #include <cstdlib>
 #include "framework/datastore/StoreArray.h"
-#include "cdc/hitcdc/CDCSimHit.h"
+#include "framework/datastore/RelationArray.h"
 #include "cdc/dataobjects/CDCHit.h"
+#include "cdc/hitcdc/CDCSimHit.h"
 #include "cdc/geometry/CDCGeometryPar.h"
 #include "trg/trg/Debug.h"
 #include "trg/trg/Time.h"
@@ -32,6 +33,7 @@
 #include "trg/cdc/TrackMC.h"
 #include "trg/cdc/Track.h"
 #include "trg/cdc/TrackSegment.h"
+#include "trg/cdc/LUT.h"
 #include "trg/cdc/FrontEnd.h"
 #include "trg/cdc/Merger.h"
 #include "trg/cdc/HoughFinder.h"
@@ -246,6 +248,9 @@ TRGCDC::initialize(bool houghFinderPerfect,
         }
     }
 
+    //...LUT for LR decision : common to all TS...
+    _luts.push_back(new TCLUT("LR LUT", * this));
+
     //...Make TSF's...
     const unsigned nWiresInTS[2] = {15, 11};
     const int shape[2][30] =
@@ -325,6 +330,7 @@ TRGCDC::initialize(bool houghFinderPerfect,
             TRGCDCTrackSegment * ts = new TRGCDCTrackSegment(idTS++,
 							     w,
 							     layer,
+							     _luts.back(),
 							     cells);
 	    for (unsigned i = 0; i < nWiresInTS[tsType]; i++) {
 		TCWire * c = (TCWire *) cells[i];
@@ -610,35 +616,53 @@ TRGCDC::update(bool mcAnalysis) {
 
     TRGDebug::enterStage("TRGCDC update");
 
-    //...Already updated?...
-//  if (TUpdater::updated()) return;
-
     //...Clear old information...
 //  fastClear();
     clear();
 
-    StoreArray<CDCSimHit> cdcArray("CDCSimHits");
-    if (! cdcArray) {
-        cout << "TRGCDC !!! can not access to CDC sim hits" << endl;
+    //...CDCSimHit...
+    StoreArray<CDCSimHit> SimHits("CDCSimHits");
+    if (! SimHits) {
+	cout << "TRGCDC !!! can not access to CDCSimHits" << endl;
+	TRGDebug::leaveStage("TRGCDC update");
+	return;
     }
-    const int n = cdcArray->GetEntriesFast();
-    
-    //...Loop over CDCHit...
+    const unsigned n = SimHits->GetEntries();
+
+    //...CDCHit...
     StoreArray<CDCHit> CDCHits("CDCHits");
     if (! CDCHits) {
         cout << "TRGCDC !!! can not access to CDCHits" << endl;
         TRGDebug::leaveStage("TRGCDC update");
         return;
     }
-
     const unsigned nHits = CDCHits->GetEntries();
 
-    for (unsigned i = 0; i < nHits; i++) {
-//      const HitCDC & h = * cdcHits[i];
-        const CDCHit & h = * CDCHits[i];
+    //...Relations...
+    RelationArray rels(SimHits, CDCHits);
+    const unsigned nRels = rels.getEntries();
 
-//         //...Check validity...
-//         if (! (h->m_stat & WireHitFindingValid)) continue;
+    //...Loop over CDCHits...
+    for (unsigned i = 0; i < nHits; i++) {
+        const CDCHit & h = * CDCHits[i];
+	unsigned iSimHit = 0;
+
+//      //...Check validity (skip broken channel)...
+//      if (! (h->m_stat & WireHitFindingValid)) continue;
+
+	//...Get CDCSimHit... This is expensive. Is there a good way?
+	for (unsigned j = 0; j < nRels; j++) {
+	    const unsigned k = rels[j].getToIndices().size();
+	    for (unsigned l = 0; l < k; l++) {
+		if (rels[j].getToIndex(l) == i)
+		    iSimHit = rels[j].getFromIndex();
+	    }
+
+	    if (TRGDebug::level())
+		if (k > 1)
+		    cout << "TRGCDC::update !!! CDCSimHit[" << iSimHit
+			 << "] has multiple CDCHit(" << k << " hits)" << endl;
+	}
 
         //...Wire...
         int t_layerId;
@@ -649,11 +673,12 @@ TRGCDC::update(bool mcAnalysis) {
 
         const TCWire & w = * wire(layerId, wireId);
 
-//        cout << "lid,wid=" << layerId << "," << wireId << endl;
+//      cout << "lid,wid=" << layerId << "," << wireId << endl;
 
         //...TCWireHit...
         TCWHit * hit = new TCWHit(w,
 				  i,
+				  iSimHit,
 				  h.getDriftTime(),
 				  0.15,
 				  h.getDriftTime(),
@@ -694,84 +719,13 @@ TRGCDC::update(bool mcAnalysis) {
 //  _hits.sort(TCWHit::sortByWireId);
     classification();
 
-    //...MC information...
-    if (mcAnalysis) updateMC();
-
-    //...Update information...
-//  TUpdater::update();
-
-    if (TRGDebug::level())
+    if (TRGDebug::level()) {
+	StoreArray<CDCSimHit> simHits("CDCSimHits");
         cout << TRGDebug::tab() << "#CDCSimHit=" << n << ",#HitCDC=" << nHits
-             << endl;
+	     << endl;
+    }
 
     TRGDebug::leaveStage("TRGCDC update");
-}
-
-void
-TRGCDC::updateMC(void) {
-
-//     //...Create TRGCDCTrackMC...
-//     TRGCDCTrackMC::update();
-
-//     //...Loop over DATRGCDC_MCWIRHIT bank...
-// //    unsigned n = 0;
-//     xxx for (unsigned i = 0; i < (unsigned) BsCouTab(DATRGCDC_MCWIRHIT); i++) {
-//         x struct datcdc_mcwirhit * h =
-//             (struct datcdc_mcwirhit *)
-//             BsGetEnt(DATRGCDC_MCWIRHIT, i + 1, BBS_No_Index);
-
-//         //...Get a pointer to RECCDC_WIRHIT...
-//         x reccdc_wirhit * whp =
-//             (reccdc_wirhit *) BsGetEnt(RECCDC_WIRHIT, h->m_dat, BBS_No_Index);
-
-//         //...Get Trasan objects...
-//         TCWHit * wh = 0;
-//         TCWire * w = 0;
-//         if (whp) {
-//             if (whp->m_stat & WireHitFindingValid) {
-//                 unsigned n = _hits.size();
-//                 unsigned j = ((unsigned) whp->m_ID < n) ? whp->m_ID : n;
-//                 while (j) {
-//                     --j;
-// //cnv                     if (_hits[j]->reccdc() == whp) {
-// //                         wh = _hits[j];
-// //                         w = _wires[wh->wire()->id()];
-// //                         break;
-// //                     }
-//                 }
-//             }
-//         }
-// //cnv         if (! w) {
-// //            x  geocdc_wire * g =
-// //                 (geocdc_wire *)        BsGetEnt(GEOCDC_WIRE, h->m_geo, BBS_No_Index);
-// //             w = _wires[g->m_ID - 1];
-// //         }
-
-//         //...Create TCWHitMC...
-//         TCWHitMC * hit = new TCWHitMC(w, wh, h);
-//         _hitsMC.push_back(hit);
-//         w->hit(hit);
-//         if (wh) wh->mc(hit);
-
-//         //...TRGCDCTrackMC...
-//         TRGCDCTrackMC * hep(0);
-//         if (h->m_hep>0) {
-//           hep = TRGCDCTrackMC::list()[h->m_hep - 1];
-//           hit->_hep = hep;
-//         }
-// //         if (h->m_hep>0 && hep) hep->_hits.push_back(hit);
-// //         else {
-// //           cout << "TRGCDC::updateMC !!! mission impossible" << endl;
-// //           cout << "                   This error will cause trasan crush";
-// //           cout << endl;
-// //           cout << "    h->m_hep, h->m_hep -1 = " << h->m_hep;
-// //           cout << ", " << h->m_hep - 1 << endl;
-// //           cout << "    TRGCDCTrackMC list length = ";
-// // //cnv          cout << TRGCDCTrackMC::list().size() << endl;
-// // //cnv          BsShwDat(GEN_HEPEVT);
-// // //cnv          BsShwDat(DATRGCDC_MCWIRHIT);
-// //        }
-//     }
 }
 
 void

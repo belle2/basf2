@@ -14,6 +14,9 @@
 #define TRG_SHORT_NAMES
 #define TRGCDC_SHORT_NAMES
 
+#include "framework/datastore/StoreArray.h"
+#include "cdc/hitcdc/CDCSimHit.h"
+#include "cdc/dataobjects/CDCHit.h"
 #include "trg/trg/Utilities.h"
 #include "trg/cdc/Wire.h"
 #include "trg/cdc/WireHit.h"
@@ -26,6 +29,7 @@ namespace Belle2 {
 
 TRGCDCWireHit::TRGCDCWireHit(const TRGCDCWire & w,
 			     unsigned indexCDCHit,
+			     unsigned indexCDCSimHit,
 			     float driftLeft,
 			     float driftLeftError,
 			     float driftRight,
@@ -35,8 +39,8 @@ TRGCDCWireHit::TRGCDCWireHit(const TRGCDCWire & w,
        _wire(w),
        _xyPosition(w.xyPosition()),
        _track(0),
-       _mc(0),
-       _iCDCHit(indexCDCHit) {
+       _iCDCHit(indexCDCHit),
+       _iCDCSimHit(indexCDCSimHit) {
 //  w.hit(this); // set by TRGCDC
     _drift[0] = driftLeft;
     _drift[1] = driftRight;
@@ -45,22 +49,6 @@ TRGCDCWireHit::TRGCDCWireHit(const TRGCDCWire & w,
     if (w.axial()) _state |= WireHitAxial;
     else           _state |= WireHitStereo;
 }
-
-// TRGCDCWireHit::TRGCDCWireHit(TRGCDCWire * w, reccdc_wirhit * r, float fudgeFactor)
-// : _state(r->m_stat),
-//   _wire(w),
-//   _r(r),
-//   _xyPosition(w->xyPosition()),
-//   _track(0),
-//   _mc(0) {
-//     w->hit(this);
-//     _drift[0] = r->m_ddl;
-//     _drift[1] = r->m_ddr;
-//     _driftError[0] = r->m_erddl * fudgeFactor;
-//     _driftError[1] = r->m_erddr * fudgeFactor;
-//     if (w->axial()) _state |= WireHitAxial;
-//     else            _state |= WireHitStereo;
-// }
 
 TRGCDCWireHit::~TRGCDCWireHit() {
 }
@@ -90,13 +78,13 @@ TRGCDCWireHit::dump(const std::string & msg,
     if (msg.find("mc") != std::string::npos ||
         msg.find("detail") != std::string::npos) {
         std::cout << ",hep ";
-        if (mc()) {
-            if (mc()->hep()) std::cout << mc()->hep()->id();
-            else std::cout << "0";
-        }
-        else {
-            std::cout << "0";
-        }
+//         if (mc()) {
+//             if (mc()->hep()) std::cout << mc()->hep()->id();
+//             else std::cout << "0";
+//         }
+//         else {
+//             std::cout << "0";
+//         }
     }
     std::cout << std::endl;
 }
@@ -129,6 +117,18 @@ TRGCDCWireHit::sortByWireId(const TRGCDCWireHit ** a,
         return 0;
     else
         return -1;
+}
+
+const CDCHit * const
+TRGCDCWireHit::hit(void) const {
+    StoreArray<CDCHit> CDCHits("CDCHits");
+    CDCHits[_iCDCHit];
+}
+
+const CDCSimHit * const
+TRGCDCWireHit::simHit(void) const {
+    StoreArray<CDCSimHit> CDCHits("CDCSimHits");
+    CDCHits[_iCDCSimHit];
 }
 
 } // namespace Belle2

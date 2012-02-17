@@ -28,6 +28,7 @@ namespace Belle2 {
 TRGCDCTrackSegment::TRGCDCTrackSegment(unsigned id,
                                        const TCWire & w,
                                        const TRGCDCLayer * layer,
+				       const TRGCDCLUT * const lut,
 				       const std::vector<const TRGCDCWire *> &
 				       cells)
 
@@ -35,6 +36,7 @@ TRGCDCTrackSegment::TRGCDCTrackSegment(unsigned id,
       _state(0),
       _id(id),
       _localId(w.localId()),
+      _lut(lut),
       _layer(layer),
       _wires(cells),
       _signal(std::string("TS_") + TRGUtil::itostring(id)),

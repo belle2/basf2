@@ -26,6 +26,7 @@ namespace Belle2 {
 
 class TRGSignal;
 class TRGCDCLayer;
+class TRGCDCLUT;
 
 /// A class to represent a wire in CDC.
 class TRGCDCTrackSegment : public TRGCDCWire {
@@ -35,6 +36,7 @@ class TRGCDCTrackSegment : public TRGCDCWire {
     TRGCDCTrackSegment(unsigned id,
                        const TRGCDCWire & w,
                        const TRGCDCLayer * layer,
+		       const TRGCDCLUT * const lut,
                        const std::vector<const TRGCDCWire *> & cells);
 
     /// Destructor
@@ -123,8 +125,11 @@ class TRGCDCTrackSegment : public TRGCDCWire {
     /// Local ID.
     unsigned _localId;
 
+    /// LookUp Table.
+    const TRGCDCLUT * const _lut;
+
     /// Layer.
-    const TRGCDCLayer * _layer;
+    const TRGCDCLayer * const _layer;
 
     /// Wires.
     std::vector<const TRGCDCWire *> _wires;

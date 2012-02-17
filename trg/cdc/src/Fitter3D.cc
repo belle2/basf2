@@ -293,7 +293,7 @@ namespace Belle2 {
 		      ptn2 |= (1 << j);
 
 		      //...Get index for CDCHit...
-		      unsigned ind = wires[j]->hit()->CDCHit();
+		      unsigned ind = wires[j]->hit()->iCDCHit();
 		      // Use 'ind' to access CDCSimHit.
 		  }
 	      }

@@ -136,7 +136,7 @@ TRGCDCModule::event() {
     }
 
     //...CDC trigger simulation...
-    _cdc->update();
+    _cdc->update(true);
     _cdc->simulate();
 }
 

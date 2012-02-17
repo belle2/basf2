@@ -57,7 +57,7 @@ trackfitter.param('NIterations', 3)
 trackfitchecker = register_module('TrackFitChecker')
 trackfitchecker.logging.log_level = LogLevel.INFO  # the reults of the statistical tests will only show up at info or debug level
 trackfitchecker.param('testSi', True)
-trackfitchecker.param('testCdc', True)
+trackfitchecker.param('testCdc', False)
 trackfitchecker.param('writeToTextFile', True)  # especially when CDC hits are anlyzed the the info on the termianl becomes unreadable. look into the file statisticaltests.txt instead (at the moment the file name is hard coded
 
 # Create paths

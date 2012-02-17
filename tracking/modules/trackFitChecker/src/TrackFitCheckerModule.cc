@@ -57,7 +57,7 @@ TrackFitCheckerModule::TrackFitCheckerModule() : Module()
   addParam("testPrediction", m_testPrediction, "Additionally test the predicted state vecs from the Kalman filter. ONLY WOKRKS IF THEY ARE SAVED DURING FITTING WHICH IS NOT THE DEFAULT", false);
   addParam("writeToRootFile", m_writeToRootFile, "Set to True if you want the data from the statistical tests written into a root file", false);
   addParam("writeToTextFile", m_writeToFile, "Set to True if you want the results of the statistical tests written out in a normal text file", false);
-  //addParam("testDaf", m_testDaf, "execute the tests of the DAF weights", false);
+  addParam("testDaf", m_testDaf, "execute the tests of the DAF weights", false);
 }
 
 
@@ -182,6 +182,8 @@ void TrackFitCheckerModule::initialize()
   // pulls and chi2 to test consistency of normal distribution model of measurements and the sigma of the digitizer with the sigma of the recoHits
   resizeLayerWiseData("zs_and_chi2_meas_t", vecSizeMeasTest);
 
+  resizeLayerWiseData("DAF_weights", 1); // at the moment only tracks with
+
   m_badR_fCounter = 0;
   m_badR_bCounter = 0;
   m_badR_smCounter = 0;
@@ -219,7 +221,7 @@ void TrackFitCheckerModule::event()
   stringstream secondLine;
   stringstream thirdLine;
   stringstream forthLine;
-  for (int i = 0; i not_eq nFittedTracks; ++i) {
+  for (int i = 0; i not_eq nFittedTracks; ++i) { // loop over all tracks in one event
     GFTrack* const aTrackPtr = fittedTracks[i];
     const int mcParticleIndex = aTrackPtr->getCand().getMcTrackId();
     const double charge = aMcParticleArray[mcParticleIndex]->getCharge();
@@ -304,7 +306,7 @@ void TrackFitCheckerModule::event()
       double fpChi2tot = 0.0;
 
       int nHits = aTrackPtr->getNumHits();
-      for (int iGFHit = 0; iGFHit not_eq nHits; ++iGFHit) {
+      for (int iGFHit = 0; iGFHit not_eq nHits; ++iGFHit) { // loop over all hits in one track
         //first determine the hit type then get the data from the hit
         GFAbsRecoHit* const aGFAbsRecoHitPtr = aTrackPtr->getHit(iGFHit);
         PXDRecoHit const* const aPxdRecoHitPtr = dynamic_cast<PXDRecoHit const * const>(aGFAbsRecoHitPtr);
@@ -353,6 +355,12 @@ void TrackFitCheckerModule::event()
         TMatrixT<double> HT(TMatrixT<double>::kTransposed, H); // the transposed is needed later
         TMatrixT<double> m = aGFAbsRecoHitPtr->getHitCoord(detPlaneOfRecoHit); //measurement of hit
         TMatrixT<double> V = aGFAbsRecoHitPtr->getHitCov(detPlaneOfRecoHit); //covariance matrix of hit
+
+        if (m_testDaf == true) { //get DAF weight of the current hit if the DAF was used as fitter algorithm
+          double dafWeight = -1.0; // a weight can never be negative
+          aTrackPtr->getBK(0)->getNumber("dafWeight", iGFHit,  dafWeight);
+          fillLayerWiseData("DAF_weights", accuVecIndex, vector<double>(1, dafWeight));
+        }
 
         // build the true state vector x_t all in local coordinates
         if (truthAvailable == true) {
@@ -447,7 +455,7 @@ void TrackFitCheckerModule::event()
           testResutlsWithoutTruth.push_back(fuChi2Inrement);
           fillLayerWiseData("zs_and_chi2_fu", accuVecIndex, testResutlsWithoutTruth);
         }
-        m_dataOut << "\t" << "layer " << hitLayerId << "\t" <<  fpChi2increment << "\t" << fuChi2Inrement << "\t" << m[0][0] << "\t" << m[1][0] << "\t" << uOutTrue - uInTrue << "\t" << vOutTrue - vInTrue;
+        if (m_inspectTracks == true) m_dataOut << "\t" << "layer " << hitLayerId << "\t" <<  fpChi2increment << "\t" << fuChi2Inrement << "\t" << m[0][0] << "\t" << m[1][0] << "\t" << uOutTrue - uInTrue << "\t" << vOutTrue - vInTrue;
 
         // test using updated forward state and truth information
         if (truthAvailable == true) {
@@ -572,6 +580,9 @@ void TrackFitCheckerModule::endRun()
         printLayerWiseStatistics("zs_and_chi2_sm_t", m_layerWiseTruthTestsVarNames);
       }
       printLayerWiseStatistics("zs_and_chi2_sm", measVarNames);
+      if (m_testDaf == true) {
+        printLayerWiseStatistics("DAF_weights", vector<string>(1, string("weight")));
+      }
     }
     //write out the test results
     B2INFO("\n" << m_textOutput.str());

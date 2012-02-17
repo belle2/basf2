@@ -157,9 +157,10 @@ namespace Belle2 {
     int m_unSymmetricCounter;
     int m_notPosDefCounter;
     int m_nDigits;
+    // module input parameters
     bool m_useTruthInfo;
     bool m_testPrediction;
-
+    bool m_testDaf;
     std::string m_dataOutFileName; //common part of all names of output files
     //stuff for text file output
     std::stringstream m_textOutput;

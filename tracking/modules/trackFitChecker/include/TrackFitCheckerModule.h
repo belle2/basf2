@@ -120,10 +120,7 @@ namespace Belle2 {
     int m_nSvdLayers;
     int m_nCdcLayers;
     int m_nLayers;
-    std::string m_dataOutFileName;
-    std::string m_dataOutFileName2;
-    std::ofstream m_dataOut;
-    std::ofstream m_testSeedOutput;
+
     std::vector<std::string> m_layerWiseTruthTestsVarNames;
     std::vector<std::string> m_vertexTestsVarNames;
 
@@ -162,10 +159,12 @@ namespace Belle2 {
     int m_nDigits;
     bool m_useTruthInfo;
     bool m_testPrediction;
-    //output
-    //bool m_writeToB2info;
-    std::string m_testOutputFileName;
+
+    std::string m_dataOutFileName; //common part of all names of output files
+    //stuff for text file output
     std::stringstream m_textOutput;
+    std::ofstream m_dataOut;
+    bool m_inspectTracks;
     //stuff for root output
     bool m_writeToFile;
     bool m_writeToRootFile;

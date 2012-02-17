@@ -53,7 +53,7 @@ TrackFitCheckerModule::TrackFitCheckerModule() : Module()
   addParam("totalChi2Cut", m_totalChi2Cut, "only tracks with a total χ² lower than this value will be considered", 1E300);
   addParam("testSi", m_testSi, "execute the layer wise tests for PXD/SVD", false);
   addParam("testCdc", m_testCdc, "execute the layer wise tests for CDC", false);
-  //addParam("useTruthInfo", m_useTruthInfo, "use the truth info from the geant4 simulation", false);
+  addParam("inspectTracks", m_inspectTracks, "write track paramters into a text file for further inspection. EXPERIMENTAL", false);
   addParam("testPrediction", m_testPrediction, "Additionally test the predicted state vecs from the Kalman filter. ONLY WOKRKS IF THEY ARE SAVED DURING FITTING WHICH IS NOT THE DEFAULT", false);
   addParam("writeToRootFile", m_writeToRootFile, "Set to True if you want the data from the statistical tests written into a root file", false);
   addParam("writeToTextFile", m_writeToFile, "Set to True if you want the results of the statistical tests written out in a normal text file", false);
@@ -71,7 +71,6 @@ void TrackFitCheckerModule::initialize()
   //set all user parameters
 
   //configure the output
-  m_testOutputFileName = m_dataOutFileName + "StatTests.txt";
   m_textOutput.precision(4);
   //set the default names of variables stored in the statistics container if they are mulitdimensional (like the 5 track parameters)
   m_layerWiseTruthTestsVarNames.push_back("q/p");
@@ -142,13 +141,17 @@ void TrackFitCheckerModule::initialize()
   }
   m_nSiLayers = m_nPxdLayers + m_nSvdLayers;
   m_nLayers = m_nPxdLayers + m_nSvdLayers + m_nCdcLayers;
-  string forwardDataFileName = m_dataOutFileName + "ForwardData.txt";
-  m_dataOut.open(forwardDataFileName.c_str());
-  m_dataOut << "#event#\tproc#\tlayer#\tχ²_inc,p\tχ²_inc,u\tm_u\tm_v\tΔu\tΔv\n";
-  m_dataOut << "#\t|p|\tq/p_p\tdu/dw_p\tdv/dw_p\tu_p\tv_p\tσ_u,p\tσ_v,p\n";
-  m_dataOut << "#\tχ²_tot,u\tq/p_u\tdu/dw_u\tdv/dw_u\tu_u\tv_u\tσ_u,u\tσ_v,u\n";
-  m_dataOut << "#\t\tq/p\tdu/dw\tdv/dw\tu\tv\tΔΦ\tΔθ\n";
-  // m_dataOut.precision(14);
+  if (m_inspectTracks == true) {
+    string forwardDataFileName = m_dataOutFileName + "ForwardData.txt";
+    m_dataOut.open(forwardDataFileName.c_str());
+    m_dataOut << "#event#\tproc#\tlayer#\tχ²_inc,p\tχ²_inc,u\tm_u\tm_v\tΔu\tΔv\n";
+    m_dataOut << "#\t|p|\tq/p_p\tdu/dw_p\tdv/dw_p\tu_p\tv_p\tσ_u,p\tσ_v,p\n";
+    m_dataOut << "#\tχ²_tot,u\tq/p_u\tdu/dw_u\tdv/dw_u\tu_u\tv_u\tσ_u,u\tσ_v,u\n";
+    m_dataOut << "#\t\tq/p\tdu/dw\tdv/dw\tu\tv\tΔΦ\tΔθ\n";
+    // m_dataOut.precision(14);
+  }
+
+
 
   //make all vector of vectors have the size of the number of current layers in use
   int vecSizeMeasTest = 3;
@@ -231,13 +234,7 @@ void TrackFitCheckerModule::event()
     }
     // first part: get variables describing the hole track
     const double chi2tot_fu = aTrackPtr->getForwardChiSqu();
-    m_dataOut << eventCounter << "\t" << m_processedTracks ;
-    if (chi2tot_fu > 50.0) {
-      thirdLine << "!!!!\t" << chi2tot_fu; //mark as outlier track
-    } else {
-      thirdLine << "\t" << chi2tot_fu;
-    }
-    forthLine << "\t";
+
 
     const int ndf = aTrackPtr->getNDF();
     const double pValue_bu = TMath::Prob(chi2tot_bu, ndf);
@@ -257,8 +254,16 @@ void TrackFitCheckerModule::event()
     GFDetPlane planeThroughVertex(poca, dirInPoca); //get planeThroughVertex through fitted vertex position
     double vertexAbsMom = aTrackPtr->getMom(planeThroughVertex).Mag(); //get fitted momentum at fitted vertex
     fillTrackWiseData("absMomVertex", vertexAbsMom);
-    secondLine << "\t" << vertexAbsMom;
-
+    if (m_inspectTracks == true) {
+      m_dataOut << eventCounter << "\t" << m_processedTracks ;
+      if (chi2tot_fu > 50.0) {
+        thirdLine << "!!!!\t" << chi2tot_fu; //mark as outlier track
+      } else {
+        thirdLine << "\t" << chi2tot_fu;
+      }
+      forthLine << "\t";
+      secondLine << "\t" << vertexAbsMom;
+    }
     aTrackPtr->getPosMomCov(planeThroughVertex, vertexPos, vertexMom, vertexCov);
     resVertexPosMom[0] = (vertexPos[0] - trueVertexPos[0]);
     resVertexPosMom[1] = (vertexPos[1] - trueVertexPos[1]);
@@ -361,7 +366,8 @@ void TrackFitCheckerModule::event()
           truthTests.push_back(calcChi2(res, V));
           fillLayerWiseData("zs_and_chi2_meas_t", accuVecIndex, truthTests);
         }
-        forthLine << "\t" << trueState[0][0] << "\t" << trueState[1][0] << "\t" << trueState[2][0] << "\t" << trueState[3][0] << "\t" << trueState[4][0] << "\t" << pOutTrue.Phi() - pInTrue.Phi() << "\t" <<  pOutTrue.Theta() - pInTrue.Theta();
+
+        if (m_inspectTracks == true) forthLine << "\t" << trueState[0][0] << "\t" << trueState[1][0] << "\t" << trueState[2][0] << "\t" << trueState[3][0] << "\t" << trueState[4][0] << "\t" << pOutTrue.Phi() - pInTrue.Phi() << "\t" <<  pOutTrue.Theta() - pInTrue.Theta();
         //cout << "true state\n";trueState.Print();
         // now test if measurements am their theoretical variances that were feeded to genfit are consistent with the acutal distribution of measurments
 
@@ -396,7 +402,7 @@ void TrackFitCheckerModule::event()
           fpChi2tot += fpChi2increment;
 
 
-          secondLine << "\t" << state[0][0] << "\t" << state[1][0] << "\t" << state[2][0] << "\t" << state[3][0] << "\t" << state[4][0] << "\t" << sqrt(cov[3][3]) << "\t" << sqrt(cov[4][4]);
+          if (m_inspectTracks == true) secondLine << "\t" << state[0][0] << "\t" << state[1][0] << "\t" << state[2][0] << "\t" << state[3][0] << "\t" << state[4][0] << "\t" << sqrt(cov[3][3]) << "\t" << sqrt(cov[4][4]);
 
           //get the propagation matrix
           //aTrackPtr->getBK(0)->getMatrix("fProp",iGFHit,propMat);
@@ -426,7 +432,9 @@ void TrackFitCheckerModule::event()
         //TMatrixT<double> fUpState(5,1);
         aTrackPtr->getBK(0)->getMatrix("fUpSt", iGFHit, state);
         aTrackPtr->getBK(0)->getMatrix("fUpCov", iGFHit, cov);
-        thirdLine  << "\t" << state[0][0] << "\t" << state[1][0] << "\t" << state[2][0] << "\t" << state[3][0] << "\t" << state[4][0] << "\t" << sqrt(cov[3][3]) << "\t" << sqrt(cov[4][4]);
+
+        if (m_inspectTracks == true) thirdLine  << "\t" << state[0][0] << "\t" << state[1][0] << "\t" << state[2][0] << "\t" << state[3][0] << "\t" << state[4][0] << "\t" << sqrt(cov[3][3]) << "\t" << sqrt(cov[4][4]);
+
         isMatrixCov(cov);
         res = m - H * state;
         R = V - H * cov * HT;
@@ -480,7 +488,7 @@ void TrackFitCheckerModule::event()
         }
       }
 
-      m_dataOut << "\n" << secondLine.rdbuf() << "\n" << thirdLine.rdbuf() << "\n" << forthLine.rdbuf() << "\n";
+      if (m_inspectTracks == true) m_dataOut << "\n" << secondLine.rdbuf() << "\n" << thirdLine.rdbuf() << "\n" << forthLine.rdbuf() << "\n";
     }
     if (m_writeToRootFile == true) {
       m_statDataTreePtr->Fill();
@@ -568,7 +576,7 @@ void TrackFitCheckerModule::endRun()
     //write out the test results
     B2INFO("\n" << m_textOutput.str());
     if (m_writeToFile == true) {
-      ofstream testOutputToFile(m_testOutputFileName.c_str());
+      ofstream testOutputToFile((m_dataOutFileName + "StatTests.txt").c_str());
       testOutputToFile << m_textOutput.str();
       testOutputToFile.close();
     }
@@ -608,7 +616,7 @@ void TrackFitCheckerModule::terminate()
       ++iter3;
     }
   }
-  m_dataOut.close();
+  if (m_inspectTracks == true) m_dataOut.close();
 }
 
 // calculate a chi2 value from a residuum and it's covariance matrix R

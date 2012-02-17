@@ -86,6 +86,9 @@ class TRGCDCTrackSegment : public TRGCDCWire {
     /// returns hit pattern.
     unsigned hitPattern(void) const;
 
+    /// returns LUT.
+    const TRGCDCLUT * LUT(void) const;
+
     /// dumps debug information.
     void dump(const std::string & message = std::string(""),
               const std::string & prefix = std::string("")) const;
@@ -245,6 +248,12 @@ TRGCDCTrackSegment::hitPattern(void) const {
 	    ptn |= (1 << i);
     }
     return ptn;
+}
+
+inline
+const TRGCDCLUT *
+TRGCDCTrackSegment::LUT(void) const {
+    return _lut;
 }
 
 } // namespace Belle2

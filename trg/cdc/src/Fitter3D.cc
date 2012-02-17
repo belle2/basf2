@@ -39,6 +39,7 @@
 #include "trg/cdc/FrontEnd.h"
 #include "trg/cdc/Merger.h"
 #include "trg/cdc/HoughFinder.h"
+#include "trg/cdc/LUT.h"
 
 //...Global varibles...
 double rr[9]={0.188,0.4016, 0.620,0.8384,1.0568,0.2934,0.5128,0.7312,0.9496};	//can be replaced with geo-information
@@ -277,6 +278,9 @@ namespace Belle2 {
 	  unsigned ptn = 0;
 	  for (unsigned j = 0; j < nWires; j++) {
 	      const TCTSegment & s = (TCTSegment &) * (* l)[j];
+
+	      //...Example to access LR LUT...
+	      cout << s.LUT()->name() << endl;
 
 	      //...Get hit pattern...
 	      unsigned ptn = s.hitPattern();

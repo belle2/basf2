@@ -238,11 +238,7 @@ TRGCDC::initialize(bool houghFinderPerfect,
             const P3D bp = P3D(cdc2.wireBackwardPosition(i, j).x(),
                                cdc2.wireBackwardPosition(i, j).y(),
                                cdc2.wireBackwardPosition(i, j).z());
-            TCWire * tw = new TCWire(nWires++,
-                                         j,
-                                         layer,
-                                         fp,
-                                         bp);
+            TCWire * tw = new TCWire(nWires++, j, layer, fp, bp);
             _wires.push_back(tw);
             layer->push_back(tw);
         }
@@ -1103,6 +1099,9 @@ TRGCDC::~TRGCDC() {
         delete _hFinder;
     if (_fitter3D)
         delete _fitter3D;
+
+    for (unsigned i = 0; i < _luts.size(); i++)
+	delete _luts[i];
 
 #ifdef TRGCDC_DISPLAY
     if (D)

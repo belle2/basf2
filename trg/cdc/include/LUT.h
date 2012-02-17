@@ -66,6 +66,12 @@ class TRGCDCLUT {
 
 //-----------------------------------------------------------------------------
 
+inline
+std::string
+TRGCDCLUT::name(void) const {
+    return _name;
+}
+
 
 } // namespace Belle2
 

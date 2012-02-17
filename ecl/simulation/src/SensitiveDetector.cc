@@ -123,13 +123,11 @@ namespace Belle2 {
       if (v.GetName().find("Crystal") != string::npos) {
         int saveIndex = -999;
         saveIndex = saveSimHit(m_cellID, m_thetaID, m_phiID  , m_trackID, pdgCode, (m_startTime + m_endTime) / 2, m_energyDeposit, 1, m_momentum, posCell, m_startPos, postPosition);
-        //      saveIndex = saveSimHit(m_cellID, m_thetaID, m_phiID  , m_trackID, pdgCode,  (m_startTime+m_endTime)/2, m_energyDeposit, 1, postPosition, posCell, postPosition, postPosition);
       }
 
       if (v.GetName().find("Diode") != string::npos) {
         int saveEBIndex = -999;
         saveEBIndex = saveEBSimHit(m_cellID, m_thetaID, m_phiID, m_trackID, pdgCode, (m_startTime + m_endTime) / 2, m_energyDeposit, 1, m_momentum, posCell, m_startPos, postPosition);
-        //      saveEBIndex = saveEBSimHit(m_cellID, m_thetaID, m_phiID  , m_trackID, pdgCode,  (m_startTime+m_endTime)/2, m_energyDeposit, 1, postPosition, posCell, postPosition, postPosition);
       }
 
       //Reset TrackID
@@ -170,22 +168,15 @@ namespace Belle2 {
     new(eclEBArray->AddrAt(m_EBhitNumber)) ECLEBSimHit();
 
 
-    eclEBArray[m_EBhitNumber]->setThetaId(thetaId);
-    eclEBArray[m_EBhitNumber]->setPhiId(phiId);
     eclEBArray[m_EBhitNumber]->setCellId(cellId);
     eclEBArray[m_EBhitNumber]->setTrackId(trackID);
     eclEBArray[m_EBhitNumber]->setPDGCode(pid);
-    eclEBArray[m_EBhitNumber]->setFlightLength(lof);
     eclEBArray[m_EBhitNumber]->setEnergyDep(edep / GeV);
-    eclEBArray[m_EBhitNumber]->setStepLength(FirstStep);
     TVector3 momentum(mom.getX() / GeV, mom.getY() / GeV, mom.getZ() / GeV);
     eclEBArray[m_EBhitNumber]->setMomentum(momentum);
-    TVector3 posCellv(posCell.getX() / cm, posCell.getY() / cm, posCell.getZ() / cm);
-    eclEBArray[m_EBhitNumber]->setPosCell(posCellv);
     TVector3 positionIn(posIn.getX() / cm, posIn.getY() / cm, posIn.getZ() / cm);
     eclEBArray[m_EBhitNumber]->setPosIn(positionIn);
-    TVector3 positionOut(posOut.getX() / cm, posOut.getY() / cm, posOut.getZ() / cm);
-    eclEBArray[m_EBhitNumber]->setPosOut(positionOut);
+
     return (m_EBhitNumber);
   }
 
@@ -211,22 +202,15 @@ namespace Belle2 {
 
     m_hitNumber = eclArray->GetLast() + 1;
     new(eclArray->AddrAt(m_hitNumber)) ECLSimHit();
-//    eclArray[m_hitNumber]->setThetaId(thetaId);
-//    eclArray[m_hitNumber]->setPhiId(phiId);
     eclArray[m_hitNumber]->setCellId(cellId);
     eclArray[m_hitNumber]->setTrackId(trackID);
     eclArray[m_hitNumber]->setPDGCode(pid);
     eclArray[m_hitNumber]->setFlightTime(tof / ns);
     eclArray[m_hitNumber]->setEnergyDep(edep / GeV);
-    eclArray[m_hitNumber]->setStepLength(FirstStep);
     TVector3 momentum(mom.getX() / GeV, mom.getY() / GeV, mom.getZ() / GeV);
     eclArray[m_hitNumber]->setMomentum(momentum);
-//    TVector3 posCellv(posCell.getX() / cm, posCell.getY() / cm, posCell.getZ() / cm);
-//    eclArray[m_hitNumber]->setPosCell(posCellv);
     TVector3 positionIn((posIn.getX() + posOut.getX()) / 2 / cm, (posIn.getY() + posOut.getY()) / 2 / cm, (posIn.getZ() + posOut.getZ()) / 2 / cm);
     eclArray[m_hitNumber]->setPosIn(positionIn);
-//    TVector3 positionOut(posOut.getX() / cm, posOut.getY() / cm, posOut.getZ() / cm);
-//    eclArray[m_hitNumber]->setPosOut(positionOut);
     B2DEBUG(150, "HitNumber: " << m_hitNumber);
     eclSimHitRel.add(trackID, m_hitNumber);
     return (m_hitNumber);

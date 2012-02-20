@@ -24,8 +24,6 @@
 
 
 namespace Belle2 {
-  class StoreIter;
-
   /** Write objects from DataStore into a ROOT file.
    *
    *  Please make sure, that you create the same objects in each call of event,
@@ -84,18 +82,13 @@ namespace Belle2 {
 
 
   private:
-    /** Find out, how many objects and arrays, actually are in the datastore.
+    /** Set up branches for the first time.
      *
-     *  Used to fill m_size and m_sizeObj.
-     *
-     *  @return    Number of elements in the respective map.
-     *  @par mapID mapID is 2 times durability plus one for the array maps.
+     *  branchNames[durability] is modified to contain the final list of branches to be written:
+     *  branchNames = elements both in branchNames and in data store, minus excludeBranchNames
+     *  (when branchNames is empty, the intersection is dropped)
      */
-    size_t getSize(const int& mapID);
-
-    /** Configuring the TFile.
-     */
-    void setupTFile();
+    void setupBranches(DataStore::EDurability durability);
 
     /** Fill TTree.
      *
@@ -108,14 +101,17 @@ namespace Belle2 {
 
     /** Switch branch name meaning function.
      *
-     *  This function reads the elements from the respective durability map, eliminates the members
-     *  that are in the inital branchNames vector and returns the remaining ones.
-     *  This way you can give a list of names that should NOT be written out, instead
-     *  of a list of names to be written out.
+     *  Swaps branchNames and excludeBranchNames. Provided for compatibility only.
      *
      *  @param durability Specifies branchNames to be taken.
      */
     void switchBranchNameMeaning(const DataStore::EDurability& durability);
+
+    /** Sorts stringlist alphabetically and removes any duplicates.
+     *
+     *  @return true, if duplicates are found
+     */
+    bool makeBranchNamesUnique(std::vector<std::string> &stringlist) const;
 
 
     //first the steerable variables:
@@ -133,12 +129,19 @@ namespace Belle2 {
      */
     std::string m_treeNames[DataStore::c_NDurabilityTypes];
 
-    /** Array for names of branches, that shall be written out.
+    /** Array for names of branches that should be written out.
      *
      *  Empty vectors result in all branches of the specific durability being written.
      *  These vectors can be configured in the steering file.
      */
     std::vector<std::string> m_branchNames[DataStore::c_NDurabilityTypes];
+
+    /** Array for names of branches that should NOT be written out.
+     *
+     *  This takes precedence over m_branchNames, so if a branch is in both
+     *  m_branchNames[d] and m_excludeBranchNames[d], it is not saved.
+     */
+    std::vector<std::string> m_excludeBranchNames[DataStore::c_NDurabilityTypes];
 
     /** Switch branchNames from inclusion to exclusion lists.
      *
@@ -186,11 +189,14 @@ namespace Belle2 {
     /** ROOT Object ID Restore Counter.*/
     int m_nObjID;
 
-    /** String vector with steering parameter Names for m_treeNames. */
-    std::vector<std::string>  m_steerTreeNames;
+    /** Steering parameter names for m_treeNames. */
+    const static std::string c_SteerTreeNames[DataStore::c_NDurabilityTypes];
 
-    /** String vector with steering parameter Names for m_branchNames. */
-    std::vector<std::string>  m_steerBranchNames;
+    /** Steering parameter names for m_branchNames. */
+    const static std::string c_SteerBranchNames[DataStore::c_NDurabilityTypes];
+
+    /** Steering parameter names for m_excludeBranchNames. */
+    const static std::string c_SteerExcludeBranchNames[DataStore::c_NDurabilityTypes];
 
     /** Vector of parent file IDs. */
     std::vector<int> m_parents;

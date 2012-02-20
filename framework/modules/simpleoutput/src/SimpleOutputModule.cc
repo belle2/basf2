@@ -11,7 +11,6 @@
 #include <framework/modules/simpleoutput/SimpleOutputModule.h>
 
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/StoreMapIter.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/dataobjects/FileMetaData.h>
 #include <framework/core/RandomNumbers.h>
@@ -110,10 +109,6 @@ void SimpleOutputModule::initialize()
     }
 
     m_tree[ii] = new TTree(m_treeNames[ii].c_str(), m_treeNames[ii].c_str());
-
-    // get iterators
-    m_iter[2 * ii] = DataStore::Instance().getObjectIterator(static_cast<DataStore::EDurability>(ii));
-    m_iter[2 * ii + 1] = DataStore::Instance().getArrayIterator(static_cast<DataStore::EDurability>(ii));
 
     if (makeBranchNamesUnique(m_branchNames[ii]))
       B2WARNING(c_SteerBranchNames[ii] << " has duplicate entries.");
@@ -258,10 +253,10 @@ void SimpleOutputModule::fillTree(const DataStore::EDurability& durability)
     // gather the object pointers for this entry
     // no need to reconnect the arrays, as the TClonesArrays aren't deleted
     size_t sizeCounter = 0;
-    const int mapid = 2 * durability;
-    for (m_iter[mapid]->first(); !m_iter[mapid]->isDone(); m_iter[mapid]->next()) {
-      if (binary_search(m_branchNames[durability].begin(), m_branchNames[durability].end(), m_iter[mapid]->key())) {
-        m_objects[durability][sizeCounter] = m_iter[mapid]->value();
+    const DataStore::StoreObjMap& map = DataStore::Instance().getObjectMap(durability);
+    for (DataStore::StoreObjConstIter iter = map.begin(); iter != map.end(); ++iter) {
+      if (binary_search(m_branchNames[durability].begin(), m_branchNames[durability].end(), iter->first)) {
+        m_objects[durability][sizeCounter] = iter->second;
         sizeCounter++;
       }
     }
@@ -280,17 +275,18 @@ void SimpleOutputModule::setupBranches(DataStore::EDurability durability)
   }
 
   std::vector<std::string> branchesToBeSaved;
-  for (int ii = 2 * durability; ii < 2 * durability + 2; ii++) {
-    for (m_iter[ii]->first(); !m_iter[ii]->isDone(); m_iter[ii]->next()) {
-      const std::string& branchName = m_iter[ii]->key();
+  for (int iMap = 0; iMap < 2; iMap++) {
+    //first objects, then arrays
+    const DataStore::StoreObjMap& map = (iMap == 0) ? DataStore::Instance().getObjectMap(durability) : DataStore::Instance().getArrayMap(durability);
+    for (DataStore::StoreObjConstIter iter = map.begin(); iter != map.end(); ++iter) {
+      const std::string& branchName = iter->first;
       //check if branchName is not excluded, and that it's in m_branchNames (which also may be empty for all branches)
       if (!binary_search(m_excludeBranchNames[durability].begin(), m_excludeBranchNames[durability].end(), branchName)
           && (m_branchNames[durability].empty() || binary_search(m_branchNames[durability].begin(), m_branchNames[durability].end(), branchName))) {
         branchesToBeSaved.push_back(branchName);
       }
     }
-    if (ii == 2 * durability) {
-      //we just made a list of all object branches
+    if (iMap == 0) { //we just made a list of all object branches
       m_sizeObj[durability] = branchesToBeSaved.size();
     }
   }
@@ -315,11 +311,13 @@ void SimpleOutputModule::setupBranches(DataStore::EDurability durability)
 
   //loop over all objects/arrays in store and create branches if they're in m_branchNames (=enabled)
   size_t sizeCounter = 0;
-  for (int ii = 2 * durability; ii < 2 * durability + 2; ii++) {
-    for (m_iter[ii]->first(); !m_iter[ii]->isDone(); m_iter[ii]->next()) {
-      if (binary_search(m_branchNames[durability].begin(), m_branchNames[durability].end(), m_iter[ii]->key())) {
-        m_objects[durability][sizeCounter] = m_iter[ii]->value();
-        m_tree[durability]->Branch((m_iter[ii]->key()).c_str(), &(m_objects[durability][sizeCounter]));
+  for (int iMap = 0; iMap < 2; iMap++) {
+    //first objects, then arrays
+    const DataStore::StoreObjMap& map = (iMap == 0) ? DataStore::Instance().getObjectMap(durability) : DataStore::Instance().getArrayMap(durability);
+    for (DataStore::StoreObjConstIter iter = map.begin(); iter != map.end(); ++iter) {
+      if (binary_search(m_branchNames[durability].begin(), m_branchNames[durability].end(), iter->first)) {
+        m_objects[durability][sizeCounter] = iter->second;
+        m_tree[durability]->Branch(iter->first.c_str(), &(m_objects[durability][sizeCounter]));
         sizeCounter++;
       }
     }

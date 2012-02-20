@@ -49,8 +49,7 @@ namespace Belle2 {
 
     /** Setting up of various stuff.
      *
-     *  Opens a file, creates TTree(s), fetches Iterators over the maps of the DataStore,
-     *  sets m_done to false.
+     *  Opens a file and creates TTree(s)
      */
     virtual void initialize();
 
@@ -182,9 +181,6 @@ namespace Belle2 {
 
     /** Pointer to pointer, that can be utilised by the TTree.*/
     TObject** m_objects[DataStore::c_NDurabilityTypes];
-
-    /** Iterators over the maps.*/
-    StoreIter* m_iter[2 * DataStore::c_NDurabilityTypes];
 
     /** ROOT Object ID Restore Counter.*/
     int m_nObjID;

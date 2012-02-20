@@ -11,7 +11,6 @@
 #include "framework/modules/datastore/PrintCollectionsModule.h"
 
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/StoreArray.h>
 #include <framework/dataobjects/EventMetaData.h>
 
 #include <boost/format.hpp>
@@ -75,33 +74,25 @@ void PrintCollectionsModule::printCollections(DataStore::EDurability durability)
   //-----------------------------
   //Print the object information
   //-----------------------------
-  StoreMapIter<DataStore::StoreObjMap>* objectMapIter = DataStore::Instance().getObjectIterator(durability);
-  if (objectMapIter == NULL) return;
-  objectMapIter->first();
-
-  while (!objectMapIter->isDone()) {
-    TObject* currCol = dynamic_cast<TObject*>(objectMapIter->value());
+  const DataStore::StoreObjMap& objMap = DataStore::Instance().getObjectMap(durability);
+  for (DataStore::StoreObjConstIter iter = objMap.begin(); iter != objMap.end(); ++iter) {
+    const TObject* currCol = iter->second;
 
     if (currCol != NULL) {
-      B2INFO(boost::format("(Object)  %1%") % objectMapIter->key());
+      B2INFO(boost::format("(Object)  %1%") % iter->first);
     }
-    objectMapIter->next();
   }
 
 
   //-----------------------------
   //Print the array information
   //-----------------------------
-  StoreMapIter<DataStore::StoreArrayMap>* arrayMapIter = DataStore::Instance().getArrayIterator(durability);
-  if (arrayMapIter == NULL) return;
-  arrayMapIter->first();
-
-  while (!arrayMapIter->isDone()) {
-    TClonesArray* currCol = dynamic_cast<TClonesArray*>(arrayMapIter->value());
+  const DataStore::StoreObjMap& arrayMap = DataStore::Instance().getArrayMap(durability);
+  for (DataStore::StoreObjConstIter iter = arrayMap.begin(); iter != arrayMap.end(); ++iter) {
+    const TClonesArray* currCol = dynamic_cast<TClonesArray*>(iter->second);
 
     if (currCol != NULL) {
-      B2INFO(boost::format("(Array)   %1% %|35t| %2%") % arrayMapIter->key()  % currCol->GetEntriesFast());
+      B2INFO(boost::format("(Array)   %1% %|35t| %2%") % iter->first % currCol->GetEntriesFast());
     }
-    arrayMapIter->next();
   }
 }

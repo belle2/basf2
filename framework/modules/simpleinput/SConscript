@@ -1,5 +1,5 @@
 Import('env')
 
-env['LIBS'] = ['framework', 'dataobjects']
+env['LIBS'] = ['framework', 'dataobjects', 'TreePlayer']
 
 Return('env')

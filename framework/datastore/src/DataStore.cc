@@ -32,18 +32,16 @@ DataStore::DataStore() : m_initializeActive(false)
 void DataStore::clearMaps(const EDurability& durability)
 {
   B2DEBUG(100, "Start deletion process of durability " << durability);
-  for (StoreObjIter iter = m_objectMap[durability].begin(); iter != m_objectMap[durability].end(); iter++) {
+  for (StoreObjIter iter = m_objectMap[durability].begin(); iter != m_objectMap[durability].end(); ++iter) {
     if (iter->second) {
       B2DEBUG(250, iter->second->ClassName() << " is going to be deleted.");
       delete iter->second; // delete object
       iter->second = 0;    // make sure pointer isn't dangling
-      //    delete iter->second.get<1>();
     }
   }
 
-  TClonesArray* array;
-  for (StoreArrayIter iter = m_arrayMap[durability].begin(); iter != m_arrayMap[durability].end(); iter++) {
-    array = static_cast<TClonesArray*>(iter->second);
+  for (StoreObjIter iter = m_arrayMap[durability].begin(); iter != m_arrayMap[durability].end(); ++iter) {
+    TClonesArray* array = static_cast<TClonesArray*>(iter->second);
     if (array) {
       array->Delete();
     }
@@ -51,14 +49,16 @@ void DataStore::clearMaps(const EDurability& durability)
 }
 
 
-StoreMapIter<DataStore::StoreObjMap>*  DataStore:: getObjectIterator(const EDurability& durability)
+StoreMapIter<DataStore::StoreObjMap>*  DataStore::getObjectIterator(const EDurability& durability)
 {
+  B2WARNING("DataStore::getObjectIterator() and the StoreIter class are deprecated! Please use getObjMap() and std:map<>::iterators instead.");
   return new StoreMapIter <DataStore::StoreObjMap> (&m_objectMap[durability]);
 }
 
 
-StoreMapIter<DataStore::StoreArrayMap>*  DataStore:: getArrayIterator(const EDurability& durability)
+StoreMapIter<DataStore::StoreObjMap>*  DataStore::getArrayIterator(const EDurability& durability)
 {
-  return new StoreMapIter <DataStore::StoreArrayMap> (&m_arrayMap[durability]);
+  B2WARNING("DataStore::getArrayIterator() and the StoreIter class are deprecated! Please use getArrayMap() and std:map<>::iterators instead.");
+  return new StoreMapIter <DataStore::StoreObjMap> (&m_arrayMap[durability]);
 }
 

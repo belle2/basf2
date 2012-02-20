@@ -25,6 +25,7 @@ namespace Belle2 {
    *  to iterate over the whole DataStore.
    *
    *  @author <a href="mailto:martin.heck@kit.edu?subject=">Martin Heck</a>
+   *  @deprecated DataStore::getArray/ObjectIterator() and the StoreIter class are deprecated! Please use getObjMap() and std:map<>::iterators instead.
    */
   class StoreIter {
   public:

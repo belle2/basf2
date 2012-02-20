@@ -127,23 +127,27 @@ void SimpleInputModule::initialize()
           if (static_cast<string>(branch->GetClassName()) == "TClonesArray") {
             branch->SetAddress(&(m_objects[ii][iarray + m_sizeObj[ii]]));
             m_objectNames[ii][iarray + m_sizeObj[ii]] = static_cast<string>(branch->GetName());
+
+            DataStore::Instance().storeArray(
+              static_cast<TClonesArray*>(m_objects[ii][iarray + m_sizeObj[ii]]),
+              m_objectNames[ii][iarray + m_sizeObj[ii]],
+              (DataStore::EDurability)ii);
             iarray++;
           } else {
             branch->SetAddress(&(m_objects[ii][iobject]));
             m_objectNames[ii][iobject] = static_cast<string>(branch->GetName());
+
+            DataStore::Instance().storeObject(
+              m_objects[ii][iobject],
+              m_objectNames[ii][iobject],
+              (DataStore::EDurability)ii);
             iobject++;
           }
           branch->GetEntry(0);
         }
       }
     }
-    // Store arrays in the DataStore
-    for (int jj = 0; jj < m_size[ii] - m_sizeObj[ii]; jj++) {
-      DataStore::Instance().storeArray(static_cast<TClonesArray*>(m_objects[ii][jj + m_sizeObj[ii]]), m_objectNames[ii][jj + m_sizeObj[ii]], (DataStore::EDurability)ii);
-    }
   }
-
-  readTree(DataStore::c_Persistent);
 }
 
 
@@ -151,6 +155,7 @@ void SimpleInputModule::beginRun()
 {
   B2DEBUG(200, "beginRun called.");
   readTree(DataStore::c_Run);
+  m_counterNumber[DataStore::c_Run]++;
 }
 
 
@@ -182,11 +187,13 @@ void SimpleInputModule::readTree(const DataStore::EDurability& durability)
 
   // Check if there are still new entries available.
   B2DEBUG(200, "Durability" << durability)
+  if (m_counterNumber[durability] == 0) return; //first entry is read in initialize()
   if (m_counterNumber[durability] >= m_tree[durability]->GetEntriesFast()) return;
 
-  for (int jj = 0; jj < m_size[durability]; jj++) {
+  for (int jj = 0; jj < m_sizeObj[durability]; jj++) {
     m_objects[durability][jj] = 0;
   }
+  //TClonesArray pointers are still valid, no need to zero
 
   //Go again over the branchlist and connect the branches with TObject pointers
   int iobject = 0;
@@ -195,17 +202,13 @@ void SimpleInputModule::readTree(const DataStore::EDurability& durability)
     if (branch) {
       if (static_cast<string>(branch->GetClassName()) != "TClonesArray") {
         branch->SetAddress(&(m_objects[durability][iobject]));
+        DataStore::Instance().storeObject(m_objects[durability][iobject], m_objectNames[durability][iobject], durability);
         iobject++;
       }
 
       //this will also (re)fill the TClonesArrays in the DataStore, we don't need to reassign any pointers
       branch->GetEntry(m_counterNumber[durability]);
     }
-  }
-
-  // Store objects in the DataStore
-  for (int jj = 0; jj < m_sizeObj[durability]; jj++) {
-    DataStore::Instance().storeObject(m_objects[durability][jj], m_objectNames[durability][jj], durability);
   }
 }
 

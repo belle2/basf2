@@ -23,7 +23,6 @@
 //#include <boost/tuple/tuple.hpp>
 
 namespace Belle2 {
-
   /** In the store you can park objects, that have to be accessed by various modules.
    *
    *  The store saves objects together with names and some flags in maps.
@@ -62,11 +61,12 @@ namespace Belle2 {
     // Convenient typedefs.
 //    For later:
 //    typedef std::map<std::string, boost::tuple<TObject*,      ECollectionPropFlags> > StoreObjMap;   /**< Map for TObjects. */
-//    typedef std::map<std::string, boost::tuple<TClonesArray*, ECollectionPropFlags> > StoreArrayMap; /**< Map for TClonesArrays. */
     typedef std::map<std::string, TObject*> StoreObjMap;   /**< Map for TObjects. */
-    typedef std::map<std::string, TClonesArray*> StoreArrayMap; /**< Map for TClonesArrays. */
-    typedef StoreObjMap::iterator   StoreObjIter;             /**< Iterator for TObjectMap. */
-    typedef StoreArrayMap::iterator StoreArrayIter;           /**< Iterator for TClonesArraysMap.*/
+    typedef StoreObjMap::iterator StoreObjIter;             /**< Iterator for a TObject map. */
+    typedef StoreObjMap::const_iterator StoreObjConstIter; /**< const_iterator for a TObject map. */
+
+    //deprecated, for backwards compatibility
+    typedef StoreObjMap StoreArrayMap; /**< Map for TClonesArrays. */
 
     //--------------------------------- Instance ---------------------------------------------------------------
     /** Instance of singleton Store.
@@ -172,6 +172,8 @@ namespace Belle2 {
 
     /** Get an iterator for one of the object maps.
      *
+     *  @deprecated Use getObjectMap() and std::map iterators instead.
+     *
      *  @return            Iterator for the specified map.
      *  @param  durability EDurability type to specify map.
      */
@@ -179,10 +181,28 @@ namespace Belle2 {
 
     /** Get an iterator for one of the TClonesArray maps.
      *
+     *  @deprecated Use getArrayMap() and std::map iterators instead.
+     *
      *  @return            Iterator for the specified map.
      *  @param  durability EDurability type to specify map.
      */
-    StoreMapIter<StoreArrayMap>* getArrayIterator(const EDurability& durability);
+    StoreMapIter<StoreObjMap>* getArrayIterator(const EDurability& durability);
+
+    /** Get a reference to the object map.
+     *
+     *  This should be used together with the map's STL iterators in preference
+     *  to the getObjectIterator() function.*/
+    const StoreObjMap& getObjectMap(EDurability durability) {
+      return m_objectMap[durability];
+    }
+
+    /** Get a reference to the array map.
+     *
+     *  This should be used together with the map's STL iterators in preference
+     *  to the getArrayIterator() function.*/
+    const StoreObjMap& getArrayMap(EDurability durability) {
+      return m_arrayMap[durability];
+    }
 
     //------------------------------ Start and end procedures --------------------------------------------------
     /** Setter for m_initializeActive. */
@@ -222,7 +242,7 @@ namespace Belle2 {
      *  Separate map because of the special properties of the TClonesArray.
      *  Otherwise same as map for the TObjects.
      */
-    StoreArrayMap m_arrayMap[c_NDurabilityTypes];
+    StoreObjMap m_arrayMap[c_NDurabilityTypes];
 
     /** Creating new map slots is only allowed, if this boolean is true. */
     bool m_initializeActive;
@@ -290,11 +310,11 @@ template <class T> bool Belle2::DataStore::handleArray(const std::string& name,
   } else { //map already contains an array
     if (array != 0) { //we have both a new array and an existing one, merge them.
       B2INFO("Found existing array '" << name << "', merging.");
-      array->AbsorbObjects(m_arrayMap[durability][name]);
+      array->AbsorbObjects(static_cast<TClonesArray*>(m_arrayMap[durability][name]));
       delete m_arrayMap[durability][name];
       m_arrayMap[durability][name] = array;
     }
-    array = m_arrayMap[durability][name];
+    array = static_cast<TClonesArray*>(m_arrayMap[durability][name]);
     B2DEBUG(250, "Attaching to existing TClonesArray with name " << name << " and durability " << durability << ".");
 
     //assuming array != 0 (valid unless someone stored a null pointer in the DataStore)

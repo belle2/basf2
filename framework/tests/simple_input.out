@@ -4,9 +4,6 @@
 [INFO] Opened file simple_input.root
 [INFO] Opened tree tree
 [INFO] Opened tree persistent
-[WARNING] m_initializeActive is false while you try to create an object EventMetaData under EDurability 0
-[WARNING] m_initializeActive is false while you try to create an object PXDClustersToPXDDigits under EDurability 0
-[WARNING] m_initializeActive is false while you try to create an object PXDClustersToPXDTrueHits under EDurability 0
 [INFO] ========================================================================
 [INFO] >>> Start new run: 1
 [INFO] ------------------------------------------------------------------------

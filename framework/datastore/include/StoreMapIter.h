@@ -21,7 +21,7 @@ namespace Belle2 {
 
   /** Iterator for DataStore maps.
    *
-   *  This iterator has to be specified with the exact map, that is used.
+   *  This iterator has to be specified with the exact map that is used.
    *  Usually you shouldn't use this class, but the parent class, and only the DataStore has
    *  to create this class internally.
    *
@@ -36,7 +36,7 @@ namespace Belle2 {
      *  @par Map to which this is an iterator.
      */
     StoreMapIter(T* AMap)
-        : m_map(AMap), m_iter(0) {}
+      : m_map(AMap), m_iter(0) {}
 
     /** Destructor. */
     ~StoreMapIter() {}
@@ -47,15 +47,12 @@ namespace Belle2 {
 
 
     /** Point Iterator to next element. */
-    void next() { m_iter++; }
+    void next() { ++m_iter; }
 
 
     /** Check if iterator is through. */
     bool isDone() const {
-      if (m_iter == m_map->end()) {
-        return true;
-      }
-      return false;
+      return m_iter == m_map->end();
     }
 
 
@@ -102,7 +99,11 @@ namespace Belle2 {
       return *this;
     }
 
-    /** Postfix increment operator. */
+    /** Postfix increment operator.
+     *
+     *  As this needs to create a copy of the current state before incrementing,
+     *  you should prefer the prefix operator.
+     */
     StoreMapIter<T> operator++(int) {
       StoreMapIter<T> buffer(*this);
       next();

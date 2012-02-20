@@ -78,9 +78,12 @@ namespace Belle2 {
       m_startEnergy =  preStep.GetKineticEnergy() * Unit::MeV;
       //Reset energy deposit;
       m_energyDeposit = 0;
+      //Reset track lenght;
+      m_trackLength = 0;
     }
     //Update energy deposit
     m_energyDeposit += aStep->GetTotalEnergyDeposit() * Unit::MeV;
+
     m_trackLength += aStep->GetStepLength() * Unit::mm;
 
     //Save Hit if track leaves volume or is killed

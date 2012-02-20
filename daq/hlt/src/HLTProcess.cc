@@ -90,12 +90,8 @@ EHLTStatus HLTProcess::initControl()
 /// @return c_ChildSuccess The process is child process
 EHLTStatus HLTProcess::initSenders()
 {
-  if (m_nodeInfo.type() == "WN")
-    //m_dataOutBuffer = new RingBuffer(boost::lexical_cast<std::string>(static_cast<int>(c_DataInPort)).c_str(), gBufferSize);
-    m_dataOutBuffer = new RingBuffer(gDataInBufferKey.c_str(), gBufferSize);
-  else
-    //m_dataOutBuffer = new RingBuffer(boost::lexical_cast<std::string>(static_cast<int>(c_DataOutPort)).c_str(), gBufferSize);
-    m_dataOutBuffer = new RingBuffer(gDataOutBufferKey.c_str(), gBufferSize);
+  B2INFO("[HLTProcess] \x1b[33mOutgoing ring buffer initializing...\x1b[0m");
+  m_dataOutBuffer = new RingBuffer(gDataOutBufferKey.c_str(), gBufferSize);
 
   for (unsigned int i = 0; i < m_nodeInfo.targetIP().size(); ++i) {
     pid_t pidHLTSender = fork();
@@ -111,7 +107,6 @@ EHLTStatus HLTProcess::initSenders()
 
       HLTSender hltSender(m_nodeInfo.targetIP()[i], port);
       hltSender.createConnection();
-      //hltSender.setBuffer();
       hltSender.setBuffer(gDataOutBufferKey);
 
       while (1) {
@@ -136,12 +131,8 @@ EHLTStatus HLTProcess::initSenders()
 /// @return c_ChildSuccess The process is child process
 EHLTStatus HLTProcess::initReceivers()
 {
-  if (m_nodeInfo.type() == "WN")
-    //m_dataInBuffer = new RingBuffer(boost::lexical_cast<std::string>(static_cast<int>(c_DataOutPort)).c_str(), gBufferSize);
-    m_dataInBuffer = new RingBuffer(gDataInBufferKey.c_str(), gBufferSize);
-  else
-    //m_dataInBuffer = new RingBuffer(boost::lexical_cast<std::string>(static_cast<int>(c_DataInPort)).c_str(), gBufferSize);
-    m_dataInBuffer = new RingBuffer(gDataOutBufferKey.c_str(), gBufferSize);
+  B2INFO("[HLTProcess] \x1b[33mIncoming ring buffer initializing...\x1b[0m");
+  m_dataInBuffer = new RingBuffer(gDataInBufferKey.c_str(), gBufferSize);
 
   for (unsigned int i = 0; i < m_nodeInfo.sourceIP().size(); ++i) {
     pid_t pidHLTReceiver = fork();
@@ -157,7 +148,6 @@ EHLTStatus HLTProcess::initReceivers()
 
       HLTReceiver hltReceiver(port, m_nodeInfo.sourceIP().size());
       hltReceiver.createConnection();
-      //hltReceiver.setBuffer();
       hltReceiver.setBuffer(gDataInBufferKey);
 
       hltReceiver.listening();

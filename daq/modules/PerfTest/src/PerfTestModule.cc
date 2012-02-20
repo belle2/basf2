@@ -28,7 +28,8 @@ REG_MODULE(PerfTest)
 PerfTestModule::PerfTestModule() : Module()
 {
   setDescription("PerfTest module");
-  addParam("outputFileName", m_outputFileName, "output", string("testResult"));
+  addParam("overallOutputFileName", m_overallOutputFileName, "Overall performance output", string("performance.overall.txt"));
+  addParam("eventsOutputFileName", m_eventsOutputFileName, "Events performance output", string("performance.events.txt"));
   //setPropertyFlags(c_Input);
 }
 
@@ -39,6 +40,7 @@ PerfTestModule::~PerfTestModule()
 void PerfTestModule::initialize()
 {
   m_start = clock();
+  m_nEvents = 0;
 }
 
 void PerfTestModule::beginRun()
@@ -47,13 +49,18 @@ void PerfTestModule::beginRun()
 
 void PerfTestModule::event()
 {
-  FILE* fp = fopen(m_outputFileName.c_str(), "a+");
-  clock_t point = clock();
-  double dt = timeDifference(point, m_start);
+  clock_t reference;
+  clock_t now = clock();
 
-  fprintf(fp, "%f\n", dt);
-  B2INFO("======= Elapsed time: " << dt << " ms");
+  if (m_nEvents == 0)
+    reference = m_start;
+  else
+    reference = m_temp;
 
+  double dt = timeDifference(now, reference);
+
+  FILE* fp = fopen(m_eventsOutputFileName.c_str(), "a+");
+  fprintf(fp, "%d\t%f\n", m_nEvents, dt);
   fclose(fp);
 }
 
@@ -64,6 +71,13 @@ void PerfTestModule::endRun()
 
 void PerfTestModule::terminate()
 {
+  clock_t point = clock();
+  double dt = timeDifference(point, m_start);
+
+  B2INFO("====== Total elapsed time: " << dt << " ms");
+  FILE* fp = fopen(m_overallOutputFileName.c_str(), "a+");
+  fprintf(fp, "%d\t%f\n", m_nEvents, dt);
+  fclose(fp);
   B2INFO("PerfTest module: terminate () called");
 }
 

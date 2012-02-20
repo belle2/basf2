@@ -71,7 +71,7 @@ EHLTStatus HLTSender::broadcasting()
   if (m_buffer->numq() <= 0) {
     return c_Success;
   }
-  //B2INFO ("[HLTSender] Start to send data to " << m_destination);
+  B2INFO("[HLTSender] Start to send data to " << m_destination);
 
   char* temp = new char [gMaxReceives + gEOSTag.size()];
   memset(temp, 0, sizeof(char) * (gMaxReceives + gEOSTag.size()));
@@ -83,7 +83,7 @@ EHLTStatus HLTSender::broadcasting()
 
   bool termCode = false;
 
-  //writeFile("test.txt", temp, bufferStatus * 4);
+  writeFile("test.txt", temp, bufferStatus * 4);
   std::string termChecker(temp);
   if (termChecker == gTerminate) {
     B2INFO("\x1b[032m[HLTSender] Termination code taken!\x1b[0m");
@@ -171,7 +171,7 @@ EHLTStatus HLTSender::setBuffer(unsigned int key)
 
 EHLTStatus HLTSender::setBuffer(std::string key)
 {
-  B2INFO("[HLTReceiver] \x1b[32mRing buffer initializing...\x1b[0m");
+  B2INFO("[HLTSender] \x1b[32mRing buffer initializing...\x1b[0m");
   m_buffer = new RingBuffer(key.c_str(), gBufferSize);
 
   return c_Success;

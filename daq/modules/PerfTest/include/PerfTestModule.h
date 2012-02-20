@@ -35,7 +35,12 @@ namespace Belle2 {
 
   private:
     clock_t m_start;
-    std::string m_outputFileName;
+    clock_t m_temp;
+
+    int m_nEvents;
+
+    std::string m_eventsOutputFileName;
+    std::string m_overallOutputFileName;
   };
 
 } // end namespace Belle2

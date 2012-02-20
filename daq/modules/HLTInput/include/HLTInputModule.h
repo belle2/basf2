@@ -33,8 +33,13 @@ namespace Belle2 {
     void writeFile(char* data, int size);
 
   private:
+    std::string m_nodeType;
+
     RingBuffer* m_buffer;
     MsgHandler* m_msgHandler;
+
+    int m_eventsTaken;
+    int m_nDataSources;
   };
 }
 

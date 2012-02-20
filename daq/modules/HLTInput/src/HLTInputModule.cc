@@ -8,6 +8,9 @@ HLTInputModule::HLTInputModule() : Module()
 {
   setDescription("HLTInput module");
   setPropertyFlags(c_Input);
+
+  addParam("nodeType", m_nodeType, std::string("Node type of the node"));
+  addParam("dataSources", m_nDataSources, std::string("# of data sources"), 1);
 }
 
 HLTInputModule::~HLTInputModule()
@@ -17,10 +20,13 @@ HLTInputModule::~HLTInputModule()
 void HLTInputModule::initialize()
 {
   B2INFO("Module HLTInput initializing...");
-  m_buffer = new RingBuffer(boost::lexical_cast<std::string>(static_cast<int>(c_DataOutPort)).c_str(), gBufferSize);
+
+  m_buffer = new RingBuffer(boost::lexical_cast<std::string>(gDataInBufferKey).c_str(), gBufferSize);
 
   m_msgHandler = new MsgHandler(0);
   m_msgHandler->clear();
+
+  m_eventsTaken = 0;
 }
 
 void HLTInputModule::beginRun()
@@ -30,9 +36,13 @@ void HLTInputModule::beginRun()
 
 void HLTInputModule::event()
 {
-  B2INFO("Module HLTInput starts an event");
+  while (getData() == c_TermCalled) {
+    usleep(100);
+  }
+  //getData();
+  m_eventsTaken++;
 
-  getData();
+  B2INFO("[HLTInput] " << m_eventsTaken << " events taken!");
 
   /*
   EHLTStatus status = c_Success;
@@ -68,18 +78,20 @@ EHLTStatus HLTInputModule::getData()
   while ((size = m_buffer->remq((int*)buffer)) <= 0)
     usleep(100);
 
-  writeFile(buffer, size * 4);
+  //writeFile(buffer, size * 4);
 
   std::string termChecker(buffer);
-  if (termChecker == gTerminate)
-    return c_TermCalled;
+  if (termChecker == gTerminate) {
+    m_nDataSources--;
+    if (m_nDataSources == 0)
+      return c_TermCalled;
+    else
+      return c_Success;
+  }
 
   EvtMessage* msg = new EvtMessage(buffer);
   m_msgHandler->decode_msg(msg, objectList, nameList);
 
-  B2INFO("\x1b[33m[HLTInput] Storing data into DataStore..(size="
-         << msg->size() << " bytes)\x1b[0m");
-  msg->type();
   DataStore::EDurability durability = (DataStore::EDurability)(msg->header())->reserved[0];
   int nObjects = msg->header()->reserved[1];
   int nArrays = msg->header()->reserved[2];
@@ -87,25 +99,40 @@ EHLTStatus HLTInputModule::getData()
   B2INFO("\x1b[33m[HLTInput] nObjects = " << nObjects << " / nArrays = " << nArrays << "\x1b[0m");
 
   for (int i = 0; i < nObjects; i++) {
-    if (!DataStore::Instance().storeObject(objectList[i], nameList[i]), durability)
+    //B2INFO ("[HLTInput] Storing object " << nameList[i]);
+    DataStore::Instance().storeObject(objectList[i], nameList[i], durability);
+    /*
+    if (!DataStore::Instance().storeObject(objectList[i], nameList[i], durability)) {
+      B2ERROR ("[HLTInput] Storing object into DataStore failed!");
       return c_FuncError;
+    }
+    */
   }
 
   for (int i = 0; i < nArrays; i++) {
-    if (!DataStore::Instance().storeArray((TClonesArray*)objectList[nObjects + i], nameList[nObjects + i]), durability)
+    //B2INFO ("[HLTInput] Storing array " << nameList[nObjects + i]);
+    DataStore::Instance().storeArray((TClonesArray*)objectList[nObjects + i], nameList[nObjects + i], durability);
+    //DataStore::Instance().storeObject(objectList[nObjects + i], nameList[nObjects + i], durability);
+    /*
+    if (!DataStore::Instance().storeArray((TClonesArray*)objectList[nObjects + i], nameList[nObjects + i], durability)) {
+      B2ERROR ("[HLTInput] Storing array into DataStore failed!");
       return c_FuncError;
+    }
+    */
   }
 
-  B2INFO("\x1b[33m[HLTInput] Received data is stored in DataStore!\x1b[0m");
+  //B2INFO("\x1b[33m[HLTInput] Received data is stored in DataStore!\x1b[0m");
 
+  /*
   if (m_buffer->numq() > 0) {
     B2INFO("[HLTInput] Events existing in the ring buffer (numq=" << m_buffer->numq() << ")");
   } else {
     B2INFO("[HLTInput] No events left in the ring buffer");
   }
+  */
 
-  //return c_Success;
-  return c_TermCalled;
+  return c_Success;
+  //return c_TermCalled;
 }
 
 void HLTInputModule::writeFile(char* data, int size)

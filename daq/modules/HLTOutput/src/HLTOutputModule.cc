@@ -13,6 +13,8 @@ HLTOutputModule::HLTOutputModule() : Module()
   addParam("branchNames", m_branchNames[0], std::string("Names of branches to be written from event"), branchNames);
   addParam("branchNamesRun", m_branchNames[1], std::string("Names of branches to be written from run"), branchNames);
   addParam("branchNamesPersistent", m_branchNames[2], std::string("Names of branches to be written from persistent"), branchNames);
+
+  addParam("nodeType", m_nodeType, std::string("Node type of the node"));
 }
 
 HLTOutputModule::~HLTOutputModule()
@@ -22,7 +24,8 @@ HLTOutputModule::~HLTOutputModule()
 void HLTOutputModule::initialize()
 {
   B2INFO("Module HLTOutput initializing...");
-  m_buffer = new RingBuffer(boost::lexical_cast<std::string>(static_cast<int>(c_DataOutPort)).c_str(), gBufferSize);
+
+  m_buffer = new RingBuffer(boost::lexical_cast<std::string>(gDataOutBufferKey).c_str(), gBufferSize);
   m_msgHandler = new MsgHandler(0);
 
   for (int i = 0; i < DataStore::c_NDurabilityTypes; i++) {
@@ -30,6 +33,8 @@ void HLTOutputModule::initialize()
     m_arrayIterator[i] = DataStore::Instance().getArrayIterator(static_cast<DataStore::EDurability>(i));
     m_done[i] = false;
   }
+
+  m_eventsSent = 0;
 }
 
 void HLTOutputModule::beginRun()
@@ -41,6 +46,8 @@ void HLTOutputModule::event()
 {
   B2INFO("Module HLTOutput starts an event");
   putData(DataStore::c_Event);
+  m_eventsSent++;
+  B2INFO("[HLTOutput] " << m_eventsSent << " events sent!");
 }
 
 void HLTOutputModule::endRun()
@@ -64,11 +71,13 @@ void HLTOutputModule::putData(const DataStore::EDurability& durability)
 
   while (!m_objectIterator[durability]->isDone()) {
     if (m_branchNames[durability].size() == 0) {
+      B2INFO("[HLTOutput] Withdraw object " << m_objectIterator[durability]->key());
       m_msgHandler->add(m_objectIterator[durability]->value(), m_objectIterator[durability]->key());
       nObjects++;
     } else {
       for (unsigned int i = 0; i < m_branchNames[durability].size(); i++) {
         if (m_branchNames[durability][i] == m_objectIterator[durability]->key()) {
+          B2INFO("[HLTOutput] Withdraw object " << m_objectIterator[durability]->key());
           m_msgHandler->add(m_objectIterator[durability]->value(), m_objectIterator[durability]->key());
           nObjects++;
         }
@@ -83,11 +92,13 @@ void HLTOutputModule::putData(const DataStore::EDurability& durability)
 
   while (!m_arrayIterator[durability]->isDone()) {
     if (m_branchNames[durability].size() == 0) {
+      B2INFO("[HLTOutput] Withdraw array " << m_arrayIterator[durability]->key());
       m_msgHandler->add(m_arrayIterator[durability]->value(), m_arrayIterator[durability]->key());
       nArrays++;
     } else {
       for (unsigned int i = 0; i < m_branchNames[durability].size(); i++) {
         if (m_branchNames[durability][i] == m_arrayIterator[durability]->key()) {
+          B2INFO("[HLTOutput] Withdraw array " << m_arrayIterator[durability]->key());
           m_msgHandler->add(m_arrayIterator[durability]->value(), m_arrayIterator[durability]->key());
           nArrays++;
         }
@@ -105,10 +116,10 @@ void HLTOutputModule::putData(const DataStore::EDurability& durability)
   std::string sendingData(msg->buffer());
   B2INFO("\x1b[33m[HLTOutput] nObjects = " << nObjects << " / nArrays = " << nArrays << "\x1b[0m");
 
-  writeFile(msg->buffer(), msg->size());
+  //writeFile(msg->buffer(), msg->size());
   //testData (msg->buffer ());
 
-  B2INFO("[HLTOutput] Put an event into the ring buffer");
+  //B2INFO("[HLTOutput] Put an event into the ring buffer");
   while (m_buffer->insq((int*)msg->buffer(), msg->size() / 4 + 1) <= 0) {
     usleep(100);
   }

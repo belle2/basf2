@@ -40,6 +40,9 @@ namespace Belle2 {
     RingBuffer* m_buffer;
     MsgHandler* m_msgHandler;
 
+    std::string m_nodeType;
+    int m_eventsSent;
+
     std::vector<std::string> m_branchNames[DataStore::c_NDurabilityTypes];
     bool m_done[DataStore::c_NDurabilityTypes];
     StoreIter* m_objectIterator[DataStore::c_NDurabilityTypes];

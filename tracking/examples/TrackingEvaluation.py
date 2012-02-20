@@ -51,18 +51,14 @@ geometry.param('Components', ['MagneticField', 'BeamPipe', 'PXD', 'SVD', 'CDC'
 # shoot particles in the detector
 pGun = register_module('ParticleGun')
 
-# generate a random seed for the simulation
-import random
-intseed = random.randint(1, 10000000)
-
 # choose the particles you want to simulate
 param_pGun = {
     'pdgCodes': [211, -211],
-    'randomSeed': intseed,
     'nTracks': 4,
+    'varyNTracks': 0,
     'momentumGeneration': 'uniform',
     'momentumParams': [0.4, 1.6],
-    'thetaGeneration': 'fixed',
+    'thetaGeneration': 'uniform',
     'thetaParams': [60., 120.],
     'phiGeneration': 'uniform',
     'phiParams': [0, 360],

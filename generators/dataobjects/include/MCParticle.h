@@ -88,16 +88,16 @@ namespace Belle2 {
      */
     MCParticle():
 
-        m_plist(0), m_index(0), m_status(0),
-        m_pdg(0), m_mass(0), m_charge(-10), m_energy(0),
-        m_momentum_x(0), m_momentum_y(0), m_momentum_z(0),
-        m_validVertex(false), m_productionTime(0),
-        m_productionVertex_x(0), m_productionVertex_y(0),
-        m_productionVertex_z(0),
-        m_decayTime(0), m_decayVertex_x(0),
-        m_decayVertex_y(0), m_decayVertex_z(0),
-        m_mother(0),
-        m_firstDaughter(0), m_lastDaughter(0), m_spinType(c_NOTSET) {}
+      m_plist(0), m_index(0), m_status(0),
+      m_pdg(0), m_mass(0), m_charge(-10), m_energy(0),
+      m_momentum_x(0), m_momentum_y(0), m_momentum_z(0),
+      m_validVertex(false), m_productionTime(0),
+      m_productionVertex_x(0), m_productionVertex_y(0),
+      m_productionVertex_z(0),
+      m_decayTime(0), m_decayVertex_x(0),
+      m_decayVertex_y(0), m_decayVertex_z(0),
+      m_mother(0),
+      m_firstDaughter(0), m_lastDaughter(0), m_spinType(c_NOTSET) {}
 
     /**
      * Construct MCParticle from a another MCParticle and the TClonesArray it is stored in.
@@ -108,16 +108,16 @@ namespace Belle2 {
      * @see class MCParticleGraph
      */
     MCParticle(TClonesArray* plist, const MCParticle& p):
-        m_plist(plist), m_index(p.m_index), m_status(p.m_status),
-        m_pdg(p.m_pdg), m_mass(p.m_mass), m_charge(p.m_charge), m_energy(p.m_energy),
-        m_momentum_x(p.m_momentum_x), m_momentum_y(p.m_momentum_y), m_momentum_z(p.m_momentum_z),
-        m_validVertex(p.m_validVertex), m_productionTime(p.m_productionTime),
-        m_productionVertex_x(p.m_productionVertex_x), m_productionVertex_y(p.m_productionVertex_y),
-        m_productionVertex_z(p.m_productionVertex_z),
-        m_decayTime(p.m_decayTime), m_decayVertex_x(p.m_decayVertex_x),
-        m_decayVertex_y(p.m_decayVertex_y), m_decayVertex_z(p.m_decayVertex_z),
-        m_mother(p.m_mother),
-        m_firstDaughter(p.m_firstDaughter), m_lastDaughter(p.m_lastDaughter) {}
+      m_plist(plist), m_index(p.m_index), m_status(p.m_status),
+      m_pdg(p.m_pdg), m_mass(p.m_mass), m_charge(p.m_charge), m_energy(p.m_energy),
+      m_momentum_x(p.m_momentum_x), m_momentum_y(p.m_momentum_y), m_momentum_z(p.m_momentum_z),
+      m_validVertex(p.m_validVertex), m_productionTime(p.m_productionTime),
+      m_productionVertex_x(p.m_productionVertex_x), m_productionVertex_y(p.m_productionVertex_y),
+      m_productionVertex_z(p.m_productionVertex_z),
+      m_decayTime(p.m_decayTime), m_decayVertex_x(p.m_decayVertex_x),
+      m_decayVertex_y(p.m_decayVertex_y), m_decayVertex_z(p.m_decayVertex_z),
+      m_mother(p.m_mother),
+      m_firstDaughter(p.m_firstDaughter), m_lastDaughter(p.m_lastDaughter) {}
 
     /**
      * Return PDG code of particle.

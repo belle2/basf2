@@ -79,13 +79,13 @@ namespace Belle2 {
        * Tells the graph that this particle decays into daughter.
        * @param daughter The daughter particle in which this particle decays.
        */
-      void decaysInto(GraphParticle &daughter) { m_graph->addDecay(*this, daughter); }
+      void decaysInto(GraphParticle& daughter) { m_graph->addDecay(*this, daughter); }
 
       /**
        * Tells the graph that this particle is a decay product of mother.
        * @param mother The mother particle of this particle.
        */
-      void comesFrom(GraphParticle &mother) { m_graph->addDecay(mother, *this); }
+      void comesFrom(GraphParticle& mother) { m_graph->addDecay(mother, *this); }
 
       /**
        * Set the 1-based index of the first daughter, 0 means no daughters.
@@ -141,12 +141,12 @@ namespace Belle2 {
        * No copying allowed.
        * @param copy Reference to the particle which should be copied.
        */
-      GraphParticle(const GraphParticle &copy) {}
+      GraphParticle(const GraphParticle& copy) {}
 
       /**
        * Hide MCParticle "almost copy" constructor.
        */
-      GraphParticle(TClonesArray* plist, const MCParticle &mc) {}
+      GraphParticle(TClonesArray* plist, const MCParticle& mc) {}
 
       /**
        * Internally used constructor. Create a new Particle with given index and a pointer
@@ -155,7 +155,7 @@ namespace Belle2 {
        * @param index The vertex id of the particle in the graph.
        */
       GraphParticle(MCParticleGraph* graph, unsigned int vertexId): MCParticle(),
-          m_graph(graph), m_vertexId(vertexId), m_ignore(false), m_primary(true), m_trackID(0) {}
+        m_graph(graph), m_vertexId(vertexId), m_ignore(false), m_primary(true), m_trackID(0) {}
 
       /**
        * Set the 1-based index of the particle.
@@ -257,7 +257,7 @@ namespace Belle2 {
   inline MCParticleGraph::GraphParticle& MCParticleGraph::addParticle()
   {
     unsigned int index = m_particles.size() + 1;
-    MCParticleGraph::GraphParticle *p = new(m_particles.add()) MCParticleGraph::GraphParticle(this, index);
+    MCParticleGraph::GraphParticle* p = new(m_particles.add()) MCParticleGraph::GraphParticle(this, index);
     return *p;
   }
 

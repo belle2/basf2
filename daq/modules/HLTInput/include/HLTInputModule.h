@@ -35,7 +35,9 @@ namespace Belle2 {
   private:
     std::string m_nodeType;
 
-    RingBuffer* m_buffer;
+    RingBuffer* m_inBuffer;
+    RingBuffer* m_outBuffer;
+
     MsgHandler* m_msgHandler;
 
     int m_eventsTaken;

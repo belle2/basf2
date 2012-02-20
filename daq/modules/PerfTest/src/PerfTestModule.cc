@@ -62,6 +62,9 @@ void PerfTestModule::event()
   FILE* fp = fopen(m_eventsOutputFileName.c_str(), "a+");
   fprintf(fp, "%d\t%f\n", m_nEvents, dt);
   fclose(fp);
+
+  m_nEvents++;
+  m_temp = clock();
 }
 
 void PerfTestModule::endRun()

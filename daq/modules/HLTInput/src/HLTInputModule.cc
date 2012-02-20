@@ -21,7 +21,8 @@ void HLTInputModule::initialize()
 {
   B2INFO("Module HLTInput initializing...");
 
-  m_buffer = new RingBuffer(boost::lexical_cast<std::string>(gDataInBufferKey).c_str(), gBufferSize);
+  m_inBuffer = new RingBuffer(boost::lexical_cast<std::string>(gDataInBufferKey).c_str(), gBufferSize);
+  m_outBuffer = new RingBuffer(boost::lexical_cast<std::string>(gDataOutBufferKey).c_str(), gBufferSize);
 
   m_msgHandler = new MsgHandler(0);
   m_msgHandler->clear();
@@ -36,10 +37,12 @@ void HLTInputModule::beginRun()
 
 void HLTInputModule::event()
 {
-  while (getData() == c_TermCalled) {
-    usleep(100);
+  /*
+  while (getData () == c_TermCalled) {
+    usleep (100);
   }
-  //getData();
+  */
+  getData();
   m_eventsTaken++;
 
   B2INFO("[HLTInput] " << m_eventsTaken << " events taken!");
@@ -75,18 +78,28 @@ EHLTStatus HLTInputModule::getData()
   memset(buffer, 0, gMaxReceives);
 
   int size = 0;
-  while ((size = m_buffer->remq((int*)buffer)) <= 0)
+  while ((size = m_inBuffer->remq((int*)buffer)) <= 0)
     usleep(100);
 
   //writeFile(buffer, size * 4);
 
   std::string termChecker(buffer);
-  if (termChecker == gTerminate) {
+  while (termChecker == gTerminate) {
+    B2INFO("\x1b[34m[HLTInput] Termination requested\x1b[0m");
+    while (m_outBuffer->insq((int*)gTerminate.c_str(), gTerminate.size() / 4 + 1) <= 0) {
+      usleep(100);
+    }
     m_nDataSources--;
-    if (m_nDataSources == 0)
+    if (m_nDataSources == 0) {
+      B2INFO("\x1b[34m[HLTInput] All data taken. Terminating...\x1b[0m");
       return c_TermCalled;
-    else
-      return c_Success;
+    } else {
+      B2INFO("\x1b[34m[HLTInput] " << m_nDataSources << " more data sources are left...\x1b[0m");
+      while ((size = m_inBuffer->remq((int*)buffer)) <= 0)
+        usleep(100);
+      termChecker = std::string(buffer);
+      //return c_Success;
+    }
   }
 
   EvtMessage* msg = new EvtMessage(buffer);

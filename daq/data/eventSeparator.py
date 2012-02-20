@@ -12,7 +12,7 @@ seqRootOutput = fw.register_module('SeqRootOutput')
 perfTest = fw.register_module('PerfTest')
 
 # Parameter settings
-evtMetaGen.param('EvtNumList', [100])
+evtMetaGen.param('EvtNumList', [10])
 particleGun.param('nTracks', 10)
 particleGun.param('PIDcodes', [-11, 11])
 particleGun.param('pPar1', 0.05)

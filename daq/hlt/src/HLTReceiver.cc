@@ -111,7 +111,7 @@ EHLTStatus HLTReceiver::listening()
 
           givenMessageIndex += givenMessageSizes[i];
           if (!strcmp(givenMessage, gTerminate.c_str())) {
-            B2INFO("\x1b[31m[HLTReceiver] Terminate tag met\x1b[0m");
+            B2INFO("\x1b[31m[HLTReceiver] Terminate tag met2\x1b[0m");
             if (m_buffer->insq((int*)gTerminate.c_str(), gTerminate.size() / 4 + 1) <= 0) {
               usleep(100);
             }

@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef trueHitTesterModule_H_
-#define trueHitTesterModule_H_
+#ifndef TrueHitTesterModule_H_
+#define TrueHitTesterModule_H_
 
 #include <framework/core/Module.h>
 
@@ -36,15 +36,15 @@
 
 namespace Belle2 {
 
-  class trueHitTesterModule : public Module {
+  class TrueHitTesterModule : public Module {
 
   public:
 
     //! Constructor
-    trueHitTesterModule();
+    TrueHitTesterModule();
 
     //! Destructor
-    virtual ~trueHitTesterModule();
+    virtual ~TrueHitTesterModule();
 
     //! Initialize the Module
     /*! Function is called only once at the beginning of your job at the beginning of the corresponding module.
@@ -92,7 +92,8 @@ namespace Belle2 {
     void fillTrackWiseVecData(const std::string& nameOfDataSample, const std::vector<double>& newData);
     void fillTrackWiseData(const std::string& nameOfDataSample, const double newData);
     std::vector<double> rootVecToStdVec(TMatrixT<double>& rootVector);
-
+    //for root output
+    std::string m_dataOutFileName;
     TFile* m_rootFilePtr;
     TTree* m_trueHitDataTreePtr;
 
@@ -104,7 +105,6 @@ namespace Belle2 {
     int m_nLayers; // number of Si layers. That is 6 of course.
     int m_nPxdLayers; // number of PXD layer (2) so number of SVD layers will be m_nSiLayers - m_nPxdLayers
     int m_nSvdLayers;
-    std::string m_dataOutFileName;
 
     bool m_filter;
 
@@ -114,4 +114,4 @@ namespace Belle2 {
   };
 }
 
-#endif /* trueHitTesterModule_H_ */
+#endif /* TrueHitTesterModule_H_ */

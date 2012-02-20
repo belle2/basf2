@@ -8,7 +8,7 @@
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
 
-#include <tracking/modules/trueHitTester/trueHitTesterModule.h>
+#include <tracking/modules/trueHitTester/TrueHitTesterModule.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <generators/dataobjects/MCParticle.h>
@@ -21,6 +21,7 @@
 #include <framework/dataobjects/EventMetaData.h>
 #include <vxd/geometry/GeoCache.h>
 #include <vxd/VxdID.h>
+#include <vxd/dataobjects/VXDTrueHit.h>
 
 using namespace std;
 using namespace Belle2;
@@ -28,13 +29,13 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(trueHitTester)
+REG_MODULE(TrueHitTester)
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-trueHitTesterModule::trueHitTesterModule() : Module()
+TrueHitTesterModule::TrueHitTesterModule() : Module()
 {
 //Set module properties
   setDescription("tests impact of material effects on tracks with simulated true hits");
@@ -46,12 +47,12 @@ trueHitTesterModule::trueHitTesterModule() : Module()
 }
 
 
-trueHitTesterModule::~trueHitTesterModule()
+TrueHitTesterModule::~TrueHitTesterModule()
 {
 
 }
 
-void trueHitTesterModule::initialize()
+void TrueHitTesterModule::initialize()
 {
   m_nPxdLayers = 2;
   m_nSvdLayers = 4;
@@ -62,6 +63,7 @@ void trueHitTesterModule::initialize()
 
   registerLayerWiseData("deltaEs", 2);
   registerLayerWiseData("deltaTrackParas", 5);
+  registerLayerWiseData("angles", 2);
 
   m_notPerfectCounter = 0;
 
@@ -69,34 +71,32 @@ void trueHitTesterModule::initialize()
 }
 
 
-void trueHitTesterModule::beginRun()
+void TrueHitTesterModule::beginRun()
 {
 
 }
 
 
-void trueHitTesterModule::event()
+void TrueHitTesterModule::event()
 {
 
-  StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
-  int eventCounter = eventMetaDataPtr->getEvent();
+  //StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
+  //int eventCounter = eventMetaDataPtr->getEvent();
 
-//simulated particles and hits
+  //simulated particles and hits
   StoreArray<MCParticle> aMcParticleArray("");
   int nMcParticles = aMcParticleArray.getEntries();
 
   StoreArray<PXDTrueHit> aPxdTrueHitArray("");
   int nPxdTrueHits = aPxdTrueHitArray.getEntries();
-//cout << "nPxdTrueHits " <<  nPxdTrueHits << "\n";
   StoreArray<SVDTrueHit> aSvdTrueHitArray("");
   int nSvdTrueHits = aSvdTrueHitArray.getEntries();
-//cout << "nSvdTrueHits " <<  nSvdTrueHits << "\n";
   RelationIndex<MCParticle, PXDTrueHit> relMcPxdTrueHit;
   int sizeRelMcPxdTrueHit = relMcPxdTrueHit.size();
   RelationIndex<MCParticle, SVDTrueHit> relMcSvdTrueHit;
   int sizeRelMcSvdTrueHit = relMcSvdTrueHit.size();
 
-  //Filter
+  //select only tracks with on
   bool filterEvent = false;
   if (m_filter == true) {
     // for the filter function to get only tracks that hits specific layers
@@ -144,14 +144,24 @@ void trueHitTesterModule::event()
         //double pVertex = aMcParticlePtr->getMomentum();
         double energyLastHit = aMcParticlePtr->getEnergy() + mass;
         RelationIndex<MCParticle, PXDTrueHit>::range_from iterPairMcPxd = relMcPxdTrueHit.getFrom(aMcParticlePtr);
-        while (iterPairMcPxd.first not_eq iterPairMcPxd.second) {
-          const PXDTrueHit* const aSiTrueHitPtr = iterPairMcPxd.first->to;
-          float deltaE = aSiTrueHitPtr->getEnergyDep();
-          int layerId = aSiTrueHitPtr->getSensorID().getLayer();
-          TVector3 pTrueIn = aSiTrueHitPtr->getEntryMomentum();
-          TVector3 pTrueOut = aSiTrueHitPtr->getExitMomentum();
-          TVector3 pTrue = aSiTrueHitPtr->getMomentum();
+        RelationIndex<MCParticle, SVDTrueHit>::range_from iterPairMcSvd = relMcSvdTrueHit.getFrom(aMcParticlePtr);
+        VXDTrueHit const* aVxdTrueHitPtr = NULL;
+        const int sumOfRelSizes = sizeRelMcPxdTrueHit + sizeRelMcSvdTrueHit;
+        for (int i = 0; i not_eq sumOfRelSizes; ++i) {
+          if (i < sizeRelMcPxdTrueHit) {
+            aVxdTrueHitPtr = static_cast<VXDTrueHit const*>(iterPairMcPxd.first->to);
+            ++iterPairMcPxd.first;
+          } else {
+            aVxdTrueHitPtr = static_cast<VXDTrueHit const*>(iterPairMcSvd.first->to);
+            ++iterPairMcSvd.first;
+          }
+          float deltaE = aVxdTrueHitPtr->getEnergyDep();
+          int layerId = aVxdTrueHitPtr->getSensorID().getLayer();
+          TVector3 pTrueIn = aVxdTrueHitPtr->getEntryMomentum();
+          TVector3 pTrueOut = aVxdTrueHitPtr->getExitMomentum();
+          TVector3 pTrue = aVxdTrueHitPtr->getMomentum();
           int vecIndex = layerId - 1;
+
           double energy = sqrt(pTrueOut.Mag() * pTrueOut.Mag() + mass * mass);
           double deltaEFromMom = energyLastHit - energy;
           energyLastHit = energy;
@@ -159,7 +169,8 @@ void trueHitTesterModule::event()
           dataSample.push_back(deltaEFromMom);
           fillLayerWiseData("deltaEs", vecIndex, dataSample);
           dataSample.clear();
-          //VxdID aSensorId = aSiTrueHitPtr->getSensorID();
+
+          //VxdID aSensorId = aVxdTrueHitPtr->getSensorID();
           //TVector3 deltaP = pTrueOut - pTrueIn;
           //pTrueIn.Print();
           //pTrueOut.Print();
@@ -171,11 +182,12 @@ void trueHitTesterModule::event()
           //pTrueOutGlobal.Print();
           //cout << "q,p " << qTrue << " "; pTrue.Print();
           //cout << "the others"; pTrueIn.Print(); pTrueOut.Print();
+
           trueState[0][0] = qTrue / pTrue.Mag();
           trueState[1][0] = pTrue[0] / pTrue[2];
           trueState[2][0] = pTrue[1] / pTrue[2];
-          trueState[3][0] = aSiTrueHitPtr->getU();
-          trueState[4][0] = aSiTrueHitPtr->getV();
+          trueState[3][0] = aVxdTrueHitPtr->getU();
+          trueState[4][0] = aVxdTrueHitPtr->getV();
           trueStateIn[0][0] = qTrue / pTrueIn.Mag();
           trueStateIn[1][0] = pTrueIn[0] / pTrueIn[2];
           trueStateIn[2][0] = pTrueIn[1] / pTrueIn[2];
@@ -184,38 +196,11 @@ void trueHitTesterModule::event()
           trueStateOut[2][0] = pTrueOut[1] / pTrueOut[2];
           TMatrixT<double> deltaTrueState = trueStateOut - trueStateIn;
           fillLayerWiseData("deltaTrackParas", vecIndex, rootVecToStdVec(deltaTrueState));
-          ++iterPairMcPxd.first;
-        }
-        RelationIndex<MCParticle, SVDTrueHit>::range_from iterPairMcSvd = relMcSvdTrueHit.getFrom(aMcParticlePtr);
-        while (iterPairMcSvd.first not_eq iterPairMcSvd.second) {
-          const SVDTrueHit* const aSiTrueHitPtr = iterPairMcSvd.first->to;
-          float deltaE = aSiTrueHitPtr->getEnergyDep();
-          int layerId = aSiTrueHitPtr->getSensorID().getLayer();
-          TVector3 pTrueIn = aSiTrueHitPtr->getEntryMomentum();
-          TVector3 pTrueOut = aSiTrueHitPtr->getExitMomentum();
-          TVector3 pTrue = aSiTrueHitPtr->getMomentum();
-          int vecIndex = layerId - 1;
-          double energy = sqrt(pTrueOut.Mag() * pTrueOut.Mag() + mass * mass);
-          double deltaEFromMom = energyLastHit - energy;
-          energyLastHit = energy;
-          dataSample.push_back(deltaE);
-          dataSample.push_back(deltaEFromMom);
-          fillLayerWiseData("deltaEs", vecIndex, dataSample);
+
+          dataSample.push_back(pTrueOut.Phi() - pTrueIn.Phi());
+          dataSample.push_back(pTrueOut.Theta() - pTrueIn.Theta());
+          fillLayerWiseData("angles", vecIndex, dataSample);
           dataSample.clear();
-          trueState[0][0] = qTrue / pTrue.Mag();
-          trueState[1][0] = pTrue[0] / pTrue[2];
-          trueState[2][0] = pTrue[1] / pTrue[2];
-          trueState[3][0] = aSiTrueHitPtr->getU();
-          trueState[4][0] = aSiTrueHitPtr->getV();
-          trueStateIn[0][0] = qTrue / pTrueIn.Mag();
-          trueStateIn[1][0] = pTrueIn[0] / pTrueIn[2];
-          trueStateIn[2][0] = pTrueIn[1] / pTrueIn[2];
-          trueStateOut[0][0] = qTrue / pTrueOut.Mag();
-          trueStateOut[1][0] = pTrueOut[0] / pTrueOut[2];
-          trueStateOut[2][0] = pTrueOut[1] / pTrueOut[2];
-          TMatrixT<double> deltaTrueState = trueStateOut - trueStateIn;
-          fillLayerWiseData("deltaTrackParas", vecIndex, rootVecToStdVec(deltaTrueState));
-          ++iterPairMcSvd.first;
         }
         m_trueHitDataTreePtr->Fill();
       }
@@ -224,7 +209,7 @@ void trueHitTesterModule::event()
   }
 }
 
-void trueHitTesterModule::endRun()
+void TrueHitTesterModule::endRun()
 {
   if (m_notPerfectCounter != 0) {
     B2WARNING(m_notPerfectCounter << " tracks had not exactly on hit in every layer and were not written to the TTree");
@@ -232,7 +217,7 @@ void trueHitTesterModule::endRun()
 }
 
 
-void trueHitTesterModule::terminate()
+void TrueHitTesterModule::terminate()
 {
   m_rootFilePtr->cd();
   m_trueHitDataTreePtr->Write();
@@ -248,7 +233,7 @@ void trueHitTesterModule::terminate()
 
 
 
-void trueHitTesterModule::registerLayerWiseData(const string& nameOfDataSample, const int nVarsToTest)
+void TrueHitTesterModule::registerLayerWiseData(const string& nameOfDataSample, const int nVarsToTest)
 {
 
   m_layerWiseDataForRoot[nameOfDataSample] = new Belle2::LayerWiseData(m_nLayers, nVarsToTest);
@@ -256,7 +241,7 @@ void trueHitTesterModule::registerLayerWiseData(const string& nameOfDataSample, 
 
 }
 
-void trueHitTesterModule::fillLayerWiseData(const string& nameOfDataSample, const int accuVecIndex, const vector<double>& newData)
+void TrueHitTesterModule::fillLayerWiseData(const string& nameOfDataSample, const int accuVecIndex, const vector<double>& newData)
 {
   const int nNewData = newData.size();
   for (int i = 0; i not_eq nNewData; ++i) {
@@ -264,7 +249,7 @@ void trueHitTesterModule::fillLayerWiseData(const string& nameOfDataSample, cons
   }
 }
 
-void trueHitTesterModule::fillTrackWiseVecData(const string& nameOfDataSample, const vector<double>& newData)
+void TrueHitTesterModule::fillTrackWiseVecData(const string& nameOfDataSample, const vector<double>& newData)
 {
   const int nNewData = newData.size();
   for (int i = 0; i not_eq nNewData; ++i) {
@@ -273,14 +258,14 @@ void trueHitTesterModule::fillTrackWiseVecData(const string& nameOfDataSample, c
 
 }
 
-void trueHitTesterModule::fillTrackWiseData(const string& nameOfDataSample, const double newData)
+void TrueHitTesterModule::fillTrackWiseData(const string& nameOfDataSample, const double newData)
 {
 
   *(m_trackWiseDataForRoot[nameOfDataSample]) = float(newData);
 
 }
 
-vector<double> trueHitTesterModule::rootVecToStdVec(TMatrixT<double>&  rootVector)
+vector<double> TrueHitTesterModule::rootVecToStdVec(TMatrixT<double>&  rootVector)
 {
   int n = rootVector.GetNrows();
   vector<double> stdVec(n);

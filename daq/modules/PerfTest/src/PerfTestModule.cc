@@ -16,37 +16,42 @@
 using namespace std;
 using namespace Belle2;
 
-//-----------------------------------------------------------------
-//                 Register the Module
-//-----------------------------------------------------------------
 REG_MODULE(PerfTest)
 
-//-----------------------------------------------------------------
-//                 Implementation
-//-----------------------------------------------------------------
-
+/* @brief PerfTestModule constructor
+ * This initializes member variables from given parameters
+*/
 PerfTestModule::PerfTestModule() : Module()
 {
   setDescription("PerfTest module");
   addParam("overallOutputFileName", m_overallOutputFileName, "Overall performance output", string("performance.overall.txt"));
   addParam("eventsOutputFileName", m_eventsOutputFileName, "Events performance output", string("performance.events.txt"));
-  //setPropertyFlags(c_Input);
 }
 
+/// @brief PerfTestModule destructor
 PerfTestModule::~PerfTestModule()
 {
 }
 
+/* @brief Initialize the module
+ * This records the start time
+*/
 void PerfTestModule::initialize()
 {
   m_start = clock();
   m_nEvents = 0;
 }
 
+/// @brief Begin a run
 void PerfTestModule::beginRun()
 {
 }
 
+/* @brief Process an event
+ * If it is the first event, the processing time per event is calculated from the
+ * difference between the start time and the current time. Otherwise, it is calculated
+ * from an arbitrary time in m_temp which is recorded at the end of an event processing.
+*/
 void PerfTestModule::event()
 {
   clock_t reference;
@@ -67,11 +72,15 @@ void PerfTestModule::event()
   m_temp = clock();
 }
 
+/// @brief End a run
 void PerfTestModule::endRun()
 {
   B2INFO("PerfTest module: endRun () ends");
 }
 
+/* @brief Terminate the module
+ * This calculates the total elapsed time and records it.
+*/
 void PerfTestModule::terminate()
 {
   clock_t point = clock();
@@ -84,6 +93,12 @@ void PerfTestModule::terminate()
   B2INFO("PerfTest module: terminate () called");
 }
 
+/* @brief Calculate time different between two points, point - start.
+ * The unit of time is milliseconds (ms)
+*/
+/// @param point Current time
+/// @param start Reference time
+/// @return Time difference between two points in unit of ms
 double PerfTestModule::timeDifference(clock_t point, clock_t start)
 {
   double ticks = point - start;

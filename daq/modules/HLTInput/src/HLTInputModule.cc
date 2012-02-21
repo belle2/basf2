@@ -1,9 +1,22 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2010 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Soohyung Lee                                             *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
 #include <daq/modules/HLTInput/HLTInputModule.h>
 
 using namespace Belle2;
 
 REG_MODULE(HLTInput)
 
+/* @brief HLTInputModule constructor
+ * This initializes member variables from given parameters
+*/
 HLTInputModule::HLTInputModule() : Module()
 {
   setDescription("HLTInput module");
@@ -13,10 +26,14 @@ HLTInputModule::HLTInputModule() : Module()
   addParam("dataSources", m_nDataSources, std::string("# of data sources"), 1);
 }
 
+/// @brief HLTInputModule destructor
 HLTInputModule::~HLTInputModule()
 {
 }
 
+/* @brief Initialize the module
+ * This sets related components like ring buffer and MsgHandler
+*/
 void HLTInputModule::initialize()
 {
   B2INFO("Module HLTInput initializing...");
@@ -30,45 +47,36 @@ void HLTInputModule::initialize()
   m_eventsTaken = 0;
 }
 
+/// @brief Begin a run
 void HLTInputModule::beginRun()
 {
   B2INFO("Module HLTInput starts a run");
 }
 
+/// @brief Process an event
 void HLTInputModule::event()
 {
-  /*
-  while (getData () == c_TermCalled) {
-    usleep (100);
-  }
-  */
   getData();
   m_eventsTaken++;
 
   B2INFO("[HLTInput] " << m_eventsTaken << " events taken!");
-
-  /*
-  EHLTStatus status = c_Success;
-
-  status = getData ();
-  while (status != c_TermCalled) {
-    if (m_buffer->numq () > 0) {
-      status = getData ();
-    }
-  }
-  */
 }
 
+/// @brief End a run
 void HLTInputModule::endRun()
 {
   B2INFO("Module HLTInput ends a run");
 }
 
+/// @brief Terminate the module
 void HLTInputModule::terminate()
 {
   B2INFO("Module HLTInput terminating...");
 }
 
+/// @brief Get data from incoming ring buffer
+/// @return c_Success Data received
+/// @return c_TermCalled Termination code received and there's no more data sources left
 EHLTStatus HLTInputModule::getData()
 {
   std::vector<TObject*> objectList;
@@ -98,7 +106,6 @@ EHLTStatus HLTInputModule::getData()
       while ((size = m_inBuffer->remq((int*)buffer)) <= 0)
         usleep(100);
       termChecker = std::string(buffer);
-      //return c_Success;
     }
   }
 
@@ -114,40 +121,19 @@ EHLTStatus HLTInputModule::getData()
   for (int i = 0; i < nObjects; i++) {
     //B2INFO ("[HLTInput] Storing object " << nameList[i]);
     DataStore::Instance().storeObject(objectList[i], nameList[i], durability);
-    /*
-    if (!DataStore::Instance().storeObject(objectList[i], nameList[i], durability)) {
-      B2ERROR ("[HLTInput] Storing object into DataStore failed!");
-      return c_FuncError;
-    }
-    */
   }
 
   for (int i = 0; i < nArrays; i++) {
     //B2INFO ("[HLTInput] Storing array " << nameList[nObjects + i]);
     DataStore::Instance().storeArray((TClonesArray*)objectList[nObjects + i], nameList[nObjects + i], durability);
-    //DataStore::Instance().storeObject(objectList[nObjects + i], nameList[nObjects + i], durability);
-    /*
-    if (!DataStore::Instance().storeArray((TClonesArray*)objectList[nObjects + i], nameList[nObjects + i], durability)) {
-      B2ERROR ("[HLTInput] Storing array into DataStore failed!");
-      return c_FuncError;
-    }
-    */
   }
-
-  //B2INFO("\x1b[33m[HLTInput] Received data is stored in DataStore!\x1b[0m");
-
-  /*
-  if (m_buffer->numq() > 0) {
-    B2INFO("[HLTInput] Events existing in the ring buffer (numq=" << m_buffer->numq() << ")");
-  } else {
-    B2INFO("[HLTInput] No events left in the ring buffer");
-  }
-  */
 
   return c_Success;
-  //return c_TermCalled;
 }
 
+/// @brief Write a data into a file (Development purpose only)
+/// @param data Data to be written
+/// @param size Size of the data
 void HLTInputModule::writeFile(char* data, int size)
 {
   FILE* fp;

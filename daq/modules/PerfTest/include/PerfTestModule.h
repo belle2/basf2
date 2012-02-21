@@ -17,32 +17,43 @@
 
 namespace Belle2 {
 
+  //! PerfTestModule class
+  /*! This class records event processing time (ms) in various ways
+  */
   class PerfTestModule : public Module {
 
   public:
+    //! Constructor
     PerfTestModule();
+    //! Destructor
     virtual ~PerfTestModule();
 
+    //! Initialize the module
     virtual void initialize();
+    //! Begin a run
     virtual void beginRun();
+    //! Event processing
     virtual void event();
+    //! End a run
     virtual void endRun();
+    //! Terminate the module
     virtual void terminate();
 
   protected:
+    //! Calculate elapsed time between two points
     double timeDifference(clock_t, clock_t);
 
 
   private:
-    clock_t m_start;
-    clock_t m_temp;
+    clock_t m_start;                        /**< Starting time */
+    clock_t m_temp;                         /**< Time that an event processed */
 
-    int m_nEvents;
+    int m_nEvents;                          /**< Number of processed events */
 
-    std::string m_eventsOutputFileName;
-    std::string m_overallOutputFileName;
+    std::string m_eventsOutputFileName;     /**< File name to record processing time per event */
+    std::string m_overallOutputFileName;    /**< File name to record overall elapsed time */
   };
 
-} // end namespace Belle2
+}
 
-#endif // HLTINPUTMODULE_H
+#endif

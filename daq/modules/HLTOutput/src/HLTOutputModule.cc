@@ -1,9 +1,22 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2010 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Soohyung Lee                                             *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
 #include <daq/modules/HLTOutput/HLTOutputModule.h>
 
 using namespace Belle2;
 
 REG_MODULE(HLTOutput)
 
+/* @brief HLTOutputModule constructor
+ * This initializes member variables from given parameters
+*/
 HLTOutputModule::HLTOutputModule() : Module()
 {
   setDescription("HLTOutput module");
@@ -17,10 +30,14 @@ HLTOutputModule::HLTOutputModule() : Module()
   addParam("nodeType", m_nodeType, std::string("Node type of the node"));
 }
 
+/// @brief HLTOutputModule destructor
 HLTOutputModule::~HLTOutputModule()
 {
 }
 
+/* @brief Initialize the module
+ * This sets related components like ring buffer, MsgHandler, and DataStore iterators
+*/
 void HLTOutputModule::initialize()
 {
   B2INFO("Module HLTOutput initializing...");
@@ -37,11 +54,13 @@ void HLTOutputModule::initialize()
   m_eventsSent = 0;
 }
 
+/// @brief Begin a run
 void HLTOutputModule::beginRun()
 {
   B2INFO("Module HLTOutput starts a run");
 }
 
+/// @brief Process an event
 void HLTOutputModule::event()
 {
   B2INFO("Module HLTOutput starts an event");
@@ -50,17 +69,21 @@ void HLTOutputModule::event()
   B2INFO("[HLTOutput] " << m_eventsSent << " events sent!");
 }
 
+/// @brief End a run
 void HLTOutputModule::endRun()
 {
   B2INFO("Module HLTOutput ends a run");
 }
 
+/// @brief Terminate the module
 void HLTOutputModule::terminate()
 {
   sendTerminate();
   B2INFO("Module HLTOutput terminating...");
 }
 
+/// @brief Put an event data into ring buffer for outgoing communication
+/// @param durability Durability of the event data
 void HLTOutputModule::putData(const DataStore::EDurability& durability)
 {
   m_msgHandler->clear();
@@ -125,6 +148,10 @@ void HLTOutputModule::putData(const DataStore::EDurability& durability)
   }
 }
 
+/// @brief Test a test (Development purpose only)
+/// @param buffer Data to be tested
+/// @return c_Success Data tested
+/// @return c_FuncError Something goes wrong during storing data into DataStore
 EHLTStatus HLTOutputModule::testData(char* buffer)
 {
   std::vector<TObject*> objectList;
@@ -157,17 +184,20 @@ EHLTStatus HLTOutputModule::testData(char* buffer)
   return c_Success;
 }
 
+/// @brief Send terminate code to ring buffer
 void HLTOutputModule::sendTerminate()
 {
-  //std::string message("Terminate");
-
   B2INFO("[HLTOutput] Termination code sending");
-  //while (m_buffer->insq ((int*)message.c_str (), message.size () / 4 + 1) <= 0) {
   while (m_buffer->insq((int*)gTerminate.c_str(), gTerminate.size() / 4 + 1) <= 0) {
     usleep(100);
   }
 }
 
+/// @brief Compare two data (Development purpose only)
+/// @param data1 String-type data to be compared
+/// @param data2 char* type data to be compared
+/// @return true Two data are the same
+/// @return false Two data differ
 bool HLTOutputModule::checkData(std::string data1, char* data2)
 {
   char* data1Transform = (char*)data1.c_str();
@@ -183,6 +213,9 @@ bool HLTOutputModule::checkData(std::string data1, char* data2)
   return true;
 }
 
+/// @brief Write a data into a file (Development purpose only)
+/// @param data Data to be written
+/// @param size Size of the data
 void HLTOutputModule::writeFile(char* data, int size)
 {
   FILE* fp;

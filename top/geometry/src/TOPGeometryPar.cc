@@ -17,6 +17,7 @@
 #include <cmath>
 #include <boost/format.hpp>
 #include <boost/foreach.hpp>
+#include <stdlib.h>
 
 using namespace std;
 using namespace boost;
@@ -25,10 +26,8 @@ namespace Belle2 {
 
   namespace TOP {
 
-    //! Stores pointer for class
     TOPGeometryPar* TOPGeometryPar::p_B4TOPGeometryParDB = 0;
 
-    //! Get instance if does not exist
     TOPGeometryPar* TOPGeometryPar::Instance()
     {
       if (!p_B4TOPGeometryParDB) {
@@ -36,160 +35,262 @@ namespace Belle2 {
       }
       return p_B4TOPGeometryParDB;
     }
-    //! Constructor
+
     TOPGeometryPar::TOPGeometryPar()
     {
       clear();
-    }//! Destuctor
+    }
 
     TOPGeometryPar::~TOPGeometryPar()
     {
     }
 
-    //! Inializer which automaticaly reads the the parameters
     void TOPGeometryPar::Initialize(const GearDir& content)
     {
       read(content);
     }
 
-    //! Resets all parameters
     void TOPGeometryPar::clear(void)
     {
 
-      //! Parameters for Bars
+      //! Bars
+      m_Nbars = 0;
+      m_Radius = 0;
+      m_Qwidth = 0;
+      m_Qthickness = 0;
+      m_Bposition = 0;
+      m_Length1 = 0;
+      m_Length2 = 0;
+      m_Length3 = 0;
+      m_WLength = 0;
+      m_Wwidth = 0;
+      m_Wextdown = 0;
+      m_Gwidth1 = 0;
+      m_Gwidth2 = 0;
+      m_Gwidth3 = 0;
 
-      _Nbars = 0;
-      _Radius = 0;
-      _Qwidth = 0;
-      _Qthickness = 0;
-      _Bposition = 0;
-      _Length1 = 0;
-      _Length2 = 0;
-      _Length3 = 0;
-      _WLength = 0;
-      _Wwidth = 0;
-      _Wextdown = 0;
-      _Gwidth1 = 0;
-      _Gwidth2 = 0;
-      _Gwidth3 = 0;
+      //! PMT's
+      m_Xgap = 0;
+      m_Ygap = 0;
+      m_Npmtx = 0;
+      m_Npmty = 0;
+      m_Msizex = 0;
+      m_Msizey = 0;
+      m_Msizez = 0;
+      m_MWallThickness = 0;
+      m_Asizex = 0;
+      m_Asizey = 0;
+      m_Asizez = 0;
+      m_Winthickness = 0;
+      m_Botthickness = 0;
+      m_Npadx = 0;
+      m_Npady = 0;
+      m_padx = 0;
+      m_pady = 0;
+      m_AsizexHalf = 0;
+      m_AsizeyHalf = 0;
+      m_dGlue = 0;
 
+      //! TDC
+      m_NTDC = 0;
+      m_TDCwidth = 0;
 
-      //! Parameters for PMT
+      //! TTS
+      m_NgaussTTS = 0;
 
-      _Xgap = 0;
-      _Ygap = 0;
-      _Npmtx = 0;
-      _Npmty = 0;
-      _Msizex = 0;
-      _Msizey = 0;
-      _Msizez = 0;
-      _MWallThickness = 0;
-      _Asizex = 0;
-      _Asizey = 0;
-      _Asizez = 0;
-      _Winthickness = 0;
-      _Botthickness = 0;
-      _Npadx = 0;
-      _Npady = 0;
-      _dGlue = 0;
-      _NTDC = 0;
-      _TDCwidth = 0;
+      //! QE
+      m_ColEffi = 0;
+      m_LambdaFirst = 0;
+      m_LambdaStep = 0;
+      m_NpointsQE = 0;
 
-      //! Support parameters
+      //! Support structure
+      m_PannelThickness = 0;
+      m_PlateThickness = 0;
+      m_LowerGap = 0;
+      m_UpperGap = 0;
+      m_SideGap = 0;
+      m_ZForward = 0;
+      m_ZBackward = 0;
 
-      _PannelThickness = 0;
-      _PlateThickness = 0;
-      _LowerGap = 0;
-      _UpperGap = 0;
-      _SideGap = 0;
-      _ZForward = 0;
-      _ZBackward = 0;
+      //! Mirror
+      m_Mirposx = 0;
+      m_Mirposy = 0;
+      m_Mirthickness = 0;
+      m_Mirradius = 0;
 
-      //! Mirror parameters
+      //! Other
 
-      _Mirposx = 0;
-      _Mirposy = 0;
-      _Mirthickness = 0;
-      _Mirradius = 0;
+      m_unit = Unit::cm;
+
     }
 
     void TOPGeometryPar::read(const GearDir& content)
     {
+      //! Bars
 
-      //------------------------------
-      // Get TOP geometry parameters
-      //------------------------------
       GearDir barParams(content, "Bars");
+      m_Nbars = barParams.getInt("Nbar");
+      m_Radius = barParams.getLength("Radius");
+      m_Qwidth = barParams.getLength("QWidth");
+      m_Qthickness = barParams.getLength("QThickness");
+      m_Bposition = barParams.getLength("QZBackward");
+      m_Length1 = barParams.getLength("QBar1Length");
+      m_Length2 = barParams.getLength("QBar2Length");
+      m_Length3 = barParams.getLength("QBarMirror");
+      m_WLength = barParams.getLength("QWedgeLength");
+      m_Wwidth = barParams.getLength("QWedgeWidth");
+      m_Wextdown = barParams.getLength("QWedgeDown");
+      m_Gwidth1 = barParams.getLength("Glue/Thicknes1");
+      m_Gwidth2 = barParams.getLength("Glue/Thicknes2");
+      m_Gwidth3 = barParams.getLength("Glue/Thicknes3");
 
-      //! Parameters for Bars
-
-      _Nbars = barParams.getInt("Nbar");
-      _Radius = barParams.getLength("Radius");
-      _Qwidth = barParams.getLength("QWidth");
-      _Qthickness = barParams.getLength("QThickness");
-      _Bposition = barParams.getLength("QZBackward");
-      _Length1 = barParams.getLength("QBar1Length");
-      _Length2 = barParams.getLength("QBar2Length");
-      _Length3 = barParams.getLength("QBarMirror");
-      _WLength = barParams.getLength("QWedgeLength");
-      _Wwidth = barParams.getLength("QWedgeWidth");
-      _Wextdown = barParams.getLength("QWedgeDown");
-      _Gwidth1 = barParams.getLength("Glue/Thicknes1");
-      _Gwidth2 = barParams.getLength("Glue/Thicknes2");
-      _Gwidth3 = barParams.getLength("Glue/Thicknes3");
-
-
-      //! Parameters for PMT
+      //! PMT's
 
       GearDir detParams(content, "PMTs");
+      m_Xgap = detParams.getLength("Xgap");
+      m_Ygap = detParams.getLength("Ygap");
+      m_Npmtx = detParams.getInt("nPMTx");
+      m_Npmty = detParams.getInt("nPMTy");
+      m_Msizex = detParams.getLength("Module/ModuleXSize");
+      m_Msizey = detParams.getLength("Module/ModuleYSize");
+      m_Msizez = detParams.getLength("Module/ModuleZSize");
+      m_MWallThickness = detParams.getLength("Module/ModuleWall");
+      m_Asizex = detParams.getLength("Module/SensXSize");
+      m_Asizey = detParams.getLength("Module/SensYSize");
+      m_Asizez = detParams.getLength("Module/SensThickness");
+      m_Winthickness = detParams.getLength("Module/WindowThickness");
+      m_Botthickness = detParams.getLength("Module/BottomThickness");
+      m_Npadx = detParams.getInt("Module/PadXNum");
+      m_Npady = detParams.getInt("Module/PadXNum");
+      m_dGlue = detParams.getLength("dGlue");
+      m_padx = m_Asizex / (double)m_Npadx;
+      m_pady = m_Asizey / (double)m_Npady;
+      m_AsizexHalf = m_Asizex / 2;
+      m_AsizeyHalf = m_Asizey / 2;
 
-      _Xgap = detParams.getLength("Xgap");
-      _Ygap = detParams.getLength("Ygap");
-      _Npmtx = detParams.getInt("nPMTx");
-      _Npmty = detParams.getInt("nPMTy");
-      _Msizex = detParams.getLength("Module/ModuleXSize");
-      _Msizey = detParams.getLength("Module/ModuleYSize");
-      _Msizez = detParams.getLength("Module/ModuleZSize");
-      _MWallThickness = detParams.getLength("Module/ModuleWall");
-      _Asizex = detParams.getLength("Module/SensXSize");
-      _Asizey = detParams.getLength("Module/SensYSize");
-      _Asizez = detParams.getLength("Module/SensThickness");
-      _Winthickness = detParams.getLength("Module/WindowThickness");
-      _Botthickness = detParams.getLength("Module/BottomThickness");
-      _Npadx = detParams.getInt("Module/PadXNum");
-      _Npady = detParams.getInt("Module/PadXNum");
-      _dGlue = detParams.getLength("dGlue");
-      _NTDC = detParams.getInt("Module/TDCbits");
-      _TDCwidth = detParams.getLength("Module/TDCbitwidth");
+      //! TDC
 
-      //! Mirror parameters
+      m_NTDC = detParams.getInt("Module/TDCbits");
+      m_TDCwidth = detParams.getTime("Module/TDCbitwidth");
+
+      //! TTS
+
+      m_NgaussTTS = 0;
+      for (int i = 0; i < MAXPTS_TTS; i++) {
+        int ii = i + 1;
+        stringstream ss; string cc;
+        ss << ii; ss >> cc;
+        string path = "TTS/Gauss[@component='term-" + cc + "']/";
+        GearDir tts(detParams, path);
+        if (!tts) break;
+        m_NgaussTTS++;
+        m_TTSfrac[i] = tts.getDouble("fraction");
+        m_TTSmean[i] = tts.getTime("mean");
+        m_TTSsigma[i] = tts.getTime("sigma");
+      }
+      double fracsum = 0;
+      for (int i = 0; i < m_NgaussTTS; i++) {fracsum += m_TTSfrac[i];}
+      if (fracsum > 0) {
+        for (int i = 0; i < m_NgaussTTS; i++) {m_TTSfrac[i] /= fracsum;}
+        B2INFO("TOPGeometryPar: TTS defined with " << m_NgaussTTS << " Gaussian terms");
+      } else {
+        m_NgaussTTS = 0;
+        B2ERROR("TOPGeometryPar: TTS - sum of fractions =0 -> Ngauss set to 0");
+      }
+
+      //! quantum & collection efficiency
+
+      GearDir qeParams(content, "QE");
+      m_ColEffi = qeParams.getDouble("ColEffi");
+      m_LambdaFirst = qeParams.getLength("LambdaFirst") / Unit::nm;
+      m_LambdaStep = qeParams.getLength("LambdaStep") / Unit::nm;
+      m_NpointsQE = 0;
+      for (int i = 0; i < MAXPTS_QE; i++) {
+        int ii = i + 1;
+        stringstream ss; string cc;
+        ss << ii; ss >> cc;
+        string path = "Qeffi[@component='point-" + cc + "']/";
+        GearDir qe(qeParams, path);
+        if (!qe) break;
+        m_NpointsQE++;
+        m_QE[i] = qe.getDouble("qe");
+      }
+
+      //! Mirror
 
       GearDir mirParams(content, "Mirror");
+      m_Mirposx = mirParams.getLength("Xpos");
+      m_Mirposy = mirParams.getLength("Ypos");
+      m_Mirthickness = mirParams.getLength("mirrorThickness");
+      m_Mirradius = mirParams.getLength("Radius");
 
-      _Mirposx = mirParams.getLength("Xpos");
-      _Mirposy = mirParams.getLength("Ypos");
-      _Mirthickness = mirParams.getLength("mirrorThickness");
-      _Mirradius = mirParams.getLength("Radius");
-
-
-      //! Support parameters
+      //! Support structure
 
       GearDir supParams(content, "Support");
+      m_PannelThickness = supParams.getLength("PannelThickness");
+      m_PlateThickness = supParams.getLength("PlateThickness");
+      m_LowerGap = supParams.getLength("lowerGap");
+      m_UpperGap = supParams.getLength("upperGap");
+      m_SideGap = supParams.getLength("sideGap");
+      m_ZForward = supParams.getLength("ZForward");
+      m_ZBackward = supParams.getLength("ZBackward");
 
-      _PannelThickness = supParams.getLength("PannelThickness");
-      _PlateThickness = supParams.getLength("PlateThickness");
-      _LowerGap = supParams.getLength("lowerGap");
-      _UpperGap = supParams.getLength("upperGap");
-      _SideGap = supParams.getLength("sideGap");
-      _ZForward = supParams.getLength("ZForward");
-      _ZBackward = supParams.getLength("ZBackward");
-
-      //! Set alignment
+      //! store alignment directory
 
       m_alignment = GearDir(content, "Alignment/");
 
-
     }
+
+    double TOPGeometryPar::QE(double e) const
+    {
+      if (e == 0) return 0;
+      double dlam = 1240 / e - m_LambdaFirst;
+      if (dlam < 0) return 0;
+      int i = int(dlam / m_LambdaStep);
+      if (i > m_NpointsQE - 2) return 0;
+      return m_QE[i] + (m_QE[i + 1] - m_QE[i]) / m_LambdaStep * (dlam - i * m_LambdaStep);
+    }
+
+    int TOPGeometryPar::getChannelID(double x, double y, int pmtID) const
+    {
+      if (fabs(x) >= m_AsizexHalf) return 0;
+      if (fabs(y) >= m_AsizeyHalf) return 0;
+
+      int ix = int((x + m_AsizexHalf) / m_padx);
+      int iy = int((y + m_AsizeyHalf) / m_pady);
+      int pmtch = ix + m_Npadx * iy;
+      int chID = pmtch + (pmtID - 1) * m_Npadx * m_Npady + 1;
+      return chID;
+    }
+
+
+    G4Transform3D TOPGeometryPar::getAlignment(const string& component)
+    {
+      //! Format the path using BOOST
+      string path = (boost::format("Align[@component='%1%']/") % component).str();
+      //! Appendt path to alignement path
+      GearDir params(m_alignment, path);
+      //! Check if parameter exists
+      if (!params) {
+        B2WARNING("Could not find alignment parameters for component " << component);
+        return G4Transform3D();
+      }
+      //! Read the translations
+      double dU = params.getLength("du") / m_unit;
+      double dV = params.getLength("dv") / m_unit;
+      double dW = params.getLength("dw") / m_unit;
+      //! Read the rotations
+      double alpha = params.getAngle("alpha");
+      double beta  = params.getAngle("beta");
+      double gamma = params.getAngle("gamma");
+      //! Combine rotations and tralstions
+      G4RotationMatrix rotation(alpha, beta, gamma);
+      G4ThreeVector translation(dU, dV, dW);
+      //! Return combine matrix
+      return G4Transform3D(rotation, translation);
+    }
+
 
     void TOPGeometryPar::Print(void) const
     {

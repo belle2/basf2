@@ -85,7 +85,8 @@ namespace Belle2 {
     }
 
 
-    void GeoTOPCreator::create(const GearDir& content, G4LogicalVolume& topVolume, GeometryTypes type)
+    void GeoTOPCreator::create(const GearDir& content, G4LogicalVolume& topVolume,
+                               GeometryTypes type)
     {
 
       isBeamBkgStudy = content.getInt("BeamBackgroundStudy");
@@ -95,7 +96,7 @@ namespace Belle2 {
       //! Initialize parameters
       m_topgp = TOPGeometryPar::Instance();
       m_topgp->Initialize(content);
-
+      m_topgp->setGeanUnits();
 
       G4int moduleID = 0;
       //build one segment
@@ -112,10 +113,10 @@ namespace Belle2 {
         G4RotationMatrix rot(M_PI / 2.0, M_PI / 2.0, -phi);
         G4ThreeVector trans(Radius * cos(phi), Radius * sin(phi), 0);
 
-        new G4PVPlacement(G4Transform3D(rot, trans), module, "PlacedTOPModule", &topVolume, false, i + 1);
+        new G4PVPlacement(G4Transform3D(rot, trans), module, "PlacedTOPModule",
+                          &topVolume, false, i + 1);
 
       }
-
     }
 
 
@@ -211,7 +212,8 @@ namespace Belle2 {
       G4double   pSTheta = M_PI / 2.0 - thetamax * 1.5;
       G4double   pDTheta = 3 * thetamax ;
 
-      G4Sphere* mirsphere = new G4Sphere("mirror_sphere_segment", pRmin, pRmax, pSPhi, pDPhi, pSTheta, pDTheta);
+      G4Sphere* mirsphere = new G4Sphere("mirror_sphere_segment",
+                                         pRmin, pRmax, pSPhi, pDPhi, pSTheta, pDTheta);
 
       G4RotationMatrix rotmir(M_PI / 2.0 + phimax, 0, 0);
       G4ThreeVector transmir(-Mirradius + length / 2.0, Mirposy, Mirposx);

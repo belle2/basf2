@@ -15,12 +15,11 @@
 #include <stdlib.h>
 #include "top/modules/TOPReconstruction/TOPtrack.h"
 #include "top/modules/TOPReconstruction/TOPf77fun.h"
+#include <TRandom3.h>
 
 #define C0 29.9798458 // speed of light in ns/cm
 
-//extern "C" {float gaus_rnd_(float*);}
-//inline double GaussRnd(float sigma){return gaus_rnd_(&sigma);}
-inline double GaussRnd(float sigma) {return 0;}
+inline double GaussRnd(double sigma) {return gRandom->Gaus(0., sigma);}
 
 TOPtrack::TOPtrack()
 {

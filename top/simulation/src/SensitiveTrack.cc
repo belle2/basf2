@@ -33,7 +33,8 @@ namespace Belle2 {
   namespace TOP {
 
     SensitiveTrack::SensitiveTrack():
-      Simulation::SensitiveDetectorBase("TOP", SensitiveTrack::TOP), m_topgp(TOPGeometryPar::Instance())
+      Simulation::SensitiveDetectorBase("TOP", SensitiveTrack::TOP),
+      m_topgp(TOPGeometryPar::Instance())
     {
       //! MCPacrticle store array needed for creation of relations
       StoreArray<MCParticle> mcParticles;
@@ -50,6 +51,8 @@ namespace Belle2 {
 
     bool SensitiveTrack::step(G4Step* aStep, G4TouchableHistory*)
     {
+
+      m_topgp->setGeanUnits();
 
       //! get particle track
       G4Track* aTrack = aStep->GetTrack();
@@ -76,7 +79,9 @@ namespace Belle2 {
       G4ThreeVector localPosition = PrePosition->GetTouchableHandle()->GetHistory()->GetTopTransform().TransformPoint(worldPosition);
 
       //! Check that it is on the outside boundary not on the glue boundary
-      if (fabs(fabs(localPosition.y()) - (m_topgp->getQthickness() / 2.0)) > 10e-6) return false ;
+      if (fabs(fabs(localPosition.y()) - (m_topgp->getQthickness() / 2)) > 10e-6) {
+        return false ;
+      }
 
       //! This few lines are for debugging
       /*
@@ -95,24 +100,29 @@ namespace Belle2 {
       //! get track length and subtract step length to get the length to the boundary
       double tracklength = aTrack->GetTrackLength() - aStep->GetStepLength();
 
-      //! get the global time
-      const G4double globalTime = PrePosition->GetGlobalTime();
+      //! get global time
+      double globalTime = PrePosition->GetGlobalTime();
 
-      //! get the local time
-      const G4double localTime = PrePosition->GetLocalTime();
+      //! get local time
+      double localTime = PrePosition->GetLocalTime();
 
-      //! the momentum on the boundary
+      //! momentum on the boundary
       G4ThreeVector momentum = PrePosition->GetMomentum();
 
       //! calculate momentum at vertex position
-      double vmomentum = sqrt(aTrack->GetVertexKineticEnergy() * aTrack->GetVertexKineticEnergy() + 2 * aTrack->GetVertexKineticEnergy() * particle->GetPDGMass());
+      double Ekin = aTrack->GetVertexKineticEnergy();
+      double vmomentum = sqrt(Ekin * Ekin + 2 * Ekin * particle->GetPDGMass());
 
       //! Fill three vectors that hold momentum and position
-      TVector3 TPosition(worldPosition.x() , worldPosition.y() , worldPosition.z());
-      TVector3 TMomentum(momentum.x() , momentum.y()  , momentum.z());
+      TVector3 TPosition(worldPosition.x(), worldPosition.y(), worldPosition.z());
+      TVector3 TMomentum(momentum.x(), momentum.y(), momentum.z());
 
-      TVector3 TVPosition(aTrack->GetVertexPosition().x() , aTrack->GetVertexPosition().y() , aTrack->GetVertexPosition().z());
-      TVector3 TVMomentum(vmomentum * aTrack->GetVertexMomentumDirection().x(), vmomentum * aTrack->GetVertexMomentumDirection().y() , vmomentum * aTrack->GetVertexMomentumDirection().z());
+      TVector3 TVPosition(aTrack->GetVertexPosition().x(),
+                          aTrack->GetVertexPosition().y(),
+                          aTrack->GetVertexPosition().z());
+      TVector3 TVMomentum(vmomentum * aTrack->GetVertexMomentumDirection().x(),
+                          vmomentum * aTrack->GetVertexMomentumDirection().y(),
+                          vmomentum * aTrack->GetVertexMomentumDirection().z());
 
       //! Get the ID of the bar that was hit
       int barID = PrePosition->GetTouchableHandle()->GetReplicaNumber(2);
@@ -130,10 +140,19 @@ namespace Belle2 {
       StoreArray<TOPTrack> topTracks;
 
       //! get the number of already stored topTracks
-      G4int nentr = topTracks->GetEntries();
+      int nentr = topTracks->GetEntries();
+
+      //! convert to Basf units
+      TPosition = TPosition * Unit::mm;
+      TVPosition = TVPosition * Unit::mm;
+      TMomentum = TMomentum  * Unit::MeV;
+      TVMomentum = TVMomentum  * Unit::MeV;
+      tracklength = tracklength * Unit::mm;
 
       //! Store hit
-      new(topTracks->AddrAt(nentr)) TOPTrack(trackID, PDG, PDGCharge, TPosition, TVPosition, TMomentum, TVMomentum, barID, tracklength, globalTime, localTime);
+      new(topTracks->AddrAt(nentr)) TOPTrack(trackID, PDG, PDGCharge, TPosition,
+                                             TVPosition, TMomentum, TVMomentum,
+                                             barID, tracklength, globalTime, localTime);
 
 
       /*!--------------------------------------------------------------------------

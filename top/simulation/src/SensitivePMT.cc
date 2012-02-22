@@ -21,6 +21,7 @@
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/RelationIndex.h>
 #include <framework/logging/Logger.h>
+#include <framework/gearbox/Unit.h>
 #include <TVector3.h>
 
 using namespace std;
@@ -54,9 +55,9 @@ namespace Belle2 {
       /*! Get time (check for proper global time) of track */
 
       //! get global time from bunch crossing
-      const G4double globalTime = track.GetGlobalTime();
+      double globalTime = track.GetGlobalTime();
       //! get local time. Time that passed from the cration of the particle.
-      const G4double localTime = track.GetLocalTime();
+      double localTime = track.GetLocalTime();
 
       //! Check all the times exist. Maybe this is not necesary!
       if (isnan(globalTime)) {
@@ -72,7 +73,7 @@ namespace Belle2 {
       //! get the possition of the particle in the lab frame - global possition
       const G4ThreeVector& worldPosition = track.GetPosition();
 
-      //! Transform to local position - position on the sensitive pad with center in the middle of the pad
+      //! Transform to local position
       const G4ThreeVector localPosition = track.GetTouchableHandle()->GetHistory()->GetTopTransform().TransformPoint(worldPosition);
 
 
@@ -80,22 +81,22 @@ namespace Belle2 {
       const G4ThreeVector dir = track.GetMomentumDirection();
 
       //! get module ID number
-      const G4int moduleID = track.GetTouchableHandle()->GetReplicaNumber(1);
+      int moduleID = track.GetTouchableHandle()->GetReplicaNumber(1);
       //! get number of the bar in which the module is housed
-      const G4int barID = track.GetTouchableHandle()->GetReplicaNumber(4);
+      int barID = track.GetTouchableHandle()->GetReplicaNumber(4);
 
       //! This is here just for debuging
       //B2INFO("replica number: " << moduleID << " bar number: " << barID)
 
       //! get photon energy
-      const G4double energy = track.GetKineticEnergy();
+      double energy = track.GetKineticEnergy();
 
       //! get the length of the track
-      const G4double length = track.GetTrackLength();
+      double length = track.GetTrackLength();
 
       //Get ID of parent particle and track (this is mainly used at the moment for separation of backgound and signal, but will be later dropped -> use relation )
-      const G4int parentID = track.GetParentID();
-      const G4int trackID = track.GetTrackID();
+      int parentID = track.GetParentID();
+      int trackID = track.GetTrackID();
 
       /*! get vertex information of the track */
       //! get vertex position
@@ -128,8 +129,18 @@ namespace Belle2 {
       //! get the number of already stored TOPSimHits
       G4int nentr = topSimHits->GetEntries();
 
+      //! convert to Basf units (photon energy in [eV]!)
+      locpos = locpos * Unit::mm;
+      glopos = glopos * Unit::mm;
+      Vpos = Vpos * Unit::mm;
+      length = length * Unit::mm;
+      energy = energy * Unit::MeV / Unit::eV;
+
       //! Store the hit
-      new(topSimHits->AddrAt(nentr)) TOPSimHit(moduleID, barID, locpos, glopos, Dir, Vpos, Vdir, globalTime, globalTime - localTime, length, energy, parentID, trackID);
+      new(topSimHits->AddrAt(nentr)) TOPSimHit(moduleID, barID, locpos, glopos,
+                                               Dir, Vpos, Vdir, globalTime,
+                                               globalTime - localTime, length,
+                                               energy, parentID, trackID);
 
       /*!--------------------------------------------------------------------------
        *                Make relation between TOPSimHit and MCParticle

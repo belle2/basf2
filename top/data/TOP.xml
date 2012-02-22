@@ -1,17 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <DetectorComponent name="TOP" xmlns:xi="http://www.w3.org/2001/XInclude">
-    <Creator library="top">TOPCreator</Creator>
-    <Content>
-        <xi:include href="TOP-Bars.xml"/>
-        <xi:include href="TOP-BarsAlignment.xml"/>
-        <xi:include href="TOP-PMT.xml"/>
-        <xi:include href="TOP-PMTAlignment.xml"/>
-        <xi:include href="TOP-Materials.xml"/>
-        <xi:include href="TOP-Support.xml"/>
-        <xi:include href="TOP-Mirror.xml"/>
-        <xi:include href="TOP-SupportAlignment.xml"/>
-        
-        <BeamBackgroundStudy desc="select 1 if you want to record neutron and gamma hits">0</BeamBackgroundStudy>
+  <Creator library="top">TOPCreator</Creator>
+  <Content>
+    <xi:include href="TOP-Bars.xml"/>
+    <xi:include href="TOP-BarsAlignment.xml"/>
+    <xi:include href="TOP-PMT.xml"/>
+    <xi:include href="TOP-QEsuperbialkali.xml"/>
+    <xi:include href="TOP-PMTAlignment.xml"/>
+    <xi:include href="TOP-Materials.xml"/>
+    <xi:include href="TOP-Support.xml"/>
+    <xi:include href="TOP-Mirror.xml"/>
+    <xi:include href="TOP-SupportAlignment.xml"/>
+    
+    <BeamBackgroundStudy desc="select 1 to record neutron and gamma hits">0</BeamBackgroundStudy>
 
-    </Content>
+  </Content>
 </DetectorComponent>

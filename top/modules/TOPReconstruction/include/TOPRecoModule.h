@@ -13,12 +13,7 @@
 
 #include <framework/core/Module.h>
 #include <top/geometry/TOPGeometryPar.h>
-
 #include <string>
-
-#include <TRandom1.h>
-
-
 
 namespace Belle2 {
   namespace TOP {
@@ -84,7 +79,6 @@ namespace Belle2 {
       std::string m_outColName;        /**< Output collection name */
 
       /* Other members.*/
-      TRandom1* m_random;              /**< Random number generator.*/
       double m_timeCPU;                /**< CPU time.     */
       int    m_nRun;                   /**< Run number.   */
       int    m_nEvent;                 /**< Event number. */

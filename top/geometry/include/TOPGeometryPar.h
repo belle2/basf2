@@ -27,13 +27,14 @@
 using namespace std;
 using namespace boost;
 
-#define MAX_N_BARS 16
+#define MAXPTS_TTS 10
+#define MAXPTS_QE 100
 
 namespace Belle2 {
   namespace TOP {
 
     /** The Class for TOP Geometry Parameters.
-     *  The aim of this class it to pass the parameters stored in .xml files to the geometry builder and any other module.
+     *  To pass the parameters from .xml files to geometry builder and any other module.
      *  Usage of this class asures that all parts of TOP obtain the same information.
      *  All acces to .xml files should be made through usage of this class.
      */
@@ -69,259 +70,316 @@ namespace Belle2 {
        */
       void read(const GearDir& content);
 
+      /** to return values in the default units */
+      void setBasfUnits() {m_unit = Unit::cm;}
 
+      /** to return values in Gean units */
+      void setGeanUnits() {m_unit = Unit::mm;}
 
-
-      //! Functions for returning parameters of the bars
+      //! Selectors
 
       /** Get number of quartz bars
        * @return number of quartz bars
        */
-      int getNbars() const;
+      int getNbars() const {return m_Nbars;}
 
       /** Get distance from IP to inner side of the qurtz bar
-       * @return distance from IP to inner side of the qurtz bar in mm
+       * @return distance from IP to inner side of the qurtz bar
        */
-      double getRadius() const;
+      double getRadius() const {return m_Radius / m_unit;}
 
       /** Get the width of the quartz bar
-       *@return width of quartz bar in mm
+       *@return width of quartz bar
        */
-      double getQwidth() const;
+      double getQwidth() const {return m_Qwidth / m_unit; }
 
       /** Get the thickness of the quartz bar
-       * @return thickness of quartz bar in mm
+       * @return thickness of quartz bar
        */
-      double getQthickness() const;
-
+      double getQthickness() const {return m_Qthickness / m_unit; }
 
       /** Get Backward position of qurtz bar
-       * @return barward possition on quartz bar in mm
+       * @return barward possition on quartz bar
        */
-      double getBposition() const;
+      double getBposition() const {return m_Bposition / m_unit; }
 
-      /** Get length of first quartz bar segment. First segment is the backward segmenet.
-       * @return length of first quartz bar segment in mm
+      /** Get length of first quartz bar segment.
+       * @return length of first quartz bar segment
        */
-      double getLength1() const;
+      double getLength1() const {return m_Length1 / m_unit; }
 
-      /** Get length of second quartz bar segment. Second segment is the forward segmenet.
-       * @return length of second quartz bar segment in mm
+      /** Get length of second quartz bar segment.
+       * @return length of second quartz bar segment
        */
-      double getLength2() const;
+      double getLength2() const {return m_Length2 / m_unit; }
 
-      /** Get length of third quartz bar segment. Third segment is the segment to which the mirror is attached
-       * @return length of third quartz bar segment in mm
+      /** Get length of third quartz bar segment.
+       * @return length of third quartz bar segment
        */
-      double getLength3() const;
+      double getLength3() const {return m_Length3 / m_unit; }
 
-      /** Get length of the wedge segment
-       * @return length of wedge segment in mm
+      /** Get length of the wedge
+       * @return length of wedge
        */
-      double getWLength() const;
+      double getWLength() const {return m_WLength / m_unit; }
 
       /** Get width of the wedge segment
-       * @return width of wedge segment in mm
+       * @return width of wedge segment
        */
-      double getWwidth() const;
+      double getWwidth() const {return m_Wwidth / m_unit; }
 
       /** Get wedge extension down measured from the inner side of the bar
-       * @return wedge extension down in mm
+       * @return wedge extension down
        */
-      double getWextdown() const;
+      double getWextdown() const {return m_Wextdown / m_unit; }
 
       /** get width of glue between wedge and bar segment 1
-       * @return width of the glue joint 1 in mm
+       * @return width of the glue joint 1
        */
-      double getGwidth1() const;
+      double getGwidth1() const {return m_Gwidth1 / m_unit; }
 
       /** get width of glue between bar segment 1 and 2
-       * @return width of the glue joint 2 in mm
+       * @return width of the glue joint 2
        */
-      double getGwidth2() const;
+      double getGwidth2() const {return m_Gwidth2 / m_unit; }
 
       /** get width of glue between bar segment 2 and segment 3
-       * @return width of the glue joint 3 in mm
+       * @return width of the glue joint 3
        */
-      double getGwidth3() const;
-
-
+      double getGwidth3() const {return m_Gwidth3 / m_unit; }
 
       //! Parameters of the PMT
 
       /** Get gap between PMTs in x direction
-       * @return gap between PMTs in x direction in mm
+       * @return gap between PMTs in x direction
        */
-      double getXgap() const;
+      double getXgap() const {return m_Xgap / m_unit; }
 
       /** Get gap between PMTs in y direction
-       * @return gap between PMTs in y direction in mm
+       * @return gap between PMTs in y direction
        */
-      double getYgap() const;
+      double getYgap() const {return m_Ygap / m_unit; }
 
       /** Get number of PMTs in the x row
        * @return number of PMTs in the x row
        */
-      int getNpmtx() const;
+      int getNpmtx() const {return m_Npmtx; }
 
       /** Get number of PMTs in the y column
        * @return number of PMTs in the y column
        */
-      int getNpmty() const;
+      int getNpmty() const {return m_Npmty; }
 
       /** Get module side in x direction
-       * @return module side in x direction in mm
+       * @return module side in x direction
        */
-      double getMsizex() const;
+      double getMsizex() const {return m_Msizex / m_unit; }
 
       /** Get module side in y direction
-       * @return module side y direction in mm
+       * @return module side y direction
        */
-      double getMsizey() const;
+      double getMsizey() const {return m_Msizey / m_unit; }
 
       /** Get module wall size in in z direction
-       * @return module wall size in z direction in mm
+       * @return module wall size in z direction
        */
-      double getMsizez() const;
+      double getMsizez() const {return m_Msizez / m_unit; }
 
       /** Get module wall thickness
-       * @return module wall thickness in mm
+       * @return module wall thickness
        */
-      double getMWallThickness() const;
+      double getMWallThickness() const {return m_MWallThickness / m_unit; }
 
       /** Get active area size in x direction
-       * @return active area size in x direction in mm
+       * @return active area size in x direction
        */
-      double getAsizex() const;
+      double getAsizex() const {return m_Asizex / m_unit; }
 
       /** Get active area size in y direction
-       * @return active area size in y direction in mm
+       * @return active area size in y direction
        */
-      double getAsizey() const;
+      double getAsizey() const {return m_Asizey / m_unit; }
 
       /** Get active area size in z direction
-       * @return active area size in z direction in mm
+       * @return active area size in z direction
        */
-      double getAsizez() const;
+      double getAsizez() const {return m_Asizez / m_unit; }
 
       /** Get thickness of the PMT window
-       * @return  window thickness in mm
+       * @return  window thickness
        */
-      double getWinthickness() const;
+      double getWinthickness() const {return m_Winthickness / m_unit; }
 
       /** Get thickness of PMT bottom
-       * @return bottom thickness in mm
+       * @return bottom thickness
        */
-      double getBotthickness() const;
+      double getBotthickness() const {return m_Botthickness / m_unit; }
 
       /** Get number of pads in x direction
-       * @return number of pads in x direction in mm
+       * @return number of pads in x direction
        */
-      int getNpadx() const;
+      int getNpadx() const {return m_Npadx; }
 
       /** Get number of pads in y direction
        * @return number of pads in y direction
        */
-      int getNpady() const;
+      int getNpady() const {return m_Npady; }
+
+      /** Get pad size in x direction
+       * @return pad size in x
+       */
+      int padx() const {return m_padx; }
+
+      /** Get pad size in y direction
+       * @return pad size in x
+       */
+      int pady() const {return m_pady; }
 
       /** Get the thickness of the glue between the PMT stack and the wedge
-       * @return the thickness of the glue between the PMT stack and the wedge in mm
+       * @return the thickness of the glue between the PMT stack and the wedge
        */
-      double getdGlue() const;
+      double getdGlue() const {return m_dGlue / m_unit; }
 
       /** Get number of TDC bits
        * @return number of TDC bits
        */
-      int getTDCbits() const;
+      int getTDCbits() const {return m_NTDC; }
 
       /** Get width of TDC bit
        * @return width of TDC bit in ns
        */
-      double getTDCbitwidth() const;
+      double getTDCbitwidth() const {return m_TDCwidth; }
 
+      /** Get number of Gaussian terms for TTS distribution
+       * @return number of Gaussian terms
+       */
+      int NgaussTTS() const {return m_NgaussTTS; }
 
+      /** Get fraction of Gaussian term i
+       * @return fraction i
+       */
+      double TTSfrac(int i) const {return m_TTSfrac[i]; }
+
+      /** Get mean of Gaussian term i
+       * @return mean i
+       */
+      double TTSmean(int i) const {return m_TTSmean[i]; }
+
+      /** Get sigma of Gaussian term i
+       * @return sigma i
+       */
+      double TTSsigma(int i) const {return m_TTSsigma[i]; }
+
+      /** Get PMT collection efficiency
+       * @return collection efficiency
+       */
+      double ColEffi() const {return m_ColEffi; }
+
+      /** Get lambda of the first QE data point
+       * @return lambda min [nm]
+       */
+      double LambdaFirst() const {return m_LambdaFirst; }
+
+      /** Get lambda step [nm]
+       * @return step
+       */
+      double LambdaStep() const {return m_LambdaStep; }
+
+      /** Get number of QE data points
+       * @return number of data points
+       */
+      int NpointsQE() const {return m_NpointsQE; }
+
+      /** Get quantum efficiency point i
+       * @return quantum efficiency point i
+       */
+      double QE(int i) const {return m_QE[i]; }
+
+      /** Get quantum efficiency for photon energy e [eV] (linear interpolation)
+       * @return quantum efficiency at e
+       */
+      double QE(double e) const;
 
       //! Mirror parameters
-
-      /** Get the dispacement along quartz width for mirror axis
-       * @return dispacement along quartz width for mirror axis in mm
-       */
-      double getMirposx() const;
-
-      /** Get the dispacement along quartz thickness for mirror axis
-       * @return dispacement along quartz thickness for mirror axis in mm
-       */
-      double getMirposy() const;
-
-
-      /** Get mirror layer thickness
-       * @return mirror layer thickness
-       */
-      double getMirthickness() const;
 
       /** Get radius of spherical mirror
        * @return radius of spherical mirror
        */
-      double getMirradius() const;
+      double getMirradius() const {return m_Mirradius / m_unit; }
+
+      /** Get the dispacement along quartz width for mirror axis
+       * @return dispacement along quartz width for mirror axis
+       */
+      double getMirposx() const {return m_Mirposx / m_unit; }
+
+      /** Get the dispacement along quartz thickness for mirror axis
+       * @return dispacement along quartz thickness for mirror axis
+       */
+      double getMirposy() const {return m_Mirposy / m_unit; }
+
+      /** Get mirror layer thickness
+       * @return mirror layer thickness
+       */
+      double getMirthickness() const {return m_Mirthickness / m_unit; }
 
       //! Support parameters
 
       /** Get thickness of the QBB pannel
-       * @return thicness of QBB pannel in mm
+       * @return thicness of QBB pannel
        */
-      double getPannelThickness() const;
+      double getPannelThickness() const {return m_PannelThickness / m_unit; }
 
       /** Get thickness of the sinde plate
-       * @return thickness of side pladte in mm
+       * @return thickness of side pladte
        */
-      double getPlateThickness() const;
+      double getPlateThickness() const {return m_PlateThickness / m_unit; }
 
       /** Get size of air gap between quartz and support at inner radious
-       * @return air gar in mm
+       * @return air gar
        */
-      double getLowerGap() const;
+      double getLowerGap() const {return m_LowerGap / m_unit; }
 
       /** Get size of air gap between quartz and support at outer radious
-       * @return air gar in mm
+       * @return air gar
        */
-      double getUpperGap() const;
+      double getUpperGap() const {return m_UpperGap / m_unit; }
 
       /** Get size of air gap between quartz and support (side plate)
-       * @return air gar in mm
+       * @return air gar
        */
-      double getSideGap() const;
+      double getSideGap() const {return m_SideGap / m_unit; }
 
       /** Get forward possition of support
-       * @return forward possition of support in mm
+       * @return forward possition of support
        */
-      double getZForward() const;
+      double getZForward() const {return m_ZForward / m_unit; }
 
       /** Get backward possition of support
-       * @return backward possition of support in mm
+       * @return backward possition of support
        */
-      double getZBackward() const;
-
-      /**< derived function that are part of geometry */
+      double getZBackward() const {return m_ZBackward / m_unit; }
 
       /** Calculate the channel ID from local possition on the PMT
        * @param position on the sensitive detector plane
        * @param ID of the PMT
        * @return ID of channel for whole bar
        */
-      int getChannelID(TVector2 position, int moduleID) const;
+      int getChannelID(double x, double y, int pmtID) const;
 
       /** Ger backwads possition
        *@return backward possition of the quartz bar
        */
-      double getZ1() const;
+      double getZ1() const {return (m_Bposition  - m_Gwidth1) / m_unit; }
 
       /** Get forward possition
        * @return forward possition of the bar (segmen 1+2+3 + glues)
        */
-      double getZ2() const;
+      double getZ2() const {
+        return (m_Bposition + m_Length1 + m_Gwidth2 + m_Length2 + m_Gwidth3 + m_Length3)
+               / m_unit;
+      }
 
-      /**
-       * Get Alignment for given component from the database
+      /** Get Alignment for given component from the database
        * @param  component Name of the component to align
        * @return Transformation matrix for component, idendity if component
        *         could not be found
@@ -331,362 +389,90 @@ namespace Belle2 {
 
     private:
 
-      //! Parameters for bars
+      //! Quartz bar parameters
 
+      int m_Nbars;          /**< number of bars */
+      double m_Radius;      /**< distance to inner surface */
+      double m_Qwidth;      /**< bar width */
+      double m_Qthickness;  /**< bar thickness */
+      double m_Bposition;   /**< bar backward position */
+      double m_Length1;     /**< length of the first bar segment (backward) */
+      double m_Length2;     /**< length of the second bar segment (middle) */
+      double m_Length3;     /**< length of the third bar segment (forward) */
+      double m_WLength;     /**< wedge length */
+      double m_Wwidth;      /**< wedge width */
+      double m_Wextdown;    /**< wedge extension down */
+      double m_Gwidth1;     /**< glue thickness between wedge and segment 1 */
+      double m_Gwidth2;     /**< glue thickness between segments 1 and 2 */
+      double m_Gwidth3;     /**< glue thickness between segment 3 and mirror */
 
-      int _Nbars;                /**< number of quartz bars */
-      double _Radius;            /**< distance from IP to inner side of qurtz bar */
-      double _Qwidth;            /**< width of the quartz bar */
-      double _Qthickness;        /**< thickness of the quartz bar */
-      double _Bposition;         /**< backward position of qurtz bar */
-      double _Length1;           /**< length of first quartz bar segment possitioned backward */
-      double _Length2;           /**< length of second quartz bar segment possitioned forwards */
-      double _Length3;           /**< length segment to which the mirror is attached */
-      double _WLength;           /**< length wedge segment */
-      double _Wwidth;            /**< width wedge segment */
-      double _Wextdown;          /**< wedge extension down */
-      double _Gwidth1;           /**< width of glue between wedge and segment 1 */
-      double _Gwidth2;           /**< width of glue between segment 1 segmen 2 */
-      double _Gwidth3;           /**< width of glue between segment 3 and mirror segment */
+      //! PMT parameters
 
+      int m_Npmtx;                /**< number of PMT columns  */
+      int m_Npmty;                /**< number of PMT rows */
+      double m_Msizex;            /**< PMT size in x */
+      double m_Msizey;            /**< PMT size in y */
+      double m_Msizez;            /**< PMT wall size in z */
+      double m_MWallThickness;    /**< PMT wall thickness */
+      double m_Xgap;              /**< gap between PMTs in x direction */
+      double m_Ygap;              /**< gap between PMTs in y direction */
+      double m_Asizex;            /**< active area in x */
+      double m_Asizey;            /**< active area in y */
+      double m_Asizez;            /**< active area thickness */
+      double m_Winthickness;      /**< window thickness */
+      double m_Botthickness;      /**< window thickness */
+      int m_Npadx;                /**< number of pads in x */
+      int m_Npady;                /**< number of pads in y */
+      double m_padx;              /**< pad size in x */
+      double m_pady;              /**< pad size in y */
+      double m_AsizexHalf;        /**< active area half size in x */
+      double m_AsizeyHalf;        /**< active area half size in y */
+      double m_dGlue;             /**< PMT wedge glue thickness */
 
-      //! Parameters for PMT
+      //! TDC parameters
 
+      int m_NTDC;                 /**< number of TDC bits */
+      double m_TDCwidth;          /**< width of a bit in [ns] */
 
-      double _Xgap;              /**< gap between PMTs in x direction */
-      double _Ygap;              /**< gap between PMTs in x direction */
-      int _Npmtx;                /**< number of PMTs in one row */
-      int _Npmty;                /**< number og PMTs in one column */
-      double _Msizex;            /**< module side X */
-      double _Msizey;            /**< module side Y */
-      double _Msizez;            /**< module wall size in Z */
-      double _MWallThickness;    /**< module wall thickness */
-      double _Asizex;            /**< active area size in X */
-      double _Asizey;            /**< active area size in y */
-      double _Asizez;            /**< active area size in z */
-      double _Winthickness;      /**< window thickness */
-      double _Botthickness;      /**< window thickness */
-      int _Npadx;                /**< number of pads in x */
-      int _Npady;                /**< number of pads in y */
-      double _dGlue;             /**< PMT wedge glue thickness */
-      int _NTDC;                 /**< number of TDC bits */
-      double _TDCwidth;          /**< width of TDC bit */
+      //! time transition spread (TTS) defined as a sum of Gaussian terms
 
-      /**< Mirror parameters */
+      int m_NgaussTTS;                 /**< number of gaussian terms */
+      double m_TTSfrac[MAXPTS_TTS];    /**< fractions */
+      double m_TTSmean[MAXPTS_TTS];    /**< mean's */
+      double m_TTSsigma[MAXPTS_TTS];   /**< sigma's */
 
+      //! Quantum & collection efficiencies
 
-      double _Mirposx;           /**< dispacement along quartz width for mirror axis */
-      double _Mirposy;           /**< dispacement along quartz whickness for mirror axis */
-      double _Mirthickness;      /**< mirror layer thickness */
-      double _Mirradius;         /**< radius of spherical mirror */
+      double m_ColEffi;           /**< collection efficiency */
+      double m_LambdaFirst;       /**< wavelength [nm]: first QE data point */
+      double m_LambdaStep;        /**< wavelength [nm]: step */
+      int m_NpointsQE;            /**< number of QE data points */
+      double m_QE[MAXPTS_QE];     /**< quantum efficiency times filter transmission*/
 
-      //! Support parameters
+      //! Mirror parameters (spherical mirror)
 
+      double m_Mirradius;     /**< radius  */
+      double m_Mirposx;       /**< center of curvature in x */
+      double m_Mirposy;       /**< center of curvature in y */
+      double m_Mirthickness;  /**< reflective layer thickness */
 
-      double _PannelThickness;   /**< thicness of QBB pannel */
-      double _PlateThickness;    /**< thickness of side pladte */
-      double _LowerGap;          /**< lower air gap */
-      double _UpperGap;          /**< upper air gap */
-      double _SideGap;           /**< side air gap */
-      double _ZForward;          /**< forward possition of support */
-      double _ZBackward;         /**< backward possition of support */
+      //! Support structure parameters
 
+      double m_PannelThickness;   /**< thicness of QBB pannel */
+      double m_PlateThickness;    /**< thickness of side pladte */
+      double m_LowerGap;          /**< lower air gap */
+      double m_UpperGap;          /**< upper air gap */
+      double m_SideGap;           /**< side air gap */
+      double m_ZForward;          /**< forward possition of support */
+      double m_ZBackward;         /**< backward possition of support */
 
-      //! Technical parameters
+      //! Other
 
-      static TOPGeometryPar* p_B4TOPGeometryParDB; /*!< Pointer that saves the instance of this class. */
-
-      //! Holds path to alignment
-      GearDir m_alignment;        /**<GearDir used to store alignment path */
+      static TOPGeometryPar* p_B4TOPGeometryParDB;  /**< Pointer to class instance */
+      GearDir m_alignment;                          /**< GearDir of alignment */
+      double m_unit;                                /**< conversion unit for length */
 
     };
-    //! functions for bars
-
-    inline int TOPGeometryPar::getNbars() const
-    {
-      return _Nbars;
-    }
-
-    inline double TOPGeometryPar::getRadius() const
-    {
-      return _Radius / Unit::mm;
-    }
-
-    inline double TOPGeometryPar::getQwidth() const
-    {
-      return _Qwidth / Unit::mm;
-    }
-
-    inline double TOPGeometryPar::getQthickness() const
-    {
-      return _Qthickness / Unit::mm;
-    }
-
-    inline double TOPGeometryPar::getBposition() const
-    {
-      return _Bposition / Unit::mm;
-    }
-
-    inline double TOPGeometryPar::getLength1() const
-    {
-      return _Length1 / Unit::mm;
-    }
-
-    inline double TOPGeometryPar::getLength2() const
-    {
-      return _Length2 / Unit::mm;
-    }
-
-    inline double TOPGeometryPar::getLength3() const
-    {
-      return _Length3 / Unit::mm;
-    }
-
-    inline double TOPGeometryPar::getWLength() const
-    {
-      return _WLength / Unit::mm;
-    }
-
-    inline double TOPGeometryPar::getWwidth() const
-    {
-      return _Wwidth / Unit::mm;
-    }
-
-    inline double TOPGeometryPar::getWextdown() const
-    {
-      return _Wextdown / Unit::mm;
-    }
-
-    inline double TOPGeometryPar::getGwidth1() const
-    {
-      return _Gwidth1 / Unit::mm;
-    }
-
-    inline double TOPGeometryPar::getGwidth2() const
-    {
-      return _Gwidth2 / Unit::mm;
-    }
-
-    inline double TOPGeometryPar::getGwidth3() const
-    {
-      return _Gwidth3 / Unit::mm;
-    }
-
-
-    //! functions for PMT
-
-
-    inline double TOPGeometryPar::getXgap() const
-    {
-      return _Xgap / Unit::mm;
-    }
-
-    inline double TOPGeometryPar::getYgap() const
-    {
-      return _Ygap / Unit::mm;
-    }
-
-    inline int TOPGeometryPar::getNpmtx() const
-    {
-      return _Npmtx;
-    }
-
-    inline int TOPGeometryPar::getNpmty() const
-    {
-      return _Npmty;
-    }
-
-    inline double TOPGeometryPar::getMsizex() const
-    {
-      return _Msizex / Unit::mm;
-    }
-
-    inline double TOPGeometryPar::getMsizey() const
-    {
-      return _Msizey / Unit::mm;
-    }
-
-    inline double TOPGeometryPar::getMsizez() const
-    {
-      return _Msizez / Unit::mm;
-    }
-
-    inline double TOPGeometryPar::getMWallThickness() const
-    {
-      return _MWallThickness / Unit::mm;
-    }
-
-    inline double TOPGeometryPar::getAsizex() const
-    {
-      return _Asizex / Unit::mm;
-    }
-
-    inline double TOPGeometryPar::getAsizey() const
-    {
-      return _Asizey / Unit::mm;
-    }
-
-    inline double TOPGeometryPar::getAsizez() const
-    {
-      return _Asizez / Unit::mm;
-    }
-
-    inline double TOPGeometryPar::getWinthickness() const
-    {
-      return _Winthickness / Unit::mm;
-    }
-
-    inline double TOPGeometryPar::getBotthickness() const
-    {
-      return _Botthickness / Unit::mm;
-    }
-
-    inline int TOPGeometryPar::getNpadx() const
-    {
-      return _Npadx;
-    }
-
-    inline int TOPGeometryPar::getNpady() const
-    {
-      return _Npmty;
-    }
-
-    inline double TOPGeometryPar::getdGlue() const
-    {
-      return _dGlue / Unit::mm;
-    }
-
-    inline int TOPGeometryPar::getTDCbits() const
-    {
-      return _NTDC;
-    }
-
-    inline double TOPGeometryPar::getTDCbitwidth() const
-    {
-      return _TDCwidth / Unit::ns;
-    }
-
-    //! Mirror functions
-
-
-    inline double TOPGeometryPar::getMirposx() const
-    {
-      return _Mirposx / Unit::mm;
-    }
-
-    inline double TOPGeometryPar::getMirposy() const
-    {
-      return _Mirposy / Unit::mm;
-    }
-
-    inline double TOPGeometryPar::getMirthickness() const
-    {
-      return _Mirthickness / Unit::mm;
-    }
-
-    inline double TOPGeometryPar::getMirradius() const
-    {
-      return _Mirradius / Unit::mm;
-    }
-
-    //! Support parameters
-
-
-    inline double TOPGeometryPar::getPannelThickness() const
-    {
-      return _PannelThickness / Unit::mm;
-    }
-
-    inline double TOPGeometryPar::getPlateThickness() const
-    {
-      return _PlateThickness / Unit::mm;
-    }
-
-    inline double TOPGeometryPar::getLowerGap() const
-    {
-      return _LowerGap / Unit::mm;
-    }
-
-    inline double TOPGeometryPar::getUpperGap() const
-    {
-      return _UpperGap / Unit::mm;
-    }
-
-    inline double TOPGeometryPar::getSideGap() const
-    {
-      return _SideGap / Unit::mm;
-    }
-
-    inline double TOPGeometryPar::getZForward() const
-    {
-      return _ZForward / Unit::mm;
-    }
-
-    inline double TOPGeometryPar::getZBackward() const
-    {
-      return _ZBackward / Unit::mm;
-    }
-
-
-    //! Derived functions which are part of geometry
-
-
-    inline int TOPGeometryPar::getChannelID(TVector2 position, int moduleID) const
-    {
-
-      double padx = _Asizex / (double)_Npadx;
-      double pady = _Asizey / (double)_Npady;
-
-      int ix = int((position.X() + _Asizex / 2.0) / padx);
-      int iy = int((position.Y() + _Asizey / 2.0) / pady);
-
-      if (ix > _Npadx - 1 || iy > _Npady - 1) return -1;
-
-      int pmtID = ix + _Npadx * iy;
-
-      int chID = pmtID + moduleID * _Npadx * _Npady;
-
-      return chID;
-    }
-
-    inline double TOPGeometryPar::getZ1() const
-    {
-      return _Bposition / Unit::mm - _Gwidth1 / Unit::mm;
-    }
-
-    inline double TOPGeometryPar::getZ2() const
-    {
-      return _Bposition / Unit::mm + _Length1 / Unit::mm + _Gwidth2 / Unit::mm + _Length2 / Unit::mm + _Gwidth3 / Unit::mm + _Length3 / Unit::mm;
-    }
-
-    //! Alignement reader
-
-    inline G4Transform3D TOPGeometryPar::getAlignment(const string& component)
-    {
-      //! Format the path using BOOST
-      string path = (boost::format("Align[@component='%1%']/") % component).str();
-      //! Appendt path to alignement path
-      GearDir params(m_alignment, path);
-      //! Check if parameter exists
-      if (!params) {
-        B2WARNING("Could not find alignment parameters for component " << component);
-        return G4Transform3D();
-      }
-      //! Read the translations
-      double dU = params.getLength("du") / Unit::mm;
-      double dV = params.getLength("dv") / Unit::mm;
-      double dW = params.getLength("dw") / Unit::mm;
-      //! Read the rotations
-      double alpha = params.getAngle("alpha");
-      double beta  = params.getAngle("beta");
-      double gamma = params.getAngle("gamma");
-      //! Combine rotations and tralstions
-      G4RotationMatrix rotation(alpha, beta, gamma);
-      G4ThreeVector translation(dU, dV, dW);
-      //! Return combine matrix
-      return G4Transform3D(rotation, translation);
-    }
-
 
   } //! end of namespace TOP
 } //! end of namespace Belle2

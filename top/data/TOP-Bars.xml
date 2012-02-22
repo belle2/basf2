@@ -9,7 +9,7 @@
     <QBar1Length desc="Length of the first bar segment which starts at QZBackward" unit="cm">130.0</QBar1Length>
     <QBar2Length desc="Length of the second bar segment which starts at QZBackward+QBar1Length" unit="cm">130.0</QBar2Length>
     <QBarMirror desc="Length of the quarz sedment to which the mirror is attached" unit="mm">50</QBarMirror>
-    <QWedgeLength dest="Size of the extension volue of the quartz bar in the z direction" unit="mm">60</QWedgeLength>
+    <QWedgeLength dest="Size of the extension volue of the quartz bar in the z direction" unit="mm">100</QWedgeLength>
     <QWedgeWidth desc="Width of the quartz bar extension" unit="mm">443</QWedgeWidth>
     <QWedgeDown dest="Size of the expansion volue of the quartz bar in the y direction downwards" unit="cm">3.1</QWedgeDown>
     

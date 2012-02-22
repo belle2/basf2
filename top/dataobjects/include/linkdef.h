@@ -8,6 +8,7 @@
 #pragma link C++ class Belle2::TOPSimHit;
 #pragma link C++ class Belle2::TOPDigiHit;
 #pragma link C++ class Belle2::TOPTrack;
+#pragma link C++ class Belle2::TOPlikelihoods;
 
 
 #endif

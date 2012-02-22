@@ -114,6 +114,12 @@ void TOPreco::DumpLogL(int Size)
   GetLogL(Size, logl, sfot, Nphot);
   rtra_get_hypid_(&Size, hypid);
 
+  int i_max = 0;
+  double logl_max = logl[0];
+  for (int i = 1; i < Size; i++) {
+    if (logl[i] > logl_max) {logl_max = logl[i]; i_max = i;}
+  }
+
   using namespace std;
   cout << "TOPreco::DumpLogL: Flag=" << Flag() << "  Detected Photons=" << Nphot << endl;
   cout << " i HypID   LogL   ExpPhot" << endl;
@@ -123,6 +129,7 @@ void TOPreco::DumpLogL(int Size)
     cout << setw(4) << hypid[i];
     cout << setw(10) << setprecision(2) << logl[i];
     cout << setw(8) << setprecision(2) << sfot[i];
+    if (i == i_max) cout << " <";
     if (hypid[i] == m_HYP) cout << " <-- truth";
     cout << endl;
   }

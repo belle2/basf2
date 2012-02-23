@@ -68,7 +68,10 @@ TCHit::setup(void)
     double hitTOF      = aECLSimHit->getFlightTime() * Unit::ns;
 
     TVector3 HitInPos  = aECLSimHit->getPosIn();
-    TVector3 HitOutPos = aECLSimHit->getPosOut();
+//iw
+//  TVector3 HitOutPos = aECLSimHit->getPosOut();
+    TVector3 HitOutPos = HitInPos;
+//iw end
 
     TVector3 PosCell = eclp->GetCrystalPos(hitCellId);
     TVector3 VecCell = eclp->GetCrystalVec(hitCellId);

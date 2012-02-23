@@ -99,7 +99,7 @@ void SimpleOutputModule::initialize()
 
   for (int ii = 0; ii < DataStore::c_NDurabilityTypes; ii++) {
     if (m_treeNames[ii] == "NONE")
-      return; //nothing to do
+      continue; //nothing to do
 
     // check for duplicate treeNames
     for (int jj = 0; jj < ii; ++jj) {

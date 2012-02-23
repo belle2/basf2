@@ -25,7 +25,7 @@ particlegun.param('zVertexParams', [0, 0.0])
 g4sim       = register_module('FullSim')
 # Turn off physics processes
 #    "physics.mac" is located at "trg/examples/" or "tracking/examples"
-g4sim.param('UICommands',['/control/execute physics.mac'])
+# g4sim.param('UICommands',['/control/execute physics.mac'])
 
 #...EvtMetaGen...
 evtmetagen  = register_module('EvtMetaGen')

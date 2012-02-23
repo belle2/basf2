@@ -18,6 +18,10 @@
 #include "framework/core/Module.h"
 #include "tracking/modules/trasan/Trasan.h"
 
+namespace Belle {
+    class Trasan;
+}
+
 namespace Belle2 {
 
 /// A track finding module using Belle track finder Trasan.
@@ -47,8 +51,14 @@ class TrasanModule : public Module {
     virtual void terminate();
 
   private:
+
+    /// Debug level.
     int _debugLevel;
-    int _testParamInt;
+
+    /// GFTrackCandidate name.
+    std::string _gfTrackCandsName;
+
+    /// Trasan.
     Belle::Trasan _tra;
 };
 

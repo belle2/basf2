@@ -240,12 +240,12 @@
 #endif
 #endif
 
-#include <string>
 #define HEP_SHORT_NAMES
-#include "tracking/modules/trasan/AList.h"
- 
-#include "framework/core/Module.h"
 
+#include <string>
+//#include "tracking/modules/trasan/TrasanModule.h"
+#include "tracking/modules/trasan/AList.h"
+#include "framework/core/Module.h"
 #include "tracking/modules/trasan/TUpdater.h"
 #include "tracking/modules/trasan/TTrackManager.h"
 #ifdef TRASAN_WINDOW_GTK
@@ -256,6 +256,7 @@
 #endif
 
 namespace Belle2 {
+    class TrasanModule;
     class TRGCDC;
     class TRGCDCWireHit;
 }
@@ -548,6 +549,9 @@ class Trasan : public Belle2::Module, TUpdater {
     unsigned _nEvents;
     AList<TTrackMC> _mcTracks;
 
+    /// GFTrackCandidates name.
+    std::string _gfTrackCandsName;
+
 #ifdef TRASAN_WINDOW_GTK
     //...Trasan window...
   public:
@@ -567,6 +571,7 @@ class Trasan : public Belle2::Module, TUpdater {
     TWindowGTKSZ * _sz;
 #endif
 
+    friend class Belle2::TrasanModule;
 };
 
 //-----------------------------------------------------------------------------

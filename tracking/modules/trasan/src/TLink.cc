@@ -594,8 +594,8 @@ TLink::outerMost(const AList<TLink> & a) {
 
 void
 TLink::separateCores(const AList<TLink> & input,
-	      AList<TLink> & cores,
-	      AList<TLink> & nonCores) {
+		     AList<TLink> & cores,
+		     AList<TLink> & nonCores) {
     unsigned n = input.length();
     for (unsigned i = 0; i < n; i++) {
 	TLink & t = * input[i];

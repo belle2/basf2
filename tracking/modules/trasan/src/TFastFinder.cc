@@ -271,7 +271,7 @@ TFastFinder::selectSimpleSegments(const AList<Belle2::TRGCDCWireHit> & in,
 	for (unsigned i = 0; i < (unsigned) cluster.length(); i++) {
 	    Belle2::TRGCDCWireHit & h = * cluster[i];
 #ifdef TRASAN_DEBUG_DETAIL
-	    std::cout << h.wire()->name() << ",";
+	    std::cout << h.wire().name() << ",";
 #endif
 	    if (! ok) {
 		unsigned state = h.state();

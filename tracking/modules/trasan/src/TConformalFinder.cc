@@ -954,7 +954,7 @@ TConformalFinder::linkSegments(unsigned level) {
     w.stage("Conformal Finder : segment links");
     w.append(_allHits[2], Gdk::Color("grey"));
 //  w.append(_hits[2], Gdk::Color("green"));
-    for (unsigned i = 0; i < nSuperLayers; i++) {
+    for (unsigned i = 0; i < Belle2::TRGCDC::getTRGCDC()->nSuperLayers();i++) {
 	unsigned superLayerId = i / 2;
 	unsigned id = i % 2;
 //	w.append(_allSegments[id][superLayerId], Gdk::Color("green"));
@@ -2863,10 +2863,11 @@ TConformalFinder::refineSegments(const TTrack & t) const {
     }
 
 #ifdef TRASAN_DEBUG_DETAIL
+    const unsigned nSuperLayers = Belle2::TRGCDC::getTRGCDC()->nSuperLayers();
     std::cout << "... refine segments : orignal sl = ";
-    Belle2::TRGCDC::bitDisplay(sl, nSuperLayers, 0);
+    Belle2::TRGUtilities::bitDisplay(sl, nSuperLayers, 0);
     std::cout << ", output sl = ";
-    Belle2::TRGCDC::bitDisplay(SuperLayer(outList), nSuperLayers, 0);
+    Belle2::TRGUtilities::bitDisplay(SuperLayer(outList), nSuperLayers, 0);
     std::cout << std::endl;
 #endif
 

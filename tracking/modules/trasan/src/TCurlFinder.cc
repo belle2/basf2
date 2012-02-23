@@ -3840,10 +3840,10 @@ TCurlFinder::dumpType1(TTrack *track) {
     }else{
       std::cout << "S:" << track->links()[j]->hit()->wire().id() << ", ";
     }
-    if(debugMcFlag){
-      std::cout << ", HepTrackID = " << track->links()[j]->hit()->mc()->hep()->id();
-      std::cout << ", HepLundID = "  << track->links()[j]->hit()->mc()->hep()->pType();
-    }
+//     if(debugMcFlag){
+//       std::cout << ", HepTrackID = " << track->links()[j]->hit()->mc()->hep()->id();
+//       std::cout << ", HepLundID = "  << track->links()[j]->hit()->mc()->hep()->pType();
+//     }
     double dist = distance(*track, *(track->links()[j]));
     if(dist > 2.)std::cout << ": Large Distance( >2cm ) = " << dist;
     std::cout << std::endl;
@@ -3858,10 +3858,10 @@ TCurlFinder::dumpType1(TTrack *track) {
 	std::cout << "CA:" << list[j]->hit()->wire().id() << ", ";
       else
 	std::cout << "CS:" << list[j]->hit()->wire().id() << ", ";
-      if(debugMcFlag){
-	std::cout << ", HepTrackID = " << list[j]->hit()->mc()->hep()->id();
-	std::cout << ", HepLundID = "  << list[j]->hit()->mc()->hep()->pType();
-      }
+//       if(debugMcFlag){
+// 	std::cout << ", HepTrackID = " << list[j]->hit()->mc()->hep()->id();
+// 	std::cout << ", HepLundID = "  << list[j]->hit()->mc()->hep()->pType();
+//       }
       std::cout << ", Distance = " << dist << std::endl;
     }
   }

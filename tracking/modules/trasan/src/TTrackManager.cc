@@ -363,10 +363,7 @@
 #include <cstring>
 #include <cstdlib>
 #include <cfloat>
-
-
 #include "tracking/modules/trasan/Strings.h"
-
 #include "trg/cdc/WireHit.h"
 #include "trg/cdc/WireHitMC.h"
 #include "trg/cdc/TrackMC.h"
@@ -376,6 +373,9 @@
 #include "tracking/modules/trasan/TTrackManager.h"
 //cnv #include "tracking/modules/trasan/TProfiler.h"
 //cnv #include "tracking/modules/trasan/TSvdAssociator.h"
+#include "GFTrackCand.h"
+#include "TVector3.h"
+
 #ifdef TRASAN_DEBUG
 #include "tracking/modules/trasan/TDebugUtilities.h"
 #endif
@@ -736,11 +736,9 @@ struct rectrk_tof {
 };
 #endif
 
-
+using namespace std;
 
 namespace Belle {
-
-
 
 static float tosingle(double d) {
   if (d>FLT_MAX) return FLT_MAX;
@@ -764,21 +762,21 @@ TTrackManager::TTrackManager()
 TTrackManager::~TTrackManager() {
 }
 
-std::string
+string
 TTrackManager::version(void) const {
-    return std::string("4.12");
+    return string("4.12");
 }
 
 void
-TTrackManager::dump(const std::string & msg, const std::string & pref) const {
+TTrackManager::dump(const string & msg, const string & pref) const {
     bool def = (msg == "") ? true : false;
-    std::string pre = pref;
-    std::string tab;
+    string pre = pref;
+    string tab;
     for (unsigned i = 0; i < pre.size(); i++)
 	tab += " ";
 
-    if (msg.find("summary") != std::string::npos ||
-	msg.find("detail") != std::string::npos) {
+    if (msg.find("summary") != string::npos ||
+	msg.find("detail") != string::npos) {
 	struct summary s;
 	//       	bzero((char*)& s, sizeof(struct summary));
        	memset((char*)& s, 0, sizeof(struct summary));
@@ -801,71 +799,71 @@ struct summary r;
 	    }
 	}
 	
-	std::cout << pre << "all events : " << s._nEvents << std::endl;
+	cout << pre << "all events : " << s._nEvents << endl;
 	pre = tab;
 
 	//...Finder loop...
-	std::string tab = pre + "    ";
+	string tab = pre + "    ";
 	for (unsigned i = 0; i < 8; i++) {
 	    if (! s._nTracksAll[i]) continue;
 
-	    std::cout << pre << TTrack::finderName((1 << i)) << std::endl;
-	    std::cout << tab << "all tracks   : " << s._nTracksAll[i]
-		      << std::endl;
-	    std::cout << tab << "good tracks  : " << s._nTracks[i]
-		      << std::endl;
-	    std::cout << tab << "2D tracks    : " << s._nTracks2D[i]
-		      << std::endl;
-	    std::cout << tab << "final tracks : " << s._nTracksFinal[i]
-		      << std::endl;
-	    std::cout << tab << "super mom.   : " << s._nSuperMoms[i]
-		      << std::endl;
-	    std::cout << tab << "Pt cut       : " << s._nPtCut[i]
-		      << std::endl;
-	    std::cout << tab << "tanl cut     : " << s._nTanlCut[i]
-		      << std::endl;
+	    cout << pre << TTrack::finderName((1 << i)) << endl;
+	    cout << tab << "all tracks   : " << s._nTracksAll[i]
+		      << endl;
+	    cout << tab << "good tracks  : " << s._nTracks[i]
+		      << endl;
+	    cout << tab << "2D tracks    : " << s._nTracks2D[i]
+		      << endl;
+	    cout << tab << "final tracks : " << s._nTracksFinal[i]
+		      << endl;
+	    cout << tab << "super mom.   : " << s._nSuperMoms[i]
+		      << endl;
+	    cout << tab << "Pt cut       : " << s._nPtCut[i]
+		      << endl;
+	    cout << tab << "tanl cut     : " << s._nTanlCut[i]
+		      << endl;
 	}
-	std::cout << pre << "Curler Information" << std::endl;
-	std::cout << tab << "to be mreged : " << s._nToBeMerged
-		  << std::endl;
-	std::cout << tab << "to be mreged2: "
-		  << s._nToBeMergedMoreThanTwo << std::endl;
+	cout << pre << "Curler Information" << endl;
+	cout << tab << "to be mreged : " << s._nToBeMerged
+		  << endl;
+	cout << tab << "to be mreged2: "
+		  << s._nToBeMergedMoreThanTwo << endl;
 
 	for (unsigned i = 0; i < 8; i++) {
 	    if (! s._nTracksAll[i]) continue;
-	    if (msg.find("MC") != std::string::npos) {
-		std::cout << pre << TTrack::finderName((1 << i))
-			  << " MC information" << std::endl;
-		std::cout << tab << "Good     : " << s._nMCQuality[i][0]
-			  << std::endl;
-		std::cout << tab << "Ghost    : " << s._nMCQuality[i][1]
-			  << std::endl;
-		std::cout << tab << "Bad      : " << s._nMCQuality[i][2]
-			  << std::endl;
-		std::cout << tab << "Charge   : " << s._nMCQuality[i][3]
-			  << std::endl;
-		std::cout << tab << "Garbage  : " << s._nMCQuality[i][4]
-			  << std::endl;
+	    if (msg.find("MC") != string::npos) {
+		cout << pre << TTrack::finderName((1 << i))
+			  << " MC information" << endl;
+		cout << tab << "Good     : " << s._nMCQuality[i][0]
+			  << endl;
+		cout << tab << "Ghost    : " << s._nMCQuality[i][1]
+			  << endl;
+		cout << tab << "Bad      : " << s._nMCQuality[i][2]
+			  << endl;
+		cout << tab << "Charge   : " << s._nMCQuality[i][3]
+			  << endl;
+		cout << tab << "Garbage  : " << s._nMCQuality[i][4]
+			  << endl;
 	    }
 	}
     }
-    if (def || msg.find("eventSummary") != std::string::npos ||
-	msg.find("detail") != std::string::npos) {
-	std::cout << pre << "tracks reconstructed : " << _tracksAll.length()
-	       << std::endl;
-	std::cout << tab << "good tracks          : " << _tracks.length()
-	       << std::endl;
-	std::cout << tab << "2D tracks            : " << _tracks2D.length()
-	       << std::endl;
-	std::cout << tab << "Track list:[name,finder,type,status,?,0,0,charge*ip,dr,dz,pt,pz,links..,chisq,errmtx]" << std::endl;
+    if (def || msg.find("eventSummary") != string::npos ||
+	msg.find("detail") != string::npos) {
+	cout << pre << "tracks reconstructed : " << _tracksAll.length()
+	       << endl;
+	cout << tab << "good tracks          : " << _tracks.length()
+	       << endl;
+	cout << tab << "2D tracks            : " << _tracks2D.length()
+	       << endl;
+	cout << tab << "Track list:[name,finder,type,status,?,0,0,charge*ip,dr,dz,pt,pz,links..,chisq,errmtx]" << endl;
 
 	for (unsigned i = 0; i < (unsigned) _tracksAll.length(); i++) {
-	    std::cout << tab << tab << TTrack::trackDump(* _tracksAll[i])
-		      << std::endl;
-	    if (msg.find("helix") != std::string::npos)
+	    cout << tab << tab << TTrack::trackDump(* _tracksAll[i])
+		      << endl;
+	    if (msg.find("helix") != string::npos)
 		_tracksAll[i]->dump("helix detail", tab + "    ");
-	    if (msg.find("hits") != std::string::npos ||
-		msg.find("detail") != std::string::npos)
+	    if (msg.find("hits") != string::npos ||
+		msg.find("detail") != string::npos)
 		TLink::dump(_tracksAll[i]->links(), "hits sort flag");
 	}
 	pre = tab;
@@ -913,8 +911,8 @@ void
 TTrackManager::salvage(const CAList<Belle2::TRGCDCWireHit> & hits) const {
 
 #ifdef TRASAN_DEBUG_DETAIL
-    std::cout << name() << " ... salvaging" << std::endl;
-    std::cout << "    # of given hits=" << hits.length() << std::endl;
+    cout << name() << " ... salvaging" << endl;
+    cout << "    # of given hits=" << hits.length() << endl;
 #endif
 
     //...Check arguments...
@@ -930,15 +928,15 @@ TTrackManager::salvage(const CAList<Belle2::TRGCDCWireHit> & hits) const {
 	//...Already used?...
 	if (h.state() & WireHitUsed) continue;
 #ifdef TRASAN_DEBUG_DETAIL
-	std::cout << "    checking " << h.wire().name() << std::endl;
+	cout << "    checking " << h.wire().name() << endl;
 #endif
 
 	//...Select the closest track to a hit...
 	TTrack * best = closest(_tracks, h);
 #ifdef TRASAN_DEBUG_DETAIL
 	if (! best) {
-	    std::cout << "        no track candidate returned";
-	    std::cout << "by TTrackManager::closest" << std::endl;
+	    cout << "        no track candidate returned";
+	    cout << "by TTrackManager::closest" << endl;
 	}
 #endif
 	if (! best) continue;
@@ -981,9 +979,9 @@ TTrackManager::saveTables(void) {
     if (_debugLevel) monitor();
 
 #ifdef TRASAN_DEBUG_DETAIL
-    std::cout << "TTrackManager::saveTables ... # 3D tracks=" << _tracks.length()
+    cout << "TTrackManager::saveTables ... # 3D tracks=" << _tracks.length()
 	   << ", # 2D tracks=" << _tracks2D.length()
-	   << ", all tracks=" << _tracksAll.length() << std::endl;
+	   << ", all tracks=" << _tracksAll.length() << endl;
 #endif
 
     //...For 3D tracks...
@@ -1003,8 +1001,8 @@ TTrackManager::saveTables(void) {
 	if (! t.nLinks()) {
 	    badTracks.append((TTrack &) t);
 #ifdef TRASAN_DEBUG_DETAIL
-	    std::cout << "    Bad track found(no link):" << t.name()
-		   << std::endl;
+	    cout << "    Bad track found(no link):" << t.name()
+		   << endl;
 #endif
 	    continue;
 	}
@@ -1018,8 +1016,8 @@ TTrackManager::saveTables(void) {
 	if (err) {
 	    badTracks.append(t);
 #ifdef TRASAN_DEBUG_DETAIL
-	    std::cout << "    Bad track found(copyTrack err=" << err << "):"
-		   << t.name() << std::endl;
+	    cout << "    Bad track found(copyTrack err=" << err << "):"
+		   << t.name() << endl;
 #endif
 	    continue;
 	}
@@ -1045,7 +1043,7 @@ TTrackManager::saveTables(void) {
     for (unsigned i = 0; i < n; i++) {
 
 #ifdef TRASAN_DEBUG_DETAIL
-	std::cout << "id[" << i << "]=" << id[i] << std::endl;
+	cout << "id[" << i << "]=" << id[i] << endl;
 #endif
 	if (! (id[i])) continue;
 	if (! (_tracks[i]->daughter())) continue;
@@ -1053,9 +1051,9 @@ TTrackManager::saveTables(void) {
 	int dId = _tracks.index(_tracks[i]->daughter());
 
 #ifdef TRASAN_DEBUG_DETAIL
-	std::cout << "    dId=" << dId;
-	if (dId >= 0) std::cout << ", id[dId]=" << id[dId];
-	std::cout << std::endl;
+	cout << "    dId=" << dId;
+	if (dId >= 0) cout << ", id[dId]=" << id[dId];
+	cout << endl;
 #endif
 
 	if (dId >= 0) {
@@ -1082,9 +1080,9 @@ TTrackManager::saveTables(void) {
 	int err = copyTrack(t, & r, & a);
 	if (err) {
 #ifdef TRASAN_DEBUG_DETAIL
-	    std::cout << "TTrackManager::saveTables !!! bad 2D tracks found"
-		      << " : err=" << err << std::endl
-		      << TTrack::trackDump(t) << std::endl;
+	    cout << "TTrackManager::saveTables !!! bad 2D tracks found"
+		      << " : err=" << err << endl
+		      << TTrack::trackDump(t) << endl;
 #endif
 	    badTracks.append(t);
 	    continue;
@@ -1107,26 +1105,26 @@ TTrackManager::saveTables(void) {
 
 #ifdef TRASAN_DEBUG
 	if ((r->m_ndf == 0) && (r->m_chiSq > 0.)) {
-	    std::cout << "TTrackManager::saveTables !!! chisq>0 with ndf=0."
-		      << std::endl
+	    cout << "TTrackManager::saveTables !!! chisq>0 with ndf=0."
+		      << endl
 		      << "    Here is a track dump"
-		      << "    " << TTrack::trackDump(t) << std::endl;
+		      << "    " << TTrack::trackDump(t) << endl;
 	    t.dump("detail");
 	}
 	if ((r->m_ndf > 0) && (r->m_chiSq == 0.)) {
-	    std::cout << "TTrackManager::saveTables !!! chisq=0 with ndf>0."
-		      << std::endl
+	    cout << "TTrackManager::saveTables !!! chisq=0 with ndf>0."
+		      << endl
 		      << "    Here is a track dump"
-		      << "    " << TTrack::trackDump(t) << std::endl;
+		      << "    " << TTrack::trackDump(t) << endl;
 	    t.dump("detail");
 	}
 
 	if (r->m_ndf == 0)
-	    std::cout << "TTrackManager::saveTables ... ndf = 0" << std::endl
-		      << "    " << TTrack::trackDump(t) << std::endl;
+	    cout << "TTrackManager::saveTables ... ndf = 0" << endl
+		      << "    " << TTrack::trackDump(t) << endl;
 	if (r->m_chiSq == 0.)
-	    std::cout << "TTrackManager::saveTables ... chisq = 0" << std::endl
-		      << "    " << TTrack::trackDump(t) << std::endl;
+	    cout << "TTrackManager::saveTables ... chisq = 0" << endl
+		      << "    " << TTrack::trackDump(t) << endl;
 #endif
     }
     _tracks2D.remove(badTracks);
@@ -1175,9 +1173,59 @@ if (mc->hep()) m->m_hep = 0;
 }
 
 void
+TTrackManager::saveBelle2(Belle2::StoreArray<GFTrackCand> & cands) {
+    if (_debugLevel) monitor();
+
+#ifdef TRASAN_DEBUG_DETAIL
+    cout << "TTrackManager::saveBelle2 ... # 3D tracks="
+	      << _tracks.length() << ", # 2D tracks=" << _tracks2D.length()
+	      << ", all tracks=" << _tracksAll.length() << endl;
+#endif
+
+    //...For 3D tracks...
+    AList<TTrack> badTracks;
+    unsigned n = _tracks.length();
+    for (unsigned i = 0; i < n; i++) {
+	TTrack & t = * _tracks[i];
+
+	//...Track quality check...
+	if (! t.nLinks()) {
+	    badTracks.append((TTrack &) t);
+#ifdef TRASAN_DEBUG_DETAIL
+	    cout << "    Bad track found(no link):" << t.name()
+		   << endl;
+#endif
+	    continue;
+	}
+	if (! goodTrack(t, false))
+	    continue;
+
+	//...Copy track parameters...
+	int err = copyTrack(cands, t);
+	if (err) {
+	    badTracks.append(t);
+#ifdef TRASAN_DEBUG_DETAIL
+	    cout << "    Bad track found(copyTrack err=" << err << "):"
+		   << t.name() << endl;
+#endif
+	    continue;
+	}
+	_tracksFinal.append(t);
+
+	//...Type and quality...
+    }
+
+    //...Daughter treatment...
+
+    //...Remove bad tracks...
+
+    //...For 2D tracks...
+}
+
+void
 TTrackManager::movePivot(void) {
 #ifdef TRASAN_DEBUG_DETAIL
-    const std::string stage = "TRKMGR::movePivot";
+    const string stage = "TRKMGR::movePivot";
     EnterStage(stage);
 #endif
 
@@ -1214,13 +1262,13 @@ TTrackManager::finish(void) {
     refit();
     movePivot();
     if (_debugLevel > 1) {
-	std::cout << name() << " ... finishing" << std::endl;
+	cout << name() << " ... finishing" << endl;
 //	unsigned n = _tracksAll.length();
 	unsigned n = _tracks.length();
 	for (unsigned i = 0; i < n; i++) {
 //	    TTrack & t = * _tracksAll[i];
 	    TTrack & t = * _tracks[i];
-	    std::cout << "    " << t.name() << std::endl;
+	    cout << "    " << t.name() << endl;
 	    t.dump("hits mc track flag sort", "    ");
 	}
     }
@@ -1229,7 +1277,7 @@ TTrackManager::finish(void) {
 void
 TTrackManager::append(AList<TTrack> & list) {
 #ifdef TRASAN_DEBUG_DETAIL
-    const std::string stage = "TRKMGR::append";
+    const string stage = "TRKMGR::append";
     EnterStage(stage);
 #endif
 
@@ -1245,7 +1293,7 @@ TTrackManager::append(AList<TTrack> & list) {
 void
 TTrackManager::append2D(AList<TTrack> & list) {
 #ifdef TRASAN_DEBUG_DETAIL
-    const std::string stage = "TRKMGR::append2D";
+    const string stage = "TRKMGR::append2D";
     EnterStage(stage);
 #endif
     _tracksAll.append(list);
@@ -1260,7 +1308,7 @@ TTrackManager::append2D(AList<TTrack> & list) {
 void
 TTrackManager::refit(void) {
 #ifdef TRASAN_DEBUG_DETAIL
-    const std::string stage = "TRKMGR::refit";
+    const string stage = "TRKMGR::refit";
     EnterStage(stage);
 #endif
 
@@ -1273,8 +1321,8 @@ TTrackManager::refit(void) {
 	if (err < 0) {
 	    bads.append(t);
 #ifdef TRASAN_DEBUG_DETAIL
-	    std::cout << Tab() << t.name()
-		      << " rejected because of fitting failure" << std::endl;
+	    cout << Tab() << t.name()
+		      << " rejected because of fitting failure" << endl;
 #endif
 	    continue;
 	}
@@ -1283,8 +1331,8 @@ TTrackManager::refit(void) {
 	if (err < 0) {
 	    bads.append(t);
 #ifdef TRASAN_DEBUG_DETAIL
-	    std::cout << Tab() << t.name()
-		      << " rejected because of fitting failure" << std::endl;
+	    cout << Tab() << t.name()
+		      << " rejected because of fitting failure" << endl;
 #endif
 	    continue;
 	}
@@ -1293,8 +1341,8 @@ TTrackManager::refit(void) {
 	if (err < 0) {
 	    bads.append(t);
 #ifdef TRASAN_DEBUG_DETAIL
-	    std::cout << Tab() << t.name()
-		      << " rejected because of fitting failure" << std::endl;
+	    cout << Tab() << t.name()
+		      << " rejected because of fitting failure" << endl;
 #endif
 	    continue;
 	}
@@ -1309,7 +1357,7 @@ TTrackManager::refit(void) {
 void
 TTrackManager::mask(void) const {
 //cnv #ifdef TRASAN_DEBUG_DETAIL
-//     std::cout << name() << " ... masking" << std::endl;
+//     cout << name() << " ... masking" << endl;
 // #endif
 //     static const unsigned nLayers = Belle2::TRGCDC::getTRGCDC()->nLayers();
 //     static unsigned * nHits = new unsigned[nLayers];
@@ -1345,8 +1393,8 @@ TTrackManager::mask(void) const {
 // 	if (! needMask) continue;
 
 // #ifdef TRASAN_DEBUG_DETAIL
-// 	std::cout << "    trk" << i << "(id is tmp) needs mask" << std::endl;
-// 	std::cout << "        type = " << t.type() << std::endl;
+// 	cout << "    trk" << i << "(id is tmp) needs mask" << endl;
+// 	cout << "        type = " << t.type() << endl;
 // #endif	
 
 // 	//...Switch by track type...
@@ -1368,7 +1416,7 @@ TTrackManager::mask(void) const {
 // 	_fitter.fit(t);
 
 // #ifdef TRASAN_DEBUG_DETAIL
-// 	std::cout << "    masking result : ";
+// 	cout << "    masking result : ";
 // 	t.dump("detail sort", "    ");
 // #endif
 //     }
@@ -1404,9 +1452,9 @@ TTrackManager::divide(const TTrack & t, AList<TLink> * l) const {
     }
 
 #ifdef TRASAN_DEBUG_DETAIL
-    std::cout << "    outer link = " << start.hit()->wire().name() << std::endl;
-    std::cout << "        nLinks of 0 = " << l[0].length() << std::endl;
-    std::cout << "        nLinks of 1 = " << l[1].length() << std::endl;
+    cout << "    outer link = " << start.hit()->wire().name() << endl;
+    cout << "        nLinks of 0 = " << l[0].length() << endl;
+    cout << "        nLinks of 1 = " << l[1].length() << endl;
 #endif
 
     if (l[0].length() == 0 || l[1].length() == 0)
@@ -1465,11 +1513,11 @@ TTrackManager::removeHitsAcrossOverIp(AList<TLink> & l) const {
     l.remove(cross);
 
 #ifdef TRASAN_DEBUG_DETAIL
-    std::cout << "    Cross over IP reduction : ";
+    cout << "    Cross over IP reduction : ";
     for (unsigned i = 0; i < (unsigned) cross.length(); i++) {
-	std::cout << cross[i]->wire()->name() << ",";
+	cout << cross[i]->wire()->name() << ",";
     }
-    std::cout << std::endl;
+    cout << endl;
 #endif
 }
 
@@ -1492,7 +1540,7 @@ TTrackManager::maskOut(TTrack & t, const AList<TLink> & links) const {
 void
 TTrackManager::maskMultiHits(TTrack & t) const {
 #ifdef TRASAN_DEBUG_DETAIL
-    std::cout << "... masking multi-hits" << std::endl;
+    cout << "... masking multi-hits" << endl;
 #endif
 
     if (! t.cores().length()) return;
@@ -1525,17 +1573,17 @@ TTrackManager::maskNormal(TTrack & t) const {
 //  TLink & start = divideByIp(t, l);
 
 #ifdef TRASAN_DEBUG_DETAIL
-    std::cout << "    normal : divided by IP" << std::endl;
-    std::cout << "    0=";
+    cout << "    normal : divided by IP" << endl;
+    cout << "    0=";
     for (unsigned j = 0; j < (unsigned) l[0].length(); j++) {
-	std::cout << "," << l[0][j]->wire()->name();
+	cout << "," << l[0][j]->wire()->name();
     }
-    std::cout << std::endl;
-    std::cout << "    1=";
+    cout << endl;
+    cout << "    1=";
     for (unsigned j = 0; j < (unsigned) l[1].length(); j++) {
-	std::cout << "," << l[1][j]->wire()->name();
+	cout << "," << l[1][j]->wire()->name();
     }
-    std::cout << std::endl;
+    cout << endl;
 #endif
     
     //...Which should be masked out ?...
@@ -1545,8 +1593,8 @@ TTrackManager::maskNormal(TTrack & t) const {
     if (TLink::nSuperLayers(l[0]) < TLink::nSuperLayers(l[1]))      maskSide = 0;
     else if (TLink::nSuperLayers(l[0]) > TLink::nSuperLayers(l[1])) maskSide = 1;
 #ifdef TRASAN_DEBUG_DETAIL
-    std::cout << "    NSuperLayers 0, 1 = " << TLink::nSuperLayers(l[0]) << ", ";
-    std::cout << TLink::nSuperLayers(l[1]) << std::endl;
+    cout << "    NSuperLayers 0, 1 = " << TLink::nSuperLayers(l[0]) << ", ";
+    cout << TLink::nSuperLayers(l[1]) << endl;
 #endif
     if (maskSide != 2) {
 	maskOut(t, l[maskSide]);
@@ -1559,7 +1607,7 @@ TTrackManager::maskNormal(TTrack & t) const {
     if (i0 < i1) maskSide = 1;
     else if (i0 > i1) maskSide = 0;
 #ifdef TRASAN_DEBUG_DETAIL
-    std::cout << "    i0, i1 = " << i0 << ", " << i1 << std::endl;
+    cout << "    i0, i1 = " << i0 << ", " << i1 << endl;
 #endif
     if (maskSide != 2) {
 	maskOut(t, l[maskSide]);
@@ -1570,8 +1618,8 @@ TTrackManager::maskNormal(TTrack & t) const {
     if (TLink::nLayers(l[0]) < TLink::nLayers(l[1])) maskSide = 0;
     else if (TLink::nLayers(l[0]) > TLink::nLayers(l[1])) maskSide = 1;
 #ifdef TRASAN_DEBUG_DETAIL
-    std::cout << "    NLayers 0, 1 = " << TLink::nLayers(l[0]) << ", ";
-    std::cout << TLink::nLayers(l[1]) << std::endl;
+    cout << "    NLayers 0, 1 = " << TLink::nLayers(l[0]) << ", ";
+    cout << TLink::nLayers(l[1]) << endl;
 #endif
     if (maskSide != 2) {
 	maskOut(t, l[maskSide]);
@@ -1589,8 +1637,8 @@ TTrackManager::maskNormal(TTrack & t) const {
 	if (tt[1]->pt() > tt[0]->pt()) maskSide = 1;
 	else                           maskSide = 0;
 #ifdef TRASAN_DEBUG_DETAIL
-	std::cout << "    pt 0 = " << tt[1]->pt() << std::endl;
-	std::cout << "    pt 1 = " << tt[0]->pt() << std::endl;
+	cout << "    pt 0 = " << tt[1]->pt() << endl;
+	cout << "    pt 1 = " << tt[0]->pt() << endl;
 #endif	    
 	delete tt[0];
 	delete tt[1];
@@ -1609,12 +1657,12 @@ TTrackManager::maskCurl(TTrack & t) const {
     if (l[1].length() == 0) return;
 
 #ifdef TRASAN_DEBUG_DETAIL
-    std::cout << "    curl : divided by IP" << std::endl;
-    std::cout << "    0:";
+    cout << "    curl : divided by IP" << endl;
+    cout << "    0:";
     TLink::dump(l[0], "flag sort");
-    std::cout << "    1:";
+    cout << "    1:";
     TLink::dump(l[1], "flag sort");
-    std::cout << std::endl;
+    cout << endl;
 #endif
 
     //...Which should be masked out ?...
@@ -1624,8 +1672,8 @@ TTrackManager::maskCurl(TTrack & t) const {
     if (TLink::nSuperLayers(l[0]) < TLink::nSuperLayers(l[1]))      maskSide = 0;
     else if (TLink::nSuperLayers(l[0]) > TLink::nSuperLayers(l[1])) maskSide = 1;
 #ifdef TRASAN_DEBUG_DETAIL
-    std::cout << "    NSuperLayers 0, 1 = " << TLink::nSuperLayers(l[0]) << ", ";
-    std::cout << TLink::nSuperLayers(l[1]) << std::endl;
+    cout << "    NSuperLayers 0, 1 = " << TLink::nSuperLayers(l[0]) << ", ";
+    cout << TLink::nSuperLayers(l[1]) << endl;
 #endif
     if (maskSide != 2) {
 	maskOut(t, l[maskSide]);
@@ -1659,8 +1707,8 @@ void
 TTrackManager::determineT0(unsigned level, unsigned nMax) {
 #ifdef TRASAN_DEBUG_DETAIL
     if (level == 0) {
-	std::cout << "TTrackManager::determineT0 !!! called with level = 0";
-	std::cout << std::endl;
+	cout << "TTrackManager::determineT0 !!! called with level = 0";
+	cout << endl;
     }
 #endif
 
@@ -1710,7 +1758,7 @@ TTrackManager::determineT0(unsigned level, unsigned nMax) {
     float t0 = 0.;
     if (methode == 0) t0 = T0(n);
     else if (methode == 1) t0 = T0Fit(n);
-    // std::cout << "reccdc_timing=" << BsCouTab(RECCDC_TIMING) << std::endl;
+    // cout << "reccdc_timing=" << BsCouTab(RECCDC_TIMING) << endl;
 //cnv    else if (methode == 2 && BsCouTab(RECCDC_TIMING) != 0) {
     else if (methode == 2) {
 //cnv 	struct reccdc_timing * r0 = (struct reccdc_timing *)
@@ -1725,14 +1773,14 @@ TTrackManager::determineT0(unsigned level, unsigned nMax) {
 // 	  }
 // 	}
 //	else if (r0->m_quality == 100) t0 = T0Fit(n);
-	// std::cout << "quality=" << r0->m_quality << std::endl;
+	// cout << "quality=" << r0->m_quality << endl;
     }
     
     //...For debug...
     if (_debugLevel) {
-	std::cout << "TTrackManager::determineT0 ... methode=" << methode;
-	std::cout << ", T0 offset=" << - t0;
-	std::cout << ", # of tracks used=" << n << std::endl;
+	cout << "TTrackManager::determineT0 ... methode=" << methode;
+	cout << ", T0 offset=" << - t0;
+	cout << ", # of tracks used=" << n << endl;
     }
 }
 
@@ -1785,7 +1833,7 @@ TTrackManager::T0Fit(unsigned n) {
     double w_sum   = 0.;
     
     //sort in order of pt
-    // std::cout << "length=" << _tracks.length() << std::endl;
+    // cout << "length=" << _tracks.length() << endl;
     const unsigned cn=_tracks.length();
 //    float* sort = new float[cn];
     unsigned * sort = new unsigned[cn];
@@ -1805,7 +1853,7 @@ TTrackManager::T0Fit(unsigned n) {
       ptmax_pre=ptmax;
     }
 
-    //    std::cout << "cn,n=" << cn <<" "<< n << std::endl;
+    //    cout << "cn,n=" << cn <<" "<< n << endl;
     //    for (unsigned i = 0; i < n; i++) {
     int n_good(0);
     for (unsigned i = 0; i < cn; i++) {
@@ -1820,16 +1868,16 @@ TTrackManager::T0Fit(unsigned n) {
       THelix hl( pvt, a );
       hl.ignoreErrorMatrix();
       hl.pivot( ORIGIN );
-      if( std::abs(hl.dr()) > 10.) continue;
-      if( std::abs(hl.dz()) > 25.) continue;
+      if( abs(hl.dr()) > 10.) continue;
+      if( abs(hl.dz()) > 25.) continue;
       n_good++;
       if(n_good > (int)n) break;
       
       //      float pt = fabs(1./t.helix().a()[2]);
-      // std::cout << "pt=" << pt << endl;
+      // cout << "pt=" << pt << endl;
       float tev = 0.;
       int fitstat = _cFitter.fit(t, tev, tev_err);
-      //	std::cout << "tev,tev_err=" <<tev<< " "<<tev_err<<endl;
+      //	cout << "tev,tev_err=" <<tev<< " "<<tev_err<<endl;
       if( fitstat != 0 ) continue;
       double w = 1. / tev_err / tev_err;
       tev_sum += w * tev;
@@ -1845,7 +1893,7 @@ TTrackManager::T0Fit(unsigned n) {
     // float tev_err_a = 1. / sqrt(w_sum);
     // float tev_err_b = (tev_sum2 - tev_sum0 * tev_sum0 / (n + 1)) / n;
     // tev_err_b = sqrt(tev_err_b);
-    // std::cout << "comp,t0,mean tev,err ="<<t0<<" "<<tev_mean<<" "<<tev_err_a<<" "<<tev_err_b<<std::endl;
+    // cout << "comp,t0,mean tev,err ="<<t0<<" "<<tev_mean<<" "<<tev_err_a<<" "<<tev_err_b<<endl;
     if (isnan(tev_mean)) tev_mean = 0.;
 
     //...Store it...
@@ -1867,7 +1915,7 @@ TTrackManager::minimum(float y0, float y1, float y2) const {
 void
 TTrackManager::merge(void) {
 #ifdef TRASAN_DEBUG_DETAIL
-    const std::string stage = "TRKMGR::merge";
+    const string stage = "TRKMGR::merge";
     EnterStage(stage);
 #endif
 
@@ -1942,12 +1990,12 @@ TTrackManager::merge(void) {
 	_tracks[MaxID]->append(_tracks[i0]->links());
 
 #ifdef TRASAN_DEBUG_DETAIL
-	std::cout << "    mask & merge " << std::endl;
-	std::cout << "    0:";
+	cout << "    mask & merge " << endl;
+	cout << "    0:";
 	TLink::dump(l[0], "flag sort");
-	std::cout << "    1:";
+	cout << "    1:";
 	TLink::dump(l[1], "flag sort");
-	std::cout << std::endl;
+	cout << endl;
 #endif
 
 	//...Which should be masked out ?...
@@ -1962,8 +2010,8 @@ TTrackManager::merge(void) {
 	else if ( super0 > super1 ) maskSide = 1;
     
 #ifdef TRASAN_DEBUG_DETAIL
-	std::cout << "    NSuperLayers 0, 1 = " << NSuperLayers(l[0]) << ", ";
-	std::cout << NSuperLayers(l[1]) << std::endl;
+	cout << "    NSuperLayers 0, 1 = " << NSuperLayers(l[0]) << ", ";
+	cout << NSuperLayers(l[1]) << endl;
 #endif
 
 	if (maskSide == 2) {
@@ -2025,7 +2073,7 @@ TTrackManager::merge(void) {
 	    if( qq > 0 ) whit.state(whit.state() & ~WireHitInvalidForFit);
 	    else         whit.state(whit.state() | WireHitInvalidForFit);
 #ifdef TRASAN_DEBUG_DETAIL
-	    std::cout << "TTrackManager::merge ... masking" << std::endl;
+	    cout << "TTrackManager::merge ... masking" << endl;
 #endif
 	}
     }
@@ -2054,9 +2102,9 @@ TTrackManager::copyTrack(TTrack & t,
     t.fitted(true);
 #endif
 #ifdef TRASAN_DEBUG_DETAIL
-    std::cout << "    checking hits ... " << t.name() 
+    cout << "    checking hits ... " << t.name() 
 	      << " quality = " << t.quality();
-    std::cout << " : " << t.cores().length() << ", " << t.ndf() << " : ";
+    cout << " : " << t.cores().length() << ", " << t.ndf() << " : ";
 #endif
 //  unsigned j = 0;
     unsigned nClst = 0;
@@ -2064,22 +2112,22 @@ TTrackManager::copyTrack(TTrack & t,
     unsigned nOccupied = 0;
     AList<TLink> hits;
     AList<TLink> badHits;
-    unsigned n = t.links().length();
+    const unsigned n = t.links().length();
     for (unsigned i = 0; i < n; i++) {
 	TLink * l = t.links()[i];
 //cnv	reccdc_wirhit * h = l->hit()->reccdc();
 	reccdc_wirhit * h = 0;
 
 #ifdef TRASAN_DEBUG_DETAIL
-	std::cout << l->wire()->name();
-	if (h->m_trk) std::cout << "(n/a)";
+	cout << l->wire()->name();
+	if (h->m_trk) cout << "(n/a)";
 	if ((l->hit()->state() & GoodHitMask) == GoodHitMask) {
 	    if (l->hit()->state() & WireHitInvalidForFit) {
 		if (! (h->m_stat & WireHitInvalidForFit))
-		    std::cout << "(bad)";
+		    cout << "(bad)";
 	    }
 	}
-	std::cout << ",";
+	cout << ",";
 #endif
 
 	if (h->m_trk) {
@@ -2100,7 +2148,7 @@ TTrackManager::copyTrack(TTrack & t,
     }
     t.finalHits(hits);
 #ifdef TRASAN_DEBUG_DETAIL
-    std::cout << std::endl;
+    cout << endl;
 #endif
 
     //...Check # of hits...
@@ -2145,8 +2193,8 @@ TTrackManager::copyTrack(TTrack & t,
 	chisq += h->m_pChiSq;
 
 #ifdef TRASAN_DEBUG_DETAIL
-	std::cout << "        chisq,sum(" << l->wire()->name() << ")=:"
-		  << h->m_pChiSq << "," << chisq << std::endl;
+	cout << "        chisq,sum(" << l->wire()->name() << ")=:"
+		  << h->m_pChiSq << "," << chisq << endl;
 #endif
     }
     r->m_chiSq = chisq;
@@ -2157,8 +2205,8 @@ TTrackManager::copyTrack(TTrack & t,
 	r->m_ndf = nHits - 3;
 
     //...Bad hits...
-    n = badHits.length();
-    for (unsigned i = 0; i < n; i++) {
+    const unsigned n2 = badHits.length();
+    for (unsigned i = 0; i < n2; i++) {
 //cnv	reccdc_wirhit * h = badHits[i]->hit()->reccdc();
 	reccdc_wirhit * h = 0;
 	h->m_trk = r->m_ID;
@@ -2208,6 +2256,65 @@ TTrackManager::copyTrack(TTrack & t,
     return err;
 }
 
+int
+TTrackManager::copyTrack(Belle2::StoreArray<GFTrackCand> & trackCandidates,
+			 TTrack & t) const {
+
+    //...Get # for new candidate...
+    const int counter = trackCandidates->GetLast() + 1;
+
+    //...New storage...
+    new(trackCandidates->AddrAt(counter)) GFTrackCand();
+
+    //...Helix parameters... Need to check pivot position
+    TVector3 momentum(t.helix().momentum().x(),
+		      t.helix().momentum().y(), 
+		      t.helix().momentum().z());
+    TVector3 position(t.helix().x().x(),
+		      t.helix().x().y(),
+		      t.helix().x().z());
+
+    cout << t.helix().pivot() << endl;
+
+    //...Erros on helix parameters...
+    //   I don't know the meaning of these errors.
+    //   So copied from MCTrckFinderModule.
+    TVector3 posError;
+    posError.SetXYZ(1.0, 1.0, 2.0);
+    TVector3 momError;
+    momError.SetXYZ(0.1, 0.1, 0.2);
+
+    //...Let's assume this as pion...
+    int pdg = 211 * int(t.charge());
+
+    //...Copy info...
+    trackCandidates[counter]->setComplTrackSeed(position,
+						momentum,
+						pdg,
+						posError,
+						momError);
+
+    //...No MC info now...
+    // trackCandidates[counter]->setMcTrackId(iPart);
+
+    //...What is Dip??? Let's skip this...
+    // trackCandidates[counter]->setDip(100);
+
+    //...CDC hit info... I don't know this is correct or not
+    const unsigned n = t.links().length();
+    for (unsigned i = 0; i < n; i++) {
+ 	const Belle2::TRGCDCWireHit & h = * t.links()[i]->hit();
+ 	const unsigned layerId = h.wire().layerId();
+ 	const unsigned hitID = h.iCDCHit();
+ 	const double driftTime = h.drift();
+ 	const unsigned uniqueId = layerId * 10000 + h.wire().localId();
+
+ 	trackCandidates[counter]->addHit(2, hitID, driftTime, uniqueId);
+    }
+
+    return 0;
+}
+
 void
 TTrackManager::sortTracksByQuality(void) {
     unsigned n = _tracks.length();
@@ -2232,8 +2339,8 @@ TTrackManager::sortTracksByQuality(void) {
 void
 TTrackManager::sortTracksByPt(void) {
 #ifdef TRASAN_DEBUG_DETAIL
-    std::cout << "trkmgr::sortTracksByPt : # of tracks="
-	 << _tracks.length() << std::endl;
+    cout << "trkmgr::sortTracksByPt : # of tracks="
+	 << _tracks.length() << endl;
 #endif
 
     unsigned n = _tracks.length();
@@ -2246,8 +2353,8 @@ TTrackManager::sortTracksByPt(void) {
 	    TTrack & t1 = * _tracks[j];
 	    float pt = t1.pt();
 #ifdef TRASAN_DEBUG_DETAIL
-	    std::cout << "i,j=" << i << "," << j
-		 << " : pt i,j=" << bestPt << "," << pt << std::endl;
+	    cout << "i,j=" << i << "," << j
+		 << " : pt i,j=" << bestPt << "," << pt << endl;
 #endif
 	    if (pt > bestPt) {
 		bestPt = pt;
@@ -2350,8 +2457,8 @@ TTrackManager::treatCurler(rectrk & trk1,
 void
 TTrackManager::sortBanksByPt(void) const {
 //cnv #ifdef TRASAN_DEBUG_DETAIL
-//     std::cout << "trkmgr::sortBanksByPt : # of tracks="
-// 	 << BsCouTab(RECCDC_TRK_ADD) << std::endl;
+//     cout << "trkmgr::sortBanksByPt : # of tracks="
+// 	 << BsCouTab(RECCDC_TRK_ADD) << endl;
 // #endif
 
 //     unsigned n = BsCouTab(RECCDC_TRK_ADD);
@@ -2394,9 +2501,9 @@ TTrackManager::sortBanksByPt(void) const {
 // 					    BBS_No_Index);
 // 	    float pt = 1. / fabs(cdc1.m_helix[2]);
 // #ifdef TRASAN_DEBUG_DETAIL
-// 	    std::cout << "i,j=" << i << "," << j
+// 	    cout << "i,j=" << i << "," << j
 // 		 << " : quality i,j=" << bestQuality << ","
-// 		 << add1.m_quality << std::endl;
+// 		 << add1.m_quality << endl;
 // #endif
 // 	    unsigned quality = add1.m_quality;
 // 	    if (quality > bestQuality) continue;
@@ -2408,19 +2515,19 @@ TTrackManager::sortBanksByPt(void) const {
 // 		id[i] = id[j];
 // 		id[j] = tmp;
 // #ifdef TRASAN_DEBUG_DETAIL
-// 		std::cout << "swapped" << std::endl;
+// 		cout << "swapped" << endl;
 // #endif
 // 		continue;
 // 	    }
 // #ifdef TRASAN_DEBUG_DETAIL
-// 	    std::cout << "i,j=" << i << "," << j
-// 		 << " : pt i,j=" << bestPt << "," << pt << std::endl;
+// 	    cout << "i,j=" << i << "," << j
+// 		 << " : pt i,j=" << bestPt << "," << pt << endl;
 // #endif
 // 	    if (pt > bestPt) {
 // #ifdef TRASAN_DEBUG_DETAIL
-// 		std::cout << "swapping ... " << & cdc0 << "," << & add0 << ","
+// 		cout << "swapping ... " << & cdc0 << "," << & add0 << ","
 // 		     << & mc0 << " <-> " << & cdc1 << "," << & add1 << ","
-// 		     << & mc1 << std::endl;
+// 		     << & mc1 << endl;
 // #endif
 // 		bestQuality = quality;
 // 		bestPt = pt;
@@ -2429,20 +2536,20 @@ TTrackManager::sortBanksByPt(void) const {
 // 		id[i] = id[j];
 // 		id[j] = tmp;
 // #ifdef TRASAN_DEBUG_DETAIL
-// 		std::cout << "swapped" << std::endl;
+// 		cout << "swapped" << endl;
 // #endif
 // 	    }
 // 	}
 //     }
 // #ifdef TRASAN_DEBUG_DETAIL
-//     std::cout << "trkmgr::sortBanksByPt : first phase finished" << std::endl;
+//     cout << "trkmgr::sortBanksByPt : first phase finished" << endl;
 // #endif
 
 //     tagReccdc(id, n);
 //     free(id);
 
 // #ifdef TRASAN_DEBUG_DETAIL
-//     std::cout << "trkmgr::sortBanksByPt : second phase finished" << std::endl;
+//     cout << "trkmgr::sortBanksByPt : second phase finished" << endl;
 // #endif
 
 // #if 0
@@ -2471,7 +2578,7 @@ TTrackManager::sortBanksByPt(void) const {
 // 	    id[i] = id[s.m_ID - 1];
 // 	    id[s.m_ID - 1] = tmp;
 
-// 	    // std::cout << "swap " << i + 1 << " and " << s.m_ID << std::endl;
+// 	    // cout << "swap " << i + 1 << " and " << s.m_ID << endl;
 
 // //cnv 	    reccdc_trk_add & a =
 // // 		* (reccdc_trk_add *) BsGetEnt(RECCDC_TRK_ADD,
@@ -2616,9 +2723,9 @@ TTrackManager::tagReccdc(unsigned * id0, unsigned nTrk) const {
 
 // #ifdef TRASAN_DEBUG_DETAIL
 //     for (unsigned i = 0; i < nTrk; i++)
-//   	std::cout << "id0 " << i << " ... " << id0[i] << std::endl;
+//   	cout << "id0 " << i << " ... " << id0[i] << endl;
 //     for (unsigned i = 0; i < nTrk; i++)
-//   	std::cout << "id  " << i << " ... " << id[i] << std::endl;
+//   	cout << "id  " << i << " ... " << id[i] << endl;
 // #endif
 // //cnv    unsigned n = BsCouTab(RECCDC_TRK_ADD);
 //     unsigned n = 0;
@@ -2633,7 +2740,7 @@ TTrackManager::tagReccdc(unsigned * id0, unsigned nTrk) const {
 //     }
 
 // #ifdef TRASAN_DEBUG_DETAIL
-//     std::cout << "TTrackManager::tagReccdc ... RECCDC_TRK_ADD done" << std::endl;
+//     cout << "TTrackManager::tagReccdc ... RECCDC_TRK_ADD done" << endl;
 // #endif
 
 //     n = BsCouTab(RECCDC_WIRHIT);
@@ -2646,7 +2753,7 @@ TTrackManager::tagReccdc(unsigned * id0, unsigned nTrk) const {
 //     }
 
 // #ifdef TRASAN_DEBUG_DETAIL
-//     std::cout << "TTrackManager::tagReccdc ... RECCDC_WIRHIT done" << std::endl;
+//     cout << "TTrackManager::tagReccdc ... RECCDC_WIRHIT done" << endl;
 // #endif
 
 //     n = BsCouTab(DATRGCDC_MCWIRHIT);
@@ -2658,7 +2765,7 @@ TTrackManager::tagReccdc(unsigned * id0, unsigned nTrk) const {
 //     }
 
 // #ifdef TRASAN_DEBUG_DETAIL
-//     std::cout << "TTrackManager::tagReccdc ... DATRGCDC_MCWIRHIT done" << std::endl;
+//     cout << "TTrackManager::tagReccdc ... DATRGCDC_MCWIRHIT done" << endl;
 // #endif
 
 //     n = BsCouTab(RECTRK);
@@ -2669,7 +2776,7 @@ TTrackManager::tagReccdc(unsigned * id0, unsigned nTrk) const {
 //     }
 
 // #ifdef TRASAN_DEBUG_DETAIL
-//     std::cout << "TTrackManager::tagReccdc ... RECTRK done" << std::endl;
+//     cout << "TTrackManager::tagReccdc ... RECTRK done" << endl;
 // #endif
 
 //     // jtanaka
@@ -2681,7 +2788,7 @@ TTrackManager::tagReccdc(unsigned * id0, unsigned nTrk) const {
 //     }
 
 // #ifdef TRASAN_DEBUG_DETAIL
-//     std::cout << "TTrackManager::tagReccdc ... RECCDC_SVD_TRK done" << std::endl;
+//     cout << "TTrackManager::tagReccdc ... RECCDC_SVD_TRK done" << endl;
 // #endif
 
 //     free(id);
@@ -2690,7 +2797,7 @@ TTrackManager::tagReccdc(unsigned * id0, unsigned nTrk) const {
 void
 TTrackManager::setCurlerFlags(void) {
 #ifdef TRASAN_DEBUG_DETAIL
-    const std::string stage = "TRKMGR::setCurlerFlags";
+    const string stage = "TRKMGR::setCurlerFlags";
     EnterStage(stage);
 #endif
 
@@ -2741,9 +2848,9 @@ void
 TTrackManager::salvageAssociateHits(const CAList<Belle2::TRGCDCWireHit> & hits,
 				    float maxSigma2) {
 #ifdef TRASAN_DEBUG_DETAIL
-    const std::string stage = "TRKMGR::salvage";
+    const string stage = "TRKMGR::salvage";
     EnterStage(stage);
-    std::cout << Tab() << "#given hits=" << hits.length() << std::endl;
+    cout << Tab() << "#given hits=" << hits.length() << endl;
 #endif
 
     //...Check arguments...
@@ -2771,7 +2878,7 @@ TTrackManager::salvageAssociateHits(const CAList<Belle2::TRGCDCWireHit> & hits,
 	//...Already used ?...
 	if (h.state() & WireHitUsed) continue;
 #ifdef TRASAN_DEBUG_DETAIL
-	std::cout << Tab() << "checking " << h.wire().name() << std::endl;;
+	cout << Tab() << "checking " << h.wire().name() << endl;;
 #endif
 
 	//...Track loop...
@@ -2791,9 +2898,9 @@ TTrackManager::salvageAssociateHits(const CAList<Belle2::TRGCDCWireHit> & hits,
 	    TPoint2D x = h.wire().xyPosition();
 
 #ifdef TRASAN_DEBUG_DETAIL
-	    std::cout << Tab(+2) << "c= " << co.cross(x - c) * t.charge()
+	    cout << Tab(+2) << "c= " << co.cross(x - c) * t.charge()
 		      << ",d=" << fabs((x - c).mag() - fabs(t.radius()))
-		      << std::endl;
+		      << endl;
 #endif
 
 	    if (co.cross(x - c) * t.charge() > 0.)
@@ -2806,7 +2913,7 @@ TTrackManager::salvageAssociateHits(const CAList<Belle2::TRGCDCWireHit> & hits,
 	    int err = t.approach(link);
 	    if (err < 0) {
 #ifdef TRASAN_DEBUG_DETAIL
-		std::cout << ":" << t.name() << " approach failure";
+		cout << ":" << t.name() << " approach failure";
 #endif
 		toBeDeleted.append(link);
 		continue;
@@ -2819,7 +2926,7 @@ TTrackManager::salvageAssociateHits(const CAList<Belle2::TRGCDCWireHit> & hits,
 	    link.pull(sigma * sigma);
 
 #ifdef TRASAN_DEBUG_DETAIL
-	    std::cout << Tab(+2) << "pull=" << link.pull() << std::endl;
+	    cout << Tab(+2) << "pull=" << link.pull() << endl;
 #endif
 	    if (link.pull() > maxSigma2) {
 		toBeDeleted.append(link);
@@ -2847,8 +2954,8 @@ TTrackManager::salvageAssociateHits(const CAList<Belle2::TRGCDCWireHit> & hits,
 	    best->hit()->state(best->hit()->state() | WireHitInvalidForFit);
 	    _associateHits.append(best);
 #ifdef TRASAN_DEBUG_DETAIL
-	    std::cout << Tab(+1) << best->hit()->wire().name()
-		      << "->" << bestTrack->name() << std::endl;
+	    cout << Tab(+1) << best->hit()->wire().name()
+		      << "->" << bestTrack->name() << endl;
 #endif
 	}
 	HepAListDeleteAll(toBeDeleted);
@@ -2862,7 +2969,7 @@ TTrackManager::salvageAssociateHits(const CAList<Belle2::TRGCDCWireHit> & hits,
 void
 TTrackManager::maskBadHits(const AList<TTrack> & tracks, float maxSigma2) {
 #ifdef TRASAN_DEBUG_DETAIL
-    std::cout << "... trkmgr::maskBadHits" << std::endl;
+    cout << "... trkmgr::maskBadHits" << endl;
 #endif		
 
     unsigned n = tracks.length();
@@ -2877,9 +2984,9 @@ TTrackManager::maskBadHits(const AList<TTrack> & tracks, float maxSigma2) {
 				       WireHitInvalidForFit);
 		toBeUpdated = true;
 #ifdef TRASAN_DEBUG_DETAIL
-		std::cout << "    " << t.name() << " : ";
-		std::cout << links[j]->wire()->name() << "(pull=";
-		std::cout << links[j]->pull() << ") is masked" << std::endl;
+		cout << "    " << t.name() << " : ";
+		cout << links[j]->wire()->name() << "(pull=";
+		cout << links[j]->pull() << ") is masked" << endl;
 #endif		
 	    }
 	}
@@ -2959,19 +3066,19 @@ TTrackManager::selectGoodTracks(const AList<TTrack> & list,
 
 #ifdef TRASAN_DEBUG_DETAIL
     if (list.length() != goodTracks.length()) {
-	std::cout << Tab() << "TTrackManager::selectGoodTracks"
-		  << "... bad tracks found" << std::endl
+	cout << Tab() << "TTrackManager::selectGoodTracks"
+		  << "... bad tracks found" << endl
 		  << Tab(+1) << "#given tracks="
-		  << list.length() << std::endl
+		  << list.length() << endl
 		  << Tab(+1) << "#bad tracks="
 		  << list.length() - goodTracks.length()
-		  << ":2D flag = " << track2D << std::endl;
+		  << ":2D flag = " << track2D << endl;
 	AList<TTrack> tmp;
 	tmp.append(list);
 	tmp.remove(goodTracks);
-	std::cout << Tab() << "Bad track dump" << std::endl;
+	cout << Tab() << "Bad track dump" << endl;
 	for (unsigned i = 0; i < (unsigned) tmp.length(); i++)
-	    std::cout << Tab(+1) << TTrack::trackDump(* tmp[i]) << std::endl;
+	    cout << Tab(+1) << TTrack::trackDump(* tmp[i]) << endl;
     }
 #endif
 
@@ -3050,9 +3157,9 @@ TTrackManager::tagRectrk(unsigned * id0, unsigned nTrk) const {
 // 	id[id0[i]] = i;
 
 // //      for (unsigned i = 0; i < nTrk; i++)
-// //    	std::cout << "id0 " << i << " ... " << id0[i] << std::endl;
+// //    	cout << "id0 " << i << " ... " << id0[i] << endl;
 // //      for (unsigned i = 0; i < nTrk; i++)
-// //    	std::cout << "id  " << i << " ... " << id[i] << std::endl;
+// //    	cout << "id  " << i << " ... " << id[i] << endl;
 // //      BsShwDat(RECTRK_TOF);
 
 //     unsigned n = BsCouTab(RECTRK_TOF);
@@ -3137,18 +3244,18 @@ void
 copyRecCDC_MCtrk_Table(const Reccdc_mctrk & org,
 		       Reccdc_mctrk & copied)
 {
-  /*std::cout << org.wirFrac() << std::endl;
-  std::cout << org.wirFracHep() << std::endl;
-  std::cout << org.charge() << std::endl;
-  std::cout << org.ptFrac() << std::endl;
-  std::cout << org.pzFrac() << std::endl;
-  std::cout << org.quality() << std::endl;
-  std::cout << copied.wirFrac() << std::endl;
-  std::cout << copied.wirFracHep() << std::endl;
-  std::cout << copied.charge() << std::endl;
-  std::cout << copied.ptFrac() << std::endl;
-  std::cout << copied.pzFrac() << std::endl;
-  std::cout << copied.quality() << std::endl;*/
+  /*cout << org.wirFrac() << endl;
+  cout << org.wirFracHep() << endl;
+  cout << org.charge() << endl;
+  cout << org.ptFrac() << endl;
+  cout << org.pzFrac() << endl;
+  cout << org.quality() << endl;
+  cout << copied.wirFrac() << endl;
+  cout << copied.wirFracHep() << endl;
+  cout << copied.charge() << endl;
+  cout << copied.ptFrac() << endl;
+  cout << copied.pzFrac() << endl;
+  cout << copied.quality() << endl;*/
 
   copied.hep(org.hep());
   copied.wirFrac(org.wirFrac());
@@ -3199,7 +3306,7 @@ TTrackManager::addSvd(const int mcFlag) const {
 
 //   int nSize = trkMgr.count();  
 //   for(int i=0;i<nSize;++i){
-//     // std::cout << "trk " << i << ": " << trkMgr[i].helix(0) << std::endl;
+//     // cout << "trk " << i << ": " << trkMgr[i].helix(0) << endl;
 // #if 1
 //     // Reconstruction Info --> SVD Recon.
 //     if(trkMgr2[i].decision() != TrackPMCurlFinder && 
@@ -3219,7 +3326,7 @@ TTrackManager::addSvd(const int mcFlag) const {
 //       AList<TSvdHit> cand;
 //       double tz,tt;
 //       if(svdA.recTrk(th,tz,tt,0.5,50.0,cand,0.5)){
-// 	// std::cout << "SVD in " << i << std::endl;
+// 	// cout << "SVD in " << i << endl;
 // #if TRASAN_REPLACE_TABLE
 // 	Reccdc_svd_trk & newSvd  = svdMgr.add();
 // #else
@@ -3286,7 +3393,7 @@ TTrackManager::addSvd(const int mcFlag) const {
 // 	    newSvd.svd_cluster(indexSvd, *(cand[j]->z()));
 // 	    ++indexSvd;
 // 	  }else{
-// 	    std::cout << "[TTrackManager of Trasan] Why ? no associated SVDhit ?" << std::endl;
+// 	    cout << "[TTrackManager of Trasan] Why ? no associated SVDhit ?" << endl;
 // 	  }
 // 	}
 // #if TRASAN_REPLACE_TABLE
@@ -3307,7 +3414,7 @@ TTrackManager::addSvd(const int mcFlag) const {
 // #endif
 //       }else if(fabs(th.a()[3]) > 30.){
 // 	if(svdA.recTrk(th,tz,tt,0.5,-1.0,cand,0.5)){
-// 	  // std::cout << "SVD in " << i << std::endl;
+// 	  // cout << "SVD in " << i << endl;
 // #if TRASAN_REPLACE_TABLE
 // 	  Reccdc_svd_trk & newSvd  = svdMgr.add();
 // #else
@@ -3374,7 +3481,7 @@ TTrackManager::addSvd(const int mcFlag) const {
 // 	      newSvd.svd_cluster(indexSvd, *(cand[j]->z()));
 // 	      ++indexSvd;
 // 	    }else{
-// 	      std::cout << "[TTrackManager of Trasan] Why ? no associated SVDhit ?" << std::endl;
+// 	      cout << "[TTrackManager of Trasan] Why ? no associated SVDhit ?" << endl;
 // 	    }
 // 	  }
 // #if TRASAN_REPLACE_TABLE
@@ -3536,7 +3643,7 @@ TTrackManager::statistics(bool doMCAnalysis) {
 void
 TTrackManager::mergeTracks(int level, float threshold) {
 #ifdef TRASAN_DEBUG
-    const std::string stage = "merging";
+    const string stage = "merging";
     EnterStage(stage);
 #endif
 
@@ -3565,14 +3672,14 @@ TTrackManager::mergeTracks(int level, float threshold) {
 	    float d = TTrack::distanceB(t0, t1);
 
 #ifdef TRASAN_DEBUG_DETAIL
-	    std::cout << Tab() << "distance=" << d << ":" << t0.name() << " <-> "
-		   << t1.name() << std::endl;
+	    cout << Tab() << "distance=" << d << ":" << t0.name() << " <-> "
+		   << t1.name() << endl;
 #endif
 
 	    if (d > threshold) {
 #ifdef TRASAN_DEBUG_DETAIL
-		std::cout << Tab() << "They are not identical : no merge"
-		       << std::endl;
+		cout << Tab() << "They are not identical : no merge"
+		       << endl;
 #endif
 #ifdef TRASAN_WINDOW_GTK_HOUGH
 		TWindowGTKConformal & w = Trasan::getTrasan()->w();
@@ -3646,7 +3753,7 @@ TTrackManager::mergeTracks(int level, float threshold) {
 	    x0->finder(TrackTrackManager);
 	    toBeRemoved.append(x1);
 	    //...Refine...
-	    //	    std::cout <<"REFIT "<< level <<std::endl;
+	    //	    cout <<"REFIT "<< level <<endl;
 	    if( level == 2) {
 	      x0->fit();		    
 	    } else if( level == 3) {

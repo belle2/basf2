@@ -508,8 +508,8 @@ TTrackBase::append(TLink & a) {
 	if (a.hit() == _links[i]->hit()) {
 	    std::cout << "TTrackBase::append !!! " << a.wire()->name()
 		      << " is already used in this track!" << std::endl;
-	    std::cout << "    a.hit()=" << a.hit()->wire()->name() << ",_links["
-		 << i << "]->hit()=" << _links[i]->hit()->wire()->name()
+	    std::cout << "    a.hit()=" << a.hit()->wire().name() << ",_links["
+		 << i << "]->hit()=" << _links[i]->hit()->wire().name()
 		 << std::endl;
 	}
     }

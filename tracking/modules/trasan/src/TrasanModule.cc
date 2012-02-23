@@ -23,13 +23,17 @@ REG_MODULE(Trasan);
 TrasanModule::TrasanModule()
     : Module::Module(),
       _debugLevel(0),
-      _testParamInt(0),
+      _gfTrackCandsName(""),
       _tra(Belle::Trasan()) {
 
     string desc = "TrasanModule(" + _tra.version() + ")";
     setDescription(desc);
 
-    addParam("testParamInt", _testParamInt, "Test Parameter", 20);
+    addParam("DebugLevel", _debugLevel, "Debug level", 0);
+    addParam("GFTrackCandidatesColName",
+	     _gfTrackCandsName,
+	     "Name of collection holding the GFTrackCandidates (output)",
+	     string(""));
 
 #ifdef TRASAN_DEBUG
     cout << "TrasanModule ... created" << endl;
@@ -44,6 +48,9 @@ TrasanModule::~TrasanModule() {
 
 void
 TrasanModule::initialize() {
+    Belle2::StoreArray<GFTrackCand> trackCandidates(_gfTrackCandsName);
+    _tra._gfTrackCandsName = _gfTrackCandsName;
+    _tra.b_debugLevel = _debugLevel;
     _tra.initialize();
 #ifdef TRASAN_DEBUG
 //  _cdc->dump("geometry superLayers layers wires detail");

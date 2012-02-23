@@ -1068,7 +1068,7 @@ TSegment::superLayerId(void) const {
 	const AList<TLink> & list = links();
 	unsigned n = list.length();
 	for (unsigned i = 1; i < n; i++) {
-	    if (list[i]->hit()->wire()->superLayerId() != id) {
+	    if (list[i]->hit()->wire().superLayerId() != id) {
 		std::cout << Tab() << "TSegment::superLayerId !!! strange segment found";
 		std::cout << Tab() << std::endl;
 		dump();

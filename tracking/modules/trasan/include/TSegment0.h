@@ -272,18 +272,18 @@ unsigned
 TSegment0::superLayerId(void) const {
     unsigned id = (links())[0]->wire()->superLayerId();
 #ifdef TRASAN_DEBUG
-    {
-	const AList<TLink> & list = links();
-	unsigned n = list.length();
-	for (unsigned i = 1; i < n; i++) {
-	    if (list[i]->hit()->wire()->superLayerId() != id) {
-		std::cout << "TSegment0::superLayerId !!! strange segment found";
-		std::cout << std::endl;
-		dump();
-		break;
-	    }
-	}
-    }
+//     {
+// 	const AList<TLink> & list = links();
+// 	unsigned n = list.length();
+// 	for (unsigned i = 1; i < n; i++) {
+// 	    if (list[i]->hit()->wire()->superLayerId() != id) {
+// 		std::cout << "TSegment0::superLayerId !!! strange segment found";
+// 		std::cout << std::endl;
+// 		dump();
+// 		break;
+// 	    }
+// 	}
+//     }
 #endif
     return id;
 }

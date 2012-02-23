@@ -703,6 +703,8 @@
 #include "tracking/modules/trasan/TTrack.h"
 #include "tracking/modules/trasan/TTrackMC.h"
 #include "tracking/modules/trasan/TLink.h"
+#include <framework/datastore/StoreArray.h>
+#include <GFTrackCand.h>
 #ifdef TRASAN_DEBUG
 #include "tracking/modules/trasan/TDebugUtilities.h"
 #endif
@@ -1468,6 +1470,11 @@ Trasan::event() {
     // _trackManager.checkNumberOfHits();
     if (b_sortMode == 0) _trackManager.sortTracksByQuality();
     else                 _trackManager.sortTracksByPt();
+
+    //...For Belle2...
+    Belle2::StoreArray<GFTrackCand> trackCandidates(_gfTrackCandsName);
+    _trackManager.saveBelle2(trackCandidates);
+
 //cnv     _trackManager.saveTables();
 //     if (b_doMCAnalysis) {
 // 	if (mcEvent()) {

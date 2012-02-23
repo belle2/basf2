@@ -259,7 +259,7 @@ TBuilderCosmic::buildStereo(TTrack & track, const AList<TLink> & list) const {
 #ifdef TRASAN_DEBUG_DETAIL
 	std::cout << "    appendStereo cut ... new line 2nd linear fit failure. ";
 	std::cout << "# of links = " << n << "," << nLine;
-	std::cout << "," << nNewLine << std::endl;
+//	std::cout << "," << nNewLine << std::endl;
 #endif	
 	return NULL;
     }

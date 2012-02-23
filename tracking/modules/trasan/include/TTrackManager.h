@@ -162,12 +162,12 @@
 #endif
 #endif
 
+#define HEP_SHORT_NAMES
 
 #include <string>
-
-#define HEP_SHORT_NAMES
+#include "framework/datastore/StoreArray.h"
+#include "GFTrackCand.h"
 #include "tracking/modules/trasan/ConstAList.h"
-
 #include "tracking/modules/trasan/TUpdater.h"
 #include "tracking/modules/trasan/THelixFitter.h"
 //cnv #include "tracking/modules/trasan/TCosmicFitter.h"
@@ -285,14 +285,22 @@ class TTrackManager : public TUpdater {
     /// stores MC track info. into Panther table.
     void saveMCTables(void) const;
 
+    /// stores track info. into GFTrackCand.
+    void saveBelle2(Belle2::StoreArray<GFTrackCand> &);
+
     /// sorts RECCDC_TRK tables.
     void sortBanksByPt(void) const;
 
   private:// table manipulations in private
+
     /// copies a track. Non-zero will be returned if error happens.
     int copyTrack(TTrack & t,
 		  reccdc_trk ** r,
 		  reccdc_trk_add ** a) const;
+
+    /// copies a track. Non-zero will be returned if error happens.
+    int copyTrack(Belle2::StoreArray<GFTrackCand> &, TTrack & t) const;
+
     /// sorts banks.
     void swapReccdc(reccdc_trk & cdc0,
 		    reccdc_trk_add & add0,

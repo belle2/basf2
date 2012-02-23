@@ -39,6 +39,7 @@ TRGCDCWireHit::TRGCDCWireHit(const TRGCDCWire & w,
        _wire(w),
        _xyPosition(w.xyPosition()),
        _track(0),
+       _mc(0),
        _iCDCHit(indexCDCHit),
        _iCDCSimHit(indexCDCSimHit) {
 //  w.hit(this); // set by TRGCDC

@@ -64,6 +64,11 @@ class TRGCDCTrack : public TRGCDCTrackBase {
     /// returns position vector.
     virtual const CLHEP::Hep3Vector & x(void) const;
 
+  public:
+
+    /// returns perfect position from GEANT.
+    std::vector<HepGeom::Point3D<double> > perfectPosition(void) const;
+
   private:// static members
 
     /// a vector to keep all TRGCDCTrack objects.

@@ -243,4 +243,25 @@ TRGCDCTrack::approach(TRGCDCLink & link, bool doSagCorrection) const {
     return nTrial;
 }
 
+std::vector<HepGeom::Point3D<double> >
+TRGCDCTrack::perfectPosition(void) const {
+
+    //...CDC...
+    const TRGCDC & cdc = * TRGCDC::getTRGCDC();
+
+    //...Super layer loop...
+    for (unsigned i = 0; i < cdc.nSuperLayers(); i++) {
+
+	//...Check links to be one...
+	if ((links(i).size() == 0) || (links(i).size() > 1)) {
+	    cout << "TRGCDCTrack::perfectPosition !!! #links in superlayer "
+		 << i << " is " << links(i).size() << endl;
+	}
+	    
+	//...Track segment hit...
+	const TRGCDCWireHit & w = * links(i)[0]->hit();
+    }
+}
+
+
 } // namespace Belle2

@@ -67,6 +67,7 @@ namespace Belle2 {
 class CDCHit;
 class CDCSimHit;
 class TRGCDCWire;
+class TRGCDCWireHitMC;
 
 /// A class to represent a wire hit in CDC.
 class TRGCDCWireHit {
@@ -122,6 +123,9 @@ class TRGCDCWireHit {
     /// returns sequential Length in one segment : this parameter is used in TCurlFinder now.
     unsigned sequence(void) const;
 
+    /// returns a pointer to TRGCDCWireHitMC.
+    const TRGCDCWireHitMC * const mc(void) const;
+
     /// returns an index to CDCHit.
     unsigned iCDCHit(void) const;
 
@@ -147,6 +151,9 @@ class TRGCDCWireHit {
     /// sets sequential length in one segment : this parameter is used in TCurlFinder now.
     unsigned sequence(unsigned) const;
 
+    /// returns a pointer to TRGCDCWireHitMC.
+    const TRGCDCWireHitMC * const mc(TRGCDCWireHitMC *);
+
   public:// Static utility functions
 
     /// Sort function.
@@ -161,6 +168,7 @@ class TRGCDCWireHit {
     const TRGCDCWire & _wire;
     const HepGeom::Point3D<double>  & _xyPosition;
     mutable const void * _track;
+    const TRGCDCWireHitMC * _mc;
     mutable unsigned _sequentialLength;
 
     /// Index to CDCHit array
@@ -294,6 +302,18 @@ inline
 unsigned
 TRGCDCWireHit::sequence(unsigned a) const {
     return _sequentialLength = a;
+}
+
+inline
+const TRGCDCWireHitMC * const
+TRGCDCWireHit::mc(void) const {
+    return _mc;
+}
+
+inline
+const TRGCDCWireHitMC * const
+TRGCDCWireHit::mc(TRGCDCWireHitMC * a) {
+    return _mc = a;
 }
 
 inline

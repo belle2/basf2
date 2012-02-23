@@ -646,7 +646,7 @@ TRGCDC::update(bool mcAnalysis) {
 //      //...Check validity (skip broken channel)...
 //      if (! (h->m_stat & WireHitFindingValid)) continue;
 
-	//...Get CDCSimHit... This is expensive. Is there a good way?
+	//...Get CDCSimHit... This is expensive. Should be moved outside.
 	for (unsigned j = 0; j < nRels; j++) {
 	    const unsigned k = rels[j].getToIndices().size();
 	    for (unsigned l = 0; l < k; l++) {
@@ -680,8 +680,7 @@ TRGCDC::update(bool mcAnalysis) {
 				  h.getDriftTime(),
 				  0.15,
 				  1);
-
-//      hit->state(WireHitFindingValid | WireHitFittingValid );
+	hit->state(WireHitFindingValid | WireHitFittingValid );
 
         //...Store a hit...
         (* _layers[layerId])[wireId]->hit(hit);
@@ -701,7 +700,12 @@ TRGCDC::update(bool mcAnalysis) {
 	    const TCWHit * h = w->hit();
 	    if (h) {
 		if (! th) {
-		    th = new TCTSHit((TCWire &) s);
+		    th = new TCTSHit((TCWire &) s,
+				     h->drift(),
+				     h->dDrift(),
+				     h->drift(),
+				     h->dDrift(),
+				     1);
 		    s.TCWire::hit(th);
 		    s.hit(th);
 		}
@@ -1161,6 +1165,10 @@ TRGCDC::simulate(void) {
     //...2D tracker : Hough finder...
     vector<TCTrack *> trackList;
     _hFinder->doit(trackList);
+
+    //...Perfect position test...
+    vector<HepGeom::Point3D<double> > ppos = trackList[0]->perfectPosition();
+
 
     //...2D tracker : helix fitter...
 

@@ -19,7 +19,8 @@ printcollections = register_module('PrintCollections')
 input.param('inputFileName', 'simple_input.root')
 #load all branches, minus PXDClusters
 input.param('branchNames', ['EventMetaData', 'PXDClustersToPXDDigits',
-'PXDClustersToPXDTrueHits', 'PXDDigits', 'PXDTrueHits'])
+'PXDClustersToPXDTrueHits', 'PXDDigits', 'PXDTrueHits', 'PXDClusters'])
+input.param('excludeBranchNames', ['PXDClusters'])
 
 #also load persistent tree (contains FileMetaData object)
 input.param('treeNamePersistent', 'persistent')

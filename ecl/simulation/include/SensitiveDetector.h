@@ -14,88 +14,88 @@
 #include <simulation/kernel/SensitiveDetectorBase.h>
 
 namespace Belle2 {
+  namespace ecl {
+    //! The Class for ECL Sensitive Detector
+    class SensitiveDetector: public Simulation::SensitiveDetectorBase {
 
-  //! The Class for ECL Sensitive Detector
-  class SensitiveDetector: public Simulation::SensitiveDetectorBase {
+    public:
 
-  public:
-
-    //! Constructor
+      //! Constructor
 //    SensitiveDetector(G4String name);
-    SensitiveDetector(G4String name, G4double thresholdEnergyDeposit, G4double thresholdKineticEnergy);
-    //! Destructor
-    ~SensitiveDetector();
+      SensitiveDetector(G4String name, G4double thresholdEnergyDeposit, G4double thresholdKineticEnergy);
+      //! Destructor
+      ~SensitiveDetector();
 
-    //! Register ECL hits collection into G4HCofThisEvent
-    void Initialize(G4HCofThisEvent* HCTE);
+      //! Register ECL hits collection into G4HCofThisEvent
+      void Initialize(G4HCofThisEvent* HCTE);
 
-    //! Process each step and calculate variables defined in ECLHit (not yet prepared)
-    bool step(G4Step* aStep, G4TouchableHistory* history);
+      //! Process each step and calculate variables defined in ECLHit (not yet prepared)
+      bool step(G4Step* aStep, G4TouchableHistory* history);
 //    G4bool ProcessHits(G4Step* aStep, G4TouchableHistory*);
 
-    //! Do what you want to do at the end of each event
-    void EndOfEvent(G4HCofThisEvent* eventHC);
+      //! Do what you want to do at the end of each event
+      void EndOfEvent(G4HCofThisEvent* eventHC);
 
 
-    //! Save ECLSimHit into datastore
-    int saveSimHit(
-      const G4int cellId,
-      const G4int thetaId,
-      const G4int phiId,
-      const G4int trackID,
-      const G4int pid,
-      const G4double tof,
-      const G4double edep,
-      const G4double stepLength,
-      G4ThreeVector mom,
-      G4ThreeVector posW,
-      G4ThreeVector posIn,
-      G4ThreeVector posOut
-    );
+      //! Save ECLSimHit into datastore
+      int saveSimHit(
+        const G4int cellId,
+        const G4int thetaId,
+        const G4int phiId,
+        const G4int trackID,
+        const G4int pid,
+        const G4double tof,
+        const G4double edep,
+        const G4double stepLength,
+        G4ThreeVector mom,
+        G4ThreeVector posW,
+        G4ThreeVector posIn,
+        G4ThreeVector posOut
+      );
 
-    //! Save EBECLSimHit into datastore
-    int saveEBSimHit(
-      const G4int cellId,
-      const G4int thetaId,
-      const G4int phiId,
-      const G4int trackID,
-      const G4int pid,
-      const G4double tof,
-      const G4double edep,
-      const G4double stepLength,
-      G4ThreeVector mom,
-      G4ThreeVector posW,
-      G4ThreeVector posIn,
-      G4ThreeVector posOut
-    );
-
-
-    //! Get cell, theta, phi Id from PhysicalVolume
-    int Mapping(const G4String VolumeName);
-    int m_phiID; /**< The current phi ID in an event. Used to fill the DataStore ECL array.*/
-    int m_thetaID; /**< The current theta ID in an event. Used to fill the DataStore ECL array.*/
-    int m_cellID; /**< The current cellID in an event. Used to fill the DataStore ECL array.*/
-  protected:
-
-  private:
-
-    G4double m_thresholdEnergyDeposit;/**Energy Deposit  threshold  */
-    G4double m_thresholdKineticEnergy;/**Kinetic Energy  threshold  */
-    int m_hitNumber; /**< The current number of created hits in an event. Used to fill the DataStore ECL array.*/
-    int m_EBhitNumber; /**< The current number of created hits in an event. Used to fill the DataStore ECL EB array.*/
-
-    int m_trackID;          /* track id */
-    G4ThreeVector m_startPos;
-    G4ThreeVector m_momentum;
-    double m_startTime;     /* global time */
-    double m_endTime;     /* global time */
-    double m_startEnergy;   /* particle energy at the entrance in volume */
-    double m_energyDeposit; /* energy deposited in volume */
-    double m_trackLength;   /* length of the track in the volume */
+      //! Save EBECLSimHit into datastore
+      int saveEBSimHit(
+        const G4int cellId,
+        const G4int thetaId,
+        const G4int phiId,
+        const G4int trackID,
+        const G4int pid,
+        const G4double tof,
+        const G4double edep,
+        const G4double stepLength,
+        G4ThreeVector mom,
+        G4ThreeVector posW,
+        G4ThreeVector posIn,
+        G4ThreeVector posOut
+      );
 
 
-  };
+      //! Get cell, theta, phi Id from PhysicalVolume
+      int Mapping(const G4String VolumeName);
+      int m_phiID; /**< The current phi ID in an event. Used to fill the DataStore ECL array.*/
+      int m_thetaID; /**< The current theta ID in an event. Used to fill the DataStore ECL array.*/
+      int m_cellID; /**< The current cellID in an event. Used to fill the DataStore ECL array.*/
+    protected:
 
+    private:
+
+      G4double m_thresholdEnergyDeposit;/**Energy Deposit  threshold  */
+      G4double m_thresholdKineticEnergy;/**Kinetic Energy  threshold  */
+      int m_hitNumber; /**< The current number of created hits in an event. Used to fill the DataStore ECL array.*/
+      int m_EBhitNumber; /**< The current number of created hits in an event. Used to fill the DataStore ECL EB array.*/
+
+      int m_trackID;          /* track id */
+      G4ThreeVector m_startPos;
+      G4ThreeVector m_momentum;
+      double m_startTime;     /* global time */
+      double m_endTime;     /* global time */
+      double m_startEnergy;   /* particle energy at the entrance in volume */
+      double m_energyDeposit; /* energy deposited in volume */
+      double m_trackLength;   /* length of the track in the volume */
+
+
+    };
+  } // end of namespace ecl
 } // end of namespace Belle2
 
 #endif /* ECLSENSITIVEDETECTOR_H_ */

@@ -375,7 +375,7 @@ void TrackFitCheckerModule::event()
           fillLayerWiseData("zs_and_chi2_meas_t", accuVecIndex, truthTests);
         }
 
-        if (m_inspectTracks == true) forthLine << "\t" << trueState[0][0] << "\t" << trueState[1][0] << "\t" << trueState[2][0] << "\t" << trueState[3][0] << "\t" << trueState[4][0] << "\t" << pOutTrue.Phi() - pInTrue.Phi() << "\t" <<  pOutTrue.Theta() - pInTrue.Theta();
+        if (m_inspectTracks == true) forthLine << "\t" << trueState[0][0] << "\t" << trueState[1][0] << "\t" << trueState[2][0] << "\t" << trueState[3][0] << "\t" << trueState[4][0] << "\t" << pOutTrue.DeltaPhi(pInTrue) << "\t" <<  pOutTrue.Theta() - pInTrue.Theta();
         //cout << "true state\n";trueState.Print();
         // now test if measurements am their theoretical variances that were feeded to genfit are consistent with the acutal distribution of measurments
 

@@ -50,6 +50,7 @@
 #include <string>
 
 #include <iostream>
+#include <algorithm>
 
 #include <boost/foreach.hpp>
 
@@ -143,44 +144,50 @@ void GenFitter2Module::event()
       B2DEBUG(100, "GenFitter2: StoreArray<CDCHit> is empty!");
     }
 
+    GFTrackCand* aTrackCandPointer = trackCandidates[0];
+    int nTrackCandHits = aTrackCandPointer->getNHits();
 
-    //filter
+    // if option is set ignore every track that does not have exactly 1 hit in every Si layer
     bool filterEvent = false;
     if (m_filter == true) {
-      // for the filter function to get only tracks that hits specific layers
-      int nHitsL1 = 0; int nHitsL2 = 0; int nHitsL3 = 0; int nHitsL4 = 0; int nHitsL5 = 0; int nHitsL6 = 0;
-      for (int i = 0; i not_eq nPxdTrueHits; ++i) {
-        int layerId = pxdTrueHits[i]->getSensorID().getLayer();
-        if (layerId == 1) {
-          ++nHitsL1;
-        } else {
-          ++nHitsL2;
-        }
-      }
-      for (int i = 0; i not_eq nSvdTrueHits; ++i) {
-        int layerId = svdTrueHits[i]->getSensorID().getLayer();
-        if (layerId == 3) {
-          ++nHitsL3;
-        } else if (layerId == 4) {
-          ++nHitsL4;
-        } else if (layerId == 5) {
-          ++nHitsL5;
-        } else {
-          ++nHitsL6;
-        }
-      }
-      if (nHitsL1 not_eq 1 or nHitsL2 not_eq 1 or nHitsL3 not_eq 1 or nHitsL4 not_eq 1 or nHitsL5 not_eq 1 or nHitsL6 not_eq 1) {
+      if (nTrackCandHits not_eq 6) {
         filterEvent = true;
         B2INFO("Not exacly one hit in very Si layer. Track "  << eventCounter << " will not be reconstructed");
         ++m_notPerfectCounter;
+      } else {
+        vector<int> layerIds(nTrackCandHits);
+        for (unsigned int i = 0; i not_eq nTrackCandHits; ++i) {
+          unsigned int detId = -1;
+          unsigned int hitId = -1;
+          aTrackCandPointer->getHit(i, detId, hitId);
+          int layerId = -1;
+          if (detId == 0) {
+            layerId = pxdTrueHits[hitId]->getSensorID().getLayer();
+          }
+          if (detId == 1) {
+            layerId = svdTrueHits[hitId]->getSensorID().getLayer();
+          }
+          layerIds[i] = layerId;
+        }
+        sort(layerIds.begin(), layerIds.end());
+        for (int l = 0; l not_eq nTrackCandHits; ++l) {
+          if (l + 1 not_eq layerIds[l]) {
+            filterEvent = true;
+            B2INFO("Not exacly one hit in very Si layer. Track "  << eventCounter << " will not be reconstructed");
+            ++m_notPerfectCounter;
+            break;
+          }
+        }
       }
     }
+
+
 
     if (filterEvent == false) { // fit the track
 
       StoreArray<GFTrack> fittedTracks(""); //holds the output of this module in the form of Genfit track objects
 
-      GFTrackCand* aTrackCandPointer = trackCandidates[0];
+
       //get fit starting values from the MCParticle
       TVector3 vertex = aTrackCandPointer->getPosSeed();
       TVector3 vertexSigma = aTrackCandPointer->getPosError();
@@ -220,11 +227,11 @@ void GenFitter2Module::event()
 
       vector <GFAbsRecoHit*> factoryHits;
       //use the factory to create RecoHits for all Hits stored in the track candidate
-      factoryHits = factory.createMany(*trackCandidates[0]);
+      factoryHits = factory.createMany(*aTrackCandPointer);
 
       //add created hits to the track
       track.addHitVector(factoryHits);
-      track.setCandidate(*trackCandidates[0]);
+      track.setCandidate(*aTrackCandPointer);
 
       B2INFO("Total Nr of Hits assigned to the Track: " << track.getNumHits());
 

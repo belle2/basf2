@@ -96,7 +96,7 @@ void ProfileModule::terminate()
   B2INFO("Memory usage at termination [MB]: " << m_terminateInfo.mem / 1024);
 
   if (m_nEvents > k_burnIn) {
-    B2INFO("Memory increase per event [kB]  : " << (m_endInfo.mem - m_startInfo.mem) / (m_nEvents - k_burnIn));
+    B2INFO("Memory increase per event [kB]  : " << ((long)m_endInfo.mem - (long)m_startInfo.mem) / (m_nEvents - k_burnIn));
     B2INFO("Execution time per event [ms]   : " << 1000 * (m_endInfo.time - m_startInfo.time) / (m_nEvents - k_burnIn));
   }
 

@@ -68,8 +68,14 @@ namespace Belle2 {
     /** Returns a pointer to the i'th branch of specified durability if valid and not disabled via branchNames, NULL otherwise */
     TBranch* validBranch(int ibranch, DataStore::EDurability durability) const;
 
+    /** Sorts stringlist alphabetically and removes any duplicates.
+     *
+     *  @return true, if duplicates are found
+     */
+    bool makeBranchNamesUnique(std::vector<std::string> &stringlist) const;
+
     /** Actually performs the reading from the tree into m_objects. */
-    void readTree(const DataStore::EDurability& durability);
+    void readTree(DataStore::EDurability durability);
 
 
     //first the steerable variables:
@@ -90,6 +96,13 @@ namespace Belle2 {
     */
     std::vector<std::string> m_branchNames[DataStore::c_NDurabilityTypes];
 
+    /** Array for names of branches that should NOT be written out.
+     *
+     *  This takes precedence over m_branchNames, so if a branch is in both
+     *  m_branchNames[d] and m_excludeBranchNames[d], it is not saved.
+     */
+    std::vector<std::string> m_excludeBranchNames[DataStore::c_NDurabilityTypes];
+
     /** Event Number. */
     /** Steerable number of events to be skipped before start.
     */
@@ -98,29 +111,20 @@ namespace Belle2 {
 
     //then those for purely internal use:
 
-    /** Name of */
-    std::vector<std::string> m_objectNames[DataStore::c_NDurabilityTypes];
-
     /** TFile for input. */
     TFile* m_file;
 
     /**  TTree for input. */
     TTree* m_tree[DataStore::c_NDurabilityTypes];
 
-    /** Total number of branches. */
-    int m_size[DataStore::c_NDurabilityTypes];
+    /** Steering parameter names for m_treeNames. */
+    const static std::string c_SteerTreeNames[DataStore::c_NDurabilityTypes];
 
-    /** Number of branches from non-array objects. */
-    int m_sizeObj[DataStore::c_NDurabilityTypes];
+    /** Steering parameter names for m_branchNames. */
+    const static std::string c_SteerBranchNames[DataStore::c_NDurabilityTypes];
 
-    /** Pointer to pointer, that can be utilised by the TTree. */
-    TObject** m_objects[DataStore::c_NDurabilityTypes];
-
-    /** String vector with steering parameter Names for m_treeNames. */
-    std::vector<std::string>  m_steerTreeNames;
-
-    /** String vector with steering parameter Names for m_branchNames. */
-    std::vector<std::string>  m_steerBranchNames;
+    /** Steering parameter names for m_excludeBranchNames. */
+    const static std::string c_SteerExcludeBranchNames[DataStore::c_NDurabilityTypes];
 
   };
 

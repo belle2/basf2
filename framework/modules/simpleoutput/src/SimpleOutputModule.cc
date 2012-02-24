@@ -49,9 +49,9 @@ SimpleOutputModule::SimpleOutputModule() : Module(), m_file(0), m_experiment(0),
   //Initialization of some member variables
   for (int jj = 0; jj < DataStore::c_NDurabilityTypes; jj++) {
     m_tree[jj] = 0;
+    m_treeNames[jj] = "NONE";
     m_size[jj] = 0;
     m_objects[jj] = 0;
-    m_treeNames[jj] = "NONE";
     m_done[jj] = false;
   }
 
@@ -256,7 +256,14 @@ void SimpleOutputModule::fillTree(const DataStore::EDurability& durability)
     const DataStore::StoreObjMap& map = DataStore::Instance().getObjectMap(durability);
     for (DataStore::StoreObjConstIter iter = map.begin(); iter != map.end(); ++iter) {
       if (binary_search(m_branchNames[durability].begin(), m_branchNames[durability].end(), iter->first)) {
-        m_objects[durability][sizeCounter] = iter->second;
+        if (iter->second != 0) {
+          m_objects[durability][sizeCounter] = iter->second;
+          m_tree[durability]->SetBranchAddress(iter->first.c_str(), &(m_objects[durability][sizeCounter]));
+        } else {
+          //no object exists, this will create a temporary owned & deleted by the branch
+          m_tree[durability]->SetBranchAddress(iter->first.c_str(), 0);
+        }
+
         sizeCounter++;
       }
     }
@@ -316,8 +323,15 @@ void SimpleOutputModule::setupBranches(DataStore::EDurability durability)
     const DataStore::StoreObjMap& map = (iMap == 0) ? DataStore::Instance().getObjectMap(durability) : DataStore::Instance().getArrayMap(durability);
     for (DataStore::StoreObjConstIter iter = map.begin(); iter != map.end(); ++iter) {
       if (binary_search(m_branchNames[durability].begin(), m_branchNames[durability].end(), iter->first)) {
-        m_objects[durability][sizeCounter] = iter->second;
-        m_tree[durability]->Branch(iter->first.c_str(), &(m_objects[durability][sizeCounter]));
+        //TODO: once setupBranches() is moved into initialize(), iter->second cannot actually be NULL
+        if (iter->second != 0) {
+          m_objects[durability][sizeCounter] = iter->second;
+          m_tree[durability]->Branch(iter->first.c_str(), &(m_objects[durability][sizeCounter]));
+        } else {
+          //no object exists, this will create a temporary owned & deleted by the branch
+          m_tree[durability]->Branch(iter->first.c_str(), 0);
+        }
+
         sizeCounter++;
       }
     }

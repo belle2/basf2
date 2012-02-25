@@ -228,12 +228,12 @@ namespace Belle2 {
       /** Get pad size in x direction
        * @return pad size in x
        */
-      int padx() const {return m_padx; }
+      double padx() const {return m_padx; }
 
       /** Get pad size in y direction
        * @return pad size in x
        */
-      int pady() const {return m_pady; }
+      double pady() const {return m_pady; }
 
       /** Get the thickness of the glue between the PMT stack and the wedge
        * @return the thickness of the glue between the PMT stack and the wedge

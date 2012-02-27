@@ -80,9 +80,9 @@ void TrueHitTesterModule::beginRun()
 void TrueHitTesterModule::event()
 {
 
-  //StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
-  //int eventCounter = eventMetaDataPtr->getEvent();
-
+  StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
+  int eventCounter = eventMetaDataPtr->getEvent();
+  B2INFO("********** TrueHitTesterModule  processing event number: " << eventCounter << " ************");
   //simulated particles and hits
   StoreArray<MCParticle> aMcParticleArray("");
   int nMcParticles = aMcParticleArray.getEntries();
@@ -96,36 +96,45 @@ void TrueHitTesterModule::event()
   RelationIndex<MCParticle, SVDTrueHit> relMcSvdTrueHit;
   int sizeRelMcSvdTrueHit = relMcSvdTrueHit.size();
 
-  //select only tracks with on
+  // if option is set ignore every track that does not have exactly 1 hit in every Si layer
   bool filterEvent = false;
   if (m_filter == true) {
-    // for the filter function to get only tracks that hits specific layers
-    int nHitsL1 = 0; int nHitsL2 = 0; int nHitsL3 = 0; int nHitsL4 = 0; int nHitsL5 = 0; int nHitsL6 = 0;
-    for (int i = 0; i not_eq nPxdTrueHits; ++i) {
-      int layerId = aPxdTrueHitArray[i]->getSensorID().getLayer();
-      if (layerId == 1) {
-        ++nHitsL1;
-      } else {
-        ++nHitsL2;
+    for (int iPart = 0; iPart not_eq nMcParticles; ++iPart) {
+      const MCParticle* const aMcParticlePtr = aMcParticleArray[iPart];
+      if (aMcParticlePtr->hasStatus(MCParticle::c_PrimaryParticle) == true) {
+        vector<int> layerIds;
+        RelationIndex<MCParticle, PXDTrueHit>::range_from iterPairMcPxd = relMcPxdTrueHit.getFrom(aMcParticlePtr);
+        while (iterPairMcPxd.first not_eq iterPairMcPxd.second) {
+          int layerId = iterPairMcPxd.first->to->getSensorID().getLayer();
+          layerIds.push_back(layerId);
+          ++iterPairMcPxd.first;
+        }
+        RelationIndex<MCParticle, SVDTrueHit>::range_from iterPairMcSvd = relMcSvdTrueHit.getFrom(aMcParticlePtr);
+        while (iterPairMcSvd.first not_eq iterPairMcSvd.second) {
+          int layerId = iterPairMcSvd.first->to->getSensorID().getLayer();
+          layerIds.push_back(layerId);
+          ++iterPairMcSvd.first;
+        }
+        if (layerIds.size() not_eq 6) {
+          filterEvent = true;
+          ++m_notPerfectCounter;
+          break;
+        } else {
+          sort(layerIds.begin(), layerIds.end());
+          for (int l = 0; l not_eq 6; ++l) {
+            if (l + 1 not_eq layerIds[l]) {
+              filterEvent = true;
+              ++m_notPerfectCounter;
+              break;
+            }
+          }
+        }
+
       }
-    }
-    for (int i = 0; i not_eq nSvdTrueHits; ++i) {
-      int layerId = aSvdTrueHitArray[i]->getSensorID().getLayer();
-      if (layerId == 3) {
-        ++nHitsL3;
-      } else if (layerId == 4) {
-        ++nHitsL4;
-      } else if (layerId == 5) {
-        ++nHitsL5;
-      } else {
-        ++nHitsL6;
-      }
-    }
-    if (nHitsL1 not_eq 1 or nHitsL2 not_eq 1 or nHitsL3 not_eq 1 or nHitsL4 not_eq 1 or nHitsL5 not_eq 1 or nHitsL6 not_eq 1) {
-      filterEvent = true;
-      ++m_notPerfectCounter;
     }
   }
+
+
   if (filterEvent == false) {
     TMatrixT<double> trueStateIn(5, 1);
     TMatrixT<double> trueState(5, 1);
@@ -143,18 +152,25 @@ void TrueHitTesterModule::event()
         double mass = aMcParticlePtr->getMass();
         //double pVertex = aMcParticlePtr->getMomentum();
         double energyLastHit = aMcParticlePtr->getEnergy() + mass;
+        vector<VXDTrueHit const*> trueHitPtrs;
         RelationIndex<MCParticle, PXDTrueHit>::range_from iterPairMcPxd = relMcPxdTrueHit.getFrom(aMcParticlePtr);
+        while (iterPairMcPxd.first not_eq iterPairMcPxd.second) {
+          trueHitPtrs.push_back(static_cast<VXDTrueHit const*>(iterPairMcPxd.first->to));
+          ++iterPairMcPxd.first;
+        }
         RelationIndex<MCParticle, SVDTrueHit>::range_from iterPairMcSvd = relMcSvdTrueHit.getFrom(aMcParticlePtr);
-        VXDTrueHit const* aVxdTrueHitPtr = NULL;
-        const int sumOfRelSizes = sizeRelMcPxdTrueHit + sizeRelMcSvdTrueHit;
-        for (int i = 0; i not_eq sumOfRelSizes; ++i) {
-          if (i < sizeRelMcPxdTrueHit) {
-            aVxdTrueHitPtr = static_cast<VXDTrueHit const*>(iterPairMcPxd.first->to);
-            ++iterPairMcPxd.first;
-          } else {
-            aVxdTrueHitPtr = static_cast<VXDTrueHit const*>(iterPairMcSvd.first->to);
-            ++iterPairMcSvd.first;
-          }
+        while (iterPairMcSvd.first not_eq iterPairMcSvd.second) {
+          trueHitPtrs.push_back(static_cast<VXDTrueHit const*>(iterPairMcSvd.first->to));
+          ++iterPairMcSvd.first;
+        }
+        int nTrueHits = trueHitPtrs.size();
+        B2DEBUG(100, "nTrueHits " << nTrueHits);
+        for (int i = 0; i not_eq nTrueHits; ++i) {
+          B2DEBUG(100, "i " << i);
+          VXDTrueHit const* aVxdTrueHitPtr = trueHitPtrs[i];
+          B2DEBUG(100, "aVxdTrueHitPtr " << aVxdTrueHitPtr);
+          B2DEBUG(100, "aVxdTrueHitPtr->getU() " << aVxdTrueHitPtr->getU());
+
           float deltaE = aVxdTrueHitPtr->getEnergyDep();
           int layerId = aVxdTrueHitPtr->getSensorID().getLayer();
           TVector3 pTrueIn = aVxdTrueHitPtr->getEntryMomentum();
@@ -191,13 +207,17 @@ void TrueHitTesterModule::event()
           trueStateIn[0][0] = qTrue / pTrueIn.Mag();
           trueStateIn[1][0] = pTrueIn[0] / pTrueIn[2];
           trueStateIn[2][0] = pTrueIn[1] / pTrueIn[2];
+          trueStateIn[3][0] = aVxdTrueHitPtr->getEntryU();
+          trueStateIn[4][0] = aVxdTrueHitPtr->getEntryV();
           trueStateOut[0][0] = qTrue / pTrueOut.Mag();
           trueStateOut[1][0] = pTrueOut[0] / pTrueOut[2];
           trueStateOut[2][0] = pTrueOut[1] / pTrueOut[2];
+          trueStateOut[3][0] = aVxdTrueHitPtr->getExitU();
+          trueStateOut[4][0] = aVxdTrueHitPtr->getExitV();
           TMatrixT<double> deltaTrueState = trueStateOut - trueStateIn;
           fillLayerWiseData("deltaTrackParas", vecIndex, rootVecToStdVec(deltaTrueState));
 
-          dataSample.push_back(pTrueOut.Phi() - pTrueIn.Phi());
+          dataSample.push_back(pTrueOut.DeltaPhi(pTrueIn));
           dataSample.push_back(pTrueOut.Theta() - pTrueIn.Theta());
           fillLayerWiseData("angles", vecIndex, dataSample);
           dataSample.clear();

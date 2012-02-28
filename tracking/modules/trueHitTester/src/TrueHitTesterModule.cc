@@ -86,15 +86,11 @@ void TrueHitTesterModule::event()
   //simulated particles and hits
   StoreArray<MCParticle> aMcParticleArray("");
   int nMcParticles = aMcParticleArray.getEntries();
-
-  StoreArray<PXDTrueHit> aPxdTrueHitArray("");
-  int nPxdTrueHits = aPxdTrueHitArray.getEntries();
-  StoreArray<SVDTrueHit> aSvdTrueHitArray("");
-  int nSvdTrueHits = aSvdTrueHitArray.getEntries();
+  // pointer to the true hits
   RelationIndex<MCParticle, PXDTrueHit> relMcPxdTrueHit;
-  int sizeRelMcPxdTrueHit = relMcPxdTrueHit.size();
   RelationIndex<MCParticle, SVDTrueHit> relMcSvdTrueHit;
-  int sizeRelMcSvdTrueHit = relMcSvdTrueHit.size();
+  // class to convert global and local coordinates into each other
+  VXD::GeoCache& aGeoCach = VXD::GeoCache::getInstance();
 
   // if option is set ignore every track that does not have exactly 1 hit in every Si layer
   bool filterEvent = false;
@@ -186,14 +182,14 @@ void TrueHitTesterModule::event()
           fillLayerWiseData("deltaEs", vecIndex, dataSample);
           dataSample.clear();
 
-          //VxdID aSensorId = aVxdTrueHitPtr->getSensorID();
+
           //TVector3 deltaP = pTrueOut - pTrueIn;
           //pTrueIn.Print();
           //pTrueOut.Print();
           //deltaP.Print();
-          //const VXD::SensorInfoBase& aCoordTrans = aGeoCach.getSensorInfo(aSensorId);
-          //TVector3 pTrueInGlobal = aCoordTrans.vectorToGlobal(pTrueIn);
-          //TVector3 pTrueOutGlobal = aCoordTrans.vectorToGlobal(pTrueOut);
+          const VXD::SensorInfoBase& aCoordTrans = aGeoCach.getSensorInfo(aVxdTrueHitPtr->getSensorID());
+          TVector3 pTrueInGlobal = aCoordTrans.vectorToGlobal(pTrueIn);
+          TVector3 pTrueOutGlobal = aCoordTrans.vectorToGlobal(pTrueOut);
           //pTrueInGlobal.Print();
           //pTrueOutGlobal.Print();
           //cout << "q,p " << qTrue << " "; pTrue.Print();
@@ -217,8 +213,8 @@ void TrueHitTesterModule::event()
           TMatrixT<double> deltaTrueState = trueStateOut - trueStateIn;
           fillLayerWiseData("deltaTrackParas", vecIndex, rootVecToStdVec(deltaTrueState));
 
-          dataSample.push_back(pTrueOut.DeltaPhi(pTrueIn));
-          dataSample.push_back(pTrueOut.Theta() - pTrueIn.Theta());
+          dataSample.push_back(pTrueOutGlobal.DeltaPhi(pTrueInGlobal));
+          dataSample.push_back(pTrueOutGlobal.Theta() - pTrueInGlobal.Theta());
           fillLayerWiseData("angles", vecIndex, dataSample);
           dataSample.clear();
         }

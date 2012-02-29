@@ -62,6 +62,9 @@ GeoEKLMBelleII::GeoEKLMBelleII()
  */
 GeoEKLMBelleII::~GeoEKLMBelleII()
 {
+  int i;
+  for (i = 0; i < nPlane; i++)
+    delete BoardTransform[i];
   delete m_sensitive;
 }
 

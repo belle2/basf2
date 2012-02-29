@@ -30,7 +30,7 @@ namespace Belle2 {
 
 
 
-  EKLMFiberAndElectronics::EKLMFiberAndElectronics(pair < const G4VPhysicalVolume *,
+  EKLMFiberAndElectronics::EKLMFiberAndElectronics(pair < const G4VPhysicalVolume*,
                                                    vector<EKLMSimHit*> >
                                                    entry)
   {
@@ -131,10 +131,10 @@ namespace Belle2 {
 
     // if save histograms if outputFilename is non-empty
     if (m_outputFilename.size() != 0) {
-      const char * info = (string("Histograms will be saved with ") + m_outputFilename + string(" prefix. To switch it off change OutputFile parameter in EKLM.xml to void")).c_str();
+      const char* info = (string("Histograms will be saved with ") + m_outputFilename + string(" prefix. To switch it off change OutputFile parameter in EKLM.xml to void")).c_str();
       B2INFO(info);
       string filename = m_outputFilename + *m_stripName + boost::lexical_cast<string>(gRandom->Integer(10000000)) + ".root";
-      TFile *hfile = new TFile(filename.c_str(), "NEW");
+      TFile* hfile = new TFile(filename.c_str(), "NEW");
       hfile->Append(m_digitizedAmplitudeDirect);
       hfile->Append(m_digitizedAmplitudeReflected);
       hfile->Append(m_digitizedAmplitude);
@@ -148,9 +148,9 @@ namespace Belle2 {
 
   //***********************************************************
 
-  void EKLMFiberAndElectronics::lightPropagationDistance(EKLMSimHit *sh)
+  void EKLMFiberAndElectronics::lightPropagationDistance(EKLMSimHit* sh)
   {
-    G4Box *box = (G4Box*)(sh->getVolume()->GetLogicalVolume()->GetSolid());
+    G4Box* box = (G4Box*)(sh->getVolume()->GetLogicalVolume()->GetSolid());
     double half_len = box->GetXHalfLength();
     double local_pos = sh->getLocalPosition()->x();
     m_hitDist = make_pair(half_len - local_pos, 3.0 * half_len + local_pos);
@@ -165,7 +165,7 @@ namespace Belle2 {
   double EKLMFiberAndElectronics::signalShape(double t)
   {
     if (t > 0)
-      return exp(-m_expCoefficient*t);
+      return exp(-m_expCoefficient * t);
     return 0;
   }
 
@@ -207,12 +207,12 @@ namespace Belle2 {
   }
 
   void EKLMFiberAndElectronics::timesToShape(const vector <double> & times,
-                                             TH1D * shape)
+                                             TH1D* shape)
   {
     for (unsigned  i = 0; i < times.size(); i++)
       for (int iTimeStep = 0; iTimeStep < m_nTimeDigitizationSteps; iTimeStep++)
         shape->AddBinContent(iTimeStep + 1,
-                             signalShape(iTimeStep*m_timeDigitizationStep -
+                             signalShape(iTimeStep * m_timeDigitizationStep -
                                          times[i]));
   }
 
@@ -244,7 +244,7 @@ namespace Belle2 {
 
 
 
-  double EKLMSignalShapeFitFunction(double *_x, double * par)
+  double EKLMSignalShapeFitFunction(double* _x, double* par)
   {
     double x = *_x;
     double u = 0;

@@ -110,33 +110,33 @@ void EKLMHitBase::increaseEDep(double deltaEDep)
   m_EDep += deltaEDep;
 }
 
-const TVector3 * EKLMHitBase::getPosition() const
+const TVector3* EKLMHitBase::getPosition() const
 {
   return &m_GlobalPosition;
 }
 
-void EKLMHitBase::setPosition(TVector3 & position)
+void EKLMHitBase::setPosition(TVector3& position)
 {
   m_GlobalPosition = position;
 }
 
-void EKLMHitBase::setPosition(const TVector3 * position)
+void EKLMHitBase::setPosition(const TVector3* position)
 {
   m_GlobalPosition = *position;
 }
 
 
-const TVector3 * EKLMHitBase::getLocalPosition() const
+const TVector3* EKLMHitBase::getLocalPosition() const
 {
   return &m_LocalPosition;
 }
 
-void EKLMHitBase::setLocalPosition(TVector3 & position)
+void EKLMHitBase::setLocalPosition(TVector3& position)
 {
   m_LocalPosition = position;
 }
 
-void EKLMHitBase::setLocalPosition(const TVector3 * position)
+void EKLMHitBase::setLocalPosition(const TVector3* position)
 {
   m_LocalPosition = *position;
 }

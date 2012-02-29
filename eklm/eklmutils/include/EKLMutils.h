@@ -29,33 +29,33 @@ namespace Belle2 {
   /**
    * Get physical volume by point
    */
-  const G4VPhysicalVolume *GetPhysicalVolumeByPoint(const G4ThreeVector &point);
+  const G4VPhysicalVolume* GetPhysicalVolumeByPoint(const G4ThreeVector& point);
 
   /**
    * Check whether strip is oriented along X
    * @strip: strip
    */
-  bool CheckStripOrientationX(const G4VPhysicalVolume *strip);
+  bool CheckStripOrientationX(const G4VPhysicalVolume* strip);
 
 
   /**
    * check if two Hitted sterips do intersect and fill Hep3Vector with coordinates of intersection
    * if interseation is not found crossPoint is set to (0,0,0)
    */
-  bool doesIntersect(const EKLMStripHit * hit1, const EKLMStripHit * hit2,
-                     TVector3 & crossPoint);
+  bool doesIntersect(const EKLMStripHit* hit1, const EKLMStripHit* hit2,
+                     TVector3& crossPoint);
 
 
 
   /**
    *  Return distance from the point and SiPM of the Strip
    */
-  double getLightPropagationLength(const G4VPhysicalVolume * vol, const TVector3  &pos);
+  double getLightPropagationLength(const G4VPhysicalVolume* vol, const TVector3&  pos);
 
   /**
    *  Return distance from the point and SiPM of the Strip
    */
-  double getLightPropagationLength(const G4VPhysicalVolume * vol, const CLHEP::Hep3Vector  &pos);
+  double getLightPropagationLength(const G4VPhysicalVolume* vol, const CLHEP::Hep3Vector&  pos);
 
 }
 

@@ -41,7 +41,7 @@ namespace Belle2 {
      * Process each step and calculate variables for EKLMStepHit
      * store EKLMStepHit
      */
-    bool step(G4Step *aStep, G4TouchableHistory *history);
+    bool step(G4Step* aStep, G4TouchableHistory* history);
 
   private:
     /**

@@ -33,7 +33,7 @@ namespace Belle2 {
     EKLMStripHit() {};
 
     //! Constructor from the EKLMSimHit
-    EKLMStripHit(const EKLMSimHit * Hit);
+    EKLMStripHit(const EKLMSimHit* Hit);
 
     //! Destructor
     ~EKLMStripHit() {};
@@ -52,10 +52,10 @@ namespace Belle2 {
 
 
     //! returns physical volume
-    const G4VPhysicalVolume *getVolume() const;
+    const G4VPhysicalVolume* getVolume() const;
 
     //! set physical volume
-    void setVolume(const G4VPhysicalVolume *pv);
+    void setVolume(const G4VPhysicalVolume* pv);
 
 
 
@@ -82,12 +82,12 @@ namespace Belle2 {
     /**
      * Get fit results
      */
-    const TFitResult * getFitResults() const;
+    const TFitResult* getFitResults() const;
 
     /**
      * Set fit results
      */
-    void setFitResults(TFitResult &res);
+    void setFitResults(TFitResult& res);
 
 
     /**
@@ -118,7 +118,7 @@ namespace Belle2 {
 
 
     //! Physical volume (for simulation)
-    const G4VPhysicalVolume *m_pv;   //! {ROOT streamer directive}
+    const G4VPhysicalVolume* m_pv;   //! {ROOT streamer directive}
 
     //! Fit results object
     TFitResult m_fitResults;

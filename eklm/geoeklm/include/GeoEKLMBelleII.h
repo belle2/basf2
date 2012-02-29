@@ -174,7 +174,7 @@ namespace Belle2 {
     /**
      * ReflectCoordinates - get reflected coordinates
      */
-    void ReflectCoordinates(double xin, double yin, double *xout, double *yout,
+    void ReflectCoordinates(double xin, double yin, double* xout, double* yout,
                             int quarter);
 
     /**
@@ -182,7 +182,7 @@ namespace Belle2 {
      * @iEndcap: number of endcap
      * @mlv: mother logical volume
      */
-    void createEndcap(int iEndcap, G4LogicalVolume *mlv);
+    void createEndcap(int iEndcap, G4LogicalVolume* mlv);
 
     /**
      * createLayer - create layer
@@ -190,41 +190,41 @@ namespace Belle2 {
      * @iEndcap: number of endcap
      * @mpvgt: mother physical volume with global transformation
      */
-    void createLayer(int iLayer, int iEndcap, G4PVPlacementGT *mpvgt);
+    void createLayer(int iLayer, int iEndcap, G4PVPlacementGT* mpvgt);
 
     /**
      * createSector - create sector
      * @iSector: number of sector
      * @mpvgt: mother physical volume with global transformation
      */
-    void createSector(int iSector, G4PVPlacementGT *mpvgt);
+    void createSector(int iSector, G4PVPlacementGT* mpvgt);
 
     /**
      * createSectorCover - create sector cover
      * @iCover: number of cover
      * @@mpvgt: mother physical volume with global transformation
      */
-    void createSectorCover(int iCover, G4PVPlacementGT *mpvgt);
+    void createSectorCover(int iCover, G4PVPlacementGT* mpvgt);
 
     /**
      * createSectorSupport - create sector support structure
      * @mpvgt: mother physical volume with global transformation
      */
-    void createSectorSupport(G4PVPlacementGT *mpvgt);
+    void createSectorSupport(G4PVPlacementGT* mpvgt);
 
     /**
      * createSectorSupportInnerTube - create inner tube of sector
      * support structure
      * @mpvgt: mother physical volume with global transformation
      */
-    G4Tubs *createSectorSupportInnerTube(G4PVPlacementGT *mpvgt);
+    G4Tubs* createSectorSupportInnerTube(G4PVPlacementGT* mpvgt);
 
     /**
      * createSectorSupportOuterTube - create outer tube of sector
      * support structure
      * @mpvgt: mother physical volume with global transformation
      */
-    G4Tubs *createSectorSupportOuterTube(G4PVPlacementGT *mpvgt);
+    G4Tubs* createSectorSupportOuterTube(G4PVPlacementGT* mpvgt);
 
     /**
      * createSectorSuportBoxX - create X side of sector support structure
@@ -233,7 +233,7 @@ namespace Belle2 {
      *
      * Sets t to the transformation of the box.
      */
-    G4Box *createSectorSupportBoxX(G4PVPlacementGT *mpvgt, G4Transform3D &t);
+    G4Box* createSectorSupportBoxX(G4PVPlacementGT* mpvgt, G4Transform3D& t);
 
     /**
      * createSectorSuportBoxY - create Y side of sector support structure
@@ -242,7 +242,7 @@ namespace Belle2 {
      *
      * Sets t to the transformation of the box.
      */
-    G4Box *createSectorSupportBoxY(G4PVPlacementGT *mpvgt, G4Transform3D &t);
+    G4Box* createSectorSupportBoxY(G4PVPlacementGT* mpvgt, G4Transform3D& t);
 
     /**
      * createSectorSuportBoxTop - create box in the cutted corner of sector
@@ -252,31 +252,31 @@ namespace Belle2 {
      *
      * Sets t to the transformation of the box.
      */
-    G4Box *createSectorSupportBoxTop(G4PVPlacementGT *mpvgt, G4Transform3D &t);
+    G4Box* createSectorSupportBoxTop(G4PVPlacementGT* mpvgt, G4Transform3D& t);
 
     /**
      * createSectorSupportCorner1 - create sector support corner 1
      * @mpvgt: mother physical volume with global transformation
      */
-    void createSectorSupportCorner1(G4PVPlacementGT *mpvgt);
+    void createSectorSupportCorner1(G4PVPlacementGT* mpvgt);
 
     /*
      * createSectorSupportCorner2 - create sector support corner 2
      * @mpvgt: mother physical volume with global transformation
      */
-    void createSectorSupportCorner2(G4PVPlacementGT *mpvgt);
+    void createSectorSupportCorner2(G4PVPlacementGT* mpvgt);
 
     /*
      * createSectorSupportCorner3 - create sector support corner 3
      * @mpvgt: mother physical volume with global transformation
      */
-    void createSectorSupportCorner3(G4PVPlacementGT *mpvgt);
+    void createSectorSupportCorner3(G4PVPlacementGT* mpvgt);
 
     /*
      * createSectorSupportCorner4 - create sector support corner 4
      * @mpvgt: mother physical volume with global transformation
      */
-    void createSectorSupportCorner4(G4PVPlacementGT *mpvgt);
+    void createSectorSupportCorner4(G4PVPlacementGT* mpvgt);
 
     /**
      * subtractBoardSolids - subtract board solids from planes
@@ -284,7 +284,7 @@ namespace Belle2 {
      * @iPlane: plane number
      * @Plane_name: plane name
      */
-    G4SubtractionSolid *subtractBoardSolids(G4SubtractionSolid *plane,
+    G4SubtractionSolid* subtractBoardSolids(G4SubtractionSolid* plane,
                                             int iPlane, std::string Plane_Name);
 
     /**
@@ -292,7 +292,7 @@ namespace Belle2 {
      * @iPlane: number of plane
      * @mpvgt: mother physical volume with global transformation
      */
-    void createPlane(int iPlane, G4PVPlacementGT *mpvgt);
+    void createPlane(int iPlane, G4PVPlacementGT* mpvgt);
 
     /**
      * createSectionReadoutBoard - create readout board
@@ -301,20 +301,20 @@ namespace Belle2 {
      * @mpvgt: mother physical volume with global transformation
      */
     void createSectionReadoutBoard(int iPlane, int iBoard,
-                                   G4PVPlacementGT *mpvgt);
+                                   G4PVPlacementGT* mpvgt);
 
     /**
      * createBaseBoard - create base board of section readout board
      * @mpvgt: mother physical volume with global transformation
      */
-    void createBaseBoard(G4PVPlacementGT *mpvgt);
+    void createBaseBoard(G4PVPlacementGT* mpvgt);
 
     /**
      * createStripBoard - create strip readout board
      * @iBoard: number of board
      * @mpvgt: mother physical volume with global transformation
      */
-    void createStripBoard(int iBoard, G4PVPlacementGT *mpvgt);
+    void createStripBoard(int iBoard, G4PVPlacementGT* mpvgt);
 
     /**
      * createSectionSupport - create section support
@@ -323,7 +323,7 @@ namespace Belle2 {
      * @mpvgt: mother physical volume with global transformation
      */
     void createSectionSupport(int iSectionSupport, int iPlane,
-                              G4PVPlacementGT *mpvgt);
+                              G4PVPlacementGT* mpvgt);
 
     /**
      * createPlasticListElement - create plastic list element
@@ -332,83 +332,83 @@ namespace Belle2 {
      * @mpvgt: mother physical volume with global transformation
      */
     void createPlasticListElement(int iListPlane, int iList,
-                                  G4PVPlacementGT *mpvgt);
+                                  G4PVPlacementGT* mpvgt);
 
     /**
      * createStripVolume - create strip volume (strip + SiPM)
      * @iStrip: number of strip
      * @mpvgt: mother physical volume with global transformation
      */
-    void createStripVolume(int iStrip, G4PVPlacementGT *mpvgt);
+    void createStripVolume(int iStrip, G4PVPlacementGT* mpvgt);
 
     /**
      * createStrip - create strip
      * @iStrip: number of strip
      * @mpvgt: mother physical volume with global transformation
      */
-    void createStrip(int iStrip, G4PVPlacementGT *mpvgt);
+    void createStrip(int iStrip, G4PVPlacementGT* mpvgt);
 
     /**
      * createStripGroove - create strip groove
      * @iStrip: number of strip
      * @mpvgt: mother physical volume with global transformation
      */
-    void createStripGroove(int iStrip, G4PVPlacementGT *mpvgt);
+    void createStripGroove(int iStrip, G4PVPlacementGT* mpvgt);
 
     /**
      * createStripSensitive - create strip sensitive volume
      * @iStrip: number of strip
      * @mpvgt: mother physical volume with global transformation
      */
-    void createStripSensitive(int iStrip, G4PVPlacementGT *mpvgt);
+    void createStripSensitive(int iStrip, G4PVPlacementGT* mpvgt);
 
     /**
      * createSiPM - create silicon cube in the place of SiPM for radiation study
      * @iStrip: number of strip
      * @mpvgt: mother physical volume with global transformation
      */
-    void createSiPM(int iStrip, G4PVPlacementGT *mpvgt);
+    void createSiPM(int iStrip, G4PVPlacementGT* mpvgt);
 
     /**
      * printVolumeMass - print mass of volume if m_mode == 2
      * @lv: logical volume
      */
-    void printVolumeMass(G4LogicalVolume *lv);
+    void printVolumeMass(G4LogicalVolume* lv);
 
     /**
      * Air.
      */
-    G4Material *Air;
+    G4Material* Air;
 
     /**
      * Polystyrene.
      */
-    G4Material *Polystyrene;
+    G4Material* Polystyrene;
 
     /**
      * Polystyrol.
      */
-    G4Material *Polystyrol;
+    G4Material* Polystyrol;
 
     /**
      * Iron.
      */
-    G4Material *Iron;
+    G4Material* Iron;
 
     /**
      * Duralumin.
      */
-    G4Material *Duralumin;
+    G4Material* Duralumin;
 
     /**
      * Silicon.
      */
-    G4Material *Silicon;
+    G4Material* Silicon;
 
     /**
      * Gel.
      */
-    G4Material *Gel;
+    G4Material* Gel;
 
     /**
      * Number of layers.
@@ -483,12 +483,12 @@ namespace Belle2 {
     /**
      * Positions of readout boards
      */
-    struct EKLMBoardPosition *BoardPosition[2];
+    struct EKLMBoardPosition* BoardPosition[2];
 
     /**
      * Transformations of boards from sector reference frame
      */
-    G4Transform3D *BoardTransform[2];
+    G4Transform3D* BoardTransform[2];
 
     /**
      * Calculate board transformations
@@ -498,7 +498,7 @@ namespace Belle2 {
     /**
      * Positions of strip readout boards.
      */
-    struct EKLMStripBoardPosition *StripBoardPosition;
+    struct EKLMStripBoardPosition* StripBoardPosition;
 
     /**
      * Position data for planes.
@@ -508,7 +508,7 @@ namespace Belle2 {
     /**
      * Position data for section support structure.
      */
-    struct EKLMSectionSupportPosition *SectionSupportPosition[2];
+    struct EKLMSectionSupportPosition* SectionSupportPosition[2];
 
     /**
      * Section support structure top box width.
@@ -543,7 +543,7 @@ namespace Belle2 {
     /**
      * Position data for strips.
      */
-    struct EKLMElementPosition *StripPosition;
+    struct EKLMElementPosition* StripPosition;
 
     /**
      * Strip size data.
@@ -558,7 +558,7 @@ namespace Belle2 {
     /**
      * Sensitive detector
      */
-    EKLMSensitiveDetector *m_sensitive;
+    EKLMSensitiveDetector* m_sensitive;
 
   };
 

@@ -29,11 +29,11 @@ namespace Belle2 {
      * This constructor is used when mother physical volume is not a
      * G4PVPlacementGT.
      */
-    G4PVPlacementGT(const G4Transform3D &globalTransform,
-                    const G4Transform3D &Transform3D,
-                    G4LogicalVolume *pCurrentLogical,
-                    const G4String &pName,
-                    G4LogicalVolume *pMotherLogical,
+    G4PVPlacementGT(const G4Transform3D& globalTransform,
+                    const G4Transform3D& Transform3D,
+                    G4LogicalVolume* pCurrentLogical,
+                    const G4String& pName,
+                    G4LogicalVolume* pMotherLogical,
                     int id = 0, int mode = 0);
 
     /**
@@ -41,10 +41,10 @@ namespace Belle2 {
      * This constructor is used when mother physical volume is
      * a G4PVPlacementGT.
      */
-    G4PVPlacementGT(G4PVPlacementGT *motherPVPlacementGT,
-                    const G4Transform3D &Transform3D,
-                    G4LogicalVolume *pCurrentLogical,
-                    const G4String &pName,
+    G4PVPlacementGT(G4PVPlacementGT* motherPVPlacementGT,
+                    const G4Transform3D& Transform3D,
+                    G4LogicalVolume* pCurrentLogical,
+                    const G4String& pName,
                     int id = 0, int mode = 0);
 
     /**
@@ -75,7 +75,7 @@ namespace Belle2 {
     /**
      * getMother - get mother G4PVPlacementGT;
      */
-    const G4PVPlacementGT *getMother() const;
+    const G4PVPlacementGT* getMother() const;
 
     /**
      * getName - get volume Name
@@ -123,7 +123,7 @@ namespace Belle2 {
     /**
      * Mother G4PVPlacementGT.
      */
-    const G4PVPlacementGT *m_mother;
+    const G4PVPlacementGT* m_mother;
 
   };
 

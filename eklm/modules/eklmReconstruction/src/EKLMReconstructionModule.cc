@@ -40,7 +40,7 @@ void EKLMReconstructionModule::beginRun()
 void EKLMReconstructionModule::event()
 {
 
-  EKLMRecon * recon = new EKLMRecon();
+  EKLMRecon* recon = new EKLMRecon();
   B2INFO("EKLMReconstructionModule::event() called")
   recon->readStripHits();
   recon->createSectorHits();

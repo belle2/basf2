@@ -219,7 +219,7 @@ void GeoEKLMBelleII::readXMLData(const GearDir& content)
   SectionSupportMiddleThickness = Sections.getLength("MiddleThickness") * cm;
   for (j = 0; j < nPlane; j++) {
     SectionSupportPosition[j] = new struct
-          EKLMSectionSupportPosition[nSection + 1];
+        EKLMSectionSupportPosition[nSection + 1];
     if (SectionSupportPosition[j] == NULL) {
       B2FATAL("Memory allocation error.");
       exit(ENOMEM);
@@ -250,8 +250,8 @@ void GeoEKLMBelleII::readXMLData(const GearDir& content)
 /**
  * ReflectCoordinates - get reflected coordinates
  */
-void GeoEKLMBelleII::ReflectCoordinates(double xin, double yin, double *xout,
-                                        double *yout, int quarter)
+void GeoEKLMBelleII::ReflectCoordinates(double xin, double yin, double* xout,
+                                        double* yout, int quarter)
 {
   switch (quarter) {
     case 1:
@@ -278,7 +278,7 @@ void GeoEKLMBelleII::ReflectCoordinates(double xin, double yin, double *xout,
  * @iEndcap: number of endcap
  * @mlv: mother logical volume
  */
-void GeoEKLMBelleII::createEndcap(int iEndcap, G4LogicalVolume *mlv)
+void GeoEKLMBelleII::createEndcap(int iEndcap, G4LogicalVolume* mlv)
 {
   int i;
   double z;
@@ -289,11 +289,11 @@ void GeoEKLMBelleII::createEndcap(int iEndcap, G4LogicalVolume *mlv)
   double zsub;
   double rminsub;
   double rmaxsub;
-  G4Polyhedra *boct;
-  G4Tubs *atube;
-  G4SubtractionSolid *solidEndcap;
-  G4LogicalVolume *logicEndcap;
-  G4PVPlacementGT *physiEndcap;
+  G4Polyhedra* boct;
+  G4Tubs* atube;
+  G4SubtractionSolid* solidEndcap;
+  G4LogicalVolume* logicEndcap;
+  G4PVPlacementGT* physiEndcap;
   G4Transform3D t;
   StructureEndcap EndcapMgr;
   EndcapMgr.read();
@@ -351,12 +351,12 @@ void GeoEKLMBelleII::createEndcap(int iEndcap, G4LogicalVolume *mlv)
  * @mpvgt: mother physical volume with global transformation
  */
 void GeoEKLMBelleII::createLayer(int iLayer, int iEndcap,
-                                 G4PVPlacementGT *mpvgt)
+                                 G4PVPlacementGT* mpvgt)
 {
   int i;
-  G4Tubs *solidLayer;
-  G4LogicalVolume *logicLayer;
-  G4PVPlacementGT *physiLayer;
+  G4Tubs* solidLayer;
+  G4LogicalVolume* logicLayer;
+  G4PVPlacementGT* physiLayer;
   G4Transform3D t;
   std::string Layer_Name = "Layer_" + lexical_cast<string>(iLayer) + "_" +
                            mpvgt->GetName();
@@ -392,13 +392,13 @@ void GeoEKLMBelleII::createLayer(int iLayer, int iEndcap,
  * @iSector: number of sector
  * @mpvgt: mother physical volume with global transformation
  */
-void GeoEKLMBelleII::createSector(int iSector, G4PVPlacementGT *mpvgt)
+void GeoEKLMBelleII::createSector(int iSector, G4PVPlacementGT* mpvgt)
 {
   int i;
   int j;
-  G4Tubs *solidSector;
-  G4LogicalVolume *logicSector;
-  G4PVPlacementGT *physiSector;
+  G4Tubs* solidSector;
+  G4LogicalVolume* logicSector;
+  G4PVPlacementGT* physiSector;
   G4Transform3D t;
   std::string Sector_Name = "Sector_" + lexical_cast<string>(iSector) + "_" +
                             mpvgt->GetName();
@@ -473,18 +473,18 @@ void GeoEKLMBelleII::calcBoardTransform()
  * @iCover: number of cover
  * @@mpvgt: mother physical volume with global transformation
  */
-void GeoEKLMBelleII::createSectorCover(int iCover, G4PVPlacementGT *mpvgt)
+void GeoEKLMBelleII::createSectorCover(int iCover, G4PVPlacementGT* mpvgt)
 {
   double z;
   double lz;
   double ang;
-  G4Tubs *solidCoverTube;
-  G4Box *solidCoverBox;
-  G4Box *box;
-  G4IntersectionSolid *is;
-  G4SubtractionSolid *solidCover;
-  G4LogicalVolume *logicCover;
-  G4PVPlacementGT *physiCover;
+  G4Tubs* solidCoverTube;
+  G4Box* solidCoverBox;
+  G4Box* box;
+  G4IntersectionSolid* is;
+  G4SubtractionSolid* solidCover;
+  G4LogicalVolume* logicCover;
+  G4PVPlacementGT* physiCover;
   G4Transform3D t1;
   G4Transform3D t2;
   G4Transform3D t;
@@ -559,8 +559,8 @@ void GeoEKLMBelleII::createSectorCover(int iCover, G4PVPlacementGT *mpvgt)
  *
  * Sets t to the transformation of the box.
  */
-G4Box *GeoEKLMBelleII::createSectorSupportBoxX(G4PVPlacementGT *mpvgt,
-                                               G4Transform3D &t)
+G4Box* GeoEKLMBelleII::createSectorSupportBoxX(G4PVPlacementGT* mpvgt,
+                                               G4Transform3D& t)
 {
   double x1;
   double x2;
@@ -570,7 +570,7 @@ G4Box *GeoEKLMBelleII::createSectorSupportBoxX(G4PVPlacementGT *mpvgt,
             SectorSupportPosition.Y * SectorSupportPosition.Y);
   t =  G4Translate3D(0.5 * (x1 + x2), SectorSupportPosition.Y +
                      0.5 * SectorSupportSize.Thickness, 0.);
-  return new G4Box("BoxX_Support_" + mpvgt->GetName(), 0.5 *(x2 - x1),
+  return new G4Box("BoxX_Support_" + mpvgt->GetName(), 0.5 * (x2 - x1),
                    0.5 * SectorSupportSize.Thickness,
                    0.5 * SectorSupportPosition.length);
 }
@@ -582,8 +582,8 @@ G4Box *GeoEKLMBelleII::createSectorSupportBoxX(G4PVPlacementGT *mpvgt,
  *
  * Sets t to the transformation of the box.
  */
-G4Box *GeoEKLMBelleII::createSectorSupportBoxY(G4PVPlacementGT *mpvgt,
-                                               G4Transform3D &t)
+G4Box* GeoEKLMBelleII::createSectorSupportBoxY(G4PVPlacementGT* mpvgt,
+                                               G4Transform3D& t)
 {
   double y1;
   double y2;
@@ -592,7 +592,7 @@ G4Box *GeoEKLMBelleII::createSectorSupportBoxY(G4PVPlacementGT *mpvgt,
   y2 = SectorSupportPosition.outerR - SectorSupportSize.DeltaLY;
   t = G4Translate3D(SectorSupportPosition.X + 0.5 * SectorSupportSize.Thickness,
                     0.5 * (y1 + y2), 0.) * G4RotateZ3D(90. * deg);
-  return new G4Box("BoxY_Support_" + mpvgt->GetName(), 0.5 *(y2 - y1),
+  return new G4Box("BoxY_Support_" + mpvgt->GetName(), 0.5 * (y2 - y1),
                    0.5 * SectorSupportSize.Thickness,
                    0.5 * SectorSupportPosition.length);
 }
@@ -625,8 +625,8 @@ double GeoEKLMBelleII::getSectorSupportCornerAngle()
  *
  * Sets t to the transformation of the box.
  */
-G4Box *GeoEKLMBelleII::createSectorSupportBoxTop(G4PVPlacementGT *mpvgt,
-                                                 G4Transform3D &t)
+G4Box* GeoEKLMBelleII::createSectorSupportBoxTop(G4PVPlacementGT* mpvgt,
+                                                 G4Transform3D& t)
 {
   double x1;
   double y1;
@@ -643,7 +643,7 @@ G4Box *GeoEKLMBelleII::createSectorSupportBoxTop(G4PVPlacementGT *mpvgt,
                     0.5 * (y1 + y2 - SectorSupportSize.Thickness * cos(ang)),
                     0.) * G4RotateZ3D(ang);
   return new G4Box("BoxTop_Support_" + mpvgt->GetName(), 0.5 * sqrt((x2 - x1) *
-                   (x2 - x1) + (y2 - y1) *(y2 - y1)),
+                   (x2 - x1) + (y2 - y1) * (y2 - y1)),
                    0.5 * SectorSupportSize.Thickness,
                    0.5 * SectorSupportPosition.length);
 }
@@ -653,7 +653,7 @@ G4Box *GeoEKLMBelleII::createSectorSupportBoxTop(G4PVPlacementGT *mpvgt,
  * @mpvgt: mother physical volume with global transformation
  * @mlv: mother logical volume
  */
-G4Tubs *GeoEKLMBelleII::createSectorSupportInnerTube(G4PVPlacementGT *mpvgt)
+G4Tubs* GeoEKLMBelleII::createSectorSupportInnerTube(G4PVPlacementGT* mpvgt)
 {
   double x1;
   double y1;
@@ -677,7 +677,7 @@ G4Tubs *GeoEKLMBelleII::createSectorSupportInnerTube(G4PVPlacementGT *mpvgt)
  * @iSector: number of sector
  * @mpvgt: mother physical volume with global transformation
  */
-G4Tubs *GeoEKLMBelleII::createSectorSupportOuterTube(G4PVPlacementGT *mpvgt)
+G4Tubs* GeoEKLMBelleII::createSectorSupportOuterTube(G4PVPlacementGT* mpvgt)
 {
   double x1;
   double y1;
@@ -705,17 +705,17 @@ G4Tubs *GeoEKLMBelleII::createSectorSupportOuterTube(G4PVPlacementGT *mpvgt)
  * createSectorSupportCorner1 - create sector support corner 1
  * @mpvgt: mother physical volume with global transformation
  */
-void GeoEKLMBelleII::createSectorSupportCorner1(G4PVPlacementGT *mpvgt)
+void GeoEKLMBelleII::createSectorSupportCorner1(G4PVPlacementGT* mpvgt)
 {
   double lx;
   double x;
-  G4Tubs *solidCorner1Tube;
-  G4Box *solidCorner1Box1;
-  G4Box *solidCorner1Box2;
-  G4IntersectionSolid *is1;
-  G4IntersectionSolid *solidCorner1;
-  G4LogicalVolume *logicCorner1;
-  G4PVPlacementGT *physiCorner1;
+  G4Tubs* solidCorner1Tube;
+  G4Box* solidCorner1Box1;
+  G4Box* solidCorner1Box2;
+  G4IntersectionSolid* is1;
+  G4IntersectionSolid* solidCorner1;
+  G4LogicalVolume* logicCorner1;
+  G4PVPlacementGT* physiCorner1;
   G4Transform3D t;
   G4Transform3D t1;
   G4Transform3D t2;
@@ -731,9 +731,9 @@ void GeoEKLMBelleII::createSectorSupportCorner1(G4PVPlacementGT *mpvgt)
                                0.5 * SectorSupportPosition.outerR,
                                0.5 * SectorSupportSize.Corner1Thickness);
   solidCorner1Box2 = new G4Box("Box2_" + Corner1_Name,
-                               0.5 *(lx / cos(getSectorSupportCornerAngle()) +
-                                     SectorSupportSize.Corner1Width *
-                                     sin(getSectorSupportCornerAngle())),
+                               0.5 * (lx / cos(getSectorSupportCornerAngle()) +
+                                      SectorSupportSize.Corner1Width *
+                                      sin(getSectorSupportCornerAngle())),
                                0.5 * SectorSupportSize.Corner1Width,
                                0.5 * SectorSupportSize.Corner1Thickness);
   if (solidCorner1Tube == NULL || solidCorner1Box1 == NULL ||
@@ -785,16 +785,16 @@ void GeoEKLMBelleII::createSectorSupportCorner1(G4PVPlacementGT *mpvgt)
  * createSectorSupportCorner2 - create sector support corner 2
  * @mpvgt: mother physical volume with global transformation
  */
-void GeoEKLMBelleII::createSectorSupportCorner2(G4PVPlacementGT *mpvgt)
+void GeoEKLMBelleII::createSectorSupportCorner2(G4PVPlacementGT* mpvgt)
 {
   double r;
   double x;
   double y;
-  G4TriangularPrism *solidCorner2Prism;
-  G4Tubs *solidCorner2Tubs;
-  G4SubtractionSolid *solidCorner2;
-  G4LogicalVolume *logicCorner2;
-  G4PVPlacementGT *physiCorner2;
+  G4TriangularPrism* solidCorner2Prism;
+  G4Tubs* solidCorner2Tubs;
+  G4SubtractionSolid* solidCorner2;
+  G4LogicalVolume* logicCorner2;
+  G4PVPlacementGT* physiCorner2;
   G4Transform3D t;
   G4Transform3D t1;
   std::string Corner2_Name = "Corner2_" + mpvgt->GetName();
@@ -845,16 +845,16 @@ void GeoEKLMBelleII::createSectorSupportCorner2(G4PVPlacementGT *mpvgt)
  * createSectorSupportCorner3 - create sector support corner 3
  * @mpvgt: mother physical volume with global transformation
  */
-void GeoEKLMBelleII::createSectorSupportCorner3(G4PVPlacementGT *mpvgt)
+void GeoEKLMBelleII::createSectorSupportCorner3(G4PVPlacementGT* mpvgt)
 {
   double r;
   double x;
   double y;
-  G4TriangularPrism *solidCorner3Prism;
-  G4Tubs *solidCorner3Tubs;
-  G4SubtractionSolid *solidCorner3;
-  G4LogicalVolume *logicCorner3;
-  G4PVPlacementGT *physiCorner3;
+  G4TriangularPrism* solidCorner3Prism;
+  G4Tubs* solidCorner3Tubs;
+  G4SubtractionSolid* solidCorner3;
+  G4LogicalVolume* logicCorner3;
+  G4PVPlacementGT* physiCorner3;
   G4Transform3D t;
   G4Transform3D t1;
   std::string Corner3_Name = "Corner3_" + mpvgt->GetName();
@@ -906,16 +906,16 @@ void GeoEKLMBelleII::createSectorSupportCorner3(G4PVPlacementGT *mpvgt)
  * createSectorSupportCorner4 - create sector support corner 4
  * @mpvgt: mother physical volume with global transformation
  */
-void GeoEKLMBelleII::createSectorSupportCorner4(G4PVPlacementGT *mpvgt)
+void GeoEKLMBelleII::createSectorSupportCorner4(G4PVPlacementGT* mpvgt)
 {
   double r;
   double x;
   double y;
-  G4TriangularPrism *solidCorner4Prism;
-  G4Tubs *solidCorner4Tubs;
-  G4SubtractionSolid *solidCorner4;
-  G4LogicalVolume *logicCorner4;
-  G4PVPlacementGT *physiCorner4;
+  G4TriangularPrism* solidCorner4Prism;
+  G4Tubs* solidCorner4Tubs;
+  G4SubtractionSolid* solidCorner4;
+  G4LogicalVolume* logicCorner4;
+  G4PVPlacementGT* physiCorner4;
   G4Transform3D t;
   G4Transform3D t1;
   std::string Corner4_Name = "Corner4_" + mpvgt->GetName();
@@ -967,21 +967,21 @@ void GeoEKLMBelleII::createSectorSupportCorner4(G4PVPlacementGT *mpvgt)
  * createSectorSupport - create sector support structure
  * @mpvgt: mother physical volume with global transformation
  */
-void GeoEKLMBelleII::createSectorSupport(G4PVPlacementGT *mpvgt)
+void GeoEKLMBelleII::createSectorSupport(G4PVPlacementGT* mpvgt)
 {
-  G4Box *solidBoxX;
-  G4Box *solidBoxY;
-  G4Box *solidBoxTop;
-  G4Tubs *solidOuterTube;
-  G4Tubs *solidInnerTube;
-  G4Tubs *solidLimitationTube;
-  G4UnionSolid *us1;
-  G4UnionSolid *us2;
-  G4UnionSolid *us3;
-  G4UnionSolid *us4;
-  G4IntersectionSolid *solidSectorSupport;
-  G4LogicalVolume *logicSectorSupport;
-  G4PVPlacementGT *physiSectorSupport;
+  G4Box* solidBoxX;
+  G4Box* solidBoxY;
+  G4Box* solidBoxTop;
+  G4Tubs* solidOuterTube;
+  G4Tubs* solidInnerTube;
+  G4Tubs* solidLimitationTube;
+  G4UnionSolid* us1;
+  G4UnionSolid* us2;
+  G4UnionSolid* us3;
+  G4UnionSolid* us4;
+  G4IntersectionSolid* solidSectorSupport;
+  G4LogicalVolume* logicSectorSupport;
+  G4PVPlacementGT* physiSectorSupport;
   G4Transform3D t;
   G4Transform3D tbx;
   G4Transform3D tby;
@@ -1060,19 +1060,19 @@ void GeoEKLMBelleII::createSectorSupport(G4PVPlacementGT *mpvgt)
  * @iPlane: plane number
  * @Plane_name: plane name
  */
-G4SubtractionSolid *GeoEKLMBelleII::
-subtractBoardSolids(G4SubtractionSolid *plane, int iPlane,
+G4SubtractionSolid* GeoEKLMBelleII::
+subtractBoardSolids(G4SubtractionSolid* plane, int iPlane,
                     std::string Plane_Name)
 {
   int i;
   int j;
   G4Transform3D t;
-  G4Box *solidBoardBox;
-  G4SubtractionSolid **ss[2];
-  G4SubtractionSolid *prev_solid;
+  G4Box* solidBoardBox;
+  G4SubtractionSolid** ss[2];
+  G4SubtractionSolid* prev_solid;
   solidBoardBox = new G4Box("PlateBox_" + Plane_Name, 0.5 * BoardSize.length,
                             0.5 * BoardSize.height,
-                            0.5 *(PlanePosition.length + PlanePosition.Z));
+                            0.5 * (PlanePosition.length + PlanePosition.Z));
   for (i = 0; i < nPlane; i++) {
     ss[i] = new G4SubtractionSolid*[nBoard];
     if (ss[i] == NULL)
@@ -1106,7 +1106,7 @@ subtractBoardSolids(G4SubtractionSolid *plane, int iPlane,
  * @iPlane: number of plane
  * @mpvgt: mother physical volume with global transformation
  */
-void GeoEKLMBelleII::createPlane(int iPlane, G4PVPlacementGT *mpvgt)
+void GeoEKLMBelleII::createPlane(int iPlane, G4PVPlacementGT* mpvgt)
 {
   int i;
   int j;
@@ -1116,20 +1116,20 @@ void GeoEKLMBelleII::createPlane(int iPlane, G4PVPlacementGT *mpvgt)
   double box_x;
   double box_lx;
   double ang;
-  G4Tubs *solidPlaneTube;
-  G4Box *solidPlaneBox;
-  G4Box *box1;
-  G4TriangularPrism *solidPlanePrism1;
-  G4TriangularPrism *solidPlanePrism2;
-  G4TriangularPrism *solidPlanePrism3;
-  G4IntersectionSolid *is;
-  G4SubtractionSolid *ss1;
-  G4SubtractionSolid *ss2;
-  G4SubtractionSolid *ss3;
-  G4SubtractionSolid *ss4;
-  G4SubtractionSolid *solidPlane;
-  G4LogicalVolume *logicPlane;
-  G4PVPlacementGT *physiPlane;
+  G4Tubs* solidPlaneTube;
+  G4Box* solidPlaneBox;
+  G4Box* box1;
+  G4TriangularPrism* solidPlanePrism1;
+  G4TriangularPrism* solidPlanePrism2;
+  G4TriangularPrism* solidPlanePrism3;
+  G4IntersectionSolid* is;
+  G4SubtractionSolid* ss1;
+  G4SubtractionSolid* ss2;
+  G4SubtractionSolid* ss3;
+  G4SubtractionSolid* ss4;
+  G4SubtractionSolid* solidPlane;
+  G4LogicalVolume* logicPlane;
+  G4PVPlacementGT* physiPlane;
   G4Transform3D t;
   G4Transform3D t1;
   G4Transform3D t2;
@@ -1283,12 +1283,12 @@ void GeoEKLMBelleII::createPlane(int iPlane, G4PVPlacementGT *mpvgt)
  * @mpvgt: mother physical volume with global transformation
  */
 void GeoEKLMBelleII::createSectionReadoutBoard(int iPlane, int iBoard,
-                                               G4PVPlacementGT *mpvgt)
+                                               G4PVPlacementGT* mpvgt)
 {
   int i;
-  G4Box *solidSectionReadoutBoard;
-  G4LogicalVolume *logicSectionReadoutBoard;
-  G4PVPlacementGT *physiSectionReadoutBoard;
+  G4Box* solidSectionReadoutBoard;
+  G4LogicalVolume* logicSectionReadoutBoard;
+  G4PVPlacementGT* physiSectionReadoutBoard;
   std::string Board_Name = "SectionReadoutBoard_" +
                            lexical_cast<string>(iBoard) + "_Plane_" +
                            lexical_cast<string>(iPlane) + "_" +
@@ -1327,11 +1327,11 @@ void GeoEKLMBelleII::createSectionReadoutBoard(int iPlane, int iBoard,
  * createBaseBoard - create base board of section readout board
  * @mpvgt: mother physical volume with global transformation
  */
-void GeoEKLMBelleII::createBaseBoard(G4PVPlacementGT *mpvgt)
+void GeoEKLMBelleII::createBaseBoard(G4PVPlacementGT* mpvgt)
 {
-  G4Box *solidBaseBoard;
-  G4LogicalVolume *logicBaseBoard;
-  G4PVPlacementGT *physiBaseBoard;
+  G4Box* solidBaseBoard;
+  G4LogicalVolume* logicBaseBoard;
+  G4PVPlacementGT* physiBaseBoard;
   G4Transform3D t;
   std::string Board_Name = "BaseBoard_" + mpvgt->GetName();
   solidBaseBoard = new G4Box(Board_Name, 0.5 * BoardSize.length,
@@ -1364,11 +1364,11 @@ void GeoEKLMBelleII::createBaseBoard(G4PVPlacementGT *mpvgt)
  * @iBoard: number of board
  * @mpvgt: mother physical volume with global transformation
  */
-void GeoEKLMBelleII::createStripBoard(int iBoard, G4PVPlacementGT *mpvgt)
+void GeoEKLMBelleII::createStripBoard(int iBoard, G4PVPlacementGT* mpvgt)
 {
-  G4Box *solidStripBoard;
-  G4LogicalVolume *logicStripBoard;
-  G4PVPlacementGT *physiStripBoard;
+  G4Box* solidStripBoard;
+  G4LogicalVolume* logicStripBoard;
+  G4PVPlacementGT* physiStripBoard;
   G4Transform3D t;
   std::string Board_Name = "StripBoard_" + lexical_cast<string>(iBoard) + "_" +
                            mpvgt->GetName();
@@ -1413,37 +1413,37 @@ void GeoEKLMBelleII::createStripBoard(int iBoard, G4PVPlacementGT *mpvgt)
  * @mpvgt: mother physical volume with global transformation
  */
 void GeoEKLMBelleII::createSectionSupport(int iSectionSupport, int iPlane,
-                                          G4PVPlacementGT *mpvgt)
+                                          G4PVPlacementGT* mpvgt)
 {
-  G4Box *solidBoxTop;
-  G4Box *solidBoxMiddle;
-  G4Box *solidBoxBottom;
+  G4Box* solidBoxTop;
+  G4Box* solidBoxMiddle;
+  G4Box* solidBoxBottom;
   G4Transform3D t;
   G4Transform3D t1;
   G4Transform3D t2;
-  G4UnionSolid *us;
-  G4UnionSolid *solidSectionSupport;
-  G4LogicalVolume *logicSectionSupport;
-  G4PVPlacementGT *physiSectionSupport;
+  G4UnionSolid* us;
+  G4UnionSolid* solidSectionSupport;
+  G4LogicalVolume* logicSectionSupport;
+  G4PVPlacementGT* physiSectionSupport;
   std::string SectionSupportName = "SectionSupport_" +
                                    lexical_cast<string>(iSectionSupport) +
                                    "_" + mpvgt->GetName();
   solidBoxTop = new G4Box("BoxTop_" + SectionSupportName,
-                          0.5 *(SectionSupportPosition[iPlane - 1]
-                                [iSectionSupport - 1].length -
-                                SectionSupportPosition[iPlane - 1]
-                                [iSectionSupport - 1].deltal_left -
-                                SectionSupportPosition[iPlane - 1]
-                                [iSectionSupport - 1].deltal_right),
+                          0.5 * (SectionSupportPosition[iPlane - 1]
+                                 [iSectionSupport - 1].length -
+                                 SectionSupportPosition[iPlane - 1]
+                                 [iSectionSupport - 1].deltal_left -
+                                 SectionSupportPosition[iPlane - 1]
+                                 [iSectionSupport - 1].deltal_right),
                           0.5 * SectionSupportTopWidth,
                           0.5 * SectionSupportTopThickness);
   solidBoxMiddle =  new G4Box("BoxMiddle_" + SectionSupportName,
-                              0.5 *(SectionSupportPosition[iPlane - 1]
-                                    [iSectionSupport - 1].length -
-                                    SectionSupportPosition[iPlane - 1]
-                                    [iSectionSupport - 1].deltal_left -
-                                    SectionSupportPosition[iPlane - 1]
-                                    [iSectionSupport - 1].deltal_right),
+                              0.5 * (SectionSupportPosition[iPlane - 1]
+                                     [iSectionSupport - 1].length -
+                                     SectionSupportPosition[iPlane - 1]
+                                     [iSectionSupport - 1].deltal_left -
+                                     SectionSupportPosition[iPlane - 1]
+                                     [iSectionSupport - 1].deltal_right),
                               0.5 * SectionSupportMiddleWidth,
                               0.5 * SectionSupportMiddleThickness);
   solidBoxBottom = new G4Box("BoxBottom_" + SectionSupportName,
@@ -1507,14 +1507,14 @@ void GeoEKLMBelleII::createSectionSupport(int iSectionSupport, int iPlane,
  * @mpvgt: mother physical volume with global transformation
  */
 void GeoEKLMBelleII::createPlasticListElement(int iListPlane, int iList,
-                                              G4PVPlacementGT *mpvgt)
+                                              G4PVPlacementGT* mpvgt)
 {
   double ly;
   double y;
   double z;
-  G4Box *solidList;
-  G4LogicalVolume *logicList;
-  G4PVPlacementGT *physiList;
+  G4Box* solidList;
+  G4LogicalVolume* logicList;
+  G4PVPlacementGT* physiList;
   G4Transform3D t;
   std::string List_Name = "List_" + lexical_cast<string>(iList) + "_ListPlane_"
                           + lexical_cast<string>(iListPlane) + "_" +
@@ -1558,17 +1558,17 @@ void GeoEKLMBelleII::createPlasticListElement(int iListPlane, int iList,
  * @iStrip: number of strip
  * @mpvgt: mother physical volume with global transformation
  */
-void GeoEKLMBelleII::createStripVolume(int iStrip, G4PVPlacementGT *mpvgt)
+void GeoEKLMBelleII::createStripVolume(int iStrip, G4PVPlacementGT* mpvgt)
 {
-  G4Box *solidStripVolume;
-  G4LogicalVolume *logicStripVolume;
-  G4PVPlacementGT *physiStripVolume;
+  G4Box* solidStripVolume;
+  G4LogicalVolume* logicStripVolume;
+  G4PVPlacementGT* physiStripVolume;
   G4Transform3D t;
   std::string StripVolume_Name = "StripVolume_" + lexical_cast<string>(iStrip)
                                  + "_" + mpvgt->GetName();
   solidStripVolume = new G4Box(StripVolume_Name,
-                               0.5 *(StripPosition[iStrip - 1].length +
-                                     StripSize.rss_size),
+                               0.5 * (StripPosition[iStrip - 1].length +
+                                      StripSize.rss_size),
                                0.5 * StripSize.width,
                                0.5 * StripSize.thickness);
   if (solidStripVolume == NULL) {
@@ -1601,11 +1601,11 @@ void GeoEKLMBelleII::createStripVolume(int iStrip, G4PVPlacementGT *mpvgt)
  * @iStrip: number of strip
  * @mpvgt: mother physical volume with global transformation
  */
-void GeoEKLMBelleII::createStrip(int iStrip, G4PVPlacementGT *mpvgt)
+void GeoEKLMBelleII::createStrip(int iStrip, G4PVPlacementGT* mpvgt)
 {
-  G4Box *solidStrip;
-  G4LogicalVolume *logicStrip;
-  G4PVPlacementGT *physiStrip;
+  G4Box* solidStrip;
+  G4LogicalVolume* logicStrip;
+  G4PVPlacementGT* physiStrip;
   G4Transform3D t;
   std::string Strip_Name = "Strip_" + mpvgt->GetName();
   solidStrip = new G4Box(Strip_Name, 0.5 * StripPosition[iStrip - 1].length,
@@ -1637,11 +1637,11 @@ void GeoEKLMBelleII::createStrip(int iStrip, G4PVPlacementGT *mpvgt)
  * @iStrip: number of strip
  * @mpvgt: mother physical volume with global transformation
  */
-void GeoEKLMBelleII::createStripGroove(int iStrip, G4PVPlacementGT *mpvgt)
+void GeoEKLMBelleII::createStripGroove(int iStrip, G4PVPlacementGT* mpvgt)
 {
-  G4Box *solidGroove;
-  G4LogicalVolume *logicGroove;
-  G4PVPlacementGT *physiGroove;
+  G4Box* solidGroove;
+  G4LogicalVolume* logicGroove;
+  G4PVPlacementGT* physiGroove;
   G4Transform3D t;
   std::string Groove_Name = "Groove_" + mpvgt->GetName();
   solidGroove = new G4Box(Groove_Name, 0.5 * StripPosition[iStrip - 1].length,
@@ -1673,13 +1673,13 @@ void GeoEKLMBelleII::createStripGroove(int iStrip, G4PVPlacementGT *mpvgt)
  * @iStrip: number of strip
  * @mpvgt: mother physical volume with global transformation
  */
-void GeoEKLMBelleII::createStripSensitive(int iStrip, G4PVPlacementGT *mpvgt)
+void GeoEKLMBelleII::createStripSensitive(int iStrip, G4PVPlacementGT* mpvgt)
 {
-  G4Box *solidSensitiveBox;
-  G4Box *solidSensitiveGroove;
-  G4SubtractionSolid *solidSensitive;
-  G4LogicalVolume *logicSensitive;
-  G4PVPlacementGT *physiSensitive;
+  G4Box* solidSensitiveBox;
+  G4Box* solidSensitiveGroove;
+  G4SubtractionSolid* solidSensitive;
+  G4LogicalVolume* logicSensitive;
+  G4PVPlacementGT* physiSensitive;
   G4Transform3D t;
   G4Transform3D t1;
   std::string Sensitive_Name = "Sensitive_" + mpvgt->GetName();
@@ -1737,11 +1737,11 @@ void GeoEKLMBelleII::createStripSensitive(int iStrip, G4PVPlacementGT *mpvgt)
  * @iStrip: number of strip
  * @mpvgt: mother physical volume with global transformation
  */
-void GeoEKLMBelleII::createSiPM(int iStrip, G4PVPlacementGT *mpvgt)
+void GeoEKLMBelleII::createSiPM(int iStrip, G4PVPlacementGT* mpvgt)
 {
-  G4Box *solidSiPM;
-  G4LogicalVolume *logicSiPM;
-  G4PVPlacementGT *physiSiPM;
+  G4Box* solidSiPM;
+  G4LogicalVolume* logicSiPM;
+  G4PVPlacementGT* physiSiPM;
   G4Transform3D t;
   std::string SiPM_Name = "SiPM_" + mpvgt->GetName();
   solidSiPM = new G4Box(SiPM_Name, 0.5 * StripSize.rss_size,
@@ -1775,7 +1775,7 @@ void GeoEKLMBelleII::createSiPM(int iStrip, G4PVPlacementGT *mpvgt)
 }
 
 /* Print volume mass */
-void GeoEKLMBelleII::printVolumeMass(G4LogicalVolume *lv)
+void GeoEKLMBelleII::printVolumeMass(G4LogicalVolume* lv)
 {
   if (m_mode == 2)
     printf("Volume %s: mass = %g g\n", lv->GetName().c_str(),

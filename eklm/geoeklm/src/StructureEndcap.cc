@@ -96,10 +96,10 @@ namespace Belle2 {
 
   const TVector3 StructureEndcap::endcapModulePos(int sec, int mod) const
   {
-    return(TVector3(m_rshift_eslot *((sec == 0 || sec == 3) ? 1 : -1),
-                    m_rshift_eslot *((sec == 0 || sec == 1) ? 1 : -1),
+    return(TVector3(m_rshift_eslot * ((sec == 0 || sec == 3) ? 1 : -1),
+                    m_rshift_eslot * ((sec == 0 || sec == 1) ? 1 : -1),
                     -(362.1 - 230.0) / 2. +
-                    (m_thick_eiron + m_thick_eslot) *(mod + 1) - m_thick_eslot / 2.));
+                    (m_thick_eiron + m_thick_eslot) * (mod + 1) - m_thick_eslot / 2.));
   }
 
   //  }

@@ -83,7 +83,7 @@ namespace Belle2 {
      *   < PhysVol2 *  , vector< EKLMStepHit1*, EKLMStepHit2*, EKLMStepHit3* ...    > >
      *   < PhysVol3 *  , vector< EKLMStepHit1*, EKLMStepHit2*, EKLMStepHit3* ...    > >
      */
-    std::map<const G4VPhysicalVolume *, std::vector<EKLMStepHit*> > m_stepHitVolumeMap;
+    std::map<const G4VPhysicalVolume*, std::vector<EKLMStepHit*> > m_stepHitVolumeMap;
 
 
     //-------------------------------------------------------
@@ -91,7 +91,7 @@ namespace Belle2 {
     /**
      * std::map for hits sorting according strip name
      */
-    std::map<const G4VPhysicalVolume *, std::vector<EKLMSimHit*> > m_HitStripMap;
+    std::map<const G4VPhysicalVolume*, std::vector<EKLMSimHit*> > m_HitStripMap;
 
     /**
      * vector of EKLMStripHits

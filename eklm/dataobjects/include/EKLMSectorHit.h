@@ -42,7 +42,7 @@ namespace Belle2 {
     void Print();
 
     //! Adds EKLMStripHit to the EKLMSectorHit
-    bool addStripHit(EKLMStripHit *);
+    bool addStripHit(EKLMStripHit*);
 
     //! returns pointer to the vector of pointers to the EKLMStripHits included to
     //! the EKLMSectorHit

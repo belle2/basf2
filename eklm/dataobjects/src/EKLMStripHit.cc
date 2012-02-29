@@ -26,8 +26,8 @@ ClassImp(Belle2::EKLMStripHit);
 
 
 
-EKLMStripHit::EKLMStripHit(const EKLMSimHit * hit)
-    : EKLMHitBase((EKLMHitBase)(*hit)),
+EKLMStripHit::EKLMStripHit(const EKLMSimHit* hit)
+  : EKLMHitBase((EKLMHitBase)(*hit)),
     m_Plane(hit->getPlane()),
     m_Strip(hit->getStrip()),
     m_NumberPhotoElectrons(-1),
@@ -64,12 +64,12 @@ void EKLMStripHit::setStrip(int strip)
   m_Strip = strip;
 }
 
-const TFitResult * EKLMStripHit::getFitResults() const
+const TFitResult* EKLMStripHit::getFitResults() const
 {
   return &m_fitResults;
 }
 
-void EKLMStripHit::setFitResults(TFitResult &res)
+void EKLMStripHit::setFitResults(TFitResult& res)
 {
   m_fitResults = res;
 }
@@ -86,7 +86,7 @@ const G4VPhysicalVolume* EKLMStripHit::getVolume() const
   return m_pv;
 }
 
-void EKLMStripHit::setVolume(const G4VPhysicalVolume *pv)
+void EKLMStripHit::setVolume(const G4VPhysicalVolume* pv)
 {
   m_pv = pv;
 }

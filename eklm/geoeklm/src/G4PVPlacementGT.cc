@@ -15,15 +15,15 @@ namespace Belle2 {
 
   class G4PVPlacementGT;
 
-  G4PVPlacementGT::G4PVPlacementGT(const G4Transform3D &globalTransform,
-                                   const G4Transform3D &Transform3D,
-                                   G4LogicalVolume *pCurrentLogical,
-                                   const G4String &pName,
-                                   G4LogicalVolume *pMotherLogical,
+  G4PVPlacementGT::G4PVPlacementGT(const G4Transform3D& globalTransform,
+                                   const G4Transform3D& Transform3D,
+                                   G4LogicalVolume* pCurrentLogical,
+                                   const G4String& pName,
+                                   G4LogicalVolume* pMotherLogical,
                                    int id, int mode) :
-      G4PVPlacement(Transform3D, pCurrentLogical, pName, pMotherLogical, false,
-                    1, false),
-      m_name(pName)
+    G4PVPlacement(Transform3D, pCurrentLogical, pName, pMotherLogical, false,
+                  1, false),
+    m_name(pName)
   {
     m_transform = globalTransform;
     m_id = id;
@@ -32,14 +32,14 @@ namespace Belle2 {
     m_type = -1; ///default value
   }
 
-  G4PVPlacementGT::G4PVPlacementGT(G4PVPlacementGT *motherPVPlacementGT,
-                                   const G4Transform3D &Transform3D,
-                                   G4LogicalVolume *pCurrentLogical,
-                                   const G4String &pName,
+  G4PVPlacementGT::G4PVPlacementGT(G4PVPlacementGT* motherPVPlacementGT,
+                                   const G4Transform3D& Transform3D,
+                                   G4LogicalVolume* pCurrentLogical,
+                                   const G4String& pName,
                                    int id, int mode) :
-      G4PVPlacement(Transform3D, pCurrentLogical, pName,
-                    motherPVPlacementGT->GetLogicalVolume(), false, 1, false),
-      m_name(pName)
+    G4PVPlacement(Transform3D, pCurrentLogical, pName,
+                  motherPVPlacementGT->GetLogicalVolume(), false, 1, false),
+    m_name(pName)
   {
     m_transform = motherPVPlacementGT->getTransform() * Transform3D;
     m_id = id;

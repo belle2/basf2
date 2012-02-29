@@ -34,7 +34,7 @@ const Belle2::EKLMStripHit* EKLMHit2d::getYStripHit() const
   return m_YStrip;
 }
 
-void EKLMHit2d::setCrossPoint(TVector3 & point)
+void EKLMHit2d::setCrossPoint(TVector3& point)
 {
   m_crossPoint = point;
 }
@@ -49,7 +49,7 @@ double EKLMHit2d::getChiSq() const
   return m_ChiSq;
 }
 
-EKLMHit2d::EKLMHit2d(EKLMStripHit * xStrip, EKLMStripHit * yStrip)
+EKLMHit2d::EKLMHit2d(EKLMStripHit* xStrip, EKLMStripHit* yStrip)
 {
   m_XStrip = xStrip;
   m_YStrip = yStrip;
@@ -75,7 +75,7 @@ void EKLMHit2d::Print()
 }
 
 
-bool EKLMHit2d::addStripHit(const EKLMStripHit *stripHit)
+bool EKLMHit2d::addStripHit(const EKLMStripHit* stripHit)
 {
   if (m_XStrip != NULL && m_YStrip != NULL) {
     B2FATAL("Attempt to add more than 2 strips in 2d hit!");

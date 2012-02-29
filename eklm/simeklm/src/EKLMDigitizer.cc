@@ -34,13 +34,13 @@ namespace Belle2 {
     for (int i = 0; i < stepHitsArray.getEntries(); i++) {
 
       // search for entries of the same strip
-      map<const G4VPhysicalVolume *, vector<EKLMStepHit*> >::iterator
+      map<const G4VPhysicalVolume*, vector<EKLMStepHit*> >::iterator
       it = m_stepHitVolumeMap.find((stepHitsArray[i])->getVolume());
 
       if (it == m_stepHitVolumeMap.end()) { //  new entry
         vector<EKLMStepHit*> *vectorHits = new vector<EKLMStepHit*> (1, (stepHitsArray[i]));
 
-        m_stepHitVolumeMap.insert(pair<const G4VPhysicalVolume *, vector<EKLMStepHit*> >((stepHitsArray[i])->getVolume(), *vectorHits));
+        m_stepHitVolumeMap.insert(pair<const G4VPhysicalVolume*, vector<EKLMStepHit*> >((stepHitsArray[i])->getVolume(), *vectorHits));
       } else {
         it->second.push_back(stepHitsArray[i]);
       }
@@ -58,7 +58,7 @@ namespace Belle2 {
 
 
     //loop over volumes
-    for (map<const G4VPhysicalVolume *, vector<EKLMStepHit*> >::iterator volumeIterator = m_stepHitVolumeMap.begin();
+    for (map<const G4VPhysicalVolume*, vector<EKLMStepHit*> >::iterator volumeIterator = m_stepHitVolumeMap.begin();
          volumeIterator != m_stepHitVolumeMap.end(); volumeIterator++) {
 
 
@@ -135,14 +135,14 @@ namespace Belle2 {
       // loop over the vertices
       for (map < int , EKLMStepHit*>::iterator hitIterator = hitMap.begin(); hitIterator != hitMap.end(); hitIterator++) {
         // get EKLMStepHit corresponding to the current vertex
-        EKLMStepHit * stepHit = hitIterator->second;
+        EKLMStepHit* stepHit = hitIterator->second;
 
         // search for the current component in the map
         map <int, EKLMSimHit*>::iterator current = graphComponentToSimHit.find(component[distance(hitMap.begin(), hitIterator)]);
         if (current == graphComponentToSimHit.end()) {    // no  entry for this component
 
           // create new EKLMSimHit and store all information into it
-          EKLMSimHit *simHit = new(m_simHitsArray->AddrAt(m_simHitsArray.getEntries()))  EKLMSimHit(stepHit);
+          EKLMSimHit* simHit = new(m_simHitsArray->AddrAt(m_simHitsArray.getEntries()))  EKLMSimHit(stepHit);
           // insert hit to the map
           graphComponentToSimHit.insert(pair<int, EKLMSimHit*>(component[distance(hitMap.begin(), hitIterator)], simHit));
 
@@ -182,13 +182,13 @@ namespace Belle2 {
     for (int i = 0; i < m_simHitsArray.getEntries(); i++) {
 
       // search for entries of the same strip
-      map<const G4VPhysicalVolume *, vector<EKLMSimHit*> >::iterator
+      map<const G4VPhysicalVolume*, vector<EKLMSimHit*> >::iterator
       it = m_HitStripMap.find((m_simHitsArray[i])->getVolume());
 
       if (it == m_HitStripMap.end()) { //  new entry
         vector<EKLMSimHit*> *vectorHits =
           new vector<EKLMSimHit*> (1, (m_simHitsArray[i]));
-        m_HitStripMap.insert(pair<const G4VPhysicalVolume *, vector<EKLMSimHit*> >
+        m_HitStripMap.insert(pair<const G4VPhysicalVolume*, vector<EKLMSimHit*> >
                              ((m_simHitsArray[i])->getVolume(), *vectorHits));
       } else {
         it->second.push_back(m_simHitsArray[i]);
@@ -202,21 +202,21 @@ namespace Belle2 {
   //!  are simulated in EKLMFiberAndElectronics class
   void EKLMDigitizer::mergeSimHitsToStripHits()
   {
-    for (map<const G4VPhysicalVolume *, vector<EKLMSimHit*> >::iterator it =
+    for (map<const G4VPhysicalVolume*, vector<EKLMSimHit*> >::iterator it =
            m_HitStripMap.begin(); it != m_HitStripMap.end(); it++) {
 
 
       // create fiberAndElectronicsSimulator entry
-      EKLMFiberAndElectronics * fiberAndElectronicsSimulator =
+      EKLMFiberAndElectronics* fiberAndElectronicsSimulator =
         new EKLMFiberAndElectronics(*it);
 
       // do all work
       fiberAndElectronicsSimulator->processEntry();
 
-      EKLMSimHit *simHit = it->second.front();
+      EKLMSimHit* simHit = it->second.front();
 
       // create new stripHit
-      EKLMStripHit *stripHit = new(m_stripHitsArray->AddrAt(m_stripHitsArray.getEntries()))EKLMStripHit(simHit);
+      EKLMStripHit* stripHit = new(m_stripHitsArray->AddrAt(m_stripHitsArray.getEntries()))EKLMStripHit(simHit);
 
       if (!fiberAndElectronicsSimulator->getFitStatus()) {
         stripHit->setTime(fiberAndElectronicsSimulator->getFitResults(0));

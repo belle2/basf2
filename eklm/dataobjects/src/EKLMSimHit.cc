@@ -18,16 +18,16 @@ using namespace Belle2;
 ClassImp(Belle2::EKLMSimHit)
 
 EKLMSimHit::EKLMSimHit():
-    EKLMHitBase(),
-    m_energy(0.),
-    m_momentum(TVector3(0., 0., 0.)),
-    m_pv(NULL),
-    m_pvName("not initialized"),
-    m_volType(0)
+  EKLMHitBase(),
+  m_energy(0.),
+  m_momentum(TVector3(0., 0., 0.)),
+  m_pv(NULL),
+  m_pvName("not initialized"),
+  m_volType(0)
 {}
 
-EKLMSimHit::EKLMSimHit(const EKLMStepHit * stepHit)
-    : EKLMHitBase((EKLMHitBase)*stepHit),
+EKLMSimHit::EKLMSimHit(const EKLMStepHit* stepHit)
+  : EKLMHitBase((EKLMHitBase)*stepHit),
     m_energy(stepHit->getEnergy()),
     m_momentum(*(stepHit->getMomentum())),
     m_pv(stepHit->getVolume()),
@@ -57,17 +57,17 @@ void  EKLMSimHit::setVolType(int vt)
 }
 
 
-const TVector3 *  EKLMSimHit::getMomentum() const
+const TVector3*   EKLMSimHit::getMomentum() const
 {
   return & m_momentum;
 }
 
-void  EKLMSimHit::setMomentum(const TVector3 &p)
+void  EKLMSimHit::setMomentum(const TVector3& p)
 {
   m_momentum = p;
 }
 
-void  EKLMSimHit::setMomentum(const TVector3 *p)
+void  EKLMSimHit::setMomentum(const TVector3* p)
 {
   m_momentum = *p;
 }

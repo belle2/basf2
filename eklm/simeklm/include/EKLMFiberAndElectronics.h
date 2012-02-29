@@ -31,7 +31,7 @@ namespace Belle2 {
     /**
      * Constructor
      */
-    EKLMFiberAndElectronics(std::pair<const G4VPhysicalVolume *, std::vector<EKLMSimHit*> >);
+    EKLMFiberAndElectronics(std::pair<const G4VPhysicalVolume*, std::vector<EKLMSimHit*> >);
 
     /**
      * Destructor
@@ -64,23 +64,23 @@ namespace Belle2 {
     /**
      * Pointer to histogramm with forward hits
      */
-    TH1D * m_digitizedAmplitudeDirect;
+    TH1D* m_digitizedAmplitudeDirect;
 
     /**
      * Pointer to histogramm with backward hits
      */
-    TH1D * m_digitizedAmplitudeReflected;
+    TH1D* m_digitizedAmplitudeReflected;
 
     /**
      * Pointer to resulting histogramm
      */
-    TH1D * m_digitizedAmplitude;
+    TH1D* m_digitizedAmplitude;
 
 
     /**
      * Pointer to fit function
      */
-    TF1 * m_fitFunction;
+    TF1* m_fitFunction;
 
 
     /**
@@ -104,7 +104,7 @@ namespace Belle2 {
     /**
      * name of the strip
      */
-    const std::string * m_stripName ;
+    const std::string* m_stripName ;
 
 
     /**
@@ -190,7 +190,7 @@ namespace Belle2 {
      * first argument is vector of hits
      * second is the pointer to the histogramm
      */
-    void timesToShape(const std::vector <double>  &  , TH1D *);
+    void timesToShape(const std::vector <double>  &  , TH1D*);
 
     /**
      * calculates hit time,
@@ -210,7 +210,7 @@ namespace Belle2 {
     /**
      * calculates 'distances' to the direct and mirrored hits
      */
-    void lightPropagationDistance(EKLMSimHit *);
+    void lightPropagationDistance(EKLMSimHit*);
 
 
 

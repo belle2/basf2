@@ -39,7 +39,7 @@ namespace Belle2 {
     /**
      *  Constructor with StepHit
      */
-    EKLMSimHit(const EKLMStepHit * stepHit);
+    EKLMSimHit(const EKLMStepHit* stepHit);
 
     /**
      * Destructor
@@ -49,12 +49,12 @@ namespace Belle2 {
     /**
      *returns physical volume
      */
-    const G4VPhysicalVolume *getVolume()  const;
+    const G4VPhysicalVolume* getVolume()  const;
 
     /**
      * set physical volume
      */
-    void setVolume(const G4VPhysicalVolume *);
+    void setVolume(const G4VPhysicalVolume*);
 
     /**
      * returns volume type (needed for background study mode)
@@ -69,17 +69,17 @@ namespace Belle2 {
     /**
      * returns  particle momentum
      */
-    const TVector3 *  getMomentum() const;
+    const TVector3*   getMomentum() const;
 
     /**
      * sets  particle momentum
      */
-    void  setMomentum(const TVector3 &p);
+    void  setMomentum(const TVector3& p);
 
     /**
      * sets  particle momentum
      */
-    void  setMomentum(const TVector3 *p);
+    void  setMomentum(const TVector3* p);
 
 
     /**
@@ -95,7 +95,7 @@ namespace Belle2 {
 
 
     //! dumps hit into ASCII file
-    void Save(char * filename);
+    void Save(char* filename);
 
 
     /**
@@ -134,7 +134,7 @@ namespace Belle2 {
     /**
      *Physical volume
      */
-    const  G4VPhysicalVolume *m_pv; //! {ROOT streamer directive}
+    const  G4VPhysicalVolume* m_pv; //! {ROOT streamer directive}
 
 
     /**

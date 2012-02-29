@@ -52,85 +52,85 @@ namespace Belle2 {
 
     //! Endcap KLM shape = octagonal - tube
     //! to get the material name for the entire Endcap Structure (octagonal shape)
-    const std::string &matname(void) const {return m_matname;}
+    const std::string& matname(void) const {return m_matname;}
 
     //! to get the starting angle of the octagonal Endcap KLM shape
-    const double &phi(void) const {return m_phi;}
+    const double& phi(void) const {return m_phi;}
 
     //! to get the opening angle (shape is extended from phi to phi+dphi)
-    const double &dphi(void) const {return m_dphi;}
+    const double& dphi(void) const {return m_dphi;}
 
     //! to get the number of sides (=8 : octagonal)
-    const int &nsides(void) const {return m_nsides;}
+    const int& nsides(void) const {return m_nsides;}
 
     //! to get the number of boundaries perpendicular to the z-axis
-    const int &nBoundary(void) const {return m_nBoundary;}
+    const int& nBoundary(void) const {return m_nBoundary;}
 
     //! to get the z coordinate of the section specified by input id (=boundary id)
-    const double &z(int id) const {return m_z[id];}
+    const double& z(int id) const {return m_z[id];}
 
     //! to get the radius of the circle tangent to the sides of the inner polygon
-    const double &rmin(int id) const {return m_rmin[id];}
+    const double& rmin(int id) const {return m_rmin[id];}
 
     //! to get the radius of the circle tangent to the sides of the outer polygon
-    const double &rmax(int id) const {return m_rmax[id];}
+    const double& rmax(int id) const {return m_rmax[id];}
 
     //! to get the material name for the tube shape which is subtracted from the octagonal shape
-    const std::string &matnamesub(void) const {return m_matnamesub;}
+    const std::string& matnamesub(void) const {return m_matnamesub;}
 
     //! to get the length of the tube
-    const double &zsub(void) const {return m_zsub;}
+    const double& zsub(void) const {return m_zsub;}
 
     //! to get the inner radius of the tube
-    const double &rminsub(void) const {return m_rminsub;}
+    const double& rminsub(void) const {return m_rminsub;}
 
     //! to get the outer radius of the tube
-    const double &rmaxsub(void) const {return m_rmaxsub;}
+    const double& rmaxsub(void) const {return m_rmaxsub;}
 
     //! to get the minimum radius of the complecated (=octagonal - tube) Endcap KLM structure
-    const double &rmin_layer(void) const {return m_rmin_layer;}
+    const double& rmin_layer(void) const {return m_rmin_layer;}
 
     //! to get the maximum radius of the complecated (=octagonal - tube) Endcap KLM structure
-    const double &rmax_layer(void) const {return m_rmax_layer;}
+    const double& rmax_layer(void) const {return m_rmax_layer;}
 
     //! to get the material name for the Endcap KLM module slot
-    const std::string &matname4slot(void) const {return m_matname4slot;}
+    const std::string& matname4slot(void) const {return m_matname4slot;}
 
     //! to get the material name for the Endcap KLM module
-    const std::string &matname4module(void) const {return m_matname4module;}
+    const std::string& matname4module(void) const {return m_matname4module;}
 
     //! to get the thickness of the mother vessel of the Endcap KLM module slot
-    const double &thick_eiron(void) const {return m_thick_eiron;}
+    const double& thick_eiron(void) const {return m_thick_eiron;}
 
     //! to get the difference between the designed thickness and the real measurement
-    const double &thick_eiron_meas(void) const {return m_thick_eiron_meas;}
+    const double& thick_eiron_meas(void) const {return m_thick_eiron_meas;}
 
     //! to get the thickness of the Endcap KLM module slot
-    const double &thick_eslot(void) const {return m_thick_eslot;}
+    const double& thick_eslot(void) const {return m_thick_eslot;}
 
     //! to get the difference between the designed thickness of the module slot and the real measurement
-    const double &thick_eslot_meas(void) const {return m_thick_eslot_meas;}
+    const double& thick_eslot_meas(void) const {return m_thick_eslot_meas;}
 
     //! to get the thickness of the Endcap KLM module
-    const double &thick_emod(void) const {return m_thick_emod;}
+    const double& thick_emod(void) const {return m_thick_emod;}
 
     //! to get the minimum radius of the Endcap KLM module
-    const double &rmin_emod(void) const {return m_rmin_emod;}
+    const double& rmin_emod(void) const {return m_rmin_emod;}
 
     //! to get the maximum radius of the Endcap KLM module
-    const double &rmax_emod(void) const {return m_rmax_emod;}
+    const double& rmax_emod(void) const {return m_rmax_emod;}
 
     //! to get the minimum radius of the Endcap KLM module slot
-    const double &rmin_eslot(void) const {return m_rmin_eslot;}
+    const double& rmin_eslot(void) const {return m_rmin_eslot;}
 
     //! to get the maximum radius of the Endcap KLM module slot
-    const double &rmax_eslot(void) const {return m_rmax_eslot;}
+    const double& rmax_eslot(void) const {return m_rmax_eslot;}
 
     //! to get the shift value in the radial direction of the Endcap KLM module slot (?)
-    const double &rshift_eslot(void) const {return m_rshift_eslot;}
+    const double& rshift_eslot(void) const {return m_rshift_eslot;}
 
     //! to get the maximum radius of the glass used in KLM module ??? : not used now.
-    const double &rmax_glass(void) const {return m_rmax_glass;}
+    const double& rmax_glass(void) const {return m_rmax_glass;}
 
   private:
 

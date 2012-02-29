@@ -30,13 +30,13 @@ void EKLMStepHit::setEnergy(double E)
   m_energy = E;
 }
 
-const TVector3 * EKLMStepHit::getMomentum() const
+const TVector3* EKLMStepHit::getMomentum() const
 {
   return & m_momentum;
 }
 
 
-void EKLMStepHit::setMomentum(TVector3  &  momentum)
+void EKLMStepHit::setMomentum(TVector3&    momentum)
 {
   m_momentum = momentum;
 }
@@ -70,7 +70,7 @@ string EKLMStepHit::getName()  const
 }
 
 
-void EKLMStepHit::setName(string &name)
+void EKLMStepHit::setName(string& name)
 {
   m_pvName = name;
 }
@@ -81,7 +81,7 @@ const G4VPhysicalVolume* EKLMStepHit::getVolume()  const
   return m_pv;
 }
 
-void EKLMStepHit::setVolume(const G4VPhysicalVolume * vol)
+void EKLMStepHit::setVolume(const G4VPhysicalVolume* vol)
 {
   m_pv = vol;
 }

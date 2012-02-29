@@ -34,7 +34,7 @@ namespace Belle2 {
      *
      * Coordinates of the third point are (0, 0)
      */
-    G4TriangularPrism(const G4String &name, double r1, double phi1,
+    G4TriangularPrism(const G4String& name, double r1, double phi1,
                       double r2, double phi2, G4double halfZlen);
 
     /**
@@ -45,24 +45,24 @@ namespace Belle2 {
     /**
      * getSolid - get solid
      */
-    G4VSolid *getSolid();
+    G4VSolid* getSolid();
 
   private:
 
     /**
      * Box.
      */
-    G4Box *m_box;
+    G4Box* m_box;
 
     /**
      * Tube.
      */
-    G4Tubs *m_tube;
+    G4Tubs* m_tube;
 
     /**
      * Intersection.
      */
-    G4IntersectionSolid *m_is;
+    G4IntersectionSolid* m_is;
 
   };
 

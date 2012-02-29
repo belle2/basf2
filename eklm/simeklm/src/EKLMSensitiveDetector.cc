@@ -25,7 +25,7 @@ namespace Belle2 {
 
 
   EKLMSensitiveDetector::EKLMSensitiveDetector(G4String name)
-      : Simulation::SensitiveDetectorBase(name, KLM)
+    : Simulation::SensitiveDetectorBase(name, KLM)
   {
     GearDir gd = GearDir("/Detector/DetectorComponent[@name=\"EKLM\"]/Content");
     m_mode = gd.getInt("Mode");
@@ -37,7 +37,7 @@ namespace Belle2 {
   //-----------------------------------------------------
   // Method invoked for every step in sensitive detector
   //-----------------------------------------------------
-  bool EKLMSensitiveDetector::step(G4Step *aStep, G4TouchableHistory *)
+  bool EKLMSensitiveDetector::step(G4Step* aStep, G4TouchableHistory*)
   {
 
     /**
@@ -57,7 +57,7 @@ namespace Belle2 {
     /**
      * get reference to the track
      */
-    const G4Track & track = * aStep->GetTrack();
+    const G4Track& track = * aStep->GetTrack();
 
     /**
      * get time of hit
@@ -82,7 +82,7 @@ namespace Belle2 {
     /**
      * get reference to a physical volume
      */
-    const G4VPhysicalVolume *pv = aStep->GetPreStepPoint()->GetPhysicalVolume();
+    const G4VPhysicalVolume* pv = aStep->GetPreStepPoint()->GetPhysicalVolume();
 
 
     /**
@@ -94,16 +94,16 @@ namespace Belle2 {
     /**
      * Get Hit position
      */
-    const G4ThreeVector & gpos = 0.5 *
-                                 (aStep->GetPostStepPoint()->GetPosition() +
-                                  aStep->GetPreStepPoint()->GetPosition());
+    const G4ThreeVector& gpos = 0.5 *
+                                (aStep->GetPostStepPoint()->GetPosition() +
+                                 aStep->GetPreStepPoint()->GetPosition());
 
     /**
      * Global -> Local position
      */
-    const G4ThreeVector & lpos = aStep->GetPreStepPoint()->
-                                 GetTouchableHandle()->GetHistory()->
-                                 GetTopTransform().TransformPoint(gpos);
+    const G4ThreeVector& lpos = aStep->GetPreStepPoint()->
+                                GetTouchableHandle()->GetHistory()->
+                                GetTopTransform().TransformPoint(gpos);
 
     /**
      * no conversion btw. G4ThreeVector and TVector3 Sad but true
@@ -122,7 +122,7 @@ namespace Belle2 {
     /**
      * Get Momentum of the particle
      */
-    const G4ThreeVector & momentum = track.GetMomentum();
+    const G4ThreeVector& momentum = track.GetMomentum();
 
     /**
      * Get Kinetic energy of the particle
@@ -155,7 +155,7 @@ namespace Belle2 {
     /**
      * creates step hit and store in to DataStore
      */
-    EKLMStepHit *hit = new(m_stepHitsArray->AddrAt(m_stepHitsArray.getEntries()))
+    EKLMStepHit* hit = new(m_stepHitsArray->AddrAt(m_stepHitsArray.getEntries()))
     EKLMStepHit(momentumRoot, E, trackID, paretntTrackID, pv);
     if (hit == NULL) {
       B2ERROR("EKLMSensitiveDetector.cc:: Memory allocation error. Cannot allocate hit in stepHitsArray");
@@ -172,7 +172,7 @@ namespace Belle2 {
     /**
      * Get information on mother volumes and store them to the hit
      */
-    const G4PVPlacementGT *pvgt = (G4PVPlacementGT*)pv;
+    const G4PVPlacementGT* pvgt = (G4PVPlacementGT*)pv;
     hit->setVolumeType(pvgt->getVolumeType());
     if (pvgt->getVolumeType() >= 0) {
       pvgt = pvgt->getMother();

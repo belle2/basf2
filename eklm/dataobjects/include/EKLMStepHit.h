@@ -30,13 +30,13 @@ namespace Belle2 {
 
     //! Default constructor
     EKLMStepHit():
-        EKLMHitBase(),
-        m_momentum(0., 0., 0.),
-        m_trackID(-1),
-        m_parentTrackID(-1),
-        m_pv(0),
-        m_Plane(0),
-        m_Strip(0) {}
+      EKLMHitBase(),
+      m_momentum(0., 0., 0.),
+      m_trackID(-1),
+      m_parentTrackID(-1),
+      m_pv(0),
+      m_Plane(0),
+      m_Strip(0) {}
 
     //!Partial info
     EKLMStepHit(
@@ -44,10 +44,10 @@ namespace Belle2 {
       const double E ,
       const int  trID,
       const int  ptrID,
-      const G4VPhysicalVolume * pv
+      const G4VPhysicalVolume* pv
     )
-        :
-        EKLMHitBase() {
+      :
+      EKLMHitBase() {
       m_energy = E;
       m_momentum = momentum;
       m_trackID = trID;
@@ -82,9 +82,9 @@ namespace Belle2 {
       const double E ,
       const int  trID,
       const int  ptrID,
-      const G4VPhysicalVolume * pv
+      const G4VPhysicalVolume* pv
     ) :
-        EKLMHitBase(Endcap, Layer, Sector, PDG, Time,  EDep, GlobalPosition, LocalPosition) {
+      EKLMHitBase(Endcap, Layer, Sector, PDG, Time,  EDep, GlobalPosition, LocalPosition) {
       m_energy = E;
       m_momentum = momentum;
       m_trackID = trID;
@@ -109,12 +109,12 @@ namespace Belle2 {
     /**
      * Get momentum of the particle hit
      */
-    const TVector3 * getMomentum() const;
+    const TVector3* getMomentum() const;
 
     /**
      * Set momentum of the particle hit
      */
-    void setMomentum(TVector3 & momentum) ;
+    void setMomentum(TVector3& momentum) ;
 
 
     /**
@@ -146,7 +146,7 @@ namespace Belle2 {
     /**
      * Set volume name
      */
-    void setName(std::string & name);
+    void setName(std::string& name);
 
 
 
@@ -158,7 +158,7 @@ namespace Belle2 {
     /**
      * Set volume
      */
-    void setVolume(const G4VPhysicalVolume *);
+    void setVolume(const G4VPhysicalVolume*);
 
 
     /**
@@ -217,7 +217,7 @@ namespace Belle2 {
     int m_parentTrackID;
 
     //** we do not want to  allow anyone to change the PV !! */
-    const G4VPhysicalVolume * m_pv;     //! {ROOT streamer directive}
+    const G4VPhysicalVolume* m_pv;      //! {ROOT streamer directive}
 
 
     /**

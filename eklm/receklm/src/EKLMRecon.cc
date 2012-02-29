@@ -82,7 +82,7 @@ namespace Belle2 {
           if (!(doesIntersect(*itX, *itY, crossPoint)))
             continue;
 
-          EKLMHit2d *hit2d = new(m_hit2dArray->AddrAt(m_hit2dArray.getEntries()))EKLMHit2d(*itX, *itY);
+          EKLMHit2d* hit2d = new(m_hit2dArray->AddrAt(m_hit2dArray.getEntries()))EKLMHit2d(*itX, *itY);
           hit2d->setCrossPoint(crossPoint);
           hit2d->setChiSq();
           m_hit2dVector.push_back(hit2d);

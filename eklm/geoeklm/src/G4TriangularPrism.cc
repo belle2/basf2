@@ -14,7 +14,7 @@
 using namespace std;
 using namespace Belle2;
 
-G4TriangularPrism::G4TriangularPrism(const G4String &name,
+G4TriangularPrism::G4TriangularPrism(const G4String& name,
                                      double r1, double phi1,
                                      double r2, double phi2,
                                      G4double halfZlen)
@@ -58,7 +58,7 @@ G4TriangularPrism::~G4TriangularPrism()
 {
 }
 
-G4VSolid *G4TriangularPrism::getSolid()
+G4VSolid* G4TriangularPrism::getSolid()
 {
   return m_is;
 }

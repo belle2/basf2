@@ -112,33 +112,33 @@ namespace Belle2 {
     /**
      * Get global position of the particle hit
      */
-    const TVector3 * getPosition() const;
+    const TVector3* getPosition() const;
 
     /**
      * Set global position of the particle hit
      */
-    void setPosition(TVector3 & position);
+    void setPosition(TVector3& position);
 
     /**
      * Set global position of the particle hit
      */
-    void setPosition(const TVector3 * position);
+    void setPosition(const TVector3* position);
 
 
     /**
      * Get global position of the particle hit
      */
-    const TVector3 * getLocalPosition() const;
+    const TVector3* getLocalPosition() const;
 
     /**
      * Set global position of the particle hit
      */
-    void setLocalPosition(TVector3 & position);
+    void setLocalPosition(TVector3& position);
 
     /**
      * Set global position of the particle hit
      */
-    void setLocalPosition(const TVector3 * position);
+    void setLocalPosition(const TVector3* position);
 
 
   protected:

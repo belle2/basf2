@@ -21,47 +21,47 @@
 using namespace CLHEP;
 namespace Belle2 {
 
-  const  G4VPhysicalVolume *GetPhysicalVolumeByPoint(const G4ThreeVector &point)
+  const  G4VPhysicalVolume* GetPhysicalVolumeByPoint(const G4ThreeVector& point)
   {
     return G4TransportationManager::GetTransportationManager()->
            GetNavigatorForTracking()->LocateGlobalPointAndSetup(point);
   }
 
-  bool CheckStripOrientationX(const G4VPhysicalVolume *strip)
+  bool CheckStripOrientationX(const G4VPhysicalVolume* strip)
   {
     G4Transform3D t = ((G4PVPlacementGT*)strip)->getTransform().inverse();
     return (fabs(sin(t.getRotation().phiX())) < 0.01);
   }
 
-  double getLightPropagationLength(const G4VPhysicalVolume * vol, const Hep3Vector  &pos)
+  double getLightPropagationLength(const G4VPhysicalVolume* vol, const Hep3Vector&  pos)
   {
     if (GetPhysicalVolumeByPoint(pos) != vol)
       B2ERROR("POINT IS NOT INSIDE IT'S VOLUME!");
 
-    G4Box *box = (G4Box*)(vol->GetLogicalVolume()->GetSolid());
+    G4Box* box = (G4Box*)(vol->GetLogicalVolume()->GetSolid());
     double half_len = box->GetXHalfLength();
 
     HepGeom::Point3D<double> pt = ((G4PVPlacementGT*)vol)->getTransform().inverse() * HepGeom::Point3D<double> (pos);
     return half_len - pt.x();
   }
 
-  double getLightPropagationLength(const G4VPhysicalVolume * vol, const TVector3  &pos)
+  double getLightPropagationLength(const G4VPhysicalVolume* vol, const TVector3&  pos)
   {
     return getLightPropagationLength(vol, Hep3Vector(pos.X(), pos.Y(), pos.Z()));
   }
 
 
 
-  bool doesIntersect(const EKLMStripHit * hit1, const EKLMStripHit * hit2,
-                     TVector3 & crossPoint)
+  bool doesIntersect(const EKLMStripHit* hit1, const EKLMStripHit* hit2,
+                     TVector3& crossPoint)
   {
-    G4Box *box1 = (G4Box*)(hit1->getVolume()->GetLogicalVolume()->GetSolid());
+    G4Box* box1 = (G4Box*)(hit1->getVolume()->GetLogicalVolume()->GetSolid());
     double max1 = 2.0 * box1->GetXHalfLength();
     HepGeom::Point3D<double> p1(0.5 * max1, 0., 0.);
     HepGeom::Point3D<double> pt1 = ((G4PVPlacementGT*)(hit1->getVolume()))->
                                    getTransform() * p1;
 
-    G4Box *box2 = (G4Box*)(hit2->getVolume()->GetLogicalVolume()->GetSolid());
+    G4Box* box2 = (G4Box*)(hit2->getVolume()->GetLogicalVolume()->GetSolid());
     double max2 = 2.0 * box2->GetXHalfLength();
     HepGeom::Point3D<double> p2(0.5 * max2, 0., 0.);
     HepGeom::Point3D<double> pt2 = ((G4PVPlacementGT*)(hit2->getVolume()))->

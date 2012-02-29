@@ -19,7 +19,7 @@ using namespace std;
 ClassImp(Belle2::EKLMSectorHit)
 
 EKLMSectorHit::EKLMSectorHit(int nEndcap, int nLayer, int  nSector) :
-    EKLMHitBase()
+  EKLMHitBase()
 {}
 
 vector <EKLMStripHit*> * EKLMSectorHit::getStripHitVector()
@@ -43,7 +43,7 @@ void EKLMSectorHit::Print()
     (*it)->Print();
 }
 
-bool EKLMSectorHit::addStripHit(EKLMStripHit *stripHit)
+bool EKLMSectorHit::addStripHit(EKLMStripHit* stripHit)
 {
   if (stripHit->getEndcap() == getEndcap() &&
       stripHit->getLayer() == getLayer() &&

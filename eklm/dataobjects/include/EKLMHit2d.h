@@ -39,7 +39,7 @@ namespace Belle2 {
     void Print();
 
     //! add StripHit to 2dhit. returns false if impossible
-    bool addStripHit(const EKLMStripHit *);
+    bool addStripHit(const EKLMStripHit*);
 
     //! returns pointer to the strip hit in X direction
     const EKLMStripHit* getXStripHit() const;
@@ -48,7 +48,7 @@ namespace Belle2 {
     const EKLMStripHit* getYStripHit() const;
 
     //! set coordinates of the crossing point
-    void setCrossPoint(TVector3 & point);
+    void setCrossPoint(TVector3& point);
 
     //! returns coordinates of the crossing point
     TVector3 getCrossPoint()  const;
@@ -63,10 +63,10 @@ namespace Belle2 {
   private:
 
     //! reference to the X Strip hit
-    EKLMStripHit const * m_XStrip; //-> {ROOT streamer directive}
+    EKLMStripHit const* m_XStrip;  //-> {ROOT streamer directive}
 
     //! reference to the Y Strip hit
-    EKLMStripHit const * m_YStrip; //-> {ROOT streamer directive}
+    EKLMStripHit const* m_YStrip;  //-> {ROOT streamer directive}
 
     //! crossing point global coordinates
     TVector3  m_crossPoint;

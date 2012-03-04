@@ -16,7 +16,7 @@
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
 
-#include <cdc/simulation/SensitiveDetector.h>
+#include <cdc/simulation/CDCSensitiveDetector.h>
 
 class G4LogicalVolume;
 class G4VPhysicalVolume;
@@ -54,7 +54,7 @@ namespace Belle2 {
       G4VPhysicalVolume* physical_cdc;
 
       //! Sensitive detector
-      SensitiveDetector* m_sensitive;
+      CDCSensitiveDetector* m_sensitive;
 
     };
 

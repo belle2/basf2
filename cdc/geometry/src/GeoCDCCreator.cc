@@ -10,7 +10,7 @@
 
 #include <cdc/geometry/GeoCDCCreator.h>
 #include <cdc/geometry/CDCGeometryPar.h>
-#include <cdc/simulation/SensitiveDetector.h>
+#include <cdc/simulation/CDCSensitiveDetector.h>
 #include <simulation/background/BkgSensitiveDetector.h>
 
 #include <geometry/CreatorFactory.h>
@@ -54,7 +54,7 @@ namespace Belle2 {
 
     GeoCDCCreator::GeoCDCCreator()
     {
-      m_sensitive = new SensitiveDetector("SensitiveDetector", (2 * 24)*eV, 10 * MeV);
+      m_sensitive = new CDCSensitiveDetector("CDCSensitiveDetector", (2 * 24)*eV, 10 * MeV);
       logical_cdc = 0;
       physical_cdc = 0;
     }

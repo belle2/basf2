@@ -41,7 +41,8 @@ namespace Belle2 {
 
     /** Empty constructor for ROOT IO. */
     CDCHit() {
-      B2DEBUG(150, "Empty CDCHit Constructor called.");
+      // M.U. 2012.03.05
+      //      B2DEBUG(150, "Empty CDCHit Constructor called.");
     }
 
     /** Useful Constructor.
@@ -65,7 +66,8 @@ namespace Belle2 {
      *  @param iWire       Values should be between [0, 511], depending on the wire radius.
      */
     void setWireId(const int& iSuperLayer, const int& iLayer, const int& iWire) {
-      B2DEBUG(150, "setWireId called with" << iSuperLayer << ", " << iLayer << ", " << iWire);
+      // M.U. 2012.03.05
+      //      B2DEBUG(150, "setWireId called with" << iSuperLayer << ", " << iLayer << ", " << iWire);
       m_wireId = static_cast<unsigned short int>(iWire + 512 * iLayer + 4096 * iSuperLayer);
     }
 
@@ -77,7 +79,8 @@ namespace Belle2 {
      *  @param driftTime Drift Length of electrons from closest ionisation cluster.
      */
     void setDriftTime(double driftTime) {
-      B2DEBUG(150, "setDriftTime called with " << driftTime);
+      // M.U. 2012.03.05
+      //      B2DEBUG(150, "setDriftTime called with " << driftTime);
       m_driftTime = static_cast<unsigned short int>(driftTime / Unit::um);
     }
 
@@ -87,7 +90,8 @@ namespace Belle2 {
      *  No special theoretical evaluation.
      */
     void setCharge(double charge) {
-      B2DEBUG(150, "setCharge called with " << charge);
+      // M.U. 2012.03.05
+      //      B2DEBUG(150, "setCharge called with " << charge);
       m_charge = static_cast<unsigned short int>(charge * 1e7);
     }
 

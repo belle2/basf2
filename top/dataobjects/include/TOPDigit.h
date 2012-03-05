@@ -1,0 +1,84 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2010 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Marko Petric, Marko Staric                               *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
+#ifndef TOPDIGIT_H
+#define TOPDIGIT_H
+
+#include <TObject.h>
+
+namespace Belle2 {
+
+
+  /*! This is a class to store TOP digitized hits in datastore.
+   *  It is also the output for digitization module (TOPDigi).
+   */
+
+  class TOPDigit : public TObject {
+  public:
+
+    /*! Default constructor */
+
+    TOPDigit():
+      m_barID(0),
+      m_channelID(0),
+      m_TDC(0) {
+    }
+
+    /*!  Full constructor
+     * @param barID:     bar ID
+     * @param channelID: channel ID
+     * @param TDC:       digitized detection time
+     */
+
+    TOPDigit(int barID, int channelID, int TDC):
+      m_barID(barID),
+      m_channelID(channelID),
+      m_TDC(TDC) {
+    }
+
+    /*! Get bar ID
+     * @return bar ID
+     */
+    int getBarID() const { return m_barID; }
+
+    /*! Get channel ID
+     * @return channel ID
+     */
+    int getChannelID() const { return m_channelID; }
+
+    /*! Get digitized time
+     * @return digitized time
+     */
+    int getTDC() const { return m_TDC; }
+
+    /*! Set bar ID
+     */
+    void setBarID(int barID) { m_barID = barID; }
+
+    /*! Set channel ID
+     */
+    void setChannelID(int channelID) { m_channelID = channelID; }
+
+    /*! Set digitized time
+     */
+    void setTDC(int TDC) { m_TDC = TDC; }
+
+  private:
+    int m_barID;             /**< Bar ID */
+    int m_channelID;         /**< Channel ID */
+    int m_TDC;               /**< digitized time */
+
+    ClassDef(TOPDigit, 1); /**< the class title */
+
+  };
+
+} // end namespace Belle2
+
+#endif

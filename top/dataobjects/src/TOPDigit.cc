@@ -3,17 +3,17 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Marko Petric                                             *
+ * Contributors: Marko Petric, Marko Staric                               *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <top/dataobjects/TOPDigiHit.h>
+#include <top/dataobjects/TOPDigit.h>
 
 using namespace std;
 using namespace Belle2;
 
-ClassImp(TOPDigiHit)
+ClassImp(TOPDigit)
 
 
 

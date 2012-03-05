@@ -6,9 +6,9 @@
 #pragma link C++ nestedclasses;
 
 #pragma link C++ class Belle2::TOPSimHit;
-#pragma link C++ class Belle2::TOPDigiHit;
+#pragma link C++ class Belle2::TOPDigit;
 #pragma link C++ class Belle2::TOPTrack;
-#pragma link C++ class Belle2::TOPlikelihoods;
+#pragma link C++ class Belle2::TOPLikelihoods;
 
 
 #endif

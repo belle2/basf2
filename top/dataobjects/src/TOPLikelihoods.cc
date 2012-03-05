@@ -8,11 +8,11 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <top/dataobjects/TOPlikelihoods.h>
+#include <top/dataobjects/TOPLikelihoods.h>
 
 using namespace std;
 using namespace Belle2;
 
-ClassImp(TOPlikelihoods)
+ClassImp(TOPLikelihoods)
 
 

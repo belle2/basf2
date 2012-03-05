@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Luka Santelj                                             *
+ * Contributors: Marko Staric                                             *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -15,14 +15,13 @@
 
 // Hit classes
 #include <top/dataobjects/TOPSimHit.h>
-#include <top/dataobjects/TOPDigiHit.h>
+#include <top/dataobjects/TOPDigit.h>
 
 // framework - DataStore
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/RelationArray.h>
-#include <framework/datastore/RelationIndex.h>
 
 // framework aux
 #include <framework/gearbox/Unit.h>
@@ -57,9 +56,9 @@ namespace Belle2 {
       //      addParam("InputColName", m_inColName, "Input collection name",
       //         string("TOPSimHitArray"));
       //      addParam("OutputColName", m_outColName, "Output collection name",
-      //         string("TOPDigiHitArray"));
+      //         string("TOPDigitArray"));
       addParam("PhotonFraction", m_photonFraction,
-               "The fraction of Cerenkov photons propagated in FullSim.", 1.0);
+               "The fraction of Cerenkov photons propagated in FullSim.", 0.3);
 
     }
 
@@ -80,8 +79,8 @@ namespace Belle2 {
       m_timeCPU = clock() * Unit::us;
 
       StoreArray<TOPSimHit> topSimHits;
-      StoreArray<TOPDigiHit> topDigiHits;
-      RelationArray relSimHitToDigiHit(topSimHits, topDigiHits);
+      StoreArray<TOPDigit> topDigits;
+      RelationArray relSimHitToDigit(topSimHits, topDigits);
     }
 
     void TOPDigiModule::beginRun()
@@ -94,21 +93,22 @@ namespace Belle2 {
     void TOPDigiModule::event()
     {
 
+      // input: simulated hits
       StoreArray<TOPSimHit> topSimHits;
-      if (!topSimHits) {
-        B2ERROR("TOPDigi: Cannot find TOPSimHit data store.");
-        return;
-      }
-      StoreArray<TOPDigiHit> topDigiHits;
-      RelationArray relSimHitToDigiHit(topSimHits, topDigiHits);
+
+      // output: digitized hits
+      StoreArray<TOPDigit> topDigits;
+      topDigits->Clear();
+      RelationArray relSimHitToDigit(topSimHits, topDigits);
+      relSimHitToDigit.clear();
 
       m_topgp->setBasfUnits();
 
-      //! simulate interaction time relative to RF clock
+      // simulate interaction time relative to RF clock
       double sig_beam = 25.e-3;
       double t_beam = gRandom->Gaus(0., sig_beam);
 
-      //! TDC
+      // TDC
       int NTDC = m_topgp->getTDCbits();
       int maxTDC = 1 << NTDC;
       double TDCwidth = m_topgp->getTDCbitwidth();
@@ -117,38 +117,35 @@ namespace Belle2 {
       for (int i = 0; i < nHits; i++) {
         TOPSimHit* aSimHit = topSimHits[i];
 
-        //! Apply quantum efficiency
+        // Apply quantum efficiency
         double energy = aSimHit->getEnergy();
         if (!DetectorQE(energy)) continue;
 
-        //! Do spatial digitization
+        // Do spatial digitization
         double x = aSimHit->getPosition().X();
         double y = aSimHit->getPosition().Y();
         int pmtID = aSimHit->getModuleID();
         int channelID = m_topgp->getChannelID(x, y, pmtID);
         if (channelID == 0) continue;
 
-        //! add T0 jitter and TTS to the photon time, and convert to TDC digits
+        // add T0 jitter and TTS to the photon time, and convert to TDC digits
         double tts = PMT_TTS();
         double time = t_beam + aSimHit->getTime() + tts;
         if (time < 0) continue;
         int TDC = int(time / TDCwidth);
         if (TDC > maxTDC) TDC = maxTDC;
 
-        //! store result
-        int nentr = topDigiHits->GetEntries();
-        new(topDigiHits->AddrAt(nentr)) TOPDigiHit(aSimHit->getBarID(),
-                                                   channelID, TDC, energy,
-                                                   aSimHit->getParentID(),
-                                                   aSimHit->getTrackID());
+        // store result
+        int nentr = topDigits->GetEntries();
+        new(topDigits->AddrAt(nentr)) TOPDigit(aSimHit->getBarID(), channelID, TDC);
 
-        //! make relations
-        relSimHitToDigiHit.add(i, nentr);
+        // make relations
+        relSimHitToDigit.add(i, nentr);
 
       }
 
       m_nEvent++;
-      B2INFO("nHits: " << nHits << " digitized hits: " << topDigiHits->GetEntries());
+      B2INFO("nHits: " << nHits << " digitized hits: " << topDigits->GetEntries());
 
     }
 
@@ -175,7 +172,7 @@ namespace Belle2 {
     bool TOPDigiModule::DetectorQE(double energy)
     {
       double rnd = gRandom->Rndm() * m_photonFraction;
-      double eff = m_topgp->QE(energy) * m_topgp->ColEffi();
+      double eff = m_topgp->QE(energy) * m_topgp->getColEffi();
       return (rnd < eff);
     }
 
@@ -183,10 +180,10 @@ namespace Belle2 {
     {
       double prob = gRandom->Rndm();
       double s = 0;
-      for (int i = 0; i < m_topgp->NgaussTTS(); i++) {
-        s = s + m_topgp->TTSfrac(i);
+      for (int i = 0; i < m_topgp->getNgaussTTS(); i++) {
+        s = s + m_topgp->getTTSfrac(i);
         if (prob < s) {
-          return gRandom->Gaus(m_topgp->TTSmean(i), m_topgp->TTSsigma(i));
+          return gRandom->Gaus(m_topgp->getTTSmean(i), m_topgp->getTTSsigma(i));
         }
       }
       return 0;

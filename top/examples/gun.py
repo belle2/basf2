@@ -27,7 +27,7 @@ particlegun = register_module('ParticleGun')
 # this number can be any int, preferably large
 # a value of 0 will use a different random seed each time
 # default is 3452346.
-particlegun.param('randomSeed', 1028307)
+# particlegun.param('RSeed', 0)
 
 # ============================================================================
 # Setting the list of particle codes (PDG codes) for the generated particles
@@ -175,7 +175,7 @@ output = register_module('SimpleOutput')
 
 # Setting the option for all non particle gun modules:
 # want to process 100 MC events
-evtmetagen.param({'EvtNumList': [100], 'RunList': [1]})
+evtmetagen.param({'EvtNumList': [5], 'RunList': [1]})
 
 # Set output filename
 output.param('outputFileName', 'TOPOutput.root')

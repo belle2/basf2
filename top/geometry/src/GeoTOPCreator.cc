@@ -74,7 +74,7 @@ namespace Belle2 {
     {
       m_sensitivePMT = new SensitivePMT();
       m_sensitiveTrack = new SensitiveTrack();
-      m_topgp = new TOPGeometryPar();
+      m_topgp = TOPGeometryPar::Instance();
     }
 
     GeoTOPCreator::~GeoTOPCreator()

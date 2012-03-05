@@ -20,13 +20,13 @@ namespace Belle2 {
    *  It is the output for reconstruction module (TOPReco).
    */
 
-  class TOPlikelihoods : public TObject {
+  class TOPLikelihoods : public TObject {
 
   public:
 
     /*! default constructor */
 
-    TOPlikelihoods(): m_flag(0), m_logL_e(0), m_logL_mu(0), m_logL_pi(0), m_logL_K(0),
+    TOPLikelihoods(): m_flag(0), m_logL_e(0), m_logL_mu(0), m_logL_pi(0), m_logL_K(0),
       m_logL_p(0), m_Nphot(0), m_Nphot_e(0), m_Nphot_mu(0), m_Nphot_pi(0),
       m_Nphot_K(0), m_Nphot_p(0) {
     }
@@ -46,7 +46,7 @@ namespace Belle2 {
      * @param Nphot_p:  expected photons for proton
      */
 
-    TOPlikelihoods(int flag,
+    TOPLikelihoods(int flag,
                    double logL_e,
                    double logL_mu,
                    double logL_pi,
@@ -79,7 +79,7 @@ namespace Belle2 {
      * @param Nphot_expect: number of expected photons in order e, mu, pi, K, p
      */
 
-    TOPlikelihoods(int flag, double logL[5], int Nphot, double Nphot_expect[5]) {
+    TOPLikelihoods(int flag, double logL[5], int Nphot, double Nphot_expect[5]) {
       m_flag = flag;
       m_logL_e  = logL[0];
       m_logL_mu = logL[1];
@@ -94,43 +94,65 @@ namespace Belle2 {
       m_Nphot_p  = Nphot_expect[4];
     }
 
-    /* @return reconstruction flag
-     * flag: 1=OK, 0=out of acceptance, -1=inside gap btw. bars
+    /*! Get reconstruction flag
+     * @return reconstruction flag: 1=OK, 0=out of acceptance, -1=inside gap btw. bars
      */
-    int flag() const {return m_flag;}
+    int getFlag() const {return m_flag;}
 
-    /* @return electron log likelihood */
-    double logL_e() const {return m_logL_e;}
+    /*! Get electron log likelihood
+     * @return electron log likelihood
+     */
+    double getLogL_e() const {return m_logL_e;}
 
-    /* @return muon log likelihood */
-    double logL_mu() const {return m_logL_mu;}
+    /*! Get muon log likelihood
+     * @return muon log likelihood
+     */
+    double getLogL_mu() const {return m_logL_mu;}
 
-    /* @return pion log likelihood */
-    double logL_pi() const {return m_logL_pi;}
+    /*! Get pion log likelihood
+     * @return pion log likelihood
+     */
+    double getLogL_pi() const {return m_logL_pi;}
 
-    /* @return kaon log likelihood */
-    double logL_K() const {return m_logL_K;}
+    /*! Get kaon log likelihood
+     * @return kaon log likelihood
+     */
+    double getLogL_K() const {return m_logL_K;}
 
-    /* @return proton log likelihood */
-    double logL_p() const {return m_logL_p;}
+    /*! Get proton log likelihood
+     * @return proton log likelihood
+     */
+    double getLogL_p() const {return m_logL_p;}
 
-    /* @return number of detected photons */
-    int Nphot() const {return m_Nphot;}
+    /*! Get number of detected photons
+     * @return number of detected photons
+     */
+    int getNphot() const {return m_Nphot;}
 
-    /* @return number of expected photons for electron */
-    double Nphot_e() const {return m_Nphot_e;}
+    /*! Get number of expected photons for electron
+     * @return number of expected photons for electron
+     */
+    double getNphot_e() const {return m_Nphot_e;}
 
-    /* @return number of expected photons for muon */
-    double Nphot_mu() const {return m_Nphot_mu;}
+    /*! Get number of expected photons for muon
+     * @return number of expected photons for muon
+     */
+    double getNphot_mu() const {return m_Nphot_mu;}
 
-    /* @return number of expected photons for pion */
-    double Nphot_pi() const {return m_Nphot_pi;}
+    /*! Get number of expected photons for pion
+     * @return number of expected photons for pion
+     */
+    double getNphot_pi() const {return m_Nphot_pi;}
 
-    /* @return number of expected photons for kaon */
-    double Nphot_K() const {return m_Nphot_K;}
+    /*! Get number of expected photons for kaon
+     * @return number of expected photons for kaon
+     */
+    double getNphot_K() const {return m_Nphot_K;}
 
-    /* @return number of expected photons for proton */
-    double Nphot_p() const {return m_Nphot_p;}
+    /*! Get number of expected photons for proton
+     * @return number of expected photons for proton
+     */
+    double getNphot_p() const {return m_Nphot_p;}
 
   private:
     int m_flag;          /**< reconstruction flag */
@@ -146,7 +168,7 @@ namespace Belle2 {
     double m_Nphot_K;    /**< number of expected photons for kaon hypothesis */
     double m_Nphot_p;    /**< number of expected photons for proton hypothesis */
 
-    ClassDef(TOPlikelihoods, 1); /**< the class title */
+    ClassDef(TOPLikelihoods, 1); /**< the class title */
 
   };
 

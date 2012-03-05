@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef TOPDIGIMODULE_H
-#define TOPDIGIMODULE_H
+#ifndef TOPRECOMODULE_H
+#define TOPRECOMODULE_H
 
 #include <framework/core/Module.h>
 #include <top/geometry/TOPGeometryPar.h>
@@ -19,8 +19,6 @@ namespace Belle2 {
   namespace TOP {
     //! TOP reconstruction module.
     /*!
-      This module takes the hits form G4 simulation (TOPSimHit), applies q.e. of PMTs, calculates and saves hit channel numbers (TOPHit).
-      No time spread and double hits are used
     */
     class TOPRecoModule : public Module {
 
@@ -50,7 +48,6 @@ namespace Belle2 {
       /**
        * Event processor.
        *
-       * Convert TOPSimHits of the event to TOPHits.
        */
       virtual void event();
 
@@ -83,10 +80,10 @@ namespace Belle2 {
       int    m_nRun;                   /**< Run number.   */
       int    m_nEvent;                 /**< Event number. */
 
-      //!Parameter reading object
+      //! Parameter reading object
       TOPGeometryPar* m_topgp;
 
-      //! TOP configure object
+      //! TOP configure function
       void TOPconfigure();
 
 
@@ -95,4 +92,4 @@ namespace Belle2 {
   } // top namespace
 } // Belle2 namespace
 
-#endif // TOPDIGIMODULE_H
+#endif // TOPRECOMODULE_H

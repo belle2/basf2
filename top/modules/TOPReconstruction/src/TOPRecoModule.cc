@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Luka Santelj                                             *
+ * Contributors: Marko Staric                                             *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -20,15 +20,14 @@
 // Hit classes
 // #include <generators/dataobjects/MCParticle.h>
 #include <top/dataobjects/TOPTrack.h>
-#include <top/dataobjects/TOPDigiHit.h>
-#include <top/dataobjects/TOPlikelihoods.h>
+#include <top/dataobjects/TOPDigit.h>
+#include <top/dataobjects/TOPLikelihoods.h>
 
 // framework - DataStore
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/RelationArray.h>
-#include <framework/datastore/RelationIndex.h>
 
 // framework aux
 #include <framework/gearbox/Unit.h>
@@ -58,11 +57,11 @@ namespace Belle2 {
       m_topgp(TOPGeometryPar::Instance())
     {
       // Set description()
-      setDescription("TOPRecotizer");
+      setDescription("TOPReconstruction");
 
       // Add parameters
       //      addParam("InputColName", m_inColName, "Input collection name",
-      //         string("TOPDigiHitArray"));
+      //         string("TOPDigitArray"));
       //      addParam("OutputColName", m_outColName, "Output collection name",
       //         string("TOPQuartzHitArray"));
     }
@@ -83,10 +82,10 @@ namespace Belle2 {
       // CPU time start
       m_timeCPU = clock() * Unit::us;
 
-      StoreArray<TOPDigiHit> topDigiHits;
+      StoreArray<TOPDigit> topDigits;
       StoreArray<TOPTrack> topTracks;
-      StoreArray<TOPlikelihoods> toplogL;
-      RelationArray relTrackToLogL(topTracks, toplogL);
+      StoreArray<TOPLikelihoods> toplogL;
+      RelationArray relTrackLikelihoods(topTracks, toplogL);
 
       TOPconfigure();
 
@@ -99,22 +98,15 @@ namespace Belle2 {
 
     void TOPRecoModule::event()
     {
-      // input: digitized photons
-      StoreArray<TOPDigiHit> topDigiHits;
-      if (!topDigiHits) {
-        B2ERROR("TOPReco: Cannot find TOPDigiHit store array.");
-        return;
-      }
-      // input: tracks (currently MC tracks at TOP)
+      // input: digitized photons and tracks (currently MC tracks at TOP)
+      StoreArray<TOPDigit> topDigits;
       StoreArray<TOPTrack> topTracks;
-      if (!topTracks) {
-        B2ERROR("TOPReco: Cannot find TOPTrack store array.");
-        return;
-      }
 
       // output: log likelihoods
-      StoreArray<TOPlikelihoods> toplogL;
-      RelationArray relTrackToLogL(topTracks, toplogL);
+      StoreArray<TOPLikelihoods> toplogL;
+      toplogL->Clear();
+      RelationArray relTrackLikelihoods(topTracks, toplogL);
+      relTrackLikelihoods.clear();
 
       // create reconstruction object
       double Masses[5] = {.511E-3, .10566, .13957, .49368, .93827};
@@ -125,31 +117,31 @@ namespace Belle2 {
       reco.Clear();
 
       // add photons
-      int nHits = topDigiHits->GetEntries();
-      for (int hit = 0; hit < nHits; ++hit) {
-        TOPDigiHit* pmthit = topDigiHits[hit];
-        reco.AddData(pmthit->getBarID() - 1, pmthit->getChannelID() - 1, pmthit->getTDC());
+      int nHits = topDigits->GetEntries();
+      for (int i = 0; i < nHits; ++i) {
+        TOPDigit* data = topDigits[i];
+        reco.AddData(data->getBarID() - 1, data->getChannelID() - 1, data->getTDC());
       }
 
       // reconstruct track-by-track and store results
       int nTracks = topTracks->GetEntries();
-      for (int track = 0; track < nTracks; ++track) {
-        TOPTrack* atrack = topTracks[track]; // MC particle at TOP
-        if (atrack->getCharge() == 0) continue;
-        TVector3 vpos = atrack->getVPosition();
+      for (int i = 0; i < nTracks; ++i) {
+        TOPTrack* track = topTracks[i]; // MC particle at TOP
+        if (track->getCharge() == 0) continue;
+        TVector3 vpos = track->getVPosition();
         if (vpos.Perp() > 50.0) continue; // emulate track reco (acceptance in rho)
-        TVector3 pos = atrack->getPosition();
-        TVector3 mom = atrack->getMomentum();
+        TVector3 pos = track->getPosition();
+        TVector3 mom = track->getMomentum();
         TOPtrack trk(pos.X(), pos.Y(), pos.Z(), mom.X(), mom.Y(), mom.Z(),
-                     atrack->getLength(), atrack->getCharge(), atrack->getParticleID());
+                     track->getLength(), track->getCharge(), track->getParticleID());
         trk.smear(1.0e-1, 1.4e-1, 1.5e-3, 1.5e-3); // emulate track reco (resolution)
         reco.Reconstruct(trk);
         double logl[5], expPhot[5];
         int nphot;
         reco.GetLogL(5, logl, expPhot, nphot);
         int nentr = toplogL->GetEntries();
-        new(toplogL->AddrAt(nentr)) TOPlikelihoods(reco.Flag(), logl, nphot, expPhot);
-        relTrackToLogL.add(track, nentr);
+        new(toplogL->AddrAt(nentr)) TOPLikelihoods(reco.Flag(), logl, nphot, expPhot);
+        relTrackLikelihoods.add(i, nentr);
       }
 
     }
@@ -166,25 +158,25 @@ namespace Belle2 {
              m_topgp->getAsizex(), m_topgp->getAsizey(),
              m_topgp->getNpadx(), m_topgp->getNpady());
 
-      int ng = m_topgp->NgaussTTS();
+      int ng = m_topgp->getNgaussTTS();
       if (ng > 0) {
         double frac[ng], mean[ng], sigma[ng];
         for (int i = 0; i < ng; i++) {
-          frac[i] = m_topgp->TTSfrac(i);
-          mean[i] = m_topgp->TTSmean(i);
-          sigma[i] = m_topgp->TTSsigma(i);
+          frac[i] = m_topgp->getTTSfrac(i);
+          mean[i] = m_topgp->getTTSmean(i);
+          sigma[i] = m_topgp->getTTSsigma(i);
         }
         setTTS(ng, frac, mean, sigma);
       }
 
-      int size = m_topgp->NpointsQE();
+      int size = m_topgp->getNpointsQE();
       if (size > 0) {
         double Wavelength[size], QE[size];
         for (int i = 0; i < size; i++) {
-          QE[i] = m_topgp->QE(i);
-          Wavelength[i] = m_topgp->LambdaFirst() + m_topgp->LambdaStep() * i;
+          QE[i] = m_topgp->getQE(i);
+          Wavelength[i] = m_topgp->getLambdaFirst() + m_topgp->getLambdaStep() * i;
         }
-        setQE(Wavelength, QE, size, m_topgp->ColEffi());
+        setQE(Wavelength, QE, size, m_topgp->getColEffi());
       }
 
       setTDC(m_topgp->getTDCbits(), m_topgp->getTDCbitwidth());

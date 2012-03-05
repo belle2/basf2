@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Marko Petric                                             *
+ * Contributors: Marko Petric, Marko Staric                               *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -228,12 +228,12 @@ namespace Belle2 {
       /** Get pad size in x direction
        * @return pad size in x
        */
-      double padx() const {return m_padx; }
+      double getPadx() const {return m_padx; }
 
       /** Get pad size in y direction
        * @return pad size in x
        */
-      double pady() const {return m_pady; }
+      double getPady() const {return m_pady; }
 
       /** Get the thickness of the glue between the PMT stack and the wedge
        * @return the thickness of the glue between the PMT stack and the wedge
@@ -253,47 +253,47 @@ namespace Belle2 {
       /** Get number of Gaussian terms for TTS distribution
        * @return number of Gaussian terms
        */
-      int NgaussTTS() const {return m_NgaussTTS; }
+      int getNgaussTTS() const {return m_NgaussTTS; }
 
       /** Get fraction of Gaussian term i
        * @return fraction i
        */
-      double TTSfrac(int i) const {return m_TTSfrac[i]; }
+      double getTTSfrac(int i) const {return m_TTSfrac[i]; }
 
       /** Get mean of Gaussian term i
        * @return mean i
        */
-      double TTSmean(int i) const {return m_TTSmean[i]; }
+      double getTTSmean(int i) const {return m_TTSmean[i]; }
 
       /** Get sigma of Gaussian term i
        * @return sigma i
        */
-      double TTSsigma(int i) const {return m_TTSsigma[i]; }
+      double getTTSsigma(int i) const {return m_TTSsigma[i]; }
 
       /** Get PMT collection efficiency
        * @return collection efficiency
        */
-      double ColEffi() const {return m_ColEffi; }
+      double getColEffi() const {return m_ColEffi; }
 
       /** Get lambda of the first QE data point
        * @return lambda min [nm]
        */
-      double LambdaFirst() const {return m_LambdaFirst; }
+      double getLambdaFirst() const {return m_LambdaFirst; }
 
       /** Get lambda step [nm]
        * @return step
        */
-      double LambdaStep() const {return m_LambdaStep; }
+      double getLambdaStep() const {return m_LambdaStep; }
 
       /** Get number of QE data points
        * @return number of data points
        */
-      int NpointsQE() const {return m_NpointsQE; }
+      int getNpointsQE() const {return m_NpointsQE; }
 
       /** Get quantum efficiency point i
        * @return quantum efficiency point i
        */
-      double QE(int i) const {return m_QE[i]; }
+      double getQE(int i) const {return m_QE[i]; }
 
       /** Get quantum efficiency for photon energy e [eV] (linear interpolation)
        * @return quantum efficiency at e

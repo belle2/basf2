@@ -15,6 +15,12 @@
 
 namespace Belle2 {
 
+  /** This module use GFTrackCand objects (track candidates with hits and momentum seed) and fits them using GenFit.
+   *
+   *  This modules can be executed after MCTrackFinderModule or any pattern recognition module, as long as these modules provide valid GFTrackCand array.
+   *
+   *  At the end GFTracks (native GenFit output with all the information) and Tracks (custom objects with only the important parameters we want to have at the end) are created.
+   */
 
   class GenFitterModule : public Module {
 
@@ -60,9 +66,11 @@ namespace Belle2 {
     std::string m_svdHitsColName;                    /**< SVDHits collection name */
     std::string m_pxdHitsColName;                    /**< PXDHits collection name */
     std::string m_gfTrackCandsColName;               /**< GFTrackCandidates collection name */
+    std::string m_mcParticlesColName;                /**< MCParticles collection name */
 
     std::string m_tracksColName;                     /**< Tracks collection name */
     std::string m_gfTracksColName;                   /**< GFTracks collection name */
+    std::string m_gfTracksToMCParticlesColName;      /**< GFTracks to MCParticles relation collection name */
 
     //These are two different counters, the counter for GFTrackCands refers to the number of input GFTrackCands. The number of total successfull/failed fits may be different, if GFTrackCand is fitted several times under different PDG hypothesises.
     int m_failedFitCounter;                          /**< Number of failed fits. */

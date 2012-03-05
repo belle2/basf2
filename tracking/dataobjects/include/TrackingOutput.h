@@ -562,99 +562,99 @@ namespace Belle2 {
     float m_mcMomentumZ;                         /**< Momentum of the MCParticle (z-component) */
     float m_mcMomentum;                          /**< Momentum of the MCParticle (absolute value) */
     float m_mcCurv;                              /**< Curvature of the MCParticle (inverse transverse momentum) */
-    float m_mcPhi;         /**< Phi of the MCParticle */
+    float m_mcPhi;                               /**< Phi of the MCParticle */
     float m_mcCotTheta;                          /**< Cotangens theta of the MCParticle (pz/pt) */
-    float m_mcTheta;         /**< Theta of the MCParticle */
+    float m_mcTheta;                             /**< Theta of the MCParticle */
     int m_mcPDG;                                 /**< PDG of the MCParticle */
     float m_mcPositionX;                         /**< Vertex of the MCParticle (x-component) */
     float m_mcPositionY;                         /**< Vertex of the MCParticle (y-component) */
     float m_mcPositionZ;                         /**< Vertex of the MCParticle (z-component) */
 
     //-------------------------------------------------------------------------
-    std::vector<int>   m_nMCFitTracks;           /** Number of fitted MCTracks */
-    std::vector<float> m_mcStartMomentumX;       /** Start values for the MCTrack fit: momentum (x-component) */
-    std::vector<float> m_mcStartMomentumY;       /** Start values for the MCTrack fit: momentum (y-component) */
-    std::vector<float> m_mcStartMomentumZ;       /** Start values for the MCTrack fit: momentum (z-component) */
-    std::vector<float> m_mcStartMomentum;        /** Start values for the MCTrack fit: momentum (absolute value) */
-    std::vector<float> m_mcStartCurv;            /** Start values for the MCTrack fit: curvature (inverse transverse momentum) */
-    std::vector<float> m_mcStartPhi;             /** Start values for the MCTrack fit: phi */
-    std::vector<float> m_mcStartCotTheta;        /** Start values for the MCTrack fit: cotangens theta (pz/pt) */
-    std::vector<float> m_mcStartTheta;           /** Start values for the MCTrack fit: theta */
+    std::vector<int>   m_nMCFitTracks;           /**< Number of fitted MCTracks */
+    std::vector<float> m_mcStartMomentumX;       /**< Start values for the MCTrack fit: momentum (x-component) */
+    std::vector<float> m_mcStartMomentumY;       /**< Start values for the MCTrack fit: momentum (y-component) */
+    std::vector<float> m_mcStartMomentumZ;       /**< Start values for the MCTrack fit: momentum (z-component) */
+    std::vector<float> m_mcStartMomentum;        /**< Start values for the MCTrack fit: momentum (absolute value) */
+    std::vector<float> m_mcStartCurv;            /**< Start values for the MCTrack fit: curvature (inverse transverse momentum) */
+    std::vector<float> m_mcStartPhi;             /**< Start values for the MCTrack fit: phi */
+    std::vector<float> m_mcStartCotTheta;        /**< Start values for the MCTrack fit: cotangens theta (pz/pt) */
+    std::vector<float> m_mcStartTheta;           /**< Start values for the MCTrack fit: theta */
 
-    std::vector<float> m_mcStartPositionX;       /** Start values for the MCTrack fit: vertex (x-component) */
-    std::vector<float> m_mcStartPositionY;       /** Start values for the MCTrack fit: vertex (y-component) */
-    std::vector<float> m_mcStartPositionZ;       /** Start values for the MCTrack fit: vertex (z-component) */
+    std::vector<float> m_mcStartPositionX;       /**< Start values for the MCTrack fit: vertex (x-component) */
+    std::vector<float> m_mcStartPositionY;       /**< Start values for the MCTrack fit: vertex (y-component) */
+    std::vector<float> m_mcStartPositionZ;       /**< Start values for the MCTrack fit: vertex (z-component) */
 
-    std::vector<float> m_mcFitMomentumX;         /** Fit result for the MCTrack fit: momentum (x-component) */
-    std::vector<float> m_mcFitMomentumY;         /** Fit result for the MCTrack fit: momentum (y-component) */
-    std::vector<float> m_mcFitMomentumZ;         /** Fit result for the MCTrack fit: momentum (z-component) */
-    std::vector<float> m_mcFitMomentum;          /** Fit result for the MCTrack fit: momentum (absolute value) */
-    std::vector<float> m_mcFitCurv;              /** Fit result for the MCTrack fit: curvature (inverse transverse momentum) */
-    std::vector<float> m_mcFitPhi  ;             /** Fit result for the MCTrack fit: phi */
-    std::vector<float> m_mcFitCotTheta;          /** Fit result for the MCTrack fit: cotangens theta(pz/pt) */
-    std::vector<float> m_mcFitTheta;             /** Fit result for the MCTrack fit: theta */
-    std::vector<float> m_mcFitPositionX;         /** Fit result for the MCTrack fit: vertex (x-component) */
-    std::vector<float> m_mcFitPositionY;         /** Fit result for the MCTrack fit: vertex (y-component) */
-    std::vector<float> m_mcFitPositionZ;         /** Fit result for the MCTrack fit: vertex (z-component) */
+    std::vector<float> m_mcFitMomentumX;         /**< Fit result for the MCTrack fit: momentum (x-component) */
+    std::vector<float> m_mcFitMomentumY;         /**< Fit result for the MCTrack fit: momentum (y-component) */
+    std::vector<float> m_mcFitMomentumZ;         /**< Fit result for the MCTrack fit: momentum (z-component) */
+    std::vector<float> m_mcFitMomentum;          /**< Fit result for the MCTrack fit: momentum (absolute value) */
+    std::vector<float> m_mcFitCurv;              /**< Fit result for the MCTrack fit: curvature (inverse transverse momentum) */
+    std::vector<float> m_mcFitPhi  ;             /**< Fit result for the MCTrack fit: phi */
+    std::vector<float> m_mcFitCotTheta;          /**< Fit result for the MCTrack fit: cotangens theta(pz/pt) */
+    std::vector<float> m_mcFitTheta;             /**< Fit result for the MCTrack fit: theta */
+    std::vector<float> m_mcFitPositionX;         /**< Fit result for the MCTrack fit: vertex (x-component) */
+    std::vector<float> m_mcFitPositionY;         /**< Fit result for the MCTrack fit: vertex (y-component) */
+    std::vector<float> m_mcFitPositionZ;         /**< Fit result for the MCTrack fit: vertex (z-component) */
 
-    std::vector<int> m_nMCHits;                  /** Number of hits in the fitted MCTrack */
-    std::vector<int> m_mcFitPDG;                 /** PDG value of the fitted MCTrack */
-    std::vector<float> m_mcFitChi2;              /** Chi2 value of the MCTrack fit */
-    std::vector<float> m_mcFitPValue;            /** Probability value of the MCTrack fit */
-    std::vector<int> m_mcSuccessFit;             /** Marker for successful fit of the MCTrack */
-    std::vector<int> m_mcSuccessExtrap;          /** Marker of successful extrapolation of the MCTrack fit */
+    std::vector<int> m_nMCHits;                  /**< Number of hits in the fitted MCTrack */
+    std::vector<int> m_mcFitPDG;                 /**< PDG value of the fitted MCTrack */
+    std::vector<float> m_mcFitChi2;              /**< Chi2 value of the MCTrack fit */
+    std::vector<float> m_mcFitPValue;            /**< Probability value of the MCTrack fit */
+    std::vector<int> m_mcSuccessFit;             /**< Marker for successful fit of the MCTrack */
+    std::vector<int> m_mcSuccessExtrap;          /**< Marker of successful extrapolation of the MCTrack fit */
 
-    std::vector<float> m_mcFitMomentumXErr;      /** Fit result for the MCTrack fit: momentum error (x-component) */
-    std::vector<float> m_mcFitMomentumYErr;      /** Fit result for the MCTrack fit: momentum error (y-component) */
-    std::vector<float> m_mcFitMomentumZErr;      /** Fit result for the MCTrack fit: momentum error (z-component) */
-    std::vector<float> m_mcFitPositionXErr;      /** Fit result for the MCTrack fit: vertex error (x-component) */
-    std::vector<float> m_mcFitPositionYErr;      /** Fit result for the MCTrack fit: vertex error (y-component) */
-    std::vector<float> m_mcFitPositionZErr;      /** Fit result for the MCTrack fit: vertex error (z-component) */
+    std::vector<float> m_mcFitMomentumXErr;      /**< Fit result for the MCTrack fit: momentum error (x-component) */
+    std::vector<float> m_mcFitMomentumYErr;      /**< Fit result for the MCTrack fit: momentum error (y-component) */
+    std::vector<float> m_mcFitMomentumZErr;      /**< Fit result for the MCTrack fit: momentum error (z-component) */
+    std::vector<float> m_mcFitPositionXErr;      /**< Fit result for the MCTrack fit: vertex error (x-component) */
+    std::vector<float> m_mcFitPositionYErr;      /**< Fit result for the MCTrack fit: vertex error (y-component) */
+    std::vector<float> m_mcFitPositionZErr;      /**< Fit result for the MCTrack fit: vertex error (z-component) */
 
-    std::vector <int> m_mcFitTracks;             /** MCTracks Ids for the given MCParticle */
+    std::vector <int> m_mcFitTracks;             /**< MCTracks Ids for the given MCParticle */
 
     //---------------------------------------------------------------------------
-    std::vector<int>   m_nPRFitTracks;           /** Number of fitted PRTracks */
-    std::vector<float> m_prStartMomentumX;       /** Start values for the PRTrack fit: momentum (x-component) */
-    std::vector<float> m_prStartMomentumY;       /** Start values for the PRTrack fit: momentum (y-component) */
-    std::vector<float> m_prStartMomentumZ;       /** Start values for the PRTrack fit: momentum (z-component) */
-    std::vector<float> m_prStartMomentum;        /** Start values for the PRTrack fit: momentum (absolute value) */
-    std::vector<float> m_prStartCurv;            /** Start values for the PRTrack fit: curvature (inverse transverse momentum) */
-    std::vector<float> m_prStartPhi  ;           /** Start values for the PRTrack fit: phi */
-    std::vector<float> m_prStartCotTheta;        /** Start values for the PRTrack fit: cotangens theta (pz/pt) */
-    std::vector<float> m_prStartTheta;           /** Start values for the PRTrack fit: theta */
+    std::vector<int>   m_nPRFitTracks;           /**< Number of fitted PRTracks */
+    std::vector<float> m_prStartMomentumX;       /**< Start values for the PRTrack fit: momentum (x-component) */
+    std::vector<float> m_prStartMomentumY;       /**< Start values for the PRTrack fit: momentum (y-component) */
+    std::vector<float> m_prStartMomentumZ;       /**< Start values for the PRTrack fit: momentum (z-component) */
+    std::vector<float> m_prStartMomentum;        /**< Start values for the PRTrack fit: momentum (absolute value) */
+    std::vector<float> m_prStartCurv;            /**< Start values for the PRTrack fit: curvature (inverse transverse momentum) */
+    std::vector<float> m_prStartPhi  ;           /**< Start values for the PRTrack fit: phi */
+    std::vector<float> m_prStartCotTheta;        /**< Start values for the PRTrack fit: cotangens theta (pz/pt) */
+    std::vector<float> m_prStartTheta;           /**< Start values for the PRTrack fit: theta */
 
-    std::vector<float> m_prStartPositionX;       /** Start values for the PRTrack fit: vertex (x-component) */
-    std::vector<float> m_prStartPositionY;       /** Start values for the PRTrack fit: vertex (y-component) */
-    std::vector<float> m_prStartPositionZ;       /** Start values for the PRTrack fit: vertex (z-component) */
+    std::vector<float> m_prStartPositionX;       /**< Start values for the PRTrack fit: vertex (x-component) */
+    std::vector<float> m_prStartPositionY;       /**< Start values for the PRTrack fit: vertex (y-component) */
+    std::vector<float> m_prStartPositionZ;       /**< Start values for the PRTrack fit: vertex (z-component) */
 
-    std::vector<float> m_prFitMomentumX;         /** Fit result for the PRTrack fit: momentum (x-component) */
-    std::vector<float> m_prFitMomentumY;         /** Fit result for the PRTrack fit: momentum (y-component) */
-    std::vector<float> m_prFitMomentumZ;         /** Fit result for the PRTrack fit: momentum (z-component) */
-    std::vector<float> m_prFitMomentum;          /** Fit result for the PRTrack fit: momentum (absolute value) */
-    std::vector<float> m_prFitCurv;              /** Fit result for the PRTrack fit: curvature (inverse transverse momentum) */
-    std::vector<float> m_prFitPhi  ;             /** Fit result for the PRTrack fit: phi */
-    std::vector<float> m_prFitCotTheta;          /** Fit result for the PRTrack fit: cotangens theta(pz/pt) */
-    std::vector<float> m_prFitTheta;             /** Fit result for the PRTrack fit: theta */
+    std::vector<float> m_prFitMomentumX;         /**< Fit result for the PRTrack fit: momentum (x-component) */
+    std::vector<float> m_prFitMomentumY;         /**< Fit result for the PRTrack fit: momentum (y-component) */
+    std::vector<float> m_prFitMomentumZ;         /**< Fit result for the PRTrack fit: momentum (z-component) */
+    std::vector<float> m_prFitMomentum;          /**< Fit result for the PRTrack fit: momentum (absolute value) */
+    std::vector<float> m_prFitCurv;              /**< Fit result for the PRTrack fit: curvature (inverse transverse momentum) */
+    std::vector<float> m_prFitPhi  ;             /**< Fit result for the PRTrack fit: phi */
+    std::vector<float> m_prFitCotTheta;          /**< Fit result for the PRTrack fit: cotangens theta(pz/pt) */
+    std::vector<float> m_prFitTheta;             /**< Fit result for the PRTrack fit: theta */
 
-    std::vector<float> m_prFitPositionX;         /** Fit result for the PRTrack fit: vertex (x-component) */
-    std::vector<float> m_prFitPositionY;         /** Fit result for the PRTrack fit: vertex (y-component) */
-    std::vector<float> m_prFitPositionZ;         /** Fit result for the PRTrack fit: vertex (z-component) */
+    std::vector<float> m_prFitPositionX;         /**< Fit result for the PRTrack fit: vertex (x-component) */
+    std::vector<float> m_prFitPositionY;         /**< Fit result for the PRTrack fit: vertex (y-component) */
+    std::vector<float> m_prFitPositionZ;         /**< Fit result for the PRTrack fit: vertex (z-component) */
 
-    std::vector<int> m_nPRHits;                  /** Number of hits in the fitted PRTrack */
-    std::vector<int> m_prFitPDG;                 /** PDG value of the fitted PRTrack */
-    std::vector<float> m_prFitChi2;              /** Chi2 value of the PRTrack fit */
-    std::vector<float> m_prFitPValue;            /** Probability value of the PRTrack fit */
-    std::vector<int> m_prSuccessFit;             /** Marker for successful fit of the PRTrack */
-    std::vector<int> m_prSuccessExtrap;          /** Marker of successful extrapolation of the PRTrack fit */
-    std::vector<float> m_prPurity;               /** Purity of the PRTrack ((hits from one MCParticle/total nr of hits) * 100) */
+    std::vector<int> m_nPRHits;                  /**< Number of hits in the fitted PRTrack */
+    std::vector<int> m_prFitPDG;                 /**< PDG value of the fitted PRTrack */
+    std::vector<float> m_prFitChi2;              /**< Chi2 value of the PRTrack fit */
+    std::vector<float> m_prFitPValue;            /**< Probability value of the PRTrack fit */
+    std::vector<int> m_prSuccessFit;             /**< Marker for successful fit of the PRTrack */
+    std::vector<int> m_prSuccessExtrap;          /**< Marker of successful extrapolation of the PRTrack fit */
+    std::vector<float> m_prPurity;               /**< Purity of the PRTrack ((hits from one MCParticle/total nr of hits) * 100) */
 
-    std::vector<float> m_prFitMomentumXErr;      /** Fit result for the PRTrack fit: momentum error (x-component) */
-    std::vector<float> m_prFitMomentumYErr;      /** Fit result for the PRTrack fit: momentum error (y-component) */
-    std::vector<float> m_prFitMomentumZErr;      /** Fit result for the PRTrack fit: momentum error (z-component) */
-    std::vector<float> m_prFitPositionXErr;      /** Fit result for the PRTrack fit: vertex error (x-component) */
-    std::vector<float> m_prFitPositionYErr;      /** Fit result for the PRTrack fit: vertex error (y-component) */
-    std::vector<float> m_prFitPositionZErr;      /** Fit result for the PRTrack fit: vertex error (z-component) */
+    std::vector<float> m_prFitMomentumXErr;      /**< Fit result for the PRTrack fit: momentum error (x-component) */
+    std::vector<float> m_prFitMomentumYErr;      /**< Fit result for the PRTrack fit: momentum error (y-component) */
+    std::vector<float> m_prFitMomentumZErr;      /**< Fit result for the PRTrack fit: momentum error (z-component) */
+    std::vector<float> m_prFitPositionXErr;      /**< Fit result for the PRTrack fit: vertex error (x-component) */
+    std::vector<float> m_prFitPositionYErr;      /**< Fit result for the PRTrack fit: vertex error (y-component) */
+    std::vector<float> m_prFitPositionZErr;      /**< Fit result for the PRTrack fit: vertex error (z-component) */
 
     std::vector <int> m_prFitTracks;             /** PRTracks Ids for the given MCParticle */
 

@@ -75,6 +75,9 @@ GenFitterModule::GenFitterModule() :
   addParam("SVDHitsColName", m_svdHitsColName, "SVDHits collection", string(""));
   addParam("PXDHitsColName", m_pxdHitsColName, "PXDHits collection", string(""));
 
+  addParam("MCParticlesColName", m_mcParticlesColName,
+           "Name of collection holding the MCParticles (need to create relations between found tracks and MCParticles)", string(""));
+
   //the tracks from MCTrackFinder are treated slightly different from tracks from pattern recognition (uknown pdg), so this parameter should be set true from mcTrack and false for pattern reco tracks
   addParam("mcTracks", m_mcTracks, "Set true if the track candidates are from MCTrackFinder, set false if they are coming from the pattern recognition", bool(true));
   //select the filter and set some parameters
@@ -87,6 +90,7 @@ GenFitterModule::GenFitterModule() :
 
   //output
   addParam("GFTracksColName", m_gfTracksColName, "Name of collection holding the final GFTracks (will be created by this module)", string(""));
+  addParam("GFTracksToMCParticlesColName", m_gfTracksToMCParticlesColName, "Name of collection holding the relations between the final GFTracks and the original MCParticle (will be created by this module)", string(""));
   addParam("TracksColName", m_tracksColName, "Name of collection holding the final Tracks (will be created by this module)", string(""));
 
   addParam("HelixOutput", m_createTextFile, "Set true if you want to have a text file with perigee helix parameters of all tracks", bool(false));
@@ -107,6 +111,11 @@ void GenFitterModule::initialize()
 
   StoreArray < Track > tracks(m_tracksColName);
   StoreArray < GFTrack > gfTracks(m_gfTracksColName);
+
+  // Needed for the initialization of the RelationArray
+  StoreArray < MCParticle > mcParticles(m_mcParticlesColName);
+
+  RelationArray gfTracksToMCPart(gfTracks, mcParticles, m_gfTracksToMCParticlesColName);
 
   if (m_createTextFile) {
     HelixParam.open("HelixParam.txt");
@@ -131,7 +140,9 @@ void GenFitterModule::event()
 {
   B2INFO("**********   GenFitterModule  ************");
 
-  StoreArray < MCParticle > mcParticles("MCParticles");
+  StoreArray < MCParticle > mcParticles(m_mcParticlesColName);
+  B2DEBUG(149, "GenFitter: total Number of MCParticles: " << mcParticles.getEntries());
+  if (mcParticles.getEntries() == 0) B2WARNING("GenFitter: MCParticlesCollection is empty!");
 
   StoreArray < GFTrackCand > trackCandidates(m_gfTrackCandsColName);
   B2INFO("GenFitter: Number of GFTrackCandidates: " << trackCandidates.getEntries());
@@ -165,6 +176,9 @@ void GenFitterModule::event()
   //StoreArrays to store the fit results
   StoreArray < Track > tracks(m_tracksColName);
   StoreArray < GFTrack > gfTracks(m_gfTracksColName);
+
+  //Create a relation between the gftracks and their most probable 'mother' MC particle
+  RelationArray gfTracksToMCPart(gfTracks, mcParticles, m_gfTracksToMCParticlesColName);
 
   //counter for fitted tracks, the number of fitted tracks may differ from the number of trackCandidates if the fit fails for some of them
   int trackCounter = -1;
@@ -292,6 +306,13 @@ void GenFitterModule::event()
               new(gfTracks->AddrAt(trackCounter)) GFTrack(gfTrack);  //GFTrack can be assigned directly
               new(tracks->AddrAt(trackCounter)) Track(); //Track is created empty, helix parameters are not available because the fit failed, but other variables may give some hint on the reason for the failure
 
+              //Create relation
+              if (trackCandidates[i]->getMcTrackId() != -999) {
+                gfTracksToMCPart.add(trackCounter, trackCandidates[i]->getMcTrackId());
+              }
+
+              else B2WARNING("No MCParticle contributed to this track! No GFTrack<->MCParticle relation will be created!");
+
               //Set non-helix parameters
               tracks[trackCounter]->setFitFailed(true);
               tracks[trackCounter]->setChi2(gfTrack.getChiSqu());
@@ -316,6 +337,13 @@ void GenFitterModule::event()
             new(gfTracks->AddrAt(trackCounter)) GFTrack(gfTrack);  //GFTrack can be assigned directly
 
             new(tracks->AddrAt(trackCounter)) Track();  //Track is created empty, parameters are set later on
+
+            //Create relation
+            if (trackCandidates[i]->getMcTrackId() != -999) {
+              gfTracksToMCPart.add(trackCounter, trackCandidates[i]->getMcTrackId());
+            }
+
+            else B2WARNING("No MCParticle contributed to this track! No GFTrack<->MCParticle relation will be created!");
 
             //Set non-helix parameters
             tracks[trackCounter]->setFitFailed(false);

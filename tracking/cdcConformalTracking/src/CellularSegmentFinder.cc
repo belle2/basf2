@@ -47,8 +47,8 @@ int CellularSegmentFinder::WireIdDifference(CDCTrackHit hit1, CDCTrackHit hit2)
 {
 
   //create instance of CDCGeometryParameters to get number of wires per layer
-  CDCGeometryPar * cdcgp = CDCGeometryPar::Instance();
-  CDCGeometryPar & cdcg(*cdcgp);
+  CDCGeometryPar* cdcgp = CDCGeometryPar::Instance();
+  CDCGeometryPar& cdcg(*cdcgp);
 
   //calculate wireId difference
   unsigned int wireIdDifference = abs(hit1.getWireId() - hit2.getWireId());
@@ -118,8 +118,8 @@ void CellularSegmentFinder::EvaluateStates(vector<CDCTrackHit> & cdcHits, int st
 
 void CellularSegmentFinder::CheckLayerNeighbours(CDCTrackHit aHit, vector<CDCTrackHit> & cdcHits)
 {
-  CDCGeometryPar * cdcgp = CDCGeometryPar::Instance();
-  CDCGeometryPar & cdcg(*cdcgp);
+  CDCGeometryPar* cdcgp = CDCGeometryPar::Instance();
+  CDCGeometryPar& cdcg(*cdcgp);
 
   int nHits = cdcHits.size();
   for (int j = 0; j < nHits; j++) {
@@ -130,7 +130,7 @@ void CellularSegmentFinder::CheckLayerNeighbours(CDCTrackHit aHit, vector<CDCTra
       //for hits which really are coming from the same tracks these two number should be similar (tracks passed between two wires)
       double wireInterval = 2 * TMath::Pi() * cdcg.innerRadiusWireLayer()[aHit.getLayerId()] / cdcg.nWiresInLayer(aHit.getLayerId());
       //B2INFO("Drifttime of the first  "<<aHit.getDriftTime()<<"   and of the second "<<cdcHits[j].getDriftTime()<<"  distance between wires "<<wireInterval);
-      if (abs(aHit.getDriftTime() + cdcHits[j].getDriftTime() - wireInterval) < 0.05*wireInterval) {
+      if (abs(aHit.getDriftTime() + cdcHits[j].getDriftTime() - wireInterval) < 0.05 * wireInterval) {
         //B2INFO("-----> Real neighbour found!");
         cdcHits[j].setSegmentIds(aHit.getSegmentIds());  //copy the segment Ids from the original hit to the "new same layer neighour"
       }
@@ -175,8 +175,8 @@ void CellularSegmentFinder::FindSegments(string CDCTrackHits, string CDCSegments
     int startLayerId = basicStartLayerId;
 
     //set number of layers for this superlayer as well as the maximum possible cellState
-    int nLayers;
-    int basicMaximumCellState;
+    int nLayers = 6;
+    int basicMaximumCellState = 5;
     int maximumCellState = basicMaximumCellState;
     //one has to distinguish between the innermost superlayer (8 layers) and other superlayers (6 layers)
     if (sl == 0) {

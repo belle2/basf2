@@ -36,6 +36,9 @@ namespace Belle2 {
       m_cotTheta = -999;
 
       m_nHits = -999;
+      m_nCDCHits = -999;
+      m_nSVDHits = -999;
+      m_nPXDHits = -999;
       m_chi2 = -999;
       m_pValue = -999;
       m_mcId = -999;
@@ -91,9 +94,22 @@ namespace Belle2 {
     /** Getter for the probability value of the track fit.
      */
     float getPValue() const {return m_pValue;}
+
     /** Getter for total number of tracker hits.
      */
     int getNHits() const {return m_nHits;}
+
+    /** Getter for number of CDC hits.
+     */
+    int getNCDCHits() const {return m_nCDCHits;}
+
+    /** Getter for number of SVD hits.
+     */
+    int getNSVDHits() const {return m_nSVDHits;}
+
+    /** Getter for number of PXD hits.
+     */
+    int getNPXDHits() const {return m_nPXDHits;}
 
     /** Getter of the MCParticle Id.
      */
@@ -173,6 +189,21 @@ namespace Belle2 {
      */
     void setNHits(const int& nHits) {
       m_nHits = nHits;
+    }
+    /** Setter for number of CDC hits.
+     */
+    void setNCDCHits(const int& nCDCHits) {
+      m_nCDCHits = nCDCHits;
+    }
+    /** Setter for number of SVD hits.
+     */
+    void setNSVDHits(const int& nSVDHits) {
+      m_nSVDHits = nSVDHits;
+    }
+    /** Setter for number of PXD hits.
+     */
+    void setNPXDHits(const int& nPXDHits) {
+      m_nPXDHits = nPXDHits;
     }
     /** Setter for the MCParticle Id.
      */
@@ -270,6 +301,18 @@ namespace Belle2 {
     /** Total number of tracking detectors (CDC, SVD, PXD) hits used for this track
      */
     int m_nHits;
+
+    /** Number CDC hits used for this track.
+     */
+    int m_nCDCHits;
+
+    /** Number SVD hits used for this track.
+     */
+    int m_nSVDHits;
+
+    /** Number PXD hits used for this track.
+     */
+    int m_nPXDHits;
 
     /** Chi2 of track fit.
         This is a measure for the quality of the track.

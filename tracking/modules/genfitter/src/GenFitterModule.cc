@@ -264,6 +264,23 @@ void GenFitterModule::event()
 
       B2INFO("Total Nr of Hits assigned to the Track: " << gfTrack.getNumHits());
 
+      //Check which hits are contributing to the track
+      int nCDC = 0;
+      int nSVD = 0;
+      int nPXD = 0;
+
+      for (unsigned int hit = 0; hit < gfTrack.getNumHits(); hit++) {
+        unsigned int detId = 0;
+        unsigned int hitId = 0;
+        trackCandidates[i]->getHit(hit, detId, hitId);
+        if (detId == 0) nPXD++;
+        if (detId == 1) nSVD++;
+        if (detId == 2) nCDC++;
+        if (detId != 0 && detId != 1 && detId != 2) B2WARNING("Hit from unknown detectorID has contributed to this track!");
+      }
+
+      B2INFO("            (CDC: " << nCDC << ", SVD: " << nSVD << ", PXD: " << nPXD << ")");
+
       if (gfTrack.getNumHits() < 3) {
         B2WARNING("GenFitter: only " << gfTrack.getNumHits() << " were assigned to the Track! This Track will not be fitted!");
         ++m_failedFitCounter;
@@ -317,6 +334,9 @@ void GenFitterModule::event()
               tracks[trackCounter]->setFitFailed(true);
               tracks[trackCounter]->setChi2(gfTrack.getChiSqu());
               tracks[trackCounter]->setNHits(gfTrack.getNumHits());
+              tracks[trackCounter]->setNCDCHits(nCDC);
+              tracks[trackCounter]->setNSVDHits(nSVD);
+              tracks[trackCounter]->setNPXDHits(nPXD);
               tracks[trackCounter]->setMCId(trackCandidates[i]->getMcTrackId());
               tracks[trackCounter]->setPDG(trackCandidates[i]->getPdgCode());
               tracks[trackCounter]->setPurity(trackCandidates[i]->getDip());
@@ -327,6 +347,7 @@ void GenFitterModule::event()
               tracks[trackCounter]->setOmega(gfTrack.getCharge());
               tracks[trackCounter]->setZ0(-999);
               tracks[trackCounter]->setCotTheta(-999);
+
             }
           } else {            //fit successful
             ++m_successfulFitCounter;
@@ -349,6 +370,9 @@ void GenFitterModule::event()
             tracks[trackCounter]->setFitFailed(false);
             tracks[trackCounter]->setChi2(gfTrack.getChiSqu());
             tracks[trackCounter]->setNHits(gfTrack.getNumHits());
+            tracks[trackCounter]->setNCDCHits(nCDC);
+            tracks[trackCounter]->setNSVDHits(nSVD);
+            tracks[trackCounter]->setNPXDHits(nPXD);
             tracks[trackCounter]->setMCId(trackCandidates[i]->getMcTrackId());
             tracks[trackCounter]->setPDG(trackCandidates[i]->getPdgCode());
             tracks[trackCounter]->setPurity(trackCandidates[i]->getDip());
@@ -365,11 +389,15 @@ void GenFitterModule::event()
             try {
               //extrapolate the track to the origin, the results are stored directly in poca and dirInPoca
               gfTrack.getCardinalRep()->extrapolateToPoint(pos, poca, dirInPoca);
+
               B2DEBUG(149, "Point of closest approach: " << poca.x() << "  " << poca.y() << "  " << poca.z());
               B2DEBUG(149, "Track direction in POCA: " << dirInPoca.x() << "  " << dirInPoca.y() << "  " << dirInPoca.z());
 
               //Now create a reference plane to get momentum and vertex position
               GFDetPlane plane(poca, dirInPoca);
+              TVector3 testPos(10., 10., 1.);
+              GFDetPlane testPlane(testPos, dirInPoca);
+              TMatrixT<double> testCovariance;
 
               //get momentum, position and covariance matrix
               TVector3 resultPosition;

@@ -1,5 +1,5 @@
 Import('env')
 
-env['LIBS'] = ['framework', 'svd_dataobjects', 'vxd_dataobjects', 'vxd', 'cdc', 'cdc_dataobjects', 'genfit']
+env['LIBS'] = ['framework', 'pxd_dataobjects', 'svd_dataobjects', 'vxd_dataobjects', 'vxd', 'cdc', 'cdc_dataobjects', 'genfit']
 Return('env')
 

@@ -155,6 +155,10 @@ namespace Belle2 {
       A1wal1_Z[5] = A1wal1_Z[4] + cA1wal1.getLength("L5") / Unit::mm;
       A1wal1_Z[6] = A1wal1_Z[5] + cA1wal1.getLength("L6") / Unit::mm;
       A1wal1_Z[7] = A1wal1_Z[6] + cA1wal1.getLength("L7") / Unit::mm;
+
+      //extend beam pipe up to 4m
+      A1wal1_Z[7] = 4000.;
+
       //
       double A1wal1_rI[A1wal1_num];
       for (int i = 0; i < A1wal1_num; i++)
@@ -1518,6 +1522,10 @@ namespace Belle2 {
       E1wal1_Z[7] = E1wal1_Z[6] + cE1wal1.getLength("L7") / Unit::mm;
       E1wal1_Z[8] = E1wal1_Z[7] + cE1wal1.getLength("L8") / Unit::mm;
       E1wal1_Z[9] = E1wal1_Z[8] + cE1wal1.getLength("L9") / Unit::mm;
+
+      //extend beam pipe up to 4m
+      E1wal1_Z[9] = -4000.;
+
       //
       double E1wal1_rI[E1wal1_num];
       for (int i = 0; i < E1wal1_num; i++)

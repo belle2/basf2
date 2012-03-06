@@ -26,7 +26,7 @@ particlegun = register_module('ParticleGun')
 # this number can be any int, preferably large
 # a value of 0 will use a different random seed each time
 # default is 3452346.
-particlegun.param('randomSeed', 1028307)
+set_random_seed(1028307)
 
 # ============================================================================
 # Setting the list of particle codes (PDG codes) for the generated particles

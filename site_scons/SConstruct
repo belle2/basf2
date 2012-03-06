@@ -152,3 +152,27 @@ if len(global_env['TEST_FILES']) > 0:
 
 global_env.RemoveNonTargets(global_env["INCDIR"])
 global_env.RemoveNonTargets(global_env["MODDIR"])
+
+
+from SCons.Script.Main import OptionsParser
+Help(OptionsParser.format_help() + """
+Targets:
+  <default> (=no target)        Build everything.
+  lib                           Build only libraries.
+  bin                           Build only executables.
+  modules                       Build only modules.
+  tests                         Build only tests.
+  test_all                      Build only the overall test executable.
+  data                          Build only data files
+                                  (copy them to the data directory).
+  include                       Build only header files
+                                  (copy them to the include directory).
+  scripts                       Build only scripts
+                                  (copy them to the lib directory).
+  <package>                     Build only the code in the given package.
+  <package>.<target>            Build only the target in the given package,
+                                  where the target can be lib, bin, etc.
+  <package>/<dir>               Build only the code in the given subdirectory.
+  <package>/<dir>.<target>      Build only the target in the given
+                                  subdirectory.                                
+""")

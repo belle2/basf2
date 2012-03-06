@@ -44,12 +44,14 @@ namespace Belle2 {
     /**
      * Constructor.
      */
-    EvtGenInterface(): m_parent(0), m_pinit(0, 0, 0, 0) {}
+    EvtGenInterface(): m_parent(0), m_Generator(0), m_pinit(0, 0, 0, 0) {}
 
     /**
      * Destructor.
      */
-    ~EvtGenInterface() {}
+    ~EvtGenInterface() {
+      if (m_Generator) delete m_Generator;
+    }
 
     int setup(const std::string& decayFileName, const std::string& pdlFileName, const std::string& userFileName = std::string(""));
     int simulateEvent(MCParticleGraph& graph);

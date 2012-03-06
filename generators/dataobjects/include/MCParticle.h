@@ -117,7 +117,7 @@ namespace Belle2 {
       m_decayTime(p.m_decayTime), m_decayVertex_x(p.m_decayVertex_x),
       m_decayVertex_y(p.m_decayVertex_y), m_decayVertex_z(p.m_decayVertex_z),
       m_mother(p.m_mother),
-      m_firstDaughter(p.m_firstDaughter), m_lastDaughter(p.m_lastDaughter) {}
+      m_firstDaughter(p.m_firstDaughter), m_lastDaughter(p.m_lastDaughter), m_spinType(p.m_spinType) {}
 
     /**
      * Return PDG code of particle.

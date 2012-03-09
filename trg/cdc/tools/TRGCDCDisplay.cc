@@ -62,11 +62,37 @@ main(int argc, char * argv[]) {
     D->clear();
     D->show();
 
-    //...Draw objects...
-    string inf = "";
+    //...For Iwasaki...
+    string inf = "1/8 of TS";
     string stg = "";
     string target = "none";
-    while (target != "quit") {
+    for (unsigned i = 0; i < cdc->nTrackSegments(); i++) {
+	if (i % 8) continue;
+	D->area().append(* cdc->trackSegment(i));
+    }
+    for (unsigned i = 0; i < cdc->nWires(); i++) {
+	const TCWire & w = * cdc->wire(i);
+	if ((w.layerId() != 2) &&
+	    (w.layerId() != 10) &&
+	    (w.layerId() != 16) &&
+	    (w.layerId() != 22) &&
+	    (w.layerId() != 28) &&
+	    (w.layerId() != 34) &&
+	    (w.layerId() != 40) &&
+	    (w.layerId() != 46) &&
+	    (w.layerId() != 52)) continue;
+	if (i % 8) continue;
+	vector<const TCWire *> v;
+	v.push_back(cdc->wire(i));
+	D->area().append(v, Gdk::Color("red"));
+    }
+    D->stage(stg);
+    D->information(inf);
+    D->show();
+    D->run();
+
+    //...Draw objects...
+    while (1) {
 
 	cout << "Enter a target to display" << endl;
 	getline(cin, target);
@@ -95,6 +121,9 @@ main(int argc, char * argv[]) {
 	}
 	else if (target == "draw") {
 	    D->run();
+	}
+	else if (target == "quit") {
+	    break;
 	}
 	else {
 	    cout << "!!! unknown target" << endl;

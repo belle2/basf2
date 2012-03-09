@@ -62,7 +62,7 @@ TRGCDC::name(void) const {
 
 std::string
 TRGCDC::version(void) const {
-    return string("TRGCDC 5.06");
+    return string("TRGCDC 5.07");
 }
 
 TRGCDC *
@@ -104,6 +104,7 @@ TRGCDC::TRGCDC(const std::string & configFile,
 	       unsigned houghFinderMeshY) 
     : _debugLevel(0),
       _configFilename(configFile),
+      _mode(0),
       _fudgeFactor(1.),
       _width(0),
       _r(0),
@@ -1162,12 +1163,17 @@ TRGCDC::simulate(void) {
         }
     }
 
+    if (_mode != 0) {
+	TRGDebug::leaveStage("TRGCDC simulation");
+	return;
+    }
+
     //...2D tracker : Hough finder...
     vector<TCTrack *> trackList;
     _hFinder->doit(trackList);
 
     //...Perfect position test...
-    vector<HepGeom::Point3D<double> > ppos = trackList[0]->perfectPosition();
+//  vector<HepGeom::Point3D<double> > ppos = trackList[0]->perfectPosition();
 
 
     //...2D tracker : helix fitter...

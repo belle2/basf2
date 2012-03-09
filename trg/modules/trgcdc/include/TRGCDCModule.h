@@ -64,6 +64,9 @@ class TRGCDCModule : public Module {
     /// Curl back stop parameter. 0:do nothing, 1:stop curling. Default is 0.
     int _curlBackStop;
 
+    /// Mode for TRGCDC simulation. 0:do everything, 1:stop after the track segment simulation. Default is 0.
+    int _mode;
+
     /// Switch for the perfect finder.
     bool _hFinderPerfect;
 

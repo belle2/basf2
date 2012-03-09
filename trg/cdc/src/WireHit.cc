@@ -123,13 +123,13 @@ TRGCDCWireHit::sortByWireId(const TRGCDCWireHit ** a,
 const CDCHit * const
 TRGCDCWireHit::hit(void) const {
     StoreArray<CDCHit> CDCHits("CDCHits");
-    CDCHits[_iCDCHit];
+    return CDCHits[_iCDCHit];
 }
 
 const CDCSimHit * const
 TRGCDCWireHit::simHit(void) const {
     StoreArray<CDCSimHit> CDCHits("CDCSimHits");
-    CDCHits[_iCDCSimHit];
+    return CDCHits[_iCDCSimHit];
 }
 
 } // namespace Belle2

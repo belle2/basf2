@@ -176,7 +176,6 @@ TRGCDCDisplayDrawingAreaRphi::drawCDC(void) {
 
 void
 TRGCDCDisplayDrawingAreaRphi::draw(void) {
-    drawWires();
     drawHits();
     for (unsigned i = 0; i < _segments.size(); i++)
         drawTrackSegment(* _segments[i],
@@ -198,6 +197,7 @@ TRGCDCDisplayDrawingAreaRphi::draw(void) {
                    1,
                    _mergerColors[i],
                    Gdk::LINE_SOLID);
+    drawWires();
 }
 
 void

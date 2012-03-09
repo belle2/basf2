@@ -99,6 +99,12 @@ class TRGCDC {
     /// returns CDC version.
     std::string versionCDC(void) const;
 
+    /// sets simulation mode.
+    unsigned mode(void) const;
+
+    /// sets simulation mode.
+    unsigned mode(unsigned);
+
     /// dumps debug information.
     void dump(const std::string & message) const;
 
@@ -275,6 +281,9 @@ class TRGCDC {
 
     /// CDC trigger configuration filename.
     std::string _configFilename;
+
+    /// Simulation mode
+    unsigned _mode;
 
     /// Super layers.
     std::vector<std::vector<TRGCDCLayer *> *> _superLayers;
@@ -529,6 +538,18 @@ inline
 unsigned
 TRGCDC::nTrackSegmentLayers(void) const {
     return _tsLayers.size();
+}
+
+inline
+unsigned
+TRGCDC::mode(void) const {
+    return _mode;
+}
+
+inline
+unsigned
+TRGCDC::mode(unsigned a) {
+    return _mode = a;
 }
 
 } // namespace Belle2

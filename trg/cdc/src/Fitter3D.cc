@@ -280,13 +280,17 @@ namespace Belle2 {
 	      const TCTSegment & s = (TCTSegment &) * (* l)[j];
 
 	      //...Example to access LR LUT...
-	      cout << s.LUT()->name() << endl;
+	      if (TRGDebug::level()) {
+		  cout << s.LUT()->name() << endl;
+	      }
 
 	      //...Get hit pattern...
 	      unsigned ptn = s.hitPattern();
 
-	      if (ptn != 0)
-		  cout << s.name() << " ... ptn=" << ptn << endl;
+	      if (TRGDebug::level()) {
+		  if (ptn != 0)
+		      cout << s.name() << " ... ptn=" << ptn << endl;
+	      }
 
 	      //...Or cal. hit pattern by my self...
 	      const std::vector<const TCWire *> & wires = s.wires();
@@ -294,16 +298,18 @@ namespace Belle2 {
 	      for (unsigned j = 0; j < wires.size(); j++) {
 		  const TRGSignal & s = wires[j]->triggerOutput();
 		  if (s.active()) {
-		      ptn2 |= (1 << j);
+//		      ptn2 |= (1 << j);
 
 		      //...Get index for CDCHit...
-		      unsigned ind = wires[j]->hit()->iCDCHit();
+//		      unsigned ind = wires[j]->hit()->iCDCHit();
 		      // Use 'ind' to access CDCSimHit.
 		  }
 	      }
 
-	      if (ptn != 0)
-		  cout << s.name() << " ... ptn2=" << ptn2 << endl;
+	      if (TRGDebug::level()) {
+		  if (ptn != 0)
+		      cout << s.name() << " ... ptn2=" << ptn2 << endl;
+	      }
 	  }
       }
     

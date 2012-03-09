@@ -28,7 +28,7 @@ REG_MODULE(TRGCDC);
 
 string
 TRGCDCModule::version() const {
-    return string("TRGCDCModule 5.04");
+    return string("TRGCDCModule 5.07");
 }
 
 TRGCDCModule::TRGCDCModule()
@@ -36,6 +36,7 @@ TRGCDCModule::TRGCDCModule()
       _debugLevel(0),
       _configFilename("TRGCDCConfig.dat"),
       _curlBackStop(0),
+      _mode(0),
       _hFinderPerfect(false),
       _hFinderMeshX(96),
       _hFinderMeshY(96),
@@ -58,6 +59,7 @@ TRGCDCModule::TRGCDCModule()
              _hFinderPerfect,
              "Hough finder perfect option",
              _hFinderPerfect);
+    addParam("SimulationMode", _mode, "TRGCDC simulation mode", _mode);
     addParam("HoughFinderMeshX",
              _hFinderMeshX,
              "Hough finder # mesh in x",
@@ -121,6 +123,9 @@ TRGCDCModule::beginRun() {
                                  _hFinderPerfect,
                                  _hFinderMeshX,
                                  _hFinderMeshY);
+
+    //...Set simulation mode...
+    _cdc->mode(_mode);
 
     if (TRGDebug::level())
         cout << "TRGCDCModule ... beginRun called " << endl;

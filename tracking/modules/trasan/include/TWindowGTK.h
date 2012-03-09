@@ -40,6 +40,8 @@ class TWindowGTK : public Gtk::Window {
     virtual void clear(void);
     bool skip(void) const;
     bool skip(bool);
+    bool skipEvent(void) const;
+    bool skipEvent(bool);
 
   public: // Status
     void stage(const std::string & stage);
@@ -157,6 +159,18 @@ inline
 bool
 TWindowGTK::skip(bool a) {
     return _skip = a;
+}
+
+inline
+bool
+TWindowGTK::skipEvent(void) const {
+    return _skipEvent;
+}
+
+inline
+bool
+TWindowGTK::skipEvent(bool a) {
+    return _skipEvent = a;
 }
 
 inline

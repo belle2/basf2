@@ -922,7 +922,7 @@ ORIGIN = Point3D(0., 0., 0.);
 
 std::string
 Trasan::version(void) const {
-    return "5.00";
+    return "5.01";
 }
 
 //...Definitions...
@@ -1392,7 +1392,8 @@ Trasan::event() {
     _hl->clear();
     _sz->clear();
 #endif
-    //    w.skip(true);
+//debug
+    w.skip(true);
 #endif
 
     //...Starting point...
@@ -1400,13 +1401,6 @@ Trasan::event() {
     
     //...Clear myself...
     clear();
-
-#ifdef TRASAN_DEBUG
-    std::cout << "Trasan TLink check : #TLinks=" << TLink::nTLinks()
-	      << ",#TLinksMax=" << TLink::nTLinksMax() << std::endl;
-    std::cout << "Trasan TTrack check : #TTracks=" << TTrack::nTTracks()
-	      << ",#TTracksMax=" << TTrack::nTTracksMax() << std::endl;
-#endif
 
     //...Update TRGCDC...
     _cdc->update(b_doMCAnalysis);
@@ -1547,7 +1541,7 @@ Trasan::event() {
 #endif
 #ifdef TRASAN_WINDOW_GTK
     AList<TLink> tmp;
-    for (unsigned i = 0; i < _trackManager.tracks().length(); i++)
+    for (unsigned i = 0; i < (unsigned) _trackManager.tracks().length(); i++)
 	tmp.append(_trackManager.tracks()[i]->links());
     w.endOfEvent();
     w.clear();
@@ -1558,8 +1552,9 @@ Trasan::event() {
     w.append(tmp, Gdk::Color("blue"));
     w.append(_trackManager.tracks(), Gdk::Color("blue"));
     w.append(_trackManager.tracks2D(), Gdk::Color("red"));
-    w.skip(false);
-    w.run();
+    w.skipEvent(true);
+//debug    w.skip(false);
+//debug    w.run();
 
 //     Glib::RefPtr<Gtk::PrintOperation> op = Gtk::PrintOperation::create(); 
 //     op->set_export_filename("test.pdf"); 

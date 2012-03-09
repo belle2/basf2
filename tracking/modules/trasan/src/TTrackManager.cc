@@ -755,8 +755,9 @@ TTrackManager::TTrackManager()
   _nCurlerMergeTest(4),
   _fitter("TTrackManager Fitter"),
   _cFitter("TTrackManager 2D Fitter"),
-  _s(0) {
-
+//cnv _s(0) {
+  _s(new summary()) {
+    memset(_s, 0, sizeof(struct summary));
 }
 
 TTrackManager::~TTrackManager() {
@@ -764,7 +765,7 @@ TTrackManager::~TTrackManager() {
 
 string
 TTrackManager::version(void) const {
-    return string("4.12");
+    return string("5.01");
 }
 
 void
@@ -1253,7 +1254,7 @@ TTrackManager::clear(bool termination) {
     if (first && !termination) {
 	first = false;
 //cnv	int size;
-	_s = 0;
+//cnv	_s = 0;
     }
 }
 

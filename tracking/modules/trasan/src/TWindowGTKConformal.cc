@@ -12,13 +12,10 @@
 // $Log$
 //-----------------------------------------------------------------------------
 
-
-
 #ifdef TRASAN_WINDOW_GTK
 
 #include <iostream>
 #include "trg/cdc/WireHit.h"
-
 #include "tracking/modules/trasan/TWindowGTKConformal.h"
 #include "tracking/modules/trasan/Trasan.h"
 #include "tracking/modules/trasan/TLink.h"

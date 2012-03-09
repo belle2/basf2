@@ -70,10 +70,10 @@ void SADInputModule::initialize()
 
   switch (m_accRing) {
     case 0 : m_PipePartMatrix->RotateY(Unit::crossingAngleLER / Unit::deg);
-      m_reader.initialize(m_PipePartMatrix, m_range, -11, m_readoutTime);
+      m_reader.initialize(m_PipePartMatrix, m_range, ReaderSAD::c_LER, m_readoutTime);
       break;
     case 1 : m_PipePartMatrix->RotateY(Unit::crossingAngleHER / Unit::deg);
-      m_reader.initialize(m_PipePartMatrix, m_range, 11,  m_readoutTime);
+      m_reader.initialize(m_PipePartMatrix, m_range, ReaderSAD::c_HER,  m_readoutTime);
       break;
     default: B2FATAL("Please specify a valid number for the accRing parameter (0 = LER, 1 = HER) !")
       break;

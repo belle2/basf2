@@ -42,6 +42,12 @@ namespace Belle2 {
     /** Exception is thrown if the end of the SAD file has been reached. */
     BELLE2_DEFINE_EXCEPTION(SADEndOfFile, "End of the SAD file.");
 
+    /** The both accelerator rings. */
+    enum AcceleratorRings {
+      c_HER = 0, /**< High Energy Ring (electrons) */
+      c_LER = 1  /**< Low Energy Ring (positrons) */
+    };
+
     /**
      * Constructor of the ReaderSAD class.
      */
@@ -56,10 +62,10 @@ namespace Belle2 {
      * Initializes the reader, sets the particle parameters and calculates important values.
      * @param transMatrix Pointer to the matrix which transforms the particles from the local SAD to the global geant4 coordinate system.
      * @param sRange The +- range for the s value for which particles are loaded.
-     * @param pdg The pdg code of the particles.
+     * @param accRing The accelerator ring from which the particles originate.
      * @param readoutTime The readout time of the detector in [ns].
      */
-    void initialize(TGeoHMatrix* transMatrix, double sRange, int pdg, double readoutTime);
+    void initialize(TGeoHMatrix* transMatrix, double sRange, AcceleratorRings accRing, double readoutTime);
 
     /**
      * Opens a root file and prepares it for reading.
@@ -110,7 +116,7 @@ namespace Belle2 {
 
     TGeoHMatrix* m_transMatrix;    /**< Transformation matrix from local SAD to global geant4 space. */
     double m_sRange;               /**< The +- range for the s value for which particles are loaded. */
-    int m_pdg;                     /**< The pdg code of the SAD particles. */
+    AcceleratorRings m_accRing;    /**< The accelerator ring from which the particles originate. */
     double m_pxRes;                /**< The resolution for the x momentum component of the SAD real particle. */
     double m_pyRes;                /**< The resolution for the y momentum component of the SAD real particle. */
 
@@ -126,7 +132,6 @@ namespace Belle2 {
     double m_lostS;             /**< lost position [m] along ring. 0 is the IP. Range goes from -L/2 to L/2, where L is the ring circumference. */
     double m_lostPx;            /**< x momentum at lost position [m]. */
     double m_lostPy;            /**< y momentum at lost position [m]. */
-    double m_lostW;             /**< weight describing loss fraction. */
     double m_lostRate;          /**< loss rate [Hz]> */
     double m_lostE;             /**< energy at lost position [m]. */
 

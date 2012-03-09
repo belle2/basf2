@@ -19,7 +19,7 @@ using namespace Belle2;
 
 
 ReaderSAD::ReaderSAD(): m_file(NULL), m_tree(NULL), m_transMatrix(NULL),
-  m_sRange(300.0), m_pdg(-11), m_pxRes(0.01), m_pyRes(0.01),
+  m_sRange(300.0), m_accRing(ReaderSAD::c_LER), m_pxRes(0.01), m_pyRes(0.01),
   m_SADToRealFactor(5.76e6), m_readoutTime(20.0), m_realPartNum(0),
   m_realPartEntry(0), m_readEntry(0)
 {
@@ -32,11 +32,11 @@ ReaderSAD::~ReaderSAD()
 }
 
 
-void ReaderSAD::initialize(TGeoHMatrix* transMatrix, double sRange, int pdg, double readoutTime)
+void ReaderSAD::initialize(TGeoHMatrix* transMatrix, double sRange, ReaderSAD::AcceleratorRings accRing, double readoutTime)
 {
   m_transMatrix = transMatrix;
   m_sRange = sRange;
-  m_pdg = pdg;
+  m_accRing = accRing;
   m_readoutTime = readoutTime;
 }
 
@@ -60,7 +60,6 @@ void ReaderSAD::open(const string& filename) throw(SADCouldNotOpenFileError)
   m_tree->SetBranchAddress("s", &m_lostS);
   m_tree->SetBranchAddress("px", &m_lostPx);
   m_tree->SetBranchAddress("py", &m_lostPy);
-  m_tree->SetBranchAddress("w", &m_lostW);
   m_tree->SetBranchAddress("rate", &m_lostRate);
   m_tree->SetBranchAddress("E", &m_lostE);
 
@@ -177,7 +176,14 @@ void ReaderSAD::addParticleToMCParticles(MCParticleGraph& graph, bool gaussSmear
   //Add particle to MCParticle collection
   MCParticleGraph::GraphParticle& particle = graph.addParticle();
   particle.setStatus(MCParticle::c_PrimaryParticle);
-  particle.setPDG(m_pdg);
+
+  switch (m_accRing) {
+    case c_HER: particle.setPDG(11); //electrons
+      break;
+    case c_LER: particle.setPDG(-11); //positrons
+      break;
+  }
+
   particle.setMassFromPDG();
   particle.setChargeFromPDG();
 
@@ -201,7 +207,16 @@ void ReaderSAD::addParticleToMCParticles(MCParticleGraph& graph, bool gaussSmear
     particleMomSAD[0] = m_lostPx;
     particleMomSAD[1] = -m_lostPy;
   }
-  particleMomSAD[2] = -sqrt(totalMomSqr - (particleMomSAD[0] *  particleMomSAD[0]) - (particleMomSAD[1] *  particleMomSAD[1]));
+
+  double zMom = sqrt(totalMomSqr - (particleMomSAD[0] *  particleMomSAD[0]) - (particleMomSAD[1] *  particleMomSAD[1]));
+
+  switch (m_accRing) {
+    case c_HER: particleMomSAD[2] = zMom;
+      break;
+    case c_LER: particleMomSAD[2] = -zMom;
+      break;
+  }
+
   m_transMatrix->LocalToMasterVect(particleMomSAD, particleMomGeant4);
 
   //Set missing particle information

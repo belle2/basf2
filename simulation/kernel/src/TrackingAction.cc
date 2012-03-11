@@ -19,7 +19,6 @@
 using namespace Belle2;
 using namespace Belle2::Simulation;
 
-
 TrackingAction::TrackingAction(MCParticleGraph& mcParticleGraph): G4UserTrackingAction(), m_mcParticleGraph(mcParticleGraph)
 {
 
@@ -34,6 +33,9 @@ TrackingAction::~TrackingAction()
 
 void TrackingAction::PreUserTrackingAction(const G4Track* track)
 {
+  //We only want to do the following for new tracks, not for suspended and reactivated ones"
+  if (track->GetCurrentStepNumber() > 0) return;
+
   const G4DynamicParticle* dynamicParticle = track->GetDynamicParticle();
 
   try {
@@ -75,6 +77,21 @@ void TrackingAction::PostUserTrackingAction(const G4Track* track)
   try {
     MCParticleGraph::GraphParticle& currParticle = TrackInfo::getInfo(*track);
 
+    //Add particle and decay Information to all secondaries
+    BOOST_FOREACH(G4Track * daughterTrack, *fpTrackingManager->GimmeSecondaries()) {
+
+      //Add the particle to the particle graph and as UserInfo to the track
+      //if it is a secondary particle created by Geant4.
+      if (daughterTrack->GetDynamicParticle()->GetPrimaryParticle() == NULL && daughterTrack->GetUserInformation() == NULL) {
+        MCParticleGraph::GraphParticle& graphParticle = m_mcParticleGraph.addParticle();
+        const_cast<G4Track*>(daughterTrack)->SetUserInformation(new TrackInfo(graphParticle));
+
+        currParticle.decaysInto(graphParticle); //Add the decay
+      }
+    }
+    //If the track is just suspended we can return here: the rest should be filled once the track is done
+    if (track->GetTrackStatus() == fSuspend) return;
+
     //Check if particle left detector.
     //fWorldBoundary seems to be broken, check if poststep is on boundary and next volume is 0
     if (postStep->GetStepStatus() == fGeomBoundary && track->GetNextVolume() == NULL) {
@@ -92,18 +109,6 @@ void TrackingAction::PostUserTrackingAction(const G4Track* track)
     currParticle.setDecayTime(postStep->GetGlobalTime() * Unit::ns);
     currParticle.setValidVertex(true);
 
-    //Add particle and decay Information to all secondaries
-    BOOST_FOREACH(G4Track * daughterTrack, *fpTrackingManager->GimmeSecondaries()) {
-
-      //Add the particle to the particle graph and as UserInfo to the track
-      //if it is a secondary particle created by Geant4.
-      if (daughterTrack->GetDynamicParticle()->GetPrimaryParticle() == NULL) {
-        MCParticleGraph::GraphParticle& graphParticle = m_mcParticleGraph.addParticle();
-        const_cast<G4Track*>(daughterTrack)->SetUserInformation(new TrackInfo(graphParticle));
-
-        currParticle.decaysInto(graphParticle); //Add the decay
-      }
-    }
   } catch (CouldNotFindUserInfo& exc) {
     B2FATAL(exc.what())
   }

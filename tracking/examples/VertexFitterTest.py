@@ -46,8 +46,8 @@ vertexfitter2 = register_module('VertexFitter2')
 # rave.logging.log_level = LogLevel.INFO
 
 # Register VertexFitterStat
-#vertexfitterstat = register_module('VertexFitterStatistics')
-#vertexfitterstat.logging.log_level = LogLevel.INFO
+# vertexfitterstat = register_module('VertexFitterStatistics')
+# vertexfitterstat.logging.log_level = LogLevel.INFO
 
 # print
 printcol = register_module('PrintCollections')
@@ -55,8 +55,6 @@ printcol = register_module('PrintCollections')
 # Output
 output = register_module('SimpleOutput')
 
-import random
-intseed = random.randint(1, 10000000)
 # Set parameters
 
 # one event
@@ -64,11 +62,8 @@ evtmetagen.param('ExpList', [0])
 evtmetagen.param('RunList', [1])
 evtmetagen.param('EvtNumList', [20])
 
-param_pGun = {  # 'randomSeed': 1028307,
-                # 'randomSeed': 1111300,
-                # 'randomSeed': intseed,
+param_pGun = {
     'pdgCodes': [13, -13],
-    'randomSeed': 5679893,
     'nTracks': 3,
     'momentumGeneration': 'uniform',
     'momentumParams': [1., 1.],
@@ -124,10 +119,10 @@ main.add_module(cdcDigitizer)
 main.add_module(mctrackfinder)
 main.add_module(cdcfitting)
 main.add_module(vertexfitter2)
-#main.add_module(vertexfitterstat)
+# main.add_module(vertexfitterstat)
 main.add_module(output)
 
 # Process events
 process(main)
-print intseed
+
 print statistics

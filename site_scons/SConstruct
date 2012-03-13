@@ -62,8 +62,10 @@ if GetOption('extralibpath'):
 option = os.environ['BELLE2_OPTION']
 if option == 'debug':
     global_env.Append(CCFLAGS = '-g')
+    global_env.Append(FORTRANFLAGS = '-g')
 elif option == 'opt':
     global_env.Append(CCFLAGS = '-O3')
+    global_env.Append(FORTRANFLAGS = '-O3')
 elif option == 'intel':
     intel_dir = None
     for dir in os.environ.get('PATH', '').split(os.pathsep):

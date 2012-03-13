@@ -30,13 +30,13 @@ fi
 basf2 $1
 
 
-##########
-#touch hanyltest1.root
-#touch hanyltest2.root
-##########
-
-
 ##############################################################################
 # Work with output files, metadata
 ##############################################################################
-./gbasf2output.py -s $1
+if [ $? -eq 0 ] 
+  then
+    ./gbasf2output.py -s $1
+  else
+    cat basf2.error
+    echo "basf2 execution occur error"
+fi

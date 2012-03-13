@@ -55,8 +55,8 @@ def main():
 
     cliParams.validOption()
 
-    CheckAndRemoveProjectIfForce(proxyinfo['Value']['username'],
-                                 cliParams.getProject())
+    status = CheckAndRemoveProjectIfForce(proxyinfo['Value']['username'],
+            cliParams.getProject())
 
     if cliParams.getDataType == 'gen-mc':
         results = {}
@@ -103,7 +103,7 @@ def main():
 
   # keep track of the number of events submitted
     totalevents = 0
-    numberOfJobs = 0
+    numberOfJobs = status[1]
     numberofLfns = 1
     tmp = 0
   # for each of the lfns, make a job and submit it

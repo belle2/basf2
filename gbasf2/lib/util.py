@@ -20,43 +20,52 @@ def CheckAndRemoveProjectIfForce(username=None, project=None):
     from DIRAC.Interfaces.API import Dirac
     from DIRAC.Core.Base import Script
 
+    projectStatus = None
+
     ac = AmgaClient()
     directory = '/belle2/user/belle/' + username + '/' + project
     if ac.checkDirectoryOnly(directory):
-        print 'The project has been in the AMGA server. Do you really want to ' \
-            + 'force to execute it again?(Y/N)'
-        user_input = raw_input('Please enter Y or N: ')
-        if user_input.upper() == 'N':
+        print 'The project has been in the AMGA server. Do you want to give up(G), or ' \
+            + 'force to execute it by remove the previous one(R), or add this project the previous(A)?'
+        user_input = raw_input('Please enter G, R or A: ')
+        if user_input.upper() == 'G':
             print 'You have terminated the project'
             DIRAC.exit(1)
-        elif user_input.upper() != 'Y':
-            print 'You must eneter Y or N'
+        elif user_input.upper() != 'R' or user_input.upper() != 'A':
+            print 'You must eneter G or R or A'
             DIRAC.exit(1)
         else:
-            gLogger.debug('The removed directory is %s' % directory)
+            gLogger.debug('The exsited directory is %s' % directory)
             files = ac.getSubdirectories(directory)
-            gLogger.debug('The removed files in  AMGA is %s' % str(files))
+            gLogger.debug('The exsited files in  AMGA is %s' % str(files))
             results = ac.directQueryWithAttributes(directory, '2>1', ['lfn'])
-            gLogger.debug('The removed lfns is %s' % str(results))
-            Script.parseCommandLine(ignoreErrors=True)
-            dirac = Dirac.Dirac()
-            for result in results:
-                rm_result = dirac.removeFile(results[result]['lfn'
-                        ].replace('belle2', 'belle'))
-                if rm_result['OK']:
-                    print 'we have removed %s in the storage element' \
-                        % results[result]['lfn'].replace('belle2', 'belle')
-            for file in files:
-                if ac.rm(file):
-                    print 'We have removed the file %s in AMGA' % file
+            gLogger.debug('The exsited lfns is %s' % str(results))
+            if user_input.upper() != 'R':
+                Script.parseCommandLine(ignoreErrors=True)
+                dirac = Dirac.Dirac()
+                for result in results:
+                    rm_result = dirac.removeFile(results[result]['lfn'
+                            ].replace('belle2', 'belle'))
+                    if rm_result['OK']:
+                        print 'we have removed %s in the storage element' \
+                            % results[result]['lfn'].replace('belle2', 'belle')
+                for file in files:
+                    if ac.rm(file):
+                        print 'We have removed the file %s in AMGA' % file
+                    else:
+                        print 'Error occur when remove the file %s in AMGA' \
+                            % file
+                        DIRAC.exit(1)
+                if ac.removeDir(directory):
+                    print 'We have removed the diretory %s' % directory
                 else:
-                    print 'Error occur when remove the file %s in AMGA' % file
+                    print 'Error occur when remove the directory %s' \
+                        % directory
                     DIRAC.exit(1)
-            if ac.removeDir(directory):
-                print 'We have removed the diretory %s' % directory
+                projectStatus = ('New', 0)
             else:
-                print 'Error occur when remove the directory %s' % directory
-                DIRAC.exit(1)
+                projectStatus = ('Old', len(results))
+        return projectStatus
 
 
 def make_jdl(

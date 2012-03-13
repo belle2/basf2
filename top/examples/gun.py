@@ -10,7 +10,7 @@
 # The different options for the particle gun are explained below.
 # Uncomment/comment different lines to get the wanted settings
 #
-# Example steering file - 2011 Belle II Collaboration
+# Example steering file - 2012 Belle II Collaboration
 ##############################################################################
 
 from basf2 import *

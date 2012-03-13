@@ -35,11 +35,11 @@ def CheckAndRemoveProjectIfForce(username=None, project=None):
             print 'You must eneter G or R or A'
             DIRAC.exit(1)
         else:
-            gLogger.debug('The exsited directory is %s' % directory)
+            gLogger.debug('The existed directory is %s' % directory)
             files = ac.getSubdirectories(directory)
-            gLogger.debug('The exsited files in  AMGA is %s' % str(files))
+            gLogger.debug('The existed files in  AMGA is %s' % str(files))
             results = ac.directQueryWithAttributes(directory, '2>1', ['lfn'])
-            gLogger.debug('The exsited lfns is %s' % str(results))
+            gLogger.debug('The existed lfns is %s' % str(results))
             if user_input.upper() != 'R':
                 Script.parseCommandLine(ignoreErrors=True)
                 dirac = Dirac.Dirac()

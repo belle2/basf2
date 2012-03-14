@@ -16,6 +16,7 @@
 #include <generators/dataobjects/MCParticleGraph.h>
 
 #include <evtgen/EvtGen/EvtGen.hh>
+#include <evtgen/EvtGenBase/EvtCPUtil.hh>
 #include <evtgen/EvtGenBase/EvtParticle.hh>
 #include <evtgen/EvtGenBase/EvtParticleFactory.hh>
 #include <evtgen/EvtGenBase/EvtPatches.hh>

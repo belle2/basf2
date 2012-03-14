@@ -14,12 +14,14 @@
 
 #include <arich/dataobjects/ARICHAeroHit.h>
 #include <arich/modules/arichReconstruction/ARICHTrack.h>
+#include <generators/dataobjects/MCParticle.h>
 
 #include <framework/core/ModuleManager.h>
 
 // framework - DataStore
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
+#include <framework/datastore/RelationArray.h>
 
 // framework aux
 #include <framework/gearbox/Unit.h>
@@ -83,6 +85,8 @@ namespace Belle2 {
 
       StoreArray<ARICHAeroHit> arichAeroHits;
       StoreArray<ARICHTrack> arichTracks;
+      StoreArray<MCParticle> mcParticles;
+      RelationArray arichTrackRel(mcParticles, arichTracks);
 
     }
 
@@ -123,6 +127,12 @@ namespace Belle2 {
       for (int iTrack = 0; iTrack < nTracks; ++iTrack) {
         ARICHAeroHit* aeroHit = arichAeroHits[iTrack];
         new(arichTracks->AddrAt(iTrack)) ARICHTrack(*aeroHit);
+        int trackID = aeroHit->getTrackID();
+
+        StoreArray<MCParticle> mcParticles;
+        RelationArray  arichTrackRel(mcParticles, arichTracks);
+        arichTrackRel.add(trackID, iTrack);
+
       } // for iTrack
 
       m_ana->ReconstructParticles();

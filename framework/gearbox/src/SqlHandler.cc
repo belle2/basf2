@@ -14,7 +14,10 @@
 #include <root/TSQLResult.h>
 #include <root/TSQLRow.h>
 #include <root/TSQLStatement.h>
+
+#ifdef HAS_ROOTPGSQL
 #include <root/TPgSQLStatement.h>
+#endif
 
 #include <framework/logging/Logger.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -66,8 +69,8 @@ namespace Belle2 {
         TString loption = ((TObjString*) objOptions->At(n))->GetName();
 
 
-        char* optoperator[] = {"=", ">", "<", ">=", "<=", "!="};
-        char* Operator = (char*)  optoperator[0];
+        TString optoperator[] = {"=", ">", "<", ">=", "<=", "!="};
+        TString Operator = optoperator[0];
         for (int i = 0; i < 6; i++) if (loption.Contains(optoperator[i])) Operator = optoperator[i];
 
         TObjArray* objTags = loption.Tokenize(Operator);

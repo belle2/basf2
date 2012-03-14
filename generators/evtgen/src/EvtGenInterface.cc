@@ -35,9 +35,10 @@ int EvtGenInterface::setup(const std::string& DECFileName, const std::string& pd
 {
   B2INFO("starting initialisation of EvtGen Interface. ");
 
-  EvtRandom::setRandomEngine((EvtRandomEngine *)&m_eng);
+  EvtRandom::setRandomEngine((EvtRandomEngine*)&m_eng);
   if (!m_Generator) {
-    m_Generator = new EvtGen(DECFileName.c_str(), pdlFileName.c_str(), (EvtRandomEngine *)&m_eng);
+    int mixingType = EvtCPUtil::Coherent;
+    m_Generator = new EvtGen(DECFileName.c_str(), pdlFileName.c_str(), (EvtRandomEngine*)&m_eng, 0, 0, mixingType);
   }
   if (!userFileName.empty()) {
     m_Generator->readUDecay(userFileName.c_str());
@@ -59,7 +60,7 @@ int EvtGenInterface::setup(const std::string& DECFileName, const std::string& pd
 }
 
 
-int EvtGenInterface::simulateEvent(MCParticleGraph &graph)
+int EvtGenInterface::simulateEvent(MCParticleGraph& graph)
 {
   //  B2INFO("Starting event simulation.");
 
@@ -86,16 +87,16 @@ int EvtGenInterface::simulateEvent(MCParticleGraph &graph)
 
 
 
-int EvtGenInterface::addParticles2Graph(EvtParticle * top, MCParticleGraph &graph)
+int EvtGenInterface::addParticles2Graph(EvtParticle* top, MCParticleGraph& graph)
 {
   //Fill top particle in the tree & starting the queue:
   int position = graph.size();
   int nParticles = 0;
   graph.addParticle(); nParticles++;
-  MCParticleGraph::GraphParticle *p = &graph[position];
+  MCParticleGraph::GraphParticle* p = &graph[position];
   updateGraphParticle(top, p);
 
-  typedef pair<MCParticleGraph::GraphParticle *, EvtParticle*> halfFamily;
+  typedef pair<MCParticleGraph::GraphParticle*, EvtParticle*> halfFamily;
   halfFamily currFamily;
   queue < halfFamily > heritancesQueue;
 
@@ -110,13 +111,13 @@ int EvtGenInterface::addParticles2Graph(EvtParticle * top, MCParticleGraph &grap
     currFamily = heritancesQueue.front(); //get the first entry from the queue
     heritancesQueue.pop(); //remove the entry.
 
-    MCParticleGraph::GraphParticle * currMother = currFamily.first;
-    EvtParticle * currDaughter = currFamily.second;
+    MCParticleGraph::GraphParticle* currMother = currFamily.first;
+    EvtParticle* currDaughter = currFamily.second;
 
     //putting the daughter in the graph:
     position = graph.size();
     graph.addParticle(); nParticles++;
-    MCParticleGraph::GraphParticle * graphDaughter = &graph[position];
+    MCParticleGraph::GraphParticle* graphDaughter = &graph[position];
     updateGraphParticle(currDaughter, graphDaughter);
     position = graph.size();
 
@@ -144,8 +145,9 @@ int EvtGenInterface::addParticles2Graph(EvtParticle * top, MCParticleGraph &grap
 }
 
 
-void EvtGenInterface::updateGraphParticle(EvtParticle * eParticle, MCParticleGraph::GraphParticle * gParticle)
-{//updating the GraphParticle information from the EvtParticle information
+void EvtGenInterface::updateGraphParticle(EvtParticle* eParticle, MCParticleGraph::GraphParticle* gParticle)
+{
+  //updating the GraphParticle information from the EvtParticle information
 
   gParticle->setStatus(MCParticle::c_PrimaryParticle);
   gParticle->setMass(eParticle->mass());

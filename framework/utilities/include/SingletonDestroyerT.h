@@ -33,7 +33,7 @@ namespace Belle2 {
     /** Destructor destroys Singleton, if one is available.
      */
     ~SingletonDestroyerT() {
-      if (m_doomed != NULL) delete m_doomed;
+      delete m_doomed;
     }
 
     /** Reset the pointer to the Singleton, that shall be destroyed.

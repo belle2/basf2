@@ -53,7 +53,7 @@ bool ParticleGun::generateEvent(MCParticleGraph& graph)
   double vz = generateValue(m_params.vertexDist, m_params.zVertexParams);
 
   //Determine number of tracks
-  int nTracks = m_params.nTracks;
+  int nTracks = static_cast<int>(m_params.nTracks);
   if (m_params.nTracks <= 0) {
     nTracks = m_params.pdgCodes.size();
   } else if (m_params.varyNumberOfTracks) {

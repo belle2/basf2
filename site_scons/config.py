@@ -91,18 +91,12 @@ def configure_system(conf):
     xml_env.ParseConfig('xml2-config --libs')
     conf.env['XML_LIBS'] = xml_env['LIBS']
 
-    # graphics packages: OpenGL, OpenSceneGraph, Qt
-    conf.env['HAS_GRAPHICS'] = False
-    conf.env['GRAPHICS_LIBS'] = []
-    graphics_packages = \
-        'gl openscenegraph QtCore QtOpenGL QtDesignerComponents QtGui'
-    if conf.CheckPackage(graphics_packages, 'graphics packages'):
-        conf.env['HAS_GRAPHICS'] = True
-        conf.env.ParseConfig('pkg-config %s --cflags --libs-only-L'
-                             % graphics_packages)
-        graphics_env = Environment(ENV=os.environ)
-        graphics_env.ParseConfig('pkg-config %s --libs' % graphics_packages)
-        conf.env['GRAPHICS_LIBS'] = graphics_env['LIBS']
+    # TEve
+    conf.env['HAS_TEVE'] = False
+    conf.env['TEVE_LIBS'] = []
+    if conf.CheckFile(os.path.join(conf.env['EXTLIBDIR'], 'libEve.so')):
+        conf.env['HAS_TEVE'] = True
+        conf.env['TEVE_LIBS'] = ['Gui', 'Eve', 'Ged', 'RGL', 'TreePlayer']
 
     # sqlite3
     conf.env['HAS_SQLITE'] = False

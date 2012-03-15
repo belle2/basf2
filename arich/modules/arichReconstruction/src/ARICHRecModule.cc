@@ -86,7 +86,7 @@ namespace Belle2 {
       StoreArray<ARICHAeroHit> arichAeroHits;
       StoreArray<ARICHTrack> arichTracks;
       StoreArray<MCParticle> mcParticles;
-      RelationArray arichTrackRel(mcParticles, arichTracks);
+      RelationArray relAeroToTracks(arichAeroHits, arichTracks);
 
     }
 
@@ -129,9 +129,9 @@ namespace Belle2 {
         new(arichTracks->AddrAt(iTrack)) ARICHTrack(*aeroHit);
         int trackID = aeroHit->getTrackID();
 
-        StoreArray<MCParticle> mcParticles;
-        RelationArray  arichTrackRel(mcParticles, arichTracks);
-        arichTrackRel.add(trackID, iTrack);
+//        StoreArray<MCParticle> mcParticles;
+        RelationArray  relAeroToTracks(arichAeroHits, arichTracks);
+        relAeroToTracks.add(iTrack, iTrack);
 
       } // for iTrack
 

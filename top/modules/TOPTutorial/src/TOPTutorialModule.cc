@@ -14,8 +14,6 @@
 #include <time.h>
 
 // Hit classes
-
-#include <simulation/dataobjects/BeamBackHit.h>
 #include <top/dataobjects/TOPTrack.h>
 #include <top/dataobjects/TOPLikelihoods.h>
 #include <arich/modules/arichReconstruction/ARICHTrack.h>
@@ -23,28 +21,26 @@
 
 
 #include <GFTrack.h>
-//#include <top/dataobjects/TOPHit.h>
 #include <generators/dataobjects/MCParticle.h>
+
 // framework - DataStore
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationIndex.h>
 #include <framework/datastore/RelationArray.h>
+
 // framework aux
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
-
-// ROOT
-#include <TVector2.h>
 #include <TClonesArray.h>
-
+// Framwrok
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/gearbox/Unit.h>
-
+//BOOST
 #include <boost/format.hpp>
 #include <boost/foreach.hpp>
-
+//Generators
 #include <generators/utilities/cm2LabBoost.h>
 
 using namespace std;
@@ -401,7 +397,7 @@ namespace Belle2 {
 
         TLorentzVector B = B0[i];
 
-        double B0mass = B.Mag();
+        //double B0mass = B.Mag();
 
         B.Boost(boostToCMS);
         m_deltae = B.E() - cmsE;
@@ -422,7 +418,7 @@ namespace Belle2 {
 
         TLorentzVector B = B0bar[i];
 
-        double B0mass = B.Mag();
+        //double B0mass = B.Mag();
 
         B.Boost(boostToCMS);
         m_deltae = B.E() - cmsE;

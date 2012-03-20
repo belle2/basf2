@@ -130,11 +130,10 @@ if repository and not GetOption('local'):
 
 
 # build global dataobjects library
-if len(global_env['DATAOBJECT_LIBS']) > 0:
-    global_env['LIBS'] = global_env['DATAOBJECT_LIBS']
-    empty_file = Command(os.path.join(global_env['BUILDDIR'], 'empty.cc'), '', Touch('$TARGET'))
-    lib = global_env.SharedLibrary(os.path.join(global_env['LIBDIR'], 'dataobjects'), empty_file)
-    global_env.Alias('lib', lib)
+empty_file = Command(os.path.join(global_env['BUILDDIR'], 'empty.cc'), '', Touch('$TARGET'))
+lib = global_env.SharedLibrary(os.path.join(global_env['LIBDIR'], 'dataobjects'), empty_file,
+                               LIBS = global_env['DATAOBJECT_LIBS'] + ['framework'])
+global_env.Alias('lib', lib)
 
 # build global test executable
 if len(global_env['TEST_FILES']) > 0:

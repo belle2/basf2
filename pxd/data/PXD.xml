@@ -2,15 +2,27 @@
 <DetectorComponent name="PXD" xmlns:xi="http://www.w3.org/2001/XInclude">
   <Creator library="pxd">PXDCreator</Creator>
   <Content>
-    <!--Settings for background and exposure studies -->
+    <!-- Settings for background and exposure studies -->
     <ActiveChips desc="Set to true to make chips on sensors sensitive">false</ActiveChips>
     <SeeNeutrons desc="Set to true to make sensitive detectors see neutrons">false</SeeNeutrons>
+    <!-- Include Alignment information -->
     <xi:include href="PXD-Alignment.xml"/>
+    <!-- Include definition of logical volume encapsulating the PXD -->
     <xi:include href="PXD-Envelope.xml"/>
+    <!-- Include the definition of the mechanical support -->
     <xi:include href="PXD-Support.xml"/>
+    <!-- Include the definition of all the components like ladders, sensors and
+         chips -->
     <xi:include href="PXD-Components.xml"/>
+
+    <!-- PXD is build as two half shells which will be attached to the beampipe
+         from the sides. We follow this scheme in the simulation geometry for
+         alignment purposes. Each shell consists of a number of ladders for
+         each layer. -->
     <HalfShell name="Ying">
+      <!-- For this shell we place the support without any rotation -->
       <Support><phi unit="deg">0</phi></Support>
+      <!-- Define the ladders in each layer with increasing phi angle -->
       <Layer id="1">
         <Ladder id="1"><phi unit="deg">0</phi></Ladder>
         <Ladder id="2"><phi unit="deg">45</phi></Ladder>
@@ -27,9 +39,14 @@
       </Layer>
     </HalfShell>
     <HalfShell name="Yang">
+      <!-- Place the support with an rotation of 180 degree around the z-axis
+           compared to form second half -->
       <Support><phi unit="deg">180</phi></Support>
+      <!-- Define the ladders in each layer with increasing phi angle. The
+           ladder ids are unique per layer and thus are continued from the
+           first half shell -->
       <Layer id="1">
-	<Ladder id="5"><phi unit="deg">180</phi></Ladder>
+        <Ladder id="5"><phi unit="deg">180</phi></Ladder>
         <Ladder id="6"><phi unit="deg">225</phi></Ladder>
         <Ladder id="7"><phi unit="deg">270</phi></Ladder>
         <Ladder id="8"><phi unit="deg">315</phi></Ladder>

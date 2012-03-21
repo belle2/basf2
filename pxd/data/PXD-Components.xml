@@ -1,10 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Components>
+  <!-- each ladder consists out of two modules which are glued together
+       at the middle. The module in forward direction is the same as int
+       the backward direction but mirrored at the global xy plane. The
+       inner layer is facing inwards (chips pointing to the beampipe),
+       the outer layer is pointing outwards (chips pointing to SVD).
+
+       Due to problems with Geant4 <-> TGeo conversion this glue is
+       disabled for now but this should not pose any problems as it is
+       only about 500µm x 50 µm x 15.4 mm and does not contribute
+       significantly to the material budget. -->
+
   <Ladder layer="1">
+    <!-- shift defines the shift of the sensor center along the rphi direction
+         of the ladder to create the windmill structure -->
     <shift  unit="mm"> 3.500</shift>
+    <!-- radius (together with the phi angle specified in PXD.xml for each
+         ladder) specifies the center of the local coordinate system for the
+         ladder: x along rphi, 0 at specified phi, y going outward 0 at
+         specified radius, z = global z, 0 at global 0 -->
     <radius unit="mm">14.000</radius>
     <!-- Disabled as it causes problems with TGeo conversion -->
     <!--<Glue><oversize unit="um">20</oversize><Material>PXD-Glue</Material></Glue>-->
+    <!-- The value of Sensors is the global z position -->
     <Sensor id="1" unit="mm" flipW="true" flipV="true"> 48.013</Sensor>
     <Sensor id="2" unit="mm" flipW="true">-20.013</Sensor>
   </Ladder>
@@ -23,18 +41,33 @@
     <width  unit="mm">15.400</width>
     <length unit="mm">67.975</length>
     <height unit="mm"> 0.420</height>
+    <!-- definition of the active area of the module which is a part of the
+         whole thing. The position is given relative to the lower left edge of
+         the module (the point with the most negative local coordinates). -->
     <Active>
       <u unit="mm"> 0.600</u>
       <v unit="mm">22.775</v>
       <width  unit="mm">12.500</width>
       <length unit="mm">44.800</length>
       <height unit="mm"> 0.075</height>
+      <!-- limit the Geant4 stepsize to get precise information on the landau fluctuation -->
       <stepSize unit="um">5</stepSize>
+      <!-- define the number of pixels in rphi direction -->
       <pixelsR>250</pixelsR>
+      <!-- define the number of pixels in z direction. There are two values
+           since we have two different pixel sizes inside of one module: Larger
+           pixels in the outer area, smaller pixels in the middle -->
       <pixelsZ>512</pixelsZ>
       <pixelsZ>256</pixelsZ>
+      <!-- splitLength defines the position inside the active area (starting at
+           the outside) where the pixel size changes. Pixel size is calculated
+           automatically from the size of the active area and the number of
+           pixels -->
       <splitLength unit="mm">30.720</splitLength>
 
+      <!-- Parameters describing the physical attributes of the sensor needed
+           for digitization. The voltages might be time dependent and than
+           should be placed somewhere else -->
       <BulkDoping unit="1/um^3">10.0</BulkDoping>
       <BackVoltage unit="V">-60.0</BackVoltage>
       <TopVoltage unit="V">0.0</TopVoltage>
@@ -44,9 +77,21 @@
       <GateDepth unit="um">22</GateDepth>
       <DoublePixel>true</DoublePixel>
 
+      <!-- Define the integration window to be 20µs. This probably should go
+           somewhere else -->
       <IntegrationStart unit="us">-10.0</IntegrationStart>
       <IntegrationEnd   unit="us"> 10.0</IntegrationEnd>
     </Active>
+    <!-- now we place some components on the sensor by giving the name of the
+         component defined further down and the positions of all placements on
+         the sensor in local coordinates, starting at the lower left edge
+
+         possible placements for the w-coordinate are:
+          - below: place below the sensor surface
+          - bottom: place in the sensor but at the bottom
+          - center: place in the sensor center
+          - top: place in the sensor touching the top surface
+          - above place on top of the sensor surface -->
     <Component type="ThinningLayer1">
       <u unit="mm"> 7.000</u><v unit="mm">45.390</v>
     </Component>
@@ -69,6 +114,8 @@
     </Component>
   </Sensor>
 
+  <!-- The sensor in layer 2 is almost the same as for layer one except for the
+       dimensions -->
   <Sensor layer="2">
     <Material>Si</Material>
     <Color>#006699</Color>
@@ -121,6 +168,17 @@
       <u unit="mm">14.189</u><v unit="mm">52.242</v><w>above</w>
     </Component>
   </Sensor>
+
+  <!-- No we start defining components of the sensor by assigning a Material
+       and color to given box dimensions. If angle is specified, all for edges
+       of the box will be slanted with the given angle between surface and edge
+       getting thinner in positive w direction. This is needed for etchings in
+       the silicon as etching is done along the crystal orientation.
+
+       Components can be placed in other components, but then the coordinates
+       are given with respect to the center of the mother component. If no
+       dimensions are given for the mother component it will be created just
+       large enough to contain all placements -->
 
   <Component name="ThinningLayer1">
     <Material>ColdAir</Material>

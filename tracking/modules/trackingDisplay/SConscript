@@ -6,6 +6,6 @@ if env.has_key('HAS_TEVE'):
     print "TrackingDisplayModule disabled, please recompile root with opengl support (on Debian/Ubuntu you'll probably only need to install libglu1-mesa-dev and rebuild)"
 
   env['CONTINUE'] = env['HAS_TEVE']
-  env['LIBS'] = ['$ROOT_LIBS', 'tracking', 'framework', 'genfit', 'RKTrackRep'] + env['TEVE_LIBS']
+  env['LIBS'] = ['$ROOT_LIBS', 'tracking', 'framework', 'geometry', 'vxd', 'pxd_dataobjects', 'svd_dataobjects', 'cdc_dataobjects', 'genfit', 'RKTrackRep'] + env['TEVE_LIBS']
 
 Return('env')

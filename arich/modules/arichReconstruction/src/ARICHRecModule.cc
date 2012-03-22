@@ -13,8 +13,9 @@
 #include <time.h>
 
 #include <arich/dataobjects/ARICHAeroHit.h>
+#include <arich/dataobjects/ARICHLikelihoods.h>
 #include <arich/modules/arichReconstruction/ARICHTrack.h>
-#include <generators/dataobjects/MCParticle.h>
+
 
 #include <framework/core/ModuleManager.h>
 
@@ -85,8 +86,8 @@ namespace Belle2 {
 
       StoreArray<ARICHAeroHit> arichAeroHits;
       StoreArray<ARICHTrack> arichTracks;
-      StoreArray<MCParticle> mcParticles;
-      RelationArray relAeroToTracks(arichAeroHits, arichTracks);
+      StoreArray<ARICHLikelihoods> arichLikelihoods;
+      RelationArray relAeroToLikelihood(arichAeroHits, arichLikelihoods);
 
     }
 
@@ -127,16 +128,22 @@ namespace Belle2 {
       for (int iTrack = 0; iTrack < nTracks; ++iTrack) {
         ARICHAeroHit* aeroHit = arichAeroHits[iTrack];
         new(arichTracks->AddrAt(iTrack)) ARICHTrack(*aeroHit);
-        int trackID = aeroHit->getTrackID();
-
-//        StoreArray<MCParticle> mcParticles;
-        RelationArray  relAeroToTracks(arichAeroHits, arichTracks);
-        relAeroToTracks.add(iTrack, iTrack);
-
       } // for iTrack
 
       m_ana->ReconstructParticles();
       m_ana->Likelihood2();
+
+      StoreArray<ARICHLikelihoods> arichLikelihoods;
+
+      for (int iTrack = 0; iTrack < nTracks; ++iTrack) {
+        ARICHTrack* track = arichTracks[iTrack];
+        double like[5]; double exp_phot[5];
+        track->getLikelihood(like); track->getExpectedNOfPhotons(exp_phot);
+        new(arichLikelihoods->AddrAt(iTrack)) ARICHLikelihoods(1, like, 1, exp_phot);
+        RelationArray  relAeroToLikelihood(arichAeroHits, arichLikelihoods);
+        relAeroToLikelihood.add(iTrack, iTrack);
+
+      } // for iTrack
 
       m_nEvent++;
     }

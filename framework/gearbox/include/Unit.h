@@ -127,10 +127,15 @@ namespace Belle2 {
     static std::map<std::string, double> m_conversionFactors;
 
   private:
+    /**
+     * @{
+     * no Unit instances allowed.
+     */
     Unit();
     Unit(const Unit&);
     Unit& operator=(const Unit&);
     ~Unit() {};
+    /** @} */
   };
 
 }

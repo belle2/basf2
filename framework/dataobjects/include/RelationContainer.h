@@ -25,30 +25,30 @@ namespace Belle2 {
 
     /** Default constructor, initialize all values to sane default. */
     RelationContainer():
-        m_elements(RelationElement::Class()),
-        m_fromName(""), m_fromDurability(-1),
-        m_toName(""), m_toDurability(-1), m_modified(true) {}
+      m_elements(RelationElement::Class()),
+      m_fromName(""), m_fromDurability(-1),
+      m_toName(""), m_toDurability(-1), m_modified(true) {}
 
     /** Get name of the StoreArray we relate from. */
-    const std::string getFromName()       const { return m_fromName; }
+    const std::string& getFromName()       const { return m_fromName; }
 
     /** Get durability of the StoreArray we relate from. */
     const int         getFromDurability() const { return m_fromDurability; }
 
     /** Get name of the StoreArray we relate to. */
-    const std::string getToName()         const { return m_toName; }
+    const std::string& getToName()         const { return m_toName; }
 
     /** Get durability of the StoreArray we relate to. */
     const int         getToDurability()   const { return m_toDurability; }
 
     /** Set name of the StoreArray we relate from. */
-    void setFromName(const std::string &name)   { m_fromName = name; }
+    void setFromName(const std::string& name)   { m_fromName = name; }
 
     /** Set durability of the StoreArray we relate from. */
     void setFromDurability(int durability)      { m_fromDurability = durability; }
 
     /** Set name of the StoreArray we relate to. */
-    void setToName(const std::string &name)     { m_toName = name; }
+    void setToName(const std::string& name)     { m_toName = name; }
 
     /** Set durability of the StoreArray we relate to. */
     void setToDurability(int durability)        { m_toDurability = durability; }
@@ -65,13 +65,13 @@ namespace Belle2 {
     }
 
     /** Get reference to the elements. */
-    TClonesArray &elements() { return m_elements; }
+    TClonesArray& elements() { return m_elements; }
 
     /** Get const reference to the elements. */
-    const TClonesArray &elements() const { return m_elements; }
+    const TClonesArray& elements() const { return m_elements; }
 
     /** Get reference to Relation element i. */
-    const RelationElement &elements(int i) const { return *static_cast<RelationElement*>(m_elements[i]); }
+    const RelationElement& elements(int i) const { return *static_cast<RelationElement*>(m_elements[i]); }
 
     /** Get number of elements. */
     int getEntries() const { return m_elements.GetEntriesFast(); }

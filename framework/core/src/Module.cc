@@ -21,13 +21,13 @@ using namespace boost::python;
 
 
 Module::Module() :
-    m_name(""),
-    m_description("Not set by the author"),
-    m_propertyFlags(0),
-    m_logConfig(),
-    m_hasReturnValue(false),
-    m_returnValue(0),
-    m_hasCondition(false)
+  m_name(""),
+  m_description("Not set by the author"),
+  m_propertyFlags(0),
+  m_logConfig(),
+  m_hasReturnValue(false),
+  m_returnValue(0),
+  m_hasCondition(false)
 {
 }
 
@@ -93,7 +93,7 @@ bool Module::evalCondition()
 }
 
 
-bool Module::hasProperties(unsigned int propertyFlags)
+bool Module::hasProperties(unsigned int propertyFlags) const
 {
   return (propertyFlags & m_propertyFlags) == propertyFlags;
 }
@@ -114,7 +114,7 @@ void Module::setPropertyFlags(unsigned int propertyFlags)
 }
 
 
-void Module::setDescription(const std::string description)
+void Module::setDescription(const std::string& description)
 {
   m_description = description;
 }

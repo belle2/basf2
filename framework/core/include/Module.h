@@ -181,7 +181,7 @@ namespace Belle2 {
      * located in.
      *
      * @param expression The expression of the condition.
-     * @return Shared pointer to the Path, which will be executed if the condition is evaluated to true.
+     * @param path       Shared pointer to the Path, which will be executed if the condition is evaluated to true.
      */
     void setCondition(const std::string& expression, boost::shared_ptr<Path> path);
 
@@ -207,7 +207,7 @@ namespace Belle2 {
      *
      * @param path
      */
-    void setConditionPath(boost::shared_ptr<Path> path) { m_conditionPath = path; };
+    void setConditionPath(const boost::shared_ptr<Path>& path) { m_conditionPath = path; };
 
     /**
      * A simplified version to set the condition of the module.
@@ -218,7 +218,7 @@ namespace Belle2 {
      *
      * It is equivalent to the setCondition() method, using the expression "<1".
      * This method is meant to be used together with the setReturnValue(bool value) method.
-     * @return Shared pointer to the Path, which will be executed if the condition is evaluated to true.
+     * @param path Shared pointer to the Path, which will be executed if the condition is evaluated to true.
      */
     void setCondition(boost::shared_ptr<Path> path);
 
@@ -245,7 +245,7 @@ namespace Belle2 {
      *
      * @return The path of the condition.
      */
-    boost::shared_ptr<Path> getConditionPath() const {return m_conditionPath; };
+    const boost::shared_ptr<Path>& getConditionPath() const {return m_conditionPath; };
 
     /**
      * Returns the parsed condition operator
@@ -267,7 +267,7 @@ namespace Belle2 {
      * @param propertyFlags The flags which should be compared with the module flags.
      * @return True if all specified property flags are available in this module.
      */
-    bool hasProperties(unsigned int propertyFlags);
+    bool hasProperties(unsigned int propertyFlags) const;
 
     /**
      * Returns true if the module has still unset parameters which the user has to set in the steering file.
@@ -312,7 +312,7 @@ namespace Belle2 {
      *
      * @param description A short description of the module.
      */
-    void setDescription(const std::string description);
+    void setDescription(const std::string& description);
 
     /**
      * Adds a new parameter to the module. This method has to be called in the constructor of the module.
@@ -373,7 +373,7 @@ namespace Belle2 {
      *
      * @param name The name of the module
      */
-    void setModuleName(const std::string name) { m_name = name; };
+    void setModuleName(const std::string& name) { m_name = name; };
 
 
   private:

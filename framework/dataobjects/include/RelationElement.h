@@ -30,7 +30,7 @@ namespace Belle2 {
 
     /** Empty constructor for ROOT */
     RelationElement():
-        TObject(), m_from(-1), m_to(), m_weights() {}
+      TObject(), m_from(-1), m_to(), m_weights() {}
 
     /** Constructor for a 1:1 relation.
      *
@@ -39,7 +39,7 @@ namespace Belle2 {
      *  @param weight  weight of the relation
      */
     RelationElement(index_type from, index_type to, weight_type weight = 1.0):
-        TObject(), m_from(from), m_to(1, to), m_weights(1, weight) {}
+      TObject(), m_from(from), m_to(1, to), m_weights(1, weight) {}
 
     /** Constructor for a 1:n relation.
      *
@@ -48,7 +48,7 @@ namespace Belle2 {
      *  @param weights weights of the relation
      */
     RelationElement(index_type from, std::vector<index_type> to, std::vector<weight_type> weights):
-        TObject(), m_from(from), m_to(to.begin(), to.end()), m_weights(weights.begin(), weights.end()) {
+      TObject(), m_from(from), m_to(to.begin(), to.end()), m_weights(weights.begin(), weights.end()) {
       if (to.size() != weights.size()) {
         B2FATAL("Size of weights is different to size of indices");
       }
@@ -63,7 +63,7 @@ namespace Belle2 {
      *                 std::pair<index_type,weight_type> or compatible
      */
     template <class InputIterator> RelationElement(index_type from, InputIterator begin, InputIterator end):
-        TObject(), m_from(from) {
+      TObject(), m_from(from) {
       setToIndices(begin, end);
     }
 
@@ -83,10 +83,10 @@ namespace Belle2 {
     weight_type                       getWeight(size_t n = 0)  const { return m_weights[n]; }
 
     /** Get vector of indices we point to. */
-    const std::vector<index_type>     getToIndices()         const { return m_to; }
+    const std::vector<index_type>&     getToIndices()         const { return m_to; }
 
     /** Get vector of weights we point to. */
-    const std::vector<weight_type>    getWeights()           const { return m_weights; }
+    const std::vector<weight_type>&    getWeights()           const { return m_weights; }
 
     /** Set index we point from. */
     void setFromIndex(index_type from) { m_from = from; }

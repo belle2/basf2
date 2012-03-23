@@ -15,8 +15,6 @@
 #include <framework/datastore/StoreAccessorBase.h>
 #include <framework/logging/Logger.h>
 
-#include <utility>
-
 namespace Belle2 {
 
   /** Type save access pointer.
@@ -60,8 +58,8 @@ namespace Belle2 {
      *  @param dummy This argument is ignored but required to distuingish
      *  between the default constructor and this one
      */
-    StoreObjPtr(int dummy)
-        : m_storeObjPtr(0), m_name(""), m_durability(DataStore::c_Event) {}
+    StoreObjPtr(int /*dummy*/)
+      : m_storeObjPtr(0), m_name(""), m_durability(DataStore::c_Event) {}
 
     /** Virtual destructor for inherited classes */
     virtual ~StoreObjPtr() {}
@@ -101,7 +99,7 @@ namespace Belle2 {
     AccessorParams getAccessorParams() const {     /**< Returns name and durability under which the object is saved in the DataStore. */
       return AccessorParams(m_name, m_durability);
     }
-    std::string getName() const { return m_name; } /**< Return  name under which the object is saved in the DataStore. */
+    const std::string& getName() const { return m_name; } /**< Return  name under which the object is saved in the DataStore. */
     DataStore::EDurability getDurability() const { /**< Return  durability with which the object is saved in the DataStore. */
       return m_durability;
     }

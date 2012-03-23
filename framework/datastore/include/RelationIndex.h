@@ -55,9 +55,9 @@ namespace Belle2 {
      *  @param durability Durabiliy of the relation
      */
     RelationIndex(std::string name = (DataStore::defaultRelationName<FROM, TO>()), DataStore::EDurability durability = DataStore::c_Event):
-        m_index(RelationIndexManager::get<FROM, TO>(RelationArray(name, durability))),
-        m_from(m_index.index().template get<FROM>()),
-        m_to(m_index.index().template get<TO>()) {}
+      m_index(RelationIndexManager::get<FROM, TO>(RelationArray(name, durability))),
+      m_from(m_index.index().template get<FROM>()),
+      m_to(m_index.index().template get<TO>()) {}
 
     /** Constructor with checks.
      *
@@ -73,12 +73,12 @@ namespace Belle2 {
      */
     RelationIndex(const StoreArray<FROM> &from, const StoreArray<TO> &to, std::string name = "",
                   DataStore::EDurability durability = DataStore::c_Event):
-        m_index(RelationIndexManager::get<FROM, TO>(RelationArray(from, to, name, durability, false))),
-        m_from(m_index.index().template get<FROM>()),
-        m_to(m_index.index().template get<TO>()) {}
+      m_index(RelationIndexManager::get<FROM, TO>(RelationArray(from, to, name, durability, false))),
+      m_from(m_index.index().template get<FROM>()),
+      m_to(m_index.index().template get<TO>()) {}
 
     /** check if index is based on valid relation. */
-    operator bool() { return m_index; }
+    operator bool() const { return m_index; }
 
     /** Return a range of all elements pointing from the given object.
      *
@@ -86,7 +86,7 @@ namespace Belle2 {
      *  @returns pair of iterators specifing the range [first,second) of
      *           elements which point from this object.
      */
-    range_from getFrom(const FROM *from) const { return m_from.equal_range(from);  }
+    range_from getFrom(const FROM* from) const { return m_from.equal_range(from);  }
 
     /** Return a range of all elements pointing from the given object.
      *
@@ -94,7 +94,7 @@ namespace Belle2 {
      *  @returns Pair of iterators specifing the range [first,second) of
      *           elements which point from this object
      */
-    range_from getFrom(const FROM &from) const { return m_from.equal_range(&from); }
+    range_from getFrom(const FROM& from) const { return m_from.equal_range(&from); }
 
     /** Return a range of all elements pointing to the given object
      *
@@ -102,7 +102,7 @@ namespace Belle2 {
      *  @returns Pair of iterators specifing the range [first,second) of
      *           elements which point to this object
      */
-    range_to   getTo(const TO *to)       const { return m_to.equal_range(to);      }
+    range_to   getTo(const TO* to)       const { return m_to.equal_range(to);      }
 
     /** Return a range of all elements pointing to the given object
      *
@@ -110,7 +110,7 @@ namespace Belle2 {
      *  @returns Pair of iterators specifing the range [first,second) of
      *           elements which point to this object
      */
-    range_to   getTo(const TO &to)       const { return m_to.equal_range(&to);     }
+    range_to   getTo(const TO& to)       const { return m_to.equal_range(&to);     }
 
     /** Return a pointer to the first Relation Element of the given object.
      *
@@ -119,7 +119,7 @@ namespace Belle2 {
      *  @returns Pointer to the RelationIndex<FROM,TO>::Element, can be
      *           NULL if no relation exists
      */
-    const Element* getFirstTo(const FROM &from) const { return getFirst(&from); }
+    const Element* getFirstTo(const FROM& from) const { return getFirst(&from); }
 
     /** Return a pointer to the first Relation Element of the given object.
      *
@@ -128,7 +128,7 @@ namespace Belle2 {
      *  @returns Pointer to the RelationIndex<FROM,TO>::Element, can be
      *           NULL if no relation exists
      */
-    const Element* getFirstTo(const FROM *from) const {
+    const Element* getFirstTo(const FROM* from) const {
       iterator_from it = m_from.find(from);
       if (it == m_from.end()) return 0;
       return &(*it);
@@ -141,7 +141,7 @@ namespace Belle2 {
      *  @returns Pointer to the RelationIndex<FROM,TO>::Element, can be
      *           NULL if no relation exists
      */
-    const Element* getFirstFrom(const TO &to)   const { return getFirst(&to);   }
+    const Element* getFirstFrom(const TO& to)   const { return getFirst(&to);   }
 
     /** Return a pointer to the first Relation Element of the given object.
      *
@@ -150,7 +150,7 @@ namespace Belle2 {
      *  @returns Pointer to the RelationIndex<FROM,TO>::Element, can be
      *           NULL if no relation exists
      */
-    const Element* getFirstFrom(const TO *to)   const {
+    const Element* getFirstFrom(const TO* to)   const {
       iterator_to it = m_to.find(to);
       if (it == m_to.end()) return 0;
       return &(*it);
@@ -173,10 +173,10 @@ namespace Belle2 {
     const RelationIndexContainer<FROM, TO> &m_index;
 
     /** Reference to the from index. */
-    const index_from &m_from;
+    const index_from& m_from;
 
     /** Reference to the to index. */
-    const index_to   &m_to;
+    const index_to&   m_to;
   };
 
 } // end namespace Belle2

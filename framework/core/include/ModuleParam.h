@@ -40,7 +40,7 @@ namespace Belle2 {
      * @param force If true the parameter has to be set in the steering file by the user.
      */
     ModuleParamBase(const std::string& typeInfo, const std::string& description, bool force)
-        : m_typeInfo(typeInfo), m_description(description), m_forceInSteering(force), m_setInSteering(false) {};
+      : m_typeInfo(typeInfo), m_description(description), m_forceInSteering(force), m_setInSteering(false) {};
 
     /**
      * Destructor.
@@ -70,7 +70,7 @@ namespace Belle2 {
      *
      * @return True if the parameter was set in the steering file.
      */
-    const bool isSetInSteering() const {return m_setInSteering; }
+    bool isSetInSteering() const {return m_setInSteering; }
 
 
     /**
@@ -78,7 +78,7 @@ namespace Belle2 {
      *
      * @return True if the parameter has to be set in the steering file.
      */
-    const bool isForcedInSteering() const {return m_forceInSteering; }
+    bool isForcedInSteering() const {return m_forceInSteering; }
 
 
   protected:
@@ -116,7 +116,7 @@ namespace Belle2 {
      * @param force If true the parameter has to be set by the user in the steering file.
      */
     ModuleParam(T& paramVariable, const std::string& description = "", bool force = false)
-        : ModuleParamBase(typeid(T).name(), description, force), m_paramVariable(paramVariable) {};
+      : ModuleParamBase(typeid(T).name(), description, force), m_paramVariable(paramVariable) {};
 
     /**
      * Destructor.

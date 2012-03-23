@@ -49,7 +49,7 @@ namespace Belle2 {
       /** Create a new element. */
       Element(RelationElement::index_type indexFrom,  RelationElement::index_type indexTo,
               FROM* from, TO* to,  RelationElement::weight_type weight):
-          indexFrom(indexFrom), indexTo(indexTo), from(from), to(to), weight(weight) {}
+        indexFrom(indexFrom), indexTo(indexTo), from(from), to(to), weight(weight) {}
 
       /** index of the element from which the relation points. */
       RelationElement::index_type indexFrom;
@@ -91,13 +91,13 @@ namespace Belle2 {
     const ElementIndex&  index()                 const { return m_index; }
 
     /** Get the AccessorParams of the underlying relation. */
-    const AccessorParams getAccessorParams()     const { return m_storeRel; }
+    const AccessorParams& getAccessorParams()     const { return m_storeRel; }
 
     /** Get the AccessorParams of the StoreArray the relation points from. */
-    const AccessorParams getFromAccessorParams() const { return m_storeFrom; }
+    const AccessorParams& getFromAccessorParams() const { return m_storeFrom; }
 
     /** Get the AccessorParams of the StoreArray the relation points to. */
-    const AccessorParams getToAccessorParams()   const { return m_storeTo; }
+    const AccessorParams& getToAccessorParams()   const { return m_storeTo; }
 
   protected:
     /** Constructor to create a new IndexContainer.
@@ -180,7 +180,7 @@ namespace Belle2 {
 
     //Loop over all RelationElements and add them to index
     for (unsigned int i = 0; i < nRel; ++i) {
-      const RelationElement &r = storeRel[i];
+      const RelationElement& r = storeRel[i];
       RelationElement::index_type idxFrom = r.getFromIndex();
       if (idxFrom >= nFrom) B2FATAL("Relation " <<  m_storeRel.first << " is inconsistent: from-index out of range");
       FROM* from = storeFrom[idxFrom];
@@ -188,8 +188,8 @@ namespace Belle2 {
       //Loop over index and weight vector at once
       typedef std::vector< RelationElement::index_type> idx_t;
       typedef std::vector< RelationElement::weight_type> wgt_t;
-      const idx_t &indices = r.getToIndices();
-      const wgt_t &weights = r.getWeights();
+      const idx_t& indices = r.getToIndices();
+      const wgt_t& weights = r.getWeights();
       idx_t::const_iterator itIdx = indices.begin();
       wgt_t::const_iterator itWgt = weights.begin();
       for (; itIdx != indices.end() && itWgt != weights.end(); ++itIdx, ++itWgt) {

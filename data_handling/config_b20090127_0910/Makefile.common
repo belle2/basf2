@@ -1,0 +1,149 @@
+#+
+# File: Makefile.common.in
+# Description : Makefile Template
+#-
+
+# System Specifications
+#    --- Do not change without knowledge
+
+# Compiler Setup with machine dependence
+
+#MODULES +=
+#OBJS +=
+#LIBS +=
+#CERNLIBS +=
+
+FC = g77
+CC = gcc
+CXX = g++
+
+DEFS = -DPACKAGE_NAME=\"\" -DPACKAGE_TARNAME=\"\" -DPACKAGE_VERSION=\"\" -DPACKAGE_STRING=\"\" -DPACKAGE_BUGREPORT=\"\" -DHAVE_LIBCURSES=1 -DHAVE_LIBREADLINE=1 -DSTDC_HEADERS=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_STDLIB_H=1 -DHAVE_STRING_H=1 -DHAVE_MEMORY_H=1 -DHAVE_STRINGS_H=1 -DHAVE_INTTYPES_H=1 -DHAVE_STDINT_H=1 -DHAVE_UNISTD_H=1 -DHAVE_LIBNSL=1 -DHAVE_LIBDL=1 -DFORTRAN_PPU=1 -DHAVE_LIBCRYPT=1  -DCERNLIB_TYPE
+CPPFLAGS = 
+DEPCPPFLAGS = -M
+
+FFLAGS = -DBELLE_TARGET_H=\"belle-x86_64-unknown-linux-gnu-g++.h\"  -fno-second-underscore -fno-automatic -finit-local-zero -fno-emulate-complex
+CFLAGS = -DBELLE_TARGET_H=\"belle-x86_64-unknown-linux-gnu-g++.h\" -g -O2
+CXXFLAGS = -DHEP_SHORT_NAMES -DBELLE_SHORT_NAMES -DDSTXX_NOINLINE -DBELLE_TARGET_H=\"belle-x86_64-unknown-linux-gnu-g++.h\" -g -fPIC
+SOFLAGS = -shared -Wl,-export-dynamic
+LDFLAGS = 
+
+SYSLIB = -lcrypt   -L/usr/lib/gcc/x86_64-redhat-linux/3.4.6 -L/usr/lib/gcc/x86_64-redhat-linux/3.4.6 -L/usr/lib/gcc/x86_64-redhat-linux/3.4.6/../../../../lib64 -L/usr/lib/gcc/x86_64-redhat-linux/3.4.6/../../.. -L/lib/../lib64 -L/usr/lib/../lib64 -lfrtbegin -lg2c -lm -lgcc_s -lgcc -lgcc_s -lgcc
+
+CLHEPLIB = -lCLHEP
+
+MOTIF_LIBS = -L/usr/X11R6/lib -lXm
+
+POSTGRESINC = /belle/local/include
+
+LINUX_G77_BUG = -e 's/\.F\.o:/.o:/'
+
+ifneq "$(CERNLIBS)" ""
+  ifeq "$(CERN)/$(CERN_LEVEL)" "/"
+    CERNLIB_LIB_DIR = /belle/cern/2006/lib
+    CERN_INCLUDE = /belle/cern/2006/include
+  else
+    CERNLIB_LIB_DIR = $(CERN)/$(CERN_LEVEL)/lib
+    CERN_INCLUDE = $(CERN)/$(CERN_LEVEL)/include
+  endif
+  CERNLIB = -L$(CERNLIB_LIB_DIR)/so -L$(CERNLIB_LIB_DIR) $(CERNLIBS:%=-l%) $(MOTIF_LIBS)
+endif
+
+ifeq "$(MY_TOP_DIR)" ""
+  LINK_LIBS = -L$(BELLE_LIB_DIR)/so $(LIBS:%=-l%)
+  INCLUDES_C = $(BELLE_TOP_DIR)/include $(CLHEPINC) $(POSTGRESINC)
+  INCLUDES_FORTRAN = $(BELLE_TOP_DIR)/inc $(CERN_INCLUDE)
+  BUILD_TOP_DIR = $(BELLE_TOP_DIR)
+else
+  LINK_LIBS = -L$(MY_LIB_SO_DIR) -L$(BELLE_LIB_DIR)/so $(LIBS:%=-l%)
+  INCLUDES_C = $(MY_TOP_DIR)/include $(BELLE_TOP_DIR)/include $(CLHEPINC) $(POSTGRESINC)
+  INCLUDES_FORTRAN = $(MY_TOP_DIR)/inc $(BELLE_TOP_DIR)/inc $(CERN_INCLUDE)
+  BELLE_CONFIG_DIR = $(MY_TOP_DIR)/src/config
+  BUILD_TOP_DIR = $(MY_TOP_DIR)
+endif
+
+ifneq "$(OBJS)" ""
+  PACKAGE = $(shell basename $(shell pwd))
+#  LINK_LIBS += -L. $(PACKAGE:%=-l%)
+  BUILD_SO = libs
+endif
+
+ifneq "$(MAINS)" ""
+  BUILD_MAINS = mains
+endif
+
+# Dependence description
+
+COMPILE_FCPP := $(FC) -c $(PANTHER_FMACROS) $(INCLUDES_FORTRAN:%=-I%) $(CPPFLAGS) $(FFLAGS)
+COMPILE_FC := $(FC) -c  $(INCLUDES_FORTRAN:%=-I%) $(FFLAGS)
+COMPILE_CC := $(CC) -c  $(PANTHER_CMACROS) $(INCLUDES_C:%=-I%) $(CPPFLAGS) $(CFLAGS)
+COMPILE_CXX := $(CXX) -c  $(PANTHER_CMACROS) $(INCLUDES_C:%=-I%) $(CPPFLAGS) $(CXXFLAGS)
+
+LINK_FCPP := $(FC)
+LINK_FC := $(FC)
+LINK_CC := $(CC)
+LINK_CXX := $(CXX)
+
+DEPEND_FCPP := $(FC) -M $(DEFS) $(PANTHER_FMACROS) $(INCLUDES_FORTRAN:%=-I%) $(CPPFLAGS) $(filter-out -KPIC -Nq1000,$(CFLAGS))
+DEPEND_CC := $(CC) $(DEPCPPFLAGS) $(DEFS) $(PANTHER_CMACROS) $(INCLUDES_C:%=-I%) $(CPPFLAGS) $(filter-out -fPIC -KPIC,$(CFLAGS))
+DEPEND_CXX := $(CXX) $(DEPCPPFLAGS) $(DEFS) $(PANTHER_CMACROS) $(INCLUDES_C:%=-I%) $(CPPFLAGS) $(filter-out -fPIC -KPIC,$(CXXFLAGS))
+
+%.o:%.c
+	$(COMPILE_CC) $<
+
+%.d:%.c
+	$(SHELL) -ec '$(DEPEND_CC) $< | sed -e "s/$*\.o[ :]*/$@ &/g" > $@'
+
+%.o:%.cc
+	$(COMPILE_CXX) $<
+
+%.d:%.cc
+	$(SHELL) -ec '$(DEPEND_CXX) $< | sed -e "s/$*\.o[ :]*/$@ &/g" > $@'
+
+%.o:%.f
+	$(COMPILE_FC) $<
+
+%.d:%.f
+	$(ATMARK)-$(SHELL) -ec '$(DEPEND_FCPP) $< | sed $(LINUX_G77_BUG) -e "s/$*\.o[ :]*/$@ &/g" > $@'
+
+%.o:%.F
+	$(COMPILE_FCPP) $<
+
+%.d:%.F
+	$(ATMARK)-$(SHELL) -ec '$(DEPEND_FCPP) $< | sed $(LINUX_G77_BUG) -e "s/$*\.o[ :]*/$@ &/g" > $@'
+
+%.so:%.o $(OBJS:%=%.o)
+	$(LINK_CXX) -o $@ $(SOFLAGS) $< $(OBJS:%=%.o) $(LINK_LIBS) $(CERNLIB) $(SYSLIB)
+
+%:%.o $(OBJS:%=%.o)
+	$(LINK_CXX) -o $@ $< $(OBJS:%=%.o) $(LINK_LIBS) $(CERNLIB) $(SYSLIB)
+
+.PHONY: all modules shared mains clean
+
+# Dependencies
+
+all: $(OBJS:%=%.o) $(MODULES:%=%.o) $(MODULES:%=%.so) $(MAINS)
+
+modules: $(OBJS:%=%.o) $(MODULES:%=%.o) $(MODULES:%=%.so)
+
+shared: $(OBJS:%=%.o)
+	$(LINK_CC) -o lib$(PACKAGE).so $(SOFLAGS) $(OBJS:%=%.o)
+
+mains: $(OBJS:%=%.d) $(MAINS:%=%.d) $(OBJS:%=%.o) $(MAINS:%=%.o) $(MAINS)
+
+
+clean:
+	-rm -f $(wildcard *.o *.d *~ fort.* fpda_pid.* fpda_spy.hbook out log last.kumac* paw.metafile)
+
+ifneq ($(MAKECMDGOALS),clean)
+  ifneq "$(OBJS)" ""
+    -include $(OBJS:%=%.d)
+  endif
+
+  ifneq "$(MODULES)" ""
+    -include $(MODULES:%=%.d)
+  endif
+
+  ifneq "$(MAINS)" ""
+    -include $(MAINS:%=%.d)
+  endif
+endif

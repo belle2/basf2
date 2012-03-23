@@ -28,16 +28,16 @@ namespace Belle2 {
   private:
     /** List of drawing options, a combination of:
      *
-     * A autoscale errors - use when hits are too small to be seen (because of tiny errors)
-     * D draw detectors - draw simple detector representation (with different size) for each hit
-     * H draw track hits
-     * R draw raw simhits (not associated with a track) - drawn as points only
-     * G draw geometry (whole detector)
-     * M draw track markers - intersections of track with detector planes (use with T)
-     * P draw detector planes
-     * S scale manually - spacepoint hits are drawn as spheres and scaled with errors
-     * T draw track (straight line between detector planes)
-     * X silent - open TEve, but don't actually draw anything
+     * - A autoscale errors - use when hits are too small to be seen (because of tiny errors)
+     * - D draw detectors - draw simple detector representation (with different size) for each hit
+     * - H draw track hits
+     * - R draw raw simhits (not associated with a track) - drawn as points only
+     * - G draw geometry (whole detector)
+     * - M draw track markers - intersections of track with detector planes (use with T)
+     * - P draw detector planes
+     * - S scale manually - spacepoint hits are drawn as spheres and scaled with errors
+     * - T draw track (straight line between detector planes)
+     * - X silent - open TEve, but don't actually draw anything
      *
      * Note that you can always turn off an individual detector component or track
      * interactively by removing its checkmark in the 'Eve' tab.
@@ -46,11 +46,17 @@ namespace Belle2 {
      */
     std::string m_options;
 
-    bool m_addPXDHits; //< wether to add PXDSimHits
-    bool m_addSVDHits; //< wether to add SVDSimHits
-    bool m_addCDCHits; //< wether to add CDCSimHits
+    /** wether to add PXDSimHits */
+    bool m_addPXDHits;
 
-    GenfitDisplay* m_display; //< pointer to actual display
+    /** wether to add SVDSimHits */
+    bool m_addSVDHits;
+
+    /** wether to add CDCSimHits */
+    bool m_addCDCHits;
+
+    /** pointer to actual display */
+    GenfitDisplay* m_display;
   };
 }
 

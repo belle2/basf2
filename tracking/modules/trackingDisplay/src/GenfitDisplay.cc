@@ -477,7 +477,6 @@ void GenfitDisplay::drawEvent(unsigned int id)
           TVector3 eVec1(eVec(0, 0), eVec(1, 0), eVec(2, 0));
           TVector3 eVec2(eVec(0, 1), eVec(1, 1), eVec(2, 1));
           TVector3 eVec3(eVec(0, 2), eVec(1, 2), eVec(2, 2));
-          TVector3 norm = u.Cross(v);
           // got everything we need -----------------------------------------------------
 
 

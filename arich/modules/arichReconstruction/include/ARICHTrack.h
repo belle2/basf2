@@ -104,12 +104,12 @@ namespace Belle2 {
     //! returns value of likelihood function for "i" particle hypothesis (here i is particle index: 0 electron, 1 muon, 2 pion, 3 kaon, 4 proton)
     double getLikelihood(int i) const {return m_lkh[i]; };
 
-    void getLikelihood(double like[]) {like = m_lkh;};
+    void getLikelihood(double like[]) {like[0] = m_lkh[0]; like[1] = m_lkh[1]; like[2] = m_lkh[2]; like[3] = m_lkh[3]; like[4] = m_lkh[4];};
 
     //! returns expected number of detected photons for "i" particle hypothesis (here i is particle index: 0 electron, 1 muon, 2 pion, 3 kaon, 4 proton)
     double getExpectedNOfPhotons(int i) const {return m_sfot[i]; };
 
-    void getExpectedNOfPhotons(double nphot[]) {nphot = m_sfot; };
+    void getExpectedNOfPhotons(double nphot[]) {nphot[0] = m_sfot[0]; nphot[1] = m_sfot[1]; nphot[2] = m_sfot[2]; nphot[3] = m_sfot[3]; nphot[4] = m_sfot[4]; };
 
     //! returns geometrical acceptance of emitted Cherenkov photos by particle "i"(here i is particle index: 0 electron, 1 muon, 2 pion, 3 kaon, 4 proton)
     double getGeometricalAcceptance(int i) const {return m_acc[i]; };

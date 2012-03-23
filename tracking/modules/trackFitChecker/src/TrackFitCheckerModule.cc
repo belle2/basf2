@@ -20,6 +20,12 @@
 #include <pxd/dataobjects/PXDRecoHit.h>
 #include <svd/dataobjects/SVDRecoHit2D.h>
 #include <cdc/dataobjects/CDCRecoHit.h>
+#include <geometry/GeometryManager.h>
+#include <geometry/bfieldmap/BFieldMap.h>
+#include <tracking/gfbfield/GFGeant4Field.h>
+
+#include <GFFieldManager.h>
+#include <GFConstField.h>
 
 #include <GFTrack.h>
 #include <GFTools.h>
@@ -68,6 +74,14 @@ TrackFitCheckerModule::~TrackFitCheckerModule()
 
 void TrackFitCheckerModule::initialize()
 {
+
+
+  //setup genfit geometry and magneic field in case you what to used data saved on disc because then the genifitter modul was not run
+  // convert the geant4 geometry to a TGeo geometry
+  geometry::GeometryManager& geoManager = geometry::GeometryManager::getInstance();
+  geoManager.createTGeoRepresentation();
+  //pass the magnetic field to genfit
+  GFFieldManager::getInstance()->init(new GFGeant4Field());
   //set all user parameters
 
   //configure the output
@@ -81,6 +95,10 @@ void TrackFitCheckerModule::initialize()
   m_layerWiseTruthTestsVarNames.push_back("χ²");
   m_layerWiseTruthTestsVarNames.push_back("χ²direc");
   m_layerWiseTruthTestsVarNames.push_back("χ²uv");
+  m_layerWiseTruthTestsVarNames.push_back("χ²diuv");
+  m_layerWiseTruthTestsVarNames.push_back("χ²qp_di");
+  m_layerWiseTruthTestsVarNames.push_back("χ²qp_uv");
+
   const int vecSizeTruthTest = m_layerWiseTruthTestsVarNames.size();
 
   m_vertexTestsVarNames.push_back("x");
@@ -181,9 +199,9 @@ void TrackFitCheckerModule::initialize()
 
   // pulls and chi2 to test consistency of normal distribution model of measurements and the sigma of the digitizer with the sigma of the recoHits
   resizeLayerWiseData("zs_and_chi2_meas_t", vecSizeMeasTest);
-
-  resizeLayerWiseData("DAF_weights", 1); // at the moment only tracks with
-
+  if (m_testDaf == true) {
+    resizeLayerWiseData("DAF_weights", 1); // at the moment only tracks with no noise
+  }
   m_badR_fCounter = 0;
   m_badR_bCounter = 0;
   m_badR_smCounter = 0;
@@ -252,7 +270,11 @@ void TrackFitCheckerModule::event()
     vector<double> resVertexPosMom(6);
     TVector3 poca; //point of closest approach will be overwritten
     TVector3 dirInPoca; //direction of the track at the point of closest approach will be overwritten
-    aTrackPtr->getCardinalRep()->extrapolateToPoint(trueVertexPos, poca, dirInPoca); //goto vertex position
+    RKTrackRep* aRKTrackRepPtr = static_cast<RKTrackRep*>(aTrackPtr->getCardinalRep());
+
+    //aRKTrackRepPtr->setPropDir(0);
+
+    aRKTrackRepPtr->extrapolateToPoint(trueVertexPos, poca, dirInPoca); //goto vertex position
     GFDetPlane planeThroughVertex(poca, dirInPoca); //get planeThroughVertex through fitted vertex position
     double vertexAbsMom = aTrackPtr->getMom(planeThroughVertex).Mag(); //get fitted momentum at fitted vertex
     fillTrackWiseData("absMomVertex", vertexAbsMom);
@@ -651,24 +673,72 @@ vector<double> TrackFitCheckerModule::calcZs(const TMatrixT<double>& res, const 
 
 vector<double> TrackFitCheckerModule::calcTestsWithTruthInfo(const TMatrixT<double>& state, const TMatrixT<double>& cov, const TMatrixT<double>& trueState)
 {
+  //first the all 5 pulls and the chi2 from the hole vector/matrix
   TMatrixT<double> res = state - trueState;
   vector<double> resultVec = calcZs(res, cov);
 
   resultVec.push_back(calcChi2(res, cov));
 
-  TMatrixT<double> resXY(2, 1);
-  TMatrixT<double> covXY(2, 2);
+  TMatrixT<double> subRes(2, 1);
+  TMatrixT<double> subCov(2, 2);
+  //chi2 only of directions
+  subRes[0][0] = res[1][0];
+  subRes[1][0] = res[2][0];
+  subCov = cov.GetSub(1, 2, 1, 2);
+  resultVec.push_back(calcChi2(subRes, subCov));
+  //chi2 only of u and v
+  subRes[0][0] = res[3][0];
+  subRes[1][0] = res[4][0];
+  subCov = cov.GetSub(3, 4, 3, 4);
 
-  resXY[0][0] = res[1][0];
-  resXY[1][0] = res[2][0];
-  covXY = cov.GetSub(1, 2, 1, 2);
-  resultVec.push_back(calcChi2(resXY, covXY));
+  resultVec.push_back(calcChi2(subRes, subCov));
+  // chi2 only of directions and u and v
+  subRes.ResizeTo(4, 1);
+  subCov.ResizeTo(4, 4);
+  subRes[0][0] = res[1][0];
+  subRes[1][0] = res[2][0];
+  subRes[2][0] = res[3][0];
+  subRes[3][0] = res[4][0];
+  subCov = cov.GetSub(1, 4, 1, 4);
+  resultVec.push_back(calcChi2(subRes, subCov));
 
-  resXY[0][0] = res[3][0];
-  resXY[1][0] = res[4][0];
-  covXY = cov.GetSub(3, 4, 3, 4);
+  //chi2 of q/p and directions
+  subRes.ResizeTo(3, 1);
+  subCov.ResizeTo(3, 3);
+  subRes[0][0] = res[0][0];
+  subRes[1][0] = res[1][0];
+  subRes[2][0] = res[2][0];
 
-  resultVec.push_back(calcChi2(resXY, covXY));
+  subCov[0][0] = cov[0][0];
+  subCov[1][0] = cov[1][0];
+  subCov[2][0] = cov[2][0];
+
+  subCov[0][1] = cov[0][1];
+  subCov[1][1] = cov[1][1];
+  subCov[2][1] = cov[2][1];
+
+  subCov[0][2] = cov[0][2];
+  subCov[1][2] = cov[1][2];
+  subCov[2][2] = cov[2][2];
+  resultVec.push_back(calcChi2(subRes, subCov));
+
+  // chi2 of q/p and u and v
+  subRes[0][0] = res[0][0];
+  subRes[1][0] = res[3][0];
+  subRes[2][0] = res[4][0];
+
+  subCov[0][0] = cov[0][0];
+  subCov[1][0] = cov[3][0];
+  subCov[2][0] = cov[4][0];
+
+  subCov[0][1] = cov[0][3];
+  subCov[1][1] = cov[3][3];
+  subCov[2][1] = cov[4][3];
+
+  subCov[0][2] = cov[0][4];
+  subCov[1][2] = cov[3][4];
+  subCov[2][2] = cov[4][4];
+  resultVec.push_back(calcChi2(subRes, subCov));
 
   return resultVec;
 }

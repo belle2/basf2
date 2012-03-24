@@ -16,7 +16,7 @@
 // Hit classes
 #include <top/dataobjects/TOPTrack.h>
 #include <top/dataobjects/TOPLikelihoods.h>
-#include <arich/modules/arichReconstruction/ARICHTrack.h>
+#include <arich/dataobjects/ARICHLikelihoods.h>
 #include <arich/dataobjects/ARICHAeroHit.h>
 
 
@@ -135,35 +135,33 @@ namespace Belle2 {
       return 0;
     }
 
-    const ARICHTrack* TOPTutorialModule::getARICHTrack(const MCParticle* particle)
+    const ARICHLikelihoods* TOPTutorialModule::getARICHLikelihoods(const MCParticle* particle)
     {
 
-
-      StoreArray<ARICHTrack> arichTracks;
+      StoreArray<ARICHLikelihoods> arichLikelihoods;
       StoreArray<ARICHAeroHit> arichAeroHits;
       StoreArray<MCParticle> mcParticles;
 
       RelationArray testarichAeroHitRel(mcParticles, arichAeroHits);
-      RelationArray testrelAeroToTracks(arichAeroHits, arichTracks);
+      RelationArray testrelAeroToLikelihood(arichAeroHits, arichLikelihoods);
 
-      if (!(testarichAeroHitRel && testrelAeroToTracks)) {
+      if (!(testarichAeroHitRel && testrelAeroToLikelihood)) {
         return 0;
       }
 
 
       RelationIndex<MCParticle, ARICHAeroHit> arichAeroHitRel(mcParticles, arichAeroHits);
-      RelationIndex<ARICHAeroHit, ARICHTrack> relAeroToTracks(arichAeroHits, arichTracks);
+      RelationIndex<ARICHAeroHit, ARICHLikelihoods> relAeroToLikelihood(arichAeroHits, arichLikelihoods);
 
-      if (!(arichAeroHitRel && relAeroToTracks)) {
+      if (!(arichAeroHitRel && relAeroToLikelihood)) {
         return 0;
       }
 
       if (arichAeroHitRel.getFirstTo(particle)) {
         const ARICHAeroHit* track = arichAeroHitRel.getFirstTo(particle)->to;
+        if (relAeroToLikelihood.getFirstTo(track)) {
 
-        if (relAeroToTracks.getFirstTo(track)) {
-
-          return relAeroToTracks.getFirstTo(track)->to;
+          return relAeroToLikelihood.getFirstTo(track)->to;
 
         }
       }
@@ -245,18 +243,48 @@ namespace Belle2 {
             if (hyp2 == 5) {
               logl2 = getTOPLikelihoods(mctrack)->getLogL_p();
             }
-
             return logl1 - logl2;
           }
         }
 
-        if (getARICHTrack(mctrack)) {
+        if (getARICHLikelihoods(mctrack)) {
 
-          logl1 = getARICHTrack(mctrack)->getLikelihood(hyp1 - 1);
-          logl2 = getARICHTrack(mctrack)->getLikelihood(hyp2 - 1);
+          if (getARICHLikelihoods(mctrack)->getFlag()) {
+            if (hyp1 == 1) {
+              logl1 = getARICHLikelihoods(mctrack)->getLogL_e();
+            }
+            if (hyp1 == 2) {
+              logl1 = getARICHLikelihoods(mctrack)->getLogL_mu();
+            }
+            if (hyp1 == 3) {
+              logl1 = getARICHLikelihoods(mctrack)->getLogL_pi();
+            }
+            if (hyp1 == 4) {
+              logl1 = getARICHLikelihoods(mctrack)->getLogL_K();
+            }
+            if (hyp1 == 5) {
+              logl1 = getARICHLikelihoods(mctrack)->getLogL_p();
+            }
 
-          return logl1 - logl2;
+            if (hyp2 == 1) {
+              logl2 = getARICHLikelihoods(mctrack)->getLogL_e();
+            }
+            if (hyp2 == 2) {
+              logl2 = getARICHLikelihoods(mctrack)->getLogL_mu();
+            }
+            if (hyp2 == 3) {
+              logl2 = getARICHLikelihoods(mctrack)->getLogL_pi();
+            }
+            if (hyp2 == 4) {
+              logl2 = getARICHLikelihoods(mctrack)->getLogL_K();
+            }
+            if (hyp2 == 5) {
+              logl2 = getARICHLikelihoods(mctrack)->getLogL_p();
+            }
+            return logl1 - logl2;
+          }
         }
+
 
       }
 
@@ -288,7 +316,7 @@ namespace Belle2 {
           continue;
         }
 
-        if (TOP_ARICH_PID(3, 4, particle) > 0) {
+        if (TOP_ARICH_PID(3, 4, particle) > cut) {
           TLorentzVector tmp;
 
           tmp.SetXYZM(particle->getMom().Mag()*dir.X(), particle->getMom().Mag()*dir.Y(), particle->getMom().Mag()*dir.Z(), pimass);
@@ -328,7 +356,7 @@ namespace Belle2 {
         }
 
 
-        if (TOP_ARICH_PID(3, 4, particle) < 0) {
+        if (TOP_ARICH_PID(3, 4, particle) < cut) {
           TLorentzVector tmp;
           tmp.SetXYZM(particle->getMom().Mag()*dir.X(), particle->getMom().Mag()*dir.Y(), particle->getMom().Mag()*dir.Z(), Kmass);
 
@@ -404,10 +432,10 @@ namespace Belle2 {
         m_m_bc = TMath::Sqrt((cmsE * cmsE) - B.Vect().Mag2());
         m_tree->Fill();
         /*
-        cout <<"-----------------------------------"<<endl;
-        cout <<"B0bar: deltaE"<< m_deltae<<"\t M_bc"<<m_m_bc<<"\t"<<B0mass<<endl;
-        cout <<"-----------------------------------"<<endl;
-        */
+         cout <<"-----------------------------------"<<endl;
+         cout <<"B0bar: deltaE"<< m_deltae<<"\t M_bc"<<m_m_bc<<"\t"<<B0mass<<endl;
+         cout <<"-----------------------------------"<<endl;
+         */
 
       }
 
@@ -425,9 +453,9 @@ namespace Belle2 {
         m_m_bc = TMath::Sqrt((cmsE * cmsE) - B.Vect().Mag2());
         m_tree->Fill();
         /*
-        cout <<"-----------------------------------"<<endl;
-        cout <<"B0bar: deltaE"<< m_deltae<<"\t M_bc"<<m_m_bc<<"\t"<<B0mass<<endl;
-        cout <<"-----------------------------------"<<endl;
+         cout <<"-----------------------------------"<<endl;
+         cout <<"B0bar: deltaE"<< m_deltae<<"\t M_bc"<<m_m_bc<<"\t"<<B0mass<<endl;
+         cout <<"-----------------------------------"<<endl;
          */
       }
 

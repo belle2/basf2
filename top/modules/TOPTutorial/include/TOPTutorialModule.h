@@ -27,7 +27,8 @@
 #include <top/dataobjects/TOPTrack.h>
 #include <top/dataobjects/TOPLikelihoods.h>
 #include <generators/dataobjects/MCParticle.h>
-#include <arich/modules/arichReconstruction/ARICHTrack.h>
+#include <arich/dataobjects/ARICHLikelihoods.h>
+#include <arich/dataobjects/ARICHAeroHit.h>
 
 namespace Belle2 {
   namespace top {
@@ -88,7 +89,7 @@ namespace Belle2 {
        */
       const TOPLikelihoods* getTOPLikelihoods(const MCParticle* particle);
 
-      const ARICHTrack* getARICHTrack(const MCParticle* particle);
+      const ARICHLikelihoods* getARICHLikelihoods(const MCParticle* particle);
 
       const MCParticle* getMCParticle(const GFTrack* particle);
 

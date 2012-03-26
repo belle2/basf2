@@ -9,7 +9,6 @@
  **************************************************************************/
 
 #include <eklm/dataobjects/EKLMSectorHit.h>
-#include <eklm/eklmutils/EKLMutils.h>
 #include <framework/logging/Logger.h>
 #include "TVector3.h"
 

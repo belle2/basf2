@@ -11,7 +11,7 @@
 #ifndef EKLMFIBERANDELECTRONICS_H
 #define EKLMFIBERANDELECTRONICS_H
 
-#include <eklm/eklmutils/EKLMutils.h>
+
 #include <eklm/dataobjects/EKLMSimHit.h>
 #include <eklm/dataobjects/EKLMStripHit.h>
 

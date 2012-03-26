@@ -10,8 +10,6 @@
 
 #include <eklm/receklm/EKLMRecon.h>
 
-#include <eklm/eklmutils/EKLMutils.h>
-
 
 
 using namespace std;
@@ -61,6 +59,7 @@ namespace Belle2 {
   void EKLMRecon::create2dHits()
   {
     // loop over sectors
+    /*
     for (vector<EKLMSectorHit*>::iterator sectorIter =
            m_SectorHitVector.begin(); sectorIter != m_SectorHitVector.end();
          sectorIter++) {
@@ -90,6 +89,7 @@ namespace Belle2 {
         }
       }
     }
+    */
   }
 
 

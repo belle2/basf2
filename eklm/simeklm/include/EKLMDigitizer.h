@@ -11,8 +11,6 @@
 #ifndef EKLMDIGITIZER_H
 #define EKLMDIGITIZER_H
 
-//#include <eklm/eklmutils/EKLMutils.h>
-
 
 #include <eklm/dataobjects/EKLMStepHit.h>
 #include <eklm/dataobjects/EKLMSimHit.h>

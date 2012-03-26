@@ -17,6 +17,7 @@
 #include  <eklm/dataobjects/EKLMStripHit.h>
 #include  "globals.hh"
 #include  "TVector3.h"
+#include "CLHEP/Vector/ThreeVector.h"
 
 #include <string>
 namespace Belle2 {
@@ -80,6 +81,13 @@ namespace Belle2 {
      * Number of plane.
      */
     int m_Plane;
+
+    const G4VPhysicalVolume* GetPhysicalVolumeByPoint(const G4ThreeVector& point);
+    double getLightPropagationLength(const G4VPhysicalVolume* vol, const CLHEP::Hep3Vector&  pos);
+    double getLightPropagationLength(const G4VPhysicalVolume* vol, const TVector3&  pos);
+    bool CheckStripOrientationX(const G4VPhysicalVolume* strip);
+    bool doesIntersect(const EKLMStripHit* hit1, const EKLMStripHit* hit2, TVector3& crossPoint);
+
 
 
   };

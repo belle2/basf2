@@ -4,7 +4,6 @@
 #include <eklm/modules/eklmReconstruction/EKLMReconstructionModule.h>
 #include <eklm/receklm/EKLMRecon.h>
 #include <eklm/geoeklm/GeoEKLMBelleII.h>
-#include <eklm/eklmutils/EKLMutils.h>
 
 using namespace std;
 using namespace Belle2;

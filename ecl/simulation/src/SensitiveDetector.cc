@@ -105,8 +105,6 @@ namespace Belle2 {
         G4ThreeVector posCell = v.GetTranslation();
         // Get layer ID
         Mapping(v.GetName());
-        ECLGeometryPar* eclp = ECLGeometryPar::Instance();
-
 
         if (v.GetName().find("Crystal") != string::npos) {
           int saveIndex = -999;

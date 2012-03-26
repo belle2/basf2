@@ -23,7 +23,7 @@ namespace Belle2 {
   public:
 
 
-    int m_eventId;/**event id of this shower. */
+    int m_showerId;/**shower id of this shower. */
     double m_Energy;/**Energy of this shower. */
     double m_Theta;/**Theta of this shower. */
     double m_Phi;/**Phi of this shower. */
@@ -40,8 +40,8 @@ namespace Belle2 {
     int m_Status;/**Status of this shower. */
     int m_Grade;/**Grade of this shower. */
 
-    //! The method to set eventId
-    void setEventId(int eventId) { m_eventId = eventId; }
+    //! The method to set showerId
+    void setShowerId(int showerId) { m_showerId = showerId; }
 
     //! The method to set Energy
     void setEnergy(double Energy) { m_Energy = Energy; }

@@ -140,7 +140,7 @@ void ECLRecCRModule::event()
       StoreArray<RecCRECL> eclRecCRArray(m_eclRecCRName);
       m_hitNum = eclRecCRArray->GetLast() + 1;
       new(eclRecCRArray->AddrAt(m_hitNum)) RecCRECL();
-      eclRecCRArray[m_hitNum]->setEventId(m_nEvent);
+      eclRecCRArray[m_hitNum]->setShowerId(nShower);
       eclRecCRArray[m_hitNum]->setEnergy((*iShower).second.Energy());
       eclRecCRArray[m_hitNum]->setTheta((*iShower).second.Theta());
       eclRecCRArray[m_hitNum]->setPhi((*iShower).second.Phi());

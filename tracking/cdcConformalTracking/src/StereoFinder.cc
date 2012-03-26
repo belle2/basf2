@@ -80,11 +80,11 @@ void StereoFinder::FindStereoSegments(CDCTrackCandidate startTrack, vector<CDCSe
 void StereoFinder::StereoFitCandidates(CDCTrackCandidate& candidate)
 {
   B2DEBUG(100, "Perform a stereo fit: candidate with " << candidate.getNSegments() << " segments");
-  if (candidate.getNSegments() > 0) {
+  if (candidate.getNSegments() > 0 && candidate.getNHits() > 10 && candidate.getNHits() < 200) {
     //create a graph to fit r vs z
     TGraph* zGraph;
-    double r[100];
-    double z[100];
+    double r[200];
+    double z[200];
     int nHits = candidate.getNHits(); //Nr of hits in a track
     bool refit = true;
 
@@ -152,6 +152,8 @@ void StereoFinder::StereoFitCandidates(CDCTrackCandidate& candidate)
 
     } //end while loop
   } //end if
+
+  else B2WARNING("This stereo candidate has too few or too many hits and wont be fitted!");
   B2DEBUG(100, "End stereo fit, number of segments reduced to " << candidate.getNSegments());
 }
 

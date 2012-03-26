@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors:                                                          *
+ * Contributors: Poyuan Chen                                              *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -40,34 +40,15 @@ namespace Belle2 {
       //! Save ECLSimHit into datastore
       int saveSimHit(
         const G4int cellId,
-        const G4int thetaId,
-        const G4int phiId,
         const G4int trackID,
         const G4int pid,
         const G4double tof,
         const G4double edep,
-        const G4double stepLength,
         G4ThreeVector mom,
-        G4ThreeVector posW,
         G4ThreeVector posIn,
         G4ThreeVector posOut
       );
 
-      //! Save EBECLSimHit into datastore
-      int saveEBSimHit(
-        const G4int cellId,
-        const G4int thetaId,
-        const G4int phiId,
-        const G4int trackID,
-        const G4int pid,
-        const G4double tof,
-        const G4double edep,
-        const G4double stepLength,
-        G4ThreeVector mom,
-        G4ThreeVector posW,
-        G4ThreeVector posIn,
-        G4ThreeVector posOut
-      );
 
 
       //! Get cell, theta, phi Id from PhysicalVolume

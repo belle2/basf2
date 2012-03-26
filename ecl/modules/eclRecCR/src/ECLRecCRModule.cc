@@ -163,7 +163,7 @@ void ECLRecCRModule::event()
 
   m_nEvent++;
   m_timeCPU = clock() * Unit::us;
-  B2INFO("ECLRecCRModule finished. Time per event: " << m_timeCPU  / Unit::ms << " ms.");
+  B2INFO("ECLRecCRModule finished. Time: " << m_timeCPU  / Unit::ms << " ms.");
 
 }
 

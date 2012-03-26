@@ -98,30 +98,6 @@ namespace Belle2 {
     */
     ECLSimHit() {;}
 
-    //! Useful Constructor
-    ECLSimHit(
-      int cellId,
-      int thetaId,
-      int phiId,
-      int trackId,
-      int pdg,
-      double flightTime,
-      double edep,
-      double FirstStep,
-      TVector3 momentum,
-      TVector3 posCell,
-      TVector3 posIn,
-      TVector3 posOut,
-      int posFlag) {
-      m_cellId = cellId;
-      m_trackId = trackId;
-      m_pdg = pdg;
-      m_flightTime = flightTime;
-      m_edep = edep;
-      m_momentum = momentum;
-      m_posIn = posIn;
-    }
-
     ClassDef(ECLSimHit, 2);/**< the class title */
 
   };

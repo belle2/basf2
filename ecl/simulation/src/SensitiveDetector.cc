@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors:                                                          *
+ * Contributors: Poyuan Chen                                              *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -17,7 +17,6 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
 #include <ecl/dataobjects/ECLSimHit.h>
-#include <ecl/dataobjects/ECLEBSimHit.h>
 #include <ecl/geometry/ECLGeometryPar.h>
 
 #include <string>
@@ -48,11 +47,10 @@ namespace Belle2 {
 
     SensitiveDetector::SensitiveDetector(G4String name, G4double thresholdEnergyDeposit, G4double thresholdKineticEnergy):
       Simulation::SensitiveDetectorBase(name, ECL), m_thresholdEnergyDeposit(thresholdEnergyDeposit),
-      m_thresholdKineticEnergy(thresholdKineticEnergy), m_hitNumber(0), m_EBhitNumber(0)
+      m_thresholdKineticEnergy(thresholdKineticEnergy), m_hitNumber(0)
     {
       StoreArray<MCParticle> mcParticles;
       StoreArray<ECLSimHit> eclSimHits;
-      StoreArray<ECLEBSimHit> eclEBSimHits;
       RelationArray eclSimHitRel(mcParticles, eclSimHits);
       registerMCParticleRelation(eclSimHitRel);
     }
@@ -62,18 +60,10 @@ namespace Belle2 {
     {
 
     }
+
     void SensitiveDetector::Initialize(G4HCofThisEvent* HCTE)
     {
-      // Create a new hit collection
-
-      // Assign a unique ID to the hits collection
-
-      // Attach collections to the hits collection of this event
-
-      // Initialize
-      B2INFO("SensitiveDetector ECL initialized");
     }
-
 
 //-----------------------------------------------------
 // Method invoked for every step in sensitive detector
@@ -116,17 +106,11 @@ namespace Belle2 {
         // Get layer ID
         Mapping(v.GetName());
         ECLGeometryPar* eclp = ECLGeometryPar::Instance();
-        TVector3 VecCell =  eclp->GetCrystalVec(m_cellID);
 
 
         if (v.GetName().find("Crystal") != string::npos) {
           int saveIndex = -999;
-          saveIndex = saveSimHit(m_cellID, m_thetaID, m_phiID  , m_trackID, pdgCode, (m_startTime + m_endTime) / 2, m_energyDeposit, 1, m_momentum, posCell, m_startPos, postPosition);
-        }
-
-        if (v.GetName().find("Diode") != string::npos) {
-          int saveEBIndex = -999;
-          saveEBIndex = saveEBSimHit(m_cellID, m_thetaID, m_phiID, m_trackID, pdgCode, (m_startTime + m_endTime) / 2, m_energyDeposit, 1, m_momentum, posCell, m_startPos, postPosition);
+          saveIndex = saveSimHit(m_cellID, m_trackID, pdgCode, (m_startTime + m_endTime) / 2, m_energyDeposit, m_momentum, m_startPos, postPosition);
         }
 
         //Reset TrackID
@@ -145,50 +129,13 @@ namespace Belle2 {
       B2INFO("End Of Event");
     }
 
-    int SensitiveDetector::saveEBSimHit(
-      const G4int cellId,
-      const G4int thetaId,
-      const G4int phiId,
-      const G4int trackID,
-      const G4int pid,
-      const G4double lof,
-      const G4double edep,
-      const G4double FirstStep,
-      G4ThreeVector mom,
-      G4ThreeVector posCell,
-      G4ThreeVector posIn,
-      G4ThreeVector posOut)
-    {
-      //change Later
-      StoreArray<ECLEBSimHit> eclEBArray;
-      m_EBhitNumber = eclEBArray->GetLast() + 1;
-      new(eclEBArray->AddrAt(m_EBhitNumber)) ECLEBSimHit();
-
-
-      eclEBArray[m_EBhitNumber]->setCellId(cellId);
-      eclEBArray[m_EBhitNumber]->setTrackId(trackID);
-      eclEBArray[m_EBhitNumber]->setPDGCode(pid);
-      eclEBArray[m_EBhitNumber]->setEnergyDep(edep / GeV);
-      TVector3 momentum(mom.getX() / GeV, mom.getY() / GeV, mom.getZ() / GeV);
-      eclEBArray[m_EBhitNumber]->setMomentum(momentum);
-      TVector3 positionIn(posIn.getX() / cm, posIn.getY() / cm, posIn.getZ() / cm);
-      eclEBArray[m_EBhitNumber]->setPosIn(positionIn);
-
-      return (m_EBhitNumber);
-    }
-
-
     int SensitiveDetector::saveSimHit(
       const G4int cellId,
-      const G4int thetaId,
-      const G4int phiId,
       const G4int trackID,
       const G4int pid,
       const G4double tof,
       const G4double edep,
-      const G4double FirstStep,
       G4ThreeVector mom,
-      G4ThreeVector posCell,
       G4ThreeVector posIn,
       G4ThreeVector posOut)
     {

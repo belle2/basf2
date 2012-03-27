@@ -54,7 +54,7 @@ TRGClock::~TRGClock() {
 }
 
 void
-TRGClock::dump(const std::string & message,
+TRGClock::dump(const std::string & ,
                const std::string & pre) const {
     cout << pre << _name << ":" << endl
          << pre << "    offset   :" << _offset << endl

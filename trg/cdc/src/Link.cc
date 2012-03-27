@@ -792,7 +792,7 @@ TRGCDCLink::nMissingAxialSuperLayers(const vector<TRGCDCLink *> & links) {
 }
 
 const Belle2::TRGCDCTrackMC &
-TRGCDCLink::links2HEP(const vector<TRGCDCLink *> & links) {
+TRGCDCLink::links2HEP(const vector<TRGCDCLink *> & ) {
     const Belle2::TRGCDCTrackMC * best = NULL;
     const std::vector<const Belle2::TRGCDCTrackMC *> list = Belle2::TRGCDCTrackMC::list();
     unsigned nHep = list.size();

@@ -107,9 +107,7 @@ main(int argc, char * argv[]) {
 }
 
 int
-vhdlVersion0(ofstream & vout) {
-    
-
+vhdlVersion0(ofstream & ) {
     return 0;
 }
 

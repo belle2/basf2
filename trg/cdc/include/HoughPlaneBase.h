@@ -490,7 +490,7 @@ TRGCDCHoughPlaneBase::vote(float rx,
 
 inline
 void
-TRGCDCHoughPlaneBase::vote(float xOffset, int weight) {
+TRGCDCHoughPlaneBase::vote(float, int) {
 // do nothing
 }
 

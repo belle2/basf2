@@ -261,6 +261,8 @@ TRGCDCTrack::perfectPosition(void) const {
 	//...Track segment hit...
 //	const TRGCDCWireHit & w = * links(i)[0]->hit();
     }
+
+    
 }
 
 

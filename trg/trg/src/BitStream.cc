@@ -69,7 +69,7 @@ TRGBitStream::~TRGBitStream() {
 }
 
 void
-TRGBitStream::dump(const string & msg,
+TRGBitStream::dump(const string & ,
 		   const string & pre) const {
 
     const string tab = "    ";

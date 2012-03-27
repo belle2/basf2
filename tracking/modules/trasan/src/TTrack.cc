@@ -4404,8 +4404,9 @@ TTrack::trackStatus(const TTrack & t) {
 
 std::string
 TTrack::trackStatus(const reccdc_trk & c) {
-    const reccdc_trk_add a = reccdc_trk_add::reccdc_trk_add();
-    return trackStatus(a);
+//     const reccdc_trk_add a = reccdc_trk_add::reccdc_trk_add();
+//     return trackStatus(a);
+    return("not implemented yet");
 }
 
 std::string

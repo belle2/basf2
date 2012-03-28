@@ -77,6 +77,17 @@ namespace Belle2 {
      */
     PXDRecoHit(const PXDCluster* hit, float sigmaU, float sigmaV, float covUV);
 
+    /** Construct PXDRecoHit from a PXD cluster
+     * This constructor is intended as a temporary solution for people who want to
+     * test the impact of realistic clusters right now using the current tracking stack and before the final error handling is
+     * implemented. The pitch / sqrt(12) will be added as measurement error estimation.
+     * This is of course not the exact error of the cluster and one cannot expect perfect tracking
+     * results when using this constructor
+     *
+     * @param hit    PXDCluster to use as base
+     */
+    PXDRecoHit(const PXDCluster* hit);
+
     /** Destructor. */
     virtual ~PXDRecoHit() {}
 

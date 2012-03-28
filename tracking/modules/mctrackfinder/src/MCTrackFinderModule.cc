@@ -18,6 +18,7 @@
 #include <cdc/dataobjects/CDCHit.h>
 #include <cdc/dataobjects/CDCSimHit.h>
 #include <pxd/dataobjects/PXDTrueHit.h>
+#include <pxd/dataobjects/PXDCluster.h>
 #include <svd/dataobjects/SVDTrueHit.h>
 #include <vxd/VxdID.h>
 
@@ -55,6 +56,11 @@ MCTrackFinderModule::MCTrackFinderModule() : Module()
   //pxd specific
   addParam("PXDHitsColName", m_pxdHitColName, "Name of collection holding the PXDHits", string(""));
   addParam("MCParticlesToPXDHitsColName", m_mcParticleToPXDHits, "Name of collection holding the Relations  MCParticles->PXDHits", string(""));
+  //pxd cluster specific
+  addParam("PXDClustersColName", m_pxdClusterColName, "Name of collection holding the PXDClusters", string(""));
+  addParam("PXDClustersToMCParticlesColName", m_pxdClusterToMCParticle, "Name of collection holding the Relations  PXDClusters->MCParticles", string(""));
+
+  addParam("UsePXDClusters", m_usePXDClusters, "Set true if you want to use PXDClusters instead of PXDTrueHits (UsePXDHits should be set true too)", bool(false));
   // svd specific
   addParam("SVDHitsColName", m_svdHitColName, "Name of collection holding the SVDHits", string(""));
   addParam("MCParticlesToSVDHitsColName", m_mcParticleToSVDHits, "Name of collection holding the Relations  MCParticles->SVDHits", string(""));
@@ -64,7 +70,7 @@ MCTrackFinderModule::MCTrackFinderModule() : Module()
   addParam("MCParticlesToCDCHitsColName", m_mcParticleToCDCHits, "Name of collection holding the Relations  MCParticles->CDCHits", string(""));
 
   //choose which hits to use, all hits assigned to the track candidate will be used in the fit
-  addParam("UsePXDHits", m_usePXDHits, "Set true if PXDHits should be used", bool(true));
+  addParam("UsePXDHits", m_usePXDHits, "Set true if PXDHits or PXDClusters should be used", bool(true));
   addParam("UseSVDHits", m_useSVDHits, "Set true if SVDHits should be used", bool(true));
   addParam("UseCDCHits", m_useCDCHits, "Set true if CDCHits should be used", bool(true));
 
@@ -125,6 +131,17 @@ void MCTrackFinderModule::event()
   B2DEBUG(149, "MCTrackFinder: Number of relations between MCParticles and PXDHits: " << nMcPartToPXDHits);
   if (nMcPartToPXDHits == 0) B2INFO("MCTrackFinder: MCParticlesToPXDHitsCollection is empty!");
 
+  //PXD clusters
+  StoreArray<PXDCluster> pxdClusters(m_pxdClusterColName);
+  int nPXDClusters = pxdClusters.getEntries();
+  B2DEBUG(149, "MCTrackFinder: Number of PXDClusters: " << nPXDClusters);
+  if (nPXDClusters == 0) {B2INFO("MCTrackFinder: PXDClustersCollection is empty!");}
+  RelationArray pxdClusterToMCParticle(pxdClusters, mcParticles);
+  int nPxdClusterToMCPart = pxdClusterToMCParticle.getEntries();
+  B2DEBUG(149, "MCTrackFinder: Number of relations between PXDCluster and MCParticles: " << nPxdClusterToMCPart);
+  if (nPxdClusterToMCPart == 0) B2INFO("MCTrackFinder: PXDClustersToMCParticlesCollection is empty!");
+
+
   //SVD
   StoreArray<SVDTrueHit> svdTrueHits(m_svdHitColName);
   int nSVDHits = svdTrueHits.getEntries();
@@ -180,13 +197,24 @@ void MCTrackFinderModule::event()
 
       // create a list containing the indices to the PXDHits that belong to one track
       vector<int> pxdHitsIndices;
-      for (int i = 0; i < nMcPartToPXDHits; ++i) {
-        if (mcPartToPXDTrueHits[i].getFromIndex() == unsigned(iPart)) {
-          for (unsigned int j = 0; j < mcPartToPXDTrueHits[i].getToIndices().size(); j++) {
-            pxdHitsIndices.push_back(mcPartToPXDTrueHits[i].getToIndex(j));
+      if (m_usePXDClusters == false) {
+        for (int i = 0; i < nMcPartToPXDHits; ++i) {
+          if (mcPartToPXDTrueHits[i].getFromIndex() == unsigned(iPart)) {
+            for (unsigned int j = 0; j < mcPartToPXDTrueHits[i].getToIndices().size(); j++) {
+              pxdHitsIndices.push_back(mcPartToPXDTrueHits[i].getToIndex(j));
+            }
+          }
+        }
+      } else {
+        for (int i = 0; i < nPxdClusterToMCPart; ++i) {
+          for (unsigned int j = 0; j < pxdClusterToMCParticle[i].getToIndices().size(); j++) {
+            if (pxdClusterToMCParticle[i].getToIndex(j) == unsigned(iPart)) {
+              pxdHitsIndices.push_back(pxdClusterToMCParticle[i].getFromIndex());
+            }
           }
         }
       }
+
       // create a list containing the indices to the SVDHits that belong to one track
       vector<int> svdHitsIndices;
       for (int i = 0; i < nMcPartToSVDHits; ++i) {
@@ -266,7 +294,7 @@ void MCTrackFinderModule::event()
         // pxd 0
         //   svd 1
         //     cdc 2
-        if (m_usePXDHits) {
+        if (m_usePXDHits && m_usePXDClusters == false) {
           BOOST_FOREACH(int hitID, pxdHitsIndices) {
             int sensorID = pxdTrueHits[hitID]->getSensorID();
             float time = pxdTrueHits[hitID]->getGlobalTime();
@@ -275,6 +303,18 @@ void MCTrackFinderModule::event()
             trackCandidates[counter]->addHit(0, hitID, double(time), uniqueSensorId);
           }
           B2INFO("     add " << pxdHitsIndices.size() << " PXDHits");
+        }
+
+        if (m_usePXDHits && m_usePXDClusters) {
+          BOOST_FOREACH(int hitID, pxdHitsIndices) {
+            int sensorID = pxdClusters[hitID]->getSensorID();
+            VxdID aVXDId = VxdID(sensorID);
+            int uniqueSensorId = aVXDId.getID();
+            //the real clusters do not have timing information, set layer ID instead ....
+            float time = aVXDId.getLayer();
+            trackCandidates[counter]->addHit(0, hitID, double(time), uniqueSensorId);
+          }
+          B2INFO("     add " << pxdHitsIndices.size() << " PXDClusters");
         }
         if (m_useSVDHits) {
           BOOST_FOREACH(int hitID, svdHitsIndices) {

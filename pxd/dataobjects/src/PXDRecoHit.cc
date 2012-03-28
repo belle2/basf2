@@ -87,15 +87,14 @@ PXDRecoHit::PXDRecoHit(const PXDCluster* hit):
   GFRecoHitIfc<GFPlanarHitPolicy> (HIT_DIMENSIONS), m_sensorID(0), m_trueHit(0), m_cluster(hit),
   m_energyDep(0)//, m_energyDepError(0)
 {
-  if (!gRandom) B2FATAL("gRandom not initialized, please set up gRandom first");
   // Set the sensor UID
   m_sensorID = hit->getSensorID();
   const PXD::SensorInfo& geometry = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(m_sensorID));
-  float sigmaU = geometry.getUPitch(hit->getV()) / sqrt(12);
-  float sigmaV = geometry.getVPitch(hit->getV()) / sqrt(12);
+  double sigmaU = geometry.getUPitch(hit->getV()) / sqrt(12);
+  double sigmaV = geometry.getVPitch(hit->getV()) / sqrt(12);
   // Set positions
-  fHitCoord(0, 0) = gRandom->Gaus(hit->getU(), sigmaU);
-  fHitCoord(1, 0) = gRandom->Gaus(hit->getV(), sigmaV);
+  fHitCoord(0, 0) = hit->getU();
+  fHitCoord(1, 0) = hit->getV();
   // Set the error covariance matrix
   fHitCov(0, 0) = sigmaU * sigmaU;
   fHitCov(0, 1) = 0;

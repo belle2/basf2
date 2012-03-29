@@ -14,6 +14,7 @@
 #define TRG_SHORT_NAMES
 #define TRGCDC_SHORT_NAMES
 
+#include "trg/cdc/TrackSegment.h"
 #include "trg/cdc/TrackSegmentHit.h"
 #include "trg/cdc/Wire.h"
 
@@ -21,25 +22,21 @@ using namespace std;
 
 namespace Belle2 {
 
-TRGCDCTrackSegmentHit::TRGCDCTrackSegmentHit(const TRGCDCWire & w)
+TRGCDCTrackSegmentHit::TRGCDCTrackSegmentHit(const TCTSegment & w)
     : TCWHit(w),
+      _segment(& w),
       _state(0) {
 }
 
-TRGCDCTrackSegmentHit::TRGCDCTrackSegmentHit(const TRGCDCWire & w,
-					     float driftLeft,
-					     float driftLeftError,
-					     float driftRight,
-					     float driftRightError,
-					     float fudgeFactor)
-    : TCWHit(w,
-	     0,
-	     0,
-	     driftLeft,
-	     driftLeftError,
-	     driftRight,
-	     driftRightError,
-	     fudgeFactor),
+TRGCDCTrackSegmentHit::TRGCDCTrackSegmentHit(const TCTSegment & w,
+					     const TCWHit & h)
+// 					     float driftLeft,
+// 					     float driftLeftError,
+// 					     float driftRight,
+// 					     float driftRightError,
+// 					     float fudgeFactor)
+    : TCWHit(h),
+      _segment(& w),
       _state(0) {
 }
 

@@ -123,7 +123,7 @@ class TRGCDCWireHit {
     /// returns sequential Length in one segment : this parameter is used in TCurlFinder now.
     unsigned sequence(void) const;
 
-    /// returns a pointer to TRGCDCWireHitMC.
+    /// returns a pointer to TRGCDCWireHitMC. This function will be removed when trasan is ready not to use this function.
     const TRGCDCWireHitMC * const mc(void) const;
 
     /// returns an index to CDCHit.

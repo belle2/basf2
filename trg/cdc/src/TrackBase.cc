@@ -75,7 +75,7 @@ TRGCDCTrackBase::dump(const string & cmd, const string & pre) const {
 	    cout << l.wire()->name();
         }
         if (_ts[i].size())
-            cout << ")";
+            cout << "),";
     }
 //     if (detail) {
 

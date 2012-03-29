@@ -701,12 +701,12 @@ TRGCDC::update(bool mcAnalysis) {
 	    const TCWHit * h = w->hit();
 	    if (h) {
 		if (! th) {
-		    th = new TCTSHit((TCWire &) s,
-				     h->drift(),
-				     h->dDrift(),
-				     h->drift(),
-				     h->dDrift(),
-				     1);
+		    th = new TCTSHit(s, * h);
+// 				     h->drift(),
+// 				     h->dDrift(),
+// 				     h->drift(),
+// 				     h->dDrift(),
+// 				     1);
 		    s.TCWire::hit(th);
 		    s.hit(th);
 		}
@@ -1163,7 +1163,7 @@ TRGCDC::simulate(void) {
         }
     }
 
-    if (_mode != 0) {
+    if (_mode == 1) {
 	TRGDebug::leaveStage("TRGCDC simulation");
 	return;
     }
@@ -1173,8 +1173,13 @@ TRGCDC::simulate(void) {
     _hFinder->doit(trackList);
 
     //...Perfect position test...
-//  vector<HepGeom::Point3D<double> > ppos = trackList[0]->perfectPosition();
-
+    vector<HepGeom::Point3D<double> > ppos = trackList[0]->perfectPosition();
+    if (TRGDebug::level()) {
+	if (ppos.size() != 9) {
+	    cout << TRGDebug::tab() << "There are only " << ppos.size()
+		 << " perfect positions" << endl;
+	}
+    }
 
     //...2D tracker : helix fitter...
 

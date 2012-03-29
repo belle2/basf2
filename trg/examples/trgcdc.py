@@ -45,7 +45,7 @@ cdctrg      = fw.register_module("TRGCDC")
 g4sim.param('UICommands',['/control/execute physics.mac'])
 
 #...EvtMetaGen...
-evtmetagen.param({'EvtNumList': [10], 'RunList': [1]})
+evtmetagen.param({'EvtNumList': [100], 'RunList': [1]})
 
 #...GeoBuilder... Exclude detectors other than CDC
 geobuilder.param('Components', ['MagneticField', 'CDC'])
@@ -55,6 +55,7 @@ cdctrg.param('ConfigFile', os.path.join(basf2datadir,"trg/TRGCDCConfig_0_2010111
 cdctrg.param('DebugLevel',2)
 cdctrg.param('CurlBackStop',1)
 cdctrg.param('HoughFinderPerfect',1)
+cdctrg.param('SimulationMode',11)
 
 #set mcprinter
 mcparticleprinter = register_module('PrintMCParticles')

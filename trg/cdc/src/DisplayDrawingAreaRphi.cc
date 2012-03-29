@@ -363,10 +363,20 @@ TRGCDCDisplayDrawingAreaRphi::drawTrack(const TCTrack & t,
         const vector<TCLink *> & links = t.links(i);
         for (unsigned j = 0; j < links.size(); j++) {
 	    const TCLink & l = * links[j];
-            drawTrackSegment(* (TCTSegment *) l.wire(),
-			     lineWidth,
-			     c,
-			     s);
+//             drawTrackSegment(* (TCTSegment *) l.wire(),
+// 			     lineWidth,
+// 			     c,
+// 			     s);
+	    const TCWire * w = l.wire();
+	    const TCTSegment * t = dynamic_cast<const TCTSegment *>(w);
+
+	    cout << "w,t=" << w << "," << t << endl;
+
+	    if (t)
+		drawTrackSegment(* t,
+				 lineWidth,
+				 c,
+				 s);
 	    _window->draw_line(_gc,
 			       x(l.positionOnTrack().x() * 10),
 			       y(l.positionOnTrack().y() * 10),
@@ -382,8 +392,10 @@ TRGCDCDisplayDrawingAreaRphi::drawTrack(const TCTrack & t,
     const double radius = fabs(hIp.radius());
     const HepGeom::Point3D<double> pIn = t.links(0)[0]->positionOnTrack();
     const HepGeom::Point3D<double> pOut = t.links(8)[0]->positionOnTrack();
+
 //     const HepGeom::Point3D<double> pIn = TLink::innerMost(t.cores())->positionOnTrack() - h;
 //     const HepGeom::Point3D<double> pOut = TLink::outerMost(t.cores())->positionOnTrack() - h;
+
     double a0 = atan2(pIn.y(), pIn.x()) / M_PI * 180;
     double a1 = atan2(pOut.y(), pOut.x()) / M_PI * 180;
      std::cout << "h=" << h << ",r=" << radius

@@ -13,6 +13,8 @@
 
 #define TRGCDC_SHORT_NAMES
 
+#include "cdc/dataobjects/CDCSimHit.h"
+#include "trg/trg/Debug.h"
 #include "trg/trg/Constants.h"
 #include "trg/cdc/Track.h"
 #include "trg/cdc/Circle.h"
@@ -249,6 +251,9 @@ TRGCDCTrack::perfectPosition(void) const {
     //...CDC...
     const TRGCDC & cdc = * TRGCDC::getTRGCDC();
 
+    //...Return value...
+    vector<HepGeom::Point3D<double> > posv;
+
     //...Super layer loop...
     for (unsigned i = 0; i < cdc.nSuperLayers(); i++) {
 
@@ -256,13 +261,37 @@ TRGCDCTrack::perfectPosition(void) const {
 	if ((links(i).size() == 0) || (links(i).size() > 1)) {
 	    cout << "TRGCDCTrack::perfectPosition !!! #links in superlayer "
 		 << i << " is " << links(i).size() << endl;
+	    continue;
 	}
 	    
 	//...Track segment hit...
-//	const TRGCDCWireHit & w = * links(i)[0]->hit();
+	const TCTSHit * h = dynamic_cast<const TCTSHit *>(links(i)[0]->hit());
+	if (! h) {
+	    cout << "TRGCDCTrack::perfectPosition !!! hit is not a TCTSHit"
+		 << endl;
+	    continue;
+	}
+
+	//...CDCSimHit...
+	const CDCSimHit * s = h->simHit();
+	if (! s) {
+	    cout << "TRGCDCTrack::perfectPosition !!! no CDCSimHit found"
+		 << endl;
+	    continue;
+	}
+
+	//...Position...
+	posv.push_back(HepGeom::Point3D<double>(s->getPosTrack().x(),
+						s->getPosTrack().y(),
+						s->getPosTrack().z()));
+
+	if (TRGDebug::level() > 1) {
+	    cout << TRGDebug::tab() << "Perfect position TSLayer " << i
+		 << " : " << posv.back() << endl;
+	}
     }
 
-    
+    return posv;
 }
 
 

@@ -17,10 +17,23 @@
 namespace Belle2 {
 
   /**
+   * \addtogroup modules
+   * @{
+   */
+
+  /**
    * A module that restores the random seed from an output file.
    *
    * This module sets the random number generator seed to the
    * one that is stored in the given output file.
+
+  \correlationdiagram
+
+  FileMetaData = graph.data('FileMetaData')
+  module = graph.module('RandomSeedRestore', [FileMetaData], [])
+
+  \endcorrelationdiagram
+
    */
   class RandomSeedRestoreModule : public Module {
 
@@ -42,6 +55,8 @@ namespace Belle2 {
 
     std::string m_fileName;    /**< The name of the file that contains the random number seed. */
   };
+
+  /*! @} */
 }
 
 #endif /* RANDOMSEEDRESTOREMODULE_H_ */

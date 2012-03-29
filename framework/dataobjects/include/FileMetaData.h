@@ -17,6 +17,11 @@
 
 namespace Belle2 {
 
+  /**
+   * \addtogroup dataobjects
+   * @{
+   */
+
   /** Metadata information about a file
    */
   class FileMetaData : public TObject {
@@ -255,5 +260,8 @@ namespace Belle2 {
     ClassDef(FileMetaData, 2);
 
   }; //class
+
+  /*! @} */
+
 } // namespace Belle2
 #endif // FILEMETADATA

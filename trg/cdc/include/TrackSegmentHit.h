@@ -67,7 +67,7 @@ class TRGCDCTrackSegmentHit : public TRGCDCWireHit {
   private:
 
     /// Track segment
-    TRGCDCTrackSegment * _segment;
+    const TRGCDCTrackSegment * _segment;
 
     /// State.
     mutable unsigned _state;
@@ -77,7 +77,7 @@ class TRGCDCTrackSegmentHit : public TRGCDCWireHit {
 
 inline
 const TRGCDCTrackSegment &
-TRGCDCWireHit::trackSegment(void) const {
+TRGCDCTrackSegmentHit::trackSegment(void) const {
     return * _segment;
 }
 

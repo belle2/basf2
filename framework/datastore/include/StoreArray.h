@@ -38,7 +38,7 @@ namespace Belle2 {
      *  @param name        Name under which the TClonesArray is stored.
      *  @param durability  Specifies lifetime of array in question.
      */
-    StoreArray(const std::string& name = "", const DataStore::EDurability& durability = DataStore::c_Event) {
+    StoreArray(const std::string& name = "", DataStore::EDurability durability = DataStore::c_Event) {
       assignArray(name, durability);
     }
 
@@ -57,8 +57,8 @@ namespace Belle2 {
      *  @param durability  Lifetime of stored TClonesArray.
      *  @param array       TClonesArray for storage.
      */
-    StoreArray(TClonesArray* const array, const std::string& name , const DataStore::EDurability& durability = DataStore::c_Event)
-        : m_name(name), m_durability(durability), m_storeArray(array) {
+    StoreArray(TClonesArray* const array, const std::string& name, DataStore::EDurability durability = DataStore::c_Event)
+      : m_name(name), m_durability(durability), m_storeArray(array) {
       DataStore::Instance().handleArray<T>(m_name, durability, m_storeArray);
     }
 
@@ -67,16 +67,16 @@ namespace Belle2 {
      *  @param name       Key with which the TClonesArray is saved. An empty string is treated as equal to class name.
      *  @param durability Specifies lifetime of array in question.
      */
-    bool assignArray(const std::string& name, const DataStore::EDurability& durability = DataStore::c_Event);
+    bool assignArray(const std::string& name, DataStore::EDurability durability = DataStore::c_Event);
 
     //------------------------ Imitate array functionality -----------------------------------------------------
     TClonesArray& operator *() const {return *m_storeArray;} /**< Imitate array functionality. */
     TClonesArray* operator ->() const {return m_storeArray;} /**< Imitate array functionality. */
 
-    bool operator==(const StoreArray<T> &b) {                /**< Check if two StoreArrays point to the same array. */
+    bool operator==(const StoreArray<T> &b) const {                /**< Check if two StoreArrays point to the same array. */
       return (b.m_name == m_name) && (b.m_durability == m_durability);
     }
-    bool operator!=(const StoreArray<T> &b) {                /**< ...or to different ones. */
+    bool operator!=(const StoreArray<T> &b) const {                /**< ...or to different ones. */
       return (b.m_name != m_name) || (b.m_durability != m_durability);
     }
     operator bool() const {return m_storeArray;}  /**< Imitate array functionality. */
@@ -95,16 +95,11 @@ namespace Belle2 {
     /** Returns name under which the object is saved in the DataStore. */
     AccessorParams getAccessorParams() const {return make_pair(m_name, m_durability);};
     /** Return  name under which the object is saved in the DataStore. */
-    std::string getName() const { return m_name; }
+    const std::string& getName() const { return m_name; }
     /** Return  durability with which the object is saved in the DataStore. */
     DataStore::EDurability getDurability() const { return m_durability; }
 
     //------------------------ Parsing for easier handling of TClonesArrays -----------------------------------
-    /** Get the number of occupied slots in the array. */
-    int GetEntries() const {
-      B2WARNING("This method is depreciated. Please use getEntries() instead!");
-      return m_storeArray->GetEntriesFast();
-    }
     /** Get the number of occupied slots in the array. */
     int getEntries() const {return m_storeArray->GetEntriesFast();}
 
@@ -124,12 +119,12 @@ namespace Belle2 {
 
 //-------------------Implementation of template part of the class ---------------------------------
 template <class T>
-bool Belle2::StoreArray<T>::assignArray(const std::string& name, const DataStore::EDurability& durability)
+bool Belle2::StoreArray<T>::assignArray(const std::string& name, DataStore::EDurability durability)
 {
   if (name == "") {
     m_name = DataStore::defaultArrayName<T>();
   } else {
-    m_name       = name;
+    m_name = name;
   }
   m_durability = durability;
   m_storeArray = 0;

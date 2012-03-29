@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Guofu Cao                                                *
+ * Contributors: Poyuan Chen                                              *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -42,52 +42,70 @@ namespace Belle2 {
 
     //! The method to set showerId
     void setShowerId(int showerId) { m_showerId = showerId; }
-
     //! The method to set Energy
     void setEnergy(double Energy) { m_Energy = Energy; }
-
     //! The method to set Theta
     void setTheta(double Theta) { m_Theta = Theta; }
-
     //! The method to set Phi
     void setPhi(double Phi) { m_Phi = Phi; }
-
     //! The method to set Distance
     void setDistance(double Distance) { m_Distance = Distance; }
-
     //! The method to set Mass
     void setMass(double Mass) { m_Mass = Mass; }
-
     //! The method to set Width
     void setWidth(double Width) { m_Width = Width; }
-
+    //! The method to set E9oE25
     void setE9oE25(double E9oE25) { m_E9oE25 = E9oE25; }
-
     //! The method to set TotEnergy
     void setTotEnergy(double TotEnergy) { m_TotEnergy = TotEnergy; }
-
     //! The method to set E9oE25unf
     void setE9oE25unf(double E9oE25unf) { m_E9oE25unf = E9oE25unf; }
-
     //! The method to set m_UncEnergy
     void setUncEnergy(double UncEnergy) { m_UncEnergy = UncEnergy; }
-
     //! The method to set NHits
     void setNHits(double NHits) { m_NHits = NHits; }
-
     //! The method to set WNHits
     void setWNHits(double WNHits) { m_WNHits = WNHits; }
-
     //! The method to set NHitsUsed
     void setNHitsUsed(double NHitsUsed) { m_NHitsUsed = NHitsUsed; }
-
     //! The method to set Status
     void setStatus(int Status) { m_Status = Status; }
-
     //! The method to set Grade
     void setGrade(int Grade) { m_Grade = Grade ; }
 
 
+    //! The method to get showerId
+    int GetShowerId() { return m_showerId ; }
+    //! The method to get Energy
+    double GetEnergy() { return m_Energy ; }
+    //! The method to get Theta
+    double GetTheta() { return m_Theta ; }
+    //! The method to get Phi
+    double GetPhi() { return m_Phi ; }
+    //! The method to get Distance
+    double GetDistance() { return m_Distance ; }
+    //! The method to get Mass
+    double GetMass() { return m_Mass ; }
+    //! The method to get Width
+    double GetWidth() { return m_Width ; }
+    //! The method to get E9oE25
+    double GetE9oE25() { return m_E9oE25 ; }
+    //! The method to get TotEnergy
+    double GetTotEnergy() { return m_TotEnergy ; }
+    //! The method to get E9oE25unf
+    double GetE9oE25unf() { return m_E9oE25unf ; }
+    //! The method to get return m_UncEnergy
+    double GetUncEnergy() { return m_UncEnergy ; }
+    //! The method to get NHits
+    double GetNHits() { return m_NHits ; }
+    //! The method to get WNHits
+    double GetWNHits() { return m_WNHits ; }
+    //! The method to get NHitsUsed
+    double GetNHitsUsed() { return m_NHitsUsed ; }
+    //! The method to get Status
+    int GetStatus() { return m_Status ; }
+    //! The method to get Grade
+    int GetGrade() { return m_Grade  ; }
 
     //! Empty constructor
     /*! Recommended for ROOT IO

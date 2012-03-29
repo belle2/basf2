@@ -27,7 +27,7 @@ namespace Belle2 {
       ~SensitiveDetector();
 
       //! Register ECL hits collection into G4HCofThisEvent
-      void Initialize(G4HCofThisEvent* HCTE);
+//      void Initialize(G4HCofThisEvent* HCTE);
 
       //! Process each step and calculate variables defined in ECLHit (not yet prepared)
       bool step(G4Step* aStep, G4TouchableHistory* history);

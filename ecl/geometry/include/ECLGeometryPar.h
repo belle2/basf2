@@ -143,9 +143,9 @@ namespace Belle2 {
 ///
     const std::vector< Identifier >::const_iterator nextEnd()   const ;
 ///
-    const std::vector< Identifier >::size_type      nearSize()  const ;
+    std::vector< Identifier >::size_type      nearSize()  const ;
 ///
-    const std::vector< Identifier >::size_type      nextSize()  const ;
+    std::vector< Identifier >::size_type      nextSize()  const ;
 
     /// assignment operator(s)
     const EclNbr& operator=(const EclNbr& aNbr);

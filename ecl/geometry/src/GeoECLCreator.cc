@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Guofu Cao                                                *
+ * Contributors: Poyuan Chen                                              *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -229,6 +229,9 @@ namespace Belle2 {
 
     void GeoECLCreator::create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes type)
     {
+
+      if (type) {}
+
       isBeamBkgStudy = content.getInt("BeamBackgroundStudy");
       string CsI  = content.getString("CsI");
       G4Material* medCsI = geometry::Materials::get(CsI.c_str());
@@ -553,22 +556,6 @@ namespace Belle2 {
         assemblyBrDiodes->MakeImprint(logical_ecl, Global_offset);
         assemblyBwDiodes->MakeImprint(logical_ecl, Global_offset);
       }
-      makeEndcap(0);
-      makeEndcap(1);
-
-///////////////////////////
-//////makeBarrelSuppor/////
-///////////////////////////
-
-
-//////BarrelCylinderMotherVolume///
-//       TripletF(k_c2z1, k_c2r1, k_c2r3),
-//       TripletF(k_c2z2, k_c2r1, k_c2r3),
-//       TripletF(k_c2z2, k_c2r1, k_c2r2),
-//       TripletF( k_c1z2, k_c1r1, k_c1r2)
-//       TripletF( k_c1z2, k_c1r1, k_c1r3)
-//       TripletF( k_c1z3, k_c1r1, k_c1r3)
-
 
       double BarrelCylinderWZ[6]    = {k_c2z1, k_c2z2, k_c2z2, k_c1z2, k_c1z2, k_c1z3};
       double BarrelCylinderWRin[6]  = {k_c2r1, k_c2r1, k_c2r1, k_c1r1, k_c1r1, k_c1r1};
@@ -578,11 +565,6 @@ namespace Belle2 {
       G4Polycone* BarrelCylinderWorld = new G4Polycone("BarrelCylinderWorld", 0, 2 * PI, 6, BarrelCylinderWZ, BarrelCylinderWRin, BarrelCylinderWRout);
       G4LogicalVolume* logical_BarrelCylinder = new G4LogicalVolume(BarrelCylinderWorld, medAir, "logical_BarrelCylinderWorld");
       physical_ECLBarrelCylinder = new G4PVPlacement(0, G4ThreeVector(0., 0., 0.), logical_BarrelCylinder, "physicalBarrelCylinder", &topVolume, false, 0);
-
-
-
-
-
       G4AssemblyVolume* assemblyBarrelCylinderSupport = new G4AssemblyVolume();
 
       double BarrelCylinder1Z[4] = {k_c1z1, k_c1z2, k_c1z2, k_c1z3};
@@ -608,6 +590,20 @@ namespace Belle2 {
       assemblyBarrelCylinderSupport->AddPlacedVolume(barCy2_logi, Global_offset);
       assemblyBarrelCylinderSupport->MakeImprint(logical_BarrelCylinder, Global_offset);
 
+
+      makeEndcap(0);
+      makeEndcap(1);
+      makeSupport();
+
+
+
+    }//create
+
+    void GeoECLCreator::makeSupport()
+    {
+///////////////////////////
+//////makeBarrelSuppor/////
+///////////////////////////
       G4AssemblyVolume* assemblyInnerBarrelSupport = new G4AssemblyVolume();
       const EclRad InnerBarreloffset = (2.796 - 2.5) * deg;
       const int InnerBarrelnSectors = 144 / 2;
@@ -1142,8 +1138,7 @@ namespace Belle2 {
 
       assemblyBackwordEndcapSupport->MakeImprint(logical_ecl, Global_offset);
       assemblyForwordEndcapSupport->MakeImprint(logical_ecl, Global_offset);
-
-    }//create
+    }//makeSupport
 
     void GeoECLCreator::makeEndcap(const bool aForward)
     {

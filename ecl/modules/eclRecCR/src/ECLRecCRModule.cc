@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Martin Heck                                              *
+ * Contributors: Poyuan Chen                                              *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -11,6 +11,8 @@
 #include <ecl/modules/eclRecCR/ECLRecCRModule.h>
 #include <ecl/dataobjects/DigiECL.h>
 #include <ecl/dataobjects/RecCRECL.h>
+#include <ecl/dataobjects/HitAssignmentECL.h>
+
 
 #include <ecl/geometry/ECLGeometryPar.h>
 #include <ecl/rec_lib/TEclCFCR.h>
@@ -47,7 +49,7 @@ REG_MODULE(ECLRecCR)
 ECLRecCRModule::ECLRecCRModule() : Module()
 {
   //Set module properties
-  setDescription("Creates ECLRecCRHits from ECLHits.");
+  setDescription("Creates ECLRecCRHits from ECLDigi.");
 
   //Parameter definition
   addParam("ECLRecInput", m_eclDigiCollectionName,
@@ -56,6 +58,10 @@ ECLRecCRModule::ECLRecCRModule() : Module()
   //output
   addParam("ECLRecCROutput", m_eclRecCRName,
            "//Output of this module//(EventNo,CRId,cellId)", string("ECLRecCRHits"));
+
+
+  addParam("ECLHitAssignmentinput", m_eclHitAssignmentName,
+           "//input of this module//(EventNo,CRId,cellId)", string("ECLHitAssignment"));
 
 
 //  addParam("RandomSeed", m_randSeed, "User-supplied random seed; Default 0 for ctime", (unsigned int)(0));
@@ -86,13 +92,6 @@ void ECLRecCRModule::beginRun()
 
 void ECLRecCRModule::event()
 {
-
-
-
-
-
-  m_timeCPU = clock() * Unit::us;
-  B2INFO("ECLRecCRModule m_timeCPU Hit initialize " << m_timeCPU << " us ;" << m_timeCPU / Unit::ms << " ms.");
   //Input Array
   StoreArray<DigiECL> eclDigiArray(m_eclDigiCollectionName);
   if (!eclDigiArray) {
@@ -129,14 +128,22 @@ void ECLRecCRModule::event()
       ///
       /// Shower Attributes
       ///
-      cout << "shower Energy: " << (*iShower).second.Energy() << " Theta " << (*iShower).second.Theta() / PI * 180 << " Phi " << (*iShower).second.Phi() / PI * 180 << endl;
+//      cout<<nShower << "shower Energy: " << (*iShower).second.Energy() << " Theta " << (*iShower).second.Theta() / PI * 180 << " Phi " << (*iShower).second.Phi() / PI * 180 << endl;
 
-//   for(Datecl_ehits_Manager::iterator ii = ehits_mgr.begin();
-//      ii != ehits_mgr.end(); ++ii) {
-//-- skip unless enough energy (500 keV)
-//       if (ii->energy()<0.0005) continue;
-//       cf.Accumulate(ii->get_ID() , ii->energy(), ii->cId());
-//   }
+      TEclCFShower iSh = (*iShower).second;
+      std::vector<MEclCFShowerHA> HAs = iSh.HitAssignment();
+      for (std::vector<MEclCFShowerHA>::iterator iHA = HAs.begin();
+           iHA != HAs.end(); ++iHA) {
+
+        StoreArray<HitAssignmentECL> eclHaArray(m_eclHitAssignmentName);
+        m_HANum = eclHaArray->GetLast() + 1;
+        new(eclHaArray->AddrAt(m_HANum)) HitAssignmentECL();
+        eclHaArray[m_HANum]->setShowerId(nShower);
+        eclHaArray[m_HANum]->setCellId(iHA->Id());
+
+//        cout<<iHA->Id()<<" ";
+      }
+//        cout<<endl;
       StoreArray<RecCRECL> eclRecCRArray(m_eclRecCRName);
       m_hitNum = eclRecCRArray->GetLast() + 1;
       new(eclRecCRArray->AddrAt(m_hitNum)) RecCRECL();
@@ -162,8 +169,6 @@ void ECLRecCRModule::event()
 
 
   m_nEvent++;
-  m_timeCPU = clock() * Unit::us;
-  B2INFO("ECLRecCRModule finished. Time: " << m_timeCPU  / Unit::ms << " ms.");
 
 }
 
@@ -176,8 +181,6 @@ void ECLRecCRModule::terminate()
 {
   m_timeCPU = clock() * Unit::us - m_timeCPU;
 
-  // Announce
-  B2INFO("ECLRecCRModule finished. Time per event: " << m_timeCPU / m_nEvent / Unit::ms << " ms.");
 }
 
 

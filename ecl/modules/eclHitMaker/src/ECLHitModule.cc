@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Guofu Cao, Martin Heck                                   *
+ * Contributors: Poyuan Chen                                              *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -80,14 +80,11 @@ void ECLHitModule::initialize()
 
 void ECLHitModule::beginRun()
 {
-  B2INFO("ECLHitModule: Processing run: " << m_nRun);
 }
 
 void ECLHitModule::event()
 {
 
-  m_timeCPU = clock() * Unit::us;
-  B2INFO("ECLHitModule m_timeCPU Hit initialize " << m_timeCPU << " us ;" << m_timeCPU / Unit::ms << " ms.");
   StoreArray<ECLSimHit> eclArray(m_inColName);
   if (!eclArray) {
     B2ERROR("Can not find " << m_inColName << ".");
@@ -179,8 +176,6 @@ void ECLHitModule::event()
   } //store  each crystal hit
 
   m_nEvent++;
-  m_timeCPU = clock() * Unit::us;
-  B2INFO("ECLHitModule finished. End CPU Time " << m_timeCPU  / Unit::ms << " ms.");
 }
 
 

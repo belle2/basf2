@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Martin Heck                                              *
+ * Contributors: Poyuan Chen                                              *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -60,17 +60,15 @@ namespace Belle2 {
   private:
     /** Name of output Hit collection of this module
      */
-    std::string m_eclRecCRName;
-
-    /**  Name of collection of ECLRecCR.
-      */
-    std::string m_eclDigiCollectionName;
+    std::string m_eclRecCRName;  /* Name of collection of ECLRecCR.*/
+    std::string m_eclDigiCollectionName;/* Name of collection of ECLDigi.*/
+    std::string m_eclHitAssignmentName; /* Name of collection of ECLHitAssignment.*/
 
     double m_timeCPU;                /*!< CPU time     */
     int    m_nRun;                   /*!< Run number   */
     int    m_nEvent;                 /*!< Event number */
-    int    m_hitNum;
-
+    int    m_hitNum;                 /*!< ECLRecCR index */
+    int    m_HANum;                 /*!<  ECLHitAssignment. index */
 
 
 

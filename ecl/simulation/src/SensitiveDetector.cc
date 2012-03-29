@@ -61,9 +61,9 @@ namespace Belle2 {
 
     }
 
-    void SensitiveDetector::Initialize(G4HCofThisEvent* HCTE)
-    {
-    }
+//    void SensitiveDetector::Initialize(G4HCofThisEvent* HCTE)
+//    {
+//    }
 
 //-----------------------------------------------------
 // Method invoked for every step in sensitive detector

@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Guofu Cao, Martin Heck                                   *
+ * Contributors: Poyuan Chen                                              *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -28,31 +28,11 @@
 
 
 namespace Belle2 {
-
-
-  /** The Class for Detailed Digitization of ECL.
-   *
-   *  Currently a double Gaussian with steerable parameters is used for the digitization.
-   *  If there are two or more hits in one cell, only the shortest drift length is selected.
-   *  The signal amplitude is the sum of all hits deposited energy in this cell.
-   *
-   *  @todo More details will be considered soon, like X-T function, transfer time and so on.
-   *        There is a bug in the Relation between the first ECLHit and the ECLSignal.
-   *        This has to be corrected, but it is not critical for the current release.
-   *        Therefore I stop working on it for the moment and focus on the parts, that have to be finished this week.
-   *
-   *  @author  Guofu Cao;<br>
-   *           Issues regarding the Relations between SimHits and Hits: Martin Heck;
-   *
-   */
-
   class ECLHitModule : public Module {
 
   public:
 
     typedef std::vector<ECLSimHit*>      ECLSimHitVec;   /**< For input from Geant4 simulation.*/
-//poyuan    typedef std::map< int, ECLSignal *>  ECLSignalMap;   /**< Map of Cell ID -> signal.*/
-//poyuan    typedef std::pair< int, ECLSignal *> vpair;          /**< Pair of ECLSignalMap. */
 
     /** Constructor.*/
     ECLHitModule();

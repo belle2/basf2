@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Martin Heck                                              *
+ * Contributors: Poyuan Chen                                              *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -92,7 +92,6 @@ void ECLDigiModule::event()
   cout.precision(6);
 
   m_timeCPU = clock() * Unit::us;
-  B2INFO("ECLDigiModule m_timeCPU Hit initialize " << m_timeCPU << " us ;" << m_timeCPU / Unit::ms << " ms.");
   //Input Array
   StoreArray<HitECL>  eclArray(m_eclHitCollectionName);
   if (!eclArray) {
@@ -201,7 +200,6 @@ void ECLDigiModule::event()
 
   m_nEvent++;
   m_timeCPU = clock() * Unit::us;
-  B2INFO("ECLDigiModule event finished.  Time: " << m_timeCPU  / Unit::ms << " ms.");
 
 }
 
@@ -213,9 +211,6 @@ void ECLDigiModule::endRun()
 void ECLDigiModule::terminate()
 {
   m_timeCPU = clock() * Unit::us - m_timeCPU;
-
-  // Announce
-  B2INFO("ECLDigiModule finished. Time per event: " << m_timeCPU / m_nEvent / Unit::ms << " ms.");
 }
 
 

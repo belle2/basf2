@@ -429,13 +429,13 @@ EclNbr::nextEnd()   const
   return m_nbrs.end() ;
 }
 
-const std::vector< EclNbr::Identifier >::size_type
+std::vector< EclNbr::Identifier >::size_type
 EclNbr::nearSize()  const
 {
   return m_nearSize ;
 }
 
-const std::vector< EclNbr::Identifier >::size_type
+std::vector< EclNbr::Identifier >::size_type
 EclNbr::nextSize()  const
 {
   return (m_nbrs.size() - m_nearSize) ;

@@ -184,7 +184,7 @@ TRecEclCF::Attributes(void)
         TEclCFShower& s = iShower->second;
 ///for new correction 2k.sep.22nd
         //EACorr(s);
-        NewEACorr(s);
+        //NewEACorr(s);
       }
     }
 // this is dummy member function 2k.feb.22
@@ -194,12 +194,13 @@ TRecEclCF::Attributes(void)
 
 
 /* for new correction 2k.sep.22nd */
+/* comment for Basf2 unused warning
 void
 TRecEclCF::
 NewEACorr(TEclCFShower& s)
 {
 }
-
+*/
 //
 // const member functions
 //

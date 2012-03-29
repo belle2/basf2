@@ -57,7 +57,9 @@ namespace Belle2 {
 //      void EACorr(TEclCFShower& s);
 
     /* for new correction on 2k.sep.22nd */
-    void NewEACorr(TEclCFShower& s);
+    /* comment for Basf2 unused warning
+        void NewEACorr(TEclCFShower& s);
+    */
     /* end of for new correction */
 
     // const member functions

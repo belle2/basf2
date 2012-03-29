@@ -1,5 +1,0 @@
-Import('env')
-
-env['LIBS'] = ['framework','generators','pxd','svd','vxd']
-
-Return('env')

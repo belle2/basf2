@@ -175,18 +175,21 @@ TRecEclCF::Attributes(void)
     iCR->UncAttributes();  // don't know how to correct yet
 
     /// Energy/Angle[r] corrections
-    if (fParameters.fEnergyAngleCorrection != 0) {
-      EclCFShowerMap tmpShower = iCR->Showers();
-//   for (EclCFShowerMap::iterator iShower = iCR->fShowers.begin();
-//        iShower != iCR->fShowers.end(); ++iShower) {
-      for (EclCFShowerMap::iterator iShower = tmpShower.begin();
-           iShower != tmpShower.end(); ++iShower) {
-        TEclCFShower& s = iShower->second;
-///for new correction 2k.sep.22nd
-        //EACorr(s);
-        //NewEACorr(s);
-      }
-    }
+    /* comment for Basf2 unused warning
+        if (fParameters.fEnergyAngleCorrection != 0) {
+          EclCFShowerMap tmpShower = iCR->Showers();
+    //   for (EclCFShowerMap::iterator iShower = iCR->fShowers.begin();
+    //        iShower != iCR->fShowers.end(); ++iShower) {
+          for (EclCFShowerMap::iterator iShower = tmpShower.begin();
+               iShower != tmpShower.end(); ++iShower) {
+            TEclCFShower& s = iShower->second;
+    ///for new correction 2k.sep.22nd
+            //EACorr(s);
+            // comment for Basf2 unused warning NewEACorr(s);
+          }
+        }
+
+     comment for Basf2 unused warning */
 // this is dummy member function 2k.feb.22
     iCR->Attributes();     // final attributes(even in uncorrected case)
   }

@@ -12,6 +12,7 @@
 #include <framework/gearbox/Unit.h>
 #include <framework/core/utilities.h>
 #include <boost/format.hpp>
+#include <algorithm>
 
 #include <TFile.h>
 #include <TH2D.h>
@@ -53,9 +54,12 @@ MaterialScan::MaterialScan(TFile* rootFile, const std::string& name, const std::
   //Set Start values
   m_curU  = m_params.minU - m_stepU / 2.;
   m_curV  = m_params.minV + m_stepV / 2.;
-
   //Convert max depth to G4 units
   m_params.maxDepth /= Unit::mm;
+  //Sort the list of ignored materials so that we can use binary search
+  std::sort(m_params.ignoredMaterials.begin(), m_params.ignoredMaterials.end());
+  //Create a directory in the root file to store all histograms in
+  m_rootFile->mkdir(m_name.c_str());
 }
 
 
@@ -82,8 +86,8 @@ void MaterialScan::fillValue(const std::string& name, double value)
   TH2D* &hist = m_regions[name];
   if (!hist) {
     //Create new histogram
-    m_rootFile->cd();
-    hist = new TH2D((m_name + name).c_str(), (name + ";" + m_axisLabel).c_str(),
+    m_rootFile->cd(m_name.c_str());
+    hist = new TH2D(name.c_str(), (name + ";" + m_axisLabel).c_str(),
                     m_params.nU, m_params.minU, m_params.maxU,
                     m_params.nV, m_params.minV, m_params.maxV);
   }
@@ -113,9 +117,24 @@ void MaterialScan::UserSteppingAction(const G4Step* step)
     }
   }
 
+  if (std::binary_search(m_params.ignoredMaterials.begin(), m_params.ignoredMaterials.end(), material->GetName())) {
+    return;
+  }
+
   //Fill x0 and lambda in a histogram for each region
+  string x0_total = "All_Regions_x0";
+  string lambda_total = "All_Regions_lambda";
   string x0_name = region->GetName() + "_x0";
   string lambda_name = region->GetName() + "_lambda";
+  //or for each Material
+  if (m_params.splitByMaterials) {
+    x0_total = "All_Materials_x0";
+    lambda_total = "All_Materials_lambda";
+    x0_name = material->GetName() + "_x0";
+    lambda_name = material->GetName() + "_lambda";
+  }
+  fillValue(x0_total, x0);
+  fillValue(lambda_total, lambda);
   fillValue(x0_name, x0);
   fillValue(lambda_name, lambda);
 }
@@ -149,6 +168,12 @@ MaterialScanModule::MaterialScanModule(): m_rootFile(0), m_sphericalOrigin(3, 0)
                  "Planar scan will shoot rays perpendicular to a given "
                  "plane.");
 
+  //Set default ignored Materials
+  m_spherical.ignoredMaterials.push_back("Vacuum");
+  m_spherical.ignoredMaterials.push_back("Air");
+  m_spherical.ignoredMaterials.push_back("G4_AIR");
+  m_planar.ignoredMaterials = m_spherical.ignoredMaterials;
+
   addParam("Filename",            m_filename,
            "The filename where the material scan will be stored",
            string("MaterialScan.root"));
@@ -172,7 +197,10 @@ MaterialScanModule::MaterialScanModule(): m_rootFile(0), m_sphericalOrigin(3, 0)
   addParam("spherical.maxDepth",  m_spherical.maxDepth,
            "Maximum scan depth in cm. The ray will be killed after having "
            "reached the maximum Depth. <=0 means no Limit.", -1.0);
-
+  addParam("spherical.ignored",      m_spherical.ignoredMaterials,
+           "Names of Materials which should be ignored when doing the scan", m_spherical.ignoredMaterials);
+  addParam("spherical.splitByMaterials", m_spherical.splitByMaterials,
+           "If True, split output by material names instead of by regions", false);
 
   addParam("planar",              m_doPlanar,
            "Do a plane scan, that is shooting parallel rays from a defined "
@@ -200,6 +228,10 @@ MaterialScanModule::MaterialScanModule(): m_rootFile(0), m_sphericalOrigin(3, 0)
            "be a list of 9 values, the first three are the coordinates of the "
            "plane origin, the second three is the direction of U and the last "
            "three are the direction of V", m_customPlane);
+  addParam("planar.ignored",      m_planar.ignoredMaterials,
+           "Names of Materials which should be ignored when doing the scan", m_planar.ignoredMaterials);
+  addParam("planar.splitByMaterials", m_planar.splitByMaterials,
+           "If True, split output by material names instead of by regions", false);
 
 }
 

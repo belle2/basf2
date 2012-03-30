@@ -34,7 +34,7 @@ namespace Belle2 {
     /**Helper struct to Store Parameters of a Scan. */
     struct ScanParams {
       /** Default Constructor */
-      ScanParams(): nU(0), nV(0), minU(0), maxU(0), minV(0), maxV(0), maxDepth(-1) {}
+      ScanParams(): nU(0), nV(0), minU(0), maxU(0), minV(0), maxV(0), maxDepth(-1), splitByMaterials(false) {}
       /** Number of rays along u coordinate */
       int nU;
       /** Number of rays along v coordinate */
@@ -49,6 +49,10 @@ namespace Belle2 {
       double maxV;
       /** Maximum depth of the scan */
       double maxDepth;
+      /** Names of ignored Materials */
+      std::vector<std::string> ignoredMaterials;
+      /** If true, split output by Materials (otherwise by region) */
+      bool splitByMaterials;
     };
 
     /** Constructor

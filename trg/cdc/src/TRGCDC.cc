@@ -38,20 +38,19 @@
 #include "trg/cdc/Merger.h"
 #include "trg/cdc/HoughFinder.h"
 #include "trg/cdc/Fitter3D.h"
+
 #ifdef TRGCDC_DISPLAY
 #include "trg/cdc/DisplayRphi.h"
 #include "trg/cdc/DisplayHough.h"
 namespace Belle2_TRGCDC {
     Belle2::TRGCDCDisplayRphi * D = 0;
 }
+using namespace Belle2_TRGCDC;
 #endif
 
 #define P3D HepGeom::Point3D<double>
 
 using namespace std;
-#ifdef TRGCDC_DISPLAY
-using namespace Belle2_TRGCDC;
-#endif
 
 namespace Belle2 {
 
@@ -62,7 +61,7 @@ TRGCDC::name(void) const {
 
 std::string
 TRGCDC::version(void) const {
-    return string("TRGCDC 5.07");
+    return string("TRGCDC 5.08");
 }
 
 TRGCDC *
@@ -239,7 +238,7 @@ TRGCDC::initialize(bool houghFinderPerfect,
             const P3D bp = P3D(cdc2.wireBackwardPosition(i, j).x(),
                                cdc2.wireBackwardPosition(i, j).y(),
                                cdc2.wireBackwardPosition(i, j).z());
-            TCWire * tw = new TCWire(nWires++, j, layer, fp, bp);
+            TCWire * tw = new TCWire(nWires++, j, * layer, fp, bp);
             _wires.push_back(tw);
             layer->push_back(tw);
         }
@@ -293,14 +292,14 @@ TRGCDC::initialize(bool houghFinderPerfect,
         }
 
         //...TS layer... w is a central wire
-        const TCWire & ww = * (* _superLayers[i])[2]->front();
+        const TCCell & ww = * (* _superLayers[i])[2]->front();
         TRGCDCLayer * layer = new TRGCDCLayer(id++, ww);
         _tsLayers.push_back(layer);
 
         //...Loop over all wires in a central wire layer...
-        const unsigned nWiresInLayer = ww.layer().nWires();
+        const unsigned nWiresInLayer = ww.layer().nCells();
         for (unsigned j = 0; j < nWiresInLayer; j++) {
-            const TCWire & w = * (* (* _superLayers[i])[2])[j];
+            const TCWire & w = * (TCWire *) (* (* _superLayers[i])[2])[j];
 
             const unsigned localId = w.localId();
             const unsigned layerId = w.layerId();
@@ -325,15 +324,14 @@ TRGCDC::initialize(bool houghFinderPerfect,
 
             //...Create a track segment...
             TRGCDCTrackSegment * ts = new TRGCDCTrackSegment(idTS++,
+							     * layer,
 							     w,
-							     layer,
 							     _luts.back(),
 							     cells);
-	    for (unsigned i = 0; i < nWiresInTS[tsType]; i++) {
-		TCWire * c = (TCWire *) cells[i];
-		c->_segment = ts;
-	    }
-
+// 	    for (unsigned i = 0; i < nWiresInTS[tsType]; i++) {
+// 		TCWire * c = (TCWire *) cells[i];
+// 		c->_segment = ts;
+// 	    }
 
             //...Store it...
             _tss.push_back(ts);
@@ -350,7 +348,7 @@ TRGCDC::initialize(bool houghFinderPerfect,
     _r2 = new float[nSuperLayers() + 1];
     for (unsigned i = 0; i < nSuperLayers(); i++) {
         const std::vector<TRGCDCLayer *> & slayer = * _superLayers[i];
-        _width[i] = M_PI * 2 / float(slayer.back()->nWires());
+        _width[i] = M_PI * 2 / float(slayer.back()->nCells());
         _r[i] = slayer[0]->innerRadius();
         _r2[i] = _r[i] * _r[i];
         if (i == (nSuperLayers() - 1)) {
@@ -359,7 +357,7 @@ TRGCDC::initialize(bool houghFinderPerfect,
         }
 
         if (TRGDebug::level() > 9) {
-            const TCWire & wi = * slayer[0]->front();
+            const TCCell & wi = * slayer[0]->front();
             const unsigned layerId = wi.layerId();
             cout << layerId << "," << cdc2.senseWireR(layerId) << ","
                  << cdc2.fieldWireR(layerId) << endl;
@@ -450,7 +448,7 @@ TRGCDC::dump(const std::string & msg) const {
                 cout << "            " << i
                        << " " << l.stereoType()
                        << " " << l.superLayerId()
-                       << " " << l.nWires()
+                       << " " << l.nCells()
                        << " " << l.localLayerId()
                        << " " << l.axialStereoLayerId()
                        << " " << l.axialStereoSuperLayerId()
@@ -510,29 +508,29 @@ TRGCDC::dump(const std::string & msg) const {
     }
 }
 
-const TCWire * const
+const TCWire *
 TRGCDC::wire(unsigned id) const {
     if (id < nWires())
         return _wires[id];
     return 0;
 }
 
-const TCWire * const
+const TCWire *
 TRGCDC::wire(unsigned layerId, int localId) const {
     if (layerId < nLayers())
-        return _layers[layerId]->wire(localId);
+        return (TCWire *) & _layers[layerId]->cell(localId);
     return 0;
 }
 
-// const TCWire * const
+// const TCWire *
 // TRGCDC::wire(const HepGeom::Point3D<double> & p) const {
 //     float r = p.mag();
 //     float phi = p.phi();
 //     return wire(r, phi);
 // }
 
-const TCWire * const
-TRGCDC::wire(float r, float p) const {
+const TCWire *
+TRGCDC::wire(float , float ) const {
 
     //...Not implemented yet...
     return _wires[0];
@@ -551,7 +549,7 @@ TRGCDC::wire(float r, float p) const {
 // //         else if (geo->m_r - geo->m_rcsiz1 > r) --id;
 // //         else ok = true;
 // //     }
-// //     float dPhi = 2. * M_PI / float(l->nWires());
+// //     float dPhi = 2. * M_PI / float(l->nCells());
 // //     if (l->geocdc()->m_offset > 0.) p -= dPhi / 2.;
 // //     unsigned localId = unsigned(phi(p) / dPhi);
 // //     return l->wire(localId);
@@ -609,7 +607,7 @@ TRGCDC::fastClear(void) {
 }
 
 void
-TRGCDC::update(bool mcAnalysis) {
+TRGCDC::update(bool ) {
 
     TRGDebug::enterStage("TRGCDC update");
 
@@ -684,7 +682,7 @@ TRGCDC::update(bool mcAnalysis) {
 	hit->state(WireHitFindingValid | WireHitFittingValid );
 
         //...Store a hit...
-        (* _layers[layerId])[wireId]->hit(hit);
+        ((TCWire *) (* _layers[layerId])[wireId])->hit(hit);
         _hits.push_back(hit);
         if (w.axial()) _axialHits.push_back(hit);
         else           _stereoHits.push_back(hit);
@@ -707,7 +705,7 @@ TRGCDC::update(bool mcAnalysis) {
 // 				     h->drift(),
 // 				     h->dDrift(),
 // 				     1);
-		    s.TCWire::hit(th);
+//		    s.TCWire::hit(th);
 		    s.hit(th);
 		}
 		s._hits.push_back(h);
@@ -900,7 +898,7 @@ TRGCDC::localId(unsigned id) const {
     bool nextLayer = true;
     while (nextLayer) {
         nWLast = nW;
-        nW += layer(iLayer++)->nWires();
+        nW += layer(iLayer++)->nCells();
         if (id < (nW - 1))
             return id - nWLast;
         if (nW >= nWires())
@@ -918,7 +916,7 @@ TRGCDC::layerId(unsigned id) const {
     unsigned nW = 0;
     bool nextLayer = true;
     while (nextLayer) {
-        nW += layer(iLayer++)->nWires();
+        nW += layer(iLayer++)->nCells();
         if (id < (nW - 1))
             return iLayer - 1;
         if (nW >= nWires())
@@ -929,7 +927,7 @@ TRGCDC::layerId(unsigned id) const {
 }
 
 unsigned
-TRGCDC::layerId(unsigned as, unsigned id) const {
+TRGCDC::layerId(unsigned , unsigned ) const {
     cout << "TRGCDC::layerId !!! this function is not implemented yet"
               << endl;
     return TRGCDC_UNDEFINED;    
@@ -944,7 +942,7 @@ TRGCDC::superLayerId(unsigned id) const {
         const std::vector<TRGCDCLayer *> & sl = * superLayer(iLayer);
         const unsigned nLayers = sl.size();
         for (unsigned i = 0; i < nLayers; i++)
-            nW += sl[i]->nWires();
+            nW += sl[i]->nCells();
 
         if (id < (nW - 1))
             return iLayer;
@@ -965,7 +963,7 @@ TRGCDC::localLayerId(unsigned id) const {
         const std::vector<TRGCDCLayer *> & sl = * superLayer(iLayer);
         const unsigned nLayers = sl.size();
         for (unsigned i = 0; i < nLayers; i++) {
-            nW += sl[i]->nWires();
+            nW += sl[i]->nCells();
             if (id < (nW - 1))
                 return i;
         }
@@ -980,7 +978,7 @@ TRGCDC::localLayerId(unsigned id) const {
 
 unsigned
 TRGCDC::axialStereoSuperLayerId(unsigned axialStereo,
-                              unsigned axialStereoLayerId) const {
+                              unsigned ) const {
     cout << "TRGCDC::axialStereoSuperLayerId !!! "
               << "this function is not implemented yet"
               << endl;

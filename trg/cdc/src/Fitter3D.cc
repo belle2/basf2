@@ -273,7 +273,7 @@ namespace Belle2 {
       const TRGCDC & cdc = * TRGCDC::getTRGCDC();
       for (unsigned i = 0; i < cdc.nTrackSegmentLayers(); i++) {
 	  const Belle2::TRGCDCLayer * l = cdc.trackSegmentLayer(i);
-	  const unsigned nWires = l->nWires();
+	  const unsigned nWires = l->nCells();
 	  if (! nWires) continue;
 	  unsigned ptn = 0;
 	  for (unsigned j = 0; j < nWires; j++) {

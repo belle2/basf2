@@ -11,25 +11,31 @@
 // $Log$
 //-----------------------------------------------------------------------------
 
+#define TRG_SHORT_NAMES
+#define TRGCDC_SHORT_NAMES
+
 #include <iostream>
 #include "trg/cdc/TRGCDC.h"
-#include "trg/cdc/Wire.h"
+#include "trg/cdc/Cell.h"
 #include "trg/cdc/Layer.h"
+
+using namespace std;
 
 namespace Belle2 {
 
 TRGCDCLayer::TRGCDCLayer(unsigned id,
-                                 unsigned superLayerId,
-                                 unsigned localLayerId,
-                                 unsigned axialStereoLayerId,
-                                 unsigned axialStereoSuperLayerId,
-                                 float offset,
-                                 int nShifts,
-                                 float cellSize,
-                                 unsigned nWires,
-                                 float innerRadius,
-                                 float outerRadius)
-:  _id(id),
+			 unsigned superLayerId,
+			 unsigned localLayerId,
+			 unsigned axialStereoLayerId,
+			 unsigned axialStereoSuperLayerId,
+			 float offset,
+			 int nShifts,
+			 float cellSize,
+			 unsigned nCells,
+			 float innerRadius,
+			 float outerRadius)
+:  _name("unknown"),
+   _id(id),
    _superLayerId(superLayerId),
    _localLayerId(localLayerId),
    _axialStereoLayerId(axialStereoLayerId),
@@ -37,13 +43,13 @@ TRGCDCLayer::TRGCDCLayer(unsigned id,
    _offset(offset),
    _nShifts(nShifts),
    _cellSize(cellSize),
-   _nWires(nWires),
+   _nCells(nCells),
    _innerRadius(innerRadius),
    _outerRadius(outerRadius) {
 }
 
 TRGCDCLayer::TRGCDCLayer(unsigned id,
-                                 const TRGCDCWire & w)
+			 const TRGCDCCell & w)
 :  _id(id),
    _superLayerId(w.superLayerId()),
    _localLayerId(0),
@@ -52,42 +58,45 @@ TRGCDCLayer::TRGCDCLayer(unsigned id,
    _offset(w.layer().offset()),
    _nShifts(w.layer().nShifts()),
    _cellSize(w.cellSize()),
-   _nWires(w.layer().nWires()) {
+   _nCells(w.layer().nCells()) {
 }
 
 TRGCDCLayer::~TRGCDCLayer() {
 }
 
 void
-TRGCDCLayer::dump(const std::string &, const std::string & pre) const {
-    std::cout << pre;
-    std::cout << "layer " << _id;
-    std::cout << ", " << stereoType();
-    std::cout << ", super layer " << _superLayerId;
-    std::cout << ", local layer " << _localLayerId;
-    if (axial()) std::cout << ", axial ";
-    else         std::cout << ", stereo ";
-    std::cout << _axialStereoLayerId;
-    if (axial()) std::cout << ", axial super ";
-    else         std::cout << ", stereo super ";
-    std::cout << _axialStereoSuperLayerId;
-    std::cout << ", " << _nWires << " wires";
-    std::cout << std::endl;
-    //    for (int i=0;i<_nWires;++i) wire(i)->dump(pre);
+TRGCDCLayer::dump(const string &, const string & pre) const {
+    cout << pre;
+    cout << "layer " << _id;
+    cout << ", " << stereoType();
+    cout << ", super layer " << _superLayerId;
+    cout << ", local layer " << _localLayerId;
+    if (axial()) cout << ", axial ";
+    else         cout << ", stereo ";
+    cout << _axialStereoLayerId;
+    if (axial()) cout << ", axial super ";
+    else         cout << ", stereo super ";
+    cout << _axialStereoSuperLayerId;
+    cout << ", " << _nCells << " wires";
+    cout << endl;
+    //    for (int i=0;i<_nCells;++i) wire(i)->dump(pre);
 }
 
-const TRGCDCWire * const
-TRGCDCLayer::wire(int id) const {
-    if (_nWires == 0) return 0;
+const TRGCDCCell &
+TRGCDCLayer::cell(int id) const {
+    if (_nCells == 0) {
+	cout << "TRGCDCLayer !!! This has no cell member : " << name() << endl;
+	return * (TRGCDCCell *)(0);
+    }
 
     if (id < 0)
         while (id < 0)
-            id += _nWires;
+            id += _nCells;
 
-    if (id >= (int) _nWires)
-        id %= (int) _nWires;
+    if (id >= (int) _nCells)
+        id %= (int) _nCells;
 
-    return (* this)[id];
+    return * (* this)[id];
 }
 
 } // namespace Belle2

@@ -22,11 +22,11 @@ using namespace std;
 
 namespace Belle2 {
 
-TRGCDCTrackSegmentHit::TRGCDCTrackSegmentHit(const TCTSegment & w)
-    : TCWHit(w),
-      _segment(& w),
-      _state(0) {
-}
+// TRGCDCTrackSegmentHit::TRGCDCTrackSegmentHit(const TCTSegment & w)
+//     : TCWHit(w),
+//       _segment(& w),
+//       _state(0) {
+// }
 
 TRGCDCTrackSegmentHit::TRGCDCTrackSegmentHit(const TCTSegment & w,
 					     const TCWHit & h)

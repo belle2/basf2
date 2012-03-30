@@ -15,7 +15,7 @@
 #define TRGCDCTrackSegment_FLAG_
 
 #include <vector>
-#include "trg/cdc/Wire.h"
+#include "trg/cdc/Cell.h"
 #include "trg/cdc/TrackSegmentHit.h"
 
 #ifdef TRGCDC_SHORT_NAMES
@@ -25,51 +25,28 @@
 namespace Belle2 {
 
 class TRGSignal;
+class TRGCDCWire;
 class TRGCDCLayer;
 class TRGCDCLUT;
 
 /// A class to represent a wire in CDC.
-class TRGCDCTrackSegment : public TRGCDCWire {
+class TRGCDCTrackSegment : public TRGCDCCell {
 
   public:
     /// Constructor.
     TRGCDCTrackSegment(unsigned id,
+                       const TRGCDCLayer & layer,
                        const TRGCDCWire & w,
-                       const TRGCDCLayer * layer,
-		       const TRGCDCLUT * const lut,
-                       const std::vector<const TRGCDCWire *> & cells);
+		       const TRGCDCLUT * lut,
+                       const std::vector<const TRGCDCWire *> & wires);
 
     /// Destructor
     virtual ~TRGCDCTrackSegment();
 
   public:// Selectors
 
-    /// returns id.
-    unsigned id(void) const;
-
-    /// returns local id in a TS layer.
-    unsigned localId(void) const;
-
-    /// returns layer id.
-    unsigned layerId(void) const;
-
-    /// returns super layer id.
-    unsigned superLayerId(void) const;
-
-    /// returns a pointer to a TS layer.
-    const TRGCDCLayer * layer(void) const;
-
     /// returns a vector containing pointers to a wire.
     const std::vector<const TRGCDCWire *> & wires(void) const;
-
-    /// returns true if this is in axial layer.
-    bool axial(void) const;
-
-    /// returns true if this is in stereo layer.
-    bool stereo(void) const;
-
-    /// returns state.
-    unsigned state(void) const;
 
     /// returns name.
     std::string name(void) const;
@@ -96,17 +73,14 @@ class TRGCDCTrackSegment : public TRGCDCWire {
   public:// Utility functions
 
     /// returns axial segments.
-    static const std::vector<const TRGCDCTrackSegment *>
-	axial(const std::vector<const TRGCDCTrackSegment *> & list);
+/*     static const std::vector<const TRGCDCTrackSegment *> */
+/* 	axial(const std::vector<const TRGCDCTrackSegment *> & list); */
 
     /// returns \# of stereo segments.
     static unsigned
 	nStereo(const std::vector<const TRGCDCTrackSegment *> & list);
 
   public:// Modifiers
-
-    /// sets state.
-    unsigned state(unsigned newState);
 
     /// clears information.
     void clear(void);
@@ -119,20 +93,8 @@ class TRGCDCTrackSegment : public TRGCDCWire {
 
   private:
 
-    /// State.
-    unsigned _state;
-
-    /// ID.
-    unsigned _id;
-
-    /// Local ID.
-    unsigned _localId;
-
     /// LookUp Table.
     const TRGCDCLUT * const _lut;
-
-    /// Layer.
-    const TRGCDCLayer * const _layer;
 
     /// Wires.
     std::vector<const TRGCDCWire *> _wires;
@@ -151,48 +113,6 @@ class TRGCDCTrackSegment : public TRGCDCWire {
 };
 
 //-----------------------------------------------------------------------------
-
-inline
-unsigned
-TRGCDCTrackSegment::id(void) const {
-    return _id;
-}
-
-inline
-unsigned
-TRGCDCTrackSegment::localId(void) const {
-    return _localId;
-}
-
-inline
-unsigned
-TRGCDCTrackSegment::layerId(void) const {
-    return _layer->id();
-}
-
-inline
-unsigned
-TRGCDCTrackSegment::superLayerId(void) const {
-    return _layer->superLayerId();
-}
-
-inline
-const TRGCDCLayer *
-TRGCDCTrackSegment::layer(void) const {
-    return _layer;
-}
-
-inline
-unsigned
-TRGCDCTrackSegment::state(void) const {
-    return _state;
-}
-
-inline
-unsigned
-TRGCDCTrackSegment::state(unsigned a) {
-    return _state = a;
-}
 
 inline
 const std::vector<const TRGCDCWire *> &
@@ -215,18 +135,6 @@ TRGCDCTrackSegment::triggerOutput(void) const {
 }
 
 inline
-bool
-TRGCDCTrackSegment::axial(void) const {
-    return _wires[0]->axial();
-}
-
-inline
-bool
-TRGCDCTrackSegment::stereo(void) const {
-    return _wires[0]->stereo();
-}
-
-inline
 const TRGCDCTrackSegmentHit *
 TRGCDCTrackSegment::hit(const TRGCDCTrackSegmentHit * const h) {
     return _hit = h;
@@ -236,18 +144,6 @@ inline
 const TRGCDCTrackSegmentHit *
 TRGCDCTrackSegment::hit(void) const {
     return _hit;
-}
-
-inline
-unsigned
-TRGCDCTrackSegment::hitPattern(void) const {
-    unsigned ptn = 0;
-    for (unsigned i = 0; i < _wires.size(); i++) {
-        const TRGSignal & s = _wires[i]->triggerOutput();
-        if (s.active())
-	    ptn |= (1 << i);
-    }
-    return ptn;
 }
 
 inline

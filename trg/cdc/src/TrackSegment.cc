@@ -17,7 +17,9 @@
 #include <iostream>
 #include "trg/trg/Utilities.h"
 #include "trg/cdc/TRGCDC.h"
+#include "trg/cdc/Wire.h"
 #include "trg/cdc/TrackSegment.h"
+#include "trg/cdc/LUT.h"
 
 using namespace std;
 
@@ -26,18 +28,16 @@ using namespace std;
 namespace Belle2 {
 
 TRGCDCTrackSegment::TRGCDCTrackSegment(unsigned id,
+                                       const TCLayer & layer,
                                        const TCWire & w,
-                                       const TRGCDCLayer * layer,
-				       const TRGCDCLUT * const lut,
-				       const std::vector<const TRGCDCWire *> &
-				       cells)
-
-    : TCWire::TCWire(this, & w),
-      _state(0),
-      _id(id),
-      _localId(w.localId()),
+				       const TCLUT * lut,
+ 			           const std::vector<const TCWire *> & cells)
+    : TCCell(id,
+	     layer.size(),
+	     layer,
+	     w.forwardPosition(),
+	     w.backwardPosition()),
       _lut(lut),
-      _layer(layer),
       _wires(cells),
       _signal(std::string("TS_") + TRGUtil::itostring(id)),
       _hit(0) {
@@ -52,8 +52,8 @@ TRGCDCTrackSegment::dump(const string & msg,
     cout << pre << name() << " (ptn=" << hitPattern() << ")" << endl;
     if ((msg.find("geometry") != string::npos) ||
         (msg.find("detail") != string::npos)) {
-        cout << pre << "w " << _id;
-        cout << ",local " << _localId;
+        cout << pre << "w " << id();
+        cout << ",local " << localId();
         cout << ",layer " << layerId();
         cout << ",super layer " << superLayerId();
         cout << ",local layer " << localLayerId();
@@ -100,7 +100,7 @@ TRGCDCTrackSegment::dump(const string & msg,
   
 void
 TRGCDCTrackSegment::clear(void) {
-    _state = 0;
+    TCCell::clear();
     _signal.clear();
 }
 
@@ -112,7 +112,7 @@ TRGCDCTrackSegment::name(void) const {
     else
         t = "=";
     string n0 = string("TS") + TRGUtil::itostring(layerId());
-    string n1 = TRGUtil::itostring(_localId);
+    string n1 = TRGUtil::itostring(localId());
     return n0 + t + n1;
 }
 
@@ -180,6 +180,17 @@ TCTSegment::simulate(void) {
 //         cout << "===========" << endl;
 //     all.dump("", "    ----> ");
     
+}
+
+unsigned
+TRGCDCTrackSegment::hitPattern(void) const {
+    unsigned ptn = 0;
+    for (unsigned i = 0; i < _wires.size(); i++) {
+        const TRGSignal & s = _wires[i]->triggerOutput();
+        if (s.active())
+	    ptn |= (1 << i);
+    }
+    return ptn;
 }
 
 } // namespace Belle2

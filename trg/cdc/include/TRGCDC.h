@@ -122,22 +122,22 @@ class TRGCDC {
 
   public:// Geometry
     /// returns a pointer to a wire. 0 will be returned if 'wireId' is invalid.
-    const TRGCDCWire * const wire(unsigned wireId) const;
+    const TRGCDCWire * wire(unsigned wireId) const;
 
     /// returns a pointer to a wire. 'localId' can be negative. 0 will be returned if 'layerId' is invalid.
-    const TRGCDCWire * const wire(unsigned layerId, int localId) const;
+    const TRGCDCWire * wire(unsigned layerId, int localId) const;
 
     /// returns a pointer to a wire.
-//    const TRGCDCWire * const wire(const HepGeom::Point3D<double> & point) const;
+//    const TRGCDCWire * wire(const HepGeom::Point3D<double> & point) const;
 
     /// returns a pointer to a wire.
-    const TRGCDCWire * const wire(float r, float phi) const;
+    const TRGCDCWire * wire(float r, float phi) const;
 
     /// returns a pointer to a layer. 0 will be returned if 'id' is invalid.
-    const TRGCDCLayer * const layer(unsigned id) const;
+    const TRGCDCLayer * layer(unsigned id) const;
 
     /// returns a pointer to a super-layer. 0 will be returned if 'id' is invalid.
-    const std::vector<TRGCDCLayer *> * const superLayer(unsigned id) const;
+    const std::vector<TRGCDCLayer *> * superLayer(unsigned id) const;
 
     /// returns \# of wire layers in a super layer. 0 will be returned if 'superLayerId' is invalid.
     unsigned nLocalLayer(unsigned superLayerId) const;
@@ -393,13 +393,13 @@ TRGCDC::nLocalLayer(unsigned superLayerId) const {
 }
 
 inline
-const TRGCDCLayer * const
+const TRGCDCLayer *
 TRGCDC::layer(unsigned id) const {
     return _layers[id];
 }
 
 inline
-const std::vector<TRGCDCLayer *> * const
+const std::vector<TRGCDCLayer *> *
 TRGCDC::superLayer(unsigned id) const {
     return _superLayers[id];
 }

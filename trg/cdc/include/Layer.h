@@ -6,7 +6,7 @@
 // Owner    : Yoshihito Iwasaki
 // Email    : yoshihito.iwasaki@kek.jp
 //-----------------------------------------------------------------------------
-// Description : A class to represent a wire layer.
+// Description : A class to represent a cell layer.
 //-----------------------------------------------------------------------------
 // $Log$
 //-----------------------------------------------------------------------------
@@ -24,33 +24,36 @@
 namespace Belle2 {
 
 class TRGCDC;
-class TRGCDCWire;
+class TRGCDCCell;
 
-/// A class to represent a wire layer.
-class TRGCDCLayer : public std::vector<TRGCDCWire *> {
+/// A class to represent a cell layer.
+class TRGCDCLayer : public std::vector<TRGCDCCell *> {
 
   public:
     /// Constructor.
     TRGCDCLayer(unsigned id,
-                    unsigned superLayerId,
-                    unsigned localLayerId,
-                    unsigned axialStereoLayerId,
-                    unsigned axialStereoSuperLayerId,
-                    float offset,
-                    int nShifts,
-                    float cellSize,
-                    unsigned nWires,
-                    float innerRadius,
-                    float outerRadius);
+		unsigned superLayerId,
+		unsigned localLayerId,
+		unsigned axialStereoLayerId,
+		unsigned axialStereoSuperLayerId,
+		float offset,
+		int nShifts,
+		float cellSize,
+		unsigned nCells,
+		float innerRadius,
+		float outerRadius);
 
     /// Constructor for track segments.
-    TRGCDCLayer(unsigned id,
-                    const TRGCDCWire & w);
+    TRGCDCLayer(unsigned id, const TRGCDCCell & w);
 
     /// Destructor
     virtual ~TRGCDCLayer();
 
   public:// Selectors
+
+    /// return name.
+    const std::string & name(void) const;
+
     /// returns id.
     unsigned id(void) const;
 
@@ -66,11 +69,11 @@ class TRGCDCLayer : public std::vector<TRGCDCWire *> {
     /// returns id of axial or stereo super layer id.
     unsigned axialStereoSuperLayerId(void) const;
 
-    /// returns \# of wires.
-    unsigned nWires(void) const;
+    /// returns \# of cells.
+    unsigned nCells(void) const;
 
-    /// returns a pointer to a wire. 'id' can be negative or 'id' can be greater than 'nWires()'.
-    const TRGCDCWire * const wire(int id) const;
+    /// returns a pointer to a cell. 'id' can be negative or 'id' can be greater than 'nCells()'.
+    const TRGCDCCell & cell(int id) const;
 
     /// returns true if this is an axial layer.
     bool axial(void) const;
@@ -101,18 +104,44 @@ class TRGCDCLayer : public std::vector<TRGCDCWire *> {
     const std::string stereoType(void) const;
 
   private:
+
+    /// Layer name.
+    const std::string _name;
+
+    /// ID in whole CDC.
     const unsigned _id;
+
+    /// Super layer ID.
     const unsigned _superLayerId;
+
+    /// ID in a super layer.
     const unsigned _localLayerId;
+
+    /// ID in whole CDC counting only axial or stereo.
     const unsigned _axialStereoLayerId;
+
+    /// Super layer ID counting only axial or stereo.
     const unsigned _axialStereoSuperLayerId;
+
+    /// Cell position offset from X axis in cell unit.
     const float _offset;
+
+    /// Stereo angle in cell unit.
     const int _nShifts;
+
+    /// Cell size.
     const float _cellSize;
-    const unsigned _nWires;
+
+    /// \# of cells
+    const unsigned _nCells;
+
+    /// Inner radius.
     float _innerRadius;
+
+    /// Outer radius.
     float _outerRadius;
 
+    /// TRGCDC has complete access.
     friend class TRGCDC;
 };
 
@@ -150,8 +179,8 @@ TRGCDCLayer::nShifts(void) const {
 
 inline
 unsigned
-TRGCDCLayer::nWires(void) const {
-    return _nWires;
+TRGCDCLayer::nCells(void) const {
+    return _nCells;
 }
 
 inline
@@ -207,6 +236,12 @@ inline
 float
 TRGCDCLayer::outerRadius(void) const {
     return _outerRadius;
+}
+
+inline
+const std::string &
+TRGCDCLayer::name(void) const {
+    return _name;
 }
 
 } // namespace Belle2

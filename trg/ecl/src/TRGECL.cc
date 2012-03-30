@@ -59,7 +59,8 @@ TRGECL::version(void) const
 //
 //
 void
-TRGECL::initialize(int m_nEvent)
+//iwasaki TRGECL::initialize(int m_nEvent)
+TRGECL::initialize(int )
 {
 }
 //

@@ -54,7 +54,7 @@ TRGCDCTrackBase::~TRGCDCTrackBase() {
 }
 
 void
-TRGCDCTrackBase::dump(const string & cmd, const string & pre) const {
+TRGCDCTrackBase::dump(const string & , const string & pre) const {
 //  bool detail = (cmd.find("detail") != string::npos);
 
     string tab = TRGDebug::tab() + pre;

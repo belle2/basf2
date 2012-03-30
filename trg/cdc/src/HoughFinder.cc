@@ -97,7 +97,7 @@ TRGCDCHoughFinder::TRGCDCHoughFinder(const string & name,
     unsigned axialSuperLayerId = 0;
     for (unsigned i = 0; i < _cdc.nTrackSegmentLayers(); i++) {
         const Belle2::TRGCDCLayer * l = _cdc.trackSegmentLayer(i);
-        const unsigned nWires = l->nWires();
+        const unsigned nWires = l->nCells();
             
         if (! nWires) continue;
         if ((* l)[0]->stereo()) continue;
@@ -105,7 +105,7 @@ TRGCDCHoughFinder::TRGCDCHoughFinder(const string & name,
         _plane[0]->preparePatterns(axialSuperLayerId, nWires);
         _plane[1]->preparePatterns(axialSuperLayerId, nWires);
         for (unsigned j = 0; j < nWires; j++) {
-            const Belle2::TRGCDCWire & w = * (* l)[j];
+            const TCCell & w = * (* l)[j];
             const float x = w.xyPosition().x();
             const float y = w.xyPosition().y();
                 
@@ -165,7 +165,7 @@ TRGCDCHoughFinder::doit(vector<TCTrack *> & trackList) {
     unsigned axialSuperLayerId = 0;
     for (unsigned i = 0; i < _cdc.nTrackSegmentLayers(); i++) {
         const Belle2::TRGCDCLayer * l = _cdc.trackSegmentLayer(i);
-        const unsigned nWires = l->nWires();
+        const unsigned nWires = l->nCells();
         if (! nWires) continue;
         if ((* l)[0]->stereo()) continue;
 
@@ -242,7 +242,7 @@ TRGCDCHoughFinder::doitPerfectly(vector<TRGCDCTrack *> & trackList) {
     vector<TCLink *> links;
     for (unsigned i = 0; i < _cdc.nTrackSegmentLayers(); i++) {
         const Belle2::TRGCDCLayer * l = _cdc.trackSegmentLayer(i);
-        const unsigned nWires = l->nWires();
+        const unsigned nWires = l->nCells();
         if (! nWires) continue;
 
         int timeMin = 99999;

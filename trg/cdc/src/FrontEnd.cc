@@ -80,7 +80,7 @@ TRGCDCFrontEnd::implementation(const TRGCDCFrontEnd::boardType & type,
 }
 
 int
-TRGCDCFrontEnd::implementationPort(const TRGCDCFrontEnd::boardType & type,
+TRGCDCFrontEnd::implementationPort(const TRGCDCFrontEnd::boardType & ,
                                    ofstream & outfile) {
     outfile << "    port (" << endl;
 

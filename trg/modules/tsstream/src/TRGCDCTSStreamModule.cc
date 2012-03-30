@@ -20,8 +20,9 @@
 #include "trg/modules/tsstream/TRGCDCTSStreamModule.h"
 #include "trg/trg/Debug.h"
 #include "trg/trg/BitStream.h"
-#include "trg/cdc/Layer.h"
+#include "trg/cdc/Wire.h"
 #include "trg/cdc/TrackSegment.h"
+#include "trg/cdc/Layer.h"
 
 using namespace std;
 
@@ -98,7 +99,7 @@ TRGCDCTSStreamModule::beginRun() {
     //...Super layer loop...
     for (unsigned l = 0; l < _cdc->nTrackSegmentLayers(); l++) {
 	const Belle2::TRGCDCLayer * lyr = _cdc->trackSegmentLayer(l);
-	const unsigned nWires = lyr->nWires();
+	const unsigned nWires = lyr->nCells();
 
 	//...Clear old pointers...
 	_wires[l].clear();

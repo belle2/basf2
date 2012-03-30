@@ -56,7 +56,7 @@ void
 TRGCDCHoughPlaneMulti::vote(float rx,
                        float ry,
                        float targetCharge,
-                       const TRGCDCHoughTransformation & hough,
+                       const TRGCDCHoughTransformation & ,
                        unsigned weight,
                        unsigned layerId) {
 

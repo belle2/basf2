@@ -528,7 +528,7 @@ TRGCDCLink::width(const vector<TRGCDCLink *> & list) {
 
     const Belle2::TRGCDCWire * const w0 = list[0]->wire();
 //cnv    const unsigned sId = w0->superLayerId();
-    unsigned nWires = w0->layer().nWires();
+    unsigned nWires = w0->layer().nCells();
     unsigned center = w0->localId();
 
     if (ms_smallcell && w0->layerId() < 3) {
@@ -592,7 +592,7 @@ TRGCDCLink::edges(const vector<TRGCDCLink *> & list) {
     else if (n == 2) return list;
 
     const Belle2::TRGCDCWire * w = list[0]->wire();
-    unsigned nWires = w->layer().nWires();
+    unsigned nWires = w->layer().nCells();
     unsigned center = w->localId();
 
     unsigned left = 0;

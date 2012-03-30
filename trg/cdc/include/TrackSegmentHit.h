@@ -31,7 +31,7 @@ class TRGCDCTrackSegmentHit : public TRGCDCWireHit {
 
     /// Constructor.
 //  TRGCDCTrackSegmentHit(const TRGCDCWire &);
-    TRGCDCTrackSegmentHit(const TRGCDCTrackSegment &);
+//     TRGCDCTrackSegmentHit(const TRGCDCTrackSegment &);
 
     /// Constructor.
 //  TRGCDCTrackSegmentHit(const TRGCDCWire &,

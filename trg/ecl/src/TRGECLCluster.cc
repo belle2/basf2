@@ -261,7 +261,8 @@ TRGECLCluster::setForwardICN(TCHit *obj_tchit){
 //
 //
 int
-TRGECLCluster::setBackwardICN(TCHit *obj_tchit){
+//iwasaki TRGECLCluster::setBackwardICN(TCHit *obj_tchit){
+TRGECLCluster::setBackwardICN(TCHit *){
   
   //  int TCFire[60] = { 0 };
   int icn = 0;

@@ -31,38 +31,15 @@ namespace Belle2 {
 
 TRGCDCWire::TRGCDCWire(unsigned id,
                        unsigned localId,
-                       TCLayer * l,
+                       const TCLayer & l,
                        const P3D & fp,
                        const P3D & bp)
-    : _id(id),
-      _localId(localId),
-      _layer(l),
-      _segment(0),
-      _xyPosition(0.5 * (fp + bp)),
-      _forwardPosition(fp),
-      _backwardPosition(bp),
-      _direction((fp - bp).unit()),
-      _state(0),
+    : TCCell(id, localId, l, fp, bp),
+//      _segment(0),
       _hit(0),
       _mcHits(),
       _triggerOutput() {
     _triggerOutput.name(name() + string("to"));
-}
-
-TRGCDCWire::TRGCDCWire(const TCTSegment * s,
-		       const TRGCDCWire * const w)
-    : _id(w->_id),
-      _localId(w->_localId),
-      _layer(w->_layer),
-      _segment(s),
-      _xyPosition(w->_xyPosition),
-      _forwardPosition(w->_forwardPosition),
-      _backwardPosition(w->_backwardPosition),
-      _direction(w->_direction),
-      _state(w->_state),
-      _hit(w->_hit),
-      _mcHits(w->_mcHits),
-      _triggerOutput(w->_triggerOutput) {
 }
 
 TRGCDCWire::~TRGCDCWire() {
@@ -71,8 +48,8 @@ TRGCDCWire::~TRGCDCWire() {
 void
 TRGCDCWire::dump(const string & msg, const string & pre) const {
     cout << pre;
-    cout << "w " << _id;
-    cout << ",local " << _localId;
+    cout << "w " << id();
+    cout << ",local " << localId();
     cout << ",layer " << layerId();
     cout << ",super layer " << superLayerId();
     cout << ",local layer " << localLayerId();
@@ -97,16 +74,16 @@ TRGCDCWire::neighbor(unsigned i) const {
                   << endl;
 
     const TRGCDC & cdc = * TRGCDC::getTRGCDC();
-    const unsigned layerId = _layer->id();
-    const unsigned superLayerId = _layer->superLayerId();
-    const unsigned localLayerId = _layer->localLayerId();
+    const unsigned layerId = layer().id();
+    const unsigned superLayerId = layer().superLayerId();
+    const unsigned localLayerId = layer().localLayerId();
     const unsigned nLayers = cdc.superLayer(superLayerId)->size();
-    const int local = int(_localId);
+    const int local = int(localId());
 
     if (i == WireInnerLeft || i == WireInnerRight) {
         if (localLayerId == 0)
             return 0;
-        if (_layer->offset() != 0) {
+        if (layer().offset() != 0) {
             if (i == WireInnerLeft)
                 return cdc.wire(layerId - 1, local);
             else
@@ -128,7 +105,7 @@ TRGCDCWire::neighbor(unsigned i) const {
     else if (i == WireOuterLeft || i == WireOuterRight) {
         if (localLayerId == (nLayers - 1))
             return 0;
-        if (_layer->offset() != 0) {
+        if (layer().offset() != 0) {
             if (i == WireOuterLeft)
                 return cdc.wire(layerId + 1, local);
             else
@@ -386,31 +363,9 @@ TRGCDCWire::neighbor(unsigned i) const {
 //     return;
 // }
 
-int
-TRGCDCWire::localIdDifference(const TRGCDCWire & a) const {
-
-    if (superLayerId() != a.superLayerId()) {
-        cout << "TRGCDCWire::localIdDifference !!!";
-        cout << "super layer assumption violation" << endl;
-    }
-
-    int diff = int(a.localId()) - int(localId());
-    unsigned nWires = layer().nWires();
-    if (diff > 0) {
-        int difR = nWires - diff;
-        if (diff < difR) return diff;
-        else return - difR;
-    }
-    else {
-        int difR = nWires + diff;
-        if (- diff < difR) return diff;
-        else return difR;
-    }
-}
-
 void
 TRGCDCWire::clear(void) {
-    _state = 0;
+    TCCell::clear();
     _hit = 0;
 
     for (unsigned i = 0; i < _mcHits.size(); i++)
@@ -426,11 +381,11 @@ TRGCDCWire::name(void) const {
         return string("w") +
             TRGUtil::itostring(layerId()) +
             string("-") +
-            TRGUtil::itostring(_localId);
+            TRGUtil::itostring(localId());
     return string("w") + 
         TRGUtil::itostring(layerId()) +
         string("=") +
-        TRGUtil::itostring(_localId);
+        TRGUtil::itostring(localId());
 }
 
 const TRGSignal &
@@ -460,7 +415,6 @@ TRGCDCWire::triggerOutput(void) const {
 
     }
 }
-
 
 } // namespace Belle2
 

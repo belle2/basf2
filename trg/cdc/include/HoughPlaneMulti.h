@@ -91,7 +91,7 @@ TRGCDCHoughPlaneMulti::registerPattern(unsigned id) {
 
 inline
 unsigned
-TRGCDCHoughPlaneMulti::nActiveCellsInPattern(unsigned id) const {
+TRGCDCHoughPlaneMulti::nActiveCellsInPattern(unsigned ) const {
 //    return _layers[id]->nActiveCellsInPattern();
     return 999;
 }

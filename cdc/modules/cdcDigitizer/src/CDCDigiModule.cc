@@ -251,7 +251,7 @@ void CDCDigiModule::event()
 
     for (int index = 0; index < cdcSimHitRel.getEntries(); index++) {
       for (int hit = 0; hit < cdcSimHitRel[index].getToIndices().size(); hit++) {
-        if (cdcSimHitRel[index].getToIndex(hit) == iterCDCMap->second->getHitNumber()) {
+        if (cdcSimHitRel[index].getToIndex(hit) == (unsigned int) iterCDCMap->second->getHitNumber()) {
           mcPartToCDCHitRel.add(cdcSimHitRel[index].getFromIndex(), iDigits);      //add entry
         }
       }

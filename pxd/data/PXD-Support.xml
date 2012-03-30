@@ -77,8 +77,8 @@
   <CarbonTubes description="Carbon tubes for air cooling of Switchers">
     <Material>PXD-CarbonTubes</Material>
     <count>4</count>
-    <minZ unit="mm">-34.083</minZ>
-    <maxZ unit="mm"> 64.822</maxZ>
+    <minZ unit="mm">-34.000</minZ>
+    <maxZ unit="mm"> 64.800</maxZ>
     <innerRadius unit="mm">0.250</innerRadius>
     <outerRadius unit="mm">0.500</outerRadius>
     <rphi unit="mm">18.700</rphi>

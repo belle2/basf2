@@ -55,7 +55,7 @@ namespace Belle2 {
      *
      *  This contructor doesn't request a name. You can later assign an object to it, if you like.
      *
-     *  @param dummy This argument is ignored but required to distuingish
+     *  The argument is ignored but required to distuingish
      *  between the default constructor and this one
      */
     StoreObjPtr(int /*dummy*/)

@@ -75,7 +75,7 @@ namespace Belle2 {
      * Return the number of nodes a given path will expand to
      * @return number of nodes, 0 if path does not exist
      */
-    virtual int getNumberNodes(const std::string &path = "") const {
+    virtual int getNumberNodes(const std::string& path = "") const {
       return getPathValue(path).numNodes;
     }
 
@@ -85,13 +85,13 @@ namespace Belle2 {
      * @param path Path of the parameter to get
      * @return value of the parameter
      */
-    virtual std::string getString(const std::string &path = "") const throw(gearbox::PathEmptyError) {
+    virtual std::string getString(const std::string& path = "") const throw(gearbox::PathEmptyError) {
       PathValue p = getPathValue(path);
       if (p.numNodes == 0) throw gearbox::PathEmptyError() << path;
       return p.value;
     }
 
-    std::string getString(const std::string &path, const std::string &defaultValue) const {
+    std::string getString(const std::string& path, const std::string& defaultValue) const {
       return gearbox::Interface::getString(path, defaultValue);
     }
 
@@ -106,7 +106,7 @@ namespace Belle2 {
      * @param path Path of the parameter to get
      * @return value of the parameter
      */
-    virtual std::pair<std::string, std::string> getStringWithUnit(const std::string &path = "") const throw(gearbox::PathEmptyError) {
+    virtual std::pair<std::string, std::string> getStringWithUnit(const std::string& path = "") const throw(gearbox::PathEmptyError) {
       PathValue p = getPathValue(path);
       if (!p.numNodes) throw gearbox::PathEmptyError() << path;
       return make_pair(p.value, p.unit);
@@ -127,7 +127,7 @@ namespace Belle2 {
      * @param factory Pointer to the factory function which will return an
      *               instance of the handler
      */
-    static void registerInputHandler(std::string prefix, gearbox::InputHandler::Factory *factory) {
+    static void registerInputHandler(std::string prefix, gearbox::InputHandler::Factory* factory) {
       getInstance().m_registeredHandlers[prefix] = factory;
     }
 
@@ -135,13 +135,13 @@ namespace Belle2 {
     /** Singleton: private constructor */
     Gearbox();
     /** Singleton: private copy constructor */
-    Gearbox(const Gearbox &b): m_parameterCache(DefaultCacheSize) {}
+    Gearbox(const Gearbox&): m_parameterCache(DefaultCacheSize) {}
 
     /** Function to be called when libxml requests a new input uri to be opened */
-    gearbox::InputContext* openXmlUri(const std::string &uri) const;
+    gearbox::InputContext* openXmlUri(const std::string& uri) const;
 
     /** Return the (cached) value of a given path */
-    PathValue getPathValue(const std::string &path) const;
+    PathValue getPathValue(const std::string& path) const;
 
     /** Pointer to the libxml Document structure */
     xmlDocPtr m_xmlDocument;

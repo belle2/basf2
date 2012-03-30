@@ -123,121 +123,136 @@ namespace Belle2 {
      * Return PDG code of particle.
      * @return The PDG code of the MonteCarlo particle.
      */
-    const int getPDG()                       const { return m_pdg; }
+    int getPDG() const { return m_pdg; }
 
     /**
      * Return status code of particle.
-     * @param bitmask Takes an optional bitmask that is compared to the status of the particle.
-     * @return Returns the status code of the particle. If a bitmask is given and it matches the
-     * the status it returns the value of the bitmask and 0 if not.
+     * @param bitmask Takes an optional bitmask that is compared to the status
+     *        of the particle.
+     * @return Returns the status code of the particle. If a bitmask is given
+     *         and it matches the the status it returns the value of the
+     *         bitmask and 0 if not.
      */
-    const unsigned int getStatus(unsigned int bitmask = -1) const { return m_status & bitmask; }
+    unsigned int getStatus(unsigned int bitmask = -1) const { return m_status & bitmask; }
 
     /**
      * Return if specific status bit is set.
      * @param bitmask The bitmask which is compared to the status of the particle.
      * @return Returns true if the bitmask matches the status code of the particle.
      */
-    bool hasStatus(unsigned int bitmask)     const { return (m_status & bitmask) == bitmask; }
+    bool hasStatus(unsigned int bitmask) const { return (m_status & bitmask) == bitmask; }
 
     /**
      * Return the particle mass in GeV.
      * @return The mass of the particle in GeV.
      */
-    const float getMass()                    const { return m_mass; }
+    float getMass() const { return m_mass; }
 
     /**
      * Return the particle charge.
      * @return The charge of the particle in units of q(positron).
      */
-    const float getCharge()                    const { return m_charge; }
+    float getCharge() const { return m_charge; }
 
     /**
      * Return particle energy in GeV.
      * @return Returns the particle energy in GeV.
      */
-    const float getEnergy()                  const { return m_energy; }
+    float getEnergy() const { return m_energy; }
 
     /**
      * Indication whether vertex and time information is useful or just default.
      * @return Returns True if the vertex and time information is useful.
      */
-    const bool hasValidVertex()              const { return m_validVertex; }
+    bool hasValidVertex() const { return m_validVertex; }
 
     /**
      * Return production time in ns.
      * @return The timestamp of the MonteCarlo particle production in ns.
      */
-    const float getProductionTime()          const { return m_productionTime; }
+    float getProductionTime() const { return m_productionTime; }
 
     /**
      * Return the decay time in ns.
      * @return The timestamp of the decay of the MonteCarlo particle in ns.
      *         If the particle is stable the time is set to infinity.
      */
-    const float getDecayTime()               const { return m_decayTime; }
+    float getDecayTime() const { return m_decayTime; }
 
     /**
      * Return the lifetime in ns.
      * A convenient method to get the lifetime of the MonteCarlo particle.
      * @return The lifetime of the MonteCarlo particle in ns.
      */
-    const float getLifetime()                const { return m_decayTime - m_productionTime; }
+    float getLifetime() const { return m_decayTime - m_productionTime; }
 
     /**
      * Return production vertex position, shorthand for getProductionVertex().
      * @return The production vertex of the MonteCarlo particle in cm.
      */
-    const TVector3 getVertex()               const { return getProductionVertex(); }
+    const TVector3 getVertex() const { return getProductionVertex(); }
 
     /**
      * Return production vertex position.
      * @return The production vertex of the MonteCarlo particle in cm.
      */
-    const TVector3 getProductionVertex()     const { return TVector3(m_productionVertex_x, m_productionVertex_y, m_productionVertex_z); }
+    const TVector3 getProductionVertex() const {
+      return TVector3(m_productionVertex_x, m_productionVertex_y, m_productionVertex_z);
+    }
 
     /**
      * Return momentum.
      * @return The momentum of the MonteCarlo particle in GeV.
      */
-    const TVector3 getMomentum()             const { return TVector3(m_momentum_x, m_momentum_y, m_momentum_z); }
+    const TVector3 getMomentum() const {
+      return TVector3(m_momentum_x, m_momentum_y, m_momentum_z);
+    }
 
     /**
      * Return 4Vector of particle.
      * @return The 4-vector of the MonteCarlo particle.
      */
-    const TLorentzVector get4Vector()        const { TLorentzVector vec; vec.SetXYZM(m_momentum_x, m_momentum_y, m_momentum_z, m_mass); return vec; }
+    const TLorentzVector get4Vector() const {
+      TLorentzVector vec; vec.SetXYZM(m_momentum_x, m_momentum_y, m_momentum_z, m_mass); return vec;
+    }
 
 
     /**
      * Return decay vertex.
      * @return The decay vertex of the MonteCarlo particle in cm.
      */
-    const TVector3 getDecayVertex()          const { return TVector3(m_decayVertex_x, m_decayVertex_y, m_decayVertex_z); }
+    const TVector3 getDecayVertex() const {
+      return TVector3(m_decayVertex_x, m_decayVertex_y, m_decayVertex_z);
+    }
 
     /**
      * Get 1-based index of the particle in the corresponding MCParticle list.
      * This is used by the MCParticle Graph.
-     * @return The index of the MonteCarlo particle in the corresponding MCParticle list (starts with 1)
+     * @return The index of the MonteCarlo particle in the corresponding
+     *         MCParticle list (starts with 1)
      */
-    const int getIndex()                     const { return m_index; }
+    int getIndex() const { return m_index; }
 
     /**
      * Get 0-based index of the particle in the corresponding MCParticle list.
-     * This is the function for users who want to use the indices of the TClonesArray. To get the
-     * corresponding mother and daughter indices use ->getMother()->getArrayIndex().
-     * @return The index of the MonteCarlo particle in the corresponding MCParticle array
-     * Careful: These indices do not follow the standard from (Fortran) generators,
-     * where the first particle has index 1. In the array the first particle has index 0.
+     * This is the function for users who want to use the indices of the
+     * TClonesArray. To get the corresponding mother and daughter indices use
+     * ->getMother()->getArrayIndex().
+     *
+     * @return The index of the MonteCarlo particle in the corresponding
+     *         MCParticle array
+     *         Careful: These indices do not follow the standard from (Fortran)
+     *         generators, where the first particle has index 1. In the array
+     *         the first particle has index 0.
      */
-    const int getArrayIndex()                     const { return m_index - 1;  }
+    int getArrayIndex() const { return m_index - 1;  }
 
     /**
      * Get 1-based index of first daughter, 0 if no daughters.
-     * @return The index of the first daughter of the MonteCarlo particle. The index is 0 if the
-     *         MonteCarlo particle doesn't have any daughters.
+     * @return The index of the first daughter of the MonteCarlo particle. The
+     *         index is 0 if the MonteCarlo particle doesn't have any daughters.
      */
-    int getFirstDaughter()                        const { return m_firstDaughter; }
+    int getFirstDaughter() const { return m_firstDaughter; }
 
 
     /**
@@ -245,21 +260,26 @@ namespace Belle2 {
      * @return The index of the last daughter of the MonteCarlo particle. The index is 0 if the
      *         MonteCarlo particle doesn't have any daughters.
      */
-    int getLastDaughter()                        const { return m_lastDaughter; }
+    int getLastDaughter() const { return m_lastDaughter; }
 
     /**
      * Get vector of all daughter particles, empty vector if none.
-     * Throws an exception of type LastChildIndexOutOfRangError if the last daughter is out of the index range.
+     * Throws an exception of type LastChildIndexOutOfRangError if the last
+     * daughter is out of the index range.
+     *
      * @return A list of all daughter particles. The list is empty if
      *         the MonteCarlo particle doesn't have any daughters.
      */
-    const std::vector<Belle2::MCParticle*> getDaughters() const; //Need namespace qualifier because ROOT CINT has troubles otherwise
+    const std::vector<Belle2::MCParticle*> getDaughters() const;
+    //Need namespace qualifier because ROOT CINT has troubles otherwise
 
     /**
-     * Returns a pointer to the mother particle. NULL if the particle doesn't have a mother.
-     * @return A pointer to the mother particle. NULL if no mother was defined for the particle.
+     * Returns a pointer to the mother particle. NULL if the particle doesn't
+     * have a mother.
+     * @return A pointer to the mother particle. NULL if no mother was defined
+     *         for the particle.
      */
-    MCParticle* getMother() const; //Need namespace qualifier because ROOT CINT has troubles otherwise
+    MCParticle* getMother() const;
 
 
     /**
@@ -278,13 +298,13 @@ namespace Belle2 {
      *Check if particle is virtual
      *
      */
-    const bool isVirtual();
+    bool isVirtual();
 
     /**
      * Set PDG code of the particle.
      * @param pdg The PDG code of the MonteCarlo particle.
      */
-    void setPDG(int pdg)                               { m_pdg = pdg; }
+    void setPDG(int pdg) { m_pdg = pdg; }
 
     /**
      * Sets the mass for the particle from the particle's PDG code.
@@ -300,63 +320,65 @@ namespace Belle2 {
      * Set Status code for the particle.
      * @param status The status code of the MonteCarlo particle.
      */
-    void setStatus(unsigned int status)                 { m_status = status; }
+    void setStatus(unsigned int status) { m_status = status; }
 
     /**
      * Add bitmask to current status.
-     * @param bitmask The status code which should be added to the existing MonteCarlo particle status code.
+     * @param bitmask The status code which should be added to the existing
+     *        MonteCarlo particle status code.
      */
-
-
-    void addStatus(unsigned int bitmask)                { m_status |= bitmask; }
+    void addStatus(unsigned int bitmask) { m_status |= bitmask; }
 
     /**
      * Remove bitmask from current status.
-     * @param bitmask The status code which should be removed from the existing MonteCarlo particle status code.
+     * @param bitmask The status code which should be removed from the existing
+     *        MonteCarlo particle status code.
      */
-    void removeStatus(unsigned int bitmask)             { m_status &= (!bitmask); }
+    void removeStatus(unsigned int bitmask) { m_status &= (!bitmask); }
 
     /**
      * Set particle mass.
      * @param mass The MonteCarlo particle mass.
      */
-    void setMass(float mass)                            { m_mass = mass; }
+    void setMass(float mass) { m_mass = mass; }
 
     /**
      * Set particle charge.
      * @param charge The MonteCarlo particle charge.
      */
-    void setCharge(float charge)                            { m_charge = charge; }
+    void setCharge(float charge) { m_charge = charge; }
 
     /**
      * Set energy.
      * @param energy The energy of the MonteCarlo particle.
      */
-    void setEnergy(float energy)                        { m_energy = energy; }
+    void setEnergy(float energy) { m_energy = energy; }
 
     /**
      * Set indication wether vertex and time information is valid or just default.
      * @param valid Set to true if the vertex is valid.
      */
-    void setValidVertex(bool valid)                     { m_validVertex = valid; }
+    void setValidVertex(bool valid) { m_validVertex = valid; }
 
     /**
      * Set production time.
      * @param time The timestamp of the production of the MonteCarlo particle.
      */
-    void setProductionTime(float time)                  { m_productionTime = time; }
+    void setProductionTime(float time) { m_productionTime = time; }
 
     /**
      * Set decay time.
      * @param time The timestamp of the decay of the MonteCarlo time.
      */
-    void setDecayTime(float time)                       { m_decayTime = time; }
+    void setDecayTime(float time) { m_decayTime = time; }
 
     /**
      * Set production vertex position.
      * @param vertex The position of the production vertex given as TVector3.
      */
-    void setProductionVertex(const TVector3& vertex)    { m_productionVertex_x = vertex.X(); m_productionVertex_y = vertex.Y(), m_productionVertex_z = vertex.Z(); }
+    void setProductionVertex(const TVector3& vertex) {
+      m_productionVertex_x = vertex.X(); m_productionVertex_y = vertex.Y(), m_productionVertex_z = vertex.Z();
+    }
 
     /**
      * Set production vertex position.
@@ -365,13 +387,17 @@ namespace Belle2 {
      * @param y The y position of the production vertex.
      * @param z The z position of the production vertex.
      */
-    void setProductionVertex(float x, float y, float z) { m_productionVertex_x = x; m_productionVertex_y = y; m_productionVertex_z = z; }
+    void setProductionVertex(float x, float y, float z) {
+      m_productionVertex_x = x; m_productionVertex_y = y; m_productionVertex_z = z;
+    }
 
     /**
      * Set particle momentum.
      * @param momentum The momentum of the MonteCarlo particle given as TVector3.
      */
-    void setMomentum(const TVector3& momentum)          { m_momentum_x = momentum.X(); m_momentum_y = momentum.Y(), m_momentum_z = momentum.Z(); }
+    void setMomentum(const TVector3& momentum) {
+      m_momentum_x = momentum.X(); m_momentum_y = momentum.Y(), m_momentum_z = momentum.Z();
+    }
 
     /**
      * Set particle momentum.
@@ -380,32 +406,35 @@ namespace Belle2 {
      * @param py The y component of the momentum vector.
      * @param pz The z component of the momentum vector.
      */
-    void setMomentum(float px, float py, float pz)      { m_momentum_x = px, m_momentum_y = py; m_momentum_z = pz; }
-
+    void setMomentum(float px, float py, float pz) {
+      m_momentum_x = px, m_momentum_y = py; m_momentum_z = pz;
+    }
 
     /**
      * Sets the 4Vector of particle.
      * @param 4Vector
      */
-    void set4Vector(const TLorentzVector& p4)      { setMomentum(p4.Vect()); m_energy = p4.Energy(); }
+    void set4Vector(const TLorentzVector& p4) { setMomentum(p4.Vect()); m_energy = p4.Energy(); }
 
     /**
      * Sets the spin type of the particle.
      * @param spin type (integer)
      */
-    void setSpinType(int IspinType)      { m_spinType = (EspinType)IspinType; }
+    void setSpinType(int IspinType) { m_spinType = (EspinType)IspinType; }
 
     /**
      * Sets the spin type of the particle.
      * @param spin type (EspinType)
      */
-    void setSpinType(EspinType NewSpinType)      { m_spinType = NewSpinType; }
+    void setSpinType(EspinType NewSpinType) { m_spinType = NewSpinType; }
 
     /**
      * Set decay vertex.
      * @param vertex The position of the decay vertex given as TVector3.
      */
-    void setDecayVertex(const TVector3& vertex)         { m_decayVertex_x = vertex.X(); m_decayVertex_y = vertex.Y(), m_decayVertex_z = vertex.Z(); }
+    void setDecayVertex(const TVector3& vertex) {
+      m_decayVertex_x = vertex.X(); m_decayVertex_y = vertex.Y(), m_decayVertex_z = vertex.Z();
+    }
 
     /**
      * Set decay vertex.
@@ -414,33 +443,40 @@ namespace Belle2 {
      * @param y The y position of the decay vertex.
      * @param z The z position of the decay vertex.
      */
-    void setDecayVertex(float x, float y, float z)      { m_decayVertex_x = x; m_decayVertex_y = y; m_decayVertex_z = z; }
+    void setDecayVertex(float x, float y, float z) {
+      m_decayVertex_x = x; m_decayVertex_y = y; m_decayVertex_z = z;
+    }
 
     /**
      * Search the DataStore for the corresponding MCParticle array.
      *
-     * This function should not be needed by normal users and is called automatically
-     * if the pointer to the particle list is not set when needed, e.g. after deserialization.
+     * This function should not be needed by normal users and is called
+     * automatically if the pointer to the particle list is not set when
+     * needed, e.g. after deserialization.
      */
     void fixParticleList() const;
 
     /**
      * Set particle to virtual. (A bit more convinient)
      */
-    void setVirtual()                                     {  addStatus(c_IsVirtual); }
+    void setVirtual() {  addStatus(c_IsVirtual); }
 
 
   protected:
 
     /**
-     * Internal pointer to DataStore Array containing particles belonging to this collection.
+     * Internal pointer to DataStore Array containing particles belonging to
+     * this collection.
      *
-     * This is a transient member and will not be written to file. The pointer will be set
-     * correctly on first access after deserialisation
+     * This is a transient member and will not be written to file. The pointer
+     * will be set correctly on first access after deserialisation
      */
     TClonesArray* m_plist; //! transient pointer to particle list
 
-    /** 1-based index of the particle, will be set automatically after deserialisation if needed. */
+    /**
+     * 1-based index of the particle, will be set automatically after
+     * deserialisation if needed.
+     */
     int m_index; //! transient 1-based index of particle
 
     unsigned int m_status;      /**< status code */
@@ -475,7 +511,7 @@ namespace Belle2 {
   };
 
 
-  inline const bool MCParticle::isVirtual()
+  inline bool MCParticle::isVirtual()
   {
     bool virtuality = hasStatus(c_IsVirtual);
     if (!virtuality) {

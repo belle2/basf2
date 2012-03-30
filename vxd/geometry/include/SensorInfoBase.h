@@ -257,6 +257,9 @@ namespace Belle2 {
         m_transform = transform;
       }
 
+      /** Return the transformation matrix of the Sensor
+       * @return Transformation matrix of the Sensor
+       */
       const TGeoHMatrix& getTransformation() const {
         return m_transform;
       }

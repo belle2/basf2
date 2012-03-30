@@ -33,13 +33,13 @@ namespace Belle2 {
     const std::string& getFromName()       const { return m_fromName; }
 
     /** Get durability of the StoreArray we relate from. */
-    const int         getFromDurability() const { return m_fromDurability; }
+    int               getFromDurability() const { return m_fromDurability; }
 
     /** Get name of the StoreArray we relate to. */
     const std::string& getToName()         const { return m_toName; }
 
     /** Get durability of the StoreArray we relate to. */
-    const int         getToDurability()   const { return m_toDurability; }
+    int               getToDurability()   const { return m_toDurability; }
 
     /** Set name of the StoreArray we relate from. */
     void setFromName(const std::string& name)   { m_fromName = name; }

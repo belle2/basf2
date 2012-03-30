@@ -141,12 +141,12 @@ namespace Belle2 {
        * No copying allowed.
        * @param copy Reference to the particle which should be copied.
        */
-      GraphParticle(const GraphParticle& copy) {}
+      GraphParticle(const GraphParticle& copy): MCParticle(copy) {}
 
       /**
        * Hide MCParticle "almost copy" constructor.
        */
-      GraphParticle(TClonesArray* plist, const MCParticle& mc) {}
+      GraphParticle(TClonesArray*, const MCParticle&) {}
 
       /**
        * Internally used constructor. Create a new Particle with given index and a pointer
@@ -204,7 +204,7 @@ namespace Belle2 {
      * Return reference to added particle with range check.
      * @return A reference to the particle given by its index.
      */
-    GraphParticle& operator[](size_t i) { if (i < 0 || i >= m_particles.size()) throw OutOfRangeError(); return *m_particles[i]; }
+    GraphParticle& operator[](size_t i) { if (i >= m_particles.size()) throw OutOfRangeError(); return *m_particles[i]; }
 
     /**
      * Return the number of particles in the graph.

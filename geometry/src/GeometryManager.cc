@@ -54,6 +54,9 @@ namespace Belle2 {
 
     void GeometryManager::clear()
     {
+      BOOST_FOREACH(CreatorBase * creator, m_creators) delete creator;
+      m_creators.clear();
+      m_topVolume = 0;
       //FIXME: Geometry is now run independent, don't delete anything, let Geant4 care about freeing stuff
       return;
       //Clean up existing Geometry
@@ -73,12 +76,14 @@ namespace Belle2 {
     void GeometryManager::createGeometry(const GearDir& detectorDir, GeometryTypes type)
     {
       clear();
+      B2INFO("Creating Geometry");
 
       try {
         string detectorName = detectorDir.getString("Name");
         B2INFO("Creating geometry for detector: " << detectorName);
       } catch (gearbox::PathEmptyError e) {
-        B2FATAL("Could not read detector name, make sure gearbox is connected and " << detectorDir.getPath() << " points to the geometry description");
+        B2FATAL("Could not read detector name, make sure gearbox is connected and "
+                << detectorDir.getPath() << " points to the geometry description");
       }
 
       Materials& materials = Materials::getInstance();
@@ -111,18 +116,41 @@ namespace Belle2 {
           B2ERROR("Could not find required element Name or Creator for " << component.getPath());
           continue;
         }
-        if (m_components.size() > 0 && m_components.count(name) == 0) continue;
-        if (m_excluded.size() > 0 && m_excluded.count(name) > 0) continue;
+        if (m_components.size() > 0 && m_components.count(name) == 0) {
+          B2INFO("DetectorComponent " << name << " not in list of components, skipping");
+          continue;
+        }
+        if (m_excluded.size() > 0 && m_excluded.count(name) > 0) {
+          B2INFO("DetectorComponent " << name << " in list of excluded components, skipping");
+          continue;
+        }
 
         string libraryName = component.getString("Creator/@library", "");
 
         CreatorBase* creator = CreatorManager::getCreator(creatorName, libraryName);
         if (creator) {
-          B2INFO_MEASURE_TIME("Calling creator " << creatorName << " to create component " << name << " took ",
-                              creator->create(GearDir(component, "Content"), *top_log, type));
+          int oldSolids = G4SolidStore::GetInstance()->size();
+          int oldLogical = G4LogicalVolumeStore::GetInstance()->size();
+          int oldPhysical = G4PhysicalVolumeStore::GetInstance()->size();
+          B2INFO_MEASURE_TIME(
+            "Calling creator " << creatorName << " to create component " << name << " took ",
+            creator->create(GearDir(component, "Content"), *top_log, type)
+          );
+          int newSolids = G4SolidStore::GetInstance()->size() - oldSolids;
+          int newLogical = G4LogicalVolumeStore::GetInstance()->size() - oldLogical;
+          int newPhysical = G4PhysicalVolumeStore::GetInstance()->size() - oldPhysical;
+          B2INFO("DetectorComponent " << name << " created " << newSolids
+                 << " solids, " << newLogical << " logical volumes and "
+                 << newPhysical << " physical volumes");
           m_creators.push_back(creator);
         }
       }
+      int newSolids = G4SolidStore::GetInstance()->size();
+      int newLogical = G4LogicalVolumeStore::GetInstance()->size();
+      int newPhysical = G4PhysicalVolumeStore::GetInstance()->size();
+      B2INFO("Created a total of " << newSolids << " solids, " << newLogical
+             << " logical volumes and " << newPhysical << " physical volumes");
+
     }
 
     void GeometryManager::createTGeoRepresentation()

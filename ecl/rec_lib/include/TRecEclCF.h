@@ -47,7 +47,7 @@ namespace Belle2 {
     void Accumulate(const TEclEnergyHit& ahit) ;
     // helper
     /// cellId -> HitId, for panther mainly
-    const Identifier HitId(Identifier cId) const;
+    Identifier HitId(Identifier cId) const;
     ///
     int SearchCRs(void);
 

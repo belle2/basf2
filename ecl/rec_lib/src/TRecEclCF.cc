@@ -207,7 +207,7 @@ NewEACorr(TEclCFShower& s)
 //
 // const member functions
 //
-const EclIdentifier
+EclIdentifier
 TRecEclCF::HitId(Identifier cId) const
 {
   const EclEnergyHitMap::const_iterator i = fEnergyHits.find(cId);

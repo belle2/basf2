@@ -11,10 +11,10 @@
 #ifndef GEOVXDASSEMBLY_H
 #define GEOVXDASSEMBLY_H
 
-#include <G4LogicalVolume.hh>
+#include <vector>
 #include <G4Transform3D.hh>
-#include <G4ReflectionFactory.hh>
 #include <boost/foreach.hpp>
+class G4LogicalVolume;
 
 namespace Belle2 {
   /** Namespace to provide code needed by both Vertex Detectors, PXD and SVD */
@@ -33,14 +33,7 @@ namespace Belle2 {
        * @param mother Pointer to the volume everything should be placed in
        * @param transform Transformation to apply to all volumes when placing them
        */
-      void place(G4LogicalVolume* mother, const G4Transform3D& transform) {
-        G4ReflectionFactory& reflection = *G4ReflectionFactory::Instance();
-        int numberOfDaughters = mother->GetNoDaughters();
-        BOOST_FOREACH(Placement & p, m_volumes) {
-          reflection.Place(transform * p.second, p.first->GetName(), p.first,
-                           mother, false, ++numberOfDaughters, false);
-        }
-      }
+      void place(G4LogicalVolume* mother, const G4Transform3D& transform);
 
       /** Add a volume to the assembly
        * @param volume Volume to be added

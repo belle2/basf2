@@ -21,6 +21,7 @@
 #include <boost/foreach.hpp>
 #include <boost/format.hpp>
 
+#include <G4ReflectionFactory.hh>
 #include <G4LogicalVolume.hh>
 #include <G4Trd.hh>
 #include <G4Trap.hh>

@@ -52,7 +52,7 @@ namespace Belle2 {
         //Now enter the volume
         nav.NewLevel(physical);
 
-        G4LogicalVolume *logical = physical->GetLogicalVolume();
+        G4LogicalVolume* logical = physical->GetLogicalVolume();
 
         //Check if we found a sensitive volume with correct type
         SensitiveDetectorBase* sensitive = dynamic_cast<SensitiveDetectorBase*>(logical->GetSensitiveDetector());

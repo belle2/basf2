@@ -22,7 +22,7 @@ namespace Belle2 {
     public:
       /** Constructor which automatically sets the SensorType */
       SensorInfo(VxdID id = 0, float width = 0, float length = 0, float thickness = 0, int uCells = 0, int vCells = 0, float splitLength = 0, int vCells2 = 0):
-          VXD::SensorInfoBase(SensorInfo::PXD, id, width, length, thickness, uCells, vCells, 0, splitLength, vCells2) {}
+        VXD::SensorInfoBase(SensorInfo::PXD, id, width, length, thickness, uCells, vCells, 0, splitLength, vCells2) {}
       /** Change the SensorID, useful to copy the SensorInfo from one sensor and use it for another */
       void setID(VxdID id) { m_id = id; }
 

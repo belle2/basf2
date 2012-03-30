@@ -19,23 +19,30 @@
          ladder) specifies the center of the local coordinate system for the
          ladder: x along rphi, 0 at specified phi, y going outward 0 at
          specified radius, z = global z, 0 at global 0 -->
-    <radius unit="mm">14.000</radius>
+
+    <!-- The nominal radius of the inner layer is 14 mm, but this is the inner
+         surface of the sensor and here we give the center of the sensor, so
+         let's add half of the sensor thickness -->
+    <radius unit="mm">14.210</radius>
     <!-- Disabled as it causes problems with TGeo conversion -->
     <!--<Glue><oversize unit="um">20</oversize><Material>PXD-Glue</Material></Glue>-->
     <!-- The value of Sensors is the global z position -->
-    <Sensor id="1" unit="mm" flipW="true" flipV="true"> 48.013</Sensor>
-    <Sensor id="2" unit="mm" flipW="true">-20.013</Sensor>
+    <Sensor id="1" type="Layer1" unit="mm" flipW="true" flipV="true"> 48.013</Sensor>
+    <Sensor id="2" type="Layer1" unit="mm" flipW="true">-20.013</Sensor>
   </Ladder>
   <Ladder layer="2">
     <shift  unit="mm"> 3.500</shift>
-    <radius unit="mm">22.000</radius>
+    <!-- The nominal radius of the outer layer is 22 mm, but this is the
+         outersurface of the sensor and here we give the center of the sensor,
+         so let's substract half of the sensor thickness -->
+    <radius unit="mm">21.790</radius>
     <!-- Disabled as it causes problems with TGeo conversion -->
     <!--<Glue><oversize unit="um">20</oversize><Material>PXD-Glue</Material></Glue>-->
-    <Sensor id="1" unit="mm" flipV="true"> 61.513</Sensor>
-    <Sensor id="2" unit="mm">-23.513</Sensor>
+    <Sensor id="1" type="Layer2" unit="mm" flipV="true"> 61.513</Sensor>
+    <Sensor id="2" type="Layer2" unit="mm">-23.513</Sensor>
   </Ladder>
 
-  <Sensor layer="1">
+  <Sensor type="Layer1">
     <Color>#006699</Color>
     <Material>Si</Material>
     <width  unit="mm">15.400</width>
@@ -45,20 +52,22 @@
          whole thing. The position is given relative to the lower left edge of
          the module (the point with the most negative local coordinates). -->
     <Active>
+      <Color>#f00</Color>
       <u unit="mm"> 0.600</u>
       <v unit="mm">22.775</v>
+      <w>top</w>
       <width  unit="mm">12.500</width>
       <length unit="mm">44.800</length>
       <height unit="mm"> 0.075</height>
       <!-- limit the Geant4 stepsize to get precise information on the landau fluctuation -->
       <stepSize unit="um">5</stepSize>
       <!-- define the number of pixels in rphi direction -->
-      <pixelsR>250</pixelsR>
+      <pixelsU>250</pixelsU>
       <!-- define the number of pixels in z direction. There are two values
            since we have two different pixel sizes inside of one module: Larger
            pixels in the outer area, smaller pixels in the middle -->
-      <pixelsZ>512</pixelsZ>
-      <pixelsZ>256</pixelsZ>
+      <pixelsV>512</pixelsV>
+      <pixelsV>256</pixelsV>
       <!-- splitLength defines the position inside the active area (starting at
            the outside) where the pixel size changes. Pixel size is calculated
            automatically from the size of the active area and the number of
@@ -92,23 +101,32 @@
           - center: place in the sensor center
           - top: place in the sensor touching the top surface
           - above place on top of the sensor surface -->
+
+    <!-- Thinning of the sensor down to the sensitive thickness by cutting out
+         a piece of the silicon -->
     <Component type="ThinningLayer1">
       <u unit="mm"> 7.000</u><v unit="mm">45.390</v>
     </Component>
+    <!-- mechanical reinforcements spanning to modules -->
     <Component type="Reinforcement">
       <u unit="mm"> 0.500</u><v unit="mm">66.475</v><w>bottom</w>
       <u unit="mm">13.500</u><v unit="mm">66.475</v><w>bottom</w>
       <u unit="mm">14.500</u><v unit="mm">66.475</v><w>bottom</w>
     </Component>
+    <!-- left and right of the sensitive area are some grooves cut out from the
+         silicon to remove material. This is done in the simulation by
+         inserting a Si/Air mixture -->
     <Component type="BorderThinningLayer1">
       <u unit="mm"> 0.525</u><v unit="mm">44.085</v><w>bottom</w>
     </Component>
     <Component type="SwitcherThinningLayer1">
       <u unit="mm">14.175</u><v unit="mm">44.085</v><w>bottom</w>
     </Component>
+    <!-- Readout chips outside the acceptance -->
     <Component type="ReadoutChips">
       <u unit="mm"> 7.390</u><v unit="mm">15.070</v><w>above</w>
     </Component>
+    <!-- Switcher chips along the module -->
     <Component type="SwitchersLayer1">
       <u unit="mm">14.189</u><v unit="mm">44.422</v><w>above</w>
     </Component>
@@ -116,7 +134,7 @@
 
   <!-- The sensor in layer 2 is almost the same as for layer one except for the
        dimensions -->
-  <Sensor layer="2">
+  <Sensor type="Layer2">
     <Material>Si</Material>
     <Color>#006699</Color>
     <width  unit="mm">15.400</width>
@@ -125,13 +143,14 @@
     <Active>
       <u unit="mm"> 0.600</u>
       <v unit="mm">23.150</v>
+      <w>top</w>
       <width  unit="mm">12.500</width>
       <length unit="mm">61.440</length>
       <height unit="mm"> 0.075</height>
       <stepSize unit="um">5</stepSize>
-      <pixelsR>250</pixelsR>
-      <pixelsZ>512</pixelsZ>
-      <pixelsZ>256</pixelsZ>
+      <pixelsU>250</pixelsU>
+      <pixelsV>512</pixelsV>
+      <pixelsV>256</pixelsV>
       <splitLength unit="mm">43.520</splitLength>
 
       <BulkDoping unit="1/um^3">10.0</BulkDoping>

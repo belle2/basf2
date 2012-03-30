@@ -61,7 +61,7 @@ namespace Belle2 {
        * handle. Ownership of the SensorInfo goes to the sensitive detector
        * instance
        */
-      SensitiveDetector(VXD::SensorInfoBase* sensorInfo, bool seeNeutrons = false);
+      SensitiveDetector(VXD::SensorInfoBase* sensorInfo, bool seeNeutrons = false, bool onlyPrimaryTrueHits = false);
 
     protected:
       /** Process one step inside the sensitive volume.
@@ -111,6 +111,8 @@ namespace Belle2 {
 
       /** See all particles (irrespective of charge, i.e., in particular, neutrons) */
       bool m_seeNeutrons;
+      /** Only create TrueHits for primary particles if true */
+      bool m_onlyPrimaryTrueHits;
       /** List of all SimHit indices and their energy deposition belonging to the current volume traversal */
       std::vector<std::pair<unsigned int, float> > m_trueHitSteps;
       /** TrackID of the current volume traversal */
@@ -136,8 +138,8 @@ namespace Belle2 {
     };
 
     template <class SimHitClass, class TrueHitClass>
-    SensitiveDetector<SimHitClass, TrueHitClass>::SensitiveDetector(VXD::SensorInfoBase* sensorInfo, bool seeNeutrons):
-      VXD::SensitiveDetectorBase(sensorInfo), m_seeNeutrons(seeNeutrons),
+    SensitiveDetector<SimHitClass, TrueHitClass>::SensitiveDetector(VXD::SensorInfoBase* sensorInfo, bool seeNeutrons, bool onlyPrimaryTrueHits):
+      VXD::SensitiveDetectorBase(sensorInfo), m_seeNeutrons(seeNeutrons), m_onlyPrimaryTrueHits(onlyPrimaryTrueHits),
       m_trueHitTrackID(0), m_trueHitCount(0), m_trueHitWeight(0.0), m_trueHitTime(0.0)
     {
       //Make sure all collections are registered
@@ -159,7 +161,6 @@ namespace Belle2 {
       // Get particle PDG code
       const int pdgCode       = track.GetDefinition()->GetPDGEncoding();
       // Get particle charge (only keep charged tracks and photons)
-      //FIXME: Add option to do neutron study .. or provide alternative SensitiveDetector for neutron studies
       const double minCharge  = 0.01 * Unit::e;
       const double pdgCharge  = track.GetDefinition()->GetPDGCharge() * Unit::e;
       bool isAllowedNeutral = (pdgCode == 22) || (m_seeNeutrons && (abs(pdgCode) == 2112));
@@ -201,7 +202,7 @@ namespace Belle2 {
 
       //Ignore all Steps with less than 1eV Energydeposition for now
       //FIXME: make this more elaborate
-      const double thresholdEnergy = 1 * Unit::eV;
+      const double thresholdEnergy = 0.01 * Unit::eV;
       if (fabs(energy) < thresholdEnergy) return -1;
 
       VxdID sensorID = m_info->getID();
@@ -228,6 +229,14 @@ namespace Belle2 {
       G4Step* step, int trackID, int index, double time, double energy,
       const TVector3& posIn, const TVector3& posOut, const TVector3& momIn, const TVector3& momOut)
     {
+      const G4Track& track = *step->GetTrack();
+
+      //Only create trueHits for primary particles if requested
+      if (m_onlyPrimaryTrueHits) {
+        const G4PrimaryParticle* primaryParticle = track.GetDynamicParticle()->GetPrimaryParticle();
+        if (primaryParticle == NULL) return;
+      }
+
       //Check if the step still belongs to the same crossing of the sensitive volume
       //by comparing the trackID. We check for particles leaving the volume
       //after adding the step.
@@ -268,7 +277,6 @@ namespace Belle2 {
         m_trueHitCount++;
       }
       //If this step is in boundary or track gets killed, save TrueHit
-      const G4Track& track = *step->GetTrack();
       if (track.GetNextVolume() != track.GetVolume() || track.GetTrackStatus() >= fStopAndKill) saveTrueHit();
     }
 

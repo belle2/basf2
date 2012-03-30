@@ -2,7 +2,12 @@
 <DetectorComponent name="PXD" xmlns:xi="http://www.w3.org/2001/XInclude">
   <Creator library="pxd">PXDCreator</Creator>
   <Content>
-    <!-- Settings for background and exposure studies -->
+    <!-- Set the  stepsize to be used in senistive volumes -->
+    <ActiveStepSize unit="um">5</ActiveStepSize>
+    <!-- If this is true, TrueHits will only be created for primary particles,
+         secondaries produced by Geant4 will not create TrueHits -->
+    <OnlyPrimaryTrueHits>false</OnlyPrimaryTrueHits>
+    <!--Settings for background and exposure studies -->
     <ActiveChips desc="Set to true to make chips on sensors sensitive">false</ActiveChips>
     <SeeNeutrons desc="Set to true to make sensitive detectors see neutrons">false</SeeNeutrons>
     <!-- Include Alignment information -->
@@ -21,7 +26,7 @@
          each layer. -->
     <HalfShell name="Ying">
       <!-- For this shell we place the support without any rotation -->
-      <Support><phi unit="deg">0</phi></Support>
+      <shellAngle unit="deg">0</shellAngle>
       <!-- Define the ladders in each layer with increasing phi angle -->
       <Layer id="1">
         <Ladder id="1"><phi unit="deg">0</phi></Ladder>
@@ -41,7 +46,7 @@
     <HalfShell name="Yang">
       <!-- Place the support with an rotation of 180 degree around the z-axis
            compared to form second half -->
-      <Support><phi unit="deg">180</phi></Support>
+      <shellAngle unit="deg">180</shellAngle>
       <!-- Define the ladders in each layer with increasing phi angle. The
            ladder ids are unique per layer and thus are continued from the
            first half shell -->

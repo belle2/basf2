@@ -9,16 +9,13 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <pxd/geometry/GeoPXDCreator.h>
+#include <vxd/geometry/GeoVXDComponents.h>
 #include <framework/logging/Logger.h>
 #include <boost/algorithm/string.hpp>
 
-using namespace std;
-
 namespace Belle2 {
-  /** Namespace to encapsulate code needed for simulation and reconstrucion of the PXD */
-  namespace PXD {
-    GeoPXDPlacement::GeoPXDPlacement(const std::string &name, double u, double v, std::string w): name(name), u(u), v(v)
+  namespace VXD {
+    GeoVXDPlacement::GeoVXDPlacement(const std::string& name, double u, double v, std::string w, double woffset): name(name), u(u), v(v), woffset(woffset)
     {
       boost::to_lower(w);
       if (w == "below")        this->w = c_below;
@@ -26,7 +23,11 @@ namespace Belle2 {
       else if (w == "center")  this->w = c_center;
       else if (w == "top")     this->w = c_top;
       else if (w == "above")   this->w = c_above;
-      else  B2FATAL("Unknown z-placement for PXD Component: " << w << ", check xml file");
+      else  B2FATAL("Unknown z-placement for VXD Component " << name << ": " << w << ", check xml file");
+
+      if (this->w != c_center && woffset < 0) {
+        B2FATAL("VXD Component " << name << ": Offset has to be positive except for centered placement");
+      }
     }
-  }
-}
+  }  // namespace svd
+}  // namespace Belle2

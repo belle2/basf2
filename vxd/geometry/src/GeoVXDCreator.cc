@@ -59,11 +59,22 @@ namespace Belle2 {
       m_sensitive.clear();
     }
 
+    GeoVXDAssembly GeoVXDCreator::createHalfShellSupport(GearDir) { return GeoVXDAssembly(); };
+
+    GeoVXDAssembly GeoVXDCreator::createLayerSupport(int, GearDir) { return GeoVXDAssembly(); };
+
+    GeoVXDAssembly GeoVXDCreator::createLadderSupport(int, GearDir) { return GeoVXDAssembly(); };
+
     vector<GeoVXDPlacement> GeoVXDCreator::getSubComponents(GearDir path)
     {
       vector<GeoVXDPlacement> result;
       BOOST_FOREACH(const GearDir & component, path.getNodes("Component")) {
-        string type = component.getString("@type");
+        string type;
+        if (!component.exists("@type")) {
+          type = component.getString("@name");
+        } else {
+          type = component.getString("@type");
+        }
         int nPos = max(component.getNumberNodes("u"), component.getNumberNodes("v"));
         nPos = max(nPos, component.getNumberNodes("w"));
         nPos = max(nPos, component.getNumberNodes("woffset"));
@@ -89,7 +100,7 @@ namespace Belle2 {
         return cached->second;
       }
       //Not cached, so lets create a new one
-      string path = (boost::format("Component[@name='%1%']/") % name).str();
+      string path = (boost::format("descendant::Component[@name='%1%']/") % name).str();
       GearDir params(m_components, path);
       if (!params) B2FATAL("Could not find definition for component " << name);
 
@@ -135,7 +146,7 @@ namespace Belle2 {
           if (!allowOutside) B2FATAL("Cannot place component " << p.name << " outside of component " << name);
         } else if (sub.height + p.woffset > component.height) {
           //Component will not fit heightwise. If we resize the volume anyway than we don't have problems
-          if (component.volume) {
+          if (component.height != 0) {
             B2FATAL("Subcomponent " << p.name << " does not fit into volume: "
                     << "height " << sub.height << " > " << component.height);
           }
@@ -146,7 +157,7 @@ namespace Belle2 {
         double minWidth =  max(abs(p.u + sub.width / 2.0), abs(p.u - sub.width / 2.0));
         double minLength = max(abs(p.v + sub.length / 2.0), abs(p.v - sub.length / 2.0));
         if (minWidth > component.width) {
-          if (component.volume) {
+          if (component.width != 0) {
             B2FATAL("Subcomponent " << p.name << " does not fit into volume: "
                     << "minWidth " << minWidth << " > " << component.width);
           }
@@ -154,7 +165,7 @@ namespace Belle2 {
           component.width2 = minWidth * 2.0;
         }
         if (minLength > component.length) {
-          if (component.volume) {
+          if (component.length != 0) {
             B2FATAL("Subcomponent " << p.name << " does not fit into volume: "
                     << "minLength " << minLength << " > " << component.length);
           }
@@ -172,10 +183,6 @@ namespace Belle2 {
       if (!component.volume) {
         G4VSolid* componentShape = createTrapezoidal(name, component.width, component.width2, component.length, component.height);
         component.volume = new G4LogicalVolume(componentShape, Materials::get(component.material), name);
-        /*if (component.material == m_defaultMaterial) {
-          B2DEBUG(200, "Component " << name << " is an default material, setting invisible");
-          setVisibility(*component.volume, false);
-        }*/
       }
 
       B2DEBUG(100, boost::format("Component %1% dimensions: %2%x%3%x%4% cm") % name % component.width % component.length % component.height);
@@ -189,7 +196,7 @@ namespace Belle2 {
           //Add to selected mother (either component or container around component
           assembly.add(s.volume, transform);
         } else {
-          new G4PVPlacement(transform, s.volume, "", component.volume, false, i);
+          new G4PVPlacement(transform, s.volume, name + "." + p.name, component.volume, false, i);
         }
       }
 
@@ -230,7 +237,7 @@ namespace Belle2 {
       double u(placement.u), v(placement.v), w(0);
       switch (placement.w) {
         case GeoVXDPlacement::c_below:  //Place below component
-          w = mother.height / 2.0 - daughter.height / 2.0;
+          w = - mother.height / 2.0 - daughter.height / 2.0;
           break;
         case GeoVXDPlacement::c_bottom: //Place inside, at bottom of component
           w = - mother.height / 2.0 + daughter.height / 2.0;
@@ -285,7 +292,7 @@ namespace Belle2 {
       VxdID ladder(m_ladder.layerID, ladderID, 0);
 
       G4Translate3D ladderPos(m_ladder.radius, m_ladder.shift, 0);
-      G4Transform3D ladderPlacement = placement * G4RotateZ3D(phi) * ladderPos * G4RotateZ3D(m_ladder.windmill) * getAlignment(ladder);
+      G4Transform3D ladderPlacement = placement * G4RotateZ3D(phi) * ladderPos * getAlignment(ladder);
 
       vector<G4Point3D> lastSensorEdge;
       BOOST_FOREACH(GeoVXDSensorPlacement & p, m_ladder.sensors) {
@@ -336,7 +343,7 @@ namespace Belle2 {
         //new G4PVPlacement(G4Translate3D(0,0,5*mm),wBox,"w",active,false,1);
         //}
 
-        //FIXME: don't make this hardcoded
+        //FIXME: don't make this hardcoded?
         setColor(*active, "#f00");
         //The coordinates of the active region are given as the distance between the corners, not to the center
         //Place the active area
@@ -449,13 +456,12 @@ namespace Belle2 {
         B2FATAL("Could not find definition for VXD Envelope.");
       }
       double minZ(0), maxZ(0);
-      G4Polycone* envelopeCone = geometry::createPolyCone("Envelope", GearDir(content, "Envelope/"), minZ, maxZ);
+      G4Polycone* envelopeCone = geometry::createRotationSolid("Envelope", GearDir(content, "Envelope/"), minZ, maxZ);
       envelope = new G4LogicalVolume(envelopeCone, material, m_prefix + ".Envelope");
-      //setColor(*envelope, "#f00");
       setVisibility(*envelope, false);
-      /*G4Region* svdRegion = G4RegionStore::GetInstance()->FindOrCreateRegion(m_name);
-        envelope->SetRegion(svdRegion);
-        svdRegion->AddRootLogicalVolume(envelope);*/
+      G4Region* vxdRegion = G4RegionStore::GetInstance()->FindOrCreateRegion(m_prefix);
+      envelope->SetRegion(vxdRegion);
+      vxdRegion->AddRootLogicalVolume(envelope);
       G4VPhysicalVolume* physEnvelope = new G4PVPlacement(getAlignment(m_prefix), envelope, m_prefix + ".Envelope", &topVolume, false, 1);
 
       //Read the definition of all sensor types
@@ -540,7 +546,6 @@ namespace Belle2 {
                    layer,
                    paramsLadder.getLength("shift") / Unit::mm,
                    paramsLadder.getLength("radius") / Unit::mm,
-                   paramsLadder.getAngle("windmill", 0),
                    paramsLadder.getAngle("slantedAngle", 0),
                    paramsLadder.getLength("slantedRadius", 0) / Unit::mm,
                    paramsLadder.getLength("Glue/oversize", 0) / Unit::mm,
@@ -548,7 +553,6 @@ namespace Belle2 {
                  );
 
       BOOST_FOREACH(const GearDir & sensorInfo, paramsLadder.getNodes("Sensor")) {
-        //FIXME: flip?
         m_ladder.sensors.push_back(GeoVXDSensorPlacement(
                                      sensorInfo.getInt("@id"),
                                      sensorInfo.getString("@type"),

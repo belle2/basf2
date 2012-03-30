@@ -93,10 +93,10 @@ namespace Belle2 {
     /** Struct containing all parameters of one ladder */
     struct GeoVXDLadder {
       /** Constructor */
-      GeoVXDLadder(int layerID = 0, double shift = 0, double radius = 0, double windmill = 0,
+      GeoVXDLadder(int layerID = 0, double shift = 0, double radius = 0,
                    double slantedAngle = 0, double slantedRadius = 0,
                    double glueSize = -1, const std::string& glueMaterial = ""):
-        layerID(layerID), shift(shift), radius(radius), windmill(windmill),
+        layerID(layerID), shift(shift), radius(radius),
         slantedAngle(slantedAngle), slantedRadius(slantedRadius),
         glueSize(glueSize), glueMaterial(glueMaterial) {}
       /** ID of the ladder inside the layer */
@@ -105,8 +105,6 @@ namespace Belle2 {
       double shift;
       /** Radius where to place the ladder */
       double radius;
-      /** Windmill angle */
-      double windmill;
       /** Angle of the module with respect to the global z-axis for slanted sensors */
       double slantedAngle;
       /** Radius of the center of the active area for slanted sensors */

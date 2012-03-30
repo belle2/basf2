@@ -10,7 +10,6 @@
  **************************************************************************/
 
 #include <pxd/geometry/GeoPXDCreator.h>
-#include <vxd/VxdID.h>
 #include <vxd/geometry/GeoCache.h>
 #include <pxd/geometry/SensorInfo.h>
 #include <pxd/simulation/SensitiveDetector.h>
@@ -25,27 +24,15 @@
 #include <cmath>
 #include <boost/format.hpp>
 #include <boost/foreach.hpp>
-#include <boost/algorithm/string.hpp>
 
 #include <G4LogicalVolume.hh>
 #include <G4PVPlacement.hh>
-#include <G4AssemblyVolume.hh>
 
 //Shapes
-#include <G4Trd.hh>
 #include <G4Box.hh>
 #include <G4Tubs.hh>
 #include <G4Polycone.hh>
 #include <G4SubtractionSolid.hh>
-#include <G4UserLimits.hh>
-#include <G4RegionStore.hh>
-#include <G4Point3D.hh>
-
-#include <G4TessellatedSolid.hh>
-#include <G4QuadrangularFacet.hh>
-#include <G4TriangularFacet.hh>
-
-//#define MATERIAL_SCAN
 
 using namespace std;
 using namespace boost;
@@ -60,7 +47,6 @@ namespace Belle2 {
     GeoPXDCreator::~GeoPXDCreator()
     {
     }
-
 
     VXD::SensorInfoBase* GeoPXDCreator::createSensorInfo(const GearDir& sensor)
     {
@@ -105,10 +91,6 @@ namespace Belle2 {
       VXD::GeoVXDAssembly supportAssembly;
       if (!support) return supportAssembly;
 
-#ifdef MATERIAL_SCAN
-      G4Region* supportRegion = G4RegionStore::GetInstance()->FindOrCreateRegion("PXD-Support");
-#endif
-
       BOOST_FOREACH(const GearDir & endflange, support.getNodes("Endflange")) {
         double minZ(0), maxZ(0);
         string name = endflange.getString("@name");
@@ -146,10 +128,6 @@ namespace Belle2 {
 
         G4LogicalVolume* volume = new G4LogicalVolume(supportCone, material, name);
         geometry::setColor(*volume, endflange.getString("color", "#ccc4"));
-#ifdef MATERIAL_SCAN
-        volume->SetRegion(supportRegion);
-        supportRegion->AddRootLogicalVolume(volume);
-#endif
         supportAssembly.add(volume);
       }
 
@@ -170,10 +148,6 @@ namespace Belle2 {
 
         G4Tubs* tube = new G4Tubs("CarbonTube", minR, maxR, sizeZ, 0, 2 * M_PI);
         G4LogicalVolume* tubeVol = new G4LogicalVolume(tube, geometry::Materials::get(material), "CarbonTube");
-#ifdef MATERIAL_SCAN
-        tubeVol->SetRegion(supportRegion);
-        supportRegion->AddRootLogicalVolume(tubeVol);
-#endif
         geometry::setColor(*tubeVol, "#000");
         for (int i = 0; i < nTubes; ++i) {
           G4Transform3D placement = G4RotateZ3D(phi0 + i * dphi) * G4Translate3D(shiftX, shiftY, shiftZ);

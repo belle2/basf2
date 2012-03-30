@@ -25,11 +25,11 @@ namespace Belle2 {
      *
      * This function takes an input stream and will return the next component of the VxdID
      * */
-    int getPart(istream &in)
+    int getPart(istream& in)
     {
       if (!in.eof()) {
         //Get next char, if it is a dot, ignore it and get the next one
-        char next = in.get();
+        int next = in.get();
         if (next == '.') next = in.get();
         //If it is a wildcard we return 0 as id, otherwise we put it back in the stream
         if (next == '*') {
@@ -69,7 +69,7 @@ namespace Belle2 {
         in.get();
         m_id.parts.segment = getPart(in);
       }
-    } catch (runtime_error &e) {
+    } catch (runtime_error&) {
       //Something went wrong parsing the parts
       B2ERROR("Could not parse VtxID '" << sensor << "'");
       m_id.id = 0;
@@ -105,7 +105,7 @@ namespace Belle2 {
     return out.str();
   }
 
-  std::ostream& operator<<(std::ostream &out, const VxdID &id)
+  std::ostream& operator<<(std::ostream& out, const VxdID& id)
   {
     out << ((string)id);
     return out;

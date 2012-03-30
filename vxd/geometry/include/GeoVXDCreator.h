@@ -16,7 +16,6 @@
 #include <vxd/geometry/GeoVXDAssembly.h>
 #include <vxd/geometry/SensorInfoBase.h>
 #include <vxd/simulation/SensitiveDetectorBase.h>
-//#include <simulation/background/BkgSensitiveDetector.h>
 #include <geometry/CreatorBase.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
@@ -56,21 +55,21 @@ namespace Belle2 {
        * thagt does not depend on layer or sensor alignment
        * @param support Reference to the database containing the parameters
        */
-      virtual GeoVXDAssembly createHalfShellSupport(GearDir support) { return GeoVXDAssembly(); };
+      virtual GeoVXDAssembly createHalfShellSupport(GearDir support);
 
       /**
        * Create support structure for a VXD Layer
        * @param layer Layer ID to create the support for
        * @param support Reference to the database containing the parameters
        */
-      virtual GeoVXDAssembly createLayerSupport(int layer, GearDir support) { return GeoVXDAssembly(); };
+      virtual GeoVXDAssembly createLayerSupport(int layer, GearDir support);
 
       /**
        * Create support structure for a VXD Ladder
        * @param layer Layer ID to create the support for
        * @param support Reference to the database containing the parameters
        */
-      virtual GeoVXDAssembly createLadderSupport(int layer, GearDir support) { return GeoVXDAssembly(); };
+      virtual GeoVXDAssembly createLadderSupport(int layer, GearDir support);
 
       /**
        * Read the sensor definitions from the database

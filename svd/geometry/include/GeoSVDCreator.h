@@ -39,14 +39,14 @@ namespace Belle2 {
        * @param layer Layer ID to create the support for
        * @param support Reference to the database containing the parameters
        */
-      //virtual GeoSVDAssembly createLayerSupport(int layer, GearDir support);
+      virtual VXD::GeoVXDAssembly createLayerSupport(int layer, GearDir support);
 
       /**
        * Create support structure for a SVD Ladder
        * @param layer Layer ID to create the support for
        * @param support Reference to the database containing the parameters
        */
-      //virtual GeoSVDAssembly createLadderSupport(int layer, GearDir support);
+      virtual VXD::GeoVXDAssembly createLadderSupport(int layer, GearDir support);
 
       /**
        * Read the sensor definitions from the database
@@ -56,10 +56,12 @@ namespace Belle2 {
 
       /**
        * Return a SensitiveDetector implementation for a given sensor
-       * @param sensorID SensorID for the sensor
-       * @param sensor   Information about the sensor to create the Sensitive Detector for
+       * @param sensorID  SensorID for the sensor
+       * @param sensor    Information about the sensor to create the Sensitive Detector for
+       * @param placement Information on how to place the sensor
        */
-      virtual VXD::SensitiveDetectorBase* createSensitiveDetector(VxdID sensorID, const VXD::GeoVXDSensor& sensor, const VXD::GeoVXDSensorPlacement& placement);
+      virtual VXD::SensitiveDetectorBase* createSensitiveDetector(
+        VxdID sensorID, const VXD::GeoVXDSensor& sensor, const VXD::GeoVXDSensorPlacement& placement);
 
     }; // class GeoSVDCreator
   } // namespace SVD

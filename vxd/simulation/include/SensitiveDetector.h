@@ -81,8 +81,8 @@ namespace Belle2 {
        * @param momIn   Momentum at beginning of the Step
        * @param momOut  Momentum at end of the Step
        */
-      int addSimHit(G4Step* step, int trackID, int pdg, double time, double energy,
-                    const TVector3& posIn, const TVector3& posOut, const TVector3& momIn, const TVector3& momOut);
+      int addSimHit(int trackID, int pdg, double time, double energy,
+                    const TVector3& posIn, const TVector3& posOut, const TVector3& momIn);
 
       /** Update TrueHit information and create TrueHit if appropriate.
        * All SimHits of a single traversal of the volume will be collected.
@@ -187,7 +187,7 @@ namespace Belle2 {
       TVector3 momOut(posStepMom.x(), posStepMom.y(), posStepMom.z());
 
       //Create SimHit
-      int hitIndex = addSimHit(step, trackID, pdgCode, globalTime, depEnergy, posIn, posOut, momIn, momOut);
+      int hitIndex = addSimHit(trackID, pdgCode, globalTime, depEnergy, posIn, posOut, momIn);
       //Update TrueHit information and create TrueHit if appropriate
       addTrueHit(step, trackID, hitIndex, globalTime, depEnergy, posIn, posOut, momIn, momOut);
       //Return true if a SimHit was created
@@ -196,8 +196,8 @@ namespace Belle2 {
 
     template <class SimHitClass, class TrueHitClass>
     int SensitiveDetector<SimHitClass, TrueHitClass>::addSimHit(
-      G4Step* step, int trackID, int pdg, double time, double energy,
-      const TVector3& posIn, const TVector3& posOut, const TVector3& momIn, const TVector3& momOut)
+      int trackID, int pdg, double time, double energy,
+      const TVector3& posIn, const TVector3& posOut, const TVector3& momIn)
     {
 
       //Ignore all Steps with less than 1eV Energydeposition for now

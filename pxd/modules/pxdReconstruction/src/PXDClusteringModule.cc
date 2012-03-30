@@ -40,7 +40,7 @@ REG_MODULE(PXDClustering)
 //-----------------------------------------------------------------
 
 PXDClusteringModule::PXDClusteringModule() : Module(), m_elNoise(200.0),
-    m_cutSeed(5.0), m_cutAdjacent(3.0), m_cutCluster(8.0), m_sizeHeadTail(3)
+  m_cutSeed(5.0), m_cutAdjacent(3.0), m_cutCluster(8.0), m_sizeHeadTail(3)
 {
   //Set module properties
   setDescription("Cluster PXDHits");
@@ -77,7 +77,7 @@ PXDClusteringModule::PXDClusteringModule() : Module(), m_elNoise(200.0),
   addParam("TanLorentz", m_tanLorentzAngle,
            "Tangent of the Lorentz angle", double(0.25));
   addParam("AssumeSorted", m_assumeSorted,
-           "Assume Digits in Collection are orderd by sensor,u,v in ascending order", true);
+           "Assume Digits in Collection are orderd by sensor,row,column in ascending order", true);
 }
 
 void PXDClusteringModule::initialize()
@@ -117,7 +117,7 @@ void PXDClusteringModule::initialize()
   B2INFO(" -->  AssumeSorted:       " << (m_assumeSorted ? "true" : "false"));
   B2INFO(" -->  TanLorentz:         " << m_tanLorentzAngle);
 
-  NoiseMap::getInstance().setCuts(m_elNoise*m_cutAdjacent, m_elNoise*m_cutSeed, m_elNoise*m_cutCluster);
+  NoiseMap::getInstance().setCuts(m_elNoise * m_cutAdjacent, m_elNoise * m_cutSeed, m_elNoise * m_cutCluster);
 }
 
 void PXDClusteringModule::event()
@@ -157,7 +157,7 @@ void PXDClusteringModule::event()
 
     //Now we loop over sensors and cluster each sensor in turn
     for (map<VxdID, Sensor>::iterator it = sensors.begin(); it != sensors.end(); it++) {
-      BOOST_FOREACH(const PXD::Pixel &px, it->second) {
+      BOOST_FOREACH(const PXD::Pixel & px, it->second) {
         findCluster(px);
       }
       writeClusters(it->first);
@@ -168,10 +168,18 @@ void PXDClusteringModule::event()
     //reordering and directly cluster them once the sensorID changes, we write
     //out all existing clusters and continue
     VxdID sensorID;
+    unsigned int lastU(0), lastV(0);
     for (int i = 0; i < nPixels; i++) {
       Pixel px(storeDigits[i], i);
       //Ignore digits with not enough signal
       if (!NoiseMap::getInstance().adjacent(px.getU(), px.getV(), px.getCharge())) continue;
+
+      //Check for sorting as precaution
+      if (lastV > px.getV() || (lastV == px.getV() && lastU > px.getU())) {
+        B2FATAL("Pixels are not sorted correctly, please change the assumeSorted parameter to false or fix the input to be ordered by v,u in ascending order");
+      }
+      lastU = px.getU();
+      lastV = px.getV();
 
       //New sensor, write clusters
       if (sensorID != px.get()->getSensorID()) {
@@ -185,7 +193,7 @@ void PXDClusteringModule::event()
   }
 }
 
-inline void PXDClusteringModule::findCluster(const Pixel &px)
+inline void PXDClusteringModule::findCluster(const Pixel& px)
 {
   ClusterCandidate* prev = m_cache.findCluster(px.getU(), px.getV());
   if (!prev) {
@@ -212,13 +220,13 @@ void PXDClusteringModule::writeClusters(VxdID sensorID)
   RelationIndex<PXDDigit, PXDTrueHit> relDigitTrueHit(storeDigits, storeTrueHits, m_relDigitTrueHitName);
 
   //Get Geometry information
-  const SensorInfo &info = dynamic_cast<const SensorInfo&>(VXD::GeoCache::get(sensorID));
+  const SensorInfo& info = dynamic_cast<const SensorInfo&>(VXD::GeoCache::get(sensorID));
 
-  BOOST_FOREACH(ClusterCandidate &cls, m_clusters) {
+  BOOST_FOREACH(ClusterCandidate & cls, m_clusters) {
     //Check for noise cut
     if (!cls.valid()) continue;
 
-    const Pixel &seed = cls.getSeed();
+    const Pixel& seed = cls.getSeed();
     unsigned int maxU(0), minU(info.getUCells() - 1) , maxV(0), minV(info.getVCells() - 1);
     double minUCharge(0), maxUCharge(0), minVCharge(0), maxVCharge(0);
     double posU(0), posV(0);
@@ -237,7 +245,7 @@ void PXDClusteringModule::writeClusters(VxdID sensorID)
     map<int, float> truehit_relations;
     vector<pair<int, float> > digit_weights;
     digit_weights.reserve(cls.size());
-    BOOST_FOREACH(const PXD::Pixel &px, cls.pixels()) {
+    BOOST_FOREACH(const PXD::Pixel & px, cls.pixels()) {
       SET_CLUSTER_LIMIT(minU, > , px.getU(), px.getCharge());
       SET_CLUSTER_LIMIT(maxU, < , px.getU(), px.getCharge());
       SET_CLUSTER_LIMIT(minV, > , px.getV(), px.getCharge());
@@ -250,11 +258,11 @@ void PXDClusteringModule::writeClusters(VxdID sensorID)
       typedef const RelationIndex<PXDDigit, PXDTrueHit>::Element relTrueHit_type;
 
       //Fill map with MCParticle relations
-      BOOST_FOREACH(relMC_type &mcRel, relDigitMCParticle.getFrom(px.get())) {
+      BOOST_FOREACH(relMC_type & mcRel, relDigitMCParticle.getFrom(px.get())) {
         mc_relations[mcRel.indexTo] += mcRel.weight;
       };
       //Fill map with PXDTrueHit relations
-      BOOST_FOREACH(relTrueHit_type &trueRel, relDigitTrueHit.getFrom(px.get())) {
+      BOOST_FOREACH(relTrueHit_type & trueRel, relDigitTrueHit.getFrom(px.get())) {
         truehit_relations[trueRel.indexTo] += trueRel.weight;
       };
       //Add digit to the Cluster->Digit relation list
@@ -288,7 +296,7 @@ void PXDClusteringModule::writeClusters(VxdID sensorID)
     new(storeClusters->AddrAt(clsIndex)) PXDCluster(
       seed.get()->getSensorID(), posU, posV,
       cls.getCharge(), seed.getCharge(),
-      cls.size(), sizeU, sizeV
+      cls.size(), sizeU, sizeV, minU, minV
     );
 
     //Create Relations to this Digit

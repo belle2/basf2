@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include <pxd/modules/pxdReconstruction/ClusterCache.h>
+#include <iostream>
 
 using namespace std;
 
@@ -19,12 +20,10 @@ namespace Belle2 {
     /** clear the Cache */
     void ClusterCache::clear()
     {
-      memset(m_clsTop, 0, 2*MAX_PIXELS_U*sizeof(ClusterCandidate*));
-      m_clsLeft = 0;
+      memset(m_clsTop, 0, MAX_PIXELS_U * sizeof(ClusterCandidate*));
+      memset(m_clsCur, 0, MAX_PIXELS_U * sizeof(ClusterCandidate*));
       m_curU = 0;
       m_curV = 0;
-      m_idxCurrent = 0;
-      m_idxNext = 1;
     }
 
     /** update the cluster for a given coordinate and remember the last updated position */
@@ -32,8 +31,7 @@ namespace Belle2 {
     {
       m_curV = v;
       m_curU = u;
-      m_clsTop[m_idxNext][u] = cls;
-      m_clsLeft = cls;
+      m_clsCur[u] = cls;
     }
 
     /** Find a cluster adjacent to the given coordinates. If no cluster is found, 0 is returned */
@@ -41,12 +39,18 @@ namespace Belle2 {
     {
       switchRow(v);
 
-      ClusterCandidate *cls = m_clsTop[m_idxCurrent][u];
-      if (u == m_curU + 1) cls = mergeCluster(u, cls, m_clsLeft);
-      ClusterCandidate *clsTopLeft = (u > 0) ? m_clsTop[m_idxCurrent][u-1] : 0;
+      //Look for cluster top of current pixel (0,0 at top left corner, rows going down, columns going left)
+      ClusterCandidate* cls = m_clsTop[u];
+      //Look for left cluster
+      ClusterCandidate* clsLeft = (u > 0) ? m_clsCur[u - 1] : 0;
+      cls = mergeCluster(u, cls, clsLeft);
+      //Look for top left cluster
+      ClusterCandidate* clsTopLeft = (u > 0) ? m_clsTop[u - 1] : 0;
       cls = mergeCluster(u - 1, cls, clsTopLeft);
-      ClusterCandidate *clsTopRight = (u < MAX_PIXELS_U - 1) ? m_clsTop[m_idxCurrent][u+1] : 0;
+      //Look for top right cluster
+      ClusterCandidate* clsTopRight = (u < MAX_PIXELS_U - 1) ? m_clsTop[u + 1] : 0;
       cls = mergeCluster(u + 1, cls, clsTopRight);
+      //Return found cluster, 0 if none was found
       return cls;
     }
 
@@ -57,15 +61,13 @@ namespace Belle2 {
       if (cls2) {
         if (!cls1 || cls1 == cls2) return cls2;
         cls1->merge(*cls2);
+        //Change the pointers of all pixels which could have changed
         for (int i = u - 1; i >= 0; --i) {
-          if (m_clsTop[m_idxNext][i] == cls2)
-            m_clsTop[m_idxNext][i] = cls1;
+          if (m_clsCur[i] == cls2) m_clsCur[i] = cls1;
         }
         for (int i = u; i < MAX_PIXELS_U; i++) {
-          if (m_clsTop[m_idxCurrent][i] == cls2)
-            m_clsTop[m_idxCurrent][i] = cls1;
+          if (m_clsTop[i] == cls2) m_clsTop[i] = cls1;
         }
-        if (m_clsLeft == cls2) m_clsLeft = cls1;
       }
       return cls1;
     }
@@ -73,17 +75,17 @@ namespace Belle2 {
     void ClusterCache::switchRow(unsigned int v)
     {
       if (v == m_curV) return;
-      //if we skip a row, then forget the clusters of the last row
-      if (v > m_curV + 1) memset(m_clsTop[m_idxNext], 0, MAX_PIXELS_U*sizeof(ClusterCandidate*));
-      //clean current row since we will use it now as cache for next row
-      memset(m_clsTop[m_idxCurrent], 0, MAX_PIXELS_U*sizeof(ClusterCandidate*));
+      //We skipped a row, forget current row
+      if (v > m_curV + 1) memset(m_clsCur, 0, MAX_PIXELS_U * sizeof(ClusterCandidate*));
+      //Clear top row
+      memset(m_clsTop, 0, MAX_PIXELS_U * sizeof(ClusterCandidate*));
 
       //reset variables
       m_curV = v;
       m_curU = MAX_PIXELS_U + 1;
-      m_clsLeft = 0;
-      m_idxCurrent  = !m_idxCurrent;
-      m_idxNext = !m_idxNext;
+      //Switch rows, Current row will be top and we reuse memory of last top
+      //row as new current row
+      swap(m_clsTop, m_clsCur);
     }
   }
 } //Belle2 namespace

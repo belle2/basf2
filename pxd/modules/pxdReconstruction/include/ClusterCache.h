@@ -92,18 +92,14 @@ namespace Belle2 {
        */
       void switchRow(unsigned int v);
 
-      /** array ID of the current top row */
-      unsigned char m_idxCurrent;
-      /** array ID of the next top row */
-      unsigned char m_idxNext;
       /** current u coordinate, needed for left neighbour */
       unsigned int m_curU;
       /** current v coordinate, needed to switch top row */
       unsigned int m_curV;
-      /** cache of the current and next top row */
-      ClusterCandidate* m_clsTop[2][MAX_PIXELS_U];
-      /** cache of the left pixel */
-      ClusterCandidate* m_clsLeft;
+      /** cache of the top row */
+      ClusterCandidate* m_clsTop[MAX_PIXELS_U];
+      /** cache of the current row */
+      ClusterCandidate* m_clsCur[MAX_PIXELS_U];
     };
 
   }

@@ -174,7 +174,7 @@ void PXDDigitizerModule::beginRun()
   //we fill it once and only clear the content of the sensors per event, not
   //the whole map
   m_sensors.clear();
-  VXD::GeoCache &geo = VXD::GeoCache::getInstance();
+  VXD::GeoCache& geo = VXD::GeoCache::getInstance();
   BOOST_FOREACH(VxdID layer, geo.getLayers(SensorInfo::PXD)) {
     BOOST_FOREACH(VxdID ladder, geo.getLadders(layer)) {
       BOOST_FOREACH(VxdID sensor, geo.getSensors(ladder)) {
@@ -188,7 +188,7 @@ void PXDDigitizerModule::beginRun()
 void PXDDigitizerModule::event()
 {
   //Clear sensors and process SimHits
-  BOOST_FOREACH(Sensors::value_type &sensor, m_sensors) {
+  BOOST_FOREACH(Sensors::value_type & sensor, m_sensors) {
     sensor.second.clear();
   }
   m_currentSensor = 0;
@@ -198,7 +198,7 @@ void PXDDigitizerModule::event()
   StoreArray<PXDSimHit>  storeSimHits(m_storeSimHitsName);
   StoreArray<PXDTrueHit> storeTrueHits(m_storeTrueHitsName);
   unsigned int nSimHits = storeSimHits->GetEntries();
-  if (nSimHits == 0) return;
+  //if (nSimHits == 0) return;
 
   RelationIndex<MCParticle, PXDSimHit> relMCParticleSimHit(storeMCParticles, storeSimHits, m_relMCParticleSimHitName);
   RelationIndex<PXDTrueHit, PXDSimHit> relTrueHitSimHit(storeTrueHits, storeSimHits, m_relTrueHitSimHitName);
@@ -267,8 +267,8 @@ void PXDDigitizerModule::processHit()
   }
 
   //Get Steplength and direction
-  const TVector3 &startPoint = m_currentHit->getPosIn();
-  const TVector3 &stopPoint = m_currentHit->getPosOut();
+  const TVector3& startPoint = m_currentHit->getPosIn();
+  const TVector3& stopPoint = m_currentHit->getPosOut();
   TVector3 direction = stopPoint - startPoint;
   double trackLength = direction.Mag();
   //Calculate the number of electrons
@@ -292,7 +292,7 @@ void PXDDigitizerModule::processHit()
   }
 }
 
-void PXDDigitizerModule::driftCharge(const TVector3 &position, double electrons)
+void PXDDigitizerModule::driftCharge(const TVector3& position, double electrons)
 {
   B2DEBUG(30, "Drifting " << electrons << " electrons at position ("
           << position.x() << ", "
@@ -306,8 +306,8 @@ void PXDDigitizerModule::driftCharge(const TVector3 &position, double electrons)
     return;
   }
   //Get references to current sensor/info for ease of use
-  const SensorInfo &info = *m_currentSensorInfo;
-  Sensor &sensor = *m_currentSensor;
+  const SensorInfo& info = *m_currentSensorInfo;
+  Sensor& sensor = *m_currentSensor;
 
   double sensorThickness = info.getThickness();
   double distanceToPlane = 0.5 * sensorThickness - info.getGateDepth() - position.Z();
@@ -320,7 +320,7 @@ void PXDDigitizerModule::driftCharge(const TVector3 &position, double electrons)
   double ktemp = Unit::e * info.getBulkDoping() / Unit::permSi;
   double ytemp = ktemp * abs(distanceToPlane) / (0.5 * ktemp * sensorThickness + (info.getBackVoltage() - info.getTopVoltage()) / sensorThickness);
   if (ytemp > 0)  B2WARNING("Sensor is not fully depleted under this conditions, please check PXD parameters");
-  if (ytemp >= 1) B2FATAL("Diffusioncoefficient becomes infinite, ytemp=" << ytemp << " sigma=" << sqrt(2* Unit::uTherm / ktemp*log(1 - ytemp)));
+  if (ytemp >= 1) B2FATAL("Diffusioncoefficient becomes infinite, ytemp=" << ytemp << " sigma=" << sqrt(2 * Unit::uTherm / ktemp * log(1 - ytemp)));
 
   double sigmaDrift  = sqrt(2 * Unit::uTherm / ktemp * log(1 - ytemp));
   double sigmaDiffus = sqrt(2 * Unit::uTherm  * Unit::eMobilitySi * m_elStepTime);
@@ -385,11 +385,11 @@ void PXDDigitizerModule::driftCharge(const TVector3 &position, double electrons)
   }
 }
 
-void PXDDigitizerModule::driftChargeSimple(const TVector3 &position, double electrons)
+void PXDDigitizerModule::driftChargeSimple(const TVector3& position, double electrons)
 {
   //Get references to current sensor/info for ease of use
-  const SensorInfo &info = *m_currentSensorInfo;
-  Sensor &sensor = *m_currentSensor;
+  const SensorInfo& info = *m_currentSensorInfo;
+  Sensor& sensor = *m_currentSensor;
 
   double sensorThickness = info.getThickness();
   //Drift to module surface
@@ -439,7 +439,7 @@ void PXDDigitizerModule::driftChargeSimple(const TVector3 &position, double elec
 
       double charge = electrons * uIntegral * vIntegral;
       sensor[Digit(uID, vID)].add(charge, m_currentParticle, m_currentTrueHit);
-      B2DEBUG(80, "Relative charge for pixel (" << uID << ", " << vID << "): " << uIntegral*vIntegral);
+      B2DEBUG(80, "Relative charge for pixel (" << uID << ", " << vID << "): " << uIntegral * vIntegral);
       fraction += uIntegral * vIntegral;
       if (m_histDiffusion && charge >= 1.0) m_histDiffusion->Fill((uPos - uCenter) / Unit::um, (vPos - vCenter) / Unit::um, charge);
     }
@@ -476,13 +476,13 @@ void PXDDigitizerModule::addNoiseDigits()
   if (!m_applyNoise) return;
 
   double fraction = 1 - m_noiseFraction;
-  BOOST_FOREACH(Sensors::value_type &sensor, m_sensors) {
-    Sensor &s = sensor.second;
+  BOOST_FOREACH(Sensors::value_type & sensor, m_sensors) {
+    Sensor& s = sensor.second;
     //FIXME: Backwards compatible
-    if (s.size() == 0) continue;
+    //if (s.size() == 0) continue;
 
     //Calculate the number of pixels on an empty sensor which will exceed the noise cut
-    const SensorInfo &info = dynamic_cast<const SensorInfo&>(VXD::GeoCache::get(sensor.first));
+    const SensorInfo& info = dynamic_cast<const SensorInfo&>(VXD::GeoCache::get(sensor.first));
     int nU = info.getUCells();
     int nV = info.getVCells();
     int nPixels = m_random->Poisson(fraction * nU * nV);
@@ -515,12 +515,12 @@ void PXDDigitizerModule::saveDigits()
   //Zero supression cut in electrons
   double charge_threshold = m_SNAdjacent * m_elNoise;
 
-  BOOST_FOREACH(Sensors::value_type &sensor, m_sensors) {
+  BOOST_FOREACH(Sensors::value_type & sensor, m_sensors) {
     int sensorID = sensor.first;
-    const SensorInfo &info = dynamic_cast<const SensorInfo&>(VXD::GeoCache::get(sensorID));
-    BOOST_FOREACH(Sensor::value_type &digit, sensor.second) {
-      const Digit &d = digit.first;
-      const DigitValue &v = digit.second;
+    const SensorInfo& info = dynamic_cast<const SensorInfo&>(VXD::GeoCache::get(sensorID));
+    BOOST_FOREACH(Sensor::value_type & digit, sensor.second) {
+      const Digit& d = digit.first;
+      const DigitValue& v = digit.second;
 
       //Add Noise where applicable
       double charge = addNoise(v.charge());

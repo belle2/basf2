@@ -85,7 +85,7 @@ namespace Belle2 {
       m_curU = MAX_PIXELS_U + 1;
       //Switch rows, Current row will be top and we reuse memory of last top
       //row as new current row
-      swap(m_clsTop, m_clsCur);
+      //FIXME: swap(m_clsTop, m_clsCur);
     }
   }
 } //Belle2 namespace

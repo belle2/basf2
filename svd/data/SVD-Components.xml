@@ -61,6 +61,21 @@
       <length unit="mm">122.760</length>
       <height unit="um"> 300</height>
       <stepSize unit="um">5</stepSize>
+      <!-- Sensor operation parameters. -->
+      <DepletionVoltage unit="V">60.0</DepletionVoltage>
+      <BiasVoltage unit="V">150</BiasVoltage>
+      <BackplaneCapacitance unit="pF">0</BackplaneCapacitance>
+      <InterstripCapacitance unit="pF">6</InterstripCapacitance>
+      <CouplingCapacitance unit="pF">120</CouplingCapacitance>
+      <ZeroSuppressionCut>2.5</ZeroSuppressionCut>
+      <ElectronicNoise unit="e">2000</ElectronicNoise>
+      <!-- The TDR value for ADCRange is -2 to +7 MIPs,
+           that is (with 100e-/um), -64000 to +224000 electrons. -->
+      <ADCRangeLow unit="e">-64000</ADCRangeLow>
+      <ADCRangeHigh unit="e">224000</ADCRangeHigh>
+      <ADCBits>10</ADCBits>
+      <!-- For now, the time window parameters will be set globally
+      for all sensors in the digitizer and clusterizer. -->
     </Active>
   </SensorBase>
 
@@ -79,6 +94,22 @@
       <length unit="mm">122.900</length>
       <height unit="um"> 320</height>
       <stepSize unit="um">5</stepSize>
+    
+      <!-- Sensor operation parameters. -->
+      <DepletionVoltage unit="V">60.0</DepletionVoltage>
+      <BiasVoltage unit="V">150</BiasVoltage>
+      <BackplaneCapacitance unit="pF">0</BackplaneCapacitance>
+      <InterstripCapacitance unit="pF">6</InterstripCapacitance>
+      <CouplingCapacitance unit="pF">120</CouplingCapacitance>
+      <ZeroSuppressionCut>2.5</ZeroSuppressionCut>
+      <ElectronicNoise unit="e">2000</ElectronicNoise>
+      <!-- The TDR value for ADCRange is -2 to +7 MIPs,
+           that is (with 100e-/um), -64000 to +224000 electrons. -->
+      <ADCRangeLow unit="e">-64000</ADCRangeLow>
+      <ADCRangeHigh unit="e">224000</ADCRangeHigh>
+      <ADCBits>10</ADCBits>
+      <!-- For now, the time window parameters will be set globally
+           for all sensors in the digitizer and clusterizer. -->
     </Active>
   </SensorBase>
 
@@ -97,6 +128,22 @@
       <length unit="mm">120.020</length>
       <height unit="um">320.000</height>
       <stepSize unit="um">5</stepSize>
+      
+      <!-- Sensor operation parameters. -->
+      <DepletionVoltage unit="V">60.0</DepletionVoltage>
+      <BiasVoltage unit="V">150</BiasVoltage>
+      <BackplaneCapacitance unit="pF">0</BackplaneCapacitance>
+      <InterstripCapacitance unit="pF">6</InterstripCapacitance>
+      <CouplingCapacitance unit="pF">120</CouplingCapacitance>
+      <ZeroSuppressionCut>2.5</ZeroSuppressionCut>
+      <ElectronicNoise unit="e">2000</ElectronicNoise>
+      <!-- The TDR value for ADCRange is -2 to +7 MIPs,
+           that is (with 100e-/um), -64000 to +224000 electrons. -->
+      <ADCRangeLow unit="e">-64000</ADCRangeLow>
+      <ADCRangeHigh unit="e">224000</ADCRangeHigh>
+      <ADCBits>10</ADCBits>
+      <!-- For now, the time window parameters will be set globally
+           for all sensors in the digitizer and clusterizer. -->
     </Active>
     <!-- For now, layer 3 only has a flex on top -->
     <Component name="KaptonLayer3">

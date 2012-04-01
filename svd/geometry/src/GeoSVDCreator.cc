@@ -60,6 +60,19 @@ namespace Belle2 {
         sensor.getInt("stripsV"),
         sensor.getLength("width2", 0)
       );
+      const double unit_pF = 1000 * Unit::fC / Unit::V; // picofarad
+      info->setSensorParams(
+        sensor.getWithUnit("DepletionVoltage"),
+        sensor.getWithUnit("BiasVoltage"),
+        sensor.getDouble("BackplaneCapacitance") / unit_pF,
+        sensor.getDouble("InterstripCapacitance") / unit_pF,
+        sensor.getDouble("CouplingCapacitance") / unit_pF,
+        sensor.getDouble("ZeroSuppressionCut"),
+        sensor.getWithUnit("ElectronicNoise"),
+        sensor.getWithUnit("ADCRangeLow"),
+        sensor.getWithUnit("ADCRangeHigh"),
+        sensor.getInt("ADCBits")
+      );
 
       return info;
     }

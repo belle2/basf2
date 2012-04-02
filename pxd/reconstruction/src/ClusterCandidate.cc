@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <pxd/modules/pxdReconstruction/ClusterCandidate.h>
+#include <pxd/reconstruction/ClusterCandidate.h>
 
 using namespace std;
 
@@ -28,7 +28,7 @@ namespace Belle2 {
       cls.m_charge = 0;
     }
 
-    void ClusterCandidate::add(const Pixel &pixel)
+    void ClusterCandidate::add(const Pixel& pixel)
     {
       float charge = pixel.getCharge();
       m_charge += charge;

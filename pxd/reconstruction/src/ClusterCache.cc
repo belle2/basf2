@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <pxd/modules/pxdReconstruction/ClusterCache.h>
+#include <pxd/reconstruction/ClusterCache.h>
 #include <iostream>
 
 using namespace std;
@@ -17,11 +17,24 @@ namespace Belle2 {
 
   namespace PXD {
 
+    ClusterCache::ClusterCache(unsigned int maxU): m_maxU(maxU)
+    {
+      m_clsTop = new ClusterCandidate*[m_maxU];
+      m_clsCur = new ClusterCandidate*[m_maxU];
+      clear();
+    }
+
+    ClusterCache::~ClusterCache()
+    {
+      delete[] m_clsTop;
+      delete[] m_clsCur;
+    }
+
     /** clear the Cache */
     void ClusterCache::clear()
     {
-      memset(m_clsTop, 0, MAX_PIXELS_U * sizeof(ClusterCandidate*));
-      memset(m_clsCur, 0, MAX_PIXELS_U * sizeof(ClusterCandidate*));
+      memset(m_clsTop, 0, m_maxU * sizeof(ClusterCandidate*));
+      memset(m_clsCur, 0, m_maxU * sizeof(ClusterCandidate*));
       m_curU = 0;
       m_curV = 0;
     }
@@ -29,6 +42,7 @@ namespace Belle2 {
     /** update the cluster for a given coordinate and remember the last updated position */
     void ClusterCache::setLast(unsigned int u, unsigned int v, ClusterCandidate* cls)
     {
+      switchRow(v);
       m_curV = v;
       m_curU = u;
       m_clsCur[u] = cls;
@@ -48,7 +62,7 @@ namespace Belle2 {
       ClusterCandidate* clsTopLeft = (u > 0) ? m_clsTop[u - 1] : 0;
       cls = mergeCluster(u - 1, cls, clsTopLeft);
       //Look for top right cluster
-      ClusterCandidate* clsTopRight = (u < MAX_PIXELS_U - 1) ? m_clsTop[u + 1] : 0;
+      ClusterCandidate* clsTopRight = (u < m_maxU - 1) ? m_clsTop[u + 1] : 0;
       cls = mergeCluster(u + 1, cls, clsTopRight);
       //Return found cluster, 0 if none was found
       return cls;
@@ -65,7 +79,7 @@ namespace Belle2 {
         for (int i = u - 1; i >= 0; --i) {
           if (m_clsCur[i] == cls2) m_clsCur[i] = cls1;
         }
-        for (int i = u; i < MAX_PIXELS_U; i++) {
+        for (int i = u; i < m_maxU; i++) {
           if (m_clsTop[i] == cls2) m_clsTop[i] = cls1;
         }
       }
@@ -76,16 +90,16 @@ namespace Belle2 {
     {
       if (v == m_curV) return;
       //We skipped a row, forget current row
-      if (v > m_curV + 1) memset(m_clsCur, 0, MAX_PIXELS_U * sizeof(ClusterCandidate*));
+      if (v > m_curV + 1) memset(m_clsCur, 0, m_maxU * sizeof(ClusterCandidate*));
       //Clear top row
-      memset(m_clsTop, 0, MAX_PIXELS_U * sizeof(ClusterCandidate*));
+      memset(m_clsTop, 0, m_maxU * sizeof(ClusterCandidate*));
 
       //reset variables
       m_curV = v;
-      m_curU = MAX_PIXELS_U + 1;
+      m_curU = m_maxU + 1;
       //Switch rows, Current row will be top and we reuse memory of last top
       //row as new current row
-      //FIXME: swap(m_clsTop, m_clsCur);
+      swap(m_clsTop, m_clsCur);
     }
   }
 } //Belle2 namespace

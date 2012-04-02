@@ -34,9 +34,9 @@ namespace Belle2 {
        */
       Pixel(PXDDigit* digit, unsigned int index): m_digit(digit), m_index(index) {}
       /** Comparison operator */
-      bool operator<(const Pixel &b)  const { return getV() < b.getV() || (getV() == b.getV() && getU() < b.getU()); }
+      bool operator<(const Pixel& b)  const { return getV() < b.getV() || (getV() == b.getV() && getU() < b.getU()); }
       /** Equality operator */
-      bool operator==(const Pixel &b) const { return getV() == b.getV() && getU() == b.getU(); }
+      bool operator==(const Pixel& b) const { return getV() == b.getV() && getU() == b.getU(); }
       /** Shorthand to get the pixel column ID */
       unsigned int getU() const { return m_digit->getUCellID(); }
       /** Shorthand to get the pixel row ID */
@@ -44,12 +44,12 @@ namespace Belle2 {
       /** Shorthand to get the pixel charge */
       float getCharge() const { return m_digit ? m_digit->getCharge() : 0;  }
       /** Return pointer to the wrapped Digit */
-      PXDDigit *get() const { return m_digit; }
+      PXDDigit* get() const { return m_digit; }
       /** Return the index of the Digit in the collection */
       unsigned int getIndex() const { return m_index; }
     protected:
       /** Pointer to the wrapped digit */
-      PXDDigit *m_digit;
+      PXDDigit* m_digit;
       /** Index of the wrapped digit */
       unsigned int m_index;
     };

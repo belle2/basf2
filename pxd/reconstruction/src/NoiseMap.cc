@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <pxd/modules/pxdReconstruction/NoiseMap.h>
+#include <pxd/reconstruction/NoiseMap.h>
 
 using namespace std;
 

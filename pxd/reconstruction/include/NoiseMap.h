@@ -38,14 +38,14 @@ namespace Belle2 {
       bool cluster(float adc) const { return adc >= cut_cluster; };
 
       /** Return a reference to the instance */
-      static NoiseMap &getInstance();
+      static NoiseMap& getInstance();
     protected:
       /** Constructor hidden, class is singleton */
       NoiseMap(): cut_adjacent(0), cut_seed(0), cut_cluster(0) {}
       /** Copy constructor hidden, class is singleton */
       NoiseMap(const NoiseMap&);
       /** Asignment operator hidden, class is singleton */
-      NoiseMap &operator=(const NoiseMap&);
+      NoiseMap& operator=(const NoiseMap&);
       /** Destructor hidden, class is singleton */
       ~NoiseMap() {}
       /** Allow destruction of singleton instance */

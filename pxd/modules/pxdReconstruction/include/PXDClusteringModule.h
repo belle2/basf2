@@ -14,8 +14,8 @@
 #include <framework/core/Module.h>
 #include <pxd/geometry/SensorInfo.h>
 #include <vxd/VxdID.h>
-#include <pxd/modules/pxdReconstruction/ClusterCache.h>
-#include <pxd/modules/pxdReconstruction/Pixel.h>
+#include <pxd/reconstruction/ClusterCache.h>
+#include <pxd/reconstruction/Pixel.h>
 #include <boost/format.hpp>
 #include <string>
 
@@ -52,7 +52,7 @@ namespace Belle2 {
        * For this to work correctly, the pixels have to be passed sorted by sensor,row,column
        * @param px Pixel to find the cluster for
        */
-      void findCluster(const Pixel &px);
+      void findCluster(const Pixel& px);
       /** Write clusters to collection.
        * This method will check all cluster candidates and write valid ones to the datastore
        */
@@ -90,7 +90,7 @@ namespace Belle2 {
       /** LorentzAngle , FIXME: should be determined directly from B-Field */
       double m_tanLorentzAngle;
       /** Pointer to the geometry info of the currently active Sensor */
-      SensorInfo *m_geometry;
+      SensorInfo* m_geometry;
       /** Assume the PXDDigits to be sorted so we can skip sorting them */
       bool m_assumeSorted;
 

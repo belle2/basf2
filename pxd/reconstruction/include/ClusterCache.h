@@ -12,8 +12,8 @@
 #define PXD_CLUSTERCACHE_H
 
 #include <cstring>
-#include <pxd/modules/pxdReconstruction/Pixel.h>
-#include <pxd/modules/pxdReconstruction/ClusterCandidate.h>
+#include <pxd/reconstruction/Pixel.h>
+#include <pxd/reconstruction/ClusterCandidate.h>
 
 namespace Belle2 {
   namespace PXD {
@@ -69,11 +69,13 @@ namespace Belle2 {
     class ClusterCache {
     public:
       enum {
-        /** Maximum number of PIXEL columns the cache can handle */
+        /** Default maximum number of PIXEL columns the cache can handle */
         MAX_PIXELS_U = 250
       };
       /** Create a new cache */
-      ClusterCache() { clear(); };
+      ClusterCache(unsigned int maxU = MAX_PIXELS_U);
+      /** Delete the cache and free the memory */
+      ~ClusterCache();
       /** Clear the cache structure */
       void clear();
       /** update the cluster for a given coordinate and remember the last updated position */
@@ -92,14 +94,16 @@ namespace Belle2 {
        */
       void switchRow(unsigned int v);
 
+      /** the maximum number of columns to be considered */
+      unsigned int m_maxU;
       /** current u coordinate, needed for left neighbour */
       unsigned int m_curU;
       /** current v coordinate, needed to switch top row */
       unsigned int m_curV;
       /** cache of the top row */
-      ClusterCandidate* m_clsTop[MAX_PIXELS_U];
+      ClusterCandidate** m_clsTop;
       /** cache of the current row */
-      ClusterCandidate* m_clsCur[MAX_PIXELS_U];
+      ClusterCandidate** m_clsCur;
     };
 
   }

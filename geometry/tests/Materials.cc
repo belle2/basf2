@@ -13,13 +13,6 @@
 
 using namespace std;
 
-/** stream operator for G4MPVEntry, needed for testing of PropertyTable */
-ostream& operator<<(ostream& out, G4MPVEntry entry)
-{
-  out << "G4MPVEntry(" << entry.GetPhotonEnergy() << "," << entry.GetProperty() << ")";
-  return out;
-}
-
 namespace Belle2 {
   namespace geometry {
 
@@ -207,15 +200,19 @@ namespace Belle2 {
       ASSERT_TRUE(properties);
       G4MaterialPropertyVector* property = properties->GetProperty("RINDEX");
       ASSERT_TRUE(property);
-      EXPECT_EQ(property->Entries(), 4);
-      EXPECT_DOUBLE_EQ(property->GetMinProperty(), 1.40);
-      EXPECT_DOUBLE_EQ(property->GetMaxProperty(), 1.43);
-      EXPECT_DOUBLE_EQ(property->GetMinPhotonEnergy(), 1 * eV);
-      EXPECT_DOUBLE_EQ(property->GetMaxPhotonEnergy(), 3.5 * eV);
-      EXPECT_EQ(property->GetEntry(0), G4MPVEntry(1.0 * eV, 1.40));
-      EXPECT_EQ(property->GetEntry(1), G4MPVEntry(1.5 * eV, 1.41));
-      EXPECT_EQ(property->GetEntry(2), G4MPVEntry(2.0 * eV, 1.42));
-      EXPECT_EQ(property->GetEntry(3), G4MPVEntry(3.5 * eV, 1.43));
+      EXPECT_EQ(4u, property->GetVectorLength());
+      EXPECT_DOUBLE_EQ(1.40, property->GetMinValue());
+      EXPECT_DOUBLE_EQ(1.43, property->GetMaxValue());
+      EXPECT_DOUBLE_EQ(1 * eV, property->GetMinLowEdgeEnergy());
+      EXPECT_DOUBLE_EQ(3.5 * eV, property->GetMaxLowEdgeEnergy());
+      EXPECT_DOUBLE_EQ(1.0 * eV, property->Energy(0));
+      EXPECT_DOUBLE_EQ(1.5 * eV, property->Energy(1));
+      EXPECT_DOUBLE_EQ(2.0 * eV, property->Energy(2));
+      EXPECT_DOUBLE_EQ(3.5 * eV, property->Energy(3));
+      EXPECT_DOUBLE_EQ(1.40, (*property)[0]);
+      EXPECT_DOUBLE_EQ(1.41, (*property)[1]);
+      EXPECT_DOUBLE_EQ(1.42, (*property)[2]);
+      EXPECT_DOUBLE_EQ(1.43, (*property)[3]);
       gb.close();
     }
   } // namespace geometry

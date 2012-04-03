@@ -12,6 +12,7 @@
 #pragma link C++ class Belle2::ECLSimHit;
 #pragma link C++ class Belle2::HitECL;
 #pragma link C++ class Belle2::HitAssignmentECL;
-
+#pragma link C++ class Belle2::MdstGamma;
+#pragma link C++ class Belle2::MdstPi0;
 
 #endif

@@ -120,6 +120,17 @@ void PXDClusteringModule::initialize()
   NoiseMap::getInstance().setCuts(m_elNoise * m_cutAdjacent, m_elNoise * m_cutSeed, m_elNoise * m_cutCluster);
 }
 
+inline void PXDClusteringModule::findCluster(const Pixel& px)
+{
+  ClusterCandidate* prev = m_cache.findCluster(px.getU(), px.getV());
+  if (!prev) {
+    m_clusters.push_back(ClusterCandidate());
+    prev = &m_clusters.back();
+  }
+  prev->add(px);
+  m_cache.setLast(px.getU(), px.getV(), prev);
+}
+
 void PXDClusteringModule::event()
 {
   StoreArray<MCParticle> storeMCParticles(m_storeMCParticlesName);
@@ -191,17 +202,6 @@ void PXDClusteringModule::event()
     }
     writeClusters(sensorID);
   }
-}
-
-inline void PXDClusteringModule::findCluster(const Pixel& px)
-{
-  ClusterCandidate* prev = m_cache.findCluster(px.getU(), px.getV());
-  if (!prev) {
-    m_clusters.push_back(ClusterCandidate());
-    prev = &m_clusters.back();
-  }
-  prev->add(px);
-  m_cache.setLast(px.getU(), px.getV(), prev);
 }
 
 void PXDClusteringModule::writeClusters(VxdID sensorID)

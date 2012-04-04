@@ -24,7 +24,7 @@
 using namespace std;
 using namespace Belle2;
 
-ClassImp(PXDRecoHit);
+ClassImp(PXDRecoHit)
 
 PXDRecoHit::PXDRecoHit():
   GFRecoHitIfc<GFPlanarHitPolicy> (HIT_DIMENSIONS), m_sensorID(0), m_trueHit(0), m_cluster(0),

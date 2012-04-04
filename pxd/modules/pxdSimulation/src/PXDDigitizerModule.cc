@@ -274,7 +274,7 @@ void PXDDigitizerModule::processHit()
   //Calculate the number of electrons
   double electrons = m_currentHit->getEnergyDep() * Unit::GeV / Unit::ehEnergy;
 
-  if (m_currentHit->getPDGcode() == 22 || trackLength == 0) {
+  if (m_currentHit->getPDGcode() == 22 || trackLength <= numeric_limits<double>::epsilon()) {
     //Photons deposit the energy at the end of their step
     driftCharge(stopPoint, electrons);
   } else {
@@ -452,7 +452,7 @@ void PXDDigitizerModule::driftChargeSimple(const TVector3& position, double elec
 
 double PXDDigitizerModule::addNoise(double charge)
 {
-  if (charge == 0) {
+  if (charge <= 0) {
     //Noise Pixel, add noise to exceed Noise Threshold;
     double p = m_random->Uniform(m_noiseFraction, 1.0);
     charge = TMath::NormQuantile(p) * m_elNoise;

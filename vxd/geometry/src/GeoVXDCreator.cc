@@ -60,11 +60,11 @@ namespace Belle2 {
       m_sensitive.clear();
     }
 
-    GeoVXDAssembly GeoVXDCreator::createHalfShellSupport(GearDir) { return GeoVXDAssembly(); };
+    GeoVXDAssembly GeoVXDCreator::createHalfShellSupport(GearDir) { return GeoVXDAssembly(); }
 
-    GeoVXDAssembly GeoVXDCreator::createLayerSupport(int, GearDir) { return GeoVXDAssembly(); };
+    GeoVXDAssembly GeoVXDCreator::createLayerSupport(int, GearDir) { return GeoVXDAssembly(); }
 
-    GeoVXDAssembly GeoVXDCreator::createLadderSupport(int, GearDir) { return GeoVXDAssembly(); };
+    GeoVXDAssembly GeoVXDCreator::createLadderSupport(int, GearDir) { return GeoVXDAssembly(); }
 
     vector<GeoVXDPlacement> GeoVXDCreator::getSubComponents(GearDir path)
     {
@@ -115,7 +115,7 @@ namespace Belle2 {
       );
       double angle  = params.getAngle("angle", 0);
 
-      if (c.width == 0 || c.length == 0 || c.height == 0) {
+      if (c.width <= 0 || c.length <= 0 || c.height <= 0) {
         B2DEBUG(100, "One dimension empty, using auto resize for component");
       } else {
         G4VSolid* solid = createTrapezoidal(m_prefix + "." + name, c.width, c.width2, c.length, c.height, angle);
@@ -135,6 +135,9 @@ namespace Belle2 {
       subComponents.reserve(placements.size());
       //Go over all subcomponents and check if they will fit inside.
       //If component.volume is zero we will create one so sum up needed space
+      bool widthResize  = component.width <= 0;
+      bool lengthResize = component.length <= 0;
+      bool heightResize = component.height <= 0;
       BOOST_FOREACH(GeoVXDPlacement & p, placements) {
 
         GeoVXDComponent sub = getComponent(p.name);
@@ -147,7 +150,7 @@ namespace Belle2 {
           if (!allowOutside) B2FATAL("Cannot place component " << p.name << " outside of component " << name);
         } else if (sub.height + p.woffset > component.height) {
           //Component will not fit heightwise. If we resize the volume anyway than we don't have problems
-          if (component.height != 0) {
+          if (!heightResize) {
             B2FATAL("Subcomponent " << p.name << " does not fit into volume: "
                     << "height " << sub.height << " > " << component.height);
           }
@@ -158,7 +161,7 @@ namespace Belle2 {
         double minWidth =  max(abs(p.u + sub.width / 2.0), abs(p.u - sub.width / 2.0));
         double minLength = max(abs(p.v + sub.length / 2.0), abs(p.v - sub.length / 2.0));
         if (minWidth > component.width) {
-          if (component.width != 0) {
+          if (!widthResize) {
             B2FATAL("Subcomponent " << p.name << " does not fit into volume: "
                     << "minWidth " << minWidth << " > " << component.width);
           }
@@ -166,7 +169,7 @@ namespace Belle2 {
           component.width2 = minWidth * 2.0;
         }
         if (minLength > component.length) {
-          if (component.length != 0) {
+          if (!lengthResize) {
             B2FATAL("Subcomponent " << p.name << " does not fit into volume: "
                     << "minLength " << minLength << " > " << component.length);
           }
@@ -176,7 +179,7 @@ namespace Belle2 {
       }
 
       //zero dimensions are fine mathematically but we don't want them in the simulation
-      if (component.width == 0 || component.length == 0 || component.height == 0) {
+      if (component.width <= 0 || component.length <= 0 || component.height <= 0) {
         B2FATAL("At least one dimension of component " << name << " is zero which does not make sense");
       }
 
@@ -264,7 +267,7 @@ namespace Belle2 {
     G4VSolid* GeoVXDCreator::createTrapezoidal(const string& name, double width, double width2, double length, double& height, double angle)
     {
       double offset(0);
-      if (angle != 0) {
+      if (angle > 0) {
         const double tana = tan(angle);
         height = min(tana * length, min(tana * width, height));
         offset = height / tana;
@@ -275,7 +278,7 @@ namespace Belle2 {
       const double hheight = height / 2.0;
 
       if (width2 <= 0 || width == width2) {
-        if (angle == 0) {
+        if (angle <= 0) {
           return new G4Box(name, hwidth, hlength, hheight);
         } else {
           return new G4Trd(name, hwidth, hwidth - offset, hlength, hlength - offset, hheight);

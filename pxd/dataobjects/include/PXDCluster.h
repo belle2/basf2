@@ -18,6 +18,8 @@ namespace Belle2 {
 
   /** The PXD Cluster class
    * This class stores all information about reconstructed PXD clusters
+    *
+    * \addtogroup dataobjects
    */
   class PXDCluster: public TObject {
   public:

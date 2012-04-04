@@ -34,9 +34,9 @@ namespace Belle2 {
       /** Constructor */
       Digit(unsigned short u = 0, unsigned short v = 0): m_u(u), m_v(v) {}
       /** Comparison operator to provide unique ordering */
-      bool operator<(const Digit &b)  const { return v() < b.v() || (v() == b.v() && u() < b.u()); }
+      bool operator<(const Digit& b)  const { return v() < b.v() || (v() == b.v() && u() < b.u()); }
       /** Equality operator to check for equality */
-      bool operator==(const Digit &b) const { return v() == b.v() && u() == b.u(); }
+      bool operator==(const Digit& b) const { return v() == b.v() && u() == b.u(); }
       /** Return u (column) ID */
       unsigned short u() const { return m_u; }
       /** Return v (row) ID */
@@ -67,9 +67,9 @@ namespace Belle2 {
       /** Return the charge collected in the pixel */
       double charge() const { return m_charge; }
       /** Return the map containing all particle contributions to the pixel charge */
-      const relations_map &particles() const { return m_particles; }
+      const relations_map& particles() const { return m_particles; }
       /** Return the map containing all truehit contributions to the pixel charge */
-      const relations_map &truehits() const { return m_truehits; }
+      const relations_map& truehits() const { return m_truehits; }
     protected:
       /** charge of the pixel */
       double m_charge;
@@ -84,7 +84,26 @@ namespace Belle2 {
     /** Map of all hits in all Sensors */
     typedef std::map<VxdID, Sensor> Sensors;
 
-    /** The PXD Digitizer module. */
+    /** The PXD Digitizer module.
+     * This module is responsible for converting the simulated energy
+     * deposition from Geant4 into real PXD detector response of single pixles.
+     *
+     * \correlationdiagram
+     * MCParticle = graph.external_data('MCParticle')
+     * PXDSimHit  = graph.data('PXDSimHit')
+     * PXDTrueHit = graph.data('PXDTrueHit')
+     * PXDDigit   = graph.data('PXDDigit')
+     *
+     * graph.module('PXDDigitizer', [MCParticle, PXDSimHit, PXDTrueHit], [PXDDigit])
+     * graph.relation(MCParticle, PXDSimHit)
+     * graph.relation(MCParticle, PXDTrueHit)
+     * graph.relation(PXDTrueHit, PXDSimHit)
+     * graph.relation(PXDDigit,   MCParticle)
+     * graph.relation(PXDDigit,   PXDTrueHit)
+     * \endcorrelationdiagram
+     *
+     * \addtogroup modules
+     */
     class PXDDigitizerModule : public Module {
     public:
       /** Constructor.  */
@@ -100,14 +119,14 @@ namespace Belle2 {
        * @param position start position of the charge
        * @param electrons number of electrons to drift
        */
-      void driftCharge(const TVector3 &position, double electrons);
+      void driftCharge(const TVector3& position, double electrons);
       /** Drift the charge inside the silicon with a simpler approach.
        * The charge is drifted to the sensor surface with gaussian diffusion and the
        * fractions of charge are distributed among the hit pixels
        * @param position start position of the charge
        * @param electrons number of electrons to drift
        */
-      void driftChargeSimple(const TVector3 &position, double electrons);
+      void driftChargeSimple(const TVector3& position, double electrons);
       /** Add pure noise digits to the Sensors */
       void addNoiseDigits();
       /** Calculate the noise contribution to one pixel with given charge.

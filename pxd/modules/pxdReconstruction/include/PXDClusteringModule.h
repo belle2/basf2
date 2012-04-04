@@ -30,9 +30,26 @@ namespace Belle2 {
      * write them to the apropriate collections. It does this in a "streaming" way:
      * The hits are examined in an ordered way (sorted by row, then by column) and for each
      * pixel we only have to check the left neighbor and the three adjacent
-     * hits in the last row By caching the last row, each pixel gets examined
+     * hits in the last row. By caching the last row, each pixel gets examined
      * only once and the 4 adjacent pixels are accessed in constant time.
      * @see ClusterCache
+     *
+     * \correlationdiagram
+     * MCParticle = graph.external_data('MCParticle')
+     * PXDTrueHit = graph.data('PXDTrueHit')
+     * PXDDigit   = graph.data('PXDDigit')
+     * PXDCluster = graph.data('PXDCluster')
+     *
+     * graph.module('PXDDigitizer', [MCParticle, PXDDigit, PXDTrueHit], [PXDCluster])
+     * graph.relation(MCParticle, PXDTrueHit)
+     * graph.relation(PXDDigit,   MCParticle)
+     * graph.relation(PXDDigit,   PXDTrueHit)
+     * graph.relation(PXDCluster, MCParticle)
+     * graph.relation(PXDCluster, PXDDigit)
+     * graph.relation(PXDCluster, PXDTrueHit)
+     * \endcorrelationdiagram
+     *
+     * \addtogroup modules
      */
     class PXDClusteringModule : public Module {
 

@@ -22,6 +22,8 @@ namespace Belle2 {
    *
    * This is a development implementation which is intentionally kept
    * somewhat bulky. The coordinates probably won't be kept in future.
+    *
+    * \addtogroup dataobjects
    */
 
   class PXDDigit : public TObject {

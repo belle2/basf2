@@ -31,6 +31,8 @@ namespace Belle2 {
     * This class holds particle hit data from geant4 simulation. As the simulated
     * hit classes are used to generate detector response, they contain _local_
     * information.
+    *
+    * \addtogroup dataobjects
     */
   class VXDTrueHit : public TObject {
 

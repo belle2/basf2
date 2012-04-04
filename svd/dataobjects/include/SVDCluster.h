@@ -18,6 +18,8 @@ namespace Belle2 {
 
   /** The SVD Cluster class
    * This class stores all information about reconstructed SVD clusters
+    *
+    * \addtogroup dataobjects
    */
   class SVDCluster: public TObject {
   public:

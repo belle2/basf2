@@ -140,8 +140,6 @@ void ECLRecPi0Module::event()
       if (fit_flag) {
         fit(lv_gamma1, lv_gamma2);
         if (pi0_mass_min < mass && mass < pi0_mass_max) {
-//    cout<< lv_rec.mag()<<" "<< lv_rec.e()<<endl;
-          cout << Get_mass() << " " << Get_E() << endl;
 
           StoreArray<MdstPi0> Pi0Array(m_MdstPi0Name);
           m_Pi0Num = Pi0Array->GetLast() + 1;
@@ -228,8 +226,6 @@ void ECLRecPi0Module::fit(CLHEP::HepLorentzVector m_shower1, CLHEP::HepLorentzVe
   y0[3][0] = m_shower2.e();
   y0[4][0] = m_shower2.phi();
   y0[5][0] = m_shower2.theta();
-
-//  for(int i=0;i<6;i++)cout <<i<<" "<< y0[i][0] <<endl;
 
   CLHEP::HepMatrix y(y0);
   CLHEP::HepMatrix Dy(6, 1, 0);

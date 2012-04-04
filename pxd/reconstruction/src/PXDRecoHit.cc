@@ -10,11 +10,11 @@
 
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Unit.h>
-#include <pxd/dataobjects/PXDRecoHit.h>
+#include <pxd/reconstruction/PXDRecoHit.h>
 #include <pxd/dataobjects/PXDTrueHit.h>
 #include <pxd/dataobjects/PXDCluster.h>
 #include <pxd/geometry/SensorInfo.h>
-#include <vxd/dataobjects/VXDSensorPlane.h>
+#include <vxd/geometry/SensorPlane.h>
 #include <vxd/geometry/GeoCache.h>
 
 #include <GFDetPlane.h>
@@ -118,7 +118,7 @@ void PXDRecoHit::setDetectorPlane()
   TVector3 vGlobal = geometry.vectorToGlobal(TVector3(0, 1, 0));
 
   //Construct the detector plane
-  GFDetPlane detPlane(origin, uGlobal, vGlobal, new VXDSensorPlane(m_sensorID, 1.0, 1.0));
+  GFDetPlane detPlane(origin, uGlobal, vGlobal, new VXD::SensorPlane(m_sensorID, 1.0, 1.0));
   // Set in policy
   fPolicy.setDetPlane(detPlane);
 }

@@ -1,4 +1,4 @@
-#include <vxd/VxdID.h>
+#include <vxd/dataobjects/VxdID.h>
 #include <gtest/gtest.h>
 #include <iostream>
 #include <string>

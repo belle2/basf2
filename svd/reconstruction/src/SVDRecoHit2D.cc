@@ -10,10 +10,10 @@
 
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Unit.h>
-#include <svd/dataobjects/SVDRecoHit2D.h>
+#include <svd/reconstruction/SVDRecoHit2D.h>
 #include <svd/dataobjects/SVDTrueHit.h>
 #include <svd/geometry/SensorInfo.h>
-#include <vxd/dataobjects/VXDSensorPlane.h>
+#include <vxd/geometry/SensorPlane.h>
 #include <vxd/geometry/GeoCache.h>
 
 #include <GFDetPlane.h>
@@ -71,7 +71,7 @@ void SVDRecoHit2D::setDetectorPlane()
   TVector3 vGlobal = geometry.vectorToGlobal(TVector3(0, 1, 0));
 
   //Construct the detector plane
-  GFDetPlane detPlane(origin, uGlobal, vGlobal, new VXDSensorPlane(m_sensorID, 1.0, 1.0));
+  GFDetPlane detPlane(origin, uGlobal, vGlobal, new VXD::SensorPlane(m_sensorID, 1.0, 1.0));
   // Set in policy
   fPolicy.setDetPlane(detPlane);
 }

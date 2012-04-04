@@ -69,10 +69,10 @@ namespace Belle2 {
     /** Construct ID from string representing the structure */
     VxdID(const std::string& sensor);
     /** Copy constructor */
-    VxdID(const VxdID &b)                   { m_id = b.m_id; }
+    VxdID(const VxdID& b)                   { m_id = b.m_id; }
 
     /** Assignment operator */
-    VxdID& operator=(const VxdID &b)        { m_id = b.m_id; return *this; }
+    VxdID& operator=(const VxdID& b)        { m_id = b.m_id; return *this; }
     /** Assignment from unsigned short */
     VxdID& operator=(unsigned short id)     { m_id.id = id; return *this; }
     /** Convert to unsigned short */
@@ -80,9 +80,9 @@ namespace Belle2 {
     /** Convert to string */
     operator std::string() const;
     /** Check for equality */
-    bool operator==(const VxdID &b) const   { return getID() == b.getID(); }
+    bool operator==(const VxdID& b) const   { return getID() == b.getID(); }
     /** Order by unique id */
-    bool operator<(const VxdID &b) const    { return getID() < b.getID(); }
+    bool operator<(const VxdID& b) const    { return getID() < b.getID(); }
 
     /** Get the unique id */
     unsigned short getID() const            { return m_id.id; }
@@ -125,7 +125,7 @@ unsigned layer: LayerBits;
   };
 
   /** Print id to stream by converting it to string */
-  std::ostream& operator<<(std::ostream &out, const VxdID &id);
+  std::ostream& operator<<(std::ostream& out, const VxdID& id);
 }
 
 #endif //VXDID_H

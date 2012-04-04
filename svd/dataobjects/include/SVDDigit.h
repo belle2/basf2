@@ -11,7 +11,7 @@
 #ifndef SVDDIGIT_H
 #define SVDDIGIT_H
 
-#include <vxd/VxdID.h>
+#include <vxd/dataobjects/VxdID.h>
 
 #include <root/TObject.h>
 

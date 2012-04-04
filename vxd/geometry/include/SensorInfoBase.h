@@ -11,7 +11,7 @@
 #ifndef VXD_SENSORINFO_H
 #define VXD_SENSORINFO_H
 
-#include <vxd/VxdID.h>
+#include <vxd/dataobjects/VxdID.h>
 #include <cmath>
 
 #include <TGeoMatrix.h>

@@ -11,7 +11,7 @@
 #ifndef SVDTRUEHIT_H
 #define SVDTRUEHIT_H
 
-#include <vxd/VxdID.h>
+#include <vxd/dataobjects/VxdID.h>
 #include <vxd/dataobjects/VXDTrueHit.h>
 
 namespace Belle2 {

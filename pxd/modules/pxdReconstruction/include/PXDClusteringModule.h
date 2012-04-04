@@ -13,7 +13,7 @@
 
 #include <framework/core/Module.h>
 #include <pxd/geometry/SensorInfo.h>
-#include <vxd/VxdID.h>
+#include <vxd/dataobjects/VxdID.h>
 #include <pxd/reconstruction/ClusterCache.h>
 #include <pxd/reconstruction/Pixel.h>
 #include <boost/format.hpp>

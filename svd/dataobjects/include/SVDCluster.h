@@ -12,7 +12,7 @@
 #define SVDCLUSTER_H
 
 #include <TObject.h>
-#include <vxd/VxdID.h>
+#include <vxd/dataobjects/VxdID.h>
 
 namespace Belle2 {
 

@@ -8,15 +8,15 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <vxd/dataobjects/VXDSensorPlane.h>
+#include <vxd/geometry/SensorPlane.h>
 #include <framework/logging/Logger.h>
 
 using namespace std;
 using namespace Belle2;
 
-ClassImp(VXDSensorPlane)
+ClassImp(VXD::SensorPlane)
 
-void VXDSensorPlane::Print(const Option_t*) const
+void VXD::SensorPlane::Print(const Option_t*) const
 {
   B2INFO("VXDSensorPlane for " << (string)VxdID(m_sensorID));
 }

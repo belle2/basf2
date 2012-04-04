@@ -14,7 +14,7 @@
 // ROOT
 #include <TObject.h>
 #include <TVector3.h>
-#include <vxd/VxdID.h>
+#include <vxd/dataobjects/VxdID.h>
 
 namespace Belle2 {
 

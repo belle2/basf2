@@ -9,7 +9,7 @@
  **************************************************************************/
 
 #include <framework/logging/Logger.h>
-#include <vxd/VxdID.h>
+#include <vxd/dataobjects/VxdID.h>
 #include <sstream>
 #include <iostream>
 #include <stdexcept>

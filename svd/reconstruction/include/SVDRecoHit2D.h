@@ -11,7 +11,8 @@
 #ifndef SVDRECOHIT2D_H_
 #define SVDRECOHIT2D_H_
 
-#include <vxd/VxdID.h>
+#include <vxd/dataobjects/VxdID.h>
+#include <svd/dataobjects/SVDTrueHit.h>
 
 // ROOT includes
 #include <TMatrixD.h>
@@ -21,8 +22,6 @@
 #include <GFRecoHitIfc.h>
 
 namespace Belle2 {
-  class SVDTrueHit;
-
   /**
    * SVDRecoHit - an extended form of SVDHit containing geometry information.
    *

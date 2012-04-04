@@ -11,7 +11,7 @@
 #ifndef VXDTRUEHIT_H
 #define VXDTRUEHIT_H
 
-#include <vxd/VxdID.h>
+#include <vxd/dataobjects/VxdID.h>
 
 // ROOT
 #include <TObject.h>

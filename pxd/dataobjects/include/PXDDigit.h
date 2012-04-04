@@ -11,7 +11,7 @@
 #ifndef PXDDIGIT_H
 #define PXDDIGIT_H
 
-#include <vxd/VxdID.h>
+#include <vxd/dataobjects/VxdID.h>
 
 #include <TObject.h>
 
@@ -30,10 +30,10 @@ namespace Belle2 {
 
     /** Default constructor for the ROOT IO. */
     PXDDigit():
-        m_sensorID(0),
-        m_uCellID(-1), m_vCellID(-1),
-        m_uCellPosition(0), m_vCellPosition(0),
-        m_charge(0)
+      m_sensorID(0),
+      m_uCellID(-1), m_vCellID(-1),
+      m_uCellPosition(0), m_vCellPosition(0),
+      m_charge(0)
     {;}
 
     /** Useful Constructor.
@@ -45,10 +45,10 @@ namespace Belle2 {
      * @param charge The charge collected in the cell.
      */
     PXDDigit(VxdID sensorID, short uCellID, short vCellID, float uCellPosition, float vCellPosition, float charge):
-        m_sensorID(sensorID),
-        m_uCellID(uCellID), m_vCellID(vCellID),
-        m_uCellPosition(uCellPosition), m_vCellPosition(vCellPosition),
-        m_charge(charge)
+      m_sensorID(sensorID),
+      m_uCellID(uCellID), m_vCellID(vCellID),
+      m_uCellPosition(uCellPosition), m_vCellPosition(vCellPosition),
+      m_charge(charge)
     {;}
 
     /** Get the sensor ID.

@@ -35,23 +35,23 @@ namespace Belle2 {
       if (index > 0) m_path = addIndex(m_path, index);
     }
     /** Create a GearDir with an absolute path and optionally appending an index */
-    GearDir(const std::string &path = "", int index = 0) {
+    GearDir(const std::string& path = "", int index = 0) {
       m_path = path;
       if (index > 0) m_path = addIndex(path, index);
     }
     /** Copy constructor */
-    GearDir(const GearDir &other) {
+    GearDir(const GearDir& other): gearbox::Interface(other) {
       m_path = other.m_path;
     }
 
     /** Append something to the current path, modifying the GearDir in place */
-    void append(const std::string &path) { m_path += path; }
+    void append(const std::string& path) { m_path += path; }
 
     /**
      * Return the number of nodes a given path will expand to
      * @return number of nodes, 0 if path does not exist
      */
-    virtual int getNumberNodes(const std::string &path = "") const {
+    virtual int getNumberNodes(const std::string& path = "") const {
       return Gearbox::getInstance().getNumberNodes(ensurePath(m_path) + path);
     }
 
@@ -61,7 +61,7 @@ namespace Belle2 {
      * @param path Path of the parameter to get
      * @return value of the parameter
      */
-    virtual std::string getString(const std::string &path = "") const throw(gearbox::PathEmptyError) {
+    virtual std::string getString(const std::string& path = "") const throw(gearbox::PathEmptyError) {
       return Gearbox::getInstance().getString(ensurePath(m_path) + path);
     }
 
@@ -73,7 +73,7 @@ namespace Belle2 {
      * @param defaultvalue value to return if the path es empty or does not exist
      * @return value of the parameter
      */
-    std::string getString(const std::string &path, const std::string &defaultValue) const {
+    std::string getString(const std::string& path, const std::string& defaultValue) const {
       return gearbox::Interface::getString(path, defaultValue);
     }
 
@@ -88,7 +88,7 @@ namespace Belle2 {
      * @param path Path of the parameter to get
      * @return value of the parameter
      */
-    virtual std::pair<std::string, std::string> getStringWithUnit(const std::string &path = "") const throw(gearbox::PathEmptyError) {
+    virtual std::pair<std::string, std::string> getStringWithUnit(const std::string& path = "") const throw(gearbox::PathEmptyError) {
       return Gearbox::getInstance().getStringWithUnit(ensurePath(m_path) + path);
     }
   };

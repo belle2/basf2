@@ -135,7 +135,7 @@ namespace Belle2 {
     /** Singleton: private constructor */
     Gearbox();
     /** Singleton: private copy constructor */
-    Gearbox(const Gearbox&): m_parameterCache(DefaultCacheSize) {}
+    Gearbox(const Gearbox& other): gearbox::Interface(other), m_parameterCache(DefaultCacheSize) {}
 
     /** Function to be called when libxml requests a new input uri to be opened */
     gearbox::InputContext* openXmlUri(const std::string& uri) const;

@@ -67,8 +67,10 @@ namespace Belle2 {
     int m_failedFitCounter;
     int m_fitCounter;
     int m_notPerfectCounter;
-
+    int m_largeAngleCounter;
+    //steering file switches
     bool m_filter;
+    double m_angleCut;
 
     //genfit fitter objects and options for them
     GFDaf m_daf;
@@ -77,13 +79,15 @@ namespace Belle2 {
     bool m_useDaf; //Determines if normal kalman filter or daf is used
     int m_nGFIter; // number of iterations for the normal kalman filter. One iteration is forward + backward
     double m_blowUpFactor; // when filter directions changes the filter covariance matrix is multipled with this number
-    // switches to controll the material effects in genfit
+    // steering file switches to controll the material effects in genfit
     bool m_energyLossBetheBloch;
     bool m_noiseBetheBloch;
     bool m_noiseCoulomb;
     bool m_energyLossBrems;
     bool m_noiseBrems;
     bool m_noEffects;
+    std::string m_mscModel;
+
 
   };
 } // end namespace Belle2

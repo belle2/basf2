@@ -37,10 +37,12 @@ namespace Belle2 {
       bool operator<(const Pixel& b)  const { return getV() < b.getV() || (getV() == b.getV() && getU() < b.getU()); }
       /** Equality operator */
       bool operator==(const Pixel& b) const { return getV() == b.getV() && getU() == b.getU(); }
+      /** Return the sensorID of the pixel */
+      VxdID getSensorID() const { return m_digit ? m_digit->getSensorID() : VxdID(0); }
       /** Shorthand to get the pixel column ID */
-      unsigned int getU() const { return m_digit->getUCellID(); }
+      unsigned int getU() const { return m_digit ? m_digit->getUCellID() : -1; }
       /** Shorthand to get the pixel row ID */
-      unsigned int getV() const { return m_digit->getVCellID(); }
+      unsigned int getV() const { return m_digit ? m_digit->getVCellID() : -1; }
       /** Shorthand to get the pixel charge */
       float getCharge() const { return m_digit ? m_digit->getCharge() : 0;  }
       /** Return pointer to the wrapped Digit */

@@ -33,7 +33,7 @@ namespace Belle2 {
       float charge = pixel.getCharge();
       m_charge += charge;
       m_pixels.push_back(pixel);
-      if (NoiseMap::getInstance().seed(pixel.getU(), pixel.getV(), charge) && m_seed.getCharge() < charge) {
+      if (m_seed.getCharge() < charge) {
         m_seed = pixel;
       }
     }

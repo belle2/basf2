@@ -11,52 +11,52 @@
 #ifndef PXD_NOISEMAP_H
 #define PXD_NOISEMAP_H
 
-#include <memory>
+#include <pxd/reconstruction/Pixel.h>
 
 namespace Belle2 {
 
   namespace PXD {
 
     /**
-     * Class to represent pixel dependent Noise Map.
-     * Currently there is no area dependence but could be used to mask
-     * noisy pixels
+     * Base Class to represent pixel dependent Noise Map.
+     * Currently there is no area dependence implemented.
      */
     class NoiseMap {
     public:
-      /** Set the cut values to be used in electrons */
-      void setCuts(float adjacent, float seed, float cluster) {
-        cut_adjacent = adjacent;
-        cut_seed = seed;
-        cut_cluster = cluster;
-      }
-      /** Check if a pixel exceeds the seed cut */
-      bool seed(unsigned int, unsigned int, float adc) const { return adc >= cut_seed; };
-      /** Check if a pixel exceeds the adjacent cut */
-      bool adjacent(unsigned int, unsigned int, float adc) const { return adc >= cut_adjacent; };
-      /** Check if a cluster exceeds the cluster cut */
-      bool cluster(float adc) const { return adc >= cut_cluster; };
+      /** Constructor  */
+      NoiseMap(): m_noiseLevel(0) {}
+      /** Destructor */
+      virtual ~NoiseMap() {}
 
-      /** Return a reference to the instance */
-      static NoiseMap& getInstance();
+      /** Set the noise level */
+      void setNoiseLevel(float noise) { m_noiseLevel = noise; }
+
+      /** Set the sensorID currently used.
+       * Should be utilised later or in derived classes to obtain the correct noiseMap.
+       */
+      virtual void setSensorID(VxdID) {}
+
+      /** Return the significance of a signal, that is signal divided by noise level */
+      float getSignificance(const Pixel& px) const { return px.getCharge() / getNoise(px); }
+
+      /** Return the noise value for a given pixel */
+      virtual float getNoise(const Pixel&) const { return m_noiseLevel; }
+
+      /** Check wether a signal exceeds a given significance
+       * @param pixel pixel to check
+       * @param significance minimum significance
+       */
+      bool operator()(const Pixel& px, float significance) const { return getSignificance(px) >= significance; }
+
+      /** Check wether a signal exceeds a given significance using the average noise level
+       * @param signal signal to check
+       * @param significance minimum significance
+       */
+      bool operator()(float signal, float significance) const { return signal / m_noiseLevel >= significance; }
+
     protected:
-      /** Constructor hidden, class is singleton */
-      NoiseMap(): cut_adjacent(0), cut_seed(0), cut_cluster(0) {}
-      /** Copy constructor hidden, class is singleton */
-      NoiseMap(const NoiseMap&);
-      /** Asignment operator hidden, class is singleton */
-      NoiseMap& operator=(const NoiseMap&);
-      /** Destructor hidden, class is singleton */
-      ~NoiseMap() {}
-      /** Allow destruction of singleton instance */
-      friend class std::auto_ptr<NoiseMap>;
-
-      /** Noist cut value */
-      float cut_adjacent;
-      /** Seed cut value */
-      float cut_seed;
-      /** Cluster cut value */
-      float cut_cluster;
+      /** Noise level */
+      float m_noiseLevel;
     };
 
   }

@@ -11,7 +11,6 @@
 #ifndef PXD_CLUSTERCANDIDATE_H
 #define PXD_CLUSTERCANDIDATE_H
 
-#include <pxd/reconstruction/NoiseMap.h>
 #include <pxd/reconstruction/Pixel.h>
 #include <vector>
 
@@ -40,13 +39,6 @@ namespace Belle2 {
        * @param pixel Pixel to add to the cluster
        */
       void add(const Pixel& pixel);
-
-      /** Check wether this cluster fullfils all constrains like noise cuts.
-       * @return true if cluster is valid and should be kept, false otherwise
-       */
-      bool valid() const {
-        return (m_charge > 0) && (m_seed.getCharge() > 0) && (NoiseMap::getInstance().cluster(m_charge));
-      }
 
       /** get the charge of the cluster */
       float getCharge() const { return m_charge; }

@@ -117,7 +117,8 @@ void PXDClusteringModule::initialize()
   B2INFO(" -->  AssumeSorted:       " << (m_assumeSorted ? "true" : "false"));
   B2INFO(" -->  TanLorentz:         " << m_tanLorentzAngle);
 
-  NoiseMap::getInstance().setCuts(m_elNoise * m_cutAdjacent, m_elNoise * m_cutSeed, m_elNoise * m_cutCluster);
+  //This is still static noise for all pixels, should be done more sophisticated in the future
+  m_noiseMap.setNoiseLevel(m_elNoise);
 }
 
 inline void PXDClusteringModule::findCluster(const Pixel& px)
@@ -159,7 +160,6 @@ void PXDClusteringModule::event()
     //Fill sensors
     for (int i = 0; i < nPixels; i++) {
       Pixel px(storeDigits[i], i);
-      if (!NoiseMap::getInstance().adjacent(px.getU(), px.getV(), px.getCharge())) continue;
       VxdID sensorID = px.get()->getSensorID();
       std::pair<Sensor::iterator, bool> it = sensors[sensorID].insert(px);
       if (!it.second) B2ERROR("Pixel (" << px.getU() << "," << px.getV() << ") in sensor "
@@ -168,7 +168,9 @@ void PXDClusteringModule::event()
 
     //Now we loop over sensors and cluster each sensor in turn
     for (map<VxdID, Sensor>::iterator it = sensors.begin(); it != sensors.end(); it++) {
+      m_noiseMap.setSensorID(it->first);
       BOOST_FOREACH(const PXD::Pixel & px, it->second) {
+        if (!m_noiseMap(px, m_cutAdjacent)) continue;
         findCluster(px);
       }
       writeClusters(it->first);
@@ -182,20 +184,25 @@ void PXDClusteringModule::event()
     unsigned int lastU(0), lastV(0);
     for (int i = 0; i < nPixels; i++) {
       Pixel px(storeDigits[i], i);
+      //Load the correct noise map for the first pixel
+      if (i == 0) m_noiseMap.setSensorID(px.getSensorID());
       //Ignore digits with not enough signal
-      if (!NoiseMap::getInstance().adjacent(px.getU(), px.getV(), px.getCharge())) continue;
+      if (!m_noiseMap(px, m_cutAdjacent)) continue;
 
       //Check for sorting as precaution
       if (lastV > px.getV() || (lastV == px.getV() && lastU > px.getU())) {
-        B2FATAL("Pixels are not sorted correctly, please change the assumeSorted parameter to false or fix the input to be ordered by v,u in ascending order");
+        B2FATAL("Pixels are not sorted correctly, please change the assumeSorted parameter "
+                "to false or fix the input to be ordered by v,u in ascending order");
       }
       lastU = px.getU();
       lastV = px.getV();
 
       //New sensor, write clusters
-      if (sensorID != px.get()->getSensorID()) {
+      if (sensorID != px.getSensorID()) {
         writeClusters(sensorID);
-        sensorID = px.get()->getSensorID();
+        sensorID = px.getSensorID();
+        //Load the correct noise map for the new sensor
+        m_noiseMap.setSensorID(sensorID);
       }
       //Find correct cluster and add pixel to cluster
       findCluster(px);
@@ -223,8 +230,8 @@ void PXDClusteringModule::writeClusters(VxdID sensorID)
   const SensorInfo& info = dynamic_cast<const SensorInfo&>(VXD::GeoCache::get(sensorID));
 
   BOOST_FOREACH(ClusterCandidate & cls, m_clusters) {
-    //Check for noise cut
-    if (!cls.valid()) continue;
+    //Check for noise cuts
+    if (!(cls.size() > 0 && m_noiseMap(cls.getCharge(), m_cutCluster) && m_noiseMap(cls.getSeed(), m_cutSeed))) continue;
 
     const Pixel& seed = cls.getSeed();
     unsigned int maxU(0), minU(info.getUCells() - 1) , maxV(0), minV(info.getVCells() - 1);

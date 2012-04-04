@@ -15,6 +15,7 @@
 #include <pxd/geometry/SensorInfo.h>
 #include <vxd/dataobjects/VxdID.h>
 #include <pxd/reconstruction/ClusterCache.h>
+#include <pxd/reconstruction/NoiseMap.h>
 #include <pxd/reconstruction/Pixel.h>
 #include <boost/format.hpp>
 #include <string>
@@ -98,6 +99,8 @@ namespace Belle2 {
       std::deque<ClusterCandidate> m_clusters;
       /** cache of the last seen clusters to speed up clustering */
       ClusterCache m_cache;
+      /** Noisemap for the currently active sensor */
+      NoiseMap m_noiseMap;
 
     };//end class declaration
 

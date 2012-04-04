@@ -193,7 +193,9 @@ namespace Belle2 {
           if (!mVector) { B2WARNING("Material '" << aeroMat << "', for ARICH aerogel layer has no specified Rayleigh attenuation length.");} else {
             double lambda0 = 400;
             double e0 = 1240. / lambda0 * Unit::eV / Unit::MeV;
-            m_arichgp->setAeroTransLength(ilayer, mVector->GetProperty(e0)*Unit::mm);
+
+            G4bool b;
+            m_arichgp->setAeroTransLength(ilayer, mVector->GetValue(e0, b)*Unit::mm);
           }
           double rindex = getAvgRINDEX(aeroMaterial);
           if (!rindex) B2WARNING("Material '" << aeroMat << "', for ARICH aerogel layer has no specified refractive index. No Cherenkov photons will be produced.");
@@ -437,7 +439,8 @@ namespace Belle2 {
       if (!mTable) return 0;
       G4MaterialPropertyVector* mVector =  mTable->GetProperty("RINDEX");
       if (!mVector) return 0;
-      return mVector->GetProperty(2 * Unit::eV / Unit::MeV);
+      G4bool b;
+      return mVector->GetValue(2 * Unit::eV / Unit::MeV, b);
     }
 
     void GeoARICHCreator::createSimple(const GearDir& content, G4LogicalVolume& topVolume)
@@ -493,7 +496,8 @@ namespace Belle2 {
         G4MaterialPropertyVector* mVector =  mTable->GetProperty("RAYLEIGH");
         double lambda0 = 400;
         double e0 = 1240. / lambda0 * Unit::eV / Unit::MeV;
-        m_arichgp->setAeroTransLength(ilayer, mVector->GetProperty(e0)*Unit::mm);
+        G4bool b;
+        m_arichgp->setAeroTransLength(ilayer, mVector->GetValue(e0, b)*Unit::mm);
         G4Box* tileBox = new G4Box("tileBox", sizeX / 2., sizeY / 2., sizeZ / 2. / Unit::mm);
         G4LogicalVolume* lTile = new G4LogicalVolume(tileBox, tileMaterial, "Tile", 0, m_sensitiveAero);
         setColor(*lTile, "rgb(0.0, 1.0, 1.0,1.0)");

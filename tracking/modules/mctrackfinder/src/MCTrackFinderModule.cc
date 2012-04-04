@@ -296,9 +296,8 @@ void MCTrackFinderModule::event()
         //     cdc 2
         if (m_usePXDHits && m_usePXDClusters == false) {
           BOOST_FOREACH(int hitID, pxdHitsIndices) {
-            int sensorID = pxdTrueHits[hitID]->getSensorID();
+            VxdID aVXDId = pxdTrueHits[hitID]->getSensorID();
             float time = pxdTrueHits[hitID]->getGlobalTime();
-            VxdID aVXDId = VxdID(sensorID);
             int uniqueSensorId = aVXDId.getID();
             trackCandidates[counter]->addHit(0, hitID, double(time), uniqueSensorId);
           }
@@ -307,10 +306,10 @@ void MCTrackFinderModule::event()
 
         if (m_usePXDHits && m_usePXDClusters) {
           BOOST_FOREACH(int hitID, pxdHitsIndices) {
-            int sensorID = pxdClusters[hitID]->getSensorID();
-            VxdID aVXDId = VxdID(sensorID);
+            VxdID aVXDId = pxdClusters[hitID]->getSensorID();
             int uniqueSensorId = aVXDId.getID();
             //the real clusters do not have timing information, set layer ID instead ....
+            // I dont think using layer id as sorting parameter will work... I deactivated sorting when clusters are used until a better solution is found. (Moritz)
             float time = aVXDId.getLayer();
             trackCandidates[counter]->addHit(0, hitID, double(time), uniqueSensorId);
           }
@@ -318,11 +317,9 @@ void MCTrackFinderModule::event()
         }
         if (m_useSVDHits) {
           BOOST_FOREACH(int hitID, svdHitsIndices) {
-            int sensorID = svdTrueHits[hitID]->getSensorID();
+            VxdID aVXDId = svdTrueHits[hitID]->getSensorID();
             float time = svdTrueHits[hitID]->getGlobalTime();
-            VxdID aVXDId = VxdID(sensorID);
             int uniqueSensorId = aVXDId.getID();
-            //addHit(detectorID, hitID, rho (distance from the origin to sort hits), planeId (Id of the sensor, needed for DAF))
             trackCandidates[counter]->addHit(1, hitID, double(time), uniqueSensorId);
           }
           B2DEBUG(112, "     add " << svdHitsIndices.size() << " SVDHits");
@@ -352,7 +349,9 @@ void MCTrackFinderModule::event()
         }
         // now after all the hits belonging to one track are added to a track candidate
         // bring them into the right order inside the trackCand objects using the rho parameter
-        trackCandidates[counter]->sortHits(); // this is not yet present in the genfit version used by basf2. After an updaet of the externals it can be used
+        if (m_usePXDClusters == false) {
+          trackCandidates[counter]->sortHits(); // sortHits() needs externals 00-02-01 or later or custom version of genfit
+        }
       } //endif
     }
   }//end loop over MCParticles

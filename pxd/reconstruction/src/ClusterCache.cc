@@ -79,7 +79,7 @@ namespace Belle2 {
         for (int i = u - 1; i >= 0; --i) {
           if (m_clsCur[i] == cls2) m_clsCur[i] = cls1;
         }
-        for (int i = u; i < m_maxU; i++) {
+        for (unsigned int i = u; i < m_maxU; i++) {
           if (m_clsTop[i] == cls2) m_clsTop[i] = cls1;
         }
       }

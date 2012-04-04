@@ -128,7 +128,7 @@ GFAbsRecoHit* PXDRecoHit::clone()
   return new PXDRecoHit(*this);
 }
 
-TMatrixD PXDRecoHit::getHMatrix(const GFAbsTrackRep* stateVector)
+TMatrixD PXDRecoHit::getHMatrix(const GFAbsTrackRep*)
 {
   TMatrixD hMatrix(2, 5);
   hMatrix.Zero();

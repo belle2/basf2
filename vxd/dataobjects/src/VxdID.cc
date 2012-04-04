@@ -8,12 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <framework/logging/Logger.h>
 #include <vxd/dataobjects/VxdID.h>
 #include <sstream>
-#include <iostream>
-#include <stdexcept>
-#include <cassert>
 
 using namespace std;
 
@@ -53,7 +49,7 @@ namespace Belle2 {
     }
   }
 
-  VxdID::VxdID(const std::string& sensor)
+  VxdID::VxdID(const std::string& sensor) throw(invalid_argument)
   {
     //We parse the Id from string, so set it to 0 first
     m_id.id = 0;
@@ -71,12 +67,17 @@ namespace Belle2 {
       }
     } catch (runtime_error&) {
       //Something went wrong parsing the parts
-      B2ERROR("Could not parse VtxID '" << sensor << "'");
+      throw invalid_argument("Could not parse VxdID: '" + sensor + "'");
       m_id.id = 0;
     }
-    //There is stuff left, warn about it
+    //There is stuff left we also throw an exception as we cannot warn the user
+    //without the logging system
     if (!in.eof()) {
-      B2WARNING("VxdID did not consume complete string");
+      string rest;
+      //Get the remainder: get everything in the stream until the next NULL
+      //character which should only occur at the end of the string.
+      getline(in, rest, '\0');
+      throw invalid_argument("Trailing characters after VxdID " + (string)*this + ": '" + rest + "'");
     }
   }
 

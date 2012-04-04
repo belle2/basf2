@@ -79,6 +79,7 @@ namespace Belle2 {
 
     /** Struct holding the information where a sensor should be placed inside the ladder */
     struct GeoVXDSensorPlacement {
+      /** Constructor */
       GeoVXDSensorPlacement(int sensorID = 0, const std::string& sensorTypeID = "", double z = 0,
                             bool flipU = false, bool flipV = false, bool flipW = false):
         sensorID(sensorID), sensorTypeID(sensorTypeID), z(z), flipU(flipU), flipV(flipV), flipW(flipW) {}

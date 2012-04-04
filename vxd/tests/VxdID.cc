@@ -37,8 +37,9 @@ namespace Belle2 {
     }
 
     //Check some invalid ids
-    EXPECT_FALSE(VxdID("1.f"));
-    EXPECT_FALSE(VxdID("1.1.f"));
-    EXPECT_FALSE(VxdID("1.*.f"));
+    EXPECT_THROW(VxdID("1.f"), invalid_argument);
+    EXPECT_THROW(VxdID("1.1.f"), invalid_argument);
+    EXPECT_THROW(VxdID("1.*.f"), invalid_argument);
+    EXPECT_THROW(VxdID("1.1.1 and some more"), invalid_argument);
   }
 }  // namespace

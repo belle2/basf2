@@ -13,6 +13,7 @@
 
 #include <string>
 #include <ostream>
+#include <stdexcept>
 
 namespace Belle2 {
   /**
@@ -41,18 +42,18 @@ namespace Belle2 {
       /** Number of bits available to represent segmentation of the sensor */
       SegmentBits = 5,
       /** Total bit size of the VxdID */
-      Bits = LayerBits + LadderBits + SensorBits + SegmentBits,
+      Bits        = LayerBits + LadderBits + SensorBits + SegmentBits,
 
       /** Maximum valid Layer ID */
-      MaxLayer   = (1 << LayerBits) - 1,
+      MaxLayer    = (1 << LayerBits) - 1,
       /** Maximum valid Ladder ID */
-      MaxLadder  = (1 << LadderBits) - 1,
+      MaxLadder   = (1 << LadderBits) - 1,
       /** Maximum valid Sensor ID */
-      MaxSensor  = (1 << SensorBits) - 1,
+      MaxSensor   = (1 << SensorBits) - 1,
       /** Maximum valid Segment ID */
-      MaxSegment = (1 << SegmentBits) - 1,
+      MaxSegment  = (1 << SegmentBits) - 1,
       /** Maximum value for ID */
-      MaxID = (1 << Bits) - 1
+      MaxID       = (1 << Bits) - 1
     };
 
     /** Constructor using the unique id */
@@ -67,7 +68,7 @@ namespace Belle2 {
       m_id.parts.segment = segment;
     }
     /** Construct ID from string representing the structure */
-    VxdID(const std::string& sensor);
+    VxdID(const std::string& sensor) throw(std::invalid_argument);
     /** Copy constructor */
     VxdID(const VxdID& b)                   { m_id = b.m_id; }
 

@@ -81,7 +81,7 @@ GFAbsRecoHit* SVDRecoHit2D::clone()
   return new SVDRecoHit2D(*this);
 }
 
-TMatrixD SVDRecoHit2D::getHMatrix(const GFAbsTrackRep* stateVector)
+TMatrixD SVDRecoHit2D::getHMatrix(const GFAbsTrackRep*)
 {
   TMatrixD hMatrix(2, 5);
   hMatrix.Zero();

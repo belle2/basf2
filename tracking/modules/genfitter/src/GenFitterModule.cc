@@ -25,8 +25,8 @@
 #include <pxd/dataobjects/PXDTrueHit.h>
 
 #include <cdc/dataobjects/CDCRecoHit.h>
-#include <svd/dataobjects/SVDRecoHit2D.h>
-#include <pxd/dataobjects/PXDRecoHit.h>
+#include <svd/reconstruction/SVDRecoHit2D.h>
+#include <pxd/reconstruction/PXDRecoHit.h>
 
 #include <tracking/dataobjects/Track.h>
 
@@ -138,14 +138,14 @@ void GenFitterModule::beginRun()
 
 void GenFitterModule::event()
 {
-  B2INFO("**********   GenFitterModule  ************");
+  B2DEBUG(99, "**********   GenFitterModule  ************");
 
   StoreArray < MCParticle > mcParticles(m_mcParticlesColName);
   B2DEBUG(149, "GenFitter: total Number of MCParticles: " << mcParticles.getEntries());
   if (mcParticles.getEntries() == 0) B2WARNING("GenFitter: MCParticlesCollection is empty!");
 
   StoreArray < GFTrackCand > trackCandidates(m_gfTrackCandsColName);
-  B2INFO("GenFitter: Number of GFTrackCandidates: " << trackCandidates.getEntries());
+  B2DEBUG(99, "GenFitter: Number of GFTrackCandidates: " << trackCandidates.getEntries());
   if (trackCandidates.getEntries() == 0)
     B2WARNING("GenFitter: GFTrackCandidatesCollection is empty!");
 
@@ -165,11 +165,11 @@ void GenFitterModule::event()
     B2WARNING("GenFitter: PXDHitsCollection is empty!");
 
   if (m_filterId == 0) {
-    B2INFO("Kalman filter with " << m_nIter << " iterations will be used ");
+    B2DEBUG(99, "Kalman filter with " << m_nIter << " iterations will be used ");
   }
 
   else {
-    B2INFO("DAF will wit probability cut " << m_probCut << " will be used ");
+    B2DEBUG(99, "DAF will wit probability cut " << m_probCut << " will be used ");
   }
 
 
@@ -184,7 +184,7 @@ void GenFitterModule::event()
   int trackCounter = -1;
 
   for (int i = 0; i < trackCandidates.getEntries(); ++i) { //loop over all track candidates
-    B2INFO("#############  Fit track candidate Nr. : " << i << "  ################");
+    B2DEBUG(99, "#############  Fit track candidate Nr. : " << i << "  ################");
 
     GFAbsTrackRep* trackRep;  //initialize track representation
 
@@ -224,14 +224,14 @@ void GenFitterModule::event()
       trackRep = new RKTrackRep(trackCandidates[i]);
 
       if (m_mcTracks) {
-        B2INFO("Fit MCTrack with start values: ");
+        B2DEBUG(99, "Fit MCTrack with start values: ");
       } else {
-        B2INFO("Fit pattern reco track with start values: ");
+        B2DEBUG(99, "Fit pattern reco track with start values: ");
       }
 
-      B2INFO("            momentum: " << trackCandidates[i]->getDirSeed().x() << "  " << trackCandidates[i]->getDirSeed().y() << "  " << trackCandidates[i]->getDirSeed().z());
-      B2INFO("            vertex:   " << trackCandidates[i]->getPosSeed().x() << "  " << trackCandidates[i]->getPosSeed().y() << "  " << trackCandidates[i]->getPosSeed().z());
-      B2INFO("            pdg:      " << trackCandidates[i]->getPdgCode());
+      B2DEBUG(99, "            momentum: " << trackCandidates[i]->getDirSeed().x() << "  " << trackCandidates[i]->getDirSeed().y() << "  " << trackCandidates[i]->getDirSeed().z());
+      B2DEBUG(99, "            vertex:   " << trackCandidates[i]->getPosSeed().x() << "  " << trackCandidates[i]->getPosSeed().y() << "  " << trackCandidates[i]->getPosSeed().z());
+      B2DEBUG(99, "            pdg:      " << trackCandidates[i]->getPdgCode());
 
       GFTrack gfTrack(trackRep, true);  //create the track with the corresponding track representation
 
@@ -262,7 +262,7 @@ void GenFitterModule::event()
       gfTrack.addHitVector(factoryHits);
       gfTrack.setCandidate(*trackCandidates[i]);
 
-      B2INFO("Total Nr of Hits assigned to the Track: " << gfTrack.getNumHits());
+      B2DEBUG(99, "Total Nr of Hits assigned to the Track: " << gfTrack.getNumHits());
 
       //Check which hits are contributing to the track
       int nCDC = 0;
@@ -279,7 +279,7 @@ void GenFitterModule::event()
         if (detId != 0 && detId != 1 && detId != 2) B2WARNING("Hit from unknown detectorID has contributed to this track!");
       }
 
-      B2INFO("            (CDC: " << nCDC << ", SVD: " << nSVD << ", PXD: " << nPXD << ")");
+      B2DEBUG(99, "            (CDC: " << nCDC << ", SVD: " << nSVD << ", PXD: " << nPXD << ")");
 
       if (gfTrack.getNumHits() < 3) {
         B2WARNING("GenFitter: only " << gfTrack.getNumHits() << " were assigned to the Track! This Track will not be fitted!");
@@ -302,15 +302,15 @@ void GenFitterModule::event()
           //gfTrack.Print();
           int genfitStatusFlag = trackRep->getStatusFlag();
           //StatusFlag == 0 means fit was successful
-          B2INFO("-----> Fit results:");
-          B2INFO("       Status of fit: " << genfitStatusFlag);
-          B2INFO("       Chi2 of the fit: " << gfTrack.getChiSqu());
-          //B2INFO("       Forward Chi2: "<<gfTrack.getForwardChiSqu());
-          B2INFO("       NDF of the fit: " << gfTrack.getNDF());
+          B2DEBUG(99, "-----> Fit results:");
+          B2DEBUG(99, "       Status of fit: " << genfitStatusFlag);
+          B2DEBUG(99, "       Chi2 of the fit: " << gfTrack.getChiSqu());
+          //B2DEBUG(99,"       Forward Chi2: "<<gfTrack.getForwardChiSqu());
+          B2DEBUG(99, "       NDF of the fit: " << gfTrack.getNDF());
           //Calculate probability
           double pValue = TMath::Prob(gfTrack.getChiSqu(), gfTrack.getNDF());
-          B2INFO("       pValue of the fit: " << pValue);
-          //B2INFO("       Covariance matrix: ");
+          B2DEBUG(99, "       pValue of the fit: " << pValue);
+          //B2DEBUG(99,"       Covariance matrix: ");
           //gfTrack.getTrackRep(0)->getCov().Print();
 
           if (genfitStatusFlag != 0) {    //if fit failed
@@ -409,14 +409,14 @@ void GenFitterModule::event()
               double xErr = sqrt(resultCovariance[0][0]);
               double yErr = sqrt(resultCovariance[1][1]);
               double zErr = sqrt(resultCovariance[2][2]);
-              B2INFO("Position standard deviation: " << xErr << "  " << yErr << "  " << zErr);
+              B2DEBUG(99, "Position standard deviation: " << xErr << "  " << yErr << "  " << zErr);
               tracks[trackCounter]->setVertexErrors(xErr, yErr, zErr);
 
               //store momentum errors
               double pxErr = sqrt(resultCovariance[3][3]);
               double pyErr = sqrt(resultCovariance[4][4]);
               double pzErr = sqrt(resultCovariance[5][5]);
-              B2INFO("Momentum standard deviation: " << pxErr << "  " << pyErr << "  " << pzErr);
+              B2DEBUG(99, "Momentum standard deviation: " << pxErr << "  " << pyErr << "  " << pzErr);
               tracks[trackCounter]->setPErrors(pxErr, pyErr, pzErr);
 
 
@@ -443,12 +443,12 @@ void GenFitterModule::event()
               tracks[trackCounter]->setCotTheta(dirInPoca.z() / (sqrt(dirInPoca.x() * dirInPoca.x() + dirInPoca.y() * dirInPoca.y())));
 
               //Print helix parameters
-              B2INFO(">>>>>>> Helix Parameters <<<<<<<");
-              B2INFO("D0: " << std::setprecision(3) << tracks[trackCounter]->getD0() << "  Phi: " << std::setprecision(3) << tracks[trackCounter]->getPhi() << "  Omega: " << std::setprecision(3) << tracks[trackCounter]->getOmega() << "  Z0: " << std::setprecision(3) << tracks[trackCounter]->getZ0() << "  CotTheta: " << std::setprecision(3) << tracks[trackCounter]->getCotTheta());
-              B2INFO("<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>");
+              B2DEBUG(99, ">>>>>>> Helix Parameters <<<<<<<");
+              B2DEBUG(99, "D0: " << std::setprecision(3) << tracks[trackCounter]->getD0() << "  Phi: " << std::setprecision(3) << tracks[trackCounter]->getPhi() << "  Omega: " << std::setprecision(3) << tracks[trackCounter]->getOmega() << "  Z0: " << std::setprecision(3) << tracks[trackCounter]->getZ0() << "  CotTheta: " << std::setprecision(3) << tracks[trackCounter]->getCotTheta());
+              B2DEBUG(99, "<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>");
               //Additional check
-              B2INFO("Recalculate momentum from perigee: px: " << abs(1 / (tracks[trackCounter]->getOmega()*alpha)) * (cos(tracks[trackCounter]->getPhi())) << "  py: " << abs(1 / (tracks[trackCounter]->getOmega()*alpha))*sin(tracks[trackCounter]->getPhi()) << "  pz: " << abs(1 / (tracks[trackCounter]->getOmega()*alpha))*tracks[trackCounter]->getCotTheta());
-              B2INFO("<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>");
+              B2DEBUG(99, "Recalculate momentum from perigee: px: " << abs(1 / (tracks[trackCounter]->getOmega()*alpha)) * (cos(tracks[trackCounter]->getPhi())) << "  py: " << abs(1 / (tracks[trackCounter]->getOmega()*alpha))*sin(tracks[trackCounter]->getPhi()) << "  pz: " << abs(1 / (tracks[trackCounter]->getOmega()*alpha))*tracks[trackCounter]->getCotTheta());
+              B2DEBUG(99, "<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>");
 
               if (m_createTextFile) {
                 //Additional code
@@ -489,7 +489,7 @@ void GenFitterModule::event()
     else m_failedGFTrackCandFitCounter++;
 
   }// end else (track has hits)
-  B2INFO("GenFitter event summary: " << trackCounter + 1 << " tracks were processed");
+  B2DEBUG(99, "GenFitter event summary: " << trackCounter + 1 << " tracks were processed");
 
 }
 

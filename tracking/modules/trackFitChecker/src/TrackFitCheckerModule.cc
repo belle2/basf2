@@ -17,8 +17,8 @@
 #include <pxd/dataobjects/PXDTrueHit.h>
 #include <svd/dataobjects/SVDTrueHit.h>
 #include <vxd/dataobjects/VXDTrueHit.h>
-#include <pxd/dataobjects/PXDRecoHit.h>
-#include <svd/dataobjects/SVDRecoHit2D.h>
+#include <pxd/reconstruction/PXDRecoHit.h>
+#include <svd/reconstruction/SVDRecoHit2D.h>
 #include <cdc/dataobjects/CDCRecoHit.h>
 #include <geometry/GeometryManager.h>
 #include <geometry/bfieldmap/BFieldMap.h>

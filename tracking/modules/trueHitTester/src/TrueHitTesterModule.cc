@@ -20,7 +20,7 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <vxd/geometry/GeoCache.h>
-#include <vxd/VxdID.h>
+#include <vxd/dataobjects/VxdID.h>
 #include <vxd/dataobjects/VXDTrueHit.h>
 
 using namespace std;

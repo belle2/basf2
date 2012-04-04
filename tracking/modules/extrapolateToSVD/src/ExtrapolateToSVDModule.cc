@@ -21,7 +21,7 @@
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <vxd/geometry/GeoCache.h>
 #include <svd/geometry/SensorInfo.h>
-#include <vxd/VxdID.h>
+#include <vxd/dataobjects/VxdID.h>
 
 #include "GFTrack.h"
 #include "GFTrackCand.h"

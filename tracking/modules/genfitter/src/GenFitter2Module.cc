@@ -23,8 +23,8 @@
 #include <pxd/dataobjects/PXDTrueHit.h>
 #include <framework/logging/Logger.h>
 #include <cdc/dataobjects/CDCRecoHit.h>
-#include <svd/dataobjects/SVDRecoHit2D.h>
-#include <pxd/dataobjects/PXDRecoHit.h>
+#include <svd/reconstruction/SVDRecoHit2D.h>
+#include <pxd/reconstruction/PXDRecoHit.h>
 
 #include <pxd/dataobjects/PXDTrueHit.h> //delete when not needed any more
 #include <svd/dataobjects/SVDTrueHit.h>
@@ -120,7 +120,7 @@ void GenFitter2Module::event()
 
   StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
   int eventCounter = eventMetaDataPtr->getEvent();
-  B2INFO("**********   GenFitter2Module  processing event number: " << eventCounter << " ************");
+  B2DEBUG(99, "**********   GenFitter2Module  processing event number: " << eventCounter << " ************");
   StoreArray<GFTrackCand> trackCandidates("");
   int nTrackCandidates = trackCandidates.getEntries();
   if (nTrackCandidates not_eq 0) {  // only try to access a track candidate if there is one
@@ -152,7 +152,7 @@ void GenFitter2Module::event()
     if (m_filter == true) {
       if (nTrackCandHits not_eq 6) {
         filterEvent = true;
-        B2INFO("Not exacly one hit in very Si layer. Track "  << eventCounter << " will not be reconstructed");
+        B2DEBUG(99, "Not exacly one hit in very Si layer. Track "  << eventCounter << " will not be reconstructed");
         ++m_notPerfectCounter;
       } else {
         vector<int> layerIds(nTrackCandHits);
@@ -173,7 +173,7 @@ void GenFitter2Module::event()
         for (int l = 0; l not_eq nTrackCandHits; ++l) {
           if (l + 1 not_eq layerIds[l]) {
             filterEvent = true;
-            B2INFO("Not exacly one hit in very Si layer. Track "  << eventCounter << " will not be reconstructed");
+            B2DEBUG(99, "Not exacly one hit in very Si layer. Track "  << eventCounter << " will not be reconstructed");
             ++m_notPerfectCounter;
             break;
           }
@@ -197,12 +197,12 @@ void GenFitter2Module::event()
 
 
 
-      //B2INFO("MCIndex: "<<mcindex);
-      B2INFO("Start values: momentum: " << momentum.x() << "  " << momentum.y() << "  " << momentum.z() << " " << momentum.Mag());
-      B2INFO("Start values: direction std: " << dirSigma.x() << "  " << dirSigma.y() << "  " << dirSigma.z());
-      B2INFO("Start values: vertex:   " << vertex.x() << "  " << vertex.y() << "  " << vertex.z());
-      B2INFO("Start values: vertex std:   " << vertexSigma.x() << "  " << vertexSigma.y() << "  " << vertexSigma.z());
-      B2INFO("Start values: pdg:      " << aTrackCandPointer->getPdgCode());
+      //B2DEBUG(99,"MCIndex: "<<mcindex);
+      B2DEBUG(99, "Start values: momentum: " << momentum.x() << "  " << momentum.y() << "  " << momentum.z() << " " << momentum.Mag());
+      B2DEBUG(99, "Start values: direction std: " << dirSigma.x() << "  " << dirSigma.y() << "  " << dirSigma.z());
+      B2DEBUG(99, "Start values: vertex:   " << vertex.x() << "  " << vertex.y() << "  " << vertex.z());
+      B2DEBUG(99, "Start values: vertex std:   " << vertexSigma.x() << "  " << vertexSigma.y() << "  " << vertexSigma.z());
+      B2DEBUG(99, "Start values: pdg:      " << aTrackCandPointer->getPdgCode());
       GFAbsTrackRep* trackRep;
       //Now create a GenFit track with this representation
 
@@ -233,7 +233,7 @@ void GenFitter2Module::event()
       track.addHitVector(factoryHits);
       track.setCandidate(*aTrackCandPointer);
 
-      B2INFO("Total Nr of Hits assigned to the Track: " << track.getNumHits());
+      B2DEBUG(99, "Total Nr of Hits assigned to the Track: " << track.getNumHits());
 
       //process track (fit them!)
       if (m_useDaf == false) {
@@ -243,11 +243,11 @@ void GenFitter2Module::event()
       }
 
       int genfitStatusFlag = trackRep->getStatusFlag();
-      B2INFO("----> Status of fit: " << genfitStatusFlag);
-      B2INFO("-----> Fit Result: momentum: " << track.getMom().x() << "  " << track.getMom().y() << "  " << track.getMom().z() << " " << track.getMom().Mag());
-      B2INFO("-----> Fit Result: current position: " << track.getPos().x() << "  " << track.getPos().y() << "  " << track.getPos().z());
-      B2INFO("----> Chi2 of the fit: " << track.getChiSqu());
-      B2INFO("----> NDF of the fit: " << track.getNDF());
+      B2DEBUG(99, "----> Status of fit: " << genfitStatusFlag);
+      B2DEBUG(99, "-----> Fit Result: momentum: " << track.getMom().x() << "  " << track.getMom().y() << "  " << track.getMom().z() << " " << track.getMom().Mag());
+      B2DEBUG(99, "-----> Fit Result: current position: " << track.getPos().x() << "  " << track.getPos().y() << "  " << track.getPos().z());
+      B2DEBUG(99, "----> Chi2 of the fit: " << track.getChiSqu());
+      B2DEBUG(99, "----> NDF of the fit: " << track.getNDF());
       /*    track.Print();
           for ( int iHit = 0; iHit not_eq track.getNumHits(); ++iHit){
             track.getHit(iHit)->Print();
@@ -268,7 +268,7 @@ void GenFitter2Module::event()
 void GenFitter2Module::endRun()
 {
   if (m_notPerfectCounter != 0) {
-    B2WARNING(m_notPerfectCounter << " of " << m_fitCounter + m_failedFitCounter + m_notPerfectCounter << " tracks had not exactly on hit in every layer and were not fitted");
+    B2INFO(m_notPerfectCounter << " of " << m_fitCounter + m_failedFitCounter + m_notPerfectCounter << " tracks had not exactly on hit in every layer and were not fitted");
   }
   if (m_failedFitCounter != 0) {
     B2WARNING(m_failedFitCounter << " of " << m_fitCounter + m_failedFitCounter << " tracks could not be fitted in this run");

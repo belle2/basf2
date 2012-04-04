@@ -105,7 +105,7 @@ void GenFitter2Module::initialize()
     GFMaterialEffects::getInstance()->setEnergyLossBrems(m_energyLossBrems);
     GFMaterialEffects::getInstance()->setNoiseBrems(m_noiseBrems);
   }
-  GFMaterialEffects::getInstance()->setMscModel(m_mscModel);
+  //GFMaterialEffects::getInstance()->setMscModel(m_mscModel);
   StoreArray<GFTrack> fittedTracks(""); //initialization of the the output container of this module
 
   //set options for fitting algorithms

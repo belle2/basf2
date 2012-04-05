@@ -49,6 +49,14 @@ eclDigi = register_module('ECLDigi')
 eclRecShower = register_module('ECLRecCR')
 makeGamma = register_module('ECLRecGamma')
 makePi0 = register_module('ECLRecPi0')
+param_Gamma = {
+    'gammaEnergyCut': 0.02,
+    'gammaE9o25Cut': 0.75,
+    'gammaWidthCut': 6.0,
+    'gammaNhitsCut': 0,
+    }
+
+makeGamma.param(param_Gamma)
 
 simpleoutput.param('outputFileName', 'output.root')
 

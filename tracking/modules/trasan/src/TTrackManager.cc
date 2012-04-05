@@ -1492,7 +1492,7 @@ TTrackManager::removeHitsAcrossOverIp(AList<TLink> & l) const {
     for (unsigned i = 0; i < n; i++) {
 	const Belle2::TRGCDCWire & w = l[i]->hit()->wire();
 	unsigned j = w.localId();
-	unsigned nWire = w.layer().nWires();
+	unsigned nWire = w.layer().nCells();
 
 	float phi = (float) j / (float) nWire;
 	phiSum += phi;
@@ -1503,7 +1503,7 @@ TTrackManager::removeHitsAcrossOverIp(AList<TLink> & l) const {
     for (unsigned i = 0; i < n; i++) {
 	const Belle2::TRGCDCWire & w = l[i]->hit()->wire();
 	unsigned j = w.localId();
-	unsigned nWire = w.layer().nWires();
+	unsigned nWire = w.layer().nCells();
 
 	float phi = (float) j / (float) nWire;
 	float dif = fabs(phi - average);

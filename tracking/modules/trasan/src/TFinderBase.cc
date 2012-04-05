@@ -285,7 +285,8 @@ TFinderBase::crossPointsByLayer(const TCircle & circle,
       RR = new float [cdc.nLayers()];
       RR2 = new float [cdc.nLayers()];
 	for (unsigned i = i0; i < cdc.nLayers(); i++) {
-	    const Belle2::TRGCDCWire & w = * (* cdc.layer(i))[0];
+//	    const Belle2::TRGCDCWire & w = * (* cdc.layer(i))[0];
+	    const Belle2::TRGCDCWire & w = * cdc.wire(i, 0);
 	    RR[i] = w.xyPosition().perp();
 	    RR2[i] = RR[i] * RR[i];
 	}

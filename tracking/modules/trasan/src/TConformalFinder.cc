@@ -783,7 +783,7 @@ TConformalFinder::findSegments(void) {
     std::vector<THistogram *> hist;
     //    THistogram * hist[11];
     for(unsigned i=0; i<nSuperLayers; ++i) {
-      unsigned nw = (*cdc.superLayer(i))[0]->nWires();
+      unsigned nw = (*cdc.superLayer(i))[0]->nCells();
       if(cdc.versionCDC()=="small cell" && i==0) {
 	nw = 64;
       }

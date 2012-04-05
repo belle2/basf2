@@ -1223,7 +1223,7 @@ TBuilderCurl::check(const TTrack &track) const {
 
 //   if(ms_superb) {
 //     const TRGCDCLayer &l=*cdc.layer(layerId);
-//     maxLocalId = l.nWires() - 1;
+//     maxLocalId = l.nCells() - 1;
 //   } else {
 //     if(layerId >= 15)maxLocalId = 127;
 //     if(layerId >= 23)maxLocalId = 159;
@@ -1260,7 +1260,7 @@ TBuilderCurl::check(const TTrack &track) const {
 //   int maxLocalId = 79;
 //   if(ms_superb) {
 //     const TRGCDCLayer &l=*cdc.layer(layerId);
-//     maxLocalId = l.nWires() - 1;
+//     maxLocalId = l.nCells() - 1;
 //   } else {
 //     if(layerId >= 15)maxLocalId = 127;
 //     if(layerId >= 23)maxLocalId = 159;
@@ -1287,7 +1287,7 @@ TBuilderCurl::offsetBorder(TLink *l){
   int layerId = l->hit()->wire().layerId();
   if(ms_superb) {
     const Belle2::TRGCDCLayer &l=*cdc.layer(layerId);
-    return l.nWires();
+    return l.nCells();
   } else {
     int maxLocalId = 79;
     if(layerId >= 15)maxLocalId = 127;
@@ -1339,7 +1339,7 @@ TBuilderCurl::sortByLocalId(AList<TLink> &list) const{
   int maxLocalId;
   if(ms_superb) {
     const Belle2::TRGCDCLayer &l=*cdc.layer(layerId);
-    maxLocalId = l.nWires() - 1;
+    maxLocalId = l.nCells() - 1;
   } else {
     if(layerId < 15)maxLocalId = 79;
     else if(layerId >= 15)maxLocalId = 127;
@@ -1597,7 +1597,7 @@ TBuilderCurl::findMaxLocalId(unsigned superLayerId){
   const std::vector<Belle2::TRGCDCLayer *> & sl = * cdc.superLayer(superLayerId);
   unsigned maxLocalId = 79;
   if(ms_superb) {
-    maxLocalId = sl[0]->nWires() - 1;
+    maxLocalId = sl[0]->nCells() - 1;
     return maxLocalId;
   } else {
     if(superLayerId == 3)maxLocalId = 127;

@@ -270,7 +270,7 @@ THoughFinder::selectGoodHits(const CAList<Belle2::TRGCDCWireHit> & axial,
 	    if (idt == 0) {
 		l0 = & t;
 	    }
-	    else if (idu == wu.layer().nWires() - 1) {
+	    else if (idu == wu.layer().nCells() - 1) {
 		if (l0) {
 		    if (l0->wire()->layerId() == wu.layerId()) {
 			u.neighbor(3, l0);
@@ -299,7 +299,7 @@ THoughFinder::selectGoodHits(const CAList<Belle2::TRGCDCWireHit> & axial,
 	    if (idt == 0) {
 		l0 = & t;
 	    }
-	    else if (idu == wu.layer().nWires() - 1) {
+	    else if (idu == wu.layer().nCells() - 1) {
 		if (l0) {
 		    if (l0->wire()->layerId() == wu.layerId()) {
 			u.neighbor(3, l0);
@@ -2584,12 +2584,13 @@ THoughFinder::init(void) {
 
     for (unsigned i = 0; i < cdc.nLayers(); i++) {
 	const Belle2::TRGCDCLayer * l = cdc.layer(i);
-	const unsigned nWires = l->nWires();
+	const unsigned nWires = l->nCells();
 	if (! nWires) continue;
 	_planeHP2->preparePatterns(i, nWires);
 	_planeHM2->preparePatterns(i, nWires);
 	for (unsigned j = 0; j < nWires; j++) {
-	    const Belle2::TRGCDCWire & w = * (* l)[j];
+//	    const Belle2::TRGCDCWire & w = * (* l)[j];
+	    const Belle2::TRGCDCWire & w = * cdc.wire(i, j);
 	    const float x = w.xyPosition().x();
 	    const float y = w.xyPosition().y();
 
@@ -2784,7 +2785,7 @@ THoughFinder::init(void) {
 #if 0
     for (unsigned i = 0; i < cdc.nLayers(); i++) {
 	const Belle2::TRGCDCLayer * l = cdc.layer(i);
-	if (! l->nWires()) continue;
+	if (! l->nCells()) continue;
 	const float r = l->wire(0)->xyPosition().perp();
 	_planeHP.vote(r, 0, +1, _circleHough, 1, i);
 	_planeHP.pattern(i);
@@ -2793,7 +2794,7 @@ THoughFinder::init(void) {
 	_planeHM.pattern(i);
 	_planeHM.clear();
 
-	const unsigned nWires = l->nWires();
+	const unsigned nWires = l->nCells();
 	unsigned ** patterns = new unsigned * [nWires];
 	unsigned * nPatterns = new unsigned [nWires];
 	for (unsigned j = 0; j < nWires; j++) {

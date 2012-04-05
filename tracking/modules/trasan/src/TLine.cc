@@ -274,7 +274,7 @@ TLine::fit2() {
 //           int ilast = nsl[l.hit()->wire().superLayerId()]-1;
 	     int ilast =
 		 (* (cdc.superLayer(l.hit()->wire().superLayerId())))[0]
-		 ->nWires();
+		 ->nCells();
              int ilocal = l.hit()->wire().localId();
              int jlocal = s.hit()->wire().localId();
              if(ilocal > 0 && ilocal < ilast){
@@ -509,7 +509,7 @@ TLine::fit2p() {
 //           int ilast = nsl[l.hit()->wire().superLayerId()]-1;
 	     int ilast =
 		 (* (cdc.superLayer(l.hit()->wire().superLayerId())))[0]
-		 ->nWires();
+		 ->nCells();
              int ilocal = l.hit()->wire().localId();
              int jlocal = s.hit()->wire().localId();
              if(ilocal > 0 && ilocal < ilast){

@@ -557,44 +557,47 @@ namespace Belle2 {
         assemblyBwDiodes->MakeImprint(logical_ecl, Global_offset);
       }
 
-      double BarrelCylinderWZ[6]    = {k_c2z1, k_c2z2, k_c2z2, k_c1z2, k_c1z2, k_c1z3};
-      double BarrelCylinderWRin[6]  = {k_c2r1, k_c2r1, k_c2r1, k_c1r1, k_c1r1, k_c1r1};
-      double BarrelCylinderWRout[6] = {k_c2r3, k_c2r3, k_c2r2, k_c1r2, k_c1r3, k_c1r3};
+
+      bool isFastSimulation = false;
+      if (!isFastSimulation) {
+        double BarrelCylinderWZ[6]    = {k_c2z1, k_c2z2, k_c2z2, k_c1z2, k_c1z2, k_c1z3};
+        double BarrelCylinderWRin[6]  = {k_c2r1, k_c2r1, k_c2r1, k_c1r1, k_c1r1, k_c1r1};
+        double BarrelCylinderWRout[6] = {k_c2r3, k_c2r3, k_c2r2, k_c1r2, k_c1r3, k_c1r3};
 
 
-      G4Polycone* BarrelCylinderWorld = new G4Polycone("BarrelCylinderWorld", 0, 2 * PI, 6, BarrelCylinderWZ, BarrelCylinderWRin, BarrelCylinderWRout);
-      G4LogicalVolume* logical_BarrelCylinder = new G4LogicalVolume(BarrelCylinderWorld, medAir, "logical_BarrelCylinderWorld");
-      physical_ECLBarrelCylinder = new G4PVPlacement(0, G4ThreeVector(0., 0., 0.), logical_BarrelCylinder, "physicalBarrelCylinder", &topVolume, false, 0);
-      G4AssemblyVolume* assemblyBarrelCylinderSupport = new G4AssemblyVolume();
+        G4Polycone* BarrelCylinderWorld = new G4Polycone("BarrelCylinderWorld", 0, 2 * PI, 6, BarrelCylinderWZ, BarrelCylinderWRin, BarrelCylinderWRout);
+        G4LogicalVolume* logical_BarrelCylinder = new G4LogicalVolume(BarrelCylinderWorld, medAir, "logical_BarrelCylinderWorld");
+        physical_ECLBarrelCylinder = new G4PVPlacement(0, G4ThreeVector(0., 0., 0.), logical_BarrelCylinder, "physicalBarrelCylinder", &topVolume, false, 0);
+        G4AssemblyVolume* assemblyBarrelCylinderSupport = new G4AssemblyVolume();
 
-      double BarrelCylinder1Z[4] = {k_c1z1, k_c1z2, k_c1z2, k_c1z3};
-      double BarrelCylinder1Rin[4] = {k_c1r1, k_c1r1, k_c1r1, k_c1r1};
-      double BarrelCylinder1Rout[4] = {k_c1r2, k_c1r2, k_c1r3, k_c1r3};
+        double BarrelCylinder1Z[4] = {k_c1z1, k_c1z2, k_c1z2, k_c1z3};
+        double BarrelCylinder1Rin[4] = {k_c1r1, k_c1r1, k_c1r1, k_c1r1};
+        double BarrelCylinder1Rout[4] = {k_c1r2, k_c1r2, k_c1r3, k_c1r3};
 
-      G4Polycone* barCy1 =
-        new G4Polycone("ECL Barrel Support Cylinder", 0 * deg, 360.*deg, 4, BarrelCylinder1Z, BarrelCylinder1Rin, BarrelCylinder1Rout);
-
-
-      double BarrelCylinder2Z[4] = {k_c2z1, k_c2z2, k_c2z2, k_c2z3};
-      double BarrelCylinder2Rin[4] = {k_c2r1, k_c2r1, k_c2r1, k_c2r1};
-      double BarrelCylinder2Rout[4] = {k_c2r3, k_c2r3, k_c2r2, k_c1r2};
-
-      G4Polycone* barCy2 =
-        new G4Polycone("ECL Barrel Support Cylinder", 0 * deg, 360.*deg, 4, BarrelCylinder2Z, BarrelCylinder2Rin, BarrelCylinder2Rout);
-
-      G4LogicalVolume* barCy1_logi = new G4LogicalVolume(barCy1, Materials::get("G4_Fe"), "ECLBarrelSupportCylinder1", 0, 0, 0);
-      G4LogicalVolume* barCy2_logi = new G4LogicalVolume(barCy2, Materials::get("G4_Fe"), "ECLBarrelSupportCylinder2", 0, 0, 0);
+        G4Polycone* barCy1 =
+          new G4Polycone("ECL Barrel Support Cylinder", 0 * deg, 360.*deg, 4, BarrelCylinder1Z, BarrelCylinder1Rin, BarrelCylinder1Rout);
 
 
-      assemblyBarrelCylinderSupport->AddPlacedVolume(barCy1_logi, Global_offset);
-      assemblyBarrelCylinderSupport->AddPlacedVolume(barCy2_logi, Global_offset);
-      assemblyBarrelCylinderSupport->MakeImprint(logical_BarrelCylinder, Global_offset);
+        double BarrelCylinder2Z[4] = {k_c2z1, k_c2z2, k_c2z2, k_c2z3};
+        double BarrelCylinder2Rin[4] = {k_c2r1, k_c2r1, k_c2r1, k_c2r1};
+        double BarrelCylinder2Rout[4] = {k_c2r3, k_c2r3, k_c2r2, k_c1r2};
+
+        G4Polycone* barCy2 =
+          new G4Polycone("ECL Barrel Support Cylinder", 0 * deg, 360.*deg, 4, BarrelCylinder2Z, BarrelCylinder2Rin, BarrelCylinder2Rout);
+
+        G4LogicalVolume* barCy1_logi = new G4LogicalVolume(barCy1, Materials::get("G4_Fe"), "ECLBarrelSupportCylinder1", 0, 0, 0);
+        G4LogicalVolume* barCy2_logi = new G4LogicalVolume(barCy2, Materials::get("G4_Fe"), "ECLBarrelSupportCylinder2", 0, 0, 0);
 
 
-      makeEndcap(0);
-      makeEndcap(1);
-      makeSupport();
+        assemblyBarrelCylinderSupport->AddPlacedVolume(barCy1_logi, Global_offset);
+        assemblyBarrelCylinderSupport->AddPlacedVolume(barCy2_logi, Global_offset);
+        assemblyBarrelCylinderSupport->MakeImprint(logical_BarrelCylinder, Global_offset);
 
+
+        makeEndcap(0);
+        makeEndcap(1);
+        makeSupport();
+      }
 
 
     }//create

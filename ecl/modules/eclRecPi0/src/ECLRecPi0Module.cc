@@ -156,6 +156,7 @@ void ECLRecPi0Module::event()
           Pi0Array[m_Pi0Num]->setmassfit(m_pi0mass);
           Pi0Array[m_Pi0Num]->setchi2(m_pi0chi2);
 
+          //cout<< "Event " << m_nEvent <<" Pi0 from Gamma "<< m_showerId1<<" "<<m_showerId2<<" "<<m_pi0E<<" "<<m_pi0mass<<endl;
 
         }
       } else if (pi0_mass_min < mass && mass < pi0_mass_max) {

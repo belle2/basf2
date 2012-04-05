@@ -155,6 +155,8 @@ void ECLRecGammaModule::event()
       gammaArray[m_GNum]->setpx(px);
       gammaArray[m_GNum]->setpy(py);
       gammaArray[m_GNum]->setpz(pz);
+
+      //cout<<"Event  "<<m_nEvent<<" Gamma "<<m_showerId<<" "<<sqrt(px*px+py*py+pz*pz)<<endl;
     }//if !m_extMatch
 
 

@@ -15,6 +15,9 @@
 #include <vxd/dataobjects/VXDTrueHit.h>
 
 namespace Belle2 {
+  /** \addtogroup dataobjects
+    * @{
+    */
 
   /**
     * Class PXDTrueHit - Position where are particle traversed the detector plane.
@@ -28,8 +31,6 @@ namespace Belle2 {
     * This class holds particle hit data from geant4 simulation. As the simulated
     * hit classes are used to generate detector response, they contain _local_
     * information.
-    *
-    * \addtogroup dataobjects
     */
   class PXDTrueHit : public VXDTrueHit {
   public:
@@ -67,6 +68,8 @@ namespace Belle2 {
     {}
     ClassDef(PXDTrueHit, 3)
   };
+
+  /** @}*/
 
 } // end namespace Belle2
 

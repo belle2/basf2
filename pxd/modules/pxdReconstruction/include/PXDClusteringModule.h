@@ -23,6 +23,9 @@
 namespace Belle2 {
 
   namespace PXD {
+    /** \addtogroup modules
+     * @{
+     */
 
     /** The PXDClustering module.
      *
@@ -48,8 +51,6 @@ namespace Belle2 {
      * graph.relation(PXDCluster, PXDDigit)
      * graph.relation(PXDCluster, PXDTrueHit)
      * \endcorrelationdiagram
-     *
-     * \addtogroup modules
      */
     class PXDClusteringModule : public Module {
 
@@ -120,6 +121,8 @@ namespace Belle2 {
       NoiseMap m_noiseMap;
 
     };//end class declaration
+
+    /** @}*/
 
   } //end PXD namespace;
 } // end namespace Belle2

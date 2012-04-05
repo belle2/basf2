@@ -16,18 +16,17 @@
 #include <TObject.h>
 
 namespace Belle2 {
+  /** \addtogroup dataobjects
+    * @{
+    */
 
   /**
    * The PXD digit class.
    *
    * This is a development implementation which is intentionally kept
    * somewhat bulky. The coordinates probably won't be kept in future.
-    *
-    * \addtogroup dataobjects
    */
-
   class PXDDigit : public TObject {
-
   public:
 
     /** Default constructor for the ROOT IO. */
@@ -96,6 +95,7 @@ namespace Belle2 {
 
   }; // class PXDDigit
 
+  /** @}*/
 
 } // end namespace Belle2
 

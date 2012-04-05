@@ -30,7 +30,7 @@ namespace Belle2 {
      */
     class GeoCache {
     public:
-      /** desttructor to clean up structures */
+      /** destructor to clean up structures */
       ~GeoCache() { clear(); };
 
 

@@ -84,6 +84,10 @@ namespace Belle2 {
     /** Map of all hits in all Sensors */
     typedef std::map<VxdID, Sensor> Sensors;
 
+    /** \addtogroup modules
+     * @{
+     */
+
     /** The PXD Digitizer module.
      * This module is responsible for converting the simulated energy
      * deposition from Geant4 into real PXD detector response of single pixles.
@@ -101,8 +105,6 @@ namespace Belle2 {
      * graph.relation(PXDDigit,   MCParticle)
      * graph.relation(PXDDigit,   PXDTrueHit)
      * \endcorrelationdiagram
-     *
-     * \addtogroup modules
      */
     class PXDDigitizerModule : public Module {
     public:
@@ -231,6 +233,9 @@ namespace Belle2 {
       TH2D*  m_histDiffusion;
 
     };//end class declaration
+
+    /** @}*/
+
   } // end namespace PXD
 } // end namespace Belle2
 

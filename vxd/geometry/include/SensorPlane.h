@@ -13,6 +13,9 @@
 
 #include <vxd/dataobjects/VxdID.h>
 #include <vxd/geometry/SensorInfoBase.h>
+#include <framework/logging/Logger.h>
+//ROOT CINT has problems with the boost classes used by the GeoCache but it
+//does not need to see them anyway
 #ifndef __CINT__
 #include <vxd/geometry/GeoCache.h>
 #endif
@@ -45,10 +48,17 @@ namespace Belle2 {
        */
       bool inActive(const double& u, const double& v) const {
 #ifndef __CINT__
+        //If running in ROOT CINT we do not now about GeoCache so we cannot get
+        //the SensorInfo
         if (!m_sensorInfo) {
           m_sensorInfo = &VXD::GeoCache::get(m_sensorID);
+
         }
 #endif
+        //No sensorInfo set so we have to bail
+        if (!m_sensorInfo) {
+          B2FATAL("Could not find sensorInfo for VXD Sensor " << VxdID(m_sensorID));
+        }
         return m_sensorInfo->inside(u, v, m_uTolerance, m_vTolerance);
       }
 

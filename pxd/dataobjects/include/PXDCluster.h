@@ -15,12 +15,13 @@
 #include <vxd/dataobjects/VxdID.h>
 
 namespace Belle2 {
+  /** \addtogroup dataobjects
+    * @{
+    */
 
   /** The PXD Cluster class
-   * This class stores all information about reconstructed PXD clusters
-    *
-    * \addtogroup dataobjects
-   */
+    * This class stores all information about reconstructed PXD clusters
+    */
   class PXDCluster: public TObject {
   public:
 
@@ -108,7 +109,9 @@ namespace Belle2 {
     unsigned short m_vStart;   /**< Start row of the cluster */
 
     ClassDef(PXDCluster, 1)
-
   };
+
+  /** @}*/
+
 } //Belle2 namespace
 #endif

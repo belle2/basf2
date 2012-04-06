@@ -175,6 +175,7 @@ void ECLHitModule::event()
     }//16 Time interval 16x 500 ns
   } //store  each crystal hit
 
+  eclArray->Delete();
   m_nEvent++;
 }
 

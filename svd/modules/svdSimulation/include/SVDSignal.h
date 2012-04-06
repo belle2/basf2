@@ -41,11 +41,13 @@ namespace Belle2 {
 
       /** Type to store contributions to strip signal by different particles */
       typedef std::map<RelationElement::index_type, RelationElement::weight_type> relations_map;
+      /** Value type to contain strip signal contributions by different particles in a map */
       typedef std::map<RelationElement::index_type, RelationElement::weight_type>::value_type relation_value_type;
       /** Type to store elementary waveforms.
        *  Waveforms are parameterized (in this order) by scale factor (charge), time constant, and width.
        */
       typedef std::deque< boost::tuple<double, double, double> > function_list;
+      /** Value type of the elementary waveform list */
       typedef std::deque< boost::tuple<double, double, double> >::value_type function_list_value_type;
 
       /** Default constructor */

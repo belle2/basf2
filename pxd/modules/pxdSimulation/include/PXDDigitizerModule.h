@@ -91,20 +91,21 @@ namespace Belle2 {
     /** The PXD Digitizer module.
      * This module is responsible for converting the simulated energy
      * deposition from Geant4 into real PXD detector response of single pixles.
-     *
-     * \correlationdiagram
-     * MCParticle = graph.external_data('MCParticle')
-     * PXDSimHit  = graph.data('PXDSimHit')
-     * PXDTrueHit = graph.data('PXDTrueHit')
-     * PXDDigit   = graph.data('PXDDigit')
-     *
-     * graph.module('PXDDigitizer', [MCParticle, PXDSimHit, PXDTrueHit], [PXDDigit])
-     * graph.relation(MCParticle, PXDSimHit)
-     * graph.relation(MCParticle, PXDTrueHit)
-     * graph.relation(PXDTrueHit, PXDSimHit)
-     * graph.relation(PXDDigit,   MCParticle)
-     * graph.relation(PXDDigit,   PXDTrueHit)
-     * \endcorrelationdiagram
+
+       \correlationdiagram
+       MCParticle = graph.external_data('MCParticle')
+       PXDSimHit  = graph.data('PXDSimHit')
+       PXDTrueHit = graph.data('PXDTrueHit')
+       PXDDigit   = graph.data('PXDDigit')
+
+       graph.module('PXDDigitizer', [MCParticle, PXDSimHit, PXDTrueHit], [PXDDigit])
+       graph.relation(MCParticle, PXDSimHit)
+       graph.relation(MCParticle, PXDTrueHit)
+       graph.relation(PXDTrueHit, PXDSimHit)
+       graph.relation(PXDDigit,   MCParticle)
+       graph.relation(PXDDigit,   PXDTrueHit)
+       \endcorrelationdiagram
+
      */
     class PXDDigitizerModule : public Module {
     public:

@@ -21,6 +21,8 @@
 #include <valgrind/callgrind.h>
 #endif
 
+#include <signal.h>
+
 using namespace std;
 using namespace Belle2;
 
@@ -68,15 +70,23 @@ void EventProcessor::process(PathPtr startPath, long maxEvent)
 //============================================================================
 //                            Protected methods
 //============================================================================
+static bool ctrl_c = false;
+static void signalHandler(int)
+{
+  ctrl_c = true;
+}
 
 void EventProcessor::processInitialize(const ModulePtrList& modulePathList)
 {
+  if (signal(SIGINT, signalHandler) == SIG_ERR) {
+    B2FATAL("Cannot setup signal handler\n");
+  }
 #ifdef HAS_CALLGRIND
   CALLGRIND_ZERO_STATS;
 #endif
   LogSystem& logSystem = LogSystem::Instance();
   ModulePtrList::const_iterator listIter;
-  ModuleStatistics &stats = ModuleStatistics::getInstance();
+  ModuleStatistics& stats = ModuleStatistics::getInstance();
   stats.startGlobal(ModuleStatistics::c_Init);
   DataStore::Instance().setInitializeActive(true);
 
@@ -127,7 +137,7 @@ void EventProcessor::processCore(PathPtr startPath, const ModulePtrList& moduleP
   //Pointer to master module;
   Module* master = 0;
 
-  ModuleStatistics &stats = ModuleStatistics::getInstance();
+  ModuleStatistics& stats = ModuleStatistics::getInstance();
 
   //Loop over the events
   while (!endProcess) {
@@ -228,7 +238,7 @@ void EventProcessor::processCore(PathPtr startPath, const ModulePtrList& moduleP
 
     currEvent++;
     if ((maxEvent > 0) && (currEvent >= maxEvent)) endProcess = true;
-
+    if (ctrl_c) endProcess = true;
     stats.stopGlobal(ModuleStatistics::c_Event);
   }
 #ifdef HAS_CALLGRIND
@@ -251,7 +261,7 @@ void EventProcessor::processTerminate(const ModulePtrList& modulePathList)
 #endif
   LogSystem& logSystem = LogSystem::Instance();
   ModulePtrList::const_reverse_iterator listIter;
-  ModuleStatistics &stats = ModuleStatistics::getInstance();
+  ModuleStatistics& stats = ModuleStatistics::getInstance();
   stats.startGlobal(ModuleStatistics::c_Term);
 
   for (listIter = modulePathList.rbegin(); listIter != modulePathList.rend(); listIter++) {
@@ -285,7 +295,7 @@ void EventProcessor::processBeginRun(const ModulePtrList& modulePathList)
 #endif
   LogSystem& logSystem = LogSystem::Instance();
   ModulePtrList::const_iterator listIter;
-  ModuleStatistics &stats = ModuleStatistics::getInstance();
+  ModuleStatistics& stats = ModuleStatistics::getInstance();
   stats.startGlobal(ModuleStatistics::c_BeginRun);
 
   for (listIter = modulePathList.begin(); listIter != modulePathList.end(); listIter++) {
@@ -317,7 +327,7 @@ void EventProcessor::processEndRun(const ModulePtrList& modulePathList)
 #endif
   LogSystem& logSystem = LogSystem::Instance();
   ModulePtrList::const_iterator listIter;
-  ModuleStatistics &stats = ModuleStatistics::getInstance();
+  ModuleStatistics& stats = ModuleStatistics::getInstance();
   stats.startGlobal(ModuleStatistics::c_EndRun);
 
   for (listIter = modulePathList.begin(); listIter != modulePathList.end(); listIter++) {

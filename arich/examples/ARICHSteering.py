@@ -1,108 +1,124 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import os
+##############################################################################
+#
+# This is an example steering file to run ARICH part of Belle2 simulation.
+# It uses ParicleGun module to generate tracks,
+# (see "generators/example/ParticleGunFull.py" for detailed usage)
+# builds ARICH geometry, performs geant4 simulation, does ARICH reconstruction
+# and stores output (for each track a value of likelihood for different
+# particle hypotheses, etc.) in an output root file.
+#
+##############################################################################
+
 from basf2 import *
-logging.log_level = LogLevel.INFO
 
-# Uncomment the line below to set the environment variable to automatically start the VRML viewer
-# for example http://freewrl.sourceforge.net/
-os.environ['G4VRMLFILE_VIEWER'] = 'freewrl'
+# suppress messages and warnings during processin
+set_log_level(LogLevel.ERROR)
 
-# -------------------------
-# here we register modules
-# -------------------------
+# to run the framework the used modules need to be registered
 
-# creates event meta data
+# Particle gun module
+particlegun = register_module('ParticleGun')
+# Create Event information
 evtmetagen = register_module('EvtMetaGen')
-# Load XML parameters
-paramloader = register_module('Gearbox')
-# Create Geometry
-geobuilder = register_module('Geometry')
-# Particle gun
-pguninput = register_module('PGunInput')
-# Simulation module
-g4sim = register_module('FullSim')
-# ARICH digitizer module
-arichDigi = register_module('ARICHDigi')
+# Show progress of processing
+progress = register_module('Progress')
+# Load parameters
+gearbox = register_module('Gearbox')
+# Create geometry
+geometry = register_module('Geometry')
+# Run simulation
+simulation = register_module('FullSim')
+# ARICH digitization module
+arichDIGI = register_module('ARICHDigi')
 # ARICH reconstruction module
-arichRec = register_module('ARICHRec')
-# Module to save the data in DataStore into root file
-# output = register_module('SimpleOutput')
+arichRECO = register_module('ARICHRec')
+# Save output of simulation
+output = register_module('SimpleOutput')
 
-# --------------------------------------
-# here we set the parameters of modules
-# --------------------------------------
+# ============================================================================
+# Setting the random seed for particle generation:
+set_random_seed(1028307)
 
-# set number of events in each run
-evtmetagen.param('EvtNumList', [2])
-# set number of runs
-evtmetagen.param('RunList', [1])
+# ============================================================================
+# Setting the list of particle codes (PDG codes) for the generated particles
+particlegun.param('pdgCodes', [-11, 11])
 
-# select which sub-detectors you want to be built
-geobuilder.param('Components', ['ARICH', 'TOP'])
-# alternatively you can select which sub-detectors you want to exclude:
-# geobuilder.param("ExcludedComponents", ["BeamPipe", "SVD"])
+# ============================================================================
+# Setting the number of tracks to be generated per event:
+particlegun.param('nTracks', 1)
 
-# This line is necessary if you want to simulate Cerenkov photons!
-# By default optical processes are not registered.
-g4sim.param('RegisterOptics', 1)
-# To speed up the simulation you can propagate only a selected fraction of photons.
-# By default all photons are propagated.
-g4sim.param('PhotonFraction', 0.3)
-# Set up the visualization
-g4sim.param('EnableVisualization', True)
+# if you set nTracks to 0, then for each PDG code in pdgCodes list a track
+# will be generated on each event.
+
+# ============================================================================
+# Setting the parameters for the random generation
+# of particles momenta:
+particlegun.param('momentumGeneration', 'uniform')
+particlegun.param('momentumParams', [1, 3])
+
+# ============================================================================
+# Setting the parameters for the random generation
+# of the particle polar angle:
+particlegun.param('thetaGeneration', 'uniform')
+particlegun.param('thetaParams', [17, 35])
+
+# ============================================================================
+# Print the parameters of the particle gun
+print_params(particlegun)
+
+# Set the number of events to be processed (10 event)
+evtmetagen.param({'EvtNumList': [10], 'RunList': [1]})
+
+# Set output filename
+output.param('outputFileName', 'ParticleGunOutput.root')
+
+# Select subdetectors to be built
+geometry.param('Components', ['ARICH'])
+
+# If you comment this out all subdetectors will be built. If you want to
+# include just some of them do for example ['ARICH','TOP','CDC'].
+
+# ============================================================================
+# To speed up the simulation you can propagate only a selected fraction of
+# photons.
+simulation.param('PhotonFraction', 0.3)
+
+# !!! NOTE: if you use ARICH digitization module this must be set to 0.3
+# since HAPD q.e. curve is scaled to that value
+# (will be solved in one of next releases)
+
+# ============================================================================
 # Here you can select visualization driver and visualization commands.
-# This creates VRML file, change VRML2FILE to HepRepFile to create HepRep file.
-g4sim.param('UICommands', ['/vis/open VRML2FILE', '/vis/drawVolume',
-            '/vis/scene/add/axes 0 0 0 100 mm',
-            '/vis/scene/add/trajectories smooth',
-            '/vis/modeling/trajectories/create/drawByCharge'])
-# short explanation of above commands:
-# g4sim.param('UICommands', [
-## Use VRML2 backend
-    # '/vis/open VRML2FILE',
-## Draw the geometry
-    # '/vis/drawVolume',
-## Draw coordinate axes at the origin with a length of 100mm in each direction
-    # '/vis/scene/add/axes 0 0 0 100 mm',
-## Draw simulated tracks
-    # '/vis/scene/add/trajectories smooth',
-    # '/vis/modeling/trajectories/create/drawByCharge'
-## Uncomment the following two lines to have yellow dots at each step boundary along the trajectory
-##    '/vis/modeling/trajectories/drawByCharge-0/default/setDrawStepPts true',
-##    '/vis/modeling/trajectories/drawByCharge-0/default/setStepPtsSize 0.5',
-# ])
+# You can use any visualization supported by geant4:
+# "http://geant4.web.cern.ch/geant4/UserDocumentation/UsersGuides/
+#  ForApplicationDeveloper/html/ch08.html"
+# Uncomment following lines  to create VRML file that can be examined with any
+# vrml viewer (freewrl,...)
+# simulation.param('EnableVisualization', True)
+# simulation.param('UICommands', ['/vis/open VRML2FILE', '/vis/drawVolume',
+#                            '/vis/scene/add/axes 0 0 0 100 mm',
+#                            '/vis/scene/add/trajectories smooth',
+#                            '/vis/modeling/trajectories/create/drawByCharge'])
 
-# Parameters for particle gun
-# number of tracks
-pguninput.param('nTracks', 1)
-# Type of particles (PDG codes)
-pguninput.param('PIDcodes', [321])
-# Particle momentum (pPar1 < p < pPar2)
-pguninput.param('pPar1', 4)
-pguninput.param('pPar2', 5)
-# theta angle
-pguninput.param('thetaPar1', 20)
-pguninput.param('thetaPar2', 25)
-# Many more parameters for PGun are available...
-# pguninput.param('xVertexPar1',0)
-# pguninput.param('xVertexPar2',8)
-# pguninput.param('phiPar1', 0)
-# pguninput.param('phiPar2', 0)
-# output.param('outputFileName', 'arich.root')
+# ============================================================================
+# Do the simulation
 
-# create path
 main = create_path()
-
-# add modules to path
 main.add_module(evtmetagen)
-main.add_module(paramloader)
-main.add_module(geobuilder)
-main.add_module(pguninput)
-main.add_module(g4sim)
-main.add_module(arichDigi)
-main.add_module(arichRec)
-# main.add_module(output)
+main.add_module(progress)
+main.add_module(gearbox)
+main.add_module(geometry)
+main.add_module(particlegun)
+main.add_module(simulation)
+main.add_module(arichDIGI)
+main.add_module(arichRECO)
+main.add_module(output)
 
+# Process events
 process(main)
+
+# Print call statistics
+print statistics

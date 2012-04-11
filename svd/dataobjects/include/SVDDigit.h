@@ -20,27 +20,21 @@ namespace Belle2 {
   /**
    * The SVD digit class.
    *
-   * SVDDigit records data about signals in SVD strips.
+   * The SVDDigit is an APV25 waveform sample.
    * This is a development implementation which is intentionally kept
-   * somewhat bulky.
-   * I record six samples of the waveform, and estimate of the waveform maximum.
-   * I also record strip coordinates that won't be kept in future.
+   * somewhat bulky. I record strip coordinates that won't be kept in future.
+   * Also the sensor and cell IDs could be somewhat compressed, if desired.
    */
 
   class SVDDigit : public TObject {
 
   public:
 
-    enum {
-      /** Number of waveform samples stored.*/
-      WAVEFORM_SAMPLES = 6
-    };
-
     /** Default constructor for the ROOT IO. */
     SVDDigit():
       m_sensorID(0), m_isU(true), m_cellID(0), m_cellPosition(0),
       m_charge(0), m_time(0)
-    { for (int i = 0; i < WAVEFORM_SAMPLES; ++i) m_samples[i] = 0.0; }
+    {}
 
     /** Useful Constructor.
      * @param sensorID Sensor compact ID.
@@ -48,14 +42,13 @@ namespace Belle2 {
      * @param cellID Strip ID.
      * @param cellPosition Strip mid-line coordinate.
      * @param charge The charge collected on the strip.
-     * @param time The time of waveform maximum.
-     * @param samples Array of six consecutive samples of the strip signals.
+     * @param time The time when the sample was taken.
      */
     SVDDigit(VxdID sensorID, bool isU, short cellID, float cellPosition,
-             float charge, double time, const float samples[]):
+             float charge, double time):
       m_sensorID(sensorID), m_isU(isU), m_cellID(cellID),
       m_cellPosition(cellPosition), m_charge(charge), m_time(time)
-    { for (int i = 0; i < WAVEFORM_SAMPLES; ++i) m_samples[i] = samples[i]; }
+    {}
 
     /** Get the sensor ID.
      * @return ID of the sensor.
@@ -82,26 +75,19 @@ namespace Belle2 {
      */
     float getCharge() const { return m_charge; }
 
-    /** Get time of waveform maximum.
-     * @return time of waveform maximum.
+    /** Get time when the sample was taken.
+     * @return time when the sample was taken.
      */
     double getTime() const { return m_time; }
-
-    /** Get waveform samples.
-     * @return array of waveform samples.
-     */
-    const float* getSamples() const { return m_samples; }
 
   private:
 
     unsigned short m_sensorID; /**< Compressed sensor identifier.*/
     bool m_isU;                /**< True if U, false if V. */
     short m_cellID;            /**< Strip coordinate in pitch units. */
-    float m_cellPosition;      /**< Absolute strip position. */
-    float m_charge;            /**< Strip signal at waveform maximum. */
-    double m_time;             /**< Time of waveform maximum. */
-    float m_samples[WAVEFORM_SAMPLES];        /**< WAVEFORM_SAMPLES samples of the strip signal (30 ns sampling time. */
-
+    float m_cellPosition;      /**< Absolute strip position, -temporary-. */
+    float m_charge;            /**< Strip signal. */
+    double m_time;             /**< Time when the sampel was taken. */
 
     ClassDef(SVDDigit, 1)
 

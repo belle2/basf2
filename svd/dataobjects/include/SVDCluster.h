@@ -15,12 +15,11 @@
 #include <vxd/dataobjects/VxdID.h>
 
 namespace Belle2 {
-  /** \addtogroup dataobjects
-    * @{
-    */
 
   /** The SVD Cluster class
    * This class stores all information about reconstructed SVD clusters
+    *
+    * \addtogroup dataobjects
    */
   class SVDCluster: public TObject {
   public:
@@ -92,17 +91,16 @@ namespace Belle2 {
   protected:
     unsigned short m_sensorID; /**< Compressed sensor identifier.*/
     bool m_isU;                /**< True if clusters of u-strips, otherwise false. */
-    float m_position;         /**< Absolute seed strip position in r-phi or z. */
-    double m_clsTime;           /**< Average waveform maximum time. */
-    double m_clsTimeSigma;        /**< Standard deviation of waveform maximum times.*/
+    float m_position;          /**< Absolute seed strip position in r-phi or z. */
+    double m_clsTime;          /**< Average waveform maximum time. */
+    double m_clsTimeSigma;     /**< Standard deviation of waveform maximum times.*/
     float m_clsCharge;         /**< Deposited charge in electrons. */
     float m_seedCharge;        /**< Cluster seed charge in electrons. */
     unsigned short m_clsSize;  /**< Cluster size in pixels */
 
+
     ClassDef(SVDCluster, 1)
+
   };
-
-  /** @}*/
-
 } //Belle2 namespace
 #endif

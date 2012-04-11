@@ -67,15 +67,6 @@
       <BackplaneCapacitance unit="pF">0</BackplaneCapacitance>
       <InterstripCapacitance unit="pF">6</InterstripCapacitance>
       <CouplingCapacitance unit="pF">120</CouplingCapacitance>
-      <ZeroSuppressionCut>2.5</ZeroSuppressionCut>
-      <ElectronicNoise unit="e">2000</ElectronicNoise>
-      <!-- The TDR value for ADCRange is -2 to +7 MIPs,
-           that is (with 100e-/um), -64000 to +224000 electrons. -->
-      <ADCRangeLow unit="e">-64000</ADCRangeLow>
-      <ADCRangeHigh unit="e">224000</ADCRangeHigh>
-      <ADCBits>10</ADCBits>
-      <!-- For now, the time window parameters will be set globally
-      for all sensors in the digitizer and clusterizer. -->
     </Active>
   </SensorBase>
 
@@ -101,15 +92,6 @@
       <BackplaneCapacitance unit="pF">0</BackplaneCapacitance>
       <InterstripCapacitance unit="pF">6</InterstripCapacitance>
       <CouplingCapacitance unit="pF">120</CouplingCapacitance>
-      <ZeroSuppressionCut>2.5</ZeroSuppressionCut>
-      <ElectronicNoise unit="e">2000</ElectronicNoise>
-      <!-- The TDR value for ADCRange is -2 to +7 MIPs,
-           that is (with 100e-/um), -64000 to +224000 electrons. -->
-      <ADCRangeLow unit="e">-64000</ADCRangeLow>
-      <ADCRangeHigh unit="e">224000</ADCRangeHigh>
-      <ADCBits>10</ADCBits>
-      <!-- For now, the time window parameters will be set globally
-           for all sensors in the digitizer and clusterizer. -->
     </Active>
   </SensorBase>
 
@@ -135,15 +117,6 @@
       <BackplaneCapacitance unit="pF">0</BackplaneCapacitance>
       <InterstripCapacitance unit="pF">6</InterstripCapacitance>
       <CouplingCapacitance unit="pF">120</CouplingCapacitance>
-      <ZeroSuppressionCut>2.5</ZeroSuppressionCut>
-      <ElectronicNoise unit="e">2000</ElectronicNoise>
-      <!-- The TDR value for ADCRange is -2 to +7 MIPs,
-           that is (with 100e-/um), -64000 to +224000 electrons. -->
-      <ADCRangeLow unit="e">-64000</ADCRangeLow>
-      <ADCRangeHigh unit="e">224000</ADCRangeHigh>
-      <ADCBits>10</ADCBits>
-      <!-- For now, the time window parameters will be set globally
-           for all sensors in the digitizer and clusterizer. -->
     </Active>
     <!-- For now, layer 3 only has a flex on top -->
     <Component name="KaptonLayer3">

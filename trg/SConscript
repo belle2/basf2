@@ -1,10 +1,10 @@
 Import('env')
 
 env['LIBS'] = ['cdc', 'ecl', 'cdc_dataobjects']
-env.Append(CPPDEFINES = {'TRG_DISPLAY':None})
-env.Append(CPPDEFINES = {'TRGCDC_DISPLAY':None})
-env.Append(CPPDEFINES = {'TRGCDC_DISPLAY_HOUGH':None})
-env.ParseConfig('pkg-config --cflags --libs gtkmm-2.4')
+#env.Append(CPPDEFINES = {'TRG_DISPLAY':None})
+#env.Append(CPPDEFINES = {'TRGCDC_DISPLAY':None})
+#env.Append(CPPDEFINES = {'TRGCDC_DISPLAY_HOUGH':None})
+#env.ParseConfig('pkg-config --cflags --libs gtkmm-2.4')
 #print env.Dump()
 
 Return('env')

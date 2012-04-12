@@ -15,6 +15,10 @@
 #include <G4UnitsTable.hh>
 #include <G4OpticalPhysics.hh>
 #include <G4PhysListFactory.hh>
+// LEP: includes for geant4e track extrapolation
+#include <simulation/kernel/ExtPhysicsConstructor.h>
+#include <G4ParticleTable.hh>
+#include <G4ParticleDefinition.hh>
 
 using namespace std;
 using namespace Belle2;
@@ -39,6 +43,8 @@ PhysicsList::PhysicsList(const string& physicsListName) : G4VModularPhysicsList(
     RegisterPhysics(regPhys);
     regPhys = const_cast<G4VPhysicsConstructor*>(physList->GetPhysics(iPhysList++));
   }
+  // LEP: Append the geant4e-specific physics constructor to the list
+  RegisterPhysics(new ExtPhysicsConstructor);
 }
 
 
@@ -54,6 +60,17 @@ void PhysicsList::SetCuts()
 
   // Set cuts to the defaultCutValue.
   SetCutsWithDefault();
+  // LEP: For geant4e-specific particles, set a big step so that AlongStep computes
+  // all the energy (as is done in G4ErrorPhysicsList)
+  G4ParticleTable* theParticleTable = G4ParticleTable::GetParticleTable();
+  G4ParticleTable::G4PTblDicIterator* theParticleIterator = theParticleTable->GetIterator();
+  theParticleIterator->reset();
+  while ((*theParticleIterator)()) {
+    G4ParticleDefinition* particle = theParticleIterator->value();
+    if (particle->GetParticleName().substr(0, 4) == "g4e_") {
+      SetParticleCuts(1.0E+9 * cm, particle);
+    }
+  }
 
   if (LogSystem::Instance().getCurrentLogLevel() == LogConfig::c_Debug) DumpCutValuesTable();
 }
@@ -69,3 +86,4 @@ void PhysicsList::registerOpticalPhysicsList()
 {
   RegisterPhysics(new G4OpticalPhysics());
 }
+

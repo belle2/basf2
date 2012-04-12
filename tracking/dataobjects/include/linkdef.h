@@ -7,6 +7,9 @@
 
 #pragma link C++ class Belle2::Track;
 #pragma link C++ class Belle2::TrackingOutput;
+#pragma link C++ class Belle2::ExtHitPolicy;
+#pragma link C++ class GFRecoHitIfc<Belle2::ExtHitPolicy>;
+#pragma link C++ class Belle2::ExtRecoHit;
 //#pragma link C++ class Belle2::VertexFitterVertexContainer;
 
 #endif

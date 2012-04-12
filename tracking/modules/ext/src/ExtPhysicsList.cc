@@ -1,33 +1,33 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2010-2011  Belle II Collaboration                         *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Martin Heck, Andreas Moll                                *
+ * Contributors: Leo Piilonen                                             *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <tracking/dataobjects/Track.h>
+#include <globals.hh>
 
-#include <cmath>
-#include <cstdlib>
+#include <tracking/modules/ext/ExtPhysicsList.h>
+#include <simulation/kernel/ExtPhysicsConstructor.h>
 
 using namespace std;
 using namespace Belle2;
 
-ClassImp(Track)
-
-TVector3 Track::getMomentum() const
+ExtPhysicsList::ExtPhysicsList() : G4VModularPhysicsList()
 {
-  TVector3 momentum(0., 0., 0.);
-  double alpha = 1 / (1.5 * 0.00299792458); //assume constant 1.5 T magnetic field
+  defaultCutValue = 1.0E+9 * cm; // set big step so that AlongStep computes all the energy
+  RegisterPhysics(new Simulation::ExtPhysicsConstructor);
+}
 
-  momentum.SetX(abs(1 / (m_omega * alpha))*cos(m_phi));
-  momentum.SetY(abs(1 / (m_omega * alpha))*sin(m_phi));
-  momentum.SetZ(abs(1 / (m_omega * alpha))*m_cotTheta);
+ExtPhysicsList::~ExtPhysicsList()
+{
+}
 
-  return momentum;
-
+void ExtPhysicsList::SetCuts()
+{
+  SetCutsWithDefault();
 }
 

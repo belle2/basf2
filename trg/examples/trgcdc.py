@@ -52,10 +52,13 @@ geobuilder.param('Components', ['MagneticField', 'CDC'])
 
 #...CDC Trigger...
 cdctrg.param('ConfigFile', os.path.join(basf2datadir,"trg/TRGCDCConfig_0_20101111_1051.dat"))
+cdctrg.param('InnerTSLUTDataFile', os.path.join(basf2datadir,"trg/LRLUT.coe"))
+cdctrg.param('OuterTSLUTDataFile', os.path.join(basf2datadir,"trg/LRLUT.coe"))
 cdctrg.param('DebugLevel',2)
 cdctrg.param('CurlBackStop',1)
 cdctrg.param('HoughFinderPerfect',1)
 cdctrg.param('SimulationMode',11)
+cdctrg.param('SimulationMode',0x11)
 
 #set mcprinter
 mcparticleprinter = register_module('PrintMCParticles')

@@ -78,7 +78,8 @@ main(int argc, char * argv[]) {
 
     //...TRGCDC...
     const string cname = path + "/data/trg/" + CONFIG;
-    TRGCDC * cdc = TRGCDC::getTRGCDC(cname, false, 100, 100);
+//  TRGCDC * cdc = TRGCDC::getTRGCDC(cname, false, 100, 100);
+    TRGCDC * cdc = TRGCDC::getTRGCDC(cname);
     const TRGClock & clock = cdc->systemClock();
 
     //...Wire layer ID for the central wires...

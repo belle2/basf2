@@ -58,6 +58,9 @@ class TRGCDC {
 
     /// returns TRGCDC object with specific configuration.
     static TRGCDC * getTRGCDC(const std::string & configFile,
+			      const std::string & innerTSLUTDataFile = "?",
+			      const std::string & outerTSLUTDataFile = "?",
+			      unsigned mode = 0,
                               bool houghFinderPerfect = false,
                               unsigned houghFinderMeshX = 96,
                               unsigned houghFinderMeshY = 96);
@@ -69,6 +72,9 @@ class TRGCDC {
 
     /// Constructor
     TRGCDC(const std::string & configFile,
+	   const std::string & innerTSLUTDataFile,
+	   const std::string & outerTSLUTDataFile,
+	   unsigned mode,
            bool houghFinderPerfect,
            unsigned houghFinderMeshX,
            unsigned houghFinderMeshY);
@@ -286,6 +292,12 @@ class TRGCDC {
     /// CDC trigger configuration filename.
     std::string _configFilename;
 
+    /// The filename of LUT for the inner-most track segments.
+    std::string _innerTSLUTDataFilename;
+
+    /// The filename of LUT for outer track segments.
+    std::string _outerTSLUTDataFilename;
+
     /// Simulation mode
     unsigned _mode;
 
@@ -372,6 +384,8 @@ class TRGCDC {
 
     /// LUT holder.
     std::vector<TRGCDCLUT *> _luts;
+
+    friend class TRGCDCModule;
 };
 
 //-----------------------------------------------------------------------------

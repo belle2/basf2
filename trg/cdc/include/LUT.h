@@ -46,7 +46,8 @@ class TRGCDCLUT {
     std::string version(void) const;
 
     /// initialize LookUpTable(LUT)
-    void doit(void);
+//  void doit(void);
+    void initialize(const std::string & filename);
 
     /// get LR componet from pattern id. Return value 0:right(decrease phi), 1:left(increase phi), 2:not determined
     int getLRLUT(int) const;

@@ -61,6 +61,12 @@ class TRGCDCModule : public Module {
     /// Config. file name.
     std::string _configFilename;
 
+    /// The filename of LUT for the inner-most track segments.
+    std::string _innerTSLUTDataFilename;
+
+    /// The filename of LUT for outer track segments.
+    std::string _outerTSLUTDataFilename;
+
     /// Curl back stop parameter. 0:do nothing, 1:stop curling. Default is 0.
     int _curlBackStop;
 

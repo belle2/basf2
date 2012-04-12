@@ -39,14 +39,21 @@ namespace Belle2{
     TRGCDCLUT::~TRGCDCLUT(){
     }
 	
-    void TRGCDCLUT::doit(){
+    void TRGCDCLUT::initialize(const string & filename){
 	int lutcomp;
 	ifstream openFile;
-	openFile.open("trg/data/LRLUT.coe");
+	openFile.open(filename.c_str());
+	if (openFile.fail()) {
+	    cout << "TRGCDCLUT !!! can not open file : " << filename << endl;
+	    cout << "              LUT is not initialized yet" << endl;
+	    return;
+	}
 	for(int i=0; i<2048;i++){
 	    openFile >> lutcomp;
 	    m_LRLUT[i]=lutcomp;
 	}
+	cout << "TTRGCDCLUT ... LUT(" << _name << ") initilized with "
+	     << filename << endl;
     }
 
     int TRGCDCLUT::getLRLUT(int ptn) const {

@@ -35,6 +35,8 @@ TRGCDCModule::TRGCDCModule()
     : Module::Module(),
       _debugLevel(0),
       _configFilename("TRGCDCConfig.dat"),
+      _innerTSLUTDataFilename("undefined"),
+      _outerTSLUTDataFilename("undefined"),
       _curlBackStop(0),
       _mode(0),
       _hFinderPerfect(false),
@@ -51,6 +53,14 @@ TRGCDCModule::TRGCDCModule()
              _configFilename,
              "The filename of CDC trigger config file",
              _configFilename);
+    addParam("InnerTSLUTDataFile",
+             _innerTSLUTDataFilename,
+             "The filename of LUT for the inner-most track segments",
+             _innerTSLUTDataFilename);
+    addParam("OuterTSLUTDataFile",
+             _outerTSLUTDataFilename,
+             "The filename of LUT for outer track segments",
+             _outerTSLUTDataFilename);
     addParam("CurlBackStop",
              _curlBackStop,
              "Curl back stop parameter",
@@ -120,12 +130,12 @@ TRGCDCModule::beginRun() {
     //...CDC trigger...
     if ((cfn != _configFilename) || (_cdc == 0))
         _cdc = TRGCDC::getTRGCDC(_configFilename,
+				 _innerTSLUTDataFilename,
+				 _outerTSLUTDataFilename,
+				 _mode,
                                  _hFinderPerfect,
                                  _hFinderMeshX,
                                  _hFinderMeshY);
-
-    //...Set simulation mode...
-    _cdc->mode(_mode);
 
     if (TRGDebug::level())
         cout << "TRGCDCModule ... beginRun called " << endl;
@@ -133,7 +143,6 @@ TRGCDCModule::beginRun() {
 
 void
 TRGCDCModule::event() {
-
     
     if (TRGDebug::level()) {
 //      _cdc->dump("geometry superLayers layers wires detail");

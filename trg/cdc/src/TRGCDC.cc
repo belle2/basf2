@@ -54,21 +54,24 @@ using namespace std;
 
 namespace Belle2 {
 
-std::string
+string
 TRGCDC::name(void) const {
     return "TRGCDC";
 }
 
-std::string
+string
 TRGCDC::version(void) const {
-    return string("TRGCDC 5.09");
+    return string("TRGCDC 5.10");
 }
 
 TRGCDC *
 TRGCDC::_cdc = 0;
 
 TRGCDC *
-TRGCDC::getTRGCDC(const std::string & configFile,
+TRGCDC::getTRGCDC(const string & configFile,
+		  const string & innerTSLUTDataFile,
+		  const string & outerTSLUTDataFile,
+		  unsigned mode,
                   bool houghFinderPerfect,
                   unsigned houghFinderMeshX,
                   unsigned houghFinderMeshY) {
@@ -77,6 +80,9 @@ TRGCDC::getTRGCDC(const std::string & configFile,
 
     if (configFile != "good-bye") {
         _cdc = new TRGCDC(configFile,
+			  innerTSLUTDataFile,
+			  outerTSLUTDataFile,
+			  mode,
                           houghFinderPerfect,
                           houghFinderMeshX,
                           houghFinderMeshY);
@@ -97,13 +103,18 @@ TRGCDC::getTRGCDC(void) {
     return _cdc;
 }
 
-TRGCDC::TRGCDC(const std::string & configFile,
+TRGCDC::TRGCDC(const string & configFile,
+	       const string & innerTSLUTDataFile,
+	       const string & outerTSLUTDataFile,
+	       unsigned mode,
 	       bool houghFinderPerfect,
 	       unsigned houghFinderMeshX,
 	       unsigned houghFinderMeshY) 
     : _debugLevel(0),
       _configFilename(configFile),
-      _mode(0),
+      _innerTSLUTDataFilename(innerTSLUTDataFile),
+      _outerTSLUTDataFilename(outerTSLUTDataFile),
+      _mode(mode),
       _fudgeFactor(1.),
       _width(0),
       _r(0),
@@ -147,7 +158,7 @@ TRGCDC::initialize(bool houghFinderPerfect,
 
     //...Loop over layers...
     int superLayerId = -1;
-    std::vector<TRGCDCLayer *> * superLayer;
+    vector<TRGCDCLayer *> * superLayer;
     unsigned lastNWires = 0;
     int lastShifts = -1000;
     int ia = -1;
@@ -179,7 +190,7 @@ TRGCDC::initialize(bool houghFinderPerfect,
         //...Is this in a new super layer?...
         if ((lastNWires != nWiresInLayer) || (lastShifts != nShifts)) {
             ++superLayerId;
-            superLayer = new std::vector<TRGCDCLayer *>;
+            superLayer = new vector<TRGCDCLayer *>;
             _superLayers.push_back(superLayer);
             if (axial) {
                 ++ias;
@@ -246,8 +257,10 @@ TRGCDC::initialize(bool houghFinderPerfect,
 
     //...LUT for LR decision : common to all TS...
     _luts.push_back(new TCLUT("LR LUT", * this));
-    for (unsigned i = 0; _luts.size(); i++)
-	_luts[i]->doit();
+    _luts.back()->initialize(_outerTSLUTDataFilename);
+    
+//  for (unsigned i = 0; _luts.size(); i++)
+//	_luts[i]->doit();
 
     //...Make TSF's...
     const unsigned nWiresInTS[2] = {15, 11};
@@ -311,7 +324,7 @@ TRGCDC::initialize(bool houghFinderPerfect,
 
             const unsigned localId = w.localId();
             const unsigned layerId = w.layerId();
-            std::vector<const TCWire *> cells;
+            vector<const TCWire *> cells;
 
             for (unsigned i = 0; i < nWiresInTS[tsType]; i++) {
                 const unsigned laid = layerId + shape[tsType][i * 2];
@@ -351,7 +364,7 @@ TRGCDC::initialize(bool houghFinderPerfect,
     _r = new float[nSuperLayers() + 1];
     _r2 = new float[nSuperLayers() + 1];
     for (unsigned i = 0; i < nSuperLayers(); i++) {
-        const std::vector<TRGCDCLayer *> & slayer = * _superLayers[i];
+        const vector<TRGCDCLayer *> & slayer = * _superLayers[i];
         _width[i] = M_PI * 2 / float(slayer.back()->nCells());
         _r[i] = slayer[0]->innerRadius();
         _r2[i] = _r[i] * _r[i];
@@ -392,23 +405,23 @@ TRGCDC::initialize(bool houghFinderPerfect,
 }
 
 void
-TRGCDC::dump(const std::string & msg) const {
-    if (msg.find("name")    != std::string::npos ||
-        msg.find("version") != std::string::npos ||
-        msg.find("detail")  != std::string::npos ||
+TRGCDC::dump(const string & msg) const {
+    if (msg.find("name")    != string::npos ||
+        msg.find("version") != string::npos ||
+        msg.find("detail")  != string::npos ||
         msg == "") {
         cout << name() << "(CDC version=" << versionCDC() << ", "
                << version() << ") ";
     }
-    if (msg.find("detail") != std::string::npos ||
-        msg.find("state") != std::string::npos) {
+    if (msg.find("detail") != string::npos ||
+        msg.find("state") != string::npos) {
         cout << "Debug Level=" << _debugLevel;
     }
     cout << endl;
 
-    std::string tab("        ");
+    string tab("        ");
 
-    if (msg == "" || msg.find("geometry") != std::string::npos) {
+    if (msg == "" || msg.find("geometry") != string::npos) {
 
         //...Get information..."
         unsigned nLayer = _layers.size();
@@ -424,7 +437,7 @@ TRGCDC::dump(const std::string & msg) const {
         cout << "        # of Stereo super layers = "
                << nStereoSuperLayers() << endl;
 
-        if (msg.find("superLayers") != std::string::npos) {
+        if (msg.find("superLayers") != string::npos) {
             cout << "        super layer detail" << endl;
             cout << "            id #layers (stereo type)" << endl;
             for (unsigned i = 0; i < nSuperLayers(); ++i) {
@@ -443,7 +456,7 @@ TRGCDC::dump(const std::string & msg) const {
         cout << "        # of Stereo layers = "
                                     << nStereoLayers() << endl;
 
-        if (msg.find("layers") != std::string::npos) {
+        if (msg.find("layers") != string::npos) {
             cout << "        layer detail" << endl;
             cout << "            id type sId #wires lId asId assId"
                    << endl;
@@ -460,7 +473,7 @@ TRGCDC::dump(const std::string & msg) const {
             }
         }
         
-        if (msg.find("wires") != std::string::npos) {
+        if (msg.find("wires") != string::npos) {
             cout << "    wire information" << endl;
             for (unsigned i = 0; i < nWires(); i++)
                 (_wires[i])->dump("neighbor", tab);
@@ -468,22 +481,22 @@ TRGCDC::dump(const std::string & msg) const {
         
         return;
     }
-    if (msg.find("hits") != std::string::npos) {
+    if (msg.find("hits") != string::npos) {
         cout << "    hits : " << _hits.size() << endl;
         for (unsigned i = 0; i < (unsigned) _hits.size(); i++)
             _hits[i]->dump("mc drift", tab);
     }
-    if (msg.find("axialHits") != std::string::npos) {
+    if (msg.find("axialHits") != string::npos) {
         cout << "    hits : " << _axialHits.size() << endl;
         for (unsigned i = 0; i < (unsigned) _axialHits.size(); i++)
             _axialHits[i]->dump("mc drift", tab);
     }
-    if (msg.find("stereoHits") != std::string::npos) {
+    if (msg.find("stereoHits") != string::npos) {
         cout << "    hits : " << _stereoHits.size() << endl;
         for (unsigned i = 0; i < (unsigned) _stereoHits.size(); i++)
             _stereoHits[i]->dump("mc drift", tab);
     }
-    if (msg.find("trgWireHits") != std::string::npos) {
+    if (msg.find("trgWireHits") != string::npos) {
         const string dumpOption = "trigger detail";
         cout << "    wire hits" << endl;
         for (unsigned i = 0; i < nWires(); i++) {
@@ -492,7 +505,7 @@ TRGCDC::dump(const std::string & msg) const {
                 w.dump(dumpOption, TRGDebug::tab(4));
         }
     }
-    if (msg.find("trgWireCentralHits") != std::string::npos) {
+    if (msg.find("trgWireCentralHits") != string::npos) {
         const string dumpOption = "trigger detail";
         cout << "    wire hits" << endl;
         for (unsigned i = 0; i < nTrackSegments(); i++) {
@@ -501,7 +514,7 @@ TRGCDC::dump(const std::string & msg) const {
                 s.wires()[5]->dump(dumpOption, TRGDebug::tab(4));
         }
     }
-    if (msg.find("trgTSHits") != std::string::npos) {
+    if (msg.find("trgTSHits") != string::npos) {
         const string dumpOption = "trigger detail";
         cout << "    TS hits" << endl;
         for (unsigned i = 0; i < nTrackSegments(); i++) {
@@ -802,9 +815,9 @@ TRGCDC::classification(void) {
     }
 }
 
-std::vector<const TCWHit *>
+vector<const TCWHit *>
 TRGCDC::axialHits(void) const {
-    std::vector<const TCWHit *> t;
+    vector<const TCWHit *> t;
     t.assign(_axialHits.begin(), _axialHits.end());
     return t;
 
@@ -814,9 +827,9 @@ TRGCDC::axialHits(void) const {
 //  return _axialHits;
 }
 
-std::vector<const TCWHit *>
+vector<const TCWHit *>
 TRGCDC::stereoHits(void) const {
-    std::vector<const TCWHit *> t;
+    vector<const TCWHit *> t;
     t.assign(_stereoHits.begin(), _stereoHits.end());
     return t;
 
@@ -826,9 +839,9 @@ TRGCDC::stereoHits(void) const {
 //     return _stereoHits;
 }
 
-std::vector<const TCWHit *>
+vector<const TCWHit *>
 TRGCDC::hits(void) const {
-    std::vector<const TCWHit *> t;
+    vector<const TCWHit *> t;
     t.assign(_hits.begin(), _hits.end());
     return t;
 
@@ -838,9 +851,9 @@ TRGCDC::hits(void) const {
 //     return _hits;
 }
 
-std::vector<const TCWHit *>
+vector<const TCWHit *>
 TRGCDC::badHits(void) const {
-    std::vector<const TCWHit *> t;
+    vector<const TCWHit *> t;
     t.assign(_badHits.begin(), _badHits.end());
     return t;
 
@@ -871,16 +884,16 @@ TRGCDC::badHits(void) const {
 //     return _badHits;
 }
 
-std::vector<const TCWHitMC *>
+vector<const TCWHitMC *>
 TRGCDC::hitsMC(void) const {
-    std::vector<const TCWHitMC *> t;
+    vector<const TCWHitMC *> t;
     t.assign(_hitsMC.begin(), _hitsMC.end());
     return t;
 }
 
-std::string
+string
 TRGCDC::wireName(unsigned wireId) const {
-    std::string as = "-";
+    string as = "-";
     const TCWire * const w = wire(wireId);
     if (w) {
         if (w->stereo())
@@ -943,7 +956,7 @@ TRGCDC::superLayerId(unsigned id) const {
     unsigned nW = 0;
     bool nextLayer = true;
     while (nextLayer) {
-        const std::vector<TRGCDCLayer *> & sl = * superLayer(iLayer);
+        const vector<TRGCDCLayer *> & sl = * superLayer(iLayer);
         const unsigned nLayers = sl.size();
         for (unsigned i = 0; i < nLayers; i++)
             nW += sl[i]->nCells();
@@ -964,7 +977,7 @@ TRGCDC::localLayerId(unsigned id) const {
     unsigned nW = 0;
     bool nextLayer = true;
     while (nextLayer) {
-        const std::vector<TRGCDCLayer *> & sl = * superLayer(iLayer);
+        const vector<TRGCDCLayer *> & sl = * superLayer(iLayer);
         const unsigned nLayers = sl.size();
         for (unsigned i = 0; i < nLayers; i++) {
             nW += sl[i]->nCells();

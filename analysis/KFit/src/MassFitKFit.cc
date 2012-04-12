@@ -9,6 +9,8 @@
  **************************************************************************/
 
 
+#include <stdio.h>
+
 #include <analysis/KFit/MassFitKFit.h>
 
 

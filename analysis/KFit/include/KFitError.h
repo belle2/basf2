@@ -12,6 +12,7 @@
 #ifndef KFITERROR_H
 #define KFITERROR_H
 
+#include <stdio.h>
 
 #include <framework/logging/Logger.h>
 

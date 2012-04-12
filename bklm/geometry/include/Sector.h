@@ -20,9 +20,6 @@
 #include "bklm/geometry/Module.h"
 #include "bklm/geometry/Rect.h"
 
-using namespace std;
-using namespace CLHEP;
-
 namespace Belle2 {
 
   namespace bklm {
@@ -63,12 +60,12 @@ namespace Belle2 {
       Sector();
 
       //! Constructor with explicit values (excludes list of contained modules)
-      Sector(int         frontBack,
-             int         sector,
-             int         nlayers,
-             Hep3Vector  shift,
-             Hep3Vector  translation,
-             HepRotation rotation);
+      Sector(int                frontBack,
+             int                sector,
+             int                nlayers,
+             CLHEP::Hep3Vector  shift,
+             CLHEP::Hep3Vector  translation,
+             CLHEP::HepRotation rotation);
 
       //! Copy constructor (includes list of contained modules)
       Sector(const Sector& s);
@@ -107,31 +104,31 @@ namespace Belle2 {
       int getNLayer() const { return m_NLayer; }
 
       //! Get sector's shift, nominally (0,0,0) (in global coordinates)
-      const Hep3Vector& getShift() const { return m_Shift; }
+      const CLHEP::Hep3Vector& getShift() const { return m_Shift; }
 
       //! Get sector's translation (in global coordinates)
-      const Hep3Vector& getTranslation() const { return m_Translation; }
+      const CLHEP::Hep3Vector& getTranslation() const { return m_Translation; }
 
       //! Get sector's orientation (in global coordinates)
-      const HepRotation& getRotation() const { return m_Rotation; }
+      const CLHEP::HepRotation& getRotation() const { return m_Rotation; }
 
       //! Get the pointer to a module within this sector
       const Module* findModule(int module) const;
 
       //! Transform space-point within this sector from local to global coordinates
-      const Hep3Vector localToGlobal(const Hep3Vector& v) const;
+      const CLHEP::Hep3Vector localToGlobal(const CLHEP::Hep3Vector& v) const;
 
       //! Transform space-point within this sector from global to local coordinates
-      const Hep3Vector globalToLocal(const Hep3Vector& v) const;
+      const CLHEP::Hep3Vector globalToLocal(const CLHEP::Hep3Vector& v) const;
 
       //! Transform space-point within this sector from global to local coordinates
-      const Hep3Vector globalToLocal(double x, double y, double z) const;
+      const CLHEP::Hep3Vector globalToLocal(double x, double y, double z) const;
 
       //! Transform rotation matrix within this sector from local to global coordinates
-      const HepMatrix localToGlobal(const HepMatrix& m) const;
+      const CLHEP::HepMatrix localToGlobal(const CLHEP::HepMatrix& m) const;
 
       //! Transform rotation matrix within this sector from global to local coordinates
-      const HepMatrix globalToLocal(const HepMatrix& m) const;
+      const CLHEP::HepMatrix globalToLocal(const CLHEP::HepMatrix& m) const;
 
       //! Transform space-points of bounding rectangle from local to global coordinates
       const Rect localToGlobal(const Rect& r) const;
@@ -140,13 +137,13 @@ namespace Belle2 {
       const Rect globalToLocal(const Rect& r) const;
 
       //! Rotate direction or momentum vector from local to global coordinates
-      const Hep3Vector rotateToGlobal(const Hep3Vector& v) const;
+      const CLHEP::Hep3Vector rotateToGlobal(const CLHEP::Hep3Vector& v) const;
 
       //! Rotate direction or momentum vector from global to local coordinates
-      const Hep3Vector rotateToLocal(const Hep3Vector& v) const;
+      const CLHEP::Hep3Vector rotateToLocal(const CLHEP::Hep3Vector& v) const;
 
       //! Get the unit vector normal to this sector (or any module within), in global coordinates
-      const Hep3Vector getNormal() const;
+      const CLHEP::Hep3Vector getNormal() const;
 
       //! Print sector definition
       void printTree() const;
@@ -163,28 +160,28 @@ namespace Belle2 {
       int m_NLayer;
 
       //! to store the shift (in global coordinates) of this sector; nominally (0,0,0)
-      Hep3Vector m_Shift;
+      CLHEP::Hep3Vector m_Shift;
 
       //! to store the position (in global coordinates) of this sector
-      Hep3Vector m_Translation;
+      CLHEP::Hep3Vector m_Translation;
 
       //! to store the rotation matrix (in global coordinates) of this sector
-      HepRotation m_Rotation;
+      CLHEP::HepRotation m_Rotation;
 
       //! to store the inverse of the rotation matrix (in global coordinates) of this sector
-      HepRotation m_RotationInverse;
+      CLHEP::HepRotation m_RotationInverse;
 
       //! to store a copy of the rotation matrix in alternate form
-      HepMatrix m_RotationMatrix;
+      CLHEP::HepMatrix m_RotationMatrix;
 
       //! to store a copy of the inverse of the rotation matrix in alternate form
-      HepMatrix m_RotationInverseMatrix;
+      CLHEP::HepMatrix m_RotationInverseMatrix;
 
       //! to store the unit normal vector (in global coordinates) of this sector or any module therein
-      Hep3Vector m_Normal;
+      CLHEP::Hep3Vector m_Normal;
 
       //! to store the array of modules contained in this sector
-      vector<Module*> m_Modules;
+      std::vector<Module*> m_Modules;
 
     };
 

@@ -16,8 +16,6 @@
 
 #include "bklm/geometry/Rect.h"
 
-using namespace CLHEP;
-
 namespace Belle2 {
 
   namespace bklm {
@@ -33,22 +31,22 @@ namespace Belle2 {
       Module(void);
 
       //! Constructor with explicit values
-      Module(int        frontBack,
-             int        sector,
-             int        module,
-             Hep3Vector shift,
-             double     localX,
-             Sector*    sectorPtr,
-             double     phiStripWidth,
-             double     phiStripLength,
-             int        phiStripNumber,
-             int        phiStripMin,
-             int        phiStripMax,
-             double     zStripWidth,
-             double     zStripLength,
-             int        zStripNumber,
-             int        zStripMin,
-             int        zStripMax);
+      Module(int               frontBack,
+             int               sector,
+             int               module,
+             CLHEP::Hep3Vector shift,
+             double            localX,
+             Sector*           sectorPtr,
+             double            phiStripWidth,
+             double            phiStripLength,
+             int               phiStripNumber,
+             int               phiStripMin,
+             int               phiStripMax,
+             double            zStripWidth,
+             double            zStripLength,
+             int               zStripNumber,
+             int               zStripMin,
+             int               zStripMax);
 
       //! Copy constructor
       Module(const Module& m);
@@ -93,7 +91,7 @@ namespace Belle2 {
       int getZStripMax() const { return m_ZStripMax; }
 
       //! Get module's shift, nominally (0,0,0) (in local coordinates)
-      const Hep3Vector getShift() const { return m_Shift; }
+      const CLHEP::Hep3Vector getShift() const { return m_Shift; }
 
       //! Get module's altitude (in local coordinates)
       double getLocalX() const { return m_LocalX; }
@@ -116,10 +114,10 @@ namespace Belle2 {
       double getLocalCoordinate(double stripAve, char direction) const;
 
       //! Convert 2D strip position (0..nStrips along each axis) to local coordinates
-      const Hep3Vector getLocalPosition(double phiStripAve, double zStripAve) const;
+      const CLHEP::Hep3Vector getLocalPosition(double phiStripAve, double zStripAve) const;
 
       //! Get 2D position covariance matrix in local coordinates, given strip multiplicities
-      const HepMatrix getLocalError(int phiStripMult, int zStripMult) const;
+      const CLHEP::HepMatrix getLocalError(int phiStripMult, int zStripMult) const;
 
       //! Get bounding rectangle of this strip's surface in local coordinates
       const Rect getStripRectLocal(double stripAve, char direction) const;
@@ -128,13 +126,13 @@ namespace Belle2 {
       const Rect getModuleRectLocal(void) const;
 
       //! Determine if space-point (in local coordinates) is in active area of RPC module, and fills phiStrip and zStrip
-      bool isInActiveArea(const Hep3Vector& p, int& phiStrip, int& zStrip) const;
+      bool isInActiveArea(const CLHEP::Hep3Vector& p, int& phiStrip, int& zStrip) const;
 
       //! Determine if space-point (in local coordinates) is in active area of scint module, and fills either phiStrip or zStrip
-      bool isInActiveArea(const Hep3Vector& p, int& phiStrip, int& zStrip, int innerOuter) const;
+      bool isInActiveArea(const CLHEP::Hep3Vector& p, int& phiStrip, int& zStrip, int innerOuter) const;
 
       //! Fills phiStrip and zStrip with relative position (-0.5..+0.5) of space-point (in local coordinates) along each strip's width
-      void getStripDivisions(const Hep3Vector& p, double& phiStrip, double& zStrip) const;
+      void getStripDivisions(const CLHEP::Hep3Vector& p, double& phiStrip, double& zStrip) const;
 
       //! Print module definition
       void printTree(void) const;
@@ -151,7 +149,7 @@ namespace Belle2 {
       int m_Layer;
 
       //! to store the shift (in global coordinates) of this module; nominally (0,0,0)
-      Hep3Vector m_Shift;
+      CLHEP::Hep3Vector m_Shift;
 
       //! to store the local altitude of this module
       double m_LocalX;

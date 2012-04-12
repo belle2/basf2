@@ -67,7 +67,7 @@ namespace Belle2 {
     //                 Build and place the BKLM
     //-----------------------------------------------------------------
 
-    void GeoBKLMCreator::create(const GearDir& content, G4LogicalVolume& motherLogical, GeometryTypes type)
+    void GeoBKLMCreator::create(const GearDir& content, G4LogicalVolume& motherLogical, GeometryTypes)
     {
 
       if (content.getInt("BeamBackgroundStudy") != 0) { m_bkgsensitive = new BkgSensitiveDetector("BKLM"); }
@@ -766,7 +766,8 @@ namespace Belle2 {
                        );
     }
 
-    void GeoBKLMCreator::putScintModuleInGap(G4LogicalVolume* gapLogical, int fb, int sector, int layer, bool hasChimney)
+    //void GeoBKLMCreator::putScintModuleInGap(G4LogicalVolume* gapLogical, int fb, int sector, int layer, bool hasChimney)
+    void GeoBKLMCreator::putScintModuleInGap(G4LogicalVolume*, int, int, int, bool)
     {
       // stub
     }

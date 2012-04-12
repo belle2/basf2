@@ -111,7 +111,7 @@ namespace Belle2 {
     double m_ADC;
 
     //! Needed to make the ROOT object storable
-    ClassDef(BKLMStrip, 1);
+    ClassDef(BKLMStrip, 1)
 
   private:
 

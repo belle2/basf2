@@ -17,7 +17,7 @@ using namespace Belle2;
 ClassImp(BKLMStrip)
 
 //! empty constructor
-BKLMStrip::BKLMStrip()
+BKLMStrip::BKLMStrip() : TObject()
 {
 }
 
@@ -25,6 +25,7 @@ BKLMStrip::BKLMStrip()
 BKLMStrip::BKLMStrip(bool inRPC, int frontBack, int sector,
                      int layer, char direction, int strip,
                      double tdc, double adc) :
+  TObject(),
   m_InRPC(inRPC),
   m_FrontBack(frontBack),
   m_Sector(sector),

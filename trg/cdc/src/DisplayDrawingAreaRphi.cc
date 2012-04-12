@@ -274,7 +274,7 @@ TRGCDCDisplayDrawingAreaRphi::drawWire(const TCWire & w,
     const float ri = w.layer().innerRadius();
     const float ro = w.layer().outerRadius();
     const float cPhi = w.backwardPosition().phi();
-    const float dPhi = M_PI / w.layer().nWires();
+    const float dPhi = M_PI / w.layer().nCells();
     for (unsigned j = 0; j < nDivisions + 1; j++) {  // inner
         const float phi = cPhi - dPhi
             + (2 * dPhi / float(nDivisions)) * float(j);

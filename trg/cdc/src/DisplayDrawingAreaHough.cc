@@ -138,8 +138,7 @@ TRGCDCDisplayDrawingAreaHough::on_button_press_event(GdkEventButton * e) {
         for (unsigned i = 0; i < 5; i++) {
             const vector<unsigned> & l = hp.patternId(i, sid);
             for (unsigned j = 0; j < l.size(); j++)
-                list.push_back(
-                    (TCTSegment *) cdc.trackSegmentLayer(i * 2)->wire(l[j]));
+                list.push_back(& cdc.trackSegment(i * 2, l[j]));
         }
         display().rphi()->area().on_expose_event(0);
         display().rphi()->area().oneShot(list, _red);

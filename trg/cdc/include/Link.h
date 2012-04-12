@@ -134,21 +134,32 @@ class TRGCDCLink {
     /// sets pull.
     double pull(double);
 
-    const unsigned fit2D(const unsigned &);
-    unsigned fit2D(void);
+//    const unsigned fit2D(const unsigned &);
+
+//    unsigned fit2D(void);
 
   public:// Drift distance
-    /// returns/sets drift distance.
+
+    /// returns drift distance.
     float drift(void) const;
+
+    /// returns drift distance of left or right.
     float drift(unsigned) const;
+
+    /// sets and returns drift distance of left or right.
     float drift(float, unsigned);
 
-    /// returns/sets drift distance error.
+    /// returns drift distance error.
     float dDrift(void) const;
+
+    /// returns drift distance error of left or right.
     float dDrift(unsigned) const;
+
+    /// sets and returns drift distance error of left or right.
     float dDrift(float, unsigned);
 
   public:// Static utility functions
+
     /// returns TRGCDCTrackMC
     static const TRGCDCTrackMC & links2HEP(
 	const std::vector<TRGCDCLink *> & links);
@@ -496,17 +507,17 @@ TRGCDCLink::xyPosition(void) const {
     return _hit->wire().xyPosition();
 }
 
-inline
-const unsigned 
-TRGCDCLink::fit2D(const unsigned &f) {
-  return _fit2D = f;
-}
+// inline
+// const unsigned 
+// TRGCDCLink::fit2D(const unsigned &f) {
+//   return _fit2D = f;
+// }
 
-inline
-unsigned 
-TRGCDCLink::fit2D(void) {
-  return _fit2D;
-}
+// inline
+// unsigned 
+// TRGCDCLink::fit2D(void) {
+//   return _fit2D;
+// }
 
 inline
 float

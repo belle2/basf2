@@ -61,7 +61,7 @@ TRGCDC::name(void) const {
 
 std::string
 TRGCDC::version(void) const {
-    return string("TRGCDC 5.08");
+    return string("TRGCDC 5.09");
 }
 
 TRGCDC *
@@ -246,6 +246,8 @@ TRGCDC::initialize(bool houghFinderPerfect,
 
     //...LUT for LR decision : common to all TS...
     _luts.push_back(new TCLUT("LR LUT", * this));
+    for (unsigned i = 0; _luts.size(); i++)
+	_luts[i]->doit();
 
     //...Make TSF's...
     const unsigned nWiresInTS[2] = {15, 11};
@@ -280,9 +282,14 @@ TRGCDC::initialize(bool houghFinderPerfect,
 	  0,   0,
 	  0,   0,
 	  0,   0}};
+    const int layerOffset[2] = {4, 2};
     unsigned id = 0;
     unsigned idTS = 0;
     for (unsigned i = 0; i < nSuperLayers(); i++) {
+	unsigned tsType = 0;
+	if (i)
+	    tsType = 1;
+
         const unsigned nLayers = _superLayers[i]->size();
         if (nLayers < 5) {
             cout << "TRGCDC !!! can not create TS because "
@@ -292,22 +299,19 @@ TRGCDC::initialize(bool houghFinderPerfect,
         }
 
         //...TS layer... w is a central wire
-        const TCCell & ww = * (* _superLayers[i])[2]->front();
+        const TCCell & ww = *(* _superLayers[i])[layerOffset[tsType]]->front();
         TRGCDCLayer * layer = new TRGCDCLayer(id++, ww);
         _tsLayers.push_back(layer);
 
         //...Loop over all wires in a central wire layer...
         const unsigned nWiresInLayer = ww.layer().nCells();
         for (unsigned j = 0; j < nWiresInLayer; j++) {
-            const TCWire & w = * (TCWire *) (* (* _superLayers[i])[2])[j];
+            const TCWire & w =
+		* (TCWire *) (* (* _superLayers[i])[layerOffset[tsType]])[j];
 
             const unsigned localId = w.localId();
             const unsigned layerId = w.layerId();
             std::vector<const TCWire *> cells;
-
-	    unsigned tsType = 0;
-	    if (i)
-		tsType = 1;
 
             for (unsigned i = 0; i < nWiresInTS[tsType]; i++) {
                 const unsigned laid = layerId + shape[tsType][i * 2];
@@ -492,7 +496,7 @@ TRGCDC::dump(const std::string & msg) const {
         const string dumpOption = "trigger detail";
         cout << "    wire hits" << endl;
         for (unsigned i = 0; i < nTrackSegments(); i++) {
-            const TCTSegment & s = * trackSegment(i);
+            const TCTSegment & s = trackSegment(i);
             if (s.wires()[5]->triggerOutput().active())
                 s.wires()[5]->dump(dumpOption, TRGDebug::tab(4));
         }
@@ -501,7 +505,7 @@ TRGCDC::dump(const std::string & msg) const {
         const string dumpOption = "trigger detail";
         cout << "    TS hits" << endl;
         for (unsigned i = 0; i < nTrackSegments(); i++) {
-            const TCTSegment & s = * trackSegment(i);
+            const TCTSegment & s = trackSegment(i);
             if (s.triggerOutput().active())
                 s.dump(dumpOption, TRGDebug::tab(4));
         }
@@ -977,8 +981,8 @@ TRGCDC::localLayerId(unsigned id) const {
 }
 
 unsigned
-TRGCDC::axialStereoSuperLayerId(unsigned axialStereo,
-                              unsigned ) const {
+TRGCDC::axialStereoSuperLayerId(unsigned ,
+				unsigned ) const {
     cout << "TRGCDC::axialStereoSuperLayerId !!! "
               << "this function is not implemented yet"
               << endl;
@@ -1155,7 +1159,7 @@ TRGCDC::simulate(void) {
         if (TRGDebug::level() > 2)
             dumpOption = "detail";
         for (unsigned i = 0; i < nTrackSegments(); i++) {
-            const TCTSegment & s = * trackSegment(i);
+            const TCTSegment & s = trackSegment(i);
             if (s.triggerOutput().active())
                 s.dump(dumpOption, TRGDebug::tab(4));
         }
@@ -1340,6 +1344,11 @@ TRGCDC::configure(void) {
 //     f.append(fl);
    
     infile.close();
+}
+
+const TRGCDCTrackSegment &
+TRGCDC::trackSegment(unsigned lid, unsigned id) const {
+    return * (const TRGCDCTrackSegment *) (* _tsLayers[lid])[id];
 }
 
 } // namespace Belle2

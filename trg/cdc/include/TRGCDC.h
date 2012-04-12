@@ -121,6 +121,7 @@ class TRGCDC {
     float fudgeFactor(float);
 
   public:// Geometry
+
     /// returns a pointer to a wire. 0 will be returned if 'wireId' is invalid.
     const TRGCDCWire * wire(unsigned wireId) const;
 
@@ -176,7 +177,10 @@ class TRGCDC {
     unsigned nTrackSegments(void) const;
 
     /// returns a track segment.
-    const TRGCDCTrackSegment * trackSegment(unsigned id) const;
+    const TRGCDCTrackSegment & trackSegment(unsigned id) const;
+
+    /// returns a track segment.
+    const TRGCDCTrackSegment & trackSegment(unsigned lyrId, unsigned id) const;
 
     /// returns \# of track segment layers.
     unsigned nTrackSegmentLayers(void) const;
@@ -483,9 +487,9 @@ TRGCDC::superLayerR2(unsigned i) const {
 }
 
 inline
-const TRGCDCTrackSegment *
+const TRGCDCTrackSegment &
 TRGCDC::trackSegment(unsigned id) const {
-    return _tss[id];
+    return * _tss[id];
 }
 
 inline

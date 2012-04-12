@@ -49,7 +49,7 @@ namespace Belle2{
 	}
     }
 
-    int TRGCDCLUT::getLRLUT(int ptn){
+    int TRGCDCLUT::getLRLUT(int ptn) const {
 	return m_LRLUT[ptn];
     }
 }

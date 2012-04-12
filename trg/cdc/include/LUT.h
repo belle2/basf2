@@ -49,7 +49,7 @@ class TRGCDCLUT {
     void doit(void);
 
     /// get LR componet from pattern id. Return value 0:right(decrease phi), 1:left(increase phi), 2:not determined
-    int getLRLUT(int);
+    int getLRLUT(int) const;
 
   private:
 

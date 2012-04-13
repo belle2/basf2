@@ -84,7 +84,7 @@ namespace Belle2 {
 
       // Record a step for a charged track that deposits some energy.
       // Background study: Record every neutron passage, whether it deposits energy or not.
-      if (((deltaE > 0.0) && (postStep->GetCharge() != 0)) ||
+      if (((deltaE > 0.0) && (postStep->GetCharge() != 0.0)) ||
           ((m_DoBackgroundStudy) && (primaryPID == m_NeutronPID))) {
         double KE = 0.5 * (preStep->GetKineticEnergy() + postStep->GetKineticEnergy());
         const G4ThreeVector g4HitPos = 0.5 * (preStep->GetPosition() + postStep->GetPosition()) / cm; // GEANT4: in mm

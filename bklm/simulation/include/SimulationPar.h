@@ -38,7 +38,7 @@ namespace Belle2 {
       double getHitTimeMax(void) const { return m_HitTimeMax; }
 
       //! Get the flag that controls whether to do the neutron-background study
-      double getDoBackgroundStudy(void) const { return m_DoBackgroundStudy; }
+      bool getDoBackgroundStudy(void) const { return (m_DoBackgroundStudy != 0.0); }
 
       //! Get the maximum multiplicity in the RPC strip cumulative prob density functions
       int getMaxMultiplicity(void) const { return c_MAX_NHIT; }

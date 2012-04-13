@@ -14,7 +14,7 @@ using namespace Belle2;
 
 ClassImp(BKLMSimHit)
 
-//! empty constructor
+//! empty constructor for ROOT
 BKLMSimHit::BKLMSimHit()
 {
 }

@@ -39,6 +39,7 @@ BKLMStrip::BKLMStrip(bool inRPC, int frontBack, int sector,
 
 //! Copy constructor
 BKLMStrip::BKLMStrip(const BKLMStrip& h) :
+  TObject(h),
   m_InRPC(h.m_InRPC),
   m_FrontBack(h.m_FrontBack),
   m_Sector(h.m_Sector),

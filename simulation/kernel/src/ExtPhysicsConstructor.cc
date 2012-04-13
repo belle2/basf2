@@ -50,7 +50,6 @@ void ExtPhysicsConstructor::ConstructParticle()
   // and names/PDGcodes are unique.
 
   static G4ParticleDefinition* g4eParticle = NULL;
-  static G4Ions* g4eBaryon = NULL;
 
   if (g4eParticle == NULL) {
     // Bohr Magneton for positron and positive muon
@@ -129,7 +128,7 @@ void ExtPhysicsConstructor::ConstructParticle()
       true,            -1.0,          NULL,
       false,          "kaon",    1000000321
     );
-    g4eBaryon = new G4Ions(
+    G4Ions* g4eBaryon = new G4Ions(
       "g4e_proton",   0.9382723 * GeV,       0.0 * MeV,       eplus,
       1,              +1,             0,
       1,              +1,             0,

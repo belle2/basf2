@@ -6,6 +6,8 @@
  *  Updated : Jul. 25, 2011
  */
 
+#include <signal.h>
+
 #include <framework/pcore/pEventProcessor.h>
 
 using namespace std;
@@ -90,6 +92,8 @@ void pEventProcessor::process(PathPtr spath)
 {
   if (spath->getModules().size() == 0) return;
 
+  signal(SIGSEGV, SIG_DFL);
+
   // 0. If nprocess is 0, pass control to kbasf2::process()
 
   if (m_nproc == 0) {   // Single process -> fall back to kbasf2
@@ -164,7 +168,7 @@ void pEventProcessor::process(PathPtr spath)
   fflush(stdout);
   procHandler->init_EvtProc(m_nproc);
   if (procHandler->isEvtProc()) {
-    PathPtr& mainpath = m_bodypathlist[m_bodypathlist.size()-1];
+    PathPtr& mainpath = m_bodypathlist[m_bodypathlist.size() - 1];
     ModulePtrList main_modules = m_pathManager.buildModulePathList(mainpath);
     ModulePtrList procinitmodules = init_modules_in_process(main_modules);
     if (procinitmodules.size() > 0)
@@ -275,7 +279,8 @@ void pEventProcessor::analyze_path(PathPtr& path, Module* inmod, int cstate)
         state = 1;
         if (inlist.size() > 0) {
           // Create RingBuffer
-          RingBuffer* rbuf = new RingBuffer((char*)"input", RBUFSIZE);
+          //          RingBuffer* rbuf = new RingBuffer((char*)"input", RBUFSIZE);
+          RingBuffer* rbuf = new RingBuffer(RBUFSIZE);
           m_rbinlist.push_back(rbuf);
           // Insert Tx at the end of current path
           ModulePtr txptr(new TxModule(rbuf));
@@ -312,7 +317,8 @@ void pEventProcessor::analyze_path(PathPtr& path, Module* inmod, int cstate)
         state = 2;
         if (mainlist.size() > 0 || (cstate == 1 && mainlist.size() == 0)) {
           // Create RingBuffer
-          RingBuffer* rbuf = new RingBuffer((char*)"output", RBUFSIZE);
+          //          RingBuffer* rbuf = new RingBuffer((char*)"output", RBUFSIZE);
+          RingBuffer* rbuf = new RingBuffer(RBUFSIZE);
           m_rboutlist.push_back(rbuf);
           // Insert Tx at the end of current path
           ModulePtr txptr(new TxModule(rbuf));
@@ -462,7 +468,7 @@ void pEventProcessor::pProcessInitialize(const ModulePtrList& modulePathList)
 {
   LogSystem& logSystem = LogSystem::Instance();
   ModulePtrList::const_iterator listIter;
-  ModuleStatistics &stats = ModuleStatistics::getInstance();
+  ModuleStatistics& stats = ModuleStatistics::getInstance();
   stats.startGlobal(ModuleStatistics::c_Init);
 
   for (listIter = modulePathList.begin(); listIter != modulePathList.end(); listIter++) {

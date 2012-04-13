@@ -60,17 +60,6 @@ TxModule::~TxModule()
 void TxModule::initialize()
 {
 
-  // get iterators
-  for (int ii = 0; ii < DataStore::c_NDurabilityTypes; ii++) {
-    m_obj_iter[ii]   = DataStore::Instance().getObjectIterator(static_cast<DataStore::EDurability>(ii));
-    m_array_iter[ii] = DataStore::Instance().getArrayIterator(static_cast<DataStore::EDurability>(ii));
-    //    m_done[ii]     = false;
-  }
-
-  // Attach to ring buffer if nprocess > 0
-  //  m_nproc = Framework::nprocess();
-  //  B2WARNING("TX : nproc = " << m_nproc)
-
   m_msghandler = new MsgHandler(m_compressionLevel);
 
   B2INFO("Tx initialized.");
@@ -92,26 +81,31 @@ void TxModule::event()
   DataStore::EDurability durability = DataStore::c_Event;
 
   // Stream objects in msg_handler
-  m_obj_iter[durability]->first();
+  const DataStore::StoreObjMap& objmap = DataStore::Instance().getObjectMap(durability);
   int nobjs = 0;
-  while (!m_obj_iter[durability]->isDone()) {
-    B2INFO("Tx: adding obj " << m_obj_iter[durability]->key());
-    m_msghandler->add(m_obj_iter[durability]->value(), m_obj_iter[durability]->key());
-    nobjs++;
-    m_obj_iter[durability]->next();
+  for (DataStore::StoreObjConstIter it = objmap.begin(); it != objmap.end(); ++it) {
+    //    if ( it->second != NULL ) {
+    if (m_msghandler->add(it->second, it->first)) {
+      B2INFO("Tx: adding obj " << it->first);
+      nobjs++;
+    }
+    //    }
   }
   // Stream arrays in msg_handler
-  m_array_iter[durability]->first();
+  const DataStore::StoreArrayMap& arymap = DataStore::Instance().getArrayMap(durability);
   int narrays = 0;
-  while (!m_array_iter[durability]->isDone()) {
-    TClonesArray* ary = (TClonesArray*)m_array_iter[durability]->value();
-    B2INFO("Tx: adding array " << m_array_iter[durability]->key() << " size = " << ary->GetEntries());
-    m_msghandler->add(m_array_iter[durability]->value(), m_array_iter[durability]->key());
-    narrays++;
-    m_array_iter[durability]->next();
+  for (DataStore::StoreObjConstIter it = arymap.begin(); it != arymap.end(); ++it) {
+    //    if ( it->second != NULL ) {
+    if (m_msghandler->add(it->second, it->first)) {
+      B2INFO("Tx: adding array " << it->first);
+      narrays++;
+    }
+    //    }
   }
 
-  //  printf ( "Tx: nobjs = %d, narrays = %d\n", nobjs, narrays );
+  //  printf ( "Tx: nobjs = %d, narrays = %d (pid=%d)\n", nobjs, narrays, (int)getpid() );
+  B2INFO("Tx: nobjs = " << nobjs << ", narrays = " << narrays <<
+         " (pid=" << (int)getpid() << ")");
 
   // Encode event message
   EvtMessage* msg = m_msghandler->encode_msg(MSG_EVENT);
@@ -127,10 +121,16 @@ void TxModule::event()
     usleep(200);
   }
 
+  B2INFO("Tx: objs sent in buffer. Size = " << msg->size());
+
+  // Try to decode the buffer for debugging
+  //  vector<TObject*> objlist;
+  //  vector<string> namelist;
+  //  m_msghandler->decode_msg ( msg, objlist, namelist );
+
   // Release EvtMessage buffer
   delete msg;
 
-  B2INFO("Tx: objs sent in buffer. Size = " << msg->size());
 }
 
 void TxModule::endRun()

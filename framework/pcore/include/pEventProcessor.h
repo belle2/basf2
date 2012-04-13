@@ -22,7 +22,7 @@
 #include <framework/pcore/RxModule.h>
 #include <framework/pcore/TxModule.h>
 
-#define RBUFSIZE 4000000
+#define RBUFSIZE 100000000
 
 namespace Belle2 {
 

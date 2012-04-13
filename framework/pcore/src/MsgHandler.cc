@@ -16,7 +16,8 @@
 // #include "pcore/EvtMessage.h"
 
 
-#define MAX_BUFFER_SIZE 4000000
+#define MAX_BUFFER_SIZE 400000000
+#define MAX_OBJECT_SIZE 1000000
 
 using namespace std;
 using namespace Belle2;
@@ -41,17 +42,55 @@ void MsgHandler::clear(void)
   m_buf.clear();
 }
 
-void MsgHandler::add(TObject* obj, string name)
+bool MsgHandler::add(TObject* obj, string name)
 {
+  /*
+  if ( obj == NULL ) {
+  //    printf ( "MsgHandler::add : No Object!!\n" );
+    B2INFO ( "MsgHandler::add " << name << " : No Object!!" );
+    return false;
+  }
+  */
+
+  //  printf ( "MsgHandler::add : object class = %s\n", obj->ClassName() );
   TMessage* msg = new TMessage(kMESS_OBJECT);
-  msg->SetWriteMode();
   msg->Reset();
+  msg->SetWriteMode();
+  //  msg->EnableSchemaEvolutionForAll();
+  //  msg->SetCompressionLevel(m_complevel);
+  //  msg->Compress();
+  int len = msg->BufferSize();
+  /*
+  if (msg->CompBuffer()) {
+    // Compression ON
+    len = msg->CompLength();
+  }
+  */
   msg->WriteObject(obj);
-  msg->SetCompressionLevel(m_complevel);
-  msg->Compress();
-  m_buf.push_back(msg);
-  m_name.push_back(name);
-  //  printf ( "MsgHandler : %s added\n", name.c_str() );
+  //  msg->ForceWriteInfo(obj->, true );
+
+  // For debug. Decode packed object once:
+  //  TMessage * tmsg = new InMessage(msg->Buffer(), len);
+  //  tmsg->Print();
+  //  tmsg->ReadObjectAny( tmsg->GetClass() );
+
+
+  //  printf ( "MsgHandler : size of %s = %d (pid=%d)\n", name.c_str(), len, (int)getpid() );
+
+
+  if (len < MAX_OBJECT_SIZE) {
+    //  if ( len < MAX_OBJECT_SIZE || name != "ARICHAeroHits" ||
+    //       name != "ECLSimHits" ) {
+    m_buf.push_back(msg);
+    m_name.push_back(name);
+    //  printf ( "MsgHandler : %s added\n", name.c_str() );
+    return true;
+  } else {
+    B2INFO("MsgHandler : " << name <<
+           " : size too large " << len  << ", dropped.");
+    //    printf ( "MsgHandler : Skipping %s\n", name.c_str() );
+    return false;
+  }
 }
 
 EvtMessage* MsgHandler::encode_msg(RECORD_TYPE rectype)
@@ -61,22 +100,17 @@ EvtMessage* MsgHandler::encode_msg(RECORD_TYPE rectype)
     return eod;
   }
 
-  //  printf ( "MsgHandler : encoding message .....\n" );
+  //  printf ( "MsgHandler : encoding message ..... Nobjs = %d\n", m_buf.size() );
 
   int totlen = 0;
   char* msgbuf = new char[MAXEVTMSG];
   char* msgptr = msgbuf;
   int nameptr = 0;
   for (vector<TMessage*>::iterator it = m_buf.begin(); it != m_buf.end(); ++it) {
-    // Put name of object
-    string& name = m_name[nameptr];
-    int lname = strlen(name.c_str()) + 1;
-    memcpy(msgptr, &lname, sizeof(int));
-    memcpy(msgptr + sizeof(int), name.c_str(), lname);
-    msgptr += (sizeof(int) + lname);
-    totlen += (sizeof(int) + lname);
-    // Put object
+    // Get object
     TMessage* msg = *it;
+    // Put object
+    //    msg->EnableSchemaEvolutionForAll();
     char* buf = msg->Buffer();
     int len = msg->BufferSize();
     if (msg->CompBuffer()) {
@@ -84,8 +118,17 @@ EvtMessage* MsgHandler::encode_msg(RECORD_TYPE rectype)
       len = msg->CompLength();
       buf = msg->CompBuffer();
     }
-    //    printf ( "new obj name = %s : size = %d, msgptr = %8.8x\n",
-    //       name.c_str(), len, msgptr );
+    // Put name of object
+    string& name = m_name[nameptr];
+    int lname = strlen(name.c_str()) + 1;
+    memcpy(msgptr, &lname, sizeof(int));
+    memcpy(msgptr + sizeof(int), name.c_str(), lname);
+    msgptr += (sizeof(int) + lname);
+    totlen += (sizeof(int) + lname);
+    // Copy object into buffer
+    //    printf ( "encode: obj name = %s : size = %d, msgptr = %8.8x\n",
+    //           name.c_str(), len, msgptr );
+    //    fflush ( stdout );
     memcpy(msgptr, &len, sizeof(int));
     memcpy(msgptr + sizeof(int), buf, len);
     msgptr += (sizeof(int) + len);
@@ -126,16 +169,34 @@ int MsgHandler::decode_msg(EvtMessage* msg, vector<TObject*>& objlist,
     int objlen;
     //    printf ( "MsgHandler::decode obj=%s\n", name.c_str() );
     memcpy(&objlen, msgptr, sizeof(int));
-    //    printf ( "decode_msg : objlen = %d\n", objlen );
+    //    printf ( "decode : objlen = %d\n", objlen );
     // Old impl.
-    TMessage * tmsg = new InMessage(msgptr + sizeof(int), objlen);
+    TMessage* tmsg = new InMessage(msgptr + sizeof(int), objlen);
     //    char* tmpmsg = new char[objlen];
     //    TMessage* tmsg = new InMessage ( tmpmsg, objlen );
-    TObject* obj = (TObject*)tmsg->ReadObjectAny(NULL);
+    //    TObject* obj = (TObject*)tmsg->ReadObjectAny(NULL);
+    TObject* obj = (TObject*)tmsg->ReadObjectAny(tmsg->GetClass());
     objlist.push_back(obj);
+
+    /*
+    if ( obj != NULL ) {
+      printf ( "MsgHandler::decode_msg : obj=%s, class=%s\n",
+         name.c_str(), obj->ClassName() );
+    }
+    else {
+      printf ( "MsgHandler::decode_msg : obj=%s, Null Object\n",
+         name.c_str() );
+    }
+    */
+
     msgptr += objlen + sizeof(int);
     totlen += objlen + sizeof(int);
     delete tmsg; // tmpmsg should be deleted here also.
+    //    printf ( "decode : %s added to objlist; size=%d (pid=%d)\n",
+    //           name.c_str(), objlen, (int)getpid()  );
+    fflush(stdout);
+
   }
+  //  printf ( "decode : done\n" );
   return 0;
 }

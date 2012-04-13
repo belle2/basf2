@@ -30,7 +30,7 @@ namespace Belle2 {
     /*! Clear object list */
     virtual void clear(void);
     /*! Add an object to be streamed */
-    virtual void add(TObject*, std::string name);
+    virtual bool add(TObject*, std::string name);
 
     /*! Stream object list into an EvtMessage */
     virtual EvtMessage* encode_msg(RECORD_TYPE rectype);

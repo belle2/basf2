@@ -44,7 +44,7 @@ SimpleOutputModule::SimpleOutputModule() : Module(), m_file(0), m_experiment(0),
 {
   //Set module properties
   setDescription("Writes datastore objects into a .root file");
-  setPropertyFlags(c_Output);
+  setPropertyFlags(c_Output | c_InitializeInProcess);
 
   //Initialization of some member variables
   for (int jj = 0; jj < DataStore::c_NDurabilityTypes; jj++) {
@@ -78,11 +78,14 @@ SimpleOutputModule::SimpleOutputModule() : Module(), m_file(0), m_experiment(0),
 
 SimpleOutputModule::~SimpleOutputModule()
 {
+  //  printf ( "SimpleOutput : destructor called\n" );
+  /* Moved to terminate()
   delete m_file;
 
   for (size_t jj = 0; jj < DataStore::c_NDurabilityTypes; jj++) {
     delete[] m_objects[jj];
   }
+  */
 }
 
 void SimpleOutputModule::initialize()
@@ -233,7 +236,14 @@ void SimpleOutputModule::terminate()
     }
   }
 
+  // Clean up (moved from destructor)
+  delete m_file;
+  for (size_t jj = 0; jj < DataStore::c_NDurabilityTypes; jj++) {
+    delete[] m_objects[jj];
+  }
+
   B2DEBUG(1, "terminate called");
+
 }
 
 void SimpleOutputModule::fillTree(const DataStore::EDurability& durability)
@@ -251,7 +261,6 @@ void SimpleOutputModule::fillTree(const DataStore::EDurability& durability)
     m_done[durability] = true;
   } else {
     // gather the object pointers for this entry
-    // no need to reconnect the arrays, as the TClonesArrays aren't deleted
     size_t sizeCounter = 0;
     const DataStore::StoreObjMap& map = DataStore::Instance().getObjectMap(durability);
     for (DataStore::StoreObjConstIter iter = map.begin(); iter != map.end(); ++iter) {
@@ -268,7 +277,27 @@ void SimpleOutputModule::fillTree(const DataStore::EDurability& durability)
       }
     }
     if (sizeCounter > m_sizeObj[durability]) {
-      B2FATAL("More elements than in first event.");
+      B2FATAL("More object elements than in first event.");
+      return;
+    }
+    // gather the array pointers for this entry
+    const DataStore::StoreArrayMap& ary = DataStore::Instance().getArrayMap(durability);
+    for (DataStore::StoreObjConstIter iter = ary.begin(); iter != ary.end(); ++iter) {
+      if (binary_search(m_branchNames[durability].begin(), m_branchNames[durability].end(), iter->first)) {
+        if (iter->second != 0) {
+          m_objects[durability][sizeCounter] = iter->second;
+          m_tree[durability]->SetBranchAddress(iter->first.c_str(), &(m_objects[durability][sizeCounter]));
+        } else {
+          //no object exists, this will create a temporary owned & deleted by the branch
+          m_tree[durability]->SetBranchAddress(iter->first.c_str(), 0);
+        }
+
+        sizeCounter++;
+      }
+    }
+    //    if (sizeCounter > m_sizeObj[durability]) {
+    if (sizeCounter > m_size[durability]) {
+      B2FATAL("More array elements than in first event.");
       return;
     }
   }

@@ -160,14 +160,14 @@ void ExtModule::event()
   G4ErrorTrajErr g4eCov(5, 0);
 
   int nTracks = gfTracks.getEntries();
-  for (int track = 0; track < nTracks; ++track) {
+  for (int t = 0; t < nTracks; ++t) {
 
-    int charge = int(gfTracks[track]->getCardinalRep()->getCharge());
+    int charge = int(gfTracks[t]->getCardinalRep()->getCharge());
 
     for (int hypothesis = 0; hypothesis < N_HYPOTHESES; hypothesis++) {
 
-      GFTrackCand* cand = addTrackCand(gfTracks[track], m_pdg[hypothesis] * charge, extTrackCands, position, momentum, g4eCov);
-      if (gfTracks[track]->getMom().Pt() <= m_minPt) continue;
+      GFTrackCand* cand = addTrackCand(gfTracks[t], m_pdg[hypothesis] * charge, extTrackCands, position, momentum, g4eCov);
+      if (gfTracks[t]->getMom().Pt() <= m_minPt) continue;
       G4ParticleDefinition* particle = G4ParticleTable::GetParticleTable()->FindParticle(m_pdg[hypothesis] * charge);
       string g4eName = "g4e_" + particle->GetParticleName();
       double mass = particle->GetPDGMass();
@@ -221,40 +221,6 @@ void ExtModule::event()
     m_runMgr->SetUserAction(m_stp);
   }
 
-  unsigned int myDetID = 5; // ECL in this example
-  for (int i = 0; i < gfTracks.getEntries(); ++i) {
-    for (int hypothesis = 0; hypothesis < 5; ++hypothesis) {
-      GFTrackCand* cand = extTrackCands[i * 5 + hypothesis];
-      for (unsigned int j = 0; j < cand->getNHits(); ++j) {
-        unsigned int detID;
-        unsigned int hitID;
-        unsigned int planeID;
-        cand->getHitWithPlane(j, detID, hitID, planeID);
-        if (detID != myDetID) continue;
-        if (planeID == 0) continue;
-        // detID encodes the intersected detector:
-        //   0=PXD, 1=SVD, 2=CDC, 3=TOP, 4=ARICH, 5=ECL, 6=KLM
-        // planeID encodes the detector element
-        // TOP:     0 for the TOP container
-        //          0 < planeID <= 16 (quartz bars)
-        // ARICH:   0 for the ARICH container
-        //          0 < planeID <= 456 (sensitive detectors)
-        // ECL:     0 for the ECL container
-        //          0 < planeID <= 1152 for Fw (16*72 crystals)
-        //       1152 < planeID <= 7776 for Br (1152 + 144*46 crystals)
-        //       7776 < planeID <= 8736 for Bw (7776 + 16*60)
-        ExtRecoHit* h = extRecoHits[hitID];
-        TMatrixD p = h->getRawHitCoord();
-        TMatrixD c = h->getRawHitCov();
-        ExtHitStatus s = h->getStatus();
-        // phasespacePoint is a 6x1 matrix containing x,y,z,px,py,pz (cm, GeV/c)
-        // covariance is the 6x6 covariance matrix at phasespacePoint
-        // status is 0=ENTER, 1=EXIT, 2=STOP, 3=ESCAPE
-        // test distance from phasespacePoint to a hit in element planeID
-      }
-    }
-  }
-
 }
 
 void ExtModule::endRun()
@@ -303,7 +269,6 @@ void ExtModule::registerVolumes()
     if (name == "moduleSensitive") {
       m_enter->push_back(*iVol);
       m_exit->push_back(*iVol);
-      G4LogicalVolume* motherLogical = (*iVol)->GetMotherLogical();
     }
     // ECL
     if (name == "physicalECL") {
@@ -335,7 +300,6 @@ void ExtModule::registerVolumes()
 void ExtModule::getVolumeID(const G4TouchableHandle& touch, int& detID, int& copyID)
 {
   G4String name = touch->GetVolume(0)->GetName();
-  G4int depth = touch->GetHistoryDepth();
   if (name.find("CDC") != string::npos) {
     detID = 3;
     copyID = touch->GetVolume(0)->GetCopyNo();

@@ -125,6 +125,7 @@ void ExtManager::InitTrackPropagation()
 G4bool ExtManager::InitFieldForBackwards()
 {
   B2FATAL("Module ext: ExtManager::InitFieldForBackwards() should never be called")
+  return false;
 }
 
 G4int ExtManager::Propagate(G4ErrorTrajState* currentTS, const G4ErrorTarget* target, G4ErrorMode mode)

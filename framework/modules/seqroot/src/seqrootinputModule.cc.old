@@ -1,0 +1,185 @@
+//+
+// File : seqrootoutput.cc
+// Description : Sequential ROOT output module for pbasf2
+//
+// Author : Ryosuke Itoh, IPNS, KEK
+// Date : 13 - Aug - 2010
+//-
+
+#include <framework/modules/seqroot/seqrootinputModule.h>
+#include <framework/core/Environment.h>
+#include <stdlib.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <stdio.h>
+#include <arpa/inet.h>
+
+using namespace std;
+using namespace Belle2;
+
+static bool first = true;
+
+//-----------------------------------------------------------------
+//                 Register the Module
+//-----------------------------------------------------------------
+REG_MODULE(SeqRootInput)
+
+//-----------------------------------------------------------------
+//                 Implementation
+//-----------------------------------------------------------------
+
+SeqRootInputModule::SeqRootInputModule() : Module()
+{
+  //Set module properties
+  setDescription("SeqROOT output module");
+  setPropertyFlags(c_Input|c_InitializeInProcess);
+
+  m_file = 0;
+
+  //Parameter definition
+  addParam("inputFileName"  , m_inputFileName, "SeqRoot file name.", string("SeqRootInput.root"));
+  addParam("compressionLevel", m_compressionLevel, "Compression Level: 0 for no, 1 for low, 9 for high compression.", 0);
+
+  B2INFO("SeqRootInput: Constructor done.");
+}
+
+
+SeqRootInputModule::~SeqRootInputModule()
+{
+}
+
+void SeqRootInputModule::initialize()
+{
+
+  // get iterators
+  for (int ii = 0; ii < DataStore::c_NDurabilityTypes; ii++) {
+    m_obj_iter[ii]   = DataStore::Instance().getObjectIterator(static_cast<DataStore::EDurability>(ii));
+    m_array_iter[ii] = DataStore::Instance().getArrayIterator(static_cast<DataStore::EDurability>(ii));
+    //    m_done[ii]     = false;
+  }
+
+  // Open input file
+  m_file = new SeqFile(m_inputFileName.c_str(), "r");
+  //  m_fd = open ( m_inputFileName.c_str(), O_RDONLY );
+
+  // Message handler to encode serialized object
+  m_msghandler = new MsgHandler(m_compressionLevel);
+
+  B2INFO("SeqRootInput: initialized.");
+}
+
+
+void SeqRootInputModule::beginRun()
+{
+  B2INFO("SeqRootInput: beginRun called.");
+}
+
+
+void SeqRootInputModule::event()
+{
+  m_msghandler->clear();
+
+  // Get a SeqRoot record from the file
+  char* evtbuf = new char[MAXEVTSIZE];
+  EvtMessage* evtmsg = NULL;
+  int size;
+  size = m_file->read(evtbuf, MAXEVTSIZE);
+  if (size == 0) {
+    delete m_file;
+    return;
+  } 
+  else {
+    printf ( "SeqRootInput : read = %d\n", size );
+    evtmsg = new EvtMessage(evtbuf);
+  }
+
+  /* Just for testing
+ retry:
+  //  size = m_file->read(evtbuf, MAXEVTSIZE);
+  unsigned int sizebuf;
+  int is = read ( m_fd, &sizebuf, 4 );
+  size = sizebuf;
+  if (is <= 0) {
+    //    delete m_file;
+    close ( m_fd );
+    return;
+  } 
+  else {
+    is = read ( m_fd, evtbuf, size );
+  }
+  if ( first ) {
+    first = false;
+    //    goto retry;
+  }
+  
+  evtmsg = new EvtMessage(evtbuf);
+  printf ( "SeqFile : read = %d (type = %d)\n", size, evtmsg->type() );
+  if ( evtmsg->type() != MSG_EVENT ) goto retry;
+  */
+
+  // Get number of objects
+  DataStore::EDurability durability = (DataStore::EDurability)(evtmsg->header())->reserved[0];
+  int nobjs = (evtmsg->header())->reserved[1];
+  int narrays = (evtmsg->header())->reserved[2];
+
+  //  printf ( "nobjs = %d, narrays = %d\n", nobjs, narrays );
+  B2INFO ( "nobjs = " << nobjs << ", narrays = " << narrays );
+
+  // Decode message
+  DataStore::Instance().clearMaps();
+  vector<TObject*> objlist;
+  vector<string> namelist;
+  m_msghandler->decode_msg(evtmsg, objlist, namelist);
+
+  delete evtbuf;
+
+
+  // Restore objects in DataStore
+  // 1. Objects
+  for (int i = 0; i < nobjs; i++) {
+    DataStore::Instance().storeObject(
+      objlist.at(i), namelist.at(i), durability);
+    B2INFO ( "Store Object : " << namelist.at(i) << " stored" );
+  }
+  for (int i = 0; i < narrays; i++) {
+    DataStore::Instance().storeArray(
+      (TClonesArray*)objlist.at(i + nobjs),
+      namelist.at(i + nobjs), durability);
+    B2INFO ( "Store Array : " << namelist.at(i) << " stored" );
+  }
+  //  B2INFO ( "Event received : " << m_nrecv++ )
+
+  // Check objects in DataStore
+  // 1. Stored Objects
+  m_obj_iter[durability]->first();
+  while (!m_obj_iter[durability]->isDone()) {
+    //    B2INFO ( "Check Object : " << (m_obj_iter[durability]->key()).c_str() ); 
+    printf ( "Check Object : %s\n", (m_obj_iter[durability]->key()).c_str() );
+    m_obj_iter[durability]->next();
+  }
+  // 2. Stored Arrays
+  m_array_iter[durability]->first();
+  while (!m_array_iter[durability]->isDone()) {
+    //    B2INFO ( "Check Array : " << (m_obj_iter[durability]->key()).c_str() ); 
+    printf ( "Check Array : %s\n", (m_array_iter[durability]->key()).c_str() );
+    m_array_iter[durability]->next();
+  } 
+
+}
+
+void SeqRootInputModule::endRun()
+{
+  //fill Run data
+
+  B2INFO("SeqRootInput: endRun done.");
+}
+
+
+void SeqRootInputModule::terminate()
+{
+  //  delete m_file;
+  B2INFO("SeqRootInput: terminate called")
+}
+

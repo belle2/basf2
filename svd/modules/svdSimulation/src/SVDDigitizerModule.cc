@@ -26,6 +26,7 @@
 #include <vector>
 #include <set>
 #include <math.h>
+#include <root/TMath.h>
 
 #include <root/TRandom.h>
 #include <root/TMath.h>
@@ -183,10 +184,19 @@ void SVDDigitizerModule::initialize()
   if (!m_rootFilename.empty()) {
     m_rootFile = new TFile(m_rootFilename.c_str(), "RECREATE");
     m_rootFile->cd();
-    m_histDiffusion_u = new TH1D("Hole diffusion", "Diffusion distance, u [um]", 200, -100, 100);
-    m_histDiffusion_v = new TH1D("Electron diffusion", "Diffusion distance, v [um]", 200, -100, 100);
+    m_histDiffusion_u = new TH1D("h_holeDiffusion", "Diffusion distance, u", 200, -100, 100);
+    m_histDiffusion_u->GetXaxis()->SetTitle("Diffusion distance u [um]");
+    m_histDiffusion_v = new TH1D("h_electronDiffusion", "Diffusion distance", 200, -100, 100);
+    m_histDiffusion_v->GetXaxis()->SetTitle("Diffusion distance v [um]");
+    m_histLorentz_u = new TH1D("h_LorentzAngle_u", "Lorentz angle, holes", 100, -0.1, 0.0);
+    m_histLorentz_u->GetXaxis()->SetTitle("Lorentz angle");
+    m_histLorentz_v = new TH1D("h_LorentzAngle_v", "Lorentz angle, electrons", 100, -0.02, 0.02);
+    m_histLorentz_v->GetXaxis()->SetTitle("Lorentz angle");
+    m_signalDist_u = new TH1D("h_signalDist_u", "Strip signals vs. TrueHits, holes", 100, -400, 400);
+    m_signalDist_u->GetXaxis()->SetTitle("U strip position - TrueHit u [um]");
+    m_signalDist_v = new TH1D("h_signalDist_v", "Strip signals vs. TrueHits, electrons", 100, -400, 400);
+    m_signalDist_v->GetXaxis()->SetTitle("V strip position - TrueHit v [um]");
   }
-
   // Check if the global random number generator is available.
   if (!gRandom) B2FATAL("gRandom not initialized, please set up gRandom first");
 }
@@ -427,19 +437,22 @@ void SVDDigitizerModule::driftCharge(const TVector3& position, double carriers)
   // Electrons:
   TVector3 v_e = getVelocity(electron, mean_e);
   double driftTime_e = distanceToFrontPlane / v_e.Z();
-  TVector3 center_e = mean_e + driftTime_e * v_e;
+  TVector3 center_e = position + driftTime_e * v_e;
   double D_e = Unit::kBoltzmann * m_temperature / Unit::e * getElectronMobility(getEField(mean_e).Mag());
   double sigma_e = sqrt(2.0 * D_e * driftTime_e);
   double tanLorentz_e = v_e.Y() / v_e.Z();
   sigma_e *= sqrt(1.0 + tanLorentz_e * tanLorentz_e);
+  if (m_histLorentz_v) m_histLorentz_v->Fill(tanLorentz_e);
+
   // Holes
   TVector3 v_h = getVelocity(hole, mean_h);
   double driftTime_h = - distanceToBackPlane / v_h.Z();
-  TVector3 center_h = mean_h + driftTime_h * v_h;
+  TVector3 center_h = position + driftTime_h * v_h;
   double D_h = Unit::kBoltzmann * m_temperature / Unit::e * getElectronMobility(getEField(mean_h).Mag());
   double sigma_h = sqrt(2.0 * D_h * driftTime_h);
   double tanLorentz_h = v_h.X() / v_h.Z(); // Is this OK?
   sigma_h *= sqrt(1.0 + tanLorentz_h * tanLorentz_h);
+  if (m_histLorentz_u) m_histLorentz_u->Fill(tanLorentz_h);
 
   //Determine strips hit by the electron cloud
   double vLow    = center_e.Y() - m_widthOfDiffusCloud * sigma_e;
@@ -482,6 +495,8 @@ void SVDDigitizerModule::driftCharge(const TVector3& position, double carriers)
   for (int vID = 0; vID < nStrips_e; ++vID) {
     double vUpperTail = NORMAL_CDF(center_e.Y(), sigma_e, vPos + 0.5 * vGeomPitch);
     double vIntegral  = vUpperTail - vLowerTail;
+    // Can fail on far tails
+    if (TMath::IsNaN(vIntegral)) vIntegral = 0.0;
     vLowerTail = vUpperTail;
     double charge = carriers * vIntegral;
     if (m_applyPoisson) {
@@ -500,17 +515,26 @@ void SVDDigitizerModule::driftCharge(const TVector3& position, double carriers)
   B2DEBUG(30, "Fraction of charge (e): " << fraction);
   // The strip signals combine due to capacitive coupling.
   // FIXME: We have the same parameters for n and p strips. Is this correct?
+  double correctedCharge = 0;
   double cNeighbour2 = 0.5 * info.getInterstripCapacitance()
                        / (0.5 * info.getInterstripCapacitance() + info.getBackplaneCapacitance() + info.getCouplingCapacitance());
   double cNeighbour1 = 0.5;
   double cSelf = 1.0 - 2.0 * cNeighbour2;
   //Leftmost strip (there must be at least one readout strip to the right):
   int arrayIndex = 0;
-  double correctedCharge =
-    (cNeighbour2 + cSelf) * eStripCharges[arrayIndex]
-    + cNeighbour1 * eStripCharges[arrayIndex + 1]
-    + cNeighbour2 * eStripCharges[arrayIndex + 2];
+  if (vIDLow == 0) {
+    correctedCharge =
+      (cNeighbour2 + cSelf) * eStripCharges[arrayIndex]
+      + cNeighbour1 * eStripCharges[arrayIndex + 1]
+      + cNeighbour2 * eStripCharges[arrayIndex + 2];
+  } else {
+    correctedCharge =
+      cSelf * eStripCharges[arrayIndex]
+      + cNeighbour1 * eStripCharges[arrayIndex + 1]
+      + cNeighbour2 * eStripCharges[arrayIndex + 2];
+  }
   sensor.second[vIDLow].add(m_currentTime + driftTime_e, correctedCharge, m_shapingTime, m_currentParticle, m_currentTrueHit);
+
   for (int vID = vIDLow + 1; vID < vIDHigh; ++vID) {
     arrayIndex = 2 * (vID - vIDLow);
     correctedCharge =
@@ -523,10 +547,17 @@ void SVDDigitizerModule::driftCharge(const TVector3& position, double carriers)
   }
   // Rightmost strip (there must be at least one readout strip to the left):
   arrayIndex = 2 * (vIDHigh - vIDLow);
-  correctedCharge =
-    cNeighbour2 * eStripCharges[arrayIndex - 2]
-    + cNeighbour2 * eStripCharges[arrayIndex - 1]
-    + (cSelf + cNeighbour2) * eStripCharges[arrayIndex];
+  if (vIDHigh == info.getVCells()) {
+    correctedCharge =
+      cNeighbour2 * eStripCharges[arrayIndex - 2]
+      + cNeighbour2 * eStripCharges[arrayIndex - 1]
+      + (cSelf + cNeighbour2) * eStripCharges[arrayIndex];
+  } else {
+    correctedCharge =
+      cNeighbour2 * eStripCharges[arrayIndex - 2]
+      + cNeighbour2 * eStripCharges[arrayIndex - 1]
+      + cNeighbour2 * eStripCharges[arrayIndex];
+  }
   sensor.second[vIDHigh].add(m_currentTime + driftTime_e, correctedCharge, m_shapingTime, m_currentParticle, m_currentTrueHit);
 
   //Holes
@@ -539,11 +570,13 @@ void SVDDigitizerModule::driftCharge(const TVector3& position, double carriers)
   fraction = 0;
   int nStrips_h = 2 * (uIDHigh - uIDLow) + 1;
   std::vector<double> hStripCharges(nStrips_h);
-  double uPos = info.getUCellPosition(uIDLow, center_h.Y());
+  double uPos = info.getUCellPosition(uIDLow, info.getVCellID(center_h.Y()));
   double uLowerTail = NORMAL_CDF(center_h.X(), sigma_h, uPos - 0.5 * uGeomPitch);
   for (int uID = 0; uID < nStrips_h; ++uID) {
-    double uUpperTail = NORMAL_CDF(center_h.X(), sigma_e, uPos + 0.5 * uGeomPitch);
+    double uUpperTail = NORMAL_CDF(center_h.X(), sigma_h, uPos + 0.5 * uGeomPitch);
     double uIntegral  = uUpperTail - uLowerTail;
+    // Can fail on far tails
+    if (TMath::IsNaN(uIntegral)) uIntegral = 0.0;
     uLowerTail = uUpperTail;
     double charge = carriers * uIntegral;
     if (m_applyPoisson) {
@@ -563,10 +596,17 @@ void SVDDigitizerModule::driftCharge(const TVector3& position, double carriers)
   // The strip signals combine due to capacitive coupling.
   //Leftmost strip (there must be at least one readout strip to the right):
   arrayIndex = 0;
-  correctedCharge =
-    (cNeighbour2 + cSelf) * hStripCharges[arrayIndex]
-    + cNeighbour1 * hStripCharges[arrayIndex + 1]
-    + cNeighbour2 * hStripCharges[arrayIndex + 2];
+  if (uIDLow == 0) {
+    correctedCharge =
+      cSelf * hStripCharges[arrayIndex]
+      + cNeighbour1 * hStripCharges[arrayIndex + 1]
+      + cNeighbour2 * hStripCharges[arrayIndex + 2];
+  } else {
+    correctedCharge =
+      (cNeighbour2 + cSelf) * hStripCharges[arrayIndex]
+      + cNeighbour1 * hStripCharges[arrayIndex + 1]
+      + cNeighbour2 * hStripCharges[arrayIndex + 2];
+  }
   sensor.first[uIDLow].add(m_currentTime + driftTime_h, correctedCharge, m_shapingTime, m_currentParticle, m_currentTrueHit);
   for (int uID = uIDLow + 1; uID < uIDHigh; ++uID) {
     arrayIndex = 2 * (uID - uIDLow);
@@ -580,10 +620,17 @@ void SVDDigitizerModule::driftCharge(const TVector3& position, double carriers)
   }
   // Rightmost strip (there must be at least one readout strip to the left):
   arrayIndex = 2 * (uIDHigh - uIDLow);
-  correctedCharge =
-    cNeighbour2 * hStripCharges[arrayIndex - 2]
-    + cNeighbour2 * hStripCharges[arrayIndex - 1]
-    + (cSelf + cNeighbour2) * hStripCharges[arrayIndex];
+  if (uIDHigh == info.getUCells()) {
+    correctedCharge =
+      cNeighbour2 * hStripCharges[arrayIndex - 2]
+      + cNeighbour2 * hStripCharges[arrayIndex - 1]
+      + (cSelf + cNeighbour2) * hStripCharges[arrayIndex];
+  } else {
+    correctedCharge =
+      cNeighbour2 * hStripCharges[arrayIndex - 2]
+      + cNeighbour2 * hStripCharges[arrayIndex - 1]
+      + cSelf * hStripCharges[arrayIndex];
+  }
   sensor.first[uIDHigh].add(m_currentTime + driftTime_h, correctedCharge, m_shapingTime, m_currentParticle, m_currentTrueHit);
 
 
@@ -654,9 +701,21 @@ void SVDDigitizerModule::saveDigits(double time)
       if (particles.size() > 0) {
         relDigitMCParticle.add(iStrip, particles.begin(), particles.end());
       }
-      //If the digit has any relations to truehits, add the Relations
+      //If the digit has any relations to truehits, add the Relations.
       if (truehits.size() > 0) {
         relDigitTrueHit.add(iStrip, truehits.begin(), truehits.end());
+        // Add reporting data
+        if (m_signalDist_u) {
+          BOOST_FOREACH(SVDSignal::relation_value_type trueRel, truehits) {
+            int iTrueHit = trueRel.first;
+            float trueWeight = trueRel.second;
+            if (iTrueHit > -1)
+              m_signalDist_u->Fill(
+                (info.getUCellPosition(iStrip) - storeTrueHits[iTrueHit]->getU()) / Unit::um,
+                trueWeight
+              );
+          }
+        }
       }
     } // FOREACH stripSignal
     // Add noisy digits
@@ -665,8 +724,8 @@ void SVDDigitizerModule::saveDigits(double time)
       int nU = info.getUCells();
       int uNoisyStrips = gRandom->Poisson(fraction * nU);
       for (short ns = 0; ns < uNoisyStrips; ++ns) {
-        if (occupied_u.count(ns) > 0) continue;
         short iStrip = gRandom->Integer(nU);
+        if (occupied_u.count(iStrip) > 0) continue;
         // Add a noisy digit, no relations.
         int digIndex = storeDigits->GetLast() + 1;
         new(storeDigits->AddrAt(digIndex)) SVDDigit(
@@ -711,6 +770,18 @@ void SVDDigitizerModule::saveDigits(double time)
       //If the digit has any relations to truehits, add the Relations
       if (truehits.size() > 0) {
         relDigitTrueHit.add(iStrip, truehits.begin(), truehits.end());
+        // Add reporting data
+        if (m_signalDist_v) {
+          BOOST_FOREACH(SVDSignal::relation_value_type trueRel, truehits) {
+            int iTrueHit = trueRel.first;
+            float trueWeight = trueRel.second;
+            if (iTrueHit > -1)
+              m_signalDist_v->Fill(
+                (info.getVCellPosition(iStrip) - storeTrueHits[iTrueHit]->getV()) / Unit::um,
+                trueWeight
+              );
+          }
+        }
       }
     } // FOREACH stripSignal
     // Add noisy digits
@@ -719,8 +790,8 @@ void SVDDigitizerModule::saveDigits(double time)
       int nV = info.getVCells();
       int vNoisyStrips = gRandom->Poisson(fraction * nV);
       for (short ns = 0; ns < vNoisyStrips; ++ns) {
-        if (occupied_v.count(ns) > 0) continue;
         short iStrip = gRandom->Integer(nV);
+        if (occupied_v.count(iStrip) > 0) continue;
         // Add a noisy digit, no relations.
         int digIndex = storeDigits->GetLast() + 1;
         new(storeDigits->AddrAt(digIndex)) SVDDigit(

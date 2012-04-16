@@ -240,6 +240,12 @@ namespace Belle2 {
       /** Histogram showing the diffusion cloud */
       TH1D*  m_histDiffusion_u;
       TH1D*  m_histDiffusion_v;
+      /** Histogram showing Lorentz agnles. */
+      TH1D*  m_histLorentz_u;
+      TH1D*  m_histLorentz_v;
+      /** Histogram showing distribution of digit signals.*/
+      TH1D*  m_signalDist_u;
+      TH1D*  m_signalDist_v;
 
     };//end class declaration
   } // end namespace SVD

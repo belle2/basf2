@@ -24,8 +24,8 @@ SVDSignal::operator()(double time)
   BOOST_FOREACH(SVDSignal::Wave wave, m_functions) {
     double wave_value = waveform(time, wave);
     wave_sum += wave_value;
-    m_particles[wave.m_particle] += wave_value;
-    m_truehits[wave.m_truehit] += wave_value;
+    m_particles[wave.m_particle] += static_cast<float>(wave_value);
+    m_truehits[wave.m_truehit] += static_cast<float>(wave_value);
   }
   return boost::make_tuple(wave_sum, boost::cref(m_particles), boost::cref(m_truehits));
 }

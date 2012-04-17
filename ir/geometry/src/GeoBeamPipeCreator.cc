@@ -105,6 +105,10 @@ namespace Belle2 {
       GearDir cSafety(content, "Safety/");
       double SafetyLength = cSafety.getLength("L1") / Unit::mm;
 
+      double stepMax = 5.0 * Unit::mm;
+      bool flag_limitStep = false;
+
+
       ////==========
       ////= IP pipe
 
@@ -325,6 +329,7 @@ namespace Belle2 {
       // Intersection with mother
       G4IntersectionSolid* geo_Lv2Vacuum = new G4IntersectionSolid("geo_Lv2Vacuum_name", geo_Lv2Vacuumx, geo_Lv1SUS);
       G4LogicalVolume* logi_Lv2Vacuum = new G4LogicalVolume(geo_Lv2Vacuum, mat_Lv2Vacuum, "logi_Lv2Vacuum_name");
+      if (flag_limitStep) logi_Lv2Vacuum->SetUserLimits(new G4UserLimits(stepMax));
 
       //-   put volume
       setColor(*logi_Lv2Vacuum, cLv2Vacuum.getString("Color", "#CCCCCC"));
@@ -485,6 +490,7 @@ namespace Belle2 {
       ////==========
       ////= Ta pipe Forward
 
+
       //----------
       //- Lv1TaFwd
 
@@ -609,6 +615,7 @@ namespace Belle2 {
       //
       G4IntersectionSolid* geo_Lv2VacFwd = new G4IntersectionSolid("geo_Lv2VacFwd_name", geo_Lv1TaFwd, geo_Lv2VacFwdx, transform_Lv2VacFwd);
       G4LogicalVolume* logi_Lv2VacFwd = new G4LogicalVolume(geo_Lv2VacFwd, mat_Lv2VacFwd, "logi_Lv2VacFwd_name");
+      if (flag_limitStep) logi_Lv2VacFwd->SetUserLimits(new G4UserLimits(stepMax));
 
       //-   put volume
       setColor(*logi_Lv2VacFwd, cLv2VacFwd.getString("Color", "#CCCCCC"));
@@ -621,6 +628,7 @@ namespace Belle2 {
 
       ////=
       ////==========
+
 
       ////==========
       ////= Ta pipe Backward
@@ -746,6 +754,7 @@ namespace Belle2 {
       //
       G4IntersectionSolid* geo_Lv2VacBwd = new G4IntersectionSolid("geo_Lv2VacBwd_name", geo_Lv1TaBwd, geo_Lv2VacBwdx, transform_Lv2VacBwd);
       G4LogicalVolume* logi_Lv2VacBwd = new G4LogicalVolume(geo_Lv2VacBwd, mat_Lv2VacBwd, "logi_Lv2VacBwd_name");
+      if (flag_limitStep) logi_Lv2VacBwd->SetUserLimits(new G4UserLimits(stepMax));
 
       //-   put volume
       setColor(*logi_Lv2VacBwd, cLv2VacBwd.getString("Color", "#CCCCCC"));
@@ -758,6 +767,7 @@ namespace Belle2 {
 
       ////=
       ////==========
+
 
       ////==========
       ////= beam pipe Forward Forward
@@ -840,6 +850,8 @@ namespace Belle2 {
       G4Polycone* geo_Lv2VacLERUppcon = new G4Polycone("geo_Lv2VacLERUppcon_name", 0, 2 * M_PI, Lv1TaLERUp_num, Lv1TaLERUp_Z, Lv1TaLERUp_rI, Lv2VacLERUp_rO);
       G4IntersectionSolid* geo_Lv2VacLERUp = new G4IntersectionSolid("geo_Lv2VacLERUp_name", geo_Lv2VacLERUppcon, geo_AreaTubeFwdpcon, transform_AreaTubeFwdForLER);
       G4LogicalVolume* logi_Lv2VacLERUp = new G4LogicalVolume(geo_Lv2VacLERUp, mat_Lv2VacLERUp, "logi_Lv2VacLERUp_name");
+      if (flag_limitStep) logi_Lv2VacLERUp->SetUserLimits(new G4UserLimits(stepMax));
+
 
       //-   put volume
       setColor(*logi_Lv2VacLERUp, cLv2VacLERUp.getString("Color", "#CCCCCC"));
@@ -905,6 +917,7 @@ namespace Belle2 {
       G4Polycone* geo_Lv2VacHERDwnpcon = new G4Polycone("geo_Lv2VacHERDwnpcon_name", 0, 2 * M_PI, Lv1TaHERDwn_num, Lv1TaHERDwn_Z, Lv1TaHERDwn_rI, Lv2VacHERDwn_rO);
       G4IntersectionSolid* geo_Lv2VacHERDwn = new G4IntersectionSolid("", geo_Lv2VacHERDwnpcon, geo_AreaTubeFwdpcon, transform_AreaTubeFwdForHER);
       G4LogicalVolume* logi_Lv2VacHERDwn = new G4LogicalVolume(geo_Lv2VacHERDwn, mat_Lv2VacHERDwn, "logi_Lv2VacHERDwn_name");
+      if (flag_limitStep) logi_Lv2VacHERDwn->SetUserLimits(new G4UserLimits(stepMax));
 
       //-   put volume
       setColor(*logi_Lv2VacHERDwn, cLv2VacHERDwn.getString("Color", "#CCCCCC"));
@@ -997,6 +1010,7 @@ namespace Belle2 {
       G4Polycone* geo_Lv2VacHERUppcon = new G4Polycone("geo_Lv2VacHERUppcon_name", 0, 2 * M_PI, Lv1TaHERUp_num, Lv1TaHERUp_Z, Lv1TaHERUp_rI, Lv2VacHERUp_rO);
       G4IntersectionSolid* geo_Lv2VacHERUp = new G4IntersectionSolid("", geo_Lv2VacHERUppcon, geo_AreaTubeBwdpcon, transform_AreaTubeFwdForHER);
       G4LogicalVolume* logi_Lv2VacHERUp = new G4LogicalVolume(geo_Lv2VacHERUp, mat_Lv2VacHERUp, "logi_Lv2VacHERUp_name");
+      if (flag_limitStep) logi_Lv2VacHERUp->SetUserLimits(new G4UserLimits(stepMax));
 
       //-   put volume
       setColor(*logi_Lv2VacHERUp, cLv2VacHERUp.getString("Color", "#CCCCCC"));
@@ -1063,6 +1077,7 @@ namespace Belle2 {
       G4Polycone* geo_Lv2VacLERDwnpcon = new G4Polycone("geo_Lv2VacLERDwnpcon_name", 0, 2 * M_PI, Lv1TaLERDwn_num, Lv1TaLERDwn_Z, Lv1TaLERDwn_rI, Lv2VacLERDwn_rO);
       G4IntersectionSolid* geo_Lv2VacLERDwn = new G4IntersectionSolid("", geo_Lv2VacLERDwnpcon, geo_AreaTubeBwdpcon, transform_AreaTubeBwdForLER);
       G4LogicalVolume* logi_Lv2VacLERDwn = new G4LogicalVolume(geo_Lv2VacLERDwn, mat_Lv2VacLERDwn, "logi_Lv2VacLERDwn_name");
+      if (flag_limitStep) logi_Lv2VacLERDwn->SetUserLimits(new G4UserLimits(stepMax));
 
       //-   put volume
       setColor(*logi_Lv2VacLERDwn, cLv2VacLERDwn.getString("Color", "#CCCCCC"));

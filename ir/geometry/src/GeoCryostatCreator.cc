@@ -138,6 +138,9 @@ namespace Belle2 {
       G4Tubs* geo_TubeR = new G4Tubs("geo_TubeR_name", 0, radius_Tube, TMath::Abs(DistanceR), 0, 2 * M_PI);
       G4Tubs* geo_TubeL = new G4Tubs("geo_TubeL_name", 0, radius_Tube, TMath::Abs(DistanceL), 0, 2 * M_PI);
 
+      double stepMax = 5.0 * Unit::mm;
+      bool flag_limitStep = false;
+
       //--------------
       //-   A1wal1
 
@@ -222,6 +225,7 @@ namespace Belle2 {
       G4IntersectionSolid* geo_A2spc1 = new G4IntersectionSolid("geo_A2spc1_name", geo_A2spc1x, geo_A1wal1);
 
       G4LogicalVolume* logi_A2spc1 = new G4LogicalVolume(geo_A2spc1, mat_A2spc1, "logi_A2spc1_name");
+      if (flag_limitStep) logi_A2spc1->SetUserLimits(new G4UserLimits(stepMax));
 
       //put volume
       setColor(*logi_A2spc1, cA2spc1.getString("Color", "#CCCCCC"));
@@ -317,6 +321,7 @@ namespace Belle2 {
       G4IntersectionSolid* geo_B2spc1 = new G4IntersectionSolid("geo_B2spc1", geo_B2spc1x, geo_B1wal1);
 
       G4LogicalVolume* logi_B2spc1 = new G4LogicalVolume(geo_B2spc1, mat_B2spc1, "logi_B2spc1_name");
+      if (flag_limitStep) logi_B2spc1->SetUserLimits(new G4UserLimits(stepMax));
 
       //put volume
       setColor(*logi_B2spc1, cB2spc1.getString("Color", "#CCCCCC"));
@@ -1494,6 +1499,7 @@ namespace Belle2 {
       G4IntersectionSolid* geo_D2spc1 = new G4IntersectionSolid("geo_D2spc1_name", geo_D2spc1x, geo_D1wal1);
 
       G4LogicalVolume* logi_D2spc1 = new G4LogicalVolume(geo_D2spc1, mat_D2spc1, "logi_D2spc1_name");
+      if (flag_limitStep) logi_D2spc1->SetUserLimits(new G4UserLimits(stepMax));
 
       //put volume
       setColor(*logi_D2spc1, cD2spc1.getString("Color", "#CCCCCC"));
@@ -1593,6 +1599,7 @@ namespace Belle2 {
       G4IntersectionSolid* geo_E2spc1 = new G4IntersectionSolid("geo_E2spc1", geo_E2spc1x, geo_E1wal1);
 
       G4LogicalVolume* logi_E2spc1 = new G4LogicalVolume(geo_E2spc1, mat_E2spc1, "logi_E2spc1_name");
+      if (flag_limitStep) logi_E2spc1->SetUserLimits(new G4UserLimits(stepMax));
 
       //put volume
       setColor(*logi_E2spc1, cE2spc1.getString("Color", "#CCCCCC"));

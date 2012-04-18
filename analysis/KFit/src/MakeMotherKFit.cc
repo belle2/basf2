@@ -38,7 +38,7 @@ MakeMotherKFit::~MakeMotherKFit(void)
 }
 
 
-const enum KFitError::ECode
+enum KFitError::ECode
 MakeMotherKFit::addTrack(const KFitTrack& p)
 {
   m_Tracks.push_back(p);
@@ -49,7 +49,7 @@ MakeMotherKFit::addTrack(const KFitTrack& p)
 }
 
 
-const enum KFitError::ECode
+enum KFitError::ECode
 MakeMotherKFit::addTrack(const HepLorentzVector& p, const HepPoint3D& x, const HepSymMatrix& e, const double q, const int flag)
 {
   if (e.num_row() != (int)KFitConst::kNumber7) {
@@ -62,7 +62,7 @@ MakeMotherKFit::addTrack(const HepLorentzVector& p, const HepPoint3D& x, const H
 }
 
 
-const enum KFitError::ECode
+enum KFitError::ECode
 MakeMotherKFit::setMagneticField(const double mf)
 {
   m_MagneticField = mf;
@@ -71,7 +71,7 @@ MakeMotherKFit::setMagneticField(const double mf)
 }
 
 
-const enum KFitError::ECode
+enum KFitError::ECode
 MakeMotherKFit::setVertex(const HepPoint3D& v)
 {
   m_Vertex = v;
@@ -80,7 +80,7 @@ MakeMotherKFit::setVertex(const HepPoint3D& v)
 }
 
 
-const enum KFitError::ECode
+enum KFitError::ECode
 MakeMotherKFit::setVertexError(const HepSymMatrix& e)
 {
   if (e.num_row() != 3) {
@@ -96,7 +96,7 @@ MakeMotherKFit::setVertexError(const HepSymMatrix& e)
 }
 
 
-const enum KFitError::ECode
+enum KFitError::ECode
 MakeMotherKFit::setTrackVertexError(const HepMatrix& e)
 {
   if (e.num_row() != 3 || e.num_col() != (int)KFitConst::kNumber7) {
@@ -112,7 +112,7 @@ MakeMotherKFit::setTrackVertexError(const HepMatrix& e)
 }
 
 
-const enum KFitError::ECode
+enum KFitError::ECode
 MakeMotherKFit::setTrackZeroVertexError(void)
 {
   HepMatrix zero(3, KFitConst::kNumber7, 0);
@@ -121,7 +121,7 @@ MakeMotherKFit::setTrackZeroVertexError(void)
 }
 
 
-const enum KFitError::ECode
+enum KFitError::ECode
 MakeMotherKFit::setCorrelation(const HepMatrix& e)
 {
   if (e.num_row() != (int)KFitConst::kNumber7 || e.num_col() != (int)KFitConst::kNumber7) {
@@ -137,7 +137,7 @@ MakeMotherKFit::setCorrelation(const HepMatrix& e)
 }
 
 
-const enum KFitError::ECode
+enum KFitError::ECode
 MakeMotherKFit::setZeroCorrelation(void)
 {
   HepMatrix zero(KFitConst::kNumber7, KFitConst::kNumber7, 0);
@@ -146,7 +146,7 @@ MakeMotherKFit::setZeroCorrelation(void)
 }
 
 
-const enum KFitError::ECode
+enum KFitError::ECode
 MakeMotherKFit::setFlagAtDecayPoint(const bool flag)
 {
   m_FlagAtDecayPoint = flag;
@@ -155,7 +155,7 @@ MakeMotherKFit::setFlagAtDecayPoint(const bool flag)
 }
 
 
-const enum KFitError::ECode
+enum KFitError::ECode
 MakeMotherKFit::setFlagBeforeAfter(const int flag)
 {
   m_FlagBeforeAfter = flag;
@@ -164,7 +164,7 @@ MakeMotherKFit::setFlagBeforeAfter(const int flag)
 }
 
 
-const enum KFitError::ECode
+enum KFitError::ECode
 MakeMotherKFit::getErrorCode(void) const
 {
   return m_ErrorCode;
@@ -198,7 +198,7 @@ MakeMotherKFit::getMotherError(void) const
 }
 
 
-const enum KFitError::ECode
+enum KFitError::ECode
 MakeMotherKFit::doMake(void)
 {
   // ...makes matrix.

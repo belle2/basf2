@@ -129,10 +129,10 @@ namespace Belle2 {
       const HepSymMatrix     getError(const int flag = KFitConst::kAfterFit) const;
       /** Get a charge of the track.
        */
-      const double           getCharge(void) const;
+      double                 getCharge(void) const;
       /** Get a mass of the track.
        */
-      const double           getMass(void) const;
+      double                 getMass(void) const;
       /** Get a vertex position associated to the track.
        */
       const HepPoint3D       getVertex(void) const;
@@ -145,7 +145,7 @@ namespace Belle2 {
        * @param flag KFitConst::kBeforeFit or KFitConst::kAfterFit
        * @return corresponding parameter
        */
-      const double           getFitParameter(const int which, const int flag) const;
+      double                 getFitParameter(const int which, const int flag) const;
       /** Get a parameter set of the track.  Not intended for end user's use.
        * @param flag KFitConst::kBeforeFit or KFitConst::kAfterFit
        * @return array of getFitParameter(0,flag) ... getFitParameter(5,flag)

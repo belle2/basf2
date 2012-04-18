@@ -34,7 +34,7 @@ MassVertexFitKFit::~MassVertexFitKFit(void)
 }
 
 
-const enum KFitError::ECode
+enum KFitError::ECode
 MassVertexFitKFit::setInitialVertex(const HepPoint3D& v)
 {
   m_BeforeVertex = v;
@@ -43,7 +43,7 @@ MassVertexFitKFit::setInitialVertex(const HepPoint3D& v)
 }
 
 
-const enum KFitError::ECode
+enum KFitError::ECode
 MassVertexFitKFit::setInvariantMass(const double m)
 {
   m_InvariantMass = m;
@@ -52,7 +52,7 @@ MassVertexFitKFit::setInvariantMass(const double m)
 }
 
 
-const enum KFitError::ECode
+enum KFitError::ECode
 MassVertexFitKFit::fixMass(void)
 {
   m_IsFixMass.push_back(true);
@@ -61,7 +61,7 @@ MassVertexFitKFit::fixMass(void)
 }
 
 
-const enum KFitError::ECode
+enum KFitError::ECode
 MassVertexFitKFit::unfixMass(void)
 {
   m_IsFixMass.push_back(false);
@@ -70,14 +70,14 @@ MassVertexFitKFit::unfixMass(void)
 }
 
 
-const enum KFitError::ECode
+enum KFitError::ECode
 MassVertexFitKFit::setCorrelation(const HepMatrix& m)
 {
   return KFitBase::setCorrelation(m);
 }
 
 
-const enum KFitError::ECode
+enum KFitError::ECode
 MassVertexFitKFit::setZeroCorrelation(void)
 {
   return KFitBase::setZeroCorrelation();
@@ -110,14 +110,14 @@ MassVertexFitKFit::getVertexError(void) const
 }
 
 
-const double
+double
 MassVertexFitKFit::getInvariantMass(void) const
 {
   return m_InvariantMass;
 }
 
 
-const double
+double
 MassVertexFitKFit::getCHIsq(void) const
 {
   return m_CHIsq;
@@ -133,7 +133,7 @@ MassVertexFitKFit::getTrackVertexError(const int id) const
 }
 
 
-const double
+double
 MassVertexFitKFit::getTrackCHIsq(const int id) const
 {
   if (!isFitted()) return -1;
@@ -194,14 +194,14 @@ MassVertexFitKFit::getCorrelation(const int id1, const int id2, const int flag) 
 }
 
 
-const enum KFitError::ECode
+enum KFitError::ECode
 MassVertexFitKFit::doFit(void)
 {
   return KFitBase::doFit2();
 }
 
 
-const enum KFitError::ECode
+enum KFitError::ECode
 MassVertexFitKFit::prepareInputMatrix(void)
 {
   if (m_TrackCount > KFitConst::kMaxTrackCount) {
@@ -278,7 +278,7 @@ MassVertexFitKFit::prepareInputMatrix(void)
 }
 
 
-const enum KFitError::ECode
+enum KFitError::ECode
 MassVertexFitKFit::prepareInputSubMatrix(void)
 {
   // vertex
@@ -288,7 +288,7 @@ MassVertexFitKFit::prepareInputSubMatrix(void)
 }
 
 
-const enum KFitError::ECode
+enum KFitError::ECode
 MassVertexFitKFit::prepareCorrelation(void)
 {
   if (m_BeforeCorrelation.size() != static_cast<unsigned int>(m_TrackCount * (m_TrackCount - 1) / 2)) {
@@ -324,7 +324,7 @@ MassVertexFitKFit::prepareCorrelation(void)
 }
 
 
-const enum KFitError::ECode
+enum KFitError::ECode
 MassVertexFitKFit::prepareOutputMatrix(void)
 {
   Hep3Vector h3v;
@@ -381,7 +381,7 @@ MassVertexFitKFit::prepareOutputMatrix(void)
 }
 
 
-const enum KFitError::ECode
+enum KFitError::ECode
 MassVertexFitKFit::makeCoreMatrix(void)
 {
   // Mass Constraint
@@ -549,7 +549,7 @@ MassVertexFitKFit::makeCoreMatrix(void)
 }
 
 
-const enum KFitError::ECode
+enum KFitError::ECode
 MassVertexFitKFit::calculateNDF(void)
 {
   m_NDF = 2 * m_TrackCount - 3 + 1;

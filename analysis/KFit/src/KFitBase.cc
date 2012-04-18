@@ -35,7 +35,7 @@ KFitBase::~KFitBase(void)
 }
 
 
-const enum KFitError::ECode
+enum KFitError::ECode
 KFitBase::addTrack(const KFitTrack& p)
 {
   m_Tracks.push_back(p);
@@ -45,7 +45,7 @@ KFitBase::addTrack(const KFitTrack& p)
 }
 
 
-const enum KFitError::ECode
+enum KFitError::ECode
 KFitBase::addTrack(const HepLorentzVector& p, const HepPoint3D& x, const HepSymMatrix& e, const double q)
 {
   if (e.num_row() != KFitConst::kNumber7) {
@@ -58,7 +58,7 @@ KFitBase::addTrack(const HepLorentzVector& p, const HepPoint3D& x, const HepSymM
 }
 
 
-const enum KFitError::ECode
+enum KFitError::ECode
 KFitBase::setCorrelation(const HepMatrix& e)
 {
   if (e.num_row() != KFitConst::kNumber7) {
@@ -73,7 +73,7 @@ KFitBase::setCorrelation(const HepMatrix& e)
 }
 
 
-const enum KFitError::ECode
+enum KFitError::ECode
 KFitBase::setZeroCorrelation(void)
 {
   HepMatrix zero(KFitConst::kNumber7, KFitConst::kNumber7, 0);
@@ -82,7 +82,7 @@ KFitBase::setZeroCorrelation(void)
 }
 
 
-const enum KFitError::ECode
+enum KFitError::ECode
 KFitBase::setMagneticField(const double mf)
 {
   m_MagneticField = mf;
@@ -91,42 +91,42 @@ KFitBase::setMagneticField(const double mf)
 }
 
 
-const enum KFitError::ECode
+enum KFitError::ECode
 KFitBase::getErrorCode(void) const
 {
   return m_ErrorCode;
 }
 
 
-const int
+int
 KFitBase::getTrackCount(void) const
 {
   return m_TrackCount;
 }
 
 
-const int
+int
 KFitBase::getNDF(void) const
 {
   return m_NDF;
 }
 
 
-const double
+double
 KFitBase::getCHIsq(void) const
 {
   return m_CHIsq;
 }
 
 
-const double
+double
 KFitBase::getMagneticField(void) const
 {
   return m_MagneticField;
 }
 
 
-const double
+double
 KFitBase::getTrackCHIsq(const int id) const
 {
   if (!isFitted()) return -1.;
@@ -362,11 +362,6 @@ KFitBase::makeError3(const HepLorentzVector& p1, const HepLorentzVector& p2, con
   // is_fix_mass = 1 : Energy term is recalculated from the other parameters.
   // is_fix_mass = 0 : not.
 
-  if (!is_fix_mass1 && !is_fix_mass2) {
-    return e;
-  }
-
-
   if (is_fix_mass1 && is_fix_mass2) {
     if (!isNonZeroEnergy(p1)) return HepSymMatrix(KFitConst::kNumber7, 0);
     if (!isNonZeroEnergy(p2)) return HepSymMatrix(KFitConst::kNumber7, 0);
@@ -431,7 +426,7 @@ KFitBase::makeError3(const HepLorentzVector& p1, const HepLorentzVector& p2, con
     return hm;
   }
 
-  /* NEVER REACHED HERE */
+  return e;
 }
 
 
@@ -455,7 +450,7 @@ KFitBase::makeError4(const HepLorentzVector& p, const HepMatrix& e) const
 }
 
 
-const enum KFitError::ECode
+enum KFitError::ECode
 KFitBase::prepareCorrelation(void)
 {
   if (m_BeforeCorrelation.size() != (double)m_TrackCount * ((double)m_TrackCount - 1)*.5) {
@@ -499,7 +494,7 @@ KFitBase::prepareCorrelation(void)
 }
 
 
-const enum KFitError::ECode
+enum KFitError::ECode
 KFitBase::doFit1(void)
 {
   if (m_ErrorCode != KFitError::kNoError) return m_ErrorCode;
@@ -574,7 +569,7 @@ KFitBase::doFit1(void)
 }
 
 
-const enum KFitError::ECode
+enum KFitError::ECode
 KFitBase::doFit2(void)
 {
   if (m_ErrorCode != KFitError::kNoError) return m_ErrorCode;
@@ -724,7 +719,7 @@ KFitBase::doFit2(void)
 }
 
 
-const bool
+bool
 KFitBase::isFitted(void) const
 {
   if (m_FlagFitted) return true;
@@ -735,7 +730,7 @@ KFitBase::isFitted(void) const
 }
 
 
-const bool
+bool
 KFitBase::isTrackIDInRange(const int id) const
 {
   if (0 <= id && id < m_TrackCount) return true;
@@ -746,7 +741,7 @@ KFitBase::isTrackIDInRange(const int id) const
 }
 
 
-const bool
+bool
 KFitBase::isNonZeroEnergy(const HepLorentzVector& p) const
 {
   if (p.t() != 0) return true;

@@ -54,7 +54,7 @@ namespace Belle2 {
        * @param kp object of the track
        * @return error code (zero if success)
        */
-      const enum KFitError::ECode addTrack(const KFitTrack& kp);
+      enum KFitError::ECode       addTrack(const KFitTrack& kp);
       /** Add a track to the make-mother object with specifying its momentum, position, error matrix, and charge.
        *  This function internally calls addTrack(const KFitTrack &kp).
        * @param p Lorentz vector of the track
@@ -64,55 +64,55 @@ namespace Belle2 {
        * @param flag KFitConst::kBeforeFit or KFitConst::kAfterFit
        * @return error code (zero if success)
        */
-      const enum KFitError::ECode addTrack(const HepLorentzVector& p, const HepPoint3D& x, const HepSymMatrix& e, const double q, const int flag = KFitConst::kAfterFit);
+      enum KFitError::ECode       addTrack(const HepLorentzVector& p, const HepPoint3D& x, const HepSymMatrix& e, const double q, const int flag = KFitConst::kAfterFit);
       /** Change a magnetic field from the default value KFitConst::kDefaultMagneticField.
        * @param mf magnetic field to set
        * @return error code (zero if success)
        */
-      const enum KFitError::ECode setMagneticField(const double mf);
+      enum KFitError::ECode       setMagneticField(const double mf);
       /** Set a vertex position of the mother particle.
        * @param v vertex position
        * @return error code (zero if success)
        */
-      const enum KFitError::ECode setVertex(const HepPoint3D& v);
+      enum KFitError::ECode       setVertex(const HepPoint3D& v);
       /** Set a vertex error matrix of the mother particle.
        * @param e (3x3) vertex error matrix
        * @return error code (zero if success)
        */
-      const enum KFitError::ECode setVertexError(const HepSymMatrix& e);
+      enum KFitError::ECode       setVertexError(const HepSymMatrix& e);
       /** Set a vertex error matrix of the child particle in the addTrack'ed order.
        * @param e (3x7) vertex error matrix
        * @return error code (zero if success)
        */
-      const enum KFitError::ECode setTrackVertexError(const HepMatrix& e);
+      enum KFitError::ECode       setTrackVertexError(const HepMatrix& e);
       /** Indicate no vertex uncertainty in the child particle in the addTrack'ed order.
        * @return error code (zero if success)
        */
-      const enum KFitError::ECode setTrackZeroVertexError(void);
+      enum KFitError::ECode       setTrackZeroVertexError(void);
       /** Set a correlation matrix.
        * @param e (7x7) correlation matrix
        * @return error code (zero if success)
        */
-      const enum KFitError::ECode setCorrelation(const HepMatrix& e);
+      enum KFitError::ECode       setCorrelation(const HepMatrix& e);
       /** Indicate no correlation between tracks.
        * @return error code (zero if success)
        */
-      const enum KFitError::ECode setZeroCorrelation(void);
+      enum KFitError::ECode       setZeroCorrelation(void);
       /** Set a flag to control computational point for the mother particle property at the decay point or not
        * @param flag true for yes, false for no
        * @return error code (zero if success)
        */
-      const enum KFitError::ECode setFlagAtDecayPoint(const bool flag);
+      enum KFitError::ECode       setFlagAtDecayPoint(const bool flag);
       /** Set a flag to control computational parameters for the mother particle property before or after the fit
        * @param flag KFitConst::kBeforeFit or KFitConst::kAfterFit
        * @return error code (zero if success)
        */
-      const enum KFitError::ECode setFlagBeforeAfter(const int flag);
+      enum KFitError::ECode       setFlagBeforeAfter(const int flag);
 
       /** Get a code of the last error.
        * @return error code
        */
-      const enum KFitError::ECode getErrorCode(void) const;
+      enum KFitError::ECode       getErrorCode(void) const;
       /** Get a track object of the mother particle.
        * @return track object of the mother particle
        */
@@ -133,7 +133,7 @@ namespace Belle2 {
       /** Perform a reconstruction of mother particle
        * @return error code (zero if success)
        */
-      const enum KFitError::ECode doMake(void);
+      enum KFitError::ECode doMake(void);
 
 
     private:

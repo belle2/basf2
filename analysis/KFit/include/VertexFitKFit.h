@@ -47,28 +47,28 @@ namespace Belle2 {
        * @param v initial vertex point
        * @return error code (zero if success)
        */
-      const enum KFitError::ECode setInitialVertex(const HepPoint3D& v);
+      enum KFitError::ECode       setInitialVertex(const HepPoint3D& v);
       /** Set an IP-ellipsoid shape for the vertex-vertex constraint fit.
        * @param ip IP position
        * @param ipe error matrix of the IP
        * @return error code (zero if success)
        */
-      const enum KFitError::ECode setIpProfile(const HepPoint3D& ip, const HepSymMatrix& ipe);
+      enum KFitError::ECode       setIpProfile(const HepPoint3D& ip, const HepSymMatrix& ipe);
       /** Set a virtual IP-tube track for the vertex-vertex constraint fit.
        * @param p virtual IP-tube track
        * @return error code (zero if success)
        */
-      const enum KFitError::ECode setIpTubeProfile(const KFitTrack& p);
+      enum KFitError::ECode       setIpTubeProfile(const KFitTrack& p);
       /** Tell the object to perform a fit with vertex position fixed.
        * @param flag true for fixed vertex, false for otherwise
        * @return error code (zero if success)
        */
-      const enum KFitError::ECode setKnownVertex(const bool flag = true);
+      enum KFitError::ECode       setKnownVertex(const bool flag = true);
       /** Tell the object to perform a fit with track correlations.
        * @param flag true for with correlation, false for otherwise
        * @return error code (zero if success)
        */
-      const enum KFitError::ECode setCorrelationMode(const bool m);
+      enum KFitError::ECode       setCorrelationMode(const bool m);
 
 
     public:
@@ -81,68 +81,68 @@ namespace Belle2 {
        * @return vertex error matrix
        */
       const HepSymMatrix          getVertexError(void) const;
-      const double                getCHIsq(void) const;
+      double                      getCHIsq(void) const;
       /** Get a chi-square of the fit excluding IP-constraint part.
        * @return chi-square of the fit excluding IP-constraint part.
        */
-      const double                getCHIsqVertex(void) const;
+      double                      getCHIsqVertex(void) const;
       /** Get a vertex error matrix of the track
        * @param id track id
        * @param flag KFitConst::kBeforeFit or KFitConst::kAfterFit
        * @return vertex error matrix
        */
       const HepMatrix             getTrackVertexError(const int id) const;
-      const double                getTrackCHIsq(const int id) const;
+      double                      getTrackCHIsq(const int id) const;
       /** Get a sum of the chi-square associated to the input tracks.
        *  The return value should be the same as the one from getCHIsqVertex().
        * @return sum of the chi-square associated to the input tracks
        */
-      const double                getTrackPartCHIsq(void) const;
+      double                      getTrackPartCHIsq(void) const;
       /** Get an NDF relevant to the getTrackPartCHIsq().
        * @return NDF relevant to the getTrackPartCHIsq()
        */
-      const int                   getTrackPartNDF(void) const;
+      int                         getTrackPartNDF(void) const;
 
 
     public:
       /** Perform a vertex-constraint fit.
        * @return error code (zero if success)
        */
-      const enum KFitError::ECode doFit(void);
+      enum KFitError::ECode doFit(void);
 
 
     private:
       /** Perform a standard vertex-constraint fit including IP-tube constraint.
        * @return error code (zero if success)
        */
-      const enum KFitError::ECode doFit3(void);
+      enum KFitError::ECode doFit3(void);
       /** Perform a IP-ellipsoid and vertex-constraint fit.
        * @return error code (zero if success)
        */
-      const enum KFitError::ECode doFit4(void);
+      enum KFitError::ECode doFit4(void);
       /** Perform a fixed-vertex-position fit mainly for slow pion.
        * @return error code (zero if success)
        */
-      const enum KFitError::ECode doFit5(void);
+      enum KFitError::ECode doFit5(void);
 
 
     private:
-      const enum KFitError::ECode prepareInputMatrix(void);
-      const enum KFitError::ECode prepareInputSubMatrix(void);
-      const enum KFitError::ECode prepareOutputMatrix(void);
-      const enum KFitError::ECode makeCoreMatrix(void);
-      const enum KFitError::ECode calculateNDF(void);
+      enum KFitError::ECode prepareInputMatrix(void);
+      enum KFitError::ECode prepareInputSubMatrix(void);
+      enum KFitError::ECode prepareOutputMatrix(void);
+      enum KFitError::ECode makeCoreMatrix(void);
+      enum KFitError::ECode calculateNDF(void);
 
 
     private:
       /** Add the virtual tube track to m_Tracks just before the internal minimization call.
        * @return error code (zero if success)
        */
-      const enum KFitError::ECode appendTube(void);
+      enum KFitError::ECode appendTube(void);
       /** Delete the virtual tube track to m_Tracks just after the internal minimization call.
        * @return error code (zero if success)
        */
-      const enum KFitError::ECode deleteTube(void);
+      enum KFitError::ECode deleteTube(void);
 
 
     private:

@@ -56,7 +56,7 @@ namespace Belle2 {
        * @param kp object of the track
        * @return error code (zero if success)
        */
-      const enum KFitError::ECode         addTrack(const KFitTrack& kp);
+      enum KFitError::ECode         addTrack(const KFitTrack& kp);
       /** Add a track to the fitter object with specifying its momentum, position, error matrix, and charge.
        *  This function internally calls addTrack(const KFitTrack &kp).
        * @param p Lorentz vector of the track
@@ -65,48 +65,48 @@ namespace Belle2 {
        * @param q charge of the track
        * @return error code (zero if success)
        */
-      const enum KFitError::ECode         addTrack(const HepLorentzVector& p, const HepPoint3D& x, const HepSymMatrix& e, const double q);
+      enum KFitError::ECode               addTrack(const HepLorentzVector& p, const HepPoint3D& x, const HepSymMatrix& e, const double q);
       /** Set a correlation matrix.  Not intended for end user's use.
        * @param c (7x7) correlation matrix
        * @return error code (zero if success)
        */
-      virtual const enum KFitError::ECode setCorrelation(const HepMatrix& c);
+      virtual enum KFitError::ECode       setCorrelation(const HepMatrix& c);
       /** Indicate no correlation between tracks.  Not intended for end user's use.
        * @return error code (zero if success)
        */
-      virtual const enum KFitError::ECode setZeroCorrelation(void);
+      virtual enum KFitError::ECode       setZeroCorrelation(void);
       /** Change a magnetic field from the default value KFitConst::kDefaultMagneticField.
        * @param mf magnetic field to set
        * @return error code (zero if success)
        */
-      const enum KFitError::ECode         setMagneticField(const double mf);
+      enum KFitError::ECode               setMagneticField(const double mf);
 
 
       /** Get a code of the last error.
        * @return the last error code
        */
-      const enum KFitError::ECode         getErrorCode(void) const;
+      enum KFitError::ECode               getErrorCode(void) const;
       /** Get the number of added tracks.
        * @return the number of added tracks
        */
-      const int                           getTrackCount(void) const;
+      int                                 getTrackCount(void) const;
       /** Get an NDF of the fit.
        * @return NDF of the fit
        */
-      virtual const int                   getNDF(void) const;
+      virtual int                         getNDF(void) const;
       /** Get a chi-square of the fit.
        * @return chi-square of the fit
        */
-      virtual const double                getCHIsq(void) const;
+      virtual double                      getCHIsq(void) const;
       /** Get a magnetic field.
        * @return magnetic field
        */
-      const double                        getMagneticField(void) const;
+      double                              getMagneticField(void) const;
       /** Get a chi-square of the track.
        * @param id track id
        * @return chi-square of the track
        */
-      virtual const double                getTrackCHIsq(const int id) const;
+      virtual double                      getTrackCHIsq(const int id) const;
       /** Get a Lorentz vector of the track.
        * @param id track id
        * @return Lorentz vector of the track
@@ -140,7 +140,7 @@ namespace Belle2 {
       /** Return false if fit is not performed yet or performed fit is failed; otherwise true.
        * @return see description
        */
-      const bool isFitted(void) const;
+      bool isFitted(void) const;
 
 
     protected:
@@ -189,38 +189,38 @@ namespace Belle2 {
       /** Build grand matrices for minimum search from input-track properties.
        * @return error code (zero if success)
        */
-      virtual const enum KFitError::ECode prepareInputMatrix(void)    = 0;
+      virtual enum KFitError::ECode prepareInputMatrix(void)    = 0;
       /** Build sub-matrices for minimum search from input-track properties.
        * @return error code (zero if success)
        */
-      virtual const enum KFitError::ECode prepareInputSubMatrix(void) = 0;
+      virtual enum KFitError::ECode prepareInputSubMatrix(void) = 0;
       /** Build a grand correlation matrix from input-track properties.
        * @return error code (zero if success)
        */
-      virtual const enum KFitError::ECode prepareCorrelation(void);
+      virtual enum KFitError::ECode prepareCorrelation(void);
       /** Build an output error matrix.
        * @return error code (zero if success)
        */
-      virtual const enum KFitError::ECode prepareOutputMatrix(void)   = 0;
+      virtual enum KFitError::ECode prepareOutputMatrix(void)   = 0;
       /** Build matrices using the kinematical constraint.
        * @return error code (zero if success)
        */
-      virtual const enum KFitError::ECode makeCoreMatrix(void)        = 0;
+      virtual enum KFitError::ECode makeCoreMatrix(void)        = 0;
       /** Calculate an NDF of the fit.
        * @return error code (zero if success)
        */
-      virtual const enum KFitError::ECode calculateNDF(void)          = 0;
+      virtual enum KFitError::ECode calculateNDF(void)          = 0;
 
 
     protected:
       /** Perform a fit (used in MassFitKFit::doFit()).
        * @return error code (zero if success)
        */
-      const enum KFitError::ECode doFit1(void);
+      enum KFitError::ECode doFit1(void);
       /** Perform a fit (used in VertexFitKFit::doFit() and MassVertexFitKFit::doFit()).
        * @return error code (zero if success)
        */
-      const enum KFitError::ECode doFit2(void);
+      enum KFitError::ECode doFit2(void);
 
 
     protected:
@@ -228,12 +228,12 @@ namespace Belle2 {
        * @param id track id
        * @return true if the id is in the range, false otherwise
        */
-      const bool isTrackIDInRange(const int id) const;
+      bool isTrackIDInRange(const int id) const;
       /** Check if the energy is non-zero.
        * @param p Lorentz vector
        * @return true for non-zero energy, false for otherwise
        */
-      const bool isNonZeroEnergy(const HepLorentzVector& p) const;
+      bool isNonZeroEnergy(const HepLorentzVector& p) const;
 
 
       /** Error code. */

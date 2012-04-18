@@ -187,14 +187,14 @@ KFitTrack::getError(const int flag) const
 }
 
 
-const double
+double
 KFitTrack::getCharge(void) const
 {
   return m_Charge;
 }
 
 
-const double
+double
 KFitTrack::getMass(void) const
 {
   return m_Mass;
@@ -215,7 +215,7 @@ KFitTrack::getVertexError(void) const
 }
 
 
-const double
+double
 KFitTrack::getFitParameter(const int which, const int flag) const
 {
   checkFlag(flag);
@@ -237,6 +237,7 @@ KFitTrack::getFitParameter(const int which, const int flag) const
   }
 
   /* NEVER REACHED */
+  return -999.;
 }
 
 

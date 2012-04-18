@@ -47,24 +47,24 @@ namespace Belle2 {
        * @param v initial vertex point
        * @return error code (zero if success)
        */
-      const enum KFitError::ECode setInitialVertex(const HepPoint3D& v);
+      enum KFitError::ECode       setInitialVertex(const HepPoint3D& v);
       /** Set an invariant mass for the mass-vertex constraint fit.
        * @param m invariant mass
        * @return error code (zero if success)
        */
-      const enum KFitError::ECode setInvariantMass(const double m);
+      enum KFitError::ECode       setInvariantMass(const double m);
       /** Tell the object to fix the last added track property at the invariant mass.
        *  Not intended for end user's use.
        * @return error code (zero if success)
        */
-      const enum KFitError::ECode fixMass(void);
+      enum KFitError::ECode       fixMass(void);
       /** Tell the object to unfix the last added track property at the invariant mass.
        *  Not intended for end user's use.
        * @return error code (zero if success)
        */
-      const enum KFitError::ECode unfixMass(void);
-      const enum KFitError::ECode setCorrelation(const HepMatrix& m);
-      const enum KFitError::ECode setZeroCorrelation(void);
+      enum KFitError::ECode       unfixMass(void);
+      enum KFitError::ECode       setCorrelation(const HepMatrix& m);
+      enum KFitError::ECode       setZeroCorrelation(void);
 
 
       /** Get a vertex position.
@@ -79,15 +79,15 @@ namespace Belle2 {
       /** Get an invariant mass.
        * @return invariant mass
        */
-      const double                getInvariantMass(void) const;
-      const double                getCHIsq(void) const;
+      double                      getInvariantMass(void) const;
+      double                      getCHIsq(void) const;
       /** Get a vertex error matrix of the track
        * @param id track id
        * @param flag KFitConst::kBeforeFit or KFitConst::kAfterFit
        * @return vertex error matrix
        */
       const HepMatrix             getTrackVertexError(const int id) const;
-      const double                getTrackCHIsq(const int id) const;
+      double                      getTrackCHIsq(const int id) const;
       const HepMatrix             getCorrelation(const int id1, const int id2, const int flag = KFitConst::kAfterFit) const;
 
 
@@ -95,16 +95,16 @@ namespace Belle2 {
       /** Perform a mass-vertex-constraint fit.
        * @return error code (zero if success)
        */
-      const enum KFitError::ECode doFit(void);
+      enum KFitError::ECode doFit(void);
 
 
     private:
-      const enum KFitError::ECode prepareInputMatrix(void);
-      const enum KFitError::ECode prepareInputSubMatrix(void);
-      const enum KFitError::ECode prepareCorrelation(void);
-      const enum KFitError::ECode prepareOutputMatrix(void);
-      const enum KFitError::ECode makeCoreMatrix(void);
-      const enum KFitError::ECode calculateNDF(void);
+      enum KFitError::ECode prepareInputMatrix(void);
+      enum KFitError::ECode prepareInputSubMatrix(void);
+      enum KFitError::ECode prepareCorrelation(void);
+      enum KFitError::ECode prepareOutputMatrix(void);
+      enum KFitError::ECode makeCoreMatrix(void);
+      enum KFitError::ECode calculateNDF(void);
 
 
     private:

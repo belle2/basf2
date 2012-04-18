@@ -42,7 +42,7 @@ VertexFitKFit::~VertexFitKFit(void)
 }
 
 
-const enum KFitError::ECode
+enum KFitError::ECode
 VertexFitKFit::setInitialVertex(const HepPoint3D& v)
 {
   m_BeforeVertex = v;
@@ -51,7 +51,7 @@ VertexFitKFit::setInitialVertex(const HepPoint3D& v)
 }
 
 
-const enum KFitError::ECode
+enum KFitError::ECode
 VertexFitKFit::setIpProfile(const HepPoint3D& ip, const HepSymMatrix& ipe)
 {
   if (m_FlagTube) {
@@ -68,7 +68,7 @@ VertexFitKFit::setIpProfile(const HepPoint3D& ip, const HepSymMatrix& ipe)
 }
 
 
-const enum KFitError::ECode
+enum KFitError::ECode
 VertexFitKFit::setIpTubeProfile(const KFitTrack& p)
 {
   if (m_FlagBeam) {
@@ -84,7 +84,7 @@ VertexFitKFit::setIpTubeProfile(const KFitTrack& p)
 }
 
 
-const enum KFitError::ECode
+enum KFitError::ECode
 VertexFitKFit::setKnownVertex(const bool flag)
 {
   m_FlagKnownVertex = flag;
@@ -93,7 +93,7 @@ VertexFitKFit::setKnownVertex(const bool flag)
 }
 
 
-const enum KFitError::ECode
+enum KFitError::ECode
 VertexFitKFit::setCorrelationMode(const bool m)
 {
   m_CorrelationMode = m;
@@ -128,14 +128,14 @@ VertexFitKFit::getVertexError(void) const
 }
 
 
-const double
+double
 VertexFitKFit::getCHIsq(void) const
 {
   return KFitBase::getCHIsq();
 }
 
 
-const double
+double
 VertexFitKFit::getCHIsqVertex(void) const
 {
   // only m_FlagBeam = 1
@@ -151,7 +151,7 @@ VertexFitKFit::getTrackVertexError(const int id) const
 }
 
 
-const double
+double
 VertexFitKFit::getTrackCHIsq(const int id) const
 {
   if (!isTrackIDInRange(id)) return -1;
@@ -164,7 +164,7 @@ VertexFitKFit::getTrackCHIsq(const int id) const
 }
 
 
-const double
+double
 VertexFitKFit::getTrackPartCHIsq(void) const
 {
   if (m_ErrorCode != KFitError::kNoError) {
@@ -187,7 +187,7 @@ VertexFitKFit::getTrackPartCHIsq(void) const
 }
 
 
-const int
+int
 VertexFitKFit::getTrackPartNDF(void) const
 {
   if (m_ErrorCode != KFitError::kNoError) {
@@ -204,7 +204,7 @@ VertexFitKFit::getTrackPartNDF(void) const
 }
 
 
-const enum KFitError::ECode
+enum KFitError::ECode
 VertexFitKFit::doFit(void)
 {
   if (m_FlagTube) this->appendTube();
@@ -225,7 +225,7 @@ VertexFitKFit::doFit(void)
 }
 
 
-const enum KFitError::ECode
+enum KFitError::ECode
 VertexFitKFit::doFit3(void)
 {
   // use small Matrix --> No Correlation
@@ -391,7 +391,7 @@ VertexFitKFit::doFit3(void)
 }
 
 
-const enum KFitError::ECode
+enum KFitError::ECode
 VertexFitKFit::doFit4(void)
 {
   // included beam position constraint (only no correlation)
@@ -511,7 +511,7 @@ VertexFitKFit::doFit4(void)
 }
 
 
-const enum KFitError::ECode
+enum KFitError::ECode
 VertexFitKFit::doFit5(void)
 {
   // known vertex --> do not find vertex. (only no correlation)
@@ -601,7 +601,7 @@ VertexFitKFit::doFit5(void)
 }
 
 
-const enum KFitError::ECode
+enum KFitError::ECode
 VertexFitKFit::prepareInputMatrix(void)
 {
   if (!m_CorrelationMode || m_FlagBeam || m_FlagKnownVertex) {
@@ -677,7 +677,7 @@ VertexFitKFit::prepareInputMatrix(void)
 }
 
 
-const enum KFitError::ECode
+enum KFitError::ECode
 VertexFitKFit::prepareInputSubMatrix(void)
 {
   // vertex
@@ -688,7 +688,7 @@ VertexFitKFit::prepareInputSubMatrix(void)
 }
 
 
-const enum KFitError::ECode
+enum KFitError::ECode
 VertexFitKFit::prepareOutputMatrix(void)
 {
   Hep3Vector h3v;
@@ -742,7 +742,7 @@ VertexFitKFit::prepareOutputMatrix(void)
 }
 
 
-const enum KFitError::ECode
+enum KFitError::ECode
 VertexFitKFit::makeCoreMatrix(void)
 {
   // vertex fit
@@ -837,7 +837,7 @@ VertexFitKFit::makeCoreMatrix(void)
 }
 
 
-const enum KFitError::ECode
+enum KFitError::ECode
 VertexFitKFit::calculateNDF(void)
 {
   if (m_FlagBeam) m_NDF = 2 * m_TrackCount;
@@ -849,7 +849,7 @@ VertexFitKFit::calculateNDF(void)
 }
 
 
-const enum KFitError::ECode
+enum KFitError::ECode
 VertexFitKFit::appendTube(void)
 {
   if (!m_FlagTube) return m_ErrorCode = KFitError::kNoError;
@@ -868,7 +868,7 @@ VertexFitKFit::appendTube(void)
 }
 
 
-const enum KFitError::ECode
+enum KFitError::ECode
 VertexFitKFit::deleteTube(void)
 {
   if (!m_FlagTube) return m_ErrorCode = KFitError::kNoError;

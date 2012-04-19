@@ -88,13 +88,13 @@ namespace Belle2 {
     /** Get the unique id */
     unsigned short getID() const            { return m_id.id; }
     /** Get the layer id */
-    unsigned short getLayer() const         { return m_id.parts.layer; }
+    unsigned short getLayerNumber() const         { return m_id.parts.layer; }
     /** Get the ladder id */
-    unsigned short getLadder() const        { return m_id.parts.ladder; }
+    unsigned short getLadderNumber() const        { return m_id.parts.ladder; }
     /** Get the sensor id */
-    unsigned short getSensor() const        { return m_id.parts.sensor; }
+    unsigned short getSensorNumber() const        { return m_id.parts.sensor; }
     /** Get the sensor segment */
-    unsigned short getSegment() const       { return m_id.parts.segment; }
+    unsigned short getSegmentNumber() const       { return m_id.parts.segment; }
 
     /** Set the unique id */
     void setID(unsigned short id)           { m_id.id = id; }

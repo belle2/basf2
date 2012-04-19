@@ -27,10 +27,10 @@ namespace Belle2 {
             string sid = (string)VxdID(layer, ladder, sensor, segment);
             VxdID id(layer, ladder, sensor, segment);
             EXPECT_EQ(id, VxdID(sid));
-            EXPECT_EQ(id.getLayer(), layer);
-            EXPECT_EQ(id.getLadder(), ladder);
-            EXPECT_EQ(id.getSensor(), sensor);
-            EXPECT_EQ(id.getSegment(), segment);
+            EXPECT_EQ(id.getLayerNumber(), layer);
+            EXPECT_EQ(id.getLadderNumber(), ladder);
+            EXPECT_EQ(id.getSensorNumber(), sensor);
+            EXPECT_EQ(id.getSegmentNumber(), segment);
           }
         }
       }

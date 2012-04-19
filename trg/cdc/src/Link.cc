@@ -18,11 +18,12 @@
 #include <cstring>
 #include "trg/trg/Constants.h"
 #include "trg/trg/Utilities.h"
+#include "trg/cdc/Wire.h"
 #include "trg/cdc/WireHit.h"
 #include "trg/cdc/WireHitMC.h"
 #include "trg/cdc/Track.h"
 #include "trg/cdc/TrackMC.h"
-#include "trg/cdc/TrackSegment.h"
+#include "trg/cdc/Segment.h"
 #include "trg/cdc/Link.h"
 
 using namespace std;
@@ -52,7 +53,7 @@ unsigned TRGCDCLink::_nSLA = 0;
 unsigned * TRGCDCLink::_nHitsSL = 0;
 
 TRGCDCLink::TRGCDCLink(TCTrack * t,
-		       const Belle2::TCWHit * h,
+		       const Belle2::TCCHit * h,
 		       const HepGeom::Point3D<double> & p)
 : _track(t),
   _hit(h),
@@ -123,8 +124,68 @@ TRGCDCLink::~TRGCDCLink() {
 #endif
 }
 
+unsigned
+TRGCDCLink::nLayers(const vector<TRGCDCLink *> & list) {
+#ifdef TRASAN_DEBUG
+    const Belle2::TRGCDC & cdc = * Belle2::TRGCDC::getTRGCDC();
+    if (cdc.nLayers() > 64)
+	std::cout << "TRGCDCLink::nLayers !!! #layers should be less than 64"
+	       << std::endl;
+#endif
+
+    unsigned l0 = 0;
+    unsigned l1 = 0;
+    unsigned n = list.size();
+    for (unsigned i = 0; i < n; i++) {
+	unsigned id = list[i]->cell()->layerId();
+	if (id < 32) l0 |= (1 << id);
+	else         l1 |= (1 << (id - 32));
+    }
+
+    unsigned l = 0;
+    for (unsigned i = 0; i < 32; i++) {
+	if (l0 & (1 << i)) ++l;
+	if (l1 & (1 << i)) ++l;
+    }
+    return l;
+}
+
 void
-TRGCDCLink::dump(const string & msg, const string & pre) const {
+TRGCDCLink::nHits(const vector<TRGCDCLink *> & links, unsigned * nHits) {
+    for (unsigned i = 0; i < _nL; i++)
+	nHits[i] = 0;
+    unsigned nLinks = links.size();
+    for (unsigned i = 0; i < nLinks; i++) {
+	++nHits[links[i]->cell()->layerId()];
+
+#ifdef TRASAN_DEBUG
+	if (links[i]->cell()->layerId() >= _nL)
+	    std::cout << "TRGCDCLink::nHits !!! layer ID("
+		   << links[i]->cell()->layerId() << ") is larger than "
+		   << "size of buffer(" << _nL << ")" << std::endl;
+#endif
+    }
+}
+
+void
+TRGCDCLink::nHitsSuperLayer(const vector<TRGCDCLink *> & links, unsigned * nHits) {
+    for (unsigned i = 0; i < _nSL; i++)
+	nHits[i] = 0;
+    const unsigned nLinks = links.size();
+    for (unsigned i = 0; i < nLinks; i++) {
+	++nHits[links[i]->cell()->superLayerId()];
+
+#ifdef TRASAN_DEBUG
+	if (links[i]->cell()->superLayerId() >= _nSL)
+	    std::cout << "TRGCDCLink::nHitsSuperLayer !!! super layer ID("
+		   << links[i]->cell()->superLayerId() << ") is larger than "
+		   << "size of buffer(" << _nSL << ")" << std::endl;
+#endif
+    }
+}
+
+void
+TRGCDCLink::dump_base(const string & msg, const string & pre) const {
 
     //...Basic options...
     bool track = (msg.find("track") != string::npos);
@@ -144,7 +205,7 @@ TRGCDCLink::dump(const string & msg, const string & pre) const {
 
     //...Output...
     std::cout << pre;
-    std::cout << wire()->name();
+    std::cout << cell()->name();
 //     if (mc) {
 // 	if (_hit) {
 // 	    if (_hit->mc()) {
@@ -162,11 +223,11 @@ TRGCDCLink::dump(const string & msg, const string & pre) const {
 	std::cout << "[pul=" << this->pull() << "]";
     if (flag) {
 	if (_hit) {
-	    if (_hit->state() & WireHitFindingValid)
+	    if (_hit->state() & CellHitFindingValid)
 		std::cout << "o";
-	    if (_hit->state() & WireHitFittingValid)
+	    if (_hit->state() & CellHitFittingValid)
 		std::cout << "+";
-	    if (_hit->state() & WireHitInvalidForFit)
+	    if (_hit->state() & CellHitInvalidForFit)
 		std::cout << "x";
 	}
     }
@@ -177,68 +238,22 @@ TRGCDCLink::dump(const string & msg, const string & pre) const {
 	std::cout << ",pos=" << position();
 	std::cout << ",drift=" << drift(0) << "," << drift(1);
     }
-    if (! breif)
-	std::cout << std::endl;
-}
-
-unsigned
-TRGCDCLink::nLayers(const vector<TRGCDCLink *> & list) {
-#ifdef TRASAN_DEBUG
-    const Belle2::TRGCDC & cdc = * Belle2::TRGCDC::getTRGCDC();
-    if (cdc.nLayers() > 64)
-	std::cout << "TRGCDCLink::nLayers !!! #layers should be less than 64"
-	       << std::endl;
-#endif
-
-    unsigned l0 = 0;
-    unsigned l1 = 0;
-    unsigned n = list.size();
-    for (unsigned i = 0; i < n; i++) {
-	unsigned id = list[i]->wire()->layerId();
-	if (id < 32) l0 |= (1 << id);
-	else         l1 |= (1 << (id - 32));
-    }
-
-    unsigned l = 0;
-    for (unsigned i = 0; i < 32; i++) {
-	if (l0 & (1 << i)) ++l;
-	if (l1 & (1 << i)) ++l;
-    }
-    return l;
 }
 
 void
-TRGCDCLink::nHits(const vector<TRGCDCLink *> & links, unsigned * nHits) {
-    for (unsigned i = 0; i < _nL; i++)
-	nHits[i] = 0;
-    unsigned nLinks = links.size();
-    for (unsigned i = 0; i < nLinks; i++) {
-	++nHits[links[i]->wire()->layerId()];
-
-#ifdef TRASAN_DEBUG
-	if (links[i]->wire()->layerId() >= _nL)
-	    std::cout << "TRGCDCLink::nHits !!! layer ID("
-		   << links[i]->wire()->layerId() << ") is larger than "
-		   << "size of buffer(" << _nL << ")" << std::endl;
-#endif
-    }
+TRGCDCLink::dump(const string & msg, const string & pre) const {
+    dump_base(msg, pre);
+    cout << endl;
 }
 
 void
-TRGCDCLink::nHitsSuperLayer(const vector<TRGCDCLink *> & links, unsigned * nHits) {
-    for (unsigned i = 0; i < _nSL; i++)
-	nHits[i] = 0;
-    const unsigned nLinks = links.size();
-    for (unsigned i = 0; i < nLinks; i++) {
-	++nHits[links[i]->wire()->superLayerId()];
-
-#ifdef TRASAN_DEBUG
-	if (links[i]->wire()->superLayerId() >= _nSL)
-	    std::cout << "TRGCDCLink::nHitsSuperLayer !!! super layer ID("
-		   << links[i]->wire()->superLayerId() << ") is larger than "
-		   << "size of buffer(" << _nSL << ")" << std::endl;
-#endif
-    }
+TRGCDCLink::dump(const vector<TRGCDCLink *> & links,
+		 const string & msg,
+		 const string & pre) {
+    vector<const TRGCDCLink *> clinks;
+    for (unsigned i = 0; i < links.size(); i++)
+	clinks.push_back(links[i]);
+    TRGCDCLink::dump(clinks, msg, pre);
 }
 
 void
@@ -248,20 +263,18 @@ TRGCDCLink::dump(const vector<const TRGCDCLink *> & links,
 
     //...Basic options...
     bool mc = (msg.find("mc") != string::npos);
-//  bool sort = (msg.find("sort") != string::npos);
+    bool sort = (msg.find("sort") != string::npos);
     bool flag = (msg.find("flag") != string::npos);
 
     //...Strong options...
-    bool breif = (msg.find("breif") != string::npos);
     bool detail = (msg.find("detail") != string::npos);
     if (detail)
 	mc = flag = true;
-    if (breif)
-	mc = true;
 
     vector<const TRGCDCLink *> tmp = links;
-//  if (sort)
-//      tmp.sort(TRGCDCLink::sortByWireId);
+    if (sort)
+	std::sort(tmp.begin(), tmp.end(), TRGCDCLink::sortById);
+//	std::sort(tmp.begin(), tmp.end(), TRGCDCLink::sortById);
     unsigned n = tmp.size();
     unsigned nForFit = 0;
 #define MCC_MAX 1000
@@ -294,26 +307,22 @@ TRGCDCLink::dump(const vector<const TRGCDCLink *> & links,
 // 	}
 	if (flag) {
 	    if (l.hit()) {
-		if (l.hit()->state() & WireHitFittingValid) {
-		    if (! (l.hit()->state() & WireHitInvalidForFit))
+		if (l.hit()->state() & CellHitFittingValid) {
+		    if (! (l.hit()->state() & CellHitInvalidForFit))
 			++nForFit;
 		}
 	    }
 	}
 	if (i == 0) {
 	    std::cout << pre;
-	    if (! breif)
-		std::cout << TRGUtil::itostring(i) << " ";
+	    std::cout << TRGUtil::itostring(i) << " ";
 	}
 	else {
-	    if (breif)
-		std::cout << ",";
-	    else
-		std::cout << pre << TRGUtil::itostring(i) << " ";
+	    std::cout << "," << TRGUtil::itostring(i) << " ";
 	}
-	l.dump(msg);
+	l.dump_base(msg);
     }
-    std::cout << pre << ",Total " << n << " links";
+    std::cout << ",Total " << n << " links";
     if (flag) std::cout << ",fv " << nForFit << " l(s)";
     if (mc) {
 	unsigned nMC = 0;
@@ -389,7 +398,7 @@ TRGCDCLink::nStereoHits(const vector<TRGCDCLink *> & links) {
     unsigned nLinks = links.size();
     unsigned n = 0;
     for (unsigned i = 0; i < nLinks; i++)
-	if (links[i]->wire()->stereo())
+	if (links[i]->cell()->stereo())
 	    ++n;
     return n;
 }
@@ -399,7 +408,7 @@ TRGCDCLink::nAxialHits(const vector<TRGCDCLink *> & links) {
     unsigned nLinks = links.size();
     unsigned n = 0;
     for (unsigned i = 0; i < nLinks; i++)
-	if (links[i]->wire()->axial())
+	if (links[i]->cell()->axial())
 	    ++n;
     return n;
 }
@@ -409,7 +418,7 @@ TRGCDCLink::axialHits(const vector<TRGCDCLink *> & links) {
     vector<TRGCDCLink *> a;
     unsigned n = links.size();
     for (unsigned i = 0; i < n; i++) {
-	if (links[i]->wire()->axial())
+	if (links[i]->cell()->axial())
 	    a.push_back(links[i]);
     }
     return a;
@@ -420,7 +429,7 @@ TRGCDCLink::stereoHits(const vector<TRGCDCLink *> & links) {
     vector<TRGCDCLink *> a;
     unsigned n = links.size();
     for (unsigned i = 0; i < n; i++) {
-	if (! links[i]->wire()->axial())
+	if (! links[i]->cell()->axial())
 	    a.push_back(links[i]);
     }
     return a;
@@ -432,7 +441,7 @@ TRGCDCLink::innerMost(const vector<TRGCDCLink *> & a) {
     unsigned minId = 19999;
     TRGCDCLink * t = 0;
     for (unsigned i = 0; i < n; i++) {
-	unsigned id = a[i]->wire()->id();
+	unsigned id = a[i]->cell()->id();
 	if (id < minId) {
 	    minId = id;
 	    t = a[i];
@@ -447,7 +456,7 @@ TRGCDCLink::outerMost(const vector<TRGCDCLink *> & a) {
     unsigned maxId = 0;
     TRGCDCLink * t = 0;
     for (unsigned i = 0; i < n; i++) {
-	unsigned id = a[i]->wire()->id();
+	unsigned id = a[i]->cell()->id();
 	if (id >= maxId) {
 	    maxId = id;
 	    t = a[i];
@@ -463,8 +472,8 @@ TRGCDCLink::separateCores(const vector<TRGCDCLink *> & input,
     unsigned n = input.size();
     for (unsigned i = 0; i < n; i++) {
 	TRGCDCLink & t = * input[i];
-	const Belle2::TCWHit & h = * t.hit();
-	if (h.state() & WireHitFittingValid)
+	const Belle2::TCCHit & h = * t.hit();
+	if (h.state() & CellHitFittingValid)
 	    cores.push_back(& t);
 	else
 	    nonCores.push_back(& t);
@@ -477,56 +486,29 @@ TRGCDCLink::cores(const vector<TRGCDCLink *> & input) {
     unsigned n = input.size();
     for (unsigned i = 0; i < n; i++) {
 	TRGCDCLink & t = * input[i];
-	const Belle2::TCWHit & h = * t.hit();
-	if (h.state() & WireHitFittingValid)
+	const Belle2::TCCHit & h = * t.hit();
+	if (h.state() & CellHitFittingValid)
 	    a.push_back(& t);
     }
     return a;
 }
 
-#if defined(__GNUG__)
-int
-TRGCDCLink::sortByWireId(const TRGCDCLink ** a, const TRGCDCLink ** b) {
-    if ((* a)->wire()->id() > (* b)->wire()->id()) return 1;
-    else if
-	((* a)->wire()->id() == (* b)->wire()->id()) return 0;
-    else return -1;
+bool
+TRGCDCLink::sortById(const TRGCDCLink * a, const TRGCDCLink * b) {
+    return a->cell()->id() < b->cell()->id();
 }
 
 int
-TRGCDCLink::sortByX(const TRGCDCLink ** a, const TRGCDCLink ** b) {
-    if ((* a)->position().x() > (* b)->position().x()) return 1;
-    else if ((* a)->position().x() == (* b)->position().x()) return 0;
-    else return -1;
+TRGCDCLink::sortByX(const TRGCDCLink * a, const TRGCDCLink * b) {
+    return a->position().x() < b->position().x();
 }
-
-#else
-extern "C" int
-SortByWireId(const void * av, const void * bv) {
-  const TRGCDCLink ** a((const TRGCDCLink**)av);
-  const TRGCDCLink ** b((const TRGCDCLink**)bv);
-    if ((* a)->wire()->id() > (* b)->wire()->id()) return 1;
-    else if
-	((* a)->wire()->id() == (* b)->wire()->id()) return 0;
-    else return -1;
-}
-
-extern "C" int
-SortByX(const void* av, const void* bv) {
-  const TRGCDCLink ** a((const TRGCDCLink**)av);
-  const TRGCDCLink ** b((const TRGCDCLink**)bv);
-    if ((* a)->position().x() > (* b)->position().x()) return 1;
-    else if ((* a)->position().x() == (* b)->position().x()) return 0;
-    else return -1;
-}
-#endif
 
 unsigned
 TRGCDCLink::width(const vector<TRGCDCLink *> & list) {
     const unsigned n = list.size();
     if (n < 2) return n;
 
-    const Belle2::TRGCDCWire * const w0 = list[0]->wire();
+    const TCCell * const w0 = list[0]->cell();
 //cnv    const unsigned sId = w0->superLayerId();
     unsigned nWires = w0->layer().nCells();
     unsigned center = w0->localId();
@@ -546,7 +528,7 @@ TRGCDCLink::width(const vector<TRGCDCLink *> & list) {
     unsigned left = 0;
     unsigned right = 0;
     for (unsigned i = 1; i < n; i++) {
-	const Belle2::TRGCDCWire * const w = list[i]->wire();
+	const TCCell * const w = list[i]->cell();
 	unsigned id = w->localId();
 
 	if (ms_smallcell && w->layerId() < 3)
@@ -591,7 +573,7 @@ TRGCDCLink::edges(const vector<TRGCDCLink *> & list) {
     if (n < 2) return a;
     else if (n == 2) return list;
 
-    const Belle2::TRGCDCWire * w = list[0]->wire();
+    const TCCell * w = list[0]->cell();
     unsigned nWires = w->layer().nCells();
     unsigned center = w->localId();
 
@@ -600,7 +582,7 @@ TRGCDCLink::edges(const vector<TRGCDCLink *> & list) {
     TRGCDCLink * leftL = list[0];
     TRGCDCLink * rightL = list[0];
     for (unsigned i = 1; i < n; i++) {
-	w = list[i]->wire();
+	w = list[i]->cell();
 	unsigned id = w->localId();
 
 	unsigned distance0, distance1;
@@ -635,10 +617,10 @@ TRGCDCLink::edges(const vector<TRGCDCLink *> & list) {
 vector<TRGCDCLink *>
 TRGCDCLink::sameLayer(const vector<TRGCDCLink *> & list, const TRGCDCLink & a) {
     vector<TRGCDCLink *> same;
-    unsigned id = a.wire()->layerId();
+    unsigned id = a.cell()->layerId();
     unsigned n = list.size();
     for (unsigned i = 0; i < n; i++) {
-	if (list[i]->wire()->layerId() == id) same.push_back(list[i]);
+	if (list[i]->cell()->layerId() == id) same.push_back(list[i]);
     }
     return same;
 }
@@ -646,10 +628,10 @@ TRGCDCLink::sameLayer(const vector<TRGCDCLink *> & list, const TRGCDCLink & a) {
 vector<TRGCDCLink *>
 TRGCDCLink::sameSuperLayer(const vector<TRGCDCLink *> & list, const TRGCDCLink & a) {
     vector<TRGCDCLink *> same;
-    unsigned id = a.wire()->superLayerId();
+    unsigned id = a.cell()->superLayerId();
     unsigned n = list.size();
     for (unsigned i = 0; i < n; i++) {
-	if (list[i]->wire()->superLayerId() == id) same.push_back(list[i]);
+	if (list[i]->cell()->superLayerId() == id) same.push_back(list[i]);
     }
     return same;
 }
@@ -659,7 +641,7 @@ TRGCDCLink::sameLayer(const vector<TRGCDCLink *> & list, unsigned id) {
     vector<TRGCDCLink *> same;
     unsigned n = list.size();
     for (unsigned i = 0; i < n; i++) {
-	if (list[i]->wire()->layerId() == id) same.push_back(list[i]);
+	if (list[i]->cell()->layerId() == id) same.push_back(list[i]);
     }
     return same;
 }
@@ -669,7 +651,7 @@ TRGCDCLink::sameSuperLayer(const vector<TRGCDCLink *> & list, unsigned id) {
     vector<TRGCDCLink *> same;
     unsigned n = list.size();
     for (unsigned i = 0; i < n; i++) {
-	if (list[i]->wire()->superLayerId() == id) same.push_back(list[i]);
+	if (list[i]->cell()->superLayerId() == id) same.push_back(list[i]);
     }
     return same;
 }
@@ -682,12 +664,12 @@ TRGCDCLink::inOut(const vector<TRGCDCLink *> & list) {
     unsigned innerMostLayer = 999;
     unsigned outerMostLayer = 0;
     for (unsigned i = 0; i < n; i++) {
-	unsigned id = list[i]->wire()->layerId();
+	unsigned id = list[i]->cell()->layerId();
 	if (id < innerMostLayer) innerMostLayer = id;
 	else if (id > outerMostLayer) outerMostLayer = id;
     }
     for (unsigned i = 0; i < n; i++) {
-	unsigned id = list[i]->wire()->layerId();
+	unsigned id = list[i]->cell()->layerId();
 	if (id == innerMostLayer) inners.push_back(list[i]);
 	else if (id == outerMostLayer) outers.push_back(list[i]);
     }
@@ -708,7 +690,7 @@ TRGCDCLink::superLayer(const vector<TRGCDCLink *> & list) {
     unsigned sl = 0;
     unsigned n = list.size();
     for (unsigned i = 0; i < n; i++)
-	sl |= (1 << (list[i]->wire()->superLayerId()));
+	sl |= (1 << (list[i]->cell()->superLayerId()));
     return sl;
 }
 
@@ -724,7 +706,7 @@ TRGCDCLink::superLayer(const vector<TRGCDCLink *> & links, unsigned minN) {
     clearBufferSL();
     unsigned n = links.size();
     for (unsigned i = 0; i < n; i++)
-	++_nHitsSL[links[i]->wire()->superLayerId()];
+	++_nHitsSL[links[i]->cell()->superLayerId()];
     unsigned sl = 0;
     for (unsigned i = 0; i < _nSL; i++)
 	if (_nHitsSL[i] >= minN)
@@ -744,7 +726,7 @@ TRGCDCLink::nSuperLayers(const vector<TRGCDCLink *> & list) {
     unsigned l0 = 0;
     unsigned n = list.size();
     for (unsigned i = 0; i < n; i++) {
-	unsigned id = list[i]->wire()->superLayerId();
+	unsigned id = list[i]->cell()->superLayerId();
 	l0 |= (1 << id);
     }
 
@@ -760,7 +742,7 @@ TRGCDCLink::nSuperLayers(const vector<TRGCDCLink *> & links, unsigned minN) {
     clearBufferSL();
     unsigned n = links.size();
     for (unsigned i = 0; i < n; i++)
-	++_nHitsSL[links[i]->wire()->superLayerId()];
+	++_nHitsSL[links[i]->cell()->superLayerId()];
     unsigned sl = 0;
     for (unsigned i = 0; i < _nSL; i++)
 	if (_nHitsSL[i] >= minN)
@@ -774,9 +756,9 @@ TRGCDCLink::nMissingAxialSuperLayers(const vector<TRGCDCLink *> & links) {
     const unsigned n = links.size();
 //  unsigned nHits[6] = {0, 0, 0, 0, 0, 0};
     for (unsigned i = 0; i < n; i++)
-	if (links[i]->wire()->axial())
-	    ++_nHitsSL[links[i]->wire()->axialStereoSuperLayerId()];
-//	    ++nHits[links[i]->wire()->superLayerId() / 2];
+	if (links[i]->cell()->axial())
+	    ++_nHitsSL[links[i]->cell()->axialStereoSuperLayerId()];
+//	    ++nHits[links[i]->cell()->superLayerId() / 2];
     unsigned j = 0;
     while (_nHitsSL[j] == 0) ++j;
     unsigned nMissing = 0;
@@ -829,7 +811,7 @@ void
 TRGCDCLink::nHitsSuperLayer(const vector<TRGCDCLink *> & links, vector<TRGCDCLink *> * list) {
     const unsigned nLinks = links.size();
     for (unsigned i = 0; i < nLinks; i++)
-	list[links[i]->wire()->superLayerId()].push_back(links[i]);
+	list[links[i]->cell()->superLayerId()].push_back(links[i]);
 }
 
 string
@@ -855,7 +837,7 @@ TRGCDCLink::remove(vector<TRGCDCLink *> & list,
 
     for (unsigned i = 0; i < n; i++) {
 	for (unsigned j = 0; j < m; j++) {
-	    if (list[i]->wire()->id() == links[j]->wire()->id())
+	    if (list[i]->cell()->id() == links[j]->cell()->id())
 //		toBeRemoved.push_back(list[i]);
 
 		cout << "TCLink::remove !!! not implemented yet" << endl;
@@ -877,5 +859,34 @@ TRGCDCLink::initializeBuffers(void) {
 	first = false;
     }
 }
+
+void
+TRGCDCLink::separate(const std::vector<TRGCDCLink *> & links,
+		     unsigned nLayers,
+		     std::vector<TRGCDCLink *> * layers) {
+    for (unsigned i = 0; i < links.size(); i++) {
+	const TCCell * c = links[i]->cell();
+	if (c) {
+	    unsigned lid = c->layer().id();
+	    if (lid < nLayers)
+		layers[lid].push_back(links[i]);
+	}
+    }
+}
+
+const TRGCDCWire *
+TRGCDCLink::wire(void) const {
+    if (_hit)
+	return dynamic_cast<const TRGCDCWire *>(& _hit->cell());
+    return 0;
+}
+
+// inline
+// const TRGCDCSegment *
+// TRGCDCLink::segment(void) const {
+//     if (_hit)
+// 	return dynamic_cast<const TRGCDCSegment *>(& _hit->cell());
+//     return 0;
+// }
 
 } // namespace Belle

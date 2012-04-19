@@ -19,6 +19,7 @@
 #include "trg/cdc/Track.h"
 #include "trg/cdc/Circle.h"
 #include "trg/cdc/Wire.h"
+#include "trg/cdc/SegmentHit.h"
 #include "trg/cdc/Link.h"
 #include "trg/cdc/Helix.h"
 
@@ -265,9 +266,9 @@ TRGCDCTrack::perfectPosition(void) const {
 	}
 	    
 	//...Track segment hit...
-	const TCTSHit * h = dynamic_cast<const TCTSHit *>(links(i)[0]->hit());
+	const TCSHit * h = dynamic_cast<const TCSHit *>(links(i)[0]->hit());
 	if (! h) {
-	    cout << "TRGCDCTrack::perfectPosition !!! hit is not a TCTSHit"
+	    cout << "TRGCDCTrack::perfectPosition !!! hit is not a TCSHit"
 		 << endl;
 	    continue;
 	}

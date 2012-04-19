@@ -21,7 +21,7 @@
 #include "trg/cdc/Wire.h"
 #include "trg/cdc/WireHit.h"
 #include "trg/cdc/WireHitMC.h"
-#include "trg/cdc/TrackSegment.h"
+#include "trg/cdc/Segment.h"
 
 #define P3D HepGeom::Point3D<double>
 

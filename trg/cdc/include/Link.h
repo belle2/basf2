@@ -6,7 +6,7 @@
 // Owner    : Yoshihito Iwasaki
 // Email    : yoshihito.iwasaki@kek.jp
 //-----------------------------------------------------------------------------
-// Description : A class to relate TRGCDCWireHit and TRGCDCTrack objects.
+// Description : A class to relate TRGCDCCellHit and TRGCDCTrack objects.
 //-----------------------------------------------------------------------------
 // $Log$
 //-----------------------------------------------------------------------------
@@ -15,10 +15,10 @@
 #define TRGCDCLink_FLAG_
 
 #include <cstring>
+#include <vector>
 #include "CLHEP/Geometry/Point3D.h"
-#include "trg/cdc/Wire.h"
-#include "trg/cdc/WireHit.h"
-#include "trg/cdc/TrackSegmentHit.h"
+#include "trg/cdc/Cell.h"
+#include "trg/cdc/CellHit.h"
 
 #ifdef TRGCDC_SHORT_NAMES
 #define TCLink TRGCDCLink
@@ -29,15 +29,19 @@ namespace Belle2 {
 class TRGCDC;
 class TRGCDCTrack;
 class TRGCDCTrackMC;
+class TRGCDCWire;
+class TRGCDCWireHit;
+class TRGCDCSegment;
+class TRGCDCSegmentHit;
 
-/// A class to relate TRGCDCWireHit and TRGCDCTrack objects.
+/// A class to relate TRGCDCCellHit and TRGCDCTrack objects.
 class TRGCDCLink {
 
   public:
 
     /// Constructor.
     TRGCDCLink(TRGCDCTrack * track = 0,
-	       const TRGCDCWireHit * hit = 0,
+	       const TRGCDCCellHit * hit = 0,
 	       const HepGeom::Point3D<double> & position = Point3D());
 
     /// Copy constructor.
@@ -48,18 +52,20 @@ class TRGCDCLink {
 
   public:// Selectors
 
-    /// dumps debug information.
-    void dump(const std::string & message = std::string(""),
-	      const std::string & prefix = std::string("")) const;
-
     /// returns a pointer to a track.
     TRGCDCTrack * track(void) const;
 
     /// returns a pointer to a hit.
-    const TRGCDCWireHit * hit(void) const;
+    const TRGCDCCellHit * hit(void) const;
+
+    /// returns a pointer to a cell.
+    const TRGCDCCell * cell(void) const;
 
     /// returns a pointer to a wire.
-    const TRGCDCWire * const wire(void) const;
+    const TRGCDCWire * wire(void) const;
+
+    /// returns a pointer to a track segment.
+    const TRGCDCSegment * segment(void) const;
 
     /// returns pull.
     double pull(void) const;
@@ -103,7 +109,7 @@ class TRGCDCLink {
 		double pull);
 
     /// sets a pointer to a hit.
-    const TRGCDCWireHit * hit(const TRGCDCWireHit *);
+    const TRGCDCCellHit * hit(const TRGCDCCellHit *);
 
     /// sets a pointer to a track.
     TRGCDCTrack * track(TRGCDCTrack *);
@@ -158,6 +164,19 @@ class TRGCDCLink {
     /// sets and returns drift distance error of left or right.
     float dDrift(float, unsigned);
 
+  public:// Utility functions
+
+    /// dumps debug information.
+    void dump(const std::string & message = std::string(""),
+	      const std::string & prefix = std::string("")) const;
+
+  public:// Static utility functions (for Belle2)
+
+    /// separates into layers.
+    static void separate(const std::vector<TRGCDCLink *> & links,
+			 unsigned nLayers,
+			 std::vector<TRGCDCLink *> * layers);
+
   public:// Static utility functions
 
     /// returns TRGCDCTrackMC
@@ -166,6 +185,8 @@ class TRGCDCLink {
 
     /// returns \# of layers.
     static unsigned nSuperLayers(const std::vector<TRGCDCLink *> & links);
+
+    /// returns \# of layers.
     static unsigned nSuperLayers(const std::vector<TRGCDCLink *> & links,
 				 unsigned minNHits);
 
@@ -179,7 +200,8 @@ class TRGCDCLink {
     static unsigned nLayers(const std::vector<TRGCDCLink *> & links);
 
     /// returns \# of hits per layer.
-    static void nHits(const std::vector<TRGCDCLink *> & links, unsigned * nHits);
+    static void nHits(const std::vector<TRGCDCLink *> & links,
+		      unsigned * nHits);
 
     /// returns \# of hits per super layer.
     static void nHitsSuperLayer(const std::vector<TRGCDCLink *> & links,
@@ -208,20 +230,36 @@ class TRGCDCLink {
     static std::vector<TRGCDCLink *> edges(const std::vector<TRGCDCLink *> &);
 
     /// returns links which are in the same layer as 'a' or 'id'.
-    static std::vector<TRGCDCLink *> sameLayer(const std::vector<TRGCDCLink *> & list, const TRGCDCLink & a);
-    static std::vector<TRGCDCLink *> sameLayer(const std::vector<TRGCDCLink *> & list, unsigned id);
+    static std::vector<TRGCDCLink *> sameLayer(
+	const std::vector<TRGCDCLink *> & list,
+	const TRGCDCLink & a);
+
+    /// returns links which are in the same layer as 'a' or 'id'.
+    static std::vector<TRGCDCLink *> sameLayer(
+	const std::vector<TRGCDCLink *> & list,
+	unsigned id);
 
     /// returns links which are in the same super layer as 'a' or 'id'.
-    static std::vector<TRGCDCLink *> sameSuperLayer(const std::vector<TRGCDCLink *> & list,
-				       const TRGCDCLink & a);
-    static std::vector<TRGCDCLink *> sameSuperLayer(const std::vector<TRGCDCLink *> & list, unsigned id);
+    static std::vector<TRGCDCLink *> sameSuperLayer(
+	const std::vector<TRGCDCLink *> & list,
+	const TRGCDCLink & a);
+
+    /// returns links which are in the same super layer as 'a' or 'id'.
+    static std::vector<TRGCDCLink *> sameSuperLayer(
+	const std::vector<TRGCDCLink *> & list,
+	unsigned id);
 
     /// returns super layer pattern.
     static unsigned superLayer(const std::vector<TRGCDCLink *> & list);
-    static unsigned superLayer(const std::vector<TRGCDCLink *> & list, unsigned minNHits);
 
-    /// returns the inner(outer)-most link.
+    /// returns super layer pattern.
+    static unsigned superLayer(const std::vector<TRGCDCLink *> & list,
+			       unsigned minNHits);
+
+    /// returns the inner-most link.
     static TRGCDCLink * innerMost(const std::vector<TRGCDCLink *> & links);
+
+    /// returns the outer-most link.
     static TRGCDCLink * outerMost(const std::vector<TRGCDCLink *> & links);
 
     /// returns links which are in the inner most and outer most layer. This function assumes that all TRGCDCLink's are in the same super layer.
@@ -229,32 +267,41 @@ class TRGCDCLink {
 
     /// separate cores and non-cores.
     static void separateCores(const std::vector<TRGCDCLink *> & input,
-		       std::vector<TRGCDCLink *> & cores,
-		       std::vector<TRGCDCLink *> & nonCores);
-    static std::vector<TRGCDCLink *> cores(const std::vector<TRGCDCLink *> & input);
+			      std::vector<TRGCDCLink *> & cores,
+			      std::vector<TRGCDCLink *> & nonCores);
+
+    /// separate cores and non-cores.
+    static std::vector<TRGCDCLink *> cores(
+	const std::vector<TRGCDCLink *> & input);
 
     /// removes links from list if wire is same
-    static void remove(std::vector<TRGCDCLink *> & list, const std::vector<TRGCDCLink *> & links);
+    static void remove(std::vector<TRGCDCLink *> & list,
+		       const std::vector<TRGCDCLink *> & links);
 
     /// dumps TRGCDCLinks.
     static void dump(const std::vector<const TRGCDCLink *> & links,
 		     const std::string & message = std::string(""),
 		     const std::string & prefix = std::string(""));
+
+    /// dumps TRGCDCLinks.
+    static void dump(const std::vector<TRGCDCLink *> & links,
+		     const std::string & message = std::string(""),
+		     const std::string & prefix = std::string(""));
+
+    /// dumps TRGCDCLinks.
     static void dump(const TRGCDCLink & link,
 		     const std::string & message = std::string(""),
 		     const std::string & prefix = std::string(""));
+
     static std::string layerUsage(const std::vector<TRGCDCLink *> & links);
 
-    /// Sorters
-#if defined(__GNUG__)
-    static int sortByWireId(const TRGCDCLink ** a, const TRGCDCLink ** b);
-    static int sortByX(const TRGCDCLink ** a, const TRGCDCLink ** b);
-#else
-//     extern "C" int
-// 	SortByWireId(const void* a, const void* b);
-//     extern "C" int
-// 	SortByX(const void* a, const void* b);
-#endif
+  public:// Sorters
+
+    /// sorts by ID.
+    static bool sortById(const TRGCDCLink * a, const TRGCDCLink * b);
+
+    /// sorts by X position.
+    static int sortByX(const TRGCDCLink * a, const TRGCDCLink * b);
 
   private:
     friend class TRGCDC;
@@ -265,10 +312,17 @@ class TRGCDCLink {
   private:
     static void clearBufferSL(void);
 
+    /// dumps debug information.
+    void dump_base(const std::string & message = std::string(""),
+		   const std::string & prefix = std::string("")) const;
+
   private:
 
+    /// Track object.
     TRGCDCTrack * _track;
-    const TRGCDCWireHit * _hit;
+
+    /// Cell hit object.
+    const TRGCDCCellHit * _hit;
 
     HepGeom::Point3D<double> _onTrack;
     HepGeom::Point3D<double> _onWire;
@@ -313,17 +367,8 @@ class TRGCDCLink {
 
 //-----------------------------------------------------------------------------
 
-#ifdef TRGCDCLink_NO_INLINE
-#define inline
-#else
-#undef inline
-#define TRGCDCLink_INLINE_DEFINE_HERE
-#endif
-
-#ifdef TRGCDCLink_INLINE_DEFINE_HERE
-
 inline
-const TRGCDCWireHit *
+const TRGCDCCellHit *
 TRGCDCLink::hit(void) const {
     return _hit;
 }
@@ -335,8 +380,8 @@ TRGCDCLink::track(void) const {
 }
 
 inline
-const TRGCDCWireHit *
-TRGCDCLink::hit(const TRGCDCWireHit * a) {
+const TRGCDCCellHit *
+TRGCDCLink::hit(const TRGCDCCellHit * a) {
     return _hit = a;
 }
 
@@ -494,17 +539,9 @@ TRGCDCLink::distance(void) const {
 }
 
 inline
-const TRGCDCWire * const
-TRGCDCLink::wire(void) const {
-    if (_hit)
-	return & _hit->wire();
-    return 0;
-}
-
-inline
 const HepGeom::Point3D<double> &
 TRGCDCLink::xyPosition(void) const {
-    return _hit->wire().xyPosition();
+    return _hit->cell().xyPosition();
 }
 
 // inline
@@ -561,10 +598,14 @@ TRGCDCLink::clearBufferSL(void) {
     bzero(_nHitsSL, sizeof(unsigned) * _nSL);
 }
 
-#endif
+inline
+const TRGCDCCell *
+TRGCDCLink::cell(void) const {
+    if (_hit)
+	return & _hit->cell();
+    return 0;
+}
 
-#undef inline
-
-} // namespace Belle
+} // namespace Belle2
 
 #endif /* TRGCDCLink_FLAG_ */

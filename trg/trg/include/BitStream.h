@@ -30,15 +30,15 @@
 #define TRGBSRecord_BeginEvent 0xffff00B0
 #define TRGBSRecord_EndEvent   0xffff00B1
 #define TRGBSRecord_Clock      0xffff00C0
-#define TRGBSRecord_TrackSegmentSL0 0xffff00F0
-#define TRGBSRecord_TrackSegmentSL1 0xffff00F1
-#define TRGBSRecord_TrackSegmentSL2 0xffff00F2
-#define TRGBSRecord_TrackSegmentSL3 0xffff00F3
-#define TRGBSRecord_TrackSegmentSL4 0xffff00F4
-#define TRGBSRecord_TrackSegmentSL5 0xffff00F5
-#define TRGBSRecord_TrackSegmentSL6 0xffff00F6
-#define TRGBSRecord_TrackSegmentSL7 0xffff00F7
-#define TRGBSRecord_TrackSegmentSL8 0xffff00F8
+#define TRGBSRecord_SegmentSL0 0xffff00F0
+#define TRGBSRecord_SegmentSL1 0xffff00F1
+#define TRGBSRecord_SegmentSL2 0xffff00F2
+#define TRGBSRecord_SegmentSL3 0xffff00F3
+#define TRGBSRecord_SegmentSL4 0xffff00F4
+#define TRGBSRecord_SegmentSL5 0xffff00F5
+#define TRGBSRecord_SegmentSL6 0xffff00F6
+#define TRGBSRecord_SegmentSL7 0xffff00F7
+#define TRGBSRecord_SegmentSL8 0xffff00F8
 
 namespace Belle2 {
 

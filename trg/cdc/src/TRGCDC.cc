@@ -32,7 +32,8 @@
 #include "trg/cdc/WireHitMC.h"
 #include "trg/cdc/TrackMC.h"
 #include "trg/cdc/Track.h"
-#include "trg/cdc/TrackSegment.h"
+#include "trg/cdc/Segment.h"
+#include "trg/cdc/SegmentHit.h"
 #include "trg/cdc/LUT.h"
 #include "trg/cdc/FrontEnd.h"
 #include "trg/cdc/Merger.h"
@@ -61,7 +62,7 @@ TRGCDC::name(void) const {
 
 string
 TRGCDC::version(void) const {
-    return string("TRGCDC 5.10");
+    return string("TRGCDC 5.11");
 }
 
 TRGCDC *
@@ -135,9 +136,12 @@ TRGCDC::TRGCDC(const string & configFile,
     cout << "TRGCDC ... GTK initialized" << endl;
 #endif
 
-    if (TRGDebug::level())
+    if (TRGDebug::level()) {
         cout << "TRGCDC ... TRGCDC initializing with " << _configFilename
-             << endl;
+             << endl
+	     << "           mode=0x" << hex << _mode << dec << endl;
+    }
+
     initialize(houghFinderPerfect, houghFinderMeshX, houghFinderMeshY);
 
     if (TRGDebug::level()) {
@@ -340,11 +344,11 @@ TRGCDC::initialize(bool houghFinderPerfect,
             }
 
             //...Create a track segment...
-            TRGCDCTrackSegment * ts = new TRGCDCTrackSegment(idTS++,
-							     * layer,
-							     w,
-							     _luts.back(),
-							     cells);
+            TRGCDCSegment * ts = new TRGCDCSegment(idTS++,
+						   * layer,
+						   w,
+						   _luts.back(),
+						   cells);
 // 	    for (unsigned i = 0; i < nWiresInTS[tsType]; i++) {
 // 		TCWire * c = (TCWire *) cells[i];
 // 		c->_segment = ts;
@@ -508,8 +512,8 @@ TRGCDC::dump(const string & msg) const {
     if (msg.find("trgWireCentralHits") != string::npos) {
         const string dumpOption = "trigger detail";
         cout << "    wire hits" << endl;
-        for (unsigned i = 0; i < nTrackSegments(); i++) {
-            const TCTSegment & s = trackSegment(i);
+        for (unsigned i = 0; i < nSegments(); i++) {
+            const TCSegment & s = segment(i);
             if (s.wires()[5]->triggerOutput().active())
                 s.wires()[5]->dump(dumpOption, TRGDebug::tab(4));
         }
@@ -517,8 +521,8 @@ TRGCDC::dump(const string & msg) const {
     if (msg.find("trgTSHits") != string::npos) {
         const string dumpOption = "trigger detail";
         cout << "    TS hits" << endl;
-        for (unsigned i = 0; i < nTrackSegments(); i++) {
-            const TCTSegment & s = trackSegment(i);
+        for (unsigned i = 0; i < nSegments(); i++) {
+            const TCSegment & s = segment(i);
             if (s.triggerOutput().active())
                 s.dump(dumpOption, TRGDebug::tab(4));
         }
@@ -578,9 +582,7 @@ TRGCDC::clear(void) {
     unsigned i = 0;
     while (TCWire * w = _wires[i++])
         w->clear();
-    for (unsigned i = 0; i < _tsHits.size(); i++)
-        _tsHits[i]->clear();
-    _tsHits.clear();
+    _segmentHits.clear();
 
     _hitWires.clear();
     _axialHits.clear();
@@ -591,9 +593,14 @@ TRGCDC::clear(void) {
         delete _hitsMC[i];
     for (unsigned i = 0; i < _badHits.size(); i++)
         delete _badHits[i];
+    for (unsigned i = 0; i < _segmentHits.size(); i++)
+        delete _segmentHits[i];
     _hits.clear();
     _hitsMC.clear();
     _badHits.clear();
+    _segmentHits.clear();
+    for (unsigned i = 0; i < 9; i++)
+	_segmentHitsSL[i].clear();
 }
 
 void
@@ -660,7 +667,7 @@ TRGCDC::update(bool ) {
 	unsigned iSimHit = 0;
 
 //      //...Check validity (skip broken channel)...
-//      if (! (h->m_stat & WireHitFindingValid)) continue;
+//      if (! (h->m_stat & CellHitFindingValid)) continue;
 
 	//...Get CDCSimHit... This is expensive. Should be moved outside.
 	for (unsigned j = 0; j < nRels; j++) {
@@ -696,7 +703,7 @@ TRGCDC::update(bool ) {
 				  h.getDriftTime(),
 				  0.15,
 				  1);
-	hit->state(WireHitFindingValid | WireHitFittingValid );
+	hit->state(CellHitFindingValid | CellHitFittingValid );
 
         //...Store a hit...
         ((TCWire *) (* _layers[layerId])[wireId])->hit(hit);
@@ -705,31 +712,7 @@ TRGCDC::update(bool ) {
         else           _stereoHits.push_back(hit);
     }
 
-    //...Track segment...
-    const unsigned nTS = _tss.size();
-    for (unsigned i = 0; i < nTS; i++) {
-	TCTSegment & s = * _tss[i];
-	unsigned j = 0;
-	const TCWire * w = s[j];
-	const TCTSHit * th = 0;
-	while (w) {
-	    const TCWHit * h = w->hit();
-	    if (h) {
-		if (! th) {
-		    th = new TCTSHit(s, * h);
-// 				     h->drift(),
-// 				     h->dDrift(),
-// 				     h->drift(),
-// 				     h->dDrift(),
-// 				     1);
-//		    s.TCWire::hit(th);
-		    s.hit(th);
-		}
-		s._hits.push_back(h);
-	    }
-	    w = s[++j];
-	}
-    }
+    //...Track segment... This part is moved to ::simulate().
 
     //...Hit classification...
 //  _hits.sort(TCWHit::sortByWireId);
@@ -764,20 +747,20 @@ TRGCDC::classification(void) {
                 if (neighbor[j]->hit())
                     pattern += (1 << j);
         }
-        state |= (pattern << WireHitNeighborHit);
+        state |= (pattern << CellHitNeighborHit);
 
         //...Check isolation...
         const TCWHit * hr1 = neighbor[2]->hit();
         const TCWHit * hl1 = neighbor[3]->hit();
         if ((hr1 == 0) && (hl1 == 0)) {
-            state |= WireHitIsolated;
+            state |= CellHitIsolated;
         }
         else {
             const TCWHit * hr2 = neighbor[2]->neighbor(2)->hit();
             const TCWHit * hl2 = neighbor[3]->neighbor(3)->hit();
             if ((hr2 == 0) && (hr1 != 0) && (hl1 == 0) ||
                 (hl2 == 0) && (hl1 != 0) && (hr1 == 0))
-                state |= WireHitIsolated;
+                state |= CellHitIsolated;
         }
 
         //...Check continuation...
@@ -797,18 +780,18 @@ TRGCDC::classification(void) {
             if ((neighbor[4]->hit()) || neighbor[5]->hit())
                 next = true;
         }
-        // if (previous && next) state |= WireHitContinuous;
-        if (previous || next) state |= WireHitContinuous;
+        // if (previous && next) state |= CellHitContinuous;
+        if (previous || next) state |= CellHitContinuous;
 
         //...Solve LR locally...
         if ((pattern == 34) || (pattern == 42) ||
             (pattern == 40) || (pattern == 10) ||
             (pattern == 35) || (pattern == 50))
-            state |= WireHitPatternRight;
+            state |= CellHitPatternRight;
         else if ((pattern == 17) || (pattern == 21) ||
                  (pattern == 20) || (pattern ==  5) ||
                  (pattern == 19) || (pattern == 49))
-            state |= WireHitPatternLeft;
+            state |= CellHitPatternLeft;
 
         //...Store it...
         h->state(state);
@@ -822,7 +805,7 @@ TRGCDC::axialHits(void) const {
     return t;
 
 //     if (! mask) return _axialHits;
-//     else if (mask == WireHitFindingValid) return _axialHits;
+//     else if (mask == CellHitFindingValid) return _axialHits;
 //     cout << "TRGCDC::axialHits !!! unsupported mask given" << endl;
 //  return _axialHits;
 }
@@ -834,7 +817,7 @@ TRGCDC::stereoHits(void) const {
     return t;
 
 //     if (! mask) return _stereoHits;
-//     else if (mask == WireHitFindingValid) return _stereoHits;
+//     else if (mask == CellHitFindingValid) return _stereoHits;
 //     cout << "TRGCDC::stereoHits !!! unsupported mask given" << endl;
 //     return _stereoHits;
 }
@@ -846,43 +829,43 @@ TRGCDC::hits(void) const {
     return t;
 
 //     if (! mask) return _hits;
-//     else if (mask == WireHitFindingValid) return _hits;
+//     else if (mask == CellHitFindingValid) return _hits;
 //     cout << "TRGCDC::hits !!! unsupported mask given" << endl;
 //     return _hits;
 }
 
-vector<const TCWHit *>
-TRGCDC::badHits(void) const {
-    vector<const TCWHit *> t;
-    t.assign(_badHits.begin(), _badHits.end());
-    return t;
+// vector<const TCWHit *>
+// TRGCDC::badHits(void) const {
+//     vector<const TCWHit *> t;
+//     t.assign(_badHits.begin(), _badHits.end());
+//     return t;
 
-//cnv     if (! updated()) update();
-//     if (_badHits.length()) return _badHits;
+// //cnv     if (! updated()) update();
+// //     if (_badHits.length()) return _badHits;
 
-//     //...Loop over RECCDC_WIRHIT bank...
-//    x unsigned nReccdc = BsCouTab(RECCDC_WIRHIT);
-//     for (unsigned i = 0; i < nReccdc; i++) {
-//         x struct reccdc_wirhit * h =
-//             (struct reccdc_wirhit *)
-//             BsGetEnt(RECCDC_WIRHIT, i + 1, BBS_No_Index);
+// //     //...Loop over RECCDC_WIRHIT bank...
+// //    x unsigned nReccdc = BsCouTab(RECCDC_WIRHIT);
+// //     for (unsigned i = 0; i < nReccdc; i++) {
+// //         x struct reccdc_wirhit * h =
+// //             (struct reccdc_wirhit *)
+// //             BsGetEnt(RECCDC_WIRHIT, i + 1, BBS_No_Index);
 
-//         //...Check validity...
-//         if (h->m_stat & WireHitFindingValid) continue;
+// //         //...Check validity...
+// //         if (h->m_stat & CellHitFindingValid) continue;
 
-//         //...Obtain a pointer to GEOCDC...
-//         x geocdc_wire * g =
-//             (geocdc_wire *) BsGetEnt(GEOCDC_WIRE, h->m_geo, BBS_No_Index);
+// //         //...Obtain a pointer to GEOCDC...
+// //         x geocdc_wire * g =
+// //             (geocdc_wire *) BsGetEnt(GEOCDC_WIRE, h->m_geo, BBS_No_Index);
 
-//         //...Get a pointer to a TRGCDCWire...
-//         TCWire * w = _wires[g->m_ID - 1];
+// //         //...Get a pointer to a TRGCDCWire...
+// //         TCWire * w = _wires[g->m_ID - 1];
 
-//         //...Create TCWHit...
-//         _badHits.append(new TCWHit(w, h, _fudgeFactor));
-//     }
+// //         //...Create TCWHit...
+// //         _badHits.append(new TCWHit(w, h, _fudgeFactor));
+// //     }
 
-//     return _badHits;
-}
+// //     return _badHits;
+// }
 
 vector<const TCWHitMC *>
 TRGCDC::hitsMC(void) const {
@@ -1160,10 +1143,28 @@ TRGCDC::simulate(void) {
     //...Store TS hits...
     const unsigned n = _tss.size();
     for (unsigned i = 0; i < n; i++) {
-        TCTSegment & s = * _tss[i];
+        TCSegment & s = * _tss[i];
         s.simulate();
-        if (s.triggerOutput().active())
-             _tsHits.push_back(& s);
+        if (s.triggerOutput().active()) {
+
+	     //...Create TCShit...
+	     unsigned j = 0;
+	     const TCWire * w = s[j];
+	     TCSHit * th = 0;
+	     while (w) {
+		 const TCWHit * h = w->hit();
+		 if (h) {
+		     if (! th) {
+			 th = new TCSHit(s);
+			 s.hit(th);
+			 _segmentHits.push_back(th);
+			 _segmentHitsSL[s.layerId()];
+		     }
+		     s._hits.push_back(h);
+		 }
+		 w = s[++j];
+	     }
+	}
     }
 
     if (TRGDebug::level() > 1) {
@@ -1171,10 +1172,18 @@ TRGCDC::simulate(void) {
 	string dumpOption = "trigger";
         if (TRGDebug::level() > 2)
             dumpOption = "detail";
-        for (unsigned i = 0; i < nTrackSegments(); i++) {
-            const TCTSegment & s = trackSegment(i);
+        for (unsigned i = 0; i < nSegments(); i++) {
+            const TCSegment & s = segment(i);
             if (s.triggerOutput().active())
                 s.dump(dumpOption, TRGDebug::tab(4));
+        }
+
+        cout << TRGDebug::tab() << "TS hit list (2)" << endl;
+        if (TRGDebug::level() > 2)
+            dumpOption = "detail";
+        for (unsigned i = 0; i < _segmentHits.size(); i++) {
+            const TCSHit & s = * _segmentHits[i];
+	    s.dump(dumpOption, TRGDebug::tab(4));
         }
     }
 
@@ -1216,7 +1225,7 @@ TRGCDC::simulate(void) {
     D->stage(stg);
     D->information(inf);
     D->area().append(hits());
-    D->area().append(tsHits());
+    D->area().append(segmentHits());
     D->area().append(tt);
     D->show();
     D->run();
@@ -1359,9 +1368,9 @@ TRGCDC::configure(void) {
     infile.close();
 }
 
-const TRGCDCTrackSegment &
-TRGCDC::trackSegment(unsigned lid, unsigned id) const {
-    return * (const TRGCDCTrackSegment *) (* _tsLayers[lid])[id];
+const TRGCDCSegment &
+TRGCDC::segment(unsigned lid, unsigned id) const {
+    return * (const TRGCDCSegment *) (* _tsLayers[lid])[id];
 }
 
 } // namespace Belle2

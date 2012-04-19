@@ -15,6 +15,7 @@
 
 #include "trg/trg/Constants.h"
 #include "trg/trg/Point2D.h"
+#include "trg/cdc/Wire.h"
 #include "trg/cdc/Link.h"
 #include "trg/cdc/Circle.h"
 #include "trg/cdc/CircleFitter.h"
@@ -27,7 +28,7 @@ namespace Belle2 {
 const TRGCDCCircleFitter
 TRGCDCCircle::_fitter = TRGCDCCircleFitter("TRGCDCCircle Default Fitter");
 
-TRGCDCCircle::TRGCDCCircle(const std::vector<TCLink *> links)
+TRGCDCCircle::TRGCDCCircle(const std::vector<TCLink *> & links)
     : TCTBase("UnknownCircle", 0),
       _center(ORIGIN),
       _radius(0),
@@ -63,7 +64,7 @@ TRGCDCCircle::dump(const string & cmd, const string & pre) const {
 
 int
 TRGCDCCircle::approach2D(TCLink & l) const {
-    HepGeom::Point3D<double> xw = l.wire()->xyPosition();
+    HepGeom::Point3D<double> xw = l.cell()->xyPosition();
     HepGeom::Point3D<double> xc(_center.x(), _center.y(), 0.);
 
     xw.setZ(0.);

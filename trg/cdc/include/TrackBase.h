@@ -100,7 +100,7 @@ class TRGCDCTrackBase {
     void append(TRGCDCLink *);
 
     /// appends links.
-    void append(const std::vector<TRGCDCLink *> links);
+    void append(const std::vector<TRGCDCLink *> & links);
 
     /// sets and returns charge.
     double charge(double c);

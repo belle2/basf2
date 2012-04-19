@@ -181,16 +181,16 @@ main(int argc, char * argv[]) {
 	    break;
 	}
 
-	case TRGBSRecord_TrackSegmentSL0:
-	case TRGBSRecord_TrackSegmentSL1:
-	case TRGBSRecord_TrackSegmentSL2:
-	case TRGBSRecord_TrackSegmentSL3:
-	case TRGBSRecord_TrackSegmentSL4:
-	case TRGBSRecord_TrackSegmentSL5:
-	case TRGBSRecord_TrackSegmentSL6:
-	case TRGBSRecord_TrackSegmentSL7:
-	case TRGBSRecord_TrackSegmentSL8: {
-	    unsigned superLayer = rec - TRGBSRecord_TrackSegmentSL0;
+	case TRGBSRecord_SegmentSL0:
+	case TRGBSRecord_SegmentSL1:
+	case TRGBSRecord_SegmentSL2:
+	case TRGBSRecord_SegmentSL3:
+	case TRGBSRecord_SegmentSL4:
+	case TRGBSRecord_SegmentSL5:
+	case TRGBSRecord_SegmentSL6:
+	case TRGBSRecord_SegmentSL7:
+	case TRGBSRecord_SegmentSL8: {
+	    unsigned superLayer = rec - TRGBSRecord_SegmentSL0;
 	    unsigned csiz = siz / 8;
 	    if (siz % 8) ++csiz;
 	    char * buf = new char[csiz];

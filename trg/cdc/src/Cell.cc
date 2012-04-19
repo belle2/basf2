@@ -19,7 +19,7 @@
 #include "trg/trg/Utilities.h"
 #include "trg/cdc/TRGCDC.h"
 #include "trg/cdc/Cell.h"
-#include "trg/cdc/TrackSegment.h"
+#include "trg/cdc/Segment.h"
 
 #define P3D HepGeom::Point3D<double>
 
@@ -81,19 +81,6 @@ TRGCDCCell::localIdDifference(const TRGCDCCell & a) const {
         if (- diff < difR) return diff;
         else return difR;
     }
-}
-
-string
-TRGCDCCell::name(void) const {
-    if (axial())
-        return string("w") +
-            TRGUtil::itostring(layerId()) +
-            string("-") +
-            TRGUtil::itostring(_localId);
-    return string("w") + 
-        TRGUtil::itostring(layerId()) +
-        string("=") +
-        TRGUtil::itostring(_localId);
 }
 
 } // namespace Belle2

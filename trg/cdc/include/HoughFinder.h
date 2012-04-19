@@ -67,6 +67,9 @@ class TRGCDCHoughFinder {
     /// do perfect finding.
     int doitPerfectly(std::vector<TRGCDCTrack *> & trackList);
 
+    /// do perfect finding (for single-track events).
+    int doitPerfectlySingleTrack(std::vector<TRGCDCTrack *> & trackList);
+
   private:
 
     /// Name.

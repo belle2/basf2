@@ -21,7 +21,7 @@
 #include "trg/trg/Debug.h"
 #include "trg/trg/BitStream.h"
 #include "trg/cdc/Wire.h"
-#include "trg/cdc/TrackSegment.h"
+#include "trg/cdc/Segment.h"
 #include "trg/cdc/Layer.h"
 
 using namespace std;
@@ -97,8 +97,8 @@ TRGCDCTSStreamModule::beginRun() {
     _cdc = TRGCDC::getTRGCDC();
 
     //...Super layer loop...
-    for (unsigned l = 0; l < _cdc->nTrackSegmentLayers(); l++) {
-	const Belle2::TRGCDCLayer * lyr = _cdc->trackSegmentLayer(l);
+    for (unsigned l = 0; l < _cdc->nSegmentLayers(); l++) {
+	const Belle2::TRGCDCLayer * lyr = _cdc->segmentLayer(l);
 	const unsigned nWires = lyr->nCells();
 
 	//...Clear old pointers...
@@ -106,7 +106,7 @@ TRGCDCTSStreamModule::beginRun() {
 
 	//...TS loop...
 	for (unsigned i = 0; i < nWires; i++) {
-	      const TCTSegment & s = (TCTSegment &) * (* lyr)[i];
+	      const TCSegment & s = (TCSegment &) * (* lyr)[i];
 	      _wires[l].push_back(s.wires()[5]);
 	}
     }
@@ -163,7 +163,7 @@ TRGCDCTSStreamModule::event() {
 	    }
 
 	    if (_out) {
-		unsigned val = TRGBSRecord_TrackSegmentSL0;
+		unsigned val = TRGBSRecord_SegmentSL0;
 		val += l;
 		_out->write((char *) & val, 4);
 		val = stream.size();

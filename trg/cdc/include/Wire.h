@@ -98,8 +98,7 @@ class TRGCDCWire : public TRGCDCCell {
   public:// TRG
 
     /// returns trigger output. Null will returned if no signal.
-//  virtual const TRGSignal * triggerOutput(void) const;
-    virtual const TRGSignal & triggerOutput(void) const;
+    const TRGSignal & triggerOutput(void) const;
 
   private:
 

@@ -1,7 +1,7 @@
 //-----------------------------------------------------------------------------
 // $Id$
 //-----------------------------------------------------------------------------
-// Filename : TrackSegmentHit.h
+// Filename : SegmentHit.h
 // Section  : TRG CDC
 // Owner    : Yoshihito Iwasaki
 // Email    : yoshihito.iwasaki@kek.jp
@@ -11,41 +11,29 @@
 // $Log$
 //-----------------------------------------------------------------------------
 
-#ifndef TRGCDCTrackSegmentHit_FLAG_
-#define TRGCDCTrackSegmentHit_FLAG_
+#ifndef TRGCDCSegmentHit_FLAG_
+#define TRGCDCSegmentHit_FLAG_
 
-#include "trg/cdc/WireHit.h"
+#include "trg/cdc/CellHit.h"
 
 #ifdef TRGCDC_SHORT_NAMES
-#define TCTSHit TRGCDCTrackSegmentHit
+#define TCSHit TRGCDCSegmentHit
 #endif
 
 namespace Belle2 {
 
-class TRGCDCTrackSegment;
+class TRGCDCSegment;
 
 /// A class to represent a track segment hit in CDC.
-class TRGCDCTrackSegmentHit : public TRGCDCWireHit {
+class TRGCDCSegmentHit : public TRGCDCCellHit {
 
   public:
 
     /// Constructor.
-//  TRGCDCTrackSegmentHit(const TRGCDCWire &);
-//     TRGCDCTrackSegmentHit(const TRGCDCTrackSegment &);
-
-    /// Constructor.
-//  TRGCDCTrackSegmentHit(const TRGCDCWire &,
-// 			  const TRGCDCWireHit &);
-    TRGCDCTrackSegmentHit(const TRGCDCTrackSegment &,
-			  const TRGCDCWireHit &);
-// 			  float driftLeft,
-// 			  float driftLeftError,
-// 			  float driftRight,
-// 			  float driftRightError,
-// 			  float fudgeFacgtor = 1);
+    TRGCDCSegmentHit(const TRGCDCSegment &);
 
     /// Destructor
-    virtual ~TRGCDCTrackSegmentHit();
+    virtual ~TRGCDCSegmentHit();
 
   public:// Selectors
 
@@ -54,33 +42,30 @@ class TRGCDCTrackSegmentHit : public TRGCDCWireHit {
 		      const std::string & prefix = std::string("")) const;
 
     /// returns a pointer to a track segment.
-    const TRGCDCTrackSegment & trackSegment(void) const;
+    const TRGCDCSegment & segment(void) const;
+
+    /// returns trigger output. Null will returned if no signal.
+    const TRGSignal & triggerOutput(void) const;
 
   public:// Modifiers
 
   public:// Static utility functions
 
     /// Sorting funnction.
-    static int sortByWireId(const TRGCDCTrackSegmentHit ** a,
-			    const TRGCDCTrackSegmentHit ** b);
+    static int sortById(const TRGCDCSegmentHit ** a,
+			const TRGCDCSegmentHit ** b);
 
   private:
-
-    /// Track segment
-    const TRGCDCTrackSegment * _segment;
-
-    /// State.
-    mutable unsigned _state;
 };
 
 //-----------------------------------------------------------------------------
 
 inline
-const TRGCDCTrackSegment &
-TRGCDCTrackSegmentHit::trackSegment(void) const {
-    return * _segment;
+const TRGSignal &
+TRGCDCSegmentHit::triggerOutput(void) const {
+    return cell().triggerOutput();
 }
 
 } // namespace Belle2
 
-#endif /* TRGCDCTrackSegmentHit_FLAG_ */
+#endif /* TRGCDCSegmentHit_FLAG_ */

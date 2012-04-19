@@ -21,7 +21,7 @@
 #include "trg/cdc/TRGCDC.h"
 #include "trg/cdc/Wire.h"
 #include "trg/cdc/WireHit.h"
-#include "trg/cdc/TrackSegment.h"
+#include "trg/cdc/Segment.h"
 #include "trg/cdc/FrontEnd.h"
 #include "trg/cdc/Merger.h"
 #include "trg/cdc/HoughPlane.h"
@@ -134,11 +134,11 @@ TRGCDCDisplayDrawingAreaHough::on_button_press_event(GdkEventButton * e) {
         const TRGCDC & cdc = * TRGCDC::getTRGCDC();
         const TCHPlaneMulti2 & hp =
             * dynamic_cast<const TCHPlaneMulti2 *>(_hp);
-        vector<const TCTSegment *> list;
+        vector<const TCSegment *> list;
         for (unsigned i = 0; i < 5; i++) {
             const vector<unsigned> & l = hp.patternId(i, sid);
             for (unsigned j = 0; j < l.size(); j++)
-                list.push_back(& cdc.trackSegment(i * 2, l[j]));
+                list.push_back(& cdc.segment(i * 2, l[j]));
         }
         display().rphi()->area().on_expose_event(0);
         display().rphi()->area().oneShot(list, _red);

@@ -38,7 +38,8 @@ class TRGCDCWire;
 class TRGCDCLayer;
 class TRGCDCWireHit;
 class TRGCDCWireHitMC;
-class TRGCDCTrackSegment;
+class TRGCDCSegment;
+class TRGCDCSegmentHit;
 class TRGCDCFrontEnd;
 class TRGCDCMerger;
 class TRGCDCHoughFinder;
@@ -180,19 +181,19 @@ class TRGCDC {
     float superLayerR2(unsigned superLayerId) const;
 
     /// returns \# of track segments.
-    unsigned nTrackSegments(void) const;
+    unsigned nSegments(void) const;
 
     /// returns a track segment.
-    const TRGCDCTrackSegment & trackSegment(unsigned id) const;
+    const TRGCDCSegment & segment(unsigned id) const;
 
     /// returns a track segment.
-    const TRGCDCTrackSegment & trackSegment(unsigned lyrId, unsigned id) const;
+    const TRGCDCSegment & segment(unsigned lyrId, unsigned id) const;
 
     /// returns \# of track segment layers.
-    unsigned nTrackSegmentLayers(void) const;
+    unsigned nSegmentLayers(void) const;
 
     /// returns a pointer to a track segment layer. 0 will be returned if 'id' is invalid.
-    const TRGCDCLayer * trackSegmentLayer(unsigned id) const;
+    const TRGCDCLayer * segmentLayer(unsigned id) const;
 
   public:// Event by event hit information.
 
@@ -202,7 +203,7 @@ class TRGCDC {
     /// clears TRGCDC information.
     void fastClear(void);
 
-    /// updates TRGCDC information. clear() is called in this function.
+    /// updates TRGCDC wire information. clear() is called in this function.
     void update(bool mcAnalysis = true);
 
     /// returns a list of TRGCDCWireHit. 'update()' must be called before calling this function.
@@ -214,11 +215,21 @@ class TRGCDC {
     /// returns a list of stereo hits. 'update()' must be called before calling this function.
     std::vector<const TRGCDCWireHit *> stereoHits(void) const;
 
+    /// returns a list of TRGCDCSegmentHit. 'simulate()' must be called before calling this function
+    std::vector<const TRGCDCSegmentHit *> segmentHits(void) const;
+
+    /// returns a list of TRGCDCSegmentHit in a super layer N. 'simulate()' must be called before calling this function
+    std::vector<const TRGCDCSegmentHit *> segmentHits(unsigned) const;
+
+
+
     /// returns a list of TRGCDCWireHitMC. 'updateMC()' must be called before calling this function.
     std::vector<const TRGCDCWireHitMC *> hitsMC(void) const;
 
     /// returns bad hits(finding invalid hits).
-    std::vector<const TRGCDCWireHit *> badHits(void) const;
+//    std::vector<const TRGCDCWireHit *> badHits(void) const;
+
+
 
   public:// Utility functions
 
@@ -261,9 +272,6 @@ class TRGCDC {
 
     /// returns the system offset in MC.
     double systemOffsetMC(void) const;
-
-    /// returns a vector of hit TSs.
-    const std::vector<const TRGCDCTrackSegment *> tsHits(void) const;
 
     /// returns a front-end board.
     const TRGCDCFrontEnd * frontEnd(unsigned id) const;
@@ -341,13 +349,16 @@ class TRGCDC {
     std::vector<TRGCDCWireHitMC *> _hitsMC;
 
     /// Track Segments.
-    std::vector<TRGCDCTrackSegment *> _tss;
-
-    /// Track Segments with hits.
-    std::vector<TRGCDCTrackSegment *> _tsHits;
+    std::vector<TRGCDCSegment *> _tss;
 
     /// Track Segment layers.
     std::vector<TRGCDCLayer *> _tsLayers;
+
+    /// Track Segments with hits.
+    std::vector<TRGCDCSegmentHit *> _segmentHits;
+
+    /// Track Segments with hits in each super layer.
+    std::vector<TRGCDCSegmentHit *> _segmentHitsSL[9];
 
     /// Fudge factor for position error.
     float _fudgeFactor;
@@ -501,14 +512,14 @@ TRGCDC::superLayerR2(unsigned i) const {
 }
 
 inline
-const TRGCDCTrackSegment &
-TRGCDC::trackSegment(unsigned id) const {
+const TRGCDCSegment &
+TRGCDC::segment(unsigned id) const {
     return * _tss[id];
 }
 
 inline
 unsigned
-TRGCDC::nTrackSegments(void) const {
+TRGCDC::nSegments(void) const {
     return _tss.size();
 }
 
@@ -525,10 +536,10 @@ TRGCDC::systemOffsetMC(void) const {
 }
 
 inline
-const std::vector<const TRGCDCTrackSegment *>
-TRGCDC::tsHits(void) const {
-    std::vector<const TRGCDCTrackSegment *> t;
-    t.assign(_tsHits.begin(), _tsHits.end());
+std::vector<const TRGCDCSegmentHit *>
+TRGCDC::segmentHits(void) const {
+    std::vector<const TRGCDCSegmentHit *> t;
+    t.assign(_segmentHits.begin(), _segmentHits.end());
     return t;
 }
 
@@ -546,7 +557,7 @@ TRGCDC::merger(unsigned a) const {
 
 inline
 const TRGCDCLayer *
-TRGCDC::trackSegmentLayer(unsigned id) const {
+TRGCDC::segmentLayer(unsigned id) const {
     if (id < _tsLayers.size())
         return _tsLayers[id];
     return 0;
@@ -554,7 +565,7 @@ TRGCDC::trackSegmentLayer(unsigned id) const {
 
 inline
 unsigned
-TRGCDC::nTrackSegmentLayers(void) const {
+TRGCDC::nSegmentLayers(void) const {
     return _tsLayers.size();
 }
 

@@ -59,14 +59,14 @@ TCCFitter::fit(TCTBase & t) const {
     const unsigned n = t.links().size();
     for (unsigned i = 0; i < n; i++) {
 	const TCLink * l = t.links()[i];
-	const Belle2::TRGCDCWireHit * h = l->hit();
+	const Belle2::TRGCDCCellHit * h = l->hit();
 
 	//...Check next hit...
 	Point3D point;
-	if (h->state() & WireHitPatternLeft)
-	    point = h->position(WireHitLeft);
-	else if (h->state() & WireHitPatternRight)
-	    point = h->position(WireHitRight);
+	if (h->state() & CellHitPatternLeft)
+	    point = h->position(CellHitLeft);
+	else if (h->state() & CellHitPatternRight)
+	    point = h->position(CellHitRight);
 	else
 	    point = h->xyPosition();
 
@@ -99,7 +99,7 @@ TCCFitter::fit(TCTBase & t) const {
 	const TCLink * l = t.links()[i];
 	if (l == 0) continue;
 
-	const Belle2::TRGCDCWireHit * h = l->hit();
+	const Belle2::TRGCDCCellHit * h = l->hit();
 	if (h == 0) continue;
 
 	float q = (_center.cross(h->xyPosition())).z();

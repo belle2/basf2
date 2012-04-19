@@ -16,6 +16,7 @@
 #include "trg/trg/Debug.h"
 #include "trg/cdc/TRGCDC.h"
 #include "trg/cdc/TrackBase.h"
+#include "trg/cdc/Wire.h"
 #include "trg/cdc/Link.h"
 #include "trg/cdc/Fitter.h"
 
@@ -72,7 +73,7 @@ TRGCDCTrackBase::dump(const string & , const string & pre) const {
             else
 		cout << ",";
 	    const TCLink & l = * _ts[i][j];
-	    cout << l.wire()->name();
+	    cout << l.cell()->name();
         }
         if (_ts[i].size())
             cout << "),";
@@ -97,13 +98,12 @@ TRGCDCTrackBase::fit(void) {
 
 void
 TRGCDCTrackBase::append(TCLink * a) {
-//    (* _ts)[a->wire()->superLayerId()]->push_back(a);
-    _ts[a->wire()->superLayerId()].push_back(a);
+    _ts[a->cell()->superLayerId()].push_back(a);
     _tsAll.push_back(a);
 }
 
 void
-TRGCDCTrackBase::append(const vector<TCLink *> links) {
+TRGCDCTrackBase::append(const vector<TCLink *> & links) {
     for (unsigned i = 0; i < links.size(); i++) {
 	append(links[i]);
     }

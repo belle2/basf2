@@ -1,7 +1,7 @@
 //-----------------------------------------------------------------------------
 // $Id$
 //-----------------------------------------------------------------------------
-// Filename : TrackSegment.cc
+// Filename : Segment.cc
 // Section  : TRG CDC
 // Owner    : Yoshihito Iwasaki
 // Email    : yoshihito.iwasaki@kek.jp
@@ -18,7 +18,9 @@
 #include "trg/trg/Utilities.h"
 #include "trg/cdc/TRGCDC.h"
 #include "trg/cdc/Wire.h"
-#include "trg/cdc/TrackSegment.h"
+#include "trg/cdc/WireHit.h"
+#include "trg/cdc/Segment.h"
+#include "trg/cdc/SegmentHit.h"
 #include "trg/cdc/LUT.h"
 
 using namespace std;
@@ -27,11 +29,11 @@ using namespace std;
 
 namespace Belle2 {
 
-TRGCDCTrackSegment::TRGCDCTrackSegment(unsigned id,
-                                       const TCLayer & layer,
-                                       const TCWire & w,
-				       const TCLUT * lut,
- 			           const std::vector<const TCWire *> & cells)
+TRGCDCSegment::TRGCDCSegment(unsigned id,
+			     const TCLayer & layer,
+			     const TCWire & w,
+			     const TCLUT * lut,
+			     const std::vector<const TCWire *> & cells)
     : TCCell(id,
 	     layer.size(),
 	     layer,
@@ -43,12 +45,12 @@ TRGCDCTrackSegment::TRGCDCTrackSegment(unsigned id,
       _hit(0) {
 }
 
-TRGCDCTrackSegment::~TRGCDCTrackSegment() {
+TRGCDCSegment::~TRGCDCSegment() {
 }
  
 void
-TRGCDCTrackSegment::dump(const string & msg,
-                         const string & pre) const {
+TRGCDCSegment::dump(const string & msg,
+		    const string & pre) const {
     cout << pre << name() << " (ptn=" << hitPattern() << ")" << endl;
     if ((msg.find("geometry") != string::npos) ||
         (msg.find("detail") != string::npos)) {
@@ -75,7 +77,7 @@ TRGCDCTrackSegment::dump(const string & msg,
 	else {
 	    cout << pre;
 	    for (unsigned i = 0; i < _hits.size(); i++) {
-		cout << _hits[i]->wire().name();
+		cout << _hits[i]->cell().name();
 		if (i < _hits.size() - 1)
 		    cout << ",";
 		else
@@ -99,13 +101,13 @@ TRGCDCTrackSegment::dump(const string & msg,
 }
   
 void
-TRGCDCTrackSegment::clear(void) {
+TRGCDCSegment::clear(void) {
     TCCell::clear();
     _signal.clear();
 }
 
 string
-TRGCDCTrackSegment::name(void) const {
+TRGCDCSegment::name(void) const {
     string t;
     if (axial())
         t = "-";
@@ -117,7 +119,7 @@ TRGCDCTrackSegment::name(void) const {
 }
 
 void
-TCTSegment::simulate(void) {
+TCSegment::simulate(void) {
 
     //...Get wire informtion...
     const unsigned n = _wires.size();
@@ -183,7 +185,7 @@ TCTSegment::simulate(void) {
 }
 
 unsigned
-TRGCDCTrackSegment::hitPattern(void) const {
+TRGCDCSegment::hitPattern(void) const {
     unsigned ptn = 0;
     for (unsigned i = 0; i < _wires.size(); i++) {
         const TRGSignal & s = _wires[i]->triggerOutput();

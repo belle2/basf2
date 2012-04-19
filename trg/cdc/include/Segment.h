@@ -1,7 +1,7 @@
 //-----------------------------------------------------------------------------
 // $Id$
 //-----------------------------------------------------------------------------
-// Filename : TrackSegment.h
+// Filename : Segment.h
 // Section  : TRG CDC
 // Owner    : Yoshihito Iwasaki
 // Email    : yoshihito.iwasaki@kek.jp
@@ -11,15 +11,14 @@
 // $Log$
 //-----------------------------------------------------------------------------
 
-#ifndef TRGCDCTrackSegment_FLAG_
-#define TRGCDCTrackSegment_FLAG_
+#ifndef TRGCDCSegment_FLAG_
+#define TRGCDCSegment_FLAG_
 
 #include <vector>
 #include "trg/cdc/Cell.h"
-#include "trg/cdc/TrackSegmentHit.h"
 
 #ifdef TRGCDC_SHORT_NAMES
-#define TCTSegment TRGCDCTrackSegment
+#define TCSegment TRGCDCSegment
 #endif
 
 namespace Belle2 {
@@ -28,20 +27,22 @@ class TRGSignal;
 class TRGCDCWire;
 class TRGCDCLayer;
 class TRGCDCLUT;
+class TRGCDCSegmentHit;
 
 /// A class to represent a wire in CDC.
-class TRGCDCTrackSegment : public TRGCDCCell {
+class TRGCDCSegment : public TRGCDCCell {
 
   public:
+
     /// Constructor.
-    TRGCDCTrackSegment(unsigned id,
-                       const TRGCDCLayer & layer,
-                       const TRGCDCWire & w,
-		       const TRGCDCLUT * lut,
-                       const std::vector<const TRGCDCWire *> & wires);
+    TRGCDCSegment(unsigned id,
+		  const TRGCDCLayer & layer,
+		  const TRGCDCWire & w,
+		  const TRGCDCLUT * lut,
+		  const std::vector<const TRGCDCWire *> & wires);
 
     /// Destructor
-    virtual ~TRGCDCTrackSegment();
+    virtual ~TRGCDCSegment();
 
   public:// Selectors
 
@@ -54,11 +55,14 @@ class TRGCDCTrackSegment : public TRGCDCCell {
     /// returns a wire.
     const TRGCDCWire * operator[](unsigned id) const;
 
+    /// returns a center wire.
+    const TRGCDCWire & center(void) const;
+
     /// returns trigger output. Null will returned if no signal.
     const TRGSignal & triggerOutput(void) const;
 
-    /// returns a pointer to a TRGCDCTrackSegmentHit.
-    const TRGCDCTrackSegmentHit * hit(void) const;
+    /// returns a pointer to a TRGCDCSegmentHit.
+    const TRGCDCSegmentHit * hit(void) const;
 
     /// returns hit pattern.
     unsigned hitPattern(void) const;
@@ -73,12 +77,12 @@ class TRGCDCTrackSegment : public TRGCDCCell {
   public:// Utility functions
 
     /// returns axial segments.
-/*     static const std::vector<const TRGCDCTrackSegment *> */
-/* 	axial(const std::vector<const TRGCDCTrackSegment *> & list); */
+/*     static const std::vector<const TRGCDCSegment *> */
+/* 	axial(const std::vector<const TRGCDCSegment *> & list); */
 
     /// returns \# of stereo segments.
     static unsigned
-	nStereo(const std::vector<const TRGCDCTrackSegment *> & list);
+	nStereo(const std::vector<const TRGCDCSegment *> & list);
 
   public:// Modifiers
 
@@ -88,8 +92,8 @@ class TRGCDCTrackSegment : public TRGCDCCell {
     /// simulates TF hit using wire information.
     void simulate(void);
 
-    /// sets a pointer to a TRGCDCTrackSegmentHit.
-    const TRGCDCTrackSegmentHit * hit(const TRGCDCTrackSegmentHit * const);
+    /// sets a pointer to a TRGCDCSegmentHit.
+    const TRGCDCSegmentHit * hit(const TRGCDCSegmentHit * const);
 
   private:
 
@@ -99,6 +103,9 @@ class TRGCDCTrackSegment : public TRGCDCCell {
     /// Wires.
     std::vector<const TRGCDCWire *> _wires;
 
+    /// Center wire.
+    const TRGCDCWire * _center;
+
     /// Wire hits.
     std::vector<const TRGCDCWireHit *> _hits;
 
@@ -106,7 +113,7 @@ class TRGCDCTrackSegment : public TRGCDCCell {
     TRGSignal _signal;
 
     /// Track segment hit.
-    const TRGCDCTrackSegmentHit * _hit;
+    const TRGCDCSegmentHit * _hit;
 
   // Friends
     friend class TRGCDC;
@@ -116,13 +123,13 @@ class TRGCDCTrackSegment : public TRGCDCCell {
 
 inline
 const std::vector<const TRGCDCWire *> &
-TRGCDCTrackSegment::wires(void) const {
+TRGCDCSegment::wires(void) const {
     return _wires;
 }
 
 inline
 const TRGCDCWire *
-TRGCDCTrackSegment::operator[](unsigned id) const {
+TRGCDCSegment::operator[](unsigned id) const {
     if (id < _wires.size())
 	return _wires[id];
     return 0;
@@ -130,28 +137,36 @@ TRGCDCTrackSegment::operator[](unsigned id) const {
 
 inline
 const TRGSignal &
-TRGCDCTrackSegment::triggerOutput(void) const {
+TRGCDCSegment::triggerOutput(void) const {
     return _signal;
 }
 
 inline
-const TRGCDCTrackSegmentHit *
-TRGCDCTrackSegment::hit(const TRGCDCTrackSegmentHit * const h) {
+const TRGCDCSegmentHit *
+TRGCDCSegment::hit(const TRGCDCSegmentHit * const h) {
     return _hit = h;
 }
 
 inline
-const TRGCDCTrackSegmentHit *
-TRGCDCTrackSegment::hit(void) const {
+const TRGCDCSegmentHit *
+TRGCDCSegment::hit(void) const {
     return _hit;
 }
 
 inline
 const TRGCDCLUT *
-TRGCDCTrackSegment::LUT(void) const {
+TRGCDCSegment::LUT(void) const {
     return _lut;
+}
+
+inline
+const TRGCDCWire &
+TRGCDCSegment::center(void) const {
+    if (_wires.size() == 15)
+	return * _wires[0];
+    return * _wires[5];
 }
 
 } // namespace Belle2
 
-#endif /* TRGCDCTrackSegment_FLAG_ */
+#endif /* TRGCDCSegment_FLAG_ */

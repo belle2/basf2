@@ -17,7 +17,7 @@
 #include <iostream>
 #include "trg/trg/Debug.h"
 #include "trg/cdc/Fitter3D.h"
-#include "trg/cdc/TrackSegment.h"
+#include "trg/cdc/Segment.h"
 #include "trg/cdc/Track.h"
 #include "trg/cdc/Link.h"
 #include <cstdlib>
@@ -271,13 +271,13 @@ namespace Belle2 {
 
       //...TS study (loop over all TS's)...
       const TRGCDC & cdc = * TRGCDC::getTRGCDC();
-      for (unsigned i = 0; i < cdc.nTrackSegmentLayers(); i++) {
-	  const Belle2::TRGCDCLayer * l = cdc.trackSegmentLayer(i);
+      for (unsigned i = 0; i < cdc.nSegmentLayers(); i++) {
+	  const Belle2::TRGCDCLayer * l = cdc.segmentLayer(i);
 	  const unsigned nWires = l->nCells();
 	  if (! nWires) continue;
 	  unsigned ptn = 0;
 	  for (unsigned j = 0; j < nWires; j++) {
-	      const TCTSegment & s = (TCTSegment &) * (* l)[j];
+	      const TCSegment & s = (TCSegment &) * (* l)[j];
 
 	      //...Example to access LR LUT...
 	      if (TRGDebug::level()) {
@@ -336,7 +336,7 @@ namespace Belle2 {
         for (unsigned i = 0; i < _cdc.nSuperLayers(); i++) {
 
           //...Access to track segment list in this super layer...
-          //const vector<const TCTSegment *> & segments = t.trackSegments(i);
+          //const vector<const TCSegment *> & segments = t.trackSegments(i);
           const vector<TCLink *> & links = t.links(i);
           const unsigned nSegments = links.size();
 
@@ -354,8 +354,8 @@ namespace Belle2 {
 
           //...Access to a track segment...
           links[0]->dump("detail");
-          //const TCTSegment & s = * (TCTSegment *) links[0]->hit();
-          const TRGCDCWire *s = & links[0]->hit()->wire();
+          //const TCSegment & s = * (TCSegment *) links[0]->hit();
+          const TRGCDCCell *s = & links[0]->hit()->cell();
           phi[i]=(double) s->localId()/ni[i]*4*M_PI;
         }
 

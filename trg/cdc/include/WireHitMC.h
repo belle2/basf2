@@ -59,13 +59,13 @@ class TRGCDCWireHitMC {
     int leftRight(void) const;
 
     /// returns a pointer to a TRGCDCWire.
-    const TRGCDCWire * const wire(void) const;
+    const TRGCDCWire * wire(void) const;
 
     /// returns a pointer to a GEN_HEPEVT.
-    const TRGCDCTrackMC * const hep(void) const;
+    const TRGCDCTrackMC * hep(void) const;
 
     /// returns a pointer to a TRGCDCWireHit.
-    const TRGCDCWireHit * const hit(void) const;
+    const TRGCDCWireHit * hit(void) const;
 
   private:
     const TRGCDCWire * _wire;
@@ -115,19 +115,19 @@ TRGCDCWireHitMC::leftRight(void) const {
 }
 
 inline
-const TRGCDCWire * const
+const TRGCDCWire *
 TRGCDCWireHitMC::wire(void) const {
     return _wire;
 }
 
 inline
-const TRGCDCTrackMC * const
+const TRGCDCTrackMC *
 TRGCDCWireHitMC::hep(void) const {
     return _hep;
 }
 
 inline
-const TRGCDCWireHit * const 
+const TRGCDCWireHit *
 TRGCDCWireHitMC::hit(void) const {
     return _hit;
 }

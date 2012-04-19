@@ -93,8 +93,11 @@ class TRGCDCCell {
     virtual std::string name(void) const = 0;
 
     /// dumps debug information.
-    void dump(const std::string & message = std::string(""),
-              const std::string & prefix = std::string("")) const;
+    virtual void dump(const std::string & message = std::string(""),
+		      const std::string & prefix = std::string("")) const;
+
+    /// returns trigger output. Null will returned if no signal.
+    virtual const TRGSignal & triggerOutput(void) const = 0;
 
   public:// Geometry
 

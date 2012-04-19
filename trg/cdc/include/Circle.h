@@ -32,7 +32,7 @@ class TRGCDCCircle : public TRGCDCTrackBase {
   public:
 
     /// Constructor with links.
-    TRGCDCCircle(const std::vector<TRGCDCLink *> links);
+    TRGCDCCircle(const std::vector<TRGCDCLink *> & links);
 
     /// Constructor with a circle center, assuming the origin is on a circle.
     TRGCDCCircle(double r,

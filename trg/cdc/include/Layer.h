@@ -30,6 +30,7 @@ class TRGCDCCell;
 class TRGCDCLayer : public std::vector<TRGCDCCell *> {
 
   public:
+
     /// Constructor.
     TRGCDCLayer(unsigned id,
 		unsigned superLayerId,

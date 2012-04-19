@@ -17,7 +17,7 @@
 #include <iostream>
 #include "trg/cdc/TRGCDC.h"
 #include "trg/cdc/Wire.h"
-#include "trg/cdc/TrackSegment.h"
+#include "trg/cdc/Segment.h"
 #ifdef TRGCDC_DISPLAY
 #include "framework/gearbox/Gearbox.h"
 #include "trg/cdc/DisplayRphi.h"
@@ -68,9 +68,9 @@ main(int , char ** ) {
     string inf = "1/8 of TS";
     string stg = "";
     string target = "none";
-    for (unsigned i = 0; i < cdc->nTrackSegments(); i++) {
+    for (unsigned i = 0; i < cdc->nSegments(); i++) {
 	if (i % 8) continue;
-	D->area().append(cdc->trackSegment(i));
+	D->area().append(cdc->segment(i));
     }
     for (unsigned i = 0; i < cdc->nWires(); i++) {
 	const TCWire & w = * cdc->wire(i);
@@ -105,9 +105,9 @@ main(int , char ** ) {
 	}
 	else if (target.find("TS") != string::npos) {
 	    bool found = false;
-	    for (unsigned i = 0; i < cdc->nTrackSegments(); i++) {
-		if (target == cdc->trackSegment(i).name()) {
-		    D->area().append(cdc->trackSegment(i));
+	    for (unsigned i = 0; i < cdc->nSegments(); i++) {
+		if (target == cdc->segment(i).name()) {
+		    D->area().append(cdc->segment(i));
 		    if (inf.size()) inf += ",";
 		    inf += target;
 		    D->stage(stg);

@@ -458,10 +458,10 @@ TSegment0::splitComplicated(void) const {
     for (unsigned i = 0; i < n; i++) {
 	const Belle2::TRGCDCWireHit * h = _links[i]->hit();
 	unsigned state = h->state();
-	if (! (state & WireHitContinuous)) continue;
-	if (! (state & WireHitIsolated)) continue;
-	if ((! (state & WireHitPatternLeft)) &&
-	    (! (state & WireHitPatternRight))) continue;
+	if (! (state & CellHitContinuous)) continue;
+	if (! (state & CellHitIsolated)) continue;
+	if ((! (state & CellHitPatternLeft)) &&
+	    (! (state & CellHitPatternRight))) continue;
 	goodHits.append(_links[i]);
     }
     if (goodHits.length() == 0) return newClusters;
@@ -848,8 +848,8 @@ NCoreLinks(const CAList<TSegment0> & list) {
 	const AList<TLink> & links = list[i]->links();
 	for (unsigned j = 0; j < (unsigned) links.length(); j++) {
 	    unsigned state = links[j]->hit()->state();
-	    if ((! (state & WireHitPatternLeft)) &&
-		(! (state & WireHitPatternRight)))
+	    if ((! (state & CellHitPatternLeft)) &&
+		(! (state & CellHitPatternRight)))
 		++n;
 	}
     }

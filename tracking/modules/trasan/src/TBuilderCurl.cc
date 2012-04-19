@@ -506,7 +506,7 @@ TBuilderCurl::buildStereo(TTrack & track,
   }
 #ifdef TRASAN_DEBUG_DETAIL
   unsigned debug_stereo_counter1 = 0;
-  for(unsigned i=0;i<track.links().length();++i){
+  for(unsigned i=0;i<unsigned(track.links().length());++i){
     unsigned superID = (track.links())[i]->hit()->wire().superLayerId();
     if(superID == 1 || superID == 3 ||
        superID == 5 || superID == 7 ||
@@ -833,9 +833,9 @@ TBuilderCurl::buildStereo(TTrack & track,
 //       std::cout << track.links()[i]->wire()->id() 
 // 	   << " :+: " << track.links()[i]->pull() << std::endl;
 //     }
-//     if(track.links()[i]->hit()->state() & WireHitInvalidForFit)
+//     if(track.links()[i]->hit()->state() & CellHitInvalidForFit)
 //       std::cout << "Not Valid For Fit!" << std::endl;
-//     //if(!(track.links()[i]->hit()->state() & WireHitFittingValid))
+//     //if(!(track.links()[i]->hit()->state() & CellHitFittingValid))
 //     // std::cout << "No-Valid For Fit!" << std::endl;
 //   }
 // #endif
@@ -865,9 +865,9 @@ TBuilderCurl::buildStereo(TTrack & track,
 //       std::cout << track.links()[i]->wire()->id() 
 // 	   << " :*: " << track.links()[i]->pull() << std::endl;
 //     }
-//     if(track.links()[i]->hit()->state() & WireHitInvalidForFit)
+//     if(track.links()[i]->hit()->state() & CellHitInvalidForFit)
 //       std::cout << "Not Valid For Fit!" << std::endl;
-//     //if(!(track.links()[i]->hit()->state() & WireHitFittingValid))
+//     //if(!(track.links()[i]->hit()->state() & CellHitFittingValid))
 //     // std::cout << "No-Valid For Fit!" << std::endl;
 //   }
 // #endif
@@ -1194,7 +1194,7 @@ unsigned
 TBuilderCurl::check(const TTrack &track) const {
   unsigned nAhits(0), nShits(0);
   for(unsigned i=0,size=track.nLinks();i<size;++i){
-    if(!(track.links()[i]->hit()->state() & WireHitFittingValid))continue;
+    if(!(track.links()[i]->hit()->state() & CellHitFittingValid))continue;
     if(track.links()[i]->wire()->stereo())++nShits;
     else ++nAhits;
   }
@@ -2225,7 +2225,7 @@ TBuilderCurl::stereoHit(double &xc, double &yc, double &r, double &q,
     //...stereo?
     if (vmag == 0.) continue;
    
-    double drift = h.drift(WireHitLeft);
+    double drift = h.drift(CellHitLeft);
     double R[2] = {r + drift, r - drift};
     double wv = w.dot(v);
     double d2[2];

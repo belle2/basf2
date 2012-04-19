@@ -317,8 +317,8 @@ TCosmicFitter::fit(TTrackBase & b, float t0Offset) const {
     unsigned nValid = 0;
     for (unsigned i = 0; i < (unsigned) b.links().length(); i++) {
 	unsigned state = b.links()[i]->hit()->state();
-	if (state & WireHitInvalidForFit) continue;
-	if (state & WireHitFittingValid) ++nValid;
+	if (state & CellHitInvalidForFit) continue;
+	if (state & CellHitFittingValid) ++nValid;
     }
     if (nValid < 5) return TFitErrorFewHits;
 
@@ -364,8 +364,8 @@ TCosmicFitter::fit(TTrackBase & b, float t0Offset) const {
 	    const Belle2::TRGCDCWireHit & h = * l->hit();
 
 	    //...Check state...
-	    if (h.state() & WireHitInvalidForFit) continue;
-	    if (! (h.state() & WireHitFittingValid)) continue;
+	    if (h.state() & CellHitInvalidForFit) continue;
+	    if (! (h.state() & CellHitFittingValid)) continue;
 
 	    //...Check wire...
 	    if (! nTrial)
@@ -385,8 +385,8 @@ TCosmicFitter::fit(TTrackBase & b, float t0Offset) const {
 #endif	    
 
 	    //...Obtain drift distance and its error...
-	    unsigned leftRight = WireHitRight;
-	    if (onWire.cross(onTrack).z() < 0.)	leftRight = WireHitLeft;
+	    unsigned leftRight = CellHitRight;
+	    if (onWire.cross(onTrack).z() < 0.)	leftRight = CellHitLeft;
             double distance = h.drift(leftRight);
 	    double eDistance = h.dDrift(leftRight);
 	    //... 
@@ -466,8 +466,8 @@ TCosmicFitter::fit(TTrackBase & b, float t0Offset) const {
 	      const Belle2::TRGCDCWireHit & h = * l->hit();
             
 	    //...Check state...
-	    if (h.state() & WireHitInvalidForFit) continue;
-	    if (! (h.state() & WireHitFittingValid)) continue;
+	    if (h.state() & CellHitInvalidForFit) continue;
+	    if (! (h.state() & CellHitFittingValid)) continue;
 
             //...Check wire...
             if (! nTrial)
@@ -487,8 +487,8 @@ TCosmicFitter::fit(TTrackBase & b, float t0Offset) const {
 #endif      
             
             //...Obtain drift distance and its error...
-            unsigned leftRight = WireHitRight;
-            if (onWire.cross(onTrack).z() < 0.) leftRight = WireHitLeft;
+            unsigned leftRight = CellHitRight;
+            if (onWire.cross(onTrack).z() < 0.) leftRight = CellHitLeft;
             double distance = h.drift(leftRight);
 	    double eDistance = h.dDrift(leftRight);
             if(nTrial  && !allAxial){
@@ -704,8 +704,8 @@ TCosmicFitter::fitWithCathode( TTrackBase &b, float t0Offset,
 #endif      
 
         //...Obtain drift distance and its error...
-        unsigned leftRight = WireHitRight;
-        if (onWire.cross(onTrack).z() < 0.)     leftRight = WireHitLeft;
+        unsigned leftRight = CellHitRight;
+        if (onWire.cross(onTrack).z() < 0.)     leftRight = CellHitLeft;
         double distance = h.drift(leftRight);
         double eDistance = h.dDrift(leftRight);
             //... 
@@ -876,8 +876,8 @@ TCosmicFitter::fitWithCathode( TTrackBase &b, float t0Offset,
 #endif      
 
         //...Obtain drift distance and its error...
-        unsigned leftRight = WireHitRight;
-        if (onWire.cross(onTrack).z() < 0.)     leftRight = WireHitLeft;
+        unsigned leftRight = CellHitRight;
+        if (onWire.cross(onTrack).z() < 0.)     leftRight = CellHitLeft;
         double distance = h.drift(leftRight);
         double eDistance = h.dDrift(leftRight);
        if(nTrial  && !allAxial){

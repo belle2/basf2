@@ -136,9 +136,9 @@ TFastFinder::doit(const AList<Belle2::TRGCDCWireHit> & axialHits,
 #endif
 
 	//...OK...
-	t->assign(WireHitFastFinder);
+	t->assign(CellHitFastFinder);
 	t->finder(TrackFastFinder);
-//	t->assign(WireHitFastFinder, TrackFastFinder);
+//	t->assign(CellHitFastFinder, TrackFastFinder);
 	tracks.append(t);
 	_stereoLinks.remove(t->links());
     }
@@ -154,13 +154,13 @@ TFastFinder::selectHits(const AList<Belle2::TRGCDCWireHit> & axialHits,
     unsigned n = axialHits.length();
     for (unsigned i = 0; i < n; i++) {
 	const Belle2::TRGCDCWireHit & h = * axialHits[i];
-	if ((h.state() & WireHitIsolated) && (h.state() & WireHitContinuous))
+	if ((h.state() & CellHitIsolated) && (h.state() & CellHitContinuous))
 	    _axialHits.append((Belle2::TRGCDCWireHit &) h);
     }
     n = stereoHits.length();
     for (unsigned i = 0; i < n; i++) {
 	const Belle2::TRGCDCWireHit & h = * stereoHits[i];
-	if ((h.state() & WireHitIsolated) && (h.state() & WireHitContinuous))
+	if ((h.state() & CellHitIsolated) && (h.state() & CellHitContinuous))
 	    _stereoHits.append((Belle2::TRGCDCWireHit &) h);
     }
 }
@@ -237,15 +237,15 @@ TFastFinder::selectSimpleSegments(const AList<Belle2::TRGCDCWireHit> & in,
 
 	    //...Check hit...
 	    unsigned state = a.state();
-	    if (! (state & WireHitIsolated)) ok = false;
-	    if (! (state & WireHitContinuous)) ok = false;
+	    if (! (state & CellHitIsolated)) ok = false;
+	    if (! (state & CellHitContinuous)) ok = false;
 
 	    //...Append...
 	    cluster.append(a);
 
 	    //...Neighbor hit...
 	    unsigned ptn =
-		(state & WireHitNeighborPatternMask) >> WireHitNeighborHit;
+		(state & CellHitNeighborPatternMask) >> CellHitNeighborHit;
 	    for (unsigned i = 0; i < 7; i++) {
 		if ((ptn >> i) % 2) {
 		    const Belle2::TRGCDCWireHit & b = * a.wire().neighbor(i)->hit();
@@ -275,8 +275,8 @@ TFastFinder::selectSimpleSegments(const AList<Belle2::TRGCDCWireHit> & in,
 #endif
 	    if (! ok) {
 		unsigned state = h.state();
-		if (state & WireHitIsolated) state ^= WireHitIsolated;
-		if (state & WireHitContinuous) state ^= WireHitContinuous;
+		if (state & CellHitIsolated) state ^= CellHitIsolated;
+		if (state & CellHitContinuous) state ^= CellHitContinuous;
 		h.state(state);
 	    }
 	}

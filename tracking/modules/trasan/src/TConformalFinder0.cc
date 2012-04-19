@@ -752,8 +752,8 @@ TConformalFinder0::doit(const CAList<Belle2::TRGCDCWireHit> & axialHits,
     for (unsigned i = 0; i < nLinks; i++) {
 	TLink * l = _axialConfLinks[i];
 	const Belle2::TRGCDCWireHit & h = * l->hit();
-	if ((h.state() & WireHitIsolated) &&
-	    (h.state() & WireHitContinuous))
+	if ((h.state() & CellHitIsolated) &&
+	    (h.state() & CellHitContinuous))
 	    goodHits.append(l);
     }
 
@@ -869,7 +869,7 @@ TConformalFinder0::standardFinding(AList<TLink> & list,
 	    _builder->salvage(* t, unusedLinks);
 
 	    //...OK...
-	    t->assign(WireHitConformalFinder);
+	    t->assign(CellHitConformalFinder);
 	    t->finder(TrackOldConformalFinder);
 //		      TrackOldConformalFinder | TrackValid | Track3D);
 	    _tracks.append(t);
@@ -989,7 +989,7 @@ TConformalFinder0::specialFinding(AList<TLink> & list,
 	    _builder->salvage(* t, unusedLinks);
 
 	    //...OK...
-	    t->assign(WireHitConformalFinder);
+	    t->assign(CellHitConformalFinder);
 	    t->finder(TrackOldConformalFinder);
 //		      TrackOldConformalFinder | TrackValid | Track3D);
 	    _tracks.append(t);

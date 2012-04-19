@@ -894,7 +894,7 @@ TBuilder::buildRphiSlow(AList<TLink> & list) const {
     AList<TLink> normal;
     for (unsigned i = 0; i < (unsigned) list.length(); i++) {
 	unsigned state = list[i]->hit()->state();
-	if ((state & WireHitIsolated) && (state & WireHitContinuous))
+	if ((state & CellHitIsolated) && (state & CellHitContinuous))
 	    good.append(list[i]);
 	else
 	    normal.append(list[i]);

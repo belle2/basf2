@@ -315,6 +315,8 @@ TWindowConformalDrawingArea::drawTrack(const TTrack & t, Gdk::Color & c) {
 			     Gdk::CAP_NOT_LAST,
 			     Gdk::JOIN_MITER);
 
+    std::cout << "Drawing a track:" << t.name() << std::endl;
+
     const AList<TLink> & links = t.links();
     unsigned n = links.length();
     for (unsigned i = 0; i < n; i++) {
@@ -327,7 +329,8 @@ TWindowConformalDrawingArea::drawTrack(const TTrack & t, Gdk::Color & c) {
  		continue;
 
 	//...Points...
-	//	const HepGeom::Point3D<double> & p = links[i]->wire()->forwardPosition();
+	// const HepGeom::Point3D<double> & p =
+	//     links[i]->wire()->forwardPosition();
 	const HepGeom::Point3D<double> & p = links[i]->positionOnWire();
 	double radius = links[i]->hit()->drift();
 	_window->draw_arc(_gc,
@@ -347,7 +350,7 @@ TWindowConformalDrawingArea::drawTrack(const TTrack & t, Gdk::Color & c) {
 
     //...Check a track...
     if (t.cores().length() == 0) {
-	t.dump("detail", "");
+	t.dump("detail", "Can not draw a track");
 	colormap->free_color(c);
 	return;
     }
@@ -357,13 +360,12 @@ TWindowConformalDrawingArea::drawTrack(const TTrack & t, Gdk::Color & c) {
     hIp.pivot(ORIGIN);
     const HepGeom::Point3D<double> & h = hIp.center();
     double radius = fabs(t.radius());
-    const HepGeom::Point3D<double> pIn = TLink::innerMost(t.cores())->positionOnTrack() - h;
-    const HepGeom::Point3D<double> pOut = TLink::outerMost(t.cores())->positionOnTrack() - h;
+    const HepGeom::Point3D<double> pIn =
+	TLink::innerMost(t.cores())->positionOnTrack() - h;
+    const HepGeom::Point3D<double> pOut =
+	TLink::outerMost(t.cores())->positionOnTrack() - h;
     double a0 = atan2(pIn.y(), pIn.x()) / M_PI * 180;
     double a1 = atan2(pOut.y(), pOut.x()) / M_PI * 180;
-//     std::cout << "h=" << h << ",r=" << radius
-// 				      << ",a0=" << a0 << ",a1=" << a1
-// 				      << std::endl;
     double d = a1 - a0;
     if (d > 180) d -= 360;
     else if (d < -180) d += 360;
@@ -377,16 +379,15 @@ TWindowConformalDrawingArea::drawTrack(const TTrack & t, Gdk::Color & c) {
 		      int(d * 64));
 
     //...Track name...
-    const HepGeom::Point3D<double> pn = TLink::outerMost(t.cores())->positionOnTrack();
+    const HepGeom::Point3D<double> pn =
+	TLink::outerMost(t.cores())->positionOnTrack();
     Glib::ustring wn = t.name();
     _pl->set_text(wn);
     _window->draw_layout(_gc, x(pn.x() * 10.), y(pn.y() * 10.), _pl);
 
-//     std::cout << "h=" << h << ",r=" << radius
-// 				      << ",a0=" << a0 << ",a1=" << a1
-// 				      << std::endl;
-
     colormap->free_color(c);
+
+    std::cout << "    a track drawn:" << t.name() << std::endl;
 }
 
 void
@@ -426,7 +427,7 @@ TWindowConformalDrawingArea::append(const AList<TLink> & list, Gdk::Color c) {
 void
 TWindowConformalDrawingArea::append(const AList<TSegment> & list,
 				    Gdk::Color c) {
-    for (unsigned i = 0; i < list.length(); i++) {
+    for (unsigned i = 0; i < unsigned(list.length()); i++) {
 	TSegment * s = new TSegment(* list[i]);
 	_selfObjects.append(s);
 	_objects.append(s);
@@ -437,7 +438,7 @@ TWindowConformalDrawingArea::append(const AList<TSegment> & list,
 
 void
 TWindowConformalDrawingArea::append(const AList<TTrack> & list, Gdk::Color c) {
-    for (unsigned i = 0; i < list.length(); i++) {
+    for (unsigned i = 0; i < unsigned(list.length()); i++) {
 	TTrack * s = new TTrack(* list[i]);
 	_selfObjects.append(s);
 	_objects.append(s);
@@ -498,7 +499,7 @@ TWindowConformalDrawingArea::drawCircle(const TCircle & t, Gdk::Color & c) {
 void
 TWindowConformalDrawingArea::append(const AList<TCircle> & list,
 				    Gdk::Color c) {
-    for (unsigned i = 0; i < list.length(); i++) {
+    for (unsigned i = 0; i < unsigned(list.length()); i++) {
 	TCircle * s = new TCircle(* list[i]);
 	_selfObjects.append(s);
 	_objects.append(s);

@@ -86,10 +86,10 @@ TCircleFitter::fit(TTrackBase & t) const {
 
 	//...Check next hit...
 	Point3D point;
-	if (h->state() & WireHitPatternLeft)
-	    point = h->position(WireHitLeft);
-	else if (h->state() & WireHitPatternRight)
-	    point = h->position(WireHitRight);
+	if (h->state() & CellHitPatternLeft)
+	    point = h->position(CellHitLeft);
+	else if (h->state() & CellHitPatternRight)
+	    point = h->position(CellHitRight);
 	else
 	    point = h->xyPosition();
 	// float weight = 1. / (h->distance() * h->distance());

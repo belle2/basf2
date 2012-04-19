@@ -1291,7 +1291,7 @@ TTrack::findCatHit(unsigned trackid) {
 //  	    const TRGCDCWireHit & h = * l->hit();
 
 //  	    //...Check state...
-//  	    if (h.state() & WireHitInvalidForFit) continue;
+//  	    if (h.state() & CellHitInvalidForFit) continue;
 
 //  	    //...Check wire...
 //  	    if (! nTrial)
@@ -1309,8 +1309,8 @@ TTrack::findCatHit(unsigned trackid) {
 //  #endif	    
 
 //  	    //...Obtain drift distance and its error...
-//  	    unsigned leftRight = WireHitRight;
-//  	    if (onWire.cross(onTrack).z() < 0.)	leftRight = WireHitLeft;
+//  	    unsigned leftRight = CellHitRight;
+//  	    if (onWire.cross(onTrack).z() < 0.)	leftRight = CellHitLeft;
 //  	    double distance = h.distance(leftRight);
 //  	    double eDistance = h.dDistance(leftRight);
 //  	    double eDistance2 = eDistance * eDistance;
@@ -1388,8 +1388,8 @@ TTrack::findCatHit(unsigned trackid) {
 //  #endif      
             
 //              //...Obtain drift distance and its error...
-//              unsigned leftRight = WireHitRight;
-//              if (onWire.cross(onTrack).z() < 0.) leftRight = WireHitLeft;
+//              unsigned leftRight = CellHitRight;
+//              if (onWire.cross(onTrack).z() < 0.) leftRight = CellHitLeft;
 //              double distance = h.distance(leftRight);
 //              double eDistance = h.dDistance(leftRight);
 //              double eDistance2 = eDistance * eDistance;
@@ -1700,8 +1700,8 @@ TTrack::fit2D(void) {
       HepGeom::Point3D<double> onWire2(onWire.x(),onWire.y(),0.);
 
       //...Obtain drift distance and its error...
-      unsigned leftRight = WireHitRight;
-      if (onWire2.cross(onTrack2).z() < 0.) leftRight = WireHitLeft;
+      unsigned leftRight = CellHitRight;
+      if (onWire2.cross(onTrack2).z() < 0.) leftRight = CellHitLeft;
       double distance = h.distance(leftRight);
       double eDistance = h.dDistance(leftRight);
       double eDistance2 = eDistance * eDistance;
@@ -1773,8 +1773,8 @@ TTrack::fit2D(void) {
 	Point3D onWire2(onWire.x(),onWire.y(),0.);
 	
 	//...Obtain drift distance and its error...
-	unsigned leftRight = WireHitRight;
-	if (onWire2.cross(onTrack2).z() < 0.) leftRight = WireHitLeft;
+	unsigned leftRight = CellHitRight;
+	if (onWire2.cross(onTrack2).z() < 0.) leftRight = CellHitLeft;
 	double distance = h.distance(leftRight);
 	double eDistance = h.dDistance(leftRight);
 	double eDistance2 = eDistance * eDistance;
@@ -1937,8 +1937,8 @@ int TTrack::fitWithCathode(float window, int SysCorr ) {
 // #endif	    
 
 // 	//...Obtain drift distance and its error...
-// 	unsigned leftRight = WireHitRight;
-// 	if (onWire.cross(onTrack).z() < 0.)	leftRight = WireHitLeft;
+// 	unsigned leftRight = CellHitRight;
+// 	if (onWire.cross(onTrack).z() < 0.)	leftRight = CellHitLeft;
 // 	double distance = h.drift(leftRight);
 // 	double eDistance = h.dDrift(leftRight);
 // 	double eDistance2 = eDistance * eDistance;
@@ -2088,8 +2088,8 @@ int TTrack::fitWithCathode(float window, int SysCorr ) {
 // #endif      
 
 //         //...Obtain drift distance and its error...
-//         unsigned leftRight = WireHitRight;
-//         if (onWire.cross(onTrack).z() < 0.)     leftRight = WireHitLeft;
+//         unsigned leftRight = CellHitRight;
+//         if (onWire.cross(onTrack).z() < 0.)     leftRight = CellHitLeft;
 //         double distance = h.drift(leftRight);
 //         double eDistance = h.dDrift(leftRight);
 //         double eDistance2 = eDistance * eDistance;
@@ -2286,7 +2286,7 @@ TTrack::stereoHitForCurl(TLink & link, AList<Point3D> & arcZList) const
 
     double r  = _helix->curv();
     double R[2];
-    double drift = h.drift(WireHitLeft);
+    double drift = h.drift(CellHitLeft);
     R[0] = r + drift;
     R[1] = r - drift;
     double wv = w.dot(v);
@@ -2394,7 +2394,7 @@ TTrack::stereoHitForCurl(TLink & link, AList<Point3D> & arcZList) const
     }
 
 #if 0
-    std::cout<< "Drift Dist. = " << h.distance(WireHitLeft) << std::endl;
+    std::cout<< "Drift Dist. = " << h.distance(CellHitLeft) << std::endl;
     std::cout<< "outer ok? = " << ok_outer << std::endl; 
     std::cout<< "Z cand = " << z[0][0] << ", " << z[1][0] << std::endl;
     std::cout<< "inner ok? = " << ok_inner << std::endl; 
@@ -2740,7 +2740,7 @@ TTrack::stereoHitForCurl(AList<TLink> & list) const
     //...stereo?
     if (vmag == 0.) continue;
    
-    double drift = h.drift(WireHitLeft);
+    double drift = h.drift(CellHitLeft);
     double R[2] = {r + drift, r - drift};
     double wv = w.dot(v);
     double d2[2];
@@ -3292,8 +3292,8 @@ TTrack::fit2D(unsigned ipFlag, double ipDistance, double ipError) {
       HepGeom::Point3D<double> onWire2(onWire.x(),onWire.y(),0.);
 
       //...Obtain drift distance and its error...
-      unsigned leftRight = WireHitRight;
-      if (onWire2.cross(onTrack2).z() < 0.) leftRight = WireHitLeft;
+      unsigned leftRight = CellHitRight;
+      if (onWire2.cross(onTrack2).z() < 0.) leftRight = CellHitLeft;
       double distance   = h.drift(leftRight);
       double eDistance  = h.dDrift(leftRight);
       double eDistance2 = eDistance * eDistance;
@@ -3401,8 +3401,8 @@ TTrack::fit2D(unsigned ipFlag, double ipDistance, double ipError) {
 	Point3D onWire2(onWire.x(),onWire.y(),0.);
 	
 	//...Obtain drift distance and its error...
-	unsigned leftRight = WireHitRight;
-	if (onWire2.cross(onTrack2).z() < 0.) leftRight = WireHitLeft;
+	unsigned leftRight = CellHitRight;
+	if (onWire2.cross(onTrack2).z() < 0.) leftRight = CellHitLeft;
 	double distance   = h.drift(leftRight);
 	double eDistance  = h.dDrift(leftRight);
 	double eDistance2 = eDistance * eDistance;
@@ -4074,8 +4074,8 @@ TTrack::szPosition(TLink & link) const {
     Vector3D X = 0.5 * (h.wire().forwardPosition()
 			+ h.wire().backwardPosition());
     //    double theta = atan2(X.y(), X.x());
-    //    Vector3D lr(h.distance(WireHitLeft) * sin(theta),
-    //		- h.distance(WireHitLeft) * cos(theta),
+    //    Vector3D lr(h.distance(CellHitLeft) * sin(theta),
+    //		- h.distance(CellHitLeft) * cos(theta),
     //		0.);
 
     Vector3D xx = Vector3D(X.x(), X.y(), 0.);
@@ -4084,12 +4084,12 @@ TTrack::szPosition(TLink & link) const {
     Vector3D ww = Vector3D(yy.x(), yy.y(), 0.);
     double wwmag2 = ww.mag2();
     double wwmag = sqrt(wwmag2);
-    Vector3D lr(h.drift(WireHitLeft)/wwmag * ww.x(),
-		h.drift(WireHitLeft)/wwmag * ww.y(),
+    Vector3D lr(h.drift(CellHitLeft)/wwmag * ww.x(),
+		h.drift(CellHitLeft)/wwmag * ww.y(),
 		0.);
  
     //...Check left or right...
-    if (link.leftRight() == WireHitRight) lr = - lr;
+    if (link.leftRight() == CellHitRight) lr = - lr;
     else if (link.leftRight() == 2) lr = ORIGIN;
     X += lr;
 
@@ -4249,7 +4249,7 @@ TTrack::szPosition(const HepGeom::Point3D<double> & p, HepGeom::Point3D<double> 
 
 void
 TTrack::assign(unsigned hitMask) {
-    hitMask |= WireHitUsed;
+    hitMask |= CellHitUsed;
 
     unsigned n = _links.length();
     for (unsigned i = 0; i < n; i++) {

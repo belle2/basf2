@@ -1077,7 +1077,7 @@ TCurlFinder::makeWireHitsListsSegments(const CAList<Belle2::TRGCDCWireHit> &axia
   //......axial
   unsigned size = axialList.length();
   for(unsigned i=0;i<size;++i){
-    if(axialList[i]->state() & WireHitFindingValid){
+    if(axialList[i]->state() & CellHitFindingValid){
       m_allAxialHitsOriginal.append(new TLink(0,axialList[i]));      
       if(axialList[i]->wire().superLayerId() <= 2)
 	m_hitsOnInnerSuperLayer.append(axialList[i]);
@@ -1086,9 +1086,9 @@ TCurlFinder::makeWireHitsListsSegments(const CAList<Belle2::TRGCDCWireHit> &axia
   }
   size = m_allAxialHitsOriginal.length();
   for(unsigned i=0;i<size;++i){
-    if(!(m_allAxialHitsOriginal[i]->hit()->state() & WireHitUsed)){
-      if(m_allAxialHitsOriginal[i]->hit()->state() & WireHitInvalidForFit){
-	unsigned newState = m_allAxialHitsOriginal[i]->hit()->state()&(~WireHitInvalidForFit);
+    if(!(m_allAxialHitsOriginal[i]->hit()->state() & CellHitUsed)){
+      if(m_allAxialHitsOriginal[i]->hit()->state() & CellHitInvalidForFit){
+	unsigned newState = m_allAxialHitsOriginal[i]->hit()->state()&(~CellHitInvalidForFit);
 	m_allAxialHitsOriginal[i]->hit()->state(newState);
       }
       m_unusedAxialHitsOriginal.append(m_allAxialHitsOriginal[i]);
@@ -1099,7 +1099,7 @@ TCurlFinder::makeWireHitsListsSegments(const CAList<Belle2::TRGCDCWireHit> &axia
   //......stereo
   size = stereoList.length();
   for(unsigned i=0;i<size;++i){
-    if(stereoList[i]->state() & WireHitFindingValid){
+    if(stereoList[i]->state() & CellHitFindingValid){
       m_allStereoHitsOriginal.append(new TLink(0,stereoList[i]));
       if(stereoList[i]->wire().superLayerId() <= 2)
 	m_hitsOnInnerSuperLayer.append(stereoList[i]);
@@ -1107,9 +1107,9 @@ TCurlFinder::makeWireHitsListsSegments(const CAList<Belle2::TRGCDCWireHit> &axia
   }
   size = m_allStereoHitsOriginal.length();
   for(unsigned i=0;i<size;++i){
-    if(!(m_allStereoHitsOriginal[i]->hit()->state() & WireHitUsed)){
-      if(m_allStereoHitsOriginal[i]->hit()->state() & WireHitInvalidForFit){
-	unsigned newState = m_allStereoHitsOriginal[i]->hit()->state()&(~WireHitInvalidForFit);
+    if(!(m_allStereoHitsOriginal[i]->hit()->state() & CellHitUsed)){
+      if(m_allStereoHitsOriginal[i]->hit()->state() & CellHitInvalidForFit){
+	unsigned newState = m_allStereoHitsOriginal[i]->hit()->state()&(~CellHitInvalidForFit);
 	m_allStereoHitsOriginal[i]->hit()->state(newState);
       }
       m_unusedStereoHitsOriginal.append(m_allStereoHitsOriginal[i]);
@@ -2065,8 +2065,8 @@ TCurlFinder::makeCurlTracks(AList<TTrack> &tracks,
 	for(unsigned i=0,size=m_tracks[j]->nLinks();i<size;++i){
 	    if(m_tracks[j]->links()[i]->wire()->stereo())++nS;
 	    else ++nA;
-	    if(/*!(m_tracks[j]->links()[i]->hit()->state() & WireHitInvalidForFit) &&*/
-		(m_tracks[j]->links()[i]->hit()->state() & WireHitFittingValid)){
+	    if(/*!(m_tracks[j]->links()[i]->hit()->state() & CellHitInvalidForFit) &&*/
+		(m_tracks[j]->links()[i]->hit()->state() & CellHitFittingValid)){
 		if(m_tracks[j]->links()[i]->wire()->stereo())++nSOK;
 		else ++nAOK;
 	    }
@@ -2087,8 +2087,8 @@ TCurlFinder::makeCurlTracks(AList<TTrack> &tracks,
 	for(unsigned i=0,size=m_2dTracks[j]->nLinks();i<size;++i){
 	    if(m_2dTracks[j]->links()[i]->wire()->stereo())++nS;
 	    else ++nA;
-	    if(/*!(m_2dTracks[j]->links()[i]->hit()->state() & WireHitInvalidForFit) &&*/
-		(m_2dTracks[j]->links()[i]->hit()->state() & WireHitFittingValid)){
+	    if(/*!(m_2dTracks[j]->links()[i]->hit()->state() & CellHitInvalidForFit) &&*/
+		(m_2dTracks[j]->links()[i]->hit()->state() & CellHitFittingValid)){
 		if(m_2dTracks[j]->links()[i]->wire()->stereo())++nSOK;
 		else ++nAOK;
 	    }
@@ -2246,20 +2246,21 @@ TCurlFinder::dividing2DTrack(TCircle *circle) {
 #ifdef TRASAN_DEBUG_DETAIL
   LeaveStage(stage);
 #endif
+  return 0;
 }
 
 void
 TCurlFinder::assignTracks(void) {
   // 3D trks
   for(int i=0,size=m_tracks.length();i<size;++i) {
-    m_tracks[i]->assign(WireHitCurlFinder);
+    m_tracks[i]->assign(CellHitCurlFinder);
     m_tracks[i]->finder(TrackCurlFinder);
-//    m_tracks[i]->assign(WireHitCurlFinder, TrackCurlFinder | TrackValid | Track3D);
+//    m_tracks[i]->assign(CellHitCurlFinder, TrackCurlFinder | TrackValid | Track3D);
   }
 
   // 2D trks
   for(int i=0,size=m_2dTracks.length();i<size;++i) {
-    m_2dTracks[i]->assign(WireHitCurlFinder);
+    m_2dTracks[i]->assign(CellHitCurlFinder);
     m_2dTracks[i]->finder(TrackCurlFinder);
   }
 }
@@ -2349,7 +2350,7 @@ TCurlFinder::check3DTrack(TTrack *track) {
   trace3DTrack(track);
   unsigned nA = 0, nS = 0;
   for(unsigned i=0,size=track->nLinks();i<size;++i){
-    if(!(track->links()[i]->hit()->state() & WireHitFittingValid))continue;
+    if(!(track->links()[i]->hit()->state() & CellHitFittingValid))continue;
     if(track->links()[i]->wire()->stereo())++nS;
     else ++nA;
     if(nA >= 3 && nS >= 2)return true;
@@ -3147,7 +3148,7 @@ TCurlFinder::fitWDD(TCircle &c,
     circle2.clear();
     // CDC
     for(int i=0;i<c.links().length();++i){
-      if(!((c.links()[i])->hit()->state() & WireHitFittingValid))continue;
+      if(!((c.links()[i])->hit()->state() & CellHitFittingValid))continue;
       double R = sqrt(((c.links()[i])->wire()->xyPosition().x()-xc)*((c.links()[i])->wire()->xyPosition().x()-xc)+
                       ((c.links()[i])->wire()->xyPosition().y()-yc)*((c.links()[i])->wire()->xyPosition().y()-yc));
       if(R == 0.)continue;
@@ -3169,7 +3170,7 @@ TCurlFinder::fitWDD(TCircle &c,
   double totalChi2 = 0.;
   int totalNHit = 0;
   for(int i=0;i<c.links().length();++i){
-    if(!((c.links()[i])->hit()->state() & WireHitFittingValid))continue;
+    if(!((c.links()[i])->hit()->state() & CellHitFittingValid))continue;
     double xw = (c.links()[i])->wire()->xyPosition().x();
     double yw = (c.links()[i])->wire()->xyPosition().y();
     double R = sqrt((xw-xc)*(xw-xc)+(yw-yc)*(yw-yc));
@@ -3178,7 +3179,7 @@ TCurlFinder::fitWDD(TCircle &c,
     double X = xc+(xw-xc)*U*r;
     double Y = yc+(yw-yc)*U*r;
     double zlr = xw*Y-yw*X;
-    unsigned leftRight = zlr > 0. ? WireHitRight : WireHitLeft;
+    unsigned leftRight = zlr > 0. ? CellHitRight : CellHitLeft;
     double pChi2 = sqrt((X-xw)*(X-xw)+(Y-yw)*(Y-yw))-(c.links()[i])->hit()->drift();
     //std::cout << sqrt((X-xw)*(X-xw)+(Y-yw)*(Y-yw)) << " - " << (c.links()[i])->hit()->drift() << std::endl;
     //std::cout << i << ": " << pChi2 << std::endl;
@@ -3314,6 +3315,8 @@ TCurlFinder::make3DTrack(const TCircle *circle) {
 #ifdef TRASAN_DEBUG_DETAIL
   LeaveStage(stage);
 #endif    
+
+  return 0;
 }
 
 TLink *
@@ -3440,7 +3443,7 @@ TCurlFinder::makeWithMC(const AList<Belle2::TRGCDCWireHit> & axialHits,
   for(unsigned i = 0, size = axialHits.length(); i < size; ++i){
     if(axialHits[i]->mc() &&
        axialHits[i]->mc()->hep() &&
-       !(axialHits[i]->state() & WireHitUsed)){
+       !(axialHits[i]->state() & CellHitUsed)){
       int flag(1);
       for(unsigned j = 0; j < MAX_INDEX_MAKEMC; ++j){
 	if(index[j] != 9999 && index[j] == axialHits[i]->mc()->hep()->id()){
@@ -3466,7 +3469,7 @@ TCurlFinder::makeWithMC(const AList<Belle2::TRGCDCWireHit> & axialHits,
     //...axial
     for(unsigned i = 0, size = axialHits.length(); i < size; ++i){
       if(index[j] == axialHits[i]->mc()->hep()->id() &&
-	 !(axialHits[i]->state() & WireHitUsed)){
+	 !(axialHits[i]->state() & CellHitUsed)){
 	axialList.append(new TLink(0, axialHits[i]));
 	++axialCounter;
       }
@@ -3478,7 +3481,7 @@ TCurlFinder::makeWithMC(const AList<Belle2::TRGCDCWireHit> & axialHits,
     //...stereo
     for(unsigned i = 0, size = stereoHits.length(); i < size; ++i){
       if(index[j] == stereoHits[i]->mc()->hep()->id() &&
-	 !(stereoHits[i]->state() & WireHitUsed)){
+	 !(stereoHits[i]->state() & CellHitUsed)){
 	stereoList.append(new TLink(0, stereoHits[i]));
 	++stereoCounter;
       }
@@ -3542,7 +3545,7 @@ TCurlFinder::makeWithMC(const AList<Belle2::TRGCDCWireHit> & axialHits,
     m_allTracks.append(track);
     if(m_builder.buildStereoMC(*track, stereoList)){
       if(track->links().length() >= 5){
-	track->assign(WireHitCurlFinder, TrackCurlFinder | TrackValid | Track3D);
+	track->assign(CellHitCurlFinder, TrackCurlFinder | TrackValid | Track3D);
 	tracks.append(track);
 	m_allTracks.remove(track);
       }else{

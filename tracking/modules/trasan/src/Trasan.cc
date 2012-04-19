@@ -1409,7 +1409,7 @@ Trasan::event() {
 
     //...Get lists of hits...
     unsigned mask = 0;
-    if (! b_useAllHits) mask = WireHitFindingValid;
+    if (! b_useAllHits) mask = CellHitFindingValid;
 //  const AList<TRGCDCWireHit> & axialHits = _cdc->axialHits(mask);
 //  const AList<TRGCDCWireHit> & stereoHits = _cdc->stereoHits(mask);
 //  const AList<TRGCDCWireHit> & allHits = _cdc->hits(mask);
@@ -1553,8 +1553,8 @@ Trasan::event() {
     w.append(_trackManager.tracks(), Gdk::Color("blue"));
     w.append(_trackManager.tracks2D(), Gdk::Color("red"));
     w.skipEvent(true);
-//debug    w.skip(false);
-//debug    w.run();
+    w.skip(false);
+    w.run();
 
 //     Glib::RefPtr<Gtk::PrintOperation> op = Gtk::PrintOperation::create(); 
 //     op->set_export_filename("test.pdf"); 

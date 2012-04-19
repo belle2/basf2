@@ -233,8 +233,8 @@ TTrackBase::update(void) const {
     for (unsigned i = 0; i < n; i++) {
 	TLink * l = _links[i];
 	const Belle2::TRGCDCWireHit & h = * l->hit();
-	if (h.state() & WireHitInvalidForFit) continue;
-	if (! (h.state() & WireHitFittingValid)) continue;
+	if (h.state() & CellHitInvalidForFit) continue;
+	if (! (h.state() & CellHitFittingValid)) continue;
 	_cores.append(l);
     }
     _updated = true;
@@ -267,7 +267,7 @@ TTrackBase::appendByApproach(AList<TLink> & list, double maxSigma) {
     for (unsigned i = 0; i < n; i++) {
 	TLink & l = * list[i];
 
-	if ((_links.hasMember(l)) || (l.hit()->state() & WireHitUsed))
+	if ((_links.hasMember(l)) || (l.hit()->state() & CellHitUsed))
 	    continue;
 
 	//...Calculate closest approach...
@@ -360,7 +360,7 @@ TTrackBase::refine(double sigma) {
     AList<TLink> bad = refineMain(sigma);
 //      for (unsigned i = 0; i < bad.length(); i++) {
 //  	const Belle2::TRGCDCWireHit * hit = bad[i]->hit();
-//  	hit->state(hit->state() | WireHitInvalidForFit);
+//  	hit->state(hit->state() | CellHitInvalidForFit);
 //      }
 
 #ifdef TRASAN_DEBUG_DETAIL
@@ -500,7 +500,7 @@ TTrackBase::fit(void) {
 void
 TTrackBase::append(TLink & a) {
 #ifdef TRASAN_DEBUG
-    if ((a.hit()->state() & WireHitUsed)) {
+    if ((a.hit()->state() & CellHitUsed)) {
 	std::cout << "TTrackBase::append !!! " << a.wire()->name()
 	       << " is already used by another track!" << std::endl;
     }

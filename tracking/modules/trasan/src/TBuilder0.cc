@@ -322,7 +322,7 @@ TBuilder0::buildRphi(const AList<TLink> & list) const {
     AList<TLink> realCores;
     for (unsigned i = 0; i < nCores; i++) {
 	TLink * l = cores[i];
-	if (l->hit()->state() & WireHitFittingValid)
+	if (l->hit()->state() & CellHitFittingValid)
 	    realCores.append(l);
     }
     if (TLink::nSuperLayers(realCores) < 2) {
@@ -438,13 +438,13 @@ TBuilder0::selectHits(AList<TLink> & list) const {
     AList<TLink> bad;
     for (unsigned i = 0; i < (unsigned) list.length(); i++) {
 	unsigned state = list[i]->hit()->state();
-	if ((! (state & WireHitContinuous)) ||
-	    (! (state & WireHitIsolated))) {
+	if ((! (state & CellHitContinuous)) ||
+	    (! (state & CellHitIsolated))) {
 	    bad.append(list[i]);
 	    continue;
 	}
-	if ((! (state & WireHitPatternLeft)) &&
-	    (! (state & WireHitPatternRight))) {
+	if ((! (state & CellHitPatternLeft)) &&
+	    (! (state & CellHitPatternRight))) {
 	    bad.append(list[i]);
 	    continue;
 	}
@@ -541,8 +541,8 @@ TBuilder0::buildStereo0(TTrack & track, const AList<TLink> & list) const {
 	TLink * tl = new TLink(* t);
 	TLink * tr = new TLink(* t);
 
-	tl->leftRight(WireHitLeft);
-	tr->leftRight(WireHitRight);
+	tl->leftRight(CellHitLeft);
+	tr->leftRight(CellHitRight);
 
 	int err = track.szPosition(* tl);
 	if (err) {
@@ -743,16 +743,16 @@ TBuilder0::buildStereo(TTrack & track, const AList<TLink> & list) const {
 //...For debug end...
 
 	    //...Left/right solved by two consective hits...
-	    if (LorR == WireHitLeft || LorR == WireHitRight) {
+	    if (LorR == CellHitLeft || LorR == CellHitRight) {
 
 		//... Set Left/Right
-		if (LorR == WireHitLeft) {
-		    l->leftRight(WireHitLeft);
-		    lnext->leftRight(WireHitRight);
+		if (LorR == CellHitLeft) {
+		    l->leftRight(CellHitLeft);
+		    lnext->leftRight(CellHitRight);
 		}
 		else {
-		    l->leftRight(WireHitRight);
-		    lnext->leftRight(WireHitLeft);
+		    l->leftRight(CellHitRight);
+		    lnext->leftRight(CellHitLeft);
 		}             
 
 		//...Calculate z...
@@ -818,7 +818,7 @@ TBuilder0::buildStereo(TTrack & track, const AList<TLink> & list) const {
 	    //...Assuming wire position...
 	    //... for left
 	    TLink * tl = new TLink(* l);
-	    tl->leftRight(WireHitLeft);
+	    tl->leftRight(CellHitLeft);
 	    tl->zStatus(-10);
 	    tl->zPair(0);
 	    int err = track.szPosition(* tl);
@@ -840,7 +840,7 @@ TBuilder0::buildStereo(TTrack & track, const AList<TLink> & list) const {
 
 	    //... for right
 	    TLink * tr = new TLink(* l);
-	    tr->leftRight(WireHitRight);
+	    tr->leftRight(CellHitRight);
 	    tr->zStatus(-10);
 	    tr->zPair(0);
 	    err = track.szPosition(* tr);
@@ -1660,7 +1660,7 @@ TBuilder0::salvage(TTrack & t, AList<TLink> & hits) const {
 	const Belle2::TRGCDCWireHit & h = * l.hit();
 
 	//...Already used?...
-	if (h.state() & WireHitUsed) continue;
+	if (h.state() & CellHitUsed) continue;
 	candidates.append(l);
     }
 
@@ -1669,9 +1669,9 @@ TBuilder0::salvage(TTrack & t, AList<TLink> & hits) const {
     t.appendByApproach(candidates, _salvageLevel);
     fit(t);
     hits.remove(candidates);
-    t.assign(WireHitConformalFinder);
+    t.assign(CellHitConformalFinder);
     t.finder(TrackOldConformalFinder);
-    // t.assign(WireHitConformalFinder, TrackOldConformalFinder);
+    // t.assign(CellHitConformalFinder, TrackOldConformalFinder);
 }
 
 void
@@ -1697,16 +1697,16 @@ TBuilder0::salvageNormal(TTrack & t, AList<TLink> & hits) const {
 	if (a.cross(h.xyPosition()).z() * t.charge() > 0.) continue;
 
 	//...Already used?...
-	if (h.state() & WireHitUsed) continue;
+	if (h.state() & CellHitUsed) continue;
 	candidates.append(l);
     }
 
     //...Try to append this hit...
     t.appendByApproach(candidates, 30.);
     hits.remove(candidates);
-    t.assign(WireHitConformalFinder);
+    t.assign(CellHitConformalFinder);
     t.finder(TrackOldConformalFinder);
-    // t.assign(WireHitConformalFinder, TrackOldConformalFinder);
+    // t.assign(CellHitConformalFinder, TrackOldConformalFinder);
 }
 
 int

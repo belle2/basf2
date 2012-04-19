@@ -639,7 +639,7 @@ THelixFitter::main(TTrackBase & b, float t0Offset,
 	    const HepGeom::Point3D<double> & onTrack = l->positionOnTrack();
 	    const HepGeom::Point3D<double> & onWire = l->positionOnWire();
 	    unsigned leftRight = (onWire.cross(onTrack).z() < 0.)
-		? WireHitLeft : WireHitRight;
+		? CellHitLeft : CellHitRight;
 
 	    //...Obtain drift distance and its error...
 	    double distance;
@@ -908,7 +908,7 @@ THelixFitter::main(TTrackBase & b, float t0Offset,
 	    Vector3D v = onTrack - onWire;
 	    double vmag = v.mag();
 	    unsigned leftRight = (onWire.cross(onTrack).z() < 0.)
-		? WireHitLeft : WireHitRight;
+		? CellHitLeft : CellHitRight;
 	    double distance;
 	    double eDistance;
 	    drift(t, * l, t0Offset, distance, eDistance);
@@ -1026,8 +1026,8 @@ THelixFitter::main(TTrackBase & b, float t0Offset,
 	    double dPhi = l->dPhi();
 	    const HepGeom::Point3D<double> & onTrack = l->positionOnTrack();
 	    const HepGeom::Point3D<double> & onWire = l->positionOnWire();
-	    unsigned leftRight = WireHitRight;
-	    if (onWire.cross(onTrack).z() < 0.)	leftRight = WireHitLeft;
+	    unsigned leftRight = CellHitRight;
+	    if (onWire.cross(onTrack).z() < 0.)	leftRight = CellHitLeft;
 
 	    //...Obtain drift distance and its error...
 	    double distance;
@@ -1593,8 +1593,8 @@ THelixFitter::drift(const TTrack & t,
     const Belle2::TRGCDCWireHit & h = * l.hit();
     const HepGeom::Point3D<double> & onTrack = l.positionOnTrack();
     const HepGeom::Point3D<double> & onWire = l.positionOnWire();
-    unsigned leftRight = WireHitRight;
-    if (onWire.cross(onTrack).z() < 0.)	leftRight = WireHitLeft;
+    unsigned leftRight = CellHitRight;
+    if (onWire.cross(onTrack).z() < 0.)	leftRight = CellHitLeft;
 
     //...No correction...
     if ((t0Offset == 0.) && (! _propagation) && (! _tof)) {
@@ -1725,7 +1725,7 @@ THelixFitter::main(TTrackBase & b, float & tev, float & tev_err,
 	    double dPhi = l->dPhi();
 	    const HepGeom::Point3D<double> & onTrack = l->positionOnTrack();
 	    const HepGeom::Point3D<double> & onWire = l->positionOnWire();
-	    unsigned leftRight = (onWire.cross(onTrack).z() < 0.) ? WireHitLeft : WireHitRight;
+	    unsigned leftRight = (onWire.cross(onTrack).z() < 0.) ? CellHitLeft : CellHitRight;
 
 	    //...Obtain drift distance and its error...
 	    double distance;
@@ -1986,8 +1986,8 @@ THelixFitter::main(TTrackBase & b, float & tev, float & tev_err,
 	    double dPhi = l->dPhi();
 	    const HepGeom::Point3D<double> & onTrack = l->positionOnTrack();
 	    const HepGeom::Point3D<double> & onWire = l->positionOnWire();
-	    unsigned leftRight = WireHitRight;
-	    if (onWire.cross(onTrack).z() < 0.)	leftRight = WireHitLeft;
+	    unsigned leftRight = CellHitRight;
+	    if (onWire.cross(onTrack).z() < 0.)	leftRight = CellHitLeft;
 
 	    //...Obtain drift distance and its error...
 	    double distance;
@@ -2172,8 +2172,8 @@ THelixFitter::drift(const TTrack & t,
     const Belle2::TRGCDCWireHit & h = * l.hit();
     const HepGeom::Point3D<double> & onTrack = l.positionOnTrack();
     const HepGeom::Point3D<double> & onWire = l.positionOnWire();
-    unsigned leftRight = WireHitRight;
-    if (onWire.cross(onTrack).z() < 0.)	leftRight = WireHitLeft;
+    unsigned leftRight = CellHitRight;
+    if (onWire.cross(onTrack).z() < 0.)	leftRight = CellHitLeft;
 
     //...No correction...
     if ((tev == 0.) && (! _propagation) && (! _tof)) {

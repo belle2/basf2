@@ -99,7 +99,7 @@ TBuilderCosmic::buildStereo(TTrack & track, const AList<TLink> & list) const {
 	TLink * l = list[i];
 
         //... Require Fitting vaildation 
-        if(!(l->hit()->state()& WireHitFittingValid)) continue;
+        if(!(l->hit()->state()& CellHitFittingValid)) continue;
 
 	TLink * t = new TLink(* l);
 
@@ -166,8 +166,8 @@ TBuilderCosmic::buildStereo(TTrack & track, const AList<TLink> & list) const {
 	TLink * tl = new TLink(* t);
 	TLink * tr = new TLink(* t);
 
-	tl->leftRight(WireHitLeft);
-	tr->leftRight(WireHitRight);
+	tl->leftRight(CellHitLeft);
+	tr->leftRight(CellHitRight);
 
 	int err = track.szPosition(* tl);
 	if (err) {

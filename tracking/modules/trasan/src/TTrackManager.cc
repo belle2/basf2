@@ -889,7 +889,7 @@ TTrackManager::maskCurlHits(const CAList<Belle2::TRGCDCWireHit> &axial,
 	  t->helix().center().y()*a->xyPosition().x();
 	double qq = q*t->charge();
       if(R-2. < r && r < R+2. && qq > 0.){
-        a->state(a->state() | WireHitUsed);
+        a->state(a->state() | CellHitUsed);
       }
     }
     j = 0;
@@ -902,7 +902,7 @@ TTrackManager::maskCurlHits(const CAList<Belle2::TRGCDCWireHit> &axial,
 	  t->helix().center().y()*s->xyPosition().x();
 	double qq = q*t->charge();
       if(R-2.5 < r && r < R+2.5 && qq > 0.){
-        s->state(s->state() | WireHitUsed);
+        s->state(s->state() | CellHitUsed);
       }
     }
   }
@@ -927,7 +927,7 @@ TTrackManager::salvage(const CAList<Belle2::TRGCDCWireHit> & hits) const {
 	const Belle2::TRGCDCWireHit & h = * hits[i];
 
 	//...Already used?...
-	if (h.state() & WireHitUsed) continue;
+	if (h.state() & CellHitUsed) continue;
 #ifdef TRASAN_DEBUG_DETAIL
 	cout << "    checking " << h.wire().name() << endl;
 #endif
@@ -946,7 +946,7 @@ TTrackManager::salvage(const CAList<Belle2::TRGCDCWireHit> & hits) const {
 	AList<TLink> link;
 	link.append(new TLink(0, & h));
 	best->appendByApproach(link, 30.);
-	// best->assign(WireHitConformalFinder);
+	// best->assign(CellHitConformalFinder);
 	best->finder(TrackTrackManager);
     }
 }
@@ -1529,7 +1529,7 @@ TTrackManager::maskOut(TTrack & t, const AList<TLink> & links) const {
     if (! n) return;
     for (unsigned i = 0; i < n; i++) {
 	const Belle2::TRGCDCWireHit & hit = * links[i]->hit();
-	hit.state(hit.state() | WireHitInvalidForFit);
+	hit.state(hit.state() | CellHitInvalidForFit);
     }
     t._fitted = false;
 
@@ -1954,7 +1954,7 @@ TTrackManager::merge(void) {
 		TLink & l =  * t1.links()[j];
 		const Belle2::TRGCDCWireHit & whit =  * l.hit();
 		double load(2.);
-		if (whit.state() & WireHitStereo) load = 3.;
+		if (whit.state() & CellHitStereo) load = 3.;
 
 		double x = t0.helix().center().x() - l.positionOnTrack().x();
 		double y = t0.helix().center().y() - l.positionOnTrack().y();
@@ -2064,15 +2064,15 @@ TTrackManager::merge(void) {
 	    TLink & l =  * t.links()[j];
 	    const Belle2::TRGCDCWireHit & whit =  * l.hit();
 	   
-	    if( !(whit.state() & WireHitFittingValid) ) continue;
+	    if( !(whit.state() & CellHitFittingValid) ) continue;
 	   
 	    // within half circle or not?
 	    double q = t.helix().center().x() * l.positionOnTrack().y() - 
 		t.helix().center().y() * l.positionOnTrack().x();
 	    double qq =  q *t.charge();
 	   
-	    if( qq > 0 ) whit.state(whit.state() & ~WireHitInvalidForFit);
-	    else         whit.state(whit.state() | WireHitInvalidForFit);
+	    if( qq > 0 ) whit.state(whit.state() & ~CellHitInvalidForFit);
+	    else         whit.state(whit.state() | CellHitInvalidForFit);
 #ifdef TRASAN_DEBUG_DETAIL
 	    cout << "TTrackManager::merge ... masking" << endl;
 #endif
@@ -2092,10 +2092,10 @@ TTrackManager::copyTrack(TTrack & t,
 			 reccdc_trk ** pr,
 			 reccdc_trk_add ** pra) const {
 
-    static const unsigned GoodHitMask = (WireHitTimeValid |
-					 WireHitChargeValid |
-					 WireHitFindingValid |
-					 WireHitFittingValid);
+    static const unsigned GoodHitMask = (CellHitTimeValid |
+					 CellHitChargeValid |
+					 CellHitFindingValid |
+					 CellHitFittingValid);
     int err = 0;
 
     //...Hit loop...
@@ -2123,8 +2123,8 @@ TTrackManager::copyTrack(TTrack & t,
 	cout << l->wire()->name();
 	if (h->m_trk) cout << "(n/a)";
 	if ((l->hit()->state() & GoodHitMask) == GoodHitMask) {
-	    if (l->hit()->state() & WireHitInvalidForFit) {
-		if (! (h->m_stat & WireHitInvalidForFit))
+	    if (l->hit()->state() & CellHitInvalidForFit) {
+		if (! (h->m_stat & CellHitInvalidForFit))
 		    cout << "(bad)";
 	    }
 	}
@@ -2133,12 +2133,12 @@ TTrackManager::copyTrack(TTrack & t,
 
 	if (h->m_trk) {
 	    ++nOccupied;
-	    if (! (h->m_stat & WireHitInvalidForFit))
+	    if (! (h->m_stat & CellHitInvalidForFit))
 		continue;
 	}
 	if ((l->hit()->state() & GoodHitMask) == GoodHitMask) {
-	    if (l->hit()->state() & WireHitInvalidForFit) {
-		if (! (h->m_stat & WireHitInvalidForFit))
+	    if (l->hit()->state() & CellHitInvalidForFit) {
+		if (! (h->m_stat & CellHitInvalidForFit))
 		    badHits.append(l);
 	    }
 	    else {
@@ -2211,7 +2211,7 @@ TTrackManager::copyTrack(TTrack & t,
 //cnv	reccdc_wirhit * h = badHits[i]->hit()->reccdc();
 	reccdc_wirhit * h = 0;
 	h->m_trk = r->m_ID;
-	h->m_stat |= WireHitInvalidForFit;
+	h->m_stat |= CellHitInvalidForFit;
     }
 
     //...Cathode...
@@ -2877,7 +2877,7 @@ TTrackManager::salvageAssociateHits(const CAList<Belle2::TRGCDCWireHit> & hits,
 	const Belle2::TRGCDCWireHit & h = * hits[i];
 
 	//...Already used ?...
-	if (h.state() & WireHitUsed) continue;
+	if (h.state() & CellHitUsed) continue;
 #ifdef TRASAN_DEBUG_DETAIL
 	cout << Tab() << "checking " << h.wire().name() << endl;;
 #endif
@@ -2952,7 +2952,7 @@ TTrackManager::salvageAssociateHits(const CAList<Belle2::TRGCDCWireHit> & hits,
 
 	if (best) {
 	    bestTrack->append(* best);
-	    best->hit()->state(best->hit()->state() | WireHitInvalidForFit);
+	    best->hit()->state(best->hit()->state() | CellHitInvalidForFit);
 	    _associateHits.append(best);
 #ifdef TRASAN_DEBUG_DETAIL
 	    cout << Tab(+1) << best->hit()->wire().name()
@@ -2982,7 +2982,7 @@ TTrackManager::maskBadHits(const AList<TTrack> & tracks, float maxSigma2) {
 	for (unsigned j = 0; j < nHits; j++) {
 	    if (links[j]->pull() > maxSigma2) {
 		links[j]->hit()->state(links[j]->hit()->state() |
-				       WireHitInvalidForFit);
+				       CellHitInvalidForFit);
 		toBeUpdated = true;
 #ifdef TRASAN_DEBUG_DETAIL
 		cout << "    " << t.name() << " : ";
@@ -3750,7 +3750,7 @@ TTrackManager::mergeTracks(int level, float threshold) {
 	    AList<TLink> links = x1->links();
 	    x0->append(links);
 	    x1->remove(links);
-	    x0->assign(WireHitTrackManager);
+	    x0->assign(CellHitTrackManager);
 	    x0->finder(TrackTrackManager);
 	    toBeRemoved.append(x1);
 	    //...Refine...

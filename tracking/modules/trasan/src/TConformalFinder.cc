@@ -732,7 +732,7 @@ TConformalFinder::selectGoodHits(void) {
 	    //...Normal cells...
 	    else {
 		unsigned state = _allHits[i][j]->hit()->state();
-		if ((state & WireHitIsolated) && (state & WireHitContinuous))
+		if ((state & CellHitIsolated) && (state & CellHitContinuous))
 		    _hits[i].append(_allHits[i][j]);
 		else
 		    _unused[i].append(_allHits[i][j]);
@@ -1590,7 +1590,7 @@ TConformalFinder::fastFinding3D(unsigned level) {
 	salvage(* s, 3, bads);
 	tracks3D.append(s);
 	touched.append(_2DTracks[i]);
-	s->assign(WireHitConformalFinder);
+	s->assign(CellHitConformalFinder);
 	s->quality(0);
 
 	//...Segment...
@@ -2180,7 +2180,7 @@ TConformalFinder::stereoSegments(const TTrack & t) const {
     //...Remove bad segments...
 #ifdef TRASAN_DEBUG_DETAIL
     std::cout << "    ... direction :" << std::endl;
-    for (unsigned i = 0; i < n6; i++)
+    for (unsigned i = 0; i < unsigned(n6); i++)
 	std::cout << "        " << i << " : " << dir[i] << std::endl;
     std::cout << "    ... direction cos :" << std::endl;
 #endif

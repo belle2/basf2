@@ -305,9 +305,9 @@ void T3DLineFitter::drift(const T3DLine& t,const TLink& l,
   const Belle2::TRGCDCWireHit& h = *l.hit();
   const Point3D& onTrack = l.positionOnTrack();
   const Point3D& onWire = l.positionOnWire();
-  unsigned leftRight = WireHitRight;
-  //  if (onWire.cross(onTrack).z() < 0) leftRight = WireHitLeft;
-  if((onWire.x()*onTrack.y()-onWire.y()*onTrack.x())<0) leftRight = WireHitLeft;
+  unsigned leftRight = CellHitRight;
+  //  if (onWire.cross(onTrack).z() < 0) leftRight = CellHitLeft;
+  if((onWire.x()*onTrack.y()-onWire.y()*onTrack.x())<0) leftRight = CellHitLeft;
 
   //...No correction...
   if ((t0Offset == 0.) && (_propagation==0) && (! _tof)) {
@@ -417,8 +417,8 @@ int T3DLineFitter::fit(TTrackBase& tb, float t0Offset) const{
       t.approach(*l,_sag);
       const Point3D& onTrack=l->positionOnTrack();
       const Point3D& onWire=l->positionOnWire();
-      unsigned leftRight = WireHitRight;
-      if (onWire.cross(onTrack).z() < 0.) leftRight = WireHitLeft;
+      unsigned leftRight = CellHitRight;
+      if (onWire.cross(onTrack).z() < 0.) leftRight = CellHitLeft;
 
       //...Obtain drift distance and its error...
       double distance;

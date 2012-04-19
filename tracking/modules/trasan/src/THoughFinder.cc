@@ -738,7 +738,7 @@ THoughFinder::build0(const TPoint2D & point,
     TTrack * s = build3D(* t, sLinks);
     if (! s) {
 	removeUsedHits(* t);
-	t->assign(WireHitHoughFinder);
+	t->assign(CellHitHoughFinder);
 	t->quality(TrackQuality2D);
 #ifdef TRASAN_DEBUG_DETAIL
 	std::cout << "Hough 2D Track made:" << t->name() << std::endl;
@@ -802,7 +802,7 @@ THoughFinder::build0(const TPoint2D & point,
     removeUsedHits(* s);
 
     //...Store a track...
-    s->assign(WireHitHoughFinder);
+    s->assign(CellHitHoughFinder);
 
 #ifdef TRASAN_DEBUG_DETAIL
     std::cout << Tab() << "Hough Track made:" << s->name() << std::endl;
@@ -981,7 +981,7 @@ THoughFinder::build1(const TPoint2D & point,
     TTrack * s = build3D(* t, sLinks);
     if (! s) {
 	removeUsedHits(* t);
-	t->assign(WireHitHoughFinder);
+	t->assign(CellHitHoughFinder);
 	t->quality(TrackQuality2D);
 #ifdef TRASAN_DEBUG_DETAIL
 	std::cout << "Hough 2D Track made:" << t->name() << std::endl;
@@ -1045,7 +1045,7 @@ THoughFinder::build1(const TPoint2D & point,
     removeUsedHits(* s);
 
     //...Store a track...
-    s->assign(WireHitHoughFinder);
+    s->assign(CellHitHoughFinder);
 
 #ifdef TRASAN_DEBUG_DETAIL
     std::cout << Tab() << "Hough Track made:" << s->name() << std::endl;
@@ -1234,7 +1234,7 @@ THoughFinder::build3(const TPoint2D & point,
     TTrack * s = build3D(* t, sLinks);
     if (! s) {
 	removeUsedHits(* t);
-	t->assign(WireHitHoughFinder);
+	t->assign(CellHitHoughFinder);
 	t->quality(TrackQuality2D);
 #ifdef TRASAN_DEBUG_DETAIL
 	std::cout << "Hough 2D Track made:" << t->name() << std::endl;
@@ -1298,7 +1298,7 @@ THoughFinder::build3(const TPoint2D & point,
     removeUsedHits(* s);
 
     //...Store a track...
-    s->assign(WireHitHoughFinder);
+    s->assign(CellHitHoughFinder);
 
 #ifdef TRASAN_DEBUG_DETAIL
     std::cout << Tab() << "Hough Track made:" << s->name() << std::endl;
@@ -1427,7 +1427,7 @@ THoughFinder::buildCurl(const TPoint2D & point,
 	    return 0;
 	}
 	removeUsedHits(* t);
-	t->assign(WireHitHoughFinder);
+	t->assign(CellHitHoughFinder);
 	t->quality(TrackQuality2D);
 #ifdef TRASAN_DEBUG_DETAIL
 	std::cout << "Hough 2D Track made:" << t->name() << std::endl;
@@ -1491,7 +1491,7 @@ THoughFinder::buildCurl(const TPoint2D & point,
     removeUsedHits(* s);
 
     //...Store a track...
-    s->assign(WireHitHoughFinder);
+    s->assign(CellHitHoughFinder);
 
 #ifdef TRASAN_DEBUG_DETAIL
     std::cout << Tab() << "Hough Track made:" << s->name() << std::endl;

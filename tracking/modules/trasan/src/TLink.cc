@@ -281,28 +281,28 @@ TLink::dump(const std::string & msg, const std::string & pre) const {
     //...Output...
     std::cout << pre;
     std::cout << wire()->name();
-    if (mc) {
-	if (_hit) {
-	    if (_hit->mc()) {
-		if (_hit->mc()->hep())
-		    std::cout << "(mc" << _hit->mc()->hep()->id() << ")";
-		else
-		    std::cout << "(mc?)";
-	    }
-	    else {
-		std::cout << "(mc?)";
-	    }
-	}
-    }
+//     if (mc) {
+// 	if (_hit) {
+// 	    if (_hit->mc()) {
+// 		if (_hit->mc()->hep())
+// 		    std::cout << "(mc" << _hit->mc()->hep()->id() << ")";
+// 		else
+// 		    std::cout << "(mc?)";
+// 	    }
+// 	    else {
+// 		std::cout << "(mc?)";
+// 	    }
+// 	}
+//     }
     if (pull)
 	std::cout << "[pul=" << this->pull() << "]";
     if (flag) {
 	if (_hit) {
-	    if (_hit->state() & WireHitFindingValid)
+	    if (_hit->state() & CellHitFindingValid)
 		std::cout << "o";
-	    if (_hit->state() & WireHitFittingValid)
+	    if (_hit->state() & CellHitFittingValid)
 		std::cout << "+";
-	    if (_hit->state() & WireHitInvalidForFit)
+	    if (_hit->state() & CellHitInvalidForFit)
 		std::cout << "x";
 	}
     }
@@ -410,28 +410,28 @@ TLink::dump(const CAList<TLink> & links,
     for (unsigned i = 0; i < n; i++) {
 	const TLink & l = * tmp[i];
 
-	if (mc) {
-	    unsigned mcId = 999;
-	    if (l.hit()) {
-		if (l.hit()->mc())
-		    if (l.hit()->mc()->hep())
-			mcId = l.hit()->mc()->hep()->id();
-		if (mcId < MCC_MAX) {
-		    ++MCC0[mcId];
-		    if (l.hit()->state() & WireHitFittingValid) {
-			if (! (l.hit()->state() & WireHitInvalidForFit))
-			    ++MCC1[mcId];
-		    }
-		}
-		else {
-		    MCCOverFlow = true;
-		}
-	    }
-	}
+// 	if (mc) {
+// 	    unsigned mcId = 999;
+// 	    if (l.hit()) {
+// 		if (l.hit()->mc())
+// 		    if (l.hit()->mc()->hep())
+// 			mcId = l.hit()->mc()->hep()->id();
+// 		if (mcId < MCC_MAX) {
+// 		    ++MCC0[mcId];
+// 		    if (l.hit()->state() & CellHitFittingValid) {
+// 			if (! (l.hit()->state() & CellHitInvalidForFit))
+// 			    ++MCC1[mcId];
+// 		    }
+// 		}
+// 		else {
+// 		    MCCOverFlow = true;
+// 		}
+// 	    }
+// 	}
 	if (flag) {
 	    if (l.hit()) {
-		if (l.hit()->state() & WireHitFittingValid) {
-		    if (! (l.hit()->state() & WireHitInvalidForFit))
+		if (l.hit()->state() & CellHitFittingValid) {
+		    if (! (l.hit()->state() & CellHitInvalidForFit))
 			++nForFit;
 		}
 	    }
@@ -600,7 +600,7 @@ TLink::separateCores(const AList<TLink> & input,
     for (unsigned i = 0; i < n; i++) {
 	TLink & t = * input[i];
 	const Belle2::TRGCDCWireHit & h = * t.hit();
-	if (h.state() & WireHitFittingValid)
+	if (h.state() & CellHitFittingValid)
 	    cores.append(t);
 	else
 	    nonCores.append(t);
@@ -614,7 +614,7 @@ TLink::cores(const AList<TLink> & input) {
     for (unsigned i = 0; i < n; i++) {
 	TLink & t = * input[i];
 	const Belle2::TRGCDCWireHit & h = * t.hit();
-	if (h.state() & WireHitFittingValid)
+	if (h.state() & CellHitFittingValid)
 	    a.append(t);
     }
     return a;

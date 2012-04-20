@@ -15,7 +15,7 @@
 #
 # In the current version only the tracking and PID sub-detectors are included (no ECL or KLM)
 #
-# In this version tracking uses only CDC hits (try BtoPhiKshortWithSVDHits.py if you would like to use SVD hits)
+# In this version CDC + matched SVD + matched PXD hits are used in track fiting
 #
 ############################################################################################################################
 
@@ -120,6 +120,62 @@ param_cdcfitting = {
 cdcfitting.param(param_cdcfitting)
 
 # ---------------------------------------------------------------
+# extrapolate to SVD
+extrapolate = register_module('ExtrapolateToSVD')
+
+# set the correct input (GFTracks from Trasa) and output (new GFTrackCands with SVDHits) collection names
+extrapolate.param('GFTracksColName', 'GFTracks_Trasan')
+extrapolate.param('GFTrackCandsColName', 'GFTrackCands_withSVD')
+
+# ---------------------------------------------------------------
+# refitting: CDC+matched SVD hits
+svdfitting = register_module('GenFitter')
+
+# set proper new collection names (important to avoid mix up with previous collections)
+param_svdfitting = {
+    'GFTrackCandidatesColName': 'GFTrackCands_withSVD',
+    'TracksColName': 'Tracks_withSVD',
+    'GFTracksColName': 'GFTracks_withSVD',
+    'GFTracksToMCParticlesColName': 'GFTracksToMCParticles_withSVD',
+    'StoreFailedTracks': 1,
+    'mcTracks': 0,
+    'pdg': 211,
+    'allPDG': 0,
+    'FilterId': 1,
+    'ProbCut': 0.001,
+    }
+
+svdfitting.param(param_svdfitting)
+
+# ---------------------------------------------------------------
+# extrapolate to PXD
+extrapolatePXD = register_module('ExtrapolateToPXD')
+
+# set the correct input (GFTracks from Trasan+SVD hits) and output (new GFTrackCands with SVD+PXD Hits) collection names
+extrapolatePXD.param('GFTracksColName', 'GFTracks_withSVD')
+extrapolatePXD.param('GFTrackCandsColName', 'GFTrackCands_withSVDPXD')
+
+# ---------------------------------------------------------------
+# refitting: CDC+matched SVD+matched PXD hits
+pxdfitting = register_module('GenFitter')
+
+# set proper new collection names (important to avoid mix up with previous collections)
+param_pxdfitting = {
+    'GFTrackCandidatesColName': 'GFTrackCands_withSVDPXD',
+    'TracksColName': 'Tracks_withSVDPXD',
+    'GFTracksColName': 'GFTracks_withSVDPXD',
+    'GFTracksToMCParticlesColName': 'GFTracksToMCParticles_withSVDPXD',
+    'StoreFailedTracks': 1,
+    'mcTracks': 0,
+    'pdg': 211,
+    'allPDG': 0,
+    'FilterId': 1,
+    'ProbCut': 0.001,
+    }
+
+pxdfitting.param(param_pxdfitting)
+
+# ---------------------------------------------------------------
 # TOP - digitization
 topdigi = register_module('TOPDigi')
 param_digi = {'PhotonFraction': 0.3}
@@ -142,12 +198,13 @@ arichRec = register_module('ARICHRec')
 analysis = register_module('B2PhiKs')
 
 # output root file name (the suffix .root will be added automaticaly)
-analysis.param('outputFileName', 'BtoPhiKshort')
+analysis.param('outputFileName', 'BtoPhiKshortWithSVDPXD')
 
 # specify the names of Track collections
-analysis.param('GFTrackCandidatesColName', 'GFTrackCands_Trasan')
-analysis.param('TracksColName', 'Tracks_Trasan')
-analysis.param('GFTracksColName', 'GFTracks_Trasan')
+# use tracks after refitting (including SVD hits)
+analysis.param('GFTrackCandidatesColName', 'GFTrackCands_withSVDPXD')
+analysis.param('TracksColName', 'Tracks_withSVDPXD')
+analysis.param('GFTracksColName', 'GFTracks_withSVDPXD')
 
 # ---------------------------------------------------------------
 # Add all modules to the main path
@@ -170,6 +227,12 @@ main.add_module(trasan)
 main.add_module(mcmatching)
 
 main.add_module(cdcfitting)
+
+main.add_module(extrapolate)
+main.add_module(svdfitting)
+
+main.add_module(extrapolatePXD)
+main.add_module(pxdfitting)
 
 main.add_module(topdigi)
 main.add_module(topreco)

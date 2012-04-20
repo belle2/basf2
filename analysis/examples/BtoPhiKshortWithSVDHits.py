@@ -19,6 +19,8 @@
 #
 ############################################################################################################################
 
+import os
+
 from basf2 import *
 set_log_level(LogLevel.INFO)
 
@@ -28,9 +30,8 @@ set_log_level(LogLevel.INFO)
 # use specified user decay file
 evtgeninput = register_module('EvtGenInput')
 evtgeninput.param('boost2LAB', True)
-evtgeninput.param('userDECFile',
-                  '/home/zupanc/belle2/somethingold/analysis/modules/B2PhiKs/datafiles/B0toPhiKshort.dec'
-                  )
+evtgeninput.param('userDECFile', os.environ['BELLE2_LOCAL_DIR']
+                  + '/analysis/modules/B2PhiKs/datafiles/B0toPhiKshort.dec')
 
 # specify number of events to be generated in job
 evtmetagen = register_module('EvtMetaGen')

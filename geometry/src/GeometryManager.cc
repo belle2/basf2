@@ -161,12 +161,12 @@ namespace Belle2 {
       }
 
       Geant4GM::Factory g4Factory;
-      if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 100, PACKAGENAME())) {
+      if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 200, PACKAGENAME())) {
         g4Factory.SetDebug(1);
       }
       g4Factory.Import(m_topVolume);
       RootGM::Factory rtFactory;
-      if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 100, PACKAGENAME())) {
+      if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 200, PACKAGENAME())) {
         rtFactory.SetDebug(1);
       }
       g4Factory.Export(&rtFactory);

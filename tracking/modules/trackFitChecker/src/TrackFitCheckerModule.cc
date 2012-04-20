@@ -346,7 +346,7 @@ void TrackFitCheckerModule::event()
           } else {
             aTrueHitPtr = static_cast<VXDTrueHit const*>(aSvdRecoHitPtr->getTrueHit());
           }
-          hitLayerId = aTrueHitPtr->getSensorID().getLayer();
+          hitLayerId = aTrueHitPtr->getSensorID().getLayerNumber();
           pTrue = aTrueHitPtr->getMomentum();
           pInTrue = aTrueHitPtr->getEntryMomentum();
           pOutTrue = aTrueHitPtr->getExitMomentum();

@@ -310,7 +310,7 @@ void MCTrackFinderModule::event()
             int uniqueSensorId = aVXDId.getID();
             //the real clusters do not have timing information, set layer ID instead ....
             // I dont think using layer id as sorting parameter will work... I deactivated sorting when clusters are used until a better solution is found. (Moritz)
-            float time = aVXDId.getLayer();
+            float time = aVXDId.getLayerNumber();
             trackCandidates[counter]->addHit(0, hitID, double(time), uniqueSensorId);
           }
           B2DEBUG(112, "     add " << pxdHitsIndices.size() << " PXDClusters");

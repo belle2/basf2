@@ -169,10 +169,10 @@ void GenFitter2Module::event()
           aTrackCandPointer->getHit(i, detId, hitId);
           int layerId = -1;
           if (detId == 0) {
-            layerId = pxdTrueHits[hitId]->getSensorID().getLayer();
+            layerId = pxdTrueHits[hitId]->getSensorID().getLayerNumber();
           }
           if (detId == 1) {
-            layerId = svdTrueHits[hitId]->getSensorID().getLayer();
+            layerId = svdTrueHits[hitId]->getSensorID().getLayerNumber();
           }
           layerIds[i] = layerId;
         }

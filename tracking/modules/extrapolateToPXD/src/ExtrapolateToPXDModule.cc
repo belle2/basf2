@@ -192,7 +192,7 @@ void ExtrapolateToPXDModule::event()
         VxdID aVXDId = VxdID(sensorID);
         const PXD::SensorInfo& geometry = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(sensorID)); //get the SensorInfo to get the hit coordinates
 
-        int layerId = aVXDId.getLayer();
+        int layerId = aVXDId.getLayerNumber();
 
         if (layerId == iLayer) {
 

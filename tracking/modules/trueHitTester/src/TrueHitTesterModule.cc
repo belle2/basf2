@@ -101,13 +101,13 @@ void TrueHitTesterModule::event()
         vector<int> layerIds;
         RelationIndex<MCParticle, PXDTrueHit>::range_from iterPairMcPxd = relMcPxdTrueHit.getFrom(aMcParticlePtr);
         while (iterPairMcPxd.first not_eq iterPairMcPxd.second) {
-          int layerId = iterPairMcPxd.first->to->getSensorID().getLayer();
+          int layerId = iterPairMcPxd.first->to->getSensorID().getLayerNumber();
           layerIds.push_back(layerId);
           ++iterPairMcPxd.first;
         }
         RelationIndex<MCParticle, SVDTrueHit>::range_from iterPairMcSvd = relMcSvdTrueHit.getFrom(aMcParticlePtr);
         while (iterPairMcSvd.first not_eq iterPairMcSvd.second) {
-          int layerId = iterPairMcSvd.first->to->getSensorID().getLayer();
+          int layerId = iterPairMcSvd.first->to->getSensorID().getLayerNumber();
           layerIds.push_back(layerId);
           ++iterPairMcSvd.first;
         }
@@ -168,7 +168,7 @@ void TrueHitTesterModule::event()
           B2DEBUG(100, "aVxdTrueHitPtr->getU() " << aVxdTrueHitPtr->getU());
 
           float deltaE = aVxdTrueHitPtr->getEnergyDep();
-          int layerId = aVxdTrueHitPtr->getSensorID().getLayer();
+          int layerId = aVxdTrueHitPtr->getSensorID().getLayerNumber();
           TVector3 pTrueIn = aVxdTrueHitPtr->getEntryMomentum();
           TVector3 pTrueOut = aVxdTrueHitPtr->getExitMomentum();
           TVector3 pTrue = aVxdTrueHitPtr->getMomentum();

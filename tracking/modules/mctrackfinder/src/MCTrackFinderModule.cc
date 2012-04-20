@@ -113,62 +113,62 @@ void MCTrackFinderModule::event()
 {
   StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
   int eventCounter = eventMetaDataPtr->getEvent();
-  B2DEBUG(112, "*******   MCTrackFinderModule processing event number: " << eventCounter << " *******");
+  B2DEBUG(100, "*******   MCTrackFinderModule processing event number: " << eventCounter << " *******");
 
   //all the input containers. First: MCParticles
   StoreArray<MCParticle> mcParticles(m_mcParticlesColName);
   int nMcParticles = mcParticles.getEntries();
   B2DEBUG(149, "MCTrackFinder: total Number of MCParticles: " << nMcParticles);
-  if (nMcParticles == 0) {B2DEBUG(112, "MCTrackFinder: MCParticlesCollection is empty!");}
+  if (nMcParticles == 0) {B2DEBUG(100, "MCTrackFinder: MCParticlesCollection is empty!");}
 
   //PXD
   StoreArray<PXDTrueHit> pxdTrueHits(m_pxdHitColName);
   int nPXDHits = pxdTrueHits.getEntries();
   B2DEBUG(149, "MCTrackFinder: Number of PXDHits: " << nPXDHits);
-  if (nPXDHits == 0) {B2DEBUG(112, "MCTrackFinder: PXDHitsCollection is empty!");}
+  if (nPXDHits == 0) {B2DEBUG(100, "MCTrackFinder: PXDHitsCollection is empty!");}
   RelationArray mcPartToPXDTrueHits(mcParticles, pxdTrueHits);
   int nMcPartToPXDHits = mcPartToPXDTrueHits.getEntries();
   B2DEBUG(149, "MCTrackFinder: Number of relations between MCParticles and PXDHits: " << nMcPartToPXDHits);
-  if (nMcPartToPXDHits == 0) B2DEBUG(112, "MCTrackFinder: MCParticlesToPXDHitsCollection is empty!");
+  if (nMcPartToPXDHits == 0) B2DEBUG(100, "MCTrackFinder: MCParticlesToPXDHitsCollection is empty!");
 
   //PXD clusters
   StoreArray<PXDCluster> pxdClusters(m_pxdClusterColName);
   int nPXDClusters = pxdClusters.getEntries();
   B2DEBUG(149, "MCTrackFinder: Number of PXDClusters: " << nPXDClusters);
-  if (nPXDClusters == 0) {B2DEBUG(112, "MCTrackFinder: PXDClustersCollection is empty!");}
+  if (nPXDClusters == 0) {B2DEBUG(100, "MCTrackFinder: PXDClustersCollection is empty!");}
   RelationArray pxdClusterToMCParticle(pxdClusters, mcParticles);
   int nPxdClusterToMCPart = pxdClusterToMCParticle.getEntries();
   B2DEBUG(149, "MCTrackFinder: Number of relations between PXDCluster and MCParticles: " << nPxdClusterToMCPart);
-  if (nPxdClusterToMCPart == 0) B2DEBUG(112, "MCTrackFinder: PXDClustersToMCParticlesCollection is empty!");
+  if (nPxdClusterToMCPart == 0) B2DEBUG(100, "MCTrackFinder: PXDClustersToMCParticlesCollection is empty!");
 
 
   //SVD
   StoreArray<SVDTrueHit> svdTrueHits(m_svdHitColName);
   int nSVDHits = svdTrueHits.getEntries();
   B2DEBUG(149, "MCTrackFinder: Number of SVDDHits: " << nSVDHits);
-  if (nSVDHits == 0) {B2DEBUG(112, "MCTrackFinder: SVDHitsCollection is empty!");}
+  if (nSVDHits == 0) {B2DEBUG(100, "MCTrackFinder: SVDHitsCollection is empty!");}
   RelationArray mcPartToSVDTrueHits(mcParticles, svdTrueHits);
   int nMcPartToSVDHits = mcPartToSVDTrueHits.getEntries();
   B2DEBUG(149, "MCTrackFinder: Number of relations between MCParticles and SVDHits: " << nMcPartToSVDHits);
-  if (nMcPartToSVDHits == 0) {B2DEBUG(112, "MCTrackFinder: MCParticlesToSVDHitsCollection is empty!");}
+  if (nMcPartToSVDHits == 0) {B2DEBUG(100, "MCTrackFinder: MCParticlesToSVDHitsCollection is empty!");}
 
   //CDC
   StoreArray<CDCHit> cdcHits(m_cdcHitColName);
   int nCDCHits = cdcHits.getEntries();
   B2DEBUG(149, "MCTrackFinder: Number of CDCHits: " << nCDCHits);
-  if (nCDCHits == 0) {B2DEBUG(112, "MCTrackFinder: CDCHitsCollection is empty!");}
+  if (nCDCHits == 0) {B2DEBUG(100, "MCTrackFinder: CDCHitsCollection is empty!");}
   RelationArray mcPartToCDCHits(mcParticles, cdcHits);
   int nMcPartToCDCHits = mcPartToCDCHits.getEntries();
   B2DEBUG(149, "MCTrackFinder: Number of relations between MCParticles and CDCHits: " << nMcPartToCDCHits);
-  if (nMcPartToCDCHits == 0) {B2DEBUG(112, "MCTrackFinder: MCParticlesToCDCHitsCollection is empty!");}
+  if (nMcPartToCDCHits == 0) {B2DEBUG(100, "MCTrackFinder: MCParticlesToCDCHitsCollection is empty!");}
   StoreArray<CDCSimHit> cdcSimHits("");
   int nCDCSimHits = cdcSimHits.getEntries();
   B2DEBUG(149, "MCTrackFinder: Number of CDCHits: " << nCDCSimHits);
-  if (nCDCSimHits == 0) {B2DEBUG(112, "MCTrackFinder: CDCSimHitsCollection is empty!");}
+  if (nCDCSimHits == 0) {B2DEBUG(100, "MCTrackFinder: CDCSimHitsCollection is empty!");}
   RelationArray cdcSimHitToHitRel(cdcSimHits, cdcHits);
   int nCdcSimHitToHitRel = cdcSimHitToHitRel.getEntries();
   B2DEBUG(149, "MCTrackFinder: Number of relations between CDCSimHit and CDCHits: " << nCdcSimHitToHitRel);
-  if (nCdcSimHitToHitRel == 0) {B2DEBUG(112, "MCTrackFinder: MCParticlesToCDCHitsCollection is empty!");}
+  if (nCdcSimHitToHitRel == 0) {B2DEBUG(100, "MCTrackFinder: MCParticlesToCDCHitsCollection is empty!");}
 
   //register StoreArray which will be filled by this module
   StoreArray<GFTrackCand> trackCandidates(m_gfTrackCandsColName);
@@ -193,7 +193,7 @@ void MCTrackFinderModule::event()
   for (int iPart = 0; iPart < nMcParticles; ++iPart) {
     //make links only for interesting MCParticles: energy cut, which subdetector was reached and a 'dirty hack' to avoid atoms which are unknown to GenFit and check for neutrals
     if (mcParticles[iPart]->getEnergy() > m_energyCut && mcParticles[iPart]->hasStatus(status) == true && abs(mcParticles[iPart]->getPDG()) < 100000000 && mcParticles[iPart]->getCharge() != forbiddenCharge) {
-      B2DEBUG(112, "Search a  track for the MCParticle with index: " << iPart << " (PDG: " << mcParticles[iPart]->getPDG() << ")");
+      B2DEBUG(100, "Search a  track for the MCParticle with index: " << iPart << " (PDG: " << mcParticles[iPart]->getPDG() << ")");
 
       // create a list containing the indices to the PXDHits that belong to one track
       vector<int> pxdHitsIndices;
@@ -285,7 +285,7 @@ void MCTrackFinderModule::event()
 
         //create relation between the track candidates and the mcParticle (redundant to saving the MCId)
         gfTrackCandToMCPart.add(counter, iPart);
-        B2DEBUG(112, " --- Create relation between GFTrackCand " << counter << " and MCParticle " << iPart);
+        B2DEBUG(100, " --- Create relation between GFTrackCand " << counter << " and MCParticle " << iPart);
 
         //member variable Dip is currently used to store the purity of the tracks, for MCTracks it is always 100 %
         trackCandidates[counter]->setDip(100);
@@ -296,33 +296,30 @@ void MCTrackFinderModule::event()
         //     cdc 2
         if (m_usePXDHits && m_usePXDClusters == false) {
           BOOST_FOREACH(int hitID, pxdHitsIndices) {
-            VxdID aVXDId = pxdTrueHits[hitID]->getSensorID();
+            int uniqueSensorId = pxdTrueHits[hitID]->getSensorID();
             float time = pxdTrueHits[hitID]->getGlobalTime();
-            int uniqueSensorId = aVXDId.getID();
             trackCandidates[counter]->addHit(0, hitID, double(time), uniqueSensorId);
           }
-          B2DEBUG(112, "     add " << pxdHitsIndices.size() << " PXDHits");
+          B2DEBUG(100, "     add " << pxdHitsIndices.size() << " PXDHits");
         }
 
         if (m_usePXDHits && m_usePXDClusters) {
           BOOST_FOREACH(int hitID, pxdHitsIndices) {
-            VxdID aVXDId = pxdClusters[hitID]->getSensorID();
-            int uniqueSensorId = aVXDId.getID();
+            VxdID aVxdId = pxdClusters[hitID]->getSensorID();
             //the real clusters do not have timing information, set layer ID instead ....
             // I dont think using layer id as sorting parameter will work... I deactivated sorting when clusters are used until a better solution is found. (Moritz)
-            float time = aVXDId.getLayerNumber();
-            trackCandidates[counter]->addHit(0, hitID, double(time), uniqueSensorId);
+            int layerId = aVxdId.getLayerNumber();
+            trackCandidates[counter]->addHit(0, hitID, double(layerId), aVxdId.getID());
           }
-          B2DEBUG(112, "     add " << pxdHitsIndices.size() << " PXDClusters");
+          B2DEBUG(100, "     add " << pxdHitsIndices.size() << " PXDClusters");
         }
         if (m_useSVDHits) {
           BOOST_FOREACH(int hitID, svdHitsIndices) {
-            VxdID aVXDId = svdTrueHits[hitID]->getSensorID();
+            int uniqueSensorId = svdTrueHits[hitID]->getSensorID();
             float time = svdTrueHits[hitID]->getGlobalTime();
-            int uniqueSensorId = aVXDId.getID();
             trackCandidates[counter]->addHit(1, hitID, double(time), uniqueSensorId);
           }
-          B2DEBUG(112, "     add " << svdHitsIndices.size() << " SVDHits");
+          B2DEBUG(100, "     add " << svdHitsIndices.size() << " SVDHits");
         }
         if (m_useCDCHits) {
           int layerId = -999;  //absolute layerId of the hit (from 0 to 55)
@@ -345,7 +342,7 @@ void MCTrackFinderModule::event()
             }
             trackCandidates[counter]->addHit(2, hitID, time, uniqueId);
           }
-          B2DEBUG(112, "    add " << cdcHitsIndices.size() << " CDCHits");
+          B2DEBUG(100, "    add " << cdcHitsIndices.size() << " CDCHits");
         }
         // now after all the hits belonging to one track are added to a track candidate
         // bring them into the right order inside the trackCand objects using the rho parameter

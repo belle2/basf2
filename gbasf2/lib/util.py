@@ -175,7 +175,8 @@ or to generate a new proxy?" \
         import sys
         sys.exit(-1)
 
-    if not proxyinfo['OK'] or 'username' not in proxyinfo['Value'].keys():
+    if not proxyinfo['OK'] or 'username' not in proxyinfo['Value'].keys() \
+        or user_choice.upper() == 'G':
         print 'No proxy found - trying to generate one'
         proxyparams = DIRAC.FrameworkSystem.Client.ProxyGeneration.CLIParams()
         proxyparams.diracGroup = 'belle'

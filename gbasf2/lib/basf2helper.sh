@@ -11,7 +11,7 @@
 VO_BELLE_SW_DIR=${VO_BELLE_SW_DIR:-$OSG_APP/belle}
 unset VO_BELLE2_SW_DIR
 . ${VO_BELLE_SW_DIR}/belle2/tools/setup_belle2.sh
-WORKDIR=`pwd`
+WORKDIR=$PWD
 cd ${VO_BELLE_SW_DIR}/belle2/releases/$2
 setuprel $2
 cd $WORKDIR

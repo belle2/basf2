@@ -39,115 +39,123 @@ namespace Belle2 {
 //
 //
 //
-REG_MODULE(TRGECL);
+  REG_MODULE(TRGECL);
 //
 //
 //
-string
-TRGECLModule::version() const {
-  return string("TRGECLModule 1.00");
-}
-//
-//
-//
-TRGECLModule::TRGECLModule()
-  : Module::Module(),
-    _debugLevel(0),_ecl(0)
-{
-
-  string desc = "TRGECLModule(" + version() + ")";
-  setDescription(desc);
-
-  addParam("DebugLevel", _debugLevel, "TRGECL debug level", _debugLevel);
-
-  if (TRGDebug::level()){
-    std::cout << "TRGECLModule ... created" << std::endl;
+  string
+  TRGECLModule::version() const
+  {
+    return string("TRGECLModule 1.00");
   }
-}
 //
 //
 //
-TRGECLModule::~TRGECLModule() {
+  TRGECLModule::TRGECLModule()
+    : Module::Module(),
+      _debugLevel(0), _ecl(0)
+  {
 
-  if (TRGDebug::level()){
-    std::cout << "TRGECLModule ... destructed " << std::endl;
+    string desc = "TRGECLModule(" + version() + ")";
+    setDescription(desc);
+    setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
+
+    addParam("DebugLevel", _debugLevel, "TRGECL debug level", _debugLevel);
+
+    if (TRGDebug::level()) {
+      std::cout << "TRGECLModule ... created" << std::endl;
+    }
   }
-}
 //
 //
 //
-void
-TRGECLModule::initialize() {
+  TRGECLModule::~TRGECLModule()
+  {
 
-  TRGDebug::level(_debugLevel);
-
-  if (TRGDebug::level()) {
-    std::cout << "TRGECLModule::initialize ... options" << std::endl;
-    std::cout << TRGDebug::tab(4) << "debug level = " << TRGDebug::level()
-	      << std::endl;
+    if (TRGDebug::level()) {
+      std::cout << "TRGECLModule ... destructed " << std::endl;
+    }
   }
-  //
-  //
-  //
-  m_nRun   = 0 ;
-  m_nEvent = 0 ;
-  m_hitNum = 0;
-  m_hitTCNum = 0;
-}
 //
 //
 //
-void
-TRGECLModule::beginRun() {
+  void
+  TRGECLModule::initialize()
+  {
 
-  if (TRGDebug::level()){
-    std::cout << "TRGECLModule ... beginRun called " << std::endl;
-  }
-  _ecl = TRGECL::getTRGECL();
+    TRGDebug::level(_debugLevel);
 
-}
+    if (TRGDebug::level()) {
+      std::cout << "TRGECLModule::initialize ... options" << std::endl;
+      std::cout << TRGDebug::tab(4) << "debug level = " << TRGDebug::level()
+                << std::endl;
+    }
+    //
+    //
+    //
+    m_nRun   = 0 ;
+    m_nEvent = 0 ;
+    m_hitNum = 0;
+    m_hitTCNum = 0;
+  }
 //
 //
 //
-void
-TRGECLModule::event() {
+  void
+  TRGECLModule::beginRun()
+  {
 
-  if (TRGDebug::level()) {
-    std::cout << "TRGECLMoudle ... event called" << std::endl;
-  }
-  //
-  // simulation
-  //
-  _ecl->initialize(m_nEvent);
-  _ecl->simulate(m_nEvent);
-  printf("TRGECLModule> bitECLtoGDL = %i \n", _ecl->getECLtoGDL());
-  //
-  //
-  //
+    if (TRGDebug::level()) {
+      std::cout << "TRGECLModule ... beginRun called " << std::endl;
+    }
+    _ecl = TRGECL::getTRGECL();
 
-  m_nEvent++;
-  //
-  //
-  //
-}
-//
-//
-//
-void
-TRGECLModule::endRun() {
-  if (TRGDebug::level()){
-    std::cout << "TRGECLModule ... endRun called " << std::endl;
   }
-}
 //
 //
 //
-void
-TRGECLModule::terminate() {
-  if (TRGDebug::level()){
-    std::cout << "TRGECLModule ... terminate called " << std::endl;
+  void
+  TRGECLModule::event()
+  {
+
+    if (TRGDebug::level()) {
+      std::cout << "TRGECLMoudle ... event called" << std::endl;
+    }
+    //
+    // simulation
+    //
+    _ecl->initialize(m_nEvent);
+    _ecl->simulate(m_nEvent);
+    printf("TRGECLModule> bitECLtoGDL = %i \n", _ecl->getECLtoGDL());
+    //
+    //
+    //
+
+    m_nEvent++;
+    //
+    //
+    //
   }
-}
+//
+//
+//
+  void
+  TRGECLModule::endRun()
+  {
+    if (TRGDebug::level()) {
+      std::cout << "TRGECLModule ... endRun called " << std::endl;
+    }
+  }
+//
+//
+//
+  void
+  TRGECLModule::terminate()
+  {
+    if (TRGDebug::level()) {
+      std::cout << "TRGECLModule ... terminate called " << std::endl;
+    }
+  }
 //
 //
 //

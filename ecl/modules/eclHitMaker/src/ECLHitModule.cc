@@ -55,6 +55,8 @@ ECLHitModule::ECLHitModule() : Module()
 //  setDescription("ECLHitMakerModule");
 
   setDescription("ECLHitMakerModule");
+  setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
+
   // Add parameters
   // I/O
   addParam("ECLHitInputColName", m_inColName, "Input Array // Output from g4sim module", string("ECLSimHits"));

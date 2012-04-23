@@ -49,6 +49,7 @@ ECLRecGammaModule::ECLRecGammaModule() : Module()
 {
   //Set module properties
   setDescription("Creates Mdst_gamma from ECLHits.");
+  setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
 
   //input
   addParam("ECLRecCRinput", m_eclRecCRName,

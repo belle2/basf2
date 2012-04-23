@@ -50,6 +50,7 @@ ECLRecCRModule::ECLRecCRModule() : Module()
 {
   //Set module properties
   setDescription("Creates ECLRecCRHits from ECLDigi.");
+  setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
 
   //Parameter definition
   addParam("ECLRecInput", m_eclDigiCollectionName,

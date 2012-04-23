@@ -41,6 +41,7 @@ ECLDigiModule::ECLDigiModule() : Module()
 {
   //Set module properties
   setDescription("Creates ECLDigiHits from ECLHits.");
+  setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
 
   //Parameter definition
   addParam("ECLDigiInput", m_eclHitCollectionName,

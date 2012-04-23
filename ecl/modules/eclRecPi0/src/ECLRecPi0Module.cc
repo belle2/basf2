@@ -52,6 +52,7 @@ ECLRecPi0Module::ECLRecPi0Module() : Module()
 {
   //Set module properties
   setDescription("Creates Mdst_pi0 from Mdst_gamma.");
+  setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
 
   //Set module properties
   setDescription("Creates Mdst_gamma from ECLHits.");

@@ -48,6 +48,7 @@ SVDDigitizerModule::SVDDigitizerModule() : Module(), m_rootFile(0), m_histDiffus
 {
   //Set module properties
   setDescription("Create SVDDigits from SVDSimHits");
+  setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
 
   // Define module parameters
 

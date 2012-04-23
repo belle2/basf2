@@ -58,6 +58,7 @@ namespace Belle2 {
     {
       // Set description()
       setDescription("TOPReconstruction");
+      setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
 
       // Add parameters
       //      addParam("InputColName", m_inColName, "Input collection name",

@@ -83,7 +83,10 @@ namespace Belle2 {
       /** Destroyer class to delete the instance of the RunManager class when the program terminates. */
       class SingletonDestroyer {
       public: ~SingletonDestroyer() {
-          if (RunManager::m_instance != NULL) delete RunManager::m_instance;
+          // Apr.23,2012, R.Itoh
+          // Removal of Singleton Instance was temporarily turned off for parallel processing
+          // Should be re-activated after proper treatment is implemented.
+          //          if (RunManager::m_instance != NULL) delete RunManager::m_instance;
         }
       };
 

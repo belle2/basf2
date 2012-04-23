@@ -20,6 +20,7 @@ REG_MODULE(EKLMReconstruction)
 EKLMReconstructionModule::EKLMReconstructionModule() : Module()
 {
   setDescription("EKLM reconstruction simple module for tests");
+  setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
 }
 
 EKLMReconstructionModule::~EKLMReconstructionModule()

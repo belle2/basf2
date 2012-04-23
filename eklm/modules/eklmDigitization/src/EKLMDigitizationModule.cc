@@ -19,7 +19,7 @@ REG_MODULE(EKLMDigitization)
 EKLMDigitizationModule::EKLMDigitizationModule() : Module()
 {
   setDescription("EKLM digitization module");
-
+  setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
 }
 
 EKLMDigitizationModule::~EKLMDigitizationModule()

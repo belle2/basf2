@@ -44,6 +44,7 @@ PXDDigitizerModule::PXDDigitizerModule() : Module(), m_random(0), m_rootFile(0),
 {
   //Set module properties
   setDescription("Digitize PXDSimHits");
+  setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
   addParam("ElectronicEffects", m_applyNoise,
            "Apply electronic effects?", true);
   addParam("ElectronicNoise", m_elNoise,

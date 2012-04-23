@@ -48,7 +48,7 @@ namespace Belle2 {
     {
       // Set description()
       setDescription("ARICHDigitizer");
-
+      setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
       // Add parameters
       addParam("InputColName", m_inColName, "Input collection name", string("ARICHSimHitArray"));
       addParam("OutputColName", m_outColName, "Output collection name", string("ARICHHitArray"));

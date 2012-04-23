@@ -51,6 +51,7 @@ namespace Belle2 {
     {
       // Set description()
       setDescription("ARICHRec");
+      setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
       std::vector<double> defMerit; defMerit.push_back(30.0); defMerit.push_back(30.0); defMerit.push_back(30.0);
       // Add parameters
       addParam("InputColName", m_inColName, "Input collection name", string("AeroHitARICHArray"));

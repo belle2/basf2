@@ -53,7 +53,7 @@ CDCDigiModule::CDCDigiModule() : Module()
 {
   // Set description
   setDescription("CDCDigiModuletizer");
-
+  setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
   // Add parameters
   // I/O
   addParam("InputColName",                m_inColName, "Input collection name", string("CDCSimHits"));

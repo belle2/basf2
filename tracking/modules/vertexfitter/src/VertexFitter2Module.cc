@@ -46,6 +46,7 @@ public:
 VertexFitter2Module::VertexFitter2Module() : Module()
 {
   setDescription("Integration of VertexFitter Rave (Reconstruction in an Abstract Vertices Environment).");
+  setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
   addParam("GFTracksColName", m_GFTracksColName, "Name of collection holding the GFTrack instances.", std::string(""));
   addParam("RAVEVerticesColName", m_RAVEVerticesColName, "Name of collection holding the rave::Vertex instances.", std::string(""));
   addParam("MCParticlesColName", m_MCParticlesColName, "Name of collection holding the MCParticle instances.", std::string(""));

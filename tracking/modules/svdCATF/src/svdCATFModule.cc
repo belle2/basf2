@@ -32,6 +32,7 @@ svdCATFModule::svdCATFModule() : Module()
 {
   //Set module properties
   setDescription("svdCATFMod module");
+  setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
 
   //Parameter definition
 
@@ -71,7 +72,7 @@ void svdCATFModule::beginRun()
   GearDir sectorIDs(sectorDefs, "sID"); // nimm Pfad von sectorDefs und hänge den zusätzlichen Pfad dran.
 
   int nSecIDs = sectorIDs.getNumberNodes();
-  if (nSecIDs != m_numUColumns*m_numVColumns) {
+  if (nSecIDs != m_numUColumns * m_numVColumns) {
     B2FATAL("CA-trackfinder: /tracking/data/SVDSectors.xml is set wrong, please repair it.");
   }
   for (int aSecID = 1; aSecID <= nSecIDs; ++aSecID) {
@@ -116,7 +117,7 @@ void svdCATFModule::beginRun()
           // füllen sektoren mit Coordinfos... hier sind sie aber nicht mehr normiert, sondern einfach lokale coords (besser zum schnellen Einsortieren der Hits)
           SectorID sectorID(geometry->getSensorUniID(aLayer, aLadder, aSensor), aSector);
           // Beim Zugriff auf ein Element wird automatisch eines erstellt sollte es noch nicht vorhanden sein.
-          Sector &sector = m_sectors[sectorID];
+          Sector& sector = m_sectors[sectorID];
 
           // füllen sektoren mit friends... muss natürlich aus der xml-datei brav einzeln ausgelesen werden, wird daher ein relativ langsamer Prozess werden.
           GearDir friends(xmlLadders, "Friend");

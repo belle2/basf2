@@ -37,6 +37,7 @@ TrackingOutputModule::TrackingOutputModule() : Module()
 {
   //Set module properties
   setDescription("This is an auxiliary output module for tracking. It can be used after pattern recognition and fitting and uses the MC information, the Tracks from fitting the MC Information and the Tracks from fitting the pattern recognition tracks. The results are stored in a TrackingOutput objects, the collection can be written out using SimpleOutputModule.");
+  setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
 
   //Parameter definition
 

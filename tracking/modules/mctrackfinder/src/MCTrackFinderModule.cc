@@ -48,6 +48,7 @@ MCTrackFinderModule::MCTrackFinderModule() : Module()
 {
   //Set module properties
   setDescription("Uses the MC information to create GFTrackCandidates for primary MCParticles and Relations between them.  Fills the created GFTrackCandidates with all information (start values, hit indices) needed for the fitting.");
+  setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
 
   //Parameter definition
 

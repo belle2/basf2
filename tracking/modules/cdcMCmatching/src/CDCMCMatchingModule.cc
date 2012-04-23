@@ -32,6 +32,7 @@ CDCMCMatchingModule::CDCMCMatchingModule() :
   Module()
 {
   setDescription("Matches the GFTrackCandidates with MCTruth to evaluate the performance of pattern recognition. Assigns to each GFTrackCandidate an ID of the MCParticles which contributed the largest amount of hits to this track candidate.");
+  setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
 
   //the collection names as parameters may soon be obsolete if we will always use the default names created automatically
 

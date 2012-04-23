@@ -46,6 +46,7 @@ ExtrapolateToSVDModule::ExtrapolateToSVDModule() :
 
   setDescription(
     "Uses Tracks found (and fitted) in the CDC and extrapolates them to the SVD. Adds the most probable SVD hit candidates to the Tracks and creates new GFTrackCands collection. Execute GenFitter again after this module to refit these track candidates.");
+  setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
 
   //input
   addParam("GFTracksColName", m_gfTracksColName, "Name of collection holding the GFTracks found in the CDC and fitted with GenFitter", string(""));

@@ -48,6 +48,7 @@ REG_MODULE(CDCTracking)
 CDCTrackingModule::CDCTrackingModule() : Module()
 {
   setDescription("Performs the pattern recognition in the CDC with the conformal finder: digitized CDCHits are combined to track candidates (GFTrackCand). (Works for tracks momentum > 0.5 GeV, no curl track finder included yet).");
+  setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
 
   addParam("CDCSimHitsColName", m_cdcSimHitsColName, "Input CDCSimHits collection (only for cross check)", string("CDCSimHits"));
   addParam("CDCHitsColName", m_cdcHitsColName, "Input CDCHits collection (should be created by CDCDigi module)", string("CDCHits"));

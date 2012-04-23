@@ -26,6 +26,7 @@ REG_MODULE(CDCSimpleBackground)
 CDCSimpleBackgroundModule::CDCSimpleBackgroundModule() : Module()
 {
   setDescription("The CDCSimpleBackgroundModule generates random hits in the CDC (approximatly 1/r distribution) to emulate background. It adds digitized CDCHits to the CDCHits array.");
+  setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
 
   addParam("CDCHitsColName", m_cdcHitsColName, "Name of collection holding the digitized CDCHits, new CDCHits will be added to this array", string("CDCHits"));
   addParam("BGLevelHits", m_hits, "Percentage of wires hit by background through single hits", 2.0);
@@ -68,8 +69,8 @@ void CDCSimpleBackgroundModule::event()
   int counter = cdcHits->GetLast() + 1; //counter for the additional hits
 
   //cdc geometry parameters information
-  CDCGeometryPar * cdcgp = CDCGeometryPar::Instance();
-  CDCGeometryPar & cdcg(*cdcgp);
+  CDCGeometryPar* cdcgp = CDCGeometryPar::Instance();
+  CDCGeometryPar& cdcg(*cdcgp);
 
   //initialize variables which describe a CDCHit
   int superlayerId = -999;        //0 - 8

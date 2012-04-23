@@ -69,6 +69,7 @@ GenFitter2Module::GenFitter2Module() :
   Module()
 {
   setDescription("Simplified trackfit module for debugging and testing new features before they go into the official GenFitter");
+  setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
   addParam("useDaf", m_useDaf, "use the DAF instead of the std. Kalman filter", false);
   addParam("blowUpFactor", m_blowUpFactor, "factor multiplied with the cov of the Kalman filter when backward filter starts", 500.0);
   addParam("filter", m_filter, "throw away tracks with do not have exactly 1 hit in every Si layer", false);

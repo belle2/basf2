@@ -57,6 +57,7 @@ REG_MODULE(Ext)
 ExtModule::ExtModule() : Module(), m_extMgr(NULL)    // no ExtManager yet
 {
   setDescription("Extrapolates tracks from CDC to outer detectors using geant4e");
+  setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
   addParam("GFTracksColName", m_gfTracksColName, "Name of collection holding the reconstructed tracks", string(""));
   addParam("ExtTrackCandsColName", m_extTrackCandsColName, "Name of collection holding the list of hits from each extrapolation", string(""));
   addParam("ExtRecoHitsColName", m_extRecoHitsColName, "Name of collection holding the RecoHits from the extrapolation", string(""));

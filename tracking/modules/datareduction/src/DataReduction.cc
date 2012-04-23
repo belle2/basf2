@@ -43,6 +43,7 @@ DataReductionModule::DataReductionModule() : Module()
 {
   //Processor description
   setDescription("DataReduction of PXD readout by using the concept of fast hough transformation on digitized SVD hits");
+  setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
 
   //Input Collections
   /*
@@ -117,30 +118,30 @@ void DataReductionModule::initialize()
   int num = 60;
   double opening = 2.0 * M_PI / num;
   for (int i = 0; i < num; i++) {
-    _sectorList->push_back(new SectorStraight(opening*i, 0, 2, opening*1.1));
+    _sectorList->push_back(new SectorStraight(opening * i, 0, 2, opening * 1.1));
   }
   for (int i = 0; i < num; i++) {
-    _sectorList->push_back(new SectorArc(opening*i, 2, 2, 75, 105));
+    _sectorList->push_back(new SectorArc(opening * i, 2, 2, 75, 105));
     _sectorList->back()->setColor(0, 0.8, 0);
   }
   for (int i = 0; i < num; i++) {
-    _sectorList->push_back(new SectorArc(opening*i, 2, 2, -75, -105));
+    _sectorList->push_back(new SectorArc(opening * i, 2, 2, -75, -105));
     _sectorList->back()->setColor(0, 0.8, 0);
   }
   for (int i = 0; i < num; i++) {
-    _sectorList->push_back(new SectorArc(opening*i, 2, 2, 100, 160));
+    _sectorList->push_back(new SectorArc(opening * i, 2, 2, 100, 160));
     _sectorList->back()->setColor(0.8, 0.8, 0);
   }
   for (int i = 0; i < num; i++) {
-    _sectorList->push_back(new SectorArc(opening*i, 2, 2, -100, -160));
+    _sectorList->push_back(new SectorArc(opening * i, 2, 2, -100, -160));
     _sectorList->back()->setColor(0.8, 0.8, 0);
   }
   for (int i = 0; i < num; i++) {
-    _sectorList->push_back(new SectorArc(opening*i, 2, 2, 150, 415));
+    _sectorList->push_back(new SectorArc(opening * i, 2, 2, 150, 415));
     _sectorList->back()->setColor(0.8, 0, 0);
   }
   for (int i = 0; i < num; i++) {
-    _sectorList->push_back(new SectorArc(opening*i, 2, 2, -150, -415));
+    _sectorList->push_back(new SectorArc(opening * i, 2, 2, -150, -415));
     _sectorList->back()->setColor(0.8, 0, 0);
   }
   /*_sectorList->back()->setColor(0,0.8,0);
@@ -313,7 +314,7 @@ void DataReductionModule::event()
 //3)
 
 #ifdef CAIRO_OUTPUT
-  cairo_pdf_surface_set_size(cairo_surface, 2*CAIRO_SIZE, 2*CAIRO_SIZE);
+  cairo_pdf_surface_set_size(cairo_surface, 2 * CAIRO_SIZE, 2 * CAIRO_SIZE);
 #endif
 
 
@@ -324,8 +325,8 @@ void DataReductionModule::event()
   sinehough.setMinHoughBoxSizeParamB(1.0e-4);//5.0e-2;
 
   for (SectorList::iterator sectorIter = _sectorList->begin(); sectorIter != _sectorList->end(); sectorIter++) {
-    SectorBasic &sect = **sectorIter;
-    SectorArc *arc = dynamic_cast<SectorArc*>(*sectorIter);
+    SectorBasic& sect = **sectorIter;
+    SectorArc* arc = dynamic_cast<SectorArc*>(*sectorIter);
     if (arc != 0) {
       sinehough.setRadius(fabs(arc->getSmallRadius()), fabs(arc->getBigRadius()));
       currhough = &sinehough;
@@ -349,7 +350,7 @@ void DataReductionModule::event()
       cairo_restore(cairo);
       cairo_save(cairo);
       cairo_translate(cairo, 0, CAIRO_SIZE);
-      cairo_plot(cairo, -300, 350, 0, 150, 2*CAIRO_SIZE, CAIRO_SIZE);
+      cairo_plot(cairo, -300, 350, 0, 150, 2 * CAIRO_SIZE, CAIRO_SIZE);
       currhough->drawRZ(cairo);
       cairo_restore(cairo);
       cairo_show_page(cairo);
@@ -360,20 +361,20 @@ void DataReductionModule::event()
   int pxwidth = 13;
   int pxheight = 120;
   double pxscale = 3;
-  cairo_pdf_surface_set_size(cairo_surface, (pxwidth*pxscale + 1)*_pxdLadderList->size() + 1, pxheight*pxscale + 2);
+  cairo_pdf_surface_set_size(cairo_surface, (pxwidth * pxscale + 1)*_pxdLadderList->size() + 1, pxheight * pxscale + 2);
   int nl = 0;
 #endif
 
   for (PXDLadderList::iterator it = _pxdLadderList->begin(); it != _pxdLadderList->end(); it++) {
-    PXDLadder &l = **it;
+    PXDLadder& l = **it;
     TVector3 p = l.getPosition();
     TVector3 s = 0.5 * l.getSize();
     TVector3 n = l.getNormal();
 #ifdef CAIRO_OUTPUT
     cairo_save(cairo);
     cairo_set_line_width(cairo, 1);
-    cairo_translate(cairo, nl*(pxwidth*pxscale + 1) + 1, pxheight*pxscale + 1);
-    cairo_scale(cairo, pxscale*s(0)*2, -s(2)*pxscale*2);
+    cairo_translate(cairo, nl * (pxwidth * pxscale + 1) + 1, pxheight * pxscale + 1);
+    cairo_scale(cairo, pxscale * s(0) * 2, -s(2)*pxscale * 2);
     cairo_rectangle(cairo, 0, 0, 1, 1);
     cairo_set_source_rgb(cairo, 0, 0, 0);
     cairo_stroke_abs(cairo, true);
@@ -384,7 +385,7 @@ void DataReductionModule::event()
     cairo_color color(0, 0, 0);
 
     for (list<RegionOfInterest*>::iterator itR = l.getRegionList().begin(); itR != l.getRegionList().end(); itR++) {
-      RegionOfInterest &r = **itR;
+      RegionOfInterest& r = **itR;
       if (r.color != color) {
         cairo_set_source_rgba(cairo, color, 0.3);
         color = r.color;
@@ -429,7 +430,7 @@ void DataReductionModule::event()
 #ifdef CAIRO_OUTPUT
       cairo_save(cairo);
       cairo_scale(cairo, 1.0 / 250, 1.0 / 1600);
-      cairo_arc(cairo, hitPosNorm.X()*250, hitPosNorm.Y()*1600, 3, 0, 2*M_PI);
+      cairo_arc(cairo, hitPosNorm.X() * 250, hitPosNorm.Y() * 1600, 3, 0, 2 * M_PI);
       cairo_fill(cairo);
       cairo_restore(cairo);
 #endif
@@ -470,7 +471,7 @@ void DataReductionModule::event()
 #ifdef CAIRO_OUTPUT
       cairo_save(cairo);
       cairo_scale(cairo, 1.0 / 250, 1.0 / 1600);
-      cairo_arc(cairo, hitPosNorm.X()*250, hitPosNorm.Y()*1600, 3, 0, 2*M_PI);
+      cairo_arc(cairo, hitPosNorm.X() * 250, hitPosNorm.Y() * 1600, 3, 0, 2 * M_PI);
       cairo_set_source_rgb(cairo, 0, 1, 0);
       cairo_fill(cairo);
       cairo_restore(cairo);

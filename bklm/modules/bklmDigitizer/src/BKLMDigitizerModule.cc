@@ -36,7 +36,7 @@ BKLMDigitizerModule::BKLMDigitizerModule() : Module()
 
   //! Set description
   setDescription("BKLMDigitizerModule");
-
+  setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
 }
 
 BKLMDigitizerModule::~BKLMDigitizerModule()

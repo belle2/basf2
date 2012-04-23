@@ -17,7 +17,7 @@ REG_MODULE(BKLMReconstruction)
 BKLMReconstructionModule::BKLMReconstructionModule() : Module()
 {
   setDescription("BKLM reconstruction simple module for tests");
-
+  setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
 }
 
 BKLMReconstructionModule::~BKLMReconstructionModule()

@@ -94,7 +94,7 @@ def configure_system(conf):
     # TEve
     conf.env['HAS_TEVE'] = False
     conf.env['TEVE_LIBS'] = []
-    if conf.CheckFile(os.path.join(conf.env['EXTLIBDIR'], 'libEve.so')):
+    if conf.CheckFile(os.path.join(os.environ['ROOTSYS'], 'lib', 'libEve.so')):
         conf.env['HAS_TEVE'] = True
         conf.env['TEVE_LIBS'] = ['Gui', 'Eve', 'Ged', 'RGL', 'TreePlayer']
 

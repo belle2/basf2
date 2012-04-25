@@ -16,7 +16,7 @@
 #include <vector>
 #include "TObject.h"
 
-#define MAXEVTMSG   4000000*4         // 4Mwords
+#define MAXEVTMSG   100000000*4         // 400Mwords
 
 namespace Belle2 {
   /*! A class to encode/decode an EvtMessage */

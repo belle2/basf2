@@ -81,7 +81,7 @@ void SeqRootInputModule::event()
     delete m_file;
     return;
   } else {
-    printf("SeqRootInput : read = %d\n", size);
+    //    printf("SeqRootInput : read = %d\n", size);
     evtmsg = new EvtMessage(evtbuf);
   }
 
@@ -101,7 +101,7 @@ void SeqRootInputModule::event()
 
   delete evtbuf;
 
-  printf("size of objlist = %d\n", objlist.size());
+  //  printf("size of objlist = %d\n", objlist.size());
 
   // Clear arrays
   //  DataStore::Instance().clearMaps(DataStore::c_Event);
@@ -125,6 +125,7 @@ void SeqRootInputModule::event()
   }
   //  B2INFO ( "Event received : " << m_nrecv++ )
 
+  /*
   // Check objects in DataStore
   // 1. Stored Objects
   const DataStore::StoreObjMap& objmap = DataStore::Instance().getObjectMap(durability);
@@ -136,6 +137,7 @@ void SeqRootInputModule::event()
   for (DataStore::StoreObjConstIter it = arymap.begin(); it != arymap.end(); ++it) {
     printf("Check Array : %s\n", (it->first).c_str());
   }
+  */
 }
 
 void SeqRootInputModule::endRun()

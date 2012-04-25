@@ -76,7 +76,8 @@ void SeqRootOutputModule::event()
 
   // Store EvtMessage
   int stat = m_file->write(msg->buffer());
-  printf("SeqRootOuput : write = %d\n", stat);
+  //  printf("SeqRootOuput : write = %d\n", stat);
+
   //  int sizebuf = htonl(msg->size());
   //  unsigned long sizebuf = (unsigned int)msg->size();
   //  int is = write ( m_fd, &sizebuf, 4 );

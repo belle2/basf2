@@ -31,7 +31,7 @@ SimpleInputModule::SimpleInputModule() : Module()
 {
   //Set module properties
   setDescription("This module reads objects/arrays from a root file and writes them into the DataStore.");
-  setPropertyFlags(c_Input);
+  setPropertyFlags(c_Input | c_InitializeInProcess);
 
   //Initialization of some member variables
   for (int jj = 0; jj < DataStore::c_NDurabilityTypes; jj++) {

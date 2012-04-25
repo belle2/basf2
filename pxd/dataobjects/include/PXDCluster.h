@@ -108,7 +108,7 @@ namespace Belle2 {
     unsigned short m_uStart;   /**< Start column of the cluster */
     unsigned short m_vStart;   /**< Start row of the cluster */
 
-    ClassDef(PXDCluster, 1)
+    ClassDef(PXDCluster, 2)
   };
 
   /** @}*/

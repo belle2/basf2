@@ -1,5 +1,5 @@
 //+
-// File : rawheader.h
+// File : RawHeader.h
 // Description : pseudo raw data header for test
 //
 // Author : Ryosuke Itoh, IPNS, KEK
@@ -9,9 +9,13 @@
 #ifndef RAWHEADER_H
 #define RAWHEADER_H
 
+#include <string.h>
+
 #include <framework/datastore/DataStore.h>
 
 #include <TObject.h>
+
+#define HEADER_SIZE 16
 
 namespace Belle2 {
 
@@ -20,26 +24,18 @@ namespace Belle2 {
     //! Default constructor
     RawHeader();
     //! Constructor using existing pointer to raw data buffer
-    RawHeader(int nwords, unsigned int*);
+    RawHeader(unsigned int*);
     //! Destructor
     ~RawHeader();
 
-    //! copy rawdata into internal buffer
-    void copy(int nwords, unsigned int*);
-
-    //! allocate buffer
-    unsigned int* allocate_buffer(int nwords);
-
-    //! get buffer
-    unsigned int* get_buffer();
+    //! Get header contents
+    unsigned int* header(void);
 
     //! set buffer
-    void set_buffer(int, unsigned int*);
+    void header(unsigned int* hdr);
 
   private:
-    unsigned int* m_buffer;
-    int m_nwords;
-    bool m_allocated;
+    unsigned int m_header[HEADER_SIZE];
 
     ClassDef(RawHeader, 1);
   };

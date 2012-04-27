@@ -30,8 +30,7 @@ typedef HepGeom::Point3D<double>  Point3D;
 typedef HepGeom::Vector3D<double>  Vector3D;
 
 class TRGCDC;
-class TRGCDCWireHit;
-class TRGCDCWireHitMC;
+class TRGCDCCellHit;
 class TRGCDCTrackSegment;
 
 /// A class to represent a wire in CDC.
@@ -124,6 +123,11 @@ class TRGCDCCell {
     /// returns cell size in phi.
     float cellSize(void) const;
 
+  public:// event by event information.
+
+    /// returns a pointer to a TRGCDCSegmentHit.
+    const TRGCDCCellHit * hit(void) const;
+
   public:// Obsolete functions from Belle
 
     /// returns true if this wire is in the inner part.
@@ -139,6 +143,9 @@ class TRGCDCCell {
 
     /// clears information.
     virtual void clear(void);
+
+    /// sets a pointer to TRGCDCWireHit.
+    const TRGCDCCellHit * hit(const TRGCDCCellHit *);
 
   private:
 
@@ -165,6 +172,9 @@ class TRGCDCCell {
 
     /// Status in this event.
     unsigned _state;
+
+    /// Cell hit.
+    const TRGCDCCellHit * _hit;
 
     /// Complete access from TRGCDC.
     friend class TRGCDC;
@@ -270,6 +280,7 @@ inline
 void
 TRGCDCCell::clear(void) {
     _state = 0;
+    _hit = 0;
 }
 
 inline
@@ -312,6 +323,18 @@ inline
 const Vector3D &
 TRGCDCCell::direction(void) const {
     return _direction;
+}
+
+inline
+const TRGCDCCellHit *
+TRGCDCCell::hit(void) const {
+    return _hit;
+}
+
+inline
+const TRGCDCCellHit *
+TRGCDCCell::hit(const TRGCDCCellHit * a) {
+    return _hit = a;
 }
 
 } // namespace Belle2

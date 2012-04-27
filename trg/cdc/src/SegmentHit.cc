@@ -14,6 +14,7 @@
 #define TRG_SHORT_NAMES
 #define TRGCDC_SHORT_NAMES
 
+#include <stdlib.h>
 #include "trg/cdc/Segment.h"
 #include "trg/cdc/SegmentHit.h"
 #include "trg/cdc/Wire.h"

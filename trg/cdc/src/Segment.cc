@@ -41,8 +41,7 @@ TRGCDCSegment::TRGCDCSegment(unsigned id,
 	     w.backwardPosition()),
       _lut(lut),
       _wires(cells),
-      _signal(std::string("TS_") + TRGUtil::itostring(id)),
-      _hit(0) {
+      _signal(std::string("TS_") + TRGUtil::itostring(id)) {
 }
 
 TRGCDCSegment::~TRGCDCSegment() {
@@ -102,10 +101,9 @@ TRGCDCSegment::dump(const string & msg,
   
 void
 TRGCDCSegment::clear(void) {
-    _signal.clear();
     TCCell::clear();
+    _signal.clear();
     _hits.clear();
-    _hit = 0;
 }
 
 string

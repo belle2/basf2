@@ -35,8 +35,6 @@ TRGCDCWire::TRGCDCWire(unsigned id,
                        const P3D & fp,
                        const P3D & bp)
     : TCCell(id, localId, l, fp, bp),
-//      _segment(0),
-      _hit(0),
       _mcHits(),
       _triggerOutput() {
     _triggerOutput.name(name() + string("to"));
@@ -366,7 +364,6 @@ TRGCDCWire::neighbor(unsigned i) const {
 void
 TRGCDCWire::clear(void) {
     TCCell::clear();
-    _hit = 0;
 
     for (unsigned i = 0; i < _mcHits.size(); i++)
         delete _mcHits[i];
@@ -390,7 +387,7 @@ TRGCDCWire::name(void) const {
 
 const TRGSignal &
 TRGCDCWire::triggerOutput(void) const {
-    if (! _hit) {
+    if (! hit()) {
         return _triggerOutput;
     }
     else {
@@ -400,7 +397,7 @@ TRGCDCWire::triggerOutput(void) const {
 
         //...Drift legnth(micron) to drift time(ns)...
         //   coefficient used here must be re-calculated.
-        float driftTime = _hit->drift() * 10 * 1000 / 40;
+        float driftTime = hit()->drift() * 10 * 1000 / 40;
         
 //      cout << name() << " drift=" << _hit->drift() << endl;
 

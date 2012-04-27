@@ -89,11 +89,11 @@ class TRGCDCWire : public TRGCDCCell {
     /// clears information.
     void clear(void);
 
-    /// sets a pointer to TRGCDCWireHit.
-    const TRGCDCWireHit * hit(const TRGCDCWireHit * const);
+    /// returns a pointer to a TRGCDCWireHit.
+    const TRGCDCWireHit * hit(const TRGCDCWireHit *);
 
     /// appends a pointer to TRGCDCWireHitMC.
-    const TRGCDCWireHitMC * hit(TRGCDCWireHitMC * const);
+    const TRGCDCWireHitMC * hit(TRGCDCWireHitMC *);
 
   public:// TRG
 
@@ -101,9 +101,6 @@ class TRGCDCWire : public TRGCDCCell {
     const TRGSignal & triggerOutput(void) const;
 
   private:
-
-    /// Wire hit.
-    const TRGCDCWireHit * _hit;
 
     /// MC wire hit.
 //  std::vector<const TRGCDCWireHitMC * const> _mcHits;
@@ -120,14 +117,14 @@ class TRGCDCWire : public TRGCDCCell {
 
 inline
 const TRGCDCWireHit *
-TRGCDCWire::hit(const TRGCDCWireHit * const h) {
-    return _hit = h;
+TRGCDCWire::hit(const TRGCDCWireHit * h) {
+    return (const TRGCDCWireHit *) TRGCDCCell::hit((const TRGCDCCellHit *) h);
 }
 
 inline
 const TRGCDCWireHit *
 TRGCDCWire::hit(void) const {
-    return _hit;
+    return (const TRGCDCWireHit *) TRGCDCCell::hit();
 }
 
 inline

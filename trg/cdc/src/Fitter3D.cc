@@ -356,6 +356,7 @@ namespace Belle2 {
           //const TCSegment & s = * (TCSegment *) links[0]->hit();
           const TRGCDCCell *s = & links[0]->hit()->cell();
           phi[i]=(double) s->localId()/ni[i]*4*M_PI;
+	  s->hit()->drift();
         }
 
         //...Do fitting job here (or call a fitting function)...

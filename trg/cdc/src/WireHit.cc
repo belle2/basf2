@@ -14,6 +14,7 @@
 #define TRG_SHORT_NAMES
 #define TRGCDC_SHORT_NAMES
 
+#include <stdlib.h>
 #include "framework/datastore/StoreArray.h"
 #include "trg/cdc/Wire.h"
 #include "trg/cdc/WireHit.h"

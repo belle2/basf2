@@ -39,7 +39,8 @@ TRGCDCCell::TRGCDCCell(unsigned id,
       _forwardPosition(fp),
       _backwardPosition(bp),
       _direction((fp - bp).unit()),
-      _state(0) {
+      _state(0),
+      _hit(0) {
 }
 
 TRGCDCCell::~TRGCDCCell() {

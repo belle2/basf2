@@ -27,6 +27,7 @@ class TRGSignal;
 class TRGCDCWire;
 class TRGCDCLayer;
 class TRGCDCLUT;
+class TRGCDCWireHit;
 class TRGCDCSegmentHit;
 
 /// A class to represent a wire in CDC.
@@ -112,9 +113,6 @@ class TRGCDCSegment : public TRGCDCCell {
     /// Wire hits.
     std::vector<const TRGCDCWireHit *> _hits;
 
-    /// Track segment hit.
-    const TRGCDCSegmentHit * _hit;
-
   // Friends
     friend class TRGCDC;
 };
@@ -143,14 +141,15 @@ TRGCDCSegment::triggerOutput(void) const {
 
 inline
 const TRGCDCSegmentHit *
-TRGCDCSegment::hit(const TRGCDCSegmentHit * const h) {
-    return _hit = h;
+TRGCDCSegment::hit(const TRGCDCSegmentHit * h) {
+    return (const TRGCDCSegmentHit *)
+	TRGCDCCell::hit((const TRGCDCCellHit *) h);
 }
 
 inline
 const TRGCDCSegmentHit *
 TRGCDCSegment::hit(void) const {
-    return _hit;
+    return  (const TRGCDCSegmentHit *) TRGCDCCell::hit();
 }
 
 inline

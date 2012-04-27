@@ -38,6 +38,17 @@ EvtMessage* EvtSocketSend::recv()
   return evt;
 }
 
+int EvtSocketSend::send_buffer(int nbytes, char* buf)
+{
+  return m_sock->put(buf, nbytes);
+}
+
+int EvtSocketSend::recv_buffer(char* buf)
+{
+  int stat = m_sock->get(buf, MAXEVTSIZE);
+  return stat;
+}
+
 // EvtSocketRecv
 
 EvtSocketRecv::EvtSocketRecv(int port)
@@ -65,4 +76,15 @@ EvtMessage* EvtSocketRecv::EvtSocketRecv::recv()
 int EvtSocketRecv::send(EvtMessage* msg)
 {
   return m_sock->put((char*)msg->buffer(), msg->size());
+}
+
+int EvtSocketRecv::send_buffer(int nbytes, char* buf)
+{
+  return m_sock->put(buf, nbytes);
+}
+
+int EvtSocketRecv::recv_buffer(char* buf)
+{
+  int stat = m_sock->get(buf, MAXEVTSIZE);
+  return stat;
 }

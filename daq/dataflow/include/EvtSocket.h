@@ -27,6 +27,9 @@ public:
   int send(EvtMessage* msg);
   EvtMessage* recv(void);
 
+  int send_buffer(int size, char* buf);
+  int recv_buffer(char* buf);
+
 private:
   SocketSend* m_sock;
   char* m_recbuf;
@@ -41,6 +44,9 @@ public:
 
   int send(EvtMessage* msg);
   EvtMessage* recv(void);
+
+  int send_buffer(int size, char* buf);
+  int recv_buffer(char* buf);
 
 private:
   SocketRecv* m_sock;

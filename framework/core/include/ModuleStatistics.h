@@ -105,13 +105,16 @@ namespace Belle2 {
     public:
       /** Default constructor to reset values */
       Statistics(const std::string& name = ""): m_name(name) { clear(); }
+
       /** Clear all counters */
       void clear() {
         memset(m_times.c_array(), 0, m_times.size()*sizeof(double));
         memset(m_calls.c_array(), 0, m_calls.size()*sizeof(unsigned int));
       }
+
       /** Get name of statistics object */
       std::string getName() const { return m_name; }
+
       /**
        * Get accumulated time for a given counter type
        * @param type which counter to return. c_Total returns the sums of all other counters
@@ -120,6 +123,7 @@ namespace Belle2 {
         if (type >= c_Total) return std::accumulate(m_times.begin(), m_times.end(), 0.0);
         return m_times[type];
       }
+
       /**
        * Get accumulated calls for a given counter type
        * @param type which counter to return. c_Total returns the sums of all other counters
@@ -131,8 +135,10 @@ namespace Belle2 {
     protected:
       /** Name of the module */
       std::string m_name;
+
       /** Time spent in functions */
       boost::array<double, c_Total> m_times;
+
       /** Number of calls to functions */
       boost::array<unsigned int, c_Total> m_calls;
 
@@ -149,40 +155,48 @@ namespace Belle2 {
      * Start to measure global time
      * @param mode    Which counter to increase
      */
-    void startGlobal(ECounters mode = c_Event) {
+    void startGlobal() {
       m_globalStart = Utils::getClock();
     }
 
-    /**
-     * Stop to measure global time
-     * @param mode    Which counter to increase
-     * @param suspend If true, time will be increased but call count will remain unchanged
+    /** Stop to measure global time, increase counters; defined as inline to save some context switches.
+     *  @param mode     Which counter to increase.
+     *  @param suspend  If true, time will be increased but call count will remain unchanged.
      */
-    void stopGlobal(ECounters mode = c_Event, bool suspend = false);
+    inline void stopGlobal(ECounters mode = c_Event, bool suspend = false) {
+      double elapsed = (Utils::getClock() - m_globalStart) / Unit::s;
+      m_global.m_times[mode] += elapsed;
+      if (!suspend) { ++m_global.m_calls[mode];}
+    }
 
     /**
      * Start to measure time
      * @param module Module the time will be attributed to
      * @param mode   Which counter to increase
      */
-    void startModule(const Module &module, ECounters mode = c_Event) {
+    void startModule() {
       m_moduleStart = Utils::getClock();
     }
 
-    /**
-     * Stop to measure time
-     * @param module Module the time will be attributed to
-     * @param mode   Which counter to increase
-     * @param suspend If true, time will be increased but call count will remain unchanged
+    /** Stop to measure time and increase counters; defined as inline to save some context switches.
+     *  @param module   Module the time will be attributed to.
+     *  @param mode     Which counter to increase.
+     *  @param suspend  If true, time will be increased but call count will remain unchanged.
      */
-    void stopModule(const Module &module, ECounters mode = c_Event, bool suspend = false);
+    inline void stopModule(const Module& module, ECounters mode = c_Event, bool suspend = false) {
+      Statistics& stats = m_modules[&module];
+      double elapsed = (Utils::getClock() - m_moduleStart) / Unit::s;
+      if (mode == c_Init && stats.m_name.empty()) { stats.m_name = module.getName();}
+      stats.m_times[mode] += elapsed;
+      if (!suspend) ++stats.m_calls[mode];
+    }
 
     /**
      * Return string with statistics for all modules
      * @param type    counter type to use for statistics
      * @param modules map of modules to use. If NULL, default map will be used
      */
-    std::string getStatistics(ECounters type = c_Event, StatisticsMap *modules = 0);
+    std::string getStatistics(ECounters type = c_Event, StatisticsMap* modules = 0);
 
     /**
      * Return string with statistics for selected modules
@@ -203,7 +217,7 @@ namespace Belle2 {
      *               to be defined
      * @param name   Name to show in statistics
      */
-    void setModuleName(const ModulePtr &module, const std::string &name) {
+    void setModuleName(const ModulePtr& module, const std::string& name) {
       m_modules[module.get()].m_name = name;
     }
 
@@ -212,7 +226,7 @@ namespace Belle2 {
      * @param module Shared pointer to the Module for which the
      *               statistics should be obtained
      */
-    const Statistics &get(const ModulePtr &module) {
+    const Statistics& get(const ModulePtr& module) {
       return m_modules[module.get()];
     }
 
@@ -229,9 +243,9 @@ namespace Belle2 {
     /** Default constructor */
     ModuleStatistics(): m_moduleStart(0), m_globalStart(0), m_global("_global_") {}
     /** Singleton, hide copy constructor*/
-    ModuleStatistics(const ModuleStatistics &b) {}
+    ModuleStatistics(const ModuleStatistics& b);
     /** Singleton, hide assignment operator*/
-    ModuleStatistics& operator=(ModuleStatistics &b) { return *this; }
+    ModuleStatistics& operator=(ModuleStatistics& b);
 
     double m_moduleStart;
     double m_globalStart;
@@ -240,24 +254,6 @@ namespace Belle2 {
     /** Statistical information for all Modules */
     StatisticsMap m_modules;
   };
-
-  /** Increase counters. Defined as inline to save some context switches */
-  inline void ModuleStatistics::stopModule(const Module &module, ECounters mode, bool suspend)
-  {
-    Statistics &stats = m_modules[&module];
-    double elapsed = (Utils::getClock() - m_moduleStart) / Unit::s;
-    if (mode == c_Init && stats.m_name.empty()) stats.m_name = module.getName();
-    stats.m_times[mode] += elapsed;
-    if (!suspend) ++stats.m_calls[mode];
-  }
-
-  /** Increase counters. Defined as inline to save some context switches */
-  inline void ModuleStatistics::stopGlobal(ECounters mode, bool suspend)
-  {
-    double elapsed = (Utils::getClock() - m_globalStart) / Unit::s;
-    m_global.m_times[mode] += elapsed;
-    if (!suspend) ++m_global.m_calls[mode];
-  }
 
 } //end namespace Belle2
 

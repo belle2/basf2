@@ -469,7 +469,7 @@ void pEventProcessor::pProcessInitialize(const ModulePtrList& modulePathList)
   LogSystem& logSystem = LogSystem::Instance();
   ModulePtrList::const_iterator listIter;
   ModuleStatistics& stats = ModuleStatistics::getInstance();
-  stats.startGlobal(ModuleStatistics::c_Init);
+  stats.startGlobal();
 
   for (listIter = modulePathList.begin(); listIter != modulePathList.end(); listIter++) {
     Module* module = listIter->get();
@@ -483,7 +483,7 @@ void pEventProcessor::pProcessInitialize(const ModulePtrList& modulePathList)
     logSystem.setModuleLogConfig(&(module->getLogConfig()), module->getName());
 
     //Do initialization
-    stats.startModule(*module, ModuleStatistics::c_Init);
+    stats.startModule();
     module->initialize();
     stats.stopModule(*module, ModuleStatistics::c_Init);
 

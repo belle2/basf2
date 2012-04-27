@@ -87,7 +87,7 @@ void EventProcessor::processInitialize(const ModulePtrList& modulePathList)
   LogSystem& logSystem = LogSystem::Instance();
   ModulePtrList::const_iterator listIter;
   ModuleStatistics& stats = ModuleStatistics::getInstance();
-  stats.startGlobal(ModuleStatistics::c_Init);
+  stats.startGlobal();
   DataStore::Instance().setInitializeActive(true);
 
   for (listIter = modulePathList.begin(); listIter != modulePathList.end(); listIter++) {
@@ -102,7 +102,7 @@ void EventProcessor::processInitialize(const ModulePtrList& modulePathList)
     logSystem.setModuleLogConfig(&(module->getLogConfig()), module->getName());
 
     //Do initialization
-    stats.startModule(*module, ModuleStatistics::c_Init);
+    stats.startModule();
     module->initialize();
     stats.stopModule(*module, ModuleStatistics::c_Init);
 
@@ -141,7 +141,7 @@ void EventProcessor::processCore(PathPtr startPath, const ModulePtrList& moduleP
 
   //Loop over the events
   while (!endProcess) {
-    stats.startGlobal(ModuleStatistics::c_Event);
+    stats.startGlobal();
 
     //Loop over the modules in the current path
     currPath = startPath;
@@ -153,7 +153,7 @@ void EventProcessor::processCore(PathPtr startPath, const ModulePtrList& moduleP
       logSystem.setModuleLogConfig(&(module->getLogConfig()), module->getName());
 
       //Call the event method of the module
-      stats.startModule(*module, ModuleStatistics::c_Event);
+      stats.startModule();
       module->event();
       stats.stopModule(*module, ModuleStatistics::c_Event);
 
@@ -203,7 +203,7 @@ void EventProcessor::processCore(PathPtr startPath, const ModulePtrList& moduleP
 #ifdef HAS_CALLGRIND
           CALLGRIND_ZERO_STATS;
 #endif
-          stats.startGlobal(ModuleStatistics::c_Event);
+          stats.startGlobal();
         }
 
         previousEventMetaData = *eventMetaDataPtr;
@@ -262,7 +262,7 @@ void EventProcessor::processTerminate(const ModulePtrList& modulePathList)
   LogSystem& logSystem = LogSystem::Instance();
   ModulePtrList::const_reverse_iterator listIter;
   ModuleStatistics& stats = ModuleStatistics::getInstance();
-  stats.startGlobal(ModuleStatistics::c_Term);
+  stats.startGlobal();
 
   for (listIter = modulePathList.rbegin(); listIter != modulePathList.rend(); listIter++) {
     Module* module = listIter->get();
@@ -271,7 +271,7 @@ void EventProcessor::processTerminate(const ModulePtrList& modulePathList)
     logSystem.setModuleLogConfig(&(module->getLogConfig()), module->getName());
 
     //Do termination
-    stats.startModule(*module, ModuleStatistics::c_Term);
+    stats.startModule();
     module->terminate();
     stats.stopModule(*module, ModuleStatistics::c_Term);
 
@@ -296,7 +296,7 @@ void EventProcessor::processBeginRun(const ModulePtrList& modulePathList)
   LogSystem& logSystem = LogSystem::Instance();
   ModulePtrList::const_iterator listIter;
   ModuleStatistics& stats = ModuleStatistics::getInstance();
-  stats.startGlobal(ModuleStatistics::c_BeginRun);
+  stats.startGlobal();
 
   for (listIter = modulePathList.begin(); listIter != modulePathList.end(); listIter++) {
     Module* module = listIter->get();
@@ -305,7 +305,7 @@ void EventProcessor::processBeginRun(const ModulePtrList& modulePathList)
     logSystem.setModuleLogConfig(&(module->getLogConfig()), module->getName());
 
     //Do beginRun() call
-    stats.startModule(*module, ModuleStatistics::c_BeginRun);
+    stats.startModule();
     module->beginRun();
     stats.stopModule(*module, ModuleStatistics::c_BeginRun);
 
@@ -328,7 +328,7 @@ void EventProcessor::processEndRun(const ModulePtrList& modulePathList)
   LogSystem& logSystem = LogSystem::Instance();
   ModulePtrList::const_iterator listIter;
   ModuleStatistics& stats = ModuleStatistics::getInstance();
-  stats.startGlobal(ModuleStatistics::c_EndRun);
+  stats.startGlobal();
 
   for (listIter = modulePathList.begin(); listIter != modulePathList.end(); listIter++) {
     Module* module = listIter->get();
@@ -337,7 +337,7 @@ void EventProcessor::processEndRun(const ModulePtrList& modulePathList)
     logSystem.setModuleLogConfig(&(module->getLogConfig()), module->getName());
 
     //Do endRun() call
-    stats.startModule(*module, ModuleStatistics::c_EndRun);
+    stats.startModule();
     module->endRun();
     stats.stopModule(*module, ModuleStatistics::c_EndRun);
 

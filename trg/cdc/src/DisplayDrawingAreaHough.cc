@@ -112,15 +112,16 @@ TRGCDCDisplayDrawingAreaHough::on_button_press_event(GdkEventButton * e) {
     //...Get cell ID...
     const int cx0 = int(float(e->x) / _scaleX / _hp->xSize());
     const int cy0 = _hp->nY() - int(float(e->y) / _scaleY / _hp->ySize());
-    const unsigned sid = _hp->serialID(cx0, cy0);
+    const unsigned sid = _hp->serialId(cx0, cy0);
 
     //...Get entries...
     const unsigned n = _hp->entry(cx0, cy0);
 
     //...Information...
     display().information("Cell(" + TRGUtilities::itostring(cx0) + "," +
-                          TRGUtilities::itostring(cy0) + ") " + 
-                          TRGUtilities::itostring(n) + "hits");
+                          TRGUtilities::itostring(cy0) + ", sid" +
+			  TRGUtilities::itostring(sid) + ") " +
+			  TRGUtilities::itostring(n) + "hits");
 
     //...Draw cell...
     _gc->set_foreground(_red);
@@ -135,11 +136,20 @@ TRGCDCDisplayDrawingAreaHough::on_button_press_event(GdkEventButton * e) {
         const TCHPlaneMulti2 & hp =
             * dynamic_cast<const TCHPlaneMulti2 *>(_hp);
         vector<const TCSegment *> list;
+	string segs;
         for (unsigned i = 0; i < 5; i++) {
             const vector<unsigned> & l = hp.patternId(i, sid);
-            for (unsigned j = 0; j < l.size(); j++)
+            for (unsigned j = 0; j < l.size(); j++) {
                 list.push_back(& cdc.segment(i * 2, l[j]));
+		if (list.size() == 1) {
+		    segs = "s" + cdc.segment(i * 2, l[j]).name();
+		}
+		else {
+		    segs += ",s" + cdc.segment(i * 2, l[j]).name();
+		}
+	    }
         }
+	display().rphi()->information(segs);
         display().rphi()->area().on_expose_event(0);
         display().rphi()->area().oneShot(list, _red);
     }

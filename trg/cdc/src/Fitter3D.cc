@@ -23,8 +23,7 @@
 #include <cstdlib>
 
 #include "framework/datastore/StoreArray.h"
-#include "cdc/hitcdc/HitCDC.h"
-#include "cdc/hitcdc/CDCSimHit.h"
+#include "cdc/dataobjects/CDCSimHit.h"
 #include "cdc/geometry/CDCGeometryPar.h"
 #include "trg/trg/Time.h"
 #include "trg/trg/Signal.h"
@@ -264,8 +263,8 @@ namespace Belle2 {
     }
 
   int
-    TRGCDCFitter3D::doit(vector<TCTrack *> & trackListIn,
-        vector<TCTrack *> & trackListOut) {
+    TRGCDCFitter3D::doit(const vector<TCTrack *> & trackListIn,
+			 vector<TCTrack *> & trackListOut) {
 
       TRGDebug::enterStage("Fitter 3D");
 
@@ -281,15 +280,15 @@ namespace Belle2 {
 
 	      //...Example to access LR LUT...
 	      if (TRGDebug::level()) {
-		  cout << s.LUT()->name() << endl;
+//		  cout << s.LUT()->name() << endl;
 	      }
 
 	      //...Get hit pattern...
 	      unsigned ptn = s.hitPattern();
 
 	      if (TRGDebug::level()) {
-		  if (ptn != 0)
-		      cout << s.name() << " ... ptn=" << ptn << endl;
+// 		  if (ptn != 0)
+// 		      cout << s.name() << " ... ptn=" << ptn << endl;
 	      }
 
 	      //...Or cal. hit pattern by my self...

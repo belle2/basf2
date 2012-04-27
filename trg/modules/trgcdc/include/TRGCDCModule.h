@@ -77,10 +77,10 @@ class TRGCDCModule : public Module {
     bool _hFinderPerfect;
 
     /// \# of X mesh for the Hough finder.
-    unsigned _hFinderMeshX;
+    int _hFinderMeshX;
 
     /// \# of Y mesh for the Hough finder.
-    unsigned _hFinderMeshY;
+    int _hFinderMeshY;
 
   private:
 

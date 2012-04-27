@@ -319,9 +319,9 @@ TRGCDCDisplayDrawingAreaRphi::drawSegment(const TCSegment & w,
 
 void
 TRGCDCDisplayDrawingAreaRphi::drawCircle(const TCCircle & t,
-                                         int lineWidth,
+                                         int ,
                                          Gdk::Color & c,
-                                         Gdk::LineStyle s) {
+                                         Gdk::LineStyle ) {
 
     Glib::RefPtr<Gdk::Colormap> colormap = get_default_colormap();
     colormap->alloc_color(c);
@@ -369,14 +369,7 @@ TRGCDCDisplayDrawingAreaRphi::drawTrack(const TCTrack & t,
         const vector<TCLink *> & links = t.links(i);
         for (unsigned j = 0; j < links.size(); j++) {
 	    const TCLink & l = * links[j];
-//             drawSegment(* (TCSegment *) l.wire(),
-// 			     lineWidth,
-// 			     c,
-// 			     s);
-	    const TCWire * w = l.wire();
-	    const TCSegment * t = dynamic_cast<const TCSegment *>(w);
-
-	    cout << "w,t=" << w << "," << t << endl;
+	    const TCSegment * t = dynamic_cast<const TCSegment *>(l.cell());
 
 	    if (t)
 		drawSegment(* t,
@@ -396,18 +389,12 @@ TRGCDCDisplayDrawingAreaRphi::drawTrack(const TCTrack & t,
     hIp.pivot(ORIGIN);
     const HepGeom::Point3D<double> & h = hIp.center();
     const double radius = fabs(hIp.radius());
-//  const HepGeom::Point3D<double> pIn = t.links(0)[0]->positionOnTrack();
-//  const HepGeom::Point3D<double> pOut = t.links(8)[0]->positionOnTrack();
-
     const HepGeom::Point3D<double> pIn =
-	TCLink::innerMost(t.links())->positionOnTrack();
+	TCLink::innerMost(t.links())->positionOnTrack() - h;
     const HepGeom::Point3D<double> pOut =
-	TCLink::outerMost(t.links())->positionOnTrack();
-
+	TCLink::outerMost(t.links())->positionOnTrack() - h;
     double a0 = atan2(pIn.y(), pIn.x()) / M_PI * 180;
     double a1 = atan2(pOut.y(), pOut.x()) / M_PI * 180;
-     cout << "h=" << h << ",r=" << radius << ",a0=" << a0 << ",a1=" << a1
-	       << endl;
     double d = a1 - a0;
     if (d > 180) d -= 360;
     else if (d < -180) d += 360;
@@ -417,22 +404,10 @@ TRGCDCDisplayDrawingAreaRphi::drawTrack(const TCTrack & t,
 		      y((h.y() + radius) * 10),
 		      int(2 * radius * 10 * _scale),
 		      int(2 * radius * 10 * _scale),
-//		      int(a0 * 64),
-		      0,
-		      360 * 64);
-//		      int(d * 64));
+		      int(a0 * 64),
+		      int(d * 64));
 
-//     //...Draw a circle...
-//     const TRGPoint2D & h = t.helix().center();
-//     double radius = fabs(t.helix().radius());
-//     _window->draw_arc(_gc,
-//                       0,
-//                       x((h.x() - radius) * 10),
-//                       y((h.y() + radius) * 10),
-//                       int(2 * radius * 10 * _scale),
-//                       int(2 * radius * 10 * _scale),
-//                       0,
-//                       360 * 64);
+    cout << "a0,d=" << a0 << "," << d << endl;
 
     colormap->free_color(c);
 }

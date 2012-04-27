@@ -16,7 +16,7 @@
 
 #include <stdlib.h>
 #include <map>
-#include "cdc/hitcdc/CDCSimHit.h"
+#include "cdc/dataobjects/CDCSimHit.h"
 #include "trg/trg/Debug.h"
 #include "trg/trg/Utilities.h"
 #include "trg/cdc/TRGCDC.h"
@@ -49,7 +49,7 @@ namespace Belle2 {
 
 string
 TRGCDCHoughFinder::version(void) const {
-    return string("TRGCDCHoughFinder 5.11");
+    return string("TRGCDCHoughFinder 5.12");
 }
 
 TRGCDCHoughFinder::TRGCDCHoughFinder(const string & name,
@@ -92,11 +92,13 @@ TRGCDCHoughFinder::TRGCDCHoughFinder(const string & name,
     H0->link(* D);
     H0->clear();
     H0->show();
+    H0->move(630, 0);
     if (! H1)
         H1 = new TCDisplayHough("Minus");
     H1->link(* D);
     H1->clear();
     H1->show();
+    H0->move(1260, 0);
 #endif
 
     //...Create patterns...
@@ -169,23 +171,13 @@ TRGCDCHoughFinder::doit(vector<TCTrack *> & trackList) {
     _plane[1]->clear();
 
     //...Voting...
-    unsigned axialSuperLayerId = 0;
-    for (unsigned i = 0; i < _cdc.nSegmentLayers(); i++) {
-        const Belle2::TRGCDCLayer * l = _cdc.segmentLayer(i);
-        const unsigned nWires = l->nCells();
-        if (! nWires) continue;
-        if ((* l)[0]->stereo()) continue;
-
-        for (unsigned j = 0; j < nWires; j++) {
-            const TCSegment & s = (TCSegment &) * (* l)[j];
-
-            //...Select hit TS only...
-            if (s.triggerOutput().active()) {
-                _plane[0]->vote(axialSuperLayerId, j);
-                _plane[1]->vote(axialSuperLayerId, j);
-            }
-        }
-        ++axialSuperLayerId;
+    unsigned nLayers = _cdc.nAxialSuperLayers();
+    for (unsigned i = 0; i < nLayers; i++) {
+	const vector<const TCSHit *> hits = _cdc.axialSegmentHits(i);
+	for (unsigned j = 0; j < hits.size(); j++) {
+	    _plane[0]->vote(i, hits[j]->cell().localId());
+	    _plane[1]->vote(i, hits[j]->cell().localId());
+	}
     }
     _plane[0]->merge();
     _plane[1]->merge();
@@ -206,31 +198,85 @@ TRGCDCHoughFinder::doit(vector<TCTrack *> & trackList) {
 #endif
 
     //...Look for peaks which have 5 hits...
-    vector<TCCircle *> circles;
-    _peakFinder.doit(circles, * _plane[0], 5, false);
-    _peakFinder.doit(circles, * _plane[1], 5, false);
+    vector<unsigned> serialIds[2];
+    _peakFinder.doit(* _plane[0], 5, false, serialIds[0]);
+    _peakFinder.doit(* _plane[1], 5, false, serialIds[1]);
+
+    //...Peak loop...
+    unsigned nCircles = 0;
+    for (unsigned pm = 0; pm < 2; pm++) {
+	for (unsigned i = 0; i < serialIds[pm].size(); i++) {
+	    const unsigned peakId = serialIds[pm][i];
+
+	    //...Get segment hits...
+	    vector<TCLink *> links;
+	    vector<const TCSegment *> segments;
+	    const unsigned nLayers = _plane[pm]->nLayers();
+	    for (unsigned j = 0; j < nLayers; j++) {
+		const vector<unsigned> & ptn =
+		    _plane[pm]->patternId(j, peakId);
+		for (unsigned k = 0; k < ptn.size(); k++) {
+		    const TCSegment & s = _cdc.axialSegment(j, ptn[k]);
+		    segments.push_back(& s);
+		    if (s.hit()) {
+			TCLink * l = new TCLink(0, s.hit());
+			links.push_back(l);
+		    }
+		}
+	    }
+
+	    //...Select best hits in each layer...
+	    const vector<TCLink *> bests = selectBestHits(links);
+
+	    //...Make a circle...
+	    TCCircle & c = * new TCCircle(bests);
+	    c.fit();
+	    c.name("CircleFitted_" + TRGUtil::itostring(nCircles));
+	    ++nCircles;
+
+	    if (TRGDebug::level()) {
+		cout << TRGDebug::tab() << "peak#" << nCircles << ":"
+		     << "plane" << pm << ",serialId=" << peakId << endl;
+		cout << TRGDebug::tab() << "segments below" << endl;
+		cout << TRGDebug::tab(4);
+		for (unsigned j = 0; j < segments.size(); j++) {
+		    cout << segments[j]->name();
+		    if (j != (segments.size() - 1))
+			cout << ",";
+		}
+		cout << endl;
+		cout << TRGDebug::tab() << "best links below" << endl;
+		TCLink::dump(bests, "", TRGDebug::tab(4));
+ 		c.dump("detail", TRGDebug::tab() + "Circle> ");
+	    }
+
+	    //...Make a track...
+	    TCTrack & t = * new TCTrack(c);
+	    t.name("Track_" + TRGUtil::itostring(i));
+	    trackList.push_back(& t);
+	    if (TRGDebug::level())
+		t.dump("detail");
 
 #ifdef TRGCDC_DISPLAY_HOUGH
-    vector<const TCCircle *> cc;
-    cc.assign(circles.begin(), circles.end());
-    stg = "2D : Peak Finding";
-    inf = "   ";
-    D->clear();
-    D->stage(stg);
-    D->information(inf);
-    D->area().append(cc, Gdk::Color("#FF0066009900"));
-    D->area().append(_cdc.hits());
-    D->area().append(_cdc.segmentHits());
-    D->show();
-    D->run();
+	    vector<const TCCircle *> cc;
+	    cc.push_back(& c);
+	    stg = "2D : Peak Finding & circle making";
+	    inf = "   ";
+	    D->clear();
+	    D->stage(stg);
+	    D->information(inf);
+	    D->area().append(cc, Gdk::Color("#FF0066009900"));
+	    D->area().append(_cdc.hits());
+	    D->area().append(_cdc.segmentHits());
+	    D->show();
+	    D->run();
 #endif
 
-    //...Make circles tracks...
-    
+ 	    //...Delete a circle...
+ 	    delete & c;
 
-    //...2D fitting...
-
-    //...Select stereo TSs...
+	}
+    }
 
     TRGDebug::leaveStage("Hough Finder");
     return 0;
@@ -286,17 +332,18 @@ TRGCDCHoughFinder::doitPerfectlySingleTrack(
     c.name("CircleFitted");
 
     //...Make a track...
-    TCTrack * track = new TCTrack(c);
-    trackList.push_back(track);
+    TCTrack & t = * new TCTrack(c);
+    t.name("Track");
+    trackList.push_back(& t);
 
     if (TRGDebug::level())
- 	track->dump("detail");
+ 	t.dump("detail");
 
 #ifdef TRGCDC_DISPLAY_HOUGH
     vector<const TCCircle *> cc;
     cc.push_back(& c);
     vector<const TCTrack *> tt;
-    tt.push_back(track);
+    tt.push_back(& t);
     string stg = "2D : Perfect Finder circle fit";
     string inf = "   ";
     D->clear();
@@ -318,21 +365,6 @@ int
 TRGCDCHoughFinder::doitPerfectly(vector<TRGCDCTrack *> & trackList) {
 
     TRGDebug::enterStage("Perfect Finder");
-
-    //...TS hit loop...
-//     map<int, vector<const TCSegment *> *> trackMap;
-//     const vector<const TCSegment *> hits = _cdc.tsHits();
-//     for (unsigned i = 0; i < hits.size(); i++) {
-// 	const TCSegment * ts = hits[i];
-// 	if (! ts->triggerOutput().active()) continue;
-// 	const TCWHit * wh = (* ts)[5]->hit();
-// 	if (! wh) continue;
-// 	const CDCSimHit & sh = * wh->simHit();
-// 	const int trackId = sh.m_trackId;
-// 	if (! trackMap[trackId])
-// 	    trackMap[trackId] = new vector<const TCSegment *>();	    
-// 	trackMap[trackId]->push_back(ts);
-//     }
 
     //...TS hit loop...
     map<int, vector<const TCSegment *> *> trackMap;
@@ -410,11 +442,14 @@ TRGCDCHoughFinder::doitPerfectly(vector<TRGCDCTrack *> & trackList) {
 	c.name("CircleFitted_" + TRGUtil::itostring(n));
 
 	//...Make a track...
-	TCTrack * track = new TCTrack(c);
-	trackList.push_back(track);
+	TCTrack & t = * new TCTrack(c);
+	t.name("Track_" + TRGUtil::itostring(n));
+	trackList.push_back(& t);
 
-	if (TRGDebug::level())
-	    track->dump("detail");
+	if (TRGDebug::level()) {
+	    c.dump("detail");
+	    t.dump("detail");
+	}
 
 	//...Incriment for next loop...
 	++it;
@@ -424,7 +459,7 @@ TRGCDCHoughFinder::doitPerfectly(vector<TRGCDCTrack *> & trackList) {
 	vector<const TCCircle *> cc;
 	cc.push_back(& c);
 	vector<const TCTrack *> tt;
-	tt.push_back(track);
+	tt.push_back(& t);
 	string stg = "2D : Perfect Finder circle fit";
 	string inf = "   ";
 	D->clear();
@@ -442,6 +477,41 @@ TRGCDCHoughFinder::doitPerfectly(vector<TRGCDCTrack *> & trackList) {
 
     TRGDebug::leaveStage("Perfect Finder");
     return 0;
+}
+
+vector<TCLink *>
+TRGCDCHoughFinder::selectBestHits(const vector<TCLink *> & links) const {
+    vector<TCLink *> bests;
+    vector<TCLink *> layers[9];
+    TCLink::separate(links, 9, layers);
+
+    for (unsigned i = 0; i < 9; i++) {
+	cout << TRGDebug::tab() << "layer " << i << endl;
+	TCLink::dump(layers[i], "", TRGDebug::tab(4));
+    }
+
+    //...Select links to be removed...
+    for (unsigned i = 0; i < 9; i++) {
+	if (layers[i].size() == 0) continue;
+	if (layers[i].size() == 1) {
+	    bests.push_back(layers[i][0]);
+	    continue;
+	}
+
+	TCLink * best = layers[i][0];
+	int timeMin = (layers[i][0]->cell()->triggerOutput())[0]->time();
+	for (unsigned j = 1; j < layers[i].size(); j++) {
+	    const TRGTime & t = * (layers[i][j]->cell()->triggerOutput())[0];
+	    if (t.time() < timeMin) {
+		timeMin = t.time();
+		best = layers[i][j];
+	    }
+	}
+
+	bests.push_back(best);
+    }
+
+    return bests;
 }
 
 } // namespace Belle2

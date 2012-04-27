@@ -18,7 +18,7 @@
 #include "framework/datastore/StoreArray.h"
 #include "framework/datastore/RelationArray.h"
 #include "cdc/dataobjects/CDCHit.h"
-#include "cdc/hitcdc/CDCSimHit.h"
+#include "cdc/dataobjects/CDCSimHit.h"
 #include "cdc/geometry/CDCGeometryPar.h"
 #include "trg/trg/Debug.h"
 #include "trg/trg/Time.h"
@@ -39,6 +39,7 @@
 #include "trg/cdc/Merger.h"
 #include "trg/cdc/HoughFinder.h"
 #include "trg/cdc/Fitter3D.h"
+#include "trg/cdc/Link.h"
 
 #ifdef TRGCDC_DISPLAY
 #include "trg/cdc/DisplayRphi.h"
@@ -62,7 +63,7 @@ TRGCDC::name(void) const {
 
 string
 TRGCDC::version(void) const {
-    return string("TRGCDC 5.11");
+    return string("TRGCDC 5.12");
 }
 
 TRGCDC *
@@ -330,9 +331,9 @@ TRGCDC::initialize(bool houghFinderPerfect,
             const unsigned layerId = w.layerId();
             vector<const TCWire *> cells;
 
-            for (unsigned i = 0; i < nWiresInTS[tsType]; i++) {
-                const unsigned laid = layerId + shape[tsType][i * 2];
-                const unsigned loid = localId + shape[tsType][i * 2 + 1];
+            for (unsigned k = 0; k < nWiresInTS[tsType]; k++) {
+                const unsigned laid = layerId + shape[tsType][k * 2];
+                const unsigned loid = localId + shape[tsType][k * 2 + 1];
         
                 const TCWire * c = wire(laid, loid);
                 if (! c)
@@ -356,6 +357,7 @@ TRGCDC::initialize(bool houghFinderPerfect,
 
             //...Store it...
             _tss.push_back(ts);
+	    _tsSL[i].push_back(ts);
             layer->push_back(ts);
         }
     }
@@ -401,7 +403,7 @@ TRGCDC::initialize(bool houghFinderPerfect,
 
     //...3D fitter...
     _fitter3D = new TCFitter3D("Fitter3D", * this);
-	_fitter3D->callLUT();
+    _fitter3D->callLUT();
 
     //...For module simulation (Front-end)...
     configure();
@@ -579,25 +581,31 @@ TRGCDC::wire(float , float ) const {
 
 void
 TRGCDC::clear(void) {
+    TCWHit::removeAll();
+    TCSHit::removeAll();
+    TCLink::removeAll();
+
+//     for (unsigned i = 0; i < _hits.size(); i++)
+//         delete _hits[i];
+    for (unsigned i = 0; i < _hitsMC.size(); i++)
+        delete _hitsMC[i];
+//     for (unsigned i = 0; i < _badHits.size(); i++)
+//         delete _badHits[i];
+//     for (unsigned i = 0; i < _segmentHits.size(); i++)
+//         delete _segmentHits[i];
+
     unsigned i = 0;
     while (TCWire * w = _wires[i++])
         w->clear();
-    _segmentHits.clear();
-
+    i = 0;
+    while (TCSegment * s = _tss[i++])
+        s->clear();
     _hitWires.clear();
+    _hits.clear();
     _axialHits.clear();
     _stereoHits.clear();
-    for (unsigned i = 0; i < _hits.size(); i++)
-        delete _hits[i];
-    for (unsigned i = 0; i < _hitsMC.size(); i++)
-        delete _hitsMC[i];
-    for (unsigned i = 0; i < _badHits.size(); i++)
-        delete _badHits[i];
-    for (unsigned i = 0; i < _segmentHits.size(); i++)
-        delete _segmentHits[i];
-    _hits.clear();
-    _hitsMC.clear();
     _badHits.clear();
+    _hitsMC.clear();
     _segmentHits.clear();
     for (unsigned i = 0; i < 9; i++)
 	_segmentHitsSL[i].clear();
@@ -605,29 +613,6 @@ TRGCDC::clear(void) {
 
 void
 TRGCDC::fastClear(void) {
-    if (_hitWires.size()) {
-        unsigned i = 0;
-        while (TCWire * w = _hitWires[i++])
-            w->clear();
-    }
-    if (_badHits.size()) {
-        unsigned i = 0;
-        while (TCWHit * h = _badHits[i++])
-            ((TCWire &) h->wire()).clear();
-    }
-
-    _hitWires.clear();
-    _axialHits.clear();
-    _stereoHits.clear();
-    for (unsigned i = 0; i < _hits.size(); i++)
-        delete _hits[i];
-    for (unsigned i = 0; i < _hitsMC.size(); i++)
-        delete _hitsMC[i];
-    for (unsigned i = 0; i < _badHits.size(); i++)
-        delete _badHits[i];
-    _hits.clear();
-    _hitsMC.clear();
-    _badHits.clear();
 }
 
 void
@@ -720,7 +705,7 @@ TRGCDC::update(bool ) {
 
     if (TRGDebug::level()) {
 	StoreArray<CDCSimHit> simHits("CDCSimHits");
-        cout << TRGDebug::tab() << "#CDCSimHit=" << n << ",#HitCDC=" << nHits
+        cout << TRGDebug::tab() << "#CDCSimHit=" << n << ",#CDCHit=" << nHits
 	     << endl;
     }
 
@@ -1158,7 +1143,7 @@ TRGCDC::simulate(void) {
 			 th = new TCSHit(s);
 			 s.hit(th);
 			 _segmentHits.push_back(th);
-			 _segmentHitsSL[s.layerId()];
+			 _segmentHitsSL[s.layerId()].push_back(th);
 		     }
 		     s._hits.push_back(h);
 		 }
@@ -1185,6 +1170,17 @@ TRGCDC::simulate(void) {
             const TCSHit & s = * _segmentHits[i];
 	    s.dump(dumpOption, TRGDebug::tab(4));
         }
+
+        cout << TRGDebug::tab() << "TS hit list (3)" << endl;
+        if (TRGDebug::level() > 2)
+            dumpOption = "detail";
+	for (unsigned j = 0; j < _superLayers.size(); j++) {
+	    for (unsigned i = 0; i < _segmentHitsSL[j].size(); i++) {
+		const vector<TCSHit *> & s = _segmentHitsSL[j];
+		for (unsigned k = 0; k < s.size(); k++)
+		    s[k]->dump(dumpOption, TRGDebug::tab(4));
+	    }
+        }
     }
 
     if (_mode == 1) {
@@ -1197,16 +1193,18 @@ TRGCDC::simulate(void) {
     _hFinder->doit(trackList);
 
     //...Perfect position test...
-    vector<HepGeom::Point3D<double> > ppos = trackList[0]->perfectPosition();
-    if (TRGDebug::level()) {
-	if (ppos.size() != 9) {
-	    cout << TRGDebug::tab() << "There are only " << ppos.size()
-		 << " perfect positions" << endl;
+    if (trackList.size()) {
+	vector<HepGeom::Point3D<double> > ppos =
+	    trackList[0]->perfectPosition();
+	if (TRGDebug::level()) {
+	    if (ppos.size() != 9) {
+		cout << TRGDebug::tab() << "There are only " << ppos.size()
+		     << " perfect positions" << endl;
+	    }
 	}
     }
 
-    //...2D tracker : helix fitter...
-
+    //...Stereo finder...
 
     //...3D tracker...
     vector<TCTrack *> trackList3D;

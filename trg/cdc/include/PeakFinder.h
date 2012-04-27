@@ -24,7 +24,7 @@
 namespace Belle2 {
 
 class TRGCDCCircle;
-class TRGCDCHoughPlane;
+class TRGCDCHoughPlaneMulti2;
 
 /// A class to find peaks in Hough Plane
 class TRGCDCPeakFinder {
@@ -51,6 +51,12 @@ class TRGCDCPeakFinder {
               const unsigned threshold,
               const bool centerIsPeak) const;
 
+    /// do peak finding.
+    void doit(TRGCDCHoughPlaneMulti2 & hp,
+              const unsigned threshold,
+              const bool centerIsPeak,
+	      std::vector<unsigned> & peakSerialId) const;
+
   private:
 
     /// do peak finding. This is a copy from "trasan".
@@ -58,6 +64,15 @@ class TRGCDCPeakFinder {
                 TRGCDCHoughPlane & hp,
                 const unsigned threshold,
                 const bool centerIsPeak) const;
+
+    /// do peak finding. This is a copy from "trasan".
+    void peaks6(TRGCDCHoughPlaneMulti2 & hp,
+                const unsigned threshold,
+                const bool centerIsPeak,
+		std::vector<unsigned> & peakSerialIds) const;
+
+    /// Makes regions.
+    void regions(TRGCDCHoughPlane & hp, const unsigned threshold) const;
 
   private:
 

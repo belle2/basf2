@@ -22,6 +22,8 @@ using namespace std;
 
 namespace Belle2 {
 
+vector<TRGCDCWireHit *> TRGCDCWireHit::_all;
+
 TRGCDCWireHit::TRGCDCWireHit(const TRGCDCWire & w,
 			     unsigned indexCDCHit,
 			     unsigned indexCDCSimHit,
@@ -57,6 +59,42 @@ TRGCDCWireHit::sortByWireId(const TRGCDCWireHit ** a,
         return 0;
     else
         return -1;
+}
+
+void
+TRGCDCWireHit::removeAll(void) {
+    while (_all.size())
+	delete _all.back();
+}
+
+void *
+TRGCDCWireHit::operator new(size_t size) {
+    void * p = malloc(size);
+    _all.push_back((TRGCDCWireHit *) p);
+
+//     cout << ">---------------------" << endl;
+//     for (unsigned i = 0; i < _all.size(); i++)
+// 	cout << "> " << i << " " << _all[i] << endl;
+
+    return p;
+}
+
+void
+TRGCDCWireHit::operator delete(void * t) {
+    for (vector<TRGCDCWireHit *>::iterator it = _all.begin();
+	 it != _all.end();
+	 it++) {
+	if ((* it) == (TRGCDCWireHit *) t) {
+	    _all.erase(it);
+	    break;
+	}
+    }
+    free(t);
+
+//     cout << "<---------------------" << endl;
+//     cout << "==> " << t << " erased" << endl;
+//     for (unsigned i = 0; i < _all.size(); i++)
+// 	cout << "< " << i << " " << _all[i] << endl;
 }
 
 } // namespace Belle2

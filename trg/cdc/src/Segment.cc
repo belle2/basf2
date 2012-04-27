@@ -102,8 +102,10 @@ TRGCDCSegment::dump(const string & msg,
   
 void
 TRGCDCSegment::clear(void) {
-    TCCell::clear();
     _signal.clear();
+    TCCell::clear();
+    _hits.clear();
+    _hit = 0;
 }
 
 string

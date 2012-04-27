@@ -134,7 +134,6 @@ class TRGCDCTrackBase {
     CLHEP::Hep3Vector _x;
 
     /// Links for each super layer
-//  std::vector<const TRGCDCLink *> * _ts;
     std::vector<TRGCDCLink *> * _ts;
 
     /// Links for all super layers

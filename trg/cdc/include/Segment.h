@@ -106,11 +106,11 @@ class TRGCDCSegment : public TRGCDCCell {
     /// Center wire.
     const TRGCDCWire * _center;
 
-    /// Wire hits.
-    std::vector<const TRGCDCWireHit *> _hits;
-
     /// Trigger signal.
     TRGSignal _signal;
+
+    /// Wire hits.
+    std::vector<const TRGCDCWireHit *> _hits;
 
     /// Track segment hit.
     const TRGCDCSegmentHit * _hit;

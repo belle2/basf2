@@ -92,10 +92,10 @@ class TRGCDCHoughPlaneBase {
     int maxEntryInRegion(unsigned id) const;
 
     /// returns serial ID for position (x, y).
-    unsigned serialID(unsigned x, unsigned y) const;
+    unsigned serialId(unsigned x, unsigned y) const;
 
     /// returns serial ID for position p.
-    unsigned serialID(const TRGPoint2D & p) const;
+    unsigned serialId(const TRGPoint2D & p) const;
 
     /// returns x and y for serialID.
     void id(unsigned serialId, unsigned & x, unsigned & y) const;
@@ -321,13 +321,13 @@ TRGCDCHoughPlaneBase::ySize(void) const {
 
 inline
 unsigned
-TRGCDCHoughPlaneBase::serialID(unsigned x, unsigned y) const {
+TRGCDCHoughPlaneBase::serialId(unsigned x, unsigned y) const {
     return _nY * x + y;
 }
 
 inline
 unsigned
-TRGCDCHoughPlaneBase::serialID(const TRGPoint2D & p) const {
+TRGCDCHoughPlaneBase::serialId(const TRGPoint2D & p) const {
     static const unsigned invalidPoint = _nX * _nY;
     if ((p.x() < _xMin) || (p.x() > _xMax)) return invalidPoint;
     if ((p.y() < _yMin) || (p.y() > _yMax)) return invalidPoint;
@@ -335,7 +335,7 @@ TRGCDCHoughPlaneBase::serialID(const TRGPoint2D & p) const {
 //    unsigned y = (p.y() - _yMin) / _ySize;
     unsigned x = unsigned((p.x() - _xMin) / _xSize);
     unsigned y = unsigned((p.y() - _yMin) / _ySize);
-    return serialID(x, y);
+    return serialId(x, y);
 }
 
 inline

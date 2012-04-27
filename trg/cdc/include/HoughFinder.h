@@ -28,6 +28,7 @@ namespace Belle2 {
 class TRGCDC;
 class TRGCDCPeakFinder;
 class TRGCDCTrack;
+class TRGCDCLink;
 
 /// A class to find tracks using Hough algorithm
 class TRGCDCHoughFinder {
@@ -69,6 +70,10 @@ class TRGCDCHoughFinder {
 
     /// do perfect finding (for single-track events).
     int doitPerfectlySingleTrack(std::vector<TRGCDCTrack *> & trackList);
+
+    /// selects the best(fastest) hits in each super layer.
+    std::vector<TRGCDCLink *> selectBestHits(
+	const std::vector<TRGCDCLink *> & links) const;
 
   private:
 

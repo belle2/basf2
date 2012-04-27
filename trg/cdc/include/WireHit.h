@@ -14,6 +14,7 @@
 #ifndef TRGCDCWireHit_FLAG_
 #define TRGCDCWireHit_FLAG_
 
+#include <vector>
 #include "trg/cdc/CellHit.h"
 
 #ifdef TRGCDC_SHORT_NAMES
@@ -42,6 +43,15 @@ class TRGCDCWireHitMC;
     /// Destructor
     virtual ~TRGCDCWireHit();
 
+    /// destructs all TRGCDCCellHit objects. (Called by TRGCDC)
+    static void removeAll(void);
+
+    /// new operator.
+    static void * operator new(size_t);
+
+    /// delete operator.
+    static void operator delete(void *);
+
   public:// Selectors
 
     /// returns a pointer to a TRGCDCWire.
@@ -60,6 +70,9 @@ class TRGCDCWireHitMC;
 			    const TRGCDCWireHit ** b);
 
   private:
+
+    /// Keeps all TRGCDCWireHit created by new().
+    static std::vector<TRGCDCWireHit *> _all;
 
     /// This will be removed.
     const TRGCDCWireHitMC * _mc;

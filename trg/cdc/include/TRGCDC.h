@@ -189,6 +189,12 @@ class TRGCDC {
     /// returns a track segment.
     const TRGCDCSegment & segment(unsigned lyrId, unsigned id) const;
 
+    /// returns a track segment in axial layers. (lyrId is axial #)
+    const TRGCDCSegment & axialSegment(unsigned lyrId, unsigned id) const;
+
+    /// returns a track segment in stereo layers. (lyrId is stereo #)
+    const TRGCDCSegment & stereoSegment(unsigned lyrId, unsigned id) const;
+
     /// returns \# of track segment layers.
     unsigned nSegmentLayers(void) const;
 
@@ -220,6 +226,12 @@ class TRGCDC {
 
     /// returns a list of TRGCDCSegmentHit in a super layer N. 'simulate()' must be called before calling this function
     std::vector<const TRGCDCSegmentHit *> segmentHits(unsigned) const;
+
+    /// returns a list of TRGCDCSegmentHit in a axial super layer N. 'simulate()' must be called before calling this function
+    std::vector<const TRGCDCSegmentHit *> axialSegmentHits(unsigned) const;
+
+    /// returns a list of TRGCDCSegmentHit in a stereo super layer N. 'simulate()' must be called before calling this function
+    std::vector<const TRGCDCSegmentHit *> stereoSegmentHits(unsigned) const;
 
 
 
@@ -350,6 +362,9 @@ class TRGCDC {
 
     /// Track Segments.
     std::vector<TRGCDCSegment *> _tss;
+
+    /// Track Segments.
+    std::vector<TRGCDCSegment *> _tsSL[9];
 
     /// Track Segment layers.
     std::vector<TRGCDCLayer *> _tsLayers;
@@ -518,6 +533,18 @@ TRGCDC::segment(unsigned id) const {
 }
 
 inline
+const TRGCDCSegment &
+TRGCDC::axialSegment(unsigned a, unsigned b) const {
+    return * _tsSL[a * 2][b];
+}
+
+inline
+const TRGCDCSegment &
+TRGCDC::stereoSegment(unsigned a, unsigned b) const {
+    return * _tsSL[a * 2 + 1][b];
+}
+
+inline
 unsigned
 TRGCDC::nSegments(void) const {
     return _tss.size();
@@ -540,6 +567,23 @@ std::vector<const TRGCDCSegmentHit *>
 TRGCDC::segmentHits(void) const {
     std::vector<const TRGCDCSegmentHit *> t;
     t.assign(_segmentHits.begin(), _segmentHits.end());
+    return t;
+}
+
+inline
+std::vector<const TRGCDCSegmentHit *>
+TRGCDC::axialSegmentHits(unsigned a) const {
+    std::vector<const TRGCDCSegmentHit *> t;
+    t.assign(_segmentHitsSL[a * 2].begin(), _segmentHitsSL[a * 2].end());
+    return t;
+}
+
+inline
+std::vector<const TRGCDCSegmentHit *>
+TRGCDC::stereoSegmentHits(unsigned a) const {
+    std::vector<const TRGCDCSegmentHit *> t;
+    t.assign(_segmentHitsSL[a * 2 + 1].begin(),
+	     _segmentHitsSL[a * 2 + 1].end());
     return t;
 }
 

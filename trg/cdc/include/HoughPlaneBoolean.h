@@ -42,11 +42,18 @@ class TRGCDCHoughPlaneBoolean : public TRGCDCHoughPlaneBase {
     virtual ~TRGCDCHoughPlaneBoolean();
 
   public:// Selectors
+
+    /// returns entry in a cell.
     unsigned entry(unsigned id) const;
+
     unsigned entry(unsigned x, unsigned y) const;
     int maxEntry(void) const;
 
+    /// returns pattern ID which activates specified cell.
+    const std::vector<unsigned> & patternId(unsigned cellId) const;
+
   public:// Modifiers
+
     /// Sets entry.
     unsigned setEntry(unsigned serialId, unsigned n);
 
@@ -79,10 +86,8 @@ class TRGCDCHoughPlaneBoolean : public TRGCDCHoughPlaneBase {
     /// allocate memory for patterns.
     void preparePatterns(unsigned nPatterns);
 
-    /// returns pattern ID which activates specified cell.
-    const std::vector<unsigned> & patternId(unsigned cellId) const;
-
   protected:
+
     /// Add to a cell.
     void add(unsigned cellId, int weight);
 
@@ -92,6 +97,8 @@ class TRGCDCHoughPlaneBoolean : public TRGCDCHoughPlaneBase {
     unsigned _nPatterns;
     unsigned ** _patterns;
     unsigned * _nActive;
+
+    /// Pattern ID's for each cell
     std::vector<unsigned> * _reverse;
 
     friend class TRGCDCHoughPlaneMulti2;

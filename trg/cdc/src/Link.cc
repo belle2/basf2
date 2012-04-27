@@ -31,27 +31,13 @@ using namespace std;
 
 namespace Belle2 {
 
-#ifdef TRASAN_DEBUG
-unsigned TRGCDCLink::_nTRGCDCLinks = 0;
-unsigned TRGCDCLink::_nTRGCDCLinksMax = 0;
-
-unsigned
-TRGCDCLink::nTRGCDCLinks(void) {
-    return _nTRGCDCLinks;
-}
-
-unsigned
-TRGCDCLink::nTRGCDCLinksMax(void) {
-    return _nTRGCDCLinksMax;
-}
-#endif
-
 bool TRGCDCLink::ms_smallcell(false);
 bool TRGCDCLink::ms_superb(false);
 unsigned TRGCDCLink::_nL = 0;
 unsigned TRGCDCLink::_nSL = 0;
 unsigned TRGCDCLink::_nSLA = 0;
 unsigned * TRGCDCLink::_nHitsSL = 0;
+vector<TCLink *> TRGCDCLink::_all;
 
 TRGCDCLink::TRGCDCLink(TCTrack * t,
 		       const Belle2::TCCHit * h,
@@ -83,12 +69,6 @@ TRGCDCLink::TRGCDCLink(TCTrack * t,
     if (h) {
 	_onTrack = _onWire = h->xyPosition();
     }
-
-#ifdef TRASAN_DEBUG
-    ++_nTRGCDCLinks;
-    if (_nTRGCDCLinks > _nTRGCDCLinksMax)
-	_nTRGCDCLinksMax = _nTRGCDCLinks;
-#endif
 }
 
 TRGCDCLink::TRGCDCLink(const TRGCDCLink & l)
@@ -112,28 +92,13 @@ TRGCDCLink::TRGCDCLink(const TRGCDCLink & l)
 	_neighbor[i] = l._neighbor[i];
     for (unsigned i = 0; i < 4; ++i)
       _arcZ[i] = l._arcZ[i];
-#ifdef TRASAN_DEBUG
-    ++_nTRGCDCLinks;
-    if (_nTRGCDCLinks > _nTRGCDCLinksMax)
-	_nTRGCDCLinksMax = _nTRGCDCLinks;
-#endif
 }
 
 TRGCDCLink::~TRGCDCLink() {
-#ifdef TRASAN_DEBUG
-    --_nTRGCDCLinks;
-#endif
 }
 
 unsigned
 TRGCDCLink::nLayers(const vector<TRGCDCLink *> & list) {
-#ifdef TRASAN_DEBUG
-    const Belle2::TRGCDC & cdc = * Belle2::TRGCDC::getTRGCDC();
-    if (cdc.nLayers() > 64)
-	std::cout << "TRGCDCLink::nLayers !!! #layers should be less than 64"
-	       << std::endl;
-#endif
-
     unsigned l0 = 0;
     unsigned l1 = 0;
     unsigned n = list.size();
@@ -156,16 +121,8 @@ TRGCDCLink::nHits(const vector<TRGCDCLink *> & links, unsigned * nHits) {
     for (unsigned i = 0; i < _nL; i++)
 	nHits[i] = 0;
     unsigned nLinks = links.size();
-    for (unsigned i = 0; i < nLinks; i++) {
+    for (unsigned i = 0; i < nLinks; i++)
 	++nHits[links[i]->cell()->layerId()];
-
-#ifdef TRASAN_DEBUG
-	if (links[i]->cell()->layerId() >= _nL)
-	    std::cout << "TRGCDCLink::nHits !!! layer ID("
-		   << links[i]->cell()->layerId() << ") is larger than "
-		   << "size of buffer(" << _nL << ")" << std::endl;
-#endif
-    }
 }
 
 void
@@ -173,16 +130,8 @@ TRGCDCLink::nHitsSuperLayer(const vector<TRGCDCLink *> & links, unsigned * nHits
     for (unsigned i = 0; i < _nSL; i++)
 	nHits[i] = 0;
     const unsigned nLinks = links.size();
-    for (unsigned i = 0; i < nLinks; i++) {
+    for (unsigned i = 0; i < nLinks; i++)
 	++nHits[links[i]->cell()->superLayerId()];
-
-#ifdef TRASAN_DEBUG
-	if (links[i]->cell()->superLayerId() >= _nSL)
-	    std::cout << "TRGCDCLink::nHitsSuperLayer !!! super layer ID("
-		   << links[i]->cell()->superLayerId() << ") is larger than "
-		   << "size of buffer(" << _nSL << ")" << std::endl;
-#endif
-    }
 }
 
 void
@@ -205,39 +154,44 @@ TRGCDCLink::dump_base(const string & msg, const string & pre) const {
 	mc = pull = flag = true;
 
     //...Output...
-    std::cout << pre;
-    std::cout << cell()->name();
+    cout << pre;
+    if (_hit) {
+	cout << cell()->name();
+    }
+    else {
+	cout << "No hit linked";
+    }
 //     if (mc) {
 // 	if (_hit) {
 // 	    if (_hit->mc()) {
 // 		if (_hit->mc()->hep())
-// 		    std::cout << "(mc" << _hit->mc()->hep()->id() << ")";
+// 		    cout << "(mc" << _hit->mc()->hep()->id() << ")";
 // 		else
-// 		    std::cout << "(mc?)";
+// 		    cout << "(mc?)";
 // 	    }
 // 	    else {
-// 		std::cout << "(mc?)";
+// 		cout << "(mc?)";
 // 	    }
 // 	}
 //     }
     if (pull)
-	std::cout << "[pul=" << this->pull() << "]";
+	cout << "[pul=" << this->pull() << "]";
     if (flag) {
 	if (_hit) {
 	    if (_hit->state() & CellHitFindingValid)
-		std::cout << "o";
+		cout << "o";
 	    if (_hit->state() & CellHitFittingValid)
-		std::cout << "+";
+		cout << "+";
 	    if (_hit->state() & CellHitInvalidForFit)
-		std::cout << "x";
+		cout << "x";
 	}
     }
     if (stereo) {
-	std::cout << "{" << leftRight() << "," << _zStatus << "}";
+	cout << "{" << leftRight() << "," << _zStatus << "}";
     }
     if (pos) {
-	std::cout << ",pos=" << position();
-	std::cout << ",drift=" << drift(0) << "," << drift(1);
+	cout << ",pos=" << position();
+	cout << ",drift=" << drift(0) << "," << drift(1);
     }
 }
 
@@ -275,7 +229,7 @@ TRGCDCLink::dump(const vector<const TRGCDCLink *> & links,
     vector<const TRGCDCLink *> tmp = links;
     if (sort)
 	std::sort(tmp.begin(), tmp.end(), TRGCDCLink::sortById);
-//	std::sort(tmp.begin(), tmp.end(), TRGCDCLink::sortById);
+//	sort(tmp.begin(), tmp.end(), TRGCDCLink::sortById);
     unsigned n = tmp.size();
     unsigned nForFit = 0;
 #define MCC_MAX 1000
@@ -285,6 +239,7 @@ TRGCDCLink::dump(const vector<const TRGCDCLink *> & links,
     memset((char *) MCC1, 0, sizeof(unsigned) * MCC_MAX);
     bool MCCOverFlow = false;
 
+    cout << pre;
     for (unsigned i = 0; i < n; i++) {
 	const TRGCDCLink & l = * tmp[i];
 
@@ -314,63 +269,61 @@ TRGCDCLink::dump(const vector<const TRGCDCLink *> & links,
 		}
 	    }
 	}
-	if (i == 0) {
-	    std::cout << pre;
-	    std::cout << TRGUtil::itostring(i) << " ";
-	}
-	else {
-	    std::cout << "," << TRGUtil::itostring(i) << " ";
-	}
+	if (i)
+	    cout << ",";
 	l.dump_base(msg);
     }
-    std::cout << ",Total " << n << " links";
-    if (flag) std::cout << ",fv " << nForFit << " l(s)";
+    if (n)
+	cout << ",Total " << n << " links";
+    else
+	cout << "no link";
+    if (flag) cout << ",fv " << nForFit << " l(s)";
     if (mc) {
 	unsigned nMC = 0;
-	std::cout << ", mc";
+	cout << ", mc";
 	for (unsigned i = 0; i < MCC_MAX; i++) {
 	    if (MCC0[i] > 0) {
 		++nMC;
-		std::cout << i << ":" << MCC0[i] << ",";
+		cout << i << ":" << MCC0[i] << ",";
 	    }
 	}
-	std::cout << "total " << nMC << " mc contributions";
+	cout << "total " << nMC << " mc contributions";
 	if (flag) {
 	    nMC = 0;
-	    std::cout << ", fv mc";
+	    cout << ", fv mc";
 	    for (unsigned i = 0; i < MCC_MAX; i++) {
 		if (MCC1[i] > 0) {
 		    ++nMC;
-		    std::cout << i << ":" << MCC1[i] << ",";
+		    cout << i << ":" << MCC1[i] << ",";
 		}
 	    }
-	    std::cout << " total " << nMC << " mc fit valid contribution(s)";
+	    cout << " total " << nMC << " mc fit valid contribution(s)";
 	}
 
 	if (MCCOverFlow)
-	    std::cout << "(counter overflow)";
+	    cout << "(counter overflow)";
     }
-    std::cout << std::endl;
+    cout << endl;
 
     //...Parent...
     if (mc) {
-	std::vector<const Belle2::TRGCDCTrackMC *> list = Belle2::TRGCDCTrackMC::list();
+	vector<const Belle2::TRGCDCTrackMC *> list = Belle2::TRGCDCTrackMC::list();
 	if (! list.size()) return;
-	std::cout << pre;
+	cout << pre;
 //cnv	unsigned nMC = 0;
 	for (unsigned i = 0; i < MCC_MAX; i++) {
 	    if (MCC0[i] > 0) {
 		const Belle2::TRGCDCTrackMC * h = list[i];
-//		std::cout << ", mc" << i << "(" << h->pType() << ")";
-		std::cout << ", mc" << i << "(";
+//		cout << ", mc" << i << "(" << h->pType() << ")";
+		cout << ", mc" << i << "(";
 		if (h)
-		    std::cout << h->pType() << ")";
+		    cout << h->pType() << ")";
 		else
-		    std::cout << "?)";
+		    cout << "?)";
 		while (h) {
 		    const Belle2::TRGCDCTrackMC * m = h->mother();
 		    if (m) {
-			std::cout << "<-mc" << m->id();
+			cout << "<-mc" << m->id();
 			h = m;
 		    }
 		    else {
@@ -380,8 +333,8 @@ TRGCDCLink::dump(const vector<const TRGCDCLink *> & links,
 	    }
 	}
 	if (MCCOverFlow)
-	    std::cout << "(counter overflow)";
-	std::cout << std::endl;
+	    cout << "(counter overflow)";
+	cout << endl;
     }
 }
 
@@ -519,13 +472,6 @@ TRGCDCLink::width(const vector<TRGCDCLink *> & list) {
 	center /= 2;
     }
 
-#ifdef TRASAN_DEBUG_DETAIL
-//     std::cout << "    ... Width : sid=" << sId << ",lid=" << w0->layerId()
-// 	      << ",nWires=" << nWires << ",center=" << center << " : " 
-// 	      << std::endl;
-//     dump(list);
-#endif
-
     unsigned left = 0;
     unsigned right = 0;
     for (unsigned i = 1; i < n; i++) {
@@ -551,16 +497,6 @@ TRGCDCLink::width(const vector<TRGCDCLink *> & list) {
 	else {
 	    if (distance1 > left) left = distance1;
 	}
-
-#ifdef TRASAN_DEBUG_DETAIL
-// 	std::cout << "        ... lyr=" << w->layerId()
-// 		  << ",true id=" << w->localId() << ",id=" << id
-// 		  << ",distance0,1=" << distance0 << "," << distance1
-// 		  << std::endl;
-// 	if (w->superLayerId() != sId)
-// 	    std::cout << "::width !!! super layer assumption violation"
-// 		      << std::endl;
-#endif
     }
 
     return right + left + 1;
@@ -681,13 +617,6 @@ TRGCDCLink::inOut(const vector<TRGCDCLink *> & list) {
 
 unsigned
 TRGCDCLink::superLayer(const vector<TRGCDCLink *> & list) {
-#ifdef TRASAN_DEBUG
-    const Belle2::TRGCDC & cdc = * Belle2::TRGCDC::getTRGCDC();
-    if (cdc.nSuperLayers() > 32)
-	std::cout << "TRGCDCLink::superLayer !!! #super layers should be less than 32"
-	       << std::endl;
-#endif
-
     unsigned sl = 0;
     unsigned n = list.size();
     for (unsigned i = 0; i < n; i++)
@@ -697,13 +626,6 @@ TRGCDCLink::superLayer(const vector<TRGCDCLink *> & list) {
 
 unsigned
 TRGCDCLink::superLayer(const vector<TRGCDCLink *> & links, unsigned minN) {
-#ifdef TRASAN_DEBUG
-    const Belle2::TRGCDC & cdc = * Belle2::TRGCDC::getTRGCDC();
-    if (cdc.nSuperLayers() > 32)
-	std::cout
-	    << "#super layers should be less than 32" << std::endl;
-#endif
-
     clearBufferSL();
     unsigned n = links.size();
     for (unsigned i = 0; i < n; i++)
@@ -717,13 +639,6 @@ TRGCDCLink::superLayer(const vector<TRGCDCLink *> & links, unsigned minN) {
 
 unsigned
 TRGCDCLink::nSuperLayers(const vector<TRGCDCLink *> & list) {
-#ifdef TRASAN_DEBUG
-    const Belle2::TRGCDC & cdc = * Belle2::TRGCDC::getTRGCDC();
-    if (cdc.nSuperLayers() > 32)
-	std::cout
-	    << "#super layers should be less than 32" << std::endl;
-#endif
-
     unsigned l0 = 0;
     unsigned n = list.size();
     for (unsigned i = 0; i < n; i++) {
@@ -777,7 +692,7 @@ TRGCDCLink::nMissingAxialSuperLayers(const vector<TRGCDCLink *> & links) {
 const Belle2::TRGCDCTrackMC &
 TRGCDCLink::links2HEP(const vector<TRGCDCLink *> & ) {
     const Belle2::TRGCDCTrackMC * best = NULL;
-    const std::vector<const Belle2::TRGCDCTrackMC *> list = Belle2::TRGCDCTrackMC::list();
+    const vector<const Belle2::TRGCDCTrackMC *> list = Belle2::TRGCDCTrackMC::list();
     unsigned nHep = list.size();
 
     if (! nHep) return * best;
@@ -862,9 +777,9 @@ TRGCDCLink::initializeBuffers(void) {
 }
 
 void
-TRGCDCLink::separate(const std::vector<TRGCDCLink *> & links,
+TRGCDCLink::separate(const vector<TRGCDCLink *> & links,
 		     unsigned nLayers,
-		     std::vector<TRGCDCLink *> * layers) {
+		     vector<TRGCDCLink *> * layers) {
     for (unsigned i = 0; i < links.size(); i++) {
 	const TCCell * c = links[i]->cell();
 	if (c) {
@@ -889,5 +804,41 @@ TRGCDCLink::wire(void) const {
 // 	return dynamic_cast<const TRGCDCSegment *>(& _hit->cell());
 //     return 0;
 // }
+
+void
+TRGCDCLink::removeAll(void) {
+    while (_all.size())
+	delete _all.back();
+}
+
+void *
+TRGCDCLink::operator new(size_t size) {
+    void * p = malloc(size);
+    _all.push_back((TRGCDCLink *) p);
+
+//     cout << ">---------------------" << endl;
+//     for (unsigned i = 0; i < _all.size(); i++)
+// 	cout << "> " << i << " " << _all[i] << endl;
+
+    return p;
+}
+
+void
+TRGCDCLink::operator delete(void * t) {
+    for (vector<TRGCDCLink *>::iterator it = _all.begin();
+	 it != _all.end();
+	 it++) {
+	if ((* it) == (TRGCDCLink *) t) {
+	    _all.erase(it);
+	    break;
+	}
+    }
+    free(t);
+
+//     cout << "<---------------------" << endl;
+//     cout << "==> " << t << " erased" << endl;
+//     for (unsigned i = 0; i < _all.size(); i++)
+// 	cout << "< " << i << " " << _all[i] << endl;
+}
 
 } // namespace Belle

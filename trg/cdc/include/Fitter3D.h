@@ -47,7 +47,7 @@ class TRGCDCFitter3D {
     std::string version(void) const;
 
     /// do track fitting.
-    int doit(std::vector<TRGCDCTrack *> & trackListIn,
+    int doit(const std::vector<TRGCDCTrack *> & trackListIn,
              std::vector<TRGCDCTrack *> & trackListOut);
 
     /// initializes Look Up Table (LUT)

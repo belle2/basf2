@@ -27,8 +27,8 @@ bool TRGCDCDisplay::_endOfEvent = false;
 bool TRGCDCDisplay::_endOfEventFlag = false;
 
 TRGCDCDisplay::TRGCDCDisplay(const string & name,
-                             int sizeWindow,
-                             int sizeMax)
+                             int ,
+                             int )
     : _skip(false),
       _wireName(false),
       _oldCDC(false),

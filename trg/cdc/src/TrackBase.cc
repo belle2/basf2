@@ -50,8 +50,6 @@ TRGCDCTrackBase::TRGCDCTrackBase(const string & name, double charge)
 }
 
 TRGCDCTrackBase::~TRGCDCTrackBase() {
-    delete[] _ts;
-    _tsAll.clear();
 }
 
 void

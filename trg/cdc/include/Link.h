@@ -50,6 +50,15 @@ class TRGCDCLink {
     /// Destructor
     virtual ~TRGCDCLink();
 
+    /// destructs all TRGCDCLink objects. (Called by TRGCDC)
+    static void removeAll(void);
+
+    /// new operator.
+    static void * operator new(size_t);
+
+    /// delete operator.
+    static void operator delete(void *);
+
   public:// Selectors
 
     /// returns a pointer to a track.
@@ -190,11 +199,14 @@ class TRGCDCLink {
     static unsigned nSuperLayers(const std::vector<TRGCDCLink *> & links,
 				 unsigned minNHits);
 
-    /// returns \# of missing axial super layers. Stereo super layers are not taken into accout.
-    static unsigned nMissingAxialSuperLayers(const std::vector<TRGCDCLink *> & links);
+    /// returns \# of missing axial super layers.
+    /// Stereo super layers are not taken into accout.
+    static unsigned nMissingAxialSuperLayers(
+	const std::vector<TRGCDCLink *> & links);
 
     /// returns \# of missing stereo super layers.
-    static unsigned nMissingStereoSuperLayers(const std::vector<TRGCDCLink *> & links);
+    static unsigned nMissingStereoSuperLayers(
+	const std::vector<TRGCDCLink *> & links);
 
     /// returns \# of layers.
     static unsigned nLayers(const std::vector<TRGCDCLink *> & links);
@@ -212,10 +224,12 @@ class TRGCDCLink {
 				std::vector<TRGCDCLink *> * list);
 
     /// returns axial hits.
-    static std::vector<TRGCDCLink *> axialHits(const std::vector<TRGCDCLink *> & links);
+    static std::vector<TRGCDCLink *> axialHits(
+	const std::vector<TRGCDCLink *> & links);
 
     /// returns stereo hits.
-    static std::vector<TRGCDCLink *> stereoHits(const std::vector<TRGCDCLink *> & links);
+    static std::vector<TRGCDCLink *> stereoHits(
+	const std::vector<TRGCDCLink *> & links);
 
     /// returns \# of axial hits.
     static unsigned nAxialHits(const std::vector<TRGCDCLink *> & links);
@@ -223,10 +237,13 @@ class TRGCDCLink {
     /// returns \# of stereo hits.
     static unsigned nStereoHits(const std::vector<TRGCDCLink *> & links);
 
-    /// returns width(wire cell unit) of given std::vector<TRGCDCLink *>. This function assumes that all TRGCDCLink's are in the same super layer.
+    /// returns width(wire cell unit) of given std::vector<TRGCDCLink *>.
+    /// This function assumes that all TRGCDCLink's are in the same super
+    /// layer.
     static unsigned width(const std::vector<TRGCDCLink *> &);
 
-    /// returns links which are edges. This function assumes that all TRGCDCLink's are in the same super layer.
+    /// returns links which are edges. This function assumes that all
+    /// TRGCDCLink's are in the same super layer.
     static std::vector<TRGCDCLink *> edges(const std::vector<TRGCDCLink *> &);
 
     /// returns links which are in the same layer as 'a' or 'id'.
@@ -262,7 +279,9 @@ class TRGCDCLink {
     /// returns the outer-most link.
     static TRGCDCLink * outerMost(const std::vector<TRGCDCLink *> & links);
 
-    /// returns links which are in the inner most and outer most layer. This function assumes that all TRGCDCLink's are in the same super layer.
+    /// returns links which are in the inner most and outer most
+    /// layer. This function assumes that all TRGCDCLink's are in the
+    /// same super layer.
     static std::vector<TRGCDCLink *> inOut(const std::vector<TRGCDCLink *> &);
 
     /// separate cores and non-cores.
@@ -317,6 +336,9 @@ class TRGCDCLink {
 		   const std::string & prefix = std::string("")) const;
 
   private:
+
+    /// Keeps all TRGCDCLinks created by new().
+    static std::vector<TRGCDCLink *> _all;
 
     /// Track object.
     TRGCDCTrack * _track;

@@ -41,8 +41,10 @@ namespace Belle2 {
       _curlBackStop(0),
       _mode(0),
       _hFinderPerfect(false),
-      _hFinderMeshX(96),
-      _hFinderMeshY(96),
+//    _hFinderMeshX(96),
+      _hFinderMeshX(180),
+//    _hFinderMeshY(96),
+      _hFinderMeshY(24),
       _cdc(0),
       _sa(0)
   {

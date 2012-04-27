@@ -46,6 +46,15 @@ class TRGCDCHoughPlaneMulti2 : public TRGCDCHoughPlane {
 
   public:// Selectors
 
+    /// returns \# of Hough Boolean layers.
+    unsigned nLayers(void) const;
+
+    /// returns pattern ID which activates specified cell.
+    const std::vector<unsigned> & patternId(unsigned cellId) const;
+
+    /// returns pattern ID in a layer which activates specified cell.
+    const std::vector<unsigned> & patternId(unsigned layer,
+                                            unsigned cellId) const;
     // Dumps debug information.
     void dump(unsigned layerId) const;
 
@@ -83,15 +92,14 @@ class TRGCDCHoughPlaneMulti2 : public TRGCDCHoughPlane {
     /// Merge layers into one.
     void merge(void);
 
-    /// registers a pattern..
-    void registerPattern(unsigned layerId, unsigned id);
-
     /// allocate memory for patterns.
     void preparePatterns(unsigned layerId, unsigned nPatterns);
 
-    /// returns pattern ID in a layer which activates specified cell.
-    const std::vector<unsigned> & patternId(unsigned layer,
-                                            unsigned cellId) const;
+    /// registers a pattern..
+    void registerPattern(unsigned layerId, unsigned id);
+
+    /// finalize patterns.
+    void finalizePatterns(void);
 
   private:
 
@@ -103,6 +111,9 @@ class TRGCDCHoughPlaneMulti2 : public TRGCDCHoughPlane {
 
     /// Used or not.
     bool _usage[N_LAYERS];
+
+    /// Pattern ID's for each cell
+    std::vector<unsigned> * _reverse;
 };
 
 //-----------------------------------------------------------------------------
@@ -159,12 +170,6 @@ TRGCDCHoughPlaneMulti2::vote(float rx,
 
 inline
 void
-TRGCDCHoughPlaneMulti2::preparePatterns(unsigned layerId, unsigned nPatterns) {
-    _layers[layerId]->preparePatterns(nPatterns);
-}
-
-inline
-void
 TRGCDCHoughPlaneMulti2::dump(unsigned a) const {
     _layers[a]->dump();
 }
@@ -193,6 +198,31 @@ TRGCDCHoughPlaneMulti2::dump(const std::string & a, const std::string & b) const
         std::cout << b << name() << " : merged plane " << std::endl;
         TRGCDCHoughPlaneBase::dump(a, b);
     }
+}
+
+inline
+void
+TRGCDCHoughPlaneMulti2::registerPattern(unsigned layerId, unsigned id) {
+    _layers[layerId]->registerPattern(id);
+}
+
+inline
+const std::vector<unsigned> &
+TRGCDCHoughPlaneMulti2:: patternId(unsigned layer,
+                                   unsigned cellId) const {
+    return _layers[layer]->patternId(cellId);
+}
+
+inline
+void
+TRGCDCHoughPlaneMulti2::preparePatterns(unsigned layerId, unsigned nPatterns) {
+    _layers[layerId]->preparePatterns(nPatterns);
+}
+
+inline
+unsigned
+TRGCDCHoughPlaneMulti2::nLayers(void) const {
+    return _nLayers;
 }
 
 } // namespace Belle2

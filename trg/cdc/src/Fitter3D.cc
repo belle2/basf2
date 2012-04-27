@@ -34,6 +34,7 @@
 #include "trg/cdc/Layer.h"
 #include "trg/cdc/WireHit.h"
 #include "trg/cdc/WireHitMC.h"
+#include "trg/cdc/SegmentHit.h"
 #include "trg/cdc/TrackMC.h"
 #include "trg/cdc/FrontEnd.h"
 #include "trg/cdc/Merger.h"
@@ -354,7 +355,8 @@ namespace Belle2 {
           //...Access to a track segment...
           links[0]->dump("detail");
           //const TCSegment & s = * (TCSegment *) links[0]->hit();
-          const TRGCDCCell *s = & links[0]->hit()->cell();
+	  //const TRGCDCCell *s = & links[0]->hit()->cell();
+          const TCSegment * s = dynamic_cast<const TCSegment *>(& links[0]->hit()->cell());
           phi[i]=(double) s->localId()/ni[i]*4*M_PI;
 	  s->hit()->drift();
         }

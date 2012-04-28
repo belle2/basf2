@@ -1,0 +1,72 @@
+//+
+// File : RawCOPPER.cc
+// Description : COPPER Raw Data Handler
+//
+// Author : Ryosuke Itoh, IPNS, KEK
+// Date : 15 - Dec - 2011
+//-
+
+#include "daq/dataobjects/RawCOPPER.h"
+
+using namespace std;
+using namespace Belle2;
+
+ClassImp(RawCOPPER);
+
+RawCOPPER::RawCOPPER()
+{
+  m_nwords = 1;
+  m_buffer = new int[1]; // Allocate dummy buffer
+  m_allocated = true;
+}
+
+RawCOPPER::RawCOPPER(RawHeader& hdr, int nwords, int* buffer)
+{
+  m_header.header ( hdr.header() );
+  m_nwords = nwords;
+  m_buffer = buffer;
+  m_allocated = false;
+}
+
+RawCOPPER::~RawCOPPER()
+{
+  if (m_allocated) delete[] m_buffer;
+}
+
+void RawCOPPER::copy(RawHeader& hdr, int nwords, int* bufin)
+{
+  m_header.header ( hdr.header() );
+  m_nwords = nwords;
+  m_buffer = new int[nwords];
+  memcpy((char*)m_buffer, (char*)bufin, nwords*sizeof(int));
+  m_allocated = true;
+}
+
+int* RawCOPPER::allocate_buffer(int nwords)
+{
+  m_nwords = nwords;
+  m_buffer = new int[nwords];
+  m_allocated = true;
+  return m_buffer;
+}
+
+int* RawCOPPER::buffer()
+{
+  return m_buffer;
+}
+
+void RawCOPPER::buffer(int nwords, int* bufin)
+{
+  m_nwords = nwords;
+  m_buffer = bufin;
+}
+
+RawHeader& RawCOPPER::header ( void )
+{
+  return m_header;
+}
+
+void RawCOPPER::header ( RawHeader& hdr )
+{
+  m_header = hdr;
+}

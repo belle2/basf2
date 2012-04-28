@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Guofu Cao, Martin Heck                                   *
+ * Contributors: Guofu Cao, Martin Heck, and Makoto Uchida                *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -90,9 +90,8 @@ namespace Belle2 {
      *  No special theoretical evaluation.
      */
     void setCharge(double charge) {
-      // M.U. 2012.03.05
-      //      B2DEBUG(150, "setCharge called with " << charge);
-      m_charge = static_cast<unsigned short int>(charge * 1e7);
+      // E. Nakano 2012.04.20
+      m_charge = static_cast<unsigned short int>((100.0 / 3.2) * charge * 1e6);
     }
 
     /** Getter for iWire. */

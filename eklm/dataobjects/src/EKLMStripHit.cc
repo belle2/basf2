@@ -11,7 +11,7 @@
 #include <G4Box.hh>
 
 #include <eklm/dataobjects/EKLMStripHit.h>
-#include <eklm/geoeklm/G4PVPlacementGT.h>
+//#include <eklm/geoeklm/G4PVPlacementGT.h>
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/GearDir.h>
 

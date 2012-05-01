@@ -32,6 +32,8 @@ geometry = register_module('Geometry')
 simulation = register_module('FullSim')
 # SVD digitization module
 SVDDIGI = register_module('SVDDigitizer')
+# SVD clusterizer
+SVDCLUST = register_module('SVDClustering')
 # Save output of simulation
 output = register_module('SimpleOutput')
 
@@ -52,7 +54,7 @@ particlegun.param('nTracks', 1)
 print_params(particlegun)
 
 # Set the number of events to be processed (100 events)
-evtmetagen.param({'EvtNumList': [100], 'RunList': [1]})
+evtmetagen.param({'EvtNumList': [1], 'RunList': [1]})
 
 # Set output filename
 output.param('outputFileName', 'SVDTestOutput.root')
@@ -61,7 +63,10 @@ output.param('outputFileName', 'SVDTestOutput.root')
 # geometry.param('Components', ['PXD','SVD'])
 geometry.param('Components', ['MagneticField', 'PXD', 'SVD'])
 
-SVDDIGI.param('statisticsFilename', 'SVDDiags.root')
+#SVDDIGI.param('statisticsFilename', 'SVDDiags.root')
+SVDDIGI.param('PoissonSmearing', False)
+SVDDIGI.param('ElectronicEffects', False)
+SVDDIGI.param('storeWaveforms', False)
 
 # ============================================================================
 # Do the simulation
@@ -74,6 +79,7 @@ main.add_module(geometry)
 main.add_module(particlegun)
 main.add_module(simulation)
 main.add_module(SVDDIGI)
+main.add_module(SVDCLUST)
 main.add_module(output)
 
 # Process events

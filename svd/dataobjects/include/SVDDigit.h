@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef SVDDIGIT_H
-#define SVDDIGIT_H
+#ifndef SVD_DIGIT_H
+#define SVD_DIGIT_H
 
 #include <vxd/dataobjects/VxdID.h>
 
@@ -20,7 +20,7 @@ namespace Belle2 {
   /**
    * The SVD digit class.
    *
-   * The SVDDigit is an APV25 waveform sample.
+   * The SVDDigit is an APV25 signal sample.
    * This is a development implementation which is intentionally kept
    * somewhat bulky. I record strip coordinates that won't be kept in future.
    * Also the sensor and cell IDs could be somewhat compressed, if desired.

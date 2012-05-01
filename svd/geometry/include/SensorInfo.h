@@ -21,6 +21,12 @@ namespace Belle2 {
      */
     class SensorInfo: public VXD::SensorInfoBase {
     public:
+      /** Enum for parametric access to sensor coordinates. */
+      enum Coordinate {
+        u = 0,
+        v = 1
+      };
+      // FIXME: Consolidate with similar enums in the digitizer.
       /** Constructor which automatically sets the SensorType to SensorInfo::SVD.
        * @param id VXD ID of the sensor.
        * @width Width of the sensor.

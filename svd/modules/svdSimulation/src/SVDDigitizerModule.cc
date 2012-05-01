@@ -27,13 +27,22 @@
 #include <set>
 #include <math.h>
 #include <root/TMath.h>
-
 #include <root/TRandom.h>
-#include <root/TMath.h>
 
 using namespace std;
 using namespace Belle2;
 using namespace Belle2::SVD;
+
+
+//-----------------------------------------------------------------
+//                Auxiliaries for waveform storage
+//-----------------------------------------------------------------
+// FIXME: I believe this is wrong, these things must be created separately for
+// each instance of the digitizer, otherwise it can crash in parallel mode.
+int   tree_vxdID    = 0;        // VXD ID of a sensor
+int   tree_uv       = 0;        // U or V coordinate
+int   tree_strip    = 0;        // number of strip
+double tree_signal[20];         // array for 20 samples of 10 ns
 
 //-----------------------------------------------------------------
 //                 Register the Module
@@ -115,7 +124,8 @@ SVDDigitizerModule::SVDDigitizerModule() : Module(), m_rootFile(0), m_histDiffus
   // 6. Reporting
   addParam("statisticsFilename", m_rootFilename,
            "ROOT Filename for statistics generation. If filename is empty, no statistics will be produced", string(""));
-
+  addParam("storeWaveforms", m_storeWaveforms,
+           "Store waveforms in a TTree in the statistics file.", bool(false));
 }
 
 void SVDDigitizerModule::initialize()
@@ -181,6 +191,7 @@ void SVDDigitizerModule::initialize()
   B2INFO(" -->  1 adu (e-)*:        " << m_unitADC);
   B2INFO(" REPORTING: ");
   B2INFO(" -->  statisticsFilename: " << m_rootFilename);
+  B2INFO(" -->  storeWaveforms:     " << (m_storeWaveforms ? "true" : "false"));
 
   if (!m_rootFilename.empty()) {
     m_rootFile = new TFile(m_rootFilename.c_str(), "RECREATE");
@@ -197,6 +208,14 @@ void SVDDigitizerModule::initialize()
     m_signalDist_u->GetXaxis()->SetTitle("U strip position - TrueHit u [um]");
     m_signalDist_v = new TH1D("h_signalDist_v", "Strip signals vs. TrueHits, electrons", 100, -400, 400);
     m_signalDist_v->GetXaxis()->SetTitle("V strip position - TrueHit v [um]");
+
+    if (m_storeWaveforms) {
+      m_waveTree = new TTree("waveTree", "SVD waveforms");
+      m_waveTree->Branch("sensor", &tree_vxdID, "sensor/I");
+      m_waveTree->Branch("u_or_v", &tree_uv, "u_or_v/I");
+      m_waveTree->Branch("strip", &tree_strip, "strip/I");
+      m_waveTree->Branch("signal", tree_signal, "signal[20]/D");
+    }
   }
   // Check if the global random number generator is available.
   if (!gRandom) B2FATAL("gRandom not initialized, please set up gRandom first");
@@ -297,7 +316,11 @@ void SVDDigitizerModule::event()
     B2DEBUG(10, "Processing hit " << i << " in Sensor " << sensorID << ", related to MCParticle " << m_currentParticle);
     processHit();
   }
-
+  // If storage of waveforms is required, store them in the statistics file.
+  if (m_waveTree) {
+    m_rootFile->cd();
+    saveWaveforms();
+  }
   // Take samples of acquired signals and store as digits.
   double initTime = m_startSampling;
   if (m_randomPhaseSampling) {
@@ -634,7 +657,6 @@ void SVDDigitizerModule::driftCharge(const TVector3& position, double carriers)
   }
   sensor.first[uIDHigh].add(m_currentTime + driftTime_h, correctedCharge, m_shapingTime, m_currentParticle, m_currentTrueHit);
 
-
 #undef NORMAL_CDF
 }
 
@@ -680,7 +702,8 @@ void SVDDigitizerModule::saveDigits(double time)
       double charge;
       SVDSignal::relations_map particles;
       SVDSignal::relations_map truehits;
-      boost::tie(charge, particles, truehits) = s(time);
+      boost::tie(charge, particles,
+                 truehits) = s(time);
       // Add noise to charge.
       double sampleCharge = addNoise(charge);
       // Zero-suppress if too small signal
@@ -805,9 +828,56 @@ void SVDDigitizerModule::saveDigits(double time)
   } // FOREACH sensor
 }
 
+void SVDDigitizerModule::saveWaveforms()
+{
+  //Only store large enough signals
+  double charge_threshold = 3. * m_elNoise;
+
+  BOOST_FOREACH(Sensors::value_type & sensor, m_sensors) {
+    tree_vxdID = sensor.first;
+    // u-side digits:
+    tree_uv = 1;
+    BOOST_FOREACH(StripSignals::value_type & stripSignal, sensor.second.first) {
+      tree_strip = stripSignal.first;
+      SVDSignal& s = stripSignal.second;
+      // Read the value only if the signal is large enough.
+      if (s.getCharge() < charge_threshold) continue;
+      double charge;
+      SVDSignal::relations_map particles;
+      SVDSignal::relations_map truehits;
+      for (int iTime = 0; iTime < 20; ++iTime) {
+        boost::tie(charge, particles, truehits) = s(10 * iTime);
+        tree_signal[iTime] = charge;
+      }
+      m_waveTree->Fill();
+    } // FOREACH stripSignal
+    // v-side digits:
+    tree_uv = 0;
+    BOOST_FOREACH(StripSignals::value_type & stripSignal, sensor.second.second) {
+      tree_strip = stripSignal.first;
+      SVDSignal& s = stripSignal.second;
+      // Read the values only if the signal is large enough
+      if (s.getCharge() < charge_threshold) continue;
+      double charge;
+      SVDSignal::relations_map particles;
+      SVDSignal::relations_map truehits;
+      for (int iTime = 0; iTime < 20; ++iTime) {
+        boost::tie(charge, particles, truehits) = s(10.*iTime);
+        tree_signal[iTime] = charge;
+      }
+      m_waveTree->Fill();
+    } // FOREACH stripSignal
+  } // FOREACH sensor
+  m_rootFile->Flush();
+}
+
 
 void SVDDigitizerModule::terminate()
 {
+  if (m_storeWaveforms) {
+    m_rootFile->cd();
+    m_waveTree->Write();
+  }
   if (m_rootFile) {
     m_rootFile->Write();
     m_rootFile->Close();

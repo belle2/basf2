@@ -22,6 +22,7 @@
 
 #include <root/TVector3.h>
 #include <root/TFile.h>
+#include <root/TTree.h>
 #include <root/TH1D.h>
 #include <root/TH2D.h>
 
@@ -111,6 +112,11 @@ namespace Belle2 {
        */
       void saveDigits(double time);
 
+      /** Save waveforms to the statistics file.
+       * This method is only called when storage of waveforms is required.
+       */
+      void saveWaveforms();
+
       /** Initialize the module and check module parameters */
       virtual void initialize();
       /** Initialize the list of existing SVD Sensors */
@@ -183,10 +189,6 @@ namespace Belle2 {
        * the SVD. */
       bool m_randomPhaseSampling;
 
-      /** FIXME: There are other options that are not introduced in this version,
-       * like different sampling times in different sensors etc.
-       */
-
       // 5. Processing
       /** Whether or not to apply discrete ADC on output values. */
       bool   m_applyADC;
@@ -202,6 +204,9 @@ namespace Belle2 {
       // 6. Reporting
       /** Name of the ROOT filename to output statistics */
       std::string m_rootFilename;
+      /** Store waveform data in the reporting file? */
+      bool m_storeWaveforms;
+
 
       // Other data members:
 
@@ -246,6 +251,8 @@ namespace Belle2 {
       /** Histogram showing distribution of digit signals.*/
       TH1D*  m_signalDist_u;
       TH1D*  m_signalDist_v;
+      /** Tree for waveform storage. */
+      TTree* m_waveTree;
 
     };//end class declaration
   } // end namespace SVD

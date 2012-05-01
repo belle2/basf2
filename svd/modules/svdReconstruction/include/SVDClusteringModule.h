@@ -1,0 +1,184 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2010 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Martin Ritter, Peter Kvasnicka                           *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
+#ifndef SVDClusteringModule_H
+#define SVDClusteringModule_H
+
+#include <framework/core/Module.h>
+#include <svd/geometry/SensorInfo.h>
+#include <vxd/dataobjects/VxdID.h>
+#include <svd/reconstruction/ClusterCandidate.h>
+#include <svd/reconstruction/ClusterCache.h>
+#include <svd/reconstruction/NoiseMap.h>
+#include <svd/reconstruction/Sample.h>
+#include <string>
+#include <deque>
+#include <set>
+#include <boost/array.hpp>
+
+namespace Belle2 {
+
+  namespace SVD {
+    /** \addtogroup modules
+     * @{
+     */
+
+    /** The SVDClustering module.
+     *
+     * This module's task is to cluster all hits found in the SVD and
+     * write them to appropriate collections. It searches for clusters in u and
+     * v strips and outputs the clusters.
+
+       \correlationdiagram
+       MCParticle = graph.external_data('MCParticle')
+       SVDTrueHit = graph.data('SVDTrueHit')
+       SVDDigit   = graph.data('SVDDigit')
+       SVDCluster = graph.data('SVDCluster')
+
+       graph.module('SVDDigitizer', [MCParticle, SVDDigit, SVDTrueHit], [SVDCluster])
+       graph.relation(MCParticle, SVDTrueHit)
+       graph.relation(SVDDigit,   MCParticle)
+       graph.relation(SVDDigit,   SVDTrueHit)
+       graph.relation(SVDCluster, MCParticle)
+       graph.relation(SVDCluster, SVDDigit)
+       graph.relation(SVDCluster, SVDTrueHit)
+       \endcorrelationdiagram
+
+     */
+
+    /** SVDClusteringModule: The SVD Clusterizer.
+     * This module produces clusters from SVDDigits (signal samples taken on
+     * individual strips) by first performing 2D clustering in strip coordinate and
+     * time, same as in PXD, and then using a waveform fit to determine the initial
+     * time of the waveform in the time coordinate and center-of-gravity or analog
+     * head-tail to determine the spatial coordinate.
+     */
+    class SVDClusteringModule : public Module {
+
+    public:
+      /** Container to sort the digits by strip number and time */
+      typedef std::set<Sample> SensorSide;
+      /** Container to hold the data of u and v strips of a sensor. */
+      typedef boost::array<SensorSide, 2> Sensor;
+      /** Structure to hold the data of all SVD sensors. */
+      typedef std::map<VxdID, Sensor > Sensors;
+      typedef std::map<VxdID, Sensor >::iterator SensorIterator;
+
+      /** Constructor defining the parameters */
+      SVDClusteringModule();
+
+      /** Initialize the module */
+      virtual void initialize();
+
+      /** do the clustering */
+      virtual void event();
+
+    protected:
+      /** Find the cluster a given sample belongs to.
+       * For this to work correctly, the samples have to be passed sorted by
+       * sensor,strip direction, strip number, and time.
+       * @param px sample for which the cluster is sought.
+       */
+      void findCluster(const Sample& sample);
+
+      /** Write a cluster to the collection. */
+      void writeClusters(VxdID sensorID, int side);
+
+      // Data members
+      //1. Collections
+      /** Name of the collection to use for the SVDDigits */
+      std::string m_storeDigitsName;
+      /** Name of the collection to use for the SVDClusters */
+      std::string m_storeClustersName;
+      /** Name of the collection to use for the SVDTrueHits */
+      std::string m_storeTrueHitsName;
+      /** Name of the collection to use for the MCParticles */
+      std::string m_storeMCParticlesName;
+      /** Name of the relation between SVDDigits and MCParticles */
+      std::string m_relDigitMCParticleName;
+      /** Name of the relation between SVDClusters and MCParticles */
+      std::string m_relClusterMCParticleName;
+      /** Name of the relation between SVDClusters and SVDDigits */
+      std::string m_relClusterDigitName;
+      /** Name of the relation between SVDDigits and SVDTrueHits */
+      std::string m_relDigitTrueHitName;
+      /** Name of the relation between SVDClusters and SVDTrueHits */
+      std::string m_relClusterTrueHitName;
+
+      // 2. Physics
+      /** Lorentz angle, electrons. FIXME: This is what one would use for reconstruction,
+       * some mean value rather than something determined directly from the B-Field */
+      double m_tanLorentzAngle_electrons;
+      /** LorentzAngle, holes. */
+      double m_tanLorentzAngle_holes;
+
+      //3. Noise
+      /** Noise in number of electrons */
+      double m_elNoise;
+
+      //4. Clustering
+      /** Seed cut in units of m_elNoise. */
+      double m_cutSeed;
+      /** Noise (cluster member) cut in units of m_elNoise. */
+      double m_cutAdjacent;
+      /** Cluster cut in units of m_elNoise */
+      double m_cutCluster;
+      /** Size of the cluster at which we switch from Center of Gravity to Analog Head Tail */
+      int m_sizeHeadTail;
+      /** Minimum number of significant consecutive samples in a strip signal.*/
+      int m_minSamples;
+      /** Time tolerance for clustering: max. mean square distance between maxima in a cluster.*/
+      double m_timeTolerance;
+
+      // 5. Timing
+      // The decay times are shaping times plus typical diffusion time."
+      /** Typical decay time for signals of electrons.*/
+      double m_shapingTimeElectrons;
+      /** Typical decay time for signal of holes. */
+      double m_shapingTimeHoles;
+      /** Interval between two consecutive signal samples (30 ns). */
+      double m_samplingTime;
+      /** Whether or not to apply a time window cut */
+      bool   m_applyWindow;
+      /** Time of the trigger. */
+      double m_triggerTime;
+      /** Acceptance window size.
+       * Only clusters with initial time within the acceptance window,
+       * (m_triggerTime, m_triggerTime+m_acceptance) will be accepted.
+       */
+      double m_acceptance;
+
+      /** The reference time for discretization (taken as the time of the first
+       * encountered digit. */
+      double m_refTime;
+
+      /** Pointer to the geometry info of the currently active Sensor */
+      SensorInfo* m_geometry;
+
+      /** Assume the SVDDigits are sorted by sensor and strip direction. */
+      bool m_assumeSorted;
+
+      /** List of all cluster candidates */
+      std::deque<ClusterCandidate> m_clusters;
+
+      /** cache of the last seen clusters to speed up clustering */
+      ClusterCache m_cache;
+
+      /** Noisemap for the currently active sensor and sensor side. */
+      NoiseMap m_noiseMap;
+
+    };//end class declaration
+
+    /** @}*/
+
+  } //end SVD namespace;
+} // end namespace Belle2
+
+#endif // SVDClusteringModule_H

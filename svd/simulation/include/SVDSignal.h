@@ -29,10 +29,10 @@ namespace Belle2 {
      * The class accumulates elementary waveforms formed by chargelets contributing to the
      * charge accumulated on the strip.
      * The elementary waveforms are currently of the form
-     * w(t|delta,tau) = charge * (t-delta)/tau * exp((t-delta)/tau) for t >= delta,
+     * w(t|delta,tau) = charge * (t-delta)/tau * exp(1.0 - (t-delta)/tau)) for t >= delta,
      *                  otherwise 0.
-     * with delta being the initial time, and tau the characteristic time.
-     * Maximum is attained at delta + tau and is charge / Euler e.
+     * with delta being the initial time, and tau the decay time.
+     * Maximum is attained at delta + tau and is equal to charge.
      * The class is a functor returning values of summary waveform at a given time.
      * Poisson and gaussian noises will be added externally.
      */
@@ -137,7 +137,7 @@ namespace Belle2 {
        */
       double waveform(double time, double initTime, double charge, double tau) const {
         if ((tau <= 0.0) || (time < initTime)) return 0;
-        double z = (time - initTime) / tau; return charge * z * exp(-z);
+        double z = (time - initTime) / tau; return charge * z * exp(1.0 - z);
       }
 
       /** Waveform taking parameters from a Wave struct.

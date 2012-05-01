@@ -1,0 +1,61 @@
+//+
+// File : file2rb.cc
+// Description : Get an event from a SeqRoot file and place it in Rbuf
+//
+// Author : Ryosuke Itoh, IPNS, KEK
+// Date : 28 - Apr - 2012
+//-
+#include <string>
+#include <vector>
+
+#include "framework/pcore/SeqFile.h"
+#include "framework/pcore/RingBuffer.h"
+#include "framework/pcore/EvtMessage.h"
+
+#define RBUFSIZE 100000000
+#define MAXEVTSIZE 4000000
+
+using namespace Belle2;
+using namespace std;
+
+int main(int argc, char** argv)
+{
+  if (argc < 3) {
+    printf("file2rb : rbufname filename neof\n");
+    exit(-1);
+  }
+
+  SeqFile* file = new SeqFile(argv[2], "w");
+  if (file->status() <= 0) {
+    perror("file open");
+    exit(-1);
+  }
+  RingBuffer* rbuf = new RingBuffer(argv[1], RBUFSIZE);
+  char* evbuf = new char[MAXEVTSIZE];
+
+  int eof = 0;
+  for (;;) {
+    // Get a record from ringbuf
+    int size;
+    while ((size = rbuf->remq((int*)evbuf)) == 0) {
+      //    printf ( "Rx : evtbuf is not available yet....\n" );
+      usleep(100);
+    }
+    EvtMessage* msg = new EvtMessage(evbuf);
+    if (msg->type() == MSG_TERMINATE) {
+      printf("EoF found. Exitting.....\n");
+      eof = 1;
+    }
+
+    // Put the record in a file
+    int wstat = file->write(evbuf);
+    if (wstat <= 0) {
+      perror("write");
+      exit(-99);
+    }
+  }
+}
+
+
+
+

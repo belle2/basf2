@@ -1,0 +1,9 @@
+Import('env')
+
+env['TOOLS_LIBS']['sock2rb'] = ['daq', 'framework', '$ROOT_LIBS' ]
+env['TOOLS_LIBS']['rb2sock'] = ['daq', 'framework', '$ROOT_LIBS' ]
+env['TOOLS_LIBS']['file2rb'] = ['daq', 'framework', '$ROOT_LIBS' ]
+env['TOOLS_LIBS']['rb2file'] = ['daq', 'framework', '$ROOT_LIBS' ]
+env['TOOLS_LIBS']['rb2rb'] = ['daq', 'framework', '$ROOT_LIBS' ]
+
+Return('env')

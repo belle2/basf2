@@ -11,7 +11,7 @@
 using namespace std;
 using namespace Belle2;
 
-Sock2Rb::Sock2Rb(string& rbuf, int port)
+Sock2Rb::Sock2Rb(string rbuf, int port)
 {
   m_rbuf = new RingBuffer(rbuf.c_str(), RBUFSIZE);
   m_sock = new EvtSocketRecv(port);

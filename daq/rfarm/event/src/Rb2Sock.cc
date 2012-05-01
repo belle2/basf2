@@ -11,7 +11,7 @@
 using namespace std;
 using namespace Belle2;
 
-Rb2Sock::Rb2Sock(string& rbuf, string& dest, int port)
+Rb2Sock::Rb2Sock(string rbuf, string dest, int port)
 {
   m_rbuf = new RingBuffer(rbuf.c_str(), RBUFSIZE);
   m_sock = new EvtSocketSend(dest, port);
@@ -37,10 +37,12 @@ int Rb2Sock::SendEvent(void)
   EvtMessage* msg = new EvtMessage(m_evtbuf);    // Ptr copy, no overhead
 
   if (msg->type() == MSG_TERMINATE) {
+    printf("EoF found. Exitting.....\n");
     m_sock->send(msg);
     return -1;
   } else {
     return m_sock->send(msg);
+    //    return msg->size();
   }
 }
 

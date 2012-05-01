@@ -28,7 +28,7 @@
 class Rb2Sock {
 public:
   /*! Constuctor and Destructor */
-  Rb2Sock(std::string& rbuf, std::string& dest, int port);
+  Rb2Sock(std::string rbuf, std::string dest, int port);
   ~Rb2Sock(void);
 
   /*! Event function */

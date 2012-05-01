@@ -25,7 +25,7 @@ Ds2RbufModule::Ds2RbufModule() : Module()
 {
   //Set module properties
   setDescription("Encode DataStore into RingBuffer");
-  //  setPropertyFlags(c_Input | c_ParallelProcessingCertified);
+  setPropertyFlags(c_InitializeInProcess);
 
   addParam("RingBufferName", m_rbufname, "Name of RingBuffer",
            string("OutputRbuf"));
@@ -97,6 +97,7 @@ void Ds2RbufModule::event()
   (msg->header())->reserved[1] = nobjs;       // No. of objects
   (msg->header())->reserved[2] = narrays;    // No. of arrays
 
+  printf("message size = %d\n", msg->size());
   // Put the message in ring buffer
   for (;;) {
     int stat = m_rbuf->insq((int*)msg->buffer(), (msg->size() - 1) / 4 + 1);
@@ -115,6 +116,7 @@ void Ds2RbufModule::endRun()
 {
   //fill Run data
 
+  printf("Ds2Rbuf: endRun called.....\n");
   B2INFO("Ds2Rbuf: endRun done.");
 }
 

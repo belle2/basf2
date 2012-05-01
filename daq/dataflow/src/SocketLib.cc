@@ -58,7 +58,7 @@ int SocketIO::write_data(int sock, char* data, int len)
   int bcount = 0;
   int br = 0;
 
-  // printf("write_data( sock=%d. data=%p. len=%d )\n", sock, data, len);
+  //  printf("write_data( sock=%d. data=%p. len=%d )\n", sock, data, len);
 
   while (bcount < len) {
     if ((br =::write(sock, ptr, len - bcount)) > 0) {
@@ -126,7 +126,7 @@ int SocketIO::read_data(int sock, char* data, int len)
       }
     }
   }
-  //  printf ( "SocketIO::read_data ended!!!\n" );
+  //  printf ( "SocketIO::read_data ended : bcount = %d!!!\n", bcount );
   return(bcount);
 }
 
@@ -202,6 +202,8 @@ int SocketRecv::accept()
     m_errno = errno;
     return(-1);
   }
+
+  printf("SocketRecv:: connection request accepted, sender=%d\n", t);
 
   m_sender = t;
   return(t);

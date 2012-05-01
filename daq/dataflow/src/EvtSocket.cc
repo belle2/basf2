@@ -26,6 +26,7 @@ EvtSocketSend::~EvtSocketSend()
 
 int EvtSocketSend::send(EvtMessage* msg)
 {
+  //  printf ( "EvtSocketSend : sending = %d\n", msg->size() );
   return m_sock->put((char*)msg->buffer(), msg->size());
 }
 

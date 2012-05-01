@@ -13,7 +13,7 @@
 #include <daq/dataflow/SocketLib.h>
 #include <framework/pcore/EvtMessage.h>
 
-#define MAXEVTSIZE 8000000
+#define MAXEVTSIZE 80000000
 
 using namespace Belle2;
 

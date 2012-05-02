@@ -1,1 +1,0 @@
-../dirac-platform.py

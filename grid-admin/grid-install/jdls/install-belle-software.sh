@@ -1,1 +1,0 @@
-../install-belle-software.sh

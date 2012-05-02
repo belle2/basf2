@@ -1,6 +1,0 @@
-SW_DIR=$VO_SW_DIR/belle
-DEFAULT_SE=$CLASSIC_HOST
-STORAGE_DIR=$CLASSIC_STORAGE_DIR/belle
-VOMS_SERVERS='vomss://voms.cc.kek.jp:8443/voms/belle?/belle/'
-VOMSES="belle voms.cc.kek.jp 15020 /C=JP/O=KEK/OU=CRC/CN=host/voms.cc.kek.jp belle"
-VOMS_CA_DN="'/C=JP/O=KEK/OU=CRC/CN=KEK GRID Certificate Authority'"

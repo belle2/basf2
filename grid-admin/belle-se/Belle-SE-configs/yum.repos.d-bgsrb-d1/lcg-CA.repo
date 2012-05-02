@@ -1,7 +1,0 @@
-# This is the official YUM repository string for the lcg-CA repository
-# Fetched from: http://grid-deployment.web.cern.ch/grid-deployment/yaim/repos/lcg-CA.repo
-# Place it to /etc/yum.repos.d/ and run 'yum update' 
-
-[CA]
-name=CAs
-baseurl=http://linuxsoft.cern.ch/LCG-CAs/current

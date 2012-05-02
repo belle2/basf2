@@ -1,3 +1,0 @@
-#!/bin/bash
-PYTHONPATH=/opt/glite/lib/python:/opt/glite/lib/python2.3/site-packages:/opt/lcg/lib/python:/opt/lcg/lib/python2.3/site-packages:/imports/ExpSoft/atlas/ddm/latest/DQ2Clients/usr/lib/python2.3/site-packages::/opt/ZSI/lib/python2.3/site-packages:/opt/SOAPpy/lib/python2.3/site-packages:/opt/glite/lib/python2.3/site-packages/amga:/opt/fpconst/lib/python2.3/site-packages:/home/fifieldt/belle-monitoring:/home/fifieldt/belle-monitoring:/opt/exp_soft/atlas/ganga/install/latest/python
-/opt/exp_soft/atlas/ganga/install/latest/bin/ganga --config=~/belle-monitoring/LONG.INI robot run belle-grid-jobs.txt

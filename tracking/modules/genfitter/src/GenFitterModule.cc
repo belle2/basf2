@@ -36,7 +36,7 @@
 #include <GFDaf.h>
 #include <GFRecoHitProducer.h>
 #include <GFRecoHitFactory.h>
-
+#include <GFMaterialEffects.h>
 
 #include <GFAbsTrackRep.h>
 #include <RKTrackRep.h>
@@ -129,6 +129,7 @@ void GenFitterModule::initialize()
 
   //get the magnetic field
   GFFieldManager::getInstance()->init(new GFGeant4Field());
+  GFMaterialEffects::getInstance()->setMscModel("Highland");
 
 }
 

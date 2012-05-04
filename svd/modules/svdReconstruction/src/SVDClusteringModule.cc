@@ -322,29 +322,41 @@ void SVDClusteringModule::writeClusters(VxdID sensorID, int side)
 
     // Estimate time - this is currently very crude
     const std::map<unsigned int, unsigned int> stripMaxima = cls.getMaxima();
+    const std::map<unsigned int, unsigned short> stripCounts = cls.getCounts();
+    // Check that we have enough data in each strip.
+    int maxCount = 0;
+    std::map<unsigned int, unsigned short>::const_iterator strip_count = stripCounts.begin();
+    for (; strip_count != stripCounts.end(); ++strip_count)
+      if (strip_count->second > maxCount) maxCount = strip_count->second;
+    if (maxCount < m_minSamples) continue;
+    // Constrain time calculation to strips with at least m_minSamples samples.
+    std::map<unsigned int, unsigned short>::const_iterator strip_low = stripCounts.begin();
+    while (strip_low->second < m_minSamples) strip_low++;
+    unsigned int stripLow = strip_low->first;
+    std::map<unsigned int, unsigned short>::const_reverse_iterator strip_high = stripCounts.rbegin();
+    while (strip_high->second < m_minSamples) strip_high++;
+    unsigned int stripHigh = strip_high->first;
     double time = 0.0;
-    std::map<unsigned int, unsigned int>::const_iterator strip_max = stripMaxima.begin();
-    for (; strip_max != stripMaxima.end(); ++strip_max) {
-      unsigned int strip = strip_max->first;
+    double restrictedCharge = 0.0;
+    for (unsigned int strip = stripLow; strip <= stripHigh; ++strip) {
       double charge = stripCharges.find(strip)->second; // safe
-      time += m_samplingTime * charge * strip_max->second;
+      time += m_samplingTime * charge * stripMaxima.find(strip)->second;
+      restrictedCharge += charge;
     }
-    time /= cls.getCharge();
+    time /= restrictedCharge;
     double timeStd = 0.0;
-    strip_max = stripMaxima.begin();
-    for (; strip_max != stripMaxima.end(); ++strip_max) {
-      unsigned int strip = strip_max->first;
+    for (unsigned int strip = stripLow; strip <= stripHigh; ++strip) {
       double charge = stripCharges.find(strip)->second; // safe
-      double diff = m_samplingTime * strip_max->second - time;
+      double diff = m_samplingTime * stripMaxima.find(strip)->second - time;
       timeStd += charge * diff * diff;
     }
-    timeStd = sqrt(timeStd / cls.getCharge() / (stripMaxima.size() - 1));
+    timeStd = sqrt(timeStd / restrictedCharge / (stripHigh - stripLow));
     time += m_refTime;
     // discard if not within acceptance
     if (m_applyWindow && ((time < m_triggerTime) || (time > m_triggerTime + m_acceptance)))
       continue;
 
-    //Lorentz shift correction FIXME: getDigit from Bfield
+    //Lorentz shift correction FIXME: get from Bfield
     if (isU)
       pos -= 0.5 * info.getThickness() * m_tanLorentzAngle_holes;
     else

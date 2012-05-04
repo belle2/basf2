@@ -18,14 +18,17 @@ using namespace SVD;
 boost::tuple<double, const SVDSignal::relations_map&, const SVDSignal::relations_map&>
 SVDSignal::operator()(double time)
 {
+  unsigned int no_relation = static_cast<unsigned int>(-1);
   double wave_sum = 0;
   m_particles.clear();
   m_truehits.clear();
   BOOST_FOREACH(SVDSignal::Wave wave, m_functions) {
     double wave_value = waveform(time, wave);
     wave_sum += wave_value;
-    m_particles[wave.m_particle] += static_cast<float>(wave_value);
-    m_truehits[wave.m_truehit] += static_cast<float>(wave_value);
+    if (wave.m_particle != no_relation)
+      m_particles[wave.m_particle] += static_cast<float>(wave_value);
+    if (wave.m_truehit != no_relation)
+      m_truehits[wave.m_truehit] += static_cast<float>(wave_value);
   }
   return boost::make_tuple(wave_sum, boost::cref(m_particles), boost::cref(m_truehits));
 }

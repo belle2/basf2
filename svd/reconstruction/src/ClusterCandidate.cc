@@ -34,6 +34,7 @@ namespace Belle2 {
         m_charge += charge;
         m_maxima[strip] = time;
       }
+      m_counts[strip]++;
       m_samples.push_back(sample);
       if (m_seed.getCharge() < charge) {
         m_seed = sample;
@@ -52,6 +53,7 @@ namespace Belle2 {
       }
       cls.m_samples.clear();
       cls.m_charges.clear();
+      cls.m_counts.clear();
       cls.m_charge = 0;
     }
 

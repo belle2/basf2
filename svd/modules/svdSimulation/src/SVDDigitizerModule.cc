@@ -723,11 +723,11 @@ void SVDDigitizerModule::saveDigits(double time)
 
       //If the digit has any relations to MCParticles, add the Relation
       if (particles.size() > 0) {
-        relDigitMCParticle.add(iStrip, particles.begin(), particles.end());
+        relDigitMCParticle.add(digIndex, particles.begin(), particles.end());
       }
       //If the digit has any relations to truehits, add the Relations.
       if (truehits.size() > 0) {
-        relDigitTrueHit.add(iStrip, truehits.begin(), truehits.end());
+        relDigitTrueHit.add(digIndex, truehits.begin(), truehits.end());
         // Add reporting data
         if (m_signalDist_u) {
           BOOST_FOREACH(SVDSignal::relation_value_type trueRel, truehits) {
@@ -789,11 +789,11 @@ void SVDDigitizerModule::saveDigits(double time)
 
       //If the digit has any relations to MCParticles, add the Relation
       if (particles.size() > 0) {
-        relDigitMCParticle.add(iStrip, particles.begin(), particles.end());
+        relDigitMCParticle.add(digIndex, particles.begin(), particles.end());
       }
       //If the digit has any relations to truehits, add the Relations
       if (truehits.size() > 0) {
-        relDigitTrueHit.add(iStrip, truehits.begin(), truehits.end());
+        relDigitTrueHit.add(digIndex, truehits.begin(), truehits.end());
         // Add reporting data
         if (m_signalDist_v) {
           BOOST_FOREACH(SVDSignal::relation_value_type trueRel, truehits) {
@@ -874,10 +874,6 @@ void SVDDigitizerModule::saveWaveforms()
 
 void SVDDigitizerModule::terminate()
 {
-  if (m_storeWaveforms) {
-    m_rootFile->cd();
-    m_waveTree->Write();
-  }
   if (m_rootFile) {
     m_rootFile->Write();
     m_rootFile->Close();

@@ -14,7 +14,7 @@ using namespace Belle2;
 using namespace std;
 
 LogConnectionIOStream::LogConnectionIOStream(ostream& outputStream, bool color) :
-    m_color(color)
+  m_color(color)
 {
   m_stream = new ostream(outputStream.rdbuf());
 }
@@ -36,7 +36,7 @@ bool LogConnectionIOStream::sendMessage(LogMessage message)
 {
   static const char* color_str[] = {
     "\x1b[32m",        // Debug  : green
-    "\x1b[30m",        // Info   : black
+    "",                // Info   : terminal default
     "\x1b[33m",        // Warning: yellow
     "\x1b[31m",        // Error  : red
     "\x1b[07m\x1b[31m" // Fatal  : red reversed
@@ -47,7 +47,7 @@ bool LogConnectionIOStream::sendMessage(LogMessage message)
     }
     (*m_stream) << message;
     if (m_color) {
-      (*m_stream) << "\x1b[m";
+      (*m_stream) << "\x1b[m" << flush;
     }
     return true;
   } else return false;

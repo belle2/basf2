@@ -11,6 +11,8 @@
 #include <framework/logging/LogSystem.h>
 #include <framework/logging/LogConnectionIOStream.h>
 
+#include <unistd.h>
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -137,8 +139,8 @@ LogConfig::ELogLevel LogSystem::getCurrentLogLevel()
 //============================================================================
 
 LogSystem::LogSystem() :
-    m_logConfig(LogConfig::c_Info, 100),
-    m_moduleLogConfig(0)
+  m_logConfig(LogConfig::c_Info, 100),
+  m_moduleLogConfig(0)
 {
   unsigned int logInfo = LogConfig::c_Level + LogConfig::c_Message;
   unsigned int debugLogInfo = LogConfig::c_Level + LogConfig::c_Message + LogConfig::c_Module + LogConfig::c_File + LogConfig::c_Line;
@@ -151,7 +153,17 @@ LogSystem::LogSystem() :
 
   resetMessageCounter();
 
-  addLogConnection(new LogConnectionIOStream(std::cout));
+  //enable color for TTYs with color support (list taken from gtest)
+  const bool isTTY = isatty(fileno(stdout));
+  const string termName = getenv("TERM");
+  const bool useColor = isTTY and(
+                          termName == "xterm" or
+                          termName == "xterm-color" or
+                          termName == "xterm-256color" or
+                          termName == "linux" or
+                          termName == "cygwin");
+
+  addLogConnection(new LogConnectionIOStream(std::cout, useColor));
 }
 
 

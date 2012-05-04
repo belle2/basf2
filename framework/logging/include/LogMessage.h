@@ -51,14 +51,14 @@ namespace Belle2 {
      *
      * @return Returns the log level of the message.
      */
-    LogConfig::ELogLevel getLogLevel() {return m_logLevel; };
+    LogConfig::ELogLevel getLogLevel() const {return m_logLevel; };
 
     /**
      * Returns the package where the message was sent from.
      *
      * @return Returns the package where the message was sent from.
      */
-    const std::string& getPackage() {return m_package; };
+    const std::string& getPackage() const {return m_package; };
 
     /**
      * Configure which information should be printed.
@@ -81,7 +81,7 @@ namespace Belle2 {
   private:
 
     LogConfig::ELogLevel m_logLevel;  /**< The log level of the message. */
-    std::string m_message;    /**< The message string which should be send. */
+    std::string m_message;    /**< The message string which should be sent. */
     std::string m_module;     /**< The module name where the message was sent from. */
     std::string m_package;    /**< The package name where the message was sent from. */
     std::string m_function;   /**< The function name where the message was sent from. */

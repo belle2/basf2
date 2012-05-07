@@ -106,6 +106,7 @@ RingBuffer::RingBuffer(const char* name, unsigned int size)
     m_new = true;
     m_shmkey = IPC_PRIVATE;
     m_semkey = IPC_PRIVATE;
+    B2INFO("[RingBUffer] Opening private ring buffer");
   }
 
   // 1. Open shared memory

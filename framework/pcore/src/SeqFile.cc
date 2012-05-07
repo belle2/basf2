@@ -67,6 +67,7 @@ int SeqFile::write(char* buf)
               strerror(errno), filename);
       exit(-1);
     }
+    m_nb = 0;
     printf("SeqFile: %s opened\n", filename);
     stat = ::write(m_fd, buf, insize);
     if (stat > 0)

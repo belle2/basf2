@@ -19,6 +19,8 @@
 #include <string>
 #include <vector>
 
+#include <sys/time.h>
+
 #include <framework/datastore/DataStore.h>
 
 #define MAXEVTSIZE 400000000*4
@@ -67,6 +69,14 @@ namespace Belle2 {
 
     //! Messaage handler
     MsgHandler* m_msghandler;
+
+    //! Time
+    struct timeval m_t0;
+    struct timeval m_tend;
+
+    //! Data flow
+    double m_size;
+    double m_size2;
 
   };
 

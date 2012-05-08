@@ -72,6 +72,14 @@ namespace Belle2 {
     //! Messaage handler
     MsgHandler* m_msghandler;
 
+    //! Time
+    struct timeval m_t0;
+    struct timeval m_tend;
+
+    //! Data flow
+    double m_size;
+    double m_size2;
+
   };
 
 } // end namespace Belle2

@@ -57,6 +57,7 @@ void SeqRootOutputModule::initialize()
   m_msghandler = new MsgHandler(m_compressionLevel);
 
   B2INFO("SeqRootOutput: initialized.");
+
 }
 
 
@@ -65,6 +66,12 @@ void SeqRootOutputModule::beginRun()
   //  EvtMessage* msg = buildMessage(MSG_BEGIN_RUN);
 
   //  m_file->write(msg->buffer());
+
+  // Statistics
+  gettimeofday(&m_t0, 0);
+  m_size = 0.0;
+  m_size2 = 0.0;
+  m_nevt = 0;
 
   B2INFO("SeqRootOutput: beginRun called.");
 }
@@ -93,6 +100,16 @@ void SeqRootOutputModule::event()
   m_msghandler->decode_msg ( msg, objlist, namelist );
   */
 
+  // Statistics
+  double dsize = (double)stat / 1000.0;
+  //  if ( dsize>100.0 && dsize < 800.0 ) {
+  m_size += dsize;
+  m_size2 += dsize * dsize;
+  m_nevt++;
+  //    printf ( "dsize = %f, dsize*dsize = %f; m_size=%f, m_size2=%f\n",
+  //       dsize, dsize*dsize, m_size, m_size2 );
+  //  }
+
 
   //  B2INFO ( "Event sent : " << m_nsent++ )
 }
@@ -100,6 +117,28 @@ void SeqRootOutputModule::event()
 void SeqRootOutputModule::endRun()
 {
   //fill Run data
+
+  // End time
+  gettimeofday(&m_tend, 0);
+  double etime = (double)((m_tend.tv_sec - m_t0.tv_sec) * 1000000 +
+                          (m_tend.tv_usec - m_t0.tv_usec));
+
+  // Statistics
+  // Sigma^2 = Sum(X^2)/n - (Sum(X)/n)^2
+
+  double flowmb = m_size / etime * 1000.0;
+  double avesize = m_size / (double)m_nevt;
+  double avesize2 = m_size2 / (double)m_nevt;
+  double sigma2 = avesize2 - avesize * avesize;
+  double sigma = sqrt(sigma2);
+
+  //  printf ( "m_size = %f, m_size2 = %f, m_nevt = %d\n", m_size, m_size2, m_nevt );
+  //  printf ( "avesize2 = %f, avesize = %f, avesize*avesize = %f\n", avesize2, avesize, avesize*avesize );
+  printf("SeqRootOutput :  %d events read with total bytes of %f kB\n",
+         m_nevt, m_size);
+  printf("SeqRootOutput : flow rate = %f (MB/s)\n", flowmb);
+  printf("SeqRootOutput : event size = %f +- %f (kB)\n", avesize, sigma);
+
 
   B2INFO("SeqRootOutput: endRun done.");
 }

@@ -1,6 +1,6 @@
 //+
-// File : seqrootoutput.cc
-// Description : Sequential ROOT output module for pbasf2
+// File : seqrootinput.cc
+// Description : Sequential ROOT input module for pbasf2
 //
 // Author : Ryosuke Itoh, IPNS, KEK
 // Date : 13 - Aug - 2010
@@ -64,6 +64,10 @@ void SeqRootInputModule::initialize()
 
 void SeqRootInputModule::beginRun()
 {
+  gettimeofday(&m_t0, 0);
+  m_size = 0.0;
+  m_size2 = 0.0;
+  m_nevt = 0;
   B2INFO("SeqRootInput: beginRun called.");
 }
 
@@ -84,6 +88,12 @@ void SeqRootInputModule::event()
     //    printf("SeqRootInput : read = %d\n", size);
     evtmsg = new EvtMessage(evtbuf);
   }
+
+  // Statistics
+  double dsize = (double)size / 1000.0;
+  m_size += dsize;
+  m_size2 += dsize * dsize;
+  m_nevt++;
 
   // Get number of objects
   DataStore::EDurability durability = (DataStore::EDurability)(evtmsg->header())->reserved[0];
@@ -142,7 +152,26 @@ void SeqRootInputModule::event()
 
 void SeqRootInputModule::endRun()
 {
-  //fill Run data
+  // End time
+  gettimeofday(&m_tend, 0);
+  double etime = (double)((m_tend.tv_sec - m_t0.tv_sec) * 1000000 +
+                          (m_tend.tv_usec - m_t0.tv_usec));
+
+  // Statistics
+  // Sigma^2 = Sum(X^2)/n - (Sum(X)/n)^2
+
+  double flowmb = m_size / etime * 1000.0;
+  double avesize = m_size / (double)m_nevt;
+  double avesize2 = m_size2 / (double)m_nevt;
+  double sigma2 = avesize2 - avesize * avesize;
+  double sigma = sqrt(sigma2);
+
+  //  printf ( "m_size = %f, m_size2 = %f, m_nevt = %d\n", m_size, m_size2, m_nevt );
+  //  printf ( "avesize2 = %f, avesize = %f, avesize*avesize = %f\n", avesize2, avesize, avesize*avesize );
+  printf("SeqRootInput :  %d events read with total bytes of %f kB\n",
+         m_nevt, m_size);
+  printf("SeqRootInput : flow rate = %f (MB/s)\n", flowmb);
+  printf("SeqRootInput : event size = %f +- %f (kB)\n", avesize, sigma);
 
   B2INFO("SeqRootInput: endRun done.");
 }

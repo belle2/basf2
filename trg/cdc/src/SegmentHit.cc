@@ -27,7 +27,14 @@ namespace Belle2 {
 vector<TRGCDCSegmentHit *> TRGCDCSegmentHit::_all;
 
 TRGCDCSegmentHit::TRGCDCSegmentHit(const TCSegment & w)
-    : TCCHit(w) {
+//  : TCCHit((TCCHit &) * w.center().hit()) {
+    : TCCHit(w,
+	     w.center().hit()->iCDCHit(),
+	     w.center().hit()->iCDCSimHit(),
+	     w.center().hit()->drift(0),
+	     w.center().hit()->dDrift(0),
+	     w.center().hit()->drift(1),
+	     w.center().hit()->dDrift(1)) {
 }
 
 TRGCDCSegmentHit::~TRGCDCSegmentHit() {

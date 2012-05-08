@@ -94,7 +94,7 @@ class TRGCDCSegment : public TRGCDCCell {
     void simulate(void);
 
     /// sets a pointer to a TRGCDCSegmentHit.
-    const TRGCDCSegmentHit * hit(const TRGCDCSegmentHit * const);
+    const TRGCDCSegmentHit * hit(const TRGCDCSegmentHit *);
 
   private:
 

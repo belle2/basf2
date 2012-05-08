@@ -358,7 +358,7 @@ namespace Belle2 {
 	  //const TRGCDCCell *s = & links[0]->hit()->cell();
           const TCSegment * s = dynamic_cast<const TCSegment *>(& links[0]->hit()->cell());
           phi[i]=(double) s->localId()/ni[i]*4*M_PI;
-	  s->hit()->drift();
+	  cout << "===> " << s->hit()->drift() << endl;
         }
 
         //...Do fitting job here (or call a fitting function)...

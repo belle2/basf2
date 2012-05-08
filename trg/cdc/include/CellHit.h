@@ -70,6 +70,7 @@ class TRGCDCCell;
 class TRGCDCCellHit {
 
   public:
+
     /// Constructor.
     TRGCDCCellHit(const TRGCDCCell &,
 		  unsigned indexCDCHit = 0,
@@ -121,6 +122,9 @@ class TRGCDCCellHit {
 
     /// returns an index to CDCHit.
     unsigned iCDCHit(void) const;
+
+    /// returns an index to CDCSimHit.
+    unsigned iCDCSimHit(void) const;
 
     /// Access to CDCHit.
     const CDCHit * hit(void) const;
@@ -295,6 +299,12 @@ inline
 unsigned
 TRGCDCCellHit::iCDCHit(void) const {
     return _iCDCHit;
+}
+
+inline
+unsigned
+TRGCDCCellHit::iCDCSimHit(void) const {
+    return _iCDCSimHit;
 }
 
 } // namespace Belle2

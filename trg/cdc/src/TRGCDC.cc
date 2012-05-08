@@ -63,7 +63,7 @@ TRGCDC::name(void) const {
 
 string
 TRGCDC::version(void) const {
-    return string("TRGCDC 5.12");
+    return string("TRGCDC 5.13");
 }
 
 TRGCDC *

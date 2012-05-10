@@ -1,0 +1,4 @@
+Import('env')
+env['LIBS'] = ['tracking', 'framework', 'cdc', 'genfit', 'RKTrackRep']
+Return('env')
+

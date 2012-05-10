@@ -62,9 +62,12 @@ GeoEKLMBelleII::GeoEKLMBelleII()
  */
 GeoEKLMBelleII::~GeoEKLMBelleII()
 {
-  int i;
-  for (i = 0; i < nPlane; i++)
-    delete BoardTransform[i];
+  int i, j;
+  for (i = 0; i < nPlane; i++) {
+    for (j = 0; j < nBoard; j++)
+      delete BoardTransform[i][j];
+    free(BoardTransform[i]);
+  }
   delete m_sensitive;
 }
 
@@ -457,16 +460,18 @@ void GeoEKLMBelleII::calcBoardTransform()
   int i;
   int j;
   for (i = 0; i < nPlane; i++) {
-    BoardTransform[i] = new G4Transform3D[nBoard];
+    BoardTransform[i] = (G4Transform3D**)
+                        malloc(sizeof(G4Transform3D*) * nBoard);
     if (BoardTransform[i] == NULL) {
       B2FATAL("Memory allocation error.");
       exit(ENOMEM);
     }
     for (j = 0; j < nBoard; j++) {
-      BoardTransform[i][j] = G4RotateZ3D(BoardPosition[i][j].phi) *
-                             G4Translate3D(BoardPosition[i][j].r -
-                                           0.5 * BoardSize.height, 0., 0.) *
-                             G4RotateZ3D(90.0 * deg);
+      BoardTransform[i][j] = new G4Transform3D(
+        G4RotateZ3D(BoardPosition[i][j].phi) *
+        G4Translate3D(BoardPosition[i][j].r -
+                      0.5 * BoardSize.height, 0., 0.) *
+        G4RotateZ3D(90.0 * deg));
     }
   }
 }
@@ -1081,7 +1086,7 @@ subtractBoardSolids(G4SubtractionSolid* plane, int iPlane,
     if (ss[i] == NULL)
       return NULL;
     for (j = 0; j < nBoard; j++) {
-      t = BoardTransform[i][j];
+      t = *BoardTransform[i][j];
       if (iPlane == 2)
         t = G4Rotate3D(180. * deg, G4ThreeVector(1., 1., 0.)) * t;
       if (i == 0) {
@@ -1312,7 +1317,7 @@ void GeoEKLMBelleII::createSectionReadoutBoard(int iPlane, int iBoard,
   }
   geometry::setVisibility(*logicSectionReadoutBoard, false);
   physiSectionReadoutBoard = new G4PVPlacementGT(mpvgt,
-                                                 BoardTransform[iPlane - 1]
+                                                 *BoardTransform[iPlane - 1]
                                                  [iBoard - 1],
                                                  logicSectionReadoutBoard,
                                                  Board_Name,

@@ -488,7 +488,7 @@ namespace Belle2 {
     /**
      * Transformations of boards from sector reference frame
      */
-    G4Transform3D* BoardTransform[2];
+    G4Transform3D** BoardTransform[2];
 
     /**
      * Calculate board transformations

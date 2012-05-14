@@ -106,7 +106,7 @@ namespace Belle2 {
       double SafetyLength = cSafety.getLength("L1") / Unit::mm;
 
       double stepMax = 5.0 * Unit::mm;
-      bool flag_limitStep = false;
+      bool flag_limitStep = true;
 
 
       ////==========
@@ -804,7 +804,7 @@ namespace Belle2 {
       //
       double Lv1TaLERUp_Z[Lv1TaLERUp_num];
       Lv1TaLERUp_Z[0] = cLv1TaLERUp.getLength("L1") / Unit::mm;
-      Lv1TaLERUp_Z[1] = Lv1TaLERUp_Z[0] + cLv1TaLERUp.getLength("L2") / Unit::mm;
+      Lv1TaLERUp_Z[1] = cLv1TaLERUp.getLength("L2") / Unit::mm;
       //
       double Lv1TaLERUp_rI[Lv1TaLERUp_num];
       for (int i = 0; i < Lv1TaLERUp_num; i++)

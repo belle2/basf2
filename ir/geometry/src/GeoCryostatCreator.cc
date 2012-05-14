@@ -139,7 +139,7 @@ namespace Belle2 {
       G4Tubs* geo_TubeL = new G4Tubs("geo_TubeL_name", 0, radius_Tube, TMath::Abs(DistanceL), 0, 2 * M_PI);
 
       double stepMax = 5.0 * Unit::mm;
-      bool flag_limitStep = false;
+      bool flag_limitStep = true;
 
       //--------------
       //-   A1wal1

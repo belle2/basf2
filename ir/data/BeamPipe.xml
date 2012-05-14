@@ -128,7 +128,7 @@
         <D3 unit="cm">45.2</D3>
         <L1 unit="cm">50.0</L1>
         <L2 unit="cm">32.426</L2>
-        <L3 unit="cm">10.0</L3>
+        <L3 unit="cm">50.0</L3>
         <R1 unit="cm">1.0</R1>
         <R2 unit="cm">1.0</R2>
         <R3 unit="cm">0.2822</R3>
@@ -167,14 +167,14 @@
     <!-- ########## Ta pipe Forward Forward ########## -->
     <AreaTubeFwd>
         <R1 unit="cm">12.</R1>
-        <D1 unit="cm">44.2</D1>
+        <D1 unit="cm">50.2</D1>
         <D2 unit="cm">63.35</D2>
     </AreaTubeFwd>
 
     <Lv1TaLERUp>
         <R1 unit="cm">1.5</R1>
-        <L1 unit="cm">44.2</L1>
-        <L2 unit="cm">65.0</L2>
+        <L1 unit="cm">30.0</L1>
+        <L2 unit="cm">100.0</L2>
         <A1 unit="rad">-0.0415</A1>
         <Material>Ta</Material>
     </Lv1TaLERUp>
@@ -186,8 +186,8 @@
 
     <Lv1TaHERDwn>
         <R1 unit="cm">1.5</R1>
-        <L1 unit="cm">44.2</L1>
-        <L2 unit="cm">65.0</L2>
+        <L1 unit="cm">30.0</L1>
+        <L2 unit="cm">100.0</L2>
         <A1 unit="rad">0.0415</A1>
         <Material>Ta</Material>
     </Lv1TaHERDwn>
@@ -200,14 +200,14 @@
     <!-- ########## Ta pipe Backward Backward ########## -->
     <AreaTubeBwd>
         <R1 unit="cm">12</R1>
-        <D1 unit="cm">44.2</D1>
+        <D1 unit="cm">50.2</D1>
         <D2 unit="cm">62.725</D2>
     </AreaTubeBwd>
 
     <Lv1TaHERUp>
         <R1 unit="cm">1.5</R1>
-        <L1 unit="cm">44.2</L1>
-        <L2 unit="cm">65.0</L2>
+        <L1 unit="cm">30.0</L1>
+        <L2 unit="cm">100.0</L2>
         <A1 unit="rad">0.0415</A1>
         <Material>Ta</Material>
     </Lv1TaHERUp>
@@ -219,8 +219,8 @@
 
     <Lv1TaLERDwn>
         <R1 unit="cm">1.5</R1>
-        <L1 unit="cm">44.2</L1>
-        <L2 unit="cm">65.0</L2>
+        <L1 unit="cm">30.0</L1>
+        <L2 unit="cm">100.0</L2>
         <A1 unit="rad">-0.0415</A1>
         <Material>Ta</Material>
     </Lv1TaLERDwn>

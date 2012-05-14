@@ -1,13 +1,13 @@
 //+
-// File : Rbuf2Ds.h
-// Description : Module to restore DataStore in RingBuffer
+// File : ElapsedTimeModule.h
+// Description : Module to measure elapsed time
 //
 // Author : Ryosuke Itoh, IPNS, KEK
-// Date : 13 - Aug - 2010
+// Date : 07 - May - 2012
 //-
 
-#ifndef RBUF2DSMODULE_H
-#define RBUF2DSMODULE_H
+#ifndef ELAPSEDTIMEMODULE_H
+#define ELAPSEDTIMEMODULE_H
 
 #include <framework/core/Module.h>
 #include <framework/pcore/EvtMessage.h>
@@ -18,24 +18,21 @@
 #include <string>
 #include <vector>
 
-#include <framework/datastore/DataStore.h>
-
-#define RBUFSIZE 100000000
-#define MAXEVTSIZE 10000000
+#include <sys/time.h>
 
 
 namespace Belle2 {
 
   /*! A class definition of an input module for Sequential ROOT I/O */
 
-  class Rbuf2DsModule : public Module {
+  class ElapsedTimeModule : public Module {
 
     // Public functions
   public:
 
     //! Constructor / Destructor
-    Rbuf2DsModule();
-    virtual ~Rbuf2DsModule();
+    ElapsedTimeModule();
+    virtual ~ElapsedTimeModule();
 
     //! Module functions to be called from main process
     virtual void initialize();
@@ -48,19 +45,14 @@ namespace Belle2 {
 
     // Data members
   private:
+    int m_nevent;
+    int m_nevprev;
+    int m_interval;
+    struct timeval m_t0;
+    struct timeval m_tprev;
+    struct timeval m_tnow;
+    struct timeval m_tend;
 
-    //! RingBuffer ID
-    std::string m_rbufname;
-    RingBuffer* m_rbuf;
-
-    //! Messaage handler
-    MsgHandler* m_msghandler;
-
-    //! Compression Level
-    int m_compressionLevel;
-
-    //! No. of sent events
-    int m_nsent;
 
   };
 

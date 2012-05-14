@@ -12,7 +12,7 @@
 #include "framework/pcore/RingBuffer.h"
 
 #define RBUFSIZE 100000000
-#define MAXEVTSIZE 4000000
+#define MAXEVTSIZE 40000000
 
 using namespace Belle2;
 using namespace std;

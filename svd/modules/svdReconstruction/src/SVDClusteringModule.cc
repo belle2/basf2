@@ -392,8 +392,6 @@ void SVDClusteringModule::writeClusters(VxdID sensorID, int side)
       seed.getCharge(), cls.getCharge(), clSize
     );
 
-    int nRels = digit_weights.size();
-
     //Create Relations to this Digit
     relClusterMCParticle.add(clsIndex, mc_relations.begin(), mc_relations.end());
     relClusterTrueHit.add(clsIndex, truehit_relations.begin(), truehit_relations.end());

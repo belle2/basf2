@@ -28,12 +28,12 @@ namespace Belle2 {
      * time in the preceding strip. If any of these samples belongs to a cluster,
      * the clusters will be merged and the sample gets assigned to the existing
      * cluster. Otherwise a new cluster is created. In the end, all clusters will
-     * be checked if they satisfiy the requiremen*ts for a valid cluster (seed
+     * be checked if they satisfiy the requirements on a valid cluster (seed
      * and cluster charge, minimum number of samples per strip) and only valid
      * clusters are kept.
      *
      * Lets assume that we have a hit in the strip/time position  marked with X.
-     * If we process the pixels in a sorted way, than we only have to check the
+     * If we process the samples in a sorted way, than we only have to check the
      * positions marked O to see if this sample belongs to a cluster. To do this,
      * we cache the samples of the preceding strip and the preceding sample of
      * the current strip. We have to check the preceding strip and see if the
@@ -70,8 +70,8 @@ namespace Belle2 {
     class ClusterCache {
     public:
       enum {
-        /** Default maximum number of PIXEL columns the cache can handle */
-        MAX_SAMPLES = 6
+        /** Default maximum number of samples per strip that the cache can handle */
+        MAX_SAMPLES = 10
       };
       /** Create a new cache */
       ClusterCache(unsigned int maxSamples = MAX_SAMPLES);

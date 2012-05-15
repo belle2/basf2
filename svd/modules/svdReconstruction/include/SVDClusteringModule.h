@@ -133,7 +133,7 @@ namespace Belle2 {
       /** Size of the cluster at which we switch from Center of Gravity to Analog Head Tail */
       int m_sizeHeadTail;
       /** Minimum number of significant consecutive samples in a strip signal.*/
-      int m_minSamples;
+      unsigned int m_minSamples;
       /** Time tolerance for clustering: max. mean square distance between maxima in a cluster.*/
       double m_timeTolerance;
 

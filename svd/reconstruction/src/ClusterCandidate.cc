@@ -29,12 +29,13 @@ namespace Belle2 {
           m_charges[strip] = charge;
           m_maxima[strip] = time;
         }
+        m_counts[strip] += 1;
       } else {
         m_charges[strip] = charge;
         m_charge += charge;
         m_maxima[strip] = time;
+        m_counts[strip] = 1;
       }
-      m_counts[strip]++;
       m_samples.push_back(sample);
       if (m_seed.getCharge() < charge) {
         m_seed = sample;

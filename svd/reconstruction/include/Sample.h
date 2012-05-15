@@ -44,12 +44,12 @@ namespace Belle2 {
       VxdID getSensorID() const { return m_digit ? m_digit->getSensorID() : VxdID(0); }
       /** Check whether we have u- or v-strip. */
       bool isUStrip() const { return m_digit ? m_digit->isUStrip() : true; }
-      /** Shorthand to getDigit the sample number */
+      /** Shorthand to get the sample time */
       unsigned int getTime() const
       { return m_digit ? int((m_digit->getTime() - m_baseTime) / m_samplingTime + 0.1) : -1; }
-      /** Shorthand to getDigit the strip ID */
+      /** Shorthand to get the strip ID */
       unsigned int getCellID() const { return m_digit ? m_digit->getCellID() : -1; }
-      /** Shorthand to getDigit the pixel charge */
+      /** Shorthand to get the sample charge */
       float getCharge() const { return m_digit ? m_digit->getCharge() : 0;  }
       /** Return pointer to the wrapped Digit */
       SVDDigit* getDigit() const { return m_digit; }

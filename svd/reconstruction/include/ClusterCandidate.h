@@ -48,14 +48,14 @@ namespace Belle2 {
       const Sample& getSeed() const { return m_seed; }
       /** get the cluster size */
       size_t size() const { return m_samples.size(); }
-      /** get a reference to all pixels in the cluster */
+      /** get a reference to all samples in the cluster */
       const std::vector<Sample>& samples() const { return m_samples; }
       /** get the reference to the map of strip charges */
       const std::map<unsigned int, float>& getStripCharges() const { return m_charges; }
       /** get the reference to the map of indices of maximum strip signals */
       const std::map<unsigned int, unsigned int>& getMaxima() const { return m_maxima; }
       /** get the reference to the map of sample counts per strip */
-      const std::map<unsigned int, unsigned short>& getCounts() const { return m_counts; }
+      const std::map<unsigned int, unsigned int>& getCounts() const { return m_counts; }
 
 
     protected:
@@ -70,7 +70,7 @@ namespace Belle2 {
       /** Samples with maximum signal indices */
       std::map<unsigned int, unsigned int> m_maxima;
       /** Number of samples per strip */
-      std::map<unsigned int, unsigned short> m_counts;
+      std::map<unsigned int, unsigned int> m_counts;
     };
 
   }

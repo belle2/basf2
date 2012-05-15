@@ -216,8 +216,8 @@ void SVDClusteringModule::event()
       VxdID sensorID = sample.getDigit()->getSensorID();
       int side = sample.getDigit()->isUStrip() ? 0 : 1;
       std::pair<SensorSide::iterator, bool> it = sensors[sensorID][side].insert(sample);
-      if (!it.second) B2ERROR("Sample (" << sample.getTime() << "," << sample.getCellID() << ") in sensor "
-                                << (string)sensorID << " is already set, ignoring second occurrence");
+      if (!it.second) B2ERROR("Sample (" << sample.getTime() << "," << sample.getCellID() << "/" << (sample.isUStrip() ? 0 : 1) << ") in sensor "
+                                << (string)sensorID << " is already set, ignoring second occurrence.");
     }
 
     //Now we loop over sensors and cluster each sensor in turn
@@ -322,18 +322,18 @@ void SVDClusteringModule::writeClusters(VxdID sensorID, int side)
 
     // Estimate time - this is currently very crude
     const std::map<unsigned int, unsigned int> stripMaxima = cls.getMaxima();
-    const std::map<unsigned int, unsigned short> stripCounts = cls.getCounts();
+    const std::map<unsigned int, unsigned int> stripCounts = cls.getCounts();
     // Check that we have enough data in each strip.
-    int maxCount = 0;
-    std::map<unsigned int, unsigned short>::const_iterator strip_count = stripCounts.begin();
+    unsigned int maxCount = 0;
+    std::map<unsigned int, unsigned int>::const_iterator strip_count = stripCounts.begin();
     for (; strip_count != stripCounts.end(); ++strip_count)
       if (strip_count->second > maxCount) maxCount = strip_count->second;
     if (maxCount < m_minSamples) continue;
     // Constrain time calculation to strips with at least m_minSamples samples.
-    std::map<unsigned int, unsigned short>::const_iterator strip_low = stripCounts.begin();
+    std::map<unsigned int, unsigned int>::const_iterator strip_low = stripCounts.begin();
     while (strip_low->second < m_minSamples) strip_low++;
     unsigned int stripLow = strip_low->first;
-    std::map<unsigned int, unsigned short>::const_reverse_iterator strip_high = stripCounts.rbegin();
+    std::map<unsigned int, unsigned int>::const_reverse_iterator strip_high = stripCounts.rbegin();
     while (strip_high->second < m_minSamples) strip_high++;
     unsigned int stripHigh = strip_high->first;
     double time = 0.0;
@@ -391,6 +391,8 @@ void SVDClusteringModule::writeClusters(VxdID sensorID, int side)
       seed.getDigit()->getSensorID(), isU, pos, time, timeStd,
       seed.getCharge(), cls.getCharge(), clSize
     );
+
+    int nRels = digit_weights.size();
 
     //Create Relations to this Digit
     relClusterMCParticle.add(clsIndex, mc_relations.begin(), mc_relations.end());

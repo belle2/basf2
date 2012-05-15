@@ -756,6 +756,8 @@ void SVDDigitizerModule::saveDigits(double time)
           sensorID, true, iStrip, info.getUCellPosition(iStrip), addNoise(-1.0),
           time
         );
+        // Remember strip as occupied
+        occupied_u.insert(iStrip);
       } // for ns
     } // apply noise
 
@@ -822,6 +824,8 @@ void SVDDigitizerModule::saveDigits(double time)
           sensorID, false, iStrip, info.getVCellPosition(iStrip), addNoise(-1.0),
           time
         );
+        // Remember strip as occupied
+        occupied_v.insert(iStrip);
       } // for ns
     } // apply noise
 

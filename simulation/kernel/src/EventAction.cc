@@ -34,14 +34,14 @@ EventAction::~EventAction()
 
 }
 
-void EventAction::BeginOfEventAction(const G4Event* event)
+void EventAction::BeginOfEventAction(const G4Event*)
 {
   //Enable recording of Hits
   SensitiveDetectorBase::setActive(true);
 }
 
 
-void EventAction::EndOfEventAction(const G4Event* event)
+void EventAction::EndOfEventAction(const G4Event*)
 {
   //Disable recording of Hits
   SensitiveDetectorBase::setActive(false);

@@ -44,7 +44,6 @@ PXDClusteringModule::PXDClusteringModule() : Module(), m_elNoise(200.0),
 {
   //Set module properties
   setDescription("Cluster PXDHits");
-  setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
   addParam("ElectronicNoise", m_elNoise,
            "Noise added by the electronics, set in ENC", m_elNoise);
   addParam("NoiseSN", m_cutAdjacent,
@@ -283,6 +282,8 @@ void PXDClusteringModule::writeClusters(VxdID sensorID)
     if (sizeU >= m_sizeHeadTail) {
       //Average charge in the central area
       double centreCharge = (cls.getCharge() - minUCharge - maxUCharge) / (sizeU - 2);
+      minUCharge = (minUCharge < centreCharge) ? minUCharge : centreCharge;
+      maxUCharge = (maxUCharge < centreCharge) ? maxUCharge : centreCharge;
       double minUPos = info.getUCellPosition(minU);
       double maxUPos = info.getUCellPosition(maxU);
       posU = 0.5 * (minUPos + maxUPos + (maxUCharge - minUCharge) / centreCharge * info.getUPitch());
@@ -290,6 +291,8 @@ void PXDClusteringModule::writeClusters(VxdID sensorID)
     if (sizeV >= m_sizeHeadTail) {
       //Average charge in the central area
       double centreCharge = (cls.getCharge() - minVCharge - maxVCharge) / (sizeV - 2);
+      minVCharge = (minVCharge < centreCharge) ? minVCharge : centreCharge;
+      maxVCharge = (maxVCharge < centreCharge) ? maxVCharge : centreCharge;
       double minVPos = info.getVCellPosition(minV);
       double maxVPos = info.getVCellPosition(maxV);
       posV = 0.5 * (minVPos + maxVPos + (maxVCharge * info.getVPitch(maxVPos) -

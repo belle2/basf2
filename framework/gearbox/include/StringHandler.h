@@ -22,7 +22,7 @@ namespace Belle2 {
       /** Take an XML fragment as parameter and create a context for it */
       StringContext(const std::string& data): m_stream(data) {};
       /** Return a block of the data */
-      virtual int readXmlData(char *buffer, int buffsize) {
+      virtual int readXmlData(char* buffer, int buffsize) {
         m_stream.read(buffer, buffsize);
         return m_stream.gcount();
       }
@@ -43,9 +43,7 @@ namespace Belle2 {
       /** empty, virtual destructor */
       virtual ~StringHandler() {}
       /** Create a new context, path will be ignored */
-      virtual InputContext* open(const std::string &path) {
-        return new StringContext(m_uri);
-      }
+      virtual InputContext* open(const std::string& path);
     };
   }
 }

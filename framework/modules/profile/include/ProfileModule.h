@@ -62,7 +62,17 @@ namespace Belle2 {
     static const int k_burnIn = 1;         /**< number of events before the average time measurement is started */
     static const int k_maxPoints = 100;    /**< maximal number of profile points */
 
-    struct MemTime {MemTime(unsigned long m = 0, double t = 0) : mem(m), time(t) {}; unsigned long mem; double time;};
+    /**
+     * An internal struct to store pairs of memory usage and time.
+     */
+    struct MemTime {
+      /**
+       * Constructor with initialization of memory usage and time to zero.
+       */
+      MemTime(unsigned long m = 0, double t = 0) : mem(m), time(t) {};
+      unsigned long mem;  /**< memory usage */
+      double time;        /**< execution time */
+    };
 
     double m_timeOffset;      /**< time at module creation */
     MemTime m_initializeInfo; /**< memory usage and time at initialization */

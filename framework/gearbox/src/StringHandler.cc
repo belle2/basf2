@@ -16,5 +16,10 @@ using namespace std;
 namespace Belle2 {
   namespace gearbox {
     B2_GEARBOX_REGISTER_INPUTHANDLER(StringHandler, "string");
+
+    InputContext* StringHandler::open(const std::string&)
+    {
+      return new StringContext(m_uri);
+    }
   }
 } //Belle2 namespace

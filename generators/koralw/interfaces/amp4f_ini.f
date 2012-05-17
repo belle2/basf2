@@ -110,7 +110,7 @@ C
       elmatr=wwborn(p1,p2,p3,p4,keyac)
 ccc      elmatr=wwborn_massive(p1,p2,p3,p4)
 ccc      elmatr=bornkd(p1,p2,p3,p4)
-
+      ELMATRunsd=elmatr
       end
 
       SUBROUTINE MASOW(SIN2W,GPICB,AMAF)

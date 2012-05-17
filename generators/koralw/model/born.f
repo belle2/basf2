@@ -776,6 +776,7 @@ c moved to karlud 11/7      BORN=BORN*CC
 !-- Naive QCD to be added here.....
 
       bornkd=born
+      BORNKD_unused=bornkd
       END 
 
 

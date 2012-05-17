@@ -44,14 +44,14 @@ namespace Belle2 {
      * Return number of elements currently stored.
      * @return The number of elements currently stored
      */
-    const size_t size() const { return m_entries; }
+    size_t size() const { return m_entries; }
 
     /**
      * Return pointer to memory segment for element i, no range check.
      * @param i The index of the memory segment.
      * @return Pointer to the memory segment.
      */
-    T* operator[](size_t i) { return m_chunks[i/chunkSize] + i % chunkSize; }
+    T* operator[](size_t i) { return m_chunks[i / chunkSize] + i % chunkSize; }
 
     /**
      * Return pointer to memory segment for element i, including range check.
@@ -71,7 +71,7 @@ namespace Belle2 {
      */
     T* add() {
       if (m_entries / chunkSize >= m_chunks.size()) {
-        m_chunks.push_back(reinterpret_cast<T*>(malloc(chunkSize*sizeof(T))));
+        m_chunks.push_back(reinterpret_cast<T*>(malloc(chunkSize * sizeof(T))));
       }
       return (*this)[m_entries++];
     }
@@ -84,7 +84,7 @@ namespace Belle2 {
       size_t needed_chunks = n / chunkSize + 1;
       m_chunks.reserve(needed_chunks);
       while (m_chunks.size() < needed_chunks) {
-        m_chunks.push_back(reinterpret_cast<T*>(malloc(chunkSize*sizeof(T))));
+        m_chunks.push_back(reinterpret_cast<T*>(malloc(chunkSize * sizeof(T))));
       }
     }
 
@@ -92,7 +92,7 @@ namespace Belle2 {
      * Release all allocated memory, called automatically upon destruction.
      */
     void release_memory() {
-      BOOST_FOREACH(T* ptr, m_chunks) {
+      BOOST_FOREACH(T * ptr, m_chunks) {
         free(reinterpret_cast<void*>(ptr));
       }
       m_chunks.clear();

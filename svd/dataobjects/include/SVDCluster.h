@@ -57,8 +57,8 @@ namespace Belle2 {
      */
     bool isUCluster() const { return m_isU; }
 
-
     /** Get the coordinate of seed strip.
+     * Note: For wedge sensors, this is the coordinate at v=0 !
      * @return absolute coordinate of the seed strip.
      */
     float getPosition() const { return m_position; }
@@ -66,12 +66,12 @@ namespace Belle2 {
     /** Get average of waveform maximum times of cluster strip signals.
      * @return average waveform maximum times.
      */
-    float getClsTime() const { return m_clsTime; }
+    float getTime() const { return m_clsTime; }
 
     /** Get standard deviation of waveform maximum times of cluster strip signals.
      * @return standard deviation of waveform maximum times.
      */
-    float getClsTimeSigma() const { return m_clsTimeSigma; }
+    float getTimeSigma() const { return m_clsTimeSigma; }
 
     /** Get collected charge.
      * @return charge collected in the cluster in e-.

@@ -16,7 +16,7 @@ namespace Belle2 {
   namespace SVD {
 
     /**
-     * Check creation and simple object getters.
+     * Check object creation and simple object getters.
      */
     TEST(SVDSignal, Getters)
     {
@@ -49,6 +49,7 @@ namespace Belle2 {
       }
     }
 
+    /** Check the different constructors. */
     TEST(SVDSignal, Constructors)
     {
       // Create an artificial signal and load it with data.
@@ -83,6 +84,7 @@ namespace Belle2 {
       }
     }
 
+    /** Check assignment operators. */
     TEST(SVDSignal, Assignment)
     {
       // Create an artificial signal and load it with data.
@@ -115,6 +117,7 @@ namespace Belle2 {
       }
     }
 
+    /** Check mathematical operations with signals.*/
     TEST(SVDSignal, Operators)
     {
       // Create an artificial signal and load it with data.
@@ -168,6 +171,7 @@ namespace Belle2 {
       }
     }
 
+    /** Check the waveform values and relations. */
     TEST(SVDSignal, Waveform)
     {
       // Create an artificial signal and load it with data.
@@ -215,9 +219,6 @@ namespace Belle2 {
         EXPECT_EQ(truehits[trueHits.at(j)], expected_truehits_map[trueHits.at(j)]);
       }
     }
-
-
-
 
   } // namespace SVD
 }  // namespace Belle2

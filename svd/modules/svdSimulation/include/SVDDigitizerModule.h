@@ -36,12 +36,16 @@ namespace Belle2 {
       stripRPhi = 0, /** for strips in R-Phi */
       stripZ = 1     /** for strips in Z     */
     };
+    /**
+     * Enum to flag charge carriers.
+     */
     enum CarrierType {
-      electron = -1,
-      hole = +1
+      electron = -1, /** electrons */
+      hole = +1      /** holes */
     };
 
     // FIXME: Has to go to Unit.h
+    /** The Fano factor for silicon. */
     const double FanoFactorSi = 0.08;
 
     /** Map of all signals in one sensor. */
@@ -54,7 +58,29 @@ namespace Belle2 {
     typedef std::map<VxdID, Sensor> Sensors;
 
 
-    /** The SVD Digitizer module. */
+    /** \addtogroup modules
+     * @{
+     */
+
+    /** The SVD Digitizer module.
+     * This module is responsible for converting the simulated energy
+     * deposition from Geant4 into real SVD detector response of single strips.
+
+       \correlationdiagram
+       MCParticle = graph.external_data('MCParticle')
+       SVDSimHit  = graph.data('SVDSimHit')
+       SVDTrueHit = graph.data('SVDTrueHit')
+       SVDDigit   = graph.data('SVDDigit')
+
+       graph.module('SVDDigitizer', [MCParticle, SVDSimHit, SVDTrueHit], [SVDDigit])
+       graph.relation(MCParticle, SVDSimHit)
+       graph.relation(MCParticle, SVDTrueHit)
+       graph.relation(SVDTrueHit, SVDSimHit)
+       graph.relation(SVDDigit,   MCParticle)
+       graph.relation(SVDDigit,   SVDTrueHit)
+       \endcorrelationdiagram
+
+     */
 
     class SVDDigitizerModule : public Module {
     public:
@@ -198,7 +224,7 @@ namespace Belle2 {
       double m_maxADC;
       /** Number of ADC bits. */
       int m_bitsADC;
-      // Derived from above: adu in electrons. */
+      /** adu in electrons (derived from the above). */
       double m_unitADC;
 
       // 6. Reporting
@@ -226,7 +252,7 @@ namespace Belle2 {
       /** Time of the current detector event, from the currently processed SimHit.. */
       double             m_currentTime;
 
-      // Read from m_currentSensorInfo
+      /** Thickness of current sensor (read from m_currentSensorInfo).*/
       double m_sensorThickness;
       /** The depletion voltage of the Silicon sensor */
       double m_depletionVoltage;
@@ -242,19 +268,25 @@ namespace Belle2 {
       // ROOT stuff:
       /** Pointer to the ROOT filename for statistics */
       TFile* m_rootFile;
-      /** Histogram showing the diffusion cloud */
+      /** Histogram showing the diffusion cloud in u (r-phi). */
       TH1D*  m_histDiffusion_u;
+      /** Histogram showing the diffusion cloud in v (z). */
       TH1D*  m_histDiffusion_v;
-      /** Histogram showing Lorentz agnles. */
+      /** Histogram showing the Lorentz angles in u (r-phi). */
       TH1D*  m_histLorentz_u;
+      /** Histogram showing the Lorentz angles in v (z). */
       TH1D*  m_histLorentz_v;
-      /** Histogram showing distribution of digit signals.*/
+      /** Histogram showing the distribution of digit signals in u (r-phi).*/
       TH1D*  m_signalDist_u;
+      /** Histogram showing the distribution of digit signals in v (z).*/
       TH1D*  m_signalDist_v;
       /** Tree for waveform storage. */
       TTree* m_waveTree;
 
     };//end class declaration
+
+    /** @}*/
+
   } // end namespace SVD
 } // end namespace Belle2
 

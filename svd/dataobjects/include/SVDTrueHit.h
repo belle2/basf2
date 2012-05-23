@@ -15,6 +15,9 @@
 #include <vxd/dataobjects/VXDTrueHit.h>
 
 namespace Belle2 {
+  /** \addtogroup dataobjects
+   * @{
+   */
 
   /**
     * Class SVDTrueHit - Position where are particle traversed the detector plane.
@@ -68,6 +71,8 @@ namespace Belle2 {
 
     ClassDef(SVDTrueHit, 3)
   };
+
+  /** @}*/
 
 } // end namespace Belle2
 

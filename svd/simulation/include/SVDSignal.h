@@ -66,10 +66,12 @@ namespace Belle2 {
         RelationElement::index_type m_truehit;
       };
 
+      /** List of elementary waveforms. */
       typedef std::deque< Wave > function_list;
 
       /** Type to store contributions to strip signal by different particles on output of SVDSignal */
       typedef std::map<RelationElement::index_type, RelationElement::weight_type> relations_map;
+      /** Type of relation_map elements. */
       typedef std::map<RelationElement::index_type, RelationElement::weight_type>::value_type relation_value_type;
 
       /** Default constructor */

@@ -28,7 +28,9 @@ namespace Belle2 {
     class StripData {
     public:
 
+      /** (time, charge) data of signal samples. */
       typedef std::map<double, double> data_type;
+      /** StoreArray indices to generating Digits. */
       typedef std::vector<int> indices_type;
 
       /** Constructor. */

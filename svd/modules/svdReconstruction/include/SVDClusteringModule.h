@@ -30,11 +30,13 @@ namespace Belle2 {
      * @{
      */
 
-    /** The SVDClustering module.
+    /** SVDClusteringModule: The SVD Clusterizer.
      *
-     * This module's task is to cluster all hits found in the SVD and
-     * write them to appropriate collections. It searches for clusters in u and
-     * v strips and outputs the clusters.
+     * This module produces clusters from SVDDigits (signal samples taken on
+     * individual strips) by first performing 2D clustering in strip coordinate and
+     * time, same as in PXD, and then using a waveform fit to determine the initial
+     * time of the waveform in the time coordinate and center-of-gravity or analog
+     * head-tail to determine the spatial coordinate.
 
        \correlationdiagram
        MCParticle = graph.external_data('MCParticle')
@@ -42,7 +44,7 @@ namespace Belle2 {
        SVDDigit   = graph.data('SVDDigit')
        SVDCluster = graph.data('SVDCluster')
 
-       graph.module('SVDDigitizer', [MCParticle, SVDDigit, SVDTrueHit], [SVDCluster])
+       graph.module('SVDClustering', [MCParticle, SVDDigit, SVDTrueHit], [SVDCluster])
        graph.relation(MCParticle, SVDTrueHit)
        graph.relation(SVDDigit,   MCParticle)
        graph.relation(SVDDigit,   SVDTrueHit)
@@ -51,14 +53,6 @@ namespace Belle2 {
        graph.relation(SVDCluster, SVDTrueHit)
        \endcorrelationdiagram
 
-     */
-
-    /** SVDClusteringModule: The SVD Clusterizer.
-     * This module produces clusters from SVDDigits (signal samples taken on
-     * individual strips) by first performing 2D clustering in strip coordinate and
-     * time, same as in PXD, and then using a waveform fit to determine the initial
-     * time of the waveform in the time coordinate and center-of-gravity or analog
-     * head-tail to determine the spatial coordinate.
      */
     class SVDClusteringModule : public Module {
 
@@ -69,6 +63,7 @@ namespace Belle2 {
       typedef boost::array<SensorSide, 2> Sensor;
       /** Structure to hold the data of all SVD sensors. */
       typedef std::map<VxdID, Sensor > Sensors;
+      /** Iterator type for the map of sensors. */
       typedef std::map<VxdID, Sensor >::iterator SensorIterator;
 
       /** Constructor defining the parameters */

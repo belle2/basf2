@@ -35,10 +35,11 @@ namespace Belle2 {
       /** (time, signal) pair of a single waveform.*/
       typedef std::map<double, double> signal_type;
 
+      /** Enum giving fit result types.*/
       enum fit_result {
-        no_fit = 0,
-        good_fit = 1,
-        bad_fit = 2
+        no_fit = 0,   /** no fit was tried yet */
+        good_fit = 1, /** successful fit - use getters to get the result.*/
+        bad_fit = 2   /** unsuccessful fit */
       };
 
       /** Constructor.
@@ -111,13 +112,13 @@ namespace Belle2 {
     private:
       double m_tau;           /** Waveform time constant. */
       double m_samplingTime;  /** Sampling time (interval between samples. */
-      signal_type m_data;     /** times and signals. */
-      signal_type m_predictions;  /** values predicted by the fit. */
-      fit_result m_hasFit;    /** indicates whether a fit was already calculated or succeeded.*/
-      double m_initTime;      /** initial time estimate of the waveform.*/
-      double m_initTimeSigma; /** initial time error estimate.*/
-      double m_charge;        /** strip charge estimate. */
-      double m_chargeSigma;   /** charge error estimate. */
+      signal_type m_data;     /** Times and signals. */
+      signal_type m_predictions;  /** Values predicted by the fit. */
+      fit_result m_hasFit;    /** Indicates whether a fit was already calculated or succeeded.*/
+      double m_initTime;      /** Initial time estimate of the waveform.*/
+      double m_initTimeSigma; /** Initial time error estimate.*/
+      double m_charge;        /** Strip charge estimate. */
+      double m_chargeSigma;   /** Charge error estimate. */
     };
 
   } // namespace SVD

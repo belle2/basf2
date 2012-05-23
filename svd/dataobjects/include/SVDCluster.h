@@ -15,11 +15,12 @@
 #include <vxd/dataobjects/VxdID.h>
 
 namespace Belle2 {
+  /** \addtogroup dataobjects
+   * @{
+   */
 
   /** The SVD Cluster class
-   * This class stores all information about reconstructed SVD clusters
-    *
-    * \addtogroup dataobjects
+   * This class stores all information about reconstructed SVD clusters.
    */
   class SVDCluster: public TObject {
   public:
@@ -102,5 +103,8 @@ namespace Belle2 {
     ClassDef(SVDCluster, 1)
 
   };
+
+  /** @}*/
+
 } //Belle2 namespace
 #endif

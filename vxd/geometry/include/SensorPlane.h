@@ -36,30 +36,39 @@ namespace Belle2 {
        * @param sensorID SensorID of the Sensor for which this plane should be build
        */
       SensorPlane(VxdID sensorID = 0, double uTolerance = 0, double vTolerance = 0):
-        m_sensorID(sensorID), m_uTolerance(uTolerance), m_vTolerance(vTolerance), m_sensorInfo(0) {}
+        m_sensorID(sensorID), m_uTolerance(uTolerance), m_vTolerance(vTolerance), m_cosPhi(1.), m_sinPhi(0.), m_sensorInfo(0) {}
 
+      /** Set plane rotation angle.
+       * This angle will be used to rotate coordinate parameters in inActive() method.
+       * @param phi The angle by which the plane was rotated.
+       */
+      void setRotation(double phi) {
+        m_cosPhi = cos(phi);
+        m_sinPhi = sin(phi);
+      }
       /** Destructor. */
       virtual ~SensorPlane() {}
 
-      /** Return wether the given coordinates are inside the finite region.
+      /** Return whether the given coordinates are inside the finite region.
        * @param u u-coordinate of the point.
        * @param v v-coordinate of the point.
        * @return true if (u,v) is within the sensor plane, otherwise false.
        */
       bool inActive(const double& u, const double& v) const {
 #ifndef __CINT__
-        //If running in ROOT CINT we do not now about GeoCache so we cannot get
+        //If running in ROOT CINT we do not know about GeoCache so we cannot get
         //the SensorInfo
         if (!m_sensorInfo) {
           m_sensorInfo = &VXD::GeoCache::get(m_sensorID);
-
         }
 #endif
         //No sensorInfo set so we have to bail
         if (!m_sensorInfo) {
           B2FATAL("Could not find sensorInfo for VXD Sensor " << VxdID(m_sensorID));
         }
-        return m_sensorInfo->inside(u, v, m_uTolerance, m_vTolerance);
+        double uRot = m_cosPhi * u - m_sinPhi * v;
+        double vRot = m_sinPhi * u + m_cosPhi * v;
+        return m_sensorInfo->inside(uRot, vRot, m_uTolerance, m_vTolerance);
       }
 
       /** Prints object data. */
@@ -74,16 +83,20 @@ namespace Belle2 {
       }
 
     private:
-      /** Sensor ID of the the sensor plane */
+      /** Sensor ID of the sensor plane */
       unsigned short m_sensorID;
       /** Tolerance to add to the sensor dimensions in u direction */
       double m_uTolerance;
       /** Tolerance to add to the sensor dimensions in v direction */
       double m_vTolerance;
+      /** Cosine term of plane rotation, used to align SVD trapezoidal sensors */
+      double m_cosPhi;
+      /** Sine term of plane rotation, used to align SVD trapezoidal sensors */
+      double m_sinPhi;
       /** Pointer to the SensorInfo which contains the geometry information for the given sensor plane */
       mutable const SensorInfoBase* m_sensorInfo; //! transient member
 
-      ClassDef(SensorPlane, 1)
+      ClassDef(SensorPlane, 2)
     };
   } // vxd namespace
 } // Belle2 namespace

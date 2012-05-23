@@ -43,7 +43,7 @@ namespace Belle2 {
        PXDDigit   = graph.data('PXDDigit')
        PXDCluster = graph.data('PXDCluster')
 
-       graph.module('PXDDigitizer', [MCParticle, PXDDigit, PXDTrueHit], [PXDCluster])
+       graph.module('PXDClustering', [MCParticle, PXDDigit, PXDTrueHit], [PXDCluster])
        graph.relation(MCParticle, PXDTrueHit)
        graph.relation(PXDDigit,   MCParticle)
        graph.relation(PXDDigit,   PXDTrueHit)

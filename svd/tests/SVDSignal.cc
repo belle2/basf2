@@ -210,9 +210,9 @@ namespace Belle2 {
       size_t nt_expected = expected_truehits_map.size();
       size_t nt_actual = truehits.size();
       EXPECT_EQ(nt_actual, nt_expected);
-      for (int i = 0; i < 3; ++i) {
-        EXPECT_EQ(particles[mcParticles.at(i)], expected_particles_map[mcParticles.at(i)]);
-        EXPECT_EQ(truehits[trueHits.at(i)], expected_truehits_map[trueHits.at(i)]);
+      for (int j = 0; j < 3; ++j) {
+        EXPECT_EQ(particles[mcParticles.at(j)], expected_particles_map[mcParticles.at(j)]);
+        EXPECT_EQ(truehits[trueHits.at(j)], expected_truehits_map[trueHits.at(j)]);
       }
     }
 

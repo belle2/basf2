@@ -356,7 +356,7 @@ void SVDDigitizerModule::processHit()
   //Calculate the number of electrons and holes
   double carriers = m_currentHit->getEnergyDep() * Unit::GeV / Unit::ehEnergy;
 
-  if (m_currentHit->getPDGcode() == 22 || trackLength == 0) {
+  if (m_currentHit->getPDGcode() == 22 || trackLength < 0.1 * Unit::um) {
     //Photons deposit the energy at the end of their step
     driftCharge(stopPoint, carriers);
   } else {

@@ -23,7 +23,7 @@
 using namespace std;
 using namespace Belle2;
 
-ClassImp(SVDRecoHit2D);
+ClassImp(SVDRecoHit2D)
 
 SVDRecoHit2D::SVDRecoHit2D():
   GFRecoHitIfc<GFPlanarHitPolicy> (HIT_DIMENSIONS), m_sensorID(0), m_trueHit(0),

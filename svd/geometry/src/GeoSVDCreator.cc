@@ -178,8 +178,8 @@ namespace Belle2 {
 
         for (int i = 0; i < nPipes; ++i) {
           //Place the straight pipes
-          G4Transform3D placement = G4RotateZ3D(startPhi + i * deltaPhi) * G4Translate3D(radius, 0, zstart + zlength);
-          supportAssembly.add(pipeVolume, placement);
+          G4Transform3D placement_pipe = G4RotateZ3D(startPhi + i * deltaPhi) * G4Translate3D(radius, 0, zstart + zlength);
+          supportAssembly.add(pipeVolume, placement_pipe);
 
           //This was the easy part, now lets add the connection between the pipes. We only need n-1 bendings
           if (i > 0) {

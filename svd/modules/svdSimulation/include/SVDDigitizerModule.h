@@ -216,15 +216,15 @@ namespace Belle2 {
       /** Pointer to the SVDSimhit currently digitized */
       const SVDSimHit*   m_currentHit;
       /** Index of the particle which caused the current hit */
-      RelationElement::index_type  m_currentParticle;
+      int                m_currentParticle;
       /** Index of the TrueHit the current hit belongs to */
-      RelationElement::index_type  m_currentTrueHit;
+      int                m_currentTrueHit;
       /** Pointer to the sensor in which the current hit occurred */
       Sensor*            m_currentSensor;
       /** Pointer to the SensorInfo of the current sensor */
       const SensorInfo*  m_currentSensorInfo;
       /** Time of the current detector event, from the currently processed SimHit.. */
-      double m_currentTime;
+      double             m_currentTime;
 
       // Read from m_currentSensorInfo
       double m_sensorThickness;

@@ -46,7 +46,7 @@ void ExtPhysicsConstructor::ConstructParticle()
   //               type    lepton number  baryon number   PDG encoding
   //             stable         lifetime    decay table
   //             shortlived      subType    anti_encoding
-  // Values copied verbatim from geant4, except g4ext particles don't decay
+  // Values copied verbatim from geant4, except these particles don't decay
   // and names/PDGcodes are unique.
 
   static G4ParticleDefinition* g4eParticle = NULL;
@@ -64,7 +64,7 @@ void ExtPhysicsConstructor::ConstructParticle()
       true,             0.0,          NULL,
       false,        "photon",    1000000022
     );
-    g4eParticle = new G4ParticleDefinition(
+    new G4ParticleDefinition(
       "g4e_e-",  0.51099906 * MeV,       0.0 * MeV,    -1.*eplus,
       1,               0,             0,
       0,               0,             0,
@@ -72,7 +72,7 @@ void ExtPhysicsConstructor::ConstructParticle()
       true,            -1.0,          NULL,
       false,             "e",   -1000000011, -muBpositron * 1.0011596521859
     );
-    g4eParticle = new G4ParticleDefinition(
+    new G4ParticleDefinition(
       "g4e_e+",  0.51099906 * MeV,       0.0 * MeV,    +1.*eplus,
       1,               0,             0,
       0,               0,             0,
@@ -80,7 +80,7 @@ void ExtPhysicsConstructor::ConstructParticle()
       true,            -1.0,          NULL,
       false,             "e",    1000000011, muBpositron * 1.0011596521859
     );
-    g4eParticle = new G4ParticleDefinition(
+    new G4ParticleDefinition(
       "g4e_mu+",   0.1056584 * GeV, 2.99591e-16 * MeV,  +1.*eplus,
       1,               0,             0,
       0,               0,             0,
@@ -88,7 +88,7 @@ void ExtPhysicsConstructor::ConstructParticle()
       true,            -1.0,          NULL,
       false,            "mu",    1000000013, muBmuon * 1.0011659208
     );
-    g4eParticle = new G4ParticleDefinition(
+    new G4ParticleDefinition(
       "g4e_mu-",   0.1056584 * GeV, 2.99591e-16 * MeV,  -1.*eplus,
       1,               0,             0,
       0,               0,             0,
@@ -96,7 +96,7 @@ void ExtPhysicsConstructor::ConstructParticle()
       true,            -1.0,          NULL,
       false,            "mu",   -1000000013, -muBmuon * 1.0011659208
     );
-    g4eParticle = new G4ParticleDefinition(
+    new G4ParticleDefinition(
       "g4e_pi+",    0.1395700 * GeV,  2.5284e-14 * MeV, +1.*eplus,
       0,              -1,             0,
       2,              +2,            -1,
@@ -104,7 +104,7 @@ void ExtPhysicsConstructor::ConstructParticle()
       true,            -1.0,          NULL,
       false,            "pi",   -1000000211
     );
-    g4eParticle = new G4ParticleDefinition(
+    new G4ParticleDefinition(
       "g4e_pi-",    0.1395700 * GeV, 2.5284e-14 * MeV,  -1.*eplus,
       0,              -1,             0,
       2,              -2,            -1,
@@ -112,7 +112,7 @@ void ExtPhysicsConstructor::ConstructParticle()
       true,            -1.0,          NULL,
       false,            "pi",    1000000211
     );
-    g4eParticle = new G4ParticleDefinition(
+    new G4ParticleDefinition(
       "g4e_kaon+",    0.493677 * GeV,  5.315e-14 * MeV,   +1.*eplus,
       0,              -1,             0,
       1,              +1,             0,
@@ -120,7 +120,7 @@ void ExtPhysicsConstructor::ConstructParticle()
       true,            -1.0,          NULL,
       false,          "kaon",   -1000000321
     );
-    g4eParticle = new G4ParticleDefinition(
+    new G4ParticleDefinition(
       "g4e_kaon-",    0.493677 * GeV,   5.315e-14 * MeV,  -1.*eplus,
       0,              -1,             0,
       1,              -1,             0,
@@ -128,7 +128,7 @@ void ExtPhysicsConstructor::ConstructParticle()
       true,            -1.0,          NULL,
       false,          "kaon",    1000000321
     );
-    G4Ions* g4eBaryon = new G4Ions(
+    new G4Ions(
       "g4e_proton",   0.9382723 * GeV,       0.0 * MeV,       eplus,
       1,              +1,             0,
       1,              +1,             0,
@@ -136,7 +136,7 @@ void ExtPhysicsConstructor::ConstructParticle()
       true,            -1.0,          NULL,
       false,       "nucleon",   -1000002212, muNucleon * 2.792847351
     );
-    g4eBaryon = new G4Ions(
+    new G4Ions(
       "g4e_anti_proton",   0.9382723 * GeV,       0.0 * MeV,   -1.0 * eplus,
       1,              +1,             0,
       1,              -1,             0,

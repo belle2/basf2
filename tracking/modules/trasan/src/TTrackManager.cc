@@ -740,176 +740,183 @@ using namespace std;
 
 namespace Belle {
 
-static float tosingle(double d) {
-  if (d>FLT_MAX) return FLT_MAX;
-  else if (d<-(FLT_MAX)) return -(FLT_MAX);
-  else return (float)d;
-}
+  static float tosingle(double d)
+  {
+    if (d > FLT_MAX) return FLT_MAX;
+    else if (d < -(FLT_MAX)) return -(FLT_MAX);
+    else return (float)d;
+  }
 
-TTrackManager::TTrackManager()
-: _debugLevel(0),
-  _maxMomentum(10.),
-  _minPt(0.),
-  _maxTanl(0.),
-  _sigmaCurlerMergeTest(sqrt(100.)),
-  _nCurlerMergeTest(4),
-  _fitter("TTrackManager Fitter"),
-  _cFitter("TTrackManager 2D Fitter"),
+  TTrackManager::TTrackManager()
+    : _debugLevel(0),
+      _maxMomentum(10.),
+      _minPt(0.),
+      _maxTanl(0.),
+      _sigmaCurlerMergeTest(sqrt(100.)),
+      _nCurlerMergeTest(4),
+      _fitter("TTrackManager Fitter"),
+      _cFitter("TTrackManager 2D Fitter"),
 //cnv _s(0) {
-  _s(new summary()) {
+      _s(new summary())
+  {
     memset(_s, 0, sizeof(struct summary));
-}
+  }
 
-TTrackManager::~TTrackManager() {
-}
+  TTrackManager::~TTrackManager()
+  {
+  }
 
-string
-TTrackManager::version(void) const {
+  string
+  TTrackManager::version(void) const
+  {
     return string("5.01");
-}
+  }
 
-void
-TTrackManager::dump(const string & msg, const string & pref) const {
+  void
+  TTrackManager::dump(const string& msg, const string& pref) const
+  {
     bool def = (msg == "") ? true : false;
     string pre = pref;
     string tab;
     for (unsigned i = 0; i < pre.size(); i++)
-	tab += " ";
+      tab += " ";
 
     if (msg.find("summary") != string::npos ||
-	msg.find("detail") != string::npos) {
-	struct summary s;
-	//       	bzero((char*)& s, sizeof(struct summary));
-       	memset((char*)& s, 0, sizeof(struct summary));
-	for (int i = 0; i < 0; i++) {
-//cnv	    int size;
-struct summary r;
-	    s._nEvents += r._nEvents;
-	    s._nToBeMerged += r._nToBeMerged;
-	    s._nToBeMergedMoreThanTwo += r._nToBeMergedMoreThanTwo;
-	    for (unsigned j = 0; j < 8; j++) {
-		s._nTracks[j] += r._nTracks[j];
-		s._nTracksAll[j] += r._nTracksAll[j];
-		s._nTracks2D[j] += r._nTracks2D[j];
-		s._nTracksFinal[j] += r._nTracksFinal[j];
-		s._nSuperMoms[j] += r._nSuperMoms[j];
-		s._nPtCut[j] += r._nPtCut[j];
-		s._nTanlCut[j] += r._nTanlCut[j];
-		for (unsigned k = 0; k < 5; k++)
-		    s._nMCQuality[j][k] += r._nMCQuality[j][k];
-	    }
-	}
-	
-	cout << pre << "all events : " << s._nEvents << endl;
-	pre = tab;
+        msg.find("detail") != string::npos) {
+      struct summary s;
+      //        bzero((char*)& s, sizeof(struct summary));
+      memset((char*)& s, 0, sizeof(struct summary));
+      for (int i = 0; i < 0; i++) {
+//cnv     int size;
+        struct summary r;
+        s._nEvents += r._nEvents;
+        s._nToBeMerged += r._nToBeMerged;
+        s._nToBeMergedMoreThanTwo += r._nToBeMergedMoreThanTwo;
+        for (unsigned j = 0; j < 8; j++) {
+          s._nTracks[j] += r._nTracks[j];
+          s._nTracksAll[j] += r._nTracksAll[j];
+          s._nTracks2D[j] += r._nTracks2D[j];
+          s._nTracksFinal[j] += r._nTracksFinal[j];
+          s._nSuperMoms[j] += r._nSuperMoms[j];
+          s._nPtCut[j] += r._nPtCut[j];
+          s._nTanlCut[j] += r._nTanlCut[j];
+          for (unsigned k = 0; k < 5; k++)
+            s._nMCQuality[j][k] += r._nMCQuality[j][k];
+        }
+      }
 
-	//...Finder loop...
-	string tab = pre + "    ";
-	for (unsigned i = 0; i < 8; i++) {
-	    if (! s._nTracksAll[i]) continue;
+      cout << pre << "all events : " << s._nEvents << endl;
+      pre = tab;
 
-	    cout << pre << TTrack::finderName((1 << i)) << endl;
-	    cout << tab << "all tracks   : " << s._nTracksAll[i]
-		      << endl;
-	    cout << tab << "good tracks  : " << s._nTracks[i]
-		      << endl;
-	    cout << tab << "2D tracks    : " << s._nTracks2D[i]
-		      << endl;
-	    cout << tab << "final tracks : " << s._nTracksFinal[i]
-		      << endl;
-	    cout << tab << "super mom.   : " << s._nSuperMoms[i]
-		      << endl;
-	    cout << tab << "Pt cut       : " << s._nPtCut[i]
-		      << endl;
-	    cout << tab << "tanl cut     : " << s._nTanlCut[i]
-		      << endl;
-	}
-	cout << pre << "Curler Information" << endl;
-	cout << tab << "to be mreged : " << s._nToBeMerged
-		  << endl;
-	cout << tab << "to be mreged2: "
-		  << s._nToBeMergedMoreThanTwo << endl;
+      //...Finder loop...
+      string tab = pre + "    ";
+      for (unsigned i = 0; i < 8; i++) {
+        if (! s._nTracksAll[i]) continue;
 
-	for (unsigned i = 0; i < 8; i++) {
-	    if (! s._nTracksAll[i]) continue;
-	    if (msg.find("MC") != string::npos) {
-		cout << pre << TTrack::finderName((1 << i))
-			  << " MC information" << endl;
-		cout << tab << "Good     : " << s._nMCQuality[i][0]
-			  << endl;
-		cout << tab << "Ghost    : " << s._nMCQuality[i][1]
-			  << endl;
-		cout << tab << "Bad      : " << s._nMCQuality[i][2]
-			  << endl;
-		cout << tab << "Charge   : " << s._nMCQuality[i][3]
-			  << endl;
-		cout << tab << "Garbage  : " << s._nMCQuality[i][4]
-			  << endl;
-	    }
-	}
-    }
-    if (def || msg.find("eventSummary") != string::npos ||
-	msg.find("detail") != string::npos) {
-	cout << pre << "tracks reconstructed : " << _tracksAll.length()
-	       << endl;
-	cout << tab << "good tracks          : " << _tracks.length()
-	       << endl;
-	cout << tab << "2D tracks            : " << _tracks2D.length()
-	       << endl;
-	cout << tab << "Track list:[name,finder,type,status,?,0,0,charge*ip,dr,dz,pt,pz,links..,chisq,errmtx]" << endl;
+        cout << pre << TTrack::finderName((1 << i)) << endl;
+        cout << tab << "all tracks   : " << s._nTracksAll[i]
+             << endl;
+        cout << tab << "good tracks  : " << s._nTracks[i]
+             << endl;
+        cout << tab << "2D tracks    : " << s._nTracks2D[i]
+             << endl;
+        cout << tab << "final tracks : " << s._nTracksFinal[i]
+             << endl;
+        cout << tab << "super mom.   : " << s._nSuperMoms[i]
+             << endl;
+        cout << tab << "Pt cut       : " << s._nPtCut[i]
+             << endl;
+        cout << tab << "tanl cut     : " << s._nTanlCut[i]
+             << endl;
+      }
+      cout << pre << "Curler Information" << endl;
+      cout << tab << "to be mreged : " << s._nToBeMerged
+           << endl;
+      cout << tab << "to be mreged2: "
+           << s._nToBeMergedMoreThanTwo << endl;
 
-	for (unsigned i = 0; i < (unsigned) _tracksAll.length(); i++) {
-	    cout << tab << tab << TTrack::trackDump(* _tracksAll[i])
-		      << endl;
-	    if (msg.find("helix") != string::npos)
-		_tracksAll[i]->dump("helix detail", tab + "    ");
-	    if (msg.find("hits") != string::npos ||
-		msg.find("detail") != string::npos)
-		TLink::dump(_tracksAll[i]->links(), "hits sort flag");
-	}
-	pre = tab;
-    }
-}
-
-void 
-TTrackManager::maskCurlHits(const CAList<Belle2::TRGCDCWireHit> &axial,
-			    const CAList<Belle2::TRGCDCWireHit> &stereo,
-			    const AList<TTrack> &tracks) const {
-//...Coded by jtanaka...
-
-  int i = 0;
-  while(const TTrack *t = tracks[i++]){
-    int j = 0;
-    while(const Belle2::TRGCDCWireHit * a = axial[j++]){
-      double x = t->helix().center().x() - a->xyPosition().x();
-      double y = t->helix().center().y() - a->xyPosition().y();
-      double r = sqrt(x*x+y*y);
-      double R = fabs(t->helix().radius());
-	double q = t->helix().center().x()*a->xyPosition().y() - 
-	  t->helix().center().y()*a->xyPosition().x();
-	double qq = q*t->charge();
-      if(R-2. < r && r < R+2. && qq > 0.){
-        a->state(a->state() | CellHitUsed);
+      for (unsigned i = 0; i < 8; i++) {
+        if (! s._nTracksAll[i]) continue;
+        if (msg.find("MC") != string::npos) {
+          cout << pre << TTrack::finderName((1 << i))
+               << " MC information" << endl;
+          cout << tab << "Good     : " << s._nMCQuality[i][0]
+               << endl;
+          cout << tab << "Ghost    : " << s._nMCQuality[i][1]
+               << endl;
+          cout << tab << "Bad      : " << s._nMCQuality[i][2]
+               << endl;
+          cout << tab << "Charge   : " << s._nMCQuality[i][3]
+               << endl;
+          cout << tab << "Garbage  : " << s._nMCQuality[i][4]
+               << endl;
+        }
       }
     }
-    j = 0;
-    while(const Belle2::TRGCDCWireHit * s = stereo[j++]){
-      double x = t->helix().center().x() - s->xyPosition().x();
-      double y = t->helix().center().y() - s->xyPosition().y();
-      double r = sqrt(x*x+y*y);
-      double R = fabs(t->helix().radius());
-	double q = t->helix().center().x()*s->xyPosition().y() - 
-	  t->helix().center().y()*s->xyPosition().x();
-	double qq = q*t->charge();
-      if(R-2.5 < r && r < R+2.5 && qq > 0.){
-        s->state(s->state() | CellHitUsed);
+    if (def || msg.find("eventSummary") != string::npos ||
+        msg.find("detail") != string::npos) {
+      cout << pre << "tracks reconstructed : " << _tracksAll.length()
+           << endl;
+      cout << tab << "good tracks          : " << _tracks.length()
+           << endl;
+      cout << tab << "2D tracks            : " << _tracks2D.length()
+           << endl;
+      cout << tab << "Track list:[name,finder,type,status,?,0,0,charge*ip,dr,dz,pt,pz,links..,chisq,errmtx]" << endl;
+
+      for (unsigned i = 0; i < (unsigned) _tracksAll.length(); i++) {
+        cout << tab << tab << TTrack::trackDump(* _tracksAll[i])
+             << endl;
+        if (msg.find("helix") != string::npos)
+          _tracksAll[i]->dump("helix detail", tab + "    ");
+        if (msg.find("hits") != string::npos ||
+            msg.find("detail") != string::npos)
+          TLink::dump(_tracksAll[i]->links(), "hits sort flag");
+      }
+      pre = tab;
+    }
+  }
+
+  void
+  TTrackManager::maskCurlHits(const CAList<Belle2::TRGCDCWireHit> &axial,
+                              const CAList<Belle2::TRGCDCWireHit> &stereo,
+                              const AList<TTrack> &tracks) const
+  {
+//...Coded by jtanaka...
+
+    int i = 0;
+    while (const TTrack* t = tracks[i++]) {
+      int j = 0;
+      while (const Belle2::TRGCDCWireHit* a = axial[j++]) {
+        double x = t->helix().center().x() - a->xyPosition().x();
+        double y = t->helix().center().y() - a->xyPosition().y();
+        double r = sqrt(x * x + y * y);
+        double R = fabs(t->helix().radius());
+        double q = t->helix().center().x() * a->xyPosition().y() -
+                   t->helix().center().y() * a->xyPosition().x();
+        double qq = q * t->charge();
+        if (R - 2. < r && r < R + 2. && qq > 0.) {
+          a->state(a->state() | CellHitUsed);
+        }
+      }
+      j = 0;
+      while (const Belle2::TRGCDCWireHit* s = stereo[j++]) {
+        double x = t->helix().center().x() - s->xyPosition().x();
+        double y = t->helix().center().y() - s->xyPosition().y();
+        double r = sqrt(x * x + y * y);
+        double R = fabs(t->helix().radius());
+        double q = t->helix().center().x() * s->xyPosition().y() -
+                   t->helix().center().y() * s->xyPosition().x();
+        double qq = q * t->charge();
+        if (R - 2.5 < r && r < R + 2.5 && qq > 0.) {
+          s->state(s->state() | CellHitUsed);
+        }
       }
     }
   }
-}
 
-void
-TTrackManager::salvage(const CAList<Belle2::TRGCDCWireHit> & hits) const {
+  void
+  TTrackManager::salvage(const CAList<Belle2::TRGCDCWireHit> & hits) const
+  {
 
 #ifdef TRASAN_DEBUG_DETAIL
     cout << name() << " ... salvaging" << endl;
@@ -924,119 +931,121 @@ TTrackManager::salvage(const CAList<Belle2::TRGCDCWireHit> & hits) const {
 
     //...Hit loop...
     for (unsigned i = 0; i < nHits; i++) {
-	const Belle2::TRGCDCWireHit & h = * hits[i];
+      const Belle2::TRGCDCWireHit& h = * hits[i];
 
-	//...Already used?...
-	if (h.state() & CellHitUsed) continue;
+      //...Already used?...
+      if (h.state() & CellHitUsed) continue;
 #ifdef TRASAN_DEBUG_DETAIL
-	cout << "    checking " << h.wire().name() << endl;
+      cout << "    checking " << h.wire().name() << endl;
 #endif
 
-	//...Select the closest track to a hit...
-	TTrack * best = closest(_tracks, h);
+      //...Select the closest track to a hit...
+      TTrack* best = closest(_tracks, h);
 #ifdef TRASAN_DEBUG_DETAIL
-	if (! best) {
-	    cout << "        no track candidate returned";
-	    cout << "by TTrackManager::closest" << endl;
-	}
+      if (! best) {
+        cout << "        no track candidate returned";
+        cout << "by TTrackManager::closest" << endl;
+      }
 #endif
-	if (! best) continue;
+      if (! best) continue;
 
-	//...Try to append this hit...
-	AList<TLink> link;
-	link.append(new TLink(0, & h));
-	best->appendByApproach(link, 30.);
-	// best->assign(CellHitConformalFinder);
-	best->finder(TrackTrackManager);
+      //...Try to append this hit...
+      AList<TLink> link;
+      link.append(new TLink(0, & h));
+      best->appendByApproach(link, 30.);
+      // best->assign(CellHitConformalFinder);
+      best->finder(TrackTrackManager);
     }
-}
+  }
 
-TTrack *
-TTrackManager::closest(const AList<TTrack> & tracks,
-		       const Belle2::TRGCDCWireHit & hit) const {
+  TTrack*
+  TTrackManager::closest(const AList<TTrack> & tracks,
+                         const Belle2::TRGCDCWireHit& hit) const
+  {
 
     TLink t;
     t.hit(& hit);
     unsigned n = tracks.length();
     double minDistance = MAXDOUBLE;
-    TTrack * minTrk = NULL;
+    TTrack* minTrk = NULL;
 
     //...Loop over all tracks...
     for (unsigned i = 0; i < n; i++) {
-	TTrack & trk = * tracks[i];
-	int err = trk.approach(t);
-	if (err < 0) continue;
-	if (minDistance > t.distance()) {
-	    minDistance = t.distance();
-	    minTrk = & trk;
-	}
+      TTrack& trk = * tracks[i];
+      int err = trk.approach(t);
+      if (err < 0) continue;
+      if (minDistance > t.distance()) {
+        minDistance = t.distance();
+        minTrk = & trk;
+      }
     }
 
     return minTrk;
-}
+  }
 
-void
-TTrackManager::saveTables(void) {
+  void
+  TTrackManager::saveTables(void)
+  {
     if (_debugLevel) monitor();
 
 #ifdef TRASAN_DEBUG_DETAIL
     cout << "TTrackManager::saveTables ... # 3D tracks=" << _tracks.length()
-	   << ", # 2D tracks=" << _tracks2D.length()
-	   << ", all tracks=" << _tracksAll.length() << endl;
+         << ", # 2D tracks=" << _tracks2D.length()
+         << ", all tracks=" << _tracksAll.length() << endl;
 #endif
 
     //...For 3D tracks...
     AList<TTrack> badTracks;
     unsigned n = _tracks.length();
-    unsigned * id;
-    if (NULL == (id = (unsigned *) malloc(n * sizeof(unsigned)))) {
-	perror("$Id: TTrackManager.cc 10700 2008-11-06 08:47:27Z hitoshi $:id:malloc");
-	exit(1);
-    }  
+    unsigned* id;
+    if (NULL == (id = (unsigned*) malloc(n * sizeof(unsigned)))) {
+      perror("$Id: TTrackManager.cc 10700 2008-11-06 08:47:27Z hitoshi $:id:malloc");
+      exit(1);
+    }
     //    bzero((char *) id, n * sizeof(unsigned));
-    memset((char *) id, 0, n * sizeof(unsigned));
+    memset((char*) id, 0, n * sizeof(unsigned));
     for (unsigned i = 0; i < n; i++) {
-	TTrack & t = * _tracks[i];
+      TTrack& t = * _tracks[i];
 
-	//...Track quality check...
-	if (! t.nLinks()) {
-	    badTracks.append((TTrack &) t);
+      //...Track quality check...
+      if (! t.nLinks()) {
+        badTracks.append((TTrack&) t);
 #ifdef TRASAN_DEBUG_DETAIL
-	    cout << "    Bad track found(no link):" << t.name()
-		   << endl;
+        cout << "    Bad track found(no link):" << t.name()
+             << endl;
 #endif
-	    continue;
-	}
-	if (! goodTrack(t, false))
-	    continue;
+        continue;
+      }
+      if (! goodTrack(t, false))
+        continue;
 
-	//...Copy track parameters...
-	reccdc_trk * r = 0;
-	reccdc_trk_add * a = 0;
-	int err = copyTrack(t, & r, & a);
-	if (err) {
-	    badTracks.append(t);
+      //...Copy track parameters...
+      reccdc_trk* r = 0;
+      reccdc_trk_add* a = 0;
+      int err = copyTrack(t, & r, & a);
+      if (err) {
+        badTracks.append(t);
 #ifdef TRASAN_DEBUG_DETAIL
-	    cout << "    Bad track found(copyTrack err=" << err << "):"
-		   << t.name() << endl;
+        cout << "    Bad track found(copyTrack err=" << err << "):"
+             << t.name() << endl;
 #endif
-	    continue;
-	}
-	_tracksFinal.append(t);
+        continue;
+      }
+      _tracksFinal.append(t);
 
-	//...Type and quality...
-	id[i] = r->m_ID;
-	r->m_stat = t.state();
-	a->m_kind = t.type();
-	a->m_decision = t.finder();
-	a->m_stat = t.fitting();
-//  	if (a->m_kind == TrackTypeCosmic) {
-//  	    a->m_quality = TrackQualityCosmic;
-//  	}
-//  	if (t.daughter() && (_tracks.index(t.daughter()) >= 0))
-//  	    a->m_daughter = _tracks.index(t.daughter()) + 1;
+      //...Type and quality...
+      id[i] = r->m_ID;
+      r->m_stat = t.state();
+      a->m_kind = t.type();
+      a->m_decision = t.finder();
+      a->m_stat = t.fitting();
+//    if (a->m_kind == TrackTypeCosmic) {
+//        a->m_quality = TrackQualityCosmic;
+//    }
+//    if (t.daughter() && (_tracks.index(t.daughter()) >= 0))
+//        a->m_daughter = _tracks.index(t.daughter()) + 1;
 
-//cnv	    reccdc_svd_trk cs;
+//cnv     reccdc_svd_trk cs;
 
     }
 
@@ -1044,25 +1053,25 @@ TTrackManager::saveTables(void) {
     for (unsigned i = 0; i < n; i++) {
 
 #ifdef TRASAN_DEBUG_DETAIL
-	cout << "id[" << i << "]=" << id[i] << endl;
+      cout << "id[" << i << "]=" << id[i] << endl;
 #endif
-	if (! (id[i])) continue;
-	if (! (_tracks[i]->daughter())) continue;
+      if (!(id[i])) continue;
+      if (!(_tracks[i]->daughter())) continue;
 
-	int dId = _tracks.index(_tracks[i]->daughter());
+      int dId = _tracks.index(_tracks[i]->daughter());
 
 #ifdef TRASAN_DEBUG_DETAIL
-	cout << "    dId=" << dId;
-	if (dId >= 0) cout << ", id[dId]=" << id[dId];
-	cout << endl;
+      cout << "    dId=" << dId;
+      if (dId >= 0) cout << ", id[dId]=" << id[dId];
+      cout << endl;
 #endif
 
-	if (dId >= 0) {
-	    if (id[dId]) {
-		reccdc_trk_add * a;
-		a->m_daughter = id[dId];
-	    }
-	}
+      if (dId >= 0) {
+        if (id[dId]) {
+          reccdc_trk_add* a;
+          a->m_daughter = id[dId];
+        }
+      }
     }
     free(id);
 
@@ -1073,147 +1082,149 @@ TTrackManager::saveTables(void) {
     //...For 2D tracks...
     n = _tracks2D.length();
     for (unsigned i = 0; i < n; i++) {
-	TTrack & t = * _tracks2D[i];
+      TTrack& t = * _tracks2D[i];
 
-	//...Copy track parameters...
-	reccdc_trk * r = 0;
-	reccdc_trk_add * a = 0;
-	int err = copyTrack(t, & r, & a);
-	if (err) {
+      //...Copy track parameters...
+      reccdc_trk* r = 0;
+      reccdc_trk_add* a = 0;
+      int err = copyTrack(t, & r, & a);
+      if (err) {
 #ifdef TRASAN_DEBUG_DETAIL
-	    cout << "TTrackManager::saveTables !!! bad 2D tracks found"
-		      << " : err=" << err << endl
-		      << TTrack::trackDump(t) << endl;
+        cout << "TTrackManager::saveTables !!! bad 2D tracks found"
+             << " : err=" << err << endl
+             << TTrack::trackDump(t) << endl;
 #endif
-	    badTracks.append(t);
-	    continue;
-	}
-	_tracksFinal.append(t);
+        badTracks.append(t);
+        continue;
+      }
+      _tracksFinal.append(t);
 
-	//...Reset helix parameter...
-//  	r->m_helix[3] = 0.;
-//  	r->m_helix[4] = 0.;
-//  	r->m_nhits -= r->m_nster;
-//  	r->m_nster = 0;
+      //...Reset helix parameter...
+//    r->m_helix[3] = 0.;
+//    r->m_helix[4] = 0.;
+//    r->m_nhits -= r->m_nster;
+//    r->m_nster = 0;
 
-	//...Table filling...
-	r->m_stat = t.state();
-	a->m_kind = t.type();
-	a->m_decision = t.finder();
-	// a->m_quality = t.quality();
-	a->m_quality = TrackQuality2D;
-	a->m_stat = t.fitting();
+      //...Table filling...
+      r->m_stat = t.state();
+      a->m_kind = t.type();
+      a->m_decision = t.finder();
+      // a->m_quality = t.quality();
+      a->m_quality = TrackQuality2D;
+      a->m_stat = t.fitting();
 
 #ifdef TRASAN_DEBUG
-	if ((r->m_ndf == 0) && (r->m_chiSq > 0.)) {
-	    cout << "TTrackManager::saveTables !!! chisq>0 with ndf=0."
-		      << endl
-		      << "    Here is a track dump"
-		      << "    " << TTrack::trackDump(t) << endl;
-	    t.dump("detail");
-	}
-	if ((r->m_ndf > 0) && (r->m_chiSq == 0.)) {
-	    cout << "TTrackManager::saveTables !!! chisq=0 with ndf>0."
-		      << endl
-		      << "    Here is a track dump"
-		      << "    " << TTrack::trackDump(t) << endl;
-	    t.dump("detail");
-	}
+      if ((r->m_ndf == 0) && (r->m_chiSq > 0.)) {
+        cout << "TTrackManager::saveTables !!! chisq>0 with ndf=0."
+             << endl
+             << "    Here is a track dump"
+             << "    " << TTrack::trackDump(t) << endl;
+        t.dump("detail");
+      }
+      if ((r->m_ndf > 0) && (r->m_chiSq == 0.)) {
+        cout << "TTrackManager::saveTables !!! chisq=0 with ndf>0."
+             << endl
+             << "    Here is a track dump"
+             << "    " << TTrack::trackDump(t) << endl;
+        t.dump("detail");
+      }
 
-	if (r->m_ndf == 0)
-	    cout << "TTrackManager::saveTables ... ndf = 0" << endl
-		      << "    " << TTrack::trackDump(t) << endl;
-	if (r->m_chiSq == 0.)
-	    cout << "TTrackManager::saveTables ... chisq = 0" << endl
-		      << "    " << TTrack::trackDump(t) << endl;
+      if (r->m_ndf == 0)
+        cout << "TTrackManager::saveTables ... ndf = 0" << endl
+             << "    " << TTrack::trackDump(t) << endl;
+      if (r->m_chiSq == 0.)
+        cout << "TTrackManager::saveTables ... chisq = 0" << endl
+             << "    " << TTrack::trackDump(t) << endl;
 #endif
     }
     _tracks2D.remove(badTracks);
-}
+  }
 
-void
-TTrackManager::saveMCTables(void) const {
+  void
+  TTrackManager::saveMCTables(void) const
+  {
     unsigned n = _tracksFinal.length();
     for (unsigned i = 0; i < n; i++) {
-	const TTrack & t = * _tracksFinal[i];
+      const TTrack& t = * _tracksFinal[i];
 
-	struct reccdc_trk * r;
-	r = 0;
+      struct reccdc_trk* r;
+      r = 0;
 
-	//...Set type...
+      //...Set type...
 
-	//...Hit loop...
-	const AList<TLink> & hits = t.finalHits();
-	unsigned nHits = hits.length();
-	for (unsigned j = 0; j < nHits;  j++) {
-//cnv	    TLink * l = hits[j];
-//	    reccdc_wirhit * h = l->hit()->reccdc();
-	    reccdc_wirhit * h = 0;
-//	    datcdc_mcwirhit * m = l->hit()->mc()->datcdc();
-	    datcdc_mcwirhit * m = 0;
-	    m->m_trk = r->m_ID;
-	    struct reccdc_mctrk2hep * c;
-            c = 0;
-	    c->m_wir = h->m_ID;
-	    c->m_trk = r->m_ID;
-c->m_hep = 0;
-	}
+      //...Hit loop...
+      const AList<TLink> & hits = t.finalHits();
+      unsigned nHits = hits.length();
+      for (unsigned j = 0; j < nHits;  j++) {
+//cnv     TLink * l = hits[j];
+//      reccdc_wirhit * h = l->hit()->reccdc();
+        reccdc_wirhit* h = 0;
+//      datcdc_mcwirhit * m = l->hit()->mc()->datcdc();
+        datcdc_mcwirhit* m = 0;
+        m->m_trk = r->m_ID;
+        struct reccdc_mctrk2hep* c;
+        c = 0;
+        c->m_wir = h->m_ID;
+        c->m_trk = r->m_ID;
+        c->m_hep = 0;
+      }
 
-	const TTrackMC * const mc = t.mc();
-	struct reccdc_mctrk * m;
-	m = 0;
-	m->m_wirFrac = mc->wireFraction();
-	m->m_wirFracHep = mc->wireFractionHEP();
-	m->m_charge = mc->charge();
-	m->m_ptFrac = mc->ptFraction();
-	m->m_pzFrac = mc->pzFraction();
-	m->m_quality = mc->quality();
-if (mc->hep()) m->m_hep = 0;
-	else           m->m_hep = 0;
+      const TTrackMC* const mc = t.mc();
+      struct reccdc_mctrk* m;
+      m = 0;
+      m->m_wirFrac = mc->wireFraction();
+      m->m_wirFracHep = mc->wireFractionHEP();
+      m->m_charge = mc->charge();
+      m->m_ptFrac = mc->ptFraction();
+      m->m_pzFrac = mc->pzFraction();
+      m->m_quality = mc->quality();
+      if (mc->hep()) m->m_hep = 0;
+      else           m->m_hep = 0;
     }
-}
+  }
 
-void
-TTrackManager::saveBelle2(Belle2::StoreArray<GFTrackCand> & cands) {
+  void
+  TTrackManager::saveBelle2(Belle2::StoreArray<GFTrackCand> & cands)
+  {
     if (_debugLevel) monitor();
 
 #ifdef TRASAN_DEBUG_DETAIL
     cout << "TTrackManager::saveBelle2 ... # 3D tracks="
-	      << _tracks.length() << ", # 2D tracks=" << _tracks2D.length()
-	      << ", all tracks=" << _tracksAll.length() << endl;
+         << _tracks.length() << ", # 2D tracks=" << _tracks2D.length()
+         << ", all tracks=" << _tracksAll.length() << endl;
 #endif
 
     //...For 3D tracks...
     AList<TTrack> badTracks;
     unsigned n = _tracks.length();
     for (unsigned i = 0; i < n; i++) {
-	TTrack & t = * _tracks[i];
+      TTrack& t = * _tracks[i];
 
-	//...Track quality check...
-	if (! t.nLinks()) {
-	    badTracks.append((TTrack &) t);
+      //...Track quality check...
+      if (! t.nLinks()) {
+        badTracks.append((TTrack&) t);
 #ifdef TRASAN_DEBUG_DETAIL
-	    cout << "    Bad track found(no link):" << t.name()
-		   << endl;
+        cout << "    Bad track found(no link):" << t.name()
+             << endl;
 #endif
-	    continue;
-	}
-	if (! goodTrack(t, false))
-	    continue;
+        continue;
+      }
+      if (! goodTrack(t, false))
+        continue;
 
-	//...Copy track parameters...
-	int err = copyTrack(cands, t);
-	if (err) {
-	    badTracks.append(t);
+      //...Copy track parameters...
+      int err = copyTrack(cands, t);
+      if (err) {
+        badTracks.append(t);
 #ifdef TRASAN_DEBUG_DETAIL
-	    cout << "    Bad track found(copyTrack err=" << err << "):"
-		   << t.name() << endl;
+        cout << "    Bad track found(copyTrack err=" << err << "):"
+             << t.name() << endl;
 #endif
-	    continue;
-	}
-	_tracksFinal.append(t);
+        continue;
+      }
+      _tracksFinal.append(t);
 
-	//...Type and quality...
+      //...Type and quality...
     }
 
     //...Daughter treatment...
@@ -1221,10 +1232,11 @@ TTrackManager::saveBelle2(Belle2::StoreArray<GFTrackCand> & cands) {
     //...Remove bad tracks...
 
     //...For 2D tracks...
-}
+  }
 
-void
-TTrackManager::movePivot(void) {
+  void
+  TTrackManager::movePivot(void)
+  {
 #ifdef TRASAN_DEBUG_DETAIL
     const string stage = "TRKMGR::movePivot";
     EnterStage(stage);
@@ -1233,18 +1245,19 @@ TTrackManager::movePivot(void) {
     unsigned n = _tracksAll.length();
 //  unsigned n = _tracks.length();
     for (unsigned i = 0; i < n; i++) {
-	if (_tracksAll[i]->nLinks()) _tracksAll[i]->movePivot();
-//	if (_tracks[i]->nLinks()) _tracks[i]->movePivot();
+      if (_tracksAll[i]->nLinks()) _tracksAll[i]->movePivot();
+//  if (_tracks[i]->nLinks()) _tracks[i]->movePivot();
     }
     nameTracks();
 
 #ifdef TRASAN_DEBUG_DETAIL
     LeaveStage(stage);
 #endif
-}
+  }
 
-void
-TTrackManager::clear(bool termination) {
+  void
+  TTrackManager::clear(bool termination)
+  {
     HepAListDeleteAll(_tracksAll);
     _tracks.removeAll();
     _tracks2D.removeAll();
@@ -1252,31 +1265,33 @@ TTrackManager::clear(bool termination) {
     HepAListDeleteAll(_associateHits);
     static bool first = true;
     if (first && !termination) {
-	first = false;
-//cnv	int size;
-//cnv	_s = 0;
+      first = false;
+//cnv int size;
+//cnv _s = 0;
     }
-}
+  }
 
-void
-TTrackManager::finish(void) {
+  void
+  TTrackManager::finish(void)
+  {
     refit();
     movePivot();
     if (_debugLevel > 1) {
-	cout << name() << " ... finishing" << endl;
-//	unsigned n = _tracksAll.length();
-	unsigned n = _tracks.length();
-	for (unsigned i = 0; i < n; i++) {
-//	    TTrack & t = * _tracksAll[i];
-	    TTrack & t = * _tracks[i];
-	    cout << "    " << t.name() << endl;
-	    t.dump("hits mc track flag sort", "    ");
-	}
+      cout << name() << " ... finishing" << endl;
+//  unsigned n = _tracksAll.length();
+      unsigned n = _tracks.length();
+      for (unsigned i = 0; i < n; i++) {
+//      TTrack & t = * _tracksAll[i];
+        TTrack& t = * _tracks[i];
+        cout << "    " << t.name() << endl;
+        t.dump("hits mc track flag sort", "    ");
+      }
     }
-}
+  }
 
-void
-TTrackManager::append(AList<TTrack> & list) {
+  void
+  TTrackManager::append(AList<TTrack> & list)
+  {
 #ifdef TRASAN_DEBUG_DETAIL
     const string stage = "TRKMGR::append";
     EnterStage(stage);
@@ -1289,10 +1304,11 @@ TTrackManager::append(AList<TTrack> & list) {
 #ifdef TRASAN_DEBUG_DETAIL
     LeaveStage(stage);
 #endif
-}
+  }
 
-void
-TTrackManager::append2D(AList<TTrack> & list) {
+  void
+  TTrackManager::append2D(AList<TTrack> & list)
+  {
 #ifdef TRASAN_DEBUG_DETAIL
     const string stage = "TRKMGR::append2D";
     EnterStage(stage);
@@ -1304,10 +1320,11 @@ TTrackManager::append2D(AList<TTrack> & list) {
 #ifdef TRASAN_DEBUG_DETAIL
     LeaveStage(stage);
 #endif
-}
+  }
 
-void
-TTrackManager::refit(void) {
+  void
+  TTrackManager::refit(void)
+  {
 #ifdef TRASAN_DEBUG_DETAIL
     const string stage = "TRKMGR::refit";
     EnterStage(stage);
@@ -1316,47 +1333,48 @@ TTrackManager::refit(void) {
     unsigned n = _tracks.length();
     AList<TTrack> bads;
     for (unsigned i = 0; i < n; i++) {
-	TTrack & t = * _tracks[i];
-	int err;
-	err = _fitter.fit(t);
-	if (err < 0) {
-	    bads.append(t);
+      TTrack& t = * _tracks[i];
+      int err;
+      err = _fitter.fit(t);
+      if (err < 0) {
+        bads.append(t);
 #ifdef TRASAN_DEBUG_DETAIL
-	    cout << Tab() << t.name()
-		      << " rejected because of fitting failure" << endl;
+        cout << Tab() << t.name()
+             << " rejected because of fitting failure" << endl;
 #endif
-	    continue;
-	}
-	t.refine(30. * 10.);
-	err = _fitter.fit(t);
-	if (err < 0) {
-	    bads.append(t);
+        continue;
+      }
+      t.refine(30. * 10.);
+      err = _fitter.fit(t);
+      if (err < 0) {
+        bads.append(t);
 #ifdef TRASAN_DEBUG_DETAIL
-	    cout << Tab() << t.name()
-		      << " rejected because of fitting failure" << endl;
+        cout << Tab() << t.name()
+             << " rejected because of fitting failure" << endl;
 #endif
-	    continue;
-	}
- 	t.refine(30. * 1.);
- 	err = _fitter.fit(t);
-	if (err < 0) {
-	    bads.append(t);
+        continue;
+      }
+      t.refine(30. * 1.);
+      err = _fitter.fit(t);
+      if (err < 0) {
+        bads.append(t);
 #ifdef TRASAN_DEBUG_DETAIL
-	    cout << Tab() << t.name()
-		      << " rejected because of fitting failure" << endl;
+        cout << Tab() << t.name()
+             << " rejected because of fitting failure" << endl;
 #endif
-	    continue;
-	}
+        continue;
+      }
     }
     _tracks.remove(bads);
 
 #ifdef TRASAN_DEBUG_DETAIL
     LeaveStage(stage);
 #endif
-}
+  }
 
-void
-TTrackManager::mask(void) const {
+  void
+  TTrackManager::mask(void) const
+  {
 //cnv #ifdef TRASAN_DEBUG_DETAIL
 //     cout << name() << " ... masking" << endl;
 // #endif
@@ -1365,91 +1383,93 @@ TTrackManager::mask(void) const {
 
 //     unsigned n = _tracks.length();
 //     for (unsigned i = 0; i < n; i++) {
-// 	TTrack & t = * _tracks[i];
+//  TTrack & t = * _tracks[i];
 
-// 	//...Skip if no core...
-// 	//   This should not be happend...
-// 	if (! t.cores().length()) continue;
+//  //...Skip if no core...
+//  //   This should not be happend...
+//  if (! t.cores().length()) continue;
 
-// 	//...Counts # of hits per layer...
-// 	static unsigned * nHits = new unsigned[Belle2::TRGCDC::getTRGCDC()->nLayers()];
-// //	unsigned nHits[50];
-// 	TLink::nHits(t.cores(), nHits);
+//  //...Counts # of hits per layer...
+//  static unsigned * nHits = new unsigned[Belle2::TRGCDC::getTRGCDC()->nLayers()];
+// // unsigned nHits[50];
+//  TLink::nHits(t.cores(), nHits);
 
-// 	//...Check each layer...
-// 	bool needMask = false;
-// 	for (unsigned j = 0; j < 50; j++) {
-// 	    if (nHits[j] > 1) {
-// 		AList<TLink> linksInLayer = TLink::sameLayer(t.links(), j);
-// 		if (TLink::width(linksInLayer) > 2) {
-// 		    needMask = true;
-
-// #ifdef TRASAN_DEBUG_DETAIL
-// 		    TLink::dump(linksInLayer, "sort", "    -->");
-// #endif	    
-// 		    break;
-// 		}
-// 	    }
-// 	}
-// 	if (! needMask) continue;
+//  //...Check each layer...
+//  bool needMask = false;
+//  for (unsigned j = 0; j < 50; j++) {
+//      if (nHits[j] > 1) {
+//    AList<TLink> linksInLayer = TLink::sameLayer(t.links(), j);
+//    if (TLink::width(linksInLayer) > 2) {
+//        needMask = true;
 
 // #ifdef TRASAN_DEBUG_DETAIL
-// 	cout << "    trk" << i << "(id is tmp) needs mask" << endl;
-// 	cout << "        type = " << t.type() << endl;
-// #endif	
-
-// 	//...Switch by track type...
-// 	switch (t.type()) {
-// 	case TrackTypeNormal:
-// 	    maskNormal(t);
-// 	    maskMultiHits(t);
-// 	    break;
-// 	case TrackTypeCurl:
-// 	    maskCurl(t);
-// 	    maskMultiHits(t);
-// 	    break;
-// 	default:
-// 	    break;
-// 	}
-
-// 	//...Refit...
-// 	// refit() ???
-// 	_fitter.fit(t);
+//        TLink::dump(linksInLayer, "sort", "    -->");
+// #endif
+//        break;
+//    }
+//      }
+//  }
+//  if (! needMask) continue;
 
 // #ifdef TRASAN_DEBUG_DETAIL
-// 	cout << "    masking result : ";
-// 	t.dump("detail sort", "    ");
+//  cout << "    trk" << i << "(id is tmp) needs mask" << endl;
+//  cout << "        type = " << t.type() << endl;
+// #endif
+
+//  //...Switch by track type...
+//  switch (t.type()) {
+//  case TrackTypeNormal:
+//      maskNormal(t);
+//      maskMultiHits(t);
+//      break;
+//  case TrackTypeCurl:
+//      maskCurl(t);
+//      maskMultiHits(t);
+//      break;
+//  default:
+//      break;
+//  }
+
+//  //...Refit...
+//  // refit() ???
+//  _fitter.fit(t);
+
+// #ifdef TRASAN_DEBUG_DETAIL
+//  cout << "    masking result : ";
+//  t.dump("detail sort", "    ");
 // #endif
 //     }
-}
+  }
 
-void
-TTrackManager::nameTracks(void) {
+  void
+  TTrackManager::nameTracks(void)
+  {
     unsigned n = _tracks.length();
     for (unsigned i = 0; i < n; i++) {
-	TTrack & t = * _tracks[i];
-	t._name = "trk" + itostring(i) + "(" + t._name + ")";
+      TTrack& t = * _tracks[i];
+      t._name = "trk" + itostring(i) + "(" + t._name + ")";
     }
     AList<TTrack> tmp = _tracksAll;
     tmp.remove(_tracks);
     unsigned n1 = tmp.length();
     for (unsigned i = 0; i < n1; i++) {
-	TTrack & t = * tmp[i];
-	t._name = "trk" + itostring(i + n)  + "(" + t._name + ")";
+      TTrack& t = * tmp[i];
+      t._name = "trk" + itostring(i + n)  + "(" + t._name + ")";
     }
-}
+  }
 
-TLink &
-TTrackManager::divide(const TTrack & t, AList<TLink> * l) const {
-    TLink & start = * TLink::outerMost(t.links());
+  TLink&
+  TTrackManager::divide(const TTrack& t, AList<TLink> * l) const
+  {
+    TLink& start = * TLink::outerMost(t.links());
     const HepGeom::Point3D<double> & center = t.helix().center();
     const Vector3D a = start.positionOnTrack() - center;
     for (unsigned j = 0; j < t.nLinks(); j++) {
-	if (t[j] == & start) continue;
-	TLink & k = * t[j];
-	const Vector3D b = k.positionOnTrack() - center;
-	if (a.cross(b).z() >= 0.) l[0].append(k);
-	else                      l[1].append(k);
+      if (t[j] == & start) continue;
+      TLink& k = * t[j];
+      const Vector3D b = k.positionOnTrack() - center;
+      if (a.cross(b).z() >= 0.) l[0].append(k);
+      else                      l[1].append(k);
     }
 
 #ifdef TRASAN_DEBUG_DETAIL
@@ -1459,87 +1479,91 @@ TTrackManager::divide(const TTrack & t, AList<TLink> * l) const {
 #endif
 
     if (l[0].length() == 0 || l[1].length() == 0)
-	return divideByIp(t, l);
+      return divideByIp(t, l);
 
     return start;
-}
+  }
 
-TLink &
-TTrackManager::divideByIp(const TTrack & t, AList<TLink> * l) const {
+  TLink&
+  TTrackManager::divideByIp(const TTrack& t, AList<TLink> * l) const
+  {
     l[0].removeAll();
     l[1].removeAll();
 
     const HepGeom::Point3D<double> & center = t.helix().center();
     const Vector3D a = ORIGIN - center;
     for (unsigned j = 0; j < t.nLinks(); j++) {
-	TLink & k = * t[j];
-	const Vector3D b = k.positionOnTrack() - center;
-	if (a.cross(b).z() >= 0.) l[0].append(k);
-	else                      l[1].append(k);
-    }    
+      TLink& k = * t[j];
+      const Vector3D b = k.positionOnTrack() - center;
+      if (a.cross(b).z() >= 0.) l[0].append(k);
+      else                      l[1].append(k);
+    }
 
     //...This is a dummy...
-    TLink & start = * TLink::outerMost(t.links());
+    TLink& start = * TLink::outerMost(t.links());
     return start;
-}
+  }
 
-void
-TTrackManager::removeHitsAcrossOverIp(AList<TLink> & l) const {
+  void
+  TTrackManager::removeHitsAcrossOverIp(AList<TLink> & l) const
+  {
 
     //...Calculate average phi...
     unsigned n = l.length();
     float phiSum = 0.;
     for (unsigned i = 0; i < n; i++) {
-	const Belle2::TRGCDCWire & w = l[i]->hit()->wire();
-	unsigned j = w.localId();
-	unsigned nWire = w.layer().nCells();
+      const Belle2::TRGCDCWire& w = l[i]->hit()->wire();
+      unsigned j = w.localId();
+      unsigned nWire = w.layer().nCells();
 
-	float phi = (float) j / (float) nWire;
-	phiSum += phi;
+      float phi = (float) j / (float) nWire;
+      phiSum += phi;
     }
     float average = phiSum / (float) n;
 
     AList<TLink> cross;
     for (unsigned i = 0; i < n; i++) {
-	const Belle2::TRGCDCWire & w = l[i]->hit()->wire();
-	unsigned j = w.localId();
-	unsigned nWire = w.layer().nCells();
+      const Belle2::TRGCDCWire& w = l[i]->hit()->wire();
+      unsigned j = w.localId();
+      unsigned nWire = w.layer().nCells();
 
-	float phi = (float) j / (float) nWire;
-	float dif = fabs(phi - average);
-	if (dif > 0.5) dif = 1. - dif;
+      float phi = (float) j / (float) nWire;
+      float dif = fabs(phi - average);
+      if (dif > 0.5) dif = 1. - dif;
 
-	if (dif > 0.3) cross.append(l[i]);
+      if (dif > 0.3) cross.append(l[i]);
     }
     l.remove(cross);
 
 #ifdef TRASAN_DEBUG_DETAIL
     cout << "    Cross over IP reduction : ";
     for (unsigned i = 0; i < (unsigned) cross.length(); i++) {
-	cout << cross[i]->wire()->name() << ",";
+      cout << cross[i]->wire()->name() << ",";
     }
     cout << endl;
 #endif
-}
+  }
 
 
-void
-TTrackManager::maskOut(TTrack & t, const AList<TLink> & links) const {
+  void
+  TTrackManager::maskOut(TTrack& t, const AList<TLink> & links) const
+  {
     unsigned n = links.length();
     if (! n) return;
     for (unsigned i = 0; i < n; i++) {
-	const Belle2::TRGCDCWireHit & hit = * links[i]->hit();
-	hit.state(hit.state() | CellHitInvalidForFit);
+      const Belle2::TRGCDCWireHit& hit = * links[i]->hit();
+      hit.state(hit.state() | CellHitInvalidForFit);
     }
     t._fitted = false;
 
 #ifdef TRASAN_DEBUG_DETAIL
     TLink::dump(links, "detail", "    TTrackManager::maskOut ... masking ");
 #endif
-}
+  }
 
-void
-TTrackManager::maskMultiHits(TTrack & t) const {
+  void
+  TTrackManager::maskMultiHits(TTrack& t) const
+  {
 #ifdef TRASAN_DEBUG_DETAIL
     cout << "... masking multi-hits" << endl;
 #endif
@@ -1552,22 +1576,23 @@ TTrackManager::maskMultiHits(TTrack & t) const {
 
     cores.sort(TLink::sortByWireId);
     for (unsigned i = 0; i < n; i++) {
-	if (layerLimited) {
-	    bads.append(cores[i]);
-	    continue;
-	}
-	AList<TLink> linksInLayer =
-	    TLink::sameLayer(cores, cores[i]->wire()->layerId());
-	if (linksInLayer.length() > 3) {
-	    bads.append(cores[i]);
-	    layerLimited = true;
-	}
+      if (layerLimited) {
+        bads.append(cores[i]);
+        continue;
+      }
+      AList<TLink> linksInLayer =
+        TLink::sameLayer(cores, cores[i]->wire()->layerId());
+      if (linksInLayer.length() > 3) {
+        bads.append(cores[i]);
+        layerLimited = true;
+      }
     }
     maskOut(t, bads);
-}
+  }
 
-void
-TTrackManager::maskNormal(TTrack & t) const {
+  void
+  TTrackManager::maskNormal(TTrack& t) const
+  {
 
     //...Divide into two tracks...
     AList<TLink> l[2];
@@ -1577,16 +1602,16 @@ TTrackManager::maskNormal(TTrack & t) const {
     cout << "    normal : divided by IP" << endl;
     cout << "    0=";
     for (unsigned j = 0; j < (unsigned) l[0].length(); j++) {
-	cout << "," << l[0][j]->wire()->name();
+      cout << "," << l[0][j]->wire()->name();
     }
     cout << endl;
     cout << "    1=";
     for (unsigned j = 0; j < (unsigned) l[1].length(); j++) {
-	cout << "," << l[1][j]->wire()->name();
+      cout << "," << l[1][j]->wire()->name();
     }
     cout << endl;
 #endif
-    
+
     //...Which should be masked out ?...
     unsigned maskSide = 2;
 
@@ -1598,8 +1623,8 @@ TTrackManager::maskNormal(TTrack & t) const {
     cout << TLink::nSuperLayers(l[1]) << endl;
 #endif
     if (maskSide != 2) {
-	maskOut(t, l[maskSide]);
-	return;
+      maskOut(t, l[maskSide]);
+      return;
     }
 
     //...2. Check by the inner-most layer...
@@ -1611,8 +1636,8 @@ TTrackManager::maskNormal(TTrack & t) const {
     cout << "    i0, i1 = " << i0 << ", " << i1 << endl;
 #endif
     if (maskSide != 2) {
-	maskOut(t, l[maskSide]);
-	return;
+      maskOut(t, l[maskSide]);
+      return;
     }
 
     //...3. Check by # of layers...
@@ -1623,33 +1648,34 @@ TTrackManager::maskNormal(TTrack & t) const {
     cout << TLink::nLayers(l[1]) << endl;
 #endif
     if (maskSide != 2) {
-	maskOut(t, l[maskSide]);
-	return;
+      maskOut(t, l[maskSide]);
+      return;
     }
 
     //...4. Check by pt...
     if (maskSide == 2) {
-	TTrack * tt[2];
-	for (unsigned j = 0; j < 2; j++) {
-	    tt[j] = new TTrack(t);
-	    tt[j]->remove(l[j]);
-	    _fitter.fit(* tt[j]);
-	}
-	if (tt[1]->pt() > tt[0]->pt()) maskSide = 1;
-	else                           maskSide = 0;
+      TTrack* tt[2];
+      for (unsigned j = 0; j < 2; j++) {
+        tt[j] = new TTrack(t);
+        tt[j]->remove(l[j]);
+        _fitter.fit(* tt[j]);
+      }
+      if (tt[1]->pt() > tt[0]->pt()) maskSide = 1;
+      else                           maskSide = 0;
 #ifdef TRASAN_DEBUG_DETAIL
-	cout << "    pt 0 = " << tt[1]->pt() << endl;
-	cout << "    pt 1 = " << tt[0]->pt() << endl;
-#endif	    
-	delete tt[0];
-	delete tt[1];
+      cout << "    pt 0 = " << tt[1]->pt() << endl;
+      cout << "    pt 1 = " << tt[0]->pt() << endl;
+#endif
+      delete tt[0];
+      delete tt[1];
     }
     maskOut(t, l[maskSide]);
     return;
-}
+  }
 
-void
-TTrackManager::maskCurl(TTrack & t) const {
+  void
+  TTrackManager::maskCurl(TTrack& t) const
+  {
 
     //...Divide into two tracks...
     AList<TLink> l[2];
@@ -1677,12 +1703,12 @@ TTrackManager::maskCurl(TTrack & t) const {
     cout << TLink::nSuperLayers(l[1]) << endl;
 #endif
     if (maskSide != 2) {
-	maskOut(t, l[maskSide]);
-	return;
+      maskOut(t, l[maskSide]);
+      return;
     }
 
     //...Make two tracks...
-    TTrack * tt[2];
+    TTrack* tt[2];
     tt[0] = new TTrack(t);
     tt[1] = new TTrack(t);
     tt[0]->remove(l[1]);
@@ -1691,7 +1717,7 @@ TTrackManager::maskCurl(TTrack & t) const {
     _fitter.fit(* tt[1]);
     THelix h0 = THelix(tt[0]->helix());
     THelix h1 = THelix(tt[1]->helix());
-    
+
     //...Check by z...
     h0.pivot(ORIGIN);
     h1.pivot(ORIGIN);
@@ -1702,52 +1728,47 @@ TTrackManager::maskCurl(TTrack & t) const {
     delete tt[1];
     maskOut(t, l[maskSide]);
     return;
-}
+  }
 
-void
-TTrackManager::determineT0(unsigned level, unsigned nMax) {
+  void
+  TTrackManager::determineT0(unsigned level, unsigned nMax)
+  {
 #ifdef TRASAN_DEBUG_DETAIL
     if (level == 0) {
-	cout << "TTrackManager::determineT0 !!! called with level = 0";
-	cout << endl;
+      cout << "TTrackManager::determineT0 !!! called with level = 0";
+      cout << endl;
     }
 #endif
 
     static bool first = true;
     static unsigned methode = 0;
     if (first) {
-	first = false;
+      first = false;
 
-	if (level == 1) {
-	    _cFitter.fit2D(true);
-	}
-	else if (level == 2) {
-	    // default setting
-	}
-	else if (level == 3) {
-	    _cFitter.sag(true);
-	}
-	else if (level == 4) {
-	    _cFitter.sag(true);
-	    _cFitter.propagation(true);
-	}
-	else if (level == 5) {
-	    _cFitter.sag(true);
-	    _cFitter.propagation(true);
-	    _cFitter.tof(true);
-	}
-	else if (level == 6) {
-	    methode = 1;
-	    _cFitter.sag(true);
-	    _cFitter.propagation(true);
-	    _cFitter.tof(true);
-	}
-	else if (level == 7) {
-	    methode = 2;
-	    _cFitter.sag(true);
-	    _cFitter.propagation(true);
-	    _cFitter.tof(true);
-	}
+      if (level == 1) {
+        _cFitter.fit2D(true);
+      } else if (level == 2) {
+        // default setting
+      } else if (level == 3) {
+        _cFitter.sag(true);
+      } else if (level == 4) {
+        _cFitter.sag(true);
+        _cFitter.propagation(true);
+      } else if (level == 5) {
+        _cFitter.sag(true);
+        _cFitter.propagation(true);
+        _cFitter.tof(true);
+      } else if (level == 6) {
+        methode = 1;
+        _cFitter.sag(true);
+        _cFitter.propagation(true);
+        _cFitter.tof(true);
+      } else if (level == 7) {
+        methode = 2;
+        _cFitter.sag(true);
+        _cFitter.propagation(true);
+        _cFitter.tof(true);
+      }
     }
 
     unsigned n = _tracks.length();
@@ -1762,31 +1783,32 @@ TTrackManager::determineT0(unsigned level, unsigned nMax) {
     // cout << "reccdc_timing=" << BsCouTab(RECCDC_TIMING) << endl;
 //cnv    else if (methode == 2 && BsCouTab(RECCDC_TIMING) != 0) {
     else if (methode == 2) {
-//cnv 	struct reccdc_timing * r0 = (struct reccdc_timing *)
-//cnv 	    BsGetEnt(RECCDC_TIMING, BsCouTab(RECCDC_TIMING), BBS_No_Index);
-//cnv	struct reccdc_timing * r0 = 0;
-//cnv 	if (r0->m_quality == 102) {
-// 	  if (BsCouTab(BELLE_EVENT)) {
-// 	    struct belle_event * b0 = (struct belle_event *)
-// 	    BsGetEnt(BELLE_EVENT, 1, BBS_No_Index);
-// 	    if(1==b0->m_ExpMC)                    t0 = T0Fit(n);
-// 	    if(2==b0->m_ExpMC && r0->m_time !=0.) t0 = T0Fit(n);
-// 	  }
-// 	}
-//	else if (r0->m_quality == 100) t0 = T0Fit(n);
-	// cout << "quality=" << r0->m_quality << endl;
+//cnv   struct reccdc_timing * r0 = (struct reccdc_timing *)
+//cnv       BsGetEnt(RECCDC_TIMING, BsCouTab(RECCDC_TIMING), BBS_No_Index);
+//cnv struct reccdc_timing * r0 = 0;
+//cnv   if (r0->m_quality == 102) {
+//    if (BsCouTab(BELLE_EVENT)) {
+//      struct belle_event * b0 = (struct belle_event *)
+//      BsGetEnt(BELLE_EVENT, 1, BBS_No_Index);
+//      if(1==b0->m_ExpMC)                    t0 = T0Fit(n);
+//      if(2==b0->m_ExpMC && r0->m_time !=0.) t0 = T0Fit(n);
+//    }
+//  }
+//  else if (r0->m_quality == 100) t0 = T0Fit(n);
+      // cout << "quality=" << r0->m_quality << endl;
     }
-    
+
     //...For debug...
     if (_debugLevel) {
-	cout << "TTrackManager::determineT0 ... methode=" << methode;
-	cout << ", T0 offset=" << - t0;
-	cout << ", # of tracks used=" << n << endl;
+      cout << "TTrackManager::determineT0 ... methode=" << methode;
+      cout << ", T0 offset=" << - t0;
+      cout << ", # of tracks used=" << n << endl;
     }
-}
+  }
 
-float
-TTrackManager::T0(unsigned n) {
+  float
+  TTrackManager::T0(unsigned n)
+  {
 
 #define X0 -10.
 #define X1 0.
@@ -1796,14 +1818,14 @@ TTrackManager::T0(unsigned n) {
     //...Determine T0 for each track...
     float t0Sum = 0.;
     for (unsigned i = 0; i < n; i++) {
-	TTrack & t = * _tracks[i];
-	float y[3];
-	for (unsigned j = 0; j < 3; j++) {
-	    float offset = X0 + j * STEP;
-	    _cFitter.fit(t, offset);
-	    y[j] = t.chi2();
-	}
-	t0Sum += minimum(y[0], y[1], y[2]);
+      TTrack& t = * _tracks[i];
+      float y[3];
+      for (unsigned j = 0; j < 3; j++) {
+        float offset = X0 + j * STEP;
+        _cFitter.fit(t, offset);
+        y[j] = t.chi2();
+      }
+      t0Sum += minimum(y[0], y[1], y[2]);
     }
     float t0 = t0Sum / (float) n;
     if (isnan(t0)) t0 = 0.;
@@ -1811,75 +1833,76 @@ TTrackManager::T0(unsigned n) {
     //...Fit with T0 correction...
     n = _tracks.length();
     for (unsigned i = 0; i < n; i++) {
-	TTrack & t = * _tracks[i];
-	_cFitter.fit(t, t0);
+      TTrack& t = * _tracks[i];
+      _cFitter.fit(t, t0);
     }
 
     //...Store it...
 //cnv    reccdc_timing * t = (reccdc_timing *) BsNewEnt(RECCDC_TIMING);
-    reccdc_timing * t = 0;
+    reccdc_timing* t = 0;
     t->m_time = - t0;
     t->m_quality = 11;
 
     return - t0;
-}
+  }
 
-float
-TTrackManager::T0Fit(unsigned n) {
+  float
+  TTrackManager::T0Fit(unsigned n)
+  {
 
     float tev_err;
 //  float tev_sum0= 0.;
     double tev_sum = 0.;
 //  float tev_sum2= 0.;
     double w_sum   = 0.;
-    
+
     //sort in order of pt
     // cout << "length=" << _tracks.length() << endl;
-    const unsigned cn=_tracks.length();
+    const unsigned cn = _tracks.length();
 //    float* sort = new float[cn];
-    unsigned * sort = new unsigned[cn];
-    float ptmax_pre=1.e10;
+    unsigned* sort = new unsigned[cn];
+    float ptmax_pre = 1.e10;
     for (unsigned i = 0; i < cn; i++) {
-      float ptmax=-999.;
+      float ptmax = -999.;
       int   jmax;
       for (unsigned j = 0; j < cn; j++) {
-	TTrack & tj = * _tracks[j];
-	float pt = fabs(1./tj.helix().a()[2]);
-	if( pt < ptmax_pre && pt > ptmax) {
-	  ptmax = pt;
-	  jmax  = j;
-	}
-	sort[i]=jmax;
+        TTrack& tj = * _tracks[j];
+        float pt = fabs(1. / tj.helix().a()[2]);
+        if (pt < ptmax_pre && pt > ptmax) {
+          ptmax = pt;
+          jmax  = j;
+        }
+        sort[i] = jmax;
       }
-      ptmax_pre=ptmax;
+      ptmax_pre = ptmax;
     }
 
     //    cout << "cn,n=" << cn <<" "<< n << endl;
     //    for (unsigned i = 0; i < n; i++) {
     int n_good(0);
     for (unsigned i = 0; i < cn; i++) {
-      //srtbypt	TTrack & t = * _tracks[i];
-      TTrack & t = * _tracks[sort[i]];     
+      //srtbypt TTrack & t = * _tracks[i];
+      TTrack& t = * _tracks[sort[i]];
       //      if( t.ndf() < 2 ) continue;
-      if( (t.helix().a()[3]==0.) && (t.helix().a()[4]==0.)) continue;
-      if( t.ndf() < 5  )                                    continue;
+      if ((t.helix().a()[3] == 0.) && (t.helix().a()[4] == 0.)) continue;
+      if (t.ndf() < 5)                                    continue;
       //      if( t.pt()  < 0.2)                                    continue;
       const HepGeom::Point3D<double>  pvt = t.helix().pivot();
       const CLHEP::HepVector  a   = t.helix().a();
-      THelix hl( pvt, a );
+      THelix hl(pvt, a);
       hl.ignoreErrorMatrix();
-      hl.pivot( ORIGIN );
-      if( abs(hl.dr()) > 10.) continue;
-      if( abs(hl.dz()) > 25.) continue;
+      hl.pivot(ORIGIN);
+      if (abs(hl.dr()) > 10.) continue;
+      if (abs(hl.dz()) > 25.) continue;
       n_good++;
-      if(n_good > (int)n) break;
-      
+      if (n_good > (int)n) break;
+
       //      float pt = fabs(1./t.helix().a()[2]);
       // cout << "pt=" << pt << endl;
       float tev = 0.;
       int fitstat = _cFitter.fit(t, tev, tev_err);
-      //	cout << "tev,tev_err=" <<tev<< " "<<tev_err<<endl;
-      if( fitstat != 0 ) continue;
+      //  cout << "tev,tev_err=" <<tev<< " "<<tev_err<<endl;
+      if (fitstat != 0) continue;
       double w = 1. / tev_err / tev_err;
       tev_sum += w * tev;
       w_sum += w;
@@ -1890,7 +1913,7 @@ TTrackManager::T0Fit(unsigned n) {
     delete [] sort;
 
     float tev_mean = 0;
-    if( w_sum != 0 ) tev_mean = tev_sum / w_sum;
+    if (w_sum != 0) tev_mean = tev_sum / w_sum;
     // float tev_err_a = 1. / sqrt(w_sum);
     // float tev_err_b = (tev_sum2 - tev_sum0 * tev_sum0 / (n + 1)) / n;
     // tev_err_b = sqrt(tev_err_b);
@@ -1899,22 +1922,24 @@ TTrackManager::T0Fit(unsigned n) {
 
     //...Store it...
 //cnv    reccdc_timing * tt = (reccdc_timing *) BsNewEnt(RECCDC_TIMING);
-    reccdc_timing * tt = 0;
+    reccdc_timing* tt = 0;
     tt->m_time = tev_mean;
     tt->m_quality = 151;
 
     return - tev_mean;
-}
+  }
 
-float
-TTrackManager::minimum(float y0, float y1, float y2) const {
+  float
+  TTrackManager::minimum(float y0, float y1, float y2) const
+  {
     float xMin = X1 + 0.5 * STEP * (y0 - y2) / (y0 + y2 - 2. * y1);
     return xMin;
-}
+  }
 
 // added by matsu ( 1999/05/24 )
-void
-TTrackManager::merge(void) {
+  void
+  TTrackManager::merge(void)
+  {
 #ifdef TRASAN_DEBUG_DETAIL
     const string stage = "TRKMGR::merge";
     EnterStage(stage);
@@ -1923,134 +1948,134 @@ TTrackManager::merge(void) {
     //...Merging...
     unsigned n = _tracks.length();
     AList<TTrack> bads;
-    unsigned * flagTrk;
-    if (NULL == (flagTrk = (unsigned *) malloc(n * sizeof(unsigned)))) {
-	perror("$Id: TTrackManager.cc 10700 2008-11-06 08:47:27Z hitoshi $:flagTrk:malloc");
-	exit(1);
-    }  
+    unsigned* flagTrk;
+    if (NULL == (flagTrk = (unsigned*) malloc(n * sizeof(unsigned)))) {
+      perror("$Id: TTrackManager.cc 10700 2008-11-06 08:47:27Z hitoshi $:flagTrk:malloc");
+      exit(1);
+    }
     for (unsigned i = 0; i < n; i++) flagTrk[i] = 0;
 
     //...Search a track to be merged...
     for (unsigned i0 = 0; i0 < n; i0++) {
 
-	if (flagTrk[i0] != 0) continue;
-	TTrack & t0 = * _tracks[i0];
-	if (! (t0.pt() < 0.25)) continue;
+      if (flagTrk[i0] != 0) continue;
+      TTrack& t0 = * _tracks[i0];
+      if (!(t0.pt() < 0.25)) continue;
 
-	unsigned Noverlap(0), Nall(0);
-	float OverlapRatioMax(-999.);
-	unsigned MaxID(0);
+      unsigned Noverlap(0), Nall(0);
+      float OverlapRatioMax(-999.);
+      unsigned MaxID(0);
 
-	for (unsigned i1= 0 ; i1 < n; i1++) {
+      for (unsigned i1 = 0 ; i1 < n; i1++) {
 
-	    if (i0 == i1 || flagTrk[i1] != 0) continue;
-	    TTrack & t1 = * _tracks[i1];
-	    if (! (t1.pt() < 0.25)) continue;
-	    Nall = t1.links().length();
-	    if (! Nall) continue;
-	    
-	    Noverlap = 0;
-	    for (unsigned j = 0; j < Nall; j++) {
-		TLink & l =  * t1.links()[j];
-		const Belle2::TRGCDCWireHit & whit =  * l.hit();
-		double load(2.);
-		if (whit.state() & CellHitStereo) load = 3.;
+        if (i0 == i1 || flagTrk[i1] != 0) continue;
+        TTrack& t1 = * _tracks[i1];
+        if (!(t1.pt() < 0.25)) continue;
+        Nall = t1.links().length();
+        if (! Nall) continue;
 
-		double x = t0.helix().center().x() - l.positionOnTrack().x();
-		double y = t0.helix().center().y() - l.positionOnTrack().y();
-		double r = sqrt(x * x + y * y);
-		double R = fabs(t0.helix().radius());
+        Noverlap = 0;
+        for (unsigned j = 0; j < Nall; j++) {
+          TLink& l =  * t1.links()[j];
+          const Belle2::TRGCDCWireHit& whit =  * l.hit();
+          double load(2.);
+          if (whit.state() & CellHitStereo) load = 3.;
 
-		if ((R - load) < r && r < (R + load)) Noverlap++;
-	    }
-     
-	    if (! Noverlap) continue;
-	    float tmpRatio = float(Noverlap) / float(Nall);
+          double x = t0.helix().center().x() - l.positionOnTrack().x();
+          double y = t0.helix().center().y() - l.positionOnTrack().y();
+          double r = sqrt(x * x + y * y);
+          double R = fabs(t0.helix().radius());
 
-	    if (tmpRatio > OverlapRatioMax) {
-		OverlapRatioMax = tmpRatio;
-		MaxID = i1;
-	    }
-	} 
+          if ((R - load) < r && r < (R + load)) Noverlap++;
+        }
 
-	if (OverlapRatioMax < 0.8) continue;
+        if (! Noverlap) continue;
+        float tmpRatio = float(Noverlap) / float(Nall);
 
-	//...Mask should be done...
-	unsigned MaskID[2] = {MaxID , i0};
-	AList<TLink> l[2];
+        if (tmpRatio > OverlapRatioMax) {
+          OverlapRatioMax = tmpRatio;
+          MaxID = i1;
+        }
+      }
 
-	for( unsigned j0=0;j0<2;j0++){
-	    for( unsigned j1=0;j1< _tracks[MaskID[j0]]->nLinks();j1++){
-		TLink &k = * _tracks[MaskID[j0]]->links()[j1]; 
-		l[j0].append( k );
-	    }
-	}
-	// _tracks[i0]->links().append( _tracks[MaxID]->links() );
-	// _tracks[MaxID]->links().append( _tracks[i0]->links ());
-	_tracks[i0]->append(_tracks[MaxID]->links());
-	_tracks[MaxID]->append(_tracks[i0]->links());
+      if (OverlapRatioMax < 0.8) continue;
+
+      //...Mask should be done...
+      unsigned MaskID[2] = {MaxID , i0};
+      AList<TLink> l[2];
+
+      for (unsigned j0 = 0; j0 < 2; j0++) {
+        for (unsigned j1 = 0; j1 < _tracks[MaskID[j0]]->nLinks(); j1++) {
+          TLink& k = * _tracks[MaskID[j0]]->links()[j1];
+          l[j0].append(k);
+        }
+      }
+      // _tracks[i0]->links().append( _tracks[MaxID]->links() );
+      // _tracks[MaxID]->links().append( _tracks[i0]->links ());
+      _tracks[i0]->append(_tracks[MaxID]->links());
+      _tracks[MaxID]->append(_tracks[i0]->links());
 
 #ifdef TRASAN_DEBUG_DETAIL
-	cout << "    mask & merge " << endl;
-	cout << "    0:";
-	TLink::dump(l[0], "flag sort");
-	cout << "    1:";
-	TLink::dump(l[1], "flag sort");
-	cout << endl;
+      cout << "    mask & merge " << endl;
+      cout << "    0:";
+      TLink::dump(l[0], "flag sort");
+      cout << "    1:";
+      TLink::dump(l[1], "flag sort");
+      cout << endl;
 #endif
 
-	//...Which should be masked out ?...
-	unsigned maskSide = 2;
+      //...Which should be masked out ?...
+      unsigned maskSide = 2;
 
 #if 0
-	//...0. Check by # of super layers... ( not applied now )
-	unsigned super0 = NSuperLayers(l[0]);
-	unsigned super1 = NSuperLayers(l[1]);
+      //...0. Check by # of super layers... ( not applied now )
+      unsigned super0 = NSuperLayers(l[0]);
+      unsigned super1 = NSuperLayers(l[1]);
 
-	if( super0 < super1 ) maskSide = 0;
-	else if ( super0 > super1 ) maskSide = 1;
-    
+      if (super0 < super1) maskSide = 0;
+      else if (super0 > super1) maskSide = 1;
+
 #ifdef TRASAN_DEBUG_DETAIL
-	cout << "    NSuperLayers 0, 1 = " << NSuperLayers(l[0]) << ", ";
-	cout << NSuperLayers(l[1]) << endl;
+      cout << "    NSuperLayers 0, 1 = " << NSuperLayers(l[0]) << ", ";
+      cout << NSuperLayers(l[1]) << endl;
 #endif
 
-	if (maskSide == 2) {
+      if (maskSide == 2) {
 #endif
 
-	    //...1. Check by the inner-most layer...
-	    unsigned inner0 = TLink::innerMost(l[0])->wire()->layerId();
-	    unsigned inner1 = TLink::innerMost(l[1])->wire()->layerId();
-	    if (inner0 < inner1 ) maskSide = 1;
-	    else if (inner0 > inner1) maskSide = 0;
+        //...1. Check by the inner-most layer...
+        unsigned inner0 = TLink::innerMost(l[0])->wire()->layerId();
+        unsigned inner1 = TLink::innerMost(l[1])->wire()->layerId();
+        if (inner0 < inner1) maskSide = 1;
+        else if (inner0 > inner1) maskSide = 0;
 
-	    if( maskSide == 2 ){
+        if (maskSide == 2) {
 
-		//...2. Check by dz 
-		
-		//...Make two tracks...
-		TTrack * tt[2];
-		tt[0] = new TTrack( *(_tracks[MaskID[0]]));
-		tt[1] = new TTrack( *(_tracks[MaskID[1]]));
-		_fitter.fit(* tt[0]);
-		_fitter.fit(* tt[1]);
-		THelix h0 = THelix(tt[0]->helix());
-		THelix h1 = THelix(tt[1]->helix());
-		   
-		//...Check dz...
-		h0.pivot(ORIGIN);
-		h1.pivot(ORIGIN);
-		if (fabs(h0.dz()) < fabs(h1.dz())) maskSide = 1;
-		else                               maskSide = 0;
-		
-		delete tt[0];
-		delete tt[1];
-	    }
+          //...2. Check by dz
+
+          //...Make two tracks...
+          TTrack* tt[2];
+          tt[0] = new TTrack(*(_tracks[MaskID[0]]));
+          tt[1] = new TTrack(*(_tracks[MaskID[1]]));
+          _fitter.fit(* tt[0]);
+          _fitter.fit(* tt[1]);
+          THelix h0 = THelix(tt[0]->helix());
+          THelix h1 = THelix(tt[1]->helix());
+
+          //...Check dz...
+          h0.pivot(ORIGIN);
+          h1.pivot(ORIGIN);
+          if (fabs(h0.dz()) < fabs(h1.dz())) maskSide = 1;
+          else                               maskSide = 0;
+
+          delete tt[0];
+          delete tt[1];
+        }
 #if 0
-	}
+      }
 #endif
-	bads.append(_tracks[MaskID[maskSide]]);
-	flagTrk[MaskID[maskSide]] = 1;
+      bads.append(_tracks[MaskID[maskSide]]);
+      flagTrk[MaskID[maskSide]] = 1;
     }
 
     _tracks.remove(bads);
@@ -2058,44 +2083,45 @@ TTrackManager::merge(void) {
     //*****  Masking *****
     n = _tracks.length();
 
-    for( unsigned i=0;i<n;i++){
-	TTrack & t = * _tracks[i];
-	for( unsigned j=0;j<(unsigned) t.links().length();j++){
-	    TLink & l =  * t.links()[j];
-	    const Belle2::TRGCDCWireHit & whit =  * l.hit();
-	   
-	    if( !(whit.state() & CellHitFittingValid) ) continue;
-	   
-	    // within half circle or not?
-	    double q = t.helix().center().x() * l.positionOnTrack().y() - 
-		t.helix().center().y() * l.positionOnTrack().x();
-	    double qq =  q *t.charge();
-	   
-	    if( qq > 0 ) whit.state(whit.state() & ~CellHitInvalidForFit);
-	    else         whit.state(whit.state() | CellHitInvalidForFit);
+    for (unsigned i = 0; i < n; i++) {
+      TTrack& t = * _tracks[i];
+      for (unsigned j = 0; j < (unsigned) t.links().length(); j++) {
+        TLink& l =  * t.links()[j];
+        const Belle2::TRGCDCWireHit& whit =  * l.hit();
+
+        if (!(whit.state() & CellHitFittingValid)) continue;
+
+        // within half circle or not?
+        double q = t.helix().center().x() * l.positionOnTrack().y() -
+                   t.helix().center().y() * l.positionOnTrack().x();
+        double qq =  q * t.charge();
+
+        if (qq > 0) whit.state(whit.state() & ~CellHitInvalidForFit);
+        else         whit.state(whit.state() | CellHitInvalidForFit);
 #ifdef TRASAN_DEBUG_DETAIL
-	    cout << "TTrackManager::merge ... masking" << endl;
+        cout << "TTrackManager::merge ... masking" << endl;
 #endif
-	}
+      }
     }
-    
+
     free(flagTrk);
 
 #ifdef TRASAN_DEBUG_DETAIL
     LeaveStage(stage);
 #endif
-}
+  }
 // end of addition
 
-int
-TTrackManager::copyTrack(TTrack & t,
-			 reccdc_trk ** pr,
-			 reccdc_trk_add ** pra) const {
+  int
+  TTrackManager::copyTrack(TTrack& t,
+                           reccdc_trk** pr,
+                           reccdc_trk_add** pra) const
+  {
 
     static const unsigned GoodHitMask = (CellHitTimeValid |
-					 CellHitChargeValid |
-					 CellHitFindingValid |
-					 CellHitFittingValid);
+                                         CellHitChargeValid |
+                                         CellHitFindingValid |
+                                         CellHitFittingValid);
     int err = 0;
 
     //...Hit loop...
@@ -2103,8 +2129,8 @@ TTrackManager::copyTrack(TTrack & t,
     t.fitted(true);
 #endif
 #ifdef TRASAN_DEBUG_DETAIL
-    cout << "    checking hits ... " << t.name() 
-	      << " quality = " << t.quality();
+    cout << "    checking hits ... " << t.name()
+         << " quality = " << t.quality();
     cout << " : " << t.cores().length() << ", " << t.ndf() << " : ";
 #endif
 //  unsigned j = 0;
@@ -2115,37 +2141,36 @@ TTrackManager::copyTrack(TTrack & t,
     AList<TLink> badHits;
     const unsigned n = t.links().length();
     for (unsigned i = 0; i < n; i++) {
-	TLink * l = t.links()[i];
-//cnv	reccdc_wirhit * h = l->hit()->reccdc();
-	reccdc_wirhit * h = 0;
+      TLink* l = t.links()[i];
+//cnv reccdc_wirhit * h = l->hit()->reccdc();
+      reccdc_wirhit* h = 0;
 
 #ifdef TRASAN_DEBUG_DETAIL
-	cout << l->wire()->name();
-	if (h->m_trk) cout << "(n/a)";
-	if ((l->hit()->state() & GoodHitMask) == GoodHitMask) {
-	    if (l->hit()->state() & CellHitInvalidForFit) {
-		if (! (h->m_stat & CellHitInvalidForFit))
-		    cout << "(bad)";
-	    }
-	}
-	cout << ",";
+      cout << l->wire()->name();
+      if (h->m_trk) cout << "(n/a)";
+      if ((l->hit()->state() & GoodHitMask) == GoodHitMask) {
+        if (l->hit()->state() & CellHitInvalidForFit) {
+          if (!(h->m_stat & CellHitInvalidForFit))
+            cout << "(bad)";
+        }
+      }
+      cout << ",";
 #endif
 
-	if (h->m_trk) {
-	    ++nOccupied;
-	    if (! (h->m_stat & CellHitInvalidForFit))
-		continue;
-	}
-	if ((l->hit()->state() & GoodHitMask) == GoodHitMask) {
-	    if (l->hit()->state() & CellHitInvalidForFit) {
-		if (! (h->m_stat & CellHitInvalidForFit))
-		    badHits.append(l);
-	    }
-	    else {
-		hits.append(l);
-		if (l->wire()->stereo()) ++nStereos;
-	    }
-	}
+      if (h->m_trk) {
+        ++nOccupied;
+        if (!(h->m_stat & CellHitInvalidForFit))
+          continue;
+      }
+      if ((l->hit()->state() & GoodHitMask) == GoodHitMask) {
+        if (l->hit()->state() & CellHitInvalidForFit) {
+          if (!(h->m_stat & CellHitInvalidForFit))
+            badHits.append(l);
+        } else {
+          hits.append(l);
+          if (l->wire()->stereo()) ++nStereos;
+        }
+      }
     }
     t.finalHits(hits);
 #ifdef TRASAN_DEBUG_DETAIL
@@ -2154,12 +2179,11 @@ TTrackManager::copyTrack(TTrack & t,
 
     //...Check # of hits...
     if (t.quality() & TrackQuality2D) {
-	if (hits.length() < 3) err = 3;
-	if (nOccupied > 2) err = 4;
-    }
-    else {
-	if (hits.length() < 5) err = 1;
-	if (nStereos < 2) err = 2;
+      if (hits.length() < 3) err = 3;
+      if (nOccupied > 2) err = 4;
+    } else {
+      if (hits.length() < 5) err = 1;
+      if (nStereos < 2) err = 2;
     }
     if (err) return err;
 
@@ -2168,7 +2192,7 @@ TTrackManager::copyTrack(TTrack & t,
 //     * pra = (reccdc_trk_add *) BsNewEnt(RECCDC_TRK_ADD);
     * pr = 0;
     * pra = 0;
-    reccdc_trk * r = * pr;
+    reccdc_trk* r = * pr;
 //  reccdc_trk_add * ra = * pra;
 
     //...Copy hit information...
@@ -2184,18 +2208,18 @@ TTrackManager::copyTrack(TTrack & t,
     float chisq = 0.;
     unsigned nHits = hits.length();
     for (unsigned i = 0; i < nHits; i++) {
-	TLink * l = hits[i];
-//cnv	reccdc_wirhit * h = hits[i]->hit()->reccdc();
-	reccdc_wirhit * h = 0;
-	h->m_trk = r->m_ID;
-	h->m_pChiSq = l->pull();
-	h->m_lr = l->leftRight();
-	if (l->usecathode() == 4) ++nClst;
-	chisq += h->m_pChiSq;
+      TLink* l = hits[i];
+//cnv reccdc_wirhit * h = hits[i]->hit()->reccdc();
+      reccdc_wirhit* h = 0;
+      h->m_trk = r->m_ID;
+      h->m_pChiSq = l->pull();
+      h->m_lr = l->leftRight();
+      if (l->usecathode() == 4) ++nClst;
+      chisq += h->m_pChiSq;
 
 #ifdef TRASAN_DEBUG_DETAIL
-	cout << "        chisq,sum(" << l->wire()->name() << ")=:"
-		  << h->m_pChiSq << "," << chisq << endl;
+      cout << "        chisq,sum(" << l->wire()->name() << ")=:"
+           << h->m_pChiSq << "," << chisq << endl;
 #endif
     }
     r->m_chiSq = chisq;
@@ -2203,23 +2227,23 @@ TTrackManager::copyTrack(TTrack & t,
     r->m_nster = nStereos;
     r->m_ndf = nHits - 5;
     if (t.quality() & TrackQuality2D)
-	r->m_ndf = nHits - 3;
+      r->m_ndf = nHits - 3;
 
     //...Bad hits...
     const unsigned n2 = badHits.length();
     for (unsigned i = 0; i < n2; i++) {
-//cnv	reccdc_wirhit * h = badHits[i]->hit()->reccdc();
-	reccdc_wirhit * h = 0;
-	h->m_trk = r->m_ID;
-	h->m_stat |= CellHitInvalidForFit;
+//cnv reccdc_wirhit * h = badHits[i]->hit()->reccdc();
+      reccdc_wirhit* h = 0;
+      h->m_trk = r->m_ID;
+      h->m_stat |= CellHitInvalidForFit;
     }
 
     //...Cathode...
     r->m_nclus = nClst;
 
     //...THelix parameter...
-    const CLHEP::HepVector & a = t.helix().a();
-    const CLHEP::HepSymMatrix & ea = t.helix().Ea();
+    const CLHEP::HepVector& a = t.helix().a();
+    const CLHEP::HepSymMatrix& ea = t.helix().Ea();
     const HepGeom::Point3D<double> & x = t.helix().pivot();
     r->m_helix[0] = tosingle(a[0]);
     r->m_helix[1] = tosingle(a[1]);
@@ -2248,18 +2272,19 @@ TTrackManager::copyTrack(TTrack & t,
     r->m_error[14] = tosingle(ea[4][4]);
 
     //...Get outer most hit(=termination point)...
-    TLink * last = TLink::outerMost(hits);
+    TLink* last = TLink::outerMost(hits);
 
     //...Calculate phi of the termination point...
     t.approach(* last);
     r->m_fiTerm = last->dPhi();
 
     return err;
-}
+  }
 
-int
-TTrackManager::copyTrack(Belle2::StoreArray<GFTrackCand> & trackCandidates,
-			 TTrack & t) const {
+  int
+  TTrackManager::copyTrack(Belle2::StoreArray<GFTrackCand> & trackCandidates,
+                           TTrack& t) const
+  {
 
     //...Get # for new candidate...
     const int counter = trackCandidates->GetLast() + 1;
@@ -2269,11 +2294,11 @@ TTrackManager::copyTrack(Belle2::StoreArray<GFTrackCand> & trackCandidates,
 
     //...Helix parameters... Need to check pivot position
     TVector3 momentum(t.helix().momentum().x(),
-		      t.helix().momentum().y(), 
-		      t.helix().momentum().z());
+                      t.helix().momentum().y(),
+                      t.helix().momentum().z());
     TVector3 position(t.helix().x().x(),
-		      t.helix().x().y(),
-		      t.helix().x().z());
+                      t.helix().x().y(),
+                      t.helix().x().z());
 
     cout << t.helix().pivot() << endl;
 
@@ -2290,10 +2315,10 @@ TTrackManager::copyTrack(Belle2::StoreArray<GFTrackCand> & trackCandidates,
 
     //...Copy info...
     trackCandidates[counter]->setComplTrackSeed(position,
-						momentum,
-						pdg,
-						posError,
-						momError);
+                                                momentum,
+                                                pdg,
+                                                posError,
+                                                momError);
 
     //...No MC info now...
     // trackCandidates[counter]->setMcTrackId(iPart);
@@ -2304,71 +2329,74 @@ TTrackManager::copyTrack(Belle2::StoreArray<GFTrackCand> & trackCandidates,
     //...CDC hit info... I don't know this is correct or not
     const unsigned n = t.links().length();
     for (unsigned i = 0; i < n; i++) {
- 	const Belle2::TRGCDCWireHit & h = * t.links()[i]->hit();
- 	const unsigned layerId = h.wire().layerId();
- 	const unsigned hitID = h.iCDCHit();
- 	const double driftTime = h.drift();
- 	const unsigned uniqueId = layerId * 10000 + h.wire().localId();
+      const Belle2::TRGCDCWireHit& h = * t.links()[i]->hit();
+      const unsigned layerId = h.wire().layerId();
+      const unsigned hitID = h.iCDCHit();
+      const double driftTime = h.drift();
+      const unsigned uniqueId = layerId * 10000 + h.wire().localId();
 
- 	trackCandidates[counter]->addHit(2, hitID, driftTime, uniqueId);
+      trackCandidates[counter]->addHit(2, hitID, driftTime, uniqueId);
     }
 
     return 0;
-}
+  }
 
-void
-TTrackManager::sortTracksByQuality(void) {
+  void
+  TTrackManager::sortTracksByQuality(void)
+  {
     unsigned n = _tracks.length();
     if (n < 2) return;
 
     for (unsigned i = 0; i < n - 1; i++) {
-	TTrack & t0 = * _tracks[i];
-	float bestRChisq = HUGE_VAL;
-	if (t0.ndf() > 0) bestRChisq = t0.chi2() / t0.ndf();
-	for (unsigned j = i + 1; j < n; j++) {
-	    TTrack & t1 = * _tracks[j];
-	    float rChisq = HUGE_VAL;
-	    if (t1.ndf() > 0) rChisq = t1.chi2() / t1.ndf();
-	    if (rChisq < bestRChisq) {
-		bestRChisq = rChisq;
-		_tracks.swap(i, j);
-	    }
-	}
+      TTrack& t0 = * _tracks[i];
+      float bestRChisq = HUGE_VAL;
+      if (t0.ndf() > 0) bestRChisq = t0.chi2() / t0.ndf();
+      for (unsigned j = i + 1; j < n; j++) {
+        TTrack& t1 = * _tracks[j];
+        float rChisq = HUGE_VAL;
+        if (t1.ndf() > 0) rChisq = t1.chi2() / t1.ndf();
+        if (rChisq < bestRChisq) {
+          bestRChisq = rChisq;
+          _tracks.swap(i, j);
+        }
+      }
     }
-}
+  }
 
-void
-TTrackManager::sortTracksByPt(void) {
+  void
+  TTrackManager::sortTracksByPt(void)
+  {
 #ifdef TRASAN_DEBUG_DETAIL
     cout << "trkmgr::sortTracksByPt : # of tracks="
-	 << _tracks.length() << endl;
+         << _tracks.length() << endl;
 #endif
 
     unsigned n = _tracks.length();
     if (n < 2) return;
 
     for (unsigned i = 0; i < n - 1; i++) {
-	TTrack & t0 = * _tracks[i];
-	float bestPt = t0.pt();
-	for (unsigned j = i + 1; j < n; j++) {
-	    TTrack & t1 = * _tracks[j];
-	    float pt = t1.pt();
+      TTrack& t0 = * _tracks[i];
+      float bestPt = t0.pt();
+      for (unsigned j = i + 1; j < n; j++) {
+        TTrack& t1 = * _tracks[j];
+        float pt = t1.pt();
 #ifdef TRASAN_DEBUG_DETAIL
-	    cout << "i,j=" << i << "," << j
-		 << " : pt i,j=" << bestPt << "," << pt << endl;
+        cout << "i,j=" << i << "," << j
+             << " : pt i,j=" << bestPt << "," << pt << endl;
 #endif
-	    if (pt > bestPt) {
-		bestPt = pt;
-		_tracks.swap(i, j);
-	    }
-	}
+        if (pt > bestPt) {
+          bestPt = pt;
+          _tracks.swap(i, j);
+        }
+      }
     }
-}
+  }
 
-void
-TTrackManager::treatCurler(rectrk & trk1,
-			   reccdc_trk_add & cdc1,
-			   unsigned flag) const {
+  void
+  TTrackManager::treatCurler(rectrk& trk1,
+                             reccdc_trk_add& cdc1,
+                             unsigned flag) const
+  {
 //cnv //...Originally coded by j.tanaka...
 
 //     //...Check inputs...
@@ -2377,8 +2405,8 @@ TTrackManager::treatCurler(rectrk & trk1,
 
 //     //...The other side...
 //     reccdc_trk_add & cdc2 = * (reccdc_trk_add *) BsGetEnt(RECCDC_TRK_ADD,
-// 							  cdc1.m_daughter,
-// 							  BBS_No_Index);
+//                cdc1.m_daughter,
+//                BBS_No_Index);
 //     if (cdc2.m_daughter == 0) return;
 //     if (cdc2.m_rectrk == 0) return;
 //     rectrk & trk2 = * (rectrk *) BsGetEnt(RECTRK, cdc2.m_rectrk, BBS_No_Index);
@@ -2386,11 +2414,11 @@ TTrackManager::treatCurler(rectrk & trk1,
 
 //     //...Obtain RECTRK_LOCALZ...
 //     rectrk_localz & z1 = * (rectrk_localz *) BsGetEnt(RECTRK_LOCALZ,
-// 						      trk1.m_zero[2],
-// 						      BBS_No_Index);
+//                  trk1.m_zero[2],
+//                  BBS_No_Index);
 //     rectrk_localz & z2 = * (rectrk_localz *) BsGetEnt(RECTRK_LOCALZ,
-// 						      trk2.m_zero[2],
-// 						      BBS_No_Index);
+//                  trk2.m_zero[2],
+//                  BBS_No_Index);
 
 //     //...Pointer to mother and daughter...
 //     reccdc_trk_add * mother = & cdc1;
@@ -2398,50 +2426,50 @@ TTrackManager::treatCurler(rectrk & trk1,
 
 // //      //...By dr...
 // //      if (flag == 1) {
-// //  	float dr1 = fabs(z1.m_helix[0]);
-// //  	float dr2 = fabs(z2.m_helix[0]);
-// //  	if (dr1 > dr2) {
-// //  	    mother = & cdc2;
-// //  	    daughter = & cdc1;
-// //  	}
+// //   float dr1 = fabs(z1.m_helix[0]);
+// //   float dr2 = fabs(z2.m_helix[0]);
+// //   if (dr1 > dr2) {
+// //       mother = & cdc2;
+// //       daughter = & cdc1;
+// //   }
 // //      }
 
 // //      //...By dz...
 // //      else {
-// //  	float dz1 = fabs(z1.m_helix[3]);
-// //  	float dz2 = fabs(z2.m_helix[3]);
-// //  	if (dz1 > dz2) {
-// //  	    mother = & cdc2;
-// //  	    daughter = & cdc1;
-// //  	}
+// //   float dz1 = fabs(z1.m_helix[3]);
+// //   float dz2 = fabs(z2.m_helix[3]);
+// //   if (dz1 > dz2) {
+// //       mother = & cdc2;
+// //       daughter = & cdc1;
+// //   }
 // //      }
 
 //     //...By dz + dr...
 //     if(flag == 3){
-// 	float dz1 = fabs(z1.m_helix[3]);
-// 	float dz2 = fabs(z2.m_helix[3]);
-// 	if (fabs(dz1 - dz2) < 2.) flag = 1;
-// 	else                      flag = 2;
+//  float dz1 = fabs(z1.m_helix[3]);
+//  float dz2 = fabs(z2.m_helix[3]);
+//  if (fabs(dz1 - dz2) < 2.) flag = 1;
+//  else                      flag = 2;
 //     }
 
 //     //...By dr...
 //     if(flag == 1){
-// 	float dr1 = fabs(z1.m_helix[0]);
-// 	float dr2 = fabs(z2.m_helix[0]);
-// 	if (dr1 > dr2) {
-// 	    mother = & cdc2;
-// 	    daughter = & cdc1;
-// 	}
+//  float dr1 = fabs(z1.m_helix[0]);
+//  float dr2 = fabs(z2.m_helix[0]);
+//  if (dr1 > dr2) {
+//      mother = & cdc2;
+//      daughter = & cdc1;
+//  }
 //     }
 
 //     //...By dz...
 //     else if(flag == 2){
-// 	float dz1 = fabs(z1.m_helix[3]);
-// 	float dz2 = fabs(z2.m_helix[3]);
-// 	if (dz1 > dz2) {
-// 	    mother = & cdc2;
-// 	    daughter = & cdc1;
-// 	}
+//  float dz1 = fabs(z1.m_helix[3]);
+//  float dz2 = fabs(z2.m_helix[3]);
+//  if (dz1 > dz2) {
+//      mother = & cdc2;
+//      daughter = & cdc1;
+//  }
 //     }
 
 //     //...Update information...
@@ -2453,13 +2481,14 @@ TTrackManager::treatCurler(rectrk & trk1,
 //     daughter->m_mother = mother->m_ID;
 //     daughter->m_daughter = 0;
 //     daughter->m_decision |= TrackTrackManager;
-}
+  }
 
-void
-TTrackManager::sortBanksByPt(void) const {
+  void
+  TTrackManager::sortBanksByPt(void) const
+  {
 //cnv #ifdef TRASAN_DEBUG_DETAIL
 //     cout << "trkmgr::sortBanksByPt : # of tracks="
-// 	 << BsCouTab(RECCDC_TRK_ADD) << endl;
+//   << BsCouTab(RECCDC_TRK_ADD) << endl;
 // #endif
 
 //     unsigned n = BsCouTab(RECCDC_TRK_ADD);
@@ -2470,77 +2499,77 @@ TTrackManager::sortBanksByPt(void) const {
 //     if (NULL == (id = (unsigned *) malloc(n * sizeof(unsigned)))) {
 //       perror("$Id: TTrackManager.cc 10700 2008-11-06 08:47:27Z hitoshi $:id:malloc");
 //       exit(1);
-//     }  
+//     }
 //     for (unsigned i = 0; i < n; i++) id[i] = i;
 //     for (unsigned i = 0; i < n - 1; i++) {
-// 	reccdc_trk & cdc0 =
-// 	    * (reccdc_trk *) BsGetEnt(RECCDC_TRK,
-// 				      i + 1,
-// 				      BBS_No_Index);
-// 	reccdc_trk_add & add0 =
-// 	    * (reccdc_trk_add *) BsGetEnt(RECCDC_TRK_ADD,
-// 					  i + 1,
-// 					  BBS_No_Index);
-// 	reccdc_mctrk & mc0 =
-// 	    * (reccdc_mctrk *) BsGetEnt(RECCDC_MCTRK,
-// 					i + 1,
-// 					BBS_No_Index);
-// 	float bestPt = 1. / fabs(cdc0.m_helix[2]);
-// 	unsigned bestQuality = add0.m_quality;
-// 	for (unsigned j = i + 1; j < n; j++) {
-// 	    reccdc_trk & cdc1 =
-// 		* (reccdc_trk *) BsGetEnt(RECCDC_TRK,
-// 					  j + 1,
-// 					  BBS_No_Index);
-// 	    reccdc_trk_add & add1 =
-// 		* (reccdc_trk_add *) BsGetEnt(RECCDC_TRK_ADD,
-// 					      j + 1,
-// 					      BBS_No_Index);
-// 	    reccdc_mctrk & mc1 =
-// 		* (reccdc_mctrk *) BsGetEnt(RECCDC_MCTRK,
-// 					    j + 1,
-// 					    BBS_No_Index);
-// 	    float pt = 1. / fabs(cdc1.m_helix[2]);
+//  reccdc_trk & cdc0 =
+//      * (reccdc_trk *) BsGetEnt(RECCDC_TRK,
+//              i + 1,
+//              BBS_No_Index);
+//  reccdc_trk_add & add0 =
+//      * (reccdc_trk_add *) BsGetEnt(RECCDC_TRK_ADD,
+//            i + 1,
+//            BBS_No_Index);
+//  reccdc_mctrk & mc0 =
+//      * (reccdc_mctrk *) BsGetEnt(RECCDC_MCTRK,
+//          i + 1,
+//          BBS_No_Index);
+//  float bestPt = 1. / fabs(cdc0.m_helix[2]);
+//  unsigned bestQuality = add0.m_quality;
+//  for (unsigned j = i + 1; j < n; j++) {
+//      reccdc_trk & cdc1 =
+//    * (reccdc_trk *) BsGetEnt(RECCDC_TRK,
+//            j + 1,
+//            BBS_No_Index);
+//      reccdc_trk_add & add1 =
+//    * (reccdc_trk_add *) BsGetEnt(RECCDC_TRK_ADD,
+//                j + 1,
+//                BBS_No_Index);
+//      reccdc_mctrk & mc1 =
+//    * (reccdc_mctrk *) BsGetEnt(RECCDC_MCTRK,
+//              j + 1,
+//              BBS_No_Index);
+//      float pt = 1. / fabs(cdc1.m_helix[2]);
 // #ifdef TRASAN_DEBUG_DETAIL
-// 	    cout << "i,j=" << i << "," << j
-// 		 << " : quality i,j=" << bestQuality << ","
-// 		 << add1.m_quality << endl;
+//      cout << "i,j=" << i << "," << j
+//     << " : quality i,j=" << bestQuality << ","
+//     << add1.m_quality << endl;
 // #endif
-// 	    unsigned quality = add1.m_quality;
-// 	    if (quality > bestQuality) continue;
-// 	    else if (quality < bestQuality) {
-// 		bestQuality = quality;
-// 		bestPt = pt;
-// 		swapReccdc(cdc0, add0, mc0, cdc1, add1, mc1);
-// 		unsigned tmp = id[i];
-// 		id[i] = id[j];
-// 		id[j] = tmp;
+//      unsigned quality = add1.m_quality;
+//      if (quality > bestQuality) continue;
+//      else if (quality < bestQuality) {
+//    bestQuality = quality;
+//    bestPt = pt;
+//    swapReccdc(cdc0, add0, mc0, cdc1, add1, mc1);
+//    unsigned tmp = id[i];
+//    id[i] = id[j];
+//    id[j] = tmp;
 // #ifdef TRASAN_DEBUG_DETAIL
-// 		cout << "swapped" << endl;
+//    cout << "swapped" << endl;
 // #endif
-// 		continue;
-// 	    }
+//    continue;
+//      }
 // #ifdef TRASAN_DEBUG_DETAIL
-// 	    cout << "i,j=" << i << "," << j
-// 		 << " : pt i,j=" << bestPt << "," << pt << endl;
+//      cout << "i,j=" << i << "," << j
+//     << " : pt i,j=" << bestPt << "," << pt << endl;
 // #endif
-// 	    if (pt > bestPt) {
+//      if (pt > bestPt) {
 // #ifdef TRASAN_DEBUG_DETAIL
-// 		cout << "swapping ... " << & cdc0 << "," << & add0 << ","
-// 		     << & mc0 << " <-> " << & cdc1 << "," << & add1 << ","
-// 		     << & mc1 << endl;
+//    cout << "swapping ... " << & cdc0 << "," << & add0 << ","
+//         << & mc0 << " <-> " << & cdc1 << "," << & add1 << ","
+//         << & mc1 << endl;
 // #endif
-// 		bestQuality = quality;
-// 		bestPt = pt;
-// 		swapReccdc(cdc0, add0, mc0, cdc1, add1, mc1);
-// 		unsigned tmp = id[i];
-// 		id[i] = id[j];
-// 		id[j] = tmp;
+//    bestQuality = quality;
+//    bestPt = pt;
+//    swapReccdc(cdc0, add0, mc0, cdc1, add1, mc1);
+//    unsigned tmp = id[i];
+//    id[i] = id[j];
+//    id[j] = tmp;
 // #ifdef TRASAN_DEBUG_DETAIL
-// 		cout << "swapped" << endl;
+//    cout << "swapped" << endl;
 // #endif
-// 	    }
-// 	}
+//      }
+//  }
 //     }
 // #ifdef TRASAN_DEBUG_DETAIL
 //     cout << "trkmgr::sortBanksByPt : first phase finished" << endl;
@@ -2559,39 +2588,39 @@ TTrackManager::sortBanksByPt(void) const {
 //     if (NULL == (id = (unsigned *) malloc(n * sizeof(unsigned)))) {
 //       perror("$Id: TTrackManager.cc 10700 2008-11-06 08:47:27Z hitoshi $:id:malloc");
 //       exit(1);
-//     }  
+//     }
 //     for (unsigned i = 0; i < n; i++) id[i] = i;
 //     if (n > 1) {
-// 	unsigned i = 0;
-// 	while (i < n - 1) {
-// 	    rectrk & t = * (rectrk *) BsGetEnt(RECTRK, i + 1, BBS_No_Index);
-// 	    if (t.m_prekal == (i + 1)) {
-// 		++i;
-// 		continue;
-// 	    }
+//  unsigned i = 0;
+//  while (i < n - 1) {
+//      rectrk & t = * (rectrk *) BsGetEnt(RECTRK, i + 1, BBS_No_Index);
+//      if (t.m_prekal == (i + 1)) {
+//    ++i;
+//    continue;
+//      }
 
-// 	    rectrk & s = * (rectrk *) BsGetEnt(RECTRK,
-// 					       t.m_prekal,
-// 					       BBS_No_Index);
+//      rectrk & s = * (rectrk *) BsGetEnt(RECTRK,
+//                 t.m_prekal,
+//                 BBS_No_Index);
 
-// 	    swapRectrk(t, s);
-// 	    unsigned tmp = id[i];
-// 	    id[i] = id[s.m_ID - 1];
-// 	    id[s.m_ID - 1] = tmp;
+//      swapRectrk(t, s);
+//      unsigned tmp = id[i];
+//      id[i] = id[s.m_ID - 1];
+//      id[s.m_ID - 1] = tmp;
 
-// 	    // cout << "swap " << i + 1 << " and " << s.m_ID << endl;
+//      // cout << "swap " << i + 1 << " and " << s.m_ID << endl;
 
-// //cnv 	    reccdc_trk_add & a =
-// // 		* (reccdc_trk_add *) BsGetEnt(RECCDC_TRK_ADD,
-// // 					      t.m_prekal,
-// // 					      BBS_No_Index);
-// // 	    reccdc_trk_add & b =
-// // 		* (reccdc_trk_add *) BsGetEnt(RECCDC_TRK_ADD,
-// // 					      s.m_prekal,
-// // 					      BBS_No_Index);
-// // 	    a.m_rectrk = t.m_ID;
-// // 	    b.m_rectrk = s.m_ID;
-// 	}
+// //cnv      reccdc_trk_add & a =
+// //     * (reccdc_trk_add *) BsGetEnt(RECCDC_TRK_ADD,
+// //                 t.m_prekal,
+// //                 BBS_No_Index);
+// //       reccdc_trk_add & b =
+// //     * (reccdc_trk_add *) BsGetEnt(RECCDC_TRK_ADD,
+// //                 s.m_prekal,
+// //                 BBS_No_Index);
+// //       a.m_rectrk = t.m_ID;
+// //       b.m_rectrk = s.m_ID;
+//  }
 //     }
 // #else
 // // jtanaka 000925 -->
@@ -2599,7 +2628,7 @@ TTrackManager::sortBanksByPt(void) const {
 //     if (NULL == (id = (unsigned *) malloc(n * sizeof(unsigned)))) {
 //       perror("$Id: TTrackManager.cc 10700 2008-11-06 08:47:27Z hitoshi $:id:malloc");
 //       exit(1);
-//     }  
+//     }
 //     for (unsigned i = 0; i < n; i++) id[i] = i;
 //     int foundId = 0;
 //     while(foundId != (int) n){
@@ -2610,34 +2639,34 @@ TTrackManager::sortBanksByPt(void) const {
 //       int minPrekal = t.m_prekal ? t.m_prekal : n+1;
 //       int exchangeId = foundId;
 //       for(int i=foundId+1;i<(int) n;++i){
-// 	rectrk & s = * (rectrk *) BsGetEnt(RECTRK, i + 1, BBS_No_Index);
-// 	int s_prekal = s.m_prekal ? s.m_prekal : n+1;
-// 	if(s_prekal < minPrekal){
-// 	// if(s.m_prekal < minPrekal){
-// 	  minPrekal = s.m_prekal;
-// 	  exchangeId = i;
-// 	}
+//  rectrk & s = * (rectrk *) BsGetEnt(RECTRK, i + 1, BBS_No_Index);
+//  int s_prekal = s.m_prekal ? s.m_prekal : n+1;
+//  if(s_prekal < minPrekal){
+//  // if(s.m_prekal < minPrekal){
+//    minPrekal = s.m_prekal;
+//    exchangeId = i;
+//  }
 //       }
 //       if(exchangeId != foundId){
-// 	rectrk & s = * (rectrk *) BsGetEnt(RECTRK,
-// 					   exchangeId + 1,
-// 					   BBS_No_Index);
+//  rectrk & s = * (rectrk *) BsGetEnt(RECTRK,
+//             exchangeId + 1,
+//             BBS_No_Index);
 
-// 	swapRectrk(t, s);
-// 	unsigned tmp = id[t.m_ID - 1];
-// 	id[t.m_ID - 1] = id[s.m_ID - 1];
-// 	id[s.m_ID - 1] = tmp;
+//  swapRectrk(t, s);
+//  unsigned tmp = id[t.m_ID - 1];
+//  id[t.m_ID - 1] = id[s.m_ID - 1];
+//  id[s.m_ID - 1] = tmp;
 
-// //cnv 	reccdc_trk_add & a =
-// // 	  * (reccdc_trk_add *) BsGetEnt(RECCDC_TRK_ADD,
-// // 					t.m_prekal,
-// // 					BBS_No_Index);
-// // 	reccdc_trk_add & b =
-// // 	  * (reccdc_trk_add *) BsGetEnt(RECCDC_TRK_ADD,
-// // 					s.m_prekal,
-// // 					BBS_No_Index);
-// // 	a.m_rectrk = t.m_ID;
-// // 	b.m_rectrk = s.m_ID;
+// //cnv  reccdc_trk_add & a =
+// //     * (reccdc_trk_add *) BsGetEnt(RECCDC_TRK_ADD,
+// //           t.m_prekal,
+// //           BBS_No_Index);
+// //   reccdc_trk_add & b =
+// //     * (reccdc_trk_add *) BsGetEnt(RECCDC_TRK_ADD,
+// //           s.m_prekal,
+// //           BBS_No_Index);
+// //   a.m_rectrk = t.m_ID;
+// //   b.m_rectrk = s.m_ID;
 //       }
 //       ++foundId;
 //     }
@@ -2646,31 +2675,32 @@ TTrackManager::sortBanksByPt(void) const {
 
 //     tagRectrk(id, n);
 //     free(id);
-}
+  }
 
-void
-TTrackManager::swapReccdc(reccdc_trk & cdc0,
-			  reccdc_trk_add & add0,
-			  reccdc_mctrk & mc0,
-			  reccdc_trk & cdc1,
-			  reccdc_trk_add & add1,
-			  reccdc_mctrk & mc1) const {
+  void
+  TTrackManager::swapReccdc(reccdc_trk& cdc0,
+                            reccdc_trk_add& add0,
+                            reccdc_mctrk& mc0,
+                            reccdc_trk& cdc1,
+                            reccdc_trk_add& add1,
+                            reccdc_mctrk& mc1) const
+  {
 #define RECCDC_ACTUAL_SIZE 124
 #define RECCDCADD_ACTUAL_SIZE 40
 #define RECCDCMC_ACTUAL_SIZE 28
 
     static bool first = true;
-    static void * swapRegion;
+    static void* swapRegion;
     if (first) {
-	first = false;
-	if (NULL == (swapRegion = malloc(RECCDC_ACTUAL_SIZE))) {
-	  perror("$Id: TTrackManager.cc 10700 2008-11-06 08:47:27Z hitoshi $:PedNoiseValid:malloc");
-	  exit(1);
-	}  
+      first = false;
+      if (NULL == (swapRegion = malloc(RECCDC_ACTUAL_SIZE))) {
+        perror("$Id: TTrackManager.cc 10700 2008-11-06 08:47:27Z hitoshi $:PedNoiseValid:malloc");
+        exit(1);
+      }
     }
 
-    void * s0 = & cdc0.m_helix[0];
-    void * s1 = & cdc1.m_helix[0];
+    void* s0 = & cdc0.m_helix[0];
+    void* s1 = & cdc1.m_helix[0];
     memcpy(swapRegion, s0, RECCDC_ACTUAL_SIZE);
     memcpy(s0, s1, RECCDC_ACTUAL_SIZE);
     memcpy(s1, swapRegion, RECCDC_ACTUAL_SIZE);
@@ -2682,62 +2712,64 @@ TTrackManager::swapReccdc(reccdc_trk & cdc0,
     memcpy(s1, swapRegion, RECCDCADD_ACTUAL_SIZE);
 
     if ((& mc0) && (& mc1)) {
-	s0 = & mc0.m_hep;
-	s1 = & mc1.m_hep;
-	memcpy(swapRegion, s0, RECCDCMC_ACTUAL_SIZE);
-	memcpy(s0, s1, RECCDCMC_ACTUAL_SIZE);
-	memcpy(s1, swapRegion, RECCDCMC_ACTUAL_SIZE);
+      s0 = & mc0.m_hep;
+      s1 = & mc1.m_hep;
+      memcpy(swapRegion, s0, RECCDCMC_ACTUAL_SIZE);
+      memcpy(s0, s1, RECCDCMC_ACTUAL_SIZE);
+      memcpy(s1, swapRegion, RECCDCMC_ACTUAL_SIZE);
     }
-}
+  }
 
-void
-TTrackManager::swapRectrk(rectrk & rec0,
-			  rectrk & rec1) const {
+  void
+  TTrackManager::swapRectrk(rectrk& rec0,
+                            rectrk& rec1) const
+  {
 #define RECTRK_ACTUAL_SIZE 84
 
     static bool first = true;
-    static void * swapRegion;
+    static void* swapRegion;
     if (first) {
-	first = false;
-	if (NULL == (swapRegion = malloc(RECTRK_ACTUAL_SIZE))) {
-	  perror("$Id: TTrackManager.cc 10700 2008-11-06 08:47:27Z hitoshi $:swapRegion:malloc");
-	  exit(1);
-	}  
+      first = false;
+      if (NULL == (swapRegion = malloc(RECTRK_ACTUAL_SIZE))) {
+        perror("$Id: TTrackManager.cc 10700 2008-11-06 08:47:27Z hitoshi $:swapRegion:malloc");
+        exit(1);
+      }
     }
 
-    void * s0 = & rec0.m_glob[0];
-    void * s1 = & rec1.m_glob[0];
+    void* s0 = & rec0.m_glob[0];
+    void* s1 = & rec1.m_glob[0];
     memcpy(swapRegion, s0, RECTRK_ACTUAL_SIZE);
     memcpy(s0, s1, RECTRK_ACTUAL_SIZE);
     memcpy(s1, swapRegion, RECTRK_ACTUAL_SIZE);
-}
+  }
 
-void
-TTrackManager::tagReccdc(unsigned * id0, unsigned nTrk) const {
+  void
+  TTrackManager::tagReccdc(unsigned* id0, unsigned nTrk) const
+  {
 //cnv     unsigned * id;
 //     if (NULL == (id = (unsigned *) malloc(nTrk * sizeof(unsigned)))) {
 //       perror("$Id: TTrackManager.cc 10700 2008-11-06 08:47:27Z hitoshi $:id:malloc");
 //       exit(1);
-//     }  
+//     }
 //     for (unsigned i = 0; i < nTrk; i++)
-// 	id[id0[i]] = i;
+//  id[id0[i]] = i;
 
 // #ifdef TRASAN_DEBUG_DETAIL
 //     for (unsigned i = 0; i < nTrk; i++)
-//   	cout << "id0 " << i << " ... " << id0[i] << endl;
+//    cout << "id0 " << i << " ... " << id0[i] << endl;
 //     for (unsigned i = 0; i < nTrk; i++)
-//   	cout << "id  " << i << " ... " << id[i] << endl;
+//    cout << "id  " << i << " ... " << id[i] << endl;
 // #endif
 // //cnv    unsigned n = BsCouTab(RECCDC_TRK_ADD);
 //     unsigned n = 0;
 
 //     for (unsigned i = 0; i < n; i++) {
-// // 	reccdc_trk_add & w = * (reccdc_trk_add *) BsGetEnt(RECCDC_TRK_ADD,
-// // 							   i + 1,
-// // 							   BBS_No_Index);
-// 	reccdc_trk_add & w = 0;
-// 	if (w.m_mother) w.m_mother = id[w.m_mother - 1] + 1;
-// 	if (w.m_daughter) w.m_daughter = id[w.m_daughter - 1] + 1;
+// //   reccdc_trk_add & w = * (reccdc_trk_add *) BsGetEnt(RECCDC_TRK_ADD,
+// //                  i + 1,
+// //                  BBS_No_Index);
+//  reccdc_trk_add & w = 0;
+//  if (w.m_mother) w.m_mother = id[w.m_mother - 1] + 1;
+//  if (w.m_daughter) w.m_daughter = id[w.m_daughter - 1] + 1;
 //     }
 
 // #ifdef TRASAN_DEBUG_DETAIL
@@ -2746,11 +2778,11 @@ TTrackManager::tagReccdc(unsigned * id0, unsigned nTrk) const {
 
 //     n = BsCouTab(RECCDC_WIRHIT);
 //     for (unsigned i = 0; i < n; i++) {
-// 	reccdc_wirhit & w = * (reccdc_wirhit *) BsGetEnt(RECCDC_WIRHIT,
-// 							 i + 1,
-// 							 BBS_No_Index);
-// 	if (w.m_trk == 0) continue;
-// 	w.m_trk = id[w.m_trk - 1] + 1;
+//  reccdc_wirhit & w = * (reccdc_wirhit *) BsGetEnt(RECCDC_WIRHIT,
+//               i + 1,
+//               BBS_No_Index);
+//  if (w.m_trk == 0) continue;
+//  w.m_trk = id[w.m_trk - 1] + 1;
 //     }
 
 // #ifdef TRASAN_DEBUG_DETAIL
@@ -2759,10 +2791,10 @@ TTrackManager::tagReccdc(unsigned * id0, unsigned nTrk) const {
 
 //     n = BsCouTab(DATRGCDC_MCWIRHIT);
 //     for (unsigned i = 0; i < n; i++) {
-// 	datcdc_mcwirhit & m =
-// 	    * (datcdc_mcwirhit *) BsGetEnt(DATRGCDC_MCWIRHIT,i + 1,BBS_No_Index);
-// 	if (m.m_trk == 0) continue;
-// 	m.m_trk = id[m.m_trk - 1] + 1;
+//  datcdc_mcwirhit & m =
+//      * (datcdc_mcwirhit *) BsGetEnt(DATRGCDC_MCWIRHIT,i + 1,BBS_No_Index);
+//  if (m.m_trk == 0) continue;
+//  m.m_trk = id[m.m_trk - 1] + 1;
 //     }
 
 // #ifdef TRASAN_DEBUG_DETAIL
@@ -2771,9 +2803,9 @@ TTrackManager::tagReccdc(unsigned * id0, unsigned nTrk) const {
 
 //     n = BsCouTab(RECTRK);
 //     for (unsigned i = 0; i < n; i++) {
-// 	rectrk & r = * (rectrk *) BsGetEnt(RECTRK, i + 1, BBS_No_Index);
-// 	if (r.m_prekal == 0) continue;
-// 	r.m_prekal = id[r.m_prekal - 1] + 1;
+//  rectrk & r = * (rectrk *) BsGetEnt(RECTRK, i + 1, BBS_No_Index);
+//  if (r.m_prekal == 0) continue;
+//  r.m_prekal = id[r.m_prekal - 1] + 1;
 //     }
 
 // #ifdef TRASAN_DEBUG_DETAIL
@@ -2783,9 +2815,9 @@ TTrackManager::tagReccdc(unsigned * id0, unsigned nTrk) const {
 //     // jtanaka
 //     n = BsCouTab(RECCDC_SVD_TRK);
 //     for (unsigned i = 0; i < n; i++) {
-// 	reccdc_svd_trk & r = * (reccdc_svd_trk *) BsGetEnt(RECCDC_SVD_TRK, i + 1, BBS_No_Index);
-// 	if (r.m_cdc_trk == 0) continue;
-// 	r.m_cdc_trk = id[r.m_cdc_trk - 1] + 1;
+//  reccdc_svd_trk & r = * (reccdc_svd_trk *) BsGetEnt(RECCDC_SVD_TRK, i + 1, BBS_No_Index);
+//  if (r.m_cdc_trk == 0) continue;
+//  r.m_cdc_trk = id[r.m_cdc_trk - 1] + 1;
 //     }
 
 // #ifdef TRASAN_DEBUG_DETAIL
@@ -2793,10 +2825,11 @@ TTrackManager::tagReccdc(unsigned * id0, unsigned nTrk) const {
 // #endif
 
 //     free(id);
-}
+  }
 
-void
-TTrackManager::setCurlerFlags(void) {
+  void
+  TTrackManager::setCurlerFlags(void)
+  {
 #ifdef TRASAN_DEBUG_DETAIL
     const string stage = "TRKMGR::setCurlerFlags";
     EnterStage(stage);
@@ -2805,49 +2838,50 @@ TTrackManager::setCurlerFlags(void) {
     unsigned n = _tracks.length();
     if (n < 2) {
 #ifdef TRASAN_DEBUG_DETAIL
-	LeaveStage(stage);
+      LeaveStage(stage);
 #endif
-	return;
+      return;
     }
 
     for (unsigned i = 0; i < n - 1; i++) {
-	TTrack & t0 = * _tracks[i];
-	if (t0.type() != TrackTypeCurl) continue;
-	float c0 = t0.charge();
+      TTrack& t0 = * _tracks[i];
+      if (t0.type() != TrackTypeCurl) continue;
+      float c0 = t0.charge();
 
-	for (unsigned j = i + 1; j < n; j++) {
-	    TTrack & t1 = * _tracks[j];
-	    float c1 = t1.charge();
-	    if (c0 * c1 > 0.) continue;
-	    if (t1.type() != TrackTypeCurl) continue;
+      for (unsigned j = i + 1; j < n; j++) {
+        TTrack& t1 = * _tracks[j];
+        float c1 = t1.charge();
+        if (c0 * c1 > 0.) continue;
+        if (t1.type() != TrackTypeCurl) continue;
 
-	    bool toBeMerged = false;
-	    unsigned n0 = t0.testByApproach(t1.cores(), _sigmaCurlerMergeTest);
-	    if (n0 > _nCurlerMergeTest) toBeMerged = true;
-	    if (! toBeMerged) {
-		unsigned n1 = t1.testByApproach(t0.cores(),
-						_sigmaCurlerMergeTest);
-		if (n1 > _nCurlerMergeTest) toBeMerged = true;
-	    }
+        bool toBeMerged = false;
+        unsigned n0 = t0.testByApproach(t1.cores(), _sigmaCurlerMergeTest);
+        if (n0 > _nCurlerMergeTest) toBeMerged = true;
+        if (! toBeMerged) {
+          unsigned n1 = t1.testByApproach(t0.cores(),
+                                          _sigmaCurlerMergeTest);
+          if (n1 > _nCurlerMergeTest) toBeMerged = true;
+        }
 
-	    if (toBeMerged) {
-//cnv 		++_s->_nToBeMerged;
-// 		if ((t0.daughter()) || (t1.daughter()))
-// 		    ++_s->_nToBeMergedMoreThanTwo;
-// 		t0.daughter(& t1);
-// 		t1.daughter(& t0);
-	    }
-	}
+        if (toBeMerged) {
+//cnv     ++_s->_nToBeMerged;
+//    if ((t0.daughter()) || (t1.daughter()))
+//        ++_s->_nToBeMergedMoreThanTwo;
+//    t0.daughter(& t1);
+//    t1.daughter(& t0);
+        }
+      }
     }
 
 #ifdef TRASAN_DEBUG_DETAIL
     LeaveStage(stage);
 #endif
-}
+  }
 
-void
-TTrackManager::salvageAssociateHits(const CAList<Belle2::TRGCDCWireHit> & hits,
-				    float maxSigma2) {
+  void
+  TTrackManager::salvageAssociateHits(const CAList<Belle2::TRGCDCWireHit> & hits,
+                                      float maxSigma2)
+  {
 #ifdef TRASAN_DEBUG_DETAIL
     const string stage = "TRKMGR::salvage";
     EnterStage(stage);
@@ -2858,145 +2892,145 @@ TTrackManager::salvageAssociateHits(const CAList<Belle2::TRGCDCWireHit> & hits,
     unsigned nTracks = _tracks.length();
     if (nTracks == 0) {
 #ifdef TRASAN_DEBUG_DETAIL
-	LeaveStage(stage);
+      LeaveStage(stage);
 #endif
-	return;
+      return;
     }
     unsigned nHits = hits.length();
     if (nHits == 0) {
 #ifdef TRASAN_DEBUG_DETAIL
-	LeaveStage(stage);
+      LeaveStage(stage);
 #endif
-	return;
+      return;
     }
 
     static const TPoint2D o(0., 0.);
 
     //...Hit loop...
     for (unsigned i = 0; i < nHits; i++) {
-	const Belle2::TRGCDCWireHit & h = * hits[i];
+      const Belle2::TRGCDCWireHit& h = * hits[i];
 
-	//...Already used ?...
-	if (h.state() & CellHitUsed) continue;
+      //...Already used ?...
+      if (h.state() & CellHitUsed) continue;
 #ifdef TRASAN_DEBUG_DETAIL
-	cout << Tab() << "checking " << h.wire().name() << endl;;
+      cout << Tab() << "checking " << h.wire().name() << endl;;
 #endif
 
-	//...Track loop...
-	AList<TLink> toBeDeleted;
-	TLink * best = NULL;
-	TTrack * bestTrack = NULL;
-	for (unsigned j = 0; j < nTracks; j++) {
-	    TTrack & t = * _tracks[j];
+      //...Track loop...
+      AList<TLink> toBeDeleted;
+      TLink* best = NULL;
+      TTrack* bestTrack = NULL;
+      for (unsigned j = 0; j < nTracks; j++) {
+        TTrack& t = * _tracks[j];
 
 #ifdef TRASAN_DEBUG_DETAIL
-	    t.dump("", Tab(+1) + t.name());
+        t.dump("", Tab(+1) + t.name());
 #endif
 
-	    //...Pre-selection...
-	    TPoint2D c = t.center();
-	    TPoint2D co = - c;
-	    TPoint2D x = h.wire().xyPosition();
+        //...Pre-selection...
+        TPoint2D c = t.center();
+        TPoint2D co = - c;
+        TPoint2D x = h.wire().xyPosition();
 
 #ifdef TRASAN_DEBUG_DETAIL
-	    cout << Tab(+2) << "c= " << co.cross(x - c) * t.charge()
-		      << ",d=" << fabs((x - c).mag() - fabs(t.radius()))
-		      << endl;
+        cout << Tab(+2) << "c= " << co.cross(x - c) * t.charge()
+             << ",d=" << fabs((x - c).mag() - fabs(t.radius()))
+             << endl;
 #endif
 
-	    if (co.cross(x - c) * t.charge() > 0.)
-		continue;
-	    if (fabs((x - c).mag() - fabs(t.radius())) > 5.)
-		continue;
+        if (co.cross(x - c) * t.charge() > 0.)
+          continue;
+        if (fabs((x - c).mag() - fabs(t.radius())) > 5.)
+          continue;
 
-	    //...Try to append this hit...
-	    TLink & link = * new TLink(0, & h);
-	    int err = t.approach(link);
-	    if (err < 0) {
+        //...Try to append this hit...
+        TLink& link = * new TLink(0, & h);
+        int err = t.approach(link);
+        if (err < 0) {
 #ifdef TRASAN_DEBUG_DETAIL
-		cout << ":" << t.name() << " approach failure";
+          cout << ":" << t.name() << " approach failure";
 #endif
-		toBeDeleted.append(link);
-		continue;
-	    }
+          toBeDeleted.append(link);
+          continue;
+        }
 
-	    //...Calculate sigma...
-	    float distance = link.distance();
-	    float diff = fabs(distance - link.hit()->drift());
-	    float sigma = diff / link.hit()->dDrift();
-	    link.pull(sigma * sigma);
+        //...Calculate sigma...
+        float distance = link.distance();
+        float diff = fabs(distance - link.hit()->drift());
+        float sigma = diff / link.hit()->dDrift();
+        link.pull(sigma * sigma);
 
 #ifdef TRASAN_DEBUG_DETAIL
-	    cout << Tab(+2) << "pull=" << link.pull() << endl;
+        cout << Tab(+2) << "pull=" << link.pull() << endl;
 #endif
-	    if (link.pull() > maxSigma2) {
-		toBeDeleted.append(link);
-		continue;
-	    }
+        if (link.pull() > maxSigma2) {
+          toBeDeleted.append(link);
+          continue;
+        }
 
-	    if (best) {
-		if (best->pull() > link.pull()) {
-		    toBeDeleted.append(best);
-		    best = & link;
-		    bestTrack = & t;
-		}
-		else {
-		    toBeDeleted.append(link);
-		}
-	    }
-	    else {
-		best = & link;
-		bestTrack = & t;
-	    }
-	}
+        if (best) {
+          if (best->pull() > link.pull()) {
+            toBeDeleted.append(best);
+            best = & link;
+            bestTrack = & t;
+          } else {
+            toBeDeleted.append(link);
+          }
+        } else {
+          best = & link;
+          bestTrack = & t;
+        }
+      }
 
-	if (best) {
-	    bestTrack->append(* best);
-	    best->hit()->state(best->hit()->state() | CellHitInvalidForFit);
-	    _associateHits.append(best);
+      if (best) {
+        bestTrack->append(* best);
+        best->hit()->state(best->hit()->state() | CellHitInvalidForFit);
+        _associateHits.append(best);
 #ifdef TRASAN_DEBUG_DETAIL
-	    cout << Tab(+1) << best->hit()->wire().name()
-		      << "->" << bestTrack->name() << endl;
+        cout << Tab(+1) << best->hit()->wire().name()
+             << "->" << bestTrack->name() << endl;
 #endif
-	}
-	HepAListDeleteAll(toBeDeleted);
+      }
+      HepAListDeleteAll(toBeDeleted);
     }
 
 #ifdef TRASAN_DEBUG_DETAIL
     LeaveStage(stage);
 #endif
-}
+  }
 
-void
-TTrackManager::maskBadHits(const AList<TTrack> & tracks, float maxSigma2) {
+  void
+  TTrackManager::maskBadHits(const AList<TTrack> & tracks, float maxSigma2)
+  {
 #ifdef TRASAN_DEBUG_DETAIL
     cout << "... trkmgr::maskBadHits" << endl;
-#endif		
+#endif
 
     unsigned n = tracks.length();
     for (unsigned i = 0; i < n; i++) {
-	TTrack & t = * tracks[i];
-	bool toBeUpdated = false;
-	const AList<TLink> links = t.links();
-	unsigned nHits = links.length();
-	for (unsigned j = 0; j < nHits; j++) {
-	    if (links[j]->pull() > maxSigma2) {
-		links[j]->hit()->state(links[j]->hit()->state() |
-				       CellHitInvalidForFit);
-		toBeUpdated = true;
+      TTrack& t = * tracks[i];
+      bool toBeUpdated = false;
+      const AList<TLink> links = t.links();
+      unsigned nHits = links.length();
+      for (unsigned j = 0; j < nHits; j++) {
+        if (links[j]->pull() > maxSigma2) {
+          links[j]->hit()->state(links[j]->hit()->state() |
+                                 CellHitInvalidForFit);
+          toBeUpdated = true;
 #ifdef TRASAN_DEBUG_DETAIL
-		cout << "    " << t.name() << " : ";
-		cout << links[j]->wire()->name() << "(pull=";
-		cout << links[j]->pull() << ") is masked" << endl;
-#endif		
-	    }
-	}
-	if (toBeUpdated) t.update();
+          cout << "    " << t.name() << " : ";
+          cout << links[j]->wire()->name() << "(pull=";
+          cout << links[j]->pull() << ") is masked" << endl;
+#endif
+        }
+      }
+      if (toBeUpdated) t.update();
     }
-}
+  }
 
-void
-TTrackManager::clearTables(void) const {
+  void
+  TTrackManager::clearTables(void) const
+  {
 //cnv     BsDelEnt(RECCDC_TRK, BBS_ID_ALL);
 //     BsDelEnt(RECCDC_TRK_ADD, BBS_ID_ALL);
 //     BsDelEnt(RECCDC_MCTRK, BBS_ID_ALL);
@@ -3005,136 +3039,138 @@ TTrackManager::clearTables(void) const {
 //     //...Clear track association...
 //     unsigned n = BsCouTab(RECCDC_WIRHIT);
 //     for (unsigned i = 0; i < n; i++) {
-// 	reccdc_wirhit & h = * (reccdc_wirhit *)
-// 	    BsGetEnt(RECCDC_WIRHIT, i + 1, BBS_No_Index);
-// 	h.m_trk = 0;
+//  reccdc_wirhit & h = * (reccdc_wirhit *)
+//      BsGetEnt(RECCDC_WIRHIT, i + 1, BBS_No_Index);
+//  h.m_trk = 0;
 //     }
 //     n = BsCouTab(DATRGCDC_MCWIRHIT);
 //     for (unsigned i = 0; i < n; i++) {
-// 	datcdc_mcwirhit & h = * (datcdc_mcwirhit *)
-// 	    BsGetEnt(DATRGCDC_MCWIRHIT, i + 1, BBS_No_Index);
-// 	h.m_trk = 0;
+//  datcdc_mcwirhit & h = * (datcdc_mcwirhit *)
+//      BsGetEnt(DATRGCDC_MCWIRHIT, i + 1, BBS_No_Index);
+//  h.m_trk = 0;
 //     }
-}
+  }
 
-AList<TTrack>
-TTrackManager::selectGoodTracks(const AList<TTrack> & list,
-				bool track2D) const {
+  AList<TTrack>
+  TTrackManager::selectGoodTracks(const AList<TTrack> & list,
+                                  bool track2D) const
+  {
     AList<TTrack> goodTracks;
     unsigned n = list.length();
     for (unsigned i = 0; i < n; i++) {
-	const TTrack & t = * list[i];
-	if (! goodTrack(t, track2D)) continue;
+      const TTrack& t = * list[i];
+      if (! goodTrack(t, track2D)) continue;
 
-	//...Remove super momentum...
-	if (_maxMomentum > 0.) {
-	    if (t.ptot() > _maxMomentum) {
-		++_s->_nSuperMoms[0];
-		const unsigned finder = t.finder();
-		for (unsigned j = 1; j < 8; j++)
-		    if (finder & (1 << j))
-			++_s->_nSuperMoms[j];
-		continue;
-	    }
-	}
+      //...Remove super momentum...
+      if (_maxMomentum > 0.) {
+        if (t.ptot() > _maxMomentum) {
+          ++_s->_nSuperMoms[0];
+          const unsigned finder = t.finder();
+          for (unsigned j = 1; j < 8; j++)
+            if (finder & (1 << j))
+              ++_s->_nSuperMoms[j];
+          continue;
+        }
+      }
 
-	//...Pt cut...
-	if (_minPt > 0.) {
-	    if (t.pt() < _minPt) {
-		++_s->_nPtCut[0];
-		const unsigned finder = t.finder();
-		for (unsigned j = 1; j < 8; j++)
-		    if (finder & (1 << j))
-			++_s->_nPtCut[j];
-		continue;
-	    }
-	}
+      //...Pt cut...
+      if (_minPt > 0.) {
+        if (t.pt() < _minPt) {
+          ++_s->_nPtCut[0];
+          const unsigned finder = t.finder();
+          for (unsigned j = 1; j < 8; j++)
+            if (finder & (1 << j))
+              ++_s->_nPtCut[j];
+          continue;
+        }
+      }
 
-	//...tanl cut...
-	if (_maxTanl > 0.) {
-	    if (t.helix().tanl() > _maxTanl) {
-		++_s->_nTanlCut[0];
-		const unsigned finder = t.finder();
-		for (unsigned j = 1; j < 8; j++)
-		    if (finder & (1 << j))
-			++_s->_nTanlCut[j];
-		continue;
-	    }
-	}
+      //...tanl cut...
+      if (_maxTanl > 0.) {
+        if (t.helix().tanl() > _maxTanl) {
+          ++_s->_nTanlCut[0];
+          const unsigned finder = t.finder();
+          for (unsigned j = 1; j < 8; j++)
+            if (finder & (1 << j))
+              ++_s->_nTanlCut[j];
+          continue;
+        }
+      }
 
-	goodTracks.append((TTrack &) t);
+      goodTracks.append((TTrack&) t);
     }
 
 #ifdef TRASAN_DEBUG_DETAIL
     if (list.length() != goodTracks.length()) {
-	cout << Tab() << "TTrackManager::selectGoodTracks"
-		  << "... bad tracks found" << endl
-		  << Tab(+1) << "#given tracks="
-		  << list.length() << endl
-		  << Tab(+1) << "#bad tracks="
-		  << list.length() - goodTracks.length()
-		  << ":2D flag = " << track2D << endl;
-	AList<TTrack> tmp;
-	tmp.append(list);
-	tmp.remove(goodTracks);
-	cout << Tab() << "Bad track dump" << endl;
-	for (unsigned i = 0; i < (unsigned) tmp.length(); i++)
-	    cout << Tab(+1) << TTrack::trackDump(* tmp[i]) << endl;
+      cout << Tab() << "TTrackManager::selectGoodTracks"
+           << "... bad tracks found" << endl
+           << Tab(+1) << "#given tracks="
+           << list.length() << endl
+           << Tab(+1) << "#bad tracks="
+           << list.length() - goodTracks.length()
+           << ":2D flag = " << track2D << endl;
+      AList<TTrack> tmp;
+      tmp.append(list);
+      tmp.remove(goodTracks);
+      cout << Tab() << "Bad track dump" << endl;
+      for (unsigned i = 0; i < (unsigned) tmp.length(); i++)
+        cout << Tab(+1) << TTrack::trackDump(* tmp[i]) << endl;
     }
 #endif
 
     return goodTracks;
-}
+  }
 
-bool
-TTrackManager::checkNumberOfHits(const TTrack & t, bool track2D) {
+  bool
+  TTrackManager::checkNumberOfHits(const TTrack& t, bool track2D)
+  {
     const AList<TLink> & cores = t.cores();
 
     if (track2D) {
-	unsigned axialHits = TLink::nAxialHits(cores);
-	if (axialHits < 3) return false;
-    }
-    else {
-	unsigned allHits = cores.length();
-	if (allHits < 5) return false;
-	unsigned stereoHits = TLink::nStereoHits(cores);
-	if (stereoHits < 2) return false;
-	unsigned axialHits = allHits - stereoHits;
-	if (axialHits < 3) return false;
+      unsigned axialHits = TLink::nAxialHits(cores);
+      if (axialHits < 3) return false;
+    } else {
+      unsigned allHits = cores.length();
+      if (allHits < 5) return false;
+      unsigned stereoHits = TLink::nStereoHits(cores);
+      if (stereoHits < 2) return false;
+      unsigned axialHits = allHits - stereoHits;
+      if (axialHits < 3) return false;
     }
     return true;
-}
+  }
 
-void
-TTrackManager::determineIP(void) {
+  void
+  TTrackManager::determineIP(void)
+  {
     static const HepGeom::Vector3D<double> InitialVertex(0., 0., 0.);
 
 //cnv     //...Track selection...
 //     unsigned n = BsCouTab(RECTRK);
 //     AList<rectrk_localz> zList;
 //     for (unsigned i = 0; i < n; i++) {
-// 	const rectrk & t = * (rectrk *) BsGetEnt(RECTRK, i + 1, BBS_No_Index);
-// 	if (t.m_prekal == 0) continue;
-// 	const reccdc_trk_add & c = * (reccdc_trk_add *)
-// 	    BsGetEnt(RECCDC_TRK_ADD, t.m_prekal, BBS_No_Index);
+//  const rectrk & t = * (rectrk *) BsGetEnt(RECTRK, i + 1, BBS_No_Index);
+//  if (t.m_prekal == 0) continue;
+//  const reccdc_trk_add & c = * (reccdc_trk_add *)
+//      BsGetEnt(RECCDC_TRK_ADD, t.m_prekal, BBS_No_Index);
 
-// 	//...Only good tracks...
-// 	if (c.m_quality) continue;
+//  //...Only good tracks...
+//  if (c.m_quality) continue;
 
-// 	//...Require SVD hits...
-// 	const rectrk_global & g = * (rectrk_global *) BsGetEnt(RECTRK_GLOBAL,
-// 							       t.m_glob[2],
-// 							       BBS_No_Index);
-// 	if (! & g) continue;
-// 	if (g.m_nhits[3] < 2) continue;
-// 	if (g.m_nhits[4] < 2) continue;
+//  //...Require SVD hits...
+//  const rectrk_global & g = * (rectrk_global *) BsGetEnt(RECTRK_GLOBAL,
+//                     t.m_glob[2],
+//                     BBS_No_Index);
+//  if (! & g) continue;
+//  if (g.m_nhits[3] < 2) continue;
+//  if (g.m_nhits[4] < 2) continue;
 
-// 	//...OK...
-// 	const rectrk_localz & z = * (rectrk_localz *) BsGetEnt(RECTRK_LOCALZ,
-// 							       t.m_zero[2],
-// 							       BBS_No_Index);
-// 	if (! & z) continue;
-// 	zList.append((rectrk_localz &) z);
+//  //...OK...
+//  const rectrk_localz & z = * (rectrk_localz *) BsGetEnt(RECTRK_LOCALZ,
+//                     t.m_zero[2],
+//                     BBS_No_Index);
+//  if (! & z) continue;
+//  zList.append((rectrk_localz &) z);
 //     }
 //     unsigned nZ = zList.length();
 //     if (nZ < 2) return;
@@ -3143,32 +3179,33 @@ TTrackManager::determineIP(void) {
 //      kvertexfitter kvf;
 //      kvf.initialVertex(initialVertex);
 //      for (unsigned i = 0; i < nZ; i++) {
-//  	kvf.addTrack();
+//    kvf.addTrack();
 //      }
-}
+  }
 
-void
-TTrackManager::tagRectrk(unsigned * id0, unsigned nTrk) const {
+  void
+  TTrackManager::tagRectrk(unsigned* id0, unsigned nTrk) const
+  {
 //cnv    unsigned * id;
 //     if (NULL == ( id = (unsigned *) malloc(nTrk * sizeof(unsigned)))) {
 //       perror("$Id: TTrackManager.cc 10700 2008-11-06 08:47:27Z hitoshi $:id:malloc");
 //       exit(1);
-//     }  
+//     }
 //     for (unsigned i = 0; i < nTrk; i++)
-// 	id[id0[i]] = i;
+//  id[id0[i]] = i;
 
 // //      for (unsigned i = 0; i < nTrk; i++)
-// //    	cout << "id0 " << i << " ... " << id0[i] << endl;
+// //     cout << "id0 " << i << " ... " << id0[i] << endl;
 // //      for (unsigned i = 0; i < nTrk; i++)
-// //    	cout << "id  " << i << " ... " << id[i] << endl;
+// //     cout << "id  " << i << " ... " << id[i] << endl;
 // //      BsShwDat(RECTRK_TOF);
 
 //     unsigned n = BsCouTab(RECTRK_TOF);
 //     for (unsigned i = 0; i < n; i++) {
-// 	rectrk_tof & t = * (rectrk_tof *) BsGetEnt(RECTRK_TOF,
-// 						   i + 1,
-// 						   BBS_No_Index);
-// 	if (t.m_rectrk) t.m_rectrk = id[t.m_rectrk - 1] + 1;
+//  rectrk_tof & t = * (rectrk_tof *) BsGetEnt(RECTRK_TOF,
+//               i + 1,
+//               BBS_No_Index);
+//  if (t.m_rectrk) t.m_rectrk = id[t.m_rectrk - 1] + 1;
 //     }
 
 // //      BsShwDat(RECTRK_TOF);
@@ -3183,103 +3220,104 @@ TTrackManager::tagRectrk(unsigned * id0, unsigned nTrk) const {
 //     }
 
 //     free(id);
-}
+  }
 
 // jtanaka 000925 -->
 #define TRASAN_REPLACE_TABLE 1
 #if !(TRASAN_REPLACE_TABLE)
-void
-copyRecCDC_trk_Table(const Reccdc_trk & org,
-		     Reccdc_trk & copied)
-{
-  copied.helix(0, org.helix(0));
-  copied.helix(1, org.helix(1));
-  copied.helix(2, org.helix(2));
-  copied.helix(3, org.helix(3));
-  copied.helix(4, org.helix(4));
-  copied.pivot(0, org.pivot(0));
-  copied.pivot(1, org.pivot(1));
-  copied.pivot(2, org.pivot(2));
-  copied.error(0, org.error(0));
-  copied.error(1, org.error(1));
-  copied.error(2, org.error(2));
-  copied.error(3, org.error(3));
-  copied.error(4, org.error(4));
-  copied.error(5, org.error(5));
-  copied.error(6, org.error(6));
-  copied.error(7, org.error(7));
-  copied.error(8, org.error(8));
-  copied.error(9, org.error(9));
-  copied.error(10, org.error(10));
-  copied.error(11, org.error(11));
-  copied.error(12, org.error(12));
-  copied.error(13, org.error(13));
-  copied.error(14, org.error(14));
-  copied.chiSq(org.chiSq());
-  copied.ndf(org.ndf());
-  copied.fiTerm(org.fiTerm());
-  copied.nhits(org.nhits());
-  copied.nster(org.nster());
-  copied.nclus(org.nclus());
-  copied.stat(org.stat());
-  copied.mass(org.mass());
-}
+  void
+  copyRecCDC_trk_Table(const Reccdc_trk& org,
+                       Reccdc_trk& copied)
+  {
+    copied.helix(0, org.helix(0));
+    copied.helix(1, org.helix(1));
+    copied.helix(2, org.helix(2));
+    copied.helix(3, org.helix(3));
+    copied.helix(4, org.helix(4));
+    copied.pivot(0, org.pivot(0));
+    copied.pivot(1, org.pivot(1));
+    copied.pivot(2, org.pivot(2));
+    copied.error(0, org.error(0));
+    copied.error(1, org.error(1));
+    copied.error(2, org.error(2));
+    copied.error(3, org.error(3));
+    copied.error(4, org.error(4));
+    copied.error(5, org.error(5));
+    copied.error(6, org.error(6));
+    copied.error(7, org.error(7));
+    copied.error(8, org.error(8));
+    copied.error(9, org.error(9));
+    copied.error(10, org.error(10));
+    copied.error(11, org.error(11));
+    copied.error(12, org.error(12));
+    copied.error(13, org.error(13));
+    copied.error(14, org.error(14));
+    copied.chiSq(org.chiSq());
+    copied.ndf(org.ndf());
+    copied.fiTerm(org.fiTerm());
+    copied.nhits(org.nhits());
+    copied.nster(org.nster());
+    copied.nclus(org.nclus());
+    copied.stat(org.stat());
+    copied.mass(org.mass());
+  }
 
-void
-copyRecCDC_trk_add_Table(const Reccdc_trk_add & org,
-			 Reccdc_trk_add & copied)
-{
-  copied.quality(org.quality());
-  copied.kind(org.kind());
-  copied.mother(org.mother());
-  copied.daughter(org.daughter());
-  copied.decision(org.decision());
-  copied.likelihood(0, org.likelihood(0));
-  copied.likelihood(1, org.likelihood(1));
-  copied.likelihood(2, org.likelihood(2));
-  copied.stat(org.stat());
-  copied.rectrk(org.rectrk());
-}
+  void
+  copyRecCDC_trk_add_Table(const Reccdc_trk_add& org,
+                           Reccdc_trk_add& copied)
+  {
+    copied.quality(org.quality());
+    copied.kind(org.kind());
+    copied.mother(org.mother());
+    copied.daughter(org.daughter());
+    copied.decision(org.decision());
+    copied.likelihood(0, org.likelihood(0));
+    copied.likelihood(1, org.likelihood(1));
+    copied.likelihood(2, org.likelihood(2));
+    copied.stat(org.stat());
+    copied.rectrk(org.rectrk());
+  }
 
-void
-copyRecCDC_MCtrk_Table(const Reccdc_mctrk & org,
-		       Reccdc_mctrk & copied)
-{
-  /*cout << org.wirFrac() << endl;
-  cout << org.wirFracHep() << endl;
-  cout << org.charge() << endl;
-  cout << org.ptFrac() << endl;
-  cout << org.pzFrac() << endl;
-  cout << org.quality() << endl;
-  cout << copied.wirFrac() << endl;
-  cout << copied.wirFracHep() << endl;
-  cout << copied.charge() << endl;
-  cout << copied.ptFrac() << endl;
-  cout << copied.pzFrac() << endl;
-  cout << copied.quality() << endl;*/
+  void
+  copyRecCDC_MCtrk_Table(const Reccdc_mctrk& org,
+                         Reccdc_mctrk& copied)
+  {
+    /*cout << org.wirFrac() << endl;
+    cout << org.wirFracHep() << endl;
+    cout << org.charge() << endl;
+    cout << org.ptFrac() << endl;
+    cout << org.pzFrac() << endl;
+    cout << org.quality() << endl;
+    cout << copied.wirFrac() << endl;
+    cout << copied.wirFracHep() << endl;
+    cout << copied.charge() << endl;
+    cout << copied.ptFrac() << endl;
+    cout << copied.pzFrac() << endl;
+    cout << copied.quality() << endl;*/
 
-  copied.hep(org.hep());
-  copied.wirFrac(org.wirFrac());
-  copied.wirFracHep(org.wirFracHep());
-  copied.charge(org.charge());
-  copied.ptFrac(org.ptFrac());
-  copied.pzFrac(org.pzFrac());
-  copied.quality(org.quality());
-}
+    copied.hep(org.hep());
+    copied.wirFrac(org.wirFrac());
+    copied.wirFracHep(org.wirFracHep());
+    copied.charge(org.charge());
+    copied.ptFrac(org.ptFrac());
+    copied.pzFrac(org.pzFrac());
+    copied.quality(org.quality());
+  }
 
-void
-copyRecCDC_MCtrk2hep_Table(const Reccdc_mctrk2hep & org,
-			   Reccdc_mctrk2hep & copied)
-{  
-  copied.wir(org.wir());
-  copied.clust(org.clust());
-  copied.trk(org.trk());
-  copied.hep(org.hep());
-}
+  void
+  copyRecCDC_MCtrk2hep_Table(const Reccdc_mctrk2hep& org,
+                             Reccdc_mctrk2hep& copied)
+  {
+    copied.wir(org.wir());
+    copied.clust(org.clust());
+    copied.trk(org.trk());
+    copied.hep(org.hep());
+  }
 #endif
 
-void
-TTrackManager::addSvd(const int mcFlag) const {
+  void
+  TTrackManager::addSvd(const int mcFlag) const
+  {
 //cnv  TSvdAssociator svdA(-20000.,20000.);
 //   svdA.fillClusters();
 
@@ -3305,13 +3343,13 @@ TTrackManager::addSvd(const int mcFlag) const {
 //     Datcdc_mcwirhit_Manager::get_manager();
 // #endif
 
-//   int nSize = trkMgr.count();  
+//   int nSize = trkMgr.count();
 //   for(int i=0;i<nSize;++i){
 //     // cout << "trk " << i << ": " << trkMgr[i].helix(0) << endl;
 // #if 1
 //     // Reconstruction Info --> SVD Recon.
-//     if(trkMgr2[i].decision() != TrackPMCurlFinder && 
-//        (trkMgr2[i].quality() & TrackQuality2D) != TrackQuality2D && 
+//     if(trkMgr2[i].decision() != TrackPMCurlFinder &&
+//        (trkMgr2[i].quality() & TrackQuality2D) != TrackQuality2D &&
 //        trkMgr[i].helix(2) != 0. && fabs(1./trkMgr[i].helix(2))<0.2){
 //       CLHEP::HepVector a(5);
 //       a[0] = trkMgr[i].helix(0);
@@ -3320,197 +3358,198 @@ TTrackManager::addSvd(const int mcFlag) const {
 //       a[3] = trkMgr[i].helix(3);
 //       a[4] = trkMgr[i].helix(4);
 //       HepGeom::Point3D<double>  p(trkMgr[i].pivot(0),
-// 		   trkMgr[i].pivot(1),
-// 		   trkMgr[i].pivot(2));
+//       trkMgr[i].pivot(1),
+//       trkMgr[i].pivot(2));
 //       THelix th(p,a);
 //       th.pivot(HepGeom::Point3D<double> (0.,0.,0.)); // pivot = (0,0,0)
 //       AList<TSvdHit> cand;
 //       double tz,tt;
 //       if(svdA.recTrk(th,tz,tt,0.5,50.0,cand,0.5)){
-// 	// cout << "SVD in " << i << endl;
+//  // cout << "SVD in " << i << endl;
 // #if TRASAN_REPLACE_TABLE
-// 	Reccdc_svd_trk & newSvd  = svdMgr.add();
+//  Reccdc_svd_trk & newSvd  = svdMgr.add();
 // #else
-// 	Reccdc_trk     & newTrk  = trkMgr.add();
-// 	Reccdc_trk_add & newTrk2 = trkMgr2.add();
-// 	Reccdc_svd_trk & newSvd  = svdMgr.add();
-// 	// copy all information
-// 	copyRecCDC_trk_Table(trkMgr[i],newTrk);
-// 	copyRecCDC_trk_add_Table(trkMgr2[i],newTrk2);
+//  Reccdc_trk     & newTrk  = trkMgr.add();
+//  Reccdc_trk_add & newTrk2 = trkMgr2.add();
+//  Reccdc_svd_trk & newSvd  = svdMgr.add();
+//  // copy all information
+//  copyRecCDC_trk_Table(trkMgr[i],newTrk);
+//  copyRecCDC_trk_add_Table(trkMgr2[i],newTrk2);
 // #endif
-// 	if(mcFlag){
+//  if(mcFlag){
 // #if TRASAN_REPLACE_TABLE
-// 	  ;
+//    ;
 // #else
-// 	  Reccdc_mctrk & newMcTrk = mcMgr.add();
-// 	  copyRecCDC_MCtrk_Table(mcMgr[i],mcMgr[mcMgr.count()-1]);
-// 	  int nMCt2h = mcMgr2.count();
-// 	  for(int j=0;j<nMCt2h;++j){
-// 	    if(mcMgr2[j].trk() &&
-// 	       mcMgr2[j].trk().get_ID() == trkMgr[i].get_ID()){
-// 	      Reccdc_mctrk2hep & newMcTrk2Hep = mcMgr2.add();
-// 	      copyRecCDC_MCtrk2hep_Table(mcMgr2[j],newMcTrk2Hep);
-// 	      newMcTrk2Hep.trk(newTrk);
-// 	    }
-// 	  }
-// 	  int nMCwire = mcMgr3.count();
-// 	  for(int j=0;j<nMCwire;++j){
-// 	    if(mcMgr3[j].trk().get_ID() == trkMgr[i].get_ID()){
-// 	      mcMgr3[j].trk(newTrk);
-// 	    }
-// 	  }
+//    Reccdc_mctrk & newMcTrk = mcMgr.add();
+//    copyRecCDC_MCtrk_Table(mcMgr[i],mcMgr[mcMgr.count()-1]);
+//    int nMCt2h = mcMgr2.count();
+//    for(int j=0;j<nMCt2h;++j){
+//      if(mcMgr2[j].trk() &&
+//         mcMgr2[j].trk().get_ID() == trkMgr[i].get_ID()){
+//        Reccdc_mctrk2hep & newMcTrk2Hep = mcMgr2.add();
+//        copyRecCDC_MCtrk2hep_Table(mcMgr2[j],newMcTrk2Hep);
+//        newMcTrk2Hep.trk(newTrk);
+//      }
+//    }
+//    int nMCwire = mcMgr3.count();
+//    for(int j=0;j<nMCwire;++j){
+//      if(mcMgr3[j].trk().get_ID() == trkMgr[i].get_ID()){
+//        mcMgr3[j].trk(newTrk);
+//      }
+//    }
 // #endif
-// 	}
-// 	CLHEP::HepVector ta = th.a(); // pivot = (0,0,0)
-// 	ta[3] = tz;
-// 	ta[4] = tt;
-// 	th.a(ta);
-// 	th.pivot(p); // pivot, (0,0,0) --> p
+//  }
+//  CLHEP::HepVector ta = th.a(); // pivot = (0,0,0)
+//  ta[3] = tz;
+//  ta[4] = tt;
+//  th.a(ta);
+//  th.pivot(p); // pivot, (0,0,0) --> p
 // #if TRASAN_REPLACE_TABLE
-// 	trkMgr[i].helix(3, th.a()[3]);
-// 	trkMgr[i].helix(4, th.a()[4]);
+//  trkMgr[i].helix(3, th.a()[3]);
+//  trkMgr[i].helix(4, th.a()[4]);
 // #else
-// 	newTrk.helix(3, th.a()[3]);
-// 	newTrk.helix(4, th.a()[4]);
+//  newTrk.helix(3, th.a()[3]);
+//  newTrk.helix(4, th.a()[4]);
 // #endif
 
-// 	newSvd.THelix(0, ta[0]);
-// 	newSvd.THelix(1, ta[1]);
-// 	newSvd.THelix(2, ta[2]);
-// 	newSvd.THelix(3, ta[3]);
-// 	newSvd.THelix(4, ta[4]);
+//  newSvd.THelix(0, ta[0]);
+//  newSvd.THelix(1, ta[1]);
+//  newSvd.THelix(2, ta[2]);
+//  newSvd.THelix(3, ta[3]);
+//  newSvd.THelix(4, ta[4]);
 // #if TRASAN_REPLACE_TABLE
-// 	newSvd.cdc_trk(trkMgr2[i]);
+//  newSvd.cdc_trk(trkMgr2[i]);
 // #else
-// 	newSvd.cdc_trk(newTrk2);
+//  newSvd.cdc_trk(newTrk2);
 // #endif
-// 	newSvd.Status(0); // 0 is normal.
-// 	int indexSvd  = 0;
-// 	for(int j=0;j<cand.length();++j){
-// 	  if(indexSvd >= 16)break;
-// 	  if((cand[j])->rphi() && (cand[j])->z()){
-// 	    newSvd.svd_cluster(indexSvd, *(cand[j]->rphi()));
-// 	    ++indexSvd;
-// 	    newSvd.svd_cluster(indexSvd, *(cand[j]->z()));
-// 	    ++indexSvd;
-// 	  }else{
-// 	    cout << "[TTrackManager of Trasan] Why ? no associated SVDhit ?" << endl;
-// 	  }
-// 	}
+//  newSvd.Status(0); // 0 is normal.
+//  int indexSvd  = 0;
+//  for(int j=0;j<cand.length();++j){
+//    if(indexSvd >= 16)break;
+//    if((cand[j])->rphi() && (cand[j])->z()){
+//      newSvd.svd_cluster(indexSvd, *(cand[j]->rphi()));
+//      ++indexSvd;
+//      newSvd.svd_cluster(indexSvd, *(cand[j]->z()));
+//      ++indexSvd;
+//    }else{
+//      cout << "[TTrackManager of Trasan] Why ? no associated SVDhit ?" << endl;
+//    }
+//  }
 // #if TRASAN_REPLACE_TABLE
-// 	trkMgr2[i].quality(0); // set to 0 --> GOOD!
-// 	trkMgr2[i].decision((trkMgr2[i].decision() | TrackSVDAssociator));
+//  trkMgr2[i].quality(0); // set to 0 --> GOOD!
+//  trkMgr2[i].decision((trkMgr2[i].decision() | TrackSVDAssociator));
 // #else
-// 	newTrk2.quality(1); // temporary
-// 	newTrk2.decision((newTrk2.decision() | TrackSVDAssociator));
+//  newTrk2.quality(1); // temporary
+//  newTrk2.decision((newTrk2.decision() | TrackSVDAssociator));
 // #endif
 // #if !(TRASAN_REPLACE_TABLE)
-// 	// CDC Wire information
-// 	for(int j=0;j<wirMgr.count();++j){
-// 	  if(wirMgr[j].trk() &&
-// 	     wirMgr[j].trk().get_ID() == trkMgr[i].get_ID()){
-// 	    wirMgr[j].trk(newTrk);
-// 	  }
-// 	}
+//  // CDC Wire information
+//  for(int j=0;j<wirMgr.count();++j){
+//    if(wirMgr[j].trk() &&
+//       wirMgr[j].trk().get_ID() == trkMgr[i].get_ID()){
+//      wirMgr[j].trk(newTrk);
+//    }
+//  }
 // #endif
 //       }else if(fabs(th.a()[3]) > 30.){
-// 	if(svdA.recTrk(th,tz,tt,0.5,-1.0,cand,0.5)){
-// 	  // cout << "SVD in " << i << endl;
+//  if(svdA.recTrk(th,tz,tt,0.5,-1.0,cand,0.5)){
+//    // cout << "SVD in " << i << endl;
 // #if TRASAN_REPLACE_TABLE
-// 	  Reccdc_svd_trk & newSvd  = svdMgr.add();
+//    Reccdc_svd_trk & newSvd  = svdMgr.add();
 // #else
-// 	  Reccdc_trk     & newTrk  = trkMgr.add();
-// 	  Reccdc_trk_add & newTrk2 = trkMgr2.add();
-// 	  Reccdc_svd_trk & newSvd  = svdMgr.add();
-// 	  // copy all information
-// 	  copyRecCDC_trk_Table(trkMgr[i],newTrk);
-// 	  copyRecCDC_trk_add_Table(trkMgr2[i],newTrk2);
+//    Reccdc_trk     & newTrk  = trkMgr.add();
+//    Reccdc_trk_add & newTrk2 = trkMgr2.add();
+//    Reccdc_svd_trk & newSvd  = svdMgr.add();
+//    // copy all information
+//    copyRecCDC_trk_Table(trkMgr[i],newTrk);
+//    copyRecCDC_trk_add_Table(trkMgr2[i],newTrk2);
 // #endif
-// 	  if(mcFlag){
+//    if(mcFlag){
 // #if TRASAN_REPLACE_TABLE
-// 	    ;
+//      ;
 // #else
-// 	    Reccdc_mctrk & newMcTrk = mcMgr.add();
-// 	    copyRecCDC_MCtrk_Table(mcMgr[i],mcMgr[mcMgr.count()-1]);
-// 	    int nMCt2h = mcMgr2.count();
-// 	    for(int j=0;j<nMCt2h;++j){
-// 	      if(mcMgr2[j].trk() &&
-// 		 mcMgr2[j].trk().get_ID() == trkMgr[i].get_ID()){
-// 		Reccdc_mctrk2hep & newMcTrk2Hep = mcMgr2.add();
-// 		copyRecCDC_MCtrk2hep_Table(mcMgr2[j],newMcTrk2Hep);
-// 		newMcTrk2Hep.trk(newTrk);
-// 	      }
-// 	    }
-// 	    int nMCwire = mcMgr3.count();
-// 	    for(int j=0;j<nMCwire;++j){
-// 	      if(mcMgr3[j].trk().get_ID() == trkMgr[i].get_ID()){
-// 		mcMgr3[j].trk(newTrk);
-// 	      }
-// 	    }
+//      Reccdc_mctrk & newMcTrk = mcMgr.add();
+//      copyRecCDC_MCtrk_Table(mcMgr[i],mcMgr[mcMgr.count()-1]);
+//      int nMCt2h = mcMgr2.count();
+//      for(int j=0;j<nMCt2h;++j){
+//        if(mcMgr2[j].trk() &&
+//     mcMgr2[j].trk().get_ID() == trkMgr[i].get_ID()){
+//    Reccdc_mctrk2hep & newMcTrk2Hep = mcMgr2.add();
+//    copyRecCDC_MCtrk2hep_Table(mcMgr2[j],newMcTrk2Hep);
+//    newMcTrk2Hep.trk(newTrk);
+//        }
+//      }
+//      int nMCwire = mcMgr3.count();
+//      for(int j=0;j<nMCwire;++j){
+//        if(mcMgr3[j].trk().get_ID() == trkMgr[i].get_ID()){
+//    mcMgr3[j].trk(newTrk);
+//        }
+//      }
 // #endif
-// 	  }
-// 	  CLHEP::HepVector ta = th.a(); // pivot = (0,0,0)
-// 	  ta[3] = tz;
-// 	  ta[4] = tt;
-// 	  th.a(ta);
-// 	  th.pivot(p); // pivot, (0,0,0) --> p
+//    }
+//    CLHEP::HepVector ta = th.a(); // pivot = (0,0,0)
+//    ta[3] = tz;
+//    ta[4] = tt;
+//    th.a(ta);
+//    th.pivot(p); // pivot, (0,0,0) --> p
 // #if TRASAN_REPLACE_TABLE
-// 	  trkMgr[i].helix(3, th.a()[3]);
-// 	  trkMgr[i].helix(4, th.a()[4]);
+//    trkMgr[i].helix(3, th.a()[3]);
+//    trkMgr[i].helix(4, th.a()[4]);
 // #else
-// 	  newTrk.helix(3, th.a()[3]);
-// 	  newTrk.helix(4, th.a()[4]);
+//    newTrk.helix(3, th.a()[3]);
+//    newTrk.helix(4, th.a()[4]);
 // #endif
-	  
-// 	  newSvd.THelix(0, ta[0]);
-// 	  newSvd.THelix(1, ta[1]);
-// 	  newSvd.THelix(2, ta[2]);
-// 	  newSvd.THelix(3, ta[3]);
-// 	  newSvd.THelix(4, ta[4]);
+
+//    newSvd.THelix(0, ta[0]);
+//    newSvd.THelix(1, ta[1]);
+//    newSvd.THelix(2, ta[2]);
+//    newSvd.THelix(3, ta[3]);
+//    newSvd.THelix(4, ta[4]);
 // #if TRASAN_REPLACE_TABLE
-// 	  newSvd.cdc_trk(trkMgr2[i]);
+//    newSvd.cdc_trk(trkMgr2[i]);
 // #else
-// 	  newSvd.cdc_trk(newTrk2);
+//    newSvd.cdc_trk(newTrk2);
 // #endif
-// 	  newSvd.Status(0); // 0 is normal.
-// 	  int indexSvd  = 0;
-// 	  for(int j=0;j<cand.length();++j){
-// 	    if(indexSvd >= 16)break;
-// 	    if((cand[j])->rphi() && (cand[j])->z()){
-// 	      newSvd.svd_cluster(indexSvd, *(cand[j]->rphi()));
-// 	      ++indexSvd;
-// 	      newSvd.svd_cluster(indexSvd, *(cand[j]->z()));
-// 	      ++indexSvd;
-// 	    }else{
-// 	      cout << "[TTrackManager of Trasan] Why ? no associated SVDhit ?" << endl;
-// 	    }
-// 	  }
+//    newSvd.Status(0); // 0 is normal.
+//    int indexSvd  = 0;
+//    for(int j=0;j<cand.length();++j){
+//      if(indexSvd >= 16)break;
+//      if((cand[j])->rphi() && (cand[j])->z()){
+//        newSvd.svd_cluster(indexSvd, *(cand[j]->rphi()));
+//        ++indexSvd;
+//        newSvd.svd_cluster(indexSvd, *(cand[j]->z()));
+//        ++indexSvd;
+//      }else{
+//        cout << "[TTrackManager of Trasan] Why ? no associated SVDhit ?" << endl;
+//      }
+//    }
 // #if TRASAN_REPLACE_TABLE
-// 	  trkMgr2[i].quality(0); // set to 0 --> GOOD!
-// 	  trkMgr2[i].decision((trkMgr2[i].decision() | TrackSVDAssociator));
+//    trkMgr2[i].quality(0); // set to 0 --> GOOD!
+//    trkMgr2[i].decision((trkMgr2[i].decision() | TrackSVDAssociator));
 // #else
-// 	  newTrk2.quality(1); // temporary
-// 	  newTrk2.decision((newTrk2.decision() | TrackSVDAssociator));
+//    newTrk2.quality(1); // temporary
+//    newTrk2.decision((newTrk2.decision() | TrackSVDAssociator));
 // #endif
 // #if !(TRASAN_REPLACE_TABLE)
-// 	  // CDC Wire information
-// 	  for(int j=0;j<wirMgr.count();++j){
-// 	    if(wirMgr[j].trk() &&
-// 	       wirMgr[j].trk().get_ID() == trkMgr[i].get_ID()){
-// 	      wirMgr[j].trk(newTrk);
-// 	    }
-// 	  }
-// #endif	  
-// 	}
+//    // CDC Wire information
+//    for(int j=0;j<wirMgr.count();++j){
+//      if(wirMgr[j].trk() &&
+//         wirMgr[j].trk().get_ID() == trkMgr[i].get_ID()){
+//        wirMgr[j].trk(newTrk);
+//      }
+//    }
+// #endif
+//  }
 //       }
 //     }
 //   }
 // #endif
-}
+  }
 // <-- jtanaka 000925
 
-bool
-TTrackManager::goodTrack(const TTrack & t, bool track2D) {
+  bool
+  TTrackManager::goodTrack(const TTrack& t, bool track2D)
+  {
 
     //...Check number of hits...
     if (! checkNumberOfHits(t, track2D)) return false;
@@ -3519,59 +3558,62 @@ TTrackManager::goodTrack(const TTrack & t, bool track2D) {
     if (TTrack::helixHasNan(t.helix())) return false;
 
     return true;
-}
+  }
 
-void
-TTrackManager::monitor(void) const {
+  void
+  TTrackManager::monitor(void) const
+  {
 //cnv     const unsigned nTracks = _tracks.length();
 //     for (unsigned i = 0; i < nTracks; i++) {
-// 	const TTrack & t = * _tracks[i];
-// 	const unsigned finder = t.finder();
+//  const TTrack & t = * _tracks[i];
+//  const unsigned finder = t.finder();
 
-// 	if ((finder & TrackFastFinder) || (finder & TrackSlowFinder))
-// 	    _profiler[0]->monitor(t);
-// 	if (finder & TrackCurlFinder)
-// 	    _profiler[1]->monitor(t);
-// 	if (finder & TrackPMCurlFinder)
-// 	    _profiler[2]->monitor(t);
-// 	if (finder & TrackHoughFinder)
-// 	    _profiler[3]->monitor(t);
+//  if ((finder & TrackFastFinder) || (finder & TrackSlowFinder))
+//      _profiler[0]->monitor(t);
+//  if (finder & TrackCurlFinder)
+//      _profiler[1]->monitor(t);
+//  if (finder & TrackPMCurlFinder)
+//      _profiler[2]->monitor(t);
+//  if (finder & TrackHoughFinder)
+//      _profiler[3]->monitor(t);
 //     }
-}
+  }
 
-void
-TTrackManager::defineHistograms(void) {
+  void
+  TTrackManager::defineHistograms(void)
+  {
 //cnv     _profiler[0] = new TProfiler();
 //     _profiler[0]->name("conformal");
 //     _profiler[0]->baseId(100);
 //     if (_debugLevel > 10)
-// 	_profiler[0]->tuple(true);
+//  _profiler[0]->tuple(true);
 //     _profiler[0]->initialize();
 
 //     _profiler[1] = new TProfiler();
 //     _profiler[1]->name("curl");
 //     _profiler[1]->baseId(200);
 //     if (_debugLevel > 10)
-// 	_profiler[1]->tuple(true);
+//  _profiler[1]->tuple(true);
 //     _profiler[1]->initialize();
 
 //     _profiler[2] = new TProfiler();
 //     _profiler[2]->name("PM");
 //     _profiler[2]->baseId(300);
 //     if (_debugLevel > 10)
-// 	_profiler[2]->tuple(true);
+//  _profiler[2]->tuple(true);
 //     _profiler[2]->initialize();
 
 //     _profiler[3] = new TProfiler();
 //     _profiler[3]->name("hough");
 //     _profiler[3]->baseId(400);
 //     if (_debugLevel > 10)
-// 	_profiler[3]->tuple(true);
+//  _profiler[3]->tuple(true);
 //     _profiler[3]->initialize();
-}
+  }
 
-void
-TTrackManager::statistics(bool doMCAnalysis) {
+  void
+  TTrackManager::statistics(bool doMCAnalysis)
+  {
     ++_s->_nEvents;
 
     //...All finders...
@@ -3583,66 +3625,67 @@ TTrackManager::statistics(bool doMCAnalysis) {
     //..._tracks...
     unsigned n = _tracks.length();
     for (unsigned i = 0; i < n; i++) {
-	const unsigned finder = _tracks[i]->finder();
-	for (unsigned j = 1; j < 8; j++)
-	    if (finder & (1 << j))
-		++_s->_nTracks[j];
+      const unsigned finder = _tracks[i]->finder();
+      for (unsigned j = 1; j < 8; j++)
+        if (finder & (1 << j))
+          ++_s->_nTracks[j];
     }
 
     //..._tracksAll...
     n = _tracksAll.length();
     for (unsigned i = 0; i < n; i++) {
-	const unsigned finder = _tracksAll[i]->finder();
-	for (unsigned j = 1; j < 8; j++)
-	    if (finder & (1 << j))
-		++_s->_nTracksAll[j];
+      const unsigned finder = _tracksAll[i]->finder();
+      for (unsigned j = 1; j < 8; j++)
+        if (finder & (1 << j))
+          ++_s->_nTracksAll[j];
     }
 
     //..._tracks2D...
     n = _tracks2D.length();
     for (unsigned i = 0; i < n; i++) {
-	const unsigned finder = _tracks2D[i]->finder();
-	for (unsigned j = 1; j < 8; j++)
-	    if (finder & (1 << j))
-		++_s->_nTracks2D[j];
+      const unsigned finder = _tracks2D[i]->finder();
+      for (unsigned j = 1; j < 8; j++)
+        if (finder & (1 << j))
+          ++_s->_nTracks2D[j];
     }
 
     //..._tracksFinal...
     n = _tracksFinal.length();
     for (unsigned i = 0; i < n; i++) {
-	const unsigned finder = _tracksFinal[i]->finder();
-	for (unsigned j = 1; j < 8; j++)
-	    if (finder & (1 << j))
-		++_s->_nTracksFinal[j];
+      const unsigned finder = _tracksFinal[i]->finder();
+      for (unsigned j = 1; j < 8; j++)
+        if (finder & (1 << j))
+          ++_s->_nTracksFinal[j];
     }
 
     if (doMCAnalysis) {
-	n = _tracks.length();
-	for (unsigned i = 0; i < n; i++) {
-	    const unsigned finder = _tracks[i]->finder();
-	    if (_tracks[i]->mc()) {
-		const unsigned quality = _tracks[i]->mc()->quality();
-		for (unsigned j = 0; j < 8; j++) {
-		    if (finder & (1 << j) || (j == 0)) {
-			if (quality & (TTrackGood))
-			    ++_s->_nMCQuality[j][0];
-			else if (quality & (TTrackGhost))
-			    ++_s->_nMCQuality[j][1];
-			else if (quality & (TTrackBad))
-			    ++_s->_nMCQuality[j][2];
-			else if (quality & (TTrackCharge))
-			    ++_s->_nMCQuality[j][3];
-			else if (quality & (TTrackGarbage))
-			    ++_s->_nMCQuality[j][4];
-		    }
-		}
-	    }
-	}
+      n = _tracks.length();
+      for (unsigned i = 0; i < n; i++) {
+        const unsigned finder = _tracks[i]->finder();
+        if (_tracks[i]->mc()) {
+          const unsigned quality = _tracks[i]->mc()->quality();
+          for (unsigned j = 0; j < 8; j++) {
+            if (finder & (1 << j) || (j == 0)) {
+              if (quality & (TTrackGood))
+                ++_s->_nMCQuality[j][0];
+              else if (quality & (TTrackGhost))
+                ++_s->_nMCQuality[j][1];
+              else if (quality & (TTrackBad))
+                ++_s->_nMCQuality[j][2];
+              else if (quality & (TTrackCharge))
+                ++_s->_nMCQuality[j][3];
+              else if (quality & (TTrackGarbage))
+                ++_s->_nMCQuality[j][4];
+            }
+          }
+        }
+      }
     }
-}
+  }
 
-void
-TTrackManager::mergeTracks(int level, float threshold) {
+  void
+  TTrackManager::mergeTracks(int level, float threshold)
+  {
 #ifdef TRASAN_DEBUG
     const string stage = "merging";
     EnterStage(stage);
@@ -3652,166 +3695,160 @@ TTrackManager::mergeTracks(int level, float threshold) {
     const unsigned n = _tracksAll.length();
     if (n < 2) return;
     for (unsigned i = 0; i < n - 1; i++) {
-	TTrack & t0 = * _tracksAll[i];
-	if (toBeRemoved.hasMember(t0))
-	    continue;
-	if (! t0.nCores())
-	    continue;
-	for (unsigned j = i + 1; j < n; j++) {
-	    TTrack & t1 = * _tracksAll[j];
-	    if (toBeRemoved.hasMember(t1))
-		continue;
-	    if (! t1.nCores())
-		continue;
+      TTrack& t0 = * _tracksAll[i];
+      if (toBeRemoved.hasMember(t0))
+        continue;
+      if (! t0.nCores())
+        continue;
+      for (unsigned j = i + 1; j < n; j++) {
+        TTrack& t1 = * _tracksAll[j];
+        if (toBeRemoved.hasMember(t1))
+          continue;
+        if (! t1.nCores())
+          continue;
 
-	    //...Check charge...
-	    if (t0.charge() != t1.charge())
-		continue;
+        //...Check charge...
+        if (t0.charge() != t1.charge())
+          continue;
 
-	    //...Calculate a kind of distance...
-//	    float d = TTrack::distance(t0, t1);
-	    float d = TTrack::distanceB(t0, t1);
+        //...Calculate a kind of distance...
+//      float d = TTrack::distance(t0, t1);
+        float d = TTrack::distanceB(t0, t1);
 
 #ifdef TRASAN_DEBUG_DETAIL
-	    cout << Tab() << "distance=" << d << ":" << t0.name() << " <-> "
-		   << t1.name() << endl;
+        cout << Tab() << "distance=" << d << ":" << t0.name() << " <-> "
+             << t1.name() << endl;
 #endif
 
-	    if (d > threshold) {
+        if (d > threshold) {
 #ifdef TRASAN_DEBUG_DETAIL
-		cout << Tab() << "They are not identical : no merge"
-		       << endl;
+          cout << Tab() << "They are not identical : no merge"
+               << endl;
 #endif
 #ifdef TRASAN_WINDOW_GTK_HOUGH
-		TWindowGTKConformal & w = Trasan::getTrasan()->w();
-		w.endOfEvent();
-		w.clear();
-		w.stage("Track Manager : merging tracks");
-		w.information("gray:all hits, green:candidates to be built");
-		AList<TTrack> tl0;
-		tl0.append((TTrack &) t0);
-		tl0.append((TTrack &) t1);
-		w.append(tl0, Gdk::Color("green"));
-//		w.run();
+          TWindowGTKConformal& w = Trasan::getTrasan()->w();
+          w.endOfEvent();
+          w.clear();
+          w.stage("Track Manager : merging tracks");
+          w.information("gray:all hits, green:candidates to be built");
+          AList<TTrack> tl0;
+          tl0.append((TTrack&) t0);
+          tl0.append((TTrack&) t1);
+          w.append(tl0, Gdk::Color("green"));
+//    w.run();
 #endif
-		continue;
-	    }
+          continue;
+        }
 
-	    //...Merge tracks...
-	    TTrack * x0 = 0;
-	    TTrack * x1 = 0;
-	    const unsigned ns0 = TLink::nStereoHits(t0.cores());
-	    const unsigned ns1 = TLink::nStereoHits(t1.cores());
-	    const unsigned n0 = t0.nCores();
-	    const unsigned n1 = t1.nCores();
-	    if (ns0 && (ns1 == 0)) {
-		x0 = & t0;
-		x1 = & t1;
-	    }
-	    else if (ns1 && (ns0 == 0)) {
-		x0 = & t1;
-		x1 = & t0;
-	    }
-	    else if (n0 > n1) {
-		x0 = & t0;
-		x1 = & t1;
-	    }
-	    else if (n0 < n1) {
-		x0 = & t1;
-		x1 = & t0;
-	    }
-	    else if (n0 == n1) {
-//		const float p0 = t0.chi2() / float(t0.ndf());
-//		const float p1 = t1.chi2() / float(t1.ndf());
-		const float p0 = t0.chi2();
-		const float p1 = t1.chi2();
-		if (p0 < p1) {
-		    x0 = & t0;
-		    x1 = & t1;
-		}
-		else {
-		    x0 = & t1;
-		    x1 = & t0;
-		}
-	    }
-	    else {
-		continue;
-	    }
+        //...Merge tracks...
+        TTrack* x0 = 0;
+        TTrack* x1 = 0;
+        const unsigned ns0 = TLink::nStereoHits(t0.cores());
+        const unsigned ns1 = TLink::nStereoHits(t1.cores());
+        const unsigned n0 = t0.nCores();
+        const unsigned n1 = t1.nCores();
+        if (ns0 && (ns1 == 0)) {
+          x0 = & t0;
+          x1 = & t1;
+        } else if (ns1 && (ns0 == 0)) {
+          x0 = & t1;
+          x1 = & t0;
+        } else if (n0 > n1) {
+          x0 = & t0;
+          x1 = & t1;
+        } else if (n0 < n1) {
+          x0 = & t1;
+          x1 = & t0;
+        } else if (n0 == n1) {
+//    const float p0 = t0.chi2() / float(t0.ndf());
+//    const float p1 = t1.chi2() / float(t1.ndf());
+          const float p0 = t0.chi2();
+          const float p1 = t1.chi2();
+          if (p0 < p1) {
+            x0 = & t0;
+            x1 = & t1;
+          } else {
+            x0 = & t1;
+            x1 = & t0;
+          }
+        } else {
+          continue;
+        }
 
 #ifdef TRASAN_DEBUG
-	    x0->dump("track breif", Tab() + "x0  ");
-	    x1->dump("track breif", Tab() + "x1  ");
+        x0->dump("track breif", Tab() + "x0  ");
+        x1->dump("track breif", Tab() + "x1  ");
 #endif
 #ifdef TRASAN_WINDOW_GTK_HOUGH
-	    TTrack tmp0(* x0);
-	    TTrack tmp1(* x1);
+        TTrack tmp0(* x0);
+        TTrack tmp1(* x1);
 #endif
 
-	    AList<TLink> links = x1->links();
-	    x0->append(links);
-	    x1->remove(links);
-	    x0->assign(CellHitTrackManager);
-	    x0->finder(TrackTrackManager);
-	    toBeRemoved.append(x1);
-	    //...Refine...
-	    //	    cout <<"REFIT "<< level <<endl;
-	    if( level == 2) {
-	      x0->fit();		    
-	    } else if( level == 3) {
-	      AList<TLink> bad;
-	      x0->fit();
-	      x0->refine(bad, 30. * 100.);
-	      x0->fit();
-	    } else if( level == 4) {
-	      AList<TLink> bad;
-	      x0->fit();
-	      x0->refine(bad, 30. * 100.);
-	      x0->fit();
-	      x0->refine(bad, 30. * 10.);
-	      x0->fit();
-	    } else if( level == 5) {
-	      AList<TLink> bad;
-	      x0->fit();
-	      x0->refine(bad, 30. * 100.);
-	      x0->fit();
-	      x0->refine(bad, 30. * 10.);
-	      x0->fit();
-	      x0->refine(bad, 30);
-	      x0->fit();
-	    }
+        AList<TLink> links = x1->links();
+        x0->append(links);
+        x1->remove(links);
+        x0->assign(CellHitTrackManager);
+        x0->finder(TrackTrackManager);
+        toBeRemoved.append(x1);
+        //...Refine...
+        //      cout <<"REFIT "<< level <<endl;
+        if (level == 2) {
+          x0->fit();
+        } else if (level == 3) {
+          AList<TLink> bad;
+          x0->fit();
+          x0->refine(bad, 30. * 100.);
+          x0->fit();
+        } else if (level == 4) {
+          AList<TLink> bad;
+          x0->fit();
+          x0->refine(bad, 30. * 100.);
+          x0->fit();
+          x0->refine(bad, 30. * 10.);
+          x0->fit();
+        } else if (level == 5) {
+          AList<TLink> bad;
+          x0->fit();
+          x0->refine(bad, 30. * 100.);
+          x0->fit();
+          x0->refine(bad, 30. * 10.);
+          x0->fit();
+          x0->refine(bad, 30);
+          x0->fit();
+        }
 
 #ifdef TRASAN_DEBUG
-	    x0->dump("detail sort", Tab() + "x0  ");
+        x0->dump("detail sort", Tab() + "x0  ");
 #endif
 #ifdef TRASAN_WINDOW_GTK_HOUGH
- 	    TWindowGTKConformal & w = Trasan::getTrasan()->w();
- 	    w.endOfEvent();
- 	    w.clear();
- 	    w.stage("Track Manager : merging tracks");
- 	    w.information("gray:all hits, green:candidates to be built");
- 	    AList<TTrack> tl0;
- 	    tl0.append((TTrack &) tmp0);
- 	    AList<TTrack> tl1;
- 	    tl1.append(tmp1);
- 	    w.append(tl0, Gdk::Color("green"));
- 	    w.append(tl1, Gdk::Color("red"));
- 	    w.run();
+        TWindowGTKConformal& w = Trasan::getTrasan()->w();
+        w.endOfEvent();
+        w.clear();
+        w.stage("Track Manager : merging tracks");
+        w.information("gray:all hits, green:candidates to be built");
+        AList<TTrack> tl0;
+        tl0.append((TTrack&) tmp0);
+        AList<TTrack> tl1;
+        tl1.append(tmp1);
+        w.append(tl0, Gdk::Color("green"));
+        w.append(tl1, Gdk::Color("red"));
+        w.run();
 #endif
 
-	}
+      }
     }
 
     for (unsigned i = 0; i < (unsigned) toBeRemoved.length(); i++) {
-	_tracksAll.remove(* toBeRemoved[i]);
-	_tracks.remove(* toBeRemoved[i]);
-	_tracks2D.remove(* toBeRemoved[i]);
-	_tracksFinal.remove(* toBeRemoved[i]);
-	delete toBeRemoved[i];
+      _tracksAll.remove(* toBeRemoved[i]);
+      _tracks.remove(* toBeRemoved[i]);
+      _tracks2D.remove(* toBeRemoved[i]);
+      _tracksFinal.remove(* toBeRemoved[i]);
+      delete toBeRemoved[i];
     }
 
 #ifdef TRASAN_DEBUG
     LeaveStage(stage);
 #endif
-}
+  }
 
 } // namespace Belle

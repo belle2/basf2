@@ -52,7 +52,7 @@
 namespace Belle {
 
 /// A class to handle update timing of static objects of tracking.
-class TUpdater {
+  class TUpdater {
 
   public:
     /// Constructor
@@ -64,8 +64,8 @@ class TUpdater {
 
   public:
     /// dumps debug information.
-    void dump(const std::string & message = std::string(""),
-	      const std::string & prefix = std::string("")) const;
+    void dump(const std::string& message = std::string(""),
+              const std::string& prefix = std::string("")) const;
 
   public:
     /// returns true if an object is updated.
@@ -88,7 +88,7 @@ class TUpdater {
     int _runN;
     int _evtN;
     bool _init;
-};
+  };
 
 //-----------------------------------------------------------------------------
 
@@ -101,23 +101,26 @@ class TUpdater {
 
 #ifdef TUpdater_INLINE_DEFINE_HERE
 
-inline
-bool
-TUpdater::initialized(void) const {
+  inline
+  bool
+  TUpdater::initialized(void) const
+  {
     return _init;
-}
+  }
 
-inline
-void
-TUpdater::initialize(void) {
+  inline
+  void
+  TUpdater::initialize(void)
+  {
     _init = true;
-}
+  }
 
-inline
-void
-TUpdater::clear(void) {
+  inline
+  void
+  TUpdater::clear(void)
+  {
     _expN = -1;
-}
+  }
 
 #endif
 

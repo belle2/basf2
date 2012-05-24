@@ -48,10 +48,10 @@ TVector2 PXDLadder::convertToRelative(const double* pos)
 {
   TVector3 hitPos = convertToLocal(pos);
   TVector3 s = 0.5 * _size;
-  return TVector2((hitPos(0) + s(0)) / (2*s(0)), (hitPos(2) + s(2)) / (2*s(2)));
+  return TVector2((hitPos(0) + s(0)) / (2 * s(0)), (hitPos(2) + s(2)) / (2 * s(2)));
 }
 
-bool PXDLadder::isInLadder(const double *pos)
+bool PXDLadder::isInLadder(const double* pos)
 {
   TVector3 s = 0.5 * _size;
   TVector3 local = convertToLocal(pos);

@@ -104,7 +104,7 @@ void SectorBasic::setIntersection(LadderEntry& ladderEntry)
   double len = (t * dir).Mod();
   if (len < width) {
     int d = pos.X() < 0 ? -1 : 1;
-    if (d*t < 0) ladderEntry.start = max(ladderEntry.start, (1 - d * len / width) / 2);
+    if (d * t < 0) ladderEntry.start = max(ladderEntry.start, (1 - d * len / width) / 2);
     else      ladderEntry.end = min(ladderEntry.end, (1 + d * len / width) / 2);
 
   }
@@ -141,7 +141,7 @@ void SectorBasic::setMinMaxRadius(LadderEntry& ladderEntry)
 
 string SectorBasic::name()
 {
-  return (boost::format("%.2f°, down=%.2f mm, width=%.2f mm") % (_RotationAngle / M_PI*180) % _DownShift % (_SectorWidth*2)).str();
+  return (boost::format("%.2f°, down=%.2f mm, width=%.2f mm") % (_RotationAngle / M_PI * 180) % _DownShift % (_SectorWidth * 2)).str();
 }
 
 void SectorBasic::makePoint(cairo_t* cairo, double x, double y, int status)
@@ -161,7 +161,7 @@ void SectorBasic::makePoint(cairo_t* cairo, double x, double y, int status)
       cairo_set_source_rgb(cairo, 0, 0, 1);
       break;
   }
-  cairo_arc(cairo, x, y, 1, 0, 2*M_PI);
+  cairo_arc(cairo, x, y, 1, 0, 2 * M_PI);
   cairo_fill(cairo);
 }
 
@@ -187,7 +187,7 @@ void SectorBasic::draw(cairo_t* cairo)
   }*/
 
   for (list<LadderEntry>::iterator it = _ladderList.begin(); it != _ladderList.end(); it++) {
-    PXDLadder &ladder = *(it->ladder);
+    PXDLadder& ladder = *(it->ladder);
     TVector3 p = ladder.getPosition();
     TVector3 s = ladder.getSize();
     TVector3 n = ladder.getNormal();
@@ -197,8 +197,8 @@ void SectorBasic::draw(cairo_t* cairo)
     cairo_translate(cairo, p(0), p(1));
     cairo_rotate(cairo, angle);
     cairo_set_source_rgb(cairo, color[0], color[1], color[2]);
-    cairo_move_to(cairo, -width + 2*width*it->start, 0);
-    cairo_line_to(cairo, -width + 2*width*it->end, 0);
+    cairo_move_to(cairo, -width + 2 * width * it->start, 0);
+    cairo_line_to(cairo, -width + 2 * width * it->end, 0);
     cairo_stroke(cairo);
 
     /*cairo_move_to(cairo,-width,0);
@@ -220,9 +220,9 @@ void SectorBasic::draw(cairo_t* cairo)
   }
   cairo_set_source_rgb(cairo, color[0], color[1], color[2]);
   for (list<TrackerHit*>::iterator it = _hitList.begin(); it != _hitList.end(); it++) {
-    TrackerHit &hit = **it;
+    TrackerHit& hit = **it;
     const double* pos = hit.getPosition();
-    cairo_arc(cairo, pos[0], pos[1], 2, 0, 2*M_PI);
+    cairo_arc(cairo, pos[0], pos[1], 2, 0, 2 * M_PI);
     cairo_close_path(cairo);
     cairo_fill(cairo);
   }

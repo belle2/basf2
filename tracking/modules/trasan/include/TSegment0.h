@@ -71,14 +71,14 @@
 
 namespace Belle {
 
-typedef HepGeom::Point3D<double>  Point3D;
-typedef HepGeom::Vector3D<double>  Vector3D;
-class TTrack;
-class Range;
-template <class T> class CAList;
+  typedef HepGeom::Point3D<double>  Point3D;
+  typedef HepGeom::Vector3D<double>  Vector3D;
+  class TTrack;
+  class Range;
+  template <class T> class CAList;
 
 /// A class to relate TRGCDCWireHit and TTrack objects.
-class TSegment0 : public TTrackBase {
+  class TSegment0 : public TTrackBase {
 
   public:
     /// Constructor.
@@ -93,8 +93,8 @@ class TSegment0 : public TTrackBase {
     virtual unsigned objectType(void) const;
 
     /// dumps debug information.
-    void dump(const std::string & message = std::string(""),
-    	      const std::string & prefix = std::string("")) const;
+    void dump(const std::string& message = std::string(""),
+              const std::string& prefix = std::string("")) const;
 
     /// returns super layer id.
     unsigned superLayerId() const;
@@ -103,11 +103,11 @@ class TSegment0 : public TTrackBase {
     const HepGeom::Point3D<double>  & position(void) const;
 
     /// returns direction.
-    const Vector3D & direction(void) const;
+    const Vector3D& direction(void) const;
 
     /// calculates distance between two clusters. Smaller value indicates closer.
-    double distance(const TSegment0 &) const;
-    double distance(const HepGeom::Point3D<double>  &, const Vector3D &) const;
+    double distance(const TSegment0&) const;
+    double distance(const HepGeom::Point3D<double>  &, const Vector3D&) const;
 
     /// returns Range of x-coordinate of TLinks.
     Range rangeX(double min, double max) const;
@@ -174,25 +174,25 @@ class TSegment0 : public TTrackBase {
     mutable double _duality;
     mutable unsigned _nDual;
     mutable double _angle;
-};
+  };
 
 // Utility functions
 /// returns \# of core links in segments.
-unsigned NCoreLinks(const CAList<TSegment0> & list);
+  unsigned NCoreLinks(const CAList<TSegment0> & list);
 
 /// returns AList of TLink used for a track.
-AList<TLink> Links(const TSegment0 &, const TTrack &);
+  AList<TLink> Links(const TSegment0&, const TTrack&);
 
 /// checks property of segments.
-void
-CheckSegments(const CAList<TSegment0> & segmentList);
+  void
+  CheckSegments(const CAList<TSegment0> & segmentList);
 
 /// checks to link segments.
-void
-CheckSegmentLink(const TSegment0 & base,
-		 const TSegment0 & next,
-		 float distance,
-		 float dirAngle);
+  void
+  CheckSegmentLink(const TSegment0& base,
+                   const TSegment0& next,
+                   float distance,
+                   float dirAngle);
 
 //-----------------------------------------------------------------------------
 
@@ -205,100 +205,112 @@ CheckSegmentLink(const TSegment0 & base,
 
 #ifdef TSegment0_INLINE_DEFINE_HERE
 
-inline
-const HepGeom::Point3D<double>  &
-TSegment0::position(void) const {
+  inline
+  const HepGeom::Point3D<double>  &
+  TSegment0::position(void) const
+  {
     if (! _fitted) update();
     return _position;
-}
+  }
 
-inline
-const Vector3D &
-TSegment0::direction(void) const {
+  inline
+  const Vector3D&
+  TSegment0::direction(void) const
+  {
     if (! _fitted) update();
     return _direction;
-}
+  }
 
-inline
-unsigned
-TSegment0::innerWidth(void) const {
+  inline
+  unsigned
+  TSegment0::innerWidth(void) const
+  {
     if (! _fitted) update();
     return _innerWidth;
-}
+  }
 
-inline
-unsigned
-TSegment0::outerWidth(void) const {
+  inline
+  unsigned
+  TSegment0::outerWidth(void) const
+  {
     if (! _fitted) update();
     return _outerWidth;
-}
+  }
 
-inline
-unsigned
-TSegment0::innerMostLayer(void) const {
+  inline
+  unsigned
+  TSegment0::innerMostLayer(void) const
+  {
     if (! _fitted) update();
     return _innerMostLayer;
-}
+  }
 
-inline
-unsigned
-TSegment0::outerMostLayer(void) const {
+  inline
+  unsigned
+  TSegment0::outerMostLayer(void) const
+  {
     if (! _fitted) update();
     return _outerMostLayer;
-}
+  }
 
-inline
-unsigned
-TSegment0::clusterType(void) const {
+  inline
+  unsigned
+  TSegment0::clusterType(void) const
+  {
     if (! nLinks()) return 0;
     if (_clusterType == 0) updateType();
     return _clusterType;
-}
+  }
 
-inline
-double
-TSegment0::duality(void) const {
+  inline
+  double
+  TSegment0::duality(void) const
+  {
     return _duality;
-}
+  }
 
-inline
-unsigned
-TSegment0::objectType(void) const {
+  inline
+  unsigned
+  TSegment0::objectType(void) const
+  {
     return Segment;
-}
+  }
 
-inline
-unsigned
-TSegment0::superLayerId(void) const {
+  inline
+  unsigned
+  TSegment0::superLayerId(void) const
+  {
     unsigned id = (links())[0]->wire()->superLayerId();
 #ifdef TRASAN_DEBUG
 //     {
-// 	const AList<TLink> & list = links();
-// 	unsigned n = list.length();
-// 	for (unsigned i = 1; i < n; i++) {
-// 	    if (list[i]->hit()->wire()->superLayerId() != id) {
-// 		std::cout << "TSegment0::superLayerId !!! strange segment found";
-// 		std::cout << std::endl;
-// 		dump();
-// 		break;
-// 	    }
-// 	}
+//  const AList<TLink> & list = links();
+//  unsigned n = list.length();
+//  for (unsigned i = 1; i < n; i++) {
+//      if (list[i]->hit()->wire()->superLayerId() != id) {
+//    std::cout << "TSegment0::superLayerId !!! strange segment found";
+//    std::cout << std::endl;
+//    dump();
+//    break;
+//      }
+//  }
 //     }
 #endif
     return id;
-}
+  }
 
-inline
-AList<TTrack> &
-TSegment0::tracks(void) {
+  inline
+  AList<TTrack> &
+  TSegment0::tracks(void)
+  {
     return _tracks;
-}
+  }
 
-inline
-AList<TSegment0> &
-TSegment0::innerLinks(void) {
+  inline
+  AList<TSegment0> &
+  TSegment0::innerLinks(void)
+  {
     return _innerLinks;
-}
+  }
 
 #endif
 

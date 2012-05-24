@@ -203,34 +203,34 @@
 #endif
 
 namespace Belle2 {
-    class TRGCDC;
+  class TRGCDC;
 }
 
 namespace Belle {
 
-class TPoint2D;
+  class TPoint2D;
 
 /// A class to find tracks with the conformal method.
-class TConformalFinder : public TFinderBase {
+  class TConformalFinder : public TFinderBase {
 
   public:
     /// Constructor.
     TConformalFinder(unsigned fastFinder,
-		     unsigned slowFinder,
-		     unsigned perfectSegmentFinding,
-		     bool useSmallCells,
-		     float maxSigma,
-		     float maxSigmaStereo,
-		     float salvageLevel,
-		     unsigned minNLinksForSegment,
-		     unsigned minNCoreLinks,
-		     unsigned minNSegments,
-		     unsigned salvageLoadWidth,
-		     unsigned stereoMode,
-		     unsigned stereoLoadWidth,
-		     float szSegmentDistance,
-		     float szLinkDistance,
-		     unsigned fittingFlag);
+                     unsigned slowFinder,
+                     unsigned perfectSegmentFinding,
+                     bool useSmallCells,
+                     float maxSigma,
+                     float maxSigmaStereo,
+                     float salvageLevel,
+                     unsigned minNLinksForSegment,
+                     unsigned minNCoreLinks,
+                     unsigned minNSegments,
+                     unsigned salvageLoadWidth,
+                     unsigned stereoMode,
+                     unsigned stereoLoadWidth,
+                     float szSegmentDistance,
+                     float szLinkDistance,
+                     unsigned fittingFlag);
 
     /// Destructor
     virtual ~TConformalFinder();
@@ -243,8 +243,8 @@ class TConformalFinder : public TFinderBase {
     std::string version(void) const;
 
     /// dumps debug information.
-    void dump(const std::string & message = std::string(""),
-	      const std::string & prefix = std::string("")) const;
+    void dump(const std::string& message = std::string(""),
+              const std::string& prefix = std::string("")) const;
 
     /// returns T0 reset is done.
     bool T0ResetDone(void) const;
@@ -258,9 +258,9 @@ class TConformalFinder : public TFinderBase {
 
     /// finds tracks.
     int doit(const CAList<Belle2::TRGCDCWireHit> & axialHits,
-	     const CAList<Belle2::TRGCDCWireHit> & stereoHits,
-	     AList<TTrack> & tracks,
-	     AList<TTrack> & tracks2D);
+             const CAList<Belle2::TRGCDCWireHit> & stereoHits,
+             AList<TTrack> & tracks,
+             AList<TTrack> & tracks2D);
 
     /// sets a flag to do T0 reset in the fast 2D finding.
     bool doT0Reset(bool);
@@ -282,26 +282,26 @@ class TConformalFinder : public TFinderBase {
 
     /// slow findings. level:0/1:selection of segments to be used
     void slowFinding2D(unsigned level);
-    TTrack * expand(AList<TSegment> &) const;
-    TTrack * expand(TTrack &) const;
-    void targetSuperLayer(unsigned ptn, unsigned & in, unsigned & out) const;
-    AList<TSegment> targetSegments(const TTrack &, unsigned sl) const;
-    AList<TLink> targetLinks(const TTrack &, unsigned sl) const;
-    bool trackQuality(const TTrack &) const;
+    TTrack* expand(AList<TSegment> &) const;
+    TTrack* expand(TTrack&) const;
+    void targetSuperLayer(unsigned ptn, unsigned& in, unsigned& out) const;
+    AList<TSegment> targetSegments(const TTrack&, unsigned sl) const;
+    AList<TLink> targetLinks(const TTrack&, unsigned sl) const;
+    bool trackQuality(const TTrack&) const;
 
     /// finds setereo segments.
-    AList<TSegment> stereoSegments(const TTrack & t) const;
-    AList<TSegment> stereoSegmentsFromBadHits(const TTrack & t) const;
+    AList<TSegment> stereoSegments(const TTrack& t) const;
+    AList<TSegment> stereoSegmentsFromBadHits(const TTrack& t) const;
 
     /// salvages segments.
-    void salvage(TTrack & track,
-		 unsigned axialStereoSwitch,
-		 const AList<TSegment> & bads) const;
+    void salvage(TTrack& track,
+                 unsigned axialStereoSwitch,
+                 const AList<TSegment> & bads) const;
 
     /// removes bad segments.
-    AList<TSegment> removeBadSegments(TTrack &) const;
-    AList<TSegment> refineSegments(const TTrack &) const;
-    void refineLinks(TTrack &, unsigned minNHits) const;
+    AList<TSegment> removeBadSegments(TTrack&) const;
+    AList<TSegment> refineSegments(const TTrack&) const;
+    void refineLinks(TTrack&, unsigned minNHits) const;
 
     /// resolves multi-assignment of segments/hits.
     void resolveSegments(AList<TTrack> & tracks) const;
@@ -311,39 +311,39 @@ class TConformalFinder : public TFinderBase {
     void removeUsedSegments(const AList<TTrack> & tracks);
 
     /// deletes a track.
-    void deleteTrack(TTrack &) const;
+    void deleteTrack(TTrack&) const;
 
     /// re-calculate TLinks.
     void updateTLinks(AList<TTrack> & tracks);
 
     /// Utility functions
     int crossPointsInConformal(const AList<TSegment> &,
-			       HepGeom::Point3D<double> points[12]) const;
+                               HepGeom::Point3D<double> points[12]) const;
     AList<TSegment> pickUpSegments(const TPoint2D p[12],
-				   float loadWidth,
-				   unsigned axialStereo) const;
+                                   float loadWidth,
+                                   unsigned axialStereo) const;
     AList<TSegment> pickUpSegmentsInConformal(float phi[12],
-					      float loadWidth,
-					      unsigned axialStereo) const;
+                                              float loadWidth,
+                                              unsigned axialStereo) const;
     AList<TLink> pickUpLinks(const TPoint2D p[12],
-			     float loadWidth,
-			     unsigned axialStereo) const;
+                             float loadWidth,
+                             unsigned axialStereo) const;
     AList<TLink> pickUpLinksInConformal(float phi[12],
-					float loadWidth,
-					unsigned axialStereo) const;
-    AList<TLink> trackSide(const TTrack &, const AList<TLink> &) const;
-    AList<TSegment> trackSide(const TTrack &, const AList<TSegment> &) const;
-    bool quality2D(TTrack & t, unsigned level) const;
-    TSegment * link(const TSegment & seed,
-		    const HepGeom::Point3D<double> & p,
-		    const Vector3D & v,
-		    const AList<TSegment> & candidates,
-		    AList<TSegment> & alternatives,
-		    unsigned level) const;
-    Vector3D direction(const TSegment &) const;
+                                        float loadWidth,
+                                        unsigned axialStereo) const;
+    AList<TLink> trackSide(const TTrack&, const AList<TLink> &) const;
+    AList<TSegment> trackSide(const TTrack&, const AList<TSegment> &) const;
+    bool quality2D(TTrack& t, unsigned level) const;
+    TSegment* link(const TSegment& seed,
+                   const HepGeom::Point3D<double> & p,
+                   const Vector3D& v,
+                   const AList<TSegment> & candidates,
+                   AList<TSegment> & alternatives,
+                   unsigned level) const;
+    Vector3D direction(const TSegment&) const;
 
   public:// Utility functions
-    static const Belle2::TRGCDCWire * conformal2Wire(const HepGeom::Point3D<double> & conformalPoint);
+    static const Belle2::TRGCDCWire* conformal2Wire(const HepGeom::Point3D<double> & conformalPoint);
 
   private:// Parameters given by arguments
     const bool _fastFinder;
@@ -383,42 +383,42 @@ class TConformalFinder : public TFinderBase {
     AList<TTrack> _3DTracks;
 
     struct summary {
-	unsigned _nEvents;
-	unsigned _nTracksFast3D;
-	unsigned _nTracksSlow3D;
-	unsigned _nTracksFast2D;
-	unsigned _nTracksSlow2D;
-	unsigned _nTracksFast2DBadQuality;
-	unsigned _nTracksSlow2DBadQuality;
-	unsigned _dummy;
+      unsigned _nEvents;
+      unsigned _nTracksFast3D;
+      unsigned _nTracksSlow3D;
+      unsigned _nTracksFast2D;
+      unsigned _nTracksSlow2D;
+      unsigned _nTracksFast2DBadQuality;
+      unsigned _nTracksSlow2DBadQuality;
+      unsigned _dummy;
     };
-    struct summary * _s;
+    struct summary* _s;
 
 #ifdef TRASAN_WINDOW
   private:
     mutable TWindow _rphiWindow;
 
   public:
-    void displayStatus(const std::string & message) const;
+    void displayStatus(const std::string& message) const;
     void displayAppendSegments(const AList<TSegment> a[2][6],
-			       leda_color =leda_black) const;
+                               leda_color = leda_black) const;
     void displayTracks(const AList<TTrack> &,
-		       const AList<TSegment> seg[2][6],
-		       const std::string & text) const;
+                       const AList<TSegment> seg[2][6],
+                       const std::string& text) const;
 #endif
 #ifdef TRASAN_WINDOW_GTK
   private:
 //    mutable TWindowGTK _cw;
 
   public:
-    void displayStatus(const std::string & message) const;
+    void displayStatus(const std::string& message) const;
 //     void displayAppendSegments(const AList<TSegment> a[2][6],
-// 			       leda_color =leda_black) const;
+//             leda_color =leda_black) const;
 //     void displayTracks(const AList<TTrack> &,
-// 		       const AList<TSegment> seg[2][6],
-// 		       const std::string & text) const;
+//           const AList<TSegment> seg[2][6],
+//           const std::string & text) const;
 #endif
-};
+  };
 
 //-----------------------------------------------------------------------------
 
@@ -431,29 +431,33 @@ class TConformalFinder : public TFinderBase {
 
 #ifdef TConformalFinder_INLINE_DEFINE_HERE
 
-inline
-std::string
-TConformalFinder::name(void) const {
+  inline
+  std::string
+  TConformalFinder::name(void) const
+  {
     return "Conformal Finder";
-}
+  }
 
-inline
-bool
-TConformalFinder::doT0Reset(bool a) {
+  inline
+  bool
+  TConformalFinder::doT0Reset(bool a)
+  {
     return _doT0Reset = a;
-}
+  }
 
-inline
-bool
-TConformalFinder::T0ResetDone(void) const {
+  inline
+  bool
+  TConformalFinder::T0ResetDone(void) const
+  {
     return _T0ResetDone;
-}
+  }
 
-inline
-void
-TConformalFinder::init(void) {
+  inline
+  void
+  TConformalFinder::init(void)
+  {
     return;
-}
+  }
 
 #endif
 

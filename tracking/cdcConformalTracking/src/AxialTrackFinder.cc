@@ -337,10 +337,10 @@ vector<CDCTrackCandidate> AxialTrackFinder:: FindTrackCandidates(vector<CDCSegme
 }
 
 
-void AxialTrackFinder::FitTrackCandidate(CDCTrackCandidate & candidate)
+void AxialTrackFinder::FitTrackCandidate(CDCTrackCandidate& candidate)
 {
 
-  TGraph * graph;
+  TGraph* graph;
   double x[100];
   double y[100];
   int nHits = candidate.getNHits(); //Nr of hits in a track
@@ -364,7 +364,7 @@ void AxialTrackFinder::FitTrackCandidate(CDCTrackCandidate & candidate)
 
   //Fit the conformal coordinates with simple linear fit
   graph->Fit("pol1", "Q", "", min, max);
-  TF1 *fit = graph->GetFunction("pol1");
+  TF1* fit = graph->GetFunction("pol1");
 
   double Chi = fit->GetChisquare();
 

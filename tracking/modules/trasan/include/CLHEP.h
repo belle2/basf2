@@ -11,7 +11,7 @@
 #ifndef BELLE_CLHEP_CLHEP_H
 #define BELLE_CLHEP_CLHEP_H
 
-//iw 
+//iw
 #if defined(BELLE_CLHEP_TARGET_H)
 #include BELLE_CLHEP_TARGET_H
 #else
@@ -26,26 +26,26 @@ namespace Belle {
 // CLASSDOC OFF
 // **** You should probably not touch anything below this line: ****
 
-typedef double HepDouble;
-typedef int    HepInt;
-typedef float  HepFloat;
+  typedef double HepDouble;
+  typedef int    HepInt;
+  typedef float  HepFloat;
 
-typedef bool HepBoolean;
+  typedef bool HepBoolean;
 
 #ifdef HEP_SHORT_NAMES
-typedef HepBoolean Boolean;
+  typedef HepBoolean Boolean;
 #endif
 
 #ifndef M_PI_4
-#define M_PI_4	0.78539816339744830962
+#define M_PI_4  0.78539816339744830962
 #endif
 
 #ifndef M_PI_2
-#define M_PI_2	1.57079632679489661923
+#define M_PI_2  1.57079632679489661923
 #endif
 
 #ifndef M_PI
-#define M_PI	3.14159265358979323846
+#define M_PI  3.14159265358979323846
 #endif
 
 #ifndef M_2PI
@@ -53,31 +53,34 @@ typedef HepBoolean Boolean;
 #endif
 
 #ifndef M_1_PI
-#define M_1_PI	0.31830988618379067154
+#define M_1_PI  0.31830988618379067154
 #endif
 
 
 
 #ifndef CLHEP_SQR_DEFINED
 #define CLHEP_SQR_DEFINED
-template <class T>
-inline T sqr(const T& x) {
-  return x*x;
-}
+  template <class T>
+  inline T sqr(const T& x)
+  {
+    return x * x;
+  }
 #endif
 
 #ifndef CLHEP_ABS_DEFINED
 #define CLHEP_ABS_DEFINED
 #ifndef HEP_ABS_NEEDS_PARAMETER_WITHOUT_CONST
-template <class T>
-inline T abs(const T& a) {
-  return a < 0 ? -a : a;
-}
+  template <class T>
+  inline T abs(const T& a)
+  {
+    return a < 0 ? -a : a;
+  }
 #else
-template <class T>
-inline T abs(T a) {
-  return a < 0 ? -a : a;
-}
+  template <class T>
+  inline T abs(T a)
+  {
+    return a < 0 ? -a : a;
+  }
 #endif /* HEP_ABS_NEEDS_PARAMETER_WITHOUT_CONST */
 #endif
 

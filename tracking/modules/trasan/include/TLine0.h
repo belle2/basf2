@@ -83,7 +83,7 @@
 namespace Belle {
 
 /// A class to represent a track in tracking.
-class TLine0 : public TTrackBase {
+  class TLine0 : public TTrackBase {
 
   public:
     /// Constructor.
@@ -100,8 +100,8 @@ class TLine0 : public TTrackBase {
     virtual unsigned objectType(void) const;
 
     /// dumps debug information.
-    void dump(const std::string & message = std::string(""),
-	      const std::string & prefix = std::string("")) const;
+    void dump(const std::string& message = std::string(""),
+              const std::string& prefix = std::string("")) const;
 
     /// returns coefficient a.
     double a(void) const;
@@ -117,7 +117,7 @@ class TLine0 : public TTrackBase {
 
   public:// Utilities
     /// returns distance to a position of TLink itself. (not to a wire)
-    double distance(const TLink &) const;
+    double distance(const TLink&) const;
 
   public:// Modifiers
     /// fits itself. Error was happened if return value is not zero.
@@ -141,13 +141,13 @@ class TLine0 : public TTrackBase {
     /// remove bad points by chi2. Bad points are returned in a 'list'. fit() should be called before calling this function.
     void refine(AList<TLink> & list, float maxSigma);
 
-    /// 
+    ///
     void removeSLY(AList<TLink> & list);
 
-    /// 
+    ///
     void appendSLY(AList<TLink> & list);
 
-    /// 
+    ///
     void appendByszdistance(AList<TLink> & list, unsigned isl, float maxSigma);
 
     /// sets circle properties.
@@ -165,7 +165,7 @@ class TLine0 : public TTrackBase {
   private:// Updated when fitted and accessed
     mutable double _chi2;
     mutable double _reducedChi2;
-};
+  };
 
 //-----------------------------------------------------------------------------
 
@@ -178,48 +178,53 @@ class TLine0 : public TTrackBase {
 
 #ifdef TLine0_INLINE_DEFINE_HERE
 
-inline
-double
-TLine0::a(void) const {
+  inline
+  double
+  TLine0::a(void) const
+  {
 #ifdef TRASAN_DEBUG
     if (! _fitted) std::cout << "TLine0::a !!! fit not performed" << std::endl;
 #endif
     return _a;
-}
+  }
 
-inline
-double
-TLine0::b(void) const {
+  inline
+  double
+  TLine0::b(void) const
+  {
 #ifdef TRASAN_DEBUG
     if (! _fitted) std::cout << "TLine0::b !!! fit not performed" << std::endl;
 #endif
     return _b;
-}
+  }
 
-inline
-double
-TLine0::distance(const TLink & l) const {
+  inline
+  double
+  TLine0::distance(const TLink& l) const
+  {
 #ifdef TRASAN_DEBUG
     if (! _fitted) std::cout << "TLine0::distance !!! fit not performed" << std::endl;
 #endif
     double dy = fabs(_a * l.position().x() + _b - l.position().y());
     double invCos = sqrt(1. + _a * _a);
     return dy / invCos;
-}
+  }
 
-inline
-void
-TLine0::property(double a, double b, double det) {
+  inline
+  void
+  TLine0::property(double a, double b, double det)
+  {
     _a = a;
     _b = b;
     _det = det;
-}
+  }
 
-inline
-unsigned
-TLine0::objectType(void) const {
+  inline
+  unsigned
+  TLine0::objectType(void) const
+  {
     return Line;
-}
+  }
 
 #endif
 

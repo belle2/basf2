@@ -21,7 +21,7 @@ geo = register_module('Geometry')
 # Outer detectors are disabled for performance reasons.
 # Note that this may produce a larger number of particles reentering
 # the detector from the outside.
-geo.param("ExcludedComponents", ["TOP", "ECL", "BKLM", "EKLM"])
+geo.param('ExcludedComponents', ['TOP', 'ECL', 'BKLM', 'EKLM'])
 
 # particle gun to shoot particles in the detector
 pGun = register_module('ParticleGun')
@@ -60,7 +60,6 @@ cdcDigitizer.param(param_cdcdigi)
 
 pxd_digi = register_module('PXDDigitizer')
 
-
 # find MCTracks
 mctrackfinder = register_module('MCTrackFinder')
 
@@ -82,7 +81,6 @@ param_cdcfitting = {
     'ProbCut': 0.001,
     }
 genfitter.param(param_cdcfitting)
-
 
 # Add modules to main path
 main.add_module(evtmetagen)
@@ -115,7 +113,7 @@ display = register_module('TrackingDisplay')
 #
 # Note that you can always turn off an individual detector component or track
 # interactively by removing its checkmark in the 'Eve' tab.
-display.param('Options', "MHTGR")  # default
+display.param('Options', 'MHTGR')  # default
 
 # show all SimHits (default)
 display.param('AddPXDHits', True)

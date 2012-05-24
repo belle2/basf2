@@ -43,17 +43,17 @@
 
 namespace Belle {
 
-template <class T> class AList;
+  template <class T> class AList;
 
 /// A class to find tracks using MC info.
-class TPerfectFinder : public TFinderBase {
+  class TPerfectFinder : public TFinderBase {
 
   public:
     /// Constructor.
     TPerfectFinder(int perfectFitting,
-		   float maxSigma,
-		   float maxSigmaStereo,
-		   unsigned fittingFlag);
+                   float maxSigma,
+                   float maxSigmaStereo,
+                   unsigned fittingFlag);
 
     /// Destructor
     virtual ~TPerfectFinder();
@@ -66,8 +66,8 @@ class TPerfectFinder : public TFinderBase {
     std::string version(void) const;
 
     /// dumps debug information.
-    void dump(const std::string & message = std::string(""),
-	      const std::string & prefix = std::string("")) const;
+    void dump(const std::string& message = std::string(""),
+              const std::string& prefix = std::string("")) const;
 
     /// gets perfect momentum from MC info.
     bool perfectFitting(bool);
@@ -81,9 +81,9 @@ class TPerfectFinder : public TFinderBase {
 
     /// finds tracks.
     int doit(const CAList<Belle2::TRGCDCWireHit> & axialHits,
-	     const CAList<Belle2::TRGCDCWireHit> & stereoHits,
-	     AList<TTrack> & tracks,
-	     AList<TTrack> & tracks2D);
+             const CAList<Belle2::TRGCDCWireHit> & stereoHits,
+             AList<TTrack> & tracks,
+             AList<TTrack> & tracks2D);
 
   private:
     float charge(int pType) const;
@@ -96,7 +96,7 @@ class TPerfectFinder : public TFinderBase {
     unsigned _fittingFlag;
     TBuilder _builder;
     THelixFitter _fitter;
-};
+  };
 
 //-----------------------------------------------------------------------------
 
@@ -109,23 +109,26 @@ class TPerfectFinder : public TFinderBase {
 
 #ifdef TPERFECTFINDER_INLINE_DEFINE_HERE
 
-inline
-std::string
-TPerfectFinder::name(void) const {
+  inline
+  std::string
+  TPerfectFinder::name(void) const
+  {
     return "Perfect Finder";
-}
+  }
 
-inline
-bool
-TPerfectFinder::perfectFitting(bool a) {
+  inline
+  bool
+  TPerfectFinder::perfectFitting(bool a)
+  {
     return _perfectFitting = a;
-}
+  }
 
-inline
-void
-TPerfectFinder::init(void) {
+  inline
+  void
+  TPerfectFinder::init(void)
+  {
     return;
-}
+  }
 
 #endif
 

@@ -11,7 +11,7 @@ namespace Belle2 {
   struct RegionOfInterest {
 
     RegionOfInterest(double widthStart, double widthEnd, double lengthStart, double lengthEnd) :
-        widthStart(widthStart), widthEnd(widthEnd), lengthStart(lengthStart), lengthEnd(lengthEnd) {};
+      widthStart(widthStart), widthEnd(widthEnd), lengthStart(lengthStart), lengthEnd(lengthEnd) {};
 
     double widthStart;
     double widthEnd;

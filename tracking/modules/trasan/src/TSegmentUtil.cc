@@ -203,387 +203,387 @@ namespace Belle {
 #endif
 
 
-unsigned 
-CDCSegId(unsigned localId,
-	 unsigned layerId,
-	 unsigned & segId0,
-	 unsigned & segId1)
-{
-  segId1 = 9999;
-  if(layerId == 0 ||
-     layerId == 2 ||
-     layerId == 4
-     ){
-    segId0 = unsigned(localId/2.0);
-    return 1;
-  }else if(layerId ==  9 ||
-           layerId == 11 ||
-           layerId == 13
-           ){
-    segId0 = unsigned(localId/3.0);
-    return 1;
-  }else if(layerId == 18 ||
-           layerId == 20 ||
-           layerId == 22
-           ){
-    segId0 = unsigned(localId/4.5);
-    return 1;
-  }else if(layerId == 27 ||
-           layerId == 29 ||
-           layerId == 31
-           ){
-    segId0 = unsigned(localId/6.0);
-    return 1;
-  }else if(layerId == 36 ||
-           layerId == 38 ||
-           layerId == 40
-           ){
-    segId0 = unsigned(localId/7.5);
-    return 1;
-  }else if(layerId == 45 ||
-           layerId == 47 ||
-           layerId == 49
-           ){
-    segId0 = unsigned(localId/9.0);
-    return 1;
-  }else if(layerId == 1 ||
-           layerId == 3 ||
-           layerId == 5
-          ){
-    if(localId == 0){
-      segId0 = unsigned(localId/2.0);
-      segId1 = unsigned(63/2.0);
-      return 2;
-    }else{
-      segId0 = unsigned(localId/2.0);
-      segId1 = unsigned((localId-1)/2.0);
-      if(segId0 == segId1){
-        segId1 = 9999;
-        return 1;
-      }else return 2;
+  unsigned
+  CDCSegId(unsigned localId,
+           unsigned layerId,
+           unsigned& segId0,
+           unsigned& segId1)
+  {
+    segId1 = 9999;
+    if (layerId == 0 ||
+        layerId == 2 ||
+        layerId == 4
+       ) {
+      segId0 = unsigned(localId / 2.0);
+      return 1;
+    } else if (layerId ==  9 ||
+               layerId == 11 ||
+               layerId == 13
+              ) {
+      segId0 = unsigned(localId / 3.0);
+      return 1;
+    } else if (layerId == 18 ||
+               layerId == 20 ||
+               layerId == 22
+              ) {
+      segId0 = unsigned(localId / 4.5);
+      return 1;
+    } else if (layerId == 27 ||
+               layerId == 29 ||
+               layerId == 31
+              ) {
+      segId0 = unsigned(localId / 6.0);
+      return 1;
+    } else if (layerId == 36 ||
+               layerId == 38 ||
+               layerId == 40
+              ) {
+      segId0 = unsigned(localId / 7.5);
+      return 1;
+    } else if (layerId == 45 ||
+               layerId == 47 ||
+               layerId == 49
+              ) {
+      segId0 = unsigned(localId / 9.0);
+      return 1;
+    } else if (layerId == 1 ||
+               layerId == 3 ||
+               layerId == 5
+              ) {
+      if (localId == 0) {
+        segId0 = unsigned(localId / 2.0);
+        segId1 = unsigned(63 / 2.0);
+        return 2;
+      } else {
+        segId0 = unsigned(localId / 2.0);
+        segId1 = unsigned((localId - 1) / 2.0);
+        if (segId0 == segId1) {
+          segId1 = 9999;
+          return 1;
+        } else return 2;
+      }
+    } else if (layerId == 10 ||
+               layerId == 12 ||
+               layerId == 14
+              ) {
+      if (localId == 0) {
+        segId0 = unsigned(localId / 3.0);
+        segId1 = unsigned(95 / 3.0);
+        return 2;
+      } else {
+        segId0 = unsigned(localId / 3.0);
+        segId1 = unsigned((localId - 1) / 3.0);
+        if (segId0 == segId1) {
+          segId1 = 9999;
+          return 1;
+        } else return 2;
+      }
+    } else if (layerId == 19 ||
+               layerId == 21
+              ) {
+      if (localId == 0) {
+        segId0 = unsigned(localId / 4.5);
+        segId1 = unsigned(143 / 4.5);
+        return 2;
+      } else {
+        segId0 = unsigned(localId / 4.5);
+        segId1 = unsigned((localId - 1) / 4.5);
+        if (segId0 == segId1) {
+          segId1 = 9999;
+          return 1;
+        } else return 2;
+      }
+    } else if (layerId == 28 ||
+               layerId == 30
+              ) {
+      if (localId == 0) {
+        segId0 = unsigned(localId / 6.0);
+        segId1 = unsigned(191 / 6.0);
+        return 2;
+      } else {
+        segId0 = unsigned(localId / 6.0);
+        segId1 = unsigned((localId - 1) / 6.0);
+        if (segId0 == segId1) {
+          segId1 = 9999;
+          return 1;
+        } else return 2;
+      }
+    } else if (layerId == 37 ||
+               layerId == 39
+              ) {
+      if (localId == 0) {
+        segId0 = unsigned(localId / 7.5);
+        segId1 = unsigned(239 / 7.5);
+        return 2;
+      } else {
+        segId0 = unsigned(localId / 7.5);
+        segId1 = unsigned((localId - 1) / 7.5);
+        if (segId0 == segId1) {
+          segId1 = 9999;
+          return 1;
+        } else return 2;
+      }
+    } else if (layerId == 46 ||
+               layerId == 48
+              ) {
+      if (localId == 0) {
+        segId0 = unsigned(localId / 9.0);
+        segId1 = unsigned(287 / 9.0);
+        return 2;
+      } else {
+        segId0 = unsigned(localId / 9.0);
+        segId1 = unsigned((localId - 1) / 9.0);
+        if (segId0 == segId1) {
+          segId1 = 9999;
+          return 1;
+        } else return 2;
+      }
     }
-  }else if(layerId == 10 ||
-           layerId == 12 ||
-           layerId == 14
-          ){
-    if(localId == 0){
-      segId0 = unsigned(localId/3.0);
-      segId1 = unsigned(95/3.0);
-      return 2;
-    }else{
-      segId0 = unsigned(localId/3.0);
-      segId1 = unsigned((localId-1)/3.0);
-      if(segId0 == segId1){
-        segId1 = 9999;
-        return 1;
-      }else return 2;
-    }
-  }else if(layerId == 19 ||
-           layerId == 21
-           ){
-    if(localId == 0){
-      segId0 = unsigned(localId/4.5);
-      segId1 = unsigned(143/4.5);
-      return 2;
-    }else{
-      segId0 = unsigned(localId/4.5);
-      segId1 = unsigned((localId-1)/4.5);
-      if(segId0 == segId1){
-        segId1 = 9999;
-        return 1;
-      }else return 2;
-    }
-  }else if(layerId == 28 ||
-           layerId == 30
-           ){
-    if(localId == 0){
-      segId0 = unsigned(localId/6.0);
-      segId1 = unsigned(191/6.0);
-      return 2;
-    }else{
-      segId0 = unsigned(localId/6.0);
-      segId1 = unsigned((localId-1)/6.0);
-      if(segId0 == segId1){
-        segId1 = 9999;
-        return 1;
-      }else return 2;
-    }
-  }else if(layerId == 37 ||
-           layerId == 39
-           ){
-    if(localId == 0){
-      segId0 = unsigned(localId/7.5);
-      segId1 = unsigned(239/7.5);
-      return 2;
-    }else{
-      segId0 = unsigned(localId/7.5);
-      segId1 = unsigned((localId-1)/7.5);
-      if(segId0 == segId1){
-        segId1 = 9999;
-        return 1;
-      }else return 2;
-    }
-  }else if(layerId == 46 ||
-           layerId == 48
-           ){
-    if(localId == 0){
-      segId0 = unsigned(localId/9.0);
-      segId1 = unsigned(287/9.0);
-      return 2;
-    }else{
-      segId0 = unsigned(localId/9.0);
-      segId1 = unsigned((localId-1)/9.0);
-      if(segId0 == segId1){
-        segId1 = 9999;
-        return 1;
-      }else return 2;
-    }
+    return 0;
   }
-  return 0;
-}
 
-unsigned 
-CDCSegLayerId(unsigned id) // CDC Global Wire ID
-{
-  if      (id < 192)  return 0;
-  else if (id < 384)  return 1;
-  else if (id < 624)  return 9999;
-  else if (id < 912)  return 2;
-  else if (id < 1200) return 3;  
-  else if (id < 1584) return 9999;
-  else if (id < 2304) return 4;
-  else if (id < 2944) return 9999;
-  else if (id < 3904) return 5;
-  else if (id < 4736) return 9999;
-  else if (id < 5936) return 6;
-  else if (id < 6960) return 9999;
-  else if (id < 8400) return 7;
-  else return 9999;    
-}
-
-unsigned 
-CDCSuperLayerId(unsigned id) // CDC Global Wire ID
-{
-  if      (id < 192)  return 0;
-  else if (id < 384)  return 0;
-  else if (id < 624)  return 9999;
-  else if (id < 912)  return 1;
-  else if (id < 1200) return 1;  
-  else if (id < 1584) return 9999;
-  else if (id < 2304) return 2;
-  else if (id < 2944) return 9999;
-  else if (id < 3904) return 3;
-  else if (id < 4736) return 9999;
-  else if (id < 5936) return 4;
-  else if (id < 6960) return 9999;
-  else if (id < 8400) return 5;
-  else return 9999;    
-}
-
-int
-CDCMovedSegId(unsigned refSegId,
-	      unsigned segId,
-	      unsigned segLayerId,
-	      unsigned type)
-{
-  int movedSegId = 9999;
-  if(type == 0){ // CDC SuperLayer = 0
-    movedSegId = (int)segId-(int)refSegId;
-    if(segLayerId >= 6)
-      movedSegId = 9999;
-    else if(segLayerId == 0 && abs(movedSegId) >= 5)
-      movedSegId = 9999;
-    else if(segLayerId == 1 && abs(movedSegId) >= 5)
-      movedSegId = 9999;
-    else if(segLayerId == 2 && abs(movedSegId) >= 4)
-      movedSegId = 9999;
-    else if(segLayerId == 3 && abs(movedSegId) >= 6)
-      movedSegId = 9999;
-    else if(segLayerId == 4 && abs(movedSegId) >= 6)
-      movedSegId = 9999;
-    else if(segLayerId == 4 && abs(movedSegId) == 0)
-      movedSegId = 9999;
-    else if(segLayerId == 5 && abs(movedSegId) >= 6)
-      movedSegId = 9999;
-    else if(segLayerId == 5 && abs(movedSegId) <= 1)
-      movedSegId = 9999;
-  }else if(type == 1){ // CDC SuperLayer = 1
-    movedSegId = (int)segId-(int)refSegId;
-    if(segLayerId >= 6)
-      movedSegId = 9999;
-    else if(segLayerId == 0 && abs(movedSegId) >= 5)
-      movedSegId = 9999;
-    else if(segLayerId == 1 && abs(movedSegId) >= 5)
-      movedSegId = 9999;
-    else if(segLayerId == 2 && abs(movedSegId) >= 4)
-      movedSegId = 9999;
-    else if(segLayerId == 3 && abs(movedSegId) >= 6)
-      movedSegId = 9999;
-    else if(segLayerId == 4 && abs(movedSegId) >= 6)
-      movedSegId = 9999;
-    else if(segLayerId == 4 && abs(movedSegId) == 0)
-      movedSegId = 9999;
-    else if(segLayerId == 5 && abs(movedSegId) >= 6)
-      movedSegId = 9999;
-    else if(segLayerId == 5 && abs(movedSegId) <= 1)
-      movedSegId = 9999;
-  }else if(type == 2){ // SVD
-    movedSegId = (int)segId-(int)(0.5*(double)refSegId);
-    if(segLayerId >= 6)
-      movedSegId = 9999;
-    else if(segLayerId == 0 && abs(movedSegId) >= 2)
-      movedSegId = 9999;
-    else if(segLayerId == 1 && abs(movedSegId) >= 4)
-      movedSegId = 9999;
-    else if(segLayerId == 2 && abs(movedSegId) >= 6)
-      movedSegId = 9999;
-    else if(segLayerId == 2 && movedSegId == 0)
-      movedSegId = 9999;
-    else if(segLayerId == 3 && abs(movedSegId) >= 7)
-      movedSegId = 9999;
-    else if(segLayerId == 3 && movedSegId == 0)
-      movedSegId = 9999;
-    else if(segLayerId == 4 && abs(movedSegId) >= 7)
-      movedSegId = 9999;
-    else if(segLayerId == 4 && abs(movedSegId) <= 1)
-      movedSegId = 9999;
-    else if(segLayerId == 5 && abs(movedSegId) >= 7)
-      movedSegId = 9999;
-    else if(segLayerId == 5 && abs(movedSegId) <= 2)
-      movedSegId = 9999;
+  unsigned
+  CDCSegLayerId(unsigned id) // CDC Global Wire ID
+  {
+    if (id < 192)  return 0;
+    else if (id < 384)  return 1;
+    else if (id < 624)  return 9999;
+    else if (id < 912)  return 2;
+    else if (id < 1200) return 3;
+    else if (id < 1584) return 9999;
+    else if (id < 2304) return 4;
+    else if (id < 2944) return 9999;
+    else if (id < 3904) return 5;
+    else if (id < 4736) return 9999;
+    else if (id < 5936) return 6;
+    else if (id < 6960) return 9999;
+    else if (id < 8400) return 7;
+    else return 9999;
   }
-  return movedSegId;
-}
 
-int
-CDCMovedSegId2(unsigned refSegId,
-	       unsigned segId,
-	       unsigned,
-	       unsigned type)
-{
-  // wide region version
-  // This is used in mapping test.
-  int movedSegId = 9999;
-  if(type == 0){ // CDC SuperLayer = 0
-    movedSegId = (int)segId-(int)refSegId;
-    if(abs(movedSegId) >= 15)movedSegId = 9999;
-  }else if(type == 1){ // CDC SuperLayer = 1
-    movedSegId = (int)segId-(int)refSegId;
-    if(abs(movedSegId) >= 15)movedSegId = 9999;
-  }else if(type == 2){ // SVD
-    movedSegId = (int)segId-(int)(0.5*(double)refSegId);
-    if(abs(movedSegId) >= 15)movedSegId = 9999;
+  unsigned
+  CDCSuperLayerId(unsigned id) // CDC Global Wire ID
+  {
+    if (id < 192)  return 0;
+    else if (id < 384)  return 0;
+    else if (id < 624)  return 9999;
+    else if (id < 912)  return 1;
+    else if (id < 1200) return 1;
+    else if (id < 1584) return 9999;
+    else if (id < 2304) return 2;
+    else if (id < 2944) return 9999;
+    else if (id < 3904) return 3;
+    else if (id < 4736) return 9999;
+    else if (id < 5936) return 4;
+    else if (id < 6960) return 9999;
+    else if (id < 8400) return 5;
+    else return 9999;
   }
-  return movedSegId;
-}
 
-unsigned 
-SVDSegLayerId(unsigned id)
-{
-  if(id < 16)return 0;
-  else if(id < 46)return 1;
-  else if(id < 102)return 2;
-  else return 9999;
-}
+  int
+  CDCMovedSegId(unsigned refSegId,
+                unsigned segId,
+                unsigned segLayerId,
+                unsigned type)
+  {
+    int movedSegId = 9999;
+    if (type == 0) { // CDC SuperLayer = 0
+      movedSegId = (int)segId - (int)refSegId;
+      if (segLayerId >= 6)
+        movedSegId = 9999;
+      else if (segLayerId == 0 && abs(movedSegId) >= 5)
+        movedSegId = 9999;
+      else if (segLayerId == 1 && abs(movedSegId) >= 5)
+        movedSegId = 9999;
+      else if (segLayerId == 2 && abs(movedSegId) >= 4)
+        movedSegId = 9999;
+      else if (segLayerId == 3 && abs(movedSegId) >= 6)
+        movedSegId = 9999;
+      else if (segLayerId == 4 && abs(movedSegId) >= 6)
+        movedSegId = 9999;
+      else if (segLayerId == 4 && abs(movedSegId) == 0)
+        movedSegId = 9999;
+      else if (segLayerId == 5 && abs(movedSegId) >= 6)
+        movedSegId = 9999;
+      else if (segLayerId == 5 && abs(movedSegId) <= 1)
+        movedSegId = 9999;
+    } else if (type == 1) { // CDC SuperLayer = 1
+      movedSegId = (int)segId - (int)refSegId;
+      if (segLayerId >= 6)
+        movedSegId = 9999;
+      else if (segLayerId == 0 && abs(movedSegId) >= 5)
+        movedSegId = 9999;
+      else if (segLayerId == 1 && abs(movedSegId) >= 5)
+        movedSegId = 9999;
+      else if (segLayerId == 2 && abs(movedSegId) >= 4)
+        movedSegId = 9999;
+      else if (segLayerId == 3 && abs(movedSegId) >= 6)
+        movedSegId = 9999;
+      else if (segLayerId == 4 && abs(movedSegId) >= 6)
+        movedSegId = 9999;
+      else if (segLayerId == 4 && abs(movedSegId) == 0)
+        movedSegId = 9999;
+      else if (segLayerId == 5 && abs(movedSegId) >= 6)
+        movedSegId = 9999;
+      else if (segLayerId == 5 && abs(movedSegId) <= 1)
+        movedSegId = 9999;
+    } else if (type == 2) { // SVD
+      movedSegId = (int)segId - (int)(0.5 * (double)refSegId);
+      if (segLayerId >= 6)
+        movedSegId = 9999;
+      else if (segLayerId == 0 && abs(movedSegId) >= 2)
+        movedSegId = 9999;
+      else if (segLayerId == 1 && abs(movedSegId) >= 4)
+        movedSegId = 9999;
+      else if (segLayerId == 2 && abs(movedSegId) >= 6)
+        movedSegId = 9999;
+      else if (segLayerId == 2 && movedSegId == 0)
+        movedSegId = 9999;
+      else if (segLayerId == 3 && abs(movedSegId) >= 7)
+        movedSegId = 9999;
+      else if (segLayerId == 3 && movedSegId == 0)
+        movedSegId = 9999;
+      else if (segLayerId == 4 && abs(movedSegId) >= 7)
+        movedSegId = 9999;
+      else if (segLayerId == 4 && abs(movedSegId) <= 1)
+        movedSegId = 9999;
+      else if (segLayerId == 5 && abs(movedSegId) >= 7)
+        movedSegId = 9999;
+      else if (segLayerId == 5 && abs(movedSegId) <= 2)
+        movedSegId = 9999;
+    }
+    return movedSegId;
+  }
 
-unsigned 
-SVDSegId(double x,
-         double y,
-         unsigned & segId0,
-         unsigned & segId1)
-{
+  int
+  CDCMovedSegId2(unsigned refSegId,
+                 unsigned segId,
+                 unsigned,
+                 unsigned type)
+  {
+    // wide region version
+    // This is used in mapping test.
+    int movedSegId = 9999;
+    if (type == 0) { // CDC SuperLayer = 0
+      movedSegId = (int)segId - (int)refSegId;
+      if (abs(movedSegId) >= 15)movedSegId = 9999;
+    } else if (type == 1) { // CDC SuperLayer = 1
+      movedSegId = (int)segId - (int)refSegId;
+      if (abs(movedSegId) >= 15)movedSegId = 9999;
+    } else if (type == 2) { // SVD
+      movedSegId = (int)segId - (int)(0.5 * (double)refSegId);
+      if (abs(movedSegId) >= 15)movedSegId = 9999;
+    }
+    return movedSegId;
+  }
+
+  unsigned
+  SVDSegLayerId(unsigned id)
+  {
+    if (id < 16)return 0;
+    else if (id < 46)return 1;
+    else if (id < 102)return 2;
+    else return 9999;
+  }
+
+  unsigned
+  SVDSegId(double x,
+           double y,
+           unsigned& segId0,
+           unsigned& segId1)
+  {
 #if 1
-  // OFFSET = OFF
-  double phi = atan2(y,x);
-  if(phi < 0.)phi += 2.*M_PI;
-  const double PHI = M_PI/32.0;    // 2pi/64
-  segId0 = unsigned(phi/PHI);
+    // OFFSET = OFF
+    double phi = atan2(y, x);
+    if (phi < 0.)phi += 2.*M_PI;
+    const double PHI = M_PI / 32.0;  // 2pi/64
+    segId0 = unsigned(phi / PHI);
 
-  const double dPHI = M_PI/256.0; // 2pi/64/8
-  if(phi-dPHI >= 0.)segId1 = unsigned((phi-dPHI)/PHI);
-  else segId1 = unsigned((2.*M_PI+phi-dPHI)/PHI);
-  if(segId1 != segId0)return 2;
-  if(phi-dPHI < 2.*M_PI)segId1 = unsigned((phi+dPHI)/PHI);
-  else segId1 = unsigned((phi+dPHI-2.*M_PI)/PHI);
-  if(segId1 != segId0)return 2;
-  segId1 = 9999;
-  return 1;
+    const double dPHI = M_PI / 256.0; // 2pi/64/8
+    if (phi - dPHI >= 0.)segId1 = unsigned((phi - dPHI) / PHI);
+    else segId1 = unsigned((2.*M_PI + phi - dPHI) / PHI);
+    if (segId1 != segId0)return 2;
+    if (phi - dPHI < 2.*M_PI)segId1 = unsigned((phi + dPHI) / PHI);
+    else segId1 = unsigned((phi + dPHI - 2.*M_PI) / PHI);
+    if (segId1 != segId0)return 2;
+    segId1 = 9999;
+    return 1;
 #else
-  // OFFSET = ON
-  double phi = atan2(y,x);
-  if(phi < 0.)phi += 2.*M_PI;
-  const double PHI = M_PI/32.0;    // 2pi/64
-  const double offPHI = M_PI/64.0; // 2pi/128
-  phi -= offPHI;
-  if(phi >= 0.)segId0 = unsigned(phi/PHI);
-  else{
-    phi += 2.*M_PI;
-    segId0 = unsigned(phi/PHI);
-  }
+    // OFFSET = ON
+    double phi = atan2(y, x);
+    if (phi < 0.)phi += 2.*M_PI;
+    const double PHI = M_PI / 32.0;  // 2pi/64
+    const double offPHI = M_PI / 64.0; // 2pi/128
+    phi -= offPHI;
+    if (phi >= 0.)segId0 = unsigned(phi / PHI);
+    else {
+      phi += 2.*M_PI;
+      segId0 = unsigned(phi / PHI);
+    }
 
-  const double dPHI = M_PI/256.0; // 2pi/64/8
-  if(phi-dPHI >= 0.)segId1 = unsigned((phi-dPHI)/PHI);
-  else segId1 = unsigned((2.*M_PI+phi-dPHI)/PHI);
-  if(segId1 != segId0)return 2;
-  if(phi-dPHI < 2.*M_PI)segId1 = unsigned((phi+dPHI)/PHI);
-  else segId1 = unsigned((phi+dPHI-2.*M_PI)/PHI);
-  if(segId1 != segId0)return 2;
-  segId1 = 9999;
-  return 1;
+    const double dPHI = M_PI / 256.0; // 2pi/64/8
+    if (phi - dPHI >= 0.)segId1 = unsigned((phi - dPHI) / PHI);
+    else segId1 = unsigned((2.*M_PI + phi - dPHI) / PHI);
+    if (segId1 != segId0)return 2;
+    if (phi - dPHI < 2.*M_PI)segId1 = unsigned((phi + dPHI) / PHI);
+    else segId1 = unsigned((phi + dPHI - 2.*M_PI) / PHI);
+    if (segId1 != segId0)return 2;
+    segId1 = 9999;
+    return 1;
 #endif
-}
-
-int
-SVDMovedSegId(unsigned refSegId,
-	      unsigned segId,
-	      unsigned,
-	      unsigned type)
-{
-  int movedSegId = 9999;
-  if(type == 0){ // CDC SuperLayer = 0
-    movedSegId = (int)segId-(int)(refSegId*2);
-    if(abs(movedSegId) >= 9)movedSegId = 9999;
-  }else if(type == 1){ // CDC SuperLayer = 1
-    movedSegId = (int)segId-(int)(refSegId*2);
-    if(abs(movedSegId) >= 9)movedSegId = 9999;
-  }else if(type == 2){ // SVD
-    if(refSegId%2 == 0){
-      // std::cout << "seed1 = " << refSegId << std::endl;
-      movedSegId = (int)segId-(int)(refSegId);
-    }else{
-      // std::cout << "seed2 = " << refSegId << std::endl;
-      movedSegId = (int)segId-(int)(refSegId-1);
-    }
-    if(abs(movedSegId) >= 2)movedSegId = 9999;
   }
-  return movedSegId;
-}
 
-int
-SVDMovedSegId2(unsigned refSegId,
-	       unsigned segId,
-	       unsigned,
-	       unsigned type)
-{
-  // wide region version
-  // This is used in mapping test.
-  int movedSegId = 9999;
-  if(type == 0){ // CDC SuperLayer = 0
-    movedSegId = (int)segId-(int)(refSegId*2);
-    if(abs(movedSegId) >= 20)movedSegId = 9999;
-  }else if(type == 1){ // CDC SuperLayer = 1
-    movedSegId = (int)segId-(int)(refSegId*2);
-    if(abs(movedSegId) >= 20)movedSegId = 9999;
-  }else if(type == 2){ // SVD
-    if(refSegId%2 == 0){
-      movedSegId = (int)segId-(int)(refSegId);
-    }else{
-      movedSegId = (int)segId-(int)(refSegId-1);
+  int
+  SVDMovedSegId(unsigned refSegId,
+                unsigned segId,
+                unsigned,
+                unsigned type)
+  {
+    int movedSegId = 9999;
+    if (type == 0) { // CDC SuperLayer = 0
+      movedSegId = (int)segId - (int)(refSegId * 2);
+      if (abs(movedSegId) >= 9)movedSegId = 9999;
+    } else if (type == 1) { // CDC SuperLayer = 1
+      movedSegId = (int)segId - (int)(refSegId * 2);
+      if (abs(movedSegId) >= 9)movedSegId = 9999;
+    } else if (type == 2) { // SVD
+      if (refSegId % 2 == 0) {
+        // std::cout << "seed1 = " << refSegId << std::endl;
+        movedSegId = (int)segId - (int)(refSegId);
+      } else {
+        // std::cout << "seed2 = " << refSegId << std::endl;
+        movedSegId = (int)segId - (int)(refSegId - 1);
+      }
+      if (abs(movedSegId) >= 2)movedSegId = 9999;
     }
-    if(abs(movedSegId) >= 20)movedSegId = 9999;
+    return movedSegId;
   }
-  return movedSegId;
-}
+
+  int
+  SVDMovedSegId2(unsigned refSegId,
+                 unsigned segId,
+                 unsigned,
+                 unsigned type)
+  {
+    // wide region version
+    // This is used in mapping test.
+    int movedSegId = 9999;
+    if (type == 0) { // CDC SuperLayer = 0
+      movedSegId = (int)segId - (int)(refSegId * 2);
+      if (abs(movedSegId) >= 20)movedSegId = 9999;
+    } else if (type == 1) { // CDC SuperLayer = 1
+      movedSegId = (int)segId - (int)(refSegId * 2);
+      if (abs(movedSegId) >= 20)movedSegId = 9999;
+    } else if (type == 2) { // SVD
+      if (refSegId % 2 == 0) {
+        movedSegId = (int)segId - (int)(refSegId);
+      } else {
+        movedSegId = (int)segId - (int)(refSegId - 1);
+      }
+      if (abs(movedSegId) >= 20)movedSegId = 9999;
+    }
+    return movedSegId;
+  }
 
 
 // //
@@ -651,8 +651,8 @@ SVDMovedSegId2(unsigned refSegId,
 //       // std::cout << "MAP R: " << map.RLA2PhiLSA(m_datsvd_hit[i]->rla()) << std::endl;
 //       // std::cout << "MAP Z: " << map.RLA2ZLSA(m_datsvd_hit[i]->rla()) << std::endl;
 //     }
-//     std::cout << "Start # = " << startPosition 
-//          << ", Width = " << width 
+//     std::cout << "Start # = " << startPosition
+//          << ", Width = " << width
 //          << ", Direction = " << direction <<std::endl;
 //   }
 // #endif
@@ -716,7 +716,7 @@ SVDMovedSegId2(unsigned refSegId,
 // #if 0
 //   u = uniqueHepID.begin();
 //   for(int i=0;i<num;++i){
-//     std::cout << i << ": TrackID = "<< *u - 1 
+//     std::cout << i << ": TrackID = "<< *u - 1
 //          << ", Count = " << counter[i]
 //          << ", LundID = " << genMgr[*u-1].idhep() << std::endl;
 //     ++u;
@@ -743,7 +743,7 @@ SVDMovedSegId2(unsigned refSegId,
 // Gen_hepevt *
 // wirhit2hep(const struct reccdc_wirhit *wirhit) {
 //   if(!((*wirhit).m_geo))return NULL;
-  
+
 //   Reccdc_wirhit_Manager   & hitMgr = Reccdc_wirhit_Manager::get_manager();
 //   Datcdc_mcwirhit_Manager & mcMgr  = Datcdc_mcwirhit_Manager::get_manager();
 //   for(Datcdc_mcwirhit_Manager::iterator j=mcMgr.begin();

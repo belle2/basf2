@@ -184,44 +184,44 @@
 //cnv #include "trg/cdc/Clust.h"
 
 namespace Belle2 {
-    class TRGCDC;
-    class TRGCDCTrackMC;
+  class TRGCDC;
+  class TRGCDCTrackMC;
 }
 
 namespace Belle {
 
-typedef HepGeom::Point3D<double>  Point3D;
-template <class T> class CAList;
-class TTrack;
+  typedef HepGeom::Point3D<double>  Point3D;
+  template <class T> class CAList;
+  class TTrack;
 
 /// A class to relate TRGCDCWireHit and TTrack objects.
-class TLink {
+  class TLink {
 
   public:
     /// Constructor.
-    TLink(TTrack * track = 0,
-	  const Belle2::TRGCDCWireHit * hit = 0,
-	  const HepGeom::Point3D<double> & position = Point3D());
+    TLink(TTrack* track = 0,
+          const Belle2::TRGCDCWireHit* hit = 0,
+          const HepGeom::Point3D<double> & position = Point3D());
 
     /// Copy constructor.
-    TLink(const TLink &);
+    TLink(const TLink&);
 
     /// Destructor
     virtual ~TLink();
 
   public:// Selectors
     /// dumps debug information.
-    void dump(const std::string & message = std::string(""),
-	      const std::string & prefix = std::string("")) const;
+    void dump(const std::string& message = std::string(""),
+              const std::string& prefix = std::string("")) const;
 
     /// returns a pointer to a hit.
-    const Belle2::TRGCDCWireHit * hit(void) const;
+    const Belle2::TRGCDCWireHit* hit(void) const;
 
     /// returns a pointer to a wire.
-    const Belle2::TRGCDCWire * const wire(void) const;
+    const Belle2::TRGCDCWire* const wire(void) const;
 
     /// returns a pointer to a track.
-    TTrack * track(void) const;
+    TTrack* track(void) const;
 
     /// returns pull.
     double pull(void) const;
@@ -241,10 +241,10 @@ class TLink {
     /// returns left-right. 0:left, 1:right, 2:wire
     unsigned leftRight(void) const;
 
-     /// returns stauts of stereo hit 
+    /// returns stauts of stereo hit
     int zStatus(void) const;
 
-    /// returns id\#  of the pair, if zStatus == 20 (2 consective hits).  
+    /// returns id\#  of the pair, if zStatus == 20 (2 consective hits).
     int zPair(void) const;
 
     /// returns position.
@@ -254,10 +254,10 @@ class TLink {
     double distance(void) const;
 
     /// returns neighbor TLink.
-    TLink * neighbor(unsigned int) const;
+    TLink* neighbor(unsigned int) const;
 
     /// returns a pointer to a TLink.
-    TLink * link(void) const;
+    TLink* link(void) const;
 
 // S.Suzuki added
     /// returns UseCathode flag
@@ -277,15 +277,15 @@ class TLink {
   public:// Modifiers
     /// sets results of fitting.
     void update(const HepGeom::Point3D<double> & onTrack,
-		const HepGeom::Point3D<double> & onWire,
-		unsigned leftRight,
-		double pull);
+                const HepGeom::Point3D<double> & onWire,
+                unsigned leftRight,
+                double pull);
 
     /// sets a pointer to a hit.
-    const Belle2::TRGCDCWireHit * hit(const Belle2::TRGCDCWireHit *);
+    const Belle2::TRGCDCWireHit* hit(const Belle2::TRGCDCWireHit*);
 
     /// sets a pointer to a track.
-    TTrack * track(TTrack *);
+    TTrack* track(TTrack*);
 
     /// sets and returns the closest point on wire to a track.
     const HepGeom::Point3D<double> & positionOnWire(const HepGeom::Point3D<double> &);
@@ -302,10 +302,10 @@ class TLink {
     const HepGeom::Point3D<double> & position(const HepGeom::Point3D<double> &);
 
     /// sets neighbor TLink.
-    void neighbor(unsigned int, TLink *);
+    void neighbor(unsigned int, TLink*);
 
     /// sets a pointer to a TLink.
-    TLink * link(TLink *);
+    TLink* link(TLink*);
 
     /// sets left-right. 0:left, 1:right, 2:wire
     unsigned leftRight(unsigned);
@@ -321,7 +321,7 @@ class TLink {
 
 // S.Suzuki added
 
-    /// sets usecathode flag 
+    /// sets usecathode flag
     void setusecathode(int);
 
     /// sets pointer to the cluster to be fit
@@ -334,7 +334,7 @@ class TLink {
 
     /// sets and returns arc and Z for the curl finder.
     const HepGeom::Point3D<double> & arcZ(const HepGeom::Point3D<double> &, const unsigned = 0);
-    const unsigned fit2D(const unsigned &);
+    const unsigned fit2D(const unsigned&);
     unsigned fit2D(void);
 
   public:// Drift distance
@@ -350,12 +350,12 @@ class TLink {
 
   public:// Static utility functions
     /// returns TRGCDCTrackMC
-    static const Belle2::TRGCDCTrackMC & links2HEP(const AList<TLink> & links);
+    static const Belle2::TRGCDCTrackMC& links2HEP(const AList<TLink> & links);
 
     /// returns \# of layers.
     static unsigned nSuperLayers(const AList<TLink> & links);
     static unsigned nSuperLayers(const AList<TLink> & links,
-				 unsigned minNHits);
+                                 unsigned minNHits);
 
     /// returns \# of missing axial super layers. Stereo super layers are not taken into accout.
     static unsigned nMissingAxialSuperLayers(const AList<TLink> & links);
@@ -367,15 +367,15 @@ class TLink {
     static unsigned nLayers(const AList<TLink> & links);
 
     /// returns \# of hits per layer.
-    static void nHits(const AList<TLink> & links, unsigned * nHits);
+    static void nHits(const AList<TLink> & links, unsigned* nHits);
 
     /// returns \# of hits per super layer.
     static void nHitsSuperLayer(const AList<TLink> & links,
-				unsigned * nHits);
+                                unsigned* nHits);
 
     /// returns hits list per super layer.
     static void nHitsSuperLayer(const AList<TLink> & links,
-				AList<TLink> * list);
+                                AList<TLink> * list);
 
     /// returns axial hits.
     static AList<TLink> axialHits(const AList<TLink> & links);
@@ -396,12 +396,12 @@ class TLink {
     static AList<TLink> edges(const AList<TLink> &);
 
     /// returns links which are in the same layer as 'a' or 'id'.
-    static AList<TLink> sameLayer(const AList<TLink> & list, const TLink & a);
+    static AList<TLink> sameLayer(const AList<TLink> & list, const TLink& a);
     static AList<TLink> sameLayer(const AList<TLink> & list, unsigned id);
 
     /// returns links which are in the same super layer as 'a' or 'id'.
     static AList<TLink> sameSuperLayer(const AList<TLink> & list,
-				       const TLink & a);
+                                       const TLink& a);
     static AList<TLink> sameSuperLayer(const AList<TLink> & list, unsigned id);
 
     /// returns super layer pattern.
@@ -409,16 +409,16 @@ class TLink {
     static unsigned superLayer(const AList<TLink> & list, unsigned minNHits);
 
     /// returns the inner(outer)-most link.
-    static TLink * innerMost(const AList<TLink> & links);
-    static TLink * outerMost(const AList<TLink> & links);
+    static TLink* innerMost(const AList<TLink> & links);
+    static TLink* outerMost(const AList<TLink> & links);
 
     /// returns links which are in the inner most and outer most layer. This function assumes that all TLink's are in the same super layer.
     static AList<TLink> inOut(const AList<TLink> &);
 
     /// separate cores and non-cores.
     static void separateCores(const AList<TLink> & input,
-		       AList<TLink> & cores,
-		       AList<TLink> & nonCores);
+                              AList<TLink> & cores,
+                              AList<TLink> & nonCores);
     static AList<TLink> cores(const AList<TLink> & input);
 
     /// removes links from list if wire is same
@@ -426,30 +426,30 @@ class TLink {
 
     /// dumps TLinks.
     static void dump(const CAList<TLink> & links,
-	      const std::string & message = std::string(""),
-	      const std::string & prefix = std::string(""));
-    static void dump(const TLink & link,
-	      const std::string & message = std::string(""),
-	      const std::string & prefix = std::string(""));
+                     const std::string& message = std::string(""),
+                     const std::string& prefix = std::string(""));
+    static void dump(const TLink& link,
+                     const std::string& message = std::string(""),
+                     const std::string& prefix = std::string(""));
     static std::string layerUsage(const AList<TLink> & links);
 
     /// Sorters
 #if defined(__GNUG__)
-    static int sortByWireId(const TLink ** a, const TLink ** b);
-    static int sortByX(const TLink ** a, const TLink ** b);
+    static int sortByWireId(const TLink** a, const TLink** b);
+    static int sortByX(const TLink** a, const TLink** b);
 #else
 //     extern "C" int
-// 	SortByWireId(const void* a, const void* b);
+//  SortByWireId(const void* a, const void* b);
 //     extern "C" int
-// 	SortByX(const void* a, const void* b);
+//  SortByX(const void* a, const void* b);
 #endif
 
   private:
     static void set_smallcell(bool s) {
-	ms_smallcell = s;
+      ms_smallcell = s;
     }
     static void set_superb(bool s) {
-	ms_superb = s;
+      ms_superb = s;
     }
     friend class Belle2::TRGCDC;
 
@@ -460,8 +460,8 @@ class TLink {
     static void clearBufferSL(void);
 
   private:
-    TTrack * _track;
-    const Belle2::TRGCDCWireHit * _hit;
+    TTrack* _track;
+    const Belle2::TRGCDCWireHit* _hit;
     HepGeom::Point3D<double> _onTrack;
     HepGeom::Point3D<double> _onWire;
     HepGeom::Point3D<double> _position;
@@ -473,13 +473,13 @@ class TLink {
     int _zStatus;
     int _zPair;
     double _pull;
-    TLink * _neighbor[7];
-    TLink * _link;
+    TLink* _neighbor[7];
+    TLink* _link;
 
     //...tmp...
     HepGeom::Point3D<double> _conf;
 
-   //-- S. Suzuki added -------
+    //-- S. Suzuki added -------
     int _usecathode;
     float _ZphiBeforeCathode;
 //cnv    Belle2::TRGCDCClust * _mclust;
@@ -492,12 +492,12 @@ class TLink {
     //
     static bool ms_smallcell;
     static bool ms_superb;
-  
+
     //...Buffers...
     static unsigned _nL;
     static unsigned _nSL;
     static unsigned _nSLA;
-    static unsigned * _nHitsSL;
+    static unsigned* _nHitsSL;
 
 #ifdef TRASAN_DEBUG
   public:
@@ -507,7 +507,7 @@ class TLink {
     static unsigned _nTLinks;
     static unsigned _nTLinksMax;
 #endif
-};
+  };
 
 //-----------------------------------------------------------------------------
 
@@ -520,131 +520,150 @@ class TLink {
 
 #ifdef TLink_INLINE_DEFINE_HERE
 
-inline
-const Belle2::TRGCDCWireHit *
-TLink::hit(void) const {
+  inline
+  const Belle2::TRGCDCWireHit*
+  TLink::hit(void) const
+  {
     return _hit;
-}
+  }
 
-inline
-TTrack *
-TLink::track(void) const {
+  inline
+  TTrack*
+  TLink::track(void) const
+  {
     return _track;
-}
+  }
 
-inline
-const Belle2::TRGCDCWireHit *
-TLink::hit(const Belle2::TRGCDCWireHit * a) {
+  inline
+  const Belle2::TRGCDCWireHit*
+  TLink::hit(const Belle2::TRGCDCWireHit* a)
+  {
     return _hit = a;
-}
+  }
 
-inline
-TTrack *
-TLink::track(TTrack * a) {
+  inline
+  TTrack*
+  TLink::track(TTrack* a)
+  {
     return _track = a;
-}
+  }
 
-inline
-void
-TLink::update(const HepGeom::Point3D<double> & onTrack,
-	      const HepGeom::Point3D<double> & onWire,
-	      unsigned leftRight,
-	      double pull) {
+  inline
+  void
+  TLink::update(const HepGeom::Point3D<double> & onTrack,
+                const HepGeom::Point3D<double> & onWire,
+                unsigned leftRight,
+                double pull)
+  {
     _onTrack = onTrack;
     _onWire = onWire;
     _leftRight = leftRight;
     _pull = pull;
-}
+  }
 
-inline
-double
-TLink::pull(void) const {
+  inline
+  double
+  TLink::pull(void) const
+  {
     return _pull;
-}
+  }
 
-inline
-double
-TLink::pull(double a) {
+  inline
+  double
+  TLink::pull(double a)
+  {
     return _pull = a;
-}
+  }
 
-inline
-const HepGeom::Point3D<double> &
-TLink::positionOnWire(void) const {
+  inline
+  const HepGeom::Point3D<double> &
+  TLink::positionOnWire(void) const
+  {
     return _onWire;
-}
+  }
 
-inline
-const HepGeom::Point3D<double> &
-TLink::positionOnTrack(void) const {
+  inline
+  const HepGeom::Point3D<double> &
+  TLink::positionOnTrack(void) const
+  {
     return _onTrack;
-}
+  }
 
-inline
-const HepGeom::Point3D<double> &
-TLink::positionOnWire(const HepGeom::Point3D<double> & a) {
+  inline
+  const HepGeom::Point3D<double> &
+  TLink::positionOnWire(const HepGeom::Point3D<double> & a)
+  {
     return _onWire = a;
-}
+  }
 
-inline
-const HepGeom::Point3D<double> &
-TLink::positionOnWire(double p[3]) {
+  inline
+  const HepGeom::Point3D<double> &
+  TLink::positionOnWire(double p[3])
+  {
     _onWire.setX(p[0]);
     _onWire.setY(p[1]);
     _onWire.setZ(p[2]);
     return _onWire;
-}
+  }
 
-inline
-const HepGeom::Point3D<double> &
-TLink::positionOnTrack(const HepGeom::Point3D<double> & a) {
+  inline
+  const HepGeom::Point3D<double> &
+  TLink::positionOnTrack(const HepGeom::Point3D<double> & a)
+  {
     return _onTrack = a;
-}
+  }
 
-inline
-const HepGeom::Point3D<double> &
-TLink::positionOnTrack(double p[3]) {
+  inline
+  const HepGeom::Point3D<double> &
+  TLink::positionOnTrack(double p[3])
+  {
     _onTrack.setX(p[0]);
     _onTrack.setY(p[1]);
     _onTrack.setZ(p[2]);
     return _onTrack;
-}
+  }
 
-inline
-unsigned
-TLink::leftRight(void) const {
+  inline
+  unsigned
+  TLink::leftRight(void) const
+  {
     return _leftRight;
-}
+  }
 
-inline
-unsigned
-TLink::leftRight(unsigned a) {
+  inline
+  unsigned
+  TLink::leftRight(unsigned a)
+  {
     return _leftRight = a;
-}
+  }
 
-inline
-double
-TLink::dPhi(void) const {
+  inline
+  double
+  TLink::dPhi(void) const
+  {
     return _dPhi;
-}
+  }
 
-inline
-double
-TLink::dPhi(double a) {
+  inline
+  double
+  TLink::dPhi(double a)
+  {
     return _dPhi = a;
-}
+  }
 
-inline
-const HepGeom::Point3D<double> &
-TLink::position(void) const {
+  inline
+  const HepGeom::Point3D<double> &
+  TLink::position(void) const
+  {
     return _position;
-}
+  }
 
-inline
-const HepGeom::Point3D<double> &
-TLink::position(const HepGeom::Point3D<double> & a) {
+  inline
+  const HepGeom::Point3D<double> &
+  TLink::position(const HepGeom::Point3D<double> & a)
+  {
     return _position = a;
-}
+  }
 
 // inline
 // const HepGeom::Point3D<double> &
@@ -652,96 +671,110 @@ TLink::position(const HepGeom::Point3D<double> & a) {
 //     return _conf;
 // }
 
-inline
-const HepGeom::Point3D<double> &
-TLink::conf(const HepGeom::Point3D<double> & a) {
+  inline
+  const HepGeom::Point3D<double> &
+  TLink::conf(const HepGeom::Point3D<double> & a)
+  {
     return _conf = a;
-}
+  }
 
-inline
-void 
-TLink::neighbor(unsigned n, TLink * neighbor){
-  if (n < 7)
-    _neighbor[n] = neighbor;
-}
+  inline
+  void
+  TLink::neighbor(unsigned n, TLink* neighbor)
+  {
+    if (n < 7)
+      _neighbor[n] = neighbor;
+  }
 
-inline
-TLink *
-TLink::neighbor(unsigned n) const {
-  if (n < 7)
-    return _neighbor[n];
-  return NULL;
-}
+  inline
+  TLink*
+  TLink::neighbor(unsigned n) const
+  {
+    if (n < 7)
+      return _neighbor[n];
+    return NULL;
+  }
 
-inline
-TLink *
-TLink::link(void) const {
+  inline
+  TLink*
+  TLink::link(void) const
+  {
     return _link;
-}
+  }
 
-inline
-TLink *
-TLink::link(TLink * a) {
+  inline
+  TLink*
+  TLink::link(TLink* a)
+  {
     return _link = a;
-}
+  }
 
-inline
-double
-TLink::distance(void) const {
+  inline
+  double
+  TLink::distance(void) const
+  {
     return (_onTrack - _onWire).mag();
-}
+  }
 
-inline
-const Belle2::TRGCDCWire * const
-TLink::wire(void) const {
+  inline
+  const Belle2::TRGCDCWire* const
+  TLink::wire(void) const
+  {
     if (_hit) return & _hit->wire();
     return NULL;
-}
+  }
 
-inline
-const HepGeom::Point3D<double> &
-TLink::xyPosition(void) const {
+  inline
+  const HepGeom::Point3D<double> &
+  TLink::xyPosition(void) const
+  {
     return _hit->wire().xyPosition();
-}
+  }
 
-inline
-int
-TLink::zStatus(void) const {
+  inline
+  int
+  TLink::zStatus(void) const
+  {
     return _zStatus;
-}
+  }
 
-inline
-int
-TLink::zStatus(int a) {
+  inline
+  int
+  TLink::zStatus(int a)
+  {
     return _zStatus = a;
-}
+  }
 
-inline
-int
-TLink::zPair(void) const {
+  inline
+  int
+  TLink::zPair(void) const
+  {
     return _zPair;
-}
+  }
 
-inline
-int
-TLink::zPair(int a) {
+  inline
+  int
+  TLink::zPair(int a)
+  {
     return _zPair = a;
-}
+  }
 
 //-- S. Suzuki added -------
-inline
-int 
-TLink::usecathode(void) const {
+  inline
+  int
+  TLink::usecathode(void) const
+  {
     return _usecathode;
-}
+  }
 
-inline
-void
-TLink::setusecathode(int a) {
+  inline
+  void
+  TLink::setusecathode(int a)
+  {
     _usecathode = a ;
-}
+  }
 
-// inline 
+// inline
 // Belle2::TRGCDCClust *
 // TLink::getmclust(void) const {
 //     return _mclust;
@@ -755,81 +788,93 @@ TLink::setusecathode(int a) {
 
 //-- S. Suzuki added end ----
 
-inline
-const HepGeom::Point3D<double> &
-TLink::arcZ(const unsigned i) const {
-  if(i < 4)return _arcZ[i];
-  std::cerr << "Error!! Please stop!!.....arcZ of TLink!!! in Trasan." << std::endl;
-  return _arcZ[0];
-}
+  inline
+  const HepGeom::Point3D<double> &
+  TLink::arcZ(const unsigned i) const
+  {
+    if (i < 4)return _arcZ[i];
+    std::cerr << "Error!! Please stop!!.....arcZ of TLink!!! in Trasan." << std::endl;
+    return _arcZ[0];
+  }
 
-inline
-const HepGeom::Point3D<double> & 
-TLink::arcZ(const HepGeom::Point3D<double> &az, const unsigned i){
-  if(i < 4)return _arcZ[i] = az;
-  std::cerr << "Error!! Please stop!!.....arcZ of TLink!!! in Trasan." << std::endl;
-  return _arcZ[0];
-}
+  inline
+  const HepGeom::Point3D<double> &
+  TLink::arcZ(const HepGeom::Point3D<double> &az, const unsigned i)
+  {
+    if (i < 4)return _arcZ[i] = az;
+    std::cerr << "Error!! Please stop!!.....arcZ of TLink!!! in Trasan." << std::endl;
+    return _arcZ[0];
+  }
 
-inline
-void
-TLink::setZphiBeforeCathode(float a) {
-	_ZphiBeforeCathode = a;
-}
+  inline
+  void
+  TLink::setZphiBeforeCathode(float a)
+  {
+    _ZphiBeforeCathode = a;
+  }
 
-inline
-const unsigned 
-TLink::fit2D(const unsigned &f) {
-  return _fit2D = f;
-}
+  inline
+  const unsigned
+  TLink::fit2D(const unsigned& f)
+  {
+    return _fit2D = f;
+  }
 
-inline
-unsigned 
-TLink::fit2D(void) {
-  return _fit2D;
-}
+  inline
+  unsigned
+  TLink::fit2D(void)
+  {
+    return _fit2D;
+  }
 
-inline
-float
-TLink::drift(unsigned a) const {
+  inline
+  float
+  TLink::drift(unsigned a) const
+  {
     return _drift[a];
-}
+  }
 
-inline
-float
-TLink::drift(float b, unsigned a) {
+  inline
+  float
+  TLink::drift(float b, unsigned a)
+  {
     return _drift[a] = b;
-}
+  }
 
-inline
-float
-TLink::dDrift(unsigned a) const {
+  inline
+  float
+  TLink::dDrift(unsigned a) const
+  {
     return _dDrift[a];
-}
+  }
 
-inline
-float
-TLink::dDrift(float b, unsigned a) {
+  inline
+  float
+  TLink::dDrift(float b, unsigned a)
+  {
     return _dDrift[a] = b;
-}
+  }
 
-inline
-float
-TLink::drift(void) const {
+  inline
+  float
+  TLink::drift(void) const
+  {
     return (_drift[0] + _drift[1]) / 2.;
-}
+  }
 
-inline
-float
-TLink::dDrift(void) const {
+  inline
+  float
+  TLink::dDrift(void) const
+  {
     return (_dDrift[0] + _dDrift[1]) / 2.;
-}
+  }
 
-inline
-void
-TLink::clearBufferSL(void) {
+  inline
+  void
+  TLink::clearBufferSL(void)
+  {
     bzero(_nHitsSL, sizeof(unsigned) * _nSL);
-}
+  }
 
 #endif
 

@@ -54,7 +54,7 @@ namespace Belle2 {
      *  The 'best matching' segment is chosen and the other segments are removed (!) from candidate.
      */
 
-    static void CheckOvercrowdedSL(CDCTrackCandidate & axialCandidate, CDCTrackCandidate & stereoCandidate);
+    static void CheckOvercrowdedSL(CDCTrackCandidate& axialCandidate, CDCTrackCandidate& stereoCandidate);
 
     /** Method to check if there are more than one segment per superlayer and remove the wrong ones.
      *  Superlayer with more the one segment are considered and the competing segments are compared to each other.
@@ -63,7 +63,7 @@ namespace Belle2 {
      *  The track candidate is refitted, as long as there are still overcrowded superlayers.
      *  At the ende the track candidate should have one best matching segment left in each stereo superlayer.
      */
-    static void StereoFitCandidates(CDCTrackCandidate & candidate);
+    static void StereoFitCandidates(CDCTrackCandidate& candidate);
 
     /**Searches for matching stereo segments for the given track candidate.
      * First parameter: track candidate

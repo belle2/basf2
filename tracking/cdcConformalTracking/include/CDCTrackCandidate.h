@@ -33,7 +33,7 @@ namespace Belle2 {
     /** Copy Constructor.
      * Creates a new track from a copy of another track and a new Id.
      */
-    CDCTrackCandidate(CDCTrackCandidate &candidate, const int Id);
+    CDCTrackCandidate(CDCTrackCandidate& candidate, const int Id);
 
     /** Destructor. */
     ~CDCTrackCandidate();
@@ -41,7 +41,7 @@ namespace Belle2 {
     /** Adds a segment object to the track.
      *  All TrackCandidateHit objects in the segment are also added to the m_TrackHits.
      */
-    void addSegment(CDCSegment & aSegment);
+    void addSegment(CDCSegment& aSegment);
 
     /**Removes a segment with a given Id from the track. */
     void removeSegment(const int Id);

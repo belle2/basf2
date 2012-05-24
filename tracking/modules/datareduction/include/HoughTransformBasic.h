@@ -21,7 +21,7 @@ namespace Belle2 {
 
   struct HoughTransformBox {
     HoughTransformBox(double left, double right, double bottom, double top) :
-        left(left), right(right), top(top), bottom(bottom) {};
+      left(left), right(right), top(top), bottom(bottom) {};
 
     double left; //left border of box
     double right;
@@ -41,7 +41,7 @@ namespace Belle2 {
 
   struct ResultItem {
     ResultItem(double a, double b, double error_a, double error_b) :
-        a(a), b(b), error_a(error_a), error_b(error_b) {};
+      a(a), b(b), error_a(error_a), error_b(error_b) {};
 
     double a; //parameter a
     double b; //parameter b
@@ -91,9 +91,9 @@ namespace Belle2 {
     virtual double getZValue(double a, double b, double r) {return 0.0; };
 
 #ifdef CAIRO_OUTPUT
-    cairo_t *cairo;
-    void drawBox(HoughTransformBox &box, box_state state);
-    virtual void drawResultItem(cairo_t* cairo, ResultItem &ri) {};
+    cairo_t* cairo;
+    void drawBox(HoughTransformBox& box, box_state state);
+    virtual void drawResultItem(cairo_t* cairo, ResultItem& ri) {};
     virtual void drawHits(double min_a, double max_a, double min_b, double max_b) {};
 #endif
 

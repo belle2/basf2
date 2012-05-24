@@ -33,7 +33,7 @@ namespace Belle2 {
     ~CDCSegment();
 
     /** Adds a reference(!) of a TrackHit object to the segment. */
-    void addTrackHit(CDCTrackHit & aTrackHit);
+    void addTrackHit(CDCTrackHit& aTrackHit);
 
     /** Adds an Id of a track candidate to which this segment may belong. */
     void setTrackCandId(const int trackId);

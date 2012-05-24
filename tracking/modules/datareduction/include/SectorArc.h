@@ -28,7 +28,7 @@ namespace Belle2 {
     virtual void setIntersection(LadderEntry& ladderEntry);
     virtual int checkPoint(double x, double y);
 
-    std::pair<double, double> intersectCircle(PXDLadder &ladder, TVector2 center, double radius, bool in);
+    std::pair<double, double> intersectCircle(PXDLadder& ladder, TVector2 center, double radius, bool in);
 
 #ifdef CAIRO_OUTPUT
     virtual void draw(cairo_t* cairo);

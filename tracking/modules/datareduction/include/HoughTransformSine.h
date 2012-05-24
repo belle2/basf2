@@ -32,7 +32,7 @@ namespace Belle2 {
 
 #ifdef CAIRO_OUTPUT
 
-    virtual void drawResultItem(cairo_t* cairo, ResultItem &ri) {
+    virtual void drawResultItem(cairo_t* cairo, ResultItem& ri) {
       double min_z = std::max(-M_PI / 2 / ri.a, -300.0);
       double max_z = std::min(M_PI / 2 / ri.a, 350.0);
       cairo_sine(cairo, 1 / ri.b, ri.a, 0, min_z, max_z);
@@ -44,7 +44,7 @@ namespace Belle2 {
         cairo_set_source_rgb(cairo, 0, 0, 1);
         cairo_set_line_width(cairo, 0.5);
         for (std::list<rzHit*>::iterator hitIter = _rzHits.begin(); hitIter != _rzHits.end(); ++hitIter) {
-          rzHit &rzhit = **hitIter;
+          rzHit& rzhit = **hitIter;
           cairo_sine(cairo, 1 / rzhit.r, rzhit.z, 0, min_a, max_a);
           cairo_stroke_abs(cairo);
         }

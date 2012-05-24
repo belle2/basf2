@@ -22,7 +22,7 @@ namespace Belle2 {
 
     double _OpeningAngle;
 
-    std::pair<double, double> intersectLine(PXDLadder &ladder, TVector2 pos, TVector2 dir, bool bigger);
+    std::pair<double, double> intersectLine(PXDLadder& ladder, TVector2 pos, TVector2 dir, bool bigger);
     virtual void setIntersection(LadderEntry& ladderEntry);
     virtual int checkPoint(double x, double y);
 

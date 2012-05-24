@@ -10,7 +10,7 @@ using namespace std;
 using namespace Belle2;
 
 SectorArc::SectorArc(double RotationAngle, double DownShift, double SectorWidth, double RadiusSmall, double RadiusBig):
-    SectorBasic(RotationAngle, DownShift, SectorWidth), _RadiusSmall(min(RadiusSmall, RadiusBig)), _RadiusBig(max(RadiusSmall, RadiusBig))
+  SectorBasic(RotationAngle, DownShift, SectorWidth), _RadiusSmall(min(RadiusSmall, RadiusBig)), _RadiusBig(max(RadiusSmall, RadiusBig))
 {
   //Signed radius, so swap if both are negative, otherwise we get closed sectors
   if ((_RadiusSmall < 0 && _RadiusBig < 0)) {
@@ -20,7 +20,7 @@ SectorArc::SectorArc(double RotationAngle, double DownShift, double SectorWidth,
   }
   double ySmall = _RadiusSmall - (_RadiusSmall > 0 ? -1 : 1) * _SectorWidth;
   double yBig   = _RadiusBig  - (_RadiusBig > 0 ? 1 : -1)  * _SectorWidth;
-  if (_RadiusSmall<0 && _RadiusBig>0) {
+  if (_RadiusSmall < 0 && _RadiusBig > 0) {
     yBig += 2 * _SectorWidth;
   }
   _CenterSmall = TVector2(-_DownShift, ySmall);
@@ -33,7 +33,7 @@ SectorArc::~SectorArc()
 
 }
 
-std::pair<double, double> SectorArc::intersectCircle(PXDLadder &ladder, TVector2 center, double radius, bool in)
+std::pair<double, double> SectorArc::intersectCircle(PXDLadder& ladder, TVector2 center, double radius, bool in)
 {
   TVector3 p = ladder.getPosition();
   TVector3 s = ladder.getSize();
@@ -77,7 +77,7 @@ std::pair<double, double> SectorArc::intersectCircle(PXDLadder &ladder, TVector2
 void SectorArc::setIntersection(LadderEntry& ladderEntry)
 {
   pair<double, double> imin = intersectCircle(*(ladderEntry.ladder), _CenterSmall, fabs(_RadiusSmall), false);
-  pair<double, double> imax = intersectCircle(*(ladderEntry.ladder), _CenterBig, fabs(_RadiusBig), !(_RadiusSmall<0 && _RadiusBig>0));
+  pair<double, double> imax = intersectCircle(*(ladderEntry.ladder), _CenterBig, fabs(_RadiusBig), !(_RadiusSmall < 0 && _RadiusBig > 0));
   ladderEntry.start = max(imin.first, imax.first);
   ladderEntry.end = min(imin.second, imax.second);
 
@@ -101,7 +101,7 @@ int SectorArc::checkPoint(double x, double y)
 
   bool in = undermax && overmin;
   //If sign-change, then condition differs
-  if (_RadiusSmall<0 && _RadiusBig>0) in = !undermax && overmin;
+  if (_RadiusSmall < 0 && _RadiusBig > 0) in = !undermax && overmin;
   if (in) return 0;
   if (!overmin) return -1;
   return 1;
@@ -116,21 +116,21 @@ void SectorArc::draw(cairo_t* cairo)
   double rmax = fabs(_RadiusBig);
   cairo_save(cairo);
   cairo_rotate(cairo, _RotationAngle);
-  if (_RadiusSmall<0 && _RadiusBig>0) {
+  if (_RadiusSmall < 0 && _RadiusBig > 0) {
     cairo_arc(cairo, -_DownShift, ymax, rmax, -M_PI / 2, M_PI / 2);
-    cairo_line_to(cairo, -_DownShift, 5000*_RadiusBig / rmax);
-    cairo_line_to(cairo, 5000, 5000*_RadiusBig / rmax);
-    cairo_line_to(cairo, 5000, 5000*_RadiusSmall / rmin);
-    cairo_line_to(cairo, -_DownShift, 5000*_RadiusSmall / rmin);
+    cairo_line_to(cairo, -_DownShift, 5000 * _RadiusBig / rmax);
+    cairo_line_to(cairo, 5000, 5000 * _RadiusBig / rmax);
+    cairo_line_to(cairo, 5000, 5000 * _RadiusSmall / rmin);
+    cairo_line_to(cairo, -_DownShift, 5000 * _RadiusSmall / rmin);
     cairo_arc(cairo, -_DownShift, ymin, rmin, -M_PI / 2, M_PI / 2);
   } else {
     cairo_arc(cairo, -_DownShift, ymax, rmax, -M_PI / 2, M_PI / 2);
     cairo_arc_negative(cairo, -_DownShift, ymin, rmin, M_PI / 2, -M_PI / 2);
   }
   cairo_close_path(cairo);
-  cairo_set_source_rgba(cairo, color[0]*0.6, color[1]*0.6, color[2]*0.6, 0.2);
+  cairo_set_source_rgba(cairo, color[0] * 0.6, color[1] * 0.6, color[2] * 0.6, 0.2);
   cairo_fill_preserve(cairo);
-  cairo_set_source_rgb(cairo, color[0]*0.6, color[1]*0.6, color[2]*0.6);
+  cairo_set_source_rgb(cairo, color[0] * 0.6, color[1] * 0.6, color[2] * 0.6);
   cairo_stroke(cairo);
   cairo_restore(cairo);
 

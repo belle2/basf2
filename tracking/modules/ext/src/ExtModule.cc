@@ -74,6 +74,9 @@ ExtModule::~ExtModule()
 void ExtModule::initialize()
 {
 
+  // Convert from GeV to GEANT4 energy units (MeV)
+  m_minKE = m_minKE / GeV;
+
   // Define the list of volumes that will have their entry and/or
   // exit points stored during the extrapolation.
   registerVolumes();
@@ -158,7 +161,7 @@ void ExtModule::event()
 
   G4ThreeVector position;
   G4ThreeVector momentum;
-  G4ErrorTrajErr g4eCov(5, 0);
+  G4ErrorTrajErr covG4e(5, 0);
 
   int nTracks = gfTracks.getEntries();
   for (int t = 0; t < nTracks; ++t) {
@@ -167,13 +170,13 @@ void ExtModule::event()
 
     for (int hypothesis = 0; hypothesis < N_HYPOTHESES; hypothesis++) {
 
-      GFTrackCand* cand = addTrackCand(gfTracks[t], m_pdg[hypothesis] * charge, extTrackCands, position, momentum, g4eCov);
+      GFTrackCand* cand = addTrackCand(gfTracks[t], m_pdg[hypothesis] * charge, extTrackCands, position, momentum, covG4e);
       if (gfTracks[t]->getMom().Pt() <= m_minPt) continue;
       G4ParticleDefinition* particle = G4ParticleTable::GetParticleTable()->FindParticle(m_pdg[hypothesis] * charge);
       string g4eName = "g4e_" + particle->GetParticleName();
       double mass = particle->GetPDGMass();
-      double minP = sqrt(mass * mass + m_minKE * m_minKE);
-      G4ErrorFreeTrajState* state = new G4ErrorFreeTrajState(g4eName, position, momentum, g4eCov);
+      double minP = sqrt((mass + m_minKE) * (mass + m_minKE) - mass * mass);
+      G4ErrorFreeTrajState* state = new G4ErrorFreeTrajState(g4eName, position, momentum, covG4e);
       m_extMgr->InitTrackPropagation();
       while (true) {
 
@@ -192,6 +195,7 @@ void ExtModule::event()
           if (preStatus == fGeomBoundary) {      // first step in this volume?
             addPoint(state, ENTER, cand, extRecoHits);
           }
+          m_tof += step->GetDeltaTime();
           // Last step in this volume?
           if (postStatus == fGeomBoundary) {
             addPoint(state, EXIT, cand, extRecoHits);
@@ -369,33 +373,33 @@ TMatrixD ExtModule::getCov(const G4ErrorFreeTrajState* state)
   G4double sinphi = sin(phi);
   G4double cosphi = cos(phi);
 
-  // Transformation Jacobian 6x5 from Geant4e 5x5 to Panther 6x6
+  // Transformation Jacobian 6x5 from Geant4e 5x5 to phasespace 6x6
   // Jacobian units are GeV/c, radians, cm
   // Geant4e covariance matrix units are GeV/c, radians, cm (!!!) - see PropagateError()
   // Phase-space covariance matrix units are GeV/c, cm
 
-  G4ErrorMatrix jacobian(6, 5, 0);
+  G4ErrorMatrix fromGeant4eToPhasespace(6, 5, 0);
 
-  jacobian(4, 1) = - p2 * coslambda * cosphi;           // @(px)/@(1/p)
-  jacobian(5, 1) = - p2 * coslambda * sinphi;           // @(py)/@(1/p)
-  jacobian(6, 1) = - p2 * sinlambda;                    // @(pz)/@(1/p)
+  fromGeant4eToPhasespace[0][0] = - p2 * coslambda * cosphi;     // d(px)/d(1/p)
+  fromGeant4eToPhasespace[1][0] = - p2 * coslambda * sinphi;     // d(py)/d(1/p)
+  fromGeant4eToPhasespace[2][0] = - p2 * sinlambda;              // d(pz)/d(1/p)
 
-  jacobian(4, 2) = - p * sinlambda * cosphi;            // @(px)/@(lambda)
-  jacobian(5, 2) = - p * sinlambda * sinphi;            // @(py)/@(lambda)
-  jacobian(6, 2) =   p * coslambda;                     // @(pz)/@(lambda)
+  fromGeant4eToPhasespace[0][1] = - p * sinlambda * cosphi;      // d(px)/d(lambda)
+  fromGeant4eToPhasespace[1][1] = - p * sinlambda * sinphi;      // d(py)/d(lambda)
+  fromGeant4eToPhasespace[2][1] =   p * coslambda;               // d(pz)/d(lambda)
 
-  jacobian(4, 3) = - p * coslambda * sinphi;            // @(px)/@(phi)
-  jacobian(5, 3) =   p * coslambda * cosphi;            // @(py)/@(phi)
+  fromGeant4eToPhasespace[0][2] = - p * coslambda * sinphi;      // d(px)/d(phi)
+  fromGeant4eToPhasespace[1][2] =   p * coslambda * cosphi;      // d(py)/d(phi)
 
-  jacobian(1, 4) = - sinphi;                            // @(x)/@(yT)
-  jacobian(2, 4) =   cosphi;                            // @(y)/@(yT)
+  fromGeant4eToPhasespace[3][3] = - sinphi;                      // d(x)/d(yT)
+  fromGeant4eToPhasespace[4][3] =   cosphi;                      // d(y)/d(yT)
 
-  jacobian(1, 5) = - sinlambda * cosphi;                // @(x)/@(zT)
-  jacobian(2, 5) = - sinlambda * sinphi;                // @(y)/@(zT)
-  jacobian(3, 5) =   coslambda;                         // @(z)/@(zT)
+  fromGeant4eToPhasespace[3][4] = - sinlambda * cosphi;          // d(x)/d(zT)
+  fromGeant4eToPhasespace[4][4] = - sinlambda * sinphi;          // d(y)/d(zT)
+  fromGeant4eToPhasespace[5][4] =   coslambda;                   // d(z)/d(zT)
 
-  G4ErrorTrajErr g4eCov = state->GetError();
-  G4ErrorTrajErr phaseSpaceCov = g4eCov.similarity(jacobian);
+  G4ErrorTrajErr covG4e = state->GetError();
+  G4ErrorTrajErr phaseSpaceCov = covG4e.similarity(fromGeant4eToPhasespace);
   TMatrixD cov(6, 6);
   for (int i = 0; i < 6; ++i) {
     for (int j = 0; j < 6; ++j) {
@@ -407,59 +411,150 @@ TMatrixD ExtModule::getCov(const G4ErrorFreeTrajState* state)
 }
 
 GFTrackCand* ExtModule::addTrackCand(const GFTrack* gfTrack, int pdgCode, StoreArray<GFTrackCand>& extTrackCands,
-                                     G4ThreeVector& position, G4ThreeVector& momentum, G4ErrorTrajErr& g4eCov)
+                                     G4ThreeVector& position, G4ThreeVector& momentum, G4ErrorTrajErr& covG4e)
 {
 
+  TVector3 ip(0.0, 0.0, 0.0);
+  TVector3 ipPosition;
+  TVector3 ipDirection;
+  gfTrack->getCardinalRep()->extrapolateToPoint(ip, ipPosition, ipDirection);
   TMatrixD lastState(gfTrack->getCardinalRep()->getLastState());
   TMatrixD lastCov(gfTrack->getCardinalRep()->getLastCov());
   GFDetPlane lastPlane(gfTrack->getCardinalRep()->getLastPlane());
-  double qop = lastState[0][0];
+  double f = 1.0;
+  double q = (lastState[0][0] > 0.0 ? 1.0 : -1.0);
+  double p = q / lastState[0][0];
   const TVector3 o = lastPlane.getO();
-  const TVector3 u = lastPlane.getU();
-  const TVector3 v = lastPlane.getV();
-  const TVector3 w = lastPlane.getNormal();
-  TVector3 lastPosition = o + lastState[3][0] * u + lastState[4][0] * v;
-  TVector3 lastMomentum = w + lastState[1][0] * u + lastState[2][0] * v;
-  double spu = 1.0 / (fabs(qop) * lastMomentum.Mag());
-  //J_pM matrix is d(x,y,z,px,py,pz) / d(q/p,u',v',u,v)
-  TMatrixD J_pM(6, 5);
-  // dx/du
-  J_pM[0][3] = u.X();
-  J_pM[1][3] = u.Y();
-  J_pM[2][3] = u.Z();
-  // dx/dv
-  J_pM[0][4] = v.X();
-  J_pM[1][4] = v.Y();
-  J_pM[2][4] = v.Z();
-  // dpx/dqop
-  J_pM[3][0] = -(spu / qop) * lastMomentum.X();
-  J_pM[4][0] = -(spu / qop) * lastMomentum.Y();
-  J_pM[5][0] = -(spu / qop) * lastMomentum.Z();
-  // dpx/du'
-  J_pM[3][1] = spu * u.X();
-  J_pM[4][1] = spu * u.Y();
-  J_pM[5][1] = spu * u.Z();
-  // dpx/dv'
-  J_pM[3][2] = spu * v.X();
-  J_pM[4][2] = spu * v.Y();
-  J_pM[5][2] = spu * v.Z();
-  TMatrixD J_pM_transp(J_pM);
-  J_pM_transp.T();
-  TMatrixD out = J_pM * (lastCov * J_pM_transp);
-  // The above covariance matrix needs to be reviewed then put into g4eCov.
-  TVector3 lastPosError(sqrt(out[0][0]), sqrt(out[1][1]), sqrt(out[2][2]));
-  TVector3 lastDirError(sqrt(out[3][3]), sqrt(out[4][4]), sqrt(out[5][5]));
-  lastDirError *= fabs(qop);
+  const TVector3 uDir = lastPlane.getU();
+  const TVector3 vDir = lastPlane.getV();
+  const TVector3 wDir = lastPlane.getNormal();
+  TVector3 lastPosition = o + lastState[3][0] * uDir + lastState[4][0] * vDir;
+  if (wDir * lastPosition < 0.0) { f = -f; }
+  TVector3 pTilde = f * (wDir + lastState[1][0] * uDir + lastState[2][0] * vDir);
+  double pTildeMag = pTilde.Mag();
+  double pTildePerp = pTilde.Perp();
+  double g = f * p / pTildeMag;
+  double h = p / (pTildeMag * pTildeMag);
+  TVector3 lastDirection = pTilde.Unit();
+  TVector3 lastMomentum = p * lastDirection;
+  double pPerp = lastMomentum.Perp();
+  double sinLambda = pPerp / p;
+  double cosLambda = sqrt(1.0 - sinLambda * sinLambda);
+  double phi = atan2(lastDirection.Y(), lastDirection.X());
+  double sinPhi = sin(phi);
+  double cosPhi = cos(phi);
+
+  double pathLength = 0.0;
+  double avgW = 0.5 * (ipDirection.Z() + lastDirection.Z());
+  if (fabs(avgW) > 1.0E-10) {
+    pathLength = fabs((lastPosition.Z() - ipPosition.Z()) / avgW);
+  } else {
+    double ipPhi = atan2(-ipDirection.X(), ipDirection.Y());
+    double lastPhi = atan2(-lastDirection.X(), lastDirection.Y());
+    double dPhi = lastPhi - ipPhi;
+    double TWOPI = M_PI + M_PI;
+    if (dPhi < -TWOPI) { dPhi += TWOPI; }
+    if (dPhi >  TWOPI) { dPhi -= TWOPI; }
+    double dx = lastPosition.X() - ipPosition.X();
+    double dy = lastPosition.Y() - ipPosition.Y();
+    pathLength = sqrt(dx * dx + dy * dy) / (ipDirection.Perp() + lastDirection.Perp())
+                 * (dPhi / sin(0.5 * dPhi));
+  }
+  double m = G4ParticleTable::GetParticleTable()->FindParticle(pdgCode)->GetPDGMass() / GeV;
+  // time of flight (ns) at the last point on the Genfit track
+  m_tof = pathLength * (sqrt(p * p + m * m) / (p * 29.9792458));
+
+  // Jacobian matrix d(x,y,z,px,py,pz) / d(q/p,u',v',u,v)
+  TMatrixD fromGenfitToPhasespace(6, 5);
+  // d(x,y,z)/d(u)
+  fromGenfitToPhasespace[0][3] = uDir.X();
+  fromGenfitToPhasespace[1][3] = uDir.Y();
+  fromGenfitToPhasespace[2][3] = uDir.Z();
+  // d(x,y,z)/d(v)
+  fromGenfitToPhasespace[0][4] = vDir.X();
+  fromGenfitToPhasespace[1][4] = vDir.Y();
+  fromGenfitToPhasespace[2][4] = vDir.Z();
+  // d(px,py,pz)/d(q/p)
+  fromGenfitToPhasespace[3][0] = -p * q * lastMomentum.X();
+  fromGenfitToPhasespace[4][0] = -p * q * lastMomentum.Y();
+  fromGenfitToPhasespace[5][0] = -p * q * lastMomentum.Z();
+  // d(px,py,pz)/d(u')
+  fromGenfitToPhasespace[3][1] = g * uDir.X() - (h * lastState[1][0]) * lastDirection.X();
+  fromGenfitToPhasespace[4][1] = g * uDir.Y() - (h * lastState[1][0]) * lastDirection.Y();
+  fromGenfitToPhasespace[5][1] = g * uDir.Z() - (h * lastState[1][0]) * lastDirection.Z();
+  // d(px,py,pz)/d(v')
+  fromGenfitToPhasespace[3][2] = g * vDir.X() - (h * lastState[2][0]) * lastDirection.X();
+  fromGenfitToPhasespace[4][2] = g * vDir.Y() - (h * lastState[2][0]) * lastDirection.Y();
+  fromGenfitToPhasespace[5][2] = g * vDir.Z() - (h * lastState[2][0]) * lastDirection.Z();
+  TMatrixD fromGenfitToPhasespaceT(fromGenfitToPhasespace);
+  fromGenfitToPhasespaceT.T();
+  TMatrixD lastCovPS = fromGenfitToPhasespace * (lastCov * fromGenfitToPhasespaceT);
+  TVector3 lastPosError(sqrt(lastCovPS[0][0]), sqrt(lastCovPS[1][1]), sqrt(lastCovPS[2][2]));
+  TVector3 lastDirError(sqrt(lastCovPS[3][3]), sqrt(lastCovPS[4][4]), sqrt(lastCovPS[5][5]));
+  lastDirError *= (1.0 / p);
+  /*
+  // Jacobian matrix d(1/p,lambda,phi,Yperp,Zperp)/d(x,y,z,px,py,pz)
+  TMatrixD fromPhasespaceToGeant4e(5, 6);
+  // d(1/p)/d(px,py,pz)
+  fromPhasespaceToGeant4e[0][3] = -lastDirection.X()/(p*p);
+  fromPhasespaceToGeant4e[0][4] = -lastDirection.Y()/(p*p);
+  fromPhasespaceToGeant4e[0][5] = -lastDirection.Z()/(p*p);
+  // d(lambda)/d(px,py,pz)
+  fromPhasespaceToGeant4e[1][3] = -lastDirection.X()*lastDirection.Z()/pPerp;
+  fromPhasespaceToGeant4e[1][4] = -lastDirection.Y()*lastDirection.Z()/pPerp;
+  fromPhasespaceToGeant4e[1][5] = pPerp/(p*p);
+  // d(phi)/d(px,py,pz)
+  fromPhasespaceToGeant4e[2][3] = -lastMomentum.Y()/(pPerp*pPerp);
+  fromPhasespaceToGeant4e[2][4] =  lastMomentum.X()/(pPerp*pPerp);
+  // d(Yperp)/d(x,y,z)
+  fromPhasespaceToGeant4e[3][0] = -sinPhi;
+  fromPhasespaceToGeant4e[3][1] =  cosPhi;
+  // d(Zperp)/d(x,y,z)
+  fromPhasespaceToGeant4e[4][0] = -sinLambda*cosPhi;
+  fromPhasespaceToGeant4e[4][1] = -sinLambda*sinPhi;
+  fromPhasespaceToGeant4e[4][2] =  cosLambda;
+  TMatrixD fromPhasespaceToGeant4eT(fromPhasespaceToGeant4e);
+  fromPhasespaceToGeant4eT.T();
+  TMatrixD lastCovG4e = fromPhasespaceToGeant4e * (lastCovPS * fromPhasespaceToGeant4eT);
+  // The 2-step calculation of lastCovG4e above gives the same result as the 1-step calculation below.
+  */
+  // Jacobian matrix d(1/p,lambda,phi,Yperp,Zperp)/d(q/p,u',v',u,v)
+  TMatrixD fromGenfitToGeant4e(5, 5);
+  // d(1/p)/d(q/p)
+  fromGenfitToGeant4e[0][0] = q;
+  // d(lambda)/d(u')
+  fromGenfitToGeant4e[1][1] = f * (-pTilde.X() * pTilde.Z() * uDir.X() - pTilde.Y() * pTilde.Z() * uDir.Y() + pTildePerp * pTildePerp * uDir.Z()) / (pTildeMag * pTildeMag * pTildePerp);
+  // d(lambda)/d(v')
+  fromGenfitToGeant4e[1][2] = f * (-pTilde.X() * pTilde.Z() * vDir.X() - pTilde.Y() * pTilde.Z() * vDir.Y() + pTildePerp * pTildePerp * vDir.Z()) / (pTildeMag * pTildeMag * pTildePerp);
+  // d(phi)/d(u')
+  fromGenfitToGeant4e[2][1] = f * (pTilde.X() * uDir.Y() - pTilde.Y() * uDir.X()) / (pTildePerp * pTildePerp);
+  // d(phi)/d(v')
+  fromGenfitToGeant4e[2][2] = f * (pTilde.X() * vDir.Y() - pTilde.Y() * vDir.X()) / (pTildePerp * pTildePerp);
+  // d(Yperp)/d(u)
+  fromGenfitToGeant4e[3][3] = -sinPhi * uDir.X() + cosPhi * uDir.Y();
+  // d(Yperp)/d(v)
+  fromGenfitToGeant4e[3][4] = -sinPhi * vDir.X() + cosPhi * vDir.Y();
+  // d(Zperp)/d(u)
+  fromGenfitToGeant4e[4][3] = -sinLambda * cosPhi * uDir.X() - sinLambda * sinPhi * uDir.Y() + cosLambda * uDir.Z();
+  // d(Zperp)/d(v)
+  fromGenfitToGeant4e[4][4] = -sinLambda * cosPhi * vDir.X() - sinLambda * sinPhi * vDir.Y() + cosLambda * vDir.Z();
+  TMatrixD fromGenfitToGeant4eT(fromGenfitToGeant4e);
+  fromGenfitToGeant4eT.T();
+  TMatrixD lastCovG4e = fromGenfitToGeant4e * (lastCov * fromGenfitToGeant4eT);
+  for (int i = 0; i < 5; ++i) {
+    for (int j = 0; j < 5; ++j) {
+      covG4e[i][j] = lastCovG4e[i][j];  // in Geant4e units (GeV, cm)
+    }
+  }
   int candNumber = extTrackCands->GetLast() + 1;
   GFTrackCand* cand = new(extTrackCands->AddrAt(candNumber)) GFTrackCand();
   cand->setComplTrackSeed(lastPosition, lastMomentum, pdgCode, lastPosError, lastDirError);
-  position.setX(lastPosition.x()*cm);
-  position.setY(lastPosition.y()*cm);
-  position.setZ(lastPosition.z()*cm);
-  lastMomentum.SetMag(1.0 / fabs(qop));
-  momentum.setX(lastMomentum.x()*GeV);
-  momentum.setY(lastMomentum.y()*GeV);
-  momentum.setZ(lastMomentum.z()*GeV);
+  position.setX(lastPosition.X()*cm); // in Geant4 units (mm)
+  position.setY(lastPosition.Y()*cm);
+  position.setZ(lastPosition.Z()*cm);
+  momentum.setX(lastMomentum.X()*GeV);  // in Geant4 units (MeV)
+  momentum.setY(lastMomentum.Y()*GeV);
+  momentum.setZ(lastMomentum.Z()*GeV);
 
   return cand;
 }
@@ -486,7 +581,7 @@ void ExtModule::addFirstPoint(const G4ErrorFreeTrajState* state, GFTrackCand* ca
   int detID(0);
   int copyID(0);
   getVolumeID(preTouch, detID, copyID);
-  cand->addHit(detID, hitNumber, 0.0, copyID);
+  cand->addHit(detID, hitNumber, m_tof, copyID);
 
 }
 
@@ -496,7 +591,6 @@ void ExtModule::addPoint(const G4ErrorFreeTrajState* state, ExtHitStatus status,
 
   G4StepPoint* stepPoint = state->GetG4Track()->GetStep()->GetPreStepPoint();
   G4TouchableHandle preTouch = stepPoint->GetTouchableHandle();
-
   G4VPhysicalVolume* preVol = preTouch->GetVolume();
   if (status == ENTER) {
     if (find(m_enter->begin(), m_enter->end(), preVol) == m_enter->end()) { return; }
@@ -519,6 +613,6 @@ void ExtModule::addPoint(const G4ErrorFreeTrajState* state, ExtHitStatus status,
   int detID(0);
   int copyID(0);
   getVolumeID(preTouch, detID, copyID);
-  cand->addHit(detID, hitNumber, 0.0, copyID);
+  cand->addHit(detID, hitNumber, m_tof, copyID);
 
 }

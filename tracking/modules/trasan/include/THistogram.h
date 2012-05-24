@@ -91,10 +91,10 @@
 
 namespace Belle {
 
-class TCircle;
+  class TCircle;
 
 /// A class for a histogram used in tracking.
-class THistogram {
+  class THistogram {
 
   public:
     /// Constructor.
@@ -105,8 +105,8 @@ class THistogram {
 
   public:// Selectors
     /// dumps debug information.
-    void dump(const std::string & message = std::string(""),
-	      const std::string & prefix = std::string("")) const;
+    void dump(const std::string& message = std::string(""),
+              const std::string& prefix = std::string("")) const;
 
     /// returns a pointer to i'th AList<TLink>.
     const AList<TLink> * const bin(unsigned i) const;
@@ -162,12 +162,12 @@ class THistogram {
 
   private:
     unsigned _nBins;
-    unsigned * _bins;
-    bool * _masks;
+    unsigned* _bins;
+    bool* _masks;
     AList<TLink> ** _links;
     AList<TLink> _all;
     float _binSize;
-};
+  };
 
 //-----------------------------------------------------------------------------
 
@@ -180,50 +180,57 @@ class THistogram {
 
 #ifdef THistogram_INLINE_DEFINE_HERE
 
-inline
-const AList<TLink> * const
-THistogram::bin(unsigned i) const {
+  inline
+  const AList<TLink> * const
+  THistogram::bin(unsigned i) const
+  {
     if (i < _nBins) return _links[i];
     return 0;
-}
+  }
 
-inline
-const AList<TLink> * const
-THistogram::bin(int i) const {
+  inline
+  const AList<TLink> * const
+  THistogram::bin(int i) const
+  {
     while (i < 0) i += _nBins;
     return _links[i % _nBins];
-}
+  }
 
-inline
-unsigned
-THistogram::nBins(void) const {
+  inline
+  unsigned
+  THistogram::nBins(void) const
+  {
     return _nBins;
-}
+  }
 
-inline
-void
-THistogram::mask(unsigned a) {
+  inline
+  void
+  THistogram::mask(unsigned a)
+  {
     _masks[a] = true;
-}
+  }
 
-inline
-void
-THistogram::unmask(void) {
+  inline
+  void
+  THistogram::unmask(void)
+  {
     for (unsigned i = 0; i < _nBins; i++) _masks[i] = false;
-}
+  }
 
-inline
-const AList<TLink> &
-THistogram::contents(void) const {
+  inline
+  const AList<TLink> &
+  THistogram::contents(void) const
+  {
     return _all;
-}
+  }
 
-inline
-unsigned
-THistogram::nBin(unsigned i) const {
+  inline
+  unsigned
+  THistogram::nBin(unsigned i) const
+  {
     if (i < _nBins) return _bins[i];
     return 0;
-}
+  }
 
 #endif
 

@@ -77,7 +77,7 @@ namespace Belle2 {
      *  Conformal coordinates of all hits (excluding the first layer) of the given track candidate are fitted with a straight line.
      *  Resulting chi2 value as well as an estimation of the transverse momentum value and charge are assigned to the track candidate.
      */
-    static void FitTrackCandidate(CDCTrackCandidate & candidate);
+    static void FitTrackCandidate(CDCTrackCandidate& candidate);
 
     /** Performs a simple linear fit of all the tracks in the conformal plane, calculates and assigns chi2, transverse momentum and charge estimation to the track candidates.
      *  Conformal coordinates of all hits (excluding the first layer) of the given track candidate are fitted with a straight line.

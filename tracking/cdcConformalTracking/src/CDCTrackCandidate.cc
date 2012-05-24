@@ -40,7 +40,7 @@ CDCTrackCandidate::CDCTrackCandidate(const int Id)
 
 }
 
-CDCTrackCandidate::CDCTrackCandidate(CDCTrackCandidate &candidate, const int Id)
+CDCTrackCandidate::CDCTrackCandidate(CDCTrackCandidate& candidate, const int Id)
 {
 
   m_Id = Id;
@@ -68,7 +68,7 @@ CDCTrackCandidate::~CDCTrackCandidate()
 {
 }
 
-void CDCTrackCandidate::addSegment(CDCSegment & aSegment)
+void CDCTrackCandidate::addSegment(CDCSegment& aSegment)
 {
   m_Segments.push_back(aSegment);
   for (int i = 0; i < aSegment.getNHits(); i++) {

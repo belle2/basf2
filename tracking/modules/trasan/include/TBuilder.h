@@ -153,35 +153,35 @@
 
 namespace Belle {
 
-class TTrack;
-class TLink;
-class TLine;
-class TSegment;
-class THoughTransformation;
-class THoughPlane;
+  class TTrack;
+  class TLink;
+  class TLine;
+  class TSegment;
+  class THoughTransformation;
+  class THoughPlane;
 
 /// A class to build a track.
-class TBuilder {
+  class TBuilder {
 
   public:
     /// Constructor with salvage level.
-    TBuilder(const std::string & name,
-	     float maxSigma,
-	     float maxSigmaStereo,
-	     float salvageLevel,
-	     float szLinkDistance,
-	     unsigned fittingFlag);
+    TBuilder(const std::string& name,
+             float maxSigma,
+             float maxSigmaStereo,
+             float salvageLevel,
+             float szLinkDistance,
+             unsigned fittingFlag);
 
     /// Destructor
     virtual ~TBuilder();
 
   public:// Debug information
     /// returns name.
-    const std::string & name(void) const;
+    const std::string& name(void) const;
 
     /// dumps debug information.
-    void dump(const std::string & message = std::string(""),
-	      const std::string & prefix = std::string("")) const;
+    void dump(const std::string& message = std::string(""),
+              const std::string& prefix = std::string("")) const;
 
     /// returns minimum \# of core links.
     unsigned minNCores(void) const;
@@ -193,45 +193,45 @@ class TBuilder {
     float maxSigmaStereo(void) const;
 
     /// returns a fitter.
-    const THelixFitter & helixFitter(void) const;
+    const THelixFitter& helixFitter(void) const;
 
   public:// Track building
 
     /// builds a r/phi track.
-    TTrack * buildRphi(const AList<TLink> &) const;
+    TTrack* buildRphi(const AList<TLink> &) const;
 
     /// builds a 3D track.
-    TTrack * buildStereo(TTrack & track, const AList<TLink> & list) const;
+    TTrack* buildStereo(TTrack& track, const AList<TLink> & list) const;
 
     /// salvages hits.
-    void salvage(TTrack & t, AList<TLink> & hits) const;
+    void salvage(TTrack& t, AList<TLink> & hits) const;
 
   protected:
-    TLine * initialLine(const TTrack &, const AList<TLink> &) const;
-    AList<TLine> initialLines(const TTrack &, const AList<TLink> &) const;
-    AList<TLine> initialLines2(const TTrack &, const AList<TLink> &) const;
-    AList<TLink> selectStereoHits(const TTrack &,
-				  const TLine &,
-				  const AList<TLink> &) const;
+    TLine* initialLine(const TTrack&, const AList<TLink> &) const;
+    AList<TLine> initialLines(const TTrack&, const AList<TLink> &) const;
+    AList<TLine> initialLines2(const TTrack&, const AList<TLink> &) const;
+    AList<TLink> selectStereoHits(const TTrack&,
+                                  const TLine&,
+                                  const AList<TLink> &) const;
     void houghTransformation(const AList<TLink> & hits,
-			     const THoughTransformation & trans,
-			     THoughPlane & plane) const;
-    void refine(TTrack & t, AList<TLink> & list, double maxSigma) const;
+                             const THoughTransformation& trans,
+                             THoughPlane& plane) const;
+    void refine(TTrack& t, AList<TLink> & list, double maxSigma) const;
 
 
     /// makes a track (standard version)
-    TTrack * buildRphiFast(AList<TLink> & list) const;
+    TTrack* buildRphiFast(AList<TLink> & list) const;
 
     /// makes a track (slow version)
-    TTrack * buildRphiSlow(AList<TLink> & list) const;
+    TTrack* buildRphiSlow(AList<TLink> & list) const;
 
-public:// Obsolete functions
-    TTrack * build(TTrack & t, const TLine & l) const;
-    TTrack * buildStereoOld(TTrack & t,
-			    const AList<TLink> & allLinks,
-			    const AList<TLink> & isolatedLinks) const;
-    TTrack * buildStereoOld(TTrack & track, const AList<TLink> & list) const;
-    AList<TLine> initialLinesOld(const TTrack &, const AList<TLink> &) const;
+  public:// Obsolete functions
+    TTrack* build(TTrack& t, const TLine& l) const;
+    TTrack* buildStereoOld(TTrack& t,
+                           const AList<TLink> & allLinks,
+                           const AList<TLink> & isolatedLinks) const;
+    TTrack* buildStereoOld(TTrack& track, const AList<TLink> & list) const;
+    AList<TLine> initialLinesOld(const TTrack&, const AList<TLink> &) const;
 
   private:
     std::string _name;
@@ -246,7 +246,7 @@ public:// Obsolete functions
     unsigned _minNCores;
 
     friend class TBuilderConformal;
-};
+  };
 
 //-----------------------------------------------------------------------------
 
@@ -259,35 +259,40 @@ public:// Obsolete functions
 
 #ifdef TBuilder_INLINE_DEFINE_HERE
 
-inline
-const std::string &
-TBuilder::name(void) const {
+  inline
+  const std::string&
+  TBuilder::name(void) const
+  {
     return _name;
-}
+  }
 
-inline
-unsigned
-TBuilder::minNCores(void) const {
+  inline
+  unsigned
+  TBuilder::minNCores(void) const
+  {
     return _minNCores;
-}
+  }
 
-inline
-float
-TBuilder::szLinkDistance(void) const {
+  inline
+  float
+  TBuilder::szLinkDistance(void) const
+  {
     return _szLinkDistance;
-}
+  }
 
-inline
-const THelixFitter &
-TBuilder::helixFitter(void) const {
+  inline
+  const THelixFitter&
+  TBuilder::helixFitter(void) const
+  {
     return _fitter;
-}
+  }
 
-inline
-float
-TBuilder::maxSigmaStereo(void) const {
+  inline
+  float
+  TBuilder::maxSigmaStereo(void) const
+  {
     return _maxSigmaStereo;
-}
+  }
 
 #endif
 

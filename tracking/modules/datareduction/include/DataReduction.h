@@ -47,8 +47,8 @@ namespace Belle2 {
     //debug output methods
     void printSectorInfo();
 #ifdef CAIRO_OUTPUT
-    cairo_t *cairo;
-    cairo_surface_t *cairo_surface;
+    cairo_t* cairo;
+    cairo_surface_t* cairo_surface;
     void makePDF(bool split = true, int group = 1);
 #endif
 

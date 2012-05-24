@@ -171,17 +171,17 @@
 #include "tracking/modules/trasan/AList.h"
 
 namespace Belle2 {
-    class TRGCDCTrackMC;
+  class TRGCDCTrackMC;
 }
 
 namespace Belle {
 
-class TLink;
-class TTrackMC;
-class TFitter;
+  class TLink;
+  class TTrackMC;
+  class TFitter;
 
 /// A virtual class for a track class in tracking.
-class TTrackBase {
+  class TTrackBase {
 
   public:
     /// Constructor.
@@ -201,8 +201,8 @@ class TTrackBase {
     virtual unsigned type(void) const;
 
     /// dumps debug information.
-    virtual void dump(const std::string & message = std::string(""),
-		      const std::string & prefix = std::string("")) const;
+    virtual void dump(const std::string& message = std::string(""),
+                      const std::string& prefix = std::string("")) const;
 
   public:// Hit information
     /// returns a list of masked TLinks assigned to this track. 'mask' will be applied if mask is not 0.
@@ -231,7 +231,7 @@ class TTrackBase {
     void update(void) const;
 
     /// appends a TLink.
-    void append(TLink &);
+    void append(TLink&);
 
     /// appends TLinks.
     void append(const AList<TLink> &);
@@ -243,7 +243,7 @@ class TTrackBase {
     void appendByDistance(AList<TLink> & list, double maxDistance);
 
     /// removes a TLink.
-    void remove(TLink & a);
+    void remove(TLink& a);
 
     /// removes TLinks.
     void remove(const AList<TLink> &);
@@ -255,39 +255,39 @@ class TTrackBase {
     virtual void refine(double maxSigma);
 
     /// returns distance to a position of TLink in TLink space.
-    virtual double distance(const TLink &) const;
+    virtual double distance(const TLink&) const;
 
     /// calculates the closest approach to a wire in real space. Results are stored in TLink. Return value is negative if error happened.
-    virtual int approach(TLink &) const;
+    virtual int approach(TLink&) const;
 
     /// returns \# of good hits to be appended.
-    unsigned testByApproach(const TLink & list, double sigma) const;
+    unsigned testByApproach(const TLink& list, double sigma) const;
     unsigned testByApproach(const AList<TLink> & list, double sigma) const;
 
     /// fits itself by a default fitter. Error was happened if return value is not zero.
     virtual int fit(void);
 
     /// returns a pointer to a default fitter.
-    const TFitter * const fitter(void) const;
+    const TFitter* const fitter(void) const;
 
     /// sets a default fitter.
-    const TFitter * const fitter(const TFitter *);
+    const TFitter* const fitter(const TFitter*);
 
     /// false Fit
     void falseFit(); // added by matsu ( 1999/05/24 )
 
   public:// Operators
-    TLink * operator[](unsigned i) const;
+    TLink* operator[](unsigned i) const;
 
   public:// MC information
     /// returns Belle2::TRGCDCTrackMC.
-    const Belle2::TRGCDCTrackMC * const hep(void) const;
+    const Belle2::TRGCDCTrackMC* const hep(void) const;
 
     /// returns \# of contributed Belle2::TRGCDCTrackMC tracks.
     unsigned nHeps(void) const;
 
     /// returns a pointer to TTrackMC.
-    const TTrackMC * const mc(void) const;
+    const TTrackMC* const mc(void) const;
 
   public:// Obsolete functions. Followings should be removed in Trasan 2.
     /// returns true if fitted.
@@ -299,8 +299,8 @@ class TTrackBase {
   public:// Static utility functions
     /// dumps TLinks.
     static void dump(const AList<TTrackBase> & list,
-		     const std::string & message = std::string(""),
-		     const std::string & prefix = std::string(""));
+                     const std::string& message = std::string(""),
+                     const std::string& prefix = std::string(""));
 
   private:
     /// refine core part.
@@ -311,7 +311,7 @@ class TTrackBase {
     mutable bool _fitted;
     mutable bool _fittedWithCathode;
     // unsigned _state;
-    TTrackMC * _mc;
+    TTrackMC* _mc;
 
   private:// Always updated
     mutable bool _updated;
@@ -319,12 +319,12 @@ class TTrackBase {
   private:// Updated when accessed
     mutable AList<TLink> _cores;
 
-  private:// Always updated when accessed 
-    mutable const Belle2::TRGCDCTrackMC * _hep;
+  private:// Always updated when accessed
+    mutable const Belle2::TRGCDCTrackMC* _hep;
     mutable unsigned _nHeps;
 
   private:
-    const TFitter * _fitter;
+    const TFitter* _fitter;
     float _time;
 
     friend class TFitter;
@@ -335,7 +335,7 @@ class TTrackBase {
   public:
     bool fitted(bool) const;
 #endif
-};
+  };
 
 //-----------------------------------------------------------------------------
 
@@ -348,88 +348,100 @@ class TTrackBase {
 
 #ifdef TTrackBase_INLINE_DEFINE_HERE
 
-inline
-void
-TTrackBase::remove(TLink & a) {
+  inline
+  void
+  TTrackBase::remove(TLink& a)
+  {
     _links.remove(a);
     _updated = false;
     _fitted = false;
     _fittedWithCathode = false; // mod. by matsu ( 1999/05/24 )
-}
+  }
 
-inline
-void
-TTrackBase::remove(const AList<TLink> & a) {
+  inline
+  void
+  TTrackBase::remove(const AList<TLink> & a)
+  {
     _links.remove(a);
     _updated = false;
     _fitted = false;
     _fittedWithCathode = false; // mod. by matsu ( 1999/05/24 )
-}
+  }
 
-inline
-bool
-TTrackBase::fitted(void) const {
+  inline
+  bool
+  TTrackBase::fitted(void) const
+  {
     return _fitted;
-}
+  }
 
 // added by matsu ( 1999/05/24 )
-inline
-void
-TTrackBase::falseFit(){
+  inline
+  void
+  TTrackBase::falseFit()
+  {
     _fitted = false;
     _fittedWithCathode = false;
-}
+  }
 // end of addition
 
-inline
-TLink *
-TTrackBase::operator[](unsigned i) const {
+  inline
+  TLink*
+  TTrackBase::operator[](unsigned i) const
+  {
     return _links[i];
-}
+  }
 
-inline
-bool
-TTrackBase::fittedWithCathode(void) const {
+  inline
+  bool
+  TTrackBase::fittedWithCathode(void) const
+  {
     return _fittedWithCathode;
-}
+  }
 
-inline
-const TTrackMC * const
-TTrackBase::mc(void) const {
+  inline
+  const TTrackMC* const
+  TTrackBase::mc(void) const
+  {
     return _mc;
-}
+  }
 
-inline
-const TFitter * const
-TTrackBase::fitter(void) const {
+  inline
+  const TFitter* const
+  TTrackBase::fitter(void) const
+  {
     return _fitter;
-}
+  }
 
-inline
-const TFitter * const
-TTrackBase::fitter(const TFitter * a) {
+  inline
+  const TFitter* const
+  TTrackBase::fitter(const TFitter* a)
+  {
     _fitted = false;
     return _fitter = a;
-}
+  }
 
-inline
-unsigned
-TTrackBase::objectType(void) const {
+  inline
+  unsigned
+  TTrackBase::objectType(void) const
+  {
     return TrackBase;
-}
+  }
 
-inline
-unsigned
-TTrackBase::type(void) const {
+  inline
+  unsigned
+  TTrackBase::type(void) const
+  {
     return 0;
-}
+  }
 
 #ifdef TRASAN_DEBUG
-inline
-bool
-TTrackBase::fitted(bool a) const {
+  inline
+  bool
+  TTrackBase::fitted(bool a) const
+  {
     return _fitted = a;
-}
+  }
 #endif
 
 #endif

@@ -18,6 +18,8 @@
 #include <GFRecoHitIfc.h>
 #include <tracking/dataobjects/ExtHitPolicy.h>
 
+class GFAbsRecoHit;
+
 namespace Belle2 {
 
   enum ExtHitStatus { ENTER, EXIT, STOP, ESCAPE };

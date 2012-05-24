@@ -26,18 +26,18 @@ namespace Belle {
 #define N_LAYERS 64
 
 /// A class to represent a Hough parameter plane.
-class THoughPlaneMulti : public THoughPlane {
+  class THoughPlaneMulti : public THoughPlane {
 
   public:
     /// Contructor.
-    THoughPlaneMulti(const std::string & name,
-		     unsigned nX,
-		     float xMin,
-		     float xMax,
-		     unsigned nY,
-		     float yMin,
-		     float yMax,
-		     unsigned nLayers);
+    THoughPlaneMulti(const std::string& name,
+                     unsigned nX,
+                     float xMin,
+                     float xMax,
+                     unsigned nY,
+                     float yMin,
+                     float yMax,
+                     unsigned nLayers);
 
     /// Destructor
     virtual ~THoughPlaneMulti();
@@ -46,8 +46,8 @@ class THoughPlaneMulti : public THoughPlane {
     /// returns # of active cells in the pattern.
     virtual unsigned nActiveCellsInPattern(unsigned layerId) const;
 
-    void dump(const std::string & message = std::string(""),
-	      const std::string & prefix = std::string("")) const;
+    void dump(const std::string& message = std::string(""),
+              const std::string& prefix = std::string("")) const;
 
   public:// Modifiers
     /// Clears all entries.
@@ -55,11 +55,11 @@ class THoughPlaneMulti : public THoughPlane {
 
     /// vote
     void vote(float rx,
-	      float ry,
-	      float charge,
-	      const THoughTransformation & hough,
-	      unsigned weight,
-	      unsigned layerId);
+              float ry,
+              float charge,
+              const THoughTransformation& hough,
+              unsigned weight,
+              unsigned layerId);
     void vote(float phi, unsigned layerId, int weight);
     void merge(void);
 
@@ -69,37 +69,41 @@ class THoughPlaneMulti : public THoughPlane {
   private:
 //  AList<THoughPlane> _layers;
     unsigned _nLayers;
-    THoughPlane * _layers[N_LAYERS];
+    THoughPlane* _layers[N_LAYERS];
     bool _usage[N_LAYERS];
-};
+  };
 
-inline
-void
-THoughPlaneMulti::clear(void) {
+  inline
+  void
+  THoughPlaneMulti::clear(void)
+  {
     for (unsigned i = 0; i < N_LAYERS; i++)
-	if (_usage[i])
-	    _layers[i]->clear();
+      if (_usage[i])
+        _layers[i]->clear();
     THoughPlane::clear();
-}
+  }
 
-inline
-void
-THoughPlaneMulti::registerPattern(unsigned id) {
+  inline
+  void
+  THoughPlaneMulti::registerPattern(unsigned id)
+  {
     _layers[id]->registerPattern(0);
-}
+  }
 
-inline
-unsigned
-THoughPlaneMulti::nActiveCellsInPattern(unsigned id) const {
+  inline
+  unsigned
+  THoughPlaneMulti::nActiveCellsInPattern(unsigned id) const
+  {
 //    return _layers[id]->nActiveCellsInPattern();
     return 0;
-}
+  }
 
-inline
-void
-THoughPlaneMulti::dump(const std::string & a, const std::string & b) const {
+  inline
+  void
+  THoughPlaneMulti::dump(const std::string& a, const std::string& b) const
+  {
     THoughPlaneBase::dump(a, b);
-}
+  }
 
 } // namespace Belle
 

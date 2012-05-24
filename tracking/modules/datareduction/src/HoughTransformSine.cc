@@ -84,5 +84,5 @@ bool HoughTransformSine::isHitInHoughBox(HoughTransformBox& houghBox, rzHit& hit
 
 double HoughTransformSine::getZValue(double a, double b, double r)
 {
-  return (1 / a) * asin(b*r);
+  return (1 / a) * asin(b * r);
 }

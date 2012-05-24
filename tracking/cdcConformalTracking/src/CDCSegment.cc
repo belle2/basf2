@@ -49,7 +49,7 @@ CDCSegment::CDCSegment(int superlayerId, int Id)
   m_direction.SetZ(0);
 }
 
-void CDCSegment::addTrackHit(CDCTrackHit &aTrackHit)
+void CDCSegment::addTrackHit(CDCTrackHit& aTrackHit)
 {
   m_TrackHits.push_back(aTrackHit);
   update();
@@ -153,8 +153,8 @@ void CDCSegment::update()
 int CDCSegment::getWireIdDiff() const
 {
 
-  CDCGeometryPar * cdcgp = CDCGeometryPar::Instance();
-  CDCGeometryPar & cdcg(*cdcgp);
+  CDCGeometryPar* cdcgp = CDCGeometryPar::Instance();
+  CDCGeometryPar& cdcg(*cdcgp);
 
   int minWireId = 1000;
   int maxWireId = 0;

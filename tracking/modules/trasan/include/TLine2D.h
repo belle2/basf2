@@ -32,11 +32,11 @@ namespace Belle {
 #define TRASAN_DEBUG
 #endif
 #endif
-class TPoint2D;
-template <class T> class CAList;
+  class TPoint2D;
+  template <class T> class CAList;
 
 /// A class to represent a line in 2D.
-class TLine2D {
+  class TLine2D {
 
   public:
     /// Constructors
@@ -61,11 +61,11 @@ class TLine2D {
     double det(void) const;
 
   public:// Geometry
-    double distance(const TPoint2D &) const;
+    double distance(const TPoint2D&) const;
 
   public:// Point members
-    void append(const TPoint2D &);
-    void remove(const TPoint2D &);
+    void append(const TPoint2D&);
+    void remove(const TPoint2D&);
     const CAList<TPoint2D> & list(void) const;
 
   private:
@@ -73,7 +73,7 @@ class TLine2D {
     double _yOffset;
     double _det;
     mutable CAList<TPoint2D> * _list;
-};
+  };
 
 //-----------------------------------------------------------------------------
 
@@ -85,35 +85,40 @@ class TLine2D {
 #endif
 #ifdef TLINE2D_INLINE_DEFINE_HERE
 
-inline
-double
-TLine2D::slope(void) const {
+  inline
+  double
+  TLine2D::slope(void) const
+  {
     return _slope;
-}
+  }
 
-inline
-double
-TLine2D::yOffset(void) const {
+  inline
+  double
+  TLine2D::yOffset(void) const
+  {
     return _yOffset;
-}
+  }
 
-inline
-double
-TLine2D::xOffset(void) const {
+  inline
+  double
+  TLine2D::xOffset(void) const
+  {
     return - _yOffset / _slope;
-}
+  }
 
-inline
-double
-TLine2D::slope(double a) {
+  inline
+  double
+  TLine2D::slope(double a)
+  {
     return _slope = a;
-}
+  }
 
-inline
-double
-TLine2D::yOffset(double a) {
+  inline
+  double
+  TLine2D::yOffset(double a)
+  {
     return _yOffset = a;
-}
+  }
 
 #endif
 #undef inline

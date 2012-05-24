@@ -28,47 +28,54 @@
 
 namespace Belle {
 
-TWindowGTKSZ::TWindowGTKSZ(const std::string & name,
-			   int size)
+  TWindowGTKSZ::TWindowGTKSZ(const std::string& name,
+                             int size)
     : TWindowGTK(name, 800, size),
-    _w(size, 800) {
+      _w(size, 800)
+  {
     _w.set_size_request(size, size);
-    pack((Gtk::DrawingArea &) _w);
-}
+    pack((Gtk::DrawingArea&) _w);
+  }
 
-TWindowGTKSZ::~TWindowGTKSZ() {
-}
+  TWindowGTKSZ::~TWindowGTKSZ()
+  {
+  }
 
-void
-TWindowGTKSZ::on_scale_value_changed(void) {
+  void
+  TWindowGTKSZ::on_scale_value_changed(void)
+  {
     const double val = TWindowGTK::scale();
     _w.scale(val);
 // std::cout << "scale value=" << val << std::endl;
-    _w.on_expose_event((GdkEventExpose *) NULL);
-}
+    _w.on_expose_event((GdkEventExpose*) NULL);
+  }
 
-void
-TWindowGTKSZ::on_positionReset(void) {
+  void
+  TWindowGTKSZ::on_positionReset(void)
+  {
     _w.resetPosition();
     const double val = _w.scale();
     TWindowGTK::scale(val);
-    _w.on_expose_event((GdkEventExpose *) NULL);
-}
+    _w.on_expose_event((GdkEventExpose*) NULL);
+  }
 
-void
-TWindowGTKSZ::append(const AList<TLine> & list, Gdk::Color c) {
+  void
+  TWindowGTKSZ::append(const AList<TLine> & list, Gdk::Color c)
+  {
     _w.append(list, c);
-}
+  }
 
-void
-TWindowGTKSZ::append(const TLine & line, Gdk::Color c) {
+  void
+  TWindowGTKSZ::append(const TLine& line, Gdk::Color c)
+  {
     _w.append(line, c);
-}
+  }
 
-void
-TWindowGTKSZ::append(const AList<TLink> & list, Gdk::Color c) {
+  void
+  TWindowGTKSZ::append(const AList<TLink> & list, Gdk::Color c)
+  {
     _w.append(list, c);
-}
+  }
 
 } // namespace Belle
 

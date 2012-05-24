@@ -54,31 +54,31 @@
 namespace Belle {
 
 /// A class to fit a TTrackBase object to a line.
-class TLineFitter : public TFitter {
+  class TLineFitter : public TFitter {
 
   public:
     /// Constructor.
-    TLineFitter(const std::string & name);
+    TLineFitter(const std::string& name);
 
     /// Destructor
     virtual ~TLineFitter();
 
   public:// Selectors
     /// dumps debug information.
-    void dump(const std::string & message = std::string(""),
-	      const std::string & prefix = std::string("")) const;
+    void dump(const std::string& message = std::string(""),
+              const std::string& prefix = std::string("")) const;
     double a(void) const;
     double b(void) const;
     double det(void) const;
 
   public:// Modifiers
-    virtual int fit(TTrackBase &) const;
+    virtual int fit(TTrackBase&) const;
 
   private:
     mutable double _a;
     mutable double _b;
     mutable double _det;
-};
+  };
 
 //-----------------------------------------------------------------------------
 
@@ -91,23 +91,26 @@ class TLineFitter : public TFitter {
 
 #ifdef TLINEFITTER_INLINE_DEFINE_HERE
 
-inline
-double
-TLineFitter::a(void) const {
+  inline
+  double
+  TLineFitter::a(void) const
+  {
     return _a;
-}
+  }
 
-inline
-double
-TLineFitter::b(void) const {
+  inline
+  double
+  TLineFitter::b(void) const
+  {
     return _b;
-}
+  }
 
-inline
-double
-TLineFitter::det(void) const {
+  inline
+  double
+  TLineFitter::det(void) const
+  {
     return _det;
-}
+  }
 
 #endif
 

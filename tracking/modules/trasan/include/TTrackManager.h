@@ -178,16 +178,16 @@ struct reccdc_mctrk;
 struct rectrk;
 
 namespace Belle2 {
-    class TRGCDCWireHit;
+  class TRGCDCWireHit;
 }
 
 namespace Belle {
 
-class TTrack;
-class TProfiler;
+  class TTrack;
+  class TProfiler;
 
 /// A manager of TTrack information to make outputs as Reccdc_trk.
-class TTrackManager : public TUpdater {
+  class TTrackManager : public TUpdater {
 
   public:
     /// Constructor.
@@ -236,15 +236,15 @@ class TTrackManager : public TUpdater {
     void defineHistograms(void);
 
     /// dumps debug information.
-    void dump(const std::string & message = std::string(""),
-	      const std::string & prefix = std::string("")) const;
+    void dump(const std::string& message = std::string(""),
+              const std::string& prefix = std::string("")) const;
 
   public:// track manipulations
     /// clears all internal information.
     void clear(bool termination);
 
     /// checks goodness of a track.
-    static bool goodTrack(const TTrack &, bool track2D = false);
+    static bool goodTrack(const TTrack&, bool track2D = false);
 
     /// appends (2D) tracks. 'list' will be cleaned up.
     void append(AList<TTrack> & list);
@@ -294,27 +294,27 @@ class TTrackManager : public TUpdater {
   private:// table manipulations in private
 
     /// copies a track. Non-zero will be returned if error happens.
-    int copyTrack(TTrack & t,
-		  reccdc_trk ** r,
-		  reccdc_trk_add ** a) const;
+    int copyTrack(TTrack& t,
+                  reccdc_trk** r,
+                  reccdc_trk_add** a) const;
 
     /// copies a track. Non-zero will be returned if error happens.
-    int copyTrack(Belle2::StoreArray<GFTrackCand> &, TTrack & t) const;
+    int copyTrack(Belle2::StoreArray<GFTrackCand> &, TTrack& t) const;
 
     /// sorts banks.
-    void swapReccdc(reccdc_trk & cdc0,
-		    reccdc_trk_add & add0,
-		    reccdc_mctrk & mc0,
-		    reccdc_trk & cdc1,
-		    reccdc_trk_add & add1,
-		    reccdc_mctrk & mc1) const;
-    void swapRectrk(rectrk & trk0, rectrk & tkr1) const;
-    void tagReccdc(unsigned * id, unsigned n) const;
-    void tagRectrk(unsigned * id, unsigned n) const;
+    void swapReccdc(reccdc_trk& cdc0,
+                    reccdc_trk_add& add0,
+                    reccdc_mctrk& mc0,
+                    reccdc_trk& cdc1,
+                    reccdc_trk_add& add1,
+                    reccdc_mctrk& mc1) const;
+    void swapRectrk(rectrk& trk0, rectrk& tkr1) const;
+    void tagReccdc(unsigned* id, unsigned n) const;
+    void tagRectrk(unsigned* id, unsigned n) const;
 
   public:// functions for after trak
     /// final decision for a curler.
-    void treatCurler(rectrk & curl, reccdc_trk_add & cdc, unsigned flag) const;
+    void treatCurler(rectrk& curl, reccdc_trk_add& cdc, unsigned flag) const;
 
     /// determines IP.
     void determineIP(void);
@@ -322,15 +322,15 @@ class TTrackManager : public TUpdater {
   public:// hit manipulations
     /// masks hits on found curl tracks.
     void maskCurlHits(const CAList<Belle2::TRGCDCWireHit> & axial,
-		      const CAList<Belle2::TRGCDCWireHit> & stereo,
-		      const AList<TTrack> & tracks) const;
+                      const CAList<Belle2::TRGCDCWireHit> & stereo,
+                      const AList<TTrack> & tracks) const;
 
     /// masks hits with large chisq as associated hits. Pull in TLink is used.
     static void maskBadHits(const AList<TTrack> &, float maxSigma2);
 
     /// salvages hits for dE/dx(not for track fitting).
     void salvageAssociateHits(const CAList<Belle2::TRGCDCWireHit> &,
-			      float maxSigma2);
+                              float maxSigma2);
 
     /// associates SVD and then adds track information.
     void addSvd(const int) const;
@@ -338,8 +338,8 @@ class TTrackManager : public TUpdater {
   private:// internal functions
     /// checks track quality.
     AList<TTrack> selectGoodTracks(const AList<TTrack> &,
-				   bool track2D = false) const;
-    static bool checkNumberOfHits(const TTrack &, bool track2D = false);
+                                   bool track2D = false) const;
+    static bool checkNumberOfHits(const TTrack&, bool track2D = false);
 
     /// monitors quality of tracks.
     void monitor(void) const;
@@ -355,19 +355,19 @@ class TTrackManager : public TUpdater {
     float minimum(float y0, float y1, float y2) const;
 
   public:// obsolete
-    TLink & divide(const TTrack & t, AList<TLink> * l) const;
-    TLink & divideByIp(const TTrack & t, AList<TLink> * l) const;
+    TLink& divide(const TTrack& t, AList<TLink> * l) const;
+    TLink& divideByIp(const TTrack& t, AList<TLink> * l) const;
     void removeHitsAcrossOverIp(AList<TLink> &) const;
     /// returns a track which is the closest to a hit.
-    TTrack * closest(const AList<TTrack> &, const Belle2::TRGCDCWireHit &) const;
+    TTrack* closest(const AList<TTrack> &, const Belle2::TRGCDCWireHit&) const;
     /// salvages remaining hits.
     void salvage(const CAList<Belle2::TRGCDCWireHit> &) const;
     /// masks hits out which are in tail of curly tracks.
     void mask(void) const;
-    void maskNormal(TTrack &) const;
-    void maskCurl(TTrack &) const;
-    void maskOut(TTrack &, const AList<TLink> &) const;
-    void maskMultiHits(TTrack &) const;
+    void maskNormal(TTrack&) const;
+    void maskCurl(TTrack&) const;
+    void maskOut(TTrack&, const AList<TLink> &) const;
+    void maskMultiHits(TTrack&) const;
     void merge(void);
 
   private:
@@ -389,22 +389,22 @@ class TTrackManager : public TUpdater {
     AList<TLink> _associateHits;
 
     struct summary {
-	unsigned _nEvents;
-	unsigned _nTracks[8];
-	unsigned _nTracksAll[8];
-	unsigned _nTracks2D[8];
-	unsigned _nTracksFinal[8];
-	unsigned _nSuperMoms[8];
-	unsigned _nPtCut[8];
-	unsigned _nTanlCut[8];
-	unsigned _nToBeMerged;
-	unsigned _nToBeMergedMoreThanTwo;
-	unsigned _nMCQuality[8][5];
+      unsigned _nEvents;
+      unsigned _nTracks[8];
+      unsigned _nTracksAll[8];
+      unsigned _nTracks2D[8];
+      unsigned _nTracksFinal[8];
+      unsigned _nSuperMoms[8];
+      unsigned _nPtCut[8];
+      unsigned _nTanlCut[8];
+      unsigned _nToBeMerged;
+      unsigned _nToBeMergedMoreThanTwo;
+      unsigned _nMCQuality[8][5];
     };
-    struct summary * _s;
+    struct summary* _s;
 
-    TProfiler * _profiler[4];
-};
+    TProfiler* _profiler[4];
+  };
 
 //-----------------------------------------------------------------------------
 
@@ -417,74 +417,85 @@ class TTrackManager : public TUpdater {
 
 #ifdef TTRACKMANAGER_INLINE_DEFINE_HERE
 
-inline
-std::string
-TTrackManager::name(void) const {
+  inline
+  std::string
+  TTrackManager::name(void) const
+  {
     return std::string("Track Manager");
-}
+  }
 
-inline
-const AList<TTrack> &
-TTrackManager::tracks(void) const {
+  inline
+  const AList<TTrack> &
+  TTrackManager::tracks(void) const
+  {
     return _tracks;
-}
+  }
 
-inline
-const AList<TTrack> &
-TTrackManager::tracks2D(void) const {
+  inline
+  const AList<TTrack> &
+  TTrackManager::tracks2D(void) const
+  {
     return _tracks2D;
-}
+  }
 
-inline
-const AList<TTrack> &
-TTrackManager::allTracks(void) const {
+  inline
+  const AList<TTrack> &
+  TTrackManager::allTracks(void) const
+  {
     return _tracksAll;
-}
+  }
 
-inline
-double
-TTrackManager::maxMomentum(double a) {
+  inline
+  double
+  TTrackManager::maxMomentum(double a)
+  {
     return _maxMomentum = a;
-}
+  }
 
-inline
-double
-TTrackManager::minPt(double a) {
+  inline
+  double
+  TTrackManager::minPt(double a)
+  {
     return _minPt = a;
-}
+  }
 
-inline
-double
-TTrackManager::maxTanl(double a) {
+  inline
+  double
+  TTrackManager::maxTanl(double a)
+  {
     return _maxTanl = a;
-}
+  }
 
-inline
-int
-TTrackManager::debugLevel(void) const {
+  inline
+  int
+  TTrackManager::debugLevel(void) const
+  {
     return _debugLevel;
-}
+  }
 
-inline
-int
-TTrackManager::debugLevel(int a) {
+  inline
+  int
+  TTrackManager::debugLevel(int a)
+  {
     return _debugLevel = a;
-}
+  }
 
-inline
-void
-TTrackManager::fittingFlag(unsigned a) {
+  inline
+  void
+  TTrackManager::fittingFlag(unsigned a)
+  {
     if (a & 1) _fitter.sag(true);
     if (a & 2) _fitter.propagation(true);
     if (a & 4) _fitter.tof(true);
     if (a & 8) _fitter.freeT0(true);
-}
+  }
 
-inline
-const AList<TTrack> &
-TTrackManager::tracksFinal(void) const {
+  inline
+  const AList<TTrack> &
+  TTrackManager::tracksFinal(void) const
+  {
     return _tracksFinal;
-}
+  }
 
 #endif
 

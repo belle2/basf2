@@ -19,13 +19,13 @@
 #include "tracking/modules/trasan/Trasan.h"
 
 namespace Belle {
-    class Trasan;
+  class Trasan;
 }
 
 namespace Belle2 {
 
 /// A track finding module using Belle track finder Trasan.
-class TrasanModule : public Module {
+  class TrasanModule : public Module {
 
   public:
 
@@ -60,7 +60,7 @@ class TrasanModule : public Module {
 
     /// Trasan.
     Belle::Trasan _tra;
-};
+  };
 
 } // namespace Belle2
 

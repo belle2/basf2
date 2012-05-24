@@ -27,11 +27,11 @@
 namespace Belle {
 
 /// A class to represent circle Hough transformation.
-class THoughTransformationCircleGeneral : public THoughTransformation {
+  class THoughTransformationCircleGeneral : public THoughTransformation {
 
   public:
     /// Contructor.
-    THoughTransformationCircleGeneral(const std::string & name);
+    THoughTransformationCircleGeneral(const std::string& name);
 
     /// Destructor
     virtual ~THoughTransformationCircleGeneral();
@@ -41,24 +41,24 @@ class THoughTransformationCircleGeneral : public THoughTransformation {
     virtual float y(float xReal, float yReal, float x) const;
 
     /// returns Point2D(phi, r) of a circle in real plane.
-    virtual TPoint2D circleCenter(const TPoint2D &) const;
+    virtual TPoint2D circleCenter(const TPoint2D&) const;
 
     /// returns radius in real plane.
-    float circleRadius(const TPoint2D &) const;
+    float circleRadius(const TPoint2D&) const;
 
     /// converts Point2D(r, phi) in real plane into Point2D(r, phi) in Hough plane.
-    virtual TPoint2D convert(const TPoint2D &) const;
+    virtual TPoint2D convert(const TPoint2D&) const;
 
     /// returns true if Y diverges in given region.
     virtual bool diverge(float xReal, float yReal, float x0, float x1) const;
 
     /// returns true if Y diverges in given region.
     virtual bool positiveDiverge(float xReal, float yReal, float x0, float x1)
-	const;
+    const;
 
     /// returns true if Y diverges in given region.
     virtual bool negativeDiverge(float xReal, float yReal, float x0, float x1)
-	const;
+    const;
 
   public:// Modifiers
     /// sets R.
@@ -66,7 +66,7 @@ class THoughTransformationCircleGeneral : public THoughTransformation {
 
   private:
     float _r;
-};
+  };
 
 #ifdef THoughTransformationCircleGeneral_NO_INLINE
 #define inline
@@ -77,35 +77,39 @@ class THoughTransformationCircleGeneral : public THoughTransformation {
 
 #ifdef THoughTransformationCircleGeneral_INLINE_DEFINE_HERE
 
-inline
-float
-THoughTransformationCircleGeneral::r(float a) {
+  inline
+  float
+  THoughTransformationCircleGeneral::r(float a)
+  {
     return _r = a;
-}
+  }
 
-inline
-bool
-THoughTransformationCircleGeneral::diverge(float, float, float, float) const {
+  inline
+  bool
+  THoughTransformationCircleGeneral::diverge(float, float, float, float) const
+  {
     return false;
-}
+  }
 
-inline
-bool
-THoughTransformationCircleGeneral::positiveDiverge(float,
-						   float,
-						   float,
-						   float) const {
+  inline
+  bool
+  THoughTransformationCircleGeneral::positiveDiverge(float,
+                                                     float,
+                                                     float,
+                                                     float) const
+  {
     return false;
-}
+  }
 
-inline
-bool
-THoughTransformationCircleGeneral::negativeDiverge(float,
-						   float,
-						   float,
-						   float) const {
+  inline
+  bool
+  THoughTransformationCircleGeneral::negativeDiverge(float,
+                                                     float,
+                                                     float,
+                                                     float) const
+  {
     return false;
-}
+  }
 
 #endif
 

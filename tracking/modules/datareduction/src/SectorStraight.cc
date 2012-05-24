@@ -11,7 +11,7 @@ using namespace Belle2;
 
 
 SectorStraight::SectorStraight(double RotationAngle, double DownShift, double SectorWidth, double OpeningAngle):
-    SectorBasic(RotationAngle, DownShift, SectorWidth)
+  SectorBasic(RotationAngle, DownShift, SectorWidth)
 {
   _OpeningAngle = OpeningAngle;
 }
@@ -23,7 +23,7 @@ SectorStraight::~SectorStraight()
 }
 
 
-pair<double, double> SectorStraight::intersectLine(PXDLadder &ladder, TVector2 pos, TVector2 dir, bool bigger)
+pair<double, double> SectorStraight::intersectLine(PXDLadder& ladder, TVector2 pos, TVector2 dir, bool bigger)
 {
   //Intersect ladder with line by transforming line in local ladder coordinates
   TVector3 p = ladder.getPosition();
@@ -55,7 +55,7 @@ pair<double, double> SectorStraight::intersectLine(PXDLadder &ladder, TVector2 p
   // - line ascending or descending
   int a = dir.Phi() < M_PI ? -1 : 1;
 
-  if (a*b > 0) {
+  if (a * b > 0) {
     if (x > 0 && x < 1) start = x;
   } else {
     if (x > 0 && x < 1) end = x;
@@ -100,13 +100,13 @@ void SectorStraight::draw(cairo_t* cairo)
   cairo_rotate(cairo, _RotationAngle);
   //cairo_arc(cairo,-_DownShift,0,500,-_OpeningAngle/2.,_OpeningAngle/2.);
   cairo_move_to(cairo, -_DownShift, _SectorWidth);
-  cairo_rel_line_to(cairo, 500, 500*tan(_OpeningAngle / 2.0));
-  cairo_rel_line_to(cairo, 0, -1000*tan(_OpeningAngle / 2.0) - 2*_SectorWidth);
+  cairo_rel_line_to(cairo, 500, 500 * tan(_OpeningAngle / 2.0));
+  cairo_rel_line_to(cairo, 0, -1000 * tan(_OpeningAngle / 2.0) - 2 * _SectorWidth);
   cairo_line_to(cairo, -_DownShift, -_SectorWidth);
   cairo_close_path(cairo);
-  cairo_set_source_rgba(cairo, color[0]*0.6, color[1]*0.6, color[2]*0.6, 0.2);
+  cairo_set_source_rgba(cairo, color[0] * 0.6, color[1] * 0.6, color[2] * 0.6, 0.2);
   cairo_fill_preserve(cairo);
-  cairo_set_source_rgb(cairo, color[0]*0.6, color[1]*0.6, color[2]*0.6);
+  cairo_set_source_rgb(cairo, color[0] * 0.6, color[1] * 0.6, color[2] * 0.6);
   cairo_stroke(cairo);
   cairo_restore(cairo);
 

@@ -118,74 +118,74 @@
 
 namespace Belle {
 
-class TTrack;
-class TLink;
-class TSegment;
+  class TTrack;
+  class TLink;
+  class TSegment;
 
 /// A class to build a track.
-class TBuilder0 {
+  class TBuilder0 {
 
   public:
     /// Constructor.
-    TBuilder0(const std::string & name);
+    TBuilder0(const std::string& name);
 
     /// Constructor with salvage level.
-    TBuilder0(const std::string & name,
-	     float salvageLevel);
+    TBuilder0(const std::string& name,
+              float salvageLevel);
 
     /// Constructor with parameters.
-    TBuilder0(const std::string & name,
-	     float stereoZ3,
-	     float stereoZ4,
-	     float stereoChisq3,
-	     float stereoChisq4,
-	     float stereoMaxSigma,
-	     unsigned fittingCorrections,
-	     float salvageLevel);
+    TBuilder0(const std::string& name,
+              float stereoZ3,
+              float stereoZ4,
+              float stereoChisq3,
+              float stereoChisq4,
+              float stereoMaxSigma,
+              unsigned fittingCorrections,
+              float salvageLevel);
 
     /// Destructor
     virtual ~TBuilder0();
 
   public:// Selectors
     /// returns name.
-    const std::string & name(void) const;
+    const std::string& name(void) const;
 
     /// dumps debug information.
-    void dump(const std::string & message = std::string(""),
-	      const std::string & prefix = std::string("")) const;
+    void dump(const std::string& message = std::string(""),
+              const std::string& prefix = std::string("")) const;
 
     /// returns a track selector.
-    const TSelector0 & trackSelector(void) const;
+    const TSelector0& trackSelector(void) const;
 
     /// builds a r/phi track from TLinks or from Segments.
-    TTrack * buildRphi(const AList<TLink> &) const;
+    TTrack* buildRphi(const AList<TLink> &) const;
 
     /// appends stereo hits to a track. (old version)
-    TTrack * buildStereo0(TTrack & track, const AList<TLink> &) const;
+    TTrack* buildStereo0(TTrack& track, const AList<TLink> &) const;
 
     /// appends stereo hits to a track.
-    virtual TTrack * buildStereo(TTrack & track, const AList<TLink> &) const;
+    virtual TTrack* buildStereo(TTrack& track, const AList<TLink> &) const;
 
     /// appends TLinks in a list.
-    void appendClusters(TTrack & track, const AList<TLink> &) const;
+    void appendClusters(TTrack& track, const AList<TLink> &) const;
 
     /// salvages links in a list. Used links will be removed from a list.
-    void salvage(TTrack & track, AList<TLink> & list) const;
+    void salvage(TTrack& track, AList<TLink> & list) const;
 
     /// fits a track using a private fitter.
-    virtual int fit(TTrackBase &) const;
+    virtual int fit(TTrackBase&) const;
 
   public:// Modifiers
     /// sets a track selector.
-    virtual const TSelector0 & trackSelector(const TSelector0 &);
+    virtual const TSelector0& trackSelector(const TSelector0&);
 
   private://
     void selectHits(AList<TLink> & list) const;
     // -50:bad consective, -20:not consective, -1:not in the same layer, 0:consective and chrg<=0, 1:consective and chrg>0
-    int consectiveHits(TLink &l, TLink & s, int ichg) const;
-    int check2CnHits(TLink &l, TLink & s, int ichg) const;
+    int consectiveHits(TLink& l, TLink& s, int ichg) const;
+    int check2CnHits(TLink& l, TLink& s, int ichg) const;
     int checkHits(unsigned i, unsigned j, unsigned k) const;
-    void salvageNormal(TTrack & track, AList<TLink> & list) const;
+    void salvageNormal(TTrack& track, AList<TLink> & list) const;
 
   private:
     std::string _name;
@@ -203,7 +203,7 @@ class TBuilder0 {
     float _stereoChisq3;
     float _stereoChisq4;
     float _stereoMaxSigma;
-};
+  };
 
 //-----------------------------------------------------------------------------
 
@@ -216,23 +216,26 @@ class TBuilder0 {
 
 #ifdef TBuilder0_INLINE_DEFINE_HERE
 
-inline
-const TSelector0 &
-TBuilder0::trackSelector(void) const {
+  inline
+  const TSelector0&
+  TBuilder0::trackSelector(void) const
+  {
     return _trackSelector;
-}
+  }
 
-inline
-const std::string &
-TBuilder0::name(void) const {
+  inline
+  const std::string&
+  TBuilder0::name(void) const
+  {
     return _name;
-}
+  }
 
-inline
-int
-TBuilder0::fit(TTrackBase & a) const {
+  inline
+  int
+  TBuilder0::fit(TTrackBase& a) const
+  {
     return _fitter.fit(a);
-}
+  }
 
 #endif
 

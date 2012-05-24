@@ -33,67 +33,67 @@
 namespace Belle {
 
 /// A class to build a track.
-class TBuilderConformal : public TBuilder {
+  class TBuilderConformal : public TBuilder {
 
   public:
     /// Constructor with salvage level.
-    TBuilderConformal(const std::string & name,
-		      float maxSigma,
-		      float maxSigmaStereo,
-		      float salvageLevel,
-		      float szSegmentDistance,
-		      float szLinkDistance,
-		      unsigned fittingFlag);
+    TBuilderConformal(const std::string& name,
+                      float maxSigma,
+                      float maxSigmaStereo,
+                      float salvageLevel,
+                      float szSegmentDistance,
+                      float szLinkDistance,
+                      unsigned fittingFlag);
 
     /// Destructor
     virtual ~TBuilderConformal();
 
   public:// Track building
     /// builds a r/phi track from segments.
-    TTrack * buildRphi(const AList<TSegment> &) const;
-    TTrack * buildRphi(const AList<TLink> &) const;
+    TTrack* buildRphi(const AList<TSegment> &) const;
+    TTrack* buildRphi(const AList<TLink> &) const;
 
     /// builds a 3D track from segments.
-    TTrack * buildStereoNew(const TTrack & t,
-			    AList<TSegment> & goodSegments,
-			    AList<TSegment> & badSegments) const;
+    TTrack* buildStereoNew(const TTrack& t,
+                           AList<TSegment> & goodSegments,
+                           AList<TSegment> & badSegments) const;
 
     /// salvages hits.
-    void salvage(TTrack & t, AList<TSegment> & segments) const;
+    void salvage(TTrack& t, AList<TSegment> & segments) const;
 
-public: // Obsolete functions
-    TTrack * buildStereo(const TTrack & t, AList<TSegment> &) const;
-    TTrack * buildStereo(TTrack & t,
-			 TLine & l,
-			 const AList<TLink> & links) const;
+  public: // Obsolete functions
+    TTrack* buildStereo(const TTrack& t, AList<TSegment> &) const;
+    TTrack* buildStereo(TTrack& t,
+                        TLine& l,
+                        const AList<TLink> & links) const;
 
-private:
+  private:
     /// initializes internal variables for stereo reconstruction. This should be called with new stereo codes.
-    bool initializeForStereo(const TTrack &,
-			     const AList<TSegment> &,
-			     const AList<TSegment> &) const;
+    bool initializeForStereo(const TTrack&,
+                             const AList<TSegment> &,
+                             const AList<TSegment> &) const;
     AList<TLine> searchInitialLines(unsigned nSuperLayers) const;
     AList<TLine> searchLines5(void) const;
     AList<TLine> searchLines4(void) const;
     AList<TLine> searchLines3(void) const;
     AList<TLine> searchLines2(void) const;
     AList<TLine> searchLines1(void) const;
-    TLine searchLine(const TLine & initialLine) const;
+    TLine searchLine(const TLine& initialLine) const;
 
     /// checks stereo quality of a track.
     unsigned stereoQuality(const AList<TLink> & links) const;
 
-    AList<TSegment> selectStereoSegment(const TLine & line,
-					const AList<TSegment> & list,
-					const AList<TLink> & szList) const;
-    void removeFarSegment(const TLine &,
-			  AList<TSegment> &,
-			  AList<TLink> &) const;
-    TLine * initialLine(const TTrack &, AList<TSegment> &) const;
-    TLine * initialLineOld(const TTrack &, AList<TSegment> &) const;
-    TLine * initialLine1(const TTrack &,
-			 const AList<TSegment> &,
-			 const AList<TLink> &) const;
+    AList<TSegment> selectStereoSegment(const TLine& line,
+                                        const AList<TSegment> & list,
+                                        const AList<TLink> & szList) const;
+    void removeFarSegment(const TLine&,
+                          AList<TSegment> &,
+                          AList<TLink> &) const;
+    TLine* initialLine(const TTrack&, AList<TSegment> &) const;
+    TLine* initialLineOld(const TTrack&, AList<TSegment> &) const;
+    TLine* initialLine1(const TTrack&,
+                        const AList<TSegment> &,
+                        const AList<TLink> &) const;
 
   private:
     const float _szSegmentDistance;
@@ -102,7 +102,7 @@ private:
     mutable AList<TLink> _links[5];
     mutable AList<TLink> _forLine;
     mutable unsigned _nHits[6];
-};
+  };
 
 //-----------------------------------------------------------------------------
 

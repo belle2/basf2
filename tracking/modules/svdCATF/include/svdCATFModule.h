@@ -61,8 +61,8 @@ namespace Belle2 {
   class SectorID {
   public:
     SectorID(int uID, short int sectID): m_uniID(uID), m_sectorID(sectID) {} // defaultwerte
-    bool operator<(const SectorID &b)  const { return getUniID() < b.getUniID() || getSectorID() < b.getSectorID(); }
-    bool operator==(const SectorID &b) const { return getUniID() < b.getUniID() && getSectorID() == b.getSectorID(); }
+    bool operator<(const SectorID& b)  const { return getUniID() < b.getUniID() || getSectorID() < b.getSectorID(); }
+    bool operator==(const SectorID& b) const { return getUniID() < b.getUniID() && getSectorID() == b.getSectorID(); }
     short int getSectorID() const { return m_sectorID; }
     int getUniID() const { return m_uniID; }
 

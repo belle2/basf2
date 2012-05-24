@@ -7,9 +7,9 @@ using namespace std;
 
 
 TrackerHit::TrackerHit() :
-    _type(0),
-    _dEdx(0),
-    _time(0)
+  _type(0),
+  _dEdx(0),
+  _time(0)
 {
   _pos[0] = 0. ;
   _pos[1] = 0. ;

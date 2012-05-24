@@ -133,6 +133,9 @@ namespace Belle2 {
     std::vector<G4VPhysicalVolume*>* m_enter;
     std::vector<G4VPhysicalVolume*>* m_exit;
 
+    // Time of flight (ns) along the track from the interaction point
+    double m_tof;
+
   };
 
 } // end of namespace Belle2

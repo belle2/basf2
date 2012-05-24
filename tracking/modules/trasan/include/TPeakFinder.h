@@ -43,20 +43,20 @@
 
 namespace Belle {
 
-class TPoint2D;
-class THoughPlane;
+  class TPoint2D;
+  class THoughPlane;
 
 /// A class to find peaks in THoughPlan
-class TPeakFinder {
+  class TPeakFinder {
 
-public:
+  public:
     /// Constructor.
     TPeakFinder(void);
 
     /// Destructor
     virtual ~TPeakFinder();
 
-public:// Selectors
+  public:// Selectors
     /// returns name.
     std::string name(void) const;
 
@@ -64,29 +64,30 @@ public:// Selectors
     std::string version(void) const;
 
     /// dumps debug information.
-    void dump(const std::string & message = std::string(""),
-	      const std::string & prefix = std::string("")) const;
+    void dump(const std::string& message = std::string(""),
+              const std::string& prefix = std::string("")) const;
 
     /// finds peaks. TPoint2D objects in AList should be deleted by user.
-    AList<TPoint2D> peaks(const THoughPlane & plane,
-			  const unsigned threshold,
-			  const unsigned nTargetPeaks,
-			  const unsigned peakSeparation) const;
-    AList<TPoint2D> peaks5(THoughPlane & plane,
-			   const unsigned threshold,
-			   bool centerIsPeak = false) const;
-    AList<TPoint2D> peaks6(THoughPlane & plane,
-			   const unsigned threshold,
-			   bool centerIsPeak = false) const;
+    AList<TPoint2D> peaks(const THoughPlane& plane,
+                          const unsigned threshold,
+                          const unsigned nTargetPeaks,
+                          const unsigned peakSeparation) const;
+    AList<TPoint2D> peaks5(THoughPlane& plane,
+                           const unsigned threshold,
+                           bool centerIsPeak = false) const;
+    AList<TPoint2D> peaks6(THoughPlane& plane,
+                           const unsigned threshold,
+                           bool centerIsPeak = false) const;
 
-private:
-};
+  private:
+  };
 
-inline
-std::string
-TPeakFinder::name(void) const {
+  inline
+  std::string
+  TPeakFinder::name(void) const
+  {
     return "TPeakFinder";
-}
+  }
 
 } // namespace Belle
 

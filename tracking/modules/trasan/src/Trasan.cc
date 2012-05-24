@@ -9,7 +9,7 @@
 // Description : A tracking module.
 //               See http://bsunsrv1.kek.jp/~yiwasaki/tracking/
 //-----------------------------------------------------------------------------
-// TTrack::appendStereo bug fixed, 
+// TTrack::appendStereo bug fixed,
 //-----------------------------------------------------------------------------
 // $Log$
 // Revision 1.231  2005/11/03 23:20:13  yiwasaki
@@ -677,7 +677,7 @@
 //
 //-----------------------------------------------------------------------------
 
-#include <cmath> 
+#include <cmath>
 #include <cfloat>
 #include <time.h>
 
@@ -905,201 +905,204 @@ struct reccdc_timing {
 namespace Belle {
 
 //...Globals...
-Trasan *
-Trasan::_trasan = 0;
+  Trasan*
+  Trasan::_trasan = 0;
 
-int
-TrasanTest = 0;
+  int
+  TrasanTest = 0;
 
-float
-TrasanTHelixFitterChisqMax = 0;
+  float
+  TrasanTHelixFitterChisqMax = 0;
 
-int 
-TrasanTHelixFitterNtrialMax = 20;
+  int
+  TrasanTHelixFitterNtrialMax = 20;
 
-const Point3D
-ORIGIN = Point3D(0., 0., 0.);
+  const Point3D
+  ORIGIN = Point3D(0., 0., 0.);
 
-std::string
-Trasan::version(void) const {
+  std::string
+  Trasan::version(void) const
+  {
     return "5.01";
-}
+  }
 
 //...Definitions...
-Trasan *
-Trasan::getTrasan(void) {
+  Trasan*
+  Trasan::getTrasan(void)
+  {
     if (! _trasan) _trasan = new Trasan();
     return _trasan;
-}
+  }
 
-Trasan::~Trasan() {
-}
+  Trasan::~Trasan()
+  {
+  }
 
 //Trasan::Trasan(void)
-Trasan::Trasan()
+  Trasan::Trasan()
 //: Belle2::Module::Module("Trasan"),
-: Belle2::Module::Module(),
-  b_cdcVersion(0),       // 0:automatic, 1:normal cell, 2:small cell
-  b_fudgeFactor(1.0),
+    : Belle2::Module::Module(),
+      b_cdcVersion(0),       // 0:automatic, 1:normal cell, 2:small cell
+      b_fudgeFactor(1.0),
 
-  b_debugLevel(0),
-  b_useAllHits(0),
-  b_doT0Reset(0),
-  b_nT0ResetMax(1),
-  b_doMCAnalysis(0),
-  b_mode(1),
-  b_helixFitterChisqMax(0.),
-  b_helixFitterNtrialMax(20),
+      b_debugLevel(0),
+      b_useAllHits(0),
+      b_doT0Reset(0),
+      b_nT0ResetMax(1),
+      b_doMCAnalysis(0),
+      b_mode(1),
+      b_helixFitterChisqMax(0.),
+      b_helixFitterNtrialMax(20),
 
-  b_doPerfectFinder(0),
-  b_perfectFitting(0),
+      b_doPerfectFinder(0),
+      b_perfectFitting(0),
 
-  b_conformalFinder(1),
-  b_doConformalFinder(1),
-  b_doConformalFastFinder(1),
-  b_doConformalSlowFinder(1),
-  b_conformalPerfectSegmentFinding(0),
-  b_conformalUseSmallCells(1),
-  b_conformalFittingFlag(0),
-  b_conformalMaxSigma(30.),
-  b_conformalMinNLinksForSegment(2),
-  b_conformalMinNCores(2),
-  b_conformalMinNSegments(3),
-  b_salvageLevel(30.),
-  b_conformalSalvageLoadWidth(1),
-  b_conformalStereoMode(1),
-  b_conformalStereoLoadWidth(5),
-  b_conformalStereoMaxSigma(30.),
-  b_conformalStereoSzSegmentDistance(10.),
-  b_conformalStereoSzLinkDistance(15.),
+      b_conformalFinder(1),
+      b_doConformalFinder(1),
+      b_doConformalFastFinder(1),
+      b_doConformalSlowFinder(1),
+      b_conformalPerfectSegmentFinding(0),
+      b_conformalUseSmallCells(1),
+      b_conformalFittingFlag(0),
+      b_conformalMaxSigma(30.),
+      b_conformalMinNLinksForSegment(2),
+      b_conformalMinNCores(2),
+      b_conformalMinNSegments(3),
+      b_salvageLevel(30.),
+      b_conformalSalvageLoadWidth(1),
+      b_conformalStereoMode(1),
+      b_conformalStereoLoadWidth(5),
+      b_conformalStereoMaxSigma(30.),
+      b_conformalStereoSzSegmentDistance(10.),
+      b_conformalStereoSzLinkDistance(15.),
 
-  b_doConformalFinderStereo(1),
-  b_doConformalFinderCosmic(0),
-  b_conformalFraction(0.7),
-  b_conformalStereoZ3(20.),
-  b_conformalStereoZ4(20.),
+      b_doConformalFinderStereo(1),
+      b_doConformalFinderCosmic(0),
+      b_conformalFraction(0.7),
+      b_conformalStereoZ3(20.),
+      b_conformalStereoZ4(20.),
 //    b_conformalStereoChisq3(15.),
 //    b_conformalStereoChisq4(9.),
-  b_conformalStereoChisq3(30.),
-  b_conformalStereoChisq4(30.),
-  b_conformalFittingCorrections(0),
+      b_conformalStereoChisq3(30.),
+      b_conformalStereoChisq4(30.),
+      b_conformalFittingCorrections(0),
 
-  b_momentumCut(0.0),
-  b_ptCut(0.005),
-  b_tanlCut(0.),
-  b_fittingFlag(0),
-  b_doSalvage(2),
-  b_mergeTracks(1),
-  b_mergeTrackDistance(0.33),
-  b_mergeCurls(0),
-  b_doT0Determination(7),
-  b_nTracksForT0(2),
-  b_sortMode(0),
-  b_doAssociation(1),
-  b_associateSigma(60),
-  b_test(0),
+      b_momentumCut(0.0),
+      b_ptCut(0.005),
+      b_tanlCut(0.),
+      b_fittingFlag(0),
+      b_doSalvage(2),
+      b_mergeTracks(1),
+      b_mergeTrackDistance(0.33),
+      b_mergeCurls(0),
+      b_doT0Determination(7),
+      b_nTracksForT0(2),
+      b_sortMode(0),
+      b_doAssociation(1),
+      b_associateSigma(60),
+      b_test(0),
 
   /* For Curl Finder --> */
-  b_doCurlFinder(1),
-  min_segment(5),
-  min_salvage(10),
-  bad_distance_for_salvage(1.0),
-  good_distance_for_salvage(0.2),
-  min_sequence(6),
-  min_fullwire(7),
-  range_for_axial_search(1.5),
-  range_for_stereo_search(2.5),
-  superlayer_for_stereo_search(3),
-  range_for_axial_last2d_search(1.5),
-  range_for_stereo_last2d_search(2.0),
-  trace2d_distance(35.0),
-  trace2d_first_distance(0.5),
-  trace3d_distance(30.0),
-  determine_one_track(0),
-  selector_max_impact(4.0),
-  selector_max_sigma(36.0),
-  selector_strange_pz(10.0),
-  selector_replace_dz(15.0),
-  stereo_2dfind(0),
-  merge_exe(1),
-  merge_ratio(0.1),
-  merge_z_diff(10.0),
-  mask_distance(0.5),
-  ratio_used_wire(0.3),
-  range_for_stereo1(2.4),
-  range_for_stereo2(2.7),
-  range_for_stereo3(2.9),
-  range_for_stereo4(3.4),
-  range_for_stereo5(4.1),
-  z_cut(50.0),
-  z_diff_for_last_attend(1.5),
-  svd_reconstruction(0),
-  min_svd_electrons(20000.),
-  on_correction(1),
-  output_2dtracks(1),
-  curl_version(2),
+      b_doCurlFinder(1),
+      min_segment(5),
+      min_salvage(10),
+      bad_distance_for_salvage(1.0),
+      good_distance_for_salvage(0.2),
+      min_sequence(6),
+      min_fullwire(7),
+      range_for_axial_search(1.5),
+      range_for_stereo_search(2.5),
+      superlayer_for_stereo_search(3),
+      range_for_axial_last2d_search(1.5),
+      range_for_stereo_last2d_search(2.0),
+      trace2d_distance(35.0),
+      trace2d_first_distance(0.5),
+      trace3d_distance(30.0),
+      determine_one_track(0),
+      selector_max_impact(4.0),
+      selector_max_sigma(36.0),
+      selector_strange_pz(10.0),
+      selector_replace_dz(15.0),
+      stereo_2dfind(0),
+      merge_exe(1),
+      merge_ratio(0.1),
+      merge_z_diff(10.0),
+      mask_distance(0.5),
+      ratio_used_wire(0.3),
+      range_for_stereo1(2.4),
+      range_for_stereo2(2.7),
+      range_for_stereo3(2.9),
+      range_for_stereo4(3.4),
+      range_for_stereo5(4.1),
+      z_cut(50.0),
+      z_diff_for_last_attend(1.5),
+      svd_reconstruction(0),
+      min_svd_electrons(20000.),
+      on_correction(1),
+      output_2dtracks(1),
+      curl_version(2),
   /* <-- For Curl Finder */
 
-  b_pmCurlFinder(1),
-  b_doPMCurlFinder(1),
-  _doPMCurlFinder(0),
-  min_svd_electrons_in_pmc(20000.),
-  b_doSvdAssociator(0),
+      b_pmCurlFinder(1),
+      b_doPMCurlFinder(1),
+      _doPMCurlFinder(0),
+      min_svd_electrons_in_pmc(20000.),
+      b_doSvdAssociator(0),
 
-  b_doClustFinder(0),
-  b_cathodeWindow(0.6),
-  b_cathodeSystematics(0),
-  b_cathodeCosmic(0), // added by matsu ( 1999/07/05 )
+      b_doClustFinder(0),
+      b_cathodeWindow(0.6),
+      b_cathodeSystematics(0),
+      b_cathodeCosmic(0), // added by matsu ( 1999/07/05 )
 
-  b_doHoughFinder(1),
-  b_doHoughFinderCurlSearch(1),
-  b_houghAxialLoadWidth(1),
-  b_houghAxialLoadWidthCurl(1),
-  b_houghMaxSigma(30),
-  b_houghStereoMaxSigma(30),
-  b_houghSalvageLevel(30),
-  b_houghMeshX(350),
-  b_houghMeshY(100),
-  b_houghPtBoundary(20),
-  b_houghThreshold(0.8),
+      b_doHoughFinder(1),
+      b_doHoughFinderCurlSearch(1),
+      b_houghAxialLoadWidth(1),
+      b_houghAxialLoadWidthCurl(1),
+      b_houghMaxSigma(30),
+      b_houghStereoMaxSigma(30),
+      b_houghSalvageLevel(30),
+      b_houghMeshX(350),
+      b_houghMeshY(100),
+      b_houghPtBoundary(20),
+      b_houghThreshold(0.8),
 //b_houghThreshold(0.7),
 //b_houghThreshold(0.72),
-  b_houghMeshXLowPt(150),
-  b_houghMeshYLowPt(100),
-  b_houghPtBoundaryLowPt(200),
-  b_houghThresholdLowPt(0.7),
-  b_houghMode(0),
+      b_houghMeshXLowPt(150),
+      b_houghMeshYLowPt(100),
+      b_houghPtBoundaryLowPt(200),
+      b_houghThresholdLowPt(0.7),
+      b_houghMode(0),
 
-  b_simulateSmallCell(0),
+      b_simulateSmallCell(0),
 
-  b_amin0(0.),
-  b_amin1(0.),
-  b_amin2(0.),
-  b_amin3(0.),
-  b_amin4(0.),
-  b_amax0(DBL_MAX),
-  b_amax1(DBL_MAX),
-  b_amax2(DBL_MAX),
-  b_amax3(DBL_MAX),
-  b_amax4(DBL_MAX),
+      b_amin0(0.),
+      b_amin1(0.),
+      b_amin2(0.),
+      b_amin3(0.),
+      b_amin4(0.),
+      b_amax0(DBL_MAX),
+      b_amax1(DBL_MAX),
+      b_amax2(DBL_MAX),
+      b_amax3(DBL_MAX),
+      b_amax4(DBL_MAX),
 
-  _cdc(0),
+      _cdc(0),
 //cnv  _cdccat(0),
-  _perfectFinder(0),
-  _confFinder(0),
-  _curlFinder(0),
+      _perfectFinder(0),
+      _confFinder(0),
+      _curlFinder(0),
 //cnv  _clustFinder(0),
 //cnv  _pmCurlFinder(0),
-  _houghFinder(0),
-  _nEvents(0)
+      _houghFinder(0),
+      _nEvents(0)
 #ifdef TRASAN_WINDOW_GTK
-  ,_w(0),
-  _hp(0),
-  _hm(0),
-  _hc(0),
-  _hl(0)
+      , _w(0),
+      _hp(0),
+      _hm(0),
+      _hc(0),
+      _hl(0)
 #endif
-{
+  {
     _trasan = this;
 //    setDescription("Hello World");
     setDescription("Trasan test version");
@@ -1111,10 +1114,11 @@ Trasan::Trasan()
 
 //    int a = 10 / 0;
 
-}
+  }
 
-void
-Trasan::initialize() {
+  void
+  Trasan::initialize()
+  {
 
 #ifdef TRASAN_DEBUG_DETAIL
     b_debugLevel = 2;
@@ -1134,8 +1138,8 @@ Trasan::initialize() {
     TLink::initializeBuffers();
 
     //...Prepare THelix related stuff...
-    CLHEP::HepVector a_min(5,0);
-    CLHEP::HepVector a_max(5,0);
+    CLHEP::HepVector a_min(5, 0);
+    CLHEP::HepVector a_max(5, 0);
     a_min[0] = b_amin0;
     a_min[1] = b_amin1;
     a_min[2] = b_amin2;     // a_min[2] = 1e-10;
@@ -1155,39 +1159,38 @@ Trasan::initialize() {
 
     //...Create rphi finder...
     _perfectFinder = new TPerfectFinder(b_perfectFitting,
-					b_conformalMaxSigma,
-					b_conformalStereoMaxSigma,
-					b_conformalFittingCorrections);
+                                        b_conformalMaxSigma,
+                                        b_conformalStereoMaxSigma,
+                                        b_conformalFittingCorrections);
 
     if ((! _confFinder) && (b_conformalFinder == 0)) {
-	_confFinder = new TConformalFinder0(b_conformalMaxSigma,
-					    b_conformalFraction,
-					    b_conformalStereoZ3,
-					    b_conformalStereoZ4,
-					    b_conformalStereoChisq3,
-					    b_conformalStereoChisq4,
-					    b_conformalStereoMaxSigma,
-					    b_conformalFittingCorrections,
-					    b_salvageLevel,
-					    b_doConformalFinderCosmic);
-    }
-    else if (! _confFinder) {
-	_confFinder = new TConformalFinder(b_doConformalFastFinder,
-					   b_doConformalSlowFinder,
-					   b_conformalPerfectSegmentFinding,
-					   b_conformalUseSmallCells,
-					   b_conformalMaxSigma,
-					   b_conformalStereoMaxSigma,
-					   b_salvageLevel,
-					   b_conformalMinNLinksForSegment,
-					   b_conformalMinNCores,
-					   b_conformalMinNSegments,
-					   b_conformalSalvageLoadWidth,
-					   b_conformalStereoMode,
-					   b_conformalStereoLoadWidth,
-					   b_conformalStereoSzSegmentDistance,
-					   b_conformalStereoSzLinkDistance,
-					   b_conformalFittingFlag);
+      _confFinder = new TConformalFinder0(b_conformalMaxSigma,
+                                          b_conformalFraction,
+                                          b_conformalStereoZ3,
+                                          b_conformalStereoZ4,
+                                          b_conformalStereoChisq3,
+                                          b_conformalStereoChisq4,
+                                          b_conformalStereoMaxSigma,
+                                          b_conformalFittingCorrections,
+                                          b_salvageLevel,
+                                          b_doConformalFinderCosmic);
+    } else if (! _confFinder) {
+      _confFinder = new TConformalFinder(b_doConformalFastFinder,
+                                         b_doConformalSlowFinder,
+                                         b_conformalPerfectSegmentFinding,
+                                         b_conformalUseSmallCells,
+                                         b_conformalMaxSigma,
+                                         b_conformalStereoMaxSigma,
+                                         b_salvageLevel,
+                                         b_conformalMinNLinksForSegment,
+                                         b_conformalMinNCores,
+                                         b_conformalMinNSegments,
+                                         b_conformalSalvageLoadWidth,
+                                         b_conformalStereoMode,
+                                         b_conformalStereoLoadWidth,
+                                         b_conformalStereoSzSegmentDistance,
+                                         b_conformalStereoSzLinkDistance,
+                                         b_conformalFittingFlag);
     }
     _confFinder->debugLevel(b_debugLevel);
     _confFinder->doStereo(b_doConformalFinderStereo);
@@ -1197,82 +1200,82 @@ Trasan::initialize() {
 
     //...Create curl finder...
     if (! _curlFinder)
-	_curlFinder = new TCurlFinder((unsigned)min_segment,
- 				      (unsigned)min_salvage,
- 				      bad_distance_for_salvage,
- 				      good_distance_for_salvage,
- 				      (unsigned)min_sequence,
- 				      (unsigned)min_fullwire,
- 				      range_for_axial_search,
- 				      range_for_stereo_search,
- 				      (unsigned)superlayer_for_stereo_search,
- 				      range_for_axial_last2d_search,
- 				      range_for_stereo_last2d_search,
- 				      trace2d_distance,
- 				      trace2d_first_distance,
- 				      trace3d_distance,
- 				      (unsigned)determine_one_track,
- 				      selector_max_impact,
- 				      selector_max_sigma,
- 				      selector_strange_pz,
- 				      selector_replace_dz,
- 				      (unsigned)stereo_2dfind,
- 				      (unsigned)merge_exe,
- 				      merge_ratio,
- 				      merge_z_diff,
- 				      mask_distance,
- 				      ratio_used_wire,
- 				      range_for_stereo1,
- 				      range_for_stereo2,
- 				      range_for_stereo3,
- 				      range_for_stereo4,
- 				      range_for_stereo5,
- 				      z_cut,
- 				      z_diff_for_last_attend,
- 				      (unsigned)svd_reconstruction,
- 				      min_svd_electrons,
- 				      (unsigned)on_correction,
- 				      (unsigned)output_2dtracks,
- 				      (unsigned)curl_version,
-				      b_simulateSmallCell);
+      _curlFinder = new TCurlFinder((unsigned)min_segment,
+                                    (unsigned)min_salvage,
+                                    bad_distance_for_salvage,
+                                    good_distance_for_salvage,
+                                    (unsigned)min_sequence,
+                                    (unsigned)min_fullwire,
+                                    range_for_axial_search,
+                                    range_for_stereo_search,
+                                    (unsigned)superlayer_for_stereo_search,
+                                    range_for_axial_last2d_search,
+                                    range_for_stereo_last2d_search,
+                                    trace2d_distance,
+                                    trace2d_first_distance,
+                                    trace3d_distance,
+                                    (unsigned)determine_one_track,
+                                    selector_max_impact,
+                                    selector_max_sigma,
+                                    selector_strange_pz,
+                                    selector_replace_dz,
+                                    (unsigned)stereo_2dfind,
+                                    (unsigned)merge_exe,
+                                    merge_ratio,
+                                    merge_z_diff,
+                                    mask_distance,
+                                    ratio_used_wire,
+                                    range_for_stereo1,
+                                    range_for_stereo2,
+                                    range_for_stereo3,
+                                    range_for_stereo4,
+                                    range_for_stereo5,
+                                    z_cut,
+                                    z_diff_for_last_attend,
+                                    (unsigned)svd_reconstruction,
+                                    min_svd_electrons,
+                                    (unsigned)on_correction,
+                                    (unsigned)output_2dtracks,
+                                    (unsigned)curl_version,
+                                    b_simulateSmallCell);
     _curlFinder->debugLevel(b_debugLevel);
 
     //...Create pm curl finder...
 //cnv     if (! _pmCurlFinder)
-// 	_pmCurlFinder = new TPMCurlFinder(-min_svd_electrons_in_pmc,
-// 					  min_svd_electrons_in_pmc);
+//  _pmCurlFinder = new TPMCurlFinder(-min_svd_electrons_in_pmc,
+//            min_svd_electrons_in_pmc);
 
     //...Create Hough finder...
 //  b_conformalSalvageLoadWidth is not used
     if (b_doHoughFinder) {
-	_houghFinder = new THoughFinder(b_doHoughFinderCurlSearch,
-					b_houghAxialLoadWidth,
-					b_houghAxialLoadWidthCurl,
-					b_houghMaxSigma,
-					b_houghStereoMaxSigma,
-					b_houghSalvageLevel,
-					5,
-					b_conformalFittingFlag,
-					b_conformalStereoLoadWidth,
-					// b_conformalStereoLoadWidth * 2,
-					b_conformalSalvageLoadWidth,
-					b_houghMeshX,
-					b_houghMeshY,
-					b_houghPtBoundary,
-					b_houghThreshold,
-					b_houghMeshXLowPt,
-					b_houghMeshYLowPt,
-					b_houghPtBoundaryLowPt,
-					b_houghThresholdLowPt,
-					b_houghMode);
-	_houghFinder->debugLevel(b_debugLevel);
- 	_houghFinder->init();
+      _houghFinder = new THoughFinder(b_doHoughFinderCurlSearch,
+                                      b_houghAxialLoadWidth,
+                                      b_houghAxialLoadWidthCurl,
+                                      b_houghMaxSigma,
+                                      b_houghStereoMaxSigma,
+                                      b_houghSalvageLevel,
+                                      5,
+                                      b_conformalFittingFlag,
+                                      b_conformalStereoLoadWidth,
+                                      // b_conformalStereoLoadWidth * 2,
+                                      b_conformalSalvageLoadWidth,
+                                      b_houghMeshX,
+                                      b_houghMeshY,
+                                      b_houghPtBoundary,
+                                      b_houghThreshold,
+                                      b_houghMeshXLowPt,
+                                      b_houghMeshYLowPt,
+                                      b_houghPtBoundaryLowPt,
+                                      b_houghThresholdLowPt,
+                                      b_houghMode);
+      _houghFinder->debugLevel(b_debugLevel);
+      _houghFinder->init();
     }
 
     //...Create cathode cluster finder...
 //cnv     if (_cdccat) {
-// // 	if (! _clustFinder) _clustFinder = new TRGCDCClustFinder(_cdccat);
-// // 	_clustFinder->debugLevel(b_debugLevel);
+// //   if (! _clustFinder) _clustFinder = new TRGCDCClustFinder(_cdccat);
+// //   _clustFinder->debugLevel(b_debugLevel);
 //     }
 
     //...Track manager setup...
@@ -1282,7 +1285,7 @@ Trasan::initialize() {
     _trackManager.debugLevel(b_debugLevel);
     _trackManager.fittingFlag(b_fittingFlag);
     if (b_debugLevel)
-	_trackManager.defineHistograms();
+      _trackManager.defineHistograms();
 
     //...Initialize...
     TUpdater::initialize();
@@ -1295,7 +1298,7 @@ Trasan::initialize() {
     //...Trasan window...
     std::cout << "TWindowGTK ... initializing GTK" << std::endl;
     int argc = 0;
-    char ** argv = 0;
+    char** argv = 0;
 
     Gtk::Main main_instance(argc, argv);
     static TWindowGTKConformal w("Conformal", 160, 1137, 600);
@@ -1339,10 +1342,11 @@ Trasan::initialize() {
     dump("parameter");
 
     TrasanTest = b_test;
-}
+  }
 
-void
-Trasan::terminate() {
+  void
+  Trasan::terminate()
+  {
 
     //...Clear Trasan objects...
     clear(true);
@@ -1358,16 +1362,18 @@ Trasan::terminate() {
 //cnv    if (_clustFinder) delete _clustFinder;
 //cnv    if (_pmCurlFinder) delete _pmCurlFinder;
     if (_houghFinder) delete _houghFinder;
-}
+  }
 
-void
-Trasan::disp_stat(const char * m) {
+  void
+  Trasan::disp_stat(const char* m)
+  {
     std::string msg = m;
     dump(msg);
-}
+  }
 
-void
-Trasan::event() {
+  void
+  Trasan::event()
+  {
 
     static clock_t time_start = 0;
 //cnv    static clock_t time_end = 0;
@@ -1375,13 +1381,13 @@ Trasan::event() {
 
     ++_nEvents;
     if (b_debugLevel) {
-	time_start = clock();
-	std::cout << "Trasan ... processing ev# " << _nEvents << std::endl;
+      time_start = clock();
+      std::cout << "Trasan ... processing ev# " << _nEvents << std::endl;
     }
 
 #ifdef TRASAN_WINDOW_GTK
     std::cout << "Trasan ... opening GTK windows" << std::endl;
-    TWindowGTKConformal & w = Trasan::getTrasan()->w();
+    TWindowGTKConformal& w = Trasan::getTrasan()->w();
     w.beginEvent();
 #ifdef TRASAN_WINDOW_GTK_HOUGH
     _hp->clear();
@@ -1398,7 +1404,7 @@ Trasan::event() {
 
     //...Starting point...
 //cnv trasan_start:
-    
+
     //...Clear myself...
     clear();
 
@@ -1416,17 +1422,17 @@ Trasan::event() {
     CAList<Belle2::TRGCDCWireHit> axialHits;
     CAList<Belle2::TRGCDCWireHit> stereoHits;
     CAList<Belle2::TRGCDCWireHit> allHits;
-    const std::vector<const Belle2::TRGCDCWireHit *> hits = _cdc->hits();
+    const std::vector<const Belle2::TRGCDCWireHit*> hits = _cdc->hits();
     for (unsigned i = 0; i < hits.size(); i++) {
-	allHits.append(hits[i]);
+      allHits.append(hits[i]);
     }
     allHits.sort(Belle2::TRGCDCWireHit::sortByWireId);
     for (unsigned i = 0; i < (unsigned) allHits.length(); i++) {
-	const Belle2::TRGCDCWireHit * hit = allHits[i];
-	if (hit->wire().axial())
-	    axialHits.append(hit);
-	else
-	    stereoHits.append(hit);
+      const Belle2::TRGCDCWireHit* hit = allHits[i];
+      if (hit->wire().axial())
+        axialHits.append(hit);
+      else
+        stereoHits.append(hit);
 
     }
 
@@ -1436,20 +1442,20 @@ Trasan::event() {
 
     //...Perfect finder...
     if (b_doPerfectFinder) {
-	_perfectFinder->doit(axialHits, stereoHits, tracks, tracks2D);
-	_trackManager.append(tracks);
+      _perfectFinder->doit(axialHits, stereoHits, tracks, tracks2D);
+      _trackManager.append(tracks);
     }
 
     //...Normal finders..
     else {
 
-	//...Mode 0... (all finders on)
-	if (b_mode == 0)
-	    main0(axialHits, stereoHits, allHits, tracks, tracks2D);
+      //...Mode 0... (all finders on)
+      if (b_mode == 0)
+        main0(axialHits, stereoHits, allHits, tracks, tracks2D);
 
-	//...Mode 1... (all finders on)
-	else
-	    main1(axialHits, stereoHits, allHits, tracks, tracks2D);
+      //...Mode 1... (all finders on)
+      else
+        main1(axialHits, stereoHits, allHits, tracks, tracks2D);
     }
 
     //...Move a pivot...
@@ -1471,10 +1477,10 @@ Trasan::event() {
 
 //cnv     _trackManager.saveTables();
 //     if (b_doMCAnalysis) {
-// 	if (mcEvent()) {
-// 	    mcInformation();
-// 	    _trackManager.saveMCTables();
-// 	}
+//  if (mcEvent()) {
+//      mcInformation();
+//      _trackManager.saveMCTables();
+//  }
 //     }
 
 //     //...Statistics...
@@ -1488,46 +1494,46 @@ Trasan::event() {
 
 //     //...T0 correction...
 //     if (b_doT0Determination)
-// 	_trackManager.determineT0(b_doT0Determination, b_nTracksForT0);
+//  _trackManager.determineT0(b_doT0Determination, b_nTracksForT0);
 
     //...For debug...
     if (b_debugLevel) {
-	std::cout
-	    << "Trasan ... ev# " << _nEvents << " processed,"
-	    << " #tracks found=" << _trackManager.allTracks().length()
-	    << ", #good tracks=" << _trackManager.tracks().length()
-	    << ", #2D tracks=" << _trackManager.tracks2D().length()
-	    << std::endl;
-	if (b_debugLevel > 1)
-	    _trackManager.dump("eventSummary");
-	else if (b_debugLevel > 2)
-	    _trackManager.dump("eventSummary hits");
+      std::cout
+          << "Trasan ... ev# " << _nEvents << " processed,"
+          << " #tracks found=" << _trackManager.allTracks().length()
+          << ", #good tracks=" << _trackManager.tracks().length()
+          << ", #2D tracks=" << _trackManager.tracks2D().length()
+          << std::endl;
+      if (b_debugLevel > 1)
+        _trackManager.dump("eventSummary");
+      else if (b_debugLevel > 2)
+        _trackManager.dump("eventSummary hits");
 
-//cnv 	if (b_debugLevel > 2) {
-// 	    BsShwDat(RECCDC_TRK);
-// 	    BsShwDat(RECCDC_TRK_ADD);
-// 	    BsShwDat(RECCDC_MCTRK);
-// 	}
+//cnv   if (b_debugLevel > 2) {
+//      BsShwDat(RECCDC_TRK);
+//      BsShwDat(RECCDC_TRK_ADD);
+//      BsShwDat(RECCDC_MCTRK);
+//  }
     }
 
     TUpdater::update();
 
 //cnv     if (b_debugLevel) {
-// 	time_end = clock();
-// 	time_total += time_end - time_start;
-// 	const float time_used = float((time_end - time_start)) /
-// 	    float(CLOCKS_PER_SEC);
-// 	const float time_total_used =
-// 	    float(time_total) / float(CLOCKS_PER_SEC);
+//  time_end = clock();
+//  time_total += time_end - time_start;
+//  const float time_used = float((time_end - time_start)) /
+//      float(CLOCKS_PER_SEC);
+//  const float time_total_used =
+//      float(time_total) / float(CLOCKS_PER_SEC);
 
-// 	const belle_event & r = * (belle_event *) BsGetEnt(BELLE_EVENT,
-// 							       1,
-// 							       BBS_No_Index);
-// 	std::cout << "Trasan ... processed ev# " << _nEvents << std::endl;
-// 	std::cout << "Trasan ... time used = " << time_used
-// 	       << " total time " << time_total_used
-// 	       << " exp " << r.m_ExpNo << " run " << r.m_RunNo
-// 	       << " evt " << r.m_EvtNo << std::endl;
+//  const belle_event & r = * (belle_event *) BsGetEnt(BELLE_EVENT,
+//                     1,
+//                     BBS_No_Index);
+//  std::cout << "Trasan ... processed ev# " << _nEvents << std::endl;
+//  std::cout << "Trasan ... time used = " << time_used
+//         << " total time " << time_total_used
+//         << " exp " << r.m_ExpNo << " run " << r.m_RunNo
+//         << " evt " << r.m_EvtNo << std::endl;
 //     }
 
 #ifdef TRASAN_WINDOW
@@ -1542,7 +1548,7 @@ Trasan::event() {
 #ifdef TRASAN_WINDOW_GTK
     AList<TLink> tmp;
     for (unsigned i = 0; i < (unsigned) _trackManager.tracks().length(); i++)
-	tmp.append(_trackManager.tracks()[i]->links());
+      tmp.append(_trackManager.tracks()[i]->links());
     w.endOfEvent();
     w.clear();
     w.stage("Trasan : all tracking finished");
@@ -1556,15 +1562,16 @@ Trasan::event() {
     w.skip(false);
     w.run();
 
-//     Glib::RefPtr<Gtk::PrintOperation> op = Gtk::PrintOperation::create(); 
-//     op->set_export_filename("test.pdf"); 
+//     Glib::RefPtr<Gtk::PrintOperation> op = Gtk::PrintOperation::create();
+//     op->set_export_filename("test.pdf");
 //     Gtk::PrintOperationResult res = op->run(Gtk::PRINT_OPERATION_ACTION_EXPORT);
 
 #endif
-}
+  }
 
-void
-Trasan::mcInformation(void) {
+  void
+  Trasan::mcInformation(void)
+  {
 
     //...Preparation...
 //  const AList<TTrack> & allTracks = _trackManager.allTracks();
@@ -1572,42 +1579,42 @@ Trasan::mcInformation(void) {
 
     unsigned nHep = Belle2::TRGCDCTrackMC::list().size();
     unsigned nTrk = allTracks.length();
-    unsigned * N;
-    if (NULL == (N = (unsigned *) malloc(nHep * sizeof(unsigned)))) {
+    unsigned* N;
+    if (NULL == (N = (unsigned*) malloc(nHep * sizeof(unsigned)))) {
       perror("$Id: Trasan.cc 11152 2010-04-28 01:24:38Z yiwasaki $:N:malloc");
       exit(1);
-    }  
+    }
     for (unsigned i = 0; i < nHep; i++) N[i] = 0;
 
     //...Loop over all tracks...
     for (unsigned i = 0; i < nTrk; i++) {
-	TTrackMC * mc = allTracks[i]->_mc;
-	if (! mc) {
-	    mc = new TTrackMC(* allTracks[i]);
-	    _mcTracks.append(mc);
-	    allTracks[i]->_mc = mc;
-	}
+      TTrackMC* mc = allTracks[i]->_mc;
+      if (! mc) {
+        mc = new TTrackMC(* allTracks[i]);
+        _mcTracks.append(mc);
+        allTracks[i]->_mc = mc;
+      }
 
-	mc->update();
-	if (mc->hepId() != -1)
-	    if (mc->charge())
-		++N[mc->hepId()];
+      mc->update();
+      if (mc->hepId() != -1)
+        if (mc->charge())
+          ++N[mc->hepId()];
     }
 
     //...Check uniqueness...
     for (unsigned i = 0; i < nHep; i++) {
-	if (N[i] < 2) {
-	    for (unsigned j = 0; j < nTrk; j++)
-		if ((unsigned) allTracks[j]->_mc->hepId() == i)
-		    allTracks[j]->_mc->_quality += TTrackUnique;
-	}
+      if (N[i] < 2) {
+        for (unsigned j = 0; j < nTrk; j++)
+          if ((unsigned) allTracks[j]->_mc->hepId() == i)
+            allTracks[j]->_mc->_quality += TTrackUnique;
+      }
     }
 
     //...Good tracks...
     for (unsigned i = 0; i < nTrk; i++) {
-	unsigned & quality = allTracks[i]->_mc->_quality;
-	if ((quality & TTrackGhost) && (quality & TTrackUnique))
-	    quality += TTrackGood;
+      unsigned& quality = allTracks[i]->_mc->_quality;
+      if ((quality & TTrackGhost) && (quality & TTrackUnique))
+        quality += TTrackGood;
     }
 
     //...Termination...
@@ -1615,18 +1622,19 @@ Trasan::mcInformation(void) {
 
     //...Debug...
     if (b_debugLevel) {
-	std::cout << "Belle2::TRGCDCTrackMC list ..." << std::endl;
-	std::cout << "   id:ptype:mother:p:v" << std::endl;
-	for (unsigned i = 0; i < nHep; i++)
-	    (Belle2::TRGCDCTrackMC::list())[i]->dump("", "    ");
-	std::cout << "TTrackMC list ..." << std::endl;
-	for (unsigned i = 0; i < nTrk; i++)
-	    allTracks[i]->_mc->dump("", "    ");
+      std::cout << "Belle2::TRGCDCTrackMC list ..." << std::endl;
+      std::cout << "   id:ptype:mother:p:v" << std::endl;
+      for (unsigned i = 0; i < nHep; i++)
+        (Belle2::TRGCDCTrackMC::list())[i]->dump("", "    ");
+      std::cout << "TTrackMC list ..." << std::endl;
+      for (unsigned i = 0; i < nTrk; i++)
+        allTracks[i]->_mc->dump("", "    ");
     }
-}
+  }
 
-void
-Trasan::cathode(float window) {
+  void
+  Trasan::cathode(float window)
+  {
 //cnv
 //    // ... Clustering...
 //     _clustFinder->doit(_cdccat->striphits());
@@ -1640,7 +1648,7 @@ Trasan::cathode(float window) {
 //     while (TTrack * t = tracks[i++]){
 //         t->findCatHit(i);
 //         t->relationClusterWithWire();
-// 	t->relationClusterWithLayer(b_cathodeSystematics);
+//  t->relationClusterWithLayer(b_cathodeSystematics);
 //     }
 
 //    //... set status and estimate error ...
@@ -1655,10 +1663,10 @@ Trasan::cathode(float window) {
 
 // //             unsigned i2 = 0;
 // //             while(TRGCDCClust *clust = cathit->candclust()[i2++]){
-// // 		if( clust->stat() == 1 ){
+// //     if( clust->stat() == 1 ){
 // //               clust->zcalc( atan(t->helix().tanl()));
 // //               clust->esterz( atan(t->helix().tanl()));
-// // 		}
+// //     }
 // //             }
 // //           }
 // //         }
@@ -1673,24 +1681,25 @@ Trasan::cathode(float window) {
 //         while (TTrack * t = tracks[i++])
 //           t->fitWithCathode(window,b_cathodeSystematics);
 //       }else{
-// 	TCosmicFitter catfitter( "cathode cosmic fitter" );
-// 	i=0;
-// 	float t0Offset(0.);
-// 	while( TTrack * t = tracks[i++]){
-// 	  catfitter.fitWithCathode( *t , t0Offset,
-// 				    window, b_cathodeSystematics );
-// 	}
+//  TCosmicFitter catfitter( "cathode cosmic fitter" );
+//  i=0;
+//  float t0Offset(0.);
+//  while( TTrack * t = tracks[i++]){
+//    catfitter.fitWithCathode( *t , t0Offset,
+//            window, b_cathodeSystematics );
+//  }
 //       }
 //     }
 
 //     //... output to panther table...
 //      _clustFinder->saveClustTables();
-//     if (b_debugLevel > 1 ) _clustFinder->dumpClustTables();    
+//     if (b_debugLevel > 1 ) _clustFinder->dumpClustTables();
 
-}
+  }
 
-void
-Trasan::clear(bool termination) {
+  void
+  Trasan::clear(bool termination)
+  {
 
     //...Clear track candidates of the last event...
     HepAListDeleteAll(_mcTracks);
@@ -1707,335 +1716,337 @@ Trasan::clear(bool termination) {
 
 #ifdef TRASAN_DEBUG
     std::cout << "Trasan::clear ... nTLinks=" << TLink::nTLinks()
-	   << ", nTLinksMax=" << TLink::nTLinksMax() << std::endl;
+              << ", nTLinksMax=" << TLink::nTLinksMax() << std::endl;
     std::cout << "Trasan::clear ... nTTracks=" << TTrack::nTTracks()
-	   << ", nTTracksMax=" << TTrack::nTTracksMax() << std::endl;
+              << ", nTTracksMax=" << TTrack::nTTracksMax() << std::endl;
 #endif
-}
+  }
 
-void
-Trasan::fastClear(void) {
+  void
+  Trasan::fastClear(void)
+  {
     clear();
-}
+  }
 
-bool
-Trasan::mcEvent(void) const {
-//cnv     struct belle_event * ev = 
-// 	(struct belle_event *) BsGetEnt(BELLE_EVENT, 1, BBS_No_Index);
+  bool
+  Trasan::mcEvent(void) const
+  {
+//cnv     struct belle_event * ev =
+//  (struct belle_event *) BsGetEnt(BELLE_EVENT, 1, BBS_No_Index);
 
 //     //...No BELLE_EVENT ???...
 //     if (! ev) return false;
 //     if (ev->m_ExpMC == 2) return true;
 //     return false;
     return true;
-}
+  }
 
-void
-Trasan::dump(const std::string & msg, const std::string & pre) const {
+  void
+  Trasan::dump(const std::string& msg, const std::string& pre) const
+  {
     bool def = (msg == "") ? true : false;
 
     std::cout << std::endl;
     if (msg.find("summary") != std::string::npos ||
-	msg.find("detail") != std::string::npos) {
-	std::cout << "Trasan Summary (" << version() << ")" << std::endl;
-	std::cout << "    Track Manager Summary" << std::endl;
-	if (b_doMCAnalysis)
-	    _trackManager.dump("summary MC", "        ");
-	else
-	    _trackManager.dump("summary", "        ");
-	if (_confFinder) {
-	    std::cout << "    Conformal Finder Summary" << std::endl;
-	    _confFinder->dump("summary", "        ");
-	}
+        msg.find("detail") != std::string::npos) {
+      std::cout << "Trasan Summary (" << version() << ")" << std::endl;
+      std::cout << "    Track Manager Summary" << std::endl;
+      if (b_doMCAnalysis)
+        _trackManager.dump("summary MC", "        ");
+      else
+        _trackManager.dump("summary", "        ");
+      if (_confFinder) {
+        std::cout << "    Conformal Finder Summary" << std::endl;
+        _confFinder->dump("summary", "        ");
+      }
     }
     if (def || msg.find("parameter") != std::string::npos ||
-	msg.find("detail") != std::string::npos) {
-	std::string t0 = pre;
-	std::string t1 = pre + "    ";
-	std::string t2 = pre + "        ";
+        msg.find("detail") != std::string::npos) {
+      std::string t0 = pre;
+      std::string t1 = pre + "    ";
+      std::string t2 = pre + "        ";
 
-	std::cout
-	    << t0 << name() << "(" << version() << ")" << " : debug level = "
-	    << b_debugLevel << std::endl;
-	if (b_doPerfectFinder != 0) {
-	    std::cout
-		<< t1 << "Perfect finder is active. ";
-	    std::cout
-		<< "Other finders will not called." << std::endl;
-	}
-	if (b_conformalFinder == 1) {
-	    std::cout
-		<< t1 << "New trasan(new conf. finder) is active."
-		<< std::endl;
-	}
+      std::cout
+          << t0 << name() << "(" << version() << ")" << " : debug level = "
+          << b_debugLevel << std::endl;
+      if (b_doPerfectFinder != 0) {
+        std::cout
+            << t1 << "Perfect finder is active. ";
+        std::cout
+            << "Other finders will not called." << std::endl;
+      }
+      if (b_conformalFinder == 1) {
+        std::cout
+            << t1 << "New trasan(new conf. finder) is active."
+            << std::endl;
+      }
 
-	if (_cdc) {
-	    std::cout
-		<< t1 << _cdc->name() << "(" << _cdc->version() << ")"
-		<< std::endl;
-	    std::cout
-		<< t2 << "cdc version           : " << _cdc->versionCDC()
-		<< std::endl;
-	    std::cout
-		<< t2 << "fudge factor          : " << _cdc->fudgeFactor()
-		<< std::endl;
-// 	    std::cout
-// 		<< t2 << "simulate small cell : "
-// 		<< _cdc->simulateSmallCell() << std::endl;
- 	    std::cout
- 		<< t2 << "simulate small cell : no longer available"
-		<< std::endl;
-	}
-	else {
-	    std::cout
-		<< t1 << "CDC is not created yet" << std::endl;
-	}
+      if (_cdc) {
+        std::cout
+            << t1 << _cdc->name() << "(" << _cdc->version() << ")"
+            << std::endl;
+        std::cout
+            << t2 << "cdc version           : " << _cdc->versionCDC()
+            << std::endl;
+        std::cout
+            << t2 << "fudge factor          : " << _cdc->fudgeFactor()
+            << std::endl;
+//      std::cout
+//    << t2 << "simulate small cell : "
+//    << _cdc->simulateSmallCell() << std::endl;
+        std::cout
+            << t2 << "simulate small cell : no longer available"
+            << std::endl;
+      } else {
+        std::cout
+            << t1 << "CDC is not created yet" << std::endl;
+      }
 
-//cnv 	if (_cdccat)
-// 	    std::cout
-// 		<< t1 << _cdccat->name() << "(" << _cdccat->version() << ")"
-// 		<< std::endl;
+//cnv   if (_cdccat)
+//      std::cout
+//    << t1 << _cdccat->name() << "(" << _cdccat->version() << ")"
+//    << std::endl;
 
-	std::cout
-	    << t1 << "ignore hit quality      : " << b_useAllHits << std::endl;
-	std::cout
-	    << t1 << "do T0 reset             : " << b_doT0Reset << std::endl;
-	std::cout
-	    << t1 << "    max number of reset : " << b_nT0ResetMax
-	    << std::endl;
-	std::cout
-	    << t1 << "MC analysis             : " << b_doMCAnalysis
-	    << std::endl;
-	std::cout
-	    << t1 << "mode                    : " << b_mode << std::endl;
-	std::cout
-	    << t1 << "helix fitter chisq max  : " << b_helixFitterChisqMax
-	    << std::endl;
-	std::cout
-	    << t1 << "helix fitter max. iterations  : " 
-	    << b_helixFitterNtrialMax
-	    << std::endl;
-	std::cout
-	    << t1 << "test flag               : " << b_test << std::endl;
+      std::cout
+          << t1 << "ignore hit quality      : " << b_useAllHits << std::endl;
+      std::cout
+          << t1 << "do T0 reset             : " << b_doT0Reset << std::endl;
+      std::cout
+          << t1 << "    max number of reset : " << b_nT0ResetMax
+          << std::endl;
+      std::cout
+          << t1 << "MC analysis             : " << b_doMCAnalysis
+          << std::endl;
+      std::cout
+          << t1 << "mode                    : " << b_mode << std::endl;
+      std::cout
+          << t1 << "helix fitter chisq max  : " << b_helixFitterChisqMax
+          << std::endl;
+      std::cout
+          << t1 << "helix fitter max. iterations  : "
+          << b_helixFitterNtrialMax
+          << std::endl;
+      std::cout
+          << t1 << "test flag               : " << b_test << std::endl;
 
-	std::cout
-	    << t1 << _trackManager.name() << "(" << _trackManager.version()
-	    << ") options" << std::endl;
-	std::cout
-	    << t2 << "T0 determination      : " << b_doT0Determination
-	    << std::endl;
-	std::cout
-	    << t2 << "    # of tracks       : " << b_nTracksForT0 << std::endl;
-	std::cout
-	    << t2 << "bank sort             : " << b_sortMode << std::endl;
-	std::cout
-	    << t2 << "max. momentum allowed : " << b_momentumCut  << " GeV/c"
-	    << std::endl;
-	std::cout
-	    << t2 << "max. pt allowed       : " << b_ptCut << " GeV/c"
-	    << std::endl;
-	std::cout
-	    << t2 << "max. tanl allowed     : " << b_tanlCut << " GeV/c"
-	    << std::endl;
-	std::cout
-	    << t2 << "salvage               : " << b_doSalvage << std::endl;
-	std::cout
-	    << t2 << "salvage level         : " << b_salvageLevel << std::endl;
+      std::cout
+          << t1 << _trackManager.name() << "(" << _trackManager.version()
+          << ") options" << std::endl;
+      std::cout
+          << t2 << "T0 determination      : " << b_doT0Determination
+          << std::endl;
+      std::cout
+          << t2 << "    # of tracks       : " << b_nTracksForT0 << std::endl;
+      std::cout
+          << t2 << "bank sort             : " << b_sortMode << std::endl;
+      std::cout
+          << t2 << "max. momentum allowed : " << b_momentumCut  << " GeV/c"
+          << std::endl;
+      std::cout
+          << t2 << "max. pt allowed       : " << b_ptCut << " GeV/c"
+          << std::endl;
+      std::cout
+          << t2 << "max. tanl allowed     : " << b_tanlCut << " GeV/c"
+          << std::endl;
+      std::cout
+          << t2 << "salvage               : " << b_doSalvage << std::endl;
+      std::cout
+          << t2 << "salvage level         : " << b_salvageLevel << std::endl;
 
-	std::cout
-	    << t1 << _perfectFinder->name() << "("
-	    << _perfectFinder->version() << ") options" << std::endl;
-	std::cout
-	    << t2 << "do finding            : " << b_doPerfectFinder
-	    << std::endl;
-	std::cout
-	    << t2 << "perfect fitting       : " << b_perfectFitting
-	    << std::endl;
+      std::cout
+          << t1 << _perfectFinder->name() << "("
+          << _perfectFinder->version() << ") options" << std::endl;
+      std::cout
+          << t2 << "do finding            : " << b_doPerfectFinder
+          << std::endl;
+      std::cout
+          << t2 << "perfect fitting       : " << b_perfectFitting
+          << std::endl;
 
-	std::cout
-	    << t1 << _confFinder->name() << "(" << _confFinder->version()
-	    << ") options" << std::endl;
-	std::cout
-	    << t2 << "do finding            : " << b_doConformalFinder
-	    << std::endl;
-	if (b_conformalFinder == 1) {
-	    std::cout
-		<< t2 << "fast finder           : " << b_doConformalFastFinder
-		<< std::endl;
-	    std::cout
-		<< t2 << "slow finder           : " << b_doConformalSlowFinder
-		<< std::endl;
-	    std::cout
-		<< t2 << "perfect segment find  : "
-		<< b_conformalPerfectSegmentFinding << std::endl;
-	    std::cout
-		<< t2 << "max sigma             : " << b_conformalMaxSigma
-		<< std::endl;
-	    std::cout
-		<< t2 << "min # hits for segment: "
-		<< b_conformalMinNLinksForSegment << std::endl;
-	    std::cout
-		<< t2 << "min # cores in segment: " << b_conformalMinNCores
-		<< std::endl;
-	    std::cout
-		<< t2 << "min # segments        : " << b_conformalMinNSegments
-		<< std::endl;
-	    std::cout
-		<< t2 << "salvage level         : " << b_salvageLevel
-		<< std::endl;
-	    std::cout
-		<< t2 << "salvage load width    : "
-		<< b_conformalSalvageLoadWidth << std::endl;
-	    std::cout
-		<< t2 << "stereo mode           : " << b_conformalStereoMode
-		<< std::endl;
-	    std::cout
-		<< t2 << "stereo load width     : "
-		<< b_conformalStereoLoadWidth << std::endl;
-	    std::cout
-		<< t2 << "stereo max sigma      : "
-		<< b_conformalStereoMaxSigma << std::endl;
-	    std::cout
-		<< t2 << "stereo segment dist.  : "
-		<< b_conformalStereoSzSegmentDistance << std::endl;
-	    std::cout
-		<< t2 << "stereo link distance  : "
-		<< b_conformalStereoSzLinkDistance << std::endl;
-	}
-	else {
-	    std::cout
-		<< t2 << "Old trasan(old conf. finder) is active."
-		<< std::endl;
-	    std::cout
-		<< t2 << "do stereo finding     : "
-		<< b_doConformalFinderStereo << std::endl;
-	    std::cout
-		<< t2 << "use cosmic builder    : "
-		<< b_doConformalFinderCosmic << std::endl;
-	    std::cout
-		<< t2 << "max sigma             : " << b_conformalMaxSigma
-		<< std::endl;
-	    std::cout
-		<< t2 << "fraction              : " << b_conformalFraction
-		<<std::endl;
-	    std::cout
-		<< t2 << "fitting corrections   : "
-		<< b_conformalFittingCorrections << std::endl;
-	    std::cout
-		<< t2 << "stereo max sigma      : "
-		<< b_conformalStereoMaxSigma << std::endl;
-	    std::cout
-		<< t2 << "stereo z3             : " << b_conformalStereoZ3
-		<< std::endl;
-	    std::cout
-		<< t2 << "stereo z4             : " << b_conformalStereoZ4
-		<< std::endl;
-	    std::cout
-		<< t2 << "stereo chisq 3        : " << b_conformalStereoChisq3
-		<< std::endl;
-	    std::cout
-		<< t2 << "stereo chisq 4        : " << b_conformalStereoChisq4
-		<< std::endl;
-	}
-	std::cout << t1 << _curlFinder->name();
-	std::cout << "(" << _curlFinder->version() << ") options" << std::endl;
-	std::cout << t2 << "do finding            : " << b_doCurlFinder
-		  << std::endl;
-//cnv 	if (_clustFinder) {
-// 	    std::cout << t1 << _clustFinder->name();
-// 	    std::cout << "(" << _clustFinder->version() << ") options"
-// 		      << std::endl;
-// 	    std::cout << t2 << "do finding            : " << b_doClustFinder
-// 		      << std::endl;
-// 	    std::cout << t2 << "cathode window        : " << b_cathodeWindow
-// 		      << std::endl;
-// 	    std::cout << t2 << "systematic correction : "
-// 		      << b_cathodeSystematics<<std::endl;
-// 	    std::cout << t2 << "cathode cosmic switch : " << b_cathodeCosmic
-// 		      << std::endl;
-// 	}
-	std::cout << t1 << "Patten Matching CurlFinder"
-		  << "(0.2beta) options" << std::endl;
-	std::cout << t2 << "do finding                    : "
-		  << b_doPMCurlFinder << std::endl;
-	std::cout << t2 << "mode(1=rec, 2=map, 3=plot)    : "
-		  << b_pmCurlFinder << std::endl;
-	std::cout << t2 << "min electrons of svd clusters : "
-		  << min_svd_electrons_in_pmc << std::endl;
-	std::cout << t1 << "SVD Associator" << "(0.2beta) options"
-		  << std::endl;
-	std::cout << t2 << "doing : " << b_doSvdAssociator << std::endl;
-	if (_houghFinder) {
-	    std::cout
-		<< t1 << _houghFinder->name() << "("
-		<< _houghFinder->version() << ") options" << std::endl;
-	    std::cout
-		<< t2 << "do finding            : " << b_doHoughFinder
-		<< std::endl;
-	    std::cout
-		<< t2 << "do curl search        : "
-		<< b_doHoughFinderCurlSearch << std::endl;
-	    std::cout
-		<< t2 << "mesh size x           : " << b_houghMeshX
-		<< std::endl;
-	    std::cout
-		<< t2 << "mesh size y           : " << b_houghMeshY
-		<< std::endl;
-	    std::cout
-		<< t2 << "Pt boundary           : " << b_houghPtBoundary
-		<< std::endl;
-	    std::cout
-		<< t2 << "threshold             : " << b_houghThreshold
-		<< std::endl;
-	    std::cout
-		<< t2 << "mesh size x (low Pt)  : " << b_houghMeshXLowPt
-		<< std::endl;
-	    std::cout
-		<< t2 << "mesh size y (low Pt)  : " << b_houghMeshYLowPt
-		<< std::endl;
-	    std::cout
-		<< t2 << "Pt boundary (low Pt)  : " << b_houghPtBoundaryLowPt
-		<< std::endl;
-	    std::cout
-		<< t2 << "threshold  (low Pt)   : " << b_houghThresholdLowPt
-		<< std::endl;
-	    std::cout
-		<< t2 << "axial load width      : " << b_houghAxialLoadWidth
-		<< std::endl;
-	    std::cout
-		<< t2 << "axial load width curl : "
-		<< b_houghAxialLoadWidthCurl
-		<< std::endl;
-	    std::cout
-		<< t2 << "max sigma             : " << b_houghMaxSigma
-		<< std::endl;
-	    std::cout
-		<< t2 << "max sigma stereo      : " << b_houghStereoMaxSigma
-		<< std::endl;
-	    std::cout
-		<< t2 << "salvage level         : " << b_houghSalvageLevel
-		<< std::endl;
-	    std::cout
-		<< t2 << "mode                  : " << b_houghMode
-		<< std::endl;
-	}
+      std::cout
+          << t1 << _confFinder->name() << "(" << _confFinder->version()
+          << ") options" << std::endl;
+      std::cout
+          << t2 << "do finding            : " << b_doConformalFinder
+          << std::endl;
+      if (b_conformalFinder == 1) {
+        std::cout
+            << t2 << "fast finder           : " << b_doConformalFastFinder
+            << std::endl;
+        std::cout
+            << t2 << "slow finder           : " << b_doConformalSlowFinder
+            << std::endl;
+        std::cout
+            << t2 << "perfect segment find  : "
+            << b_conformalPerfectSegmentFinding << std::endl;
+        std::cout
+            << t2 << "max sigma             : " << b_conformalMaxSigma
+            << std::endl;
+        std::cout
+            << t2 << "min # hits for segment: "
+            << b_conformalMinNLinksForSegment << std::endl;
+        std::cout
+            << t2 << "min # cores in segment: " << b_conformalMinNCores
+            << std::endl;
+        std::cout
+            << t2 << "min # segments        : " << b_conformalMinNSegments
+            << std::endl;
+        std::cout
+            << t2 << "salvage level         : " << b_salvageLevel
+            << std::endl;
+        std::cout
+            << t2 << "salvage load width    : "
+            << b_conformalSalvageLoadWidth << std::endl;
+        std::cout
+            << t2 << "stereo mode           : " << b_conformalStereoMode
+            << std::endl;
+        std::cout
+            << t2 << "stereo load width     : "
+            << b_conformalStereoLoadWidth << std::endl;
+        std::cout
+            << t2 << "stereo max sigma      : "
+            << b_conformalStereoMaxSigma << std::endl;
+        std::cout
+            << t2 << "stereo segment dist.  : "
+            << b_conformalStereoSzSegmentDistance << std::endl;
+        std::cout
+            << t2 << "stereo link distance  : "
+            << b_conformalStereoSzLinkDistance << std::endl;
+      } else {
+        std::cout
+            << t2 << "Old trasan(old conf. finder) is active."
+            << std::endl;
+        std::cout
+            << t2 << "do stereo finding     : "
+            << b_doConformalFinderStereo << std::endl;
+        std::cout
+            << t2 << "use cosmic builder    : "
+            << b_doConformalFinderCosmic << std::endl;
+        std::cout
+            << t2 << "max sigma             : " << b_conformalMaxSigma
+            << std::endl;
+        std::cout
+            << t2 << "fraction              : " << b_conformalFraction
+            << std::endl;
+        std::cout
+            << t2 << "fitting corrections   : "
+            << b_conformalFittingCorrections << std::endl;
+        std::cout
+            << t2 << "stereo max sigma      : "
+            << b_conformalStereoMaxSigma << std::endl;
+        std::cout
+            << t2 << "stereo z3             : " << b_conformalStereoZ3
+            << std::endl;
+        std::cout
+            << t2 << "stereo z4             : " << b_conformalStereoZ4
+            << std::endl;
+        std::cout
+            << t2 << "stereo chisq 3        : " << b_conformalStereoChisq3
+            << std::endl;
+        std::cout
+            << t2 << "stereo chisq 4        : " << b_conformalStereoChisq4
+            << std::endl;
+      }
+      std::cout << t1 << _curlFinder->name();
+      std::cout << "(" << _curlFinder->version() << ") options" << std::endl;
+      std::cout << t2 << "do finding            : " << b_doCurlFinder
+                << std::endl;
+//cnv   if (_clustFinder) {
+//      std::cout << t1 << _clustFinder->name();
+//      std::cout << "(" << _clustFinder->version() << ") options"
+//          << std::endl;
+//      std::cout << t2 << "do finding            : " << b_doClustFinder
+//          << std::endl;
+//      std::cout << t2 << "cathode window        : " << b_cathodeWindow
+//          << std::endl;
+//      std::cout << t2 << "systematic correction : "
+//          << b_cathodeSystematics<<std::endl;
+//      std::cout << t2 << "cathode cosmic switch : " << b_cathodeCosmic
+//          << std::endl;
+//  }
+      std::cout << t1 << "Patten Matching CurlFinder"
+                << "(0.2beta) options" << std::endl;
+      std::cout << t2 << "do finding                    : "
+                << b_doPMCurlFinder << std::endl;
+      std::cout << t2 << "mode(1=rec, 2=map, 3=plot)    : "
+                << b_pmCurlFinder << std::endl;
+      std::cout << t2 << "min electrons of svd clusters : "
+                << min_svd_electrons_in_pmc << std::endl;
+      std::cout << t1 << "SVD Associator" << "(0.2beta) options"
+                << std::endl;
+      std::cout << t2 << "doing : " << b_doSvdAssociator << std::endl;
+      if (_houghFinder) {
+        std::cout
+            << t1 << _houghFinder->name() << "("
+            << _houghFinder->version() << ") options" << std::endl;
+        std::cout
+            << t2 << "do finding            : " << b_doHoughFinder
+            << std::endl;
+        std::cout
+            << t2 << "do curl search        : "
+            << b_doHoughFinderCurlSearch << std::endl;
+        std::cout
+            << t2 << "mesh size x           : " << b_houghMeshX
+            << std::endl;
+        std::cout
+            << t2 << "mesh size y           : " << b_houghMeshY
+            << std::endl;
+        std::cout
+            << t2 << "Pt boundary           : " << b_houghPtBoundary
+            << std::endl;
+        std::cout
+            << t2 << "threshold             : " << b_houghThreshold
+            << std::endl;
+        std::cout
+            << t2 << "mesh size x (low Pt)  : " << b_houghMeshXLowPt
+            << std::endl;
+        std::cout
+            << t2 << "mesh size y (low Pt)  : " << b_houghMeshYLowPt
+            << std::endl;
+        std::cout
+            << t2 << "Pt boundary (low Pt)  : " << b_houghPtBoundaryLowPt
+            << std::endl;
+        std::cout
+            << t2 << "threshold  (low Pt)   : " << b_houghThresholdLowPt
+            << std::endl;
+        std::cout
+            << t2 << "axial load width      : " << b_houghAxialLoadWidth
+            << std::endl;
+        std::cout
+            << t2 << "axial load width curl : "
+            << b_houghAxialLoadWidthCurl
+            << std::endl;
+        std::cout
+            << t2 << "max sigma             : " << b_houghMaxSigma
+            << std::endl;
+        std::cout
+            << t2 << "max sigma stereo      : " << b_houghStereoMaxSigma
+            << std::endl;
+        std::cout
+            << t2 << "salvage level         : " << b_houghSalvageLevel
+            << std::endl;
+        std::cout
+            << t2 << "mode                  : " << b_houghMode
+            << std::endl;
+      }
     }
     if (def
-	|| msg.find("tracks") != std::string::npos
-	|| msg.find("detail") != std::string::npos) {
-	_trackManager.dump("eventSummary");
+        || msg.find("tracks") != std::string::npos
+        || msg.find("detail") != std::string::npos) {
+      _trackManager.dump("eventSummary");
     }
     if (msg.find("cathode") != std::string::npos
-	|| msg.find("detail") != std::string::npos) {
-// 	if (b_doClustFinder && _cdccat) {
-// 	    _cdccat->dump("hit");
-// //	    _clustFinder->dump("");
-// 	}
+        || msg.find("detail") != std::string::npos) {
+//  if (b_doClustFinder && _cdccat) {
+//      _cdccat->dump("hit");
+// //     _clustFinder->dump("");
+//  }
     }
-}
+  }
 
-void
-Trasan::banner(void) const {
+  void
+  Trasan::banner(void) const
+  {
     std::cout << "\n";
     std::cout << "=========================================================\n";
     std::cout << "      Trasan : Belle Tracking Module                     \n";
@@ -2256,10 +2267,11 @@ Trasan::banner(void) const {
 //  std::cout << "  Last purified : 25-Apr-2001 with 3.00RC6" << std::endl;
 //  std::cout << "  Default finder is still Conformal + Curl Finders\n";
     std::cout << std::endl;
-}
+  }
 
-void
-Trasan::beginRun() {
+  void
+  Trasan::beginRun()
+  {
 
 //cnv   Belle_version_Manager &bvMgr = Belle_version_Manager::get_manager();
 //   if( bvMgr.count() > 0 ) {
@@ -2268,45 +2280,45 @@ Trasan::beginRun() {
 //     Belle_version & bv = bvMgr.add();
 //     bv.CDC(b_doHoughFinder);
 //   }
-  
+
 //     //...Access Belle_Runhead...
 //     const belle_runhead & r = * (belle_runhead *) BsGetEnt(BELLE_RUNHEAD,
-// 							   1,
-// 							   BBS_No_Index);
+//                 1,
+//                 BBS_No_Index);
 //     if (! (& r))
-// 	std::cout << "Trasan::begin_run !!! BELLE_RUNHEAD not found"
-// 		  << std::endl
-// 		  << "           Normal cell CDC is selected" << std::endl;
+//  std::cout << "Trasan::begin_run !!! BELLE_RUNHEAD not found"
+//      << std::endl
+//      << "           Normal cell CDC is selected" << std::endl;
 
 //     //...MC analysis...
 //     if (& r) {
-// 	if (r.m_ExpMC == 2)
-// 	  //	if (r.m_ExpMC == 2 && r.m_ExpNo <= 1000)
-// 	  // g4superb does not fill MC hits yet
-// 	    b_doMCAnalysis = 1;
-// 	else
-// 	    b_doMCAnalysis = 0;
+//  if (r.m_ExpMC == 2)
+//    //  if (r.m_ExpMC == 2 && r.m_ExpNo <= 1000)
+//    // g4superb does not fill MC hits yet
+//      b_doMCAnalysis = 1;
+//  else
+//      b_doMCAnalysis = 0;
 //     }
 
 //     //...Check CDC version...
 //     _cdcVersion = "normal cell";
 //     b_doPMCurlFinder = _doPMCurlFinder;
 //     if (b_cdcVersion == 0) {
-// 	if (& r) {
-// 	    if (r.m_ExpNo > 29) {
-// 		_cdcVersion = "small cell";
-// 		b_doPMCurlFinder = 0;
-// 	    }
-// 	}
+//  if (& r) {
+//      if (r.m_ExpNo > 29) {
+//    _cdcVersion = "small cell";
+//    b_doPMCurlFinder = 0;
+//      }
+//  }
 //     }
 //     else if (b_cdcVersion == 2) {
-// 	_cdcVersion = "small cell";
-// 	b_doPMCurlFinder = 0;
+//  _cdcVersion = "small cell";
+//  b_doPMCurlFinder = 0;
 //     }
 //     else if (b_cdcVersion > 10) {
-// 	_cdcVersion = "superb";
-// 	b_doPMCurlFinder = 0;
-// 	//	b_doCurlFinder = 0;
+//  _cdcVersion = "superb";
+//  b_doPMCurlFinder = 0;
+//  //  b_doCurlFinder = 0;
 //     }
 
 //     //...Create TRGCDC...
@@ -2321,11 +2333,11 @@ Trasan::beginRun() {
 //     //...Obtain fudge factor...
 //     float fudgeFactor = b_fudgeFactor;
 //     if (fudgeFactor == 0.) {
-//  	const calcdc_const4 & c = * (calcdc_const4 *) BsGetEnt(CALCDC_CONST4,
-// 							       1,
-//  							       BBS_No_Index);
-// 	if (!(& c)) fudgeFactor = 1.;
-//  	else        fudgeFactor = c.m_fudge;
+//    const calcdc_const4 & c = * (calcdc_const4 *) BsGetEnt(CALCDC_CONST4,
+//                     1,
+//                       BBS_No_Index);
+//  if (!(& c)) fudgeFactor = 1.;
+//    else        fudgeFactor = c.m_fudge;
 //     }
 
 //     //...Turn off fudge factor before checking performance...
@@ -2337,47 +2349,50 @@ Trasan::beginRun() {
 //     _cdccat = NULL;
 //     //    if (_cdcVersion.toFloat() > 0) {
 // //     if (atof(_cdcVersion.c_str()) > 0) {
-// // 	if (! _cdccat) _cdccat = new TRGCDCCat();
-// // 	_cdccat->debugLevel(b_debugLevel);
+// //   if (! _cdccat) _cdccat = new TRGCDCCat();
+// //   _cdccat->debugLevel(b_debugLevel);
 // //     }
 // //     else {
-// // 	b_doClustFinder = 0;
-// //     }    
+// //   b_doClustFinder = 0;
+// //     }
 
 //     //...Initialize finders...
 //     if (_houghFinder)
-// 	_houghFinder->init();
-}
+//  _houghFinder->init();
+  }
 
-void
-Trasan::endRun() {
-}
+  void
+  Trasan::endRun()
+  {
+  }
 
-void
-Trasan::selectUnusedHits(const CAList<Belle2::TRGCDCWireHit> & hits,
-			 CAList<Belle2::TRGCDCWireHit> & unusedHits) const {
+  void
+  Trasan::selectUnusedHits(const CAList<Belle2::TRGCDCWireHit> & hits,
+                           CAList<Belle2::TRGCDCWireHit> & unusedHits) const
+  {
 
     //...Pick up used hits (3D tracks only)...
     CAList<Belle2::TRGCDCWireHit> used;
     const AList<TTrack> & tracks = _trackManager.tracks();
     for (unsigned i = 0; i < (unsigned) tracks.length(); i++) {
-	const TTrack & t = * tracks[i];
-	const AList<TLink> & links = t.links();
-	const unsigned n = links.length();
-	for (unsigned j = 0; j < n; j++)
-	    used.append((Belle2::TRGCDCWireHit *) links[j]->hit());
+      const TTrack& t = * tracks[i];
+      const AList<TLink> & links = t.links();
+      const unsigned n = links.length();
+      for (unsigned j = 0; j < n; j++)
+        used.append((Belle2::TRGCDCWireHit*) links[j]->hit());
     }
 
     unusedHits = hits;
     unusedHits.remove(used);
-}
+  }
 
-void
-Trasan::main0(const CAList<Belle2::TRGCDCWireHit> & axialHits,
-	      const CAList<Belle2::TRGCDCWireHit> & stereoHits,
-	      const CAList<Belle2::TRGCDCWireHit> & allHits,
-	      AList<TTrack> & tracks,
-	      AList<TTrack> & tracks2D) {
+  void
+  Trasan::main0(const CAList<Belle2::TRGCDCWireHit> & axialHits,
+                const CAList<Belle2::TRGCDCWireHit> & stereoHits,
+                const CAList<Belle2::TRGCDCWireHit> & allHits,
+                AList<TTrack> & tracks,
+                AList<TTrack> & tracks2D)
+  {
 
 start:
     unsigned nT0Reset = 0;
@@ -2385,88 +2400,88 @@ start:
     //...Conformal finder...
     if (b_doConformalFinder) {
 
-	//...T0 reset option...
-	if (b_doT0Reset) {
-	    if ((unsigned) b_nT0ResetMax > nT0Reset)
-		((TConformalFinder *) _confFinder)->doT0Reset(true);
-	    else
-		((TConformalFinder *) _confFinder)->doT0Reset(false);
-	}		    
+      //...T0 reset option...
+      if (b_doT0Reset) {
+        if ((unsigned) b_nT0ResetMax > nT0Reset)
+          ((TConformalFinder*) _confFinder)->doT0Reset(true);
+        else
+          ((TConformalFinder*) _confFinder)->doT0Reset(false);
+      }
 
-// 	    AList<TRGCDCWireHit> unusedAxial;
-// 	    AList<TRGCDCWireHit> unusedStereo;
-// 	    selectUnusedHits(axialHits, unusedAxial);
-// 	    selectUnusedHits(stereoHits, unusedStereo);
-//	    _confFinder->doit(unusedAxial, unusedStereo, tracks, tracks2D);
-	_confFinder->doit(axialHits, stereoHits, tracks, tracks2D);
+//      AList<TRGCDCWireHit> unusedAxial;
+//      AList<TRGCDCWireHit> unusedStereo;
+//      selectUnusedHits(axialHits, unusedAxial);
+//      selectUnusedHits(stereoHits, unusedStereo);
+//      _confFinder->doit(unusedAxial, unusedStereo, tracks, tracks2D);
+      _confFinder->doit(axialHits, stereoHits, tracks, tracks2D);
 
-	//...T0 reset...
-	if (b_doT0Reset) {
-	    ++nT0Reset;
-	    if (((TConformalFinder *) _confFinder)->T0ResetDone()) {
-		clear();
-		goto start;
-	    }
-	}
+      //...T0 reset...
+      if (b_doT0Reset) {
+        ++nT0Reset;
+        if (((TConformalFinder*) _confFinder)->T0ResetDone()) {
+          clear();
+          goto start;
+        }
+      }
 
-	//...Stores tracks...
-	_trackManager.append(tracks);
-	if (curl_version < 2)
-	    _trackManager.append2D(tracks2D);
-	if (b_conformalFinder == 0) {
-	    if (b_doSalvage == 1) _trackManager.salvage(allHits);
-	    if (b_doSalvage) _trackManager.mask();
-	}
+      //...Stores tracks...
+      _trackManager.append(tracks);
+      if (curl_version < 2)
+        _trackManager.append2D(tracks2D);
+      if (b_conformalFinder == 0) {
+        if (b_doSalvage == 1) _trackManager.salvage(allHits);
+        if (b_doSalvage) _trackManager.mask();
+      }
     }
 
     //...Hough finder...
     if (b_doHoughFinder) {
-	((THoughFinder *) _houghFinder)->
-	    doit(axialHits, stereoHits, tracks, tracks2D);
-	_trackManager.append(tracks);
-	_trackManager.append2D(tracks2D);
-	_trackManager.refit();
+      ((THoughFinder*) _houghFinder)->
+      doit(axialHits, stereoHits, tracks, tracks2D);
+      _trackManager.append(tracks);
+      _trackManager.append2D(tracks2D);
+      _trackManager.refit();
     }
 
     //...Curl finder...
     if (b_doCurlFinder) {
-	if ((! b_doSalvage) && (b_conformalFinder == 0)) {
-	    _trackManager.maskCurlHits(axialHits,
-				       stereoHits,
-				       _trackManager.tracks());
-	}
+      if ((! b_doSalvage) && (b_conformalFinder == 0)) {
+        _trackManager.maskCurlHits(axialHits,
+                                   stereoHits,
+                                   _trackManager.tracks());
+      }
 
-// 	    AList<TRGCDCWireHit> unusedAxial;
-// 	    AList<TRGCDCWireHit> unusedStereo;
-// 	    selectUnusedHits(axialHits, unusedAxial);
-// 	    selectUnusedHits(stereoHits, unusedStereo);
+//      AList<TRGCDCWireHit> unusedAxial;
+//      AList<TRGCDCWireHit> unusedStereo;
+//      selectUnusedHits(axialHits, unusedAxial);
+//      selectUnusedHits(stereoHits, unusedStereo);
 
-	AList<TTrack> confTracks = _trackManager.tracks();
-	tracks.append(confTracks);
-//	    _curlFinder->doit(unusedAxial, unusedStereo, tracks, tracks2D);
-	_curlFinder->doit(axialHits, stereoHits, tracks, tracks2D);
-	tracks.remove(confTracks);
-	//_trackManager.append(tracks);
+      AList<TTrack> confTracks = _trackManager.tracks();
+      tracks.append(confTracks);
+//      _curlFinder->doit(unusedAxial, unusedStereo, tracks, tracks2D);
+      _curlFinder->doit(axialHits, stereoHits, tracks, tracks2D);
+      tracks.remove(confTracks);
+      //_trackManager.append(tracks);
     }
-	
+
     //...Finishes tracks...
     if ((b_doSalvage) && (b_conformalFinder == 0)) _trackManager.refit();
-	
+
     //...Appends tracks which are reconstructed by CurlFinder...
     _trackManager.append(tracks);
     _trackManager.append2D(tracks2D);
 
     //...PM Curl finder...
     if (b_doPMCurlFinder) {
-//cnv 	_pmCurlFinder->doit(axialHits,
-// 			    stereoHits,
-// 			    _trackManager.tracks(),
-// 			    b_pmCurlFinder);
-// 	_trackManager.append(_pmCurlFinder->getTracks());
-	
+//cnv   _pmCurlFinder->doit(axialHits,
+//          stereoHits,
+//          _trackManager.tracks(),
+//          b_pmCurlFinder);
+//  _trackManager.append(_pmCurlFinder->getTracks());
+
 // #ifdef TRASAN_DEBUG_DETAIL
-// 	std::cout << "Track list after PM Curl finder" << std::endl;
-// 	_trackManager.dump("eventSummary helix", Tab(+1));
+//  std::cout << "Track list after PM Curl finder" << std::endl;
+//  _trackManager.dump("eventSummary helix", Tab(+1));
 // #endif
     }
 
@@ -2481,73 +2496,74 @@ start:
 
     //...Track merge...
     if (b_mergeTracks)
-	_trackManager.mergeTracks(b_mergeTracks, b_mergeTrackDistance);
+      _trackManager.mergeTracks(b_mergeTracks, b_mergeTrackDistance);
 
     //...Salvage for dE/dx...
     if (b_doAssociation)
-	_trackManager.salvageAssociateHits(allHits, b_associateSigma);
-    
+      _trackManager.salvageAssociateHits(allHits, b_associateSigma);
+
 #ifdef TRASAN_DEBUG_DETAIL
     std::cout << "Track list after salvage" << std::endl;
     _trackManager.dump("eventSummary helix", Tab(+1));
 #endif
-}
+  }
 
-void
-Trasan::main1(const CAList<Belle2::TRGCDCWireHit> & axialHits,
-	      const CAList<Belle2::TRGCDCWireHit> & stereoHits,
-	      const CAList<Belle2::TRGCDCWireHit> & allHits,
-	      AList<TTrack> & tracks,
-	      AList<TTrack> & tracks2D) {
+  void
+  Trasan::main1(const CAList<Belle2::TRGCDCWireHit> & axialHits,
+                const CAList<Belle2::TRGCDCWireHit> & stereoHits,
+                const CAList<Belle2::TRGCDCWireHit> & allHits,
+                AList<TTrack> & tracks,
+                AList<TTrack> & tracks2D)
+  {
 
     //...Hough finder...
     if (b_doHoughFinder) {
-	((THoughFinder *) _houghFinder)->
-	    doit(axialHits, stereoHits, tracks, tracks2D);
-	_trackManager.append(tracks);
-	_trackManager.append2D(tracks2D);
-	_trackManager.refit();
+      ((THoughFinder*) _houghFinder)->
+      doit(axialHits, stereoHits, tracks, tracks2D);
+      _trackManager.append(tracks);
+      _trackManager.append2D(tracks2D);
+      _trackManager.refit();
     }
 
     //...Conformal finder...
 //cnv  if (b_doConformalFinder) {
     if (0) {
 
-	CAList<Belle2::TRGCDCWireHit> unusedAxial;
-	CAList<Belle2::TRGCDCWireHit> unusedStereo;
-	selectUnusedHits(axialHits, unusedAxial);
-	selectUnusedHits(stereoHits, unusedStereo);
+      CAList<Belle2::TRGCDCWireHit> unusedAxial;
+      CAList<Belle2::TRGCDCWireHit> unusedStereo;
+      selectUnusedHits(axialHits, unusedAxial);
+      selectUnusedHits(stereoHits, unusedStereo);
 
-	_confFinder->doit(unusedAxial, unusedStereo, tracks, tracks2D);
+      _confFinder->doit(unusedAxial, unusedStereo, tracks, tracks2D);
 
-	//...Stores tracks...
-	_trackManager.append(tracks);
-	if (curl_version < 2)
-	    _trackManager.append2D(tracks2D);
-	if (b_conformalFinder == 0) {
-	    if (b_doSalvage == 1) _trackManager.salvage(allHits);
-	    if (b_doSalvage) _trackManager.mask();
-	}
+      //...Stores tracks...
+      _trackManager.append(tracks);
+      if (curl_version < 2)
+        _trackManager.append2D(tracks2D);
+      if (b_conformalFinder == 0) {
+        if (b_doSalvage == 1) _trackManager.salvage(allHits);
+        if (b_doSalvage) _trackManager.mask();
+      }
     }
 
     //...Curl finder...
 //cnv    if (b_doCurlFinder) {
     if (0) {
-	if ((! b_doSalvage) && (b_conformalFinder == 0)) {
-	    _trackManager.maskCurlHits(axialHits,
-				       stereoHits,
-				       _trackManager.tracks());
-	}
+      if ((! b_doSalvage) && (b_conformalFinder == 0)) {
+        _trackManager.maskCurlHits(axialHits,
+                                   stereoHits,
+                                   _trackManager.tracks());
+      }
 
-	AList<TTrack> confTracks = _trackManager.tracks();
-	tracks.append(confTracks);
-	_curlFinder->doit(axialHits, stereoHits, tracks, tracks2D);
-	tracks.remove(confTracks);
+      AList<TTrack> confTracks = _trackManager.tracks();
+      tracks.append(confTracks);
+      _curlFinder->doit(axialHits, stereoHits, tracks, tracks2D);
+      tracks.remove(confTracks);
     }
-	
+
     //...Finishes tracks...
     if ((b_doSalvage) && (b_conformalFinder == 0)) _trackManager.refit();
-	
+
     //...Appends tracks which are reconstructed by CurlFinder...
     _trackManager.append(tracks);
     _trackManager.append2D(tracks2D);
@@ -2563,17 +2579,17 @@ Trasan::main1(const CAList<Belle2::TRGCDCWireHit> & axialHits,
 
     //...Track merge...
     if (b_mergeTracks)
-	_trackManager.mergeTracks(b_mergeTracks, b_mergeTrackDistance);
+      _trackManager.mergeTracks(b_mergeTracks, b_mergeTrackDistance);
 
     //...Salvage for dE/dx...
     if (b_doAssociation)
-	_trackManager.salvageAssociateHits(allHits, b_associateSigma);
-    
+      _trackManager.salvageAssociateHits(allHits, b_associateSigma);
+
 #ifdef TRASAN_DEBUG_DETAIL
     std::cout << "Track list after salvage" << std::endl;
     _trackManager.dump("eventSummary helix", Tab(+1));
 #endif
-}
+  }
 
 } // namespace Belle
 

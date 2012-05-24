@@ -24,11 +24,11 @@ double nextRoundNumber(double x)
     double xround = base * goodFactors[i];
     if (xround >= x) return xround;
   }
-  return base*10.0;
+  return base * 10.0;
 }
 
 
-void cairo_plot(cairo_t *ctx, double min_x, double max_x, double min_y, double max_y, double width, double height)
+void cairo_plot(cairo_t* ctx, double min_x, double max_x, double min_y, double max_y, double width, double height)
 {
   boost::format label("%.4f");
   {
@@ -84,7 +84,7 @@ void cairo_plot(cairo_t *ctx, double min_x, double max_x, double min_y, double m
   cairo_set_line_width(ctx, 0.1 / xscale);
 }
 
-void cairo_sine(cairo_t *cr, double amplitude, double period, double offset, double min_x, double max_x, int steps)
+void cairo_sine(cairo_t* cr, double amplitude, double period, double offset, double min_x, double max_x, int steps)
 {
   double range = max_x - min_x;
   double sw(0);
@@ -103,7 +103,7 @@ void cairo_sine(cairo_t *cr, double amplitude, double period, double offset, dou
     double x1 = x0 + sw;
     double y1 = amplitude * sin(offset + period * x1);
     double d1 = amplitude * period * cos(offset + period * x1);
-    cairo_curve_to(cr, x0 + sw3, y0 + d0*sw3, x1 - sw3, y1 - d1*sw3, x1, y1);
+    cairo_curve_to(cr, x0 + sw3, y0 + d0 * sw3, x1 - sw3, y1 - d1 * sw3, x1, y1);
     x0 = x1;
     y0 = y1;
     d0 = d1;
@@ -112,7 +112,7 @@ void cairo_sine(cairo_t *cr, double amplitude, double period, double offset, dou
 
 #include <iostream>
 
-void cairo_straight(cairo_t *cr, double m, double t, double min_x, double max_x, double min_y, double max_y)
+void cairo_straight(cairo_t* cr, double m, double t, double min_x, double max_x, double min_y, double max_y)
 {
   if (m == 0) {
     if (t < min_y || t > max_y) return;
@@ -144,7 +144,7 @@ void cairo_straight(cairo_t *cr, double m, double t, double min_x, double max_x,
   cairo_line_to(cr, x, y);
 }
 
-void cairo_text(cairo_t *ctx, const string &txt, bool flip)
+void cairo_text(cairo_t* ctx, const string& txt, bool flip)
 {
   cairo_save(ctx);
   if (flip) cairo_scale(ctx, 1, -1);

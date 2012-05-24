@@ -236,311 +236,319 @@ struct reccdc_timing {
 
 namespace Belle {
 
-extern const HepGeom::Point3D<double>  ORIGIN;
+  extern const HepGeom::Point3D<double>  ORIGIN;
 
-extern "C" 
-void
-calcdc_driftdist_(int *,
-                  int *,
-                  int *,
-                  float[3],
-                  float[3],
-                  float *,
-                  float *,
-                  float *);
+  extern "C"
+  void
+  calcdc_driftdist_(int*,
+                    int*,
+                    int*,
+                    float[3],
+                    float[3],
+                    float*,
+                    float*,
+                    float*);
 
-extern "C"
-void
-calcdc_tof2_(int *, float *, float *, float *);
+  extern "C"
+  void
+  calcdc_tof2_(int*, float*, float*, float*);
 
-TRungeFitter::TRungeFitter(const std::string& name)
-  : TFitter(name),
-    _sag(true),_propagation(1),_tof(false){
-}
-TRungeFitter::TRungeFitter(const std::string& name,
-                             bool m_sag,int m_prop,bool m_tof)
-  : TFitter(name),
-    _sag(m_sag),_propagation(m_prop),_tof(m_tof){
-}
+  TRungeFitter::TRungeFitter(const std::string& name)
+    : TFitter(name),
+      _sag(true), _propagation(1), _tof(false)
+  {
+  }
+  TRungeFitter::TRungeFitter(const std::string& name,
+                             bool m_sag, int m_prop, bool m_tof)
+    : TFitter(name),
+      _sag(m_sag), _propagation(m_prop), _tof(m_tof)
+  {
+  }
 
-TRungeFitter::~TRungeFitter() {
-}
+  TRungeFitter::~TRungeFitter()
+  {
+  }
 
-void TRungeFitter::sag(bool _in){
-  _sag = _in;
-}
-void TRungeFitter::propagation(int _in){
-  _propagation = _in;
-}
-void TRungeFitter::tof(bool _in){
-  _tof = _in;
-}
-int TRungeFitter::fit(TTrackBase& tb) const{
-  return fit(tb,0);
-}
+  void TRungeFitter::sag(bool _in)
+  {
+    _sag = _in;
+  }
+  void TRungeFitter::propagation(int _in)
+  {
+    _propagation = _in;
+  }
+  void TRungeFitter::tof(bool _in)
+  {
+    _tof = _in;
+  }
+  int TRungeFitter::fit(TTrackBase& tb) const
+  {
+    return fit(tb, 0);
+  }
 
-int TRungeFitter::fit(TTrackBase& tb, float t0Offset) const{
+  int TRungeFitter::fit(TTrackBase& tb, float t0Offset) const
+  {
 
-  // std::cout<<"TRungeFitter::fit  start"<<std::endl;
+    // std::cout<<"TRungeFitter::fit  start"<<std::endl;
 
-  //...Type check...
-  if(tb.objectType() != Runge) return TFitUnavailable;
-  TRunge& t = (TRunge&) tb;
+    //...Type check...
+    if (tb.objectType() != Runge) return TFitUnavailable;
+    TRunge& t = (TRunge&) tb;
 
-  //...Already fitted ?...
-  if(t.fitted()) return TFitAlreadyFitted;
+    //...Already fitted ?...
+    if (t.fitted()) return TFitAlreadyFitted;
 
-  //...Count # of hits...
-  AList<TLink> cores = t.cores();
-  unsigned nCores = cores.length();
-  unsigned nStereoCores = TLink::nStereoHits(cores);
-  
-  //...Check # of hits...
-  if ((nStereoCores < 2) || (nCores - nStereoCores < 3))
-    return TFitErrorFewHits;
+    //...Count # of hits...
+    AList<TLink> cores = t.cores();
+    unsigned nCores = cores.length();
+    unsigned nStereoCores = TLink::nStereoHits(cores);
 
-  //...Move pivot to ORIGIN...
-  const HepGeom::Point3D<double> pivot_bak = t.pivot();
-  t.pivot(ORIGIN);
+    //...Check # of hits...
+    if ((nStereoCores < 2) || (nCores - nStereoCores < 3))
+      return TFitErrorFewHits;
 
-  //...Setup...
-  CLHEP::HepVector a(5),da(5);
-  a = t.a();
-  CLHEP::HepVector dDda(5);
-  CLHEP::HepVector dchi2da(5);
-  CLHEP::HepSymMatrix d2chi2d2a(5,0);
-  const CLHEP::HepSymMatrix zero5(5,0);
-  double chi2;
-  double chi2Old = DBL_MAX;
-  int err = 0;
+    //...Move pivot to ORIGIN...
+    const HepGeom::Point3D<double> pivot_bak = t.pivot();
+    t.pivot(ORIGIN);
 
-  double factor = 0.1;
-  CLHEP::HepVector beta(5);
-  CLHEP::HepSymMatrix alpha(5,0);
-  CLHEP::HepSymMatrix alpha2(5,0);
+    //...Setup...
+    CLHEP::HepVector a(5), da(5);
+    a = t.a();
+    CLHEP::HepVector dDda(5);
+    CLHEP::HepVector dchi2da(5);
+    CLHEP::HepSymMatrix d2chi2d2a(5, 0);
+    const CLHEP::HepSymMatrix zero5(5, 0);
+    double chi2;
+    double chi2Old = DBL_MAX;
+    int err = 0;
 
-  double (*d)[5]=new double[nCores][5];
-  //  double (*d2)[5]=new double[nCores][5];
-  CLHEP::HepVector ea(5);
+    double factor = 0.1;
+    CLHEP::HepVector beta(5);
+    CLHEP::HepSymMatrix alpha(5, 0);
+    CLHEP::HepSymMatrix alpha2(5, 0);
 
-  float tof;
-  HepGeom::Vector3D<double> p;
-  unsigned i;
+    double(*d)[5] = new double[nCores][5];
+    //  double (*d2)[5]=new double[nCores][5];
+    CLHEP::HepVector ea(5);
 
-  double distance;
-  double eDistance;
+    float tof;
+    HepGeom::Vector3D<double> p;
+    unsigned i;
 
-  // ea... init
-  const double ea_init=0.000001;
-  ea[0]=ea_init;		//dr
-  ea[1]=ea_init;		//phi0
-  ea[2]=ea_init;		//kappa
-  ea[3]=ea_init;		//dz
-  ea[4]=ea_init;		//tanl
+    double distance;
+    double eDistance;
 
-  // std::cout<<"TRF ::"<<a[0]<<","<<a[1]<<","<<a[2]<<","<<a[3]<<","<<a[4]<<std::endl;
+    // ea... init
+    const double ea_init = 0.000001;
+    ea[0] = ea_init;  //dr
+    ea[1] = ea_init;  //phi0
+    ea[2] = ea_init;  //kappa
+    ea[3] = ea_init;  //dz
+    ea[4] = ea_init;  //tanl
 
-  //long int lclock0=clock()/1000;
-  //long int lclock=lclock0;
+    // std::cout<<"TRF ::"<<a[0]<<","<<a[1]<<","<<a[2]<<","<<a[3]<<","<<a[4]<<std::endl;
 
-  CLHEP::HepVector def_a(t.a());
-  CLHEP::HepVector ta(def_a);
+    //long int lclock0=clock()/1000;
+    //long int lclock=lclock0;
 
-  //...Fitting loop...
-  unsigned nTrial = 0;
-  while(nTrial < 100){
-    
-    //...Set up...
-    chi2 = 0;
-    for (unsigned j=0;j<5;j++) dchi2da[j]=0;
-    d2chi2d2a=zero5;
+    CLHEP::HepVector def_a(t.a());
+    CLHEP::HepVector ta(def_a);
 
-    def_a=t.a();
+    //...Fitting loop...
+    unsigned nTrial = 0;
+    while (nTrial < 100) {
 
-    //#### loop for shifted helix parameter set ####
-    for(unsigned j=0;j<5;j++){
-      ta=def_a;
-      ta[j]+=ea[j];
-      t.a(ta);
-      //...Loop with hits...
-      i=0;
-      // std::cout<<"TRF:: cores="<<cores.length()<<std::endl;
-      while(TLink* l = cores[i++]){
-	//...Cal. closest points...
-	t.approach(*l,tof,p,_sag);
-	const Point3D& onTrack=l->positionOnTrack();
-	const Point3D& onWire=l->positionOnWire();
-	d[i-1][j]=(onTrack-onWire).mag();
-	// std::cout<<"TRF:: i="<<i<<std::endl;
-      }//end of loop with hits
-      //lclock=clock()/1000;
-      // std::cout<<"TRF  clock="<<lclock-lclock0<<std::endl;
-      //lclock0=lclock;
-    }
-    /*
-    for(int j=0;j<5;j++){
-      ta=def_a;
-      ta[j]-=ea[j];
-      t.a(ta);
-      //...Loop with hits...
-      float tof_dummy;
-      HepGeom::Vector3D<double> p_dummy;
-      unsigned i=0;
-      while(TLink* l = cores[i++]){
-	//...Cal. closest points...
-	t.approach(*l,tof_dummy,p_dummy,_sag);
-	const Point3D& onTrack=l->positionOnTrack();
-	const Point3D& onWire=l->positionOnWire();
-	d2[i-1][j]=(onTrack-onWire).mag();
-      }//end of loop with hits
-    }
-    */
-    t.a(def_a);
-      
-    //#### original parameter set  and  calc. chi2 ####
-    //...Loop with hits...
-    i=0;
-    while(TLink* l = cores[i++]){
-      const Belle2::TRGCDCWireHit& h = *l->hit();
+      //...Set up...
+      chi2 = 0;
+      for (unsigned j = 0; j < 5; j++) dchi2da[j] = 0;
+      d2chi2d2a = zero5;
 
-      //...Cal. closest points...
-      if(t.approach(*l,tof,p,_sag)<0){
-	std::cout<<"trasan:TRF::  bad wire"<<std::endl;
-	continue;
+      def_a = t.a();
+
+      //#### loop for shifted helix parameter set ####
+      for (unsigned j = 0; j < 5; j++) {
+        ta = def_a;
+        ta[j] += ea[j];
+        t.a(ta);
+        //...Loop with hits...
+        i = 0;
+        // std::cout<<"TRF:: cores="<<cores.length()<<std::endl;
+        while (TLink* l = cores[i++]) {
+          //...Cal. closest points...
+          t.approach(*l, tof, p, _sag);
+          const Point3D& onTrack = l->positionOnTrack();
+          const Point3D& onWire = l->positionOnWire();
+          d[i - 1][j] = (onTrack - onWire).mag();
+          // std::cout<<"TRF:: i="<<i<<std::endl;
+        }//end of loop with hits
+        //lclock=clock()/1000;
+        // std::cout<<"TRF  clock="<<lclock-lclock0<<std::endl;
+        //lclock0=lclock;
       }
+      /*
+      for(int j=0;j<5;j++){
+        ta=def_a;
+        ta[j]-=ea[j];
+        t.a(ta);
+        //...Loop with hits...
+        float tof_dummy;
+        HepGeom::Vector3D<double> p_dummy;
+        unsigned i=0;
+        while(TLink* l = cores[i++]){
+      //...Cal. closest points...
+      t.approach(*l,tof_dummy,p_dummy,_sag);
       const Point3D& onTrack=l->positionOnTrack();
       const Point3D& onWire=l->positionOnWire();
-      unsigned leftRight = CellHitRight;
-      if (onWire.cross(onTrack).z() < 0.) leftRight = CellHitLeft;
-
-      //...Obtain drift distance and its error...
-      if ((t0Offset == 0.) && (_propagation==0) && (! _tof)) {
-	//...No correction...
-	distance = l->drift(leftRight);
-	eDistance = h.dDrift(leftRight);
-      }else{
-	//...T0 and propagation corrections...
-	int wire = h.wire().id();
-	int side = leftRight;
-	if (side==0) side = -1;
-	float tp[3] = {p.x(),p.y(),p.z()};
-	float x[3] = {onWire.x(), onWire.y(), onWire.z()};
-//cnv	float time = h.reccdc()->m_tdc + t0Offset - tof;
-	float time = 0;
-	float dist;
-	float edist;
-	int prop = _propagation;
-	calcdc_driftdist_(& prop,
-			  & wire,
-			  & side,
-			  tp,
-			  x,
-			  & time,
-			  & dist,
-			  & edist);
-	distance = (double) dist;
-	eDistance = (double) edist;
+      d2[i-1][j]=(onTrack-onWire).mag();
+        }//end of loop with hits
       }
-      double eDistance2=eDistance*eDistance;
+      */
+      t.a(def_a);
 
-      //...Residual...
-      const double d0 = (onTrack-onWire).mag();
-      //if(d0>2) std::cout<<"TRF:: strange dist.  d0="<<d0<<" x="<<distance
-      //		   <<" ex="<<eDistance<<std::endl;
-      double dDistance = d0 - distance;
+      //#### original parameter set  and  calc. chi2 ####
+      //...Loop with hits...
+      i = 0;
+      while (TLink* l = cores[i++]) {
+        const Belle2::TRGCDCWireHit& h = *l->hit();
 
-      //...dDda...
-      for(int j=0;j<5;j++){
-	dDda[j]=(d[i-1][j]-d0)/ea[j];
-	//if(dDda[j]==0) std::cout<<"TRF:: dDda=0 j="<<j<<" ea="<<ea[j]<<std::endl;
+        //...Cal. closest points...
+        if (t.approach(*l, tof, p, _sag) < 0) {
+          std::cout << "trasan:TRF::  bad wire" << std::endl;
+          continue;
+        }
+        const Point3D& onTrack = l->positionOnTrack();
+        const Point3D& onWire = l->positionOnWire();
+        unsigned leftRight = CellHitRight;
+        if (onWire.cross(onTrack).z() < 0.) leftRight = CellHitLeft;
+
+        //...Obtain drift distance and its error...
+        if ((t0Offset == 0.) && (_propagation == 0) && (! _tof)) {
+          //...No correction...
+          distance = l->drift(leftRight);
+          eDistance = h.dDrift(leftRight);
+        } else {
+          //...T0 and propagation corrections...
+          int wire = h.wire().id();
+          int side = leftRight;
+          if (side == 0) side = -1;
+          float tp[3] = {p.x(), p.y(), p.z()};
+          float x[3] = {onWire.x(), onWire.y(), onWire.z()};
+//cnv float time = h.reccdc()->m_tdc + t0Offset - tof;
+          float time = 0;
+          float dist;
+          float edist;
+          int prop = _propagation;
+          calcdc_driftdist_(& prop,
+                            & wire,
+                            & side,
+                            tp,
+                            x,
+                            & time,
+                            & dist,
+                            & edist);
+          distance = (double) dist;
+          eDistance = (double) edist;
+        }
+        double eDistance2 = eDistance * eDistance;
+
+        //...Residual...
+        const double d0 = (onTrack - onWire).mag();
+        //if(d0>2) std::cout<<"TRF:: strange dist.  d0="<<d0<<" x="<<distance
+        //       <<" ex="<<eDistance<<std::endl;
+        double dDistance = d0 - distance;
+
+        //...dDda...
+        for (int j = 0; j < 5; j++) {
+          dDda[j] = (d[i - 1][j] - d0) / ea[j];
+          //if(dDda[j]==0) std::cout<<"TRF:: dDda=0 j="<<j<<" ea="<<ea[j]<<std::endl;
+        }
+        //      for(int j=0;j<5;j++) dDda[j]=(d[i-1][j]-d2[i-1][j])/ea[j]/2.;
+        //...Chi2 related...
+        dchi2da += (dDistance / eDistance2) * dDda;
+        d2chi2d2a += vT_times_v(dDda) / eDistance2;
+        double pChi2 = dDistance * dDistance / eDistance2;
+        chi2 += pChi2;
+        //if(!(pChi2<0 || pChi2>=0)){
+        //  std::cout<<"TRF::  pChi2="<<pChi2<<" X="<<d0<<" fx="<<distance
+        //      <<" ex="<<eDistance<<std::endl;
+        //}
+
+        //...Store results...
+        l->update(onTrack, onWire, leftRight, pChi2);
+      }//end of loop with hits
+
+      //...Check condition...
+      double change = chi2Old - chi2;
+
+      if (0 <= change && change < 0.01) break;
+      if (change < 0.) {
+        factor *= 100;
+        a += da;  //recover
+        if (-0.01 < change) {
+          d2chi2d2a = alpha;
+          chi2 = chi2Old;
+          break;
+        }
+      } else if (change > 0.) {
+        chi2Old = chi2;
+        factor *= 0.1;
+        alpha = d2chi2d2a;
+        beta = dchi2da;
+      } else {
+        std::cout << "trasan:TRF::  bad chi2 = " << chi2 << std::endl;
+        break;  // protection for nan
       }
-      //      for(int j=0;j<5;j++) dDda[j]=(d[i-1][j]-d2[i-1][j])/ea[j]/2.;
-      //...Chi2 related...
-      dchi2da += (dDistance / eDistance2) * dDda;
-      d2chi2d2a += vT_times_v(dDda) / eDistance2;
-      double pChi2 = dDistance * dDistance / eDistance2;
-      chi2 += pChi2;
-      //if(!(pChi2<0 || pChi2>=0)){
-      //	std::cout<<"TRF::  pChi2="<<pChi2<<" X="<<d0<<" fx="<<distance
-      //	    <<" ex="<<eDistance<<std::endl;
-      //}
+      alpha2 = alpha;
+      for (unsigned j = 0; j < 5; j++) alpha2[j][j] *= (1 + factor);
+      //...Cal. helix parameters for next loop...
+      da = solve(alpha2, beta);
 
-      //...Store results...
-      l->update(onTrack, onWire, leftRight, pChi2);
-    }//end of loop with hits
+      //lclock=clock()/1000;
+      // std::cout<<"TRF "<<nTrial<<": "
+      //  <<"cl="<<lclock-lclock0<<": "
+      //  <<a[0]<<","<<a[1]<<","<<a[2]<<","<<a[3]<<","<<a[4]<<" "
+      //  <<chi2<<"/"<<nCores<<":"<<factor
+      //  <<" :da "<<da[0]<<","<<da[1]<<","<<da[2]<<","<<da[3]<<","<<da[4]<<std::endl;
+      //lclock0=lclock;
 
-    //...Check condition...
-    double change = chi2Old - chi2;
-
-    if (0 <= change && change < 0.01) break;
-    if (change < 0.) {
-      factor *= 100;
-      a += da;	//recover
-      if(-0.01 < change){
-	d2chi2d2a=alpha;
-	chi2=chi2Old;
-	break;
+      a -= da;
+      t.a(a);
+      //ea = 0.0001*da;
+      for (i = 0; i < 5; i++) {
+        ea[i] = 0.0001 * abs(da[i]);
+        if (ea[i] > ea_init) ea[i] = ea_init;
+        if (ea[i] < 1.0e-10) ea[i] = 1.0e-10;
       }
-    }else if(change > 0.){
-      chi2Old = chi2;
-      factor *= 0.1;
-      alpha=d2chi2d2a;
-      beta=dchi2da;
-    }else{
-      std::cout<<"trasan:TRF::  bad chi2 = "<<chi2<<std::endl;
-      break;	// protection for nan
+      ++nTrial;
     }
-    alpha2=alpha;
-    for(unsigned j=0;j<5;j++) alpha2[j][j]*=(1+factor);
-    //...Cal. helix parameters for next loop...
-    da = solve(alpha2,beta);
+    // std::cout<<"TRungeFitter:: nTrial="<<nTrial<<std::endl;
 
-    //lclock=clock()/1000;
-    // std::cout<<"TRF "<<nTrial<<": "
-    //  <<"cl="<<lclock-lclock0<<": "
-    //	<<a[0]<<","<<a[1]<<","<<a[2]<<","<<a[3]<<","<<a[4]<<" "
-    //	<<chi2<<"/"<<nCores<<":"<<factor
-    //	<<" :da "<<da[0]<<","<<da[1]<<","<<da[2]<<","<<da[3]<<","<<da[4]<<std::endl;
-    //lclock0=lclock;
+    //...Cal. error matrix...
+    CLHEP::HepSymMatrix Ea(5, 0);
+    unsigned dim;
+    dim = 5;
+    Ea = d2chi2d2a.inverse(err);
 
-    a -= da;
-    t.a(a);
-    //ea = 0.0001*da;
-    for(i=0;i<5;i++){
-      ea[i]=0.0001*abs(da[i]);
-      if(ea[i]>ea_init) ea[i]=ea_init;
-      if(ea[i]<1.0e-10) ea[i]=1.0e-10;
+    //...Store information...
+    if (! err) {
+      t.a(a);
+      t.Ea(Ea);
+      t._fitted = true;
+    } else {
+      err = TFitFailed;
     }
-    ++nTrial;
+
+    t._ndf = nCores - dim;
+    t._chi2 = chi2;
+
+    //...Recover pivot...
+    t.pivot(pivot_bak);
+
+    delete [] d;
+    //  delete [] d2;
+
+    return err;
   }
-  // std::cout<<"TRungeFitter:: nTrial="<<nTrial<<std::endl;
-  
-  //...Cal. error matrix...
-  CLHEP::HepSymMatrix Ea(5,0);
-  unsigned dim;
-  dim=5;
-  Ea = d2chi2d2a.inverse(err);
-
-  //...Store information...
-  if(! err){
-    t.a(a);
-    t.Ea(Ea);
-    t._fitted = true;
-  }else{
-    err = TFitFailed;
-  }
-
-  t._ndf = nCores - dim;
-  t._chi2 = chi2;
-
-  //...Recover pivot...
-  t.pivot(pivot_bak);
-
-  delete [] d;
-  //  delete [] d2;
-  
-  return err;
-}
 
 } // namespace Belle
 

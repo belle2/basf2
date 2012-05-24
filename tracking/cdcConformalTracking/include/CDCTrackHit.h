@@ -30,7 +30,7 @@ namespace Belle2 {
      * The index should be the index of the CDCTrackHit/CDCHit in the StoreArray (CDCTrackHit objects should be created in the same order).
      * For the moment the definition of layerID differs between CDCHit and CDCTrackHit, this will be made consistent later on.
      */
-    CDCTrackHit(CDCHit *hit, int index);
+    CDCTrackHit(CDCHit* hit, int index);
 
     /* Destructor. */
     ~CDCTrackHit();

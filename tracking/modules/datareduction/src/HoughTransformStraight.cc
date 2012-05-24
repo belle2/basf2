@@ -64,7 +64,7 @@ bool HoughTransformStraight::isHitInHoughBox(HoughTransformBox& houghBox, rzHit&
 
 double HoughTransformStraight::getZValue(double a, double b, double r)
 {
-  return a*r + b;
+  return a * r + b;
 }
 
 

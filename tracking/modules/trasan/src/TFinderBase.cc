@@ -61,81 +61,85 @@
 
 namespace Belle {
 
-TPoint2D TFinderBase::_points0[100];
-TPoint2D TFinderBase::_points1[100];
-TPoint2D TFinderBase::_points2[100];
+  TPoint2D TFinderBase::_points0[100];
+  TPoint2D TFinderBase::_points1[100];
+  TPoint2D TFinderBase::_points2[100];
 
 // const float WIDTHXXX[11] = {PI2 / 64,
-// 			 PI2 / 80,
-// 			 PI2 / 96,
-// 			 PI2 / 128,
-// 			 PI2 / 144,
-// 			 PI2 / 160,
-// 			 PI2 / 192,
-// 			 PI2 / 208,
-// 			 PI2 / 240,
-// 			 PI2 / 256,
-// 			 PI2 / 288};
+//       PI2 / 80,
+//       PI2 / 96,
+//       PI2 / 128,
+//       PI2 / 144,
+//       PI2 / 160,
+//       PI2 / 192,
+//       PI2 / 208,
+//       PI2 / 240,
+//       PI2 / 256,
+//       PI2 / 288};
 
 // const float RXXX[] = {8.3,
-// 		   16.9,
-// 		   21.7,
-// 		   31.3,
-// 		   36.1,
-// 		   44.1,
-// 		   50.5,
-// 		   58.5,
-// 		   64.9,
-// 		   72.9,
-// 		   79.3,
-// 		   87.4};
+//       16.9,
+//       21.7,
+//       31.3,
+//       36.1,
+//       44.1,
+//       50.5,
+//       58.5,
+//       64.9,
+//       72.9,
+//       79.3,
+//       87.4};
 
 // const float R2XXX[] = {8.3 *  8.3,
-// 		    16.9 * 16.9,
-// 		    21.7 * 21.7,
-// 		    31.3 * 31.3,
-// 		    36.1 * 36.1,
-// 		    44.1 * 44.1,
-// 		    50.5 * 50.5,
-// 		    58.5 * 58.5,
-// 		    64.9 * 64.9,
-// 		    72.9 * 72.9,
-// 		    79.3 * 79.3,
-// 		    87.4 * 87.4};
+//        16.9 * 16.9,
+//        21.7 * 21.7,
+//        31.3 * 31.3,
+//        36.1 * 36.1,
+//        44.1 * 44.1,
+//        50.5 * 50.5,
+//        58.5 * 58.5,
+//        64.9 * 64.9,
+//        72.9 * 72.9,
+//        79.3 * 79.3,
+//        87.4 * 87.4};
 
-TFinderBase::TFinderBase()
-    : _debugLevel(0) {
-}
+  TFinderBase::TFinderBase()
+    : _debugLevel(0)
+  {
+  }
 
-TFinderBase::~TFinderBase() {
-}
+  TFinderBase::~TFinderBase()
+  {
+  }
 
-void
-TFinderBase::dump(const std::string & msg, const std::string & pre) const {
+  void
+  TFinderBase::dump(const std::string& msg, const std::string& pre) const
+  {
     std::cout << pre;
-    if (   msg.find("name")    != std::string::npos
-	|| msg.find("version") != std::string::npos
-	|| msg.find("detail")    != std::string::npos
-	|| msg == "") {
-	std::cout << name() << "(" << version() << ")";
+    if (msg.find("name")    != std::string::npos
+        || msg.find("version") != std::string::npos
+        || msg.find("detail")    != std::string::npos
+        || msg == "") {
+      std::cout << name() << "(" << version() << ")";
     }
     if (msg.find("detail") != std::string::npos || msg.find("state") != std::string::npos) {
-	std::cout << "Debug Level=" << _debugLevel;
+      std::cout << "Debug Level=" << _debugLevel;
     }
     std::cout << std::endl;
-}
+  }
 
-int
-TFinderBase::crossPointsBySuperLayer(const TCircle & circle,
-				     TPoint2D * points) {
+  int
+  TFinderBase::crossPointsBySuperLayer(const TCircle& circle,
+                                       TPoint2D* points)
+  {
 #ifdef TRASAN_DEBUG
     const std::string stage = "TFndrBs::crossPointsBySuperLayer";
     EnterStage(stage);
 #endif
 #ifdef TRASAN_DEBUG_DETAIL
     std::cout << Tab() << "cirle center=" << circle.center()
-	      << ",r=" << fabs(circle.radius())
-	      << ",d=" << circle.center().mag() << std::endl;
+              << ",r=" << fabs(circle.radius())
+              << ",d=" << circle.center().mag() << std::endl;
     std::cout << Tab() << "cross points are :" << std::endl;
 #endif
 
@@ -149,40 +153,40 @@ TFinderBase::crossPointsBySuperLayer(const TCircle & circle,
     const double sl = - c.x() / c.y();
 
     //...Calculate points...
-    const Belle2::TRGCDC & cdc = * Belle2::TRGCDC::getTRGCDC();
+    const Belle2::TRGCDC& cdc = * Belle2::TRGCDC::getTRGCDC();
     unsigned nOk = 0;
     //    for (unsigned i = 0; i < 12; i++) {
     for (unsigned i = 0; i <= cdc.nSuperLayers(); i++) {
-	const double minR = r < cdc.superLayerR(i) ? r : cdc.superLayerR(i);
-	const double maxR = r < cdc.superLayerR(i) ? cdc.superLayerR(i) : r;
+      const double minR = r < cdc.superLayerR(i) ? r : cdc.superLayerR(i);
+      const double maxR = r < cdc.superLayerR(i) ? cdc.superLayerR(i) : r;
 
-	if ((r + cdc.superLayerR(i) < d) || (minR + d < maxR)) {
+      if ((r + cdc.superLayerR(i) < d) || (minR + d < maxR)) {
 
-//	    std::cout << "minR,maxR=" << minR << "," << maxR << std::endl;
+//      std::cout << "minR,maxR=" << minR << "," << maxR << std::endl;
 
-	    points[i] = Origin;
-	    continue;
-	}
-	++nOk;
-	double a = cdc.superLayerR2(i) + d2 - r2;
-	double s = sqrt(4. * cdc.superLayerR2(i) * d2 - a * a);
-	double q = 0.5 * a / c.y();
-	points[i].x(0.5 * (c.x() * a + c.y() * s) / d2);
-	points[i].y(q + sl * points[i].x());
-	if (co.cross(points[i] - c) * circle.charge() > 0.) {
-	    points[i].x(0.5 * (c.x() * a - c.y() * s) / d2);
-	    points[i].y(q + sl * points[i].x());
-	}
+        points[i] = Origin;
+        continue;
+      }
+      ++nOk;
+      double a = cdc.superLayerR2(i) + d2 - r2;
+      double s = sqrt(4. * cdc.superLayerR2(i) * d2 - a * a);
+      double q = 0.5 * a / c.y();
+      points[i].x(0.5 * (c.x() * a + c.y() * s) / d2);
+      points[i].y(q + sl * points[i].x());
+      if (co.cross(points[i] - c) * circle.charge() > 0.) {
+        points[i].x(0.5 * (c.x() * a - c.y() * s) / d2);
+        points[i].y(q + sl * points[i].x());
+      }
 #ifdef TRASAN_DEBUG_DETAIL
-	std::cout << Tab() << i << " : " << points[i] << std::endl;
-//  	std::cout << "    chg=" << circle.charge();
-//  	std::cout << ", c=" << c << ", co=" << co;
-//  	std::cout << ", " << co.cross(points[i] - c) * circle.charge() << std::endl;
-//  	std::cout << "        " << 0.5 * (c.x() * a + c.y() * s) / d2;
-//  	std::cout << ", " << q + sl * (0.5 * (c.x() * a + c.y() * s) / d2);
-//  	std::cout << "        " << 0.5 * (c.x() * a - c.y() * s) / d2;
-//  	std::cout << ", " << q + sl * (0.5 * (c.x() * a - c.y() * s) / d2);
-//  	std::cout << std::endl;
+      std::cout << Tab() << i << " : " << points[i] << std::endl;
+//    std::cout << "    chg=" << circle.charge();
+//    std::cout << ", c=" << c << ", co=" << co;
+//    std::cout << ", " << co.cross(points[i] - c) * circle.charge() << std::endl;
+//    std::cout << "        " << 0.5 * (c.x() * a + c.y() * s) / d2;
+//    std::cout << ", " << q + sl * (0.5 * (c.x() * a + c.y() * s) / d2);
+//    std::cout << "        " << 0.5 * (c.x() * a - c.y() * s) / d2;
+//    std::cout << ", " << q + sl * (0.5 * (c.x() * a - c.y() * s) / d2);
+//    std::cout << std::endl;
 #endif
 
     }
@@ -193,104 +197,104 @@ TFinderBase::crossPointsBySuperLayer(const TCircle & circle,
 
     if (nOk) return 0;
     else return -1;
-}
+  }
 
-AList<TLink>
-TFinderBase::pickUpLinks(const TCircle & circle,
-			 const AList<TLink> & links,
-			 float loadWidth,
-			 unsigned axialStereoSwitch) {
+  AList<TLink>
+  TFinderBase::pickUpLinks(const TCircle& circle,
+                           const AList<TLink> & links,
+                           float loadWidth,
+                           unsigned axialStereoSwitch)
+  {
 
     AList<TLink> outList;
-    const Belle2::TRGCDC & cdc = * Belle2::TRGCDC::getTRGCDC();
+    const Belle2::TRGCDC& cdc = * Belle2::TRGCDC::getTRGCDC();
 //  TPoint2D points[cdc.nSuperLayers()+1];
 //  _points0 = new TPoint2D[cdc.nSuperLayers() + 1];
     int err = crossPointsBySuperLayer(circle, _points0);
     if (err) {
 #ifdef TRASAN_DEBUG_DETAIL
-	std::cout << "TFinderBase::pickUpLinks !!! circle cross-point to "
-		  << "super-layers not found" << std::endl;
+      std::cout << "TFinderBase::pickUpLinks !!! circle cross-point to "
+                << "super-layers not found" << std::endl;
 #endif
-	return outList;
+      return outList;
     }
 
     //    const Belle2::TRGCDC & cdc = * Belle2::TRGCDC::getTRGCDC();
     unsigned nBad = links.length();
     for (unsigned i = 0; i < nBad; i++) {
-	unsigned sl = links[i]->wire()->superLayerId();
-// 	unsigned as = sl % 2;
-// 	if (as == 0) {
-// 	    if (! (axialStereoSwitch & 1)) continue;
-// 	}
-// 	else {
-// 	    if (! (axialStereoSwitch & 2)) continue;
-// 	}
-	bool axial = links[i]->wire()->axial();
-	if (axial) {
-	    if (! (axialStereoSwitch & 1)) continue;
-	}
-	else {
-	    if (! (axialStereoSwitch & 2)) continue;
-	}
+      unsigned sl = links[i]->wire()->superLayerId();
+//  unsigned as = sl % 2;
+//  if (as == 0) {
+//      if (! (axialStereoSwitch & 1)) continue;
+//  }
+//  else {
+//      if (! (axialStereoSwitch & 2)) continue;
+//  }
+      bool axial = links[i]->wire()->axial();
+      if (axial) {
+        if (!(axialStereoSwitch & 1)) continue;
+      } else {
+        if (!(axialStereoSwitch & 2)) continue;
+      }
 
-	if (_points0[sl] == Origin) continue;
+      if (_points0[sl] == Origin) continue;
 
-	float a = cdc.cellWidth(sl) * loadWidth;
-	float phi0 = _points0[sl].phi();
-	float phi1 = _points0[sl + 1].phi();
-	if (_points0[sl + 1] == Origin) phi1 = circle.center().phi();
-	float phi = links[i]->position().phi();
-	if (phi < 0.) phi += PI2;
-	if (phi1 < phi0) {
-	    phi1 = phi0;
-	    phi0 = _points0[sl + 1].phi();
-	}
-	float dPhi = phi1 - phi0;
-	if (dPhi < M_PI) {
-	    phi0 -= a;
-	    phi1 += a;
-	    if (phi > phi0 && phi < phi1) outList.append(links[i]);
-	}
-	else {
-	    phi0 += a;
-	    phi1 -= a;
-	    if (phi < phi0 || phi > phi1) outList.append(links[i]);
-	}
+      float a = cdc.cellWidth(sl) * loadWidth;
+      float phi0 = _points0[sl].phi();
+      float phi1 = _points0[sl + 1].phi();
+      if (_points0[sl + 1] == Origin) phi1 = circle.center().phi();
+      float phi = links[i]->position().phi();
+      if (phi < 0.) phi += PI2;
+      if (phi1 < phi0) {
+        phi1 = phi0;
+        phi0 = _points0[sl + 1].phi();
+      }
+      float dPhi = phi1 - phi0;
+      if (dPhi < M_PI) {
+        phi0 -= a;
+        phi1 += a;
+        if (phi > phi0 && phi < phi1) outList.append(links[i]);
+      } else {
+        phi0 += a;
+        phi1 -= a;
+        if (phi < phi0 || phi > phi1) outList.append(links[i]);
+      }
 #ifdef TRASAN_DEBUG_DETAIL
-//  	std::cout << links[i]->wire()->name()
-//  	     << ":phi,phi0,phi1,dPhi,a=" << phi << "," << phi0 << "," << phi1
-// 	     << "," << dPhi << "," << a << std::endl;
+//    std::cout << links[i]->wire()->name()
+//         << ":phi,phi0,phi1,dPhi,a=" << phi << "," << phi0 << "," << phi1
+//       << "," << dPhi << "," << a << std::endl;
 #endif
     }
 
     return outList;
-}
+  }
 
-int
-TFinderBase::crossPointsByLayer(const TCircle & circle,
-				TPoint2D * points) {
+  int
+  TFinderBase::crossPointsByLayer(const TCircle& circle,
+                                  TPoint2D* points)
+  {
 
     //...Check CDC version...
-    const Belle2::TRGCDC & cdc = * Belle2::TRGCDC::getTRGCDC();
+    const Belle2::TRGCDC& cdc = * Belle2::TRGCDC::getTRGCDC();
     bool scdc = false;
     if (cdc.versionCDC() == "small cell") scdc = true;
 
     //...r...
     unsigned i0 = 0;
     if (scdc) i0 = 1;
-    static float *RR(NULL);
-    static float *RR2(NULL);
+    static float* RR(NULL);
+    static float* RR2(NULL);
     static bool first = true;
     if (first) {
       RR = new float [cdc.nLayers()];
       RR2 = new float [cdc.nLayers()];
-	for (unsigned i = i0; i < cdc.nLayers(); i++) {
-//	    const Belle2::TRGCDCWire & w = * (* cdc.layer(i))[0];
-	    const Belle2::TRGCDCWire & w = * cdc.wire(i, 0);
-	    RR[i] = w.xyPosition().perp();
-	    RR2[i] = RR[i] * RR[i];
-	}
-	first = false;
+      for (unsigned i = i0; i < cdc.nLayers(); i++) {
+//      const Belle2::TRGCDCWire & w = * (* cdc.layer(i))[0];
+        const Belle2::TRGCDCWire& w = * cdc.wire(i, 0);
+        RR[i] = w.xyPosition().perp();
+        RR2[i] = RR[i] * RR[i];
+      }
+      first = false;
     }
 
     //...Parameters...
@@ -305,56 +309,57 @@ TFinderBase::crossPointsByLayer(const TCircle & circle,
     //...Calculate points...
     unsigned nOk = 0;
     for (unsigned i = i0; i < cdc.nLayers(); i++) {
-	double minR = r < RR[i] ? r : RR[i];
-	double maxR = r < RR[i] ? RR[i] : r;
+      double minR = r < RR[i] ? r : RR[i];
+      double maxR = r < RR[i] ? RR[i] : r;
 
-	if ((r + RR[i] < d) || (minR + d < maxR)) {
-	    points[i] = Origin;
-	    continue;
-	}
-	++nOk;
-	double a = RR2[i] + d2 - r2;
-	double s = sqrt(4. * RR2[i] * d2 - a * a);
-	double q = 0.5 * a / c.y();
-	points[i].x(0.5 * (c.x() * a + c.y() * s) / d2);
-	points[i].y(q + sl * points[i].x());
-	if (co.cross(points[i] - c) * circle.charge() > 0.) {
-	    points[i].x(0.5 * (c.x() * a - c.y() * s) / d2);
-	    points[i].y(q + sl * points[i].x());
-	}
+      if ((r + RR[i] < d) || (minR + d < maxR)) {
+        points[i] = Origin;
+        continue;
+      }
+      ++nOk;
+      double a = RR2[i] + d2 - r2;
+      double s = sqrt(4. * RR2[i] * d2 - a * a);
+      double q = 0.5 * a / c.y();
+      points[i].x(0.5 * (c.x() * a + c.y() * s) / d2);
+      points[i].y(q + sl * points[i].x());
+      if (co.cross(points[i] - c) * circle.charge() > 0.) {
+        points[i].x(0.5 * (c.x() * a - c.y() * s) / d2);
+        points[i].y(q + sl * points[i].x());
+      }
 
 #ifdef TRASAN_DEBUG_DETAIL
-//	std::cout << "       " << i << " : " << points[i] << std::endl;
-//  	std::cout << "    chg=" << circle.charge();
-//  	std::cout << ", c=" << c << ", co=" << co;
-//  	std::cout << ", " << co.cross(points[i] - c) * circle.charge() << std::endl;
-//  	std::cout << "        " << 0.5 * (c.x() * a + c.y() * s) / d2;
-//  	std::cout << ", " << q + sl * (0.5 * (c.x() * a + c.y() * s) / d2);
-//  	std::cout << "        " << 0.5 * (c.x() * a - c.y() * s) / d2;
-//  	std::cout << ", " << q + sl * (0.5 * (c.x() * a - c.y() * s) / d2);
-//  	std::cout << std::endl;
+//  std::cout << "       " << i << " : " << points[i] << std::endl;
+//    std::cout << "    chg=" << circle.charge();
+//    std::cout << ", c=" << c << ", co=" << co;
+//    std::cout << ", " << co.cross(points[i] - c) * circle.charge() << std::endl;
+//    std::cout << "        " << 0.5 * (c.x() * a + c.y() * s) / d2;
+//    std::cout << ", " << q + sl * (0.5 * (c.x() * a + c.y() * s) / d2);
+//    std::cout << "        " << 0.5 * (c.x() * a - c.y() * s) / d2;
+//    std::cout << ", " << q + sl * (0.5 * (c.x() * a - c.y() * s) / d2);
+//    std::cout << std::endl;
 #endif
 
     }
     if (nOk) return 0;
     else return -1;
 
-}
+  }
 
 // AList<TLink>
 // TFinderBase::pickUpLinks2(const TTrack & track,
-// 			  const AList<TLink> & links,
-// 			  float loadWidth,
-// 			  unsigned axialStereoSwitch) {
+//        const AList<TLink> & links,
+//        float loadWidth,
+//        unsigned axialStereoSwitch) {
 //     TCircle circle(track);
 //     return pickUpLinks2((TCircle &) circle, links, loadWidth, axialStereoSwitch);
 // }
 
-AList<TLink>
-TFinderBase::pickUpLinks2(const TCircle & circle,
-			  const AList<TLink> & links,
-			  float loadWidth,
-			  unsigned axialStereoSwitch) {
+  AList<TLink>
+  TFinderBase::pickUpLinks2(const TCircle& circle,
+                            const AList<TLink> & links,
+                            float loadWidth,
+                            unsigned axialStereoSwitch)
+  {
 #ifdef TRASAN_DEBUG
     const std::string stage = "TFndrBs::pickUpLinks2";
     EnterStage(stage);
@@ -364,93 +369,92 @@ TFinderBase::pickUpLinks2(const TCircle & circle,
 #endif
 
     AList<TLink> outList;
-    const Belle2::TRGCDC & cdc = * Belle2::TRGCDC::getTRGCDC();
+    const Belle2::TRGCDC& cdc = * Belle2::TRGCDC::getTRGCDC();
 //  TPoint2D points[cdc.nSuperLayers()+1];
 //  _points1 = new TPoint2D[cdc.nSuperLayers() + 1];
     const int err = crossPointsBySuperLayer(circle, _points1);
     if (err) {
 #ifdef TRASAN_DEBUG_DETAIL
-	std::cout << Tab() << "circle cross-point to "
-		  << "any super-layers not found:loadwidth=" << loadWidth
-		  << std::endl;
+      std::cout << Tab() << "circle cross-point to "
+                << "any super-layers not found:loadwidth=" << loadWidth
+                << std::endl;
 #endif
-	return outList;
+      return outList;
     }
 
     //    const Belle2::TRGCDC & cdc = * Belle2::TRGCDC::getTRGCDC();
     unsigned nBad = links.length();
     for (unsigned i = 0; i < nBad; i++) {
-	const unsigned sl = links[i]->wire()->superLayerId();
-// 	const unsigned as = sl % 2;
-// 	if (as == 0) {
-// 	    if (! (axialStereoSwitch & 1)) continue;
-// 	}
-// 	else {
-// 	    if (! (axialStereoSwitch & 2)) continue;
-// 	}
-	bool axial = links[i]->wire()->axial();
-	if (axial) {
-	    if (! (axialStereoSwitch & 1)) continue;
-	}
-	else {
-	    if (! (axialStereoSwitch & 2)) continue;
-	}
+      const unsigned sl = links[i]->wire()->superLayerId();
+//  const unsigned as = sl % 2;
+//  if (as == 0) {
+//      if (! (axialStereoSwitch & 1)) continue;
+//  }
+//  else {
+//      if (! (axialStereoSwitch & 2)) continue;
+//  }
+      bool axial = links[i]->wire()->axial();
+      if (axial) {
+        if (!(axialStereoSwitch & 1)) continue;
+      } else {
+        if (!(axialStereoSwitch & 2)) continue;
+      }
 
-	if (_points1[sl] == Origin) continue;
+      if (_points1[sl] == Origin) continue;
 
-// 	const float a = WIDTH[sl] * loadWidth;
-// 	float phi = links[i]->position().phi();
-// 	if (phi < 0.) phi += PI2;
-// 	float phi0 = _points1[sl].phi();
-// 	float phi1 = _points1[sl + 1].phi();
-// 	if (_points1[sl + 1] == Origin)
-// 	    phi1 = circle.center().phi();
-// 	if (phi0 < 0.) phi0 += PI2;
-// 	if (phi1 < 0.) phi1 += PI2;
-// 	if (phi1 < phi0) {
-// 	    float tmp = phi1;
-// 	    phi1 = phi0;
-// 	    phi0 = tmp;
-// 	}
-// 	float dPhi = fabs(phi1 - phi0);
-// 	if (dPhi < M_PI) {
-// 	    phi0 -= a;
-// 	    phi1 += a;
-// 	    if (phi > phi0 && phi < phi1) outList.append(links[i]);
-// 	}
-// 	else {
-// 	    phi0 += a;
-// 	    phi1 -= a;
-// 	    if (phi < phi0 || phi > phi1) outList.append(links[i]);
-// 	}
+//  const float a = WIDTH[sl] * loadWidth;
+//  float phi = links[i]->position().phi();
+//  if (phi < 0.) phi += PI2;
+//  float phi0 = _points1[sl].phi();
+//  float phi1 = _points1[sl + 1].phi();
+//  if (_points1[sl + 1] == Origin)
+//      phi1 = circle.center().phi();
+//  if (phi0 < 0.) phi0 += PI2;
+//  if (phi1 < 0.) phi1 += PI2;
+//  if (phi1 < phi0) {
+//      float tmp = phi1;
+//      phi1 = phi0;
+//      phi0 = tmp;
+//  }
+//  float dPhi = fabs(phi1 - phi0);
+//  if (dPhi < M_PI) {
+//      phi0 -= a;
+//      phi1 += a;
+//      if (phi > phi0 && phi < phi1) outList.append(links[i]);
+//  }
+//  else {
+//      phi0 += a;
+//      phi1 -= a;
+//      if (phi < phi0 || phi > phi1) outList.append(links[i]);
+//  }
 
-	const float a = cdc.cellWidth(sl) * loadWidth;
-	float phi = links[i]->position().phi();
-	float phi0 = _points1[sl].phi();
-	float phi1 = _points1[sl + 1].phi();
-	if (_points1[sl + 1] == Origin)
-	    phi1 = circle.center().phi();
+      const float a = cdc.cellWidth(sl) * loadWidth;
+      float phi = links[i]->position().phi();
+      float phi0 = _points1[sl].phi();
+      float phi1 = _points1[sl + 1].phi();
+      if (_points1[sl + 1] == Origin)
+        phi1 = circle.center().phi();
 
-	const bool inRange = InRangeRadian(phi0, phi1, phi);
+      const bool inRange = InRangeRadian(phi0, phi1, phi);
 
-	if (inRange)
-	    outList.append(links[i]);
-	else if (DistanceRadian(phi0, phi) < a)
-	    outList.append(links[i]);
-	else if (DistanceRadian(phi1, phi) < a)
-	    outList.append(links[i]);
+      if (inRange)
+        outList.append(links[i]);
+      else if (DistanceRadian(phi0, phi) < a)
+        outList.append(links[i]);
+      else if (DistanceRadian(phi1, phi) < a)
+        outList.append(links[i]);
 
 #ifdef TRASAN_DEBUG_DETAIL
-    	std::cout << Tab() << links[i]->wire()->name()
-  		  << ":phi,phi0,phi1,a=" << phi << "," << phi0 << ","
-  		  << phi1 << "," << a;
-	if (inRange)
-	    std::cout << ":ir=ok";
-	if (DistanceRadian(phi0, phi) < a)
-	    std::cout << ":dr0=ok";
-	if (DistanceRadian(phi1, phi) < a)
-	    std::cout << ":dr1=ok";
-	std::cout << std::endl;
+      std::cout << Tab() << links[i]->wire()->name()
+                << ":phi,phi0,phi1,a=" << phi << "," << phi0 << ","
+                << phi1 << "," << a;
+      if (inRange)
+        std::cout << ":ir=ok";
+      if (DistanceRadian(phi0, phi) < a)
+        std::cout << ":dr0=ok";
+      if (DistanceRadian(phi1, phi) < a)
+        std::cout << ":dr1=ok";
+      std::cout << std::endl;
 #endif
     }
 
@@ -462,13 +466,14 @@ TFinderBase::pickUpLinks2(const TCircle & circle,
 #endif
 
     return outList;
-}
+  }
 
-AList<TLink>
-TFinderBase::pickUpLinksDetail(const TCircle & circle,
-			       const AList<TLink> & links,
-			       float loadWidth,
-			       unsigned axialStereoSwitch) {
+  AList<TLink>
+  TFinderBase::pickUpLinksDetail(const TCircle& circle,
+                                 const AList<TLink> & links,
+                                 float loadWidth,
+                                 unsigned axialStereoSwitch)
+  {
 #ifdef TRASAN_DEBUG
     const std::string stage = "TFndrBs::pickUpLinksDetail";
     EnterStage(stage);
@@ -478,52 +483,51 @@ TFinderBase::pickUpLinksDetail(const TCircle & circle,
 #endif
 
     AList<TLink> outList;
-    const Belle2::TRGCDC & cdc = * Belle2::TRGCDC::getTRGCDC();
+    const Belle2::TRGCDC& cdc = * Belle2::TRGCDC::getTRGCDC();
 //  TPoint2D points[cdc.nLayers()+1];
 //  _points2 = new TPoint2D[cdc.nLayers() + 1];
     int err = crossPointsByLayer(circle, _points2);
     if (err) {
 #ifdef TRASAN_DEBUG_DETAIL
-	std::cout << Tab() << "circle cross-point to "
-		  << "any layers not found:loadwidth=" << loadWidth
-		  << std::endl;
+      std::cout << Tab() << "circle cross-point to "
+                << "any layers not found:loadwidth=" << loadWidth
+                << std::endl;
 #endif
-	return outList;
+      return outList;
     }
 
     unsigned nBad = links.length();
     for (unsigned i = 0; i < nBad; i++) {
-	const unsigned sl = links[i]->wire()->superLayerId();
-	const unsigned lid = links[i]->wire()->layerId();
-// 	unsigned as = sl % 2;
-// 	if (as == 0) {
-// 	    if (! (axialStereoSwitch & 1)) continue;
-// 	}
-// 	else {
-// 	    if (! (axialStereoSwitch & 2)) continue;
-// 	}
-	bool axial = links[i]->wire()->axial();
-	if (axial) {
-	    if (! (axialStereoSwitch & 1)) continue;
-	}
-	else {
-	    if (! (axialStereoSwitch & 2)) continue;
-	}
+      const unsigned sl = links[i]->wire()->superLayerId();
+      const unsigned lid = links[i]->wire()->layerId();
+//  unsigned as = sl % 2;
+//  if (as == 0) {
+//      if (! (axialStereoSwitch & 1)) continue;
+//  }
+//  else {
+//      if (! (axialStereoSwitch & 2)) continue;
+//  }
+      bool axial = links[i]->wire()->axial();
+      if (axial) {
+        if (!(axialStereoSwitch & 1)) continue;
+      } else {
+        if (!(axialStereoSwitch & 2)) continue;
+      }
 
-	if (_points2[lid] == Origin) continue;
+      if (_points2[lid] == Origin) continue;
 
-	const float a = cdc.cellWidth(sl) * loadWidth;
-	float phi = links[i]->position().phi();
-	float phi0 = _points2[lid].phi();
-	if (DistanceRadian(phi0, phi) < a)
-	    outList.append(links[i]);
+      const float a = cdc.cellWidth(sl) * loadWidth;
+      float phi = links[i]->position().phi();
+      float phi0 = _points2[lid].phi();
+      if (DistanceRadian(phi0, phi) < a)
+        outList.append(links[i]);
 
 #ifdef TRASAN_DEBUG_DETAIL
-     	std::cout << Tab() << links[i]->wire()->name()
-	       << ":phi,phi0,dist,a=" << phi << "," << phi0 << "," << DistanceRadian(phi0, phi) << "," << a;
- 	if (DistanceRadian(phi0, phi) < a)
- 	    std::cout << ":dr0=ok";
- 	std::cout << std::endl;
+      std::cout << Tab() << links[i]->wire()->name()
+                << ":phi,phi0,dist,a=" << phi << "," << phi0 << "," << DistanceRadian(phi0, phi) << "," << a;
+      if (DistanceRadian(phi0, phi) < a)
+        std::cout << ":dr0=ok";
+      std::cout << std::endl;
 #endif
     }
 
@@ -534,11 +538,12 @@ TFinderBase::pickUpLinksDetail(const TCircle & circle,
     LeaveStage(stage);
 #endif
     return outList;
-}
+  }
 
-AList<TLink>
-TFinderBase::pickUpNeighborLinks(const AList<TLink> & seeds,
-				 const AList<TLink> & links) {
+  AList<TLink>
+  TFinderBase::pickUpNeighborLinks(const AList<TLink> & seeds,
+                                   const AList<TLink> & links)
+  {
 
 #ifdef TRASAN_DEBUG
     const std::string stage = "TFndrBs::pickUpNeighborLinks";
@@ -550,26 +555,26 @@ TFinderBase::pickUpNeighborLinks(const AList<TLink> & seeds,
     //...Loop...
     const unsigned n = seeds.length();
     for (unsigned i = 0; i < n; i++) {
-	const TLink & t = * seeds[i];
-	const TLink * const t2 = t.neighbor(2);
-	const TLink * const t3 = t.neighbor(3);
-	if (! links.hasMember((TLink *) t2)) continue;
-	if (! links.hasMember((TLink *) t3)) continue;
+      const TLink& t = * seeds[i];
+      const TLink* const t2 = t.neighbor(2);
+      const TLink* const t3 = t.neighbor(3);
+      if (! links.hasMember((TLink*) t2)) continue;
+      if (! links.hasMember((TLink*) t3)) continue;
 
-	if (t2) {
-	    const TLink * const t22 = t2->neighbor(2);
-	    if (! t22) {
-		if (! seeds.hasMember((TLink *) t2))
-		    outList.append((TLink *) t2);
-	    }
-	}
-	if (t3) {
-	    const TLink * const t33 = t3->neighbor(3);
-	    if (! t33) {
-		if (! seeds.hasMember((TLink *) t3))
-		    outList.append((TLink *) t3);
-	    }
-	}
+      if (t2) {
+        const TLink* const t22 = t2->neighbor(2);
+        if (! t22) {
+          if (! seeds.hasMember((TLink*) t2))
+            outList.append((TLink*) t2);
+        }
+      }
+      if (t3) {
+        const TLink* const t33 = t3->neighbor(3);
+        if (! t33) {
+          if (! seeds.hasMember((TLink*) t3))
+            outList.append((TLink*) t3);
+        }
+      }
     }
 
 #ifdef TRASAN_DEBUG_DETAIL
@@ -579,7 +584,7 @@ TFinderBase::pickUpNeighborLinks(const AList<TLink> & seeds,
     LeaveStage(stage);
 #endif
     return outList;
-}
+  }
 
 } // namespace Belle
 

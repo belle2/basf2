@@ -25,14 +25,14 @@
 namespace Belle {
 
 /// A class to display tracking objects.
-class TWindowGTK : public Gtk::Window {
-    
+  class TWindowGTK : public Gtk::Window {
+
   public:
     /// Default constructor
-    TWindowGTK(const std::string & name = "TWindowGTK",
-	       double outerR=880.0, 
-	       int size = 600);
-    
+    TWindowGTK(const std::string& name = "TWindowGTK",
+               double outerR = 880.0,
+               int size = 600);
+
     /// Destructor
     virtual ~TWindowGTK();
 
@@ -44,8 +44,8 @@ class TWindowGTK : public Gtk::Window {
     bool skipEvent(bool);
 
   public: // Status
-    void stage(const std::string & stage);
-    void information(const std::string & information);
+    void stage(const std::string& stage);
+    void information(const std::string& information);
     void beginEvent(void);
     void endOfEvent(void);
 
@@ -66,7 +66,7 @@ class TWindowGTK : public Gtk::Window {
 
   public: // Others
     /// Set and pack drawing area.
-    void pack(Gtk::DrawingArea &);
+    void pack(Gtk::DrawingArea&);
 
     /// To get/set sclaer value.
     double scale(void) const;
@@ -101,8 +101,8 @@ class TWindowGTK : public Gtk::Window {
     Gtk::CheckButton _buttonAxial;
     Gtk::CheckButton _buttonStereo;
     Gtk::CheckButton _buttonWireName;
-    Gtk::DrawingArea * _w;
-};
+    Gtk::DrawingArea* _w;
+  };
 
 //-----------------------------------------------------------------------------
 
@@ -114,126 +114,143 @@ class TWindowGTK : public Gtk::Window {
 #endif
 #ifdef TWINDOWGTK_INLINE_DEFINE_HERE
 
-inline
-void
-TWindowGTK::clear(void) {
-//     const struct belle_event & ev = 
-// 	* (struct belle_event *) BsGetEnt(BELLE_EVENT, 1, BBS_No_Index);
+  inline
+  void
+  TWindowGTK::clear(void)
+  {
+//     const struct belle_event & ev =
+//  * (struct belle_event *) BsGetEnt(BELLE_EVENT, 1, BBS_No_Index);
 //     const unsigned e = ev.m_ExpNo;
 //     const unsigned r = ev.m_RunNo;
 //     const unsigned f = (ev.m_EvtNo >> 28);
 //     const unsigned v = ev.m_EvtNo & 0x0fffffff;
 //     const std::string id =
-// 	"e" + itostring(e) +
-// 	" r" + itostring(r) +
-// 	" f" + itostring(f) +
-// 	" ev" + itostring(v) + " : ";
+//  "e" + itostring(e) +
+//  " r" + itostring(r) +
+//  " f" + itostring(f) +
+//  " ev" + itostring(v) + " : ";
     const std::string id = "unknown : ";
     _stage = "";
     _info = id;
-}
+  }
 
-inline
-void
-TWindowGTK::stage(const std::string & a) {
+  inline
+  void
+  TWindowGTK::stage(const std::string& a)
+  {
     _stage = a;
     Glib::ustring s = "Stage : " + _stage + "\nInformation : " + _info;
     _label.set_label(s);
-}
+  }
 
-inline
-void
-TWindowGTK::information(const std::string & a) {
+  inline
+  void
+  TWindowGTK::information(const std::string& a)
+  {
     _info += a;
     Glib::ustring s = "Stage : " + _stage + "\nInformation : " + _info;
     _label.set_label(s);
-}
+  }
 
-inline
-bool
-TWindowGTK::skip(void) const {
+  inline
+  bool
+  TWindowGTK::skip(void) const
+  {
     return _skip;
-}
+  }
 
-inline
-bool
-TWindowGTK::skip(bool a) {
+  inline
+  bool
+  TWindowGTK::skip(bool a)
+  {
     return _skip = a;
-}
+  }
 
-inline
-bool
-TWindowGTK::skipEvent(void) const {
+  inline
+  bool
+  TWindowGTK::skipEvent(void) const
+  {
     return _skipEvent;
-}
+  }
 
-inline
-bool
-TWindowGTK::skipEvent(bool a) {
+  inline
+  bool
+  TWindowGTK::skipEvent(bool a)
+  {
     return _skipEvent = a;
-}
+  }
 
-inline
-void
-TWindowGTK::on_axial(void) {
+  inline
+  void
+  TWindowGTK::on_axial(void)
+  {
     _axial = _buttonAxial.get_active();
-}
+  }
 
-inline
-void
-TWindowGTK::on_stereo(void) {
+  inline
+  void
+  TWindowGTK::on_stereo(void)
+  {
     _stereo = _buttonStereo.get_active();
-}
+  }
 
-inline
-void
-TWindowGTK::on_wireName(void) {
+  inline
+  void
+  TWindowGTK::on_wireName(void)
+  {
     _wireName = _buttonWireName.get_active();
-}
+  }
 
-inline
-double
-TWindowGTK::scale(void) const {
+  inline
+  double
+  TWindowGTK::scale(void) const
+  {
     return _scaler.get_value();
-}
+  }
 
-inline
-double
-TWindowGTK::scale(double a) {
+  inline
+  double
+  TWindowGTK::scale(double a)
+  {
     _scaler.set_value(a);
     return _scaler.get_value();
-}
+  }
 
-inline
-bool
-TWindowGTK::axial(void) const {
+  inline
+  bool
+  TWindowGTK::axial(void) const
+  {
     return _axial;
-}
+  }
 
-inline
-bool
-TWindowGTK::stereo(void) const {
+  inline
+  bool
+  TWindowGTK::stereo(void) const
+  {
     return _stereo;
-}
+  }
 
-inline
-bool
-TWindowGTK::wireName(void) const {
+  inline
+  bool
+  TWindowGTK::wireName(void) const
+  {
     return _wireName;
-}
+  }
 
-inline
-void
-TWindowGTK::beginEvent(void) {
+  inline
+  void
+  TWindowGTK::beginEvent(void)
+  {
     _skipEvent = false;
     _endOfEvent = false;
-}
+  }
 
-inline
-void
-TWindowGTK::endOfEvent(void) {
+  inline
+  void
+  TWindowGTK::endOfEvent(void)
+  {
     _endOfEvent = true;
-}
+  }
 
 #endif
 #undef inline

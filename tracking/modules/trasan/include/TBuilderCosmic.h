@@ -59,23 +59,23 @@
 namespace Belle {
 
 /// A class to build a cosmic track.
-class TBuilderCosmic : public TBuilder0 {
+  class TBuilderCosmic : public TBuilder0 {
 
   public:
     /// Constructor.
-    TBuilderCosmic(const std::string & name, float salvageLevel);
+    TBuilderCosmic(const std::string& name, float salvageLevel);
 
     /// Destructor
     virtual ~TBuilderCosmic();
 
   public:// Selectors
     /// appends stereo hits to a track.
-    TTrack * buildStereo(TTrack & track, const AList<TLink> &) const;
+    TTrack* buildStereo(TTrack& track, const AList<TLink> &) const;
 
   private:
     // THelixFitter _fitter;
     TCosmicFitter _fitter;
-};
+  };
 
 //-----------------------------------------------------------------------------
 

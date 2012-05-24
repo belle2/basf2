@@ -28,7 +28,7 @@ namespace Belle2 {
     virtual double getZValue(double a, double b, double r);
 
 #ifdef CAIRO_OUTPUT
-    virtual void drawResultItem(cairo_t* cairo, ResultItem &ri) {
+    virtual void drawResultItem(cairo_t* cairo, ResultItem& ri) {
       double min_z = -300;
       double max_z = 350;
       double min_r = 0;
@@ -44,7 +44,7 @@ namespace Belle2 {
         cairo_set_source_rgb(cairo, 0, 0, 1);
         cairo_set_line_width(cairo, 0.5);
         for (std::list<rzHit*>::iterator hitIter = _rzHits.begin(); hitIter != _rzHits.end(); ++hitIter) {
-          rzHit &rzhit = **hitIter;
+          rzHit& rzhit = **hitIter;
           cairo_straight(cairo, -rzhit.r, rzhit.z, min_a, max_a, min_b, max_b);
           cairo_stroke_abs(cairo);
         }

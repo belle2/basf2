@@ -1,5 +1,5 @@
 #if 0 // old
-// Functions for position calculation 
+// Functions for position calculation
 // in SVD system from Yokoyama-san(U-tokyo)
 // In future, when svd utilities functions will be supported,
 // this fuctions will be replaced. (May 28, 1999)
@@ -13,12 +13,12 @@
 #include "belleCLHEP/Geometry/Transform3D.h"
 
 /// returns global position (includes alignment)
-HepGeom::Point3D<double> 
+HepGeom::Point3D<double>
 tsvd_position(int DSSD, double philsa, double zlsa);
 
 /*
 /// returns global position (not include alignment)
-HepGeom::Point3D<double> 
+HepGeom::Point3D<double>
 svd_nominalposition(int DSSD, double philsa, double zlsa);
 */
 
@@ -27,7 +27,7 @@ HepTransform3D
 tsvd_toglobal(int DSSD);
 
 /// returns local position
-HepGeom::Point3D<double>  
+HepGeom::Point3D<double>
 tsvd_localposition(int DSSD, double philsa, double zlsa);
 
 /// returns local x
@@ -59,7 +59,7 @@ tsvd_dssd2hladder(int DSSD);
 
 int
 TRLA2PhiDSSD(int rla);
-int 
+int
 TRLA2ZDSSD(int rla);
 #endif /* _DEFINE_TSVD_POSITION_H_ */
 #if defined(BELLE_NAMESPACE)

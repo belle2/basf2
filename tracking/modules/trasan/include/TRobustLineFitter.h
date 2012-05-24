@@ -45,36 +45,36 @@
 namespace Belle {
 
 /// A class to fit a TTrackBase object to a line.
-class TRobustLineFitter : public TLineFitter {
+  class TRobustLineFitter : public TLineFitter {
 
   public:
     /// Constructor.
-    TRobustLineFitter(const std::string & name);
+    TRobustLineFitter(const std::string& name);
 
     /// Destructor
     virtual ~TRobustLineFitter();
 
   public:// Selectors
     /// dumps debug information.
-    void dump(const std::string & message = std::string(""),
-	      const std::string & prefix = std::string("")) const;
+    void dump(const std::string& message = std::string(""),
+              const std::string& prefix = std::string("")) const;
     double a(void) const;
     double b(void) const;
     double det(void) const;
 
   public:// Modifiers
-    virtual int fit(TTrackBase &) const;
+    virtual int fit(TTrackBase&) const;
 
   private:
-    double rofunc(const TTrackBase &, double) const;
-    double select(unsigned k, unsigned n, double *) const;
+    double rofunc(const TTrackBase&, double) const;
+    double select(unsigned k, unsigned n, double*) const;
 
   private:
     mutable double _a;
     mutable double _b;
     mutable double _det;
     mutable unsigned _n;
-};
+  };
 
 //-----------------------------------------------------------------------------
 
@@ -87,23 +87,26 @@ class TRobustLineFitter : public TLineFitter {
 
 #ifdef TROBUSTLINEFITTER_INLINE_DEFINE_HERE
 
-inline
-double
-TRobustLineFitter::a(void) const {
+  inline
+  double
+  TRobustLineFitter::a(void) const
+  {
     return _a;
-}
+  }
 
-inline
-double
-TRobustLineFitter::b(void) const {
+  inline
+  double
+  TRobustLineFitter::b(void) const
+  {
     return _b;
-}
+  }
 
-inline
-double
-TRobustLineFitter::det(void) const {
+  inline
+  double
+  TRobustLineFitter::det(void) const
+  {
     return _det;
-}
+  }
 
 #endif
 

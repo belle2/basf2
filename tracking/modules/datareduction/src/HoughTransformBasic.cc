@@ -56,7 +56,7 @@ void HoughTransformBasic::setRegionEnlargement(double widthStart, double widthEn
 }
 
 #ifdef CAIRO_OUTPUT
-void HoughTransformBasic::drawBox(HoughTransformBox &box, box_state state)
+void HoughTransformBasic::drawBox(HoughTransformBox& box, box_state state)
 {
   if (!cairo) return;
   cairo_color color;
@@ -101,7 +101,7 @@ void HoughTransformBasic::drawRZ(cairo_t* cairo)
   cairo_set_source_rgb(cairo, 1, 0, 0);
   for (list<rzHit*>::iterator iHit = _rzHits.begin(); iHit != _rzHits.end(); iHit++) {
     rzHit hit = **iHit;
-    cairo_arc(cairo, hit.z, hit.r, 1, 0, 2*M_PI);
+    cairo_arc(cairo, hit.z, hit.r, 1, 0, 2 * M_PI);
     cairo_fill(cairo);
   }
 }
@@ -224,10 +224,10 @@ void HoughTransformBasic::doHoughSearch(SectorBasic& sector)
         drawBox(*currBox, FINAL);
 #endif
 
-        _resultSet.push_back(new ResultItem(0.5*(currBox->right + currBox->left),
-                                            0.5*(currBox->bottom + currBox->top),
-                                            0.5*fabs(currBox->right - currBox->left),
-                                            0.5*fabs(currBox->top - currBox->bottom)));
+        _resultSet.push_back(new ResultItem(0.5 * (currBox->right + currBox->left),
+                                            0.5 * (currBox->bottom + currBox->top),
+                                            0.5 * fabs(currBox->right - currBox->left),
+                                            0.5 * fabs(currBox->top - currBox->bottom)));
       }
     }
     delete currBox;

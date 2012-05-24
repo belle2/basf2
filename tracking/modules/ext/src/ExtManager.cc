@@ -32,6 +32,7 @@
 #include <G4ChordFinder.hh>
 #include <G4EquationOfMotion.hh>
 #include <G4FieldManager.hh>
+#include <G4PropagatorInField.hh>
 #include <G4VParticleChange.hh>
 
 #include <framework/logging/Logger.h>
@@ -60,6 +61,11 @@ ExtManager::ExtManager()
 
 ExtManager::~ExtManager()
 {
+  if (m_equationOfMotion) delete m_equationOfMotion;
+  if (m_navigator) delete m_navigator;
+  if (m_propagator) delete m_propagator;
+  if (m_helper) delete m_helper;
+  if (m_manager) delete m_manager;
 }
 
 void ExtManager::StartHelper()
@@ -74,6 +80,9 @@ void ExtManager::StartHelper()
 
 void ExtManager::StartNavigator()
 {
+  // Replace G4Navigator with ExtNavigator, which is an extension of G4Navigator that
+  // examines the geant4e "target" surface also when computing distance to boundary
+  // (but only if geant4e is actively propagating a track!)
   if (m_navigator == NULL) {
     G4TransportationManager* transportationManager = G4TransportationManager::GetTransportationManager();
     G4Navigator* g4navi = transportationManager->GetNavigatorForTracking();
@@ -87,6 +96,8 @@ void ExtManager::StartNavigator()
     }
     m_navigator->SetVerboseLevel(verbosity);
     transportationManager->SetNavigatorForTracking((G4Navigator*)m_navigator);
+    transportationManager->GetPropagatorInField()->GetIntersectionLocator()->SetNavigatorFor((G4Navigator*)m_navigator);
+    G4EventManager::GetEventManager()->GetTrackingManager()->GetSteppingManager()->SetNavigator((G4Navigator*)m_navigator);
   }
   B2INFO("Module ext: ExtManager::StartNavigator(): initial state is " << PrintExtState())
 }

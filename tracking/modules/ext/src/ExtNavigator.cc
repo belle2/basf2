@@ -4,6 +4,7 @@
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors:  Leo Piilonen                                            *
+ * Derived from:  G4ErrorPropagationNavigator.cc                          *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/

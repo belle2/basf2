@@ -260,3 +260,8 @@ int CDCLegendreTrackCandidate::getNUniqueHits() const
 
   return nUnique;
 }
+
+int CDCLegendreTrackCandidate::getChargeSign() const
+{
+  return m_charge / abs(m_charge);
+}

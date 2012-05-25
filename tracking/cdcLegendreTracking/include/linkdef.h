@@ -7,6 +7,5 @@
 
 #pragma link C++ class Belle2::CDCLegendreTrackHit;
 #pragma link C++ class Belle2::CDCLegendreTrackCandidate;
-#pragma link C++ class Belle2::CDCLegendreMCInformation;
 
 #endif

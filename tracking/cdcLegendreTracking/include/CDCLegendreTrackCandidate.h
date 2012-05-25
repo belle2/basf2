@@ -104,9 +104,7 @@ namespace Belle2 {
     /** Return charge sign of track.
      * Sure to be 1 or -1 (1 for curler and two tracks).
      */
-    int getChargeSign() const {
-      return m_charge / abs(m_charge);
-    }
+    int getChargeSign() const;
 
     /** Return number of unique hits, when the track was constructed.*/
     int getStartingUniqueHits() const {

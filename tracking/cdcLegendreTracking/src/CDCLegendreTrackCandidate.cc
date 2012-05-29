@@ -12,6 +12,7 @@
 
 #include <framework/datastore/StoreArray.h>
 #include <cmath>
+#include <cstdlib>
 #include "TMath.h"
 #include "boost/foreach.hpp"
 

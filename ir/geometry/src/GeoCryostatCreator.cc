@@ -1838,6 +1838,46 @@ namespace Belle2 {
       new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_C2spc1, "phys_C2spc1_name", logi_C1wal1, false, 0);
 
       //--------------
+      //-   C2spc2
+
+      //get parameters from .xml file
+      GearDir cC2spc2(content, "C2spc2/");
+
+      const int C2spc2_num = atoi(cC2spc2.getString("N").c_str());
+
+      double C2spc2_Z[C2spc2_num];
+      double C2spc2_R[C2spc2_num];
+      double C2spc2_r[C2spc2_num];
+
+      for (int i = 0; i < C2spc2_num; ++i) {
+        ostringstream ossZID;
+        ossZID << "Z" << i;
+
+        ostringstream ossRID;
+        ossRID << "R" << i;
+
+        ostringstream ossrID;
+        ossrID << "r" << i;
+
+        C2spc2_Z[i] = cC2spc2.getLength(ossZID.str()) * unitFactor;
+        C2spc2_R[i] = cC2spc2.getLength(ossRID.str()) * unitFactor;
+        C2spc2_r[i] = cC2spc2.getLength(ossrID.str()) * unitFactor;
+      }
+
+      //define geometry
+      G4Polycone* geo_C2spc2xx = new G4Polycone("geo_C2spc2xx_name", 0, 2 * M_PI, C2spc2_num, C2spc2_Z, C2spc2_r, C2spc2_R);
+      G4IntersectionSolid* geo_C2spc2 = new G4IntersectionSolid("geo_C2spc2_name", geo_C2spc2xx, geo_C1wal1);
+
+      string strMat_C2spc2 = cC2spc2.getString("Material");
+      G4Material* mat_C2spc2 = Materials::get(strMat_C2spc2);
+      G4LogicalVolume* logi_C2spc2 = new G4LogicalVolume(geo_C2spc2, mat_C2spc2, "logi_C2spc2_name");
+
+      //put volume
+      setColor(*logi_C2spc2, cC2spc2.getString("Color", "#CCCCCC"));
+      //setVisibility(*logi_C2spc2, false);
+      new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_C2spc2, "phys_C2spc2_name", logi_C1wal1, false, 0);
+
+      //--------------
       //-   C3wal2
 
       //get parameters from .xml file
@@ -1909,7 +1949,7 @@ namespace Belle2 {
       //put volume
       setColor(*logi_C3wal3, cC3wal3.getString("Color", "#CC0000"));
       //setVisibility(*logi_C3wal3, false);
-      new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_C3wal3, "phys_C3wal3_name", logi_C2spc1, false, 0);
+      new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_C3wal3, "phys_C3wal3_name", logi_C2spc2, false, 0);
 
       //--------------
       //-   C3wal4
@@ -1946,7 +1986,7 @@ namespace Belle2 {
       //put volume
       setColor(*logi_C3wal4, cC3wal4.getString("Color", "#CC0000"));
       //setVisibility(*logi_C3wal4, false);
-      new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_C3wal4, "phys_C3wal4_name", logi_C2spc1, false, 0);
+      new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_C3wal4, "phys_C3wal4_name", logi_C2spc2, false, 0);
 
       //--------------
       //-   C4spc2

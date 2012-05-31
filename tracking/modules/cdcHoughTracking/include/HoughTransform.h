@@ -31,11 +31,11 @@ namespace Belle2 {
 
       void printDebugInfo();
 
-      const float getCScale() const {
+      float getCScale() const {
         return m_cScale;
       }
 
-      const float getPScale() const {
+      float getPScale() const {
         return m_pScale;
       }
 

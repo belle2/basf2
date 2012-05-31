@@ -31,158 +31,6 @@ HoughTransform::~HoughTransform()
 
 void HoughTransform::vote()
 {
-//
-//  const float prec = m_precision;
-//  const unsigned int iprec = m_precision;
-//  const float phiScale = m_pScale;
-//  const float curScale = m_cScale;
-//
-//  float angDegN[iprec];
-//  float angDegP[iprec];
-//  int sincosN[iprec];
-//  int sincosP[iprec];
-//
-//
-//  float phiN_vals[iprec];
-//  float phiP_vals[iprec];
-//  float curN_vals[iprec];
-//  float curP_vals[iprec];
-//
-//  int binsCurN[iprec];
-//  int binsCurP[iprec];
-//  int binsPhiP[iprec];
-//  int binsPhiN[iprec];
-//
-//  for (int i = 0; i < iprec; ++i) {
-//    angDegN[i] = (i + 1) * 90.0f / prec;
-//    angDegP[i] = -angDegN[i] + 360;
-//    sincosN[i] = (int) (angDegN[i] * 8);
-//    sincosP[i] = (int) (angDegP[i] * 8);
-//
-//  }
-//
-//
-//
-//  const std::vector<CDCHoughHit>& hits = *m_hits;
-//
-//  const unsigned int numberOfHits = hits.size();
-//
-//  float phi_vals[numberOfHits];
-//  float r_vals[numberOfHits];
-//
-//  unsigned int maxPhi[numberOfHits];
-//
-//
-//  for( unsigned int i = 0; i < numberOfHits; ++i ){
-//    int sLayer = hits[i].getSuperlayerId(); //max_phi depends on super Layer
-//////    B2INFO("superlayer " << sLayer);
-//    switch (sLayer) {
-//    case 0:
-//      maxPhi[i] = 19; //check values again
-//      break;
-//    case 2:
-//      maxPhi[i] = 36;
-//      break;
-//    case 4:
-//      maxPhi[i] = 59;
-//      break;
-//    default:
-//      maxPhi[i] = 90;
-//      break;
-//    }
-//    maxPhi[i] *= prec/90.0f;
-//  }
-//
-//////  B2INFO("1");
-//
-//  for( unsigned int i = 0; i < numberOfHits; ++i ){
-//    if (!hits[i].getIsAxial())
-//      continue;
-//    phi_vals[i] = hits[i].getPhi().getDeg(); //polar angle in deg
-//    r_vals[i]   = hits[i].getR() * 10;
-//  }
-//////  B2INFO("2");
-////
-////  //used to check if calculated bin is the same as last time
-//  int oldCurN = -1;
-//  int oldPhiN = -1;
-//  int oldCurP = -1;
-//  int oldPhiP = -1;
-//
-////  //helpers
-////  int votes = 0;
-////  int total = 0;
-////  int samebin = 0;
-////
-//  for (int i_hit = 0; i_hit < numberOfHits; ++i_hit) {
-//    if ( !hits[i_hit].getIsAxial() )
-//      continue;
-//    const unsigned int phi_max = maxPhi[i_hit];
-//
-//    for (int i = 0; i < phi_max; ++i) {
-//      phiN_vals[i] = -angDegN[i] + phi_vals[i_hit] + 90;
-//      phiP_vals[i] = -angDegP[i] + phi_vals[i_hit] + 270;
-//    }
-//
-//    for (int i = 0; i < phi_max; ++i) {
-//      while (phiN_vals[i] >= 360)
-//        phiN_vals[i] -= 360;
-//
-//      while (phiN_vals[i] < 0)
-//        phiN_vals[i] += 360;
-//
-//      while (phiP_vals[i] >= 360)
-//        phiP_vals[i] -= 360;
-//
-//      while (phiP_vals[i] < 0)
-//        phiP_vals[i] += 360;
-//    }
-//
-//    for (int i = 0; i < phi_max; ++i) {
-//      float xHitN = r_vals[i_hit] * cosine[sincosN[i]];
-//      float yHitN = r_vals[i_hit] * sine[sincosN[i]];
-//      curN_vals[i] = fabs(2 * yHitN * 1E6)
-//          / (yHitN * yHitN + xHitN * xHitN);
-//
-//      const float xHitP = r_vals[i_hit] * cosine[sincosP[i]];
-//      const float yHitP = r_vals[i_hit] * sine[sincosP[i]];
-//      curP_vals[i] = fabs(2 * yHitP * 1E6)
-//          / (yHitP * yHitP + xHitP * xHitP);
-//
-//
-//    }
-//
-//
-//    for (int i = 0; i < phi_max; ++i) {
-////      B2INFO(i << " " << phiP_vals[i]);
-//      int binCurN = (int) (curN_vals[i] * curScale);
-//      int binCurP = (int) (curP_vals[i] * curScale);
-//      int binPhiP = (int) (phiP_vals[i] * phiScale);
-//      int binPhiN = (int) (phiN_vals[i] * phiScale);
-//      if ((binPhiN == oldPhiN and binCurN == oldCurN) or curN_vals[i] > 2500) { //same bin again?
-//////        ++samebin;
-//      } else {
-//        oldPhiN = binPhiN;
-//        oldCurN = binCurN;
-////        B2INFO(binPhiN << " N " << binCurN);
-//        ++(m_binsN[binPhiN][binCurN]); //increment bin
-//////        ++votes; //count used votes
-//      }
-//      if ((binPhiP == oldPhiP and binCurP == oldCurP) or curP_vals[i] > 2500) { //same bin again?
-//////        ++samebin;
-//      } else {
-//        oldPhiP = binPhiP;
-//        oldCurP = binCurP;
-////        B2INFO(binPhiP << " P " << binCurP);
-//        ++(m_binsP[binPhiP][binCurP]); //increment bin
-//////        ++votes; //count used votes
-//      }
-//
-//    }
-//  }
-//////  B2INFO("Voting Done!");
-
-
 
   float angDegN[m_precision];
   float angDegP[m_precision];
@@ -221,23 +69,23 @@ void HoughTransform::vote()
     float c_phi = tmp.getPhi().getDeg(); //polar angle in deg
     float c_r = tmp.getR();
 
-    int max_phi = 90; //maximum value for voting, to stay in sane region (curvature < 2500)
-
-    int sLayer = hits[i_hit].getSuperlayerId(); //max_phi depends on super Layer
-
-    switch (sLayer) {
-      case 0:
-        max_phi = 19; //check values again
-        break;
-      case 2:
-        max_phi = 36;
-        break;
-      case 4:
-        max_phi = 59;
-        break;
-      default:
-        break;
-    }
+//    int max_phi = 90; //maximum value for voting, to stay in sane region (curvature < 2500)
+//
+//    int sLayer = hits[i_hit].getSuperlayerId(); //max_phi depends on super Layer
+//
+//    switch (sLayer) {
+//      case 0:
+//        max_phi = 19; //check values again
+//        break;
+//      case 2:
+//        max_phi = 36;
+//        break;
+//      case 4:
+//        max_phi = 59;
+//        break;
+//      default:
+//        break;
+//    }
 
     for (unsigned int i = 0; i < m_precision; ++i) {
       const float xHitN = c_r * cosine[sincosN[i]];
@@ -265,10 +113,6 @@ void HoughTransform::vote()
       while (phiP < 0)
         phiP += 360;
 
-//      if (curvatureN > 2500){  //wouldn't make it into CDC anyway
-//        ++curvecount;
-//        continue;
-//      }
       float phiScale = m_pBins / 360.0f;
       float curScale = m_cBins / 2500.0f;
 
@@ -296,8 +140,7 @@ void HoughTransform::vote()
 
     }
   }
-//  B2INFO("Votes: " << votes << " Same: " << samebin << " Max Phi: " << countmaxphi << " Total: " << total);
-//  B2INFO("Curve: " << curvecount);
+
 
 }
 
@@ -369,8 +212,8 @@ void HoughTransform::peakFinder(const int charge)
 //      B2INFO("<maxcur: " << avCur - cur);
       if (fabs(avPhi - phi) < maxphi && fabs(avCur - cur) < maxcur) { //is candidate in region?
         ++numHits;
-        avPhi = (avPhi * (numHits - 1) + phi) / numHits; //only averaging phi seems better
-        avCur = (avCur * (numHits - 1) + cur) / numHits; //only averaging phi seems better
+        avPhi = (avPhi * (numHits - 1) + phi) / numHits;
+        avCur = (avCur * (numHits - 1) + cur) / numHits;
         region.push_back(std::make_pair(phi, cur)); //add candidate to region
         i = candidates.erase(i); //erase added candidate and keep iterator valid
       } else {

@@ -46,12 +46,11 @@ class TRGCDCHoughFinder;
 class TRGCDCFitter3D;
 class TRGCDCLUT;
 
-/** A class to represent CDC.
-
-  The instance of TRGCDC is a singleton. 'TRGCDC::getTRGCDC()' gives you a
-  pointer to access the TRGCDC. Geometrical information is initialized
-  automatically. Before accessing hit information, user has to call
-  'update()' to initialize hit information event by event. */
+///  The instance of TRGCDC is a singleton. 'TRGCDC::getTRGCDC()'
+///  gives you a pointer to access the TRGCDC. Geometrical information
+///  is initialized automatically. Before accessing hit information,
+///  user has to call 'update()' to initialize hit information event
+///  by event.
 
 class TRGCDC {
 
@@ -59,23 +58,26 @@ class TRGCDC {
 
     /// returns TRGCDC object with specific configuration.
     static TRGCDC * getTRGCDC(const std::string & configFile,
+			      unsigned simulationMode = 0,
+			      unsigned firmwareSimulationMode = 0,
 			      const std::string & innerTSLUTDataFile = "?",
 			      const std::string & outerTSLUTDataFile = "?",
-			      unsigned mode = 0,
                               bool houghFinderPerfect = false,
                               unsigned houghFinderMeshX = 96,
                               unsigned houghFinderMeshY = 96);
     
-    /// returns TRGCDC object. TRGCDC should be created with specific configuration before calling this function.
+    /// returns TRGCDC object. TRGCDC should be created with specific
+    /// configuration before calling this function.
     static TRGCDC * getTRGCDC(void);
 
   private:
 
     /// Constructor
     TRGCDC(const std::string & configFile,
+	   unsigned simulationMode,
+	   unsigned firmwareSimulationMode,
 	   const std::string & innerTSLUTDataFile,
 	   const std::string & outerTSLUTDataFile,
-	   unsigned mode,
            bool houghFinderPerfect,
            unsigned houghFinderMeshX,
            unsigned houghFinderMeshY);
@@ -88,15 +90,16 @@ class TRGCDC {
                     unsigned houghFinderMeshX,
                     unsigned houghFinderMeshY);
 
-    /// configures trigger modules for detail simulation.
+    /// configures trigger modules for firmware simulation.
     void configure(void);
 
-  public:
-
-    /// simulates CDC trigger.
+    /// fast trigger simulation.
     void simulate(void);
 
+    /// simulates track segment decisions.
+
   public:// Selectors
+
     /// returns name.
     std::string name(void) const;
 
@@ -111,6 +114,9 @@ class TRGCDC {
 
     /// sets simulation mode.
     unsigned mode(unsigned);
+
+    /// returns firmware simulation mode.
+    unsigned firmwareSimulationMode(void) const;
 
     /// dumps debug information.
     void dump(const std::string & message) const;
@@ -129,10 +135,12 @@ class TRGCDC {
 
   public:// Geometry
 
-    /// returns a pointer to a wire. 0 will be returned if 'wireId' is invalid.
+    /// returns a pointer to a wire. 0 will be returned if 'wireId' is
+    /// invalid.
     const TRGCDCWire * wire(unsigned wireId) const;
 
-    /// returns a pointer to a wire. 'localId' can be negative. 0 will be returned if 'layerId' is invalid.
+    /// returns a pointer to a wire. 'localId' can be negative. 0 will
+    /// be returned if 'layerId' is invalid.
     const TRGCDCWire * wire(unsigned layerId, int localId) const;
 
     /// returns a pointer to a wire.
@@ -147,7 +155,8 @@ class TRGCDC {
     /// returns a pointer to a super-layer. 0 will be returned if 'id' is invalid.
     const std::vector<TRGCDCLayer *> * superLayer(unsigned id) const;
 
-    /// returns \# of wire layers in a super layer. 0 will be returned if 'superLayerId' is invalid.
+    /// returns \# of wire layers in a super layer. 0 will be returned
+    /// if 'superLayerId' is invalid.
     unsigned nLocalLayer(unsigned superLayerId) const;
 
     /// return \# of wires.
@@ -198,7 +207,8 @@ class TRGCDC {
     /// returns \# of track segment layers.
     unsigned nSegmentLayers(void) const;
 
-    /// returns a pointer to a track segment layer. 0 will be returned if 'id' is invalid.
+    /// returns a pointer to a track segment layer. 0 will be returned
+    /// if 'id' is invalid.
     const TRGCDCLayer * segmentLayer(unsigned id) const;
 
   public:// Event by event hit information.
@@ -212,36 +222,40 @@ class TRGCDC {
     /// updates TRGCDC wire information. clear() is called in this function.
     void update(bool mcAnalysis = true);
 
-    /// returns a list of TRGCDCWireHit. 'update()' must be called before calling this function.
+    /// returns a list of TRGCDCWireHit. 'update()' must be called
+    /// before calling this function.
     std::vector<const TRGCDCWireHit *> hits(void) const;
 
-    /// returns a list of axial hits. 'update()' must be called before calling this function.
+    /// returns a list of axial hits. 'update()' must be called before
+    /// calling this function.
     std::vector<const TRGCDCWireHit *> axialHits(void) const;
 
-    /// returns a list of stereo hits. 'update()' must be called before calling this function.
+    /// returns a list of stereo hits. 'update()' must be called
+    /// before calling this function.
     std::vector<const TRGCDCWireHit *> stereoHits(void) const;
 
-    /// returns a list of TRGCDCSegmentHit. 'simulate()' must be called before calling this function
+    /// returns a list of TRGCDCSegmentHit. 'simulate()' must be
+    /// called before calling this function
     std::vector<const TRGCDCSegmentHit *> segmentHits(void) const;
 
-    /// returns a list of TRGCDCSegmentHit in a super layer N. 'simulate()' must be called before calling this function
+    /// returns a list of TRGCDCSegmentHit in a super layer
+    /// N. 'simulate()' must be called before calling this function
     std::vector<const TRGCDCSegmentHit *> segmentHits(unsigned) const;
 
-    /// returns a list of TRGCDCSegmentHit in a axial super layer N. 'simulate()' must be called before calling this function
+    /// returns a list of TRGCDCSegmentHit in a axial super layer
+    /// N. 'simulate()' must be called before calling this function
     std::vector<const TRGCDCSegmentHit *> axialSegmentHits(unsigned) const;
 
-    /// returns a list of TRGCDCSegmentHit in a stereo super layer N. 'simulate()' must be called before calling this function
+    /// returns a list of TRGCDCSegmentHit in a stereo super layer
+    /// N. 'simulate()' must be called before calling this function
     std::vector<const TRGCDCSegmentHit *> stereoSegmentHits(unsigned) const;
 
-
-
-    /// returns a list of TRGCDCWireHitMC. 'updateMC()' must be called before calling this function.
+    /// returns a list of TRGCDCWireHitMC. 'updateMC()' must be called
+    /// before calling this function.
     std::vector<const TRGCDCWireHitMC *> hitsMC(void) const;
 
     /// returns bad hits(finding invalid hits).
 //    std::vector<const TRGCDCWireHit *> badHits(void) const;
-
-
 
   public:// Utility functions
 
@@ -271,7 +285,8 @@ class TRGCDC {
     /// returns true if w0 and w1 are neighbor.
     bool neighbor(const TRGCDCWire & w0, const TRGCDCWire & w1) const;
 
-    /// calculates corrected drift time. correctionFlag(bit 0:tof, 1:T0 offset, 2:propagation delay, 3:tan(lambda) correction)
+    /// calculates corrected drift time. correctionFlag(bit 0:tof,
+    /// 1:T0 offset, 2:propagation delay, 3:tan(lambda) correction)
 //     static void driftDistance(TLink & link,
 //                               const TTrack & track,
 //                               unsigned correctionFlag = 0,
@@ -281,6 +296,9 @@ class TRGCDC {
 
     /// returns the system clock.
     const TRGClock & systemClock(void) const;
+
+    /// returns the system clock of the front-end
+    const TRGClock & systemClockFE(void) const;
 
     /// returns the system offset in MC.
     double systemOffsetMC(void) const;
@@ -292,6 +310,7 @@ class TRGCDC {
     const TRGCDCMerger * merger(unsigned id) const;
 
   private:
+
     /// classify hits.
     void classification(void);
 
@@ -312,14 +331,17 @@ class TRGCDC {
     /// CDC trigger configuration filename.
     std::string _configFilename;
 
+    /// Simulation mode
+    unsigned _simulationMode;
+
+    /// Firmware simulation mode
+    unsigned _firmwareSimulationMode;
+
     /// The filename of LUT for the inner-most track segments.
     std::string _innerTSLUTDataFilename;
 
     /// The filename of LUT for outer track segments.
     std::string _outerTSLUTDataFilename;
-
-    /// Simulation mode
-    unsigned _mode;
 
     /// Super layers.
     std::vector<std::vector<TRGCDCLayer *> *> _superLayers;
@@ -389,6 +411,9 @@ class TRGCDC {
 
     /// CDC trigger system clock.
     const TRGClock _clock;
+
+    /// CDC FE trigger system clock.
+    const TRGClock _clockFE;
 
     /// Timing offset of CDC trigger.
     const double _offset;
@@ -557,6 +582,12 @@ TRGCDC::systemClock(void) const {
 }
 
 inline
+const TRGClock &
+TRGCDC::systemClockFE(void) const {
+    return _clockFE;
+}
+
+inline
 double
 TRGCDC::systemOffsetMC(void) const {
     return _offset;
@@ -616,13 +647,19 @@ TRGCDC::nSegmentLayers(void) const {
 inline
 unsigned
 TRGCDC::mode(void) const {
-    return _mode;
+    return _simulationMode;
 }
 
 inline
 unsigned
 TRGCDC::mode(unsigned a) {
-    return _mode = a;
+    return _simulationMode = a;
+}
+
+inline
+unsigned
+TRGCDC::firmwareSimulationMode(void) const {
+    return _firmwareSimulationMode;
 }
 
 } // namespace Belle2

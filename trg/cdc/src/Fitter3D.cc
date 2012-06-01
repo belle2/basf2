@@ -23,6 +23,8 @@
 #include <cstdlib>
 
 #include "framework/datastore/StoreArray.h"
+//#include "cdc/hitcdc/HitCDC.h"
+//#include "cdc/hitcdc/CDCSimHit.h"
 #include "cdc/dataobjects/CDCSimHit.h"
 #include "cdc/geometry/CDCGeometryPar.h"
 #include "trg/trg/Time.h"
@@ -40,9 +42,12 @@
 #include "trg/cdc/Merger.h"
 #include "trg/cdc/HoughFinder.h"
 #include "trg/cdc/LUT.h"
+#include "trg/cdc/SegmentHit.h"
+
 
 //...Global varibles...
 double rr[9]={0.188,0.4016, 0.620,0.8384,1.0568,0.2934,0.5128,0.7312,0.9496};	//can be replaced with geo-information
+double rro[9]={0.188,0.2934,0.4016, 0.5128,0.620,0.7312,0.8384,0.9496,1.0568};
 double anglest[4]={0.0702778, -0.06176, 0.069542, -0.07489};
 double ztostraw[4]={-0.508184,-0.645228,-0.687681,-0.730134};	//can be replaced with geo-information
 int ni[9]={320,320,384,448,512,576,640,704,768};
@@ -265,40 +270,51 @@ namespace Belle2 {
 
   int
     TRGCDCFitter3D::doit(const vector<TCTrack *> & trackListIn,
-			 vector<TCTrack *> & trackListOut) {
+        vector<TCTrack *> & trackListOut) {
 
       TRGDebug::enterStage("Fitter 3D");
+//	StoreArray<CDCSimHit> cdcArray("CDCSimHIts");
+//	StoreArray<CDCHit> CDCHits("CDCHits");
+//	RelationArray cdcSimHitsToCDCHits(cdcArray,CDCHits);
 
       //...TS study (loop over all TS's)...
       const TRGCDC & cdc = * TRGCDC::getTRGCDC();
-      for (unsigned i = 0; i < cdc.nSegmentLayers(); i++) {
+ /*     for (unsigned i = 0; i < cdc.nSegmentLayers(); i++) {
 	  const Belle2::TRGCDCLayer * l = cdc.segmentLayer(i);
 	  const unsigned nWires = l->nCells();
 	  if (! nWires) continue;
 	  unsigned ptn = 0;
 	  for (unsigned j = 0; j < nWires; j++) {
-	      const TCSegment & s = (TCSegment &) * (* l)[j];
+	      const TCSegment & t = (TCSegment &) * (* l)[j];
 
 	      //...Example to access LR LUT...
-	      if (TRGDebug::level()) {
+//	      if (TRGDebug::level()) {
 //		  cout << s.LUT()->name() << endl;
-	      }
+//	      }
 
 	      //...Get hit pattern...
-	      unsigned ptn = s.hitPattern();
+	      unsigned ptn = t.hitPattern();
 
-	      if (TRGDebug::level()) {
-// 		  if (ptn != 0)
-// 		      cout << s.name() << " ... ptn=" << ptn << endl;
-	      }
+//	      if (TRGDebug::level()) {
+//		  if (ptn != 0)
+//		      cout << s.name() << " ... ptn=" << ptn << endl;
+//	      }
 
 	      //...Or cal. hit pattern by my self...
-	      const std::vector<const TCWire *> & wires = s.wires();
-	      unsigned ptn2 = 0;
+	      const std::vector<const TCWire *> & wires = t.wires();
+//	      unsigned ptn2 = 0;
 	      for (unsigned j = 0; j < wires.size(); j++) {
+		int lid=0;
 		  const TRGSignal & s = wires[j]->triggerOutput();
 		  if (s.active()) {
 //		      ptn2 |= (1 << j);
+			unsigned ind=wires[j]->hit()->iCDCHit();
+			int simind=cdcSimHitsToCDCHits[ind].getFromIndex();
+			CDCSimHit &h=*cdcArray[simind];
+			lid=h.getLayerId();
+			if(lid==0){
+				cout << "pattern:"<<ptn<<" " << h.getPosFlag()<<"."<< endl;
+			}
 
 		      //...Get index for CDCHit...
 //		      unsigned ind = wires[j]->hit()->iCDCHit();
@@ -306,12 +322,12 @@ namespace Belle2 {
 		  }
 	      }
 
-	      if (TRGDebug::level()) {
-		  if (ptn != 0)
-		      cout << s.name() << " ... ptn2=" << ptn2 << endl;
-	      }
+//	      if (TRGDebug::level()) {
+//		  if (ptn != 0)
+//		      cout << s.name() << " ... ptn2=" << ptn2 << endl;
+//	      }
 	  }
-      }
+      }*/
     
 
 
@@ -330,7 +346,7 @@ namespace Belle2 {
         //...Access to a track...
         const TCTrack & t = * trackListIn[i];
 
-        t.dump("detail");
+ //       t.dump("detail");
 
         //...Super layer loop...
         for (unsigned i = 0; i < _cdc.nSuperLayers(); i++) {
@@ -353,13 +369,30 @@ namespace Belle2 {
           ckt=ckt*chk[i];
 
           //...Access to a track segment...
-          links[0]->dump("detail");
-          //const TCSegment & s = * (TCSegment *) links[0]->hit();
-	  //const TRGCDCCell *s = & links[0]->hit()->cell();
-          const TCSegment * s = dynamic_cast<const TCSegment *>(& links[0]->hit()->cell());
-          phi[i]=(double) s->localId()/ni[i]*4*M_PI;
-	  cout << "===> " << s->hit()->drift() << endl;
+//         links[0]->dump("detail");
+//          const TCSegment & s =  (TCSegment &) links[0]->hit()->cell();
+//         const TRGCDCCell *s = & links[0]->hit()->cell();
+    //      phi[i]=(double) s->localId()/ni[i]*4*M_PI;
+//		double dphi=s->hit()->drift()*10;
+//		s.drift();
+//	cout << lutcomp << endl;
+	//...using LRLUT to determine Left/Right(assume drift() will return drift distance)
+	const TCSegment * s = dynamic_cast<const TCSegment *>(& links[0]->hit()->cell());
+        phi[i]=(double) s->localId()/ni[i]*4*M_PI;
+
+	///...Using Drift time information
+	int lutcomp=s->LUT()->getLRLUT(s->hitPattern(),i);
+	float dphi=s->hit()->drift()*10;
+	dphi=atan(dphi/rro[i]/1000);
+	if(lutcomp==0){phi[i]-=dphi;}
+	else if(lutcomp==1){phi[i]+=dphi;}
+	else{
+		phi[i]=phi[i];
+	//	nfrac--;
+	}
+
         }
+
 
         //...Do fitting job here (or call a fitting function)...
         if(ckt){
@@ -371,9 +404,10 @@ namespace Belle2 {
           double phierror[5]={0.0085106,0.0039841,0.0025806,0.0019084,0.001514};
           int qqq=0;
 
-          kkk++;
+          //kkk++;
           //re-ordering
-          cout << "tsimTS/"<<phi2[0]<<" " <<phi2[1]<<" "<<phi2[2]<<" "<<phi2[3]<<" "<<phi2[4]<<" "<<phi2[5]<<" "<<phi2[6]<<" "<<phi2[7]<<" "<<phi2[8] <<"]" << endl;
+//          cout << "tsimTS/"<<phi2[0]<<" " <<phi2[1]<<" "<<phi2[2]<<" "<<phi2[3]<<" "<<phi2[4]<<" "<<phi2[5]<<" "<<phi2[6]<<" "<<phi2[7]<<" "<<phi2[8] <<"]" << endl;
+//	cout << "frac :" << nfrac << endl;
 
           //Sign Finder
           int mysign;
@@ -431,7 +465,7 @@ namespace Belle2 {
           //Change the range to [-pi~pi]
           if(myphi0>M_PI){myphi0-=2*M_PI;}
           if(myphi0<-M_PI){myphi0+=2*M_PI;}
-          cout << "track center " << myphi0 << endl;
+//          cout << "track center " << myphi0 << endl;
 
           //int phi_st_int[4],myphi_int,rho_int,acos_int;
 
@@ -461,7 +495,7 @@ namespace Belle2 {
 
           //The actual start of the fitter
           double myphiz[4];	
-          cout << "rho " << rho<< " lut00 " <<lut00[(int) rho]<< " phi 5 " << phi2[5] << endl;
+//          cout << "rho " << rho<< " lut00 " <<lut00[(int) rho]<< " phi 5 " << phi2[5] << endl;
 
           if(mysign==1){
             myphiz[0]=(lut00[(int)rho]+1652)+myphi0-phi2[5];
@@ -479,7 +513,7 @@ namespace Belle2 {
             if(myphiz[i]>1023)qqq=1;
           }	
           if(qqq) continue;
-          cout << "myphiz " << myphiz[0]<<" " <<myphiz[1]<<" "<<myphiz[2]<< " " <<myphiz[3]<<endl;
+//          cout << "myphiz " << myphiz[0]<<" " <<myphiz[1]<<" "<<myphiz[2]<< " " <<myphiz[3]<<endl;
 
 
           //Change myphi to correct z lut address.
@@ -492,7 +526,7 @@ namespace Belle2 {
           zz[2]=zz_2_lut[(int)myphiz[2]];
           zz[3]=zz_3_lut[(int)myphiz[3]];
 
-          cout << "zz " << zz[0]<<" " <<zz[1]<<" "<<zz[2]<< " " <<zz[3]<<endl;
+//          cout << "zz " << zz[0]<<" " <<zz[1]<<" "<<zz[2]<< " " <<zz[3]<<endl;
 
 
           //rz fitter
@@ -544,10 +578,10 @@ namespace Belle2 {
           ztheta=M_PI/2.-atan(cot);
           ztheta*=180./M_PI;
 
-          cout << "tsimz0/"  << z0*100 <<"]"<<endl;
-          cout << "tsimpt/"  << pt <<"]"<<endl;
-          cout << "tsimth/"  << ztheta <<"]"<<endl;
-          cout << "tsimpi/" << myphi0*180/M_PI*3.2/intnum3 << "]" << endl;
+//          cout << "tsimz0/"  << z0*100 <<"]"<<endl;
+//          cout << "tsimpt/"  << pt <<"]"<<endl;
+//          cout << "tsimth/"  << ztheta <<"]"<<endl;
+//          cout << "tsimpi/" << myphi0*180/M_PI*3.2/intnum3 << "]" << endl;
 
         }  
       }

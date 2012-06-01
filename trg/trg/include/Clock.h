@@ -33,10 +33,17 @@ namespace Belle2 {
 class TRGClock {
 
   public:
+
     /// Constructor. "offset" is in unit of ns. "frequency" is in unit of MHz.
-    TRGClock(double offset,
-             double frequency,
-             const std::string & name = "a clock");
+    TRGClock(const std::string & name,
+	     double offset,
+             double frequency);
+
+    /// Constructor with clock source.
+    TRGClock(const std::string & name,
+	     const TRGClock &,
+	     unsigned multiplicationFactor,
+	     unsigned divisionFactor = 1);
 
     /// Destructor
     virtual ~TRGClock();
@@ -46,16 +53,26 @@ class TRGClock {
     /// returns clock point.
     int time(double timing) const;
 
+    /// returns absolute time.
+    double absoluteTime(int time) const;
+
+    /// returns over shoot.
+    double overShoot(double timing) const;
+
     /// returns min \# of clocks to cover given time period.
     int unit(double period) const;
 
-    /// returns offset.
+    /// returns offset in nano second.
     double offset(void) const;
+
+    /// returns frequency in MHz.
+    double frequency(void) const;
 
     /// returns name.
     const std::string & name(void) const;
 
-    /// dumps contents. "message" is to select information to dump. "pre" will be printed in head of each line.
+    /// dumps contents. "message" is to select information to
+    /// dump. "pre" will be printed in head of each line.
     void dump(const std::string & message = "",
               const std::string & pre = "") const;
 
@@ -80,12 +97,33 @@ class TRGClock {
     TRGTime maxTRGTime(bool edge) const;
 
   private:
-    const double _offset;
-    const double _frequency;
-    const double _cycle;
-    int _min;
-    int _max;
+
+    /// Name.
     const std::string _name;
+
+    /// Clock source.
+    const TRGClock * _source;
+
+    /// Multiplication factor.
+    const unsigned _multi;
+
+    /// Division factor.
+    const unsigned _div;
+
+    /// Clock offset in nano second.
+    const double _offset;
+
+    /// Frequency in MHz
+    const double _frequency;
+
+    /// Clock cycle in nano second.
+    const double _cycle;
+
+    /// Clock min. count.
+    int _min;
+
+    /// Clock max. count.
+    int _max;
 };
 
 //-----------------------------------------------------------------------------
@@ -120,6 +158,12 @@ inline
 int
 TRGClock::unit(double a) const {
     return int(a / _cycle) + 1;
+}
+
+inline
+double
+TRGClock::frequency(void) const {
+    return _frequency;
 }
 
 } // namespace Belle2

@@ -121,29 +121,39 @@ TRGCDCSegment::name(void) const {
 void
 TCSegment::simulate(void) {
 
+    //...System clocks...
+    const TRGClock & systemClock = TRGCDC::getTRGCDC()->systemClock();
+    const TRGClock & systemClockFE = TRGCDC::getTRGCDC()->systemClockFE();
+
     //...Get wire informtion...
     const unsigned n = _wires.size();
     unsigned nHits = 0;
     vector<TRGSignal> signals;
     for (unsigned i = 0; i < n; i++) {
-        const TRGSignal & s = _wires[i]->triggerOutput();
+
+	//...Copy signal from a wire...
+        const TRGSignal & s = _wires[i]->timing();
         signals.push_back(s);
 
-        if (s.active()) {
+	//...Widen it...
+	static const unsigned width = systemClockFE.unit(400);
+	signals.back().widen(width);
+
+	//...Change clock...
+
+	signals.back().dump("detail", " 0 ");
+
+	signals.back().clock(systemClock);
+
+	signals.back().dump("detail", " 1 ");
+
+        if (s.active())
             ++nHits;
-        }
     }
 
     //...Check number of hit wires...
     if (nHits < 4)
         return;
-
-    //...Widen signal...400 ns
-    static const unsigned width =
-        TRGCDC::getTRGCDC()->systemClock().unit(400);
-    for (unsigned i = 0; i < n; i++) {
-        signals[i].widen(width);
-    }
 
     //...Signal simulation...
     TRGSignal l0, l1, l2, l3, l4;
@@ -188,7 +198,7 @@ unsigned
 TRGCDCSegment::hitPattern(void) const {
     unsigned ptn = 0;
     for (unsigned i = 0; i < _wires.size(); i++) {
-        const TRGSignal & s = _wires[i]->triggerOutput();
+        const TRGSignal & s = _wires[i]->timing();
         if (s.active())
 	    ptn |= (1 << i);
     }

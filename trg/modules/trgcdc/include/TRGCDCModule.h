@@ -71,7 +71,10 @@ class TRGCDCModule : public Module {
     int _curlBackStop;
 
     /// Mode for TRGCDC simulation. 0:do everything, 1:stop after the track segment simulation. Default is 0.
-    int _mode;
+    int _simulationMode;
+
+    /// Switch to simulate firmwares. 0:do nothing, 1:do everything
+    int _firmwareSimulationMode;
 
     /// Switch for the perfect finder.
     bool _hFinderPerfect;

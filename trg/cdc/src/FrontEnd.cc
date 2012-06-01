@@ -25,7 +25,8 @@ namespace Belle2 {
 
 TRGCDCFrontEnd::TRGCDCFrontEnd(const std::string & name,
                                const TRGClock & clock)
-    : TRGBoard(name, clock) {
+    : TRGBoard(name, clock),
+      _input(name + " input") {
 }
 
 TRGCDCFrontEnd::~TRGCDCFrontEnd() {
@@ -114,6 +115,18 @@ TRGCDCFrontEnd::implementationPort(const TRGCDCFrontEnd::boardType & ,
     outfile << "    );" << endl;
 
     return 0;
+}
+
+void
+TRGCDCFrontEnd::push_back(const TRGCDCWire * a) {
+    std::vector<const TRGCDCWire *>::push_back(a);
+    _input += a->timing();
+}
+
+void
+TRGCDCFrontEnd::dump(const string & message, const string & pre) const {
+    TRGBoard::dump(message, pre);
+    _input.dump(message, pre + "    ");
 }
 
 } // namespace Belle2

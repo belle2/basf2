@@ -27,4 +27,9 @@ TRGBoard::TRGBoard(const std::string & name, const TRGClock & clock) :
 TRGBoard::~TRGBoard() {
 }
 
+void
+TRGBoard::dump(const string &, const string & pre) const {
+    cout << pre << _name << "(" << _clock->name() << ")" << endl;
+}
+
 } // namespace Belle2

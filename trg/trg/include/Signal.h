@@ -25,6 +25,7 @@ class TRGTime;
 class TRGSignal {
 
   public:
+
     /// Default constructor.
     TRGSignal();
 
@@ -45,8 +46,8 @@ class TRGSignal {
     /// returns name.
     const std::string & name(void) const;
 
-    /// sets and returns name.
-    const std::string & name(const std::string & newName);
+    /// returns clock.
+    const TRGClock & clock(void) const;
 
     /// returns \# of edges.
     unsigned nEdges(void) const;
@@ -57,7 +58,8 @@ class TRGSignal {
     /// returns true if signal is active in given clock position.
     bool active(int clockPosition) const;
 
-    /// dumps contents. "message" is to select information to dump. "pre" will be printed in head of each line.
+    /// dumps contents. "message" is to select information to
+    /// dump. "pre" will be printed in head of each line.
     void dump(const std::string & message = "",
               const std::string & pre = "") const;
 
@@ -65,6 +67,12 @@ class TRGSignal {
 
     /// clears contents.
     void clear(void);
+
+    /// sets and returns name.
+    const std::string & name(const std::string & newName);
+
+    /// changes clock.
+    const TRGClock & clock(const TRGClock &);
 
   public:// Operators
 
@@ -99,11 +107,19 @@ class TRGSignal {
     const TRGTime * operator[](unsigned i) const;
 
   private:
+
+    /// And operation.
     static std::vector<TRGTime> andOperation(const std::vector<TRGTime> &);
+
+    /// Or operation
     static std::vector<TRGTime> orOperation(const std::vector<TRGTime> &);
 
   private:
+
+    /// Timing history.
     std::vector<TRGTime> _history;
+
+    /// Name.
     std::string _name;
 };
 
@@ -191,6 +207,24 @@ inline
 const TRGTime *
 TRGSignal::operator[](unsigned i) const {
     return & _history[i];
+}
+
+inline
+const TRGClock &
+TRGSignal::clock(void) const {
+
+    //...Assuming clock is same for all TRGTime.
+    return _history[0].clock();
+}
+
+inline
+const TRGClock &
+TRGSignal::clock(const TRGClock & c) {
+
+    for (unsigned i = 0; i < _history.size(); i++)
+	_history[i].clock(c);
+	
+    return _history[0].clock();
 }
 
 } // namespace Belle2

@@ -17,6 +17,7 @@
 #include <fstream>
 #include <string>
 #include "trg/trg/Board.h"
+#include "trg/trg/SignalVector.h"
 #include "trg/trg/Link.h"
 
 #ifdef TRGCDC_SHORT_NAMES
@@ -40,6 +41,7 @@ class TRGCDCFrontEnd
     };
 
   public:
+
     /// Constructor.
     TRGCDCFrontEnd(const std::string & name, const TRGClock &);
 
@@ -56,27 +58,30 @@ class TRGCDCFrontEnd
 
   public:// VHDL utilities
 
-    /// make a VHDL component file. Non-zero value will be returned if errors occured.
+    /// make a VHDL component file. Non-zero value will be returned if
+    /// errors occured.
     static int implementation(const boardType & type, std::ofstream &);
 
     /// writes a port map.
     static int implementationPort(const boardType & type, std::ofstream &);
 
-//     /// dumps contents. "message" is to select information to dump. "pre" will be printed in head of each line.
-//     void dump(const std::string & message = "",
-//               const std::string & pre = "") const;
+  public:// Configuration
 
-  public:// Modifiers
+    void push_back(const TRGCDCWire *);
+
+//     /// dumps contents. "message" is to select information to
+//     dump. "pre" will be printed in head of each line.
+    void dump(const std::string & message = "",
+	      const std::string & pre = "") const;
+
+  private:
+
+    /// Input signal vector.
+    TRGSignalVector _input;
 
 };
 
 //-----------------------------------------------------------------------------
-
-// inline
-// void
-// TRGCDCFrontEnd::append(const TRGCDCWire * w) {
-//     _wires.push_back(w);
-// }
 
 } // namespace Belle2
 

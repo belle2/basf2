@@ -54,7 +54,7 @@ class TRGCDCSegmentHit : public TRGCDCCellHit {
     const TRGCDCSegment & segment(void) const;
 
     /// returns trigger output. Null will returned if no signal.
-    const TRGSignal & triggerOutput(void) const;
+    const TRGSignal & timing(void) const;
 
   public:// Modifiers
 
@@ -75,8 +75,8 @@ class TRGCDCSegmentHit : public TRGCDCCellHit {
 
 inline
 const TRGSignal &
-TRGCDCSegmentHit::triggerOutput(void) const {
-    return cell().triggerOutput();
+TRGCDCSegmentHit::timing(void) const {
+    return cell().timing();
 }
 
 } // namespace Belle2

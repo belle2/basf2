@@ -46,11 +46,10 @@ class TRGCDCLUT {
     std::string version(void) const;
 
     /// initialize LookUpTable(LUT)
-//  void doit(void);
     void initialize(const std::string & filename);
 
     /// get LR componet from pattern id. Return value 0:right(decrease phi), 1:left(increase phi), 2:not determined
-    int getLRLUT(int) const;
+    int getLRLUT(int,int) const;
 
   private:
 
@@ -62,6 +61,9 @@ class TRGCDCLUT {
 
     /// left/right lookuptable except for inner-most super layer
     int m_LRLUT[2048];
+
+    /// left/right lookuptable for inner-most super layer
+    int m_LRLUTIN[32768];
 
 };
 

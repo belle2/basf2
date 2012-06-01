@@ -306,7 +306,7 @@ TRGCDCHoughFinder::doitPerfectlySingleTrack(
             const TCSegment & s = (TCSegment &) * (* l)[j];
 
             //...Select hit TS only...
-            const TRGSignal & timing = s.triggerOutput();
+            const TRGSignal & timing = s.timing();
             if (! timing.active())
                 continue;
 
@@ -371,7 +371,7 @@ TRGCDCHoughFinder::doitPerfectly(vector<TRGCDCTrack *> & trackList) {
     const vector<const TCSHit *> hits = _cdc.segmentHits();
     for (unsigned i = 0; i < hits.size(); i++) {
 	const TCSHit & ts = * hits[i];
-	if (! ts.triggerOutput().active()) continue;
+	if (! ts.timing().active()) continue;
 	const TCWHit * wh = ts.segment().center().hit();
 	if (! wh) continue;
 	const CDCSimHit & sh = * wh->simHit();
@@ -422,7 +422,7 @@ TRGCDCHoughFinder::doitPerfectly(vector<TRGCDCTrack *> & trackList) {
  	    TCLink * best = 0;
 	    int timeMin = 99999;
  	    for (unsigned j = 0; j < layers[i].size(); j++) {
- 		const TRGTime & t = * (layers[i][j]->cell()->triggerOutput())[0];
+ 		const TRGTime & t = * (layers[i][j]->cell()->timing())[0];
  		if (t.time() < timeMin) {
  		    timeMin = t.time();
  		    best = layers[i][j];
@@ -499,9 +499,9 @@ TRGCDCHoughFinder::selectBestHits(const vector<TCLink *> & links) const {
 	}
 
 	TCLink * best = layers[i][0];
-	int timeMin = (layers[i][0]->cell()->triggerOutput())[0]->time();
+	int timeMin = (layers[i][0]->cell()->timing())[0]->time();
 	for (unsigned j = 1; j < layers[i].size(); j++) {
-	    const TRGTime & t = * (layers[i][j]->cell()->triggerOutput())[0];
+	    const TRGTime & t = * (layers[i][j]->cell()->timing())[0];
 	    if (t.time() < timeMin) {
 		timeMin = t.time();
 		best = layers[i][j];

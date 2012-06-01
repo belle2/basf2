@@ -22,20 +22,24 @@ namespace Belle2 {
 class TRGSignal;
 class TRGClock;
 
-/// A class to represent a signal timing in the trigger system. Unit is nano second.
+/// A class to represent a signal timing in the trigger system. Unit
+/// is nano second.
 class TRGTime {
 
   public:
+
     /// Copy constructor.
     TRGTime(const TRGTime &);
 
-    /// Constructor with clock. For rising edge, edge must be true. Given timing is syncronized to clock.
+    /// Constructor with clock. For rising edge, edge must be
+    /// true. Given timing is syncronized to clock.
     TRGTime(double timing,
             bool edge,
             const TRGClock & clock,
             const std::string & name = "signal");
 
-    /// Constructor with clock. For rising edge, edge must be true. Given timing is syncronized to clock.
+    /// Constructor with clock. For rising edge, edge must be
+    /// true. Given timing is syncronized to clock.
     TRGTime(int clockPosition,
             bool edge,
             const TRGClock & clock,
@@ -61,18 +65,26 @@ class TRGTime {
     /// returns timing in clock position.
     int time(void) const;
 
-    /// dumps contents. "message" is to select information to dump. "pre" will be printed in head of each line.
+    /// dumps contents. "message" is to select information to
+    /// dump. "pre" will be printed in head of each line.
     void dump(const std::string & message = "",
               const std::string & pre = "") const;
 
   public:// Operators
 
+    /// changes clock.
+    const TRGClock & clock(const TRGClock &);
+
     /// adding two TRGTime. A result is TRGSignal.
     TRGSignal operator&(const TRGTime &) const;
+
+    /// adding two TRGTime. A result is TRGSignal.
     TRGSignal operator&(const TRGSignal &) const;
 
     /// oring two TRGTime. A result is TRGSignal.
     TRGSignal operator|(const TRGTime &) const;
+
+    /// oring two TRGTime. A result is TRGSignal.
     TRGSignal operator|(const TRGSignal &) const;
 
     /// sets and returns timing in clock position.

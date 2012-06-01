@@ -30,6 +30,7 @@
 #include "trg/cdc/FrontEnd.h"
 #include "trg/cdc/Merger.h"
 #include "trg/cdc/DisplayDrawingAreaRphi.h"
+#include "cdc/dataobjects/CDCSimHit.h"
 
 using namespace std;
 
@@ -227,7 +228,7 @@ TRGCDCDisplayDrawingAreaRphi::drawHits(void) {
         //...Points...
         const TCWire & w = _hits[i]->wire();
         const HepGeom::Point3D<double> & p = w.backwardPosition();
-        double radius = _hits[i]->drift();
+	const double radius = _hits[i]->drift();
 
         colormap->alloc_color(_hitsColor[i]);
         _gc->set_foreground(_hitsColor[i]);
@@ -235,6 +236,14 @@ TRGCDCDisplayDrawingAreaRphi::drawHits(void) {
                                  Gdk::LINE_SOLID,
                                  Gdk::CAP_NOT_LAST,
                                  Gdk::JOIN_MITER);
+//         _window->draw_arc(_gc,
+//                           0,
+//                           x((p.x() - radiusMC) * 10),
+//                           y((p.y() + radiusMC) * 10),
+//                           int(2 * radiusMC * 10 * _scale),
+//                           int(2 * radiusMC * 10 * _scale),
+//                           0,
+//                           360 * 64);
         _window->draw_arc(_gc,
                           0,
                           x((p.x() - radius) * 10),
@@ -315,6 +324,9 @@ TRGCDCDisplayDrawingAreaRphi::drawSegment(const TCSegment & w,
     for (unsigned i = 0; i < n; i++) {
         drawWire(* wires[i], lineWidth, c, s);
     }
+
+//     Glib::RefPtr<Gdk::Colormap> colormap = get_default_colormap();
+//     const double radiusTDC = w.timing().time() * 
 }
 
 void

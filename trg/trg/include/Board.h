@@ -26,6 +26,7 @@ class TRGLink;
 class TRGBoard {
 
   public:
+
     /// Constructor.
     TRGBoard(const std::string & name, const TRGClock &);
 
@@ -40,7 +41,8 @@ class TRGBoard {
     /// returns clock.
     const TRGClock & clock(void) const;
 
-    /// dumps contents. "message" is to select information to dump. "pre" will be printed in head of each line.
+    /// dumps contents. "message" is to select information to
+    /// dump. "pre" will be printed in head of each line.
     void dump(const std::string & message = "",
               const std::string & pre = "") const;
 

@@ -60,7 +60,7 @@ class TRGCDCSegment : public TRGCDCCell {
     const TRGCDCWire & center(void) const;
 
     /// returns trigger output. Null will returned if no signal.
-    const TRGSignal & triggerOutput(void) const;
+    const TRGSignal & timing(void) const;
 
     /// returns a pointer to a TRGCDCSegmentHit.
     const TRGCDCSegmentHit * hit(void) const;
@@ -135,7 +135,7 @@ TRGCDCSegment::operator[](unsigned id) const {
 
 inline
 const TRGSignal &
-TRGCDCSegment::triggerOutput(void) const {
+TRGCDCSegment::timing(void) const {
     return _signal;
 }
 

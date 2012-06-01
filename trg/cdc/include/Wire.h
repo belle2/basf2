@@ -97,8 +97,8 @@ class TRGCDCWire : public TRGCDCCell {
 
   public:// TRG
 
-    /// returns trigger output. Null will returned if no signal.
-    const TRGSignal & triggerOutput(void) const;
+    /// returns an input to the trigger. This is sync'ed to 1GHz clock.
+    const TRGSignal & timing(void) const;
 
   private:
 
@@ -106,8 +106,8 @@ class TRGCDCWire : public TRGCDCCell {
 //  std::vector<const TRGCDCWireHitMC * const> _mcHits;
     std::vector<const TRGCDCWireHitMC *> _mcHits;
 
-    /// Trigger output. This will be moved somewhere else in future.
-    mutable TRGSignal _triggerOutput;
+    /// Trigger output.
+    mutable TRGSignal _timing;
 
     /// Complete access from TRGCDC.
     friend class TRGCDC;
@@ -149,6 +149,12 @@ TRGCDCWire::adjacent(const TRGCDCWire & w) const {
         if (neighbor(i) == & w)
             return true;
     return false;
+}
+
+inline
+const TRGSignal &
+TRGCDCWire::timing(void) const {
+    return _timing;
 }
 
 } // namespace Belle2

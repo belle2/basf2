@@ -36,8 +36,8 @@ TRGCDCWire::TRGCDCWire(unsigned id,
                        const P3D & bp)
     : TCCell(id, localId, l, fp, bp),
       _mcHits(),
-      _triggerOutput() {
-    _triggerOutput.name(name() + string("to"));
+      _timing() {
+    _timing.name(name() + string("to"));
 }
 
 TRGCDCWire::~TRGCDCWire() {
@@ -56,10 +56,10 @@ TRGCDCWire::dump(const string & msg, const string & pre) const {
         for (unsigned i = 0; i < 7; i++)
             if (neighbor(i))
                 neighbor(i)->dump("", pre + TRGUtil::itostring(i) + "   ");
-    }    
+    }
     if (msg.find("trigger") != string::npos ||
         msg.find("detail") != string::npos) {
-	triggerOutput().dump(msg, pre + "    ");
+	timing().dump(msg, pre + "    ");
     }    
 }
   
@@ -369,7 +369,7 @@ TRGCDCWire::clear(void) {
         delete _mcHits[i];
     _mcHits.clear();
 
-    _triggerOutput.clear();
+    _timing.clear();
 }
 
 string
@@ -383,34 +383,6 @@ TRGCDCWire::name(void) const {
         TRGUtil::itostring(layerId()) +
         string("=") +
         TRGUtil::itostring(localId());
-}
-
-const TRGSignal &
-TRGCDCWire::triggerOutput(void) const {
-    if (! hit()) {
-        return _triggerOutput;
-    }
-    else {
-
-        //...Clock...
-        const TRGClock & clock = TRGCDC::getTRGCDC()->systemClock();
-
-        //...Drift legnth(micron) to drift time(ns)...
-        //   coefficient used here must be re-calculated.
-        float driftTime = hit()->drift() * 10 * 1000 / 40;
-        
-//      cout << name() << " drift=" << _hit->drift() << endl;
-
-        TRGTime rise = TRGTime(driftTime, true, clock, name() + string("trg"));
-        TRGTime fall = rise;
-        fall.shift(1).reverse();
-        _triggerOutput = TRGSignal(rise & fall);
-//      _triggerOutput->name(name() + string("to"));
-//      _triggerOutput->dump();
-        
-        return _triggerOutput;
-
-    }
 }
 
 } // namespace Belle2

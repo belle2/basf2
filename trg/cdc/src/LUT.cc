@@ -48,16 +48,27 @@ namespace Belle2{
 	    cout << "              LUT is not initialized yet" << endl;
 	    return;
 	}
-	for(int i=0; i<2048;i++){
-	    openFile >> lutcomp;
-	    m_LRLUT[i]=lutcomp;
+	if(std::strstr(filename.c_str(),"LRLUT.coe")){
+		for(int i=0; i<2048;i++){
+		    openFile >> lutcomp;
+		    m_LRLUT[i]=lutcomp;
+		}
+	}
+	else if(strstr(filename.c_str(),"LRLUTIN.coe")){
+		for(int i=0; i<32768;i++){
+		    openFile >> lutcomp;
+		    m_LRLUTIN[i]=lutcomp;
+		}
 	}
 	cout << "TTRGCDCLUT ... LUT(" << _name << ") initilized with "
 	     << filename << endl;
     }
 
-    int TRGCDCLUT::getLRLUT(int ptn) const {
-	return m_LRLUT[ptn];
+	/// using pattenr(ptn) and supler layer id(slid) to check left/right
+    int TRGCDCLUT::getLRLUT(int ptn,int slid) const {
+	if(slid) return m_LRLUT[ptn];
+	else return m_LRLUTIN[ptn];
+
     }
 }
 

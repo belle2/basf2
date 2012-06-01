@@ -87,9 +87,11 @@ TRGTime:: dump(const std::string & msg,
         cout << " . ";
 
     cout << _time;
+    cout << " abs=" << _clock->absoluteTime(_time);
     if (msg.find("name") != string::npos ||
-        msg.find("detail") != string::npos)
-        cout << "(" << _name << ")";
+        msg.find("detail") != string::npos) {
+        cout << " (" << _name << ")";
+    }
     cout << endl;
 }
 
@@ -105,6 +107,13 @@ TRGTime::sortByTime(const TRGTime & a, const TRGTime & b) {
             return true;
     }
     return false;
+}
+
+const TRGClock &
+TRGTime::clock(const TRGClock & c) {
+    const double t = _clock->absoluteTime(_time);
+    _clock = & c;
+    _time = c.time(t);
 }
 
 } // namespace Belle2

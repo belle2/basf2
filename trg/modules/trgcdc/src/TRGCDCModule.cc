@@ -24,30 +24,29 @@ using namespace std;
 
 namespace Belle2 {
 
-  REG_MODULE(TRGCDC);
+REG_MODULE(TRGCDC);
 
-  string
-  TRGCDCModule::version() const
-  {
+string
+TRGCDCModule::version() const {
     return string("TRGCDCModule 5.07");
-  }
+}
 
-  TRGCDCModule::TRGCDCModule()
+TRGCDCModule::TRGCDCModule()
     : Module::Module(),
       _debugLevel(0),
       _configFilename("TRGCDCConfig.dat"),
       _innerTSLUTDataFilename("undefined"),
       _outerTSLUTDataFilename("undefined"),
       _curlBackStop(0),
-      _mode(0),
+      _simulationMode(0),
+      _firmwareSimulationMode(0),
       _hFinderPerfect(false),
 //    _hFinderMeshX(96),
       _hFinderMeshX(180),
 //    _hFinderMeshY(96),
       _hFinderMeshY(24),
       _cdc(0),
-      _sa(0)
-  {
+      _sa(0) {
 
     string desc = "TRGCDCModule(" + version() + ")";
     setDescription(desc);
@@ -74,7 +73,11 @@ namespace Belle2 {
              _hFinderPerfect,
              "Hough finder perfect option",
              _hFinderPerfect);
-    addParam("SimulationMode", _mode, "TRGCDC simulation mode", _mode);
+    addParam("SimulationMode", _simulationMode, "TRGCDC simulation mode", _simulationMode);
+    addParam("FirmwareSimulationMode",
+	     _firmwareSimulationMode,
+	     "TRGCDC firmware simulation mode",
+	     _firmwareSimulationMode);
     addParam("HoughFinderMeshX",
              _hFinderMeshX,
              "Hough finder # mesh in x",
@@ -128,26 +131,26 @@ namespace Belle2 {
     }
   }
 
-  void
-  TRGCDCModule::beginRun()
-  {
+void
+TRGCDCModule::beginRun() {
 
     //...CDC trigger config. name...
     static string cfn = _configFilename;
 
     //...CDC trigger...
     if ((cfn != _configFilename) || (_cdc == 0))
-      _cdc = TRGCDC::getTRGCDC(_configFilename,
-                               _innerTSLUTDataFilename,
-                               _outerTSLUTDataFilename,
-                               _mode,
-                               _hFinderPerfect,
-                               _hFinderMeshX,
-                               _hFinderMeshY);
+	_cdc = TRGCDC::getTRGCDC(_configFilename,
+				 _simulationMode,
+				 _firmwareSimulationMode,
+				 _innerTSLUTDataFilename,
+				 _outerTSLUTDataFilename,
+				 _hFinderPerfect,
+				 _hFinderMeshX,
+				 _hFinderMeshY);
 
     if (TRGDebug::level())
-      cout << "TRGCDCModule ... beginRun called " << endl;
-  }
+	cout << "TRGCDCModule ... beginRun called " << endl;
+}
 
   void
   TRGCDCModule::event()

@@ -63,7 +63,7 @@ TRGCDC::name(void) const {
 
 string
 TRGCDC::version(void) const {
-    return string("TRGCDC 5.13");
+    return string("TRGCDC 5.14");
 }
 
 TRGCDC *
@@ -71,9 +71,10 @@ TRGCDC::_cdc = 0;
 
 TRGCDC *
 TRGCDC::getTRGCDC(const string & configFile,
+		  unsigned simulationMode,
+		  unsigned firmwareSimulationMode,
 		  const string & innerTSLUTDataFile,
 		  const string & outerTSLUTDataFile,
-		  unsigned mode,
                   bool houghFinderPerfect,
                   unsigned houghFinderMeshX,
                   unsigned houghFinderMeshY) {
@@ -82,9 +83,10 @@ TRGCDC::getTRGCDC(const string & configFile,
 
     if (configFile != "good-bye") {
         _cdc = new TRGCDC(configFile,
+			  simulationMode,
+			  firmwareSimulationMode,
 			  innerTSLUTDataFile,
 			  outerTSLUTDataFile,
-			  mode,
                           houghFinderPerfect,
                           houghFinderMeshX,
                           houghFinderMeshY);
@@ -106,22 +108,25 @@ TRGCDC::getTRGCDC(void) {
 }
 
 TRGCDC::TRGCDC(const string & configFile,
+	       unsigned simulationMode,
+	       unsigned firmwareSimulationMode,
 	       const string & innerTSLUTDataFile,
 	       const string & outerTSLUTDataFile,
-	       unsigned mode,
 	       bool houghFinderPerfect,
 	       unsigned houghFinderMeshX,
 	       unsigned houghFinderMeshY) 
     : _debugLevel(0),
       _configFilename(configFile),
+      _simulationMode(simulationMode),
+      _firmwareSimulationMode(firmwareSimulationMode),
       _innerTSLUTDataFilename(innerTSLUTDataFile),
       _outerTSLUTDataFilename(outerTSLUTDataFile),
-      _mode(mode),
       _fudgeFactor(1.),
       _width(0),
       _r(0),
       _r2(0),
-      _clock(TRGClock(2.7, 125.000, "CDCTrigge system clock")),
+      _clock("CDCTrigge system clock", Belle2_GDL::GDLSystemClock, 1),
+      _clockFE("CDCFETrigge system clock", Belle2_GDL::GDLSystemClock, 8),
       _offset(5.3),
       _hFinder(0),
       _fitter3D(0) {
@@ -140,7 +145,7 @@ TRGCDC::TRGCDC(const string & configFile,
     if (TRGDebug::level()) {
         cout << "TRGCDC ... TRGCDC initializing with " << _configFilename
              << endl
-	     << "           mode=0x" << hex << _mode << dec << endl;
+	     << "           mode=0x" << hex << _simulationMode << dec << endl;
     }
 
     initialize(houghFinderPerfect, houghFinderMeshX, houghFinderMeshY);
@@ -149,6 +154,7 @@ TRGCDC::TRGCDC(const string & configFile,
         cout << "TRGCDC ... TRGCDC created with " << _configFilename << endl;
         Belle2_GDL::GDLSystemClock.dump();
         _clock.dump();
+        _clockFE.dump();
     }
 }
 
@@ -271,7 +277,7 @@ TRGCDC::initialize(bool houghFinderPerfect,
     const unsigned nWiresInTS[2] = {15, 11};
     const int shape[2][30] =
 	{{-2,  0,  // relative layer id, relative wire id
-	  -1, -1, // assuming layer offset 0.0, not 0.5
+	  -1, -1,  // assuming layer offset 0.0, not 0.5
 	  -1,  0,
 	  0,  -1,
 	  0,   0,
@@ -350,10 +356,6 @@ TRGCDC::initialize(bool houghFinderPerfect,
 						   w,
 						   _luts.back(),
 						   cells);
-// 	    for (unsigned i = 0; i < nWiresInTS[tsType]; i++) {
-// 		TCWire * c = (TCWire *) cells[i];
-// 		c->_segment = ts;
-// 	    }
 
             //...Store it...
             _tss.push_back(ts);
@@ -362,7 +364,7 @@ TRGCDC::initialize(bool houghFinderPerfect,
         }
     }
 
-    //...Fill buffers...
+    //...Fill caches...
     if (_width) delete [] _width;
     if (_r) delete [] _r;
     if (_r2) delete [] _r2;
@@ -390,11 +392,6 @@ TRGCDC::initialize(bool houghFinderPerfect,
     }
 
     //...Hough Finder...
-//  _hFinder = new TCHFinder("HoughFinder", * this, 350, 100);
-//  _hFinder = new TCHFinder("HoughFinder", * this, 160, 96);
-//  _hFinder = new TCHFinder("HoughFinder", * this, 96, 96);
-/// _hFinder = new TCHFinder("HoughFinder", * this, 128, 48);
-/// _hFinder = new TCHFinder("HoughFinder", * this, 384, 48);
     _hFinder = new TCHFinder("HoughFinder",
                              * this,
                              houghFinderMeshX,
@@ -507,7 +504,7 @@ TRGCDC::dump(const string & msg) const {
         cout << "    wire hits" << endl;
         for (unsigned i = 0; i < nWires(); i++) {
             const TCWire & w = * wire(i);
-            if (w.triggerOutput().active())
+            if (w.timing().active())
                 w.dump(dumpOption, TRGDebug::tab(4));
         }
     }
@@ -516,7 +513,7 @@ TRGCDC::dump(const string & msg) const {
         cout << "    wire hits" << endl;
         for (unsigned i = 0; i < nSegments(); i++) {
             const TCSegment & s = segment(i);
-            if (s.wires()[5]->triggerOutput().active())
+            if (s.wires()[5]->timing().active())
                 s.wires()[5]->dump(dumpOption, TRGDebug::tab(4));
         }
     }
@@ -525,7 +522,7 @@ TRGCDC::dump(const string & msg) const {
         cout << "    TS hits" << endl;
         for (unsigned i = 0; i < nSegments(); i++) {
             const TCSegment & s = segment(i);
-            if (s.triggerOutput().active())
+            if (s.timing().active())
                 s.dump(dumpOption, TRGDebug::tab(4));
         }
     }
@@ -674,18 +671,35 @@ TRGCDC::update(bool ) {
         else t_layerId = h.getILayer()+6*h.getISuperLayer()+2;
         const unsigned layerId = t_layerId;
         const unsigned wireId = h.getIWire();
+	TCWire & w = * (TCWire *) wire(layerId, wireId);
 
-        const TCWire & w = * wire(layerId, wireId);
+        //...Drift legnth(micron) to drift time(ns)...
+        //   coefficient used here must be re-calculated.
+        const float driftTimeMC =
+	    SimHits[iSimHit]->getDriftLength() * 10 * 1000 / 40;
 
-//      cout << "lid,wid=" << layerId << "," << wireId << endl;
+	cout << " -2 driftTimeMC=" << driftTimeMC << endl;
+
+	//...Trigger timing...
+        TRGTime rise = TRGTime(driftTimeMC, true, _clockFE, w.name());
+        TRGTime fall = rise;
+        fall.shift(1).reverse();
+        w._timing = TRGSignal(rise & fall);
+	w._timing.name(w.name());
+
+	//...Simulated drift distance...
+	const double driftLength =
+	    _clockFE.absoluteTime(w._timing[0]->time()) * 40 / 10 / 1000;
+
+	w._timing.dump("detail", " -1 ");
 
         //...TCWireHit...
         TCWHit * hit = new TCWHit(w,
 				  i,
 				  iSimHit,
-				  h.getDriftTime(),
+				  driftLength,
 				  0.15,
-				  h.getDriftTime(),
+				  driftLength,
 				  0.15,
 				  1);
 	hit->state(CellHitFindingValid | CellHitFittingValid );
@@ -1130,7 +1144,7 @@ TRGCDC::simulate(void) {
     for (unsigned i = 0; i < n; i++) {
         TCSegment & s = * _tss[i];
         s.simulate();
-        if (s.triggerOutput().active()) {
+        if (s.timing().active()) {
 
 	     //...Create TCShit...
 	     unsigned j = 0;
@@ -1159,7 +1173,7 @@ TRGCDC::simulate(void) {
             dumpOption = "detail";
         for (unsigned i = 0; i < nSegments(); i++) {
             const TCSegment & s = segment(i);
-            if (s.triggerOutput().active())
+            if (s.timing().active())
                 s.dump(dumpOption, TRGDebug::tab(4));
         }
 
@@ -1183,7 +1197,7 @@ TRGCDC::simulate(void) {
         }
     }
 
-    if (_mode == 1) {
+    if (_simulationMode == 1) {
 	TRGDebug::leaveStage("TRGCDC simulation");
 	return;
     }
@@ -1348,10 +1362,12 @@ TRGCDC::configure(void) {
         TCFrontEnd & f = * _fronts[i];
         TRGLink * fl = new TRGLink(f.name(), f.clock());
         f.append(fl);
-         const unsigned nWires = f.size();
-         for (unsigned j = 0; j < nWires; j++) {
-            fl->append(& f[j]->triggerOutput());
+	const unsigned nWires = f.size();
+	for (unsigned j = 0; j < nWires; j++) {
+            fl->append(& f[j]->timing());
         }
+	if (TRGDebug::level() > 1)
+	    f.dump("detail");
     }
 
     //...Make a link for mergers
@@ -1359,7 +1375,7 @@ TRGCDC::configure(void) {
 //     _links.push_back(fl);
 //     for (unsigned j = 0; j < 3; j++)
 //         for (unsigned i = 0; i < 16; i++)
-//             fl->append(& (* _layers[j])[i]->triggerOutput());
+//             fl->append(& (* _layers[j])[i]->timing());
 //     TCFrontEnd f("CDCFrontEnd_0", _clock);
 //     f.append(fl);
    

@@ -96,7 +96,7 @@ class TRGCDCCell {
 		      const std::string & prefix = std::string("")) const;
 
     /// returns trigger output. Null will returned if no signal.
-    virtual const TRGSignal & triggerOutput(void) const = 0;
+    virtual const TRGSignal & timing(void) const = 0;
 
   public:// Geometry
 
@@ -125,7 +125,7 @@ class TRGCDCCell {
 
   public:// event by event information.
 
-    /// returns a pointer to a TRGCDCSegmentHit.
+    /// returns a pointer to a TRGCDCCellHit.
     const TRGCDCCellHit * hit(void) const;
 
   public:// Obsolete functions from Belle

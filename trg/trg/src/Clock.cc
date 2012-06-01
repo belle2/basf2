@@ -21,24 +21,27 @@ using namespace std;
 namespace Belle2_GDL {
 
     //...This should be moved to GDL module...
-    const Belle2::TRGClock GDLSystemClock(5.9, 125.000, "GDL system clock");
+    const Belle2::TRGClock GDLSystemClock("GDL system clock", 0, 125.000);
 }
 
 namespace Belle2 {
 
-TRGClock::TRGClock(double offset,
-                   double frequency,
-                   const std::string & name) :
-    _offset(offset),
-    _frequency(frequency),
-    _cycle(1000 / frequency),
+TRGClock::TRGClock(const string & name,
+		   double offset,
+                   double frequency)
+    : _name(name),
+      _source(0),
+      _multi(1),
+      _div(1),
+      _offset(offset),
+      _frequency(frequency),
+      _cycle(1000 / frequency),
 //     _min(int(TRGTime::min() / frequency)),
 //     _max(int(TRGTime::max() / frequency)),
 //     _min(numeric_limits<int>::min() + 100),
 //     _max(numeric_limits<int>::max() - 100),
-    _min(numeric_limits<int>::min() / 16),
-    _max(numeric_limits<int>::max() / 16),
-    _name(name) {
+      _min(numeric_limits<int>::min() / 16),
+      _max(numeric_limits<int>::max() / 16) {
 
     if (this != & Belle2_GDL::GDLSystemClock) {
         if (Belle2_GDL::GDLSystemClock.minTiming() > minTiming())
@@ -50,14 +53,32 @@ TRGClock::TRGClock(double offset,
     }
 }
 
+TRGClock::TRGClock(const string & name,
+		   const TRGClock & source,
+		   unsigned multiplicationFactor,
+		   unsigned divisionFactor)
+    : _name(name),
+      _source(& source),
+      _multi(multiplicationFactor),
+      _div(divisionFactor),
+      _offset(source._offset),
+      _frequency(source._frequency * double(multiplicationFactor)),
+      _cycle(source._cycle / double(multiplicationFactor)),
+      _min(source._min * int(multiplicationFactor)),
+      _max(source._max * int(multiplicationFactor)) {
+}
+
 TRGClock::~TRGClock() {
 }
 
 void
-TRGClock::dump(const std::string & ,
-               const std::string & pre) const {
-    cout << pre << _name << ":" << endl
-         << pre << "    offset   :" << _offset << endl
+TRGClock::dump(const string & ,
+               const string & pre) const {
+    cout << pre << _name;
+    if (_source)
+	cout << ":sync'd to " << _source->name()
+	     << ", multiplication factor=" << _multi << endl;
+    cout << pre << "    offset   :" << _offset << endl
          << pre << "    freq(MHz):" << _frequency << endl
          << pre << "    cycle(ns):" << _cycle << endl
          << pre << "    min pos  :" << _min << endl
@@ -77,9 +98,31 @@ TRGClock::time(double t) const {
              << ") !!! out of time window : min=" << minTiming()
              << ",max=" << maxTiming() << ",given value=" << t << endl;
 
-//    cout << "t,offset,unit=" << t << "," << _offset << "," << int((t - _offset) / _cycle) << endl;
+//    cout << "t,offset,unit=" << t << "," << _offset << "," << int((t
+//    - _offset) / _cycle) << endl;
 
-    return int((t - _offset) / _cycle);
+    // Here ignoring offset effect (assuming same offset to a source).
+
+    if (_source && _multi != 1) {
+	const int tt = _source->time(t);
+	const double rem = _source->overShoot(t);
+	return tt * int(_multi) + int(rem / _cycle);
+    }
+    return int((t - _offset) / _cycle) + 1;
+}
+
+double
+TRGClock::absoluteTime(int t) const {
+    return double(t) * _cycle + _offset;
+}
+
+double
+TRGClock::overShoot(double t) const {
+    if (_source && _multi != 1) {
+	const double rem = _source->overShoot(t);
+	return rem - _cycle * double(_source->time(t));
+    }
+    return (t - _offset) - _cycle * double(time(t));
 }
 
 TRGTime

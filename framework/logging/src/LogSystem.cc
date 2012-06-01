@@ -9,7 +9,10 @@
  **************************************************************************/
 
 #include <framework/logging/LogSystem.h>
+#include <framework/logging/LogMessage.h>
+#include <framework/logging/LogConnectionBase.h>
 #include <framework/logging/LogConnectionIOStream.h>
+
 
 #include <unistd.h>
 
@@ -155,7 +158,7 @@ LogSystem::LogSystem() :
 
   //enable color for TTYs with color support (list taken from gtest)
   const bool isTTY = isatty(fileno(stdout));
-  const string termName = getenv("TERM");
+  const string termName = getenv("TERM") ? getenv("TERM") : "";
   const bool useColor = isTTY and(
                           termName == "xterm" or
                           termName == "xterm-color" or

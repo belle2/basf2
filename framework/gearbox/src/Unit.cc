@@ -91,6 +91,9 @@ namespace Belle2 {
   DEFINE_UNIT_NAME(mg_mm3  , Unit::mg_cm3 / Unit::mm3, "mg/mm3"); /**< [mg/mm^3] */
   DEFINE_UNIT_NAME(kg_mm3  , Unit::kg_cm3 / Unit::mm3, "kg/mm3"); /**< [kg/mm^3] */
 
+// magnetic field units
+  DEFINE_UNIT(TinStdUnits  , Unit::V* Unit::s / Unit::m2);  /**< [Vs/m^2] */
+
 //Various constants
   const double Unit::speedOfLight   = 29.9792458;
   const double Unit::kBoltzmann     = 8.617343 * 1.0e-5 * Unit::eV / Unit::K;

@@ -47,7 +47,6 @@ namespace Belle2 {
 
     private:
 
-      TRandom3  m_random;    /**< The random number generator used for rejecting Cerenkov photons.*/
       double    m_photonFraction; /**< The fraction of Cerenkov photons which will be kept and propagated. */
 
     };

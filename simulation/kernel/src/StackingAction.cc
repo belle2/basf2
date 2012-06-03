@@ -23,7 +23,7 @@ using namespace Simulation;
 
 StackingAction::StackingAction(): m_photonFraction(1.0)
 {
-  m_random.SetSeed(0);
+
 }
 
 StackingAction::~StackingAction()
@@ -42,7 +42,7 @@ G4ClassificationOfNewTrack StackingAction::ClassifyNewTrack(const G4Track* aTrac
       // particle is secondary
       if (aTrack->GetCreatorProcess()->GetProcessName() == "Cerenkov") {
         // particle is Cerenkov photon
-        if (m_random.Uniform(1) > m_photonFraction) return fKill;
+        if (gRandom->Uniform() > m_photonFraction) return fKill;   /**< The random number generator used for rejecting Cerenkov photons.*/
       }
     }
   }

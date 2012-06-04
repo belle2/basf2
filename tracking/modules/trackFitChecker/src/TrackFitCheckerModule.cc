@@ -376,8 +376,8 @@ void TrackFitCheckerModule::event()
         GFDetPlane detPlaneOfRecoHit = aGFAbsRecoHitPtr->getDetPlane(rep);
         TMatrixT<double> H = aGFAbsRecoHitPtr->getHMatrix(rep);
         TMatrixT<double> HT(TMatrixT<double>::kTransposed, H); // the transposed is needed later
-        TMatrixT<double> m = aGFAbsRecoHitPtr->getHitCoord(detPlaneOfRecoHit); //measurement of hit
-        TMatrixT<double> V = aGFAbsRecoHitPtr->getHitCov(detPlaneOfRecoHit); //covariance matrix of hit
+        TMatrixT<double> m; //measurement of hit
+        TMatrixT<double> V; //covariance matrix of hit
         aGFAbsRecoHitPtr->getMeasurement(rep, detPlaneOfRecoHit, rep->getState(), rep->getCov(), m, V);
 
         if (m_testDaf == true) { //get DAF weight of the current hit if the DAF was used as fitter algorithm

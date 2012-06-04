@@ -16,8 +16,9 @@
 
 #include  <eklm/dataobjects/EKLMStripHit.h>
 #include  "globals.hh"
-#include  "TVector3.h"
-#include "CLHEP/Vector/ThreeVector.h"
+#include  <TVector3.h>
+#include <CLHEP/Vector/ThreeVector.h>
+#include <CLHEP/Geometry/Point3D.h>
 
 #include <string>
 namespace Belle2 {
@@ -40,7 +41,7 @@ namespace Belle2 {
     void Print();
 
     //! add StripHit to 2dhit. returns false if impossible
-    bool addStripHit(const EKLMStripHit*);
+    //    bool addStripHit(const EKLMStripHit*);
 
     //! returns pointer to the strip hit in X direction
     const EKLMStripHit* getXStripHit() const;
@@ -55,7 +56,7 @@ namespace Belle2 {
     TVector3 getCrossPoint()  const;
 
     //! calculates ChiSquare of the crossing point
-    void setChiSq();
+    void setChiSq(double chi);
 
     //! returns  ChiSquare of the crossing point
     double getChiSq() const;
@@ -85,8 +86,8 @@ namespace Belle2 {
     const G4VPhysicalVolume* GetPhysicalVolumeByPoint(const G4ThreeVector& point);
     double getLightPropagationLength(const G4VPhysicalVolume* vol, const CLHEP::Hep3Vector&  pos);
     double getLightPropagationLength(const G4VPhysicalVolume* vol, const TVector3&  pos);
-    bool CheckStripOrientationX(const G4VPhysicalVolume* strip);
-    bool doesIntersect(const EKLMStripHit* hit1, const EKLMStripHit* hit2, TVector3& crossPoint);
+    /*     bool CheckStripOrientationX(const G4VPhysicalVolume* strip); */
+    /*     bool doesIntersect(const EKLMStripHit* hit1, const EKLMStripHit* hit2, TVector3& crossPoint); */
 
 
 

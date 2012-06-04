@@ -38,6 +38,12 @@ namespace Belle2 {
     EKLMHitBase(int Endcap, int Layer, int Sector, int PDG, double Time, double EDep,  TVector3 GlobalPosition, TVector3 LocalPosition);
 
     /**
+     *  Constructor with endcap, layer and sector initializations
+     */
+
+    EKLMHitBase(int Endcap, int Layer, int Sector);
+
+    /**
      * Destructor
      */
     ~EKLMHitBase() {};

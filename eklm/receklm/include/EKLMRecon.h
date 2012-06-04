@@ -14,7 +14,7 @@
 #include<vector>
 #include<eklm/dataobjects/EKLMStripHit.h>
 #include<eklm/dataobjects/EKLMSectorHit.h>
-#include <framework/datastore/StoreArray.h>
+#include<framework/datastore/StoreArray.h>
 
 
 
@@ -56,6 +56,19 @@ namespace Belle2 {
 
     //! vector of  2d hits
     std::vector <EKLMHit2d*> m_hit2dVector;
+
+    /**
+     * returns true if strip is along X
+     */
+    bool CheckStripOrientationX(const G4VPhysicalVolume*);
+
+
+    /**
+     * returns true strips have intersection
+     */
+    bool doesIntersect(const EKLMStripHit* , const EKLMStripHit* ,
+                       TVector3&);
+
 
   };
 

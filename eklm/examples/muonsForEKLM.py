@@ -29,7 +29,7 @@ set_log_level(LogLevel.ERROR)
 
 # EvtMetaGen - generate event meta data
 evtmetagen = register_module('EvtMetaGen')
-evtmetagen.param('EvtNumList', [2])
+evtmetagen.param('EvtNumList', [1])
 evtmetagen.param('RunList', [1])
 
 # Particle gun
@@ -63,7 +63,7 @@ mcprint = register_module('PrintMCParticles')
 # EKLM digi
 eklmdigi = register_module('EKLMDigitization')
 # EKLM reco
-# eklmreco = register_module('EKLMReconstruction')
+eklmreco = register_module('EKLMReconstruction')
 
 # Create main path
 main = create_path()
@@ -76,7 +76,7 @@ main.add_module(geobuilder)
 main.add_module(g4sim)
 
 main.add_module(eklmdigi)
-# main.add_module(eklmreco)
+main.add_module(eklmreco)
 
 main.add_module(simpleoutput)
 

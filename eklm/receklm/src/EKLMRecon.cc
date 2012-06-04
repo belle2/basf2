@@ -9,6 +9,10 @@
  **************************************************************************/
 
 #include <eklm/receklm/EKLMRecon.h>
+#include <eklm/geoeklm/G4PVPlacementGT.h>
+#include "G4TransportationManager.hh"
+#include "G4Navigator.hh"
+#include "G4Box.hh"
 
 
 
@@ -26,7 +30,7 @@ namespace Belle2 {
 
   void EKLMRecon::createSectorHits()
   {
-    /*
+
     //    EKLMSectorHit *newSectorHit;
     StoreArray<EKLMSectorHit> sectorHitsArray;
 
@@ -44,22 +48,22 @@ namespace Belle2 {
         }
       }
       if (sectorNotFound) {
-        EKLMSectorHit *newSectorHit = new(sectorHitsArray->AddrAt(sectorHitsArray.getEntries()))
+        EKLMSectorHit* newSectorHit = new(sectorHitsArray->AddrAt(sectorHitsArray.getEntries()))
         EKLMSectorHit((*stripIter)->getEndcap(),
                       (*stripIter)->getLayer(),
-                      (*stripIter)->getSector(), 0, 0);
+                      (*stripIter)->getSector());
 
         newSectorHit->addStripHit(*stripIter);
         m_SectorHitVector.push_back(newSectorHit);
       }
     }
-    */
+
   }
 
   void EKLMRecon::create2dHits()
   {
     // loop over sectors
-    /*
+
     for (vector<EKLMSectorHit*>::iterator sectorIter =
            m_SectorHitVector.begin(); sectorIter != m_SectorHitVector.end();
          sectorIter++) {
@@ -83,14 +87,64 @@ namespace Belle2 {
 
           EKLMHit2d* hit2d = new(m_hit2dArray->AddrAt(m_hit2dArray.getEntries()))EKLMHit2d(*itX, *itY);
           hit2d->setCrossPoint(crossPoint);
-          hit2d->setChiSq();
+          hit2d->setChiSq(0.);
           m_hit2dVector.push_back(hit2d);
           //hit2d->Print();
         }
       }
     }
-    */
+
   }
 
+
+  bool EKLMRecon::doesIntersect(const EKLMStripHit* hit1, const EKLMStripHit* hit2,
+                                TVector3& crossPoint)
+  {
+    // actually, it is not too safe to use GetConstituentSolid(0).
+    // here we rely on the fact that the first child is a real strip G4box
+    G4Box* box1 = (G4Box*)(hit1->getVolume()->GetLogicalVolume()->GetSolid()->GetConstituentSolid(0));
+    double max1 = 2.0 * box1->GetXHalfLength();
+    HepGeom::Point3D<double> p1(0.5 * max1, 0., 0.);
+    HepGeom::Point3D<double> pt1 = ((G4PVPlacementGT*)(hit1->getVolume()))-> getTransform() * p1;
+
+    // actually, it is not too safe to use GetConstituentSolid(0).
+    // here we rely on the fact that the first child is a real strip G4box
+    G4Box* box2 = (G4Box*)(hit2->getVolume()->GetLogicalVolume()->GetSolid()->GetConstituentSolid(0));
+    double max2 = 2.0 * box2->GetXHalfLength();
+    HepGeom::Point3D<double> p2(0.5 * max2, 0., 0.);
+    HepGeom::Point3D<double> pt2 = ((G4PVPlacementGT*)(hit2->getVolume()))->getTransform() * p2;
+
+
+    crossPoint.SetZ((pt1.z() + pt2.z()) / 2);
+
+    if (CheckStripOrientationX(hit1->getVolume())) { // strip is X-oriented
+      {
+        if (fabs(pt1.x() - pt2.x()) <= max1 && fabs(pt1.y() - pt2.y()) <= max2 &&
+            fabs(pt2.x()) <= fabs(pt1.x()) && fabs(pt1.y()) <= fabs(pt2.y())) {   // there is a crossing
+          crossPoint.SetX(pt2.x());
+          crossPoint.SetY(pt1.y());
+          return true;
+        }
+      }
+    } else { // Y-oriented strip
+      {
+        if (fabs(pt1.x() - pt2.x()) <= max2 && fabs(pt1.y() - pt2.y()) <= max1 &&
+            fabs(pt1.x()) <= fabs(pt2.x()) && fabs(pt2.y()) <= fabs(pt1.y())) { // there is a crossing
+          crossPoint.SetX(pt1.x());
+          crossPoint.SetY(pt2.y());
+          return true;
+        }
+      }
+    }
+    crossPoint = TVector3(0., 0., 0.);
+    return false; // no crossing found
+  }
+
+
+  bool EKLMRecon::CheckStripOrientationX(const G4VPhysicalVolume* strip)
+  {
+    G4Transform3D t = ((G4PVPlacementGT*)strip)->getTransform().inverse();
+    return (fabs(sin(t.getRotation().phiX())) < 0.01);
+  }
 
 }//namespace

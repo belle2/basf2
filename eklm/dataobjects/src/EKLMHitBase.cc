@@ -39,6 +39,18 @@ EKLMHitBase::EKLMHitBase(int Endcap, int Layer, int Sector, int PDG, double Time
   m_LocalPosition = LocalPosition;
 }
 
+EKLMHitBase::EKLMHitBase(int Endcap, int Layer, int Sector)
+{
+  m_Endcap = Endcap;
+  m_Layer = Layer;
+  m_Sector = Sector;
+  m_PDG = 0;
+  m_Time = 0;
+  m_EDep = 0;
+  m_GlobalPosition = TVector3(0., 0., 0.);
+  m_LocalPosition = TVector3(0., 0., 0.);
+}
+
 int EKLMHitBase::getEndcap() const
 {
   return m_Endcap;

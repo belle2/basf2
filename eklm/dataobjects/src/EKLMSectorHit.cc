@@ -13,31 +13,31 @@
 #include "TVector3.h"
 
 using namespace Belle2;
-using namespace std;
+
 
 ClassImp(Belle2::EKLMSectorHit)
 
 EKLMSectorHit::EKLMSectorHit(int nEndcap, int nLayer, int  nSector) :
-  EKLMHitBase()
+  EKLMHitBase(nEndcap, nLayer, nSector)
 {}
 
-vector <EKLMStripHit*> * EKLMSectorHit::getStripHitVector()
+std::vector <EKLMStripHit*> * EKLMSectorHit::getStripHitVector()
 {
   return & m_stripHitVector;
 }
 
-vector <EKLMHit2d*> * EKLMSectorHit::get2dHitVector()
+std::vector <EKLMHit2d*> * EKLMSectorHit::get2dHitVector()
 {
   return  & m_hit2dVector;
 }
 
 void EKLMSectorHit::Print()
 {
-  cout << "------------  Sector Hit  -------------- " << endl;
-  cout << "Endcap: " << getEndcap()
-       << " Layer: " << getLayer()
-       << " Sector: " << getSector() << endl;
-  for (vector<EKLMStripHit*>::iterator it = m_stripHitVector.begin();
+  std::cout << "------------  Sector Hit  -------------- " << std::endl;
+  std::cout << "Endcap: " << getEndcap()
+            << " Layer: " << getLayer()
+            << " Sector: " << getSector() << std::endl;
+  for (std::vector<EKLMStripHit*>::iterator it = m_stripHitVector.begin();
        it != m_stripHitVector.end(); ++it)
     (*it)->Print();
 }

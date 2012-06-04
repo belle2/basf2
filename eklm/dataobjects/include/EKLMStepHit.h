@@ -85,6 +85,8 @@ namespace Belle2 {
       const G4VPhysicalVolume* pv
     ) :
       EKLMHitBase(Endcap, Layer, Sector, PDG, Time,  EDep, GlobalPosition, LocalPosition) {
+      m_Plane = Plane;
+      m_Strip = Strip;
       m_energy = E;
       m_momentum = momentum;
       m_trackID = trID;

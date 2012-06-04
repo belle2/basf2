@@ -173,7 +173,45 @@ namespace Belle2 {
      * Get information on mother volumes and store them to the hit
      */
     const G4PVPlacementGT* pvgt = (G4PVPlacementGT*)pv;
+
     hit->setVolumeType(pvgt->getVolumeType());
+    switch (pvgt->getVolumeType()) {
+      case 0: // StripSensitive
+        pvgt = pvgt->getMother();  // Strip
+        pvgt = pvgt->getMother();  // StripVolume
+        hit->setStrip(pvgt->getID());
+        pvgt = pvgt->getMother();  // Plane
+        hit->setPlane(pvgt->getID());
+        break;
+      case 1: // SiPM
+        pvgt = pvgt->getMother();  // StripVolume
+        hit->setStrip(pvgt->getID());
+        pvgt = pvgt->getMother();  // Plane
+        hit->setPlane(pvgt->getID());
+        break;
+      case 2: // StripBoard
+        pvgt = pvgt->getMother();  // SectionReadoutBoard
+        hit->setStrip(-1);
+        hit->setPlane(-1);
+        break;
+      default:
+        B2ERROR("EKLMSensitiveDetector.cc:: Try to get hit information from insensitive volumes");
+    }
+    pvgt = pvgt->getMother(); // Sector
+    hit->setSector(pvgt->getID()); // Sector ID
+
+    pvgt = pvgt->getMother();
+    hit->setLayer(pvgt->getID());  // Layer ID
+
+    pvgt = pvgt->getMother();
+    hit->setEndcap(pvgt->getID()); // Endcap ID
+    /*
+
+    if (pvgt->getVolumeType() ==2 )
+      {
+    std::cerr<<"Type 2"<<std::endl;
+    return true;
+      }
     if (pvgt->getVolumeType() >= 0) {
       pvgt = pvgt->getMother();
 
@@ -182,9 +220,10 @@ namespace Belle2 {
       }
       hit->setStrip(pvgt->getID()); // StripVolume ID for Strip and SiPM and BaseBoard ID for StripBoard
 
-      if (hit->getVolumeType() == 0 || hit->getVolumeType() == 1) { // Sensitive strip
-        pvgt = pvgt->getMother();
-      }
+      //     if (hit->getVolumeType() == 0 || hit->getVolumeType() == 1) { // Sensitive strip
+      // Sensitive strip
+      pvgt = pvgt->getMother();
+
       hit->setPlane(pvgt->getID());  // Plane ID for Stripand and SiPM and SectionBoard ID for StripBoard
 
       pvgt = pvgt->getMother();
@@ -195,9 +234,10 @@ namespace Belle2 {
 
       pvgt = pvgt->getMother();
       hit->setEndcap(pvgt->getID()); // Endcap ID
+
     } else
       B2ERROR("EKLMSensitiveDetector.cc:: Try to get hit information from insensitive volumes");
-
+    */
 
 
 

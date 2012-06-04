@@ -41,8 +41,7 @@
 
 #include <errno.h>
 
-using namespace std;
-using namespace boost;
+
 using namespace Belle2;
 
 /* Register the creator */
@@ -142,8 +141,8 @@ void GeoEKLMBelleII::readXMLData(const GearDir& content)
     }
     for (i = 0; i < nBoard; i++) {
       GearDir BoardContent(Boards);
-      BoardContent.append((format("/BoardData[%1%]") % (j + 1)).str());
-      BoardContent.append((format("/Board[%1%]") % (i + 1)).str());
+      BoardContent.append((boost::format("/BoardData[%1%]") % (j + 1)).str());
+      BoardContent.append((boost::format("/Board[%1%]") % (i + 1)).str());
       BoardPosition[j][i].phi = BoardContent.getLength("Phi") * rad;
       BoardPosition[j][i].r = BoardContent.getLength("Radius") * cm;
     }
@@ -155,7 +154,7 @@ void GeoEKLMBelleII::readXMLData(const GearDir& content)
   }
   for (i = 0; i < nStripBoard; i++) {
     GearDir StripBoardContent(Boards);
-    StripBoardContent.append((format("/StripBoardData/Board[%1%]") %
+    StripBoardContent.append((boost::format("/StripBoardData/Board[%1%]") %
                               (i + 1)).str());
     StripBoardPosition[i].x = StripBoardContent.getLength("PositionX") * cm;
   }
@@ -211,7 +210,7 @@ void GeoEKLMBelleII::readXMLData(const GearDir& content)
   }
   for (i = 0; i < nStrip; i++) {
     GearDir StripContent(Strips);
-    StripContent.append((format("/Strip[%1%]") % (i + 1)).str());
+    StripContent.append((boost::format("/Strip[%1%]") % (i + 1)).str());
     StripPosition[i].length = StripContent.getLength("Length") * cm;
     StripPosition[i].X = StripContent.getLength("PositionX") * cm;
     StripPosition[i].Y = StripContent.getLength("PositionY") * cm;
@@ -232,9 +231,9 @@ void GeoEKLMBelleII::readXMLData(const GearDir& content)
     }
     for (i = 0; i <= nSection; i++) {
       GearDir SectionSupportContent(Sections);
-      SectionSupportContent.append((format("/SectionSupportData[%1%]") % (j +
+      SectionSupportContent.append((boost::format("/SectionSupportData[%1%]") % (j +
                                     1)).str());
-      SectionSupportContent.append((format("/SectionSupport[%1%]") % (i +
+      SectionSupportContent.append((boost::format("/SectionSupport[%1%]") % (i +
                                     1)).str());
       SectionSupportPosition[j][i].length = SectionSupportContent.
                                             getLength("Length") * cm;
@@ -319,7 +318,7 @@ void GeoEKLMBelleII::createEndcap(int iEndcap, G4LogicalVolume* mlv)
   zsub = EndcapMgr.zsub();
   rminsub = EndcapMgr.rminsub();
   rmaxsub = EndcapMgr.rmaxsub();
-  std::string Endcap_Name = "Endcap_" + lexical_cast<string>(iEndcap);
+  std::string Endcap_Name = "Endcap_" + boost::lexical_cast<std::string>(iEndcap);
   boct = new G4Polyhedra("tempoct", phi, dphi, nsides, nBoundary, struct_z,
                          rmin, rmax);
   atube = new G4Tubs("tempatube", rminsub, rmaxsub, zsub, 0.0, 360.0 * deg);
@@ -364,7 +363,7 @@ void GeoEKLMBelleII::createLayer(int iLayer, int iEndcap,
   G4LogicalVolume* logicLayer;
   G4PVPlacementGT* physiLayer;
   G4Transform3D t;
-  std::string Layer_Name = "Layer_" + lexical_cast<string>(iLayer) + "_" +
+  std::string Layer_Name = "Layer_" + boost::lexical_cast<std::string>(iLayer) + "_" +
                            mpvgt->GetName();
   solidLayer = new G4Tubs(Layer_Name, LayerPosition.innerR,
                           LayerPosition.outerR, LayerPosition.length / 2.0,
@@ -406,7 +405,7 @@ void GeoEKLMBelleII::createSector(int iSector, G4PVPlacementGT* mpvgt)
   G4LogicalVolume* logicSector;
   G4PVPlacementGT* physiSector;
   G4Transform3D t;
-  std::string Sector_Name = "Sector_" + lexical_cast<string>(iSector) + "_" +
+  std::string Sector_Name = "Sector_" + boost::lexical_cast<std::string>(iSector) + "_" +
                             mpvgt->GetName();
   solidSector = new G4Tubs(Sector_Name, SectorPosition.innerR,
                            SectorPosition.outerR, 0.5 * SectorPosition.length,
@@ -497,7 +496,7 @@ void GeoEKLMBelleII::createSectorCover(int iCover, G4PVPlacementGT* mpvgt)
   G4Transform3D t2;
   G4Transform3D t;
   lz = 0.5 * (SectorPosition.length - SectorSupportPosition.length);
-  std::string Cover_Name = "Cover_" + lexical_cast<string>(iCover) + "_" +
+  std::string Cover_Name = "Cover_" + boost::lexical_cast<std::string>(iCover) + "_" +
                            mpvgt->GetName();
   solidCoverTube = new G4Tubs("Tube_" + Cover_Name,
                               SectorSupportPosition.innerR,
@@ -677,7 +676,7 @@ G4Tubs* GeoEKLMBelleII::createSectorSupportInnerTube(G4PVPlacementGT* mpvgt)
                     SectorSupportPosition.innerR,
                     SectorSupportPosition.innerR + SectorSupportSize.Thickness,
                     0.5 * SectorSupportPosition.length,
-                    min(ang1, ang2) * rad, fabs(ang1 - ang2) * rad);
+                    std::min(ang1, ang2) * rad, fabs(ang1 - ang2) * rad);
 }
 
 /**
@@ -706,7 +705,7 @@ G4Tubs* GeoEKLMBelleII::createSectorSupportOuterTube(G4PVPlacementGT* mpvgt)
                     SectorSupportPosition.outerR - SectorSupportSize.Thickness,
                     SectorSupportPosition.outerR,
                     0.5 * SectorSupportPosition.length,
-                    min(ang1, ang2) * rad, fabs(ang1 - ang2) * rad);
+                    std::min(ang1, ang2) * rad, fabs(ang1 - ang2) * rad);
 }
 
 /**
@@ -1101,8 +1100,8 @@ subtractBoardSolids(G4SubtractionSolid* plane, int iPlane,
           prev_solid = ss[1][j - 1];
       }
       ss[i][j] = new G4SubtractionSolid("BoardSubtraction_" +
-                                        lexical_cast<string>(i) + "_" +
-                                        lexical_cast<string>(j) + Plane_Name,
+                                        boost::lexical_cast<std::string>(i) + "_" +
+                                        boost::lexical_cast<std::string>(j) + Plane_Name,
                                         prev_solid, solidBoardBox, t);
     }
   }
@@ -1144,12 +1143,12 @@ void GeoEKLMBelleII::createPlane(int iPlane, G4PVPlacementGT* mpvgt)
   G4Transform3D t3;
   G4Transform3D t4;
   G4Transform3D t5;
-  std::string Plane_Name = "Plane_" + lexical_cast<string>(iPlane) + "_" +
+  std::string Plane_Name = "Plane_" + boost::lexical_cast<std::string>(iPlane) + "_" +
                            mpvgt->GetName();
   solidPlaneTube = new G4Tubs("Tube_" + Plane_Name, PlanePosition.innerR,
                               PlanePosition.outerR, 0.5 * PlanePosition.length,
                               0.0, 90.0 * deg);
-  box_x = max(SectorSupportPosition.Y, SectorSupportPosition.X) +
+  box_x = std::max(SectorSupportPosition.Y, SectorSupportPosition.X) +
           SectorSupportSize.Thickness;
   box_lx =  PlanePosition.outerR - box_x;
   solidPlaneBox = new G4Box("Box_" + Plane_Name, 0.5 * box_lx, 0.5 * box_lx,
@@ -1190,7 +1189,7 @@ void GeoEKLMBelleII::createPlane(int iPlane, G4PVPlacementGT* mpvgt)
   if (iPlane == 2)
     t1 = G4Rotate3D(180. * deg, G4ThreeVector(1., 1., 0.)) * t1;
   ang = getSectorSupportCornerAngle();
-  x = max(SectorSupportPosition.Y, SectorSupportPosition.X);
+  x = std::max(SectorSupportPosition.Y, SectorSupportPosition.X);
   y = SectorSupportPosition.outerR -
       SectorSupportSize.DeltaLY -
       SectorSupportSize.TopCornerHeight;
@@ -1298,8 +1297,8 @@ void GeoEKLMBelleII::createSectionReadoutBoard(int iPlane, int iBoard,
   G4LogicalVolume* logicSectionReadoutBoard;
   G4PVPlacementGT* physiSectionReadoutBoard;
   std::string Board_Name = "SectionReadoutBoard_" +
-                           lexical_cast<string>(iBoard) + "_Plane_" +
-                           lexical_cast<string>(iPlane) + "_" +
+                           boost::lexical_cast<std::string>(iBoard) + "_Plane_" +
+                           boost::lexical_cast<std::string>(iPlane) + "_" +
                            mpvgt->GetName();
   solidSectionReadoutBoard = new G4Box(Board_Name,
                                        0.5 * BoardSize.length,
@@ -1378,7 +1377,7 @@ void GeoEKLMBelleII::createStripBoard(int iBoard, G4PVPlacementGT* mpvgt)
   G4LogicalVolume* logicStripBoard;
   G4PVPlacementGT* physiStripBoard;
   G4Transform3D t;
-  std::string Board_Name = "StripBoard_" + lexical_cast<string>(iBoard) + "_" +
+  std::string Board_Name = "StripBoard_" + boost::lexical_cast<std::string>(iBoard) + "_" +
                            mpvgt->GetName();
   solidStripBoard = new G4Box(Board_Name, 0.5 * BoardSize.strip_length,
                               0.5 * BoardSize.strip_height,
@@ -1434,7 +1433,7 @@ void GeoEKLMBelleII::createSectionSupport(int iSectionSupport, int iPlane,
   G4LogicalVolume* logicSectionSupport;
   G4PVPlacementGT* physiSectionSupport;
   std::string SectionSupportName = "SectionSupport_" +
-                                   lexical_cast<string>(iSectionSupport) +
+                                   boost::lexical_cast<std::string>(iSectionSupport) +
                                    "_" + mpvgt->GetName();
   solidBoxTop = new G4Box("BoxTop_" + SectionSupportName,
                           0.5 * (SectionSupportPosition[iPlane - 1]
@@ -1524,8 +1523,8 @@ void GeoEKLMBelleII::createPlasticListElement(int iListPlane, int iList,
   G4LogicalVolume* logicList;
   G4PVPlacementGT* physiList;
   G4Transform3D t;
-  std::string List_Name = "List_" + lexical_cast<string>(iList) + "_ListPlane_"
-                          + lexical_cast<string>(iListPlane) + "_" +
+  std::string List_Name = "List_" + boost::lexical_cast<std::string>(iList) + "_ListPlane_"
+                          + boost::lexical_cast<std::string>(iListPlane) + "_" +
                           mpvgt->GetName();
   ly = StripSize.width;
   if (iList % 15 <= 1)
@@ -1572,7 +1571,7 @@ void GeoEKLMBelleII::createStripVolume(int iStrip, G4PVPlacementGT* mpvgt)
   G4LogicalVolume* logicStripVolume;
   G4PVPlacementGT* physiStripVolume;
   G4Transform3D t;
-  std::string StripVolume_Name = "StripVolume_" + lexical_cast<string>(iStrip)
+  std::string StripVolume_Name = "StripVolume_" + boost::lexical_cast<std::string>(iStrip)
                                  + "_" + mpvgt->GetName();
   solidStripVolume = new G4Box(StripVolume_Name,
                                0.5 * (StripPosition[iStrip - 1].length +
@@ -1734,7 +1733,7 @@ void GeoEKLMBelleII::createStripSensitive(int iStrip, G4PVPlacementGT* mpvgt)
     B2FATAL("Memory allocation error.");
     exit(ENOMEM);
   }
-  // mark this object as SensitiveStrip
+  // mark this object as Sensitivtrip
   physiSensitive->setVolumeType(0);
 
   printVolumeMass(logicSensitive);

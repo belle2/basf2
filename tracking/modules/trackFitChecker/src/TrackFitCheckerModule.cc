@@ -372,11 +372,13 @@ void TrackFitCheckerModule::event()
           B2ERROR("An unknown type of recoHit was detected in TrackFitCheckerModule::event(). This hit will not be included in the statistical tests");
           continue;
         }
-        GFDetPlane detPlaneOfRecoHit = aGFAbsRecoHitPtr->getDetPlane(aTrackPtr->getTrackRep(0));
-        TMatrixT<double> H = aGFAbsRecoHitPtr->getHMatrix(aTrackPtr->getTrackRep(0));
+        GFAbsTrackRep* rep = aTrackPtr->getTrackRep(0);
+        GFDetPlane detPlaneOfRecoHit = aGFAbsRecoHitPtr->getDetPlane(rep);
+        TMatrixT<double> H = aGFAbsRecoHitPtr->getHMatrix(rep);
         TMatrixT<double> HT(TMatrixT<double>::kTransposed, H); // the transposed is needed later
         TMatrixT<double> m = aGFAbsRecoHitPtr->getHitCoord(detPlaneOfRecoHit); //measurement of hit
         TMatrixT<double> V = aGFAbsRecoHitPtr->getHitCov(detPlaneOfRecoHit); //covariance matrix of hit
+        aGFAbsRecoHitPtr->getMeasurement(rep, detPlaneOfRecoHit, rep->getState(), rep->getCov(), m, V);
 
         if (m_testDaf == true) { //get DAF weight of the current hit if the DAF was used as fitter algorithm
           double dafWeight = -1.0; // a weight can never be negative

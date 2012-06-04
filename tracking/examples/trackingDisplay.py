@@ -58,8 +58,6 @@ cdcDigitizer = register_module('CDCDigi')
 param_cdcdigi = {'Fraction': 1, 'Resolution1': 0.01, 'Resolution2': 0.0}
 cdcDigitizer.param(param_cdcdigi)
 
-pxd_digi = register_module('PXDDigitizer')
-
 # find MCTracks
 mctrackfinder = register_module('MCTrackFinder')
 
@@ -89,8 +87,6 @@ main.add_module(geo)
 main.add_module(pGun)
 main.add_module(g4sim)
 main.add_module(cdcDigitizer)
-main.add_module(pxd_digi)
-main.add_module(register_module('PXDClustering'))
 main.add_module(mctrackfinder)
 main.add_module(genfitter)
 

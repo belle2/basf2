@@ -206,7 +206,7 @@ void GenfitDisplay::drawEvent(unsigned int id)
   // finished parsing the option string -------------------------------------------------------------
 
   // draw SPHits  // quick n dirty hack
-  if (drawRawHits) {
+  if (drawRawHits && id < fHits.size() && !fHits[id].empty()) {
     TEvePointSet* pointSet = new TEvePointSet("Raw hits", fHits[id].size());
     B2INFO("showing raw hits in event " << id << ": found " << fHits[id].size() << ".");
     pointSet->IncDenyDestroy();

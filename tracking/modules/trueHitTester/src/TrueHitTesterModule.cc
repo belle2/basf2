@@ -166,7 +166,7 @@ void TrueHitTesterModule::event()
           VXDTrueHit const* aVxdTrueHitPtr = trueHitPtrs[i];
           B2DEBUG(100, "aVxdTrueHitPtr " << aVxdTrueHitPtr);
           B2DEBUG(100, "aVxdTrueHitPtr->getU() " << aVxdTrueHitPtr->getU());
-
+          B2DEBUG(100, "aVxdTrueHitPtr->getGlobalTime() " << aVxdTrueHitPtr->getGlobalTime());
           float deltaE = aVxdTrueHitPtr->getEnergyDep();
           int layerId = aVxdTrueHitPtr->getSensorID().getLayerNumber();
           TVector3 pTrueIn = aVxdTrueHitPtr->getEntryMomentum();
@@ -228,7 +228,7 @@ void TrueHitTesterModule::event()
 void TrueHitTesterModule::endRun()
 {
   if (m_notPerfectCounter != 0) {
-    B2WARNING(m_notPerfectCounter << " tracks had not exactly on hit in every layer and were not written to the TTree");
+    B2WARNING(m_notPerfectCounter << " tracks had not exactly one hit in every layer and were not written to the TTree");
   }
 }
 
@@ -239,8 +239,8 @@ void TrueHitTesterModule::terminate()
   m_trueHitDataTreePtr->Write();
   m_rootFilePtr->Close();
   // delete all the objects associated with branches
-  std::map<std::string, LayerWiseData* >::iterator iter = m_layerWiseDataForRoot.begin();
-  std::map<std::string, LayerWiseData* >::const_iterator iterMax = m_layerWiseDataForRoot.end();
+  std::map<std::string, std::vector<vector<float> >* >::iterator iter = m_layerWiseDataForRoot.begin();
+  std::map<std::string, std::vector<vector<float> >* >::const_iterator iterMax = m_layerWiseDataForRoot.end();
   while (iter not_eq iterMax) {
     delete(iter->second);
     ++iter;
@@ -251,34 +251,16 @@ void TrueHitTesterModule::terminate()
 
 void TrueHitTesterModule::registerLayerWiseData(const string& nameOfDataSample, const int nVarsToTest)
 {
-
-  m_layerWiseDataForRoot[nameOfDataSample] = new Belle2::LayerWiseData(m_nLayers, nVarsToTest);
-  m_trueHitDataTreePtr->Bronch(nameOfDataSample.c_str(), "Belle2::LayerWiseData", &(m_layerWiseDataForRoot[nameOfDataSample]));
-
+  m_layerWiseDataForRoot[nameOfDataSample] = new std::vector<vector<float> >(m_nLayers, vector<float>(nVarsToTest));
+  m_trueHitDataTreePtr->Branch(nameOfDataSample.c_str(), "std::vector<std::vector<float> >", &(m_layerWiseDataForRoot[nameOfDataSample]));
 }
 
 void TrueHitTesterModule::fillLayerWiseData(const string& nameOfDataSample, const int accuVecIndex, const vector<double>& newData)
 {
   const int nNewData = newData.size();
   for (int i = 0; i not_eq nNewData; ++i) {
-    m_layerWiseDataForRoot[nameOfDataSample]->layerVecData[accuVecIndex][i] = float(newData[i]);
+    (*m_layerWiseDataForRoot[nameOfDataSample])[accuVecIndex][i] = float(newData[i]);
   }
-}
-
-void TrueHitTesterModule::fillTrackWiseVecData(const string& nameOfDataSample, const vector<double>& newData)
-{
-  const int nNewData = newData.size();
-  for (int i = 0; i not_eq nNewData; ++i) {
-    m_trackWiseVecDataForRoot[nameOfDataSample]->at(i) = float(newData[i]);
-  }
-
-}
-
-void TrueHitTesterModule::fillTrackWiseData(const string& nameOfDataSample, const double newData)
-{
-
-  *(m_trackWiseDataForRoot[nameOfDataSample]) = float(newData);
-
 }
 
 vector<double> TrueHitTesterModule::rootVecToStdVec(TMatrixT<double>&  rootVector)

@@ -13,7 +13,6 @@
 
 #include <framework/core/Module.h>
 
-#include <tracking/LayerWiseData.h>
 //root
 #include <TMatrixT.h>
 #include <TTree.h>
@@ -89,8 +88,7 @@ namespace Belle2 {
   protected:
     void registerLayerWiseData(const std::string& nameOfDataSample, const int nVarsToTest);
     void fillLayerWiseData(const std::string& nameOfDataSample, const int accuVecIndex, const std::vector<double>& newData);
-    void fillTrackWiseVecData(const std::string& nameOfDataSample, const std::vector<double>& newData);
-    void fillTrackWiseData(const std::string& nameOfDataSample, const double newData);
+
     std::vector<double> rootVecToStdVec(TMatrixT<double>& rootVector);
     //for root output
     std::string m_dataOutFileName;
@@ -99,7 +97,7 @@ namespace Belle2 {
 
     std::map<std::string, float* > m_trackWiseDataForRoot;
     std::map<std::string, std::vector<float>* > m_trackWiseVecDataForRoot;
-    std::map<std::string, LayerWiseData* > m_layerWiseDataForRoot;
+    std::map<std::string, std::vector<std::vector<float> >* > m_layerWiseDataForRoot;
 
 
     int m_nLayers; // number of Si layers. That is 6 of course.

@@ -13,6 +13,7 @@
 
 #include <vxd/dataobjects/VxdID.h>
 #include <svd/dataobjects/SVDTrueHit.h>
+#include <vxd/dataobjects/VXDSimpleDigiHit.h>
 
 // ROOT includes
 #include <TMatrixD.h>
@@ -60,6 +61,9 @@ namespace Belle2 {
      */
     SVDRecoHit2D(const SVDTrueHit* hit, float sigmaU = -1, float sigmaV = -1);
 
+
+    SVDRecoHit2D(const VXDSimpleDigiHit* hit);
+
     /** Destructor. */
     virtual ~SVDRecoHit2D() {}
 
@@ -78,7 +82,8 @@ namespace Belle2 {
 
     /** Get pointer to the TrueHit used when creating this RecoHit, can be NULL if created from something else */
     const SVDTrueHit* getTrueHit() const { return m_trueHit; }
-
+    /** Get pointer to the VXDSimpleDigiHit used when creating this RecoHit, can be NULL if created from something else */
+    const VXDSimpleDigiHit* getSimpleDigiHit() const { return m_vxdSimpleDigiHit; }
     /** Get u coordinate.*/
     float getU() const { return fHitCoord(0, 0); }
     /** Get v coordinate.*/
@@ -103,13 +108,15 @@ namespace Belle2 {
 
     unsigned short m_sensorID; /**< Unique sensor identifier.*/
     const SVDTrueHit* m_trueHit; /**< Pointer to the Truehit used to generate this hit */
+    const VXDSimpleDigiHit* m_vxdSimpleDigiHit; /**< Pointer to the VXDSimpleDigiHit used when creating this object */
+
     float m_energyDep; /**< deposited energy.*/
     //float m_energyDepError; /**< error in dep. energy.*/
 
     /** Set up Detector plane information */
     void setDetectorPlane();
 
-    ClassDef(SVDRecoHit2D, 1)
+    ClassDef(SVDRecoHit2D, 2)
   };
 
 } // namespace Belle2

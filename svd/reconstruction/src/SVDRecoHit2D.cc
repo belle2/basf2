@@ -26,12 +26,12 @@ using namespace Belle2;
 ClassImp(SVDRecoHit2D)
 
 SVDRecoHit2D::SVDRecoHit2D():
-  GFRecoHitIfc<GFPlanarHitPolicy> (HIT_DIMENSIONS), m_sensorID(0), m_trueHit(0),
+  GFRecoHitIfc<GFPlanarHitPolicy> (HIT_DIMENSIONS), m_sensorID(0), m_trueHit(0), m_vxdSimpleDigiHit(NULL),
   m_energyDep(0)//, m_energyDepError(0)
 {}
 
 SVDRecoHit2D::SVDRecoHit2D(const SVDTrueHit* hit, float sigmaU, float sigmaV):
-  GFRecoHitIfc<GFPlanarHitPolicy> (HIT_DIMENSIONS), m_sensorID(0), m_trueHit(hit),
+  GFRecoHitIfc<GFPlanarHitPolicy> (HIT_DIMENSIONS), m_sensorID(0), m_trueHit(hit), m_vxdSimpleDigiHit(NULL),
   m_energyDep(0)//, m_energyDepError(0)
 {
   if (!gRandom) B2FATAL("gRandom not initialized, please set up gRandom first");
@@ -56,6 +56,29 @@ SVDRecoHit2D::SVDRecoHit2D(const SVDTrueHit* hit, float sigmaU, float sigmaV):
   fHitCov(1, 1) = sigmaV * sigmaV;
   // Set physical parameters
   m_energyDep = hit->getEnergyDep();
+  // Setup geometry information
+  setDetectorPlane();
+}
+
+SVDRecoHit2D::SVDRecoHit2D(const VXDSimpleDigiHit* hit):
+  GFRecoHitIfc<GFPlanarHitPolicy> (HIT_DIMENSIONS), m_sensorID(0), m_trueHit(0), m_vxdSimpleDigiHit(hit),
+  m_energyDep(0)//, m_energyDepError(0)
+{
+  // Set the sensor UID
+  m_sensorID = hit->getSensorID();
+  double sigmaU = hit->getSigU();
+  double sigmaV = hit->getSigV();
+  // Set positions
+  fHitCoord(0, 0) = hit->getU();
+  fHitCoord(1, 0) = hit->getV();
+  // Set the error covariance matrix
+  fHitCov(0, 0) = sigmaU * sigmaU;
+  fHitCov(0, 1) = 0;
+  fHitCov(1, 0) = 0;
+  fHitCov(1, 1) = sigmaV * sigmaV;
+  // Set physical parameters
+  //m_energyDep = hit->getCharge() * Unit::ehEnergy;
+  //m_energyDepError = 0;
   // Setup geometry information
   setDetectorPlane();
 }

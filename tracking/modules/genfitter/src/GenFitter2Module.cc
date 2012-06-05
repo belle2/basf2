@@ -31,7 +31,7 @@
 
 #include <vxd/geometry/GeoCache.h>
 #include <vxd/dataobjects/VXDTrueHit.h>
-
+#include <vxd/dataobjects/VXDSimpleDigiHit.h>
 #include <tracking/gfbfield/GFGeant4Field.h>
 //genfit stuff
 #include <GFTrack.h>
@@ -83,6 +83,8 @@ GenFitter2Module::GenFitter2Module() :
   addParam("noEffects", m_noEffects, "switch off all material effects in Genfit. This overwrites all individual material effects switches", false);
   addParam("angleCut", m_angleCut, "only process tracks with scattering angles smaller then angleCut (The angles are calculated from TrueHits). If negative value given no selection will take place", -1.0);
   addParam("mscModel", m_mscModel, "select the MSC model in Genfit", string("Highland"));
+  addParam("useVXDSimpleDigiHits", m_useVXDSimpleDigiHits, "set true if processing of Hits from the VXDSimpleBackround module is wanted", false);
+  addParam("dafTemperatures", m_dafTemperatures, "set the anihiling scheme (temperatures) for the DAF. Length of vector will determine DAF iterations", vector<double>(3, 1.0));
 }
 
 GenFitter2Module::~GenFitter2Module()
@@ -106,13 +108,26 @@ void GenFitter2Module::initialize()
     GFMaterialEffects::getInstance()->setEnergyLossBrems(m_energyLossBrems);
     GFMaterialEffects::getInstance()->setNoiseBrems(m_noiseBrems);
   }
-  //GFMaterialEffects::getInstance()->setMscModel(m_mscModel);
+  GFMaterialEffects::getInstance()->setMscModel(m_mscModel);
   StoreArray<GFTrack> fittedTracks(""); //initialization of the the output container of this module
 
   //set options for fitting algorithms
   m_kalmanFilter.setNumIterations(m_nGFIter);
   m_kalmanFilter.setBlowUpFactor(m_blowUpFactor);
   m_daf.setProbCut(m_probCut);
+  int nDafTemps = m_dafTemperatures.size();
+  if (nDafTemps <= 10) {
+    m_dafTemperatures.resize(10, -1.0);
+    m_daf.setBetas(m_dafTemperatures[0], m_dafTemperatures[1], m_dafTemperatures[2], m_dafTemperatures[3], m_dafTemperatures[4], m_dafTemperatures[5], m_dafTemperatures[6], m_dafTemperatures[7], m_dafTemperatures[8], m_dafTemperatures[9]);
+//    cout << "m_dafTemperatures: ";
+//    for ( int i = 0; i not_eq m_dafTemperatures.size(); ++i){
+//      cout << m_dafTemperatures[i] << " | ";
+//    }
+//    cout << endl;
+  } else {
+    m_daf.setBetas(1, 1, 1);
+    B2ERROR("An anihiling scheme for the DAF with more then 10 temperatures is not supported. The default scheme was selcted instead.");
+  }
 
 }
 
@@ -128,7 +143,7 @@ void GenFitter2Module::event()
 
   StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
   int eventCounter = eventMetaDataPtr->getEvent();
-  B2DEBUG(99, "**********   GenFitter2Module  processing event number: " << eventCounter << " ************");
+  B2DEBUG(100, "**********   GenFitter2Module  processing event number: " << eventCounter << " ************");
   StoreArray<GFTrackCand> trackCandidates("");
   int nTrackCandidates = trackCandidates.getEntries();
   if (nTrackCandidates not_eq 0) {  // only try to access a track candidate if there is one
@@ -152,15 +167,19 @@ void GenFitter2Module::event()
       B2DEBUG(100, "GenFitter2: StoreArray<CDCHit> is empty!");
     }
 
+    StoreArray<VXDSimpleDigiHit> pxdSimpleDigiHits("pxdSimpleDigiHits");
+    StoreArray<VXDSimpleDigiHit> svdSimpleDigiHits("svdSimpleDigiHits");
+    B2DEBUG(100, "pxdSimpleDigiHits.getEntries() " << pxdSimpleDigiHits.getEntries());
+    B2DEBUG(100, "svdSimpleDigiHits.getEntries() " << svdSimpleDigiHits.getEntries());
     GFTrackCand* aTrackCandPointer = trackCandidates[0];
     int nTrackCandHits = aTrackCandPointer->getNHits();
-
+    B2DEBUG(100, "nTrackCandHits " << nTrackCandHits);
     // if option is set ignore every track that does not have exactly 1 hit in every Si layer
     bool filterEvent = false;
     if (m_filter == true) {
       if (nTrackCandHits not_eq 6) {
         filterEvent = true;
-        B2DEBUG(99, "Not exactly one hit in very Si layer. Track "  << eventCounter << " will not be reconstructed");
+        B2DEBUG(100, "Not exactly one hit in very Si layer. Track "  << eventCounter << " will not be reconstructed");
         ++m_notPerfectCounter;
       } else {
         vector<int> layerIds(nTrackCandHits);
@@ -170,10 +189,18 @@ void GenFitter2Module::event()
           aTrackCandPointer->getHit(i, detId, hitId);
           int layerId = -1;
           if (detId == 0) {
-            layerId = pxdTrueHits[hitId]->getSensorID().getLayerNumber();
+            if (m_useVXDSimpleDigiHits == true) {
+              layerId = pxdSimpleDigiHits[hitId]->getSensorID().getLayerNumber();
+            } else {
+              layerId = pxdTrueHits[hitId]->getSensorID().getLayerNumber();
+            }
           }
           if (detId == 1) {
-            layerId = svdTrueHits[hitId]->getSensorID().getLayerNumber();
+            if (m_useVXDSimpleDigiHits == true) {
+              layerId = svdSimpleDigiHits[hitId]->getSensorID().getLayerNumber();
+            } else {
+              layerId = svdTrueHits[hitId]->getSensorID().getLayerNumber();
+            }
           }
           layerIds[i] = layerId;
         }
@@ -181,11 +208,12 @@ void GenFitter2Module::event()
         for (int l = 0; l not_eq nTrackCandHits; ++l) {
           if (l + 1 not_eq layerIds[l]) {
             filterEvent = true;
-            B2DEBUG(99, "Not exactly one hit in very Si layer. Track "  << eventCounter << " will not be reconstructed");
+            B2DEBUG(100, "Not exactly one hit in very Si layer. Track "  << eventCounter << " will not be reconstructed");
             ++m_notPerfectCounter;
             break;
           }
         }
+
       }
     }
     //find out if a track has a too large scattering angel and if yes ignore it ( only check if event was not filter out by the six hit only filter)
@@ -205,9 +233,9 @@ void GenFitter2Module::event()
         }
         TVector3 pTrueIn = aVxdTrueHitPtr->getEntryMomentum();
         TVector3 pTrueOut = aVxdTrueHitPtr->getExitMomentum();
-//        const VXD::SensorInfoBase& aCoordTrans = aGeoCach.getSensorInfo(aVxdTrueHitPtr->getSensorID());
-//        TVector3 pTrueInGlobal = aCoordTrans.vectorToGlobal(pTrueIn);
-//        TVector3 pTrueOutGlobal = aCoordTrans.vectorToGlobal(pTrueOut);
+        //        const VXD::SensorInfoBase& aCoordTrans = aGeoCach.getSensorInfo(aVxdTrueHitPtr->getSensorID());
+        //        TVector3 pTrueInGlobal = aCoordTrans.vectorToGlobal(pTrueIn);
+        //        TVector3 pTrueOutGlobal = aCoordTrans.vectorToGlobal(pTrueOut);
         if (abs(pTrueIn.Angle(pTrueOut)) > m_angleCut) {
           filterEvent = true;
           ++m_largeAngleCounter;
@@ -232,33 +260,49 @@ void GenFitter2Module::event()
       TVector3 dirSigma = aTrackCandPointer->getDirError();
 
 
-      //B2DEBUG(99,"MCIndex: "<<mcindex);
-      B2DEBUG(99, "Start values: momentum: " << momentum.x() << "  " << momentum.y() << "  " << momentum.z() << " " << momentum.Mag());
-      B2DEBUG(99, "Start values: direction std: " << dirSigma.x() << "  " << dirSigma.y() << "  " << dirSigma.z());
-      B2DEBUG(99, "Start values: vertex:   " << vertex.x() << "  " << vertex.y() << "  " << vertex.z());
-      B2DEBUG(99, "Start values: vertex std:   " << vertexSigma.x() << "  " << vertexSigma.y() << "  " << vertexSigma.z());
-      B2DEBUG(99, "Start values: pdg:      " << aTrackCandPointer->getPdgCode());
+      //B2DEBUG(100,"MCIndex: "<<mcindex);
+      B2DEBUG(100, "Start values: momentum: " << momentum.x() << "  " << momentum.y() << "  " << momentum.z() << " " << momentum.Mag());
+      B2DEBUG(100, "Start values: momentum std: " << dirSigma.x() << "  " << dirSigma.y() << "  " << dirSigma.z());
+      B2DEBUG(100, "Start values: vertex:   " << vertex.x() << "  " << vertex.y() << "  " << vertex.z());
+      B2DEBUG(100, "Start values: vertex std:   " << vertexSigma.x() << "  " << vertexSigma.y() << "  " << vertexSigma.z());
+      B2DEBUG(100, "Start values: pdg:      " << aTrackCandPointer->getPdgCode());
       RKTrackRep* trackRep;
       //Now create a GenFit track with this representation
 
       trackRep = new RKTrackRep(aTrackCandPointer);
-      //trackRep->setPropDir(1); // setting the prop dir disables the automatic selection of the direction (but it still will automatically change when switching between forward and backward filter
+      trackRep->setPropDir(1); // setting the prop dir disables the automatic selection of the direction (but it still will automatically change when switching between forward and backward filter
       GFTrack track(trackRep, true);
 
       GFRecoHitFactory factory;
 
-      //create RecoHitProducers for PXD, SVD and CDC
+
       GFRecoHitProducer <PXDTrueHit, PXDRecoHit> * PXDProducer;
-      PXDProducer =  new GFRecoHitProducer <PXDTrueHit, PXDRecoHit> (&*pxdTrueHits);
       GFRecoHitProducer <SVDTrueHit, SVDRecoHit2D> * SVDProducer;
-      SVDProducer =  new GFRecoHitProducer <SVDTrueHit, SVDRecoHit2D> (&*svdTrueHits);
       GFRecoHitProducer <CDCHit, CDCRecoHit> * CDCProducer;
-      CDCProducer =  new GFRecoHitProducer <CDCHit, CDCRecoHit> (&*cdcHits);
+
+      GFRecoHitProducer <VXDSimpleDigiHit, PXDRecoHit> * pxdSimpleDigiHitProducer;
+      GFRecoHitProducer <VXDSimpleDigiHit, SVDRecoHit2D> * svdSimpleDigiHitProducer;
+      //create RecoHitProducers for PXD, SVD and CDC
+      if (m_useVXDSimpleDigiHits == false) { // use the trueHits
+        PXDProducer =  new GFRecoHitProducer <PXDTrueHit, PXDRecoHit> (&*pxdTrueHits);
+        SVDProducer =  new GFRecoHitProducer <SVDTrueHit, SVDRecoHit2D> (&*svdTrueHits);
+        CDCProducer =  new GFRecoHitProducer <CDCHit, CDCRecoHit> (&*cdcHits);
+      } else {
+        pxdSimpleDigiHitProducer =  new GFRecoHitProducer <VXDSimpleDigiHit, PXDRecoHit> (&*pxdSimpleDigiHits);
+        svdSimpleDigiHitProducer =  new GFRecoHitProducer <VXDSimpleDigiHit, SVDRecoHit2D> (&*svdSimpleDigiHits);
+      }
+
 
       //add producers to the factory with correct detector Id
-      factory.addProducer(0, PXDProducer);
-      factory.addProducer(1, SVDProducer);
-      factory.addProducer(2, CDCProducer);
+
+      if (m_useVXDSimpleDigiHits == false) { // use the trueHits
+        factory.addProducer(0, PXDProducer);
+        factory.addProducer(1, SVDProducer);
+        factory.addProducer(2, CDCProducer);
+      } else {
+        factory.addProducer(0, pxdSimpleDigiHitProducer);
+        factory.addProducer(1, svdSimpleDigiHitProducer);
+      }
 
       vector <GFAbsRecoHit*> factoryHits;
       //use the factory to create RecoHits for all Hits stored in the track candidate
@@ -268,7 +312,7 @@ void GenFitter2Module::event()
       track.addHitVector(factoryHits);
       track.setCandidate(*aTrackCandPointer);
 
-      B2DEBUG(99, "Total Nr of Hits assigned to the Track: " << track.getNumHits());
+      B2DEBUG(100, "Total Nr of Hits assigned to the Track: " << track.getNumHits());
       /*for ( int iHit = 0; iHit not_eq track.getNumHits(); ++iHit){
         GFAbsRecoHit* const aGFAbsRecoHitPtr = track.getHit(iHit);
 
@@ -296,15 +340,15 @@ void GenFitter2Module::event()
       }
 
       int genfitStatusFlag = trackRep->getStatusFlag();
-      B2DEBUG(99, "----> Status of fit: " << genfitStatusFlag);
-      B2DEBUG(99, "-----> Fit Result: momentum: " << track.getMom().x() << "  " << track.getMom().y() << "  " << track.getMom().z() << " " << track.getMom().Mag());
-      B2DEBUG(99, "-----> Fit Result: current position: " << track.getPos().x() << "  " << track.getPos().y() << "  " << track.getPos().z());
-      B2DEBUG(99, "----> Chi2 of the fit: " << track.getChiSqu());
-      B2DEBUG(99, "----> NDF of the fit: " << track.getNDF());
-//          track.Print();
-//          for ( int iHit = 0; iHit not_eq track.getNumHits(); ++iHit){
-//            track.getHit(iHit)->Print();
-//          }
+      B2DEBUG(100, "----> Status of fit: " << genfitStatusFlag);
+      B2DEBUG(100, "-----> Fit Result: momentum: " << track.getMom().x() << "  " << track.getMom().y() << "  " << track.getMom().z() << " " << track.getMom().Mag());
+      B2DEBUG(100, "-----> Fit Result: current position: " << track.getPos().x() << "  " << track.getPos().y() << "  " << track.getPos().z());
+      B2DEBUG(100, "----> Chi2 of the fit: " << track.getChiSqu());
+      B2DEBUG(100, "----> NDF of the fit: " << track.getNDF());
+      //          track.Print();
+      //          for ( int iHit = 0; iHit not_eq track.getNumHits(); ++iHit){
+      //            track.getHit(iHit)->Print();
+      //          }
 
       if (genfitStatusFlag == 0) {
         new(fittedTracks->AddrAt(0)) GFTrack(track);

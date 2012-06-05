@@ -14,6 +14,8 @@
 #include <vxd/dataobjects/VxdID.h>
 #include <pxd/dataobjects/PXDTrueHit.h>
 #include <pxd/dataobjects/PXDCluster.h>
+#include <vxd/dataobjects/VXDSimpleDigiHit.h>
+
 
 // ROOT includes
 #include <TMatrixD.h>
@@ -88,6 +90,8 @@ namespace Belle2 {
      */
     PXDRecoHit(const PXDCluster* hit);
 
+    PXDRecoHit(const VXDSimpleDigiHit* hit);
+
     /** Destructor. */
     virtual ~PXDRecoHit() {}
 
@@ -108,7 +112,8 @@ namespace Belle2 {
     const PXDTrueHit* getTrueHit() const { return m_trueHit; }
     /** Get pointer to the Cluster used when creating this RecoHit, can be NULL if created from something else */
     const PXDCluster* getCluster() const { return m_cluster; }
-
+    /** Get pointer to the VXDSimpleDigiHit used when creating this RecoHit, can be NULL if created from something else */
+    const VXDSimpleDigiHit* getSimpleDigiHit() const { return m_vxdSimpleDigiHit; }
     /** Get u coordinate.*/
     float getU() const { return fHitCoord(0, 0); }
     /** Get v coordinate.*/
@@ -134,13 +139,14 @@ namespace Belle2 {
     unsigned short m_sensorID; /**< Unique sensor identifier.*/
     const PXDTrueHit* m_trueHit; /**< Pointer to the TrueHit used when creating this object */
     const PXDCluster* m_cluster; /**< Pointer to the Cluster used when creating this object */
+    const VXDSimpleDigiHit* m_vxdSimpleDigiHit; /**< Pointer to the VXDSimpleDigiHit used when creating this object */
     float m_energyDep; /**< deposited energy.*/
     //float m_energyDepError; /**< error in dep. energy.*/
 
     /** Set up Detector plane information */
     void setDetectorPlane();
 
-    ClassDef(PXDRecoHit, 1)
+    ClassDef(PXDRecoHit, 2)
   };
 
 } // namespace Belle2

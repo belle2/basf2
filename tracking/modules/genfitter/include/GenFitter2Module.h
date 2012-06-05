@@ -88,6 +88,9 @@ namespace Belle2 {
     bool m_noEffects;
     std::string m_mscModel;
 
+    bool m_useVXDSimpleDigiHits;
+    std::vector<double> m_dafTemperatures;
+
 
   };
 } // end namespace Belle2

@@ -54,9 +54,11 @@ def main():
     proxyinfo = prepareProxy()
 
     cliParams.validOption()
-
-    status = CheckAndRemoveProjectIfForce(proxyinfo['Value']['username'],
-            cliParams.getProject())
+# comment it out because it doesnt work and set status manually
+#    status =
+# CheckAndRemoveProjectIfForce(proxyinfo['Value']['username'],
+#            cliParams.getProject())
+    status = ('New', 0)
 
     if cliParams.getDataType == 'gen-mc':
         results = {}
@@ -103,6 +105,7 @@ def main():
 
   # keep track of the number of events submitted
     totalevents = 0
+  # print status[1]
     numberOfJobs = status[1]
     numberofLfns = 1
     tmp = 0

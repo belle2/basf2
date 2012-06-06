@@ -102,7 +102,8 @@ def make_jdl(
     f.write('    PilotType = "private";\n')
     f.write('    SystemConfig = ' + sysconfig + ';\n')
     if site != '':
-        f.write('    Site = ' + site + ';\n')
+        if site != None:
+            f.write('    Site = ' + site + ';\n')
     f.write('    Requirements = Member("VO-belle-' + swver
             + '",other.GlueHostApplicationSoftwareRunTimeEnvironment);\n')
     f.write('    InputSandbox = \n')

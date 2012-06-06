@@ -15,7 +15,7 @@ gbasf2_path=`dirname path`/..
 find ${gbasf2_path}/lib -name gbasf2.py >/dev/null 2>&1
 if [ $? -eq 1 ]
 then
- BELLE2_LOCAL_DIR=${BELLE2_LOCAL_DIR:-..}
+ BELLE2_LOCAL_DIR=${BELLE2_LOCAL_DIR:-.}
  ${BELLE2_LOCAL_DIR}/gbasf2/lib/gbasf2.py "$@"  
 else
  ${gbasf2_path}/lib/gbasf2.py "$@"

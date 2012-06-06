@@ -21,7 +21,7 @@
 #include <fstream>
 #include <functional>
 #include <map>
-
+#include <G4String.hh>
 
 #include "TVector3.h"
 typedef int EclIdentifier ;
@@ -82,6 +82,7 @@ namespace Belle2 {
     int GetCellID() {return mPar_cellID;};//! Get Cell Id
     int GetThetaID() {return mPar_thetaID;};//! Get Theta Id
     int GetPhiID() {return mPar_phiID;};//! Get Phi Id
+
 
   private:
 
@@ -337,6 +338,8 @@ namespace Belle2 {
     // static data members
 
   };
+
+  int ECLG4VolNameToCellID(const G4String VolumeName);//Mapping from VolumeName to Crystal CellID
 
 ///
   typedef std::map < TEclEnergyHit::Identifier, TEclEnergyHit,

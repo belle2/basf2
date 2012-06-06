@@ -304,6 +304,10 @@ void ExtModule::registerVolumes()
 // Convert the physical volume name to an integer pair that identifies it
 void ExtModule::getVolumeID(const G4TouchableHandle& touch, int& detID, int& copyID)
 {
+  int GSector = 0; // for ECL cell ID
+  int iCry = 0;    // for ECL cell ID
+  // default value is 0
+  copyID = 0;
   G4String name = touch->GetVolume(0)->GetName();
   if (name.find("CDC") != string::npos) {
     detID = 3;
@@ -312,7 +316,6 @@ void ExtModule::getVolumeID(const G4TouchableHandle& touch, int& detID, int& cop
   // TOP doesn't have one envelope; it has several "PlacedTOPModule"s
   if (name == "PlacedTOPModule") {
     detID = 3;
-    copyID = 0;
   }
   // TOP quartz bar (=sensitive) has an automatically generated PV name
   // av_WWW_impr_XXX_YYY_ZZZ because it is an imprint of a G4AssemblyVolume;
@@ -324,11 +327,9 @@ void ExtModule::getVolumeID(const G4TouchableHandle& touch, int& detID, int& cop
   // ARICH has an envelope that contains modules that each contain a moduleSensitive
   if (name == "ARICH.Envelope") {
     detID = 4;
-    copyID = 0;
   }
   if (name == "ARICH.DetectorModules") {
     detID = 4;
-    copyID = 0;
   }
   if (name == "moduleSensitive") {
     detID = 4;
@@ -337,27 +338,79 @@ void ExtModule::getVolumeID(const G4TouchableHandle& touch, int& detID, int& cop
   // ECL
   if (name == "physicalECL") {
     detID = 5;
-    copyID = 0;
   }
   // ECL crystal (=sensitive) has an automatically generated PV name
   // av_WWW_impr_XXX_YYY_ZZZ because it is an imprint of a G4AssemblyVolume;
   // YYY is logicalEcl**Crystal, where **=Br, Fw, or Bw.
   // XXX is 1..144 for Br, 1..16 for Fw, and 1..16 for Bw
   // ZZZ is n_pv_m where n is 1..46 for Br, 1..72 for Fw, and 73..132 for Bw
-  // CopyNo() encodes XXX and n.
+  // ECL cellID is derived from XXX and n (using code from Poyuan).
   if (name.find("_logicalEclBrCrystal_") != string::npos) {
     detID = 5;
-    copyID = (touch->GetVolume(0)->GetCopyNo() + 1) / 2;
-  }
-  if (name.find("_logicalEclFwCrystal_") != string::npos) {
+    sscanf(name.c_str(), "%*[^'_']_%*[^'_']_%*[^'_']_%d_%*[^'_']_%d_%*s", &GSector, &iCry);
+    if (GSector == 0) GSector = 144;
+    GSector--;
+    iCry--;
+    copyID = 1152 + iCry * 144 + GSector;
+  } else if (name.find("_logicalEclFwCrystal_") != string::npos) {
     detID = 5;
-    copyID = (touch->GetVolume(0)->GetCopyNo() + 1) / 2;
-  }
-  if (name.find("_logicalEclBwCrystal_") != string::npos) {
+    sscanf(name.c_str(), "%*[^'_']_%*[^'_']_%*[^'_']_%d_%*[^'_']_%d_%*s", &GSector, &iCry);
+    GSector--;
+    iCry--;
+    if (iCry < 3) {
+      copyID = GSector * 3 + iCry - 0;
+    } else if (iCry < 6) {
+      copyID = GSector * 3 + (iCry - 3) + 16 * 3;
+    } else if (iCry < 10) {
+      copyID = GSector * 4 + (iCry - 6) + 16 * 6;
+    } else if (iCry < 14) {
+      copyID = GSector * 4 + (iCry - 10) + 16 * 10;
+    } else if (iCry < 18) {
+      copyID = GSector * 4 + (iCry - 14) + 16 * 14;
+    } else if (iCry < 24) {
+      copyID = GSector * 6 + (iCry - 18) + 16 * 18;
+    } else if (iCry < 30) {
+      copyID = GSector * 6 + (iCry - 24) + 16 * 24;
+    } else if (iCry < 36) {
+      copyID = GSector * 6 + (iCry - 30) + 16 * 30;
+    } else if (iCry < 42) {
+      copyID = GSector * 6 + (iCry - 36) + 16 * 36;
+    } else if (iCry < 48) {
+      copyID = GSector * 6 + (iCry - 42) + 16 * 42;
+    } else if (iCry < 54) {
+      copyID = GSector * 6 + (iCry - 48) + 16 * 48;
+    } else if (iCry < 63) {
+      copyID = GSector * 9 + (iCry - 54) + 16 * 54;
+    } else if (iCry < 72) {
+      copyID = GSector * 9 + (iCry - 63) + 16 * 63;
+    }
+  } else if (name.find("_logicalEclBwCrystal_") != string::npos) {
     detID = 5;
-    copyID = (touch->GetVolume(0)->GetCopyNo() + 1) / 2;
+    sscanf(name.c_str(), "%*[^'_']_%*[^'_']_%*[^'_']_%d_%*[^'_']_%d_%*s", &GSector, &iCry);
+    GSector--;
+    iCry -= 73;
+    if (iCry < 9) {
+      copyID = GSector * 9 + iCry - 0 + 7776;
+    } else if (iCry < 18) {
+      copyID = GSector * 9 + (iCry - 9) + 16 * 9 + 7776;
+    } else if (iCry < 24) {
+      copyID = GSector * 6 + (iCry - 18) + 16 * 18 + 7776;
+    } else if (iCry < 30) {
+      copyID = GSector * 6 + (iCry - 24) + 16 * 24 + 7776;
+    } else if (iCry < 36) {
+      copyID = GSector * 6 + (iCry - 30) + 16 * 30 + 7776;
+    } else if (iCry < 42) {
+      copyID = GSector * 6 + (iCry - 36) + 16 * 36 + 7776;
+    } else if (iCry < 48) {
+      copyID = GSector * 6 + (iCry - 42) + 16 * 42 + 7776;
+    } else if (iCry < 52) {
+      copyID = GSector * 4 + (iCry - 48) + 16 * 48 + 7776;
+    } else if (iCry < 56) {
+      copyID = GSector * 4 + (iCry - 52) + 16 * 52 + 7776;
+    } else if (iCry < 60) {
+      copyID = GSector * 4 + (iCry - 56) + 16 * 56 + 7776;
+    }
   }
-
 }
 
 TMatrixD ExtModule::getCov(const G4ErrorFreeTrajState* state)

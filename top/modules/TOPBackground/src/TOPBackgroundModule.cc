@@ -1,0 +1,305 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2010 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contrbutors: Marko Petric                                              *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+// Own include
+
+#include <top/modules/TOPBackground/TOPBackgroundModule.h>
+#include <framework/core/ModuleManager.h>
+#include <time.h>
+
+// framework - DataStore
+#include <framework/datastore/DataStore.h>
+#include <framework/datastore/StoreArray.h>
+#include <framework/datastore/RelationIndex.h>
+#include <framework/datastore/RelationArray.h>
+
+// framework aux
+#include <framework/gearbox/Unit.h>
+#include <framework/logging/Logger.h>
+#include <TClonesArray.h>
+// Framwrok
+#include <framework/dataobjects/EventMetaData.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/gearbox/Unit.h>
+
+
+using namespace std;
+using namespace boost;
+
+namespace Belle2 {
+  namespace top {
+    //-----------------------------------------------------------------
+    //                 Register the Module
+    //-----------------------------------------------------------------
+
+    REG_MODULE(TOPBackground)
+
+
+    //-----------------------------------------------------------------
+    //                 Implementation
+    //-----------------------------------------------------------------
+
+    TOPBackgroundModule::TOPBackgroundModule() : Module()
+    {
+      // Set description()
+      setDescription("TOPBackground");
+
+      // Add parameters
+      addParam("Type", m_BkgType, "Backgound typ name" , string("Backgound"));
+      addParam("Output", m_OutputFileName, "Name of output file", string("Backgound.root"));
+      addParam("TimeOfSimulation", m_TimeOfSimulation, "How is the analysed file", 5.);
+    }
+
+    TOPBackgroundModule::~TOPBackgroundModule()
+    {
+
+    }
+
+    void TOPBackgroundModule::initialize()
+    {
+
+      // CPU time start
+
+      // Initializing the output root file
+      m_rootFile = new TFile(m_OutputFileName.c_str(), "RECREATE");
+
+      peflux = new TH1F("Photoelectron flux", "Photoelectron flux", 33, -11.25, 360);
+      rdose = new TH1F("Radiation dose", "Radiation dose", 33, -11.25, 360);
+      nflux = new TH1F("Neutron flux", "Neutron flux", 33, -11.25, 360);
+      zdist = new TH1F("Photoelectron origin", "Photoelectron origin", 200, -400, 400);
+      origin_zx = new TGraph();
+      origin_zy = new TGraph();
+
+      PCBmass = 0.417249;
+      PCBarea = 496.725;
+      yearns = 1.e13;
+      evtoJ = 1.60217653 * 1e-10;
+      mtoc = 1.97530864197531;
+
+
+    }
+
+    void TOPBackgroundModule::beginRun()
+    {
+      // Print run number
+      B2INFO("TOPBackground: Processing:");
+
+    }
+
+    const TOPSimHit* TOPBackgroundModule::getTOPSimHit(const TOPDigit* digit)
+    {
+
+
+      StoreArray<TOPDigit>  topDigits;
+      StoreArray<TOPSimHit>  topSimhits;
+      StoreArray<MCParticle> mcParticles;
+
+      RelationArray testrelSimHitToDigit(topSimhits, topDigits);
+
+      if (!testrelSimHitToDigit) {
+        return 0;
+      }
+
+      RelationIndex< TOPSimHit, TOPDigit > relSimHitToDigit(topSimhits, topDigits);
+
+      if (!relSimHitToDigit) {
+        return 0;
+      }
+
+      if (relSimHitToDigit.getFirstFrom(digit)) {
+        return relSimHitToDigit.getFirstFrom(digit)->from;
+      }
+
+      return 0;
+    }
+
+    void TOPBackgroundModule::event()
+    {
+      StoreArray<TOPSimHit>  topSimhits;
+      StoreArray<MCParticle> mcParticles;
+      StoreArray<TOPDigit> topDigits;
+      StoreArray<TOPTrack> topTracks;
+
+      int nHits = topDigits->GetEntries();
+      int barID = 0;
+      for (int i = 0; i < nHits; i++) {
+        TOPDigit* aDigit = topDigits[i];
+        barID = aDigit->getBarID();
+        peflux->AddBinContent(barID * 2, 1. / m_TimeOfSimulation / 32.0);
+
+        const TOPSimHit* simHit = getTOPSimHit(aDigit);
+
+        RelationIndex<MCParticle, TOPSimHit> relMCParticleToTOPSimHit(mcParticles, topSimhits);
+
+        if (relMCParticleToTOPSimHit.getFirstFrom(simHit)) {
+          const MCParticle* currParticle = relMCParticleToTOPSimHit.getFirstFrom(simHit)->from;
+
+          const MCParticle* mother = currParticle->getMother();
+          int mm = 0;
+          while (mother) {
+            const MCParticle* pommother = mother->getMother();
+            if (!pommother) {
+              zdist->Fill(mother->getVertex().Z());
+            }
+            mother = pommother;
+            mm++;
+          }
+        }
+      }
+
+
+      StoreArray<BeamBackHit> beamBackHits;
+      nHits = beamBackHits->GetEntries();
+
+      for (int iHit = 0; iHit < nHits; ++iHit) {
+        BeamBackHit* tophit = beamBackHits[iHit];
+        int subdet = tophit->getSubDet();
+        if (subdet != 5) continue;
+
+        TVector3 pos = tophit->getPosition();
+        double phi = pos.XYvector().Phi_0_2pi(pos.XYvector().Phi()) / 3.14159265358979 * 180.;
+        int barID = int (phi / 22.5 + 0.5);
+        if (barID == 16) {
+          barID = 0;
+        }
+        barID++;
+
+
+        if (tophit->getPDG() == 2112) {
+          double w = tophit->getNeutronWeight();
+          double tlen = tophit->getTrackLength();
+
+          nflux->AddBinContent(barID * 2, w / m_TimeOfSimulation / PCBarea * yearns * tlen / 0.2);
+
+        } else {
+          double edep = tophit->getEnergyDeposit();
+          rdose->AddBinContent(barID * 2, edep / m_TimeOfSimulation * yearns / PCBmass * evtoJ);
+        }
+      }
+
+      nHits = topTracks->GetEntries();
+      for (int iHit = 0; iHit < nHits; ++iHit) {
+
+        TOPTrack* simHit = topTracks[iHit];
+        origin_zx->SetPoint(iHit, simHit->getVPosition().Z(), simHit->getVPosition().X());
+        origin_zy->SetPoint(iHit, simHit->getVPosition().Z(), simHit->getVPosition().Y());
+      }
+    }
+
+
+    void TOPBackgroundModule::myprint(TH1F* histo, const char* path, const char* xtit = "", const char* ytit = "", double tresh = 0)
+    {
+
+      gROOT->Reset();
+      gStyle->SetOptStat("");
+      gStyle->SetOptFit(1111);
+
+      gStyle->SetCanvasColor(-1);
+      gStyle->SetPadColor(-1);
+      gStyle->SetFrameFillColor(-1);
+      gStyle->SetHistFillColor(-1);
+      gStyle->SetTitleFillColor(-1);
+      gStyle->SetFillColor(-1);
+      gStyle->SetFillStyle(4000);
+      gStyle->SetStatStyle(0);
+      gStyle->SetTitleStyle(0);
+      gStyle->SetCanvasBorderSize(0);
+      gStyle->SetCanvasBorderMode(0);
+      gStyle->SetPadBorderMode(0);
+      //  gStyle->SetTitleMode(0);
+      gStyle->SetFrameBorderSize(0);
+      gStyle->SetLegendBorderSize(0);
+      gStyle->SetStatBorderSize(0);
+      gStyle->SetTitleBorderSize(0);
+      //gROOT->ForceStyle();*/
+
+
+
+      TCanvas* c1 = new TCanvas("c1", "", 1920, 1200);
+
+      double x1 = histo->GetBinLowEdge(1);
+      double nb = histo->GetNbinsX();
+      double bin = histo->GetBinWidth(1);
+      double x2 = x1 + bin * nb;
+
+      double max = histo->GetBinContent(histo->GetMaximumBin());
+
+      if (max < tresh) {
+        histo->GetYaxis()->SetRangeUser(0, tresh * 1.1);
+      }
+
+      TLine* line = new TLine(x1, tresh, x2, tresh);
+      line->SetLineColor(1);
+      line->SetLineWidth(3);
+      line->SetLineStyle(2);
+
+
+      histo->SetFillColor(2);
+      histo->SetLineColor(1);
+
+      gPad->SetTopMargin(0.08);
+      gPad->SetBottomMargin(0.15);
+      gPad->SetGridy();
+
+      histo->GetXaxis()->SetLabelSize(0.06);
+      histo->GetYaxis()->SetLabelSize(0.06);
+      histo->GetXaxis()->SetTitleSize(0.06);
+      histo->GetYaxis()->SetTitleSize(0.06);
+      histo->GetXaxis()->SetTitle(xtit);
+      histo->GetYaxis()->SetTitle(ytit);
+      histo->GetXaxis()->SetTitleOffset(0.9);
+      histo->GetYaxis()->SetTitleOffset(0.7);
+
+      histo->Draw();
+
+      TLegend* leg = new TLegend(0.75, 0.95, 0.90, 1.00);
+      leg->AddEntry(histo, m_BkgType.c_str(), "pf");
+      leg->Draw("SAME");
+      if (tresh > 0.01) {
+        line->Draw("SAME");
+      }
+
+      c1->Print(path);
+    }
+
+
+
+    void TOPBackgroundModule::endRun()
+    {
+      B2INFO("TOPBackground: Finished:");
+    }
+
+    void TOPBackgroundModule::terminate()
+    {
+      myprint(peflux, ("peflux_" + m_BkgType + ".pdf").c_str(), "#phi", "MHz / PMT", 1.);
+      myprint(zdist, ("zdist_" + m_BkgType + ".pdf").c_str(), "z[cm]", "", 0.0);
+      myprint(nflux, ("nflux_" + m_BkgType + ".pdf").c_str(), "#phi", "neutrons / cm^{2} / year", 0.0);
+      myprint(rdose, ("rdose_" + m_BkgType + ".pdf").c_str(), "#phi", "Gy/year", 0.0);
+
+      m_rootFile->cd();
+      peflux->Write();
+      zdist->Write();
+      nflux->Write();
+      rdose->Write();
+      m_rootFile->Close();
+
+      // Announce
+      B2INFO("TOPBackground finished");
+
+
+    }
+
+    void TOPBackgroundModule::printModuleParams() const
+    {
+
+    }
+
+
+  } // end top namespace
+} // end Belle2 namespace

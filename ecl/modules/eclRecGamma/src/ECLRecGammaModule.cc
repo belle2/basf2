@@ -20,6 +20,10 @@
 #include <ecl/rec_lib/TEclCFShower.h>
 #include <ecl/rec_lib/TRecEclCF.h>
 
+#include <GFTrack.h>
+#include <GFTrackCand.h>
+#include <tracking/dataobjects/ExtRecoHit.h>
+
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Unit.h>
@@ -57,6 +61,10 @@ ECLRecGammaModule::ECLRecGammaModule() : Module()
 
   addParam("ECLHitAssignmentinput", m_eclHitAssignmentName,
            "//input of this module//(showerID,Hits)", string("ECLHitAssignment"));
+
+  addParam("GFTracksColName", m_gfTracksColName, "Name of collection holding the reconstructed tracks", string("GFTracks"));
+  addParam("ExtTrackCandsColName", m_extTrackCandsColName, "Name of collection holding the list of hits from each extrapolation", string("ExtTrackCands"));
+  addParam("ExtRecoHitsColName", m_extRecoHitsColName, "Name of collection holding the RecoHits from the extrapolation", string("ExtRecoHits"));
 
   //output
   addParam("MdstGammaOutput", m_MdstGammaName,
@@ -156,8 +164,19 @@ void ECLRecGammaModule::event()
       gammaArray[m_GNum]->setpx(px);
       gammaArray[m_GNum]->setpy(py);
       gammaArray[m_GNum]->setpz(pz);
+      /*
+            cout<<"Event  "<<m_nEvent<<" Gamma "<<m_showerId<<" "<<sqrt(px*px+py*py+pz*pz)<<" m_extMatch  "<<m_extMatch<<endl;
+            cout<<"CellID ";
 
-      //cout<<"Event  "<<m_nEvent<<" Gamma "<<m_showerId<<" "<<sqrt(px*px+py*py+pz*pz)<<endl;
+          for (int iHA = 0; iHA < hANum; iHA++) {
+
+            HitAssignmentECL* aECLHit = eclHitAssignmentArray[iHA];
+            int m_HAShowerId = aECLHit->getShowerId();
+            int m_HAcellId = aECLHit->getCellId();
+            if(m_showerId==m_HAShowerId)cout<<m_HAcellId<<" ";
+          }//for HA hANum
+           cout<<endl;
+      */
     }//if !m_extMatch
 
 
@@ -194,10 +213,35 @@ bool ECLRecGammaModule::goodGamma(double ftheta, double energy, double nhit, dou
 void ECLRecGammaModule::readExtrapolate()
 {
   for (int i = 0; i < 8736; i++) {
-
     m_TrackCellId[i] = false ;
-//if(i>5000)m_TrackCellId[i]=true;
   }
+
+  StoreArray<GFTrack> gfTracks(m_gfTracksColName);
+  StoreArray<GFTrackCand> extTrackCands(m_extTrackCandsColName);
+  StoreArray<ExtRecoHit> extRecoHits(m_extRecoHitsColName);
+  unsigned int myDetID = 5; // ECL in this example
+  for (int t = 0; t < gfTracks.getEntries(); ++t) {
+//GFTrack* track = gfTracks[i];
+//for ( int hypothesis = 0; hypothesis < 5; ++hypothesis ) {
+    int hypothesis = 0;
+    GFTrackCand* cand = extTrackCands[t * 5 + hypothesis];
+    std::vector<double> TOFs = cand->GetRhos();
+    for (unsigned int j = 0; j < cand->getNHits(); ++j) {
+      unsigned int detID;
+      unsigned int hitID;
+      unsigned int planeID;
+      cand->getHitWithPlane(j, detID, hitID, planeID);
+      if ((detID != myDetID) || (planeID == 0)) continue;
+//cout<<"match Cell Id "<<planeID<<endl;
+      m_TrackCellId[planeID] = 1;
+//double tof = TOFs.at(j);
+//ExtRecoHit* hit = extRecoHits[hitID];
+//TMatrixD phasespacePoint = hit->getRawHitCoord();
+//TMatrixD covariance = hit->getRawHitCov();
+//ExtHitStatus status = hit->getStatus();
+    }//cand->getNHits()
+//}//hypothesis
+  }//gfTracks.getEntries()
 
 
 }

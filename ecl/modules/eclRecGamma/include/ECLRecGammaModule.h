@@ -64,6 +64,15 @@ namespace Belle2 {
     std::string m_eclRecCRName;  /** Name of output Hit collection of this module */
     std::string m_eclHitAssignmentName;  /**  Name of collection of ECLHitAssignment.*/
     std::string m_MdstGammaName ;     /**  Name of collection of MdstGamma.*/
+    //! Name of the GFTrack collection of the reconstructed tracks to be extrapolated
+    std::string m_gfTracksColName;
+
+    //! Name of the GFTrackCand collection, each holding the list of hits for a particular track and hypothesis
+    std::string m_extTrackCandsColName;
+
+    //! Name of the extRecoHit collection of the extrapolation hits
+    std::string m_extRecoHitsColName;
+
 
     double m_timeCPU;                /*!< CPU time     */
     int    m_nRun;                   /*!< Run number   */

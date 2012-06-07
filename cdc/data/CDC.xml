@@ -2528,8 +2528,8 @@
           <Name>BackwardEndplate</Name>
           <InnerR desc="Inner radius" unit="mm">650.712</InnerR>
           <OuterR desc="Outer radius" unit="mm">662.087</OuterR>
-<BackwardZ desc="Backward z position" unit="mm">-632.941</BackwardZ>
-<ForwardZ desc="Forward z position" unit="mm">-622.941</ForwardZ>
+	  <BackwardZ desc="Backward z position" unit="mm">-632.942</BackwardZ>
+	  <ForwardZ desc="Forward z position" unit="mm">-622.942</ForwardZ>
         </EndplateLayer>
         <EndplateLayer id="2">
           <Name>BackwardEndplate</Name>

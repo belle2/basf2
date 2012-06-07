@@ -21,7 +21,7 @@
 
 //cdc package headers
 #include <cdc/dataobjects/CDCHit.h>
-#include <cdc/dataobjects/HitCDC.h>
+//#include <cdc/dataobjects/HitCDC.h>
 #include <cdc/geometry/CDCGeometryPar.h>
 
 //root
@@ -57,7 +57,7 @@ CDCDigiModule::CDCDigiModule() : Module()
   // Add parameters
   // I/O
   addParam("InputColName",                m_inColName, "Input collection name", string("CDCSimHits"));
-  addParam("OutputColName",               m_outColName, "Output collection name", string("HitCDCArray"));
+  //  addParam("OutputColName",               m_outColName, "Output collection name", string("HitCDCArray"));
   addParam("CDCHitOutColName",            m_cdcHitOutColName, "Output collection name", string("CDCHits"));
   //Parameters for Digitization
   addParam("RandomSeed",                  m_randomSeed, "Random seed", 12345);
@@ -225,15 +225,15 @@ void CDCDigiModule::event()
 
     // Save digits into data store
     // Next lines are the storage for HitCDC connected to trasan, which will eventually become obsolete.
-    StoreArray<HitCDC> NNcdcArray(m_outColName);
-    new(NNcdcArray->AddrAt(iDigits)) HitCDC();
-    NNcdcArray[iDigits]->setLayerId(iterCDCMap->second->getLayerId());
-    NNcdcArray[iDigits]->setWireId(iterCDCMap->second->getWireId());
-    NNcdcArray[iDigits]->setLeftDriftLength(iterCDCMap->second->getDriftLength());
-    NNcdcArray[iDigits]->setRightDriftLength(iterCDCMap->second->getDriftLength());
-    NNcdcArray[iDigits]->setLeftDriftTime(iterCDCMap->second->getDriftTime());
-    NNcdcArray[iDigits]->setRightDriftTime(iterCDCMap->second->getDriftTime());
-    NNcdcArray[iDigits]->setCharge(iterCDCMap->second->getCharge());
+    //    StoreArray<HitCDC> NNcdcArray(m_outColName);
+    //    new(NNcdcArray->AddrAt(iDigits)) HitCDC();
+    //    NNcdcArray[iDigits]->setLayerId(iterCDCMap->second->getLayerId());
+    //    NNcdcArray[iDigits]->setWireId(iterCDCMap->second->getWireId());
+    //    NNcdcArray[iDigits]->setLeftDriftLength(iterCDCMap->second->getDriftLength());
+    //    NNcdcArray[iDigits]->setRightDriftLength(iterCDCMap->second->getDriftLength());
+    //    NNcdcArray[iDigits]->setLeftDriftTime(iterCDCMap->second->getDriftTime());
+    //    NNcdcArray[iDigits]->setRightDriftTime(iterCDCMap->second->getDriftTime());
+    //    NNcdcArray[iDigits]->setCharge(iterCDCMap->second->getCharge());
     // End Lines referring to HitCDC.
 
     // Save digits into the DataStore as CDCHit TClonesArray.

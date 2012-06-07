@@ -180,6 +180,7 @@ namespace Belle2 {
       m_momentum = momentum;
       m_posWire = posWire;
       m_posIn = posIn;
+      m_posOut = posOut;
       m_posTrack = posTrack;
       m_posFlag = posFlag;
     }

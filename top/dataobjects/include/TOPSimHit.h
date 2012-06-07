@@ -16,9 +16,10 @@
 
 namespace Belle2 {
 
-
-  /*! This is a class to store TOP Geant4 hits in datastore.
-   *  It is also the input for digitization module (TOPDigi).
+  /*! Class to store G4 Cerenkov photons entering PMT's
+   * input for digitization module (TOPDigi).
+   * relation to MCParticle
+   * filled in top/simulation/src/SensitivePMT.cc
    */
 
   class TOPSimHit : public TObject {
@@ -43,22 +44,22 @@ namespace Belle2 {
     }
 
     /*!  Full constructor.
-     * @param moduleID ID of PMT module containing hit
-     * @param barID is the ID of the bar in which the PMT was hit
-     * @param position position of the hit on the hit on PMT pad
-     * @param gposition postion of the hit on the pad in the lab frame
-     * @param direction momentum direction of the hit
-     * @param vposition vertex position in lab frame
-     * @param vdirection momentum direction of vertex position
-     * @param globalTime global time of photon hit
-     * @param localTime time that pased since the the photon was created
-     * @param length tract lenth of the photon
-     * @param energy energy of photon
-     * @param parentID geant4 id of photon parent particle
-     * @param trackID geant4 id of photon track
+     * @param pmtID         PMT ID
+     * @param barID         bar ID
+     * @param position      detection position in local (PMT) frame
+     * @param gposition     detection point
+     * @param direction     detection direction
+     * @param vposition     emission point
+     * @param vdirection    emission direction
+     * @param globalTime    detection time
+     * @param emissionTime  emission time
+     * @param length        photon track length
+     * @param energy        photon energy in [eV]
+     * @param parentID      geant4 id of parent particle
+     * @param trackID       geant4 id of photon
      */
     TOPSimHit(
-      int moduleID,
+      int pmtID,
       int barID,
       TVector3 position,
       TVector3 gposition,
@@ -66,12 +67,12 @@ namespace Belle2 {
       TVector3 vposition,
       TVector3 vdirection,
       double globalTime,
-      double localTime,
+      double emissionTime,
       double length,
       double energy,
       int parentID,
       int trackID):
-      m_moduleID(moduleID),
+      m_moduleID(pmtID),
       m_barID(barID),
       m_position(position),
       m_gposition(gposition),
@@ -79,153 +80,99 @@ namespace Belle2 {
       m_vposition(vposition),
       m_vdirection(vdirection),
       m_globalTime(globalTime),
-      m_localTime(localTime),
+      m_localTime(emissionTime),
       m_length(length),
       m_energy(energy),
       m_parentID(parentID),
       m_trackID(trackID) {
     }
 
-    /*! -- Function for getting parameters out of TOPSimHit -- */
+    /*! Get PMT ID
+     * @return PMT ID
+     */
+    int getPmtID() const { return m_moduleID; }
 
-    /*! Get ID number of module that registered hit
-     * @return moduleID of the hit
+    /*! Get PMT ID (for backward comp. - same as getPmtID)
+     * @return PMT ID
      */
     int getModuleID() const { return m_moduleID; }
 
-    /*! Get ID number of bar that registered hit
-     * @return ID of the bar in which the hit took place
+    /*! Get bar ID
+     * @return bar ID
      */
     int getBarID() const { return m_barID; }
 
-    /*! Get local position of hit (in module coordinates)
-     * @return vector of the local position of the hit on the pad
+    /*! Get local position of hit (in PMT coordinates)
+     * @return local position
      */
     const TVector3& getPosition() const { return m_position; }
 
-    /*! Get global position of hit (in module coordinates)
-     * @return position of the hit in global coordinates
+    /*! Get global position of hit
+     * @return detection point
      */
     const TVector3& getGPosition() const { return m_gposition; }
 
-    /*! Get global position of hit (in module coordinates)
-     * @return get direction vector of the momentum of the hit
+    /*! Get photon direction at detection (global frame)
+     * @return direction vector at detection
      */
     const TVector3& getDirection() const { return m_direction; }
 
-    /*! Get local position of hit (in module coordinates)
-     * @return vertex position of the hit particle
+    /*! Get position at emission (global frame)
+     * @return emission point
      */
     const TVector3& getVposition() const { return m_vposition; }
 
-    /*! Get global position of hit (in module coordinates)
-     * @return vector for momentum direction at vertex position
+    /*! Get photon direction at emission (global frame)
+     * @return direction vector at emission
      */
     const TVector3& getVdirection() const { return m_vdirection; }
 
-    /*! Get global time of hit
-     * @return global time
+    /*! Get detection time
+     * @return detection time
      */
     double getTime() const { return m_globalTime; }
 
-    /*! Get global time of hit
-     * @return time at which the photon was emitted
+    /*! Get emission time
+     * @return emission time
      */
     double getEmissionTime() const { return m_localTime; }
 
-    /*! Get track length
-     * @return length of the photon track
+    /*! Get propagation length
+     * @return propagation length
      */
     double getLength() const { return m_length; }
 
-    /*! Get detected photon energy
-     * @return energy of the detected photon
+    /*! Get photon energy
+     * @return photon energy in [eV]
      */
     double getEnergy() const { return m_energy; }
 
-    /*! Get G4 ID number of photons parent particle
-     * @return GeantID of the parent particle
+    /*! Get G4 ID of parent particle
+     * @return GeantID
      */
     int getParentID() const { return m_parentID; }
 
-    /*! Get G4 ID number of photons track
-     * @return GeantID of the photon track
+    /*! Get G4 ID of photon
+     * @return GeantID
      */
     int getTrackID() const { return m_trackID; }
 
-    /*! -- Function for parameters parameters in TOPSimHit -- */
-
-
-    /*! Set ID number of module that registered hit
-     */
-    void getModuleID(int ModuleID) { m_moduleID = ModuleID; }
-
-    /*! Set ID number of bar that registered hit
-     */
-    void setBarID(int BarID) { m_barID = BarID; }
-
-    /*! Set local position of hit (in module coordinates)
-     */
-    void setPosition(double x, double y, double z) { m_position.SetXYZ(x, y, z); }
-
-    /*! Set global position of hit (in module coordinates)
-     */
-    void setGPosition(double x, double y, double z) { m_gposition.SetXYZ(x, y, z); }
-
-    /*! Set global position of hit (in module coordinates)
-     */
-    void setDirection(double x, double y, double z) { m_direction.SetXYZ(x, y, z); }
-
-    /*! Set local position of hit (in module coordinates)
-     */
-    void setVposition(double x, double y, double z) { m_vposition.SetXYZ(x, y, z); }
-
-    /*! Set global position of hit (in module coordinates)
-     */
-    void setVdirection(double x, double y, double z) { m_vdirection.SetXYZ(x, y, z); }
-
-    /*! Set global time of hit
-     */
-    void setTime(double time) { m_globalTime = time; }
-
-    /*! Set global time of hit
-     */
-    void setEmissionTime(double EmissionTime) {  m_localTime = EmissionTime; }
-
-    /*! Set track length
-     */
-    void setLength(double Length) {  m_length = Length; }
-
-    /*! Set detected photon energy
-     */
-    void setEnergy(double Energy) {  m_energy = Energy; }
-
-    /*! Set G4 ID number of photons parent particle
-     */
-    void setParentID(int ParentID)  { m_parentID = ParentID; }
-
-    /*! Set G4 ID number of photons track
-     */
-    void setTrackID(int TrackID) {  m_trackID = TrackID; }
-
-
   private:
-    int m_moduleID;           /**< ID number of module that registered hit*/
-    int m_barID;              /**< ID number of bar in which the hit was registered*/
-    TVector3 m_position;      /**< local position of the hit no the pad*/
-    TVector3 m_gposition;     /**< global position of hit in lab frame*/
-    TVector3 m_direction;     /**< momentum direction of the hit*/
-    TVector3 m_vposition;     /**< vertex position of the photon*/
-    TVector3 m_vdirection;    /**< momentum direction of photon at vertex position*/
-    double m_globalTime;      /**< Global time of hit */
-    double m_localTime;       /**< time that passes since the photon was created*/
-    double m_length;          /**< track length of the photon*/
-    double m_energy;          /**< Energy of detected photon */
-    int m_parentID;           /**< G4 ID number of photons parent particle */
-    int m_trackID;            /**< G4 ID number of photons track */
+    int m_moduleID;           /**< PMT ID */
+    int m_barID;              /**< bar ID */
+    TVector3 m_position;      /**< detection position in local (PMT) frame */
+    TVector3 m_gposition;     /**< detection position  */
+    TVector3 m_direction;     /**< detection direction vector */
+    TVector3 m_vposition;     /**< emission point */
+    TVector3 m_vdirection;    /**< emission direction vector */
+    double m_globalTime;      /**< detection time */
+    double m_localTime;       /**< emission time */
+    double m_length;          /**< photon propagation length */
+    double m_energy;          /**< photon energy in [eV] */
+    int m_parentID;           /**< G4 ID of parent particle */
+    int m_trackID;            /**< G4 ID of photon */
 
-
-    ClassDef(TOPSimHit, 1); /**< the class title */
+    ClassDef(TOPSimHit, 1); /**< ClassDef */
 
   };
 

@@ -21,8 +21,8 @@ topback = register_module('TOPBackground')
 
 param_back = {'TimeOfSimulation': 10.0, 'Type': 'Touschek_HER',
               'Output': 'Background_Touschek_HER.root'}
-#TimeOfSimulation in us
-#Type the backgound type just for labeing
+# TimeOfSimulation in us
+# Type the backgound type just for labeing
 
 topback.param(param_back)
 # --------------------------------------

@@ -16,10 +16,10 @@
 
 namespace Belle2 {
 
-  /*! This is a class to store TOP Geant4 hits in datastore.
-   *  It is also the input for digitization module (TOPDigi).
+  /*! Class to store MC particle track parameters at impact to TOP (at bar surface)
+   * relation to MCParticle
+   * filled in top/simulation/src/SensitiveTrack.cc
    */
-
 
   class TOPTrack : public TObject {
   public:
@@ -41,17 +41,17 @@ namespace Belle2 {
     }
 
     /*!  Full constructor.
-     * @param geant4 track id
-     * @param particle PDG id number
-     * @param the charge of the track
-     * @param position of the detected track
-     * @param production vertex of the detected track
-     * @param momentum vector of the detected track
-     * @param momentum of the detected particle at vertex position
-     * @param ID of the bar which was hit
-     * @param length of the track from vertex to this point
-     * @param global time at which the track was detected
-     * @param time at which the track was generated
+     * @param trackID    Geant4 track id
+     * @param particleID PDG encoding
+     * @param charge     charge
+     * @param position   impact point
+     * @param vposition  production point
+     * @param momentum   impact momentum vector
+     * @param vmomentum  production momentum vector
+     * @param barID      bar ID
+     * @param length     track length
+     * @param globaltime global time
+     * @param localtime  local time
      */
     TOPTrack(
       int trackID,
@@ -79,129 +79,76 @@ namespace Belle2 {
       m_localtime = localtime;
     }
 
-    /*! -- Function for getting parameters out of TOPTrack -- */
-
-    /*! Get the track ID of the detected track
-     * @return track ID of detected track
+    /*! Get G4 track ID
+     * @return G4 track ID
      */
     int getTrackID() const { return m_trackID; }
 
-    /*! Get the PDG code of the track
+    /*! Get PDG code
      * @return PDG code
      */
     int getParticleID() const { return m_particleID; }
 
-    /*! Get the charge of the particle
-     * @return charge of the track
+    /*! Get particle charge
+     * @return charge
      */
     int getCharge() const { return m_charge;}
 
-    /*! Get the position at which the track was detected
-     * @return detection position
+    /*! Get impact point
+     * @return impact position
      */
     const TVector3& getPosition() const { return m_position; }
 
-    /*! Get position of vertex of detected track
-     * @return vertex position
+    /*! Get production point
+     * @return production position
      */
     const TVector3& getVPosition() const { return m_vposition; }
 
-    /*! Get momentum of the detected track
-     * @return momentum of detected track
+    /*! Get impact momentum
+     * @return impact momentum vector
      */
     const TVector3& getMomentum() const { return m_momentum; }
 
-    /*! Get vertex momentum of the detected track
-     * @return vertex momentum
+    /*! Get production momentum
+     * @return production momentum vector
      */
     const TVector3& getVMomentum() const { return m_vmomentum; }
 
-    /*! Get ID of bar that was hit by track
-     * @return ID of hit bar
+    /*! Get impact bar ID
+     * @return bar ID
      */
     int getBarID() const { return m_barID;}
 
-    /*! Get the length from vertex point to detection point
+    /*! Get tract length from production to impact point
      * @return track length
      */
     double getLength() const { return m_length; }
 
-    /*! Get the time since the begining of the evetn
-     * @return time since start of event
+    /*! Get time since the begining of event
+     * @return global time
      */
     double getGlobalTime() const { return m_globaltime; }
 
-    /*! Get the time since the creation of the particle
-     * @return local time of particle
+    /*! Get time since production of particle
+     * @return local time
      */
     double getLocalTime() const { return m_localtime; }
 
-
-    /*! -- Function for parameters parameters in TOPTrack -- */
-
-
-    /*! Set track ID of track
-     */
-    void setTrackID(int trackID) { m_trackID = trackID; }
-
-    /*! Set charge of track
-     */
-    void setCharge(int charge) {m_charge = charge;}
-
-    /*! Set PDG number of track
-     */
-    void setParticleID(int particleId) { m_particleID = particleId; }
-
-    /*! Set detection position of track
-     */
-    void setPosition(TVector3 position) { m_position = position; }
-
-    /*! Set vertex position of track
-     */
-    void setVPosition(TVector3 vposition) { m_vposition = vposition; }
-
-    /*! Set momentum of tract at detection position
-     */
-    void setMomentum(TVector3 momentum) { m_momentum = momentum; }
-
-    /*! Set momentum of track at vertex position
-     */
-    void setVMomentum(TVector3 vmomentum) { m_vmomentum = vmomentum; }
-
-    /*! Set ID of bar that was hit by track
-     */
-    void setBarID(int barID) {m_barID = barID;}
-
-    /*! Set legth of track from vertex point to detection point
-     */
-    void setLength(double length) { m_length = length; }
-
-    /*! Set global time
-     */
-    void setGlobalTime(double globaltime)  {m_globaltime = globaltime; }
-
-    /*! Set local time - time since creation of particle
-     */
-    void setLocalTime(double localtime)  { m_localtime = localtime; }
-
-
-
   private:
 
-    int m_trackID;             /**< G4 id of track */
-    int m_particleID;          /**< particle PDG id number */
-    int m_charge;              /**< charge of track */
-    TVector3 m_position;       /**< track position at detection point */
-    TVector3 m_vposition;      /**< track momentum at detection point */
-    TVector3 m_momentum;       /**< track vertex point */
-    TVector3 m_vmomentum;      /**< track momentum at vertex point */
-    int m_barID;               /**< ID of bar that was hit */
+    int m_trackID;             /**< G4 track id */
+    int m_particleID;          /**< PDG code */
+    int m_charge;              /**< charge */
+    TVector3 m_position;       /**< impact point */
+    TVector3 m_vposition;      /**< production point */
+    TVector3 m_momentum;       /**< impact momentum vector */
+    TVector3 m_vmomentum;      /**< production momentum vector */
+    int m_barID;               /**< bar ID */
     double m_length;           /**< track length */
-    double m_globaltime;       /**< global time - time since begining of event */
-    double m_localtime;        /**< local time - time since creaton of particle */
+    double m_globaltime;       /**< global time at impact */
+    double m_localtime;        /**< local time at impact */
 
-
-    ClassDef(TOPTrack, 1);     /**< the class title */
+    ClassDef(TOPTrack, 1);     /**< ClassDef */
 
   };
 

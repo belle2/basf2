@@ -22,6 +22,9 @@
 namespace Belle2 {
   namespace TOP {
 
+    /*! Gaussian random number
+     * @param sigma: sigma
+     */
     inline double GaussRnd(double sigma) {return gRandom->Gaus(0., sigma);}
 
     TOPtrack::TOPtrack()

@@ -16,8 +16,9 @@
 namespace Belle2 {
 
 
-  /*! This is a class to store TOP digitized hits in datastore.
-   *  It is also the output for digitization module (TOPDigi).
+  /*! Class to store TOP digitized hits (output of TOPDigi)
+   * relation to TOPSimHit
+   * filled in top/modules/TOPDigitizer/src/TOPDigiModule.cc
    */
 
   class TOPDigit : public TObject {
@@ -32,9 +33,9 @@ namespace Belle2 {
     }
 
     /*!  Full constructor
-     * @param barID:     bar ID
-     * @param channelID: channel ID
-     * @param TDC:       digitized detection time
+     * @param barID     bar ID
+     * @param channelID channel ID
+     * @param TDC       digitized detection time
      */
 
     TOPDigit(int barID, int channelID, int TDC):
@@ -58,24 +59,12 @@ namespace Belle2 {
      */
     int getTDC() const { return m_TDC; }
 
-    /*! Set bar ID
-     */
-    void setBarID(int barID) { m_barID = barID; }
-
-    /*! Set channel ID
-     */
-    void setChannelID(int channelID) { m_channelID = channelID; }
-
-    /*! Set digitized time
-     */
-    void setTDC(int TDC) { m_TDC = TDC; }
-
   private:
     int m_barID;             /**< Bar ID */
     int m_channelID;         /**< Channel ID */
     int m_TDC;               /**< digitized time */
 
-    ClassDef(TOPDigit, 1); /**< the class title */
+    ClassDef(TOPDigit, 1); /**< ClassDef */
 
   };
 

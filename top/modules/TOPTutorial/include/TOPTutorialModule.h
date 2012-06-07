@@ -85,31 +85,49 @@ namespace Belle2 {
       void printModuleParams() const;
 
       /**
-       *Returns object that host the TOP Likelihoods
+       *Returns object that host TOP Likelihoods
        */
       const TOPLikelihoods* getTOPLikelihoods(const MCParticle* particle);
 
+      /**
+       *Returns object that host ARICH Likelihoods
+       */
       const ARICHLikelihoods* getARICHLikelihoods(const MCParticle* particle);
 
+      /**
+       *Get MCparticle associated with GFTrack
+       */
       const MCParticle* getMCParticle(const GFTrack* particle);
 
+      /**
+       *Get combined PID
+       */
       double TOP_ARICH_PID(int hyp1, int hyp2, const GFTrack* particle);
 
+      /**
+       *Make pion list
+       */
       void makePi(std::vector<TLorentzVector>& pip, std::vector<TLorentzVector>& pim, double cut = 0);
 
+      /**
+       *Make kaon list
+       */
       void makeK(std::vector<TLorentzVector>& kp, std::vector<TLorentzVector>& km, double cut = 0);
 
+      /**
+       *combination
+       */
       void combination(std::vector<TLorentzVector>& mother, std::vector<TLorentzVector>& child1, std::vector<TLorentzVector>& child2);
 
     protected:
-      std::string  m_mcParticlesColName;         /**< MCParticles collection name. */
-      std::string  m_gfTracksColName;         /**< MCParticles collection name. */
-      std::string  m_dataOutFileName;
+      std::string  m_mcParticlesColName;      /**< MCParticles collection name. */
+      std::string  m_gfTracksColName;         /**< GFTrack collection name. */
+      std::string  m_dataOutFileName;         /**< output file name */
     private:
-      TTree* m_tree;
-      TFile* m_rootFile;
-      double m_m_bc;
-      double m_deltae;
+      TTree* m_tree;                  /**< root tree */
+      TFile* m_rootFile;              /**< root file */
+      double m_m_bc;                  /**< Mbc */
+      double m_deltae;                /**< deltaE */
       double m_timeCPU;                /**< CPU time.     */
       int    m_nRun;                   /**< Run number.   */
       int    m_nEvent;                 /**< Event number. */

@@ -24,9 +24,6 @@
 #include <G4ThreeVector.hh>
 #include <G4RotationMatrix.hh>
 
-using namespace std;
-using namespace boost;
-
 #define MAXPTS_TTS 10
 #define MAXPTS_QE 100
 

@@ -60,15 +60,9 @@ namespace Belle2 {
 
   namespace TOP {
 
-    //-----------------------------------------------------------------
-    //                 Register the Creator
-    //-----------------------------------------------------------------
-
+    /** Register the creator */
     geometry::CreatorFactory<GeoTOPCreator> GeoTOPFactory("TOPCreator");
 
-    //-----------------------------------------------------------------
-    //                 Implementation
-    //-----------------------------------------------------------------
 
     GeoTOPCreator::GeoTOPCreator(): isBeamBkgStudy(0)
     {
@@ -76,6 +70,7 @@ namespace Belle2 {
       m_sensitiveTrack = new SensitiveTrack();
       m_topgp = TOPGeometryPar::Instance();
     }
+
 
     GeoTOPCreator::~GeoTOPCreator()
     {

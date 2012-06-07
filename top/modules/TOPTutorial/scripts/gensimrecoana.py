@@ -110,7 +110,7 @@ toptut = register_module('TOPTutorial')
 
 # Setting the option for all non particle gun modules:
 # want to process 100 MC events
-evtmetagen.param({'EvtNumList': [200], 'RunList': [1]})
+evtmetagen.param({'EvtNumList': [10], 'RunList': [1]})
 
 # Set output filename
 # output.param('outputFileName', 'TOPOutput.root')

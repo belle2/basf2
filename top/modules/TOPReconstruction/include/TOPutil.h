@@ -27,7 +27,7 @@ namespace Belle2 {
      */
     inline int chID(double X, double Y, double Z, int QbarID)
     {
-      float x = X; float y = Y; float z = Z;
+      float x = (float) X; float y = (float) Y; float z = (float) Z;
       return ich_digiz_(&x, &y, &z, &QbarID);
     }
 
@@ -40,7 +40,7 @@ namespace Belle2 {
      */
     inline int chID(double X, double Y, int LR, int QbarID)
     {
-      float x = X; float y = Y;
+      float x = (float) X; float y = (float) Y;
       return ich_digi_(&x, &y, &LR, &QbarID);
     }
 
@@ -94,7 +94,7 @@ namespace Belle2 {
      */
     inline int TDCdigi(double T)
     {
-      float t = T;
+      float t = (float) T;
       return tdc_digi_(&t);
     }
 
@@ -119,7 +119,7 @@ namespace Belle2 {
     inline void PointToLocal(int QbarID, double X, double Y, double Z,
                              double& x, double& y, double& z)
     {
-      float r[3] = {X, Y, Z};
+      float r[3] = {(float) X, (float) Y, (float) Z};
       float dir[3] = {0, 0, 0};
       to_local_(r, dir, &QbarID);
       x = r[0]; y = r[1]; z = r[2];
@@ -138,7 +138,7 @@ namespace Belle2 {
     inline void PointToGlobal(int QbarID, double X, double Y, double Z,
                               double& x, double& y, double& z)
     {
-      float r[3] = {X, Y, Z};
+      float r[3] = {(float) X, (float) Y, (float) Z};
       float dir[3] = {0, 0, 0};
       to_global_(r, dir, &QbarID);
       x = r[0]; y = r[1]; z = r[2];
@@ -157,7 +157,7 @@ namespace Belle2 {
                                 double& px, double& py, double& pz)
     {
       float r[3] = {0, 0, 0};
-      float dir[3] = {Px, Py, Pz};
+      float dir[3] = {(float) Px, (float) Py, (float) Pz};
       to_local_(r, dir, &QbarID);
       px = dir[0]; py = dir[1]; pz = dir[2];
     }
@@ -175,7 +175,7 @@ namespace Belle2 {
                                  double& px, double& py, double& pz)
     {
       float r[3] = {0, 0, 0};
-      float dir[3] = {Px, Py, Pz};
+      float dir[3] = {(float) Px, (float) Py, (float) Pz};
       to_global_(r, dir, &QbarID);
       px = dir[0]; py = dir[1]; pz = dir[2];
     }
@@ -189,7 +189,7 @@ namespace Belle2 {
      */
     inline bool InsideQbar(double X, double Y, double Z, int QbarID)
     {
-      float x = X; float y = Y; float z = Z;
+      float x = (float) X; float y = (float) Y; float z = (float) Z;
       return inside_qbar_(&x, &y, &z, &QbarID) != 0;
     }
 
@@ -202,7 +202,7 @@ namespace Belle2 {
      */
     inline bool InsideExpansionVolume(double X, double Y, double Z, int QbarID)
     {
-      float x = X; float y = Y; float z = Z;
+      float x = (float) X; float y = (float) Y; float z = (float) Z;
       return inside_extvol_(&x, &y, &z, &QbarID) != 0;
     }
 
@@ -212,7 +212,7 @@ namespace Belle2 {
      */
     inline double PhaseIndex(double E)
     {
-      float e = E;
+      float e = (float) E;
       return phase_index_(&e);
     }
 
@@ -232,7 +232,7 @@ namespace Belle2 {
      */
     inline double GroupIndex(double E)
     {
-      float e = E;
+      float e = (float) E;
       return group_index_(&e);
     }
 
@@ -252,7 +252,7 @@ namespace Belle2 {
      */
     inline double AtenuLength(double E)
     {
-      float e = E;
+      float e = (float) E;
       return abspt_leng_(&e);
     }
 
@@ -262,7 +262,7 @@ namespace Belle2 {
      */
     inline double MirrorRefl(double E)
     {
-      float e = E;
+      float e = (float) E;
       return mirror_refl_(&e);
     }
 
@@ -272,7 +272,7 @@ namespace Belle2 {
      */
     inline double QEffi(double E)
     {
-      float e = E;
+      float e = (float) E;
       return qe_pmt_(&e);
     }
 
@@ -311,7 +311,8 @@ namespace Belle2 {
      */
     inline double CerAngle(double P, double Mass, double RefrIndex)
     {
-      float p = P; float mass = Mass; float refind = RefrIndex;
+      float p = (float) P; float mass = (float) Mass;
+      float refind = (float) RefrIndex;
       return cher_angle_(&p, &mass, &refind);
     }
 

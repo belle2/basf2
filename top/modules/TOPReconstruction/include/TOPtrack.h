@@ -15,8 +15,8 @@
 namespace Belle2 {
   namespace TOP {
 
-    /*! Class to hold reconstructed track, interface to fortran
-     *  Input to TOPreco
+    /*! Class to hold reconstructed track, interface to fortran.
+     *  Input to TOPreco.
      */
 
     class TOPtrack {

@@ -80,9 +80,10 @@ namespace Belle2 {
     {
       if (m_atTop) return m_QbarID;
 
-      float r[3], p[3], q, t; int m;
-      r[0] = m_X; r[1] = m_Y; r[2] = m_Z; p[0] = m_Px; p[1] = m_Py; p[2] = m_Pz;
-      q = m_Q;
+      float r[3] = {(float) m_X, (float) m_Y, (float) m_Z};
+      float p[3] = {(float) m_Px, (float) m_Py, (float) m_Pz};
+      float q = (float) m_Q;
+      float t; int m;
       track2top_(r, p, &q, &t, &m);
       m_X = r[0]; m_Y = r[1]; m_Z = r[2];
       m_Px = p[0]; m_Py = p[1]; m_Pz = p[2];

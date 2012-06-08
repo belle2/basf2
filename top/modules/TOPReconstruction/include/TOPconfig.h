@@ -19,10 +19,6 @@
 namespace Belle2 {
   namespace TOP {
 
-    /*! functions to configure TOP
-     * provide interface to fortran code
-     */
-
     /*! exit window types */
     enum {None = 0, PMT, PlaneM, CylindricM, SphericM};
     /*! argument LR */
@@ -38,7 +34,8 @@ namespace Belle2 {
      */
     inline void TOPvolume(double R1, double R2, double Z1, double Z2)
     {
-      float r1 = R1; float r2 = R2; float z1 = Z1; float z2 = Z2;
+      float r1 = (float) R1; float r2 = (float) R2;
+      float z1 = (float) Z1; float z2 = (float) Z2;
       set_topvol_(&r1, &r2, &z1, &z2);
     }
 
@@ -47,7 +44,7 @@ namespace Belle2 {
      */
     inline void setBfield(double B)
     {
-      float b = B;
+      float b = (float) B;
       set_bfield_(&b);
     }
 
@@ -56,7 +53,7 @@ namespace Belle2 {
      */
     inline void setEdgeRoughness(double R)
     {
-      float r = R;
+      float r = (float) R;
       set_qbar_redg_(&r);
     }
 
@@ -72,7 +69,9 @@ namespace Belle2 {
     inline void setPMT(double A, double B, double Asens, double Bsens,
                        int Nx, int Ny, double TTS = 50.e-3)
     {
-      float a = A; float b = B; float aa = Asens; float bb = Bsens; float tts = TTS;
+      float a = (float) A; float b = (float) B;
+      float aa = (float) Asens; float bb = (float) Bsens;
+      float tts = (float) TTS;
       set_pmt_(&a, &b, &aa, &bb, &Nx, &Ny, &tts);
     }
 
@@ -86,9 +85,9 @@ namespace Belle2 {
     {
       float frac[ng], t0[ng], sig[ng];
       for (int i = 0; i < ng; i++) {
-        frac[i] = Frac[i];
-        t0[i] = Mean[i];
-        sig[i] = Sigma[i];
+        frac[i] = (float) Frac[i];
+        t0[i] = (float) Mean[i];
+        sig[i] = (float) Sigma[i];
       }
       set_tts_(&ng, frac, t0, sig);
     }
@@ -99,7 +98,7 @@ namespace Belle2 {
      */
     inline void setQE(const char* file, double CE)
     {
-      int len = strlen(file); float ce = CE;
+      int len = strlen(file); float ce = (float) CE;
       read_qeffi_(file, &ce, len);
     }
 
@@ -113,10 +112,10 @@ namespace Belle2 {
     {
       float lam[Size], qef[Size];
       for (int i = 0; i < Size; i++) {
-        lam[i] = Wavelength[i];
-        qef[i] = QE[i];
+        lam[i] = (float) Wavelength[i];
+        qef[i] = (float) QE[i];
       }
-      float ce = CE;
+      float ce = (float) CE;
       set_qeffi_(lam, qef, &Size, &ce);
     }
 
@@ -135,8 +134,9 @@ namespace Belle2 {
     inline int setQbar(double A, double B, double Z1, double Z2, double R,
                        double Dx, double Phi, int Lside, int Rside)
     {
-      float a = A; float b = B; float z1 = Z1; float z2 = Z2; float r = R;
-      float dx = Dx; float phi = Phi;
+      float a = (float) A; float b = (float) B;
+      float z1 = (float) Z1; float z2 = (float) Z2; float r = (float) R;
+      float dx = (float) Dx; float phi = (float) Phi;
       int id = set_qbar_(&a, &b, &z1, &z2, &r, &dx, &phi, &Lside, &Rside);
       return id;
     }
@@ -152,7 +152,7 @@ namespace Belle2 {
     inline void addExpansionVolume(int QbarID, int LR, int Shape, double Dz, double Yup,
                                    double Ydown)
     {
-      float dz = Dz; float yup = Yup; float ydn = Ydown;
+      float dz = (float) Dz; float yup = (float) Yup; float ydn = (float) Ydown;
       set_extvol_(&QbarID, &LR, &Shape, &dz, &yup, &ydn);
     }
 
@@ -166,7 +166,8 @@ namespace Belle2 {
     inline void arrangePMT(int QbarID, double sizX, double sizY,
                            double Dx = 0, double Dy = 0)
     {
-      float sizx = sizX; float sizy = sizY; float dx = Dx; float dy = Dy;
+      float sizx = (float) sizX; float sizy = (float) sizY;
+      float dx = (float) Dx; float dy = (float) Dy;
       int LR = 0;
       arrange_pmt_(&QbarID, &LR, &sizx, &sizy, &dx, &dy);
       LR = 1;
@@ -184,7 +185,8 @@ namespace Belle2 {
     inline void arrangePMT(int QbarID, int LR, double sizX, double sizY,
                            double Dx = 0, double Dy = 0)
     {
-      float sizx = sizX; float sizy = sizY; float dx = Dx; float dy = Dy;
+      float sizx = (float) sizX; float sizy = (float) sizY;
+      float dx = (float) Dx; float dy = (float) Dy;
       arrange_pmt_(&QbarID, &LR, &sizx, &sizy, &dx, &dy);
     }
 
@@ -194,7 +196,7 @@ namespace Belle2 {
      */
     inline void setMirrorRadius(int QbarID, double R)
     {
-      float r = R;
+      float r = (float) R;
       set_rmi_(&QbarID, &r);
     }
 
@@ -205,7 +207,7 @@ namespace Belle2 {
      */
     inline void setMirrorCenter(int QbarID, double Xc, double Yc)
     {
-      float xc = Xc; float yc = Yc;
+      float xc = (float) Xc; float yc = (float) Yc;
       set_xyc_(&QbarID, &xc, &yc);
     }
 
@@ -216,7 +218,7 @@ namespace Belle2 {
      */
     inline void setTDC(int NBIT, double ChWid, double Offset = 0)
     {
-      float chwid = ChWid; float offset = Offset;
+      float chwid = (float) ChWid; float offset = (float) Offset;
       set_tdc_(&NBIT, &chwid, &offset);
     }
 

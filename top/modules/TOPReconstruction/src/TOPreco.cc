@@ -25,10 +25,10 @@ namespace Belle2 {
       rtra_clear_();
       float masses[Num];
       for (int i = 0; i < Num; i++) {
-        masses[i] = Masses[i];
+        masses[i] = (float) Masses[i];
       }
       rtra_set_hypo_(&Num, masses);
-      float b = BkgPerQbar; float s = ScaleN0;
+      float b = (float) BkgPerQbar; float s = (float) ScaleN0;
       set_top_par_(&b, &s);
       m_HYP = 0;
     }
@@ -57,8 +57,9 @@ namespace Belle2 {
                               double Px, double Py, double Pz, int Q, int HYP)
     {
       m_HYP = HYP;
-      float x = X; float y = Y; float z = Z;  float t = Tlen / C0;
-      float px = Px; float py = Py; float pz = Pz;
+      float x = (float) X; float y = (float) Y; float z = (float) Z;
+      float t = float(Tlen / C0);
+      float px = (float) Px; float py = (float) Py; float pz = (float) Pz;
       int REF = 0; int MCREF = 0;
       rtra_clear_();
       rtra_put_(&x, &y, &z, &t, &px, &py, &pz, &Q, &m_HYP, &REF, &MCREF);
@@ -68,8 +69,10 @@ namespace Belle2 {
     void TOPreco::Reconstruct(TOPtrack& trk)
     {
       m_HYP = trk.Hyp();
-      float x = trk.X(); float y = trk.Y(); float z = trk.Z();  float t = trk.Tlen() / C0;
-      float px = trk.Px(); float py = trk.Py(); float pz = trk.Pz();
+      float x = (float) trk.X(); float y = (float) trk.Y();
+      float z = (float) trk.Z(); float t = float(trk.Tlen() / C0);
+      float px = (float) trk.Px(); float py = (float) trk.Py();
+      float pz = (float) trk.Pz();
       int Q = trk.Q();
       int REF = 0; int MCREF = trk.Label();
       rtra_clear_();

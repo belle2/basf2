@@ -17,13 +17,12 @@
 namespace Belle2 {
   namespace TOP {
 
-    /*! TOP reconstruction: this class provides interface to fortran code
-     */
-
     /*! Local(=bar)/Global(=BelleII) frame
      */
     enum {Local = 0, Global = 1};
 
+    /*! TOP reconstruction: this class provides interface to fortran code
+     */
     class TOPreco {
     public:
       /*! constructor

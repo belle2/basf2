@@ -395,7 +395,7 @@ namespace Belle2 {
 
       //put volume
       setColor(*logi_A3wal1, cA3wal1.getString("Color", "#CC0000"));
-      //setVisibility(*logi_A3wal1, false);
+      setVisibility(*logi_A3wal1, false);
       new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_A3wal1, "phys_A3wal1_name", logi_A1spc1, false, 0);
 
       //--------------
@@ -555,7 +555,7 @@ namespace Belle2 {
 
       //put volume
       setColor(*logi_A4mag2p2, cA4mag2p2.getString("Color", "#CC0000"));
-      //setVisibility(*logi_A4mag2p2, false);
+      setVisibility(*logi_A4mag2p2, false);
       new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_A4mag2p2, "phys_A4mag2p2_name", logi_A1spc1, false, 0);
 
       //--------------
@@ -595,7 +595,7 @@ namespace Belle2 {
 
       //put volume
       setColor(*logi_A4mag2p3, cA4mag2p3.getString("Color", "#CC0000"));
-      //setVisibility(*logi_A4mag2p3, false);
+      setVisibility(*logi_A4mag2p3, false);
       new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_A4mag2p3, "phys_A4mag2p3_name", logi_A1spc1, false, 0);
 
       //--------------
@@ -675,7 +675,7 @@ namespace Belle2 {
 
       //put volume
       setColor(*logi_A4mag3p1, cA4mag3p1.getString("Color", "#CC0000"));
-      //setVisibility(*logi_A4mag3p1, false);
+      setVisibility(*logi_A4mag3p1, false);
       new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_A4mag3p1, "phys_A4mag3p1_name", logi_A1spc1, false, 0);
 
       //--------------
@@ -1156,7 +1156,7 @@ namespace Belle2 {
 
       //put volume
       setColor(*logi_B3wal1, cB3wal1.getString("Color", "#CC0000"));
-      //setVisibility(*logi_B3wal1, false);
+      setVisibility(*logi_B3wal1, false);
       new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_B3wal1, "phys_B3wal1_name", logi_B1spc1, false, 0);
 
       //--------------
@@ -1556,7 +1556,7 @@ namespace Belle2 {
 
       //put volume
       setColor(*logi_B4mag3p5, cB4mag3p5.getString("Color", "#CC0000"));
-      //setVisibility(*logi_B4mag3p5, false);
+      setVisibility(*logi_B4mag3p5, false);
       new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_B4mag3p5, "phys_B4mag3p5_name", logi_B1spc1, false, 0);
 
       //--------------
@@ -1596,7 +1596,7 @@ namespace Belle2 {
 
       //put volume
       setColor(*logi_B4mag3p6, cB4mag3p6.getString("Color", "#CC0000"));
-      //setVisibility(*logi_B4mag3p6, false);
+      setVisibility(*logi_B4mag3p6, false);
       new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_B4mag3p6, "phys_B4mag3p6_name", logi_B1spc1, false, 0);
 
       //--------------
@@ -1797,7 +1797,7 @@ namespace Belle2 {
 
       //put volume
       setColor(*logi_C1wal1, cC1wal1.getString("Color", "#CC0000"));
-      //setVisibility(*logi_C1wal1, false);
+      setVisibility(*logi_C1wal1, false);
       new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_C1wal1, "phys_C1wal1_name", &topVolume, false, 0);
 
       //--------------
@@ -1834,7 +1834,7 @@ namespace Belle2 {
 
       //put volume
       setColor(*logi_C2spc1, cC2spc1.getString("Color", "#CCCCCC"));
-      //setVisibility(*logi_C2spc1, false);
+      setVisibility(*logi_C2spc1, false);
       new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_C2spc1, "phys_C2spc1_name", logi_C1wal1, false, 0);
 
       //--------------
@@ -1874,7 +1874,7 @@ namespace Belle2 {
 
       //put volume
       setColor(*logi_C2spc2, cC2spc2.getString("Color", "#CCCCCC"));
-      //setVisibility(*logi_C2spc2, false);
+      setVisibility(*logi_C2spc2, false);
       new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_C2spc2, "phys_C2spc2_name", logi_C1wal1, false, 0);
 
       //--------------
@@ -1911,7 +1911,7 @@ namespace Belle2 {
 
       //put volume
       setColor(*logi_C3wal2, cC3wal2.getString("Color", "#CC0000"));
-      //setVisibility(*logi_C3wal2, false);
+      setVisibility(*logi_C3wal2, false);
       new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_C3wal2, "phys_C3wal2_name", logi_C2spc1, false, 0);
 
       //--------------
@@ -1948,7 +1948,7 @@ namespace Belle2 {
 
       //put volume
       setColor(*logi_C3wal3, cC3wal3.getString("Color", "#CC0000"));
-      //setVisibility(*logi_C3wal3, false);
+      setVisibility(*logi_C3wal3, false);
       new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_C3wal3, "phys_C3wal3_name", logi_C2spc2, false, 0);
 
       //--------------
@@ -1985,7 +1985,7 @@ namespace Belle2 {
 
       //put volume
       setColor(*logi_C3wal4, cC3wal4.getString("Color", "#CC0000"));
-      //setVisibility(*logi_C3wal4, false);
+      setVisibility(*logi_C3wal4, false);
       new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_C3wal4, "phys_C3wal4_name", logi_C2spc2, false, 0);
 
       //--------------
@@ -2022,7 +2022,7 @@ namespace Belle2 {
 
       //put volume
       setColor(*logi_C4spc2, cC4spc2.getString("Color", "#CCCCCC"));
-      //setVisibility(*logi_C4spc2, false);
+      setVisibility(*logi_C4spc2, false);
       new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_C4spc2, "phys_C4spc2_name", logi_C3wal2, false, 0);
 
       //--------------
@@ -2059,7 +2059,7 @@ namespace Belle2 {
 
       //put volume
       setColor(*logi_C4spc4, cC4spc4.getString("Color", "#CCCCCC"));
-      //setVisibility(*logi_C4spc4, false);
+      setVisibility(*logi_C4spc4, false);
       new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_C4spc4, "phys_C4spc4_name", logi_C3wal3, false, 0);
 
       //--------------
@@ -2096,7 +2096,7 @@ namespace Belle2 {
 
       //put volume
       setColor(*logi_C5wal3, cC5wal3.getString("Color", "#CC0000"));
-      //setVisibility(*logi_C5wal3, false);
+      setVisibility(*logi_C5wal3, false);
       new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_C5wal3, "phys_C5wal3_name", logi_C4spc2, false, 0);
 
       //--------------
@@ -2133,7 +2133,7 @@ namespace Belle2 {
 
       //put volume
       setColor(*logi_C5wal5, cC5wal5.getString("Color", "#CC0000"));
-      //setVisibility(*logi_C5wal5, false);
+      setVisibility(*logi_C5wal5, false);
       new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_C5wal5, "phys_C5wal5_name", logi_C4spc4, false, 0);
 
       //--------------
@@ -2170,7 +2170,7 @@ namespace Belle2 {
 
       //put volume
       setColor(*logi_C6spc3, cC6spc3.getString("Color", "#CC0000"));
-      //setVisibility(*logi_C6spc3, false);
+      setVisibility(*logi_C6spc3, false);
       new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_C6spc3, "phys_C6spc3_name", logi_C5wal3, false, 0);
 
       //--------------
@@ -2207,7 +2207,7 @@ namespace Belle2 {
 
       //put volume
       setColor(*logi_C6spc6, cC6spc6.getString("Color", "#CC0000"));
-      //setVisibility(*logi_C6spc6, false);
+      setVisibility(*logi_C6spc6, false);
       new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_C6spc6, "phys_C6spc6_name", logi_C5wal5, false, 0);
 
       //--------------
@@ -2244,7 +2244,7 @@ namespace Belle2 {
 
       //put volume
       setColor(*logi_C7wal7, cC7wal7.getString("Color", "#CC0000"));
-      //setVisibility(*logi_C7wal7, false);
+      setVisibility(*logi_C7wal7, false);
       new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_C7wal7, "phys_C7wal7_name", logi_C6spc6, false, 0);
 
       //--------------
@@ -2284,7 +2284,7 @@ namespace Belle2 {
 
       //put volume
       setColor(*logi_C7lyr1, cC7lyr1.getString("Color", "#CC0000"));
-      //setVisibility(*logi_C7lyr1, false);
+      setVisibility(*logi_C7lyr1, false);
       new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_C7lyr1, "phys_C7lyr1_name", logi_C6spc3, false, 0);
 
       //--------------
@@ -2324,7 +2324,7 @@ namespace Belle2 {
 
       //put volume
       setColor(*logi_C7lyr2, cC7lyr2.getString("Color", "#CC0000"));
-      //setVisibility(*logi_C7lyr2, false);
+      setVisibility(*logi_C7lyr2, false);
       new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_C7lyr2, "phys_C7lyr2_name", logi_C6spc3, false, 0);
 
       //--------------
@@ -2364,7 +2364,7 @@ namespace Belle2 {
 
       //put volume
       setColor(*logi_C7lyr3, cC7lyr3.getString("Color", "#CC0000"));
-      //setVisibility(*logi_C7lyr3, false);
+      setVisibility(*logi_C7lyr3, false);
       new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_C7lyr3, "phys_C7lyr3_name", logi_C6spc3, false, 0);
 
       //--------------
@@ -2404,7 +2404,7 @@ namespace Belle2 {
 
       //put volume
       setColor(*logi_C7lyr4, cC7lyr4.getString("Color", "#CC0000"));
-      //setVisibility(*logi_C7lyr4, false);
+      setVisibility(*logi_C7lyr4, false);
       new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_C7lyr4, "phys_C7lyr4_name", logi_C6spc3, false, 0);
 
       //--------------
@@ -2444,7 +2444,7 @@ namespace Belle2 {
 
       //put volume
       setColor(*logi_C7lyr5, cC7lyr5.getString("Color", "#CC0000"));
-      //setVisibility(*logi_C7lyr5, false);
+      setVisibility(*logi_C7lyr5, false);
       new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_C7lyr5, "phys_C7lyr5_name", logi_C6spc3, false, 0);
 
       //--------------
@@ -2780,7 +2780,7 @@ namespace Belle2 {
 
       //put volume
       setColor(*logi_D4mag2p2, cD4mag2p2.getString("Color", "#CC0000"));
-      //setVisibility(*logi_D4mag2p2, false);
+      setVisibility(*logi_D4mag2p2, false);
       new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_D4mag2p2, "phys_D4mag2p2_name", logi_D1spc1, false, 0);
 
       //--------------
@@ -2820,7 +2820,7 @@ namespace Belle2 {
 
       //put volume
       setColor(*logi_D4mag2p3, cD4mag2p3.getString("Color", "#CC0000"));
-      //setVisibility(*logi_D4mag2p3, false);
+      setVisibility(*logi_D4mag2p3, false);
       new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_D4mag2p3, "phys_D4mag2p3_name", logi_D1spc1, false, 0);
 
       //--------------
@@ -3302,7 +3302,7 @@ namespace Belle2 {
 
       //put volume
       setColor(*logi_E4mag1p3, cE4mag1p3.getString("Color", "#CC0000"));
-      //setVisibility(*logi_E4mag1p3, false);
+      setVisibility(*logi_E4mag1p3, false);
       new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_E4mag1p3, "phys_E4mag1p3_name", logi_E1spc1, false, 0);
 
       //--------------
@@ -3589,7 +3589,7 @@ namespace Belle2 {
 
       //put volume
       setColor(*logi_F1wal1, cF1wal1.getString("Color", "#CC0000"));
-      //setVisibility(*logi_F1wal1, false);
+      setVisibility(*logi_F1wal1, false);
       new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_F1wal1, "phys_F1wal1_name", &topVolume, false, 0);
 
       //--------------
@@ -3626,7 +3626,7 @@ namespace Belle2 {
 
       //put volume
       setColor(*logi_F2spc1, cF2spc1.getString("Color", "#CC0000"));
-      //setVisibility(*logi_F2spc1, false);
+      setVisibility(*logi_F2spc1, false);
       new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_F2spc1, "phys_F2spc1_name", logi_F1wal1, false, 0);
 
       //--------------
@@ -3663,7 +3663,7 @@ namespace Belle2 {
 
       //put volume
       setColor(*logi_F3wal2, cF3wal2.getString("Color", "#CC0000"));
-      //setVisibility(*logi_F3wal2, false);
+      setVisibility(*logi_F3wal2, false);
       new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_F3wal2, "phys_F3wal2_name", logi_F2spc1, false, 0);
 
       //--------------
@@ -3700,7 +3700,7 @@ namespace Belle2 {
 
       //put volume
       setColor(*logi_F3wal3, cF3wal3.getString("Color", "#CC0000"));
-      //setVisibility(*logi_F3wal3, false);
+      setVisibility(*logi_F3wal3, false);
       new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_F3wal3, "phys_F3wal3_name", logi_F2spc1, false, 0);
 
       //--------------
@@ -3737,7 +3737,7 @@ namespace Belle2 {
 
       //put volume
       setColor(*logi_F3wal4, cF3wal4.getString("Color", "#CC0000"));
-      //setVisibility(*logi_F3wal4, false);
+      setVisibility(*logi_F3wal4, false);
       new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_F3wal4, "phys_F3wal4_name", logi_F2spc1, false, 0);
 
       //--------------
@@ -3774,7 +3774,7 @@ namespace Belle2 {
 
       //put volume
       setColor(*logi_F4spc2, cF4spc2.getString("Color", "#CC0000"));
-      //setVisibility(*logi_F4spc2, false);
+      setVisibility(*logi_F4spc2, false);
       new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_F4spc2, "phys_F4spc2_name", logi_F3wal2, false, 0);
 
       //--------------
@@ -3811,7 +3811,7 @@ namespace Belle2 {
 
       //put volume
       setColor(*logi_F5wal3, cF5wal3.getString("Color", "#CC0000"));
-      //setVisibility(*logi_F5wal3, false);
+      setVisibility(*logi_F5wal3, false);
       new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_F5wal3, "phys_F5wal3_name", logi_F4spc2, false, 0);
 
       //--------------
@@ -3848,7 +3848,7 @@ namespace Belle2 {
 
       //put volume
       setColor(*logi_F6spc3, cF6spc3.getString("Color", "#CC0000"));
-      //setVisibility(*logi_F6spc3, false);
+      setVisibility(*logi_F6spc3, false);
       new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_F6spc3, "phys_F6spc3_name", logi_F5wal3, false, 0);
 
       //--------------
@@ -3888,7 +3888,7 @@ namespace Belle2 {
 
       //put volume
       setColor(*logi_F7lyr1, cF7lyr1.getString("Color", "#CC0000"));
-      //setVisibility(*logi_F7lyr1, false);
+      setVisibility(*logi_F7lyr1, false);
       new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_F7lyr1, "phys_F7lyr1_name", logi_F6spc3, false, 0);
 
       //--------------
@@ -3928,7 +3928,7 @@ namespace Belle2 {
 
       //put volume
       setColor(*logi_F7lyr2, cF7lyr2.getString("Color", "#CC0000"));
-      //setVisibility(*logi_F7lyr2, false);
+      setVisibility(*logi_F7lyr2, false);
       new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_F7lyr2, "phys_F7lyr2_name", logi_F6spc3, false, 0);
 
       //--------------
@@ -3968,7 +3968,7 @@ namespace Belle2 {
 
       //put volume
       setColor(*logi_F7lyr3, cF7lyr3.getString("Color", "#CC0000"));
-      //setVisibility(*logi_F7lyr3, false);
+      setVisibility(*logi_F7lyr3, false);
       new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_F7lyr3, "phys_F7lyr3_name", logi_F6spc3, false, 0);
 
       //--------------
@@ -4008,7 +4008,7 @@ namespace Belle2 {
 
       //put volume
       setColor(*logi_F7lyr4, cF7lyr4.getString("Color", "#CC0000"));
-      //setVisibility(*logi_F7lyr4, false);
+      setVisibility(*logi_F7lyr4, false);
       new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_F7lyr4, "phys_F7lyr4_name", logi_F6spc3, false, 0);
 
       //--------------
@@ -4045,7 +4045,7 @@ namespace Belle2 {
 
       //put volume
       setColor(*logi_F7lyr5, cF7lyr5.getString("Color", "#CC0000"));
-      //setVisibility(*logi_F7lyr5, false);
+      setVisibility(*logi_F7lyr5, false);
       new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_F7lyr5, "phys_F7lyr5_name", logi_F6spc3, false, 0);
 
     }

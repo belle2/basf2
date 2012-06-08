@@ -31,7 +31,13 @@
 #include <arich/dataobjects/ARICHAeroHit.h>
 
 namespace Belle2 {
-  namespace top {
+  namespace TOP {
+
+    //! TOP Tutorial module.
+    /*
+     * A showcase module for analysis
+     * Tutorial at B2GM spring 2012
+     */
 
     class TOPTutorialModule : public Module {
 
@@ -135,7 +141,7 @@ namespace Belle2 {
 
     };
 
-  } // top namespace
+  } // TOP namespace
 } // Belle2 namespace
 
 #endif // TOPDIGIMODULE_H

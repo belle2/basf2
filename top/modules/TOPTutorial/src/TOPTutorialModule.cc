@@ -47,7 +47,7 @@ using namespace std;
 using namespace boost;
 
 namespace Belle2 {
-  namespace top {
+  namespace TOP {
     //-----------------------------------------------------------------
     //                 Register the Module
     //-----------------------------------------------------------------

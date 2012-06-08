@@ -110,8 +110,8 @@ namespace Belle2 {
        */
       const TOPSimHit* getTOPSimHit(const TOPDigit* digit);
 
-      /*
-       *Print histogram 1D
+      /**
+       *Print histogram 1D, helper function.
        */
       void myprint(TH1F* histo, const char* path, const char* xtit, const char* ytit, double tresh);
 

@@ -189,22 +189,20 @@ void PXDClusteringModule::event()
       //Ignore digits with not enough signal
       if (!m_noiseMap(px, m_cutAdjacent)) continue;
 
-      //Check for sorting as precaution
-      if (lastV > px.getV() || (lastV == px.getV() && lastU > px.getU())) {
-        B2FATAL("Pixels are not sorted correctly, please change the assumeSorted parameter "
-                "to false or fix the input to be ordered by v,u in ascending order");
-      }
-      lastU = px.getU();
-      lastV = px.getV();
-
       //New sensor, write clusters
       if (sensorID != px.getSensorID()) {
         writeClusters(sensorID);
         sensorID = px.getSensorID();
         //Load the correct noise map for the new sensor
         m_noiseMap.setSensorID(sensorID);
+      } else if (lastV > px.getV() || (lastV == px.getV() && lastU > px.getU())) {
+        //Check for sorting as precaution
+        B2FATAL("Pixels are not sorted correctly, please change the assumeSorted parameter " <<
+                "to false or fix the input to be ordered by v,u in ascending order");
       }
-      //Find correct cluster and add pixel to cluster
+      lastU = px.getU();
+      lastV = px.getV();
+      // Find correct cluster and add pixel to cluster
       findCluster(px);
     }
     writeClusters(sensorID);

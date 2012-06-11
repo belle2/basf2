@@ -182,7 +182,7 @@ namespace Belle2 {
 
       G4LogicalVolume* logi_ShieldR3 = new G4LogicalVolume(geo_ShieldR3, mat_ShieldR3, "logi_ShieldR3_name");
       setColor(*logi_ShieldR3, "#CC0000");
-      //setVisibility(*logi_ShieldR3, false);
+      setVisibility(*logi_ShieldR3, false);
       new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_ShieldR3, "phys_ShieldR3", &topVolume, false, 0);
 
 

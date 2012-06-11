@@ -244,7 +244,7 @@ namespace Belle2 {
 
     double TOPGeometryPar::QE(double e) const
     {
-      if (e == 0) return 0;
+      if (e < 0.001) return 0;
       double dlam = 1240 / e - m_LambdaFirst;
       if (dlam < 0) return 0;
       int i = int(dlam / m_LambdaStep);

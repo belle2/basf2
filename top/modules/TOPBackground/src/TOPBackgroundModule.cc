@@ -127,10 +127,9 @@ namespace Belle2 {
       StoreArray<TOPTrack> topTracks;
 
       int nHits = topDigits->GetEntries();
-      int barID = 0;
       for (int i = 0; i < nHits; i++) {
         TOPDigit* aDigit = topDigits[i];
-        barID = aDigit->getBarID();
+        int barID = aDigit->getBarID();
         peflux->AddBinContent(barID * 2, 1. / m_TimeOfSimulation / 32.0);
 
         const TOPSimHit* simHit = getTOPSimHit(aDigit);

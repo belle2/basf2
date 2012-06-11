@@ -188,7 +188,7 @@ namespace Belle2 {
 
     double TOPreco::PDF(int chID, double T, double Mass)
     {
-      float t = T; float mass = Mass;
+      float t = (float) T; float mass = (float) Mass;
       return get_pdf_(&chID, &t, &mass);
     }
 

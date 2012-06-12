@@ -7,8 +7,8 @@
 # Yanliang Han
 # 2011-11
 
-DIRACROOT=${DIRACROOT:-$DIRAC/..}
-. $DIRACROOT/../bashrc
+DIRACROOT=${DIRACROOT:-$DIRAC/}
+. $DIRACROOT/bashrc
 # check if gbasf2 is unreachable by PATH
 path=`which gbasf2`
 gbasf2_path=`dirname path`/..

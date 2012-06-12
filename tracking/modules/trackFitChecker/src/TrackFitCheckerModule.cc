@@ -16,9 +16,15 @@
 #include <generators/dataobjects/MCParticle.h>
 #include <pxd/dataobjects/PXDTrueHit.h>
 #include <svd/dataobjects/SVDTrueHit.h>
+
+#include <pxd/dataobjects/PXDTrueHit.h>
+#include <svd/dataobjects/SVDTrueHit.h>
+
 #include <vxd/dataobjects/VXDTrueHit.h>
+
 #include <pxd/reconstruction/PXDRecoHit.h>
 #include <svd/reconstruction/SVDRecoHit2D.h>
+#include <svd/reconstruction/SVDRecoHit.h>
 #include <cdc/dataobjects/CDCRecoHit.h>
 
 #include <geometry/GeometryManager.h>
@@ -252,6 +258,9 @@ void TrackFitCheckerModule::event()
     } catch (GFException& e) {
       //m_layerWiseTests.havePredicitons = false;
       m_testPrediction = false;
+      if (m_inspectTracks == true) {
+        m_dataOut << "#inspect tracks was disables because no predictions are available in the Genfit bookkeeping\n";
+      }
     }
 
     m_wAndPredPresentsTested = true;
@@ -365,7 +374,7 @@ void TrackFitCheckerModule::event()
           truthTests(); //uses data from trueHits
           B2DEBUG(100, "executed truth tests");
         }
-        if (m_inspectTracks == true) {
+        if (m_inspectTracks == true and m_testPrediction == true) {
           inspectTracks(chi2tot_fu, vertexAbsMom);
           B2DEBUG(100, "executed inspect tracks");
         }
@@ -801,6 +810,7 @@ void TrackFitCheckerModule::setTrackData(GFTrack* const aTrackPtr, const double 
   //make sure anything from the last track is cleared;
   m_trackData.accuVecIndices.clear();
   m_trackData.detIds.clear();
+  m_trackData.hitDims.clear();
   m_trackData.ms.clear();
   m_trackData.Hs.clear();
   m_trackData.Vs.clear();
@@ -827,10 +837,12 @@ void TrackFitCheckerModule::setTrackData(GFTrack* const aTrackPtr, const double 
     VXDTrueHit const* aVxdTrueHitPtr = NULL;
     PXDRecoHit const*  aPxdRecoHitPtr = dynamic_cast<PXDRecoHit const* >(aGFAbsRecoHitPtr);
     SVDRecoHit2D const*  aSvdRecoHitPtr =  dynamic_cast<SVDRecoHit2D  const* >(aGFAbsRecoHitPtr);
+    SVDRecoHit const*  aSvdRecoHit1DPtr =  dynamic_cast<SVDRecoHit  const* >(aGFAbsRecoHitPtr);
     CDCRecoHit*  aCdcRecoHitPtr = dynamic_cast<CDCRecoHit* >(aGFAbsRecoHitPtr); // cannot use the additional const here because the getter fuctions inside the CDCRecoHit class are not decleared as const (although they could be const)
     if (aPxdRecoHitPtr not_eq NULL) {
       m_trackData.accuVecIndices.push_back(aPxdRecoHitPtr->getSensorID().getLayerNumber() - 1);
       m_trackData.detIds.push_back(0);
+      m_trackData.hitDims.push_back(2);
       if (m_truthAvailable == true) {
         aVxdTrueHitPtr = static_cast<VXDTrueHit const*>(aPxdRecoHitPtr->getTrueHit());
         if (aVxdTrueHitPtr == NULL) {
@@ -840,15 +852,21 @@ void TrackFitCheckerModule::setTrackData(GFTrack* const aTrackPtr, const double 
     } else if (aSvdRecoHitPtr not_eq NULL) {
       m_trackData.accuVecIndices.push_back(aSvdRecoHitPtr->getSensorID().getLayerNumber() - 1);
       m_trackData.detIds.push_back(1);
+      m_trackData.hitDims.push_back(2);
       if (m_truthAvailable == true) {
         aVxdTrueHitPtr = static_cast<VXDTrueHit const*>(aSvdRecoHitPtr->getTrueHit());
         if (aVxdTrueHitPtr == NULL) {
           aVxdTrueHitPtr = static_cast<VXDTrueHit const*>(aSvdRecoHitPtr->getSimpleDigiHit()->getTrueHit());
         }
       }
+    } else if (aSvdRecoHit1DPtr not_eq NULL) {
+      m_trackData.accuVecIndices.push_back(aSvdRecoHit1DPtr->getSensorID().getLayerNumber() - 1);
+      m_trackData.detIds.push_back(1);
+      m_trackData.hitDims.push_back(1);
     } else if (aCdcRecoHitPtr not_eq NULL) {
       m_trackData.accuVecIndices.push_back(aCdcRecoHitPtr->getLayerId() + m_nPxdLayers + m_nSvdLayers);
       m_trackData.detIds.push_back(2);
+      m_trackData.hitDims.push_back(1);
     } else {
       B2ERROR("An unknown type of recoHit was detected in TrackFitCheckerModule::event(). This hit will not be included in the statistical tests");
     }
@@ -891,6 +909,8 @@ void TrackFitCheckerModule::setTrackData(GFTrack* const aTrackPtr, const double 
       aTrackPtr->getBK(trackRepId)->getMatrix("bPreCov", iGFHit, cov);
       m_trackData.states_bp.push_back(state);
       m_trackData.covs_bp.push_back(cov);
+    } else if (m_inspectTracks == true) {
+
     }
 
     if (aVxdTrueHitPtr not_eq NULL) {
@@ -948,18 +968,23 @@ void TrackFitCheckerModule::normalTests()
   for (int iGFHit = 0; iGFHit not_eq m_trackData.nHits; ++iGFHit) {
     int detId = m_trackData.detIds[iGFHit];
     int accuVecIndex = m_trackData.accuVecIndices[iGFHit];
+    int hitDim = m_trackData.hitDims[iGFHit];
     if (detId == 0 or detId == 1) {
       if (m_testSi == false) {
         continue;
       }
-      res.ResizeTo(2, 1);
-      R.ResizeTo(2, 2);
     } else if (detId == 2) {
       if (m_testCdc == false) {
         continue;
       }
+    }
+
+    if (hitDim == 1) {
       res.ResizeTo(1, 1);
       R.ResizeTo(1, 1);
+    } else if (hitDim == 2) {
+      res.ResizeTo(2, 1);
+      R.ResizeTo(2, 2);
     }
     const TMatrixT<double> H = m_trackData.Hs[iGFHit];
     const TMatrixT<double> HT(TMatrixT<double>::kTransposed, H); // the transposed is needed later

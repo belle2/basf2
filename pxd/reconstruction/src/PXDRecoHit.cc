@@ -153,8 +153,8 @@ GFAbsRecoHit* PXDRecoHit::clone()
 
 TMatrixD PXDRecoHit::getHMatrix(const GFAbsTrackRep*)
 {
-  TMatrixD hMatrix(2, 5);
-  hMatrix.Zero();
+  TMatrixD hMatrix(HIT_DIMENSIONS, 5);
+  //hMatrix.Zero(); is already set to 0 during initialization in statement one line above
   hMatrix(0, 3) = 1;
   hMatrix(1, 4) = 1;
   return (hMatrix);

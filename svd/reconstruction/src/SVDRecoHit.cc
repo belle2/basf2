@@ -124,9 +124,12 @@ GFAbsRecoHit* SVDRecoHit::clone()
 
 TMatrixD SVDRecoHit::getHMatrix(const GFAbsTrackRep*)
 {
-  TMatrixD hMatrix(1, 5);
-  hMatrix.Zero();
-  hMatrix(0, 3) = (m_isU) ? 1 : 0;
-  hMatrix(0, 4) = (m_isU) ? 0 : 1;
+  TMatrixD hMatrix(HIT_DIMENSIONS, 5);
+  //hMatrix.Zero(); the TMatrixD constructor already set all elements to 0
+  if (m_isU == true) {
+    hMatrix(0, 3) = 1.0;
+  } else {
+    hMatrix(0, 4) = 1.0;
+  }
   return (hMatrix);
 }

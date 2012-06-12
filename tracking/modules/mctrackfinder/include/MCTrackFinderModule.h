@@ -82,7 +82,7 @@ namespace Belle2 {
     bool m_useSVDHits;                                          /**< Boolean to select if SVDHits should be used*/
     bool m_useCDCHits;                                          /**< Boolean to select if CDCHits should be used*/
 
-    bool m_usePXDClusters;                                      /**< Boolean to select if PXDClusters should be used instead of default PXDTrueHits. m_usePXDHits should be set to true too!*/
+    bool m_useClusters;                                      /**< Boolean to select if PXD and SVD Clusters should be used instead of default TrueHits. */
 
     int m_whichParticles;                                       /**< Boolean to mark for which particles a track candidate should be created: 0 for all primaries, 1 for all tracks which reach PXD, 2 for all tracks which reach SVD, 3 for all tracks which reach CDC . */
     double m_energyCut;                                         /**< Create track candidates only for MCParticles with energy above this cut*/

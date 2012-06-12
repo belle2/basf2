@@ -87,8 +87,8 @@ namespace Belle2 {
     bool m_noiseBrems;
     bool m_noEffects;
     std::string m_mscModel;
-
-    bool m_useVXDSimpleDigiHits;
+    std::string m_hitType;
+    int m_hitTypeId;
     std::vector<double> m_dafTemperatures;
 
 

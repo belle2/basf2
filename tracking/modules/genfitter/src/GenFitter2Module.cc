@@ -24,10 +24,11 @@
 #include <framework/logging/Logger.h>
 #include <cdc/dataobjects/CDCRecoHit.h>
 #include <svd/reconstruction/SVDRecoHit2D.h>
+#include <svd/reconstruction/SVDRecoHit.h>
 #include <pxd/reconstruction/PXDRecoHit.h>
 
-#include <pxd/dataobjects/PXDTrueHit.h>
-#include <svd/dataobjects/SVDTrueHit.h>
+#include <svd/dataobjects/SVDCluster.h>
+#include <pxd/dataobjects/PXDCluster.h>
 
 #include <vxd/geometry/GeoCache.h>
 #include <vxd/dataobjects/VXDTrueHit.h>
@@ -83,7 +84,8 @@ GenFitter2Module::GenFitter2Module() :
   addParam("noEffects", m_noEffects, "switch off all material effects in Genfit. This overwrites all individual material effects switches", false);
   addParam("angleCut", m_angleCut, "only process tracks with scattering angles smaller then angleCut (The angles are calculated from TrueHits). If negative value given no selection will take place", -1.0);
   addParam("mscModel", m_mscModel, "select the MSC model in Genfit", string("Highland"));
-  addParam("useVXDSimpleDigiHits", m_useVXDSimpleDigiHits, "set true if processing of Hits from the VXDSimpleBackround module is wanted", false);
+  addParam("hitType", m_hitType, "select what kind of hits are feeded to Genfit. Current Options \"TrueHit\", \"Cluster\" or \"VXDSimpleDigiHit\"", string("TrueHit"));
+
   addParam("dafTemperatures", m_dafTemperatures, "set the anihiling scheme (temperatures) for the DAF. Length of vector will determine DAF iterations", vector<double>(3, 1.0));
 }
 
@@ -129,6 +131,14 @@ void GenFitter2Module::initialize()
     B2ERROR("An anihiling scheme for the DAF with more then 10 temperatures is not supported. The default scheme was selcted instead.");
   }
 
+  //interpred the hittype option
+  if (m_hitType == "TrueHit") {
+    m_hitTypeId = 0;
+  } else if (m_hitType == "VXDSimpleDigiHit") {
+    m_hitTypeId = 1;
+  } else if (m_hitType == "Cluster") {
+    m_hitTypeId = 2;
+  }
 }
 
 void GenFitter2Module::beginRun()
@@ -171,6 +181,20 @@ void GenFitter2Module::event()
     StoreArray<VXDSimpleDigiHit> svdSimpleDigiHits("svdSimpleDigiHits");
     B2DEBUG(100, "pxdSimpleDigiHits.getEntries() " << pxdSimpleDigiHits.getEntries());
     B2DEBUG(100, "svdSimpleDigiHits.getEntries() " << svdSimpleDigiHits.getEntries());
+
+    //PXD clusters
+    StoreArray<PXDCluster> pxdClusters("");
+    int nPXDClusters = pxdClusters.getEntries();
+    B2DEBUG(149, "GenFitter2: Number of PXDClusters: " << nPXDClusters);
+    if (nPXDClusters == 0) {B2DEBUG(100, "GenFitter2: PXDClustersCollection is empty!");}
+
+    //SVD clusters
+    StoreArray<SVDCluster> svdClusters("");
+    int nSVDClusters = svdClusters.getEntries();
+    B2DEBUG(149, "GenFitter2: Number of SVDClusters: " << nSVDClusters);
+    if (nSVDClusters == 0) {B2DEBUG(100, "GenFitter2: SVDClustersCollection is empty!");}
+
+
     GFTrackCand* aTrackCandPointer = trackCandidates[0];
     int nTrackCandHits = aTrackCandPointer->getNHits();
     B2DEBUG(100, "nTrackCandHits " << nTrackCandHits);
@@ -189,16 +213,16 @@ void GenFitter2Module::event()
           aTrackCandPointer->getHit(i, detId, hitId);
           int layerId = -1;
           if (detId == 0) {
-            if (m_useVXDSimpleDigiHits == true) {
+            if (m_hitTypeId == 1) {
               layerId = pxdSimpleDigiHits[hitId]->getSensorID().getLayerNumber();
-            } else {
+            } else if (m_hitTypeId == 0) {
               layerId = pxdTrueHits[hitId]->getSensorID().getLayerNumber();
             }
           }
           if (detId == 1) {
-            if (m_useVXDSimpleDigiHits == true) {
+            if (m_hitTypeId == 1) {
               layerId = svdSimpleDigiHits[hitId]->getSensorID().getLayerNumber();
-            } else {
+            } else if (m_hitTypeId == 0) {
               layerId = svdTrueHits[hitId]->getSensorID().getLayerNumber();
             }
           }
@@ -282,27 +306,41 @@ void GenFitter2Module::event()
 
       GFRecoHitProducer <VXDSimpleDigiHit, PXDRecoHit> * pxdSimpleDigiHitProducer;
       GFRecoHitProducer <VXDSimpleDigiHit, SVDRecoHit2D> * svdSimpleDigiHitProducer;
+
+      GFRecoHitProducer <PXDCluster, PXDRecoHit> * pxdClusterProducer;
+      GFRecoHitProducer <SVDCluster, SVDRecoHit> * svdClusterProducer;
+
       //create RecoHitProducers for PXD, SVD and CDC
-      if (m_useVXDSimpleDigiHits == false) { // use the trueHits
+      if (m_hitTypeId == 0) { // use the trueHits
         PXDProducer =  new GFRecoHitProducer <PXDTrueHit, PXDRecoHit> (&*pxdTrueHits);
         SVDProducer =  new GFRecoHitProducer <SVDTrueHit, SVDRecoHit2D> (&*svdTrueHits);
         CDCProducer =  new GFRecoHitProducer <CDCHit, CDCRecoHit> (&*cdcHits);
-      } else {
+      } else if (m_hitTypeId == 1) {
         pxdSimpleDigiHitProducer =  new GFRecoHitProducer <VXDSimpleDigiHit, PXDRecoHit> (&*pxdSimpleDigiHits);
         svdSimpleDigiHitProducer =  new GFRecoHitProducer <VXDSimpleDigiHit, SVDRecoHit2D> (&*svdSimpleDigiHits);
+      } else if (m_hitTypeId == 2) {
+        pxdClusterProducer =  new GFRecoHitProducer <PXDCluster, PXDRecoHit> (&*pxdClusters);
+        svdClusterProducer =  new GFRecoHitProducer <SVDCluster, SVDRecoHit> (&*svdClusters);
+        CDCProducer =  new GFRecoHitProducer <CDCHit, CDCRecoHit> (&*cdcHits);
       }
 
 
       //add producers to the factory with correct detector Id
 
-      if (m_useVXDSimpleDigiHits == false) { // use the trueHits
+      if (m_hitTypeId == 0) { // use the trueHits
         factory.addProducer(0, PXDProducer);
         factory.addProducer(1, SVDProducer);
         factory.addProducer(2, CDCProducer);
-      } else {
+      } else if (m_hitTypeId == 1) {
         factory.addProducer(0, pxdSimpleDigiHitProducer);
         factory.addProducer(1, svdSimpleDigiHitProducer);
+      } else if (m_hitTypeId == 2) {
+        factory.addProducer(0, pxdClusterProducer);
+        factory.addProducer(1, svdClusterProducer);
+        factory.addProducer(2, CDCProducer);
       }
+
+
 
       vector <GFAbsRecoHit*> factoryHits;
       //use the factory to create RecoHits for all Hits stored in the track candidate

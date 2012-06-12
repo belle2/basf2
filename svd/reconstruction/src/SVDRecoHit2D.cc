@@ -106,8 +106,8 @@ GFAbsRecoHit* SVDRecoHit2D::clone()
 
 TMatrixD SVDRecoHit2D::getHMatrix(const GFAbsTrackRep*)
 {
-  TMatrixD hMatrix(2, 5);
-  hMatrix.Zero();
+  TMatrixD hMatrix(HIT_DIMENSIONS, 5);
+  //hMatrix.Zero(); the TMatrixD constructor already set all elements to 0
   hMatrix(0, 3) = 1;
   hMatrix(1, 4) = 1;
   return (hMatrix);

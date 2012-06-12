@@ -195,6 +195,7 @@ namespace Belle2 {
 
       std::vector<int> accuVecIndices;
       std::vector<int> detIds;
+      std::vector<int> hitDims;
 
       std::vector<TMatrixD> ms;
       std::vector<TMatrixD> Hs;

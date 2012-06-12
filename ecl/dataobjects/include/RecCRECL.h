@@ -75,37 +75,37 @@ namespace Belle2 {
 
 
     //! The method to get showerId
-    int GetShowerId() { return m_showerId ; }
+    int GetShowerId() const { return m_showerId ; }
     //! The method to get Energy
-    double GetEnergy() { return m_Energy ; }
+    double GetEnergy() const { return m_Energy ; }
     //! The method to get Theta
-    double GetTheta() { return m_Theta ; }
+    double GetTheta() const { return m_Theta ; }
     //! The method to get Phi
-    double GetPhi() { return m_Phi ; }
+    double GetPhi() const { return m_Phi ; }
     //! The method to get Distance
-    double GetDistance() { return m_Distance ; }
+    double GetDistance() const { return m_Distance ; }
     //! The method to get Mass
-    double GetMass() { return m_Mass ; }
+    double GetMass() const { return m_Mass ; }
     //! The method to get Width
-    double GetWidth() { return m_Width ; }
+    double GetWidth() const { return m_Width ; }
     //! The method to get E9oE25
-    double GetE9oE25() { return m_E9oE25 ; }
+    double GetE9oE25() const { return m_E9oE25 ; }
     //! The method to get TotEnergy
-    double GetTotEnergy() { return m_TotEnergy ; }
+    double GetTotEnergy() const { return m_TotEnergy ; }
     //! The method to get E9oE25unf
-    double GetE9oE25unf() { return m_E9oE25unf ; }
+    double GetE9oE25unf() const { return m_E9oE25unf ; }
     //! The method to get return m_UncEnergy
-    double GetUncEnergy() { return m_UncEnergy ; }
+    double GetUncEnergy() const { return m_UncEnergy ; }
     //! The method to get NHits
-    double GetNHits() { return m_NHits ; }
+    double GetNHits() const { return m_NHits ; }
     //! The method to get WNHits
-    double GetWNHits() { return m_WNHits ; }
+    double GetWNHits() const { return m_WNHits ; }
     //! The method to get NHitsUsed
-    double GetNHitsUsed() { return m_NHitsUsed ; }
+    double GetNHitsUsed() const { return m_NHitsUsed ; }
     //! The method to get Status
-    int GetStatus() { return m_Status ; }
+    int GetStatus() const { return m_Status ; }
     //! The method to get Grade
-    int GetGrade() { return m_Grade  ; }
+    int GetGrade() const { return m_Grade  ; }
 
     //! Empty constructor
     /*! Recommended for ROOT IO

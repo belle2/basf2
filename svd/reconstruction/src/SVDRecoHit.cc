@@ -57,10 +57,11 @@ SVDRecoHit::SVDRecoHit(const SVDTrueHit* hit, bool uDirection, float sigma):
 
 SVDRecoHit::SVDRecoHit(const SVDCluster* hit, float sigma):
   GFRecoHitIfc<GFPlanarHitPolicy> (HIT_DIMENSIONS), m_sensorID(0), m_trueHit(0),
-  m_cluster(hit), m_isU(true), m_energyDep(0), m_rotationPhi(0)
+  m_cluster(hit), m_energyDep(0), m_rotationPhi(0)
 {
   // Set the sensor UID
   m_sensorID = hit->getSensorID();
+  m_isU = hit->isUCluster();
 
   // Determine if we have a wedge sensor.
   const SVD::SensorInfo& geometry = dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::get(m_sensorID));
@@ -123,9 +124,9 @@ GFAbsRecoHit* SVDRecoHit::clone()
 
 TMatrixD SVDRecoHit::getHMatrix(const GFAbsTrackRep*)
 {
-  TMatrixD hMatrix(2, 5);
+  TMatrixD hMatrix(1, 5);
   hMatrix.Zero();
   hMatrix(0, 3) = (m_isU) ? 1 : 0;
-  hMatrix(1, 4) = (m_isU) ? 0 : 1;
+  hMatrix(0, 4) = (m_isU) ? 0 : 1;
   return (hMatrix);
 }

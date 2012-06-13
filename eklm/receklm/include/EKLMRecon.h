@@ -24,8 +24,9 @@ namespace Belle2 {
   class EKLMRecon   {
 
   public:
-    //! constructor
-    EKLMRecon() {};
+    //! constructor with default values
+    EKLMRecon();
+
 
     //! destructor
     ~EKLMRecon() {};
@@ -65,10 +66,29 @@ namespace Belle2 {
 
     /**
      * returns true strips have intersection
+     * determins crossing point in the global rest frame
+     * calculates chisq of the hit
+     * and hittime
      */
     bool doesIntersect(const EKLMStripHit* , const EKLMStripHit* ,
-                       TVector3&);
+                       TVector3&, double&, double&);
 
+    /**
+     * Adds trip hit to sector, return  true on success
+     */
+    bool addStripHitToSector(EKLMSectorHit* , EKLMStripHit*);
+
+
+
+    /**
+     * Speed of the first photon
+     */
+    double m_firstPhotonlightSpeed;
+
+    /**
+     * Time smearing
+     */
+    double m_sigmaT;
 
   };
 

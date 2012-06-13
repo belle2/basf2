@@ -70,6 +70,8 @@ namespace Belle2 {
   protected:
   private:
 
+    double m_firstPhotonlightSpeed;
+    double m_sigmaT;
   };
 } // end namespace Belle2
 #endif

@@ -34,7 +34,6 @@ namespace Belle2 {
                                                    vector<EKLMSimHit*> >
                                                    entry)
   {
-
     // get information from Gearbox
     GearDir Digitizer = GearDir("/Detector/DetectorComponent[@name=\"EKLM\"]/Content/Digitizer");
     m_timeDigitizationStep = Digitizer.getInt("TimeDigitizationStep");
@@ -43,10 +42,9 @@ namespace Belle2 {
     m_minCosTheta = cos(Digitizer.getAngle("MaxTheta"));
     m_mirrorReflectiveIndex = Digitizer.getDouble("MirrorReflectiveIndex");
     m_scintillatorDeExcitationTime = Digitizer.getDouble("ScintillatorDeExcitationTime");
-    m_scintillatorDeExcitationTime = Digitizer.getDouble("ScintillatorDeExcitationTime");
     m_fiberDeExcitationTime = Digitizer.getDouble("FiberDeExcitationTime");
     m_outputFilename = Digitizer.getString("OutputFile");
-    m_lightSpeed = Digitizer.getDouble("LightSpeedInFiber");
+    //    m_lightSpeed = Digitizer.getDouble("LightSpeedInFiber");
     m_firstPhotonlightSpeed = Digitizer.getDouble("FirstPhotonSpeed");
     m_attenuationLength = Digitizer.getLength("AttenuationLength");
     m_expCoefficient = Digitizer.getDouble("SignalShapeExpCoefficient");
@@ -54,33 +52,31 @@ namespace Belle2 {
 
     m_stripName = &entry.first->GetName();
 
+    m_histRange = m_nTimeDigitizationSteps *   m_timeDigitizationStep;
 
     // create histos
     m_digitizedAmplitudeDirect = new TH1D("digitizedAmplitudeDirect", "",
                                           m_nTimeDigitizationSteps, 0,
-                                          m_nTimeDigitizationSteps *
-                                          m_timeDigitizationStep);
+                                          m_histRange);
 
     m_digitizedAmplitudeDirect->SetNameTitle("digitizedAmplitudeDirect",
                                              m_stripName->c_str());
 
     m_digitizedAmplitudeReflected = new TH1D("digitizedAmplitudeReflected", "",
                                              m_nTimeDigitizationSteps, 0,
-                                             m_nTimeDigitizationSteps *
-                                             m_timeDigitizationStep);
+                                             m_histRange);
 
     m_digitizedAmplitudeReflected->SetNameTitle("digitizedAmplitudeReflected",
                                                 m_stripName->c_str());
 
     m_digitizedAmplitude = new TH1D("digitizedAmplitude", "",
                                     m_nTimeDigitizationSteps, 0,
-                                    m_nTimeDigitizationSteps *
-                                    m_timeDigitizationStep);
+                                    m_histRange);
 
     m_digitizedAmplitude->SetNameTitle("digitizedAmplitude", m_stripName->c_str());
 
     // define fit function
-    m_fitFunction = new TF1("fitFunction", EKLMSignalShapeFitFunction, 0, 300, 4);
+    m_fitFunction = new TF1("fitFunction", EKLMSignalShapeFitFunction, 0, m_histRange, 5);
 
     // define vector of hits
     m_vectorHits = entry.second;
@@ -104,6 +100,7 @@ namespace Belle2 {
       // calculate distance
       lightPropagationDistance(*iHit);
 
+
       // Poisson mean for # of p.e.
       double nPEmean = (*iHit)->getEDep() * m_nPEperMeV;
 
@@ -124,9 +121,12 @@ namespace Belle2 {
 
     // set up fit parameters
     m_fitFunction->SetParameters(10, 2., 0.04, 50);
+    m_fitFunction->SetParLimits(0, 0, m_histRange);
+    m_fitFunction->SetParLimits(1, 0, m_histRange);
+
 
     // do fit
-    m_fitResultsPtr = m_digitizedAmplitude->Fit(m_fitFunction, "LLSQ");
+    m_fitResultsPtr = m_digitizedAmplitude->Fit(m_fitFunction, "LLSQB");
 
 
     // if save histograms if outputFilename is non-empty
@@ -150,9 +150,13 @@ namespace Belle2 {
 
   void EKLMFiberAndElectronics::lightPropagationDistance(EKLMSimHit* sh)
   {
-    G4Box* box = (G4Box*)(sh->getVolume()->GetLogicalVolume()->GetSolid());
-    double half_len = box->GetXHalfLength();
-    double local_pos = sh->getLocalPosition()->x();
+    // actually, it is not too safe to use GetConstituentSolid(0).
+    // here we rely on the fact that the first child is a real strip G4box
+    // similar problem appears in EKLMRecon.cc
+    G4Box* box = (G4Box*)(sh->getVolume()->GetLogicalVolume()->GetSolid()->GetConstituentSolid(0));
+    // Native Geant4 units are mm, here we account for that
+    double half_len = box->GetXHalfLength() * Unit::mm;
+    double local_pos = sh->getLocalPosition()->x() * Unit::mm;
     m_hitDist = make_pair(half_len - local_pos, 3.0 * half_len + local_pos);
   }
 

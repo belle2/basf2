@@ -41,16 +41,3 @@ void EKLMSectorHit::Print()
        it != m_stripHitVector.end(); ++it)
     (*it)->Print();
 }
-
-bool EKLMSectorHit::addStripHit(EKLMStripHit* stripHit)
-{
-  if (stripHit->getEndcap() == getEndcap() &&
-      stripHit->getLayer() == getLayer() &&
-      stripHit->getSector() == getSector()) {
-    m_stripHitVector.push_back(stripHit);
-    return true;
-  }
-  return false;
-}
-
-

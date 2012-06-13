@@ -85,6 +85,16 @@ namespace Belle2 {
     const TFitResult* getFitResults() const;
 
     /**
+     * Get fit status
+     */
+    int getFitStatus();
+
+    /**
+     * Set fit status
+     */
+    void setFitStatus(int s);
+
+    /**
      * Set fit results
      */
     void setFitResults(TFitResult& res);
@@ -115,6 +125,11 @@ namespace Belle2 {
 
     //! number of photo electrons
     double m_NumberPhotoElectrons;
+
+    //! number of photo electrons
+    int m_fitStatus;
+
+
 
 
     //! Physical volume (for simulation)

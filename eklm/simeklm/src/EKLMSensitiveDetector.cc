@@ -101,7 +101,7 @@ namespace Belle2 {
     /**
      * Global -> Local position
      */
-    const G4ThreeVector& lpos = aStep->GetPreStepPoint()->
+    const G4ThreeVector& lpos = aStep->GetPostStepPoint()->
                                 GetTouchableHandle()->GetHistory()->
                                 GetTopTransform().TransformPoint(gpos);
 

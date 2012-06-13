@@ -78,6 +78,16 @@ void EKLMStripHit::setFitResults(TFitResultPtr resPtr)
   m_fitResults = *resPtr;
 }
 
+void EKLMStripHit::setFitStatus(int s)
+{
+  m_fitStatus = s;
+}
+
+int EKLMStripHit::getFitStatus()
+{
+  return m_fitStatus;
+}
+
 
 
 const G4VPhysicalVolume* EKLMStripHit::getVolume() const

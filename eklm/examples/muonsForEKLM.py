@@ -25,11 +25,11 @@ import random
 from basf2 import *
 
 # Set the log level to show only error and fatal messages
-set_log_level(LogLevel.ERROR)
+set_log_level(LogLevel.INFO)
 
 # EvtMetaGen - generate event meta data
 evtmetagen = register_module('EvtMetaGen')
-evtmetagen.param('EvtNumList', [1])
+evtmetagen.param('EvtNumList', [20])
 evtmetagen.param('RunList', [1])
 
 # Particle gun
@@ -62,9 +62,10 @@ mcprint = register_module('PrintMCParticles')
 
 # EKLM digi
 eklmdigi = register_module('EKLMDigitization')
+eklmdigi.log_level = LogLevel.INFO
 # EKLM reco
 eklmreco = register_module('EKLMReconstruction')
-
+eklmreco.log_level = LogLevel.INFO
 # Create main path
 main = create_path()
 

@@ -19,9 +19,10 @@
      <FiberDeExcitationTime desc="Fiber deexcitation time" unit="ns">10</FiberDeExcitationTime>
      <LightSpeedInFiber desc="Light speed in fiber, does not depend on angle, cm/ns">17.0</LightSpeedInFiber>
      <FirstPhotonSpeed desc="Speed for a fastest photon. Should be measured, cm/ns">17.0</FirstPhotonSpeed>
+     <TimeResolution desc="Time resolution used in 2D hit reconstruction">3.0</TimeResolution>
      <SignalShapeExpCoefficient desc="exponent coefficient for a single-photoelectron shape">0.04</SignalShapeExpCoefficient>
      <AttenuationLength desc="attenuation length in the fiber" unit="cm">300</AttenuationLength>
-     <BackgroundPoissonMean desc="Mean for SiPM backgrouns. If zero or negative no backgopunds are added">1</BackgroundPoissonMean>
+     <BackgroundPoissonMean desc="Mean for SiPM backgrouns. If zero or negative no backgrounds are added">1</BackgroundPoissonMean>
      <OutputFile desc="Prefix for name of file with histograms (can include directory name). If void no histos would be saved"></OutputFile>
     </Digitizer>
     <Rotation desc="Rotation of the EKLM with respect to the Detector"

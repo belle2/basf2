@@ -78,16 +78,6 @@ namespace Belle2 {
 
     //! Needed to make Belle2::EKLMHit2d storable
     ClassDef(Belle2::EKLMHit2d, 1);
-    /**
-     * Number of plane.
-     */
-    int m_Plane;
-
-    const G4VPhysicalVolume* GetPhysicalVolumeByPoint(const G4ThreeVector& point);
-    double getLightPropagationLength(const G4VPhysicalVolume* vol, const CLHEP::Hep3Vector&  pos);
-    double getLightPropagationLength(const G4VPhysicalVolume* vol, const TVector3&  pos);
-    /*     bool CheckStripOrientationX(const G4VPhysicalVolume* strip); */
-    /*     bool doesIntersect(const EKLMStripHit* hit1, const EKLMStripHit* hit2, TVector3& crossPoint); */
 
 
 

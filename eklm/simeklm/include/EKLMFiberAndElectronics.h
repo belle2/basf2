@@ -120,6 +120,17 @@ namespace Belle2 {
      */
     int m_nTimeDigitizationSteps;
 
+
+    /**
+     * ADC digitization step
+     */
+    int m_timeDigitizationStep;
+
+    /**
+     * Stands for m_nTimeDigitizationSteps*m_timeDigitizationStep
+     */
+    double m_histRange;
+
     /**
      * lightspeed in fiber
      */
@@ -148,11 +159,6 @@ namespace Belle2 {
      */
     double m_nPEperMeV;
 
-
-    /**
-     * ADC digitization step
-     */
-    int m_timeDigitizationStep;
 
     /**
      * mirror reflective index

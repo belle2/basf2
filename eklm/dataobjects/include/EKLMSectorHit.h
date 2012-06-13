@@ -41,8 +41,6 @@ namespace Belle2 {
     //! Print information about the sector hit
     void Print();
 
-    //! Adds EKLMStripHit to the EKLMSectorHit
-    bool addStripHit(EKLMStripHit*);
 
     //! returns pointer to the vector of pointers to the EKLMStripHits included to
     //! the EKLMSectorHit
@@ -52,9 +50,6 @@ namespace Belle2 {
 
     //! Belle2::EKLMSectorHit
     std::vector <EKLMHit2d*>* get2dHitVector() ;
-
-    //! creates 2d hits from the SectorHits of the current sector
-    void create2dHits();
 
 
   private:

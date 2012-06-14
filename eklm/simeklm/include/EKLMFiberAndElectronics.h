@@ -171,6 +171,12 @@ namespace Belle2 {
     double m_meanSiPMNoise;
 
     /**
+     * if non-zero used as a seed value for constant background fraction in the fit
+     * if zero fix constant background fraction to zero
+     */
+    double m_enableConstBkg;
+
+    /**
      * Deexcitation time for scintillator
      * unit=ns
      */
@@ -199,11 +205,12 @@ namespace Belle2 {
     void timesToShape(const std::vector <double>  &  , TH1D*);
 
     /**
-     * calculates hit time,
+     * calculates StripHit times (at the end of the strip),
      * first argument stands for # of p.e.
-     * the second indicates if the hit is direct or reflected
+     * second argument stands for time of the SimHit
+     * the third indicates if the hit is direct or reflected
      */
-    std::vector<double>  hitTimes(int , bool isReflected = false) ;
+    std::vector<double>  hitTimes(int , double, bool isReflected = false) ;
 
 
     /**

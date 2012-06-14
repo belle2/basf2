@@ -23,7 +23,8 @@
      <SignalShapeExpCoefficient desc="exponent coefficient for a single-photoelectron shape">0.04</SignalShapeExpCoefficient>
      <AttenuationLength desc="attenuation length in the fiber" unit="cm">300</AttenuationLength>
      <BackgroundPoissonMean desc="Mean for SiPM backgrouns. If zero or negative no backgrounds are added">1</BackgroundPoissonMean>
-     <OutputFile desc="Prefix for name of file with histograms (can include directory name). If void no histos would be saved"></OutputFile>
+     <EnableConstantBackgroundInTheFit desc="Enables (non-zero) or disables (0) constant background fraction in the fit. If value!=0,  value  will be used as seed  fit value">1.</EnableConstantBackgroundInTheFit>
+     <OutputFile desc="Prefix for name of file with histograms (can include directory name). If void no histos would be saved">/tmp/hist/</OutputFile>
     </Digitizer>
     <Rotation desc="Rotation of the EKLM with respect to the Detector"
       unit="mrad">0.0</Rotation>

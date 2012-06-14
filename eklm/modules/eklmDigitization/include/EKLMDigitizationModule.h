@@ -69,6 +69,11 @@ namespace Belle2 {
   protected:
   private:
 
+    /**
+     * Strip hits with npe lower this value will be marked as bad
+     */
+    double m_discriminatorThreshold;
+
   };
 } // end namespace Belle2
 #endif

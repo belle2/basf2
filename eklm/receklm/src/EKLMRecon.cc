@@ -31,7 +31,8 @@ namespace Belle2 {
   {
     StoreArray<EKLMStripHit> stripHitsArray;
     for (int i = 0; i < stripHitsArray.getEntries(); i++)
-      m_StripHitVector.push_back(stripHitsArray[i]);
+      if (stripHitsArray[i]->isGood())
+        m_StripHitVector.push_back(stripHitsArray[i]);
   }
 
 

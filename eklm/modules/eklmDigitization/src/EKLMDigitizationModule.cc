@@ -20,6 +20,7 @@ EKLMDigitizationModule::EKLMDigitizationModule() : Module()
 {
   setDescription("EKLM digitization module");
   setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
+  addParam("DiscriminatorThreshold", m_discriminatorThreshold, "Strip hits with npe lower this value will be marked as bad", double(7.));
 }
 
 EKLMDigitizationModule::~EKLMDigitizationModule()
@@ -44,7 +45,7 @@ void EKLMDigitizationModule::event()
   digi->readAndSortStepHits();
   digi->makeSimHits();
   digi->readAndSortSimHits();
-  digi->mergeSimHitsToStripHits();
+  digi->mergeSimHitsToStripHits(m_discriminatorThreshold);
   delete digi;
   B2DEBUG(1, " DELETE DIGITIZER OBJECT");
 }

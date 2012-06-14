@@ -200,7 +200,7 @@ namespace Belle2 {
   //!  This function is  to form StripHits from SimHits.
   //!  Light propagation into the fiber, SiPM and electronics effects
   //!  are simulated in EKLMFiberAndElectronics class
-  void EKLMDigitizer::mergeSimHitsToStripHits()
+  void EKLMDigitizer::mergeSimHitsToStripHits(double threshold)
   {
     for (map<const G4VPhysicalVolume*, vector<EKLMSimHit*> >::iterator it =
            m_HitStripMap.begin(); it != m_HitStripMap.end(); it++) {
@@ -218,6 +218,7 @@ namespace Belle2 {
       // create new stripHit
       EKLMStripHit* stripHit = new(m_stripHitsArray->AddrAt(m_stripHitsArray.getEntries()))EKLMStripHit(simHit);
 
+
       if (!fiberAndElectronicsSimulator->getFitStatus()) {
         stripHit->setTime(fiberAndElectronicsSimulator->getFitResults(0));
         stripHit->setNumberPhotoElectrons(fiberAndElectronicsSimulator->
@@ -227,6 +228,12 @@ namespace Belle2 {
         stripHit->setNumberPhotoElectrons(0);
       }
       stripHit->setFitStatus(fiberAndElectronicsSimulator->getFitStatus());
+
+      if (stripHit->getNumberPhotoElectrons() < threshold)
+        stripHit->isGood(false);
+      else
+        stripHit->isGood(true);
+
 
       delete fiberAndElectronicsSimulator;
     }

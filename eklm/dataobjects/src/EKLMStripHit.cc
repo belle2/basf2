@@ -46,6 +46,17 @@ void EKLMStripHit::setNumberPhotoElectrons(double npe)
 }
 
 
+bool EKLMStripHit::isGood() const
+{
+  return m_good;
+}
+
+void EKLMStripHit::isGood(bool status)
+{
+  m_good = status;
+}
+
+
 int EKLMStripHit::getPlane() const
 {
   return m_Plane;

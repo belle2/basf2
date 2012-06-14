@@ -57,6 +57,17 @@ namespace Belle2 {
     //! set physical volume
     void setVolume(const G4VPhysicalVolume* pv);
 
+    /**
+     * whether hit could be used late (if it passed discriminator threshold)
+     * (getter)
+     */
+    bool isGood() const;
+
+    /**
+     * whether hit could be used late (if it passed discriminator threshold)
+     * (setter)
+     */
+    void isGood(bool) ;
 
 
     /**
@@ -120,6 +131,11 @@ namespace Belle2 {
      * Number of strip.
      */
     int m_Strip;
+
+    /**
+     *  if hit passes threshold
+     */
+    bool m_good;
 
 
 

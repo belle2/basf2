@@ -67,7 +67,7 @@ namespace Belle2 {
     /**
      * merges hits from the same strip. Creates EKLMStripHits
      */
-    void mergeSimHitsToStripHits();
+    void mergeSimHitsToStripHits(double);
 
 
 

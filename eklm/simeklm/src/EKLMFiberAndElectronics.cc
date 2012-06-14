@@ -49,6 +49,7 @@ namespace Belle2 {
     m_attenuationLength = Digitizer.getLength("AttenuationLength");
     m_expCoefficient = Digitizer.getDouble("SignalShapeExpCoefficient");
     m_meanSiPMNoise = Digitizer.getDouble("BackgroundPoissonMean");
+    m_enableConstBkg = Digitizer.getDouble("EnableConstantBackgroundInTheFit");
 
     m_stripName = &entry.first->GetName();
 
@@ -106,8 +107,8 @@ namespace Belle2 {
 
 
       // fill histograms
-      timesToShape(hitTimes(gRandom->Poisson(nPEmean), true), m_digitizedAmplitudeDirect);
-      timesToShape(hitTimes(gRandom->Poisson(nPEmean), false), m_digitizedAmplitudeReflected);
+      timesToShape(hitTimes(gRandom->Poisson(nPEmean), (*iHit)->getTime(), true), m_digitizedAmplitudeDirect);
+      timesToShape(hitTimes(gRandom->Poisson(nPEmean), (*iHit)->getTime(), false), m_digitizedAmplitudeReflected);
 
     }
 
@@ -120,10 +121,11 @@ namespace Belle2 {
     addRandomSiPMNoise();
 
     // set up fit parameters
-    m_fitFunction->SetParameters(10, 2., 0.04, 50);
+    m_fitFunction->SetParameters(10, 2., 0.04, 50, m_enableConstBkg);
     m_fitFunction->SetParLimits(0, 0, m_histRange);
     m_fitFunction->SetParLimits(1, 0, m_histRange);
-
+    if (abs(m_enableConstBkg) < 0.0001)
+      m_fitFunction->FixParameter(4, 0);
 
     // do fit
     m_fitResultsPtr = m_digitizedAmplitude->Fit(m_fitFunction, "LLSQB");
@@ -178,7 +180,7 @@ namespace Belle2 {
     return exp(-dist / m_attenuationLength);
   }
 
-  vector<double>  EKLMFiberAndElectronics::hitTimes(int nPE, bool isReflected)
+  vector<double>  EKLMFiberAndElectronics::hitTimes(int nPE, double timeShift, bool isReflected)
   {
     vector <double> hitTimesVector;
     // start selection procedure
@@ -203,7 +205,7 @@ namespace Belle2 {
       // Scintillator de-excitation time  && Fiber  de-excitation time
       double deExcitationTime = gRandom->Exp(m_scintillatorDeExcitationTime)
                                 + gRandom->Exp(m_fiberDeExcitationTime);
-      double hitTime = lightPropagationTime(hitDist) + deExcitationTime;
+      double hitTime = lightPropagationTime(hitDist) + deExcitationTime + timeShift;
 
       hitTimesVector.push_back(hitTime);
     }
@@ -258,7 +260,7 @@ namespace Belle2 {
     else if (x > par[0] + par[1])
       u = par[3] * exp(-par[2] * (x - par[0] - par[1]));
 
-    return u;
+    return u + par[4];
   }
 
 

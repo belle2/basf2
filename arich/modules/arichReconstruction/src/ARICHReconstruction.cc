@@ -263,7 +263,7 @@ namespace Belle2 {
     int ARICHReconstruction::Likelihood2()
     {
 
-      const double p_mass[5] = { 0.000511, 0.10566, 0.113957, 0.49368, 0.93827};// mass of particles in GeV
+      const double p_mass[5] = { 0.000511, 0.10566, 0.13957, 0.49368, 0.93827};// mass of particles in GeV
 
       StoreArray<ARICHTrack> arichTracks;
       unsigned int tsize = arichTracks->GetLast() + 1;

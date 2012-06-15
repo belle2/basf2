@@ -9,6 +9,8 @@
 //-----------------------------------------------------------------------------
 //*****************************************************************************
 
+#include <math.h>
+
 #ifndef _TOPtrack_h
 #define _TOPtrack_h
 
@@ -38,7 +40,7 @@ namespace Belle2 {
        * @param label label (optional)
        */
       TOPtrack(double x, double y, double z, double Px, double Py, double Pz,
-               double Tlen, int Q, int Lund = 0, int label = 0);
+               double Tlen, int Q, int Lund = 0);
 
       /*! get x
        * @return  spatial position x
@@ -75,30 +77,48 @@ namespace Belle2 {
        */
       double Tlen() {return m_Tlen;}
 
+      /*! set track length from time-of-flight and particle mass
+       * @param tof time-of-flight
+       * @param mass particle mass
+       */
+      void setTrackLength(double tof, double mass);
+
       /*! get momentum magnitude
        * @return momentum
        */
-      double p();
+      double p() {return sqrt(m_Px * m_Px + m_Py * m_Py + m_Pz * m_Pz);}
 
       /*! get momentum polar angle
        * @return momentum polar angle
        */
-      double theta();
+      double theta() {return acos(m_Pz / p());}
 
       /*! get momentum azimuthal angle
        * @return momentum azimuthal angle
        */
-      double phi();
+      double phi() {return atan2(m_Py, m_Px);}
 
       /*! get LUND code
        * @return LUND code
        */
       int Lund() {return m_LUND;}
 
-      /*! get label
+      /*! get first label
        * @return label
        */
-      int Label() {return m_REF;}
+      int Label() {return m_Label[0];}
+
+      /*! get label i
+       * @param i label index (i=0...9)
+       * @return label
+       */
+      int Label(unsigned int i) {if (i < 10) {return m_Label[i];} else {return 0;}}
+
+      /*! set label i
+       * @param i label index (i=0...9)
+       * @param label label to store
+       */
+      void setLabel(unsigned int i, int label) {if (i < 10) m_Label[i] = label;}
 
       /*! get charge
        * @return charge
@@ -106,7 +126,7 @@ namespace Belle2 {
       int Q() {return m_Q;}
 
       /*! get internal particle code
-       * @return internal particle code: 1=e, 2=mu, 3=pi, 4=K, 5=p, 0=other
+       * @return internal particle code: 1=e, 2=mu, 3=pi, 4=K, 5=p, 0=unknown
        */
       int Hyp();
 
@@ -138,18 +158,18 @@ namespace Belle2 {
       void Dump();
 
     private:
-      double m_X;    /**< point */
-      double m_Y;    /**< point */
-      double m_Z;    /**< point */
-      double m_Px;   /**< momentum */
-      double m_Py;   /**< momentum */
-      double m_Pz;   /**< momentum */
-      double m_Tlen; /**< track length from IP to point */
-      int m_Q;       /**< charge */
-      int m_LUND;    /**< LUND code (optional) */
-      int m_REF;     /**< label (optional) */
-      bool m_atTop;  /**< true, if toTop() called */
-      int m_QbarID;  /**< bar ID or -1 */
+      double m_X;      /**< point */
+      double m_Y;      /**< point */
+      double m_Z;      /**< point */
+      double m_Px;     /**< momentum */
+      double m_Py;     /**< momentum */
+      double m_Pz;     /**< momentum */
+      double m_Tlen;   /**< track length from IP to point */
+      int m_Q;         /**< charge */
+      int m_LUND;      /**< LUND code (optional) */
+      int m_Label[10]; /**< labels (optional) */
+      bool m_atTop;    /**< true, if toTop() called */
+      int m_QbarID;    /**< bar ID or -1 */
     };
 
   } // end top namespace

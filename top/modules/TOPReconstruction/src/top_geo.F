@@ -563,7 +563,7 @@ c--   J. Va'vra (7-jul-2004)
       END
 
 
-c-- utility functions (moved from top_mcgen.F) -------------------------
+c-- utility functions (moved from top_mcgen.F + new) -------------------
 
       SUBROUTINE TO_MODULE(RF,DIR,MODULE,OK)
       
@@ -612,6 +612,7 @@ c-- utility functions (moved from top_mcgen.F) -------------------------
       REAL RR, XC, YC, X, Y
 
       INSIDE_QBAR=.FALSE.
+      IF(M.LT.0.OR.M.GE.NUM_MOD) RETURN
       IF(ABS(XP).GT.QBAR_A(M)/2) RETURN
       IF(ABS(YP).GT.QBAR_B(M)/2) RETURN
       IF(ABS(ZP).GT.QBAR_C(M)/2) RETURN
@@ -663,6 +664,7 @@ c-- utility functions (moved from top_mcgen.F) -------------------------
 
 
       INSIDE_EXTVOL=.FALSE.
+      IF(M.LT.0.OR.M.GE.NUM_MOD) RETURN
       IF(ABS(XP).GT.QBAR_A(M)/2) RETURN
       BH=QBAR_B(M)/2
       ZZ=ZP
@@ -832,4 +834,76 @@ c-- utility functions (moved from top_mcgen.F) -------------------------
 
       END
 
+
+      SUBROUTINE GET_QBAR(ID,A,B,C,LSIDE,RSIDE,LEXPV,REXPV)
+
+      IMPLICIT NONE
+      INTEGER ID
+      REAL A, B, C
+      INTEGER LSIDE, RSIDE
+      INTEGER LEXPV, REXPV
+#include "TOP_GEO.fi"
+
+      A=0.
+      B=0.
+      C=0.
+      LSIDE=0
+      RSIDE=0
+      LEXPV=0
+      REXPV=0
+      IF(ID.LT.0.OR.ID.GE.NUM_MOD) RETURN
+
+      A=QBAR_A(ID)
+      B=QBAR_B(ID)
+      C=QBAR_C(ID)
+      LSIDE=QBAR_LSIDE(ID)
+      RSIDE=QBAR_RSIDE(ID)
+      LEXPV=QBAR_EXT(0,ID)
+      REXPV=QBAR_EXT(1,ID)
+      END
+
+
+      SUBROUTINE GET_MIRROR(ID,R,XC,YC,ZC,F)
+
+      IMPLICIT NONE
+      INTEGER ID
+      REAL R, XC, YC, ZC, F
+#include "TOP_GEO.fi"
+
+      R=0
+      XC=0
+      YC=0
+      ZC=0
+      F=0
+      IF(ID.LT.0.OR.ID.GE.NUM_MOD) RETURN
+
+      R=QBAR_RMI(ID)
+      XC=QBAR_XCMI(ID)
+      YC=QBAR_YCMI(ID)
+      ZC=QBAR_ZCMI(ID)
+      F=QBAR_FOCL(ID)
+      END
+
+
+      SUBROUTINE GET_EXPVOL(ID,DZ,YUP,YDN,SHAPE,LR)
+      
+      IMPLICIT NONE
+      INTEGER ID
+      REAL DZ, YUP, YDN
+      INTEGER SHAPE, LR
+#include "TOP_EXT.fi"
+
+      DZ=0
+      YUP=0
+      YDN=0
+      SHAPE=-1
+      LR=-1
+      IF(ID.LT.1.OR.ID.GT.NUM_EXT) RETURN
+
+      DZ=EXT_DZ(ID)
+      YUP=EXT_YUP(ID)
+      YDN=EXT_YDN(ID)
+      SHAPE=EXT_SHAPE(ID)
+      LR=EXT_LR(ID)
+      END
 

@@ -13,8 +13,7 @@
 #include <iomanip>
 #include "top/modules/TOPReconstruction/TOPreco.h"
 #include "top/modules/TOPReconstruction/TOPf77fun.h"
-
-#define C0 29.9798458 // speed of light in ns/cm
+#include <framework/gearbox/Unit.h>
 
 namespace Belle2 {
   namespace TOP {
@@ -58,7 +57,7 @@ namespace Belle2 {
     {
       m_HYP = HYP;
       float x = (float) X; float y = (float) Y; float z = (float) Z;
-      float t = float(Tlen / C0);
+      float t = float(Tlen / Unit::speedOfLight);
       float px = (float) Px; float py = (float) Py; float pz = (float) Pz;
       int REF = 0; int MCREF = 0;
       rtra_clear_();
@@ -70,7 +69,7 @@ namespace Belle2 {
     {
       m_HYP = trk.Hyp();
       float x = (float) trk.X(); float y = (float) trk.Y();
-      float z = (float) trk.Z(); float t = float(trk.Tlen() / C0);
+      float z = (float) trk.Z(); float t = float(trk.Tlen() / Unit::speedOfLight);
       float px = (float) trk.Px(); float py = (float) trk.Py();
       float pz = (float) trk.Pz();
       int Q = trk.Q();
@@ -109,7 +108,7 @@ namespace Belle2 {
         R[i] = r[i];
         Dir[i] = dir[i];
       }
-      Len = len; Tlen = tof * C0; Mom = p;
+      Len = len; Tlen = tof * Unit::speedOfLight; Mom = p;
     }
 
     void TOPreco::DumpLogL(int Size)

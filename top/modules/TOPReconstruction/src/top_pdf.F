@@ -1,6 +1,6 @@
 !-----------------------------------------------------------------------
 ! TOP counter for Belle: Reconstruction - construct TOP PDF
-! M. Staric, nov-2008, jun-2009, feb-2010
+! M. Staric, nov-2008, jun-2009, feb-2010, jun-2012
 ! units: GeV, GeV/c, cm, ns, cm/ns, T, nm
 !-----------------------------------------------------------------------
 
@@ -758,10 +758,24 @@ c--   calculate PDF parameters
 #include "TOP_EXT.fi"
 #include "TOP_PIK.fi"
 #include "TOP_PAR.fi"
+#include "TOP_DATA.fi"
+
       INTEGER LR, I, ICH, II
+      INTEGER N_BGR
       REAL S(0:1), B(0:1), F
       INTEGER M_OLD /-1/
       SAVE M_OLD
+
+      IF(NUM_MOD.GT.1) THEN
+         N_BGR=0
+         DO I=1,N_DATA
+            IF(DATA_MOD(I).NE.M) N_BGR=N_BGR+1
+         ENDDO
+         STFB=FLOAT(N_BGR)/FLOAT(NUM_MOD-1)
+         STFB=MAX(NUM_BGR,STFB)
+      ELSE
+         STFB=NUM_BGR
+      ENDIF
 
       IF(M.EQ.M_OLD) RETURN
       M_OLD=M
@@ -780,8 +794,6 @@ c--   calculate PDF parameters
             S(LR)=S(LR)+PIK_DXCH(ICH)*PIK_DYCH(ICH)
          ENDDO
       ENDDO
-      STFB=NUM_BGR*(S(0)/B(0)+S(1)/B(1))/QBAR_A(M)
-      IF(LR_FLAG(0).GT.1.OR.LR_FLAG(1).GT.1) STFB=STFB*2
       F=1.
       IF(LR_FLAG(0).EQ.1.AND.LR_FLAG(1).EQ.1) F=2.
       DO LR=0,1

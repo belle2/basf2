@@ -16,8 +16,7 @@
 #include "top/modules/TOPReconstruction/TOPtrack.h"
 #include "top/modules/TOPReconstruction/TOPf77fun.h"
 #include <TRandom3.h>
-
-#define C0 29.9798458 // speed of light in ns/cm
+#include <framework/gearbox/Unit.h>
 
 namespace Belle2 {
   namespace TOP {
@@ -38,14 +37,14 @@ namespace Belle2 {
       m_Tlen = 0;
       m_Q = 0;
       m_LUND = 0;
-      m_REF = 0;
+      for (int i = 0; i < 10; i++) m_Label[i] = 0;
       m_atTop = false;
       m_QbarID = -1;
     }
 
     TOPtrack::TOPtrack(double x, double y, double z,
                        double Px, double Py, double Pz,
-                       double Tlen, int Q, int Lund, int label)
+                       double Tlen, int Q, int Lund)
     {
       m_X = x;
       m_Y = y;
@@ -56,16 +55,17 @@ namespace Belle2 {
       m_Tlen = Tlen;
       m_Q = Q;
       m_LUND = Lund;
-      m_REF = label;
+      for (int i = 0; i < 10; i++) m_Label[i] = 0;
       m_atTop = false;
       m_QbarID = -1;
     }
 
-    double TOPtrack::p() {return sqrt(m_Px * m_Px + m_Py * m_Py + m_Pz * m_Pz);}
-
-    double TOPtrack::theta() {return acos(m_Pz / p());}
-
-    double TOPtrack::phi() {return atan2(m_Py, m_Px);}
+    void TOPtrack::setTrackLength(double tof, double mass)
+    {
+      double pmom = p();
+      double beta = pmom / sqrt(pmom * pmom + mass * mass);
+      m_Tlen = tof * Unit::speedOfLight * beta;
+    }
 
     int TOPtrack::Hyp()
     {
@@ -87,7 +87,7 @@ namespace Belle2 {
       track2top_(r, p, &q, &t, &m);
       m_X = r[0]; m_Y = r[1]; m_Z = r[2];
       m_Px = p[0]; m_Py = p[1]; m_Pz = p[2];
-      m_Tlen += t * C0;
+      m_Tlen += t * Unit::speedOfLight;
       m_atTop = true;
       m_QbarID = m;
       return m;
@@ -115,7 +115,9 @@ namespace Belle2 {
     {
       double pi = 4 * atan(1);
       using namespace std;
-      cout << "TOPtrack::Dump(): Ref=" << m_REF << " Lund=" << m_LUND;
+      cout << "TOPtrack::Dump(): labels";
+      for (int i = 0; i < 10; i++) cout << " " << m_Label[i];
+      cout << " Lund=" << m_LUND;
       cout << " charge=" << m_Q << endl;
       cout << "  p=" << setprecision(3) << p() << " GeV/c";
       cout << "  theta=" << setprecision(3) << theta() / pi * 180;

@@ -15,15 +15,20 @@
 #include <top/geometry/TOPGeometryPar.h>
 #include <string>
 
+#include <GFTrack.h>
+#include <generators/dataobjects/MCParticle.h>
+#include "top/modules/TOPReconstruction/TOPtrack.h"
+
+
 namespace Belle2 {
   namespace TOP {
+
     //! TOP reconstruction module.
     /*!
     */
     class TOPRecoModule : public Module {
 
     public:
-
 
       //! Constructor.
       TOPRecoModule();
@@ -72,20 +77,44 @@ namespace Belle2 {
 
     private:
 
-      std::string m_inColName;         /**< Input collection name */
-      std::string m_outColName;        /**< Output collection name */
+      //! Module parameters
+      std::string m_gfTracksColName;      /**< GF tracks (input) */
+      std::string m_extTrackCandsColName; /**< Ext track candidates (input) */
+      std::string m_extRecoHitsColName;   /**< Ext reconstructed hits (input) */
+      std::string m_topDigitColName;      /**< Digitized data (input) */
+      std::string m_topLogLColName;       /**< TOP log likelihoods (output) */
+      std::string m_topTrackColName;      /**< MC particle hit (to set relation to) */
+      int m_debugLevel; /**< debug level */
+      double m_minBkgPerQbar;  /**< minimal assumed background photons per bar */
+      double m_ScaleN0;  /**< scale factor for N0 */
 
-      /* Other members.*/
-      double m_timeCPU;                /**< CPU time.     */
-      int    m_nRun;                   /**< Run number.   */
-      int    m_nEvent;                 /**< Event number. */
-
-      //! Parameter reading object
+      //! Geometry parameters object
       TOPGeometryPar* m_topgp;
+
+      //! space for TOP bars including wedges
+      double m_R1; /**< inner radius */
+      double m_R2; /**< outer radius */
+      double m_Z1; /**< backward z */
+      double m_Z2; /**< forward z */
 
       //! TOP configure function
       void TOPconfigure();
 
+      //! Masses of particle hypotheses
+      enum {Nhyp = 5};        /**< number of hypotheses */
+      double m_Masses[Nhyp];  /**< particle masses */
+
+      //! Label tags
+      enum {LgfTrack = 0, LextTrackCand, LextHit, LtopTrack};
+
+      //! MC particle associated with GF track
+      const MCParticle* getMCParticle(const GFTrack* track);
+
+      //! index of TOPTrack of a given MC patricle or -1
+      int getTOPTrackIndex(const MCParticle* particle);
+
+      //! get extrapolated tracks
+      void getTracks(std::vector<TOPtrack> & tracks, int hypothesis);
 
     };
 

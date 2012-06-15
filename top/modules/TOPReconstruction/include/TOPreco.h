@@ -28,7 +28,7 @@ namespace Belle2 {
       /*! constructor
        * @param NumHyp number of mass hypotheses
        * @param Masses masses
-       * @param BkgPerQbar estimation for number of background hits
+       * @param BkgPerQbar estimation for minimal number of background hits
        * @param ScaleN0 scale factor to scale N0
        */
       TOPreco(int NumHyp, double Masses[], double BkgPerQbar = 0, double ScaleN0 = 1);

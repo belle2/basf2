@@ -18,16 +18,20 @@
 #include <time.h>
 
 // Hit classes
-// #include <generators/dataobjects/MCParticle.h>
-#include <top/dataobjects/TOPTrack.h>
+#include <GFTrack.h>
+#include <GFTrackCand.h>
+#include <tracking/dataobjects/ExtRecoHit.h>
 #include <top/dataobjects/TOPDigit.h>
 #include <top/dataobjects/TOPLikelihoods.h>
+#include <generators/dataobjects/MCParticle.h>
+#include <top/dataobjects/TOPTrack.h>
 
 // framework - DataStore
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/RelationArray.h>
+#include <framework/datastore/RelationIndex.h>
 
 // framework aux
 #include <framework/gearbox/Unit.h>
@@ -54,6 +58,7 @@ namespace Belle2 {
     //-----------------------------------------------------------------
 
     TOPRecoModule::TOPRecoModule() : Module(),
+      m_debugLevel(0),
       m_topgp(TOPGeometryPar::Instance())
     {
       // Set description()
@@ -61,10 +66,23 @@ namespace Belle2 {
       setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
 
       // Add parameters
-      //      addParam("InputColName", m_inColName, "Input collection name",
-      //         string("TOPDigitArray"));
-      //      addParam("OutputColName", m_outColName, "Output collection name",
-      //         string("TOPQuartzHitArray"));
+      addParam("GFTracksColName", m_gfTracksColName, "GF tracks",
+               string(""));
+      addParam("ExtTrackCandsColName", m_extTrackCandsColName, "Ext track candidates",
+               string("ExtTrackCands"));
+      addParam("ExtRecoHitsColName", m_extRecoHitsColName, "Ext reconstructed hits",
+               string("ExtRecoHits"));
+      addParam("TOPDigitColName", m_topDigitColName, "TOP digits",
+               string(""));
+      addParam("TOPLikelihoodsColName", m_topLogLColName, "TOP likelihoods",
+               string(""));
+      addParam("TOPTrackColName", m_topTrackColName, "MCParticle hits at bars",
+               string(""));
+      addParam("DebugLevel", m_debugLevel, "Debug level", 0);
+      addParam("minBkgPerBar", m_minBkgPerQbar,
+               "minimal number of background photons per bar", 0.0);
+      addParam("scaleN0", m_ScaleN0, "scale factor for N0", 1.0);
+
     }
 
     TOPRecoModule::~TOPRecoModule()
@@ -73,85 +91,153 @@ namespace Belle2 {
 
     void TOPRecoModule::initialize()
     {
-      // Initialize variables
-      m_nRun    = 0 ;
-      m_nEvent  = 0 ;
+      // Initialize masses (PDG 2010, hard coding -> to be removed in future (?))
+      m_Masses[0] = 0.510998910E-3;
+      m_Masses[1] = 0.105658367;
+      m_Masses[2] = 0.13957018;
+      m_Masses[3] = 0.493677;
+      m_Masses[4] = 0.938272013;
 
       // Print set parameters
       printModuleParams();
 
-      // CPU time start
-      m_timeCPU = clock() * Unit::us;
-
+      // Data store
       StoreArray<TOPDigit> topDigits;
+      StoreArray<GFTrack> gfTracks(m_gfTracksColName);
+      StoreArray<GFTrackCand> extTrackCands(m_extTrackCandsColName);
+      StoreArray<ExtRecoHit> extRecoHits(m_extRecoHitsColName);
       StoreArray<TOPTrack> topTracks;
       StoreArray<TOPLikelihoods> toplogL;
-      RelationArray relTrackLikelihoods(topTracks, toplogL);
+      RelationArray gfTrackLogL(gfTracks, toplogL);
+      RelationArray LogLextHit(toplogL, extRecoHits);
+      RelationArray LogLextTrackCand(toplogL, extTrackCands);
+      RelationArray topTrackLogL(topTracks, toplogL);
 
+      // Configure TOP detector
       TOPconfigure();
 
     }
 
     void TOPRecoModule::beginRun()
     {
-      B2INFO("TOPReco: Processing run: " << m_nRun);
+
     }
 
     void TOPRecoModule::event()
     {
-      // input: digitized photons and tracks (currently MC tracks at TOP)
+      // input: digitized photons
+
       StoreArray<TOPDigit> topDigits;
+
+      // input: reconstructed tracks
+
+      StoreArray<GFTrack> gfTracks(m_gfTracksColName);
+      StoreArray<GFTrackCand> extTrackCands(m_extTrackCandsColName);
+      StoreArray<ExtRecoHit> extRecoHits(m_extRecoHitsColName);
       StoreArray<TOPTrack> topTracks;
 
       // output: log likelihoods
+
       StoreArray<TOPLikelihoods> toplogL;
       toplogL->Clear();
-      RelationArray relTrackLikelihoods(topTracks, toplogL);
-      relTrackLikelihoods.clear();
+
+      // output: relations
+
+      RelationArray gfTrackLogL(gfTracks, toplogL);
+      gfTrackLogL.clear();
+      RelationArray LogLextHit(toplogL, extRecoHits);
+      LogLextHit.clear();
+      RelationArray LogLextTrackCand(toplogL, extTrackCands);
+      LogLextTrackCand.clear();
+      RelationArray topTrackLogL(topTracks, toplogL);
+      topTrackLogL.clear();
+
+      // collect reconstructed tracks extrapolated to TOP
+
+      std::vector<TOPtrack> tracks; // extrapolated tracks
+      getTracks(tracks, 2); // use pion hypothesis
+      if (tracks.size() == 0) return;
 
       // create reconstruction object
-      double Masses[5] = {.511E-3, .10566, .13957, .49368, .93827};
-      int Nhyp = 5;
-      TOPreco reco(Nhyp, Masses);
+
+      TOPreco reco(Nhyp, m_Masses, m_minBkgPerQbar, m_ScaleN0);
 
       // clear reconstruction object
+
       reco.Clear();
 
       // add photons
+
       int nHits = topDigits->GetEntries();
       for (int i = 0; i < nHits; ++i) {
         TOPDigit* data = topDigits[i];
         reco.AddData(data->getBarID() - 1, data->getChannelID() - 1, data->getTDC());
       }
 
-      // reconstruct track-by-track and store results
-      int nTracks = topTracks->GetEntries();
-      for (int i = 0; i < nTracks; ++i) {
-        TOPTrack* track = topTracks[i]; // MC particle at TOP
-        if (track->getCharge() == 0) continue;
-        TVector3 vpos = track->getVPosition();
-        if (vpos.Perp() > 50.0) continue; // emulate track reco (acceptance in rho)
-        TVector3 pos = track->getPosition();
-        TVector3 mom = track->getMomentum();
-        TOPtrack trk(pos.X(), pos.Y(), pos.Z(), mom.X(), mom.Y(), mom.Z(),
-                     track->getLength(), track->getCharge(), track->getParticleID());
-        trk.smear(1.0e-1, 1.4e-1, 1.5e-3, 1.5e-3); // emulate track reco (resolution)
-        reco.Reconstruct(trk);
-        double logl[5], expPhot[5];
+      // reconstruct track-by-track and store the results
+
+      for (unsigned int i = 0; i < tracks.size(); i++) {
+        // reconstruct
+        reco.Reconstruct(tracks[i]);
+        if (m_debugLevel != 0) {
+          tracks[i].Dump();
+          reco.DumpHit(Local);
+          reco.DumpLogL(Nhyp);
+        }
+        // get results
+        double logl[Nhyp], expPhot[Nhyp];
         int nphot;
-        reco.GetLogL(5, logl, expPhot, nphot);
+        reco.GetLogL(Nhyp, logl, expPhot, nphot);
+        // store results
         int nentr = toplogL->GetEntries();
         new(toplogL->AddrAt(nentr)) TOPLikelihoods(reco.Flag(), logl, nphot, expPhot);
-        relTrackLikelihoods.add(i, nentr);
+        // make relations
+        gfTrackLogL.add(tracks[i].Label(LgfTrack), nentr);
+        LogLextHit.add(nentr, tracks[i].Label(LextHit));
+        LogLextTrackCand.add(nentr, tracks[i].Label(LextTrackCand));
+        int iTopTrack = tracks[i].Label(LtopTrack);
+        if (iTopTrack >= 0) topTrackLogL.add(iTopTrack, nentr);
       }
 
+      // consolidate relatons
+
+      gfTrackLogL.consolidate();
+      LogLextHit.consolidate();
+      LogLextTrackCand.consolidate();
+      topTrackLogL.consolidate();
+
     }
+
+
+    void TOPRecoModule::endRun()
+    {
+
+    }
+
+    void TOPRecoModule::terminate()
+    {
+
+    }
+
+    void TOPRecoModule::printModuleParams() const
+    {
+
+    }
+
 
     void TOPRecoModule::TOPconfigure()
     {
       m_topgp->setBasfUnits();
 
-      TOPvolume(116.5, 125.0, -85.0, 192.0);
+      // space for bars including wedges
+      m_R1 = m_topgp->getRadius() - m_topgp->getWextdown();
+      double x = m_topgp->getQwidth() / 2.0;
+      double y = m_topgp->getRadius() + m_topgp->getQthickness();
+      m_R2 = sqrt(x * x + y * y);
+      m_Z1 = m_topgp->getZ1() - m_topgp->getWLength();
+      m_Z2 = m_topgp->getZ2();
+
+      TOPvolume(m_R1, m_R2, m_Z1, m_Z2);
 
       setBfield(-1.5);
 
@@ -214,25 +300,94 @@ namespace Belle2 {
     }
 
 
-    void TOPRecoModule::endRun()
+    const MCParticle* TOPRecoModule::getMCParticle(const GFTrack* track)
     {
-      m_nRun++;
+      if (! track) return 0;
+
+      StoreArray<MCParticle> mcParticles;
+      StoreArray<GFTrack> gfTracks(m_gfTracksColName);
+
+      RelationArray rel(gfTracks, mcParticles);
+      if (! rel) return 0;
+
+      RelationIndex<GFTrack, MCParticle> irel(gfTracks, mcParticles);
+      if (irel.getFirstTo(track)) {
+        return irel.getFirstTo(track)->to;
+      }
+      return 0;
     }
 
-    void TOPRecoModule::terminate()
-    {
-      // CPU time end
-      m_timeCPU = clock() * Unit::us - m_timeCPU;
 
-      // Announce
-      B2INFO("TOPReco finished. Time per event: "/* << m_timeCPU / m_nEvent / Unit::ms << " ms."*/);
+    int TOPRecoModule::getTOPTrackIndex(const MCParticle* particle)
+    {
+      if (! particle) return -1;
+
+      StoreArray<MCParticle> mcParticles;
+      StoreArray<TOPTrack> topTracks;
+
+      RelationArray rel(mcParticles, topTracks);
+      if (! rel) return -1;
+
+      RelationIndex<MCParticle, TOPTrack> irel(mcParticles, topTracks);
+      if (irel.getFirstTo(particle)) {
+        return irel.getFirstTo(particle)->indexTo;
+      }
+      return -1;
+    }
+
+
+    void TOPRecoModule::getTracks(std::vector<TOPtrack> & tracks, int hypothesis)
+    {
+      unsigned int myDetID = 3; // TOP
+      unsigned int NumBars = m_topgp->getNbars();
+      StoreArray<GFTrack> gfTracks(m_gfTracksColName);
+      StoreArray<GFTrackCand> extTrackCands(m_extTrackCandsColName);
+      StoreArray<ExtRecoHit> extRecoHits(m_extRecoHitsColName);
+
+      for (int itra = 0; itra < gfTracks.getEntries(); ++itra) {
+        GFTrack* track = gfTracks[itra];
+        int charge = (int) track->getCharge();
+        const MCParticle* particle = getMCParticle(track);
+        int Lund = 0;
+        if (particle) Lund = particle->getPDG();
+        int iTopTrack = getTOPTrackIndex(particle);
+        int iTrackCand = itra * 5 + hypothesis;
+        GFTrackCand* cand = extTrackCands[iTrackCand];
+        if (! cand) continue;
+        std::vector<double> TOFs = cand->GetRhos();
+        for (unsigned int j = 0; j < cand->getNHits(); ++j) {
+          unsigned int detID;
+          unsigned int hitID;
+          unsigned int planeID;
+          cand->getHitWithPlane(j, detID, hitID, planeID);
+          if (detID != myDetID) continue;
+          if (planeID == 0 || planeID > NumBars) continue;
+          ExtRecoHit* hit = extRecoHits[hitID];
+          ExtHitStatus status = hit->getStatus();
+          if (status != 0) continue;
+          TMatrixD point = hit->getRawHitCoord();
+          double x = point(0, 0);
+          double y = point(1, 0);
+          double z = point(2, 0);
+          if (z < m_Z1 || z > m_Z2) continue;
+          double r = sqrt(x * x + y * y);
+          if (r < m_R1 || r > m_R2) continue;
+          double px = point(3, 0);
+          double py = point(4, 0);
+          double pz = point(5, 0);
+          TOPtrack trk(x, y, z, px, py, pz, 0.0, charge, Lund);
+          double tof = TOFs.at(j);
+          trk.setTrackLength(tof, m_Masses[hypothesis]);
+          trk.setLabel(LgfTrack, itra);
+          trk.setLabel(LextTrackCand, iTrackCand);
+          trk.setLabel(LextHit, hitID);
+          trk.setLabel(LtopTrack, iTopTrack);
+          tracks.push_back(trk);
+        }
+      }
 
     }
 
-    void TOPRecoModule::printModuleParams() const
-    {
-
-    }
 
   } // end top namespace
 } // end Belle2 namespace

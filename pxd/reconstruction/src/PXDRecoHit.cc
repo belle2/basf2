@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Peter Kvasnicka, Martin Ritter                           *
+ * Contributors: Peter Kvasnicka, Martin Ritter, Moritz Nadler            *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -25,6 +25,9 @@ using namespace std;
 using namespace Belle2;
 
 ClassImp(PXDRecoHit)
+
+const double PXDRecoHit::c_HMatrixContent[10] = {0, 0, 0, 1, 0, 0, 0, 0, 0, 1};
+const TMatrixD PXDRecoHit::c_HMatrix = TMatrixD(HIT_DIMENSIONS, 5, c_HMatrixContent);
 
 PXDRecoHit::PXDRecoHit():
   GFRecoHitIfc<GFPlanarHitPolicy> (HIT_DIMENSIONS), m_sensorID(0), m_trueHit(0), m_cluster(0), m_vxdSimpleDigiHit(NULL),
@@ -153,9 +156,5 @@ GFAbsRecoHit* PXDRecoHit::clone()
 
 TMatrixD PXDRecoHit::getHMatrix(const GFAbsTrackRep*)
 {
-  TMatrixD hMatrix(HIT_DIMENSIONS, 5);
-  //hMatrix.Zero(); is already set to 0 during initialization in statement one line above
-  hMatrix(0, 3) = 1;
-  hMatrix(1, 4) = 1;
-  return (hMatrix);
+  return c_HMatrix;
 }

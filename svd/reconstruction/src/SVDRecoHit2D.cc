@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Peter Kvasnicka, Martin Ritter                           *
+ * Contributors: Peter Kvasnicka, Martin Ritter, Moritz Nadler            *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -24,6 +24,9 @@ using namespace std;
 using namespace Belle2;
 
 ClassImp(SVDRecoHit2D)
+
+const double SVDRecoHit2D::c_HMatrixContent[10] = {0, 0, 0, 1, 0, 0, 0, 0, 0, 1};
+const TMatrixD SVDRecoHit2D::c_HMatrix = TMatrixD(HIT_DIMENSIONS, 5, c_HMatrixContent);
 
 SVDRecoHit2D::SVDRecoHit2D():
   GFRecoHitIfc<GFPlanarHitPolicy> (HIT_DIMENSIONS), m_sensorID(0), m_trueHit(0), m_vxdSimpleDigiHit(NULL),
@@ -106,9 +109,5 @@ GFAbsRecoHit* SVDRecoHit2D::clone()
 
 TMatrixD SVDRecoHit2D::getHMatrix(const GFAbsTrackRep*)
 {
-  TMatrixD hMatrix(HIT_DIMENSIONS, 5);
-  //hMatrix.Zero(); the TMatrixD constructor already set all elements to 0
-  hMatrix(0, 3) = 1;
-  hMatrix(1, 4) = 1;
-  return (hMatrix);
+  return c_HMatrix;
 }

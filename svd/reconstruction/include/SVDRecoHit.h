@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Peter Kvasnicka, Martin Ritter                           *
+ * Contributors: Peter Kvasnicka, Martin Ritter, Moritz Nadler            *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -109,6 +109,11 @@ namespace Belle2 {
   private:
 
     enum { HIT_DIMENSIONS = 1 /**< sensitive Dimensions of the Hit */ };
+    const static double c_HMatrixUContent[5]; /**< holds all elements of H Matrix for U coordinate cluster. A C array is only possibility to set TMatrixD elements with its constuctor*/
+    const static TMatrixD c_HMatrixU; /**< H matrix needed for Genfit. getHMatrix will return this attribute if cluster is U coordinate*/
+
+    const static double c_HMatrixVContent[5]; /**< holds all elements of H Matrix for V coordinate cluster. A C array is only possibility to set TMatrixD elements with its constuctor*/
+    const static TMatrixD c_HMatrixV; /**< H matrix needed for Genfit. getHMatrix will return this attribute if cluster is V coordinate*/
 
     unsigned short m_sensorID; /**< Unique sensor identifier.*/
     const SVDTrueHit* m_trueHit; /**< Pointer to the Truehit used to generate this hit */

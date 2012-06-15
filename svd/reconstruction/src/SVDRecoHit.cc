@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Peter Kvasnicka, Martin Ritter                           *
+ * Contributors: Peter Kvasnicka, Martin Ritter, Moritz Nadler            *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -18,12 +18,21 @@
 #include <GFDetPlane.h>
 #include <TVector3.h>
 #include <TRandom.h>
-#include <math.h>
+#include <cmath>
 
 using namespace std;
 using namespace Belle2;
 
+
+
 ClassImp(SVDRecoHit)
+
+
+const double SVDRecoHit::c_HMatrixUContent[5] = {0, 0, 0, 1, 0};
+const TMatrixD SVDRecoHit::c_HMatrixU = TMatrixD(HIT_DIMENSIONS, 5, c_HMatrixUContent);
+
+const double SVDRecoHit::c_HMatrixVContent[5] = {0, 0, 0, 0, 1};
+const TMatrixD SVDRecoHit::c_HMatrixV = TMatrixD(HIT_DIMENSIONS, 5, c_HMatrixVContent);
 
 SVDRecoHit::SVDRecoHit():
   GFRecoHitIfc<GFPlanarHitPolicy> (HIT_DIMENSIONS), m_sensorID(0), m_trueHit(0),
@@ -124,12 +133,9 @@ GFAbsRecoHit* SVDRecoHit::clone()
 
 TMatrixD SVDRecoHit::getHMatrix(const GFAbsTrackRep*)
 {
-  TMatrixD hMatrix(HIT_DIMENSIONS, 5);
-  //hMatrix.Zero(); the TMatrixD constructor already set all elements to 0
   if (m_isU == true) {
-    hMatrix(0, 3) = 1.0;
+    return c_HMatrixU;
   } else {
-    hMatrix(0, 4) = 1.0;
+    return c_HMatrixV;
   }
-  return (hMatrix);
 }

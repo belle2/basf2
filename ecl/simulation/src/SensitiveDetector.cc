@@ -76,45 +76,68 @@ namespace Belle2 {
       const G4StepPoint& postStep = * aStep->GetPostStepPoint();
       G4Track& track  = *aStep->GetTrack();
 
-      if (m_trackID != track.GetTrackID()) {
-        //TrackID changed, store track informations
-        m_trackID = track.GetTrackID();
-        //Get world position
-        //      const G4ThreeVector& prePosition = preStep.GetPosition();
-        m_startPos =  preStep.GetPosition();
-        //Get momentum
-        m_momentum = preStep.GetMomentum() ;
-        //Get time
-        m_startTime = preStep.GetGlobalTime();
-        //Get energy
-        m_startEnergy =  preStep.GetKineticEnergy() ;
-        //Reset energy deposit;
-        m_energyDeposit = 0;
-      }
+//      if (m_trackID != track.GetTrackID()) {
+      //TrackID changed, store track informations
+      m_trackID = track.GetTrackID();
+      //Get world position
+      //      const G4ThreeVector& prePosition = preStep.GetPosition();
+      m_startPos =  preStep.GetPosition();
+      //Get momentum
+      m_momentum = preStep.GetMomentum() ;
+      //Get time
+      m_startTime = preStep.GetGlobalTime();
+      //Get energy
+      m_startEnergy =  preStep.GetKineticEnergy() ;
+      //Reset energy deposit;
+//        m_energyDeposit = 0;
+//      }
       //Update energy deposit
-      m_energyDeposit += aStep->GetTotalEnergyDeposit() ;
+      m_energyDeposit = aStep->GetTotalEnergyDeposit() ;
       m_endTime = postStep.GetGlobalTime();
       G4ThreeVector postPosition = postStep.GetPosition();
 
 
       //Save Hit if track leaves volume or is killed
-      if (track.GetNextVolume() != track.GetVolume() || track.GetTrackStatus() >= fStopAndKill) {
-        int pdgCode = track.GetDefinition()->GetPDGEncoding();
+//      if (track.GetNextVolume() != track.GetVolume() || track.GetTrackStatus() >= fStopAndKill) {
+      int pdgCode = track.GetDefinition()->GetPDGEncoding();
 
-        const G4VPhysicalVolume& v = * track.GetVolume();
-        G4ThreeVector posCell = v.GetTranslation();
-        // Get layer ID
-        Mapping(v.GetName());
+      const G4VPhysicalVolume& v = * track.GetVolume();
+      G4ThreeVector posCell = v.GetTranslation();
+      // Get layer ID
+      Mapping(v.GetName());
 
-        if (v.GetName().find("Crystal") != string::npos) {
-          int saveIndex = -999;
-          saveIndex = saveSimHit(m_cellID, m_trackID, pdgCode, (m_startTime + m_endTime) / 2, m_energyDeposit, m_momentum, m_startPos, postPosition);
-        }
-
-        //Reset TrackID
-        m_trackID = 0;
+      if (v.GetName().find("Crystal") != string::npos) {
+        int saveIndex = -999;
+        saveIndex = saveSimHit(m_cellID, m_trackID, pdgCode, (m_startTime + m_endTime) / 2, m_energyDeposit, m_momentum, m_startPos, postPosition);
       }
-//    cout << v.GetName() << " CellID " << m_cellID << " " << pid <<" FirstStepFlag"<<FirstStepFlag<< endl;
+
+      //Reset TrackID
+//        m_trackID = 0;
+//      }
+
+
+      /*
+           if (track.GetNextVolume() != track.GetVolume() || track.GetTrackStatus() >= fStopAndKill) {
+              if(find(myvector.begin(), myvector.end(), track.GetParentID()) !=myvector.end()  ){
+                myvector.push_back(m_trackID);
+                cout<<"saved track "<<m_trackID<<endl;
+
+              }
+              else if(find(myvector.begin(), myvector.end(), track.GetParentID()) ==myvector.end()||track.GetParentID()==0)
+              {cout<<"Myvector Size "<< myvector.size()<<"  mother "<<track.GetParentID()  <<" first track "<< m_trackID<<" "<<pdgCode<<endl;
+               myvector.clear();
+               myvector.push_back(m_trackID);}
+           }else{
+              const G4VPhysicalVolume& v1 = *track.GetNextVolume();
+             cout<< m_trackID <<" track.GetTrackStatus() "<<track.GetTrackStatus()<<" track.GetNextVolume()   "<<v1.GetName()<<" "<<v.GetName()<<endl;
+
+          }
+
+      */
+
+
+
+//    cout << pdgCode << " CellID " << m_cellID  <<" track ID "<<m_trackID<< endl;
       // Ge layer ID
 //  const unsigned layerId = v.GetCopyNo();
       return true;

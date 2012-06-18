@@ -12,6 +12,11 @@
 #define ECLSENSITIVEDETECTOR_H_
 
 #include <simulation/kernel/SensitiveDetectorBase.h>
+#include <algorithm>
+#include <iostream>
+#include <vector>
+
+using namespace std;
 
 namespace Belle2 {
   namespace ecl {
@@ -60,6 +65,7 @@ namespace Belle2 {
 
     private:
 
+//      vector<int> myvector;
       G4double m_thresholdEnergyDeposit;/**Energy Deposit  threshold  */
       G4double m_thresholdKineticEnergy;/**Kinetic Energy  threshold  */
       int m_hitNumber; /**< The current number of created hits in an event. Used to fill the DataStore ECL array.*/

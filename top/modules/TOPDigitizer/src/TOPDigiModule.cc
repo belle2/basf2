@@ -54,12 +54,14 @@ namespace Belle2 {
       setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
 
       // Add parameters
-      //      addParam("InputColName", m_inColName, "Input collection name",
-      //         string("TOPSimHitArray"));
-      //      addParam("OutputColName", m_outColName, "Output collection name",
-      //         string("TOPDigitArray"));
+      addParam("InputColName", m_inColName, "Input collection name (TOPSimHits)",
+               string(""));
+      addParam("OutputColName", m_outColName, "Output collection name (TOPDigits)",
+               string(""));
       addParam("PhotonFraction", m_photonFraction,
-               "The fraction of Cerenkov photons propagated in FullSim.", 0.3);
+               "Fraction of Cerenkov photons propagated in FullSim.", 0.3);
+      addParam("T0jitter", m_T0jitter, "r.m.s of T0 jitter", 25e-3);
+      addParam("ELjitter", m_ELjitter, "r.m.s of electronics jitter", 0.0);
 
     }
 
@@ -69,25 +71,17 @@ namespace Belle2 {
 
     void TOPDigiModule::initialize()
     {
-      // Initialize variables
-      m_nRun    = 0 ;
-      m_nEvent  = 0 ;
-
       // Print set parameters
       printModuleParams();
 
-      // CPU time start
-      m_timeCPU = clock() * Unit::us;
-
-      StoreArray<TOPSimHit> topSimHits;
-      StoreArray<TOPDigit> topDigits;
+      // data store
+      StoreArray<TOPSimHit> topSimHits(m_inColName);
+      StoreArray<TOPDigit> topDigits(m_outColName);
       RelationArray relSimHitToDigit(topSimHits, topDigits);
     }
 
     void TOPDigiModule::beginRun()
     {
-      // Print run number
-      B2INFO("TOPDigi: Processing run: " << m_nRun);
 
     }
 
@@ -95,10 +89,10 @@ namespace Belle2 {
     {
 
       // input: simulated hits
-      StoreArray<TOPSimHit> topSimHits;
+      StoreArray<TOPSimHit> topSimHits(m_inColName);
 
       // output: digitized hits
-      StoreArray<TOPDigit> topDigits;
+      StoreArray<TOPDigit> topDigits(m_outColName);
       topDigits->Clear();
       RelationArray relSimHitToDigit(topSimHits, topDigits);
       relSimHitToDigit.clear();
@@ -106,13 +100,13 @@ namespace Belle2 {
       m_topgp->setBasfUnits();
 
       // simulate interaction time relative to RF clock
-      double sig_beam = 25.e-3;
-      double t_beam = gRandom->Gaus(0., sig_beam);
+      double t_beam = gRandom->Gaus(0., m_T0jitter);
 
       // TDC
       int NTDC = m_topgp->getTDCbits();
       int maxTDC = 1 << NTDC;
       double TDCwidth = m_topgp->getTDCbitwidth();
+      double Tmax = maxTDC * TDCwidth;
 
       int nHits = topSimHits->GetEntries();
       for (int i = 0; i < nHits; i++) {
@@ -125,14 +119,17 @@ namespace Belle2 {
         // Do spatial digitization
         double x = aSimHit->getPosition().X();
         double y = aSimHit->getPosition().Y();
-        int pmtID = aSimHit->getModuleID();
+        int pmtID = aSimHit->getPmtID();
         int channelID = m_topgp->getChannelID(x, y, pmtID);
         if (channelID == 0) continue;
 
-        // add T0 jitter and TTS to the photon time, and convert to TDC digits
+        // add T0 jitter, TTS and electronic jitter to photon time
+        // and convert to TDC digits
         double tts = PMT_TTS();
-        double time = t_beam + aSimHit->getTime() + tts;
+        double tel = gRandom->Gaus(0., m_ELjitter);
+        double time = t_beam + aSimHit->getTime() + tts + tel;
         if (time < 0) continue;
+        if (time > Tmax) time = Tmax;
         int TDC = int(time / TDCwidth);
         if (TDC > maxTDC) TDC = maxTDC;
 
@@ -145,29 +142,24 @@ namespace Belle2 {
 
       }
 
-      m_nEvent++;
-      B2INFO("nHits: " << nHits << " digitized hits: " << topDigits->GetEntries());
-
     }
+
 
     void TOPDigiModule::endRun()
     {
-      m_nRun++;
+
     }
 
     void TOPDigiModule::terminate()
     {
-      // CPU time end
-      m_timeCPU = clock() * Unit::us - m_timeCPU;
-
-      // Announce
-      B2INFO("TOPDigi finished. Time per event: " << m_timeCPU / m_nEvent / Unit::ms << " ms.");
 
     }
 
     void TOPDigiModule::printModuleParams() const
     {
       cout << "TOPDigi: PhotonFraction=" << m_photonFraction << endl;
+      cout << "TOPDigi: T0jitter (rms)=" << m_T0jitter << endl;
+      cout << "TOPDigi: ELjitter (rms)=" << m_ELjitter << endl;
     }
 
     bool TOPDigiModule::DetectorQE(double energy)
@@ -193,3 +185,4 @@ namespace Belle2 {
 
   } // end top namespace
 } // end Belle2 namespace
+

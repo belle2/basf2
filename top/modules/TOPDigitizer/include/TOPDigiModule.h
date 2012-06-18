@@ -72,23 +72,20 @@ namespace Belle2 {
 
       std::string m_inColName;    /**< Input collection name */
       std::string m_outColName;   /**< Output collection name */
-      double m_photonFraction;    /**< Fraction of Cer. photons propagated in FillSim */
+      double m_photonFraction;    /**< Fraction of Cer. photons propagated in FullSim */
+      double m_T0jitter;          /**< r.m.s of T0 jitter */
+      double m_ELjitter;          /**< r.m.s of electronics jitter */
 
-      /* Other members.*/
-      double m_timeCPU;                /**< CPU time.     */
-      int    m_nRun;                   /**< Run number.   */
-      int    m_nEvent;                 /**< Event number. */
-
-      //!Parameter reading object
+      //! Geometry parameters reading object
       TOPGeometryPar* m_topgp;
 
-      //! Apply q.e., returns trure if photon is detected and false if not.
-      /*!
-        \param energy energy of photon
-      */
+      /*! Apply quantum times collection efficiency via hit or miss method
+       * @param energy energy of photon in eV
+       * @return true if photon is detected
+       */
       bool DetectorQE(double energy);
 
-      //! Returns gausian distribuded random number
+      //! Returns random number according to TTS distribution
       double PMT_TTS();
 
     };

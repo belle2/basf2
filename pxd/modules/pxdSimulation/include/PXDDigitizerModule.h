@@ -114,6 +114,30 @@ namespace Belle2 {
 
       /** Process one PXDSimHit by dividing the step in smaller steps and drifting the charge */
       void processHit();
+      /** Calculate electron mobility at a given electric field.
+       * @param eField Electric field, V/cm
+       * @return electron mobility, cm*2/V.ns
+       */
+      double getElectronMobility(double E) const;
+      /** Model of the E field inside the sensor.
+       * @param point Desired position in local coordinates.
+       * @return The E field vector in local coordinates.
+       */
+      const TVector3 getEField(const TVector3& point) const;
+
+      /** Get B field value from the field map.
+       * @param point Desired position in local coordinates.
+       * @return The B field vector in local coordinates.
+       */
+      const TVector3 getBField(const TVector3& point) const;
+      /** Get drift velocity for electrons at a given point.
+       * The method assumes that the E-field causes the drift that makes electrons
+       * susceptible to Lorentz force.
+       * @param E Electric field at the desired position
+       * @param B Magnetic field at the desired position
+       * @result The vector of drift velocity in local coordinates.
+       */
+      const TVector3 getDriftVelocity(const TVector3& E, const TVector3& B) const;
       /** Drift the charge inside the silicon.
        * This method will drift the charge inside the silicon in two steps:
        * 1. Drift to the potential minimum plane by using vertical drift along the fieldlines
@@ -125,7 +149,8 @@ namespace Belle2 {
       void driftCharge(const TVector3& position, double electrons);
       /** Drift the charge inside the silicon with a simpler approach.
        * The charge is drifted to the sensor surface with gaussian diffusion and the
-       * fractions of charge are distributed among the hit pixels
+       * fractions of charge are distributed among the hit pixels. Effective
+       * diffusion constant and mean Lorentz angle are used.
        * @param position start position of the charge
        * @param electrons number of electrons to drift
        */
@@ -189,24 +214,28 @@ namespace Belle2 {
       double m_elStepTime;
       /** Maximum number of random walks before abort */
       int    m_elMaxSteps;
-      /** Tangens of the Lorentz angle */
-      double m_tanLorentz;
 
-      /** Wether or not to apply discrete ADC */
+      /** Whether or not to apply discrete ADC */
       bool   m_applyADC;
       /** Maximum value of the ADC in electrons */
       double m_rangeADC;
       /** Number of available bits of the ADC */
       double m_bitsADC;
-      /** Nuber of electrons per ADC step */
+      /** Number of electrons per ADC step */
       double m_unitADC;
 
-      /** Wether of not to use simple drift model */
+      /** Whether of not to use simple drift model */
       bool   m_useSimpleDrift;
       /** Width of diffusion cloud for simple drift model */
       double m_widthOfDiffusCloud;
       /** Diffusion coefficient for simple drift model */
       double m_diffusionCoefficient;
+      /** Tangent of the Lorentz angle for simple drift model */
+      double m_tanLorentz;
+      /** Temperature of the sensor(s) */
+      double m_temperature;
+      /** Hall factor for electrons in Si (only depends on temperature */
+      double m_hallFactor;
 
       /** Structure containing all existing sensors */
       Sensors m_sensors;
@@ -223,6 +252,8 @@ namespace Belle2 {
       Sensor*            m_currentSensor;
       /** Pointer to the SensorInfo of the current sensor */
       const SensorInfo*  m_currentSensorInfo;
+      /** Current magnetic field */
+      TVector3 m_currentBField;
 
       /** Name of the ROOT filename to output statistics */
       std::string m_rootFilename;
@@ -232,6 +263,11 @@ namespace Belle2 {
       TH1D*  m_histSteps;
       /** Histogram showing the diffusion cloud */
       TH2D*  m_histDiffusion;
+      /** Histogram showing the Lorentz angles in u (r-phi). */
+      TH1D*  m_histLorentz_u;
+      /** Histogram showing the Lorentz angles in v (z). */
+      TH1D*  m_histLorentz_v;
+
 
     };//end class declaration
 

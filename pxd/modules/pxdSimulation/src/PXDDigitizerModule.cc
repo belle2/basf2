@@ -9,6 +9,7 @@
 
 #include <pxd/modules/pxdSimulation/PXDDigitizerModule.h>
 #include <vxd/geometry/GeoCache.h>
+#include <geometry/bfieldmap/BFieldMap.h>
 
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Unit.h>
@@ -40,7 +41,8 @@ REG_MODULE(PXDDigitizer)
 //                 Implementation
 //-----------------------------------------------------------------
 
-PXDDigitizerModule::PXDDigitizerModule() : Module(), m_random(0), m_rootFile(0), m_histSteps(0), m_histDiffusion(0)
+PXDDigitizerModule::PXDDigitizerModule() : Module(), m_random(0), m_rootFile(0), m_histSteps(0), m_histDiffusion(0),
+  m_histLorentz_u(0), m_histLorentz_v(0)
 {
   //Set module properties
   setDescription("Digitize PXDSimHits");
@@ -82,8 +84,6 @@ PXDDigitizerModule::PXDDigitizerModule() : Module(), m_random(0), m_rootFile(0),
            "Time step for tracking electron groups in readout plane (in ns)", 1.0);
   addParam("ElectronMaxSteps", m_elMaxSteps,
            "Maximum number of steps when propagating electrons", 200);
-  addParam("TanLorentz", m_tanLorentz,
-           "Tangent of Lorentz angle", 0.25);
 
   addParam("ADC", m_applyADC,
            "Simulate ADC?", false);
@@ -97,7 +97,12 @@ PXDDigitizerModule::PXDDigitizerModule() : Module(), m_random(0), m_rootFile(0),
   addParam("Diffusion", m_diffusionCoefficient,
            "Diffusion coefficient (in mm)", double(0.00008617));
   addParam("widthOfDiffusCloud", m_widthOfDiffusCloud,
-           "Integration range the e- cloud in sigmas", double(5.0));
+           "Integration range of the e- cloud in sigmas", double(5.0));
+  addParam("tanLorentz", m_tanLorentz,
+           "Tangent of the Lorentz angle", double(0.25));
+  addParam("temperature", m_temperature,
+           "Working temperature of the sensors", double(300.0));
+
 
   addParam("statisticsFilename", m_rootFilename,
            "ROOT Filename for statistics generation. If filename is empty, no statistics will be produced", string(""));
@@ -129,6 +134,7 @@ void PXDDigitizerModule::initialize()
   m_unitADC = m_rangeADC / (pow(2.0, m_bitsADC) - 1);
   m_diffusionCoefficient *= Unit::mm;
   m_noiseFraction = TMath::Freq(m_SNAdjacent);
+  m_hallFactor = (1.13 + 0.0008 * (m_temperature - 273));
 
   B2INFO("PXDDigitizer Parameters (in default system units, *=cannot be set directly):");
   B2INFO(" -->  ElectronicEffects:  " << (m_applyNoise ? "true" : "false"));
@@ -149,7 +155,6 @@ void PXDDigitizerModule::initialize()
   B2INFO(" -->  ElectronGroupSize:  " << m_elGroupSize);
   B2INFO(" -->  ElectronStepTime:   " << m_elStepTime);
   B2INFO(" -->  ElectronMaxSteps:   " << m_elMaxSteps);
-  B2INFO(" -->  TanLorentz:         " << m_tanLorentz);
   B2INFO(" -->  ADC:                " << (m_applyADC ? "true" : "false"));
   B2INFO(" -->  ADCRange:           " << m_rangeADC);
   B2INFO(" -->  ADCBits:            " << m_bitsADC);
@@ -157,6 +162,7 @@ void PXDDigitizerModule::initialize()
   B2INFO(" -->  SimpleDriftModel:   " << (m_useSimpleDrift ? "true" : "false"));
   B2INFO(" -->  Diffusion:          " << m_diffusionCoefficient);
   B2INFO(" -->  widthOfDiffusCloud: " << m_widthOfDiffusCloud);
+  B2INFO(" -->  temperature:        " << m_temperature);
   B2INFO(" -->  statisticsFilename: " << m_rootFilename);
 
   if (!m_rootFilename.empty()) {
@@ -164,6 +170,10 @@ void PXDDigitizerModule::initialize()
     m_rootFile->cd();
     m_histSteps = new TH1D("steps", "Diffusion steps;number of steps", m_elMaxSteps + 1, 0, m_elMaxSteps + 1);
     m_histDiffusion = new TH2D("diffusion", "Diffusion distance;u [um];v [um];", 200, -100, 100, 200, -100, 100);
+    m_histLorentz_u = new TH1D("h_LorentzAngle_u", "Lorentz angle, u", 100, -0.1, 0.3);
+    m_histLorentz_u->GetXaxis()->SetTitle("Lorentz angle");
+    m_histLorentz_v = new TH1D("h_LorentzAngle_v", "Lorentz angle, v", 100, -0.1, 0.1);
+    m_histLorentz_v->GetXaxis()->SetTitle("Lorentz angle");
   }
 
   m_random = new TRandom3(0);
@@ -286,6 +296,9 @@ void PXDDigitizerModule::processHit()
     electrons /= numberOfSegments;
     direction.SetMag(1.0);
 
+    // Set magnetic field to save calls to getBField()
+    m_currentBField = getBField(0.5 * (startPoint + stopPoint));
+
     for (int segment = 0; segment < numberOfSegments; ++segment) {
       TVector3 position = startPoint + direction * segmentLength * (segment + 0.5);
       driftCharge(position, electrons);
@@ -293,8 +306,60 @@ void PXDDigitizerModule::processHit()
   }
 }
 
+double PXDDigitizerModule::getElectronMobility(double E) const
+{
+  // Electron parameters - maximum velocity, critical intensity, beta factor
+  static double vmElec   = 1.53 * pow(m_temperature, -0.87) * 1.E9 * Unit::cm / Unit::s;
+  static double EcElec   = 1.01 * pow(m_temperature, +1.55) * Unit::V / Unit::cm;
+  static double betaElec = 2.57 * pow(m_temperature, +0.66) * 1.E-2;
+
+  return (vmElec / EcElec * 1. / (pow(1. + pow((fabs(E) / EcElec), betaElec), (1. / betaElec))));
+}
+
+const TVector3 PXDDigitizerModule::getEField(const TVector3& point) const
+{
+  //Get references to current sensor/info for ease of use
+  const SensorInfo& info = *m_currentSensorInfo;
+  double sensorThickness = info.getThickness();
+
+  double depletionVoltage = 0.5 * Unit::e * info.getBulkDoping() / Unit::permSi * sensorThickness * sensorThickness;
+  double Ez = (info.getBackVoltage() - info.getTopVoltage()) / sensorThickness + 2 * depletionVoltage * point.Z() / sensorThickness / sensorThickness;
+
+  TVector3 E(0, 0, Ez);
+  return E;
+}
+
+const TVector3 PXDDigitizerModule::getBField(const TVector3& point) const
+{
+  TVector3 pointGlobal = m_currentSensorInfo->pointToGlobal(point);
+  TVector3 bGlobal = BFieldMap::Instance().getBField(pointGlobal);
+  TVector3 bLocal = m_currentSensorInfo->vectorToLocal(bGlobal);
+  return Unit::TinStdUnits * bLocal;
+}
+
+const TVector3 PXDDigitizerModule::getDriftVelocity(const TVector3& E, const TVector3& B) const
+{
+  // Set mobility parameters
+  double mobility = - getElectronMobility(E.Mag());
+  double mobilityH = m_hallFactor * mobility;
+  // Calculate products
+  TVector3 EcrossB = E.Cross(B);
+  TVector3 BEdotB = E.Dot(B) * B;
+  TVector3 v = mobility * E + mobility * mobilityH * EcrossB +
+               + mobility * mobilityH * mobilityH * BEdotB;
+  v *= 1.0 / (1.0 + mobilityH * mobilityH * B.Mag2());
+  return v;
+}
+
 void PXDDigitizerModule::driftCharge(const TVector3& position, double electrons)
 {
+  // Constants for the 7-point Gauss-Lobatto quadrature formula
+  static const double alphaGL = sqrt(2.0 / 3.0);
+  static const double betaGL = 1.0 / sqrt(5.0);
+  static const double weightGL[7] = {77.0 / 1478, 432.0 / 1478, 625.0 / 1478, 672.0 / 1478,
+                                     625.0 / 1478, 432.0 / 1478, 77.0 / 1478
+                                    };
+
   B2DEBUG(30, "Drifting " << electrons << " electrons at position ("
           << position.x() << ", "
           << position.y() << ", "
@@ -313,30 +378,76 @@ void PXDDigitizerModule::driftCharge(const TVector3& position, double electrons)
   double sensorThickness = info.getThickness();
   double distanceToPlane = 0.5 * sensorThickness - info.getGateDepth() - position.Z();
 
-  //Lorentz shift correction FIXME: get from Bfield
-  double uCenter = position.X() +  m_tanLorentz * distanceToPlane;
-  double vCenter = position.Y();
-
-  //Calculate diffusion during drift
-  double ktemp = Unit::e * info.getBulkDoping() / Unit::permSi;
-  double ytemp = ktemp * abs(distanceToPlane) / (0.5 * ktemp * sensorThickness + (info.getBackVoltage() - info.getTopVoltage()) / sensorThickness);
-  if (ytemp > 0)  B2WARNING("Sensor is not fully depleted under this conditions, please check PXD parameters");
-  if (ytemp >= 1) B2FATAL("Diffusioncoefficient becomes infinite, ytemp=" << ytemp << " sigma=" << sqrt(2 * Unit::uTherm / ktemp * log(1 - ytemp)));
-
-  double sigmaDrift  = sqrt(2 * Unit::uTherm / ktemp * log(1 - ytemp));
+  // We have to calculate final position, and width of the diffusion cloud.
+  TVector3 currentEField = getEField(position);
+  TVector3 v = getDriftVelocity(currentEField, m_currentBField);
+  TVector3 positionInPlane(position);
+  double sigmaDrift2 = 0;
+  // If we are close to the target plane, don't integrate
+  if (distanceToPlane < 1.0 * Unit::um) {
+    positionInPlane += distanceToPlane / v.Z() * v;
+    sigmaDrift2 = 2 * Unit::uTherm * getElectronMobility(currentEField.Mag()) * distanceToPlane / v.Z();
+  } else { // Integrate
+    // set integration region and integration points
+    double a = position.Z();
+    double b = 0.5 * sensorThickness - info.getGateDepth();
+    double h = distanceToPlane / 2.0;
+    double midpoint = position.Z() + 0.5 * distanceToPlane;
+    std::vector<double> zKnots(7);
+    zKnots[0] = a;
+    zKnots[1] = midpoint - alphaGL * h;
+    zKnots[2] = midpoint - betaGL * h;
+    zKnots[3] = midpoint;
+    zKnots[4] = midpoint + betaGL * h;
+    zKnots[5] = midpoint + alphaGL * h;
+    zKnots[6] = b;
+    // Calculate the quadrature. We already calculated the quantities for a.
+    // We integrate
+    // - v/v_z for position,
+    // - 2 * kT/e * mobility(E(position) / v_z for sigmaDrift.
+    // We already calculated v for a.
+    double weightByT = h * weightGL[0] / v.Z();
+    positionInPlane += weightByT * v;
+    TVector3 currentPosition(position);
+    sigmaDrift2 += weightByT * 2 * Unit::uTherm * getElectronMobility(currentEField.Mag());
+    for (int iz = 1; iz < 7; ++iz) {
+      // This is a bit imprecise. We calculate the electric field in a position calculatted
+      // by Euler's rule. As long as E only depends on z, it makes no difference.
+      currentPosition += (zKnots[iz] - zKnots[iz - 1]) / v.Z() * v;
+      currentEField = getEField(currentPosition);
+      v = getDriftVelocity(currentEField, m_currentBField);
+      weightByT = h * weightGL[iz] / v.Z();
+      positionInPlane += weightByT * v;
+      sigmaDrift2 += weightByT * 2 * Unit::uTherm * getElectronMobility(currentEField.Mag());
+    } // for knots
+  } // Integration
+  // Adjust sigmaDrift to _current_ Lorentz angle
+  double currentTanLA_u = v.X() / v.Z();
+  double currentTanLA_v = v.Y() / v.Z();
+  double sigmaDrift_u = sqrt(sigmaDrift2 * (1 + currentTanLA_u * currentTanLA_u));
+  double sigmaDrift_v = sqrt(sigmaDrift2 * (1 + currentTanLA_v * currentTanLA_v));
+  if (distanceToPlane > 1.0 * Unit::um) {
+    double tanLorentz_u = (positionInPlane.X() - position.X()) / distanceToPlane;
+    double tanLorentz_v = (positionInPlane.Y() - position.Y()) / distanceToPlane;
+    if (m_histLorentz_u) m_histLorentz_u->Fill(tanLorentz_u);
+    if (m_histLorentz_v) m_histLorentz_v->Fill(tanLorentz_v);
+  };
+  // Diffusion: Free diffusion + drift due to magnetic force. We use mean mobility
+  // here, as the drift is perpendicular to the "macro" E field.
   double sigmaDiffus = sqrt(2 * Unit::uTherm  * Unit::eMobilitySi * m_elStepTime);
   //Divide into groups of m_elGroupSize electrons and simulate lateral diffusion of each group by doing a
   //random walk with free electron mobility in uv-plane
   int    nGroups     = (int)(electrons / m_elGroupSize) + 1;
   double groupCharge = electrons / nGroups;
 
-  B2DEBUG(30, "Sigma of drift diffusion is " << sigmaDrift);
+  B2DEBUG(30, "Sigma of drift diffusion is " << sigmaDrift_u << " in u, and " << sigmaDrift_v << " in v");
   B2DEBUG(30, "Sigma of lateral diffusion is " << sigmaDiffus << " per step");
   B2DEBUG(40, "Splitting charge in " << nGroups << " groups of " << groupCharge << " electrons");
   for (int group = 0; group < nGroups; ++group) {
-    //Apply initial drift diffusion
-    double uPos = uCenter + m_random->Gaus(0.0, sigmaDrift);
-    double vPos = vCenter + m_random->Gaus(0.0, sigmaDrift);
+    //Distribute according to sigmaDrift in u and v
+    TVector3 step3(m_random->Gaus(0.0, sigmaDrift_u), m_random->Gaus(0.0, sigmaDrift_v), 0);
+    double uPos = positionInPlane.X() + step3.X();
+    double vPos = positionInPlane.Y() + step3.Y();
     int uID(0), vID(0);
 
     //double collectionTime(0);
@@ -365,19 +476,20 @@ void PXDDigitizerModule::driftCharge(const TVector3& position, double electrons)
         if (m_histSteps) m_histSteps->Fill(step);
         break;
       }
-
-      //Random walk
+      //Random walk with drift
       //collectionTime += m_elStepTime;
-      uPos += m_random->Gaus(0.0, sigmaDiffus);
-      vPos += m_random->Gaus(0.0, sigmaDiffus);
+      step3.SetXYZ(m_random->Gaus(0.0, sigmaDiffus), m_random->Gaus(0.0, sigmaDiffus), 0);
+      step3 += m_hallFactor * Unit::eMobilitySi * step3.Cross(m_currentBField);
+      uPos += step3.X();
+      vPos += step3.Y();
     }
-    if (m_histDiffusion) m_histDiffusion->Fill((uPos - uCenter) / Unit::um, (vPos - vCenter) / Unit::um, groupCharge);
+    if (m_histDiffusion) m_histDiffusion->Fill((uPos - positionInPlane.X()) / Unit::um, (vPos - positionInPlane.Y()) / Unit::um, groupCharge);
 
     if (!insideIG) {
       B2DEBUG(50, "Group " << group << " not inside IG after " << m_elMaxSteps << " steps");
       B2DEBUG(50, " --> charge position: u=" << uPos << ", v=" << vPos
               << ", uID=" << info.getUCellID(uPos) << ", vID=" << info.getVCellID(vPos));
-      B2DEBUG(50, " --> neares pixel:    u=" << info.getUCellPosition(uID)
+      B2DEBUG(50, " --> nearest pixel:    u=" << info.getUCellPosition(uID)
               << ", v=" << info.getVCellPosition(vID)
               << ", uID=" << uID << ", vID=" << vID);
       if (m_histSteps) m_histSteps->Fill(m_elMaxSteps);

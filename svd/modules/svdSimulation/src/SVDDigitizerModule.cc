@@ -407,9 +407,7 @@ const TVector3 SVDDigitizerModule::getBField(const TVector3& point) const
   TVector3 pointGlobal = m_currentSensorInfo->pointToGlobal(point);
   TVector3 bGlobal = BFieldMap::Instance().getBField(pointGlobal);
   TVector3 bLocal = m_currentSensorInfo->vectorToLocal(bGlobal);
-  // FIXME: Unit::T is wrong, Tesla = V.s/m^2. Take care when it changes!!!
-  double Unit_T = Unit::V * Unit::s / Unit::m2;
-  return Unit_T * bLocal;
+  return bLocal * Unit::TinStdUnits;
 }
 
 const TVector3 SVDDigitizerModule::getVelocity(CarrierType carrier, const TVector3& point) const
@@ -421,10 +419,10 @@ const TVector3 SVDDigitizerModule::getVelocity(CarrierType carrier, const TVecto
   double hallFactor = 0;
   if (carrier == electron) {
     mobility = - getElectronMobility(E.Mag());
-    hallFactor = 1.13 + 0.0008 * (m_temperature - 273) * Unit::m2 / Unit::s;
+    hallFactor = (1.13 + 0.0008 * (m_temperature - 273));
   } else {
     mobility = getHoleMobility(E.Mag());
-    hallFactor = 0.72 - 0.0005 * (m_temperature - 273) * Unit::m2 / Unit::s;
+    hallFactor = (0.72 - 0.0005 * (m_temperature - 273));
   }
   double mobilityH = hallFactor * mobility;
   // Calculate products

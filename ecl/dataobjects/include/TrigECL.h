@@ -22,25 +22,16 @@ namespace Belle2 {
 
 
     //! The cell id of this hit.
-    int m_eventId;
-
-    //! The cell id of this hit.
     int m_cellId;
 
     //!  Fit time of this hit.
     double m_TimeTrig;
 
     //! The method to set cell id
-    void setEventId(int eventId) { m_eventId = eventId; }
-
-    //! The method to set cell id
     void setCellId(int cellId) { m_cellId = cellId; }
 
     //! The method to get Fitt time
     void setTimeTrig(double TimeTrig) { m_TimeTrig = TimeTrig; }
-
-    //! The method to get event id
-    int getEventId() const { return m_eventId; }
 
     //! The method to get cell id
     int getCellId() const { return m_cellId; }
@@ -53,17 +44,6 @@ namespace Belle2 {
     /*! Recommended for ROOT IO
     */
     TrigECL() {;}
-
-    //! Useful Constructor
-    TrigECL(
-      int eventId,
-      int cellId,
-      double TimeTrig
-    ) {
-      m_eventId = eventId;
-      m_cellId = cellId;
-      m_TimeTrig = TimeTrig;
-    }
 
     ClassDef(TrigECL, 1);/**< the class title */
 

@@ -22,10 +22,6 @@ namespace Belle2 {
   class DigiECL : public TObject {
   public:
 
-
-    //! The cell id of this hit.
-    int m_eventId;
-
     //! The cell id of this hit.
     int m_cellId;
 
@@ -38,8 +34,6 @@ namespace Belle2 {
     //!  Fit Quality of this hit.
     double m_Quality;
 
-    //! The method to set cell id
-    void setEventId(int eventId) { m_eventId = eventId; }
 
     //! The method to set cell id
     void setCellId(int cellId) { m_cellId = cellId; }
@@ -53,9 +47,6 @@ namespace Belle2 {
     //! The method to get  Fit Quality
     void setQuality(double Quality) { m_Quality = Quality; }
 
-
-    //! The method to get event id
-    int getEventId() const { return m_eventId; }
 
     //! The method to get cell id
     int getCellId() const { return m_cellId; }
@@ -75,21 +66,6 @@ namespace Belle2 {
     /*! Recommended for ROOT IO
     */
     DigiECL() {;}
-
-    //! Useful Constructor
-    DigiECL(
-      int eventId,
-      int cellId,
-      double Amp,
-      double TimeFit,
-      double Quality
-    ) {
-      m_eventId = eventId;
-      m_cellId = cellId;
-      m_Amp = Amp;
-      m_TimeFit = TimeFit;
-      m_Quality = Quality;
-    }
 
     ClassDef(DigiECL, 1);/**< the class title */
 

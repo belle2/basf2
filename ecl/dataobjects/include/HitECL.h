@@ -24,9 +24,6 @@ namespace Belle2 {
 
 
     //! The cell id of this hit.
-    int m_eventId;
-
-    //! The cell id of this hit.
     int m_cellId;
 
     //! Deposited energy of this hit.
@@ -34,9 +31,6 @@ namespace Belle2 {
 
     //! Hit average time
     double m_TimeAve;
-
-    //! The method to set event id
-    void setEventId(int eventId) { m_eventId = eventId; }
 
     //! The method to set cell id
     void setCellId(int cellId) { m_cellId = cellId; }
@@ -46,9 +40,6 @@ namespace Belle2 {
 
     //! The method to set hit average time
     void setTimeAve(double TimeAve) { m_TimeAve = TimeAve; }
-
-    //! The method to get event id
-    int getEventId() const { return m_eventId; }
 
     //! The method to get cell id
     int getCellId() const { return m_cellId; }
@@ -66,19 +57,6 @@ namespace Belle2 {
     /*! Recommended for ROOT IO
     */
     HitECL() {;}
-
-    //! Useful Constructor
-    HitECL(
-      int eventId,
-      int cellId,
-      double edep,
-      double TimeAve
-    ) {
-      m_eventId = eventId;
-      m_cellId = cellId;
-      m_edep = edep;
-      m_TimeAve = TimeAve;
-    }
 
     ClassDef(HitECL, 1);
 

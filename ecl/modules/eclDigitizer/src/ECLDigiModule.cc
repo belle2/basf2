@@ -171,18 +171,16 @@ void ECLDigiModule::event()
 
 
       if (energyFit[iECLCell] > 0) {
-        /*
-              StoreArray<DspECL> eclDspArray(m_eclDspCollectionName);
-              m_hitNum = eclDspArray->GetLast() + 1;
-              new(eclDspArray->AddrAt(m_hitNum)) DspECL();
-              eclDspArray[m_hitNum]->setEventId(m_nEvent);
-              eclDspArray[m_hitNum]->setCellId(iECLCell);
-              eclDspArray[m_hitNum]->setDspA(FitA);
-        */
+
+        StoreArray<DspECL> eclDspArray(m_eclDspCollectionName);
+        m_hitNum = eclDspArray->GetLast() + 1;
+        new(eclDspArray->AddrAt(m_hitNum)) DspECL();
+        eclDspArray[m_hitNum]->setCellId(iECLCell);
+        eclDspArray[m_hitNum]->setDspA(FitA);
+
         StoreArray<DigiECL> eclDigiArray(m_eclDigiCollectionName);
         m_hitNum1 = eclDigiArray->GetLast() + 1;
         new(eclDigiArray->AddrAt(m_hitNum1)) DigiECL();
-        eclDigiArray[m_hitNum1]->setEventId(m_nEvent);
         eclDigiArray[m_hitNum1]->setCellId(iECLCell);
         eclDigiArray[m_hitNum1]->setAmp(energyFit[iECLCell]);//E (GeV) = energyFit/20000;
         eclDigiArray[m_hitNum1]->setTimeFit(tFit[iECLCell]);//t0 (us)= (1520 - m_ltr)*24.*12/508/(3072/2) ;
@@ -195,7 +193,7 @@ void ECLDigiModule::event()
   StoreArray<TrigECL> eclTrigArray(m_eclTrigCollectionName);
   m_hitNum2 = eclTrigArray->GetLast() + 1;
   new(eclTrigArray->AddrAt(m_hitNum2)) TrigECL();
-  eclTrigArray[m_hitNum2]->setEventId(m_nEvent);
+//  eclTrigArray[m_hitNum2]->setEventId(m_nEvent);
   eclTrigArray[m_hitNum2]->setTimeTrig(DeltaT * 12. / 508.); //t0 (us)= (1520 - m_ltr)*24.*12/508/(3072/2) ;
 
 

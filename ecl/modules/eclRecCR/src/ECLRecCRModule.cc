@@ -107,16 +107,14 @@ void ECLRecCRModule::event()
   cf.Clear();
   int hitNum = eclDigiArray->GetEntriesFast();
   TEclEnergyHit ss;
-  int    get_ID = 0;
   for (int ii = 0; ii < hitNum; ii++) {
     DigiECL* aECLHit = eclDigiArray[ii];
-    get_ID       =  aECLHit->getEventId();
     float FitEnergy    = (aECLHit->getAmp()) / 20000;//ADC count to GeV
 //    double FitTime    = (1520 - aECLHit->getTimeFit()) * 24.*12 / 508 / (3072 / 2) ;//ADC count to us
     int cId          =  aECLHit->getCellId();
     if (FitEnergy < 0.) {continue;}
 
-    cf.Accumulate(get_ID , FitEnergy, cId);
+    cf.Accumulate(m_nEvent, FitEnergy, cId);
   }
 
   cf.SearchCRs();

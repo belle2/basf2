@@ -167,7 +167,6 @@ void ECLHitModule::event()
 
         m_hitNum = eclHitArray->GetLast() + 1;
         new(eclHitArray->AddrAt(m_hitNum)) HitECL();
-        eclHitArray[m_hitNum]->setEventId(m_nEvent);
         eclHitArray[m_hitNum]->setCellId(iECLCell);
         eclHitArray[m_hitNum]->setEnergyDep(E_cell[iECLCell][TimeIndex]);
         eclHitArray[m_hitNum]->setTimeAve(T_ave[iECLCell][TimeIndex] + Tof_ave[iECLCell][TimeIndex]);

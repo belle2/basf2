@@ -57,7 +57,7 @@ namespace Belle2 {
     /*! Recommended for ROOT IO
     */
     HitECL() {;}
-
+    /** ROOT Macro.*/
     ClassDef(HitECL, 1);
 
   };

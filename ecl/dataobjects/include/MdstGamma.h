@@ -67,7 +67,7 @@ namespace Belle2 {
     /*! Recommended for ROOT IO
     */
     MdstGamma() {;}
-
+    /** ROOT Macro.*/
     ClassDef(MdstGamma, 1);
 
   };

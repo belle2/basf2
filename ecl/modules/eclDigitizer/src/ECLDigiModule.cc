@@ -73,7 +73,6 @@ void ECLDigiModule::initialize()
   // Initialize variables
   m_nRun    = 0 ;
   m_nEvent  = 0 ;
-  printModuleParams();
 
   m_random = new TRandom3(0);
   // CPU time start
@@ -101,19 +100,16 @@ void ECLDigiModule::event()
 
   int hitNum = eclArray->GetEntriesFast();
 
-  double energyFit[8736] = {0}; //fit output : Amplitude
-  double tFit[8736] = {0};    //fit output : T_ave
+  int energyFit[8736] = {0}; //fit output : Amplitude
+  int tFit[8736] = {0};    //fit output : T_ave
   int qualityFit[8736] = {0};    //fit output : T_ave
-  double HitEnergy[8736][31];
+  double HitEnergy[8736][31] = {{0}};
   double E_tmp[8736] = {0};
   double test_A[31] = {0};
 //  double AdcPedestal=3000.;
-  double AdcNoise[8736][31];
-  double genNoise[8736][31];
+  double AdcNoise[8736][31] = {{0}};
+  double genNoise[8736][31] = {{0}};
 
-
-
-  for (int i = 0; i < 8736; i++) {for (int j = 0; j < 31; j++) {HitEnergy[i][j] = 0; AdcNoise[i][j] = 0; genNoise[i][j] = 0;}}
   double DeltaT = (24. - m_random->Uniform(0, 24));
   for (int ii = 0; ii < hitNum; ii++) {
 
@@ -214,13 +210,6 @@ void ECLDigiModule::terminate()
 }
 
 
-void ECLDigiModule::printModuleParams() const
-{
-  B2INFO("ECLDigiModule parameters:");
-  B2INFO("  Input collection name:  " << m_eclHitCollectionName);
-  B2INFO("  Output collection name: " << m_eclDigiCollectionName);
-
-}
 
 double ECLDigiModule::ShaperDSP(double Ti)
 {

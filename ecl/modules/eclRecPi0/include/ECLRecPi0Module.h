@@ -53,38 +53,38 @@ namespace Belle2 {
     /** Stopping of CPU clock.*/
     virtual void terminate();
 
-    void fit(CLHEP::HepLorentzVector m_shower1, CLHEP::HepLorentzVector m_shower2);
-    double errorE(CLHEP::HepLorentzVector m_shower);
-    double errorTheta(CLHEP::HepLorentzVector m_shower);
-    double errorPhi(CLHEP::HepLorentzVector m_shower);
-    double cellR(CLHEP::HepLorentzVector m_shower);
+    void fit(CLHEP::HepLorentzVector m_shower1, CLHEP::HepLorentzVector m_shower2);/*! mass constraint fit of  pi0      */
+    double errorE(CLHEP::HepLorentzVector m_shower);/*! calculate error of Energy      */
+    double errorTheta(CLHEP::HepLorentzVector m_shower);/*! calculate error of Theta      */
+    double errorPhi(CLHEP::HepLorentzVector m_shower);/*! calculate error of phi     */
+    double cellR(CLHEP::HepLorentzVector m_shower);/*! calculate error of R of cell       */
 
 
 
-    double squ(double x) { return x * x; }
-    double Get_E() { return m_pi0E; }
-    double Get_px() { return m_pi0px; }
-    double Get_py() { return m_pi0py; }
-    double Get_pz() { return m_pi0pz; }
-    double Get_mass() { return m_pi0mass; }
-    double Get_chi2() { return m_pi0chi2; }
+    double squ(double x) { return x * x; } /*! operator of square      */
+    double Get_E() { return m_pi0E; }      /*! get Energy of Pi0      */
+    double Get_px() { return m_pi0px; }    /*! get px of Pi0      */
+    double Get_py() { return m_pi0py; }    /*! get py of Pi0      */
+    double Get_pz() { return m_pi0pz; }    /*! get pz of Pi0      */
+    double Get_mass() { return m_pi0mass; }/*! get combined mass of Pi0      */
+    double Get_chi2() { return m_pi0chi2; }/*! get chi2 of  Pi0      */
 
-    // Require: E_gamma > gamma_energy_threshold;
+    //** Require: E_gamma > gamma_energy_threshold;*/
     float gamma_energy_threshold;
 
     // Require: theta_open > theta_min - opening_angle_cut_margin
     float opening_angle_cut_margin;
 
-    // pi0 mass region (without fitting)
+    //** pi0 mass region (without fitting) */
     float pi0_mass_min, pi0_mass_max;
 
-    // apply mass constraint fit
+    //** apply mass constraint fit */
     int fit_flag;
 
-    // chi2 threshold of fitting result
+    //** chi2 threshold of fitting result */
     float chi2_max;
 
-    // define   enum region_type
+    //** define   enum region_type */
     enum region_type {REGION_SIGMA, REGION_GEV};
 
 

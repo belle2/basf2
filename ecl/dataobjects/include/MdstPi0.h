@@ -111,7 +111,7 @@ namespace Belle2 {
     /*! Recommended for ROOT IO
     */
     MdstPi0() {;}
-
+    /** ROOT Macro.*/
     ClassDef(MdstPi0, 1);
 
   };

@@ -38,9 +38,6 @@ namespace Belle2 {
     //! Deposited energy of this hit.
     double m_edep;
 
-    //! Step length of this hit.
-    double m_FirstStep;
-
     //! The momentum of pre-step.
     TVector3 m_momentum;
 
@@ -90,7 +87,7 @@ namespace Belle2 {
     //! The method to get momentum
     TVector3 getMomentum() const { return m_momentum; }
 
-
+    //! The method to get position
     TVector3 getPosIn() const { return m_posIn; }
 
     //! Empty constructor

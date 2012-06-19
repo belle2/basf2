@@ -22,8 +22,8 @@
 
 #include "TVector3.h"
 #include "TMatrix.h"
-#include "CLHEP/Matrix/SymMatrix.h"
-
+#include  "CLHEP/Matrix/Matrix.h"
+#include  "CLHEP/Matrix/SymMatrix.h"
 namespace Belle2 {
 
 
@@ -32,17 +32,17 @@ namespace Belle2 {
     friend class TEclCFCR;
     friend class TEclCFShower;
   public:
-    ///
+    //** define EclIdentifier is Identifier(int)
     typedef EclIdentifier Identifier;
 
     ///
     MEclCFShowerHA() {}
     ///
     virtual ~MEclCFShowerHA() {}
-    ///
+    //** construct MEclCFShowerHA with MEclCFShowerHA& a
     MEclCFShowerHA(const MEclCFShowerHA& a)
       : fId(a.fId), fFraction(a.fFraction) {}
-    ///
+    //** define operator= for  MEclCFShowerHA
     const MEclCFShowerHA& operator=(const MEclCFShowerHA& rhs) {
       if (this != &rhs) {
         fId = rhs.fId;
@@ -50,20 +50,20 @@ namespace Belle2 {
       }
       return *this;
     }
-    ///
+    //** construct MEclCFShowerHA with  fId(id), fFraction(w)
     MEclCFShowerHA(int id, double w): fId(id), fFraction(w) {}
-    ///
+    //** Get fId
     const Identifier Id(void) const {
       return fId;
     }
-    ///
+    //** Get fFraction
     const double Fraction(void) const {
       return fFraction;
     }
   private:
     // not HitId but cellId!
-    Identifier fId;
-    double fFraction;
+    Identifier fId;/*!fid     */
+    double fFraction;/*!fFraction     */
   };
 
 
@@ -80,7 +80,7 @@ namespace Belle2 {
   public:
     // constants, enums and typedefs
     ///
-    typedef EclIdentifier Identifier;
+    typedef EclIdentifier Identifier;/*! define EclIdentifier is Identifier(int) */
     /// backward compat.
     // no GARBAGE anymore
     // in fact, the proper meanings are
@@ -95,7 +95,7 @@ namespace Belle2 {
 
 
     // Constructors and destructor
-    ///
+    ////** construct TEclCFShower with  fId(id)/
     TEclCFShower(int id = 0) : fId(id) {
       fEnergy = 0.0;  //gcc does not initialize...
       fE3x3 = 0.0;
@@ -106,19 +106,20 @@ namespace Belle2 {
       fStatus = 0;
       fGrade = UNKNOWN;
 //   fError = TMatrix(3,1);
+      fError = CLHEP::HepSymMatrix(3, 1);
     }
     ///
     virtual ~TEclCFShower() {
     }
 
-    ///
+    //** construct TEclCFShower with aShower/
     TEclCFShower(const TEclCFShower& aShower)
       : fId(aShower.fId)
       , fEnergy(aShower.fEnergy)
       , fTheta(aShower.fTheta)
       , fPhi(aShower.fPhi)
       , fDistance(aShower.fDistance)
-//   , fError(aShower.fError)
+      , fError(aShower.fError)
       , fMass(aShower.fMass)
       , fWidth(aShower.fWidth)
 
@@ -144,17 +145,13 @@ namespace Belle2 {
         fTheta = rhs.fTheta;
         fPhi = rhs.fPhi;
         fDistance = rhs.fDistance;
-//poyuan    fError = rhs.fError;
+        fError = rhs.fError;
         fMass = rhs.fMass;
         fWidth = rhs.fWidth;
-//      fE9oE25 = rhs.fE9oE25;
-//      fE9oE25unf = rhs.fE9oE25unf;
         fE3x3 = rhs.fE3x3;
         fE5x5 = rhs.fE5x5;
         fE3x3unf = rhs.fE3x3unf;
         fE5x5unf = rhs.fE5x5unf;
-//      fNHits = rhs.fNHits;
-//    double fWNHits;  // weighted
         fNHitsUsed = rhs.fNHitsUsed;
 
         fStatus = rhs.fStatus;
@@ -169,25 +166,24 @@ namespace Belle2 {
       return
         fId == rhs.fId;
     }
-    ///
+    /// comparison operators
     bool operator!=(const TEclCFShower& rhs) const {
       return
         fId != rhs.fId;
     }
-    ///
+    /// comparison operators
     bool operator<(const TEclCFShower& rhs) const {
       return
         fId < rhs.fId;
     }
 
 
-    // member functions
-    ///
+    ///member functions Accumulate  from belle Library
     void Accumulate(Identifier cId, EclGeV energy, double w = 1.0) {
       fEnergy += (energy * w);
       Assign(cId, w);
     }
-    ///
+    ///member functions Assign  from belle Library
     void Assign(Identifier cId, double w = 1.0) {
       fHA.push_back(MEclCFShowerHA(cId, w));
     }
@@ -199,7 +195,7 @@ namespace Belle2 {
       return
         fId;
     }
-    ///
+    ///get fEnergy
     const EclGeV Energy(void) const {
       return
         fEnergy;
@@ -209,44 +205,45 @@ namespace Belle2 {
       return
         fTheta;
     }
-    ///
+    /// get fPhi
     const EclRad Phi(void) const {
       return
         fPhi;
     }
-    ///
+    ///get fDistance
     const EclCM Distance(void) const {
       return
         fDistance;
     }
-    ///
-//      const TMatrix& Error(void) const {
-//   return
-//      fError;
-//      }
-    ///
+    ///get fError
+    const CLHEP::HepSymMatrix& Error(void) const {
+      return
+        fError;
+    }
+
+    ///get Mass
     const EclGeV Mass(void) const {
       return
         fMass;
     }
-    ///
+    ///get Width
     const EclCM  Width(void) const {
       return
         fWidth;
     }
-    ///
+    ///get  fE3x3 / fE5x5
     const double E9oE25(void) const {
       return
         fE3x3 / fE5x5;
 //      fE9oE25;
     }
-    ///
+    /// get E9oE25unf
     const double E9oE25unf(void) const {
       return
         fE3x3unf / fE5x5unf;
 //      fE9oE25unf;
     }
-    ///
+    /// get NHits
     const int NHits(void) const {
       return
         fHA.size();
@@ -260,13 +257,13 @@ namespace Belle2 {
         n += i->fFraction;
       return n;
     }
-    ///
+    ///get NHitsUsed
     const double NHitsUsed(void) const {
       return
         NHits();  // not implemented yet
 //      fNHits;
     }
-    ///
+    ///get Status
     const int Status(void) const {
       return
         fStatus;
@@ -276,7 +273,7 @@ namespace Belle2 {
       return
         fGrade;
     }
-    ///
+    ///get Grade
     void Grade(EGrade g) {
       if (g > fGrade)
         fGrade = g;
@@ -287,12 +284,12 @@ namespace Belle2 {
       return
         fE5x5unf;
     }
-    ///
+    ///get TotEnergy
     const EclGeV TotEnergy(void) const {
       return
         fE5x5;
     }
-    ///
+    ///get HitAssignment
     const std::vector<MEclCFShowerHA>& HitAssignment(void) const {
       return
         fHA;
@@ -314,12 +311,12 @@ namespace Belle2 {
     // private const member functions
 
     // data members
-    ///
     Identifier fId;
     /// corrected energy of shower
     EclGeV fEnergy;
     /// correct runtime with vertex info?
     EclRad fTheta;
+    /// correct runtime with vertex info?
     EclRad fPhi;
 
     /// from origin to shower(how to correct?), by center or front face?
@@ -327,6 +324,8 @@ namespace Belle2 {
 
     /// energy,theta,phi
 //      TMatrix fError;
+    CLHEP::HepSymMatrix fError;
+//    CLHEP::HepMatrix fError;
     /// shower mass
     EclGeV fMass;
     /// rms shower width
@@ -337,11 +336,11 @@ namespace Belle2 {
 
     /// not true for the endcaps
     EclGeV fE3x3;
-    ///
+    /// not true for the endcaps
     EclGeV fE5x5;
-    ///
+    /// not true for the endcaps
     EclGeV fE3x3unf;
-    ///
+    /// not true for the endcaps
     EclGeV fE5x5unf;
 //      int    fNHits;      // #crystals in shower
 //    double fWNHits;  // weighted
@@ -358,7 +357,7 @@ namespace Belle2 {
     /// for backward compatibility
     EGrade fGrade;
 
-    ///
+    //member MEclCFShowerHA
     std::vector<MEclCFShowerHA> fHA;
 
     // static data members

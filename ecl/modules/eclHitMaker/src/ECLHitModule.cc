@@ -99,16 +99,11 @@ void ECLHitModule::event()
   // Get number of hits in this event
   int nHits = eclArray->GetEntriesFast();
 
-  double E_cell[8736][16];
-  double X_ave[8736][16];
-  double T_ave[8736][16];
-  double Tof_ave[8736][16];
+  double E_cell[8736][16] = {{0}};
+  double X_ave[8736][16] = {{0}};
+  double T_ave[8736][16] = {{0}};
+  double Tof_ave[8736][16] = {{0}};
 
-  for (int i = 0; i < 8736; i++) {
-    for (int j = 0; j < 16; j++) {
-      E_cell[i][j] = 0.; X_ave[i][j] = 0. ; T_ave[i][j] = 0.; Tof_ave[i][j] = 0.;
-    }
-  }
   // Get instance of ecl geometry parameters
   ECLGeometryPar* eclp = ECLGeometryPar::Instance();
   // Loop over all hits of steps

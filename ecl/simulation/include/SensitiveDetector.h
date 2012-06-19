@@ -15,6 +15,7 @@
 #include <algorithm>
 #include <iostream>
 #include <vector>
+#include "TVector3.h"
 
 using namespace std;
 
@@ -50,8 +51,7 @@ namespace Belle2 {
         const G4double tof,
         const G4double edep,
         G4ThreeVector mom,
-        G4ThreeVector posIn,
-        G4ThreeVector posOut
+        TVector3 WightedPos
       );
 
 
@@ -73,9 +73,12 @@ namespace Belle2 {
 
       int m_trackID;          /* track id */
       G4ThreeVector m_startPos;
+      G4ThreeVector m_endPos;
+      TVector3 m_WightedPos;
       G4ThreeVector m_momentum;
       double m_startTime;     /* global time */
       double m_endTime;     /* global time */
+      double m_WightedTime;     /* global time */
       double m_startEnergy;   /* particle energy at the entrance in volume */
       double m_energyDeposit; /* energy deposited in volume */
       double m_trackLength;   /* length of the track in the volume */

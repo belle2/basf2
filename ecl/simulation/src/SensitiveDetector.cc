@@ -76,65 +76,70 @@ namespace Belle2 {
       const G4StepPoint& postStep = * aStep->GetPostStepPoint();
       G4Track& track  = *aStep->GetTrack();
 
-//      if (m_trackID != track.GetTrackID()) {
-      //TrackID changed, store track informations
-      m_trackID = track.GetTrackID();
-      //Get world position
-      //      const G4ThreeVector& prePosition = preStep.GetPosition();
-      m_startPos =  preStep.GetPosition();
-      //Get momentum
-      m_momentum = preStep.GetMomentum() ;
-      //Get time
-      m_startTime = preStep.GetGlobalTime();
-      //Get energy
-      m_startEnergy =  preStep.GetKineticEnergy() ;
-      //Reset energy deposit;
-//        m_energyDeposit = 0;
-//      }
-      //Update energy deposit
-      m_energyDeposit = aStep->GetTotalEnergyDeposit() ;
-      m_endTime = postStep.GetGlobalTime();
-      G4ThreeVector postPosition = postStep.GetPosition();
+      if (m_trackID != track.GetTrackID()) {
+        //TrackID changed, store track informations
+        m_trackID = track.GetTrackID();
+        //Get momentum
+        m_momentum = preStep.GetMomentum() ;
+        //Get energy
+        m_startEnergy =  preStep.GetKineticEnergy() ;
+        //Reset energy deposit;
+        m_energyDeposit = 0;
+        //Reset Wighted Time;
+        m_WightedTime = 0;
+        //Reset m_WightedPos;
+        m_WightedPos.SetXYZ(0, 0, 0);
 
+      }
+      //Update energy deposit
+      m_energyDeposit += aStep->GetTotalEnergyDeposit() ;
+
+      m_startTime = preStep.GetGlobalTime();
+      m_endTime = postStep.GetGlobalTime();
+      m_WightedTime += (m_startTime + m_endTime) / 2 * (aStep->GetTotalEnergyDeposit());
+
+      m_startPos =  preStep.GetPosition();
+      m_endPos = postStep.GetPosition();
+      TVector3 position((m_startPos.getX() + m_endPos.getX()) / 2 / cm, (m_startPos.getY() + m_endPos.getY()) / 2 / cm, (m_startPos.getZ() + m_endPos.getZ()) / 2 / cm);
+      m_WightedPos += position * (aStep->GetTotalEnergyDeposit());
 
       //Save Hit if track leaves volume or is killed
-//      if (track.GetNextVolume() != track.GetVolume() || track.GetTrackStatus() >= fStopAndKill) {
-      int pdgCode = track.GetDefinition()->GetPDGEncoding();
+      if (track.GetNextVolume() != track.GetVolume() || track.GetTrackStatus() >= fStopAndKill) {
+        int pdgCode = track.GetDefinition()->GetPDGEncoding();
 
-      const G4VPhysicalVolume& v = * track.GetVolume();
-      G4ThreeVector posCell = v.GetTranslation();
-      // Get layer ID
-      Mapping(v.GetName());
+        const G4VPhysicalVolume& v = * track.GetVolume();
+        G4ThreeVector posCell = v.GetTranslation();
+        // Get layer ID
+        Mapping(v.GetName());
 
-      if (v.GetName().find("Crystal") != string::npos) {
-        int saveIndex = -999;
-        saveIndex = saveSimHit(m_cellID, m_trackID, pdgCode, (m_startTime + m_endTime) / 2, m_energyDeposit, m_momentum, m_startPos, postPosition);
+        if (v.GetName().find("Crystal") != string::npos) {
+          int saveIndex = -999;
+          double dTotalEnergy = 1 / m_energyDeposit; //avoid the error  no match for 'operator/'
+          saveIndex = saveSimHit(m_cellID, m_trackID, pdgCode, m_WightedTime / m_energyDeposit , m_energyDeposit, m_momentum, m_WightedPos * dTotalEnergy);
+        }
+
+        //Reset TrackID
+        m_trackID = 0;
       }
 
-      //Reset TrackID
-//        m_trackID = 0;
-//      }
-
-
       /*
-           if (track.GetNextVolume() != track.GetVolume() || track.GetTrackStatus() >= fStopAndKill) {
-              if(find(myvector.begin(), myvector.end(), track.GetParentID()) !=myvector.end()  ){
-                myvector.push_back(m_trackID);
-                cout<<"saved track "<<m_trackID<<endl;
+                 if (track.GetNextVolume() != track.GetVolume() || track.GetTrackStatus() >= fStopAndKill) {
+                    if(find(myvector.begin(), myvector.end(), track.GetParentID()) !=myvector.end()  ){
+                      myvector.push_back(m_trackID);
+                      cout<<"saved track "<<m_trackID<<endl;
 
-              }
-              else if(find(myvector.begin(), myvector.end(), track.GetParentID()) ==myvector.end()||track.GetParentID()==0)
-              {cout<<"Myvector Size "<< myvector.size()<<"  mother "<<track.GetParentID()  <<" first track "<< m_trackID<<" "<<pdgCode<<endl;
-               myvector.clear();
-               myvector.push_back(m_trackID);}
-           }else{
-              const G4VPhysicalVolume& v1 = *track.GetNextVolume();
-             cout<< m_trackID <<" track.GetTrackStatus() "<<track.GetTrackStatus()<<" track.GetNextVolume()   "<<v1.GetName()<<" "<<v.GetName()<<endl;
+                    }
+                    else if((find(myvector.begin(), myvector.end(), track.GetParentID()) ==myvector.end()&&find(myvector.begin(), myvector.end(), track.GetParentID()->GetParentID()) ==myvector.end()  )||track.GetParentID()==0)
+                    {cout<<"Myvector Size "<< myvector.size()<<"  mother "<<track.GetParentID()  <<" first track "<< m_trackID<<" "<<pdgCode<<endl;
+                     myvector.clear();
+                     myvector.push_back(m_trackID);}
+                 }else{
+                    const G4VPhysicalVolume& v1 = *track.GetNextVolume();
+                   cout<< m_trackID <<" track.GetTrackStatus() "<<track.GetTrackStatus()<<" track.GetNextVolume()   "<<v1.GetName()<<" "<<v.GetName()<<endl;
 
-          }
+                }
 
       */
-
 
 
 //    cout << pdgCode << " CellID " << m_cellID  <<" track ID "<<m_trackID<< endl;
@@ -157,8 +162,7 @@ namespace Belle2 {
       const G4double tof,
       const G4double edep,
       G4ThreeVector mom,
-      G4ThreeVector posIn,
-      G4ThreeVector posOut)
+      TVector3 posAve)
     {
       StoreArray<MCParticle> mcParticles;
       //change Later
@@ -174,8 +178,7 @@ namespace Belle2 {
       eclArray[m_hitNumber]->setEnergyDep(edep / GeV);
       TVector3 momentum(mom.getX() / GeV, mom.getY() / GeV, mom.getZ() / GeV);
       eclArray[m_hitNumber]->setMomentum(momentum);
-      TVector3 positionIn((posIn.getX() + posOut.getX()) / 2 / cm, (posIn.getY() + posOut.getY()) / 2 / cm, (posIn.getZ() + posOut.getZ()) / 2 / cm);
-      eclArray[m_hitNumber]->setPosIn(positionIn);
+      eclArray[m_hitNumber]->setPosIn(posAve);
       B2DEBUG(150, "HitNumber: " << m_hitNumber);
       eclSimHitRel.add(trackID, m_hitNumber);
       return (m_hitNumber);

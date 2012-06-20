@@ -9,7 +9,7 @@
  **************************************************************************/
 
 #include <ecl/modules/eclRecGamma/ECLRecGammaModule.h>
-#include <ecl/dataobjects/RecCRECL.h>
+#include <ecl/dataobjects/MdstShower.h>
 #include <ecl/dataobjects/HitAssignmentECL.h>
 #include <ecl/dataobjects/MdstGamma.h>
 
@@ -56,8 +56,8 @@ ECLRecGammaModule::ECLRecGammaModule() : Module()
   setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
 
   //input
-  addParam("ECLRecCRinput", m_eclRecCRName,
-           "//input of this module//shower infromation", string("ECLRecCRHits"));
+  addParam("MdstShowerinput", m_eclMdstShowerName,
+           "//input of this module//shower infromation", string("mdstShower"));
 
   addParam("ECLHitAssignmentinput", m_eclHitAssignmentName,
            "//input of this module//(showerID,Hits)", string("ECLHitAssignment"));
@@ -105,23 +105,23 @@ void ECLRecGammaModule::beginRun()
 void ECLRecGammaModule::event()
 {
   //Input Array
-  StoreArray<RecCRECL> eclRecCRArray(m_eclRecCRName);
+  StoreArray<MdstShower> eclRecShowerArray(m_eclMdstShowerName);
   StoreArray<HitAssignmentECL> eclHitAssignmentArray(m_eclHitAssignmentName);
 
-  if (!eclRecCRArray) {
-    B2ERROR("Can not find ECLRecCRHits" << m_eclRecCRName << ".");
+  if (!eclRecShowerArray) {
+    B2ERROR("Can not find ECLRecCRHits" << m_eclMdstShowerName << ".");
   }
   if (!eclHitAssignmentArray) {
     B2ERROR("Can not find eclHitAssignment" << m_eclHitAssignmentName << ".");
   }
-  const int hitNum = eclRecCRArray->GetEntriesFast();
+  const int hitNum = eclRecShowerArray->GetEntriesFast();
   const int hANum = eclHitAssignmentArray->GetEntriesFast();
 
 
   readExtrapolate();//m_TrackCellId[i] =1 => Extrapolated cell
 
   for (int iShower = 0; iShower < hitNum; iShower++) {
-    RecCRECL* aECLHit = eclRecCRArray[iShower];
+    MdstShower* aECLHit = eclRecShowerArray[iShower];
     m_showerId = aECLHit->GetShowerId();
     m_energy = aECLHit->GetEnergy();
     m_theta = aECLHit->GetTheta();
@@ -225,25 +225,18 @@ void ECLRecGammaModule::readExtrapolate()
 //for ( int hypothesis = 0; hypothesis < 5; ++hypothesis ) {
     int hypothesis = 0;
     GFTrackCand* cand = extTrackCands[t * 5 + hypothesis];
-    std::vector<double> TOFs = cand->GetRhos();
+//    std::vector<double> TOFs = cand->GetRhos();
     for (unsigned int j = 0; j < cand->getNHits(); ++j) {
       unsigned int detID;
       unsigned int hitID;
       unsigned int planeID;
       cand->getHitWithPlane(j, detID, hitID, planeID);
       if ((detID != myDetID) || (planeID == 0)) continue;
-//cout<<"match Cell Id "<<planeID<<endl;
+//      cout<<"match Cell Id "<<planeID<<endl;
       m_TrackCellId[planeID] = 1;
-//double tof = TOFs.at(j);
-//ExtRecoHit* hit = extRecoHits[hitID];
-//TMatrixD phasespacePoint = hit->getRawHitCoord();
-//TMatrixD covariance = hit->getRawHitCov();
-//ExtHitStatus status = hit->getStatus();
     }//cand->getNHits()
 //}//hypothesis
   }//gfTracks.getEntries()
-
-
 }
 
 

@@ -10,7 +10,7 @@
 
 #include <ecl/modules/eclRecCR/ECLRecCRModule.h>
 #include <ecl/dataobjects/DigiECL.h>
-#include <ecl/dataobjects/RecCRECL.h>
+#include <ecl/dataobjects/MdstShower.h>
 #include <ecl/dataobjects/HitAssignmentECL.h>
 
 
@@ -57,8 +57,8 @@ ECLRecCRModule::ECLRecCRModule() : Module()
            "Input Array // Output from ECLRecCR module or Data", string("ECLDigiHits"));
 
   //output
-  addParam("ECLRecCROutput", m_eclRecCRName,
-           "//Output of this module//(EventNo,CRId,cellId)", string("ECLRecCRHits"));
+  addParam("ECLRecCROutput", m_eclMdstShowerName,
+           "//Output of this module//(EventNo,CRId,cellId)", string("mdstShower"));
 
 
   addParam("ECLHitAssignmentinput", m_eclHitAssignmentName,
@@ -99,7 +99,6 @@ void ECLRecCRModule::event()
     B2ERROR("Can not find ECLRecCRHits" << m_eclDigiCollectionName << ".");
   }
 
-
   int checkflag = 0;
   cout.unsetf(ios::scientific);
   cout.precision(6);
@@ -109,8 +108,8 @@ void ECLRecCRModule::event()
   TEclEnergyHit ss;
   for (int ii = 0; ii < hitNum; ii++) {
     DigiECL* aECLHit = eclDigiArray[ii];
-    float FitEnergy    = (aECLHit->getAmp()) / 20000;//ADC count to GeV
-//    double FitTime    = (1520 - aECLHit->getTimeFit()) * 24.*12 / 508 / (3072 / 2) ;//ADC count to us
+    float FitEnergy    = (aECLHit->getAmp()) / 20000.;//ADC count to GeV
+
     int cId          =  aECLHit->getCellId();
     if (FitEnergy < 0.) {continue;}
 
@@ -149,25 +148,35 @@ void ECLRecCRModule::event()
 //        cout<<iHA->Id()<<" ";
       }
 //        cout<<endl;
-      StoreArray<RecCRECL> eclRecCRArray(m_eclRecCRName);
-      m_hitNum = eclRecCRArray->GetLast() + 1;
-      new(eclRecCRArray->AddrAt(m_hitNum)) RecCRECL();
-      eclRecCRArray[m_hitNum]->setShowerId(nShower);
-      eclRecCRArray[m_hitNum]->setEnergy((*iShower).second.Energy());
-      eclRecCRArray[m_hitNum]->setTheta((*iShower).second.Theta());
-      eclRecCRArray[m_hitNum]->setPhi((*iShower).second.Phi());
-      eclRecCRArray[m_hitNum]->setDistance((*iShower).second.Distance());
-      eclRecCRArray[m_hitNum]->setMass((*iShower).second.Mass());
-      eclRecCRArray[m_hitNum]->setWidth((*iShower).second.Width());
-      eclRecCRArray[m_hitNum]->setE9oE25((*iShower).second.E9oE25());
-      eclRecCRArray[m_hitNum]->setTotEnergy((*iShower).second.TotEnergy());
-      eclRecCRArray[m_hitNum]->setE9oE25unf((*iShower).second.E9oE25unf());
-      eclRecCRArray[m_hitNum]->setUncEnergy((*iShower).second.UncEnergy());
-      eclRecCRArray[m_hitNum]->setNHits((*iShower).second.NHits());
-      eclRecCRArray[m_hitNum]->setWNHits((*iShower).second.WNHits());
-      eclRecCRArray[m_hitNum]->setNHitsUsed((*iShower).second.NHitsUsed());
-      eclRecCRArray[m_hitNum]->setStatus((*iShower).second.Status());
-      eclRecCRArray[m_hitNum]->setGrade((*iShower).second.Grade());
+      StoreArray<MdstShower> eclRecShowerArray(m_eclMdstShowerName);
+      m_hitNum = eclRecShowerArray->GetLast() + 1;
+      new(eclRecShowerArray->AddrAt(m_hitNum)) MdstShower();
+      eclRecShowerArray[m_hitNum]->setShowerId(nShower);
+      eclRecShowerArray[m_hitNum]->setEnergy((*iShower).second.Energy());
+      eclRecShowerArray[m_hitNum]->setTheta((*iShower).second.Theta());
+      eclRecShowerArray[m_hitNum]->setPhi((*iShower).second.Phi());
+      eclRecShowerArray[m_hitNum]->setR((*iShower).second.Distance());
+      eclRecShowerArray[m_hitNum]->setMass((*iShower).second.Mass());
+      eclRecShowerArray[m_hitNum]->setWidth((*iShower).second.Width());
+      eclRecShowerArray[m_hitNum]->setE9oE25((*iShower).second.E9oE25());
+      eclRecShowerArray[m_hitNum]->setE9oE25unf((*iShower).second.E9oE25unf());
+      eclRecShowerArray[m_hitNum]->setNHits((*iShower).second.NHits());
+      eclRecShowerArray[m_hitNum]->setStatus((*iShower).second.Status());
+      eclRecShowerArray[m_hitNum]->setGrade((*iShower).second.Grade());
+      eclRecShowerArray[m_hitNum]->setUncEnergy((*iShower).second.UncEnergy());
+      double sEnergy = (*iShower).second.Energy();
+      double sTheta = (*iShower).second.Theta();
+
+      double ErrorMatrix[6] = {
+        squ(errorE(sEnergy)),
+        errorE(sEnergy)* errorPhi(sEnergy, sTheta),
+        errorPhi(sEnergy, sTheta)* errorPhi(sEnergy, sTheta),
+        errorE(sEnergy)* errorTheta(sEnergy, sTheta),
+        errorPhi(sEnergy, sTheta)* errorTheta(sEnergy, sTheta),
+        errorTheta(sEnergy, sTheta)* errorTheta(sEnergy, sTheta)
+      };
+      eclRecShowerArray[m_hitNum]->setError(ErrorMatrix);
+
       nShower++;
       if (((*iShower).second.Energy() > 0.05 && (*iShower).second.Energy() < 0.2)) {
         checkflag = 1;
@@ -218,5 +227,63 @@ void ECLRecCRModule::terminate()
   m_timeCPU = clock() * Unit::us - m_timeCPU;
 
 }
+
+double ECLRecCRModule::errorE(double E)
+{
+  double sigmaE = 0.01 * E * sqrt(squ(0.066 / E) + squ(0.81) / sqrt(E) + squ(1.34)) ;
+//sigmaE / E = 0.066% / E +- 0.81% / (E)^(1/4)  +- 1.34%
+  return sigmaE;
+
+}
+double ECLRecCRModule::errorTheta(double Energy, double Theta)
+{
+
+  double sigmaX = 0.1 * (0.27 + 3.4 / sqrt(Energy) + 1.8 / sqrt(sqrt(Energy))) ;
+//sigmaX (mm)=  0.27 + 3.4/ (E)^(1/2) + 1.8 / (E)^(1/4) ;E (GeV)
+
+  double zForward  =  196.2;
+  double zBackward = -102.2;
+  double Rbarrel   =  125.0;
+
+  double theta_f = atan2(Rbarrel, zForward);
+  double theta_b = atan2(Rbarrel, zBackward);
+
+  if (Theta < theta_f) {
+    return sigmaX * squ(cos(Theta)) / zForward;
+  } else if (Theta > theta_b) {
+    return sigmaX * squ(cos(Theta)) / (-1 * zBackward);
+  } else {
+    return sigmaX * sin(Theta) / Rbarrel   ;
+  }
+
+
+}
+
+double ECLRecCRModule::errorPhi(double Energy, double Theta)
+{
+
+  double sigmaX = 0.1 * (0.27 + 3.4 / sqrt(Energy) + 1.8 / sqrt(sqrt(Energy))) ;
+//sigmaX (mm)=  0.27 + 3.4/ (E)^(1/2) + 1.8 / (E)^(1/4) ;E (GeV)
+
+  double zForward  =  196.2;
+  double zBackward = -102.2;
+  double Rbarrel   =  125.0;
+
+  double theta_f = atan2(Rbarrel, zForward);
+  double theta_b = atan2(Rbarrel, zBackward);
+
+  if (Theta < theta_f) {
+    return sigmaX / (zForward * tan(Theta))   ;
+  } else if (Theta > theta_b) {
+    return sigmaX / (zBackward * tan(Theta))   ;
+  } else {
+    return sigmaX / Rbarrel;
+  }
+
+
+
+}
+
+
 
 

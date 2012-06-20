@@ -14,5 +14,5 @@
 #pragma link C++ class Belle2::HitAssignmentECL;
 #pragma link C++ class Belle2::MdstGamma;
 #pragma link C++ class Belle2::MdstPi0;
-
+#pragma link C++ class Belle2::MdstShower;
 #endif

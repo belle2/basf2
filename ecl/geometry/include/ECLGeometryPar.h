@@ -24,17 +24,19 @@
 #include <G4String.hh>
 
 #include "TVector3.h"
+/** tyep define EclIdentifier */
 typedef int EclIdentifier ;
+/** tyep define EclGeV */
 typedef double     EclGeV        ;
-///
+/** tyep define EclGeV */
 typedef double   EclCM         ;
-///
+/** tyep define EclCC */
 typedef double     EclCC         ;
-///
+/** tyep define EclKG */
 typedef double     EclKG         ;
-///
+/** tyep define EclRad */
 typedef double     EclRad        ;
-///
+/** tyep define EclDeg */
 typedef double     EclDeg        ;
 
 
@@ -72,16 +74,19 @@ namespace Belle2 {
     //! Mapping theta, phi Id
     void Mapping(int cid);
 
+    /** The Postion of crystal*/
+    TVector3 GetCrystalPos(int cid);
+    /** The direction of crystal*/
+    TVector3 GetCrystalVec(int cid);
 
-    TVector3 GetCrystalPos(int cid);  /** The Postion of crystal*/
-
-    TVector3 GetCrystalVec(int cid);  /** The dection of crystal*/
-
-    int GetCellID(int ThetaId, int PhiId);//! Get Cell Id
-
-    int GetCellID() {return mPar_cellID;};//! Get Cell Id
-    int GetThetaID() {return mPar_thetaID;};//! Get Theta Id
-    int GetPhiID() {return mPar_phiID;};//! Get Phi Id
+    /** Get Cell Id */
+    int GetCellID(int ThetaId, int PhiId);
+    /** Get Cell Id */
+    int GetCellID() {return mPar_cellID;};
+    /** Get Theta Id */
+    int GetThetaID() {return mPar_thetaID;};
+    /** Get Phi Id */
+    int GetPhiID() {return mPar_phiID;};
 
 
   private:
@@ -113,16 +118,14 @@ namespace Belle2 {
     // friend classses and functions
 
   public:
-    // constants, enums and typedefs
-///
-
+    /** constants, enums and typedefs */
     typedef EclIdentifier Identifier ;
 
-    /// Constructors and destructor
+    /** Constructors and destructor */
     EclNbr();
-///
+    /** Constructor of EclNbr */
     EclNbr(const EclNbr& aNbr);
-///
+    /** Constructor of EclNbr */
     EclNbr(
       const std::vector< Identifier >&           aNbrs     ,
       const std::vector< Identifier >::size_type aNearSize
@@ -133,24 +136,26 @@ namespace Belle2 {
     // member functions
 
     // const member functions
-///
+    /** get crystals nbrs */
     const std::vector< Identifier >&                nbrs()      const ;
-///
+    /** get crystals nearBegin */
     const std::vector< Identifier >::const_iterator nearBegin() const ;
-///
+    /** get crystals nearEnd */
     const std::vector< Identifier >::const_iterator nearEnd()   const ;
-///
+    /** get crystals nextBegin */
     const std::vector< Identifier >::const_iterator nextBegin() const ;
-///
+    /** get crystals nextEnd */
     const std::vector< Identifier >::const_iterator nextEnd()   const ;
-///
+    /** get crystals nearSize */
     std::vector< Identifier >::size_type      nearSize()  const ;
-///
+    /**get crystals nextSize */
     std::vector< Identifier >::size_type      nextSize()  const ;
 
     /// assignment operator(s)
     const EclNbr& operator=(const EclNbr& aNbr);
+    /** get crystals nbr */
     EclNbr getNbr(const Identifier  aCellId);
+    /** print crystals nbrs */
     void printNbr();
     //! Mapping theta, phi Id
     void Mapping(int cid);
@@ -172,18 +177,18 @@ namespace Belle2 {
 
     // private const member functions
 
-    // data members
+    /** data members */
     int mNbr_cellID;           /** The Cell ID information*/
     int mNbr_thetaID;          /** The Theta ID information*/
     int mNbr_phiID;            /** The Phi ID information*/
-    std::vector< Identifier >&           m_nbrs     ;
-    std::vector< Identifier >::size_type m_nearSize ;
+    std::vector< Identifier >&           m_nbrs     ; /** id  of m_brs */
+    std::vector< Identifier >::size_type m_nearSize ;/**  size of near brs*/
 
     // static data members
 
   };
 
-
+  /**  define class TEclEnergyHit */
   class TEclEnergyHit {
     // friend classes and functions
 
@@ -195,13 +200,14 @@ namespace Belle2 {
 //      typedef int Identifier;
 
     /// Constructors and destructor
+    /** Constructor of TEclEnergyHit */
     TEclEnergyHit() : fId(0), fEnergy(0), fCellId(0) {
     }
-    ///
+    /** Constructor of TEclEnergyHit */
     TEclEnergyHit(const TEclEnergyHit& ahit)
       : fId(ahit.Id()), fEnergy(ahit.Energy()), fCellId(ahit.CellId()) {
     }
-    ///
+    /** Constructor of TEclEnergyHit */
     TEclEnergyHit(
       const Identifier hid, const EclGeV energy, const Identifier cid)
       : fId(hid), fEnergy(energy), fCellId(cid) {
@@ -220,30 +226,30 @@ namespace Belle2 {
     }
 
     // member functions
-    ///
+    /** get Id */
     const Identifier Id(void) const {
       return fId;
     }
-    ///
+    /** set Id */
     Identifier Id(Identifier id) {
       return fId = id;
     }
-    ///
+    /** get Cell Id */
     const Identifier CellId(void) const {
       return fCellId;
     }
-    ///
+    /** set Cell Id */
     Identifier CellId(int cId) {
       return fCellId = cId;
     }
 
 
 
-    ///
+    /** get Energy  */
     const EclGeV Energy(void) const {
       return fEnergy;
     }
-    ///
+    /** set Energy  */
     EclGeV Energy(EclGeV energy) {
       return fEnergy = energy;
     }
@@ -252,17 +258,17 @@ namespace Belle2 {
 
     // static member functions
 
-    /// comparison operators
+    /** comparison operators */
     bool operator<(const TEclEnergyHit& rhs) const {
       return
         fId < rhs.Id();
     }
-    ///
+    /** comparison operators */
     bool operator>(const TEclEnergyHit& rhs) const {
       return
         fId > rhs.Id();
     }
-    ///
+    /** comparison operators */
     bool operator==(const TEclEnergyHit& rhs) const {
       return
         (fId == rhs.Id())
@@ -270,7 +276,7 @@ namespace Belle2 {
         && (fCellId == rhs.CellId())
         ;
     }
-    ///
+    /** comparison operators */
     bool operator!=(const TEclEnergyHit& rhs) const {
       return
         (fId != rhs.Id())
@@ -279,36 +285,36 @@ namespace Belle2 {
         ;
     }
 
-    ///
+    /** struct less_Energy */
     struct less_Energy {
-      ///
+      /** operator */
       bool operator()(const TEclEnergyHit& lhs, const TEclEnergyHit& rhs)
       const {
         return
           lhs.Energy() < rhs.Energy();
       }
     };
-    ///
+    /** struct less_CellId */
     struct less_CellId {
-      ///
+      /** operator */
       bool operator()(const TEclEnergyHit& lhs, const TEclEnergyHit& rhs)
       const {
         return
           lhs.CellId() < rhs.CellId();
       }
     };
-    ///
+    /** struct greater_Energy  */
     struct greater_Energy {
-      ///
+      /** operator */
       bool operator()(const TEclEnergyHit& lhs, const TEclEnergyHit& rhs)
       const {
         return
           lhs.Energy() > rhs.Energy();
       }
     };
-    ///
+    /** struct greater_CellId */
     struct greater_CellId {
-      ///
+      /** operator */
       bool operator()(const TEclEnergyHit& lhs, const TEclEnergyHit& rhs)
       const {
         return
@@ -331,17 +337,19 @@ namespace Belle2 {
     // private const member functions
     // private const member functions
 
-    // data members
-    Identifier fId;
-    EclGeV fEnergy;
-    int fCellId;
+    /** data members */
+    Identifier fId; /**  Id  */
+    EclGeV fEnergy; /**  Energy  */
+    int fCellId;    /**  Cell Id  */
     // static data members
 
   };
 
+  /**  function of G4  VolumeName to Crystal CellID */
   int ECLG4VolNameToCellID(const G4String VolumeName);//Mapping from VolumeName to Crystal CellID
 
-///
+
+  /**  define EclEnergyHitMap */
   typedef std::map < TEclEnergyHit::Identifier, TEclEnergyHit,
           std::less<TEclEnergyHit::Identifier> > EclEnergyHitMap;
 

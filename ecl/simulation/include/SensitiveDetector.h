@@ -66,22 +66,22 @@ namespace Belle2 {
     private:
 
 //      vector<int> myvector;
-      G4double m_thresholdEnergyDeposit;/**Energy Deposit  threshold  */
-      G4double m_thresholdKineticEnergy;/**Kinetic Energy  threshold  */
-      int m_hitNumber; /**< The current number of created hits in an event. Used to fill the DataStore ECL array.*/
-      int m_EBhitNumber; /**< The current number of created hits in an event. Used to fill the DataStore ECL EB array.*/
-
-      int m_trackID;          /** track id */
-      G4ThreeVector m_startPos; /**  Position of prestep */
-      G4ThreeVector m_endPos;   /**  Position of poststep*/
-      TVector3 m_WightedPos;    /**  Wighted step Position*/
-      G4ThreeVector m_momentum; /**  momentum of track */
-      double m_startTime;     /** global time */
-      double m_endTime;     /** global time */
-      double m_WightedTime;     /** global time */
-      double m_startEnergy;   /** particle energy at the entrance in volume */
-      double m_energyDeposit; /** energy deposited in volume */
-      double m_trackLength;   /** length of the track in the volume */
+      /** members of  SensitiveDetector  */
+      G4double m_thresholdEnergyDeposit;/** Energy Deposit  threshold  */
+      G4double m_thresholdKineticEnergy;/** Kinetic Energy  threshold  */
+      int m_hitNumber;                  /** The current number of created hits in an event. Used to fill the DataStore ECL array.*/
+      int m_EBhitNumber;                /**  The current number of created hits in an event. Used to fill the DataStore ECL EB array.*/
+      int m_trackID;                    /** track id */
+      G4ThreeVector m_startPos;         /**  Position of prestep */
+      G4ThreeVector m_endPos;     /**  Position of poststep*/
+      TVector3 m_WightedPos;      /**  Wighted step Position*/
+      G4ThreeVector m_momentum;   /**  momentum of track */
+      double m_startTime;         /** global time */
+      double m_endTime;         /** global time */
+      double m_WightedTime;         /** global time */
+      double m_startEnergy;       /** particle energy at the entrance in volume */
+      double m_energyDeposit;     /** energy deposited in volume */
+      double m_trackLength;       /** length of the track in the volume */
 
 
     };

@@ -61,10 +61,6 @@ namespace Belle2 {
 
   protected:
 
-
-    void printModuleParams() const;
-    /** Method to print SimHit information. */
-
     std::string m_inColName;                /**< Input array name. */
     std::string m_eclHitOutColName;         /**< Output array name. */
     std::string m_relColNameSimHitToHit;    /**< Relation collection name - ecl signal (Digit)  <-> MCParticle */

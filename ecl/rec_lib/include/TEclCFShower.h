@@ -39,10 +39,10 @@ namespace Belle2 {
     MEclCFShowerHA() {}
     ///
     virtual ~MEclCFShowerHA() {}
-    //** construct MEclCFShowerHA with MEclCFShowerHA& a
+    /** construct MEclCFShowerHA with MEclCFShowerHA& a */
     MEclCFShowerHA(const MEclCFShowerHA& a)
       : fId(a.fId), fFraction(a.fFraction) {}
-    //** define operator= for  MEclCFShowerHA
+    /** define operator= for  MEclCFShowerHA */
     const MEclCFShowerHA& operator=(const MEclCFShowerHA& rhs) {
       if (this != &rhs) {
         fId = rhs.fId;
@@ -50,20 +50,22 @@ namespace Belle2 {
       }
       return *this;
     }
-    //** construct MEclCFShowerHA with  fId(id), fFraction(w)
+    /** construct MEclCFShowerHA with  fId(id), fFraction(w) */
     MEclCFShowerHA(int id, double w): fId(id), fFraction(w) {}
-    //** Get fId
+    /** Get fId */
     const Identifier Id(void) const {
       return fId;
     }
-    //** Get fFraction
+    /** Get fFraction */
     const double Fraction(void) const {
       return fFraction;
     }
   private:
     // not HitId but cellId!
-    Identifier fId;/*!fid     */
-    double fFraction;/*!fFraction     */
+    /** fid     */
+    Identifier fId;
+    /** fFraction     */
+    double fFraction;
   };
 
 
@@ -79,8 +81,8 @@ namespace Belle2 {
 
   public:
     // constants, enums and typedefs
-    ///
-    typedef EclIdentifier Identifier;/*! define EclIdentifier is Identifier(int) */
+    /** define EclIdentifier is Identifier(int) */
+    typedef EclIdentifier Identifier;
     /// backward compat.
     // no GARBAGE anymore
     // in fact, the proper meanings are
@@ -95,7 +97,7 @@ namespace Belle2 {
 
 
     // Constructors and destructor
-    ////** construct TEclCFShower with  fId(id)/
+    /** construct TEclCFShower with  fId(id) */
     TEclCFShower(int id = 0) : fId(id) {
       fEnergy = 0.0;  //gcc does not initialize...
       fE3x3 = 0.0;
@@ -112,7 +114,7 @@ namespace Belle2 {
     virtual ~TEclCFShower() {
     }
 
-    //** construct TEclCFShower with aShower/
+    /** construct TEclCFShower with aShower */
     TEclCFShower(const TEclCFShower& aShower)
       : fId(aShower.fId)
       , fEnergy(aShower.fEnergy)
@@ -190,7 +192,7 @@ namespace Belle2 {
 
 //      void UncAttributes(void);
 
-    /// currently only getters are implemented...
+    /** currently only getters are implemented... */
     const Identifier Id(void) const {
       return
         fId;
@@ -310,7 +312,7 @@ namespace Belle2 {
 
     // private const member functions
 
-    // data members
+    /** data members */
     Identifier fId;
     /// corrected energy of shower
     EclGeV fEnergy;
@@ -334,36 +336,36 @@ namespace Belle2 {
 //      double fE9oE25;
 //      double fE9oE25unf;  // unfolded
 
-    /// not true for the endcaps
+    /** not true for the endcaps */
     EclGeV fE3x3;
-    /// not true for the endcaps
+    /** not true for the endcaps */
     EclGeV fE5x5;
-    /// not true for the endcaps
+    /** not true for the endcaps */
     EclGeV fE3x3unf;
-    /// not true for the endcaps
+    /** not true for the endcaps */
     EclGeV fE5x5unf;
 //      int    fNHits;      // #crystals in shower
 //    double fWNHits;  // weighted
-    /// for highest N method, not impl. yet
+    /** for highest N method, not impl. yet */
     double fNHitsUsed;
 
-    /// shower status flag;  0 == O.K.
+    /** shower status flag;  0 == O.K. */
     int    fStatus;
 
 //      EclGeV fUncEnergy;  // E before final correc
     // if we move to highestN, it will be different
 //      EclGeV fTotEnergy;  // E, no corr, incl All xtals(for highestN?)
 
-    /// for backward compatibility
+    /** for backward compatibility */
     EGrade fGrade;
 
-    //member MEclCFShowerHA
+    /** member MEclCFShowerHA */
     std::vector<MEclCFShowerHA> fHA;
 
     // static data members
 
   };
-
+  /** define EclCFShowerMap */
   typedef std::map<EclIdentifier, TEclCFShower, std::less <EclIdentifier> > EclCFShowerMap;
 } // end of namespace Belle2
 

@@ -28,48 +28,48 @@ namespace Belle2 {
   class TEclCFCR {
   public:
     // constants, enums and typedefs
-    ///
+    /** typedef Identifier */
     typedef EclIdentifier Identifier;
-    ///
+    /** typedef MMap */
     typedef std::multimap <Identifier, Identifier, std::less <Identifier> > MMap;
 
-    /// Constructors and destructor
+    /** Constructors and destructor */
     TEclCFCR(int id = 0);
-    ///
+    /** Constructors */
     TEclCFCR(const TEclCFCR& rhs);
     virtual ~TEclCFCR();
 
     /// assignment operator(s)
     const TEclCFCR& operator=(const TEclCFCR&);
 
-    /// comparison operators
+    /** comparison operators */
     bool operator==(const TEclCFCR&) const;
-    ///
+    /** comparison operators */
     bool operator!=(const TEclCFCR&) const;
-    ///
+    /** comparison operators */
     bool operator<(const TEclCFCR&) const;
 
     // member functions
-    ///
+    /** get Id */
     const Identifier Id() const {
       return fId;
     }
-    ///
+    /** get mass */
     const EclGeV Mass() const {
       return fMass;
     }
 
-    ///
+    /** get Energy */
     const EclGeV Energy() const {
       return
         fEnergy;
     }
-    ///
+    /** get Width */
     const double Width() const {
       return
         fWidth;
     }
-    ///
+    /** do  Accumulate */
     void Accumulate(TEclEnergyHit& ahit) {
       fEnergyHits[ahit.CellId()] = ahit;
     }
@@ -95,20 +95,20 @@ namespace Belle2 {
      * ... think about staggered case, it'll bias position.
      */
     void UncAttributes(void);
-    ///
+    /** do Attributes */
     void Attributes(void);
 
-    ///
+    /** get Showers */
     const EclCFShowerMap& Showers(void) const {
       return
         fShowers;
     }
-    ///
+    /** get EnergyHits */
     const EclEnergyHitMap& EnergyHits(void) const {
       return
         fEnergyHits;
     }
-    ///
+    /** get Seeds */
     const EclEnergyHitMap& Seeds(void) const {
       return
         fSeeds;
@@ -129,27 +129,27 @@ namespace Belle2 {
     // private const member functions
 
     // data members
-    /// CR id
+    /** CR id */
     Identifier fId;
-    ///
+    /** CR mass */
     EclGeV fMass;
-    ///
+    /** CR Energy */
     EclGeV fEnergy;
-    ///
+    /** CR Width */
     double fWidth;
-    /// accessed by cellId of Seed
+    /** accessed by cellId of Seed */
     EclCFShowerMap fShowers;
 
-    /// partitions, accessed by CellId
+    /** partitions, accessed by CellId */
     EclEnergyHitMap fEnergyHits;
-    /// accessed by CellId
+    /** accessed by CellId */
     EclEnergyHitMap fSeeds;
 
     /// not determined how to fuse
     EclEnergyHitMap fFreeHits;
     /// cell -> seed
     MMap fNext;
-    ///
+    /// cell -> seed
     MMap fNear;
     // static data members
 

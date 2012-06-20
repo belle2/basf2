@@ -46,17 +46,20 @@ namespace Belle2 {
       virtual void create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes type);
 //      virtual void create(const GearDir& content, G4LogicalVolume& topVolume);
 
-      void makeEndcap(const bool aForward);/* make geometry of endcap container */
-      void makeSupport();/* make geometry ot support structure */
+      /** make geometry of endcap container */
+      void makeEndcap(const bool aForward);
+      /** make geometry ot support structure */
+      void makeSupport();
     protected:
+      /** isBeamBkgStudy for neutron flux  */
       int isBeamBkgStudy;
 
     private:
-
+      /** data members */
       G4LogicalVolume* logical_ecl;/**< the ecl Logical Volume */
       G4VPhysicalVolume* physical_ecl;/**< the ecl Physical Volume*/
-      G4VPhysicalVolume* physical_ECLBarrelCylinder;
-      //! Sensitive detector
+      G4VPhysicalVolume* physical_ECLBarrelCylinder; /**< the ecl BarrelCylinder Physical Volume*/
+      /** Sensitive detector */
       SensitiveDetector* m_sensitive;
 
     };

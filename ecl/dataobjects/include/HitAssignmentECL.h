@@ -56,7 +56,7 @@ namespace Belle2 {
       m_cellId = cellId;
     }
 
-    ClassDef(HitAssignmentECL, 1);
+    ClassDef(HitAssignmentECL, 1);/**< the class title */
 
   };
 

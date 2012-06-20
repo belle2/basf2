@@ -57,10 +57,10 @@ namespace Belle2 {
     /** Shaper-DSP Output  Map */
     double ShaperDSP(double Ti);
 
-    /* Shaper-DSP Output  basic */
+    /** Shaper-DSP Output  basic */
     double  Sv123(double t, double t01, double tb1, double t02, double tb2, double td1, double ts1);
 
-    /* Shaper-DSP Fitter */
+    /** Shaper-DSP Fitter */
     void shapeFitter(short int* id, int* f, int* f1, int* fg41, int* fg43, int* fg31,
                      int* fg32, int* fg33, int* y, int* ttrig, int* n16, int* ch, int* lar, int* ltr, int* lq);
 
@@ -90,11 +90,11 @@ namespace Belle2 {
 //    unsigned int m_randSeed;    /**< User-supplied random seed, default is 0. for ctime  */
     TRandom3* m_random;     /**< Random number generator.*/
 
-    double m_timeCPU;                /*!< CPU time     */
-    int    m_nRun;                   /*!< Run number   */
-    int    m_nEvent;                 /*!< Event number */
-    int    m_hitNum;                 /*! index of eclDsp*/
-    int    m_hitNum1;        /*! index of Digitized result*/
+    double m_timeCPU;                /*! CPU time     */
+    int    m_nRun;                   /*! Run number   */
+    int    m_nEvent;                 /*! Event number */
+    int    m_hitNum;                 /*! index of eclDsp */
+    int    m_hitNum1;                /*! index of Digitized result*/
     int    m_hitNum2;                /*! index of trig*/
 
 

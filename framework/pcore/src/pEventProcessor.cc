@@ -9,6 +9,7 @@
 #include <signal.h>
 
 #include <framework/pcore/pEventProcessor.h>
+#include <framework/core/ModuleManager.h>
 
 using namespace std;
 using namespace Belle2;
@@ -21,7 +22,7 @@ pEventProcessor::pEventProcessor(PathManager& pathManager) : EventProcessor(path
 
 pEventProcessor::~pEventProcessor()
 {
-
+  delete procHandler;
 }
 
 

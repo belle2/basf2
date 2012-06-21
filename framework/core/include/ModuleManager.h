@@ -18,7 +18,6 @@
 
 #include <string>
 #include <map>
-#include <set>
 #include <list>
 
 
@@ -118,7 +117,7 @@ namespace Belle2 {
      * @param sharedLibPath Optional: The shared library from which the module should be registered (not a map file !).
      * @return A shared pointer to the created module instance.
      */
-    boost::shared_ptr<Module> registerModule(const std::string& moduleName, const std::string sharedLibPath = "") throw(ModuleNotCreatedError);
+    boost::shared_ptr<Module> registerModule(const std::string& moduleName, const std::string& sharedLibPath = "") throw(ModuleNotCreatedError);
 
     /**
      * Returns a reference to the list of created modules.

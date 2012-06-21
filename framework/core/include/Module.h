@@ -19,13 +19,10 @@
 #include <framework/core/CondParser.h>
 #include <framework/core/ModuleParamList.h>
 #include <framework/logging/LogConfig.h>
-#include <framework/core/ModuleManager.h>
 
-#include <vector>
 #include <list>
 #include <string>
 #include <set>
-#include <map>
 
 namespace Belle2 {
 
@@ -50,7 +47,7 @@ namespace Belle2 {
       c_ParallelProcessingCertified = 4,  /**< This module can be run in parallel processing mode safely (has to comply with certain standards). */
       c_RequiresGUISupport          = 8,   /**< This module requires the framework to have GUI support built-in. */
       c_HistogramManager            = 16,  /**< This module is used to manage histograms accumulated by other modules */
-      c_InitializeInProcess         = 32,  /**< initialize() function is called in forked process */
+      c_InitializeInProcess         = 32  /**< initialize() function is called in forked process */
     };
 
     /**
@@ -542,7 +539,7 @@ namespace Belle2 {
    * This definition has to be added to each module definition. A macro is available
    */
   template <class T>
-  class ModuleProxy : ModuleProxyBase {
+  class ModuleProxy : public ModuleProxyBase {
 
   public:
 

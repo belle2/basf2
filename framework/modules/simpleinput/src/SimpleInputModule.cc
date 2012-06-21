@@ -71,7 +71,7 @@ void SimpleInputModule::initialize()
 {
   //Open TFile
   m_file = new TFile(m_inputFileName.c_str(), "READ");
-  if (!m_file) {
+  if (!m_file or !m_file->IsOpen()) {
     B2FATAL("Couldn't open input file " + m_inputFileName);
     return;
   }

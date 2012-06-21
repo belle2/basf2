@@ -78,9 +78,6 @@ static void signalHandler(int)
 
 void EventProcessor::processInitialize(const ModulePtrList& modulePathList)
 {
-  if (signal(SIGINT, signalHandler) == SIG_ERR) {
-    B2FATAL("Cannot setup signal handler\n");
-  }
 #ifdef HAS_CALLGRIND
   CALLGRIND_ZERO_STATS;
 #endif
@@ -119,6 +116,9 @@ void EventProcessor::processInitialize(const ModulePtrList& modulePathList)
 
 void EventProcessor::processCore(PathPtr startPath, const ModulePtrList& modulePathList, long maxEvent)
 {
+  if (signal(SIGINT, signalHandler) == SIG_ERR) {
+    B2FATAL("Cannot setup signal handler\n");
+  }
 #ifdef HAS_CALLGRIND
   CALLGRIND_ZERO_STATS;
 #endif

@@ -26,106 +26,107 @@
 
 
 namespace Belle2 {
+  namespace ECL {
 
-  class TRecEclCF {
-    // friend classes and functions
+    class TRecEclCF {
+      // friend classes and functions
 
-  public:
-    // constants, enums and typedefs
-    /** typedef Identifier */
-    typedef EclIdentifier Identifier;
+    public:
+      // constants, enums and typedefs
+      /** typedef Identifier */
+      typedef EclIdentifier Identifier;
 
-    // Constructors and destructor
-    virtual ~TRecEclCF();
+      // Constructors and destructor
+      virtual ~TRecEclCF();
 
-    // member functions
-    /** Clear */
-    void Clear(void);
-    /** with zero suppression */
-    void Accumulate(const int hid, const float energy, const int cid);
-    /** with zero suppression */
-    void Accumulate(const TEclEnergyHit& ahit) ;
-    // helper
-    /// cellId -> HitId, for panther mainly
-    Identifier HitId(Identifier cId) const;
-    /** SearchCRs */
-    int SearchCRs(void);
+      // member functions
+      /** Clear */
+      void Clear(void);
+      /** with zero suppression */
+      void Accumulate(const int hid, const float energy, const int cid);
+      /** with zero suppression */
+      void Accumulate(const TEclEnergyHit& ahit) ;
+      // helper
+      /// cellId -> HitId, for panther mainly
+      Identifier HitId(Identifier cId) const;
+      /** SearchCRs */
+      int SearchCRs(void);
 
-    /** do Attributes */
-    void Attributes(void);
-    ///
+      /** do Attributes */
+      void Attributes(void);
+      ///
 //      void EACorr(TEclCFShower& s);
 
-    /* for new correction on 2k.sep.22nd */
-    /* comment for Basf2 unused warning
-        void NewEACorr(TEclCFShower& s);
-    */
-    /* end of for new correction */
+      /* for new correction on 2k.sep.22nd */
+      /* comment for Basf2 unused warning
+          void NewEACorr(TEclCFShower& s);
+      */
+      /* end of for new correction */
 
-    // const member functions
+      // const member functions
 //      const vector<TEclEnergyHit>& EnergyHits(void) const;
-    /** get EnergyHits */
-    const EclEnergyHitMap& EnergyHits(void) const;
-    /** get CRs */
-    const std::vector<TEclCFCR>& CRs(void) const;
+      /** get EnergyHits */
+      const EclEnergyHitMap& EnergyHits(void) const;
+      /** get CRs */
+      const std::vector<TEclCFCR>& CRs(void) const;
 
 
-    // static member functions
-    /**  TRecEclCF& Instance */
-    static TRecEclCF& Instance(void);
-    /** Check Instance */
-    static bool IsInstance(void);
-    /** Kill */
-    static void Kill(void);
+      // static member functions
+      /**  TRecEclCF& Instance */
+      static TRecEclCF& Instance(void);
+      /** Check Instance */
+      static bool IsInstance(void);
+      /** Kill */
+      static void Kill(void);
 
 
-  public:
-    /// backdoor, compromise with basf define_param
-    TRecEclCFParameters fParameters;
-  protected:
-    /// protected member functions
-    TRecEclCF();
+    public:
+      /// backdoor, compromise with basf define_param
+      TRecEclCFParameters fParameters;
+    protected:
+      /// protected member functions
+      TRecEclCF();
 
-    // protected const member functions
+      // protected const member functions
 
-  private:
-    /** Constructors and destructor
-       TRecEclCF(); */
-    TRecEclCF(const TRecEclCF&);
+    private:
+      /** Constructors and destructor
+         TRecEclCF(); */
+      TRecEclCF(const TRecEclCF&);
 
-    /** assignment operator(s) */
-    const TRecEclCF& operator=(const TRecEclCF&);
+      /** assignment operator(s) */
+      const TRecEclCF& operator=(const TRecEclCF&);
 
-    /** comparison operators */
-    bool operator==(const TRecEclCF&) const;
-    /** comparison operators */
-    bool operator!=(const TRecEclCF&) const;
+      /** comparison operators */
+      bool operator==(const TRecEclCF&) const;
+      /** comparison operators */
+      bool operator!=(const TRecEclCF&) const;
 
-    // private member functions
+      // private member functions
 
-    // private const member functions
+      // private const member functions
 
-    // data members
+      // data members
 //      vector <TEclEnergyHit> fEnergyHits;
-    /** fEnergyHits  */
-    EclEnergyHitMap fEnergyHits;  // can be acessed by CellId
-    /** CRs  */
-    std::vector <TEclCFCR> fCRs;
+      /** fEnergyHits  */
+      EclEnergyHitMap fEnergyHits;  // can be acessed by CellId
+      /** CRs  */
+      std::vector <TEclCFCR> fCRs;
 
-    /** static data members */
-    static TRecEclCF* fgInstance;
+      /** static data members */
+      static TRecEclCF* fgInstance;
 
-  private:
-    /* for new correction
-       will not be used any longer
-       actually moved to TComEclGQ class
-    */
-  };
+    private:
+      /* for new correction
+         will not be used any longer
+         actually moved to TComEclGQ class
+      */
+    };
 
 // inline function definitions
 
 
-
+  }//ECL
 } // end of namespace Belle2
 
 #endif

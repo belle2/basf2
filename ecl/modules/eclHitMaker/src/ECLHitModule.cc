@@ -39,6 +39,7 @@
 using namespace std;
 using namespace boost;
 using namespace Belle2;
+using namespace ECL;
 
 //-----------------------------------------------------------------
 //                 Register the Module
@@ -61,11 +62,6 @@ ECLHitModule::ECLHitModule() : Module()
   // I/O
   addParam("ECLHitInputColName", m_inColName, "Input Array // Output from g4sim module", string("ECLSimHits"));
   addParam("ECLHitOutColName", m_eclHitOutColName, "Output of this module//(EventNo,CellId,EnergyDep,TimeAve )", string("ECLHits"));
-  //Relations
-  addParam("MCPartToECLSimHitCollectionName", m_relColNameMCToSim,
-           "Name of relation collection - MCParticle to SimECLHit (if nonzero, created)", string("MCPartToECLSimHits"));
-  addParam("SimHitToECLHitCollectionName", m_relColNameSimHitToHit,
-           "Name of relation collection - Hit ECL to MCParticle (if nonzero, created)", string("SimHitToECLHits"));
 }
 
 ECLHitModule::~ECLHitModule()
@@ -123,17 +119,6 @@ void ECLHitModule::event()
     TVector3 VecCell =  eclp->GetCrystalVec(hitCellId);
     double local_pos = (15. - (HitInPos  - PosCell) * VecCell);
 
-    cout << setiosflags(ios::fixed);
-
-    /*
-    if(local_pos>27){
-
-        cout<<hitCellId<<setprecision(6)<<" "<<local_pos<<" "<<hitTOF<<" "<<hitE <<endl;
-        cout<<HitInPos.x()<<" "<<PosCell.x()<<" "<<VecCell.x()<<endl;
-        cout<<HitInPos.y()<<" "<<PosCell.y()<<" "<<VecCell.y()<<endl;
-        cout<<HitInPos.z()<<" "<<PosCell.z()<<" "<<VecCell.z()<<endl<<endl;
-    }
-    */
     for (int iECLCell = 0; iECLCell < 8736; iECLCell++) {
 
       if (hitCellId == iECLCell && hitTOF < 8000) {

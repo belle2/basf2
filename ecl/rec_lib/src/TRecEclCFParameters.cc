@@ -41,6 +41,7 @@
 using namespace std;
 using namespace boost;
 using namespace Belle2;
+using namespace ECL;
 
 /* for new correction */
 const float TRecEclCFParameters::fgEthX3[69] = {

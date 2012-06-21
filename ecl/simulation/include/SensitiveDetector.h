@@ -11,6 +11,7 @@
 #ifndef ECLSENSITIVEDETECTOR_H_
 #define ECLSENSITIVEDETECTOR_H_
 
+#include <ecl/geometry/ECLGeometryPar.h>
 #include <simulation/kernel/SensitiveDetectorBase.h>
 #include <algorithm>
 #include <iostream>
@@ -20,7 +21,7 @@
 using namespace std;
 
 namespace Belle2 {
-  namespace ecl {
+  namespace ECL {
     //! The Class for ECL Sensitive Detector
     class SensitiveDetector: public Simulation::SensitiveDetectorBase {
 
@@ -71,6 +72,7 @@ namespace Belle2 {
       G4double m_thresholdKineticEnergy;/** Kinetic Energy  threshold  */
       int m_hitNumber;                  /** The current number of created hits in an event. Used to fill the DataStore ECL array.*/
       int m_EBhitNumber;                /**  The current number of created hits in an event. Used to fill the DataStore ECL EB array.*/
+      ECLGeometryPar eclp;              /**ECLGeometryPar  convert the G4Volume name to cellID */
       int m_trackID;                    /** track id */
       G4ThreeVector m_startPos;         /**  Position of prestep */
       G4ThreeVector m_endPos;     /**  Position of poststep*/

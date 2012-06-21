@@ -18,115 +18,145 @@
 
 
 namespace Belle2 {
+  namespace ECL {
 
-  /** Module for making ECLRecoHits of CDCHits.
-   *
-   */
-  class ECLRecPi0Module : public Module {
-
-  public:
-
-    /** Constructor.
-     */
-    ECLRecPi0Module();
-
-    /** Destructor.
-     */
-    ~ECLRecPi0Module();
-
-
-    /** Initialize variables, print info, and start CPU clock. */
-    virtual void initialize();
-
-    /** Nothing so far.*/
-    virtual void beginRun();
-
-    /** Actual digitization of all hits in the ECL.
+    /** Module for making ECLRecoHits of CDCHits.
      *
-     *  The digitized hits are written into the DataStore.
      */
-    virtual void event();
+    class ECLRecPi0Module : public Module {
 
-    /** Nothing so far. */
-    virtual void endRun();
+    public:
 
-    /** Stopping of CPU clock.*/
-    virtual void terminate();
+      /** Constructor.
+       */
+      ECLRecPi0Module();
 
-    /*! mass constraint fit of  pi0      */
-    void fit(CLHEP::HepLorentzVector m_shower1, CLHEP::HepLorentzVector m_shower2);/*! mass constraint fit of  pi0      */
-    double errorE(CLHEP::HepLorentzVector m_shower);/*! calculate error of Energy      */
-    double errorTheta(CLHEP::HepLorentzVector m_shower);/*! calculate error of Theta      */
-    double errorPhi(CLHEP::HepLorentzVector m_shower);/*! calculate error of phi     */
-    double cellR(CLHEP::HepLorentzVector m_shower);/*! calculate error of R of cell       */
+      /** Destructor.
+       */
+      ~ECLRecPi0Module();
 
 
+      /** Initialize variables, print info, and start CPU clock. */
+      virtual void initialize();
 
-    double squ(double x) { return x * x; } /*! operator of square      */
-    double Get_E() { return m_pi0E; }      /*! get Energy of Pi0      */
-    double Get_px() { return m_pi0px; }    /*! get px of Pi0      */
-    double Get_py() { return m_pi0py; }    /*! get py of Pi0      */
-    double Get_pz() { return m_pi0pz; }    /*! get pz of Pi0      */
-    double Get_mass() { return m_pi0mass; }/*! get combined mass of Pi0      */
-    double Get_chi2() { return m_pi0chi2; }/*! get chi2 of  Pi0      */
+      /** Nothing so far.*/
+      virtual void beginRun();
 
-    /** Require: E_gamma > gamma_energy_threshold;*/
-    float gamma_energy_threshold;
+      /** Actual digitization of all hits in the ECL.
+       *
+       *  The digitized hits are written into the DataStore.
+       */
+      virtual void event();
 
-    /** Require: theta_open > theta_min - opening_angle_cut_margi.n */
-    float opening_angle_cut_margin;
+      /** Nothing so far. */
+      virtual void endRun();
 
-    /** pi0 mass region (without fitting). */
-    float pi0_mass_min;
+      /** Stopping of CPU clock.*/
+      virtual void terminate();
 
-    /** pi0 mass region (without fitting). */
-    float pi0_mass_max;
-
-    /** apply mass constraint fit */
-    int fit_flag;
-
-    /** chi2 threshold of fitting result */
-    float chi2_max;
-
-    /** define enum region_type */
-    enum region_type {REGION_SIGMA, REGION_GEV};
-
+      /** mass constraint fit of  pi0      */
+      void fit(CLHEP::HepLorentzVector m_shower1, CLHEP::HepLorentzVector m_shower2);
+      /** calculate error of Energy      */
+      double errorE(CLHEP::HepLorentzVector m_shower);
+      /** calculate error of Theta      */
+      double errorTheta(CLHEP::HepLorentzVector m_shower);
+      /** calculate error of phi     */
+      double errorPhi(CLHEP::HepLorentzVector m_shower);
+      /** calculate error of R of cell       */
+      double cellR(CLHEP::HepLorentzVector m_shower);
 
 
+      /** operator of square      */
+      double squ(double x) { return x * x; }
+      /** get Energy of Pi0      */
+      double Get_E() { return m_pi0E; }
+      /** get px of Pi0      */
+      double Get_px() { return m_pi0px; }
+      /** get py of Pi0      */
+      double Get_py() { return m_pi0py; }
+      /** get pz of Pi0      */
+      double Get_pz() { return m_pi0pz; }
+      /** get combined mass of Pi0      */
+      double Get_mass() { return m_pi0mass; }
+      /** get chi2 of  Pi0      */
+      double Get_chi2() { return m_pi0chi2; }
 
-  protected:
+      /** Require: E_gamma > gamma_energy_threshold;*/
+      float gamma_energy_threshold;
+
+      /** Require: theta_open > theta_min - opening_angle_cut_margi.n */
+      float opening_angle_cut_margin;
+
+      /** pi0 mass region (without fitting). */
+      float pi0_mass_min;
+
+      /** pi0 mass region (without fitting). */
+      float pi0_mass_max;
+
+      /** apply mass constraint fit */
+      int fit_flag;
+
+      /** chi2 threshold of fitting result */
+      float chi2_max;
+
+      /** define enum region_type */
+      enum region_type {REGION_SIGMA, REGION_GEV};
 
 
 
-  private:
 
-    /**  private members of  MdstGamma.*/
-    std::string m_MdstGammaName ;     /**  Name of collection of MdstGamma.*/
-    std::string m_MdstPi0Name ;     /**  Name of collection of MdstPi0.*/
-    double m_timeCPU;                /*!< CPU time     */
-    int    m_nRun;                   /*!< Run number   */
-    int    m_nEvent;                 /*!< Event number */
-    int    m_GNum;                   /*!< Mdst Gamma index */
-    int    m_Pi0Num;                   /*!< Mdst Gamma index */
-    int    m_showerId1 ;               /*!gamma1 information    */
-    int    m_showerId2 ;               /*!gamma2 information    */
-    double m_px1;                     /*!gamma1 information    */
-    double m_py1;                     /*!gamma1 information    */
-    double m_pz1;                     /*!gamma1 information    */
-
-    double m_px2;                     /*!gamma2 information    */
-    double m_py2;                     /*!gamma2 information    */
-    double m_pz2;                     /*!gamma2 information    */
+    protected:
 
 
-    double m_pi0E;                      /*!pi0 information    */
-    double m_pi0px;                     /*!pi0 information    */
-    double m_pi0py;                     /*!pi0 information    */
-    double m_pi0pz;                     /*!pi0 information    */
-    double m_pi0mass;                   /*!pi0 information    */
-    double m_pi0chi2;                 /*!pi0 information    */
 
-  };
-}
+    private:
+
+      /**  Name of collection of MdstGamma.*/
+      std::string m_MdstGammaName ;
+      /**  Name of collection of MdstPi0.*/
+      std::string m_MdstPi0Name ;
+      /**< CPU time     */
+      double m_timeCPU;
+      /**< Run number   */
+      int    m_nRun;
+      /**< Event number */
+      int    m_nEvent;
+      /**< Mdst Gamma index */
+      int    m_GNum;
+      /**< Mdst Gamma index */
+      int    m_Pi0Num;
+      /**gamma1 information    */
+      int    m_showerId1 ;
+      /**gamma2 information    */
+      int    m_showerId2 ;
+      /**gamma1 information    */
+      double m_px1;
+      /**gamma1 information    */
+      double m_py1;
+      /**gamma1 information    */
+      double m_pz1;
+      /**gamma2 information    */
+      double m_px2;
+      /**gamma2 information    */
+      double m_py2;
+      /**gamma2 information    */
+      double m_pz2;
+
+      /**pi0 information    */
+      double m_pi0E;
+      /**pi0 information    */
+      double m_pi0px;
+      /**pi0 information    */
+      double m_pi0py;
+      /**pi0 information    */
+      double m_pi0pz;
+      /**pi0 information    */
+      double m_pi0mass;
+      /**pi0 information    */
+      double m_pi0chi2;
+
+    };
+  }//ECL
+}//Belle2
 
 #endif /* EVTMETAINFO_H_ */

@@ -23,56 +23,56 @@
 #include <ecl/rec_lib/TEclCFShower.h>
 #include "TVector3.h"
 
-
 namespace Belle2 {
+  namespace ECL {
 
-  struct TRecEclCFParameters {
-  public:
-    TRecEclCFParameters();
-    virtual ~TRecEclCFParameters();
+    struct TRecEclCFParameters {
+    public:
+      TRecEclCFParameters();
+      virtual ~TRecEclCFParameters();
 
-  public:
-    /** Initial Parameters,
-     *need different thresholds for endcap & barrel eventually
-     */
+    public:
+      /** Initial Parameters,
+       *need different thresholds for endcap & barrel eventually
+       */
 //@{
-    //EclGeV
-    /// single-crystal threshold;(for MC data for now)
-    static
-    const float fgEthX3[69];
+      //EclGeV
+      /// single-crystal threshold;(for MC data for now)
+      static
+      const float fgEthX3[69];
 
-    double fEthHit;
+      double fEthHit;
 
-    int     fEthX3;
+      int     fEthX3;
 
-    //EclGeV
-    /// for a seed candidate,
-    double fEthSeed;
+      //EclGeV
+      /// for a seed candidate,
+      double fEthSeed;
 
-    //EclGeV
-    /// for a cluster(NA)
-    double fEthCluster;
+      //EclGeV
+      /// for a cluster(NA)
+      double fEthCluster;
 
-    //EclGeV
-    /// for a connected region(NA)
-    double fEthCR;
+      //EclGeV
+      /// for a connected region(NA)
+      double fEthCR;
 
-    //EclGeV
-    ///(not used yet)
-    double fEthCRSearch;
+      //EclGeV
+      ///(not used yet)
+      double fEthCRSearch;
 //@}
-  public:
+    public:
 //Control switches
-    /// corr, cone, garbage collection ...
-    int fEnergyAngleCorrection;
+      /// corr, cone, garbage collection ...
+      int fEnergyAngleCorrection;
 
-    //we cannot use "bool" to use basf define_parameters...
-    // and we cannot use user defined type also...
-    //and we need to open backdoor, cannot hide data-members
-    // to define user parameters...
+      //we cannot use "bool" to use basf define_parameters...
+      // and we cannot use user defined type also...
+      //and we need to open backdoor, cannot hide data-members
+      // to define user parameters...
 
-  };
-
+    };
+  }//ECL
 } // end of namespace Belle2
 
 #endif

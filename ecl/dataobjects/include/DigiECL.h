@@ -26,39 +26,39 @@ namespace Belle2 {
     int m_cellId;
 
     //! Deposited energy of this hit.
-    double m_Amp;
+    int m_Amp;
 
     //!  Fit time of this hit.
-    double m_TimeFit;
+    int m_TimeFit;
 
     //!  Fit Quality of this hit.
-    double m_Quality;
+    int m_Quality;
 
 
     //! The method to set cell id
     void setCellId(int cellId) { m_cellId = cellId; }
 
     //! The method to set Fit deposited energy
-    void setAmp(double Amp) { m_Amp = Amp; }
+    void setAmp(int Amp) { m_Amp = Amp; }
 
     //! The method to get Fitt time
-    void setTimeFit(double TimeFit) { m_TimeFit = TimeFit; }
+    void setTimeFit(int TimeFit) { m_TimeFit = TimeFit; }
 
     //! The method to get  Fit Quality
-    void setQuality(double Quality) { m_Quality = Quality; }
+    void setQuality(int Quality) { m_Quality = Quality; }
 
 
     //! The method to get cell id
     int getCellId() const { return m_cellId; }
 
     //! The method to get Fit deposited energy
-    double getAmp() const { return m_Amp; }
+    int getAmp() const { return m_Amp; }
 
     //! The method to get Fit time
-    double getTimeFit() const { return m_TimeFit; }
+    int getTimeFit() const { return m_TimeFit; }
 
     //! The method to get Fit Quality
-    double getQuality() const { return m_Quality; }
+    int getQuality() const { return m_Quality; }
 
 
 

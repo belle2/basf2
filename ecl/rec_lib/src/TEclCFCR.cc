@@ -29,6 +29,7 @@
 using namespace std;
 using namespace boost;
 using namespace Belle2;
+using namespace ECL;
 
 //
 // constants, enums and typedefs

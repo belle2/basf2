@@ -23,9 +23,9 @@
 using namespace std;
 using namespace boost;
 using namespace Belle2;
+using namespace ECL;
 
 #define PI 3.14159265358979323846
-
 
 
 ECLGeometryPar* ECLGeometryPar::m_B4ECLGeometryParDB = 0;
@@ -308,6 +308,84 @@ void ECLGeometryPar::Mapping(int cid)
 //      cout<<"cid "<<cid<<" mPar_thetaID "<<mPar_thetaID<<" mPar_phiID "<<mPar_phiID<<" mPar_phiIndex "<<mPar_phiIndex<<" mPar_thetaIndex "<<mPar_thetaIndex<<endl;
 
 }
+
+
+int ECLGeometryPar::ECLVolNameToCellID(const G4String VolumeName)
+{
+  char temp1[10], temp2[10], temp3[10], temp4[30], temp5[30], temp6[10], temp7[10];
+  int cellID = 0;
+  sscanf(VolumeName.c_str(), "%[^'_']_%[^'_']_%[^'_']_%[^'_']_%[^'_']_%[^'_']_%s", temp1, temp2, temp3, temp4, temp5, temp6, temp7);
+
+  int GSector = atoi(temp4) - 1;
+  int iCry = atoi(temp6) - 1;
+
+  if (VolumeName.c_str() == 0) {
+    B2ERROR("ECL simulation cellId; Sector  " << GSector << ". Out of range.");
+    return -1;
+  } else if (string(VolumeName.c_str()).find("Fw") != string::npos) {
+
+    if (iCry < 3) {
+      cellID = GSector * 3 + iCry - 0;
+    } else if (iCry < 6) {
+      cellID = GSector * 3 + (iCry - 3) + 16 * 3;
+    } else if (iCry < 10) {
+      cellID = GSector * 4 + (iCry - 6) + 16 * 6;
+    } else if (iCry < 14) {
+      cellID = GSector * 4 + (iCry - 10) + 16 * 10;
+    } else if (iCry < 18) {
+      cellID = GSector * 4 + (iCry - 14) + 16 * 14;
+    } else if (iCry < 24) {
+      cellID = GSector * 6 + (iCry - 18) + 16 * 18;
+    } else if (iCry < 30) {
+      cellID = GSector * 6 + (iCry - 24) + 16 * 24;
+    } else if (iCry < 36) {
+      cellID = GSector * 6 + (iCry - 30) + 16 * 30;
+    } else if (iCry < 42) {
+      cellID = GSector * 6 + (iCry - 36) + 16 * 36;
+    } else if (iCry < 48) {
+      cellID = GSector * 6 + (iCry - 42) + 16 * 42;
+    } else if (iCry < 54) {
+      cellID = GSector * 6 + (iCry - 48) + 16 * 48;
+    } else if (iCry < 63) {
+      cellID = GSector * 9 + (iCry - 54) + 16 * 54;
+    } else if (iCry < 72) {
+      cellID = GSector * 9 + (iCry - 63) + 16 * 63;
+
+    }
+  } else if (string(VolumeName.c_str()).find("Br") != string::npos) {
+    if (GSector == -1) GSector = 143;
+    cellID = 1152 + (iCry) * 144 + GSector;
+
+  } else {
+
+    iCry = iCry - 72;
+    if (iCry < 9) {
+      cellID = (GSector) * 9 + iCry - 0 + 7776;
+    } else if (iCry < 18) {
+      cellID = (GSector) * 9 + (iCry - 9) + 16 * 9 + 7776;
+    } else if (iCry < 24) {
+      cellID = (GSector) * 6 + (iCry - 18) + 16 * 18 + 7776;
+    } else if (iCry < 30) {
+      cellID = (GSector) * 6 + (iCry - 24) + 16 * 24 + 7776;
+    } else if (iCry < 36) {
+      cellID = (GSector) * 6 + (iCry - 30) + 16 * 30 + 7776;
+    } else if (iCry < 42) {
+      cellID = (GSector) * 6 + (iCry - 36) + 16 * 36 + 7776;
+    } else if (iCry < 48) {
+      cellID = (GSector) * 6 + (iCry - 42) + 16 * 42 + 7776;
+    } else if (iCry < 52) {
+      cellID = (GSector) * 4 + (iCry - 48) + 16 * 48 + 7776;
+    } else if (iCry < 56) {
+      cellID = (GSector) * 4 + (iCry - 52) + 16 * 52 + 7776;
+    } else if (iCry < 60) {
+      cellID = (GSector) * 4 + (iCry - 56) + 16 * 56 + 7776;
+    }
+  }
+  return cellID;
+}
+
+
+
 
 
 
@@ -927,7 +1005,6 @@ EclNbr::getNbr(const Identifier aCellId)
   return
     EclNbr(vNbr, nearSize);
 }
-
 
 namespace Belle2 {
   int ECLG4VolNameToCellID(const G4String VolumeName)

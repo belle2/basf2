@@ -61,7 +61,7 @@ namespace Belle2 {
 
   using namespace geometry;
 
-  namespace ecl {
+  namespace ECL {
 //-----------------------------------------------------------------
 //                 Register the GeoCreator
 //-----------------------------------------------------------------

@@ -38,6 +38,7 @@
 
 using namespace std;
 using namespace Belle2;
+using namespace ECL;
 
 //-----------------------------------------------------------------
 //                 Register the Module
@@ -127,6 +128,7 @@ void ECLRecPi0Module::event()
       m_px2 = aGamma2->getpx();
       m_py2 = aGamma2->getpy();
       m_pz2 = aGamma2->getpz();
+
       CLHEP::Hep3Vector p3Gamma2(m_px2, m_py2, m_pz2);
       // gamma energy cut
       const double EGamma2 = p3Gamma2.mag();
@@ -157,7 +159,7 @@ void ECLRecPi0Module::event()
           Pi0Array[m_Pi0Num]->setmassfit(m_pi0mass);
           Pi0Array[m_Pi0Num]->setchi2(m_pi0chi2);
 
-          //cout<< "Event " << m_nEvent <<" Pi0 from Gamma "<< m_showerId1<<" "<<m_showerId2<<" "<<m_pi0E<<" "<<m_pi0mass<<endl;
+          //cout << "Event " << m_nEvent << " Pi0 from Gamma " << m_showerId1 << " " << m_showerId2 << " " << m_pi0E << " " << m_pi0mass << endl;
 
         }
       } else if (pi0_mass_min < mass && mass < pi0_mass_max) {

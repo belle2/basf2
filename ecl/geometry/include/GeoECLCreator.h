@@ -23,7 +23,7 @@ class G4VPhysicalVolume;
 
 namespace Belle2 {
 
-  namespace ecl {
+  namespace ECL {
 
     //!  The GeoECLCreator class.
     /*!

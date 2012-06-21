@@ -14,7 +14,7 @@
 
 //basf2 framework headers
 #include <framework/core/Module.h>
-
+#include <ecl/geometry/ECLGeometryPar.h>
 #include <ecl/dataobjects/ECLSimHit.h>
 
 //C++/C standard lib elements.
@@ -28,55 +28,58 @@
 
 
 namespace Belle2 {
-  class ECLHitModule : public Module {
+  namespace ECL {
+    class ECLHitModule : public Module {
 
-  public:
+    public:
+      /** Constructor.*/
+      ECLHitModule();
 
-    typedef std::vector<ECLSimHit*>      ECLSimHitVec;   /**< For input from Geant4 simulation.*/
+      /** Destructor.*/
+      virtual ~ECLHitModule();
 
-    /** Constructor.*/
-    ECLHitModule();
+      /** Initialize variables, print info, and start CPU clock. */
+      virtual void initialize();
 
-    /** Destructor.*/
-    virtual ~ECLHitModule();
+      /** Nothing so far.*/
+      virtual void beginRun();
 
-    /** Initialize variables, print info, and start CPU clock. */
-    virtual void initialize();
+      /** Actual digitization of all hits in the ECL.
+       *
+       *  The digitized hits are written into the DataStore.
+       */
+      virtual void event();
 
-    /** Nothing so far.*/
-    virtual void beginRun();
+      /** Nothing so far. */
+      virtual void endRun();
 
-    /** Actual digitization of all hits in the ECL.
-     *
-     *  The digitized hits are written into the DataStore.
-     */
-    virtual void event();
-
-    /** Nothing so far. */
-    virtual void endRun();
-
-    /** Stopping of CPU clock.*/
-    virtual void terminate();
+      /** Stopping of CPU clock.*/
+      virtual void terminate();
 
 
-  protected:
+    protected:
+      /**< Input array name. */
+      std::string m_inColName;
+      /**< Output array name. */
+      std::string m_eclHitOutColName;
 
-    std::string m_inColName;                /**< Input array name. */
-    std::string m_eclHitOutColName;         /**< Output array name. */
-    std::string m_relColNameSimHitToHit;    /**< Relation collection name - ecl signal (Digit)  <-> MCParticle */
-    std::string m_relColNameMCToSim;        /**< Relation collection name - MCParticle        <-> SimTrkHit */
-
-    int m_hitNum; /**< The current number of created hits in an event. Used to fill the DataStore ECL array.*/
+      /**< The current number of created hits in an event. Used to fill the DataStore ECL array.*/
+      int m_hitNum;
 
 
-  private:
+    private:
 
-    double m_timeCPU;                /*!< CPU time     */
-    int    m_nRun;                   /*!< Run number   */
-    int    m_nEvent;                 /*!< Event number */
+      /**ECLGeometryPar  convert the G4Volume name to cellID */
+      ECLGeometryPar eclP;
+      /*!< CPU time     */
+      double m_timeCPU;
+      /*!< Run number   */
+      int    m_nRun;
+      /*!< Event number */
+      int    m_nEvent;
 
-  };
-
+    };
+  } //ECL
 } // end of Belle2 namespace
 
 #endif // ECLDIGI_H

@@ -28,7 +28,7 @@ namespace Belle2 {
     return instance;
   }
 
-  string ModuleStatistics::getStatistics(ECounters mode, StatisticsMap *modules)
+  string ModuleStatistics::getStatistics(ECounters mode, StatisticsMap* modules)
   {
     if (!modules) modules = &m_modules;
     stringstream out;
@@ -37,19 +37,19 @@ namespace Belle2 {
     out << output % "Name" % "Calls" % "Time(s)" % "Time(ms)/Call";
     out << boost::format("%|79T-|\n");
     for (StatisticsMap::const_iterator it = modules->begin(); it != modules->end(); ++it) {
-      const Statistics &stats = it->second;
+      const Statistics& stats = it->second;
       out << output
-      % stats.getName()
-      % stats.getCalls(mode)
-      % stats.getTime(mode)
-      % (stats.getCalls(mode) > 0 ? (1e3*stats.getTime(mode) / stats.getCalls(mode)) : 0);
+          % stats.getName()
+          % stats.getCalls(mode)
+          % stats.getTime(mode)
+          % (stats.getCalls(mode) > 0 ? (1e3 * stats.getTime(mode) / stats.getCalls(mode)) : 0);
     }
     out << boost::format("%|79T-|\n");
     out << output
-    % "Total"
-    % m_global.getCalls(mode)
-    % m_global.getTime(mode)
-    % (m_global.getCalls(mode) > 0 ? (1e3*m_global.getTime(mode) / m_global.getCalls(mode)) : 0);
+        % "Total"
+        % m_global.getCalls(mode)
+        % m_global.getTime(mode)
+        % (m_global.getCalls(mode) > 0 ? (1e3 * m_global.getTime(mode) / m_global.getCalls(mode)) : 0);
     out << boost::format("%|79T=|\n");
     return out.str();
   }
@@ -63,7 +63,7 @@ namespace Belle2 {
       extract<ModulePtr> checkValue(pyList[i]);
       if (checkValue.check()) {
         ModulePtr ptr = checkValue;
-        Statistics &stats = m_modules[ptr.get()];
+        Statistics& stats = m_modules[ptr.get()];
         //Name could be empty if module has never been called
         if (stats.m_name.empty()) stats.m_name = ptr->getName();
         modules[ptr.get()] = stats;
@@ -76,7 +76,7 @@ namespace Belle2 {
   boost::python::list ModuleStatistics::getAll()
   {
     boost::python::list result;
-    BOOST_FOREACH(StatisticsMap::value_type &module, m_modules) {
+    BOOST_FOREACH(StatisticsMap::value_type & module, m_modules) {
       result.append(module.second);
     }
     return result;
@@ -85,7 +85,7 @@ namespace Belle2 {
   /** clear counters, keep names */
   void ModuleStatistics::clear()
   {
-    BOOST_FOREACH(StatisticsMap::value_type &module, m_modules) {
+    BOOST_FOREACH(StatisticsMap::value_type & module, m_modules) {
       module.second.clear();
     }
     m_global.clear();
@@ -145,7 +145,7 @@ namespace Belle2 {
     ;
 
     //Expose ModuleStatistics instance as "statistics" object in pybasf2 module
-    ModuleStatistics &instance = getInstance();
+    ModuleStatistics& instance = getInstance();
     global.attr("statistics") = object(ptr(&instance));
   }
 

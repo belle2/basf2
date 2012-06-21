@@ -75,14 +75,14 @@ namespace Belle2 {
      * @param key key to the new item
      * @param value to the new item
      */
-    void insert(const KEY &key, const VALUE &value) { insert(value_type(key, value)); }
+    void insert(const KEY& key, const VALUE& value) { insert(value_type(key, value)); }
 
     /**
      * Insert a key value pair into the cache. If the maximum size is
      * reached, the least recently used item is dropped
      * @param item std::pair containing key and value of the new item
      */
-    void insert(const value_type &item) {
+    void insert(const value_type& item) {
       std::pair<iterator, bool> p = m_container.push_front(item);
       if (!p.second) {  /* duplicate item, put existing in front */
         m_container.replace(p.first, item);
@@ -99,7 +99,7 @@ namespace Belle2 {
      * @param[out] value reference to the value. Will only be modified if an item is found
      * @return true if value could be found, false otherwise
      */
-    bool retrieve(const KEY &key, VALUE &value) {
+    bool retrieve(const KEY& key, VALUE& value) {
       hash_iterator it = m_container.template get<1>().find(key);
       if (it == m_container.template get<1>().end()) {
         ++m_misses;
@@ -143,7 +143,7 @@ namespace Belle2 {
      * the front of the list
      * @param iterator to the item to update
      */
-    void update(const iterator &item) {
+    void update(const iterator& item) {
       m_container.relocate(m_container.begin(), item);
     }
 

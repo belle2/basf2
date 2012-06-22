@@ -25,7 +25,7 @@
 
 namespace Belle2 {
   namespace ECL {
-
+    /** TRecEclCFParameters struct */
     struct TRecEclCFParameters {
     public:
       TRecEclCFParameters();

@@ -27,6 +27,7 @@
 namespace Belle2 {
   namespace ECL {
 
+    /** MEclCFShower Hit Assignment  class  */
     class MEclCFShowerHA {
       friend class TRecEclCF;
       friend class TEclCFCR;
@@ -35,7 +36,7 @@ namespace Belle2 {
       //** define EclIdentifier is Identifier(int)
       typedef EclIdentifier Identifier;
 
-      ///
+      /** construct MEclCFShowerHA */
       MEclCFShowerHA() {}
       ///
       virtual ~MEclCFShowerHA() {}

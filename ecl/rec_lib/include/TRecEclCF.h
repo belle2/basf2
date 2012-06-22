@@ -27,7 +27,7 @@
 
 namespace Belle2 {
   namespace ECL {
-
+    /** TRecEclCF  class  */
     class TRecEclCF {
       // friend classes and functions
 

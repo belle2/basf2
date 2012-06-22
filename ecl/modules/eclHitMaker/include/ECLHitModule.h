@@ -29,6 +29,8 @@
 
 namespace Belle2 {
   namespace ECL {
+
+    /** Class to represent the hit of one cell */
     class ECLHitModule : public Module {
 
     public:

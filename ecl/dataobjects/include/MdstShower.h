@@ -21,22 +21,36 @@ namespace Belle2 {
   //! Example Detector
   class MdstShower : public TObject {
   public:
-
-    int m_showerId;/**shower id of this shower. */
-    double m_Energy;/**Energy of this shower. */
-    double m_Theta;/**Theta of this shower. */
-    double m_Phi;/**Phi of this shower. */
-    double m_R;/**Distance of this shower. */
-    double m_Error[6];/**Error of this shower. */
-    double m_Mass;/**Mass of this shower. */
-    double m_Width;/**Width of this shower. */
-    double m_E9oE25;/**E9oE25 of this shower. */
-    double m_E9oE25unf;/**E9oE25unf of this shower. */
-    double m_NHits;/**NHits of this shower. */
-    int m_Status;/**Status of this shower. */
-    int m_Grade;/**Grade of this shower. */
-    double m_UncEnergy;/**EUncEnergy of this shower. */
-    double m_Time;/**Time of this shower. */
+    /**shower id of this shower. */
+    int m_showerId;
+    /**Energy of this shower. */
+    double m_Energy;
+    /**Theta of this shower. */
+    double m_Theta;
+    /**Phi of this shower. */
+    double m_Phi;
+    /**Distance of this shower. */
+    double m_R;
+    /**Error of this shower. */
+    double m_Error[6];
+    /**Mass of this shower. */
+    double m_Mass;
+    /**Width of this shower. */
+    double m_Width;
+    /**E9oE25 of this shower. */
+    double m_E9oE25;
+    /**E9oE25unf of this shower. */
+    double m_E9oE25unf;
+    /**NHits of this shower. */
+    double m_NHits;
+    /**Status of this shower. */
+    int m_Status;
+    /**Grade of this shower. */
+    int m_Grade;
+    /**EUncEnergy of this shower. */
+    double m_UncEnergy;
+    /**Time of this shower. */
+    double m_Time;
 
 
     //! The method to set showerId

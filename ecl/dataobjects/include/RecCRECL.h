@@ -22,7 +22,7 @@ namespace Belle2 {
   class RecCRECL : public TObject {
   public:
 
-    //! The members of RecCRECL.
+    /** The members of RecCRECL. */
     int m_showerId;/**shower id of this shower. */
     double m_Energy;/**Energy of this shower. */
     double m_Theta;/**Theta of this shower. */

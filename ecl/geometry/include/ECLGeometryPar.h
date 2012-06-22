@@ -92,30 +92,42 @@ namespace Belle2 {
       int ECLVolNameToCellID(const G4String VolumeName);//Mapping from VolumeName to Crystal CellID
 
     private:
-
-      double m_BLThetaCrystal[46];  /** The Theta angle of  crystal derection for Barrel crystals */
-      double m_BLPhiCrystal[46];    /** The Phi angle of  crystal derection  for Barrel crystals */
-      double m_BLPreppos[46];       /** The Prep of  crystal derection  for Barrel crystals */
-      double m_BLPhipos[46];        /** The Theta angle of  crystal position  for Barrel crystals */
-      double m_BLZpos[46];          /** The Z of  crystal position  for Barrel crystals */
-
-      double m_ECThetaCrystal[132]; /** The Theta angle of  crystal derection  for Endcap crystals */
-      double m_ECPhiCrystal[132];   /** The Phi angle of  crystal derection  for Endcap crystals */
-      double m_ECThetapos[132];     /** The Theta angle of  crystal position  for Endcap crystals */
-      double m_ECPhipos[132];       /** The Phi angle of  crystal position  for Endcap crystals */
-      double m_ECRpos[132];         /** The R angle of  crystal position  for Endcap crystals */
-
-      int mPar_cellID;           /** The Cell ID information*/
-      int mPar_thetaID;          /** The Theta ID information*/
-      int mPar_phiID;            /** The Phi ID information*/
-      int mPar_thetaIndex;       /** The Theta Index information*/
-      int mPar_phiIndex;         /** The Phi IndeX information*/
-
-      static ECLGeometryPar* m_B4ECLGeometryParDB; /*!< Pointer that saves the instance of this class. */
+      /** The Theta angle of  crystal derection for Barrel crystals */
+      double m_BLThetaCrystal[46];
+      /** The Phi angle of  crystal derection  for Barrel crystals */
+      double m_BLPhiCrystal[46];
+      /** The Prep of  crystal derection  for Barrel crystals */
+      double m_BLPreppos[46];
+      /** The Theta angle of  crystal position  for Barrel crystals */
+      double m_BLPhipos[46];
+      /** The Z of  crystal position  for Barrel crystals */
+      double m_BLZpos[46];
+      /** The Theta angle of  crystal derection  for Endcap crystals */
+      double m_ECThetaCrystal[132];
+      /** The Phi angle of  crystal derection  for Endcap crystals */
+      double m_ECPhiCrystal[132];
+      /** The Theta angle of  crystal position  for Endcap crystals */
+      double m_ECThetapos[132];
+      /** The Phi angle of  crystal position  for Endcap crystals */
+      double m_ECPhipos[132];
+      /** The R angle of  crystal position  for Endcap crystals */
+      double m_ECRpos[132];
+      /** The Cell ID information*/
+      int mPar_cellID;
+      /** The Theta ID information*/
+      int mPar_thetaID;
+      /** The Phi ID information*/
+      int mPar_phiID;
+      /** The Theta Index information*/
+      int mPar_thetaIndex;
+      /** The Phi IndeX information*/
+      int mPar_phiIndex;
+      /** Pointer that saves the instance of this class. */
+      static ECLGeometryPar* m_B4ECLGeometryParDB;
     };
 
 
-
+    /** EclNbr class  */
     class EclNbr {
       // friend classses and functions
 
@@ -196,7 +208,8 @@ namespace Belle2 {
 
     public:
       // constants, enums and typedefs
-      ///
+
+      /** type define Identifier */
       typedef EclIdentifier Identifier;
 //      has trouble with g++ stl, poor compiler
 //      typedef int Identifier;

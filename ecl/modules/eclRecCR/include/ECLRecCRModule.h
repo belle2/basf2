@@ -68,7 +68,7 @@ namespace Belle2 {
       /** Stopping of CPU clock.*/
       virtual void terminate();
 
-      /* function of sruare */
+      /** function of sruare */
       double squ(double x) { return x * x; }
 
       /**calculate error of Energy with Energy  */

@@ -25,6 +25,7 @@
 
 namespace Belle2 {
   namespace ECL {
+    /** TEclCFCR  class  */
     class TEclCFCR {
     public:
       // constants, enums and typedefs

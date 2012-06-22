@@ -69,8 +69,6 @@ namespace Belle2 {
 
     private:
 
-      /**ECLGeometryPar  convert the G4Volume name to cellID */
-      ECLGeometryPar eclP;
       /*!< CPU time     */
       double m_timeCPU;
       /*!< Run number   */

@@ -356,7 +356,7 @@ void ExtModule::getVolumeID(const G4TouchableHandle& touch, int& detID, int& cop
       (name.find("_logicalEclBwCrystal_") != string::npos) ||
       (name.find("_logicalEclFwCrystal_") != string::npos)) {
     detID = 5;
-    copyID = ECLG4VolNameToCellID(name);
+    copyID = ECL::ECLGeometryPar::Instance()->ECLVolNameToCellID(name);
   }
 
 }
@@ -431,8 +431,6 @@ GFTrackCand* ExtModule::addTrackCand(const GFTrack* gfTrack, int pdgCode, StoreA
   const TVector3 firstV = firstPlane.getV();
   const TVector3 firstW = firstPlane.getNormal();
   TVector3 firstPosition = firstO + firstState[3][0] * firstU + firstState[4][0] * firstV;
-  //double firstSpu = (firstW * firstPosition >= 0.0 ? 1.0 : -1.0);
-  //TVector3 firstMomTilde = firstSpu * (firstW + firstState[1][0] * firstU + firstState[2][0] * firstV);
   TVector3 firstMomTilde = firstW + firstState[1][0] * firstU + firstState[2][0] * firstV;
   if (firstMomTilde * firstPosition < 0.0) { firstMomTilde = -firstMomTilde; }
   TVector3 firstDirection = firstMomTilde.Unit();
@@ -455,9 +453,6 @@ GFTrackCand* ExtModule::addTrackCand(const GFTrack* gfTrack, int pdgCode, StoreA
                        firstDirection.Z());
   // or, approximately, ipPosition=(0,0,0) and ipDirection=(?,?,firstDirection.Z())
   TMatrixD lastState(gfTrackRep->getLastState());
-  if (firstState[0][0]*lastState[0][0] < 0.0) {
-    std::cout << "ext:addTrackCand: gfTrack charge flip.  qi/pi=" << firstState[0][0] << "   qf/pf=" << lastState[0][0] << "   Q=" << gfTrack->getCharge() << std::endl;
-  }
   TMatrixD lastCov(gfTrackRep->getLastCov());
   GFDetPlane lastPlane(gfTrackRep->getLastPlane());
   const TVector3 lastO = lastPlane.getO();
@@ -465,8 +460,6 @@ GFTrackCand* ExtModule::addTrackCand(const GFTrack* gfTrack, int pdgCode, StoreA
   const TVector3 lastV = lastPlane.getV();
   const TVector3 lastW = lastPlane.getNormal();
   TVector3 lastPosition = lastO + lastState[3][0] * lastU + lastState[4][0] * lastV;
-  //double lastSpu = (lastW * lastPosition >= 0.0 ? 1.0 : -1.0);
-  //TVector3 lastMomTilde = lastSpu * (lastW + lastState[1][0] * lastU + lastState[2][0] * lastV);
   double lastSpu = 1.0;
   TVector3 lastMomTilde = lastW + lastState[1][0] * lastU + lastState[2][0] * lastV;
   if (lastMomTilde * lastPosition < 0.0) {

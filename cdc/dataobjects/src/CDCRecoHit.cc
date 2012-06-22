@@ -23,13 +23,16 @@ using namespace Belle2;
 
 ClassImp(CDCRecoHit);
 
+const double CDCRecoHit::c_HMatrixContent[5] = {0, 0, 0, 1, 0};
+const TMatrixD CDCRecoHit::c_HMatrix = TMatrixD(1, 5, c_HMatrixContent);
+
 CDCRecoHit::CDCRecoHit()
-  : GFRecoHitIfc<GFWireHitPolicy> (m_nParHitRep)
+  : GFRecoHitIfc<GFWireHitPolicy> (c_nParHitRep)
 {
 }
 
 CDCRecoHit::CDCRecoHit(const CDCHit* cdcHit)
-  : GFRecoHitIfc<GFWireHitPolicy> (m_nParHitRep)
+  : GFRecoHitIfc<GFWireHitPolicy> (c_nParHitRep)
 {
 
   // Get the position of the hit wire from CDCGeometryParameters
@@ -76,17 +79,8 @@ GFAbsRecoHit* CDCRecoHit::clone()
 
 TMatrixD CDCRecoHit::getHMatrix(const GFAbsTrackRep* stateVector)
 {
-
-  TMatrixD m_hMatrix(1, 5);
-  m_hMatrix[0][0] = 0.;
-  m_hMatrix[0][1] = 0.;
-  m_hMatrix[0][2] = 0.;
-  m_hMatrix[0][3] = 1.;
-  m_hMatrix[0][4] = 0.;
-
   //don't check for specific Track Representation at the moment, as RKTrackRep is the only one we are currently using.
-  return (m_hMatrix);
-
+  return (c_HMatrix);
 }
 
 

@@ -97,7 +97,11 @@ namespace Belle2 {
 
     /** A parameter for GENFIT.
      */
-    static const int m_nParHitRep = 7;
+    static const int c_nParHitRep = 7;
+
+
+    const static double c_HMatrixContent[5];/**< holds all elements of H Matrix. A C array is only possibility to set TMatrixD elements with its constuctor*/
+    const static TMatrixD c_HMatrix; /**< H matrix needed for Genfit. getHMatrix will return this attribute*/
 
     // Next two variables contain wire identification as used in cdc geometry.
 
@@ -134,7 +138,7 @@ namespace Belle2 {
     //NOTE: The endcap positions of the wire is stored in a variable inherited from GFRecoHitIfc<GFWireHitPolicy>.
 
     /** ROOT Macro.*/
-    ClassDef(CDCRecoHit, 1);
+    ClassDef(CDCRecoHit, 2);
   };
 
 }

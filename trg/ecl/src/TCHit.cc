@@ -26,6 +26,7 @@
 
 using namespace std;
 using namespace Belle2;
+using namespace ECL;
 //
 //
 //

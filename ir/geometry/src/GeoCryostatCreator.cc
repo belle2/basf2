@@ -129,6 +129,9 @@ namespace Belle2 {
       //                +- F6spc7
       //                   +- F7mag7
 
+      double stepMax = 5.0 * Unit::mm;
+      //bool flag_limitStep = true;
+      bool flag_limitStep = false;
 
       double unitFactor = 10.0;
 
@@ -303,6 +306,7 @@ namespace Belle2 {
       string strMat_A1spc1 = cA1spc1.getString("Material");
       G4Material* mat_A1spc1 = Materials::get(strMat_A1spc1);
       G4LogicalVolume* logi_A1spc1 = new G4LogicalVolume(geo_A1spc1, mat_A1spc1, "logi_A1spc1_name");
+      if (flag_limitStep) logi_A1spc1->SetUserLimits(new G4UserLimits(stepMax));
 
       //put volume
       setColor(*logi_A1spc1, cA1spc1.getString("Color", "#CC0000"));
@@ -312,6 +316,7 @@ namespace Belle2 {
       string strMat_B1spc1 = cB1spc1.getString("Material");
       G4Material* mat_B1spc1 = Materials::get(strMat_B1spc1);
       G4LogicalVolume* logi_B1spc1 = new G4LogicalVolume(geo_B1spc1, mat_B1spc1, "logi_B1spc1_name");
+      if (flag_limitStep) logi_B1spc1->SetUserLimits(new G4UserLimits(stepMax));
 
       //put volume
       setColor(*logi_B1spc1, cB1spc1.getString("Color", "#CC0000"));
@@ -2527,6 +2532,7 @@ namespace Belle2 {
       string strMat_D1spc1 = cD1spc1.getString("Material");
       G4Material* mat_D1spc1 = Materials::get(strMat_D1spc1);
       G4LogicalVolume* logi_D1spc1 = new G4LogicalVolume(geo_D1spc1, mat_D1spc1, "logi_D1spc1_name");
+      if (flag_limitStep) logi_D1spc1->SetUserLimits(new G4UserLimits(stepMax));
 
       //put volume
       setColor(*logi_D1spc1, cD1spc1.getString("Color", "#CC0000"));
@@ -2536,6 +2542,7 @@ namespace Belle2 {
       string strMat_E1spc1 = cE1spc1.getString("Material");
       G4Material* mat_E1spc1 = Materials::get(strMat_E1spc1);
       G4LogicalVolume* logi_E1spc1 = new G4LogicalVolume(geo_E1spc1, mat_E1spc1, "logi_E1spc1_name");
+      if (flag_limitStep) logi_E1spc1->SetUserLimits(new G4UserLimits(stepMax));
 
       //put volume
       setColor(*logi_E1spc1, cE1spc1.getString("Color", "#CC0000"));

@@ -5,90 +5,62 @@ import os
 import random
 from basf2 import *
 
-# Create main path
-main = create_path()
 
+# register necessary modules
 evtmetagen = register_module('EvtMetaGen')
 
+# generate one event
 evtmetagen.param('ExpList', [0])
 evtmetagen.param('RunList', [1])
 evtmetagen.param('EvtNumList', [5])
 
 evtmetainfo = register_module('EvtMetaInfo')
 
+# create geometry
 gearbox = register_module('Gearbox')
-geo = register_module('Geometry')
-# Outer detectors are disabled for performance reasons.
-# Note that this may produce a larger number of particles reentering
-# the detector from the outside.
-geo.param('ExcludedComponents', ['TOP', 'ECL', 'BKLM', 'EKLM'])
+geometry = register_module('Geometry')
 
-# particle gun to shoot particles in the detector
-pGun = register_module('ParticleGun')
+# EvtGen to provide generic BB events
+evtgeninput = register_module('EvtGenInput')
 
-# choose the particles you want to simulate
-param_pGun = {
-    'pdgCodes': [211, -211],
-    'nTracks': 4,
-    'varyNTracks': 0,
-    'momentumGeneration': 'uniform',
-    'momentumParams': [0.4, 1.6],
-    'thetaGeneration': 'uniform',
-    'thetaParams': [60., 120.],
-    'phiGeneration': 'uniform',
-    'phiParams': [0, 360],
-    'vertexGeneration': 'uniform',
-    'xVertexParams': [0.0, 0.0],
-    'yVertexParams': [0.0, 0.0],
-    'zVertexParams': [0.0, 0.0],
-    }
-
-pGun.param(param_pGun)
+evtgeninput.param('boost2LAB', True)
 
 # simulation
 g4sim = register_module('FullSim')
 # make the simulation less noisy
 g4sim.logging.log_level = LogLevel.ERROR
 
-# digitizer
-cdcDigitizer = register_module('CDCDigi')
 
-# use one gaussian with resolution of 0.01 in the digitizer
-# (to simplify the fitting)
-param_cdcdigi = {'Fraction': 1, 'Resolution1': 0.01, 'Resolution2': 0.0}
-cdcDigitizer.param(param_cdcdigi)
+# create paths
+main = create_path()
 
-# find MCTracks
-mctrackfinder = register_module('MCTrackFinder')
-
-# select which detectors you would like to use
-param_mctrackfinder = {'UseCDCHits': 1, 'UseSVDHits': 1, 'UsePXDHits': 1}
-# select which particles to use: primary particles
-param_mctrackfinder = {'WhichParticles': 0}
-mctrackfinder.param(param_mctrackfinder)
-
-# fitting
-genfitter = register_module('GenFitter')
-
-# fit the tracks with one iteration of Kalman filter
-param_cdcfitting = {
-    'StoreFailedTracks': 0,
-    'mcTracks': 1,
-    'FilterId': 0,
-    'NIterations': 1,
-    'ProbCut': 0.001,
-    }
-genfitter.param(param_cdcfitting)
-
-# Add modules to main path
+# add modules to paths
 main.add_module(evtmetagen)
+main.add_module(evtmetainfo)
+
 main.add_module(gearbox)
-main.add_module(geo)
-main.add_module(pGun)
+main.add_module(geometry)
+main.add_module(evtgeninput)
 main.add_module(g4sim)
-main.add_module(cdcDigitizer)
+
+cdcdigi = register_module('CDCDigi')
+main.add_module(cdcdigi)
+
+
+pxd_digi = register_module('PXDDigitizer')
+main.add_module(pxd_digi)
+
+main.add_module(register_module('PXDClustering'))
+
+
+mctrackfinder = register_module('MCTrackFinder')
+mctrackfinder.param("UsePXDHits", True)
+mctrackfinder.param("UseSVDHits", True)
+mctrackfinder.param("UseCDCHits", True)
 main.add_module(mctrackfinder)
-main.add_module(genfitter)
+
+genfit = register_module('GenFitter')
+main.add_module(genfit)
 
 display = register_module('TrackingDisplay')
 # The Options parameter is a combination of:

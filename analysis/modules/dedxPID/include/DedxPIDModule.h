@@ -97,9 +97,6 @@ namespace Belle2 {
     /** dedx:momentum PDFs. */
     TH2F* m_pdfs[c_Dedx_num_detectors][c_Dedx_num_particles]; //m_pdfs[detector_type][particle_type]
 
-    /** momentum prior PDFs. */
-    TH1F* m_momentumPrior[c_Dedx_num_particles];
-
     //parameters: full likelihood vs. truncated mean
     bool m_useIndividualHits; //< Include PDF value for each hit in likelihood. If false, the truncated mean of dedx values for the detectors will be used.
     double m_removeLowest; //< Portion of events with low dE/dx that should be discarded for truncated mean

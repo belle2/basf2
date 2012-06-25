@@ -71,7 +71,7 @@ DedxPIDModule::DedxPIDModule() : Module()
   addParam("EnableDebugOutput", m_enableDebugOutput, "Wether to save information on tracks and associated hits and dE/dx values in TrackDedx objects.", false);
 
   addParam("PDFFile", m_pdfFilename, "The dE/dx:momentum PDF file to use. Use an empty string to disable classification.", std::string("pdfs.root"));
-  addParam("IgnoreMissingParticles", m_ignoreMissingParticles, "Ignore particles for which no momentum PDFs are found", false);
+  addParam("IgnoreMissingParticles", m_ignoreMissingParticles, "Ignore particles for which no PDFs are found", false);
 }
 
 
@@ -100,21 +100,6 @@ void DedxPIDModule::initialize()
     if (!pdf_file->IsOpen())
       B2FATAL("Couldn't open pdf file: " << m_pdfFilename);
 
-    //load momentum PDFs
-    for (int particle = 0; particle < c_Dedx_num_particles; particle++) {
-      const int pdg_code = c_Dedx_pdg_codes[particle];
-      //TODO: remove m_momentumPrior, was moved to DedxLikelihood class
-      m_momentumPrior[particle] = dynamic_cast<TH1F*>(pdf_file->Get(TString::Format("momentum_%i", pdg_code)));
-
-      if (!m_momentumPrior[particle]) {
-        if (m_ignoreMissingParticles) {
-          B2WARNING("Couldn't find momentum PDF for PDG " << pdg_code);
-        } else {
-          B2FATAL("Couldn't find momentum PDF for PDG " << pdg_code);
-        }
-      }
-    }
-
     //load dedx:momentum PDFs
     const char* suffix = (!m_useIndividualHits) ? "_trunc" : "";
     for (int detector = 0; detector < c_Dedx_num_detectors; detector++) {
@@ -123,18 +108,18 @@ void DedxPIDModule::initialize()
       nBinsX = nBinsY = -1;
       xMin = xMax = yMin = yMax = 0.0;
       for (int particle = 0; particle < c_Dedx_num_particles; particle++) {
-        if (m_ignoreMissingParticles and !m_momentumPrior[particle])
-          continue;
-
         const int pdg_code = c_Dedx_pdg_codes[particle];
         m_pdfs[detector][particle] =
           dynamic_cast<TH2F*>(pdf_file->Get(TString::Format("hist_d%i_%i%s", detector, pdg_code, suffix)));
 
-        if (!m_pdfs[detector][particle])
-          B2FATAL("Couldn't find PDF for PDG " << pdg_code << ", detector " << detector << suffix)
+        if (!m_pdfs[detector][particle]) {
+          if (m_ignoreMissingParticles)
+            continue;
+          B2FATAL("Couldn't find PDF for PDG " << pdg_code << ", detector " << detector << suffix);
+        }
 
-          //check that PDFs have the same dimensions and same binning
-          const double eps_factor = 1e-5;
+        //check that PDFs have the same dimensions and same binning
+        const double eps_factor = 1e-5;
         if (nBinsX == -1 and nBinsY == -1) {
           nBinsX = m_pdfs[detector][particle]->GetNbinsX();
           nBinsY = m_pdfs[detector][particle]->GetNbinsY();
@@ -637,7 +622,7 @@ void DedxPIDModule::saveLogLikelihood(float(&logl)[c_Dedx_num_particles], float 
   const Int_t bin_y = pdf[0]->GetYaxis()->FindFixBin(dedx);
 
   for (int iParticle = 0; iParticle < c_Dedx_num_particles; iParticle++) {
-    if (m_ignoreMissingParticles and !m_momentumPrior[iParticle])
+    if (!pdf[iParticle])
       continue;
     double probability = 0.0;
 

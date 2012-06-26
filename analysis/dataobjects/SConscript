@@ -1,5 +1,4 @@
 Import('env')
-
-#env['LIBS'] = ['genfit']
+env['LIBS'] = ['framework']
 Return('env')
 

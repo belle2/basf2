@@ -141,11 +141,11 @@ TCSegment::simulate(void) {
 
 	//...Change clock...
 
-	signals.back().dump("detail", " 0 ");
+	//signals.back().dump("detail", " 0 ");
 
 	signals.back().clock(systemClock);
 
-	signals.back().dump("detail", " 1 ");
+	//signals.back().dump("detail", " 1 ");
 
         if (s.active())
             ++nHits;

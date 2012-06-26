@@ -96,6 +96,9 @@ class TRGCDC {
     /// fast trigger simulation.
     void simulate(void);
 
+    /// terminates when run is finished
+    void terminate(void);
+
     /// simulates track segment decisions.
 
   public:// Selectors

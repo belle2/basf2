@@ -258,12 +258,14 @@ TRGCDCTrack::perfectPosition(void) const {
     //...Super layer loop...
     for (unsigned i = 0; i < cdc.nSuperLayers(); i++) {
 
-	//...Check links to be one...
-	if ((links(i).size() == 0) || (links(i).size() > 1)) {
-	    cout << "TRGCDCTrack::perfectPosition !!! #links in superlayer "
-		 << i << " is " << links(i).size() << endl;
-	    continue;
-	}
+	  //...Check links to be one...
+    if ((links(i).size() == 0) || (links(i).size() > 1)) {
+	    if (TRGDebug::level() > 1) {
+        cout << TRGDebug::tab() << "TRGCDCTrack::perfectPosition !!! #links in superlayer "
+          << i << " is " << links(i).size() << endl;
+      }
+      continue;
+    }
 	    
 	//...Track segment hit...
 	const TCSHit * h = dynamic_cast<const TCSHit *>(links(i)[0]->hit());

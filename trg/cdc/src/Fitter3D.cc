@@ -44,13 +44,17 @@
 #include "trg/cdc/LUT.h"
 #include "trg/cdc/SegmentHit.h"
 
+#include <TVectorD.h>
+#include "trg/cdc/Fitter3DUtility.h"
+
 
 //...Global varibles...
-double rr[9]={0.188,0.4016, 0.620,0.8384,1.0568,0.2934,0.5128,0.7312,0.9496};	//can be replaced with geo-information
+double rr[9];
 double rro[9]={0.188,0.2934,0.4016, 0.5128,0.620,0.7312,0.8384,0.9496,1.0568};
-double anglest[4]={0.0702778, -0.06176, 0.069542, -0.07489};
-double ztostraw[4]={-0.508184,-0.645228,-0.687681,-0.730134};	//can be replaced with geo-information
-int ni[9]={320,320,384,448,512,576,640,704,768};
+double anglest[4];
+double ztostraw[4];
+int ni[9];
+
 int lut00[4096];
 int lut01[4096];
 int lut02[4096];
@@ -108,6 +112,41 @@ namespace Belle2 {
 
   TRGCDCFitter3D::~TRGCDCFitter3D() {
   }
+
+  void TRGCDCFitter3D::initialize(){
+    callLUT();
+    double Trg_PI = 3.141592653589793; 
+
+    m_fileFitter3D = new TFile("Fitter3D.root","RECREATE");
+    m_treeFitter3D = new TTree("m_treeFitter3D","tree");
+    m_tSTrackFitter3D = new TClonesArray("TVectorD");
+    m_fitTrackFitter3D = new TClonesArray("TVectorD");
+    m_treeFitter3D->Branch("tSTrackFitter3D", &m_tSTrackFitter3D);
+    m_treeFitter3D->Branch("fitTrackFitter3D", &m_fitTrackFitter3D);
+
+    // Flags
+    m_flagRealInt = 0;
+    m_flagWireLRLUT = 1;
+    m_flagNonTSStudy = 0;
+
+    // Geometry
+    CDCGeometryPar* cdcp = CDCGeometryPar::Instance();
+    //Initialize rr,ztostarw,anglest,ni
+    rr[0]=cdcp->senseWireR(2)*0.01;
+    ni[0]=cdcp->nWiresInLayer(2)*2;
+    for(int axSuperLayer=1;axSuperLayer<5;axSuperLayer++){
+      rr[axSuperLayer]=cdcp->senseWireR(12*axSuperLayer+4)*0.01;
+      ni[2*axSuperLayer]=cdcp->nWiresInLayer(12*axSuperLayer+4)*2;
+    }
+    for(int stSuperLayer=0;stSuperLayer<4;stSuperLayer++){
+      rr[stSuperLayer+5]=cdcp->senseWireR(12*stSuperLayer+10)*0.01;
+      ztostraw[stSuperLayer]=cdcp->senseWireBZ(12*stSuperLayer+10)*0.01;
+      anglest[stSuperLayer]=2*rr[stSuperLayer+5]*sin(Trg_PI*cdcp->nShifts(12*stSuperLayer+10)/(2*cdcp->nWiresInLayer(12*stSuperLayer+10)))/(cdcp->senseWireFZ(12*stSuperLayer+10)-cdcp->senseWireBZ(12*stSuperLayer+10))/0.01;
+      ni[2*stSuperLayer+1]=cdcp->nWiresInLayer(12*stSuperLayer+10)*2;
+    }
+
+  }
+
 
   void
     TRGCDCFitter3D::callLUT(){
@@ -272,63 +311,68 @@ namespace Belle2 {
     TRGCDCFitter3D::doit(const vector<TCTrack *> & trackListIn,
         vector<TCTrack *> & trackListOut) {
 
+      double Trg_PI = 3.141592653589793; 
       TRGDebug::enterStage("Fitter 3D");
-//	StoreArray<CDCSimHit> cdcArray("CDCSimHIts");
-//	StoreArray<CDCHit> CDCHits("CDCHits");
-//	RelationArray cdcSimHitsToCDCHits(cdcArray,CDCHits);
+      //	StoreArray<CDCSimHit> cdcArray("CDCSimHIts");
+      //	StoreArray<CDCHit> CDCHits("CDCHits");
+      //	RelationArray cdcSimHitsToCDCHits(cdcArray,CDCHits);
+      TClonesArray &tSTrackFitter3D = *m_tSTrackFitter3D;
+      TClonesArray &fitTrackFitter3D = *m_fitTrackFitter3D;
 
       //...TS study (loop over all TS's)...
       const TRGCDC & cdc = * TRGCDC::getTRGCDC();
- /*     for (unsigned i = 0; i < cdc.nSegmentLayers(); i++) {
-	  const Belle2::TRGCDCLayer * l = cdc.segmentLayer(i);
-	  const unsigned nWires = l->nCells();
-	  if (! nWires) continue;
-	  unsigned ptn = 0;
-	  for (unsigned j = 0; j < nWires; j++) {
-	      const TCSegment & t = (TCSegment &) * (* l)[j];
+      if(m_flagNonTSStudy == 1){
+        /*     for (unsigned i = 0; i < cdc.nSegmentLayers(); i++) {
+               const Belle2::TRGCDCLayer * l = cdc.segmentLayer(i);
+               const unsigned nWires = l->nCells();
+               if (! nWires) continue;
+               unsigned ptn = 0;
+               for (unsigned j = 0; j < nWires; j++) {
+               const TCSegment & t = (TCSegment &) * (* l)[j];
 
-	      //...Example to access LR LUT...
-//	      if (TRGDebug::level()) {
-//		  cout << s.LUT()->name() << endl;
-//	      }
+        //...Example to access LR LUT...
+        //	      if (TRGDebug::level()) {
+        //		  cout << s.LUT()->name() << endl;
+        //	      }
 
-	      //...Get hit pattern...
-	      unsigned ptn = t.hitPattern();
+        //...Get hit pattern...
+        unsigned ptn = t.hitPattern();
 
-//	      if (TRGDebug::level()) {
-//		  if (ptn != 0)
-//		      cout << s.name() << " ... ptn=" << ptn << endl;
-//	      }
+        //	      if (TRGDebug::level()) {
+        //		  if (ptn != 0)
+        //		      cout << s.name() << " ... ptn=" << ptn << endl;
+        //	      }
 
-	      //...Or cal. hit pattern by my self...
-	      const std::vector<const TCWire *> & wires = t.wires();
-//	      unsigned ptn2 = 0;
-	      for (unsigned j = 0; j < wires.size(); j++) {
-		int lid=0;
-		  const TRGSignal & s = wires[j]->triggerOutput();
-		  if (s.active()) {
-//		      ptn2 |= (1 << j);
-			unsigned ind=wires[j]->hit()->iCDCHit();
-			int simind=cdcSimHitsToCDCHits[ind].getFromIndex();
-			CDCSimHit &h=*cdcArray[simind];
-			lid=h.getLayerId();
-			if(lid==0){
-				cout << "pattern:"<<ptn<<" " << h.getPosFlag()<<"."<< endl;
-			}
+        //...Or cal. hit pattern by my self...
+        const std::vector<const TCWire *> & wires = t.wires();
+        //	      unsigned ptn2 = 0;
+        for (unsigned j = 0; j < wires.size(); j++) {
+        int lid=0;
+        const TRGSignal & s = wires[j]->triggerOutput();
+        if (s.active()) {
+        //		      ptn2 |= (1 << j);
+        unsigned ind=wires[j]->hit()->iCDCHit();
+        int simind=cdcSimHitsToCDCHits[ind].getFromIndex();
+        CDCSimHit &h=*cdcArray[simind];
+        lid=h.getLayerId();
+        if(lid==0){
+        cout << "pattern:"<<ptn<<" " << h.getPosFlag()<<"."<< endl;
+        }
 
-		      //...Get index for CDCHit...
-//		      unsigned ind = wires[j]->hit()->iCDCHit();
-		      // Use 'ind' to access CDCSimHit.
-		  }
-	      }
+        //...Get index for CDCHit...
+        //		      unsigned ind = wires[j]->hit()->iCDCHit();
+        // Use 'ind' to access CDCSimHit.
+        }
+        }
 
-//	      if (TRGDebug::level()) {
-//		  if (ptn != 0)
-//		      cout << s.name() << " ... ptn2=" << ptn2 << endl;
-//	      }
-	  }
-      }*/
-    
+        //	      if (TRGDebug::level()) {
+        //		  if (ptn != 0)
+        //		      cout << s.name() << " ... ptn2=" << ptn2 << endl;
+        //	      }
+        }
+        }*/
+      }
+
 
 
 
@@ -336,17 +380,20 @@ namespace Belle2 {
       double cotnum=0,sxx=0,z0num=0;
       int z0nump1[4],z0nump2[4],z0den,iz0den;
 
+      tSTrackFitter3D.Clear();
+      fitTrackFitter3D.Clear();
+
       //...Loop over track list...
       const unsigned nInput = trackListIn.size();
-      for (unsigned i = 0; i < nInput; i++) {
+      for (unsigned iInput = 0; iInput < nInput; iInput++) {
         double phi[9]={0,0,0,0,0,0,0,0,0};
         int ckt=1;
         int chk[9]={1,1,1,1,1,1,1,1,1};
 
         //...Access to a track...
-        const TCTrack & t = * trackListIn[i];
+        const TCTrack & t = * trackListIn[iInput];
 
- //       t.dump("detail");
+        //       t.dump("detail");
 
         //...Super layer loop...
         for (unsigned i = 0; i < _cdc.nSuperLayers(); i++) {
@@ -369,27 +416,29 @@ namespace Belle2 {
           ckt=ckt*chk[i];
 
           //...Access to a track segment...
-//         links[0]->dump("detail");
-//          const TCSegment & s =  (TCSegment &) links[0]->hit()->cell();
-//         const TRGCDCCell *s = & links[0]->hit()->cell();
-    //      phi[i]=(double) s->localId()/ni[i]*4*M_PI;
-//		double dphi=s->hit()->drift()*10;
-//		s.drift();
-//	cout << lutcomp << endl;
-	//...using LRLUT to determine Left/Right(assume drift() will return drift distance)
-	const TCSegment * s = dynamic_cast<const TCSegment *>(& links[0]->hit()->cell());
-        phi[i]=(double) s->localId()/ni[i]*4*M_PI;
+          //         links[0]->dump("detail");
+          //          const TCSegment & s =  (TCSegment &) links[0]->hit()->cell();
+          //         const TRGCDCCell *s = & links[0]->hit()->cell();
+          //      phi[i]=(double) s->localId()/ni[i]*4*Trg_PI;
+          //		double dphi=s->hit()->drift()*10;
+          //		s.drift();
+          //	cout << lutcomp << endl;
+          //...using LRLUT to determine Left/Right(assume drift() will return drift distance)
+          const TCSegment * s = dynamic_cast<const TCSegment *>(& links[0]->hit()->cell());
+          phi[i]=(double) s->localId()/ni[i]*4*Trg_PI;
 
-	///...Using Drift time information
-	int lutcomp=s->LUT()->getLRLUT(s->hitPattern(),i);
-	float dphi=s->hit()->drift()*10;
-	dphi=atan(dphi/rro[i]/1000);
-	if(lutcomp==0){phi[i]-=dphi;}
-	else if(lutcomp==1){phi[i]+=dphi;}
-	else{
-		phi[i]=phi[i];
-	//	nfrac--;
-	}
+          if( m_flagWireLRLUT == 1){
+            ///...Using Drift time information
+            int lutcomp=s->LUT()->getLRLUT(s->hitPattern(),i);
+            float dphi=s->hit()->drift()*10;
+            dphi=atan(dphi/rro[i]/1000);
+            if(lutcomp==0){phi[i]-=dphi;}
+            else if(lutcomp==1){phi[i]+=dphi;}
+            else{
+              phi[i]=phi[i];
+              //	nfrac--;
+            }
+          }
 
         }
 
@@ -397,198 +446,222 @@ namespace Belle2 {
         //...Do fitting job here (or call a fitting function)...
         if(ckt){
           double phi2[9]={phi[0], phi[2],phi[4],phi[6],phi[8],phi[1],phi[3],phi[5],phi[7]};
-          double zz[4];
+          double zz[4], arcS[4];
           double zerror[4]={0.0319263,0.028765,0.0290057,0.0396206};
-          double A,B,C,D,E,G,hcx,hcy;
-          double fiterror[5];
           double phierror[5]={0.0085106,0.0039841,0.0025806,0.0019084,0.001514};
           int qqq=0;
+          double rr_conv[4];
+          double iezz2[4];
+          double myphiz[4];	
+          double z0=-999,ztheta=-999,ss=0.,sx=0.,cot=0.;
+          double pt, rho, myphi0;
 
           //kkk++;
           //re-ordering
-//          cout << "tsimTS/"<<phi2[0]<<" " <<phi2[1]<<" "<<phi2[2]<<" "<<phi2[3]<<" "<<phi2[4]<<" "<<phi2[5]<<" "<<phi2[6]<<" "<<phi2[7]<<" "<<phi2[8] <<"]" << endl;
-//	cout << "frac :" << nfrac << endl;
+          //          cout << "tsimTS/"<<phi2[0]<<" " <<phi2[1]<<" "<<phi2[2]<<" "<<phi2[3]<<" "<<phi2[4]<<" "<<phi2[5]<<" "<<phi2[6]<<" "<<phi2[7]<<" "<<phi2[8] <<"]" << endl;
+          //	cout << "frac :" << nfrac << endl;
 
-          //Sign Finder
-          int mysign;
-          double sign_phi[2];
-          if((phi2[0]-phi2[4])>M_PI||(phi2[0]-phi2[4])<-M_PI){
-            if(phi2[0]>M_PI){sign_phi[0]=phi2[0]-2*M_PI;}
-            else{sign_phi[0]=phi[0];}
-            if(phi2[4]>M_PI){sign_phi[1]=phi2[4]-2*M_PI;}
-            else{sign_phi[1]=phi[4];}
-          }
-          else{
-            sign_phi[0]=phi2[0];
-            sign_phi[1]=phi2[4];
-          }
-          if((sign_phi[1]-sign_phi[0])>0){mysign=0;}
-          else{mysign=1;}
+          // Save track segment information
+          TVectorD tempPhi(9,phi2);
+          new(tSTrackFitter3D[iInput]) TVectorD(tempPhi);
 
+          // Sign Finder
+          int mysign = findSign(phi2);
 
-          //fiterror(added)
-          for(unsigned i=0;i<5;i++){
-            fiterror[i]=sqrt((rr[4]*rr[4]-2*rr[4]*rr[2]*cos(phi[4]-phi[2])+rr[2]*rr[2])/(sin(phi[4]-phi[2])*sin(phi[4]-phi[2]))-rr[i]*rr[i])*phierror[i];
-          }
+          // r-phi fitter(2D Fitter) ->calculate pt and radius of track-> input for 3D fitter.
+          rPhiFit(rr,phi2,phierror,rho,myphi0);
+          pt = 0.3*rho*1.5;
 
-          //r-phi fitter(2D Fitter) ->calculate pt and radius of track-> input for 3D fitter.
-          A=0,B=0,C=0,D=0,E=0,G=0,hcx=0,hcy=0;
-          for(unsigned i=0;i<5;i++){
-            A+=cos(phi2[i])*cos(phi2[i])/(fiterror[i]*fiterror[i]);
-            B+=sin(phi2[i])*sin(phi2[i])/(fiterror[i]*fiterror[i]);
-            C+=cos(phi2[i])*sin(phi2[i])/(fiterror[i]*fiterror[i]);
-            D+=rr[i]*cos(phi2[i])/(fiterror[i]*fiterror[i]);
-            E+=rr[i]*sin(phi2[i])/(fiterror[i]*fiterror[i]);
-          }
-          hcx=D*B-E*C;		//helix center x
-          hcx/=2*(A*B-C*C);
-          hcy=E*A-D*C;		//helix center y
-          hcy/=2*(A*B-C*C);
-          double rho=sqrt(hcx*hcx + hcy*hcy);	//radius of helix
-          double pt=0.3*rho*1.5;
+          if(m_flagRealInt == 1){
+            //Change input into relative values.
+            for(unsigned i=0;i<4;i++){
+              phi2[i+5]=phi2[i+5]-phi2[2];
+              //Change the range to [-pi~pi]
+              if(phi2[i+5]>Trg_PI){phi2[i+5]-=2*Trg_PI;}
+              if(phi2[i+5]<-Trg_PI){phi2[i+5]+=2*Trg_PI;}
+            }
+            myphi0=myphi0-phi2[2];
 
-          //Calculate phi0(center of track)->this should be input for 3D fitter.
-          double myphi0=atan(hcy/hcx);
-          if(hcx<0 && hcy>0) myphi0+=M_PI;
-          if(hcx<0 && hcy<0) myphi0+=M_PI;
-          if(hcx>0 && hcy<0) myphi0+=M_PI*2.0;
-
-          //Change input into relative values.
-          for(unsigned i=0;i<4;i++){
-            phi2[i+5]=phi2[i+5]-phi2[2];
             //Change the range to [-pi~pi]
-            if(phi2[i+5]>M_PI){phi2[i+5]-=2*M_PI;}
-            if(phi2[i+5]<-M_PI){phi2[i+5]+=2*M_PI;}
-          }
-          myphi0=myphi0-phi2[2];
+            if(myphi0>Trg_PI){myphi0-=2*Trg_PI;}
+            if(myphi0<-Trg_PI){myphi0+=2*Trg_PI;}
+            //          cout << "track center " << myphi0 << endl;
 
-          //Change the range to [-pi~pi]
-          if(myphi0>M_PI){myphi0-=2*M_PI;}
-          if(myphi0<-M_PI){myphi0+=2*M_PI;}
-//          cout << "track center " << myphi0 << endl;
+            //int phi_st_int[4],myphi_int,rho_int,acos_int;
 
-          //int phi_st_int[4],myphi_int,rho_int,acos_int;
+            //Change values into integers.
+            //For phi stereos
+            for (unsigned i=0;i<4;i++){
+              phi2[i+5]=intnum2/3.2*phi2[i+5];
+              if(phi2[i+5]>0){phi2[i+5]+=0.5;}
+              else{phi2[i+5]-=0.5;}
+              phi2[i+5]=(int) phi2[i+5];
+            }
+            //For myphi0
+            myphi0=intnum2/3.2*myphi0;
+            if(myphi0>0){myphi0+=0.5;}
+            else myphi0-=0.5;
+            myphi0=(int)myphi0;
+            //For rho
+            rho=(int)(intnum3/16*rho+0.5);
+            //Interize rr
+            for(unsigned i=0;i<4;i++){rr_conv[i]=(int)(rr[i+5]*intnum6/rr[8]+0.5);}
+            //Change zerrorz to iezz2
+            for(unsigned i=0;i<4;i++){
+              iezz2[i]=(int)(1./zerror[i]/zerror[i]*intnum7*zerror[1]*zerror[1]+0.5);
+            }
 
-          //Change values into integers.
-          //For phi stereos
-          for (unsigned i=0;i<4;i++){
-            phi2[i+5]=intnum2/3.2*phi2[i+5];
-            if(phi2[i+5]>0){phi2[i+5]+=0.5;}
-            else{phi2[i+5]-=0.5;}
-            phi2[i+5]=(int) phi2[i+5];
-          }
-          //For myphi0
-          myphi0=intnum2/3.2*myphi0;
-          if(myphi0>0){myphi0+=0.5;}
-          else myphi0-=0.5;
-          myphi0=(int)myphi0;
-          //For rho
-          rho=(int)(intnum3/16*rho+0.5);
-          //Interize rr
-          double rr_conv[4];
-          for(unsigned i=0;i<4;i++){rr_conv[i]=(int)(rr[i+5]*intnum6/rr[8]+0.5);}
-          //Change zerrorz to iezz2
-          double iezz2[4];
-          for(unsigned i=0;i<4;i++){
-            iezz2[i]=(int)(1./zerror[i]/zerror[i]*intnum7*zerror[1]*zerror[1]+0.5);
-          }
+            //The actual start of the fitter
+            //          cout << "rho " << rho<< " lut00 " <<lut00[(int) rho]<< " phi 5 " << phi2[5] << endl;
 
-          //The actual start of the fitter
-          double myphiz[4];	
-//          cout << "rho " << rho<< " lut00 " <<lut00[(int) rho]<< " phi 5 " << phi2[5] << endl;
+            if(mysign==1){
+              myphiz[0]=(lut00[(int)rho]+1652)+myphi0-phi2[5];
+              myphiz[1]=(lut01[(int)rho]+1366)+myphi0-phi2[6];
+              myphiz[2]=(lut02[(int)rho]+1039)+myphi0-phi2[7];
+              myphiz[3]=(lut03[(int)rho]+596)+myphi0-phi2[8];
+            }else{
+              myphiz[0]=-(lut00[(int)rho]+1652)+myphi0-phi2[5];
+              myphiz[1]=-(lut01[(int)rho]+1366)+myphi0-phi2[6];
+              myphiz[2]=-(lut02[(int)rho]+1039)+myphi0-phi2[7];
+              myphiz[3]=-(lut03[(int)rho]+596)+myphi0-phi2[8];
+            }
 
-          if(mysign==1){
-            myphiz[0]=(lut00[(int)rho]+1652)+myphi0-phi2[5];
-            myphiz[1]=(lut01[(int)rho]+1366)+myphi0-phi2[6];
-            myphiz[2]=(lut02[(int)rho]+1039)+myphi0-phi2[7];
-            myphiz[3]=(lut03[(int)rho]+596)+myphi0-phi2[8];
-          }else{
-            myphiz[0]=-(lut00[(int)rho]+1652)+myphi0-phi2[5];
-            myphiz[1]=-(lut01[(int)rho]+1366)+myphi0-phi2[6];
-            myphiz[2]=-(lut02[(int)rho]+1039)+myphi0-phi2[7];
-            myphiz[3]=-(lut03[(int)rho]+596)+myphi0-phi2[8];
-          }
-
-          for(unsigned i=0;i<4;i++){
-            if(myphiz[i]>1023)qqq=1;
-          }	
-          if(qqq) continue;
-//          cout << "myphiz " << myphiz[0]<<" " <<myphiz[1]<<" "<<myphiz[2]<< " " <<myphiz[3]<<endl;
+            //          cout << "myphiz " << myphiz[0]<<" " <<myphiz[1]<<" "<<myphiz[2]<< " " <<myphiz[3]<<endl;
 
 
-          //Change myphi to correct z lut address.
-          for(unsigned i=0;i<4;i++){
-            if(myphiz[i]>=0){myphiz[i]=(int)myphiz[i];}
-            else{myphiz[i]=(int)(1024+myphiz[i]);}
-          }
-          zz[0]=zz_0_lut[(int)myphiz[0]];
-          zz[1]=zz_1_lut[(int)myphiz[1]];
-          zz[2]=zz_2_lut[(int)myphiz[2]];
-          zz[3]=zz_3_lut[(int)myphiz[3]];
+            //Change myphi to correct z lut address.
+            for(unsigned i=0;i<4;i++){
+              if(myphiz[i]>=0){myphiz[i]=(int)myphiz[i];}
+              else{myphiz[i]=(int)(1024+myphiz[i]);}
+            }
 
-//          cout << "zz " << zz[0]<<" " <<zz[1]<<" "<<zz[2]<< " " <<zz[3]<<endl;
+            for(unsigned i=0;i<4;i++){
+              if(int(myphiz[i])>1023)qqq=1;
+            }	
+            if(qqq) continue;
 
+            zz[0]=zz_0_lut[int(myphiz[0])];
+            zz[1]=zz_1_lut[int(myphiz[1])];
+            zz[2]=zz_2_lut[int(myphiz[2])];
+            zz[3]=zz_3_lut[int(myphiz[3])];
 
-          //rz fitter
-          double z0=-999,ztheta=-999,ss=0.,sx=0.,cot=0.;
-          for(unsigned i=0;i<4;i++){
-            ss+=iezz2[i];
-            sx+=rr_conv[i]*iezz2[i];
-            sxx+=rr_conv[i]*rr_conv[i]*iezz2[i];
-          }
-
-          for(unsigned i=0;i<4;i++){
-            cotnum+=(ss*rr_conv[i]-sx)*iezz2[i]*zz[i];
-            z0nump1[i]=(int)(sxx-sx*rr_conv[i]);
-            z0nump1[i]=z0nump1[i] >> numbit10;
-            z0nump2[i]=(int)(z0nump1[i]*iezz2[i]*zz[i]);
-            z0nump2[i]=z0nump2[i] >> numbit11;
-            z0num+=z0nump2[i];
-          }
-          z0den=(int)((ss*sxx)-(sx*sx));
-          z0den=z0den >> numbit9;
-          iz0den=iz0den_lut[z0den];
-          z0num*=iz0den;
-          z0=z0num/intnum8/intnum9*intnum10*intnum11;
-          cot=cotnum*iz0den/intnum8/intnum9;
-
-
-
-          /*		double sxoss=(int) sx/ss;
-                for(unsigned i=0;i<4;i++){
-                tt=(rr_conv[i]-sxoss);
-                st2+= tt*tt*iezz2[i];
-                cot+= tt*zz[i]*iezz2[i];
-                }
-
-                cot/=st2;
-                z0=(sy-sx*cot)/ss;*/
-
-
-          //Backwards convertor
-          cot=cot*1.5/intnum5*intnum6/rr[8];
-          z0=z0*1.5/intnum5;
-          for(unsigned i=0;i<4;i++){
-            rr_conv[i]=rr_conv[i]*rr[8]/intnum6;
-            iezz2[i]=iezz2[i]/zerror[1]/zerror[1]/intnum7;
-            zz[i]=zz[i]*1.5/intnum5;
+            //          cout << "zz " << zz[0]<<" " <<zz[1]<<" "<<zz[2]<< " " <<zz[3]<<endl;
+            // Real space converter
+            for(unsigned i=0; i<4; i++){
+              zz[i]=zz[i]/intnum5*1.5;
+              rr_conv[i]=rr_conv[i]*rr[8]/intnum6;
+              iezz2[i]=iezz2[i]/zerror[1]/zerror[1]/intnum7;
+              rho=rho/intnum3*16;
+            }
+          } else {
+            // Real space
+            // Calculate z position from rho and myphi0 and phi2
+            for(unsigned i=0; i<4; i++){
+              zz[i]=calZ(mysign, anglest[i], ztostraw[i],  rr[i+5], phi2[i+5], rho, myphi0);
+              rr_conv[i]=rr[i+5];
+              iezz2[i] = 1/zerror[i]/zerror[i];
+            }   
           }
 
+          // Calculate s
+          for(unsigned i=0; i<4; i++){
+            arcS[i]=calS(rho,rr_conv[i]);
+          }
+          // Every thing is in real space here
 
-          ztheta=M_PI/2.-atan(cot);
-          ztheta*=180./M_PI;
+          // RZ Fit
+          if(m_flagRealInt == 1){
+            // Integer space converter
+            for(unsigned i=0; i<4; i++){
+              zz[i]=zz[i]*intnum5/1.5;
+              rr_conv[i]=rr_conv[i]/rr[8]*intnum6;
+              iezz2[i]=iezz2[i]*zerror[1]*zerror[1]*intnum7;
+            }
 
-//          cout << "tsimz0/"  << z0*100 <<"]"<<endl;
-//          cout << "tsimpt/"  << pt <<"]"<<endl;
-//          cout << "tsimth/"  << ztheta <<"]"<<endl;
-//          cout << "tsimpi/" << myphi0*180/M_PI*3.2/intnum3 << "]" << endl;
+            //rz fitter
+            z0=-999; ztheta=-999; ss=0.; sx=0.; cot=0.;
+            for(unsigned i=0;i<4;i++){
+              ss+=iezz2[i];
+              sx+=rr_conv[i]*iezz2[i];
+              sxx+=rr_conv[i]*rr_conv[i]*iezz2[i];
+            }
+
+            for(unsigned i=0;i<4;i++){
+              cotnum+=(ss*rr_conv[i]-sx)*iezz2[i]*zz[i];
+              z0nump1[i]=(int)(sxx-sx*rr_conv[i]);
+              z0nump1[i]=z0nump1[i] >> numbit10;
+              z0nump2[i]=(int)(z0nump1[i]*iezz2[i]*zz[i]);
+              z0nump2[i]=z0nump2[i] >> numbit11;
+              z0num+=z0nump2[i];
+            }
+            z0den=(int)((ss*sxx)-(sx*sx));
+            z0den=z0den >> numbit9;
+            iz0den=iz0den_lut[z0den];
+            z0num*=iz0den;
+            z0=z0num/intnum8/intnum9*intnum10*intnum11;
+            cot=cotnum*iz0den/intnum8/intnum9;
+
+
+
+            /*		double sxoss=(int) sx/ss;
+                  for(unsigned i=0;i<4;i++){
+                  tt=(rr_conv[i]-sxoss);
+                  st2+= tt*tt*iezz2[i];
+                  cot+= tt*zz[i]*iezz2[i];
+                  }
+
+                  cot/=st2;
+                  z0=(sy-sx*cot)/ss;*/
+
+
+            // Backwards convertor
+            cot=cot*1.5/intnum5*intnum6/rr[8];
+            z0=z0*1.5/intnum5;
+            myphi0 = myphi0*3.2/intnum3;
+            for(unsigned i=0;i<4;i++){
+              rr_conv[i]=rr_conv[i]*rr[8]/intnum6;
+              iezz2[i]=iezz2[i]/zerror[1]/zerror[1]/intnum7;
+              zz[i]=zz[i]*1.5/intnum5;
+            }
+          } else {
+            rSFit(iezz2, arcS, zz, z0, cot);
+          }
+
+
+          // Convert from rad to deg
+          myphi0 = myphi0*180/Trg_PI;
+
+          ztheta=Trg_PI/2.-atan(cot);
+          ztheta*=180./Trg_PI;
+
+          //Save fit values
+          TVectorD tempFit(4);
+          tempFit[0]=pt;
+          tempFit[1]=myphi0;
+          tempFit[2]=z0*100;
+          tempFit[3]=ztheta;
+          new(fitTrackFitter3D[iInput]) TVectorD(tempFit);
+
+          //          cout << "tsimz0/"  << z0*100 <<"]"<<endl;
+          //          cout << "tsimpt/"  << pt <<"]"<<endl;
+          //          cout << "tsimth/"  << ztheta <<"]"<<endl;
+          //          cout << "tsimpi/" << myphi0*180/Trg_PI*3.2/intnum3 << "]" << endl;
 
         }  
       }
+
+      m_treeFitter3D->Fill();
 
       //...Termination...
       TRGDebug::leaveStage("Fitter 3D");
       return 0;
     }
+
+  void TRGCDCFitter3D::terminate(void){
+    m_fileFitter3D->Write();
+    m_fileFitter3D->Close();
+  }   
+
+
 
 } // namespace Belle2

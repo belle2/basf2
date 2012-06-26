@@ -78,8 +78,10 @@ TRGCDC::getTRGCDC(const string & configFile,
                   bool houghFinderPerfect,
                   unsigned houghFinderMeshX,
                   unsigned houghFinderMeshY) {
-    if (_cdc)
-        delete _cdc;
+    if (_cdc){
+        //delete _cdc;
+        _cdc = 0;
+    }
 
     if (configFile != "good-bye") {
         _cdc = new TRGCDC(configFile,
@@ -400,11 +402,16 @@ TRGCDC::initialize(bool houghFinderPerfect,
 
     //...3D fitter...
     _fitter3D = new TCFitter3D("Fitter3D", * this);
-    _fitter3D->callLUT();
+    _fitter3D->initialize();
 
     //...For module simulation (Front-end)...
     configure();
 
+}
+
+void
+TRGCDC::terminate(void){
+  _fitter3D->terminate();
 }
 
 void
@@ -678,7 +685,7 @@ TRGCDC::update(bool ) {
         const float driftTimeMC =
 	    SimHits[iSimHit]->getDriftLength() * 10 * 1000 / 40;
 
-	cout << " -2 driftTimeMC=" << driftTimeMC << endl;
+	//cout << " -2 driftTimeMC=" << driftTimeMC << endl;
 
 	//...Trigger timing...
         TRGTime rise = TRGTime(driftTimeMC, true, _clockFE, w.name());
@@ -691,7 +698,7 @@ TRGCDC::update(bool ) {
 	const double driftLength =
 	    _clockFE.absoluteTime(w._timing[0]->time()) * 40 / 10 / 1000;
 
-	w._timing.dump("detail", " -1 ");
+	//w._timing.dump("detail", " -1 ");
 
         //...TCWireHit...
         TCWHit * hit = new TCWHit(w,

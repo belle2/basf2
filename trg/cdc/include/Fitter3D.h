@@ -16,6 +16,8 @@
 
 #include <string>
 #include <vector>
+#include <TFile.h>
+#include <TTree.h>
 
 #ifdef TRGCDC_SHORT_NAMES
 #define TCFitter3D TRGCDCFitter3D
@@ -53,6 +55,10 @@ class TRGCDCFitter3D {
     /// initializes Look Up Table (LUT)
     void callLUT(void);
 
+    void initialize(void);
+
+    void terminate(void);
+
   private:
 
     /// Name.
@@ -84,6 +90,17 @@ class TRGCDCFitter3D {
 
     /// LUTs
     int zz_3_lut[1024];
+
+    protected:
+      TFile* m_fileFitter3D;
+      TTree* m_treeFitter3D;
+      TClonesArray* m_tSTrackFitter3D;
+      TClonesArray* m_fitTrackFitter3D;
+
+    public:
+      bool m_flagRealInt;
+      bool m_flagWireLRLUT;
+      bool m_flagNonTSStudy;
 };
 
 //-----------------------------------------------------------------------------

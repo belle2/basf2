@@ -1,0 +1,131 @@
+
+#ifndef __CINT__
+#include "trg/cdc/Fitter3DUtility.h"
+#include <cmath>
+#endif
+
+#include <iostream>
+
+using std::cout;
+using std::endl;
+
+int findSign(double *phi2){
+  double Trg_PI=3.141592653589793; 
+  int mysign;
+  double sign_phi[2];
+
+  if((phi2[0]-phi2[4])>Trg_PI||(phi2[0]-phi2[4])<-Trg_PI){
+    if(phi2[0]>Trg_PI){sign_phi[0]=phi2[0]-2*Trg_PI;}
+    else{sign_phi[0]=phi2[0];}
+    if(phi2[4]>Trg_PI){sign_phi[1]=phi2[4]-2*Trg_PI;}
+    else{sign_phi[1]=phi2[4];}
+  }
+  else{
+    sign_phi[0]=phi2[0];
+    sign_phi[1]=phi2[4];
+  }
+  if((sign_phi[1]-sign_phi[0])>0){mysign=0;}
+  else{mysign=1;}
+
+  return mysign;
+}
+
+void rPhiFit(double *rr, double *phi2, double *phierror, double &rho, double &myphi0){
+
+  double Trg_PI=3.141592653589793; 
+  double A,B,C,D,E,G,hcx,hcy;
+  double fiterror[5];
+  //Calculate fit error
+  for(unsigned i=0;i<5;i++){
+    fiterror[i]=sqrt((rr[4]*rr[4]-2*rr[4]*rr[2]*cos(phi2[4]-phi2[2])+rr[2]*rr[2])/(sin(phi2[4]-phi2[2])*sin(phi2[4]-phi2[2]))-rr[i]*rr[i])*phierror[i];
+  }
+
+  //r-phi fitter(2D Fitter) ->calculate pt and radius of track-> input for 3D fitter.
+  A=0,B=0,C=0,D=0,E=0,G=0,hcx=0,hcy=0;
+  for(unsigned i=0;i<5;i++){
+    A+=cos(phi2[i])*cos(phi2[i])/(fiterror[i]*fiterror[i]);
+    B+=sin(phi2[i])*sin(phi2[i])/(fiterror[i]*fiterror[i]);
+    C+=cos(phi2[i])*sin(phi2[i])/(fiterror[i]*fiterror[i]);
+    D+=rr[i]*cos(phi2[i])/(fiterror[i]*fiterror[i]);
+    E+=rr[i]*sin(phi2[i])/(fiterror[i]*fiterror[i]);
+    G+=rr[i]*rr[i]/(fiterror[i]*fiterror[i]);
+  }
+  hcx=D*B-E*C;    //helix center x
+  hcx/=2*(A*B-C*C);
+  hcy=E*A-D*C;    //helix center y
+  hcy/=2*(A*B-C*C);
+  rho=sqrt(hcx*hcx + hcy*hcy);  //radius of helix
+  myphi0=atan2(hcy,hcx);
+  if(myphi0<0) myphi0 += 2*Trg_PI;
+  //myphi0=atan(hcy/hcx);
+  //if(hcx<0 && hcy>0) myphi0 += Trg_PI;
+  //if(hcx<0 && hcy<0) myphi0 += Trg_PI;
+  //if(hcx>0 && hcy<0) myphi0 += Trg_PI*2.0;
+
+  // For chi2
+  double pchi2 = -2*hcx*D-2*hcy*E+G;
+  pchi2/=3;
+  // Another way to calculate chi2
+  double pchi3;
+  for(unsigned i=0;i<5;i++){
+    pchi3+=(2*(hcx*cos(phi2[i])+hcy*sin(phi2[i]))-rr[i])*(2*(hcx*cos(phi2[i])+hcy*sin(phi2[i]))-rr[i])/(fiterror[i]*fiterror[i]);
+  }
+  pchi3/=3;
+  
+}
+
+double calZ(int &mysign, double &anglest, double &ztostraw, double &rr, double &phi2, double &rho, double &myphi0){
+  double myphiz, acos_real;
+  double Trg_PI=3.141592653589793; 
+  //Find phifit-phist
+  acos_real=acos(rr/(2*rho));
+  if(mysign==1){
+    myphiz = -acos_real-myphi0+phi2;
+  }
+  else{
+    myphiz = +acos_real-myphi0+phi2;
+  }
+  if(myphiz>Trg_PI) myphiz-=2*Trg_PI;
+  if(myphiz<-Trg_PI) myphiz+=2*Trg_PI;
+
+  return (ztostraw - rr*2*sin(myphiz/2)/anglest);
+}
+
+double calS(double &rho, double &rr){
+  double result;
+  result = rho*2*asin(rr/2/rho);
+  return result;
+}
+
+void rSFit(double *iezz2, double *arcS, double *zz, double &z0, double &cot){
+
+  double ss=0, sx=0, sxx=0, cotnum=0, z0num=0;
+  double z0nump1[4], z0nump2[4];
+  double z0den, iz0den;
+
+  for(unsigned i=0;i<4;i++){
+    ss+=iezz2[i];
+    sx+=arcS[i]*iezz2[i];
+    sxx+=arcS[i]*arcS[i]*iezz2[i];
+  }
+
+  for(unsigned i=0;i<4;i++){
+    cotnum+=(ss*arcS[i]-sx)*iezz2[i]*zz[i];
+    z0nump1[i]=sxx-sx*arcS[i];
+    z0nump2[i]=z0nump1[i]*iezz2[i]*zz[i];
+    z0num+=z0nump2[i];
+  }
+  z0den=(ss*sxx)-(sx*sx);
+  iz0den=1./z0den;
+  z0num*=iz0den;
+  cotnum*=iz0den;
+  z0=z0num;
+  cot=cotnum;
+
+  // Calculate chi2 of z0
+  double zchi2 = 0.;
+  for(unsigned i=0;i<4;i++){
+    zchi2 += (zz[i]-z0-cot*arcS[i])*(zz[i]-z0-cot*arcS[i])*iezz2[i];
+  }
+  zchi2 /= (4-2);
+}

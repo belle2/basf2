@@ -123,5 +123,17 @@ TRGCDCTrackBase::approach2D(TCLink &) const {
     return -1;
 }
 
+bool
+TRGCDCTrackBase::MCInformation(void) const {
+
+    TRGDebug::enterStage("MCInfo");
+
+    for (unsigned i = 0; i < _tsAll.size(); i++) {
+//	cout << _tsAll[i]->cell()->name() << endl;
+
+    }
+
+    TRGDebug::leaveStage("MCInfo");
+}
 
 } // namespace Belle2

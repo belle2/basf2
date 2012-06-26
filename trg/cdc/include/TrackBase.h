@@ -73,13 +73,9 @@ class TRGCDCTrackBase {
                       const std::string & prefix = std::string("")) const;
 
     /// returns a vector to track segments.
-//     const std::vector<const TRGCDCTrackSegment *> &
-//         trackSegments(void) const;
     const std::vector<TRGCDCLink *> & links(void) const;
 
     /// returns a vector to track segments.
-//     const std::vector<const TRGCDCTrackSegment *> &
-//         trackSegments(unsigned layerId) const;
     const std::vector<TRGCDCLink *> & links(unsigned layerId) const;
 
     /// returns true if fitted.
@@ -90,6 +86,10 @@ class TRGCDCTrackBase {
 
     /// returns a pointer to a default fitter.
     const TRGCDCFitter * const fitter(void) const;
+
+    /// returns MC information. False will be returned if no MC
+    /// info. available.
+    bool MCInformation(void) const;
 
   public: // Modifiers
 

@@ -301,7 +301,7 @@ namespace Belle2 {
       vector<G4Point3D> lastSensorEdge;
       BOOST_FOREACH(GeoVXDSensorPlacement & p, m_ladder.sensors) {
         VxdID sensorID(ladder);
-        sensorID.setSensor(p.sensorID);
+        sensorID.setSensorNumber(p.sensorID);
 
         std::map<string, GeoVXDSensor>::iterator it = m_sensorMap.find(p.sensorTypeID);
         if (it == m_sensorMap.end()) {

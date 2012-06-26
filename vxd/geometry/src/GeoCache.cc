@@ -79,9 +79,9 @@ namespace Belle2 {
           //layers,ladders,sensors
           VxdID sensorID = info->getID();
           VxdID ladderID = sensorID;
-          ladderID.setSensor(0);
+          ladderID.setSensorNumber(0);
           VxdID layerID  = ladderID;
-          layerID.setLadder(0);
+          layerID.setLadderNumber(0);
 
           m_sensorInfo[sensorID] = info;
 
@@ -128,8 +128,8 @@ namespace Belle2 {
     const set<VxdID>& GeoCache::getLadders(VxdID layer) const
     {
       //We only index by layer, so set everything else to 0
-      layer.setLadder(0);
-      layer.setSensor(0);
+      layer.setLadderNumber(0);
+      layer.setSensorNumber(0);
       SensorHierachy::const_iterator info = m_ladders.find(layer);
       if (info == m_ladders.end()) B2FATAL("VXD Layer " << layer << "does not exist.");
       return info->second;
@@ -138,7 +138,7 @@ namespace Belle2 {
     const set<VxdID>& GeoCache::getSensors(VxdID ladder) const
     {
       //We only index by layer and ladder, set sensor to 0
-      ladder.setSensor(0);
+      ladder.setSensorNumber(0);
       SensorHierachy::const_iterator info = m_sensors.find(ladder);
       if (info == m_sensors.end()) B2FATAL("VXD Ladder " << ladder << "does not exist.");
       return info->second;

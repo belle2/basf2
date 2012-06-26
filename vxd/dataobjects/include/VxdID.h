@@ -99,13 +99,13 @@ namespace Belle2 {
     /** Set the unique id */
     void setID(unsigned short id)           { m_id.id = id; }
     /** Set the layer id */
-    void setLayer(unsigned short layer)     { m_id.parts.layer  = layer;  }
+    void setLayerNumber(unsigned short layer)     { m_id.parts.layer  = layer;  }
     /** Set the ladder id */
-    void setLadder(unsigned short ladder)   { m_id.parts.ladder = ladder; }
+    void setLadderNumber(unsigned short ladder)   { m_id.parts.ladder = ladder; }
     /** Set the sensor id */
-    void setSensor(unsigned short sensor)   { m_id.parts.sensor = sensor; }
+    void setSensorNumber(unsigned short sensor)   { m_id.parts.sensor = sensor; }
     /** Set the sensor segment */
-    void setSegment(unsigned short segment) { m_id.parts.segment = segment; }
+    void setSegmentNumber(unsigned short segment) { m_id.parts.segment = segment; }
 
   private:
 

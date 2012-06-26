@@ -12,10 +12,11 @@
 class TH1F;
 
 namespace Belle2 {
-  /** Container for likelihoods obtained by the dE/dx PID (DedxPIDModule).
-   *
-   * \addtogroup dataobjects
+  /** \addtogroup dataobjects
    * @{
+   */
+
+  /** Container for likelihoods obtained by the dE/dx PID (DedxPIDModule).
    */
   class DedxLikelihood : public TObject {
   public:

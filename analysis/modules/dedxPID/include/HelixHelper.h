@@ -7,20 +7,25 @@
 
 
 namespace Belle2 {
-//! helper class to work with helical tracks
+  /** Helper class representing a helical track
+   *
+   * It is used as an alternative to Genfit's track representation
+   * and provides much faster replacements for its extrapolateToLine/
+   * extrapolateToPoint() methods.
+   */
   class HelixHelper {
-    const static double c_cTimesB = (1.5 * 0.00299792458);
-    const static double c_maxFlightLength = 150.0; //fitted values are below this
+    const static double c_cTimesB = (1.5 * 0.00299792458); /**< magnetic filed times speed of light */
+    const static double c_maxFlightLength = 150.0; /**< maximal path length (from origin) considered for extrapolation */
 
   public:
-    //construct a helix with given helix parameters
+    /** construct a helix with given helix parameters, as defined for Track objects */
     HelixHelper(float z0, float d0, float omega, float cotTheta, float phi):
       z0(z0), d0(d0), omega(omega), cotTheta(cotTheta), phi(phi),
       poca(d0* sin(phi), -d0* cos(phi), z0)
     { }
 
 
-    //construct a helix at an arbitrary position 'poca' (helices built at different points are not comparable)
+    /** construct a helix at an arbitrary position 'poca' (helices built at different points are not comparable) */
     HelixHelper(const TVector3& poca, const TVector3& momentum_in_poca, int charge):
       poca(poca) {
       const double pt = momentum_in_poca.Pt();
@@ -43,8 +48,10 @@ namespace Belle2 {
       cotTheta = dirInPoca.z() / dirInPoca.Pt();
     }
 
-    //returns the path length (along the helix) to the helix point closest to p
-    //path length 0 corresponds to p = (0,0,0)
+    /** returns the path length (along the helix) to the helix point closest to p.
+     *
+     * a path length of 0 corresponds to p = poca
+     */
     double pathLengthToPoint(const TVector3& p) const {
       minimize_distance_to_point = p;
       helix_object = this; //ok, this is ugly
@@ -60,6 +67,9 @@ namespace Belle2 {
       return bm.XMinimum();
     }
 
+    /** returns the path length (along the helix) to the helix point closest to the line
+     *  going through points a and b.
+     */
     double pathLengthToLine(const TVector3& a, const TVector3& b) const {
       minimize_distance_to_line_a = a;
       minimize_distance_to_line_b = b;
@@ -78,7 +88,9 @@ namespace Belle2 {
     }
 
 
-    //momentum of the particle represented by the helical track
+    /** momentum of the particle, at the helix point
+     *  corresponding to a flown path length s (from poca).
+     */
     TVector3 momentum(double s = 0) const {
       const float pt = c_cTimesB / TMath::Abs(omega);
       return TVector3(
@@ -88,7 +100,7 @@ namespace Belle2 {
              );
     }
 
-    //point on helix corresponding to a flown path length s (from poca)
+    /** point on helix corresponding to a flown path length s (from poca) */
     TVector3 position(double s) const {
       //aproximation (but it does work for straight tracks)
       return poca + TVector3(
@@ -99,29 +111,29 @@ namespace Belle2 {
     }
 
   private:
-    //helix parameters are those stored in Track objects
+    /** helix parameters, with same convention as those stored in Track objects */
     float z0, d0, omega, cotTheta, phi;
 
-    //point of closest approach to origin
+    /** point of closest approach to origin */
     TVector3 poca;
 
-    //minimization function, calculates distance to minimize_distance_to_point
+    /** minimization function, calculates distance to minimize_distance_to_point */
     static double distanceToPoint(double s) {
       return (helix_object->position(s) - minimize_distance_to_point).Mag();
     }
 
-    //same as distanceToHelixAt, but ignoring z coordinate
+    /** same as distanceToPoint, but ignoring z coordinate */
     static double distanceToLine(double s) {
       const TVector3& p = helix_object->position(s);
       // d = |(p-a) \times (p-b)| / |b-a|
       return ((p - minimize_distance_to_line_a).Cross(p - minimize_distance_to_line_b)).Mag() / (minimize_distance_to_line_b - minimize_distance_to_line_a).Mag();
     }
 
-    //user supplied point we're trying to find the nearest helix point to
+    /** user supplied point we're trying to find the nearest helix point to */
     static TVector3 minimize_distance_to_point;
-    //user supplied line we're trying to find the nearest helix point to
+    /** user supplied line we're trying to find the nearest helix point to */
     static TVector3 minimize_distance_to_line_a, minimize_distance_to_line_b;
-    //keep a 'this' pointer around for minimization
+    /** keep a 'this' pointer around for minimization */
     static HelixHelper const* helix_object;
   };
 

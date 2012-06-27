@@ -66,6 +66,8 @@ CDCTrackingModule::~CDCTrackingModule()
 
 void CDCTrackingModule::initialize()
 {
+  m_nTracks = 0;
+
   if (m_textFileOutput) {
     //open the output txt files
     SimHitsfile.open("SimHits.txt");
@@ -142,9 +144,7 @@ void CDCTrackingModule::event()
 
     if (cdcSegments[i]->getIsAxial()) {
       cdcAxialSegments.push_back(*cdcSegments[i]);
-    }
-
-    else {
+    } else {
       cdcStereoSegments.push_back(*cdcSegments[i]);
     }
   }

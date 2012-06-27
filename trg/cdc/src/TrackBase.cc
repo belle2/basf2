@@ -2,7 +2,7 @@
 // $Id$
 //-----------------------------------------------------------------------------
 // Filename : TrackBase.cc
-// Section  : TrackBaseing
+// Section  : TRG CDC
 // Owner    : Yoshihito Iwasaki
 // Email    : yoshihito.iwasaki@kek.jp
 //-----------------------------------------------------------------------------
@@ -13,12 +13,14 @@
 
 #define TRGCDC_SHORT_NAMES
 
+#include "cdc/dataobjects/CDCSimHit.h"
 #include "trg/trg/Debug.h"
 #include "trg/cdc/TRGCDC.h"
 #include "trg/cdc/TrackBase.h"
 #include "trg/cdc/Wire.h"
 #include "trg/cdc/Link.h"
 #include "trg/cdc/Fitter.h"
+#include "trg/cdc/Relation.h"
 
 using namespace std;
 
@@ -123,17 +125,44 @@ TRGCDCTrackBase::approach2D(TCLink &) const {
     return -1;
 }
 
-bool
-TRGCDCTrackBase::MCInformation(void) const {
+const TRGCDCRelation
+TRGCDCTrackBase::relation(void) const {
 
     TRGDebug::enterStage("MCInfo");
 
+    map<unsigned, unsigned> relations;
     for (unsigned i = 0; i < _tsAll.size(); i++) {
-//	cout << _tsAll[i]->cell()->name() << endl;
 
+	const TCCell & cell = * _tsAll[i]->cell();
+	const TCCHit & hit = * cell.hit();
+	const CDCSimHit & simHit = * hit.simHit();
+	const unsigned trkID = simHit.getTrackId();
+	
+	map<unsigned, unsigned>::iterator it = relations.find(trkID);
+	if (it != relations.end())
+	    ++it->second;
+	else
+	    relations[trkID] = 1;
+
+	if (TRGDebug::level()) {
+	    cout << TRGDebug::tab() << cell.name() << ","
+		 << ",MCTrkId=" << trkID << endl;
+	}
+    }
+
+    if (TRGDebug::level()) {
+	map<unsigned, unsigned>::const_iterator it = relations.begin();
+	while (it != relations.end()) {
+	    cout << TRGDebug::tab()
+		 << it->first << ","
+		 << it->second << endl;
+	    ++it;
+	}
     }
 
     TRGDebug::leaveStage("MCInfo");
+
+    return TCRelation(* this, relations);
 }
 
 } // namespace Belle2

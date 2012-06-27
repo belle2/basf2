@@ -411,7 +411,8 @@ TRGCDC::initialize(bool houghFinderPerfect,
 
 void
 TRGCDC::terminate(void){
-  _fitter3D->terminate();
+    _fitter3D->terminate();
+    _cdc->terminate();
 }
 
 void

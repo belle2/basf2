@@ -33,6 +33,7 @@ namespace Belle2 {
 
 class TRGCDCLink;
 class TRGCDCFitter;
+class TRGCDCRelation;
 
 /// A class to represent a track object in TRGCDC.
 class TRGCDCTrackBase {
@@ -89,7 +90,7 @@ class TRGCDCTrackBase {
 
     /// returns MC information. False will be returned if no MC
     /// info. available.
-    bool MCInformation(void) const;
+    const TRGCDCRelation relation(void) const;
 
   public: // Modifiers
 

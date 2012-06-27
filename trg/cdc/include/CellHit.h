@@ -117,7 +117,8 @@ class TRGCDCCellHit {
     /// assigns a pointer to a TTrack.
     const void * const track(void) const;
 
-    /// returns sequential Length in one segment : this parameter is used in TCurlFinder now.
+    /// returns sequential Length in one segment : this parameter is
+    /// used in TCurlFinder now.
     unsigned sequence(void) const;
 
     /// returns an index to CDCHit.

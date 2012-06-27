@@ -30,6 +30,7 @@
 #include "trg/cdc/Circle.h"
 #include "trg/cdc/Track.h"
 #include "trg/cdc/Link.h"
+#include "trg/cdc/Relation.h"
 
 #ifdef TRGCDC_DISPLAY_HOUGH
 #include "trg/cdc/DisplayRphi.h"
@@ -254,9 +255,10 @@ TRGCDCHoughFinder::doit(vector<TCTrack *> & trackList) {
 	    TCTrack & t = * new TCTrack(c);
 	    t.name("Track_" + TRGUtil::itostring(i));
 	    trackList.push_back(& t);
-	    if (TRGDebug::level())
+	    if (TRGDebug::level()) {
+		t.relation().dump("", "        MCInfo");
 		t.dump("detail");
-
+	    }
 #ifdef TRGCDC_DISPLAY_HOUGH
 	    vector<const TCCircle *> cc;
 	    cc.push_back(& c);

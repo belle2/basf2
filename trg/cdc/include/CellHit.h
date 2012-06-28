@@ -64,6 +64,7 @@ namespace Belle2 {
 
 class CDCHit;
 class CDCSimHit;
+class MCParticle;
 class TRGCDCCell;
 
 /// A class to represent a wire hit in CDC.
@@ -75,6 +76,7 @@ class TRGCDCCellHit {
     TRGCDCCellHit(const TRGCDCCell &,
 		  unsigned indexCDCHit = 0,
 		  unsigned indexCDCSimHit = 0,
+		  unsigned indexMCParticle = 0,
 		  float driftLeft = 0,
 		  float driftLeftError = 0,
 		  float driftRight = 0,
@@ -127,11 +129,17 @@ class TRGCDCCellHit {
     /// returns an index to CDCSimHit.
     unsigned iCDCSimHit(void) const;
 
+    /// returns an index to MCParticle.
+    unsigned iMCParticle(void) const;
+
     /// Access to CDCHit.
     const CDCHit * hit(void) const;
 
     /// Access to CDCSimHit.
     const CDCSimHit * simHit(void) const;
+
+    /// Access to MCParticle.
+    const MCParticle * mcParticle(void) const;
 
   public:// Modifiers
     /// sets state. Meaning of bits are written below.
@@ -169,6 +177,9 @@ class TRGCDCCellHit {
 
     /// Index to CDCSimHit array
     unsigned _iCDCSimHit;
+
+    /// Index to MCParticle array
+    unsigned _iMCParticle;
 
    // _state bit definition
 
@@ -306,6 +317,12 @@ inline
 unsigned
 TRGCDCCellHit::iCDCSimHit(void) const {
     return _iCDCSimHit;
+}
+
+inline
+unsigned
+TRGCDCCellHit::iMCParticle(void) const {
+    return _iMCParticle;
 }
 
 } // namespace Belle2

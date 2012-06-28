@@ -113,6 +113,4 @@ TRGCDCRelation::dump(const std::string & ,
     }
 }
 
-
-
 } // namespace Belle2

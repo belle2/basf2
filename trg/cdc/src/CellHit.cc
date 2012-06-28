@@ -15,6 +15,7 @@
 #define TRGCDC_SHORT_NAMES
 
 #include "framework/datastore/StoreArray.h"
+#include "generators/dataobjects/MCParticle.h"
 #include "cdc/dataobjects/CDCSimHit.h"
 #include "cdc/dataobjects/CDCHit.h"
 #include "trg/trg/Utilities.h"
@@ -30,6 +31,7 @@ namespace Belle2 {
 TRGCDCCellHit::TRGCDCCellHit(const TRGCDCCell & w,
 			     unsigned indexCDCHit,
 			     unsigned indexCDCSimHit,
+			     unsigned indexMCParticle,
 			     float driftLeft,
 			     float driftLeftError,
 			     float driftRight,
@@ -40,7 +42,8 @@ TRGCDCCellHit::TRGCDCCellHit(const TRGCDCCell & w,
        _xyPosition(w.xyPosition()),
        _track(0),
        _iCDCHit(indexCDCHit),
-       _iCDCSimHit(indexCDCSimHit) {
+       _iCDCSimHit(indexCDCSimHit),
+       _iMCParticle(indexMCParticle) {
 //  w.hit(this); // set by TRGCDC
     _drift[0] = driftLeft;
     _drift[1] = driftRight;
@@ -128,6 +131,12 @@ const CDCSimHit *
 TRGCDCCellHit::simHit(void) const {
     StoreArray<CDCSimHit> CDCHits("CDCSimHits");
     return CDCHits[_iCDCSimHit];
+}
+
+const MCParticle *
+TRGCDCCellHit::mcParticle(void) const {
+    StoreArray<MCParticle> mcParticles("MCParticles");
+    return mcParticles[_iMCParticle];
 }
 
 } // namespace Belle2

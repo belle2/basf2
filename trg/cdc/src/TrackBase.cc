@@ -135,18 +135,17 @@ TRGCDCTrackBase::relation(void) const {
 
 	const TCCell & cell = * _tsAll[i]->cell();
 	const TCCHit & hit = * cell.hit();
-	const CDCSimHit & simHit = * hit.simHit();
-	const unsigned trkID = simHit.getTrackId();
+	const unsigned iMCParticle = hit.iMCParticle();
 	
-	map<unsigned, unsigned>::iterator it = relations.find(trkID);
+	map<unsigned, unsigned>::iterator it = relations.find(iMCParticle);
 	if (it != relations.end())
 	    ++it->second;
 	else
-	    relations[trkID] = 1;
+	    relations[iMCParticle] = 1;
 
 	if (TRGDebug::level()) {
 	    cout << TRGDebug::tab() << cell.name() << ","
-		 << ",MCTrkId=" << trkID << endl;
+		 << ",MCParticle=" << iMCParticle << endl;
 	}
     }
 

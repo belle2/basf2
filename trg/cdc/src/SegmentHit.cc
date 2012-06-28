@@ -31,6 +31,7 @@ TRGCDCSegmentHit::TRGCDCSegmentHit(const TCSegment & w)
     : TCCHit(w,
 	     w.center().hit()->iCDCHit(),
 	     w.center().hit()->iCDCSimHit(),
+	     w.center().hit()->iMCParticle(),
 	     w.center().hit()->drift(0),
 	     w.center().hit()->dDrift(0),
 	     w.center().hit()->drift(1),

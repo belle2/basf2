@@ -17,6 +17,7 @@
 #include <cstdlib>
 #include "framework/datastore/StoreArray.h"
 #include "framework/datastore/RelationArray.h"
+#include "generators/dataobjects/MCParticle.h"
 #include "cdc/dataobjects/CDCHit.h"
 #include "cdc/dataobjects/CDCSimHit.h"
 #include "cdc/geometry/CDCGeometryPar.h"
@@ -40,6 +41,7 @@
 #include "trg/cdc/HoughFinder.h"
 #include "trg/cdc/Fitter3D.h"
 #include "trg/cdc/Link.h"
+#include "trg/cdc/Relation.h"
 
 #ifdef TRGCDC_DISPLAY
 #include "trg/cdc/DisplayRphi.h"
@@ -412,7 +414,6 @@ TRGCDC::initialize(bool houghFinderPerfect,
 void
 TRGCDC::terminate(void){
     _fitter3D->terminate();
-    _cdc->terminate();
 }
 
 void
@@ -647,19 +648,29 @@ TRGCDC::update(bool ) {
     }
     const unsigned nHits = CDCHits->GetEntries();
 
+    //...MCParticle...
+    StoreArray<MCParticle> mcParticles;
+    if (! mcParticles) {
+        cout << "TRGCDC !!! can not access to MCParticles" << endl;
+        TRGDebug::leaveStage("TRGCDC update");
+        return;
+    }
+
     //...Relations...
     RelationArray rels(SimHits, CDCHits);
     const unsigned nRels = rels.getEntries();
+    RelationArray relsMC(mcParticles, CDCHits);
+    const unsigned nRelsMC = relsMC.getEntries();
 
     //...Loop over CDCHits...
     for (unsigned i = 0; i < nHits; i++) {
         const CDCHit & h = * CDCHits[i];
-	unsigned iSimHit = 0;
 
 //      //...Check validity (skip broken channel)...
 //      if (! (h->m_stat & CellHitFindingValid)) continue;
 
 	//...Get CDCSimHit... This is expensive. Should be moved outside.
+	unsigned iSimHit = 0;
 	for (unsigned j = 0; j < nRels; j++) {
 	    const unsigned k = rels[j].getToIndices().size();
 	    for (unsigned l = 0; l < k; l++) {
@@ -670,6 +681,24 @@ TRGCDC::update(bool ) {
 	    if (TRGDebug::level())
 		if (k > 1)
 		    cout << "TRGCDC::update !!! CDCSimHit[" << iSimHit
+			 << "] has multiple CDCHit(" << k << " hits)" << endl;
+	}
+
+	//...Get MCParticle... This is expensive, again.
+	//   (Getting the first MCParticle only)
+	unsigned iMCPart = 0;
+	for (unsigned j = 0; j < nRelsMC; j++) {
+	    const unsigned k = relsMC[j].getToIndices().size();
+	    for (unsigned l = 0; l < k; l++) {
+		if (relsMC[j].getToIndex(l) == i) {
+		    iMCPart = relsMC[j].getFromIndex();
+		    break;
+		}
+	    }
+
+	    if (TRGDebug::level())
+		if (k > 1)
+		    cout << "TRGCDC::update !!! MCParticle[" << iMCPart
 			 << "] has multiple CDCHit(" << k << " hits)" << endl;
 	}
 
@@ -705,6 +734,7 @@ TRGCDC::update(bool ) {
         TCWHit * hit = new TCWHit(w,
 				  i,
 				  iSimHit,
+				  iMCPart,
 				  driftLength,
 				  0.15,
 				  driftLength,
@@ -1223,6 +1253,14 @@ TRGCDC::simulate(void) {
 		cout << TRGDebug::tab() << "There are only " << ppos.size()
 		     << " perfect positions" << endl;
 	    }
+	}
+    }
+
+
+    //...Check relations...
+    if (TRGDebug::level()) {
+	for (unsigned i = 0; i < trackList.size(); i++) {
+	    trackList[i]->relation().dump();
 	}
     }
 

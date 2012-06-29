@@ -19,7 +19,6 @@
 #include <pxd/reconstruction/Pixel.h>
 #include <boost/format.hpp>
 #include <string>
-#include <deque>
 
 namespace Belle2 {
 

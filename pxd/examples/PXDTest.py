@@ -58,7 +58,7 @@ particlegun.param('nTracks', 10)
 print_params(particlegun)
 
 # Set the number of events to be processed (10 events)
-evtmetagen.param({'EvtNumList': [10], 'RunList': [1]})
+evtmetagen.param({'EvtNumList': [100], 'RunList': [1]})
 
 # Set output filename
 output.param('outputFileName', 'PXDTestOutput.root')
@@ -70,11 +70,13 @@ geometry.param('Components', ['MagneticField', 'PXD', 'SVD'])
 PXDDIGI.param('SimpleDriftModel', False)
 PXDDIGI.param('statisticsFilename', 'PXDDiags.root')
 PXDDIGI.param('PoissonSmearing', True)
-PXDDIGI.param('ElectronicEffects', True)
+PXDDIGI.param('ElectronicEffects', False)
+PXDDIGI.param('NoiseSN', 1.0)
+PXDCLUST.param('NoiseSN', 1.0)
 
 SVDDIGI.param('statisticsFilename', 'SVDDiags.root')
 SVDDIGI.param('PoissonSmearing', True)
-SVDDIGI.param('ElectronicEffects', True)
+SVDDIGI.param('ElectronicEffects', False)
 
 # ============================================================================
 # Do the simulation

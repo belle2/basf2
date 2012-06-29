@@ -170,7 +170,7 @@ void PXDDigitizerModule::initialize()
     m_rootFile->cd();
     m_histSteps = new TH1D("steps", "Diffusion steps;number of steps", m_elMaxSteps + 1, 0, m_elMaxSteps + 1);
     m_histDiffusion = new TH2D("diffusion", "Diffusion distance;u [um];v [um];", 200, -100, 100, 200, -100, 100);
-    m_histLorentz_u = new TH1D("h_LorentzAngle_u", "Lorentz angle, u", 100, -0.1, 0.3);
+    m_histLorentz_u = new TH1D("h_LorentzAngle_u", "Lorentz angle, u", 200, -0.3, 0.3);
     m_histLorentz_u->GetXaxis()->SetTitle("Lorentz angle");
     m_histLorentz_v = new TH1D("h_LorentzAngle_v", "Lorentz angle, v", 100, -0.1, 0.1);
     m_histLorentz_v->GetXaxis()->SetTitle("Lorentz angle");
@@ -323,7 +323,8 @@ const TVector3 PXDDigitizerModule::getEField(const TVector3& point) const
   double sensorThickness = info.getThickness();
 
   double depletionVoltage = 0.5 * Unit::e * info.getBulkDoping() / Unit::permSi * sensorThickness * sensorThickness;
-  double Ez = (info.getBackVoltage() - info.getTopVoltage()) / sensorThickness + 2 * depletionVoltage * point.Z() / sensorThickness / sensorThickness;
+  double gateZ = 0.5 * sensorThickness - info.getGateDepth();
+  double Ez = 2 * depletionVoltage * (point.Z() - gateZ) / sensorThickness / sensorThickness;
 
   TVector3 E(0, 0, Ez);
   return E;
@@ -353,12 +354,12 @@ const TVector3 PXDDigitizerModule::getDriftVelocity(const TVector3& E, const TVe
 
 void PXDDigitizerModule::driftCharge(const TVector3& position, double electrons)
 {
-  // Constants for the 7-point Gauss-Lobatto quadrature formula
-  static const double alphaGL = sqrt(2.0 / 3.0);
-  static const double betaGL = 1.0 / sqrt(5.0);
-  static const double weightGL[7] = {77.0 / 1478, 432.0 / 1478, 625.0 / 1478, 672.0 / 1478,
-                                     625.0 / 1478, 432.0 / 1478, 77.0 / 1478
-                                    };
+  // Constants for the 5-point Gauss quadrature formula
+  static double alphaGL = 1.0 / 3.0 * sqrt(5.0 + 2.0 * sqrt(10.0 / 7.0));
+  static double betaGL =  1.0 / 3.0 * sqrt(5.0 - 2.0 * sqrt(10.0 / 7.0));
+  static double walpha = (322 - 13.0 * sqrt(70)) / 900;
+  static double wbeta = (322 + 13.0 * sqrt(70)) / 900;
+  static double weightGL[5] = {walpha, wbeta, 128.0 / 225.0, wbeta, walpha};
 
   B2DEBUG(30, "Drifting " << electrons << " electrons at position ("
           << position.x() << ", "
@@ -384,40 +385,33 @@ void PXDDigitizerModule::driftCharge(const TVector3& position, double electrons)
   TVector3 positionInPlane(position);
   double sigmaDrift2 = 0;
   // If we are close to the target plane, don't integrate
-  if (distanceToPlane < 1.0 * Unit::um) {
-    positionInPlane += distanceToPlane / v.Z() * v;
-    sigmaDrift2 = 2 * Unit::uTherm * getElectronMobility(currentEField.Mag()) * distanceToPlane / v.Z();
-  } else { // Integrate
+  if (fabs(distanceToPlane) > 1.0 * Unit::um) {
     // set integration region and integration points
     double a = position.Z();
     double b = 0.5 * sensorThickness - info.getGateDepth();
     double h = distanceToPlane / 2.0;
     double midpoint = position.Z() + 0.5 * distanceToPlane;
-    std::vector<double> zKnots(7);
-    zKnots[0] = a;
-    zKnots[1] = midpoint - alphaGL * h;
-    zKnots[2] = midpoint - betaGL * h;
-    zKnots[3] = midpoint;
-    zKnots[4] = midpoint + betaGL * h;
-    zKnots[5] = midpoint + alphaGL * h;
-    zKnots[6] = b;
-    // Calculate the quadrature. We already calculated the quantities for a.
+    std::vector<double> zKnots(5);
+    zKnots[0] = midpoint - alphaGL * h;
+    zKnots[1] = midpoint - betaGL * h;
+    zKnots[2] = midpoint;
+    zKnots[3] = midpoint + betaGL * h;
+    zKnots[4] = midpoint + alphaGL * h;
+    // Calculate the quadrature.
     // We integrate
     // - v/v_z for position,
     // - 2 * kT/e * mobility(E(position) / v_z for sigmaDrift.
-    // We already calculated v for a.
-    double weightByT = h * weightGL[0] / v.Z();
-    positionInPlane += weightByT * v;
     TVector3 currentPosition(position);
-    sigmaDrift2 += weightByT * 2 * Unit::uTherm * getElectronMobility(currentEField.Mag());
-    for (int iz = 1; iz < 7; ++iz) {
+    //double tanLorentz2 = 0;
+    for (int iz = 0; iz < 5; ++iz) {
       // This is a bit imprecise. We calculate the electric field in a position calculatted
       // by Euler's rule. As long as E only depends on z, it makes no difference.
       currentPosition += (zKnots[iz] - zKnots[iz - 1]) / v.Z() * v;
       currentEField = getEField(currentPosition);
       v = getDriftVelocity(currentEField, m_currentBField);
-      weightByT = h * weightGL[iz] / v.Z();
+      double weightByT = h * weightGL[iz] / v.Z();
       positionInPlane += weightByT * v;
+      //tanLorentz2 += 0.5 * weightGL[iz] * getElectronMobility(currentEField.Mag())*m_hallFactor*m_currentBField.Y();
       sigmaDrift2 += weightByT * 2 * Unit::uTherm * getElectronMobility(currentEField.Mag());
     } // for knots
   } // Integration
@@ -426,15 +420,16 @@ void PXDDigitizerModule::driftCharge(const TVector3& position, double electrons)
   double currentTanLA_v = v.Y() / v.Z();
   double sigmaDrift_u = sqrt(sigmaDrift2 * (1 + currentTanLA_u * currentTanLA_u));
   double sigmaDrift_v = sqrt(sigmaDrift2 * (1 + currentTanLA_v * currentTanLA_v));
-  if (distanceToPlane > 1.0 * Unit::um) {
+  if (fabs(distanceToPlane) > 1.0 * Unit::um) {
     double tanLorentz_u = (positionInPlane.X() - position.X()) / distanceToPlane;
     double tanLorentz_v = (positionInPlane.Y() - position.Y()) / distanceToPlane;
     if (m_histLorentz_u) m_histLorentz_u->Fill(tanLorentz_u);
     if (m_histLorentz_v) m_histLorentz_v->Fill(tanLorentz_v);
   };
-  // Diffusion: Free diffusion + drift due to magnetic force. We use mean mobility
+  // Diffusion: Free diffusion + drift due to magnetic force. We use asymptotic mobility
   // here, as the drift is perpendicular to the "macro" E field.
-  double sigmaDiffus = sqrt(2 * Unit::uTherm  * Unit::eMobilitySi * m_elStepTime);
+  TVector3 E0(0, 0, 0);
+  double sigmaDiffus = sqrt(2 * Unit::uTherm  * getElectronMobility(0) * m_elStepTime);
   //Divide into groups of m_elGroupSize electrons and simulate lateral diffusion of each group by doing a
   //random walk with free electron mobility in uv-plane
   int    nGroups     = (int)(electrons / m_elGroupSize) + 1;

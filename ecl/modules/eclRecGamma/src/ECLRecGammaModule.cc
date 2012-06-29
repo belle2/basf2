@@ -140,9 +140,9 @@ void ECLRecGammaModule::event()
 
     if (!m_extMatch) { //no match to track => assign as gamma
 
-      double px = m_energy * sin(m_theta) * cos(m_phi);
-      double py = m_energy * sin(m_theta) * sin(m_phi);
-      double pz = m_energy * cos(m_theta);
+//      double px = m_energy * sin(m_theta) * cos(m_phi);
+//      double py = m_energy * sin(m_theta) * sin(m_phi)
+//      double pz = m_energy * cos(m_theta);
 
 
       StoreArray<MdstGamma> gammaArray(m_MdstGammaName);

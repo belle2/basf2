@@ -42,8 +42,7 @@ using std::endl;
 
 //root stuff
 #include <TRandom.h>
-//genfit stuff
-#include <GFTrackCand.h>
+
 
 using namespace Belle2;
 
@@ -60,7 +59,7 @@ VXDSimpleClusterizerModule::VXDSimpleClusterizerModule() : Module()
   addParam("onlyPrimaries", m_onlyPrimaries, "if true use only primary particles from the generator no particles created by Geant4", false);
   addParam("setMeasSigma", m_setMeasSigma, "if positive value (in cm) is given it will be used as the sigma to smear the Clusters otherwise pitch/sqrt(12) will be used", -1.0);
 
-  addParam("writeTruthToFile", m_writeTruthToFile, "write the u and v coordinate of the trueHits of one track to a text file", false);
+  //addParam("writeTruthToFile", m_writeTruthToFile, "write the u and v coordinate of the trueHits of one track to a text file", false);
 
 }
 
@@ -71,16 +70,16 @@ VXDSimpleClusterizerModule::~VXDSimpleClusterizerModule()
 void VXDSimpleClusterizerModule::initialize()
 {
   //output containers, will be created when initialized here
-  StoreArray<PXDCluster> pxdClusters("pxdClusters");
-  StoreArray<SVDCluster> svdClusters("svdClusters");
+  StoreArray<PXDCluster> pxdClusters("");
+  StoreArray<SVDCluster> svdClusters("");
   StoreArray<MCParticle> mcParticles("");
   StoreArray<PXDTrueHit> pxdTrueHits("");
   StoreArray<SVDTrueHit> svdTrueHits("");
 
-  RelationArray relPXDClusterMCParticle(pxdClusters, mcParticles, "relPXDClusterMCParticle");
-  RelationArray relPXDClusterTrueHit(pxdClusters, pxdTrueHits, "relPXDClusterTrueHit");
-  RelationArray relSVDClusterMCParticle(svdClusters, mcParticles, "relSVDClusterMCParticle");
-  RelationArray relSVDClusterTrueHit(svdClusters, svdTrueHits, "relSVDClusterTrueHit");
+  RelationArray relPXDClusterMCParticle(pxdClusters, mcParticles, "");
+  RelationArray relPXDClusterTrueHit(pxdClusters, pxdTrueHits, "");
+  RelationArray relSVDClusterMCParticle(svdClusters, mcParticles, "");
+  RelationArray relSVDClusterTrueHit(svdClusters, svdTrueHits, "");
 }
 
 void VXDSimpleClusterizerModule::beginRun()
@@ -90,8 +89,8 @@ void VXDSimpleClusterizerModule::beginRun()
 
 void VXDSimpleClusterizerModule::event()
 {
-  ofstream dataOut;
-  if (m_writeTruthToFile == true) dataOut.open("data.txt");
+//  ofstream dataOut;
+//  if (m_writeTruthToFile == true) dataOut.open("data.txt");
   StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
   int eventCounter = eventMetaDataPtr->getEvent();
 
@@ -120,8 +119,8 @@ void VXDSimpleClusterizerModule::event()
 
 
   //output containers
-  StoreArray<PXDCluster> pxdClusters("pxdClusters");
-  StoreArray<SVDCluster> svdClusters("svdClusters");
+  StoreArray<PXDCluster> pxdClusters("");
+  StoreArray<SVDCluster> svdClusters("");
   MCParticle* aMcParticle = mcParticles[0];
 
   RelationArray relPXDClusterMCParticle(pxdClusters, mcParticles, "relPXDClusterMCParticle");
@@ -172,7 +171,7 @@ void VXDSimpleClusterizerModule::event()
     u = gRandom->Gaus(uTrue, sigmaU);
     v = gRandom->Gaus(vTrue, sigmaV);
 
-    if (m_writeTruthToFile == true) dataOut << uTrue << "\t" << vTrue << "\n";
+    //if (m_writeTruthToFile == true) dataOut << uTrue << "\t" << vTrue << "\n";
 
 
     new(pxdClusters->AddrAt(aClusterHit)) PXDCluster(aVXDId, u, v, 0, 0, 1, 1, 1, 1, 1);
@@ -219,7 +218,7 @@ void VXDSimpleClusterizerModule::event()
     u = gRandom->Gaus(uTrue, sigmaU);
     v = gRandom->Gaus(vTrue, sigmaV);
 
-    if (m_writeTruthToFile == true) dataOut << uTrue << "\t" << vTrue << "\n";
+    //if (m_writeTruthToFile == true) dataOut << uTrue << "\t" << vTrue << "\n";
 
     new(svdClusters->AddrAt(aClusterHit)) SVDCluster(aVXDId, true, u, svdTrueHits[i]->getGlobalTime(), 0, 1, 1, 1);
 
@@ -230,7 +229,7 @@ void VXDSimpleClusterizerModule::event()
     ++aClusterHit;
   }
 
-  if (m_writeTruthToFile == true) dataOut.close();
+  //if (m_writeTruthToFile == true) dataOut.close();
 
   B2DEBUG(10, "pxdClusters.getEntries()" << pxdClusters.getEntries());
   B2DEBUG(10, "svdClusters.getEntries()" << svdClusters.getEntries());

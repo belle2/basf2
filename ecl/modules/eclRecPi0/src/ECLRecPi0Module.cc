@@ -12,20 +12,20 @@
 #include <ecl/dataobjects/MdstPi0.h>
 #include <ecl/dataobjects/MdstGamma.h>
 
-#include <ecl/geometry/ECLGeometryPar.h>
-#include <ecl/rec_lib/TEclCFCR.h>
-#include <ecl/rec_lib/TRecEclCF.h>
-#include <ecl/rec_lib/TRecEclCFParameters.h>
-#include <ecl/rec_lib/TEclCFShower.h>
-#include <ecl/rec_lib/TRecEclCF.h>
+//#include <ecl/geometry/ECLGeometryPar.h>
+//#include <ecl/rec_lib/TEclCFCR.h>
+//#include <ecl/rec_lib/TRecEclCF.h>
+//#include <ecl/rec_lib/TRecEclCFParameters.h>
+//#include <ecl/rec_lib/TEclCFShower.h>
+//#include <ecl/rec_lib/TRecEclCF.h>
 
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 
-#include<ctime>
-#include <iomanip>
+//#include<ctime>
+//#include <iomanip>
 #include <float.h>
 
 
@@ -59,11 +59,11 @@ ECLRecPi0Module::ECLRecPi0Module() : Module()
   setDescription("Creates Mdst_gamma from ECLHits.");
 
   //input
-  addParam("MdstGammaOutput", m_MdstGammaName,
-           "//output of this module//(showerId,px,py,pz)", string("mdstGamma"));
+  addParam("MdstGammaInput", m_MdstGammaName,
+           "//Input of this RecPi0  module", string("mdstGamma"));
 
   addParam("MdstPi0Output", m_MdstPi0Name,
-           "//output of this module//(showerId,px,py,pz)", string("mdstPi0"));
+           "//output of this RecPi0 module", string("mdstPi0"));
 
 //  addParam("RandomSeed", m_randSeed, "User-supplied random seed; Default 0 for ctime", (unsigned int)(0));
 
@@ -110,13 +110,15 @@ void ECLRecPi0Module::event()
   const int GNum = Gamma->GetEntriesFast();
 
 
-  for (int iGamma = 0; iGamma < GNum - 1; iGamma++) {
+  for (int iGamma = 0; iGamma < GNum - 1 ; iGamma++) {
     MdstGamma* aGamma = Gamma[iGamma];
     m_showerId1 = aGamma->getShowerId();
     m_px1 = aGamma->getpx();
     m_py1 = aGamma->getpy();
     m_pz1 = aGamma->getpz();
     CLHEP::Hep3Vector p3Gamma1(m_px1, m_py1, m_pz1);
+
+    //cout<<"Pi0   "<<m_px1<<" "<<m_py1<<" "<<m_pz1<<" "<<" "<<sqrt(m_px1*m_px1+m_py1*m_py1+m_pz1*m_pz1)<<endl;
 
     // gamma energy cut
     const double EGamma1 = p3Gamma1.mag();
@@ -147,17 +149,17 @@ void ECLRecPi0Module::event()
           StoreArray<MdstPi0> Pi0Array(m_MdstPi0Name);
           m_Pi0Num = Pi0Array->GetLast() + 1;
           new(Pi0Array->AddrAt(m_Pi0Num)) MdstPi0();
-          Pi0Array[m_Pi0Num]->setShowerId1(m_showerId1);
-          Pi0Array[m_Pi0Num]->setShowerId2(m_showerId2);
+          Pi0Array[m_Pi0Num]->setShower1(aGamma->getShower());
+          Pi0Array[m_Pi0Num]->setShower2(aGamma2->getShower());
 
-          Pi0Array[m_Pi0Num]->setenergy(m_pi0E);
-          Pi0Array[m_Pi0Num]->setpx(m_pi0px);
-          Pi0Array[m_Pi0Num]->setpy(m_pi0py);
-          Pi0Array[m_Pi0Num]->setpz(m_pi0pz);
+          Pi0Array[m_Pi0Num]->setenergy((float)m_pi0E);
+          Pi0Array[m_Pi0Num]->setpx((float)m_pi0px);
+          Pi0Array[m_Pi0Num]->setpy((float)m_pi0py);
+          Pi0Array[m_Pi0Num]->setpz((float)m_pi0pz);
 
-          Pi0Array[m_Pi0Num]->setmass(lv_rec.mag());
-          Pi0Array[m_Pi0Num]->setmassfit(m_pi0mass);
-          Pi0Array[m_Pi0Num]->setchi2(m_pi0chi2);
+          Pi0Array[m_Pi0Num]->setmass((float)lv_rec.mag());
+          Pi0Array[m_Pi0Num]->setmassfit((float)m_pi0mass);
+          Pi0Array[m_Pi0Num]->setchi2((float)m_pi0chi2);
 
           //cout << "Event " << m_nEvent << " Pi0 from Gamma " << m_showerId1 << " " << m_showerId2 << " " << m_pi0E << " " << m_pi0mass << endl;
 

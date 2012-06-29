@@ -115,44 +115,44 @@ namespace Belle2 {
       std::string m_MdstGammaName ;
       /**  Name of collection of MdstPi0.*/
       std::string m_MdstPi0Name ;
-      /**< CPU time     */
+      /** CPU time     */
       double m_timeCPU;
-      /**< Run number   */
+      /** Run number   */
       int    m_nRun;
-      /**< Event number */
+      /** Event number */
       int    m_nEvent;
-      /**< Mdst Gamma index */
+      /** Mdst Gamma index */
       int    m_GNum;
-      /**< Mdst Gamma index */
+      /** Mdst Gamma index */
       int    m_Pi0Num;
-      /**gamma1 information    */
+      /** gamma1 information    */
       int    m_showerId1 ;
-      /**gamma2 information    */
+      /** gamma2 information    */
       int    m_showerId2 ;
-      /**gamma1 information    */
+      /** gamma1 information    */
       double m_px1;
-      /**gamma1 information    */
+      /** gamma1 information    */
       double m_py1;
-      /**gamma1 information    */
+      /** gamma1 information    */
       double m_pz1;
-      /**gamma2 information    */
+      /** gamma2 information    */
       double m_px2;
-      /**gamma2 information    */
+      /** gamma2 information    */
       double m_py2;
-      /**gamma2 information    */
+      /** gamma2 information    */
       double m_pz2;
 
-      /**pi0 information    */
+      /** pi0 information    */
       double m_pi0E;
-      /**pi0 information    */
+      /** pi0 information    */
       double m_pi0px;
-      /**pi0 information    */
+      /** pi0 information    */
       double m_pi0py;
-      /**pi0 information    */
+      /** pi0 information    */
       double m_pi0pz;
-      /**pi0 information    */
+      /** pi0 information    */
       double m_pi0mass;
-      /**pi0 information    */
+      /** pi0 information    */
       double m_pi0chi2;
 
     };

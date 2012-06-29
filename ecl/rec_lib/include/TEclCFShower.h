@@ -33,7 +33,7 @@ namespace Belle2 {
       friend class TEclCFCR;
       friend class TEclCFShower;
     public:
-      //** define EclIdentifier is Identifier(int)
+      /** define EclIdentifier is Identifier(int) */
       typedef EclIdentifier Identifier;
 
       /** construct MEclCFShowerHA */

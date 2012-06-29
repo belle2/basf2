@@ -12,6 +12,9 @@
 #define MDSTGAMMA_H
 
 #include <framework/datastore/DataStore.h>
+#include "ecl/dataobjects/MdstShower.h"
+#include <math.h>
+
 
 #include <TObject.h>
 #include <TVector3.h>
@@ -22,45 +25,29 @@ namespace Belle2 {
   class MdstGamma : public TObject {
   public:
 
-
-    //! The shower id of this gamma.
-    int m_showerId;
-
-    //! The px of this gamma.
-    double m_px;
-
-    //! The py of this gamma.
-    double m_py;
-
-    //! The pz of this gamma.
-    double m_pz;
+    //! The shower point of this gamma.
+    MdstShower* m_aECLShower;
 
     //! The method to set shower id
-    void setShowerId(int showerId) { m_showerId = showerId; }
+    void setShower(MdstShower* aECLShower) { m_aECLShower = aECLShower;}
 
-    //! The method to set px
-    void setpx(double px) { m_px = px; }
-
-    //! The method to set py
-    void setpy(double py) { m_py = py; }
-
-    //! The method to set pz
-    void setpz(double pz) { m_pz = pz; }
+    //! The method to get shower
+    MdstShower* getShower() {return m_aECLShower; }
 
     //! The method to get shower id
-    int getShowerId() const { return m_showerId; }
+    int getShowerId() const { return  m_aECLShower->GetShowerId(); }
 
     //! The method to get px
-    double getpx() const { return m_px; }
+    float getpx() const { return   m_aECLShower->GetEnergy() * sin(m_aECLShower->GetTheta()) * cos(m_aECLShower->GetPhi()) ; }
 
     //! The method to get py
-    double getpy() const { return m_py; }
+    float getpy() const { return   m_aECLShower->GetEnergy() * sin(m_aECLShower->GetTheta()) * sin(m_aECLShower->GetPhi()) ; }
 
     //! The method to get pz
-    double getpz() const { return m_pz; }
+    float getpz() const { return   m_aECLShower->GetEnergy() * cos(m_aECLShower->GetTheta()); }
 
     //! The method to get momentum
-    TVector3 getp() const { TVector3 momentum(m_px, m_py, m_pz); return momentum ; }
+    TVector3 getp() const { TVector3 momentum(getpx(), getpy(), getpz()); return momentum ; }
 
 
     //! Empty constructor

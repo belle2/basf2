@@ -60,22 +60,22 @@ namespace Belle2 {
 
 
     protected:
-      /**< Input array name. */
+      /** Input array name. */
       std::string m_inColName;
-      /**< Output array name. */
+      /** Output array name. */
       std::string m_eclHitOutColName;
 
-      /**< The current number of created hits in an event. Used to fill the DataStore ECL array.*/
+      /** The current number of created hits in an event. Used to fill the DataStore ECL array.*/
       int m_hitNum;
 
 
     private:
 
-      /*!< CPU time     */
+      /** CPU time     */
       double m_timeCPU;
-      /*!< Run number   */
+      /** Run number   */
       int    m_nRun;
-      /*!< Event number */
+      /** Event number */
       int    m_nEvent;
 
     };

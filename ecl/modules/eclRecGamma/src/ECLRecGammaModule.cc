@@ -13,29 +13,15 @@
 #include <ecl/dataobjects/HitAssignmentECL.h>
 #include <ecl/dataobjects/MdstGamma.h>
 
-#include <ecl/geometry/ECLGeometryPar.h>
-#include <ecl/rec_lib/TEclCFCR.h>
-#include <ecl/rec_lib/TRecEclCF.h>
-#include <ecl/rec_lib/TRecEclCFParameters.h>
-#include <ecl/rec_lib/TEclCFShower.h>
-#include <ecl/rec_lib/TRecEclCF.h>
 
 #include <GFTrack.h>
 #include <GFTrackCand.h>
 #include <tracking/dataobjects/ExtRecoHit.h>
 
-
 #include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 
-#include<ctime>
-#include <iomanip>
-
-// ROOT
-#include <TVector3.h>
-
-#define PI 3.14159265358979323846
 
 using namespace std;
 using namespace Belle2;
@@ -122,16 +108,16 @@ void ECLRecGammaModule::event()
   readExtrapolate();//m_TrackCellId[i] =1 => Extrapolated cell
 
   for (int iShower = 0; iShower < hitNum; iShower++) {
-    MdstShower* aECLHit = eclRecShowerArray[iShower];
-    m_showerId = aECLHit->GetShowerId();
-    m_energy = aECLHit->GetEnergy();
-    m_theta = aECLHit->GetTheta();
+    MdstShower* aECLShower = eclRecShowerArray[iShower];
+    m_showerId = aECLShower->GetShowerId();
+    m_energy = aECLShower->GetEnergy();
+    m_theta = aECLShower->GetTheta();
     m_Theta  = m_theta * 180. / M_PI;
-    m_phi = aECLHit->GetPhi();
-    m_e9oe25 = aECLHit->GetE9oE25();
-    m_width  = aECLHit->GetWidth();
-    m_nhit      = aECLHit->GetNHits();
-    m_quality   = aECLHit->GetStatus();
+    m_phi = aECLShower->GetPhi();
+    m_e9oe25 = aECLShower->GetE9oE25();
+    m_width  = aECLShower->GetWidth();
+    m_nhit      = aECLShower->GetNHits();
+    m_quality   = aECLShower->GetStatus();
 //    cout<<m_showerId<<" "<<m_energy<<" "<<m_Theta<<" "<<m_phi<<endl;;
     if (m_quality != 0)continue;
     if (!goodGamma(m_Theta, m_energy, m_nhit, m_e9oe25, m_width, m_ecut, m_e925cut, m_widcut, m_nhcut))continue;
@@ -140,9 +126,9 @@ void ECLRecGammaModule::event()
 
     for (int iHA = 0; iHA < hANum; iHA++) {
 
-      HitAssignmentECL* aECLHit = eclHitAssignmentArray[iHA];
-      int m_HAShowerId = aECLHit->getShowerId();
-      int m_HAcellId = aECLHit->getCellId();
+      HitAssignmentECL* aECLShower = eclHitAssignmentArray[iHA];
+      int m_HAShowerId = aECLShower->getShowerId();
+      int m_HAcellId = aECLShower->getCellId();
 
       if (m_HAShowerId != m_showerId)continue;
       if (m_HAShowerId > m_showerId)break;
@@ -158,22 +144,23 @@ void ECLRecGammaModule::event()
       double py = m_energy * sin(m_theta) * sin(m_phi);
       double pz = m_energy * cos(m_theta);
 
+
       StoreArray<MdstGamma> gammaArray(m_MdstGammaName);
       m_GNum = gammaArray->GetLast() + 1;
       new(gammaArray->AddrAt(m_GNum)) MdstGamma();
-      gammaArray[m_GNum]->setShowerId(m_showerId);
-      gammaArray[m_GNum]->setpx(px);
-      gammaArray[m_GNum]->setpy(py);
-      gammaArray[m_GNum]->setpz(pz);
+      gammaArray[m_GNum]->setShower(aECLShower);
+
+//       cout<<"GAMMA "<<px<<" "<<py<<" "<<pz<<" "<<sqrt(px*px+py*py+pz*pz)<<endl;
       /*
+
             cout<<"Event  "<<m_nEvent<<" Gamma "<<m_showerId<<" "<<sqrt(px*px+py*py+pz*pz)<<" m_extMatch  "<<m_extMatch<<endl;
             cout<<"CellID ";
 
           for (int iHA = 0; iHA < hANum; iHA++) {
 
-            HitAssignmentECL* aECLHit = eclHitAssignmentArray[iHA];
-            int m_HAShowerId = aECLHit->getShowerId();
-            int m_HAcellId = aECLHit->getCellId();
+            HitAssignmentECL* aECLShower = eclHitAssignmentArray[iHA];
+            int m_HAShowerId = aECLShower->getShowerId();
+            int m_HAcellId = aECLShower->getCellId();
             if(m_showerId==m_HAShowerId)cout<<m_HAcellId<<" ";
           }//for HA hANum
            cout<<endl;

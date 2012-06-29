@@ -59,11 +59,11 @@ ECLRecCRModule::ECLRecCRModule() : Module()
 
   //output
   addParam("ECLRecCROutput", m_eclMdstShowerName,
-           "//Output of this module//(EventNo,CRId,cellId)", string("mdstShower"));
+           "//Output of this module", string("mdstShower"));
 
 
   addParam("ECLHitAssignmentinput", m_eclHitAssignmentName,
-           "//input of this module//(EventNo,CRId,cellId)", string("ECLHitAssignment"));
+           "//Output of this module", string("ECLHitAssignment"));
 
 
 //  addParam("RandomSeed", m_randSeed, "User-supplied random seed; Default 0 for ctime", (unsigned int)(0));
@@ -108,10 +108,10 @@ void ECLRecCRModule::event()
   int hitNum = eclDigiArray->GetEntriesFast();
   TEclEnergyHit ss;
   for (int ii = 0; ii < hitNum; ii++) {
-    DigiECL* aECLHit = eclDigiArray[ii];
-    float FitEnergy    = (aECLHit->getAmp()) / 20000.;//ADC count to GeV
+    DigiECL* aECLDigi = eclDigiArray[ii];
+    float FitEnergy    = (aECLDigi->getAmp()) / 20000.;//ADC count to GeV
 
-    int cId          =  aECLHit->getCellId();
+    int cId          = (aECLDigi->getCellId() - 1);
     if (FitEnergy < 0.) {continue;}
 
     cf.Accumulate(m_nEvent, FitEnergy, cId);
@@ -122,11 +122,8 @@ void ECLRecCRModule::event()
 
   int nShower = 0;
 
-//  cout<<"cf.CRs() "<<cf.CRs().size()<<endl;
   for (std::vector<TEclCFCR>::const_iterator iCR = cf.CRs().begin();
        iCR != cf.CRs().end(); ++iCR) {
-//      cout<<"CR Energy: "<<iCR->Energy()<<" Mass:" <<iCR->Mass()<<" Width:"<<iCR->Width()<<" nshower  "<<iCR->Showers().size()<<endl;
-    /// it should be gauranteed that the shower_id is in order in each cr
 
 
     for (EclCFShowerMap::const_iterator iShower = iCR->Showers().begin(); iShower != iCR->Showers().end(); ++iShower) {
@@ -149,32 +146,30 @@ void ECLRecCRModule::event()
 //        cout<<iHA->Id()<<" ";
       }
 //        cout<<endl;
+
       StoreArray<MdstShower> eclRecShowerArray(m_eclMdstShowerName);
       m_hitNum = eclRecShowerArray->GetLast() + 1;
       new(eclRecShowerArray->AddrAt(m_hitNum)) MdstShower();
       eclRecShowerArray[m_hitNum]->setShowerId(nShower);
-      eclRecShowerArray[m_hitNum]->setEnergy((*iShower).second.Energy());
-      eclRecShowerArray[m_hitNum]->setTheta((*iShower).second.Theta());
-      eclRecShowerArray[m_hitNum]->setPhi((*iShower).second.Phi());
-      eclRecShowerArray[m_hitNum]->setR((*iShower).second.Distance());
-      eclRecShowerArray[m_hitNum]->setMass((*iShower).second.Mass());
-      eclRecShowerArray[m_hitNum]->setWidth((*iShower).second.Width());
-      eclRecShowerArray[m_hitNum]->setE9oE25((*iShower).second.E9oE25());
-      eclRecShowerArray[m_hitNum]->setE9oE25unf((*iShower).second.E9oE25unf());
+      eclRecShowerArray[m_hitNum]->setEnergy((float)(*iShower).second.Energy());
+      eclRecShowerArray[m_hitNum]->setTheta((float)(*iShower).second.Theta());
+      eclRecShowerArray[m_hitNum]->setPhi((float)(*iShower).second.Phi());
+      eclRecShowerArray[m_hitNum]->setR((float)(*iShower).second.Distance());
+      eclRecShowerArray[m_hitNum]->setMass((float)(*iShower).second.Mass());
+      eclRecShowerArray[m_hitNum]->setWidth((float)(*iShower).second.Width());
+      eclRecShowerArray[m_hitNum]->setE9oE25((float)(*iShower).second.E9oE25());
+      eclRecShowerArray[m_hitNum]->setE9oE25unf((float)(*iShower).second.E9oE25unf());
       eclRecShowerArray[m_hitNum]->setNHits((*iShower).second.NHits());
       eclRecShowerArray[m_hitNum]->setStatus((*iShower).second.Status());
       eclRecShowerArray[m_hitNum]->setGrade((*iShower).second.Grade());
-      eclRecShowerArray[m_hitNum]->setUncEnergy((*iShower).second.UncEnergy());
+      eclRecShowerArray[m_hitNum]->setUncEnergy((float)(*iShower).second.UncEnergy());
       double sEnergy = (*iShower).second.Energy();
       double sTheta = (*iShower).second.Theta();
 
-      double ErrorMatrix[6] = {
-        squ(errorE(sEnergy)),
-        errorE(sEnergy)* errorPhi(sEnergy, sTheta),
-        errorPhi(sEnergy, sTheta)* errorPhi(sEnergy, sTheta),
-        errorE(sEnergy)* errorTheta(sEnergy, sTheta),
-        errorPhi(sEnergy, sTheta)* errorTheta(sEnergy, sTheta),
-        errorTheta(sEnergy, sTheta)* errorTheta(sEnergy, sTheta)
+      float ErrorMatrix[3] = {
+        errorE(sEnergy),
+        errorTheta(sEnergy, sTheta),
+        errorPhi(sEnergy, sTheta)
       };
       eclRecShowerArray[m_hitNum]->setError(ErrorMatrix);
 
@@ -202,9 +197,9 @@ void ECLRecCRModule::event()
 
       }//vector<TEclCFCR>
       for (int ia = 0; ia < hitNum; ia++) {
-        DigiECL* aECLHit = eclDigiArray[ia];
-        float FitEnergy    = (aECLHit->getAmp()) / 20000;//ADC count to GeV
-        int cId          =  aECLHit->getCellId();
+        DigiECL* aECLDigi = eclDigiArray[ia];
+        float FitEnergy    = (aECLDigi->getAmp()) / 20000;//ADC count to GeV
+        int cId          =  aECLDigi->getCellId();
         ECLGeometryPar* eclp = ECLGeometryPar::Instance();
         TVector3 PosCell =  eclp->GetCrystalPos(cId);
         eclp->Mapping(cId);

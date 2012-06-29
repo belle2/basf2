@@ -178,7 +178,7 @@ void ECLDigiModule::event()
         StoreArray<DigiECL> eclDigiArray(m_eclDigiCollectionName);
         m_hitNum1 = eclDigiArray->GetLast() + 1;
         new(eclDigiArray->AddrAt(m_hitNum1)) DigiECL();
-        eclDigiArray[m_hitNum1]->setCellId(iECLCell);
+        eclDigiArray[m_hitNum1]->setCellId(iECLCell + 1);
         eclDigiArray[m_hitNum1]->setAmp(energyFit[iECLCell]);//E (GeV) = energyFit/20000;
         eclDigiArray[m_hitNum1]->setTimeFit(tFit[iECLCell]);//t0 (us)= (1520 - m_ltr)*24.*12/508/(3072/2) ;
         eclDigiArray[m_hitNum1]->setQuality(qualityFit[iECLCell]);
